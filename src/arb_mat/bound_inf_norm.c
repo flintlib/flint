@@ -45,4 +45,3 @@ arb_mat_bound_inf_norm(mag_t b, const arb_mat_t A)
     mag_clear(s);
     mag_clear(t);
 }
-

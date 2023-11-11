@@ -108,4 +108,3 @@ void fmpq_poly_div(fmpq_poly_t Q,
 
     _fmpq_poly_set_length(Q, lenQ);
 }
-

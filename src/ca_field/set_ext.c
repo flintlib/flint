@@ -19,4 +19,3 @@ ca_field_set_ext(ca_field_t K, slong i, ca_ext_srcptr x, ca_ctx_t ctx)
     CA_FIELD_EXT_ELEM(K, i) = (ca_ext_ptr) x;
     CA_FIELD_HASH(K) = CA_FIELD_HASH(K) * 100003 + CA_EXT_HASH(x);
 }
-

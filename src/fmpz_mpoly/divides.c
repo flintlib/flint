@@ -52,4 +52,3 @@ int fmpz_mpoly_divides(
 
     return divides;
 }
-

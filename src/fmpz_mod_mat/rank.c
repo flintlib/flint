@@ -34,4 +34,3 @@ slong fmpz_mod_mat_rank(const fmpz_mod_mat_t A)
     fmpz_mod_mat_clear(tmp);
     return rank;
 }
-

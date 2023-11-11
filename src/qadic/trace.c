@@ -77,4 +77,3 @@ void qadic_trace(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
             fmpz_clear(pN);
     }
 }
-

@@ -51,4 +51,3 @@ nmod_poly_discriminant(const nmod_poly_t f)
     else
        return _nmod_poly_discriminant(f->coeffs, len, f->mod);
 }
-

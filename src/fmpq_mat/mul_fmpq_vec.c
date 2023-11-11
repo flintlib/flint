@@ -93,4 +93,3 @@ void fmpq_mat_mul_fmpq_vec_ptr(
 
     TMP_END;
 }
-

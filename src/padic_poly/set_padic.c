@@ -45,4 +45,3 @@ void padic_poly_set_padic(padic_poly_t poly,
         }
     }
 }
-

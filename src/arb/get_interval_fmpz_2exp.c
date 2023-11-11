@@ -85,4 +85,3 @@ arb_get_interval_fmpz_2exp(fmpz_t a, fmpz_t b, fmpz_t exp, const arb_t x)
         fmpz_clear(tmp);
     }
 }
-

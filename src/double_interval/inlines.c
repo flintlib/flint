@@ -11,4 +11,3 @@
 
 #define DOUBLE_INTERVAL_INLINES_C
 #include "double_interval.h"
-

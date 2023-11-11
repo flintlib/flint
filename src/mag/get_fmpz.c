@@ -27,4 +27,3 @@ mag_get_fmpz_lower(fmpz_t res, const mag_t x)
     arf_init_set_mag_shallow(t, x);
     arf_get_fmpz(res, t, ARF_RND_DOWN);
 }
-

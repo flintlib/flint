@@ -167,4 +167,3 @@ arb_mul_fmpz(arb_t z, const arb_t x, const fmpz_t y, slong prec)
         arf_clear(t);
     }
 }
-

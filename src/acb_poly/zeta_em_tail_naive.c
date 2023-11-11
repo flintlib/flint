@@ -92,4 +92,3 @@ _acb_poly_zeta_em_tail_naive(acb_ptr sum, const acb_t s, const acb_t Na, acb_src
     arb_clear(x);
     fmpz_clear(c);
 }
-

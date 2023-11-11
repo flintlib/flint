@@ -71,4 +71,3 @@ arb_mat_lu_classical(slong * P, arb_mat_t LU, const arb_mat_t A, slong prec)
 
     return result;
 }
-

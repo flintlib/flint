@@ -76,4 +76,3 @@ unity_zp_aut_inv(unity_zp f, const unity_zp g, ulong x)
     fmpz_clear(f_coeff);
     fmpz_clear(g_coeff);
 }
-

@@ -1315,4 +1315,3 @@ int fmpz_mod_mpolyn_interp_mcrt_sm_mpoly(
     *lastdeg = lastlen - 1;
     return changed;
 }
-

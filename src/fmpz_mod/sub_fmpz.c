@@ -79,4 +79,3 @@ void fmpz_mod_si_sub(fmpz_t a, slong b, const fmpz_t c,
 
     FLINT_ASSERT(fmpz_mod_is_canonical(a, ctx));
 }
-

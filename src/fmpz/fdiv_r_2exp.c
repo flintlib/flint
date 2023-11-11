@@ -48,4 +48,3 @@ void fmpz_fdiv_r_2exp(fmpz_t f, const fmpz_t g, ulong exp)
         _fmpz_demote_val(f);  /* division may make value small */
     }
 }
-

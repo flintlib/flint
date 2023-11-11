@@ -48,4 +48,3 @@ acb_hypgeom_pfq_direct(acb_t res, acb_srcptr a, slong p, acb_srcptr b, slong q,
     mag_clear(err);
     mag_clear(C);
 }
-

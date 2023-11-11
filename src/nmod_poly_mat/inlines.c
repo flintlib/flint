@@ -13,4 +13,3 @@
 
 #include "flint.h"
 #include "nmod_poly_mat.h"
-

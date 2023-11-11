@@ -100,4 +100,3 @@ arb_get_unique_fmpz(fmpz_t z, const arb_t x)
         return res;
     }
 }
-

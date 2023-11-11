@@ -226,4 +226,3 @@ arith_stirling_number_1_vec(fmpz * row, ulong n, slong klen)
     for (k = (n + 1) % 2; k < klen; k += 2)
         fmpz_neg(row + k, row + k);
 }
-

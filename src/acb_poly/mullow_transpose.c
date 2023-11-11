@@ -118,4 +118,3 @@ acb_poly_mullow_transpose(acb_poly_t res, const acb_poly_t poly1,
     _acb_poly_set_length(res, n);
     _acb_poly_normalise(res);
 }
-

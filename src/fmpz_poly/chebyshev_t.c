@@ -56,4 +56,3 @@ fmpz_poly_chebyshev_t(fmpz_poly_t poly, ulong n)
     _fmpz_poly_chebyshev_t(poly->coeffs, n);
     _fmpz_poly_set_length(poly, n + 1);
 }
-

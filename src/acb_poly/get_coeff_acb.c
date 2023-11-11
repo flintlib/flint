@@ -19,4 +19,3 @@ acb_poly_get_coeff_acb(acb_t x, const acb_poly_t poly, slong n)
     else
         acb_zero(x);
 }
-

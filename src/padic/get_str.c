@@ -200,4 +200,3 @@ char * padic_get_str(char *str, const padic_t op, const padic_ctx_t ctx)
 {
     return _padic_get_str(str, op, ctx->p, ctx->mode);
 }
-

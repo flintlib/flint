@@ -51,4 +51,3 @@ acb_hypgeom_rising(acb_t y, const acb_t x, const acb_t n, slong prec)
         acb_clear(t);
     }
 }
-

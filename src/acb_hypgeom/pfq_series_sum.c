@@ -79,4 +79,3 @@ acb_hypgeom_pfq_series_sum(acb_poly_t s, acb_poly_t t,
     acb_hypgeom_pfq_series_sum_forward(s, t, a, p, b, q, z,
         regularized, n, len, prec);
 }
-

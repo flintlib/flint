@@ -47,4 +47,3 @@ nmod_poly_equal_trunc(const nmod_poly_t poly1, const nmod_poly_t poly2, slong n)
 
     return 1;
 }
-

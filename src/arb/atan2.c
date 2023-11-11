@@ -109,4 +109,3 @@ arb_atan2(arb_t r, const arb_t b, const arb_t a, slong prec)
         mag_const_pi(arb_radref(r));
     }
 }
-

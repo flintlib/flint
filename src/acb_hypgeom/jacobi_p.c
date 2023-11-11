@@ -117,4 +117,3 @@ acb_hypgeom_jacobi_p(acb_t res, const acb_t n, const acb_t a, const acb_t b,
     acb_clear(v);
     acb_clear(w);
 }
-

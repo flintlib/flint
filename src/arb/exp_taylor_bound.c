@@ -76,4 +76,3 @@ _arb_exp_taylor_bound(slong mag, slong prec)
             return i;
     }
 }
-

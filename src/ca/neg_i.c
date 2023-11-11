@@ -17,4 +17,3 @@ ca_neg_i(ca_t x, ca_ctx_t ctx)
     ca_i(x, ctx);
     ca_neg(x, x, ctx);
 }
-

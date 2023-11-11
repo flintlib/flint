@@ -323,4 +323,3 @@ int arf_complex_sqr(arf_t e, arf_t f,
         return inex1 | (inex2 << 1);
     }
 }
-

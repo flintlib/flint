@@ -36,4 +36,3 @@ void nmod_mpoly_factor_append_fmpz(
     fmpz_set(f->exp + i, e);
     f->num = i + 1;
 }
-

@@ -519,4 +519,3 @@ int fmpz_mpoly_hlift(
     else
         return _hlift_quintic(m, f, r, alpha, A, degs, ctx);
 }
-

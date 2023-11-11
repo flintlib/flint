@@ -382,4 +382,3 @@ slong nmod_mpolyd_length(const nmod_mpolyd_t A)
 
     return i;
 }
-

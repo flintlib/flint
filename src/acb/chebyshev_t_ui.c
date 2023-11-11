@@ -55,4 +55,3 @@ acb_chebyshev_t_ui(acb_t y, ulong n, const acb_t x, slong prec)
         acb_sub_ui(y, y, 1, prec);
     }
 }
-

@@ -17,4 +17,3 @@ ca_zero(ca_t x, ca_ctx_t ctx)
     _ca_make_fmpq(x, ctx);
     fmpq_zero(CA_FMPQ(x));
 }
-

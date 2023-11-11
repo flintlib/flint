@@ -27,4 +27,3 @@ int fmpz_mod_mpoly_discriminant(fmpz_mod_mpoly_t R, const fmpz_mod_mpoly_t A,
 
     return success;
 }
-

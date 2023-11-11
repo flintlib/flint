@@ -361,4 +361,3 @@ void fmpq_mpoly_from_univar(fmpq_mpoly_t A, const fmpq_mpoly_univar_t B,
 
     fmpq_mpoly_from_univar_bits(A, bits, B, var, ctx);
 }
-

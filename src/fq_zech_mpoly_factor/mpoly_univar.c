@@ -28,4 +28,3 @@ int fq_zech_mpoly_univar_content_mpoly(
 
     return 1;
 }
-

@@ -76,4 +76,3 @@ qqbar_inv(qqbar_t res, const qqbar_t x)
         acb_clear(t);
     }
 }
-

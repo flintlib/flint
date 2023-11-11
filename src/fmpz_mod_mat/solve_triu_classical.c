@@ -70,4 +70,3 @@ void fmpz_mod_mat_solve_triu_classical(fmpz_mod_mat_t X,
 
     fmpz_mod_ctx_clear(ctx);
 }
-

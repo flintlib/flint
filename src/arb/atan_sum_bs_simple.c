@@ -66,4 +66,3 @@ _arb_atan_sum_bs_simple(fmpz_t T, fmpz_t Q, flint_bitcnt_t * Qexp,
     bsplit(P, T, Q, Qexp, x, r, 0, N);
     fmpz_clear(P);
 }
-

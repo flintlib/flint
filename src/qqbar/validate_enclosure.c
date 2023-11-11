@@ -194,4 +194,3 @@ _qqbar_validate_existence_uniqueness(acb_t res, const fmpz_poly_t poly, const ac
         return ans;
     }
 }
-

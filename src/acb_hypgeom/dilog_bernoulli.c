@@ -100,4 +100,3 @@ acb_hypgeom_dilog_bernoulli(acb_t res, const acb_t z, slong prec)
     mag_clear(m);
     mag_clear(err);
 }
-

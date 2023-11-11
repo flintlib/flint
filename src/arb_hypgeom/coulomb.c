@@ -45,4 +45,3 @@ arb_hypgeom_coulomb(arb_t F, arb_t G, const arb_t l, const arb_t eta, const arb_
 
     _acb_vec_clear(tmp, 5);
 }
-

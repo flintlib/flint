@@ -30,4 +30,3 @@ arb_poly_majorant(arb_poly_t res, const arb_poly_t poly, slong prec)
     _arb_poly_majorant(res->coeffs, poly->coeffs, poly->length, prec);
     _arb_poly_set_length(res, poly->length);
 }
-

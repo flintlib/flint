@@ -68,4 +68,3 @@ void fq_nmod_randtest_not_zero(fq_nmod_t rop, flint_rand_t state, const fq_nmod_
     if (fq_nmod_is_zero(rop, ctx))
         fq_nmod_one(rop, ctx);
 }
-

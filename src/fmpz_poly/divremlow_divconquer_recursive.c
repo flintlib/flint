@@ -137,4 +137,3 @@ _fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * QB,
 
     return 1;
 }
-

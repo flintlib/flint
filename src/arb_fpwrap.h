@@ -334,4 +334,3 @@ int arb_fpwrap_cdouble_modular_delta(complex_double * res, complex_double tau, i
 #endif
 
 #endif
-

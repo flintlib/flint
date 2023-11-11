@@ -38,4 +38,3 @@ acb_get_mag_lower(mag_t z, const acb_t x)
         mag_clear(t);
     }
 }
-

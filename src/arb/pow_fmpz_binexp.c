@@ -77,4 +77,3 @@ arb_pow_fmpz_binexp(arb_t y, const arb_t b, const fmpz_t e, slong prec)
             arb_mul(y, y, b, wp);
     }
 }
-

@@ -90,4 +90,3 @@ fmpz_poly_pseudo_rem_cohen(fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t
     else
         _fmpz_poly_set_length(R, lenr);
 }
-

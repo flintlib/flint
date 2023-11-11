@@ -93,4 +93,3 @@ fmpz_mod_poly_pow_trunc(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly,
     _fmpz_mod_poly_set_length(res, trunc);
     _fmpz_mod_poly_normalise(res);
 }
-

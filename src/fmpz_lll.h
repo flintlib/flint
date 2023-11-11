@@ -165,4 +165,3 @@ void fmpz_lll_storjohann_ulll(fmpz_mat_t FM, slong new_size, const fmpz_lll_t fl
 #endif
 
 #endif
-

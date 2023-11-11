@@ -78,4 +78,3 @@ arb_poly_pow_ui_trunc_binexp(arb_poly_t res,
         }
     }
 }
-

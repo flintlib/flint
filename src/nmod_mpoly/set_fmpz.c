@@ -42,4 +42,3 @@ void nmod_mpoly_set_fmpz(
 {
     nmod_mpoly_set_ui(A, fmpz_get_nmod(c, ctx->mod), ctx);
 }
-

@@ -83,4 +83,3 @@ acb_elliptic_rg(acb_t res, const acb_t x, const acb_t y, const acb_t z,
         _acb_elliptic_rg(res, x, y, z, flags, prec);
     }
 }
-

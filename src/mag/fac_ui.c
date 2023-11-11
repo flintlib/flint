@@ -582,4 +582,3 @@ mag_rfac_ui(mag_t z, ulong n)
         MAG_MAN(z) = MAG_ONE_HALF;
     }
 }
-

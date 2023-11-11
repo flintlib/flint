@@ -17,4 +17,3 @@ _acb_poly_powsum_one_series_sieved(acb_ptr z, const acb_t s, slong n, slong len,
 {
     acb_dirichlet_powsum_sieved(z, s, n, len, prec);
 }
-

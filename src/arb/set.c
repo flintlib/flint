@@ -50,4 +50,3 @@ arb_set(arb_t x, const arb_t y)
         mag_set(arb_radref(x), arb_radref(y));
     }
 }
-

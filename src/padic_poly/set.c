@@ -54,4 +54,3 @@ void padic_poly_set(padic_poly_t poly1,
         }
     }
 }
-

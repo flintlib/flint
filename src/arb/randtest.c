@@ -103,4 +103,3 @@ arb_randtest_special(arb_t x, flint_rand_t state, slong prec, slong mag_bits)
             break;
     }
 }
-

@@ -235,4 +235,3 @@ arb_set_str(arb_t res, const char * inp, slong prec)
     flint_free(buf);
     return error;
 }
-

@@ -174,4 +174,3 @@ void fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz_mod_poly_t G,
         }
     }
 }
-

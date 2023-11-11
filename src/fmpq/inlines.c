@@ -40,4 +40,3 @@ int fmpq_equal_fmpz(fmpq_t q, fmpz_t n)
 {
    return fmpz_equal(fmpq_numref(q), n) && q->den == WORD(1);
 }
-

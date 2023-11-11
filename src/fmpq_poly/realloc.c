@@ -45,4 +45,3 @@ void fmpq_poly_realloc(fmpq_poly_t poly, slong alloc)
 
     poly->alloc = alloc;
 }
-

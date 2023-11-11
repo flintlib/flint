@@ -16,4 +16,3 @@ void flint_mpq_clear_readonly(mpq_t z)
     flint_mpz_clear_readonly(mpq_numref(z));
     flint_mpz_clear_readonly(mpq_denref(z));
 }
-

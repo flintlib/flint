@@ -1303,4 +1303,3 @@ void sd_ifft_trunc(
         sd_ifft_base_1(Q, I, j);
     }
 }
-

@@ -16,4 +16,3 @@ ca_swap(ca_t x, ca_t y, ca_ctx_t ctx)
 {
     FLINT_SWAP(ca_struct, *x, *y);
 }
-

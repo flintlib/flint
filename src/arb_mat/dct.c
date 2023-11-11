@@ -57,4 +57,3 @@ arb_mat_dct(arb_mat_t res, int kind, slong prec)
     acb_clear(t);
     arb_clear(v);
 }
-

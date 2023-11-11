@@ -61,4 +61,3 @@ arf_get_mag_lower(mag_t y, const arf_t x)
         _fmpz_set_fast(MAG_EXPREF(y), ARF_EXPREF(x));
     }
 }
-

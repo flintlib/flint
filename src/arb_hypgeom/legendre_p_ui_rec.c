@@ -147,4 +147,3 @@ arb_hypgeom_legendre_p_ui_rec(arb_t res, arb_t res_prime, ulong n, const arb_t x
     mag_clear(err2);
     mag_clear(xrad);
 }
-

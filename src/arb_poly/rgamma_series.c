@@ -197,4 +197,3 @@ arb_poly_rgamma_series(arb_poly_t res, const arb_poly_t f, slong n, slong prec)
         _arb_poly_normalise(res);
     }
 }
-

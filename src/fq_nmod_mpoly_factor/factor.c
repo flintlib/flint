@@ -1033,4 +1033,3 @@ int fq_nmod_mpoly_factor_zippel(
 {
     return fq_nmod_mpoly_factor_algo(f, A, ctx, MPOLY_FACTOR_USE_ZIP);
 }
-

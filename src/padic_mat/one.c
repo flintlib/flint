@@ -25,4 +25,3 @@ void padic_mat_one(padic_mat_t A)
         A->val = 0;
     }
 }
-

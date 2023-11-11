@@ -60,4 +60,3 @@ int arb_calc_newton_step(arb_t xnew, arb_calc_func_t func,
 
     return result;
 }
-

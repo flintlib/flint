@@ -155,4 +155,3 @@ TEMPLATE(T, poly_sqrt)(TEMPLATE(T, poly_t) b, const TEMPLATE(T, poly_t) a, TEMPL
 }
 
 #endif
-

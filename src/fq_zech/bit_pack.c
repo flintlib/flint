@@ -22,4 +22,3 @@ fq_zech_bit_pack(fmpz_t f, const fq_zech_t op, flint_bitcnt_t bit_size,
     fq_nmod_bit_pack(f, opn, bit_size, ctx->fq_nmod_ctx);
     fq_nmod_clear(opn, ctx->fq_nmod_ctx);
 }
-

@@ -130,4 +130,3 @@ void qadic_ctx_init(qadic_ctx_t ctx,
     fmpz_mod_poly_clear(poly, ctxp);
     fmpz_mod_ctx_clear(ctxp);
 }
-

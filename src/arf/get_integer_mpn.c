@@ -64,4 +64,3 @@ _arf_get_integer_mpn(mp_ptr y, mp_srcptr x, mp_size_t xn, slong exp)
         }
     }
 }
-

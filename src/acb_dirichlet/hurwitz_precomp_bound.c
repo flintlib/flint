@@ -85,4 +85,3 @@ acb_dirichlet_hurwitz_precomp_bound(mag_t res, const acb_t s,
     mag_clear(TK);
     mag_clear(C);
 }
-

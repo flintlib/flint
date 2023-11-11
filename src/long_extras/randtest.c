@@ -54,4 +54,3 @@ mp_limb_signed_t z_randtest_not_zero(flint_rand_t state)
     while ((z = z_randtest(state)) == 0) ;
     return z;
 }
-

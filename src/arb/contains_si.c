@@ -22,4 +22,3 @@ arb_contains_si(const arb_t x, slong y)
     arf_clear(t);
     return ans;
 }
-

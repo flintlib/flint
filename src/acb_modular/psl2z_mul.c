@@ -44,4 +44,3 @@ psl2z_mul(psl2z_t h, const psl2z_t f, const psl2z_t g)
         fmpz_neg(&h->d, &h->d);
     }
 }
-

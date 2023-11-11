@@ -60,4 +60,3 @@ void fmpz_mod_mpoly_push_term_si_ui(
     fmpz_mod_set_si(A->coeffs + A->length - 1, c, ctx->ffinfo);
 }
 
-

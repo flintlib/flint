@@ -171,4 +171,3 @@ _arb_get_mpn_fixed_mod_log2(mp_ptr w, fmpz_t q, mp_limb_t * error,
         return 1;
     }
 }
-

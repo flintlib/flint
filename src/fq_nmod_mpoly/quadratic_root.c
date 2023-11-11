@@ -532,4 +532,3 @@ int fq_nmod_mpoly_quadratic_root(
 
     return success;
 }
-

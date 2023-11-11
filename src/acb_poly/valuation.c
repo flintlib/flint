@@ -22,4 +22,3 @@ acb_poly_valuation(const acb_poly_t poly)
 
     return -1;
 }
-

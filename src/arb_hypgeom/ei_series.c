@@ -78,4 +78,3 @@ arb_hypgeom_ei_series(arb_poly_t g, const arb_poly_t h, slong len, slong prec)
     _arb_poly_set_length(g, len);
     _arb_poly_normalise(g);
 }
-

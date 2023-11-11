@@ -19,4 +19,3 @@ qqbar_init(qqbar_t res)
     fmpz_poly_set_coeff_si(QQBAR_POLY(res), 1, 1);
     acb_init(QQBAR_ENCLOSURE(res));
 }
-

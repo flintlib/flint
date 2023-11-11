@@ -44,4 +44,3 @@ arb_hypgeom_airy(arb_t ai, arb_t aip, arb_t bi, arb_t bip, const arb_t z, slong 
 
     acb_clear(tmp + 4);
 }
-

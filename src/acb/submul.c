@@ -33,4 +33,3 @@ acb_submul(acb_t z, const acb_t x, const acb_t y, slong prec)
         acb_clear(t);
     }
 }
-

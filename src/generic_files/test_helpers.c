@@ -35,4 +35,3 @@ double flint_test_multiplier(void)
 
     return _flint_test_multiplier;
 }
-

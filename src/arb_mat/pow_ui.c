@@ -60,4 +60,3 @@ arb_mat_pow_ui(arb_mat_t B, const arb_mat_t A, ulong exp, slong prec)
         arb_mat_clear(U);
     }
 }
-

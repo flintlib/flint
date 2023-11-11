@@ -41,4 +41,3 @@ ulong arb_fmpz_poly_deflation(const fmpz_poly_t input)
 
     return deflation;
 }
-

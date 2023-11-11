@@ -63,4 +63,3 @@ acb_tan(acb_t r, const acb_t z, slong prec)
         acb_clear(t);
     }
 }
-

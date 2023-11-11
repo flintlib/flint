@@ -35,4 +35,3 @@ arb_cot_pi(arb_t y, const arb_t x, slong prec)
         arb_clear(u);
     }
 }
-

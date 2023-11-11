@@ -24,4 +24,3 @@ arb_get_interval_mpfr(mpfr_t a, mpfr_t b, const arb_t x)
     arf_get_mpfr(b, t, MPFR_RNDU);
     arf_clear(t);
 }
-

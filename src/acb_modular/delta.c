@@ -74,4 +74,3 @@ acb_modular_delta(acb_t z, const acb_t tau, slong prec)
     acb_clear(t4);
     acb_clear(q);
 }
-

@@ -31,4 +31,3 @@ void fmpq_mat_transpose(fmpq_mat_t rop, const fmpq_mat_t op)
                          fmpq_mat_entry(op, j, i));
     }
 }
-

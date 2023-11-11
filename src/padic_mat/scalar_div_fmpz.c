@@ -58,4 +58,3 @@ void padic_mat_scalar_div_fmpz(padic_mat_t B,
         fmpz_clear(d);
     }
 }
-

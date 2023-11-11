@@ -20,4 +20,3 @@ acb_hypgeom_shi(acb_t res, const acb_t z, slong prec)
     acb_mul_onei(res, res);
     acb_neg(res, res);
 }
-

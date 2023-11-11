@@ -20,4 +20,3 @@ arf_frexp(arf_t man, fmpz_t exp, const arf_t x)
     if (!arf_is_special(man))
         fmpz_swap(exp, ARF_EXPREF(man));
 }
-

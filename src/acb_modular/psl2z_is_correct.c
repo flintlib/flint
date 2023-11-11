@@ -30,4 +30,3 @@ psl2z_is_correct(const psl2z_t g)
     fmpz_clear(t);
     return res;
 }
-

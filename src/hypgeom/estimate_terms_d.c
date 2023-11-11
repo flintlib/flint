@@ -59,4 +59,3 @@ hypgeom_estimate_terms(const mag_t z, int r, slong prec)
 
     return y;
 }
-

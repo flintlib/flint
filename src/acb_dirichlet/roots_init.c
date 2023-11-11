@@ -105,4 +105,3 @@ acb_dirichlet_roots_init(acb_dirichlet_roots_t t, ulong order, slong num, slong 
         t->Z = NULL;
     }
 }
-

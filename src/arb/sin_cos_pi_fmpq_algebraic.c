@@ -188,4 +188,3 @@ _arb_sin_cos_pi_fmpq_algebraic(arb_t s, arb_t c, ulong p, ulong q, slong prec)
         arb_sqrt(s, s, prec);
     }
 }
-

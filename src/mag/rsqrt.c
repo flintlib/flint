@@ -114,4 +114,3 @@ mag_rsqrt_lower(mag_t y, const mag_t x)
         }
     }
 }
-

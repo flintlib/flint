@@ -45,4 +45,3 @@ arb_hypgeom_rising_ui_jet(arb_ptr res, const arb_t x, ulong n, slong len, slong 
         }
     }
 }
-

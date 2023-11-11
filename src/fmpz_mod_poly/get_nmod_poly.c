@@ -23,4 +23,3 @@ void fmpz_mod_poly_get_nmod_poly(nmod_poly_t f, const fmpz_mod_poly_t g)
     for (i = 0; i < g->length; i++)
        f->coeffs[i] = fmpz_get_ui(g->coeffs + i);
 }
-

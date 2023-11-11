@@ -53,4 +53,3 @@ acb_modular_is_in_fundamental_domain(const acb_t z, const arf_t tol, slong prec)
     arb_clear(t);
     return 1;
 }
-

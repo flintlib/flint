@@ -75,4 +75,3 @@ ca_poly_pow_ui_trunc(ca_poly_t res,
         }
     }
 }
-

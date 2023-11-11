@@ -72,4 +72,3 @@ acb_poly_exp_pi_i_series(acb_poly_t f, const acb_poly_t h, slong n, slong prec)
     _acb_poly_set_length(f, n);
     _acb_poly_normalise(f);
 }
-

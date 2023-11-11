@@ -22,4 +22,3 @@ void fmpq_mat_scalar_mul_fmpz(fmpq_mat_t rop,
             fmpq_mul_fmpz(fmpq_mat_entry(rop, i, j),
                           fmpq_mat_entry(op, i, j), x);
 }
-

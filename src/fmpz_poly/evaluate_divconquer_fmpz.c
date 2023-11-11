@@ -90,4 +90,3 @@ fmpz_poly_evaluate_divconquer_fmpz(fmpz_t res, const fmpz_poly_t poly,
     else
         _fmpz_poly_evaluate_divconquer_fmpz(res, poly->coeffs, poly->length, a);
 }
-

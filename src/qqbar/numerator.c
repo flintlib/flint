@@ -27,4 +27,3 @@ qqbar_numerator(qqbar_t res, const qqbar_t y)
         fmpz_clear(t);
     }
 }
-

@@ -19,4 +19,3 @@ qqbar_conjugates(qqbar_ptr res, const qqbar_t x)
     else
         qqbar_roots_fmpz_poly(res, QQBAR_POLY(x), QQBAR_ROOTS_IRREDUCIBLE);
 }
-

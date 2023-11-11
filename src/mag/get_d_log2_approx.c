@@ -46,4 +46,3 @@ mag_get_d_log2_approx(const mag_t x)
                 mag_d_log_upper_bound(MAG_MAN(x) * ldexp(1.0, -MAG_BITS));
     }
 }
-

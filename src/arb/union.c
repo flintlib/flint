@@ -49,4 +49,3 @@ arb_union(arb_t z, const arb_t x, const arb_t y, slong prec)
     arf_clear(right);
     arf_clear(t);
 }
-

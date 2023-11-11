@@ -361,4 +361,3 @@ int fmpz_mpoly_interp_crt_p_mpolyn(
     fmpz_clear(zero);
     return changed;
 }
-

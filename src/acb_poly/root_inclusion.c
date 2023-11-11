@@ -49,4 +49,3 @@ _acb_poly_root_inclusion(acb_t r, const acb_t m,
     arf_clear(v);
     acb_clear(t);
 }
-

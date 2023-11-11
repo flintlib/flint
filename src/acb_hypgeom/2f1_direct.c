@@ -130,4 +130,3 @@ acb_hypgeom_2f1_direct(acb_t res, const acb_t a, const acb_t b,
     if (!acb_is_finite(res))
         acb_indeterminate(res);
 }
-

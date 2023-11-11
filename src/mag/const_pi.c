@@ -26,4 +26,3 @@ mag_const_pi_lower(mag_t res)
     MAG_MAN(res) = 843314856;
     MAG_EXP(res) = 2;
 }
-

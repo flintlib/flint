@@ -29,4 +29,3 @@ arb_doublefac_ui(arb_t res, ulong n, slong prec)
         arb_clear(t);
     }
 }
-

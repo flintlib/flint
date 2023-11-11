@@ -111,4 +111,3 @@ acb_mat_exp_taylor_sum(acb_mat_t S, const acb_mat_t A, slong N, slong prec)
         acb_mat_clear(U);
     }
 }
-

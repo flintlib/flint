@@ -61,4 +61,3 @@ void fq_zech_mpoly_factor_realloc(fq_zech_mpoly_factor_t f, slong alloc,
 
     f->alloc = alloc;
 }
-

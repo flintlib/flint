@@ -10,4 +10,3 @@
 */
 
 #include "nmod_mpoly.h"
-

@@ -46,4 +46,3 @@ acb_poly_binomial_transform(acb_poly_t b, const acb_poly_t a, slong len, slong p
     _acb_poly_set_length(b, len);
     _acb_poly_normalise(b);
 }
-

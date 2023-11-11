@@ -25,4 +25,3 @@ int fmpq_mpoly_factor_squarefree(fmpq_mpoly_factor_t f, const fmpq_mpoly_t A,
 
 	return success;
 }
-

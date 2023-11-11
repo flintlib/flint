@@ -57,4 +57,3 @@ void fmpq_pow_si(fmpq_t rop, const fmpq_t op, slong e)
     _fmpq_pow_si(fmpq_numref(rop), fmpq_denref(rop),
                  fmpq_numref(op), fmpq_denref(op), e);
 }
-

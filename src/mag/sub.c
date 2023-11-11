@@ -45,4 +45,3 @@ mag_sub(mag_t z, const mag_t x, const mag_t y)
         arf_clear(u);
     }
 }
-

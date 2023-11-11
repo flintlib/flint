@@ -56,4 +56,3 @@ arb_can_round_mpfr(const arb_t x, slong prec, mpfr_rnd_t rnd)
         return mpfr_round_p(d, n, e, prec + (rnd == MPFR_RNDN));
     }
 }
-

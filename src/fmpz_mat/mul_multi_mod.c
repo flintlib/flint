@@ -505,4 +505,3 @@ fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 
     _fmpz_mat_mul_multi_mod(C, A, B, sign, Cbits);
 }
-

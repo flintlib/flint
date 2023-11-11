@@ -2270,4 +2270,3 @@ int nmod_mpoly_gcd(
 
     return _nmod_mpoly_gcd_algo(G, NULL, NULL, A, B, ctx, MPOLY_GCD_USE_ALL);
 }
-

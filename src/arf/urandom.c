@@ -33,4 +33,3 @@ arf_urandom(arf_t x, flint_rand_t state, slong bits, arf_rnd_t rnd)
     fmpz_clear(n);
     fmpz_clear(t);
 }
-

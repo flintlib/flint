@@ -22,4 +22,3 @@ void fq_nmod_mpoly_factor_init(
     f->num   = 0;
     f->alloc = 0;
 }
-

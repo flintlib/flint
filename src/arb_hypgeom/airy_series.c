@@ -125,4 +125,3 @@ arb_hypgeom_airy_series(arb_poly_t ai, arb_poly_t ai_prime,
         _arb_poly_normalise(bi_prime);
     }
 }
-

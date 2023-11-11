@@ -60,4 +60,3 @@ int arb_calc_refine_root_newton(arb_t r, arb_calc_func_t func,
 
     return ARB_CALC_SUCCESS;
 }
-

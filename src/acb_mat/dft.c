@@ -48,4 +48,3 @@ acb_mat_dft(acb_mat_t res, int kind, slong prec)
     acb_clear(t);
     acb_clear(v);
 }
-

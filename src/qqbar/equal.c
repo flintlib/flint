@@ -71,4 +71,3 @@ qqbar_equal(const qqbar_t x, const qqbar_t y)
 
     return res;
 }
-

@@ -295,4 +295,3 @@ void fmpz_mpoly_q_evaluate_acb(acb_t res, const fmpz_mpoly_q_t f, acb_srcptr x, 
 #endif
 
 #endif
-

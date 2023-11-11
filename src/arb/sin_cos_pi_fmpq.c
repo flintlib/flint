@@ -224,4 +224,3 @@ arb_cos_pi_fmpq(arb_t c, const fmpq_t x, slong prec)
     fmpz_clear(v);
     fmpz_clear(w);
 }
-

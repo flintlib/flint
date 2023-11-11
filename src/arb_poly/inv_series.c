@@ -111,4 +111,3 @@ arb_poly_inv_series(arb_poly_t Qinv, const arb_poly_t Q, slong n, slong prec)
     _arb_poly_set_length(Qinv, n);
     _arb_poly_normalise(Qinv);
 }
-

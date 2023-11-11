@@ -23,4 +23,3 @@ arb_poly_evaluate_acb(acb_t res, const arb_poly_t f, const acb_t a, slong prec)
 {
     _arb_poly_evaluate_acb(res, f->coeffs, f->length, a, prec);
 }
-

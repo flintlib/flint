@@ -90,4 +90,3 @@ acb_elliptic_p_jet(acb_ptr r, const acb_t z, const acb_t tau, slong len, slong p
     _acb_vec_clear(tz3, len);
     _acb_vec_clear(tz4, len);
 }
-

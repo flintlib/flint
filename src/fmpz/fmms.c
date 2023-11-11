@@ -71,4 +71,3 @@ void fmpz_fmms(fmpz_t f, const fmpz_t a, const fmpz_t b,
         fmpz_submul(f, c, d);
     }
 }
-

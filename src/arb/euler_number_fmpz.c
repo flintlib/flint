@@ -59,4 +59,3 @@ arb_euler_number_fmpz(arb_t res, const fmpz_t n, slong prec)
         fmpz_clear(m);
     }
 }
-

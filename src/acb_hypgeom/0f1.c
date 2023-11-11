@@ -135,4 +135,3 @@ acb_hypgeom_0f1(acb_t res, const acb_t a, const acb_t z, int regularized, slong 
     else
         acb_hypgeom_0f1_direct(res, a, z, regularized, prec);
 }
-

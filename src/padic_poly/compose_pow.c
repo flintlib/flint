@@ -92,4 +92,3 @@ void padic_poly_compose_pow(padic_poly_t rop, const padic_poly_t op, slong k,
         _padic_poly_set_length(rop, lenr);
     }
 }
-

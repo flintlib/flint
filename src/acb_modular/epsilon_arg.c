@@ -95,4 +95,3 @@ acb_modular_epsilon_arg(const psl2z_t g)
 #undef c
 #undef d
 }
-

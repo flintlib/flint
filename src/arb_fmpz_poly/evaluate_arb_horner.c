@@ -57,4 +57,3 @@ arb_fmpz_poly_evaluate_arb_horner(arb_t res, const fmpz_poly_t f, const arb_t a,
 {
     _arb_fmpz_poly_evaluate_arb_horner(res, f->coeffs, f->length, a, prec);
 }
-

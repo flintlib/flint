@@ -196,4 +196,3 @@ acb_inv(acb_t res, const acb_t z, slong prec)
 #undef x
 #undef y
 }
-

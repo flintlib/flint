@@ -77,4 +77,3 @@ arf_mul_via_mpfr(arf_t z, const arf_t x, const arf_t y,
 
     return ret;
 }
-

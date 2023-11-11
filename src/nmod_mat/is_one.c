@@ -36,4 +36,3 @@ int nmod_mat_is_one(const nmod_mat_t mat)
 
     return 1;
 }
-

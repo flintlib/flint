@@ -19,4 +19,3 @@ unity_zp_print(const unity_zp f)
     fmpz_mod_poly_print(f->poly, f->ctx);
     flint_printf("\n");
 }
-

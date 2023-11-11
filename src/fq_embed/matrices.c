@@ -203,4 +203,3 @@ void fq_embed_matrices(fmpz_mod_mat_t embed,
     fmpz_clear(invd);
     fmpz_mod_poly_clear(gen_minpoly_cp, ctxp);
 }
-

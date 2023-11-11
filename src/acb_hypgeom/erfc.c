@@ -111,4 +111,3 @@ acb_hypgeom_erfc(acb_t res, const acb_t z, slong prec)
         acb_neg(res, res);
     }
 }
-

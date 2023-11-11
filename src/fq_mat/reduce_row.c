@@ -63,4 +63,3 @@ slong fq_mat_reduce_row(fq_mat_t A, slong * P, slong * L,
 
    return res;
 }
-

@@ -89,4 +89,3 @@ int nmod_poly_invmod(nmod_poly_t A,
     _nmod_poly_normalise(A);
     return ans;
 }
-

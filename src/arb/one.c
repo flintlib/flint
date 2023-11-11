@@ -17,4 +17,3 @@ arb_one(arb_t f)
     arf_one(arb_midref(f));
     mag_zero(arb_radref(f));
 }
-

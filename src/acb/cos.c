@@ -50,4 +50,3 @@ acb_cos(acb_t r, const acb_t z, slong prec)
 #undef a
 #undef b
 }
-

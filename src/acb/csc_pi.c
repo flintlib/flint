@@ -67,4 +67,3 @@ acb_csc_pi(acb_t res, const acb_t z, slong prec)
         }
     }
 }
-

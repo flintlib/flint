@@ -79,4 +79,3 @@ acb_poly_pow_ui_trunc_binexp(acb_poly_t res,
         }
     }
 }
-

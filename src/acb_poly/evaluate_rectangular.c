@@ -69,4 +69,3 @@ acb_poly_evaluate_rectangular(acb_t res, const acb_poly_t f, const acb_t a, slon
 {
     _acb_poly_evaluate_rectangular(res, f->coeffs, f->length, a, prec);
 }
-

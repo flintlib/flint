@@ -235,4 +235,3 @@ acb_hypgeom_rgamma(acb_t y, const acb_t x, slong prec)
 
     mag_clear(magz);
 }
-

@@ -38,4 +38,3 @@ di_t di_fast_sqr(di_t x)
 
     return res;
 }
-

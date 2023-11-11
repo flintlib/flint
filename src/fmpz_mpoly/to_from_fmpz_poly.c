@@ -224,4 +224,3 @@ void _fmpz_mpoly_from_fmpz_poly_inflate(
 
     TMP_END;
 }
-

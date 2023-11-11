@@ -105,4 +105,3 @@ acb_modular_theta_transform(int * R, int * S, int * C, const psl2z_t g)
         R[3] &= 7;
     }
 }
-

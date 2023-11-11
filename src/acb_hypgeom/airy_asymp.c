@@ -586,4 +586,3 @@ acb_hypgeom_airy_asymp(acb_t ai, acb_t aip, acb_t bi, acb_t bip, const acb_t z, 
     mag_clear(erru);
     mag_clear(errv);
 }
-

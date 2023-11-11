@@ -18,4 +18,3 @@ acb_atanh(acb_t res, const acb_t z, slong prec)
     acb_atan(res, res, prec);
     acb_div_onei(res, res);
 }
-

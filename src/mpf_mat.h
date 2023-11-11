@@ -144,4 +144,3 @@ void mpf_mat_qr(mpf_mat_t Q, mpf_mat_t R, const mpf_mat_t A);
 #endif
 
 #endif
-

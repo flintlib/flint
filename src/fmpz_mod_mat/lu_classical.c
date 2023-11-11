@@ -113,4 +113,3 @@ cleanup:
 
     return rank;
 }
-

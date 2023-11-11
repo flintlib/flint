@@ -73,4 +73,3 @@ acb_elliptic_roots(acb_t e1, acb_t e2, acb_t e3, const acb_t tau, slong prec)
     acb_clear(t3);
     acb_clear(t4);
 }
-

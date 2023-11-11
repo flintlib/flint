@@ -71,4 +71,3 @@ mag_expm1(mag_t y, const mag_t x)
         }
     }
 }
-

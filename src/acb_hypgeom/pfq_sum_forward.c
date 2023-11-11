@@ -61,4 +61,3 @@ acb_hypgeom_pfq_sum_forward(acb_t s, acb_t t,
     acb_clear(u);
     acb_clear(v);
 }
-

@@ -46,4 +46,3 @@ mag_set_fmpz_2exp_fmpz_lower(mag_t z, const fmpz_t man, const fmpz_t exp)
         _fmpz_add_fast(MAG_EXPREF(z), exp, cexp + MAG_BITS);
     }
 }
-

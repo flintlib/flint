@@ -94,4 +94,3 @@ _fmpz_poly_div_divconquer_recursive(fmpz * Q, fmpz * temp,
 
     }
 }
-

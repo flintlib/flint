@@ -44,4 +44,3 @@ arb_fmpz_poly_evaluate_arb(arb_t res, const fmpz_poly_t f, const arb_t a, slong 
 {
     _arb_fmpz_poly_evaluate_arb(res, f->coeffs, f->length, a, prec);
 }
-

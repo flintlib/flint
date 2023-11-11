@@ -35,4 +35,3 @@ void nf_clear(nf_t nf)
 
     fmpq_poly_clear(nf->traces);
 }
-

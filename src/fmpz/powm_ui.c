@@ -176,4 +176,3 @@ void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong e, const fmpz_t m)
         }
     }
 }
-

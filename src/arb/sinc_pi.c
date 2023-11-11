@@ -59,4 +59,3 @@ arb_sinc_pi(arb_t res, const arb_t x, slong prec)
     mag_clear(m);
     arb_clear(t);
 }
-

@@ -104,4 +104,3 @@ void fmpz_poly_hensel_build_tree(slong *link, fmpz_poly_t *v, fmpz_poly_t *w,
     flint_free(V);
     flint_free(W);
 }
-

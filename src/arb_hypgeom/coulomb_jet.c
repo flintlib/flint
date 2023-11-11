@@ -61,4 +61,3 @@ arb_hypgeom_coulomb_jet(arb_ptr F, arb_ptr G, const arb_t l, const arb_t eta, co
     _acb_vec_clear(tmpG, len);
     _acb_vec_clear(tmp, 3);
 }
-

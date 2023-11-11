@@ -33,4 +33,3 @@ arf_set_mpfr(arf_t x, const mpfr_t y)
         fmpz_set_si(ARF_EXPREF(x), y->_mpfr_exp);
     }
 }
-

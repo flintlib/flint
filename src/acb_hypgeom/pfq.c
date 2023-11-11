@@ -136,4 +136,3 @@ acb_hypgeom_pfq(acb_t res, acb_srcptr a, slong p,
     if (!acb_is_finite(res))
         acb_indeterminate(res);
 }
-

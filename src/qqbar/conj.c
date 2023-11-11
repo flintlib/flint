@@ -18,4 +18,3 @@ qqbar_conj(qqbar_t res, const qqbar_t x)
     fmpz_poly_set(QQBAR_POLY(res), QQBAR_POLY(x));
     acb_conj(QQBAR_ENCLOSURE(res), QQBAR_ENCLOSURE(x));
 }
-

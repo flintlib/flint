@@ -47,4 +47,3 @@ ca_factor_insert(ca_factor_t fac, const ca_t base, const ca_t exp, ca_ctx_t ctx)
     ca_set(fac->exp + fac->length, exp, ctx);
     fac->length++;
 }
-

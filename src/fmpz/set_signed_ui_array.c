@@ -65,4 +65,3 @@ void fmpz_set_signed_ui_array(fmpz_t f, const ulong * c, slong n)
         }
     }
 }
-

@@ -23,4 +23,3 @@ acb_mat_ones(acb_mat_t mat)
         for (j = 0; j < C; j++)
             acb_one(acb_mat_entry(mat, i, j));
 }
-

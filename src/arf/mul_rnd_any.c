@@ -78,4 +78,3 @@ arf_mul_rnd_any(arf_ptr z, arf_srcptr x, arf_srcptr y,
         return inexact;
     }
 }
-

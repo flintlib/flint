@@ -406,4 +406,3 @@ acb_hypgeom_airy_bound(mag_t ai, mag_t aip, mag_t bi, mag_t bip, const acb_t z)
     mag_clear(zlo);
     mag_clear(zhi);
 }
-

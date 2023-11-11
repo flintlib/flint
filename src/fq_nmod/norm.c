@@ -72,4 +72,3 @@ void fq_nmod_norm(fmpz_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
         _fq_nmod_norm(rop, op->coeffs, op->length, ctx);
     }
 }
-

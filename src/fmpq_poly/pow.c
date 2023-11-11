@@ -53,4 +53,3 @@ void fmpq_poly_pow(fmpq_poly_t res, const fmpq_poly_t poly, ulong e)
         fmpq_poly_clear(t);
     }
 }
-

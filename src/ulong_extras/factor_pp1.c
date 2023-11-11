@@ -242,4 +242,3 @@ void n_factor_pp1_table_insert(slong bits, slong B1, slong count)
     n_factor_pp1_table[bits][1] = B1;
     n_factor_pp1_table[bits][2] = count;
 }
-

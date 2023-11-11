@@ -4238,4 +4238,3 @@ _arb_hypgeom_gamma_coeff_shallow(arf_t c, mag_t err, slong i, slong prec)
 
     return 1;
 }
-

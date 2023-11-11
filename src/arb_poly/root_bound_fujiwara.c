@@ -58,4 +58,3 @@ arb_poly_root_bound_fujiwara(mag_t bound, arb_poly_t poly)
 {
     _arb_poly_root_bound_fujiwara(bound, poly->coeffs, poly->length);
 }
-

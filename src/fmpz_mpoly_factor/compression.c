@@ -105,4 +105,3 @@ void fmpz_mpoly_compression_undo(
     fmpz_mpoly_sort_terms(A, Actx);
     fmpz_mpoly_unit_normalize(A, Actx);
 }
-

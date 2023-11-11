@@ -32,4 +32,3 @@ arb_zeta_ui_asymp(arb_t z, ulong s, slong prec)
     const signed char chi[1] = {1};
     _acb_dirichlet_euler_product_real_ui(z, s, chi, 1, 0, prec);
 }
-

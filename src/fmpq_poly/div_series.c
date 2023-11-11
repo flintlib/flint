@@ -63,4 +63,3 @@ void fmpq_poly_div_series(fmpq_poly_t Q, const fmpq_poly_t A,
     _fmpq_poly_set_length(Q, n);
     fmpq_poly_canonicalise(Q);
 }
-

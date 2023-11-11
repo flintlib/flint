@@ -49,4 +49,3 @@ int fmpq_mpoly_resultant(fmpq_mpoly_t R, const fmpq_mpoly_t A,
 
     return success;
 }
-

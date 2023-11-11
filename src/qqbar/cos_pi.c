@@ -81,4 +81,3 @@ qqbar_cos_pi(qqbar_t res, slong p, ulong q)
 
     fmpq_clear(t);
 }
-

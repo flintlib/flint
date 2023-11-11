@@ -105,4 +105,3 @@ acb_dirichlet_hurwitz_precomp_choose_param(ulong * _A, ulong *_K, ulong *_N,
 
     mag_clear(err);
 }
-

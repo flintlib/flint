@@ -33,4 +33,3 @@ void padic_mat_mul(padic_mat_t C, const padic_mat_t A, const padic_mat_t B,
         padic_mat_reduce(C, ctx);
     }
 }
-

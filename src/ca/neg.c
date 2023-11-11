@@ -51,4 +51,3 @@ ca_neg(ca_t res, const ca_t x, ca_ctx_t ctx)
         fmpz_mpoly_q_neg(CA_MPOLY_Q(res), CA_MPOLY_Q(x), CA_FIELD_MCTX(field, ctx));
     }
 }
-

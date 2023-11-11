@@ -381,4 +381,3 @@ arb_hypgeom_sum_fmpq_imag_arb_rs(arb_t res_real, arb_t res_imag, const fmpq * a,
     fmpz_clear(c);
     fmpz_clear(den);
 }
-

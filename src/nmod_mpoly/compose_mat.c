@@ -67,4 +67,3 @@ void _nmod_mpoly_compose_mat(
     nmod_mpoly_combine_like_terms(A, ctxAC);
     return;
 }
-

@@ -18,4 +18,3 @@ arb_csc_pi(arb_t res, const arb_t x, slong prec)
     arb_sin_pi(res, x, prec + 4);
     arb_inv(res, res, prec);
 }
-

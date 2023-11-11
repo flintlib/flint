@@ -112,4 +112,3 @@ unity_zp_mul_inplace(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
     unity_zp_mul(f, g, h);
 }
 
-

@@ -446,4 +446,3 @@ void fmpzi_gcd_shortest(fmpzi_t g, const fmpzi_t a, const fmpzi_t b)
                         fmpzi_realref(b), fmpzi_imagref(b));
     fmpzi_canonicalise_unit(g, g);
 }
-

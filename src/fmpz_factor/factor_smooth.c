@@ -284,4 +284,3 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
     TMP_END;
     return ret;
 }
-

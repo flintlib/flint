@@ -41,4 +41,3 @@ slong _fmpz_vec_ord_p(const fmpz * vec, slong len, const fmpz_t p)
         return (min < WORD_MAX) ? min : 0;
     }
 }
-

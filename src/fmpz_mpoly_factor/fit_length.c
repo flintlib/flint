@@ -21,4 +21,3 @@ void fmpz_mpoly_factor_fit_length(fmpz_mpoly_factor_t f, slong len,
         fmpz_mpoly_factor_realloc(f, len, ctx);
     }
 }
-

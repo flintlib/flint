@@ -54,4 +54,3 @@ acb_mat_find_pivot_partial(const acb_mat_t mat,
     }
     return best_row;
 }
-

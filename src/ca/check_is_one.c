@@ -51,4 +51,3 @@ ca_check_is_one(const ca_t x, ca_ctx_t ctx)
         return res;
     }
 }
-

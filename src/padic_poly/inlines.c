@@ -12,4 +12,3 @@
 #define PADIC_POLY_INLINES_C
 
 #include "padic_poly.h"
-

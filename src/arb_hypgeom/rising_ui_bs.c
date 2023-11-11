@@ -66,4 +66,3 @@ arb_hypgeom_rising_ui_bs(arb_t res, const arb_t x, ulong n, slong prec)
         arb_clear(t);
     }
 }
-

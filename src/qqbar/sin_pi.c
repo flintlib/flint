@@ -17,4 +17,3 @@ qqbar_sin_pi(qqbar_t res, slong p, ulong q)
     p = p % (2 * (slong) q);
     qqbar_cos_pi(res, (slong) q - 2 * p, 2 * q);
 }
-

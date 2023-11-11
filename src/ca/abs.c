@@ -50,4 +50,3 @@ ca_abs(ca_t res, const ca_t x, ca_ctx_t ctx)
         qqbar_clear(t);
     }
 }
-

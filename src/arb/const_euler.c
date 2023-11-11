@@ -488,4 +488,3 @@ arb_const_euler(arb_t res, slong prec)
         arb_const_euler_brent_mcmillan(res, prec);
     }
 }
-

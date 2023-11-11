@@ -24,4 +24,3 @@ acb_real_ceil(acb_t res, const acb_t z, int analytic, slong prec)
         arb_zero(acb_imagref(res));
     }
 }
-

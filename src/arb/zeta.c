@@ -22,4 +22,3 @@ arb_zeta(arb_t y, const arb_t s, slong prec)
     arb_set(y, acb_realref(t));
     acb_clear(t);
 }
-

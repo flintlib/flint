@@ -34,4 +34,3 @@ fmpz_mpoly_q_print_pretty(const fmpz_mpoly_q_t f, const char ** x, const fmpz_mp
         flint_printf(")");
     }
 }
-

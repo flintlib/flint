@@ -28,4 +28,3 @@ arb_set_interval_mpfr(arb_t x, const mpfr_t a, const mpfr_t b, slong prec)
     arf_clear(aa);
     arf_clear(bb);
 }
-

@@ -113,4 +113,3 @@ arb_bernoulli_poly_ui(arb_t res, ulong n, const arb_t x, slong prec)
     arb_clear(c);
     arb_clear(x2);
 }
-

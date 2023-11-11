@@ -18,4 +18,3 @@ unity_zpq_swap(unity_zpq f, unity_zpq g)
     f->polys = g->polys;
     g->polys = temp;
 }
-

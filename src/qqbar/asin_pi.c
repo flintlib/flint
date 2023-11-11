@@ -150,4 +150,3 @@ qqbar_asin_pi(slong * p, ulong * q, const qqbar_t x)
         return res;
     }
 }
-

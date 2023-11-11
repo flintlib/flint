@@ -41,4 +41,3 @@ fmpq_poly_evaluate_fmpz(fmpq_t res, const fmpq_poly_t poly, const fmpz_t a)
     _fmpq_poly_evaluate_fmpz(fmpq_numref(res), fmpq_denref(res),
                              poly->coeffs, poly->den, poly->length, a);
 }
-

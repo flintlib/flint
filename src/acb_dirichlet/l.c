@@ -114,4 +114,3 @@ acb_dirichlet_l(acb_t res, const acb_t s,
         acb_dirichlet_l_general(res, s, G, chi, prec);
     }
 }
-

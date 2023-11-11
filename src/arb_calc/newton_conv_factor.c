@@ -32,4 +32,3 @@ void arb_calc_newton_conv_factor(arf_t conv_factor,
     arb_clear(t + 1);
     arb_clear(t + 2);
 }
-

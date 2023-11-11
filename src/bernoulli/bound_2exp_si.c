@@ -89,4 +89,3 @@ bernoulli_bound_2exp_si(ulong n)
         return l + 2 - (131 * n) / 32;
     }
 }
-

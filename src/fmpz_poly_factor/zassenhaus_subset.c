@@ -94,4 +94,3 @@ slong zassenhaus_subset_next_disjoint(slong * s, slong r)
 
     return 1;
 }
-

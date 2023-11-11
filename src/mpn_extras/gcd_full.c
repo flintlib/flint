@@ -86,4 +86,3 @@ mp_size_t flint_mpn_gcd_full(mp_ptr arrayg,
 {
    return flint_mpn_gcd_full2(arrayg, array1, limbs1, array2, limbs2, NULL);
 }
-

@@ -68,4 +68,3 @@ acb_dirichlet_zeta_rs_d_coeffs(arb_ptr d, const arb_t sigma, slong k, slong prec
 
     arb_clear(u);
 }
-

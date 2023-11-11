@@ -110,4 +110,3 @@ acb_poly_div_series(acb_poly_t Q, const acb_poly_t A, const acb_poly_t B, slong 
     _acb_poly_set_length(Q, n);
     _acb_poly_normalise(Q);
 }
-

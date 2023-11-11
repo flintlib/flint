@@ -231,4 +231,3 @@ nmod_poly_xgcd_euclidean(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
         }
     }
 }
-

@@ -11,4 +11,3 @@
 
 #define CA_MAT_INLINES_C
 #include "ca_mat.h"
-

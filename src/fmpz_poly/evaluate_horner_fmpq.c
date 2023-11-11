@@ -73,4 +73,3 @@ fmpz_poly_evaluate_horner_fmpq(fmpq_t res, const fmpz_poly_t f, const fmpq_t a)
             f->coeffs, f->length, fmpq_numref(a), fmpq_denref(a));
     }
 }
-

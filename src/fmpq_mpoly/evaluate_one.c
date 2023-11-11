@@ -281,4 +281,3 @@ int fmpq_mpoly_evaluate_one_fmpq(fmpq_mpoly_t A,
 
     return success;
 }
-

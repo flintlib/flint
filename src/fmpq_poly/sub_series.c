@@ -208,4 +208,3 @@ void fmpq_poly_sub_series(fmpq_poly_t res, const fmpq_poly_t poly1,
 {
    fmpq_poly_sub_series_can(res, poly1, poly2, n, 1);
 }
-

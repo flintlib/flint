@@ -706,4 +706,3 @@ poly_pow_length(slong poly_len, ulong exp, slong trunc)
 #endif
 
 #endif
-

@@ -443,4 +443,3 @@ void fq_nmod_mpoly_set_n_fq_bpoly(
 
     fq_nmod_mpoly_sort_terms(A, ctx);
 }
-

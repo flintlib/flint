@@ -198,4 +198,3 @@ void _acb_modular_mul(acb_t z, acb_t tmp1, acb_t tmp2, const acb_t x, const acb_
 #endif
 
 #endif
-

@@ -163,4 +163,3 @@ void _arb_sin_cos_taylor_rs(mp_ptr ysin, mp_ptr ycos,
 
     TMP_END;
 }
-

@@ -45,4 +45,3 @@ acb_sinc_pi(acb_t res, const acb_t x, slong prec)
     mag_clear(m);
     acb_clear(t);
 }
-

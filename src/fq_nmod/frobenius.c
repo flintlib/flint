@@ -87,4 +87,3 @@ void fq_nmod_frobenius(fq_nmod_t rop, const fq_nmod_t op, slong e, const fq_nmod
         _nmod_poly_normalise(rop);
     }
 }
-

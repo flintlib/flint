@@ -361,4 +361,3 @@ arb_hypgeom_legendre_p_ui_asymp(arb_t res, arb_t res2, ulong n, const arb_t x, s
     acb_clear(w);
     _acb_vec_clear(w4pow, m + 1);
 }
-

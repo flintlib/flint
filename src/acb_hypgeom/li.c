@@ -65,4 +65,3 @@ acb_hypgeom_li(acb_t res, const acb_t z, int offset, slong prec)
     else
         _acb_hypgeom_li(res, z, prec);
 }
-

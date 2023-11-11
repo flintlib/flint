@@ -50,4 +50,3 @@ dlog_vec_eratos_add(ulong *v, ulong nv, ulong a, ulong va, nmod_t mod, ulong na,
 
     dlog_precomp_clear(pre);
 }
-

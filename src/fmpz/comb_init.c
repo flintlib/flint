@@ -361,4 +361,3 @@ zero_moduli:
 
     flint_throw(FLINT_ERROR, "fmpz_comb_init: moduli are not nonzero");
 }
-

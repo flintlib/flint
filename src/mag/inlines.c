@@ -11,4 +11,3 @@
 
 #define MAG_INLINES_C
 #include "mag.h"
-

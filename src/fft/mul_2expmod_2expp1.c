@@ -32,4 +32,3 @@ void mpn_mul_2expmod_2expp1(mp_limb_t * t, mp_limb_t * i1, mp_size_t limbs, flin
       mpn_addmod_2expp1_1(t + 1, limbs - 1, -hi1);
    }
 }
-

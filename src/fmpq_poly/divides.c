@@ -120,4 +120,3 @@ int fmpq_poly_divides(fmpq_poly_t q, const fmpq_poly_t poly1,
 
     return divides;
 }
-

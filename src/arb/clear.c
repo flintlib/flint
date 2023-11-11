@@ -25,4 +25,3 @@ arb_clear(arb_t x)
     if (COEFF_IS_MPZ(MAG_EXP(arb_radref(x))))
         _fmpz_clear_mpz(MAG_EXP(arb_radref(x)));
 }
-

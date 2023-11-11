@@ -149,4 +149,3 @@ _qqbar_acb_lindep(fmpz * rel, acb_srcptr vec, slong len, int check, slong prec)
 
     return found;
 }
-

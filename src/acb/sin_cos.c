@@ -55,4 +55,3 @@ acb_sin_cos(acb_t s, acb_t c, const acb_t z, slong prec)
 #undef a
 #undef b
 }
-

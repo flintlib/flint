@@ -40,4 +40,3 @@ arb_poly_borel_transform(arb_poly_t res, const arb_poly_t poly, slong prec)
     _arb_poly_set_length(res, poly->length);
     _arb_poly_normalise(res);
 }
-

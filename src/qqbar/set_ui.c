@@ -19,4 +19,3 @@ qqbar_set_ui(qqbar_t res, ulong x)
     qqbar_set_fmpz(res, t);
     fmpz_clear(t);
 }
-

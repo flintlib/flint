@@ -39,4 +39,3 @@ acb_poly_randtest(acb_poly_t poly, flint_rand_t state, slong len, slong prec, sl
     _acb_poly_normalise(poly);
 }
 
-

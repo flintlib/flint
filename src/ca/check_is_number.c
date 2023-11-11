@@ -24,4 +24,3 @@ ca_check_is_number(const ca_t x, ca_ctx_t ctx)
 
     return T_TRUE;
 }
-

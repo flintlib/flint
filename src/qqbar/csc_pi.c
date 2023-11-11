@@ -20,4 +20,3 @@ qqbar_csc_pi(qqbar_t res, slong p, ulong q)
     qqbar_inv(res, res);
     return 1;
 }
-

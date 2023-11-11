@@ -74,4 +74,3 @@ arb_poly_evaluate_acb_rectangular(acb_t res, const arb_poly_t f, const acb_t a, 
 {
     _arb_poly_evaluate_acb_rectangular(res, f->coeffs, f->length, a, prec);
 }
-

@@ -392,4 +392,3 @@ void acb_hypgeom_u_asymp(acb_t res, const acb_t a, const acb_t b,
     acb_clear(w);
     acb_clear(winv);
 }
-

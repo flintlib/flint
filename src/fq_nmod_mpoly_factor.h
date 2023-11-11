@@ -533,4 +533,3 @@ void _fq_nmod_mpoly_set_n_fq_bpoly_gen1_zero(fq_nmod_mpoly_t A,
 #endif
 
 #endif
-

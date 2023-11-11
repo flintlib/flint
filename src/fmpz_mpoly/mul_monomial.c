@@ -111,4 +111,3 @@ cleanup_C:
     if (freeCcoeff0)
         fmpz_clear(&Ccoeff0);
 }
-

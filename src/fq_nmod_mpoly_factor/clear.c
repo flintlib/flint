@@ -31,4 +31,3 @@ void fq_nmod_mpoly_factor_clear(
 
     fq_nmod_clear(f->constant, ctx->fqctx);
 }
-

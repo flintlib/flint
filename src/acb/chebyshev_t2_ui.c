@@ -48,4 +48,3 @@ acb_chebyshev_t2_ui(acb_t a, acb_t b, ulong n, const acb_t x, slong prec)
         }
     }
 }
-

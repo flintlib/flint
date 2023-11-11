@@ -88,4 +88,3 @@ void qadic_ctx_init_conway(qadic_ctx_t ctx,
     flint_printf("(p,d) = (%wd,%wd) is not present in the database.\n", *p, d);
     flint_abort();
 }
-

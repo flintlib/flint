@@ -110,4 +110,3 @@ arb_dot_siui(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong x
 
     TMP_END;
 }
-

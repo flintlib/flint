@@ -44,4 +44,3 @@ arb_const_glaisher_eval(arb_t y, slong prec)
 }
 
 ARB_DEF_CACHED_CONSTANT(arb_const_glaisher, arb_const_glaisher_eval)
-

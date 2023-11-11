@@ -112,4 +112,3 @@ void acb_hypgeom_beta_lower_series(acb_poly_t res,
     _acb_poly_set_length(res, len);
     _acb_poly_normalise(res);
 }
-

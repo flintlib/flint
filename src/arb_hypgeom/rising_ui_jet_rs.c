@@ -179,4 +179,3 @@ arb_hypgeom_rising_ui_jet_rs(arb_ptr res, const arb_t x, ulong n, ulong m, slong
     _arb_vec_clear(tmp, 2 * len + (m + 1) * xmlen);
     TMP_END;
 }
-

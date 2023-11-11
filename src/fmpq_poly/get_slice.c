@@ -45,4 +45,3 @@ void fmpq_poly_get_slice(fmpq_poly_t rop, const fmpq_poly_t op, slong i, slong j
         fmpq_poly_zero(rop);
     }
 }
-

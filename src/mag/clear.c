@@ -18,4 +18,3 @@ mag_clear(mag_t x)
     if (COEFF_IS_MPZ(MAG_EXP(x)))
         _fmpz_clear_mpz(MAG_EXP(x));
 }
-

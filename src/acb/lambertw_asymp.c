@@ -142,4 +142,3 @@ acb_lambertw_asymp(acb_t res, const acb_t z, const fmpz_t k, slong L, slong M, s
     acb_clear(u);
     fmpz_clear(t);
 }
-

@@ -496,4 +496,3 @@ acb_modular_theta_sum(acb_ptr theta1,
     mag_clear(vmag);
     _mag_vec_clear(err, len);
 }
-

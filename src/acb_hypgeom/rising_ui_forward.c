@@ -45,4 +45,3 @@ acb_hypgeom_rising_ui_forward(acb_t res, const acb_t x, ulong n, slong prec)
 
     acb_clear(t);
 }
-

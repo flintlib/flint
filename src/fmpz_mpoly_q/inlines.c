@@ -11,4 +11,3 @@
 
 #define FMPZ_MPOLY_Q_INLINES_C
 #include "fmpz_mpoly_q.h"
-

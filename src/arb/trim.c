@@ -54,4 +54,3 @@ arb_trim(arb_t y, const arb_t x)
         }
     }
 }
-

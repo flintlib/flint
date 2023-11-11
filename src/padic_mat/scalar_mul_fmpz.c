@@ -49,4 +49,3 @@ void padic_mat_scalar_mul_fmpz(padic_mat_t B,
     _padic_mat_scalar_mul_fmpz(B, A, c, ctx);
     _padic_mat_reduce(B, ctx);
 }
-

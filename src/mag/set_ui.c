@@ -72,4 +72,3 @@ mag_set_ui_lower(mag_t z, ulong x)
         MAG_MAN(z) = x;
     }
 }
-

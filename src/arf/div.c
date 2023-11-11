@@ -129,4 +129,3 @@ arf_div(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec, arf_rnd_t rnd)
 
     return inexact;
 }
-

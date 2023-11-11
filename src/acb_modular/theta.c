@@ -297,4 +297,3 @@ acb_modular_theta_notransform(acb_t theta1, acb_t theta2,
     acb_clear(q4);
     acb_clear(w);
 }
-

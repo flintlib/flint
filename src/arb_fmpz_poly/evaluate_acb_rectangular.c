@@ -61,4 +61,3 @@ arb_fmpz_poly_evaluate_acb_rectangular(acb_t res, const fmpz_poly_t f, const acb
 {
     _arb_fmpz_poly_evaluate_acb_rectangular(res, f->coeffs, f->length, a, prec);
 }
-

@@ -16,4 +16,3 @@ arb_mat_sqr(arb_mat_t B, const arb_mat_t A, slong prec)
 {
     arb_mat_mul(B, A, A, prec);
 }
-

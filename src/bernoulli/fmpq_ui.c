@@ -35,4 +35,3 @@ bernoulli_fmpq_ui(fmpq_t b, ulong n)
 {
     _bernoulli_fmpq_ui(fmpq_numref(b), fmpq_denref(b), n);
 }
-

@@ -26,4 +26,3 @@ void padic_mat_neg(padic_mat_t B, const padic_mat_t A, const padic_ctx_t ctx)
     _padic_mat_neg(B, A);
     _padic_mat_reduce(B, ctx);
 }
-

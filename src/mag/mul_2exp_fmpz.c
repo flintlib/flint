@@ -24,4 +24,3 @@ mag_mul_2exp_fmpz(mag_t z, const mag_t x, const fmpz_t y)
         MAG_MAN(z) = MAG_MAN(x);
     }
 }
-

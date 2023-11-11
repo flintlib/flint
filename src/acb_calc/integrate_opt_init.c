@@ -20,4 +20,3 @@ acb_calc_integrate_opt_init(acb_calc_integrate_opt_t options)
     options->use_heap = 0;
     options->verbose = 0;
 }
-

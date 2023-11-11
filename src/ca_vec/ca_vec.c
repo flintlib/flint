@@ -302,4 +302,3 @@ ca_vec_zero(ca_vec_t res, slong len, ca_ctx_t ctx)
     ca_vec_set_length(res, len, ctx);
     _ca_vec_zero(ca_vec_entry(res, 0), ca_vec_length(res, ctx), ctx);
 }
-

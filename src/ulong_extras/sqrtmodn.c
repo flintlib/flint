@@ -117,4 +117,3 @@ slong n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac)
 
     return num;
 }
-

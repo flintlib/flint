@@ -128,4 +128,3 @@ slong fmpz_mod_mat_lu_recursive(slong * P, fmpz_mod_mat_t A, int rank_check)
 
     return r1 + r2;
 }
-

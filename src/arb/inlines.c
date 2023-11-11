@@ -11,4 +11,3 @@
 
 #define ARB_INLINES_C
 #include "arb.h"
-

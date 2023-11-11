@@ -132,4 +132,3 @@ void fmpz_multi_CRT_ui(
     _fmpz_multi_CRT_precomp(T, C->crt_P, A, sign);
     fmpz_swap(T + 0, b);
 }
-

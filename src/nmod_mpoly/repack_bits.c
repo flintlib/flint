@@ -89,4 +89,3 @@ int nmod_mpoly_repack_bits_inplace(
     }
     return success;
 }
-

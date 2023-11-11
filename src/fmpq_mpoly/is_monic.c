@@ -31,4 +31,3 @@ int fmpq_mpoly_is_monic(const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
     fmpz_clear(t);
     return res;
 }
-

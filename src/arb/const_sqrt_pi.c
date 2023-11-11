@@ -19,4 +19,3 @@ _arb_const_sqrt_pi(arb_t t, slong prec)
 }
 
 ARB_DEF_CACHED_CONSTANT(arb_const_sqrt_pi, _arb_const_sqrt_pi)
-

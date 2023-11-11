@@ -139,4 +139,3 @@ void fmpz_mod_poly_gcdinv_f(fmpz_t f, fmpz_mod_poly_t G, fmpz_mod_poly_t S,
         }
     }
 }
-

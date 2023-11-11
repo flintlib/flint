@@ -128,4 +128,3 @@ _acb_poly_zeta_em_tail_bsplit(acb_ptr z, const acb_t s, const acb_t Na, acb_srcp
     _acb_vec_clear(P, len);
     _acb_vec_clear(T, len);
 }
-

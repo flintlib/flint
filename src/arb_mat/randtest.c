@@ -33,4 +33,3 @@ arb_mat_randtest(arb_mat_t mat, flint_rand_t state, slong prec, slong mag_bits)
                 else
                     arb_zero(arb_mat_entry(mat, i, j));
 }
-

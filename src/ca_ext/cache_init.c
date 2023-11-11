@@ -27,4 +27,3 @@ ca_ext_cache_init(ca_ext_cache_t cache, ca_ctx_t ctx)
     for (i = 0; i < INITIAL_HASH_SIZE; i++)
         cache->hash_table[i] = -1;
 }
-

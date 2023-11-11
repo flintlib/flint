@@ -18,4 +18,3 @@ qqbar_clear(qqbar_t res)
     fmpz_poly_clear(QQBAR_POLY(res));
     acb_clear(QQBAR_ENCLOSURE(res));
 }
-

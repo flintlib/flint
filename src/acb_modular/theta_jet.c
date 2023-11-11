@@ -293,4 +293,3 @@ acb_modular_theta_jet(acb_ptr theta1, acb_ptr theta2,
     arf_clear(one_minus_eps);
     acb_clear(tau_prime);
 }
-

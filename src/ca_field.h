@@ -57,4 +57,3 @@ ca_field_ptr ca_field_cache_insert_ext(ca_field_cache_t cache, ca_ext_struct ** 
 #endif
 
 #endif
-

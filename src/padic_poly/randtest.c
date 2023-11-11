@@ -107,4 +107,3 @@ void padic_poly_randtest_not_zero(padic_poly_t f, flint_rand_t state,
         f->val = f->N - 1;
     }
 }
-

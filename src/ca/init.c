@@ -18,4 +18,3 @@ ca_init(ca_t x, ca_ctx_t ctx)
     *CA_FMPQ_NUMREF(x) = 0;
     *CA_FMPQ_DENREF(x) = 1;
 }
-

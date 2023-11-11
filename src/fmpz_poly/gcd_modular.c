@@ -328,4 +328,3 @@ fmpz_poly_gcd_modular(fmpz_poly_t res, const fmpz_poly_t poly1,
         }
     }
 }
-

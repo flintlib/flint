@@ -1870,4 +1870,3 @@ int _fmpz_mod_mpoly_gcd_algo(
     else
         return _fmpz_mod_mpoly_gcd_algo_large(G, Abar, Bbar, A, B, ctx, algo);
 }
-

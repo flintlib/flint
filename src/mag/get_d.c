@@ -35,4 +35,3 @@ mag_get_d(const mag_t z)
         return ldexp(MAG_MAN(z), MAG_EXP(z) - MAG_BITS);
     }
 }
-

@@ -1607,4 +1607,3 @@ void mpoly_main_variable_terms1(slong * i1, slong * n1, const ulong * exp1,
 #endif
 
 #endif
-

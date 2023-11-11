@@ -30,4 +30,3 @@ acb_poly_contains_fmpz_poly(const acb_poly_t poly1, const fmpz_poly_t poly2)
 
     return 1;
 }
-

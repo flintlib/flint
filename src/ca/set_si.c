@@ -18,4 +18,3 @@ ca_set_si(ca_t x, slong v, ca_ctx_t ctx)
     fmpz_set_si(CA_FMPQ_NUMREF(x), v);
     fmpz_one(CA_FMPQ_DENREF(x));
 }
-

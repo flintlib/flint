@@ -69,4 +69,3 @@ arb_log1p(arb_t r, const arb_t z, slong prec)
         arb_log(r, r, prec);
     }
 }
-

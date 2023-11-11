@@ -421,4 +421,3 @@ int fmpz_mod_mpolyn_is_nonzero_fmpz(
     N = mpoly_words_per_exp_sp(A->bits, ctx->minfo);
     return mpoly_monomial_is_zero(A->exps + N*0, N);
 }
-

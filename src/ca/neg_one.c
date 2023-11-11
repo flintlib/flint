@@ -18,4 +18,3 @@ ca_neg_one(ca_t x, ca_ctx_t ctx)
     fmpz_one(fmpq_denref(CA_FMPQ(x)));
     fmpz_set_si(fmpq_numref(CA_FMPQ(x)), -1);
 }
-

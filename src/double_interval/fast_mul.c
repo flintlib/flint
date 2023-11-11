@@ -61,4 +61,3 @@ di_t di_fast_mul(di_t x, di_t y)
 
     return res;
 }
-

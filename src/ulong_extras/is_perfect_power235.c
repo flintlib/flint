@@ -63,4 +63,3 @@ int n_is_perfect_power235(mp_limb_t n)
 
     return 0;
 }
-

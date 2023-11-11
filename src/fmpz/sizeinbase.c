@@ -22,4 +22,3 @@ size_t fmpz_sizeinbase(const fmpz_t f, int b)
     else
         return mpz_sizeinbase(COEFF_TO_PTR(d), b);
 }
-

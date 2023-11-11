@@ -78,4 +78,3 @@ _acb_poly_validate_roots(acb_ptr roots,
 
     return isolated;
 }
-

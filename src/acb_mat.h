@@ -467,4 +467,3 @@ acb_mat_allocated_bytes(const acb_mat_t x)
 #endif
 
 #endif
-

@@ -56,4 +56,3 @@ mag_add_2exp_fmpz(mag_t z, const mag_t x, const fmpz_t e)
         MAG_ADJUST_ONE_TOO_LARGE(z);
     }
 }
-

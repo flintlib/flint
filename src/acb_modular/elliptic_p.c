@@ -17,4 +17,3 @@ acb_modular_elliptic_p(acb_t r, const acb_t z, const acb_t tau, slong prec)
 {
     acb_elliptic_p(r, z, tau, prec);
 }
-

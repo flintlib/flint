@@ -294,4 +294,3 @@ _bernoulli_fmpq_ui_multi_mod(fmpz_t num, fmpz_t den, ulong n, double alpha)
     fmpz_clear(M);
     mag_clear(primes_product);
 }
-

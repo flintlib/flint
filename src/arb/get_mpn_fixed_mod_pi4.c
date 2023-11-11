@@ -124,4 +124,3 @@ _arb_get_mpn_fixed_mod_pi4(mp_ptr w, fmpz_t q, int * octant,
         return 1;
     }
 }
-

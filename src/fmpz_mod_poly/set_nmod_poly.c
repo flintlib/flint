@@ -22,4 +22,3 @@ void fmpz_mod_poly_set_nmod_poly(fmpz_mod_poly_t f, const nmod_poly_t g)
     for (i = 0; i < g->length; i++)
        fmpz_set_ui(f->coeffs + i, g->coeffs[i]);
 }
-

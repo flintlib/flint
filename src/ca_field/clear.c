@@ -28,4 +28,3 @@ ca_field_clear(ca_field_t K, ca_ctx_t ctx)
 
     fmpz_mpoly_vec_clear(CA_FIELD_IDEAL(K), CA_FIELD_MCTX(K, ctx));
 }
-

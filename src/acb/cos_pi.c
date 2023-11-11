@@ -57,4 +57,3 @@ acb_cos_pi(acb_t r, const acb_t z, slong prec)
 #undef a
 #undef b
 }
-

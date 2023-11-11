@@ -45,4 +45,3 @@ unity_zpq_gauss_sum_sigma_pow(unity_zpq f, ulong q, ulong p)
     n = fmpz_fdiv_ui(fmpz_mod_ctx_modulus(f->ctx), p);
     unity_zpq_gauss_sum_character_pow(f, q, p, n);
 }
-

@@ -149,4 +149,3 @@ void fmpz_mod_mpoly_geobucket_sub(
     fmpz_mod_mpoly_swap(B->polys + i, B->temps + i, ctx);
     _fmpz_mod_mpoly_geobucket_fix(B, i, ctx);
 }
-

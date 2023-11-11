@@ -655,4 +655,3 @@ int fmpz_mpoly_univar_discriminant(
 
     return success;
 }
-

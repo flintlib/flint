@@ -144,4 +144,3 @@ fmpz_poly_cyclotomic(fmpz_poly_t poly, ulong n)
 
     _fmpz_poly_set_length(poly, phi * s + 1);
 }
-

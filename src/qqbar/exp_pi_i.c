@@ -16,4 +16,3 @@ qqbar_exp_pi_i(qqbar_t res, slong p, ulong q)
 {
     qqbar_root_of_unity(res, p, q * 2);
 }
-

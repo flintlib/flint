@@ -31,4 +31,3 @@ acb_mat_onei(acb_mat_t mat)
         }
     }
 }
-

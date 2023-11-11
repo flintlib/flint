@@ -1587,4 +1587,3 @@ int nmod_mpolyn_interp_mcrt_sm_mpoly(
     *lastdeg_ = lastdeg;
     return changed;
 }
-

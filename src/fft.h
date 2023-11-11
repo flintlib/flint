@@ -262,4 +262,3 @@ void fft_convolution_precache(mp_limb_t ** ii, mp_limb_t ** jj,
 #endif
 
 #endif
-

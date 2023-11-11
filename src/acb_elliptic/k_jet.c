@@ -91,4 +91,3 @@ acb_elliptic_k_jet(acb_ptr w, const acb_t m, slong len, slong prec)
     acb_clear(msub1m);
     acb_clear(m2sub1);
 }
-

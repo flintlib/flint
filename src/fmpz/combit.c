@@ -33,4 +33,3 @@ void fmpz_combit(fmpz_t f, ulong i)
         _fmpz_demote_val(f);
     }
 }
-

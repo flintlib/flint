@@ -25,4 +25,3 @@ void fmpq_mat_one(fmpq_mat_t mat)
     for (i = 0; i < min; i++)
         fmpq_one(fmpq_mat_entry(mat, i, i));
 }
-

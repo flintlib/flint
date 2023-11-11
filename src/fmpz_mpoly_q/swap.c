@@ -17,4 +17,3 @@ fmpz_mpoly_q_swap(fmpz_mpoly_q_t x, fmpz_mpoly_q_t y, const fmpz_mpoly_ctx_t ctx
     fmpz_mpoly_swap(fmpz_mpoly_q_numref(x), fmpz_mpoly_q_numref(y), ctx);
     fmpz_mpoly_swap(fmpz_mpoly_q_denref(x), fmpz_mpoly_q_denref(y), ctx);
 }
-

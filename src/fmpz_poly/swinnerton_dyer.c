@@ -39,4 +39,3 @@ fmpz_poly_swinnerton_dyer(fmpz_poly_t poly, ulong n)
     _fmpz_poly_swinnerton_dyer(poly->coeffs, n);
     _fmpz_poly_set_length(poly, N + 1);
 }
-

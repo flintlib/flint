@@ -45,4 +45,3 @@ void n_tpoly_clear(n_tpoly_t A)
         flint_free(A->coeffs);
     }
 }
-

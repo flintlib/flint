@@ -36,4 +36,3 @@ arb_poly_evaluate(arb_t res, const arb_poly_t f, const arb_t a, slong prec)
 {
     _arb_poly_evaluate(res, f->coeffs, f->length, a, prec);
 }
-

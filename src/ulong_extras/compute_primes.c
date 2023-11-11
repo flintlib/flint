@@ -95,4 +95,3 @@ n_compute_primes(ulong num_primes)
     pthread_mutex_unlock(&primes_lock);
 #endif
 }
-

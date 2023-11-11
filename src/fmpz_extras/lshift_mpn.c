@@ -45,4 +45,3 @@ fmpz_lshift_mpn(fmpz_t z, mp_srcptr d, mp_size_t dn, int sgnbit, flint_bitcnt_t 
     zmpz->_mp_size = sgnbit ? -(slong) zn : zn;
     _fmpz_demote_val(z);
 }
-

@@ -53,4 +53,3 @@ void fmpz_or(fmpz_t f, const fmpz_t g, const fmpz_t h)
             }
         }
 }
-

@@ -20,4 +20,3 @@ arb_poly_set_round(arb_poly_t dest, const arb_poly_t src, slong prec)
     _arb_vec_set_round(dest->coeffs, src->coeffs, len, prec);
     _arb_poly_set_length(dest, len);
 }
-

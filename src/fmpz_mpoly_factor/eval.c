@@ -198,4 +198,3 @@ next:
     flint_free(offsets);
     flint_free(shifts);
 }
-

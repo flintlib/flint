@@ -191,4 +191,3 @@ void fmpz_mod_poly_eval2_pow(
     fmpz_clear(a);
     fmpz_clear(b);
 }
-

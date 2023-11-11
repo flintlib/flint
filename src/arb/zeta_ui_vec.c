@@ -33,4 +33,3 @@ arb_zeta_ui_vec(arb_ptr x, ulong start, slong num, slong prec)
     for (i = 0; i < num_odd; i++) x[!start_odd + 2  * i] = tmp[num_even + i];
     flint_free(tmp);
 }
-

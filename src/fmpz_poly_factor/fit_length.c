@@ -22,4 +22,3 @@ void fmpz_poly_factor_fit_length(fmpz_poly_factor_t fac, slong len)
         fmpz_poly_factor_realloc(fac, len);
     }
 }
-

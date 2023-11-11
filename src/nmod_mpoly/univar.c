@@ -652,4 +652,3 @@ int nmod_mpoly_univar_discriminant(
 
     return success;
 }
-

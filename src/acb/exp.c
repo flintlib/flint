@@ -46,4 +46,3 @@ acb_exp(acb_t r, const acb_t z, slong prec)
 #undef a
 #undef b
 }
-

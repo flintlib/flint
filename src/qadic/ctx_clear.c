@@ -20,4 +20,3 @@ void qadic_ctx_clear(qadic_ctx_t ctx)
     flint_free(ctx->j);
     flint_free(ctx->var);
 }
-

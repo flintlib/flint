@@ -39,4 +39,3 @@ arf_abs_bound_lt_2exp_si(const arf_t x)
 
     return res;
 }
-

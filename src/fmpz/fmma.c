@@ -69,4 +69,3 @@ void fmpz_fmma(fmpz_t f, const fmpz_t a, const fmpz_t b,
         fmpz_addmul(f, c, d);
     }
 }
-

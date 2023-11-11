@@ -29,4 +29,3 @@ arf_debug(const arf_t x)
 
     flint_printf("]}");
 }
-

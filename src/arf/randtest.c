@@ -55,4 +55,3 @@ arf_randtest_special(arf_t x, flint_rand_t state, slong bits, slong mag_bits)
             arf_randtest_not_zero(x, state, bits, mag_bits);
     }
 }
-

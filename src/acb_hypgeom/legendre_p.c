@@ -142,4 +142,3 @@ acb_hypgeom_legendre_p(acb_t res, const acb_t n, const acb_t m,
     acb_clear(c);
     acb_clear(w);
 }
-

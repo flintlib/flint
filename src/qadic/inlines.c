@@ -12,4 +12,3 @@
 #define QADIC_INLINES_C
 
 #include "qadic.h"
-

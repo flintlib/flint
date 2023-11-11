@@ -87,4 +87,3 @@ acb_dirichlet_l_hurwitz(acb_t res, const acb_t s,
     acb_clear(a);
     acb_clear(w);
 }
-

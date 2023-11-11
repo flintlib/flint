@@ -72,4 +72,3 @@ acb_hypgeom_pfq_bound_factor(mag_t C,
     mag_clear(u);
     acb_clear(w);
 }
-

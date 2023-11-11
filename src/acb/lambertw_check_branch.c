@@ -109,4 +109,3 @@ acb_lambertw_check_branch(const acb_t w, const fmpz_t k, slong prec)
 
     return _acb_lambertw_check_branch(w, k, prec);
 }
-

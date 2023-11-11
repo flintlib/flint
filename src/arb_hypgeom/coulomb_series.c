@@ -103,4 +103,3 @@ arb_hypgeom_coulomb_series(arb_poly_t F, arb_poly_t G,
     if (F != NULL) _arb_poly_normalise(F);
     if (G != NULL) _arb_poly_normalise(G);
 }
-

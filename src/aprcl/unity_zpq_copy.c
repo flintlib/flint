@@ -22,4 +22,3 @@ unity_zpq_copy(unity_zpq f, const unity_zpq g)
         fmpz_mod_poly_set(f->polys[i], g->polys[i], g->ctx);
     }
 }
-

@@ -68,4 +68,3 @@ void fmpz_poly_sqr_classical(fmpz_poly_t rop, const fmpz_poly_t op)
 
     _fmpz_poly_set_length(rop, len);
 }
-

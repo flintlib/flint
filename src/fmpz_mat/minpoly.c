@@ -326,4 +326,3 @@ void fmpz_mat_minpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
 
    fmpz_mat_minpoly_modular(cp, mat);
 }
-

@@ -44,4 +44,3 @@ void fq_one(fq_t rop,  const fq_ctx_t ctx)
 {
     fmpz_poly_one(rop);
 }
-

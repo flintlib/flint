@@ -282,4 +282,3 @@ acb_modular_eta_sum(acb_t eta, const acb_t q, slong prec)
     mag_clear(err);
     mag_clear(qmag);
 }
-

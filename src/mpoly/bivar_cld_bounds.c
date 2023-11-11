@@ -82,4 +82,3 @@ void mpoly_bivar_cld_bounds(slong * l, slong n)
 
     TMP_END;
 }
-

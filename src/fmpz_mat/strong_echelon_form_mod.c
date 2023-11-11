@@ -341,4 +341,3 @@ fmpz_mat_strong_echelon_form_mod(fmpz_mat_t A, const fmpz_t mod)
     fmpz_clear(t2);
     fmpz_clear(g);
 }
-

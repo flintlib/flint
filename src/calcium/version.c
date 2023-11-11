@@ -17,4 +17,3 @@ const char * calcium_version(void)
 {
     return __calcium_version_string;
 }
-

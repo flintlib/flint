@@ -20,4 +20,3 @@ void fmpq_poly_set_si(fmpq_poly_t poly, slong x)
     _fmpq_poly_set_length(poly, 1);
     _fmpq_poly_normalise(poly);
 }
-

@@ -167,4 +167,3 @@ arb_primorial_ui(arb_t res, ulong n, slong prec)
         n_primes_clear(primes);
     }
 }
-

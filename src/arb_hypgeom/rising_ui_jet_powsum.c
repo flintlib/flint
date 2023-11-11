@@ -158,4 +158,3 @@ arb_hypgeom_rising_ui_jet_powsum(arb_ptr res, const arb_t x, ulong n, slong len,
         _fmpz_vec_clear(c, (n + 1) * len);
     }
 }
-

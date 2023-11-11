@@ -68,4 +68,3 @@ arb_poly_binomial_transform_basecase(arb_poly_t b, const arb_poly_t a, slong len
     _arb_poly_set_length(b, len);
     _arb_poly_normalise(b);
 }
-

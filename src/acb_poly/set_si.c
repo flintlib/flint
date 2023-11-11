@@ -25,4 +25,3 @@ acb_poly_set_si(acb_poly_t poly, slong c)
         _acb_poly_set_length(poly, 1);
     }
 }
-

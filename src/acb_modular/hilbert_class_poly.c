@@ -219,4 +219,3 @@ acb_modular_hilbert_class_poly(fmpz_poly_t res, slong D)
 
     flint_free(qbf);
 }
-

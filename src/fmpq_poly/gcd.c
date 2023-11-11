@@ -127,4 +127,3 @@ void fmpq_poly_gcd(fmpq_poly_t G, const fmpq_poly_t A, const fmpq_poly_t B)
         }
     }
 }
-

@@ -30,4 +30,3 @@ acb_hypgeom_2f1_series_direct(acb_poly_t res,
 
     acb_poly_clear(&aa[3]);
 }
-

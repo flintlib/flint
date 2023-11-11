@@ -110,4 +110,3 @@ arb_hypgeom_fresnel_series(arb_poly_t s, arb_poly_t c,
     if (s != NULL) _arb_poly_normalise(s);
     if (c != NULL) _arb_poly_normalise(c);
 }
-

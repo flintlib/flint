@@ -44,4 +44,3 @@ void _fq_nmod_mpoly_set_lead0(
     fq_nmod_mpoly_clear(t, ctx);
     fq_nmod_mpoly_clear(g, ctx);
 }
-

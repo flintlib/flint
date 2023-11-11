@@ -18,4 +18,3 @@ ca_set_ui(ca_t x, ulong v, ca_ctx_t ctx)
     fmpz_set_ui(CA_FMPQ_NUMREF(x), v);
     fmpz_one(CA_FMPQ_DENREF(x));
 }
-

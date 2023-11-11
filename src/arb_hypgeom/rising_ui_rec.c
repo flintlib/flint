@@ -43,4 +43,3 @@ arb_hypgeom_rising_ui_rec(arb_t res, const arb_t x, ulong n, slong prec)
             arb_hypgeom_rising_ui_rs(res, x, n, 0, prec);
     }
 }
-

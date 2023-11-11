@@ -149,4 +149,3 @@ acb_agm(acb_t res, const acb_t a, const acb_t b, slong prec)
     acb_clear(u);
     acb_clear(v);
 }
-

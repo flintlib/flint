@@ -20,4 +20,3 @@ qqbar_i(qqbar_t res)
     fmpz_poly_set_coeff_si(QQBAR_POLY(res), 0, 1);
     acb_onei(QQBAR_ENCLOSURE(res));
 }
-

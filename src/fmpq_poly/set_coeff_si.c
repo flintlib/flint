@@ -41,4 +41,3 @@ void fmpq_poly_set_coeff_si(fmpq_poly_t poly, slong n, slong x)
             fmpq_poly_canonicalise(poly);
     }
 }
-

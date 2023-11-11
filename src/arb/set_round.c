@@ -23,4 +23,3 @@ arb_set_round(arb_t z, const arb_t x, slong prec)
     else
         mag_set(arb_radref(z), arb_radref(x));
 }
-

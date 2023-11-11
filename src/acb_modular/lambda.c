@@ -67,4 +67,3 @@ acb_modular_lambda(acb_t r, const acb_t tau, slong prec)
     acb_clear(thetas + 2);
     acb_clear(thetas + 3);
 }
-

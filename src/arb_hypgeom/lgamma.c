@@ -72,4 +72,3 @@ arb_hypgeom_lgamma(arb_t res, const arb_t x, slong prec)
 
     arb_hypgeom_lgamma_stirling(res, x, prec);
 }
-

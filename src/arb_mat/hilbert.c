@@ -29,4 +29,3 @@ arb_mat_hilbert(arb_mat_t mat, slong prec)
         }
     }
 }
-

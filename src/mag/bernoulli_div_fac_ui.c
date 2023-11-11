@@ -68,4 +68,3 @@ mag_bernoulli_div_fac_ui(mag_t z, ulong n)
            when n >= 32, so there is no need */
     }
 }
-

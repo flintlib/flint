@@ -148,4 +148,3 @@ qqbar_mul_si(qqbar_t res, const qqbar_t x, slong y)
     qqbar_mul(res, x, t);
     qqbar_clear(t);
 }
-

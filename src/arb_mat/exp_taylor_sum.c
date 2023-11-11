@@ -111,4 +111,3 @@ arb_mat_exp_taylor_sum(arb_mat_t S, const arb_mat_t A, slong N, slong prec)
         arb_mat_clear(U);
     }
 }
-

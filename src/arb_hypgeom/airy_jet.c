@@ -47,4 +47,3 @@ arb_hypgeom_airy_jet(arb_ptr ai, arb_ptr bi, const arb_t z, slong len, slong pre
     if (ai != NULL) airy_recurrence(ai, z, len, prec);
     if (bi != NULL) airy_recurrence(bi, z, len, prec);
 }
-

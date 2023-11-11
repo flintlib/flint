@@ -93,4 +93,3 @@ int fmpz_mod_poly_invmod(fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
     _fmpz_mod_poly_normalise(A);
     return ans;
 }
-

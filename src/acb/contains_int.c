@@ -19,4 +19,3 @@ acb_contains_int(const acb_t x)
 
     return arb_contains_int(acb_realref(x));
 }
-

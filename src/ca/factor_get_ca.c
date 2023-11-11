@@ -41,4 +41,3 @@ ca_factor_get_ca(ca_t res, const ca_factor_t fac, ca_ctx_t ctx)
         ca_clear(t, ctx);
     }
 }
-

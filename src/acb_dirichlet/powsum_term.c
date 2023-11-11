@@ -70,4 +70,3 @@ acb_dirichlet_powsum_term(acb_ptr res, arb_t log_prev, ulong * prev,
         arb_neg(log_prev, log_prev);
     }
 }
-

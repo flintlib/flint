@@ -73,4 +73,3 @@ arb_sqrt1pm1(arb_t r, const arb_t z, slong prec)
         arb_sub_ui(r, r, 1, wp);
     }
 }
-

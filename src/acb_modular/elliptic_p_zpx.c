@@ -17,4 +17,3 @@ acb_modular_elliptic_p_zpx(acb_ptr r, const acb_t z, const acb_t tau, slong len,
 {
     acb_elliptic_p_jet(r, z, tau, len, prec);
 }
-

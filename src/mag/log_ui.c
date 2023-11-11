@@ -27,4 +27,3 @@ mag_log_ui(mag_t t, ulong n)
         mag_log1p(t, t);
     }
 }
-

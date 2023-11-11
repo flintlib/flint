@@ -114,4 +114,3 @@ acb_lambertw_bound_deriv(mag_t res, const acb_t z, const acb_t ez1, const fmpz_t
     mag_clear(u);
     mag_clear(v);
 }
-

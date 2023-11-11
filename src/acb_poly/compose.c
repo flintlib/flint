@@ -63,4 +63,3 @@ void acb_poly_compose(acb_poly_t res,
         _acb_poly_normalise(res);
     }
 }
-

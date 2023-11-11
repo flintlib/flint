@@ -24,4 +24,3 @@ void fmpq_poly_clear(fmpq_poly_t poly)
     }
     fmpz_clear(poly->den);
 }
-

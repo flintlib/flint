@@ -34,4 +34,3 @@ acb_clear(acb_t x)
     if (COEFF_IS_MPZ(MAG_EXP(arb_radref(acb_imagref(x)))))
         _fmpz_clear_mpz(MAG_EXP(arb_radref(acb_imagref(x))));
 }
-

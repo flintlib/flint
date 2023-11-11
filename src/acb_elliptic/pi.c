@@ -269,4 +269,3 @@ acb_elliptic_pi_inc(acb_t res, const acb_t n, const acb_t phi, const acb_t m, in
     acb_clear(w);
     acb_clear(r);
 }
-

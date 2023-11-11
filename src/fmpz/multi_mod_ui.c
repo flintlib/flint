@@ -78,4 +78,3 @@ void fmpz_multi_mod_ui(
     if (klen == 1)
         A[0] = *ttt;
 }
-

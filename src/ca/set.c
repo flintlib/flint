@@ -50,4 +50,3 @@ ca_set(ca_t res, const ca_t x, ca_ctx_t ctx)
         }
     }
 }
-

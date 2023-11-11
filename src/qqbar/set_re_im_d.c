@@ -44,4 +44,3 @@ qqbar_set_re_im_d(qqbar_t res, double x, double y)
 
     return ok;
 }
-

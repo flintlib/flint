@@ -73,4 +73,3 @@ acb_dirichlet_hardy_theta_series(acb_poly_t res, const acb_poly_t s,
     _acb_poly_set_length(res, len);
     _acb_poly_normalise(res);
 }
-

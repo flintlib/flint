@@ -23,4 +23,3 @@ acb_csgn(arb_t res, const acb_t z)
         arb_sgn(res, acb_realref(z));
     }
 }
-

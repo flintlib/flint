@@ -81,4 +81,3 @@ arb_add_error(arb_t x, const arb_t err)
     mag_add(arb_radref(x), arb_radref(x), u);
     mag_clear(u);
 }
-

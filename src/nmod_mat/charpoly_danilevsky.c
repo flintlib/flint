@@ -164,4 +164,3 @@ cleanup:
    nmod_poly_clear(b);
    TMP_END;
 }
-

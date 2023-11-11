@@ -2268,4 +2268,3 @@ const mp_limb_t arb_log_tab22[1 << ARB_LOG_TAB22_BITS][ARB_LOG_TAB2_LIMBS] =
   Z8(f0a5b553,221ccad4,2d3e91ef,be0fe5f4,167294c9,e10d6380,c3372b02,07a28fb8)
 }};
 
-

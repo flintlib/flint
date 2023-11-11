@@ -193,4 +193,3 @@ arb_exp_arf_rs_generic(arb_t res, const arf_t x, slong prec, int minus_one)
     arb_set_round(res, t, prec);
     arb_clear(t);
 }
-

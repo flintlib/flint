@@ -28,4 +28,3 @@ qqbar_print(const qqbar_t x)
     acb_printn(QQBAR_ENCLOSURE(x), FLINT_MAX(6, FLINT_MIN(acb_rel_accuracy_bits(QQBAR_ENCLOSURE(x)),
         acb_bits(QQBAR_ENCLOSURE(x)))), 0);
 }
-

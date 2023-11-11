@@ -35,4 +35,3 @@ arb_mul_2exp_si(arb_t y, const arb_t x, slong e)
     arf_mul_2exp_si(arb_midref(y), arb_midref(x), e);
     _mag_mul_2exp_si(arb_radref(y), arb_radref(x), e);
 }
-

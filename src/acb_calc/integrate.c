@@ -346,4 +346,3 @@ acb_calc_integrate(acb_t res, acb_calc_func_t f, void * param,
 
     return status;
 }
-

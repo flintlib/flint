@@ -114,4 +114,3 @@ unity_zp_pow_sliding_fmpz(unity_zp f, unity_zp g, const fmpz_t pow)
 
     unity_zp_clear(temp);
 }
-

@@ -40,4 +40,3 @@ acb_hypgeom_u_use_asymp(const acb_t z, slong prec)
 
     return sqrt(x * x + y * y) > prec * 0.69314718055994530942;
 }
-

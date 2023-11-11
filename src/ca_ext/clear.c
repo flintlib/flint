@@ -35,4 +35,3 @@ ca_ext_clear(ca_ext_t res, ca_ctx_t ctx)
         }
     }
 }
-

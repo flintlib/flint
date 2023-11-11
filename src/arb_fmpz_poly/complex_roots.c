@@ -219,4 +219,3 @@ arb_fmpz_poly_complex_roots(acb_ptr roots, const fmpz_poly_t poly, int flags, sl
     acb_poly_clear(cpoly_deflated);
     _acb_vec_clear(roots_deflated, deg);
 }
-

@@ -72,4 +72,3 @@ void qsieve_poly_clear(qs_t qs_inf)
    qs_inf->curr_subset = NULL;
 }
 
-

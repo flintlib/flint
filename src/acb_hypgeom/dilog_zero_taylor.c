@@ -235,4 +235,3 @@ acb_hypgeom_dilog_zero_taylor(acb_t res, const acb_t z, slong prec)
 
     mag_clear(m);
 }
-

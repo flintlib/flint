@@ -57,4 +57,3 @@ acb_hypgeom_gamma_lower(acb_t res, const acb_t s, const acb_t z, int regularized
     acb_clear(t);
     acb_clear(u);
 }
-

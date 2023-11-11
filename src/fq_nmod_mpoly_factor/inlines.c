@@ -14,4 +14,3 @@
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fq_nmod_mpoly_factor.h"
-

@@ -83,4 +83,3 @@ mag_sub_lower(mag_t z, const mag_t x, const mag_t y)
         }
     }
 }
-

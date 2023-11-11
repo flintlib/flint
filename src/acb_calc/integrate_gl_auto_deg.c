@@ -423,4 +423,3 @@ acb_calc_integrate_gl_auto_deg(acb_t res, slong * eval_count,
 
     return status;
 }
-

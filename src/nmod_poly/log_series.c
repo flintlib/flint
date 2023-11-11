@@ -42,4 +42,3 @@ nmod_poly_log_series(nmod_poly_t res, const nmod_poly_t f, slong n)
     res->length = n;
 	_nmod_poly_normalise(res);
 }
-

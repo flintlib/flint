@@ -33,4 +33,3 @@ void fmpz_mod_poly_scalar_mul_ui(fmpz_mod_poly_t res,
     _fmpz_mod_poly_set_length(res, poly->length);
     _fmpz_mod_poly_normalise(res);
 }
-

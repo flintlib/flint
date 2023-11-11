@@ -380,4 +380,3 @@ arb_sin_cos_arf_generic(arb_t res_sin, arb_t res_cos, const arf_t x, slong prec)
         fmpz_clear(q);
     }
 }
-

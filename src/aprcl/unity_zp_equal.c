@@ -24,4 +24,3 @@ unity_zp_equal(unity_zp f, unity_zp g)
 
     return fmpz_mod_poly_equal(f->poly, g->poly, f->ctx);
 }
-

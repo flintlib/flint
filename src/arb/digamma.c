@@ -98,4 +98,3 @@ arb_digamma(arb_t y, const arb_t x, slong prec)
     arb_clear(u);
     arb_clear(v);
 }
-

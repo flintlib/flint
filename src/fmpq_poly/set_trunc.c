@@ -35,4 +35,3 @@ fmpq_poly_set_trunc(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
         fmpq_poly_canonicalise(res);
     }
 }
-

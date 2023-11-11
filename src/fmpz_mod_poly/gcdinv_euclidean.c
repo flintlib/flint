@@ -220,4 +220,3 @@ void fmpz_mod_poly_gcdinv_euclidean(fmpz_mod_poly_t G, fmpz_mod_poly_t S,
         fmpz_clear(inv);
     }
 }
-

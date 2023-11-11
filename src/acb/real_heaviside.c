@@ -22,4 +22,3 @@ acb_real_heaviside(acb_t res, const acb_t z, int analytic, slong prec)
         acb_mul_2exp_si(res, res, -1);
     }
 }
-

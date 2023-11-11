@@ -51,4 +51,3 @@ unity_zp_coeff_add_ui(unity_zp f, ulong ind, ulong x)
         fmpz_sub(f->poly->coeffs + ind, f->poly->coeffs + ind,
                                                  fmpz_mod_ctx_modulus(f->ctx));
 }
-

@@ -75,4 +75,3 @@ void fmpz_gcdinv(fmpz_t d, fmpz_t a, const fmpz_t f, const fmpz_t g)
         _fmpz_demote_val(a);
     }
 }
-

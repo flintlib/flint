@@ -21,4 +21,3 @@ arb_hypgeom_sum_fmpq_imag_arb(arb_t res1, arb_t res2, const fmpq * a, slong alen
     else
         arb_hypgeom_sum_fmpq_imag_arb_rs(res1, res2, a, alen, b, blen, z, reciprocal, N, prec);
 }
-

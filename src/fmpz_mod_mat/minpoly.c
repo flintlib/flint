@@ -192,4 +192,3 @@ void fmpz_mod_mat_minpoly(fmpz_mod_poly_t p, const fmpz_mod_mat_t X,
 
     TMP_END;
 }
-

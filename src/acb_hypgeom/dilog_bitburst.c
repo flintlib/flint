@@ -86,4 +86,3 @@ acb_hypgeom_dilog_bitburst(acb_t res, acb_t z0, const acb_t z, slong prec)
     acb_clear(tprev);
     acb_clear(u);
 }
-

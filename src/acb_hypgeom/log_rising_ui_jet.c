@@ -284,4 +284,3 @@ acb_hypgeom_log_rising_ui(acb_ptr res, const acb_t z, ulong r, slong prec)
 {
     acb_hypgeom_log_rising_ui_jet(res, z, r, 1, prec);
 }
-

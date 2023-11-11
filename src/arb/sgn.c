@@ -28,4 +28,3 @@ arb_sgn(arb_t res, const arb_t x)
         arb_set_si(res, arf_sgn(arb_midref(x)));
     }
 }
-

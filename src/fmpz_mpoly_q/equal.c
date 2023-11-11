@@ -17,4 +17,3 @@ fmpz_mpoly_q_equal(const fmpz_mpoly_q_t x, const fmpz_mpoly_q_t y, const fmpz_mp
     return fmpz_mpoly_equal(fmpz_mpoly_q_numref(x), fmpz_mpoly_q_numref(y), ctx) &&
             fmpz_mpoly_equal(fmpz_mpoly_q_denref(x), fmpz_mpoly_q_denref(y), ctx);
 }
-

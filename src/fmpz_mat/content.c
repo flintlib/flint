@@ -35,4 +35,3 @@ void fmpz_mat_content(fmpz_t mat_gcd, const fmpz_mat_t A)
 
 	return;
 }
-

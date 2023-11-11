@@ -32,4 +32,3 @@ void n_prime_pi_bounds(ulong *lo, ulong *hi, mp_limb_t n)
         *hi = (n / (10 * FLINT_FLOG2(n)) + 1) * 19;
     }
 }
-

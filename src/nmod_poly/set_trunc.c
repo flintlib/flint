@@ -36,4 +36,3 @@ nmod_poly_set_trunc(nmod_poly_t res, const nmod_poly_t poly, slong len)
         _nmod_poly_set_length(res, rlen);
     }
 }
-

@@ -82,4 +82,3 @@ void flint_mpn_mul_fft_main(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
       mul_mfa_truncate_sqrt2(r1, i1, n1, i2, n2, depth, w);
    }
 }
-

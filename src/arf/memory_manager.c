@@ -95,4 +95,3 @@ _arf_demote(arf_t x)
         flint_free(ptr);
     }
 }
-

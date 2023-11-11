@@ -38,4 +38,3 @@ fmpz_mpoly_q_is_canonical(const fmpz_mpoly_q_t res, const fmpz_mpoly_ctx_t ctx)
         return ans;
     }
 }
-

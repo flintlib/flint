@@ -200,4 +200,3 @@ char * fmpq_poly_get_str_pretty(const fmpq_poly_t poly, const char * var)
     return _fmpq_poly_get_str_pretty(poly->coeffs, poly->den, poly->length,
                                      var);
 }
-

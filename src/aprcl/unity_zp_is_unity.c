@@ -44,4 +44,3 @@ unity_zp_is_unity(unity_zp f)
     unity_zp_clear(unity);
     return result;
 }
-

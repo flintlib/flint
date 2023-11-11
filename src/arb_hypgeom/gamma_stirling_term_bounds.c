@@ -47,4 +47,3 @@ _arb_hypgeom_gamma_stirling_term_bounds(slong * bound, const mag_t zinv, slong N
     mag_clear(b);
     mag_clear(u);
 }
-

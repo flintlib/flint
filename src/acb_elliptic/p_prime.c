@@ -56,4 +56,3 @@ acb_elliptic_p_prime(acb_t r, const acb_t z, const acb_t tau, slong prec)
     for (i = 0; i < 4; i++)
         acb_clear(tz + i);
 }
-

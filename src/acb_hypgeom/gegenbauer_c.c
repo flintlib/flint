@@ -125,4 +125,3 @@ acb_hypgeom_gegenbauer_c(acb_t res, const acb_t n, const acb_t m,
     acb_clear(c);
     acb_clear(t);
 }
-

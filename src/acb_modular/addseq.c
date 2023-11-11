@@ -175,4 +175,3 @@ acb_modular_addseq_eta(slong * exponents, slong * aindex, slong * bindex, slong 
         }
     }
 }
-

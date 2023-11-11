@@ -50,4 +50,3 @@ arb_contains_int(const arb_t x)
         return res;
     }
 }
-

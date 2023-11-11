@@ -128,4 +128,3 @@ acb_hypgeom_ei(acb_t res, const acb_t z, slong prec)
     else
         acb_hypgeom_ei_2f2(res, z, prec);
 }
-

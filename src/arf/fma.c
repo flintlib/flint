@@ -76,4 +76,3 @@ arf_fma(arf_ptr res, arf_srcptr x, arf_srcptr y, arf_srcptr z, slong prec, arf_r
 
     return inexact;
 }
-

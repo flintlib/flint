@@ -317,4 +317,3 @@ acb_elliptic_rf(acb_t res, const acb_t x, const acb_t y, const acb_t z,
     mag_clear(err2);
     mag_clear(prev_err);
 }
-

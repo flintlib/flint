@@ -188,4 +188,3 @@ int _nmod_vec_print(mp_srcptr vec, slong len, nmod_t mod);
 #endif
 
 #endif
-

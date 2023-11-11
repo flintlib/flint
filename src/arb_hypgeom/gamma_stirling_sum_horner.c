@@ -72,4 +72,3 @@ arb_hypgeom_gamma_stirling_sum_horner(arb_t s, const arb_t z, slong N, slong pre
     arb_clear(w);
     mag_clear(zinv_mag);
 }
-

@@ -79,4 +79,3 @@ arb_zeta_ui(arb_t x, ulong n, slong prec)
         }
     }
 }
-

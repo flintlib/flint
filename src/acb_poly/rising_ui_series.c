@@ -103,4 +103,3 @@ acb_poly_rising_ui_series(acb_poly_t res, const acb_poly_t f, ulong r, slong tru
         _acb_poly_normalise(res);
     }
 }
-

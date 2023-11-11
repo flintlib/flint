@@ -59,4 +59,3 @@ acb_chebyshev_u2_ui(acb_t a, acb_t b, ulong n, const acb_t x, slong prec)
     acb_clear(t);
     acb_clear(u);
 }
-

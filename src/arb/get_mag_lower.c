@@ -101,4 +101,3 @@ arb_get_mag_lower(mag_t z, const arb_t x)
 {
     _arb_get_mag_lower(z, arb_midref(x), arb_radref(x));
 }
-

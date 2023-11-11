@@ -42,4 +42,3 @@ acb_zeta(acb_t z, const acb_t s, slong prec)
 {
     acb_dirichlet_zeta(z, s, prec);
 }
-

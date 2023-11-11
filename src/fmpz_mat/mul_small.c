@@ -456,4 +456,3 @@ void _fmpz_mat_mul_small(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 
     _fmpz_mat_mul_small_internal(C, A, B, Cbits);
 }
-

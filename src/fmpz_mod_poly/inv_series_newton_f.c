@@ -75,4 +75,3 @@ cleanup:
         flint_free(Qcopy);
     fmpz_clear(cinv);
 }
-

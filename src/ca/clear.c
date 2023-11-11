@@ -82,4 +82,3 @@ ca_clear(ca_t x, ca_ctx_t ctx)
         }
     }
 }
-

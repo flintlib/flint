@@ -54,4 +54,3 @@ ca_ext_print(const ca_ext_t x, ca_ctx_t ctx)
         }
     }
 }
-

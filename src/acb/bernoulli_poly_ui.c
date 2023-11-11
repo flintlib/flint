@@ -87,4 +87,3 @@ acb_bernoulli_poly_ui(acb_t res, ulong n, const acb_t x, slong prec)
     arb_clear(t);
     arb_clear(c);
 }
-

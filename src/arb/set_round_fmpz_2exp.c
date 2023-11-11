@@ -22,4 +22,3 @@ arb_set_round_fmpz_2exp(arb_t y, const fmpz_t x, const fmpz_t exp, slong prec)
     else
         mag_zero(arb_radref(y));
 }
-

@@ -37,4 +37,3 @@ arb_mat_spd_get_fmpz_mat(fmpz_mat_t B, const arb_mat_t A, slong prec)
     arb_clear(z);
     return res;
 }
-

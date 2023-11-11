@@ -20,4 +20,3 @@ ca_mat_det_cofactor(ca_t res, const ca_mat_t A, ca_ctx_t ctx)
 
     GR_MUST_SUCCEED(gr_mat_det_cofactor(res, (const gr_mat_struct *) A, gr_ctx));
 }
-

@@ -87,4 +87,3 @@ void fmpz_poly_lcm(fmpz_poly_t res, const fmpz_poly_t poly1,
     _fmpz_poly_normalise(res);
 
 }
-

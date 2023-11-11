@@ -267,4 +267,3 @@ acb_hypgeom_lgamma(acb_t y, const acb_t x, slong prec)
     acb_clear(u);
     acb_clear(v);
 }
-

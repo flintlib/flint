@@ -16,4 +16,3 @@ acb_mat_sqr(acb_mat_t B, const acb_mat_t A, slong prec)
 {
     acb_mat_mul(B, A, A, prec);
 }
-

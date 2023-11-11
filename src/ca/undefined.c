@@ -17,4 +17,3 @@ ca_undefined(ca_t x, ca_ctx_t ctx)
     ca_zero(x, ctx);
     x->field = CA_UNDEFINED;
 }
-

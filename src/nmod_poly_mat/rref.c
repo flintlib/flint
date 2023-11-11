@@ -94,4 +94,3 @@ nmod_poly_mat_rref(nmod_poly_mat_t R, nmod_poly_t den, const nmod_poly_mat_t A)
 
     return rank;
 }
-

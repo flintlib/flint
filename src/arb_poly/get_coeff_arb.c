@@ -19,4 +19,3 @@ arb_poly_get_coeff_arb(arb_t x, const arb_poly_t poly, slong n)
     else
         arb_zero(x);
 }
-

@@ -33,4 +33,3 @@ qqbar_printnd(const qqbar_t x, slong n)
     qqbar_printn(x, n);
     flint_printf(" (deg %wd)", qqbar_degree(x));
 }
-

@@ -28,4 +28,3 @@ n_cleanup_primes(void)
 
     _flint_primes_used = 0;
 }
-

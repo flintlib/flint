@@ -17,4 +17,3 @@ acb_modular_elliptic_e(acb_t res, const acb_t m, slong prec)
 {
     acb_elliptic_e(res, m, prec);
 }
-

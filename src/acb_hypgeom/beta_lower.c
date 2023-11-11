@@ -84,4 +84,3 @@ void acb_hypgeom_beta_lower(acb_t res,
     acb_clear(t);
     acb_clear(u);
 }
-

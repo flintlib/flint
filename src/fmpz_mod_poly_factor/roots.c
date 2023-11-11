@@ -213,4 +213,3 @@ void fmpz_mod_poly_roots(fmpz_mod_poly_factor_t r, const fmpz_mod_poly_t f,
     for (i = 0; i < FLINT_BITS + 3; i++)
         fmpz_mod_poly_clear(t + i, ctx);
 }
-

@@ -283,4 +283,3 @@ _arb_mat_addmul_rad_mag_fast(arb_mat_t C, mag_srcptr A, mag_srcptr B,
     flint_free(BB);
     flint_free(CC);
 }
-

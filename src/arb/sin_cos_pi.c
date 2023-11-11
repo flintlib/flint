@@ -180,4 +180,3 @@ arb_sin_cos_pi(arb_t s, arb_t c, const arb_t x, slong prec)
     arb_clear(t);
     arb_clear(u);
 }
-

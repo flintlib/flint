@@ -54,4 +54,3 @@ int fmpz_mod_mat_inv(fmpz_mod_mat_t B, fmpz_mod_mat_t A)
 
     return result;
 }
-

@@ -78,4 +78,3 @@ void padic_poly_mul(padic_poly_t f,
         _padic_poly_normalise(f);
     }
 }
-

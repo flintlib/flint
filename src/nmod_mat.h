@@ -337,4 +337,3 @@ void nmod_mat_set_entry(nmod_mat_t mat, slong i, slong j, mp_limb_t x);
 #endif
 
 #endif
-

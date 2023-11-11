@@ -53,4 +53,3 @@ arf_set_mpn(arf_t y, mp_srcptr x, mp_size_t xn, int sgnbit)
 
     fmpz_set_ui(ARF_EXPREF(y), xn1 * FLINT_BITS - leading);
 }
-

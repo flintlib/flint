@@ -112,4 +112,3 @@ acb_elliptic_rc1(acb_t res, const acb_t x, slong prec)
 
     mag_clear(xm);
 }
-

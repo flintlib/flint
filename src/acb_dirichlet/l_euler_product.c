@@ -162,4 +162,3 @@ acb_dirichlet_l_euler_product(acb_t res, const acb_t s,
     acb_clear(negs);
     arf_clear(left);
 }
-

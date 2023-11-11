@@ -21,4 +21,3 @@ arb_fac_ui(arb_t x, ulong n, slong prec)
     arb_gamma_fmpz(x, t, prec);
     fmpz_clear(t);
 }
-

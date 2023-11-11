@@ -174,4 +174,3 @@ fq_zech_mpoly_struct * _fq_zech_mpolyu_get_coeff(fq_zech_mpolyu_t A,
 
     return xk;
 }
-

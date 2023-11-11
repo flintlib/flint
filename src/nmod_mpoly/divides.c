@@ -191,4 +191,3 @@ int nmod_mpoly_divides(
 
     return divides;
 }
-

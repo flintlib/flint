@@ -306,4 +306,3 @@ acb_hypgeom_pfq_series_choose_n(const acb_poly_struct * a, slong p,
 
     return n;
 }
-

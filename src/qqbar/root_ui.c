@@ -165,4 +165,3 @@ qqbar_root_ui(qqbar_t res, const qqbar_t x, ulong n)
         acb_clear(t);
     }
 }
-

@@ -79,4 +79,3 @@ void fmpq_poly_set_coeff_fmpq(fmpq_poly_t poly, slong n, const fmpq_t x)
         fmpz_clear(t);
     }
 }
-

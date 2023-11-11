@@ -67,4 +67,3 @@ int arf_cmpabs_d(const arf_t x, double y)
     arf_set_d(t, y);
     return arf_cmpabs(x, t);
 }
-

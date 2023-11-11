@@ -50,4 +50,3 @@ acb_sin(acb_t r, const acb_t z, slong prec)
 #undef b
 }
 
-

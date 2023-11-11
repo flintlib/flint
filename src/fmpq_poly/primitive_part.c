@@ -37,4 +37,3 @@ void fmpq_poly_primitive_part(fmpq_poly_t res, const fmpq_poly_t poly)
                                   poly->coeffs, poly->den, len);
     }
 }
-

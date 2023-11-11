@@ -66,4 +66,3 @@ arb_sub_fmpz(arb_t z, const arb_t x, const fmpz_t y, slong prec)
     else
         mag_set(arb_radref(z), arb_radref(x));
 }
-

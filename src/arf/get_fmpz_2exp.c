@@ -55,4 +55,3 @@ arf_get_fmpz_2exp(fmpz_t man, fmpz_t exp, const arf_t x)
         }
     }
 }
-

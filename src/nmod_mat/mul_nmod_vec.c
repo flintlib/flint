@@ -29,4 +29,3 @@ void nmod_mat_mul_nmod_vec(
         NMOD_VEC_DOT(c[i], j, len, Ai[j], b[j], mod, nlimbs);
     }
 }
-

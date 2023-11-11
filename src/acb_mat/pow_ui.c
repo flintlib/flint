@@ -60,4 +60,3 @@ acb_mat_pow_ui(acb_mat_t B, const acb_mat_t A, ulong exp, slong prec)
         acb_mat_clear(U);
     }
 }
-

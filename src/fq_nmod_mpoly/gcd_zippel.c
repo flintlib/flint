@@ -488,4 +488,3 @@ int fq_nmod_mpoly_gcd_zippel(
 
     return _fq_nmod_mpoly_gcd_algo(G, NULL, NULL, A, B, ctx, MPOLY_GCD_USE_ZIPPEL);
 }
-

@@ -300,4 +300,3 @@ n2prime:
       return 0;
    }
 }
-

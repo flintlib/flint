@@ -63,4 +63,3 @@ qqbar_express_in_field(fmpq_poly_t res, const qqbar_t alpha, const qqbar_t x, sl
 
     return found;
 }
-

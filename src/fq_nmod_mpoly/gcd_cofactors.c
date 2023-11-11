@@ -55,4 +55,3 @@ int fq_nmod_mpoly_gcd_cofactors(
 
     return _fq_nmod_mpoly_gcd_algo(G, Abar, Bbar, A, B, ctx, MPOLY_GCD_USE_ALL);
 }
-

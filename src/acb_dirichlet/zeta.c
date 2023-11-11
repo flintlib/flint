@@ -98,4 +98,3 @@ acb_dirichlet_zeta(acb_t res, const acb_t s, slong prec)
         _acb_dirichlet_zeta(res, s, prec);
     }
 }
-

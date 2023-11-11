@@ -26,4 +26,3 @@ acb_mat_window_init(acb_mat_t window, const acb_mat_t mat,
     window->r = r2 - r1;
     window->c = c2 - c1;
 }
-

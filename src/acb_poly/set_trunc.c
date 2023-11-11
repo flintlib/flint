@@ -32,4 +32,3 @@ acb_poly_set_trunc(acb_poly_t res, const acb_poly_t poly, slong n)
         _acb_poly_set_length(res, rlen);
     }
 }
-

@@ -29,4 +29,3 @@ arb_poly_add_series(arb_poly_t res, const arb_poly_t poly1,
     _arb_poly_set_length(res, len);
     _arb_poly_normalise(res);
 }
-

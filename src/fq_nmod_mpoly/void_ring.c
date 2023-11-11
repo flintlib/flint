@@ -133,4 +133,3 @@ void mpoly_void_ring_init_fq_nmod_mpoly_ctx(
     R->pow_fmpz = fq_nmod_mpoly_void_pow_fmpz;
     R->length = fq_nmod_mpoly_void_length;
 }
-

@@ -64,4 +64,3 @@ void fmpz_mod_poly_mul(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
     }
     _fmpz_mod_poly_normalise(res);
 }
-

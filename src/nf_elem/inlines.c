@@ -17,4 +17,3 @@
 #define NF_ELEM_INLINES_C
 
 #include "nf_elem.h"
-

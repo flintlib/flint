@@ -43,4 +43,3 @@ acb_modular_theta_jet_notransform(acb_ptr theta1, acb_ptr theta2,
     acb_clear(q4);
     acb_clear(w);
 }
-

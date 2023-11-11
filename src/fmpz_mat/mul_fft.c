@@ -589,4 +589,3 @@ void fmpz_mat_mul_fft(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 
     _fmpz_mat_mul_fft(C, A, abits, B, bbits, sign);
 }
-

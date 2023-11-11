@@ -110,4 +110,3 @@ acb_hypgeom_fresnel_series(acb_poly_t s, acb_poly_t c,
     if (s != NULL) _acb_poly_normalise(s);
     if (c != NULL) _acb_poly_normalise(c);
 }
-

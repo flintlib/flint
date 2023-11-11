@@ -29,4 +29,3 @@ void fmpz_poly_hensel_lift_tree(slong *link, fmpz_poly_t *v, fmpz_poly_t *w,
     fmpz_clear(p0);
     fmpz_clear(p1);
 }
-

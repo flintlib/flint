@@ -76,4 +76,3 @@ arb_poly_sinh_cosh_series_basecase(arb_poly_t s, arb_poly_t c,
     _arb_poly_set_length(c, n);
     _arb_poly_normalise(c);
 }
-

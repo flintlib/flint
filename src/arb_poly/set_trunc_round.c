@@ -33,4 +33,3 @@ arb_poly_set_trunc_round(arb_poly_t res, const arb_poly_t poly, slong n, slong p
         _arb_poly_set_length(res, rlen);
     }
 }
-

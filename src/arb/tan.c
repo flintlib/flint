@@ -20,4 +20,3 @@ arb_tan(arb_t y, const arb_t x, slong prec)
     arb_div(y, y, u, prec);
     arb_clear(u);
 }
-

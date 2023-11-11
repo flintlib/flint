@@ -63,4 +63,3 @@ void fft_adjust_sqrt2(mp_limb_t * r, mp_limb_t * i1,
    else
       mpn_sub_n(r, temp, r, limbs + 1);
 }
-

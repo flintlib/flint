@@ -237,4 +237,3 @@ cleanup:
         fmpz_clear(inv);
     }
 }
-

@@ -87,4 +87,3 @@ void _mpf_vec_norm2(mpf_t res, const mpf * vec, slong len, flint_bitcnt_t prec);
 #endif
 
 #endif
-

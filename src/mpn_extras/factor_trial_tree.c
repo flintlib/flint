@@ -217,4 +217,3 @@ int flint_mpn_factor_trial_tree(slong * factors,
 
     return numfacs;
 }
-

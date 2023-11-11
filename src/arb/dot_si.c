@@ -73,4 +73,3 @@ arb_dot_si(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong xst
 
     TMP_END;
 }
-

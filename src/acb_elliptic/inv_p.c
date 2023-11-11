@@ -33,4 +33,3 @@ acb_elliptic_inv_p(acb_t res, const acb_t z, const acb_t tau, slong prec)
     acb_clear(e2);
     acb_clear(e3);
 }
-

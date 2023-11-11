@@ -20,4 +20,3 @@ acb_poly_set_round(acb_poly_t dest, const acb_poly_t src, slong prec)
     _acb_vec_set_round(dest->coeffs, src->coeffs, len, prec);
     _acb_poly_set_length(dest, len);
 }
-

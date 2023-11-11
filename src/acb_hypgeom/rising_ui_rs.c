@@ -119,4 +119,3 @@ acb_hypgeom_rising_ui_rs(acb_t res, const acb_t x, ulong n, ulong m, slong prec)
     _acb_vec_clear(xpow, m + 1);
     TMP_END;
 }
-

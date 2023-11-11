@@ -236,4 +236,3 @@ cleanup:
     fmpz_clear(N);
     mag_clear(err);
 }
-

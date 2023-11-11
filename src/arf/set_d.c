@@ -86,4 +86,3 @@ arf_set_d(arf_t x, double v)
     arf_set_mpfr(x, t);
 #endif
 }
-

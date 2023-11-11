@@ -25,4 +25,3 @@ bernoulli_rev_clear(bernoulli_rev_t iter)
         arb_clear(iter->two_pi_squared);
     }
 }
-

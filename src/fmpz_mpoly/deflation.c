@@ -21,4 +21,3 @@ void fmpz_mpoly_deflation(fmpz * shift, fmpz * stride,
 }
 
 
-

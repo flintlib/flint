@@ -132,4 +132,3 @@ arb_hypgeom_central_bin_ui(arb_t res, ulong n, slong prec)
         arb_hypgeom_central_bin_ui_asymp(res, n, prec);
     }
 }
-

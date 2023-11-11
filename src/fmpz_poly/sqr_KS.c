@@ -92,4 +92,3 @@ void fmpz_poly_sqr_KS(fmpz_poly_t rop, const fmpz_poly_t op)
     _fmpz_poly_sqr_KS(rop->coeffs, op->coeffs, op->length);
     _fmpz_poly_set_length(rop, len);
 }
-

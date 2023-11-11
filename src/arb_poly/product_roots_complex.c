@@ -92,4 +92,3 @@ arb_poly_product_roots_complex(arb_poly_t poly,
     _arb_poly_product_roots_complex(poly->coeffs, r, rn, c, cn, prec);
     _arb_poly_set_length(poly, rn + 2 * cn + 1);
 }
-

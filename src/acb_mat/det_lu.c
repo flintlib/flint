@@ -155,4 +155,3 @@ acb_mat_det_lu(acb_t det, const acb_mat_t A, slong prec)
         acb_mat_clear(T);
     }
 }
-

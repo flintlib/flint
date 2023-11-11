@@ -27,4 +27,3 @@ void _fmpz_mod_vec_scalar_div_fmpz_mod(
         fmpz_mod_mul(A + len, B + len, d, ctx);
     fmpz_clear(d);
 }
-

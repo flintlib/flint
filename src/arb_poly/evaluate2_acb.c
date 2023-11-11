@@ -22,4 +22,3 @@ arb_poly_evaluate2_acb(acb_t r, acb_t s, const arb_poly_t f, const acb_t a, slon
 {
     _arb_poly_evaluate2_acb(r, s, f->coeffs, f->length, a, prec);
 }
-

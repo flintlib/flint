@@ -80,4 +80,3 @@ fmpz_mpoly_q_canonicalise(fmpz_mpoly_q_t res, const fmpz_mpoly_ctx_t ctx)
         fmpz_mpoly_clear(g, ctx);
     }
 }
-

@@ -39,4 +39,3 @@ arb_ceil(arb_t z, const arb_t x, slong prec)
         arf_clear(b);
     }
 }
-

@@ -210,4 +210,3 @@ fmpq_poly_pow_trunc(fmpq_poly_t res,
         }
     }
 }
-

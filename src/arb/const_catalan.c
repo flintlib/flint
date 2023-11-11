@@ -37,4 +37,3 @@ arb_const_catalan_eval(arb_t s, slong prec)
 }
 
 ARB_DEF_CACHED_CONSTANT(arb_const_catalan, arb_const_catalan_eval)
-

@@ -45,4 +45,3 @@ void nmod_mpoly_compose_nmod_mpoly_gen(nmod_mpoly_t A,
 
     return;
 }
-

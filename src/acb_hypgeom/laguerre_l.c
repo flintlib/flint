@@ -112,4 +112,3 @@ acb_hypgeom_laguerre_l(acb_t res, const acb_t n, const acb_t m, const acb_t z, s
     acb_clear(u);
     acb_clear(v);
 }
-

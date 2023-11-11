@@ -37,4 +37,3 @@ mag_hurwitz_zeta_uiui(mag_t res, ulong s, ulong a)
         mag_clear(u);
     }
 }
-

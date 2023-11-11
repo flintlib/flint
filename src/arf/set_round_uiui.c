@@ -194,4 +194,3 @@ _arf_set_round_uiui(arf_t z, slong * fix, mp_limb_t hi, mp_limb_t lo, int sgnbit
     ARF_NOPTR_D(z)[1] = hi;
     return inexact;
 }
-

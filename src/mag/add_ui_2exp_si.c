@@ -20,4 +20,3 @@ mag_add_ui_2exp_si(mag_t z, const mag_t x, ulong y, slong e)
     mag_add(z, x, t);
     mag_clear(t);
 }
-

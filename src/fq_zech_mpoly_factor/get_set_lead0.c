@@ -49,4 +49,3 @@ void _fq_zech_mpoly_set_lead0(
     fq_zech_mpoly_clear(t, ctx);
     fq_zech_mpoly_clear(g, ctx);
 }
-

@@ -171,4 +171,3 @@ acb_sqrt_analytic(acb_t res, const acb_t z, int analytic, slong prec)
         acb_sqrt(res, z, prec);
     }
 }
-

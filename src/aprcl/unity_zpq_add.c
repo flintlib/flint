@@ -32,4 +32,3 @@ unity_zpq_add(unity_zpq f, const unity_zpq g, const unity_zpq h)
         fmpz_mod_poly_add(f->polys[i], g->polys[i], h->polys[i], f->ctx);
     }
 }
-

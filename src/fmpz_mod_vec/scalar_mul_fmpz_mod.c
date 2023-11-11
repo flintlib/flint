@@ -31,4 +31,3 @@ void _fmpz_mod_vec_scalar_mul_fmpz_mod(
             fmpz_mod_mul(A + len, B + len, c, ctx);
     }
 }
-

@@ -36,4 +36,3 @@ acb_real_max(acb_t res, const acb_t x, const acb_t y, int analytic, slong prec)
 
     arb_clear(t);
 }
-

@@ -65,4 +65,3 @@ double _d_vec_dot(const double * vec1, const double * vec2, slong len2);
 #endif
 
 #endif
-

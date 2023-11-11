@@ -112,4 +112,3 @@ void arb_hypgeom_beta_lower_series(arb_poly_t res,
     _arb_poly_set_length(res, len);
     _arb_poly_normalise(res);
 }
-

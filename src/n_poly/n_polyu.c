@@ -77,4 +77,3 @@ void n_polyu3_degrees(
     *deg1 = extract_exp(m, 1, 3);
     *deg2 = extract_exp(m, 0, 3);
 }
-

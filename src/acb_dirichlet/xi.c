@@ -66,4 +66,3 @@ void acb_dirichlet_xi(acb_t res, const acb_t s, slong prec)
         _acb_dirichlet_xi(res, s, prec);
     }
 }
-

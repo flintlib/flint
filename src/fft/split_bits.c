@@ -285,4 +285,3 @@ mp_size_t fft_split_bits(mp_limb_t ** poly, mp_srcptr limbs,
 
     return length;
 }
-

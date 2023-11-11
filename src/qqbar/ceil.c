@@ -76,4 +76,3 @@ qqbar_ceil(fmpz_t res, const qqbar_t x)
         arb_clear(v);
     }
 }
-

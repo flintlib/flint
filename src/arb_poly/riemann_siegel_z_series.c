@@ -103,4 +103,3 @@ arb_poly_riemann_siegel_z_series(arb_poly_t res, const arb_poly_t f, slong n, sl
     _arb_poly_set_length(res, n);
     _arb_poly_normalise(res);
 }
-

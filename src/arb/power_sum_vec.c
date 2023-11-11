@@ -51,4 +51,3 @@ arb_power_sum_vec(arb_ptr res, const arb_t a, const arb_t b, slong len, slong pr
     _arb_vec_clear(u, len + 1);
     _arb_vec_clear(v, len + 1);
 }
-

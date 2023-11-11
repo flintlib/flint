@@ -106,4 +106,3 @@ arb_get_fmpz_mid_rad_10exp(fmpz_t mid, fmpz_t rad, fmpz_t exp, const arb_t x, sl
     arb_clear(u);
     arf_clear(r);
 }
-

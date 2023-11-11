@@ -71,4 +71,3 @@ matrix_no_good:
 
     return fmpz_mpoly_compose_fmpz_mpoly_geobucket(A, B, C, ctxB, ctxAC);
 }
-

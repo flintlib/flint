@@ -181,4 +181,3 @@ arb_calc_isolate_roots(arf_interval_ptr * blocks, int ** flags,
 
     return length;
 }
-

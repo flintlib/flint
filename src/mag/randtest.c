@@ -44,4 +44,3 @@ mag_randtest(mag_t x, flint_rand_t state, slong expbits)
     if (mag_is_inf(x))
         mag_zero(x);
 }
-

@@ -27,4 +27,3 @@ qqbar_cache_enclosure(qqbar_t res, slong prec)
 
     acb_clear(t);
 }
-

@@ -68,4 +68,3 @@ acb_poly_binomial_transform_basecase(acb_poly_t b, const acb_poly_t a, slong len
     _acb_poly_set_length(b, len);
     _acb_poly_normalise(b);
 }
-

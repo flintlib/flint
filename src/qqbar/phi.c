@@ -25,4 +25,3 @@ qqbar_phi(qqbar_t res)
     arb_mul_2exp_si(acb_realref(QQBAR_ENCLOSURE(res)), acb_realref(QQBAR_ENCLOSURE(res)), -1);
     arb_zero(acb_imagref(QQBAR_ENCLOSURE(res)));
 }
-

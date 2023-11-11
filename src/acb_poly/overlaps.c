@@ -39,4 +39,3 @@ acb_poly_overlaps(const acb_poly_t poly1, const acb_poly_t poly2)
     else
         return _acb_poly_overlaps(poly2->coeffs, len2, poly1->coeffs, len1);
 }
-

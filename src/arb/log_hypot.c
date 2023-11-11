@@ -198,4 +198,3 @@ arb_log_hypot(arb_t res, const arb_t a, const arb_t b, slong prec)
 
     arb_clear(x);
 }
-

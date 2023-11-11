@@ -147,4 +147,3 @@ acb_mat_solve_precond(acb_mat_t X, const acb_mat_t A, const acb_mat_t B, slong p
     else
         return _acb_mat_solve_d(X, A, B, prec);
 }
-

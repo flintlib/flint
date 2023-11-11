@@ -49,4 +49,3 @@ arb_poly_cot_pi_series(arb_poly_t res, const arb_poly_t f, slong len, slong prec
     _arb_poly_set_length(res, len);
     _arb_poly_normalise(res);
 }
-

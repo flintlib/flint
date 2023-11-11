@@ -52,4 +52,3 @@ void _thread_pool_distribute_work_2(
         *Bstop  = stop - Alen;
     }
 }
-

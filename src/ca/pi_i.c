@@ -21,4 +21,3 @@ ca_pi_i(ca_t res, ca_ctx_t ctx)
     ca_mul(res, res, t, ctx);
     ca_clear(t, ctx);
 }
-

@@ -54,4 +54,3 @@ mag_cmp_2exp_si(const mag_t x, slong e)
 
     return (fmpz_cmp_si(MAG_EXPREF(x), e) <= 0) ? -1 : 1;
 }
-
