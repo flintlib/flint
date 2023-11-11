@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "qadic.h"
 
 void qadic_set_fmpz_poly(qadic_t rop, const fmpz_poly_t op,

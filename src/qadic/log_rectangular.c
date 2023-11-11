@@ -10,8 +10,11 @@
 */
 
 #include "ulong_extras.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
+#include "padic.h"
 #include "qadic.h"
 
 static void __fmpz_mod_poly_neg(fmpz *res, const fmpz *poly, slong len, const fmpz_t p)

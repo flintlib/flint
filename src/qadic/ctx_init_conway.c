@@ -11,7 +11,6 @@
 */
 
 #include <string.h>
-
 #include "fmpz_vec.h"
 #include "padic.h"
 #include "qadic.h"

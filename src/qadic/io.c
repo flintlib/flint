@@ -10,11 +10,44 @@
 */
 
 #include <stdio.h>
+#include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 #include "qadic.h"
 
 /* printing *******************************************************************/
+
+void qadic_ctx_print(const qadic_ctx_t ctx)
+{
+    slong i, k;
+
+    flint_printf("p    = "), fmpz_print((&ctx->pctx)->p), flint_printf("\n");
+    flint_printf("d    = %wd\n", ctx->j[ctx->len - 1]);
+    flint_printf("f(X) = ");
+    fmpz_print(ctx->a + 0);
+    for (k = 1; k < ctx->len; k++)
+    {
+        i = ctx->j[k];
+        flint_printf(" + ");
+        if (fmpz_is_one(ctx->a + k))
+        {
+            if (i == 1)
+                flint_printf("X");
+            else
+                flint_printf("X^%wd", i);
+        }
+        else
+        {
+            fmpz_print(ctx->a + k);
+            if (i == 1)
+                flint_printf("*X");
+            else
+                flint_printf("*X^%wd", i);
+        }
+    }
+    flint_printf("\n");
+}
 
 int _qadic_fprint_pretty(FILE * file, const fmpz * u, slong len, slong v, const qadic_ctx_t ctx)
 {

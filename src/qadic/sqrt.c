@@ -10,6 +10,8 @@
 */
 
 #include "nmod_mat.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
@@ -861,7 +863,7 @@ int qadic_sqrt(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
         _padic_poly_set_length(rop, d);
         _padic_poly_normalise(rop);
         if (padic_poly_length(rop) == 0)
-            padic_poly_val(rop) = 0;
+            rop->val = 0;
     }
 
     return ans;

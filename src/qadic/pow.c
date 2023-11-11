@@ -9,7 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "padic.h"
 #include "qadic.h"
 
 void _qadic_pow(fmpz *rop, const fmpz *op, slong len, const fmpz_t e,
