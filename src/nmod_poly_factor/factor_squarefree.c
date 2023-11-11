@@ -22,9 +22,10 @@ nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
     mp_limb_t p;
     slong deg, i;
 
+    res->num = 0;
+
     if (f->length <= 1)
     {
-        res->num = 0;
         return;
     }
 
