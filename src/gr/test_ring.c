@@ -3452,8 +3452,14 @@ gr_test_multiplicative_group(gr_ctx_t R, slong iters, int test_flags)
     /* if (gr_ctx_is_multiplicative_group(R) != T_TRUE)
         flint_abort(); */
 
+    gr_test_iter(R, state, "ctx_get_str", gr_test_ctx_get_str, 1, test_flags);
+
     gr_test_iter(R, state, "init/clear", gr_test_init_clear, iters, test_flags);
     gr_test_iter(R, state, "swap", gr_test_swap, iters, test_flags);
+
+    gr_test_iter(R, state, "get_set_fexpr", gr_test_get_set_fexpr, iters, test_flags);
+    gr_test_iter(R, state, "get_set_str", gr_test_get_set_str, iters, test_flags);
+
     gr_test_iter(R, state, "one", gr_test_one, iters, test_flags);
 
     gr_test_iter(R, state, "mul: associative", gr_test_mul_associative, iters, test_flags);
