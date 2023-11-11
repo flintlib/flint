@@ -9,16 +9,23 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "padic.h"
+#include "fmpz_vec.h"
 #include "padic_poly.h"
 
-void padic_poly_set_ui(padic_poly_t poly, ulong x, const padic_ctx_t ctx)
+int padic_poly_debug(const padic_poly_t poly)
 {
-    padic_t y;
+    flint_printf("(alloc = %wd, length = %wd, val = %wd, N = %wd, vec = ", poly->alloc, poly->length, poly->val, poly->N);
+    if (poly->coeffs)
+    {
+        flint_printf("{");
+        _fmpz_vec_print(poly->coeffs, poly->alloc);
+        flint_printf("}");
+    }
+    else
+    {
+        flint_printf("NULL");
+    }
+    flint_printf(")");
 
-    padic_init2(y, padic_poly_prec(poly));
-    padic_set_ui(y, x, ctx);
-    padic_poly_set_padic(poly, y, ctx);
-    padic_clear(y);
+    return 1;
 }
-

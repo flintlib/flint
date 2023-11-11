@@ -11,6 +11,5 @@
 
 #define PADIC_POLY_INLINES_C
 
-#include "flint.h"
 #include "padic_poly.h"
 

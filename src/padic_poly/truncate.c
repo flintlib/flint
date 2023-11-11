@@ -9,16 +9,19 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "padic.h"
+#include "fmpz.h"
 #include "padic_poly.h"
 
-void padic_poly_set_ui(padic_poly_t poly, ulong x, const padic_ctx_t ctx)
+void padic_poly_truncate(padic_poly_t poly, slong n, const fmpz_t p)
 {
-    padic_t y;
+    if (poly->length > n)
+    {
+        slong i;
 
-    padic_init2(y, padic_poly_prec(poly));
-    padic_set_ui(y, x, ctx);
-    padic_poly_set_padic(poly, y, ctx);
-    padic_clear(y);
+        for (i = n; i < poly->length; i++)
+            _fmpz_demote(poly->coeffs + i);
+        poly->length = n;
+        _padic_poly_normalise(poly);
+        padic_poly_canonicalise(poly, p);
+    }
 }
-

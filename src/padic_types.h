@@ -64,6 +64,19 @@ typedef padic_mat_struct padic_mat_t[1];
 #define padic_mat_val(A) ((A)->val)
 #define padic_mat_prec(A) ((A)->N)
 
+typedef struct
+{
+    fmpz * coeffs;
+    slong alloc;
+    slong length;
+    slong val;
+    slong N;
+} padic_poly_struct;
+
+typedef padic_poly_struct padic_poly_t[1];
+
+#define padic_poly_prec(poly) ((poly)->N)
+
 #ifdef __cplusplus
 }
 #endif

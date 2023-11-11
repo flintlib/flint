@@ -10,7 +10,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-
 #include "fmpz.h"
 #include "padic_poly.h"
 
@@ -35,3 +34,14 @@ void padic_poly_fit_length(padic_poly_t poly, slong len)
     }
 }
 
+void _padic_poly_set_length(padic_poly_t poly, slong len)
+{
+    if (poly->length > len)
+    {
+        slong i;
+
+        for (i = len; i < poly->length; i++)
+            _fmpz_demote(poly->coeffs + i);
+    }
+    poly->length = len;
+}

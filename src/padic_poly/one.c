@@ -9,16 +9,20 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "padic.h"
+#include "fmpz.h"
 #include "padic_poly.h"
 
-void padic_poly_set_ui(padic_poly_t poly, ulong x, const padic_ctx_t ctx)
+void padic_poly_one(padic_poly_t poly)
 {
-    padic_t y;
-
-    padic_init2(y, padic_poly_prec(poly));
-    padic_set_ui(y, x, ctx);
-    padic_poly_set_padic(poly, y, ctx);
-    padic_clear(y);
+    if (padic_poly_prec(poly) > 0)
+    {
+        padic_poly_fit_length(poly, 1);
+        fmpz_one(poly->coeffs);
+        _padic_poly_set_length(poly, 1);
+        poly->val = 0;
+    }
+    else
+    {
+        padic_poly_zero(poly);
+    }
 }
-

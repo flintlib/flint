@@ -10,8 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
+#include "padic.h"
 #include "padic_poly.h"
 
 void padic_poly_init(padic_poly_t poly)
