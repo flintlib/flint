@@ -9,11 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
+#include "perm.h"
 #include "fmpz_poly.h"
 #include "fmpz_poly_mat.h"
-#include "perm.h"
 
 int
 fmpz_poly_mat_solve_fflu(fmpz_poly_mat_t X, fmpz_poly_t den,

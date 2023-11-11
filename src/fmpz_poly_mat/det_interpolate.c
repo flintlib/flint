@@ -12,6 +12,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_mat.h"
+#include "fmpz_poly.h"
 #include "fmpz_poly_mat.h"
 
 void
