@@ -28,7 +28,6 @@ do {                                                \
         (i)--;                                      \
 } while (0)
 
-
 #define FQ_NMOD_VEC_SWAP(vec1, len1, vec2, len2)   \
 do {                                          \
     fq_nmod_struct *__t;                           \
@@ -40,7 +39,6 @@ do {                                          \
     (len1) = (len2);                          \
     (len2) = __tn;                            \
 } while (0);
-
 
 #define T fq_nmod
 #define CAP_T FQ_NMOD
