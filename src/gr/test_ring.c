@@ -615,6 +615,73 @@ gr_test_get_set_fexpr(gr_ctx_t R, flint_rand_t state, int test_flags)
 }
 
 int
+gr_test_ctx_get_str(gr_ctx_t R, flint_rand_t state, int test_flags)
+{
+    int status = GR_SUCCESS;
+    char * s;
+
+    status = gr_ctx_get_str(&s, R);
+
+    if (status != GR_SUCCESS)
+    {
+        status = GR_TEST_FAIL;
+        flint_printf("ctx_get_str\n");
+    }
+
+    flint_free(s);
+
+    return status;
+}
+
+int
+gr_test_get_set_str(gr_ctx_t R, flint_rand_t state, int test_flags)
+{
+    int status = GR_SUCCESS;
+    gr_ptr x, y;
+    char * s;
+
+    GR_TMP_INIT2(x, y, R);
+
+    GR_MUST_SUCCEED(gr_randtest(x, state, R));
+    GR_MUST_SUCCEED(gr_randtest(y, state, R));
+
+    status |= gr_get_str(&s, x, R);
+
+    if (status == GR_SUCCESS)
+    {
+        status |= gr_set_str(y, s, R);
+
+        if (status == GR_SUCCESS && gr_equal(x, y, R) == T_FALSE)
+        {
+            status = GR_TEST_FAIL;
+        }
+    }
+    else
+    {
+        status = GR_TEST_FAIL;
+    }
+
+    if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
+    {
+        flint_printf("get_set_str\n");
+        gr_ctx_println(R);
+        flint_printf("x = \n"); gr_println(x, R);
+        if (s == NULL)
+            flint_printf("(NULL)\n");
+        else
+            flint_printf("%s\n", s);
+        flint_printf("y = \n"); gr_println(y, R);
+        flint_printf("\n");
+    }
+
+    flint_free(s);
+
+    GR_TMP_CLEAR2(x, y, R);
+
+    return status;
+}
+
+int
 gr_test_set_other(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status = GR_SUCCESS;
@@ -3244,6 +3311,8 @@ gr_test_ring(gr_ctx_t R, slong iters, int test_flags)
     /* if (gr_ctx_is_ring(R) != T_TRUE)
         flint_abort(); */
 
+    gr_test_iter(R, state, "ctx_get_str", gr_test_ctx_get_str, 1, test_flags);
+
     gr_test_iter(R, state, "init/clear", gr_test_init_clear, iters, test_flags);
     gr_test_iter(R, state, "equal", gr_test_equal, iters, test_flags);
     gr_test_iter(R, state, "swap", gr_test_swap, iters, test_flags);
@@ -3264,6 +3333,7 @@ gr_test_ring(gr_ctx_t R, slong iters, int test_flags)
     gr_test_iter(R, state, "get_fmpz_2exp_fmpz", gr_test_get_fmpz_2exp_fmpz, iters, test_flags);
 
     gr_test_iter(R, state, "get_set_fexpr", gr_test_get_set_fexpr, iters, test_flags);
+    gr_test_iter(R, state, "get_set_str", gr_test_get_set_str, iters, test_flags);
 
     gr_test_iter(R, state, "add: associative", gr_test_add_associative, iters, test_flags);
     gr_test_iter(R, state, "add: commutative", gr_test_add_commutative, iters, test_flags);
@@ -3382,8 +3452,14 @@ gr_test_multiplicative_group(gr_ctx_t R, slong iters, int test_flags)
     /* if (gr_ctx_is_multiplicative_group(R) != T_TRUE)
         flint_abort(); */
 
+    gr_test_iter(R, state, "ctx_get_str", gr_test_ctx_get_str, 1, test_flags);
+
     gr_test_iter(R, state, "init/clear", gr_test_init_clear, iters, test_flags);
     gr_test_iter(R, state, "swap", gr_test_swap, iters, test_flags);
+
+    gr_test_iter(R, state, "get_set_fexpr", gr_test_get_set_fexpr, iters, test_flags);
+    gr_test_iter(R, state, "get_set_str", gr_test_get_set_str, iters, test_flags);
+
     gr_test_iter(R, state, "one", gr_test_one, iters, test_flags);
 
     gr_test_iter(R, state, "mul: associative", gr_test_mul_associative, iters, test_flags);
