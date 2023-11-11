@@ -12,7 +12,7 @@
 #ifndef PADIC_TYPES_H
 #define PADIC_TYPES_H
 
-#include "flint.h"
+#include "fmpz_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -51,6 +51,18 @@ typedef struct
 } padic_ctx_struct;
 
 typedef padic_ctx_struct padic_ctx_t[1];
+
+typedef struct
+{
+    fmpz_mat_struct mat;
+    slong val;
+    slong N;
+} padic_mat_struct;
+
+typedef padic_mat_struct padic_mat_t[1];
+
+#define padic_mat_val(A) ((A)->val)
+#define padic_mat_prec(A) ((A)->N)
 
 #ifdef __cplusplus
 }

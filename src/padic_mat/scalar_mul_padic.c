@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_mat.h"
+#include "padic.h"
 #include "padic_mat.h"
 
 void _padic_mat_scalar_mul_padic(padic_mat_t B,

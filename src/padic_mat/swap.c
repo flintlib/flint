@@ -9,10 +9,19 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mat.h"
+#include "fmpz.h"
 #include "padic_mat.h"
 
 void padic_mat_swap(padic_mat_t A, padic_mat_t B)
 {
     FLINT_SWAP(padic_mat_struct, *A, *B);
+}
+
+void padic_mat_swap_entrywise(padic_mat_t mat1, padic_mat_t mat2)
+{
+    slong i, j;
+
+    for (i = 0; i < padic_mat_nrows(mat1); i++)
+        for (j = 0; j < padic_mat_ncols(mat1); j++)
+            fmpz_swap(padic_mat_entry(mat2, i, j), padic_mat_entry(mat1, i, j));
 }

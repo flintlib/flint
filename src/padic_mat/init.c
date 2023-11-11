@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_mat.h"
+#include "padic.h"
 #include "padic_mat.h"
 
 void padic_mat_init(padic_mat_t A, slong r, slong c)
