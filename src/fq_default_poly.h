@@ -19,35 +19,25 @@
 #define FQ_DEFAULT_POLY_INLINE static __inline__
 #endif
 
+#include "nmod.h"
+#include "nmod_poly.h"
 #include "nmod_poly_factor.h"
-#include "fq_default.h"
-#include "fq_vec.h"
+#include "fmpz.h"
+#include "fmpz_mod.h"
+#include "fmpz_mod_poly.h"
 #include "fq_poly.h"
 #include "fq_nmod_poly.h"
 #include "fq_zech_poly.h"
+#include "fq_default_types.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/*  Type definitions *********************************************************/
-
-typedef union fq_default_poly_struct
-{
-    fq_poly_t fq;
-    fq_nmod_poly_t fq_nmod;
-    fq_zech_poly_t fq_zech;
-    nmod_poly_t nmod;
-    fmpz_mod_poly_t fmpz_mod;
-}
-fq_default_poly_struct;
-
-typedef fq_default_poly_struct fq_default_poly_t[1];
-
 /*  Memory management ********************************************************/
 
-FQ_DEFAULT_POLY_INLINE void fq_default_poly_init(fq_default_poly_t poly,
-                                                    const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_init(fq_default_poly_t poly, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -71,8 +61,8 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_init(fq_default_poly_t poly,
     }
 }
 
-FQ_DEFAULT_POLY_INLINE void fq_default_poly_init2(fq_default_poly_t poly,
-                                       slong alloc, const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_init2(fq_default_poly_t poly, slong alloc, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -96,8 +86,8 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_init2(fq_default_poly_t poly,
     }
 }
 
-FQ_DEFAULT_POLY_INLINE void fq_default_poly_realloc(fq_default_poly_t poly,
-                                       slong alloc, const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_realloc(fq_default_poly_t poly, slong alloc, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -121,8 +111,8 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_realloc(fq_default_poly_t poly,
     }
 }
 
-FQ_DEFAULT_POLY_INLINE void fq_default_poly_truncate(fq_default_poly_t poly,
-                                         slong len, const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_truncate(fq_default_poly_t poly, slong len, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -146,18 +136,16 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_truncate(fq_default_poly_t poly,
     }
 }
 
-FQ_DEFAULT_POLY_INLINE void fq_default_poly_set_trunc(fq_default_poly_t poly1,
-                  fq_default_poly_t poly2, slong len, const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_set_trunc(fq_default_poly_t poly1, fq_default_poly_t poly2, slong len, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_poly_set_trunc(poly1->fq_zech,
-		                        poly2->fq_zech, len, ctx->ctx.fq_zech);
+        fq_zech_poly_set_trunc(poly1->fq_zech, poly2->fq_zech, len, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_poly_set_trunc(poly1->fq_nmod,
-		                        poly2->fq_nmod, len, ctx->ctx.fq_nmod);
+        fq_nmod_poly_set_trunc(poly1->fq_nmod, poly2->fq_nmod, len, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -165,8 +153,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_set_trunc(fq_default_poly_t poly1,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_set_trunc(poly1->fmpz_mod,
-                                  poly2->fmpz_mod, len, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_set_trunc(poly1->fmpz_mod, poly2->fmpz_mod, len, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -174,8 +161,8 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_set_trunc(fq_default_poly_t poly1,
     }
 }
 
-FQ_DEFAULT_POLY_INLINE void fq_default_poly_fit_length(fq_default_poly_t poly,
-                                         slong len, const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_fit_length(fq_default_poly_t poly, slong len, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -200,8 +187,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_fit_length(fq_default_poly_t poly,
 }
 
 FQ_DEFAULT_POLY_INLINE
-void _fq_default_poly_set_length(fq_default_poly_t poly,
-                                         slong len, const fq_default_ctx_t ctx)
+void _fq_default_poly_set_length(fq_default_poly_t poly, slong len, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -225,8 +211,8 @@ void _fq_default_poly_set_length(fq_default_poly_t poly,
     }
 }
 
-FQ_DEFAULT_POLY_INLINE void fq_default_poly_clear(fq_default_poly_t poly,
-                                                    const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_clear(fq_default_poly_t poly, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -252,9 +238,8 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_clear(fq_default_poly_t poly,
 
 /*  Polynomial parameters  ***************************************************/
 
-FQ_DEFAULT_POLY_INLINE slong
-fq_default_poly_length(const fq_default_poly_t poly,
-		                                    const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+slong fq_default_poly_length(const fq_default_poly_t poly, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -278,9 +263,8 @@ fq_default_poly_length(const fq_default_poly_t poly,
     }
 }
 
-FQ_DEFAULT_POLY_INLINE slong
-fq_default_poly_degree(const fq_default_poly_t poly,
-                                                    const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+slong fq_default_poly_degree(const fq_default_poly_t poly, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -306,8 +290,8 @@ fq_default_poly_degree(const fq_default_poly_t poly,
 
 /*  Randomisation  ***********************************************************/
 
-FQ_DEFAULT_POLY_INLINE void fq_default_poly_randtest(fq_default_poly_t f,
-                     flint_rand_t state, slong len, const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_randtest(fq_default_poly_t f, flint_rand_t state, slong len, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -332,8 +316,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_randtest(fq_default_poly_t f,
 }
 
 FQ_DEFAULT_POLY_INLINE
-void fq_default_poly_randtest_not_zero(fq_default_poly_t f,
-                     flint_rand_t state, slong len, const fq_default_ctx_t ctx)
+void fq_default_poly_randtest_not_zero(fq_default_poly_t f, flint_rand_t state, slong len, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -349,8 +332,7 @@ void fq_default_poly_randtest_not_zero(fq_default_poly_t f,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_randtest_not_zero(f->fmpz_mod, state, len,
-                                                        ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_randtest_not_zero(f->fmpz_mod, state, len, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -359,8 +341,7 @@ void fq_default_poly_randtest_not_zero(fq_default_poly_t f,
 }
 
 FQ_DEFAULT_POLY_INLINE
-void fq_default_poly_randtest_monic(fq_default_poly_t f,
-                     flint_rand_t state, slong len, const fq_default_ctx_t ctx)
+void fq_default_poly_randtest_monic(fq_default_poly_t f, flint_rand_t state, slong len, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -376,8 +357,7 @@ void fq_default_poly_randtest_monic(fq_default_poly_t f,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_randtest_monic(f->fmpz_mod, state, len,
-                                                        ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_randtest_monic(f->fmpz_mod, state, len, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -386,18 +366,15 @@ void fq_default_poly_randtest_monic(fq_default_poly_t f,
 }
 
 FQ_DEFAULT_POLY_INLINE
-void fq_default_poly_randtest_irreducible(fq_default_poly_t f,
-                     flint_rand_t state, slong len, const fq_default_ctx_t ctx)
+void fq_default_poly_randtest_irreducible(fq_default_poly_t f, flint_rand_t state, slong len, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_poly_randtest_irreducible(f->fq_zech,
-                                                 state, len, ctx->ctx.fq_zech);
+        fq_zech_poly_randtest_irreducible(f->fq_zech, state, len, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_poly_randtest_irreducible(f->fq_nmod,
-                                                 state, len, ctx->ctx.fq_nmod);
+        fq_nmod_poly_randtest_irreducible(f->fq_nmod, state, len, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -405,8 +382,7 @@ void fq_default_poly_randtest_irreducible(fq_default_poly_t f,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_randtest_irreducible(f->fmpz_mod, state, len,
-                                                        ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_randtest_irreducible(f->fmpz_mod, state, len, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -416,8 +392,8 @@ void fq_default_poly_randtest_irreducible(fq_default_poly_t f,
 
 /*  Assignment and basic manipulation  ***************************************/
 
-FQ_DEFAULT_POLY_INLINE void fq_default_poly_set(fq_default_poly_t rop,
-                        const fq_default_poly_t op, const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_set(fq_default_poly_t rop, const fq_default_poly_t op, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -442,8 +418,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_set(fq_default_poly_t rop,
 }
 
 FQ_DEFAULT_POLY_INLINE
-void fq_default_poly_set_fq_default(fq_default_poly_t poly,
-                              const fq_default_t c, const fq_default_ctx_t ctx)
+void fq_default_poly_set_fq_default(fq_default_poly_t poly, const fq_default_t c, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -460,8 +435,7 @@ void fq_default_poly_set_fq_default(fq_default_poly_t poly,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_set_fmpz(poly->fmpz_mod, c->fmpz_mod,
-                                                        ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_set_fmpz(poly->fmpz_mod, c->fmpz_mod, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -469,8 +443,8 @@ void fq_default_poly_set_fq_default(fq_default_poly_t poly,
     }
 }
 
-FQ_DEFAULT_POLY_INLINE void fq_default_poly_swap(fq_default_poly_t op1,
-                               fq_default_poly_t op2, const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_swap(fq_default_poly_t op1, fq_default_poly_t op2, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -494,8 +468,8 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_swap(fq_default_poly_t op1,
     }
 }
 
-FQ_DEFAULT_POLY_INLINE void
-fq_default_poly_zero(fq_default_poly_t poly, const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_zero(fq_default_poly_t poly, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -519,8 +493,8 @@ fq_default_poly_zero(fq_default_poly_t poly, const fq_default_ctx_t ctx)
     }
 }
 
-FQ_DEFAULT_POLY_INLINE void fq_default_poly_one(fq_default_poly_t poly,
-                                                    const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_one(fq_default_poly_t poly, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -544,8 +518,8 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_one(fq_default_poly_t poly,
     }
 }
 
-FQ_DEFAULT_POLY_INLINE void fq_default_poly_gen(fq_default_poly_t f,
-                                                    const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_gen(fq_default_poly_t f, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -570,8 +544,8 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_gen(fq_default_poly_t f,
     }
 }
 
-FQ_DEFAULT_POLY_INLINE void fq_default_poly_make_monic(fq_default_poly_t rop,
-                        const fq_default_poly_t op, const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_make_monic(fq_default_poly_t rop, const fq_default_poly_t op, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -587,8 +561,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_make_monic(fq_default_poly_t rop,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_make_monic(rop->fmpz_mod, op->fmpz_mod,
-                                                        ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_make_monic(rop->fmpz_mod, op->fmpz_mod, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -596,8 +569,8 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_make_monic(fq_default_poly_t rop,
     }
 }
 
-FQ_DEFAULT_POLY_INLINE void fq_default_poly_reverse(fq_default_poly_t res,
-             const fq_default_poly_t poly, slong n, const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_reverse(fq_default_poly_t res, const fq_default_poly_t poly, slong n, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -613,8 +586,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_reverse(fq_default_poly_t res,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_reverse(res->fmpz_mod, poly->fmpz_mod, n,
-                                                        ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_reverse(res->fmpz_mod, poly->fmpz_mod, n, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -623,8 +595,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_reverse(fq_default_poly_t res,
 }
 
 FQ_DEFAULT_POLY_INLINE
-ulong fq_default_poly_deflation(const fq_default_poly_t input,
-                                                    const fq_default_ctx_t ctx)
+ulong fq_default_poly_deflation(const fq_default_poly_t input, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -648,18 +619,16 @@ ulong fq_default_poly_deflation(const fq_default_poly_t input,
     }
 }
 
-FQ_DEFAULT_POLY_INLINE void fq_default_poly_deflate(fq_default_poly_t result,
-    const fq_default_poly_t input, ulong deflation, const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_deflate(fq_default_poly_t result, const fq_default_poly_t input, ulong deflation, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_poly_deflate(result->fq_zech,
-                                  input->fq_zech, deflation, ctx->ctx.fq_zech);
+        fq_zech_poly_deflate(result->fq_zech, input->fq_zech, deflation, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_poly_deflate(result->fq_nmod,
-                                  input->fq_nmod, deflation, ctx->ctx.fq_nmod);
+        fq_nmod_poly_deflate(result->fq_nmod, input->fq_nmod, deflation, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -667,8 +636,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_deflate(fq_default_poly_t result,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_deflate(result->fmpz_mod, input->fmpz_mod, deflation,
-                                                        ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_deflate(result->fmpz_mod, input->fmpz_mod, deflation, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -676,18 +644,16 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_deflate(fq_default_poly_t result,
     }
 }
 
-FQ_DEFAULT_POLY_INLINE void fq_default_poly_inflate(fq_default_poly_t result,
-    const fq_default_poly_t input, ulong inflation, const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_inflate(fq_default_poly_t result, const fq_default_poly_t input, ulong inflation, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_poly_inflate(result->fq_zech,
-                                  input->fq_zech, inflation, ctx->ctx.fq_zech);
+        fq_zech_poly_inflate(result->fq_zech, input->fq_zech, inflation, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_poly_inflate(result->fq_nmod,
-                                  input->fq_nmod, inflation, ctx->ctx.fq_nmod);
+        fq_nmod_poly_inflate(result->fq_nmod, input->fq_nmod, inflation, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -695,8 +661,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_inflate(fq_default_poly_t result,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_inflate(result->fmpz_mod, input->fmpz_mod, inflation,
-                                                        ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_inflate(result->fmpz_mod, input->fmpz_mod, inflation, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -706,8 +671,8 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_inflate(fq_default_poly_t result,
 
 /*  Getting and setting coefficients  ****************************************/
 
-FQ_DEFAULT_POLY_INLINE void fq_default_poly_get_coeff(fq_default_t x,
-             const fq_default_poly_t poly, slong n, const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_get_coeff(fq_default_t x, const fq_default_poly_t poly, slong n, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -723,8 +688,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_get_coeff(fq_default_t x,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_get_coeff_fmpz(x->fmpz_mod, poly->fmpz_mod, n,
-                                                        ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_get_coeff_fmpz(x->fmpz_mod, poly->fmpz_mod, n, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -732,8 +696,8 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_get_coeff(fq_default_t x,
     }
 }
 
-FQ_DEFAULT_POLY_INLINE void fq_default_poly_set_coeff(fq_default_poly_t poly,
-                     slong n, const fq_default_t x, const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_set_coeff(fq_default_poly_t poly, slong n, const fq_default_t x, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -749,8 +713,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_set_coeff(fq_default_poly_t poly,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_set_coeff_fmpz(poly->fmpz_mod, n, x->fmpz_mod,
-                                                        ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_set_coeff_fmpz(poly->fmpz_mod, n, x->fmpz_mod, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -758,9 +721,8 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_set_coeff(fq_default_poly_t poly,
     }
 }
 
-FQ_DEFAULT_POLY_INLINE void
-fq_default_poly_set_coeff_fmpz(fq_default_poly_t poly,
-                           slong n, const fmpz_t x, const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_set_coeff_fmpz(fq_default_poly_t poly, slong n, const fmpz_t x, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -776,8 +738,7 @@ fq_default_poly_set_coeff_fmpz(fq_default_poly_t poly,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_set_coeff_fmpz(poly->fmpz_mod, n, x,
-                                                        ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_set_coeff_fmpz(poly->fmpz_mod, n, x, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -786,8 +747,7 @@ fq_default_poly_set_coeff_fmpz(fq_default_poly_t poly,
 }
 
 FQ_DEFAULT_POLY_INLINE
-void fq_default_poly_set_nmod_poly(fq_default_poly_t rop,
-                          const     nmod_poly_t op, const fq_default_ctx_t ctx)
+void fq_default_poly_set_nmod_poly(fq_default_poly_t rop, const nmod_poly_t op, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -812,8 +772,7 @@ void fq_default_poly_set_nmod_poly(fq_default_poly_t rop,
 }
 
 FQ_DEFAULT_POLY_INLINE
-void fq_default_poly_set_fmpz_mod_poly(fq_default_poly_t rop,
-                          const fmpz_mod_poly_t op, const fq_default_ctx_t ctx)
+void fq_default_poly_set_fmpz_mod_poly(fq_default_poly_t rop, const fmpz_mod_poly_t op, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -838,14 +797,12 @@ void fq_default_poly_set_fmpz_mod_poly(fq_default_poly_t rop,
 }
 
 
-void fq_default_poly_set_fmpz_poly(fq_default_poly_t rop,
-                             const fmpz_poly_t op, const fq_default_ctx_t ctx);
+void fq_default_poly_set_fmpz_poly(fq_default_poly_t rop, const fmpz_poly_t op, const fq_default_ctx_t ctx);
 
 /*  Comparison  **************************************************************/
 
 FQ_DEFAULT_POLY_INLINE
-int fq_default_poly_equal(const fq_default_poly_t poly1,
-                     const fq_default_poly_t poly2, const fq_default_ctx_t ctx)
+int fq_default_poly_equal(const fq_default_poly_t poly1, const fq_default_poly_t poly2, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -861,8 +818,7 @@ int fq_default_poly_equal(const fq_default_poly_t poly1,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        return fmpz_mod_poly_equal(poly1->fmpz_mod, poly2->fmpz_mod,
-                                                        ctx->ctx.fmpz_mod.mod);
+        return fmpz_mod_poly_equal(poly1->fmpz_mod, poly2->fmpz_mod, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -871,18 +827,15 @@ int fq_default_poly_equal(const fq_default_poly_t poly1,
 }
 
 FQ_DEFAULT_POLY_INLINE
-int fq_default_poly_equal_trunc(const fq_default_poly_t poly1,
-            const fq_default_poly_t poly2, slong n, const fq_default_ctx_t ctx)
+int fq_default_poly_equal_trunc(const fq_default_poly_t poly1, const fq_default_poly_t poly2, slong n, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        return fq_zech_poly_equal_trunc(poly1->fq_zech,
-                                          poly2->fq_zech, n, ctx->ctx.fq_zech);
+        return fq_zech_poly_equal_trunc(poly1->fq_zech, poly2->fq_zech, n, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        return fq_nmod_poly_equal_trunc(poly1->fq_nmod,
-                                          poly2->fq_nmod, n, ctx->ctx.fq_nmod);
+        return fq_nmod_poly_equal_trunc(poly1->fq_nmod, poly2->fq_nmod, n, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -890,8 +843,7 @@ int fq_default_poly_equal_trunc(const fq_default_poly_t poly1,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        return fmpz_mod_poly_equal_trunc(poly1->fmpz_mod, poly2->fmpz_mod, n,
-                                                        ctx->ctx.fmpz_mod.mod);
+        return fmpz_mod_poly_equal_trunc(poly1->fmpz_mod, poly2->fmpz_mod, n, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -899,9 +851,8 @@ int fq_default_poly_equal_trunc(const fq_default_poly_t poly1,
     }
 }
 
-FQ_DEFAULT_POLY_INLINE int
-fq_default_poly_is_zero(const fq_default_poly_t poly,
-		                                    const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+int fq_default_poly_is_zero(const fq_default_poly_t poly, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -925,8 +876,8 @@ fq_default_poly_is_zero(const fq_default_poly_t poly,
     }
 }
 
-FQ_DEFAULT_POLY_INLINE int
-fq_default_poly_is_one(const fq_default_poly_t op, const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+int fq_default_poly_is_one(const fq_default_poly_t op, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -950,8 +901,8 @@ fq_default_poly_is_one(const fq_default_poly_t op, const fq_default_ctx_t ctx)
     }
 }
 
-FQ_DEFAULT_POLY_INLINE int
-fq_default_poly_is_unit(const fq_default_poly_t op, const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+int fq_default_poly_is_unit(const fq_default_poly_t op, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -975,9 +926,8 @@ fq_default_poly_is_unit(const fq_default_poly_t op, const fq_default_ctx_t ctx)
     }
 }
 
-FQ_DEFAULT_POLY_INLINE int
-fq_default_poly_is_gen(const fq_default_poly_t poly,
-		                                    const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+int fq_default_poly_is_gen(const fq_default_poly_t poly, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -1001,19 +951,16 @@ fq_default_poly_is_gen(const fq_default_poly_t poly,
     }
 }
 
-FQ_DEFAULT_POLY_INLINE int
-fq_default_poly_equal_fq_default(const fq_default_poly_t poly,
-                              const fq_default_t c, const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+int fq_default_poly_equal_fq_default(const fq_default_poly_t poly, const fq_default_t c, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        return fq_zech_poly_equal_fq_zech(poly->fq_zech,
-		                                 c->fq_zech, ctx->ctx.fq_zech);
+        return fq_zech_poly_equal_fq_zech(poly->fq_zech, c->fq_zech, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        return fq_nmod_poly_equal_fq_nmod(poly->fq_nmod,
-		                                 c->fq_nmod, ctx->ctx.fq_nmod);
+        return fq_nmod_poly_equal_fq_nmod(poly->fq_nmod, c->fq_nmod, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -1027,8 +974,7 @@ fq_default_poly_equal_fq_default(const fq_default_poly_t poly,
         if (fmpz_is_zero(c->fmpz_mod))
             return poly->fmpz_mod->length == 0;
         else
-            return poly->fmpz_mod->length == 1 &&
-                   fmpz_equal(poly->fmpz_mod->coeffs + 0, c->fmpz_mod);
+            return poly->fmpz_mod->length == 1 && fmpz_equal(poly->fmpz_mod->coeffs + 0, c->fmpz_mod);
     }
     else
     {
@@ -1039,18 +985,15 @@ fq_default_poly_equal_fq_default(const fq_default_poly_t poly,
 /*  Addition and subtraction  ************************************************/
 
 FQ_DEFAULT_POLY_INLINE
-void fq_default_poly_add(fq_default_poly_t rop, const fq_default_poly_t op1,
-                       const fq_default_poly_t op2, const fq_default_ctx_t ctx)
+void fq_default_poly_add(fq_default_poly_t rop, const fq_default_poly_t op1, const fq_default_poly_t op2, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_poly_add(rop->fq_zech,
-                                 op1->fq_zech, op2->fq_zech, ctx->ctx.fq_zech);
+        fq_zech_poly_add(rop->fq_zech, op1->fq_zech, op2->fq_zech, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_poly_add(rop->fq_nmod,
-                                 op1->fq_nmod, op2->fq_nmod, ctx->ctx.fq_nmod);
+        fq_nmod_poly_add(rop->fq_nmod, op1->fq_nmod, op2->fq_nmod, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -1058,8 +1001,7 @@ void fq_default_poly_add(fq_default_poly_t rop, const fq_default_poly_t op1,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_add(rop->fmpz_mod, op1->fmpz_mod, op2->fmpz_mod,
-                                                        ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_add(rop->fmpz_mod, op1->fmpz_mod, op2->fmpz_mod, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -1067,8 +1009,8 @@ void fq_default_poly_add(fq_default_poly_t rop, const fq_default_poly_t op1,
     }
 }
 
-FQ_DEFAULT_POLY_INLINE void fq_default_poly_add_si(fq_default_poly_t rop,
-              const fq_default_poly_t op1, slong c, const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_add_si(fq_default_poly_t rop, const fq_default_poly_t op1, slong c, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -1089,8 +1031,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_add_si(fq_default_poly_t rop,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_add_si(rop->fmpz_mod, op1->fmpz_mod, c,
-                                                        ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_add_si(rop->fmpz_mod, op1->fmpz_mod, c, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -1099,19 +1040,15 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_add_si(fq_default_poly_t rop,
 }
 
 FQ_DEFAULT_POLY_INLINE
-void fq_default_poly_add_series(fq_default_poly_t rop,
-		const fq_default_poly_t op1, const fq_default_poly_t op2,
-                                           slong n, const fq_default_ctx_t ctx)
+void fq_default_poly_add_series(fq_default_poly_t rop, const fq_default_poly_t op1, const fq_default_poly_t op2, slong n, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_poly_add_series(rop->fq_zech,
-                              op1->fq_zech, op2->fq_zech, n, ctx->ctx.fq_zech);
+        fq_zech_poly_add_series(rop->fq_zech, op1->fq_zech, op2->fq_zech, n, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_poly_add_series(rop->fq_nmod,
-                              op1->fq_nmod, op2->fq_nmod, n, ctx->ctx.fq_nmod);
+        fq_nmod_poly_add_series(rop->fq_nmod, op1->fq_nmod, op2->fq_nmod, n, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -1119,8 +1056,7 @@ void fq_default_poly_add_series(fq_default_poly_t rop,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_add_series(rop->fmpz_mod, op1->fmpz_mod, op2->fmpz_mod, n,
-                                                        ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_add_series(rop->fmpz_mod, op1->fmpz_mod, op2->fmpz_mod, n, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -1128,19 +1064,16 @@ void fq_default_poly_add_series(fq_default_poly_t rop,
     }
 }
 
-FQ_DEFAULT_POLY_INLINE void fq_default_poly_sub(fq_default_poly_t rop,
-                const fq_default_poly_t op1, const fq_default_poly_t op2,
-                                                    const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_sub(fq_default_poly_t rop, const fq_default_poly_t op1, const fq_default_poly_t op2, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_poly_sub(rop->fq_zech,
-                                 op1->fq_zech, op2->fq_zech, ctx->ctx.fq_zech);
+        fq_zech_poly_sub(rop->fq_zech, op1->fq_zech, op2->fq_zech, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_poly_sub(rop->fq_nmod,
-                                 op1->fq_nmod, op2->fq_nmod, ctx->ctx.fq_nmod);
+        fq_nmod_poly_sub(rop->fq_nmod, op1->fq_nmod, op2->fq_nmod, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -1148,8 +1081,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_sub(fq_default_poly_t rop,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_sub(rop->fmpz_mod, op1->fmpz_mod, op2->fmpz_mod,
-                                                        ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_sub(rop->fmpz_mod, op1->fmpz_mod, op2->fmpz_mod, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -1157,19 +1089,16 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_sub(fq_default_poly_t rop,
     }
 }
 
-FQ_DEFAULT_POLY_INLINE void fq_default_poly_sub_series(fq_default_poly_t rop,
-		const fq_default_poly_t op1, const fq_default_poly_t op2,
-                                           slong n, const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_sub_series(fq_default_poly_t rop, const fq_default_poly_t op1, const fq_default_poly_t op2, slong n, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_poly_sub_series(rop->fq_zech,
-                              op1->fq_zech, op2->fq_zech, n, ctx->ctx.fq_zech);
+        fq_zech_poly_sub_series(rop->fq_zech, op1->fq_zech, op2->fq_zech, n, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_poly_sub_series(rop->fq_nmod,
-                              op1->fq_nmod, op2->fq_nmod, n, ctx->ctx.fq_nmod);
+        fq_nmod_poly_sub_series(rop->fq_nmod, op1->fq_nmod, op2->fq_nmod, n, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -1177,8 +1106,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_sub_series(fq_default_poly_t rop,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_sub_series(rop->fmpz_mod, op1->fmpz_mod, op2->fmpz_mod, n,
-                                                        ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_sub_series(rop->fmpz_mod, op1->fmpz_mod, op2->fmpz_mod, n, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -1186,8 +1114,8 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_sub_series(fq_default_poly_t rop,
     }
 }
 
-FQ_DEFAULT_POLY_INLINE void fq_default_poly_neg(fq_default_poly_t rop,
-                        const fq_default_poly_t op, const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_neg(fq_default_poly_t rop, const fq_default_poly_t op, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -1214,19 +1142,15 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_neg(fq_default_poly_t rop,
 /*  Scalar multiplication and division  **************************************/
 
 FQ_DEFAULT_POLY_INLINE
-void fq_default_poly_scalar_mul_fq_default(fq_default_poly_t rop,
-                 const fq_default_poly_t op, const fq_default_t x,
-                                                    const fq_default_ctx_t ctx)
+void fq_default_poly_scalar_mul_fq_default(fq_default_poly_t rop, const fq_default_poly_t op, const fq_default_t x, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_poly_scalar_mul_fq_zech(rop->fq_zech,
-                                    op->fq_zech, x->fq_zech, ctx->ctx.fq_zech);
+        fq_zech_poly_scalar_mul_fq_zech(rop->fq_zech, op->fq_zech, x->fq_zech, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_poly_scalar_mul_fq_nmod(rop->fq_nmod,
-                                    op->fq_nmod, x->fq_nmod, ctx->ctx.fq_nmod);
+        fq_nmod_poly_scalar_mul_fq_nmod(rop->fq_nmod, op->fq_nmod, x->fq_nmod, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -1234,8 +1158,7 @@ void fq_default_poly_scalar_mul_fq_default(fq_default_poly_t rop,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_scalar_mul_fmpz(rop->fmpz_mod, op->fmpz_mod, x->fmpz_mod,
-                                                        ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_scalar_mul_fmpz(rop->fmpz_mod, op->fmpz_mod, x->fmpz_mod, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -1244,32 +1167,26 @@ void fq_default_poly_scalar_mul_fq_default(fq_default_poly_t rop,
 }
 
 FQ_DEFAULT_POLY_INLINE
-void fq_default_poly_scalar_div_fq_default(fq_default_poly_t rop,
-                 const fq_default_poly_t op, const fq_default_t x,
-                                                    const fq_default_ctx_t ctx)
+void fq_default_poly_scalar_div_fq_default(fq_default_poly_t rop, const fq_default_poly_t op, const fq_default_t x, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_poly_scalar_div_fq_zech(rop->fq_zech,
-                                    op->fq_zech, x->fq_zech, ctx->ctx.fq_zech);
+        fq_zech_poly_scalar_div_fq_zech(rop->fq_zech, op->fq_zech, x->fq_zech, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_poly_scalar_div_fq_nmod(rop->fq_nmod,
-                                    op->fq_nmod, x->fq_nmod, ctx->ctx.fq_nmod);
+        fq_nmod_poly_scalar_div_fq_nmod(rop->fq_nmod, op->fq_nmod, x->fq_nmod, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
-        nmod_poly_scalar_mul_nmod(rop->nmod, op->nmod,
-                                         nmod_inv(x->nmod, ctx->ctx.nmod.mod));
+        nmod_poly_scalar_mul_nmod(rop->nmod, op->nmod, nmod_inv(x->nmod, ctx->ctx.nmod.mod));
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_t t;
         fmpz_init(t);
         fmpz_mod_inv(t, x->fmpz_mod, ctx->ctx.fmpz_mod.mod);
-        fmpz_mod_poly_scalar_mul_fmpz(rop->fmpz_mod, op->fmpz_mod, t,
-                                                        ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_scalar_mul_fmpz(rop->fmpz_mod, op->fmpz_mod, t, ctx->ctx.fmpz_mod.mod);
         fmpz_clear(t);
     }
     else
@@ -1279,19 +1196,15 @@ void fq_default_poly_scalar_div_fq_default(fq_default_poly_t rop,
 }
 
 FQ_DEFAULT_POLY_INLINE
-void fq_default_poly_scalar_addmul_fq_default(fq_default_poly_t rop,
-                 const fq_default_poly_t op, const fq_default_t x,
-                                                    const fq_default_ctx_t ctx)
+void fq_default_poly_scalar_addmul_fq_default(fq_default_poly_t rop, const fq_default_poly_t op, const fq_default_t x, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_poly_scalar_addmul_fq_zech(rop->fq_zech,
-                                    op->fq_zech, x->fq_zech, ctx->ctx.fq_zech);
+        fq_zech_poly_scalar_addmul_fq_zech(rop->fq_zech, op->fq_zech, x->fq_zech, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_poly_scalar_addmul_fq_nmod(rop->fq_nmod,
-                                    op->fq_nmod, x->fq_nmod, ctx->ctx.fq_nmod);
+        fq_nmod_poly_scalar_addmul_fq_nmod(rop->fq_nmod, op->fq_nmod, x->fq_nmod, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -1299,8 +1212,7 @@ void fq_default_poly_scalar_addmul_fq_default(fq_default_poly_t rop,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_scalar_addmul_fmpz(rop->fmpz_mod, op->fmpz_mod,
-                                           x->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_scalar_addmul_fmpz(rop->fmpz_mod, op->fmpz_mod, x->fmpz_mod, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -1309,32 +1221,26 @@ void fq_default_poly_scalar_addmul_fq_default(fq_default_poly_t rop,
 }
 
 FQ_DEFAULT_POLY_INLINE
-void fq_default_poly_scalar_submul_fq_default(fq_default_poly_t rop,
-                 const fq_default_poly_t op, const fq_default_t x,
-                                                    const fq_default_ctx_t ctx)
+void fq_default_poly_scalar_submul_fq_default(fq_default_poly_t rop, const fq_default_poly_t op, const fq_default_t x, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_poly_scalar_submul_fq_zech(rop->fq_zech,
-                                    op->fq_zech, x->fq_zech, ctx->ctx.fq_zech);
+        fq_zech_poly_scalar_submul_fq_zech(rop->fq_zech, op->fq_zech, x->fq_zech, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_poly_scalar_submul_fq_nmod(rop->fq_nmod,
-                                    op->fq_nmod, x->fq_nmod, ctx->ctx.fq_nmod);
+        fq_nmod_poly_scalar_submul_fq_nmod(rop->fq_nmod, op->fq_nmod, x->fq_nmod, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
-        nmod_poly_scalar_addmul_nmod(rop->nmod, op->nmod,
-                                         nmod_neg(x->nmod, ctx->ctx.nmod.mod));
+        nmod_poly_scalar_addmul_nmod(rop->nmod, op->nmod, nmod_neg(x->nmod, ctx->ctx.nmod.mod));
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_t t;
         fmpz_init(t);
         fmpz_mod_neg(t, x->fmpz_mod, ctx->ctx.fmpz_mod.mod);
-        fmpz_mod_poly_scalar_addmul_fmpz(rop->fmpz_mod, op->fmpz_mod, t,
-                                                        ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_scalar_addmul_fmpz(rop->fmpz_mod, op->fmpz_mod, t, ctx->ctx.fmpz_mod.mod);
         fmpz_clear(t);
     }
     else
@@ -1345,19 +1251,16 @@ void fq_default_poly_scalar_submul_fq_default(fq_default_poly_t rop,
 
 /*  Multiplication  **********************************************************/
 
-FQ_DEFAULT_POLY_INLINE void fq_default_poly_mul(fq_default_poly_t rop,
-                 const fq_default_poly_t op1, const fq_default_poly_t op2,
-                                                    const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_mul(fq_default_poly_t rop, const fq_default_poly_t op1, const fq_default_poly_t op2, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_poly_mul(rop->fq_zech,
-                                 op1->fq_zech, op2->fq_zech, ctx->ctx.fq_zech);
+        fq_zech_poly_mul(rop->fq_zech, op1->fq_zech, op2->fq_zech, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_poly_mul(rop->fq_nmod,
-                                 op1->fq_nmod, op2->fq_nmod, ctx->ctx.fq_nmod);
+        fq_nmod_poly_mul(rop->fq_nmod, op1->fq_nmod, op2->fq_nmod, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -1365,8 +1268,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_mul(fq_default_poly_t rop,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_mul(rop->fmpz_mod, op1->fmpz_mod,
-                                         op2->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_mul(rop->fmpz_mod, op1->fmpz_mod, op2->fmpz_mod, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -1374,19 +1276,16 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_mul(fq_default_poly_t rop,
     }
 }
 
-FQ_DEFAULT_POLY_INLINE void fq_default_poly_mullow(fq_default_poly_t rop,
-                 const fq_default_poly_t op1, const fq_default_poly_t op2,
-                                           slong n, const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_mullow(fq_default_poly_t rop, const fq_default_poly_t op1, const fq_default_poly_t op2, slong n, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_poly_mullow(rop->fq_zech,
-                              op1->fq_zech, op2->fq_zech, n, ctx->ctx.fq_zech);
+        fq_zech_poly_mullow(rop->fq_zech, op1->fq_zech, op2->fq_zech, n, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_poly_mullow(rop->fq_nmod,
-                              op1->fq_nmod, op2->fq_nmod, n, ctx->ctx.fq_nmod);
+        fq_nmod_poly_mullow(rop->fq_nmod, op1->fq_nmod, op2->fq_nmod, n, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -1394,8 +1293,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_mullow(fq_default_poly_t rop,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_mullow(rop->fmpz_mod, op1->fmpz_mod, op2->fmpz_mod, n,
-                                                        ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_mullow(rop->fmpz_mod, op1->fmpz_mod, op2->fmpz_mod, n, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -1403,19 +1301,16 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_mullow(fq_default_poly_t rop,
     }
 }
 
-FQ_DEFAULT_POLY_INLINE void fq_default_poly_mulhigh(fq_default_poly_t rop,
-                 const fq_default_poly_t op1, const fq_default_poly_t op2,
-                                       slong start, const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_mulhigh(fq_default_poly_t rop, const fq_default_poly_t op1, const fq_default_poly_t op2, slong start, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_poly_mulhigh(rop->fq_zech,
-                          op1->fq_zech, op2->fq_zech, start, ctx->ctx.fq_zech);
+        fq_zech_poly_mulhigh(rop->fq_zech, op1->fq_zech, op2->fq_zech, start, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_poly_mulhigh(rop->fq_nmod,
-                          op1->fq_nmod, op2->fq_nmod, start, ctx->ctx.fq_nmod);
+        fq_nmod_poly_mulhigh(rop->fq_nmod, op1->fq_nmod, op2->fq_nmod, start, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -1423,8 +1318,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_mulhigh(fq_default_poly_t rop,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_mulhigh(rop->fmpz_mod, op1->fmpz_mod, op2->fmpz_mod,
-                                                 start, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_mulhigh(rop->fmpz_mod, op1->fmpz_mod, op2->fmpz_mod, start, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -1432,19 +1326,16 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_mulhigh(fq_default_poly_t rop,
     }
 }
 
-FQ_DEFAULT_POLY_INLINE void fq_default_poly_mulmod(fq_default_poly_t res,
-                 const fq_default_poly_t poly1, const fq_default_poly_t poly2,
-                         const fq_default_poly_t f, const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_mulmod(fq_default_poly_t res, const fq_default_poly_t poly1, const fq_default_poly_t poly2, const fq_default_poly_t f, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_poly_mulmod(res->fq_zech, poly1->fq_zech, poly2->fq_zech,
-                                                 f->fq_zech, ctx->ctx.fq_zech);
+        fq_zech_poly_mulmod(res->fq_zech, poly1->fq_zech, poly2->fq_zech, f->fq_zech, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_poly_mulmod(res->fq_nmod, poly1->fq_nmod, poly2->fq_nmod,
-                                                 f->fq_nmod, ctx->ctx.fq_nmod);
+        fq_nmod_poly_mulmod(res->fq_nmod, poly1->fq_nmod, poly2->fq_nmod, f->fq_nmod, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -1452,8 +1343,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_mulmod(fq_default_poly_t res,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_mulmod(res->fmpz_mod, poly1->fmpz_mod, poly2->fmpz_mod,
-                                           f->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_mulmod(res->fmpz_mod, poly1->fmpz_mod, poly2->fmpz_mod, f->fmpz_mod, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -1463,8 +1353,8 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_mulmod(fq_default_poly_t res,
 
 /* Squaring ******************************************************************/
 
-FQ_DEFAULT_POLY_INLINE void fq_default_poly_sqr(fq_default_poly_t rop,
-                        const fq_default_poly_t op, const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_sqr(fq_default_poly_t rop, const fq_default_poly_t op, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -1490,9 +1380,8 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_sqr(fq_default_poly_t rop,
 
 /*  Powering  ****************************************************************/
 
-FQ_DEFAULT_POLY_INLINE void fq_default_poly_pow(fq_default_poly_t rop,
-                                      const fq_default_poly_t op, ulong e,
-                                                    const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_pow(fq_default_poly_t rop, const fq_default_poly_t op, ulong e, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -1517,19 +1406,15 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_pow(fq_default_poly_t rop,
 }
 
 FQ_DEFAULT_POLY_INLINE
-void fq_default_poly_pow_trunc(fq_default_poly_t res,
-                                    const fq_default_poly_t poly, ulong e,
-				       slong trunc, const fq_default_ctx_t ctx)
+void fq_default_poly_pow_trunc(fq_default_poly_t res, const fq_default_poly_t poly, ulong e, slong trunc, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_poly_pow_trunc(res->fq_zech,
-                                    poly->fq_zech, e, trunc, ctx->ctx.fq_zech);
+        fq_zech_poly_pow_trunc(res->fq_zech, poly->fq_zech, e, trunc, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_poly_pow_trunc(res->fq_nmod,
-                                    poly->fq_nmod, e, trunc, ctx->ctx.fq_nmod);
+        fq_nmod_poly_pow_trunc(res->fq_nmod, poly->fq_nmod, e, trunc, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -1537,8 +1422,7 @@ void fq_default_poly_pow_trunc(fq_default_poly_t res,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_pow_trunc(res->fmpz_mod, poly->fmpz_mod, e, trunc,
-                                                        ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_pow_trunc(res->fmpz_mod, poly->fmpz_mod, e, trunc, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -1547,28 +1431,23 @@ void fq_default_poly_pow_trunc(fq_default_poly_t res,
 }
 
 FQ_DEFAULT_POLY_INLINE
-void fq_default_poly_powmod_fmpz_binexp(fq_default_poly_t res,
-                             const fq_default_poly_t poly, const fmpz_t e,
-                         const fq_default_poly_t f, const fq_default_ctx_t ctx)
+void fq_default_poly_powmod_fmpz_binexp(fq_default_poly_t res, const fq_default_poly_t poly, const fmpz_t e, const fq_default_poly_t f, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_poly_powmod_fmpz_binexp(res->fq_zech,
-                               poly->fq_zech, e, f->fq_zech, ctx->ctx.fq_zech);
+        fq_zech_poly_powmod_fmpz_binexp(res->fq_zech, poly->fq_zech, e, f->fq_zech, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_poly_powmod_fmpz_binexp(res->fq_nmod,
-                               poly->fq_nmod, e, f->fq_nmod, ctx->ctx.fq_nmod);
+        fq_nmod_poly_powmod_fmpz_binexp(res->fq_nmod, poly->fq_nmod, e, f->fq_nmod, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
-        nmod_poly_powmod_fmpz_binexp(res->nmod, poly->nmod, (fmpz*) e, f->nmod);
+        nmod_poly_powmod_fmpz_binexp(res->nmod, poly->nmod, (fmpz *) e, f->nmod);
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_powmod_fmpz_binexp(res->fmpz_mod, poly->fmpz_mod, e,
-                                           f->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_powmod_fmpz_binexp(res->fmpz_mod, poly->fmpz_mod, e, f->fmpz_mod, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -1577,19 +1456,15 @@ void fq_default_poly_powmod_fmpz_binexp(fq_default_poly_t res,
 }
 
 FQ_DEFAULT_POLY_INLINE
-void fq_default_poly_powmod_ui_binexp(fq_default_poly_t res,
-                         const fq_default_poly_t poly, ulong e,
-                         const fq_default_poly_t f, const fq_default_ctx_t ctx)
+void fq_default_poly_powmod_ui_binexp(fq_default_poly_t res, const fq_default_poly_t poly, ulong e, const fq_default_poly_t f, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_poly_powmod_ui_binexp(res->fq_zech,
-                               poly->fq_zech, e, f->fq_zech, ctx->ctx.fq_zech);
+        fq_zech_poly_powmod_ui_binexp(res->fq_zech, poly->fq_zech, e, f->fq_zech, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_poly_powmod_ui_binexp(res->fq_nmod,
-                               poly->fq_nmod, e, f->fq_nmod, ctx->ctx.fq_nmod);
+        fq_nmod_poly_powmod_ui_binexp(res->fq_nmod, poly->fq_nmod, e, f->fq_nmod, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -1597,8 +1472,7 @@ void fq_default_poly_powmod_ui_binexp(fq_default_poly_t res,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_powmod_ui_binexp(res->fmpz_mod, poly->fmpz_mod, e,
-                                           f->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_powmod_ui_binexp(res->fmpz_mod, poly->fmpz_mod, e, f->fmpz_mod, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -1609,8 +1483,7 @@ void fq_default_poly_powmod_ui_binexp(fq_default_poly_t res,
 /*  Shifting  ****************************************************************/
 
 FQ_DEFAULT_POLY_INLINE
-void fq_default_poly_shift_left(fq_default_poly_t rop,
-               const fq_default_poly_t op, slong n, const fq_default_ctx_t ctx)
+void fq_default_poly_shift_left(fq_default_poly_t rop, const fq_default_poly_t op, slong n, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -1626,8 +1499,7 @@ void fq_default_poly_shift_left(fq_default_poly_t rop,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_shift_left(rop->fmpz_mod, op->fmpz_mod, n,
-                                                        ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_shift_left(rop->fmpz_mod, op->fmpz_mod, n, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -1636,8 +1508,7 @@ void fq_default_poly_shift_left(fq_default_poly_t rop,
 }
 
 FQ_DEFAULT_POLY_INLINE
-void fq_default_poly_shift_right(fq_default_poly_t rop,
-               const fq_default_poly_t op, slong n, const fq_default_ctx_t ctx)
+void fq_default_poly_shift_right(fq_default_poly_t rop, const fq_default_poly_t op, slong n, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -1653,8 +1524,7 @@ void fq_default_poly_shift_right(fq_default_poly_t rop,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_shift_right(rop->fmpz_mod, op->fmpz_mod, n,
-                                                        ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_shift_right(rop->fmpz_mod, op->fmpz_mod, n, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -1665,8 +1535,7 @@ void fq_default_poly_shift_right(fq_default_poly_t rop,
 /*  Norms  *******************************************************************/
 
 FQ_DEFAULT_POLY_INLINE
-slong fq_default_poly_hamming_weight(const fq_default_poly_t op,
-                                                    const fq_default_ctx_t ctx)
+slong fq_default_poly_hamming_weight(const fq_default_poly_t op, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -1692,19 +1561,16 @@ slong fq_default_poly_hamming_weight(const fq_default_poly_t op,
 
 /*  Greatest common divisor  *************************************************/
 
-FQ_DEFAULT_POLY_INLINE void fq_default_poly_gcd(fq_default_poly_t rop,
-                  const fq_default_poly_t op1, const fq_default_poly_t op2,
-                                                    const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_gcd(fq_default_poly_t rop, const fq_default_poly_t op1, const fq_default_poly_t op2, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_poly_gcd(rop->fq_zech,
-		                 op1->fq_zech, op2->fq_zech, ctx->ctx.fq_zech);
+        fq_zech_poly_gcd(rop->fq_zech, op1->fq_zech, op2->fq_zech, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_poly_gcd(rop->fq_nmod,
-		                 op1->fq_nmod, op2->fq_nmod, ctx->ctx.fq_nmod);
+        fq_nmod_poly_gcd(rop->fq_nmod, op1->fq_nmod, op2->fq_nmod, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -1712,8 +1578,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_gcd(fq_default_poly_t rop,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_gcd(rop->fmpz_mod, op1->fmpz_mod, op2->fmpz_mod,
-                                                        ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_gcd(rop->fmpz_mod, op1->fmpz_mod, op2->fmpz_mod, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -1721,21 +1586,16 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_gcd(fq_default_poly_t rop,
     }
 }
 
-FQ_DEFAULT_POLY_INLINE void
-fq_default_poly_xgcd(fq_default_poly_t G,
-                         fq_default_poly_t S, fq_default_poly_t T,
-                  const fq_default_poly_t A, const fq_default_poly_t B,
-                                                    const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_xgcd(fq_default_poly_t G, fq_default_poly_t S, fq_default_poly_t T, const fq_default_poly_t A, const fq_default_poly_t B, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_poly_xgcd(G->fq_zech,
-             S->fq_zech, T->fq_zech, A->fq_zech, B->fq_zech, ctx->ctx.fq_zech);
+        fq_zech_poly_xgcd(G->fq_zech, S->fq_zech, T->fq_zech, A->fq_zech, B->fq_zech, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_poly_xgcd(G->fq_nmod,
-             S->fq_nmod, T->fq_nmod, A->fq_nmod, B->fq_nmod, ctx->ctx.fq_nmod);
+        fq_nmod_poly_xgcd(G->fq_nmod, S->fq_nmod, T->fq_nmod, A->fq_nmod, B->fq_nmod, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -1743,8 +1603,7 @@ fq_default_poly_xgcd(fq_default_poly_t G,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_xgcd(G->fmpz_mod, S->fmpz_mod, T->fmpz_mod, A->fmpz_mod,
-                                           B->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_xgcd(G->fmpz_mod, S->fmpz_mod, T->fmpz_mod, A->fmpz_mod, B->fmpz_mod, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -1754,8 +1613,8 @@ fq_default_poly_xgcd(fq_default_poly_t G,
 
 /*  Euclidean division  ******************************************************/
 
-FQ_DEFAULT_POLY_INLINE ulong fq_default_poly_remove(fq_default_poly_t f,
-                         const fq_default_poly_t g, const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+ulong fq_default_poly_remove(fq_default_poly_t f, const fq_default_poly_t g, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -1771,8 +1630,7 @@ FQ_DEFAULT_POLY_INLINE ulong fq_default_poly_remove(fq_default_poly_t f,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        return fmpz_mod_poly_remove(f->fmpz_mod, g->fmpz_mod,
-                                                        ctx->ctx.fmpz_mod.mod);
+        return fmpz_mod_poly_remove(f->fmpz_mod, g->fmpz_mod, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -1780,20 +1638,16 @@ FQ_DEFAULT_POLY_INLINE ulong fq_default_poly_remove(fq_default_poly_t f,
     }
 }
 
-FQ_DEFAULT_POLY_INLINE void
-fq_default_poly_divrem(fq_default_poly_t Q, fq_default_poly_t R,
-                   const fq_default_poly_t A, const fq_default_poly_t B,
-                                                    const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_divrem(fq_default_poly_t Q, fq_default_poly_t R, const fq_default_poly_t A, const fq_default_poly_t B, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_poly_divrem(Q->fq_zech,
-                         R->fq_zech, A->fq_zech, B->fq_zech, ctx->ctx.fq_zech);
+        fq_zech_poly_divrem(Q->fq_zech, R->fq_zech, A->fq_zech, B->fq_zech, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_poly_divrem(Q->fq_nmod,
-                         R->fq_nmod, A->fq_nmod, B->fq_nmod, ctx->ctx.fq_nmod);
+        fq_nmod_poly_divrem(Q->fq_nmod, R->fq_nmod, A->fq_nmod, B->fq_nmod, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -1801,8 +1655,7 @@ fq_default_poly_divrem(fq_default_poly_t Q, fq_default_poly_t R,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_divrem(Q->fmpz_mod, R->fmpz_mod, A->fmpz_mod,
-                                           B->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_divrem(Q->fmpz_mod, R->fmpz_mod, A->fmpz_mod, B->fmpz_mod, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -1810,10 +1663,8 @@ fq_default_poly_divrem(fq_default_poly_t Q, fq_default_poly_t R,
     }
 }
 
-FQ_DEFAULT_POLY_INLINE void
-fq_default_poly_rem(fq_default_poly_t R,
-             const fq_default_poly_t A, const fq_default_poly_t B,
-                                                    const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_rem(fq_default_poly_t R, const fq_default_poly_t A, const fq_default_poly_t B, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -1829,8 +1680,7 @@ fq_default_poly_rem(fq_default_poly_t R,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_rem(R->fmpz_mod, A->fmpz_mod, B->fmpz_mod,
-                                                        ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_rem(R->fmpz_mod, A->fmpz_mod, B->fmpz_mod, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -1838,10 +1688,8 @@ fq_default_poly_rem(fq_default_poly_t R,
     }
 }
 
-FQ_DEFAULT_POLY_INLINE void
-fq_default_poly_inv_series(fq_default_poly_t Qinv,
-                               const fq_default_poly_t Q, slong n,
-                                                    const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_inv_series(fq_default_poly_t Qinv, const fq_default_poly_t Q, slong n, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -1857,8 +1705,7 @@ fq_default_poly_inv_series(fq_default_poly_t Qinv,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_inv_series(Qinv->fmpz_mod, Q->fmpz_mod, n,
-                                                        ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_inv_series(Qinv->fmpz_mod, Q->fmpz_mod, n, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -1866,19 +1713,16 @@ fq_default_poly_inv_series(fq_default_poly_t Qinv,
     }
 }
 
-FQ_DEFAULT_POLY_INLINE void fq_default_poly_div_series(fq_default_poly_t Q,
-               const fq_default_poly_t A, const fq_default_poly_t B,
-                                           slong n, const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+void fq_default_poly_div_series(fq_default_poly_t Q, const fq_default_poly_t A, const fq_default_poly_t B, slong n, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_poly_div_series(Q->fq_zech,
-                                  A->fq_zech, B->fq_zech, n, ctx->ctx.fq_zech);
+        fq_zech_poly_div_series(Q->fq_zech, A->fq_zech, B->fq_zech, n, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_poly_div_series(Q->fq_nmod,
-                                  A->fq_nmod, B->fq_nmod, n, ctx->ctx.fq_nmod);
+        fq_nmod_poly_div_series(Q->fq_nmod, A->fq_nmod, B->fq_nmod, n, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -1886,8 +1730,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_div_series(fq_default_poly_t Q,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_div_series(Q->fmpz_mod, A->fmpz_mod, B->fmpz_mod, n,
-                                                        ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_div_series(Q->fmpz_mod, A->fmpz_mod, B->fmpz_mod, n, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -1897,19 +1740,16 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_div_series(fq_default_poly_t Q,
 
 /*  Divisibility testing  ****************************************************/
 
-FQ_DEFAULT_POLY_INLINE int fq_default_poly_divides(fq_default_poly_t Q,
-                      const fq_default_poly_t A, const fq_default_poly_t B,
-                                                    const fq_default_ctx_t ctx)
+FQ_DEFAULT_POLY_INLINE
+int fq_default_poly_divides(fq_default_poly_t Q, const fq_default_poly_t A, const fq_default_poly_t B, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        return fq_zech_poly_divides(Q->fq_zech,
-                                     A->fq_zech, B->fq_zech, ctx->ctx.fq_zech);
+        return fq_zech_poly_divides(Q->fq_zech, A->fq_zech, B->fq_zech, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        return fq_nmod_poly_divides(Q->fq_nmod,
-                                     A->fq_nmod, B->fq_nmod, ctx->ctx.fq_nmod);
+        return fq_nmod_poly_divides(Q->fq_nmod, A->fq_nmod, B->fq_nmod, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -1917,8 +1757,7 @@ FQ_DEFAULT_POLY_INLINE int fq_default_poly_divides(fq_default_poly_t Q,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        return fmpz_mod_poly_divides(Q->fmpz_mod, A->fmpz_mod, B->fmpz_mod,
-                                                        ctx->ctx.fmpz_mod.mod);
+        return fmpz_mod_poly_divides(Q->fmpz_mod, A->fmpz_mod, B->fmpz_mod, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -1929,8 +1768,7 @@ FQ_DEFAULT_POLY_INLINE int fq_default_poly_divides(fq_default_poly_t Q,
 /*  Derivative  **************************************************************/
 
 FQ_DEFAULT_POLY_INLINE
-void fq_default_poly_derivative(fq_default_poly_t rop,
-                        const fq_default_poly_t op, const fq_default_ctx_t ctx)
+void fq_default_poly_derivative(fq_default_poly_t rop, const fq_default_poly_t op, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -1946,8 +1784,7 @@ void fq_default_poly_derivative(fq_default_poly_t rop,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_derivative(rop->fmpz_mod, op->fmpz_mod,
-                                                        ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_derivative(rop->fmpz_mod, op->fmpz_mod, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -1958,8 +1795,7 @@ void fq_default_poly_derivative(fq_default_poly_t rop,
 /* Square root ***************************************************************/
 
 FQ_DEFAULT_POLY_INLINE
-void fq_default_poly_invsqrt_series(fq_default_poly_t rop,
-                    const fq_default_poly_t op, slong n, fq_default_ctx_t ctx)
+void fq_default_poly_invsqrt_series(fq_default_poly_t rop, const fq_default_poly_t op, slong n, fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -1984,8 +1820,7 @@ void fq_default_poly_invsqrt_series(fq_default_poly_t rop,
 }
 
 FQ_DEFAULT_POLY_INLINE
-void fq_default_poly_sqrt_series(fq_default_poly_t rop,
-                    const fq_default_poly_t op, slong n, fq_default_ctx_t ctx)
+void fq_default_poly_sqrt_series(fq_default_poly_t rop, const fq_default_poly_t op, slong n, fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -2010,8 +1845,7 @@ void fq_default_poly_sqrt_series(fq_default_poly_t rop,
 }
 
 FQ_DEFAULT_POLY_INLINE
-int fq_default_poly_sqrt(fq_default_poly_t rop,
-                              const fq_default_poly_t op, fq_default_ctx_t ctx)
+int fq_default_poly_sqrt(fq_default_poly_t rop, const fq_default_poly_t op, fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -2038,19 +1872,15 @@ int fq_default_poly_sqrt(fq_default_poly_t rop,
 /*  Evaluation  **************************************************************/
 
 FQ_DEFAULT_POLY_INLINE
-void fq_default_poly_evaluate_fq_default(fq_default_t res,
-                           const fq_default_poly_t f, const fq_default_t a,
-                                                    const fq_default_ctx_t ctx)
+void fq_default_poly_evaluate_fq_default(fq_default_t res, const fq_default_poly_t f, const fq_default_t a, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_poly_evaluate_fq_zech(res->fq_zech,
-		                     f->fq_zech, a->fq_zech, ctx->ctx.fq_zech);
+        fq_zech_poly_evaluate_fq_zech(res->fq_zech, f->fq_zech, a->fq_zech, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_poly_evaluate_fq_nmod(res->fq_nmod,
-		                     f->fq_nmod, a->fq_nmod, ctx->ctx.fq_nmod);
+        fq_nmod_poly_evaluate_fq_nmod(res->fq_nmod, f->fq_nmod, a->fq_nmod, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -2058,8 +1888,7 @@ void fq_default_poly_evaluate_fq_default(fq_default_t res,
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
-        fmpz_mod_poly_evaluate_fmpz(res->fmpz_mod, f->fmpz_mod, a->fmpz_mod,
-                                                        ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_evaluate_fmpz(res->fmpz_mod, f->fmpz_mod, a->fmpz_mod, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -2070,19 +1899,15 @@ void fq_default_poly_evaluate_fq_default(fq_default_t res,
 /*  Composition  *************************************************************/
 
 FQ_DEFAULT_POLY_INLINE
-void fq_default_poly_compose(fq_default_poly_t rop,
-            const fq_default_poly_t op1, const fq_default_poly_t op2,
-                                                    const fq_default_ctx_t ctx)
+void fq_default_poly_compose(fq_default_poly_t rop, const fq_default_poly_t op1, const fq_default_poly_t op2, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_poly_compose(rop->fq_zech,
-                                 op1->fq_zech, op2->fq_zech, ctx->ctx.fq_zech);
+        fq_zech_poly_compose(rop->fq_zech, op1->fq_zech, op2->fq_zech, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_poly_compose(rop->fq_nmod,
-                                 op1->fq_nmod, op2->fq_nmod, ctx->ctx.fq_nmod);
+        fq_nmod_poly_compose(rop->fq_nmod, op1->fq_nmod, op2->fq_nmod, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -2090,8 +1915,7 @@ void fq_default_poly_compose(fq_default_poly_t rop,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_compose(rop->fmpz_mod, op1->fmpz_mod, op2->fmpz_mod,
-                                                        ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_compose(rop->fmpz_mod, op1->fmpz_mod, op2->fmpz_mod, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -2100,19 +1924,15 @@ void fq_default_poly_compose(fq_default_poly_t rop,
 }
 
 FQ_DEFAULT_POLY_INLINE
-void fq_default_poly_compose_mod(fq_default_poly_t res,
-            const fq_default_poly_t poly1, const fq_default_poly_t poly2,
-                     const fq_default_poly_t poly3, const fq_default_ctx_t ctx)
+void fq_default_poly_compose_mod(fq_default_poly_t res, const fq_default_poly_t poly1, const fq_default_poly_t poly2, const fq_default_poly_t poly3, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_poly_compose_mod(res->fq_zech,
-             poly1->fq_zech, poly2->fq_zech, poly3->fq_zech, ctx->ctx.fq_zech);
+        fq_zech_poly_compose_mod(res->fq_zech, poly1->fq_zech, poly2->fq_zech, poly3->fq_zech, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_poly_compose_mod(res->fq_nmod,
-             poly1->fq_nmod, poly2->fq_nmod, poly3->fq_nmod, ctx->ctx.fq_nmod);
+        fq_nmod_poly_compose_mod(res->fq_nmod, poly1->fq_nmod, poly2->fq_nmod, poly3->fq_nmod, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -2120,13 +1940,11 @@ void fq_default_poly_compose_mod(fq_default_poly_t res,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_compose_mod(res->fmpz_mod, poly1->fmpz_mod,
-                      poly2->fmpz_mod, poly3->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_compose_mod(res->fmpz_mod, poly1->fmpz_mod, poly2->fmpz_mod, poly3->fmpz_mod, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
-        fq_poly_compose_mod(res->fq,
-                                 poly1->fq, poly2->fq, poly3->fq, ctx->ctx.fq);
+        fq_poly_compose_mod(res->fq, poly1->fq, poly2->fq, poly3->fq, ctx->ctx.fq);
     }
 }
 
@@ -2141,8 +1959,7 @@ int fq_default_poly_print(const fq_default_poly_t poly, const fq_default_ctx_t c
 int fq_default_poly_print_pretty(const fq_default_poly_t poly, const char *x, const fq_default_ctx_t ctx);
 
 FQ_DEFAULT_POLY_INLINE
-char * fq_default_poly_get_str_pretty(const fq_default_poly_t poly,
-                                     const char *x, const fq_default_ctx_t ctx)
+char * fq_default_poly_get_str_pretty(const fq_default_poly_t poly, const char *x, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -2158,8 +1975,7 @@ char * fq_default_poly_get_str_pretty(const fq_default_poly_t poly,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        return fmpz_mod_poly_get_str_pretty(poly->fmpz_mod, x,
-                                                        ctx->ctx.fmpz_mod.mod);
+        return fmpz_mod_poly_get_str_pretty(poly->fmpz_mod, x, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -2168,8 +1984,7 @@ char * fq_default_poly_get_str_pretty(const fq_default_poly_t poly,
 }
 
 FQ_DEFAULT_POLY_INLINE
-char * fq_default_poly_get_str(const fq_default_poly_t poly,
-                                                    const fq_default_ctx_t ctx)
+char * fq_default_poly_get_str(const fq_default_poly_t poly, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -2198,8 +2013,7 @@ char * fq_default_poly_get_str(const fq_default_poly_t poly,
 /* Characteristic polynomial *************************************************/
 
 FQ_DEFAULT_POLY_INLINE
-void fq_default_mat_charpoly(fq_default_poly_t p,
-                          const fq_default_mat_t M, const fq_default_ctx_t ctx)
+void fq_default_mat_charpoly(fq_default_poly_t p, const fq_default_mat_t M, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -2226,8 +2040,7 @@ void fq_default_mat_charpoly(fq_default_poly_t p,
 /* Minimal polynomial ********************************************************/
 
 FQ_DEFAULT_POLY_INLINE
-void fq_default_mat_minpoly(fq_default_poly_t p,
-                          const fq_default_mat_t X, const fq_default_ctx_t ctx)
+void fq_default_mat_minpoly(fq_default_poly_t p, const fq_default_mat_t X, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {

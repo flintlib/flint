@@ -69,6 +69,18 @@ typedef union fq_default_mat_struct
 
 typedef fq_default_mat_struct fq_default_mat_t[1];
 
+typedef union fq_default_poly_struct
+{
+    fq_poly_t fq;
+    fq_nmod_poly_t fq_nmod;
+    fq_zech_poly_t fq_zech;
+    nmod_poly_t nmod;
+    fmpz_mod_poly_t fmpz_mod;
+}
+fq_default_poly_struct;
+
+typedef fq_default_poly_struct fq_default_poly_t[1];
+
 #ifdef __cplusplus
 }
 #endif
