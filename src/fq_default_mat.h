@@ -19,33 +19,27 @@
 #define FQ_DEFAULT_MAT_INLINE static __inline__
 #endif
 
+#include "fmpz.h"
+#include "fmpz_mod.h"
 #include "nmod_mat.h"
 #include "fmpz_mat.h"
 #include "fmpz_mod_mat.h"
+#include "fq.h"
 #include "fq_mat.h"
+#include "fq_nmod.h"
 #include "fq_nmod_mat.h"
+#include "fq_zech.h"
 #include "fq_zech_mat.h"
-#include "fq_default.h"
+#include "fq_default_types.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
-
-typedef union fq_default_mat_struct
-{
-    fq_mat_t fq;
-    fq_nmod_mat_t fq_nmod;
-    fq_zech_mat_t fq_zech;
-    nmod_mat_t nmod;
-    fmpz_mod_mat_t fmpz_mod;
-} fq_default_mat_struct;
-
-typedef fq_default_mat_struct fq_default_mat_t[1];
 
 /* Memory management  ********************************************************/
 
-FQ_DEFAULT_MAT_INLINE void fq_default_mat_init(fq_default_mat_t mat,
-                            slong rows, slong cols, const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+void fq_default_mat_init(fq_default_mat_t mat, slong rows, slong cols, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -61,8 +55,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_init(fq_default_mat_t mat,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_mat_init(mat->fmpz_mod, rows, cols,
-                                  fmpz_mod_ctx_modulus(ctx->ctx.fmpz_mod.mod));
+        fmpz_mod_mat_init(mat->fmpz_mod, rows, cols, fmpz_mod_ctx_modulus(ctx->ctx.fmpz_mod.mod));
     }
     else
     {
@@ -70,8 +63,8 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_init(fq_default_mat_t mat,
     }
 }
 
-FQ_DEFAULT_MAT_INLINE void fq_default_mat_init_set(fq_default_mat_t mat,
-                        const fq_default_mat_t src, const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+void fq_default_mat_init_set(fq_default_mat_t mat, const fq_default_mat_t src, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -95,8 +88,8 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_init_set(fq_default_mat_t mat,
     }
 }
 
-FQ_DEFAULT_MAT_INLINE void fq_default_mat_swap(fq_default_mat_t mat1,
-                               fq_default_mat_t mat2, const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+void fq_default_mat_swap(fq_default_mat_t mat1, fq_default_mat_t mat2, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -120,8 +113,8 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_swap(fq_default_mat_t mat1,
     }
 }
 
-FQ_DEFAULT_MAT_INLINE void fq_default_mat_set(fq_default_mat_t mat1,
-                       const fq_default_mat_t mat2, const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+void fq_default_mat_set(fq_default_mat_t mat1, const fq_default_mat_t mat2, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -145,8 +138,8 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_set(fq_default_mat_t mat1,
     }
 }
 
-FQ_DEFAULT_MAT_INLINE void fq_default_mat_clear(fq_default_mat_t mat,
-                                                    const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+void fq_default_mat_clear(fq_default_mat_t mat, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -170,8 +163,8 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_clear(fq_default_mat_t mat,
     }
 }
 
-FQ_DEFAULT_MAT_INLINE int fq_default_mat_equal(const fq_default_mat_t mat1,
-                       const fq_default_mat_t mat2, const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+int fq_default_mat_equal(const fq_default_mat_t mat1, const fq_default_mat_t mat2, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -195,8 +188,8 @@ FQ_DEFAULT_MAT_INLINE int fq_default_mat_equal(const fq_default_mat_t mat1,
     }
 }
 
-FQ_DEFAULT_MAT_INLINE int fq_default_mat_is_zero(const fq_default_mat_t mat,
-                                                    const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+int fq_default_mat_is_zero(const fq_default_mat_t mat, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -220,8 +213,8 @@ FQ_DEFAULT_MAT_INLINE int fq_default_mat_is_zero(const fq_default_mat_t mat,
     }
 }
 
-FQ_DEFAULT_MAT_INLINE int fq_default_mat_is_one(const fq_default_mat_t mat,
-                                                    const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+int fq_default_mat_is_one(const fq_default_mat_t mat, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -245,8 +238,8 @@ FQ_DEFAULT_MAT_INLINE int fq_default_mat_is_one(const fq_default_mat_t mat,
     }
 }
 
-FQ_DEFAULT_MAT_INLINE int
-fq_default_mat_is_empty(const fq_default_mat_t mat, const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+int fq_default_mat_is_empty(const fq_default_mat_t mat, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -270,9 +263,8 @@ fq_default_mat_is_empty(const fq_default_mat_t mat, const fq_default_ctx_t ctx)
     }
 }
 
-FQ_DEFAULT_MAT_INLINE int
-fq_default_mat_is_square(const fq_default_mat_t mat,
-                                                    const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+int fq_default_mat_is_square(const fq_default_mat_t mat, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -296,9 +288,8 @@ fq_default_mat_is_square(const fq_default_mat_t mat,
     }
 }
 
-FQ_DEFAULT_MAT_INLINE void
-fq_default_mat_entry(fq_default_t val, const fq_default_mat_t mat,
-		                  slong i, slong j, const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+void fq_default_mat_entry(fq_default_t val, const fq_default_mat_t mat, slong i, slong j, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -324,9 +315,8 @@ fq_default_mat_entry(fq_default_t val, const fq_default_mat_t mat,
     }
 }
 
-FQ_DEFAULT_MAT_INLINE void
-fq_default_mat_entry_set(fq_default_mat_t mat, slong i, slong j,
-                              const fq_default_t x, const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+void fq_default_mat_entry_set(fq_default_mat_t mat, slong i, slong j, const fq_default_t x, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -350,19 +340,10 @@ fq_default_mat_entry_set(fq_default_mat_t mat, slong i, slong j,
     }
 }
 
-FQ_DEFAULT_MAT_INLINE void
-fq_default_mat_entry_set_fmpz(fq_default_mat_t mat, slong i, slong j,
-                                    const fmpz_t x, const fq_default_ctx_t ctx)
-{
-   fq_default_t c;
-   fq_default_init(c, ctx);
-   fq_default_set_fmpz(c, x, ctx);
-   fq_default_mat_entry_set(mat, i, j, c, ctx);
-   fq_default_clear(c, ctx);
-}
+void fq_default_mat_entry_set_fmpz(fq_default_mat_t mat, slong i, slong j, const fmpz_t x, const fq_default_ctx_t ctx);
 
-FQ_DEFAULT_MAT_INLINE slong
-fq_default_mat_nrows(const fq_default_mat_t mat, const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+slong fq_default_mat_nrows(const fq_default_mat_t mat, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -386,8 +367,8 @@ fq_default_mat_nrows(const fq_default_mat_t mat, const fq_default_ctx_t ctx)
     }
 }
 
-FQ_DEFAULT_MAT_INLINE slong
-fq_default_mat_ncols(const fq_default_mat_t mat, const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+slong fq_default_mat_ncols(const fq_default_mat_t mat, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -411,9 +392,8 @@ fq_default_mat_ncols(const fq_default_mat_t mat, const fq_default_ctx_t ctx)
     }
 }
 
-FQ_DEFAULT_MAT_INLINE void
-fq_default_mat_swap_rows(fq_default_mat_t mat,
-                    slong * perm, slong r, slong s, const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+void fq_default_mat_swap_rows(fq_default_mat_t mat, slong * perm, slong r, slong s, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -437,9 +417,8 @@ fq_default_mat_swap_rows(fq_default_mat_t mat,
     }
 }
 
-FQ_DEFAULT_MAT_INLINE void
-fq_default_mat_invert_rows(fq_default_mat_t mat,
-                                      slong * perm, const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+void fq_default_mat_invert_rows(fq_default_mat_t mat, slong * perm, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -463,9 +442,8 @@ fq_default_mat_invert_rows(fq_default_mat_t mat,
     }
 }
 
-FQ_DEFAULT_MAT_INLINE void
-fq_default_mat_swap_cols(fq_default_mat_t mat,
-                    slong * perm, slong r, slong s, const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+void fq_default_mat_swap_cols(fq_default_mat_t mat, slong * perm, slong r, slong s, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -489,9 +467,8 @@ fq_default_mat_swap_cols(fq_default_mat_t mat,
     }
 }
 
-FQ_DEFAULT_MAT_INLINE void
-fq_default_mat_invert_cols(fq_default_mat_t mat,
-                                      slong * perm, const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+void fq_default_mat_invert_cols(fq_default_mat_t mat, slong * perm, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -517,8 +494,8 @@ fq_default_mat_invert_cols(fq_default_mat_t mat,
 
 /* Assignment  ***************************************************************/
 
-FQ_DEFAULT_MAT_INLINE void fq_default_mat_zero(fq_default_mat_t A,
-                                                    const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+void fq_default_mat_zero(fq_default_mat_t A, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -542,8 +519,8 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_zero(fq_default_mat_t A,
     }
 }
 
-FQ_DEFAULT_MAT_INLINE void fq_default_mat_one(fq_default_mat_t A,
-                                                    const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+void fq_default_mat_one(fq_default_mat_t A, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -570,8 +547,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_one(fq_default_mat_t A,
 /* Conversions ***************************************************************/
 
 FQ_DEFAULT_MAT_INLINE
-void fq_default_mat_set_nmod_mat(fq_default_mat_t mat1,
-		             const nmod_mat_t mat2, const fq_default_ctx_t ctx)
+void fq_default_mat_set_nmod_mat(fq_default_mat_t mat1, const nmod_mat_t mat2, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -596,8 +572,7 @@ void fq_default_mat_set_nmod_mat(fq_default_mat_t mat1,
 }
 
 FQ_DEFAULT_MAT_INLINE
-void fq_default_mat_set_fmpz_mod_mat(fq_default_mat_t mat1,
-                         const fmpz_mod_mat_t mat2, const fq_default_ctx_t ctx)
+void fq_default_mat_set_fmpz_mod_mat(fq_default_mat_t mat1, const fmpz_mod_mat_t mat2, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -622,21 +597,18 @@ void fq_default_mat_set_fmpz_mod_mat(fq_default_mat_t mat1,
 }
 
 FQ_DEFAULT_MAT_INLINE
-void fq_default_mat_set_fmpz_mat(fq_default_mat_t mat1,
-		             const fmpz_mat_t mat2, const fq_default_ctx_t ctx)
+void fq_default_mat_set_fmpz_mat(fq_default_mat_t mat1, const fmpz_mat_t mat2, const fq_default_ctx_t ctx)
 {
     fmpz_mod_mat_t mod_mat;
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fmpz_mod_mat_init(mod_mat, mat2->r, mat2->c,
-		                            fq_zech_ctx_prime(ctx->ctx.fq_zech));
+        fmpz_mod_mat_init(mod_mat, mat2->r, mat2->c, fq_zech_ctx_prime(ctx->ctx.fq_zech));
         fmpz_mod_mat_set_fmpz_mat(mod_mat, mat2);
         fq_zech_mat_set_fmpz_mod_mat(mat1->fq_zech, mod_mat, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fmpz_mod_mat_init(mod_mat, mat2->r, mat2->c,
-		                            fq_nmod_ctx_prime(ctx->ctx.fq_nmod));
+        fmpz_mod_mat_init(mod_mat, mat2->r, mat2->c, fq_nmod_ctx_prime(ctx->ctx.fq_nmod));
         fmpz_mod_mat_set_fmpz_mat(mod_mat, mat2);
         fq_nmod_mat_set_fmpz_mod_mat(mat1->fq_nmod, mod_mat, ctx->ctx.fq_nmod);
     }
@@ -659,43 +631,35 @@ void fq_default_mat_set_fmpz_mat(fq_default_mat_t mat1,
     fmpz_mod_mat_clear(mod_mat);
 }
 
-/* Windows and concatenation */
+/* Windows and concatenation *************************************************/
 
 FQ_DEFAULT_MAT_INLINE
-void fq_default_mat_window_init(fq_default_mat_t window,
-    const fq_default_mat_t mat, slong r1, slong c1, slong r2, slong c2,
-                                                    const fq_default_ctx_t ctx)
+void fq_default_mat_window_init(fq_default_mat_t window, const fq_default_mat_t mat, slong r1, slong c1, slong r2, slong c2, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_mat_window_init(window->fq_zech,
-                               mat->fq_zech, r1, c1, r2, c2, ctx->ctx.fq_zech);
+        fq_zech_mat_window_init(window->fq_zech, mat->fq_zech, r1, c1, r2, c2, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_mat_window_init(window->fq_nmod,
-                               mat->fq_nmod, r1, c1, r2, c2, ctx->ctx.fq_nmod);
+        fq_nmod_mat_window_init(window->fq_nmod, mat->fq_nmod, r1, c1, r2, c2, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
-        nmod_mat_window_init(window->nmod,
-                               mat->nmod, r1, c1, r2, c2);
+        nmod_mat_window_init(window->nmod, mat->nmod, r1, c1, r2, c2);
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_mat_window_init(window->fmpz_mod,
-                               mat->fmpz_mod, r1, c1, r2, c2);
+        fmpz_mod_mat_window_init(window->fmpz_mod, mat->fmpz_mod, r1, c1, r2, c2);
     }
     else
     {
-        fq_mat_window_init(window->fq,
-                                         mat->fq, r1, c1, r2, c2, ctx->ctx.fq);
+        fq_mat_window_init(window->fq, mat->fq, r1, c1, r2, c2, ctx->ctx.fq);
     }
 }
 
 FQ_DEFAULT_MAT_INLINE
-void fq_default_mat_window_clear(fq_default_mat_t window,
-                                                    const fq_default_ctx_t ctx)
+void fq_default_mat_window_clear(fq_default_mat_t window, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -721,19 +685,15 @@ void fq_default_mat_window_clear(fq_default_mat_t window,
 }
 
 FQ_DEFAULT_MAT_INLINE
-void fq_default_mat_concat_horizontal(fq_default_mat_t res,
-          const fq_default_mat_t mat1,  const fq_default_mat_t mat2,
-                                                    const fq_default_ctx_t ctx)
+void fq_default_mat_concat_horizontal(fq_default_mat_t res, const fq_default_mat_t mat1, const fq_default_mat_t mat2, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_mat_concat_horizontal(res->fq_zech,
-                               mat1->fq_zech, mat2->fq_zech, ctx->ctx.fq_zech);
+        fq_zech_mat_concat_horizontal(res->fq_zech, mat1->fq_zech, mat2->fq_zech, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_mat_concat_horizontal(res->fq_nmod,
-                               mat1->fq_nmod, mat2->fq_nmod, ctx->ctx.fq_nmod);
+        fq_nmod_mat_concat_horizontal(res->fq_nmod, mat1->fq_nmod, mat2->fq_nmod, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -741,8 +701,7 @@ void fq_default_mat_concat_horizontal(fq_default_mat_t res,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_mat_concat_horizontal(res->fmpz_mod,
-                                       mat1->fmpz_mod, mat2->fmpz_mod);
+        fmpz_mod_mat_concat_horizontal(res->fmpz_mod, mat1->fmpz_mod, mat2->fmpz_mod);
     }
     else
     {
@@ -751,19 +710,15 @@ void fq_default_mat_concat_horizontal(fq_default_mat_t res,
 }
 
 FQ_DEFAULT_MAT_INLINE
-void fq_default_mat_concat_vertical(fq_default_mat_t res,
-          const fq_default_mat_t mat1,  const fq_default_mat_t mat2,
-                                                    const fq_default_ctx_t ctx)
+void fq_default_mat_concat_vertical(fq_default_mat_t res, const fq_default_mat_t mat1, const fq_default_mat_t mat2, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_mat_concat_vertical(res->fq_zech,
-                               mat1->fq_zech, mat2->fq_zech, ctx->ctx.fq_zech);
+        fq_zech_mat_concat_vertical(res->fq_zech, mat1->fq_zech, mat2->fq_zech, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_mat_concat_vertical(res->fq_nmod,
-                               mat1->fq_nmod, mat2->fq_nmod, ctx->ctx.fq_nmod);
+        fq_nmod_mat_concat_vertical(res->fq_nmod, mat1->fq_nmod, mat2->fq_nmod, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -771,8 +726,7 @@ void fq_default_mat_concat_vertical(fq_default_mat_t res,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_mat_concat_vertical(res->fmpz_mod,
-                                     mat1->fmpz_mod, mat2->fmpz_mod);
+        fmpz_mod_mat_concat_vertical(res->fmpz_mod, mat1->fmpz_mod, mat2->fmpz_mod);
     }
     else
     {
@@ -794,8 +748,8 @@ int fq_default_mat_print_pretty(const fq_default_mat_t mat, const fq_default_ctx
 
 /* Random matrix generation  *************************************************/
 
-FQ_DEFAULT_MAT_INLINE void fq_default_mat_randtest(fq_default_mat_t mat,
-                                flint_rand_t state, const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+void fq_default_mat_randtest(fq_default_mat_t mat, flint_rand_t state, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -819,8 +773,8 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_randtest(fq_default_mat_t mat,
     }
 }
 
-FQ_DEFAULT_MAT_INLINE void fq_default_mat_randrank(fq_default_mat_t mat,
-                    flint_rand_t state, slong rank, const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+void fq_default_mat_randrank(fq_default_mat_t mat, flint_rand_t state, slong rank, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -844,10 +798,8 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_randrank(fq_default_mat_t mat,
     }
 }
 
-
 FQ_DEFAULT_MAT_INLINE
-void fq_default_mat_randops(fq_default_mat_t mat,
-                   slong count, flint_rand_t state, const fq_default_ctx_t ctx)
+void fq_default_mat_randops(fq_default_mat_t mat, slong count, flint_rand_t state, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -872,8 +824,7 @@ void fq_default_mat_randops(fq_default_mat_t mat,
 }
 
 FQ_DEFAULT_MAT_INLINE
-void fq_default_mat_randtril(fq_default_mat_t mat,
-                      flint_rand_t state, int unit, const fq_default_ctx_t ctx)
+void fq_default_mat_randtril(fq_default_mat_t mat, flint_rand_t state, int unit, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -898,8 +849,7 @@ void fq_default_mat_randtril(fq_default_mat_t mat,
 }
 
 FQ_DEFAULT_MAT_INLINE
-void fq_default_mat_randtriu(fq_default_mat_t mat,
-                      flint_rand_t state, int unit, const fq_default_ctx_t ctx)
+void fq_default_mat_randtriu(fq_default_mat_t mat, flint_rand_t state, int unit, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -923,15 +873,14 @@ void fq_default_mat_randtriu(fq_default_mat_t mat,
     }
 }
 
-/* Norms */
+/* Norms *********************************************************************/
 
-/* Transpose */
+/* Transpose *****************************************************************/
 
-/* Addition and subtraction */
+/* Addition and subtraction **************************************************/
 
-FQ_DEFAULT_MAT_INLINE void fq_default_mat_add(fq_default_mat_t C,
-                      const fq_default_mat_t A, const fq_default_mat_t B,
-                                                    const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+void fq_default_mat_add(fq_default_mat_t C, const fq_default_mat_t A, const fq_default_mat_t B, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -955,9 +904,8 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_add(fq_default_mat_t C,
     }
 }
 
-FQ_DEFAULT_MAT_INLINE void fq_default_mat_sub(fq_default_mat_t C,
-                      const fq_default_mat_t A, const fq_default_mat_t B,
-                                                    const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+void fq_default_mat_sub(fq_default_mat_t C, const fq_default_mat_t A, const fq_default_mat_t B, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -981,8 +929,8 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_sub(fq_default_mat_t C,
     }
 }
 
-FQ_DEFAULT_MAT_INLINE void fq_default_mat_neg(fq_default_mat_t B,
-                          const fq_default_mat_t A, const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+void fq_default_mat_neg(fq_default_mat_t B, const fq_default_mat_t A, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -1006,9 +954,8 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_neg(fq_default_mat_t B,
     }
 }
 
-FQ_DEFAULT_MAT_INLINE void fq_default_mat_submul(fq_default_mat_t D,
-                        const fq_default_mat_t C, const fq_default_mat_t A,
-                          const fq_default_mat_t B, const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+void fq_default_mat_submul(fq_default_mat_t D, const fq_default_mat_t C, const fq_default_mat_t A, const fq_default_mat_t B, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -1034,13 +981,12 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_submul(fq_default_mat_t D,
     }
 }
 
-/* Scalar operations */
+/* Scalar operations *********************************************************/
 
-/* Multiplication */
+/* Multiplication ************************************************************/
 
-FQ_DEFAULT_MAT_INLINE void fq_default_mat_mul(fq_default_mat_t C,
-                      const fq_default_mat_t A, const fq_default_mat_t B,
-                                                    const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+void fq_default_mat_mul(fq_default_mat_t C, const fq_default_mat_t A, const fq_default_mat_t B, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -1064,8 +1010,8 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_mul(fq_default_mat_t C,
     }
 }
 
-FQ_DEFAULT_MAT_INLINE slong fq_default_mat_lu(slong * P,
-                  fq_default_mat_t A, int rank_check, const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+slong fq_default_mat_lu(slong * P, fq_default_mat_t A, int rank_check, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -1091,8 +1037,8 @@ FQ_DEFAULT_MAT_INLINE slong fq_default_mat_lu(slong * P,
 
 /* Inverse *******************************************************************/
 
-FQ_DEFAULT_MAT_INLINE int fq_default_mat_inv(fq_default_mat_t B,
-                                  fq_default_mat_t A, const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+int fq_default_mat_inv(fq_default_mat_t B, fq_default_mat_t A, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -1118,8 +1064,8 @@ FQ_DEFAULT_MAT_INLINE int fq_default_mat_inv(fq_default_mat_t B,
 
 /* Solving *******************************************************************/
 
-FQ_DEFAULT_MAT_INLINE slong fq_default_mat_rref(fq_default_mat_t A,
-                                                    const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+slong fq_default_mat_rref(fq_default_mat_t A, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -1143,8 +1089,8 @@ FQ_DEFAULT_MAT_INLINE slong fq_default_mat_rref(fq_default_mat_t A,
     }
 }
 
-FQ_DEFAULT_MAT_INLINE slong fq_default_mat_nullspace(fq_default_mat_t X,
-                          const fq_default_mat_t A, const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+slong fq_default_mat_nullspace(fq_default_mat_t X, const fq_default_mat_t A, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -1168,8 +1114,8 @@ FQ_DEFAULT_MAT_INLINE slong fq_default_mat_nullspace(fq_default_mat_t X,
     }
 }
 
-FQ_DEFAULT_MAT_INLINE slong fq_default_mat_rank(const fq_default_mat_t A,
-                                                    const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+slong fq_default_mat_rank(const fq_default_mat_t A, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -1193,9 +1139,8 @@ FQ_DEFAULT_MAT_INLINE slong fq_default_mat_rank(const fq_default_mat_t A,
     }
 }
 
-FQ_DEFAULT_MAT_INLINE void fq_default_mat_solve_tril(fq_default_mat_t X,
-                         const fq_default_mat_t L, const fq_default_mat_t B,
-                                          int unit, const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+void fq_default_mat_solve_tril(fq_default_mat_t X, const fq_default_mat_t L, const fq_default_mat_t B, int unit, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -1219,9 +1164,8 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_solve_tril(fq_default_mat_t X,
     }
 }
 
-FQ_DEFAULT_MAT_INLINE void fq_default_mat_solve_triu(fq_default_mat_t X,
-                        const fq_default_mat_t U, const fq_default_mat_t B,
-                                          int unit, const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+void fq_default_mat_solve_triu(fq_default_mat_t X, const fq_default_mat_t U, const fq_default_mat_t B, int unit, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
@@ -1247,19 +1191,16 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_solve_triu(fq_default_mat_t X,
 
 /* Nonsingular solving *******************************************************/
 
-FQ_DEFAULT_MAT_INLINE int fq_default_mat_solve(fq_default_mat_t X,
-                      const fq_default_mat_t A, const fq_default_mat_t C,
-                                                    const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+int fq_default_mat_solve(fq_default_mat_t X, const fq_default_mat_t A, const fq_default_mat_t C, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        return fq_zech_mat_solve(X->fq_zech,
-                                     A->fq_zech, C->fq_zech, ctx->ctx.fq_zech);
+        return fq_zech_mat_solve(X->fq_zech, A->fq_zech, C->fq_zech, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        return fq_nmod_mat_solve(X->fq_nmod,
-                                     A->fq_nmod, C->fq_nmod, ctx->ctx.fq_nmod);
+        return fq_nmod_mat_solve(X->fq_nmod, A->fq_nmod, C->fq_nmod, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -1277,19 +1218,16 @@ FQ_DEFAULT_MAT_INLINE int fq_default_mat_solve(fq_default_mat_t X,
 
 /* Solving *******************************************************************/
 
-FQ_DEFAULT_MAT_INLINE int fq_default_mat_can_solve(fq_default_mat_t X,
-                      const fq_default_mat_t A, const fq_default_mat_t B,
-                                                    const fq_default_ctx_t ctx)
+FQ_DEFAULT_MAT_INLINE
+int fq_default_mat_can_solve(fq_default_mat_t X, const fq_default_mat_t A, const fq_default_mat_t B, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        return fq_zech_mat_can_solve(X->fq_zech,
-                                     A->fq_zech, B->fq_zech, ctx->ctx.fq_zech);
+        return fq_zech_mat_can_solve(X->fq_zech, A->fq_zech, B->fq_zech, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        return fq_nmod_mat_can_solve(X->fq_nmod,
-                                     A->fq_nmod, B->fq_nmod, ctx->ctx.fq_nmod);
+        return fq_nmod_mat_can_solve(X->fq_nmod, A->fq_nmod, B->fq_nmod, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -1308,8 +1246,7 @@ FQ_DEFAULT_MAT_INLINE int fq_default_mat_can_solve(fq_default_mat_t X,
 /* Transforms ****************************************************************/
 
 FQ_DEFAULT_MAT_INLINE
-void fq_default_mat_similarity(fq_default_mat_t A, slong r,
-                                      fq_default_t d, const fq_default_ctx_t ctx)
+void fq_default_mat_similarity(fq_default_mat_t A, slong r, fq_default_t d, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {

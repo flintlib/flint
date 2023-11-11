@@ -27,50 +27,13 @@
 #include "fq.h"
 #include "fq_nmod.h"
 #include "fq_zech.h"
-
-#define FQ_DEFAULT_FQ_ZECH  1
-#define FQ_DEFAULT_FQ_NMOD  2
-#define FQ_DEFAULT_FQ       3
-#define FQ_DEFAULT_NMOD     4
-#define FQ_DEFAULT_FMPZ_MOD 5
+#include "fq_default_types.h"
 
 /* Data types and context ****************************************************/
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-typedef union fq_default_struct
-{
-    fq_t fq;
-    fq_nmod_t fq_nmod;
-    fq_zech_t fq_zech;
-    ulong nmod;
-    fmpz_t fmpz_mod;
-} fq_default_struct;
-
-typedef fq_default_struct fq_default_t[1];
-
-typedef struct
-{
-    int type;
-    union ctx
-    {
-        fq_ctx_t fq;
-        fq_nmod_ctx_t fq_nmod;
-        fq_zech_ctx_t fq_zech;
-        struct {
-            nmod_t mod;
-            mp_limb_t a;    /* minpoly is x - a */
-        } nmod;
-        struct {
-            fmpz_mod_ctx_t mod;
-            fmpz_t a;       /* minpoly is x - a */
-        } fmpz_mod;
-    } ctx;
-} fq_default_ctx_struct;
-
-typedef fq_default_ctx_struct fq_default_ctx_t[1];
 
 FQ_DEFAULT_INLINE
 void fq_default_ctx_init_type(fq_default_ctx_t ctx, const fmpz_t p, slong d, const char * var, int type)
