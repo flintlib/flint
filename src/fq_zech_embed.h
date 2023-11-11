@@ -26,14 +26,11 @@
 #define B nmod
 #include "fq_embed_templates.h"
 
-void TEMPLATE(T, modulus_pow_series_inv)(TEMPLATE(B, poly_t) res,
-                                         const TEMPLATE(T, ctx_t) ctx,
-                                         slong trunc);
+void TEMPLATE(T, modulus_pow_series_inv)(TEMPLATE(B, poly_t) res, const TEMPLATE(T, ctx_t) ctx, slong trunc);
 
 #undef B
 #undef T
 
-void fq_zech_modulus_derivative_inv(fq_zech_t m_prime, fq_zech_t m_prime_inv,
-                                                     const fq_zech_ctx_t ctx);
+void fq_zech_modulus_derivative_inv(fq_zech_t m_prime, fq_zech_t m_prime_inv, const fq_zech_ctx_t ctx);
 
 #endif
