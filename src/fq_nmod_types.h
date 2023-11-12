@@ -88,6 +88,17 @@ typedef struct
 
 typedef fq_nmod_mpoly_struct fq_nmod_mpoly_t[1];
 
+typedef struct
+{
+    fq_nmod_t constant;
+    fq_nmod_mpoly_struct * poly;
+    fmpz * exp;
+    slong num;
+    slong alloc;
+} fq_nmod_mpoly_factor_struct;
+
+typedef fq_nmod_mpoly_factor_struct fq_nmod_mpoly_factor_t[1];
+
 #ifdef __cplusplus
 }
 #endif
