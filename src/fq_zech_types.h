@@ -80,6 +80,17 @@ fq_zech_poly_factor_struct;
 
 typedef fq_zech_poly_factor_struct fq_zech_poly_factor_t[1];
 
+typedef struct
+{
+    fq_zech_struct * coeffs;
+    ulong * exps;
+    slong alloc;
+    slong length;
+    flint_bitcnt_t bits;     /* number of bits per exponent */
+} fq_zech_mpoly_struct;
+
+typedef fq_zech_mpoly_struct fq_zech_mpoly_t[1];
+
 #ifdef __cplusplus
 }
 #endif
