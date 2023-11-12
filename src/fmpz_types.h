@@ -18,6 +18,19 @@
 extern "C" {
 #endif
 
+/* The largest bit count for an fmpz to be small */
+#define SMALL_FMPZ_BITCOUNT_MAX (FLINT_BITS - 2)
+
+/* Minimum and maximum value for a small fmpz */
+#define COEFF_MIN (-((WORD(1) << SMALL_FMPZ_BITCOUNT_MAX) - WORD(1)))
+#define COEFF_MAX ((WORD(1) << SMALL_FMPZ_BITCOUNT_MAX) - WORD(1))
+
+/* Conversions between mpz_ptr and fmpz_t */
+#define PTR_TO_COEFF(x) (((ulong) (x) >> 2) | (WORD(1) << (FLINT_BITS - 2)))
+#define COEFF_TO_PTR(x) ((mpz_ptr) (((ulong)x) << 2))
+
+#define COEFF_IS_MPZ(x) (((x) >> SMALL_FMPZ_BITCOUNT_MAX) == WORD(1))  /* is x a pointer not an integer */
+
 typedef struct
 {
     int sign;
