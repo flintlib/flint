@@ -19,6 +19,8 @@
 extern "C" {
 #endif
 
+#define MPOLY_MIN_BITS (UWORD(8))    /* minimum number of bits to pack into */
+
 typedef enum {
     ORD_LEX,
     ORD_DEGLEX,
