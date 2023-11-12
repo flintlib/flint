@@ -14,6 +14,8 @@
 
 #include "limb_types.h"
 #include "fmpz_mod_types.h"
+#include "fq_nmod_types.h"
+#include "fq_zech_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -101,6 +103,15 @@ typedef fmpz_mpoly_ctx_struct fmpz_mpoly_ctx_t[1];
 
 typedef struct
 {
+    mpoly_ctx_t minfo;
+    fmpz_mod_ctx_t ffinfo;
+}
+fmpz_mod_mpoly_ctx_struct;
+
+typedef fmpz_mod_mpoly_ctx_struct fmpz_mod_mpoly_ctx_t[1];
+
+typedef struct
+{
     fmpz_mpoly_ctx_t zctx;
 }
 fmpq_mpoly_ctx_struct;
@@ -110,11 +121,18 @@ typedef fmpq_mpoly_ctx_struct fmpq_mpoly_ctx_t[1];
 typedef struct
 {
     mpoly_ctx_t minfo;
-    fmpz_mod_ctx_t ffinfo;
-}
-fmpz_mod_mpoly_ctx_struct;
+    fq_nmod_ctx_t fqctx;
+} fq_nmod_mpoly_ctx_struct;
 
-typedef fmpz_mod_mpoly_ctx_struct fmpz_mod_mpoly_ctx_t[1];
+typedef fq_nmod_mpoly_ctx_struct fq_nmod_mpoly_ctx_t[1];
+
+typedef struct
+{
+    mpoly_ctx_t minfo;
+    fq_zech_ctx_t fqctx;
+} fq_zech_mpoly_ctx_struct;
+
+typedef fq_zech_mpoly_ctx_struct fq_zech_mpoly_ctx_t[1];
 
 #ifdef __cplusplus
 }

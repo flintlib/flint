@@ -35,17 +35,6 @@ nmod_t fq_zech_ctx_mod(const fq_zech_ctx_t ctx)
 /*  Type definitions *********************************************************/
 
 /*
-    context object for fq_zech_mpoly
-*/
-typedef struct
-{
-    mpoly_ctx_t minfo;
-    fq_zech_ctx_t fqctx;
-} fq_zech_mpoly_ctx_struct;
-
-typedef fq_zech_mpoly_ctx_struct fq_zech_mpoly_ctx_t[1];
-
-/*
     fq_zech_mpoly_t
     sparse multivariates with fq_zech coefficients
 */
