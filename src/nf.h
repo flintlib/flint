@@ -17,7 +17,6 @@
 #ifndef NF_H
 #define NF_H
 
-#include "fmpz.h"
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
@@ -25,13 +24,16 @@
 extern "C" {
 #endif
 
-typedef struct {
+typedef struct
+{
    fmpq_poly_t pol;  /* defining polynomial */
-   union {
+   union
+   {
       /* insert any precomputed inverse for zz case here */
       fmpz_preinvn_t qq; /* precomputed inverse for leading coeff of num(pol), QQ case */
    } pinv;
-   union { /* powers of the generator mod pol */
+   union
+   { /* powers of the generator mod pol */
       fmpq_poly_powers_precomp_t qq;
       fmpz_poly_powers_precomp_t zz;
    } powers;
@@ -56,9 +58,7 @@ typedef nf_struct nf_t[1];
 ******************************************************************************/
 
 void nf_init(nf_t nf, const fmpq_poly_t pol);
-
 void nf_init_randtest(nf_t nf, flint_rand_t state, slong len,  mp_bitcnt_t bits_in);
-
 void nf_clear(nf_t nf);
 
 void nf_print(const nf_t nf);
