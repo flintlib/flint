@@ -25,8 +25,8 @@ TEST_FUNCTION_START(arith_chebyshev_u_polynomial, state)
 
     for (n = 0; n <= 500; n++)
     {
-        arith_chebyshev_u_polynomial(U, n);
-        arith_chebyshev_t_polynomial(T, n + 1);
+        fmpz_poly_chebyshev_u(U, n);
+        fmpz_poly_chebyshev_t(T, n + 1);
         fmpz_poly_derivative(T, T);
         fmpz_poly_scalar_divexact_ui(T, T, n + 1);
 

@@ -24,12 +24,12 @@ TEST_FUNCTION_START(arith_chebyshev_t_polynomial, state)
     fmpz_poly_init(T2);
     fmpz_poly_init(t);
 
-    arith_chebyshev_t_polynomial(T0, 0);
-    arith_chebyshev_t_polynomial(T1, 1);
+    fmpz_poly_chebyshev_t(T0, 0);
+    fmpz_poly_chebyshev_t(T1, 1);
 
     for (n = 2; n <= 500; n++)
     {
-        arith_chebyshev_t_polynomial(T2, n);
+        fmpz_poly_chebyshev_t(T2, n);
 
         /* Verify T_{n+1} = 2 x T_n - T_{n-1} */
         fmpz_poly_scalar_mul_ui(t, T1, UWORD(2));

@@ -38,7 +38,7 @@ TEST_FUNCTION_START(arith_swinnerton_dyer_polynomial, state)
     for (n = 0; n <= 10; n++)
     {
         fmpz_poly_init(S);
-        arith_swinnerton_dyer_polynomial(S, n);
+        fmpz_poly_swinnerton_dyer(S, n);
         r = fmpz_poly_evaluate_mod(S, UWORD(2147483629), UWORD(4294967291));
 
         if (r != known_values[n])
