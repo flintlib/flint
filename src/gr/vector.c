@@ -375,6 +375,38 @@ _gr_vec_apply_const(gr_ptr res, gr_method_constant_op f, slong len, gr_ctx_t ctx
     return status;
 }
 
+static truth_t
+_gr_vec_all_binary_predicate(gr_method_binary_predicate f, gr_srcptr x, gr_srcptr y, slong len, gr_ctx_t ctx)
+{
+    truth_t res, res1;
+    slong i, sz;
+
+    sz = ctx->sizeof_elem;
+    res = T_TRUE;
+
+    for (i = 0; i < len; i++)
+    {
+        res1 = f(GR_ENTRY(x, i, sz), GR_ENTRY(y, i, sz), ctx);
+
+        if (res1 == T_FALSE)
+            return T_FALSE;
+
+        if (res1 == T_UNKNOWN)
+            res = T_UNKNOWN;
+    }
+
+    return res;
+}
+
+truth_t
+vector_gr_vec_divides(const gr_vec_t x, const gr_vec_t y, gr_ctx_t ctx)
+{
+    if (x->length != y->length)
+        return T_FALSE;
+
+    return _gr_vec_all_binary_predicate(GR_BINARY_PREDICATE(ENTRY_CTX(ctx), DIVIDES), x->entries, y->entries, x->length, ENTRY_CTX(ctx));
+}
+
 #define DEF_CONSTANT_OP_FROM_OP(op, OP) \
 int \
 vector_gr_vec_ ## op(gr_vec_t res, gr_ctx_t ctx) \
@@ -591,6 +623,36 @@ DEF_BINARY_OP(div)
 DEF_BINARY_OP(divexact)
 DEF_BINARY_OP(pow)
 
+#define DEF_BINARY_OP_NO_TYPE_VARIANTS(op) \
+int \
+vector_gr_vec_ ## op(gr_vec_t res, const gr_vec_t x, const gr_vec_t y, gr_ctx_t ctx) \
+{ \
+    slong xlen = x->length; \
+ \
+    if (xlen != y->length) \
+        return GR_DOMAIN; \
+ \
+    if (res->length != xlen) \
+        gr_vec_set_length(res, xlen, ENTRY_CTX(ctx)); \
+ \
+    return _gr_vec_## op(res->entries, x->entries, y->entries, xlen, ENTRY_CTX(ctx)); \
+} \
+
+int
+_gr_vec_div_nonunique(gr_ptr res, gr_srcptr x, gr_srcptr y, slong len, gr_ctx_t ctx)
+{
+    int status = GR_SUCCESS;
+    slong sz = ctx->sizeof_elem;
+    slong i;
+
+    for (i = 0; i < len; i++)
+        status |= gr_div_nonunique(GR_ENTRY(res, i, sz), GR_ENTRY(x, i, sz), GR_ENTRY(y, i, sz), ctx);
+
+    return status;
+}
+
+DEF_BINARY_OP_NO_TYPE_VARIANTS(div_nonunique)
+
 
 /* todo: all versions */
 
@@ -671,6 +733,9 @@ gr_method_tab_input _gr_vec_methods_input[] =
     {GR_METHOD_DIV_FMPQ,    (gr_funcptr) vector_gr_vec_div_fmpq},
     {GR_METHOD_DIV_OTHER,   (gr_funcptr) vector_gr_vec_div_other},
     {GR_METHOD_OTHER_DIV,   (gr_funcptr) vector_gr_vec_other_div},
+
+    {GR_METHOD_DIV_NONUNIQUE,   (gr_funcptr) vector_gr_vec_div_nonunique},
+    {GR_METHOD_DIVIDES,         (gr_funcptr) vector_gr_vec_divides},
 
     {GR_METHOD_DIVEXACT,        (gr_funcptr) vector_gr_vec_divexact},
     {GR_METHOD_DIVEXACT_UI,     (gr_funcptr) vector_gr_vec_divexact_ui},

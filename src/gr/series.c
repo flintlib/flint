@@ -587,8 +587,20 @@ gr_series_inv(gr_series_t res, const gr_series_t x, gr_series_ctx_t sctx, gr_ctx
     xerr = x->error;
     err = xerr;
 
+    if (xlen == 0 && sctx->mod == 0)
+        return gr_series_zero(res, sctx, cctx);
+
     if (xlen == 0 && xerr == SERIES_ERR_EXACT)
+    {
+        truth_t zero = gr_ctx_is_zero_ring(cctx);
+
+        if (zero == T_TRUE)
+            return gr_series_zero(res, sctx, cctx);
+        if (zero == T_UNKNOWN)
+            return GR_UNABLE;
+
         return GR_DOMAIN;
+    }
 
     if (xlen == 0 || xerr == 0)
         return GR_UNABLE;

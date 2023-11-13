@@ -554,6 +554,12 @@ _gr_fmpz_poly_divides(const fmpz_poly_t x, const fmpz_poly_t y, const gr_ctx_t c
     truth_t res;
     fmpz_poly_t tmp;
 
+    if (fmpz_poly_is_zero(y))
+        return T_TRUE;
+
+    if (fmpz_poly_is_zero(x))
+        return T_FALSE;
+
     fmpz_poly_init(tmp);
     res = fmpz_poly_divides(tmp, y, x) ? T_TRUE : T_FALSE;
     fmpz_poly_clear(tmp);

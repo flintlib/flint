@@ -19,6 +19,7 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 #include "gr_mat.h"
+#include "ulong_extras.h"
 
 #define NMOD_CTX_REF(ring_ctx) (((nmod_t *)((ring_ctx))))
 #define NMOD_CTX(ring_ctx) (*NMOD_CTX_REF(ring_ctx))
@@ -367,7 +368,6 @@ _gr_nmod_sqr(ulong * res, const ulong * x, const gr_ctx_t ctx)
     return _gr_nmod_mul(res, x, x, ctx);
 }
 
-/* optimize */
 int
 _gr_nmod_div(ulong * res, const ulong * x, const ulong * y, const gr_ctx_t ctx)
 {
@@ -375,47 +375,35 @@ _gr_nmod_div(ulong * res, const ulong * x, const ulong * y, const gr_ctx_t ctx)
     int status;
 
     status = _gr_nmod_inv(&t, y, ctx);
-    _gr_nmod_mul(res, x, &t, ctx);
+
+    if (status == GR_SUCCESS)
+        _gr_nmod_mul(res, x, &t, ctx);
+
     return status;
 }
 
-/* optimize */
 int
 _gr_nmod_div_si(ulong * res, const ulong * x, slong y, const gr_ctx_t ctx)
 {
-    ulong t;
+    ulong c = nmod_set_si(y, NMOD_CTX(ctx));
 
-    y = nmod_set_si(y, NMOD_CTX(ctx));
-
-    if (n_gcdinv(&t, y, NMOD_CTX(ctx).n) == 1)
-    {
-        res[0] = nmod_mul(x[0], t, NMOD_CTX(ctx));
-        return GR_SUCCESS;
-    }
-    else
-    {
-        res[0] = 0;
-        return GR_DOMAIN;
-    }
+    return _gr_nmod_div(res, x, &c, ctx);
 }
 
 int
 _gr_nmod_div_ui(ulong * res, const ulong * x, ulong y, const gr_ctx_t ctx)
 {
-    ulong t;
+    ulong c = nmod_set_ui(y, NMOD_CTX(ctx));
 
-    y = nmod_set_ui(y, NMOD_CTX(ctx));
+    return _gr_nmod_div(res, x, &c, ctx);
+}
 
-    if (n_gcdinv(&t, y, NMOD_CTX(ctx).n) == 1)
-    {
-        res[0] = nmod_mul(x[0], t, NMOD_CTX(ctx));
-        return GR_SUCCESS;
-    }
-    else
-    {
-        res[0] = 0;
-        return GR_DOMAIN;
-    }
+int
+_gr_nmod_div_fmpz(ulong * res, const ulong * x, const fmpz_t y, const gr_ctx_t ctx)
+{
+    ulong c = fmpz_get_nmod(y, NMOD_CTX(ctx));
+
+    return _gr_nmod_div(res, x, &c, ctx);
 }
 
 truth_t
@@ -424,6 +412,33 @@ _gr_nmod_is_invertible(const ulong * x, const gr_ctx_t ctx)
     ulong r, g;
     g = n_gcdinv(&r, x[0], NMOD_CTX(ctx).n);
     return (g == 1) ? T_TRUE : T_FALSE;
+}
+
+truth_t
+_gr_nmod_divides(const ulong * x, const ulong * y, const gr_ctx_t ctx)
+{
+    ulong t;
+    return nmod_divides(&t, y[0], x[0], NMOD_CTX(ctx)) ? T_TRUE : T_FALSE;
+}
+
+int
+_gr_nmod_div_nonunique(ulong * res, const ulong * x, const ulong * y, const gr_ctx_t ctx)
+{
+    ulong t;
+    int status;
+
+    status = _gr_nmod_inv(&t, y, ctx);
+
+    if (status == GR_SUCCESS)
+    {
+        _gr_nmod_mul(res, x, &t, ctx);
+    }
+    else
+    {
+        status = nmod_divides(res, *x, *y, NMOD_CTX(ctx)) ? GR_SUCCESS : GR_DOMAIN;
+    }
+
+    return status;
 }
 
 int
@@ -1390,6 +1405,9 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_DIV,             (gr_funcptr) _gr_nmod_div},
     {GR_METHOD_DIV_SI,          (gr_funcptr) _gr_nmod_div_si},
     {GR_METHOD_DIV_UI,          (gr_funcptr) _gr_nmod_div_ui},
+    {GR_METHOD_DIV_FMPZ,        (gr_funcptr) _gr_nmod_div_fmpz},
+    {GR_METHOD_DIV_NONUNIQUE,   (gr_funcptr) _gr_nmod_div_nonunique},
+    {GR_METHOD_DIVIDES,         (gr_funcptr) _gr_nmod_divides},
     {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) _gr_nmod_is_invertible},
     {GR_METHOD_INV,             (gr_funcptr) _gr_nmod_inv},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_nmod_sqrt},

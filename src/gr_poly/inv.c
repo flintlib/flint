@@ -15,9 +15,12 @@ int
 gr_poly_inv(gr_poly_t res,
     const gr_poly_t poly, gr_ctx_t ctx)
 {
-    if (poly->length == 0)   /* todo: defined mod 1? */
+    if (poly->length == 0)
     {
-        return GR_DOMAIN;
+        if (gr_ctx_is_zero_ring(ctx) == T_TRUE)
+            return gr_poly_zero(res, ctx);
+        else
+            return GR_DOMAIN;
     }
     else if (poly->length == 1)
     {
