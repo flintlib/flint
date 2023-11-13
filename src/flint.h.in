@@ -108,9 +108,9 @@ typedef struct __FLINT_FILE FLINT_FILE;
 #define flint_bitcnt_t ulong
 
 #ifdef FLINT_WANT_ASSERT
-#define FLINT_ASSERT(param) assert(param)
+# define FLINT_ASSERT(param) assert(param)
 #else
-#define FLINT_ASSERT(param)
+# define FLINT_ASSERT(param)
 #endif
 
 #include "longlong.h"
@@ -204,13 +204,8 @@ void flint_register_cleanup_function(flint_cleanup_function_t cleanup_function);
 void flint_cleanup(void);
 void flint_cleanup_master(void);
 
-void __flint_set_memory_functions(void *(*alloc_func) (size_t),
-     void *(*calloc_func) (size_t, size_t), void *(*realloc_func) (void *, size_t),
-                                                              void (*free_func) (void *));
-
-void __flint_get_memory_functions(void *(**alloc_func) (size_t),
-     void *(**calloc_func) (size_t, size_t), void *(**realloc_func) (void *, size_t),
-                                                              void (**free_func) (void *));
+void __flint_set_memory_functions(void * (* alloc_func)(size_t), void * (* calloc_func)(size_t, size_t), void * (* realloc_func)(void *, size_t), void (* free_func)(void *));
+void __flint_get_memory_functions(void * (** alloc_func)(size_t), void * (** calloc_func)(size_t, size_t), void * (** realloc_func)(void *, size_t), void (** free_func)(void *));
 
 FLINT_NORETURN void flint_abort(void);
 
@@ -250,20 +245,10 @@ void flint_randinit(flint_rand_t state)
 #endif
 }
 
-FLINT_INLINE
-void flint_randseed(flint_rand_t state, ulong seed1, ulong seed2)
-{
-   state->__randval = seed1;
-   state->__randval2 = seed2;
-}
+FLINT_INLINE void flint_randclear(flint_rand_t state) { if (state->gmp_init) gmp_randclear(state->gmp_state); }
 
-FLINT_INLINE
-void flint_get_randseed(ulong * seed1, ulong * seed2, flint_rand_t state)
-{
-   *seed1 = state->__randval;
-   *seed2 = state->__randval2;
-}
-
+FLINT_INLINE void flint_randseed(flint_rand_t state, ulong seed1, ulong seed2) { state->__randval = seed1; state->__randval2 = seed2; }
+FLINT_INLINE void flint_get_randseed(ulong * seed1, ulong * seed2, flint_rand_t state) { *seed1 = state->__randval; *seed2 = state->__randval2; }
 
 FLINT_INLINE
 void _flint_rand_init_gmp(flint_rand_t state)
@@ -275,24 +260,8 @@ void _flint_rand_init_gmp(flint_rand_t state)
     }
 }
 
-FLINT_INLINE
-void flint_randclear(flint_rand_t state)
-{
-    if (state->gmp_init)
-        gmp_randclear(state->gmp_state);
-}
-
-FLINT_INLINE
-flint_rand_s * flint_rand_alloc(void)
-{
-    return (flint_rand_s *) flint_malloc(sizeof(flint_rand_s));
-}
-
-FLINT_INLINE
-void flint_rand_free(flint_rand_s * state)
-{
-    flint_free(state);
-}
+FLINT_INLINE flint_rand_s * flint_rand_alloc(void) { return (flint_rand_s *) flint_malloc(sizeof(flint_rand_s)); }
+FLINT_INLINE void flint_rand_free(flint_rand_s * state) { flint_free(state); }
 
 /* defined in ulong_extras, but used throughout the test code */
 ulong n_randint(flint_rand_t, ulong);
@@ -300,18 +269,18 @@ ulong n_randtest(flint_rand_t);
 ulong n_randtest_not_zero(flint_rand_t);
 
 #if FLINT_USES_GC
-#define FLINT_GC_INIT() GC_init()
+# define FLINT_GC_INIT() GC_init()
 #else
-#define FLINT_GC_INIT()
+# define FLINT_GC_INIT()
 #endif
 
-#define FLINT_TEST_INIT(xxx) \
-   flint_rand_t xxx; \
-   FLINT_GC_INIT(); \
+#define FLINT_TEST_INIT(xxx)    \
+   flint_rand_t xxx;            \
+   FLINT_GC_INIT();             \
    flint_randinit(xxx)
 
 #define FLINT_TEST_CLEANUP(xxx) \
-   flint_randclear(xxx); \
+   flint_randclear(xxx);        \
    flint_cleanup_master();
 
 #define FLINT_MAX(x, y) ((x) > (y) ? (x) : (y))
@@ -321,11 +290,9 @@ ulong n_randtest_not_zero(flint_rand_t);
 #define FLINT_SGN(x) ((0 < (slong)(x)) - ((slong)(x) < 0))
 #define FLINT_SWAP(T, x, y) do { T _swap_t = (x); (x) = (y); (y) = _swap_t; } while(0)
 
-#define r_shift(in, shift) \
-    ((shift == FLINT_BITS) ? WORD(0) : ((in) >> (shift)))
+#define r_shift(in, shift) ((shift == FLINT_BITS) ? WORD(0) : ((in) >> (shift)))
 
-#define l_shift(in, shift) \
-    ((shift == FLINT_BITS) ? WORD(0) : ((in) << (shift)))
+#define l_shift(in, shift) ((shift == FLINT_BITS) ? WORD(0) : ((in) << (shift)))
 
 /* Beware when using the unsigned return value in signed arithmetic */
 static __inline__
@@ -337,78 +304,73 @@ mp_limb_t FLINT_BIT_COUNT(mp_limb_t x)
 }
 
 #define FLINT_FLOG2(k)  (FLINT_BIT_COUNT(k) - 1)
-
 #define FLINT_CLOG2(k)  FLINT_BIT_COUNT((k) - 1)
 
-#define flint_mpn_zero(xxx, nnn) \
-    do \
-    { \
-        slong ixxx; \
-        for (ixxx = 0; ixxx < (nnn); ixxx++) \
-            (xxx)[ixxx] = UWORD(0); \
+#define flint_mpn_zero(xxx, nnn)                \
+    do                                          \
+    {                                           \
+        slong ixxx;                             \
+        for (ixxx = 0; ixxx < (nnn); ixxx++)    \
+            (xxx)[ixxx] = UWORD(0);             \
     } while (0)
 
-#define flint_mpn_copyi(xxx, yyy, nnn) \
-   do { \
-      slong ixxx; \
-      for (ixxx = 0; ixxx < (nnn); ixxx++) \
-         (xxx)[ixxx] = (yyy)[ixxx]; \
-   } while (0)
+#define flint_mpn_copyi(xxx, yyy, nnn)          \
+    do                                          \
+    {                                           \
+        slong ixxx;                             \
+        for (ixxx = 0; ixxx < (nnn); ixxx++)    \
+            (xxx)[ixxx] = (yyy)[ixxx];          \
+    } while (0)
 
-#define flint_mpn_copyd(xxx, yyy, nnn) \
-   do { \
-      slong ixxx; \
-      for (ixxx = nnn - 1; ixxx >= 0; ixxx--) \
-         (xxx)[ixxx] = (yyy)[ixxx]; \
-   } while (0)
+#define flint_mpn_copyd(xxx, yyy, nnn)          \
+    do                                          \
+    {                                           \
+        slong ixxx;                             \
+        for (ixxx = nnn - 1; ixxx >= 0; ixxx--) \
+            (xxx)[ixxx] = (yyy)[ixxx];          \
+    } while (0)
 
-#define flint_mpn_store(xxx, nnn, yyy) \
-   do \
-   { \
-      slong ixxx; \
-      for (ixxx = 0; ixxx < nnn; ixxx++) \
-         (xxx)[ixxx] = yyy; \
-   } while (0)
+#define flint_mpn_store(xxx, nnn, yyy)          \
+    do                                          \
+    {                                           \
+        slong ixxx;                             \
+        for (ixxx = 0; ixxx < nnn; ixxx++)      \
+            (xxx)[ixxx] = yyy;                  \
+    } while (0)
 
 /* common usage of flint_malloc */
 #define FLINT_ARRAY_ALLOC(n, T) (T *) flint_malloc((n)*sizeof(T))
 #define FLINT_ARRAY_REALLOC(p, n, T) (T *) flint_realloc(p, (n)*sizeof(T))
 
 /* temporary allocation */
-#define TMP_INIT \
-   typedef struct __tmp_struct { \
-      void * block; \
-      struct __tmp_struct * next; \
-   } __tmp_t; \
-   __tmp_t * __tmp_root; \
-   __tmp_t * __tpx
+#define TMP_INIT                    \
+    typedef struct __tmp_struct     \
+    {                               \
+        void * block;               \
+        struct __tmp_struct * next; \
+    } __tmp_t;                      \
+    __tmp_t * __tmp_root;           \
+    __tmp_t * __tpx
 
-#define TMP_START \
+#define TMP_START                   \
    __tmp_root = NULL
 
+#define _TMP_MALLOC(size) (__tpx = (__tmp_t *) alloca(sizeof(__tmp_t)), __tpx->next = __tmp_root, __tmp_root = __tpx, __tpx->block = flint_malloc(size))
+
 #ifdef FLINT_WANT_ASSERT
-#define TMP_ALLOC(size) \
-   (__tpx = (__tmp_t *) alloca(sizeof(__tmp_t)), \
-       __tpx->next = __tmp_root, \
-       __tmp_root = __tpx, \
-       __tpx->block = flint_malloc(size))
+# define TMP_ALLOC(size)  _TMP_MALLOC(size)
 #else
-#define TMP_ALLOC(size) \
-   (((size) > 8192) ? \
-      (__tpx = (__tmp_t *) alloca(sizeof(__tmp_t)), \
-       __tpx->next = __tmp_root, \
-       __tmp_root = __tpx, \
-       __tpx->block = flint_malloc(size)) : \
-      alloca(size))
+# define TMP_ALLOC(size)  (((size) > 8192) ? _TMP_MALLOC(size) : alloca(size))
 #endif
 
-#define TMP_ARRAY_ALLOC(n, T) (T *) TMP_ALLOC((n)*sizeof(T))
+#define TMP_ARRAY_ALLOC(n, T) (T *) TMP_ALLOC((n) * sizeof(T))
 
-#define TMP_END \
-   while (__tmp_root) { \
-      flint_free(__tmp_root->block); \
-      __tmp_root = __tmp_root->next; \
-   }
+#define TMP_END                         \
+    while (__tmp_root)                  \
+    {                                   \
+        flint_free(__tmp_root->block);  \
+        __tmp_root = __tmp_root->next;  \
+    }
 
 int parse_fmt(int * floating, const char * fmt);
 
@@ -426,7 +388,8 @@ int flint_fprintf(FILE * f, const char * str, ...); /* flint version of fprintf 
 int flint_fscanf(FILE * f, const char * str, ...); /* flint version of fscanf */
 #endif
 
-FLINT_INLINE slong flint_mul_sizes(slong x, slong y)
+FLINT_INLINE
+slong flint_mul_sizes(slong x, slong y)
 {
     ulong hi, lo;
 
