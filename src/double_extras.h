@@ -18,11 +18,10 @@
 #define DOUBLE_EXTRAS_INLINE static __inline__
 #endif
 
-#include <math.h>
 #include "flint.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 #define D_BITS 53
@@ -31,9 +30,7 @@
 #define D_NAN (HUGE_VAL - HUGE_VAL)
 
 double d_randtest(flint_rand_t state);
-
 double d_randtest_signed(flint_rand_t state, slong minexp, slong maxexp);
-
 double d_randtest_special(flint_rand_t state, slong minexp, slong maxexp);
 
 DOUBLE_EXTRAS_INLINE
