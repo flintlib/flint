@@ -617,6 +617,13 @@ _gr_fmpzi_divides(const fmpzi_t x, const fmpzi_t y, const gr_ctx_t ctx)
 {
     fmpzi_t q, r;
     truth_t result;
+
+    if (fmpzi_is_zero(y))
+        return T_TRUE;
+
+    if (fmpzi_is_zero(x))
+        return T_FALSE;
+
     fmpzi_init(q);
     fmpzi_init(r);
 

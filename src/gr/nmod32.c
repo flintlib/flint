@@ -261,7 +261,10 @@ nmod32_div(nmod32_t res, const nmod32_t x, const nmod32_t y, const gr_ctx_t ctx)
     int status;
 
     status = nmod32_inv(t, y, ctx);
-    nmod32_mul(res, x, t, ctx);
+
+    if (status == GR_SUCCESS)
+        nmod32_mul(res, x, t, ctx);
+
     return status;
 }
 
@@ -273,12 +276,57 @@ nmod32_div_si(nmod32_t res, const nmod32_t x, slong y, const gr_ctx_t ctx)
     return nmod32_div(res, x, t, ctx);
 }
 
+int
+nmod32_div_ui(nmod32_t res, const nmod32_t x, ulong y, const gr_ctx_t ctx)
+{
+    nmod32_t t;
+    nmod32_set_ui(t, y, ctx);
+    return nmod32_div(res, x, t, ctx);
+}
+
+int
+nmod32_div_fmpz(nmod32_t res, const nmod32_t x, const fmpz_t y, const gr_ctx_t ctx)
+{
+    nmod32_t t;
+    nmod32_set_fmpz(t, y, ctx);
+    return nmod32_div(res, x, t, ctx);
+}
+
 truth_t
 nmod32_is_invertible(const nmod32_t x, const gr_ctx_t ctx)
 {
     ulong r, g;
     g = n_gcdinv(&r, x[0], NMOD32_CTX(ctx).n);
     return (g == 1) ? T_TRUE : T_FALSE;
+}
+
+truth_t
+nmod32_divides(const nmod32_t x, const nmod32_t y, const gr_ctx_t ctx)
+{
+    ulong t;
+    return nmod_divides(&t, y[0], x[0], NMOD32_CTX(ctx)) ? T_TRUE : T_FALSE;
+}
+
+int
+nmod32_div_nonunique(nmod32_t res, const nmod32_t x, const nmod32_t y, const gr_ctx_t ctx)
+{
+    nmod32_t t;
+    int status;
+
+    status = nmod32_inv(t, y, ctx);
+
+    if (status == GR_SUCCESS)
+    {
+        nmod32_mul(res, x, t, ctx);
+    }
+    else
+    {
+        ulong t2;
+        status = nmod_divides(&t2, x[0], y[0], NMOD32_CTX(ctx)) ? GR_SUCCESS : GR_DOMAIN;
+        res[0] = t2;
+    }
+
+    return status;
 }
 
 void
@@ -501,6 +549,10 @@ gr_method_tab_input _nmod32_methods_input[] =
     {GR_METHOD_SQR,             (gr_funcptr) nmod32_sqr},
     {GR_METHOD_DIV,             (gr_funcptr) nmod32_div},
     {GR_METHOD_DIV_SI,          (gr_funcptr) nmod32_div_si},
+    {GR_METHOD_DIV_UI,          (gr_funcptr) nmod32_div_ui},
+    {GR_METHOD_DIV_FMPZ,        (gr_funcptr) nmod32_div_fmpz},
+    {GR_METHOD_DIV_NONUNIQUE,   (gr_funcptr) nmod32_div_nonunique},
+    {GR_METHOD_DIVIDES,         (gr_funcptr) nmod32_divides},
     {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) nmod32_is_invertible},
     {GR_METHOD_INV,             (gr_funcptr) nmod32_inv},
     {GR_METHOD_VEC_INIT,        (gr_funcptr) _nmod32_vec_init},

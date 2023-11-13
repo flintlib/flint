@@ -62,9 +62,7 @@ gr_test_binary_op_aliasing(gr_ctx_t R, int (*gr_op)(gr_ptr, gr_srcptr, gr_srcptr
     }
 
     if (status == GR_SUCCESS && gr_equal(xy1, xy2, R) == T_FALSE)
-    {
         status = GR_TEST_FAIL;
-    }
 
     if ((test_flags & GR_TEST_ALWAYS_ABLE) && (status & GR_UNABLE))
         status = GR_TEST_FAIL;
@@ -72,6 +70,7 @@ gr_test_binary_op_aliasing(gr_ctx_t R, int (*gr_op)(gr_ptr, gr_srcptr, gr_srcptr
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
         flint_printf("\n");
+        gr_ctx_println(R);
         flint_printf("alias: %d\n", alias);
         flint_printf("x = "); gr_println(x, R);
         flint_printf("y = "); gr_println(y, R);
@@ -1710,11 +1709,56 @@ gr_test_submul_type_variants(gr_ctx_t R, flint_rand_t state, int test_flags)
 }
 
 int
+gr_test_div_aliasing(gr_ctx_t R, flint_rand_t state, int test_flags)
+{
+    return gr_test_binary_op_aliasing(R, gr_div, state, test_flags);
+}
+
+int
 gr_test_div_type_variants(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     return gr_test_binary_op_type_variants(R, "div",
         gr_div, gr_div_ui, gr_div_si, gr_div_fmpz, gr_div_fmpq,
             0, 0, state, test_flags);
+}
+
+int
+gr_test_is_invertible(gr_ctx_t R, flint_rand_t state, int test_flags)
+{
+    int status;
+    truth_t invertible = T_UNKNOWN;
+    gr_ptr x, x_inv;
+
+    GR_TMP_INIT2(x, x_inv, R);
+
+    GR_MUST_SUCCEED(gr_randtest(x, state, R));
+
+    status = GR_SUCCESS;
+    status |= gr_inv(x_inv, x, R);
+
+    if (status != GR_UNABLE)
+    {
+        invertible = gr_is_invertible(x, R);
+
+        if ((status == GR_SUCCESS && invertible == T_FALSE) ||
+            (status == GR_DOMAIN && invertible == T_TRUE))
+        {
+            status = GR_TEST_FAIL;
+        }
+    }
+
+    if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
+    {
+        flint_printf("\n");
+        flint_printf("x = \n"); gr_println(x, R);
+        flint_printf("x ^ -1 = \n"); gr_println(x_inv, R);
+        flint_printf("status = %d, invertible = %d\n", status, invertible);
+        flint_printf("\n");
+    }
+
+    GR_TMP_CLEAR2(x, x_inv, R);
+
+    return status;
 }
 
 int
@@ -1834,6 +1878,7 @@ gr_test_div_then_mul(gr_ctx_t R, flint_rand_t state, int test_flags)
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
         flint_printf("\n");
+        gr_ctx_println(R);
         flint_printf("x = \n"); gr_println(x, R);
         flint_printf("y = \n"); gr_println(y, R);
         flint_printf("x / y = \n"); gr_println(xy, R);
@@ -2038,6 +2083,164 @@ gr_test_divexact_type_variants(gr_ctx_t R, flint_rand_t state, int test_flags)
     GR_TMP_CLEAR3(x, xy, q, R);
 
     fmpz_clear(zy);
+
+    return status;
+}
+
+int
+gr_test_div_nonunique(gr_ctx_t R, flint_rand_t state, int test_flags)
+{
+    int status = GR_SUCCESS;
+    int status2 = GR_SUCCESS;
+    int status3 = GR_SUCCESS;
+    int status4 = GR_SUCCESS;
+    int status5 = GR_SUCCESS;
+    gr_ptr x, y, xy, z, q;
+
+    GR_TMP_INIT5(x, y, xy, z, q, R);
+
+    GR_MUST_SUCCEED(gr_randtest(x, state, R));
+    GR_MUST_SUCCEED(gr_randtest(y, state, R));
+
+    status |= gr_mul(xy, x, y, R);
+
+    if (status == GR_SUCCESS)
+    {
+        status2 = gr_div_nonunique(q, xy, x, R);
+
+        if (status2 == GR_DOMAIN)
+        {
+            status = GR_TEST_FAIL;
+        }
+        else if (status2 == GR_SUCCESS)
+        {
+            status2 = gr_mul(z, q, x, R);
+            if (status2 == GR_SUCCESS && gr_equal(z, xy, R) == T_FALSE)
+                status = GR_TEST_FAIL;
+        }
+
+        status3 = gr_div_nonunique(q, xy, y, R);
+
+        if (status3 == GR_DOMAIN)
+        {
+            status = GR_TEST_FAIL;
+        }
+        else if (status3 == GR_SUCCESS)
+        {
+            status3 = gr_mul(z, q, y, R);
+            if (status3 == GR_SUCCESS && gr_equal(z, xy, R) == T_FALSE)
+                status = GR_TEST_FAIL;
+        }
+
+        status4 = gr_div_nonunique(z, x, y, R);
+
+        if (status4 == GR_DOMAIN)
+        {
+            /* if claimed non-divisible, verify that div claims the same */
+            status5 = gr_div(z, x, y, R);
+            if (status5 == GR_SUCCESS)
+                status = GR_TEST_FAIL;
+        }
+    }
+
+    if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
+    {
+        flint_printf("div_nonunique\n");
+        gr_ctx_println(R);
+        flint_printf("x = \n"); gr_println(x, R);
+        flint_printf("y = \n"); gr_println(y, R);
+        flint_printf("xy = \n"); gr_println(xy, R);
+        flint_printf("z = \n"); gr_println(z, R);
+        flint_printf("status = %d, %d, %d, %d, %d\n", status,
+            status2, status3, status4, status5);
+        flint_printf("\n");
+    }
+
+    GR_TMP_CLEAR5(x, y, xy, z, q, R);
+
+    return status;
+}
+
+int
+gr_test_div_nonunique_aliasing(gr_ctx_t R, flint_rand_t state, int test_flags)
+{
+    return gr_test_binary_op_aliasing(R, gr_div_nonunique, state, test_flags);
+}
+
+int
+gr_test_divides(gr_ctx_t R, flint_rand_t state, int test_flags)
+{
+    int status = GR_SUCCESS;
+    int status2 = GR_SUCCESS;
+    int status3 = GR_SUCCESS;
+    int status4 = GR_SUCCESS;
+    truth_t x_divides = T_UNKNOWN, y_divides = T_UNKNOWN;
+    gr_ptr x, y, xy, z;
+
+    GR_TMP_INIT4(x, y, xy, z, R);
+
+    GR_MUST_SUCCEED(gr_randtest(x, state, R));
+    GR_MUST_SUCCEED(gr_randtest(y, state, R));
+
+    status |= gr_mul(xy, x, y, R);
+
+    if (status == GR_SUCCESS)
+    {
+        x_divides = gr_divides(x, xy, R);
+        y_divides = gr_divides(y, xy, R);
+
+        if (x_divides == T_FALSE || y_divides == T_FALSE)
+        {
+            status = GR_TEST_FAIL;
+        }
+
+        if (gr_ctx_is_integral_domain(R) == T_TRUE)
+        {
+            if (gr_is_zero(x, R) == T_FALSE)
+            {
+                status2 = gr_divexact(z, xy, x, R);
+                if (status2 == GR_DOMAIN)
+                    status = GR_TEST_FAIL;
+            }
+
+            if (gr_is_zero(y, R) == T_FALSE)
+            {
+                status3 = gr_divexact(z, xy, y, R);
+                if (status3 == GR_DOMAIN)
+                    status = GR_TEST_FAIL;
+            }
+        }
+    }
+
+    if (status == GR_SUCCESS)
+    {
+        truth_t d = gr_divides(x, y, R);
+
+        /* if claimed non-divisible, verify that div claims the same */
+        if (d == T_FALSE)
+        {
+            status4 = gr_div(z, y, x, R);
+
+            if (status4 == GR_SUCCESS)
+                status = GR_TEST_FAIL;
+        }
+    }
+
+    if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
+    {
+        flint_printf("divides\n");
+        gr_ctx_println(R);
+        flint_printf("x = \n"); gr_println(x, R);
+        flint_printf("y = \n"); gr_println(y, R);
+        flint_printf("xy = \n"); gr_println(xy, R);
+        flint_printf("x divides = "); truth_println(x_divides);
+        flint_printf("y divides = "); truth_println(y_divides);
+        flint_printf("status = %d, %d, %d, %d\n", status,
+            status2, status3, status4);
+        flint_printf("\n");
+    }
+
+    GR_TMP_CLEAR4(x, y, xy, z, R);
 
     return status;
 }
@@ -3366,12 +3569,21 @@ gr_test_ring(gr_ctx_t R, slong iters, int test_flags)
     if (gr_ctx_is_field(R) == T_TRUE)
         gr_test_iter(R, state, "field", gr_test_integral_domain, iters, test_flags);
 
-    gr_test_iter(R, state, "div: distributive", gr_test_div_right_distributive, iters, test_flags);
+    if (gr_ctx_is_integral_domain(R) == T_TRUE)
+        gr_test_iter(R, state, "div: distributive", gr_test_div_right_distributive, iters, test_flags);
+
+    gr_test_iter(R, state, "div: aliasing", gr_test_div_aliasing, iters, test_flags);
+
     gr_test_iter(R, state, "div: div then mul", gr_test_div_then_mul, iters, test_flags);
     gr_test_iter(R, state, "div: mul then div", gr_test_mul_then_div, iters, test_flags);
 
+    gr_test_iter(R, state, "div_nonunique", gr_test_div_nonunique, iters, test_flags);
+    gr_test_iter(R, state, "div_nonunique: aliasing", gr_test_div_nonunique_aliasing, iters, test_flags);
+    gr_test_iter(R, state, "divides", gr_test_divides, iters, test_flags);
+
     gr_test_iter(R, state, "inv: multiplication", gr_test_inv_multiplication, iters, test_flags);
     gr_test_iter(R, state, "inv: involution", gr_test_inv_involution, iters, test_flags);
+    gr_test_iter(R, state, "is_invertible", gr_test_is_invertible, iters, test_flags);
 
     gr_test_iter(R, state, "divexact", gr_test_divexact, iters, test_flags);
     gr_test_iter(R, state, "divexact: ui/si/fmpz", gr_test_divexact_type_variants, iters, test_flags);
