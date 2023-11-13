@@ -33,9 +33,6 @@
 extern "C" {
 #endif
 
-#define count_leading_zeros _Pragma("GCC error \"'count_leading_zeros' is deprecated. Use 'flint_clz' instead.\"")
-#define count_trailing_zeros _Pragma("GCC error \"'count_trailing_zeros' is deprecated. Use 'flint_ctz' instead.\"")
-
 #ifdef FLINT_HAS_POPCNT
 # ifndef _LONG_LONG_LIMB
 #  define flint_popcount __builtin_popcountl
@@ -79,14 +76,14 @@ extern "C" {
 
 #define add_sssaaaaaa(sh, sm, sl, ah, am, al, bh, bm, bl)  \
   __asm__ ("addq %8,%q2\n\tadcq %6,%q1\n\tadcq %4,%q0"     \
-       : "=r" (sh), "=&r" (sm), "=&r" (sl)                  \
+       : "=r" (sh), "=&r" (sm), "=&r" (sl)                 \
        : "0"  ((mp_limb_t)(ah)), "rme" ((mp_limb_t)(bh)),  \
          "1"  ((mp_limb_t)(am)), "rme" ((mp_limb_t)(bm)),  \
          "2"  ((mp_limb_t)(al)), "rme" ((mp_limb_t)(bl)))  \
 
 #define sub_dddmmmsss(dh, dm, dl, mh, mm, ml, sh, sm, sl)  \
   __asm__ ("subq %8,%q2\n\tsbbq %6,%q1\n\tsbbq %4,%q0"     \
-       : "=r" (dh), "=&r" (dm), "=&r" (dl)                  \
+       : "=r" (dh), "=&r" (dm), "=&r" (dl)                 \
        : "0"  ((mp_limb_t)(mh)), "rme" ((mp_limb_t)(sh)),  \
          "1"  ((mp_limb_t)(mm)), "rme" ((mp_limb_t)(sm)),  \
          "2"  ((mp_limb_t)(ml)), "rme" ((mp_limb_t)(sl)))  \
@@ -114,12 +111,12 @@ extern "C" {
        : "%0" ((mp_limb_t)(u)), "rm" ((mp_limb_t)(v)))
 
 #define udiv_qrnnd(q, r, n1, n0, dx)                                            \
-  __asm__ volatile ("divq %4"                                                            \
+  __asm__ volatile ("divq %4"                                                   \
        : "=a" (q), "=d" (r)                                                     \
        : "0" ((mp_limb_t)(n0)), "1" ((mp_limb_t)(n1)), "rm" ((mp_limb_t)(dx)))
 
 #define sdiv_qrnnd(q, r, n1, n0, dx)                                            \
-  __asm__ volatile ("idivq %4"                                                           \
+  __asm__ volatile ("idivq %4"                                                  \
        : "=a" (q), "=d" (r)                                                     \
        : "0" ((mp_limb_t)(n0)), "1" ((mp_limb_t)(n1)), "rm" ((mp_limb_t)(dx)))
 
@@ -145,20 +142,18 @@ static __inline__ flint_bitcnt_t flint_ctz(mp_limb_t x)
 }
 #endif
 
-#define byte_swap(x)                                                 \
-  do {                                                               \
-    __asm__("bswapq %q0" : "=r"(x) : "0"(x));                         \
+#define byte_swap(x)                            \
+  do {                                          \
+    __asm__("bswapq %q0" : "=r"(x) : "0"(x));   \
   } while (0)
 
 #endif /* x86_64 */
 
 /* x86 : 32 bit */
-#if (GMP_LIMB_BITS == 32 && (defined (__i386__) \
-   || defined (__i486__) || defined(__amd64__)))
+#if (GMP_LIMB_BITS == 32 && (defined (__i386__) || defined (__i486__) || defined(__amd64__)))
 
 #undef FLINT_KNOW_STRONG_ORDER
 #define FLINT_KNOW_STRONG_ORDER 1
-
 
 #define add_ssssaaaaaaaa(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0)  \
   __asm__ ("addl %11,%k3\n\tadcl %9,%k2\n\tadcl %7,%k1\n\tadcl %5,%k0"    \
@@ -205,12 +200,12 @@ static __inline__ flint_bitcnt_t flint_ctz(mp_limb_t x)
        : "%0" ((mp_limb_t)(u)), "rm" ((mp_limb_t)(v)))
 
 #define udiv_qrnnd(q, r, n1, n0, dx)                                            \
-  __asm__ volatile ("divl %4"                                                            \
+  __asm__ volatile ("divl %4"                                                   \
        : "=a" (q), "=d" (r)                                                     \
        : "0" ((mp_limb_t)(n0)), "1" ((mp_limb_t)(n1)), "rm" ((mp_limb_t)(dx)))
 
 #define sdiv_qrnnd(q, r, n1, n0, dx)                                            \
-  __asm__ volatile ("idivl %4"                                                           \
+  __asm__ volatile ("idivl %4"                                                  \
        : "=a" (q), "=d" (r)                                                     \
        : "0" ((mp_limb_t)(n0)), "1" ((mp_limb_t)(n1)), "rm" ((mp_limb_t)(dx)))
 
@@ -236,9 +231,9 @@ static __inline__ flint_bitcnt_t flint_ctz(mp_limb_t x)
 }
 #endif
 
-#define byte_swap(x)                                                 \
-  do {                                                               \
-    __asm__("bswap %0" : "=r"(x) : "0"(x));                          \
+#define byte_swap(x)                        \
+  do {                                      \
+    __asm__("bswap %0" : "=r"(x) : "0"(x)); \
   } while (0)
 
 #endif /* x86 */
@@ -246,63 +241,63 @@ static __inline__ flint_bitcnt_t flint_ctz(mp_limb_t x)
 /* ARM */
 #if (GMP_LIMB_BITS == 32 && defined (__arm__))
 
-#define add_ssaaaa(sh, sl, ah, al, bh, bl)                \
-  __asm__ ("adds\t%1, %4, %5\n\tadc\t%0, %2, %3"			 \
-	   : "=r" (sh), "=&r" (sl)					                \
-	   : "r" (ah), "rI" (bh), "%r" (al), "rI" (bl) : "cc")
+#define add_ssaaaa(sh, sl, ah, al, bh, bl)              \
+  __asm__ ("adds\t%1, %4, %5\n\tadc\t%0, %2, %3"        \
+   : "=r" (sh), "=&r" (sl)                              \
+   : "r" (ah), "rI" (bh), "%r" (al), "rI" (bl) : "cc")
 
 /* rsbs is only available in ARM and Thumb modes, not in Thumb2 mode */
 #if !defined(__thumb2__)
 
-#define sub_ddmmss(sh, sl, ah, al, bh, bl)                    \
-  do {									                             \
-    if (__builtin_constant_p (al))					              \
-      {									                             \
-	if (__builtin_constant_p (ah))					              \
-	  __asm__ ("rsbs\t%1, %5, %4\n\trsc\t%0, %3, %2"		     \
-		   : "=r" (sh), "=&r" (sl)				                    \
-		   : "rI" (ah), "r" (bh), "rI" (al), "r" (bl) : "cc");  \
-	else								                                \
-	  __asm__ ("rsbs\t%1, %5, %4\n\tsbc\t%0, %2, %3"		     \
-		   : "=r" (sh), "=&r" (sl)				                    \
-		   : "r" (ah), "rI" (bh), "rI" (al), "r" (bl) : "cc");  \
-      }									                             \
-    else if (__builtin_constant_p (ah))					        \
-      {									                             \
-	if (__builtin_constant_p (bl))					              \
-	  __asm__ ("subs\t%1, %4, %5\n\trsc\t%0, %3, %2"		     \
-		   : "=r" (sh), "=&r" (sl)				                    \
-		   : "rI" (ah), "r" (bh), "r" (al), "rI" (bl) : "cc");  \
-	else								                                \
-	  __asm__ ("rsbs\t%1, %5, %4\n\trsc\t%0, %3, %2"		     \
-		   : "=r" (sh), "=&r" (sl)				                    \
-		   : "rI" (ah), "r" (bh), "rI" (al), "r" (bl) : "cc");  \
-      }									                             \
-    else if (__builtin_constant_p (bl))					        \
-      {									                             \
-	if (__builtin_constant_p (bh))					              \
-	  __asm__ ("subs\t%1, %4, %5\n\tsbc\t%0, %2, %3"		     \
-		   : "=r" (sh), "=&r" (sl)				                    \
-		   : "r" (ah), "rI" (bh), "r" (al), "rI" (bl) : "cc");  \
-	else								                                \
-	  __asm__ ("subs\t%1, %4, %5\n\trsc\t%0, %3, %2"		     \
-		   : "=r" (sh), "=&r" (sl)				                    \
-		   : "rI" (ah), "r" (bh), "r" (al), "rI" (bl) : "cc");  \
-      }									                             \
-    else /* only bh might be a constant */				        \
-      __asm__ ("subs\t%1, %4, %5\n\tsbc\t%0, %2, %3"			  \
-	       : "=r" (sh), "=&r" (sl)					              \
-	       : "r" (ah), "rI" (bh), "r" (al), "rI" (bl) : "cc"); \
+#define sub_ddmmss(sh, sl, ah, al, bh, bl)                              \
+    do {                                                                \
+        if (__builtin_constant_p (al))                                  \
+        {                                                               \
+            if (__builtin_constant_p (ah))                              \
+                __asm__ ("rsbs\t%1, %5, %4\n\trsc\t%0, %3, %2"          \
+                    : "=r" (sh), "=&r" (sl)                             \
+                    : "rI" (ah), "r" (bh), "rI" (al), "r" (bl) : "cc"); \
+            else                                                        \
+                __asm__ ("rsbs\t%1, %5, %4\n\tsbc\t%0, %2, %3"          \
+                    : "=r" (sh), "=&r" (sl)                             \
+                    : "r" (ah), "rI" (bh), "rI" (al), "r" (bl) : "cc"); \
+        }                                                               \
+        else if (__builtin_constant_p (ah))                             \
+        {                                                               \
+            if (__builtin_constant_p (bl))                              \
+                __asm__ ("subs\t%1, %4, %5\n\trsc\t%0, %3, %2"          \
+                    : "=r" (sh), "=&r" (sl)                             \
+                    : "rI" (ah), "r" (bh), "r" (al), "rI" (bl) : "cc"); \
+            else                                                        \
+                __asm__ ("rsbs\t%1, %5, %4\n\trsc\t%0, %3, %2"          \
+                    : "=r" (sh), "=&r" (sl)                             \
+                    : "rI" (ah), "r" (bh), "rI" (al), "r" (bl) : "cc"); \
+        }                                                               \
+        else if (__builtin_constant_p (bl))                             \
+        {                                                               \
+            if (__builtin_constant_p (bh))                              \
+                __asm__ ("subs\t%1, %4, %5\n\tsbc\t%0, %2, %3"          \
+                    : "=r" (sh), "=&r" (sl)                             \
+                    : "r" (ah), "rI" (bh), "r" (al), "rI" (bl) : "cc"); \
+            else                                                        \
+                __asm__ ("subs\t%1, %4, %5\n\trsc\t%0, %3, %2"          \
+                    : "=r" (sh), "=&r" (sl)                             \
+                    : "rI" (ah), "r" (bh), "r" (al), "rI" (bl) : "cc"); \
+        }                                                               \
+        else /* only bh might be a constant */                          \
+            __asm__ ("subs\t%1, %4, %5\n\tsbc\t%0, %2, %3"              \
+                : "=r" (sh), "=&r" (sl)                                 \
+                : "r" (ah), "rI" (bh), "r" (al), "rI" (bl) : "cc");     \
     } while (0)
 
 #else
 
-#define sub_ddmmss(sh, sl, ah, al, bh, bl)                    \
-  do {                                                         \
-     __asm__ ("subs\t%1, %4, %5\n\tsbc\t%0, %2, %3"                     \
-              : "=r" (sh), "=&r" (sl)                                   \
-              : "r" (ah), "r" (bh), "r" (al), "r" (bl) : "cc");       \
- } while (0)
+#define sub_ddmmss(sh, sl, ah, al, bh, bl)                      \
+    do {                                                        \
+        __asm__ ("subs\t%1, %4, %5\n\tsbc\t%0, %2, %3"          \
+            : "=r" (sh), "=&r" (sl)                             \
+            : "r" (ah), "r" (bh), "r" (al), "r" (bl) : "cc");   \
+    } while (0)
 
 #endif /* not Thumb2 */
 
@@ -378,30 +373,30 @@ static __inline__ flint_bitcnt_t flint_ctz(mp_limb_t x)
 #if !(GMP_LIMB_BITS == 32 && defined (__arm__))
 #if !defined(__arm64__)
 
-#define umul_ppmm(w1, w0, u, v)				 \
-  do {									          \
-    mp_limb_t __x0, __x1, __x2, __x3;		 \
-    mp_limb_t __ul, __vl, __uh, __vh;		 \
-    mp_limb_t __u = (u), __v = (v);			 \
-									                \
-    __ul = __ll_lowpart (__u);				 \
-    __uh = __ll_highpart (__u);				 \
-    __vl = __ll_lowpart (__v);				 \
-    __vh = __ll_highpart (__v);				 \
-									                \
-    __x0 = (mp_limb_t) __ul * __vl;			 \
-    __x1 = (mp_limb_t) __ul * __vh;			 \
-    __x2 = (mp_limb_t) __uh * __vl;			 \
-    __x3 = (mp_limb_t) __uh * __vh;			 \
-									                \
-    __x1 += __ll_highpart (__x0);/* this can't give carry */            \
-    __x1 += __x2;		/* but this indeed can */		                     \
-    if (__x1 < __x2)		/* did we get it? */			                     \
-      __x3 += __ll_B;		/* yes, add it in the proper pos. */         \
-									                                             \
-    (w1) = __x3 + __ll_highpart (__x1);					                  \
-    (w0) = (__x1 << GMP_LIMB_BITS/2) + __ll_lowpart (__x0);		\
-  } while (0)
+#define umul_ppmm(w1, w0, u, v)             \
+    do {                                    \
+        mp_limb_t __x0, __x1, __x2, __x3;   \
+        mp_limb_t __ul, __vl, __uh, __vh;   \
+        mp_limb_t __u = (u), __v = (v);     \
+                                            \
+        __ul = __ll_lowpart (__u);          \
+        __uh = __ll_highpart (__u);         \
+        __vl = __ll_lowpart (__v);          \
+        __vh = __ll_highpart (__v);         \
+                                            \
+        __x0 = (mp_limb_t) __ul * __vl;     \
+        __x1 = (mp_limb_t) __ul * __vh;     \
+        __x2 = (mp_limb_t) __uh * __vl;     \
+        __x3 = (mp_limb_t) __uh * __vh;     \
+                                            \
+        __x1 += __ll_highpart (__x0);/* this can't give carry */ \
+        __x1 += __x2;/* but this indeed can */ \
+        if (__x1 < __x2)/* did we get it? */ \
+            __x3 += __ll_B;/* yes, add it in the proper pos. */ \
+                                            \
+        (w1) = __x3 + __ll_highpart (__x1); \
+        (w0) = (__x1 << GMP_LIMB_BITS / 2) + __ll_lowpart (__x0); \
+    } while (0)
 
 #endif
 #endif
@@ -409,13 +404,13 @@ static __inline__ flint_bitcnt_t flint_ctz(mp_limb_t x)
 #if !(GMP_LIMB_BITS == 32 && defined (__arm__))
 #if !defined(__arm64__)
 
-#define add_ssaaaa(sh, sl, ah, al, bh, bl) \
-  do {									          \
-    mp_limb_t __x;								 \
-    __x = (al) + (bl);							 \
-    (sh) = (ah) + (bh) + (__x < (al));		 \
-    (sl) = __x;								    \
-  } while (0)
+#define add_ssaaaa(sh, sl, ah, al, bh, bl)  \
+    do {                                    \
+        mp_limb_t __x;                      \
+        __x = (al) + (bl);                  \
+        (sh) = (ah) + (bh) + (__x < (al));  \
+        (sl) = __x;                         \
+    } while (0)
 
 #endif
 #endif
@@ -423,20 +418,20 @@ static __inline__ flint_bitcnt_t flint_ctz(mp_limb_t x)
 #if !defined(__arm64__)
 
 #define add_sssaaaaaa(sh, sm, sl, ah, am, al, bh, bm, bl)           \
-  do {                                                              \
-    mp_limb_t __t, __u;                                             \
-    add_ssaaaa(__t, sl, (mp_limb_t) 0, al, (mp_limb_t) 0, bl);      \
-    add_ssaaaa(__u, sm, (mp_limb_t) 0, am, (mp_limb_t) 0, bm);      \
-    add_ssaaaa(sh, sm, ah + bh, sm, __u, __t);                      \
-  } while (0)
+    do {                                                            \
+        mp_limb_t __t, __u;                                         \
+        add_ssaaaa(__t, sl, (mp_limb_t) 0, al, (mp_limb_t) 0, bl);  \
+        add_ssaaaa(__u, sm, (mp_limb_t) 0, am, (mp_limb_t) 0, bm);  \
+        add_ssaaaa(sh, sm, ah + bh, sm, __u, __t);                  \
+    } while (0)
 
-#define add_ssssaaaaaaaa(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0)       \
-  do {                                                                         \
-    mp_limb_t __tt;                                                            \
-    add_sssaaaaaa(__tt, s1, s0, (mp_limb_t) 0, a1, a0, (mp_limb_t) 0, b1, b0); \
-    add_ssaaaa(s3, s2, a3, a2, b3, b2);                                        \
-    add_ssaaaa(s3, s2, s3, s2, (mp_limb_t) 0, __tt);                           \
-  } while (0)
+#define add_ssssaaaaaaaa(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0)            \
+    do {                                                                            \
+        mp_limb_t __tt;                                                             \
+        add_sssaaaaaa(__tt, s1, s0, (mp_limb_t) 0, a1, a0, (mp_limb_t) 0, b1, b0);  \
+        add_ssaaaa(s3, s2, a3, a2, b3, b2);                                         \
+        add_ssaaaa(s3, s2, s3, s2, (mp_limb_t) 0, __tt);                            \
+    } while (0)
 
 #endif
 
@@ -444,66 +439,66 @@ static __inline__ flint_bitcnt_t flint_ctz(mp_limb_t x)
 #if !(GMP_LIMB_BITS == 32 && defined (__arm__))
 #if !defined(__arm64__)
 
-#define sub_ddmmss(sh, sl, ah, al, bh, bl) \
-  do {									          \
-    mp_limb_t __x;								 \
-    __x = (al) - (bl);							 \
-    (sh) = (ah) - (bh) - ((mp_limb_t) (al) < (mp_limb_t) (bl));    \
-    (sl) = __x;								    \
-  } while (0)
+#define sub_ddmmss(sh, sl, ah, al, bh, bl)                          \
+    do {                                                            \
+        mp_limb_t __x;                                              \
+        __x = (al) - (bl);                                          \
+        (sh) = (ah) - (bh) - ((mp_limb_t) (al) < (mp_limb_t) (bl)); \
+        (sl) = __x;                                                 \
+    } while (0)
 
 #endif
 #endif
 
 #if !defined(__arm64__)
 #define sub_dddmmmsss(dh, dm, dl, mh, mm, ml, sh, sm, sl)           \
-  do {                                                              \
-    mp_limb_t __t, __u;                                             \
-    sub_ddmmss(__t, dl, (mp_limb_t) 0, ml, (mp_limb_t) 0, sl);      \
-    sub_ddmmss(__u, dm, (mp_limb_t) 0, mm, (mp_limb_t) 0, sm);      \
-    sub_ddmmss(dh, dm, (mh) - (sh), dm, -__u, -__t);                \
-  } while (0)
+    do {                                                            \
+        mp_limb_t __t, __u;                                         \
+        sub_ddmmss(__t, dl, (mp_limb_t) 0, ml, (mp_limb_t) 0, sl);  \
+        sub_ddmmss(__u, dm, (mp_limb_t) 0, mm, (mp_limb_t) 0, sm);  \
+        sub_ddmmss(dh, dm, (mh) - (sh), dm, -__u, -__t);            \
+    } while (0)
 #endif
 
-#define udiv_qrnnd_int(q, r, n1, n0, d)                                \
-  do {									                                      \
-    mp_limb_t __d1, __d0, __q1, __q0, __r1, __r0, __m;			        \
-									                                            \
-    FLINT_ASSERT ((d) != 0);							                       \
-    FLINT_ASSERT ((n1) < (d));						                       \
-    						                                                  \
-    __d1 = __ll_highpart (d);						                          \
-    __d0 = __ll_lowpart (d);						                          \
-					                                                        \
-    __q1 = (n1) / __d1;							                             \
-    __r1 = (n1) - __q1 * __d1;						                       \
-    __m = __q1 * __d0;							                             \
-    __r1 = __r1 * __ll_B | __ll_highpart (n0);				              \
-    if (__r1 < __m)							                                \
-      {									                                      \
-	__q1--, __r1 += (d);						                                \
-	if (__r1 >= (d)) /* i.e. we didn't get carry when adding to __r1 */ \
-	  if (__r1 < __m)						                                   \
-	    __q1--, __r1 += (d);					                             \
-      }									                                      \
-    __r1 -= __m;							                                   \
-									                                            \
-    __q0 = __r1 / __d1;							                             \
-    __r0 = __r1  - __q0 * __d1;						                       \
-    __m = __q0 * __d0;							                             \
-    __r0 = __r0 * __ll_B | __ll_lowpart (n0);				              \
-    if (__r0 < __m)							                                \
-      {									                                      \
-	__q0--, __r0 += (d);						                                \
-	if (__r0 >= (d))						                                   \
-	  if (__r0 < __m)						                                   \
-	    __q0--, __r0 += (d);					                             \
-      }									                                      \
-    __r0 -= __m;							                                   \
-									                                            \
-    (q) = __q1 * __ll_B | __q0;						                       \
-    (r) = __r0;								                                \
-  } while (0)
+#define udiv_qrnnd_int(q, r, n1, n0, d)                     \
+    do {                                                    \
+        mp_limb_t __d1, __d0, __q1, __q0, __r1, __r0, __m;  \
+                                                            \
+        FLINT_ASSERT ((d) != 0);                            \
+        FLINT_ASSERT ((n1) < (d));                          \
+                                                            \
+        __d1 = __ll_highpart (d);                           \
+        __d0 = __ll_lowpart (d);                            \
+                                                            \
+        __q1 = (n1) / __d1;                                 \
+        __r1 = (n1) - __q1 * __d1;                          \
+        __m = __q1 * __d0;                                  \
+        __r1 = __r1 * __ll_B | __ll_highpart (n0);          \
+        if (__r1 < __m)                                     \
+        {                                                   \
+            __q1--, __r1 += (d);                            \
+            if (__r1 >= (d)) /* i.e. we didn't get carry when adding to __r1 */ \
+                if (__r1 < __m)                             \
+                    __q1--, __r1 += (d);                    \
+        }                                                   \
+        __r1 -= __m;                                        \
+                                                            \
+        __q0 = __r1 / __d1;                                 \
+        __r0 = __r1  - __q0 * __d1;                         \
+        __m = __q0 * __d0;                                  \
+        __r0 = __r0 * __ll_B | __ll_lowpart (n0);           \
+        if (__r0 < __m)                                     \
+        {                                                   \
+            __q0--, __r0 += (d);                            \
+            if (__r0 >= (d))                                \
+                if (__r0 < __m)                             \
+                    __q0--, __r0 += (d);                    \
+        }                                                   \
+        __r0 -= __m;                                        \
+                                                            \
+        (q) = __q1 * __ll_B | __q0;                         \
+        (r) = __r0;                                         \
+    } while (0)
 
 FLINT_DLL extern const unsigned char __flint_clz_tab[128];
 
