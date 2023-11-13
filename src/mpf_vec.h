@@ -24,7 +24,7 @@
 typedef __mpf_struct mpf;
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /*  Memory management  *******************************************************/
@@ -35,8 +35,7 @@ void _mpf_vec_clear(mpf * vec, slong len);
 
 /*  Randomisation  ***********************************************************/
 
-void _mpf_vec_randtest(mpf * f, flint_rand_t state,
-                        slong len, flint_bitcnt_t bits);
+void _mpf_vec_randtest(mpf * f, flint_rand_t state, slong len, flint_bitcnt_t bits);
 
 /*  Assignment and basic manipulation  ***************************************/
 
@@ -47,10 +46,6 @@ void _mpf_vec_set(mpf * vec1, const mpf * vec2, slong len2);
 /*  Conversion  **************************************************************/
 
 void _mpf_vec_set_fmpz_vec(mpf * appv, const fmpz * vec, slong len);
-
-/* Backwards compatibility (this will generate errors for non-GCC compatible
- * compilers) */
-#define _fmpz_vec_get_mpf_vec(appv, vec, len) _Pragma("GCC warning \"'_fmpz_vec_get_mpf_vec' is deprecated in favor for '_mpf_vec_set_fmpz_vec'\"") _mpf_vec_set_fmpz_vec(appv, vec, len)
 
 /*  Comparison  **************************************************************/
 
@@ -63,7 +58,6 @@ int _mpf_vec_is_zero(const mpf * vec, slong len);
 /*  Addition  ****************************************************************/
 
 void _mpf_vec_add(mpf * res, const mpf * vec1, const mpf * vec2, slong len2);
-
 void _mpf_vec_sub(mpf * res, const mpf * vec1, const mpf * vec2, slong len2);
 
 /*  Scalar multiplication  **************************************/
@@ -74,13 +68,11 @@ void _mpf_vec_scalar_mul_mpf(mpf * res, const mpf * vec, slong len, mpf_t c);
 
 /*  Dot product and norm  **************************************/
 
+int _mpf_vec_dot2(mpf_t res, const mpf * vec1, const mpf * vec2, slong len2, flint_bitcnt_t prec);
 void _mpf_vec_dot(mpf_t res, const mpf * vec1, const mpf * vec2, slong len2);
 
-void _mpf_vec_norm(mpf_t res, const mpf * vec, slong len);
-
-int _mpf_vec_dot2(mpf_t res, const mpf * vec1, const mpf * vec2, slong len2, flint_bitcnt_t prec);
-
 void _mpf_vec_norm2(mpf_t res, const mpf * vec, slong len, flint_bitcnt_t prec);
+void _mpf_vec_norm(mpf_t res, const mpf * vec, slong len);
 
 #ifdef __cplusplus
 }
