@@ -57,8 +57,8 @@ void fft_radix2_twiddle(mp_limb_t ** ii, mp_size_t is,
       mp_size_t tw2 = tw1 + rs*c;
       fft_butterfly_twiddle(*t1, *t2, ii[0], ii[is], limbs, tw1*ws, tw2*ws);
 
-      SWAP_PTRS(ii[0],  *t1);
-      SWAP_PTRS(ii[is], *t2);
+      FLINT_SWAP(mp_ptr,ii[0],  *t1);
+      FLINT_SWAP(mp_ptr,ii[is], *t2);
 
       return;
    }
@@ -67,8 +67,8 @@ void fft_radix2_twiddle(mp_limb_t ** ii, mp_size_t is,
    {
       fft_butterfly(*t1, *t2, ii[i*is], ii[(n+i)*is], i, limbs, w);
 
-      SWAP_PTRS(ii[i*is],     *t1);
-      SWAP_PTRS(ii[(n+i)*is], *t2);
+      FLINT_SWAP(mp_ptr,ii[i*is],     *t1);
+      FLINT_SWAP(mp_ptr,ii[(n+i)*is], *t2);
    }
 
    fft_radix2_twiddle(ii, is, n/2, 2*w, t1, t2, ws, r, c, 2*rs);
@@ -96,8 +96,8 @@ void fft_truncate1_twiddle(mp_limb_t ** ii, mp_size_t is,
       {
          fft_butterfly(*t1, *t2, ii[i*is], ii[(n+i)*is], i, limbs, w);
 
-         SWAP_PTRS(ii[i*is],     *t1);
-         SWAP_PTRS(ii[(n+i)*is], *t2);
+         FLINT_SWAP(mp_ptr,ii[i*is],     *t1);
+         FLINT_SWAP(mp_ptr,ii[(n+i)*is], *t2);
       }
 
       fft_radix2_twiddle(ii, is, n/2, 2*w, t1, t2, ws, r, c, 2*rs);
@@ -135,8 +135,8 @@ void fft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n,
             else
                fft_butterfly(*t1, *t2, ii[j], ii[2*n+j], j/2, limbs, w);
 
-            SWAP_PTRS(ii[j],     *t1);
-            SWAP_PTRS(ii[2*n+j], *t2);
+            FLINT_SWAP(mp_ptr,ii[j],     *t1);
+            FLINT_SWAP(mp_ptr,ii[2*n+j], *t2);
          }
 
          for ( ; j < 2*n; j+=n1)
@@ -152,8 +152,8 @@ void fft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n,
          {
             fft_butterfly(*t1, *t2, ii[j], ii[2*n+j], j, limbs, w/2);
 
-            SWAP_PTRS(ii[j],     *t1);
-            SWAP_PTRS(ii[2*n+j], *t2);
+            FLINT_SWAP(mp_ptr,ii[j],     *t1);
+            FLINT_SWAP(mp_ptr,ii[2*n+j], *t2);
          }
 
          for ( ; j < 2*n; j+=n1)
@@ -169,7 +169,7 @@ void fft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n,
       for (j = 0; j < n2; j++)
       {
          mp_size_t s = n_revbin(j, depth);
-         if (j < s) SWAP_PTRS(ii[i+j*n1], ii[i+s*n1]);
+         if (j < s) FLINT_SWAP(mp_ptr,ii[i+j*n1], ii[i+s*n1]);
       }
    }
 
@@ -180,7 +180,7 @@ void fft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n,
       for (j = 0; j < n1; j++)
       {
          mp_size_t t = n_revbin(j, depth2);
-         if (j < t) SWAP_PTRS(ii[i*n1+j], ii[i*n1+t]);
+         if (j < t) FLINT_SWAP(mp_ptr,ii[i*n1+j], ii[i*n1+t]);
       }
    }
 
@@ -199,7 +199,7 @@ void fft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n,
       for (j = 0; j < n2; j++)
       {
          mp_size_t s = n_revbin(j, depth);
-         if (j < s) SWAP_PTRS(ii[i+j*n1], ii[i+s*n1]);
+         if (j < s) FLINT_SWAP(mp_ptr,ii[i+j*n1], ii[i+s*n1]);
       }
    }
 
@@ -212,7 +212,7 @@ void fft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n,
       for (j = 0; j < n1; j++)
       {
          mp_size_t t = n_revbin(j, depth2);
-         if (j < t) SWAP_PTRS(ii[i*n1+j], ii[i*n1+t]);
+         if (j < t) FLINT_SWAP(mp_ptr,ii[i*n1+j], ii[i*n1+t]);
       }
    }
 }
@@ -281,8 +281,8 @@ _fft_outer1_worker(void * arg_ptr)
                     else
                         fft_butterfly(*t1, *t2, ii[j], ii[2*n+j], j/2, limbs, w);
 
-                    SWAP_PTRS(ii[j],     *t1);
-                    SWAP_PTRS(ii[2*n+j], *t2);
+                    FLINT_SWAP(mp_ptr,ii[j],     *t1);
+                    FLINT_SWAP(mp_ptr,ii[2*n+j], *t2);
                 }
 
                 for ( ; j < 2*n; j+=n1)
@@ -298,8 +298,8 @@ _fft_outer1_worker(void * arg_ptr)
                 {
                     fft_butterfly(*t1, *t2, ii[j], ii[2*n+j], j, limbs, w/2);
 
-                    SWAP_PTRS(ii[j],     *t1);
-                    SWAP_PTRS(ii[2*n+j], *t2);
+                    FLINT_SWAP(mp_ptr,ii[j],     *t1);
+                    FLINT_SWAP(mp_ptr,ii[2*n+j], *t2);
                 }
 
                 for ( ; j < 2*n; j+=n1)
@@ -315,7 +315,7 @@ _fft_outer1_worker(void * arg_ptr)
             for (j = 0; j < n2; j++)
             {
                 mp_size_t s = n_revbin(j, depth);
-                if (j < s) SWAP_PTRS(ii[i + j*n1], ii[i + s*n1]);
+                if (j < s) FLINT_SWAP(mp_ptr,ii[i + j*n1], ii[i + s*n1]);
             }
         }
     }
@@ -360,7 +360,7 @@ _fft_outer2_worker(void * arg_ptr)
             for (j = 0; j < n2; j++)
             {
                 mp_size_t s = n_revbin(j, depth);
-                if (j < s) SWAP_PTRS(ii[i+j*n1], ii[i+s*n1]);
+                if (j < s) FLINT_SWAP(mp_ptr,ii[i+j*n1], ii[i+s*n1]);
             }
         }
     }

@@ -36,8 +36,8 @@ void fft_radix2(mp_limb_t ** ii,
    {
       fft_butterfly(*t1, *t2, ii[0], ii[1], 0, limbs, w);
 
-      SWAP_PTRS(ii[0], *t1);
-      SWAP_PTRS(ii[1], *t2);
+      FLINT_SWAP(mp_ptr,ii[0], *t1);
+      FLINT_SWAP(mp_ptr,ii[1], *t2);
 
       return;
    }
@@ -46,8 +46,8 @@ void fft_radix2(mp_limb_t ** ii,
    {
       fft_butterfly(*t1, *t2, ii[i], ii[n+i], i, limbs, w);
 
-      SWAP_PTRS(ii[i],   *t1);
-      SWAP_PTRS(ii[n+i], *t2);
+      FLINT_SWAP(mp_ptr,ii[i],   *t1);
+      FLINT_SWAP(mp_ptr,ii[n+i], *t2);
    }
 
    fft_radix2(ii,     n/2, 2*w, t1, t2);

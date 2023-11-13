@@ -32,8 +32,8 @@ void fft_truncate1(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w,
         {
             fft_butterfly(*t1, *t2, ii[i], ii[n+i], i, limbs, w);
 
-            SWAP_PTRS(ii[i],   *t1);
-            SWAP_PTRS(ii[n+i], *t2);
+            FLINT_SWAP(mp_ptr,ii[i],   *t1);
+            FLINT_SWAP(mp_ptr,ii[n+i], *t2);
         }
 
         fft_radix2(ii, n/2, 2*w, t1, t2);
@@ -57,8 +57,8 @@ void fft_truncate(mp_limb_t ** ii,  mp_size_t n, flint_bitcnt_t w,
         {
             fft_butterfly(*t1, *t2, ii[i], ii[n+i], i, limbs, w);
 
-            SWAP_PTRS(ii[i],   *t1);
-            SWAP_PTRS(ii[n+i], *t2);
+            FLINT_SWAP(mp_ptr,ii[i],   *t1);
+            FLINT_SWAP(mp_ptr,ii[n+i], *t2);
         }
 
         for ( ; i < n; i++)

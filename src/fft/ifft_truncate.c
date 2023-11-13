@@ -48,7 +48,7 @@ void ifft_truncate1(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w,
             mpn_sub_n(ii[i+n], ii[i], ii[i+n], limbs + 1);
             fft_adjust(*t1, ii[i+n], i, limbs, w);
             mpn_add_n(ii[i], ii[i], ii[i+n], limbs + 1);
-            SWAP_PTRS(ii[i+n], *t1);
+            FLINT_SWAP(mp_ptr,ii[i+n], *t1);
         }
 
         ifft_truncate1(ii+n, n/2, 2*w, t1, t2, trunc - n);
@@ -57,8 +57,8 @@ void ifft_truncate1(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w,
         {
             ifft_butterfly(*t1, *t2, ii[i], ii[n+i], i, limbs, w);
 
-            SWAP_PTRS(ii[i],   *t1);
-            SWAP_PTRS(ii[n+i], *t2);
+            FLINT_SWAP(mp_ptr,ii[i],   *t1);
+            FLINT_SWAP(mp_ptr,ii[n+i], *t2);
         }
     }
 }
@@ -90,8 +90,8 @@ void ifft_truncate(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w,
         {
             ifft_butterfly(*t1, *t2, ii[i], ii[n+i], i, limbs, w);
 
-            SWAP_PTRS(ii[i],   *t1);
-            SWAP_PTRS(ii[n+i], *t2);
+            FLINT_SWAP(mp_ptr,ii[i],   *t1);
+            FLINT_SWAP(mp_ptr,ii[n+i], *t2);
         }
 
         for (i = trunc - n; i < n; i++)

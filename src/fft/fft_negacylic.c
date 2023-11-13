@@ -24,40 +24,40 @@ void fft_negacyclic(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w,
       for (i = 0; i < n; i++)
       {
           fft_adjust(*t1, ii[i], i/2, limbs, w);
-          SWAP_PTRS(ii[i], *t1);
+          FLINT_SWAP(mp_ptr,ii[i], *t1);
 
           fft_adjust(*t2, ii[n+i], (n+i)/2, limbs, w);
-          SWAP_PTRS(ii[n+i], *t2);
+          FLINT_SWAP(mp_ptr,ii[n+i], *t2);
 
           fft_butterfly(*t1, *t2, ii[i], ii[n+i], i, limbs, w);
-          SWAP_PTRS(ii[i],   *t1);
-          SWAP_PTRS(ii[n+i], *t2);
+          FLINT_SWAP(mp_ptr,ii[i],   *t1);
+          FLINT_SWAP(mp_ptr,ii[n+i], *t2);
 
           i++;
 
           fft_adjust_sqrt2(*t1, ii[i], i, limbs, w, *temp);
-          SWAP_PTRS(ii[i], *t1);
+          FLINT_SWAP(mp_ptr,ii[i], *t1);
 
           fft_adjust_sqrt2(*t2, ii[n+i], n+i, limbs, w, *temp);
-          SWAP_PTRS(ii[n+i], *t2);
+          FLINT_SWAP(mp_ptr,ii[n+i], *t2);
 
           fft_butterfly(*t1, *t2, ii[i], ii[n+i], i, limbs, w);
-          SWAP_PTRS(ii[i],   *t1);
-          SWAP_PTRS(ii[n+i], *t2);
+          FLINT_SWAP(mp_ptr,ii[i],   *t1);
+          FLINT_SWAP(mp_ptr,ii[n+i], *t2);
        }
    } else
    {
        for (i = 0; i < n; i++)
        {
           fft_adjust(*t1, ii[i], i, limbs, w/2);
-          SWAP_PTRS(ii[i], *t1);
+          FLINT_SWAP(mp_ptr,ii[i], *t1);
 
           fft_adjust(*t2, ii[n+i], n+i, limbs, w/2);
-          SWAP_PTRS(ii[n+i], *t2);
+          FLINT_SWAP(mp_ptr,ii[n+i], *t2);
 
           fft_butterfly(*t1, *t2, ii[i], ii[n+i], i, limbs, w);
-          SWAP_PTRS(ii[i],   *t1);
-          SWAP_PTRS(ii[n+i], *t2);
+          FLINT_SWAP(mp_ptr,ii[i],   *t1);
+          FLINT_SWAP(mp_ptr,ii[n+i], *t2);
        }
    }
 

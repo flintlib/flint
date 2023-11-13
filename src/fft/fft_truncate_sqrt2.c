@@ -72,15 +72,15 @@ void fft_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w,
     {
         fft_butterfly(*t1, *t2, ii[i], ii[2*n+i], i/2, limbs, w);
 
-        SWAP_PTRS(ii[i],     *t1);
-        SWAP_PTRS(ii[i+2*n], *t2);
+        FLINT_SWAP(mp_ptr,ii[i],     *t1);
+        FLINT_SWAP(mp_ptr,ii[i+2*n], *t2);
 
         i++;
 
         fft_butterfly_sqrt2(*t1, *t2, ii[i], ii[2*n+i], i, limbs, w, *temp);
 
-        SWAP_PTRS(ii[i],     *t1);
-        SWAP_PTRS(ii[2*n+i], *t2);
+        FLINT_SWAP(mp_ptr,ii[i],     *t1);
+        FLINT_SWAP(mp_ptr,ii[2*n+i], *t2);
     }
 
     for (i = trunc - 2*n; i < 2*n; i++)
