@@ -158,30 +158,15 @@ void dlog_precomp_clear(dlog_precomp_t pre);
 ulong dlog_precomp(const dlog_precomp_t pre, ulong b);
 
 ulong dlog_order23_init(dlog_order23_t t, ulong a);
+DLOG_INLINE void dlog_order23_clear(dlog_order23_t t) { return; }
+
 ulong dlog_table_init(dlog_table_t t, ulong a, ulong mod);
+DLOG_INLINE void dlog_table_clear(dlog_table_t t) { flint_free(t->table); }
+
 ulong dlog_crt_init(dlog_crt_t t, ulong a, ulong mod, ulong n, ulong num);
-ulong dlog_power_init(dlog_power_t t, ulong a, ulong mod, ulong p, ulong e, ulong num);
-ulong dlog_modpe_init(dlog_modpe_t t, ulong a, ulong p, ulong e, ulong pe, ulong num);
-ulong dlog_bsgs_init(dlog_bsgs_t t, ulong a, ulong mod, ulong n, ulong m);
-void dlog_1modpe_init(dlog_1modpe_t t, ulong a1, ulong p, ulong e, nmod_t pe);
-void dlog_rho_init(dlog_rho_t t, ulong a, ulong mod, ulong n);
-/*#define dlog_bsgs_init(t, a, n, m) bsgs_table_init(t, a, n, m)*/
-
-ulong dlog_once(ulong b, ulong a, const nmod_t mod, ulong n);
-
-DLOG_INLINE void
-dlog_order23_clear(dlog_order23_t t)
-{
-    return;
-}
-
-DLOG_INLINE void
-dlog_table_clear(dlog_table_t t)
-{
-    flint_free(t->table);
-}
-
 void dlog_crt_clear(dlog_crt_t t);
+
+ulong dlog_power_init(dlog_power_t t, ulong a, ulong mod, ulong p, ulong e, ulong num);
 
 DLOG_INLINE void
 dlog_power_clear(dlog_power_t t)
@@ -191,24 +176,18 @@ dlog_power_clear(dlog_power_t t)
     flint_free(t->pre);
 }
 
-DLOG_INLINE void
-dlog_modpe_clear(dlog_modpe_t t)
-{
-    dlog_precomp_clear(t->modp);
-    flint_free(t->modp);
-}
+ulong dlog_modpe_init(dlog_modpe_t t, ulong a, ulong p, ulong e, ulong pe, ulong num);
+DLOG_INLINE void dlog_modpe_clear(dlog_modpe_t t) { dlog_precomp_clear(t->modp); flint_free(t->modp); }
 
-DLOG_INLINE void
-dlog_bsgs_clear(dlog_bsgs_t t)
-{
-    flint_free(t->table);
-}
+ulong dlog_bsgs_init(dlog_bsgs_t t, ulong a, ulong mod, ulong n, ulong m);
+DLOG_INLINE void dlog_bsgs_clear(dlog_bsgs_t t) { flint_free(t->table); }
 
-DLOG_INLINE void
-dlog_rho_clear(dlog_rho_t t)
-{
-    return;
-}
+void dlog_1modpe_init(dlog_1modpe_t t, ulong a1, ulong p, ulong e, nmod_t pe);
+
+void dlog_rho_init(dlog_rho_t t, ulong a, ulong mod, ulong n);
+DLOG_INLINE void dlog_rho_clear(dlog_rho_t t) { return; }
+
+ulong dlog_once(ulong b, ulong a, const nmod_t mod, ulong n);
 
 DLOG_INLINE ulong
 dlog_bsgs_size(ulong n, ulong num)
@@ -218,8 +197,6 @@ dlog_bsgs_size(ulong n, ulong num)
     else
         return n;
 }
-
-/*#define dlog_bsgs_clear(t) bsgs_table_clear(t)*/
 
 ulong dlog_order23(const dlog_order23_t t, ulong b);
 ulong dlog_table(const dlog_table_t t, ulong b);
@@ -232,7 +209,6 @@ ulong dlog_1modpe_1modp(ulong b1, ulong p, ulong e, ulong inv1p, nmod_t pe);
 ulong dlog_1modpe(const dlog_1modpe_t t, ulong b1, ulong p, ulong e, nmod_t pe);
 ulong dlog_mod2e_1mod4(ulong b1, ulong e, ulong inva, nmod_t pe);
 ulong dlog_mod2e(const dlog_modpe_t t, ulong b);
-/*#define dlog_bsgs(t, b) n_discrete_log_bsgs_table(t, b)*/
 
 #define DLOG_SMALL_LIM 50
 #define DLOG_TABLE_LIM 50
@@ -245,6 +221,7 @@ ulong dlog_mod2e(const dlog_modpe_t t, ulong b);
 #define DLOG_LOOP_MAX_FACTOR 6
 #define DLOG_G_SMALL 0
 #define DLOG_G_BIG 1
+
 void dlog_n_factor_group(n_factor_t * fac, ulong bound);
 
 #define DLOG_NOT_FOUND UWORD_MAX
@@ -261,7 +238,6 @@ void dlog_vec_sieve_add(ulong * v, ulong nv, ulong a, ulong va, nmod_t mod, ulon
 void dlog_vec_sieve(ulong * v, ulong nv, ulong a, ulong va, nmod_t mod, ulong na, nmod_t order);
 void dlog_vec_add(ulong * v, ulong nv, ulong a, ulong va, nmod_t mod, ulong na, nmod_t order);
 void dlog_vec(ulong * v, ulong nv, ulong a, ulong va, nmod_t mod, ulong na, nmod_t order);
-
 
 void dlog_vec_sieve_precomp(ulong *v, ulong nv, dlog_precomp_t pre,  ulong a, ulong va, nmod_t mod, ulong na, nmod_t order);
 void dlog_vec_sieve_add_precomp(ulong *v, ulong nv, dlog_precomp_t pre, ulong a, ulong va, nmod_t mod, ulong na, nmod_t order);
