@@ -135,9 +135,6 @@ ULONG_EXTRAS_INLINE double n_precompute_inverse(ulong n) { return (double) 1 / (
 ulong n_preinvert_limb(ulong n);
 ulong n_preinvert_limb_prenorm(ulong n);
 
-/* deprecated -- originally defined in longlong.h */
-#define invert_limb(dinv, d) do { (dinv) = n_preinvert_limb_prenorm(d); } while (0)
-
 ulong n_mod_precomp(ulong a, ulong n, double ninv);
 ulong n_mod2_precomp(ulong a, ulong n, double ninv);
 ulong n_mod2_preinv(ulong a, ulong n, ulong ninv);
