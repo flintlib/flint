@@ -18,7 +18,7 @@
 #include "fmpz_types.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 #define QS_DEBUG 0 /* level of debug information printed, 0 = none */
@@ -298,40 +298,33 @@ static const mp_limb_t qsieve_tune[][6] =
 #define QS_TUNE_SIZE (sizeof(qsieve_tune)/(6*sizeof(mp_limb_t)))
 
 void qsieve_init(qs_t qs_inf, const fmpz_t n);
+void qsieve_clear(qs_t qs_inf);
 
 mp_limb_t qsieve_knuth_schroeppel(qs_t qs_inf);
 
-void qsieve_clear(qs_t qs_inf);
-
 void qsieve_factor(fmpz_factor_t factors, const fmpz_t n);
 
-prime_t * compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf,
-                                                             slong num_primes);
+prime_t * compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf, slong num_primes);
 
 mp_limb_t qsieve_primes_init(qs_t qs_inf);
 
 mp_limb_t qsieve_primes_increment(qs_t qs_inf, mp_limb_t delta);
 
 mp_limb_t qsieve_poly_init(qs_t qs_inf);
+void qsieve_init_poly_first(qs_t qs_inf);
+void qsieve_init_poly_next(qs_t qs_inf, slong i);
+void qsieve_poly_clear(qs_t qs_inf);
 
 int qsieve_init_A(qs_t qs_inf);
-
 void qsieve_reinit_A(qs_t qs_inf);
 
 int qsieve_next_A(qs_t qs_inf);
-
-void qsieve_init_poly_first(qs_t qs_inf);
-
-void qsieve_init_poly_next(qs_t qs_inf, slong i);
 
 void qsieve_compute_C(fmpz_t C, qs_t qs_inf, qs_poly_t poly);
 
 void qsieve_poly_copy(qs_poly_t poly, qs_t qs_inf);
 
-void qsieve_poly_clear(qs_t qs_inf);
-
 void qsieve_do_sieving(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly);
-
 void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly);
 
 slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_poly_t poly);
@@ -341,17 +334,14 @@ slong qsieve_evaluate_sieve(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly);
 slong qsieve_collect_relations(qs_t qs_inf, unsigned char * sieve);
 
 void qsieve_linalg_init(qs_t qs_inf);
-
 void qsieve_linalg_realloc(qs_t qs_inf);
-
 void qsieve_linalg_clear(qs_t qs_inf);
 
 int qsieve_relations_cmp(const void * a, const void * b);
 
 slong qsieve_merge_relations(qs_t qs_inf);
 
-void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime,
-                                                     fmpz_t Y, qs_poly_t poly);
+void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime, fmpz_t Y, qs_poly_t poly);
 
 hash_t * qsieve_get_table_entry(qs_t qs_inf, mp_limb_t prime);
 
@@ -365,12 +355,12 @@ int qsieve_compare_relation(const void * a, const void * b);
 
 int qsieve_remove_duplicates(relation_t * rel_list, slong num_relations);
 
-void qsieve_insert_relation(qs_t qs_inf, relation_t * rel_list,
-                                                          slong num_relations);
+void qsieve_insert_relation(qs_t qs_inf, relation_t * rel_list, slong num_relations);
 
 int qsieve_process_relation(qs_t qs_inf);
 
-static __inline__ void insert_col_entry(la_col_t * col, slong entry)
+static __inline__
+void insert_col_entry(la_col_t * col, slong entry)
 {
    if (((col->weight >> 4) << 4) == col->weight) /* need more space */
    {
@@ -383,7 +373,8 @@ static __inline__ void insert_col_entry(la_col_t * col, slong entry)
    col->weight++;
 }
 
-static __inline__ void swap_cols(la_col_t * col2, la_col_t * col1)
+static __inline__
+void swap_cols(la_col_t * col2, la_col_t * col1)
 {
    la_col_t temp;
 
@@ -400,25 +391,16 @@ static __inline__ void swap_cols(la_col_t * col2, la_col_t * col1)
    col2->orig = temp.orig;
 }
 
-static __inline__ void clear_col(la_col_t * col)
-{
-   col->weight = 0;
-}
-
-static __inline__ void free_col(la_col_t * col)
-{
-   if (col->weight) flint_free(col->data);
-}
+static __inline__ void free_col(la_col_t * col) { if (col->weight) flint_free(col->data); }
+static __inline__ void clear_col(la_col_t * col) { col->weight = 0; }
 
 uint64_t get_null_entry(uint64_t * nullrows, slong i, slong l);
 
 void reduce_matrix(qs_t qs_inf, slong *nrows, slong *ncols, la_col_t *cols);
 
-uint64_t * block_lanczos(flint_rand_t state, slong nrows,
-			slong dense_rows, slong ncols, la_col_t *B);
+uint64_t * block_lanczos(flint_rand_t state, slong nrows, slong dense_rows, slong ncols, la_col_t *B);
 
-void qsieve_square_root(fmpz_t X, fmpz_t Y, qs_t qs_inf,
-   uint64_t * nullrows, slong ncols, slong l, fmpz_t N);
+void qsieve_square_root(fmpz_t X, fmpz_t Y, qs_t qs_inf, uint64_t * nullrows, slong ncols, slong l, fmpz_t N);
 
 #ifdef __cplusplus
 }
