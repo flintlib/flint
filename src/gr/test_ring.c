@@ -2961,22 +2961,37 @@ gr_test_gcd(gr_ctx_t R, flint_rand_t state, int test_flags)
 {
     int status;
     gr_ptr a, f, g, d, t;
+    int aliasing;
 
     GR_TMP_INIT5(a, f, g, d, t, R);
 
     status = GR_SUCCESS;
-    status |= gr_randtest_not_zero(a, state, R);
+    status |= gr_randtest(a, state, R);
     status |= gr_randtest(f, state, R);
     status |= gr_randtest(g, state, R);
     status |= gr_mul(f, a, f, R);
     status |= gr_mul(g, g, a, R);
 
+    aliasing = n_randint(state, 3);
+
     if (status == GR_SUCCESS)
     {
-        status |= gr_gcd(d, f, g, R);
+        if (aliasing == 0)
+        {
+            status |= gr_gcd(d, f, g, R);
+        }
+        else if (aliasing == 1)
+        {
+            status |= gr_set(d, f, R);
+            status |= gr_gcd(d, d, g, R);
+        }
+        else if (aliasing == 2)
+        {
+            status |= gr_set(d, g, R);
+            status |= gr_gcd(d, f, d, R);
+        }
 
-        /* todo: divisible predicate */
-        if (status == GR_SUCCESS && gr_div(t, d, a, R) == GR_DOMAIN)
+        if (status == GR_SUCCESS && gr_divides(a, d, R) == T_FALSE)
         {
             status = GR_TEST_FAIL;
         }
@@ -2986,6 +3001,7 @@ gr_test_gcd(gr_ctx_t R, flint_rand_t state, int test_flags)
     {
         flint_printf("gcd\n");
         gr_ctx_println(R);
+        flint_printf("aliasing = %d\n", aliasing);
         flint_printf("a = "); gr_println(a, R);
         flint_printf("f = "); gr_println(f, R);
         flint_printf("g = "); gr_println(g, R);
@@ -2994,6 +3010,73 @@ gr_test_gcd(gr_ctx_t R, flint_rand_t state, int test_flags)
     }
 
     GR_TMP_CLEAR5(a, f, g, d, t, R);
+
+    return status;
+}
+
+/* verify that LCM(a, b) GCD(a, b) ~ a b */
+int
+gr_test_lcm(gr_ctx_t R, flint_rand_t state, int test_flags)
+{
+    int status;
+    gr_ptr a, b, x, y, ab, xy;
+    int aliasing;
+
+    GR_TMP_INIT3(a, b, ab, R);
+    GR_TMP_INIT3(x, y, xy, R);
+
+    status = GR_SUCCESS;
+    status |= gr_randtest(a, state, R);
+    status |= gr_randtest(b, state, R);
+    status |= gr_randtest(x, state, R);
+    status |= gr_randtest(y, state, R);
+
+    aliasing = n_randint(state, 3);
+
+    if (aliasing == 0)
+    {
+        status |= gr_lcm(x, a, b, R);
+    }
+    else if (aliasing == 1)
+    {
+        status |= gr_set(x, a, R);
+        status |= gr_lcm(x, x, b, R);
+    }
+    else if (aliasing == 2)
+    {
+        status |= gr_set(x, b, R);
+        status |= gr_lcm(x, a, x, R);
+    }
+
+    status |= gr_gcd(y, a, b, R);
+
+    status |= gr_mul(ab, a, b, R);
+    status |= gr_mul(xy, x, y, R);
+
+    if (status == GR_SUCCESS)
+    {
+        if (gr_divides(xy, ab, R) == T_FALSE || gr_divides(ab, xy, R) == T_FALSE)
+        {
+            status = GR_TEST_FAIL;
+        }
+    }
+
+    if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
+    {
+        flint_printf("lcm\n");
+        gr_ctx_println(R);
+        flint_printf("aliasing = %d\n", aliasing);
+        flint_printf("a = "); gr_println(a, R);
+        flint_printf("b = "); gr_println(b, R);
+        flint_printf("x = "); gr_println(x, R);
+        flint_printf("y = "); gr_println(y, R);
+        flint_printf("ab = "); gr_println(ab, R);
+        flint_printf("xy = "); gr_println(xy, R);
+        flint_printf("\n");
+    }
+
+    GR_TMP_CLEAR3(a, b, ab, R);
+    GR_TMP_CLEAR3(x, y, xy, R);
 
     return status;
 }
@@ -3616,6 +3699,7 @@ gr_test_ring(gr_ctx_t R, slong iters, int test_flags)
     if (gr_ctx_is_unique_factorization_domain(R) == T_TRUE)
     {
         gr_test_iter(R, state, "gcd", gr_test_gcd, iters, test_flags);
+        gr_test_iter(R, state, "lcm", gr_test_lcm, iters, test_flags);
         gr_test_iter(R, state, "factor", gr_test_factor, iters, test_flags);
     }
 
