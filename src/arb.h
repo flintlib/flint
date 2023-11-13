@@ -25,16 +25,6 @@
 extern "C" {
 #endif
 
-#define __ARB_VERSION 2
-#define __ARB_VERSION_MINOR 23
-#define __ARB_VERSION_PATCHLEVEL 0
-#define ARB_VERSION "2.23.0"
-#define __ARB_RELEASE (__ARB_VERSION * 10000 + \
-                         __ARB_VERSION_MINOR * 100 + \
-                         __ARB_VERSION_PATCHLEVEL)
-
-FLINT_DLL extern const char * arb_version;
-
 #define arb_midref(x) (&(x)->mid)
 #define arb_radref(x) (&(x)->rad)
 
