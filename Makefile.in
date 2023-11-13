@@ -34,9 +34,9 @@ FLINT_SOLIB:=@FLINT_SOLIB@
 prefix:=@prefix@
 exec_prefix:=@exec_prefix@
 
-INCLUDEDIR:=$(DESTDIR)@includedir@
-LIBDIR:=$(DESTDIR)@libdir@
-BINDIR:=$(DESTDIR)@bindir@
+INCLUDEDIR:=@includedir@
+LIBDIR:=@libdir@
+BINDIR:=@bindir@
 PKGCONFIGDIR:=$(LIBDIR)/pkgconfig
 
 HOST_OS:=@host_os@
@@ -237,10 +237,10 @@ BUILD_DIRS +=                                                               \
 endif
 
 INSTALL_DIRS :=                                                             \
-        $(LIBDIR)                       $(INCLUDEDIR)/flint                 \
-        $(PKGCONFIGDIR)
+        $(DESTDIR)$(LIBDIR)             $(DESTDIR)$(INCLUDEDIR)/flint       \
+        $(DESTDIR)$(PKGCONFIGDIR)
 ifneq ($(FLINT_DLLLIB),0)
-INSTALL_DIRS += $(BINDIR)
+INSTALL_DIRS += $(DESTDIR)$(BINDIR)
 endif
 
 ################################################################################
@@ -859,26 +859,26 @@ distclean: clean
 ################################################################################
 
 install: library | $(INSTALL_DIRS)
-	$(CP) flint.pc $(PKGCONFIGDIR)/flint.pc
+	$(CP) flint.pc $(DESTDIR)$(PKGCONFIGDIR)/flint.pc
 ifneq ($(SHARED), 0)
 ifneq ($(FLINT_DLLLIB),0)
-	$(CP_A) $(FLINT_DIR)/$(FLINT_LIB) $(BINDIR)
-	$(CP_A) $(FLINT_DIR)/$(FLINT_LIB_MAJOR) $(BINDIR)
-	$(CP_A) $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BINDIR)
-	$(CP) $(FLINT_DIR)/$(FLINT_IMPLIB) $(LIBDIR)
+	$(CP_A) $(FLINT_DIR)/$(FLINT_LIB) $(DESTDIR)$(BINDIR)
+	$(CP_A) $(FLINT_DIR)/$(FLINT_LIB_MAJOR) $(DESTDIR)$(BINDIR)
+	$(CP_A) $(FLINT_DIR)/$(FLINT_LIB_FULL) $(DESTDIR)$(BINDIR)
+	$(CP) $(FLINT_DIR)/$(FLINT_IMPLIB) $(DESTDIR)$(LIBDIR)
 else
-	$(CP_A) $(FLINT_DIR)/$(FLINT_LIB) $(LIBDIR)
-	$(CP_A) $(FLINT_DIR)/$(FLINT_LIB_MAJOR) $(LIBDIR)
-	$(CP_A) $(FLINT_DIR)/$(FLINT_LIB_FULL) $(LIBDIR)
+	$(CP_A) $(FLINT_DIR)/$(FLINT_LIB) $(DESTDIR)$(LIBDIR)
+	$(CP_A) $(FLINT_DIR)/$(FLINT_LIB_MAJOR) $(DESTDIR)$(LIBDIR)
+	$(CP_A) $(FLINT_DIR)/$(FLINT_LIB_FULL) $(DESTDIR)$(LIBDIR)
 endif
 ifneq ($(FLINT_DYLIB),0)
-	install_name_tool -id $(LIBDIR)/$(FLINT_LIB_FULL) $(LIBDIR)/$(FLINT_LIB)
+	install_name_tool -id $(LIBDIR)/$(FLINT_LIB_FULL) $(DESTDIR)$(LIBDIR)/$(FLINT_LIB)
 endif
 endif
 ifneq ($(STATIC), 0)
-	$(CP) $(FLINT_DIR)/$(FLINT_LIB_STATIC) $(LIBDIR)
+	$(CP) $(FLINT_DIR)/$(FLINT_LIB_STATIC) $(DESTDIR)$(LIBDIR)
 endif
-	$(CP) $(HEADERS) $(INCLUDEDIR)/flint
+	$(CP) $(HEADERS) $(DESTDIR)$(INCLUDEDIR)/flint
 	@echo ""
 	@echo '############################################################'
 	@echo '# NOTE:                                                    #'
@@ -894,19 +894,19 @@ endif
 	@echo '############################################################'
 
 uninstall:
-	$(RM_F) $(PKGCONFIGDIR)/flint.pc
+	$(RM_F) $(DESTDIR)$(PKGCONFIGDIR)/flint.pc
 ifneq ($(FLINT_DLLLIB),0)
-	$(RM_F) $(BINDIR)/$(FLINT_LIB)
-	$(RM_F) $(BINDIR)/$(FLINT_LIB_MAJOR)
-	$(RM_F) $(BINDIR)/$(FLINT_LIB_FULL)
-	$(RM_F) $(LIBDIR)/$(FLINT_IMPLIB)
+	$(RM_F) $(DESTDIR)$(BINDIR)/$(FLINT_LIB)
+	$(RM_F) $(DESTDIR)$(BINDIR)/$(FLINT_LIB_MAJOR)
+	$(RM_F) $(DESTDIR)$(BINDIR)/$(FLINT_LIB_FULL)
+	$(RM_F) $(DESTDIR)$(LIBDIR)/$(FLINT_IMPLIB)
 else
-	$(RM_F) $(LIBDIR)/$(FLINT_LIB)
-	$(RM_F) $(LIBDIR)/$(FLINT_LIB_MAJOR)
-	$(RM_F) $(LIBDIR)/$(FLINT_LIB_FULL)
+	$(RM_F) $(DESTDIR)$(LIBDIR)/$(FLINT_LIB)
+	$(RM_F) $(DESTDIR)$(LIBDIR)/$(FLINT_LIB_MAJOR)
+	$(RM_F) $(DESTDIR)$(LIBDIR)/$(FLINT_LIB_FULL)
 endif
-	$(RM_F) $(LIBDIR)/$(FLINT_LIB_STATIC)
-	$(RM_RF) $(INCLUDEDIR)/flint
+	$(RM_F) $(DESTDIR)$(LIBDIR)/$(FLINT_LIB_STATIC)
+	$(RM_RF) $(DESTDIR)$(INCLUDEDIR)/flint
 
 ################################################################################
 # regenerate part of the build system of needed
