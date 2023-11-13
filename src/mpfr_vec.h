@@ -22,14 +22,10 @@
 #include "flint.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
-/* Soon to be deprecated */
-#define flint_mpfr __mpfr_struct
-
 mpfr_ptr _mpfr_vec_init(slong length, flint_bitcnt_t prec);
-
 void _mpfr_vec_clear(mpfr_ptr vec, slong length);
 
 void _mpfr_vec_randtest(mpfr_ptr f, flint_rand_t state, slong len);
@@ -42,9 +38,8 @@ int _mpfr_vec_equal(mpfr_srcptr vec1, mpfr_srcptr vec2, slong len);
 
 void _mpfr_vec_add(mpfr_ptr res, mpfr_srcptr vec1, mpfr_srcptr vec2, slong length);
 
-void _mpfr_vec_scalar_mul_2exp(mpfr_ptr res, mpfr_srcptr vec, slong length, flint_bitcnt_t exp);
-
 void _mpfr_vec_scalar_mul_mpfr(mpfr_ptr res, mpfr_srcptr vec, slong length, mpfr_t c);
+void _mpfr_vec_scalar_mul_2exp(mpfr_ptr res, mpfr_srcptr vec, slong length, flint_bitcnt_t exp);
 
 void _mpfr_vec_scalar_product(mpfr_t res, mpfr_srcptr vec1, mpfr_srcptr vec2, slong length);
 
