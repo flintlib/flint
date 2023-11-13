@@ -132,7 +132,7 @@ set(_BUILD_DIRS
     nf              nf_elem         qfb
 
     double_interval dlog
-    fmpz_extras     fmpzi
+    fmpz_extras     fmpq_extras     fmpzi
     bool_mat        partitions
     mag
     arf             acf             arb             acb
@@ -163,8 +163,18 @@ set(_TEMPLATE_DIRS
 string(REGEX REPLACE "([A-Za-z0-9_-]+;|[A-Za-z0-9_-]+$)" "src/\\1" TEMPLATE_DIRS "${_TEMPLATE_DIRS}")
 
 set(_HEADERS
-    NTL-interface.h flint.h longlong.h flint-config.h gmpcompat.h fft_tuning.h
-    profiler.h templates.h exception.h
+        flint.h         longlong.h      exception.h     gmpcompat.h
+        profiler.h      templates.h     flint-config.h  fft_tuning.h
+
+        limb_types.h                    mpoly_types.h
+        fmpz_types.h                    fmpq_types.h
+        nmod_types.h                    fmpz_mod_types.h
+        fq_types.h                      fq_nmod_types.h
+        fq_zech_types.h                 fq_default_types.h
+        arf_types.h                     acf_types.h
+        arb_types.h                     acb_types.h
+        padic_types.h
+        NTL-interface.h
 )
 string(REGEX REPLACE "([A-Za-z0-9_-]+\.h;|[A-Za-z0-9_-]+\.h$)" "src/\\1" HEADERS "${_HEADERS}")
 
