@@ -196,6 +196,8 @@ mp_limb_t nmod_div(mp_limb_t a, mp_limb_t b, nmod_t mod)
     return nmod_mul(a, n_invmod(b, mod.n), mod);
 }
 
+int nmod_divides(mp_limb_t * a, mp_limb_t b, mp_limb_t c, nmod_t mod);
+
 NMOD_INLINE
 mp_limb_t nmod_pow_ui(mp_limb_t a, ulong exp, nmod_t mod)
 {
