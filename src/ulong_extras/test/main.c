@@ -87,6 +87,7 @@
 #include "t-powmod_precomp.c"
 #include "t-powmod_ui_precomp.c"
 #include "t-powmod_ui_preinv.c"
+#include "t-preinvert_limb_prenorm.c"
 #include "t-prime_pi_bounds.c"
 #include "t-prime_pi.c"
 #include "t-primes.c"
@@ -183,6 +184,7 @@ test_struct tests[] =
     TEST_FUNCTION(n_powmod_precomp),
     TEST_FUNCTION(n_powmod_ui_precomp),
     TEST_FUNCTION(n_powmod_ui_preinv),
+    TEST_FUNCTION(n_preinvert_limb_prenorm),
     TEST_FUNCTION(n_prime_pi_bounds),
     TEST_FUNCTION(n_prime_pi),
     TEST_FUNCTION(n_primes),
