@@ -18,11 +18,11 @@
 #define MPFR_MAT_INLINE static __inline__
 #endif
 
-#include "flint.h"
 #include <mpfr.h>
+#include "flint.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 typedef struct
@@ -37,25 +37,13 @@ typedef struct
 /* fmpz_mat_t allows reference-like semantics for fmpz_mat_struct */
 typedef mpfr_mat_struct mpfr_mat_t[1];
 
-MPFR_MAT_INLINE
-__mpfr_struct * mpfr_mat_entry(const mpfr_mat_t mat, slong i, slong j)
-{
-   return mat->rows[i] + j;
-}
+MPFR_MAT_INLINE __mpfr_struct * mpfr_mat_entry(const mpfr_mat_t mat, slong i, slong j) { return mat->rows[i] + j; }
 
-MPFR_MAT_INLINE
-slong mpfr_mat_nrows(const mpfr_mat_t mat)
-{
-    return mat->r;
-}
-
-MPFR_MAT_INLINE
-slong mpfr_mat_ncols(const mpfr_mat_t mat)
-{
-    return mat->c;
-}
+MPFR_MAT_INLINE slong mpfr_mat_nrows(const mpfr_mat_t mat) { return mat->r; }
+MPFR_MAT_INLINE slong mpfr_mat_ncols(const mpfr_mat_t mat) { return mat->c; }
 
 void mpfr_mat_init(mpfr_mat_t mat, slong rows, slong cols, mpfr_prec_t prec);
+void mpfr_mat_clear(mpfr_mat_t mat);
 
 void mpfr_mat_swap(mpfr_mat_t mat1, mpfr_mat_t mat2);
 
@@ -71,8 +59,6 @@ mpfr_mat_swap_entrywise(mpfr_mat_t mat1, mpfr_mat_t mat2)
 
 void mpfr_mat_set(mpfr_mat_t mat1, const mpfr_mat_t mat2);
 
-void mpfr_mat_clear(mpfr_mat_t mat);
-
 int mpfr_mat_equal(const mpfr_mat_t mat1, const mpfr_mat_t mat2);
 
 void mpfr_mat_zero(mpfr_mat_t mat);
@@ -81,7 +67,7 @@ void mpfr_mat_zero(mpfr_mat_t mat);
 
 void mpfr_mat_randtest(mpfr_mat_t mat, flint_rand_t state);
 
-/* Multiplication */
+/* Multiplication  ***********************************************************/
 
 void mpfr_mat_mul_classical(mpfr_mat_t C, const mpfr_mat_t A, const mpfr_mat_t B, mpfr_rnd_t rnd);
 
