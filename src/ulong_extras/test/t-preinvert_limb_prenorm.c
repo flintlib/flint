@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
 #include "test_helpers.h"
+#include "ulong_extras.h"
 
 #define invert_limb_naive(ninv, n)                    \
    do {                                               \
@@ -18,7 +18,7 @@
       udiv_qrnnd (ninv, dummy, ~(n), ~(WORD(0)), n);  \
    } while (0)
 
-TEST_FUNCTION_START(invert_limb, state)
+TEST_FUNCTION_START(n_preinvert_limb_prenorm, state)
 {
    int i, result;
 
@@ -29,7 +29,7 @@ TEST_FUNCTION_START(invert_limb, state)
       n = n_randtest(state);
       n |= (UWORD(1) << (FLINT_BITS - 1));
 
-      invert_limb(ninv1, n);
+      ninv1 = n_preinvert_limb_prenorm(n);
       invert_limb_naive(ninv2, n);
 
       result = (ninv1 == ninv2);

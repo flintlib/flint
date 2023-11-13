@@ -177,7 +177,7 @@ slong _fmpz_mpoly_sqrt_heap1(
         lc_abs = fmpz_get_ui(Qcoeffs + 0);
         lc_norm = flint_clz(lc_abs);
         lc_n = lc_abs << lc_norm;
-        invert_limb(lc_i, lc_n);
+        lc_i = n_preinvert_limb_prenorm(lc_n);
     }
     else
     {
@@ -643,7 +643,7 @@ slong _fmpz_mpoly_sqrt_heap(
         lc_abs = fmpz_get_ui(Qcoeffs + 0);
         lc_norm = flint_clz(lc_abs);
         lc_n = lc_abs << lc_norm;
-        invert_limb(lc_i, lc_n);
+        lc_i = n_preinvert_limb_prenorm(lc_n);
     }
     else
     {
