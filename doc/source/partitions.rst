@@ -66,13 +66,6 @@ terms. This gives a significant speedup for small (e.g. `n < 10^6`).
     formula. This function computes a numerical ball containing `p(n)`
     and verifies that the ball contains a unique integer.
 
-.. function:: void partitions_fmpz_ui_using_doubles(fmpz_t p, ulong n)
-
-    Computes the partition function `p(n)`, enabling the use of doubles
-    internally. This significantly speeds up evaluation for small `n`
-    (e.g. `n < 10^6`), but the error bounds are not certified
-    (see remarks for :func:`partitions_hrr_sum_arb`).
-
 .. function:: void partitions_leading_fmpz(arb_t res, const fmpz_t n, slong prec)
 
     Sets *res* to the leading term in the Hardy-Ramanujan series
