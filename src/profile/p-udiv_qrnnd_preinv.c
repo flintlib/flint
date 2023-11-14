@@ -37,7 +37,7 @@ void sample(void * arg, ulong count)
          array[j + 1] = n_randtest(state);
       }
 
-      invert_limb(dinv, d);
+      dinv = n_preinvert_limb_prenorm(d);
 
       prof_start();
       for (j = 0; j < 200; j+=2)

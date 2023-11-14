@@ -45,7 +45,7 @@ void sample(void * arg, ulong count)
       {
          for (j = 0; j < 200; j++)
          {
-            invert_limb(ninv, array[j]);
+            ninv = n_preinvert_limb_prenorm(array[j]);
             sum += ninv;
          }
       } else

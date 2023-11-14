@@ -29,7 +29,7 @@ TEST_FUNCTION_START(udiv_qrnnd_preinv, state)
       } while (nh >= d);
       nl = n_randtest(state);
 
-      invert_limb(dinv, d);
+      dinv = n_preinvert_limb_prenorm(d);
 
       udiv_qrnnd_preinv(q1, r1, nh, nl, d, dinv);
       udiv_qrnnd(q2, r2, nh, nl, d);
