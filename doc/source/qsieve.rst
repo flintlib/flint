@@ -91,13 +91,18 @@
     Call for initialization of polynomial, sieving, and scanning of sieve
     for all the possible polynomials for particular hypercube i.e. `A`.
 
-.. function:: void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime, fmpz_t Y, qs_poly_t poly)
+.. function:: void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime, const fmpz_t Y, const qs_poly_t poly)
 
-    Write a relation to the file. Format is as follows,
-    first write large prime, in case of full relation it is 1, then write exponent
-    of small primes, then write number of factor followed by offset of factor in
-    factor base and their exponent and at last value of `Q(x)` for particular relation.
-    each relation is written in new line.
+    Write a relation to the file in a binary format as follows. First, write
+    large prime of size ``sizeof(mp_limb_t)``, in case of full relation it is 1.
+    After this, write the number of small primes with size ``sizeof(slong)``.
+    Then, write the small primes, with a total size of
+    ``number_of_small_primes * sizeof(slong)``. Then, write the number of
+    factors with a size of ``sizeof(slong)``. After that, write the factors and
+    their exponents in the format ``factor_1, exponent_1, factor_2, ...``, all
+    with a total size of ``2 * number_of_factors * sizeof(slong)``. Then write
+    ``Y`` with the size of ``Y`` first (size ``sizeof(slong)``, that may be
+    negative), and then its limbs (size ``Y_size * sizeof(mp_limb_t)``).
 
 .. function:: hash_t * qsieve_get_table_entry(qs_t qs_inf, mp_limb_t prime)
 
