@@ -343,6 +343,8 @@ elseif (WIN32)
     set_target_properties(flint PROPERTIES RUNTIME_OUTPUT_NAME "flint-${FLINT_MAJOR_SO}")
 endif()
 
+set_property(TARGET flint PROPERTY C_STANDARD 11)
+
 if(NOT DEFINED IPO_SUPPORTED)
     message(STATUS "Checking for IPO")
     check_ipo_supported(RESULT ipo_supported LANGUAGES C)
