@@ -15,7 +15,7 @@
 #ifdef ACB_MODULAR_INLINES_C
 #define ACB_MODULAR_INLINE
 #else
-#define ACB_MODULAR_INLINE static __inline__
+#define ACB_MODULAR_INLINE static inline
 #endif
 
 #include "fmpz.h"

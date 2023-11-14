@@ -12,7 +12,7 @@
 #include "arb.h"
 
 /* mag_mul_2exp_si is non-inline, but avoid overhead here */
-static __inline__ void
+static inline void
 _mag_mul_2exp_si(mag_t z, const mag_t x, slong y)
 {
     if (mag_is_special(x))

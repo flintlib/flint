@@ -15,7 +15,7 @@
 #ifdef NMOD_MPOLY_INLINES_C
 #define NMOD_MPOLY_INLINE
 #else
-#define NMOD_MPOLY_INLINE static __inline__
+#define NMOD_MPOLY_INLINE static inline
 #endif
 
 #include "thread_pool.h"

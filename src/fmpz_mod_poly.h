@@ -16,7 +16,7 @@
 #ifdef FMPZ_MOD_POLY_INLINES_C
 #define FMPZ_MOD_POLY_INLINE
 #else
-#define FMPZ_MOD_POLY_INLINE static __inline__
+#define FMPZ_MOD_POLY_INLINE static inline
 #endif
 
 #include "thread_pool.h"

@@ -15,7 +15,7 @@
 #ifdef CA_EXT_INLINES_C
 #define CA_EXT_INLINE
 #else
-#define CA_EXT_INLINE static __inline__
+#define CA_EXT_INLINE static inline
 #endif
 
 #include "ca.h"

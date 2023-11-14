@@ -17,7 +17,7 @@
 # include <math.h>
 #endif
 
-static __inline__ int
+static inline int
 d_is_ok(double x)
 {
     return (x > -1e15) && (x < 1e15);

@@ -16,7 +16,7 @@
 #ifdef MPOLY_INLINES_C
 #define MPOLY_INLINE
 #else
-#define MPOLY_INLINE static __inline__
+#define MPOLY_INLINE static inline
 #endif
 
 #include <string.h>

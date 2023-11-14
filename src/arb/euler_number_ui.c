@@ -101,7 +101,7 @@ nmod_redc_init(nmod_redc_t * rmod, nmod_t mod)
     rmod->ninv = ninv2 & LOW_MASK;
 }
 
-static __inline__ ulong
+static inline ulong
 nmod_redc_fast(ulong x, ulong n, ulong ninv2)
 {
     ulong y = (x * ninv2) & LOW_MASK;
@@ -109,7 +109,7 @@ nmod_redc_fast(ulong x, ulong n, ulong ninv2)
     return z >> (FLINT_BITS / 2);
 }
 
-static __inline__ ulong
+static inline ulong
 nmod_redc(ulong x, ulong n, ulong ninv2)
 {
     ulong y = nmod_redc_fast(x, n, ninv2);

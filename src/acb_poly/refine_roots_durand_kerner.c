@@ -14,7 +14,7 @@
 /* we don't need any error bounding, so we define a few helper
    functions that ignore the radii */
 
-static __inline__ void
+static inline void
 acb_sub_mid(acb_t z, const acb_t x, const acb_t y, slong prec)
 {
     arf_sub(arb_midref(acb_realref(z)),
@@ -25,7 +25,7 @@ acb_sub_mid(acb_t z, const acb_t x, const acb_t y, slong prec)
         arb_midref(acb_imagref(y)), prec, ARF_RND_DOWN);
 }
 
-static __inline__ void
+static inline void
 acb_add_mid(acb_t z, const acb_t x, const acb_t y, slong prec)
 {
     arf_add(arb_midref(acb_realref(z)),
@@ -36,7 +36,7 @@ acb_add_mid(acb_t z, const acb_t x, const acb_t y, slong prec)
         arb_midref(acb_imagref(y)), prec, ARF_RND_DOWN);
 }
 
-static __inline__ void
+static inline void
 acb_mul_mid(acb_t z, const acb_t x, const acb_t y, slong prec)
 {
 #define a arb_midref(acb_realref(x))
@@ -56,7 +56,7 @@ acb_mul_mid(acb_t z, const acb_t x, const acb_t y, slong prec)
 #undef f
 }
 
-static __inline__ void
+static inline void
 acb_inv_mid(acb_t z, const acb_t x, slong prec)
 {
     arf_t t;

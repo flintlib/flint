@@ -15,7 +15,7 @@
 #ifdef QFB_INLINES_C
 #define QFB_INLINE
 #else
-#define QFB_INLINE static __inline__
+#define QFB_INLINE static inline
 #endif
 
 #include "fmpz.h"

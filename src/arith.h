@@ -15,7 +15,7 @@
 #ifdef ARITH_INLINES_C
 #define ARITH_INLINE
 #else
-#define ARITH_INLINE static __inline__
+#define ARITH_INLINE static inline
 #endif
 
 #include "fmpq_types.h"

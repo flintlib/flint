@@ -16,7 +16,7 @@
 #ifdef FQ_DEFAULT_POLY_INLINES_C
 #define FQ_DEFAULT_POLY_INLINE
 #else
-#define FQ_DEFAULT_POLY_INLINE static __inline__
+#define FQ_DEFAULT_POLY_INLINE static inline
 #endif
 
 #include "nmod_poly_factor.h"

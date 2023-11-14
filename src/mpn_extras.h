@@ -18,7 +18,7 @@
 #ifdef MPN_EXTRAS_INLINES_C
 #define MPN_EXTRAS_INLINE
 #else
-#define MPN_EXTRAS_INLINE static __inline__
+#define MPN_EXTRAS_INLINE static inline
 #endif
 
 #include "flint.h"
@@ -183,7 +183,7 @@ flint_mpn_divisible_1_odd(mp_srcptr x, mp_size_t xsize, mp_limb_t d)
 
 #endif
 
-static __inline__ void
+static inline void
 mpn_tdiv_q(mp_ptr qp, mp_srcptr np, mp_size_t nn, mp_srcptr dp, mp_size_t dn)
 {
     mp_ptr _scratch;

@@ -42,7 +42,7 @@ static const short rec_fac_bound_2exp_si_tab[TABSIZE] =
     -1652, -1660, -1668, -1675
 };
 
-static __inline__ slong
+static inline slong
 rec_fac_bound_2exp_si(slong n)
 {
     if (n < TABSIZE)

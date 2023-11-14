@@ -13,7 +13,7 @@
 #include "nmod_vec.h"
 #include "nmod_mat.h"
 
-static __inline__ int
+static inline int
 nmod_mat_pivot(nmod_mat_t A, slong * P, slong start_row, slong col)
 {
     slong j, t;

@@ -11,7 +11,7 @@
 
 #include "arb.h"
 
-static __inline__ void
+static inline void
 _arb_get_mag_lower(mag_t z, const arf_t mid, const mag_t rad)
 {
     if (arf_is_special(mid) || mag_is_special(rad))

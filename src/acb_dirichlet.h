@@ -17,7 +17,7 @@
 #ifdef ACB_DIRICHLET_INLINES_C
 #define ACB_DIRICHLET_INLINE
 #else
-#define ACB_DIRICHLET_INLINE static __inline__
+#define ACB_DIRICHLET_INLINE static inline
 #endif
 
 #include "acb.h"

@@ -15,7 +15,7 @@
 
 #define E fmpz_poly_mat_entry
 
-static __inline__ void
+static inline void
 fmpz_poly_addlow(fmpz_poly_t c, const fmpz_poly_t a,
     const fmpz_poly_t b, slong len)
 {

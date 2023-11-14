@@ -18,8 +18,8 @@
 #define FQ_POLY_TEMPLATES_INLINE
 #define FQ_NMOD_POLY_INLINE
 #else
-#define FQ_POLY_TEMPLATES_INLINE static __inline__
-#define FQ_NMOD_POLY_INLINE static __inline__
+#define FQ_POLY_TEMPLATES_INLINE static inline
+#define FQ_NMOD_POLY_INLINE static inline
 #endif
 
 #include "fq_nmod_types.h"

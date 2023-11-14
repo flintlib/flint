@@ -15,7 +15,7 @@
 #ifdef CA_MAT_INLINES_C
 #define CA_MAT_INLINE
 #else
-#define CA_MAT_INLINE static __inline__
+#define CA_MAT_INLINE static inline
 #endif
 
 #include "ca_poly.h"

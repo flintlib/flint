@@ -15,7 +15,7 @@
 #ifdef ARB_POLY_INLINES_C
 #define ARB_POLY_INLINE
 #else
-#define ARB_POLY_INLINE static __inline__
+#define ARB_POLY_INLINE static inline
 #endif
 
 #include "fmpq_types.h"

@@ -15,7 +15,7 @@
 #ifdef ARF_INLINES_C
 #define ARF_INLINE
 #else
-#define ARF_INLINE static __inline__
+#define ARF_INLINE static inline
 #endif
 
 #include "mag.h"

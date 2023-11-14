@@ -17,7 +17,7 @@
 #ifdef FMPZ_POLY_FACTOR_INLINES_C
 #define FMPZ_POLY_FACTOR_INLINE
 #else
-#define FMPZ_POLY_FACTOR_INLINE static __inline__
+#define FMPZ_POLY_FACTOR_INLINE static inline
 #endif
 
 #include "nmod_types.h"

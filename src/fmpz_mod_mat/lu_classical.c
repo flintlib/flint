@@ -16,7 +16,7 @@
 #include "fmpz_mod_vec.h"
 #include "fmpz_mod_mat.h"
 
-static __inline__ int
+static inline int
 fmpz_mod_mat_pivot(fmpz_mod_mat_t A, slong * P, slong start_row,
                         slong col, const fmpz_mod_ctx_t ctx)
 {

@@ -11,7 +11,7 @@
 
 #include "arb_poly.h"
 
-static __inline__ slong _arf_mag(const arf_t c)
+static inline slong _arf_mag(const arf_t c)
 {
     slong m = arf_abs_bound_lt_2exp_si(c);
     return FLINT_MAX(m, 0);

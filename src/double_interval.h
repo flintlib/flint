@@ -15,7 +15,7 @@
 #ifdef DOUBLE_INTERVAL_INLINES_C
 #define DOUBLE_INTERVAL_INLINE
 #else
-#define DOUBLE_INTERVAL_INLINE static __inline__
+#define DOUBLE_INTERVAL_INLINE static inline
 #endif
 
 #include <math.h>

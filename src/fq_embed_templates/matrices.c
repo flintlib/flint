@@ -108,14 +108,14 @@ void TEMPLATE(T, embed_trace_matrix)(TEMPLATE(B, mat_t) res,
     TEMPLATE(B, mat_clear)(tmp);
 }
 
-static __inline__
+static inline
 int __fmpz_mod_inv_degree(fmpz_t invd, slong d, const fmpz_t p)
 {
     fmpz_set_si(invd, d);
     return fmpz_invmod(invd, invd, p);
 }
 
-static __inline__
+static inline
 int __nmod_inv_degree(fmpz_t invd, slong d, mp_limb_t p)
 {
     mp_limb_t ud = d % p;

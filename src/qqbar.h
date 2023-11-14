@@ -15,7 +15,7 @@
 #ifdef QQBAR_INLINES_C
 #define QQBAR_INLINE
 #else
-#define QQBAR_INLINE static __inline__
+#define QQBAR_INLINE static inline
 #endif
 
 #ifdef __cplusplus

@@ -16,7 +16,7 @@
 #ifdef FMPZ_POLY_Q_INLINES_C
 #define FMPZ_POLY_Q_INLINE
 #else
-#define FMPZ_POLY_Q_INLINE static __inline__
+#define FMPZ_POLY_Q_INLINE static inline
 #endif
 
 #include "fmpz_poly.h"

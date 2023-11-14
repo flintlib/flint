@@ -12,7 +12,7 @@
 #include "fmpz.h"
 #include "fmpq_poly.h"
 
-static __inline__ void __legendre_denom(fmpz_t den, ulong n)
+static inline void __legendre_denom(fmpz_t den, ulong n)
 {
     ulong d, k;
     d = k = n >> 1;

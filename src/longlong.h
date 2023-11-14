@@ -125,7 +125,7 @@ extern "C" {
 
 #ifndef FLINT_HAS_CLZ
 # define flint_clz flint_clz
-static __inline__ flint_bitcnt_t flint_clz(mp_limb_t x)
+static inline flint_bitcnt_t flint_clz(mp_limb_t x)
 {
     mp_limb_t count;
     FLINT_ASSERT(x != 0);
@@ -136,7 +136,7 @@ static __inline__ flint_bitcnt_t flint_clz(mp_limb_t x)
 
 #ifndef FLINT_HAS_CTZ
 # define flint_ctz flint_ctz
-static __inline__ flint_bitcnt_t flint_ctz(mp_limb_t x)
+static inline flint_bitcnt_t flint_ctz(mp_limb_t x)
 {
     mp_limb_t count;
     FLINT_ASSERT(x != 0);
@@ -216,7 +216,7 @@ static __inline__ flint_bitcnt_t flint_ctz(mp_limb_t x)
 
 #ifndef FLINT_HAS_CLZ
 # define flint_clz flint_clz
-static __inline__ flint_bitcnt_t flint_clz(mp_limb_t x)
+static inline flint_bitcnt_t flint_clz(mp_limb_t x)
 {
     mp_limb_t count;
     FLINT_ASSERT(x != 0);
@@ -227,7 +227,7 @@ static __inline__ flint_bitcnt_t flint_clz(mp_limb_t x)
 
 #ifndef FLINT_HAS_CTZ
 # define flint_ctz flint_ctz
-static __inline__ flint_bitcnt_t flint_ctz(mp_limb_t x)
+static inline flint_bitcnt_t flint_ctz(mp_limb_t x)
 {
     mp_limb_t count;
     FLINT_ASSERT(x != 0);
@@ -509,7 +509,7 @@ FLINT_DLL extern const unsigned char __flint_clz_tab[128];
 
 #ifndef flint_clz
 # define flint_clz flint_clz
-static __inline__ flint_bitcnt_t flint_clz(mp_limb_t x)
+static inline flint_bitcnt_t flint_clz(mp_limb_t x)
 {
     mp_limb_t __a, __xr = x;
     if (GMP_LIMB_BITS == 32)
@@ -530,7 +530,7 @@ static __inline__ flint_bitcnt_t flint_clz(mp_limb_t x)
 
 #ifndef flint_ctz
 # define flint_ctz flint_ctz
-static __inline__ flint_bitcnt_t flint_ctz(mp_limb_t x)
+static inline flint_bitcnt_t flint_ctz(mp_limb_t x)
 {
     mp_limb_t __ctz_x = (x);
     FLINT_ASSERT (__ctz_x != 0);

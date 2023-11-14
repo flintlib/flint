@@ -16,8 +16,8 @@
 #define FQ_VEC_TEMPLATES_INLINE
 #define FQ_ZECH_VEC_INLINE
 #else
-#define FQ_VEC_TEMPLATES_INLINE static __inline__
-#define FQ_ZECH_VEC_INLINE static __inline__
+#define FQ_VEC_TEMPLATES_INLINE static inline
+#define FQ_ZECH_VEC_INLINE static inline
 #endif
 
 #include "fq_zech_types.h"

@@ -15,7 +15,7 @@
 #ifdef DLOG_INLINES_C
 #define DLOG_INLINE
 #else
-#define DLOG_INLINE static __inline__
+#define DLOG_INLINE static inline
 #endif
 
 #include "ulong_extras.h"

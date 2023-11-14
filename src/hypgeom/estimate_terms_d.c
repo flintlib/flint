@@ -16,7 +16,7 @@
 #define LOG2 0.69314718055994530942
 #define EXP1 2.7182818284590452354
 
-static __inline__ double d_root(double x, int r)
+static inline double d_root(double x, int r)
 {
     if (r == 1)
         return x;

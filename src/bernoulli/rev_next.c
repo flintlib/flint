@@ -12,7 +12,7 @@
 #include "arb.h"
 #include "bernoulli.h"
 
-static __inline__ void
+static inline void
 mag_ui_div(mag_t z, ulong c, const mag_t x)
 {
     mag_t t;

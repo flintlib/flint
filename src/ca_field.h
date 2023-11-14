@@ -15,7 +15,7 @@
 #ifdef CA_FIELD_INLINES_C
 #define CA_FIELD_INLINE
 #else
-#define CA_FIELD_INLINE static __inline__
+#define CA_FIELD_INLINE static inline
 #endif
 
 #include "ca.h"

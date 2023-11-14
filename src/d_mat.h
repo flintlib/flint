@@ -17,7 +17,7 @@
 #ifdef D_MAT_INLINES_C
 #define D_MAT_INLINE
 #else
-#define D_MAT_INLINE static __inline__
+#define D_MAT_INLINE static inline
 #endif
 
 

@@ -15,7 +15,7 @@
 #ifdef FMPZ_POLY_MAT_INLINES_C
 #define FMPZ_POLY_MAT_INLINE
 #else
-#define FMPZ_POLY_MAT_INLINE static __inline__
+#define FMPZ_POLY_MAT_INLINE static inline
 #endif
 
 #include "fmpz_poly.h"

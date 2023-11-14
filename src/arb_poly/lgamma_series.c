@@ -21,7 +21,7 @@ void arb_hypgeom_gamma_stirling_choose_param(int * reflect, slong * r, slong * n
 
 void _arb_poly_gamma_stirling_eval(arb_ptr res, const arb_t z, slong n, slong num, slong prec);
 
-static __inline__ void
+static inline void
 _log_rising_ui_series(arb_ptr t, const arb_t x, slong r, slong len, slong prec)
 {
     slong rflen;

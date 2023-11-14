@@ -15,7 +15,7 @@
 #ifdef BOOL_MAT_INLINES_C
 #define BOOL_MAT_INLINE
 #else
-#define BOOL_MAT_INLINE static __inline__
+#define BOOL_MAT_INLINE static inline
 #endif
 
 #include "fmpz_types.h"
