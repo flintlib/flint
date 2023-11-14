@@ -1,7 +1,7 @@
 /*
-    Copyright 2022 Daniel Schultz
+    Copyright (C) 2022 Daniel Schultz
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
