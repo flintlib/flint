@@ -339,6 +339,13 @@ static void _find_edge(
     }
 }
 
+/* NOTE: Here `input' has to be an array of size `count'.  It will be
+ * overwritten, and its initial element values do not matter.  It will contain
+ * dangling pointers after returning, that is, the values `input[ix]' will be
+ * invalid after returning.  Hence, we silence warnings about dangling pointers. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wdangling-pointer"
+#endif
 static slong _fmpz_mpoly_crt(
     const fmpz_multi_CRT_t P,
     _joinworker_arg_struct * S,
@@ -511,6 +518,9 @@ static slong _fmpz_mpoly_crt(
 
     return lastdegree;
 }
+#ifdef __GNUC__
+# pragma GCC diagnostic pop
+#endif
 
 
 typedef struct
