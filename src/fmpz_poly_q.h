@@ -41,8 +41,20 @@ void fmpz_poly_q_clear(fmpz_poly_q_t rop);
 
 /* Randomisation *************************************************************/
 
-void fmpz_poly_q_randtest(fmpz_poly_q_t poly, flint_rand_t state, slong len1, flint_bitcnt_t bits1, slong len2, flint_bitcnt_t bits2);
-void fmpz_poly_q_randtest_not_zero(fmpz_poly_q_t poly, flint_rand_t state, slong len1, flint_bitcnt_t bits1, slong len2, flint_bitcnt_t bits2);
+void fmpz_poly_q_randtest(
+    fmpz_poly_q_t poly,
+    flint_rand_t state,
+    slong len1,
+    flint_bitcnt_t bits1,
+    slong len2,
+    flint_bitcnt_t bits2);
+void fmpz_poly_q_randtest_not_zero(
+    fmpz_poly_q_t poly,
+    flint_rand_t state,
+    slong len1,
+    flint_bitcnt_t bits1,
+    slong len2,
+    flint_bitcnt_t bits2);
 
 /* Assignment ****************************************************************/
 
@@ -51,45 +63,99 @@ void fmpz_poly_q_set(fmpz_poly_q_t rop, const fmpz_poly_q_t op);
 
 void fmpz_poly_q_swap(fmpz_poly_q_t op1, fmpz_poly_q_t op2);
 
-FMPZ_POLY_Q_INLINE void fmpz_poly_q_zero(fmpz_poly_q_t rop) { fmpz_poly_zero(rop->num); fmpz_poly_set_si(rop->den, 1); }
-FMPZ_POLY_Q_INLINE void fmpz_poly_q_one(fmpz_poly_q_t rop) { fmpz_poly_set_si(rop->num, 1); fmpz_poly_set_si(rop->den, 1); }
+FMPZ_POLY_Q_INLINE
+void fmpz_poly_q_zero(fmpz_poly_q_t rop)
+{
+    fmpz_poly_zero(rop->num); fmpz_poly_set_si(rop->den, 1);
+}
+FMPZ_POLY_Q_INLINE
+void fmpz_poly_q_one(fmpz_poly_q_t rop)
+{
+    fmpz_poly_set_si(rop->num, 1); fmpz_poly_set_si(rop->den, 1);
+}
 
 void fmpz_poly_q_inv(fmpz_poly_q_t rop, const fmpz_poly_q_t op);
 
 /* Comparison ****************************************************************/
 
-FMPZ_POLY_Q_INLINE int fmpz_poly_q_is_zero(const fmpz_poly_q_t op) { return fmpz_poly_is_zero(op->num); }
-FMPZ_POLY_Q_INLINE int fmpz_poly_q_is_one(const fmpz_poly_q_t op) { return fmpz_poly_is_one(op->num) && fmpz_poly_is_one(op->den); }
+FMPZ_POLY_Q_INLINE
+int fmpz_poly_q_is_zero(const fmpz_poly_q_t op)
+{
+    return fmpz_poly_is_zero(op->num);
+}
+FMPZ_POLY_Q_INLINE
+int fmpz_poly_q_is_one(const fmpz_poly_q_t op)
+{
+    return fmpz_poly_is_one(op->num) && fmpz_poly_is_one(op->den);
+}
 
-FMPZ_POLY_Q_INLINE int fmpz_poly_q_equal(const fmpz_poly_q_t op1, const fmpz_poly_q_t op2) { return fmpz_poly_equal(op1->num, op2->num) && fmpz_poly_equal(op1->den, op2->den); }
+FMPZ_POLY_Q_INLINE
+int fmpz_poly_q_equal(const fmpz_poly_q_t op1, const fmpz_poly_q_t op2)
+{
+    return fmpz_poly_equal(op1->num, op2->num) && fmpz_poly_equal(op1->den, op2->den);
+}
 
 /* Addition and subtraction **************************************************/
 
 void fmpz_poly_q_add_in_place(fmpz_poly_q_t rop, const fmpz_poly_q_t op);
-void fmpz_poly_q_add(fmpz_poly_q_t rop, const fmpz_poly_q_t op1, const fmpz_poly_q_t op2);
+void fmpz_poly_q_add(
+    fmpz_poly_q_t rop,
+    const fmpz_poly_q_t op1,
+    const fmpz_poly_q_t op2);
 
 void fmpz_poly_q_sub_in_place(fmpz_poly_q_t rop, const fmpz_poly_q_t op);
-void fmpz_poly_q_sub(fmpz_poly_q_t rop, const fmpz_poly_q_t op1, const fmpz_poly_q_t op2);
+void fmpz_poly_q_sub(
+    fmpz_poly_q_t rop,
+    const fmpz_poly_q_t op1,
+    const fmpz_poly_q_t op2);
 
-FMPZ_POLY_Q_INLINE void fmpz_poly_q_neg(fmpz_poly_q_t rop, const fmpz_poly_q_t op) { fmpz_poly_neg(rop->num, op->num); fmpz_poly_set(rop->den, op->den); }
+FMPZ_POLY_Q_INLINE
+void fmpz_poly_q_neg(fmpz_poly_q_t rop, const fmpz_poly_q_t op)
+{
+    fmpz_poly_neg(rop->num, op->num); fmpz_poly_set(rop->den, op->den);
+}
 
-void fmpz_poly_q_addmul(fmpz_poly_q_t rop, const fmpz_poly_q_t op1, const fmpz_poly_q_t op2);
-void fmpz_poly_q_submul(fmpz_poly_q_t rop, const fmpz_poly_q_t op1, const fmpz_poly_q_t op2);
+void fmpz_poly_q_addmul(
+    fmpz_poly_q_t rop,
+    const fmpz_poly_q_t op1,
+    const fmpz_poly_q_t op2);
+void fmpz_poly_q_submul(
+    fmpz_poly_q_t rop,
+    const fmpz_poly_q_t op1,
+    const fmpz_poly_q_t op2);
 
 /* Scalar multiplication and division ****************************************/
 
 void fmpz_poly_q_scalar_mul_si(fmpz_poly_q_t rop, const fmpz_poly_q_t op, slong x);
-void fmpz_poly_q_scalar_mul_fmpz(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const fmpz_t x);
-void fmpz_poly_q_scalar_mul_fmpq(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const fmpq_t x);
+void fmpz_poly_q_scalar_mul_fmpz(
+    fmpz_poly_q_t rop,
+    const fmpz_poly_q_t op,
+    const fmpz_t x);
+void fmpz_poly_q_scalar_mul_fmpq(
+    fmpz_poly_q_t rop,
+    const fmpz_poly_q_t op,
+    const fmpq_t x);
 
 void fmpz_poly_q_scalar_div_si(fmpz_poly_q_t rop, const fmpz_poly_q_t op, slong x);
-void fmpz_poly_q_scalar_div_fmpz(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const fmpz_t x);
-void fmpz_poly_q_scalar_div_fmpq(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const fmpq_t x);
+void fmpz_poly_q_scalar_div_fmpz(
+    fmpz_poly_q_t rop,
+    const fmpz_poly_q_t op,
+    const fmpz_t x);
+void fmpz_poly_q_scalar_div_fmpq(
+    fmpz_poly_q_t rop,
+    const fmpz_poly_q_t op,
+    const fmpq_t x);
 
 /* Multiplication and division ***********************************************/
 
-void fmpz_poly_q_mul(fmpz_poly_q_t rop, const fmpz_poly_q_t op1, const fmpz_poly_q_t op2);
-void fmpz_poly_q_div(fmpz_poly_q_t rop, const fmpz_poly_q_t op1, const fmpz_poly_q_t op2);
+void fmpz_poly_q_mul(
+    fmpz_poly_q_t rop,
+    const fmpz_poly_q_t op1,
+    const fmpz_poly_q_t op2);
+void fmpz_poly_q_div(
+    fmpz_poly_q_t rop,
+    const fmpz_poly_q_t op1,
+    const fmpz_poly_q_t op2);
 
 /* Powering ******************************************************************/
 

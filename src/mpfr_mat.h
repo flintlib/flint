@@ -37,7 +37,11 @@ typedef struct
 /* fmpz_mat_t allows reference-like semantics for fmpz_mat_struct */
 typedef mpfr_mat_struct mpfr_mat_t[1];
 
-MPFR_MAT_INLINE __mpfr_struct * mpfr_mat_entry(const mpfr_mat_t mat, slong i, slong j) { return mat->rows[i] + j; }
+MPFR_MAT_INLINE
+__mpfr_struct * mpfr_mat_entry(const mpfr_mat_t mat, slong i, slong j)
+{
+    return mat->rows[i] + j;
+}
 
 MPFR_MAT_INLINE slong mpfr_mat_nrows(const mpfr_mat_t mat) { return mat->r; }
 MPFR_MAT_INLINE slong mpfr_mat_ncols(const mpfr_mat_t mat) { return mat->c; }
@@ -69,7 +73,11 @@ void mpfr_mat_randtest(mpfr_mat_t mat, flint_rand_t state);
 
 /* Multiplication  ***********************************************************/
 
-void mpfr_mat_mul_classical(mpfr_mat_t C, const mpfr_mat_t A, const mpfr_mat_t B, mpfr_rnd_t rnd);
+void mpfr_mat_mul_classical(
+    mpfr_mat_t C,
+    const mpfr_mat_t A,
+    const mpfr_mat_t B,
+    mpfr_rnd_t rnd);
 
 #ifdef __cplusplus
 }

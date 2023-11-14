@@ -51,7 +51,11 @@ void _mpf_vec_set_fmpz_vec(mpf * appv, const fmpz * vec, slong len);
 
 int _mpf_vec_equal(const mpf * vec1, const mpf * vec2, slong len);
 
-int _mpf_vec_approx_equal(const mpf * vec1, const mpf * vec2, slong len, flint_bitcnt_t bits);
+int _mpf_vec_approx_equal(
+    const mpf * vec1,
+    const mpf * vec2,
+    slong len,
+    flint_bitcnt_t bits);
 
 int _mpf_vec_is_zero(const mpf * vec, slong len);
 
@@ -68,7 +72,12 @@ void _mpf_vec_scalar_mul_mpf(mpf * res, const mpf * vec, slong len, mpf_t c);
 
 /*  Dot product and norm  **************************************/
 
-int _mpf_vec_dot2(mpf_t res, const mpf * vec1, const mpf * vec2, slong len2, flint_bitcnt_t prec);
+int _mpf_vec_dot2(
+    mpf_t res,
+    const mpf * vec1,
+    const mpf * vec2,
+    slong len2,
+    flint_bitcnt_t prec);
 void _mpf_vec_dot(mpf_t res, const mpf * vec1, const mpf * vec2, slong len2);
 
 void _mpf_vec_norm2(mpf_t res, const mpf * vec, slong len, flint_bitcnt_t prec);

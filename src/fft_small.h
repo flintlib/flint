@@ -47,8 +47,16 @@ FLINT_INLINE ulong n_next_pow2m1(ulong a)
     return a;
 }
 
-FLINT_INLINE ulong n_leading_zeros(ulong x) { return x == 0 ? FLINT_BITS : flint_clz(x); }
-FLINT_INLINE ulong n_trailing_zeros(ulong x) { return x == 0 ? FLINT_BITS : flint_ctz(x); }
+FLINT_INLINE
+ulong n_leading_zeros(ulong x)
+{
+    return x == 0 ? FLINT_BITS : flint_clz(x);
+}
+FLINT_INLINE
+ulong n_trailing_zeros(ulong x)
+{
+    return x == 0 ? FLINT_BITS : flint_ctz(x);
+}
 
 /*
     nbits is a mess
@@ -63,11 +71,27 @@ FLINT_INLINE ulong n_trailing_zeros(ulong x) { return x == 0 ? FLINT_BITS : flin
     assuming x != 0:
         on x86 we want BSR + 1
 */
-FLINT_INLINE ulong n_nbits(ulong x) { return (x == 0) ? 0 : FLINT_BITS - flint_clz(x); }
-FLINT_INLINE ulong n_nbits_nz(ulong x) { FLINT_ASSERT(x != 0); return (flint_clz(x) ^ (FLINT_BITS - 1)) + 1; }
+FLINT_INLINE
+ulong n_nbits(ulong x)
+{
+    return (x == 0) ? 0 : FLINT_BITS - flint_clz(x);
+}
+FLINT_INLINE
+ulong n_nbits_nz(ulong x)
+{
+    FLINT_ASSERT(x != 0); return (flint_clz(x) ^ (FLINT_BITS - 1)) + 1;
+}
 
-FLINT_INLINE ulong n_clog2(ulong x) { return (x <= 2) ? (x == 2) : FLINT_BITS - flint_clz(x - 1); }
-FLINT_INLINE ulong n_flog2(ulong x) { return (x <= 2) ? (x == 2) : FLINT_BITS - flint_clz(x); }
+FLINT_INLINE
+ulong n_clog2(ulong x)
+{
+    return (x <= 2) ? (x == 2) : FLINT_BITS - flint_clz(x - 1);
+}
+FLINT_INLINE
+ulong n_flog2(ulong x)
+{
+    return (x <= 2) ? (x == 2) : FLINT_BITS - flint_clz(x);
+}
 
 FLINT_INLINE slong z_min(slong a, slong b) { return FLINT_MIN(a, b); }
 FLINT_INLINE slong z_max(slong a, slong b) { return FLINT_MAX(a, b); }
@@ -160,16 +184,40 @@ typedef sd_fft_lctx_struct sd_fft_lctx_t[1];
     and stores in the fft (unspecified vec4d_load) need to support unaligned
     addresses.
 */
-FLINT_INLINE ulong sd_fft_ctx_blk_offset(ulong I) { return (I << LG_BLK_SZ) + 4*(I >> (BLK_SHIFT+2)); }
+FLINT_INLINE
+ulong sd_fft_ctx_blk_offset(ulong I)
+{
+    return (I << LG_BLK_SZ) + 4*(I >> (BLK_SHIFT+2));
+}
 
-FLINT_INLINE ulong sd_fft_ctx_data_size(ulong depth) { FLINT_ASSERT(depth >= LG_BLK_SZ); return sd_fft_ctx_blk_offset(n_pow2(depth - LG_BLK_SZ)); }
+FLINT_INLINE
+ulong sd_fft_ctx_data_size(ulong depth)
+{
+    FLINT_ASSERT(depth >= LG_BLK_SZ); return sd_fft_ctx_blk_offset(n_pow2(depth - LG_BLK_SZ));
+}
 
-FLINT_INLINE double * sd_fft_ctx_blk_index(double * d, ulong I) { return d + sd_fft_ctx_blk_offset(I); }
+FLINT_INLINE
+double * sd_fft_ctx_blk_index(double * d, ulong I)
+{
+    return d + sd_fft_ctx_blk_offset(I);
+}
 
-FLINT_INLINE double * sd_fft_lctx_blk_index(const sd_fft_lctx_t Q, ulong I) { return Q->data + sd_fft_ctx_blk_offset(I); }
+FLINT_INLINE
+double * sd_fft_lctx_blk_index(const sd_fft_lctx_t Q, ulong I)
+{
+    return Q->data + sd_fft_ctx_blk_offset(I);
+}
 
-FLINT_INLINE void sd_fft_ctx_set_index(double * d, ulong i, double x) { sd_fft_ctx_blk_index(d, i/BLK_SZ)[i%BLK_SZ] = x; }
-FLINT_INLINE double sd_fft_ctx_get_index(double * d, ulong i) { return sd_fft_ctx_blk_index(d, i/BLK_SZ)[i%BLK_SZ]; }
+FLINT_INLINE
+void sd_fft_ctx_set_index(double * d, ulong i, double x)
+{
+    sd_fft_ctx_blk_index(d, i/BLK_SZ)[i%BLK_SZ] = x;
+}
+FLINT_INLINE
+double sd_fft_ctx_get_index(double * d, ulong i)
+{
+    return sd_fft_ctx_blk_index(d, i/BLK_SZ)[i%BLK_SZ];
+}
 
 /* slightly-worse-than-bit-reversed order of sd_{i}fft_basecase_4 */
 FLINT_INLINE double sd_fft_ctx_get_fft_index(double * d, ulong i)
@@ -199,7 +247,11 @@ FLINT_INLINE void sd_fft_lctx_init(sd_fft_lctx_t L, sd_fft_ctx_t Q, ulong depth)
         L->w2tab[i] = Q->w2tab[i];
 }
 
-FLINT_INLINE void sd_fft_lctx_clear(sd_fft_lctx_t LQ, sd_fft_ctx_t Q) { /* empty */ }
+FLINT_INLINE
+void sd_fft_lctx_clear(sd_fft_lctx_t LQ, sd_fft_ctx_t Q)
+{
+    /* empty */
+}
 
 FLINT_DLL void sd_fft_lctx_point_mul(const sd_fft_lctx_t Q, double * a, const double * b, ulong m_, ulong depth);
 FLINT_DLL void sd_fft_lctx_point_sqr(const sd_fft_lctx_t Q, double * a, ulong m_, ulong depth);
@@ -292,14 +344,30 @@ FLINT_DLL void crt_data_init(crt_data_t C, ulong prime, ulong coeff_len, ulong n
 FLINT_DLL void crt_data_clear(crt_data_t C);
 
 /* return mpn of length C->coeff_len */
-FLINT_FORCE_INLINE ulong * _crt_data_co_prime(const crt_data_t C, ulong i, ulong n) { FLINT_ASSERT(i < C->nprimes); FLINT_ASSERT(n == C->coeff_len); return C->data + i * n; }
-FLINT_FORCE_INLINE ulong * crt_data_co_prime(const crt_data_t C, ulong i) { FLINT_ASSERT(i < C->nprimes); return C->data + i * C->coeff_len; }
+FLINT_FORCE_INLINE
+ulong * _crt_data_co_prime(const crt_data_t C, ulong i, ulong n)
+{
+    FLINT_ASSERT(i < C->nprimes); FLINT_ASSERT(n == C->coeff_len); return C->data + i * n;
+}
+FLINT_FORCE_INLINE
+ulong * crt_data_co_prime(const crt_data_t C, ulong i)
+{
+    FLINT_ASSERT(i < C->nprimes); return C->data + i * C->coeff_len;
+}
 
 /* return mpn of length C->coeff_len */
-FLINT_FORCE_INLINE ulong * crt_data_prod_primes(const crt_data_t C) { return C->data + C->nprimes * C->coeff_len; }
+FLINT_FORCE_INLINE
+ulong * crt_data_prod_primes(const crt_data_t C)
+{
+    return C->data + C->nprimes * C->coeff_len;
+}
 
 /* the reduction of co_prime mod the i^th prime */
-FLINT_FORCE_INLINE ulong * crt_data_co_prime_red(const crt_data_t C, ulong i) { FLINT_ASSERT(i < C->nprimes); return C->data + C->nprimes * C->coeff_len + C->coeff_len + i; }
+FLINT_FORCE_INLINE
+ulong * crt_data_co_prime_red(const crt_data_t C, ulong i)
+{
+    FLINT_ASSERT(i < C->nprimes); return C->data + C->nprimes * C->coeff_len + C->coeff_len + i;
+}
 
 typedef void (* to_ffts_func)(sd_fft_ctx_struct * Qffts, double * d, ulong dstride, const ulong * a_, ulong an_, ulong atrunc, const vec4d * two_pow, ulong start_easy, ulong stop_easy, ulong start_hard, ulong stop_hard);
 
@@ -345,7 +413,13 @@ typedef struct {
 
 typedef mpn_ctx_struct mpn_ctx_t[1];
 
-void _convert_block(ulong * Xs, sd_fft_ctx_struct * Rffts, double * d, ulong dstride, ulong np, ulong I);
+void _convert_block(
+    ulong * Xs,
+    sd_fft_ctx_struct * Rffts,
+    double * d,
+    ulong dstride,
+    ulong np,
+    ulong I);
 ulong flint_mpn_nbits(const ulong * a, ulong an);
 int flint_mpn_cmp_ui_2exp(const ulong * a, ulong an, ulong b, ulong e);
 unsigned char flint_mpn_add_inplace_c(ulong * z, ulong zn, ulong * a, ulong an, unsigned char cf);
@@ -353,12 +427,42 @@ unsigned char flint_mpn_add_inplace_c(ulong * z, ulong zn, ulong * a, ulong an, 
 void mpn_ctx_init(mpn_ctx_t R, ulong p);
 void mpn_ctx_clear(mpn_ctx_t R);
 void * mpn_ctx_fit_buffer(mpn_ctx_t R, ulong n);
-void mpn_ctx_mpn_mul(mpn_ctx_t R, ulong * z, const ulong * a, ulong an, const ulong * b, ulong bn);
+void mpn_ctx_mpn_mul(
+    mpn_ctx_t R,
+    ulong * z,
+    const ulong * a,
+    ulong an,
+    const ulong * b,
+    ulong bn);
 
-void _nmod_poly_divrem_mpn_ctx(ulong * q, ulong * r, const ulong * a, ulong an, const ulong * b, ulong bn, nmod_t mod, mpn_ctx_t R);
+void _nmod_poly_divrem_mpn_ctx(
+    ulong * q,
+    ulong * r,
+    const ulong * a,
+    ulong an,
+    const ulong * b,
+    ulong bn,
+    nmod_t mod,
+    mpn_ctx_t R);
 
-void _nmod_poly_mul_mid_classical(ulong * z, slong zl, slong zh, const ulong * a, slong an, const ulong * b, slong bn, nmod_t mod);
-void _nmod_poly_mul_mid(ulong * z, slong zl, slong zh, const ulong * a, slong an, const ulong * b, slong bn, nmod_t mod);
+void _nmod_poly_mul_mid_classical(
+    ulong * z,
+    slong zl,
+    slong zh,
+    const ulong * a,
+    slong an,
+    const ulong * b,
+    slong bn,
+    nmod_t mod);
+void _nmod_poly_mul_mid(
+    ulong * z,
+    slong zl,
+    slong zh,
+    const ulong * a,
+    slong an,
+    const ulong * b,
+    slong bn,
+    nmod_t mod);
 
 typedef struct
 {
@@ -372,10 +476,29 @@ typedef struct
     double * bbuf;
 } mul_precomp_struct;
 
-void _mul_precomp_init(mul_precomp_struct * M, const ulong * b, ulong bn, ulong btrunc, ulong depth, nmod_t mod, mpn_ctx_t R);
-FLINT_INLINE void _mul_precomp_clear(mul_precomp_struct * M) { flint_aligned_free(M->bbuf); }
+void _mul_precomp_init(
+    mul_precomp_struct * M,
+    const ulong * b,
+    ulong bn,
+    ulong btrunc,
+    ulong depth,
+    nmod_t mod,
+    mpn_ctx_t R);
+FLINT_INLINE
+void _mul_precomp_clear(mul_precomp_struct * M)
+{
+    flint_aligned_free(M->bbuf);
+}
 
-int _nmod_poly_mul_mid_precomp(ulong * z, ulong zl, ulong zh, const ulong * a, ulong an, mul_precomp_struct * M, nmod_t mod, mpn_ctx_t R);
+int _nmod_poly_mul_mid_precomp(
+    ulong * z,
+    ulong zl,
+    ulong zh,
+    const ulong * a,
+    ulong an,
+    mul_precomp_struct * M,
+    nmod_t mod,
+    mpn_ctx_t R);
 
 typedef struct
 {
@@ -383,20 +506,74 @@ typedef struct
     mul_precomp_struct rem_maker[1];
 } nmod_poly_divrem_precomp_struct;
 
-void _nmod_poly_divrem_precomp_init(nmod_poly_divrem_precomp_struct * M, const ulong * b, ulong bn, ulong Bn, nmod_t mod, mpn_ctx_t R);
-FLINT_INLINE void _nmod_poly_divrem_precomp_clear(nmod_poly_divrem_precomp_struct * M) { _mul_precomp_clear(M->quo_maker); _mul_precomp_clear(M->rem_maker); }
+void _nmod_poly_divrem_precomp_init(
+    nmod_poly_divrem_precomp_struct * M,
+    const ulong * b,
+    ulong bn,
+    ulong Bn,
+    nmod_t mod,
+    mpn_ctx_t R);
+FLINT_INLINE
+void _nmod_poly_divrem_precomp_clear(nmod_poly_divrem_precomp_struct * M)
+{
+    _mul_precomp_clear(M->quo_maker); _mul_precomp_clear(M->rem_maker);
+}
 
-int _nmod_poly_divrem_precomp(ulong * q, ulong * r, const ulong * a, ulong an, nmod_poly_divrem_precomp_struct * M, nmod_t mod, mpn_ctx_t R);
+int _nmod_poly_divrem_precomp(
+    ulong * q,
+    ulong * r,
+    const ulong * a,
+    ulong an,
+    nmod_poly_divrem_precomp_struct * M,
+    nmod_t mod,
+    mpn_ctx_t R);
 
 mpn_ctx_struct * get_default_mpn_ctx(void);
 
-void mpn_mul_default_mpn_ctx(mp_ptr r1, mp_srcptr i1, mp_size_t n1, mp_srcptr i2, mp_size_t n2);
+void mpn_mul_default_mpn_ctx(
+    mp_ptr r1,
+    mp_srcptr i1,
+    mp_size_t n1,
+    mp_srcptr i2,
+    mp_size_t n2);
 
-void _nmod_poly_mul_mid_mpn_ctx(ulong * z, ulong zl, ulong zh, const ulong * a, ulong an, const ulong * b, ulong bn, nmod_t mod, mpn_ctx_t R);
-int _fmpz_poly_mul_mid_mpn_ctx(fmpz * z, ulong zl, ulong zh, const fmpz * a, ulong an, const fmpz * b, ulong bn, mpn_ctx_t R);
+void _nmod_poly_mul_mid_mpn_ctx(
+    ulong * z,
+    ulong zl,
+    ulong zh,
+    const ulong * a,
+    ulong an,
+    const ulong * b,
+    ulong bn,
+    nmod_t mod,
+    mpn_ctx_t R);
+int _fmpz_poly_mul_mid_mpn_ctx(
+    fmpz * z,
+    ulong zl,
+    ulong zh,
+    const fmpz * a,
+    ulong an,
+    const fmpz * b,
+    ulong bn,
+    mpn_ctx_t R);
 
-void _nmod_poly_mul_mid_default_mpn_ctx(mp_ptr res, slong zl, slong zh, mp_srcptr a, slong an, mp_srcptr b, slong bn, nmod_t mod);
-int _fmpz_poly_mul_mid_default_mpn_ctx(fmpz * z, slong zl, slong zh, const fmpz * a, slong an, const fmpz * b, slong bn);
+void _nmod_poly_mul_mid_default_mpn_ctx(
+    mp_ptr res,
+    slong zl,
+    slong zh,
+    mp_srcptr a,
+    slong an,
+    mp_srcptr b,
+    slong bn,
+    nmod_t mod);
+int _fmpz_poly_mul_mid_default_mpn_ctx(
+    fmpz * z,
+    slong zl,
+    slong zh,
+    const fmpz * a,
+    slong an,
+    const fmpz * b,
+    slong bn);
 
 #ifdef __cplusplus
 }

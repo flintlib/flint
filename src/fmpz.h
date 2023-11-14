@@ -521,9 +521,25 @@ flint_bitcnt_t fmpz_popcnt(const fmpz_t c);
 
 /* Bit packing ***************************************************************/
 
-int fmpz_bit_pack(mp_ptr arr, flint_bitcnt_t shift, flint_bitcnt_t bits, const fmpz_t coeff, int negate, int borrow);
-int fmpz_bit_unpack(fmpz_t coeff, mp_srcptr arr, flint_bitcnt_t shift, flint_bitcnt_t bits, int negate, int borrow);
-void fmpz_bit_unpack_unsigned(fmpz_t coeff, mp_srcptr arr, flint_bitcnt_t shift, flint_bitcnt_t bits);
+int fmpz_bit_pack(
+    mp_ptr arr,
+    flint_bitcnt_t shift,
+    flint_bitcnt_t bits,
+    const fmpz_t coeff,
+    int negate,
+    int borrow);
+int fmpz_bit_unpack(
+    fmpz_t coeff,
+    mp_srcptr arr,
+    flint_bitcnt_t shift,
+    flint_bitcnt_t bits,
+    int negate,
+    int borrow);
+void fmpz_bit_unpack_unsigned(
+    fmpz_t coeff,
+    mp_srcptr arr,
+    flint_bitcnt_t shift,
+    flint_bitcnt_t bits);
 
 /* Modular arithmetic ********************************************************/
 
@@ -562,7 +578,13 @@ int fmpz_sqrtmod(fmpz_t b, const fmpz_t a, const fmpz_t p);
 void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong exp, const fmpz_t m);
 void fmpz_powm(fmpz_t f, const fmpz_t g, const fmpz_t e, const fmpz_t m);
 
-void fmpz_divides_mod_list(fmpz_t xstart, fmpz_t xstride, fmpz_t xlength, const fmpz_t a, const fmpz_t b, const fmpz_t n);
+void fmpz_divides_mod_list(
+    fmpz_t xstart,
+    fmpz_t xstride,
+    fmpz_t xlength,
+    const fmpz_t a,
+    const fmpz_t b,
+    const fmpz_t n);
 
 slong _fmpz_remove(fmpz_t x, const fmpz_t f, double finv);
 slong fmpz_remove(fmpz_t rop, const fmpz_t op, const fmpz_t f);
@@ -575,15 +597,29 @@ void fmpz_gcd3(fmpz_t f, const fmpz_t a, const fmpz_t b, const fmpz_t c);
 
 void fmpz_gcdinv(fmpz_t d, fmpz_t a, const fmpz_t f, const fmpz_t g);
 void fmpz_xgcd(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g);
-void fmpz_xgcd_canonical_bezout(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g);
+void fmpz_xgcd_canonical_bezout(
+    fmpz_t d,
+    fmpz_t a,
+    fmpz_t b,
+    const fmpz_t f,
+    const fmpz_t g);
 void fmpz_xgcd_partial(fmpz_t co2, fmpz_t co1, fmpz_t r2, fmpz_t r1, const fmpz_t L);
 
 void fmpz_lcm(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 /* preinvn *******************************************************************/
 
-void fmpz_fdiv_qr_preinvn(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h, const fmpz_preinvn_t inv);
-void fmpz_fdiv_r_preinvn(fmpz_t f, const fmpz_t g, const fmpz_t h, const fmpz_preinvn_t inv);
+void fmpz_fdiv_qr_preinvn(
+    fmpz_t f,
+    fmpz_t s,
+    const fmpz_t g,
+    const fmpz_t h,
+    const fmpz_preinvn_t inv);
+void fmpz_fdiv_r_preinvn(
+    fmpz_t f,
+    const fmpz_t g,
+    const fmpz_t h,
+    const fmpz_preinvn_t inv);
 
 void fmpz_preinvn_init(fmpz_preinvn_t inv, const fmpz_t f);
 void fmpz_preinvn_clear(fmpz_preinvn_t inv);
@@ -606,9 +642,30 @@ void fmpz_fib_ui(fmpz_t f, ulong n);
 
 /* crt ***********************************************************************/
 
-void _fmpz_CRT_ui_precomp(fmpz_t out, const fmpz_t r1, const fmpz_t m1, ulong r2, ulong m2, mp_limb_t m2inv, const fmpz_t m1m2, mp_limb_t c, int sign);
-void fmpz_CRT_ui(fmpz_t out, const fmpz_t r1, const fmpz_t m1, ulong r2, ulong m2, int sign);
-void fmpz_CRT(fmpz_t out, const fmpz_t r1, const fmpz_t m1, const fmpz_t r2, const fmpz_t m2, int sign);
+void _fmpz_CRT_ui_precomp(
+    fmpz_t out,
+    const fmpz_t r1,
+    const fmpz_t m1,
+    ulong r2,
+    ulong m2,
+    mp_limb_t m2inv,
+    const fmpz_t m1m2,
+    mp_limb_t c,
+    int sign);
+void fmpz_CRT_ui(
+    fmpz_t out,
+    const fmpz_t r1,
+    const fmpz_t m1,
+    ulong r2,
+    ulong m2,
+    int sign);
+void fmpz_CRT(
+    fmpz_t out,
+    const fmpz_t r1,
+    const fmpz_t m1,
+    const fmpz_t r2,
+    const fmpz_t m2,
+    int sign);
 
 /* multi CRT *****************************************************************/
 
@@ -640,10 +697,23 @@ typedef fmpz_multi_CRT_struct fmpz_multi_CRT_t[1];
 void fmpz_multi_CRT_init(fmpz_multi_CRT_t CRT);
 void fmpz_multi_CRT_clear(fmpz_multi_CRT_t P);
 
-void _fmpz_multi_CRT_precomp(fmpz * outputs, const fmpz_multi_CRT_t P, const fmpz * inputs, int sign);
-void fmpz_multi_CRT_precomp(fmpz_t output, const fmpz_multi_CRT_t P, const fmpz * inputs, int sign);
+void _fmpz_multi_CRT_precomp(
+    fmpz * outputs,
+    const fmpz_multi_CRT_t P,
+    const fmpz * inputs,
+    int sign);
+void fmpz_multi_CRT_precomp(
+    fmpz_t output,
+    const fmpz_multi_CRT_t P,
+    const fmpz * inputs,
+    int sign);
 int fmpz_multi_CRT_precompute(fmpz_multi_CRT_t CRT, const fmpz * moduli, slong len);
-int fmpz_multi_CRT(fmpz_t output, const fmpz * moduli, const fmpz * values, slong len, int sign);
+int fmpz_multi_CRT(
+    fmpz_t output,
+    const fmpz * moduli,
+    const fmpz * values,
+    slong len,
+    int sign);
 
 /* multi mod *****************************************************************/
 
@@ -675,8 +745,17 @@ void fmpz_multi_mod_clear(fmpz_multi_mod_t P);
 
 int fmpz_multi_mod_precompute(fmpz_multi_mod_t P, const fmpz * f, slong r);
 
-void _fmpz_multi_mod_precomp(fmpz * outputs, const fmpz_multi_mod_t P, const fmpz_t input, int sign, fmpz * tmp);
-void fmpz_multi_mod_precomp(fmpz * outputs, const fmpz_multi_mod_t P, const fmpz_t input, int sign);
+void _fmpz_multi_mod_precomp(
+    fmpz * outputs,
+    const fmpz_multi_mod_t P,
+    const fmpz_t input,
+    int sign,
+    fmpz * tmp);
+void fmpz_multi_mod_precomp(
+    fmpz * outputs,
+    const fmpz_multi_mod_t P,
+    const fmpz_t input,
+    int sign);
 
 /* multi mod/multi CRT ui ****************************************************/
 
@@ -723,18 +802,70 @@ void fmpz_comb_temp_clear(fmpz_comb_temp_t CT);
 void fmpz_comb_init(fmpz_comb_t C, mp_srcptr primes, slong num_primes);
 void fmpz_comb_clear(fmpz_comb_t C);
 
-void fmpz_multi_mod_ui(mp_limb_t * out, const fmpz_t in, const fmpz_comb_t C, fmpz_comb_temp_t CT);
-void fmpz_multi_CRT_ui(fmpz_t output, mp_srcptr residues, const fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign);
+void fmpz_multi_mod_ui(
+    mp_limb_t * out,
+    const fmpz_t in,
+    const fmpz_comb_t C,
+    fmpz_comb_temp_t CT);
+void fmpz_multi_CRT_ui(
+    fmpz_t output,
+    mp_srcptr residues,
+    const fmpz_comb_t comb,
+    fmpz_comb_temp_t temp,
+    int sign);
 
 /*****************************************************************************/
 
-void fmpz_lucas_chain(fmpz_t Vm, fmpz_t Vm1, const fmpz_t A, const fmpz_t m, const fmpz_t n);
-void fmpz_lucas_chain_full(fmpz_t Vm, fmpz_t Vm1, const fmpz_t A, const fmpz_t B, const fmpz_t m, const fmpz_t n);
-void fmpz_lucas_chain_double(fmpz_t U2m, fmpz_t U2m1, const fmpz_t Um, const fmpz_t Um1, const fmpz_t A, const fmpz_t B, const fmpz_t n);
+void fmpz_lucas_chain(
+    fmpz_t Vm,
+    fmpz_t Vm1,
+    const fmpz_t A,
+    const fmpz_t m,
+    const fmpz_t n);
+void fmpz_lucas_chain_full(
+    fmpz_t Vm,
+    fmpz_t Vm1,
+    const fmpz_t A,
+    const fmpz_t B,
+    const fmpz_t m,
+    const fmpz_t n);
+void fmpz_lucas_chain_double(
+    fmpz_t U2m,
+    fmpz_t U2m1,
+    const fmpz_t Um,
+    const fmpz_t Um1,
+    const fmpz_t A,
+    const fmpz_t B,
+    const fmpz_t n);
 
-void fmpz_lucas_chain_add(fmpz_t Umn, fmpz_t Umn1, const fmpz_t Um, const fmpz_t Um1, const fmpz_t Un, const fmpz_t Un1, const fmpz_t A, const fmpz_t B, const fmpz_t n);
-void fmpz_lucas_chain_mul(fmpz_t Ukm, fmpz_t Ukm1, const fmpz_t Um, const fmpz_t Um1, const fmpz_t A, const fmpz_t B, const fmpz_t k, const fmpz_t n);
-void fmpz_lucas_chain_VtoU(fmpz_t Um, fmpz_t Um1, const fmpz_t Vm, const fmpz_t Vm1, const fmpz_t A, const fmpz_t B, const fmpz_t Dinv, const fmpz_t n);
+void fmpz_lucas_chain_add(
+    fmpz_t Umn,
+    fmpz_t Umn1,
+    const fmpz_t Um,
+    const fmpz_t Um1,
+    const fmpz_t Un,
+    const fmpz_t Un1,
+    const fmpz_t A,
+    const fmpz_t B,
+    const fmpz_t n);
+void fmpz_lucas_chain_mul(
+    fmpz_t Ukm,
+    fmpz_t Ukm1,
+    const fmpz_t Um,
+    const fmpz_t Um1,
+    const fmpz_t A,
+    const fmpz_t B,
+    const fmpz_t k,
+    const fmpz_t n);
+void fmpz_lucas_chain_VtoU(
+    fmpz_t Um,
+    fmpz_t Um1,
+    const fmpz_t Vm,
+    const fmpz_t Vm1,
+    const fmpz_t A,
+    const fmpz_t B,
+    const fmpz_t Dinv,
+    const fmpz_t n);
 
 int fmpz_is_probabprime_lucas(const fmpz_t n);
 int fmpz_is_probabprime_BPSW(const fmpz_t n);
@@ -742,8 +873,18 @@ int fmpz_is_probabprime(const fmpz_t p);
 int fmpz_is_strong_probabprime(const fmpz_t n, const fmpz_t a);
 
 int fmpz_is_prime_pseudosquare(const fmpz_t n);
-int fmpz_is_prime_pocklington(fmpz_t F, fmpz_t R, const fmpz_t n, mp_ptr pm1, slong num_pm1);
-int fmpz_is_prime_morrison(fmpz_t F, fmpz_t R, const fmpz_t n, mp_ptr pm1, slong num_pm1);
+int fmpz_is_prime_pocklington(
+    fmpz_t F,
+    fmpz_t R,
+    const fmpz_t n,
+    mp_ptr pm1,
+    slong num_pm1);
+int fmpz_is_prime_morrison(
+    fmpz_t F,
+    fmpz_t R,
+    const fmpz_t n,
+    mp_ptr pm1,
+    slong num_pm1);
 int fmpz_is_prime(const fmpz_t p);
 
 void fmpz_nextprime(fmpz_t res, const fmpz_t n, int proved);
@@ -751,7 +892,11 @@ void fmpz_nextprime(fmpz_t res, const fmpz_t n, int proved);
 void _fmpz_nm1_trial_factors(const fmpz_t n, mp_ptr pm1, slong * num_pm1, ulong limit);
 void _fmpz_np1_trial_factors(const fmpz_t n, mp_ptr pp1, slong * num_pp1, ulong limit);
 
-int fmpz_divisor_in_residue_class_lenstra(fmpz_t fac, const fmpz_t n, const fmpz_t r, const fmpz_t s);
+int fmpz_divisor_in_residue_class_lenstra(
+    fmpz_t fac,
+    const fmpz_t n,
+    const fmpz_t r,
+    const fmpz_t s);
 
 /* Primorial *****************************************************************/
 

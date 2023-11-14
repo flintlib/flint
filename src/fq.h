@@ -33,15 +33,27 @@ extern "C" {
 void fq_ctx_init(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var);
 int _fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var);
 void fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var);
-void fq_ctx_init_modulus(fq_ctx_t ctx, const fmpz_mod_poly_t modulus, const fmpz_mod_ctx_t ctxp, const char *var);
+void fq_ctx_init_modulus(
+    fq_ctx_t ctx,
+    const fmpz_mod_poly_t modulus,
+    const fmpz_mod_ctx_t ctxp,
+    const char *var);
 
 void fq_ctx_clear(fq_ctx_t ctx);
 
 void fq_ctx_randtest(fq_ctx_t ctx, flint_rand_t state);
 void fq_ctx_randtest_reducible(fq_ctx_t ctx, flint_rand_t state);
 
-FQ_INLINE const fmpz_mod_poly_struct * fq_ctx_modulus(const fq_ctx_t ctx) { return ctx->modulus; }
-FQ_INLINE slong fq_ctx_degree(const fq_ctx_t ctx) { return ctx->modulus->length - 1; }
+FQ_INLINE
+const fmpz_mod_poly_struct * fq_ctx_modulus(const fq_ctx_t ctx)
+{
+    return ctx->modulus;
+}
+FQ_INLINE
+slong fq_ctx_degree(const fq_ctx_t ctx)
+{
+    return ctx->modulus->length - 1;
+}
 const fmpz * fq_ctx_prime(const fq_ctx_t ctx);
 void fq_ctx_order(fmpz_t f, const fq_ctx_t ctx);
 
@@ -155,7 +167,11 @@ void fq_norm(fmpz_t rop, const fq_t op, const fq_ctx_t ctx);
 /* Bit packing ******************************************************/
 
 void fq_bit_pack(fmpz_t f, const fq_t op, flint_bitcnt_t bit_size, const fq_ctx_t ctx);
-void fq_bit_unpack(fq_t rop, const fmpz_t f, flint_bitcnt_t bit_size, const fq_ctx_t ctx);
+void fq_bit_unpack(
+    fq_t rop,
+    const fmpz_t f,
+    flint_bitcnt_t bit_size,
+    const fq_ctx_t ctx);
 
 /* Inlines *******************************************************************/
 

@@ -62,7 +62,12 @@ double flint_mpn_get_d(mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp);
 
 #define FLINT_MPN_MUL_THRESHOLD 400
 
-mp_limb_t flint_mpn_mul_large(mp_ptr r1, mp_srcptr i1, mp_size_t n1, mp_srcptr i2, mp_size_t n2);
+mp_limb_t flint_mpn_mul_large(
+    mp_ptr r1,
+    mp_srcptr i1,
+    mp_size_t n1,
+    mp_srcptr i2,
+    mp_size_t n2);
 
 MPN_EXTRAS_INLINE
 mp_limb_t flint_mpn_mul(mp_ptr z, mp_srcptr x, mp_size_t xn, mp_srcptr y, mp_size_t yn)
@@ -145,7 +150,11 @@ void flint_mpn_sqr(mp_ptr z, mp_srcptr x, mp_size_t n)
 # define mpn_modexact_1_odd __gmpn_modexact_1_odd
 
 mp_limb_t mpn_modexact_1_odd(mp_srcptr, mp_size_t, mp_limb_t);
-MPN_EXTRAS_INLINE int flint_mpn_divisible_1_odd(mp_srcptr x, mp_size_t xsize, mp_limb_t d) { return mpn_modexact_1_odd(x, xsize, d) == 0; }
+MPN_EXTRAS_INLINE
+int flint_mpn_divisible_1_odd(mp_srcptr x, mp_size_t xsize, mp_limb_t d)
+{
+    return mpn_modexact_1_odd(x, xsize, d) == 0;
+}
 
 #else
 # include "gmpcompat.h"
@@ -194,22 +203,60 @@ void flint_mpn_debug(mp_srcptr x, mp_size_t xsize);
 
 mp_size_t flint_mpn_remove_2exp(mp_ptr x, mp_size_t xsize, flint_bitcnt_t *bits);
 
-mp_size_t flint_mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize, mp_ptr p, mp_size_t psize, ulong *exp);
+mp_size_t flint_mpn_remove_power_ascending(
+    mp_ptr x,
+    mp_size_t xsize,
+    mp_ptr p,
+    mp_size_t psize,
+    ulong *exp);
 
 int flint_mpn_factor_trial(mp_srcptr x, mp_size_t xsize, slong start, slong stop);
 
-int flint_mpn_factor_trial_tree(slong * factors, mp_srcptr x, mp_size_t xsize, slong num_primes);
+int flint_mpn_factor_trial_tree(
+    slong * factors,
+    mp_srcptr x,
+    mp_size_t xsize,
+    slong num_primes);
 
-mp_size_t flint_mpn_fmms1(mp_ptr y, mp_limb_t a1, mp_srcptr x1, mp_limb_t a2, mp_srcptr x2, mp_size_t n);
+mp_size_t flint_mpn_fmms1(
+    mp_ptr y,
+    mp_limb_t a1,
+    mp_srcptr x1,
+    mp_limb_t a2,
+    mp_srcptr x2,
+    mp_size_t n);
 
-int flint_mpn_divides(mp_ptr q, mp_srcptr array1, mp_size_t limbs1, mp_srcptr arrayg, mp_size_t limbsg, mp_ptr temp);
+int flint_mpn_divides(
+    mp_ptr q,
+    mp_srcptr array1,
+    mp_size_t limbs1,
+    mp_srcptr arrayg,
+    mp_size_t limbsg,
+    mp_ptr temp);
 
-mp_size_t flint_mpn_gcd_full2(mp_ptr arrayg, mp_srcptr array1, mp_size_t limbs1, mp_srcptr array2, mp_size_t limbs2, mp_ptr temp);
-mp_size_t flint_mpn_gcd_full(mp_ptr arrayg, mp_srcptr array1, mp_size_t limbs1, mp_srcptr array2, mp_size_t limbs2);
+mp_size_t flint_mpn_gcd_full2(
+    mp_ptr arrayg,
+    mp_srcptr array1,
+    mp_size_t limbs1,
+    mp_srcptr array2,
+    mp_size_t limbs2,
+    mp_ptr temp);
+mp_size_t flint_mpn_gcd_full(
+    mp_ptr arrayg,
+    mp_srcptr array1,
+    mp_size_t limbs1,
+    mp_srcptr array2,
+    mp_size_t limbs2);
 
 mp_limb_t flint_mpn_preinv1(mp_limb_t d, mp_limb_t d2);
 
-mp_limb_t flint_mpn_divrem_preinv1(mp_ptr q, mp_ptr a, mp_size_t m, mp_srcptr b, mp_size_t n, mp_limb_t dinv);
+mp_limb_t flint_mpn_divrem_preinv1(
+    mp_ptr q,
+    mp_ptr a,
+    mp_size_t m,
+    mp_srcptr b,
+    mp_size_t n,
+    mp_limb_t dinv);
 
 #define flint_mpn_divrem21_preinv(q, a_hi, a_lo, dinv) \
    do { \
@@ -220,15 +267,48 @@ mp_limb_t flint_mpn_divrem_preinv1(mp_ptr q, mp_ptr a, mp_size_t m, mp_srcptr b,
       add_ssaaaa((q), __q2, (q), __q2, (a_hi), (a_lo)); \
    } while (0)
 
-void flint_mpn_mulmod_preinv1(mp_ptr r, mp_srcptr a, mp_srcptr b, mp_size_t n, mp_srcptr d, mp_limb_t dinv, ulong norm);
-void flint_mpn_mulmod_preinvn(mp_ptr r, mp_srcptr a, mp_srcptr b, mp_size_t n, mp_srcptr d, mp_srcptr dinv, ulong norm);
-int flint_mpn_mulmod_2expp1_basecase(mp_ptr xp, mp_srcptr yp, mp_srcptr zp, int c, flint_bitcnt_t b, mp_ptr tp);
+void flint_mpn_mulmod_preinv1(
+    mp_ptr r,
+    mp_srcptr a,
+    mp_srcptr b,
+    mp_size_t n,
+    mp_srcptr d,
+    mp_limb_t dinv,
+    ulong norm);
+void flint_mpn_mulmod_preinvn(
+    mp_ptr r,
+    mp_srcptr a,
+    mp_srcptr b,
+    mp_size_t n,
+    mp_srcptr d,
+    mp_srcptr dinv,
+    ulong norm);
+int flint_mpn_mulmod_2expp1_basecase(
+    mp_ptr xp,
+    mp_srcptr yp,
+    mp_srcptr zp,
+    int c,
+    flint_bitcnt_t b,
+    mp_ptr tp);
 
 void flint_mpn_preinvn(mp_ptr dinv, mp_srcptr d, mp_size_t n);
 
-void flint_mpn_mod_preinvn(mp_ptr r, mp_srcptr a, mp_size_t m, mp_srcptr d, mp_size_t n, mp_srcptr dinv);
+void flint_mpn_mod_preinvn(
+    mp_ptr r,
+    mp_srcptr a,
+    mp_size_t m,
+    mp_srcptr d,
+    mp_size_t n,
+    mp_srcptr dinv);
 
-mp_limb_t flint_mpn_divrem_preinvn(mp_ptr q, mp_ptr r, mp_srcptr a, mp_size_t m, mp_srcptr d, mp_size_t n, mp_srcptr dinv);
+mp_limb_t flint_mpn_divrem_preinvn(
+    mp_ptr q,
+    mp_ptr r,
+    mp_srcptr a,
+    mp_size_t m,
+    mp_srcptr d,
+    mp_size_t n,
+    mp_srcptr dinv);
 
 MPN_EXTRAS_INLINE
 void flint_mpn_rrandom(mp_limb_t *rp, gmp_randstate_t state, mp_size_t n)

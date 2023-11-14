@@ -70,14 +70,27 @@ void nmod_poly_factor_concat(nmod_poly_factor_t res, const nmod_poly_factor_t fa
 
 void nmod_poly_factor_pow(nmod_poly_factor_t fac, slong exp);
 
-void nmod_poly_factor_equal_deg(nmod_poly_factor_t factors, const nmod_poly_t pol, slong d);
-int nmod_poly_factor_equal_deg_prob(nmod_poly_t factor, flint_rand_t state, const nmod_poly_t pol, slong d);
+void nmod_poly_factor_equal_deg(
+    nmod_poly_factor_t factors,
+    const nmod_poly_t pol,
+    slong d);
+int nmod_poly_factor_equal_deg_prob(
+    nmod_poly_t factor,
+    flint_rand_t state,
+    const nmod_poly_t pol,
+    slong d);
 
-void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res, const nmod_poly_t poly, slong * const *degs);
+void nmod_poly_factor_distinct_deg(
+    nmod_poly_factor_t res,
+    const nmod_poly_t poly,
+    slong * const *degs);
 
 ulong nmod_poly_remove(nmod_poly_t f, const nmod_poly_t p);
 
-void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res, const nmod_poly_t poly, slong * const *degs);
+void nmod_poly_factor_distinct_deg_threaded(
+    nmod_poly_factor_t res,
+    const nmod_poly_t poly,
+    slong * const *degs);
 
 int nmod_poly_is_irreducible(const nmod_poly_t f);
 int nmod_poly_is_irreducible_rabin(const nmod_poly_t f);
@@ -101,7 +114,11 @@ void _nmod_poly_interval_poly_worker(void* arg_ptr);
 /* Roots *********************************************************************/
 
 void nmod_poly_roots(nmod_poly_factor_t r, const nmod_poly_t f, int with_multiplicity);
-int nmod_poly_roots_factored(nmod_poly_factor_t r, const nmod_poly_t f, int with_multiplicity, const n_factor_t * n);
+int nmod_poly_roots_factored(
+    nmod_poly_factor_t r,
+    const nmod_poly_t f,
+    int with_multiplicity,
+    const n_factor_t * n);
 
 #ifdef __cplusplus
 }

@@ -164,10 +164,17 @@ char * fmpq_mpoly_get_str_pretty(const fmpq_mpoly_t A,
                                   const char ** x, const fmpq_mpoly_ctx_t ctx);
 
 #ifdef FLINT_HAVE_FILE
-int fmpq_mpoly_fprint_pretty(FILE * file, const fmpq_mpoly_t A, const char ** x, const fmpq_mpoly_ctx_t ctx);
+int fmpq_mpoly_fprint_pretty(
+    FILE * file,
+    const fmpq_mpoly_t A,
+    const char ** x,
+    const fmpq_mpoly_ctx_t ctx);
 #endif
 
-int fmpq_mpoly_print_pretty(const fmpq_mpoly_t A, const char ** x, const fmpq_mpoly_ctx_t ctx);
+int fmpq_mpoly_print_pretty(
+    const fmpq_mpoly_t A,
+    const char ** x,
+    const fmpq_mpoly_ctx_t ctx);
 
 /*  Basic manipulation *******************************************************/
 
@@ -873,7 +880,10 @@ void fmpq_mpoly_univar_swap_term_coeff(fmpq_mpoly_t c,
 
 ******************************************************************************/
 
-void fmpq_mpoly_remainder_test(const fmpq_mpoly_t r, const fmpq_mpoly_t g, const fmpq_mpoly_ctx_t ctx);
+void fmpq_mpoly_remainder_test(
+    const fmpq_mpoly_t r,
+    const fmpq_mpoly_t g,
+    const fmpq_mpoly_ctx_t ctx);
 
 #ifdef __cplusplus
 }

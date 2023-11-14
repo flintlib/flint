@@ -340,7 +340,12 @@ void fq_default_mat_entry_set(fq_default_mat_t mat, slong i, slong j, const fq_d
     }
 }
 
-void fq_default_mat_entry_set_fmpz(fq_default_mat_t mat, slong i, slong j, const fmpz_t x, const fq_default_ctx_t ctx);
+void fq_default_mat_entry_set_fmpz(
+    fq_default_mat_t mat,
+    slong i,
+    slong j,
+    const fmpz_t x,
+    const fq_default_ctx_t ctx);
 
 FQ_DEFAULT_MAT_INLINE
 slong fq_default_mat_nrows(const fq_default_mat_t mat, const fq_default_ctx_t ctx)
@@ -737,8 +742,14 @@ void fq_default_mat_concat_vertical(fq_default_mat_t res, const fq_default_mat_t
 /* Input and output  *********************************************************/
 
 #ifdef FLINT_HAVE_FILE
-int fq_default_mat_fprint(FILE * file, const fq_default_mat_t mat, const fq_default_ctx_t ctx);
-int fq_default_mat_fprint_pretty(FILE * file, const fq_default_mat_t mat, const fq_default_ctx_t ctx);
+int fq_default_mat_fprint(
+    FILE * file,
+    const fq_default_mat_t mat,
+    const fq_default_ctx_t ctx);
+int fq_default_mat_fprint_pretty(
+    FILE * file,
+    const fq_default_mat_t mat,
+    const fq_default_ctx_t ctx);
 #endif
 
 int fq_default_mat_print(const fq_default_mat_t mat, const fq_default_ctx_t ctx);

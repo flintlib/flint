@@ -37,7 +37,11 @@ typedef struct
 
 typedef mpf_mat_struct mpf_mat_t[1];
 
-MPF_MAT_INLINE mpf * mpf_mat_entry(const mpf_mat_t mat, slong i, slong j) { return mat->rows[i] + j; }
+MPF_MAT_INLINE
+mpf * mpf_mat_entry(const mpf_mat_t mat, slong i, slong j)
+{
+    return mat->rows[i] + j;
+}
 
 MPF_MAT_INLINE slong mpf_mat_nrows(const mpf_mat_t mat) { return mat->r; }
 MPF_MAT_INLINE slong mpf_mat_ncols(const mpf_mat_t mat) { return mat->c; }
@@ -62,12 +66,23 @@ mpf_mat_swap_entrywise(mpf_mat_t mat1, mpf_mat_t mat2)
 void mpf_mat_set(mpf_mat_t mat1, const mpf_mat_t mat2);
 
 int mpf_mat_equal(const mpf_mat_t mat1, const mpf_mat_t mat2);
-int mpf_mat_approx_equal(const mpf_mat_t mat1, const mpf_mat_t mat2, flint_bitcnt_t bits);
+int mpf_mat_approx_equal(
+    const mpf_mat_t mat1,
+    const mpf_mat_t mat2,
+    flint_bitcnt_t bits);
 
 int mpf_mat_is_zero(const mpf_mat_t mat);
 
-MPF_MAT_INLINE int mpf_mat_is_empty(const mpf_mat_t mat) { return mat->r == 0 || mat->c == 0; }
-MPF_MAT_INLINE int mpf_mat_is_square(const mpf_mat_t mat) { return mat->r == mat->c; }
+MPF_MAT_INLINE
+int mpf_mat_is_empty(const mpf_mat_t mat)
+{
+    return mat->r == 0 || mat->c == 0;
+}
+MPF_MAT_INLINE
+int mpf_mat_is_square(const mpf_mat_t mat)
+{
+    return mat->r == mat->c;
+}
 
 void mpf_mat_zero(mpf_mat_t mat);
 void mpf_mat_one(mpf_mat_t mat);

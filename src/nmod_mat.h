@@ -81,11 +81,23 @@ nmod_mat_swap_entrywise(nmod_mat_t mat1, nmod_mat_t mat2)
 
 /* Windows and concatenation */
 
-void nmod_mat_window_init(nmod_mat_t window, const nmod_mat_t mat, slong r1, slong c1, slong r2, slong c2);
+void nmod_mat_window_init(
+    nmod_mat_t window,
+    const nmod_mat_t mat,
+    slong r1,
+    slong c1,
+    slong r2,
+    slong c2);
 void nmod_mat_window_clear(nmod_mat_t window);
 
-void nmod_mat_concat_horizontal(nmod_mat_t res, const nmod_mat_t mat1, const nmod_mat_t mat2);
-void nmod_mat_concat_vertical(nmod_mat_t res, const nmod_mat_t mat1, const nmod_mat_t mat2);
+void nmod_mat_concat_horizontal(
+    nmod_mat_t res,
+    const nmod_mat_t mat1,
+    const nmod_mat_t mat2);
+void nmod_mat_concat_vertical(
+    nmod_mat_t res,
+    const nmod_mat_t mat1,
+    const nmod_mat_t mat2);
 
 /* Random matrix generation */
 void nmod_mat_randtest(nmod_mat_t mat, flint_rand_t state);
@@ -135,7 +147,11 @@ void nmod_mat_neg(nmod_mat_t B, const nmod_mat_t A);
 /* Matrix-scalar arithmetic */
 
 void nmod_mat_scalar_mul(nmod_mat_t B, const nmod_mat_t A, mp_limb_t c);
-void nmod_mat_scalar_addmul_ui(nmod_mat_t dest, const nmod_mat_t X, const nmod_mat_t Y, const mp_limb_t b);
+void nmod_mat_scalar_addmul_ui(
+    nmod_mat_t dest,
+    const nmod_mat_t X,
+    const nmod_mat_t Y,
+    const mp_limb_t b);
 void nmod_mat_scalar_mul_fmpz(nmod_mat_t res, const nmod_mat_t M, const fmpz_t c);
 
 /* Matrix multiplication */
@@ -149,18 +165,50 @@ _nmod_mat_mul_classical_threaded_pool_op(nmod_mat_t D, const nmod_mat_t C,
 		            const nmod_mat_t A, const nmod_mat_t B, int op,
 			      thread_pool_handle * threads, slong num_threads);
 
-void nmod_mat_mul_classical_threaded(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
+void nmod_mat_mul_classical_threaded(
+    nmod_mat_t C,
+    const nmod_mat_t A,
+    const nmod_mat_t B);
 void nmod_mat_mul_strassen(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
-void _nmod_mat_mul_classical_op(nmod_mat_t D, const nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, int op);
+void _nmod_mat_mul_classical_op(
+    nmod_mat_t D,
+    const nmod_mat_t C,
+    const nmod_mat_t A,
+    const nmod_mat_t B,
+    int op);
 
-void nmod_mat_addmul(nmod_mat_t D, const nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
-void nmod_mat_submul(nmod_mat_t D, const nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
+void nmod_mat_addmul(
+    nmod_mat_t D,
+    const nmod_mat_t C,
+    const nmod_mat_t A,
+    const nmod_mat_t B);
+void nmod_mat_submul(
+    nmod_mat_t D,
+    const nmod_mat_t C,
+    const nmod_mat_t A,
+    const nmod_mat_t B);
 
-void nmod_mat_mul_nmod_vec(mp_limb_t * c, const nmod_mat_t A, const mp_limb_t * b, slong blen);
-void nmod_mat_mul_nmod_vec_ptr(mp_limb_t * const * c, const nmod_mat_t A, const mp_limb_t * const * b, slong blen);
+void nmod_mat_mul_nmod_vec(
+    mp_limb_t * c,
+    const nmod_mat_t A,
+    const mp_limb_t * b,
+    slong blen);
+void nmod_mat_mul_nmod_vec_ptr(
+    mp_limb_t * const * c,
+    const nmod_mat_t A,
+    const mp_limb_t * const * b,
+    slong blen);
 
-void nmod_mat_nmod_vec_mul(mp_limb_t * c, const mp_limb_t * a, slong alen, const nmod_mat_t B);
-void nmod_mat_nmod_vec_mul_ptr(mp_limb_t * const * c, const mp_limb_t * const * a, slong alen, const nmod_mat_t B);
+void nmod_mat_nmod_vec_mul(
+    mp_limb_t * c,
+    const mp_limb_t * a,
+    slong alen,
+    const nmod_mat_t B);
+void nmod_mat_nmod_vec_mul_ptr(
+    mp_limb_t * const * c,
+    const mp_limb_t * const * a,
+    slong alen,
+    const nmod_mat_t B);
 
 /* Exponent */
 
@@ -249,12 +297,28 @@ void nmod_mat_permute_rows(nmod_mat_t mat, const slong * perm_act, slong * perm_
 /* Triangular solving */
 
 void nmod_mat_solve_tril(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t B, int unit);
-void nmod_mat_solve_tril_recursive(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t B, int unit);
-void nmod_mat_solve_tril_classical(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t B, int unit);
+void nmod_mat_solve_tril_recursive(
+    nmod_mat_t X,
+    const nmod_mat_t L,
+    const nmod_mat_t B,
+    int unit);
+void nmod_mat_solve_tril_classical(
+    nmod_mat_t X,
+    const nmod_mat_t L,
+    const nmod_mat_t B,
+    int unit);
 
 void nmod_mat_solve_triu(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, int unit);
-void nmod_mat_solve_triu_recursive(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, int unit);
-void nmod_mat_solve_triu_classical(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, int unit);
+void nmod_mat_solve_triu_recursive(
+    nmod_mat_t X,
+    const nmod_mat_t U,
+    const nmod_mat_t B,
+    int unit);
+void nmod_mat_solve_triu_classical(
+    nmod_mat_t X,
+    const nmod_mat_t U,
+    const nmod_mat_t B,
+    int unit);
 
 /* LU decomposition */
 

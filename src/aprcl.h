@@ -107,8 +107,17 @@ primality_test_status _aprcl_is_prime_jacobi(const fmpz_t n, const aprcl_config 
 
 slong _aprcl_is_prime_jacobi_check_pk(const unity_zp j, const fmpz_t u, ulong v);
 slong _aprcl_is_prime_jacobi_check_21(ulong q, const fmpz_t n);
-slong _aprcl_is_prime_jacobi_check_22(const unity_zp j, const fmpz_t u, ulong v, ulong q);
-slong _aprcl_is_prime_jacobi_check_2k(const unity_zp j, const unity_zp j2_1, const unity_zp j2_2, const fmpz_t u, ulong v);
+slong _aprcl_is_prime_jacobi_check_22(
+    const unity_zp j,
+    const fmpz_t u,
+    ulong v,
+    ulong q);
+slong _aprcl_is_prime_jacobi_check_2k(
+    const unity_zp j,
+    const unity_zp j2_1,
+    const unity_zp j2_2,
+    const fmpz_t u,
+    ulong v);
 
 int _aprcl_is_prime_jacobi_additional_test(const fmpz_t n, ulong p);
 
@@ -204,7 +213,14 @@ mp_ptr aprcl_f_table(const ulong q);
 
 void unity_zp_jacobi_sum_2q_one(unity_zp f, ulong q);
 void unity_zp_jacobi_sum_2q_two(unity_zp f, ulong q);
-void _unity_zp_jacobi_sum_pq_general(unity_zp f, const mp_ptr table, ulong p, ulong q, ulong k, ulong a, ulong b);
+void _unity_zp_jacobi_sum_pq_general(
+    unity_zp f,
+    const mp_ptr table,
+    ulong p,
+    ulong q,
+    ulong k,
+    ulong a,
+    ulong b);
 void unity_zp_jacobi_sum_pq(unity_zp f, ulong q, ulong p);
 
 

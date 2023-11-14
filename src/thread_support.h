@@ -42,7 +42,19 @@ typedef void (* bsplit_basecase_func_t)(void *, slong, slong, void *);
 typedef void (* bsplit_init_func_t)(void *, void *);
 typedef void (* bsplit_clear_func_t)(void *, void *);
 
-void flint_parallel_binary_splitting(void * res, bsplit_basecase_func_t basecase, bsplit_merge_func_t merge, size_t sizeof_res, bsplit_init_func_t init, bsplit_clear_func_t clear, void * args, slong a, slong b, slong basecase_cutoff, int thread_limit, int flags);
+void flint_parallel_binary_splitting(
+    void * res,
+    bsplit_basecase_func_t basecase,
+    bsplit_merge_func_t merge,
+    size_t sizeof_res,
+    bsplit_init_func_t init,
+    bsplit_clear_func_t clear,
+    void * args,
+    slong a,
+    slong b,
+    slong basecase_cutoff,
+    int thread_limit,
+    int flags);
 
 #ifdef __cplusplus
 }

@@ -36,6 +36,10 @@ int FQ_NMOD_POLY_ITERATED_FROBENIUS_CUTOFF(const fq_nmod_ctx_t ctx, slong length
 
 /* Inlines *******************************************************************/
 
-void fq_nmod_poly_factor_get_poly(fq_nmod_poly_t z, const fq_nmod_poly_factor_t fac, slong i, const fq_nmod_ctx_t ctx);
+void fq_nmod_poly_factor_get_poly(
+    fq_nmod_poly_t z,
+    const fq_nmod_poly_factor_t fac,
+    slong i,
+    const fq_nmod_ctx_t ctx);
 
 #endif

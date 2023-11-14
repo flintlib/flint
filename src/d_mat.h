@@ -38,8 +38,16 @@ typedef d_mat_struct d_mat_t[1];
 
 #define d_mat_entry(mat,i,j) (*((mat)->rows[i] + (j)))
 
-D_MAT_INLINE double * d_mat_entry_ptr(const d_mat_t mat, slong i, slong j) { return mat->rows[i] + j; }
-D_MAT_INLINE double d_mat_get_entry(const d_mat_t mat, slong i, slong j) { return mat->rows[i][j]; }
+D_MAT_INLINE
+double * d_mat_entry_ptr(const d_mat_t mat, slong i, slong j)
+{
+    return mat->rows[i] + j;
+}
+D_MAT_INLINE
+double d_mat_get_entry(const d_mat_t mat, slong i, slong j)
+{
+    return mat->rows[i][j];
+}
 
 D_MAT_INLINE slong d_mat_nrows(const d_mat_t mat) { return mat->r; }
 D_MAT_INLINE slong d_mat_ncols(const d_mat_t mat) { return mat->c; }
@@ -60,7 +68,11 @@ int d_mat_approx_equal(const d_mat_t mat1, const d_mat_t mat2, double eps);
 int d_mat_is_zero(const d_mat_t mat);
 int d_mat_is_approx_zero(const d_mat_t mat, double eps);
 
-D_MAT_INLINE int d_mat_is_empty(const d_mat_t mat) { return (mat->r == 0) || (mat->c == 0); }
+D_MAT_INLINE
+int d_mat_is_empty(const d_mat_t mat)
+{
+    return (mat->r == 0) || (mat->c == 0);
+}
 D_MAT_INLINE int d_mat_is_square(const d_mat_t mat) { return (mat->r == mat->c); }
 
 void d_mat_zero(d_mat_t mat);
@@ -84,7 +96,11 @@ void d_mat_mul_classical(d_mat_t C, const d_mat_t A, const d_mat_t B);
 
 /* Permutations  *************************************************************/
 
-D_MAT_INLINE void d_mat_swap_rows(d_mat_t mat, slong r, slong s) { if (r != s) FLINT_SWAP(double *, mat->rows[r], mat->rows[s]); }
+D_MAT_INLINE
+void d_mat_swap_rows(d_mat_t mat, slong r, slong s)
+{
+    if (r != s) FLINT_SWAP(double *, mat->rows[r], mat->rows[s]);
+}
 
 /* Gram-Schmidt Orthogonalisation and QR Decomposition  **********************/
 

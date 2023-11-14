@@ -327,7 +327,11 @@ void qsieve_poly_copy(qs_poly_t poly, qs_t qs_inf);
 void qsieve_do_sieving(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly);
 void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly);
 
-slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_poly_t poly);
+slong qsieve_evaluate_candidate(
+    qs_t qs_inf,
+    ulong i,
+    unsigned char * sieve,
+    qs_poly_t poly);
 
 slong qsieve_evaluate_sieve(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly);
 
@@ -398,9 +402,21 @@ uint64_t get_null_entry(uint64_t * nullrows, slong i, slong l);
 
 void reduce_matrix(qs_t qs_inf, slong *nrows, slong *ncols, la_col_t *cols);
 
-uint64_t * block_lanczos(flint_rand_t state, slong nrows, slong dense_rows, slong ncols, la_col_t *B);
+uint64_t * block_lanczos(
+    flint_rand_t state,
+    slong nrows,
+    slong dense_rows,
+    slong ncols,
+    la_col_t *B);
 
-void qsieve_square_root(fmpz_t X, fmpz_t Y, qs_t qs_inf, uint64_t * nullrows, slong ncols, slong l, fmpz_t N);
+void qsieve_square_root(
+    fmpz_t X,
+    fmpz_t Y,
+    qs_t qs_inf,
+    uint64_t * nullrows,
+    slong ncols,
+    slong l,
+    fmpz_t N);
 
 #ifdef __cplusplus
 }

@@ -24,10 +24,22 @@
 extern "C" {
 #endif
 
-FMPQ_MAT_INLINE fmpq * fmpq_mat_entry(const fmpq_mat_t mat, slong i, slong j) { return mat->rows[i] + j; }
+FMPQ_MAT_INLINE
+fmpq * fmpq_mat_entry(const fmpq_mat_t mat, slong i, slong j)
+{
+    return mat->rows[i] + j;
+}
 
-FMPQ_MAT_INLINE fmpz * fmpq_mat_entry_num(const fmpq_mat_t mat, slong i, slong j) { return fmpq_numref(fmpq_mat_entry(mat, i, j)); }
-FMPQ_MAT_INLINE fmpz * fmpq_mat_entry_den(const fmpq_mat_t mat, slong i, slong j) { return fmpq_denref(fmpq_mat_entry(mat, i, j)); }
+FMPQ_MAT_INLINE
+fmpz * fmpq_mat_entry_num(const fmpq_mat_t mat, slong i, slong j)
+{
+    return fmpq_numref(fmpq_mat_entry(mat, i, j));
+}
+FMPQ_MAT_INLINE
+fmpz * fmpq_mat_entry_den(const fmpq_mat_t mat, slong i, slong j)
+{
+    return fmpq_denref(fmpq_mat_entry(mat, i, j));
+}
 
 FMPQ_MAT_INLINE slong fmpq_mat_nrows(const fmpq_mat_t mat) { return mat->r; }
 FMPQ_MAT_INLINE slong fmpq_mat_ncols(const fmpq_mat_t mat) { return mat->c; }
@@ -41,11 +53,23 @@ void fmpq_mat_swap_entrywise(fmpq_mat_t mat1, fmpq_mat_t mat2);
 
 /* Windows and concatenation *************************************************/
 
-void fmpq_mat_window_init(fmpq_mat_t window, const fmpq_mat_t mat, slong r1, slong c1, slong r2, slong c2);
+void fmpq_mat_window_init(
+    fmpq_mat_t window,
+    const fmpq_mat_t mat,
+    slong r1,
+    slong c1,
+    slong r2,
+    slong c2);
 void fmpq_mat_window_clear(fmpq_mat_t window);
 
-void fmpq_mat_concat_horizontal(fmpq_mat_t res, const fmpq_mat_t mat1, const fmpq_mat_t mat2);
-void fmpq_mat_concat_vertical(fmpq_mat_t res, const fmpq_mat_t mat1, const fmpq_mat_t mat2);
+void fmpq_mat_concat_horizontal(
+    fmpq_mat_t res,
+    const fmpq_mat_t mat1,
+    const fmpq_mat_t mat2);
+void fmpq_mat_concat_vertical(
+    fmpq_mat_t res,
+    const fmpq_mat_t mat1,
+    const fmpq_mat_t mat2);
 
 /* Input and output **********************************************************/
 
@@ -89,25 +113,50 @@ int fmpq_mat_is_integral(const fmpq_mat_t mat);
 int fmpq_mat_is_zero(const fmpq_mat_t mat);
 int fmpq_mat_is_one(const fmpq_mat_t mat);
 
-FMPQ_MAT_INLINE int fmpq_mat_is_empty(const fmpq_mat_t mat) { return (mat->r == 0) || (mat->c == 0); }
-FMPQ_MAT_INLINE int fmpq_mat_is_square(const fmpq_mat_t mat) { return (mat->r == mat->c); }
+FMPQ_MAT_INLINE
+int fmpq_mat_is_empty(const fmpq_mat_t mat)
+{
+    return (mat->r == 0) || (mat->c == 0);
+}
+FMPQ_MAT_INLINE
+int fmpq_mat_is_square(const fmpq_mat_t mat)
+{
+    return (mat->r == mat->c);
+}
 
 /* Integer matrix conversion *************************************************/
 
 int fmpq_mat_get_fmpz_mat(fmpz_mat_t dest, const fmpq_mat_t mat);
-void fmpq_mat_get_fmpz_mat_entrywise(fmpz_mat_t num, fmpz_mat_t den, const fmpq_mat_t mat);
+void fmpq_mat_get_fmpz_mat_entrywise(
+    fmpz_mat_t num,
+    fmpz_mat_t den,
+    const fmpq_mat_t mat);
 void fmpq_mat_get_fmpz_mat_matwise(fmpz_mat_t num, fmpz_t den, const fmpq_mat_t mat);
 void fmpq_mat_get_fmpz_mat_rowwise(fmpz_mat_t num, fmpz * den, const fmpq_mat_t mat);
-void fmpq_mat_get_fmpz_mat_rowwise_2(fmpz_mat_t num, fmpz_mat_t num2, fmpz * den, const fmpq_mat_t mat, const fmpq_mat_t mat2);
+void fmpq_mat_get_fmpz_mat_rowwise_2(
+    fmpz_mat_t num,
+    fmpz_mat_t num2,
+    fmpz * den,
+    const fmpq_mat_t mat,
+    const fmpq_mat_t mat2);
 void fmpq_mat_get_fmpz_mat_colwise(fmpz_mat_t num, fmpz * den, const fmpq_mat_t mat);
 
-void fmpq_mat_get_fmpz_mat_mod_fmpz(fmpz_mat_t dest, const fmpq_mat_t mat, const fmpz_t mod);
+void fmpq_mat_get_fmpz_mat_mod_fmpz(
+    fmpz_mat_t dest,
+    const fmpq_mat_t mat,
+    const fmpz_t mod);
 
 void fmpq_mat_set_fmpz_mat(fmpq_mat_t dest, const fmpz_mat_t src);
 
-void fmpq_mat_set_fmpz_mat_div_fmpz(fmpq_mat_t X, const fmpz_mat_t Xmod, const fmpz_t div);
+void fmpq_mat_set_fmpz_mat_div_fmpz(
+    fmpq_mat_t X,
+    const fmpz_mat_t Xmod,
+    const fmpz_t div);
 
-int fmpq_mat_set_fmpz_mat_mod_fmpz(fmpq_mat_t X, const fmpz_mat_t Xmod, const fmpz_t mod);
+int fmpq_mat_set_fmpz_mat_mod_fmpz(
+    fmpq_mat_t X,
+    const fmpz_mat_t Xmod,
+    const fmpz_t mod);
 
 /* Matrix multiplication *****************************************************/
 
@@ -122,16 +171,32 @@ void fmpq_mat_mul_fmpz_mat(fmpq_mat_t C, const fmpq_mat_t A, const fmpz_mat_t B)
 void fmpq_mat_mul_r_fmpz_mat(fmpq_mat_t C, const fmpz_mat_t A, const fmpq_mat_t B);
 
 void fmpq_mat_mul_fmpq_vec(fmpq * c, const fmpq_mat_t A, const fmpq * b, slong blen);
-void fmpq_mat_mul_fmpq_vec_ptr(fmpq * const * c, const fmpq_mat_t A, const fmpq * const * b, slong blen);
+void fmpq_mat_mul_fmpq_vec_ptr(
+    fmpq * const * c,
+    const fmpq_mat_t A,
+    const fmpq * const * b,
+    slong blen);
 
 void fmpq_mat_mul_fmpz_vec(fmpq* c, const fmpq_mat_t A, const fmpz * b, slong blen);
-void fmpq_mat_mul_fmpz_vec_ptr(fmpq * const * c, const fmpq_mat_t A, const fmpz * const * b, slong blen);
+void fmpq_mat_mul_fmpz_vec_ptr(
+    fmpq * const * c,
+    const fmpq_mat_t A,
+    const fmpz * const * b,
+    slong blen);
 
 void fmpq_mat_fmpq_vec_mul(fmpq* c, const fmpq* a, slong alen, const fmpq_mat_t B);
-void fmpq_mat_fmpq_vec_mul_ptr(fmpq * const * c, const fmpq * const * a, slong alen, const fmpq_mat_t B);
+void fmpq_mat_fmpq_vec_mul_ptr(
+    fmpq * const * c,
+    const fmpq * const * a,
+    slong alen,
+    const fmpq_mat_t B);
 
 void fmpq_mat_fmpz_vec_mul(fmpq * c, const fmpz * a, slong alen, const fmpq_mat_t B);
-void fmpq_mat_fmpz_vec_mul_ptr(fmpq * const * c, const fmpz * const * a, slong alen, const fmpq_mat_t B);
+void fmpq_mat_fmpz_vec_mul_ptr(
+    fmpq * const * c,
+    const fmpz * const * a,
+    slong alen,
+    const fmpq_mat_t B);
 
 /* Kronecker product *********************************************************/
 
@@ -155,24 +220,39 @@ void fmpq_mat_det(fmpq_t det, const fmpq_mat_t mat);
 
 /* Nonsingular solving *******************************************************/
 
-int fmpq_mat_solve_fmpz_mat_fraction_free(fmpq_mat_t X, const fmpz_mat_t A, const fmpz_mat_t B);
+int fmpq_mat_solve_fmpz_mat_fraction_free(
+    fmpq_mat_t X,
+    const fmpz_mat_t A,
+    const fmpz_mat_t B);
 int fmpq_mat_solve_fraction_free(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B);
 
 int fmpq_mat_solve_fmpz_mat_dixon(fmpq_mat_t X, const fmpz_mat_t A, const fmpz_mat_t B);
 int fmpq_mat_solve_dixon(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B);
 
-int fmpq_mat_solve_fmpz_mat_multi_mod(fmpq_mat_t X, const fmpz_mat_t A, const fmpz_mat_t B);
+int fmpq_mat_solve_fmpz_mat_multi_mod(
+    fmpq_mat_t X,
+    const fmpz_mat_t A,
+    const fmpz_mat_t B);
 int fmpq_mat_solve_multi_mod(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B);
 
 int fmpq_mat_solve_fmpz_mat(fmpq_mat_t X, const fmpz_mat_t A, const fmpz_mat_t B);
 int fmpq_mat_solve(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B);
 
-int fmpq_mat_can_solve_fraction_free(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B);
+int fmpq_mat_can_solve_fraction_free(
+    fmpq_mat_t X,
+    const fmpq_mat_t A,
+    const fmpq_mat_t B);
 
-int fmpq_mat_can_solve_fmpz_mat_dixon(fmpq_mat_t X, const fmpz_mat_t A, const fmpz_mat_t B);
+int fmpq_mat_can_solve_fmpz_mat_dixon(
+    fmpq_mat_t X,
+    const fmpz_mat_t A,
+    const fmpz_mat_t B);
 int fmpq_mat_can_solve_dixon(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B);
 
-int fmpq_mat_can_solve_fmpz_mat_multi_mod(fmpq_mat_t X, const fmpz_mat_t A, const fmpz_mat_t B);
+int fmpq_mat_can_solve_fmpz_mat_multi_mod(
+    fmpq_mat_t X,
+    const fmpz_mat_t A,
+    const fmpz_mat_t B);
 int fmpq_mat_can_solve_multi_mod(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B);
 
 int fmpq_mat_can_solve(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B);

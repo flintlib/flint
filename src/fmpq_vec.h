@@ -32,7 +32,11 @@ void _fmpq_vec_clear(fmpq * vec, slong len);
 /*  Randomisation  ***********************************************************/
 
 void _fmpq_vec_randtest(fmpq * f, flint_rand_t state, slong len, flint_bitcnt_t bits);
-void _fmpq_vec_randtest_uniq_sorted(fmpq * vec, flint_rand_t state, slong len, flint_bitcnt_t bits);
+void _fmpq_vec_randtest_uniq_sorted(
+    fmpq * vec,
+    flint_rand_t state,
+    slong len,
+    flint_bitcnt_t bits);
 
 /* Sorting  ******************************************************************/
 

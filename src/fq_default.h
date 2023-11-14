@@ -99,13 +99,33 @@ void fq_default_ctx_clear(fq_default_ctx_t ctx)
     }
 }
 
-void fq_default_ctx_init_modulus_type(fq_default_ctx_t ctx, const fmpz_mod_poly_t modulus, fmpz_mod_ctx_t mod_ctx, const char * var, int type);
-void fq_default_ctx_init_modulus(fq_default_ctx_t ctx, const fmpz_mod_poly_t modulus, fmpz_mod_ctx_t mod_ctx, const char * var);
+void fq_default_ctx_init_modulus_type(
+    fq_default_ctx_t ctx,
+    const fmpz_mod_poly_t modulus,
+    fmpz_mod_ctx_t mod_ctx,
+    const char * var,
+    int type);
+void fq_default_ctx_init_modulus(
+    fq_default_ctx_t ctx,
+    const fmpz_mod_poly_t modulus,
+    fmpz_mod_ctx_t mod_ctx,
+    const char * var);
 
-void fq_default_ctx_init_modulus_nmod_type(fq_default_ctx_t ctx, const nmod_poly_t modulus, const char * var, int type);
-void fq_default_ctx_init_modulus_nmod(fq_default_ctx_t ctx, const nmod_poly_t modulus, const char * var);
+void fq_default_ctx_init_modulus_nmod_type(
+    fq_default_ctx_t ctx,
+    const nmod_poly_t modulus,
+    const char * var,
+    int type);
+void fq_default_ctx_init_modulus_nmod(
+    fq_default_ctx_t ctx,
+    const nmod_poly_t modulus,
+    const char * var);
 
-FQ_DEFAULT_INLINE int fq_default_ctx_type(const fq_default_ctx_t ctx) { return ctx->type; }
+FQ_DEFAULT_INLINE
+int fq_default_ctx_type(const fq_default_ctx_t ctx)
+{
+    return ctx->type;
+}
 
 FQ_DEFAULT_INLINE
 slong fq_default_ctx_degree(const fq_default_ctx_t ctx)
@@ -1188,11 +1208,23 @@ int fq_default_get_fmpz(fmpz_t z, const fq_default_t op, const fq_default_ctx_t 
     }
 }
 
-void fq_default_get_fmpz_poly(fmpz_poly_t poly, const fq_default_t op, const fq_default_ctx_t ctx);
-void fq_default_get_fmpz_mod_poly(fmpz_mod_poly_t poly, const fq_default_t op, const fq_default_ctx_t ctx);
+void fq_default_get_fmpz_poly(
+    fmpz_poly_t poly,
+    const fq_default_t op,
+    const fq_default_ctx_t ctx);
+void fq_default_get_fmpz_mod_poly(
+    fmpz_mod_poly_t poly,
+    const fq_default_t op,
+    const fq_default_ctx_t ctx);
 
-void fq_default_set_fmpz_poly(fq_default_t op, const fmpz_poly_t poly, const fq_default_ctx_t ctx);
-void fq_default_set_fmpz_mod_poly(fq_default_t op, const fmpz_mod_poly_t poly, const fq_default_ctx_t ctx);
+void fq_default_set_fmpz_poly(
+    fq_default_t op,
+    const fmpz_poly_t poly,
+    const fq_default_ctx_t ctx);
+void fq_default_set_fmpz_mod_poly(
+    fq_default_t op,
+    const fmpz_mod_poly_t poly,
+    const fq_default_ctx_t ctx);
 
 FQ_DEFAULT_INLINE
 void fq_default_get_coeff_fmpz(fmpz_t c, fq_default_t op, slong n, const fq_default_ctx_t ctx)
@@ -1240,7 +1272,10 @@ void fq_default_get_coeff_fmpz(fmpz_t c, fq_default_t op, slong n, const fq_defa
 
 #ifdef FLINT_HAVE_FILE
 int fq_default_fprint(FILE * file, const fq_default_t op, const fq_default_ctx_t ctx);
-int fq_default_fprint_pretty(FILE * file, const fq_default_t op, const fq_default_ctx_t ctx);
+int fq_default_fprint_pretty(
+    FILE * file,
+    const fq_default_t op,
+    const fq_default_ctx_t ctx);
 #endif
 
 void fq_default_print(const fq_default_t op, const fq_default_ctx_t ctx);

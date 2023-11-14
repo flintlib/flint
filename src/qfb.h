@@ -45,12 +45,28 @@ typedef struct
     slong iter;
 } qfb_hash_t;
 
-QFB_INLINE void qfb_init(qfb_t q) { fmpz_init(q->a); fmpz_init(q->b); fmpz_init(q->c); }
-QFB_INLINE void qfb_clear(qfb_t q) { fmpz_clear(q->a); fmpz_clear(q->b); fmpz_clear(q->c); }
+QFB_INLINE
+void qfb_init(qfb_t q)
+{
+    fmpz_init(q->a); fmpz_init(q->b); fmpz_init(q->c);
+}
+QFB_INLINE
+void qfb_clear(qfb_t q)
+{
+    fmpz_clear(q->a); fmpz_clear(q->b); fmpz_clear(q->c);
+}
 
-QFB_INLINE int qfb_equal(qfb_t f, qfb_t g) { return (fmpz_equal(f->a, g->a) && fmpz_equal(f->b, g->b) && fmpz_equal(f->c, g->c)); }
+QFB_INLINE
+int qfb_equal(qfb_t f, qfb_t g)
+{
+    return (fmpz_equal(f->a, g->a) && fmpz_equal(f->b, g->b) && fmpz_equal(f->c, g->c));
+}
 
-QFB_INLINE void qfb_set(qfb_t f, qfb_t g) { fmpz_set(f->a, g->a); fmpz_set(f->b, g->b); fmpz_set(f->c, g->c); }
+QFB_INLINE
+void qfb_set(qfb_t f, qfb_t g)
+{
+    fmpz_set(f->a, g->a); fmpz_set(f->b, g->b); fmpz_set(f->c, g->c);
+}
 
 QFB_INLINE
 void qfb_discriminant(fmpz_t D, qfb_t f)

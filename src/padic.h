@@ -44,7 +44,12 @@ typedef padic_inv_struct padic_inv_t[1];
 
 /* Context *******************************************************************/
 
-void padic_ctx_init(padic_ctx_t ctx, const fmpz_t p, slong min, slong max, enum padic_print_mode mode);
+void padic_ctx_init(
+    padic_ctx_t ctx,
+    const fmpz_t p,
+    slong min,
+    slong max,
+    enum padic_print_mode mode);
 void padic_ctx_clear(padic_ctx_t ctx);
 
 PADIC_INLINE
@@ -176,10 +181,22 @@ void padic_one(padic_t rop)
 
 /* Comparison ****************************************************************/
 
-PADIC_INLINE int padic_is_zero(const padic_t op) { return fmpz_is_zero(padic_unit(op)); }
-PADIC_INLINE int padic_is_one(const padic_t op) { return fmpz_is_one(padic_unit(op)) && padic_val(op) == 0; }
+PADIC_INLINE
+int padic_is_zero(const padic_t op)
+{
+    return fmpz_is_zero(padic_unit(op));
+}
+PADIC_INLINE
+int padic_is_one(const padic_t op)
+{
+    return fmpz_is_one(padic_unit(op)) && padic_val(op) == 0;
+}
 
-PADIC_INLINE int padic_equal(const padic_t op1, const padic_t op2) { return padic_val(op1) == padic_val(op2) && fmpz_equal(padic_unit(op1), padic_unit(op2)); }
+PADIC_INLINE
+int padic_equal(const padic_t op1, const padic_t op2)
+{
+    return padic_val(op1) == padic_val(op2) && fmpz_equal(padic_unit(op1), padic_unit(op2));
+}
 
 /* Arithmetic operations *****************************************************/
 
@@ -213,7 +230,12 @@ void padic_pow_si(padic_t rop, const padic_t op, slong e, const padic_ctx_t ctx)
 slong _padic_exp_bound(slong v, slong N, const fmpz_t p);
 
 void _padic_exp(fmpz_t rop, const fmpz_t u, slong v, const fmpz_t p, slong N);
-void _padic_exp_rectangular(fmpz_t rop, const fmpz_t u, slong v, const fmpz_t p, slong N);
+void _padic_exp_rectangular(
+    fmpz_t rop,
+    const fmpz_t u,
+    slong v,
+    const fmpz_t p,
+    slong N);
 void _padic_exp_balanced(fmpz_t rop, const fmpz_t u, slong v, const fmpz_t p, slong N);
 
 int padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx);
@@ -247,7 +269,11 @@ void padic_val_fac(fmpz_t rop, const fmpz_t op, const fmpz_t p);
 
 /* Input and output **********************************************************/
 
-char * _padic_get_str(char * str, const padic_t op, const fmpz_t p, enum padic_print_mode mode);
+char * _padic_get_str(
+    char * str,
+    const padic_t op,
+    const fmpz_t p,
+    enum padic_print_mode mode);
 char * padic_get_str(char * str, const padic_t op, const padic_ctx_t ctx);
 
 #ifdef FLINT_HAVE_FILE

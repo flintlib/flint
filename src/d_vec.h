@@ -31,7 +31,12 @@ void _d_vec_clear(double * vec);
 
 /*  Randomisation  ***********************************************************/
 
-void _d_vec_randtest(double * f, flint_rand_t state, slong len, slong minexp, slong maxexp);
+void _d_vec_randtest(
+    double * f,
+    flint_rand_t state,
+    slong len,
+    slong minexp,
+    slong maxexp);
 
 /*  Assignment and basic manipulation  ***************************************/
 
@@ -56,8 +61,16 @@ void _d_vec_sub(double * res, const double * vec1, const double * vec2, slong le
 
 double _d_vec_norm(const double * vec, slong len);
 
-double _d_vec_dot_heuristic(const double * vec1, const double * vec2, slong len2, double * err);
-double _d_vec_dot_thrice(const double * vec1, const double * vec2, slong len2, double * err);
+double _d_vec_dot_heuristic(
+    const double * vec1,
+    const double * vec2,
+    slong len2,
+    double * err);
+double _d_vec_dot_thrice(
+    const double * vec1,
+    const double * vec2,
+    slong len2,
+    double * err);
 double _d_vec_dot(const double * vec1, const double * vec2, slong len2);
 
 #ifdef __cplusplus

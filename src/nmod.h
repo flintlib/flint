@@ -258,7 +258,11 @@ double nmod_discrete_log_pohlig_hellman_precompute_prime(nmod_discrete_log_pohli
 
 ulong nmod_discrete_log_pohlig_hellman_run(const nmod_discrete_log_pohlig_hellman_t L, mp_limb_t y);
 
-NMOD_INLINE mp_limb_t nmod_discrete_log_pohlig_hellman_primitive_root(const nmod_discrete_log_pohlig_hellman_t L) { return L->alpha; }
+NMOD_INLINE
+mp_limb_t nmod_discrete_log_pohlig_hellman_primitive_root(const nmod_discrete_log_pohlig_hellman_t L)
+{
+    return L->alpha;
+}
 
 #ifdef __cplusplus
 }

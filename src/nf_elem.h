@@ -75,7 +75,11 @@ void nf_elem_swap(nf_elem_t a, nf_elem_t b, const nf_t nf);
 
 void nf_elem_randtest(nf_elem_t a, flint_rand_t state, mp_bitcnt_t bits, const nf_t nf);
 
-void nf_elem_randtest_not_zero(nf_elem_t a, flint_rand_t state, mp_bitcnt_t bits, const nf_t nf);
+void nf_elem_randtest_not_zero(
+    nf_elem_t a,
+    flint_rand_t state,
+    mp_bitcnt_t bits,
+    const nf_t nf);
 
 NF_ELEM_INLINE
 void nf_elem_canonicalise(nf_elem_t a, const nf_t nf)
@@ -171,18 +175,45 @@ void nf_elem_set_fmpq_poly(nf_elem_t a, const fmpq_poly_t pol, const nf_t nf);
 
 /* Conversion ****************************************************************/
 
-void nf_elem_set_fmpz_mat_row(nf_elem_t b, const fmpz_mat_t M, const slong i, fmpz_t den, const nf_t nf);
-void nf_elem_get_fmpz_mat_row(fmpz_mat_t M, const slong i, fmpz_t den, const nf_elem_t b, const nf_t nf);
+void nf_elem_set_fmpz_mat_row(
+    nf_elem_t b,
+    const fmpz_mat_t M,
+    const slong i,
+    fmpz_t den,
+    const nf_t nf);
+void nf_elem_get_fmpz_mat_row(
+    fmpz_mat_t M,
+    const slong i,
+    fmpz_t den,
+    const nf_elem_t b,
+    const nf_t nf);
 
 void nf_elem_get_fmpq_poly(fmpq_poly_t pol, const nf_elem_t a, const nf_t nf);
 
-void nf_elem_get_nmod_poly_den(nmod_poly_t pol, const nf_elem_t a, const nf_t nf, int den);
+void nf_elem_get_nmod_poly_den(
+    nmod_poly_t pol,
+    const nf_elem_t a,
+    const nf_t nf,
+    int den);
 void _nf_elem_get_nmod_poly(nmod_poly_t pol, const nf_elem_t a, const nf_t nf);
 void nf_elem_get_nmod_poly(nmod_poly_t pol, const nf_elem_t a, const nf_t nf);
 
-void nf_elem_get_fmpz_mod_poly_den(fmpz_mod_poly_t pol, const nf_elem_t a, const nf_t nf, int den, const fmpz_mod_ctx_t ctx);
-void _nf_elem_get_fmpz_mod_poly(fmpz_mod_poly_t pol, const nf_elem_t a, const nf_t nf, const fmpz_mod_ctx_t ctx);
-void nf_elem_get_fmpz_mod_poly(fmpz_mod_poly_t pol, const nf_elem_t a, const nf_t nf, const fmpz_mod_ctx_t ctx);
+void nf_elem_get_fmpz_mod_poly_den(
+    fmpz_mod_poly_t pol,
+    const nf_elem_t a,
+    const nf_t nf,
+    int den,
+    const fmpz_mod_ctx_t ctx);
+void _nf_elem_get_fmpz_mod_poly(
+    fmpz_mod_poly_t pol,
+    const nf_elem_t a,
+    const nf_t nf,
+    const fmpz_mod_ctx_t ctx);
+void nf_elem_get_fmpz_mod_poly(
+    fmpz_mod_poly_t pol,
+    const nf_elem_t a,
+    const nf_t nf,
+    const fmpz_mod_ctx_t ctx);
 
 /* Basic manipulation ********************************************************/
 
@@ -241,20 +272,56 @@ void nf_elem_fmpq_sub(nf_elem_t a, const fmpq_t c, const nf_elem_t b, const nf_t
 void nf_elem_neg(nf_elem_t a, const nf_elem_t b, const nf_t nf);
 
 void nf_elem_scalar_mul_si(nf_elem_t a, const nf_elem_t b, slong c, const nf_t nf);
-void nf_elem_scalar_mul_fmpz(nf_elem_t a, const nf_elem_t b, const fmpz_t c, const nf_t nf);
-void nf_elem_scalar_mul_fmpq(nf_elem_t a, const nf_elem_t b, const fmpq_t c, const nf_t nf);
+void nf_elem_scalar_mul_fmpz(
+    nf_elem_t a,
+    const nf_elem_t b,
+    const fmpz_t c,
+    const nf_t nf);
+void nf_elem_scalar_mul_fmpq(
+    nf_elem_t a,
+    const nf_elem_t b,
+    const fmpq_t c,
+    const nf_t nf);
 
 void nf_elem_scalar_div_si(nf_elem_t a, const nf_elem_t b, slong c, const nf_t nf);
-void nf_elem_scalar_div_fmpz(nf_elem_t a, const nf_elem_t b, const fmpz_t c, const nf_t nf);
-void nf_elem_scalar_div_fmpq(nf_elem_t a, const nf_elem_t b, const fmpq_t c, const nf_t nf);
+void nf_elem_scalar_div_fmpz(
+    nf_elem_t a,
+    const nf_elem_t b,
+    const fmpz_t c,
+    const nf_t nf);
+void nf_elem_scalar_div_fmpq(
+    nf_elem_t a,
+    const nf_elem_t b,
+    const fmpq_t c,
+    const nf_t nf);
 
-void _nf_elem_add_lf(nf_elem_t a, const nf_elem_t b, const nf_elem_t c, const nf_t nf, int can);
-void _nf_elem_sub_lf(nf_elem_t a, const nf_elem_t b, const nf_elem_t c, const nf_t nf, int can);
+void _nf_elem_add_lf(
+    nf_elem_t a,
+    const nf_elem_t b,
+    const nf_elem_t c,
+    const nf_t nf,
+    int can);
+void _nf_elem_sub_lf(
+    nf_elem_t a,
+    const nf_elem_t b,
+    const nf_elem_t c,
+    const nf_t nf,
+    int can);
 
-void _nf_elem_add_qf(nf_elem_t a, const nf_elem_t b, const nf_elem_t c, const nf_t nf, int can);
+void _nf_elem_add_qf(
+    nf_elem_t a,
+    const nf_elem_t b,
+    const nf_elem_t c,
+    const nf_t nf,
+    int can);
 void nf_elem_add_qf(nf_elem_t a, const nf_elem_t b, const nf_elem_t c, const nf_t nf);
 
-void _nf_elem_sub_qf(nf_elem_t a, const nf_elem_t b, const nf_elem_t c, const nf_t nf, int can);
+void _nf_elem_sub_qf(
+    nf_elem_t a,
+    const nf_elem_t b,
+    const nf_elem_t c,
+    const nf_t nf,
+    int can);
 void nf_elem_sub_qf(nf_elem_t a, const nf_elem_t b, const nf_elem_t c, const nf_t nf);
 
 void _nf_elem_add(nf_elem_t a, const nf_elem_t b, const nf_elem_t c, const nf_t nf);
@@ -268,8 +335,18 @@ void nf_elem_mul_gen(nf_elem_t a, const nf_elem_t b, const nf_t nf);
 void _nf_elem_mul(nf_elem_t a, const nf_elem_t b, const nf_elem_t c, const nf_t nf);
 void nf_elem_mul(nf_elem_t a, const nf_elem_t b, const nf_elem_t c, const nf_t nf);
 
-void _nf_elem_mul_red(nf_elem_t a, const nf_elem_t b, const nf_elem_t c, const nf_t nf, int red);
-void nf_elem_mul_red(nf_elem_t a, const nf_elem_t b, const nf_elem_t c, const nf_t nf, int red);
+void _nf_elem_mul_red(
+    nf_elem_t a,
+    const nf_elem_t b,
+    const nf_elem_t c,
+    const nf_t nf,
+    int red);
+void nf_elem_mul_red(
+    nf_elem_t a,
+    const nf_elem_t b,
+    const nf_elem_t c,
+    const nf_t nf,
+    int red);
 
 void _nf_elem_inv(nf_elem_t a, const nf_elem_t b, const nf_t nf);
 void nf_elem_inv(nf_elem_t a, const nf_elem_t b, const nf_t nf);
@@ -283,25 +360,67 @@ void nf_elem_pow(nf_elem_t res, const nf_elem_t a, ulong e, const nf_t nf);
 void _nf_elem_norm(fmpz_t rnum, fmpz_t rden, const nf_elem_t a, const nf_t nf);
 void nf_elem_norm(fmpq_t res, const nf_elem_t a, const nf_t nf);
 
-void _nf_elem_norm_div(fmpz_t rnum, fmpz_t rden, const nf_elem_t a, const nf_t nf, const fmpz_t divisor, slong nbits);
-void nf_elem_norm_div(fmpq_t res, const nf_elem_t a, const nf_t nf, const fmpz_t divisor, slong nbits);
+void _nf_elem_norm_div(
+    fmpz_t rnum,
+    fmpz_t rden,
+    const nf_elem_t a,
+    const nf_t nf,
+    const fmpz_t divisor,
+    slong nbits);
+void nf_elem_norm_div(
+    fmpq_t res,
+    const nf_elem_t a,
+    const nf_t nf,
+    const fmpz_t divisor,
+    slong nbits);
 
 void _nf_elem_trace(fmpz_t rnum, fmpz_t rden, const nf_elem_t a, const nf_t nf);
 void nf_elem_trace(fmpq_t res, const nf_elem_t a, const nf_t nf);
 
 void nf_elem_rep_mat(fmpq_mat_t res, const nf_elem_t a, const nf_t nf);
 
-void nf_elem_rep_mat_fmpz_mat_den(fmpz_mat_t res, fmpz_t den, const nf_elem_t a, const nf_t nf);
+void nf_elem_rep_mat_fmpz_mat_den(
+    fmpz_mat_t res,
+    fmpz_t den,
+    const nf_elem_t a,
+    const nf_t nf);
 
 /* Modular reduction *********************************************************/
 
-void _nf_elem_mod_fmpz(nf_elem_t res, const nf_elem_t a, const fmpz_t mod, const nf_t nf, int sign);
-void nf_elem_mod_fmpz_den(nf_elem_t res, const nf_elem_t a, const fmpz_t mod, const nf_t nf, int den);
-void nf_elem_smod_fmpz_den(nf_elem_t res, const nf_elem_t a, const fmpz_t mod, const nf_t nf, int den);
+void _nf_elem_mod_fmpz(
+    nf_elem_t res,
+    const nf_elem_t a,
+    const fmpz_t mod,
+    const nf_t nf,
+    int sign);
+void nf_elem_mod_fmpz_den(
+    nf_elem_t res,
+    const nf_elem_t a,
+    const fmpz_t mod,
+    const nf_t nf,
+    int den);
+void nf_elem_smod_fmpz_den(
+    nf_elem_t res,
+    const nf_elem_t a,
+    const fmpz_t mod,
+    const nf_t nf,
+    int den);
 void nf_elem_mod_fmpz(nf_elem_t res, const nf_elem_t a, const fmpz_t mod, const nf_t nf);
-void nf_elem_smod_fmpz(nf_elem_t res, const nf_elem_t a, const fmpz_t mod, const nf_t nf);
-void nf_elem_coprime_den(nf_elem_t res, const nf_elem_t a, const fmpz_t mod, const nf_t nf);
-void nf_elem_coprime_den_signed(nf_elem_t res, const nf_elem_t a, const fmpz_t mod, const nf_t nf);
+void nf_elem_smod_fmpz(
+    nf_elem_t res,
+    const nf_elem_t a,
+    const fmpz_t mod,
+    const nf_t nf);
+void nf_elem_coprime_den(
+    nf_elem_t res,
+    const nf_elem_t a,
+    const fmpz_t mod,
+    const nf_t nf);
+void nf_elem_coprime_den_signed(
+    nf_elem_t res,
+    const nf_elem_t a,
+    const fmpz_t mod,
+    const nf_t nf);
 
 #ifdef __cplusplus
 }

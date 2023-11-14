@@ -797,7 +797,10 @@ void fq_default_poly_set_fmpz_mod_poly(fq_default_poly_t rop, const fmpz_mod_pol
 }
 
 
-void fq_default_poly_set_fmpz_poly(fq_default_poly_t rop, const fmpz_poly_t op, const fq_default_ctx_t ctx);
+void fq_default_poly_set_fmpz_poly(
+    fq_default_poly_t rop,
+    const fmpz_poly_t op,
+    const fq_default_ctx_t ctx);
 
 /*  Comparison  **************************************************************/
 
@@ -1951,12 +1954,22 @@ void fq_default_poly_compose_mod(fq_default_poly_t res, const fq_default_poly_t 
 /*  Input and output  ********************************************************/
 
 #ifdef FLINT_HAVE_FILE
-int fq_default_poly_fprint(FILE * file, const fq_default_poly_t poly, const fq_default_ctx_t ctx);
-int fq_default_poly_fprint_pretty(FILE * file, const fq_default_poly_t poly, const char *x, const fq_default_ctx_t ctx);
+int fq_default_poly_fprint(
+    FILE * file,
+    const fq_default_poly_t poly,
+    const fq_default_ctx_t ctx);
+int fq_default_poly_fprint_pretty(
+    FILE * file,
+    const fq_default_poly_t poly,
+    const char *x,
+    const fq_default_ctx_t ctx);
 #endif
 
 int fq_default_poly_print(const fq_default_poly_t poly, const fq_default_ctx_t ctx);
-int fq_default_poly_print_pretty(const fq_default_poly_t poly, const char *x, const fq_default_ctx_t ctx);
+int fq_default_poly_print_pretty(
+    const fq_default_poly_t poly,
+    const char *x,
+    const fq_default_ctx_t ctx);
 
 FQ_DEFAULT_POLY_INLINE
 char * fq_default_poly_get_str_pretty(const fq_default_poly_t poly, const char *x, const fq_default_ctx_t ctx)
