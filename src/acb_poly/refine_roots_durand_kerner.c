@@ -132,9 +132,15 @@ _acb_poly_refine_roots_durand_kerner(acb_ptr roots,
         mag_zero(arb_radref(acb_realref(y)));
         mag_zero(arb_radref(acb_imagref(y)));
 
+        /* In the extremely unlikely event that y = 0, don't divide by 0. */
+        if (arf_is_zero(arb_midref(acb_realref(y))) && arf_is_zero(arb_midref(acb_imagref(y))))
+        {
+            arf_set_ui_2exp_si(arb_midref(acb_realref(y)), 1, -prec);
+            arf_set_ui_2exp_si(arb_midref(acb_imagref(y)), 1, -prec);
+        }
+
         acb_inv_mid(t, y, prec);
         acb_mul_mid(t, t, x, prec);
-
         acb_sub_mid(roots + i, roots + i, t, prec);
 
         arf_get_mag(arb_radref(acb_realref(roots + i)), arb_midref(acb_realref(t)));
