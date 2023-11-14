@@ -15,7 +15,7 @@
 #ifdef D_VEC_INLINES_C
 #define D_VEC_INLINE
 #else
-#define D_VEC_INLINE static __inline__
+#define D_VEC_INLINE static inline
 #endif
 
 #include "flint.h"

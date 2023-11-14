@@ -15,7 +15,7 @@
 #ifdef FMPZ_MPOLY_Q_INLINES_C
 #define FMPZ_MPOLY_Q_INLINE
 #else
-#define FMPZ_MPOLY_Q_INLINE static __inline__
+#define FMPZ_MPOLY_Q_INLINE static inline
 #endif
 
 #ifdef __cplusplus

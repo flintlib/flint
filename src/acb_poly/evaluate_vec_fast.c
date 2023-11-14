@@ -12,7 +12,7 @@
 #include "acb_poly.h"
 
 /* This gives some speedup for small lengths. */
-static __inline__ void
+static inline void
 _acb_poly_rem_2(acb_ptr r, acb_srcptr a, slong al,
     acb_srcptr b, slong bl, slong prec)
 {

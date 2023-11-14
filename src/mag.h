@@ -15,7 +15,7 @@
 #ifdef MAG_INLINES_C
 #define MAG_INLINE
 #else
-#define MAG_INLINE static __inline__
+#define MAG_INLINE static inline
 #endif
 
 #include "fmpz_extras.h"
@@ -38,7 +38,7 @@ extern "C" {
 
 /* TODO: rename these and move them to fmpz_extras */
 
-static __inline__ void
+static inline void
 _fmpz_set_fast(fmpz_t f, const fmpz_t g)
 {
     if (!COEFF_IS_MPZ(*f) && !COEFF_IS_MPZ(*g))
@@ -47,7 +47,7 @@ _fmpz_set_fast(fmpz_t f, const fmpz_t g)
         fmpz_set(f, g);
 }
 
-static __inline__ void
+static inline void
 _fmpz_add_fast(fmpz_t z, const fmpz_t x, slong c)
 {
     fmpz ze, xe;
@@ -61,7 +61,7 @@ _fmpz_add_fast(fmpz_t z, const fmpz_t x, slong c)
         fmpz_add_si(z, x, c);
 }
 
-static __inline__ void
+static inline void
 _fmpz_add2_fast(fmpz_t z, const fmpz_t x, const fmpz_t y, slong c)
 {
     fmpz ze, xe, ye;
@@ -82,7 +82,7 @@ _fmpz_add2_fast(fmpz_t z, const fmpz_t x, const fmpz_t y, slong c)
     }
 }
 
-static __inline__ void
+static inline void
 _fmpz_sub2_fast(fmpz_t z, const fmpz_t x, const fmpz_t y, slong c)
 {
     fmpz ze, xe, ye;
@@ -118,7 +118,7 @@ _fmpz_sub2_fast(fmpz_t z, const fmpz_t x, const fmpz_t y, slong c)
 
 #define MAG_ONE_HALF (UWORD(1) << (MAG_BITS - 1))
 
-static __inline__ mp_limb_t
+static inline mp_limb_t
 __mag_fixmul32(mp_limb_t x, mp_limb_t y)
 {
     mp_limb_t u, v;

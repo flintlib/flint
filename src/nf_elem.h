@@ -20,7 +20,7 @@
 #ifdef NF_ELEM_INLINES_C
 #define NF_ELEM_INLINE
 #else
-#define NF_ELEM_INLINE static __inline__
+#define NF_ELEM_INLINE static inline
 #endif
 
 #include "fmpq.h"

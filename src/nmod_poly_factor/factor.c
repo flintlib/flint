@@ -20,7 +20,7 @@
 #define BERLEKAMP 1
 #define KALTOFEN 2
 
-static __inline__ void
+static inline void
 __nmod_poly_factor1(nmod_poly_factor_t res, const nmod_poly_t f, int algorithm)
 {
     if (algorithm == KALTOFEN)

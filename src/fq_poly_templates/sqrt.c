@@ -14,7 +14,7 @@
 
 #include "templates.h"
 
-static __inline__
+static inline
 int _TEMPLATE(T, poly_sqrt_2)(TEMPLATE(T, struct) * s,
                    const TEMPLATE(T, struct) * p, slong len, TEMPLATE(T, ctx_t) ctx)
 {

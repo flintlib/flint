@@ -15,7 +15,7 @@
 #ifdef CA_VEC_INLINES_C
 #define CA_VEC_INLINE
 #else
-#define CA_VEC_INLINE static __inline__
+#define CA_VEC_INLINE static inline
 #endif
 
 #include "ca.h"

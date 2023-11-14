@@ -13,7 +13,7 @@
 #include "nmod_poly.h"
 #include "nmod_poly_mat.h"
 
-static __inline__ void
+static inline void
 nmod_poly_sqr(nmod_poly_t y, const nmod_poly_t x)
 {
     nmod_poly_mul(y, x, x);

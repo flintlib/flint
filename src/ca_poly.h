@@ -15,7 +15,7 @@
 #ifdef CA_POLY_INLINES_C
 #define CA_POLY_INLINE
 #else
-#define CA_POLY_INLINE static __inline__
+#define CA_POLY_INLINE static inline
 #endif
 
 #include "ca_vec.h"

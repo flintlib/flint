@@ -28,7 +28,7 @@
    slack for accumulated sums. */
 #define DOUBLE_MAX_OFFSET 900
 
-static __inline__ double dot8(const double * A, const double * B)
+static inline double dot8(const double * A, const double * B)
 {
     return ((A[0] * B[0] + A[1] * B[1]) + (A[2] * B[2] + A[3] * B[3])) +
            ((A[4] * B[4] + A[5] * B[5]) + (A[6] * B[6] + A[7] * B[7]));
@@ -90,7 +90,7 @@ _d_mat_addmul(double * C, const double * A, const double * B, slong ar, slong ac
 }
 
 /* We use WORD_MIN to represent zero here. */
-static __inline__ slong _mag_get_exp(const mag_t x)
+static inline slong _mag_get_exp(const mag_t x)
 {
     if (mag_is_special(x))
         return WORD_MIN;

@@ -118,7 +118,7 @@ _fmpz_mpoly_q_cmp(const fmpz_mpoly_q_t x, const fmpz_mpoly_q_t y, fmpz_mpoly_ctx
     return _fmpz_mpoly_cmp2(fmpz_mpoly_q_numref(x), fmpz_mpoly_q_numref(y), ctx);
 }
 
-static __inline__ slong si_sign(slong x)
+static inline slong si_sign(slong x)
 {
     if (x != 0)
         x = (x > 0) ? 1 : -1;

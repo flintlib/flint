@@ -19,7 +19,7 @@
 #ifdef ULONG_EXTRAS_INLINES_C
 #define ULONG_EXTRAS_INLINE
 #else
-#define ULONG_EXTRAS_INLINE static __inline__
+#define ULONG_EXTRAS_INLINE static inline
 #endif
 
 #include "limb_types.h"

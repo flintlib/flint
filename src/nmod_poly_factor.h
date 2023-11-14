@@ -19,7 +19,7 @@
 #ifdef NMOD_POLY_FACTOR_INLINES_C
 #define NMOD_POLY_FACTOR_INLINE
 #else
-#define NMOD_POLY_FACTOR_INLINE static __inline__
+#define NMOD_POLY_FACTOR_INLINE static inline
 #endif
 
 #include "limb_types.h"

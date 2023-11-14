@@ -17,7 +17,7 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-static __inline__ int
+static inline int
 TEMPLATE(T, mat_pivot) (TEMPLATE(T, mat_t) A, slong * P, slong start_row,
                         slong col, const TEMPLATE(T, ctx_t) ctx)
 {

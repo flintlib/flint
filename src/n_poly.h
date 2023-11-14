@@ -15,7 +15,7 @@
 #ifdef N_POLY_INLINES_C
 #define N_POLY_INLINE
 #else
-#define N_POLY_INLINE static __inline__
+#define N_POLY_INLINE static inline
 #endif
 
 #include "nmod.h"

@@ -15,7 +15,7 @@
 #ifdef CALCIUM_INLINES_C
 #define CALCIUM_INLINE
 #else
-#define CALCIUM_INLINE static __inline__
+#define CALCIUM_INLINE static inline
 #endif
 
 #include "fmpz.h"

@@ -59,7 +59,6 @@
 
 #ifndef __GNUC__
 # define __asm__     asm
-# define __inline__  inline
 #endif
 
 #ifdef va_start
@@ -82,7 +81,7 @@
 #ifdef FLINT_INLINES_C
 # define FLINT_INLINE
 #else
-# define FLINT_INLINE static __inline__
+# define FLINT_INLINE static inline
 #endif
 
 #ifdef __cplusplus
@@ -116,7 +115,7 @@ typedef struct __FLINT_FILE FLINT_FILE;
 #include "longlong.h"
 
 #if defined(__GNUC__)
-# define FLINT_FORCE_INLINE static __attribute__((always_inline)) __inline__
+# define FLINT_FORCE_INLINE static __attribute__((always_inline)) inline
 # define FLINT_STATIC_NOINLINE static __attribute__((noinline))
 # define FLINT_UNUSED(x) UNUSED_ ## x __attribute__((unused))
 # define FLINT_SET_BUT_UNUSED(x) x __attribute__((unused))
@@ -133,7 +132,7 @@ typedef struct __FLINT_FILE FLINT_FILE;
 # define FLINT_OPTIMIZE(x) FLINT_OPTIMIZE_NESTED_1(x)
 #else
 # define __attribute__(x)
-# define FLINT_FORCE_INLINE static __inline__
+# define FLINT_FORCE_INLINE static inline
 # define FLINT_STATIC_NOINLINE static
 # define FLINT_UNUSED(x) x
 # define FLINT_SET_BUT_UNUSED(x) x
@@ -328,7 +327,7 @@ ulong n_randtest_not_zero(flint_rand_t);
     ((shift == FLINT_BITS) ? WORD(0) : ((in) << (shift)))
 
 /* Beware when using the unsigned return value in signed arithmetic */
-static __inline__
+static inline
 mp_limb_t FLINT_BIT_COUNT(mp_limb_t x)
 {
    mp_limb_t zeros = FLINT_BITS;

@@ -15,7 +15,7 @@
 
 #define E(j,k) fmpz_poly_mat_entry(B,j,k)
 
-static __inline__ void
+static inline void
 fmpz_poly_mat_swap_rows(fmpz_poly_mat_t mat, slong * perm, slong r, slong s)
 {
     if (r != s)

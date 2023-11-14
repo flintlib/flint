@@ -14,7 +14,7 @@
 #include "nmod_poly.h"
 
 /* This gives some speedup for small lengths. */
-static __inline__ void _nmod_poly_rem_2(mp_ptr r, mp_srcptr a, slong al,
+static inline void _nmod_poly_rem_2(mp_ptr r, mp_srcptr a, slong al,
     mp_srcptr b, slong bl, nmod_t mod)
 {
     if (al == 2)

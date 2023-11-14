@@ -15,7 +15,7 @@
 #ifdef GR_SPECIAL_INLINES_C
 #define GR_SPECIAL_INLINE
 #else
-#define GR_SPECIAL_INLINE static __inline__
+#define GR_SPECIAL_INLINE static inline
 #endif
 
 #include "gr.h"

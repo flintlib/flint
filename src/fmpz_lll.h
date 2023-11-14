@@ -17,7 +17,7 @@
 #ifdef FMPZ_LLL_INLINES_C
 #define FMPZ_LLL_INLINE
 #else
-#define FMPZ_LLL_INLINE static __inline__
+#define FMPZ_LLL_INLINE static inline
 #endif
 
 #include "d_mat.h"

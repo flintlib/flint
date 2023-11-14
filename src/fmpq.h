@@ -16,7 +16,7 @@
 #ifdef FMPQ_INLINES_C
 #define FMPQ_INLINE
 #else
-#define FMPQ_INLINE static __inline__
+#define FMPQ_INLINE static inline
 #endif
 
 #include "fmpz.h"

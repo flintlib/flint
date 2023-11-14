@@ -19,7 +19,7 @@
         ? (mp_ptr) _mpz_realloc(z, len) \
         : ((z)->_mp_d))
 
-static __inline__
+static inline
 void flint_mpz_add_uiui(mpz_ptr a, mpz_srcptr b, ulong c1, ulong c0)
 {
     ulong d[2];
@@ -32,7 +32,7 @@ void flint_mpz_add_uiui(mpz_ptr a, mpz_srcptr b, ulong c1, ulong c0)
     mpz_add(a, b, c);
 }
 
-static __inline__
+static inline
 void flint_mpz_add_signed_uiui(mpz_ptr a, mpz_srcptr b, ulong c1, ulong c0)
 {
     ulong d[2];
@@ -47,7 +47,7 @@ void flint_mpz_add_signed_uiui(mpz_ptr a, mpz_srcptr b, ulong c1, ulong c0)
     mpz_add(a, b, c);
 }
 
-static __inline__
+static inline
 void flint_mpz_add_uiuiui(mpz_ptr a, mpz_srcptr b, ulong c2, ulong c1, ulong c0)
 {
     ulong d[3];
@@ -61,7 +61,7 @@ void flint_mpz_add_uiuiui(mpz_ptr a, mpz_srcptr b, ulong c2, ulong c1, ulong c0)
     mpz_add(a, b, c);
 }
 
-static __inline__
+static inline
 void flint_mpz_add_signed_uiuiui(mpz_ptr a, mpz_srcptr b,
                                                  ulong c2, ulong c1, ulong c0)
 {

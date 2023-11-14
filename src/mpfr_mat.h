@@ -15,7 +15,7 @@
 #ifdef MPFR_MAT_INLINES_C
 #define MPFR_MAT_INLINE
 #else
-#define MPFR_MAT_INLINE static __inline__
+#define MPFR_MAT_INLINE static inline
 #endif
 
 #include "flint.h"

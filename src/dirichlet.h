@@ -15,7 +15,7 @@
 #ifdef DIRICHLET_INLINES_C
 #define DIRICHLET_INLINE
 #else
-#define DIRICHLET_INLINE static __inline__
+#define DIRICHLET_INLINE static inline
 #endif
 
 #include "nmod.h"

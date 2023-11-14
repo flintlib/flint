@@ -15,7 +15,7 @@
 #ifdef CA_INLINES_C
 #define CA_INLINE
 #else
-#define CA_INLINE static __inline__
+#define CA_INLINE static inline
 #endif
 
 #include "flint.h"

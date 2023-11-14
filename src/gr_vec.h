@@ -15,7 +15,7 @@
 #ifdef GR_VEC_INLINES_C
 #define GR_VEC_INLINE
 #else
-#define GR_VEC_INLINE static __inline__
+#define GR_VEC_INLINE static inline
 #endif
 
 #include "gr.h"

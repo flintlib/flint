@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-static __inline__ ulong rfac(ulong x, ulong b)
+static inline ulong rfac(ulong x, ulong b)
 {
     ulong i, c = x;
 

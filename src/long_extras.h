@@ -15,7 +15,7 @@
 #ifdef LONG_EXTRAS_INLINES_C
 #define LONG_EXTRAS_INLINE
 #else
-#define LONG_EXTRAS_INLINE static __inline__
+#define LONG_EXTRAS_INLINE static inline
 #endif
 
 #include "flint.h"

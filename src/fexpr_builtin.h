@@ -15,7 +15,7 @@
 #ifdef FEXPR_BUILTIN_INLINES_C
 #define FEXPR_BUILTIN_INLINE
 #else
-#define FEXPR_BUILTIN_INLINE static __inline__
+#define FEXPR_BUILTIN_INLINE static inline
 #endif
 
 #ifdef __cplusplus

@@ -15,7 +15,7 @@
 #ifdef QADIC_INLINES_C
 #define QADIC_INLINE
 #else
-#define QADIC_INLINE static __inline__
+#define QADIC_INLINE static inline
 #endif
 
 #include "padic_poly.h"

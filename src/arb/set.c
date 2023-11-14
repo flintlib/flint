@@ -11,7 +11,7 @@
 
 #include "arb.h"
 
-static __inline__ void
+static inline void
 _arf_set_inline(arf_t y, const arf_t x)
 {
     /* Fast path */

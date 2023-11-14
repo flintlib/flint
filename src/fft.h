@@ -15,7 +15,7 @@
 #ifdef FFT_INLINES_C
 #define FFT_INLINE
 #else
-#define FFT_INLINE static __inline__
+#define FFT_INLINE static inline
 #endif
 
 #include "flint.h"

@@ -89,7 +89,7 @@ static mp_limb_t primorial_tab[] = {
 #endif
 };
 
-static __inline__ int
+static inline int
 bound_primes(ulong k)
 {
     int i;
@@ -102,7 +102,7 @@ bound_primes(ulong k)
 }
 
 
-static __inline__ slong
+static inline slong
 log2_ceil(double x)
 {
     /* ceil(log2(n)) = bitcount(n-1);

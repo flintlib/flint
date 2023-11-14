@@ -15,7 +15,7 @@
 #ifdef ARB_FPWRAP_INLINES_C
 #define ARB_FPWRAP_INLINE
 #else
-#define ARB_FPWRAP_INLINE static __inline__
+#define ARB_FPWRAP_INLINE static inline
 #endif
 
 #include "flint.h"

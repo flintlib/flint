@@ -14,7 +14,7 @@
 #include "arb.h"
 #include "hypgeom.h"
 
-static __inline__ void
+static inline void
 fmpz_poly_evaluate_si(fmpz_t y, const fmpz_poly_t poly, slong x)
 {
     fmpz_set_si(y, x);

@@ -16,8 +16,8 @@
 #define FQ_EMBED_INLINE
 #define FQ_EMBED_TEMPLATES_INLINE
 #else
-#define FQ_EMBED_INLINE static __inline__
-#define FQ_EMBED_TEMPLATES_INLINE static __inline__
+#define FQ_EMBED_INLINE static inline
+#define FQ_EMBED_TEMPLATES_INLINE static inline
 #endif
 
 #include "fq_types.h"

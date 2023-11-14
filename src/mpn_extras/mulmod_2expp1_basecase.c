@@ -17,7 +17,7 @@
    inputs, outputs are fully reduced
    NOTE: 2n is not the same as 2b rounded up to nearest limb
 */
-static __inline__ int
+static inline int
 flint_mpn_mulmod_2expp1_internal(mp_ptr xp, mp_srcptr yp, mp_srcptr zp,
     flint_bitcnt_t b, mp_ptr tp)
 {

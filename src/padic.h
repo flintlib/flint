@@ -15,7 +15,7 @@
 #ifdef PADIC_INLINES_C
 #define PADIC_INLINE
 #else
-#define PADIC_INLINE static __inline__
+#define PADIC_INLINE static inline
 #endif
 
 #include "fmpz.h"

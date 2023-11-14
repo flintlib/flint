@@ -16,7 +16,7 @@
 #include "fmpz_mod_vec.h"
 #include "fmpz_mod_poly.h"
 
-static __inline__
+static inline
 int _fmpz_mod_poly_sqrt_2(fmpz * s, const fmpz * p, slong len)
 {
    slong i;

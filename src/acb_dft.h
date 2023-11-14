@@ -15,7 +15,7 @@
 #ifdef ACB_DFT_INLINES_C
 #define ACB_DFT_INLINE
 #else
-#define ACB_DFT_INLINE static __inline__
+#define ACB_DFT_INLINE static inline
 #endif
 
 #include "ulong_extras.h"

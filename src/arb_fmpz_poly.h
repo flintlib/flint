@@ -15,7 +15,7 @@
 #ifdef ARB_FMPZ_POLY_INLINES_C
 #define ARB_FMPZ_POLY_INLINE
 #else
-#define ARB_FMPZ_POLY_INLINE static __inline__
+#define ARB_FMPZ_POLY_INLINE static inline
 #endif
 
 #include "fmpz_poly.h"

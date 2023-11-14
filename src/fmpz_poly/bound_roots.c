@@ -13,7 +13,7 @@
 #include "fmpz_poly.h"
 
 /* quotient of absolute value, rounded up */
-static __inline__ void
+static inline void
 fmpz_cdiv_abs_q(fmpz_t q, const fmpz_t x, const fmpz_t y)
 {
     if (fmpz_sgn(x) == fmpz_sgn(y))

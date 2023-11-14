@@ -54,7 +54,7 @@ static const unsigned short den_ratio_tab[512] = {
     16,997,2,1,4,1,2,1009,8,1013,2,1,4076,1021,2,1
 };
 
-static __inline__ slong rj_fdiv(slong x, slong y)
+static inline slong rj_fdiv(slong x, slong y)
 {
     if (x < 0)
         return -1;

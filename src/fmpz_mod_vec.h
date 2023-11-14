@@ -15,7 +15,7 @@
 #ifdef FMPZ_MOD_VEC_INLINES_C
 #define FMPZ_MOD_VEC_INLINE
 #else
-#define FMPZ_MOD_VEC_INLINE static __inline__ \
+#define FMPZ_MOD_VEC_INLINE static inline \
     error fmpz_mod_vec/inlines.c does not exist
 #endif
 

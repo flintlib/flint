@@ -16,7 +16,7 @@
 #ifdef MPF_VEC_INLINES_C
 #define MPF_VEC_INLINE
 #else
-#define MPF_VEC_INLINE static __inline__
+#define MPF_VEC_INLINE static inline
 #endif
 
 #include "flint.h"

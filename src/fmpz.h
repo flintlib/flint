@@ -15,7 +15,7 @@
 #ifdef FMPZ_INLINES_C
 #define FMPZ_INLINE
 #else
-#define FMPZ_INLINE static __inline__
+#define FMPZ_INLINE static inline
 #endif
 
 #include "fmpz_types.h"

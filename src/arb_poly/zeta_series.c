@@ -13,7 +13,7 @@
 #include "acb_poly.h"
 
 /* series of c^(d+x) */
-static __inline__ void
+static inline void
 _arb_poly_pow_cpx(arb_ptr res, const arb_t c, const arb_t d, slong trunc, slong prec)
 {
     slong i;

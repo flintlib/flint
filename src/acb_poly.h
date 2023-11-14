@@ -15,7 +15,7 @@
 #ifdef ACB_POLY_INLINES_C
 #define ACB_POLY_INLINE
 #else
-#define ACB_POLY_INLINE static __inline__
+#define ACB_POLY_INLINE static inline
 #endif
 
 #include "fmpq_types.h"

@@ -21,7 +21,7 @@
 #define BERLEKAMP 1
 #define KALTOFEN 2
 
-static __inline__ void
+static inline void
 __TEMPLATE(T, poly_factor1) (TEMPLATE(T, poly_factor_t) res,
                              const TEMPLATE(T, poly_t) f, int algorithm,
                              const TEMPLATE(T, ctx_t) ctx)

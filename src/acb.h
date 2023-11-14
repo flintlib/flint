@@ -15,7 +15,7 @@
 #ifdef ACB_INLINES_C
 #define ACB_INLINE
 #else
-#define ACB_INLINE static __inline__
+#define ACB_INLINE static inline
 #endif
 
 #include "arb.h"

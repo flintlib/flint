@@ -12,7 +12,7 @@
 #include "arb_poly.h"
 
 /* This gives some speedup for small lengths. */
-static __inline__ void
+static inline void
 _arb_poly_rem_2(arb_ptr r, arb_srcptr a, slong al,
     arb_srcptr b, slong bl, slong prec)
 {

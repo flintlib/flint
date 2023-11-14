@@ -15,7 +15,7 @@
 #ifdef ARB_MAT_INLINES_C
 #define ARB_MAT_INLINE
 #else
-#define ARB_MAT_INLINE static __inline__
+#define ARB_MAT_INLINE static inline
 #endif
 
 #include "fmpq_types.h"

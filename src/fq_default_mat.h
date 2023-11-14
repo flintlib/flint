@@ -16,7 +16,7 @@
 #ifdef FQ_DEFAULT_MAT_INLINES_C
 #define FQ_DEFAULT_MAT_INLINE
 #else
-#define FQ_DEFAULT_MAT_INLINE static __inline__
+#define FQ_DEFAULT_MAT_INLINE static inline
 #endif
 
 #include "nmod_mat.h"

@@ -15,7 +15,7 @@
 #ifdef FMPQ_MAT_INLINES_C
 #define FMPQ_MAT_INLINE
 #else
-#define FMPQ_MAT_INLINE static __inline__
+#define FMPQ_MAT_INLINE static inline
 #endif
 
 #include "fmpq_types.h"

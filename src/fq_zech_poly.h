@@ -18,8 +18,8 @@
 #define FQ_ZECH_POLY_INLINE
 #define FQ_POLY_TEMPLATES_INLINE
 #else
-#define FQ_ZECH_POLY_INLINE static __inline__
-#define FQ_POLY_TEMPLATES_INLINE static __inline__
+#define FQ_ZECH_POLY_INLINE static inline
+#define FQ_POLY_TEMPLATES_INLINE static inline
 #endif
 
 #include "fq_zech_types.h"

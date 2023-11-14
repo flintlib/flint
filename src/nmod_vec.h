@@ -16,7 +16,7 @@
 #ifdef NMOD_VEC_INLINES_C
 #define NMOD_VEC_INLINE
 #else
-#define NMOD_VEC_INLINE static __inline__
+#define NMOD_VEC_INLINE static inline
 #endif
 
 #include "flint.h"

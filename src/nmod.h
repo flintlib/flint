@@ -16,7 +16,7 @@
 #ifdef NMOD_INLINES_C
 #define NMOD_INLINE
 #else
-#define NMOD_INLINE static __inline__
+#define NMOD_INLINE static inline
 #endif
 
 #include "ulong_extras.h"
