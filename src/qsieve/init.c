@@ -14,20 +14,17 @@
 #include "qsieve.h"
 
 #if (defined(__WIN32) && !defined(__CYGWIN__)) || defined(_MSC_VER)
-#include <windows.h>
+# include <windows.h>
 #endif
 
 void qsieve_init(qs_t qs_inf, const fmpz_t n)
 {
-    size_t fname_alloc_size;
     slong i;
 
-#if (defined(__WIN32) && !defined(__CYGWIN__)) || defined(_MSC_VER)
-    fname_alloc_size = MAX_PATH;
-#else
-    fname_alloc_size = 20;
-#endif
-    qs_inf->fname = flint_malloc(fname_alloc_size); /* space for filename */
+    qs_inf->siqs = NULL;
+    qs_inf->siqs_cur = NULL;
+    qs_inf->siqs_alloc = 0;
+    qs_inf->siqs_size = 0;
 
     /* store n in struct */
     fmpz_init_set(qs_inf->n, n);

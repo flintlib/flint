@@ -64,6 +64,18 @@ typedef struct          /* format for relation */
     fmpz_t Y;           /* square root of sieve value for relation */
 } relation_t;
 
+typedef struct              /* format for storing relations */
+{
+    slong relation_size;    /* total size of this relation, incl. this */
+    mp_limb_t lp;
+    slong num_factors;
+    slong small_primes;
+    slong Ysz;
+    void * small_factor_Yd; /* storage for small, factor and Y->_mp_d */
+} strg_rel_struct;
+
+typedef strg_rel_struct * strg_rel_ptr;
+
 typedef struct
 {
    fmpz_t B;            /* current B coeff of poly */
@@ -166,8 +178,10 @@ typedef struct
                        RELATION DATA
    ***************************************************************************/
 
-   FLINT_FILE * siqs;     /* pointer to file for storing relations */
-   slong fname;           /* name of file used for relations */
+   void * siqs;           /* pointer to relations for storage */
+   void * siqs_cur;       /* pointer to current relation in storage */
+   slong siqs_alloc;      /* allocation size of storage */
+   slong siqs_size;       /* used size of storage */
 
    slong full_relation;   /* number of full relations */
    slong num_cycles;      /* number of possible full relations from partials */
