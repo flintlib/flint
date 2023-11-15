@@ -655,6 +655,11 @@ endif
 
 examples: library $(EXMPS)
 
+%_EXMP_RUN: %
+	@$(FLINT_DIR)/dev/check_examples.sh $(patsubst $(BUILD_DIR)/examples/%,%,$<) $(BUILD_DIR)/examples
+
+checkexamples: examples $(EXMPS:%=%_EXMP_RUN)
+
 ################################################################################
 # profiling
 ################################################################################
@@ -801,4 +806,4 @@ dist:
 print-%:
 	@echo "$*=$($*)"
 
-.PHONY: all library shared static examples profile tests check tune valgrind clean distclean install uninstall dist %_TEST_RUN %_VALGRIND_RUN print-% coverage
+.PHONY: all library shared static examples checkexamples profile tests check tune valgrind clean distclean install uninstall dist %_TEST_RUN %_VALGRIND_RUN print-% coverage
