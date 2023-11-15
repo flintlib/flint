@@ -18,7 +18,7 @@
 #include "fmpz_types.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 #define QS_DEBUG 0 /* level of debug information printed, 0 = none */

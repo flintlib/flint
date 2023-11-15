@@ -418,7 +418,7 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
 more_primes: /* ran out of A's in init/sieving of linalg failed, increase FB */
 
 #if QS_DEBUG
-        printf("Increasing factor base.\n");
+        flint_printf("Increasing factor base.\n");
 #endif
 
         delta = qs_inf->num_primes / 10;
@@ -442,7 +442,7 @@ more_primes: /* ran out of A's in init/sieving of linalg failed, increase FB */
         qs_inf->s = 0; /* indicate polynomials need setting up again */
 
 #if QS_DEBUG
-        printf("Now %ld primes\n", qs_inf->num_primes);
+        flint_printf("Now %ld primes\n", qs_inf->num_primes);
 #endif
 
         if (small_factor)

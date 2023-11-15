@@ -572,7 +572,7 @@ int qsieve_process_relation(qs_t qs_inf)
         flint_throw(FLINT_ERROR, "fopen fail\n");
 
 #if QS_DEBUG & 64
-    printf("Getting relations\n");
+    flint_printf("Getting relations\n");
 #endif
 
     while (1)
@@ -613,14 +613,14 @@ int qsieve_process_relation(qs_t qs_inf)
     qs_inf->siqs = NULL;
 
 #if QS_DEBUG & 64
-    printf("Removing duplicates\n");
+    flint_printf("Removing duplicates\n");
 #endif
 
     num_relations = qsieve_remove_duplicates(rel_list, num_relations);
     rel_list_length = num_relations;
 
 #if QS_DEBUG & 64
-    printf("Merging relations\n");
+    flint_printf("Merging relations\n");
 #endif
 
     rlist = flint_malloc(num_relations * sizeof(relation_t));
@@ -656,7 +656,7 @@ int qsieve_process_relation(qs_t qs_inf)
     num_relations = rlist_length;
 
 #if QS_DEBUG & 64
-    printf("Sorting relations\n");
+    flint_printf("Sorting relations\n");
 #endif
 
     if (rlist_length < qs_inf->num_primes + qs_inf->ks_primes + qs_inf->extra_rels)
