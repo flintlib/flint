@@ -292,17 +292,9 @@ relation_t qsieve_parse_relation(qs_t qs_inf)
 #if COEFF_MAX != -COEFF_MIN
 # error
 #endif
-        if (abslimb <= (mp_limb_t) COEFF_MAX)
-        {
-            *rel.Y = (Ysz < 0) ? -abslimb : abslimb;
-        }
-        else
-        {
-            mpz_ptr mY = _fmpz_new_mpz();
-            mY->_mp_size = Ysz;
-            *mY->_mp_d = abslimb;
-            *rel.Y = PTR_TO_COEFF(mY);
-        }
+        fmpz_set_ui(rel.Y, abslimb);
+        if (Ysz < 0)
+            fmpz_neg(rel.Y, rel.Y);
     }
     else
     {
