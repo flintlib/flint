@@ -29,52 +29,51 @@ extern "C" {
 
 typedef struct
 {
-   mp_limb_t pinv;     /* precomputed inverse */
-   int p;              /* prime */
-   char size;
+    mp_limb_t pinv; /* precomputed inverse */
+    int p;          /* prime */
+    char size;
 } prime_t;
 
-typedef struct          /* struct for factors of relations */
+typedef struct  /* struct for factors of relations */
 {
-   slong ind;
-   slong exp;
+    slong ind;
+    slong exp;
 } fac_t;
 
-typedef struct           /* matrix column */
+typedef struct      /* matrix column */
 {
-   slong * data;		/* The list of occupied rows in this column */
-   slong weight;		/* Number of nonzero entries in this column */
-   slong orig;         /* Original relation number */
+    slong * data;   /* The list of occupied rows in this column */
+    slong weight;   /* Number of nonzero entries in this column */
+    slong orig;     /* Original relation number */
 } la_col_t;
-
 
 typedef struct          /* entry in hash table */
 {
-   mp_limb_t prime;    /* value of prime */
-   mp_limb_t next;     /* next prime which have same hash value as 'prime' */
-   mp_limb_t count;    /* number of occurrence of 'prime' */
+    mp_limb_t prime;    /* value of prime */
+    mp_limb_t next;     /* next prime which have same hash value as 'prime' */
+    mp_limb_t count;    /* number of occurrence of 'prime' */
 } hash_t;
 
-typedef struct             /* format for relation */
+typedef struct          /* format for relation */
 {
-   mp_limb_t lp;          /* large prime, is 1, if relation is full */
-   slong num_factors;     /* number of factors, excluding small factor */
-   slong small_primes;   /* number of small factors */
-   slong * small;         /* exponent of small factors */
-   fac_t * factor;        /* factor of relation */
-   fmpz_t Y;              /* square root of sieve value for relation */
+    mp_limb_t lp;       /* large prime, is 1, if relation is full */
+    slong num_factors;  /* number of factors, excluding small factor */
+    slong small_primes; /* number of small factors */
+    slong * small;      /* exponent of small factors */
+    fac_t * factor;     /* factor of relation */
+    fmpz_t Y;           /* square root of sieve value for relation */
 } relation_t;
 
 typedef struct
 {
-   fmpz_t B;          /* current B coeff of poly */
-   int * soln1;       /* first start position in sieve per prime */
-   int * soln2;       /* second start position in sieve per prime */
-   int * posn1;       /* temp space for sieving */
-   int * posn2;       /* temp space for sieving */
-   slong * small;     /* exponents of small prime factors in relations */
-   fac_t * factor;    /* factors for a relation */
-   slong num_factors; /* number of factors found in a relation */
+   fmpz_t B;            /* current B coeff of poly */
+   int * soln1;         /* first start position in sieve per prime */
+   int * soln2;         /* second start position in sieve per prime */
+   int * posn1;         /* temp space for sieving */
+   int * posn2;         /* temp space for sieving */
+   slong * small;       /* exponents of small prime factors in relations */
+   fac_t * factor;      /* factors for a relation */
+   slong num_factors;   /* number of factors found in a relation */
 } qs_poly_s;
 
 typedef qs_poly_s qs_poly_t[1];
@@ -167,8 +166,8 @@ typedef struct
                        RELATION DATA
    ***************************************************************************/
 
-   FLINT_FILE * siqs;           /* pointer to file for storing relations */
-   char * fname;          /* name of file used for relations */
+   FLINT_FILE * siqs;     /* pointer to file for storing relations */
+   slong fname;           /* name of file used for relations */
 
    slong full_relation;   /* number of full relations */
    slong num_cycles;      /* number of possible full relations from partials */
@@ -260,36 +259,36 @@ static const mp_limb_t qsieve_tune[][6] =
 
 static const mp_limb_t qsieve_tune[][6] =
 {
-   {10,   50,   90,  5,   2 *  1500,  18}, /* */
-   {20,   50,   90,  6,   2 *  1600,  18}, /* */
-   {30,   50,   100,  6,   2 *  1800,  19}, /* */
-   {40,   50,   100,  8,   2 *  2000,  20}, /* 13 digits */
-   {50,   50,   100,  8,   2 *  2500,  22}, /* 16 digits */
-   {60,   50,   100,  9,   2 *  3000,  24}, /* 19 digits */
-   {70,  100,   250,  9,   2 *  6000,  25}, /* 22 digits */
-   {80,  100,   250,  9,   2 *  8000,  26}, /* 25 digits */
-   {90,  100,   250,  9,   2 *  9000,  30}, /* 28 digits */
-   {100, 100,   250,  9,   2 *  10000, 34}, /* 31 digits */
-   {110, 100,   250,  9,   2 *  30000, 38}, /* 34 digits */
-   {120, 100,   700,  9,   2 *  40000, 49}, /* 37 digits */
-   {130, 100,   800,  9,   2 *  50000, 59}, /* 40 digits */
-   {140, 100,  1200,  9,   2 *  65536, 66}, /* 43 digits */
-   {150, 100,  1500, 10,   2 *  65536, 70}, /* 46 digit */
-   {160, 150,  2000, 11,   4 *  65536, 73}, /* 49 digit */
-   {170, 150,  2000, 12,   4 *  65536, 75}, /* 52 digits */
-   {180, 150,  3000, 12,   4 *  65536, 76}, /* 55 digits */
-   {190, 150,  3000, 13,   4 *  65536, 78}, /* 58 digit */
-   {200, 200,  4500, 14,   4 *  65536, 81}, /* 61 digits */
-   {210, 100,  8000, 14,   12 *  65536, 84}, /* 64 digits */
-   {220, 300, 10000, 15,   12 *  65536, 88}, /* 67 digits */
-   {230, 400, 20000, 17,   20 *  65536, 90}, /* 70 digits */
-   {240, 450, 20000, 19,   20 *  65536, 93}, /* 73 digis */
-   {250, 500, 22000, 22,   24 *  65536, 97}, /* 76 digits */
-   {260, 600, 25000, 25,   24 *  65536, 100}, /* 79 digits */
-   {270, 800, 35000, 27,   28 *  65536, 102}, /* 82 digits */
-   {280, 900, 40000, 29,   28 *  65536, 104}, /* 85 digits */
-   {290, 1000, 60000, 29,  32 *  65536, 106}, /* 88 digits */
-   {300, 1100, 140000, 30,  32 * 65536, 108} /* 91 digits */
+    { 10,   50,     90,  5,  2 *  1500,  18}, /* */
+    { 20,   50,     90,  6,  2 *  1600,  18}, /* */
+    { 30,   50,    100,  6,  2 *  1800,  19}, /* */
+    { 40,   50,    100,  8,  2 *  2000,  20}, /* 13 digits */
+    { 50,   50,    100,  8,  2 *  2500,  22}, /* 16 digits */
+    { 60,   50,    100,  9,  2 *  3000,  24}, /* 19 digits */
+    { 70,  100,    250,  9,  2 *  6000,  25}, /* 22 digits */
+    { 80,  100,    250,  9,  2 *  8000,  26}, /* 25 digits */
+    { 90,  100,    250,  9,  2 *  9000,  30}, /* 28 digits */
+    {100,  100,    250,  9,  2 * 10000,  34}, /* 31 digits */
+    {110,  100,    250,  9,  2 * 30000,  38}, /* 34 digits */
+    {120,  100,    700,  9,  2 * 40000,  49}, /* 37 digits */
+    {130,  100,    800,  9,  2 * 50000,  59}, /* 40 digits */
+    {140,  100,   1200,  9,  2 * 65536,  66}, /* 43 digits */
+    {150,  100,   1500, 10,  2 * 65536,  70}, /* 46 digit */
+    {160,  150,   2000, 11,  4 * 65536,  73}, /* 49 digit */
+    {170,  150,   2000, 12,  4 * 65536,  75}, /* 52 digits */
+    {180,  150,   3000, 12,  4 * 65536,  76}, /* 55 digits */
+    {190,  150,   3000, 13,  4 * 65536,  78}, /* 58 digit */
+    {200,  200,   4500, 14,  4 * 65536,  81}, /* 61 digits */
+    {210,  100,   8000, 14, 12 * 65536,  84}, /* 64 digits */
+    {220,  300,  10000, 15, 12 * 65536,  88}, /* 67 digits */
+    {230,  400,  20000, 17, 20 * 65536,  90}, /* 70 digits */
+    {240,  450,  20000, 19, 20 * 65536,  93}, /* 73 digis */
+    {250,  500,  22000, 22, 24 * 65536,  97}, /* 76 digits */
+    {260,  600,  25000, 25, 24 * 65536, 100}, /* 79 digits */
+    {270,  800,  35000, 27, 28 * 65536, 102}, /* 82 digits */
+    {280,  900,  40000, 29, 28 * 65536, 104}, /* 85 digits */
+    {290, 1000,  60000, 29, 32 * 65536, 106}, /* 88 digits */
+    {300, 1100, 140000, 30, 32 * 65536, 108} /* 91 digits */
 };
 
 #endif
@@ -374,30 +373,20 @@ static inline void insert_col_entry(la_col_t * col, slong entry)
 {
    if (((col->weight >> 4) << 4) == col->weight) /* need more space */
    {
-       if (col->weight != 0) col->data =
-           (slong *) flint_realloc(col->data, (col->weight + 16)*sizeof(slong));
-       else col->data = (slong *) flint_malloc(16*sizeof(slong));
+       if (col->weight != 0)
+           col->data = (slong *) flint_realloc(col->data, (col->weight + 16) * sizeof(slong));
+       else
+           col->data = (slong *) flint_malloc(16 * sizeof(slong));
    }
 
    col->data[col->weight] = entry;
    col->weight++;
 }
 
-static inline void swap_cols(la_col_t * col2, la_col_t * col1)
+static inline
+void swap_cols(la_col_t * col1, la_col_t * col2)
 {
-   la_col_t temp;
-
-   temp.weight = col1->weight;
-   temp.data = col1->data;
-   temp.orig = col1->orig;
-
-   col1->weight = col2->weight;
-   col1->data = col2->data;
-   col1->orig = col2->orig;
-
-   col2->weight = temp.weight;
-   col2->data = temp.data;
-   col2->orig = temp.orig;
+    FLINT_SWAP(la_col_t, *col1, *col2);
 }
 
 static inline void clear_col(la_col_t * col)
@@ -407,7 +396,8 @@ static inline void clear_col(la_col_t * col)
 
 static inline void free_col(la_col_t * col)
 {
-   if (col->weight) flint_free(col->data);
+   if (col->weight)
+       flint_free(col->data);
 }
 
 uint64_t get_null_entry(uint64_t * nullrows, slong i, slong l);

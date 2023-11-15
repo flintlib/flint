@@ -552,8 +552,7 @@ slong qsieve_collect_relations(qs_t qs_inf, unsigned char * sieve)
     const thread_pool_handle* handles = qs_inf->handles;
     slong num_handles = qs_inf->num_handles;
 
-    args = (_worker_arg_struct *) flint_malloc((1 + num_handles)
-                                                  *sizeof(_worker_arg_struct));
+    args = flint_malloc((1 + num_handles) * sizeof(_worker_arg_struct));
 
     qs_inf->index_j = 0;
     qsieve_init_poly_first(qs_inf);
