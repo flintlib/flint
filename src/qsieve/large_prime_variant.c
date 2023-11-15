@@ -567,7 +567,7 @@ int qsieve_process_relation(qs_t qs_inf)
 
     if (qs_inf->siqs != NULL && fclose((FILE *) qs_inf->siqs))
         flint_throw(FLINT_ERROR, "fclose fail\n");
-    qs_inf->siqs = (FLINT_FILE *) fopen(qs_inf->fname, "r");
+    qs_inf->siqs = (FLINT_FILE *) fopen(qs_inf->fname, "rb");
     if (qs_inf->siqs == NULL)
         flint_throw(FLINT_ERROR, "fopen fail\n");
 
@@ -665,7 +665,7 @@ int qsieve_process_relation(qs_t qs_inf)
        done = 0;
        if (qs_inf->siqs != NULL && fclose((FILE *) qs_inf->siqs))
            flint_throw(FLINT_ERROR, "fclose fail\n");
-       qs_inf->siqs = (FLINT_FILE *) fopen(qs_inf->fname, "a");
+       qs_inf->siqs = (FLINT_FILE *) fopen(qs_inf->fname, "ab");
        if (qs_inf->siqs == NULL)
            flint_throw(FLINT_ERROR, "fopen fail\n");
     } else
