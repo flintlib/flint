@@ -329,7 +329,7 @@ jobs:
   # ubuntu with clang
   #############################################################################
   ubuntu-clang:
-    name: Ubuntu Clang (x5)
+    name: Ubuntu Clang with examples (x5)
 
     runs-on: ubuntu-latest
 
@@ -344,14 +344,12 @@ jobs:
 
       - name: "Setup"
         run: |
-          sudo apt-get install -y libgmp-dev
-          sudo apt-get install -y libmpfr-dev
-          sudo apt-get install -y autoconf
-          sudo apt-get install -y libtool-bin
+          sudo apt-get install -y libgmp-dev libmpfr-dev autoconf libtool-bin perl
           clang --version
           make --version
           autoconf --version
           libtool --version
+          perl --version
           echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
 
       - name: "Configure"
@@ -374,6 +372,14 @@ jobs:
       - name: "Check"
         run: |
           $MAKE check
+
+      - name: "Compile examples"
+        run: |
+          $MAKE examples
+
+      - name: "Check examples"
+        run: |
+          $MAKE checkexamples
 
 
 
