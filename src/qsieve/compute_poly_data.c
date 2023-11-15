@@ -285,11 +285,11 @@ int qsieve_init_A(qs_t qs_inf)
             first_subset[j] = curr_subset[j]; /* save 1st tuple for restarts */
 
 #if QS_DEBUG
-        printf("First A_ind = (");
+        flint_printf("First A_ind = (");
         for (i = 0; i < s - 1; i++)
-            printf("%ld, ", A_ind[i]);
-        printf("%ld", A_ind[s - 1]);
-        printf(")\n");
+            flint_printf("%ld, ", A_ind[i]);
+        flint_printf("%ld", A_ind[s - 1]);
+        flint_printf(")\n");
 #endif
     }
 
@@ -509,11 +509,11 @@ int qsieve_next_A(qs_t qs_inf)
     }
 
 #if QS_DEBUG
-    printf("A_ind = (");
+    flint_printf("A_ind = (");
     for (i = 0; i < s - 1; i++)
-        printf("%ld, ", A_ind[i]);
-    printf("%ld", A_ind[s - 1]);
-    printf(")\n");
+        flint_printf("%ld, ", A_ind[i]);
+    flint_printf("%ld", A_ind[s - 1]);
+    flint_printf(")\n");
 #endif
 
     qs_inf->h = h;

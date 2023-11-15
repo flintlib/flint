@@ -226,7 +226,7 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
         flint_printf("Exception (qsieve_factor). GetTempFileNameA() failed.\n");
         flint_abort();
     }
-    qs_inf->siqs = (FLINT_FILE *) fopen(qs_inf->fname, "w");
+    qs_inf->siqs = (FLINT_FILE *) fopen(qs_inf->fname, "wb");
     if (qs_inf->siqs == NULL)
         flint_throw(FLINT_ERROR, "fopen failed\n");
 #else
@@ -235,7 +235,7 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
     if (fd == -1)
         flint_throw(FLINT_ERROR, "mkstemp failed\n");
 
-    qs_inf->siqs = (FLINT_FILE *) fdopen(fd, "w");
+    qs_inf->siqs = (FLINT_FILE *) fdopen(fd, "wb");
     if (qs_inf->siqs == NULL)
         flint_throw(FLINT_ERROR, "fdopen failed\n");
 #endif
@@ -406,7 +406,7 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
 
                     _fmpz_vec_clear(facs, 100);
 
-                    qs_inf->siqs = (FLINT_FILE *) fopen(qs_inf->fname, "w");
+                    qs_inf->siqs = (FLINT_FILE *) fopen(qs_inf->fname, "wb");
                     if (qs_inf->siqs == NULL)
                         flint_throw(FLINT_ERROR, "fopen fail\n");
                     qs_inf->num_primes = num_primes; /* linear algebra adjusts this */
@@ -418,7 +418,7 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
 more_primes: /* ran out of A's in init/sieving of linalg failed, increase FB */
 
 #if QS_DEBUG
-        printf("Increasing factor base.\n");
+        flint_printf("Increasing factor base.\n");
 #endif
 
         delta = qs_inf->num_primes / 10;
@@ -442,7 +442,7 @@ more_primes: /* ran out of A's in init/sieving of linalg failed, increase FB */
         qs_inf->s = 0; /* indicate polynomials need setting up again */
 
 #if QS_DEBUG
-        printf("Now %ld primes\n", qs_inf->num_primes);
+        flint_printf("Now %ld primes\n", qs_inf->num_primes);
 #endif
 
         if (small_factor)
