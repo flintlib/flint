@@ -23,7 +23,7 @@ with op = 1, computes D = C + A*B
 with op = -1, computes D = C - A*B
 */
 
-static __inline__ void
+static inline void
 _fmpz_mod_mat_addmul_basic_op(fmpz ** D, fmpz ** const C, fmpz ** const A,
                fmpz ** const B, slong m, slong k, slong n, int op, fmpz_t p)
 {
@@ -133,7 +133,7 @@ _fmpz_mod_mat_addmul_transpose_worker(void * arg_ptr)
     }
 }
 
-static __inline__ void
+static inline void
 _fmpz_mod_mat_addmul_transpose_threaded_pool_op(fmpz ** D, fmpz ** const C,
                             fmpz ** const A, fmpz ** const B, slong m,
                                        slong k, slong n, int op, fmpz_t p,

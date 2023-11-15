@@ -15,7 +15,7 @@
 #ifdef PADIC_POLY_INLINES_C
 #define PADIC_POLY_INLINE
 #else
-#define PADIC_POLY_INLINE static __inline__
+#define PADIC_POLY_INLINE static inline
 #endif
 
 #include "padic.h"

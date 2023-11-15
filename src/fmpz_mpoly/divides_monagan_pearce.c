@@ -89,7 +89,7 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
         lc_sign = FLINT_SIGN_EXT(poly3[0]);
         lc_norm = flint_clz(lc_abs);
         lc_n = lc_abs << lc_norm;
-        invert_limb(lc_i, lc_n);
+        lc_i = n_preinvert_limb_prenorm(lc_n);
     }
 
     while (heap_len > 1)
@@ -381,7 +381,7 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
         lc_sign = FLINT_SIGN_EXT(poly3[0]);
         lc_norm = flint_clz(lc_abs);
         lc_n = lc_abs << lc_norm;
-        invert_limb(lc_i, lc_n);
+        lc_i = n_preinvert_limb_prenorm(lc_n);
     }
 
     while (heap_len > 1)

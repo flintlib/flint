@@ -16,7 +16,7 @@
 #ifdef MPF_MAT_INLINES_C
 #define MPF_MAT_INLINE
 #else
-#define MPF_MAT_INLINE static __inline__
+#define MPF_MAT_INLINE static inline
 #endif
 
 #include "fmpz_types.h"

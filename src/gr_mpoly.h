@@ -17,7 +17,7 @@
 #ifdef GR_MPOLY_INLINES_C
 #define GR_MPOLY_INLINE
 #else
-#define GR_MPOLY_INLINE static __inline__
+#define GR_MPOLY_INLINE static inline
 #endif
 
 #include "mpoly.h"

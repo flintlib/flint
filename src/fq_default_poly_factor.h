@@ -16,7 +16,7 @@
 #ifdef FQ_DEFAULT_POLY_FACTOR_INLINES_C
 #define FQ_DEFAULT_POLY_FACTOR_INLINE
 #else
-#define FQ_DEFAULT_POLY_FACTOR_INLINE static __inline__
+#define FQ_DEFAULT_POLY_FACTOR_INLINE static inline
 #endif
 
 #include "thread_pool.h"

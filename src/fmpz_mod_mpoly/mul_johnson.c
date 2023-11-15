@@ -18,7 +18,7 @@
 # undef fmpz_mod_ctx_get_modulus_mpz_read_only
 #endif
 
-static __inline__ void
+static inline void
 fmpz_mod_ctx_get_modulus_mpz_read_only(mpz_t m, const fmpz_mod_ctx_t ctx)
 {
     const fmpz * p = fmpz_mod_ctx_modulus(ctx);

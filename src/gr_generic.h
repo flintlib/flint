@@ -15,7 +15,7 @@
 #ifdef GR_GENERIC_INLINES_C
 #define GR_GENERIC_INLINE
 #else
-#define GR_GENERIC_INLINE static __inline__
+#define GR_GENERIC_INLINE static inline
 #endif
 
 #include "flint.h"

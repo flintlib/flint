@@ -16,8 +16,8 @@
 #define FQ_MAT_TEMPLATES_INLINE
 #define FQ_NMOD_MAT_INLINE
 #else
-#define FQ_MAT_TEMPLATES_INLINE static __inline__
-#define FQ_NMOD_MAT_INLINE static __inline__
+#define FQ_MAT_TEMPLATES_INLINE static inline
+#define FQ_NMOD_MAT_INLINE static inline
 #endif
 
 #include "fq_nmod_types.h"

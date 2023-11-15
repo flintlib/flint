@@ -15,7 +15,7 @@
 #ifdef FQ_NMOD_MPOLY_INLINES_C
 #define FQ_NMOD_MPOLY_INLINE
 #else
-#define FQ_NMOD_MPOLY_INLINE static __inline__
+#define FQ_NMOD_MPOLY_INLINE static inline
 #endif
 
 #include "nmod_mpoly.h"

@@ -1,9 +1,9 @@
 /*
     Copyright (C) 2012 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
@@ -29,7 +29,7 @@ zeta_bsplit_state;
 
 typedef zeta_bsplit_state zeta_bsplit_t[1];
 
-static __inline__ void
+static inline void
 zeta_bsplit_init(zeta_bsplit_t S)
 {
     arb_init(S->A);
@@ -41,7 +41,7 @@ zeta_bsplit_init(zeta_bsplit_t S)
     arb_init(S->Q3);
 }
 
-static __inline__ void
+static inline void
 zeta_bsplit_clear(zeta_bsplit_t S)
 {
     arb_clear(S->A);
@@ -54,7 +54,7 @@ zeta_bsplit_clear(zeta_bsplit_t S)
 }
 
 
-static __inline__ void
+static inline void
 zeta_coeff_k(zeta_bsplit_t S, slong k, slong n, slong s)
 {
     arb_set_si(S->D, 2 * (n + k));

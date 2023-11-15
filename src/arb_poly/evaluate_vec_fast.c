@@ -1,9 +1,9 @@
 /*
     Copyright (C) 2012 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
@@ -12,7 +12,7 @@
 #include "arb_poly.h"
 
 /* This gives some speedup for small lengths. */
-static __inline__ void
+static inline void
 _arb_poly_rem_2(arb_ptr r, arb_srcptr a, slong al,
     arb_srcptr b, slong bl, slong prec)
 {

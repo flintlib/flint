@@ -25,7 +25,7 @@
    Find s, t such that g = s*a - t*b is the gcd of a and b mod n and where
    s is a unit mod n. Assumes a and b are reduced mod n and no aliasing.
 */
-static __inline__ mp_limb_t
+static inline mp_limb_t
 _nmod_xgcd_unit(mp_limb_t * s, mp_limb_t * t, mp_limb_t a, mp_limb_t b, nmod_t mod)
 {
    mp_limb_t g, ag, bg;
@@ -51,7 +51,7 @@ _nmod_xgcd_unit(mp_limb_t * s, mp_limb_t * t, mp_limb_t a, mp_limb_t b, nmod_t m
    return g;
 }
 
-static __inline__ int
+static inline int
 _nmod_mat_pivot(nmod_mat_t A, slong start_row, slong col)
 {
     slong j;

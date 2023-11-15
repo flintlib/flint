@@ -1,9 +1,9 @@
 /*
     Copyright (C) 2012 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
@@ -14,7 +14,7 @@
 /* we don't need any error bounding, so we define a few helper
    functions that ignore the radii */
 
-static __inline__ void
+static inline void
 acb_sub_mid(acb_t z, const acb_t x, const acb_t y, slong prec)
 {
     arf_sub(arb_midref(acb_realref(z)),
@@ -25,7 +25,7 @@ acb_sub_mid(acb_t z, const acb_t x, const acb_t y, slong prec)
         arb_midref(acb_imagref(y)), prec, ARF_RND_DOWN);
 }
 
-static __inline__ void
+static inline void
 acb_add_mid(acb_t z, const acb_t x, const acb_t y, slong prec)
 {
     arf_add(arb_midref(acb_realref(z)),
@@ -36,7 +36,7 @@ acb_add_mid(acb_t z, const acb_t x, const acb_t y, slong prec)
         arb_midref(acb_imagref(y)), prec, ARF_RND_DOWN);
 }
 
-static __inline__ void
+static inline void
 acb_mul_mid(acb_t z, const acb_t x, const acb_t y, slong prec)
 {
 #define a arb_midref(acb_realref(x))
@@ -56,7 +56,7 @@ acb_mul_mid(acb_t z, const acb_t x, const acb_t y, slong prec)
 #undef f
 }
 
-static __inline__ void
+static inline void
 acb_inv_mid(acb_t z, const acb_t x, slong prec)
 {
     arf_t t;
@@ -132,9 +132,15 @@ _acb_poly_refine_roots_durand_kerner(acb_ptr roots,
         mag_zero(arb_radref(acb_realref(y)));
         mag_zero(arb_radref(acb_imagref(y)));
 
+        /* In the extremely unlikely event that y = 0, don't divide by 0. */
+        if (arf_is_zero(arb_midref(acb_realref(y))) && arf_is_zero(arb_midref(acb_imagref(y))))
+        {
+            arf_set_ui_2exp_si(arb_midref(acb_realref(y)), 1, -prec);
+            arf_set_ui_2exp_si(arb_midref(acb_imagref(y)), 1, -prec);
+        }
+
         acb_inv_mid(t, y, prec);
         acb_mul_mid(t, t, x, prec);
-
         acb_sub_mid(roots + i, roots + i, t, prec);
 
         arf_get_mag(arb_radref(acb_realref(roots + i)), arb_midref(acb_realref(t)));

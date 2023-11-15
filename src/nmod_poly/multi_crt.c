@@ -279,14 +279,20 @@ int nmod_poly_multi_crt_precompute(
 
     TMP_START;
 
-    m = (const nmod_poly_struct **) TMP_ALLOC(len*sizeof(nmod_poly_struct *));
+    m = TMP_ALLOC(len * sizeof(nmod_poly_struct *));
     for (i = 0; i < len; i++)
     {
         m[i] = moduli + i;
     }
 
-    success = nmod_poly_multi_crt_precompute_p(P,
-                                    (const nmod_poly_struct * const *) m, len);
+    /* GCC really wants to complain about this one */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
+    success = nmod_poly_multi_crt_precompute_p(P, m, len);
+#ifdef __GNUC__
+# pragma GCC diagnostic pop
+#endif
     TMP_END;
 
     return success;

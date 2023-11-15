@@ -370,7 +370,7 @@ void qsieve_insert_relation(qs_t qs_inf, relation_t * rel_list,
 
 int qsieve_process_relation(qs_t qs_inf);
 
-static __inline__ void insert_col_entry(la_col_t * col, slong entry)
+static inline void insert_col_entry(la_col_t * col, slong entry)
 {
    if (((col->weight >> 4) << 4) == col->weight) /* need more space */
    {
@@ -383,7 +383,7 @@ static __inline__ void insert_col_entry(la_col_t * col, slong entry)
    col->weight++;
 }
 
-static __inline__ void swap_cols(la_col_t * col2, la_col_t * col1)
+static inline void swap_cols(la_col_t * col2, la_col_t * col1)
 {
    la_col_t temp;
 
@@ -400,12 +400,12 @@ static __inline__ void swap_cols(la_col_t * col2, la_col_t * col1)
    col2->orig = temp.orig;
 }
 
-static __inline__ void clear_col(la_col_t * col)
+static inline void clear_col(la_col_t * col)
 {
    col->weight = 0;
 }
 
-static __inline__ void free_col(la_col_t * col)
+static inline void free_col(la_col_t * col)
 {
    if (col->weight) flint_free(col->data);
 }

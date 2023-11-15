@@ -26,6 +26,7 @@ Domain properties
               truth_t gr_ctx_is_algebraically_closed(gr_ctx_t ctx)
               truth_t gr_ctx_is_finite_characteristic(gr_ctx_t ctx)
               truth_t gr_ctx_is_ordered_ring(gr_ctx_t ctx)
+              truth_t gr_ctx_is_zero_ring(gr_ctx_t ctx)
 
     Returns whether the structure satisfies the respective
     mathematical property.

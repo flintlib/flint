@@ -15,7 +15,7 @@
 #ifdef FQ_NMOD_MPOLY_FACTOR_INLINES_C
 #define FQ_NMOD_MPOLY_FACTOR_INLINE
 #else
-#define FQ_NMOD_MPOLY_FACTOR_INLINE static __inline__
+#define FQ_NMOD_MPOLY_FACTOR_INLINE static inline
 #endif
 
 #include "fq_nmod_mpoly.h"

@@ -19,7 +19,7 @@
         ? (mp_ptr) _mpz_realloc(z, len) \
         : ((z)->_mp_d))
 
-static __inline__
+static inline
 void flint_mpz_add_uiui(mpz_ptr a, mpz_srcptr b, ulong c1, ulong c0)
 {
     ulong d[2];
@@ -32,7 +32,7 @@ void flint_mpz_add_uiui(mpz_ptr a, mpz_srcptr b, ulong c1, ulong c0)
     mpz_add(a, b, c);
 }
 
-static __inline__
+static inline
 void flint_mpz_add_signed_uiui(mpz_ptr a, mpz_srcptr b, ulong c1, ulong c0)
 {
     ulong d[2];
@@ -47,7 +47,7 @@ void flint_mpz_add_signed_uiui(mpz_ptr a, mpz_srcptr b, ulong c1, ulong c0)
     mpz_add(a, b, c);
 }
 
-static __inline__
+static inline
 void flint_mpz_add_uiuiui(mpz_ptr a, mpz_srcptr b, ulong c2, ulong c1, ulong c0)
 {
     ulong d[3];
@@ -61,7 +61,7 @@ void flint_mpz_add_uiuiui(mpz_ptr a, mpz_srcptr b, ulong c2, ulong c1, ulong c0)
     mpz_add(a, b, c);
 }
 
-static __inline__
+static inline
 void flint_mpz_add_signed_uiuiui(mpz_ptr a, mpz_srcptr b,
                                                  ulong c2, ulong c1, ulong c0)
 {
@@ -102,7 +102,7 @@ void flint_mpz_add_signed_uiuiui(mpz_ptr a, mpz_srcptr b,
 #define flint_mpz_get_ui(xxx) \
    ((xxx)->_mp_size == 0 ? UWORD(0) : (xxx)->_mp_d[0])
 
-static __inline__
+static inline
 void flint_mpz_set_si(mpz_ptr r, slong s)
 {
    /* GMP 6.2 lazily performs allocation, deal with that if necessary
@@ -122,7 +122,7 @@ void flint_mpz_set_si(mpz_ptr r, slong s)
    }
 }
 
-static __inline__
+static inline
 void flint_mpz_set_ui(mpz_ptr r, ulong u)
 {
    /* GMP 6.2 lazily performs allocation, deal with that if necessary
@@ -137,7 +137,7 @@ void flint_mpz_set_ui(mpz_ptr r, ulong u)
    r->_mp_size = u != 0;
 }
 
-static __inline__
+static inline
 void flint_mpz_init_set_si(mpz_ptr r, slong s)
 {
    r->_mp_d = (mp_ptr) flint_malloc(sizeof(mp_limb_t));
@@ -152,7 +152,7 @@ void flint_mpz_init_set_si(mpz_ptr r, slong s)
    }
 }
 
-static __inline__
+static inline
 void flint_mpz_init_set_ui(mpz_ptr r, ulong u)
 {
    r->_mp_d = (mp_ptr) flint_malloc(sizeof(mp_limb_t));
@@ -162,7 +162,7 @@ void flint_mpz_init_set_ui(mpz_ptr r, ulong u)
    r->_mp_size = u != 0;
 }
 
-static __inline__
+static inline
 void flint_mpz_add_ui(mpz_ptr a, mpz_srcptr b, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tc, c);
@@ -170,7 +170,7 @@ void flint_mpz_add_ui(mpz_ptr a, mpz_srcptr b, ulong c)
    mpz_add(a, b, tc);
 }
 
-static __inline__
+static inline
 void flint_mpz_sub_ui(mpz_ptr a, mpz_srcptr b, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tc, c);
@@ -178,7 +178,7 @@ void flint_mpz_sub_ui(mpz_ptr a, mpz_srcptr b, ulong c)
    mpz_sub(a, b, tc);
 }
 
-static __inline__
+static inline
 void flint_mpz_mul_ui(mpz_ptr a, mpz_srcptr b, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tc, c);
@@ -186,7 +186,7 @@ void flint_mpz_mul_ui(mpz_ptr a, mpz_srcptr b, ulong c)
    mpz_mul(a, b, tc);
 }
 
-static __inline__
+static inline
 void flint_mpz_mul_si(mpz_ptr a, mpz_srcptr b, slong c)
 {
    FLINT_MOCK_MPZ_SI(tc, c);
@@ -194,7 +194,7 @@ void flint_mpz_mul_si(mpz_ptr a, mpz_srcptr b, slong c)
    mpz_mul(a, b, tc);
 }
 
-static __inline__
+static inline
 void flint_mpz_addmul_ui(mpz_ptr a, mpz_srcptr b, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tc, c);
@@ -202,7 +202,7 @@ void flint_mpz_addmul_ui(mpz_ptr a, mpz_srcptr b, ulong c)
    mpz_addmul(a, b, tc);
 }
 
-static __inline__
+static inline
 void flint_mpz_submul_ui(mpz_ptr a, mpz_srcptr b, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tc, c);
@@ -210,7 +210,7 @@ void flint_mpz_submul_ui(mpz_ptr a, mpz_srcptr b, ulong c)
    mpz_submul(a, b, tc);
 }
 
-static __inline__
+static inline
 void flint_mpz_ui_sub(mpz_ptr a, ulong b, mpz_srcptr c)
 {
    FLINT_MOCK_MPZ_UI(tb, b);
@@ -218,7 +218,7 @@ void flint_mpz_ui_sub(mpz_ptr a, ulong b, mpz_srcptr c)
    mpz_sub(a, tb, c);
 }
 
-static __inline__
+static inline
 void flint_mpz_ui_pow_ui(mpz_ptr a, ulong b, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tb, b);
@@ -226,7 +226,7 @@ void flint_mpz_ui_pow_ui(mpz_ptr a, ulong b, ulong c)
    mpz_pow_ui(a, tb, c);
 }
 
-static __inline__
+static inline
 void flint_mpz_divexact_ui(mpz_ptr a, mpz_srcptr b, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tc, c);
@@ -234,7 +234,7 @@ void flint_mpz_divexact_ui(mpz_ptr a, mpz_srcptr b, ulong c)
    mpz_divexact(a, b, tc);
 }
 
-static __inline__
+static inline
 int flint_mpz_divisible_ui_p(mpz_srcptr a, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tc, c);
@@ -242,7 +242,7 @@ int flint_mpz_divisible_ui_p(mpz_srcptr a, ulong c)
    return mpz_divisible_p(a, tc);
 }
 
-static __inline__
+static inline
 int flint_mpz_congruent_ui_p(mpz_srcptr a, ulong b, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tc, c);
@@ -253,7 +253,7 @@ int flint_mpz_congruent_ui_p(mpz_srcptr a, ulong b, ulong c)
    }
 }
 
-static __inline__
+static inline
 int flint_mpz_cmp_ui(mpz_srcptr a, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tc, c);
@@ -261,7 +261,7 @@ int flint_mpz_cmp_ui(mpz_srcptr a, ulong c)
    return mpz_cmp(a, tc);
 }
 
-static __inline__
+static inline
 int flint_mpz_cmp_si(mpz_srcptr a, slong c)
 {
    FLINT_MOCK_MPZ_SI(tc, c);
@@ -269,7 +269,7 @@ int flint_mpz_cmp_si(mpz_srcptr a, slong c)
    return mpz_cmp(a, tc);
 }
 
-static __inline__
+static inline
 int flint_mpq_cmp_si(mpq_srcptr a, slong b, ulong c)
 {
    mpq_t tq;
@@ -289,7 +289,7 @@ int flint_mpq_cmp_si(mpq_srcptr a, slong b, ulong c)
    }
 }
 
-static __inline__
+static inline
 int flint_mpq_cmp_ui(mpq_srcptr a, ulong b, ulong c)
 {
    mpq_t tq;
@@ -309,7 +309,7 @@ int flint_mpq_cmp_ui(mpq_srcptr a, ulong b, ulong c)
    }
 }
 
-static __inline__
+static inline
 void flint_mpq_set_si(mpq_ptr a, slong b, ulong c)
 {
    FLINT_MOCK_MPZ_SI(tb, b);
@@ -321,7 +321,7 @@ void flint_mpq_set_si(mpq_ptr a, slong b, ulong c)
    }
 }
 
-static __inline__
+static inline
 void flint_mpq_set_ui(mpq_ptr a, ulong b, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tb, b);
@@ -333,7 +333,7 @@ void flint_mpq_set_ui(mpq_ptr a, ulong b, ulong c)
    }
 }
 
-static __inline__
+static inline
 ulong flint_mpz_cdiv_q_ui(mpz_ptr q, mpz_srcptr n, ulong c)
 {
    if (FLINT_BIT_COUNT(c) <= 32)
@@ -357,7 +357,7 @@ ulong flint_mpz_cdiv_q_ui(mpz_ptr q, mpz_srcptr n, ulong c)
    }
 }
 
-static __inline__
+static inline
 ulong flint_mpz_fdiv_q_ui(mpz_ptr q, mpz_srcptr n, ulong c)
 {
    if (FLINT_BIT_COUNT(c) <= 32)
@@ -381,7 +381,7 @@ ulong flint_mpz_fdiv_q_ui(mpz_ptr q, mpz_srcptr n, ulong c)
    }
 }
 
-static __inline__
+static inline
 ulong flint_mpz_tdiv_q_ui(mpz_ptr q, mpz_srcptr n, ulong c)
 {
     if (FLINT_BIT_COUNT(c) <= 32)
@@ -405,7 +405,7 @@ ulong flint_mpz_tdiv_q_ui(mpz_ptr q, mpz_srcptr n, ulong c)
    }
 }
 
-static __inline__
+static inline
 ulong flint_mpz_cdiv_r_ui(mpz_ptr r, mpz_srcptr n, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tc, c);
@@ -415,7 +415,7 @@ ulong flint_mpz_cdiv_r_ui(mpz_ptr r, mpz_srcptr n, ulong c)
    return flint_mpz_get_ui(r);
 }
 
-static __inline__
+static inline
 ulong flint_mpz_fdiv_r_ui(mpz_ptr r, mpz_srcptr n, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tc, c);
@@ -425,7 +425,7 @@ ulong flint_mpz_fdiv_r_ui(mpz_ptr r, mpz_srcptr n, ulong c)
    return flint_mpz_get_ui(r);
 }
 
-static __inline__
+static inline
 ulong flint_mpz_tdiv_r_ui(mpz_ptr r, mpz_srcptr n, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tc, c);
@@ -435,7 +435,7 @@ ulong flint_mpz_tdiv_r_ui(mpz_ptr r, mpz_srcptr n, ulong c)
    return flint_mpz_get_ui(r);
 }
 
-static __inline__
+static inline
 ulong flint_mpz_cdiv_qr_ui(mpz_ptr q, mpz_ptr r, mpz_srcptr n, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tc, c);
@@ -445,7 +445,7 @@ ulong flint_mpz_cdiv_qr_ui(mpz_ptr q, mpz_ptr r, mpz_srcptr n, ulong c)
    return flint_mpz_get_ui(r);
 }
 
-static __inline__
+static inline
 ulong flint_mpz_fdiv_qr_ui(mpz_ptr q, mpz_ptr r, mpz_srcptr n, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tc, c);
@@ -455,7 +455,7 @@ ulong flint_mpz_fdiv_qr_ui(mpz_ptr q, mpz_ptr r, mpz_srcptr n, ulong c)
    return flint_mpz_get_ui(r);
 }
 
-static __inline__
+static inline
 ulong flint_mpz_tdiv_qr_ui(mpz_ptr q, mpz_ptr r, mpz_srcptr n, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tc, c);
@@ -465,7 +465,7 @@ ulong flint_mpz_tdiv_qr_ui(mpz_ptr q, mpz_ptr r, mpz_srcptr n, ulong c)
    return flint_mpz_get_ui(r);
 }
 
-static __inline__
+static inline
 ulong flint_mpz_cdiv_ui(mpz_srcptr n, ulong c)
 {
    mpz_t r;
@@ -483,7 +483,7 @@ ulong flint_mpz_cdiv_ui(mpz_srcptr n, ulong c)
    return res;
 }
 
-static __inline__
+static inline
 ulong flint_mpz_fdiv_ui(mpz_srcptr n, ulong c)
 {
    mpz_t r;
@@ -501,7 +501,7 @@ ulong flint_mpz_fdiv_ui(mpz_srcptr n, ulong c)
    return res;
 }
 
-static __inline__
+static inline
 ulong flint_mpz_tdiv_ui(mpz_srcptr n, ulong c)
 {
    mpz_t r;
@@ -519,7 +519,7 @@ ulong flint_mpz_tdiv_ui(mpz_srcptr n, ulong c)
    return res;
 }
 
-static __inline__
+static inline
 ulong flint_mpz_mod_ui(mpz_ptr r, mpz_srcptr n, ulong c)
 {
    FLINT_MOCK_MPZ_UI(tc, c);
@@ -529,7 +529,7 @@ ulong flint_mpz_mod_ui(mpz_ptr r, mpz_srcptr n, ulong c)
    return flint_mpz_get_ui(r);
 }
 
-static __inline__
+static inline
 void flint_mpz_powm_ui(mpz_ptr r, mpz_srcptr b, ulong exp, mpz_srcptr mod)
 {
    FLINT_MOCK_MPZ_UI(texp, exp);
@@ -537,7 +537,7 @@ void flint_mpz_powm_ui(mpz_ptr r, mpz_srcptr b, ulong exp, mpz_srcptr mod)
    mpz_powm(r, b, texp, mod);
 }
 
-static __inline__
+static inline
 void flint_mpz_pow_ui(mpz_ptr r, mpz_srcptr b, ulong exp)
 {
    if (exp >= (UWORD(1) << 32)) {
@@ -548,7 +548,7 @@ void flint_mpz_pow_ui(mpz_ptr r, mpz_srcptr b, ulong exp)
    mpz_pow_ui(r, b, (unsigned long) exp);
 }
 
-static __inline__
+static inline
 void flint_mpz_fac_ui(mpz_ptr r, ulong n)
 {
    if (n >= (UWORD(1) << 32)) {
@@ -559,7 +559,7 @@ void flint_mpz_fac_ui(mpz_ptr r, ulong n)
    mpz_fac_ui(r, (unsigned long) n);
 }
 
-static __inline__
+static inline
 void flint_mpz_bin_uiui(mpz_ptr r, ulong n, ulong k)
 {
    if (n >= (UWORD(1) << 32)) {
@@ -575,7 +575,7 @@ void flint_mpz_bin_uiui(mpz_ptr r, ulong n, ulong k)
    mpz_bin_uiui(r, (unsigned long) n, (unsigned long) k);
 }
 
-static __inline__
+static inline
 void flint_mpz_fib_ui(mpz_ptr r, ulong n)
 {
    if (n >= (UWORD(1) << 32)) {
@@ -610,7 +610,7 @@ along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
 the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA. */
 
-static __inline__
+static inline
 void flint_mpf_set_si (mpf_ptr dest, slong val)
 {
   mp_size_t size;
@@ -648,7 +648,7 @@ along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
 the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA. */
 
-static __inline__
+static inline
 void flint_mpf_set_ui(mpf_ptr f, ulong val)
 {
   mp_size_t size;
@@ -683,7 +683,7 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-static __inline__
+static inline
 slong flint_mpf_get_si (mpf_srcptr f)
 {
   mp_exp_t exp;
@@ -735,7 +735,7 @@ along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
 the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA. */
 
-static __inline__
+static inline
 int flint_mpf_cmp_ui(mpf_srcptr u, ulong vval)
 {
   mp_srcptr up;
@@ -800,7 +800,7 @@ along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
 the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA. */
 
-static __inline__
+static inline
 int flint_mpf_fits_slong_p(mpf_srcptr f)
 {
   mp_size_t  fs, fn;
@@ -854,7 +854,7 @@ along with the GNU MP Library; see the file COPYING.LIB.  If not, write to
 the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA. */
 
-static __inline__
+static inline
 double flint_mpf_get_d_2exp(slong * exp2, mpf_srcptr src)
 {
   mp_size_t size, abs_size;

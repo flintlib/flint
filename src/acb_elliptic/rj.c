@@ -1,9 +1,9 @@
 /*
     Copyright (C) 2017, 2020 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
@@ -54,7 +54,7 @@ static const unsigned short den_ratio_tab[512] = {
     16,997,2,1,4,1,2,1009,8,1013,2,1,4076,1021,2,1
 };
 
-static __inline__ slong rj_fdiv(slong x, slong y)
+static inline slong rj_fdiv(slong x, slong y)
 {
     if (x < 0)
         return -1;

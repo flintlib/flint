@@ -103,7 +103,7 @@ fmpz_mat_solve_fflu_precomp(fmpz_mat_t X,
                     if (uden != 0) /* see #1029 */
                     {
                        norm = flint_clz(uden);
-                       invert_limb(dinv, uden << norm);
+                       dinv = n_preinvert_limb_prenorm(uden << norm);
                     } else
                        dinv = 0;
                     den1 = fmpz_is_one(diag + i - 1);
@@ -236,7 +236,7 @@ fmpz_mat_solve_fflu_precomp(fmpz_mat_t X,
                     if (uden != 0) /* see #1029 */
                     {
                        norm = flint_clz(uden);
-                       invert_limb(dinv, uden << norm);
+                       dinv = n_preinvert_limb_prenorm(uden << norm);
                     } else
                        dinv = 0;
 

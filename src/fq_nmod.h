@@ -18,8 +18,8 @@
 #define FQ_NMOD_INLINE
 #define FQ_TEMPLATES_INLINE
 #else
-#define FQ_NMOD_INLINE static __inline__
-#define FQ_TEMPLATES_INLINE static __inline__
+#define FQ_NMOD_INLINE static inline
+#define FQ_TEMPLATES_INLINE static inline
 #endif
 
 #include "fq_nmod_types.h"

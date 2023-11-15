@@ -15,7 +15,7 @@
 #ifdef FMPQ_VEC_INLINES_C
 #define FMPQ_VEC_INLINE
 #else
-#define FMPQ_VEC_INLINE static __inline__
+#define FMPQ_VEC_INLINE static inline
 #endif
 
 #include "flint.h"

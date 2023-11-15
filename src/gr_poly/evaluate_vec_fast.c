@@ -139,7 +139,7 @@ _gr_poly_tree_build(gr_ptr * tree, gr_srcptr roots, slong len, gr_ctx_t ctx)
 }
 
 /* This gives some speedup for small lengths. */
-static __inline__ int
+static inline int
 _gr_poly_rem_2(gr_ptr q, gr_ptr r, gr_srcptr a, slong al,
     gr_srcptr b, slong bl, gr_ctx_t ctx)
 {

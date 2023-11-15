@@ -217,13 +217,13 @@ int fmpz_poly_fread(FILE * file, fmpz_poly_t poly)
     return 1;
 }
 
-static __inline__
+static inline
 int is_varsymbol0(char c)
 {
     return isalpha((unsigned char) c);
 }
 
-static __inline__
+static inline
 int is_varsymbol1(char c)
 {
     return isalnum((unsigned char) c) || (c == '_');

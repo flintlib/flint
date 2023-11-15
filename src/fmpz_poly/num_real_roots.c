@@ -12,7 +12,7 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-static __inline__
+static inline
 slong _fmpz_poly_num_real_roots_quadratic(const fmpz * pol, slong len)
 {
     if ((fmpz_sgn(pol) * fmpz_sgn(pol + 2) < 0) ||
@@ -41,7 +41,7 @@ slong _fmpz_poly_num_real_roots_quadratic(const fmpz * pol, slong len)
     }
 }
 
-static __inline__
+static inline
 slong _num_roots_quartic_positive_discriminant(const fmpz * p)
 {
     /* more delicate quartic case */

@@ -16,8 +16,8 @@
 #define FQ_POLY_FACTOR_TEMPLATES_INLINE
 #define FQ_POLY_FACTOR_INLINE
 #else
-#define FQ_POLY_FACTOR_TEMPLATES_INLINE static __inline__
-#define FQ_POLY_FACTOR_INLINE static __inline__
+#define FQ_POLY_FACTOR_TEMPLATES_INLINE static inline
+#define FQ_POLY_FACTOR_INLINE static inline
 #endif
 
 #include "fq_types.h"

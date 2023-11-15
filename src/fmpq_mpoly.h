@@ -15,7 +15,7 @@
 #ifdef FMPQ_MPOLY_INLINES_C
 #define FMPQ_MPOLY_INLINE
 #else
-#define FMPQ_MPOLY_INLINE static __inline__
+#define FMPQ_MPOLY_INLINE static inline
 #endif
 
 #include "fmpq.h"

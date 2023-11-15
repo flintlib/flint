@@ -118,6 +118,10 @@ Modular reduction and arithmetic
     Returns `ab^{-1}` modulo ``mod.n``. The inverse of `b` is assumed to
     exist. It is assumed that `a` is already reduced modulo ``mod.n``.
 
+.. function:: int nmod_divides(mp_limb_t * a, mp_limb_t b, mp_limb_t c, nmod_t mod)
+
+    If `a\cdot c = b \mod n` has a solution for `a` return `1` and set `a` to such a solution. Otherwise return `0` and leave `a` undefined.
+
 .. function:: mp_limb_t nmod_pow_ui(mp_limb_t a, ulong e, nmod_t mod)
 
     Returns `a^e` modulo ``mod.n``. No assumptions are made about 

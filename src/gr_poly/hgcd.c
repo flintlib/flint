@@ -111,7 +111,7 @@ do {                                                                \
     }                                                               \
 } while (0)
 
-static __inline__ int
+static inline int
 __mat_one(gr_ptr * M, slong * lenM, gr_ctx_t ctx)
 {
     int status = GR_SUCCESS;

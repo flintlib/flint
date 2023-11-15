@@ -18,9 +18,9 @@
 # define FQ_TEMPLATES_INLINE
 #endif
 #else
-#define FQ_ZECH_INLINE static __inline__
+#define FQ_ZECH_INLINE static inline
 #ifndef FQ_TEMPLATES_INLINE
-# define FQ_TEMPLATES_INLINE static __inline__
+# define FQ_TEMPLATES_INLINE static inline
 #endif
 #endif
 

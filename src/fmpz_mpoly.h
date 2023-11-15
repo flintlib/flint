@@ -16,7 +16,7 @@
 #ifdef FMPZ_MPOLY_INLINES_C
 #define FMPZ_MPOLY_INLINE
 #else
-#define FMPZ_MPOLY_INLINE static __inline__
+#define FMPZ_MPOLY_INLINE static inline
 #endif
 
 #include "fmpz_vec.h"

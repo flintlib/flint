@@ -15,7 +15,7 @@
 #ifdef MPFR_VEC_INLINES_C
 #define MPFR_VEC_INLINE
 #else
-#define MPFR_VEC_INLINE static __inline__
+#define MPFR_VEC_INLINE static inline
 #endif
 
 #include <mpfr.h>

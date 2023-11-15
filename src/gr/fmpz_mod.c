@@ -334,9 +334,50 @@ _gr_fmpz_mod_div(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
     status = _gr_fmpz_mod_inv(t, y, ctx);
     if (status == GR_SUCCESS)
         fmpz_mod_mul(res, x, t, FMPZ_MOD_CTX(ctx));
-
+    else
+        fmpz_zero(res);
     fmpz_clear(t);
+
     return status;
+}
+
+int
+_gr_fmpz_mod_div_nonunique(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
+{
+    int status;
+
+#if 1
+    status = fmpz_mod_divides(res, x, y, FMPZ_MOD_CTX(ctx)) ? GR_SUCCESS : GR_DOMAIN;
+#else
+    if (FMPZ_MOD_IS_PRIME(ctx) != T_TRUE)
+    {
+        status = fmpz_mod_divides(res, x, y, FMPZ_MOD_CTX(ctx)) ? GR_SUCCESS : GR_DOMAIN;
+    }
+    else
+    {
+        fmpz_t t;
+        fmpz_init(t);
+        status = _gr_fmpz_mod_inv(t, y, ctx);
+        if (status == GR_SUCCESS)
+            fmpz_mod_mul(res, x, t, FMPZ_MOD_CTX(ctx));
+        else
+            fmpz_zero(res);
+        fmpz_clear(t);
+    }
+#endif
+
+    return status;
+}
+
+truth_t
+_gr_fmpz_mod_divides(const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
+{
+    truth_t res;
+    fmpz_t t;
+    fmpz_init(t);
+    res = fmpz_mod_divides(t, y, x, FMPZ_MOD_CTX(ctx)) ? T_TRUE : T_FALSE;
+    fmpz_clear(t);
+    return res;
 }
 
 truth_t
@@ -669,6 +710,8 @@ gr_method_tab_input _fmpz_mod_methods_input[] =
     {GR_METHOD_MUL_TWO,         (gr_funcptr) _gr_fmpz_mod_mul_two},
     {GR_METHOD_SQR,             (gr_funcptr) _gr_fmpz_mod_sqr},
     {GR_METHOD_DIV,             (gr_funcptr) _gr_fmpz_mod_div},
+    {GR_METHOD_DIV_NONUNIQUE,   (gr_funcptr) _gr_fmpz_mod_div_nonunique},
+    {GR_METHOD_DIVIDES,         (gr_funcptr) _gr_fmpz_mod_divides},
     {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) _gr_fmpz_mod_is_invertible},
     {GR_METHOD_INV,             (gr_funcptr) _gr_fmpz_mod_inv},
     {GR_METHOD_POW_UI,          (gr_funcptr) _gr_fmpz_mod_pow_ui},

@@ -15,7 +15,7 @@
 #ifdef NMOD_MPOLY_FACTOR_INLINES_C
 #define NMOD_MPOLY_FACTOR_INLINE
 #else
-#define NMOD_MPOLY_FACTOR_INLINE static __inline__
+#define NMOD_MPOLY_FACTOR_INLINE static inline
 #endif
 
 #include "nmod_mpoly.h"

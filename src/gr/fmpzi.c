@@ -617,6 +617,13 @@ _gr_fmpzi_divides(const fmpzi_t x, const fmpzi_t y, const gr_ctx_t ctx)
 {
     fmpzi_t q, r;
     truth_t result;
+
+    if (fmpzi_is_zero(y))
+        return T_TRUE;
+
+    if (fmpzi_is_zero(x))
+        return T_FALSE;
+
     fmpzi_init(q);
     fmpzi_init(r);
 
@@ -686,19 +693,26 @@ _gr_fmpzi_gcd(fmpzi_t res, const fmpzi_t x, const fmpzi_t y, const gr_ctx_t ctx)
 int
 _gr_fmpzi_lcm(fmpzi_t res, const fmpzi_t x, const fmpzi_t y, const gr_ctx_t ctx)
 {
-    fmpzi_t g;
-    fmpzi_init(g);
+    if (fmpzi_is_zero(x) || fmpzi_is_zero(y))
+    {
+        fmpzi_zero(res);
+    }
+    else
+    {
+        fmpzi_t g;
+        fmpzi_init(g);
 
-    fmpzi_gcd(g, x, y);
-    fmpzi_mul(res, x, y);
+        fmpzi_gcd(g, x, y);
+        fmpzi_mul(res, x, y);
 
-    if (!fmpzi_is_one(g))
-        fmpzi_divexact(res, res, g);
+        if (!fmpzi_is_one(g))
+            fmpzi_divexact(res, res, g);
 
-    /* is this what we want? */
-    fmpzi_canonicalise_unit(res, res);
+        /* is this what we want? */
+        fmpzi_canonicalise_unit(res, res);
 
-    fmpzi_clear(g);
+        fmpzi_clear(g);
+    }
 
     return GR_SUCCESS;
 }

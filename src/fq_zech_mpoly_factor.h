@@ -15,7 +15,7 @@
 #ifdef FQ_ZECH_MPOLY_FACTOR_INLINES_C
 #define FQ_ZECH_MPOLY_FACTOR_INLINE
 #else
-#define FQ_ZECH_MPOLY_FACTOR_INLINE static __inline__
+#define FQ_ZECH_MPOLY_FACTOR_INLINE static inline
 #endif
 
 #include "fq_zech.h"

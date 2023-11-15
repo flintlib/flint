@@ -20,7 +20,7 @@
 
 #define CHARPOLY_M_LOG2E  1.44269504088896340736  /* log2(e) */
 
-static __inline__ long double _log2(const long double x)
+static inline long double _log2(const long double x)
 {
     return log(x) * CHARPOLY_M_LOG2E;
 }

@@ -17,7 +17,7 @@
 #ifdef NMOD_MAT_INLINES_C
 #define NMOD_MAT_INLINE
 #else
-#define NMOD_MAT_INLINE static __inline__
+#define NMOD_MAT_INLINE static inline
 #endif
 
 #include "nmod_types.h"

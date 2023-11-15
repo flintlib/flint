@@ -16,7 +16,7 @@
 #ifdef FQ_DEFAULT_INLINES_C
 #define FQ_DEFAULT_INLINE
 #else
-#define FQ_DEFAULT_INLINE static __inline__
+#define FQ_DEFAULT_INLINE static inline
 #endif
 
 #include "nmod.h"

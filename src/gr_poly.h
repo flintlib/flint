@@ -15,7 +15,7 @@
 #ifdef GR_POLY_INLINES_C
 #define GR_POLY_INLINE
 #else
-#define GR_POLY_INLINE static __inline__
+#define GR_POLY_INLINE static inline
 #endif
 
 #include "fmpz_types.h"

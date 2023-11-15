@@ -1,9 +1,9 @@
 /*
     Copyright (C) 2012 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
@@ -44,7 +44,7 @@ hypgeom_standardize(fmpz_poly_t P2, fmpz_poly_t Q2,
 
 
 /* quotient of absolute value, rounded up */
-static __inline__ void
+static inline void
 fmpz_cdiv_abs_q(fmpz_t q, const fmpz_t x, const fmpz_t y)
 {
     if (fmpz_sgn(x) == fmpz_sgn(y))
@@ -93,7 +93,7 @@ hypgeom_root_norm(const fmpz_poly_t P)
 }
 
 
-static __inline__ void
+static inline void
 fmpz_poly_evaluate_si(fmpz_t y, const fmpz_poly_t poly, slong x)
 {
     fmpz_set_si(y, x);

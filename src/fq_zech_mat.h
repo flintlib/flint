@@ -16,8 +16,8 @@
 #define FQ_MAT_TEMPLATES_INLINE
 #define FQ_ZECH_MAT_INLINE
 #else
-#define FQ_MAT_TEMPLATES_INLINE static __inline__
-#define FQ_ZECH_MAT_INLINE static __inline__
+#define FQ_MAT_TEMPLATES_INLINE static inline
+#define FQ_ZECH_MAT_INLINE static inline
 #endif
 
 #include "fq_zech_types.h"

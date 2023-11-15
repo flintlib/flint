@@ -13,7 +13,7 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-static __inline__
+static inline
 int _nmod_poly_sqrt_2(mp_ptr s, mp_srcptr p, slong len)
 {
    slong i;
