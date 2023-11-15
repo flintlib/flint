@@ -124,3 +124,19 @@ Apery's constant `\zeta(3)` is computed using the hypergeometric series
     \zeta(3) = \frac{1}{64} \sum_{k=0}^\infty
         (-1)^k (205k^2 + 250k + 77) \frac{(k!)^{10}}{[(2k+1)!]^5}.
 
+Reciprocal Fibonacci constant
+-------------------------------------------------------------------------------
+
+We use Gosper's series ([Gos1974]_, corrected in [Arn2012]_)
+
+.. math ::
+
+    \sum_{n=1}^{\infty} \frac{1}{F_n} = \sum_{n=0}^{\infty}
+        \frac{(-1)^{n(n-1)/2} (F_{4n+3} + (-1)^n F_{2n+2})}{F_{2n+1} F_{2n+2} L_1 L_3 \cdots L_{2n+1}}
+
+where `L_n = 2F_{n-1} + F_n` denotes a Lucas number.
+The truncation error after `N \ge 1` terms is bounded by `(1 / \phi)^{N^2}`.
+The series is not of hypergeometric type, but we can evaluate it
+in quasilinar time using binary splitting; factoring out a
+multiplicative recurrence for `L_1 L_3 \cdots` allows computing the series
+as a product of `O(\sqrt{p})` matrices with `O(\sqrt{p})`-bit entries.

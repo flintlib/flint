@@ -555,6 +555,7 @@ void arb_const_catalan(arb_t z, slong prec);
 void arb_const_e(arb_t z, slong prec);
 void arb_const_khinchin(arb_t z, slong prec);
 void arb_const_glaisher(arb_t z, slong prec);
+void arb_const_reciprocal_fibonacci(arb_t res, slong prec);
 void arb_agm(arb_t z, const arb_t x, const arb_t y, slong prec);
 void arb_lgamma(arb_t z, const arb_t x, slong prec);
 void arb_rgamma(arb_t z, const arb_t x, slong prec);
