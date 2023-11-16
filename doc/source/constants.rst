@@ -79,10 +79,10 @@ where
 
 .. math ::
 
-    \begin{align}
+    \begin{matrix}
         P(k) & = -43203456k^6 + 92809152k^5 - 76613904k^4 \\
              & + 30494304k^3 - 6004944k^2 + 536620^k - 17325,
-    \end{align}
+    \end{matrix}
 
 discovered by Zuniga [Zun2023]_.
 It was previously computed using a series given in [PP2010]_.
@@ -100,12 +100,12 @@ where
 
 .. math ::
 
-    \begin{align}
+    \begin{matrix}
         P(k) & = 1565994397644288k^{11} - 6719460725627136k^{10} + 12632254526031264k^9 \\
              & - 13684352515879536k^8 + 9451223531851808k^7 - 4348596587040104k^6 \\
              & + 1352700034136826k^5 - 282805786014979k^4 + 38721705264979k^3 \\
              & - 3292502315430k^2 + 156286859400k - 3143448000,
-    \end{align}
+    \end{matrix}
 
 discovered by Zuniga [Zun2023]_.
 
