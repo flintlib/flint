@@ -378,7 +378,22 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
 #if FLINT_USES_PTHREAD
          pthread_mutex_lock(&qs_inf->mutex);
 #endif
-	 qsieve_write_to_file(qs_inf, 1, Y, poly);
+         {
+            slong Ysz = COEFF_IS_MPZ(*Y) ? COEFF_TO_PTR(*Y)->_mp_size : FLINT_SGN(*Y);
+            slong relation_size =
+               sizeof(slong)                           /* relation_size */
+               + sizeof(mp_limb_t)                     /* lp */
+               + sizeof(slong)                         /* num_factors */
+               + sizeof(slong)                         /* small_primes */
+               + sizeof(slong)                         /* Ysz */
+               + sizeof(slong) * qs_inf->small_primes  /* small */
+               + sizeof(fac_t) * poly->num_factors     /* factor */
+               + sizeof(mp_limb_t) * Ysz;              /* Yd */
+
+            qsieve_write_to_storage(qs_inf, relation_size, 1,
+                  COEFF_IS_MPZ(*Y) ? COEFF_TO_PTR(*Y)->_mp_d : (mp_ptr) Y,
+                  Ysz, poly);
+         }
 
          qs_inf->full_relation++;
 
@@ -424,7 +439,22 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
 #endif
                   /* store this partial in file */
 
-                  qsieve_write_to_file(qs_inf, prime, Y, poly);
+                  {
+                     slong Ysz = COEFF_IS_MPZ(*Y) ? COEFF_TO_PTR(*Y)->_mp_size : FLINT_SGN(*Y);
+                     slong relation_size =
+                        sizeof(slong)                           /* relation_size */
+                        + sizeof(mp_limb_t)                     /* lp */
+                        + sizeof(slong)                         /* num_factors */
+                        + sizeof(slong)                         /* small_primes */
+                        + sizeof(slong)                         /* Ysz */
+                        + sizeof(slong) * qs_inf->small_primes  /* small */
+                        + sizeof(fac_t) * poly->num_factors     /* factor */
+                        + sizeof(mp_limb_t) * Ysz;              /* Yd */
+
+                     qsieve_write_to_storage(qs_inf, relation_size, prime,
+                           COEFF_IS_MPZ(*Y) ? COEFF_TO_PTR(*Y)->_mp_d : (mp_ptr) Y,
+                           Ysz, poly);
+                  }
 
                   qs_inf->edges++;
 

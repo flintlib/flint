@@ -24,6 +24,6 @@ void qsieve_clear(qs_t qs_inf)
     qs_inf->factor_base = NULL;
     qs_inf->sqrts       = NULL;
 
-    if (qs_inf->siqs != NULL)
+    if (qs_inf->siqs_alloc != 0)
         flint_free(qs_inf->siqs);
 }

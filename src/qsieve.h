@@ -363,20 +363,20 @@ int qsieve_relations_cmp(const void * a, const void * b);
 
 slong qsieve_merge_relations(qs_t qs_inf);
 
-void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime,
-                                                     const fmpz_t Y, const qs_poly_t poly);
+/* void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime, const fmpz_t Y, const qs_poly_t poly); */
+void qsieve_write_to_storage(qs_t qs_inf, slong relation_size, mp_limb_t prime, mp_srcptr Yd, slong Ysz, const qs_poly_t poly);
 
 hash_t * qsieve_get_table_entry(qs_t qs_inf, mp_limb_t prime);
 
 void qsieve_add_to_hashtable(qs_t qs_inf, mp_limb_t prime);
 
-relation_t qsieve_parse_relation(qs_t qs_inf);
+/* relation_t qsieve_parse_relation(qs_t qs_inf); */
 
-relation_t qsieve_merge_relation(qs_t qs_inf, relation_t  a, relation_t  b);
+/* relation_t qsieve_merge_relation(qs_t qs_inf, relation_t  a, relation_t  b); */
 
 int qsieve_compare_relation(const void * a, const void * b);
 
-int qsieve_remove_duplicates(relation_t * rel_list, slong num_relations);
+/* int qsieve_remove_duplicates(relation_t * rel_list, slong num_relations); */
 
 void qsieve_insert_relation(qs_t qs_inf, relation_t * rel_list,
                                                           slong num_relations);
