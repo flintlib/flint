@@ -16,10 +16,10 @@ concurrency:
 
 jobs:
   ##############################################################################
-  # ubuntu, gcc, avx2, code coverage
+  # ubuntu, gcc, code coverage
   ##############################################################################
-  ubuntu-avx2-codecoverage:
-    name: Ubuntu GCC, AVX2, Code Coverage (x10)
+  ubuntu-codecoverage:
+    name: Ubuntu GCC, Code Coverage (x10)
 
     runs-on: ubuntu-latest
 
