@@ -72,9 +72,42 @@ Catalan's constant is computed using the hypergeometric series
 
 .. math ::
 
-    C = \frac{1}{64} \sum_{k=1}^{\infty} \frac{256^k (580k^2-184k+15)}{k^3(2k-1){6k\choose 3k}{6k\choose 4k}{4k\choose 2k}}
+    C = \frac{1}{768} \sum_{k=1}^{\infty} \frac{(-4096)^k P(k)}
+        {k^3 (2k-1)(3k-1)(3k-2)(6k-1)(6k-5) {5k \choose k} {10k \choose 5k} {12k \choose 6k}}
 
-given in [PP2010]_.
+where
+
+.. math ::
+
+    \begin{align}
+        P(k) & = -43203456k^6 + 92809152k^5 - 76613904k^4 \\
+             & + 30494304k^3 - 6004944k^2 + 536620^k - 17325,
+    \end{align}
+
+discovered by Zuniga [Zun2023]_.
+It was previously computed using a series given in [PP2010]_.
+
+Apery's constant
+-------------------------------------------------------------------------------
+
+Apery's constant `\zeta(3)` is computed using the hypergeometric series
+
+.. math ::
+
+    \zeta(3) = \frac{1}{48} \sum_{k=1}^{\infty} \frac{(-1)^{k-1} P(k)}{k^5 (2k-1)^3(3k-1)(3k-2)(4k-1)(4k-3)(6k-1)(6k-5){5k \choose k}{5k \choose 2k}{9k \choose 4k}{10k \choose 5k}{12k \choose 6k}}
+
+where
+
+.. math ::
+
+    \begin{align}
+        P(k) & = 1565994397644288k^{11} - 6719460725627136k^{10} + 12632254526031264k^9 \\
+             & - 13684352515879536k^8 + 9451223531851808k^7 - 4348596587040104k^6 \\
+             & + 1352700034136826k^5 - 282805786014979k^4 + 38721705264979k^3 \\
+             & - 3292502315430k^2 + 156286859400k - 3143448000,
+    \end{align}
+
+discovered by Zuniga [Zun2023]_.
 
 Khinchin's constant
 -------------------------------------------------------------------------------
@@ -113,16 +146,6 @@ Glaisher's constant `A = \exp(1/12 - \zeta'(-1))` is computed directly
 from this formula. We don't use the reflection formula for the zeta function,
 as the arithmetic in Euler-Maclaurin summation is faster at `s = -1`
 than at `s = 2`.
-
-Apery's constant
--------------------------------------------------------------------------------
-
-Apery's constant `\zeta(3)` is computed using the hypergeometric series
-
-.. math ::
-
-    \zeta(3) = \frac{1}{64} \sum_{k=0}^\infty
-        (-1)^k (205k^2 + 250k + 77) \frac{(k!)^{10}}{[(2k+1)!]^5}.
 
 Reciprocal Fibonacci constant
 -------------------------------------------------------------------------------
