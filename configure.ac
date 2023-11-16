@@ -1032,7 +1032,15 @@ error
 error
 #endif
              ])],
-            [enable_fft_small="yes"]
+            [AC_COMPILE_IFELSE(
+                [AC_LANG_PROGRAM([#include <gmp.h>],[
+#if GMP_LIMB_BITS == 32
+#error Dead man
+error
+#endif
+                 ])],
+                [enable_fft_small="yes"]
+            )]
         )]
     )
 fi
