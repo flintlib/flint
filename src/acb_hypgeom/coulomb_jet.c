@@ -6,7 +6,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "acb_poly.h"
@@ -29,7 +29,7 @@ _acb_hypgeom_coulomb_f_int_jet(acb_ptr F, const acb_t l, const acb_t eta, const 
         return;
     }
 
-    /* http://fungrim.org/entry/2a2f18/ */
+    /* https://fungrim.org/entry/2a2f18/ */
     /* F = C * (z+x)^(l+1) e^(-+ i (z+x)) M(l + 1 -+  i eta, 2l+2, +- 2 i (z+x)) */
 
     acb_poly_init(a);
@@ -172,7 +172,7 @@ _acb_hypgeom_coulomb_jet(acb_ptr F, acb_ptr G, acb_ptr Hpos, acb_ptr Hneg, const
                         l1, eta, z, prec);
 
     /* First derivatives:
-       http://fungrim.org/entry/a51a4b/, http://fungrim.org/entry/2fec14/ */
+       https://fungrim.org/entry/a51a4b/, https://fungrim.org/entry/2fec14/ */
 
     /* R_l = (2l+1) C_l / C_{l+1} = sqrt(l+i eta) sqrt(l-i eta) / l */
     if (acb_is_real(l) && acb_is_real(eta) && arb_is_nonzero(acb_realref(eta)))
@@ -238,7 +238,7 @@ _acb_hypgeom_coulomb_jet(acb_ptr F, acb_ptr G, acb_ptr Hpos, acb_ptr Hneg, const
         acb_inv(w, z, prec);
         acb_mul(w2, w, w, prec);
 
-        /* http://fungrim.org/entry/07a654/ */
+        /* https://fungrim.org/entry/07a654/ */
         /* F''/2 = q F,   q = (2eta/z + l(l+1)/z^2 - 1)/2 */
 
         acb_mul(q, l, l1, prec);
@@ -253,7 +253,7 @@ _acb_hypgeom_coulomb_jet(acb_ptr F, acb_ptr G, acb_ptr Hpos, acb_ptr Hneg, const
         if (Hpos != NULL) acb_mul(Hpos + 2, Hpos, q, prec);
         if (Hneg != NULL) acb_mul(Hneg + 2, Hneg, q, prec);
 
-        /* http://fungrim.org/entry/faa118/ */
+        /* https://fungrim.org/entry/faa118/ */
         /* F'''/6 = (2qF' - q2 F)/6,   q2 = 2(eta + l(l+1)/z)/z^2 */
         if (len >= 4)
         {
@@ -293,7 +293,7 @@ _acb_hypgeom_coulomb_jet(acb_ptr F, acb_ptr G, acb_ptr Hpos, acb_ptr Hneg, const
             }
         }
 
-        /* http://fungrim.org/entry/eca10b/ */
+        /* https://fungrim.org/entry/eca10b/ */
         if (len >= 5)
         {
             slong k;
