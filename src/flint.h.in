@@ -132,7 +132,11 @@ typedef struct __FLINT_FILE FLINT_FILE;
 # define FLINT_OPTIMIZE(x) FLINT_OPTIMIZE_NESTED_1(x)
 #else
 # define __attribute__(x)
-# define FLINT_FORCE_INLINE static inline
+# if defined(_MSC_VER)
+#  define FLINT_FORCE_INLINE static __forceinline
+# else
+#  define FLINT_FORCE_INLINE static inline
+# endif
 # define FLINT_STATIC_NOINLINE static
 # define FLINT_UNUSED(x) x
 # define FLINT_SET_BUT_UNUSED(x) x
