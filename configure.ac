@@ -958,7 +958,11 @@ AX_CHECK_COMPILE_FLAG([-Wall],[DEFAULT_CFLAGS="-Wall $DEFAULT_CFLAGS"])
 AX_CHECK_COMPILE_FLAG([-Wno-stringop-overread],[DEFAULT_CFLAGS="-Wno-stringop-overread $DEFAULT_CFLAGS"])
 AX_CHECK_COMPILE_FLAG([-Wno-stringop-overflow],[DEFAULT_CFLAGS="-Wno-stringop-overflow $DEFAULT_CFLAGS"])
 AX_CHECK_COMPILE_FLAG([-Werror=implicit-function-declaration],[DEFAULT_CFLAGS="-Werror=implicit-function-declaration $DEFAULT_CFLAGS"])
-AX_CHECK_COMPILE_FLAG([-O2],[DEFAULT_CFLAGS="-O2 $DEFAULT_CFLAGS"])
+AX_CHECK_COMPILE_FLAG([-O3],[DEFAULT_CFLAGS="-O3 $DEFAULT_CFLAGS"])
+if test "$host" = "$build";
+then
+    AX_CHECK_COMPILE_FLAG([-march=native],[DEFAULT_CFLAGS="-march=native $DEFAULT_CFLAGS"])
+fi
 AX_CHECK_COMPILE_FLAG([-std=c11],[DEFAULT_CFLAGS="-std=c11 $DEFAULT_CFLAGS"])
 AX_CHECK_COMPILE_FLAG([-pedantic],[DEFAULT_CFLAGS="-pedantic $DEFAULT_CFLAGS"])
 
