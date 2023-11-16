@@ -17,6 +17,7 @@
 # include <math.h>
 #endif
 
+#include <stdio.h>
 #include <stdlib.h>
 #include "thread_support.h"
 #include "fmpz.h"
@@ -220,9 +221,17 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
     while (1)
     {
         if (qs_inf->s) /* we have already tried factoring, so restart */
+        {
+            printf("reinit_A\n");
+            fflush(stdout);
+
             qsieve_reinit_A(qs_inf);
+        }
         else
         {
+            printf("init_A\n");
+            fflush(stdout);
+
             if (!qsieve_init_A(qs_inf))
                 goto more_primes; /* initialisation failed, increase FB */
         }
@@ -248,7 +257,13 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
                 /* Reset current position to storage */
                 qs_inf->siqs_cur = qs_inf->siqs;
 
+                printf("process relations\n");
+                fflush(stdout);
+
                 ok = qsieve_process_relation(qs_inf);
+
+                printf("post relations\n");
+                fflush(stdout);
 
                 if (ok == -1)
                 {
@@ -273,7 +288,13 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
                     ncols = qs_inf->num_primes + qs_inf->extra_rels;
                     nrows = qs_inf->num_primes;
 
+                    printf("\nreduce_matrix...\n");
+                    fflush(stdout);
+
                     reduce_matrix(qs_inf, &nrows, &ncols, qs_inf->matrix);
+
+                    printf("done reduce matrix\n");
+                    fflush(stdout);
 
 
    /**************************************************************************
@@ -302,6 +323,9 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
                     }
 
                     flint_randclear(state); /* clean up random state */
+
+                    printf("haj\n");
+                    fflush(stdout);
 
     /**************************************************************************
         SQUARE ROOT:
@@ -368,6 +392,9 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
 
 more_primes: /* ran out of A's in init/sieving of linalg failed, increase FB */
 
+        printf("more primes\n");
+        fflush(stdout);
+
 #if QS_DEBUG
         flint_printf("Increasing factor base.\n");
 #endif
@@ -378,9 +405,18 @@ more_primes: /* ran out of A's in init/sieving of linalg failed, increase FB */
 #if QS_DEBUG
         flint_printf("\nfactor base increment\n");
 #endif
+        printf("poly clear\n");
+        fflush(stdout);
+
         qsieve_poly_clear(qs_inf);
 
+        printf("poly clear done\n");
+        fflush(stdout);
+
         small_factor = qsieve_primes_increment(qs_inf, delta);
+
+        printf("primes increment\n");
+        fflush(stdout);
 
         for (j = qs_inf->small_primes; j < qs_inf->num_primes; j++)
         {
@@ -388,7 +424,13 @@ more_primes: /* ran out of A's in init/sieving of linalg failed, increase FB */
                break;
         }
 
+        printf("bla1\n");
+        fflush(stdout);
+
         qs_inf->second_prime = j;
+
+        printf("bla2\n");
+        fflush(stdout);
 
         qs_inf->s = 0; /* indicate polynomials need setting up again */
 
@@ -405,6 +447,9 @@ more_primes: /* ran out of A's in init/sieving of linalg failed, increase FB */
 
 found_small_factor:
 
+            printf("small factor\n");
+            fflush(stdout);
+
             fmpz_set_ui(temp, small_factor);
 
             expt += fmpz_remove(temp, qs_inf->n, temp);
@@ -416,6 +461,9 @@ found_small_factor:
             goto cleanup;
         }
 
+        printf("realloc\n");
+        fflush(stdout);
+
         qsieve_linalg_realloc(qs_inf);
     }
 
@@ -425,6 +473,9 @@ found_small_factor:
     **************************************************************************/
 
 cleanup:
+
+    printf("cleanup\n");
+    fflush(stdout);
 
 #if QS_DEBUG
     flint_printf("\nCleanup\n");

@@ -388,7 +388,13 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
                + sizeof(slong)                         /* Ysz */
                + sizeof(slong) * qs_inf->small_primes  /* small */
                + sizeof(fac_t) * poly->num_factors     /* factor */
-               + sizeof(mp_limb_t) * Ysz;              /* Yd */
+               + sizeof(mp_limb_t) * FLINT_ABS(Ysz);   /* Yd */
+
+            if (relation_size == 0)
+            {
+                flint_printf("HAJJJ\n");
+                flint_abort();
+            }
 
             qsieve_write_to_storage(qs_inf, relation_size, 1,
                   COEFF_IS_MPZ(*Y) ? COEFF_TO_PTR(*Y)->_mp_d : (mp_ptr) Y,
@@ -449,7 +455,7 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
                         + sizeof(slong)                         /* Ysz */
                         + sizeof(slong) * qs_inf->small_primes  /* small */
                         + sizeof(fac_t) * poly->num_factors     /* factor */
-                        + sizeof(mp_limb_t) * Ysz;              /* Yd */
+                        + sizeof(mp_limb_t) * FLINT_ABS(Ysz);   /* Yd */
 
                      qsieve_write_to_storage(qs_inf, relation_size, prime,
                            COEFF_IS_MPZ(*Y) ? COEFF_TO_PTR(*Y)->_mp_d : (mp_ptr) Y,

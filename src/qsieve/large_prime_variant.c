@@ -11,6 +11,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
@@ -110,7 +111,6 @@ void qsieve_write_to_storage(
     fac_t * factor_ptr;
     mp_ptr Yd_ptr;
 
-    FLINT_ASSERT(Ysz >= 0);
     FLINT_ASSERT(sizeof(char) == 1);
 
     /* Check if we have space left to write the relation */
@@ -158,7 +158,7 @@ void qsieve_write_to_storage(
 
     /* Write Yd */
     Yd_ptr = (mp_ptr) (factor_ptr + num_factors);
-    memcpy(Yd_ptr, Yd, sizeof(mp_limb_t) * Ysz);
+    memcpy(Yd_ptr, Yd, sizeof(mp_limb_t) * FLINT_ABS(Ysz));
 
     /* Update qs_inf */
     qs_inf->siqs_cur = (char *) siqs_cur + relation_size;
@@ -285,9 +285,11 @@ relation_t qsieve_get_relation(qs_t qs_inf)
     /* Get Y */
     Yd_ptr = (mp_srcptr) (factor_ptr + rel.num_factors);
     fmpz_init(rel.Y);
-    if (Ysz <= 1)
+    if (FLINT_ABS(Ysz) <= 1)
     {
         fmpz_set_ui(rel.Y, *Yd_ptr);
+        if (Ysz < 0)
+            fmpz_neg(rel.Y, rel.Y);
     }
     else
     {
@@ -295,10 +297,10 @@ relation_t qsieve_get_relation(qs_t qs_inf)
 
         mY->_mp_size = Ysz;
 
-        if (mY->_mp_alloc < Ysz)
-            _mpz_realloc(mY, Ysz);
+        if (mY->_mp_alloc < FLINT_ABS(Ysz))
+            _mpz_realloc(mY, FLINT_ABS(Ysz));
 
-        memcpy(mY->_mp_d, Yd_ptr, sizeof(mp_limb_t) * Ysz);
+        memcpy(mY->_mp_d, Yd_ptr, sizeof(mp_limb_t) * FLINT_ABS(Ysz));
         *rel.Y = PTR_TO_COEFF(mY);
     }
 
@@ -562,22 +564,48 @@ int qsieve_process_relation(qs_t qs_inf)
     flint_printf("Getting relations\n");
 #endif
 
+    printf("relations, 1\n");
+    fflush(stdout);
+
+    i = 0;
     while ((char *) qs_inf->siqs + qs_inf->siqs_size != (char *) qs_inf->siqs_cur)
     {
         strg_rel_ptr siqs_cur = qs_inf->siqs_cur;
         slong relation_size = siqs_cur->relation_size;
         mp_limb_t prime = siqs_cur->lp;
+
+        i++;
         
+        if (relation_size == 0)
+        {
+            printf("left = %ld\n", (long int) (((char *) qs_inf->siqs + qs_inf->siqs_size) - (char *) qs_inf->siqs_cur));
+            printf("relation_size = %ld\n", relation_size);
+            printf("i = %ld\n", i);
+            fflush(stdout);
+            flint_abort();
+        }
+
+        printf("left = %ld\n", (long int) (((char *) qs_inf->siqs + qs_inf->siqs_size) - (char *) qs_inf->siqs_cur));
+        printf("relation_size = %ld\n", relation_size);
+        printf("i = %ld\n", i);
+        fflush(stdout);
+
         entry = qsieve_get_table_entry(qs_inf, prime);
 
         if (num_relations == rel_size)
         {
+            printf("realloc rel_list\n");
+            fflush(stdout);
+
            rel_list = (relation_t *) flint_realloc(rel_list, 2 * rel_size * sizeof(relation_t));
            rel_size *= 2;
         }
 
         if (prime == 1 || entry->count >= 2)
         {
+            printf("get relations, 1\n");
+            fflush(stdout);
+
             rel_list[num_relations] = qsieve_get_relation(qs_inf);
             rel_list[num_relations].lp = prime;
             num_relations++;
@@ -586,8 +614,15 @@ int qsieve_process_relation(qs_t qs_inf)
         {
             /* Get to the next relation in the storage. */
             qs_inf->siqs_cur = (char *) qs_inf->siqs_cur + relation_size;
+            printf("siqs + relation_size = %lu\n", (long) ((char *) qs_inf->siqs + qs_inf->siqs_size));
+            printf("siqs_cur             = %lu\n", (long) ((char *) qs_inf->siqs_cur));
+            fflush(stdout);
         }
+
     }
+
+    printf("relations, 2\n");
+    fflush(stdout);
 
     /* Reset position of current pointer to storage */
     qs_inf->siqs_cur = qs_inf->siqs;
@@ -602,6 +637,9 @@ int qsieve_process_relation(qs_t qs_inf)
 #if QS_DEBUG & 64
     flint_printf("Merging relations\n");
 #endif
+
+    printf("relations, 3\n");
+    fflush(stdout);
 
     rlist = flint_malloc(num_relations * sizeof(relation_t));
     memset(hash_table, 0, (1 << 20) * sizeof(mp_limb_t));

@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "fmpz.h"
 #include "qsieve.h"
 
@@ -74,17 +75,27 @@ void qsieve_linalg_realloc(qs_t qs_inf)
     num_primes = qs_inf->num_primes;
     qs_inf->num_primes += qs_inf->ks_primes;
     qs_inf->buffer_size = 2*(qs_inf->num_primes + qs_inf->extra_rels);
+    printf("flint_realloc\n");
+    fflush(stdout);
     qs_inf->matrix = flint_realloc(qs_inf->matrix, qs_inf->buffer_size*sizeof(la_col_t));
+    printf("flint_realloc2\n");
+    fflush(stdout);
     qs_inf->Y_arr = flint_realloc(qs_inf->Y_arr, qs_inf->buffer_size*sizeof(fmpz));
+    printf("flint_realloc3\n");
+    fflush(stdout);
     qs_inf->curr_rel = qs_inf->relation
                      = flint_realloc(qs_inf->relation, 2*qs_inf->buffer_size*qs_inf->max_factors*sizeof(slong));
 
+    printf("flint_realloc4\n");
+    fflush(stdout);
     qs_inf->prime_count = flint_realloc(qs_inf->prime_count, qs_inf->num_primes*sizeof(slong));
     qs_inf->num_primes = num_primes;
 
     qs_inf->extra_rels = 64; /* number of opportunities to factor n */
     qs_inf->max_factors = 60; /* maximum number of factors a (merged) relation can have */
 
+    printf("into for loop...\n");
+    fflush(stdout);
     for (i = 0; i < old_buffer_size; i++)
     {
         fmpz_zero(qs_inf->Y_arr + i);
@@ -96,6 +107,8 @@ void qsieve_linalg_realloc(qs_t qs_inf)
         qs_inf->matrix[i].data = NULL;
     }
 
+    printf("into second for loop...\n");
+    fflush(stdout);
     for ( ; i < qs_inf->buffer_size; i++)
     {
         fmpz_init(qs_inf->Y_arr + i);
@@ -103,15 +116,23 @@ void qsieve_linalg_realloc(qs_t qs_inf)
         qs_inf->matrix[i].data = NULL;
     }
 
+    printf("bla...\n");
+    fflush(stdout);
     qs_inf->columns = 0;
     qs_inf->num_relations = 0;
 
     /* parameter related to partials */
+    printf("bla2...\n");
+    fflush(stdout);
     qs_inf->full_relation = 0;
     qs_inf->edges = 0;
     qs_inf->vertices = 0;
     qs_inf->components = 1;
     qs_inf->num_cycles = 0;
 
+    printf("memset...\n");
+    fflush(stdout);
     memset(qs_inf->hash_table, 0, (1 << 20)*sizeof(mp_limb_t));
+    printf("exiting...\n");
+    fflush(stdout);
 }

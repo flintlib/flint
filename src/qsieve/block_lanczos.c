@@ -21,6 +21,7 @@ benefit from your work.
 --------------------------------------------------------------------*/
 
 
+#include <stdio.h>
 #include "ulong_extras.h"
 #include "qsieve.h"
 
@@ -78,14 +79,22 @@ void reduce_matrix(qs_t qs_inf, slong *nrows, slong *ncols, la_col_t *cols) {
 #if QS_DEBUG
 	slong passes = 0;
 #endif
+    printf("entering reduce_matrix\n");
+    fflush(stdout);
 
 	/* count the number of nonzero entries in each row */
 
 	counts = (slong *)flint_calloc((size_t)*nrows, sizeof(slong));
+    printf("1\n");
+    fflush(stdout);
+
 	for (i = 0; i < *ncols; i++) {
 		for (j = 0; j < cols[i].weight; j++)
 			counts[cols[i].data[j]]++;
 	}
+
+    printf("2\n");
+    fflush(stdout);
 
 	reduced_rows = *nrows;
 	reduced_cols = *ncols;
@@ -161,6 +170,9 @@ void reduce_matrix(qs_t qs_inf, slong *nrows, slong *ncols, la_col_t *cols) {
 #endif
 
 	} while (r != reduced_rows);
+    printf("2\n");
+    fflush(stdout);
+
 
 #if QS_DEBUG
 	flint_printf("reduce to %wd x %wd in %wd passes\n",
