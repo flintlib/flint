@@ -571,7 +571,7 @@ case "$host_cpu" in
         fft_tuning_in="src/fft_tuning32.in"
         ;;
 esac
-AC_CONFIG_FILES([src/fft_tuning.h:$fft_tuning_in])
+AC_CONFIG_FILES([src/fft_tuning.h:$fft_tuning_in],[],[fft_tuning_in="$fft_tuning_in"])
 
 if test -z "$LDCONFIG";
 then
@@ -641,6 +641,8 @@ AC_COMPILE_IFELSE(
     gmpcompat_h_in="gmpcompat-longlong.h.in",
     AC_MSG_RESULT([no])
     gmpcompat_h_in="gmpcompat.h.in")
+
+AC_CONFIG_FILES([src/gmpcompat.h:src/$gmpcompat_h_in],[],[gmpcompat_h_in="$gmpcompat_h_in"])
 
 # Check that MPFR >= 4.1.0
 AC_MSG_CHECKING([if version of MPFR is greater than 4.1.0])
@@ -1087,7 +1089,7 @@ else
     fi
 fi
 
-AC_CONFIG_FILES([src/fmpz/fmpz.c:$fmpz_c])
+AC_CONFIG_FILES([src/fmpz/fmpz.c:$fmpz_c],[],[fmpz_c="$fmpz_c"])
 
 if test "$enable_shared" = "yes";
 then
@@ -1168,7 +1170,7 @@ fi
 # epilog
 ################################################################################
 
-AC_CONFIG_FILES([Makefile flint.pc src/flint.h src/gmpcompat.h:src/${gmpcompat_h_in}])
+AC_CONFIG_FILES([Makefile flint.pc src/flint.h])
 AC_OUTPUT
 
 dnl Shorten the original help message
