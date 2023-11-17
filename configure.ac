@@ -572,6 +572,7 @@ case "$host_cpu" in
         ;;
 esac
 AC_CONFIG_FILES([src/fft_tuning.h:$fft_tuning_in],[],[fft_tuning_in="$fft_tuning_in"])
+AC_SUBST(FFT_TUNING_IN, $fft_tuning_in)
 
 if test -z "$LDCONFIG";
 then
@@ -643,6 +644,7 @@ AC_COMPILE_IFELSE(
     gmpcompat_h_in="gmpcompat.h.in")
 
 AC_CONFIG_FILES([src/gmpcompat.h:src/$gmpcompat_h_in],[],[gmpcompat_h_in="$gmpcompat_h_in"])
+AC_SUBST(GMPCOMPAT_H_IN, $gmpcompat_h_in)
 
 # Check that MPFR >= 4.1.0
 AC_MSG_CHECKING([if version of MPFR is greater than 4.1.0])
@@ -1102,6 +1104,7 @@ else
 fi
 
 AC_CONFIG_FILES([src/fmpz/fmpz.c:$fmpz_c],[],[fmpz_c="$fmpz_c"])
+AC_SUBST(FMPZ_C_IN, $fmpz_c)
 
 if test "$enable_shared" = "yes";
 then

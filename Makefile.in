@@ -795,6 +795,45 @@ endif
 	$(RM_RF) $(INCLUDEDIR)/flint
 
 ################################################################################
+# regenerate part of the build system of needed
+################################################################################
+
+ifneq ($(MAINTAINER_MODE),no)  # disable this for releases?
+ifneq ($(shell command -v autoconf 2> /dev/null),)
+configure: configure.ac
+	@echo "Running autoconf"
+	@autoconf
+else
+configure: configure.ac
+	$(warning autoconf not available, proceeding with stale configure)
+endif
+endif
+
+config.status: configure
+	./config.status --recheck
+
+Makefile: Makefile.in config.status
+	./config.status $@
+
+flint.pc: flint.pc.in config.status
+	./config.status $@
+
+src/flint.h: src/flint.h.in config.status
+	./config.status $@
+
+libtool: config.status
+	./config.status $@
+
+src/fft_tuning.h: @FFT_TUNING_IN@ config.status
+	./config.status $@
+
+src/fmpz/fmpz.c: @FMPZ_C_IN@ config.status
+	./config.status $@
+
+src/gmpcompat.h: src/@GMPCOMPAT_H_IN@ config.status
+	./config.status $@
+
+################################################################################
 # maintainer stuff
 ################################################################################
 
