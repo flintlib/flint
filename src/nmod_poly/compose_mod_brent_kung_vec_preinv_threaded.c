@@ -11,9 +11,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#if FLINT_USES_PTHREAD
-#include <pthread.h>
-#endif
 #include "thread_support.h"
 #include "ulong_extras.h"
 #include "nmod_vec.h"
