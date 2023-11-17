@@ -18,6 +18,8 @@
 
 #cmakedefine01 FLINT_USES_FENV
 
+#cmakedefine FLINT_HAVE_FFT_SMALL
+
 #ifdef _MSC_VER
 # define access _access
 # define strcasecmp _stricmp
