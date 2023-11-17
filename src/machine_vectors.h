@@ -16,11 +16,18 @@
 
 #include <math.h>
 
-#if defined(__AVX2__)
-# include <x86intrin.h>
-# include <immintrin.h>
-#elif defined(__ARM_NEON)
-# include <arm_neon.h>
+#if defined(__GNUC__)
+# if defined(__AVX2__)
+#  include <x86intrin.h>
+# elif defined(__ARM_NEON)
+#  include <arm_neon.h>
+# endif
+#elif defined(_MSC_VER)
+# if defined(__AVX2__)
+#  include <intrin.h>
+# elif defined(_M_ARM64)
+#  include <arm_neon.h>
+# endif
 #endif
 
 #include "flint.h"
@@ -745,7 +752,7 @@ FLINT_FORCE_INLINE vec8n vec8n_bit_and(vec8n a, vec8n b) {
 
 
 
-#elif defined(__ARM_NEON)
+#elif defined(__ARM_NEON) || defined(_M_ARM64)
 
 typedef ulong vec1n;
 typedef uint64x2_t vec2n;
