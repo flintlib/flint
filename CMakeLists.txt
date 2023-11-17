@@ -217,12 +217,7 @@ set(_BUILD_DIRS
 )
 string(REGEX REPLACE "([A-Za-z0-9_-]+;|[A-Za-z0-9_-]+$)" "src/\\1" BUILD_DIRS "${_BUILD_DIRS}")
 
-set(_TEMPLATE_DIRS
-    fq_vec_templates     fq_mat_templates
-    fq_poly_templates    fq_poly_factor_templates
-    fq_embed_templates   fq_templates
-)
-string(REGEX REPLACE "([A-Za-z0-9_-]+;|[A-Za-z0-9_-]+$)" "src/\\1" TEMPLATE_DIRS "${_TEMPLATE_DIRS}")
+# NOTE: Template directories are not supposed to be used.
 
 set(_HEADERS
     NTL-interface.h flint.h longlong.h flint-config.h gmpcompat.h fft_tuning.h
@@ -331,7 +326,7 @@ elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
 endif()
 
 
-foreach (build_dir IN LISTS BUILD_DIRS TEMPLATE_DIRS)
+foreach (build_dir IN LISTS BUILD_DIRS)
     file(GLOB TEMP RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${build_dir}/*.c")
     list(APPEND SOURCES ${TEMP})
     file(GLOB TEMP RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${build_dir}/*.h")
