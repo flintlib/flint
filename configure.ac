@@ -828,31 +828,6 @@ fi
 
 AC_SUBST(PIC_FLAG,$pic_flag)
 
-if test "$enable_thread_safe" = "yes";
-then
-    AC_MSG_CHECKING([if $CC supports TLS handle])
-    for tls_expression in '__thread' '_Thread_local' '__declspec(thread)'
-    do
-        AC_LINK_IFELSE(
-            [AC_LANG_PROGRAM([$tls_expression int myvariable = 0;],[])],
-            [flint_success="yes"],
-            [flint_success="no"]
-        )
-
-        if test "$flint_success" = "yes";
-        then
-            AC_MSG_RESULT([$tls_expression])
-            break
-        fi
-    done
-
-    if test "$flint_success" = "no";
-    then
-        AC_MSG_RESULT([no])
-        AC_MSG_ERROR([--enable-thread-safe was specified, but $CC does not have any TLS handle.])
-    fi
-fi
-
 AC_MSG_CHECKING([if cpu_set_t is supported])
 AC_LINK_IFELSE([AC_LANG_PROGRAM([#define _GNU_SOURCE
 #include <sched.h>
