@@ -148,8 +148,8 @@ typedef struct __FLINT_FILE FLINT_FILE;
 # define FLINT_OPTIMIZE(x)
 #endif
 
-#if __STDC_VERSION__ < 201112L
-# error FLINT requires C11 or newer.
+#if defined(__cplusplus)
+# define FLINT_NORETURN [[noreturn]]
 #elif __STDC_VERSION__ < 202300L
 # define FLINT_NORETURN _Noreturn
 #else
@@ -157,7 +157,7 @@ typedef struct __FLINT_FILE FLINT_FILE;
 #endif
 
 #if FLINT_USES_TLS
-# if __STDC_VERSION__ < 202300L
+# if __STDC_VERSION__ < 202300L && !defined(__cplusplus)
 #  define FLINT_TLS_PREFIX _Thread_local
 # else
 #  define FLINT_TLS_PREFIX thread_local
