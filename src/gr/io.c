@@ -72,10 +72,7 @@ gr_stream_write_si(gr_stream_t out, slong x)
     else
     {
         char tmp[22];
-        if (sizeof(slong) == sizeof(long))
-            sprintf(tmp, "%ld", x);
-        else
-            flint_sprintf(tmp, "%wd", x);
+        sprintf(tmp, WORD_FMT "d", x);
         gr_stream_write(out, tmp);
     }
 }
@@ -90,10 +87,7 @@ gr_stream_write_ui(gr_stream_t out, ulong x)
     else
     {
         char tmp[22];
-        if (sizeof(ulong) == sizeof(unsigned long))
-            sprintf(tmp, "%lu", x);
-        else
-            flint_sprintf(tmp, "%wu", x);
+        sprintf(tmp, WORD_FMT "u", x);
         gr_stream_write(out, tmp);
     }
 }
