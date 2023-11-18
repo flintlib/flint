@@ -49,7 +49,7 @@ TEST_FUNCTION_START(qfb_nucomp, state)
               {
                  printf("FAIL:\n");
                  printf("Incorrect discriminant\n");
-                 fmpz_print(D); printf(" should be %ld\n", -i);
+                 fmpz_print(D); flint_printf(" should be %wd\n", -i);
                  flint_abort();
               }
            }

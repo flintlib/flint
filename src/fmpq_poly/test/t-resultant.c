@@ -13,7 +13,9 @@
 #include "fmpq.h"
 #include "fmpq_poly.h"
 
-#pragma GCC diagnostic ignored "-Woverlength-strings"
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Woverlength-strings"
+#endif
 
 TEST_FUNCTION_START(fmpq_poly_resultant, state)
 {
@@ -160,3 +162,6 @@ TEST_FUNCTION_START(fmpq_poly_resultant, state)
 
     TEST_FUNCTION_END(state);
 }
+#ifdef __GNUC__
+# pragma GCC diagnostic pop
+#endif

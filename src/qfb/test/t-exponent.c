@@ -52,7 +52,7 @@ TEST_FUNCTION_START(qfb_exponent, state)
               printf("FAIL:\n");
               printf("Exponent does not divide class number\n");
               printf("Discriminant: "); fmpz_print(D); printf("\n");
-              printf("%ld does not divide %ld\n", e, num);
+              flint_printf("%wd does not divide %wd\n", e, num);
               flint_abort();
            }
 
@@ -67,7 +67,7 @@ TEST_FUNCTION_START(qfb_exponent, state)
                  printf("Exponent does not annihilate form\n");
                  printf("Discriminant: "); fmpz_print(D); printf("\n");
                  printf("Form: "); qfb_print(forms + i1); printf("\n");
-                 printf("Exponent: %ld\n", e);
+                 flint_printf("Exponent: %wd\n", e);
                  flint_abort();
               }
            }
