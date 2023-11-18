@@ -387,7 +387,7 @@ jobs:
   # ubuntu with gcc and cmake (no checks)
   #############################################################################
   ubuntu-cmake-gcc:
-    name: Ubuntu GCC, CMake (no checks)
+    name: Ubuntu GCC, CMake (1x)
 
     runs-on: ubuntu-latest
 
@@ -415,11 +415,16 @@ jobs:
           cmake -G"Unix Makefiles" -DWITH_NTL=no -DBUILD_TESTING=yes \
               -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=${LOCAL} ..
 
-      - name: "Compile library"
+      - name: "Compile library and tests"
         run: |
           cd build
           $MAKE
           ldd lib/libflint.so
+
+      - name: "Run tests"
+        run: |
+          cd build
+          ctest -j$(expr $(nproc) + 1) --output-on-failure --timeout 450
 
 
 
