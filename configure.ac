@@ -95,11 +95,23 @@ else
     testcflags_set="no"
 fi
 
+if test -n "${CXXFLAGS+x}";
+then
+    cxxflags_set="yes"
+else
+    cxxflags_set="no"
+fi
+
 LT_INIT
 
 if test "$cflags_set" = "no";
 then
     CFLAGS=
+fi
+
+if test "$cxxflags_set" = "no";
+then
+    CXXFLAGS=
 fi
 
 ################################################################################
@@ -456,12 +468,36 @@ fi
 # programs
 ################################################################################
 
-dnl NOTE: This is invoked from LT_INIT
+dnl NOTE: The following line is invoked from LT_INIT
 dnl AC_PROG_CC
 
-if test "$with_ntl" = "yes" ;
+if test "$with_ntl" = "yes";
 then
     AC_PROG_CXX
+    AC_LANG_PUSH(C++)
+    if test "$cxxflags_set" = "no";
+    then
+        AX_CXX_CHECK_COMPILE_FLAG([-Wall],[CXXFLAGS="-Wall $CXXFLAGS"])
+        AX_CXX_CHECK_COMPILE_FLAG([-Werror=implicit-function-declaration],[CXXFLAGS="-Werror=implicit-function-declaration $CXXFLAGS"])
+        AX_CXX_CHECK_COMPILE_FLAG([-O2],[CXXFLAGS="-O2 $CXXFLAGS"])
+        if test "$host" = "$build";
+        then
+            AX_CXX_CHECK_COMPILE_FLAG([-march=native],[CXXFLAGS="-march=native $CXXFLAGS"])
+            fi
+        AX_CXX_CHECK_COMPILE_FLAG([-std=c++11],[CXXFLAGS="-std=c++11 $CXXFLAGS"],
+            AC_MSG_ERROR([Couldn't compile with the C++11 standard needed by the NTL interface.])
+        )
+        if test "$enable_debug" = "yes";
+        then
+            if "$ac_cv_prog_cxx_g" = "yes";
+            then
+                CXXFLAGS="-g $CXXFLAGS"
+            else
+                AC_MSG_ERROR([$CXX does not support the flag -g needed to generate debug information])
+            fi
+        fi
+    fi
+    AC_LANG_POP
 fi
 
 AC_PROG_MKDIR_P
