@@ -94,6 +94,7 @@ endif()
 
 
 # Check if fft_small module is available
+message(STATUS "Checking whether fft_small module is available")
 set(CMAKE_REQUIRED_INCLUDES ${GMP_INCLUDE_DIRS})
 if(HAS_FLAG_GCC_MARCH_NATIVE)
     set(CMAKE_REQUIRED_FLAGS "-march=native")
@@ -140,9 +141,18 @@ unset(CMAKE_REQUIRED_INCLUDES)
 unset(CMAKE_REQUIRED_FLAGS)
 
 if(FLINT_FFT_SMALL_ARM OR FLINT_FFT_SMALL_X86)
-    set(FFT_SMALL fft_small)
-	set(FLINT_HAVE_FFT_SMALL ON)
+    if(MSVC)
+        # fft_small module is currently not working for MSVC
+        message(WARNING "fft_small module is not available MSVC")
+        message(STATUS "Checking whether fft_small module is available - no")
+        set(FFT_SMALL)
+    else()
+        message(STATUS "Checking whether fft_small module is available - yes")
+        set(FFT_SMALL fft_small)
+        set(FLINT_HAVE_FFT_SMALL ON)
+    endif()
 else()
+    message(STATUS "Checking whether fft_small module is available - no")
     set(FFT_SMALL)
 endif()
 
