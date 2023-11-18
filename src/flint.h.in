@@ -157,14 +157,10 @@ typedef struct __FLINT_FILE FLINT_FILE;
 #endif
 
 #if FLINT_USES_TLS
-# if defined(__GNUC__)
-#  define FLINT_TLS_PREFIX __thread
-# elif __STDC_VERSION__ >= 201112L
+# if __STDC_VERSION__ < 202300L
 #  define FLINT_TLS_PREFIX _Thread_local
-# elif defined(_MSC_VER)
-#  define FLINT_TLS_PREFIX __declspec(thread)
 # else
-#  error "thread local prefix defined in C11 or later"
+#  define FLINT_TLS_PREFIX thread_local
 # endif
 #else
 # define FLINT_TLS_PREFIX
