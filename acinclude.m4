@@ -69,3 +69,51 @@ AS_VAR_IF(CACHEVAR,yes,
   [m4_default([$3], :)])
 AS_VAR_POPDEF([CACHEVAR])dnl
 ])dnl AX_CXX_CHECK_COMPILE_FLAGS
+
+# AX_CHECK_LONGLONG_HEADER(FLAG, [ACTION-SUCCESS], [ACTION-FAILURE], [EXTRA-PROLOGUE])
+AC_DEFUN([AX_CHECK_LONGLONG_HEADER],
+[AS_VAR_PUSHDEF([CACHEVAR],[ax_cv_check_$1])dnl
+AC_CACHE_CHECK([whether system can compile with $1], CACHEVAR, [
+AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM(
+    [[#include <gmp.h>
+      typedef mp_limb_t ulong;
+      #define FLINT_ASSERT(x)
+      #define FLINT_DLL
+      #define FLINT_BITS GMP_LIMB_BITS
+      #include "$1"
+      $4]],
+    [[ulong s3, s2, s1, s0;
+      ulong a3, a2, a1, a0;
+      ulong b3, b2, b1, b0;
+
+      a0 = 19827;
+      a1 = 1872;
+      a2 = 338237;
+      a3 = 98080;
+      b0 = 1798291;
+      b1 = 719271;
+      b2 = 891;
+      b3 = 9112;
+
+      s0 = flint_clz(a0);
+      s1 = flint_ctz(a0);
+      add_ssaaaa(s1, s0, a1, a0, b1, b0);
+      add_sssaaaaaa(s2, s1, s0, a2, a1, a0, b2, b1, b0);
+      add_ssssaaaaaaaa(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0);
+      sub_ddmmss(s1, s0, a1, a0, b1, b0);
+      sub_dddmmmsss(s2, s1, s0, a2, a1, a0, b2, b1, b0);
+      umul_ppmm(s1, s0, a0, b0);
+      smul_ppmm(s1, s0, a0, b0);
+      udiv_qrnnd(s1, s0, a1, a0, b0);
+      sdiv_qrnnd(s1, s0, a1, a0, b0);
+      byte_swap(s2);
+      /* udiv_qrnnd_preinv is the same for every header */]]
+    )],
+    [AS_VAR_SET(CACHEVAR,[yes])],
+    [AS_VAR_SET(CACHEVAR,[no])])])
+AS_VAR_IF(CACHEVAR,yes,
+  [m4_default([$2], :)],
+  [m4_default([$3], :)])
+AS_VAR_POPDEF([CACHEVAR])dnl
+])dnl AX_CHECK_LONGLONG_HEADER

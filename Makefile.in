@@ -833,6 +833,9 @@ src/fmpz/fmpz.c: @FMPZ_C_IN@ config.status
 src/gmpcompat.h: src/@GMPCOMPAT_H_IN@ config.status
 	./config.status $@
 
+src/longlong.h: @LONGLONG_H_IN@ config.status
+	./config.status $@
+
 ################################################################################
 # maintainer stuff
 ################################################################################

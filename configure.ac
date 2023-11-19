@@ -930,7 +930,6 @@ then
     AX_CHECK_COMPILE_FLAG([-march=native],[DEFAULT_CFLAGS="-march=native $DEFAULT_CFLAGS"])
 fi
 AX_CHECK_COMPILE_FLAG([-std=c11],[DEFAULT_CFLAGS="-std=c11 $DEFAULT_CFLAGS"])
-AX_CHECK_COMPILE_FLAG([-pedantic],[DEFAULT_CFLAGS="-pedantic $DEFAULT_CFLAGS"])
 
 dnl NOTE: The following flags shouldn't be default. They are leftovers from
 dnl previous configure script
@@ -952,6 +951,90 @@ else
 fi
 
 CPPFLAGS="-I./src $CPPFLAGS"
+
+################################################################################
+# check which longlong.h to use
+################################################################################
+
+save_CFLAGS="$CFLAGS"
+CFLAGS="-Wall"
+
+AX_CHECK_LONGLONG_HEADER([src/longlong-x86_64.h.in],
+                         [longlong_h_in="src/longlong-x86_64.h.in"],[],
+                         [#if !defined(__GNUC__) || GMP_LIMB_BITS != 64 || !defined(__amd64__)
+                          # error
+                          error
+                          #endif])
+if test ! -n "$longlong_h_in";
+then
+    AX_CHECK_LONGLONG_HEADER([src/longlong-arm64.h.in],
+                             [longlong_h_in="src/longlong-arm64.h.in"],[],
+                             [#if !defined(__GNUC__) || GMP_LIMB_BITS != 64 || !(defined(__aarch64__) || defined(__ARM_ARCH_ISA_A64))
+                              # error
+                              error
+                              #endif])
+fi
+if test ! -n "$longlong_h_in";
+then
+AX_CHECK_LONGLONG_HEADER([src/longlong-x86.h.in],
+                         [longlong_h_in="src/longlong-x86.h.in"],[],
+                         [#if !defined(__GNUC__) || GMP_LIMB_BITS != 32 || !(defined (__i386__) || defined (__i486__) || defined(__amd64__))
+                          # error
+                          error
+                          #endif])
+fi
+if test ! -n "$longlong_h_in";
+then
+AX_CHECK_LONGLONG_HEADER([src/longlong-arm.h.in],
+                         [longlong_h_in="src/longlong-arm.h.in"],[],
+                         [#if !defined(__GNUC__) || GMP_LIMB_BITS != 32 || !defined(__arm__)
+                          # error
+                          error
+                          #endif])
+fi
+if test ! -n "$longlong_h_in";
+then
+AX_CHECK_LONGLONG_HEADER([src/longlong-generic_gnu.h.in],
+                         [longlong_h_in="src/longlong-generic_gnu.h.in"],[],
+                         [#if !defined(__GNUC__)
+                          # error
+                          error
+                          #endif])
+fi
+if test ! -n "$longlong_h_in";
+then
+AX_CHECK_LONGLONG_HEADER([src/longlong-x86_win.h.in],
+                         [longlong_h_in="src/longlong-x86_win.h.in"],[],
+                         [#if !(defined(_WIN32) || defined(_WIN64)) || !(defined(_M_X64) || defined(_M_IX86))
+                          # error
+                          error
+                          #endif])
+fi
+if test ! -n "$longlong_h_in";
+then
+AX_CHECK_LONGLONG_HEADER([src/longlong-arm_win.h.in],
+                         [longlong_h_in="src/longlong-arm_win.h.in"],[],
+                         [#if !(defined(_WIN32) || defined(_WIN64)) || !(defined(_M_ARM) || defined(_M_ARM64) || defined(_M_ARM_ARMV7VE) || defined(_M_ARM_FP) || defined(_M_ARM64EC))
+                          # error
+                          error
+                          #endif])
+fi
+if test ! -n "$longlong_h_in";
+then
+AX_CHECK_LONGLONG_HEADER([src/longlong-generic.h.in],
+                         [longlong_h_in="src/longlong-generic.h.in"])
+fi
+
+if test ! -n "$longlong_h_in";
+then
+    AC_MSG_ERROR([Could not find a suitable longlong.h. Please submit a bug report to
+<https://github.com/flintlib/flint/issues/> and specify your operating system.])
+fi
+
+AC_CONFIG_FILES([src/longlong.h:$longlong_h_in],[],[longlong_h_in="$longlong_h_in"])
+AC_SUBST(LONGLONG_H_IN, $longlong_h_in)
+
+CFLAGS="$save_CFLAGS"
 
 ################################################################################
 # fft_small module

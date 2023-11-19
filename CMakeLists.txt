@@ -275,6 +275,413 @@ check_c_source_compiles([[#include <gmp.h>
   #endif
   void main(){};]] LONG_LONG_LIMB)
 
+# longlong.h configuration
+set(CMAKE_REQUIRED_INCLUDES ${GMP_INCLUDE_DIRS})
+check_c_source_compiles([[#include <gmp.h>
+typedef mp_limb_t ulong;
+#define FLINT_ASSERT(x)
+#define FLINT_DLL
+#define FLINT_BITS GMP_LIMB_BITS
+#include "${CMAKE_CURRENT_SOURCE_DIR}/src/longlong-x86_64.h.in"
+#if !defined(__GNUC__) || GMP_LIMB_BITS != 64 || !defined(__amd64__)
+# error
+error
+#endif
+int main(void)
+{
+    ulong s3, s2, s1, s0;
+    ulong a3, a2, a1, a0;
+    ulong b3, b2, b1, b0;
+
+    a0 = 19827;
+    a1 = 1872;
+    a2 = 338237;
+    a3 = 98080;
+    b0 = 1798291;
+    b1 = 719271;
+    b2 = 891;
+    b3 = 9112;
+
+    s0 = flint_clz(a0);
+    s1 = flint_ctz(a0);
+    add_ssaaaa(s1, s0, a1, a0, b1, b0);
+    add_sssaaaaaa(s2, s1, s0, a2, a1, a0, b2, b1, b0);
+    add_ssssaaaaaaaa(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0);
+    sub_ddmmss(s1, s0, a1, a0, b1, b0);
+    sub_dddmmmsss(s2, s1, s0, a2, a1, a0, b2, b1, b0);
+    umul_ppmm(s1, s0, a0, b0);
+    smul_ppmm(s1, s0, a0, b0);
+    udiv_qrnnd(s1, s0, a1, a0, b0);
+    sdiv_qrnnd(s1, s0, a1, a0, b0);
+    byte_swap(s2);
+    /* udiv_qrnnd_preinv is the same for every header */
+    return 0;
+}]] LONGLONG_X86_64)
+
+if(LONGLONG_X86_64)
+    set(LONGLONG ON)
+    configure_file(
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/longlong-x86_64.h.in
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/longlong.h
+        COPYONLY)
+endif()
+
+if(NOT LONGLONG)
+    check_c_source_compiles([[#include <gmp.h>
+typedef mp_limb_t ulong;
+#define FLINT_ASSERT(x)
+#define FLINT_DLL
+#define FLINT_BITS GMP_LIMB_BITS
+#include "${CMAKE_CURRENT_SOURCE_DIR}/src/longlong-arm64.h.in"
+#if !defined(__GNUC__) || GMP_LIMB_BITS != 64 || !defined(__arm64__)
+# error
+error
+#endif
+int main(void)
+{
+    ulong s3, s2, s1, s0;
+    ulong a3, a2, a1, a0;
+    ulong b3, b2, b1, b0;
+
+    a0 = 19827;
+    a1 = 1872;
+    a2 = 338237;
+    a3 = 98080;
+    b0 = 1798291;
+    b1 = 719271;
+    b2 = 891;
+    b3 = 9112;
+
+    s0 = flint_clz(a0);
+    s1 = flint_ctz(a0);
+    add_ssaaaa(s1, s0, a1, a0, b1, b0);
+    add_sssaaaaaa(s2, s1, s0, a2, a1, a0, b2, b1, b0);
+    add_ssssaaaaaaaa(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0);
+    sub_ddmmss(s1, s0, a1, a0, b1, b0);
+    sub_dddmmmsss(s2, s1, s0, a2, a1, a0, b2, b1, b0);
+    umul_ppmm(s1, s0, a0, b0);
+    smul_ppmm(s1, s0, a0, b0);
+    udiv_qrnnd(s1, s0, a1, a0, b0);
+    sdiv_qrnnd(s1, s0, a1, a0, b0);
+    byte_swap(s2);
+    /* udiv_qrnnd_preinv is the same for every header */
+    return 0;
+}]] LONGLONG_ARM64)
+
+    if(LONGLONG_ARM64)
+        set(LONGLONG ON)
+        configure_file(
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/longlong-arm64.h.in
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/longlong.h
+            COPYONLY)
+    endif()
+endif()
+
+if(NOT LONGLONG)
+    check_c_source_compiles([[#include <gmp.h>
+typedef mp_limb_t ulong;
+#define FLINT_ASSERT(x)
+#define FLINT_DLL
+#define FLINT_BITS GMP_LIMB_BITS
+#include "${CMAKE_CURRENT_SOURCE_DIR}/src/longlong-x86.h.in"
+#if !defined(__GNUC__) || GMP_LIMB_BITS != 32 || !(defined (__i386__) || defined (__i486__) || defined(__amd64__))
+# error
+error
+#endif
+int main(void)
+{
+    ulong s3, s2, s1, s0;
+    ulong a3, a2, a1, a0;
+    ulong b3, b2, b1, b0;
+
+    a0 = 19827;
+    a1 = 1872;
+    a2 = 338237;
+    a3 = 98080;
+    b0 = 1798291;
+    b1 = 719271;
+    b2 = 891;
+    b3 = 9112;
+
+    s0 = flint_clz(a0);
+    s1 = flint_ctz(a0);
+    add_ssaaaa(s1, s0, a1, a0, b1, b0);
+    add_sssaaaaaa(s2, s1, s0, a2, a1, a0, b2, b1, b0);
+    add_ssssaaaaaaaa(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0);
+    sub_ddmmss(s1, s0, a1, a0, b1, b0);
+    sub_dddmmmsss(s2, s1, s0, a2, a1, a0, b2, b1, b0);
+    umul_ppmm(s1, s0, a0, b0);
+    smul_ppmm(s1, s0, a0, b0);
+    udiv_qrnnd(s1, s0, a1, a0, b0);
+    sdiv_qrnnd(s1, s0, a1, a0, b0);
+    byte_swap(s2);
+    /* udiv_qrnnd_preinv is the same for every header */
+    return 0;
+}]] LONGLONG_X86)
+
+    if(LONGLONG_X86)
+        set(LONGLONG ON)
+        configure_file(
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/longlong-x86.h.in
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/longlong.h
+            COPYONLY)
+    endif()
+endif()
+
+if(NOT LONGLONG)
+    check_c_source_compiles([[#include <gmp.h>
+typedef mp_limb_t ulong;
+#define FLINT_ASSERT(x)
+#define FLINT_DLL
+#define FLINT_BITS GMP_LIMB_BITS
+#include "${CMAKE_CURRENT_SOURCE_DIR}/src/longlong-arm.h.in"
+#if !defined(__GNUC__) || GMP_LIMB_BITS != 32 || !defined(__arm__)
+# error
+error
+#endif
+int main(void)
+{
+    ulong s3, s2, s1, s0;
+    ulong a3, a2, a1, a0;
+    ulong b3, b2, b1, b0;
+
+    a0 = 19827;
+    a1 = 1872;
+    a2 = 338237;
+    a3 = 98080;
+    b0 = 1798291;
+    b1 = 719271;
+    b2 = 891;
+    b3 = 9112;
+
+    s0 = flint_clz(a0);
+    s1 = flint_ctz(a0);
+    add_ssaaaa(s1, s0, a1, a0, b1, b0);
+    add_sssaaaaaa(s2, s1, s0, a2, a1, a0, b2, b1, b0);
+    add_ssssaaaaaaaa(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0);
+    sub_ddmmss(s1, s0, a1, a0, b1, b0);
+    sub_dddmmmsss(s2, s1, s0, a2, a1, a0, b2, b1, b0);
+    umul_ppmm(s1, s0, a0, b0);
+    smul_ppmm(s1, s0, a0, b0);
+    udiv_qrnnd(s1, s0, a1, a0, b0);
+    sdiv_qrnnd(s1, s0, a1, a0, b0);
+    byte_swap(s2);
+    /* udiv_qrnnd_preinv is the same for every header */
+    return 0;
+}]] LONGLONG_ARM)
+
+    if(LONGLONG_ARM)
+        set(LONGLONG ON)
+        configure_file(
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/longlong-arm.h.in
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/longlong.h
+            COPYONLY)
+    endif()
+endif()
+
+if(NOT LONGLONG)
+    check_c_source_compiles([[#include <gmp.h>
+typedef mp_limb_t ulong;
+#define FLINT_ASSERT(x)
+#define FLINT_DLL
+#define FLINT_BITS GMP_LIMB_BITS
+#include "${CMAKE_CURRENT_SOURCE_DIR}/src/longlong-generic_gnu.h.in"
+#if !defined(__GNUC__)
+# error
+error
+#endif
+int main(void)
+{
+    ulong s3, s2, s1, s0;
+    ulong a3, a2, a1, a0;
+    ulong b3, b2, b1, b0;
+
+    a0 = 19827;
+    a1 = 1872;
+    a2 = 338237;
+    a3 = 98080;
+    b0 = 1798291;
+    b1 = 719271;
+    b2 = 891;
+    b3 = 9112;
+
+    s0 = flint_clz(a0);
+    s1 = flint_ctz(a0);
+    add_ssaaaa(s1, s0, a1, a0, b1, b0);
+    add_sssaaaaaa(s2, s1, s0, a2, a1, a0, b2, b1, b0);
+    add_ssssaaaaaaaa(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0);
+    sub_ddmmss(s1, s0, a1, a0, b1, b0);
+    sub_dddmmmsss(s2, s1, s0, a2, a1, a0, b2, b1, b0);
+    umul_ppmm(s1, s0, a0, b0);
+    smul_ppmm(s1, s0, a0, b0);
+    udiv_qrnnd(s1, s0, a1, a0, b0);
+    sdiv_qrnnd(s1, s0, a1, a0, b0);
+    byte_swap(s2);
+    /* udiv_qrnnd_preinv is the same for every header */
+    return 0;
+}]] LONGLONG_GENERIC_GNU)
+
+    if(LONGLONG_GENERIC_GNU)
+        set(LONGLONG ON)
+        configure_file(
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/longlong-generic_gnu.h.in
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/longlong.h
+            COPYONLY)
+    endif()
+endif()
+
+if(NOT LONGLONG)
+    check_c_source_compiles([[#include <gmp.h>
+typedef mp_limb_t ulong;
+#define FLINT_ASSERT(x)
+#define FLINT_DLL
+#define FLINT_BITS GMP_LIMB_BITS
+#include "${CMAKE_CURRENT_SOURCE_DIR}/src/longlong-x86_win.h.in"
+#if !(defined(_WIN32) || defined(_WIN64)) || !(defined(_M_X64) || defined(_M_IX86))
+# error
+error
+#endif
+int main(void)
+{
+    ulong s3, s2, s1, s0;
+    ulong a3, a2, a1, a0;
+    ulong b3, b2, b1, b0;
+
+    a0 = 19827;
+    a1 = 1872;
+    a2 = 338237;
+    a3 = 98080;
+    b0 = 1798291;
+    b1 = 719271;
+    b2 = 891;
+    b3 = 9112;
+
+    s0 = flint_clz(a0);
+    s1 = flint_ctz(a0);
+    add_ssaaaa(s1, s0, a1, a0, b1, b0);
+    add_sssaaaaaa(s2, s1, s0, a2, a1, a0, b2, b1, b0);
+    add_ssssaaaaaaaa(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0);
+    sub_ddmmss(s1, s0, a1, a0, b1, b0);
+    sub_dddmmmsss(s2, s1, s0, a2, a1, a0, b2, b1, b0);
+    umul_ppmm(s1, s0, a0, b0);
+    smul_ppmm(s1, s0, a0, b0);
+    udiv_qrnnd(s1, s0, a1, a0, b0);
+    sdiv_qrnnd(s1, s0, a1, a0, b0);
+    byte_swap(s2);
+    /* udiv_qrnnd_preinv is the same for every header */
+    return 0;
+}]] LONGLONG_X86_WIN)
+
+    if(LONGLONG_X86_WIN)
+        set(LONGLONG ON)
+        configure_file(
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/longlong-x86_win.h.in
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/longlong.h
+            COPYONLY)
+    endif()
+endif()
+
+if(NOT LONGLONG)
+    check_c_source_compiles([[#include <gmp.h>
+typedef mp_limb_t ulong;
+#define FLINT_ASSERT(x)
+#define FLINT_DLL
+#define FLINT_BITS GMP_LIMB_BITS
+#include "${CMAKE_CURRENT_SOURCE_DIR}/src/longlong-arm_win.h.in"
+#if !(defined(_WIN32) || defined(_WIN64)) || !(defined(_M_ARM) || defined(_M_ARM64) || defined(_M_ARM_ARMV7VE) || defined(_M_ARM_FP) || defined(_M_ARM64EC))
+# error
+error
+#endif
+int main(void)
+{
+    ulong s3, s2, s1, s0;
+    ulong a3, a2, a1, a0;
+    ulong b3, b2, b1, b0;
+
+    a0 = 19827;
+    a1 = 1872;
+    a2 = 338237;
+    a3 = 98080;
+    b0 = 1798291;
+    b1 = 719271;
+    b2 = 891;
+    b3 = 9112;
+
+    s0 = flint_clz(a0);
+    s1 = flint_ctz(a0);
+    add_ssaaaa(s1, s0, a1, a0, b1, b0);
+    add_sssaaaaaa(s2, s1, s0, a2, a1, a0, b2, b1, b0);
+    add_ssssaaaaaaaa(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0);
+    sub_ddmmss(s1, s0, a1, a0, b1, b0);
+    sub_dddmmmsss(s2, s1, s0, a2, a1, a0, b2, b1, b0);
+    umul_ppmm(s1, s0, a0, b0);
+    smul_ppmm(s1, s0, a0, b0);
+    udiv_qrnnd(s1, s0, a1, a0, b0);
+    sdiv_qrnnd(s1, s0, a1, a0, b0);
+    byte_swap(s2);
+    /* udiv_qrnnd_preinv is the same for every header */
+    return 0;
+}]] LONGLONG_ARM_WIN)
+
+    if(LONGLONG_ARM_WIN)
+        set(LONGLONG ON)
+        configure_file(
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/longlong-arm_win.h.in
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/longlong.h
+            COPYONLY)
+    endif()
+endif()
+
+if(NOT LONGLONG)
+    check_c_source_compiles([[#include <gmp.h>
+typedef mp_limb_t ulong;
+#define FLINT_ASSERT(x)
+#define FLINT_DLL
+#define FLINT_BITS GMP_LIMB_BITS
+#include "${CMAKE_CURRENT_SOURCE_DIR}/src/longlong-generic.h.in"
+int main(void)
+{
+    ulong s3, s2, s1, s0;
+    ulong a3, a2, a1, a0;
+    ulong b3, b2, b1, b0;
+
+    a0 = 19827;
+    a1 = 1872;
+    a2 = 338237;
+    a3 = 98080;
+    b0 = 1798291;
+    b1 = 719271;
+    b2 = 891;
+    b3 = 9112;
+
+    s0 = flint_clz(a0);
+    s1 = flint_ctz(a0);
+    add_ssaaaa(s1, s0, a1, a0, b1, b0);
+    add_sssaaaaaa(s2, s1, s0, a2, a1, a0, b2, b1, b0);
+    add_ssssaaaaaaaa(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0);
+    sub_ddmmss(s1, s0, a1, a0, b1, b0);
+    sub_dddmmmsss(s2, s1, s0, a2, a1, a0, b2, b1, b0);
+    umul_ppmm(s1, s0, a0, b0);
+    smul_ppmm(s1, s0, a0, b0);
+    udiv_qrnnd(s1, s0, a1, a0, b0);
+    sdiv_qrnnd(s1, s0, a1, a0, b0);
+    byte_swap(s2);
+    /* udiv_qrnnd_preinv is the same for every header */
+    return 0;
+}]] LONGLONG_GENERIC)
+
+    if(LONGLONG_GENERIC)
+        set(LONGLONG ON)
+        configure_file(
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/longlong-generic.h.in
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/longlong.h
+            COPYONLY)
+    else()
+        message(FATAL_ERROR "Could not find a suitable longlong.h that would compile.")
+    endif()
+endif()
+
+
 # Populate headers
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/CMake/cmake_config.h.in
