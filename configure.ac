@@ -859,19 +859,6 @@ AC_MSG_ERROR([Couldn't find alloca, which is required for FLINT. Please submit a
 report to <https://github.com/flintlib/flint/issues/> and specify your
 operating system.])])
 
-AC_MSG_CHECKING([if $CC has popcount intrinsics])
-AC_COMPILE_IFELSE(
-    [AC_LANG_PROGRAM([],[long int x = __builtin_popcountl(3);])],
-    [AC_COMPILE_IFELSE(
-        [AC_LANG_PROGRAM([],[long long int x = __builtin_popcountll(3);])],
-        [AC_MSG_RESULT([yes])
-         has_popcount="yes"
-         AC_DEFINE(FLINT_HAS_POPCNT,1,[Define if compiler has popcount intrinsics])],
-        [AC_MSG_RESULT([no])]
-    )],
-    [AC_MSG_RESULT([no])]
-)
-
 AC_MSG_CHECKING([if $CC has CLZ intrinsics])
 AC_COMPILE_IFELSE(
     [AC_LANG_PROGRAM([],[long int x = __builtin_clzl(3);])],

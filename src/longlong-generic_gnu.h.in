@@ -1,0 +1,225 @@
+/*
+   Copyright 1991, 1992, 1993, 1994, 1996, 1997, 1999, 2000, 2001, 2002, 2003,
+   2004, 2005 Free Software Foundation, Inc.
+
+   Copyright 2009, 2015, 2016 William Hart
+   Copyright 2011 Fredrik Johansson
+   Copyright 2023 Albin Ahlbäck
+
+   This file is free software; you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as published by
+   the Free Software Foundation; either version 2.1 of the License, or (at your
+   option) any later version.
+
+   This file is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+   or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+   License for more details.
+
+   You should have received a copy of the GNU Lesser General Public License
+   along with this file; see the file COPYING.LIB.  If not, write to
+   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+   MA 02110-1301, USA.
+*/
+
+/*
+   N.B: This file has been adapted from code found in GMP 4.2.1.
+*/
+
+#ifndef FLINT_LONGLONG_H
+#define FLINT_LONGLONG_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define FLINT_KNOW_STRONG_ORDER 0
+
+/* NOTE: GCC does not appear to have __builtin_addc as of yet, although it
+ * appears in their online documentation. Currently only Clang has it. */
+#ifndef _LONG_LONG_LIMB
+# define flint_clz __builtin_clzl
+# define flint_ctz __builtin_ctzl
+# define _flint_add __builtin_uaddl_overflow
+# define _flint_sub __builtin_usubl_overflow
+# if __has_builtin(__builtin_addcl) && __has_builtin(__builtin_subcl)
+#  define _flint_adc __builtin_addcl
+#  define _flint_sbc __builtin_subcl
+# else
+#  define _flint_adc(a, b, carry_in, carry_out)             \
+  ({ ulong __s;                                             \
+   ulong c1 = __builtin_uaddl_overflow(a, b, &__s);         \
+   ulong c2 = __builtin_uaddl_overflow(__s, carry_in, &__s);\
+   *(carry_out) = c1 | c2;                                  \
+   __s; })
+#  define _flint_sbc(a, b, carry_in, carry_out)             \
+  ({ ulong __s;                                             \
+   ulong c1 = __builtin_usubl_overflow(a, b, &__s);         \
+   ulong c2 = __builtin_usubl_overflow(__s, carry_in, &__s);\
+   *(carry_out) = c1 | c2;                                  \
+   __s; })
+# endif
+#else
+# define flint_clz __builtin_clzll
+# define flint_ctz __builtin_ctzll
+# define _flint_add __builtin_uaddll_overflow
+# define _flint_sub __builtin_usubll_overflow
+# if __has_builtin(__builtin_addcll) && __has_builtin(__builtin_subcll)
+#  define _flint_adc __builtin_addcll
+#  define _flint_sbc __builtin_subcll
+# else
+#  define _flint_adc(a, b, carry_in, carry_out)               \
+  ({ ulong __s;                                               \
+   ulong c1 = __builtin_uaddll_overflow(a, b, &__s);          \
+   ulong c2 = __builtin_uaddll_overflow(__s, carry_in, &__s); \
+   *(carry_out) = c1 | c2;                                    \
+   __s; })
+#  define _flint_sbc(a, b, carry_in, carry_out)               \
+  ({ ulong __s;                                               \
+   ulong c1 = __builtin_usubll_overflow(a, b, &__s);          \
+   ulong c2 = __builtin_usubll_overflow(__s, carry_in, &__s); \
+   *(carry_out) = c1 | c2;                                    \
+   __s; })
+# endif
+#endif
+
+#define add_ssaaaa(s1, s0, a1, a0, b1, b0)  \
+  do {                                      \
+    unsigned char carry;                    \
+    carry = _flint_add(a0, b0, &s0);        \
+    s1 = _flint_adc(a1, b1, carry, &carry); \
+  } while (0)
+
+#define add_sssaaaaaa(s2, s1, s0, a2, a1, a0, b2, b1, b0) \
+  do {                                      \
+    unsigned char carry;                    \
+    carry = _flint_add(a0, b0, &s0);        \
+    s1 = _flint_adc(a1, b1, carry, &carry); \
+    s2 = _flint_adc(a2, b2, carry, &carry); \
+  } while (0)
+
+#define add_ssssaaaaaaaa(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0) \
+  do {                                      \
+    unsigned char carry;                    \
+    carry = _flint_add(a0, b0, &s0);        \
+    s1 = _flint_adc(a1, b1, carry, &carry); \
+    s2 = _flint_adc(a2, b2, carry, &carry); \
+    s3 = _flint_adc(a3, b3, carry, &carry); \
+  } while (0)
+
+#define sub_ddmmss(s1, s0, a1, a0, b1, b0)  \
+  do {                                      \
+    unsigned char carry;                    \
+    carry = _flint_sub(a0, b0, &s0);        \
+    s1 = _flint_sbc(a1, b1, carry, &carry); \
+  } while (0)
+
+#define sub_dddmmmsss(s2, s1, s0, a2, a1, a0, b2, b1, b0) \
+  do {                                      \
+    unsigned char carry;                    \
+    carry = _flint_sub(a0, b0, &s0);        \
+    s1 = _flint_sbc(a1, b1, carry, &carry); \
+    s2 = _flint_sbc(a2, b2, carry, &carry); \
+  } while (0)
+
+#if GMP_LIMB_BITS == 32
+# define umul_ppmm(w1, w0, u, v)      \
+  do {                                \
+    unsigned long long int res, a, b; \
+    a = (unsigned long long int) (u); \
+    b = (unsigned long long int) (v); \
+    res = a * b;                      \
+    (w1) = res >> 32;                 \
+    (w0) = res;                       \
+  } while (0)
+
+# define smul_ppmm(w1, w0, u, v)  \
+  do {                            \
+    long long int res, a, b;      \
+    a = (long long int) (u);      \
+    b = (long long int) (v);      \
+    res = a * b;                  \
+    (w1) = res >> 32;             \
+    (w0) = res;                   \
+  } while (0)
+
+# define udiv_qrnnd(q, r, n1, n0, d)        \
+  do {                                      \
+    unsigned long long int n;               \
+    n = ((unsigned long long int) (n1)) << 32 + (unsigned long long int) (n0); \
+    (q) = n / (unsigned long long int) (d); \
+    (r) = n % (unsigned long long int) (d); \
+  } while (0)
+
+# define sdiv_qrnnd(q, r, n1, n0, d)  \
+  do {                                \
+    long long int n;                  \
+    n = ((long long int) (n1)) << 32 + (long long int) (n0); \
+    (q) = n / (long long int) (d);    \
+    (r) = n % (long long int) (d);    \
+  } while (0)
+
+# define byte_swap(n) do { n = __builtin_bswap32(n); } while (0)
+#else
+# define umul_ppmm(w1, w0, u, v)  \
+  do {                            \
+    unsigned __int128 res, a, b;  \
+    a = (unsigned __int128) (u);  \
+    b = (unsigned __int128) (v);  \
+    res = a * b;                  \
+    (w1) = res >> 64;             \
+    (w0) = res;                   \
+  } while (0)
+
+# define smul_ppmm(w1, w0, u, v)\
+  do {                          \
+    __int128 res, a, b;         \
+    a = (__int128) (u);         \
+    b = (__int128) (v);         \
+    res = a * b;                \
+    (w1) = res >> 64;           \
+    (w0) = res;                 \
+  } while (0)
+
+# define udiv_qrnnd(q, r, n1, n0, d)    \
+  do {                                  \
+    unsigned __int128 n;                \
+    n = (((unsigned __int128) (n1)) << 64) + (unsigned __int128) (n0); \
+    (q) = n / (unsigned __int128) (d);  \
+    (r) = n % (unsigned __int128) (d);  \
+  } while (0)
+
+# define sdiv_qrnnd(q, r, n1, n0, d)\
+  do {                              \
+    __int128 n;                     \
+    n = (((__int128) (n1)) << 64) + (__int128) (n0); \
+    (q) = n / (__int128) (d);       \
+    (r) = n % (__int128) (d);       \
+  } while (0)
+
+# define byte_swap(n) do { n = __builtin_bswap64(n); } while (0)
+#endif
+
+#define udiv_qrnnd_preinv(q, r, nh, nl, d, di)               \
+  do {                                                       \
+    mp_limb_t _n2, _n10, _nmask, _nadj, _q1;                 \
+    mp_limb_t _xh, _xl;                                      \
+    _n2 = (nh);                                              \
+    _n10 = (nl);                                             \
+    _nmask = (mp_limb_signed_t) (_n10) >> (FLINT_BITS - 1);  \
+    _nadj = _n10 + (_nmask & (d));                           \
+    umul_ppmm (_xh, _xl, di, _n2 - _nmask);                  \
+    add_ssaaaa (_xh, _xl, _xh, _xl, _n2, _nadj);             \
+    _q1 = ~_xh;                                              \
+    umul_ppmm (_xh, _xl, _q1, d);                            \
+    add_ssaaaa (_xh, _xl, _xh, _xl, nh, nl);                 \
+    _xh -= (d);                 /* xh = 0 or -1 */           \
+    (r) = _xl + ((d) & _xh);                                 \
+    (q) = _xh - _q1;                                         \
+  } while (0)
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif
