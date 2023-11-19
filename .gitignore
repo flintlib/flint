@@ -15,6 +15,7 @@ src/fft_tuning.h
 src/flint.h
 src/flint-config.h
 src/gmpcompat.h
+src/longlong.h
 build/
 config/
 config.log
