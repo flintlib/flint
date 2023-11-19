@@ -72,12 +72,6 @@
 # define FLINT_HAVE_FILE
 #endif
 
-#ifdef FLINT_HAVE_CONSTANT_P
-# define FLINT_CONSTANT_P __builtin_constant_p
-#else
-# define FLINT_CONSTANT_P(x) 0
-#endif
-
 #ifdef FLINT_INLINES_C
 # define FLINT_INLINE
 #else
@@ -123,6 +117,7 @@ typedef struct __FLINT_FILE FLINT_FILE;
 # define FLINT_WARN_UNUSED __attribute__((warn_unused_result))
 # define FLINT_UNLIKELY(x) __builtin_expect((x),0)
 # define FLINT_LIKELY(x) __builtin_expect((x),1)
+# define FLINT_CONSTANT_P __builtin_constant_p
 #else
 # define __attribute__(x)
 # if defined(_MSC_VER)
@@ -137,6 +132,7 @@ typedef struct __FLINT_FILE FLINT_FILE;
 # define FLINT_CONST
 # define FLINT_UNLIKELY(x) (x)
 # define FLINT_LIKELY(x) (x)
+# define FLINT_CONSTANT_P(x) 0
 #endif
 
 #if defined(__cplusplus)
