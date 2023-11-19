@@ -92,3 +92,8 @@ jobs:
           # FIXME: Is it possible to run these in parallel without freezing?
           qemu-aarch64 -L /usr/aarch64-linux-gnu build/test/main
           qemu-aarch64 -L /usr/aarch64-linux-gnu build/fft_small/test/main
+
+      - if: failure()
+        name: "Print config.log"
+        run: |
+          cat config.log
