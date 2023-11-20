@@ -179,7 +179,10 @@ _artin_schreier_preimage(fmpz *rop, const fmpz *op, slong len,
      */
 
 #ifdef FLINT_WANT_ASSERT
-    FLINT_ASSERT(nmod_mat_lu(P, A, 0) == d - 1);
+    {
+        slong res = nmod_mat_lu(P, A, 0);
+        FLINT_ASSERT(res == d - 1);
+    }
 #else
     nmod_mat_lu(P, A, 0);
 #endif
