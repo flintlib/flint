@@ -112,9 +112,9 @@ FLINT_INLINE slong z_min(slong a, slong b) {return FLINT_MIN(a, b);}
 FLINT_INLINE slong z_max(slong a, slong b) {return FLINT_MAX(a, b);}
 
 
-FLINT_DLL void* flint_aligned_alloc(ulong alignment, ulong size);
+void* flint_aligned_alloc(ulong alignment, ulong size);
 
-FLINT_DLL void flint_aligned_free(void* p);
+void flint_aligned_free(void* p);
 
 /*
     The twiddle factors are split across FLINT_BITS tables:
@@ -242,15 +242,15 @@ FLINT_INLINE double sd_fft_ctx_get_fft_index(double* d, ulong i)
 }
 
 /* sd_fft.c */
-FLINT_DLL void sd_fft_trunc(const sd_fft_lctx_t Q, ulong I, ulong S, ulong k, ulong j, ulong itrunc, ulong otrunc);
+void sd_fft_trunc(const sd_fft_lctx_t Q, ulong I, ulong S, ulong k, ulong j, ulong itrunc, ulong otrunc);
 
 /* sd_ifft.c */
-FLINT_DLL void sd_ifft_trunc(const sd_fft_lctx_t Q, ulong I, ulong S, ulong k, ulong j, ulong z, ulong n, int f);
+void sd_ifft_trunc(const sd_fft_lctx_t Q, ulong I, ulong S, ulong k, ulong j, ulong z, ulong n, int f);
 
 /* sd_fft_ctx.c */
-FLINT_DLL void sd_fft_ctx_clear(sd_fft_ctx_t Q);
-FLINT_DLL void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp);
-FLINT_DLL void sd_fft_ctx_fit_depth(sd_fft_ctx_t Q, ulong k);
+void sd_fft_ctx_clear(sd_fft_ctx_t Q);
+void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp);
+void sd_fft_ctx_fit_depth(sd_fft_ctx_t Q, ulong k);
 
 /* TODO: these should probably increment/decrement a ref count */
 FLINT_INLINE void sd_fft_lctx_init(sd_fft_lctx_t L, sd_fft_ctx_t Q, ulong depth)
@@ -266,9 +266,9 @@ FLINT_INLINE void sd_fft_lctx_clear(sd_fft_lctx_t LQ, sd_fft_ctx_t Q)
 {
 }
 
-FLINT_DLL void sd_fft_lctx_point_mul(const sd_fft_lctx_t Q,
+void sd_fft_lctx_point_mul(const sd_fft_lctx_t Q,
                             double* a, const double* b, ulong m_, ulong depth);
-FLINT_DLL void sd_fft_lctx_point_sqr(const sd_fft_lctx_t Q,
+void sd_fft_lctx_point_sqr(const sd_fft_lctx_t Q,
                             double* a, ulong m_, ulong depth);
 
 
@@ -348,9 +348,9 @@ typedef struct {
 
 typedef crt_data_struct crt_data_t[1];
 
-FLINT_DLL void crt_data_init(crt_data_t C, ulong prime, ulong coeff_len, ulong nprimes);
+void crt_data_init(crt_data_t C, ulong prime, ulong coeff_len, ulong nprimes);
 
-FLINT_DLL void crt_data_clear(crt_data_t C);
+void crt_data_clear(crt_data_t C);
 
 /* return mpn of length C->coeff_len */
 FLINT_FORCE_INLINE ulong* crt_data_co_prime(const crt_data_t C, ulong i)
