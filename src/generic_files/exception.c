@@ -14,7 +14,7 @@
 #include <stdarg.h>
 #include "flint.h"
 
-#if FLINT_REENTRANT && !FLINT_USES_TLS
+#if FLINT_REENTRANT && !FLINT_USES_TLS && FLINT_USES_PTHREAD
 #include <pthread.h>
 
 static pthread_once_t abort_func_init = PTHREAD_ONCE_INIT;
@@ -34,7 +34,7 @@ void (*abort_func)(void) = abort;
 
 void flint_set_abort(void (*func)(void))
 {
-#if FLINT_REENTRANT && !FLINT_USES_TLS
+#if FLINT_REENTRANT && !FLINT_USES_TLS && FLINT_USES_PTHREAD
     pthread_once(&abort_func_init, __flint_set_abort_init);
     pthread_mutex_lock(&abort_func_lock);
 #endif
@@ -47,7 +47,7 @@ void flint_set_abort(void (*func)(void))
 # pragma GCC diagnostic pop
 #endif
 
-#if FLINT_REENTRANT && !FLINT_USES_TLS
+#if FLINT_REENTRANT && !FLINT_USES_TLS && FLINT_USES_PTHREAD
     pthread_mutex_unlock(&abort_func_lock);
 #endif
 }

@@ -20,10 +20,6 @@
 
 #include "fmpz_types.h"
 
-#if FLINT_USES_PTHREAD
-#include <pthread.h>
-#endif
-
 #ifdef __cplusplus
  extern "C" {
 #endif

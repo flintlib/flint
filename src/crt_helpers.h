@@ -546,7 +546,7 @@ DEFINE_IT(7)
 
 #endif
 
-#if 0 /* def __GNUC__ */
+#ifdef __GNUC__
 FLINT_FORCE_INLINE void _mul(ulong* hi, ulong* lo, ulong y, ulong x)
 {
     __uint128_t p = ((__uint128_t) x) * ((__uint128_t) y);

@@ -22,6 +22,7 @@
 #include "fmpz.h"
 
 #if FLINT_USES_PTHREAD
+# include <pthread.h>
 # include <stdatomic.h>
 #endif
 
