@@ -546,7 +546,7 @@ DEFINE_IT(7)
 
 #endif
 
-#ifdef __GNUC__
+#if 0 /* def __GNUC__ */
 FLINT_FORCE_INLINE void _mul(ulong* hi, ulong* lo, ulong y, ulong x)
 {
     __uint128_t p = ((__uint128_t) x) * ((__uint128_t) y);
@@ -573,9 +573,8 @@ FLINT_FORCE_INLINE void _mul(ulong* hi, ulong* lo, ulong y, ulong x)
 FLINT_FORCE_INLINE void _madd(ulong* hi, ulong* lo, ulong y, ulong x)
 {
     ulong r1, r0;
-    add_ssaaaa(r1, r0, (mp_limb_t) 0, x, (mp_limb_t) 0, y);
-    *lo = r0;
-    *hi = r1;
+    umul_ppmm(r1, r0, x, y);
+    add_ssaaaa(*hi, *lo, r1, r0, *hi, *lo);
 }
 #endif
 
