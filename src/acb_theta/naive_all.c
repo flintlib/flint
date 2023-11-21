@@ -70,20 +70,50 @@ acb_theta_naive_all_gen(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau
     acb_clear(c);
 }
 
+static void
+acb_theta_naive_all_g1(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
+{
+    acb_t q4, q, w;
+    acb_ptr res;
+    int w_is_unit;
+    slong k;
+
+    acb_init(q4);
+    acb_init(q);
+    acb_init(w);
+    res = _acb_vec_init(4);
+
+    acb_mul_2exp_si(q4, acb_mat_entry(tau, 0, 0), -2);
+    acb_exp_pi_i(q4, q4, prec);
+    acb_pow_ui(q, q4, 4, prec);
+
+    for (k = 0; k < nb; k++)
+    {
+        acb_exp_pi_i(w, &zs[k], prec);
+        w_is_unit = arb_is_zero(acb_imagref(&zs[k]));
+        acb_modular_theta_sum(&res[0], &res[1], &res[2], &res[3],
+            w, w_is_unit, q, 1, prec);
+        acb_set(&th[4 * k], &res[2]);
+        acb_set(&th[4 * k + 1], &res[3]);
+        acb_mul(&th[4 * k + 2], &res[1], q4, prec);
+        acb_mul(&th[4 * k + 3], &res[0], q4, prec);
+        acb_neg(&th[4 * k + 3], &th[4 * k + 3]);
+    }
+
+    acb_clear(q4);
+    acb_clear(q);
+    acb_clear(w);
+    _acb_vec_clear(res, 4);
+}
+
 void
 acb_theta_naive_all(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
-    slong k;
 
     if (g == 1)
     {
-        for (k = 0; k < nb; k++)
-        {
-            acb_modular_theta(&th[4 * k + 3], &th[4 * k + 2], &th[4 * k],
-                &th[4 * k + 1], zs + k * g, acb_mat_entry(tau, 0, 0), prec);
-            acb_neg(&th[4 * k + 3], &th[4 * k + 3]);
-        }
+        acb_theta_naive_all_g1(th, zs, nb, tau, prec);
     }
     else
     {

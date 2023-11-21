@@ -55,8 +55,8 @@ acb_theta_agm_rel_mag_err(arf_t m, arf_t eps, acb_srcptr a, arb_srcptr d,
 }
 
 /* This is assuming a0 corresponds to theta constants */
-void
-acb_theta_agm_mul_tight(acb_ptr res, acb_srcptr a0, acb_srcptr a,
+static void
+acb_theta_agm_mul_tight_gen(acb_ptr res, acb_srcptr a0, acb_srcptr a,
     arb_srcptr d0, arb_srcptr d, slong g, slong prec)
 {
     slong n = 1 << g;
@@ -121,4 +121,53 @@ acb_theta_agm_mul_tight(acb_ptr res, acb_srcptr a0, acb_srcptr a,
     arf_clear(e);
     arf_clear(t);
     arb_clear(err);
+}
+
+/* there might be a way of saving some multiplications here by writing in terms
+   of real & imaginary parts */
+static void
+acb_theta_agm_mul_tight_g1(acb_ptr res, acb_srcptr a0, acb_srcptr a,
+    arb_srcptr d0, arb_srcptr d, slong g, slong prec)
+{
+    acb_t t;
+    acb_ptr aux;
+
+    acb_init(t);
+    aux = _acb_vec_init(2);
+
+    if (a == a0)
+    {
+        acb_sqr(t, &a[0], prec);
+        acb_sqr(&aux[0], &a[1], prec);
+        acb_add(&aux[0], &aux[0], t, prec + acb_theta_dist_addprec(&d[0]));
+        acb_mul(&aux[1], &a[0], &a[1], prec);
+        acb_mul_2exp_si(&aux[1], &aux[1], 1);
+    }
+    else
+    {
+        acb_mul(t, &a0[0], &a[0], prec);
+        acb_mul(&aux[0], &a0[1], &a[1], prec);
+        acb_add(&aux[0], &aux[0], t, prec + acb_theta_dist_addprec(&d[0]));
+        acb_mul(t, &a0[0], &a[1], prec);
+        acb_mul(&aux[1], &a0[1], &a[0], prec);
+        acb_add(&aux[1], &aux[1], t, prec + acb_theta_dist_addprec(&d[1]));
+    }
+    _acb_vec_scalar_mul_2exp_si(res, aux, 2, -1);
+
+    acb_clear(t);
+    _acb_vec_clear(aux, 2);
+}
+
+void
+acb_theta_agm_mul_tight(acb_ptr res, acb_srcptr a0, acb_srcptr a,
+    arb_srcptr d0, arb_srcptr d, slong g, slong prec)
+{
+    if (g == 1)
+    {
+        acb_theta_agm_mul_tight_g1(res, a0, a, d0, d, g, prec);
+    }
+    else
+    {
+        acb_theta_agm_mul_tight_gen(res, a0, a, d0, d, g, prec);
+    }
 }

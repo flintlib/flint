@@ -968,18 +968,18 @@ Quasi-linear algorithms: AGM steps
     roughly `e^{-d_k}` for each `0\leq k < 2^g`, and similarly for *a0* and
     *d0*.
 
-    We manage the error bounds as follows. We compute `m, \varepsilon` such
-    that the following holds: for each `0\leq k < \mathit{nb}`, if `d_k`
-    (resp. `a_k`) denotes the `k^{\mathrm{th}}` entry of *d* (resp. *a*), then
-    the absolute value of `a_k` is at most `m \cdot e^{-d_k}` and the radius of
-    the complex ball `a_k` is at most `\mathit{eps}\cdot e^{-d_k}`. We proceed
-    similarly on *a0* and *d0* to obtain `m_0, \varepsilon_0`. Then we call
-    :func:`acb_theta_agm_mul` on the midpoints of *a0* and *a* at a higher
-    working precision, and finally add `e^{-d_k} (m_0 \varepsilon + m
-    \varepsilon_0 + \varepsilon\varepsilon_0)` to the error bound on the
-    `k^\mathrm{th}` entry of *res*. This is valid for the following reason:
-    keeping notation from :func:`acb_theta_dist_a0`, for each `b\in \{0,1\}^g`,
-    the sum
+    When `g>1`, we manage the error bounds as follows. We compute `m,
+    \varepsilon` such that the following holds: for each `0\leq k <
+    \mathit{nb}`, if `d_k` (resp. `a_k`) denotes the `k^{\mathrm{th}}` entry of
+    *d* (resp. *a*), then the absolute value of `a_k` is at most `m \cdot
+    e^{-d_k}` and the radius of the complex ball `a_k` is at most
+    `\mathit{eps}\cdot e^{-d_k}`. We proceed similarly on *a0* and *d0* to
+    obtain `m_0, \varepsilon_0`. Then we call :func:`acb_theta_agm_mul` on the
+    midpoints of *a0* and *a* at a higher working precision, and finally add
+    `e^{-d_k} (m_0 \varepsilon + m \varepsilon_0 + \varepsilon\varepsilon_0)`
+    to the error bound on the `k^\mathrm{th}` entry of *res*. This is valid for
+    the following reason: keeping notation from :func:`acb_theta_dist_a0`, for
+    each `b\in \{0,1\}^g`, the sum
 
         .. math ::
 
@@ -2174,11 +2174,14 @@ This is meant to provide information on the correct value to return in
 
 .. code-block:: bash
 
-    ./build/acb_theta/profile/p-all
+    ./build/acb_theta/profile/p-all g nb_steps hasz
 
-Prints quick performance measurements for the functions :func:`acb_theta_all`
-and :func:`acb_theta_naive_all` at different precisions on a specific input
-matrix for `g=2`.
+Prints quick performance measurements for the functions :func:`acb_theta_all`,
+:func:`acb_theta_ql_a0`, :func:`acb_theta_ql_all` and
+:func:`acb_theta_naive_all` at different precisions on a specific input matrix
+of the specified dimension *g*. We start at precision 32, then double it
+*nb_steps* times. The parameter *hasz* should be either 0 (theta constants) or
+1 (theta values at a nonzero point).
 
 This is meant to show whether the main user function is slower than naive
 algorithms at low precisions. (This is currently the case.)

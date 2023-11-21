@@ -14,13 +14,13 @@
 #include "acb_mat.h"
 #include "acb_theta.h"
 
-static int usage(char *argv[])
+static int usage(char * argv[])
 {
     flint_printf("usage: %s g pstep pmax dstep dmax\n", argv[0]);
     return 1;
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char * argv[])
 {
     slong g;
     slong prec, pmax, pstep;

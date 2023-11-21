@@ -67,6 +67,10 @@ acb_theta_ql_a0(acb_ptr r, acb_srcptr t, acb_srcptr z, arb_srcptr dist0,
     acb_siegel_cho(cho, tau, ACB_THETA_LOW_PREC);
     split = acb_theta_ql_split(cho);
     nb_steps = acb_theta_ql_a0_nb_steps(cho, split, prec);
+    if (has_t || has_z)
+    {
+        nb_steps += 1; /* cf p-ql_a0_steps */
+    }
     padding = nb_steps * (guard + g);
     arf_one(e);
     arf_mul_2exp_si(e, e, -prec - padding);

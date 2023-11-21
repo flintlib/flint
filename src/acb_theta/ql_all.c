@@ -80,7 +80,9 @@ acb_theta_ql_all_with_t(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d0,
         acb_theta_naive_fixed_a(rts + a * n, a, new_z, 1, tau, hprec);
         for (k = 0; (k < n) && res; k++)
         {
-            if (acb_contains_zero(&rts[a * n + k]))
+            /* Ignore theta constants if z = t = 0 */
+            if (acb_contains_zero(&rts[a * n + k])
+                && (hasz || hast || acb_theta_char_is_even(a * n + k, g)))
             {
                 res = 0;
             }
@@ -113,6 +115,18 @@ acb_theta_ql_all_with_t(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d0,
             for (k = 0; k < n * n; k++)
             {
                 acb_div(&th[k], &aux[k], &th[k], prec);
+            }
+        }
+    }
+
+    /* Set odd theta constants to zero */
+    if (!hasz)
+    {
+        for (a = 0; a < n * n; a++)
+        {
+            if (!acb_theta_char_is_even(a, g))
+            {
+                acb_zero(&th[a]);
             }
         }
     }
