@@ -62,7 +62,7 @@ TEST_FUNCTION_START(qfb_pow_ui, state)
         if (!result)
         {
            printf("FAIL:\n");
-           printf("exp = %lu\n", exp);
+           flint_printf("exp = %wu\n", exp);
            qfb_print(r); printf("\n");
            qfb_print(s); printf("\n");
            qfb_print(t); printf("\n");

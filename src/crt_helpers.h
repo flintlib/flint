@@ -12,10 +12,18 @@
 #ifndef CRT_HELPERS_H
 #define CRT_HELPERS_H
 
-#if defined (__AVX2__)
-# include <x86intrin.h>
-#else
-# include <arm_neon.h>
+#if defined(__GNUC__)
+# if defined(__AVX2__)
+#  include <x86intrin.h>
+# elif defined(__ARM_NEON)
+#  include <arm_neon.h>
+# endif
+#elif defined(_MSC_VER)
+# if defined(__AVX2__)
+#  include <intrin.h>
+# elif defined(_M_ARM64)
+#  include <arm_neon.h>
+# endif
 #endif
 
 #include "flint.h"
@@ -84,7 +92,7 @@ FLINT_FORCE_INLINE unsigned char _subborrow_ulong(unsigned char cf, ulong x, ulo
 
 #if 1
 
-#if defined(__AVX2__)
+#if defined(__GNUC__) && defined(__AVX2__)
 
 #define add_sssssaaaaaaaaaa(s4,s3,s2,s1,s0, a4,a3,a2,a1,a0, b4,b3,b2,b1,b0)  \
   __asm__ ("addq %14,%q4\n\tadcq %12,%q3\n\tadcq %10,%q2\n\tadcq %8,%q1\n\tadcq %6,%q0"    \
@@ -179,7 +187,7 @@ FLINT_FORCE_INLINE unsigned char _subborrow_ulong(unsigned char cf, ulong x, ulo
          "6"  ((mp_limb_t)(a1)), "rme" ((mp_limb_t)(b1)),                 \
          "7"  ((mp_limb_t)(a0)), "rme" ((mp_limb_t)(b0)))
 
-#elif defined(__ARM_NEON)
+#elif defined(__GNUC__) && defined(__ARM_NEON)
 
 #define add_sssssaaaaaaaaaa(s4, s3, s2, s1, s0, a4, a3, a2, a1, a0, b4, b3, b2, b1, b0)      \
   __asm__ ("adds %4,%9,%14\n\tadcs %3,%8,%13\n\tadcs %2,%7,%12\n\tadcs %1,%6,%11\n\tadc %0,%5,%10"\
@@ -244,6 +252,79 @@ FLINT_FORCE_INLINE unsigned char _subborrow_ulong(unsigned char cf, ulong x, ulo
        : "r" ((mp_limb_t)(a7)), "r" ((mp_limb_t)(a6)), "r" ((mp_limb_t)(a5)), "r" ((mp_limb_t)(a4)), "r" ((mp_limb_t)(a3)), "r" ((mp_limb_t)(a2)), "r" ((mp_limb_t)(a1)), "r" ((mp_limb_t)(a0)), \
          "r" ((mp_limb_t)(b7)), "r" ((mp_limb_t)(b6)), "r" ((mp_limb_t)(b5)), "r" ((mp_limb_t)(b4)), "r" ((mp_limb_t)(b3)), "r" ((mp_limb_t)(b2)), "r" ((mp_limb_t)(b1)), "rI" ((mp_limb_t)(b0))                        \
        : "cc")
+
+#elif defined(_MSC_VER) && (defined(__AVX2__) || defined(_M_ARM64))
+#define add_sssssaaaaaaaaaa(s4, s3, s2, s1, s0, a4, a3, a2, a1, a0, b4, b3, b2, b1, b0)         \
+  do {                                                                                          \
+    mp_limb_t __t0 = 0;                                                                         \
+    add_ssssaaaaaaaa(__t0, s2, s1, s0, (mp_limb_t) 0, a2, a1, a0, (mp_limb_t) 0, b2, b1, b0);   \
+    add_ssaaaa(s4, s3, a4, a3, b4, b3);                                                         \
+    add_ssaaaa(s4, s3, s4, s3, (mp_limb_t) 0, __t0);                                            \
+  } while (0)
+
+#define add_ssssssaaaaaaaaaaaa(s5, s4, s3, s2, s1, s0, a5, a4, a3, a2, a1, a0, b5, b4, b3, b2, b1, b0)      \
+  do {                                                                                                      \
+    mp_limb_t __t1 = 0;                                                                                     \
+    add_sssssaaaaaaaaaa(__t1, s3, s2, s1, s0, (mp_limb_t) 0, a3, a2, a1, a0, (mp_limb_t) 0, b3, b2, b1, b0);\
+    add_ssaaaa(s5, s4, a5, a4, b5, b4);                                                                     \
+    add_ssaaaa(s5, s4, s5, s4, (mp_limb_t) 0, __t1);                                                        \
+  } while (0)
+
+#define add_sssssssaaaaaaaaaaaaaa(s6, s5, s4, s3, s2, s1, s0, a6, a5, a4, a3, a2, a1, a0, b6, b5, b4, b3, b2, b1, b0)       \
+  do {                                                                                                                      \
+    mp_limb_t __t2 = 0;                                                                                                     \
+    add_ssssssaaaaaaaaaaaa(__t2, s4, s3, s2, s1, s0, (mp_limb_t) 0, a4, a3, a2, a1, a0, (mp_limb_t) 0, b4, b3, b2, b1, b0); \
+    add_ssaaaa(s6, s5, a6, a5, b6, b5);                                                                                     \
+    add_ssaaaa(s6, s5, s6, s5, (mp_limb_t) 0, __t2);                                                                        \
+  } while (0)
+
+#define add_ssssssssaaaaaaaaaaaaaaaa(s7, s6, s5, s4, s3, s2, s1, s0, a7, a6, a5, a4, a3, a2, a1, a0, b7, b6, b5, b4, b3, b2, b1, b0)        \
+  do {                                                                                                                                      \
+    mp_limb_t __t3 = 0;                                                                                                                     \
+    add_sssssssaaaaaaaaaaaaaa(__t3, s5, s4, s3, s2, s1, s0, (mp_limb_t) 0, a5, a4, a3, a2, a1, a0, (mp_limb_t) 0, b5, b4, b3, b2, b1, b0);  \
+    add_ssaaaa(s7, s6, a7, a6, b7, b6);                                                                                                     \
+    add_ssaaaa(s7, s6, s7, s6, (mp_limb_t) 0, __t3);                                                                                        \
+  } while (0)
+
+#define sub_ddddmmmmssss(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0)        \
+  do {                                                                          \
+    mp_limb_t __t1, __u1;                                                       \
+    sub_dddmmmsss(__t1, s1, s0, (mp_limb_t) 0, a1, a0, (mp_limb_t) 0, b1, b0);  \
+    sub_ddmmss(__u1, s2, (mp_limb_t) 0, a2, (mp_limb_t) 0, b2);                 \
+    sub_ddmmss(s3, s2, (a3) - (b3), s2, -__u1, -__t1);                          \
+  } while (0)
+
+#define sub_dddddmmmmmsssss(s4, s3, s2, s1, s0, a4, a3, a2, a1, a0, b4, b3, b2, b1, b0)         \
+  do {                                                                                          \
+    mp_limb_t __t2, __u2;                                                                       \
+    sub_ddddmmmmssss(__t2, s2, s1, s0, (mp_limb_t) 0, a2, a1, a0, (mp_limb_t) 0, b2, b1, b0);   \
+    sub_ddmmss(__u2, s3, (mp_limb_t) 0, a3, (mp_limb_t) 0, b3);                                 \
+    sub_ddmmss(s4, s3, (a4) - (b4), s3, -__u2, -__t2);                                          \
+  } while (0)
+
+#define sub_ddddddmmmmmmssssss(s5, s4, s3, s2, s1, s0, a5, a4, a3, a2, a1, a0, b5, b4, b3, b2, b1, b0)      \
+  do {                                                                                                      \
+    mp_limb_t __t3, __u3;                                                                                   \
+    sub_dddddmmmmmsssss(__t3, s3, s2, s1, s0, (mp_limb_t) 0, a3, a2, a1, a0, (mp_limb_t) 0, b3, b2, b1, b0);\
+    sub_ddmmss(__u3, s4, (mp_limb_t) 0, a4, (mp_limb_t) 0, b4);                                             \
+    sub_ddmmss(s5, s4, (a5) - (b5), s4, -__u3, -__t3);                                                      \
+  } while (0)
+
+#define sub_dddddddmmmmmmmsssssss(s6, s5, s4, s3, s2, s1, s0, a6, a5, a4, a3, a2, a1, a0, b6, b5, b4, b3, b2, b1, b0)       \
+  do {                                                                                                                      \
+    mp_limb_t __t4, __u4;                                                                                                   \
+    sub_ddddddmmmmmmssssss(__t4, s4, s3, s2, s1, s0, (mp_limb_t) 0, a4, a3, a2, a1, a0, (mp_limb_t) 0, b4, b3, b2, b1, b0); \
+    sub_ddmmss(__u4, s5, (mp_limb_t) 0, a5, (mp_limb_t) 0, b5);                                                             \
+    sub_ddmmss(s6, s5, (a6) - (b6), s5, -__u4, -__t4);                                                                      \
+  } while (0)
+
+#define sub_ddddddddmmmmmmmmssssssss(s7, s6, s5, s4, s3, s2, s1, s0, a7, a6, a5, a4, a3, a2, a1, a0, b7, b6, b5, b4, b3, b2, b1, b0)        \
+  do {                                                                                                                                      \
+    mp_limb_t __t5, __u5;                                                                                                                   \
+    sub_dddddddmmmmmmmsssssss(__t5, s5, s4, s3, s2, s1, s0, (mp_limb_t) 0, a5, a4, a3, a2, a1, a0, (mp_limb_t) 0, b5, b4, b3, b2, b1, b0);  \
+    sub_ddmmss(__u5, s6, (mp_limb_t) 0, a6, (mp_limb_t) 0, b6);                                                                             \
+    sub_ddmmss(s7, s6, (a7) - (b7), s6, -__u5, -__t5);                                                                                      \
+  } while (0)
 
 #else
 # error crt_helpers.h requires AVX2 or Neon instructions
@@ -465,7 +546,7 @@ DEFINE_IT(7)
 
 #endif
 
-
+#ifdef __GNUC__
 FLINT_FORCE_INLINE void _mul(ulong* hi, ulong* lo, ulong y, ulong x)
 {
     __uint128_t p = ((__uint128_t) x) * ((__uint128_t) y);
@@ -480,6 +561,22 @@ FLINT_FORCE_INLINE void _madd(ulong* hi, ulong* lo, ulong y, ulong x)
     *lo = (ulong) (p);
     *hi = (ulong) (p >> 64);
 }
+#else
+FLINT_FORCE_INLINE void _mul(ulong* hi, ulong* lo, ulong y, ulong x)
+{
+    ulong r1, r0;
+    umul_ppmm(r1, r0, x, y);
+    *lo = r0;
+    *hi = r1;
+}
+
+FLINT_FORCE_INLINE void _madd(ulong* hi, ulong* lo, ulong y, ulong x)
+{
+    ulong r1, r0;
+    umul_ppmm(r1, r0, x, y);
+    add_ssaaaa(*hi, *lo, r1, r0, *hi, *lo);
+}
+#endif
 
 #define DEFINE_IT(n, m) \
 FLINT_FORCE_INLINE void CAT3(_big_mul, n, m)(ulong r[], ulong t[], ulong C[], ulong y) \

@@ -58,7 +58,7 @@ TEST_FUNCTION_START(_fmpz_poly_mul_mid_mpn_ctx, state)
                     if (!fmpz_equal(c + i, d + i-zl))
                     {
                         flint_printf("(squaring) mulmid error at index %wu\n", i);
-                        flint_printf("abits=%wu, bbits=%wu\n", abits);
+                        flint_printf("abits=%wu\n", abits);
                         flint_printf("zl=%wu, zh=%wu, an=%wu\n", zl, zh, an);
                         flint_abort();
                     }

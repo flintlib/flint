@@ -18,14 +18,9 @@
 
 #cmakedefine01 FLINT_USES_FENV
 
+#cmakedefine FLINT_HAVE_FFT_SMALL
+
 #ifdef _MSC_VER
-# define access _access
-# define strcasecmp _stricmp
-# define strncasecmp	_strnicmp
-# define alloca _alloca
-# define MSC_C_(x) #x  
-# define MSC_CC_(x)  MSC_C_(x)
-# define MSC_VERSION "Microsoft C++ (Version " MSC_CC_(_MSC_FULL_VER) ")"
 # if defined(FLINT_BUILD_DLL)
 #  define FLINT_DLL __declspec(dllexport)
 # else

@@ -47,7 +47,7 @@ TEST_FUNCTION_START(qfb_reduced_forms, state)
                 qfb_print(forms2 + j);
                 printf("\n");
              } else
-                printf("%ld != %ld\n", num, num2);
+                flint_printf("%wd != %wd\n", num, num2);
 
             flint_abort();
         }

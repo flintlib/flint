@@ -119,7 +119,6 @@ typedef struct __FLINT_FILE FLINT_FILE;
 # define FLINT_STATIC_NOINLINE static __attribute__((noinline))
 # define FLINT_UNUSED(x) UNUSED_ ## x __attribute__((unused))
 # define FLINT_SET_BUT_UNUSED(x) x __attribute__((unused))
-# define FLINT_NORETURN __attribute__ ((noreturn))
 # define FLINT_CONST __attribute__ ((const))
 # define FLINT_WARN_UNUSED __attribute__((warn_unused_result))
 # define FLINT_UNLIKELY(x) __builtin_expect((x),0)
@@ -141,7 +140,6 @@ typedef struct __FLINT_FILE FLINT_FILE;
 # define FLINT_UNUSED(x) x
 # define FLINT_SET_BUT_UNUSED(x) x
 # define FLINT_WARN_UNUSED
-# define FLINT_NORETURN
 # define FLINT_CONST
 # define FLINT_UNLIKELY(x) (x)
 # define FLINT_LIKELY(x) (x)
@@ -150,15 +148,19 @@ typedef struct __FLINT_FILE FLINT_FILE;
 # define FLINT_OPTIMIZE(x)
 #endif
 
+#if defined(__cplusplus)
+# define FLINT_NORETURN [[noreturn]]
+#elif __STDC_VERSION__ < 202300L
+# define FLINT_NORETURN _Noreturn
+#else
+# define FLINT_NORETURN noreturn
+#endif
+
 #if FLINT_USES_TLS
-# if defined(__GNUC__)
-#  define FLINT_TLS_PREFIX __thread
-# elif __STDC_VERSION__ >= 201112L
+# if __STDC_VERSION__ < 202300L && !defined(__cplusplus)
 #  define FLINT_TLS_PREFIX _Thread_local
-# elif defined(_MSC_VER)
-#  define FLINT_TLS_PREFIX __declspec(thread)
 # else
-#  error "thread local prefix defined in C11 or later"
+#  define FLINT_TLS_PREFIX thread_local
 # endif
 #else
 # define FLINT_TLS_PREFIX
@@ -218,7 +220,7 @@ void __flint_get_memory_functions(void *(**alloc_func) (size_t),
 FLINT_NORETURN void flint_abort(void);
 
 /* If user want to set change abort function from `abort' */
-void flint_set_abort(FLINT_NORETURN void (*func)(void));
+void flint_set_abort(void (*func)(void));
 
 int flint_get_num_threads(void);
 void flint_set_num_threads(int num_threads);

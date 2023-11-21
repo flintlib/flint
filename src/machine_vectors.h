@@ -16,11 +16,18 @@
 
 #include <math.h>
 
-#if defined(__AVX2__)
-# include <x86intrin.h>
-# include <immintrin.h>
-#elif defined(__ARM_NEON)
-# include <arm_neon.h>
+#if defined(__GNUC__)
+# if defined(__AVX2__)
+#  include <x86intrin.h>
+# elif defined(__ARM_NEON)
+#  include <arm_neon.h>
+# endif
+#elif defined(_MSC_VER)
+# if defined(__AVX2__)
+#  include <intrin.h>
+# elif defined(_M_ARM64)
+#  include <arm_neon.h>
+# endif
 #endif
 
 #include "flint.h"
@@ -50,7 +57,13 @@ typedef struct {__m256d e1, e2;} vec8d;
 
 FLINT_FORCE_INLINE void vec4d_print(vec4d a)
 {
+#ifdef _MSC_VER
+    double as[4];
+    _mm256_storeu_pd(as, a);
+    flint_printf("{%f, %f, %f, %f}", as[0], as[1], as[2], as[3]);
+#else
     flint_printf("{%f, %f, %f, %f}", a[0], a[1], a[2], a[3]);
+#endif
 }
 
 FLINT_FORCE_INLINE void vec4n_print(vec4n a)
@@ -246,7 +259,13 @@ FLINT_FORCE_INLINE vec1d vec1d_reduce_2n_to_n(vec1d a, vec1d n) {
 /* vec4 *****************************************************/
 
 FLINT_FORCE_INLINE double vec4d_get_index(vec4d a, const int i) {
+#ifdef _MSC_VER
+    double as[4];
+    _mm256_storeu_pd(as, a);
+    return as[i];
+#else
     return a[i];
+#endif
 }
 
 FLINT_FORCE_INLINE vec4d vec4d_load(const double* a) {
@@ -274,7 +293,14 @@ FLINT_FORCE_INLINE void vec4d_store_unaligned(double* z, vec4d a) {
 }
 
 FLINT_FORCE_INLINE int vec4d_same(vec4d a, vec4d b) {
+#ifdef _MSC_VER
+    double as[4], bs[4];
+    _mm256_storeu_pd(as, a);
+    _mm256_storeu_pd(bs, b);
+    return as[0] == bs[0] && as[1] == bs[1] && as[2] == bs[2] && as[3] == bs[3];
+#else
     return a[0] == b[0] && a[1] == b[1] && a[2] == b[2] && a[3] == b[3];
+#endif
 }
 
 FLINT_FORCE_INLINE vec4d vec4d_set_d(double a) {
@@ -745,7 +771,7 @@ FLINT_FORCE_INLINE vec8n vec8n_bit_and(vec8n a, vec8n b) {
 
 
 
-#elif defined(__ARM_NEON)
+#elif defined(__ARM_NEON) || defined(_M_ARM64)
 
 typedef ulong vec1n;
 typedef uint64x2_t vec2n;

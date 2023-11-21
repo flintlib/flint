@@ -103,22 +103,6 @@ notionally the more complex of the two modules. E.g. fmpz_poly_get_nmod_poly.
 The set function should set an object of module1 to the value of an object of
 module2, and the get function should do the opposite.
 
-Function prototypes
--------------------
-
-All function prototypes in .h files in FLINT require a FLINT_DLL declaration in
-front of them. Please keep the initial part of the prototype all on a single
-line, rather than placing the FLINT_DLL and/or return type on a different
-line, e.g. prototypes should look like this:
-
-FLINT_DLL void myfunc(blah, ....
-      ...., blah, blah)
-
-Note that dll import/export is handled differently for inlines. Please don't
-add FLINT_DLL to inline functions. Rather, add a single FLINT_DLL to the
-non-inline branch inside the relevant BLAH_INLINES_C #define at the top of the
-.h file.
-
 Underscores in function names
 -----------------------------
 

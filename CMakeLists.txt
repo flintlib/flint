@@ -1,5 +1,6 @@
 #
 # Copyright (C) 2023 Isuru Fernando
+# Copyright (C) 2023 Albin Ahlbäck
 #
 # This file is part of FLINT.
 #
@@ -43,6 +44,14 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
+# Try to enable the fft_small module
+if("${CMAKE_C_COMPILER_ID}" MATCHES "Clang" OR "${CMAKE_C_COMPILER_ID}" MATCHES "GNU")
+    check_c_compiler_flag("-march=native" HAS_FLAG_GCC_MARCH_NATIVE)
+elseif("${CMAKE_C_COMPILER_ID}" MATCHES "MSVC")
+    # Check if AVX2 is available
+    check_c_compiler_flag("/arch:AVX2" HAS_FLAG_MSVC_AVX2)
+endif()
+
 # Build options
 option(BUILD_SHARED_LIBS "Build shared libs" on)
 option(WITH_NTL "Build tests for NTL interface or not" off)
@@ -83,6 +92,62 @@ else()
     set(FLINT_USES_PTHREAD ON CACHE BOOL "Use POSIX Threads.")
 endif()
 
+
+# Check if fft_small module is available
+message(STATUS "Checking whether fft_small module is available")
+set(CMAKE_REQUIRED_INCLUDES ${GMP_INCLUDE_DIRS})
+if(HAS_FLAG_GCC_MARCH_NATIVE)
+    set(CMAKE_REQUIRED_FLAGS "-march=native")
+elseif(HAS_FLAG_MSVC_AVX2)
+    set(CMAKE_REQUIRED_FLAGS "/arch:AVX2")
+endif()
+check_c_source_compiles([[
+    #include <gmp.h>
+    #if GMP_LIMB_BITS != 64
+    # error
+    error
+    #endif
+
+    #include <arm_neon.h>
+    #if !(defined(__GNUC__) && defined(__ARM_NEON))
+    # if !(defined(_MSC_VER) && defined(_M_ARM64))
+    #  error
+    error
+    # endif
+    #endif
+    void main(){};]] FLINT_FFT_SMALL_ARM)
+check_c_source_compiles([[
+    #include <gmp.h>
+    #if GMP_LIMB_BITS != 64
+    # error
+    error
+    #endif
+
+    #if defined(__GNUC__)
+    # include <x86intrin.h>
+    #elif defined(_MSC_VER)
+    # include <intrin.h>
+    #else
+    # error
+    error
+    #endif
+
+    #if !defined(__AVX2__)
+    # error
+    error
+    #endif
+    void main(){};]] FLINT_FFT_SMALL_X86)
+unset(CMAKE_REQUIRED_INCLUDES)
+unset(CMAKE_REQUIRED_FLAGS)
+
+if(FLINT_FFT_SMALL_ARM OR FLINT_FFT_SMALL_X86)
+    message(STATUS "Checking whether fft_small module is available - yes")
+    set(FFT_SMALL fft_small)
+    set(FLINT_HAVE_FFT_SMALL ON)
+else()
+    message(STATUS "Checking whether fft_small module is available - no")
+    set(FFT_SMALL)
+endif()
 
 # Find sources
 
@@ -126,8 +191,8 @@ set(_BUILD_DIRS
     fmpz_mod_mpoly_factor           fmpq_mpoly_factor
     fq_nmod_mpoly_factor            fq_zech_mpoly_factor
 
-    fft             fmpz_poly_q     fmpz_lll        n_poly
-    arith           qsieve          aprcl
+    fft             ${FFT_SMALL}    fmpz_poly_q    fmpz_lll
+    n_poly          arith           qsieve          aprcl
 
     nf              nf_elem         qfb
 
@@ -155,12 +220,7 @@ set(_BUILD_DIRS
 )
 string(REGEX REPLACE "([A-Za-z0-9_-]+;|[A-Za-z0-9_-]+$)" "src/\\1" BUILD_DIRS "${_BUILD_DIRS}")
 
-set(_TEMPLATE_DIRS
-    fq_vec_templates     fq_mat_templates
-    fq_poly_templates    fq_poly_factor_templates
-    fq_embed_templates   fq_templates
-)
-string(REGEX REPLACE "([A-Za-z0-9_-]+;|[A-Za-z0-9_-]+$)" "src/\\1" TEMPLATE_DIRS "${_TEMPLATE_DIRS}")
+# NOTE: Template directories are not supposed to be used.
 
 set(_HEADERS
     NTL-interface.h flint.h longlong.h flint-config.h gmpcompat.h fft_tuning.h
@@ -203,9 +263,7 @@ check_c_source_compiles([[#define _GNU_SOURCE
 unset(CMAKE_REQUIRED_FLAGS)
 
 # Thread-local storage configuration
-if(cxx_thread_local IN_LIST CMAKE_CXX_COMPILE_FEATURES)
-  set(FLINT_USES_TLS ON CACHE BOOL "Use thread local storage.")
-endif()
+set(FLINT_USES_TLS ON CACHE BOOL "Use thread local storage.")
 
 # Memory manager configuration
 set(MEMORY_MANAGER "single" CACHE STRING "The FLINT memory manager.")
@@ -269,7 +327,7 @@ elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
 endif()
 
 
-foreach (build_dir IN LISTS BUILD_DIRS TEMPLATE_DIRS)
+foreach (build_dir IN LISTS BUILD_DIRS)
     file(GLOB TEMP RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${build_dir}/*.c")
     list(APPEND SOURCES ${TEMP})
     file(GLOB TEMP RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${build_dir}/*.h")
@@ -319,6 +377,12 @@ if (HAS_FLAG_MPOPCNT)
 endif()
 if (HAS_FLAG_UNROLL_LOOPS)
     target_compile_options(flint PUBLIC "-funroll-loops")
+endif()
+
+if(HAS_FLAG_GCC_MARCH_NATIVE)
+    target_compile_options(flint PUBLIC "-march=native")
+elseif(HAS_FLAG_MSVC_AVX2)
+    target_compile_options(flint PUBLIC "/arch:AVX2")
 endif()
 
 # Versioning

@@ -22,10 +22,7 @@ calcium_write_si(calcium_stream_t out, slong x)
     else
     {
         char tmp[22];
-        if (sizeof(slong) == sizeof(long))
-            sprintf(tmp, "%ld", x);
-        else
-            flint_sprintf(tmp, "%wd", x);
+        sprintf(tmp, WORD_FMT "d", x);
         calcium_write(out, tmp);
     }
 }

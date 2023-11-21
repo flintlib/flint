@@ -26,16 +26,26 @@ void __flint_set_abort_init(void)
 }
 #endif
 
-FLINT_NORETURN void (*abort_func)(void) = abort;
+#ifdef __GNUC__
+__attribute__((noreturn)) void (*abort_func)(void) = abort;
+#else
+void (*abort_func)(void) = abort;
+#endif
 
-void flint_set_abort(FLINT_NORETURN void (*func)(void))
+void flint_set_abort(void (*func)(void))
 {
 #if FLINT_REENTRANT && !FLINT_USES_TLS && FLINT_USES_PTHREAD
     pthread_once(&abort_func_init, __flint_set_abort_init);
     pthread_mutex_lock(&abort_func_lock);
 #endif
 
-  abort_func = func;
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+#endif
+    abort_func = func;
+#ifdef __GNUC__
+# pragma GCC diagnostic pop
+#endif
 
 #if FLINT_REENTRANT && !FLINT_USES_TLS && FLINT_USES_PTHREAD
     pthread_mutex_unlock(&abort_func_lock);
