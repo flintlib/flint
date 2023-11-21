@@ -6,7 +6,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "ca.h"
@@ -101,7 +101,7 @@ ca_is_gen_pow_fmpz_as_ext(fmpz_t exp, const ca_t x, ca_ctx_t ctx)
 }
 
 
-/* log(exp(z)) -- http://fungrim.org/entry/a3a253/ */
+/* log(exp(z)) -- https://fungrim.org/entry/a3a253/ */
 void
 ca_log_exp(ca_t res, const ca_t z, ca_ctx_t ctx)
 {

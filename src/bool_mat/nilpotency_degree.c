@@ -6,7 +6,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fmpz.h"
@@ -105,7 +105,7 @@ bool_mat_nilpotency_degree(const bool_mat_t A)
         else
         {
             /* Find the length of the longest path within the DAG */
-            /* http://stackoverflow.com/a/10737524/4072759 */
+            /* https://stackoverflow.com/a/10737524/4072759 */
 
             slong x, y, z;
             slong max_overall;

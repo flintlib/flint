@@ -6,7 +6,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "test_helpers.h"
@@ -39,7 +39,7 @@ TEST_FUNCTION_START(dirichlet_char, state)
 
         if (FLINT_BITS == 64 || q < 1024)
         {
-            /* use http://oeis.org/A053818 to check all elements
+            /* use https://oeis.org/A053818 to check all elements
              * are gone through */
             ref = (q % 4 == 2) ? -2 : 1;
             for (k = (G->neven == 2); k < G->num; k++)

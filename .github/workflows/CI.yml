@@ -16,10 +16,10 @@ concurrency:
 
 jobs:
   ##############################################################################
-  # ubuntu, gcc, avx2, code coverage
+  # ubuntu, gcc, code coverage
   ##############################################################################
-  ubuntu-avx2-codecoverage:
-    name: Ubuntu GCC, AVX2, Code Coverage (x10)
+  ubuntu-codecoverage:
+    name: Ubuntu GCC, Code Coverage (x10)
 
     runs-on: ubuntu-latest
 
@@ -329,7 +329,7 @@ jobs:
   # ubuntu with clang
   #############################################################################
   ubuntu-clang:
-    name: Ubuntu Clang (x5)
+    name: Ubuntu Clang with examples (x5)
 
     runs-on: ubuntu-latest
 
@@ -344,14 +344,12 @@ jobs:
 
       - name: "Setup"
         run: |
-          sudo apt-get install -y libgmp-dev
-          sudo apt-get install -y libmpfr-dev
-          sudo apt-get install -y autoconf
-          sudo apt-get install -y libtool-bin
+          sudo apt-get install -y libgmp-dev libmpfr-dev autoconf libtool-bin perl
           clang --version
           make --version
           autoconf --version
           libtool --version
+          perl --version
           echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
 
       - name: "Configure"
@@ -375,13 +373,21 @@ jobs:
         run: |
           $MAKE check
 
+      - name: "Compile examples"
+        run: |
+          $MAKE examples
+
+      - name: "Check examples"
+        run: |
+          $MAKE checkexamples
+
 
 
   #############################################################################
   # ubuntu with gcc and cmake (no checks)
   #############################################################################
   ubuntu-cmake-gcc:
-    name: Ubuntu GCC, CMake (no checks)
+    name: Ubuntu GCC, CMake (1x)
 
     runs-on: ubuntu-latest
 
@@ -409,11 +415,16 @@ jobs:
           cmake -G"Unix Makefiles" -DWITH_NTL=no -DBUILD_TESTING=yes \
               -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=${LOCAL} ..
 
-      - name: "Compile library"
+      - name: "Compile library and tests"
         run: |
           cd build
           $MAKE
           ldd lib/libflint.so
+
+      - name: "Run tests"
+        run: |
+          cd build
+          ctest -j$(expr $(nproc) + 1) --output-on-failure --timeout 450
 
 
 

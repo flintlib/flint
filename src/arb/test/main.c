@@ -61,6 +61,7 @@
 #include "t-const_log10.c"
 #include "t-const_log2.c"
 #include "t-const_pi.c"
+#include "t-const_reciprocal_fibonacci.c"
 #include "t-contains_arf.c"
 #include "t-contains.c"
 #include "t-contains_fmpq.c"
@@ -267,6 +268,7 @@ test_struct tests[] =
     TEST_FUNCTION(arb_const_log10),
     TEST_FUNCTION(arb_const_log2),
     TEST_FUNCTION(arb_const_pi),
+    TEST_FUNCTION(arb_const_reciprocal_fibonacci),
     TEST_FUNCTION(arb_contains_arf),
     TEST_FUNCTION(arb_contains),
     TEST_FUNCTION(arb_contains_fmpq),

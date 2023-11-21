@@ -6,7 +6,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <stdio.h>
@@ -72,10 +72,7 @@ gr_stream_write_si(gr_stream_t out, slong x)
     else
     {
         char tmp[22];
-        if (sizeof(slong) == sizeof(long))
-            sprintf(tmp, "%ld", x);
-        else
-            flint_sprintf(tmp, "%wd", x);
+        sprintf(tmp, WORD_FMT "d", x);
         gr_stream_write(out, tmp);
     }
 }
@@ -90,10 +87,7 @@ gr_stream_write_ui(gr_stream_t out, ulong x)
     else
     {
         char tmp[22];
-        if (sizeof(ulong) == sizeof(unsigned long))
-            sprintf(tmp, "%lu", x);
-        else
-            flint_sprintf(tmp, "%wu", x);
+        sprintf(tmp, WORD_FMT "u", x);
         gr_stream_write(out, tmp);
     }
 }

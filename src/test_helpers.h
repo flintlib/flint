@@ -94,8 +94,8 @@ main(int argc, char ** argv)                                                \
 {                                                                           \
     char numthreads_str[] = "--numthreads=";                                \
     char thread_str[] = "--thread=";                                        \
-    int numthreads_str_len = sizeof(numthreads_str) / sizeof(char) - 1;     \
-    int thread_str_len = sizeof(thread_str) / sizeof(char) - 1;             \
+    size_t numthreads_str_len = sizeof(numthreads_str) / sizeof(char) - 1;  \
+    size_t thread_str_len = sizeof(thread_str) / sizeof(char) - 1;          \
     long int numthreads, thread;                                            \
     int ix, ix_max, numtests;                                               \
                                                                             \

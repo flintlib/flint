@@ -11,7 +11,9 @@ References
 
 .. [Ari2012] \J. Arias de Reyna, "Programs for Riemann's zeta function", (J. A. J. van Vonderen, Ed.) *Leven met getallen : liber amicorum ter gelegenheid van de pensionering van Herman te Riele* CWI (2012) 102-112, https://ir.cwi.nl/pub/19724
 
-.. [Arn2010] \J. Arndt, *Matters Computational*, Springer (2010), http://www.jjj.de/fxt/#fxtbook
+.. [Arn2010] \J. Arndt, *Matters Computational*, Springer (2010), https://www.jjj.de/fxt/#fxtbook
+
+.. [Arn2012] \J. Arndt, "On computing the generalized Lambert series", https://arxiv.org/abs/1202.6525
 
 .. [ArnoldMonagan2011] \Arnold, Andrew and Monagan, Michael : Calculating cyclotomic polynomials, Mathematics of Computation 80:276 (2011) 2359--2379
 
@@ -27,7 +29,7 @@ References
 
 .. [BFSS2006] \A. Bostan, P. Flajolet, B. Salvy and É. Schost. "Fast computation of special resultants". Journal of Symbolic Computation, 41(1):1–29, January 2006. https://doi.org/10.1016/j.jsc.2005.07.001
 
-.. [BJ2013] \R. P. Brent and F. Johansson, "A bound for the error term in the Brent-McMillan algorithm", preprint (2013), http://arxiv.org/abs/1312.0039
+.. [BJ2013] \R. P. Brent and F. Johansson, "A bound for the error term in the Brent-McMillan algorithm", preprint (2013), https://arxiv.org/abs/1312.0039
 
 .. [BM1980] \R. P. Brent and E. M. McMillan, "Some new algorithms for high-precision computation of Euler's constant", Mathematics of Computation 34 (1980) 305-312.
 
@@ -95,7 +97,7 @@ References
 
 .. [DomKanTro1987] \Domich, P. D. and Kannan, R. and Trotter, L. E. Jr. : Hermite Normal Form Computation Using Modulo Determinant Arithmetic, Math. Operations Res. (12) 1987 50-59
 
-.. [Dup2006] \R. Dupont. "Moyenne arithmético-géométrique, suites de Borchardt et applications." These de doctorat, École polytechnique, Palaiseau (2006). http://http://www.lix.polytechnique.fr/Labo/Regis.Dupont/these_soutenance.pdf
+.. [Dup2006] \R. Dupont. "Moyenne arithmético-géométrique, suites de Borchardt et applications." These de doctorat, École polytechnique, Palaiseau (2006). http://www.lix.polytechnique.fr/Labo/Regis.Dupont/these_soutenance.pdf
 
 .. [Dus1999] \P. Dusart, "The `k^{th}` prime is greater than `k(\ln k+\ln \ln k-1)` for `k \ge 2`," Math. Comp., 68:225 (January 1999) 411--415.
 
@@ -119,7 +121,9 @@ References
 
 .. [GVL1996] \G. H. Golub and C. F. Van Loan, *Matrix Computations*, third edition, Johns Hopkins University Press (1996).
 
-.. [Gas2018]  \D. Gaspard, "Connection formulas between Coulomb wave functions" (2018), https://arxiv.org/abs/1804.10976
+.. [Gas2018] \D. Gaspard, "Connection formulas between Coulomb wave functions" (2018), https://arxiv.org/abs/1804.10976
+
+.. [Gos1974] \R. W. Gosper, "Acceleration of series", MIT AI Memo no.304, (March-1974). https://dspace.mit.edu/handle/1721.1/6088
 
 .. [Got1959] \E. Gottschling, "Explizite Bestimmung der Randflächen es Fundamentalbereiches der Modulgruppe zweiten Grades'', Math. Annalen 138 (1959), 103--124. https://doi.org/10.1007/BF01342938
 
@@ -167,15 +171,15 @@ References
 
 .. [Joh2012] \F. Johansson, "Efficient implementation of the Hardy-Ramanujan-Rademacher formula", LMS Journal of Computation and Mathematics, Volume 15 (2012), 341-359, http://journals.cambridge.org/action/displayAbstract?fromPage=online&aid=8710297
 
-.. [Joh2013] \F. Johansson, "Rigorous high-precision computation of the Hurwitz zeta function and its derivatives", Numerical Algorithms, http://arxiv.org/abs/1309.2877 http://dx.doi.org/10.1007/s11075-014-9893-1
+.. [Joh2013] \F. Johansson, "Rigorous high-precision computation of the Hurwitz zeta function and its derivatives", Numerical Algorithms, http://arxiv.org/abs/1309.2877 https://doi.org/10.1007/s11075-014-9893-1
 
-.. [Joh2014a] \F. Johansson, *Fast and rigorous computation of special functions to high precision*, PhD thesis, RISC, Johannes Kepler University, Linz, 2014. http://fredrikj.net/thesis/
+.. [Joh2014a] \F. Johansson, *Fast and rigorous computation of special functions to high precision*, PhD thesis, RISC, Johannes Kepler University, Linz, 2014. https://fredrikj.net/thesis/
 
-.. [Joh2014b] \F. Johansson, "Evaluating parametric holonomic sequences using rectangular splitting", ISSAC 2014, 256-263. http://dx.doi.org/10.1145/2608628.2608629
+.. [Joh2014b] \F. Johansson, "Evaluating parametric holonomic sequences using rectangular splitting", ISSAC 2014, 256-263. https://doi.org/10.1145/2608628.2608629
 
-.. [Joh2014c] \F. Johansson, "Efficient implementation of elementary functions in the medium-precision range", http://arxiv.org/abs/1410.7176
+.. [Joh2014c] \F. Johansson, "Efficient implementation of elementary functions in the medium-precision range", https://arxiv.org/abs/1410.7176
 
-.. [Joh2015] \F. Johansson, "Computing Bell numbers", http://fredrikj.net/blog/2015/08/computing-bell-numbers/
+.. [Joh2015] \F. Johansson, "Computing Bell numbers", https://fredrikj.net/blog/2015/08/computing-bell-numbers/
 
 .. [Joh2015b] \F. Johansson, "A fast algorithm for reversion of power series", Math. Comp. 84 (2015), 475-484, http://doi.org/10.1090/S0025-5718-2014-02857-3
 
@@ -189,7 +193,7 @@ References
 
 .. [Joh2018a] \F. Johansson, "Numerical integration in arbitrary-precision ball arithmetic", preprint (2018), https://arxiv.org/abs/1802.07942
 
-.. [Joh2018b] \F. Johansson and others, "mpmath: a Python library for arbitrary-precision floating-point arithmetic (version 1.1.0)", December 2018. http://mpmath.org/
+.. [Joh2018b] \F. Johansson and others, "mpmath: a Python library for arbitrary-precision floating-point arithmetic (version 1.1.0)", December 2018. https://mpmath.org/
 
 .. [JvdP2002] \M. J. Jacobson Jr. and A. J. van der Poorten. "Computational aspects of NUCOMP." In International Algorithmic Number Theory Symposium, pp. 120-133. Berlin, Heidelberg: Springer Berlin Heidelberg, 2002.
 
@@ -215,13 +219,13 @@ References
 
 .. [MP2006] \M. Monagan and R. Pearce. "Rational simplification modulo a polynomial ideal". Proceedings of the 2006 international symposium on Symbolic and algebraic computation - ISSAC '06. https://doi.org/10.1145/1145768.1145809
 
-.. [MPFR2012] The MPFR team, "MPFR Algorithms" (2012), http://www.mpfr.org/algo.html
+.. [MPFR2012] The MPFR team, "MPFR Algorithms" (2012), https://www.mpfr.org/algo.html
 
 .. [MasRob1996] \J. Massias and G. Robin, "Bornes effectives pour certaines fonctions concernant les nombres premiers," J. Theorie Nombres Bordeaux, 8 (1996) 215-242.
 
 .. [Mic2007] \N. Michel, "Precise Coulomb wave functions for a wide range of complex l, eta and z", Computer Physics Communications, Volume 176, Issue 3, (2007), 232-249, https://doi.org/10.1016/j.cpc.2006.10.004
 
-.. [Miy2010] \S. Miyajima, "Fast enclosure for all eigenvalues in generalized eigenvalue problems", Journal of Computational and Applied Mathematics, 233 (2010), 2994-3004, https://dx.doi.org/10.1016/j.cam.2009.11.048
+.. [Miy2010] \S. Miyajima, "Fast enclosure for all eigenvalues in generalized eigenvalue problems", Journal of Computational and Applied Mathematics, 233 (2010), 2994-3004, https://doi.org/10.1016/j.cam.2009.11.048
 
 .. [Mos1971] \J. Moses. "Algebraic simplification - a guide for the perplexed". Proceedings of the second ACM symposium on Symbolic and algebraic manipulation (1971), 282-304. https://doi.org/10.1145/362637.362648
 
@@ -231,7 +235,7 @@ References
 
 .. [Mum1984] \D. Mumford, *Tata Lectures on Theta II*, Birkhäuser, 1984. https://doi.org/10.1007/978-0-8176-4578-6
 
-.. [NIST2012] National Institute of Standards and Technology, *Digital Library of Mathematical Functions* (2012), http://dlmf.nist.gov/
+.. [NIST2012] National Institute of Standards and Technology, *Digital Library of Mathematical Functions* (2012), https://dlmf.nist.gov/
 
 .. [NakTurWil1997] \Nakos, George and Turner, Peter and Williams, Robert : Fraction-free algorithms for linear and polynomial equations, ACM SIGSAM Bull. 31 (1997) 3 11--19
 
@@ -317,10 +321,12 @@ References
 
 .. [Zip1985] \R. Zippel. "Simplification of expressions involving radicals". Journal of Symbolic Computation (1985) 1, 189-210. https://doi.org/10.1016/S0747-7171(85)80014-6
 
+.. [Zun2023] \J. Zuniga, "Catalan's constant fast convergent series", https://mathoverflow.net/q/424055
+
 .. [vHP2012] \M. van Hoeij and V. Pal. "Isomorphisms of algebraic number fields". Journal de Théorie des Nombres de Bordeaux, Vol. 24, No. 2 (2012), pp. 293-305. https://doi.org/10.2307/43973105
 
 .. [vdH1995] \J. van der Hoeven, "Automatic numerical expansions". Proc. of the conference Real numbers and computers (1995), 261-274. https://www.texmacs.org/joris/ane/ane-abs.html
 
 .. [vdH2006] \J. van der Hoeven, "Computations with effective real numbers". Theoretical Computer Science, Volume 351, Issue 1, 14 February 2006, Pages 52-60. https://doi.org/10.1016/j.tcs.2005.09.060
 
-All referenced works: [AbbottBronsteinMulders1999]_, [Apostol1997]_, [Ari2011]_, [Ari2012]_, [Arn2010]_, [ArnoldMonagan2011]_, [BBC1997]_, [BBC2000]_, [BBK2014]_, [BD1992]_, [BF2020]_, [BFSS2006]_, [BJ2013]_, [BM1980]_, [BZ1992]_, [BZ2011]_, [BaiWag1980]_, [BerTas2010]_, [Blo2009]_, [Bodrato2010]_, [Boe2020]_, [Bog2012]_, [Bol1887]_, [Bor1987]_, [Bor2000]_, [Bre1978]_, [Bre1979]_, [Bre2010]_, [BrentKung1978]_, [BuhlerCrandallSompolski1992]_, [CFG2017]_, [CFG2019]_, [CGHJK1996]_, [CP2005]_, [Car1995]_, [Car2004]_, [Chen2003]_, [Cho1999]_, [Coh1996]_, [Coh2000]_, [Col1971]_, [CraPom2005]_, [DHBHS2004]_, [DYF1999]_, [DelegliseNicolasZimmermann2009]_, [DomKanTro1987]_, [Dup2006]_, [Dus1999]_, [EHJ2016]_, [EM2004]_, [EK2023]_, [Fie2007]_, [FieHof2014]_, [Fil1992]_, [GCL1992]_, [GG2003]_, [GS2003]_, [GVL1996]_, [Gas2018]_, [GowWag2008]_, [Got1959]_, [GraMol2010]_, [HM2017]_, [HS1967]_, [HZ2004]_, [HanZim2004]_, [Har2010]_, [Har2012]_, [Har2015]_, [Har2018]_, [Hart2010]_, [Hen1956]_, [Hoe2001]_, [Hoe2009]_, [Hor1972]_, [Iliopoulos1989]_, [Igu1972]_, [Igu1979]_, [JB2018]_, [JM2018]_, [JR1999]_, [Joh2012]_, [Joh2013]_, [Joh2014a]_, [Joh2014b]_, [Joh2014c]_, [Joh2015]_, [Joh2015b]_, [Joh2016]_, [Joh2017]_, [Joh2017a]_, [Joh2017b]_, [Joh2018a]_, [Joh2018b]_, [JvdP2002]_, [Kahan1991]_, [KanBac1979]_, [Kar1998]_, [Knu1997]_, [Kob2010]_, [Kri2013]_, [LT2016]_, [Leh1970]_, [LukPatWil1996]_, [MN2019]_, [MP2006]_, [MPFR2012]_, [MasRob1996]_, [Mic2007]_, [Miy2010]_, [Mos1971]_, [Mul2000]_, [Mum1983]_, [Mum1984]_, [NIST2012]_, [NakTurWil1997]_, [Olv1997]_, [PP2010]_, [PS1973]_, [PS1991]_, [Paterson1973]_, [PernetStein2010]_, [Pet1999]_, [Pla2011]_, [Pla2017]_, [RF1994]_, [Rad1973]_, [Rademacher1937]_, [Ric1992]_, [Ric1995]_, [Ric1997]_, [Ric2007]_, [Ric2009]_, [RosSch1962]_, [Rum2010]_, [Smi2001]_, [SorWeb2016]_, [Ste2002]_, [Ste2010]_, [Stehle2010]_, [Stein2007]_, [Sut2007]_, [StoMul1998]_, [Str2014]_, [Str1997]_, [Str2012]_, [Tak2000]_, [ThullYap1990]_, [Tre2008]_, [Tru2011]_, [Tru2014]_, [Tur1953]_, [Villard2007]_, [WaktinsZeitlin1993]_, [Wei2000]_, [Whiteman1956]_, [Zip1985]_, [vHP2012]_, [vdH1995]_, [vdH2006]_
+All referenced works: [AbbottBronsteinMulders1999]_, [Apostol1997]_, [Ari2011]_, [Ari2012]_, [Arn2010]_, [Arn2012]_, [ArnoldMonagan2011]_, [BBC1997]_, [BBC2000]_, [BBK2014]_, [BD1992]_, [BF2020]_, [BFSS2006]_, [BJ2013]_, [BM1980]_, [BZ1992]_, [BZ2011]_, [BaiWag1980]_, [BerTas2010]_, [Blo2009]_, [Bodrato2010]_, [Boe2020]_, [Bog2012]_, [Bol1887]_, [Bor1987]_, [Bor2000]_, [Bre1978]_, [Bre1979]_, [Bre2010]_, [BrentKung1978]_, [BuhlerCrandallSompolski1992]_, [CFG2017]_, [CFG2019]_, [CGHJK1996]_, [CP2005]_, [Car1995]_, [Car2004]_, [Chen2003]_, [Cho1999]_, [Coh1996]_, [Coh2000]_, [Col1971]_, [CraPom2005]_, [DHBHS2004]_, [DYF1999]_, [DelegliseNicolasZimmermann2009]_, [DomKanTro1987]_, [Dup2006]_, [Dus1999]_, [EHJ2016]_, [EM2004]_, [EK2023]_, [Fie2007]_, [FieHof2014]_, [Fil1992]_, [GCL1992]_, [GG2003]_, [GS2003]_, [GVL1996]_, [Gas2018]_, [Gos1974]_, [GowWag2008]_, [GraMol2010]_, [HM2017]_, [HS1967]_, [HZ2004]_, [HanZim2004]_, [Har2010]_, [Har2012]_, [Har2015]_, [Har2018]_, [Hart2010]_, [Hen1956]_, [Hoe2001]_, [Hoe2009]_, [Hor1972]_, [Iliopoulos1989]_, [Igu1972]_, [Igu1979]_, [JB2018]_, [JM2018]_, [JR1999]_, [Joh2012]_, [Joh2013]_, [Joh2014a]_, [Joh2014b]_, [Joh2014c]_, [Joh2015]_, [Joh2015b]_, [Joh2016]_, [Joh2017]_, [Joh2017a]_, [Joh2017b]_, [Joh2018a]_, [Joh2018b]_, [JvdP2002]_, [Kahan1991]_, [KanBac1979]_, [Kar1998]_, [Knu1997]_, [Kob2010]_, [Kri2013]_, [LT2016]_, [Leh1970]_, [LukPatWil1996]_, [MN2019]_, [MP2006]_, [MPFR2012]_, [MasRob1996]_, [Mic2007]_, [Miy2010]_, [Mos1971]_, [Mul2000]_, [Mum1983]_, [Mum1984]_, [NIST2012]_, [NakTurWil1997]_, [Olv1997]_, [PP2010]_, [PS1973]_, [PS1991]_, [Paterson1973]_, [PernetStein2010]_, [Pet1999]_, [Pla2011]_, [Pla2017]_, [RF1994]_, [Rad1973]_, [Rademacher1937]_, [Ric1992]_, [Ric1995]_, [Ric1997]_, [Ric2007]_, [Ric2009]_, [RosSch1962]_, [Rum2010]_, [Smi2001]_, [SorWeb2016]_, [Ste2002]_, [Ste2010]_, [Stehle2010]_, [Stein2007]_, [Sut2007]_, [StoMul1998]_, [Str2014]_, [Str1997]_, [Str2012]_, [Tak2000]_, [ThullYap1990]_, [Tre2008]_, [Tru2011]_, [Tru2014]_, [Tur1953]_, [Villard2007]_, [WaktinsZeitlin1993]_, [Wei2000]_, [Whiteman1956]_, [Zip1985]_, [Zun2023]_, [vHP2012]_, [vdH1995]_, [vdH2006]_

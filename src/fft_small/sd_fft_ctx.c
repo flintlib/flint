@@ -13,6 +13,12 @@
 #include "fft_small.h"
 #include "nmod.h"
 
+#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
+# include <malloc.h>
+# define aligned_alloc(alignment, size) _aligned_malloc(size, alignment)
+# define free _aligned_free
+#endif
+
 void * flint_aligned_alloc(ulong alignment, ulong size)
 {
     void * p;
@@ -31,6 +37,11 @@ void flint_aligned_free(void * p)
 {
     free(p);
 }
+
+#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
+# undef aligned_alloc
+# undef free
+#endif
 
 void sd_fft_ctx_clear(sd_fft_ctx_t Q)
 {
@@ -87,7 +98,7 @@ void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp)
     for ( ; k < FLINT_BITS; k++)
         Q->w2tab[k] = NULL;
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
     for (k = 1; k < SD_FFT_CTX_INIT_DEPTH; k++)
     {
         ulong ww = nmod_pow_ui(Q->primitive_root, (Q->mod.n - 1)>>(k + 1), Q->mod);
@@ -136,7 +147,7 @@ void sd_fft_ctx_fit_depth(sd_fft_ctx_t Q, ulong depth)
             off = l;
         }
 
-#if FLINT_WANT_ASSERT
+#ifdef FLINT_WANT_ASSERT
         {
             ulong ww = nmod_pow_ui(Q->primitive_root, (Q->mod.n - 1)>>(k + 1), Q->mod);
             for (i = 0; i < n_pow2(k-1); i++)

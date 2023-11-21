@@ -6,7 +6,7 @@
 # FLINT is free software: you can redistribute it and/or modify it under
 # the terms of the GNU Lesser General Public License (LGPL) as published
 # by the Free Software Foundation; either version 2.1 of the License, or
-# (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+# (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 #
 
 FLINT_DIR:=.
@@ -517,6 +517,8 @@ endif
 
 endif
 
+DEPFLAGS = -MMD -MP -MF $(@:%=%.d)
+
 ################################################################################
 # objects
 ################################################################################
@@ -525,7 +527,7 @@ ifneq ($(STATIC), 0)
 define xxx_OBJS_rule
 $(BUILD_DIR)/$(1)/%.o: $(SRC_DIR)/$(1)/%.c | $(BUILD_DIR)/$(1)
 	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $$< -o $$@ -MMD -MF $$(@:%=%.d)
+	@$(CC) $(CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $$< -o $$@ $$(DEPFLAGS)
 endef
 
 $(foreach dir, $(DIRS), $(eval $(call xxx_OBJS_rule,$(dir))))
@@ -539,7 +541,7 @@ ifneq ($(SHARED), 0)
 define xxx_LOBJS_rule
 $(BUILD_DIR)/$(1)/%.lo: $(SRC_DIR)/$(1)/%.c | $(BUILD_DIR)/$(1)
 	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(PIC_FLAG) $(CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $$< -o $$@ -MMD -MF $$(@:%=%.d)
+	@$(CC) $(PIC_FLAG) $(CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $$< -o $$@ $$(DEPFLAGS)
 endef
 
 $(foreach dir, $(DIRS), $(eval $(call xxx_LOBJS_rule,$(dir))))
@@ -552,24 +554,24 @@ endif
 ifeq ($(SHARED), 0)
 $(BUILD_DIR)/profile/%$(EXEEXT): $(SRC_DIR)/profile/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/profile
 	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
+	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
 else
 $(BUILD_DIR)/profile/%$(EXEEXT): $(SRC_DIR)/profile/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/profile
 	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
+	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
 endif
 
 ifeq ($(SHARED), 0)
 define xxx_PROFS_rule
 $(BUILD_DIR)/$(1)/profile/%$(EXEEXT): $(SRC_DIR)/$(1)/profile/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/$(1)/profile
 	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $$(@:%=%.d)
+	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) $$(DEPFLAGS)
 endef
 else
 define xxx_PROFS_rule
 $(BUILD_DIR)/$(1)/profile/%$(EXEEXT): $(SRC_DIR)/$(1)/profile/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/$(1)/profile
 	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $$(@:%=%.d)
+	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) $$(DEPFLAGS)
 endef
 endif
 
@@ -578,24 +580,24 @@ $(foreach dir, $(DIRS), $(eval $(call xxx_PROFS_rule,$(dir))))
 ifeq ($(SHARED), 0)
 $(BUILD_DIR)/test/%$(EXEEXT): $(SRC_DIR)/test/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/test
 	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
+	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
 else
 $(BUILD_DIR)/test/%$(EXEEXT): $(SRC_DIR)/test/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/test
 	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
+	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
 endif
 
 ifeq ($(SHARED), 0)
 define xxx_TESTS_rule
 $(BUILD_DIR)/$(1)/test/%$(EXEEXT): $(SRC_DIR)/$(1)/test/%.c $(FLINT_DIR)/libflint.a | $(BUILD_DIR)/$(1)/test
 	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $$(@:%=%.d)
+	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) $$(DEPFLAGS)
 endef
 else
 define xxx_TESTS_rule
 $(BUILD_DIR)/$(1)/test/%$(EXEEXT): $(SRC_DIR)/$(1)/test/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/$(1)/test
 	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $$(@:%=%.d)
+	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) $$(DEPFLAGS)
 endef
 endif
 
@@ -605,35 +607,35 @@ ifneq ($(WANT_NTL), 0)
 ifeq ($(SHARED), 0)
 $(BUILD_DIR)/interfaces/test/t-NTL-interface$(EXEEXT): $(SRC_DIR)/interfaces/test/t-NTL-interface.cpp $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/interfaces/test
 	@echo "  CXX $(@:$(BUILD_DIR)/%=%)"
-	@$(CXX) $(CXXFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
+	@$(CXX) $(CXXFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
 else
 $(BUILD_DIR)/interfaces/test/t-NTL-interface$(EXEEXT): $(SRC_DIR)/interfaces/test/t-NTL-interface.cpp | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/interfaces/test
 	@echo "  CXX $(@:$(BUILD_DIR)/%=%)"
-	@$(CXX) $(CXXFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
+	@$(CXX) $(CXXFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
 endif
 endif
 
 ifeq ($(SHARED), 0)
 $(BUILD_DIR)/tune/%$(EXEEXT): $(SRC_DIR)/tune/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/tune
 	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
+	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
 else
 $(BUILD_DIR)/tune/%$(EXEEXT): $(SRC_DIR)/tune/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/tune
 	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
+	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
 endif
 
 ifeq ($(SHARED), 0)
 define xxx_TUNES_rule
 $(BUILD_DIR)/$(1)/tune/%$(EXEEXT): $(SRC_DIR)/$(1)/tune/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/$(1)/tune
 	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $$(@:%=%.d)
+	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) $$(DEPFLAGS)
 endef
 else
 define xxx_TUNES_rule
 $(BUILD_DIR)/$(1)/tune/%$(EXEEXT): $(SRC_DIR)/$(1)/tune/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/$(1)/tune
 	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $$(@:%=%.d)
+	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) $$(DEPFLAGS)
 endef
 endif
 
@@ -642,11 +644,11 @@ $(foreach dir, $(DIRS), $(eval $(call xxx_TUNES_rule,$(dir))))
 ifeq ($(SHARED), 0)
 $(BUILD_DIR)/examples/%$(EXEEXT): $(FLINT_DIR)/examples/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/examples
 	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
+	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
 else
 $(BUILD_DIR)/examples/%$(EXEEXT): $(FLINT_DIR)/examples/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/examples
 	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
-	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) -MMD -MF $(@:%=%.d)
+	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
 endif
 
 ################################################################################
@@ -654,6 +656,11 @@ endif
 ################################################################################
 
 examples: library $(EXMPS)
+
+%_EXMP_RUN: %
+	@$(FLINT_DIR)/dev/check_examples.sh $(patsubst $(BUILD_DIR)/examples/%,%,$<) $(BUILD_DIR)/examples
+
+checkexamples: examples $(EXMPS:%=%_EXMP_RUN)
 
 ################################################################################
 # profiling
@@ -788,6 +795,45 @@ endif
 	$(RM_RF) $(INCLUDEDIR)/flint
 
 ################################################################################
+# regenerate part of the build system of needed
+################################################################################
+
+ifneq ($(MAINTAINER_MODE),no)  # disable this for releases?
+ifneq ($(shell command -v autoconf 2> /dev/null),)
+configure: configure.ac
+	@echo "Running autoconf"
+	@autoconf
+else
+configure: configure.ac
+	$(warning autoconf not available, proceeding with stale configure)
+endif
+endif
+
+config.status: configure
+	./config.status --recheck
+
+Makefile: Makefile.in config.status
+	./config.status $@
+
+flint.pc: flint.pc.in config.status
+	./config.status $@
+
+src/flint.h: src/flint.h.in config.status
+	./config.status $@
+
+libtool: config.status
+	./config.status $@
+
+src/fft_tuning.h: @FFT_TUNING_IN@ config.status
+	./config.status $@
+
+src/fmpz/fmpz.c: @FMPZ_C_IN@ config.status
+	./config.status $@
+
+src/gmpcompat.h: src/@GMPCOMPAT_H_IN@ config.status
+	./config.status $@
+
+################################################################################
 # maintainer stuff
 ################################################################################
 
@@ -801,4 +847,4 @@ dist:
 print-%:
 	@echo "$*=$($*)"
 
-.PHONY: all library shared static examples profile tests check tune valgrind clean distclean install uninstall dist %_TEST_RUN %_VALGRIND_RUN print-% coverage
+.PHONY: all library shared static examples checkexamples profile tests check tune valgrind clean distclean install uninstall dist %_TEST_RUN %_VALGRIND_RUN print-% coverage

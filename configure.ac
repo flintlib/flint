@@ -10,7 +10,7 @@ This file is part of FLINT.
 FLINT is free software: you can redistribute it and/or modify it under
 the terms of the GNU Lesser General Public License (LGPL) as published
 by the Free Software Foundation; either version 2.1 of the License, or
-(at your option) any later version.  See <http://www.gnu.org/licenses/>.
+(at your option) any later version.  See <https://www.gnu.org/licenses/>.
 
 ]])
 define(FLINT_COPYRIGHT_C,[[/*
@@ -21,7 +21,7 @@ define(FLINT_COPYRIGHT_C,[[/*
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */]])
 
 AC_COPYRIGHT(FLINT_COPYRIGHT)
@@ -95,11 +95,23 @@ else
     testcflags_set="no"
 fi
 
+if test -n "${CXXFLAGS+x}";
+then
+    cxxflags_set="yes"
+else
+    cxxflags_set="no"
+fi
+
 LT_INIT
 
 if test "$cflags_set" = "no";
 then
     CFLAGS=
+fi
+
+if test "$cxxflags_set" = "no";
+then
+    CXXFLAGS=
 fi
 
 ################################################################################
@@ -456,12 +468,36 @@ fi
 # programs
 ################################################################################
 
-dnl NOTE: This is invoked from LT_INIT
+dnl NOTE: The following line is invoked from LT_INIT
 dnl AC_PROG_CC
 
-if test "$with_ntl" = "yes" ;
+if test "$with_ntl" = "yes";
 then
     AC_PROG_CXX
+    AC_LANG_PUSH(C++)
+    if test "$cxxflags_set" = "no";
+    then
+        AX_CXX_CHECK_COMPILE_FLAG([-Wall],[CXXFLAGS="-Wall $CXXFLAGS"])
+        AX_CXX_CHECK_COMPILE_FLAG([-Werror=implicit-function-declaration],[CXXFLAGS="-Werror=implicit-function-declaration $CXXFLAGS"])
+        AX_CXX_CHECK_COMPILE_FLAG([-O2],[CXXFLAGS="-O2 $CXXFLAGS"])
+        if test "$host" = "$build";
+        then
+            AX_CXX_CHECK_COMPILE_FLAG([-march=native],[CXXFLAGS="-march=native $CXXFLAGS"])
+            fi
+        AX_CXX_CHECK_COMPILE_FLAG([-std=c++11],[CXXFLAGS="-std=c++11 $CXXFLAGS"],
+            AC_MSG_ERROR([Couldn't compile with the C++11 standard needed by the NTL interface.])
+        )
+        if test "$enable_debug" = "yes";
+        then
+            if "$ac_cv_prog_cxx_g" = "yes";
+            then
+                CXXFLAGS="-g $CXXFLAGS"
+            else
+                AC_MSG_ERROR([$CXX does not support the flag -g needed to generate debug information])
+            fi
+        fi
+    fi
+    AC_LANG_POP
 fi
 
 AC_PROG_MKDIR_P
@@ -571,7 +607,8 @@ case "$host_cpu" in
         fft_tuning_in="src/fft_tuning32.in"
         ;;
 esac
-AC_CONFIG_FILES([src/fft_tuning.h:$fft_tuning_in])
+AC_CONFIG_FILES([src/fft_tuning.h:$fft_tuning_in],[],[fft_tuning_in="$fft_tuning_in"])
+AC_SUBST(FFT_TUNING_IN, $fft_tuning_in)
 
 if test -z "$LDCONFIG";
 then
@@ -641,6 +678,9 @@ AC_COMPILE_IFELSE(
     gmpcompat_h_in="gmpcompat-longlong.h.in",
     AC_MSG_RESULT([no])
     gmpcompat_h_in="gmpcompat.h.in")
+
+AC_CONFIG_FILES([src/gmpcompat.h:src/$gmpcompat_h_in],[],[gmpcompat_h_in="$gmpcompat_h_in"])
+AC_SUBST(GMPCOMPAT_H_IN, $gmpcompat_h_in)
 
 # Check that MPFR >= 4.1.0
 AC_MSG_CHECKING([if version of MPFR is greater than 4.1.0])
@@ -788,31 +828,6 @@ fi
 
 AC_SUBST(PIC_FLAG,$pic_flag)
 
-if test "$enable_thread_safe" = "yes";
-then
-    AC_MSG_CHECKING([if $CC supports TLS handle])
-    for tls_expression in '__thread' '_Thread_local' '__declspec(thread)'
-    do
-        AC_LINK_IFELSE(
-            [AC_LANG_PROGRAM([$tls_expression int myvariable = 0;],[])],
-            [flint_success="yes"],
-            [flint_success="no"]
-        )
-
-        if test "$flint_success" = "yes";
-        then
-            AC_MSG_RESULT([$tls_expression])
-            break
-        fi
-    done
-
-    if test "$flint_success" = "no";
-    then
-        AC_MSG_RESULT([no])
-        AC_MSG_ERROR([--enable-thread-safe was specified, but $CC does not have any TLS handle.])
-    fi
-fi
-
 AC_MSG_CHECKING([if cpu_set_t is supported])
 AC_LINK_IFELSE([AC_LANG_PROGRAM([#define _GNU_SOURCE
 #include <sched.h>
@@ -956,7 +971,11 @@ AX_CHECK_COMPILE_FLAG([-Wall],[DEFAULT_CFLAGS="-Wall $DEFAULT_CFLAGS"])
 AX_CHECK_COMPILE_FLAG([-Wno-stringop-overread],[DEFAULT_CFLAGS="-Wno-stringop-overread $DEFAULT_CFLAGS"])
 AX_CHECK_COMPILE_FLAG([-Wno-stringop-overflow],[DEFAULT_CFLAGS="-Wno-stringop-overflow $DEFAULT_CFLAGS"])
 AX_CHECK_COMPILE_FLAG([-Werror=implicit-function-declaration],[DEFAULT_CFLAGS="-Werror=implicit-function-declaration $DEFAULT_CFLAGS"])
-AX_CHECK_COMPILE_FLAG([-O2],[DEFAULT_CFLAGS="-O2 $DEFAULT_CFLAGS"])
+AX_CHECK_COMPILE_FLAG([-O3],[DEFAULT_CFLAGS="-O3 $DEFAULT_CFLAGS"])
+if test "$host" = "$build";
+then
+    AX_CHECK_COMPILE_FLAG([-march=native],[DEFAULT_CFLAGS="-march=native $DEFAULT_CFLAGS"])
+fi
 AX_CHECK_COMPILE_FLAG([-std=c11],[DEFAULT_CFLAGS="-std=c11 $DEFAULT_CFLAGS"])
 AX_CHECK_COMPILE_FLAG([-pedantic],[DEFAULT_CFLAGS="-pedantic $DEFAULT_CFLAGS"])
 
@@ -1026,7 +1045,15 @@ error
 error
 #endif
              ])],
-            [enable_fft_small="yes"]
+            [AC_COMPILE_IFELSE(
+                [AC_LANG_PROGRAM([#include <gmp.h>],[
+#if GMP_LIMB_BITS == 32
+#error Dead man
+error
+#endif
+                 ])],
+                [enable_fft_small="yes"]
+            )]
         )]
     )
 fi
@@ -1087,7 +1114,8 @@ else
     fi
 fi
 
-AC_CONFIG_FILES([src/fmpz/fmpz.c:$fmpz_c])
+AC_CONFIG_FILES([src/fmpz/fmpz.c:$fmpz_c],[],[fmpz_c="$fmpz_c"])
+AC_SUBST(FMPZ_C_IN, $fmpz_c)
 
 if test "$enable_shared" = "yes";
 then
@@ -1168,7 +1196,7 @@ fi
 # epilog
 ################################################################################
 
-AC_CONFIG_FILES([Makefile flint.pc src/flint.h src/gmpcompat.h:src/${gmpcompat_h_in}])
+AC_CONFIG_FILES([Makefile flint.pc src/flint.h])
 AC_OUTPUT
 
 dnl Shorten the original help message

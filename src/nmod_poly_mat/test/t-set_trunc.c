@@ -45,7 +45,7 @@ void test_with_dims(ulong m, ulong n, flint_rand_t state)
                 flint_printf("FAIL:\n");
                 nmod_poly_mat_print(a, "X"), flint_printf("\n\n");
                 nmod_poly_mat_print(b, "X"), flint_printf("\n\n");
-                printf("truncation length %ld\n\n", len);
+                flint_printf("truncation length %wd\n\n", len);
                 fflush(stdout);
                 flint_abort();
             }
@@ -62,7 +62,7 @@ void test_with_dims(ulong m, ulong n, flint_rand_t state)
         nmod_poly_mat_print(a, "X"), flint_printf("\n\n");
         nmod_poly_mat_print(b, "X"), flint_printf("\n\n");
         nmod_poly_mat_print(c, "X"), flint_printf("\n\n");
-        printf("truncation length %ld\n\n", len);
+        flint_printf("truncation length %wd\n\n", len);
         fflush(stdout);
         flint_abort();
     }
@@ -75,7 +75,7 @@ void test_with_dims(ulong m, ulong n, flint_rand_t state)
         flint_printf("FAIL (aliasing):\n");
         nmod_poly_mat_print(a, "X"), flint_printf("\n\n");
         nmod_poly_mat_print(c, "X"), flint_printf("\n\n");
-        printf("truncation length %ld\n\n", len);
+        flint_printf("truncation length %wd\n\n", len);
         fflush(stdout);
         flint_abort();
     }

@@ -242,9 +242,9 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
    fmpz_add(res, res, C); /* res = AX^2 + 2BX + C */
 
 #if QS_DEBUG & 128
-   printf("res = "); fmpz_print(res); printf("\n");
+   flint_printf("res = "); fmpz_print(res); flint_printf("\n");
    flint_printf("Poly: "); fmpz_print(qs_inf->A); flint_printf("*x^2 + 2*");
-   fmpz_print(poly->B); flint_printf("*x + "); fmpz_print(C); printf("\n");
+   fmpz_print(poly->B); flint_printf("*x + "); fmpz_print(C); flint_printf("\n");
    flint_printf("x = %wd\n", i - qs_inf->sieve_size / 2);
 #endif
 
@@ -356,7 +356,7 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
       {
 #if QS_DEBUG
          if (qs_inf->full_relation % 100 == 0)
-            printf("%ld relations\n", qs_inf->full_relation);
+            flint_printf("%ld relations\n", qs_inf->full_relation);
 #endif
          /* set sign amongst small factors */
          if (fmpz_cmp_si(res, -1) == 0)

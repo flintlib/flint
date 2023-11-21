@@ -1311,6 +1311,11 @@ For further implementation details, see :ref:`algorithms_constants`.
 
     Computes Apery's constant `\zeta(3)`.
 
+.. function:: void arb_const_reciprocal_fibonacci(arb_t z, slong prec)
+
+    Computes the reciprocal Fibonacci constant `\sum_{n=1}^{\infty} 1/F_n`.
+
+
 Lambert W function
 -------------------------------------------------------------------------------
 

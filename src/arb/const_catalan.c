@@ -6,7 +6,7 @@
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
     by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fmpz_poly.h"
@@ -22,14 +22,14 @@ arb_const_catalan_eval(arb_t s, slong prec)
     arb_init(t);
     hypgeom_init(series);
 
-    fmpz_poly_set_str(series->P, "5  32 160 288 224 64");
-    fmpz_poly_set_str(series->Q, "5  225 3240 14904 23328 11664");
-    fmpz_poly_set_str(series->A, "3  411 976 580");
-    fmpz_poly_set_str(series->B, "5  1 5 9 7 2");
+    fmpz_poly_set_str(series->A, "7  1999553 21620948 94165776 211938912 260619984 166411584 43203456");
+    fmpz_poly_set_str(series->B, "1  1");
+    fmpz_poly_set_str(series->P, "9  0 0 0 1280 -17536 86400 -195840 207360 -82944");
+    fmpz_poly_set_str(series->Q, "9  363825 12034680 150240200 918651040 3101725520 6073920000 6863040000 4147200000 1036800000");
 
-    prec += FLINT_CLOG2(prec);
+    prec += 4 + FLINT_CLOG2(prec);
     arb_hypgeom_infsum(s, t, series, prec, prec);
-    arb_mul_ui(t, t, 450, prec);
+    arb_mul_ui(t, t, 2182950, prec);
     arb_div(s, s, t, prec);
 
     hypgeom_clear(series);
