@@ -1341,7 +1341,7 @@ Dimension 2 specifics
 -------------------------------------------------------------------------------
 
 In the `g=2` case, one can use theta functions to evaluate many fundamental
-Siegel modular forms. This section methods functions to do so, in analogy with
+Siegel modular forms. This section contains methods to do so, in analogy with
 :func:`acb_modular_delta` or :func:`acb_modular_eisenstein` when `g=1`.
 
 We use the following notation. Fix `k,j\geq 0`. A Siegel modular form of weight
