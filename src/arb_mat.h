@@ -321,8 +321,6 @@ void arb_mat_vector_mul_row(arb_ptr res, arb_srcptr v, const arb_mat_t A, slong 
 
 void arb_mat_vector_mul_col(arb_ptr res, const arb_mat_t A, arb_srcptr v, slong prec);
 
-void arb_mat_bilinear_form(arb_t res, const arb_mat_t A, arb_srcptr v1, arb_srcptr v2, slong prec);
-
 /* Solving */
 
 ARB_MAT_INLINE void

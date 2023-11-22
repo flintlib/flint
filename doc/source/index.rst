@@ -202,6 +202,7 @@ Real and complex numbers
    arb_hypgeom.rst
    acb_elliptic.rst
    acb_modular.rst
+   acb_theta.rst
    acb_dirichlet.rst
    bernoulli.rst
    hypgeom.rst
