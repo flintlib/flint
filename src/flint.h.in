@@ -57,10 +57,6 @@
 # endif
 #endif
 
-#ifndef __GNUC__
-# define __asm__     asm
-#endif
-
 #ifdef va_start
 # define FLINT_HAVE_VA_LIST
 #endif
