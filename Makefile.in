@@ -227,9 +227,14 @@ endif
 ################################################################################
 
 SINGLE_HEADERS :=                                                           \
-        flint.h         longlong.h      exception.h     gmpcompat.h         \
-        profiler.h      templates.h     flint-config.h  fft_tuning.h        \
-        crt_helpers.h                   machine_vectors.h                   \
+        flint.h         flint-config.h    exception.h     gmpcompat.h       \
+        profiler.h      templates.h       fft_tuning.h                      \
+                                                                            \
+        longlong.h                        longlong_asm_clang.h              \
+        longlong_asm_gcc.h                longlong_div_gnu.h                \
+        longlong_msc_arm64.h              longlong_msc_x86.h                \
+                                                                            \
+        crt_helpers.h   machine_vectors.h                                   \
                                                                             \
         fq_zech_vec.h                                                       \
                                                                             \
