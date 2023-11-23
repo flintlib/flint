@@ -14,6 +14,10 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
+/* Definitions that occurs in get_fft.c and set_fft.c */
+#define work_t work_t_get_fft
+#define worker worker_get_fft
+
 static void _fmpz_vec_set_fft_coeff(fmpz * coeffs_m, slong i,
                           const mp_ptr * coeffs_f, slong limbs, slong sign)
 {
@@ -95,3 +99,6 @@ void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length,
 
     flint_parallel_do((do_func_t) worker, &work, length, max_threads, FLINT_PARALLEL_UNIFORM);
 }
+
+#undef work_t
+#undef worker
