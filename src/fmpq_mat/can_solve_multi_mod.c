@@ -17,7 +17,7 @@
 #include "fmpz_mat.h"
 #include "fmpq_mat.h"
 
-static int
+int
 _fmpq_mat_check_solution_fmpz_mat(const fmpq_mat_t X, const fmpz_mat_t A, const fmpz_mat_t B)
 {
     slong i, j;
