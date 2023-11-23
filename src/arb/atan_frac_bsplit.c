@@ -114,13 +114,22 @@ arb_atan_frac_bsplit(arb_t s, const fmpz_t p, const fmpz_t q, int hyperbolic, sl
     fmpz_init(q2);
     mag_init(err);
 
-    /* todo: handle huge */
-    logqp = fabs(fmpz_get_d(q)) / fmpz_get_d(p);
-
     /* If N >= 1 and p/q <= 1/2, the error is bounded by (p/q)^(2N+1).
     For error <= 2^-prec, it is sufficient to pick
     N >= (1/2) * (prec * log(2) / log(q/p) - 1). */
-    logqp = mag_d_log_lower_bound(logqp) * (1.0 - 1e-12);
+
+    {
+        slong qexp, pexp;
+        double logp, logq;
+
+        logp = fmpz_get_d_2exp(&pexp, p);
+        logq = fmpz_get_d_2exp(&qexp, q);
+
+        logqp = fabs(logq) / logp;
+        logqp = mag_d_log_lower_bound(logqp) * (1.0 - 1e-12);
+        logqp = logqp + (qexp - pexp) * LOG2 * (1.0 - 1e-12);
+    }
+
     N = ceil((prec * (0.5 * LOG2) / logqp) * (1.0 + 1e-12));
     N = FLINT_MAX(N, 1);
     N = FLINT_MIN(N, 4 * prec);
