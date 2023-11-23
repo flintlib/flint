@@ -17,6 +17,9 @@
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
+#ifndef __fmpq_poly_set_array_mpq
+/* Defined in io.c and set_str.c */
+# define __fmpq_poly_set_array_mpq __fmpq_poly_set_array_mpq
 /* TODO: Remove me */
 static void
 __fmpq_poly_set_array_mpq(fmpz * poly, fmpz_t den, const mpq_t * a, slong n)
@@ -44,6 +47,7 @@ __fmpq_poly_set_array_mpq(fmpz * poly, fmpz_t den, const mpq_t * a, slong n)
     mpz_clear(d);
     mpz_clear(t);
 }
+#endif
 
 int
 _fmpq_poly_set_str(fmpz * poly, fmpz_t den, const char * str, slong len)

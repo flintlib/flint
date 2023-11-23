@@ -14,6 +14,9 @@
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
+#ifndef _set_vec
+/* Defined in revert_series_lagrange_fast.c and revert_series_lagrange.c */
+# define _set_vec _set_vec
 static void
 _set_vec(fmpz * rnum, fmpz_t den,
                 const fmpz * xnum, const fmpz * xden, slong len)
@@ -34,6 +37,7 @@ _set_vec(fmpz * rnum, fmpz_t den,
 
     fmpz_clear(t);
 }
+#endif
 
 void
 _fmpq_poly_revert_series_lagrange(fmpz * Qinv, fmpz_t den,

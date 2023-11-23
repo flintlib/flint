@@ -16,13 +16,20 @@
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
+#ifndef _fmpz_gcd_big_small
+/* Defined in exp_series.c and integral.c */
+# define _fmpz_gcd_big_small _fmpz_gcd_big_small
 static ulong _fmpz_gcd_big_small(const fmpz_t g, ulong h)
 {
     __mpz_struct * z = COEFF_TO_PTR(*g);
 
     return n_gcd(mpn_mod_1(z->_mp_d, FLINT_ABS(z->_mp_size), h), h);
 }
+#endif
 
+#ifndef _fmpz_gcd_small
+/* Defined in exp_series.c and integral.c */
+# define _fmpz_gcd_small _fmpz_gcd_small
 static ulong _fmpz_gcd_small(const fmpz_t g, ulong h)
 {
     if (!COEFF_IS_MPZ(*g))
@@ -30,7 +37,7 @@ static ulong _fmpz_gcd_small(const fmpz_t g, ulong h)
     else
         return _fmpz_gcd_big_small(g, h);
 }
-
+#endif
 
 /* Basecase algorithm, given a precomputed derivative of
    of the input series (Alen still refers to the length

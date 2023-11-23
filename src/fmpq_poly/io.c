@@ -29,9 +29,12 @@
     On failure, a negative number is returned.''
  */
 
+#ifndef __fmpq_poly_set_array_mpq
+/* Defined in io.c and set_str.c */
+# define __fmpq_poly_set_array_mpq __fmpq_poly_set_array_mpq
 /* TODO: Remove me! */
 static void
-___fmpq_poly_set_array_mpq(fmpz * poly, fmpz_t den, const mpq_t * a, slong n)
+__fmpq_poly_set_array_mpq(fmpz * poly, fmpz_t den, const mpq_t * a, slong n)
 {
     slong i;
     mpz_t d, t;
@@ -56,9 +59,10 @@ ___fmpq_poly_set_array_mpq(fmpz * poly, fmpz_t den, const mpq_t * a, slong n)
     mpz_clear(d);
     mpz_clear(t);
 }
+#endif
 
 /* TODO: Remove me! */
-static void __fmpq_poly_set_array_mpq(fmpq_poly_t poly, const mpq_t * a, slong n)
+static void ___fmpq_poly_set_array_mpq(fmpq_poly_t poly, const mpq_t * a, slong n)
 {
     if (n == 0)
     {
@@ -67,7 +71,7 @@ static void __fmpq_poly_set_array_mpq(fmpq_poly_t poly, const mpq_t * a, slong n
     else
     {
         fmpq_poly_fit_length(poly, n);
-        ___fmpq_poly_set_array_mpq(poly->coeffs, poly->den, a, n);
+        __fmpq_poly_set_array_mpq(poly->coeffs, poly->den, a, n);
         _fmpq_poly_set_length(poly, n);
         _fmpq_poly_normalise(poly);
     }
@@ -304,7 +308,7 @@ int fmpq_poly_fread(FILE * file, fmpq_poly_t poly)
         r = mpq_inp_str(a[i], file, 10);
 
     if (r > 0)
-        __fmpq_poly_set_array_mpq(poly, (const mpq_t *) a, len);
+        ___fmpq_poly_set_array_mpq(poly, (const mpq_t *) a, len);
 
     for (i = 0; i < len; i++)
         mpq_clear(a[i]);
