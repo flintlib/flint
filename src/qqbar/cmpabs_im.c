@@ -11,6 +11,9 @@
 
 #include "qqbar.h"
 
+#ifndef _arb_overlaps_abs
+/* Defined in cmpabs_im.c and cmpabs_re.c */
+# define _arb_overlaps_abs _arb_overlaps_abs
 static int
 _arb_overlaps_abs(const arb_t x, const arb_t y)
 {
@@ -26,6 +29,7 @@ _arb_overlaps_abs(const arb_t x, const arb_t y)
 
     return arb_overlaps(t, u);
 }
+#endif
 
 int
 qqbar_cmpabs_im(const qqbar_t x, const qqbar_t y)
