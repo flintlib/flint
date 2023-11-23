@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
@@ -17,14 +18,6 @@
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 #include "arith.h"
-
-#ifdef __GNUC__
-# define log __builtin_log
-# define exp __builtin_exp
-# define frexp __builtin_frexp
-#else
-# include <math.h>
-#endif
 
 /* S(n,k) <= (1/2) binomial(n,k) * k^(n-k) */
 static slong
@@ -235,6 +228,9 @@ arith_stirling_number_2_vec_convolution(fmpz * res, ulong n, slong klen)
     _fmpz_vec_clear(v, len);
 }
 
+#ifndef divisor_table
+/* Defined in bell_number_multi_mod.c and stirling2.c */
+# define divisor_table divisor_table
 static void
 divisor_table(unsigned int * tab, slong len)
 {
@@ -255,6 +251,7 @@ divisor_table(unsigned int * tab, slong len)
         }
     }
 }
+#endif
 
 static void
 arith_stirling_number_2_nmod_vec(mp_ptr res, const unsigned int * divtab, ulong n, slong len, nmod_t mod)

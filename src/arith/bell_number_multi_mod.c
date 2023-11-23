@@ -67,6 +67,9 @@ arith_bell_number_nmod2(unsigned int * divtab, mp_ptr facs, mp_ptr pows, ulong n
     return s;
 }
 
+#ifndef divisor_table
+/* Defined in bell_number_multi_mod.c and stirling2.c */
+# define divisor_table divisor_table
 static void
 divisor_table(unsigned int * tab, slong len)
 {
@@ -87,6 +90,7 @@ divisor_table(unsigned int * tab, slong len)
         }
     }
 }
+#endif
 
 void
 arith_bell_number_multi_mod(fmpz_t res, ulong n)
