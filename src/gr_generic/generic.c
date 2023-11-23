@@ -2841,3 +2841,5 @@ gr_method_tab_init(gr_funcptr * methods, gr_method_tab_input * tab)
         methods[tab[i].index] = tab[i].function;
     }
 }
+
+#undef BINARY_OP

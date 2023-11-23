@@ -312,3 +312,8 @@ gr_set_fexpr(gr_ptr res, const fexpr_t expr, gr_ctx_t ctx)
     return status;
 }
 */
+
+#undef BINARY_OP
+#undef BINARY_OP_WITH_FMPZ
+#undef UNARY_OP
+#undef NARY_OP
