@@ -18,6 +18,9 @@
 # include <math.h>
 #endif
 
+/* Defined in rf.c and rj.c */
+#define den_ratio_tab den_ratio_tab_rf
+
 static const unsigned short den_ratio_tab[512] = {
     1,1,10,7,12,11,26,1,136,19,2,23,20,1,58,31,
     16,1,74,1,164,43,2,47,56,1,106,1,4,59,122,1,
@@ -318,3 +321,4 @@ acb_elliptic_rf(acb_t res, const acb_t x, const acb_t y, const acb_t z,
     mag_clear(prev_err);
 }
 
+#undef den_ratio_tab

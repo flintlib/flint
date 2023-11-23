@@ -19,6 +19,9 @@
 # include <math.h>
 #endif
 
+/* Defined in rf.c and rj.c */
+#define den_ratio_tab den_ratio_tab_rj
+
 static const unsigned short den_ratio_tab[512] = {
     1,1,14,3,44,13,10,17,152,1,46,1,12,29,62,1,
     16,37,2,41,172,1,94,7,8,53,2,1,236,61,2,1,
@@ -839,3 +842,4 @@ acb_elliptic_rj(acb_t res, const acb_t x, const acb_t y,
     acb_elliptic_rj_integration(res, x, y, z, p, flags, prec);
 }
 
+#undef den_ratio_tab
