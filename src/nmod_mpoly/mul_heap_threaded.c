@@ -14,6 +14,14 @@
 #include "fmpz_vec.h"
 #include "nmod_mpoly.h"
 
+/* Defined in mul_heap_threaded.c, mul_array_threaded.c,
+ * mpolyn_divides_threaded.c and divides_heap_threaded.c */
+#define _worker_arg_struct _worker_arg_struct_mul_heap_threaded
+
+/* Defined in mul_heap_threaded.c and mul_array_threaded.c */
+#define _base_struct _base_struct_mul_heap_threaded
+#define _base_t _base_t_mul_heap_threaded
+
 /*
     set A = the part of B*C with exps in [start, end)
     this functions reallocates A and returns the length of A
@@ -851,3 +859,7 @@ void nmod_mpoly_mul_heap_threaded(
 
     TMP_END;
 }
+
+#undef _worker_arg_struct
+#undef _base_struct
+#undef _base_t

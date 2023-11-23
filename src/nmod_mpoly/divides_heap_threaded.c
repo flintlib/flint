@@ -13,6 +13,31 @@
 #include "nmod_mpoly.h"
 #include "fmpz_mpoly.h"
 
+/* Defined in mul_heap_threaded.c, mul_array_threaded.c,
+ * mpolyn_divides_threaded.c and divides_heap_threaded.c */
+#define _worker_arg_struct _worker_arg_struct_divides_heap_threaded
+
+/* Defined in mpolyn_divides_threaded.c and divides_heap_threaded.c */
+#define worker_arg_struct worker_arg_struct_divides_heap_threaded
+#define worker_arg_t worker_arg_t_divides_heap_threaded
+#define worker_loop worker_loop_divides_heap_threaded
+
+#define trychunk trychunk_divides_heap_threaded
+#define chunk_mulsub chunk_mulsub_divides_heap_threaded
+
+#define divides_heap_base_struct divides_heap_base_struct_divides_heap_threaded
+#define divides_heap_base_t divides_heap_base_t_divides_heap_threaded
+#define divides_heap_base_init divides_heap_base_init_divides_heap_threaded
+#define divides_heap_base_clear divides_heap_base_clear_divides_heap_threaded
+#define divides_heap_base_add_chunk divides_heap_base_add_chunk_divides_heap_threaded
+
+#define _divides_heap_chunk_struct _divides_heap_chunk_struct_divides_heap_threaded
+#define divides_heap_chunk_struct divides_heap_chunk_struct_divides_heap_threaded
+#define divides_heap_chunk_t divides_heap_chunk_t_divides_heap_threaded
+#define divides_heap_chunk_clear divides_heap_chunk_clear_divides_heap_threaded
+
+#define stripe_fit_length stripe_fit_length_divides_heap_threaded
+
 #define PROFILE_THIS 0
 
 #if PROFILE_THIS
@@ -1967,3 +1992,27 @@ int nmod_mpoly_divides_heap_threaded(
 
     return divides;
 }
+
+#undef PROFILE_THIS
+
+#undef _worker_arg_struct
+
+#undef worker_arg_struct
+#undef worker_arg_t
+#undef worker_loop
+
+#undef trychunk
+#undef chunk_mulsub
+
+#undef divides_heap_base_struct
+#undef divides_heap_base_t
+#undef divides_heap_base_init
+#undef divides_heap_base_clear
+#undef divides_heap_base_add_chunk
+
+#undef _divides_heap_chunk_struct
+#undef divides_heap_chunk_struct
+#undef divides_heap_chunk_t
+#undef divides_heap_chunk_clear
+
+#undef stripe_fit_length

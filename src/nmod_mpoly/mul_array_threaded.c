@@ -12,6 +12,14 @@
 #include "thread_support.h"
 #include "nmod_mpoly.h"
 
+/* Defined in mul_heap_threaded.c, mul_array_threaded.c,
+ * mpolyn_divides_threaded.c and divides_heap_threaded.c */
+#define _worker_arg_struct _worker_arg_struct_mul_array_threaded
+
+/* Defined in mul_heap_threaded.c and mul_array_threaded.c */
+#define _base_struct _base_struct_mul_array_threaded
+#define _base_t _base_t_mul_array_threaded
+
 /* improve locality */
 #define BLOCK 128
 #define MAX_ARRAY_SIZE (WORD(300000))
@@ -882,3 +890,7 @@ int nmod_mpoly_mul_array_threaded(
     TMP_END;
     return success;
 }
+
+#undef _worker_arg_struct
+#undef _base_struct
+#undef _base_t
