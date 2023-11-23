@@ -315,3 +315,8 @@ cleanup:
 
     return flag;
 }
+
+#undef XX
+#undef XXx
+#undef BB
+#undef LU

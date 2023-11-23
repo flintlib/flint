@@ -15,6 +15,10 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
+/* Defined in mul_[small/double_word/multi_mod].c */
+#define _worker_arg _worker_arg_mul_small
+#define _mul_worker _mul_worker_mul_small
+
 static void _dot1(fmpz_t z, fmpz * a, slong * b, slong len)
 {
     slong i;
@@ -457,3 +461,5 @@ void _fmpz_mat_mul_small(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
     _fmpz_mat_mul_small_internal(C, A, B, Cbits);
 }
 
+#undef _worker_arg
+#undef _mul_worker

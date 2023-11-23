@@ -162,3 +162,7 @@ fmpz_mat_solve_cramer(fmpz_mat_t X, fmpz_t den,
         return 0; /* not reached, but silence compiler warning */
     }
 }
+
+#undef AA
+#undef BB
+#undef XX

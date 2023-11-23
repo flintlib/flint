@@ -18,12 +18,15 @@
 #include "fmpz_poly.h"
 #include "fmpz_mat.h"
 
-#define CHARPOLY_M_LOG2E  1.44269504088896340736  /* log2(e) */
-
+#ifndef _log2
+/* Defined in charpoly_modular.c and minpoly_modular.c */
+# define _log2 _log2
+# define CHARPOLY_M_LOG2E  1.44269504088896340736  /* log2(e) */
 static inline long double _log2(const long double x)
 {
     return log(x) * CHARPOLY_M_LOG2E;
 }
+#endif
 
 static void _fmpz_mat_charpoly_small_2x2(fmpz *rop, fmpz ** const x)
 {

@@ -161,3 +161,5 @@ fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, slong * perm,
 
     return rank;
 }
+
+#undef E

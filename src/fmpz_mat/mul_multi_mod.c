@@ -16,6 +16,9 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
+/* Defined in mul_[small/double_word/multi_mod].c */
+#define _worker_arg _worker_arg_mul_multi_mod
+
 typedef struct {
     slong m;
     slong k;
@@ -506,3 +509,4 @@ fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
     _fmpz_mat_mul_multi_mod(C, A, B, sign, Cbits);
 }
 
+#undef _worker_arg

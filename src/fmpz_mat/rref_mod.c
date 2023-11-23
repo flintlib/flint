@@ -83,3 +83,5 @@ fmpz_mat_rref_mod(slong * perm, fmpz_mat_t A, const fmpz_t p)
 
     return rank;
 }
+
+#undef E

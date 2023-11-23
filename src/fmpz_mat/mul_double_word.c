@@ -15,6 +15,10 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
+/* Defined in mul_[small/double_word/multi_mod].c */
+#define _worker_arg _worker_arg_mul_double_word
+#define _mul_worker _mul_worker_mul_double_word
+
 /*
     There is a branchy version because the k loop takes time to warmup.
     Once k is big enough, the loop runs fast and there is no point in checking
@@ -557,3 +561,5 @@ void _fmpz_mat_mul_double_word(
     _fmpz_mat_mul_double_word_internal(C, A, B, sign, Cbits);
 }
 
+#undef _worker_arg
+#undef _mul_worker

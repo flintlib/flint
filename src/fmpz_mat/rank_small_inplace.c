@@ -107,3 +107,5 @@ fmpz_mat_rank_small_inplace(fmpz_mat_t B)
 
     return rank;
 }
+
+#undef E

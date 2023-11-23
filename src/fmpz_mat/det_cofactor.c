@@ -86,3 +86,5 @@ fmpz_mat_det_cofactor(fmpz_t det, const fmpz_mat_t A)
             flint_abort();
     }
 }
+
+#undef E
