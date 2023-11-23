@@ -14,12 +14,16 @@
 #include "arb.h"
 #include "hypgeom.h"
 
+#ifndef fmpz_poly_evaluate_si
+/* Defined in precompute.c and sum.c */
+# define fmpz_poly_evaluate_si fmpz_poly_evaluate_si
 static inline void
 fmpz_poly_evaluate_si(fmpz_t y, const fmpz_poly_t poly, slong x)
 {
     fmpz_set_si(y, x);
     fmpz_poly_evaluate_fmpz(y, poly, y);
 }
+#endif
 
 static void
 bsplit_recursive_fmpz(fmpz_t P, fmpz_t Q, fmpz_t B, fmpz_t T,

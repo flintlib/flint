@@ -92,13 +92,16 @@ hypgeom_root_norm(const fmpz_poly_t P)
     return res;
 }
 
-
+#ifndef fmpz_poly_evaluate_si
+/* Defined in precompute.c and sum.c */
+# define fmpz_poly_evaluate_si fmpz_poly_evaluate_si
 static inline void
 fmpz_poly_evaluate_si(fmpz_t y, const fmpz_poly_t poly, slong x)
 {
     fmpz_set_si(y, x);
     fmpz_poly_evaluate_fmpz(y, poly, y);
 }
+#endif
 
 void
 _hypgeom_precompute(hypgeom_t hyp, const fmpz_poly_t P, const fmpz_poly_t Q)
