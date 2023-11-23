@@ -20,6 +20,24 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
+/* Defined in nmod_poly_mul.c and fmpz_poly_mul.c */
+#define _mod _mod_fmpz_poly_mul
+#define s1worker_struct s1worker_struct_fmpz_poly_mul
+#define s2worker_struct s2worker_struct_fmpz_poly_mul
+#define s1worker_func s1worker_func_fmpz_poly_mul
+#define s2worker_func s2worker_func_fmpz_poly_mul
+#define extra_func extra_func_fmpz_poly_mul
+#define _crt_1 _crt_1_fmpz_poly_mul
+#define _crt_2 _crt_2_fmpz_poly_mul
+#define _crt_3 _crt_3_fmpz_poly_mul
+#define _crt_4 _crt_4_fmpz_poly_mul
+
+/* Not defined in nmod_poly_mul.c, but keep the consistency */
+#define _crt_5 _crt_5_fmpz_poly_mul
+#define _crt_6 _crt_6_fmpz_poly_mul
+#define _crt_7 _crt_7_fmpz_poly_mul
+#define _crt_8 _crt_8_fmpz_poly_mul
+
 static void _mod(
     double* abuf, ulong atrunc,
     const fmpz * a, ulong an,
@@ -210,7 +228,7 @@ void fmpz_neg_ui_array(fmpz_t out, const ulong * in, slong in_len)
 }
 
 #define DEFINE_IT(NP, N, M) \
-static void CAT(_crt, NP)( \
+static void CAT3(_crt, NP, fmpz_poly_mul)( \
     fmpz * z, ulong zl, ulong zi_start, ulong zi_stop, \
     sd_fft_ctx_struct* Rffts, double* d, ulong dstride, \
     crt_data_struct* Rcrts) \
@@ -605,3 +623,18 @@ int _fmpz_poly_mul_mid_mpn_ctx(
 
     return 1;
 }
+
+#undef _mod
+#undef s1worker_struct
+#undef s2worker_struct
+#undef s1worker_func
+#undef s2worker_func
+#undef extra_func
+#undef _crt_1
+#undef _crt_2
+#undef _crt_3
+#undef _crt_4
+#undef _crt_5
+#undef _crt_6
+#undef _crt_7
+#undef _crt_8

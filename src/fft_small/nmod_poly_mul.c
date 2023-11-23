@@ -16,6 +16,18 @@
 #include "fft_small.h"
 #include "crt_helpers.h"
 
+/* Defined in nmod_poly_mul.c and fmpz_poly_mul.c */
+#define _mod _mod_nmod_poly_mul
+#define s1worker_struct s1worker_struct_nmod_poly_mul
+#define s2worker_struct s2worker_struct_nmod_poly_mul
+#define s1worker_func s1worker_func_nmod_poly_mul
+#define s2worker_func s2worker_func_nmod_poly_mul
+#define extra_func extra_func_nmod_poly_mul
+#define _crt_1 _crt_1_nmod_poly_mul
+#define _crt_2 _crt_2_nmod_poly_mul
+#define _crt_3 _crt_3_nmod_poly_mul
+#define _crt_4 _crt_4_nmod_poly_mul
+
 static void _mod_red(
     double* abuf, ulong atrunc,
     const ulong* a, ulong an,
@@ -218,7 +230,7 @@ FLINT_ASSERT(i+j < atrunc);
 
 
 #define DEFINE_IT(NP, N, M) \
-static void CAT(_crt, NP)( \
+static void CAT3(_crt, NP, nmod_poly_mul)( \
     ulong* z, ulong zl, ulong zi_start, ulong zi_stop, \
     sd_fft_ctx_struct* Rffts, double* d, ulong dstride, \
     crt_data_struct* Rcrts, \
@@ -1465,4 +1477,13 @@ void _nmod_poly_mul_mid(
     return;
 }
 
-
+#undef _mod
+#undef s1worker_struct
+#undef s2worker_struct
+#undef s1worker_func
+#undef s2worker_func
+#undef extra_func
+#undef _crt_1
+#undef _crt_2
+#undef _crt_3
+#undef _crt_4
