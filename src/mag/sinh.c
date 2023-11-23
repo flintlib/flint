@@ -12,6 +12,9 @@
 #include "double_extras.h"
 #include "mag.h"
 
+/* Defined in exp.c and sinh.c */
+#define inverse_factorials inverse_factorials_sinh
+
 static const double inverse_factorials[] = {
     1.0,
     0.16666666666666666667,
@@ -93,3 +96,5 @@ mag_sinh_lower(mag_t res, const mag_t x)
         }
     }
 }
+
+#undef inverse_factorials
