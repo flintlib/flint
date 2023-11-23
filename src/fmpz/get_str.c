@@ -19,6 +19,11 @@
 #include "thread_support.h"
 #include "string.h"
 
+/* Some definitions that also occurs in get_str.c and set_str.c */
+#define worker_args_struct worker_args_struct_get_str
+#define _fmpz_get_str_recursive _fmpz_get_str_recursive_get_str
+#define worker worker_get_str
+
 /*
     Notes:
 
@@ -322,3 +327,7 @@ char * fmpz_get_str(char * str, int b, const fmpz_t f)
 
     return str;
 }
+
+#undef worker_args_struct
+#undef _fmpz_get_str_recursive
+#undef worker

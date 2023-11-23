@@ -16,7 +16,11 @@
 #include "fmpz_vec.h"
 #include "thread_support.h"
 #include "thread_pool.h"
-#include "profiler.h"
+
+/* Some definitions that also occurs in get_str.c and set_str.c */
+#define worker_args_struct worker_args_struct_set_str
+#define _fmpz_get_str_recursive _fmpz_get_str_recursive_set_str
+#define worker worker_set_str
 
 #define BASECASE_CUTOFF 24000
 
@@ -258,3 +262,7 @@ fmpz_set_str(fmpz_t res, const char * str, int base)
 
     return 0;
 }
+
+#undef worker_args_struct
+#undef _fmpz_get_str_recursive
+#undef worker

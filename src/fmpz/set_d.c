@@ -37,3 +37,6 @@ fmpz_set_d(fmpz_t f, double c)
         _fmpz_demote_val(f);
     }
 }
+
+#undef DOUBLE_MAX
+#undef DOUBLE_MIN

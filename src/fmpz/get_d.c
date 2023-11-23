@@ -47,3 +47,6 @@ fmpz_get_d(const fmpz_t f)
     else
         return mpz_get_d(COEFF_TO_PTR(c));
 }
+
+#undef DOUBLE_MAX
+#undef DOUBLE_MIN
