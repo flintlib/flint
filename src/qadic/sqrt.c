@@ -15,6 +15,9 @@
 #include "fmpz_mod_poly.h"
 #include "qadic.h"
 
+#ifndef __fmpz_mod_poly_invmod
+/* Defined in inv.c and sqrt.c */
+# define __fmpz_mod_poly_invmod __fmpz_mod_poly_invmod
 static int __fmpz_mod_poly_invmod(fmpz *A,
                           const fmpz *B, slong lenB,
                           const fmpz *P, slong lenP, const fmpz_t p)
@@ -40,6 +43,7 @@ static int __fmpz_mod_poly_invmod(fmpz *A,
 
     return res;
 }
+#endif
 
 /*
     FILE DOCUMENTATION.

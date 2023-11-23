@@ -14,6 +14,9 @@
 #include "fmpz_mod_poly.h"
 #include "qadic.h"
 
+#ifndef __fmpz_mod_poly_neg
+/* Defined in frobenius.c and log_rectangular.c */
+# define __fmpz_mod_poly_neg __fmpz_mod_poly_neg
 static void __fmpz_mod_poly_neg(fmpz *res, const fmpz *poly, slong len, const fmpz_t p)
 {
     slong i;
@@ -26,7 +29,11 @@ static void __fmpz_mod_poly_neg(fmpz *res, const fmpz *poly, slong len, const fm
             fmpz_zero(res + i);
     }
 }
+#endif
 
+#ifndef __fmpz_mod_poly_add
+/* Defined in exp_rectangular.c and log_rectangular.c */
+# define __fmpz_mod_poly_add __fmpz_mod_poly_add
 static void __fmpz_mod_poly_add(fmpz *res, const fmpz *poly1, slong len1,
                                    const fmpz *poly2, slong len2, const fmpz_t p)
 {
@@ -40,13 +47,18 @@ static void __fmpz_mod_poly_add(fmpz *res, const fmpz *poly1, slong len1,
 		    fmpz_sub(res + i, res + i, p);
     }
 }
+#endif
 
+#ifndef __fmpz_mod_poly_mul
+/* Defined in frobenius.c, exp_rectangular.c and log_rectangular.c */
+# define __fmpz_mod_poly_mul __fmpz_mod_poly_mul
 static void __fmpz_mod_poly_mul(fmpz *res, const fmpz *poly1, slong len1,
                                    const fmpz *poly2, slong len2, const fmpz_t p)
 {
     _fmpz_poly_mul(res, poly1, len1, poly2, len2);
     _fmpz_vec_scalar_mod_fmpz(res, res, len1 + len2 - 1, p);
 }
+#endif
 
 /*
     Carries out the finite series evaluation for the logarithm
