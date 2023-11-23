@@ -51,6 +51,9 @@ _nmod_xgcd_unit(mp_limb_t * s, mp_limb_t * t, mp_limb_t a, mp_limb_t b, nmod_t m
    return g;
 }
 
+#ifndef _nmod_mat_pivot
+/* Defined in det_howell.c and strong_echelon_form.c */
+#define _nmod_mat_pivot _nmod_mat_pivot
 static inline int
 _nmod_mat_pivot(nmod_mat_t A, slong start_row, slong col)
 {
@@ -73,8 +76,12 @@ _nmod_mat_pivot(nmod_mat_t A, slong start_row, slong col)
     }
     return 0;
 }
+#endif
 
 /* test whether q*a = b mod N has a solution */
+#ifndef _n_is_divisible
+/* Defined in det_howell.c and strong_echelon_form.c */
+#define _n_is_divisible _n_is_divisible
 static int
 _n_is_divisible(mp_ptr q, mp_limb_t b, mp_limb_t a, nmod_t N)
 {
@@ -89,6 +96,7 @@ _n_is_divisible(mp_ptr q, mp_limb_t b, mp_limb_t a, nmod_t N)
 
     return 0;
 }
+#endif
 
 mp_limb_t _nmod_mat_det_howell(nmod_mat_t A)
 {

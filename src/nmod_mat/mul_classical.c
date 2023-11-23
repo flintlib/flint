@@ -19,6 +19,9 @@ with op = 1, computes D = C + A*B
 with op = -1, computes D = C - A*B
 */
 
+#ifndef _nmod_mat_addmul_basic_op
+/* Defined in mul_classical.c and mul_classical_threaded.c */
+#define _nmod_mat_addmul_basic_op _nmod_mat_addmul_basic_op
 static inline void
 _nmod_mat_addmul_basic_op(mp_ptr * D, mp_ptr * const C, mp_ptr * const A,
     mp_ptr * const B, slong m, slong k, slong n, int op, nmod_t mod, int nlimbs)
@@ -41,6 +44,7 @@ _nmod_mat_addmul_basic_op(mp_ptr * D, mp_ptr * const C, mp_ptr * const A,
         }
     }
 }
+#endif
 
 static inline void
 _nmod_mat_addmul_transpose_op(mp_ptr * D, const mp_ptr * C, const mp_ptr * A,
