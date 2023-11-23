@@ -21,6 +21,11 @@
 #include "gr_mat.h"
 #include "ulong_extras.h"
 
+/* Defined in nmod.c and fmpz_mod.c */
+#define inv_series_cutoff_tab inv_series_cutoff_tab_nmod
+#define div_series_cutoff_tab div_series_cutoff_tab_nmod
+#define fmpz_mod_ctx_extended_struct fmpz_mod_ctx_extended_struct_nmod
+
 #define NMOD_CTX_REF(ring_ctx) (((nmod_t *)((ring_ctx))))
 #define NMOD_CTX(ring_ctx) (*NMOD_CTX_REF(ring_ctx))
 
@@ -1483,3 +1488,8 @@ _gr_ctx_init_nmod(gr_ctx_t ctx, void * nmod_t_ref)
         __gr_nmod_methods_initialized = 1;
     }
 }
+
+#undef inv_series_cutoff_tab
+#undef div_series_cutoff_tab
+#undef fmpz_mod_ctx_extended_struct
+#undef FMPZ_MOD_CTX

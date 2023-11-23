@@ -2255,3 +2255,9 @@ gr_ctx_init_complex_acb(gr_ctx_t ctx, slong prec)
         _acb_methods_initialized = 1;
     }
 }
+
+#undef DEF_FUNC
+#undef DEF_2FUNC
+#undef DEF_FUNC2
+#undef DEF_FUNC_SING
+#undef DEF_FUNC2_SING

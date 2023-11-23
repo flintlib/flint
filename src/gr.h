@@ -25,14 +25,12 @@
 #endif
 
 #ifndef CALCIUM_H
-
 typedef enum
 {
     T_TRUE,
     T_FALSE,
     T_UNKNOWN
 } truth_t;
-
 #endif
 
 GR_INLINE truth_t truth_and(truth_t x, truth_t y)

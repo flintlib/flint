@@ -689,3 +689,5 @@ gr_ctx_init_fq_nmod(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var)
     fq_nmod_ctx_init(fq_nmod_ctx, p, d, var == NULL ? "a" : var);
     _gr_ctx_init_fq_nmod_from_ref(ctx, fq_nmod_ctx);
 }
+
+#undef FQ_CTX

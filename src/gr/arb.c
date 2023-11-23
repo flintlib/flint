@@ -1955,3 +1955,9 @@ gr_ctx_init_real_arb(gr_ctx_t ctx, slong prec)
         _arb_methods_initialized = 1;
     }
 }
+
+#undef DEF_FUNC
+#undef DEF_2FUNC
+#undef DEF_FUNC2
+#undef DEF_FUNC_SING
+#undef DEF_FUNC2_SING

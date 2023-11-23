@@ -19,6 +19,11 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 
+/* Defined in nmod.c and fmpz_mod.c */
+#define inv_series_cutoff_tab inv_series_cutoff_tab_fmpz_mod
+#define div_series_cutoff_tab div_series_cutoff_tab_fmpz_mod
+#define fmpz_mod_ctx_extended_struct fmpz_mod_ctx_extended_struct_fmpz_mod
+
 typedef struct
 {
     fmpz_mod_ctx_struct * ctx;
@@ -773,3 +778,8 @@ gr_ctx_fmpz_mod_set_primality(gr_ctx_t ctx, truth_t is_prime)
 {
     FMPZ_MOD_IS_PRIME(ctx) = is_prime;
 }
+
+#undef inv_series_cutoff_tab
+#undef div_series_cutoff_tab
+#undef fmpz_mod_ctx_extended_struct
+#undef FMPZ_MOD_CTX

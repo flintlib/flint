@@ -21,6 +21,9 @@
 #include "gr_poly.h"
 #include "fmpz_poly_factor.h"
 
+/* Defined in nf.c, fmpz_poly.c, polynomial.c and series.c */
+#define default_var default_var_fmpz_poly
+
 #define FMPZ_POLY_CTX(ctx) POLYNOMIAL_CTX(ctx)
 #define FMPZ_POLY_CTX_VAR(ctx) (FMPZ_POLY_CTX(ctx)->var)
 
@@ -858,3 +861,5 @@ gr_ctx_init_fmpz_poly(gr_ctx_t ctx)
         _fmpz_poly_methods_initialized = 1;
     }
 }
+
+#undef default_var

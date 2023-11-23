@@ -577,3 +577,5 @@ gr_ctx_init_fq_zech(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var)
     fq_zech_ctx_init(fq_zech_ctx, p, d, var == NULL ? "a" : var);
     _gr_ctx_init_fq_zech_from_ref(ctx, fq_zech_ctx);
 }
+
+#undef FQ_CTX

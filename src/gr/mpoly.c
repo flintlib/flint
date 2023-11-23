@@ -260,3 +260,7 @@ gr_ctx_init_gr_mpoly(gr_ctx_t ctx, gr_ctx_t base_ring, slong nvars, const orderi
         _gr__gr_gr_mpoly_methods_initialized = 1;
     }
 }
+
+#undef MPOLYNOMIAL_CTX
+#undef MPOLYNOMIAL_ELEM_CTX
+#undef MPOLYNOMIAL_MCTX

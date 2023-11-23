@@ -20,6 +20,9 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 
+/* Defined in nf.c, fmpz_poly.c, polynomial.c and series.c */
+#define default_var default_var_nf
+
 typedef struct
 {
     nf_struct * nf;
@@ -649,3 +652,5 @@ _gr_ctx_init_nf_from_ref(gr_ctx_t ctx, const void * nfctx)
         _nf_methods_initialized = 1;
     }
 }
+
+#undef default_var

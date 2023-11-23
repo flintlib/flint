@@ -17,11 +17,15 @@
 #include "fmpz_mpoly_q.h"
 #include "fmpz_mpoly_factor.h"
 
+#ifndef _gr_fmpz_mpoly_ctx_t
+/* Defined in fmpz_mpoly.c and fmpz_mpoly_q.c */
+# define _gr_fmpz_mpoly_ctx_t _gr_fmpz_mpoly_ctx_t
 typedef struct
 {
     fmpz_mpoly_ctx_t mctx;
 }
 _gr_fmpz_mpoly_ctx_t;
+#endif
 
 #define MPOLYNOMIAL_CTX(ring_ctx) ((_gr_fmpz_mpoly_ctx_t *)(GR_CTX_DATA_AS_PTR(ring_ctx)))
 #define MPOLYNOMIAL_MCTX(ring_ctx) (MPOLYNOMIAL_CTX(ring_ctx)->mctx)
@@ -603,3 +607,6 @@ gr_ctx_init_fmpz_mpoly_q(gr_ctx_t ctx, slong nvars, const ordering_t ord)
         _gr_fmpz_mpoly_q_methods_initialized = 1;
     }
 }
+
+#undef MPOLYNOMIAL_CTX
+#undef MPOLYNOMIAL_MCTX

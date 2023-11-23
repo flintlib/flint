@@ -66,12 +66,14 @@ void calcium_write_free(calcium_stream_t out, char * s)
 
 /* Triple-valued logic */
 
+#ifndef GR_H
 typedef enum
 {
     T_TRUE,
     T_FALSE,
     T_UNKNOWN
 } truth_t;
+#endif
 
 CALCIUM_INLINE void truth_print(truth_t t)
 {

@@ -21,6 +21,9 @@
 
 /* arb wrappers todo: elementary functions; pfq, coulomb, zeta/dirichlet deflated */
 
+/* Defined in nf.c, fmpz_poly.c, polynomial.c and series.c */
+#define default_var default_var_series
+
 static const char * default_var = "x";
 
 int
@@ -2021,3 +2024,5 @@ gr_ctx_init_gr_series_mod(gr_ctx_t ctx, gr_ctx_t base_ring, slong mod)
         _gr_series_methods_initialized = 1;
     }
 }
+
+#undef default_var

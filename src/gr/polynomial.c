@@ -18,6 +18,9 @@
 #include "gr.h"
 #include "gr_poly.h"
 
+/* Defined in nf.c, fmpz_poly.c, polynomial.c and series.c */
+#define default_var default_var_polynomial
+
 #ifdef __GNUC__
 # define strcmp __builtin_strcmp
 #else
@@ -449,3 +452,5 @@ gr_ctx_init_gr_poly(gr_ctx_t ctx, gr_ctx_t base_ring)
         _gr_poly_methods_initialized = 1;
     }
 }
+
+#undef default_var

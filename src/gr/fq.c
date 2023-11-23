@@ -726,3 +726,5 @@ gr_ctx_init_fq(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var)
     fq_ctx_init(fq_ctx, p, d, var == NULL ? "a" : var);
     _gr_ctx_init_fq_from_ref(ctx, fq_ctx);
 }
+
+#undef FQ_CTX
