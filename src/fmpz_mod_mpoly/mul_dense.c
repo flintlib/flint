@@ -13,6 +13,9 @@
 #include "fmpz_mod_poly.h"
 #include "fmpz_mod_mpoly.h"
 
+/* Defined in divides_dense.c and mul_dense.c */
+#define _from_dense _from_dense_mul_dense
+
 void _fmpz_mod_mpoly_init_dense_mock(
     fmpz_mod_poly_t D,
     const fmpz_mod_mpoly_t A,
@@ -267,3 +270,5 @@ int fmpz_mod_mpoly_mul_dense(fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_t B,
 
     return success;
 }
+
+#undef _from_dense

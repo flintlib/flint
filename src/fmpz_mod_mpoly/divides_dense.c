@@ -13,6 +13,9 @@
 #include "fmpz_mod_poly.h"
 #include "fmpz_mod_mpoly.h"
 
+/* Defined in divides_dense.c and mul_dense.c */
+#define _from_dense _from_dense_divides_dense
+
 /*
     Convert D to A if the degrees of A are <= expected_deg
     If not, return 0 and set A to 0.
@@ -290,3 +293,5 @@ int fmpz_mod_mpoly_divides_dense(
     TMP_END;
     return success;
 }
+
+#undef _from_dense
