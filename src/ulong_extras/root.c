@@ -12,13 +12,15 @@
 */
 
 #include <math.h>
-#include "flint.h"
 #include "ulong_extras.h"
 
 /* A table of precomputed inverses of values from 1 to 64
    inv_table[n] = i/n for all n in range[1, 64]
    inv_table[0] is set to 0, albeit it will never be called */
 
+#ifndef inv_table
+/* This table is defined in root.c and rootrem.c */
+#define inv_table inv_table
 static const double inv_table[] = {
                        0.000000000000000, 1.000000000000000, 0.500000000000000,
                        0.333333333333333, 0.250000000000000, 0.200000000000000,
@@ -44,11 +46,15 @@ static const double inv_table[] = {
                        0.015873015873016, 0.015625000000000 };
 
                        /* this table consists 65 values */
+#endif
 
 /* This table has the max possible base for a given root.
    max_base[n] = UWORD_MAX^(1/n) for n in range [1, FLINT_BITS]
    max_base[0] is set to 0, although it will never be called */
 
+#ifndef max_base
+/* This table is defined in root.c and rootrem.c */
+#define max_base max_base
 static const mp_limb_t max_base[] = {
 #ifdef FLINT64
                         UWORD(0), UWORD_MAX, UWORD(4294967296), UWORD(2642245), UWORD(65536),
@@ -72,6 +78,7 @@ static const mp_limb_t max_base[] = {
 
                         /* this table consists of 65 values in case of FLINT64,
                            otherwise 33 */
+#endif
 
 mp_limb_t
 n_root(mp_limb_t n, mp_limb_t root)
