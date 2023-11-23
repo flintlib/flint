@@ -12,6 +12,11 @@
 #include "thread_support.h"
 #include "fmpz_mpoly.h"
 
+/* Defined in mul_array_threaded.c and mul_heap_threaded.c */
+#define _base_struct _base_struct_mul_array_threaded
+#define _base_t _base_t_mul_array_threaded
+#define _worker_arg_struct _worker_arg_struct_mul_array_threaded
+
 /*
     NOTE: this file is dirty - it assumes that a zero fmpz is zero
 */
@@ -947,3 +952,7 @@ int fmpz_mpoly_mul_array_threaded(
     TMP_END;
     return success;
 }
+
+#undef _base_struct
+#undef _base_t
+#undef _worker_arg_struct

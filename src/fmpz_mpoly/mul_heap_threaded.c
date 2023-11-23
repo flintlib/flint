@@ -13,6 +13,11 @@
 #include "thread_support.h"
 #include "fmpz_mpoly.h"
 
+/* Defined in mul_array_threaded.c and mul_heap_threaded.c */
+#define _base_struct _base_struct_mul_heap_threaded
+#define _base_t _base_t_mul_heap_threaded
+#define _worker_arg_struct _worker_arg_struct_mul_heap_threaded
+
 slong _fmpz_mpoly_mul_heap_part1(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc,
               const fmpz * Bcoeff, const ulong * Bexp, slong Blen,
               const fmpz * Ccoeff, const ulong * Cexp, slong Clen,
@@ -944,3 +949,7 @@ void fmpz_mpoly_mul_heap_threaded(
 
     TMP_END;
 }
+
+#undef _base_struct
+#undef _base_t
+#undef _worker_arg_struct
