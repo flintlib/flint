@@ -1310,3 +1310,5 @@ void _arb_exp_taylor_rs(mp_ptr y, mp_limb_t * error,
     TMP_END;
 }
 
+#undef TMP_ALLOC_LIMBS
+#undef FACTORIAL_TAB_SIZE

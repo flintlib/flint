@@ -536,3 +536,6 @@ arb_cos(arb_t c, const arb_t x, slong prec)
 {
     _arb_sin_cos(NULL, c, arb_midref(x), arb_radref(x), prec);
 }
+
+#undef TMP_ALLOC_LIMBS
+#undef MAGLIM

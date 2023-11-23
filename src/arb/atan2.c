@@ -11,14 +11,14 @@
 
 #include "arb.h"
 
-void
-arb_atan2(arb_t r, const arb_t b, const arb_t a, slong prec)
-{
 #define am arb_midref(a)
 #define ar arb_radref(a)
 #define bm arb_midref(b)
 #define br arb_radref(b)
 
+void
+arb_atan2(arb_t r, const arb_t b, const arb_t a, slong prec)
+{
     /* a + bi is a real number */
     if (arb_is_zero(b))
     {
@@ -110,3 +110,7 @@ arb_atan2(arb_t r, const arb_t b, const arb_t a, slong prec)
     }
 }
 
+#undef am
+#undef ar
+#undef bm
+#undef br

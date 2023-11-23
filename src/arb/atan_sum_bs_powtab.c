@@ -13,6 +13,14 @@
 #include "fmpz_vec.h"
 #include "arb.h"
 
+/* Defined in primorial.c, sin_cos_arf_bb.c, rising_fmpq_ui.c,
+ * exp_sum_bs_simple.c, exp_sum_bs_powtab.c, atan_sum_bs_simple.c,
+ * atan_sum_bs_powtab.c, atan_frac_bsplit.c and bell_sum_bsplit.c */
+#define bsplit bsplit_atan_sum_bs_powtab
+
+/* Defined in atan_sum_bs_powtab.c, exp_sum_bs_powtab.c and sin_cos_arf_bb */
+#define bsplit2 bsplit2_atan_sum_bs_powtab
+
 slong _arb_compute_bs_exponents(slong * tab, slong n);
 
 slong _arb_get_exp_pos(const slong * tab, slong step);
@@ -238,3 +246,5 @@ _arb_atan_sum_bs_powtab(fmpz_t T, fmpz_t Q, flint_bitcnt_t * Qexp,
     flint_free(xexp);
 }
 
+#undef bsplit
+#undef bsplit2

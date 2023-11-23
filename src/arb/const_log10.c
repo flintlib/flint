@@ -13,6 +13,9 @@
 #include "arb.h"
 #include "hypgeom.h"
 
+#ifndef atanh_bsplit
+/* Defined in const_euler.c and const_log10.c */
+# define atanh_bsplit atanh_bsplit
 static void
 atanh_bsplit(arb_t s, ulong c, slong a, slong prec)
 {
@@ -35,6 +38,7 @@ atanh_bsplit(arb_t s, ulong c, slong a, slong prec)
     arb_clear(t);
     hypgeom_clear(series);
 }
+#endif
 
 void
 arb_const_log10_eval(arb_t s, slong prec)

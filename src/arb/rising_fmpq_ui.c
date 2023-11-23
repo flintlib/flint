@@ -11,6 +11,11 @@
 
 #include "arb.h"
 
+/* Defined in primorial.c, sin_cos_arf_bb.c, rising_fmpq_ui.c,
+ * exp_sum_bs_simple.c, exp_sum_bs_powtab.c, atan_sum_bs_simple.c,
+ * atan_sum_bs_powtab.c, atan_frac_bsplit.c and bell_sum_bsplit.c */
+#define bsplit bsplit_rising_fmpq_ui
+
 static void
 bsplit(arb_t y, const fmpz_t p, const fmpz_t q, ulong a, ulong b, slong prec)
 {
@@ -86,3 +91,4 @@ arb_rising_fmpq_ui(arb_t y, const fmpq_t x, ulong n, slong prec)
     }
 }
 
+#undef bsplit

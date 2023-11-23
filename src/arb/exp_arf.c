@@ -411,3 +411,5 @@ arb_exp_arf(arb_t z, const arf_t x, slong prec, int minus_one, slong maglim)
         fmpz_clear(n);
     }
 }
+
+#undef TMP_ALLOC_LIMBS

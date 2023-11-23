@@ -12,6 +12,11 @@
 #include "ulong_extras.h"
 #include "arb.h"
 
+/* Defined in primorial.c, sin_cos_arf_bb.c, rising_fmpq_ui.c,
+ * exp_sum_bs_simple.c, exp_sum_bs_powtab.c, atan_sum_bs_simple.c,
+ * atan_sum_bs_powtab.c, atan_frac_bsplit.c and bell_sum_bsplit.c */
+#define bsplit bsplit_primorial
+
 #define NUM_BASECASE 30
 
 static int
@@ -168,3 +173,4 @@ arb_primorial_ui(arb_t res, ulong n, slong prec)
     }
 }
 
+#undef bsplit

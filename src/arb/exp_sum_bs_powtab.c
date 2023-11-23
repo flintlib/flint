@@ -13,6 +13,14 @@
 #include "fmpz_vec.h"
 #include "arb.h"
 
+/* Defined in primorial.c, sin_cos_arf_bb.c, rising_fmpq_ui.c,
+ * exp_sum_bs_simple.c, exp_sum_bs_powtab.c, atan_sum_bs_simple.c,
+ * atan_sum_bs_powtab.c, atan_frac_bsplit.c and bell_sum_bsplit.c */
+#define bsplit bsplit_exp_sum_bs_powtab
+
+/* Defined in atan_sum_bs_powtab.c, exp_sum_bs_powtab.c and sin_cos_arf_bb */
+#define bsplit2 bsplit2_exp_sum_bs_powtab
+
 /* When splitting [a,b) into [a,m), [m,b), we need the power x^(m-a).
    This function computes all the exponents (m-a) that can appear when
    doing binary splitting with the top-level interval [0,n),
@@ -343,3 +351,6 @@ _arb_exp_sum_bs_powtab(fmpz_t T, fmpz_t Q, flint_bitcnt_t * Qexp,
     _fmpz_vec_clear(xpow, length);
     flint_free(xexp);
 }
+
+#undef bsplit
+#undef bsplit2

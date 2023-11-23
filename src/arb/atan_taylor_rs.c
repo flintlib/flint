@@ -703,3 +703,5 @@ void _arb_atan_taylor_rs(mp_ptr y, mp_limb_t * error,
     TMP_END;
 }
 
+#undef TMP_ALLOC_LIMBS
+#undef ODD_RECIPROCAL_TAB_SIZE

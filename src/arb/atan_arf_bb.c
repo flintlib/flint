@@ -13,6 +13,11 @@
 #include "fmpz_vec.h"
 #include "arb.h"
 
+/* Defined in atan_arf_bb.c, exp_arf_bb.c and sin_cos_arf_bb.c */
+#define bs_num_terms bs_num_terms_atan_arf_bb
+#define worker worker_atan_arf_bb
+#define work_t work_t_atan_arf_bb
+
 /*
 Determine N such that the error is bounded by 2^-prec.
 We choose an N with many trailing zeros to improve efficiency
@@ -477,3 +482,6 @@ arb_atan_arf_bb(arb_t z, const arf_t x, slong prec)
     mag_clear(inp_err);
 }
 
+#undef bs_num_terms
+#undef worker
+#undef work_t

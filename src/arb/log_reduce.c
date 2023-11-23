@@ -662,6 +662,9 @@ static const double atan_rel_epsilon_inv[] = {
     -1.16883669265794326e+54,
 };
 
+#ifndef small_gaussian_primes
+/* Defined in log_primes.c and log_reduce.c */
+# define small_gaussian_primes small_gaussian_primes
 /* Consecutively, real and imaginary parts of first 64 nonreal
    Gaussian primes. */
 static const char small_gaussian_primes[] = {
@@ -672,6 +675,7 @@ static const char small_gaussian_primes[] = {
     14, 19, 13, 20, 1, 24, 8, 23, 5, 24, 17, 18, 16, 19, 4, 25, 13, 22, 6, 25, 12, 23, 1, 26,
     5, 26, 15, 22, 2, 27, 9, 26
 };
+#endif
 
 static const float small_gaussian_prime_weights[] = {
     0.0,
@@ -943,3 +947,5 @@ arb_sin_cos_arf_atan_reduction(arb_t res1, arb_t res2, const arf_t x, slong prec
         atan_rel_d,
         atan_rel_epsilon, atan_rel_epsilon_inv, 0.5 * prec);
 }
+
+#undef TERMINATOR

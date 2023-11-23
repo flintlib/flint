@@ -362,3 +362,5 @@ void arb_exp_invexp(arb_t res, arb_t res2, const arb_t x, slong prec)
         }
     }
 }
+
+#undef MAGLIM

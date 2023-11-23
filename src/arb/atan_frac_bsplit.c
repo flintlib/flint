@@ -18,6 +18,11 @@
 # include <math.h>
 #endif
 
+/* Defined in primorial.c, sin_cos_arf_bb.c, rising_fmpq_ui.c,
+ * exp_sum_bs_simple.c, exp_sum_bs_powtab.c, atan_sum_bs_simple.c,
+ * atan_sum_bs_powtab.c, atan_frac_bsplit.c and bell_sum_bsplit.c */
+#define bsplit bsplit_atan_frac_bsplit
+
 /* todo: arb arithmetic when sizes exceed prec */
 
 static void
@@ -144,3 +149,5 @@ arb_atan_frac_bsplit(arb_t s, const fmpz_t p, const fmpz_t q, int hyperbolic, sl
     fmpz_clear(R);
     mag_clear(err);
 }
+
+#undef bsplit

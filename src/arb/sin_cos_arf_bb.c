@@ -14,6 +14,24 @@
 #include "arb.h"
 #include "acb.h"
 
+/* Defined in primorial.c, sin_cos_arf_bb.c, rising_fmpq_ui.c,
+ * exp_sum_bs_simple.c, exp_sum_bs_powtab.c, atan_sum_bs_simple.c,
+ * atan_sum_bs_powtab.c, atan_frac_bsplit.c and bell_sum_bsplit.c */
+#define bsplit bsplit_sin_cos_arf_bb
+
+/* Defined in atan_arf_bb.c, exp_arf_bb.c and sin_cos_arf_bb.c */
+#define bs_num_terms bs_num_terms_sin_cos_arf_bb
+#define worker worker_sin_cos_arf_bb
+#define work_t work_t_sin_cos_arf_bb
+
+/* Defined in exp_arf_bb.c and sin_cos_arf_bb.c */
+#define pbasecase pbasecase_sin_cos_arf_bb
+#define pmerge pmerge_sin_cos_arf_bb
+#define pwork_t pwork_t_sin_cos_arf_bb
+
+/* Defined in atan_sum_bs_powtab.c, exp_sum_bs_powtab.c and sin_cos_arf_bb */
+#define bsplit2 bsplit2_sincos_arf_bb
+
 slong _arb_compute_bs_exponents(slong * tab, slong n);
 slong _arb_get_exp_pos(const slong * tab, slong step);
 
@@ -604,3 +622,12 @@ arb_sin_cos_arf_bb(arb_t zsin, arb_t zcos, const arf_t x, slong prec)
     arb_clear(tmp1);
 }
 
+#undef bsplit
+#undef bsplit2
+#undef bs_num_terms
+#undef worker
+#undef work_t
+#undef pbasecase
+#undef pmerge
+#undef pwork_t
+#undef bsplit2

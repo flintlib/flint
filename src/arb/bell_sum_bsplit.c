@@ -11,6 +11,11 @@
 
 #include "arb.h"
 
+/* Defined in primorial.c, sin_cos_arf_bb.c, rising_fmpq_ui.c,
+ * exp_sum_bs_simple.c, exp_sum_bs_powtab.c, atan_sum_bs_simple.c,
+ * atan_sum_bs_powtab.c, atan_frac_bsplit.c and bell_sum_bsplit.c */
+#define bsplit bsplit_bell_sum_bsplit
+
 static void
 bsplit(arb_t P, arb_t Q, const fmpz_t n, const fmpz_t a, const fmpz_t b, slong prec)
 {
@@ -110,3 +115,4 @@ arb_bell_sum_bsplit(arb_t res, const fmpz_t n,
     }
 }
 
+#undef bsplit

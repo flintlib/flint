@@ -393,3 +393,4 @@ arb_log_arf(arb_t z, const arf_t x, slong prec)
     }
 }
 
+#undef TMP_ALLOC_LIMBS

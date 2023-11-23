@@ -293,6 +293,9 @@ euler_bsplit_2(arb_t P, arb_t Q, arb_t T, slong n1, slong n2,
     *T = *s->T;
 }
 
+#ifndef atanh_bsplit
+/* Defined in const_euler.c and const_log10.c */
+# define atanh_bsplit atanh_bsplit
 static void
 atanh_bsplit(arb_t s, ulong c, slong a, slong prec)
 {
@@ -315,6 +318,7 @@ atanh_bsplit(arb_t s, ulong c, slong a, slong prec)
     arb_clear(t);
     hypgeom_clear(series);
 }
+#endif
 
 static ulong
 next_smooth(ulong n)
