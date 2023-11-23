@@ -12,6 +12,9 @@
 #include "acb_poly.h"
 #include "bernoulli.h"
 
+/* Defined in gamma_series.c and zeta_em_tail_bsplit.c */
+#define bsplit bsplit_zeta_em_tail_bsplit
+
 static void
 bsplit(acb_ptr P, acb_ptr T, const acb_t s, const acb_t Na,
     slong a, slong b, int cont, slong len, slong prec)
@@ -129,3 +132,4 @@ _acb_poly_zeta_em_tail_bsplit(acb_ptr z, const acb_t s, const acb_t Na, acb_srcp
     _acb_vec_clear(T, len);
 }
 
+#undef bsplit

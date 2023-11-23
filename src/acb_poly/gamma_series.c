@@ -12,6 +12,9 @@
 #include "arb_poly.h"
 #include "acb_poly.h"
 
+/* Defined in gamma_series.c and zeta_em_tail_bsplit.c */
+#define bsplit bsplit_gamma_series
+
 void acb_gamma_stirling_bound(mag_ptr err, const acb_t x, slong k0, slong knum, slong n);
 
 void acb_hypgeom_gamma_stirling_choose_param(int * reflect, slong * r, slong * n,
@@ -328,3 +331,4 @@ acb_poly_gamma_series(acb_poly_t res, const acb_poly_t f, slong n, slong prec)
     _acb_poly_normalise(res);
 }
 
+#undef bsplit
