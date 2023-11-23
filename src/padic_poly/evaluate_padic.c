@@ -43,6 +43,9 @@ static void _fmpz_mod_poly_evaluate_fmpz_horner(fmpz_t res, const fmpz *poly, sl
     }
 }
 
+#ifndef __padic_reduce
+/* Defined in compose.c, compose_pow.c and evaluate_padic.c */
+# define __padic_reduce __padic_reduce
 /*
     TODO:  Move this bit of code into "padic".
  */
@@ -67,6 +70,7 @@ static void __padic_reduce(fmpz_t u, slong *v, slong N, const padic_ctx_t ctx)
         }
     }
 }
+#endif
 
 /*
     Evaluates the polynomial $F(x) = p^w f(x)$ at $x = p^b a$, setting

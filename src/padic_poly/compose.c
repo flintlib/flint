@@ -13,6 +13,9 @@
 #include "fmpz_mod_poly.h"
 #include "padic_poly.h"
 
+#ifndef __padic_reduce
+/* Defined in compose.c, compose_pow.c and evaluate_padic.c */
+# define __padic_reduce __padic_reduce
 /*
     TODO:  Move this bit of code into "padic".
  */
@@ -37,6 +40,7 @@ static void __padic_reduce(fmpz_t u, slong *v, slong N, const padic_ctx_t ctx)
         }
     }
 }
+#endif
 
 /* Assumes that len1 > 0. */
 
