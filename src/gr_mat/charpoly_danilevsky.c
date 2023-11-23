@@ -255,3 +255,7 @@ gr_mat_charpoly_danilevsky(gr_poly_t cp, const gr_mat_t mat, gr_ctx_t ctx)
     _gr_poly_normalise(cp, ctx);   /* only needed for the zero ring */
     return status;
 }
+
+#undef MAT_ENTRY
+#undef POL_ENTRY
+#undef ADDMUL

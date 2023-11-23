@@ -12,6 +12,9 @@
 #include "gr_vec.h"
 #include "gr_mat.h"
 
+#ifndef _gr_mat_swap_rows
+/* Defined in fflu.c and lu_classical.c */
+# define _gr_mat_swap_rows _gr_mat_swap_rows
 static void
 _gr_mat_swap_rows(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx)
 {
@@ -32,6 +35,7 @@ _gr_mat_swap_rows(gr_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx)
         mat->rows[r] = u;
     }
 }
+#endif
 
 int
 gr_mat_fflu(slong * res_rank, slong * P, gr_mat_t LU, gr_ptr den, const gr_mat_t A, int rank_check, gr_ctx_t ctx)
@@ -149,3 +153,5 @@ cleanup:
     *res_rank = rank;
     return status;
 }
+
+#undef ENTRY

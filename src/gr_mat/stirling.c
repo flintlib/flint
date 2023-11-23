@@ -144,3 +144,5 @@ gr_mat_stirling(gr_mat_t mat, int kind, gr_ctx_t ctx)
     else
         return GR_DOMAIN;
 }
+
+#undef ENTRY

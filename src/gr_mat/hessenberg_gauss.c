@@ -146,3 +146,6 @@ cleanup:
 
     return status;
 }
+
+#undef MAT_ENTRY
+#undef ADDMUL

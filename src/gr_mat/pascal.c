@@ -82,3 +82,5 @@ gr_mat_pascal(gr_mat_t mat, int triangular, gr_ctx_t ctx)
 
     return status;
 }
+
+#undef ENTRY
