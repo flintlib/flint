@@ -167,8 +167,10 @@ typedef struct
                        RELATION DATA
    ***************************************************************************/
 
-   FLINT_FILE * siqs;           /* pointer to file for storing relations */
-   char * fname;          /* name of file used for relations */
+   char * siqs;           /* pointer to storage */
+   char * siqs_cur;       /* pointer to current position in storage */
+   slong siqs_alloc;      /* number of bytes allocated */
+   slong siqs_size;       /* number of bytes used */
 
    slong full_relation;   /* number of full relations */
    slong num_cycles;      /* number of possible full relations from partials */
@@ -419,6 +421,100 @@ uint64_t * block_lanczos(flint_rand_t state, slong nrows,
 
 void qsieve_square_root(fmpz_t X, fmpz_t Y, qs_t qs_inf,
    uint64_t * nullrows, slong ncols, slong l, fmpz_t N);
+
+#define QS_SIQS_SIZE_LEFT(qs_inf) ((slong) ((qs_inf)->siqs + (qs_inf)->siqs_size - (qs_inf)->siqs_cur))
+#define QS_SIQS_ALLOC_LEFT(qs_inf) ((slong) ((qs_inf)->siqs + (qs_inf)->siqs_alloc - (qs_inf)->siqs_cur))
+
+#define QS_SIQS_INIT_ALLOC_SIZE (sizeof(char) * (WORD(1) << 25)) /* 32 MB */
+
+#define QS_SIQS_INIT(qs_inf)                                \
+do                                                          \
+{                                                           \
+    (qs_inf)->siqs = flint_malloc(QS_SIQS_INIT_ALLOC_SIZE); \
+    /* Do not set (qs_inf)->siqs_cur */                     \
+    (qs_inf)->siqs_alloc = QS_SIQS_INIT_ALLOC_SIZE;         \
+    (qs_inf)->siqs_size = 0;                                \
+} while (0)
+#define QS_SIQS_REALLOC(qs_inf, size)                                   \
+do                                                                      \
+{                                                                       \
+    char * __tmp = flint_realloc((qs_inf)->siqs, size);                 \
+    (qs_inf)->siqs_cur = __tmp + ((qs_inf)->siqs_cur - (qs_inf)->siqs); \
+    (qs_inf)->siqs = __tmp;                                             \
+    (qs_inf)->siqs_alloc = (size);                                      \
+} while (0)
+#define QS_SIQS_CLEAR(qs_inf)               \
+do                                          \
+{                                           \
+    flint_free((qs_inf)->siqs);             \
+    (qs_inf)->siqs = NULL;                  \
+    /* Do not clear (qs_inf)->siqs_cur */   \
+    (qs_inf)->siqs_alloc = 0;               \
+    (qs_inf)->siqs_size = 0;                \
+} while (0)
+
+#define QS_SIQS_FCLOSE(qs_inf)  \
+do                              \
+{                               \
+    (qs_inf)->siqs_cur = NULL;  \
+} while (0)
+#define QS_SIQS_FOPEN_R(qs_inf)             \
+do                                          \
+{                                           \
+    (qs_inf)->siqs_cur = (qs_inf)->siqs;    \
+} while (0)
+#define QS_SIQS_FOPEN_W(qs_inf)             \
+do                                          \
+{                                           \
+    (qs_inf)->siqs_cur = (qs_inf)->siqs;    \
+    (qs_inf)->siqs_size = 0;                \
+} while (0)
+#define QS_SIQS_FOPEN_A(qs_inf)                                 \
+do                                                              \
+{                                                               \
+    (qs_inf)->siqs_cur = (qs_inf)->siqs + (qs_inf)->siqs_size;  \
+} while (0)
+
+#define QS_SIQS_FREAD(res, ptr, size, count, qs_inf)    \
+do                                                      \
+{                                                       \
+    slong _max_read                                     \
+        = FLINT_MIN((slong) (size) * (slong) (count),   \
+            QS_SIQS_SIZE_LEFT(qs_inf));                 \
+                                                        \
+    memcpy(ptr, (qs_inf)->siqs_cur, _max_read);         \
+    (qs_inf)->siqs_cur += _max_read;                    \
+    (res) = _max_read;                                  \
+} while (0)
+#define QS_SIQS_FREAD_NORES(ptr, size, count, qs_inf)   \
+do                                                      \
+{                                                       \
+    slong __useless;                                    \
+    QS_SIQS_FREAD(__useless, ptr, size, count, qs_inf); \
+} while (0)
+#define QS_SIQS_FWRITE(ptr, size, count, qs_inf)            \
+do                                                          \
+{                                                           \
+    slong _write_size = (slong) (size) * (slong) (count);   \
+                                                            \
+    /* Here we assume that the relation size is always */   \
+    /* less than QS_SIQS_INIT_ALLOC_SIZE */                 \
+    if (_write_size > QS_SIQS_ALLOC_LEFT(qs_inf))           \
+        QS_SIQS_REALLOC(qs_inf, 2 * (qs_inf)->siqs_alloc);  \
+                                                            \
+    memcpy((qs_inf)->siqs_cur, ptr, _write_size);           \
+    (qs_inf)->siqs_cur += _write_size;                      \
+    (qs_inf)->siqs_size += _write_size;                     \
+} while (0)
+
+#define QS_SIQS_FSEEK_SEEK_CUR(qs_inf, offset)                      \
+do                                                                  \
+{                                                                   \
+    slong _jump_size                                                \
+        = FLINT_MIN((slong) (offset), QS_SIQS_SIZE_LEFT(qs_inf));   \
+                                                                    \
+    (qs_inf)->siqs_cur += _jump_size;                               \
+} while (0)
 
 #ifdef __cplusplus
 }

@@ -10,17 +10,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <ctype.h>
 #include "fmpz.h"
 #include "qsieve.h"
-
-#ifdef __GNUC__
-# define memset __builtin_memset
-#else
-# include <string.h>
-#endif
 
 #define HASH_MULT (2654435761U)       /* hash function, taken from 'msieve' */
 #define HASH(a) ((ulong)((((unsigned int) a) * HASH_MULT) >> (12)))
@@ -131,26 +125,26 @@ void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime, const fmpz_t Y, const qs
         + sizeof(fac_t) * num_factors           /* factors */
         + sizeof(slong)                         /* Y->_mp_size */
         + sizeof(mp_limb_t) * (Ysz != 0 ? FLINT_ABS(Ysz) : 1); /* Y->_mp_d */
-    fwrite(&write_size, sizeof(slong), 1, (FILE *) qs_inf->siqs);
+    QS_SIQS_FWRITE(&write_size, sizeof(slong), 1, qs_inf);
 
     /* Write large prime */
-    fwrite(&prime, sizeof(mp_limb_t), 1, (FILE *) qs_inf->siqs);
+    QS_SIQS_FWRITE(&prime, sizeof(mp_limb_t), 1, qs_inf);
 
     /* NOTE: We do not have to write small primes. */
     /* Write number of small primes */
-    fwrite(&qs_inf->small_primes, sizeof(slong), 1, (FILE *) qs_inf->siqs);
+    QS_SIQS_FWRITE(&qs_inf->small_primes, sizeof(slong), 1, qs_inf);
 
     /* Write small primes */
-    fwrite(small, sizeof(slong), qs_inf->small_primes, (FILE *) qs_inf->siqs);
+    QS_SIQS_FWRITE(small, sizeof(slong), qs_inf->small_primes, qs_inf);
 
     /* Write number of factors */
-    fwrite(&num_factors, sizeof(slong), 1, (FILE *) qs_inf->siqs);
+    QS_SIQS_FWRITE(&num_factors, sizeof(slong), 1, qs_inf);
 
     /* Write factors and exponents */
-    fwrite(factor, sizeof(fac_t), num_factors, (FILE *) qs_inf->siqs);
+    QS_SIQS_FWRITE(factor, sizeof(fac_t), num_factors, qs_inf);
 
     /* Write Y->_mp_size (or mock it) */
-    fwrite(&Ysz, sizeof(slong), 1, (FILE *) qs_inf->siqs);
+    QS_SIQS_FWRITE(&Ysz, sizeof(slong), 1, qs_inf);
 
     /* Write Y->_mp_d (or mock it) */
     if (!COEFF_IS_MPZ(*Y))
@@ -158,14 +152,14 @@ void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime, const fmpz_t Y, const qs
         slong abslimb = FLINT_ABS(*Y);
 
         /* Write mock Y->_mp_d */
-        fwrite(&abslimb, sizeof(mp_limb_t), 1, (FILE *) qs_inf->siqs);
+        QS_SIQS_FWRITE(&abslimb, sizeof(mp_limb_t), 1, qs_inf);
     }
     else
     {
         mp_srcptr Yd = COEFF_TO_PTR(*Y)->_mp_d;
 
         /* Write Y->_mp_d */
-        fwrite(Yd, sizeof(mp_limb_t), FLINT_ABS(Ysz), (FILE *) qs_inf->siqs);
+        QS_SIQS_FWRITE(Yd, sizeof(mp_limb_t), FLINT_ABS(Ysz), qs_inf);
     }
 }
 
@@ -264,22 +258,22 @@ relation_t qsieve_parse_relation(qs_t qs_inf)
 
     /* NOTE: We can use qs_inf->small_primes here instead of reading. */
     /* Get number of small primes */
-    fread(&rel.small_primes, sizeof(slong), 1, (FILE *) qs_inf->siqs);
+    QS_SIQS_FREAD_NORES(&rel.small_primes, sizeof(slong), 1, qs_inf);
 
     /* Get small primes */
     rel.small = flint_malloc(rel.small_primes * sizeof(slong));
-    fread(rel.small, sizeof(slong), rel.small_primes, (FILE *) qs_inf->siqs);
+    QS_SIQS_FREAD_NORES(rel.small, sizeof(slong), rel.small_primes, qs_inf);
 
     /* Get number of factors */
-    fread(&rel.num_factors, sizeof(slong), 1, (FILE *) qs_inf->siqs);
+    QS_SIQS_FREAD_NORES(&rel.num_factors, sizeof(slong), 1, qs_inf);
 
     /* Get factors */
     rel.factor = flint_malloc(rel.num_factors * sizeof(fac_t));
-    fread(rel.factor, sizeof(fac_t), rel.num_factors, (FILE *) qs_inf->siqs);
+    QS_SIQS_FREAD_NORES(rel.factor, sizeof(fac_t), rel.num_factors, qs_inf);
 
     /* Get Ysz */
     Ysz = 0;
-    fread(&Ysz, sizeof(slong), 1, (FILE *) qs_inf->siqs);
+    QS_SIQS_FREAD_NORES(&Ysz, sizeof(slong), 1, qs_inf);
 
     /* Get Y */
     fmpz_init(rel.Y);
@@ -287,7 +281,7 @@ relation_t qsieve_parse_relation(qs_t qs_inf)
     {
         mp_limb_t abslimb = 0;
 
-        fread(&abslimb, sizeof(mp_limb_t), 1, (FILE *) qs_inf->siqs);
+        QS_SIQS_FREAD_NORES(&abslimb, sizeof(mp_limb_t), 1, qs_inf);
 
 #if COEFF_MAX != -COEFF_MIN
 # error
@@ -305,7 +299,7 @@ relation_t qsieve_parse_relation(qs_t qs_inf)
         if (mY->_mp_alloc < FLINT_ABS(Ysz))
             _mpz_realloc(mY, FLINT_ABS(Ysz));
 
-        fread(mY->_mp_d, sizeof(mp_limb_t), FLINT_ABS(Ysz), (FILE *) qs_inf->siqs);
+        QS_SIQS_FREAD_NORES(mY->_mp_d, sizeof(mp_limb_t), FLINT_ABS(Ysz), qs_inf);
         *rel.Y = PTR_TO_COEFF(mY);
     }
 
@@ -557,11 +551,8 @@ int qsieve_process_relation(qs_t qs_inf)
     relation_t * rlist;
     int done = 0;
 
-    if (qs_inf->siqs != NULL && fclose((FILE *) qs_inf->siqs))
-        flint_throw(FLINT_ERROR, "fclose fail\n");
-    qs_inf->siqs = (FLINT_FILE *) fopen(qs_inf->fname, "rb");
-    if (qs_inf->siqs == NULL)
-        flint_throw(FLINT_ERROR, "fopen fail\n");
+    QS_SIQS_FCLOSE(qs_inf);
+    QS_SIQS_FOPEN_R(qs_inf);
 
 #if QS_DEBUG & 64
     flint_printf("Getting relations\n");
@@ -569,15 +560,15 @@ int qsieve_process_relation(qs_t qs_inf)
 
     while (1)
     {
-        int siqs_eof;
-        slong write_size = 0;
+        int read_size;
+        slong relation_size = 0;
 
-        siqs_eof = !fread(&write_size, sizeof(slong), 1, (FILE *) qs_inf->siqs);
+        QS_SIQS_FREAD(read_size, &relation_size, sizeof(slong), 1, qs_inf);
 
-        if (siqs_eof)
+        if (read_size != sizeof(slong))
             break;
 
-        fread(&prime, sizeof(mp_limb_t), 1, (FILE *) qs_inf->siqs);
+        QS_SIQS_FREAD_NORES(&prime, sizeof(mp_limb_t), 1, qs_inf);
         entry = qsieve_get_table_entry(qs_inf, prime);
 
         if (num_relations == rel_size)
@@ -596,13 +587,11 @@ int qsieve_process_relation(qs_t qs_inf)
         {
             /* We have to get to the next relation in the file. We have already
              * read write_size (is a slong) and large prime (is an mp_limb_t).*/
-            fseek((FILE *) qs_inf->siqs, write_size - sizeof(slong) - sizeof(mp_limb_t), SEEK_CUR);
+            QS_SIQS_FSEEK_SEEK_CUR(qs_inf, relation_size - sizeof(slong) - sizeof(mp_limb_t));
         }
     }
 
-    if(fclose((FILE *) qs_inf->siqs))
-        flint_throw(FLINT_ERROR, "fclose fail\n");
-    qs_inf->siqs = NULL;
+    QS_SIQS_FCLOSE(qs_inf);
 
 #if QS_DEBUG & 64
     flint_printf("Removing duplicates\n");
@@ -655,11 +644,8 @@ int qsieve_process_relation(qs_t qs_inf)
     {
        qs_inf->edges -= 100;
        done = 0;
-       if (qs_inf->siqs != NULL && fclose((FILE *) qs_inf->siqs))
-           flint_throw(FLINT_ERROR, "fclose fail\n");
-       qs_inf->siqs = (FLINT_FILE *) fopen(qs_inf->fname, "ab");
-       if (qs_inf->siqs == NULL)
-           flint_throw(FLINT_ERROR, "fopen fail\n");
+       QS_SIQS_FCLOSE(qs_inf);
+       QS_SIQS_FOPEN_A(qs_inf);
     } else
     {
        done = 1;
