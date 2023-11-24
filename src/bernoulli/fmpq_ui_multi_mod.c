@@ -295,3 +295,5 @@ _bernoulli_fmpq_ui_multi_mod(fmpz_t num, fmpz_t den, ulong n, double alpha)
     mag_clear(primes_product);
 }
 
+#undef TIMING
+#undef DEBUG

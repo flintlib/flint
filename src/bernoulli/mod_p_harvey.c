@@ -889,3 +889,5 @@ ulong bernoulli_mod_p_harvey(ulong k, ulong p)
     return n_mulmod2_preinv(x, k % p, p, pinv);
 }
 
+#undef DEBUG
+#undef TIMING
