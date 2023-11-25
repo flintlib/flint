@@ -44,3 +44,7 @@ nmod_poly_mat_sqr(nmod_poly_mat_t C, const nmod_poly_mat_t A)
             nmod_poly_mat_sqr_KS(C, A);
     }
 }
+
+#undef KS_MIN_DIM
+#undef INTERPOLATE_MIN_DIM
+#undef KS_MAX_LENGTH

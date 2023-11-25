@@ -96,3 +96,5 @@ nmod_poly_mat_fflu(nmod_poly_mat_t B, nmod_poly_t den, slong * perm,
     nmod_poly_clear(t);
     return rank;
 }
+
+#undef E

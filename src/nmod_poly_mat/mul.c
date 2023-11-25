@@ -52,3 +52,7 @@ nmod_poly_mat_mul(nmod_poly_mat_t C, const nmod_poly_mat_t A,
             nmod_poly_mat_mul_KS(C, A, B);
     }
 }
+
+#undef KS_MIN_DIM
+#undef INTERPOLATE_MIN_DIM
+#undef KS_MAX_LENGTH

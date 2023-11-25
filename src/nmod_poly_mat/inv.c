@@ -88,3 +88,5 @@ nmod_poly_mat_inv(nmod_poly_mat_t Ainv, nmod_poly_t den,
         return result;
     }
 }
+
+#undef E
