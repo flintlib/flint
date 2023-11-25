@@ -13,8 +13,8 @@
 #include "fmpq.h"
 #include "arb_hypgeom.h"
 
-#define LOG2 0.69314718055994530942
 #define EXP1 2.7182818284590452354
+#define LOG2 0.69314718055994530942
 #define INV_LOG2 1.4426950408889634074
 
 void
@@ -638,3 +638,6 @@ arb_hypgeom_erfc(arb_t res, const arb_t z, slong prec)
     arb_neg(res, res);
 }
 
+#undef EXP1
+#undef LOG2
+#undef INV_LOG2

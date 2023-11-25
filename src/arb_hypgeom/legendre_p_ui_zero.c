@@ -13,6 +13,9 @@
 #include "fmpz_vec.h"
 #include "arb_hypgeom.h"
 
+/* Defined in legendre_p_ui_zero.c and legendre_p_ui_one.c */
+#define sum_rs_inner sum_rs_inner_legendre_p_ui_zero
+
 #define UNROLL 4
 
 static void
@@ -239,3 +242,6 @@ arb_hypgeom_legendre_p_ui_zero(arb_t res, arb_t res2, ulong n,
     arb_clear(v);
 }
 
+#undef UNROLL
+
+#undef sum_rs_inner

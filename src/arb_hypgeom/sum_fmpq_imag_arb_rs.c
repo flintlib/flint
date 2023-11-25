@@ -19,12 +19,19 @@
 # include <math.h>
 #endif
 
+#ifndef d_log2_fac
+/* Defined in sum_fmpq_arb_rs.c and sum_fmpq_imag_arb_rs.c */
+# define d_log2_fac d_log2_fac
 static double
 d_log2_fac(double n)
 {
     return (n * (log(n) - 1.0)) * 1.4426950408889634;
 }
+#endif
 
+#ifndef tail_precision
+/* Defined in sum_fmpq_arb_rs.c and sum_fmpq_imag_arb_rs.c */
+# define tail_precision tail_precision
 static slong
 tail_precision(slong k, double min_k, slong alen, slong blen, double log2z, double log2max, slong prec)
 {
@@ -46,6 +53,7 @@ tail_precision(slong k, double min_k, slong alen, slong blen, double log2z, doub
 
     return new_prec;
 }
+#endif
 
 /* Return approximation of log2(|x|), clambed between COEFF_MIN and COEFF_MAX. */
 double arf_get_d_log2_abs_approx_clamped(const arf_t x);

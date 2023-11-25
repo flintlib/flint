@@ -12,6 +12,10 @@
 #include "arb_poly.h"
 #include "arb_hypgeom.h"
 
+/* Defined in sum_fmpq_arb_bs.c, sum_fmpq_imag_arb_bs.c, rising_ui_bs.c and
+ * rising_ui_jet_bs.c */
+#define bsplit bsplit_rising_ui_jet_bs
+
 static void
 bsplit(arb_ptr res, const arb_t x, ulong a, ulong b, slong trunc, slong prec)
 {
@@ -83,3 +87,4 @@ arb_hypgeom_rising_ui_jet_bs(arb_ptr res, const arb_t x, ulong n, slong len, slo
     bsplit(res, x, 0, n, len, prec);
 }
 
+#undef bsplit

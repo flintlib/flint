@@ -14,6 +14,13 @@
 #include "acb_calc.h"
 #include "double_interval.h"
 
+/* Defined in 1f1_integration.c, 2f1_integration.c and u_integration.c */
+#define di_integrand_edge di_integrand_edge_u_integration
+#define di_integrand_edge_diff di_integrand_edge_diff_u_integration
+#define integrand_wide_bound5 integrand_wide_bound5_u_integration
+#define integrand integrand_u_integration
+#define estimate_magnitude estimate_magnitude_u_integration
+
 /*
 
 Integrand (see comments for 1f1_integration):
@@ -65,6 +72,9 @@ di_integrand_edge_diff(di_t u, di_t v, di_t a1, di_t ba1, di_t z, int which)
         return di_fast_mul(v, di_fast_add(Y, Z));
 }
 
+#ifndef di_subinterval
+/* Defined in 1f1_integration.c, 2f1_integration.c and u_integration.c */
+# define di_subinterval di_subinterval
 static di_t di_subinterval(di_t x, slong i, slong N)
 {
     di_t res;
@@ -77,6 +87,7 @@ static di_t di_subinterval(di_t x, slong i, slong N)
 
     return res;
 }
+#endif
 
 static void
 integrand_wide_bound5(acb_t res, const acb_t t, const arb_t a1, const arb_t ba1, const arb_t z, slong prec)
@@ -163,6 +174,9 @@ integrand_wide_bound5(acb_t res, const acb_t t, const arb_t a1, const arb_t ba1,
     arb_clear(abound);
 }
 
+#ifndef acb_my_pow_arb
+/* Defined in 1f1_integration.c, 2f1_integration.c and u_integration.c */
+# define acb_my_pow_arb acb_my_pow_arb
 /* todo: fix acb_pow(_arb) */
 static void
 acb_my_pow_arb(acb_t res, const acb_t a, const arb_t b, slong prec)
@@ -197,6 +211,7 @@ acb_my_pow_arb(acb_t res, const acb_t a, const arb_t b, slong prec)
         acb_pow_arb(res, a, b, prec);
     }
 }
+#endif
 
 static int
 integrand(acb_ptr out, const acb_t t, void * param, slong order, slong prec)
@@ -508,3 +523,9 @@ arb_hypgeom_u_integration(arb_t res, const arb_t a, const arb_t b, const arb_t z
     arb_swap(res, res2);
     arb_clear(res2);
 }
+
+#undef di_integrand_edge
+#undef di_integrand_edge_diff
+#undef integrand_wide_bound5
+#undef integrand
+#undef estimate_magnitude

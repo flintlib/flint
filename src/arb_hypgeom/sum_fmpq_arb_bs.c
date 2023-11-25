@@ -11,6 +11,13 @@
 
 #include "arb_hypgeom.h"
 
+/* Defined in sum_fmpq_arb_bs.c, sum_fmpq_imag_arb_bs.c, rising_ui_bs.c and
+ * rising_ui_jet_bs.c */
+#define bsplit bsplit_sum_fmpq_arb_bs
+
+#ifndef factor
+/* Defined in sum_fmpq_arb_bs.c and sum_fmpq_imag_arb_bs.c */
+# define factor factor
 static void
 factor(arb_t A, const fmpq * a, slong alen, const fmpq * b, slong blen, const fmpz_t bden, const arb_t z, slong k, slong prec)
 {
@@ -54,6 +61,7 @@ factor(arb_t A, const fmpq * a, slong alen, const fmpq * b, slong blen, const fm
     fmpz_clear(t);
     fmpz_clear(u);
 }
+#endif
 
 static void
 bsplit(arb_t A1, arb_t B1, arb_t C1,
@@ -157,3 +165,4 @@ arb_hypgeom_sum_fmpq_arb_bs(arb_t res, const fmpq * a, slong alen, const fmpq * 
     fmpz_clear(bden);
 }
 
+#undef bsplit
