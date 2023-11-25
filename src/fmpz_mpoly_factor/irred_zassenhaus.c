@@ -13,6 +13,9 @@
 #include "fmpz_mpoly_factor.h"
 #include "nmod_mpoly_factor.h"
 
+/* Defined in irred_zassenhaus.c and lcc_kaltofen.c */
+#define _try_lift _try_lift_irred_zassenhaus
+
 /*
     return:
         1: success
@@ -401,3 +404,5 @@ cleanup:
 
     return success;
 }
+
+#undef _try_lift

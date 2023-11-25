@@ -13,6 +13,9 @@
 #include "fmpz_mpoly_factor.h"
 #include "n_poly.h"
 
+/* Defined in irred_zassenhaus.c and lcc_kaltofen.c */
+#define _try_lift _try_lift_lcc_kaltofen
+
 static void fmpz_mpoly_convert_perm(
     fmpz_mpoly_t A,
     flint_bitcnt_t Abits,
@@ -731,3 +734,4 @@ cleanup:
     return success;
 }
 
+#undef _try_lift
