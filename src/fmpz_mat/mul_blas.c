@@ -19,6 +19,13 @@
 #include "thread_support.h"
 #include "cblas.h"
 
+/* Defined in mul_blas.c and mul_multi_mod.c */
+#define _crt_worker _crt_worker_mul_blas
+#define _mod_worker _mod_worker_mul_blas
+
+/* Defined in mul_blas.c and mul_double_word.c */
+#define _red_worker _red_worker_mul_blas
+
 typedef struct {
     slong m;
     slong k;
@@ -620,3 +627,7 @@ int fmpz_mat_mul_blas(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
     return _fmpz_mat_mul_blas(C, A, Abits, B, Bbits, sign, Cbits);
 }
 
+#undef _crt_worker
+#undef _mod_worker
+
+#undef _red_worker

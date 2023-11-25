@@ -19,6 +19,9 @@
 #define _worker_arg _worker_arg_mul_double_word
 #define _mul_worker _mul_worker_mul_double_word
 
+/* Defined in mul_blas.c and mul_double_word.c */
+#define _red_worker _red_worker_mul_double_word
+
 /*
     There is a branchy version because the k loop takes time to warmup.
     Once k is big enough, the loop runs fast and there is no point in checking
@@ -563,3 +566,5 @@ void _fmpz_mat_mul_double_word(
 
 #undef _worker_arg
 #undef _mul_worker
+
+#undef _red_worker
