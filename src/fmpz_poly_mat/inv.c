@@ -88,3 +88,5 @@ fmpz_poly_mat_inv(fmpz_poly_mat_t Ainv, fmpz_poly_t den,
         return result;
     }
 }
+
+#undef E

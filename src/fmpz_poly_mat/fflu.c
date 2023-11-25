@@ -96,3 +96,5 @@ fmpz_poly_mat_fflu(fmpz_poly_mat_t B, fmpz_poly_t den, slong * perm,
     fmpz_poly_clear(t);
     return rank;
 }
+
+#undef E
