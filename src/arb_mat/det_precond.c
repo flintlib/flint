@@ -12,6 +12,9 @@
 #include "perm.h"
 #include "arb_mat.h"
 
+/* Defined in approx_lu.c and det_precond.c */
+#define _apply_permutation _apply_permutation_det_precond
+
 static void
 _apply_permutation(arb_mat_t A, slong * P, slong n)
 {
@@ -140,3 +143,5 @@ arb_mat_det_precond(arb_t det, const arb_mat_t A, slong prec)
     _perm_clear(P);
     arb_mat_clear(LU);
 }
+
+#undef _apply_permutation

@@ -11,11 +11,15 @@
 
 #include "arb_mat.h"
 
+#ifndef arb_approx_div
+/* Defined in approx_solve_tril.c and approx_solve_triu.c */
+# define arb_approx_div arb_approx_div
 static void
 arb_approx_div(arb_t z, const arb_t x, const arb_t y, slong prec)
 {
     arf_div(arb_midref(z), arb_midref(x), arb_midref(y), prec, ARB_RND);
 }
+#endif
 
 void
 arb_mat_approx_solve_triu_classical(arb_mat_t X, const arb_mat_t U,

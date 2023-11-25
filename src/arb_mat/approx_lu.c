@@ -11,6 +11,9 @@
 
 #include "arb_mat.h"
 
+/* Defined in approx_lu.c and det_precond.c */
+#define _apply_permutation _apply_permutation_approx_lu
+
 static void
 _apply_permutation(slong * AP, arb_mat_t A, slong * P,
     slong n, slong offset)
@@ -191,3 +194,5 @@ arb_mat_approx_lu(slong * P, arb_mat_t LU, const arb_mat_t A, slong prec)
     else
         return arb_mat_approx_lu_recursive(P, LU, A, prec);
 }
+
+#undef _apply_permutation

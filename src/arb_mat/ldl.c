@@ -11,11 +11,15 @@
 
 #include "arb_mat.h"
 
+#ifndef _arb_sqr
+/* Defined in ldl.c and inv_cho_precomp.c */
+# define _arb_sqr _arb_sqr
 static void
 _arb_sqr(arb_t dest, const arb_t src, slong prec)
 {
     arb_mul(dest, src, src, prec);
 }
+#endif
 
 int
 _arb_mat_ldl_inplace(arb_mat_t A, slong prec)
