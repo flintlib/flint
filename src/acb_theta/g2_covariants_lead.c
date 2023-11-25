@@ -12,6 +12,9 @@
 #include "acb_poly.h"
 #include "acb_theta.h"
 
+/* Defined in g2_covariants.c and g2_covariants_lead.c */
+#define acb_theta_g2_transvectants acb_theta_g2_transvectants_g2_covariants_lead
+
 static void
 acb_theta_g2_transvectants(acb_ptr res, const acb_poly_t f, slong prec)
 {
@@ -93,3 +96,5 @@ acb_theta_g2_covariants_lead(acb_ptr res, const acb_poly_t f, slong prec)
 
     fmpz_clear(m);
 }
+
+#undef acb_theta_g2_transvectants

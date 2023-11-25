@@ -14,6 +14,10 @@
 #include "acb_modular.h"
 #include "acb_theta.h"
 
+/* Defined in g2_jet_naive_1.c, jet_naive_00.c, jet_naive_all.c, naive_00.c and
+ * naive_0b.c */
+#define worker worker_naive_0b
+
 static void
 worker(acb_ptr th, acb_srcptr v1, acb_srcptr v2, const slong * precs, slong len,
     const acb_t cofactor, const slong * coords, slong ord, slong g, slong prec, slong fullprec)
@@ -168,3 +172,5 @@ acb_theta_naive_0b(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slo
         acb_theta_naive_0b_gen(th, zs, nb, tau, prec);
     }
 }
+
+#undef worker

@@ -12,6 +12,10 @@
 #include "acb_mat.h"
 #include "acb_theta.h"
 
+/* Defined in g2_jet_naive_1.c, jet_naive_00.c, jet_naive_all.c, naive_00.c and
+ * naive_0b.c */
+#define worker worker_g2_jet_naive_1
+
 #define ACB_THETA_G2_JET_NAIVE_1_THRESHOLD 100
 
 static void
@@ -249,3 +253,5 @@ acb_theta_g2_jet_naive_1(acb_ptr dth, const acb_mat_t tau, slong prec)
     acb_clear(c);
     arb_clear(u);
 }
+
+#undef worker
