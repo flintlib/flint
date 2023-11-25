@@ -185,3 +185,6 @@ int gr_poly_resultant_hgcd(gr_ptr r, const gr_poly_t f,
 
     return status;
 }
+
+#undef GR_VEC_NORM
+#undef __divrem

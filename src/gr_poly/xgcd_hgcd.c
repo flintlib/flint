@@ -365,3 +365,11 @@ gr_poly_xgcd_hgcd(gr_poly_t G, gr_poly_t S, gr_poly_t T, const gr_poly_t A, cons
         return status;
     }
 }
+
+#undef GR_VEC_NORM
+#undef __set
+#undef __add
+#undef __sub
+#undef __mul
+#undef __divrem
+#undef __div

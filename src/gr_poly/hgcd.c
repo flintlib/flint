@@ -739,3 +739,14 @@ int _gr_poly_hgcd(gr_ptr r, slong * sgn, gr_ptr * M, slong * lenM,
 
     return status;
 }
+
+#undef OFFSET
+#undef GR_VEC_NORM
+#undef __attach_shift
+#undef __attach_truncate
+#undef __set
+#undef __swap
+#undef __add
+#undef __sub
+#undef __mul
+#undef __divrem

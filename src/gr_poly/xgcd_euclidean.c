@@ -271,3 +271,6 @@ gr_poly_xgcd_euclidean(gr_poly_t G, gr_poly_t S, gr_poly_t T, const gr_poly_t A,
         return status;
     }
 }
+
+#undef GR_VEC_NORM
+#undef GR_VEC_SWAP

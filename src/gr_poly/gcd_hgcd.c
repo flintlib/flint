@@ -156,3 +156,7 @@ int gr_poly_gcd_hgcd(gr_poly_t G, const gr_poly_t A, const gr_poly_t B, slong in
         }
     }
 }
+
+#undef GR_VEC_NORM
+#undef __set
+#undef __divrem

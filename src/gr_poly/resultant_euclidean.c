@@ -132,3 +132,5 @@ int gr_poly_resultant_euclidean(gr_ptr r, const gr_poly_t f,
 
     return status;
 }
+
+#undef GR_VEC_NORM
