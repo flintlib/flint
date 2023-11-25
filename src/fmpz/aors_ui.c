@@ -242,3 +242,5 @@ fmpz_sub_ui(fmpz_t res, const fmpz_t x, ulong y)
         }
     }
 }
+
+#undef VARIANT
