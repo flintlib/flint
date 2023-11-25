@@ -21,6 +21,9 @@ Todo items present in the original code:
 
 #include "acb_mat.h"
 
+#ifndef acb_approx_mag
+/* Defined in approx_eig_qr.c, eig_enclosure_rump.c and eig_multiple_rump.c */
+# define acb_approx_mag acb_approx_mag
 static void
 acb_approx_mag(mag_t res, const acb_t x)
 {
@@ -31,7 +34,12 @@ acb_approx_mag(mag_t res, const acb_t x)
     mag_hypot(res, res, t);
     mag_clear(t);
 }
+#endif
 
+#ifndef acb_approx_mul
+/* Defined in approx_solve_tril.c, approx_solve_triu.c, approx_lu.c and
+ * approx_eig_qr.c */
+# define acb_approx_mul acb_approx_mul
 static void
 acb_approx_mul(acb_t res, const acb_t x, const acb_t y, slong prec)
 {
@@ -39,6 +47,7 @@ acb_approx_mul(acb_t res, const acb_t x, const acb_t y, slong prec)
         arb_midref(acb_realref(x)), arb_midref(acb_imagref(x)),
         arb_midref(acb_realref(y)), arb_midref(acb_imagref(y)), prec, ARF_RND_DOWN);
 }
+#endif
 
 static void
 acb_approx_add(acb_t res, const acb_t x, const acb_t y, slong prec)
@@ -47,12 +56,16 @@ acb_approx_add(acb_t res, const acb_t x, const acb_t y, slong prec)
     arf_add(arb_midref(acb_imagref(res)), arb_midref(acb_imagref(x)), arb_midref(acb_imagref(y)), prec, ARF_RND_DOWN);
 }
 
+#ifndef acb_approx_sub
+/* Defined in approx_eig_qr.c and eig_enclosure_rump.c */
+# define acb_approx_sub acb_approx_sub
 static void
 acb_approx_sub(acb_t res, const acb_t x, const acb_t y, slong prec)
 {
     arf_sub(arb_midref(acb_realref(res)), arb_midref(acb_realref(x)), arb_midref(acb_realref(y)), prec, ARF_RND_DOWN);
     arf_sub(arb_midref(acb_imagref(res)), arb_midref(acb_imagref(x)), arb_midref(acb_imagref(y)), prec, ARF_RND_DOWN);
 }
+#endif
 
 static void
 acb_approx_set(acb_t res, const acb_t x)
@@ -84,7 +97,7 @@ acb_approx_inv(acb_t z, const acb_t x, slong prec)
 }
 
 static void
-acb_approx_div(acb_t z, const acb_t x, const acb_t y, slong prec)
+_acb_approx_div(acb_t z, const acb_t x, const acb_t y, slong prec)
 {
     acb_t t;
     acb_init(t);
@@ -594,7 +607,7 @@ acb_mat_approx_eig_triu_r(acb_mat_t ER, const acb_mat_t A, slong prec)
                 arf_set_mag(arb_midref(acb_realref(t)), smin);
             }
 
-            acb_approx_div(acb_mat_entry(ER, i, j), r, t, prec);
+            _acb_approx_div(acb_mat_entry(ER, i, j), r, t, prec);
             acb_neg(acb_mat_entry(ER, i, j), acb_mat_entry(ER, i, j));
 
             acb_approx_mag(tm, r);
@@ -698,7 +711,7 @@ acb_mat_approx_eig_triu_l(acb_mat_t EL, const acb_mat_t A, slong prec)
                 arf_set_mag(arb_midref(acb_realref(t)), smin);
             }
 
-            acb_approx_div(acb_mat_entry(EL, i, j), r, t, prec);
+            _acb_approx_div(acb_mat_entry(EL, i, j), r, t, prec);
             acb_neg(acb_mat_entry(EL, i, j), acb_mat_entry(EL, i, j));
 
             acb_approx_mag(tm, r);

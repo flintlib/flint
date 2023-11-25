@@ -11,8 +11,11 @@
 
 #include "acb_mat.h"
 
+#ifndef apply_permutation
+/* Defined in approx_lu.c and lu_recursive.c */
+# define apply_permutation apply_permutation
 static void
-_apply_permutation(slong * AP, acb_mat_t A, slong * P,
+apply_permutation(slong * AP, acb_mat_t A, slong * P,
     slong n, slong offset)
 {
     if (n != 0)
@@ -34,14 +37,20 @@ _apply_permutation(slong * AP, acb_mat_t A, slong * P,
         flint_free(APtmp);
     }
 }
+#endif
 
+#ifndef acb_approx_mul
+/* Defined in approx_solve_tril.c, approx_solve_triu.c, approx_lu.c and
+ * approx_eig_qr.c */
+# define acb_approx_mul acb_approx_mul
 static void
-_acb_approx_mul(acb_t res, const acb_t x, const acb_t y, slong prec)
+acb_approx_mul(acb_t res, const acb_t x, const acb_t y, slong prec)
 {
     arf_complex_mul(arb_midref(acb_realref(res)), arb_midref(acb_imagref(res)),
         arb_midref(acb_realref(x)), arb_midref(acb_imagref(x)),
         arb_midref(acb_realref(y)), arb_midref(acb_imagref(y)), prec, ARB_RND);
 }
+#endif
 
 static void
 _acb_approx_inv(acb_t z, const acb_t x, slong prec)
@@ -68,7 +77,7 @@ _acb_vec_approx_scalar_addmul(acb_ptr res, acb_srcptr vec,
 
     for (i = 0; i < len; i++)
     {
-        _acb_approx_mul(t, vec + i, c, prec);
+        acb_approx_mul(t, vec + i, c, prec);
 
         arf_add(arb_midref(acb_realref(res + i)),
             arb_midref(acb_realref(res + i)),
@@ -124,7 +133,7 @@ acb_mat_approx_lu_classical(slong * P, acb_mat_t LU, const acb_mat_t A, slong pr
 
         for (j = row + 1; j < m; j++)
         {
-            _acb_approx_mul(e, a[j] + col, d, prec);
+            acb_approx_mul(e, a[j] + col, d, prec);
             acb_neg(e, e);
             _acb_vec_approx_scalar_addmul(a[j] + col,
                 a[row] + col, n - col, e, prec);
@@ -181,7 +190,7 @@ acb_mat_approx_lu_recursive(slong * P, acb_mat_t LU, const acb_mat_t A, slong pr
     /* r1 = rank of A0 */
     r1 = FLINT_MIN(m, n1);
 
-    _apply_permutation(P, LU, P1, m, 0);
+    apply_permutation(P, LU, P1, m, 0);
 
     acb_mat_window_init(A00, LU, 0, 0, r1, r1);
     acb_mat_window_init(A10, LU, r1, 0, m, r1);
@@ -205,7 +214,7 @@ acb_mat_approx_lu_recursive(slong * P, acb_mat_t LU, const acb_mat_t A, slong pr
     if (!r2)
         r1 = r2 = 0;
     else
-        _apply_permutation(P, LU, P1, m - r1, r1);
+        apply_permutation(P, LU, P1, m - r1, r1);
 
     flint_free(P1);
     acb_mat_window_clear(A00);

@@ -11,8 +11,11 @@
 
 #include "acb_mat.h"
 
+#ifndef apply_permutation
+/* Defined in approx_lu.c and lu_recursive.c */
+# define apply_permutation apply_permutation
 static void
-_apply_permutation(slong * AP, acb_mat_t A, slong * P,
+apply_permutation(slong * AP, acb_mat_t A, slong * P,
     slong n, slong offset)
 {
     if (n != 0)
@@ -34,6 +37,7 @@ _apply_permutation(slong * AP, acb_mat_t A, slong * P,
         flint_free(APtmp);
     }
 }
+#endif
 
 int
 acb_mat_lu_recursive(slong * P, acb_mat_t LU, const acb_mat_t A, slong prec)
@@ -75,7 +79,7 @@ acb_mat_lu_recursive(slong * P, acb_mat_t LU, const acb_mat_t A, slong prec)
     /* r1 = rank of A0 */
     r1 = FLINT_MIN(m, n1);
 
-    _apply_permutation(P, LU, P1, m, 0);
+    apply_permutation(P, LU, P1, m, 0);
 
     acb_mat_window_init(A00, LU, 0, 0, r1, r1);
     acb_mat_window_init(A10, LU, r1, 0, m, r1);
@@ -98,7 +102,7 @@ acb_mat_lu_recursive(slong * P, acb_mat_t LU, const acb_mat_t A, slong prec)
     if (!r2)
         r1 = r2 = 0;
     else
-        _apply_permutation(P, LU, P1, m - r1, r1);
+        apply_permutation(P, LU, P1, m - r1, r1);
 
     flint_free(P1);
     acb_mat_window_clear(A00);

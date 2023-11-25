@@ -40,12 +40,16 @@ acb_approx_neg(acb_t res, const acb_t x)
     arf_neg(arb_midref(acb_imagref(res)), arb_midref(acb_imagref(x)));
 }
 
+#ifndef acb_approx_sub
+/* Defined in approx_eig_qr.c and eig_enclosure_rump.c */
+# define acb_approx_sub acb_approx_sub
 static void
 acb_approx_sub(acb_t res, const acb_t x, const acb_t y, slong prec)
 {
     arf_sub(arb_midref(acb_realref(res)), arb_midref(acb_realref(x)), arb_midref(acb_realref(y)), prec, ARF_RND_DOWN);
     arf_sub(arb_midref(acb_imagref(res)), arb_midref(acb_imagref(x)), arb_midref(acb_imagref(y)), prec, ARF_RND_DOWN);
 }
+#endif
 
 /* todo: separate out */
 void
@@ -135,6 +139,9 @@ arb_mat_nonnegative_eig_bound(mag_t eps, const arb_mat_t M, slong prec)
     }
 }
 
+#ifndef acb_approx_mag
+/* Defined in approx_eig_qr.c, eig_enclosure_rump.c and eig_multiple_rump.c */
+# define acb_approx_mag acb_approx_mag
 static void
 acb_approx_mag(mag_t res, const acb_t x)
 {
@@ -145,6 +152,7 @@ acb_approx_mag(mag_t res, const acb_t x)
     mag_hypot(res, res, t);
     mag_clear(t);
 }
+#endif
 
 /* Extract k largest rows to freeze */
 static void

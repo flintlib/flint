@@ -11,6 +11,9 @@
 
 #include "acb_mat.h"
 
+#ifndef acb_approx_mag
+/* Defined in approx_eig_qr.c, eig_enclosure_rump.c and eig_multiple_rump.c */
+# define acb_approx_mag acb_approx_mag
 static void
 acb_approx_mag(mag_t res, const acb_t x)
 {
@@ -21,6 +24,7 @@ acb_approx_mag(mag_t res, const acb_t x)
     mag_hypot(res, res, t);
     mag_clear(t);
 }
+#endif
 
 static int
 close(const acb_t x, const acb_t y, const mag_t eps)

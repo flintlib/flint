@@ -11,6 +11,10 @@
 
 #include "acb_mat.h"
 
+#ifndef acb_approx_mul
+/* Defined in approx_solve_tril.c, approx_solve_triu.c, approx_lu.c and
+ * approx_eig_qr.c */
+# define acb_approx_mul acb_approx_mul
 static void
 acb_approx_mul(acb_t res, const acb_t x, const acb_t y, slong prec)
 {
@@ -18,7 +22,11 @@ acb_approx_mul(acb_t res, const acb_t x, const acb_t y, slong prec)
         arb_midref(acb_realref(x)), arb_midref(acb_imagref(x)),
         arb_midref(acb_realref(y)), arb_midref(acb_imagref(y)), prec, ARB_RND);
 }
+#endif
 
+#ifndef acb_approx_div
+/* Defined in approx_solve_tril.c and approx_solve_triu.c */
+# define acb_approx_div acb_approx_div
 /* note: the tmp variable t should have zero radius */
 static void
 acb_approx_div(acb_t z, const acb_t x, const acb_t y, acb_t t, slong prec)
@@ -33,6 +41,7 @@ acb_approx_div(acb_t z, const acb_t x, const acb_t y, acb_t t, slong prec)
 
     acb_approx_mul(z, x, t, prec);
 }
+#endif
 
 void
 acb_mat_approx_solve_triu_classical(acb_mat_t X, const acb_mat_t U,
