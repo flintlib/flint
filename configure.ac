@@ -225,6 +225,17 @@ yes|no)
 esac],
 enable_dependency_tracking="yes")
 
+AC_ARG_ENABLE(merged-compilation,
+[AS_HELP_STRING([--enable-merged-compilation],[Enable compiling each module as a single translation unit, leading to about twice the compilation speed [default=yes]])],
+[case $enableval in
+yes|no)
+    ;;
+*)
+    AC_MSG_ERROR([Bad value $enableval for --enable-merged-compilation. Need yes or no.])
+    ;;
+esac],
+enable_merged_compilation="yes")
+
 AC_ARG_ENABLE(gmp-internals,
 [AS_HELP_STRING([--enable-gmp-internals],[Enable calling GMP internals directly [default=yes]])],
 [case $enableval in
@@ -1143,6 +1154,13 @@ then
     AC_SUBST(WANT_DEPS,1)
 else
     AC_SUBST(WANT_DEPS,0)
+fi
+
+if test "$enable_merged_compilation" = "yes";
+then
+    AC_SUBST(WANT_MERGED_COMPILATION,1)
+else
+    AC_SUBST(WANT_MERGED_COMPILATION,0)
 fi
 
 if test "$with_ntl" = "yes";
