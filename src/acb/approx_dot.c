@@ -16,6 +16,9 @@
    safe summation of 30-bit error bounds. */
 #include <stdint.h>
 
+/* Defined in approx_dot.c and dot.c */
+#define _arb_dot_output _arb_dot_output_approx_dot
+
 void
 _arb_dot_addmul_generic(mp_ptr sum, mp_ptr serr, mp_ptr tmp, mp_size_t sn,
     mp_srcptr xptr, mp_size_t xn, mp_srcptr yptr, mp_size_t yn,
@@ -94,6 +97,9 @@ _arb_dot_output(arb_t res, mp_ptr sum, mp_size_t sn, int negative,
         } \
     } \
 
+#ifndef _arf_complex_mul_gauss
+/* Defined in approx_dot.c and dot.c */
+# define _arf_complex_mul_gauss _arf_complex_mul_gauss
 static void
 _arf_complex_mul_gauss(arf_t e, arf_t f, const arf_t a, const arf_t b,
                                          const arf_t c, const arf_t d)
@@ -169,6 +175,7 @@ _arf_complex_mul_gauss(arf_t e, arf_t f, const arf_t a, const arf_t b,
     fmpz_clear(u);
     fmpz_clear(v);
 }
+#endif
 
 FLINT_DLL extern slong acb_dot_gauss_dot_cutoff;
 #define GAUSS_CUTOFF acb_dot_gauss_dot_cutoff
@@ -708,3 +715,8 @@ acb_approx_dot(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong
     if (use_gauss != NULL)
         flint_free(use_gauss);
 }
+
+#undef ARB_DOT_ADD
+#undef GAUSS_CUTOFF
+
+#undef _arb_dot_output

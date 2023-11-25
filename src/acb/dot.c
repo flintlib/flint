@@ -31,6 +31,9 @@
             (srad) += 1; \
     } while (0)
 
+/* Defined in approx_dot.c and dot.c */
+#define _arb_dot_output _arb_dot_output_dot
+
 void mag_set_ui_2exp_small(mag_t z, ulong x, slong e);
 
 static void
@@ -200,6 +203,9 @@ _arb_dot_output(arb_t res, mp_ptr sum, mp_size_t sn, int negative,
             s_srad++; \
     }
 
+#ifndef _arf_complex_mul_gauss
+/* Defined in approx_dot.c and dot.c */
+# define _arf_complex_mul_gauss _arf_complex_mul_gauss
 static void
 _arf_complex_mul_gauss(arf_t e, arf_t f, const arf_t a, const arf_t b,
                                          const arf_t c, const arf_t d)
@@ -275,6 +281,7 @@ _arf_complex_mul_gauss(arf_t e, arf_t f, const arf_t a, const arf_t b,
     fmpz_clear(u);
     fmpz_clear(v);
 }
+#endif
 
 /* TODO: this could be much lower, but it's currently competing
    against mulhigh in the Karatsuba range. */
@@ -944,3 +951,10 @@ acb_dot(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong xstep,
     if (use_gauss != NULL)
         flint_free(use_gauss);
 }
+
+#undef RAD_ADDMUL
+#undef ARB_DOT_ADD
+#undef ARB_DOT_ADD_RAD
+#undef GAUSS_CUTOFF
+
+#undef _arb_dot_output
