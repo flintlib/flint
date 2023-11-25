@@ -11,8 +11,6 @@
 
 #include "dlog.h"
 
-#define vbs 0
-
 /* TODO: tune the limit dlog -> index calculus */
 void
 dlog_vec_sieve(ulong *v, ulong nv, ulong a, ulong va, nmod_t mod, ulong na, nmod_t order)

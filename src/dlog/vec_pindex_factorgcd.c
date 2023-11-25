@@ -12,7 +12,6 @@
 #include "nmod.h"
 #include "dlog.h"
 
-#define vbs 1
 #define FACTOR_RATIO 4
 
 static int
@@ -99,3 +98,5 @@ dlog_vec_pindex_factorgcd(ulong * v, ulong nv, ulong p, nmod_t mod, ulong a, ulo
     }
     return DLOG_NOT_FOUND;
 }
+
+#undef FACTOR_RATIO
