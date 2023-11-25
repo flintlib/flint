@@ -12,6 +12,10 @@
 #include "acb.h"
 #include "acb_hypgeom.h"
 
+/* Defined in dilog_continuation.c, pfq_series_sum_bs.c, pfq_sum_bs.c,
+ * pfq_sum_fme.c, rising_ui_bs.c, rising_ui_jet_bs.c and u.c */
+#define bsplit bsplit_rising_ui_bs
+
 static void
 bsplit(acb_t y, const acb_t x, ulong a, ulong b, slong prec)
 {
@@ -68,3 +72,4 @@ acb_hypgeom_rising_ui_bs(acb_t res, const acb_t x, ulong n, slong prec)
     }
 }
 
+#undef bsplit

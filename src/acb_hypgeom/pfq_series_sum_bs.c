@@ -12,6 +12,13 @@
 #include "acb_poly.h"
 #include "acb_hypgeom.h"
 
+/* Defined in dilog_continuation.c, pfq_series_sum_bs.c, pfq_sum_bs.c,
+ * pfq_sum_fme.c, rising_ui_bs.c, rising_ui_jet_bs.c and u.c */
+#define bsplit bsplit_pfq_series_sum_bs
+
+/* Defined in pfq_series_sum_bs.c and pfq_sum_bs.c */
+#define factor factor_pfq_series_sum_bs
+
 static void
 factor(acb_poly_t A, acb_poly_t tmp,
     const acb_poly_struct * a, slong p,
@@ -205,3 +212,5 @@ acb_hypgeom_pfq_series_sum_bs(acb_poly_t s, acb_poly_t t,
     acb_poly_clear(w);
 }
 
+#undef factor
+#undef bsplit

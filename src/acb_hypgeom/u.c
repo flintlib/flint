@@ -19,6 +19,10 @@
 # include <math.h>
 #endif
 
+/* Defined in dilog_continuation.c, pfq_series_sum_bs.c, pfq_sum_bs.c,
+ * pfq_sum_fme.c, rising_ui_bs.c, rising_ui_jet_bs.c and u.c */
+#define bsplit bsplit_u
+
 static void
 bsplit(acb_t A, acb_t B, acb_t C, acb_t D,
     const acb_t b, const acb_t z, slong n0, slong n1, slong prec)
@@ -478,3 +482,5 @@ acb_hypgeom_u(acb_t res, const acb_t a, const acb_t b, const acb_t z, slong prec
     acb_swap(res, res2);
     acb_clear(res2);
 }
+
+#undef bsplit

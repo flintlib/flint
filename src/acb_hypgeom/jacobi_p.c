@@ -12,6 +12,9 @@
 #include "acb.h"
 #include "acb_hypgeom.h"
 
+/* Defined in gegenbauer_c.c, jacobi_p.c and laguerre_l.c */
+#define use_recurrence use_recurrence_jacobi_p
+
 /* this can be improved */
 static int
 use_recurrence(const acb_t n, const acb_t a, const acb_t b, slong prec)
@@ -118,3 +121,4 @@ acb_hypgeom_jacobi_p(acb_t res, const acb_t n, const acb_t a, const acb_t b,
     acb_clear(w);
 }
 
+#undef use_recurrence

@@ -20,6 +20,9 @@
 # include <math.h>
 #endif
 
+/* Defined in gamma_taylor.c and lgamma.c */
+#define want_taylor want_taylor_lgamma
+
 void acb_hypgeom_gamma_stirling_choose_param(int * reflect, slong * r, slong * n,
     const acb_t z, int use_reflect, int digamma, slong prec);
 
@@ -268,3 +271,4 @@ acb_hypgeom_lgamma(acb_t y, const acb_t x, slong prec)
     acb_clear(v);
 }
 
+#undef want_taylor

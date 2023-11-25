@@ -20,6 +20,9 @@
 # include <math.h>
 #endif
 
+/* Defined in gamma_taylor.c and lgamma.c */
+#define want_taylor want_taylor_gamma_taylor
+
 static void
 evaluate_rect(acb_t res, const short * term_prec, slong len, const acb_t x, slong prec)
 {
@@ -301,3 +304,4 @@ cleanup:
     return success;
 }
 
+#undef want_taylor

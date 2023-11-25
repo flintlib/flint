@@ -13,6 +13,10 @@
 #include "acb_poly.h"
 #include "acb_hypgeom.h"
 
+/* Defined in dilog_continuation.c, pfq_series_sum_bs.c, pfq_sum_bs.c,
+ * pfq_sum_fme.c, rising_ui_bs.c, rising_ui_jet_bs.c and u.c */
+#define bsplit bsplit_rising_ui_jet_bs
+
 static void
 bsplit(acb_ptr res, const acb_t x, ulong a, ulong b, slong trunc, slong prec)
 {
@@ -84,3 +88,4 @@ acb_hypgeom_rising_ui_jet_bs(acb_ptr res, const acb_t x, ulong n, slong len, slo
     bsplit(res, x, 0, n, len, prec);
 }
 
+#undef bsplit

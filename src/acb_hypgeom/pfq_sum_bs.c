@@ -31,6 +31,13 @@ A1 B2 + B1 B2 = B2 (A1 + B1) -- use to save time?
 
 */
 
+/* Defined in dilog_continuation.c, pfq_series_sum_bs.c, pfq_sum_bs.c,
+ * pfq_sum_fme.c, rising_ui_bs.c, rising_ui_jet_bs.c and u.c */
+#define bsplit bsplit_pfq_sum_bs
+
+/* Defined in pfq_series_sum_bs.c and pfq_sum_bs.c */
+#define factor factor_pfq_sum_bs
+
 static void
 factor(acb_t A, acb_t tmp, acb_srcptr a, slong p, const acb_t z, slong k, slong prec)
 {
@@ -196,3 +203,5 @@ acb_hypgeom_pfq_sum_bs_invz(acb_t s, acb_t t,
     acb_clear(tmp);
 }
 
+#undef factor
+#undef bsplit

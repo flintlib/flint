@@ -13,6 +13,10 @@
 #include "acb_poly.h"
 #include "acb_hypgeom.h"
 
+/* Defined in dilog_continuation.c, pfq_series_sum_bs.c, pfq_sum_bs.c,
+ * pfq_sum_fme.c, rising_ui_bs.c, rising_ui_jet_bs.c and u.c */
+#define bsplit bsplit_pfq_sum_fme
+
 static void
 evaluate(acb_poly_t A, acb_srcptr a, slong p, const acb_t z, slong n, slong prec)
 {
@@ -268,3 +272,4 @@ acb_hypgeom_pfq_sum_fme(acb_t s, acb_t t,
     acb_poly_clear(C);
 }
 
+#undef bsplit
