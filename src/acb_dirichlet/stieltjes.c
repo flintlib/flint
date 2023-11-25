@@ -778,3 +778,10 @@ acb_dirichlet_stieltjes(acb_t res, const fmpz_t n, const acb_t a, slong prec)
     }
 }
 
+#undef atan2
+#undef cos
+#undef exp
+#undef log
+#undef pow
+#undef sqrt
+#undef tan

@@ -163,3 +163,8 @@ acb_dirichlet_l_euler_product(acb_t res, const acb_t s,
     arf_clear(left);
 }
 
+#undef ONE_OVER_LOG2
+
+#undef log
+#undef pow
+#undef sqrt

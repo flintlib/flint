@@ -23,6 +23,9 @@ _arb_pow_si(arb_t res, const arb_t x, slong y, slong prec)
     arb_clear(a);
 }
 
+#ifndef _arb_add_d
+/* Defined in platt_c_bound.c and platt_multieval.c */
+# define _arb_add_d _arb_add_d
 static void
 _arb_add_d(arb_t res, const arb_t x, double y, slong prec)
 {
@@ -32,6 +35,7 @@ _arb_add_d(arb_t res, const arb_t x, double y, slong prec)
     arb_add(res, x, a, prec);
     arb_clear(a);
 }
+#endif
 
 static void
 _arb_sub_d(arb_t res, const arb_t x, double y, slong prec)

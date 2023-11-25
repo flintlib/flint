@@ -22,6 +22,9 @@
 
 #define VERBOSE 0
 
+#define PI 3.1415926535897932385
+#define INV_LOG2 1.4426950408889634074
+
 static double
 log_gamma_upper_approx(double a, double z)
 {
@@ -442,9 +445,6 @@ acb_dirichlet_fmpq_sum_afe(acb_t res, const fmpq_t s, const dirichlet_group_t G,
     fmpq_clear(s2);
 }
 
-#define PI 3.1415926535897932385
-#define INV_LOG2 1.4426950408889634074;
-
 /* max(pi/q,s/2)**(s/2-1) * exp(-max(pi/q,s/2))
 static double
 estimate_sum1_mag(double s, double q)
@@ -613,3 +613,8 @@ acb_dirichlet_l_fmpq_afe(acb_t res, const fmpq_t s, const dirichlet_group_t G, c
     mag_clear(tol1);
     mag_clear(tol2);
 }
+
+#undef log
+
+#undef PI
+#undef INV_LOG2

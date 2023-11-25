@@ -45,22 +45,30 @@ _acb_dot_arb(acb_t res, const acb_t initial, int subtract,
     arb_dot(a, b, subtract, c, xstep*2, y, ystep, len, prec);
 }
 
+#ifndef _arb_add_d
+/* Defined in platt_c_bound.c and platt_multieval.c */
+# define _arb_add_d _arb_add_d
 static void
-_arb_add_d(arb_t z, const arb_t x, double d, slong prec)
+_arb_add_d(arb_t res, const arb_t x, double y, slong prec)
 {
-    arb_t u;
-    arb_init(u);
-    arb_set_d(u, d);
-    arb_add(z, x, u, prec);
-    arb_clear(u);
+    arb_t a;
+    arb_init(a);
+    arb_set_d(a, y);
+    arb_add(res, x, a, prec);
+    arb_clear(a);
 }
+#endif
 
+#ifndef _arb_div_si_si
+/* Defined in platt_multieval.c and platt_ws_interpolation.c */
+# define _arb_div_si_si _arb_div_si_si
 static void
-_arb_div_si_si(arb_t z, slong a, slong b, slong prec)
+_arb_div_si_si(arb_t res, slong x, slong y, slong prec)
 {
-    arb_set_si(z, a);
-    arb_div_si(z, z, b, prec);
+    arb_set_si(res, x);
+    arb_div_si(res, res, y, prec);
 }
+#endif
 
 static void
 _arb_inv_si(arb_t z, slong n, slong prec)

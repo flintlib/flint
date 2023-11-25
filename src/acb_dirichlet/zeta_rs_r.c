@@ -237,3 +237,5 @@ cleanup:
     mag_clear(err);
 }
 
+#undef log
+#undef pow

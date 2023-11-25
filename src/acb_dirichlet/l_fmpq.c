@@ -78,3 +78,5 @@ acb_dirichlet_l_fmpq(acb_t res, const fmpq_t s, const dirichlet_group_t G, const
     acb_set_fmpq(res, s, prec + 10);
     acb_dirichlet_l(res, res, G, chi, prec);
 }
+
+#undef fabs

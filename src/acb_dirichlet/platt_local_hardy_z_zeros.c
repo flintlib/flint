@@ -20,6 +20,29 @@
 # include <math.h>
 #endif
 
+/* Defined in isolate_hardy_z_zero.c and platt_local_hardy_z_zeros.c */
+#define _zz_node_struct _zz_node_struct_platt_local_hardy_z_zeros
+#define zz_node_struct zz_node_struct_platt_local_hardy_z_zeros
+#define zz_node_t zz_node_t_platt_local_hardy_z_zeros
+#define zz_node_ptr zz_node_ptr_platt_local_hardy_z_zeros
+#define zz_node_srcptr zz_node_srcptr_platt_local_hardy_z_zeros
+#define zz_node_srcptr zz_node_srcptr_platt_local_hardy_z_zeros
+#define zz_node_is_gram_node zz_node_is_gram_node_platt_local_hardy_z_zeros
+#define zz_node_sgn zz_node_sgn_platt_local_hardy_z_zeros
+#define zz_node_is_good_gram_node zz_node_is_good_gram_node_platt_local_hardy_z_zeros
+#define zz_node_init zz_node_init_platt_local_hardy_z_zeros
+#define zz_node_clear zz_node_clear_platt_local_hardy_z_zeros
+#define create_non_gram_node create_non_gram_node_platt_local_hardy_z_zeros
+#define create_gram_node create_gram_node_platt_local_hardy_z_zeros
+#define count_gram_intervals count_gram_intervals_platt_local_hardy_z_zeros
+#define count_sign_changes count_sign_changes_platt_local_hardy_z_zeros
+#define extend_to_next_good_gram_node extend_to_next_good_gram_node_platt_local_hardy_z_zeros
+#define extend_to_prev_good_gram_node extend_to_prev_good_gram_node_platt_local_hardy_z_zeros
+#define _weighted_arithmetic_mean _weighted_arithmetic_mean_platt_local_hardy_z_zeros
+#define split_interval split_interval_platt_local_hardy_z_zeros
+#define intercalate intercalate_platt_local_hardy_z_zeros
+#define count_up_separated_zeros count_up_separated_zeros_platt_local_hardy_z_zeros
+
 static const slong LOOPCOUNT = 4;
 
 /*
@@ -1534,3 +1557,27 @@ acb_dirichlet_platt_local_hardy_z_zeros(
     }
     return 0;
 }
+
+#undef _zz_node_struct
+#undef zz_node_struct
+#undef zz_node_t
+#undef zz_node_ptr
+#undef zz_node_srcptr
+#undef zz_node_srcptr
+#undef zz_node_is_gram_node
+#undef zz_node_sgn
+#undef zz_node_is_good_gram_node
+#undef zz_node_init
+#undef zz_node_clear
+#undef create_non_gram_node
+#undef create_gram_node
+#undef count_gram_intervals
+#undef count_sign_changes
+#undef extend_to_next_good_gram_node
+#undef extend_to_prev_good_gram_node
+#undef _weighted_arithmetic_mean
+#undef split_interval
+#undef intercalate
+#undef count_up_separated_zeros
+
+#undef exp

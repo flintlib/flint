@@ -14,6 +14,29 @@
 #include "acb_dirichlet.h"
 #include "arb_calc.h"
 
+/* Defined in isolate_hardy_z_zero.c and platt_local_hardy_z_zeros.c */
+#define _zz_node_struct _zz_node_struct_isolate_hardy_z_zero
+#define zz_node_struct zz_node_struct_isolate_hardy_z_zero
+#define zz_node_t zz_node_t_isolate_hardy_z_zero
+#define zz_node_ptr zz_node_ptr_isolate_hardy_z_zero
+#define zz_node_srcptr zz_node_srcptr_isolate_hardy_z_zero
+#define zz_node_srcptr zz_node_srcptr_isolate_hardy_z_zero
+#define zz_node_is_gram_node zz_node_is_gram_node_isolate_hardy_z_zero
+#define zz_node_sgn zz_node_sgn_isolate_hardy_z_zero
+#define zz_node_is_good_gram_node zz_node_is_good_gram_node_isolate_hardy_z_zero
+#define zz_node_init zz_node_init_isolate_hardy_z_zero
+#define zz_node_clear zz_node_clear_isolate_hardy_z_zero
+#define create_non_gram_node create_non_gram_node_isolate_hardy_z_zero
+#define create_gram_node create_gram_node_isolate_hardy_z_zero
+#define count_gram_intervals count_gram_intervals_isolate_hardy_z_zero
+#define count_sign_changes count_sign_changes_isolate_hardy_z_zero
+#define extend_to_next_good_gram_node extend_to_next_good_gram_node_isolate_hardy_z_zero
+#define extend_to_prev_good_gram_node extend_to_prev_good_gram_node_isolate_hardy_z_zero
+#define _weighted_arithmetic_mean _weighted_arithmetic_mean_isolate_hardy_z_zero
+#define split_interval split_interval_isolate_hardy_z_zero
+#define intercalate intercalate_isolate_hardy_z_zero
+#define count_up_separated_zeros count_up_separated_zeros_isolate_hardy_z_zero
+
 /*
  * For a detailed explanation of the algorithm implemented in this file, see:
  *
@@ -1195,12 +1218,16 @@ _acb_dirichlet_isolate_gram_hardy_z_zero(arf_t a, arf_t b, const fmpz_t n)
     }
 }
 
+#ifndef _acb_set_arf
+/* Defined in hardy_z_zero.c and isolate_hardy_z_zero.c */
+# define _acb_set_arf _acb_set_arf
 static void
 _acb_set_arf(acb_t res, const arf_t t)
 {
     acb_zero(res);
     arb_set_arf(acb_realref(res), t);
 }
+#endif
 
 /*
  * Find the index of the largest Gram point less than t.
@@ -1534,3 +1561,25 @@ acb_dirichlet_zeta_nzeros_gram(fmpz_t res, const fmpz_t n)
     fmpz_clear(k);
     fmpz_clear(N);
 }
+
+#undef _zz_node_struct
+#undef zz_node_struct
+#undef zz_node_t
+#undef zz_node_ptr
+#undef zz_node_srcptr
+#undef zz_node_srcptr
+#undef zz_node_is_gram_node
+#undef zz_node_sgn
+#undef zz_node_is_good_gram_node
+#undef zz_node_init
+#undef zz_node_clear
+#undef create_non_gram_node
+#undef create_gram_node
+#undef count_gram_intervals
+#undef count_sign_changes
+#undef extend_to_next_good_gram_node
+#undef extend_to_prev_good_gram_node
+#undef _weighted_arithmetic_mean
+#undef split_interval
+#undef intercalate
+#undef count_up_separated_zeros

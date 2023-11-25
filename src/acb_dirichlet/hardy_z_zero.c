@@ -13,12 +13,16 @@
 #include "acb_dirichlet.h"
 #include "arb_calc.h"
 
+#ifndef _acb_set_arf
+/* Defined in hardy_z_zero.c and isolate_hardy_z_zero.c */
+# define _acb_set_arf _acb_set_arf
 static void
 _acb_set_arf(acb_t res, const arf_t t)
 {
     acb_zero(res);
     arb_set_arf(acb_realref(res), t);
 }
+#endif
 
 int
 _acb_dirichlet_definite_hardy_z(arb_t res, const arf_t t, slong *pprec)

@@ -11,12 +11,16 @@
 
 #include "acb_dirichlet.h"
 
+#ifndef _mag_div_ui_ui
+/* Defined in backlund_s_bound.c and turing_method_bound.c */
+# define _mag_div_ui_ui _mag_div_ui_ui
 static void
 _mag_div_ui_ui(mag_t res, ulong a, ulong b)
 {
     mag_set_ui(res, a);
     mag_div_ui(res, res, b);
 }
+#endif
 
 void
 acb_dirichlet_backlund_s_bound(mag_t res, const arb_t t)

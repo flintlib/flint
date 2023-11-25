@@ -115,3 +115,4 @@ acb_dirichlet_l(acb_t res, const acb_t s,
     }
 }
 
+#undef log

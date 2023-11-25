@@ -99,3 +99,4 @@ acb_dirichlet_zeta(acb_t res, const acb_t s, slong prec)
     }
 }
 
+#undef sqrt

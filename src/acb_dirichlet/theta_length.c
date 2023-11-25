@@ -10,8 +10,16 @@
 */
 
 #include "acb_dirichlet.h"
-#include <math.h>
-#define PI   3.14159265358
+
+#ifdef __GNUC__
+# define ceil __builtin_ceil
+# define log __builtin_log
+# define sqrt __builtin_sqrt
+#else
+# include <math.h>
+#endif
+
+#define PI 3.1415926535897932385
 #define LOG2 0.69314718055
 
 ulong
@@ -78,3 +86,10 @@ _acb_dirichlet_theta_argument_at_arb(arb_t xt, ulong q, const arb_t t, slong pre
     arb_mul(xt, xt, t, prec);
     arb_mul(xt, xt, t, prec);
 }
+
+#undef PI
+#undef LOG2
+
+#undef ceil
+#undef log
+#undef sqrt

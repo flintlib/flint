@@ -290,3 +290,7 @@ void _acb_dirichlet_euler_product_real_ui(arb_t res, ulong s,
     arb_clear(u);
 }
 
+#undef ONE_OVER_LOG2
+
+#undef log
+#undef sqrt

@@ -13,12 +13,16 @@
 #include "arb_hypgeom.h"
 #include "arb_poly.h"
 
+#ifndef _arb_div_si_si
+/* Defined in platt_multieval.c and platt_ws_interpolation.c */
+# define _arb_div_si_si _arb_div_si_si
 static void
 _arb_div_si_si(arb_t res, slong x, slong y, slong prec)
 {
     arb_set_si(res, x);
     arb_div_si(res, res, y, prec);
 }
+#endif
 
 static void
 _arb_ui_pow_arb(arb_t res, ulong n, const arb_t x, slong prec)
