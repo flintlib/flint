@@ -15,6 +15,14 @@
 #include "fq_nmod_poly_factor.h"
 #include "fq_nmod_mpoly_factor.h"
 
+/* Defined in n_bpoly_fq_factor_smprime.c and n_bpoly_fq_factor_lgprime.c */
+#define _hensel_build_tree _hensel_build_tree_n_bpoly_fq_factor_lgprime
+#define _hensel_lift_fac _hensel_lift_fac_n_bpoly_fq_factor_lgprime
+#define _hensel_lift_inv _hensel_lift_inv_n_bpoly_fq_factor_lgprime
+#define _hensel_lift_tree _hensel_lift_tree_n_bpoly_fq_factor_lgprime
+#define _lattice _lattice_n_bpoly_fq_factor_lgprime
+#define _zassenhaus _zassenhaus_n_bpoly_fq_factor_lgprime
+
 static void n_fq_bpoly_eval_sm_to_lg(
     fq_nmod_poly_t E,
     const n_bpoly_t B,
@@ -937,3 +945,9 @@ cleanup:
     return success;
 }
 
+#undef _hensel_build_tree
+#undef _hensel_lift_fac
+#undef _hensel_lift_inv
+#undef _hensel_lift_tree
+#undef _lattice
+#undef _zassenhaus

@@ -19,6 +19,14 @@
 
 #define n_fq_bpoly_swap n_bpoly_swap
 
+/* Defined in n_bpoly_fq_factor_smprime.c and n_bpoly_fq_factor_lgprime.c */
+#define _hensel_build_tree _hensel_build_tree_n_bpoly_fq_factor_smprime
+#define _hensel_lift_fac _hensel_lift_fac_n_bpoly_fq_factor_smprime
+#define _hensel_lift_inv _hensel_lift_inv_n_bpoly_fq_factor_smprime
+#define _hensel_lift_tree _hensel_lift_tree_n_bpoly_fq_factor_smprime
+#define _lattice _lattice_n_bpoly_fq_factor_smprime
+#define _zassenhaus _zassenhaus_n_bpoly_fq_factor_smprime
+
 static void n_fq_bpoly_eval_gen1(
     fq_nmod_poly_t E,
     const n_bpoly_t A,
@@ -1352,3 +1360,13 @@ cleanup:
 
     return success;
 }
+
+#undef FLINT_TMP_ARRAY_ALLOC
+#undef n_fq_bpoly_swap
+
+#undef _hensel_build_tree
+#undef _hensel_lift_fac
+#undef _hensel_lift_inv
+#undef _hensel_lift_tree
+#undef _lattice
+#undef _zassenhaus
