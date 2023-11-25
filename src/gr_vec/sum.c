@@ -12,6 +12,9 @@
 #include "thread_support.h"
 #include "gr_vec.h"
 
+/* Defined in product.c and sum.c */
+#define bsplit_basecase bsplit_basecase_sum
+#define bsplit_merge bsplit_merge_sum
 
 typedef struct
 {
@@ -130,32 +133,48 @@ _gr_vec_sum_parallel(gr_ptr res, gr_srcptr vec, slong len, gr_ctx_t ctx)
     return _gr_vec_parallel_reduce(res, (gr_method_vec_reduce_op) _gr_vec_sum, vec, len, ctx, -1, FLINT_PARALLEL_UNIFORM);
 }
 
+#ifndef bsplit_args_t
+/* Defined in product.c and sum.c */
+# define bsplit_args_t bsplit_args_t
 typedef struct
 {
     gr_srcptr vec;
     gr_ctx_struct * ctx;
 }
 bsplit_args_t;
+#endif
 
+#ifndef bsplit_res_t
+/* Defined in product.c and sum.c */
+# define bsplit_res_t bsplit_res_t
 typedef struct
 {
     gr_ptr res;
     int status;
 }
 bsplit_res_t;
+#endif
 
+#ifndef bsplit_init
+/* Defined in product.c and sum.c */
+# define bsplit_init bsplit_init
 static void
 bsplit_init(bsplit_res_t * x, bsplit_args_t * args)
 {
     x->res = gr_heap_init(args->ctx);
     x->status = GR_SUCCESS;
 }
+#endif
 
+#ifndef bsplit_clear
+/* Defined in product.c and sum.c */
+# define bsplit_clear bsplit_clear
 static void
 bsplit_clear(bsplit_res_t * x, bsplit_args_t * args)
 {
     gr_heap_clear(x->res, args->ctx);
 }
+#endif
 
 static void
 bsplit_basecase(bsplit_res_t * res, slong a, slong b, bsplit_args_t * args)
@@ -280,3 +299,6 @@ _gr_vec_sum_generic(gr_ptr res, gr_srcptr vec, slong len, gr_ctx_t ctx)
 
     return status;
 }
+
+#undef bsplit_basecase
+#undef bsplit_merge
