@@ -13,6 +13,10 @@
 #include "fq_zech.h"
 #include "fq_zech_mpoly_factor.h"
 
+/* Defined in irred_medprime.c and irred_lgprime.c */
+#define _frob_combine _frob_combine_irred_medprime
+#define _map_fac _map_fac_irred_medprime
+
 static void _frob_combine(
     nmod_mpolyv_t Af,
     fq_zech_mpolyv_t eAf,
@@ -351,3 +355,5 @@ cleanup:
     return success;
 }
 
+#undef _frob_combine
+#undef _map_fac

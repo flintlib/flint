@@ -14,6 +14,13 @@
 #include "fmpz_poly_factor.h"
 #include "nmod_mpoly_factor.h"
 
+/* Defined in n_bpoly_mod_factor_smprime.c and n_bpoly_mod_factor_lgprime.c */
+#define _hensel_lift_fac _hensel_lift_fac_n_bpoly_mod_factor_smprime
+#define _hensel_lift_inv _hensel_lift_inv_n_bpoly_mod_factor_smprime
+#define _hensel_lift_tree _hensel_lift_tree_n_bpoly_mod_factor_smprime
+#define _lattice _lattice_n_bpoly_mod_factor_smprime
+#define _zassenhaus _zassenhaus_n_bpoly_mod_factor_smprime
+
 static void n_bpoly_reverse_gens(n_bpoly_t a, const n_bpoly_t b)
 {
     slong i, j;
@@ -1580,3 +1587,9 @@ irreducible:
     success = 1;
     goto cleanup;
 }
+
+#undef _hensel_lift_fac
+#undef _hensel_lift_inv
+#undef _hensel_lift_tree
+#undef _lattice
+#undef _zassenhaus

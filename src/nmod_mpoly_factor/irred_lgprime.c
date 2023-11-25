@@ -12,6 +12,9 @@
 #include "nmod_mpoly_factor.h"
 #include "fq_nmod_mpoly_factor.h"
 
+/* Defined in irred_medprime.c and irred_lgprime.c */
+#define _frob_combine _frob_combine_irred_lgprime
+#define _map_fac _map_fac_irred_lgprime
 
 static void _fq_nmod_mpoly_set_nmod_mpoly(
     fq_nmod_mpoly_t A,
@@ -34,7 +37,6 @@ static void _fq_nmod_mpoly_set_nmod_mpoly(
     for (i = 0; i < B->length; i++)
         _n_fq_set_nmod(A->coeffs + d*i, B->coeffs[i], d);
 }
-
 
 static void _frob_combine(
     nmod_mpolyv_t Af,
@@ -348,3 +350,5 @@ cleanup:
     return success;
 }
 
+#undef _frob_combine
+#undef _map_fac
