@@ -919,9 +919,16 @@ AX_CHECK_COMPILE_FLAG([-Werror=unknown-warning-option], [CFLAGS="-Werror=unknown
 if test "$enable_coverage" = "yes";
 then
     AX_CHECK_COMPILE_FLAG([--coverage],
-    [save_CFLAGS="--coverage $save_CFLAGS"],
-    [AC_MSG_ERROR([$CC does not to support test coverage flags])])
+        [save_CFLAGS="--coverage $save_CFLAGS"],
+        [AC_MSG_ERROR([$CC does not to support test coverage flags])])
     LDFLAGS="--coverage $LDFLAGS"
+
+    if test "$enable_pthread" = "yes";
+    then
+        AX_CHECK_COMPILE_FLAG([-fprofile-update=atomic],
+            [save_CFLAGS="-fprofile-update=atomic $save_CFLAGS"],
+            [AC_MSG_ERROR([$CC does not to support multi-threaded test coverage flags])])
+    fi
 fi
 
 if test "$enable_debug" = "yes";
