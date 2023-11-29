@@ -200,8 +200,7 @@ _arb_dot_addmul_generic(mp_ptr sum, mp_ptr serr, mp_ptr tmp, mp_size_t sn,
     /* Sanity check; must conform to the pre-allocated memory! */
     if (nn > sn + 2)
     {
-        flint_printf("nn > sn + 2\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "nn > sn + 2\n");
     }
 
     /* Use mulhigh? */

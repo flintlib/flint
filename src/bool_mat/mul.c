@@ -23,8 +23,7 @@ bool_mat_mul(bool_mat_t C, const bool_mat_t A, const bool_mat_t B)
 
     if (ac != br || ar != bool_mat_nrows(C) || bc != bool_mat_ncols(C))
     {
-        flint_printf("bool_mat_mul: incompatible dimensions\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "bool_mat_mul: incompatible dimensions\n");
     }
 
     if (br == 0)

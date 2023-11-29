@@ -127,8 +127,7 @@ fq_zech_ctx_init_fq_nmod_ctx_check(fq_zech_ctx_t ctx,
 
     if (fmpz_bits(order) > FLINT_BITS)
     {
-        flint_printf("Exception (fq_zech_ctx_init_fq_nmod_ctx). Requires q < 2^FLINT_BITS\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fq_zech_ctx_init_fq_nmod_ctx). Requires q < 2^FLINT_BITS\n");
     }
 
     q = fmpz_get_ui(order);
@@ -231,7 +230,6 @@ fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx, fq_nmod_ctx_t fq_nmod_ctx)
 {
     if (!fq_zech_ctx_init_fq_nmod_ctx_check(ctx, fq_nmod_ctx))
     {
-        flint_printf("Exception (fq_zech_ctx_init_fq_nmod_ctx). Polynomial is not primitive.\n");
-	flint_abort();
+        flint_throw(FLINT_ERROR, "(fq_zech_ctx_init_fq_nmod_ctx): Polynomial is not primitive.\n");
     }
 }

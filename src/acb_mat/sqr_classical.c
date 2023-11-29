@@ -21,8 +21,7 @@ acb_mat_sqr_classical(acb_mat_t B, const acb_mat_t A, slong prec)
 
     if (acb_mat_ncols(A) != n || acb_mat_nrows(B) != n || acb_mat_ncols(B) != n)
     {
-        flint_printf("acb_mat_sqr: incompatible dimensions\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "acb_mat_sqr: incompatible dimensions\n");
     }
 
     if (n == 0)

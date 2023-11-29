@@ -139,8 +139,7 @@ zz_node_sgn(const zz_node_t p)
     int s = arb_sgn_nonzero(&p->v);
     if (!s)
     {
-        flint_printf("unexpectedly imprecise evaluation of f(t)\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "unexpectedly imprecise evaluation of f(t)\n");
     }
     return s;
 }
@@ -195,8 +194,7 @@ delete_list_to(zz_node_ptr head, zz_node_srcptr target)
     {
         if (head->prev)
         {
-            flint_printf("expected the first node in the list\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "expected the first node in the list\n");
         }
     }
     u = head;
@@ -204,8 +202,7 @@ delete_list_to(zz_node_ptr head, zz_node_srcptr target)
     {
         if (u == NULL)
         {
-            flint_printf("failed to find target within list\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "failed to find target within list\n");
         }
         v = u;
         u = u->next;
@@ -296,13 +293,11 @@ count_gram_intervals(zz_node_srcptr a, zz_node_srcptr b)
     slong out = 0;
     if (!a || !b)
     {
-        flint_printf("a and b must be non-NULL\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "a and b must be non-NULL\n");
     }
     if (!zz_node_is_good_gram_node(a) || !zz_node_is_good_gram_node(b))
     {
-        flint_printf("both nodes must be good Gram points\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "both nodes must be good Gram points\n");
     }
     else
     {
@@ -326,8 +321,7 @@ count_sign_changes(zz_node_srcptr a, zz_node_srcptr b)
     slong n = 0;
     if (!a || !b)
     {
-        flint_printf("a and b must be non-NULL\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "a and b must be non-NULL\n");
     }
     p = a;
     q = a->next;
@@ -335,8 +329,7 @@ count_sign_changes(zz_node_srcptr a, zz_node_srcptr b)
     {
         if (!q)
         {
-            flint_printf("prematurely reached end of list\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "prematurely reached end of list\n");
         }
         if (zz_node_sgn(p) != zz_node_sgn(q))
         {
@@ -367,13 +360,11 @@ extend_to_next_good_gram_node(
 
     if (!zz_node_is_gram_node(p))
     {
-        flint_printf("expected to begin at a gram point\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "expected to begin at a gram point\n");
     }
     if (p->next)
     {
-        flint_printf("expected to extend from the end of a list\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "expected to extend from the end of a list\n");
     }
     fmpz_set(n, p->gram);
     q = p;
@@ -423,13 +414,11 @@ extend_to_prev_good_gram_node(zz_node_ptr *out,
 
     if (!zz_node_is_gram_node(p))
     {
-        flint_printf("expected to begin at a gram point\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "expected to begin at a gram point\n");
     }
     if (p->prev)
     {
-        flint_printf("expected to extend from the start of a list\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "expected to extend from the start of a list\n");
     }
     fmpz_set(n, p->gram);
     q = p;
@@ -647,13 +636,11 @@ intercalate(const platt_ctx_t ctx, zz_node_t a, zz_node_t b, slong prec)
 
     if (a == NULL || b == NULL)
     {
-        flint_printf("a and b must be non-NULL\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "a and b must be non-NULL\n");
     }
     if (!zz_node_is_good_gram_node(a) || !zz_node_is_good_gram_node(b))
     {
-        flint_printf("a and b must represent good Gram points\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "a and b must represent good Gram points\n");
     }
 
     if (a == b) return result;
@@ -666,8 +653,7 @@ intercalate(const platt_ctx_t ctx, zz_node_t a, zz_node_t b, slong prec)
     {
         if (!r)
         {
-            flint_printf("prematurely reached end of list\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "prematurely reached end of list\n");
         }
         split_interval(t,
                 &q->t, &q->v, zz_node_sgn(q),
@@ -714,18 +700,15 @@ count_up_separated_zeros(arf_interval_ptr res,
     }
     else if (fmpz_sgn(n) < 1)
     {
-        flint_printf("nonpositive indices of zeros are not supported\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "nonpositive indices of zeros are not supported\n");
     }
     else if (U == NULL || V == NULL)
     {
-        flint_printf("U and V must not be NULL\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "U and V must not be NULL\n");
     }
     if (!zz_node_is_good_gram_node(U) || !zz_node_is_good_gram_node(V))
     {
-        flint_printf("U and V must be good Gram points\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "U and V must be good Gram points\n");
     }
     else
     {
@@ -740,8 +723,7 @@ count_up_separated_zeros(arf_interval_ptr res,
         {
             if (!p->next)
             {
-                flint_printf("prematurely reached end of list\n");
-                flint_abort();
+                flint_throw(FLINT_ERROR, "prematurely reached end of list\n");
             }
             if (zz_node_sgn(p) != zz_node_sgn(p->next))
             {
@@ -907,8 +889,7 @@ create_initial_double_superblock(zz_node_ptr *pu, zz_node_ptr *pv,
 
     if (v != p)
     {
-        flint_printf("unexpected endpoint of backwards scan\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "unexpected endpoint of backwards scan\n");
     }
 
     /*
@@ -986,8 +967,7 @@ _isolate_zeros(arf_interval_ptr res,
     x = scan_to_next_good_gram_node(p, bound);
     if (x == NULL)
     {
-        flint_printf("missing or incomplete initial block\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "missing or incomplete initial block\n");
     }
     delete_list_to(p, x);
     p = x;
@@ -999,8 +979,7 @@ _isolate_zeros(arf_interval_ptr res,
     v = scan_to_next_good_gram_node(p, bound);
     if (v == NULL)
     {
-        flint_printf("missing or incomplete initial block\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "missing or incomplete initial block\n");
     }
     k = 2*bound;
     u = v;
@@ -1019,8 +998,7 @@ _isolate_zeros(arf_interval_ptr res,
     }
     if (u != q)
     {
-        flint_printf("failed to scan the initial list\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "failed to scan the initial list\n");
     }
     v = u;
 
@@ -1062,8 +1040,7 @@ _isolate_zeros(arf_interval_ptr res,
             y = scan_to_prev_good_gram_node(v, bound);
             if (!y)
             {
-                flint_printf("failed to scan backwards to anchor point\n");
-                flint_abort();
+                flint_throw(FLINT_ERROR, "failed to scan backwards to anchor point\n");
             }
             zn = count_gram_intervals(x, y);
             while (count_sign_changes(x, y) < zn)
@@ -1077,8 +1054,7 @@ _isolate_zeros(arf_interval_ptr res,
                     x, y, nnext, len - zeros_count);
             if (zc < 0 || zc > len - zeros_count)
             {
-                flint_printf("unexpected number of isolated zeros\n");
-                flint_abort();
+                flint_throw(FLINT_ERROR, "unexpected number of isolated zeros\n");
             }
             zeros_count += zc;
             if (zeros_count == len)
@@ -1150,14 +1126,12 @@ _refine_local_hardy_z_zero_illinois(arb_t res,
 
     if (!asign || !bsign)
     {
-        flint_printf("the function evaluations at the endpoints of the initial "
+        flint_throw(FLINT_ERROR, "the function evaluations at the endpoints of the initial "
                 "interval must not contain zero\n");
-        flint_abort();
     }
     if (asign == bsign)
     {
-        flint_printf("isolate a zero before bisecting the interval\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "isolate a zero before bisecting the interval\n");
     }
 
     for (k = 0; k < 40; k++)
@@ -1477,8 +1451,7 @@ acb_dirichlet_platt_isolate_local_hardy_z_zeros(
     }
     else if (fmpz_sgn(n) < 1)
     {
-        flint_printf("Nonpositive indices of Hardy Z zeros are not supported.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Nonpositive indices of Hardy Z zeros are not supported.\n");
     }
     else
     {
@@ -1507,8 +1480,7 @@ acb_dirichlet_platt_local_hardy_z_zeros(
     }
     else if (fmpz_sgn(n) < 1)
     {
-        flint_printf("Nonpositive indices of Hardy Z zeros are not supported.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Nonpositive indices of Hardy Z zeros are not supported.\n");
     }
     else
     {

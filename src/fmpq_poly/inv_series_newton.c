@@ -143,8 +143,7 @@ fmpq_poly_inv_series_newton(fmpq_poly_t Qinv, const fmpq_poly_t Q, slong n)
 
     if (Qlen == 0)
     {
-        flint_printf("Exception (fmpq_poly_inv_series_newton). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpq_poly_inv_series_newton). Division by zero.\n");
     }
 
     if (Qinv != Q)

@@ -21,7 +21,7 @@ arb_bernoulli_ui_zeta(arb_t b, ulong n, slong prec)
     arb_t t, u;
 
     if (n < 10 || n % 2 != 0)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     wp = prec + 8;
     piwp = wp + 2*FLINT_BIT_COUNT(n);

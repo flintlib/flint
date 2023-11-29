@@ -114,18 +114,15 @@ nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
 
         if (len3 >= len2)
         {
-            flint_printf("Exception (nmod_poly_compose_mod_brent_kung_vec_preinv)."
-                 "The degree of the first polynomial must be smaller than that of the "
-                 " modulus\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(nmod_poly_compose_mod_brent_kung_vec_preinv): "
+                 "The degree of the first polynomial must be smaller than that of the modulus\n");
         }
     }
 
     if (n > len1)
     {
-        flint_printf("Exception (nmod_poly_compose_mod_brent_kung_vec_preinv)."
-                                     "n is larger than the length of polys\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(nmod_poly_compose_mod_brent_kung_vec_preinv): "
+                "n is larger than the length of polys\n");
     }
 
     if (n == 0)

@@ -217,14 +217,12 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
 #if (defined(__WIN32) && !defined(__CYGWIN__)) || defined(_MSC_VER)
     if (GetTempPathA(MAX_PATH, temp_path) == 0)
     {
-        flint_printf("Exception (qsieve_factor). GetTempPathA() failed.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (qsieve_factor). GetTempPathA() failed.\n");
     }
     /* uUnique = 0 means the we *do* want a unique filename (obviously!). */
     if (GetTempFileNameA(temp_path, "siq", /*uUnique*/ 0, qs_inf->fname) == 0)
     {
-        flint_printf("Exception (qsieve_factor). GetTempFileNameA() failed.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (qsieve_factor). GetTempFileNameA() failed.\n");
     }
     qs_inf->siqs = (FLINT_FILE *) fopen(qs_inf->fname, "wb");
     if (qs_inf->siqs == NULL)

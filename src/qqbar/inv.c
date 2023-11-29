@@ -19,8 +19,7 @@ qqbar_inv(qqbar_t res, const qqbar_t x)
 
     if (qqbar_is_zero(x))
     {
-        flint_printf("qqbar_inv: division by zero\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "qqbar_inv: division by zero\n");
     }
 
     if (qqbar_is_one(x) || qqbar_is_neg_one(x))

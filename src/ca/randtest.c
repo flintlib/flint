@@ -39,8 +39,7 @@ ca_randtest_same_nf(ca_t res, flint_rand_t state, const ca_t x, slong bits, slon
     }
     else
     {
-        flint_printf("ca_randtest_same_nf: not implemented\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "ca_randtest_same_nf: not implemented\n");
     }
 }
 

@@ -23,9 +23,8 @@ fmpz_divexact_checked(fmpz_t Q, const fmpz_t A, const fmpz_t B)
     fmpz_fdiv_qr(Q, r, A, B);
     if (!fmpz_is_zero(r))
     {
-        fmpz_clear(r);
-        flint_printf("Not an exact division\n");
-        flint_abort();
+        fmpz_clear(r); /* flint_throw */
+        flint_throw(FLINT_ERROR, "Not an exact division\n");
     }
     /* no need to clear r */
 }
@@ -242,8 +241,7 @@ void fmpz_poly_div_series_basecase(fmpz_poly_t Q, const fmpz_poly_t A,
 
     if (Blen == 0)
     {
-        flint_printf("Exception (fmpz_poly_div_series_basecase). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_poly_div_series_basecase). Division by zero.\n");
     }
 
     if (Alen == 0)

@@ -73,8 +73,7 @@ char * _padic_get_str(char *str, const padic_t op, const fmpz_t p, enum padic_pr
             str = flint_malloc(b);
             if (!str)
             {
-                flint_printf("Exception (padic_get_str).  Memory allocation failed.\n");
-                flint_abort();
+                flint_throw(FLINT_ERROR, "Exception (padic_get_str).  Memory allocation failed.\n");
             }
         }
 
@@ -161,8 +160,7 @@ char * _padic_get_str(char *str, const padic_t op, const fmpz_t p, enum padic_pr
             str = flint_malloc(b);
             if (!str)
             {
-                flint_printf("Exception (padic_get_str).  Memory allocation failed.\n");
-                flint_abort();
+                flint_throw(FLINT_ERROR, "Exception (padic_get_str).  Memory allocation failed.\n");
             }
         }
 

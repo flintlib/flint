@@ -56,13 +56,7 @@ TEMPLATE(T, poly_factor_distinct_deg) (TEMPLATE(T, poly_factor_t) res,
     TEMPLATE(T, poly_init) (vinv, ctx);
     TEMPLATE(T, poly_init) (tmp, ctx);
 
-    if (!
-        (h = flint_malloc((2 * m + l + 1) * sizeof(TEMPLATE(T, poly_struct)))))
-    {
-        TEMPLATE_PRINTF("Exception (%s_poly_factor_distinct_deg):\n", T);
-        flint_printf("Not enough memory.\n");
-        flint_abort();
-    }
+    h = flint_malloc((2 * m + l + 1) * sizeof(TEMPLATE(T, poly_struct)));
     H = h + (l + 1);
     I = H + m;
     for (i = 0; i < l + 1; i++)

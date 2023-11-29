@@ -26,7 +26,7 @@ _fmpz_poly_swinnerton_dyer(fmpz * T, ulong n)
         arb_poly_init(t);
         arb_poly_swinnerton_dyer_ui(t, n, 0);
         if (!_arb_vec_get_unique_fmpz_vec(T, t->coeffs, t->length))
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
         arb_poly_clear(t);
     }
 }

@@ -45,8 +45,7 @@ char * fexpr_get_string(const fexpr_t expr)
     }
     else
     {
-        flint_printf("fexpr_get_string: a string is required\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "fexpr_get_string: a string is required\n");
     }
 
     return res;

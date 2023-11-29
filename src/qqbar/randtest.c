@@ -93,8 +93,7 @@ qqbar_randtest_nonreal(qqbar_t res, flint_rand_t state, slong deg, slong bits)
 {
     if (deg <= 1)
     {
-        flint_printf("qqbar_randtest_nonreal: must have deg >= 2\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "qqbar_randtest_nonreal: must have deg >= 2\n");
     }
 
     _qqbar_randtest(res, state, deg, bits, 2);

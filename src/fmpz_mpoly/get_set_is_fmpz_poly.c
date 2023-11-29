@@ -150,8 +150,7 @@ fmpz_mpoly_set_gen_fmpz_poly(fmpz_mpoly_t res, slong var, const fmpz_poly_t pol,
 {
     if (ctx->minfo->nvars == 0)
     {
-        flint_printf("fmpz_mpoly_set_gen_fmpz_poly: require nvars >= 1");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "fmpz_mpoly_set_gen_fmpz_poly: require nvars >= 1");
     }
 
     fmpz_mpoly_set_fmpz_poly(res, pol, var, ctx);

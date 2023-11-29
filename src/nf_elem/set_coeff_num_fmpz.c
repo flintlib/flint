@@ -15,8 +15,7 @@ void _nf_elem_set_coeff_num_fmpz(nf_elem_t a, slong i, const fmpz_t b, const nf_
 {
     if (i > 2*(fmpq_poly_degree(nf->pol) - 1))
     {
-        flint_printf("Degree out of range\n");
-	flint_abort();
+        flint_throw(FLINT_ERROR, "(%s): Degree out of range\n", __func__);
     }
 
     if (nf->flag & NF_LINEAR)

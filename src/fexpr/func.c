@@ -28,8 +28,7 @@ fexpr_func(fexpr_t res, const fexpr_t expr)
     }
     else
     {
-        flint_printf("fexpr_func: a non-atomic expression is required\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "fexpr_func: a non-atomic expression is required\n");
     }
 
     size = FEXPR_SIZE(data[0]);
@@ -53,8 +52,7 @@ fexpr_view_func(fexpr_t res, const fexpr_t expr)
     }
     else
     {
-        flint_printf("fexpr_view_func: a non-atomic expression is required\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "fexpr_view_func: a non-atomic expression is required\n");
     }
 
     res->data = (ulong *) data;

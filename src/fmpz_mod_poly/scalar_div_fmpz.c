@@ -32,8 +32,7 @@ void _fmpz_mod_poly_scalar_div_fmpz(fmpz *res, const fmpz *poly, slong len,
 
     if (!fmpz_is_one(g))
     {
-        flint_printf("Exception (_fmpz_mod_poly_scalar_div_fmpz). Impossible inverse.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (_fmpz_mod_poly_scalar_div_fmpz). Impossible inverse.\n");
     }
 
     _fmpz_mod_vec_scalar_mul_fmpz_mod(res, poly, len, xinv, ctx);
@@ -55,8 +54,7 @@ void fmpz_mod_poly_scalar_div_fmpz(fmpz_mod_poly_t res,
         }
         else
         {
-            flint_printf("Exception (fmpz_mod_poly_scalar_div_fmpz). Division by zero.\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "Exception (fmpz_mod_poly_scalar_div_fmpz). Division by zero.\n");
         }
     }
 

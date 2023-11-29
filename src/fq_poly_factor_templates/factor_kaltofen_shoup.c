@@ -26,14 +26,7 @@ TEMPLATE(T, poly_factor_kaltofen_shoup) (TEMPLATE(T, poly_factor_t) res,
     slong i, j, k, l, res_num, dist_deg_num;
     slong *degs;
 
-    if (!
-        (degs =
-         flint_malloc(TEMPLATE(T, poly_degree) (poly, ctx) * sizeof(slong))))
-    {
-        TEMPLATE_PRINTF("Exception (%s_poly_factor_kaltofen_shoup): \n", T);
-        flint_printf("Not enough memory.\n");
-        flint_abort();
-    }
+    degs = flint_malloc(TEMPLATE(T, poly_degree) (poly, ctx) * sizeof(slong));
 
     TEMPLATE(T, poly_init) (v, ctx);
 

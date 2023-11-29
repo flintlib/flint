@@ -20,15 +20,13 @@ bool_mat_transitive_closure(bool_mat_t dest, const bool_mat_t src)
     if (bool_mat_nrows(dest) != bool_mat_nrows(src) ||
         bool_mat_ncols(dest) != bool_mat_ncols(src))
     {
-        flint_printf("bool_mat_transitive_closure: incompatible dimensions\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "bool_mat_transitive_closure: incompatible dimensions\n");
     }
 
     dim = bool_mat_nrows(src);
     if (dim != bool_mat_ncols(src))
     {
-        flint_printf("bool_mat_transitive_closure: a square matrix is required!\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "bool_mat_transitive_closure: a square matrix is required!\n");
     }
 
     bool_mat_set(dest, src);

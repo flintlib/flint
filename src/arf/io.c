@@ -25,9 +25,10 @@ arf_set_fmpz_2exp_dump(arf_t x, const fmpz_t m, const fmpz_t e) {
         else if (fmpz_get_si(e) == -1) arf_pos_inf(x);
         else if (fmpz_get_si(e) == -2) arf_neg_inf(x);
         else if (fmpz_get_si(e) == -3) arf_nan(x);
-        else {
+        else
+        {
             /* Impossible to happen; all the special values have been treated above. */
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
         }
         return;
     }
@@ -47,7 +48,7 @@ arf_get_fmpz_2exp_dump(fmpz_t m, fmpz_t e, const arf_t x) {
         else
         {
             /* Impossible to happen; all the special values have been treated above. */
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
         }
         return;
     }
@@ -152,7 +153,8 @@ arf_dump_str(const arf_t x)
     fmpz_clear(mantissa);
     fmpz_clear(exponent);
 
-    if(strlen(res) != res_len) flint_abort(); /* assert */
+    if (strlen(res) != res_len)
+        flint_throw(FLINT_ERROR, "(%s): strlen(res) != res_len\n", __func__);
 
     return res;
 }

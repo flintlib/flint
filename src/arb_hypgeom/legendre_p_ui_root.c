@@ -32,7 +32,7 @@ arb_hypgeom_legendre_p_ui_root_initial(arb_t res, ulong n, ulong k, slong prec)
     /* Petras numbering starts from 1 */
     k++;
     if (k > n / 2)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     tol = -prec;
     /* We need slightly higher precision since the Newton iteration
@@ -132,8 +132,7 @@ arb_hypgeom_legendre_p_ui_root(arb_t res, arb_t weight, ulong n, ulong k, slong 
 
     if (k >= n)
     {
-        flint_printf("require n > 0 and a root index 0 <= k < n\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "require n > 0 and a root index 0 <= k < n\n");
     }
 
     sign = 1;

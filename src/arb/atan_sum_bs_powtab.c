@@ -224,8 +224,7 @@ _arb_atan_sum_bs_powtab(fmpz_t T, fmpz_t Q, flint_bitcnt_t * Qexp,
         }
         else
         {
-            flint_printf("power table has the wrong structure!\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "power table has the wrong structure!\n");
         }
     }
 

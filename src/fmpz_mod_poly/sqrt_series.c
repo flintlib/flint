@@ -34,8 +34,7 @@ void fmpz_mod_poly_sqrt_series(fmpz_mod_poly_t g, const fmpz_mod_poly_t h, slong
 
     if (!fmpz_is_one(h->coeffs + 0))
     {
-        flint_printf("Exception (fmpz_mod_poly_sqrt_series). Constant term != 1.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mod_poly_sqrt_series). Constant term != 1.\n");
     }
 
     if (hlen == 1)

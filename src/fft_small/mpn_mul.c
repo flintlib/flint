@@ -818,7 +818,7 @@ ulong next_fft_number(ulong p)
     l = n_trailing_zeros(p - 1);
     q = p - (UWORD(2) << l);
     if (bits < 15)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
     if (n_nbits(q) == bits)
         return q;
     if (l < 5)

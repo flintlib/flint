@@ -51,8 +51,7 @@ void fmpz_mod_poly_div_newton_n_preinv(fmpz_mod_poly_t Q,
         }
         else
         {
-            flint_printf("Exception (fmpz_mod_poly_div_newton_n_preinv). Division by zero.\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "Exception (fmpz_mod_poly_div_newton_n_preinv). Division by zero.\n");
         }
     }
 
@@ -64,8 +63,7 @@ void fmpz_mod_poly_div_newton_n_preinv(fmpz_mod_poly_t Q,
 
     if (lenA > 2 * lenB - 2)
     {
-        flint_printf("Exception (fmpz_mod_poly_div_newton_n_preinv).\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mod_poly_div_newton_n_preinv).\n");
     }
 
     if (Q == A || Q == B || Q == Binv)

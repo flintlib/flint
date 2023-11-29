@@ -53,9 +53,8 @@ add_columns(fmpz_mat_t H, const fmpz_mat_t B, const fmpz_mat_t H1, flint_rand_t 
     /* find kernel basis vector */
     if (fmpz_mat_nullspace(k, B1) != 1)
     {
-        flint_printf("Exception (fmpz_mat_hnf_pernet_stein). "
+        flint_throw(FLINT_ERROR, "(fmpz_mat_hnf_pernet_stein): "
                 "Nullspace was not dimension one.\n");
-        flint_abort();
     }
 
     bits = fmpz_mat_max_bits(B1);
@@ -81,9 +80,8 @@ add_columns(fmpz_mat_t H, const fmpz_mat_t B, const fmpz_mat_t H1, flint_rand_t 
     /* solve Bu*x = cols */
     if (!fmpq_mat_solve_fmpz_mat(x, Bu, cols))
     {
-        flint_printf("Exception (fmpz_mat_hnf_pernet_stein). "
-                "Singular input matrix for solve.");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(fmpz_mat_hnf_pernet_stein): "
+                "Singular input matrix for solve.\n");
     }
 
     /* fix final row */

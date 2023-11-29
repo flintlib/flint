@@ -42,8 +42,7 @@ arb_mat_companion(arb_mat_t A, const arb_poly_t poly, slong prec)
 
     if (n != arb_poly_degree(poly) || n != arb_mat_ncols(A))
     {
-        flint_printf("arb_mat_companion: incompatible dimensions!\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "arb_mat_companion: incompatible dimensions!\n");
     }
 
     _arb_mat_companion(A, poly->coeffs, prec);

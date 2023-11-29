@@ -34,8 +34,7 @@ arb_set_interval_mag(arb_t res, const mag_t a, const mag_t b, slong prec)
         if (bman == 0 || (aman != 0 &&
                             (aexp > bexp || (aexp == bexp && aman > bman))))
         {
-            flint_printf("exception: arb_set_interval_mag: endpoints not ordered\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "exception: arb_set_interval_mag: endpoints not ordered\n");
         }
 
         /* now a = 0 or bexp >= aexp */
@@ -69,8 +68,7 @@ arb_set_interval_mag(arb_t res, const mag_t a, const mag_t b, slong prec)
 
         if (mag_cmp(a, b) > 0)
         {
-            flint_printf("exception: arb_set_interval_mag: endpoints not ordered\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "exception: arb_set_interval_mag: endpoints not ordered\n");
         }
 
         if (mag_is_inf(a))

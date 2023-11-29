@@ -62,8 +62,7 @@ hypgeom_term_bound(mag_t Tn, const mag_t TK, slong K, slong A, slong B, int r, c
 
     if (m < 0)
     {
-        flint_printf("hypgeom term bound\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "hypgeom term bound\n");
     }
 
     /* TK * z^n */

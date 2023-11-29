@@ -532,8 +532,8 @@ _gr_ctx_init_matrix(gr_ctx_t ctx, gr_ctx_t base_ring, int all_sizes, slong nrows
     ctx->sizeof_elem = sizeof(gr_mat_struct);
     ctx->size_limit = WORD_MAX;
 
-    if (nrows < 0) flint_abort();
-    if (ncols < 0) flint_abort();
+    if (nrows < 0 || ncols < 0)
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     MATRIX_CTX(ctx)->base_ring = (gr_ctx_struct *) base_ring;
     MATRIX_CTX(ctx)->all_sizes = all_sizes;

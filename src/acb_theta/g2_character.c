@@ -66,8 +66,7 @@ g2_character_switch(slong * a, slong * b, slong * c, slong * d, int twice)
 
     if (twice)
     {
-        flint_printf("error: went through g2_character_switch twice\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "error: went through g2_character_switch twice\n");
     }
     row[0] = a[0];
     row[1] = a[1];

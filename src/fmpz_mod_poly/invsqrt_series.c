@@ -28,14 +28,12 @@ void fmpz_mod_poly_invsqrt_series(fmpz_mod_poly_t g, const fmpz_mod_poly_t h, sl
 
     if (n == 0 || h->length == 0 || fmpz_is_zero(h->coeffs + 0))
     {
-        flint_printf("Exception (fmpz_mod_poly_invsqrt). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mod_poly_invsqrt). Division by zero.\n");
     }
 
     if (!fmpz_is_one(h->coeffs + 0))
     {
-        flint_printf("Exception (fmpz_mod_poly_invsqrt_series). Constant term != 1.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mod_poly_invsqrt_series). Constant term != 1.\n");
     }
 
     if (hlen == 1)

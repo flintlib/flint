@@ -110,8 +110,7 @@ nmod_mat_det(const nmod_mat_t A)
 
     if (dim != A->c)
     {
-        flint_printf("Exception (nmod_mat_det). Non-square matrix.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (nmod_mat_det). Non-square matrix.\n");
     }
 
     if (dim == 0) return A->mod.n != 1;

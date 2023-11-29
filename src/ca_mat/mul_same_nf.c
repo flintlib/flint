@@ -225,8 +225,7 @@ ca_mat_mul_same_nf(ca_mat_t C, const ca_mat_t A, const ca_mat_t B, ca_field_t K,
 
     if (!CA_FIELD_IS_NF(K))
     {
-        flint_printf("ca_mat_mul_same_nf: expected a number field\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "ca_mat_mul_same_nf: expected a number field\n");
     }
 
     Aden = _fmpz_vec_init(Ar);

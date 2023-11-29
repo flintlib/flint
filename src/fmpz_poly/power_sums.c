@@ -19,9 +19,7 @@ fmpz_poly_power_sums(fmpz_poly_t res, const fmpz_poly_t poly, slong n)
 
     if (len == 0)
     {
-        flint_printf
-            ("Exception (fmpz_poly_power_sums). Zero polynomial.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(fmpz_poly_power_sums): Zero polynomial.\n");
     }
     else if (n <= 0 || len == 1)
     {

@@ -170,8 +170,7 @@ fmpq_mat_solve_fmpz_mat_dixon(fmpq_mat_t X,
 
     if (!fmpz_mat_is_square(A))
     {
-        flint_printf("Exception (fmpz_mat_solve_fmpz_mat_dixon). Non-square system matrix.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mat_solve_fmpz_mat_dixon). Non-square system matrix.\n");
     }
 
     if (fmpz_mat_is_empty(A) || fmpz_mat_is_empty(B))

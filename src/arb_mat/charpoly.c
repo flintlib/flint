@@ -79,8 +79,7 @@ void arb_mat_charpoly(arb_poly_t cp, const arb_mat_t mat, slong prec)
 {
     if (mat->r != mat->c)
     {
-        flint_printf("Exception (arb_mat_charpoly).  Non-square matrix.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (arb_mat_charpoly).  Non-square matrix.\n");
     }
 
     arb_poly_fit_length(cp, mat->r + 1);

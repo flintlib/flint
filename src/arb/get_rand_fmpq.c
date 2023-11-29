@@ -26,8 +26,7 @@ _arb_get_rand_fmpq(fmpz_t num, fmpz_t den, flint_rand_t state,
 
     if (COEFF_IS_MPZ(*exp))
     {
-        flint_printf("exception: arb_get_rand_fmpq: too large exponent\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "exception: arb_get_rand_fmpq: too large exponent\n");
     }
 
     if (*exp >= 0)

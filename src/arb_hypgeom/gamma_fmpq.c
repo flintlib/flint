@@ -220,8 +220,7 @@ arb_hypgeom_gamma_small_frac(arb_t y, unsigned int p, unsigned int q, slong prec
     }
     else
     {
-        flint_printf("small fraction not implemented!\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "small fraction not implemented!\n");
     }
 }
 
@@ -374,8 +373,7 @@ build_bsplit_power_table(arb_ptr xpow, const slong * xexp, slong len, slong prec
         }
         else
         {
-            flint_printf("power table has the wrong structure!\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "power table has the wrong structure!\n");
         }
     }
 }
@@ -522,8 +520,7 @@ arb_hypgeom_gamma_fmpq_outward(arb_t y, const fmpq_t x, slong prec)
 
     if (!fmpz_fits_si(n))
     {
-        flint_printf("gamma: too large fmpq to reduce to 0!\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "gamma: too large fmpq to reduce to 0!\n");
     }
 
     m = fmpz_get_si(n);

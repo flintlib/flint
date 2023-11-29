@@ -123,8 +123,7 @@ ca_ext_get_acb_raw(acb_t res, ca_ext_t x, slong prec, ca_ctx_t ctx)
         case CA_RiemannZeta:  ACB_UNARY(acb_zeta)
         case CA_HurwitzZeta:  ACB_BINARY(acb_hurwitz_zeta)
         default:
-            flint_printf("ca_ext_get_acb_raw: unknown function\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "ca_ext_get_acb_raw: unknown function\n");
     }
 
     acb_set(CA_EXT_FUNC_ENCLOSURE(x), res);

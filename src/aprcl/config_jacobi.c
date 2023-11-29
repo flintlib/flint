@@ -68,8 +68,7 @@ aprcl_R_value(const fmpz_t n)
     /* 2^5 * 3^3 * 5^2 * 7 * 11 * 13 * 17 * 19 */
     return UWORD(6983776800);
 #else
-    flint_printf("APRCL not supported for huge numbers on 32 bits\n");
-    flint_abort();
+    flint_throw(FLINT_ERROR, "APRCL not supported for huge numbers on 32 bits\n");
     return 0;
 #endif
 }

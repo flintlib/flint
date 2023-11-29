@@ -191,11 +191,12 @@ arb_hypgeom_gamma_upper_taylor_choose(slong * res_N, mag_t err, const arb_t a, c
 
     if (mag_cmp(err, abs_tol) > 0)
     {
-        printf("err = "); mag_printd(err, 10); printf("\n");
-        printf("abs_tol = "); mag_printd(abs_tol, 10); printf("\n");
-        printf("a = "); arb_printd(a, 10); printf("\n");
-        printf("z = "); arb_printd(z, 10); printf("\n");
-        printf("x = "); mag_printd(x, 10); printf("\n");
+        /* TODO: Find a nice way to print this using flint_throw */
+        printf("err = "); mag_printd(err, 10);
+        printf("\nabs_tol = "); mag_printd(abs_tol, 10);
+        printf("\na = "); arb_printd(a, 10);
+        printf("\nz = "); arb_printd(z, 10);
+        printf("\nx = "); mag_printd(x, 10);
         flint_abort();
     }
 

@@ -284,10 +284,7 @@ int fmpz_is_prime(const fmpz_t n)
       this fallback here */
    if (res < 0)
    {
-      flint_printf("Exception in fmpz_is_prime: failed to prove ");
-      fmpz_print(n);
-      flint_printf(" prime or composite\n");
-      flint_abort();
+      flint_throw(FLINT_ERROR, "Failed to prove %s prime or composite\n", fmpz_get_str(NULL, 10, n));
    }
 
    fmpz_clear(F1);

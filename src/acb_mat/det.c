@@ -46,8 +46,7 @@ acb_mat_det(acb_t det, const acb_mat_t A, slong prec)
 
     if (!acb_mat_is_square(A))
     {
-        flint_printf("acb_mat_det: a square matrix is required!\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "acb_mat_det: a square matrix is required!\n");
     }
 
     n = acb_mat_nrows(A);

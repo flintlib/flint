@@ -56,8 +56,7 @@ int fmpz_poly_q_set_str(fmpz_poly_q_t rop, const char *s)
         numstr = flint_malloc(m + 1);
         if (!numstr)
         {
-            flint_printf("Exception (fmpz_poly_q_set_str). Memory allocation failed.\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "Exception (fmpz_poly_q_set_str). Memory allocation failed.\n");
         }
 
         for (i = 0; i < m; i++)

@@ -16,8 +16,7 @@ void fmpq_poly_inv(fmpq_poly_t poly1, const fmpq_poly_t poly2)
 {
     if (poly2->length != 1)
     {
-        flint_printf("Exception (fmpq_poly_inv). poly2 is not invertible.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpq_poly_inv). poly2 is not invertible.\n");
     }
 
     if (poly1 == poly2)

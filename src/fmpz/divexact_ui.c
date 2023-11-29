@@ -21,8 +21,7 @@ void fmpz_divexact_ui(fmpz_t f, const fmpz_t g, ulong h)
 
     if (h == 0)
     {
-        flint_printf("Exception (fmpz_divexact_ui). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_divexact_ui). Division by zero.\n");
     }
 
     if (!COEFF_IS_MPZ(c1))  /* g is small */

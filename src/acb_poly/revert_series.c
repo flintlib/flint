@@ -31,9 +31,8 @@ acb_poly_revert_series(acb_poly_t Qinv,
     if (Qlen < 2 || !acb_is_zero(Q->coeffs)
                  || acb_contains_zero(Q->coeffs + 1))
     {
-        flint_printf("Exception (acb_poly_revert_series). Input must \n"
+        flint_throw(FLINT_ERROR, "(acb_poly_revert_series): Input must \n"
                "have zero constant term and nonzero coefficient of x^1.\n");
-        flint_abort();
     }
 
     if (Qinv != Q)

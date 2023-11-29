@@ -64,7 +64,7 @@ _mag_exp_d(mag_t res, double x, int roundup)
     if (u >= -0.375 && u <= 0.375)
         u = d_polyval(inverse_factorials, 11, u) + eps2;
     else
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     if (roundup)
         mag_set_d(res, u);

@@ -105,8 +105,7 @@ static void _frob_combine(
             {
                 if ((t->coeffs + d*i)[j] != 0)
                 {
-                    flint_printf("fatal error in _frob_combine");
-                    flint_abort();
+                    flint_throw(FLINT_ERROR, "fatal error in _frob_combine");
                 }
             }
             s->coeffs[i] = (t->coeffs + d*i)[0];

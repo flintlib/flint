@@ -209,8 +209,7 @@ _ca_get_fexpr_given_ext(fexpr_t res, const ca_t x, ulong flags,
 
     if (CA_IS_SPECIAL(x))
     {
-        flint_printf("_ca_get_fexpr_given_ext: unexpected special value\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "_ca_get_fexpr_given_ext: unexpected special value\n");
     }
 
     K = CA_FIELD(x, ctx);
@@ -231,8 +230,7 @@ _ca_get_fexpr_given_ext(fexpr_t res, const ca_t x, ulong flags,
 
         if (ext_pos == -1)
         {
-            flint_printf("Unable to look up ext position\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "Unable to look up ext position\n");
         }
 
         fexpr_set_nf_elem(res, CA_NF_ELEM(x), CA_FIELD_NF(K), ext_vars + ext_pos);
@@ -262,8 +260,7 @@ _ca_get_fexpr_given_ext(fexpr_t res, const ca_t x, ulong flags,
 
             if (j == num_ext)
             {
-                flint_printf("_ca_get_fexpr_given_ext: ext not found!\n");
-                flint_abort();
+                flint_throw(FLINT_ERROR, "_ca_get_fexpr_given_ext: ext not found!\n");
             }
         }
 

@@ -18,8 +18,7 @@ fmpz_poly_scalar_divexact_ui(fmpz_poly_t poly1, const fmpz_poly_t poly2,
 {
     if (x == 0)
     {
-        flint_printf("Exception (fmpz_poly_scalar_divexact_ui). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_poly_scalar_divexact_ui). Division by zero.\n");
     }
 
     if (poly2->length == 0)

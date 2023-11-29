@@ -31,8 +31,7 @@ acb_dirichlet_hurwitz_precomp_init(acb_dirichlet_hurwitz_precomp_t pre,
 
     if (A < 1 || K < 1 || N < 1)
     {
-        flint_printf("hurwitz_precomp_init: require A, K, N >= 1 (unless A == 0)\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "hurwitz_precomp_init: require A, K, N >= 1 (unless A == 0)\n");
     }
 
     pre->coeffs = _acb_vec_init(N * K);

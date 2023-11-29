@@ -64,10 +64,7 @@ partitions_fmpz_fmpz_hrr(fmpz_t p, const fmpz_t n, int use_doubles)
 
     if (!arb_get_unique_fmpz(p, x))
     {
-        flint_printf("not unique!\n");
-        arb_printd(x, 50);
-        flint_printf("\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "not unique!\n%s\n", arb_get_str(x, 50, 0));
     }
 
     arb_clear(x);

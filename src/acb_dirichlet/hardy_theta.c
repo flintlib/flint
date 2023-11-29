@@ -47,8 +47,7 @@ acb_dirichlet_hardy_theta(acb_ptr res, const acb_t t,
 
         if (q != dirichlet_conductor_char(G, chi))
         {
-            flint_printf("hardy theta: need primitive character\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "hardy theta: need primitive character\n");
         }
     }
 

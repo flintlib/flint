@@ -24,8 +24,7 @@ fmpzi_divrem(fmpzi_t q, fmpzi_t r, const fmpzi_t x, const fmpzi_t y)
 
     if (ybits == 0)
     {
-        flint_printf("fmpzi_divrem: division by zero\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "fmpzi_divrem: division by zero\n");
     }
 
     if (xbits == 0)

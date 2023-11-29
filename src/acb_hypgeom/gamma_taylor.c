@@ -54,7 +54,7 @@ evaluate_rect(acb_t res, const short * term_prec, slong len, const acb_t x, slon
             else
             {
                 if (!_arb_hypgeom_gamma_coeff_shallow(arb_midref(c + j - n1), arb_radref(c + j - n1), j, term_prec[j]))
-                    flint_abort();
+                    flint_throw(FLINT_ERROR, "(%s)\n", __func__);
             }
         }
 

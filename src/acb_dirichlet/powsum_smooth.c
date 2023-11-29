@@ -62,7 +62,7 @@ acb_dirichlet_powsum_smooth(acb_ptr res, const acb_t s, ulong N, slong d, slong 
     }
 
     if (N >= UWORD_MAX - 2)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     critical_line = arb_is_exact(acb_realref(s)) &&
         (arf_cmp_2exp_si(arb_midref(acb_realref(s)), -1) == 0);

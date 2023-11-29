@@ -33,7 +33,7 @@ mag_set_arf_dump(mag_t x, const arf_t y)
         else
         {
             /* a mag cannot be negative infinity or NaN */
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
         }
     }
     else
@@ -44,7 +44,8 @@ mag_set_arf_dump(mag_t x, const arf_t y)
 
         arf_get_fmpz_2exp(mantissa, exponent, y);
 
-        if(fmpz_cmp_ui(mantissa, 1 << MAG_BITS) >= 0) flint_abort(); /* assert */
+        if (fmpz_cmp_ui(mantissa, 1 << MAG_BITS) >= 0)
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
         mag_set_ui(x, fmpz_get_ui(mantissa));
 

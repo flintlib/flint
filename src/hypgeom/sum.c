@@ -170,7 +170,7 @@ bsplit_merge(bsplit_res_t * res, bsplit_res_t * left, bsplit_res_t * right, bspl
     int cont = b != args->b;
 
     if (res != left)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     if (arb_is_one(B) && arb_is_one(B2))
     {

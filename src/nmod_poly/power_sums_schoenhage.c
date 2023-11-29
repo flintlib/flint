@@ -35,9 +35,7 @@ nmod_poly_power_sums_schoenhage(nmod_poly_t res, const nmod_poly_t poly,
 {
     if (poly->length == 0)
     {
-        flint_printf
-            ("Exception (nmod_poly_power_sums_schoenhage). Zero polynomial.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(nmod_poly_power_sums_schoenhage): Zero polynomial.\n");
     }
     else if ((n <= 0) || (poly->length == 1))
     {

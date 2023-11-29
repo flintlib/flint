@@ -16,7 +16,7 @@ void
 qqbar_fmpq_pow_si_ui(qqbar_t res, const fmpq_t x, slong a, ulong b)
 {
     if (b == 0)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     if (a == 0)
     {

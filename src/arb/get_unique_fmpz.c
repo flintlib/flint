@@ -68,8 +68,7 @@ arb_get_unique_fmpz(fmpz_t z, const arb_t x)
 
             if (COEFF_IS_MPZ(*exp))
             {
-                flint_printf("arb_get_unique_fmpz: input too large\n");
-                flint_abort();
+                flint_throw(FLINT_ERROR, "arb_get_unique_fmpz: input too large\n");
             }
 
             if (*exp >= 0)

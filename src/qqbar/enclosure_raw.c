@@ -60,8 +60,7 @@ _qqbar_enclosure_raw(acb_t res, const fmpz_poly_t poly, const acb_t zin, slong p
 
         if (step > 40 || prec > 1000000000)
         {
-            flint_printf("qqbar_enclosure_raw: root refinement not converging\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "qqbar_enclosure_raw: root refinement not converging\n");
         }
 
         prec *= 2;
@@ -102,9 +101,7 @@ _qqbar_enclosure_raw(acb_t res, const fmpz_poly_t poly, const acb_t zin, slong p
 */
 
             if (!fmpz_poly_is_squarefree(poly))
-            {
-                flint_abort();
-            }
+                flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
             arb_fmpz_poly_complex_roots(roots, poly, 0, 2 * prec);
 

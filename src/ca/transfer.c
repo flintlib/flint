@@ -34,8 +34,7 @@ ca_transfer(ca_t res, ca_ctx_t res_ctx, const ca_t src, ca_ctx_t src_ctx)
 
         if (!ca_set_fexpr(res, expr, res_ctx))
         {
-            flint_printf("ca_transfer: failed to recreate from expression!\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "ca_transfer: failed to recreate from expression!\n");
         }
 
         fexpr_clear(expr);

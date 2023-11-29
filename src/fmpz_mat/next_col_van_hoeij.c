@@ -40,7 +40,7 @@ void _fmpz_mat_resize_van_hoeij(fmpz_mat_t M, slong r, slong c)
          slong diff = (slong) (M->rows[i] - old_entries);
 
          if (M->rows[i] >= old_entries + M->c*M->r)
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
          j = diff/M->c;
          M->rows[i + 1] = M->entries + (j + 1)*c;

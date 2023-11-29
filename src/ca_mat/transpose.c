@@ -18,8 +18,7 @@ ca_mat_transpose(ca_mat_t B, const ca_mat_t A, ca_ctx_t ctx)
 
     if (ca_mat_nrows(B) != ca_mat_ncols(A) || ca_mat_ncols(B) != ca_mat_nrows(A))
     {
-        flint_printf("Exception (ca_mat_transpose). Incompatible dimensions.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (ca_mat_transpose). Incompatible dimensions.\n");
     }
 
     if (ca_mat_is_empty(A))

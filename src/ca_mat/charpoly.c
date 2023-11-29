@@ -40,8 +40,7 @@ void ca_mat_charpoly(ca_poly_t cp, const ca_mat_t mat, ca_ctx_t ctx)
 {
     if (mat->r != mat->c)
     {
-        flint_printf("Exception (ca_mat_charpoly).  Non-square matrix.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (ca_mat_charpoly).  Non-square matrix.\n");
     }
 
     ca_poly_fit_length(cp, mat->r + 1, ctx);

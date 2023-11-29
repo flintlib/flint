@@ -166,7 +166,7 @@ ca_check_is_zero(const ca_t x, ca_ctx_t ctx)
 
         /* the zero test will surely have succeeded over a number field */
         if (!CA_FIELD_IS_GENERIC(CA_FIELD(x, ctx)))
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
         /* extract numerator */
         ca_init(t, ctx);

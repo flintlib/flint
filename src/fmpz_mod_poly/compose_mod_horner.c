@@ -71,8 +71,7 @@ void fmpz_mod_poly_compose_mod_horner(fmpz_mod_poly_t res,
 
     if (len3 == 0)
     {
-        flint_printf("Exception (fmpz_mod_poly_compose_mod_horner). Division by zero \n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mod_poly_compose_mod_horner). Division by zero \n");
     }
 
     if (len1 == 0 || len3 == 1)

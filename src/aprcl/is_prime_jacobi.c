@@ -829,9 +829,7 @@ aprcl_is_prime_jacobi(const fmpz_t n)
 
     if (result == PROBABPRIME || result == UNKNOWN)
     {
-        flint_printf("aprcl_is_prime_jacobi: failed to prove n prime\n");
-        fmpz_print(n); flint_printf("\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "aprcl_is_prime_jacobi: failed to prove n prime for n = %s\n", fmpz_get_str(NULL, 10, n));
     }
 
     /* if we prove primality, returns 1 */

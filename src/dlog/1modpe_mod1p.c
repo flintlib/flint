@@ -25,9 +25,7 @@ dlog_1modpe_1modp(ulong b1, ulong p, ulong e, ulong inv1p, nmod_t pe)
     {
         if (b1 % pf != 1)
         {
-            flint_printf("ERROR dlog_1modpe_1modp: %wu %% %wu != 1 mod %wu\n\n",
-                    b1, pf, pe.n);
-            flint_abort();
+            flint_throw(FLINT_ERROR, "ERROR dlog_1modpe_1modp: %wu %% %wu != 1 mod %wu\n\n", b1, pf, pe.n);
         }
         xf = (b1 - 1) / pf;
         xf = (xf % p) * pf1;

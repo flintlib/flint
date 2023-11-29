@@ -33,8 +33,7 @@ static void _mod(
 
     if (atrunc < an)
     {
-        flint_printf("fft _mod: atrunc < an not handled\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "fft _mod: atrunc < an not handled\n");
     }
 
     if (FLINT_ABS(abits) < FLINT_BIT_COUNT(p))

@@ -53,9 +53,8 @@ void fmpz_mod_poly_divrem_f(fmpz_t f, fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
 
     if (lenB == 0)
     {
-        fmpz_clear(invB);
-	    flint_printf("Exception (fmpz_mod_poly_divrem_f). Division by zero.\n");
-        flint_abort();
+        fmpz_clear(invB); /* flint_throw */
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mod_poly_divrem_f). Division by zero.\n");
     }
 
     if (lenA < lenB)

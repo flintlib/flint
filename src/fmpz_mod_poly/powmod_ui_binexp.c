@@ -73,8 +73,7 @@ fmpz_mod_poly_powmod_ui_binexp(fmpz_mod_poly_t res,
 
     if (lenf == 0)
     {
-        flint_printf("Exception (fmpz_mod_poly_powmod). Divide by zero\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mod_poly_powmod). Divide by zero\n");
     }
 
     if (lenf == 1)

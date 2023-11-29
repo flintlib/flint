@@ -16,8 +16,7 @@ qqbar_get_fmpz(fmpz_t res, const qqbar_t x)
 {
     if (qqbar_degree(x) != 1 || !fmpz_is_one(QQBAR_COEFFS(x) + 1))
     {
-        flint_printf("qqbar_get_fmpz: not an integer\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "qqbar_get_fmpz: not an integer\n");
     }
 
     fmpz_neg(res, QQBAR_COEFFS(x));

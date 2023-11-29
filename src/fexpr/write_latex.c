@@ -54,8 +54,7 @@ const char * fexpr_get_symbol_str_pointer(char * tmp, const fexpr_t expr)
     }
     else
     {
-        flint_printf("fexpr_get_symbol_str_pointer: a symbol is required\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "fexpr_get_symbol_str_pointer: a symbol is required\n");
     }
 }
 

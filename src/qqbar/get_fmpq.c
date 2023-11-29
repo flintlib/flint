@@ -16,8 +16,7 @@ _qqbar_get_fmpq(fmpz_t num, fmpz_t den, const qqbar_t x)
 {
     if (qqbar_degree(x) != 1)
     {
-        flint_printf("_qqbar_get_fmpq: not a rational value\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "_qqbar_get_fmpq: not a rational value\n");
     }
 
     fmpz_neg(num, QQBAR_COEFFS(x));

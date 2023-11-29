@@ -19,8 +19,7 @@ ca_mat_conj(ca_mat_t B, const ca_mat_t A, ca_ctx_t ctx)
     if ((ca_mat_nrows(B) != ca_mat_nrows(A)) ||
         (ca_mat_ncols(B) != ca_mat_ncols(A)))
     {
-        flint_printf("ca_mat_conj: incompatible dimensions.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "ca_mat_conj: incompatible dimensions.\n");
     }
 
     for (i = 0; i < ca_mat_nrows(A); i++)

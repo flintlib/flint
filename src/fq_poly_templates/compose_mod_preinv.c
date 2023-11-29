@@ -55,9 +55,7 @@ TEMPLATE(T, poly_compose_mod_preinv) (TEMPLATE(T, poly_t) res,
 
     if (len3 == 0)
     {
-        TEMPLATE_PRINTF("Exception: division by zero in %s_poly_compose_mod\n",
-                        T);
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s): Division by zero\n", __func__);
     }
 
     if (len1 == 0 || len3 == 1)

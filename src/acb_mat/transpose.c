@@ -18,8 +18,7 @@ acb_mat_transpose(acb_mat_t B, const acb_mat_t A)
 
     if (acb_mat_nrows(B) != acb_mat_ncols(A) || acb_mat_ncols(B) != acb_mat_nrows(A))
     {
-        flint_printf("Exception (acb_mat_transpose). Incompatible dimensions.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (acb_mat_transpose). Incompatible dimensions.\n");
     }
 
     if (acb_mat_is_empty(A))

@@ -87,14 +87,12 @@ void TEMPLATE(T, poly_invsqrt_series)(TEMPLATE(T, poly_t) g,
 
     if (n == 0 || h->length == 0 || TEMPLATE(T, is_zero)(h->coeffs + 0, ctx))
     {
-        flint_printf("Exception (fq_poly_invsqrt). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fq_poly_invsqrt). Division by zero.\n");
     }
 
     if (!TEMPLATE(T, is_one)(h->coeffs + 0, ctx))
     {
-        flint_printf("Exception (fq_poly_invsqrt_series). Constant term != 1.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fq_poly_invsqrt_series). Constant term != 1.\n");
     }
 
     if (hlen < n)

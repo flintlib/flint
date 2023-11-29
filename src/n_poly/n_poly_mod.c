@@ -250,8 +250,7 @@ void n_poly_mod_mulmod(n_poly_t res, const n_poly_t poly1,
 
     if (lenf == 0)
     {
-        flint_printf("Exception (nmod_poly_mulmod). Divide by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (nmod_poly_mulmod). Divide by zero.\n");
     }
 
     if (lenf == 1 || len1 == 0 || len2 == 0)
@@ -305,8 +304,7 @@ void n_poly_mod_div(n_poly_t Q, const n_poly_t A, const n_poly_t B, nmod_t ctx)
         }
         else
         {
-            flint_printf("Exception (n_poly_mod_div). Division by zero.\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "Exception (n_poly_mod_div). Division by zero.\n");
         }
     }
 
@@ -348,8 +346,7 @@ void n_poly_mod_rem(n_poly_t R, const n_poly_t A, const n_poly_t B, nmod_t ctx)
 
     if (lenB == 0)
     {
-        flint_printf("Exception (nmod_poly_rem). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (nmod_poly_rem). Division by zero.\n");
     }
     if (lenA < lenB)
     {
@@ -398,8 +395,7 @@ void n_poly_mod_divrem(n_poly_t Q, n_poly_t R,
         }
         else
         {
-            flint_printf("Exception (n_poly_mod_divrem). Division by zero.");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "Exception (n_poly_mod_divrem). Division by zero.");
         }
     }
 
@@ -695,8 +691,7 @@ void n_poly_mod_mulmod_preinv(
 
     if (lenf <= len1 || lenf <= len2)
     {
-        flint_printf("n_poly_mod_mulmod_preinv: Input is larger than modulus.");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "n_poly_mod_mulmod_preinv: Input is larger than modulus.");
     }
 
     if (lenf == 1 || len1 == 0 || len2 == 0)
@@ -772,8 +767,7 @@ void n_poly_mod_div_series(n_poly_t Q, const n_poly_t A, const n_poly_t B,
 
     if (order < 1 || Blen == 0 || B->coeffs[0] == 0)
     {
-        flint_printf("Exception (n_poly_div_series). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (n_poly_div_series). Division by zero.\n");
     }
 
     if (Alen == 0)

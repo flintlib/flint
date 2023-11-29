@@ -27,8 +27,7 @@ void nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M)
 
    if (M->r != M->c)
    {
-      flint_printf("Exception (nmod_mat_charpoly_danilevsky).  Non-square matrix.\n");
-      flint_abort();
+      flint_throw(FLINT_ERROR, "Exception (nmod_mat_charpoly_danilevsky).  Non-square matrix.\n");
    }
 
    if (n == 0)

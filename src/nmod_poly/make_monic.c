@@ -27,8 +27,7 @@ void nmod_poly_make_monic(nmod_poly_t output, const nmod_poly_t input)
 {
     if (input->length == 0)
     {
-        flint_printf("Exception (nmod_poly_make_monic). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (nmod_poly_make_monic). Division by zero.\n");
     }
 
     nmod_poly_fit_length(output, input->length);

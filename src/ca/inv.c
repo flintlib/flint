@@ -78,8 +78,7 @@ ca_inv_no_division_by_zero(ca_t res, const ca_t x, ca_ctx_t ctx)
 
     if (ca_is_zero_check_fast(x, ctx) == T_TRUE)
     {
-        flint_printf("ca_inv_no_division_by_zero: zero element encountered!\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "ca_inv_no_division_by_zero: zero element encountered!\n");
     }
 
     if (CA_IS_QQ(x, ctx))

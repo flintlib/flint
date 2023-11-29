@@ -100,8 +100,7 @@ void nmod_mat_charpoly_berkowitz(nmod_poly_t cp, const nmod_mat_t mat)
 {
     if (mat->r != mat->c)
     {
-        flint_printf("Exception (nmod_mat_charpoly_berkowitz).  Non-square matrix.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (nmod_mat_charpoly_berkowitz).  Non-square matrix.\n");
     }
 
     nmod_poly_fit_length(cp, mat->r + 1);

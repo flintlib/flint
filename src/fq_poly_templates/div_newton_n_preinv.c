@@ -53,9 +53,7 @@ TEMPLATE(T, poly_div_newton_n_preinv) (TEMPLATE(T, poly_t) Q,
 
     if (lenB == 0)
     {
-        TEMPLATE_PRINTF("Exception (%s_poly_div_newton). Division by zero.\n",
-                        T);
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s): Division by zero\n", __func__);
     }
 
     if (lenA < lenB)

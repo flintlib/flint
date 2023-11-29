@@ -61,8 +61,7 @@ ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx)
 
     if (CA_IS_SPECIAL(x) || CA_IS_SPECIAL(y))
     {
-        flint_printf("ca_merge_fields: inputs must be field elements, not special values\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "ca_merge_fields: inputs must be field elements, not special values\n");
     }
 
     xfield = CA_FIELD(x, ctx);
@@ -77,8 +76,7 @@ ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx)
 
     if (x == resx || y == resy)
     {
-        flint_printf("ca_merge_fields: aliasing not implemented!\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "ca_merge_fields: aliasing not implemented!\n");
     }
 
     xlen = CA_FIELD_LENGTH(xfield);
@@ -116,7 +114,7 @@ ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx)
             if (cmp == 0)
             {
                 if (CA_FIELD_EXT_ELEM(xfield, ix) != CA_FIELD_EXT_ELEM(yfield, iy))
-                    flint_abort();
+                    flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
                 ext[ext_len] = CA_FIELD_EXT_ELEM(xfield, ix);
                 xgen_map[ix] = ext_len;

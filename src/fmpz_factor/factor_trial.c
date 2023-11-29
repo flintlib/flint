@@ -31,8 +31,7 @@ fmpz_factor_trial(fmpz_factor_t factor, const fmpz_t n, slong num_primes)
 
     if (num_primes > 3512 || num_primes < 0)
     {
-        flint_printf("(fmpz_factor_trial) Number of primes must be in 0..3512\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(fmpz_factor_trial) Number of primes must be in 0..3512\n");
     }
 
     if (!COEFF_IS_MPZ(*n))

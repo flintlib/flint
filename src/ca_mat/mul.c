@@ -107,8 +107,7 @@ ca_mat_mul(ca_mat_t C, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx)
 
     if (ac != br || ar != ca_mat_nrows(C) || bc != ca_mat_ncols(C))
     {
-        flint_printf("ca_mat_mul: incompatible dimensions\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "ca_mat_mul: incompatible dimensions\n");
     }
 
     if (br == 0)

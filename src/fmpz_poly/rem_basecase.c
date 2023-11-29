@@ -47,8 +47,7 @@ fmpz_poly_rem_basecase(fmpz_poly_t R,
 
     if (B->length == 0)
     {
-        flint_printf("Exception (fmpz_poly_rem_basecase). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_poly_rem_basecase). Division by zero.\n");
     }
     if (A->length < B->length)
     {

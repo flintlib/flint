@@ -582,13 +582,11 @@ void fq_default_poly_factor_split_single(fq_default_poly_t linfactor,
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
-        flint_printf("operation not implemented");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "operation not implemented");
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        flint_printf("operation not implemented");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "operation not implemented");
     }
     else
     {

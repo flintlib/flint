@@ -18,8 +18,7 @@ void fmpz_poly_q_canonicalise(fmpz_poly_q_t rop)
 
     if (fmpz_poly_is_zero(rop->den))
     {
-        flint_printf("Exception (fmpz_poly_q_canonicalise). Denominator is zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_poly_q_canonicalise). Denominator is zero.\n");
     }
 
     if (fmpz_poly_is_one(rop->den))

@@ -36,8 +36,7 @@ di_t;
 #define DI_CHECK(__x) \
     if (!(__x.a <= __x.b)) \
     { \
-        flint_printf("di_t endpoints %g, %g not ordered\n", __x.a, __x.b); \
-        flint_abort(); \
+        flint_throw(FLINT_ERROR, "di_t endpoints %g, %g not ordered\n", __x.a, __x.b); \
     } \
 
 DOUBLE_INTERVAL_INLINE
@@ -47,8 +46,7 @@ di_t di_interval(double a, double b)
 
     if (!(a <= b))
     {
-        flint_printf("di_interval endpoints %g, %g not ordered\n", a, b);
-        flint_abort();
+        flint_throw(FLINT_ERROR, "di_interval endpoints %g, %g not ordered\n", a, b);
     }
 
     res.a = a;

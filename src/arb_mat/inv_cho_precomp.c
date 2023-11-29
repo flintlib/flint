@@ -25,8 +25,7 @@ arb_mat_inv_cho_precomp(arb_mat_t X, const arb_mat_t L, slong prec)
     if (arb_mat_nrows(X) != arb_mat_nrows(L) ||
         arb_mat_ncols(X) != arb_mat_ncols(L))
     {
-        flint_printf("arb_mat_inv_cho_precomp: incompatible dimensions\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "arb_mat_inv_cho_precomp: incompatible dimensions\n");
     }
 
     if (arb_mat_is_empty(L))
@@ -43,8 +42,7 @@ arb_mat_inv_cho_precomp(arb_mat_t X, const arb_mat_t L, slong prec)
 
     if (X == L)
     {
-        flint_printf("arb_mat_inv_cho_precomp: unsupported aliasing\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "arb_mat_inv_cho_precomp: unsupported aliasing\n");
     }
 
     /* invert a 2x2 or larger matrix given its L * L^T decomposition */

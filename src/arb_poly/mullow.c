@@ -99,8 +99,9 @@ arb_poly_mullow(arb_poly_t res, const arb_poly_t poly1,
         }
         else
         {
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
+#if 0
             if (res == poly1 || res == poly2)
             {
                 arb_t t;
@@ -117,6 +118,7 @@ arb_poly_mullow(arb_poly_t res, const arb_poly_t poly1,
                 arb_mul(res->coeffs + 1, poly1->coeffs, poly2->coeffs + 1, prec);
                 arb_addmul(res->coeffs + 1, poly2->coeffs, poly1->coeffs + 1, prec);
             }
+#endif
         }
 
         _arb_poly_set_length(res, n);

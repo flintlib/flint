@@ -38,7 +38,8 @@ _si_stack_clear(_si_stack_t s)
 static void
 _si_stack_push(_si_stack_t s, slong x)
 {
-    if (s->size >= s->capacity) flint_abort(); /* assert */
+    if (s->size >= s->capacity)
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
     s->data[s->size++] = x;
 }
 
@@ -46,7 +47,8 @@ static slong
 _si_stack_pop(_si_stack_t s)
 {
     slong x;
-    if (s->size <= 0) flint_abort(); /* assert */
+    if (s->size <= 0)
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
     x = s->data[s->size - 1];
     s->size--;
     return x;
@@ -173,7 +175,8 @@ _tarjan_strongconnect(slong *sccs, _tarjan_t t, const bool_mat_t A, slong v)
         while (w != v)
         {
             w = _tarjan_pop(t);
-            if (sccs[w] != _tarjan_UNDEFINED) flint_abort(); /* assert */
+            if (sccs[w] != _tarjan_UNDEFINED)
+                flint_throw(FLINT_ERROR, "(%s)\n", __func__);
             sccs[w] = scc;
         }
     }
@@ -189,9 +192,8 @@ bool_mat_get_strongly_connected_components(slong *partition, const bool_mat_t A)
 
     if (!bool_mat_is_square(A))
     {
-        flint_printf("bool_mat_get_strongly_connected_components: "
+        flint_throw(FLINT_ERROR, "bool_mat_get_strongly_connected_components: "
                      "a square matrix is required!\n");
-        flint_abort();
     }
 
     if (bool_mat_is_empty(A))

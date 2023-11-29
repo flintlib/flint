@@ -743,8 +743,7 @@ void qsieve_compute_C(fmpz_t C, qs_t qs_inf, qs_poly_t poly)
     fmpz_mod(r, C, qs_inf->A);
     if (!fmpz_is_zero(r))
     {
-       flint_printf("B^2 - kn not divisible by A\n");
-       flint_abort();
+       flint_throw(FLINT_ERROR, "B^2 - kn not divisible by A\n");
     }
 #endif
 

@@ -155,8 +155,7 @@ fmpq_mat_solve_fmpz_mat_multi_mod(fmpq_mat_t X,
 
     if (!fmpz_mat_is_square(A))
     {
-        flint_printf("Exception (fmpq_mat_solve_fmpz_mat_multi_mod). Non-square system matrix.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpq_mat_solve_fmpz_mat_multi_mod). Non-square system matrix.\n");
     }
 
     if (fmpz_mat_is_empty(A) || fmpz_mat_is_empty(B))

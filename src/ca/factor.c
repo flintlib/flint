@@ -38,9 +38,7 @@ _ca_factor_fmpz(ca_factor_t res, const fmpz_t x, int inv, ulong flags, ca_ctx_t 
         fmpz_factor_smooth(fac, x, smooth_limit, -1); /* -1  =>  no primality test */
     }
     else
-    {
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     ca_init(b, ctx);
     ca_init(e, ctx);
@@ -103,8 +101,7 @@ ca_factor(ca_factor_t res, const ca_t x, ulong flags, ca_ctx_t ctx)
 {
     if (CA_IS_SPECIAL(x))
     {
-        flint_printf("ca_factor: expected a non-special value\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "ca_factor: expected a non-special value\n");
     }
 
     ca_factor_one(res, ctx);
@@ -151,8 +148,7 @@ ca_factor(ca_factor_t res, const ca_t x, ulong flags, ca_ctx_t ctx)
 
                 if (!_ca_fmpz_mpoly_factor(mfac, fmpz_mpoly_q_numref(CA_MPOLY_Q(x)), full, mctx))
                 {
-                    flint_printf("ca_factor: unable to factor numerator\n");
-                    flint_abort();
+                    flint_throw(FLINT_ERROR, "ca_factor: unable to factor numerator\n");
                 }
 
                 for (i = 0; i < mfac->num; i++)
@@ -171,8 +167,7 @@ ca_factor(ca_factor_t res, const ca_t x, ulong flags, ca_ctx_t ctx)
 
                 if (!_ca_fmpz_mpoly_factor(mfac, fmpz_mpoly_q_denref(CA_MPOLY_Q(x)), full, mctx))
                 {
-                    flint_printf("ca_factor: unable to factor denominator\n");
-                    flint_abort();
+                    flint_throw(FLINT_ERROR, "ca_factor: unable to factor denominator\n");
                 }
 
                 for (i = 0; i < mfac->num; i++)

@@ -18,8 +18,7 @@ dirichlet_char_lift(dirichlet_char_t y, const dirichlet_group_t G, const dirichl
 
     if (G->q % H->q != 0)
     {
-        flint_printf("conrey_lift: lower modulus %wu does not divide %wu\n", H->q, G->q);
-        flint_abort();
+        flint_throw(FLINT_ERROR, "conrey_lift: lower modulus %wu does not divide %wu\n", H->q, G->q);
     }
 
     for (k = 0, l = 0; k < G->num && l < H->num; k++)

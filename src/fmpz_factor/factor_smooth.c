@@ -119,8 +119,7 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
 
     if (bits <= 0)
     {
-        flint_printf("(fmpz_factor_smooth) Number of bits must be at least 1\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(fmpz_factor_smooth) Number of bits must be at least 1\n");
     }
 
     if (bits <= 15)

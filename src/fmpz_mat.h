@@ -349,8 +349,7 @@ void fmpz_mat_charpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
 {
    if (mat->r != mat->c)
    {
-       flint_printf("Exception (nmod_mat_charpoly).  Non-square matrix.\n");
-       flint_abort();
+       flint_throw(FLINT_ERROR, "Exception (nmod_mat_charpoly).  Non-square matrix.\n");
    }
 
    fmpz_mat_charpoly_modular(cp, mat);
@@ -373,8 +372,7 @@ void fmpz_mat_minpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
 {
    if (mat->r != mat->c)
    {
-       flint_printf("Exception (fmpz_mat_minpoly).  Non-square matrix.\n");
-       flint_abort();
+       flint_throw(FLINT_ERROR, "Exception (fmpz_mat_minpoly).  Non-square matrix.\n");
    }
 
    fmpz_mat_minpoly_modular(cp, mat);

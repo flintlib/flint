@@ -37,14 +37,12 @@ TEMPLATE(T, poly_sqrt_series)(TEMPLATE(T, poly_t) g, const TEMPLATE(T, poly_t) h
 
     if (n == 0)
     {
-        flint_printf("Exception (fq_poly_sqrt_series). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fq_poly_sqrt_series). Division by zero.\n");
     }
 
     if (h->length == 0 || !TEMPLATE(T, is_one)(h->coeffs + 0, ctx))
     {
-        flint_printf("Exception (fq_poly_sqrt_series). Requires constant term 1.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fq_poly_sqrt_series). Requires constant term 1.\n");
     }
 
     if (hlen < n)

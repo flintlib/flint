@@ -75,7 +75,7 @@ arb_sin_cos_taylor_sum_rs(arb_t s, const arb_t x, slong N, int cosine, slong pre
         /* not intended (and not 32-bit safe...) */
         if (M > 30000)
         {
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
         }
 
         tpow = _arb_vec_init(m + 2);
@@ -347,8 +347,7 @@ arb_sin_cos_arf_generic(arb_t res_sin, arb_t res_cos, const arf_t x, slong prec)
         /* guard against infinite recursion */
         if (arf_cmpabs_2exp_si(arb_midref(t), 0) > 0)
         {
-            flint_printf("mod pi/4 reduction unexpectedly failed!\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "mod pi/4 reduction unexpectedly failed!\n");
         }
 
         /* todo: allow NULL in arb_sin_cos and simplify here */

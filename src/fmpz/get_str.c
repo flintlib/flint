@@ -163,7 +163,7 @@ fmpz_get_str_bsplit_threaded(char * s, const fmpz_t f)
     fmpz_preinvn_struct * preinv;
 
     if (!COEFF_IS_MPZ(*f))
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     if (s == NULL)
         s = flint_malloc(mpz_sizeinbase(COEFF_TO_PTR(*f), 10) + 2);

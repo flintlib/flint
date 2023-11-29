@@ -226,8 +226,7 @@ _arb_sin_sum_bs_powtab(fmpz_t T, fmpz_t Q, flint_bitcnt_t * Qexp,
         }
         else
         {
-            flint_printf("power table has the wrong structure!\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "power table has the wrong structure!\n");
         }
     }
 
@@ -284,7 +283,7 @@ arb_sin_cos_fmpz_div_2exp_bsplit(arb_t wsin, arb_t wcos, const fmpz_t x, flint_b
     fmpz_init(Q);
 
     if (r > prec)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     /* Binary splitting (+1 fixed-point ulp truncation error). */
     xmag = fmpz_bits(x) - r;
@@ -358,7 +357,7 @@ pbasecase(acb_t res, slong a, slong b, pwork_t * work)
     }
     else
     {
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
     }
 }
 
@@ -448,8 +447,7 @@ arb_sin_cos_arf_bb(arb_t zsin, arb_t zcos, const arf_t x, slong prec)
        the main sin/cos wrapper). */
     if (arf_is_special(x) || arf_cmpabs_d(x, 3.15) > 0 || xmag < -2 * prec - 100)
     {
-        flint_printf("arb_sin_cos_arf_bb: unexpectedly large/small input\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "arb_sin_cos_arf_bb: unexpectedly large/small input\n");
     }
 
     argred_bits = 24;

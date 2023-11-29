@@ -56,12 +56,7 @@ int fmpz_mod_poly_is_irreducible_ddf(const fmpz_mod_poly_t poly,
     fmpz_mod_poly_init(vinv, ctx);
     fmpz_mod_poly_init(tmp, ctx);
 
-    if (!(h = flint_malloc((2 * m + l + 1) * sizeof(fmpz_mod_poly_struct))))
-    {
-        flint_printf("Exception (fmpz_mod_poly_is_irreducible_ddf): \n");
-        flint_printf("Not enough memory.\n");
-        flint_abort();
-    }
+    h = flint_malloc((2 * m + l + 1) * sizeof(fmpz_mod_poly_struct));
     H = h + (l + 1);
     I = H + m;
 

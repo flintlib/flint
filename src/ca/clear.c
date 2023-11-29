@@ -58,9 +58,7 @@ ca_clear(ca_t x, ca_ctx_t ctx)
 #if CHECK_DATA
             if (nf_elem_is_rational(CA_NF_ELEM(x), CA_FIELD_NF(field)))
             {
-                ca_print(x, ctx); printf("\n");
-                flint_printf("ca_clear: nf_elem is rational!\n");
-                flint_abort();
+                flint_throw(FLINT_ERROR, "ca_clear: nf_elem is rational:\n\nx = %s\n", ca_get_str(x, ctx));
             }
 #endif
 
@@ -71,9 +69,7 @@ ca_clear(ca_t x, ca_ctx_t ctx)
 #if CHECK_DATA
             if (fmpz_mpoly_q_is_fmpq(CA_MPOLY_Q(x), CA_FIELD_MCTX(field, ctx)))
             {
-                ca_print(x, ctx); printf("\n");
-                flint_printf("ca_clear: mpoly_q is rational!\n");
-                flint_abort();
+                flint_throw(FLINT_ERROR, "ca_clear: mpoly_q is rational:\n\nx = %s\n", ca_get_str(x, ctx));
             }
 #endif
 

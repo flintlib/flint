@@ -89,7 +89,7 @@ acb_dirichlet_root(acb_t z, const acb_dirichlet_roots_t t, ulong k, slong prec)
         }
 
         if (k != 0)
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
         acb_set_round(z, z, prec);
     }

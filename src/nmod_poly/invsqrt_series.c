@@ -29,8 +29,7 @@ nmod_poly_invsqrt_series(nmod_poly_t res, const nmod_poly_t h, slong len)
 
     if (h->length == 0 || h->coeffs[0] == 0)
     {
-        flint_printf("Exception (nmod_poly_invsqrt_series). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (nmod_poly_invsqrt_series). Division by zero.\n");
     }
 
     if (len == 0)

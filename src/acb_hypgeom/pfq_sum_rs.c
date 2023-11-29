@@ -30,7 +30,7 @@ acb_hypgeom_pfq_sum_rs(acb_t res, acb_t term, acb_srcptr a, slong p,
     }
 
     if (n < 0)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     m = n_sqrt(n);
     m = FLINT_MIN(m, 150);

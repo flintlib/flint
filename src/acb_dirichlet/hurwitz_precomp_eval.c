@@ -21,8 +21,7 @@ acb_dirichlet_hurwitz_precomp_eval(acb_t res,
 
     if (p > q)
     {
-        flint_printf("hurwitz_precomp_eval: require p <= n\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "hurwitz_precomp_eval: require p <= n\n");
     }
 
     if (pre->A == 0)

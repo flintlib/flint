@@ -25,14 +25,12 @@ slong fmpq_poly_remove(fmpq_poly_t q, const fmpq_poly_t poly1,
 
     if (len2 == 0)
     {
-        flint_printf("Exception (fmpq_poly_remove). Division by zero.\n");
-	flint_abort();
+        flint_throw(FLINT_ERROR, "(fmpq_poly_remove): Division by zero.\n");
     }
 
     if (len2 == 1)
     {
-        flint_printf("Exception (fmpq_poly_remove). Divisor must not be a unit.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(fmpq_poly_remove): Divisor must not be a unit.\n");
     }
 
     if (len2 > len1)

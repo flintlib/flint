@@ -16,7 +16,7 @@ ca_gamma_inert(ca_t res, const ca_t x, ca_ctx_t ctx)
 {
     if (CA_IS_SPECIAL(x))
     {
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
     }
     else
     {

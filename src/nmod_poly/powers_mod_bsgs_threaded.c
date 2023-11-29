@@ -186,8 +186,7 @@ nmod_poly_powers_mod_bsgs(nmod_poly_struct * res,
 
     if (nmod_poly_length(g) == 0)
     {
-        flint_printf("Exception (nmod_poly_powers_mod_naive). Divide by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (nmod_poly_powers_mod_naive). Divide by zero.\n");
     }
 
     if (nmod_poly_length(f) == 0 || nmod_poly_length(g) == 1)

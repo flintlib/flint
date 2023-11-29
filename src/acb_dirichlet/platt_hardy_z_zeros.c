@@ -21,8 +21,7 @@ acb_dirichlet_platt_hardy_z_zeros(
     }
     else if (fmpz_sgn(n) < 1)
     {
-        flint_printf("Nonpositive indices of Hardy Z zeros are not supported.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Nonpositive indices of Hardy Z zeros are not supported.\n");
     }
     else
     {

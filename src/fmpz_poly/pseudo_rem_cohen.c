@@ -57,8 +57,7 @@ fmpz_poly_pseudo_rem_cohen(fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t
 
     if (B->length == 0)
     {
-        flint_printf("Exception (fmpz_poly_pseudo_rem_cohen). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_poly_pseudo_rem_cohen). Division by zero.\n");
     }
     if (A->length < B->length)
     {

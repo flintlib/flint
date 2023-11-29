@@ -33,10 +33,7 @@ dlog_single(ulong b, ulong a, const nmod_t mod, ulong n)
             ak = nmod_mul(ak, a, mod);
         }
 
-        flint_printf("FAIL[dlog single]: log(%wu,%wu) mod %wu not found (size %wu)\n",
-                b, a, mod.n, n);
-        flint_abort();
-        return 0; /* dummy return because flint_abort() is not declared noreturn */
+        flint_throw(FLINT_ERROR, "(dlog single): log(%wu,%wu) mod %wu not found (size %wu)\n", b, a, mod.n, n);
     }
     else
     {
@@ -55,9 +52,7 @@ dlog_quotient(const dlog_rho_t t, ulong e, ulong f, ulong g, ulong b)
 
     if (g == n.n)
     {
-        flint_printf("FAIL[dlog quotient]: trivial relation e = %wu, f = %wu mod %wu\n",
-                e, f, n.n);
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(dlog quotient): trivial relation e = %wu, f = %wu mod %wu\n", e, f, n.n);
     }
 
     nmod_init(&n, n.n / g);

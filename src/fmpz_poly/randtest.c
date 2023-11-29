@@ -119,8 +119,7 @@ fmpz_poly_randtest_not_zero(fmpz_poly_t f, flint_rand_t state,
 {
     if ((bits == 0) || (len == 0))
     {
-        flint_printf("Exception (fmpz_poly_randtest_not_zero). bits or len is zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_poly_randtest_not_zero). bits or len is zero.\n");
     }
 
     fmpz_poly_randtest(f, state, len, bits);

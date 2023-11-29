@@ -782,7 +782,8 @@ _gr_ctx_init_vector(gr_ctx_t ctx, gr_ctx_t base_ring, int all_sizes, slong n)
     ctx->sizeof_elem = sizeof(gr_vec_struct);
     ctx->size_limit = WORD_MAX;
 
-    if (n < 0) flint_abort();
+    if (n < 0)
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     VECTOR_CTX(ctx)->base_ring = (gr_ctx_struct *) base_ring;
     VECTOR_CTX(ctx)->all_sizes = all_sizes;

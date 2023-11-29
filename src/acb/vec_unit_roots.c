@@ -23,8 +23,7 @@ _acb_vec_unit_roots(acb_ptr res, slong n, slong len, slong prec)
         return;
     if (n == 0)
     {
-        flint_printf("\n_acb_vec_unit_roots: need order != 0\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "\n_acb_vec_unit_roots: need order != 0\n");
     }
 
     if (n < 0)

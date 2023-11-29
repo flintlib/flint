@@ -24,7 +24,8 @@ _arb_hypgeom_rising_coeffs_1(ulong * c, ulong k, slong l)
     slong i, j;
     ulong d;
 
-    if (l < 2) flint_abort();
+    if (l < 2)
+        flint_throw(FLINT_ERROR, "(%s): l < 2\n", __func__);
 
     c[0] = k * (k + 1);
     c[1] = 2 * k + 1;
@@ -49,7 +50,8 @@ _arb_hypgeom_rising_coeffs_2(ulong * c, ulong k, slong l)
     ulong d;
     mp_limb_t hi, lo;
 
-    if (l < 2) flint_abort();
+    if (l < 2)
+        flint_throw(FLINT_ERROR, "(%s): l < 2\n", __func__);
 
     umul_ppmm(c[1], c[0], k, k + 1);
 
@@ -81,7 +83,8 @@ _arb_hypgeom_rising_coeffs_fmpz(fmpz * c, ulong k, slong l)
     slong i, j;
     ulong d;
 
-    if (l < 2) flint_abort();
+    if (l < 2)
+        flint_throw(FLINT_ERROR, "(%s): l < 2\n", __func__);
 
     fmpz_set_ui(c + 0, k);
     fmpz_mul_ui(c + 0, c + 0, k + 1);

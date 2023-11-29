@@ -157,8 +157,6 @@ fmpz_mat_solve_cramer(fmpz_mat_t X, fmpz_t den,
     }
     else
     {
-        flint_printf("Exception (fmpz_mat_solve_cramer). dim > 3 not implemented.");
-        flint_abort();
-        return 0; /* not reached, but silence compiler warning */
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mat_solve_cramer). dim > 3 not implemented.");
     }
 }

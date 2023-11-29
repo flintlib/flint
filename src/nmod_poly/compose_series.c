@@ -32,9 +32,8 @@ nmod_poly_compose_series(nmod_poly_t res,
 
     if (len2 != 0 && poly2->coeffs[0] != 0)
     {
-        flint_printf("Exception (nmod_poly_compose_series). Inner polynomial \n"
-               "must have zero constant term.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(nmod_poly_compose_series): "
+                "Inner polynomial must have zero constant term.\n");
     }
 
     if (len1 == 0 || n == 0)

@@ -109,7 +109,7 @@ _arb_hypgeom_gamma_upper_sum_rs_1(arb_t res, ulong p, ulong q, const arb_t z, sl
         }
 
         if (jbot != jtop - jlen + 1)
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
         /* Factors between jbot and jtop inclusive */
         if (jbot == 0)

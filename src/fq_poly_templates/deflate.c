@@ -24,8 +24,7 @@ TEMPLATE(T, poly_deflate) (TEMPLATE(T, poly_t) result,
 
     if (deflation == 0)
     {
-        TEMPLATE_PRINTF("Exception (%s_poly_deflate). Division by zero.\n", T);
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s): Division by zero\n", __func__);
     }
 
     if (input->length <= 1 || deflation == 1)

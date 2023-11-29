@@ -55,7 +55,7 @@ ca_get_acb_raw(acb_t res, const ca_t x, slong prec, ca_ctx_t ctx)
     if (CA_FIELD_IS_NF(xfield))
     {
         if (CA_FIELD_NF(xfield)->flag & NF_LINEAR)
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
         ca_ext_get_acb_raw(res, CA_FIELD_EXT_ELEM(xfield, 0), prec, ctx);
 

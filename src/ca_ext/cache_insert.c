@@ -91,6 +91,6 @@ ca_ext_ptr ca_ext_cache_insert(ca_ext_cache_t cache, const ca_ext_t x, ca_ctx_t 
     }
 
     /* cannot happen */
-    flint_abort();
+    flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 }
 

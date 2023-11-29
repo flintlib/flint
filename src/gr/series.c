@@ -2006,7 +2006,7 @@ gr_ctx_init_gr_series_mod(gr_ctx_t ctx, gr_ctx_t base_ring, slong mod)
     ctx->size_limit = WORD_MAX;
 
     if (mod >= SERIES_ERR_EXACT)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     SERIES_CTX(ctx)->base_ring = (gr_ctx_struct *) base_ring;
     SERIES_CTX(ctx)->var = (char *) default_var;

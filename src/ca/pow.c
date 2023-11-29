@@ -18,7 +18,7 @@ nf_elem_bits(const nf_elem_t x, nf_t nf)
 
     if (nf->flag & NF_LINEAR)
     {
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
     }
     else if (nf->flag & NF_QUADRATIC)
     {
@@ -137,8 +137,7 @@ ca_pow_si_arithmetic(ca_t res, const ca_t x, slong n, ca_ctx_t ctx)
            the base should never be a rational number here. */
         if (nf_elem_is_rational(CA_NF_ELEM(x), CA_FIELD_NF(CA_FIELD(x, ctx))))
         {
-            flint_printf("ca_pow_fmpz: unexpected rational nf_elem\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "ca_pow_fmpz: unexpected rational nf_elem\n");
         }
 
         ca_init(t, ctx);
@@ -171,7 +170,7 @@ ca_pow_pow(ca_t res, const ca_t z, const ca_t a, const ca_t b, ca_ctx_t ctx)
     ca_t t, u, pi;
 
     if (CA_IS_SPECIAL(z) || CA_IS_SPECIAL(a) || CA_IS_SPECIAL(b))
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     ca_init(t, ctx);
     ca_init(u, ctx);
@@ -398,8 +397,7 @@ ca_pow_fmpz(ca_t res, const ca_t x, const fmpz_t y, ca_ctx_t ctx)
            the base should never be a rational number here. */
         if (nf_elem_is_rational(CA_NF_ELEM(x), CA_FIELD_NF(CA_FIELD(x, ctx))))
         {
-            flint_printf("ca_pow_fmpz: unexpected rational nf_elem\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "ca_pow_fmpz: unexpected rational nf_elem\n");
         }
 
         if (xbits1 * (double) FLINT_ABS(*y) < ctx->options[CA_OPT_PREC_LIMIT])

@@ -184,8 +184,7 @@ fmpz_mod_poly_powers_mod_bsgs(fmpz_mod_poly_struct * res,
 
     if (fmpz_mod_poly_length(g, ctx) == 0)
     {
-        flint_printf("Exception (fmpz_mod_poly_powers_mod_bsgs). Divide by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mod_poly_powers_mod_bsgs). Divide by zero.\n");
     }
 
     if (fmpz_mod_poly_length(f, ctx) == 0 || fmpz_mod_poly_length(g, ctx) == 1)

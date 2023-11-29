@@ -74,8 +74,7 @@ _ca_poly_mullow_same_nf(ca_ptr C, ca_srcptr A, slong Alen, ca_srcptr B, slong Bl
 
     if (!CA_FIELD_IS_NF(K))
     {
-        flint_printf("_ca_poly_mullow_same_nf: expected a number field\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "_ca_poly_mullow_same_nf: expected a number field\n");
     }
 
     squaring = (A == B) && (Alen == Blen);
@@ -85,7 +84,7 @@ _ca_poly_mullow_same_nf(ca_ptr C, ca_srcptr A, slong Alen, ca_srcptr B, slong Bl
 
     if (!get_lcm(Aden, A, Alen, K, WORD_MAX, ctx) || (!squaring && !get_lcm(Bden, B, Blen, K, WORD_MAX, ctx)))
     {
-        flint_abort();
+        flint_throw(FLINT_ERROR, "%s\n", __func__);
         /*
         fmpz_clear(Aden);
         fmpz_clear(Bden);

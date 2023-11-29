@@ -70,8 +70,7 @@ bernoulli_fmpq_vec_no_cache(fmpq * res, ulong a, slong num)
 {
     if (a > (UWORD(1) << 31) || num > 1000000000)
     {
-        flint_printf("bernoulli_fmpq_vec_no_cache: excessive input\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "bernoulli_fmpq_vec_no_cache: excessive input\n");
     }
 
     if (a == 0 && num <= 128)

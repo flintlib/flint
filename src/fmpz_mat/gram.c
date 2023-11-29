@@ -16,9 +16,9 @@ void fmpz_mat_gram(fmpz_mat_t B, const fmpz_mat_t A)
 {
 	slong i, j, k;
 
-	if(B->r != A->r || B->c != A->r) {
-		flint_printf("Exception (fmpz_mat_gram). Incompatible dimensions.\n");
-		flint_abort();
+	if (B->r != A->r || B->c != A->r)
+    {
+        flint_throw(FLINT_ERROR, "(fmpz_mat_gram): Incompatible dimensions.\n");
 	}
 
 	if(B == A) {

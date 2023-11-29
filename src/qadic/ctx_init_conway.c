@@ -29,9 +29,7 @@ void qadic_ctx_init_conway(qadic_ctx_t ctx,
 
     if (fmpz_cmp_ui(p, 109987) > 0)
     {
-        flint_printf("Exception (qadic_ctx_init_conway).  Conway polynomials \n");
-        flint_printf("are only available for primes up to 109987.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (qadic_ctx_init_conway).  Conway polynomials are only available for primes up to 109987.\n");
     }
 
     for (position = 0; flint_conway_polynomials[position] != 0; position += 3+flint_conway_polynomials[position+1])
@@ -85,8 +83,6 @@ void qadic_ctx_init_conway(qadic_ctx_t ctx,
         }
     }
 
-    flint_printf("Exception (qadic_ctx_init_conway).  The polynomial for \n");
-    flint_printf("(p,d) = (%wd,%wd) is not present in the database.\n", *p, d);
-    flint_abort();
+    flint_throw(FLINT_ERROR, "Exception (qadic_ctx_init_conway).  The polynomial for (p,d) = (%wd,%wd) is not present in the database.\n", *p, d);
 }
 

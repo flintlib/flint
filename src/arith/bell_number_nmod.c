@@ -35,8 +35,7 @@ arith_bell_number_nmod_fallback(ulong n, nmod_t mod)
 
     if (n > WORD_MAX / 4)
     {
-        flint_printf("arith_bell_number_nmod: too large n\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "arith_bell_number_nmod: too large n\n");
     }
 
     bvec = flint_malloc(sizeof(mp_limb_t) * (n + 1));

@@ -39,9 +39,8 @@ arf_get_mpfr(mpfr_t x, const arf_t y, mpfr_rnd_t rnd)
         if (COEFF_MIN > mpfr_get_emin_min() ||
             COEFF_MAX < mpfr_get_emax_max())
         {
-            flint_printf("unsupported MPFR exponent range: %wd, %wd, %wd, %wd\n",
+            flint_throw(FLINT_ERROR, "unsupported MPFR exponent range: %wd, %wd, %wd, %wd\n",
                 COEFF_MIN, mpfr_get_emin_min(), COEFF_MAX, mpfr_get_emax_max());
-            flint_abort();
         }
 
         if (fmpz_sgn(ARF_EXPREF(y)) > 0)

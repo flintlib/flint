@@ -228,7 +228,7 @@ euler_bsplit_2_basecase(euler_bsplit_2_t s, slong n1, slong n2, bsplit_args_t * 
         arb_ptr T = s->T;
 
         if (n2 - n1 != 1)
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
         if (n1 == 0)
         {
@@ -345,7 +345,7 @@ arb_log_ui_smooth(arb_t s, ulong n, slong prec)
     while (m % 5 == 0) { m /= 5; k++; }
 
     if (m != 1)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     arb_init(t);
 

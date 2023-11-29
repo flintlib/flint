@@ -25,15 +25,14 @@ fmpz_poly_mat_set_perm(fmpz_poly_mat_t X, const slong * perm,
 {
     if (X == B)
     {
-        /* Not implemented */
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s): Not implemented\n", __func__);
     }
     else
     {
         slong i, j;
 
         if (perm == NULL)
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s): perm == NULL\n", __func__);
 
         for (i = 0; i < fmpz_poly_mat_nrows(B); i++)
             for (j = 0; j < fmpz_poly_mat_ncols(B); j++)

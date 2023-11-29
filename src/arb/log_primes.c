@@ -593,7 +593,7 @@ arb_atan_gauss_primes_vec_bsplit(arb_ptr res, slong n, slong prec)
 
     /* not implemented */
     if (n > 64)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     wp = prec + 64;
 
@@ -736,7 +736,7 @@ void _arb_atan_gauss_p_ensure_cached(slong prec)
                 n = ARB_LOG_TAB2_PREC / FLINT_BITS;
 
                 if (i >= 24)
-                    flint_abort();
+                    flint_throw(FLINT_ERROR, "(%s)\n", __func__);
                 /* exponent of 2*atan(x) */
                 exp = exponents[i] + 1;
 

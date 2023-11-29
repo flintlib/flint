@@ -96,8 +96,7 @@ void fmpq_poly_cos_series(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
 
     if (!fmpz_is_zero(poly->coeffs))
     {
-        flint_printf("Exception (fmpq_poly_cos_series). Constant term != 0.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpq_poly_cos_series). Constant term != 0.\n");
     }
 
     fmpq_poly_fit_length(res, n);

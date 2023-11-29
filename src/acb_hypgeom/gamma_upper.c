@@ -295,7 +295,7 @@ _mag_gt_norm_ui(const mag_t a, const mag_t b, const mag_t c, ulong n)
     result = 0;
     if (n < 1)
     {
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
     }
     else if (mag_is_zero(a))
     {

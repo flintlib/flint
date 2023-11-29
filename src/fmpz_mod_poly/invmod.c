@@ -52,8 +52,7 @@ int fmpz_mod_poly_invmod(fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
 
     if (lenP < 2)
     {
-        flint_printf("Exception (fmpz_mod_poly_invmod). lenP < 2.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mod_poly_invmod). lenP < 2.\n");
     }
     if (lenB == 0)
     {

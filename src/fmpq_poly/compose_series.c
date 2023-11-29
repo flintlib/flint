@@ -37,9 +37,8 @@ fmpq_poly_compose_series(fmpq_poly_t res,
 
     if (len2 != 0 && !fmpz_is_zero(poly2->coeffs))
     {
-        flint_printf("Exception (fmpq_poly_compose_series). Inner polynomial \n"
-               "must have zero constant term,\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(fmpq_poly_compose_series): Inner polynomial \n"
+               "must have zero constant term.\n");
     }
 
     if (len1 == 0 || n == 0)
