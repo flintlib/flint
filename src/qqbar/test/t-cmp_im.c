@@ -65,5 +65,126 @@ TEST_FUNCTION_START(qqbar_cmp_im, state)
         qqbar_clear(u);
     }
 
+    /* Some branches are difficult to reach with random test cases. */
+    {
+        qqbar_t x, y, z, i;
+        mag_t eps;
+        int which, ans, want;
+
+        qqbar_init(x);
+        qqbar_init(y);
+        qqbar_init(z);
+        qqbar_init(i);
+        mag_init(eps);
+
+        qqbar_i(i);
+
+        for (which = 0; which <= 8; which++)
+        {
+            if (which <= 4)
+            {
+                qqbar_set_si(x, 5);
+                qqbar_mul_si(z, i, 3);
+                qqbar_add(x, x, z);
+                qqbar_set_si(y, 6);
+                qqbar_mul_si(z, i, 3);
+                qqbar_add(y, y, z);
+
+                if (which == 0)
+                {
+                    qqbar_set_d(z, 1e-30);
+                    qqbar_mul(z, z, i);
+                    qqbar_add(x, x, z);
+                    want = 1;
+                }
+                else if (which == 1)
+                {
+                    qqbar_set_d(z, -1e-30);
+                    qqbar_mul(z, z, i);
+                    qqbar_add(x, x, z);
+                    want = -1;
+                }
+                else if (which == 2)
+                {
+                    qqbar_set_d(z, -1e-30);
+                    qqbar_mul(z, z, i);
+                    qqbar_add(x, x, z);
+                    mag_set_d(eps, 1e-15);
+                    arb_add_error_mag(acb_imagref(QQBAR_ENCLOSURE(y)), eps);
+                    want = -1;
+                }
+                else if (which == 3)
+                {
+                    qqbar_set_d(z, 1e-30);
+                    qqbar_mul(z, z, i);
+                    qqbar_add(x, x, z);
+                    mag_set_d(eps, 1e-15);
+                    arb_add_error_mag(acb_imagref(QQBAR_ENCLOSURE(y)), eps);
+                    want = 1;
+                }
+                else if (which == 4)
+                {
+                    mag_set_d(eps, 1e-10);
+                    arb_add_error_mag(acb_imagref(QQBAR_ENCLOSURE(x)), eps);
+                    mag_set_d(eps, 1e-15);
+                    arb_add_error_mag(acb_imagref(QQBAR_ENCLOSURE(y)), eps);
+                    want = 0;
+                }
+            }
+            else if (which == 5)
+            {
+                qqbar_set_si(x, 5);
+                qqbar_set_si(y, 6);
+                mag_set_d(eps, 1e-10);
+                arb_add_error_mag(acb_imagref(QQBAR_ENCLOSURE(y)), eps);
+                want = 0;
+            }
+            else if (which == 6)
+            {
+                qqbar_sqrt_ui(x, 2);
+                qqbar_set_si(y, 1);
+                qqbar_add(y, y, i);
+                mag_set_d(eps, 1.1);
+                arb_add_error_mag(acb_imagref(QQBAR_ENCLOSURE(y)), eps);
+                want = -1;
+            }
+            else if (which == 7)
+            {
+                qqbar_sqrt_ui(x, 2);
+                qqbar_set_si(y, 1);
+                qqbar_sub(y, y, i);
+                mag_set_d(eps, 1.1);
+                arb_add_error_mag(acb_imagref(QQBAR_ENCLOSURE(y)), eps);
+                want = 1;
+            }
+            else if (which == 8)
+            {
+                qqbar_sqrt_ui(x, 2);
+                qqbar_sqrt_ui(y, 3);
+                mag_set_d(eps, 0.5);
+                arb_add_error_mag(acb_imagref(QQBAR_ENCLOSURE(y)), eps);
+                want = 0;
+            }
+
+            ans = qqbar_cmp_im(x, y);
+     
+            if (ans != want)
+            {
+                flint_printf("FAIL!\n");
+                flint_printf("x = "); qqbar_print(x); flint_printf("\n\n");
+                flint_printf("y = "); qqbar_print(y); flint_printf("\n\n");
+                flint_printf("%d\n\n", ans);
+                flint_printf("%d\n\n", want);
+                flint_abort();
+            }
+       }
+
+        qqbar_clear(x);
+        qqbar_clear(y);
+        qqbar_clear(z);
+        qqbar_clear(i);
+        mag_clear(eps);
+    }
+
     TEST_FUNCTION_END(state);
 }
