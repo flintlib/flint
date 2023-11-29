@@ -375,9 +375,7 @@ void _fmpq_cfrac_list_append_ui(_fmpq_cfrac_list_t v, const ulong * a, slong n);
 
 FMPQ_INLINE void _fmpq_cfrac_list_swap(_fmpq_cfrac_list_t a, _fmpq_cfrac_list_t b)
 {
-    _fmpq_cfrac_list_struct t = *a;
-    *a = *b;
-    *b = t;
+    FLINT_SWAP(_fmpq_cfrac_list_struct, *a, *a);
 }
 
 /*************** ball for closed interval [left, right] **********************/
@@ -395,9 +393,7 @@ void _fmpq_ball_clear(_fmpq_ball_t x);
 
 FMPQ_INLINE void _fmpq_ball_swap(_fmpq_ball_t x, _fmpq_ball_t y)
 {
-   _fmpq_ball_struct t = *x;
-   *x = *y;
-   *y = t;
+    FLINT_SWAP(_fmpq_ball_struct, *x, *y);
 }
 
 int _fmpq_ball_gt_one(const _fmpq_ball_t x);
