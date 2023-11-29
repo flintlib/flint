@@ -57,3 +57,4 @@ config.status
 configure
 libtool
 flint.pc
+autom4te.cache/
