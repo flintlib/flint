@@ -72,6 +72,9 @@ void flint_throw(flint_err_t exc, const char * msg, ...)
         case FLINT_ERROR:
             flint_printf("General error");
             break;
+        case FLINT_OVERFLOW:
+            flint_printf("Overflow");
+            break;
         case FLINT_IMPINV:
             flint_printf("Impossible inverse");
             break;
@@ -80,6 +83,9 @@ void flint_throw(flint_err_t exc, const char * msg, ...)
             break;
         case FLINT_DIVZERO:
             flint_printf("Divide by zero");
+            break;
+        case FLINT_EXPOF:
+            flint_printf("Exponent overflow");
             break;
         case FLINT_INEXACT:
             flint_printf("Inexact");
