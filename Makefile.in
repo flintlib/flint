@@ -732,8 +732,13 @@ endif
 
 ifneq ($(COVERAGE), 0)
 coverage: | $(BUILD_DIR)/coverage
-	lcov --capture --exclude "*test/t-*.c" --exclude "*test/main.c" --exclude "/usr/*" --directory $(BUILD_DIR) --output-file $(BUILD_DIR)/coverage/coverage.info
-	genhtml $(BUILD_DIR)/coverage/coverage.info --output-directory $(BUILD_DIR)/coverage
+	lcov --capture  --exclude "*test/t-*.c" --exclude "*test/main.c" --exclude "/usr/*" --directory $(BUILD_DIR) --output-file $(BUILD_DIR)/coverage/coverage.info
+
+# TODO: Add -j $(NJOBS) and --omit-lines "flint_throw" --omit-lines '^}$$' to
+# lcov flags when next Ubuntu LTS ships lcov v2.0.0+.
+
+coverage_html: coverage
+	genhtml -j $(NJOBS) $(BUILD_DIR)/coverage/coverage.info --output-directory $(BUILD_DIR)/coverage
 endif
 
 ################################################################################
@@ -847,4 +852,4 @@ dist:
 print-%:
 	@echo "$*=$($*)"
 
-.PHONY: all library shared static examples checkexamples profile tests check tune valgrind clean distclean install uninstall dist %_TEST_RUN %_VALGRIND_RUN print-% coverage
+.PHONY: all library shared static examples checkexamples profile tests check tune valgrind clean distclean install uninstall dist %_TEST_RUN %_VALGRIND_RUN print-% coverage coverage_html

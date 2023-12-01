@@ -32,15 +32,25 @@ jobs:
 
       - name: "Setup"
         run: |
-          sudo apt-get install -y libgmp-dev
-          sudo apt-get install -y libmpfr-dev
-          sudo apt-get install -y autoconf
-          sudo apt-get install -y libtool-bin
+          sudo apt-get install -y libgmp-dev libmpfr-dev autoconf libtool-bin
+
+          # Install lcov 2.0
+          mkdir lcov
+          cd lcov
+          wget https://github.com/linux-test-project/lcov/releases/download/v2.0/lcov-2.0.tar.gz
+          tar -xf lcov-2.0.tar.gz
+          cd lcov-2.0/
+          sudo make install
+
+          # Install lcov dependencies
+          sudo cpan -T Capture::Tiny DateTime Digest::MD5 File::Spec JSON::XS Memory::Process Module::Load::Conditional Scalar::Util Time::HiRes
+
+          # Check versions
           gcc --version
-          gcov --version
           make --version
           autoconf --version
           libtool --version
+          lcov --version
           echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
 
       - name: "Configure"
@@ -66,10 +76,16 @@ jobs:
           $MAKE check
 
       - name: "Gather coverage data"
-        run: dev/gather_coverage.sh
+        run: |
+          # NOTE: When Ubuntu LTS ships lcov v2.0.0+, change this section to
+          # `$MAKE coverage'.
+          mkdir build/coverage
+          lcov -j $(expr $(nproc) + 1) --capture --omit-lines "flint_throw" --omit-lines '^}$' --exclude "*test/t-*.c" --exclude "*test/main.c" --exclude "/usr/*" --directory build --output-file build/coverage/coverage.info
 
       - name: "Upload coverage data"
-        uses: codecov/codecov-action@v3.1.1
+        uses: codecov/codecov-action@v3.1.4
+        with:
+          files: build/coverage/coverage.info
 
 
 
