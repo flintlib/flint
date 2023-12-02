@@ -738,7 +738,7 @@ coverage: | $(BUILD_DIR)/coverage
 # lcov flags when next Ubuntu LTS ships lcov v2.0.0+.
 
 coverage_html: coverage
-	genhtml -j $(NJOBS) $(BUILD_DIR)/coverage/coverage.info --output-directory $(BUILD_DIR)/coverage
+	genhtml $(NJOBS) $(BUILD_DIR)/coverage/coverage.info --output-directory $(BUILD_DIR)/coverage
 endif
 
 ################################################################################

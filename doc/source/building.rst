@@ -137,10 +137,9 @@ FLINT with ``--enable-coverage``. Then run:
 .. code-block:: bash
 
     make -j N check
-    make coverage
+    make coverage_html
 
 This will place a coverage report in ``build/coverage``.
-
 
 Static or dynamic library only
 -------------------------------------------------------------------------------
