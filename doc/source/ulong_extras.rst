@@ -864,7 +864,7 @@ Primality testing
     Tests if `n` is a strong probable prime to the base `a`. We require
     that `d` is set to the largest odd factor of `n - 1` and ``npre``
     is a precomputed inverse of `n` computed with :func:`n_preinvert_limb`.
-    We require a to be reduced modulo `n` and not `0` and `n` to be odd.
+    We require `a` to be reduced modulo `n` and non-zero, and `n` to be odd.
 
     If we write `n - 1 = 2^s d` where `d` is odd then `n` is a strong
     probable prime to the base `a` (an `a`-SPRP) if either `a^d = 1 \pmod n`

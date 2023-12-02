@@ -11,7 +11,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "ulong_extras.h"
 
 int
@@ -21,11 +20,10 @@ n_is_strong_probabprime2_preinv(mp_limb_t n, mp_limb_t ninv, mp_limb_t a,
     mp_limb_t t = d;
     mp_limb_t y;
 
-    /* Map large base to range 2 ... n - 1 */
-    if (a >= n)
-       a = n_mod2_preinv(a, n, ninv);
+    FLINT_ASSERT(a < n);
 
-    if ((a <= 1) || (a == n - 1))  return 1;
+    if (a <= 1 || a == n - 1)
+        return 1;
 
     y = n_powmod2_ui_preinv(a, t, n, ninv);
 
