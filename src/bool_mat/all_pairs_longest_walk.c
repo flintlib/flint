@@ -32,7 +32,8 @@ _condensation_init(_condensation_t c, const bool_mat_t A)
 {
     slong i, j, u, v;
 
-    if (!bool_mat_is_square(A)) flint_abort(); /* assert */
+    if (!bool_mat_is_square(A))
+        flint_throw(FLINT_ERROR, "_condensation_init: A must be square\n");
 
     c->n = bool_mat_nrows(A);
     c->partition = flint_malloc(c->n * sizeof(slong));
@@ -62,14 +63,8 @@ _condensation_init(_condensation_t c, const bool_mat_t A)
         }
     }
 
-    /* assert */
     if (!bool_mat_is_lower_triangular(c->C) || bool_mat_trace(c->C))
-    {
-        flint_printf("_condensation_init: internal error: "
-                     "unexpected matrix structure\n");
-        bool_mat_print(c->C); flint_printf("\n");
-        flint_abort();
-    }
+        flint_throw(FLINT_ERROR, "_condensation_init: unexpected matrix structure\n");
 }
 
 static void
@@ -263,9 +258,8 @@ bool_mat_all_pairs_longest_walk(fmpz_mat_t B, const bool_mat_t A)
 
     if (!bool_mat_is_square(A))
     {
-        flint_printf("bool_mat_all_pairs_longest_walk: "
+        flint_throw(FLINT_ERROR, "bool_mat_all_pairs_longest_walk: "
                      "a square matrix is required!\n");
-        flint_abort();
     }
 
     if (bool_mat_is_empty(A))

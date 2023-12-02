@@ -72,8 +72,7 @@ fmpz_poly_bit_unpack_unsigned(fmpz_poly_t poly, const fmpz_t f,
 
     if (fmpz_sgn(f) < 0)
     {
-        flint_printf("Exception (fmpz_poly_bit_unpack_unsigned). Expected an unsigned value.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_poly_bit_unpack_unsigned). Expected an unsigned value.\n");
     }
 
     if (bit_size == 0 || fmpz_is_zero(f))

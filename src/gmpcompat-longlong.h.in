@@ -541,8 +541,7 @@ static inline
 void flint_mpz_pow_ui(mpz_ptr r, mpz_srcptr b, ulong exp)
 {
    if (exp >= (UWORD(1) << 32)) {
-      flint_printf("Exception (flint_mpz_pow_ui). Power too large.\n");
-      flint_abort();
+      flint_throw(FLINT_ERROR, "Exception (flint_mpz_pow_ui). Power too large.\n");
    }
 
    mpz_pow_ui(r, b, (unsigned long) exp);
@@ -552,8 +551,7 @@ static inline
 void flint_mpz_fac_ui(mpz_ptr r, ulong n)
 {
    if (n >= (UWORD(1) << 32)) {
-      flint_printf("Exception (flint_mpz_fac_ui). Value n too large.\n");
-      flint_abort();
+      flint_throw(FLINT_ERROR, "Exception (flint_mpz_fac_ui). Value n too large.\n");
    }
 
    mpz_fac_ui(r, (unsigned long) n);
@@ -563,13 +561,11 @@ static inline
 void flint_mpz_bin_uiui(mpz_ptr r, ulong n, ulong k)
 {
    if (n >= (UWORD(1) << 32)) {
-      flint_printf("Exception (flint_mpz_bin_uiui). Value n too large.\n");
-      flint_abort();
+      flint_throw(FLINT_ERROR, "Exception (flint_mpz_bin_uiui). Value n too large.\n");
    }
 
    if (k >= (UWORD(1) << 32)) {
-      flint_printf("Exception (flint_mpz_bin_uiui). Value k too large.\n");
-      flint_abort();
+      flint_throw(FLINT_ERROR, "Exception (flint_mpz_bin_uiui). Value k too large.\n");
    }
 
    mpz_bin_uiui(r, (unsigned long) n, (unsigned long) k);
@@ -579,8 +575,7 @@ static inline
 void flint_mpz_fib_ui(mpz_ptr r, ulong n)
 {
    if (n >= (UWORD(1) << 32)) {
-      flint_printf("Exception (flint_mpz_fib_ui). Value n too large.\n");
-      flint_abort();
+      flint_throw(FLINT_ERROR, "Exception (flint_mpz_fib_ui). Value n too large.\n");
    }
 
    mpz_fib_ui(r, (unsigned long) n);

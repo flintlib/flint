@@ -30,9 +30,7 @@ nmod_poly_power_sums(nmod_poly_t res, const nmod_poly_t poly, slong n)
 
     if (len == 0)
     {
-        flint_printf
-            ("Exception (nmod_poly_power_sums_naive). Zero polynomial.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(nmod_poly_power_sums_naive): Zero polynomial.\n");
     }
     while (poly->coeffs[i] == 0)
         i++;

@@ -19,8 +19,7 @@ fmpz_poly_scalar_fdiv_fmpz(fmpz_poly_t poly1, const fmpz_poly_t poly2,
 {
     if (fmpz_is_zero(x))
     {
-        flint_printf("Exception (fmpz_poly_scalar_fdiv_fmpz). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_poly_scalar_fdiv_fmpz). Division by zero.\n");
     }
 
     if (poly2->length == 0)

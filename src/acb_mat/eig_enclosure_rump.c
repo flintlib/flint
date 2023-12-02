@@ -231,8 +231,7 @@ acb_mat_eig_enclosure_rump(acb_t lambda, acb_mat_t J, acb_mat_t X, const acb_mat
 
     if (k < 1 || k > n || n != acb_mat_nrows(X_approx) || n != acb_mat_ncols(A))
     {
-        flint_printf("bad matrix dimensions in acb_mat_eig_enclosure_rump\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "bad matrix dimensions in acb_mat_eig_enclosure_rump\n");
     }
 
     /* Not frozen rows of the approximation. */

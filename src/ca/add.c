@@ -77,8 +77,7 @@ _ca_mpoly_q_reduce_ideal(fmpz_mpoly_q_t res, ca_field_srcptr field, ca_ctx_t ctx
 #if 0
             if (!fmpz_mpoly_q_is_canonical(res, CA_FIELD_MCTX(field, ctx)))
             {
-                flint_printf("not canonical!\n");
-                flint_abort();
+                flint_throw(FLINT_ERROR, "not canonical!\n");
             }
 #endif
 

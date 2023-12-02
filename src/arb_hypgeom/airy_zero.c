@@ -63,8 +63,7 @@ _arb_hypgeom_airy_zero(arb_t res, const fmpz_t n, int which, slong prec)
     {
         if (fmpz_sgn(n) <= 0)
         {
-            flint_printf("Airy zero only defined for index >= 1\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "Airy zero only defined for index >= 1\n");
         }
 
         /* The asymptotic expansions work well except when n == 1, so

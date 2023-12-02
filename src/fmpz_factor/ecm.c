@@ -123,8 +123,7 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
     mmax = ((B2 - P/2) + P - 1)/P;      /* ceil */
     if (mmax < mmin)
     {
-       flint_printf("Exception (ecm). B1 > B2 encountered.\n");
-       flint_abort();
+       flint_throw(FLINT_ERROR, "Exception (ecm). B1 > B2 encountered.\n");
     }
     maxj = (P + 1)/2;
     mdiff = mmax - mmin + 1;

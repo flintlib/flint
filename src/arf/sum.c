@@ -49,8 +49,7 @@ _arf_add_eps(arf_t s, const arf_t x, int sgn, slong prec, arf_rnd_t rnd)
 
     if (bits == 0)
     {
-        flint_printf("_arf_add_eps\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "_arf_add_eps\n");
     }
 
     bits = FLINT_MAX(bits, prec) + 10;

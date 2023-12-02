@@ -92,8 +92,7 @@ qqbar_get_quadratic(fmpz_t res_a, fmpz_t res_b, fmpz_t res_c, fmpz_t res_q, cons
 
     if (qqbar_degree(x) != 2)
     {
-        flint_printf("qqbar_get_quadratic: degree 1 or 2 is required\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "qqbar_get_quadratic: degree 1 or 2 is required\n");
     }
 
     a = QQBAR_COEFFS(x) + 2;

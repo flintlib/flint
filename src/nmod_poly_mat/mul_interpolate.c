@@ -49,9 +49,7 @@ nmod_poly_mat_mul_interpolate(nmod_poly_mat_t C, const nmod_poly_mat_t A,
 
     if (mod.n < len)
     {
-        flint_printf("Exception (nmod_poly_mat_mul_interpolate). \n"
-               "Characteristic is too small.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(nmod_poly_mat_mul_interpolate): Characteristic is too small.\n");
     }
 
     xs = _nmod_vec_init(len);

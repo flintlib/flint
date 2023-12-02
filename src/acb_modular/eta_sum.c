@@ -133,8 +133,7 @@ _acb_modular_eta_sum_basecase(acb_t eta, const acb_t q, double log2q_approx, slo
             }
             else
             {
-                flint_printf("exponent not in addition sequence!\n");
-                flint_abort();
+                flint_throw(FLINT_ERROR, "exponent not in addition sequence!\n");
             }
         }
 

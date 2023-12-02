@@ -173,7 +173,7 @@ qqbar_atan_pi(slong * p, ulong * q, const qqbar_t x)
         {
             /* root is ~0.267 or ~3.73 -- accuracy should not be that bad */
             if (arb_contains_si(acb_realref(QQBAR_ENCLOSURE(x)), 1))
-                flint_abort();
+                flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
            *p = (arf_cmpabs_2exp_si(arb_midref(acb_realref(QQBAR_ENCLOSURE(x))), 0) < 0) ? 1 : 5;
             *q = 12;
@@ -183,7 +183,7 @@ qqbar_atan_pi(slong * p, ulong * q, const qqbar_t x)
         if (a == 1 && b == 4 && c == 1)
         {
             if (arb_contains_si(acb_realref(QQBAR_ENCLOSURE(x)), -1))
-                flint_abort();
+                flint_throw(FLINT_ERROR, "(%s)\n", __func__);
             *p = (arf_cmpabs_2exp_si(arb_midref(acb_realref(QQBAR_ENCLOSURE(x))), 0) < 0) ? -1 : -5;
             *q = 12;
             return 1;

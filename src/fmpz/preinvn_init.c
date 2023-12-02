@@ -22,9 +22,7 @@ void fmpz_preinvn_init(fmpz_preinvn_t inv, const fmpz_t f)
 
    if (c == 0)
    {
-      flint_printf("Exception (fmpz_preinvn_init). Division by zero.\n");
-      flint_abort();
-      norm = 0;  /* not reached, but silence compiler warning */
+      flint_throw(FLINT_ERROR, "Exception (fmpz_preinvn_init). Division by zero.\n");
    } else if (!COEFF_IS_MPZ(c)) /* c is small */
    {
       inv->dinv = flint_malloc(sizeof(mp_limb_t));

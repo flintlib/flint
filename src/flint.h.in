@@ -431,20 +431,19 @@ int flint_fprintf(FILE * f, const char * str, ...); /* flint version of fprintf 
 int flint_fscanf(FILE * f, const char * str, ...); /* flint version of fscanf */
 #endif
 
+#include "exception.h"
+
 FLINT_INLINE slong flint_mul_sizes(slong x, slong y)
 {
     ulong hi, lo;
 
     umul_ppmm(hi, lo, (ulong) x, (ulong) y);
+
     if (hi != 0 || lo > WORD_MAX)
-    {
-        flint_printf("Exception (flint). Overflow creating size %wd x %wd object.\n", x, y);
-        flint_abort();
-    }
+        flint_throw(FLINT_OVERFLOW, "Overflow creating size %wd x %wd object.\n", x, y);
+
     return lo;
 }
-
-#include "exception.h"
 
 /* Defined ahead of nmod.h, fmpz.h and fmpq.h so that the types are usable in
  * prototypes without importing those headers */

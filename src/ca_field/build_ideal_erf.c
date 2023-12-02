@@ -37,8 +37,7 @@ fmpz_mpoly_set_linear_three_term_si(fmpz_mpoly_t poly, slong a, slong xa, slong 
 
     if (xa == xb)
     {
-        flint_printf("fmpz_mpoly_set_linear_three_term_si\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "fmpz_mpoly_set_linear_three_term_si\n");
     }
 
     fmpz_mpoly_set_si(poly, c, ctx);
@@ -62,8 +61,7 @@ fmpz_mpoly_set_linear2_three_term_si(fmpz_mpoly_t poly, slong a, slong xa, slong
 
     if (xa == xb || xa == xa2)
     {
-        flint_printf("fmpz_mpoly_set_linear2_three_term_si\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "fmpz_mpoly_set_linear2_three_term_si\n");
     }
 
     fmpz_mpoly_set_si(poly, c, ctx);

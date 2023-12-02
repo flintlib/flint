@@ -19,8 +19,7 @@ acb_mat_conjugate(acb_mat_t B, const acb_mat_t A)
     if ((acb_mat_nrows(B) != acb_mat_nrows(A)) ||
         (acb_mat_ncols(B) != acb_mat_ncols(A)))
     {
-        flint_printf("acb_mat_conjugate: incompatible dimensions.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "acb_mat_conjugate: incompatible dimensions.\n");
     }
 
     for (i = 0; i < acb_mat_nrows(A); i++)

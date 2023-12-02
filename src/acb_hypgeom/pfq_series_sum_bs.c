@@ -170,7 +170,8 @@ acb_hypgeom_pfq_series_sum_bs(acb_poly_t s, acb_poly_t t,
         }
 
         /* We should now have start <= n. */
-        if (start > n) flint_abort();
+        if (start > n)
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
         acb_hypgeom_pfq_series_sum_forward(s, t, a, p, b, q, z,
             regularized, start, len, prec);

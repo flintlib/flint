@@ -1195,8 +1195,7 @@ FQ_DEFAULT_INLINE void fq_default_get_nmod_poly(nmod_poly_t poly,
     }
     else
     {
-        flint_printf("Impossible conversion\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Impossible conversion\n");
     }
 }
 
@@ -1217,8 +1216,7 @@ FQ_DEFAULT_INLINE void fq_default_set_nmod_poly(fq_default_t op,
     }
     else
     {
-        flint_printf("Impossible conversion\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Impossible conversion\n");
     }
 }
 

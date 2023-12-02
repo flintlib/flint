@@ -38,8 +38,7 @@ fq_inv(fq_t rop, const fq_t op, const fq_ctx_t ctx)
 {
     if (fq_is_zero(op, ctx))
     {
-        flint_printf("Exception (fq_inv).  Zero is not invertible.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fq_inv).  Zero is not invertible.\n");
     }
     else
     {

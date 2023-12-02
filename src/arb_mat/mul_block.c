@@ -142,8 +142,7 @@ arb_mat_mid_addmul_block_prescaled(arb_mat_t C,
 
                     if (inexact)
                     {
-                        flint_printf("matrix multiplication: bad exponent!\n");
-                        flint_abort();
+                        flint_throw(FLINT_ERROR, "matrix multiplication: bad exponent!\n");
                     }
                 }
             }
@@ -160,8 +159,7 @@ arb_mat_mid_addmul_block_prescaled(arb_mat_t C,
 
                     if (inexact)
                     {
-                        flint_printf("matrix multiplication: bad exponent!\n");
-                        flint_abort();
+                        flint_throw(FLINT_ERROR, "matrix multiplication: bad exponent!\n");
                     }
                 }
             }
@@ -224,8 +222,7 @@ arb_mat_mul_block(arb_mat_t C, const arb_mat_t A, const arb_mat_t B, slong prec)
 
     if (N != arb_mat_nrows(B) || M != arb_mat_nrows(C) || P != arb_mat_ncols(C))
     {
-        flint_printf("arb_mat_mul_block: incompatible dimensions\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "arb_mat_mul_block: incompatible dimensions\n");
     }
 
     if (M == 0 || N == 0 || P == 0 || arb_mat_is_zero(A) || arb_mat_is_zero(B))

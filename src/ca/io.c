@@ -185,8 +185,7 @@ _ca_field_print(calcium_stream_t out, const ca_field_t K, ca_print_info_t * info
 
         if (j == info->ext_len)
         {
-            flint_printf("_ca_field_print: ext not found!\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "_ca_field_print: ext not found!\n");
         }
     }
 
@@ -407,8 +406,7 @@ _ca_print(calcium_stream_t out, const ca_t x, ca_print_info_t * info, ca_ctx_t c
 
                 if (j == info->ext_len)
                 {
-                    flint_printf("_ca_field_print: ext not found!\n");
-                    flint_abort();
+                    flint_throw(FLINT_ERROR, "_ca_field_print: ext not found!\n");
                 }
             }
 

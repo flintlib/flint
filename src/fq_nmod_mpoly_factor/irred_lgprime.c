@@ -108,8 +108,7 @@ static void _frob_combine(
             bad_n_fq_embed_lg_to_sm(c, t->coeffs + lgd*i, emb);
             if (c->length != 1)
             {
-                flint_printf("fatal error in _frob_combine");
-                flint_abort();
+                flint_throw(FLINT_ERROR, "fatal error in _frob_combine");
             }
             _n_fq_set(s->coeffs + smd*i, c->coeffs + smd*0, smd);
         }

@@ -74,7 +74,7 @@ _integrand(acb_ptr res, const acb_t t, void * param, slong order, int negate_pow
     acb_t u, v;
 
     if (order > 1)
-        flint_abort();  /* Would be needed for Taylor method. */
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);  /* Would be needed for Taylor method. */
 
     z = ((acb_srcptr)(param)) + 0;
     s = ((acb_srcptr)(param)) + 1;

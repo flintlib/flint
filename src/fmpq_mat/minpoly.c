@@ -61,8 +61,7 @@ void fmpq_mat_minpoly(fmpq_poly_t pol, const fmpq_mat_t mat)
 
    if (mat->r != mat->c)
    {
-       flint_printf("Exception (fmpq_mat_minpoly).  Non-square matrix.\n");
-       flint_abort();
+       flint_throw(FLINT_ERROR, "Exception (fmpq_mat_minpoly).  Non-square matrix.\n");
    }
 
    fmpq_poly_fit_length(pol, n + 1);

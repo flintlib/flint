@@ -22,8 +22,7 @@ fmpz_mat_randrank(fmpz_mat_t mat, flint_rand_t state, slong rank,
 
     if (rank < 0 || rank > mat->r || rank > mat->c)
     {
-        flint_printf("Exception (fmpz_mat_randrank). Impossible rank.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mat_randrank). Impossible rank.\n");
     }
 
     diag = _fmpz_vec_init(rank);

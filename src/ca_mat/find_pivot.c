@@ -47,7 +47,7 @@ ca_mat_find_pivot(slong * pivot_row, ca_mat_t mat, slong start_row, slong end_ro
     int unknown;
 
     if (end_row <= start_row)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s): end_row <= start_row\n", __func__);
 
     /* First find the simplest element that is not trivially zero. With high probability
        this will actually be nonzero. */

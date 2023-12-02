@@ -312,8 +312,7 @@ void nmod_poly_divrem_basecase(nmod_poly_t Q, nmod_poly_t R,
             return;
         } else
         {
-            flint_printf("Exception (nmod_poly_divrem). Division by zero.");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "Exception (nmod_poly_divrem). Division by zero.");
         }
     }
 

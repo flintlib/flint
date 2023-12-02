@@ -23,7 +23,8 @@ arb_const_khinchin_eval_param(arb_t s, ulong N, ulong M, slong prec)
     arb_init(u);
     arb_init(h);
 
-    if (N < 2) flint_abort();
+    if (N < 2)
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
     /* if (M < 0) flint_abort(); */
 
     pows = _arb_vec_init(N - 2);

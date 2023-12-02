@@ -132,8 +132,7 @@ ca_cmp_repr(const ca_t x, const ca_t y, ca_ctx_t ctx)
 
     if (CA_IS_SPECIAL(x) || CA_IS_SPECIAL(y))
     {
-        flint_printf("ca_cmp_repr: not implemented for special values\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "ca_cmp_repr: not implemented for special values\n");
     }
 
     xfield = CA_FIELD(x, ctx);
@@ -163,7 +162,7 @@ slong
 ca_depth(const ca_t x, ca_ctx_t ctx)
 {
     if (CA_IS_SPECIAL(x))
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     return ca_field_depth(CA_FIELD(x, ctx), ctx);
 }

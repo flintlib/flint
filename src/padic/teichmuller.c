@@ -93,8 +93,7 @@ void padic_teichmuller(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 {
     if (padic_val(op) < 0)
     {
-        flint_printf("Exception (padic_teichmuller).  op is not a p-adic integer.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (padic_teichmuller).  op is not a p-adic integer.\n");
     }
 
     if (padic_is_zero(op) || padic_val(op) > 0 || padic_prec(rop) <= 0)

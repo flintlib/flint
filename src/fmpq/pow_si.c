@@ -50,8 +50,7 @@ void fmpq_pow_si(fmpq_t rop, const fmpq_t op, slong e)
 {
     if (e < 0 && fmpz_is_zero(fmpq_numref(op)))
     {
-        flint_printf("Exception (fmpq_pow_si). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpq_pow_si). Division by zero.\n");
     }
 
     _fmpq_pow_si(fmpq_numref(rop), fmpq_denref(rop),

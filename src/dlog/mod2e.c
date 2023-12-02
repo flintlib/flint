@@ -24,9 +24,7 @@ dlog_mod2e_1mod4(ulong b1, ulong e, ulong inv5, nmod_t pe)
     {
         if (b1 % pf != 1)
         {
-            flint_printf("ERROR dlog_mod2e: %wu %% %wu != 1 mod %wu\n\n",
-                    b1, pf, pe.n);
-            flint_abort();
+            flint_throw(FLINT_ERROR, "ERROR dlog_mod2e: %wu %% %wu != 1 mod %wu\n\n", b1, pf, pe.n);
         }
         xf = (b1 - 1) / pf;
         xf = (f == 2) ? xf % 4 : (xf % 2) * (pf1 / 2);

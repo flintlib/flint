@@ -152,7 +152,7 @@ ca_rewrite_ext_complex_normal_form(ca_t res, ca_ext_ptr ext, int deep, ca_ctx_t 
                         break;
 
                     default:
-                        flint_abort();
+                        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
                 }
 
                 ca_clear(t, ctx);
@@ -236,7 +236,7 @@ ca_rewrite_ext_complex_normal_form(ca_t res, ca_ext_ptr ext, int deep, ca_ctx_t 
                             ca_sqrt(res, res, ctx);
                             break;
                         default:
-                            flint_abort();
+                            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
                     }
                 }
             }

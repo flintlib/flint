@@ -42,7 +42,7 @@ qqbar_fmpq_root_ui(qqbar_t res, const fmpq_t x, ulong b)
     fmpz_t p, q, t;
 
     if (b == 0)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     if (b == 1 || fmpq_is_zero(x) || fmpq_is_one(x))
     {
@@ -120,7 +120,7 @@ qqbar_fmpq_root_ui(qqbar_t res, const fmpq_t x, ulong b)
         arb_root_ui(acb_realref(QQBAR_ENCLOSURE(res)), acb_realref(QQBAR_ENCLOSURE(res)), b, QQBAR_DEFAULT_PREC);
 
     if (!arb_is_positive(acb_realref(QQBAR_ENCLOSURE(res))))
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     fmpz_clear(p);
     fmpz_clear(q);

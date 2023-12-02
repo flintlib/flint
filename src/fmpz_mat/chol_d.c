@@ -25,9 +25,7 @@ fmpz_mat_chol_d(d_mat_t R, const fmpz_mat_t A)
 
     if (A->r != A->c || R->r != A->r || R->c != A->c)
     {
-        flint_printf
-            ("Exception (fmpz_mat_chol_d). Incompatible dimensions.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(fmpz_mat_chol_d): Incompatible dimensions.\n");
     }
 
     if (A->r == 0)

@@ -18,8 +18,7 @@ ca_mat_trace(ca_t trace, const ca_mat_t mat, ca_ctx_t ctx)
 
     if (!ca_mat_is_square(mat))
     {
-        flint_printf("ca_mat_trace: a square matrix is required!\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "ca_mat_trace: a square matrix is required!\n");
     }
 
     if (ca_mat_is_empty(mat))

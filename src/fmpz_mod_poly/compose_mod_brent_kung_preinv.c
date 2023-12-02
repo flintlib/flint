@@ -105,17 +105,14 @@ fmpz_mod_poly_compose_mod_brent_kung_preinv(fmpz_mod_poly_t res,
 
     if (len3 == 0)
     {
-        flint_printf("Exception (fmpz_mod_poly_compose_mod_brent_kung preinv)."
+        flint_throw(FLINT_ERROR, "(fmpz_mod_poly_compose_mod_brent_kung preinv): "
                      "Division by zero\n");
-        flint_abort();
     }
 
     if (len1 >= len3)
     {
-        flint_printf("Exception (fmpz_mod_poly_compose_mod_brent_kung_preinv)."
-               "The degree of the first polynomial must be smaller than that of the "
-               " modulus\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(fmpz_mod_poly_compose_mod_brent_kung_preinv): "
+               "The degree of the first polynomial must be smaller than that of the modulus\n");
     }
 
     if (len1 == 0 || len3 == 1)

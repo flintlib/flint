@@ -290,8 +290,7 @@ int fmpq_poly_fread(FILE * file, fmpq_poly_t poly)
     }
     if (!mpz_fits_slong_p(t))
     {
-        flint_printf("Exception (fmpz_poly_fread). Length does not fit into a slong.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_poly_fread). Length does not fit into a slong.\n");
     }
     len = flint_mpz_get_si(t);
     mpz_clear(t);

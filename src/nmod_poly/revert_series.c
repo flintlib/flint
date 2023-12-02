@@ -32,9 +32,8 @@ nmod_poly_revert_series(nmod_poly_t Qinv,
 
     if (Qlen < 2 || Q->coeffs[0] != 0 || Q->coeffs[1] == 0)
     {
-        flint_printf("Exception (nmod_poly_revert_series). Input must have \n"
-               "zero constant and an invertible coefficient of x^1.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(nmod_poly_revert_series): "
+                "Input must have zero constant and an invertible coefficient of x^1.\n");
     }
 
     if (Qinv != Q)

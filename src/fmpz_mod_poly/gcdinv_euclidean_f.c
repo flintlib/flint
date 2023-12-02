@@ -153,8 +153,7 @@ fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz_mod_poly_t G,
 
 	if (lenB < 2)
     {
-        flint_printf("Exception (fmpz_mod_poly_gcdinv_euclidean_f). lenB < 2.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mod_poly_gcdinv_euclidean_f). lenB < 2.\n");
     }
     if (lenA >= lenB)
     {

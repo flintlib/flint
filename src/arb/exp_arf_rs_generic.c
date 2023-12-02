@@ -56,7 +56,7 @@ arb_exp_taylor_sum_rs_generic(arb_t res, const arb_t x, slong N, slong prec)
         /* not intended (and not 32-bit safe...) */
         if (M > 30000)
         {
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
         }
 
         tpow = _arb_vec_init(m + 2);

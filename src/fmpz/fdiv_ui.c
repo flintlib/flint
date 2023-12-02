@@ -22,8 +22,7 @@ fmpz_fdiv_ui(const fmpz_t g, ulong h)
 
     if (h == UWORD(0))
     {
-        flint_printf("Exception (fmpz_fdiv_ui). Division by 0.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_fdiv_ui). Division by 0.\n");
     }
 
     if (!COEFF_IS_MPZ(c1))      /* g is small */

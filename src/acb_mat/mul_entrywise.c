@@ -19,8 +19,7 @@ acb_mat_mul_entrywise(acb_mat_t C, const acb_mat_t A, const acb_mat_t B, slong p
     if (acb_mat_nrows(A) != acb_mat_nrows(B) ||
         acb_mat_ncols(A) != acb_mat_ncols(B))
     {
-        flint_printf("acb_mat_mul_entrywise: incompatible dimensions\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "acb_mat_mul_entrywise: incompatible dimensions\n");
     }
 
     for (i = 0; i < acb_mat_nrows(A); i++)

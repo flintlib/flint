@@ -179,7 +179,6 @@ void fmpz_poly_pow_addchains(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
     }
     else
     {
-        flint_printf("Exception (fmpz_poly_addchains). Powering via chains not implemented for e > 148.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_poly_addchains). Powering via chains not implemented for e > 148.\n");
     }
 }

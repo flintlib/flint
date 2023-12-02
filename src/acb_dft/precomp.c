@@ -94,9 +94,7 @@ acb_dft_precomp_clear(acb_dft_pre_t pre)
             acb_dft_bluestein_clear(pre->t.bluestein);
             break;
         default:
-            flint_printf("acb_dft_clear: unknown strategy code %i\n", pre->type);
-            flint_abort();
-            break;
+            flint_throw(FLINT_ERROR, "acb_dft_clear: unknown strategy code %i\n", pre->type);
     }
 }
 
@@ -124,9 +122,7 @@ acb_dft_precomp(acb_ptr w, acb_srcptr v, const acb_dft_pre_t pre, slong prec)
             acb_dft_bluestein_precomp(w, v, pre->t.bluestein, prec);
             break;
         default:
-            flint_printf("acb_dft_precomp: unknown strategy code %i\n", pre->type);
-            flint_abort();
-            break;
+            flint_throw(FLINT_ERROR, "acb_dft_precomp: unknown strategy code %i\n", pre->type);
     }
 }
 

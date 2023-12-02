@@ -76,7 +76,7 @@ sin_cos(double * sin_a, double * cos_a, int * q, double a)
     i = a * 16.0;
 
     if (i < 0 || i > 25)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     as = sin_tab[i];
     ac = cos_tab[i];

@@ -28,8 +28,7 @@ void fmpz_mod_mat_minpoly(fmpz_mod_poly_t p, const fmpz_mod_mat_t X,
 
     if (n != fmpz_mod_mat_ncols(X))
     {
-        flint_printf("Exception (fmpz_mod_mat_charpoly). Non-square matrix.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mod_mat_charpoly). Non-square matrix.\n");
     }
 
     if (n == 0)

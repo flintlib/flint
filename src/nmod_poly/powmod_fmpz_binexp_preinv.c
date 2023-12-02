@@ -91,8 +91,7 @@ nmod_poly_powmod_fmpz_binexp_preinv(nmod_poly_t res, const nmod_poly_t poly,
 
     if (lenf == 0)
     {
-        flint_printf("Exception (nmod_poly_powmod_fmpz_binexp_preinv). Divide by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (nmod_poly_powmod_fmpz_binexp_preinv). Divide by zero.\n");
     }
 
     if (lenf == 1)

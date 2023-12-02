@@ -44,8 +44,7 @@ fexpr_arg(fexpr_t res, const fexpr_t expr, slong i)
     }
     else
     {
-        flint_printf("fexpr_arg: a non-atomic expression is required\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "fexpr_arg: a non-atomic expression is required\n");
     }
 }
 
@@ -79,7 +78,6 @@ fexpr_view_arg(fexpr_t res, const fexpr_t expr, slong i)
     }
     else
     {
-        flint_printf("fexpr_view_arg: a non-atomic expression is required\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "fexpr_view_arg: a non-atomic expression is required\n");
     }
 }

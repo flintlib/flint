@@ -21,8 +21,7 @@ d_mat_qr(d_mat_t Q, d_mat_t R, const d_mat_t A)
 
     if (Q->r != A->r || Q->c != A->c || R->r != A->c || R->c != A->c)
     {
-        flint_printf("Exception (d_mat_qr). Incompatible dimensions.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (d_mat_qr). Incompatible dimensions.\n");
     }
 
     if (Q == A)

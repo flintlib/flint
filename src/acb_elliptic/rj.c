@@ -170,7 +170,7 @@ acb_elliptic_rj_taylor_sum(acb_t res, const acb_t E2, const acb_t E3,
                     N = 5 * m5 + 4 * m4 + 3 * m3 + 2 * m2;
 
                     if (N > NMAX)
-                        flint_abort();
+                        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
                     fmpz_divexact_ui(t, c2, 2 * N + 3);
                     if ((M + N) % 2)
@@ -533,7 +533,7 @@ RJ_integrand(acb_ptr res, const acb_t t, void * param, slong order, slong prec)
     int analytic, deflated;
 
     if (order > 1)
-        flint_abort();  /* Would be needed for Taylor method. */
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);  /* Would be needed for Taylor method. */
 
     x = ((acb_ptr) param);
     y = ((acb_ptr) param) + 1;

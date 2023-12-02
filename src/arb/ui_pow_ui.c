@@ -299,7 +299,7 @@ arb_ui_pow_ui(arb_t res, ulong a, ulong exp, slong prec)
         }
 
         if (yn < wp_limbs)
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
         /* y = y * a */
         if (exp & (UWORD(1) << i))
@@ -322,7 +322,7 @@ arb_ui_pow_ui(arb_t res, ulong a, ulong exp, slong prec)
                and there was no multiplication by a, but in that case
                there are 0 leading zeros anyway */
             if (yn == wp_limbs)
-                flint_abort();
+                flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
             if (tmp[yn - 1] >> (FLINT_BITS - 2))
             {

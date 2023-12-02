@@ -23,15 +23,13 @@ _acb_dot_arb(acb_t res, const acb_t initial, int subtract,
     arb_srcptr b, c;
     if (sizeof(acb_struct) != 2*sizeof(arb_struct))
     {
-        flint_printf("expected sizeof(acb_struct)=%zu "
+        flint_throw(FLINT_ERROR, "expected sizeof(acb_struct)=%zu "
                 "to be twice sizeof(arb_struct)=%zu\n",
                 sizeof(acb_struct), sizeof(arb_struct));
-        flint_abort();
     }
     if (initial == NULL)
     {
-        flint_printf("not implemented for NULL initial value\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "not implemented for NULL initial value\n");
     }
 
     a = acb_realref(res);
@@ -341,8 +339,7 @@ smk_block_increment(smk_block_t p, const acb_t z, arb_srcptr v)
 {
     if (smk_block_is_full(p))
     {
-        flint_printf("trying to increment a full block\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "trying to increment a full block\n");
     }
     acb_set(p->v + p->b, z);
     _arb_vec_set(p->M + p->K * p->b, v, p->K);
@@ -417,9 +414,8 @@ _platt_smk(acb_ptr table, acb_ptr startvec, acb_ptr stopvec,
 
         if (m < mstart || m > mstop)
         {
-            flint_printf("out of bounds error: m = %wd not in [%wd, %wd]\n",
+            flint_throw(FLINT_ERROR, "out of bounds error: m = %wd not in [%wd, %wd]\n",
                           m, mstart, mstop);
-            flint_abort();
         }
 
         arb_mul_2exp_si(base, a, -1);

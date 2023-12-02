@@ -87,7 +87,8 @@ void _acb_dirichlet_euler_product_real_ui(arb_t res, ulong s,
         return;
     }
 
-    if (prec < 2) flint_abort(); /* assert */
+    if (prec < 2)
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     /* L(s), 1/L(s) = 1 + ...  For s >= 3, zeta(s,2) < 2^(1-s). */
     if (s > (ulong) prec)

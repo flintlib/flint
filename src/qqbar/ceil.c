@@ -56,8 +56,7 @@ qqbar_ceil(fmpz_t res, const qqbar_t x)
 
                 if (!arb_get_unique_fmpz(res, v))
                 {
-                    flint_printf("qqbar_ceil: either ceil(x) or ceil(x-1/2) should evaluate numerically\n");
-                    flint_abort();
+                    flint_throw(FLINT_ERROR, "qqbar_ceil: either ceil(x) or ceil(x-1/2) should evaluate numerically\n");
                 }
 
                 qqbar_set_fmpz(u, res);

@@ -20,8 +20,7 @@ acb_dirichlet_platt_zeta_zeros(acb_ptr res, const fmpz_t n, slong len, slong pre
     }
     else if (fmpz_sgn(n) < 1)
     {
-        flint_printf("nonpositive indices of zeta zeros are not supported\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "nonpositive indices of zeta zeros are not supported\n");
     }
     else
     {

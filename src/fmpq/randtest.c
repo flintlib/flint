@@ -65,8 +65,7 @@ void fmpq_randtest_not_zero(fmpq_t f, flint_rand_t state, flint_bitcnt_t bits)
 {
     if (bits == 0)
     {
-        flint_printf("Exception (fmpq_randtest_not_zero). bits == 0.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpq_randtest_not_zero). bits == 0.\n");
     }
 
     do {

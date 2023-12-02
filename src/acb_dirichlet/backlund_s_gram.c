@@ -17,8 +17,7 @@ acb_dirichlet_backlund_s_gram(const fmpz_t n)
     slong res = 0;
     if (fmpz_cmp_si(n, -1) < 0)
     {
-        flint_printf("n must be >= -1\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "n must be >= -1\n");
     }
     else
     {

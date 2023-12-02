@@ -32,8 +32,6 @@ dlog_precomp(const dlog_precomp_t pre, ulong b)
         case DLOG_23:
             return dlog_order23(pre->t.order23, b);
         default:
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(dlog_precomp): Unknown option");
     }
-
-    return 0; /* dummy return because flint_abort() is not declared noreturn */
 }

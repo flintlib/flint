@@ -90,7 +90,7 @@ acb_calc_gl_node(arb_ptr x, arb_ptr w, slong i, slong k, slong prec)
     int all;
 
     if (i < 0 || i >= GL_STEPS || prec < 2)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     if (gl_cache == NULL)
         gl_init();
@@ -98,7 +98,7 @@ acb_calc_gl_node(arb_ptr x, arb_ptr w, slong i, slong k, slong prec)
     n = gl_steps[i];
 
     if (k >= n)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     all = (k < 0);
 
@@ -339,7 +339,7 @@ acb_calc_integrate_gl_auto_deg(acb_t res, slong * eval_count,
         }
 
         if (best_n == -1)
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
         for (i = 0; i < GL_STEPS; i++)
             if (gl_steps[i] == best_n)

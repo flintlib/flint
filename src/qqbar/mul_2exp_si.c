@@ -28,8 +28,7 @@ qqbar_mul_2exp_si(qqbar_t res, const qqbar_t x, slong exp)
 
     if (FLINT_BIT_COUNT(d) + FLINT_BIT_COUNT((ulong) FLINT_ABS(exp)) > FLINT_BITS - 8)
     {
-        flint_printf("qqbar_mul_2exp_si: ludicrously large coefficients\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "qqbar_mul_2exp_si: ludicrously large coefficients\n");
     }
 
     fmpz_poly_set(QQBAR_POLY(res), QQBAR_POLY(x));

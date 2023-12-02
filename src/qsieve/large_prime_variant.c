@@ -352,8 +352,7 @@ relation_t qsieve_merge_relation(qs_t qs_inf, relation_t a, relation_t b)
 
         if (k >= qs_inf->max_factors)
         {
-            flint_printf("more than max_factor !!\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "more than max_factor !!\n");
         }
     }
 
@@ -364,8 +363,7 @@ relation_t qsieve_merge_relation(qs_t qs_inf, relation_t a, relation_t b)
 
         if (k >= qs_inf->max_factors)
         {
-            flint_printf("more than max_factor !!\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "more than max_factor !!\n");
         }
     }
 
@@ -376,8 +374,7 @@ relation_t qsieve_merge_relation(qs_t qs_inf, relation_t a, relation_t b)
 
         if (k >= qs_inf->max_factors)
         {
-            flint_printf("more than max_factor !!\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "more than max_factor !!\n");
         }
     }
 
@@ -388,8 +385,7 @@ relation_t qsieve_merge_relation(qs_t qs_inf, relation_t a, relation_t b)
 
     if (fmpz_invmod(temp, temp, qs_inf->kn) == 0)
     {
-        flint_printf("Inverse doesn't exist !!\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Inverse doesn't exist !!\n");
     }
 
     fmpz_mul(c.Y, a.Y, b.Y);

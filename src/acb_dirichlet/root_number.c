@@ -36,8 +36,7 @@ acb_dirichlet_root_number(acb_t res, const dirichlet_group_t G, const dirichlet_
 {
     if (dirichlet_conductor_char(G, chi) < G->q)
     {
-        flint_printf("root number: need primitive character\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "root number: need primitive character\n");
     }
     else if (G->num > 1)
     {

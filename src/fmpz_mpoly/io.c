@@ -166,10 +166,12 @@ void fmpz_mpoly_remainder_test(const fmpz_mpoly_t r, const fmpz_mpoly_t g,
 
         if (divides && fmpz_cmpabs(g->coeffs + 0, r->coeffs + i) <= 0)
         {
-            flint_printf("fmpz_mpoly_remainder_test FAILED i = %wd\n", i);
-            flint_printf("rem ");fmpz_mpoly_print_pretty(r, NULL, ctx); printf("\n\n");
-            flint_printf("den ");fmpz_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "fmpz_mpoly_remainder_test FAILED i = %wd\n"
+                                     "rem %s\n\n"
+                                     "den %s\n\n",
+                                     i,
+                                     fmpz_mpoly_get_str_pretty(r, NULL, ctx),
+                                     fmpz_mpoly_get_str_pretty(g, NULL, ctx));
         }
     }
 
@@ -219,10 +221,12 @@ void fmpz_mpoly_remainder_strongtest(const fmpz_mpoly_t r, const fmpz_mpoly_t g,
 
         if (divides)
         {
-            flint_printf("fmpz_mpoly_remainder_strongtest FAILED i = %wd\n", i);
-            flint_printf("rem ");fmpz_mpoly_print_pretty(r, NULL, ctx); printf("\n\n");
-            flint_printf("den ");fmpz_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "fmpz_mpoly_remainder_strongtest FAILED i = %wd\n"
+                                     "rem %s\n\n"
+                                     "den %s\n\n",
+                                     i,
+                                     fmpz_mpoly_get_str_pretty(r, NULL, ctx),
+                                     fmpz_mpoly_get_str_pretty(g, NULL, ctx));
         }
     }
 

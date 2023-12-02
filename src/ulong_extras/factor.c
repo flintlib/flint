@@ -69,8 +69,7 @@ void n_factor(n_factor_t * factors, mp_limb_t n, int proved)
                factors_left++;
             } else
         {
-               flint_printf("Exception (n_factor). Failed to factor %wd.\n", n);
-               flint_abort();
+               flint_throw(FLINT_ERROR, "Exception (n_factor). Failed to factor %wd.\n", n);
         }
          } else
      {

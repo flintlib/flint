@@ -115,8 +115,7 @@ mp_limb_t qsieve_primes_init(qs_t qs_inf)
 
     if (num_primes < 3)
     {
-       flint_printf("Too few factor base primes\n");
-       flint_abort();
+       flint_throw(FLINT_ERROR, "Too few factor base primes\n");
     }
 
     qs_inf->sieve_size = qsieve_tune[i][4]; /* size of sieve to use */
@@ -135,8 +134,7 @@ mp_limb_t qsieve_primes_init(qs_t qs_inf)
 
     if (qs_inf->small_primes > num_primes)
     {
-       flint_printf("Too few factor base primes\n");
-       flint_abort();
+       flint_throw(FLINT_ERROR, "Too few factor base primes\n");
     }
 
     /* build up FB */

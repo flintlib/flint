@@ -19,8 +19,7 @@ fmpz_poly_mat_transpose(fmpz_poly_mat_t B, const fmpz_poly_mat_t A)
 
     if (B->r != A->c || B->c != A->r)
     {
-        flint_printf("Exception (fmpz_poly_mat_transpose). Incompatible dimensions.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_poly_mat_transpose). Incompatible dimensions.\n");
     }
 
     if (A == B)  /* In-place, guaranteed to be square */

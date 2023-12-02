@@ -73,8 +73,7 @@ mp_limb_t n_factor_partial(n_factor_t * factors, mp_limb_t n, mp_limb_t limit, i
                factors_left++;
 				} else
 				{
-               flint_printf("Error (n_factor_partial). Failed to factor %wd.\n", n);
-               flint_abort();
+               flint_throw(FLINT_ERROR, "Error (n_factor_partial). Failed to factor %wd.\n", n);
 				}
          } else
 			{

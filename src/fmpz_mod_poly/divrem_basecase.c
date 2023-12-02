@@ -82,8 +82,7 @@ void fmpz_mod_poly_divrem_basecase(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
         }
         else
         {
-            flint_printf("Exception (fmpz_mod_poly_divrem_basecase). Division by zero.\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "Exception (fmpz_mod_poly_divrem_basecase). Division by zero.\n");
         }
     }
 

@@ -24,8 +24,7 @@ qqbar_cos_pi(qqbar_t res, slong p, ulong q)
 
     if (q == 0)
     {
-        flint_printf("qqbar_cos_pi: q = 0\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "qqbar_cos_pi: q = 0\n");
     }
 
     fmpq_set_si(t, p, q);

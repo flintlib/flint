@@ -45,8 +45,7 @@ crt_print(const crt_t c)
     slong k;
     if (c->num == 0)
     {
-        flint_printf("trivial group\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "trivial group\n");
     }
     for (k = 0; k < c->num; k++)
         flint_printf("Z/%wuZ ", c->m[k]);

@@ -46,16 +46,14 @@ bool_mat_randtest_nilpotent(bool_mat_t mat, flint_rand_t state)
 
     if (!bool_mat_is_square(mat))
     {
-        flint_printf("bool_mat_randtest_nilpotent: "
+        flint_throw(FLINT_ERROR, "bool_mat_randtest_nilpotent: "
                      "a square matrix is required!\n");
-        flint_abort();
     }
 
     if (bool_mat_is_empty(mat))
     {
-        flint_printf("bool_mat_randtest_nilpotent: "
+        flint_throw(FLINT_ERROR, "bool_mat_randtest_nilpotent: "
                      "a non-empty matrix is required!\n");
-        flint_abort();
     }
 
     n = bool_mat_nrows(mat);

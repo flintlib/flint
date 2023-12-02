@@ -23,8 +23,7 @@ TEMPLATE(T, mat_randrank) (TEMPLATE(T, mat_t) mat, flint_rand_t state,
 
     if (rank < 0 || rank > mat->r || rank > mat->c)
     {
-        printf("Exception (nmod_mat_randrank). Impossible rank.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s): Impossible rank.\n", __func__);
     }
 
     diag = _TEMPLATE(T, vec_init) (rank, ctx);

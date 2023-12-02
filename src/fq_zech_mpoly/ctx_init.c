@@ -26,7 +26,6 @@ void fq_zech_mpoly_ctx_init(fq_zech_mpoly_ctx_t ctx, slong nvars,
                                const ordering_t ord, const fq_zech_ctx_t fqctx)
 {
     mpoly_ctx_init(ctx->minfo, nvars, ord);
-    flint_printf("fq_zech_mpoly_ctx_init not implemented\n");
-    flint_abort();
-/*    fq_nmod_ctx_init_modulus(ctx->fqctx, fqctx->modulus, fqctx->var);*/
+    flint_throw(FLINT_ERROR, "fq_zech_mpoly_ctx_init not implemented\n");
+    /* fq_nmod_ctx_init_modulus(ctx->fqctx, fqctx->modulus, fqctx->var); */
 }

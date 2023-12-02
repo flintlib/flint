@@ -284,7 +284,7 @@ partitions_hrr_sum_arb(arb_t x, const fmpz_t n, slong N0, slong N, int use_doubl
 
     if (fmpz_cmp_ui(n, 2) <= 0)
     {
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
     }
 
     nd = fmpz_get_d(n);

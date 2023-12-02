@@ -19,8 +19,7 @@ nmod_poly_deflate(nmod_poly_t result, const nmod_poly_t input, ulong deflation)
 
     if (deflation == 0)
     {
-        flint_printf("Exception (nmod_poly_deflate). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (nmod_poly_deflate). Division by zero.\n");
     }
 
     if (input->length <= 1 || deflation == 1)

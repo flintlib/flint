@@ -62,8 +62,7 @@ qqbar_scalar_op(qqbar_t res, const qqbar_t x, const fmpz_t a, const fmpz_t b, co
 
     if (fmpz_is_zero(c))
     {
-        flint_printf("qqbar_scalar_op: division by zero\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "qqbar_scalar_op: division by zero\n");
     }
 
     /* Special case: set to rational */

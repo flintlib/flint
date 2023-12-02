@@ -35,8 +35,7 @@ mpf_mat_mul(mpf_mat_t C, const mpf_mat_t A, const mpf_mat_t B)
 
     if (C->r != ar || C->c != bc)
     {
-        flint_printf("Exception (mpf_mat_mul). Incompatible dimensions.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (mpf_mat_mul). Incompatible dimensions.\n");
     }
 
     if (br == 0)

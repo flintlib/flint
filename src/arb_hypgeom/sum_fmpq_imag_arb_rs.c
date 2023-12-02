@@ -185,7 +185,7 @@ arb_hypgeom_sum_fmpq_imag_arb_rs(arb_t res_real, arb_t res_imag, const fmpq * a,
         }
 
         if (jbot != jtop - jlen + 1)
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
         /* Factors between jbot and jtop inclusive */
         if (jbot == 0 || alen == 0)

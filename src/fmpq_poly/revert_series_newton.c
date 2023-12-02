@@ -110,9 +110,8 @@ fmpq_poly_revert_series_newton(fmpq_poly_t res,
     if (poly->length < 2 || !fmpz_is_zero(poly->coeffs)
                          || fmpz_is_zero(poly->coeffs + 1))
     {
-        flint_printf("Exception (fmpq_poly_revert_series_newton). Input must have \n"
-               "zero constant term and nonzero coefficient of x^1.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(fmpq_poly_revert_series_newton): "
+                "Input must have zero constant term and nonzero coefficient of x^1.\n");
     }
 
     if (n < 2)

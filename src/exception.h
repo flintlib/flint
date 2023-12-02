@@ -14,12 +14,13 @@
 
 typedef enum
 {
-   FLINT_ERROR,  /* general error */
-   FLINT_IMPINV, /* impossible inverse */
-   FLINT_DOMERR, /* domain error */
-   FLINT_DIVZERO, /* divide by zero */
-   FLINT_EXPOF,   /* exponent overflow */
-   FLINT_INEXACT /* inexact error */
+   FLINT_ERROR,     /* general error */
+   FLINT_OVERFLOW,  /* overflow */
+   FLINT_IMPINV,    /* impossible inverse */
+   FLINT_DOMERR,    /* domain error */
+   FLINT_DIVZERO,   /* divide by zero */
+   FLINT_EXPOF,     /* exponent overflow */
+   FLINT_INEXACT    /* inexact error */
 } flint_err_t;
 
 FLINT_NORETURN void flint_throw(flint_err_t exc, const char * msg, ...);

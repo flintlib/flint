@@ -22,8 +22,7 @@ _ca_make_field_element(ca_t x, ca_field_srcptr field, ca_ctx_t ctx)
 
     if (field == NULL)
     {
-        flint_printf("NULL in _ca_make_field_element\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "NULL in _ca_make_field_element\n");
     }
 
     old_field = (ca_field_srcptr) (x->field & ~CA_SPECIAL);

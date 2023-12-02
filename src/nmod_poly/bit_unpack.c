@@ -203,8 +203,7 @@ nmod_poly_bit_unpack(nmod_poly_t poly, const fmpz_t f, flint_bitcnt_t bit_size)
 
     if (fmpz_sgn(f) < 0)
     {
-        flint_printf("Exception (nmod_poly_bit_unpack). f < 0.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (nmod_poly_bit_unpack). f < 0.\n");
     }
 
     if (bit_size == 0 || fmpz_is_zero(f))

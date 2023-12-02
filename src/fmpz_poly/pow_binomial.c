@@ -70,8 +70,7 @@ fmpz_poly_pow_binomial(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
 
     if (len != 2)
     {
-        flint_printf("Exception (fmpz_poly_pow_binomial). poly->length not equal to 2.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_poly_pow_binomial). poly->length not equal to 2.\n");
     }
 
     if (e < UWORD(3))

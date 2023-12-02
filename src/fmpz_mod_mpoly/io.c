@@ -61,10 +61,12 @@ void fmpz_mod_mpoly_remainder_strongtest(const fmpz_mod_mpoly_t r,
 
         if (divides)
         {
-            flint_printf("fmpz_mod_mpoly_remainder_strongtest FAILED i = %wd\n", i);
-            flint_printf("rem ");fmpz_mod_mpoly_print_pretty(r, NULL, ctx); printf("\n\n");
-            flint_printf("den ");fmpz_mod_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "fmpz_mod_mpoly_remainder_strongtest FAILED i = %wd\n"
+                                     "rem %s\n\n"
+                                     "den %s\n\n",
+                                     i,
+                                     fmpz_mod_mpoly_get_str_pretty(r, NULL, ctx),
+                                     fmpz_mod_mpoly_get_str_pretty(g, NULL, ctx));
         }
     }
 

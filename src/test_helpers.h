@@ -20,9 +20,7 @@
     do {                                                \
         if (!(e))                                       \
         {                                               \
-            flint_printf("test %s FAILED\n", #e);       \
-            flint_printf("%s:%d\n", __FILE__, __LINE__);\
-            flint_abort();                              \
+            flint_throw(FLINT_ERROR, "test %s FAILED\n%s:%d", #e, __FILE__, __LINE__); \
         }                                               \
     } while (0)
 
@@ -131,10 +129,7 @@ main(int argc, char ** argv)                                                \
                                                                             \
             if (ix == numtests)                                             \
             {                                                               \
-                fprintf(stderr,                                             \
-                        "Error: Could not find test function for %s\n",     \
-                        argv[jx]);                                          \
-                flint_abort();                                              \
+                flint_throw(FLINT_ERROR, "Could not find test function for %s\n", argv[jx]); \
             }                                                               \
         }                                                                   \
                                                                             \

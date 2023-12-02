@@ -170,13 +170,11 @@ acb_dirichlet_platt_c_precomp_init(acb_dirichlet_platt_c_precomp_t pre,
 {
     if (!arb_is_positive(h))
     {
-        flint_printf("requires positive h\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "requires positive h\n");
     }
     else if (sigma % 2 == 0 || sigma < 3)
     {
-        flint_printf("requires odd integer sigma >= 3 (sigma=%wd)\n", sigma);
-        flint_abort();
+        flint_throw(FLINT_ERROR, "requires odd integer sigma >= 3 (sigma=%wd)\n", sigma);
     }
     else
     {

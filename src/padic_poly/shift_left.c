@@ -17,8 +17,7 @@ void padic_poly_shift_left(padic_poly_t rop, const padic_poly_t op, slong n,
 {
     if (rop->N < op->N)
     {
-        flint_printf("Exception (padic_poly_shift_left).  rop->N < op->N.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (padic_poly_shift_left).  rop->N < op->N.\n");
     }
 
     if (n == 0)

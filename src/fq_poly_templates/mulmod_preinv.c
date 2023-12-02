@@ -73,8 +73,7 @@ TEMPLATE(T, poly_mulmod_preinv) (TEMPLATE(T, poly_t) res,
 
     if (lenf == 0)
     {
-        TEMPLATE_PRINTF("Exception (%s_poly_mulmod). Divide by zero.\n", T);
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s): Division by zero\n", __func__);
     }
 
     if (lenf == 1 || len1 == 0 || len2 == 0)

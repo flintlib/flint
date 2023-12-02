@@ -108,10 +108,7 @@ int _padic_ctx_pow_ui(fmpz_t rop, ulong e, const padic_ctx_t ctx)
         slong l = (slong) e;
         if (l < 0)
         {
-            flint_printf("Exception (_padic_ctx_pow_ui). Power too large.\n");
-            flint_printf("e = %wu\n", e);
-            flint_printf("l = %wd\n", l);
-            flint_abort();
+            flint_throw(FLINT_ERROR, "Exception (_padic_ctx_pow_ui). Power too large.\ne = %wu\nl = %wd\n", e, l);
         }
 
         fmpz_init(rop);
@@ -130,10 +127,7 @@ void padic_ctx_pow_ui(fmpz_t rop, ulong e, const padic_ctx_t ctx)
         slong l = (slong) e;
         if (l < 0)
         {
-            flint_printf("Exception (padic_ctx_pow_ui). Power too large.\n");
-            flint_printf("e = %wu\n", e);
-            flint_printf("l = %wd\n", l);
-            flint_abort();
+            flint_throw(FLINT_ERROR, "Exception (padic_ctx_pow_ui). Power too large.\ne = %wu\nl = %wd\n", e, l);
         }
 
         fmpz_pow_ui(rop, ctx->p, e);

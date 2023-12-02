@@ -83,8 +83,7 @@ static void _frob_combine(
             fq_zech_get_nmod_poly(asdf, t->coeffs + i, ectx->fqctx);
             if (asdf->length != 1)
             {
-                flint_printf("fatal error in _frob_combine");
-                flint_abort();
+                flint_throw(FLINT_ERROR, "fatal error in _frob_combine");
             }
             s->coeffs[i] = asdf->coeffs[0];
             nmod_poly_clear(asdf);

@@ -197,7 +197,7 @@ static void
 MULLOW(fmpz * z, fmpz_t zden, const fmpz * x, const fmpz_t xden, slong xn, const fmpz * y, const fmpz_t yden, slong yn, slong n)
 {
     if (xn + yn - 1 < n)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     if (xn >= yn)
         _fmpz_poly_mullow(z, x, xn, y, yn, n);
@@ -489,8 +489,7 @@ void fmpq_poly_exp_series(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
 
     if (!fmpz_is_zero(poly->coeffs))
     {
-        flint_printf("Exception (fmpq_poly_exp_series). Constant term != 0.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpq_poly_exp_series). Constant term != 0.\n");
     }
 
     fmpq_poly_fit_length(res, n);
@@ -518,8 +517,7 @@ void fmpq_poly_exp_expinv_series(fmpq_poly_t res1, fmpq_poly_t res2, const fmpq_
 
     if (!fmpz_is_zero(poly->coeffs))
     {
-        flint_printf("Exception (fmpq_poly_exp_expinv_series). Constant term != 0.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpq_poly_exp_expinv_series). Constant term != 0.\n");
     }
 
     fmpq_poly_fit_length(res1, n);

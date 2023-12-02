@@ -35,8 +35,7 @@ TEMPLATE(T, TEMPLATE(poly_scalar_div, T)) (TEMPLATE(T, poly_t) rop,
 {
     if (TEMPLATE(T, is_zero) (x, ctx))
     {
-       flint_printf("Exception (fq_poly_scalar_div) Division by zero");
-       flint_abort();
+       flint_throw(FLINT_ERROR, "Exception (fq_poly_scalar_div) Division by zero");
     }
     if (TEMPLATE(T, poly_is_zero) (op, ctx))
     {

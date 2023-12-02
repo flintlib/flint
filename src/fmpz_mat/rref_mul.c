@@ -75,9 +75,8 @@ fmpz_mat_rref_mul(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
         fmpz_mat_init(E2, rank, n - rank);
         if (!fmpz_mat_solve(E2, den, B, C))
         {
-            flint_printf("Exception (fmpz_mat_rref_mul). "
-                         "Singular input matrix for solve.");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(fmpz_mat_rref_mul): "
+                    "Singular input matrix for solve.\n");
         }
 
         fmpz_mat_clear(B);

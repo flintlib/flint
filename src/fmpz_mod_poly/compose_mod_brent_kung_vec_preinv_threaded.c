@@ -279,20 +279,15 @@ fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded(fmpz_mod_poly_struct * 
     {
         if (polys[i].length >= len2)
         {
-            flint_printf
-                ("Exception (fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded)."
-                 "The degree of the first polynomial must be smaller than that of the "
-                 " modulus\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded): "
+                 "The degree of the first polynomial must be smaller than that of the modulus\n");
         }
     }
 
     if (n > len1)
     {
-        flint_printf
-            ("Exception (fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded)."
+        flint_throw(FLINT_ERROR, "(fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded): "
              "n is larger than the length of polys\n");
-        flint_abort();
     }
 
     if (n == 0)

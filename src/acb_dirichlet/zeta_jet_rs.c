@@ -96,8 +96,7 @@ acb_dirichlet_zeta_jet_rs(acb_ptr res, const acb_t s, slong len, slong prec)
 {
     if (len > 2)
     {
-        flint_printf("acb_dirichlet_zeta_jet_rs: len > 2 not implemented\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "acb_dirichlet_zeta_jet_rs: len > 2 not implemented\n");
     }
 
     if (len <= 0)

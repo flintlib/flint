@@ -18,8 +18,7 @@ fmpz_mat_det(fmpz_t det, const fmpz_mat_t A)
 
     if (dim != A->c)
     {
-        flint_printf("Exception (fmpz_mat_det). Non-square matrix.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mat_det). Non-square matrix.\n");
     }
 
     if (dim < 5)

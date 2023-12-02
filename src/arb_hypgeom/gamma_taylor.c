@@ -226,8 +226,7 @@ void arb_set_interval_d_fast(arb_t res, double a, double b, slong prec)
 
     if (a > b)
     {
-        flint_printf("arb_set_interval_d_fast: expected a < b\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "arb_set_interval_d_fast: expected a < b\n");
     }
 
     mid = a + 0.5 * (b - a);
@@ -584,9 +583,9 @@ arb_hypgeom_gamma_taylor(arb_t res, const arb_t x, int reciprocal, slong prec)
 
         if (!_arb_hypgeom_gamma_coeff_shallow(c, NULL, i, term_prec[i]))
         {
-            flint_printf("arb_hypgeom_gamma_taylor: prec = %wd, du = %g, log2u = %d, term_prec[%wd] = %wd",
-                prec, du, log2u, i, term_prec[i]);
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(arb_hypgeom_gamma_taylor):"
+                    "prec = %wd, du = %g, log2u = %d, term_prec[%wd] = %wd",
+                    prec, du, log2u, i, term_prec[i]);
         }
 
         if (term_prec[i] < wp - 128)

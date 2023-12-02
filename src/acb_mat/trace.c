@@ -18,8 +18,7 @@ acb_mat_trace(acb_t trace, const acb_mat_t mat, slong prec)
 
     if (!acb_mat_is_square(mat))
     {
-        flint_printf("acb_mat_trace: a square matrix is required!\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "acb_mat_trace: a square matrix is required!\n");
     }
 
     if (acb_mat_is_empty(mat))

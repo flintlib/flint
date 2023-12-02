@@ -29,10 +29,7 @@ dlog_once(ulong b, ulong a, const nmod_t mod, ulong n)
             ak = nmod_mul(ak, a, mod);
         }
 
-        flint_printf("FAIL[dlog once]: log(%wu,%wu) mod %wu not found (size %wu)\n",
-                b, a, mod.n, n);
-        flint_abort();
-        return 0; /* dummy return because flint_abort() is not declared noreturn */
+        flint_throw(FLINT_ERROR, "(dlog_once): log(%wu,%wu) mod %wu not found (size %wu)\n", b, a, mod.n, n);
     }
     else
     {

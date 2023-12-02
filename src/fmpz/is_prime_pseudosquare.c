@@ -203,8 +203,7 @@ void fmpz_set_pseudosquare(fmpz_t f, unsigned int i)
 #endif
    else
    {
-      flint_printf("Exception (fmpz_set_pseudosquare). Index too large.\n");
-      flint_abort();
+      flint_throw(FLINT_ERROR, "Exception (fmpz_set_pseudosquare). Index too large.\n");
    }
 }
 
@@ -215,8 +214,6 @@ int fmpz_is_prime_pseudosquare(const fmpz_t n)
     fmpz_t NB, f, exp, mod, nm1;
     int ret;
     const mp_limb_t * primes;
-
-    ret = -1; /* silence compiler warning (not set when aborting) */
 
     if (fmpz_sgn(n) <= 0)
        return 0;
@@ -291,10 +288,7 @@ int fmpz_is_prime_pseudosquare(const fmpz_t n)
            ret = 1;
            goto cleanup;
         }
-        flint_printf("Whoah, ");
-        fmpz_print(n);
-        flint_printf("is a probable prime, but not prime, please report!!\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "%s is a probable prime, but not prime, please report!!\n", fmpz_get_str(NULL, 10, n));
     }
     else
     {
@@ -315,16 +309,10 @@ int fmpz_is_prime_pseudosquare(const fmpz_t n)
             }
             if (!fmpz_is_one(mod))
             {
-                flint_printf("Whoah, ");
-                fmpz_print(n);
-                flint_printf("is a probable prime, but not prime, please report!!\n");
-                flint_abort();
+                flint_throw(FLINT_ERROR, "%s is a probable prime, but not prime, please report!!\n", fmpz_get_str(NULL, 10, n));
             }
         }
-        flint_printf("Whoah, ");
-        fmpz_print(n);
-        flint_printf("is a probable prime, but not prime, please report!!\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "%s is a probable prime, but not prime, please report!!\n", fmpz_get_str(NULL, 10, n));
     }
 
 cleanup:

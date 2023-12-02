@@ -136,8 +136,7 @@ int _padic_fprint(FILE * file, const fmpz_t u, slong v, const padic_ctx_t ctx)
     }
     else
     {
-        flint_printf("Exception (_padic_fprint).  Unknown print mode.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (_padic_fprint).  Unknown print mode.\n");
     }
 
     return 1;

@@ -81,7 +81,7 @@ evaluate(acb_poly_t A, acb_srcptr a, slong p, const acb_t z, slong n, slong prec
     }
     else if (p != 0)
     {
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
     }
 
     if (z != NULL)

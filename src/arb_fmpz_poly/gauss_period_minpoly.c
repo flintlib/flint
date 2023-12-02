@@ -112,8 +112,7 @@ arb_fmpz_poly_gauss_period_minpoly(fmpz_poly_t res, ulong q, ulong n)
                 if (arb_contains_zero(acb_imagref(u)))
                 {
                     /* todo: could increase precision */
-                    flint_printf("fail! imaginary part should be nonzero\n");
-                    flint_abort();
+                    flint_throw(FLINT_ERROR, "fail! imaginary part should be nonzero\n");
                 }
                 else
                 {

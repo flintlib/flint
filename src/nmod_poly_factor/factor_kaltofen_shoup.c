@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2012 Lina Kulakova
     Copyright (C) 2022 William Hart
+
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
@@ -33,12 +34,7 @@ void nmod_poly_factor_kaltofen_shoup(nmod_poly_factor_t res,
         return;
     }
 
-    if (!(degs = (slong *) flint_malloc(nmod_poly_degree(poly)*sizeof(slong))))
-    {
-        flint_printf("Exception (nmod_poly_factor_kaltofen_shoup): \n");
-        flint_printf("Not enough memory.\n");
-        flint_abort();
-    }
+    degs = flint_malloc(nmod_poly_degree(poly) * sizeof(slong));
 
     /* compute squarefree factorisation */
     nmod_poly_factor_init(sq_free);

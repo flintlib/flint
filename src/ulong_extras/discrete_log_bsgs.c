@@ -81,9 +81,8 @@ n_discrete_log_bsgs_table(const bsgs_t t, ulong b)
             return i * t->m + x->k;
         c.ak = n_mulmod_precomp(c.ak, t->am, t->n, t->ninv);
     }
-    flint_printf("Exception (n_discrete_log_bsgs).  discrete log not found.\n");
-    flint_abort();
-    return 0; /* not reached, but silence the compiler */
+
+    flint_throw(FLINT_ERROR, "Exception (n_discrete_log_bsgs).  discrete log not found.\n");
 }
 
 ulong

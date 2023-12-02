@@ -110,8 +110,7 @@ fexpr_replace_vec(fexpr_t res, const fexpr_t expr, const fexpr_vec_t xs, const f
 
     if (num_rules != ys->length)
     {
-        flint_printf("fexpr_replace_vec: vectors don't match\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "fexpr_replace_vec: vectors don't match\n");
     }
 
     if (num_rules == 0)

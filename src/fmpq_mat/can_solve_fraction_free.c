@@ -26,8 +26,7 @@ fmpq_mat_can_solve_fraction_free(fmpq_mat_t X, const fmpq_mat_t A,
 
     if (A->r != B->r || A->c != X->r || X->c != B->c)
     {
-        flint_printf("Exception (fmpq_mat_can_solve_fraction_free). Incompatible matrix dimensions.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpq_mat_can_solve_fraction_free). Incompatible matrix dimensions.\n");
     }
 
     if (A->r == 0)

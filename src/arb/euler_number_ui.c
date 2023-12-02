@@ -658,8 +658,7 @@ arb_fmpz_euler_number_ui(fmpz_t res, ulong n)
         arb_euler_number_ui_beta(x, n, mag + 5);
         if (!arb_get_unique_fmpz(res, x))
         {
-            flint_printf("arb_fmpz_euler_number_ui: unexpected inaccuracy\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "arb_fmpz_euler_number_ui: unexpected inaccuracy\n");
         }
         arb_clear(x);
     }

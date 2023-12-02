@@ -62,8 +62,7 @@ CA_EXT_INLINE void ca_ext_get_arg(ca_t res, const ca_ext_t x, slong i, ca_ctx_t 
 {
     if (CA_EXT_HEAD(x) == CA_QQBar || i < 0 || i >= CA_EXT_FUNC_NARGS(x))
     {
-        flint_printf("ca_ext_get_arg: index out of range\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "ca_ext_get_arg: index out of range\n");
     }
     else
     {

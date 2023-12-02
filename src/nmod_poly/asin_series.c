@@ -27,8 +27,7 @@ nmod_poly_asin_series(nmod_poly_t g, const nmod_poly_t h, slong n)
 
     if (hlen > 0 && h->coeffs[0] != UWORD(0))
     {
-        flint_printf("Exception (nmod_poly_asin_series). Constant term != 0.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (nmod_poly_asin_series). Constant term != 0.\n");
     }
 
     if (hlen <= 1 || n <= 1)

@@ -20,15 +20,13 @@ arb_mat_spd_inv(arb_mat_t X, const arb_mat_t A, slong prec)
 
     if (!arb_mat_is_square(A))
     {
-        flint_printf("arb_mat_spd_inv: a square matrix is required\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "arb_mat_spd_inv: a square matrix is required\n");
     }
 
     if (arb_mat_nrows(X) != arb_mat_nrows(A) ||
         arb_mat_ncols(X) != arb_mat_ncols(A))
     {
-        flint_printf("arb_mat_spd_inv: incompatible dimensions\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "arb_mat_spd_inv: incompatible dimensions\n");
     }
 
     if (arb_mat_is_empty(A))

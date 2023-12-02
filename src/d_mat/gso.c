@@ -21,8 +21,7 @@ d_mat_gso(d_mat_t B, const d_mat_t A)
 
     if (B->r != A->r || B->c != A->c)
     {
-        flint_printf("Exception (d_mat_gso). Incompatible dimensions.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (d_mat_gso). Incompatible dimensions.\n");
     }
 
     if (B == A)

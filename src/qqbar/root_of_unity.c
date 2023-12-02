@@ -67,8 +67,7 @@ qqbar_is_root_of_unity(slong * p, ulong * q, const qqbar_t x)
 
             if (!arb_get_unique_fmpz(k, t))
             {
-                flint_printf("qqbar_is_root_of_unity: unexpected precision issue\n");
-                flint_abort();
+                flint_throw(FLINT_ERROR, "qqbar_is_root_of_unity: unexpected precision issue\n");
             }
 
             if (fmpz_sgn(k) < 0)
@@ -97,8 +96,7 @@ qqbar_root_of_unity(qqbar_t res, slong p, ulong q)
 
     if (q == 0)
     {
-        flint_printf("qqbar_root_of_unity: q = 0\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "qqbar_root_of_unity: q = 0\n");
     }
 
     fmpq_set_si(t, p, q);

@@ -16,8 +16,7 @@ void padic_div(padic_t rop, const padic_t op1, const padic_t op2,
 {
     if (padic_is_zero(op2))
     {
-        flint_printf("Exception (padic_div).  op2 is zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (padic_div).  op2 is zero.\n");
     }
 
     if (padic_is_zero(op1) || padic_val(op1) - padic_val(op2) >= padic_prec(rop))

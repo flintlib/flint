@@ -19,8 +19,7 @@ _fmpz_mpoly_q_div(fmpz_mpoly_t res_num, fmpz_mpoly_t res_den,
 {
     if (fmpz_mpoly_is_zero(y_num, ctx))
     {
-        flint_printf("_fmpz_mpoly_q_div: division by zero\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "_fmpz_mpoly_q_div: division by zero\n");
     }
 
     if (fmpz_mpoly_is_zero(x_num, ctx) || fmpz_mpoly_is_zero(y_num, ctx))
@@ -67,8 +66,7 @@ fmpz_mpoly_q_div_fmpq(fmpz_mpoly_q_t res, const fmpz_mpoly_q_t x, const fmpq_t y
 {
     if (fmpq_is_zero(y))
     {
-        flint_printf("fmpz_mpoly_q_div_fmpq: division by zero\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "fmpz_mpoly_q_div_fmpq: division by zero\n");
     }
     else
     {
@@ -103,8 +101,7 @@ fmpz_mpoly_q_div_fmpz(fmpz_mpoly_q_t res, const fmpz_mpoly_q_t x, const fmpz_t y
 {
     if (fmpz_is_zero(y))
     {
-        flint_printf("fmpz_mpoly_q_div_fmpz: division by zero\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "fmpz_mpoly_q_div_fmpz: division by zero\n");
     }
     else
     {

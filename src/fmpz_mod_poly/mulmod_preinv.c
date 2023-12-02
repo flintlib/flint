@@ -53,14 +53,12 @@ fmpz_mod_poly_mulmod_preinv(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
 
     if (lenf == 0)
     {
-        flint_printf("Exception (fmpz_mod_poly_mulmod_preinv). Divide by zero\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mod_poly_mulmod_preinv). Divide by zero\n");
     }
 
     if (lenf <= len1 || lenf <= len2)
     {
-        flint_printf("Exception (fmpz_mod_poly_mulmod_preinv). Input larger than modulus.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mod_poly_mulmod_preinv). Input larger than modulus.\n");
     }
 
     if (lenf == 1 || len1 == 0 || len2 == 0)

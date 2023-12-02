@@ -20,8 +20,7 @@ fmpq_mat_gso(fmpq_mat_t B, const fmpq_mat_t A)
 
     if (B->r != A->r || B->c != A->c)
     {
-        flint_printf("Exception (fmpq_mat_gso). Incompatible dimensions.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpq_mat_gso). Incompatible dimensions.\n");
     }
 
     if (B == A)

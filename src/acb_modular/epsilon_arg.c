@@ -73,8 +73,7 @@ acb_modular_epsilon_arg(const psl2z_t g)
         }
         else if (u != 1)
         {
-            flint_printf("bad kronecker input\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "bad kronecker input\n");
         }
 
         /* mod 24 */

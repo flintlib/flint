@@ -67,14 +67,12 @@ fmpz_poly_pseudo_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R,
 
     if (B->length == 0)
     {
-        flint_printf("Exception (fmpz_poly_pseudo_divrem_basecase). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(fmpz_poly_pseudo_divrem_basecase): Division by zero.\n");
     }
     if (Q == R)
     {
-        flint_printf("Exception (fmpz_poly_pseudo_divrem_basecase). \n"
+        flint_throw(FLINT_ERROR, "(fmpz_poly_pseudo_divrem_basecase): "
                "Output arguments Q and R may not be aliased.\n");
-        flint_abort();
     }
     if (A->length < B->length)
     {

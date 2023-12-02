@@ -34,6 +34,7 @@
 #include "t-div_2exp.c"
 #include "t-div.c"
 #include "t-div_fmpz.c"
+#include "t-equal_si_ui.c"
 #include "t-farey_neighbors.c"
 #include "t-gcd_cofactors.c"
 #include "t-get_cfrac.c"
@@ -88,6 +89,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpq_div_2exp),
     TEST_FUNCTION(fmpq_div),
     TEST_FUNCTION(fmpq_div_fmpz),
+    TEST_FUNCTION(fmpq_equal_si_ui),
     TEST_FUNCTION(fmpq_farey_neighbors),
     TEST_FUNCTION(fmpq_gcd_cofactors),
     TEST_FUNCTION(fmpq_get_cfrac),

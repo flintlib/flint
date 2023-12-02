@@ -982,7 +982,7 @@ _gr_fmpq_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, g
                     fmpz_swap(fmpq_denref(res_entries + j), fac->p[i].coeffs + 1);
 
                     if (fmpz_sgn(fmpq_denref(res_entries + j)) <= 0)
-                        flint_abort();
+                        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
                     fmpz_set_ui(mult_entries + j, fac->exp[i]);
                     j++;

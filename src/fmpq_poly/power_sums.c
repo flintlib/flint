@@ -101,9 +101,7 @@ fmpq_poly_power_sums(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
 {
     if (poly->length == 0)
     {
-        flint_printf
-            ("Exception (fmpq_poly_power_sums_naive). Zero polynomial.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(fmpq_poly_power_sums_naive): Zero polynomial.\n");
     }
     else if (n <= 0 || poly->length == 1)
     {

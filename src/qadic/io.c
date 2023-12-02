@@ -62,8 +62,7 @@ int _qadic_fprint_pretty(FILE * file, const fmpz * u, slong len, slong v, const 
 
         if (i < len)
         {
-            flint_printf("ERROR (qadic_fprint_pretty).  u < 0 in SERIES mode.\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "ERROR (qadic_fprint_pretty).  u < 0 in SERIES mode.\n");
         }
 
         x = _fmpz_vec_init(len);
@@ -145,8 +144,7 @@ int _qadic_fprint_pretty(FILE * file, const fmpz * u, slong len, slong v, const 
     }
     else
     {
-        flint_printf("Exception (qadic_fprint_pretty).  Unknown print mode.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (qadic_fprint_pretty).  Unknown print mode.\n");
     }
 
     return 1;

@@ -74,8 +74,7 @@ fmpz_mod_poly_powmod_fmpz_binexp(fmpz_mod_poly_t res,
 
     if (lenf == 0)
     {
-        flint_printf("Exception (fmpz_mod_poly_powmod_fmpz_binexp). Divide by zero\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mod_poly_powmod_fmpz_binexp). Divide by zero\n");
     }
 
     if (lenf == 1)
@@ -86,8 +85,7 @@ fmpz_mod_poly_powmod_fmpz_binexp(fmpz_mod_poly_t res,
 
     if (fmpz_sgn(e) < 0)
     {
-        flint_printf("Exception (fmpz_mod_poly_powmod_fmpz_binexp). negative exp not implemented\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mod_poly_powmod_fmpz_binexp). negative exp not implemented\n");
     }
 
     if (len >= lenf)

@@ -118,8 +118,7 @@ qqbar_fmpz_poly_composed_op(fmpz_poly_t res, const fmpz_poly_t A, const fmpz_pol
 
     if (d1 <= 0 || d2 <= 0)
     {
-        flint_printf("composed_op: inputs must not be constants\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "composed_op: inputs must not be constants\n");
     }
 
     n = d1 * d2 + 1;
@@ -138,8 +137,7 @@ qqbar_fmpz_poly_composed_op(fmpz_poly_t res, const fmpz_poly_t A, const fmpz_pol
     {
         if (fmpz_is_zero(P2->coeffs))
         {
-            flint_printf("composed_op: division by zero\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "composed_op: division by zero\n");
         }
 
         fmpq_poly_reverse(P2, P2, d2 + 1);

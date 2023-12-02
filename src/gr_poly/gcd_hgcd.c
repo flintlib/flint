@@ -59,7 +59,8 @@ _gr_poly_gcd_hgcd(gr_ptr G, slong * _lenG, gr_srcptr A, slong lenA, gr_srcptr B,
     slong alloc = 2 * lenB + lenA;
     gr_ptr J, R, Q;
 
-    if (lenB > lenA) flint_abort();
+    if (lenB > lenA)
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     GR_TMP_INIT_VEC(J, alloc, ctx);
     R = GR_ENTRY(J, lenB, sz);

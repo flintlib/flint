@@ -153,8 +153,7 @@ acb_poly_find_roots(acb_ptr roots,
 
     if (len == 0)
     {
-        flint_printf("find_roots: expected a nonzero polynomial");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "find_roots: expected a nonzero polynomial");
     }
 
     return _acb_poly_find_roots(roots, poly->coeffs, initial,

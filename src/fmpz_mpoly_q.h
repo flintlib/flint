@@ -249,8 +249,7 @@ fmpz_mpoly_gcd_assert_successful(fmpz_mpoly_t res, const fmpz_mpoly_t x, const f
 {
     if (!fmpz_mpoly_gcd(res, x, y, ctx))
     {
-        flint_printf("fmpz_mpoly_gcd failed\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "fmpz_mpoly_gcd failed\n");
     }
 }
 

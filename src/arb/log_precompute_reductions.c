@@ -61,8 +61,7 @@ _arb_log_precompute_reductions(short * rel, double * eps, arb_srcptr alpha, slon
 
             if (!arb_get_unique_fmpz(fmpz_mat_entry(M, j, n), x))
             {
-                flint_printf("failure\n");
-                flint_abort();
+                flint_throw(FLINT_ERROR, "failure\n");
             }
         }
 

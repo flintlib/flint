@@ -16,8 +16,7 @@ bool_mat_directed_cycle(bool_mat_t mat)
 {
     if (!bool_mat_is_square(mat))
     {
-        flint_printf("bool_mat_directed_cycle: a square matrix is required!\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "bool_mat_directed_cycle: a square matrix is required!\n");
     }
 
     if (bool_mat_is_empty(mat))

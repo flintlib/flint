@@ -167,8 +167,7 @@ fmpq_poly_sin_cos_series(fmpq_poly_t res1, fmpq_poly_t res2, const fmpq_poly_t p
 
     if (!fmpz_is_zero(poly->coeffs))
     {
-        flint_printf("Exception (fmpq_poly_sin_cos_series). Constant term != 0.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpq_poly_sin_cos_series). Constant term != 0.\n");
     }
 
     fmpq_poly_fit_length(res1, n);

@@ -105,8 +105,7 @@ void TEMPLATE(T, poly_div_series)(TEMPLATE(T, poly_t) Q, const TEMPLATE(T, poly_
 
     if (Blen == 0)
     {
-        flint_printf("Exception (fq_poly_div_series). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fq_poly_div_series). Division by zero.\n");
     }
 
     if (Alen == 0)

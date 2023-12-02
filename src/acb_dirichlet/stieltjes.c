@@ -308,7 +308,7 @@ _f_stieltjes(acb_ptr res, const acb_t x, void * param, slong order, slong prec)
     const acb_struct * alpha;
 
     if (order > 1)
-        flint_abort();  /* Would be needed for Taylor method. */
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__); /* Would be needed for Taylor method. */
 
     n1 = ((const _stieltjes_param *) param)->n1;
     alpha = ((const _stieltjes_param *) param)->alpha;
@@ -754,8 +754,7 @@ acb_dirichlet_stieltjes(acb_t res, const fmpz_t n, const acb_t a, slong prec)
 
     if (fmpz_sgn(n) < 0)
     {
-        flint_printf("stieltjes constants only defined for n >= 0");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "stieltjes constants only defined for n >= 0");
     }
 
     /* undefined at a = 0, -1, -2, ... */

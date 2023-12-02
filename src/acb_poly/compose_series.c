@@ -61,9 +61,8 @@ acb_poly_compose_series(acb_poly_t res,
 
     if (len2 != 0 && !acb_is_zero(poly2->coeffs))
     {
-        flint_printf("exception: compose_series: inner "
+        flint_throw(FLINT_ERROR, "compose_series: inner "
                 "polynomial must have zero constant term\n");
-        flint_abort();
     }
 
     if (len1 == 0 || n == 0)

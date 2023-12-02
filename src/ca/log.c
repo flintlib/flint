@@ -108,7 +108,7 @@ ca_log_exp(ca_t res, const ca_t z, ca_ctx_t ctx)
     ca_t t, pi;
 
     if (CA_IS_SPECIAL(z))
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     ca_init(t, ctx);
     ca_init(pi, ctx);
@@ -151,7 +151,7 @@ ca_log_pow(ca_t res, const ca_t z, const ca_t a, ca_ctx_t ctx)
     ca_t t, u, pi;
 
     if (CA_IS_SPECIAL(z) || CA_IS_SPECIAL(a))
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     ca_init(t, ctx);
     ca_init(u, ctx);

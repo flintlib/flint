@@ -135,8 +135,7 @@ fr_node_list_pop_front(fr_node_ptr *phead, fr_node_ptr *ptail)
 
     if (phead == ptail)
     {
-        flint_printf("aliasing issue...\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "aliasing issue...\n");
     }
 
     if (*phead)

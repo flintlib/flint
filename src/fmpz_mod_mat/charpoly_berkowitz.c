@@ -106,8 +106,7 @@ void fmpz_mod_mat_charpoly_berkowitz(fmpz_mod_poly_t cp,
 {
     if (!fmpz_mod_mat_is_square(mat))
     {
-        flint_printf("Exception (fmpz_mod_mat_charpoly_berkowitz). Non-square matrix.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mod_mat_charpoly_berkowitz). Non-square matrix.\n");
     }
 
     fmpz_mod_poly_fit_length(cp, fmpz_mod_mat_nrows(mat) + 1, ctx);

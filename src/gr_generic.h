@@ -28,22 +28,22 @@
 #define GR_GENERIC_DEBUG_RINGS 0
 
 #if GR_GENERIC_DEBUG_RINGS
-void gr_generic_init(void) { flint_printf("ctx must implement init()\n"); flint_abort(); }
-void gr_generic_clear(void) { flint_printf("ctx must implement clear()\n"); flint_abort(); }
-void gr_generic_swap(void) { flint_printf("ctx must implement swap()\n"); flint_abort(); }
-void gr_generic_randtest(void) { flint_printf("ctx must implement randtest()\n"); flint_abort(); }
-void gr_generic_write(void) { flint_printf("ctx must implement write()\n"); flint_abort(); }
-void gr_generic_zero(void) { flint_printf("ctx must implement zero()\n"); flint_abort(); }
-void gr_generic_one(void) { flint_printf("ctx must implement one()\n"); flint_abort(); }
-void gr_generic_equal(void) { flint_printf("ctx must implement equal()\n"); flint_abort(); }
-void gr_generic_set(void) { flint_printf("ctx must implement set()\n"); flint_abort(); }
-void gr_generic_set_si(void) { flint_printf("ctx must implement set_si()\n"); flint_abort(); }
-void gr_generic_set_ui(void) { flint_printf("ctx must implement set_ui()\n"); flint_abort(); }
-void gr_generic_set_fmpz(void) { flint_printf("ctx must implement set_fmpz()\n"); flint_abort(); }
-void gr_generic_neg(void) { flint_printf("ctx must implement neg()\n"); flint_abort(); }
-void gr_generic_add(void) { flint_printf("ctx must implement add()\n"); flint_abort(); }
-void gr_generic_sub(void) { flint_printf("ctx must implement sub()\n"); flint_abort(); }
-void gr_generic_mul(void) { flint_printf("ctx must implement mul()\n"); flint_abort(); }
+void gr_generic_init(void) { flint_throw(FLINT_ERROR, "ctx must implement init()\n"); }
+void gr_generic_clear(void) { flint_throw(FLINT_ERROR, "ctx must implement clear()\n"); }
+void gr_generic_swap(void) { flint_throw(FLINT_ERROR, "ctx must implement swap()\n"); }
+void gr_generic_randtest(void) { flint_throw(FLINT_ERROR, "ctx must implement randtest()\n"); }
+void gr_generic_write(void) { flint_throw(FLINT_ERROR, "ctx must implement write()\n"); }
+void gr_generic_zero(void) { flint_throw(FLINT_ERROR, "ctx must implement zero()\n"); }
+void gr_generic_one(void) { flint_throw(FLINT_ERROR, "ctx must implement one()\n"); }
+void gr_generic_equal(void) { flint_throw(FLINT_ERROR, "ctx must implement equal()\n"); }
+void gr_generic_set(void) { flint_throw(FLINT_ERROR, "ctx must implement set()\n"); }
+void gr_generic_set_si(void) { flint_throw(FLINT_ERROR, "ctx must implement set_si()\n"); }
+void gr_generic_set_ui(void) { flint_throw(FLINT_ERROR, "ctx must implement set_ui()\n"); }
+void gr_generic_set_fmpz(void) { flint_throw(FLINT_ERROR, "ctx must implement set_fmpz()\n"); }
+void gr_generic_neg(void) { flint_throw(FLINT_ERROR, "ctx must implement neg()\n"); }
+void gr_generic_add(void) { flint_throw(FLINT_ERROR, "ctx must implement add()\n"); }
+void gr_generic_sub(void) { flint_throw(FLINT_ERROR, "ctx must implement sub()\n"); }
+void gr_generic_mul(void) { flint_throw(FLINT_ERROR, "ctx must implement mul()\n"); }
 #else
 #define gr_generic_init gr_not_implemented
 #define gr_generic_clear gr_not_implemented

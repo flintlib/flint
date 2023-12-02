@@ -42,7 +42,7 @@ rsplit(acb_poly_t res, acb_poly_t term,
     }
 
     if (n < 0)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     m = n_sqrt(n);
     m = FLINT_MIN(m, 150);
@@ -261,7 +261,8 @@ acb_hypgeom_pfq_series_sum_rs(acb_poly_t s, acb_poly_t t,
         }
 
         /* We should now have start <= n. */
-        if (start > n) flint_abort();
+        if (start > n)
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
         acb_hypgeom_pfq_series_sum_forward(s, t, a, p, b, q, z,
             regularized, start, len, prec);

@@ -32,12 +32,7 @@ TEMPLATE(T, poly_is_irreducible_ddf) (const TEMPLATE(T, poly_t) f,
     if (!TEMPLATE(T, poly_is_squarefree) (f, ctx))
         return 0;
 
-    if (!(degs = (slong *) flint_malloc(n * sizeof(slong))))
-    {
-        TEMPLATE_PRINTF("Exception (%s_poly_is_irreducible_ddf): \n", T);
-        flint_printf("Not enough memory.\n");
-        flint_abort();
-    }
+    degs = (slong *) flint_malloc(n * sizeof(slong));
 
     TEMPLATE(T, poly_factor_init) (dist_deg, ctx);
     TEMPLATE(T, poly_factor_distinct_deg) (dist_deg, f, &degs, ctx);

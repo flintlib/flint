@@ -199,18 +199,10 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
 
     num_threads = flint_request_threads(&threads, flint_get_num_threads());
 
-    h = (nmod_poly_struct *) flint_malloc((2*m + l + num_threads + 2)*
-                           sizeof(nmod_poly_struct));
-
-    if (h == NULL)
-    {
-        flint_printf("Exception (nmod_poly_factor_distinct_deg):\n");
-        flint_printf("Not enough memory.\n");
-        flint_abort();
-    }
+    h = flint_malloc((2 * m + l + num_threads + 2) * sizeof(nmod_poly_struct));
 
     for (i = 0; i < 2*m + l + 2 + num_threads; i++)
-       nmod_poly_init_mod(h + i, poly->mod);
+        nmod_poly_init_mod(h + i, poly->mod);
 
     H = h + (l + 1);
     I = H + m;
