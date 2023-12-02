@@ -85,25 +85,16 @@ int fmpz_mat_is_square(const fmpz_mat_t mat)
 void fmpz_mat_zero(fmpz_mat_t mat);
 void fmpz_mat_one(fmpz_mat_t mat);
 
-/* Windows and concatenation */
+/* Windows and concatenation *************************************************/
 
-void fmpz_mat_window_init(fmpz_mat_t window, const fmpz_mat_t mat, slong r1,
-    slong c1, slong r2, slong c2);
-
+void fmpz_mat_window_init(fmpz_mat_t window, const fmpz_mat_t mat, slong r1, slong c1, slong r2, slong c2);
 void fmpz_mat_window_clear(fmpz_mat_t window);
 
-void fmpz_mat_concat_horizontal(fmpz_mat_t res,
-                           const fmpz_mat_t mat1,  const fmpz_mat_t mat2);
+void _fmpz_mat_window_readonly_init_strip_initial_zero_rows(fmpz_mat_t A, const fmpz_mat_t B);
+#define _fmpz_mat_window_readonly_clear(A) /* Do nothing */
 
-void fmpz_mat_concat_vertical(fmpz_mat_t res,
-                           const fmpz_mat_t mat1,  const fmpz_mat_t mat2);
-
-void _fmpz_mat_read_only_window_init_strip_initial_zero_rows(
-                                             fmpz_mat_t A, const fmpz_mat_t B);
-
-FMPZ_MAT_INLINE void _fmpz_mat_read_only_window_clear(fmpz_mat_t A)
-{
-}
+void fmpz_mat_concat_horizontal(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_mat_t mat2);
+void fmpz_mat_concat_vertical(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_mat_t mat2);
 
 /* Input and output  *********************************************************/
 

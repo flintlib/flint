@@ -29,7 +29,7 @@ fmpz_lll_is_reduced(const fmpz_mat_t B, const fmpz_lll_t fl, flint_bitcnt_t prec
         int res;
         fmpz_mat_t BB;
 
-        _fmpz_mat_read_only_window_init_strip_initial_zero_rows(BB, B);
+        _fmpz_mat_window_readonly_init_strip_initial_zero_rows(BB, B);
 
         if (fmpz_lll_is_reduced_d(BB, fl))
         {
@@ -44,7 +44,7 @@ fmpz_lll_is_reduced(const fmpz_mat_t B, const fmpz_lll_t fl, flint_bitcnt_t prec
             res = fmpz_mat_is_reduced(BB, fl->delta, fl->eta);
         }
 
-        _fmpz_mat_read_only_window_clear(BB);
+        _fmpz_mat_window_readonly_clear(BB);
         return res;
     }
     else

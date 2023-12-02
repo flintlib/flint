@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2014 Abhinav Baid
+    Copyright (C) 2022 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "fmpz_mat.h"
 
 void
@@ -35,4 +37,30 @@ fmpz_mat_window_init(fmpz_mat_t window, const fmpz_mat_t mat, slong r1,
 
     window->r = r2 - r1;
     window->c = c2 - c1;
+}
+
+void
+fmpz_mat_window_clear(fmpz_mat_t window)
+{
+    if (window->r != 0)
+        flint_free(window->rows);
+}
+
+void
+_fmpz_mat_window_readonly_init_strip_initial_zero_rows(fmpz_mat_t A, const fmpz_mat_t B)
+{
+    slong r = B->r;
+    slong c = B->c;
+    slong i;
+
+    for (i = 0; i < r; i++)
+    {
+        if (!_fmpz_vec_is_zero(B->rows[i], c))
+            break;
+    }
+
+    A->entries = NULL;
+    A->rows = B->rows + i;
+    A->r = r - i;
+    A->c = c;
 }
