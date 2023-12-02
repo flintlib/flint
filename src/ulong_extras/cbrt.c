@@ -11,7 +11,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <math.h>
 #include "ulong_extras.h"
 
 mp_limb_t
@@ -31,17 +30,20 @@ n_cbrt(mp_limb_t n)
         return 11 + (n >= 1728) + (n >= 2197) + (n >= 2744) + (n >= 3375) + (n >= 4096);
 
     val = (double)n;
+
+#ifdef FLINT64
     bits = FLINT_BIT_COUNT(n);
 
     if (bits > 46)    /* for larger numbers chebyshev approximation method is faster */
         return n_cbrt_chebyshev_approx(n);
+#endif
 
     /* upper_limit is the max cube root possible for one word */
 
 #ifdef FLINT64
-    upper_limit = 2642245;  /* 2642245 < (2^64)^(1/3) */
+    upper_limit = 2642245;  /* 2642245 = floor((2^64)^(1/3)) */
 #else
-    upper_limit = 1625;     /* 1625 < (2^32)^(1/3) */
+    upper_limit = 1625;     /* 1625 = floor((2^32)^(1/3)) */
 #endif
 
     x = n_cbrt_estimate((double)n);   /* initial estimate */
@@ -58,8 +60,12 @@ n_cbrt(mp_limb_t n)
 
     if (ret >= upper_limit)
     {
+#ifndef FLINT64
+        /* If bits(n) > 46, then Chebyshev is used. Hence, this is only possible
+         * for 32-bit systems. */
         if (n >= upper_limit * upper_limit * upper_limit)
             return upper_limit;
+#endif
         ret = upper_limit - 1;
     }
     while (ret * ret * ret <= n)
