@@ -64,6 +64,12 @@ TEST_FUNCTION_START(fmpz_CRT, state)
         fmpz_mod(r1, input, m1);
         fmpz_mod(r2, input, m2);
 
+        if (sign && n_randint(state, 2))
+        {
+            /* If sign is set, fmpz_CRT allows -m_{1} <= r < m_{1}. Set r < 0.*/
+            fmpz_sub(r1, r1, m1);
+        }
+
         fmpz_CRT(result, r1, m1, r2, m2, sign);
 
         if (!fmpz_equal(result, input) || !_fmpz_is_canonical(result))
