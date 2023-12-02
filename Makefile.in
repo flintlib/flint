@@ -61,6 +61,8 @@ STATIC:=@STATIC@
 SHARED:=@SHARED@
 
 COVERAGE:=@COVERAGE@
+PROFILING:=@PROFILING@
+
 WANT_NTL:=@WANT_NTL@
 
 WANT_DEPS:=@WANT_DEPS@
@@ -199,13 +201,18 @@ TEMPLATE_DIRS :=                                                            \
         fq_embed_templates              fq_templates
 
 BUILD_DIRS :=                                                               \
-		$(BUILD_DIR)                                                        \
+        $(BUILD_DIR)                                                        \
         $(patsubst %, $(BUILD_DIR)/%, $(DIRS))                              \
-        $(patsubst %, $(BUILD_DIR)/%/profile, $(DIRS))                      \
         $(patsubst %, $(BUILD_DIR)/%/test, $(DIRS))                         \
         $(patsubst %, $(BUILD_DIR)/%/tune, $(DIRS))                         \
-        $(BUILD_DIR)/examples           $(BUILD_DIR)/profile                \
-        $(BUILD_DIR)/test               $(BUILD_DIR)/tune
+        $(BUILD_DIR)/examples           $(BUILD_DIR)/test                   \
+        $(BUILD_DIR)/tune
+
+ifneq ($(PROFILING), 0)
+BUILD_DIRS +=
+        $(patsubst %, $(BUILD_DIR)/%/profile, $(DIRS))                      \
+        $(BUILD_DIR)/profile
+endif
 ifneq ($(WANT_NTL), 0)
 BUILD_DIRS +=                                                               \
         $(BUILD_DIR)/interfaces         $(BUILD_DIR)/interfaces/test
@@ -262,12 +269,14 @@ fmpz_lll_SOURCES := $(filter-out $(SRC_DIR)/fmpz_lll/babai.c $(SRC_DIR)/fmpz_lll
 
 SOURCES := $(foreach dir,$(DIRS),$($(dir)_SOURCES))
 
+ifneq ($(PROFILING), 0)
 define xxx_PROF_SOURCES
 $(1)_PROF_SOURCES := $(wildcard $(SRC_DIR)/$(1)/profile/*.c)
 endef
 _PROF_SOURCES := $(wildcard $(SRC_DIR)/profile/*.c)
 $(foreach dir, $(DIRS), $(eval $(call xxx_PROF_SOURCES,$(dir))))
 PROF_SOURCES := $(foreach dir,$(DIRS),$($(dir)_PROF_SOURCES)) $(_PROF_SOURCES)
+endif
 
 # FIXME: De-hardcode fq_zech_vec from this.
 fq_zech_vec_TEST_SOURCES := $(wildcard $(SRC_DIR)/fq_zech_vec/test/main.c)
@@ -319,12 +328,14 @@ endif
 # executables
 ################################################################################
 
+ifneq ($(PROFILING), 0)
 define xxx_PROFS
 $(1)_PROFS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%$(EXEEXT),$($(1)_PROF_SOURCES))
 endef
 _PROFS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%$(EXEEXT),$(_PROF_SOURCES))
 $(foreach dir, $(DIRS), $(eval $(call xxx_PROFS,$(dir))))
 PROFS := $(foreach dir,$(DIRS),$($(dir)_PROFS)) $(_PROFS)
+endif
 
 define xxx_TESTS
 $(1)_TESTS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%$(EXEEXT),$($(1)_TEST_SOURCES))
@@ -551,6 +562,7 @@ endif
 # executables
 ################################################################################
 
+ifneq ($(PROFILING), 0)
 ifeq ($(SHARED), 0)
 $(BUILD_DIR)/profile/%$(EXEEXT): $(SRC_DIR)/profile/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/profile
 	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
@@ -576,6 +588,7 @@ endef
 endif
 
 $(foreach dir, $(DIRS), $(eval $(call xxx_PROFS_rule,$(dir))))
+endif
 
 ifeq ($(SHARED), 0)
 $(BUILD_DIR)/test/%$(EXEEXT): $(SRC_DIR)/test/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/test
@@ -666,10 +679,12 @@ checkexamples: examples $(EXMPS:%=%_EXMP_RUN)
 # profiling
 ################################################################################
 
+ifneq ($(PROFILING), 0)
 ifdef MOD
 profile: library $(foreach dir, $(MOD), $($(dir)_PROFS))
 else
 profile: library $(PROFS)
+endif
 endif
 
 ################################################################################
