@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "ulong_extras.h"
 
 /* compute square roots of a modulo m given factorisation of m */
@@ -19,6 +18,7 @@ slong n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac)
     slong i, j, num;
     mp_limb_t * x, * sn, * ind, ** s;
 
+    /* Check if modulus is one, that is, it has a trivial representation */
     if (fac->num == 0)
     {
         *sqrt = flint_malloc(sizeof(mp_limb_t));
@@ -56,9 +56,9 @@ slong n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac)
     *sqrt = flint_malloc(num*sizeof(mp_limb_t));
 
     /*
-        compute values s_i = 1 mod x_i and s_i = 0 mod x_j for j != i
-        then replace sqrts a_i with a_i * s_i mod m = x_1*x_2*...*x_n
-    */
+       compute values s_i = 1 mod x_i and s_i = 0 mod x_j for j != i
+       then replace sqrts a_i with a_i * s_i mod m = x_1*x_2*...*x_n
+     */
     for (i = 0; i < fac->num; i++)
     {
         mp_limb_t xp = 1, si;
@@ -88,8 +88,7 @@ slong n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac)
        compute all the square roots by computing
        sum_{i=0}^{fac->num} s[i][j] for each different permutation
        of j's, all modulo m
-    */
-
+     */
     for (i = 0; i < num; i++) /* loop through every possibility */
     {
         /* compute next root */
@@ -117,4 +116,3 @@ slong n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac)
 
     return num;
 }
-

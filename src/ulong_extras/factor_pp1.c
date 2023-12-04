@@ -35,6 +35,8 @@ static slong n_factor_pp1_table[][3] = {
       x = (c << norm);           \
    } while (0)
 
+#if 0
+/* For debugging */
 void n_pp1_print(mp_limb_t x, mp_limb_t y, ulong norm)
 {
    if (norm)
@@ -45,6 +47,16 @@ void n_pp1_print(mp_limb_t x, mp_limb_t y, ulong norm)
 
    flint_printf("[%wu, %wu]", x, y);
 }
+#endif
+
+#if FLINT_PROFILE
+/* exists only for tuning/profiling */
+void n_factor_pp1_table_insert(slong bits, slong B1, slong count)
+{
+    n_factor_pp1_table[bits][1] = B1;
+    n_factor_pp1_table[bits][2] = count;
+}
+#endif
 
 #define n_pp1_2k(x, y, n, ninv, x0, norm)       \
    do {                                         \
@@ -235,11 +247,3 @@ mp_limb_t n_factor_pp1_wrapper(mp_limb_t n)
    flint_randclear(state);
    return 0;
 }
-
-/* exists only for tuning/profiling */
-void n_factor_pp1_table_insert(slong bits, slong B1, slong count)
-{
-    n_factor_pp1_table[bits][1] = B1;
-    n_factor_pp1_table[bits][2] = count;
-}
-

@@ -25,9 +25,8 @@ TEST_FUNCTION_START(n_sqrtmodn, state)
         int btest;
         n_factor_t fac;
 
-        bits = n_randint(state, 18) + 2;
+        bits = n_randint(state, 18) + 1;
         n = n_randtest_bits(state, bits);
-        if (n == 0) n = 1;
         b = n_randtest(state) % n;
 
         n_factor_init(&fac);
