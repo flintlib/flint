@@ -86,6 +86,7 @@ jobs:
         uses: codecov/codecov-action@v3.1.4
         with:
           files: build/coverage/coverage.info
+          fail_ci_if_error: true
 
 
 
