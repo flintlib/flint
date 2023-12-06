@@ -8,4 +8,4 @@ Description: Fast Library for Number Theory
 Version: @PACKAGE_VERSION@
 URL: https://flintlib.org/
 Cflags: -I${includedir}
-Libs: -L${libdir} -lgmp -lmpfr
+Libs: -L${libdir} -lflint -lgmp -lmpfr
