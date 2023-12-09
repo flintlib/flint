@@ -286,11 +286,12 @@ int nmod_poly_multi_crt_precompute(
     }
 
     /* GCC really wants to complain about this one */
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(__clang__)
+# pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
     success = nmod_poly_multi_crt_precompute_p(P, m, len);
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(__clang__)
 # pragma GCC diagnostic pop
 #endif
     TMP_END;

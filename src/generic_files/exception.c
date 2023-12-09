@@ -40,7 +40,12 @@ void flint_set_abort(void (*func)(void))
 #endif
 
 #ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+# pragma GCC diagnostic push
+# if defined(__clang__)
+#  pragma GCC diagnostic ignored "-Wincompatible-function-pointer-types"
+# elif defined(__GNUC__)
+#  pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+# endif
 #endif
     abort_func = func;
 #ifdef __GNUC__
