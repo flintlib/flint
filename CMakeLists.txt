@@ -452,8 +452,9 @@ set_target_properties(flint
 )
 
 if(BUILD_TESTING)
+    set(FLINT_SRC ${CMAKE_CURRENT_SOURCE_DIR}/src) # To get src/test/main
     enable_testing()
-    foreach(dir IN LISTS BUILD_DIRS CMAKE_CURRENT_SOURCE_DIR)
+    foreach(dir IN LISTS BUILD_DIRS FLINT_SRC)
         file(GLOB test_file "${dir}/test/main.c")
         if(test_file)
             file(RELATIVE_PATH test_name ${CMAKE_CURRENT_SOURCE_DIR} ${test_file})
