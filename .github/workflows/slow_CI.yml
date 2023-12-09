@@ -50,6 +50,7 @@ jobs:
           make --version
           autoconf --version
           libtool --version
+          qemu-aarch64 --version
           echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
 
       - name: "Install GMP and MPFR"
