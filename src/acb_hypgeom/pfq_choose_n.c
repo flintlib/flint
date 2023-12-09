@@ -192,7 +192,7 @@ acb_hypgeom_pfq_choose_n(acb_srcptr a, slong p,
                                 const acb_t z, slong prec)
 {
     return acb_hypgeom_pfq_choose_n_max(a, p, b, q, z, prec,
-        FLINT_MIN(WORD_MAX / 2, 50 + 10.0 * prec));
+        FLINT_MIN(WORD_MAX / 2, 50 + 10 * prec));
 }
 
 slong
@@ -227,7 +227,7 @@ acb_hypgeom_pfq_series_choose_n(const acb_poly_struct * a, slong p,
 
     n_skip = 1;
     n_min = 1;
-    n_max = FLINT_MIN(WORD_MAX / 2, 50 + 10.0 * prec);
+    n_max = FLINT_MIN(WORD_MAX / 2, 50 + 10 * prec);
     n_terminating = WORD_MAX;
 
     /* e.g. for exp(x + O(x^100)), make sure that we actually

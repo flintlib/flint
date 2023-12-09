@@ -22,18 +22,18 @@ mag_get_d_log2_approx(const mag_t x)
 {
     if (mag_is_zero(x))
     {
-        return COEFF_MIN;
+        return (double) COEFF_MIN;
     }
     else if (mag_is_inf(x))
     {
-        return COEFF_MAX;
+        return (double) COEFF_MAX;
     }
     else if (COEFF_IS_MPZ(MAG_EXP(x)))
     {
         if (fmpz_sgn(MAG_EXPREF(x)) < 0)
-            return COEFF_MIN;
+            return (double) COEFF_MIN;
         else
-            return COEFF_MAX;
+            return (double) COEFF_MAX;
     }
     else
     {
