@@ -384,13 +384,54 @@ Input/Output
 Exceptions
 -----------------
 
-When FLINT encounters a problem, mostly illegal input, it currently aborts.
-There is an experimental interface for generating proper exceptions
-``flint_throw``, but this is currently rarely used and experimental - you
-should expect this to change.
+.. function:: void flint_abort(void)
 
-At the end, all of FLINT's exceptions call ``abort()`` to terminate
-the program. Using ``flint_set_abort(void (*abort_func)(void))``, the
-user can install a function that will be called instead. Similar
-to the exceptions, this should be regarded as experimental.
+    FLINT version of the C standard function ``abort``.
 
+.. function:: void flint_set_abort(void (* func)(void))
+
+    Sets the :function:``flint_abort`` function to call ``func`` instead of
+    ``abort``.
+
+.. enum:: flint_err_t
+
+    An error code with one of the following values
+
+    .. macro:: FLINT_ERROR
+
+        Describes a generic error.
+
+    .. macro:: FLINT_OVERFLOW
+
+        Describes an overflow.
+
+    .. macro:: FLINT_IMPINV
+
+        Describes an impossible inversion.
+
+    .. macro:: FLINT_DOMERR
+
+        Describes a domain error.
+
+    .. macro:: FLINT_DIVZERO
+
+        Describes a division by zero.
+
+    .. macro:: FLINT_EXPOF
+
+        Describes a exponent overflow.
+
+    .. macro:: FLINT_INEXACT
+
+        Describes an inexact operation.
+
+    .. macro:: FLINT_TEST_FAIL
+
+        Describes a test fail.
+
+.. function:: void flint_throw(flint_err_t exc, const char * msg, ...)
+
+    Throws an error of type ``exc`` with message ``msg`` and aborts via
+    :function:`flint_abort`. The printing back-end function is
+    :function:`flint_fprintf`, and so it allows for printing of FLINT types as
+    well.
