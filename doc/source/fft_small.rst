@@ -41,7 +41,7 @@ Polynomial arithmetic
 ---------------------------------------------------------------------------------
 
 .. function:: void _nmod_poly_mul_mid_mpn_ctx(ulong * z, ulong zl, ulong zh, const ulong * a, ulong an, const ulong * b, ulong bn, nmod_t mod, mpn_ctx_t R)
-              void _nmod_poly_mul_mid_default_mpn_ctx(z res, slong zl, slong zh, mp_srcptr a, slong an, mp_srcptr b, slong bn, nmod_t mod);
+              void _nmod_poly_mul_mid_default_mpn_ctx(mp_ptr res, slong zl, slong zh, mp_srcptr a, slong an, mp_srcptr b, slong bn, nmod_t mod)
 
     Writes to ``z`` the middle product containing coefficients in the
     range `[zl, zh)` of the product of the polynomials  ``(a, an)`` and ``(b, bn)``,

@@ -586,11 +586,9 @@ Scalar multiplication and division
     Supports aliasing of ``(rpoly, den)`` and ``(poly, den)``.
     The ``fmpz_t``'s `r` and `s` may not be part of ``(rpoly, rden)``.
 
-.. function:: void fmpq_poly_scalar_mul_si(fmpq_poly_t rop, const fmpq_poly_t op, slong c)
-
-    Sets ``rop`` to `c` times ``op``.
-
-.. function:: void fmpq_poly_scalar_mul_ui(fmpq_poly_t rop, const fmpq_poly_t op, ulong c)
+.. function:: void fmpq_poly_scalar_mul_fmpq(fmpq_poly_t rop, const fmpq_poly_t op, const fmpq_t c)
+              void fmpq_poly_scalar_mul_si(fmpq_poly_t rop, const fmpq_poly_t op, slong c)
+              void fmpq_poly_scalar_mul_ui(fmpq_poly_t rop, const fmpq_poly_t op, ulong c)
 
     Sets ``rop`` to `c` times ``op``.
 
@@ -598,10 +596,6 @@ Scalar multiplication and division
 
     Sets ``rop`` to `c` times ``op``.  Assumes that the ``fmpz_t c``
     is not part of ``rop``.
-
-.. function:: void fmpq_poly_scalar_mul_mpq(fmpq_poly_t rop, const fmpq_poly_t op, const fmpq_t c)
-
-    Sets ``rop`` to `c` times ``op``.
 
 .. function:: void _fmpq_poly_scalar_div_fmpz(fmpz * rpoly, fmpz_t rden, const fmpz * poly, const fmpz_t den, slong len, const fmpz_t c)
 
