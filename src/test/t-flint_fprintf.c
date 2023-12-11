@@ -270,6 +270,13 @@ do                  \
 /* NOTE: The lengths has to be put into flint_fprintf as slongs. GCC and MSVC
  * handles it without specifying them as slongs, but at least Clang messes it
  * up. */
+#define SLONG_VEC_LEN WORD(4)
+#define SLONG_VEC_INIT(x) do { } while (0)
+#define SLONG_VEC_CLEAR(x) do { } while (0)
+#define SLONG_VEC_ENTRIES ((slong[]) {WORD(-1), WORD(0), WORD(1), WORD(2)})
+#define SLONG_VEC_SET(x) memcpy((x), SLONG_VEC_ENTRIES, sizeof(slong) * SLONG_VEC_LEN)
+#define SLONG_VEC_STRING "[-1, 0, 1, 2]"
+
 #define NMOD_VEC_LEN WORD(3)
 #define NMOD_VEC_INIT(x) do { (x) = _nmod_vec_init(NMOD_VEC_LEN); } while (0)
 #define NMOD_VEC_CLEAR(x) _nmod_vec_clear(x)
@@ -501,6 +508,7 @@ static void test_composite_string(FILE * fs)
     arb_t xarb1, xarb2, xarb3;
     acb_t xacb1, xacb2, xacb3, xacb4, xacb5, xacb6, xacb7, xacb8;
 
+    slong xslong_vec[SLONG_VEC_LEN];
     mp_ptr xnmod_vec;
     fmpz * xfmpz_vec;
     fmpq * xfmpq_vec;
@@ -546,6 +554,7 @@ static void test_composite_string(FILE * fs)
     ACB7_INIT(xacb7);
     ACB8_INIT(xacb8);
 
+    SLONG_VEC_INIT(xslong_vec);
     NMOD_VEC_INIT(xnmod_vec);
     FMPZ_VEC_INIT(xfmpz_vec);
     FMPQ_VEC_INIT(xfmpq_vec);
@@ -592,6 +601,7 @@ static void test_composite_string(FILE * fs)
     ACB7_SET(xacb7);
     ACB8_SET(xacb8);
 
+    SLONG_VEC_SET(xslong_vec);
     NMOD_VEC_SET(xnmod_vec);
     FMPZ_VEC_SET(xfmpz_vec);
     FMPQ_VEC_SET(xfmpq_vec);
@@ -648,6 +658,8 @@ static void test_composite_string(FILE * fs)
             "\n"
             "We will now start printing FLINT types...\n"
             "\n"
+            "ulong: " WORD_FMT "u\n"
+            "slong: " WORD_FMT "d\n"
             "nmod: " NMOD_STRING "\n"
             "small fmpz: " FMPZ1_STRING "\n"
             "big fmpz: " FMPZ2_STRING "\n"
@@ -690,6 +702,7 @@ static void test_composite_string(FILE * fs)
             "\n"
             "And now we go back to printing FLINT types...\n"
             "\n"
+            "slong_vec: " SLONG_VEC_STRING "\n"
             "nmod_vec: " NMOD_VEC_STRING "\n"
             "fmpz_vec: " FMPZ_VEC_STRING "\n"
             "fmpq_vec: " FMPQ_VEC_STRING "\n"
@@ -715,6 +728,8 @@ static void test_composite_string(FILE * fs)
             xulong2,
             xdouble,
             xdouble,
+            xulong1,
+            xslong,
             xchar,
             xshort,
             10, xint,
@@ -760,6 +775,8 @@ static void test_composite_string(FILE * fs)
             "\n"
             "We will now start printing FLINT types...\n"
             "\n"
+            "ulong: %{ulong}\n"
+            "slong: %{slong}\n"
             "nmod: %{nmod}\n"
             "small fmpz: %{fmpz}\n"
             "big fmpz: %{fmpz}\n"
@@ -802,11 +819,12 @@ static void test_composite_string(FILE * fs)
             "\n"
             "And now we go back to printing FLINT types...\n"
             "\n"
-            "nmod_vec: %{nmod_vec}\n"
-            "fmpz_vec: %{fmpz_vec}\n"
-            "fmpq_vec: %{fmpq_vec}\n"
-            "arb_vec: %{arb_vec}\n"
-            "acb_vec: %{acb_vec}\n"
+            "slong_vec: %{slong*}\n"
+            "nmod_vec: %{ulong*}\n"
+            "fmpz_vec: %{fmpz*}\n"
+            "fmpq_vec: %{fmpq*}\n"
+            "arb_vec: %{arb*}\n"
+            "acb_vec: %{acb*}\n"
             "\n"
             "empty fmpz_mat: %{fmpz_mat}\n"
             "window nmod_mat: %{nmod_mat}\n"
@@ -827,6 +845,8 @@ static void test_composite_string(FILE * fs)
             xulong2,
             xdouble,
             xdouble,
+            xulong1,
+            xslong,
             xnmod,
             xfmpz1,
             xfmpz2,
@@ -863,6 +883,7 @@ static void test_composite_string(FILE * fs)
             xlongdouble,
             xpointer,
             xwcharp,
+            xslong_vec, SLONG_VEC_LEN,
             xnmod_vec, NMOD_VEC_LEN,
             xfmpz_vec, FMPZ_VEC_LEN,
             xfmpq_vec, FMPQ_VEC_LEN,
@@ -938,6 +959,7 @@ static void test_composite_string(FILE * fs)
     ACB7_CLEAR(xacb7);
     ACB8_CLEAR(xacb8);
 
+    SLONG_VEC_CLEAR(xslong_vec);
     NMOD_VEC_CLEAR(xnmod_vec);
     FMPZ_VEC_CLEAR(xfmpz_vec);
     FMPQ_VEC_CLEAR(xfmpq_vec);

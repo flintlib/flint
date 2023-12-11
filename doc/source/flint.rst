@@ -226,31 +226,42 @@ Input/Output
 
 .. function:: int flint_printf(const char * format, ...)
               int flint_fprintf(FILE * fs, const char * format, ...)
-              int flint_vprintf(const char * str, va_list vlist)
-              int flint_vfprintf(FILE * fs, const char * str, va_list vlist)
+              int flint_vprintf(const char * format, va_list vlist)
+              int flint_vfprintf(FILE * fs, const char * format, va_list vlist)
 
-    These functions are extensions of the C standard library functions ``printf``,
-    ``fprintf``, ``vprintf``, and ``vfprintf``.
+    These functions are extensions of the C standard library functions
+    ``printf``, ``fprintf``, ``vprintf``, and ``vfprintf``.
 
     The first extension is the addition of the length modifier ``w``, used for
     printing the types :type:`ulong`, :type:`slong` and :type:`mp_limb_t`. As
-    these types are either defined as signed and unsigned ``long int`` or ``long
-    long int``, this comes in handy. Just like ``long int`` and ``long long
-    int``, the conversion format specifier are allowed to be ``d``, ``i``,
+    these types are either defined as signed and unsigned ``long int`` or
+    ``long long int``, this comes in handy. Just like ``long int`` and ``long
+    long int``, the conversion format specifier are allowed to be ``d``, ``i``,
     ``o``, ``x``, ``X`` and ``u``.
 
     The second and final extension is printing of FLINT types. Currently
-    supported types are the base types :type:`fmpz_t`, :type:`fmpq_t`,
-    :type:`mag_t`, :type:`arf_t`, :type:`arb_t` and :type:`acb_t` as well as the
-    context structures for modulo arithmetic :type:`nmod_t` and
-    :type:`fmpz_mod_ctx_t`. Furthermore, we support printing vectors, matrices
-    and polynomials for the base types ``nmod``, :type:`fmpz_t`, ``fmpz_mod``
-    (with the exception of vectors), :type:`fmpq_t`, :type:`arb_t` and
-    :type:`acb_t`. We demonstrate all format specifiers for the supported FLINT
-    types in the code blocks below.
+    supported types are the base types :type:`ulong`, :type:`slong`,
+    :type:`fmpz_t`, :type:`fmpq_t`, :type:`mag_t`, :type:`arf_t`, :type:`arb_t`
+    and :type:`acb_t` as well as the context structures for modulo arithmetic
+    :type:`nmod_t` and :type:`fmpz_mod_ctx_t`.
+
+    We currently support printing vectors of pointers to the following base
+    types: :type:`slong`, :type:`ulong`, :type:`fmpz`, :type:`fmpq`,
+    :type:`mag_struct`, :type:`arf_struct`, :type:`arb_struct` and
+    :type:`acb_struct`.
+
+    We also support printing matrices of the following types:
+    :type:`nmod_mat_t`, :type:`fmpz_mat_t`, :type:`fmpq_mat_t`,
+    :type:`arb_mat_t` and :type:`acb_mat_t`.
+
+    Finally, we currently support printing polynomial of the following types:
+    :type:`nmod_poly_t`, :type:`fmpz_poly_t`, :type:`fmpq_poly_t`,
+    :type:`arb_poly_t` and :type:`acb_poly_t`.
 
 .. code-block:: c
 
+    ulong bulong;
+    slong bslong;
     fmpz_t bfmpz;
     fmpq_t bfmpq;
     mag_t bmag;
@@ -263,6 +274,8 @@ Input/Output
     /* Initialize and set variables */
 
     flint_printf(
+        "ulong: %{ulong}\n"
+        "slong: %{slong}\n"
         "fmpz: %{fmpz}\n"
         "fmpq: %{fmpq}\n"
         "mag: %{mag}\n"
@@ -271,6 +284,8 @@ Input/Output
         "acb: %{acb}\n"
         "nmod: %{nmod}\n"
         "fmpz_mod_ctx: %{fmpz_mod_ctx}\n",
+        bulong,
+        bslong,
         bfmpz,
         bfmpq,
         bmag,
@@ -282,24 +297,33 @@ Input/Output
 
 .. code-block:: c
 
-    mp_ptr vnmod; slong vnmod_len;
+    slong * vslong; slong vslong_len;
+    mp_ptr vnmod; slong vnmod_len; /* The base type for nmod is ulong */
     fmpz * vfmpz; slong vfmpz_len;
     /* fmpz_mod vectors are given by the type `fmpz *' */
     fmpq * vfmpq; slong vfmpq_len;
+    mag_ptr vmag; slong vmag_len;
+    arf_ptr varf; slong varf_len;
     arb_ptr varb; slong varb_len;
     acb_ptr vacb; slong vacb_len;
 
     /* Initialize and set variables */
 
     flint_printf(
-        "nmod vector: %{nmod_vec}\n"
-        "fmpz vector: %{fmpz_vec}\n"
-        "fmpq vector: %{fmpq_vec}\n"
-        "arb vector: %{arb_vec}\n"
-        "acb vector: %{acb_vec}\n"
+        "slong vector: %{slong*}\n"
+        "nmod vector: %{ulong*}\n"
+        "fmpz vector: %{fmpz*}\n"
+        "fmpq vector: %{fmpq*}\n"
+        "mag vector: %{mag*}\n"
+        "arf vector: %{arf*}\n"
+        "arb vector: %{arb*}\n"
+        "acb vector: %{acb*}\n"
+        vslong, vslong_len, /* They require a vector length specifier */
         vnmod, vnmod_len,
         vfmpz, vfmpz_len,
         vfmpq, vfmpq_len,
+        vmag, vmag_len,
+        varf, varf_len,
         varb, varb_len,
         vacb, vacb_len);
 

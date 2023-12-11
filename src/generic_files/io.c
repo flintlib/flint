@@ -104,7 +104,7 @@ static int __ulong_is_zero(const void * ip)
 
 static int __fmpz_is_neg(const void * ip)
 {
-    return fmpz_cmp_si(ip, 0) < 0;
+    return fmpz_sgn(ip) < 0;
 }
 
 static int __fmpq_is_neg(const void * ip)
@@ -139,10 +139,13 @@ static int __acb_is_neg(const void * ip)
 typedef enum
 {
     ulong_type = 0,
-    fmpz_type = 1,
-    fmpq_type = 2,
-    arb_type = 3,
-    acb_type = 4
+    fmpz_type,
+    fmpq_type,
+    arb_type,
+    acb_type,
+    slong_type,
+    mag_type,
+    arf_type
 } flint_type_t;
 
 static inline size_t flint_type_size_in_chars(flint_type_t type)
@@ -155,8 +158,14 @@ static inline size_t flint_type_size_in_chars(flint_type_t type)
         return sizeof(fmpq) / sizeof(char);
     else if (type == arb_type)
         return sizeof(arb_struct) / sizeof(char);
-    else /* if (type == acb_type) */
+    else if (type == acb_type)
         return sizeof(acb_struct) / sizeof(char);
+    else if (type == slong_type)
+        return sizeof(slong) / sizeof(char);
+    else if (type == mag_type)
+        return sizeof(mag_struct) / sizeof(char);
+    else /* if (type == arf_type) */
+        return sizeof(arf_struct) / sizeof(char);
 }
 
 /* Declaring local printing functions ****************************************/
@@ -169,6 +178,7 @@ static inline size_t flint_type_size_in_chars(flint_type_t type)
 #define FLAG_IS_PAREN(flag) ((flag) & FLAG_PAREN)
 
 static size_t __ulong_fprint(FILE *, const ulong *, int);
+static size_t __slong_fprint(FILE *, const slong *, int);
 static size_t __fmpz_fprint(FILE *, const fmpz *, int);
 static size_t __fmpq_fprint(FILE *, const fmpq *, int);
 static size_t __mag_fprint(FILE *, mag_srcptr);
@@ -238,101 +248,65 @@ do                              \
     }                           \
 } while (0)
 
-#define IS_PRINTF_CHARFMT(str)                  \
-    (  (str)[0] == 'h'                          \
-    && (str)[1] == 'h'                          \
-    && (   (str)[2] == 'd' || (str)[2] == 'i'   \
-        || (str)[2] == 'o'                      \
-        || (str)[2] == 'x' || (str)[2] == 'X'   \
-        || (str)[2] == 'u'))
+#define _IS_PRINTF_INTEGERFMT(chr)  \
+    (  (chr) == 'd' || (chr) == 'i' \
+    || (chr) == 'o'                 \
+    || (chr) == 'x' || (chr) == 'X' \
+    || (chr) == 'u')
 
-#define IS_PRINTF_SHORTFMT(str)                 \
-    (  (str)[0] == 'h'                          \
-    && (   (str)[1] == 'd' || (str)[1] == 'i'   \
-        || (str)[1] == 'o'                      \
-        || (str)[1] == 'x' || (str)[1] == 'X'   \
-        || (str)[1] == 'u'))
+#define _IS_PRINTF_FLOATFMT(chr)    \
+    (  (chr) == 'f' || (chr) == 'F' \
+    || (chr) == 'e' || (chr) == 'E' \
+    || (chr) == 'a' || (chr) == 'A' \
+    || (chr) == 'g' || (chr) == 'G')
 
-#define IS_PRINTF_INTFMT(str)               \
-    (  (str)[0] == 'c'                      \
-    || (str)[0] == 'd' || (str)[0] == 'i'   \
-    || (str)[0] == 'o'                      \
-    || (str)[0] == 'x' || (str)[0] == 'X'   \
-    || (str)[0] == 'u')
+/* "Generic" ones */
+#define IS_PRINTF_CHARFMT(str) \
+    ((str)[0] == 'h' && (str)[1] == 'h' && _IS_PRINTF_INTEGERFMT((str)[2]))
 
-#define IS_PRINTF_WINTFMT(str)  \
-    (  (str)[0] == 'l'          \
-    && (str)[1] == 'c')
+#define IS_PRINTF_SHORTFMT(str) \
+    ((str)[0] == 'h' && _IS_PRINTF_INTEGERFMT((str)[1]))
 
-#define IS_PRINTF_LONGFMT(str)                  \
-    (  (str)[0] == 'l'                          \
-    && (   (str)[1] == 'd' || (str)[1] == 'i'   \
-        || (str)[1] == 'o'                      \
-        || (str)[1] == 'x' || (str)[1] == 'X'   \
-        || (str)[1] == 'u'))
+#define IS_PRINTF_INTFMT(str) \
+    ((str)[0] == 'c' || _IS_PRINTF_INTEGERFMT((str)[0]))
 
-#define IS_PRINTF_LONGLONGFMT(str)              \
-    (  (str)[0] == 'l'                          \
-    && (str)[1] == 'l'                          \
-    && (   (str)[2] == 'd' || (str)[2] == 'i'   \
-        || (str)[2] == 'o'                      \
-        || (str)[2] == 'x' || (str)[2] == 'X'   \
-        || (str)[2] == 'u'))
+#define IS_PRINTF_LONGFMT(str) \
+    ((str)[0] == 'l' && _IS_PRINTF_INTEGERFMT((str)[1]))
 
-#define IS_PRINTF_INTMAXFMT(str)                \
-    (  (str)[0] == 'j'                          \
-    && (   (str)[1] == 'd' || (str)[1] == 'i'   \
-        || (str)[1] == 'o'                      \
-        || (str)[1] == 'x' || (str)[1] == 'X'   \
-        || (str)[1] == 'u'))
+#define IS_PRINTF_LONGLONGFMT(str) \
+    ((str)[0] == 'l' && (str)[1] == 'l' && _IS_PRINTF_INTEGERFMT((str)[2]))
 
-#define IS_PRINTF_SIZEFMT(str)                  \
-    (  (str)[0] == 'z'                          \
-    && (   (str)[1] == 'd' || (str)[1] == 'i'   \
-        || (str)[1] == 'o'                      \
-        || (str)[1] == 'x' || (str)[1] == 'X'   \
-        || (str)[1] == 'u'))
+#define IS_PRINTF_INTMAXFMT(str) \
+    ((str)[0] == 'j' &&  _IS_PRINTF_INTEGERFMT((str)[1]))
 
-#define IS_PRINTF_PTRDIFFFMT(str)               \
-    (  (str)[0] == 't'                          \
-    && (   (str)[1] == 'd' || (str)[1] == 'i'   \
-        || (str)[1] == 'o'                      \
-        || (str)[1] == 'x' || (str)[1] == 'X'   \
-        || (str)[1] == 'u'))
+#define IS_PRINTF_SIZEFMT(str) \
+    ((str)[0] == 'z' &&  _IS_PRINTF_INTEGERFMT((str)[1]))
 
-#define IS_PRINTF_DOUBLEFMT(str)                \
-    (     ((str)[0] == 'f' || (str)[0] == 'F'   \
-        || (str)[0] == 'e' || (str)[0] == 'E'   \
-        || (str)[0] == 'a' || (str)[0] == 'A'   \
-        || (str)[0] == 'g' || (str)[0] == 'G')  \
-    || ((str)[0] == 'l'                         \
-        &&((str)[1] == 'f' || (str)[1] == 'F'   \
-        || (str)[1] == 'e' || (str)[1] == 'E'   \
-        || (str)[1] == 'a' || (str)[1] == 'A'   \
-        || (str)[1] == 'g' || (str)[1] == 'G')))
+#define IS_PRINTF_PTRDIFFFMT(str) \
+    ((str)[0] == 't' &&  _IS_PRINTF_INTEGERFMT((str)[1]))
 
-#define IS_PRINTF_LONGDOUBLEFMT(str)            \
-    (  (str)[0] == 'L'                          \
-    && (   (str)[1] == 'f' || (str)[1] == 'F'   \
-        || (str)[1] == 'e' || (str)[1] == 'E'   \
-        || (str)[1] == 'a' || (str)[1] == 'A'   \
-        || (str)[1] == 'g' || (str)[1] == 'G'))
+#define IS_FLINT_PRINTF_ULONGFMT(str) \
+    ((str)[0] == 'w' &&  _IS_PRINTF_INTEGERFMT((str)[1]))
 
-#define IS_PRINTF_POINTERFMT(str)   \
+#define IS_PRINTF_DOUBLEFMT(str)    \
+    (_IS_PRINTF_FLOATFMT((str)[0])  \
+     || ((str)[0] == 'l' && _IS_PRINTF_FLOATFMT((str)[1])))
+
+#define IS_PRINTF_LONGDOUBLEFMT(str) \
+    ((str)[0] == 'L' && _IS_PRINTF_FLOATFMT((str)[1]))
+
+/* "Special" ones */
+#define IS_PRINTF_POINTERFMT(str) \
     ((str)[0] == 'p')
 
-#define IS_PRINTF_CHARPFMT(str)     \
+#define IS_PRINTF_CHARPFMT(str) \
     ((str)[0] == 's')
 
-#define IS_PRINTF_WCHARPFMT(str)    \
-    ((str)[0] == 'l' && (str)[1] == 's')
+#define IS_PRINTF_WINTFMT(str) \
+    ((str)[0] == 'l' && (str)[1] == 'c')
 
-#define IS_FLINT_PRINTF_ULONGFMT(str)           \
-    (  (str)[0] == 'w'                          \
-    && (   (str)[1] == 'd' || (str)[1] == 'i'   \
-        || (str)[1] == 'o'                      \
-        || (str)[1] == 'x' || (str)[1] == 'X'   \
-        || (str)[1] == 'u'))
+#define IS_PRINTF_WCHARPFMT(str) \
+    ((str)[0] == 'l' && (str)[1] == 's')
 
 int flint_vfprintf(FILE * fs, const char * ip, va_list vlist)
 {
@@ -493,19 +467,46 @@ print_flint_type:
     opcur = op;
     ip = ipcur + 2; /* Now `ip' points to "FLINT_TYPE..." */
 
-    if (IS_FLINT_BASE_TYPE(ip, "nmod"))
+    if (IS_FLINT_BASE_TYPE(ip, "ulong"))
+    {
+        if (IS_FLINT_TYPE(ip, "ulong"))
+        {
+            res += fprintf(fs, WORD_FMT "u", va_arg(vlist, ulong));
+            ip += STRING_LENGTH("ulong}");
+        }
+        else if (IS_FLINT_TYPE(ip, "ulong*"))
+        {
+            const ulong * vec = va_arg(vlist, const ulong *);
+            slong len = va_arg(vlist, slong);
+            res += __flint_vec_fprint(fs, vec, len, ulong_type);
+            ip += STRING_LENGTH("ulong*}");
+        }
+        else
+            goto printpercentcurlybracket;
+    }
+    else if (IS_FLINT_BASE_TYPE(ip, "slong"))
+    {
+        if (IS_FLINT_TYPE(ip, "slong"))
+        {
+            res += fprintf(fs, WORD_FMT "d", va_arg(vlist, slong));
+            ip += STRING_LENGTH("slong}");
+        }
+        else if (IS_FLINT_TYPE(ip, "slong*"))
+        {
+            const slong * vec = va_arg(vlist, const slong *);
+            slong len = va_arg(vlist, slong);
+            res += __flint_vec_fprint(fs, vec, len, slong_type);
+            ip += STRING_LENGTH("slong*}");
+        }
+        else
+            goto printpercentcurlybracket;
+    }
+    else if (IS_FLINT_BASE_TYPE(ip, "nmod"))
     {
         if (IS_FLINT_TYPE(ip, "nmod"))
         {
             res += __nmod_fprint(fs, va_arg(vlist, nmod_t));
             ip += STRING_LENGTH("nmod}");
-        }
-        else if (IS_FLINT_TYPE(ip, "nmod_vec"))
-        {
-            mp_srcptr vec = va_arg(vlist, mp_srcptr);
-            slong len = va_arg(vlist, slong);
-            res += __flint_vec_fprint(fs, vec, len, ulong_type);
-            ip += STRING_LENGTH("nmod_vec}");
         }
         else if (IS_FLINT_TYPE(ip, "nmod_mat"))
         {
@@ -520,10 +521,31 @@ print_flint_type:
         else
             goto printpercentcurlybracket;
     }
-    else if (IS_FLINT_BASE_TYPE(ip, "fmpz_mod"))
+    else if (IS_FLINT_BASE_TYPE(ip, "fmpz")) /* fmpz or fmpz_mod base type */
     {
-        /* NOTE: fmpz_mod must come before fmpz */
-        if (IS_FLINT_TYPE(ip, "fmpz_mod_ctx"))
+        if (IS_FLINT_TYPE(ip, "fmpz"))
+        {
+            res += __fmpz_fprint(fs, va_arg(vlist, const fmpz *), FLAG_NONE);
+            ip += STRING_LENGTH("fmpz}");
+        }
+        else if (IS_FLINT_TYPE(ip, "fmpz*"))
+        {
+            const fmpz * vec = va_arg(vlist, const fmpz *);
+            slong len = va_arg(vlist, slong);
+            res += __flint_vec_fprint(fs, vec, len, fmpz_type);
+            ip += STRING_LENGTH("fmpz*}");
+        }
+        else if (IS_FLINT_TYPE(ip, "fmpz_mat"))
+        {
+            res += __flint_mat_fprint(fs, va_arg(vlist, const fmpz_mat_struct *), fmpz_type);
+            ip += STRING_LENGTH("fmpz_mat}");
+        }
+        else if (IS_FLINT_TYPE(ip, "fmpz_poly"))
+        {
+            res += __flint_poly_fprint(fs, va_arg(vlist, const fmpz_poly_struct *), fmpz_type);
+            ip += STRING_LENGTH("fmpz_poly}");
+        }
+        else if (IS_FLINT_TYPE(ip, "fmpz_mod_ctx"))
         {
             res += __fmpz_mod_ctx_fprint(fs, va_arg(vlist, const fmpz_mod_ctx_struct *));
             ip += STRING_LENGTH("fmpz_mod_ctx}");
@@ -543,33 +565,6 @@ print_flint_type:
         else
             goto printpercentcurlybracket;
     }
-    else if (IS_FLINT_BASE_TYPE(ip, "fmpz"))
-    {
-        if (IS_FLINT_TYPE(ip, "fmpz"))
-        {
-            res += __fmpz_fprint(fs, va_arg(vlist, const fmpz *), FLAG_NONE);
-            ip += STRING_LENGTH("fmpz}");
-        }
-        else if (IS_FLINT_TYPE(ip, "fmpz_vec"))
-        {
-            const fmpz * vec = va_arg(vlist, const fmpz *);
-            slong len = va_arg(vlist, slong);
-            res += __flint_vec_fprint(fs, vec, len, fmpz_type);
-            ip += STRING_LENGTH("fmpz_vec}");
-        }
-        else if (IS_FLINT_TYPE(ip, "fmpz_mat"))
-        {
-            res += __flint_mat_fprint(fs, va_arg(vlist, const fmpz_mat_struct *), fmpz_type);
-            ip += STRING_LENGTH("fmpz_mat}");
-        }
-        else if (IS_FLINT_TYPE(ip, "fmpz_poly"))
-        {
-            res += __flint_poly_fprint(fs, va_arg(vlist, const fmpz_poly_struct *), fmpz_type);
-            ip += STRING_LENGTH("fmpz_poly}");
-        }
-        else
-            goto printpercentcurlybracket;
-    }
     else if (IS_FLINT_BASE_TYPE(ip, "fmpq"))
     {
         if (IS_FLINT_TYPE(ip, "fmpq"))
@@ -577,12 +572,12 @@ print_flint_type:
             res += __fmpq_fprint(fs, va_arg(vlist, const fmpq *), FLAG_NONE);
             ip += STRING_LENGTH("fmpq}");
         }
-        else if (IS_FLINT_TYPE(ip, "fmpq_vec"))
+        else if (IS_FLINT_TYPE(ip, "fmpq*"))
         {
             const fmpq * vec = va_arg(vlist, const fmpq *);
             slong len = va_arg(vlist, slong);
             res += __flint_vec_fprint(fs, vec, len, fmpq_type);
-            ip += STRING_LENGTH("fmpq_vec}");
+            ip += STRING_LENGTH("fmpq*}");
         }
         else if (IS_FLINT_TYPE(ip, "fmpq_mat"))
         {
@@ -597,15 +592,39 @@ print_flint_type:
         else
             goto printpercentcurlybracket;
     }
-    else if (IS_FLINT_TYPE(ip, "arf"))
+    else if (IS_FLINT_BASE_TYPE(ip, "arf"))
     {
-        res += __arf_fprint(fs, va_arg(vlist, arf_srcptr));
-        ip += STRING_LENGTH("arf}");
+        if (IS_FLINT_TYPE(ip, "arf"))
+        {
+            res += __arf_fprint(fs, va_arg(vlist, arf_srcptr));
+            ip += STRING_LENGTH("arf}");
+        }
+        else if (IS_FLINT_TYPE(ip, "arf*"))
+        {
+            arf_srcptr vec = va_arg(vlist, arf_srcptr);
+            slong len = va_arg(vlist, slong);
+            res += __flint_vec_fprint(fs, vec, len, arf_type);
+            ip += STRING_LENGTH("arf*}");
+        }
+        else
+            goto printpercentcurlybracket;
     }
-    else if (IS_FLINT_TYPE(ip, "mag"))
+    else if (IS_FLINT_BASE_TYPE(ip, "mag"))
     {
-        res += __mag_fprint(fs, va_arg(vlist, mag_srcptr));
-        ip += STRING_LENGTH("mag}");
+        if (IS_FLINT_TYPE(ip, "mag"))
+        {
+            res += __mag_fprint(fs, va_arg(vlist, mag_srcptr));
+            ip += STRING_LENGTH("mag}");
+        }
+        else if (IS_FLINT_TYPE(ip, "mag*"))
+        {
+            mag_srcptr vec = va_arg(vlist, mag_srcptr);
+            slong len = va_arg(vlist, slong);
+            res += __flint_vec_fprint(fs, vec, len, mag_type);
+            ip += STRING_LENGTH("mag*}");
+        }
+        else
+            goto printpercentcurlybracket;
     }
     else if (IS_FLINT_BASE_TYPE(ip, "arb"))
     {
@@ -614,12 +633,12 @@ print_flint_type:
             res += __arb_fprint(fs, va_arg(vlist, arb_srcptr), FLAG_NONE);
             ip += STRING_LENGTH("arb}");
         }
-        else if (IS_FLINT_TYPE(ip, "arb_vec"))
+        else if (IS_FLINT_TYPE(ip, "arb*"))
         {
             arb_srcptr vec = va_arg(vlist, arb_srcptr);
             slong len = va_arg(vlist, slong);
             res += __flint_vec_fprint(fs, vec, len, arb_type);
-            ip += STRING_LENGTH("arb_vec}");
+            ip += STRING_LENGTH("arb*}");
         }
         else if (IS_FLINT_TYPE(ip, "arb_mat"))
         {
@@ -641,12 +660,12 @@ print_flint_type:
             res += __acb_fprint(fs, va_arg(vlist, acb_srcptr), FLAG_NONE);
             ip += STRING_LENGTH("acb}");
         }
-        else if (IS_FLINT_TYPE(ip, "acb_vec"))
+        else if (IS_FLINT_TYPE(ip, "acb*"))
         {
             acb_srcptr vec = va_arg(vlist, acb_srcptr);
             slong len = va_arg(vlist, slong);
             res += __flint_vec_fprint(fs, vec, len, acb_type);
-            ip += STRING_LENGTH("acb_vec}");
+            ip += STRING_LENGTH("acb*}");
         }
         else if (IS_FLINT_TYPE(ip, "acb_mat"))
         {
@@ -727,31 +746,24 @@ static size_t __ulong_fprint(FILE * fs, const ulong * ip, int flag)
     return fprintf(fs, WORD_FMT "u", *ip);
 }
 
+static size_t __slong_fprint(FILE * fs, const slong * ip, int flag)
+{
+    return fprintf(fs, WORD_FMT "d", *ip);
+}
+
 #define BASE 10
 static size_t __fmpz_fprint(FILE * fs, const fmpz * ip, int flag)
 {
-    __mpz_struct mip;
-    mp_limb_t limb;
+    size_t res = 0;
+    char * str;
+    size_t skipminus = __fmpz_is_neg(ip) ? FLAG_IS_NEG(flag) : 0;
 
-    if (fmpz_is_zero(ip))
-        return (fputc('0', fs) != EOF);
+    str = fmpz_get_str(NULL, BASE, ip);
+    res += fwrite(str + skipminus, sizeof(char), strlen(str + skipminus), fs);
 
-    if (!COEFF_IS_MPZ(*ip))
-    {
-        limb = FLINT_ABS(*ip);
-        mip._mp_d = &limb;
-        mip._mp_size = FLINT_SGN(*ip);
-    }
-    else
-    {
-        mip._mp_d = COEFF_TO_PTR(*ip)->_mp_d;
-        mip._mp_size = COEFF_TO_PTR(*ip)->_mp_size;
-    }
+    flint_free(str);
 
-    if (FLAG_IS_NEG(flag))
-        mip._mp_size = -mip._mp_size;
-
-    return mpz_out_str(fs, BASE, &mip);
+    return res;
 }
 #undef BASE
 
@@ -810,13 +822,19 @@ static size_t __arf_fprint(FILE * fs, arf_srcptr ip)
     return res;
 }
 
+#define MAX_INT_SIZE 64
 /* NOTE: If arb is an integer, we print it as one. */
 static size_t __arb_fprint(FILE * fs, arb_srcptr ip, int flag)
 {
     size_t res;
 
-    if (arb_is_int(ip))
+    if (arb_is_zero(ip))
     {
+        return (fputc('0', fs) != EOF);
+    }
+    else if (arb_is_int(ip) && ARF_EXP(arb_midref(ip)) <= MAX_INT_SIZE)
+    {
+        /* NOTE: Only print as integer if ip < 2^64. */
         fmpz_t fip;
 
         fmpz_init(fip);
@@ -848,6 +866,7 @@ static size_t __arb_fprint(FILE * fs, arb_srcptr ip, int flag)
 
     return res;
 }
+#undef MAX_INT_SIZE
 #undef DIGITS
 
 static size_t __acb_fprint(FILE * fs, acb_srcptr ip, int flag)
@@ -932,7 +951,10 @@ static print_func_t print_functions[] =
     (print_func_t) __fmpz_fprint,
     (print_func_t) __fmpq_fprint,
     (print_func_t) __arb_fprint,
-    (print_func_t) __acb_fprint
+    (print_func_t) __acb_fprint,
+    (print_func_t) __slong_fprint, /* NOTE: These print functions are only  */
+    (print_func_t) __mag_fprint,   /* used for vectors, not other composite */
+    (print_func_t) __arf_fprint    /* types. */
 };
 
 static size_t __flint_vec_fprint(FILE * fs, const void * ip, slong len, flint_type_t type)
