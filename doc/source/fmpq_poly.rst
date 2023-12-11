@@ -599,10 +599,6 @@ Scalar multiplication and division
     Sets ``rop`` to `c` times ``op``.  Assumes that the ``fmpz_t c``
     is not part of ``rop``.
 
-.. function:: void fmpq_poly_scalar_mul_mpq(fmpq_poly_t rop, const fmpq_poly_t op, const fmpq_t c)
-
-    Sets ``rop`` to `c` times ``op``.
-
 .. function:: void _fmpq_poly_scalar_div_fmpz(fmpz * rpoly, fmpz_t rden, const fmpz * poly, const fmpz_t den, slong len, const fmpz_t c)
 
     Sets ``(rpoly, rden, len)`` to ``(poly, den, len)`` divided by `c`,
