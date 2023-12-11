@@ -2814,9 +2814,13 @@ void
 gr_method_tab_init(gr_funcptr * methods, gr_method_tab_input * tab)
 {
     slong i;
+    /* Write to a temporary table so that gr_not_implemented entries
+       do not overwrite proper entries if there are multiple threads
+       trying to init the same table simultaneously. */
+    gr_static_method_table tmp;
 
     for (i = 0; i < GR_METHOD_TAB_SIZE; i++)
-        methods[i] = (gr_funcptr) gr_not_implemented;
+        tmp[i] = (gr_funcptr) gr_not_implemented;
 
     /* Assign generic methods as fallbacks */
     for (i = 0; ; i++)
@@ -2827,7 +2831,7 @@ gr_method_tab_init(gr_funcptr * methods, gr_method_tab_input * tab)
         if (_gr_generic_methods[i].index >= GR_METHOD_TAB_SIZE)
             flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
-        methods[_gr_generic_methods[i].index] = _gr_generic_methods[i].function;
+        tmp[_gr_generic_methods[i].index] = _gr_generic_methods[i].function;
     }
 
     for (i = 0; ; i++)
@@ -2838,6 +2842,8 @@ gr_method_tab_init(gr_funcptr * methods, gr_method_tab_input * tab)
         if (tab[i].index >= GR_METHOD_TAB_SIZE)
             flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
-        methods[tab[i].index] = tab[i].function;
+        tmp[tab[i].index] = tab[i].function;
     }
+
+    memcpy(methods, tmp, sizeof(gr_static_method_table));
 }
