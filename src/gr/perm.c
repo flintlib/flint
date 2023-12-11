@@ -171,7 +171,7 @@ _gr_perm_set_other(perm_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 int
 _gr_perm_one(perm_t res, gr_ctx_t ctx)
 {
-    _perm_set_one(res->entries, PERM_N(ctx));
+    _perm_one(res->entries, PERM_N(ctx));
     return GR_SUCCESS;
 }
 

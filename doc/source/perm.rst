@@ -25,7 +25,7 @@ Assignment
 
     Sets the permutation ``res`` to the same as the permutation ``vec``.
 
-.. function:: void _perm_set_one(slong * vec, slong n)
+.. function:: void _perm_one(slong * vec, slong n)
 
     Sets the permutation to the identity permutation.
 

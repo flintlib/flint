@@ -70,7 +70,7 @@ PERM_INLINE void _perm_set(slong *res, const slong *vec, slong n)
         res[i] = vec[i];
 }
 
-PERM_INLINE void _perm_set_one(slong *vec, slong n)
+PERM_INLINE void _perm_one(slong *vec, slong n)
 {
     slong i;
 
@@ -170,6 +170,8 @@ PERM_INLINE int _perm_print(const slong * vec, slong n)
 
     return 1;
 }
+
+#define _perm_set_one _Pragma("GCC error \"'_perm_set_one' is deprecated. Use '_perm_one' instead.\"")
 
 #ifdef __cplusplus
 }
