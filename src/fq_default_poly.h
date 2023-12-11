@@ -19,7 +19,6 @@
 #define FQ_DEFAULT_POLY_INLINE static inline
 #endif
 
-#include "nmod_poly_factor.h"
 #include "fq_default.h"
 #include "fq_vec.h"
 #include "fq_poly.h"

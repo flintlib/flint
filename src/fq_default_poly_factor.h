@@ -20,7 +20,7 @@
 #endif
 
 #include "thread_pool.h"
-#include "nmod_mat.h"
+#include "nmod_poly_factor.h"
 #include "fmpz_mod_poly_factor.h"
 #include "fq_poly_factor.h"
 #include "fq_nmod_poly_factor.h"

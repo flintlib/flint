@@ -659,17 +659,13 @@ mp_limb_t nmod_poly_div_root(nmod_poly_t Q,
 
 /* Divisibility testing  *****************************************************/
 
-int _nmod_poly_divides_classical(mp_ptr Q, mp_srcptr A, slong lenA,
-                                          mp_srcptr B, slong lenB, nmod_t mod);
+int _nmod_poly_divides_classical(mp_ptr Q, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod);
+int nmod_poly_divides_classical(nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B);
 
-int nmod_poly_divides_classical(nmod_poly_t Q,
-		                     const nmod_poly_t A, const nmod_poly_t B);
+int _nmod_poly_divides(mp_ptr Q, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod);
+int nmod_poly_divides(nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B);
 
-int _nmod_poly_divides(mp_ptr Q, mp_srcptr A, slong lenA,
-                                          mp_srcptr B, slong lenB, nmod_t mod);
-
-int nmod_poly_divides(nmod_poly_t Q,
-		                     const nmod_poly_t A, const nmod_poly_t B);
+ulong nmod_poly_remove(nmod_poly_t f, const nmod_poly_t p);
 
 /* Derivative  ***************************************************************/
 

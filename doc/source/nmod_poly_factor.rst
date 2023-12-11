@@ -65,11 +65,6 @@ Factorisation
 
     Raises ``fac`` to the power ``exp``.
 
-.. function:: ulong nmod_poly_remove(nmod_poly_t f, const nmod_poly_t p)
-
-    Removes the highest possible power of ``p`` from ``f`` and
-    returns the exponent.
-
 .. function:: int nmod_poly_is_irreducible(const nmod_poly_t f)
 
     Returns 1 if the polynomial ``f`` is irreducible, otherwise returns 0.
