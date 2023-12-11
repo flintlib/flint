@@ -782,6 +782,18 @@ then
         [AC_MSG_ERROR([MPFR library was not found.  If you indeed have MPFR installed, please
 submit a bug report to <https://github.com/flintlib/flint/issues/> so
 that we can either fix the issue or give a more proper error message.])])
+
+    AC_SEARCH_LIBS([mpfr_round_p],[mpfr],
+        [],
+        [AC_MSG_ERROR(["`mpfr_round_p' was not found in the MPFR library. It is required for FLINT."])])
+
+    AC_SEARCH_LIBS([mpfr_mulhigh_n],[mpfr],
+        [],
+        [AC_MSG_ERROR(["`mpfr_mulhigh_n' was not found in the MPFR library. It is required for FLINT."])])
+
+    AC_SEARCH_LIBS([mpfr_sqrhigh_n],[mpfr],
+        [],
+        [AC_MSG_ERROR(["`mpfr_sqrhigh_n' was not found in the MPFR library. It is required for FLINT."])])
 else
     LIBS="$LIBS -lmpfr"
 fi
