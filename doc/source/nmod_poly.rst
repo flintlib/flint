@@ -1203,6 +1203,11 @@ Divisibility testing
     Returns `1` if `B` divides `A` and sets `Q` to the quotient. Otherwise
     returns `0` and sets `Q` to zero.
 
+.. function:: ulong nmod_poly_remove(nmod_poly_t f, const nmod_poly_t p)
+
+    Removes the highest possible power of ``p`` from ``f`` and
+    returns the exponent.
+
 
 Derivative and integral
 --------------------------------------------------------------------------------
