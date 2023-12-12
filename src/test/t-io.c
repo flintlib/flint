@@ -1112,4 +1112,58 @@ TEST_FUNCTION_START(flint_fprintf, state)
     TEST_FUNCTION_END(state);
 }
 
+#if HAVE_UNISTD_H && FLINT_COVERAGE
+#include <unistd.h>
+TEST_FUNCTION_START(flint_printf, state)
+{
+    FILE * fs;
+    ulong xulong = 9812;
+    slong xslong = -123;
+    char str[128];
+    int res;
+    int original_stdout_fd = dup(fileno(stdout));
+
+    fflush(stdout);
+    fs = freopen(TMP_FILENAME, "w", stdout);
+    if (fs == NULL)
+        flint_throw(FLINT_TEST_FAIL, "Could not redirect stdout to \"" TMP_FILENAME "\"\n");
+
+    res = flint_printf(
+            "Tjingeling!\n"
+            "ulong = %wu\n"
+            "slong = %wd\n",
+            xulong, xslong);
+    fputc('\0', stdout);
+    fflush(stdout);
+
+    if (res < 0)
+        flint_throw(FLINT_TEST_FAIL, "res = %d\n", res);
+
+    if (dup2(original_stdout_fd, fileno(stdout)) == -1)
+        flint_throw(FLINT_TEST_FAIL, "Could not restore stdout\n");
+
+    fs = fopen(TMP_FILENAME, "r");
+    if (fs == NULL)
+        flint_throw(FLINT_TEST_FAIL, "Could not open \"" TMP_FILENAME "\"\n");
+
+    res = fread(str, sizeof(char), res + 1, fs);
+
+    if (strcmp(str, "Tjingeling!\nulong = 9812\nslong = -123\n"))
+        flint_throw(FLINT_TEST_FAIL, "Strings not equal.\n");
+
+    if (fclose(fs))
+        flint_throw(FLINT_TEST_FAIL, "Could not close temporary file \"" TMP_FILENAME "\"\n");
+
+    if (remove(TMP_FILENAME))
+        flint_throw(FLINT_TEST_FAIL, "Could not remove temporary file \"" TMP_FILENAME "\"\n");
+
+    TEST_FUNCTION_END(state);
+}
+#else
+TEST_FUNCTION_START(flint_printf, state)
+{
+    TEST_FUNCTION_END_SKIPPED(state);
+}
+#endif
+
 #undef TMP_FILENAME
