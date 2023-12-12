@@ -125,7 +125,7 @@ Types, macros and constants
    A macro to convert an ``fmpz`` which represents a pointer into an actual
    pointer to an ``__mpz_struct`` (i.e. to an ``mpz_t``).
 
-.. function:: int COEFF_IS_MPZ(fmpz f)
+.. macro:: COEFF_IS_MPZ(f)
 
    A macro which returns `1` if `f` represents an ``mpz_t``, otherwise `0` is
    returned.
