@@ -16,7 +16,7 @@
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 
-TEST_FUNCTION_START(fmpz_mod_poly_evaluate_fmpz_vec_fast, state)
+TEST_FUNCTION_START(fmpz_mod_poly_evaluate_fmpz_vec, state)
 {
     int i, result = 1;
     fmpz_mod_ctx_t ctx;
@@ -41,7 +41,7 @@ TEST_FUNCTION_START(fmpz_mod_poly_evaluate_fmpz_vec_fast, state)
         fmpz_mod_ctx_set_modulus(ctx, mod);
 
         npoints = n_randint(state, 10);
-        n = n_randint(state, 10);
+        n = n_randint(state, FMPZ_MOD_POLY_EVALUATE_FMPZ_VEC + 2);
 
         fmpz_mod_poly_init(P, ctx);
         x = _fmpz_vec_init(npoints);
@@ -53,27 +53,31 @@ TEST_FUNCTION_START(fmpz_mod_poly_evaluate_fmpz_vec_fast, state)
         for (j = 0; j < npoints; j++)
             fmpz_randtest_mod(x + j, state, mod);
 
-        fmpz_mod_poly_evaluate_fmpz_vec_iter(y, P, x, npoints, ctx);
-        fmpz_mod_poly_evaluate_fmpz_vec_fast(z, P, x, npoints, ctx);
+        if (npoints < FMPZ_MOD_POLY_EVALUATE_FMPZ_VEC)
+        {
+            fmpz_mod_poly_evaluate_fmpz_vec(y, P, x, npoints, ctx);
+            fmpz_mod_poly_evaluate_fmpz_vec_fast(z, P, x, npoints, ctx);
+        }
+        else
+        {
+            fmpz_mod_poly_evaluate_fmpz_vec_iter(y, P, x, npoints, ctx);
+            fmpz_mod_poly_evaluate_fmpz_vec(z, P, x, npoints, ctx);
+        }
 
         result = _fmpz_vec_equal(y, z, npoints);
 
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("mod=");
-            fmpz_print(mod);
-            flint_printf(", n=%wd, npoints=%wd\n\n", n, npoints);
-            flint_printf("P: "); fmpz_mod_poly_print(P, ctx); flint_printf("\n\n");
-            for (j = 0; j < npoints; j++)
-               fmpz_print(y + j), flint_printf(" ");
-            flint_printf("\n");
-            for (j = 0; j < npoints; j++)
-               fmpz_print(z + j), flint_printf(" ");
-            flint_printf("\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            flint_throw(FLINT_TEST_FAIL,
+                    "mod = %{fmpz}\n"
+                    "n = %wd\n"
+                    "npoints = %wd\n\n"
+                    "P = %{fmpz_mod_poly}\n\n"
+                    "y = %{fmpz*}\n\n"
+                    "z = %{fmpz*}\n",
+                    mod, n, npoints,
+                    P,
+                    y, npoints,
+                    z, npoints);
 
         fmpz_clear(mod);
         fmpz_mod_poly_clear(P, ctx);

@@ -33,6 +33,8 @@ extern "C" {
 #define FMPZ_MOD_POLY_INV_NEWTON_CUTOFF  64 /* Inv series newton: Basecase -> Newton */
 #define FMPZ_MOD_POLY_DIV_DIVCONQUER_CUTOFF
 
+#define FMPZ_MOD_POLY_EVALUATE_FMPZ_VEC  32 /* Evaluate fmpz_vec: Iter -> Fast  */
+
 /*  Type definitions *********************************************************/
 
 typedef struct
@@ -682,42 +684,22 @@ void fmpz_mod_poly_derivative(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, c
 /*  Evaluation  **************************************************************/
 
 void _fmpz_mod_poly_evaluate_fmpz(fmpz_t res, const fmpz *poly, slong len, const fmpz_t a, const fmpz_mod_ctx_t ctx);
-void fmpz_mod_poly_evaluate_fmpz(fmpz_t res,
-                                 const fmpz_mod_poly_t poly, const fmpz_t a,
-                                                     const fmpz_mod_ctx_t ctx);
+void fmpz_mod_poly_evaluate_fmpz(fmpz_t res, const fmpz_mod_poly_t poly, const fmpz_t a, const fmpz_mod_ctx_t ctx);
 
 fmpz_poly_struct ** _fmpz_mod_poly_tree_alloc(slong len);
-
 void _fmpz_mod_poly_tree_free(fmpz_poly_struct ** tree, slong len);
+void _fmpz_mod_poly_tree_build(fmpz_poly_struct ** tree, const fmpz * roots, slong len, const fmpz_mod_ctx_t ctx);
 
-void _fmpz_mod_poly_tree_build(fmpz_poly_struct ** tree,
-                             const fmpz * roots, slong len, const fmpz_mod_ctx_t ctx);
+void _fmpz_mod_poly_evaluate_fmpz_vec_iter(fmpz * ys, const fmpz * coeffs, slong len, const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_poly_evaluate_fmpz_vec_iter(fmpz * ys, const fmpz_mod_poly_t poly, const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx);
 
-void _fmpz_mod_poly_evaluate_fmpz_vec_iter(fmpz * ys, const fmpz * coeffs,
-                        slong len, const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx);
+void _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(fmpz * vs, const fmpz * poly, slong plen, fmpz_poly_struct * const * tree, slong len, const fmpz_mod_ctx_t ctx);
 
-void fmpz_mod_poly_evaluate_fmpz_vec_iter(fmpz * ys,
-                        const fmpz_mod_poly_t poly, const fmpz * xs, slong n,
-                                                     const fmpz_mod_ctx_t ctx);
+void _fmpz_mod_poly_evaluate_fmpz_vec_fast(fmpz * ys, const fmpz * poly, slong plen, const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_poly_evaluate_fmpz_vec_fast(fmpz * ys, const fmpz_mod_poly_t poly, const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx);
 
-void _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(fmpz * vs,
-              const fmpz * poly, slong plen, fmpz_poly_struct * const * tree,
-                                                 slong len, const fmpz_mod_ctx_t ctx);
-
-void _fmpz_mod_poly_evaluate_fmpz_vec_fast(fmpz * ys,
-    const fmpz * poly, slong plen, const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx);
-
-void fmpz_mod_poly_evaluate_fmpz_vec_fast(fmpz * ys,
-                        const fmpz_mod_poly_t poly, const fmpz * xs, slong n,
-                                                     const fmpz_mod_ctx_t ctx);
-
-void _fmpz_mod_poly_evaluate_fmpz_vec(fmpz * ys, const fmpz * coeffs,
-                        slong len, const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx);
-
-void fmpz_mod_poly_evaluate_fmpz_vec(fmpz * ys,
-                        const fmpz_mod_poly_t poly, const fmpz * xs, slong n,
-                                                     const fmpz_mod_ctx_t ctx);
-
+void _fmpz_mod_poly_evaluate_fmpz_vec(fmpz * ys, const fmpz * coeffs, slong len, const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_poly_evaluate_fmpz_vec(fmpz * ys, const fmpz_mod_poly_t poly, const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx);
 
 /*  Composition  *************************************************************/
 
