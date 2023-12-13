@@ -25,6 +25,8 @@
 extern "C" {
 #endif
 
+#define FMPQ_RECONSTRUCT_HGCD_CUTOFF 500
+
 FMPQ_INLINE void fmpq_init(fmpq_t x)
 {
     x->num = WORD(0);
