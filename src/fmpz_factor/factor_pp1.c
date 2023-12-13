@@ -58,27 +58,6 @@ void pp1_set_ui(mp_ptr x, mp_size_t nn, ulong norm, ulong c)
         x[1] = (c >> (FLINT_BITS - norm));
 }
 
-void pp1_print(mp_srcptr x, mp_srcptr y, mp_size_t nn, ulong norm)
-{
-    mp_ptr tx = flint_malloc(nn*sizeof(mp_limb_t));
-    mp_ptr ty = flint_malloc(nn*sizeof(mp_limb_t));
-
-    if (norm)
-    {
-        mpn_rshift(tx, x, nn, norm);
-        mpn_rshift(ty, y, nn, norm);
-    } else
-    {
-        flint_mpn_copyi(tx, x, nn);
-        flint_mpn_copyi(ty, y, nn);
-    }
-
-    flint_printf("["), gmp_printf("%Nd", tx, nn), flint_printf(", "), gmp_printf("%Nd", ty, nn), flint_printf("]");
-
-    flint_free(tx);
-    flint_free(ty);
-}
-
 void pp1_2k(mp_ptr x, mp_ptr y, mp_size_t nn, mp_srcptr n,
             mp_srcptr ninv, mp_srcptr x0, ulong norm)
 {
