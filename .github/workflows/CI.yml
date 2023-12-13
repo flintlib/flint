@@ -75,6 +75,10 @@ jobs:
         run: |
           $MAKE check
 
+      - name: "Check Python"
+        run: |
+          $MAKE check PYTHON=1
+
       - name: "Gather coverage data"
         run: |
           # NOTE: When Ubuntu LTS ships lcov v2.0.0+, change this section to
