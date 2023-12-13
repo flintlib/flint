@@ -83,5 +83,15 @@ TEST_FUNCTION_START(mpn_ctx_mpn_mul, state)
         mpn_ctx_clear(R);
     }
 
+    /* Generate more parts of code */
+    /* TODO: p = 16567 fails the test. This has a bn_bound of 0. */
+    /* TODO: p = 8796093022237 also fails the test. This has a bn_bound of 12. */
+    {
+        mpn_ctx_t R;
+        mpn_ctx_init(R, UWORD(16567));
+        test_mul(R, 50, 1000 * flint_test_multiplier(), state);
+        mpn_ctx_clear(R);
+    }
+
     TEST_FUNCTION_END(state);
 }
