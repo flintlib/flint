@@ -189,11 +189,6 @@ Conversion
     This is equivalent to assigning the numerator and denominator
     separately and calling ``fmpq_canonicalise``.
 
-.. function:: void fmpq_get_mpz_frac(mpz_t a, mpz_t b, fmpq_t c)
-
-    Sets ``a``, ``b`` to the numerator and denominator of ``c``
-    respectively.
-
 .. function:: void fmpq_set_si(fmpq_t res, slong p, ulong q)
 
     Sets ``res`` to the canonical form of the fraction ``p / q``.
