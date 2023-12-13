@@ -220,13 +220,6 @@ Conversion
     Returns 0 if no error occurs. Otherwise returns -1 and ``dest`` is
     set to zero.
 
-.. function:: void fmpq_init_set_mpz_frac_readonly(fmpq_t z, const mpz_t p, const mpz_t q)
-
-    Assuming ``z`` is an ``fmpz_t`` which will not be cleaned up,
-    this temporarily copies ``p`` and ``q`` into the numerator and
-    denominator of ``z`` for read only operations only. The user must not
-    run ``fmpq_clear`` on ``z``.
-
 .. function:: double fmpq_get_d(const fmpq_t f)
 
     Returns `f` as a ``double``, rounding towards zero if ``f`` cannot be represented exactly. The return is system dependent if ``f`` is too large or too small to fit in a ``double``.
