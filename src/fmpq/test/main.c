@@ -27,9 +27,6 @@
 #include "t-canonicalise.c"
 #include "t-cfrac_bound.c"
 #include "t-cmp.c"
-#include "t-cmp_fmpz.c"
-#include "t-cmp_si.c"
-#include "t-cmp_ui.c"
 #include "t-dedekind_sum.c"
 #include "t-div_2exp.c"
 #include "t-div.c"
@@ -82,9 +79,6 @@ test_struct tests[] =
     TEST_FUNCTION(fmpq_canonicalise),
     TEST_FUNCTION(fmpq_cfrac_bound),
     TEST_FUNCTION(fmpq_cmp),
-    TEST_FUNCTION(fmpq_cmp_fmpz),
-    TEST_FUNCTION(fmpq_cmp_si),
-    TEST_FUNCTION(fmpq_cmp_ui),
     TEST_FUNCTION(fmpq_dedekind_sum),
     TEST_FUNCTION(fmpq_div_2exp),
     TEST_FUNCTION(fmpq_div),
