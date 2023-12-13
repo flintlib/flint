@@ -69,12 +69,3 @@ Randomisation
 
     This function uses the Knuth shuffle algorithm to generate a uniformly 
     random permutation without retries.
-
-
-Input and output
---------------------------------------------------------------------------------
-
-
-.. function:: int _perm_print(const slong * vec, slong n)
-
-    Prints the permutation vector of length `n` to ``stdout``.

@@ -34,12 +34,15 @@ TEST_FUNCTION_START(perm_inv, state)
 
         if (!_perm_equal(a, c, n))
         {
-            flint_printf("FAIL:\n");
-            flint_printf("a: "); _perm_print(a, n); flint_printf("\n\n");
-            flint_printf("b: "); _perm_print(b, n); flint_printf("\n\n");
-            flint_printf("c: "); _perm_print(c, n); flint_printf("\n\n");
-            fflush(stdout);
-            flint_abort();
+            flint_throw(FLINT_TEST_FAIL,
+                    "n = %wd\n"
+                    "a = %{slong*}\n\n"
+                    "b = %{slong*}\n\n"
+                    "c = %{slong*}\n\n",
+                    n,
+                    a, n,
+                    b, n,
+                    c, n);
         }
 
         _perm_clear(a);
@@ -64,11 +67,13 @@ TEST_FUNCTION_START(perm_inv, state)
 
         if (!_perm_equal(a, b, n))
         {
-            flint_printf("FAIL:\n");
-            flint_printf("a: "); _perm_print(a, n); flint_printf("\n\n");
-            flint_printf("b: "); _perm_print(b, n); flint_printf("\n\n");
-            fflush(stdout);
-            flint_abort();
+            flint_throw(FLINT_TEST_FAIL,
+                    "n = %wd\n"
+                    "a = %{slong*}\n\n"
+                    "b = %{slong*}\n\n",
+                    n,
+                    a, n,
+                    b, n);
         }
 
         _perm_clear(a);

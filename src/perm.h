@@ -139,38 +139,8 @@ int _perm_randtest(slong * vec, slong n, flint_rand_t state);
 
 int _perm_parity(const slong * vec, slong n);
 
-/* Input and output **********************************************************/
-
-PERM_INLINE  int _long_vec_print(const slong * vec, slong len)
-{
-    slong i;
-
-    flint_printf("%wd", len);
-    if (len > 0)
-    {
-        flint_printf(" ");
-        for (i = 0; i < len; i++)
-            flint_printf(" %wd", vec[i]);
-    }
-
-    return 1;
-}
-
-PERM_INLINE int _perm_print(const slong * vec, slong n)
-{
-    slong i;
-
-    flint_printf("%wd", n);
-    if (n > 0)
-    {
-        flint_printf(" ");
-        for (i = 0; i < n; i++)
-            flint_printf(" %wd", vec[i]);
-    }
-
-    return 1;
-}
-
+#define _long_vec_print _Pragma("GCC error \"'_long_vec_print(vec, len)' is deprecated. Use 'flint_printf(\"%{slong*}\", vec, len)' instead.\"")
+#define _perm_print _Pragma("GCC error \"'_perm_print(vec, len)' is deprecated. Use 'flint_printf(\"%{slong*}\", vec, len)' instead.\"")
 #define _perm_set_one _Pragma("GCC error \"'_perm_set_one' is deprecated. Use '_perm_one' instead.\"")
 
 #ifdef __cplusplus
