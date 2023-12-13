@@ -148,7 +148,8 @@ Comparison
 
 .. function:: int fmpq_sgn(const fmpq_t x)
 
-    Returns the sign of the rational number `x`.
+    Returns the sign of the rational number `x`. That is, returns `-1` if
+    `x < 0`, `1` if `x > 0` and `0` if `x = 0`.
 
 .. function:: int fmpq_cmp(const fmpq_t x, const fmpq_t y)
               int fmpq_cmp_fmpz(const fmpq_t x, const fmpz_t y)
