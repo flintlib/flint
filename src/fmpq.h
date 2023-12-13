@@ -163,6 +163,8 @@ double fmpq_get_d(const fmpq_t a);
 int fmpq_get_mpfr(mpfr_t r, const fmpq_t x, mpfr_rnd_t rnd);
 #endif
 
+void fmpq_get_mpz_frac(mpz_t a, mpz_t b, fmpq_t c);
+
 void flint_mpq_init_set_readonly(mpq_t z, const fmpq_t f);
 
 void flint_mpq_clear_readonly(mpq_t z);
@@ -408,7 +410,6 @@ fmpz * fmpq_numerator_ptr(fmpq_t q);
 fmpz * fmpq_denominator_ptr(fmpq_t q);
 int fmpq_equal_fmpz(fmpq_t q, fmpz_t n);
 
-#define fmpq_get_mpz_frac _Pragma("GCC error \"'fmpq_get_mpz_frac' is deprecated.\"")
 #define fmpq_init_set_mpz_frac_readonly _Pragma("GCC error \"'fmpq_init_set_mpz_frac_readonly' is deprecated.\"")
 
 #ifdef __cplusplus
