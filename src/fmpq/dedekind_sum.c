@@ -12,6 +12,58 @@
 
 #include "fmpq.h"
 
+void
+fmpq_dedekind_sum_naive(fmpq_t s, const fmpz_t h, const fmpz_t k)
+{
+    fmpz_t i, j, q1, q2, r2;
+
+    if (fmpz_is_zero(k))
+    {
+        fmpq_zero(s);
+        return;
+    }
+
+    fmpz_init(i);
+    fmpz_init(j);
+    fmpz_init(q1);
+    fmpz_init(q2);
+    fmpz_init(r2);
+
+    fmpz_zero(fmpq_numref(s));
+
+    for (fmpz_one(i); fmpz_cmp(i, k) < 0; fmpz_add_ui(i, i, 1))
+    {
+        fmpz_fdiv_q(q1, i, k);
+
+        fmpz_mul(j, h, i);
+        fmpz_fdiv_qr(q2, r2, j, k);
+        if (fmpz_is_zero(r2))
+            continue;
+
+        fmpz_mul(q1, q1, k);
+        fmpz_sub(q1, i, q1);
+        fmpz_mul_ui(q1, q1, 2);
+        fmpz_sub(q1, q1, k);
+
+        fmpz_mul(q2, q2, k);
+        fmpz_sub(q2, j, q2);
+        fmpz_mul_ui(q2, q2, 2);
+        fmpz_sub(q2, q2, k);
+
+        fmpz_addmul(fmpq_numref(s), q1, q2);
+    }
+
+    fmpz_mul(fmpq_denref(s), k, k);
+    fmpz_mul_ui(fmpq_denref(s), fmpq_denref(s), 4);
+    fmpq_canonicalise(s);
+
+    fmpz_clear(i);
+    fmpz_clear(j);
+    fmpz_clear(q1);
+    fmpz_clear(q2);
+    fmpz_clear(r2);
+}
+
 #define _UI_MAT22_RMUL_ELEM(m11, m12, m21, m22, q) \
   do {                                             \
     mp_limb_t __t1 = m12 + q*m11;                  \
