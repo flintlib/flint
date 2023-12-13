@@ -62,6 +62,7 @@
 #include "t-set_round_mpz.c"
 #include "t-set_round_ui.c"
 #include "t-set_round_uiui.c"
+#include "t-sgn.c"
 #include "t-sosq.c"
 #include "t-sqrt.c"
 #include "t-sub.c"
@@ -125,6 +126,7 @@ test_struct tests[] =
     TEST_FUNCTION(arf_set_round_mpz),
     TEST_FUNCTION(arf_set_round_ui),
     TEST_FUNCTION(arf_set_round_uiui),
+    TEST_FUNCTION(arf_sgn),
     TEST_FUNCTION(arf_sosq),
     TEST_FUNCTION(arf_sqrt),
     TEST_FUNCTION(arf_sub),
