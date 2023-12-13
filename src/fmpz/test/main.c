@@ -29,8 +29,8 @@
 #include "t-addmul.c"
 #include "t-addmul_si.c"
 #include "t-addmul_ui.c"
-#include "t-add_ui.c"
 #include "t-and.c"
+#include "t-aors_ui.c"
 #include "t-bin_uiui.c"
 #include "t-bit_pack.c"
 #include "t-bits.c"
@@ -172,7 +172,6 @@
 #include "t-submul.c"
 #include "t-submul_si.c"
 #include "t-submul_ui.c"
-#include "t-sub_ui.c"
 #include "t-swap.c"
 #include "t-tdiv_q_2exp.c"
 #include "t-tdiv_q.c"
@@ -200,8 +199,8 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_addmul),
     TEST_FUNCTION(fmpz_addmul_si),
     TEST_FUNCTION(fmpz_addmul_ui),
-    TEST_FUNCTION(fmpz_add_ui),
     TEST_FUNCTION(fmpz_and),
+    TEST_FUNCTION(fmpz_aors_ui),
     TEST_FUNCTION(fmpz_bin_uiui),
     TEST_FUNCTION(fmpz_bit_pack),
     TEST_FUNCTION(fmpz_bits),
@@ -343,7 +342,6 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_submul),
     TEST_FUNCTION(fmpz_submul_si),
     TEST_FUNCTION(fmpz_submul_ui),
-    TEST_FUNCTION(fmpz_sub_ui),
     TEST_FUNCTION(fmpz_swap),
     TEST_FUNCTION(fmpz_tdiv_q_2exp),
     TEST_FUNCTION(fmpz_tdiv_q),

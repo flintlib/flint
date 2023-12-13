@@ -40,18 +40,27 @@ TEST_FUNCTION_START(perm_parity, state)
 
         if (ap != ap2 || bp != bp2 || cp != cp2)
         {
-            flint_printf("FAIL:\n");
-            flint_printf("a: "); _perm_print(a, n); flint_printf("\n\n");
-            flint_printf("b: "); _perm_print(b, n); flint_printf("\n\n");
-            flint_printf("c: "); _perm_print(c, n); flint_printf("\n\n");
-            flint_printf("ap = %d\n", ap);
-            flint_printf("bp = %d\n", bp);
-            flint_printf("cp = %d\n", cp);
-            flint_printf("ap2 = %d\n", ap2);
-            flint_printf("bp2 = %d\n", bp2);
-            flint_printf("cp2 = %d\n", cp2);
-            fflush(stdout);
-            flint_abort();
+            flint_throw(FLINT_TEST_FAIL,
+                    "n = %wd\n"
+                    "a = %{slong*}\n\n"
+                    "b = %{slong*}\n\n"
+                    "c = %{slong*}\n\n"
+                    "ap = %d\n"
+                    "bp = %d\n"
+                    "cp = %d\n"
+                    "ap2 = %d\n"
+                    "bp2 = %d\n"
+                    "cp2 = %d\n",
+                    n,
+                    a, n,
+                    b, n,
+                    c, n,
+                    ap,
+                    bp,
+                    cp,
+                    ap2,
+                    bp2,
+                    cp2);
         }
 
         _perm_clear(a);
