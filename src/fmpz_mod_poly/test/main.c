@@ -43,7 +43,7 @@
 #include "t-divrem_newton_n_preinv.c"
 #include "t-div_series.c"
 #include "t-evaluate_fmpz.c"
-#include "t-evaluate_fmpz_vec_fast.c"
+#include "t-evaluate_fmpz_vec.c"
 #include "t-find_distinct_nonzero_roots.c"
 #include "t-frobenius_powers_precomp.c"
 #include "t-gcd.c"
@@ -121,7 +121,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mod_poly_divrem_newton_n_preinv),
     TEST_FUNCTION(fmpz_mod_poly_div_series),
     TEST_FUNCTION(fmpz_mod_poly_evaluate_fmpz),
-    TEST_FUNCTION(fmpz_mod_poly_evaluate_fmpz_vec_fast),
+    TEST_FUNCTION(fmpz_mod_poly_evaluate_fmpz_vec),
     TEST_FUNCTION(fmpz_mod_poly_find_distinct_nonzero_roots),
     TEST_FUNCTION(fmpz_mod_poly_frobenius_powers_precomp),
     TEST_FUNCTION(fmpz_mod_poly_gcd),
