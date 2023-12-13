@@ -431,6 +431,10 @@ int flint_fprintf(FILE * f, const char * str, ...); /* flint version of fprintf 
 int flint_fscanf(FILE * f, const char * str, ...); /* flint version of fscanf */
 #endif
 
+#if defined(FLINT_HAVE_VA_LIST) && defined(FLINT_HAVE_FILE)
+int flint_vfprintf(FILE * f, const char * str, va_list ap);
+#endif
+
 #include "exception.h"
 
 FLINT_INLINE slong flint_mul_sizes(slong x, slong y)

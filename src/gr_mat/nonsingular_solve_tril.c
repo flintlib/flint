@@ -19,11 +19,12 @@ gr_mat_nonsingular_solve_tril_classical(gr_mat_t X,
 {
     slong i, j, n, m;
     gr_ptr tmp;
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(__clang__)
+# pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
     gr_ptr inv;
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(__clang__)
 # pragma GCC diagnostic pop
 #endif
     gr_ptr s;
@@ -87,11 +88,12 @@ gr_mat_nonsingular_solve_tril_classical(gr_mat_t X,
 cleanup:
     if (!unit)
     {
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(__clang__)
+# pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
         GR_TMP_CLEAR_VEC(inv, n, ctx);
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(__clang__)
 # pragma GCC diagnostic pop
 #endif
     }

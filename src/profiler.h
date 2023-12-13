@@ -128,7 +128,7 @@ FLINT_DLL extern double clock_last[FLINT_NUM_CLOCKS];
 FLINT_DLL extern double clock_accum[FLINT_NUM_CLOCKS];
 
 static inline
-double get_cycle_counter()
+double get_cycle_counter(void)
 {
 #if defined( _MSC_VER )
     return (double)__rdtsc();
@@ -154,7 +154,7 @@ void init_clock(int n)
 }
 
 static inline
-void init_all_clocks()
+void init_all_clocks(void)
 {
    int i;
    for (i = 0; i < FLINT_NUM_CLOCKS; i++)
@@ -187,13 +187,13 @@ void stop_clock(int n)
 ******************************************************************************/
 
 static inline
-void prof_start()
+void prof_start(void)
 {
    start_clock(0);
 }
 
 static inline
-void prof_stop()
+void prof_stop(void)
 {
    stop_clock(0);
 }

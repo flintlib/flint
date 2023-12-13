@@ -15,6 +15,50 @@
 #include <stdarg.h>
 #include "flint.h"
 
+/* return number of arguments called for by a specific format specifier */
+int parse_fmt(int * floating, const char * fmt)
+{
+   int args = 1;
+
+   fmt++; /* skip % */
+
+   if (fmt[0] == '%')
+      return 0; /* special case, print % */
+
+   if (fmt[0] == ' ' || fmt[0] == '+' || fmt[0] == '-')
+      fmt++; /* skip flag */
+
+   if (fmt[0] == '*')
+   {
+      args++;
+      fmt++; /* skip * */
+   } else
+      while (isdigit((unsigned char) fmt[0]))
+         fmt++; /* skip width */
+
+   if (fmt[0] == '.')
+   {
+      fmt++; /* skip . */
+      if (fmt[0] == '*')
+      {
+         args++;
+         fmt++; /* skip * */
+      } else
+         while (isdigit((unsigned char) fmt[0]))
+            fmt++; /* skip precision */
+   }
+
+   if (fmt[0] == 'h' || fmt[0] == 'l' || fmt[0] == 'L')
+      fmt++; /* skip length */
+
+   if (fmt[0] == 'e' || fmt[0] == 'E' || fmt[0] == 'f' || fmt[0] == 'g' || fmt[0] == 'G')
+      (*floating) = 1;
+   else
+      (*floating) = 0;
+
+   return args;
+}
+
 FLINT_WARN_UNUSED int flint_scanf(const char * str, ...)
 {
    va_list ap;

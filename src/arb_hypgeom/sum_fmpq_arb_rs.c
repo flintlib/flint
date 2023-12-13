@@ -54,18 +54,18 @@ arf_get_d_log2_abs_approx_clamped(const arf_t x)
 {
     if (arf_is_zero(x))
     {
-        return COEFF_MIN;
+        return (double) COEFF_MIN;
     }
     else if (!arf_is_finite(x))
     {
-        return COEFF_MAX;
+        return (double) COEFF_MAX;
     }
     else if (COEFF_IS_MPZ(ARF_EXP(x)))
     {
         if (fmpz_sgn(ARF_EXPREF(x)) < 0)
-            return COEFF_MIN;
+            return (double) COEFF_MIN;
         else
-            return COEFF_MAX;
+            return (double) COEFF_MAX;
     }
     else
     {

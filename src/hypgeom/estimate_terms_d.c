@@ -50,7 +50,7 @@ hypgeom_estimate_terms(const mag_t z, int r, slong prec)
         y = (prec * LOG2) / (r * d_lambertw(y)) + 1;
     }
 
-    if (y >= WORD_MAX / 2)
+    if (y >= (double) (WORD_MAX / 2))
     {
         flint_throw(FLINT_ERROR, "error: series will converge too slowly\n");
     }

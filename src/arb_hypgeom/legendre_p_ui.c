@@ -218,7 +218,7 @@ arb_hypgeom_legendre_p_ui(arb_t res, arb_t res_prime, ulong n, const arb_t x, sl
 
             K_one = n + 1;
             K_one = FLINT_MIN(K_one, 100000.0 * prec);
-            K_one = FLINT_MIN(K_one, UWORD_MAX * 0.25);
+            K_one = FLINT_MIN(K_one, UWORD_MAX / 4);
 
             size = 0.0;
 

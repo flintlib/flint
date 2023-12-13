@@ -1180,6 +1180,7 @@ fi
 if test "$enable_coverage" = "yes";
 then
     AC_SUBST(COVERAGE,1)
+    AC_DEFINE(FLINT_COVERAGE,1,[Define to enable coverage.])
 else
     AC_SUBST(COVERAGE,0)
 fi

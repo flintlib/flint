@@ -40,7 +40,12 @@ void flint_set_abort(void (*func)(void))
 #endif
 
 #ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+# pragma GCC diagnostic push
+# if defined(__clang__)
+#  pragma GCC diagnostic ignored "-Wincompatible-function-pointer-types"
+# elif defined(__GNUC__)
+#  pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+# endif
 #endif
     abort_func = func;
 #ifdef __GNUC__
@@ -65,39 +70,44 @@ void flint_throw(flint_err_t exc, const char * msg, ...)
 
     va_start(ap, msg);
 
-    flint_printf("Flint exception (");
-
-    switch (exc)
+    if (exc != FLINT_TEST_FAIL)
     {
-        case FLINT_ERROR:
-            flint_printf("General error");
-            break;
-        case FLINT_OVERFLOW:
-            flint_printf("Overflow");
-            break;
-        case FLINT_IMPINV:
-            flint_printf("Impossible inverse");
-            break;
-        case FLINT_DOMERR:
-            flint_printf("Domain error");
-            break;
-        case FLINT_DIVZERO:
-            flint_printf("Divide by zero");
-            break;
-        case FLINT_EXPOF:
-            flint_printf("Exponent overflow");
-            break;
-        case FLINT_INEXACT:
-            flint_printf("Inexact");
-            break;
-        default:
-            flint_printf("Unknown exception");
-     }
+        printf("Flint exception (");
+        switch (exc)
+        {
+            case FLINT_ERROR:
+                printf("General error");
+                break;
+            case FLINT_OVERFLOW:
+                printf("Overflow");
+                break;
+            case FLINT_IMPINV:
+                printf("Impossible inverse");
+                break;
+            case FLINT_DOMERR:
+                printf("Domain error");
+                break;
+            case FLINT_DIVZERO:
+                printf("Divide by zero");
+                break;
+            case FLINT_EXPOF:
+                printf("Exponent overflow");
+                break;
+            case FLINT_INEXACT:
+                printf("Inexact");
+                break;
+            default:
+                printf("Unknown exception");
+        }
+        printf("):\n    ");
+    }
+    else
+    {
+        printf("FAIL!\n\n");
+    }
 
-     printf("):\n    ");
+    flint_vprintf(msg, ap);
+    va_end(ap);
 
-     flint_vprintf(msg, ap);
-     va_end(ap);
-
-     flint_abort();
+    flint_abort();
 }

@@ -349,7 +349,7 @@ void acb_hypgeom_u_asymp(acb_t res, const acb_t a, const acb_t b,
                     moreprec = MAG_EXP(err);
 
                 n = acb_hypgeom_pfq_choose_n_max(aa, p, aa + p, q, w,
-                    prec + moreprec, FLINT_MIN(WORD_MAX / 2, 50 + 10.0 * prec));
+                    prec + moreprec, FLINT_MIN(WORD_MAX / 2, 50 + 10 * prec));
             }
 
             acb_hypgeom_pfq_sum_invz(s, t, aa, p, aa + p, q, w, winv, n, prec);

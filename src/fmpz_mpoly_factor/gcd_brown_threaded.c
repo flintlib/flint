@@ -343,7 +343,8 @@ static void _find_edge(
  * overwritten, and its initial element values do not matter.  It will contain
  * dangling pointers after returning, that is, the values `input[ix]' will be
  * invalid after returning.  Hence, we silence warnings about dangling pointers. */
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(__clang__)
+# pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Wdangling-pointer"
 #endif
 static slong _fmpz_mpoly_crt(
@@ -518,7 +519,7 @@ static slong _fmpz_mpoly_crt(
 
     return lastdegree;
 }
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(__clang__)
 # pragma GCC diagnostic pop
 #endif
 
