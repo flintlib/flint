@@ -64,7 +64,7 @@ arf_mul_rnd_any(arf_ptr z, arf_srcptr x, arf_srcptr y,
             if (xptr == yptr)
                 mpn_sqr(tmp, xptr, xn);
             else
-                mpn_mul_n(tmp, xptr, yptr, yn);
+                flint_mpn_mul_n(tmp, xptr, yptr, yn);
         }
         else
         {
