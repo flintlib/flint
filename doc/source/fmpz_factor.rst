@@ -176,6 +176,21 @@ A separate ``int`` field holds the sign, which may be `-1`, `0` or `1`.
     https://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf
 
 
+Input and output
+--------------------------------------------------------------------------------
+
+.. function:: int fmpz_factor_fprint(FILE * fs, const fmpz_factor_t factor)
+              int fmpz_factor_print(const fmpz_factor_t factor)
+
+    Prints the factorization ``factor`` into ``fs`` or ``stdout``. If ``factor``
+    is zero, it prints ``0``. Else, it prints the factorization as
+    ``f_{1}^e_{1} * ... * f_{n}^e_{n}``, where ``f_{i}`` and ``e_{i}`` are the
+    `i`-th factor and exponent, where ``^e_{i}`` is omitted if `e_{i} = 1`. In
+    particular, if ``factor`` is `1` or `-1`, it prints ``1`` or ``-1``,
+    respectively.
+
+    Returns the number of characters written to file stream.
+
 Elliptic curve (ECM) method
 --------------------------------------------------------------------------------
 

@@ -551,33 +551,14 @@ Input and output
     This function calls the ``mpz_inp_raw`` function in library gmp. So that it
     can read the raw data written by ``mpz_inp_raw`` directly.
 
-.. function:: int fmpz_print(const fmpz_t x)
+.. function:: int fmpz_fprint(FILE * fs, const fmpz_t x)
+              int fmpz_print(const fmpz_t x)
 
-    Prints the value `x` to ``stdout``, without a carriage return (CR).
-    The value is printed as either `0`, the decimal digits of a
-    positive integer, or a minus sign followed by the digits of
-    a negative integer.
+    Prints the value `x` to ``fs`` or ``stdout``, without a carriage return.
+    The value is printed as either `0`, the decimal digits of a positive
+    integer, or a minus sign followed by the digits of a negative integer.
 
-    In case of success, returns a positive number.  In case of failure,
-    returns a non-positive number.
-
-    This convention is adopted in light of the return values of
-    ``flint_printf`` from the standard library and ``mpz_out_str``
-    from GMP.
-
-.. function:: int fmpz_fprint(FILE * file, const fmpz_t x)
-
-    Prints the value `x` to ``file``, without a carriage return (CR).
-    The value is printed as either `0`, the decimal digits of a
-    positive integer, or a minus sign followed by the digits of
-    a negative integer.
-
-    In case of success, returns a positive number.  In case of failure,
-    returns a non-positive number.
-
-    This convention is adopted in light of the return values of
-    ``flint_printf`` from the standard library and ``mpz_out_str``
-    from GMP.
+    Returns the number of characters written to file stream.
 
 .. function:: size_t fmpz_out_raw(FILE * fout, const fmpz_t x )
 
