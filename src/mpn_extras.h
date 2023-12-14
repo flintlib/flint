@@ -75,22 +75,20 @@ flint_mpn_get_d(mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp);
 
 mp_limb_t flint_mpn_mul_large(mp_ptr r1, mp_srcptr i1, mp_size_t n1, mp_srcptr i2, mp_size_t n2);
 
+void flint_mpn_mul_n(mp_ptr z, mp_srcptr x, mp_srcptr y, mp_size_t n);
+
 MPN_EXTRAS_INLINE mp_limb_t
 flint_mpn_mul(mp_ptr z, mp_srcptr x, mp_size_t xn, mp_srcptr y, mp_size_t yn)
 {
-    if (yn < FLINT_MPN_MUL_THRESHOLD)
+    if (xn == yn)
+    {
+        flint_mpn_mul_n(z, x, y, yn);
+        return z[xn + yn - 1];
+    }
+    else if (yn < FLINT_MPN_MUL_THRESHOLD)
         return mpn_mul(z, x, xn, y, yn);
     else
         return flint_mpn_mul_large(z, x, xn, y, yn);
-}
-
-MPN_EXTRAS_INLINE void
-flint_mpn_mul_n(mp_ptr z, mp_srcptr x, mp_srcptr y, mp_size_t n)
-{
-    if (n < FLINT_MPN_MUL_THRESHOLD)
-        mpn_mul_n(z, x, y, n);
-    else
-        flint_mpn_mul_large(z, x, n, y, n);
 }
 
 MPN_EXTRAS_INLINE void
@@ -118,12 +116,10 @@ flint_mpn_sqr(mp_ptr z, mp_srcptr x, mp_size_t n)
             __tt_y1 = (_y)[1]; \
             flint_mpn_mul_2x2((_z)[3], (_z)[2], (_z)[1], (_z)[0], __tt_x1, __tt_x0, __tt_y1, __tt_y0); \
         } \
-        else if ((_xn) >= FLINT_MPN_MUL_THRESHOLD) \
-            flint_mpn_mul_large((_z), (_x), (_xn), (_y), (_yn)); \
         else if ((_x) == (_y)) \
             mpn_sqr((_z), (_x), (_xn)); \
         else \
-            mpn_mul_n((_z), (_x), (_y), (_xn)); \
+            flint_mpn_mul_n((_z), (_x), (_y), (_xn)); \
     } \
     else if ((_xn) > (_yn)) \
     { \
