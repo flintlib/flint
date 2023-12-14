@@ -710,8 +710,13 @@ $(foreach num, $(THREAD_LIST), $(eval $(call xxx_test_run_parallel,$(num))))
 endif
 
 ifdef PYTHON
+ifeq ($(findstring linux,$(HOST_OS)),linux)
 check: library
-	PYTHONPATH=$(FLINT_DIR) python3 $(SRC_DIR)/python/flint_ctypes.py
+	@LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:$(ABS_FLINT_DIR) python3 $(SRC_DIR)/python/flint_ctypes.py
+else
+check: library
+	@python3 $(SRC_DIR)/python/flint_ctypes.py
+endif
 else ifdef MOD
 ifeq ($(NJOBS),)
 check: library $(patsubst %,%_TEST_RUN,$(foreach dir, $(MOD), $($(dir)_TESTS)))
