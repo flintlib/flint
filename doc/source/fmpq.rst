@@ -142,9 +142,12 @@ Comparison
     Returns nonzero if ``res`` has value `\pm{1}` and zero otherwise.
 
 .. function:: int fmpq_equal(const fmpq_t x, const fmpq_t y)
+              int fmpq_equal_fmpz(const fmpq_t x, const fmpz_t y)
+              int fmpq_equal_si(fmpq_t x, slong y)
+              int fmpq_equal_ui(fmpq_t x, ulong y)
 
-    Returns nonzero if ``x`` and ``y`` are equal, and zero otherwise.
-    Assumes that ``x`` and ``y`` are both in canonical form.
+    Returns nonzero if ``x`` and ``y`` are equal, and zero otherwise. Assumes
+    that any input of type :type:`fmpq_t` is in the canonical form.
 
 .. function:: int fmpq_sgn(const fmpq_t x)
 
@@ -153,21 +156,10 @@ Comparison
 
 .. function:: int fmpq_cmp(const fmpq_t x, const fmpq_t y)
               int fmpq_cmp_fmpz(const fmpq_t x, const fmpz_t y)
+              int fmpq_cmp_si(const fmpq_t x, slong y)
               int fmpq_cmp_ui(const fmpq_t x, ulong y)
 
     Returns negative if `x < y`, zero if `x = y`, and positive if `x > y`.
-
-.. function:: int fmpq_cmp_si(const fmpq_t x, slong y)
-
-     Returns negative if `x < y`, zero if `x = y`, and positive if `x > y`.
-
-.. function:: int fmpq_equal_ui(fmpq_t x, ulong y)
-
-    Returns `1` if `x = y`, otherwise returns `0`.
-
-.. function:: int fmpq_equal_si(fmpq_t x, slong y)
-
-    Returns `1` if `x = y`, otherwise returns `0`.
 
 .. function:: void fmpq_height(fmpz_t height, const fmpq_t x)
 
