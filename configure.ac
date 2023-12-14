@@ -137,17 +137,6 @@ AC_CONFIG_HEADERS(src/config.h src/flint-config.h)
 # features
 ################################################################################
 
-AC_ARG_ENABLE(profiling,
-[AS_HELP_STRING([--enable-profiling],[Enable profiling [default=no]])],
-[case $enableval in
-yes|no)
-    ;;
-*)
-    AC_MSG_ERROR([Bad value $enableval for --enable-profiling. Need yes or no.])
-    ;;
-esac],
-enable_profiling="no")
-
 AC_ARG_ENABLE(pthread,
 [AS_HELP_STRING([--enable-pthread],[Enable pthread [default=yes]])],
 [case $enableval in
@@ -1028,15 +1017,6 @@ else
     TESTCFLAGS="$TESTCFLAGS $save_CFLAGS"
 fi
 
-################################################################################
-# CPPFLAGS
-################################################################################
-
-if test "$enable_profiling" = "yes";
-then
-    CPPFLAGS="$CPPFLAGS -DFLINT_PROFILE"
-fi
-
 CPPFLAGS="-I./src $CPPFLAGS"
 
 ################################################################################
@@ -1168,13 +1148,6 @@ then
     AC_SUBST(STATIC,1)
 else
     AC_SUBST(STATIC,0)
-fi
-
-if test "$enable_profiling" = "yes";
-then
-    AC_SUBST(PROFILING,1)
-else
-    AC_SUBST(PROFILING,0)
 fi
 
 if test "$enable_coverage" = "yes";
