@@ -3,6 +3,8 @@ import ctypes.util
 import sys
 
 libflint_path = ctypes.util.find_library('flint')
+if libflint_path == None:
+    raise ValueError('Could not find libflint.')
 libflint = ctypes.CDLL(libflint_path)
 libcalcium = libarb = libgr = libflint
 

@@ -51,6 +51,7 @@ jobs:
           autoconf --version
           libtool --version
           lcov --version
+          python3 --version
           echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
 
       - name: "Configure"
