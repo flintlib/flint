@@ -9,20 +9,19 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "ulong_extras.h"
 
 /* bits of n, B1, count */
-static slong n_factor_pp1_table[][3] = {
-        {31, 2784, 5}, {32, 1208, 2}, {33, 2924, 3},
-        {34, 286, 5}, {35, 58, 5}, {36, 61, 4}, {37, 815, 2},
-        {38, 944, 2}, {39, 61, 3}, {40, 0, 0}, {41, 0, 0},
-        {42, 0, 0}, {43, 0, 0}, {44, 0, 0}, {45, 0, 0},
-        {46, 0, 0}, {47, 0, 0}, {47, 0, 0}, {49, 0, 0},
-        {50, 606, 1}, {51, 2403, 1}, {52, 2524, 1}, {53, 2924, 1},
-        {54, 3735, 2}, {55, 669, 2}, {56, 6092, 3}, {57, 2179, 3},
-        {58, 3922, 3}, {59, 6717, 4}, {60, 4119, 4}, {61, 2288, 4},
-        {62, 9004, 3}, {63, 9004, 3}, {64, 9004, 3}};
+slong n_factor_pp1_table[][2] = {
+    {2784, 5}, {1208, 2}, {2924, 3},
+    { 286, 5}, {  58, 5}, {  61, 4}, { 815, 2},
+    { 944, 2}, {  61, 3}, {   0, 0}, {   0, 0},
+    {   0, 0}, {   0, 0}, {   0, 0}, {   0, 0},
+    {   0, 0}, {   0, 0}, {   0, 0}, {   0, 0},
+    { 606, 1}, {2403, 1}, {2524, 1}, {2924, 1},
+    {3735, 2}, { 669, 2}, {6092, 3}, {2179, 3},
+    {3922, 3}, {6717, 4}, {4119, 4}, {2288, 4},
+    {9004, 3}, {9004, 3}, {9004, 3}};
 
 #define n_pp1_set(x1, y1, x2, y2) \
    do {                           \
@@ -46,15 +45,6 @@ void n_pp1_print(mp_limb_t x, mp_limb_t y, ulong norm)
    }
 
    flint_printf("[%wu, %wu]", x, y);
-}
-#endif
-
-#if FLINT_PROFILE
-/* exists only for tuning/profiling */
-void n_factor_pp1_table_insert(slong bits, slong B1, slong count)
-{
-    n_factor_pp1_table[bits][1] = B1;
-    n_factor_pp1_table[bits][2] = count;
 }
 #endif
 
@@ -228,8 +218,8 @@ mp_limb_t n_factor_pp1_wrapper(mp_limb_t n)
    if (bits < 31)
        return 0;
 
-   B1 = n_factor_pp1_table[bits - 31][1];
-   count = n_factor_pp1_table[bits - 31][2];
+   B1 = n_factor_pp1_table[bits - 31][0];
+   count = n_factor_pp1_table[bits - 31][1];
 
    flint_randinit(state);
 

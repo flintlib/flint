@@ -373,7 +373,6 @@ ulong n_factor_SQUFOF(ulong n, ulong iters);
 
 ulong n_factor_pp1(ulong n, ulong B1, ulong c);
 ulong n_factor_pp1_wrapper(ulong n);
-void n_factor_pp1_table_insert(slong bits, slong B1, slong count);
 
 int n_factor_pollard_brent_single(ulong *factor, ulong n, ulong ninv, ulong ai, ulong xi, ulong normbits, ulong max_iters);
 int n_factor_pollard_brent(ulong *factor, flint_rand_t state, ulong n_in, ulong max_tries, ulong max_iters);
