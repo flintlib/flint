@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2008, 2009 William Hart
     Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2023 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -10,36 +11,38 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include "fmpz.h"
 #include "fmpz_factor.h"
 
-void
-fmpz_factor_print(const fmpz_factor_t factor)
+int fmpz_factor_fprint(FILE * fs, const fmpz_factor_t factor)
 {
     slong i;
+    int res = 0;
 
     if (factor->sign == 0)
-    {
-        flint_printf("0");
-        return;
-    }
+        return (fputc('0', fs) != EOF);
 
     if (factor->sign == -1)
-    {
-        if (factor->num)
-            flint_printf("-1 * ");
-        else
-            flint_printf("-1");
-    }
+        res += fwrite("-1 * ", sizeof(char), 2 + 3 * (factor->num != 0), fs);
+    else if (factor->num == 0)
+        return (fputc('1', fs) != EOF);
 
     for (i = 0; i < factor->num; i++)
     {
-        fmpz_print(factor->p + i);
+        res += fmpz_fprint(fs, factor->p + i);
 
         if (factor->exp[i] != UWORD(1))
-            flint_printf("^%wu", factor->exp[i]);
+            res += fprintf(fs, "^" WORD_FMT "u", factor->exp[i]);
 
         if (i != factor->num - 1)
-            flint_printf(" * ");
+            res += fwrite(" * ", sizeof(char), 3, fs);
     }
+
+    return res;
+}
+
+int fmpz_factor_print(const fmpz_factor_t factor)
+{
+    return fmpz_factor_fprint(stdout, factor);
 }

@@ -19,6 +19,7 @@
 #include "t-factor_pp1.c"
 #include "t-factor_smooth.c"
 #include "t-factor_trial.c"
+#include "t-io.c"
 #include "t-pollard_brent.c"
 #include "t-pollard_brent_single.c"
 #include "t-refine.c"
@@ -27,8 +28,9 @@
 
 test_struct tests[] =
 {
-    TEST_FUNCTION(fmpz_factor_ecm),
     TEST_FUNCTION(fmpz_factor),
+    TEST_FUNCTION(fmpz_factor_ecm),
+    TEST_FUNCTION(fmpz_factor_fprint),
     TEST_FUNCTION(fmpz_factor_pp1),
     TEST_FUNCTION(fmpz_factor_smooth),
     TEST_FUNCTION(fmpz_factor_trial),
