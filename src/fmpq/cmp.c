@@ -42,11 +42,9 @@ _fmpq_cmp(const fmpz_t p, const fmpz_t q, const fmpz_t r, const fmpz_t s)
     if (s1 != s2)
         return s1 < s2 ? -1 : 1;
 
-    if (s1 == 0)
-        return -s2;
-
-    if (s2 == 0)
-        return -s1;
+    /* NOTE: If `p' and `r' was zero, then we stepped into the first
+     * if-statement. Else, if `p' or `r' was zero, then s1 != s2. Hence, at this
+     * stage `p' and `r' has to be non-zero. */
 
     bp = fmpz_bits(p);
     bq = fmpz_bits(q);
@@ -214,11 +212,9 @@ _fmpq_cmp_ui(const fmpz_t p, const fmpz_t q, ulong c)
     if (s1 != s2)
         return s1 < s2 ? -1 : 1;
 
-    if (s1 == 0)
-        return -s2;
-
-    if (s2 == 0)
-        return -s1;
+    /* NOTE: If `p' and `r' was zero, then we stepped into the first
+     * if-statement. Else, if `p' or `r' was zero, then s1 != s2. Hence, at this
+     * stage `p' and `r' has to be non-zero. */
 
     bp = fmpz_bits(p);
     bq = fmpz_bits(q);

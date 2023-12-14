@@ -25,6 +25,8 @@
 extern "C" {
 #endif
 
+#define FMPQ_RECONSTRUCT_HGCD_CUTOFF 500
+
 FMPQ_INLINE void fmpq_init(fmpq_t x)
 {
     x->num = WORD(0);
@@ -170,8 +172,6 @@ void flint_mpq_clear_readonly(mpq_t z);
 void fmpq_init_set_readonly(fmpq_t f, const mpq_t z);
 
 void fmpq_clear_readonly(fmpq_t f);
-
-void fmpq_init_set_mpz_frac_readonly(fmpq_t z, const mpz_t num, const mpz_t den);
 
 char * _fmpq_get_str(char * str, int b, const fmpz_t num, const fmpz_t den);
 char * fmpq_get_str(char * str, int b, const fmpq_t x);
@@ -409,6 +409,8 @@ void fmpq_denominator(fmpz_t n, const fmpq_t q);
 fmpz * fmpq_numerator_ptr(fmpq_t q);
 fmpz * fmpq_denominator_ptr(fmpq_t q);
 int fmpq_equal_fmpz(fmpq_t q, fmpz_t n);
+
+#define fmpq_init_set_mpz_frac_readonly _Pragma("GCC error \"'fmpq_init_set_mpz_frac_readonly' is deprecated.\"")
 
 #ifdef __cplusplus
 }

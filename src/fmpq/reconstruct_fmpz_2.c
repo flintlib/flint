@@ -15,7 +15,6 @@
 #include "fmpq.h"
 
 #define FMPQ_RECONSTRUCT_ARRAY_LIMIT 12
-#define FMPQ_RECONSTRUCT_HGCD_CUTOFF 500
 
 /*
     hgcd for two-limb input, individual quotients not written
