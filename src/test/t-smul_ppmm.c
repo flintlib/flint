@@ -64,13 +64,11 @@ TEST_FUNCTION_START(smul_ppmm, state)
       result = ((ph2 == ph1) && (pl2 == pl1));
 
       if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("m1 = %wu, m2 = %wu\n", n1, n2);
-         flint_printf("ph2 = %wu, ph1 = %wu, pl2 = %wu, pl1 = %wu\n", ph2, ph1, pl2, pl1);
-         fflush(stdout);
-         flint_abort();
-      }
+         flint_throw(FLINT_TEST_FAIL,
+                 "Inputs: u = %wd, v = %wd\n\n"
+                 "Got:      r1 = %wd, r0 = %wd\n"
+                 "Expected: r1 = %wd, r0 = %wd\n",
+                 n1, n2, ph1, pl1, ph2, pl2);
    }
 
    TEST_FUNCTION_END(state);
