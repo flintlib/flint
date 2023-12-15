@@ -1005,7 +1005,7 @@ void flint_mpn_mul_12x12(mp_ptr res, mp_srcptr u, mp_srcptr v)
 
 typedef void (*flint_mpn_mul_func_t)(mp_ptr, mp_srcptr, mp_srcptr);
 
-const flint_mpn_mul_func_t flint_mpn_mul_n_tab[11][11] = {
+const flint_mpn_mul_func_t flint_mpn_mul_tab[11][11] = {
     { NULL, },
     { NULL, flint_mpn_mul_1x1, },
     { NULL, flint_mpn_mul_2x1, flint_mpn_mul_2x2, },
@@ -1019,7 +1019,7 @@ const flint_mpn_mul_func_t flint_mpn_mul_n_tab[11][11] = {
     { NULL, flint_mpn_mul_10x1, flint_mpn_mul_10x2, flint_mpn_mul_10x3, flint_mpn_mul_10x4, flint_mpn_mul_10x5, flint_mpn_mul_10x6, flint_mpn_mul_10x7, flint_mpn_mul_10x8, flint_mpn_mul_10x9, flint_mpn_mul_10x10, },
 };
 
-const flint_mpn_mul_func_t flint_mpn_mul_tab[13] = {
+const flint_mpn_mul_func_t flint_mpn_mul_n_tab[13] = {
     NULL,
     flint_mpn_mul_1x1,
     flint_mpn_mul_2x2,
@@ -1035,6 +1035,37 @@ const flint_mpn_mul_func_t flint_mpn_mul_tab[13] = {
     flint_mpn_mul_12x12,
 };
 
+FLINT_FORCE_INLINE
+void flint_mpn_mul_1x1i(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    NN_MUL_1X1(res[1], res[0], u[0], v[0]);
+}
+
+FLINT_FORCE_INLINE
+void flint_mpn_mul_2x1i(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t a, v0 = v[0];
+    NN_MUL_1X1(a, res[0], u[0], v0);
+    NN_ADDMUL_S2_A2_1X1(res[2], res[1], 0, a, u[1], v0);
+}
+
+FLINT_FORCE_INLINE
+void flint_mpn_mul_2x2i(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_ADDMUL_S2_A2_1X1(res[3], res[2], b, a, u[1], v[1]);
+}
+
+#define MUL_STATS 0
+
+#if MUL_STATS
+slong mulncount[11] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+slong mulncounter = 0;
+#define T mulncount
+#endif
+
 void
 flint_mpn_mul_n(mp_ptr z, mp_srcptr x, mp_srcptr y, mp_size_t n)
 {
@@ -1042,8 +1073,21 @@ flint_mpn_mul_n(mp_ptr z, mp_srcptr x, mp_srcptr y, mp_size_t n)
     FLINT_ASSERT(z != x);
     FLINT_ASSERT(z != y);
 
-    if (n <= 12)
-        flint_mpn_mul_tab[n](z, x, y);
+#if MUL_STATS
+    mulncounter++;
+    mulncount[FLINT_MIN(n, 10)]++;
+    if (mulncounter % 1000 == 0)
+        flint_printf("mul n %wd [%wd %wd %wd %wd %wd %wd %wd %wd %wd %wd]\n", n, T[1], T[2], T[3], T[4], T[5], T[6], T[7], T[8], T[9], T[10]);
+#endif
+
+    /* Experimentally inline n = 2. Whether this is beneficial depends on the
+       distribution of inputs. We do not waste a branch on checking for n = 1,
+       following the assumption that many callers already handle single-limb
+       input specially. */
+    if (n == 2)
+        flint_mpn_mul_2x2i(z, x, y);
+    else if (n <= 12)
+        flint_mpn_mul_n_tab[n](z, x, y);
     else if (n < FLINT_MPN_MUL_THRESHOLD)
         mpn_mul_n(z, x, y, n);
     else
@@ -1058,9 +1102,33 @@ flint_mpn_mul(mp_ptr z, mp_srcptr x, mp_size_t xn, mp_srcptr y, mp_size_t yn)
     FLINT_ASSERT(z != x);
     FLINT_ASSERT(z != y);
 
-    if (xn <= 10)
+#if MUL_STATS
+    mulncounter++;
+    mulncount[FLINT_MIN(xn, 10)]++;
+    if (mulncounter % 10000 == 0)
+        flint_printf("mul n %wd [%wd %wd %wd %wd %wd %wd %wd %wd %wd %wd]\n", xn, T[1], T[2], T[3], T[4], T[5], T[6], T[7], T[8], T[9], T[10]);
+#endif
+
+    /* Experimentally inline n = 2. Whether this is beneficial depends on the
+       distribution of inputs. We do not waste a branch on checking for n = 1,
+       following the assumption that many callers already handle single-limb
+       input specially. */
+    if (xn == 2)
     {
-        flint_mpn_mul_n_tab[xn][yn](z, x, y);
+        if (yn == 1)
+        {
+            flint_mpn_mul_2x1i(z, x, y);
+            return z[2];
+        }
+        else
+        {
+            flint_mpn_mul_2x2i(z, x, y);
+            return z[3];
+        }
+    }
+    else if (xn <= 10)
+    {
+        flint_mpn_mul_tab[xn][yn](z, x, y);
         return z[xn + yn - 1];
     }
     else if (yn == 1)
