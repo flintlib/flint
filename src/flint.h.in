@@ -112,8 +112,6 @@ typedef struct __FLINT_FILE FLINT_FILE;
 #define FLINT_ASSERT(param)
 #endif
 
-#include "longlong.h"
-
 #if defined(__GNUC__)
 # define FLINT_FORCE_INLINE static __attribute__((always_inline)) inline
 # define FLINT_STATIC_NOINLINE static __attribute__((noinline))
@@ -201,6 +199,8 @@ typedef struct __FLINT_FILE FLINT_FILE;
 # define FLINT_BITS 32
 # define FLINT_D_BITS 31
 #endif
+
+#include "longlong.h"
 
 void * flint_malloc(size_t size);
 void * flint_realloc(void * ptr, size_t size);
