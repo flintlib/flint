@@ -72,12 +72,6 @@
 # define FLINT_HAVE_FILE
 #endif
 
-#ifdef FLINT_HAVE_CONSTANT_P
-# define FLINT_CONSTANT_P __builtin_constant_p
-#else
-# define FLINT_CONSTANT_P(x) 0
-#endif
-
 #ifdef FLINT_INLINES_C
 # define FLINT_INLINE
 #else
@@ -130,6 +124,7 @@ typedef struct __FLINT_FILE FLINT_FILE;
 # define FLINT_OPTIMIZE_NESTED_1(part) FLINT_OPTIMIZE_NESTED_2(#part)
 # define FLINT_OPTIMIZE(x) FLINT_OPTIMIZE_NESTED_1(x)
 # define FLINT_UNREACHABLE __builtin_unreachable()
+# define FLINT_CONSTANT_P __builtin_constant_p
 #else
 # define __attribute__(x)
 # if defined(_MSC_VER)
@@ -149,6 +144,7 @@ typedef struct __FLINT_FILE FLINT_FILE;
 # define FLINT_PUSH_OPTIONS
 # define FLINT_POP_OPTIONS
 # define FLINT_OPTIMIZE(x)
+# define FLINT_CONSTANT_P(x) 0
 #endif
 
 #if defined(__cplusplus)
