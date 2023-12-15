@@ -60,7 +60,7 @@ mp_size_t flint_mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
             break;
         maxi = i + 1;
         square[i + 1] = flint_malloc(sizeof(mp_limb_t) * sqsize);
-        mpn_sqr(square[i + 1], square[i], square_size[i]);
+        flint_mpn_sqr(square[i + 1], square[i], square_size[i]);
         if (square[i + 1][sqsize - 1] == 0)
             sqsize -= 1;
         square_size[i + 1] = sqsize;

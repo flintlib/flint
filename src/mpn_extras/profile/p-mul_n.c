@@ -13,7 +13,7 @@
 #include "mpn_extras.h"
 #include "profiler.h"
 
-#define MAXN 15
+#define MAXN 20
 
 int main()
 {
@@ -22,7 +22,7 @@ int main()
 
     {
         mp_limb_t x[MAXN], y[MAXN], r[2 * MAXN], s[2 * MAXN];
-        slong i, n;
+        slong i, n, m;
 
         for (i = 0; i < MAXN; i++)
         {
@@ -51,6 +51,30 @@ int main()
 
             if (mpn_cmp(r, s, 2 * n) != 0)
                 flint_abort();
+        }
+
+        for (n = 1; n <= MAXN; n++)
+        {
+            flint_printf("n = %wd    ", n);
+
+            for (m = 1; m <= n; m++)
+            {
+                double t1, t2, __;
+
+                TIMEIT_START
+                mpn_mul(r, x, n, y, m);
+                TIMEIT_STOP_VALUES(__, t1)
+                TIMEIT_START
+                flint_mpn_mul(s, x, n, y, m);
+                TIMEIT_STOP_VALUES(__, t2)
+
+                flint_printf("%.3fx  ", t1 / t2);
+
+                if (mpn_cmp(r, s, n + m) != 0)
+                    flint_abort();
+            }
+
+            flint_printf("\n");
         }
     }
 

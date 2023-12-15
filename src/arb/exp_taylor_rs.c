@@ -10,6 +10,7 @@
 */
 
 #include "arb.h"
+#include "mpn_extras.h"
 
 /* See verify_taylor.py for code to generate tables and
    proof of correctness */
@@ -1222,7 +1223,7 @@ void _arb_exp_taylor_rs(mp_ptr y, mp_limb_t * error,
             /* 1 + x + x^2 / 2 */
             t = TMP_ALLOC_LIMBS(2 * xn);
 
-            mpn_sqr(t, x, xn);
+            flint_mpn_sqr(t, x, xn);
             mpn_rshift(t + xn, t + xn, xn, 1);
             y[xn] = mpn_add_n(y, x, t + xn, xn) + 1;
 
@@ -1251,12 +1252,12 @@ void _arb_exp_taylor_rs(mp_ptr y, mp_limb_t * error,
 #define XPOW_READ(__k) (xpow + (m - (__k) + 1) * xn)
 
         flint_mpn_copyi(XPOW_READ(1), x, xn);
-        mpn_sqr(XPOW_WRITE(2), XPOW_READ(1), xn);
+        flint_mpn_sqr(XPOW_WRITE(2), XPOW_READ(1), xn);
 
         for (k = 4; k <= m; k += 2)
         {
-            mpn_mul_n(XPOW_WRITE(k - 1), XPOW_READ(k / 2), XPOW_READ(k / 2 - 1), xn);
-            mpn_sqr(XPOW_WRITE(k), XPOW_READ(k / 2), xn);
+            flint_mpn_mul_n(XPOW_WRITE(k - 1), XPOW_READ(k / 2), XPOW_READ(k / 2 - 1), xn);
+            flint_mpn_sqr(XPOW_WRITE(k), XPOW_READ(k / 2), xn);
         }
 
         flint_mpn_zero(s, xn + 1);
@@ -1285,7 +1286,7 @@ void _arb_exp_taylor_rs(mp_ptr y, mp_limb_t * error,
                 /* Outer polynomial evaluation: multiply by x^m */
                 if (k != 0)
                 {
-                    mpn_mul(t, s, xn + 1, XPOW_READ(m), xn);
+                    flint_mpn_mul(t, s, xn + 1, XPOW_READ(m), xn);
                     flint_mpn_copyi(s, t + xn, xn + 1);
                 }
 

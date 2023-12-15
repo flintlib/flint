@@ -557,8 +557,8 @@ gauss:
 
     /* (m11, m12) = (m12 + Q*m11, m11), use R for temp */
     mdet *= -1;
-    ex0 = (Qlen > m_len) ? mpn_mul(R, Q, Qlen, m11, m_len)
-                         : mpn_mul(R, m11, m_len, Q, Qlen);
+    ex0 = (Qlen > m_len) ? flint_mpn_mul(R, Q, Qlen, m11, m_len)
+                         : flint_mpn_mul(R, m11, m_len, Q, Qlen);
     m_len = Qlen + m_len - (ex0 == 0);
     ex0 = mpn_add_n(R, R, m12, m_len);
     R[m_len] = ex0;

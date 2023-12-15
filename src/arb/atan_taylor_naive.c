@@ -10,6 +10,7 @@
 */
 
 #include "arb.h"
+#include "mpn_extras.h"
 
 void
 _arb_atan_taylor_naive(mp_ptr y, mp_limb_t * error,
@@ -48,7 +49,7 @@ _arb_atan_taylor_naive(mp_ptr y, mp_limb_t * error,
     flint_mpn_copyi(x1 + 1, x, xn);
 
     /* x2 = x * x */
-    mpn_mul_n(u, x1, x1, nn);
+    flint_mpn_mul_n(u, x1, x1, nn);
     flint_mpn_copyi(x2, u + nn, nn);
 
     /* s = t = x */
@@ -58,7 +59,7 @@ _arb_atan_taylor_naive(mp_ptr y, mp_limb_t * error,
     for (k = 1; k < N; k++)
     {
         /* t = t * x2 */
-        mpn_mul_n(u, t, x2, nn);
+        flint_mpn_mul_n(u, t, x2, nn);
         flint_mpn_copyi(t, u + nn, nn);
 
         /* u = t / (2k+1) */

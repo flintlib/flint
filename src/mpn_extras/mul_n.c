@@ -59,7 +59,7 @@
 
 
 /*
-Generic version:
+Generic version of mul_n:
 
 void flint_mpn_mul_n_basecase(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
 {
@@ -78,31 +78,61 @@ void flint_mpn_mul_n_basecase(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
     NN_ADDMUL_S2_A2_1X1(res[2 * n - 1], res[2 * n - 2], b, a, u[n - 1], v[n - 1]);
 }
 
-The compiler may refuse to unroll the nested loops, so we generate the code:
+The compiler may refuse to unroll the nested loops, so we generate the code.
 
-def mul(n):
-    print("void flint_mpn_mul_%i(mp_ptr res, mp_srcptr u, mp_srcptr v)" % n)
-    print("{")
-    print("    mp_limb_t b, a;")
-    print("    NN_MUL_1X1(a, res[0], u[0], v[0]);")
-    print("    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);")
-    for i in range(2, n):
-        print("    NN_DOTREV_S3_A3_1X1(b, a, res[%i], 0, b, a, u, v, %i);" % (i, i + 1))
-    for i in range(n, 2 * n - 2):
-        print("    NN_DOTREV_S3_A3_1X1(b, a, res[%i], 0, b, a, u + %i, v + %i, %i);" % (i, i - n + 1, i - n + 1, 2 * n - i - 1))
-    print("    NN_ADDMUL_S2_A2_1X1(res[%i], res[%i], b, a, u[%i], v[%i]);" % (2 * n - 1, 2 * n - 2, n - 1, n - 1))
-    print("}")
+Schema for a general n x m multiply (here n = 7, m = 4):
+
+    v0   u0 u1 u2 u3 u4 u5 u6 .
+    v1      u0 u1 u2 u3 u4 u5 u6 .
+    v2         u0 u1 u2 u3 u4 u5 u6 .
+    v3            u0 u1 u2 u3 u4 u5 u6 .
+
+def mulnm(n, m):
+    if m == 1:
+        print("void flint_mpn_mul_%ix1(mp_ptr res, mp_srcptr u, mp_srcptr v)" % n)
+        print("{")
+        print("    mp_limb_t a, v0 = v[0];")
+        print("    NN_MUL_1X1(a, res[0], u[0], v0);")
+        for i in range(1, n-1):
+            print("    NN_ADDMUL_S2_A2_1X1(a, res[%i], 0, a, u[%i], v0);" % (i, i))
+        print("    NN_ADDMUL_S2_A2_1X1(res[%i], res[%i], 0, a, u[%i], v0);" % (n, n - 1, n - 1))
+        print("}")
+    else:
+        print("void flint_mpn_mul_%ix%i(mp_ptr res, mp_srcptr u, mp_srcptr v)" % (n, m))
+        print("{")
+        print("    mp_limb_t b, a;")
+        print("    NN_MUL_1X1(a, res[0], u[0], v[0]);")
+        print("    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);")
+        for i in range(2, m):
+            print("    NN_DOTREV_S3_A3_1X1(b, a, res[%i], 0, b, a, u, v, %i);" % (i, i + 1))
+        for i in range(m, n):
+            print("    NN_DOTREV_S3_A3_1X1(b, a, res[%i], 0, b, a, u + %i, v, %i);" % (i, i - m + 1, m))
+        for i in range(n, n+m-2):
+            print("    NN_DOTREV_S3_A3_1X1(b, a, res[%i], 0, b, a, u + %i, v + %i, %i);" % (i, i - m + 1, i - n + 1, n + m - i - 1))
+        print("    NN_ADDMUL_S2_A2_1X1(res[%i], res[%i], b, a, u[%i], v[%i]);" % (n + m - 1, n + m - 2, n - 1, m - 1))
+        print("}")
+
+for n in range(2, 10+1):
+    for m in range(1, n+1):
+        mulnm(n, m)
+        print()
+    print()
 
 */
 
-FLINT_FORCE_INLINE
-void flint_mpn_mul_1(mp_ptr res, mp_srcptr u, mp_srcptr v)
+void flint_mpn_mul_1x1(mp_ptr res, mp_srcptr u, mp_srcptr v)
 {
     NN_MUL_1X1(res[1], res[0], u[0], v[0]);
 }
 
-FLINT_FORCE_INLINE
-void flint_mpn_mul_2(mp_ptr res, mp_srcptr u, mp_srcptr v)
+void flint_mpn_mul_2x1(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t a, v0 = v[0];
+    NN_MUL_1X1(a, res[0], u[0], v0);
+    NN_ADDMUL_S2_A2_1X1(res[2], res[1], 0, a, u[1], v0);
+}
+
+void flint_mpn_mul_2x2(mp_ptr res, mp_srcptr u, mp_srcptr v)
 {
     mp_limb_t b, a;
     NN_MUL_1X1(a, res[0], u[0], v[0]);
@@ -110,7 +140,24 @@ void flint_mpn_mul_2(mp_ptr res, mp_srcptr u, mp_srcptr v)
     NN_ADDMUL_S2_A2_1X1(res[3], res[2], b, a, u[1], v[1]);
 }
 
-void flint_mpn_mul_3(mp_ptr res, mp_srcptr u, mp_srcptr v)
+void flint_mpn_mul_3x1(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t a, v0 = v[0];
+    NN_MUL_1X1(a, res[0], u[0], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[1], 0, a, u[1], v0);
+    NN_ADDMUL_S2_A2_1X1(res[3], res[2], 0, a, u[2], v0);
+}
+
+void flint_mpn_mul_3x2(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u + 1, v, 2);
+    NN_ADDMUL_S2_A2_1X1(res[4], res[3], b, a, u[2], v[1]);
+}
+
+void flint_mpn_mul_3x3(mp_ptr res, mp_srcptr u, mp_srcptr v)
 {
     mp_limb_t b, a;
     NN_MUL_1X1(a, res[0], u[0], v[0]);
@@ -120,7 +167,38 @@ void flint_mpn_mul_3(mp_ptr res, mp_srcptr u, mp_srcptr v)
     NN_ADDMUL_S2_A2_1X1(res[5], res[4], b, a, u[2], v[2]);
 }
 
-void flint_mpn_mul_4(mp_ptr res, mp_srcptr u, mp_srcptr v)
+
+void flint_mpn_mul_4x1(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t a, v0 = v[0];
+    NN_MUL_1X1(a, res[0], u[0], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[1], 0, a, u[1], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[2], 0, a, u[2], v0);
+    NN_ADDMUL_S2_A2_1X1(res[4], res[3], 0, a, u[3], v0);
+}
+
+void flint_mpn_mul_4x2(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u + 1, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[3], 0, b, a, u + 2, v, 2);
+    NN_ADDMUL_S2_A2_1X1(res[5], res[4], b, a, u[3], v[1]);
+}
+
+void flint_mpn_mul_4x3(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[3], 0, b, a, u + 1, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[4], 0, b, a, u + 2, v + 1, 2);
+    NN_ADDMUL_S2_A2_1X1(res[6], res[5], b, a, u[3], v[2]);
+}
+
+void flint_mpn_mul_4x4(mp_ptr res, mp_srcptr u, mp_srcptr v)
 {
     mp_limb_t b, a;
     NN_MUL_1X1(a, res[0], u[0], v[0]);
@@ -132,7 +210,54 @@ void flint_mpn_mul_4(mp_ptr res, mp_srcptr u, mp_srcptr v)
     NN_ADDMUL_S2_A2_1X1(res[7], res[6], b, a, u[3], v[3]);
 }
 
-void flint_mpn_mul_5(mp_ptr res, mp_srcptr u, mp_srcptr v)
+
+void flint_mpn_mul_5x1(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t a, v0 = v[0];
+    NN_MUL_1X1(a, res[0], u[0], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[1], 0, a, u[1], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[2], 0, a, u[2], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[3], 0, a, u[3], v0);
+    NN_ADDMUL_S2_A2_1X1(res[5], res[4], 0, a, u[4], v0);
+}
+
+void flint_mpn_mul_5x2(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u + 1, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[3], 0, b, a, u + 2, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[4], 0, b, a, u + 3, v, 2);
+    NN_ADDMUL_S2_A2_1X1(res[6], res[5], b, a, u[4], v[1]);
+}
+
+void flint_mpn_mul_5x3(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[3], 0, b, a, u + 1, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[4], 0, b, a, u + 2, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[5], 0, b, a, u + 3, v + 1, 2);
+    NN_ADDMUL_S2_A2_1X1(res[7], res[6], b, a, u[4], v[2]);
+}
+
+void flint_mpn_mul_5x4(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[3], 0, b, a, u, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[4], 0, b, a, u + 1, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[5], 0, b, a, u + 2, v + 1, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[6], 0, b, a, u + 3, v + 2, 2);
+    NN_ADDMUL_S2_A2_1X1(res[8], res[7], b, a, u[4], v[3]);
+}
+
+void flint_mpn_mul_5x5(mp_ptr res, mp_srcptr u, mp_srcptr v)
 {
     mp_limb_t b, a;
     NN_MUL_1X1(a, res[0], u[0], v[0]);
@@ -146,7 +271,72 @@ void flint_mpn_mul_5(mp_ptr res, mp_srcptr u, mp_srcptr v)
     NN_ADDMUL_S2_A2_1X1(res[9], res[8], b, a, u[4], v[4]);
 }
 
-void flint_mpn_mul_6(mp_ptr res, mp_srcptr u, mp_srcptr v)
+void flint_mpn_mul_6x1(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t a, v0 = v[0];
+    NN_MUL_1X1(a, res[0], u[0], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[1], 0, a, u[1], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[2], 0, a, u[2], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[3], 0, a, u[3], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[4], 0, a, u[4], v0);
+    NN_ADDMUL_S2_A2_1X1(res[6], res[5], 0, a, u[5], v0);
+}
+
+void flint_mpn_mul_6x2(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u + 1, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[3], 0, b, a, u + 2, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[4], 0, b, a, u + 3, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[5], 0, b, a, u + 4, v, 2);
+    NN_ADDMUL_S2_A2_1X1(res[7], res[6], b, a, u[5], v[1]);
+}
+
+void flint_mpn_mul_6x3(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[3], 0, b, a, u + 1, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[4], 0, b, a, u + 2, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[5], 0, b, a, u + 3, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[6], 0, b, a, u + 4, v + 1, 2);
+    NN_ADDMUL_S2_A2_1X1(res[8], res[7], b, a, u[5], v[2]);
+}
+
+void flint_mpn_mul_6x4(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[3], 0, b, a, u, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[4], 0, b, a, u + 1, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[5], 0, b, a, u + 2, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[6], 0, b, a, u + 3, v + 1, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[7], 0, b, a, u + 4, v + 2, 2);
+    NN_ADDMUL_S2_A2_1X1(res[9], res[8], b, a, u[5], v[3]);
+}
+
+void flint_mpn_mul_6x5(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[3], 0, b, a, u, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[4], 0, b, a, u, v, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[5], 0, b, a, u + 1, v, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[6], 0, b, a, u + 2, v + 1, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[7], 0, b, a, u + 3, v + 2, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[8], 0, b, a, u + 4, v + 3, 2);
+    NN_ADDMUL_S2_A2_1X1(res[10], res[9], b, a, u[5], v[4]);
+}
+
+void flint_mpn_mul_6x6(mp_ptr res, mp_srcptr u, mp_srcptr v)
 {
     mp_limb_t b, a;
     NN_MUL_1X1(a, res[0], u[0], v[0]);
@@ -162,7 +352,95 @@ void flint_mpn_mul_6(mp_ptr res, mp_srcptr u, mp_srcptr v)
     NN_ADDMUL_S2_A2_1X1(res[11], res[10], b, a, u[5], v[5]);
 }
 
-void flint_mpn_mul_7(mp_ptr res, mp_srcptr u, mp_srcptr v)
+
+void flint_mpn_mul_7x1(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t a, v0 = v[0];
+    NN_MUL_1X1(a, res[0], u[0], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[1], 0, a, u[1], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[2], 0, a, u[2], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[3], 0, a, u[3], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[4], 0, a, u[4], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[5], 0, a, u[5], v0);
+    NN_ADDMUL_S2_A2_1X1(res[7], res[6], 0, a, u[6], v0);
+}
+
+void flint_mpn_mul_7x2(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u + 1, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[3], 0, b, a, u + 2, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[4], 0, b, a, u + 3, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[5], 0, b, a, u + 4, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[6], 0, b, a, u + 5, v, 2);
+    NN_ADDMUL_S2_A2_1X1(res[8], res[7], b, a, u[6], v[1]);
+}
+
+void flint_mpn_mul_7x3(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[3], 0, b, a, u + 1, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[4], 0, b, a, u + 2, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[5], 0, b, a, u + 3, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[6], 0, b, a, u + 4, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[7], 0, b, a, u + 5, v + 1, 2);
+    NN_ADDMUL_S2_A2_1X1(res[9], res[8], b, a, u[6], v[2]);
+}
+
+void flint_mpn_mul_7x4(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[3], 0, b, a, u, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[4], 0, b, a, u + 1, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[5], 0, b, a, u + 2, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[6], 0, b, a, u + 3, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[7], 0, b, a, u + 4, v + 1, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[8], 0, b, a, u + 5, v + 2, 2);
+    NN_ADDMUL_S2_A2_1X1(res[10], res[9], b, a, u[6], v[3]);
+}
+
+void flint_mpn_mul_7x5(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[3], 0, b, a, u, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[4], 0, b, a, u, v, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[5], 0, b, a, u + 1, v, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[6], 0, b, a, u + 2, v, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[7], 0, b, a, u + 3, v + 1, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[8], 0, b, a, u + 4, v + 2, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[9], 0, b, a, u + 5, v + 3, 2);
+    NN_ADDMUL_S2_A2_1X1(res[11], res[10], b, a, u[6], v[4]);
+}
+
+void flint_mpn_mul_7x6(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[3], 0, b, a, u, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[4], 0, b, a, u, v, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[5], 0, b, a, u, v, 6);
+    NN_DOTREV_S3_A3_1X1(b, a, res[6], 0, b, a, u + 1, v, 6);
+    NN_DOTREV_S3_A3_1X1(b, a, res[7], 0, b, a, u + 2, v + 1, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[8], 0, b, a, u + 3, v + 2, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[9], 0, b, a, u + 4, v + 3, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[10], 0, b, a, u + 5, v + 4, 2);
+    NN_ADDMUL_S2_A2_1X1(res[12], res[11], b, a, u[6], v[5]);
+}
+
+void flint_mpn_mul_7x7(mp_ptr res, mp_srcptr u, mp_srcptr v)
 {
     mp_limb_t b, a;
     NN_MUL_1X1(a, res[0], u[0], v[0]);
@@ -180,7 +458,119 @@ void flint_mpn_mul_7(mp_ptr res, mp_srcptr u, mp_srcptr v)
     NN_ADDMUL_S2_A2_1X1(res[13], res[12], b, a, u[6], v[6]);
 }
 
-void flint_mpn_mul_8(mp_ptr res, mp_srcptr u, mp_srcptr v)
+void flint_mpn_mul_8x1(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t a, v0 = v[0];
+    NN_MUL_1X1(a, res[0], u[0], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[1], 0, a, u[1], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[2], 0, a, u[2], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[3], 0, a, u[3], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[4], 0, a, u[4], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[5], 0, a, u[5], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[6], 0, a, u[6], v0);
+    NN_ADDMUL_S2_A2_1X1(res[8], res[7], 0, a, u[7], v0);
+}
+
+void flint_mpn_mul_8x2(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u + 1, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[3], 0, b, a, u + 2, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[4], 0, b, a, u + 3, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[5], 0, b, a, u + 4, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[6], 0, b, a, u + 5, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[7], 0, b, a, u + 6, v, 2);
+    NN_ADDMUL_S2_A2_1X1(res[9], res[8], b, a, u[7], v[1]);
+}
+
+void flint_mpn_mul_8x3(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[3], 0, b, a, u + 1, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[4], 0, b, a, u + 2, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[5], 0, b, a, u + 3, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[6], 0, b, a, u + 4, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[7], 0, b, a, u + 5, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[8], 0, b, a, u + 6, v + 1, 2);
+    NN_ADDMUL_S2_A2_1X1(res[10], res[9], b, a, u[7], v[2]);
+}
+
+void flint_mpn_mul_8x4(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[3], 0, b, a, u, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[4], 0, b, a, u + 1, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[5], 0, b, a, u + 2, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[6], 0, b, a, u + 3, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[7], 0, b, a, u + 4, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[8], 0, b, a, u + 5, v + 1, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[9], 0, b, a, u + 6, v + 2, 2);
+    NN_ADDMUL_S2_A2_1X1(res[11], res[10], b, a, u[7], v[3]);
+}
+
+void flint_mpn_mul_8x5(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[3], 0, b, a, u, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[4], 0, b, a, u, v, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[5], 0, b, a, u + 1, v, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[6], 0, b, a, u + 2, v, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[7], 0, b, a, u + 3, v, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[8], 0, b, a, u + 4, v + 1, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[9], 0, b, a, u + 5, v + 2, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[10], 0, b, a, u + 6, v + 3, 2);
+    NN_ADDMUL_S2_A2_1X1(res[12], res[11], b, a, u[7], v[4]);
+}
+
+void flint_mpn_mul_8x6(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[3], 0, b, a, u, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[4], 0, b, a, u, v, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[5], 0, b, a, u, v, 6);
+    NN_DOTREV_S3_A3_1X1(b, a, res[6], 0, b, a, u + 1, v, 6);
+    NN_DOTREV_S3_A3_1X1(b, a, res[7], 0, b, a, u + 2, v, 6);
+    NN_DOTREV_S3_A3_1X1(b, a, res[8], 0, b, a, u + 3, v + 1, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[9], 0, b, a, u + 4, v + 2, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[10], 0, b, a, u + 5, v + 3, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[11], 0, b, a, u + 6, v + 4, 2);
+    NN_ADDMUL_S2_A2_1X1(res[13], res[12], b, a, u[7], v[5]);
+}
+
+void flint_mpn_mul_8x7(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[3], 0, b, a, u, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[4], 0, b, a, u, v, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[5], 0, b, a, u, v, 6);
+    NN_DOTREV_S3_A3_1X1(b, a, res[6], 0, b, a, u, v, 7);
+    NN_DOTREV_S3_A3_1X1(b, a, res[7], 0, b, a, u + 1, v, 7);
+    NN_DOTREV_S3_A3_1X1(b, a, res[8], 0, b, a, u + 2, v + 1, 6);
+    NN_DOTREV_S3_A3_1X1(b, a, res[9], 0, b, a, u + 3, v + 2, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[10], 0, b, a, u + 4, v + 3, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[11], 0, b, a, u + 5, v + 4, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[12], 0, b, a, u + 6, v + 5, 2);
+    NN_ADDMUL_S2_A2_1X1(res[14], res[13], b, a, u[7], v[6]);
+}
+
+void flint_mpn_mul_8x8(mp_ptr res, mp_srcptr u, mp_srcptr v)
 {
     mp_limb_t b, a;
     NN_MUL_1X1(a, res[0], u[0], v[0]);
@@ -200,7 +590,148 @@ void flint_mpn_mul_8(mp_ptr res, mp_srcptr u, mp_srcptr v)
     NN_ADDMUL_S2_A2_1X1(res[15], res[14], b, a, u[7], v[7]);
 }
 
-void flint_mpn_mul_9(mp_ptr res, mp_srcptr u, mp_srcptr v)
+
+void flint_mpn_mul_9x1(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t a, v0 = v[0];
+    NN_MUL_1X1(a, res[0], u[0], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[1], 0, a, u[1], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[2], 0, a, u[2], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[3], 0, a, u[3], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[4], 0, a, u[4], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[5], 0, a, u[5], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[6], 0, a, u[6], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[7], 0, a, u[7], v0);
+    NN_ADDMUL_S2_A2_1X1(res[9], res[8], 0, a, u[8], v0);
+}
+
+void flint_mpn_mul_9x2(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u + 1, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[3], 0, b, a, u + 2, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[4], 0, b, a, u + 3, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[5], 0, b, a, u + 4, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[6], 0, b, a, u + 5, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[7], 0, b, a, u + 6, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[8], 0, b, a, u + 7, v, 2);
+    NN_ADDMUL_S2_A2_1X1(res[10], res[9], b, a, u[8], v[1]);
+}
+
+void flint_mpn_mul_9x3(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[3], 0, b, a, u + 1, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[4], 0, b, a, u + 2, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[5], 0, b, a, u + 3, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[6], 0, b, a, u + 4, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[7], 0, b, a, u + 5, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[8], 0, b, a, u + 6, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[9], 0, b, a, u + 7, v + 1, 2);
+    NN_ADDMUL_S2_A2_1X1(res[11], res[10], b, a, u[8], v[2]);
+}
+
+void flint_mpn_mul_9x4(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[3], 0, b, a, u, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[4], 0, b, a, u + 1, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[5], 0, b, a, u + 2, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[6], 0, b, a, u + 3, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[7], 0, b, a, u + 4, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[8], 0, b, a, u + 5, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[9], 0, b, a, u + 6, v + 1, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[10], 0, b, a, u + 7, v + 2, 2);
+    NN_ADDMUL_S2_A2_1X1(res[12], res[11], b, a, u[8], v[3]);
+}
+
+void flint_mpn_mul_9x5(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[3], 0, b, a, u, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[4], 0, b, a, u, v, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[5], 0, b, a, u + 1, v, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[6], 0, b, a, u + 2, v, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[7], 0, b, a, u + 3, v, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[8], 0, b, a, u + 4, v, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[9], 0, b, a, u + 5, v + 1, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[10], 0, b, a, u + 6, v + 2, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[11], 0, b, a, u + 7, v + 3, 2);
+    NN_ADDMUL_S2_A2_1X1(res[13], res[12], b, a, u[8], v[4]);
+}
+
+void flint_mpn_mul_9x6(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[3], 0, b, a, u, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[4], 0, b, a, u, v, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[5], 0, b, a, u, v, 6);
+    NN_DOTREV_S3_A3_1X1(b, a, res[6], 0, b, a, u + 1, v, 6);
+    NN_DOTREV_S3_A3_1X1(b, a, res[7], 0, b, a, u + 2, v, 6);
+    NN_DOTREV_S3_A3_1X1(b, a, res[8], 0, b, a, u + 3, v, 6);
+    NN_DOTREV_S3_A3_1X1(b, a, res[9], 0, b, a, u + 4, v + 1, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[10], 0, b, a, u + 5, v + 2, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[11], 0, b, a, u + 6, v + 3, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[12], 0, b, a, u + 7, v + 4, 2);
+    NN_ADDMUL_S2_A2_1X1(res[14], res[13], b, a, u[8], v[5]);
+}
+
+void flint_mpn_mul_9x7(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[3], 0, b, a, u, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[4], 0, b, a, u, v, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[5], 0, b, a, u, v, 6);
+    NN_DOTREV_S3_A3_1X1(b, a, res[6], 0, b, a, u, v, 7);
+    NN_DOTREV_S3_A3_1X1(b, a, res[7], 0, b, a, u + 1, v, 7);
+    NN_DOTREV_S3_A3_1X1(b, a, res[8], 0, b, a, u + 2, v, 7);
+    NN_DOTREV_S3_A3_1X1(b, a, res[9], 0, b, a, u + 3, v + 1, 6);
+    NN_DOTREV_S3_A3_1X1(b, a, res[10], 0, b, a, u + 4, v + 2, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[11], 0, b, a, u + 5, v + 3, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[12], 0, b, a, u + 6, v + 4, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[13], 0, b, a, u + 7, v + 5, 2);
+    NN_ADDMUL_S2_A2_1X1(res[15], res[14], b, a, u[8], v[6]);
+}
+
+void flint_mpn_mul_9x8(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[3], 0, b, a, u, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[4], 0, b, a, u, v, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[5], 0, b, a, u, v, 6);
+    NN_DOTREV_S3_A3_1X1(b, a, res[6], 0, b, a, u, v, 7);
+    NN_DOTREV_S3_A3_1X1(b, a, res[7], 0, b, a, u, v, 8);
+    NN_DOTREV_S3_A3_1X1(b, a, res[8], 0, b, a, u + 1, v, 8);
+    NN_DOTREV_S3_A3_1X1(b, a, res[9], 0, b, a, u + 2, v + 1, 7);
+    NN_DOTREV_S3_A3_1X1(b, a, res[10], 0, b, a, u + 3, v + 2, 6);
+    NN_DOTREV_S3_A3_1X1(b, a, res[11], 0, b, a, u + 4, v + 3, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[12], 0, b, a, u + 5, v + 4, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[13], 0, b, a, u + 6, v + 5, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[14], 0, b, a, u + 7, v + 6, 2);
+    NN_ADDMUL_S2_A2_1X1(res[16], res[15], b, a, u[8], v[7]);
+}
+
+void flint_mpn_mul_9x9(mp_ptr res, mp_srcptr u, mp_srcptr v)
 {
     mp_limb_t b, a;
     NN_MUL_1X1(a, res[0], u[0], v[0]);
@@ -222,7 +753,179 @@ void flint_mpn_mul_9(mp_ptr res, mp_srcptr u, mp_srcptr v)
     NN_ADDMUL_S2_A2_1X1(res[17], res[16], b, a, u[8], v[8]);
 }
 
-void flint_mpn_mul_10(mp_ptr res, mp_srcptr u, mp_srcptr v)
+
+void flint_mpn_mul_10x1(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t a, v0 = v[0];
+    NN_MUL_1X1(a, res[0], u[0], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[1], 0, a, u[1], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[2], 0, a, u[2], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[3], 0, a, u[3], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[4], 0, a, u[4], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[5], 0, a, u[5], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[6], 0, a, u[6], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[7], 0, a, u[7], v0);
+    NN_ADDMUL_S2_A2_1X1(a, res[8], 0, a, u[8], v0);
+    NN_ADDMUL_S2_A2_1X1(res[10], res[9], 0, a, u[9], v0);
+}
+
+void flint_mpn_mul_10x2(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u + 1, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[3], 0, b, a, u + 2, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[4], 0, b, a, u + 3, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[5], 0, b, a, u + 4, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[6], 0, b, a, u + 5, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[7], 0, b, a, u + 6, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[8], 0, b, a, u + 7, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[9], 0, b, a, u + 8, v, 2);
+    NN_ADDMUL_S2_A2_1X1(res[11], res[10], b, a, u[9], v[1]);
+}
+
+void flint_mpn_mul_10x3(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[3], 0, b, a, u + 1, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[4], 0, b, a, u + 2, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[5], 0, b, a, u + 3, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[6], 0, b, a, u + 4, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[7], 0, b, a, u + 5, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[8], 0, b, a, u + 6, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[9], 0, b, a, u + 7, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[10], 0, b, a, u + 8, v + 1, 2);
+    NN_ADDMUL_S2_A2_1X1(res[12], res[11], b, a, u[9], v[2]);
+}
+
+void flint_mpn_mul_10x4(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[3], 0, b, a, u, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[4], 0, b, a, u + 1, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[5], 0, b, a, u + 2, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[6], 0, b, a, u + 3, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[7], 0, b, a, u + 4, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[8], 0, b, a, u + 5, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[9], 0, b, a, u + 6, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[10], 0, b, a, u + 7, v + 1, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[11], 0, b, a, u + 8, v + 2, 2);
+    NN_ADDMUL_S2_A2_1X1(res[13], res[12], b, a, u[9], v[3]);
+}
+
+void flint_mpn_mul_10x5(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[3], 0, b, a, u, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[4], 0, b, a, u, v, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[5], 0, b, a, u + 1, v, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[6], 0, b, a, u + 2, v, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[7], 0, b, a, u + 3, v, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[8], 0, b, a, u + 4, v, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[9], 0, b, a, u + 5, v, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[10], 0, b, a, u + 6, v + 1, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[11], 0, b, a, u + 7, v + 2, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[12], 0, b, a, u + 8, v + 3, 2);
+    NN_ADDMUL_S2_A2_1X1(res[14], res[13], b, a, u[9], v[4]);
+}
+
+void flint_mpn_mul_10x6(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[3], 0, b, a, u, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[4], 0, b, a, u, v, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[5], 0, b, a, u, v, 6);
+    NN_DOTREV_S3_A3_1X1(b, a, res[6], 0, b, a, u + 1, v, 6);
+    NN_DOTREV_S3_A3_1X1(b, a, res[7], 0, b, a, u + 2, v, 6);
+    NN_DOTREV_S3_A3_1X1(b, a, res[8], 0, b, a, u + 3, v, 6);
+    NN_DOTREV_S3_A3_1X1(b, a, res[9], 0, b, a, u + 4, v, 6);
+    NN_DOTREV_S3_A3_1X1(b, a, res[10], 0, b, a, u + 5, v + 1, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[11], 0, b, a, u + 6, v + 2, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[12], 0, b, a, u + 7, v + 3, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[13], 0, b, a, u + 8, v + 4, 2);
+    NN_ADDMUL_S2_A2_1X1(res[15], res[14], b, a, u[9], v[5]);
+}
+
+void flint_mpn_mul_10x7(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[3], 0, b, a, u, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[4], 0, b, a, u, v, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[5], 0, b, a, u, v, 6);
+    NN_DOTREV_S3_A3_1X1(b, a, res[6], 0, b, a, u, v, 7);
+    NN_DOTREV_S3_A3_1X1(b, a, res[7], 0, b, a, u + 1, v, 7);
+    NN_DOTREV_S3_A3_1X1(b, a, res[8], 0, b, a, u + 2, v, 7);
+    NN_DOTREV_S3_A3_1X1(b, a, res[9], 0, b, a, u + 3, v, 7);
+    NN_DOTREV_S3_A3_1X1(b, a, res[10], 0, b, a, u + 4, v + 1, 6);
+    NN_DOTREV_S3_A3_1X1(b, a, res[11], 0, b, a, u + 5, v + 2, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[12], 0, b, a, u + 6, v + 3, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[13], 0, b, a, u + 7, v + 4, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[14], 0, b, a, u + 8, v + 5, 2);
+    NN_ADDMUL_S2_A2_1X1(res[16], res[15], b, a, u[9], v[6]);
+}
+
+void flint_mpn_mul_10x8(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[3], 0, b, a, u, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[4], 0, b, a, u, v, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[5], 0, b, a, u, v, 6);
+    NN_DOTREV_S3_A3_1X1(b, a, res[6], 0, b, a, u, v, 7);
+    NN_DOTREV_S3_A3_1X1(b, a, res[7], 0, b, a, u, v, 8);
+    NN_DOTREV_S3_A3_1X1(b, a, res[8], 0, b, a, u + 1, v, 8);
+    NN_DOTREV_S3_A3_1X1(b, a, res[9], 0, b, a, u + 2, v, 8);
+    NN_DOTREV_S3_A3_1X1(b, a, res[10], 0, b, a, u + 3, v + 1, 7);
+    NN_DOTREV_S3_A3_1X1(b, a, res[11], 0, b, a, u + 4, v + 2, 6);
+    NN_DOTREV_S3_A3_1X1(b, a, res[12], 0, b, a, u + 5, v + 3, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[13], 0, b, a, u + 6, v + 4, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[14], 0, b, a, u + 7, v + 5, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[15], 0, b, a, u + 8, v + 6, 2);
+    NN_ADDMUL_S2_A2_1X1(res[17], res[16], b, a, u[9], v[7]);
+}
+
+void flint_mpn_mul_10x9(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t b, a;
+    NN_MUL_1X1(a, res[0], u[0], v[0]);
+    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);
+    NN_DOTREV_S3_A3_1X1(b, a, res[2], 0, b, a, u, v, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[3], 0, b, a, u, v, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[4], 0, b, a, u, v, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[5], 0, b, a, u, v, 6);
+    NN_DOTREV_S3_A3_1X1(b, a, res[6], 0, b, a, u, v, 7);
+    NN_DOTREV_S3_A3_1X1(b, a, res[7], 0, b, a, u, v, 8);
+    NN_DOTREV_S3_A3_1X1(b, a, res[8], 0, b, a, u, v, 9);
+    NN_DOTREV_S3_A3_1X1(b, a, res[9], 0, b, a, u + 1, v, 9);
+    NN_DOTREV_S3_A3_1X1(b, a, res[10], 0, b, a, u + 2, v + 1, 8);
+    NN_DOTREV_S3_A3_1X1(b, a, res[11], 0, b, a, u + 3, v + 2, 7);
+    NN_DOTREV_S3_A3_1X1(b, a, res[12], 0, b, a, u + 4, v + 3, 6);
+    NN_DOTREV_S3_A3_1X1(b, a, res[13], 0, b, a, u + 5, v + 4, 5);
+    NN_DOTREV_S3_A3_1X1(b, a, res[14], 0, b, a, u + 6, v + 5, 4);
+    NN_DOTREV_S3_A3_1X1(b, a, res[15], 0, b, a, u + 7, v + 6, 3);
+    NN_DOTREV_S3_A3_1X1(b, a, res[16], 0, b, a, u + 8, v + 7, 2);
+    NN_ADDMUL_S2_A2_1X1(res[18], res[17], b, a, u[9], v[8]);
+}
+
+void flint_mpn_mul_10x10(mp_ptr res, mp_srcptr u, mp_srcptr v)
 {
     mp_limb_t b, a;
     NN_MUL_1X1(a, res[0], u[0], v[0]);
@@ -246,7 +949,7 @@ void flint_mpn_mul_10(mp_ptr res, mp_srcptr u, mp_srcptr v)
     NN_ADDMUL_S2_A2_1X1(res[19], res[18], b, a, u[9], v[9]);
 }
 
-void flint_mpn_mul_11(mp_ptr res, mp_srcptr u, mp_srcptr v)
+void flint_mpn_mul_11x11(mp_ptr res, mp_srcptr u, mp_srcptr v)
 {
     mp_limb_t b, a;
     NN_MUL_1X1(a, res[0], u[0], v[0]);
@@ -272,7 +975,7 @@ void flint_mpn_mul_11(mp_ptr res, mp_srcptr u, mp_srcptr v)
     NN_ADDMUL_S2_A2_1X1(res[21], res[20], b, a, u[10], v[10]);
 }
 
-void flint_mpn_mul_12(mp_ptr res, mp_srcptr u, mp_srcptr v)
+void flint_mpn_mul_12x12(mp_ptr res, mp_srcptr u, mp_srcptr v)
 {
     mp_limb_t b, a;
     NN_MUL_1X1(a, res[0], u[0], v[0]);
@@ -300,31 +1003,78 @@ void flint_mpn_mul_12(mp_ptr res, mp_srcptr u, mp_srcptr v)
     NN_ADDMUL_S2_A2_1X1(res[23], res[22], b, a, u[11], v[11]);
 }
 
+typedef void (*flint_mpn_mul_func_t)(mp_ptr, mp_srcptr, mp_srcptr);
+
+const flint_mpn_mul_func_t flint_mpn_mul_n_tab[11][11] = {
+    { NULL, },
+    { NULL, flint_mpn_mul_1x1, },
+    { NULL, flint_mpn_mul_2x1, flint_mpn_mul_2x2, },
+    { NULL, flint_mpn_mul_3x1, flint_mpn_mul_3x2, flint_mpn_mul_3x3, },
+    { NULL, flint_mpn_mul_4x1, flint_mpn_mul_4x2, flint_mpn_mul_4x3, flint_mpn_mul_4x4, },
+    { NULL, flint_mpn_mul_5x1, flint_mpn_mul_5x2, flint_mpn_mul_5x3, flint_mpn_mul_5x4, flint_mpn_mul_5x5, },
+    { NULL, flint_mpn_mul_6x1, flint_mpn_mul_6x2, flint_mpn_mul_6x3, flint_mpn_mul_6x4, flint_mpn_mul_6x5, flint_mpn_mul_6x6, },
+    { NULL, flint_mpn_mul_7x1, flint_mpn_mul_7x2, flint_mpn_mul_7x3, flint_mpn_mul_7x4, flint_mpn_mul_7x5, flint_mpn_mul_7x6, flint_mpn_mul_7x7, },
+    { NULL, flint_mpn_mul_8x1, flint_mpn_mul_8x2, flint_mpn_mul_8x3, flint_mpn_mul_8x4, flint_mpn_mul_8x5, flint_mpn_mul_8x6, flint_mpn_mul_8x7, flint_mpn_mul_8x8, },
+    { NULL, flint_mpn_mul_9x1, flint_mpn_mul_9x2, flint_mpn_mul_9x3, flint_mpn_mul_9x4, flint_mpn_mul_9x5, flint_mpn_mul_9x6, flint_mpn_mul_9x7, flint_mpn_mul_9x8, flint_mpn_mul_9x9, },
+    { NULL, flint_mpn_mul_10x1, flint_mpn_mul_10x2, flint_mpn_mul_10x3, flint_mpn_mul_10x4, flint_mpn_mul_10x5, flint_mpn_mul_10x6, flint_mpn_mul_10x7, flint_mpn_mul_10x8, flint_mpn_mul_10x9, flint_mpn_mul_10x10, },
+};
+
+const flint_mpn_mul_func_t flint_mpn_mul_tab[13] = {
+    NULL,
+    flint_mpn_mul_1x1,
+    flint_mpn_mul_2x2,
+    flint_mpn_mul_3x3,
+    flint_mpn_mul_4x4,
+    flint_mpn_mul_5x5,
+    flint_mpn_mul_6x6,
+    flint_mpn_mul_7x7,
+    flint_mpn_mul_8x8,
+    flint_mpn_mul_9x9,
+    flint_mpn_mul_10x10,
+    flint_mpn_mul_11x11,
+    flint_mpn_mul_12x12,
+};
+
 void
 flint_mpn_mul_n(mp_ptr z, mp_srcptr x, mp_srcptr y, mp_size_t n)
 {
     FLINT_ASSERT(n >= 1);
+    FLINT_ASSERT(z != x);
+    FLINT_ASSERT(z != y);
 
-    switch (n)
+    if (n <= 12)
+        flint_mpn_mul_tab[n](z, x, y);
+    else if (n < FLINT_MPN_MUL_THRESHOLD)
+        mpn_mul_n(z, x, y, n);
+    else
+        flint_mpn_mul_large(z, x, n, y, n);
+}
+
+mp_limb_t
+flint_mpn_mul(mp_ptr z, mp_srcptr x, mp_size_t xn, mp_srcptr y, mp_size_t yn)
+{
+    FLINT_ASSERT(xn >= yn);
+    FLINT_ASSERT(yn >= 1);
+    FLINT_ASSERT(z != x);
+    FLINT_ASSERT(z != y);
+
+    if (xn <= 10)
     {
-        case 0: FLINT_UNREACHABLE;
-        case 1: flint_mpn_mul_1(z, x, y); break;
-        case 2: flint_mpn_mul_2(z, x, y); break;
-        case 3: flint_mpn_mul_3(z, x, y); break;
-        case 4: flint_mpn_mul_4(z, x, y); break;
-        case 5: flint_mpn_mul_5(z, x, y); break;
-        case 6: flint_mpn_mul_6(z, x, y); break;
-        case 7: flint_mpn_mul_7(z, x, y); break;
-        case 8: flint_mpn_mul_8(z, x, y); break;
-        case 9: flint_mpn_mul_9(z, x, y); break;
-        case 10: flint_mpn_mul_10(z, x, y); break;
-        case 11: flint_mpn_mul_11(z, x, y); break;
-        case 12: flint_mpn_mul_12(z, x, y); break;
-        default:
-            if (n < FLINT_MPN_MUL_THRESHOLD)
-                mpn_mul_n(z, x, y, n);
-            else
-                flint_mpn_mul_large(z, x, n, y, n);
+        flint_mpn_mul_n_tab[xn][yn](z, x, y);
+        return z[xn + yn - 1];
     }
+    else if (yn == 1)
+    {
+        return (z[xn + yn - 1] = mpn_mul_1(z, x, xn, y[0]));
+    }
+    else if (xn == yn)
+    {
+        flint_mpn_mul_n(z, x, y, yn);
+        return z[xn + yn - 1];
+    }
+    else if (yn < FLINT_MPN_MUL_THRESHOLD)
+        return mpn_mul(z, x, xn, y, yn);
+    else
+        return flint_mpn_mul_large(z, x, xn, y, yn);
 }
 

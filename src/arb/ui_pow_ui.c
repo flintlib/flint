@@ -187,7 +187,7 @@ arb_ui_pow_ui(arb_t res, ulong a, ulong exp, slong prec)
                         mp_limb_t y0, y1;
                         y0 = yman[0];
                         y1 = yman[1];
-                        flint_mpn_mul_2x1(yman[2], yman[1], yman[0], y1, y0, aodd);
+                        FLINT_MPN_MUL_2X1(yman[2], yman[1], yman[0], y1, y0, aodd);
                         yn += (yman[2] != 0);
                     }
                 }
@@ -198,7 +198,7 @@ arb_ui_pow_ui(arb_t res, ulong a, ulong exp, slong prec)
                    wp_limbs, we might want to go to the floating-point
                    code here */
                 yexp_lo *= 2;
-                mpn_sqr(tmp, yman, yn);
+                flint_mpn_sqr(tmp, yman, yn);
                 yn = 2 * yn;
                 yn -= (tmp[yn - 1] == 0);
 
