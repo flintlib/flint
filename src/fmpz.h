@@ -378,8 +378,49 @@ FMPZ_INLINE void fmpz_sub_si(fmpz_t f, const fmpz_t g, slong x)
         fmpz_add_ui(f, g, (ulong) -x);
 }
 
-void fmpz_abs(fmpz_t f1, const fmpz_t f2);
-void fmpz_neg(fmpz_t f1, const fmpz_t f2);
+FMPZ_INLINE void fmpz_abs(fmpz_t f1, const fmpz_t f2)
+{
+    if (!COEFF_IS_MPZ(*f2))
+    {
+        if (FLINT_CONSTANT_P(f1 == f2) && f1 == f2)
+            ;
+        else
+            _fmpz_demote(f1);
+
+        *f1 = FLINT_ABS(*f2);
+    }
+    else
+    {
+        __mpz_struct * mf1;
+        if (FLINT_CONSTANT_P(f1 == f2) && f1 == f2)
+            mf1 = COEFF_TO_PTR(*f1);
+        else
+            mf1 = _fmpz_promote(f1);
+        mpz_abs(mf1, COEFF_TO_PTR(*f2));
+    }
+}
+
+FMPZ_INLINE void fmpz_neg(fmpz_t f1, const fmpz_t f2)
+{
+    if (!COEFF_IS_MPZ(*f2))
+    {
+        if (FLINT_CONSTANT_P(f1 == f2) && f1 == f2)
+            ;
+        else
+            _fmpz_demote(f1);
+
+        *f1 = -*f2;
+    }
+    else
+    {
+        __mpz_struct * mf1;
+        if (FLINT_CONSTANT_P(f1 == f2) && f1 == f2)
+            mf1 = COEFF_TO_PTR(*f1);
+        else
+            mf1 = _fmpz_promote(f1);
+        mpz_neg(mf1, COEFF_TO_PTR(*f2));
+    }
+}
 
 void fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong x);
 void fmpz_mul_si(fmpz_t f, const fmpz_t g, slong x);
