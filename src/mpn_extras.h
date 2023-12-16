@@ -89,15 +89,42 @@ flint_mpn_sqr(mp_ptr z, mp_srcptr x, mp_size_t n)
         flint_mpn_mul_large(z, x, n, x, n);
 }
 
+
 #define FLINT_MPN_MUL_WITH_SPECIAL_CASES(_z, _x, _xn, _y, _yn) \
-    if ((_xn) == 1 && (_yn) == 1) \
-        umul_ppmm((_z)[1], (_z)[0], (_x)[0], (_y)[0]); \
-    else if ((_x) == (_y)) \
-        flint_mpn_sqr((_z), (_x), (_xn)); \
-    else if ((_xn) >= (_yn)) \
-        flint_mpn_mul((_z), (_x), (_xn), (_y), (_yn)); \
+    if ((_xn) == (_yn)) \
+    { \
+        if ((_xn) == 1) \
+        { \
+            umul_ppmm((_z)[1], (_z)[0], (_x)[0], (_y)[0]); \
+        } \
+        else if ((_xn) == 2) \
+        { \
+            mp_limb_t __tt_x1, __tt_x0, __tt_y1, __tt_y0; \
+            __tt_x0 = (_x)[0]; \
+            __tt_x1 = (_x)[1]; \
+            __tt_y0 = (_y)[0]; \
+            __tt_y1 = (_y)[1]; \
+            FLINT_MPN_MUL_2X2((_z)[3], (_z)[2], (_z)[1], (_z)[0], __tt_x1, __tt_x0, __tt_y1, __tt_y0); \
+        } \
+        else if ((_x) == (_y)) \
+            flint_mpn_sqr((_z), (_x), (_xn)); \
+        else \
+            flint_mpn_mul_n((_z), (_x), (_y), (_xn)); \
+    } \
+    else if ((_xn) > (_yn)) \
+    { \
+        if ((_yn) == 1) \
+            (_z)[(_xn) + (_yn) - 1] = mpn_mul_1((_z), (_x), (_xn), (_y)[0]); \
+        else \
+            flint_mpn_mul((_z), (_x), (_xn), (_y), (_yn)); \
+    } \
     else \
-        flint_mpn_mul((_z), (_y), (_yn), (_x), (_xn)); \
+    { \
+        if ((_xn) == 1) \
+            (_z)[(_xn) + (_yn) - 1] = mpn_mul_1((_z), (_y), (_yn), (_x)[0]); \
+        else \
+            flint_mpn_mul((_z), (_y), (_yn), (_x), (_xn)); \
+    }
 
 /*
     return the high limb of a two limb left shift by n < GMP_LIMB_BITS bits.
