@@ -57,10 +57,6 @@
 # endif
 #endif
 
-#ifndef __GNUC__
-# define __asm__     asm
-#endif
-
 #ifdef va_start
 # define FLINT_HAVE_VA_LIST
 #endif
@@ -111,8 +107,6 @@ typedef struct __FLINT_FILE FLINT_FILE;
 #else
 #define FLINT_ASSERT(param)
 #endif
-
-#include "longlong.h"
 
 #if defined(__GNUC__)
 # define FLINT_FORCE_INLINE static __attribute__((always_inline)) inline
@@ -201,6 +195,8 @@ typedef struct __FLINT_FILE FLINT_FILE;
 # define FLINT_BITS 32
 # define FLINT_D_BITS 31
 #endif
+
+#include "longlong.h"
 
 void * flint_malloc(size_t size);
 void * flint_realloc(void * ptr, size_t size);

@@ -227,9 +227,14 @@ endif
 ################################################################################
 
 SINGLE_HEADERS :=                                                           \
-        flint.h         longlong.h      exception.h     gmpcompat.h         \
-        profiler.h      templates.h     flint-config.h  fft_tuning.h        \
-        crt_helpers.h                   machine_vectors.h                   \
+        flint.h         flint-config.h    exception.h     gmpcompat.h       \
+        profiler.h      templates.h       fft_tuning.h                      \
+                                                                            \
+        longlong.h                        longlong_asm_clang.h              \
+        longlong_asm_gcc.h                longlong_div_gnu.h                \
+        longlong_msc_arm64.h              longlong_msc_x86.h                \
+                                                                            \
+        crt_helpers.h   machine_vectors.h                                   \
                                                                             \
         fq_zech_vec.h                                                       \
                                                                             \
@@ -276,7 +281,7 @@ $(1)_TEST_SOURCES := $(wildcard $(SRC_DIR)/$(1)/test/main.c)
 endef
 _TEST_SOURCES := $(wildcard $(SRC_DIR)/test/main.c)
 $(foreach dir, $(DIRS), $(eval $(call xxx_TEST_SOURCES,$(dir))))
-TEST_SOURCES := $(foreach dir,$(DIRS),$($(dir)_TEST_SOURCES)) $(_TEST_SOURCES) $(fq_zech_vec_TEST_SOURCES)
+TEST_SOURCES := $(_TEST_SOURCES) $(foreach dir,$(DIRS),$($(dir)_TEST_SOURCES)) $(fq_zech_vec_TEST_SOURCES)
 # NOTE: We do not add CPP files to C files in SOURCES in order to not screw up
 # the `patsubst' in the object files.
 ifneq ($(WANT_NTL), 0)
@@ -334,7 +339,7 @@ $(foreach dir, $(DIRS), $(eval $(call xxx_TESTS,$(dir))))
 ifneq ($(WANT_NTL), 0)
 interfaces_TESTS := $(BUILD_DIR)/interfaces/test/t-NTL-interface$(EXEEXT)
 endif
-TESTS := $(foreach dir,$(DIRS),$($(dir)_TESTS)) $(_TESTS) $(interfaces_TESTS)
+TESTS := $(_TESTS) $(foreach dir,$(DIRS),$($(dir)_TESTS)) $(interfaces_TESTS)
 
 define xxx_TUNES
 $(1)_TUNES := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%$(EXEEXT),$($(1)_TUNE_SOURCES))
