@@ -24,8 +24,10 @@
 #include "flint.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
+
+#define FLINT_MPN_MUL_THRESHOLD 400
 
 #define MPN_NORM(a, an)                         \
     do {                                        \
@@ -72,7 +74,10 @@ flint_mpn_get_d(mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp);
         r3 += r2 < t1;                                      \
     } while (0)
 
-#define FLINT_MPN_MUL_THRESHOLD 400
+#if FLINT_HAVE_ADX
+mp_limb_t flint_mpn_mul_basecase(mp_ptr res, mp_srcptr ap, mp_srcptr bp, slong alen, slong blen);
+mp_limb_t flint_mpn_sqr_basecase(mp_ptr res, mp_srcptr ap, slong alen);
+#endif
 
 mp_limb_t flint_mpn_mul_large(mp_ptr r1, mp_srcptr i1, mp_size_t n1, mp_srcptr i2, mp_size_t n2);
 

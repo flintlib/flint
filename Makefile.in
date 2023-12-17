@@ -50,6 +50,7 @@ DLLTOOL:=@DLLTOOL@
 LD:=@LD@
 LDCONFIG:=@LDCONFIG@
 LN_S:=@LN_S@
+M4:=@M4@
 MKDIR_P:=@MKDIR_P@
 STRIP:=@STRIP@
 RM_F:=rm -f
@@ -66,6 +67,8 @@ WANT_NTL:=@WANT_NTL@
 WANT_DEPS:=@WANT_DEPS@
 
 WANT_CXX:=@WANT_CXX@
+
+WANT_ADX_ASSEMBLY:=@WANT_ADX_ASSEMBLY@
 
 GMP_LIB_PATH:=@GMP_LIB_PATH@
 MPFR_LIB_PATH:=@MPFR_LIB_PATH@
@@ -85,6 +88,11 @@ LIBS += -lstdc++ -lntl
 endif
 LIBS2:=-lflint $(LIBS)
 PIC_FLAG:=@PIC_FLAG@
+
+ifeq ($(WANT_ADX_ASSEMBLY),1)
+ASM_OBJ_FLAGS:=$(filter-out -D%,$(CPPFLAGS) $(LIB_CPPFLAGS)) $(filter-out -funroll-loops -pedantic, $(CFLAGS))
+ASM_LOBJ_FLAGS:=$(filter-out -D%,$(PIC_FLAG)) $(ASM_OBJ_FLAGS)
+endif
 
 LDFLAGS:=@LDFLAGS@
 EXTRA_SHARED_FLAGS:=@EXTRA_SHARED_FLAGS@ $(foreach path, $(GMP_LIB_PATH) $(MPFR_LIB_PATH) $(BLAS_LIB_PATH) $(GC_LIB_PATH) $(NTL_LIB_PATH), @WL@-rpath,$(path))
@@ -118,7 +126,7 @@ CFG_FILES :=                                                                \
         $(FLINT_DIR)/config.log         $(SRC_DIR)/flint.h                  \
         $(SRC_DIR)/fft_tuning.h         $(FLINT_DIR)/flint.pc               \
         $(FLINT_DIR)/Makefile           $(SRC_DIR)/fmpz/fmpz.c              \
-        $(SRC_DIR)/gmpcompat.h
+        $(SRC_DIR)/gmpcompat.h          $(SRC_DIR)/config.m4
 
 ################################################################################
 # directories
@@ -199,7 +207,7 @@ TEMPLATE_DIRS :=                                                            \
         fq_embed_templates              fq_templates
 
 BUILD_DIRS :=                                                               \
-		$(BUILD_DIR)                                                        \
+        $(BUILD_DIR)                                                        \
         $(patsubst %, $(BUILD_DIR)/%, $(DIRS))                              \
         $(patsubst %, $(BUILD_DIR)/%/profile, $(DIRS))                      \
         $(patsubst %, $(BUILD_DIR)/%/test, $(DIRS))                         \
@@ -213,6 +221,10 @@ endif
 ifneq ($(COVERAGE), 0)
 BUILD_DIRS +=                                                               \
         $(BUILD_DIR)/coverage
+endif
+ifeq ($(WANT_ADX_ASSEMBLY),1)
+BUILD_DIRS +=                                                               \
+        $(BUILD_DIR)/mpn_extras/broadwell
 endif
 
 INSTALL_DIRS :=                                                             \
@@ -267,6 +279,12 @@ fmpz_lll_SOURCES := $(filter-out $(SRC_DIR)/fmpz_lll/babai.c $(SRC_DIR)/fmpz_lll
 
 SOURCES := $(foreach dir,$(DIRS),$($(dir)_SOURCES))
 
+ifeq ($(WANT_ADX_ASSEMBLY),1)
+mpn_extras_ASM_SOURCES := $(wildcard $(SRC_DIR)/mpn_extras/broadwell/*.asm)
+mpn_extras_S_SOURCES := $(patsubst $(SRC_DIR)/%.asm,$(BUILD_DIR)/%.s,$(mpn_extras_ASM_SOURCES))
+mpn_extras_SOURCES += $(mpn_extras_S_SOURCES)
+endif
+
 define xxx_PROF_SOURCES
 $(1)_PROF_SOURCES := $(wildcard $(SRC_DIR)/$(1)/profile/*.c)
 endef
@@ -303,9 +321,12 @@ EXMP_SOURCES := $(wildcard $(FLINT_DIR)/examples/*.c)
 
 ifneq ($(STATIC), 0)
 define xxx_OBJS
-$(1)_OBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$($(1)_SOURCES))
+$(1)_OBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(filter-out %.s,$($(1)_SOURCES)))
 endef
 $(foreach dir, $(DIRS), $(eval $(call xxx_OBJS,$(dir))))
+ifeq ($(WANT_ADX_ASSEMBLY),1)
+mpn_extras_OBJS += $(patsubst %.s,%.o,$(mpn_extras_S_SOURCES))
+endif
 OBJS := $(foreach dir, $(DIRS), $($(dir)_OBJS))
 endif
 
@@ -315,9 +336,13 @@ endif
 
 ifneq ($(SHARED), 0)
 define xxx_LOBJS
-$(1)_LOBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.lo,$($(1)_SOURCES))
+$(1)_LOBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.lo,$(filter-out %.s, $($(1)_SOURCES)))
 endef
 $(foreach dir, $(DIRS), $(eval $(call xxx_LOBJS,$(dir))))
+ifeq ($(WANT_ADX_ASSEMBLY),1)
+mpn_extras_LOBJS += $(patsubst %.s,%.lo,$(mpn_extras_S_SOURCES))
+endif
+LOBJS := $(foreach dir, $(DIRS), $($(dir)_LOBJS))
 endif
 
 ################################################################################
@@ -525,6 +550,16 @@ endif
 DEPFLAGS = -MMD -MP -MF $(@:%=%.d)
 
 ################################################################################
+# generated sources
+################################################################################
+
+ifeq ($(WANT_ADX_ASSEMBLY),1)
+$(BUILD_DIR)/%.s: $(SRC_DIR)/%.asm | $(BUILD_DIR)/mpn_extras/broadwell
+	@echo "  M4  $(@:$(BUILD_DIR)/%=%)"
+	@$(M4) $< > $@
+endif
+
+################################################################################
 # objects
 ################################################################################
 
@@ -534,6 +569,12 @@ $(BUILD_DIR)/$(1)/%.o: $(SRC_DIR)/$(1)/%.c | $(BUILD_DIR)/$(1)
 	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
 	@$(CC) $(CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $$< -o $$@ $$(DEPFLAGS)
 endef
+
+ifeq ($(WANT_ADX_ASSEMBLY),1)
+%.o: %.s
+	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
+	@$(CC) $(ASM_OBJ_FLAGS) -c $< -o $@
+endif
 
 $(foreach dir, $(DIRS), $(eval $(call xxx_OBJS_rule,$(dir))))
 endif
@@ -548,6 +589,12 @@ $(BUILD_DIR)/$(1)/%.lo: $(SRC_DIR)/$(1)/%.c | $(BUILD_DIR)/$(1)
 	@echo "  CC  $$(@:$(BUILD_DIR)/%=%)"
 	@$(CC) $(PIC_FLAG) $(CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $$< -o $$@ $$(DEPFLAGS)
 endef
+
+ifeq ($(WANT_ADX_ASSEMBLY),1)
+%.lo: %.s
+	@echo "  CC  $(@:$(BUILD_DIR)/%=%)"
+	@$(CC) $(ASM_LOBJ_FLAGS) -c $< -o $@
+endif
 
 $(foreach dir, $(DIRS), $(eval $(call xxx_LOBJS_rule,$(dir))))
 endif

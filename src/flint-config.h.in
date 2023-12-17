@@ -15,6 +15,9 @@
 /* Define if system is strongly ordered */
 #undef FLINT_KNOW_STRONG_ORDER
 
+/* Define if system has the ADX instruction set */
+#undef FLINT_HAVE_ADX
+
 /* Define if system has AVX2 */
 #undef FLINT_HAVE_AVX2
 
