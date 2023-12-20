@@ -89,7 +89,6 @@ flint_mpn_sqr(mp_ptr z, mp_srcptr x, mp_size_t n)
         flint_mpn_mul_large(z, x, n, x, n);
 }
 
-
 #define FLINT_MPN_MUL_WITH_SPECIAL_CASES(_z, _x, _xn, _y, _yn) \
     if ((_xn) == (_yn)) \
     { \
