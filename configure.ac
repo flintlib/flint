@@ -641,6 +641,24 @@ then
 fi
 AC_SUBST(LDCONFIG)
 
+dnl FIXME: Improve this check to include more processors.
+AC_MSG_CHECKING([if memory is strongly-ordered])
+case "$host_cpu" in
+    x86_64|x86|i386|i586)
+        flint_know_strong_order="yes"
+        AC_MSG_CHECKING([yes])
+        ;;
+    *)
+        flint_know_strong_order="no"
+        AC_MSG_CHECKING([unsure])
+        ;;
+esac
+
+if test "$flint_know_strong_order" = "yes";
+then
+    AC_DEFINE(FLINT_KNOW_STRONG_ORDER,1,[Define if system is strongly ordered])]
+fi
+
 ################################################################################
 # check headers
 ################################################################################
