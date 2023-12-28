@@ -12,6 +12,9 @@
 /* Define if system is big endian. */
 #undef FLINT_BIG_ENDIAN
 
+/* Define if system is strongly ordered */
+#undef FLINT_KNOW_STRONG_ORDER
+
 /* Define if system has AVX2 */
 #undef FLINT_HAVE_AVX2
 
