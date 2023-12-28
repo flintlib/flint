@@ -200,7 +200,7 @@ void nmod_mpolyd_print(nmod_mpolyd_t poly)
             ulong m = poly->deg_bounds[j];
             ulong e = k % m;
             k = k / m;
-            flint_printf("*x%wd^%wd", j, e);
+            flint_printf("*x%wd^%wu", j, e);
         }
         FLINT_ASSERT(k == 0);
         first = 0;

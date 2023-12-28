@@ -70,7 +70,7 @@ _nmod_mpoly_get_str_pretty(const mp_limb_t * coeff, const ulong * exp, slong len
         first = (coeff[i] == 1);
         if (!first)
         {
-            off += flint_sprintf(str + off, "%wd", coeff[i]);
+            off += flint_sprintf(str + off, "%wu", coeff[i]);
         }
 
         mpoly_get_monomial_ffmpz(exponents, exp + N*i, bits, mctx);
