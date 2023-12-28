@@ -641,6 +641,24 @@ then
 fi
 AC_SUBST(LDCONFIG)
 
+dnl FIXME: Improve this check to include more processors.
+AC_MSG_CHECKING([if memory is strongly-ordered])
+case "$host_cpu" in
+    x86_64|x86|i386|i586)
+        flint_know_strong_order="yes"
+        AC_MSG_RESULT([yes])
+        ;;
+    *)
+        flint_know_strong_order="no"
+        AC_MSG_RESULT([unsure])
+        ;;
+esac
+
+if test "$flint_know_strong_order" = "yes";
+then
+    AC_DEFINE(FLINT_KNOW_STRONG_ORDER,1,[Define if system is strongly ordered])
+fi
+
 ################################################################################
 # check headers
 ################################################################################
@@ -870,53 +888,6 @@ AC_LINK_IFELSE([AC_LANG_PROGRAM(
 AC_MSG_ERROR([Couldn't find alloca, which is required for FLINT. Please submit a bug
 report to <https://github.com/flintlib/flint/issues/> and specify your
 operating system.])])
-
-AC_MSG_CHECKING([if $CC has popcount intrinsics])
-AC_COMPILE_IFELSE(
-    [AC_LANG_PROGRAM([],[long int x = __builtin_popcountl(3);])],
-    [AC_COMPILE_IFELSE(
-        [AC_LANG_PROGRAM([],[long long int x = __builtin_popcountll(3);])],
-        [AC_MSG_RESULT([yes])
-         has_popcount="yes"
-         AC_DEFINE(FLINT_HAS_POPCNT,1,[Define if compiler has popcount intrinsics])],
-        [AC_MSG_RESULT([no])]
-    )],
-    [AC_MSG_RESULT([no])]
-)
-
-AC_MSG_CHECKING([if $CC has CLZ intrinsics])
-AC_COMPILE_IFELSE(
-    [AC_LANG_PROGRAM([],[long int x = __builtin_clzl(3);])],
-    [AC_COMPILE_IFELSE(
-        [AC_LANG_PROGRAM([],[long long int x = __builtin_clzll(3);])],
-        [AC_MSG_RESULT([yes])
-         has_clz="yes"
-         AC_DEFINE(FLINT_HAS_CLZ,1,[Define if compiler has CLZ intrinsics])],
-        [AC_MSG_RESULT([no])]
-    )],
-    [AC_MSG_RESULT([no])]
-)
-
-AC_MSG_CHECKING([if $CC has CTZ intrinsics])
-AC_COMPILE_IFELSE(
-    [AC_LANG_PROGRAM([],[long int x = __builtin_ctzl(3);])],
-    [AC_COMPILE_IFELSE(
-        [AC_LANG_PROGRAM([],[long long int x = __builtin_ctzll(3);])],
-        [AC_MSG_RESULT([yes])
-         has_ctz="yes"
-         AC_DEFINE(FLINT_HAS_CTZ,1,[Define if compiler has CTZ intrinsics])],
-        [AC_MSG_RESULT([no])]
-    )],
-    [AC_MSG_RESULT([no])]
-)
-
-AC_MSG_CHECKING([if $CC has __builtin_constant_p])
-AC_COMPILE_IFELSE(
-    [AC_LANG_PROGRAM([], [int a = __builtin_constant_p(0 == 1);])],
-    [AC_MSG_RESULT([yes])
-     AC_DEFINE(FLINT_HAVE_CONSTANT_P,1,[Define if compiler has __builtin_constant_p])],
-    [AC_MSG_RESULT([no])]
-)
 
 ################################################################################
 # CFLAGS

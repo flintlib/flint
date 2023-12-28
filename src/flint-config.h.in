@@ -12,23 +12,14 @@
 /* Define if system is big endian. */
 #undef FLINT_BIG_ENDIAN
 
-/* Define if compiler has CLZ intrinsics */
-#undef FLINT_HAS_CLZ
-
-/* Define if compiler has CTZ intrinsics */
-#undef FLINT_HAS_CTZ
-
-/* Define if compiler has popcount intrinsics */
-#undef FLINT_HAS_POPCNT
+/* Define if system is strongly ordered */
+#undef FLINT_KNOW_STRONG_ORDER
 
 /* Define if system has AVX2 */
 #undef FLINT_HAVE_AVX2
 
 /* Define if system has AVX512 */
 #undef FLINT_HAVE_AVX512
-
-/* Define if compiler has __builtin_constant_p */
-#undef FLINT_HAVE_CONSTANT_P
 
 /* Define to use the fft_small module */
 #undef FLINT_HAVE_FFT_SMALL

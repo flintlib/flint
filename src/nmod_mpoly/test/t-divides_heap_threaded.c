@@ -12,6 +12,7 @@
 #include "test_helpers.h"
 #include "nmod_mpoly.h"
 
+#if defined(nmod_mpoly_divides_heap_threaded)
 TEST_FUNCTION_START(nmod_mpoly_divides_heap_threaded, state)
 {
     int i, j, result, result2, max_threads = 5, tmul = 30;
@@ -428,3 +429,9 @@ TEST_FUNCTION_START(nmod_mpoly_divides_heap_threaded, state)
 
     TEST_FUNCTION_END(state);
 }
+#else
+TEST_FUNCTION_START(nmod_mpoly_divides_heap_threaded, state)
+{
+    TEST_FUNCTION_END_SKIPPED(state);
+}
+#endif

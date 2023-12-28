@@ -48,7 +48,7 @@
 #include "t-get_term.c"
 #include "t-get_term_monomial.c"
 #include "t-inflate_deflate.c"
-#include "t-mpolyn_divides_threaded.c"
+#include "t-mpolyn_divides_threaded_pool.c"
 #include "t-mpolyuu_divides.c"
 #include "t-mul_array.c"
 #include "t-mul_array_threaded.c"
@@ -111,7 +111,7 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_mpoly_get_term),
     TEST_FUNCTION(nmod_mpoly_get_term_monomial),
     TEST_FUNCTION(nmod_mpoly_inflate_deflate),
-    TEST_FUNCTION(nmod_mpoly_mpolyn_divides_threaded),
+    TEST_FUNCTION(nmod_mpolyn_divides_threaded_pool),
     TEST_FUNCTION(nmod_mpoly_mpolyuu_divides),
     TEST_FUNCTION(nmod_mpoly_mul_array),
     TEST_FUNCTION(nmod_mpoly_mul_array_threaded),

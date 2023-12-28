@@ -56,6 +56,16 @@ endif()
 option(BUILD_SHARED_LIBS "Build shared libs" on)
 option(WITH_NTL "Build tests for NTL interface or not" off)
 
+# Check if strongly ordered memory
+set(STRONGLY_ORDERED_CPUS x86_64 x86 i386 i586 AMD64)
+if(CMAKE_SYSTEM_PROCESSOR IN_LIST STRONGLY_ORDERED_CPUS)
+    message(STATUS "Checking if system is strongly ordered - yes")
+    set(FLINT_KNOW_STRONG_ORDER ON)
+else()
+    message(STATUS "Checking if system is strongly ordered - unsure")
+    set(FLINT_KNOW_STRONG_ORDER OFF)
+endif()
+
 # Find dependencies
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GMP REQUIRED IMPORTED_TARGET gmp>=6.2.1)

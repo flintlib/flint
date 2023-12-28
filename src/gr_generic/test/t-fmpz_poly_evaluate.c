@@ -115,5 +115,5 @@ TEST_FUNCTION_START(gr_generic_fmpz_poly_evaluate, state)
         gr_ctx_clear(ctx);
     }
 
-    TEST_FUNCTION_END(state);
+    TEST_GR_FUNCTION_END(state, count_success, count_unable, count_domain);
 }

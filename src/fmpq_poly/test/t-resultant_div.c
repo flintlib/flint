@@ -14,6 +14,7 @@
 #include "fmpq_poly.h"
 
 #ifdef __GNUC__
+# pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Woverlength-strings"
 #endif
 

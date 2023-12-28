@@ -770,12 +770,16 @@ int fmpz_mpoly_divides(fmpz_mpoly_t Q,
 int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t Q,
        const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
 
+#if FLINT_KNOW_STRONG_ORDER
+#define fmpz_mpoly_divides_heap_threaded fmpz_mpoly_divides_heap_threaded
 int fmpz_mpoly_divides_heap_threaded(fmpz_mpoly_t Q,
        const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
 
+#define _fmpz_mpoly_divides_heap_threaded_pool _fmpz_mpoly_divides_heap_threaded_pool
 int _fmpz_mpoly_divides_heap_threaded_pool(fmpz_mpoly_t Q,
        const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx,
                         const thread_pool_handle * handles, slong num_handles);
+#endif
 
 slong _fmpz_mpoly_divides_array(fmpz ** poly1, ulong ** exp1,
          slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2,
