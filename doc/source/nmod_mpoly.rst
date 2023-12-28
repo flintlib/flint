@@ -518,8 +518,21 @@ The division functions assume that the modulus is prime.
 
 .. function:: int nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q, const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx)
 
-    Do the operation of ``nmod_mpoly_divides`` using a heap and multiple threads.
-    This function should only be called once ``global_thread_pool`` has been initialized.
+    Do the operation of ``nmod_mpoly_divides`` using the heap and multiple
+    threads. This function should only be called once ``global_thread_pool`` has
+    been initialized.
+
+.. note::
+
+    This function is only defined if the machine is known to be strongly ordered
+    during the configuration. To check whether this function is defined during
+    compilation-time, use the C preprocessor macro
+    ``#ifdef nmod_mpoly_divides_heap_threaded``.
+
+    Note that, if the system is known to be strongly ordered, the underlying
+    algorithm for this function is utilized in :func:``nmod_mpoly_divides``.
+    Hence, you may find it easier to use this function instead if the C
+    preprocessor is not available.
 
 
 Greatest Common Divisor

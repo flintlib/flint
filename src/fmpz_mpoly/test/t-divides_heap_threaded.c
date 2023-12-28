@@ -12,6 +12,7 @@
 #include "test_helpers.h"
 #include "fmpz_mpoly.h"
 
+#if defined(fmpz_mpoly_divides_heap_threaded)
 TEST_FUNCTION_START(fmpz_mpoly_divides_heap_threaded, state)
 {
     int result, result2;
@@ -417,3 +418,9 @@ TEST_FUNCTION_START(fmpz_mpoly_divides_heap_threaded, state)
 
     TEST_FUNCTION_END(state);
 }
+#else
+TEST_FUNCTION_START(fmpz_mpoly_divides_heap_threaded, state)
+{
+    TEST_FUNCTION_END_SKIPPED(state);
+}
+#endif

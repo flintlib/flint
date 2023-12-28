@@ -9,8 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "thread_pool.h"
 #include "nmod_mpoly.h"
+
+#if FLINT_KNOW_STRONG_ORDER
+
+#include "thread_pool.h"
 #include "fmpz_mpoly.h"
 
 typedef struct _nmod_mpolyn_stripe_struct
@@ -1735,10 +1738,6 @@ int nmod_mpolyn_divides_threaded_pool(
     FLINT_ASSERT(B->bits == bits);
     FLINT_ASSERT(Q->bits == bits);
 
-#if !FLINT_KNOW_STRONG_ORDER
-    return nmod_mpolyn_divides(Q, A, B, ctx);
-#endif
-
     if (B->length < 2 || A->length < 2)
     {
         return nmod_mpolyn_divides(Q, A, B, ctx);
@@ -1885,5 +1884,6 @@ cleanup1:
 
     return divides;
 }
-
-
+#else
+typedef int this_file_is_empty;
+#endif

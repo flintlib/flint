@@ -1163,10 +1163,15 @@ compute_split:
     {
         nmod_mpolyn_content_last(t1, G, ctx);
         nmod_mpolyn_divexact_last(G, t1, ctx);
+#ifdef nmod_mpolyn_divides_threaded_pool
         success =            nmod_mpolyn_divides_threaded_pool(T1, A, G,
                                                     ctx, handles, num_handles);
         success = success && nmod_mpolyn_divides_threaded_pool(T2, B, G,
                                                     ctx, handles, num_handles);
+#else
+        success = nmod_mpolyn_divides(T1, A, G, ctx);
+        success = success && nmod_mpolyn_divides(T2, B, G, ctx);
+#endif
         if (success)
         {
             ulong temp;
@@ -1185,10 +1190,15 @@ successful_fix_lc:
     {
         nmod_mpolyn_content_last(t1, Abar, ctx);
         nmod_mpolyn_divexact_last(Abar, t1, ctx);
+#ifdef nmod_mpolyn_divides_threaded_pool
         success =            nmod_mpolyn_divides_threaded_pool(T1, A, Abar,
                                                     ctx, handles, num_handles);
         success = success && nmod_mpolyn_divides_threaded_pool(T2, B, T1,
                                                     ctx, handles, num_handles);
+#else
+        success = nmod_mpolyn_divides(T1, A, Abar, ctx);
+        success = success && nmod_mpolyn_divides(T2, B, T1, ctx);
+#endif
         if (success)
         {
             nmod_mpolyn_swap(T1, G);
@@ -1200,10 +1210,15 @@ successful_fix_lc:
     {
         nmod_mpolyn_content_last(t1, Bbar, ctx);
         nmod_mpolyn_divexact_last(Bbar, t1, ctx);
+#ifdef nmod_mpolyn_divides_threaded_pool
         success =            nmod_mpolyn_divides_threaded_pool(T1, B, Bbar,
                                                     ctx, handles, num_handles);
         success = success && nmod_mpolyn_divides_threaded_pool(T2, A, T1,
                                                     ctx, handles, num_handles);
+#else
+        success = nmod_mpolyn_divides(T1, B, Bbar, ctx);
+        success = success && nmod_mpolyn_divides(T2, A, T1, ctx);
+#endif
         if (success)
         {
             nmod_mpolyn_swap(T1, G);

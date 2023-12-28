@@ -13,6 +13,7 @@
 #include "thread_support.h"
 #include "nmod_mpoly.h"
 
+#if defined(nmod_mpolyn_divides_threaded_pool)
 void _divides_check(
     const nmod_mpoly_t A,
     const nmod_mpoly_t B,
@@ -127,7 +128,7 @@ cleanup:
     flint_free(stride);
 }
 
-TEST_FUNCTION_START(nmod_mpoly_mpolyn_divides_threaded, state)
+TEST_FUNCTION_START(nmod_mpolyn_divides_threaded_pool, state)
 {
     slong i, j, max_threads = 5, tmul = 50;
 #ifdef _WIN32
@@ -223,3 +224,9 @@ TEST_FUNCTION_START(nmod_mpoly_mpolyn_divides_threaded, state)
 
     TEST_FUNCTION_END(state);
 }
+#else
+TEST_FUNCTION_START(nmod_mpolyn_divides_threaded_pool, state)
+{
+    TEST_FUNCTION_END_SKIPPED(state);
+}
+#endif
