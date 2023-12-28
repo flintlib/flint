@@ -777,15 +777,28 @@ Internal Functions
 
 .. function:: int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
 
+    Set ``poly1`` to ``poly2`` divided by ``poly3`` and return 1 if the quotient
+    is exact. Otherwise return 0. The function uses the algorithm of Michael
+    Monagan and Roman Pearce. Note that the function
+    ``fmpz_mpoly_div_monagan_pearce`` below may be much faster if the quotient
+    is known to be exact.
+
 .. function:: int fmpz_mpoly_divides_heap_threaded(fmpz_mpoly_t Q, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
 
-    Set ``poly1`` to ``poly2`` divided by ``poly3`` and return 1 if
-    the quotient is exact. Otherwise return 0. The function uses the algorithm
-    of Michael Monagan and Roman Pearce. Note that the function
-    ``fmpz_mpoly_div_monagan_pearce`` below may be much faster if the
-    quotient is known to be exact.
+    The same method as used as in :func:``fmpz_mpoly_divides_monagan_pearce``,
+    but is also multi-threaded.
 
-    The threaded version takes an upper limit on the number of threads to use, while the first version always uses one thread.
+.. note::
+
+    This function is only defined if the machine is known to be strongly ordered
+    during the configuration. To check whether this function is defined during
+    compilation-time, use the C preprocessor macro
+    ``#ifdef fmpz_mpoly_divides_heap_threaded``.
+
+    Note that, if the system is known to be strongly ordered, the underlying
+    algorithm for this function is utilized in :func:``fmpz_mpoly_divides``.
+    Hence, you may find it easier to use this function instead if the C
+    preprocessor is not available.
 
 .. function:: slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq, ulong ** expq, slong * allocq, const fmpz * poly2, const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, slong len3, slong bits, slong N, const mp_limb_t * cmpmask)
 

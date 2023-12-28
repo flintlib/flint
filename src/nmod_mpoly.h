@@ -917,12 +917,16 @@ int _nmod_mpoly_divides_threaded_pool(nmod_mpoly_t Q,
 int nmod_mpoly_divides_monagan_pearce(nmod_mpoly_t Q,
        const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx);
 
+#if FLINT_KNOW_STRONG_ORDER
+#define nmod_mpoly_divides_heap_threaded nmod_mpoly_divides_heap_threaded
 int nmod_mpoly_divides_heap_threaded(nmod_mpoly_t Q,
        const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx);
 
+#define _nmod_mpoly_divides_heap_threaded_pool _nmod_mpoly_divides_heap_threaded_pool
 int _nmod_mpoly_divides_heap_threaded_pool(nmod_mpoly_t Q,
        const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx,
                         const thread_pool_handle * handles, slong num_handles);
+#endif
 
 int nmod_mpoly_divides_dense(nmod_mpoly_t Q,
        const nmod_mpoly_t A, const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx);
@@ -1556,9 +1560,12 @@ void nmod_mpolyun_divexact_last(nmod_mpolyun_t A, n_poly_t b,
 int nmod_mpolyn_divides(nmod_mpolyn_t Q, const nmod_mpolyn_t A,
                             const nmod_mpolyn_t B, const nmod_mpoly_ctx_t ctx);
 
+#if FLINT_KNOW_STRONG_ORDER
+#define nmod_mpolyn_divides_threaded_pool nmod_mpolyn_divides_threaded_pool
 int nmod_mpolyn_divides_threaded_pool(nmod_mpolyn_t Q,
     const nmod_mpolyn_t A, const nmod_mpolyn_t B, const nmod_mpoly_ctx_t ctx,
                         const thread_pool_handle * handles, slong num_handles);
+#endif
 
 int nmod_mpolyun_divides(nmod_mpolyun_t Q, const nmod_mpolyun_t A,
                            const nmod_mpolyun_t B, const nmod_mpoly_ctx_t ctx);

@@ -133,6 +133,7 @@ int _nmod_mpoly_divides_threaded_pool(
         goto cleanup;
     }
 
+#ifdef _nmod_mpoly_divides_heap_threaded_pool
     if (num_handles > 0)
     {
         divides = _nmod_mpoly_divides_heap_threaded_pool(Q, A, B, ctx,
@@ -142,6 +143,9 @@ int _nmod_mpoly_divides_threaded_pool(
     {
         divides = nmod_mpoly_divides_monagan_pearce(Q, A, B, ctx);
     }
+#else
+    divides = nmod_mpoly_divides_monagan_pearce(Q, A, B, ctx);
+#endif
 
 cleanup:
 
