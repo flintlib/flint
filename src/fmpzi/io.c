@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 2010 Fredrik Johansson
-    Copyright (C) 2014 Abhinav Baid
+    Copyright (C) 2022 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -10,10 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "d_mat.h"
+#include "fmpzi.h"
 
-void
-d_mat_swap(d_mat_t mat1, d_mat_t mat2)
+void fmpzi_print(const fmpzi_t x)
 {
-    FLINT_SWAP(d_mat_struct, *mat1, *mat2);
+    fmpz_print(fmpzi_realref(x));
+    if (fmpz_sgn(fmpzi_imagref(x)) >= 0)
+        flint_printf("+");
+    fmpz_print(fmpzi_imagref(x));
+    flint_printf("*I");
 }

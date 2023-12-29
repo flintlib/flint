@@ -67,8 +67,6 @@ slong d_mat_ncols(const d_mat_t mat)
 
 void d_mat_init(d_mat_t mat, slong rows, slong cols);
 
-void d_mat_swap(d_mat_t mat1, d_mat_t mat2);
-
 D_MAT_INLINE void
 d_mat_swap_entrywise(d_mat_t mat1, d_mat_t mat2)
 {
@@ -89,10 +87,6 @@ void d_mat_clear(d_mat_t mat);
 int d_mat_equal(const d_mat_t mat1, const d_mat_t mat2);
 
 int d_mat_approx_equal(const d_mat_t mat1, const d_mat_t mat2, double eps);
-
-int d_mat_is_zero(const d_mat_t mat);
-
-int d_mat_is_approx_zero(const d_mat_t mat, double eps);
 
 D_MAT_INLINE
 int d_mat_is_empty(const d_mat_t mat)

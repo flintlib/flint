@@ -12,7 +12,7 @@
 #include "fmpz_poly.h"
 #include "fmpz_mpoly.h"
 
-slong fmpz_mpolyd_length(const fmpz_mpolyd_t A)
+static slong fmpz_mpolyd_length(const fmpz_mpolyd_t A)
 {
     slong i, j;
     slong degb_prod;
@@ -35,7 +35,7 @@ slong fmpz_mpolyd_length(const fmpz_mpolyd_t A)
 }
 
 
-int fmpz_mpolyd_set_degbounds(fmpz_mpolyd_t A, slong * bounds)
+static int fmpz_mpolyd_set_degbounds(fmpz_mpolyd_t A, slong * bounds)
 {
     slong i;
     int success = 0;
@@ -64,7 +64,7 @@ done:
 /*
     assuming poly1 has valid degree bounds set, pack poly2 into it.
 */
-void fmpz_mpoly_convert_to_fmpz_mpolyd_degbound(fmpz_mpolyd_t poly1,
+static void fmpz_mpoly_convert_to_fmpz_mpolyd_degbound(fmpz_mpolyd_t poly1,
                           const fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
 {
     slong degb_prod;
@@ -115,7 +115,7 @@ void fmpz_mpoly_convert_to_fmpz_mpolyd_degbound(fmpz_mpolyd_t poly1,
 /*
     Convert B to A and clear B in the process
 */
-void fmpz_mpoly_consume_fmpz_mpolyd_clear(fmpz_mpoly_t A, fmpz_mpolyd_t B,
+static void fmpz_mpoly_consume_fmpz_mpolyd_clear(fmpz_mpoly_t A, fmpz_mpolyd_t B,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
     slong i, j, k, N;

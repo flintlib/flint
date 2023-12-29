@@ -27,11 +27,6 @@ Basic assignment and manipulation
     Sets ``mat1`` to a copy of ``mat2``. The dimensions of 
     ``mat1`` and ``mat2`` must be the same.
 
-.. function:: void d_mat_swap(d_mat_t mat1, d_mat_t mat2)
-
-    Swaps two matrices. The dimensions of ``mat1`` and ``mat2`` 
-    are allowed to be different.
-
 .. function:: void d_mat_swap_entrywise(d_mat_t mat1, d_mat_t mat2)
 
     Swaps two matrices by swapping the individual entries rather than swapping
@@ -97,16 +92,6 @@ Comparison
     Returns a non-zero value if ``mat1`` and ``mat2`` have 
     the same dimensions and entries within ``eps`` of each other,
     and zero otherwise.
-
-.. function:: int d_mat_is_zero(const d_mat_t mat)
-
-    Returns a non-zero value if all entries ``mat`` are zero, and
-    otherwise returns zero.
-
-.. function:: int d_mat_is_approx_zero(const d_mat_t mat, double eps)
-
-    Returns a non-zero value if all entries ``mat`` are zero to within
-    ``eps`` and otherwise returns zero.
 
 .. function:: int d_mat_is_empty(const d_mat_t mat)
 
