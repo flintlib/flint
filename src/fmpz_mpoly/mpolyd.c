@@ -11,6 +11,7 @@
 
 #include "fmpz_mpoly.h"
 
+#if 0
 void fmpz_mpolyd_swap(fmpz_mpolyd_t A, fmpz_mpolyd_t B)
 {
     fmpz_mpolyd_struct t = *A;
@@ -29,7 +30,6 @@ void fmpz_mpolyd_ctx_init(fmpz_mpolyd_ctx_t dctx, slong nvars)
         dctx->perm[i] = i;
     }
 }
-
 
 int fmpz_mpolyd_ctx_init_version1(fmpz_mpolyd_ctx_t dctx,
                             const fmpz_mpoly_t A, const fmpz_mpoly_t B,
@@ -88,56 +88,10 @@ cleanup:
     return success;
 }
 
-
 void fmpz_mpolyd_ctx_clear(fmpz_mpolyd_ctx_t dctx)
 {
     flint_free(dctx->perm);
 }
-
-
-void fmpz_mpolyd_init(fmpz_mpolyd_t poly, slong nvars)
-{
-    slong i;
-
-    poly->nvars = nvars;
-    poly->degb_alloc = nvars;
-    poly->deg_bounds = (slong *) flint_malloc(poly->degb_alloc*sizeof(slong));
-    for (i = 0; i < nvars; i++)
-    {
-        poly->deg_bounds[i] = WORD(1);
-    }
-    poly->coeff_alloc = WORD(16);
-    poly->coeffs = (fmpz *) flint_malloc(poly->coeff_alloc*sizeof(fmpz));
-    for (i = 0; i < poly->coeff_alloc; i++)
-    {
-        fmpz_init(poly->coeffs + i);
-    }
-}
-
-
-void fmpz_mpolyd_fit_length(fmpz_mpolyd_t poly, slong len)
-{
-    if (poly->coeff_alloc < len) {
-        slong i;
-        poly->coeffs = (fmpz *) flint_realloc(poly->coeffs, len*sizeof(fmpz));
-        for (i = poly->coeff_alloc; i < len; i++)
-        {
-            fmpz_init(poly->coeffs + i);
-        }
-        poly->coeff_alloc = len;
-    }
-}
-
-
-void fmpz_mpolyd_set_nvars(fmpz_mpolyd_t poly, slong nvars)
-{
-    poly->nvars = nvars;
-    if (poly->degb_alloc < nvars) {
-        poly->deg_bounds = (slong *) flint_realloc(poly->deg_bounds, nvars*sizeof(slong));
-        poly->degb_alloc = nvars;
-    }
-}
-
 
 void fmpz_mpolyd_zero(fmpz_mpolyd_t poly)
 {
@@ -161,22 +115,14 @@ void fmpz_mpolyd_set_fmpz(fmpz_mpolyd_t poly, fmpz_t num)
     fmpz_set(poly->coeffs + 0, num);
 }
 
-
-void fmpz_mpolyd_clear(fmpz_mpolyd_t poly)
+void fmpz_mpolyd_set_nvars(fmpz_mpolyd_t poly, slong nvars)
 {
-    slong i;
-
-    for (i = 0; i < poly->coeff_alloc; i++)
-    {
-        fmpz_clear(poly->coeffs + i);
+    poly->nvars = nvars;
+    if (poly->degb_alloc < nvars) {
+        poly->deg_bounds = (slong *) flint_realloc(poly->deg_bounds, nvars*sizeof(slong));
+        poly->degb_alloc = nvars;
     }
-
-    flint_free(poly->deg_bounds);
-    flint_free(poly->coeffs);
-    poly->deg_bounds = NULL;
-    poly->coeffs = NULL;
 }
-
 
 void fmpz_mpoly_convert_to_fmpz_mpolyd(
                             fmpz_mpolyd_t poly1, const fmpz_mpolyd_ctx_t dctx,
@@ -273,4 +219,53 @@ void fmpz_mpoly_convert_from_fmpz_mpolyd(
     }
 
     TMP_END;
+}
+#endif
+
+void fmpz_mpolyd_init(fmpz_mpolyd_t poly, slong nvars)
+{
+    slong i;
+
+    poly->nvars = nvars;
+    poly->degb_alloc = nvars;
+    poly->deg_bounds = (slong *) flint_malloc(poly->degb_alloc*sizeof(slong));
+    for (i = 0; i < nvars; i++)
+    {
+        poly->deg_bounds[i] = WORD(1);
+    }
+    poly->coeff_alloc = WORD(16);
+    poly->coeffs = (fmpz *) flint_malloc(poly->coeff_alloc*sizeof(fmpz));
+    for (i = 0; i < poly->coeff_alloc; i++)
+    {
+        fmpz_init(poly->coeffs + i);
+    }
+}
+
+
+void fmpz_mpolyd_fit_length(fmpz_mpolyd_t poly, slong len)
+{
+    if (poly->coeff_alloc < len) {
+        slong i;
+        poly->coeffs = (fmpz *) flint_realloc(poly->coeffs, len*sizeof(fmpz));
+        for (i = poly->coeff_alloc; i < len; i++)
+        {
+            fmpz_init(poly->coeffs + i);
+        }
+        poly->coeff_alloc = len;
+    }
+}
+
+void fmpz_mpolyd_clear(fmpz_mpolyd_t poly)
+{
+    slong i;
+
+    for (i = 0; i < poly->coeff_alloc; i++)
+    {
+        fmpz_clear(poly->coeffs + i);
+    }
+
+    flint_free(poly->deg_bounds);
+    flint_free(poly->coeffs);
+    poly->deg_bounds = NULL;
+    poly->coeffs = NULL;
 }

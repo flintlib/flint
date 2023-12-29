@@ -1158,7 +1158,6 @@ typedef struct
 
 typedef fmpz_mpolyd_ctx_struct fmpz_mpolyd_ctx_t[1];
 
-
 void fmpz_mpolyd_init(fmpz_mpolyd_t poly, slong nvars);
 
 void fmpz_mpolyd_fit_length(fmpz_mpolyd_t poly, slong len);
