@@ -82,15 +82,7 @@ fmpzi_swap(fmpzi_t x, fmpzi_t y)
     FLINT_SWAP(fmpzi_struct, *x, *y);
 }
 
-FMPZI_INLINE void
-fmpzi_print(const fmpzi_t x)
-{
-    fmpz_print(fmpzi_realref(x));
-    if (fmpz_sgn(fmpzi_imagref(x)) >= 0)
-        flint_printf("+");
-    fmpz_print(fmpzi_imagref(x));
-    flint_printf("*I");
-}
+void fmpzi_print(const fmpzi_t x);
 
 FMPZI_INLINE void
 fmpzi_set_si_si(fmpzi_t res, slong a, slong b)
