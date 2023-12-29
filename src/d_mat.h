@@ -88,10 +88,6 @@ int d_mat_equal(const d_mat_t mat1, const d_mat_t mat2);
 
 int d_mat_approx_equal(const d_mat_t mat1, const d_mat_t mat2, double eps);
 
-int d_mat_is_zero(const d_mat_t mat);
-
-int d_mat_is_approx_zero(const d_mat_t mat, double eps);
-
 D_MAT_INLINE
 int d_mat_is_empty(const d_mat_t mat)
 {

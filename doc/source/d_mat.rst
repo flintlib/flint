@@ -93,16 +93,6 @@ Comparison
     the same dimensions and entries within ``eps`` of each other,
     and zero otherwise.
 
-.. function:: int d_mat_is_zero(const d_mat_t mat)
-
-    Returns a non-zero value if all entries ``mat`` are zero, and
-    otherwise returns zero.
-
-.. function:: int d_mat_is_approx_zero(const d_mat_t mat, double eps)
-
-    Returns a non-zero value if all entries ``mat`` are zero to within
-    ``eps`` and otherwise returns zero.
-
 .. function:: int d_mat_is_empty(const d_mat_t mat)
 
     Returns a non-zero value if the number of rows or the number of
