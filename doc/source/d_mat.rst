@@ -27,11 +27,6 @@ Basic assignment and manipulation
     Sets ``mat1`` to a copy of ``mat2``. The dimensions of 
     ``mat1`` and ``mat2`` must be the same.
 
-.. function:: void d_mat_swap(d_mat_t mat1, d_mat_t mat2)
-
-    Swaps two matrices. The dimensions of ``mat1`` and ``mat2`` 
-    are allowed to be different.
-
 .. function:: void d_mat_swap_entrywise(d_mat_t mat1, d_mat_t mat2)
 
     Swaps two matrices by swapping the individual entries rather than swapping

@@ -67,8 +67,6 @@ slong d_mat_ncols(const d_mat_t mat)
 
 void d_mat_init(d_mat_t mat, slong rows, slong cols);
 
-void d_mat_swap(d_mat_t mat1, d_mat_t mat2);
-
 D_MAT_INLINE void
 d_mat_swap_entrywise(d_mat_t mat1, d_mat_t mat2)
 {
