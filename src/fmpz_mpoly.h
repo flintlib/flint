@@ -430,26 +430,15 @@ slong fmpz_mpoly_length(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
     return A->length;
 }
 
-void fmpz_mpoly_resize(fmpz_mpoly_t A, slong new_length,
-                                                   const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_resize(fmpz_mpoly_t A, slong new_length, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_get_term_coeff_fmpz(fmpz_t c, const fmpz_mpoly_t A,
-                                          slong i, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_get_term_coeff_fmpz(fmpz_t c, const fmpz_mpoly_t A, slong i, const fmpz_mpoly_ctx_t ctx);
+ulong fmpz_mpoly_get_term_coeff_ui(const fmpz_mpoly_t A, slong i, const fmpz_mpoly_ctx_t ctx);
+slong fmpz_mpoly_get_term_coeff_si(const fmpz_mpoly_t A, slong i, const fmpz_mpoly_ctx_t ctx);
 
-ulong fmpz_mpoly_get_term_coeff_ui(           const fmpz_mpoly_t A,
-                                          slong i, const fmpz_mpoly_ctx_t ctx);
-
-slong fmpz_mpoly_get_term_coeff_si(           const fmpz_mpoly_t A,
-                                          slong i, const fmpz_mpoly_ctx_t ctx);
-
-void fmpz_mpoly_set_term_coeff_fmpz(fmpz_mpoly_t A,
-                          slong i, const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
-
-void fmpz_mpoly_set_term_coeff_ui(fmpz_mpoly_t A,
-                                 slong i, ulong c, const fmpz_mpoly_ctx_t ctx);
-
-void fmpz_mpoly_set_term_coeff_si(fmpz_mpoly_t A,
-                                 slong i, slong c, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_set_term_coeff_fmpz(fmpz_mpoly_t A, slong i, const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_set_term_coeff_ui(fmpz_mpoly_t A, slong i, ulong c, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_set_term_coeff_si(fmpz_mpoly_t A, slong i, slong c, const fmpz_mpoly_ctx_t ctx);
 
 FMPZ_MPOLY_INLINE
 int fmpz_mpoly_term_exp_fits_ui(const fmpz_mpoly_t A, slong i,
@@ -1411,10 +1400,6 @@ void _fmpz_mpoly_addmul_uiuiui_fmpz(ulong * c, slong d1, slong d2)
     p2 = FLINT_SIGN_EXT(p[1]);
     add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], p2, p[1], p[0]);
 }
-
-
-mpz_srcptr _fmpz_mpoly_get_mpz_signed_uiuiui(ulong * sm, fmpz x,
-                                                                    mpz_ptr t);
 
 /******************************************************************************
 
