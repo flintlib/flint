@@ -890,13 +890,13 @@ Rising factorials
     These functions are aliases for :func:`acb_hypgeom_rising_ui`
     and :func:`acb_hypgeom_rising`.
 
-.. function :: void acb_rising2_ui(acb_t u, acb_t v, const acb_t x, ulong n, slong prec)
+.. function:: void acb_rising2_ui(acb_t u, acb_t v, const acb_t x, ulong n, slong prec)
 
     Letting `u(x) = x (x+1) (x+2) \cdots (x+n-1)`, simultaneously compute
     `u(x)` and `v(x) = u'(x)`.
     This function is a wrapper of :func:`acb_hypgeom_rising_ui_jet`.
 
-.. function :: void acb_rising_ui_get_mag(mag_t bound, const acb_t x, ulong n)
+.. function:: void acb_rising_ui_get_mag(mag_t bound, const acb_t x, ulong n)
 
     Computes an upper bound for the absolute value of
     the rising factorial `z = x (x+1) (x+2) \cdots (x+n-1)`.

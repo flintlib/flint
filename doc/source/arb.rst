@@ -1356,7 +1356,7 @@ Gamma function and factorials
     compared to *prec*, it is more efficient to convert *x* to an approximation
     and use :func:`arb_rising_ui`.
 
-.. function :: void arb_rising2_ui(arb_t u, arb_t v, const arb_t x, ulong n, slong prec)
+.. function:: void arb_rising2_ui(arb_t u, arb_t v, const arb_t x, ulong n, slong prec)
 
     Letting `u(x) = x (x+1) (x+2) \cdots (x+n-1)`, simultaneously compute
     `u(x)` and `v(x) = u'(x)`.
