@@ -988,7 +988,7 @@ Greatest common divisor
     letting `x` and `y` denote the leading coefficients, the resultant
     is defined as
 
-    .. math ::
+    .. math::
 
 
          x^{\deg(f)} y^{\deg(g)} \prod_{1 \leq i, j \leq n} (r_i - s_j).

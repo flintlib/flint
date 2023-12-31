@@ -210,13 +210,13 @@ Booleans and logic
 
     ``Cases(Case(f(x), P(x)), Case(g(x), Otherwise))`` denotes:
 
-    .. math ::
+    .. math::
 
         \begin{cases} f(x), & P(x)\\g(x), & \text{otherwise}\\ \end{cases}
 
     ``Cases(Case(f(x), P(x)), Case(g(x), Q(x)), Case(h(x), Otherwise))`` denotes:
 
-    .. math ::
+    .. math::
 
         \begin{cases} f(x), & P(x)\\g(x), & Q(x)\\h(x), & \text{otherwise}\\ \end{cases}
 

@@ -725,7 +725,7 @@ Elementary functions
 
     Uses the formula
 
-    .. math ::
+    .. math::
 
         \tan^{-1}(f(x)) = \int f'(x) / (1+f(x)^2) dx,
 
@@ -905,7 +905,7 @@ Power sums
 
     Computes
 
-    .. math ::
+    .. math::
 
         z = S(s,a,n) = \sum_{k=0}^{n-1} \frac{q^k}{(k+a)^{s+t}}
 
@@ -918,7 +918,7 @@ Power sums
 
     Computes
 
-    .. math ::
+    .. math::
 
         z = S(s,1,n) \sum_{k=1}^n \frac{1}{k^{s+t}}
 
@@ -986,7 +986,7 @@ Zeta function
     In particular, expanding `\zeta(s,a) + 1/(1-s)` with `s = 1+x`
     gives the Stieltjes constants
 
-    .. math ::
+    .. math::
 
         \sum_{k=0}^{n-1} \frac{(-1)^k}{k!} \gamma_k(a) x^k`.
 
@@ -1060,7 +1060,7 @@ Root-finding
     Sets *bound* to an upper bound for the magnitude of all the complex
     roots of *poly*. Uses Fujiwara's bound
 
-    .. math ::
+    .. math::
 
         2 \max \left\{\left|\frac{a_{n-1}}{a_n}\right|,
                       \left|\frac{a_{n-2}}{a_n}\right|^{1/2},
@@ -1080,7 +1080,7 @@ Root-finding
     where `n` is the degree of `f`. Proof: assume that the distance
     to the nearest root exceeds `r = |f(m)/f'(m)| n`. Then
 
-    .. math ::
+    .. math::
 
         \left|\frac{f'(m)}{f(m)}\right| =
             \left|\sum_i \frac{1}{m-\zeta_i}\right|

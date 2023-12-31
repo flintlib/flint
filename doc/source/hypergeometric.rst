@@ -13,13 +13,13 @@ Convergent series
 
 Let
 
-.. math ::
+.. math::
 
     T(k) = \frac{\prod_{i=0}^{p-1} (a_i)_k}{\prod_{i=0}^{q-1} (b_i)_k} z^k.
 
 We compute a factor *C* such that
 
-.. math ::
+.. math::
 
     \left|\sum_{k=n}^{\infty} T(k)\right| \le C |T(n)|.
 
@@ -28,13 +28,13 @@ parameters *b*. If this does not hold, *C* is set to infinity.
 Otherwise, we cancel out pairs of parameters
 `a` and `b` against each other. We have
 
-.. math ::
+.. math::
 
     \left|\frac{a+k}{b+k}\right| = \left|1 + \frac{a-b}{b+k}\right| \le 1 + \frac{|a-b|}{|b+n|}
 
 and
 
-.. math ::
+.. math::
 
     \left|\frac{1}{b+k}\right| \le \frac{1}{|b+n|}
 
@@ -60,14 +60,14 @@ First, we fix some notation, assuming that `A` and `B` are power series:
 
 Using the formulas
 
-.. math ::
+.. math::
 
     (A B)_{[k]} = \sum_{j=0}^k A_{[j]} B_{[k-j]}, \quad (1 / B)_{[k]} = \frac{1}{B_{[0]}} \sum_{j=1}^k -B_{[j]} (1/B)_{[k-j]},
 
 it is easy prove the following bounds for the coefficients
 of sums, products and quotients of formal power series:
 
-.. math ::
+.. math::
 
     |A + B| \le |A| + |B|,
     \quad |A B|  \le |A| |B|,
@@ -75,7 +75,7 @@ of sums, products and quotients of formal power series:
 
 If `p \le q` and `\operatorname{Re}({b_i}_{[0]}+N) > 0` for all `b_i`, then we may take
 
-.. math ::
+.. math::
 
     D = |z| \, \prod_{i=1}^p \left(1 + \frac{|a_i-b_i|}{\mathcal{R}(b_i+N)}\right) \prod_{i=p+1}^{q} \frac{1}{\mathcal{R}(b_i + N)}.
 
@@ -98,7 +98,7 @@ let `U^{*} = z^a U(a,b,z)`.
 For all `z \ne 0` and `b \notin \mathbb{Z}` (but valid for all `b` as a limit),
 we have (DLMF 13.2.42)
 
-.. math ::
+.. math::
 
     U(a,b,z)
         = \frac{\Gamma(1-b)}{\Gamma(a-b+1)} M(a,b,z)
@@ -106,7 +106,7 @@ we have (DLMF 13.2.42)
 
 Moreover, for all `z \ne 0` we have
 
-.. math ::
+.. math::
 
     \frac{{}_1F_1(a,b,z)}{\Gamma(b)}
         = \frac{(-z)^{-a}}{\Gamma(b-a)} U^{*}(a,b,z)
@@ -116,13 +116,13 @@ which is equivalent to DLMF 13.2.41 (but simpler in form).
 
 We have the asymptotic expansion
 
-.. math ::
+.. math::
 
     U^{*}(a,b,z) \sim {}_2F_0(a, a-b+1, -1/z)
 
 where `{}_2F_0(a,b,z)` denotes a formal hypergeometric series, i.e.
 
-.. math ::
+.. math::
 
     U^{*}(a,b,z) = \sum_{k=0}^{n-1} \frac{(a)_k (a-b+1)_k}{k! (-z)^k} + \varepsilon_n(z).
 
@@ -140,17 +140,17 @@ Otherwise, if `|z| \ge 2r`, set `R = 3`.
 Otherwise, the bound is infinite.
 If the bound is finite, we have
 
-.. math ::
+.. math::
 
     |\varepsilon_n(z)| \le 2 \alpha C_n \left|\frac{(a)_n (a-b+1)_n}{n! z^n} \right| \exp(2 \alpha \rho C_1 / |z|)
 
 in terms of the following auxiliary quantities
 
-.. math ::
+.. math::
 
     \sigma = |(b-2a)/z|
 
-.. math ::
+.. math::
 
     C_n = \begin{cases}
     1                              & \text{if } R = 1 \\
@@ -158,26 +158,26 @@ in terms of the following auxiliary quantities
     (\chi(n) + \sigma \nu^2 n) \nu^n & \text{if } R = 3
     \end{cases}
 
-.. math ::
+.. math::
 
     \nu = \left(\tfrac{1}{2} + \tfrac{1}{2}\sqrt{1-4\sigma^2}\right)^{-1/2} \le 1 + 2 \sigma^2
 
-.. math ::
+.. math::
 
     \chi(n) = \sqrt{\pi} \Gamma(\tfrac{1}{2}n+1) / \Gamma(\tfrac{1}{2} n + \tfrac{1}{2})
 
-.. math ::
+.. math::
 
     \sigma' = \begin{cases}
     \sigma & \text{if } R \ne 3 \\
     \nu \sigma & \text{if } R = 3
     \end{cases}
 
-.. math ::
+.. math::
 
     \alpha = (1 - \sigma')^{-1}
 
-.. math ::
+.. math::
 
     \rho = \tfrac{1}{2} |2a^2-2ab+b| + \sigma' (1+ \tfrac{1}{4} \sigma') (1-\sigma')^{-2}
 
@@ -189,30 +189,30 @@ Asymptotic series for Airy functions
 Error bounds are based on Olver (DLMF section 9.7).
 For `\arg(z) < \pi` and `\zeta = (2/3) z^{3/2}`, we have
 
-.. math ::
+.. math::
 
     \operatorname{Ai}(z) = \frac{e^{-\zeta}}{2 \sqrt{\pi} z^{1/4}} \left[S_n(\zeta) + R_n(z)\right], \quad
     \operatorname{Ai}'(z) = -\frac{z^{1/4} e^{-\zeta}}{2 \sqrt{\pi}} \left[(S'_n(\zeta) + R'_n(z)\right]
 
-.. math ::
+.. math::
 
     S_n(\zeta) = \sum_{k=0}^{n-1} (-1)^k \frac{u(k)}{\zeta^k}, \quad
     S'_n(\zeta) = \sum_{k=0}^{n-1} (-1)^k \frac{v(k)}{\zeta^k}
 
-.. math ::
+.. math::
 
     u(k) = \frac{(1/6)_k (5/6)_k}{2^k k!}, \quad
     v(k) = \frac{6k+1}{1-6k} u(k).
 
 Assuming that *n* is positive, the error terms are bounded by
 
-.. math ::
+.. math::
 
     |R_n(z)|  \le C |u(n)| |\zeta|^{-n}, \quad |R'_n(z)| \le C |v(n)| |\zeta|^{-n}
 
 where
 
-.. math ::
+.. math::
 
     C = \begin{cases}
         2 \exp(7 / (36 |\zeta|)) & |\arg(z)| \le \pi/3 \\
@@ -223,7 +223,7 @@ where
 For computing Bi when *z* is roughly in the positive half-plane, we use the
 connection formulas
 
-.. math ::
+.. math::
 
     \operatorname{Bi}(z) = -i (2 w^{+1} \operatorname{Ai}(z w^{-2}) - \operatorname{Ai}(z))
 
@@ -231,15 +231,15 @@ connection formulas
 
 where `w = \exp(\pi i/3)`. Combining roots of unity gives
 
-.. math ::
+.. math::
 
     \operatorname{Bi}(z) = \frac{1}{2 \sqrt{\pi} z^{1/4}} [2X + iY]
 
-.. math ::
+.. math::
 
     \operatorname{Bi}(z) = \frac{1}{2 \sqrt{\pi} z^{1/4}} [2X - iY]
 
-.. math ::
+.. math::
 
     X = \exp(+\zeta) [S_n(-\zeta) + R_n(z w^{\mp 2})], \quad Y = \exp(-\zeta) [S_n(\zeta) + R_n(z)]
 
@@ -249,11 +249,11 @@ We proceed analogously for the derivative of Bi.
 
 In the negative half-plane, we use the connection formulas
 
-.. math ::
+.. math::
 
     \operatorname{Ai}(z) = e^{+\pi i/3} \operatorname{Ai}(z_1)  +  e^{-\pi i/3} \operatorname{Ai}(z_2)
 
-.. math ::
+.. math::
 
     \operatorname{Bi}(z) = e^{-\pi i/6} \operatorname{Ai}(z_1)  +  e^{+\pi i/6} \operatorname{Ai}(z_2)
 
@@ -262,19 +262,19 @@ Provided that `|\arg(-z)| < 2 \pi / 3`, we have
 `|\arg(z_1)|, |\arg(z_2)| < \pi`, and thus the asymptotic expansion
 for Ai can be used. As before, we collect roots of unity to obtain
 
-.. math ::
+.. math::
 
     \operatorname{Ai}(z) = A_1 [S_n(i \zeta)  + R_n(z_1)]
                          + A_2 [S_n(-i \zeta) + R_n(z_2)]
 
-.. math ::
+.. math::
 
     \operatorname{Bi}(z) = A_3 [S_n(i \zeta)  + R_n(z_1)]
                          + A_4 [S_n(-i \zeta) + R_n(z_2)]
 
 where `\zeta = (2/3) (-z)^{3/2}` and
 
-.. math ::
+.. math::
 
     A_1 = \frac{\exp(-i (\zeta - \pi/4))}{2 \sqrt{\pi} (-z)^{1/4}}, \quad
     A_2 = \frac{\exp(+i (\zeta - \pi/4))}{2 \sqrt{\pi} (-z)^{1/4}}, \quad
@@ -292,7 +292,7 @@ In this case, we use Taylor series to analytically continue the solution
 of the hypergeometric differential equation from the origin.
 The function `f(z) = {}_2F_1(a,b,c,z_0+z)` satisfies
 
-.. math ::
+.. math::
 
     f''(z) = -\frac{((z_0+z)(a+b+1)-c)}{(z_0+z)(z_0-1+z)} f'(z) - \frac{a b}{(z_0+z)(z_0-1+z)} f(z).
 
@@ -302,7 +302,7 @@ compute `f(z), f'(z)` to high accuracy
 for sufficiently small `z`.
 Some experimentation showed that two continuation steps
 
-.. math ::
+.. math::
 
     0 \quad \to \quad 0.375 \pm 0.625i \quad \to \quad 0.5 \pm 0.8125i \quad \to \quad z
 
@@ -312,7 +312,7 @@ using the Cauchy-Kovalevskaya majorant method,
 following the outline in [Hoe2001]_.
 The differential equation is majorized by
 
-.. math ::
+.. math::
 
     g''(z) = \frac{N+1}{2} \left( \frac{\nu}{1-\nu z} \right) g'(z)
     + \frac{(N+1)N}{2} \left( \frac{\nu}{1-\nu z} \right)^2 g(z)
@@ -322,7 +322,7 @@ are chosen sufficiently large. It follows that we can compute explicit
 numbers `A, N, \nu` such that the simple solution `g(z) = A (1-\nu z)^{-N}`
 of the differential equation provides the bound
 
-.. math ::
+.. math::
 
     |f_{[k]}| \le g_{[k]} = A {{N+k} \choose k} \nu^k.
 

@@ -431,7 +431,7 @@ Triangular solving
 
     Uses the block inversion formula
 
-    .. math ::
+    .. math::
         \begin{pmatrix} A & 0 \\ C & D \end{pmatrix}^{-1}
         \begin{pmatrix} X \\ Y \end{pmatrix} =
         \begin{pmatrix} A^{-1} X \\ D^{-1} ( Y - C A^{-1} X ) \end{pmatrix}
@@ -467,7 +467,7 @@ Triangular solving
 
     Uses the block inversion formula
 
-    .. math ::
+    .. math::
         \begin{pmatrix} A & B \\ 0 & D \end{pmatrix}^{-1}
         \begin{pmatrix} X \\ Y \end{pmatrix} =
         \begin{pmatrix} A^{-1} (X - B D^{-1} Y) \\ D^{-1} Y \end{pmatrix}

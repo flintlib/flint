@@ -7,7 +7,7 @@ This module allows working with values of Dirichlet characters,
 Dirichlet L-functions, and related functions.
 A Dirichlet L-function is the analytic continuation of an L-series
 
-.. math ::
+.. math::
 
     L(s,\chi) = \sum_{k=1}^\infty \frac{\chi(k)}{k^s}
 
@@ -139,17 +139,17 @@ The Riemann-Siegel (RS) formula is implemented closely following
 J. Arias de Reyna [Ari2011]_.
 For `s = \sigma + it` with `t > 0`, the expansion takes the form
 
-.. math ::
+.. math::
 
     \zeta(s) = \mathcal{R}(s) + X(s) \overline{\mathcal{R}}(1-s), \quad X(s) = \pi^{s-1/2} \frac{\Gamma((1-s)/2)}{\Gamma(s/2)}
 
 where
 
-.. math ::
+.. math::
 
     \mathcal{R}(s) = \sum_{k=1}^N \frac{1}{k^s} + (-1)^{N-1} U a^{-\sigma} \left[ \sum_{k=0}^K \frac{C_k(p)}{a^k} + RS_K \right]
 
-.. math ::
+.. math::
 
     U = \exp\left(-i\left[ \frac{t}{2} \log\left(\frac{t}{2\pi}\right)-\frac{t}{2}-\frac{\pi}{8} \right]\right), \quad
     a = \sqrt{\frac{t}{2\pi}}, \quad N = \lfloor a \rfloor, \quad p = 1-2(a-N).
@@ -276,7 +276,7 @@ Lerch transcendent
 
     Computes the Lerch transcendent
 
-    .. math ::
+    .. math::
 
         \Phi(z,s,a) = \sum_{k=0}^{\infty} \frac{z^k}{(k+a)^s}
 
@@ -285,7 +285,7 @@ Lerch transcendent
     The *direct* version evaluates a truncation of the defining series.
     The *integral* version uses the Hankel contour integral
 
-    .. math ::
+    .. math::
 
         \Phi(z,s,a) = -\frac{\Gamma(1-s)}{2 \pi i} \int_C \frac{(-t)^{s-1} e^{-a t}}{1 - z e^{-t}} dt
 
@@ -304,7 +304,7 @@ Stieltjes constants
     `\gamma_n(a)` which is the coefficient in the Laurent series of the
     Hurwitz zeta function at the pole
 
-    .. math ::
+    .. math::
 
         \zeta(s,a) = \frac{1}{s-1} + \sum_{n=0}^\infty \frac{(-1)^n}{n!} \gamma_n(a) (s-1)^n.
 
@@ -547,14 +547,14 @@ Dirichlet L-functions
     An error bound is computed via :func:`mag_hurwitz_zeta_uiui`.
     If *s* is complex, replace it with its real part. Since
 
-    .. math ::
+    .. math::
 
         \frac{1}{L(s,\chi)} = \prod_{p} \left(1 - \frac{\chi(p)}{p^s}\right)
                 = \sum_{k=1}^{\infty} \frac{\mu(k)\chi(k)}{k^s}
 
     and the truncated product gives all smooth-index terms in the series, we have
 
-    .. math ::
+    .. math::
 
         \left|\prod_{p < N} \left(1 - \frac{\chi(p)}{p^s}\right) - \frac{1}{L(s,\chi)}\right|
         \le \sum_{k=N}^{\infty} \frac{1}{k^s} = \zeta(s,N).
@@ -593,7 +593,7 @@ Dirichlet L-functions
     i.e. `L(s), L'(s), \ldots, L^{(len-1)}(s) / (len-1)!`.
     If *deflate* is set, computes the expansion of
 
-    .. math ::
+    .. math::
 
         L(s,\chi) - \frac{\sum_{k=1}^q \chi(k)}{(s-1)q}
 
@@ -623,7 +623,7 @@ Currently, these methods require *chi* to be a primitive character.
     Computes the phase function used to construct the Z-function.
     We have
 
-    .. math ::
+    .. math::
 
         \theta(t) = -\frac{t}{2} \log(\pi/q) - \frac{i \log(\epsilon)}{2}
             + \frac{\log \Gamma((s+\delta)/2) - \log \Gamma((1-s+\delta)/2)}{2i}
@@ -777,7 +777,7 @@ and formulas described by David J. Platt in [Pla2017]_.
 
     Compute `\Lambda(t) e^{\pi t/4}` where
 
-    .. math ::
+    .. math::
 
         \Lambda(t) = \pi^{-\frac{it}{2}}
                          \Gamma\left(\frac{\frac{1}{2}+it}{2}\right)

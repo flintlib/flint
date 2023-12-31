@@ -509,7 +509,7 @@ GCD
     Computes the HGCD of `a` and `b`, that is, a matrix `M`, a sign `\sigma`
     and two polynomials `A` and `B` such that
 
-    .. math ::
+    .. math::
 
         (A,B)^t = \sigma M^{-1} (a,b)^t.
 

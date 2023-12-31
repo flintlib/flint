@@ -11,7 +11,7 @@ Pi
 
 `\pi` is computed using the Chudnovsky series
 
-    .. math ::
+    .. math::
 
         \frac{1}{\pi} = 12 \sum^\infty_{k=0}
         \frac{(-1)^k (6k)! (13591409 + 545140134k)}{(3k)!(k!)^3 640320^{3k + 3/2}}
@@ -27,11 +27,11 @@ Logarithms of integers
 
 We use the formulas
 
-.. math ::
+.. math::
 
     \log(2) = \frac{3}{4} \sum_{k=0}^{\infty} \frac{(-1)^k (k!)^2}{2^k (2k+1)!}
 
-.. math ::
+.. math::
 
     \log(10) = 46 \operatorname{atanh}(1/31) + 34 \operatorname{atanh}(1/49) + 20 \operatorname{atanh}(1/161)
 
@@ -42,18 +42,18 @@ Euler's constant
 Euler's constant `\gamma` is computed using
 the Brent-McMillan formula ([BM1980]_,  [MPFR2012]_)
 
-.. math ::
+.. math::
 
     \gamma = \frac{S_0(2n) - K_0(2n)}{I_0(2n)} - \log(n)
 
 in which `n` is a free parameter and
 
-.. math ::
+.. math::
 
     S_0(x) = \sum_{k=0}^{\infty} \frac{H_k}{(k!)^2} \left(\frac{x}{2}\right)^{2k}, \quad
     I_0(x) = \sum_{k=0}^{\infty} \frac{1}{(k!)^2} \left(\frac{x}{2}\right)^{2k}
 
-.. math ::
+.. math::
 
     2x I_0(x) K_0(x) \sim \sum_{k=0}^{\infty} \frac{[(2k)!]^3}{(k!)^4 8^{2k} x^{2k}}.
 
@@ -70,14 +70,14 @@ Catalan's constant
 
 Catalan's constant is computed using the hypergeometric series
 
-.. math ::
+.. math::
 
     C = \frac{1}{768} \sum_{k=1}^{\infty} \frac{(-4096)^k P(k)}
         {k^3 (2k-1)(3k-1)(3k-2)(6k-1)(6k-5) {5k \choose k} {10k \choose 5k} {12k \choose 6k}}
 
 where
 
-.. math ::
+.. math::
 
     \begin{matrix}
         P(k) & = -43203456k^6 + 92809152k^5 - 76613904k^4 \\
@@ -92,13 +92,13 @@ Apery's constant
 
 Apery's constant `\zeta(3)` is computed using the hypergeometric series
 
-.. math ::
+.. math::
 
     \zeta(3) = \frac{1}{48} \sum_{k=1}^{\infty} \frac{(-1)^{k-1} P(k)}{k^5 (2k-1)^3(3k-1)(3k-2)(4k-1)(4k-3)(6k-1)(6k-5){5k \choose k}{5k \choose 2k}{9k \choose 4k}{10k \choose 5k}{12k \choose 6k}}
 
 where
 
-.. math ::
+.. math::
 
     \begin{matrix}
         P(k) & = 1565994397644288k^{11} - 6719460725627136k^{10} + 12632254526031264k^9 \\
@@ -114,7 +114,7 @@ Khinchin's constant
 
 Khinchin's constant `K_0` is computed using the formula
 
-.. math ::
+.. math::
 
     \log K_0 = \frac{1}{\log 2} \left[
     \sum_{k=2}^{N-1} \log \left(\frac{k-1}{k} \right) \log \left(\frac{k+1}{k} \right)
@@ -126,7 +126,7 @@ where `N \ge 2` is a free parameter that can be used for tuning [BBC1997]_.
 If the infinite series is truncated after `n = M`, the remainder
 is smaller in absolute value than
 
-.. math ::
+.. math::
 
     \sum_{n=M+1}^{\infty} \zeta(2n, N) = 
     \sum_{n=M+1}^{\infty} \sum_{k=0}^{\infty} (k+N)^{-2n} \le
@@ -152,7 +152,7 @@ Reciprocal Fibonacci constant
 
 We use Gosper's series ([Gos1974]_, corrected in [Arn2012]_)
 
-.. math ::
+.. math::
 
     \sum_{n=1}^{\infty} \frac{1}{F_n} = \sum_{n=0}^{\infty}
         \frac{(-1)^{n(n-1)/2} (F_{4n+3} + (-1)^n F_{2n+2})}{F_{2n+1} F_{2n+2} L_1 L_3 \cdots L_{2n+1}}

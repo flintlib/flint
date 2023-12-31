@@ -1009,13 +1009,13 @@ Powering
     polynomial as `P(x) = p_0 + p_1 x + \dotsb + p_m x^m` with `p_0 \neq 0`
     and let
 
-    .. math ::
+    .. math::
 
         P(x)^n = a(n, 0) + a(n, 1) x + \dotsb + a(n, mn) x^{mn}.
 
     Then `a(n, 0) = p_0^n` and, for all `1 \leq k \leq mn`,
 
-    .. math ::
+    .. math::
 
         a(n, k) =
             (k p_0)^{-1} \sum_{i = 1}^m p_i \bigl( (n + 1) i - k \bigr) a(n, k-i).
@@ -1347,7 +1347,7 @@ Greatest common divisor
 
     This ensures that the equality
 
-    .. math ::
+    .. math::
 
         f g = \gcd(f, g) \operatorname{lcm}(f, g)
 
@@ -1366,7 +1366,7 @@ Greatest common divisor
     `g(x) = b_n x^n + \dotsb + b_0` of degrees `m` and `n`, the resultant
     is defined to be
 
-    .. math ::
+    .. math::
 
         a_m^n b_n^m \prod_{(x, y) : f(x) = g(y) = 0} (x - y).
 
@@ -1398,7 +1398,7 @@ Greatest common divisor
     `g(x) = b_n x^n + \dotsb + b_0` of degrees `m` and `n`, the resultant
     is defined to be
 
-    .. math ::
+    .. math::
 
         a_m^n b_n^m \prod_{(x, y) : f(x) = g(y) = 0} (x - y).
 
@@ -1421,7 +1421,7 @@ Greatest common divisor
     `g(x) = b_n x^n + \dotsb + b_0` of degrees `m` and `n`, the resultant
     is defined to be
 
-    .. math ::
+    .. math::
 
         a_m^n b_n^m \prod_{(x, y) : f(x) = g(y) = 0} (x - y).
 
@@ -2808,7 +2808,7 @@ Hensel lifting
 
     The lifting formulae are
 
-    .. math ::
+    .. math::
 
         G = \biggl( \bigl( \frac{f-gh}{p} \bigr) b \bmod g \biggr) p + g
 
@@ -3155,7 +3155,7 @@ Roots
     Computes a nonnegative integer ``bound`` that bounds the absolute
     value of all complex roots of ``poly``. Uses Fujiwara's bound
 
-    .. math ::
+    .. math::
 
         2 \max \left(
             \left|\frac{a_{n-1}}{a_n}\right|,
@@ -3219,7 +3219,7 @@ Minimal polynomials
     We use the sparse power series algorithm described as Algorithm 4
     [ArnoldMonagan2011]_. The algorithm is based on the identity
 
-    .. math ::
+    .. math::
 
         \Phi_n(x) = \prod_{d|n} (x^d - 1)^{\mu(n/d)}.
 
@@ -3373,21 +3373,21 @@ Eulerian numbers and polynomials
 
 Eulerian numbers are the coefficients to the Eulerian polynomials
 
-.. math ::
+.. math::
 
     A_n(x) = \sum_{m = 0}^{n} A(n, m) x^m,
 
 where the Eulerian polynomials are defined by the exponential generating
 function
 
-.. math ::
+.. math::
 
     \frac{x - 1}{x - e^{(x - 1) t}}
     = \sum_{n = 0}^{\infty} A_n(x) \frac{t^n}{n!}.
 
 The Eulerian numbers can be expressed explicitly via the formula
 
-.. math ::
+.. math::
 
     A(n, m) = \sum_{k = 0}^{m + 1} (-1)^k \binom{n + 1}{k} (m + 1 - k)^n.
 

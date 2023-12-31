@@ -298,7 +298,7 @@ Arithmetic
     `c` as the weighted arithmetic mean of the slopes,
     rounded to the nearest integer:
 
-    .. math ::
+    .. math::
 
         c = \left\lfloor
             \frac{(e_2 - e_1) + (f_2 + f_1)}{(a_2 - a_1) + (b_2 - b_1)}
@@ -512,7 +512,7 @@ Product trees
 
     Generates the polynomial
 
-    .. math ::
+    .. math::
 
         \left(\prod_{i=0}^{rn-1} (x-r_i)\right) \left(\prod_{i=0}^{cn-1} (x-c_i)(x-\bar{c_i})\right)
 
@@ -805,7 +805,7 @@ Powers and elementary functions
 
     Uses the formulas
 
-    .. math ::
+    .. math::
 
         \tan^{-1}(f(x)) = \int f'(x) / (1+f(x)^2) dx,
 
@@ -996,7 +996,7 @@ Zeta function
     In particular, expanding `\zeta(s,a) + 1/(1-s)` with `s = 1+x`
     gives the Stieltjes constants
 
-    .. math ::
+    .. math::
 
         \sum_{k=0}^{n-1} \frac{(-1)^k}{k!} \gamma_k(a) x^k.
 
@@ -1010,7 +1010,7 @@ Zeta function
     Sets *res* to the series expansion of the Riemann-Siegel theta
     function
 
-    .. math ::
+    .. math::
 
         \theta(h) = \arg \left(\Gamma\left(\frac{2ih+1}{4}\right)\right) - \frac{\log \pi}{2} h
 
@@ -1027,7 +1027,7 @@ Zeta function
 
     Sets *res* to the series expansion of the Riemann-Siegel Z-function
 
-    .. math ::
+    .. math::
 
         Z(h) = e^{i\theta(h)} \zeta(1/2+ih).
 
@@ -1049,7 +1049,7 @@ Root-finding
     Sets *bound* to an upper bound for the magnitude of all the complex
     roots of *poly*. Uses Fujiwara's bound
 
-    .. math ::
+    .. math::
 
         2 \max \left\{\left|\frac{a_{n-1}}{a_n}\right|,
                       \left|\frac{a_{n-2}}{a_n}\right|^{1/2},
