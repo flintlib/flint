@@ -366,7 +366,7 @@ Special functions
 
     Computes 
 
-    .. math ::
+    .. math::
 
         z = - \sum_{i = 1}^{\infty} \frac{y^i}{i} \pmod{p^N}.
 
@@ -375,7 +375,7 @@ Special functions
     Note that this can be used to compute the `p`-adic logarithm 
     via the equation 
 
-    .. math ::
+    .. math::
 
         \log(x) & = \sum_{i=1}^{\infty} (-1)^{i-1} \frac{(x-1)^i}{i} \\
                 & = - \sum_{i=1}^{\infty} \frac{(1-x)^i}{i}.
@@ -399,7 +399,7 @@ Special functions
 
     Computes `(z, d)` as 
 
-    .. math ::
+    .. math::
 
 
         z = - \sum_{i = 1}^{\infty} \frac{y^i}{i} \pmod{p^N}.
@@ -420,7 +420,7 @@ Special functions
 
     Computes `(z, d)` as 
 
-    .. math ::
+    .. math::
 
         z = - \sum_{i = 1}^{\infty} \frac{y^i}{i} \pmod{p^N}.
 
@@ -428,7 +428,7 @@ Special functions
     Note that this can be used to compute the `p`-adic logarithm 
     via the equation 
 
-    .. math ::
+    .. math::
 
         \log(x) & = \sum_{i=1}^{\infty} (-1)^{i-1} \frac{(x-1)^i}{i} \\
                 & = - \sum_{i=1}^{\infty} \frac{(1-x)^i}{i}.
@@ -450,7 +450,7 @@ Special functions
 
     The `p`-adic logarithm function is defined by the usual series 
 
-    .. math ::
+    .. math::
 
 
         \log_p(x) = \sum_{i=1}^{\infty} (-1)^{i-1} \frac{(x-1)^i}{i}
@@ -548,7 +548,7 @@ Special functions
     Whenever ``op`` has valuation greater than `(p-1)^{-1}`, this 
     routine computes its norm ``rop`` via 
 
-    .. math ::
+    .. math::
 
 
         \operatorname{Norm} (x) = \exp \Bigl( \bigl( \operatorname{Trace} \log (x) \bigr) \Bigr).
@@ -567,7 +567,7 @@ Special functions
 
     Sets ``rop`` to the norm of ``op``, using the formula 
 
-    .. math ::
+    .. math::
 
 
         \operatorname{Norm}(x) = \ell(f)^{-\deg(a)} \operatorname{Res}(f(X), a(X)),

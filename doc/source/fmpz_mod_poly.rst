@@ -1084,7 +1084,7 @@ Greatest common divisor
     Computes the HGCD of `a` and `b`, that is, a matrix~`M`, a sign~`\sigma`
     and two polynomials `A` and `B` such that
 
-    .. math ::
+    .. math::
 
         (A,B)^t = \sigma M^{-1} (a,b)^t.
 
@@ -1333,7 +1333,7 @@ Resultant
     `g(x) = b_n x^n + \dotsb + b_0` of degrees `m` and `n`, the resultant
     is defined to be
 
-    .. math ::
+    .. math::
 
 
             a_m^n b_n^m \prod_{(x, y) : f(x) = g(y) = 0} (x - y).
@@ -1389,7 +1389,7 @@ Resultant
     `g(x) = b_n x^n + \dotsb + b_0` of degrees `m` and `n`, the resultant
     is defined to be
 
-    .. math ::
+    .. math::
 
 
             a_m^n b_n^m \prod_{(x, y) : f(x) = g(y) = 0} (x - y).
@@ -1415,7 +1415,7 @@ Resultant
     `g(x) = b_n x^n + \dotsb + b_0` of degrees `m` and `n`, the resultant
     is defined to be
 
-    .. math ::
+    .. math::
 
 
             a_m^n b_n^m \prod_{(x, y) : f(x) = g(y) = 0} (x - y).
@@ -1794,7 +1794,7 @@ The following functions provide the functionality to solve the
 radix conversion problems for polynomials, which is to express
 a polynomial `f(X)` with respect to a given radix `r(X)` as
 
-    .. math ::
+    .. math::
 
         f(X) = \sum_{i = 0}^{N} b_i(X) r(X)^i
 
@@ -1865,7 +1865,7 @@ depends on~`r` and an upper bound on the degree of~`f`.
     computes polynomials `B_0, \dotsc, B_N` of degree less than `\deg(R)`
     such that
 
-    .. math ::
+    .. math::
 
         F = B_0 + B_1 R + \dotsb + B_N R^N,
 
@@ -1953,7 +1953,7 @@ Berlekamp-Massey Algorithm
     At any point in time, after, say, `n` points have been added, a call to :func:`fmpz_mod_berlekamp_massey_reduce` will
     calculate the polynomials `U`, `V` and `R` in the extended euclidean remainder sequence with
 
-    .. math ::
+    .. math::
 
         U*x^n + V*(a_1*x^{n-1} + \cdots + a_{n-1}*x + a_n) = R, \quad \deg(U) < \deg(V) \le n/2, \quad \deg(R) < n/2.
 
@@ -1961,14 +1961,14 @@ Berlekamp-Massey Algorithm
     This class differs from :func:`fmpz_mod_poly_minpoly` in the following respect. Let `v_i` denote the coefficient of `x^i` in `V`.
     :func:`fmpz_mod_poly_minpoly` will return a polynomial `V` of lowest degree that annihilates the whole sequence `a_1, \dots, a_n` as
 
-    .. math ::
+    .. math::
 
         \sum_{i} v_i a_{j + i} = 0, \quad 1 \le j \le n - \deg(V).
 
     The cost is that a polynomial of degree `n-1` might be returned and the return is not generally uniquely determined by the input sequence.
     For the fmpz_mod_berlekamp_massey_t we have
 
-    .. math ::
+    .. math::
 
         \sum_{i,j} v_i a_{j+i} x^{-j} = -U + \frac{R}{x^n}\text{,}
 

@@ -734,7 +734,7 @@ Prime number generation and counting
 
     We use the following estimates, valid for `n > 5` :
 
-    .. math ::
+    .. math::
 
         p_n  & >  n (\ln n + \ln \ln n - 1) \\
         p_n  & <  n (\ln n + \ln \ln n) \\

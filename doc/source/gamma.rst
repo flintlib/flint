@@ -8,7 +8,7 @@ The Stirling series
 
 In general, the gamma function is computed via the Stirling series
 
-.. math ::
+.. math::
 
     \log \Gamma(z) = \left(z-\frac{1}{2}\right)\log z - z +
           \frac{\ln {2 \pi}}{2}
@@ -17,7 +17,7 @@ In general, the gamma function is computed via the Stirling series
 
 where ([Olv1997]_ pp. 293-295) the remainder term is exactly
 
-.. math ::
+.. math::
 
     R_n(z) = \int_0^{\infty} \frac{B_{2n} - {\tilde B}_{2n}(x)}{2n(x+z)^{2n}} dx.
 
@@ -29,7 +29,7 @@ that the numerator of the integrand is bounded in
 absolute value by `2 |B_{2n}|`, the remainder can be shown
 to satisfy the bound
 
-.. math ::
+.. math::
 
     |[t^k] R_n(z+t)| \le 2 |B_{2n}|
         \frac{\Gamma(2n+k-1)}{\Gamma(k+1) \Gamma(2n+1)}
@@ -39,7 +39,7 @@ where `b = 1/\cos(\operatorname{arg}(z)/2)`.
 Note that by trigonometric identities, assuming that `z = x+yi`, we
 have `b = \sqrt{1 + u^2}` where
 
-.. math ::
+.. math::
 
     u = \frac{y}{\sqrt{x^2 + y^2} + x} = \frac{\sqrt{x^2 + y^2} - x}{y}.
 
@@ -69,19 +69,19 @@ The cases `\Gamma(1) = 1` and `\Gamma(1/2) = \sqrt \pi` are trivial.
 We reduce all remaining cases to `\Gamma(1/3)` or `\Gamma(1/4)`
 using the following relations:
 
-.. math ::
+.. math::
 
     \Gamma(2/3) = \frac{2 \pi}{3^{1/2} \Gamma(1/3)}, \quad \quad
     \Gamma(3/4) = \frac{2^{1/2} \pi}{\Gamma(1/4)},
 
-.. math ::
+.. math::
 
     \Gamma(1/6) = \frac{\Gamma(1/3)^2}{(\pi/3)^{1/2} 2^{1/3}}, \quad \quad
     \Gamma(5/6) = \frac{2 \pi (\pi/3)^{1/2} 2^{1/3}}{\Gamma(1/3)^2}.
 
 We compute `\Gamma(1/3)` and `\Gamma(1/4)` rapidly to high precision using
 
-.. math ::
+.. math::
 
     \Gamma(1/3) = \left( \frac{12 \pi^4}{\sqrt{10}}
         \sum_{k=0}^{\infty}
@@ -90,7 +90,7 @@ We compute `\Gamma(1/3)` and `\Gamma(1/4)` rapidly to high precision using
 
 An alternative formula which could be used for `\Gamma(1/3)` is
 
-.. math ::
+.. math::
 
     \Gamma(1/3) = \frac{2^{4/9} \pi^{2/3}}{3^{1/12} \left( \operatorname{agm}\left(1,\frac{1}{2} \sqrt{2+\sqrt{3}}\right)\right)^{1/3}},
 

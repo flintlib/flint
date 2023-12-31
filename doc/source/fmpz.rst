@@ -1065,7 +1065,7 @@ Greatest common divisor
     canonical solution to satisfy one of the following if one of the given
     conditions apply:
 
-    .. math ::
+    .. math::
 
         \operatorname{xgcd}(\pm g, g) &= \bigl(|g|, 0, \operatorname{sgn}(g)\bigr)
 
@@ -1087,7 +1087,7 @@ Greatest common divisor
     If the pair `(f, g)` does not satisfy any of these conditions, the solution
     `(d, a, b)` will satisfy the following:
 
-    .. math ::
+    .. math::
 
         |a| < \Bigl| \frac{g}{2 d} \Bigr|,
         \qquad |b| < \Bigl| \frac{f}{2 d} \Bigr|.

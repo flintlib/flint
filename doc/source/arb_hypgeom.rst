@@ -160,7 +160,7 @@ Confluent hypergeometric functions
     Computes the confluent hypergeometric function using numerical integration
     of the representation
 
-    .. math ::
+    .. math::
 
         {}_1F_1(a,b,z) = \frac{\Gamma(b)}{\Gamma(a) \Gamma(b-a)} \int_0^1 e^{zt} t^{a-1} (1-t)^{b-a-1} dt.
 
@@ -176,7 +176,7 @@ Confluent hypergeometric functions
     Computes the confluent hypergeometric function `U(a,b,z)` using numerical integration
     of the representation
 
-    .. math ::
+    .. math::
 
         U(a,b,z) = \frac{1}{\Gamma(a)} \int_0^{\infty} e^{-zt} t^{a-1} (1+t)^{b-a-1} dt.
 
@@ -201,7 +201,7 @@ Gauss hypergeometric function
     Computes the Gauss hypergeometric function using numerical integration
     of the representation
 
-    .. math ::
+    .. math::
 
         {}_2F_1(a,b,c,z) = \frac{\Gamma(a)}{\Gamma(b) \Gamma(c-b)} \int_0^1 t^{b-1} (1-t)^{c-b-1} (1-zt)^{-a} dt.
 
@@ -629,7 +629,7 @@ Orthogonal polynomials and functions
     Sets *res* to the *k*-th root of the Legendre polynomial `P_n(x)`.
     We index the roots in decreasing order
 
-    .. math ::
+    .. math::
 
         1 > x_0 > x_1 > \ldots > x_{n-1} > -1
 

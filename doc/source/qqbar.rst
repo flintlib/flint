@@ -222,7 +222,7 @@ Input and output
 For example, *print*, *printn* and *printnd* with `n = 6` give
 the following output for the numbers 0, 1, `i`, `\varphi`, `\sqrt{2}-\sqrt{3} i`:
 
-.. code ::
+.. code::
 
     deg 1 [0, 1] 0
     deg 1 [-1, 1] 1.00000
@@ -758,7 +758,7 @@ Symbolic expressions and conversion to radicals
     Assuming that *x* has degree 1 or 2, computes integers *a*, *b*, *c*
     and *q* such that
 
-        .. math ::
+        .. math::
 
             x = \frac{a + b \sqrt{c}}{q}
 

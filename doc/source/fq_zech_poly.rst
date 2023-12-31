@@ -400,7 +400,7 @@ Multiplication
     change the representation to
 
 
-    .. math ::
+    .. math::
 
 
         \begin{split}

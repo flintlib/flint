@@ -7,7 +7,7 @@ This module provides helper functions for exact or approximate calculation
 of the Bernoulli numbers, which are defined by the exponential
 generating function
 
-.. math ::
+.. math::
 
     \frac{x}{e^x-1} = \sum_{n=0}^{\infty} B_n \frac{x^n}{n!}.
 

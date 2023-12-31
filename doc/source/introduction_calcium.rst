@@ -9,7 +9,7 @@ Exact numbers in Calcium
 The core idea behind Calcium is to represent real and complex
 numbers as elements of extension fields
 
-.. math ::
+.. math::
 
     \mathbb{Q}(a_1, \ldots, a_n)
 
@@ -20,7 +20,7 @@ The system constructs such fields automatically as needed
 to represent the results of computations.
 Any extension field is isomorphic to a formal field
 
-.. math ::
+.. math::
 
     \mathbb{Q}(a_1,\ldots,a_n) \;\; \cong \;\; K_{\text{formal}} := \operatorname{Frac}(\mathbb{Q}[X_1,\ldots,X_n] / I)
 
@@ -42,7 +42,7 @@ As an important special case, Calcium can be used for
 arithmetic in algebraic number fields (embedded explicitly in
 `\mathbb{C}`)
 
-.. math ::
+.. math::
 
     \mathbb{Q}(a) \cong \mathbb{Q}[X] / \langle f(X) \rangle
 

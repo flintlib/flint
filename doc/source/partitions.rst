@@ -23,7 +23,7 @@ terms. This gives a significant speedup for small (e.g. `n < 10^6`).
 
     Sets `b` to an upper bound for
 
-    .. math ::
+    .. math::
 
         M(n,N) = \frac{44 \pi^2}{225 \sqrt 3} N^{-1/2}
                   + \frac{\pi \sqrt{2}}{75} \left( \frac{N}{n-1} \right)^{1/2}

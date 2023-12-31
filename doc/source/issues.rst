@@ -87,13 +87,13 @@ This assumption is made to improve performance.
 For example, the call ``arb_mul(z, x, x, prec)``
 sets *z* to a ball enclosing the set
 
-.. math ::
+.. math::
 
     \{ t^2 \,:\, t \in x \}
 
 and not the (generally larger) set
 
-.. math ::
+.. math::
 
     \{ t u \,:\, t \in x, u \in x \}.
 

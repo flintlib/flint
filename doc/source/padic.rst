@@ -414,7 +414,7 @@ Exponential
 
     The `p`-adic exponential function is defined by the usual series 
 
-    .. math ::
+    .. math::
 
 
         \exp_p(x) = \sum_{i = 0}^{\infty} \frac{x^i}{i!}
@@ -450,7 +450,7 @@ Logarithm
 
     Returns `b` such that for all `i \geq b` we have 
 
-    .. math ::
+    .. math::
 
 
         i v - \operatorname{ord}_p(i) \geq N
@@ -469,7 +469,7 @@ Logarithm
 
     Computes 
 
-    .. math ::
+    .. math::
 
         z = - \sum_{i = 1}^{\infty} \frac{y^i}{i} \pmod{p^N},
 
@@ -478,7 +478,7 @@ Logarithm
     Note that this can be used to compute the `p`-adic logarithm 
     via the equation 
 
-    .. math ::
+    .. math::
 
         \log(x) & = \sum_{i=1}^{\infty} (-1)^{i-1} \frac{(x-1)^i}{i} \\
                 & = - \sum_{i=1}^{\infty} \frac{(1-x)^i}{i}.
@@ -499,7 +499,7 @@ Logarithm
 
     The `p`-adic logarithm function is defined by the usual series 
 
-    .. math ::
+    .. math::
 
         \log_p(x) = \sum_{i=1}^{\infty} (-1)^{i-1} \frac{(x-1)^i}{i}
 
@@ -524,7 +524,7 @@ Logarithm
     Uses an algorithm based on a result of Satoh, Skjernaa and Taguchi 
     that `\operatorname{ord}_p\bigl(a^{p^k} - 1\bigr) > k`, which implies that 
 
-    .. math ::
+    .. math::
 
         \log(a) \equiv p^{-k} \Bigl( \log\bigl(a^{p^k}\bigr) \pmod{p^{N+k}} 
                                                           \Bigr) \pmod{p^N}.

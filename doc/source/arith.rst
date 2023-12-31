@@ -42,7 +42,7 @@ Stirling numbers
     kind `S_2(n, k)`.  The Stirling numbers are defined using the
     generating functions
 
-    .. math ::
+    .. math::
 
         x_{(n)} = \sum_{k=0}^n S_1(n,k) x^k
 
@@ -156,7 +156,7 @@ Bell numbers
 
     After handling special cases, we use the formula
 
-    .. math ::
+    .. math::
 
         B_n = \sum_{k=0}^n \frac{(n-k)^n}{(n-k)!}
             \sum_{j=0}^k \frac{(-1)^j}{j!}.
@@ -279,7 +279,7 @@ Bernoulli numbers and polynomials
     numerators and denominators of `B_0, B_1, B_2, \ldots, B_{n-1}`
     inclusive. Uses the generating function
 
-    .. math ::
+    .. math::
 
         \frac{x^2}{\cosh(x)-1} = \sum_{k=0}^{\infty}
             \frac{(2-4k) B_{2k}}{(2k)!} x^{2k}
@@ -330,7 +330,7 @@ The corresponding Euler polynomials are defined by
 
     Sets ``poly`` to the Euler polynomial `E_n(x)`. Uses the formula
 
-    .. math ::
+    .. math::
 
         E_n(x) = \frac{2}{n+1}\left(B_{n+1}(x) -
             2^{n+1}B_{n+1}\left(\frac{x}{2}\right)\right),
@@ -383,7 +383,7 @@ Multiplicative functions
     We use the theta function identity
 
 
-    .. math ::
+    .. math::
 
 
         f(q) = q  \Biggl( \sum_{k \geq 0} (-1)^k (2k+1) q^{k(k+1)/2} \Biggr)^8
@@ -443,7 +443,7 @@ Number of partitions
 
     Symbolically evaluates the exponential sum
 
-    .. math ::
+    .. math::
 
         A_k(n) = \sum_{h=0}^{k-1}
             \exp\left(\pi i \left[ s(h,k) - \frac{2hn}{k}\right]\right)
@@ -475,13 +475,13 @@ Number of partitions
     The Hardy-Ramanujan-Rademacher formula is given with error bounds
     in [Rademacher1937]_. We evaluate it in the form
 
-    .. math ::
+    .. math::
 
         p(n) = \sum_{k=1}^N B_k(n) U(C/k) + R(n,N)
 
     where
 
-    .. math ::
+    .. math::
 
         U(x) = \cosh(x) + \frac{\sinh(x)}{x},
             \quad C = \frac{\pi}{6} \sqrt{24n-1}
@@ -490,7 +490,7 @@ Number of partitions
 
     and where `A_k(n)` is a certain exponential sum. The remainder satisfies
 
-    .. math ::
+    .. math::
 
         |R(n,N)| < \frac{44 \pi^2}{225 \sqrt{3}} N^{-1/2} +
             \frac{\pi \sqrt{2}}{75} \left(\frac{N}{n-1}\right)^{1/2}
@@ -559,6 +559,6 @@ Sums of squares
     This effectively computes the `q`-expansion of `\vartheta_3(q)`
     raised to the `k`-th power, i.e.
 
-    .. math ::
+    .. math::
 
         \vartheta_3^k(q) = \left( \sum_{i=-\infty}^{\infty} q^{i^2} \right)^k.
