@@ -1251,7 +1251,7 @@ Dilogarithm
 The dilogarithm function
 is given by `\operatorname{Li}_2(z) = -\int_0^z \frac{\log(1-t)}{t} dt = z {}_3F_2(1,1,1,2,2,z)`.
 
-.. function :: void acb_hypgeom_dilog_bernoulli(acb_t res, const acb_t z, slong prec)
+.. function:: void acb_hypgeom_dilog_bernoulli(acb_t res, const acb_t z, slong prec)
 
     Computes the dilogarithm using a series expansion in `w = \log(z)`,
     with rate of convergence `|w/(2\pi)|^n`. This provides good convergence
