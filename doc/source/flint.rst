@@ -36,10 +36,10 @@ are of type ``T``. For instance, with ``x`` and ``y`` of type ``fmpz_poly_t`` ,
 one can write ``FLINT_SWAP(fmpz_poly_struct, *x, *y)`` to swap the content of
 ``x`` with the content of ``y``.
 
-.. macro:: int FLINT_SGN(slong x)
+.. macro:: FLINT_SGN(x)
 
-    Returns the sign of `x`, that is, `-1` if `x < 0`, `0` if `x = 0` and `1` if
-    `x > 0`.
+    Returns the sign of `x` where `x` is interpreted as a :type:`slong`, that
+    is, returns `-1` if `x < 0`, `0` if `x = 0` and `1` if `x > 0`.
 
 .. function:: mp_limb_t FLINT_BIT_COUNT(mp_limb_t x)
 
