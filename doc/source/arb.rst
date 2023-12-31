@@ -874,7 +874,7 @@ Arithmetic
     Sets `z = x / y`, rounded to *prec* bits. If *y* contains zero, *z* is
     set to `0 \pm \infty`. Otherwise, error propagation uses the rule
 
-    .. math ::
+    .. math::
         \left| \frac{x}{y} - \frac{x+\xi_1 a}{y+\xi_2 b} \right| =
         \left|\frac{x \xi_2 b - y \xi_1 a}{y (y+\xi_2 b)}\right| \le
         \frac{|xb|+|ya|}{|y| (|y|-b)}
@@ -989,7 +989,7 @@ Powers and roots
     if input interval is `[m-r, m+r]` with `r \le m`, the error is largest at
     `m-r` where it satisfies
 
-    .. math ::
+    .. math::
 
         m^{1/k} - (m-r)^{1/k} = m^{1/k} [1 - (1-r/m)^{1/k}]
 
@@ -1530,14 +1530,14 @@ Bernoulli numbers and polynomials
 
     For *n* from 0 to *len* - 1, sets entry *n* in the output vector *res* to
 
-    .. math ::
+    .. math::
 
         S_n(a,b) = \frac{1}{n+1}\left(B_{n+1}(b) - B_{n+1}(a)\right)
 
     where `B_n(x)` is a Bernoulli polynomial. If *a* and *b* are integers
     and `b \ge a`, this is equivalent to
 
-    .. math ::
+    .. math::
 
         S_n(a,b) = \sum_{k=a}^{b-1} k^n.
 
@@ -1765,7 +1765,7 @@ Internals for computing elementary functions
     Computes the arctangent of *x*.
     Initially, the argument-halving formula
 
-    .. math ::
+    .. math::
 
         \operatorname{atan}(x) = 2 \operatorname{atan}\left(\frac{x}{1+\sqrt{1+x^2}}\right)
 
@@ -1773,7 +1773,7 @@ Internals for computing elementary functions
     Then a version of the bit-burst algorithm is used.
     The functional equation
 
-    .. math ::
+    .. math::
 
         \operatorname{atan}(x) = \operatorname{atan}(p/q) +
             \operatorname{atan}(w),

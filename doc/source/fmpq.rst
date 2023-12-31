@@ -645,7 +645,7 @@ Continued fractions
     the ``rem`` variable. The return value is the number `k` of generated
     terms. The output satisfies
 
-    .. math ::
+    .. math::
 
         x = c_0 + \cfrac{1}{c_1 + \cfrac{1}{c_2 +
             \cfrac{1}{ \ddots + \cfrac{1}{c_{k-1} + r }}}}
@@ -678,7 +678,7 @@ Continued fractions
 
     Sets `x` to the value of the continued fraction
 
-    .. math ::
+    .. math::
 
         x = c_0 + \cfrac{1}{c_1 + \cfrac{1}{c_2 +
             \cfrac{1}{ \ddots + \cfrac{1}{c_{n-1}}}}}
@@ -718,14 +718,14 @@ Most of the definitions and relations used in the following section
 are given by Apostol [Apostol1997]_. The Dedekind sum `s(h,k)` is
 defined for all integers `h` and `k` as
 
-.. math ::
+.. math::
 
      s(h,k) = \sum_{i=1}^{k-1} \left(\left(\frac{i}{k}\right)\right)
      \left(\left(\frac{hi}{k}\right)\right)
 
 where
 
-.. math ::
+.. math::
 
     ((x))=\begin{cases}
     x-\lfloor x\rfloor-1/2 &\mbox{if }
@@ -735,7 +735,7 @@ where
 
 If `0 < h < k` and `(h,k) = 1`, this reduces to
 
-.. math ::
+.. math::
 
     s(h,k) = \sum_{i=1}^{k-1} \frac{i}{k}
         \left(\frac{hi}{k}-\left\lfloor\frac{hi}{k}\right\rfloor
@@ -746,7 +746,7 @@ Letting `r_0 = k`, `r_1 = h`, `r_2, r_3, \ldots, r_n, r_{n+1} = 1`
 be the remainder sequence in the Euclidean algorithm for
 computing GCD of `h` and `k`,
 
-.. math ::
+.. math::
     s(h,k) = \frac{1-(-1)^n}{8} - \frac{1}{12} \sum_{i=1}^{n+1}
     (-1)^i \left(\frac{1+r_i^2+r_{i-1}^2}{r_i r_{i-1}}\right).
 

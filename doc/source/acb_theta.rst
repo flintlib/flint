@@ -15,7 +15,7 @@ Siegel upper half-space `\mathbb{H}_g`, which consists of all symmetric
 Riemann theta function of characteristic `(a,b)` is the following analytic
 function in `\tau\in \mathbb{H}_g` and `z\in \mathbb{C}^g`:
 
-    .. math ::
+    .. math::
 
         \theta_{a,b}(z,\tau) = \sum_{n\in \mathbb{Z}^{g} + \tfrac a2} \exp(\pi i n^T\tau n + 2\pi i n^T (z + \tfrac b2)),
 
@@ -133,7 +133,7 @@ In the following functions (with the exception of :func:`sp2gz_is_correct`) we
 always assume that the input matrix *mat* is square of even size `2g`, and
 write it as
 
-    .. math ::
+    .. math::
 
         m = \begin{pmatrix} \alpha&\beta\\ \gamma&\delta \end{pmatrix}
 
@@ -169,7 +169,7 @@ where `\alpha,\beta,\gamma,\delta` are `g\times g` blocks.
     Assuming that *mat* is a symplectic matrix of size `2r\times 2r` and *res*
     is square of size `2g\times 2g` for some `g\geq r`, sets *res* to the symplectic matrix
 
-        .. math ::
+        .. math::
 
             \begin{pmatrix} \alpha && \beta & \\ & I_{g-r} && 0_{g-r} \\ \gamma &&\delta &\\ & 0_{g-r} && I_{g-r} \end{pmatrix}
 
@@ -511,7 +511,7 @@ Naive algorithms: error bounds
 By [EK2023]_, for any `v\in \mathbb{R}^g` and any upper-triangular Cholesky
 matrix `C`, and any `R` such that `R^2 \geq\max(4,\mathit{ord})`, we have
 
-    .. math ::
+    .. math::
 
         \sum_{n\in C\mathbb{Z}^g + v,\ \lVert n\rVert^2 \geq R^2} \lVert n\rVert^{\mathit{ord}} e^{-\lVert n\rVert^2}
         \leq 2^{2g+2} R^{g-1+p} e^{-R^2} \prod_{j=0}^{g-1} (1 + \gamma_j^{-1})
@@ -541,7 +541,7 @@ common compact domain and use only one ellipsoid, following [DHBHS2004]_.
     bounded. (We set `a=0` instead if the entries of this vector have an
     unreasonably large magnitude.) Then
 
-        .. math ::
+        .. math::
 
             \begin{aligned}
             \theta_{0,b}(z,\tau) &= e^{\pi y^T Y^{-1} y} \sum_{n\in \mathbb{Z}^g}
@@ -558,7 +558,7 @@ common compact domain and use only one ellipsoid, following [DHBHS2004]_.
     for the error bound, and is stored as the `k^{\mathrm{th}}` entry of
     *us*. The quantity
 
-        .. math ::
+        .. math::
 
             c = u \exp(\pi i (a^T X a - 2a^T x + i r^T Y r))
 
@@ -589,13 +589,13 @@ compute:
 - the vector `v_2` with entries `x^j` for `n_{\mathrm{min}}\leq j\leq
   n_{\mathrm{max}}`, where
 
-    .. math ::
+    .. math::
 
         x = \exp(2 \pi i z_0) \prod_{k = 1}^{g-1} \exp(2 \pi i n_k \tau_{0,k}),
 
 - the cofactor `c\in \mathbb{C}` given by
 
-    .. math ::
+    .. math::
 
         c = \prod_{k = 1}^{g-1} \exp(2 \pi i n_k z_k) \cdot
         \prod_{1\leq j\leq k < g} \exp(\pi i (2 - \delta_{j,k}) n_j n_k \tau_{j,k}).
@@ -664,7 +664,7 @@ directly.
     We reduce to calling :func:`acb_theta_naive_0b`
     by writing
 
-        .. math ::
+        .. math::
 
             \theta_{a,b}(z,\tau) = \exp(\pi i \tfrac{a^T}{2} \tau \tfrac a2)
             \exp(\pi i a^T(z + \tfrac b 2)) \theta_{0,b}(z + \tau \tfrac{a}{2}, \tau).
@@ -680,7 +680,7 @@ This section contains methods to evaluate the successive partial derivatives of
 `\theta_{a,b}(z,\tau)` with respect to the `g` coordinates of `z`. Derivatives
 with respect to `\tau` are accounted for by the heat equation
 
-    .. math ::
+    .. math::
 
         \frac{\partial\theta_{a,b}}{\partial \tau_{j,k}} = \frac{1}{2\pi i(1 +\delta_{j,k})}
         \frac{\partial^2\theta_{a,b}}{\partial z_j \partial z_k}.
@@ -691,7 +691,7 @@ as vectors of type :type:`slong` and length `g`. In agreement with
 as in the Taylor expansion, so that the tuple `(k_0,\ldots,k_{g-1})`
 corresponds to the differential operator
 
-    .. math ::
+    .. math::
 
         \frac{1}{k_0!}\cdots\frac{1}{k_{g-1}!} \cdot \frac{\partial^{|k|}}{\partial z_0^{k_0}\cdots \partial z_{g-1}^{k_{g-1}}},
 
@@ -703,7 +703,7 @@ orders is `(0,0)`, `(1,0)`, `(0,1)`, `(2,0)`, `(1,1)`, etc.
 The naive algorithms for derivatives will evaluate a partial sum of the
 differentiated series:
 
-    .. math ::
+    .. math::
 
         \frac{\partial^{|k|}\theta_{a,b}}{\partial z_0^{k_0}\cdots \partial z_{g-1}^{k_{g-1}}}(z,\tau) = (2\pi i)^{|k|} \sum_{n\in \mathbb{Z}^g + \tfrac a2} n_0^{k_0} \cdots n_{g-1}^{k_{g-1}}
         e^{\pi i n^T \tau n + 2\pi i n^T (z + \tfrac b2)}.
@@ -755,13 +755,13 @@ differentiated series:
 
     We can rewrite the above sum as
 
-        .. math ::
+        .. math::
 
             (2\pi i)^{|k|} e^{\pi y^T Y^{-1} y} \sum_{n\in \mathbb{Z}^g + \tfrac a2} n_0^{k_0} \cdots n_{g-1}^{k_{g-1}} e^{\pi i(\cdots)} e^{-\pi (n + Y^{-1}y)^T Y (n + Y^{-1}y)}.
 
     We ignore the leading multiplicative factor. Writing `m = C n + v`, we have
 
-        .. math ::
+        .. math::
 
             n_0^{k_0}\cdots n_{g-1}^{k_{g-1}}\leq
             (\lVert C^{-1}\rVert_\infty \lVert n\rVert_2 + \lVert Y^{-1}y\rVert_\infty)^{|k|}.
@@ -769,7 +769,7 @@ differentiated series:
     Using the upper bound from :func:`acb_theta_naive_radius`, we see that the
     absolute value of the tail of the series is bounded above by
 
-        .. math ::
+        .. math::
 
             (\lVert C^{-1} \rVert_\infty R + \lVert Y^{-1}y \rVert_\infty)^{|k|}
              2^{2g+2} R^{g-1} e^{-R^2} \prod_{j=0}^{g-1} (1 + \gamma_j^{-1}).
@@ -816,14 +816,14 @@ We refer to [EK2023]_ for a detailed description of the quasi-linear algorithm
 implemented here. In a nutshell, the algorithm relies on the following
 duplication formula: for all `z,z'\in \mathbb{C}^g` and `\tau\in \mathbb{H}_g`,
 
-    .. math ::
+    .. math::
 
         \theta_{a,0}(z,\tau) \theta_{a,0}(z',\tau) = \sum_{a'\in(\mathbb{Z}/2\mathbb{Z})^g}
         \theta_{a',0}(z+z',2\tau) \theta_{a+a',0}(z-z',2\tau).
 
 In particular,
 
-    .. math ::
+    .. math::
 
         \begin{aligned}
         \theta_{a,0}(z,\tau)^2 &= \sum_{a'\in (\mathbb{Z}/2\mathbb{Z})^g}
@@ -838,7 +838,7 @@ Applying one of these duplication formulas amounts to taking a step in a
 (generalized) AGM sequence. These formulas also have analogues for all theta
 values, not just `\theta_{a,0}`: for instance, we have
 
-    .. math ::
+    .. math::
 
         \theta_{a,b}(0,\tau)^2 = \sum_{a'\in (\mathbb{Z}/2\mathbb{Z})^g} (-1)^{a'^Tb}
         \theta_{a',0}(0,2\tau)\theta_{a+a',0}(0,2\tau).
@@ -981,7 +981,7 @@ Quasi-linear algorithms: AGM steps
     the following reason: keeping notation from :func:`acb_theta_dist_a0`, for
     each `b\in \{0,1\}^g`, the sum
 
-        .. math ::
+        .. math::
 
             \mathrm{Dist}_\tau(-Y^{-1}y, \mathbb{Z}^g + \tfrac b2)^2
             + \mathrm{Dist}_\tau(-Y^{-1} y, \mathbb{Z}^g + \tfrac{b + k}{2})^2
@@ -1041,7 +1041,7 @@ domain, however `\mathrm{Im}(\tau)` may have large eigenvalues.
     list all of them. Then, for a given choice of `n_1`, the sum of the
     corresponding terms in the theta series is
 
-        .. math ::
+        .. math::
 
             e^{\pi i \bigl((n_1 + \tfrac{a_1}{2})\tau_1 (n_1 + \tfrac{a_1}{2}) + 2 (n_1
             + \tfrac{a_1}{2}) z_1\bigr)}
@@ -1103,13 +1103,13 @@ probabilistic algorithm where we gradually increase *guard* and first choose `t
     characteristic `(a,b)`, we have (borrowing notation from
     :func:`acb_theta_ql_a0_split`): either
 
-        .. math ::
+        .. math::
 
             |\theta_{a,b}(z,\tau) - c i^{\,n_1^Tb_1} \theta_{a_0,b_0}(z', \tau_0)| \leq u
 
     when the last `g-s` coordinates of `a` equal `n_1` modulo 2, or
 
-        .. math ::
+        .. math::
 
             |\theta_{a,b}(z,\tau)|\leq u
 
@@ -1130,7 +1130,7 @@ probabilistic algorithm where we gradually increase *guard* and first choose `t
     \{0,1\}^{g-s}` be the corresponding characteristic. We can then write the
     sum defining `\theta_{a,b}` over `E` as
 
-        .. math ::
+        .. math::
 
             e^{\pi i (\tfrac{n_1^T}{2} \tau_1 \tfrac{n_1}{2} + n_1^T(z_1 + \tfrac{b_1}{2}))}
             \sum_{n_0\in E_0 \cap (\mathbb{Z}^s + \tfrac{a_0}{2})}
@@ -1157,7 +1157,7 @@ Quasi-linear algorithms: derivatives
 We implement an algorithm for derivatives of theta functions on the reduced
 domain based on finite differences. Consider the Taylor expansion:
 
-    .. math ::
+    .. math::
 
         \theta_{a,b}(z + h, \tau)
         = \sum_{k\in \mathbb{Z}^g,\ k\geq 0} a_k\, h_0^{k_0}\cdots h_{g-1}^{k_{g-1}}.
@@ -1171,7 +1171,7 @@ derivation tuple that is bounded by `m-1` elementwise. A constant proportion,
 for fixed `g`, of this set consists of all tuples of total order at most
 `m-1`. More precisely, fix `p\in \mathbb{Z}^g`. Then
 
-    .. math ::
+    .. math::
 
         \sum_{n\in \{0,\ldots,m-1\}^g} \zeta^{-p^T n} \theta_{a,b}(z + h_n, \tau)
         = m^g \sum_{\substack{k\in \mathbb{Z}^g,\ k\geq 0,\\ k = p\ (\text{mod } m)}}
@@ -1182,7 +1182,7 @@ formula: if `|\theta_{a,b}(z,\tau)|\leq c` uniformly on a ball of radius `\rho`
 centered in `z` for `\lVert\cdot\rVert_\infty`, then the sum is `m^g
 (a_p\,\varepsilon^{|p|} + T)` with
 
-    .. math ::
+    .. math::
 
         |T|\leq 2c g\,\frac{\varepsilon^{|p|+m}}{\rho^m}.
 
@@ -1202,15 +1202,15 @@ transform.
     any choice of `\rho`, one can take `c = c_0\exp((c_1 + c_2\rho)^2)`
     above. We can take
 
-        .. math ::
+        .. math::
 
             c_0 = 2^g \prod_{j=0}^{g-1} (1 + 2\gamma_j^{-1}),
 
-        .. math ::
+        .. math::
 
             c_1 = \sqrt{\pi y^T Y^{-1} y},
 
-        .. math ::
+        .. math::
 
             c_2 = \sup_{\lVert x \rVert_\infty\leq 1}
               \sqrt{\pi x^T \mathrm{Im}(\tau)^{-1} x}.
@@ -1267,7 +1267,7 @@ The functions in this section implement the theta transformation formula of
 `(z,\tau)\in \mathbb{C}^g\times \mathbb{H}_g`, and any characteristic `(a,b)`,
 we have
 
-    .. math ::
+    .. math::
 
         \theta_{a,b}(m\cdot(z,\tau)) = \kappa(m) \zeta_8^{e(m, a, b)} \det(\gamma\tau + \delta)^{1/2} e^{\pi i z^T (\gamma\tau + \delta)^{-1} \gamma z} \theta_{a',b'}(z,\tau)
 
@@ -1350,7 +1350,7 @@ We use the following notation. Fix `k,j\geq 0`. A Siegel modular form of weight
 at most `j`) such that for any `\tau\in \mathbb{H}_g` and
 `m\in \mathrm{Sp}_4(\mathbb{Z})`, we have
 
-    .. math ::
+    .. math::
 
         f((\alpha\tau + \beta)(\gamma\tau + \delta)^{-1}) = \det(\gamma\tau +
         \delta)^k\cdot \mathrm{Sym}^j(\gamma\tau + \delta)(f(\tau)).
@@ -1359,7 +1359,7 @@ Here `\alpha,\beta,\gamma,\delta` are the `g\times g` blocks of `m`, and the
 notation `\mathrm{Sym}^j(r)` where `r = \bigl(\begin{smallmatrix} a & b\\ c &
 d\end{smallmatrix}\bigr)\in \mathrm{GL}_2(\mathbb{C})` stands for the map
 
-    .. math ::
+    .. math::
 
         P(X) \mapsto (b X + d)^j P\bigl(\tfrac{a X + c}{b X + d}\bigr).
 
@@ -1404,7 +1404,7 @@ modular forms and covariants.
     `h` of degrees `m` and `n`: considering `g` and `h` as homogeneous
     polynomials of degree `m` (resp. `n`) in `x_1,x_2`, this sets *res* to
 
-        .. math ::
+        .. math::
 
             (g,h)_k := \frac{(m-k)!(n-k)!}{m!n!}  \sum_{j=0}^{k} (-1)^{k-j} \binom{k}{j}
             \frac{\partial^k g}{\partial x_1^{k-j}\partial x_2^j}
@@ -1438,7 +1438,7 @@ modular forms and covariants.
 
     We use the formulas from §7.1 in [Str2014]_, with the following normalizations:
 
-        .. math ::
+        .. math::
 
             \psi_4 = h_4/4, \quad \psi_6 = h_6/4,\quad \chi_{10} = -2^{-12} h_{10},
             \quad \chi_{12} = 2^{-15}h_{12}.
@@ -1449,7 +1449,7 @@ modular forms and covariants.
     \tau_3\end{smallmatrix}\bigr)` and `q_j = \exp(2\pi i \tau_j)`, the Fourier
     expansions of these modular forms begin as follows:
 
-        .. math ::
+        .. math::
 
             \begin{aligned} \psi_4(\tau) &= 1 + 240(q_1 + q_3) + \cdots\\
             \psi_6(\tau) &= 1 - 504(q_1 + q_3) + \cdots\\
@@ -1471,7 +1471,7 @@ modular forms and covariants.
     modular form of weight `\det^{35}\otimes \mathrm{Sym}^0` up to scalars, and is
     normalized as follows:
 
-        .. math ::
+        .. math::
 
             \chi_{35}(\tau) = q_1^2 q_3^2 (q_1 - q_3 )(q_2 - q_2^{-1}) + \cdots
 
@@ -1486,7 +1486,7 @@ modular forms and covariants.
     given values of *dth*, computed as in e.g.
     :func:`acb_theta_g2_jet_naive_1`. We have by [CFG2017]_:
 
-        .. math ::
+        .. math::
 
             \chi_{3,6}(\tau) = \frac{1}{64\pi^6} \prod_{(a,b) \text{ odd}}
             \left(\frac{\partial \theta_{a,b}}{\partial z_1}(0,\tau) x_1 +

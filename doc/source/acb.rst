@@ -936,13 +936,13 @@ Gamma function
 
     Computes the logarithmic sine function defined by
 
-    .. math ::
+    .. math::
 
         S(z) = \log(\pi) - \log \Gamma(z) + \log \Gamma(1-z)
 
     which is equal to
 
-    .. math ::
+    .. math::
 
         S(z) = \int_{1/2}^z \pi \cot(\pi t) dt
 
@@ -950,7 +950,7 @@ Gamma function
     if `0 < \arg(z) \le \pi` and through the lower half plane
     if `-\pi < \arg(z) \le 0`. Equivalently,
 
-    .. math ::
+    .. math::
 
         S(z) = \log(\sin(\pi(z-n))) \mp n \pi i, \quad n = \lfloor \operatorname{re}(z) \rfloor
 
@@ -983,7 +983,7 @@ Gamma function
     The generalization to other values of *s* is due to
     Espinosa and Moll [EM2004]_:
 
-    .. math ::
+    .. math::
 
         \psi(s,z) = \frac{\zeta'(s+1,z) + (\gamma + \psi(-s)) \zeta(s+1,z)}{\Gamma(-s)}
 
@@ -997,7 +997,7 @@ Gamma function
     in analogy with the logarithmic gamma function. The functional
     equation
 
-    .. math ::
+    .. math::
 
         \log G(z+1) = \log \Gamma(z) + \log G(z).
 
@@ -1007,7 +1007,7 @@ Gamma function
     relation `G(z+1) = \Gamma(z) G(z)` together with the initial value
     `G(1) = 1`. For general *z*, we use the formula
 
-    .. math ::
+    .. math::
 
         \log G(z) = (z-1) \log \Gamma(z) - \zeta'(-1,z) + \zeta'(-1).
 

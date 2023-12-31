@@ -250,7 +250,7 @@ Special matrices
     There are many different conventions for defining DCT matrices; here,
     we use the normalized "DCT-II" transform matrix
 
-    .. math ::
+    .. math::
 
         A_{j,k} = \sqrt{\frac{2}{n}} \cos\left(\frac{\pi j}{n} \left(k+\frac{1}{2}\right)\right)
 
@@ -708,7 +708,7 @@ Special functions
 
     Sets *B* to the exponential of the matrix *A*, defined by the Taylor series
 
-    .. math ::
+    .. math::
 
         \exp(A) = \sum_{k=0}^{\infty} \frac{A^k}{k!}.
 
@@ -718,7 +718,7 @@ Special functions
     The elementwise error when truncating the Taylor series after *N*
     terms is bounded by the error in the infinity norm, for which we have
 
-    .. math ::
+    .. math::
         \left\|\exp(2^{-r}A) - \sum_{k=0}^{N-1}
             \frac{\left(2^{-r} A\right)^k}{k!} \right\|_{\infty} =
         \left\|\sum_{k=N}^{\infty} \frac{\left(2^{-r} A\right)^k}{k!}\right\|_{\infty} \le

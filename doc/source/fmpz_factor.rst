@@ -226,11 +226,11 @@ Factoring of ``fmpz`` integers using ECM
     Sets the point `(x : z)` to two times `(x_0 : z_0)` modulo `n` according
     to the formula
 
-    .. math ::
+    .. math::
 
         x = (x_0 + z_0)^2 \cdot (x_0 - z_0)^2 \mod n,
 
-    .. math ::
+    .. math::
 
         z = 4 x_0 z_0 \left((x_0 - z_0)^2 + 4a_{24}x_0z_0\right) \mod n.
 
@@ -243,7 +243,7 @@ Factoring of ``fmpz`` integers using ECM
     Sets the point `(x : z)` to the sum of `(x_1 : z_1)` and `(x_2 : z_2)`
     modulo `n`, given the difference `(x_0 : z_0)` according to the formula
 
-    .. math ::
+    .. math::
 
         x = 4z_0(x_1x_2 - z_1z_2)^2 \mod n, \\ z = 4x_0(x_2z_1 - x_1z_2)^2 \mod n.
 

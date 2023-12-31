@@ -238,7 +238,7 @@ Special matrices
     the matrix is extended periodically along the larger dimension).
     Here, we use the normalized DFT matrix
 
-    .. math ::
+    .. math::
 
         A_{j,k} = \frac{\omega^{jk}}{\sqrt{n}}, \quad \omega = e^{-2\pi i/n}.
 
@@ -577,7 +577,7 @@ Special functions
 
     Sets *B* to the exponential of the matrix *A*, defined by the Taylor series
 
-    .. math ::
+    .. math::
 
         \exp(A) = \sum_{k=0}^{\infty} \frac{A^k}{k!}.
 
