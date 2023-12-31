@@ -1117,8 +1117,27 @@ void flint_mpn_mul_2x2i(mp_ptr res, mp_srcptr u, mp_srcptr v)
 #define MUL_STATS 0
 
 #if MUL_STATS
-slong mulncount[11] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-slong mulncounter = 0;
+
+slong mulcount[17][17] = { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                           { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                           { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                           { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                           { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                           { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                           { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                           { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                           { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                           { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                           { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                           { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                           { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                           { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                           { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                           { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                           { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, };
+
+slong mulcounter = 0;
+
 #define T mulncount
 #endif
 
@@ -1130,10 +1149,22 @@ flint_mpn_mul_n(mp_ptr z, mp_srcptr x, mp_srcptr y, mp_size_t n)
     FLINT_ASSERT(z != y);
 
 #if MUL_STATS
-    mulncounter++;
-    mulncount[FLINT_MIN(n, 10)]++;
-    if (mulncounter % 1000 == 0)
-        flint_printf("mul n %wd [%wd %wd %wd %wd %wd %wd %wd %wd %wd %wd]\n", n, T[1], T[2], T[3], T[4], T[5], T[6], T[7], T[8], T[9], T[10]);
+    mulcounter++;
+    mulcount[FLINT_MIN(n, 16)][FLINT_MIN(n,16)]++;
+    if (mulcounter % 10000 == 0)
+    {
+        flint_printf("count %wd\n", mulcounter);
+        int i, j;
+        for (i = 1; i <= 16; i++)
+        {
+            for (j = 1; j <= i; j++)
+            {
+                flint_printf("%7wd ", mulcount[i][j]);
+            }
+            flint_printf("\n");
+        }
+
+    }
 #endif
 
     /* Experimentally inline n = 2. Whether this is beneficial depends on the
@@ -1159,10 +1190,21 @@ flint_mpn_mul(mp_ptr z, mp_srcptr x, mp_size_t xn, mp_srcptr y, mp_size_t yn)
     FLINT_ASSERT(z != y);
 
 #if MUL_STATS
-    mulncounter++;
-    mulncount[FLINT_MIN(xn, 10)]++;
-    if (mulncounter % 10000 == 0)
-        flint_printf("mul n %wd [%wd %wd %wd %wd %wd %wd %wd %wd %wd %wd]\n", xn, T[1], T[2], T[3], T[4], T[5], T[6], T[7], T[8], T[9], T[10]);
+    mulcounter++;
+    mulcount[FLINT_MIN(xn, 16)][FLINT_MIN(yn, 16)]++;
+    if (mulcounter % 10000 == 0)
+    {
+        flint_printf("count %wd\n", mulcounter);
+        int i, j;
+        for (i = 1; i <= 16; i++)
+        {
+            for (j = 1; j <= i; j++)
+            {
+                flint_printf("%7wd ", mulcount[i][j]);
+            }
+            flint_printf("\n");
+        }
+    }
 #endif
 
     /* Experimentally inline n = 2. Whether this is beneficial depends on the
