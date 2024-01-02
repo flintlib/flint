@@ -778,6 +778,11 @@ internals."])])
         [AC_MSG_ERROR([`mpn_div_q' was not found in the GMP library. It is needed to enable GMP
 internals.])])
 
+    AC_SEARCH_LIBS([__gmpn_mul_basecase],[gmp],
+        [],
+        [AC_MSG_ERROR([`mpn_mul_basecase' was not found in the GMP library. It is needed to enable GMP
+internals.])])
+
     AC_SEARCH_LIBS([__gmpn_modexact_1_odd],[gmp],
         [AC_DEFINE(FLINT_HAVE_MPN_MODEXACT_1_ODD,1,Define if system has mpn_modexact_1_odd)])
 fi
