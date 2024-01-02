@@ -58,7 +58,7 @@ flint_mpn_get_d(mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp);
         add_ssaaaa(r2, r1, r2, r1, 0, t1);                  \
     } while (0)
 
-/* todo; */
+/* todo: use optimal code here */
 #define FLINT_MPN_MUL_2X2(r3, r2, r1, r0, a1, a0, b1, b0)   \
     do {                                                    \
         mp_limb_t t1, t2, t3;                               \

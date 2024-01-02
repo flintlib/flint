@@ -32,29 +32,6 @@ int main()
 
         for (n = 1; n <= MAXN; n++)
         {
-            double t1, t2, __;
-
-            flint_printf("n = %wd    ", n);
-
-            TIMEIT_START
-#if 0
-            __gmpn_mul_basecase(r, x, n, y, n);
-#else
-            mpn_mul_n(r, x, y, n);
-#endif
-            TIMEIT_STOP_VALUES(__, t1)
-            TIMEIT_START
-            flint_mpn_mul_n(s, x, y, n);
-            TIMEIT_STOP_VALUES(__, t2)
-
-            flint_printf("%g    %g   %.3fx\n", t1, t2, t1 / t2);
-
-            if (mpn_cmp(r, s, 2 * n) != 0)
-                flint_abort();
-        }
-
-        for (n = 1; n <= MAXN; n++)
-        {
             flint_printf("n = %wd    ", n);
 
             for (m = 1; m <= n; m++)
@@ -75,6 +52,29 @@ int main()
             }
 
             flint_printf("\n");
+        }
+
+        for (n = 1; n <= MAXN; n++)
+        {
+            double t1, t2, __;
+
+            flint_printf("n = %wd    ", n);
+
+            TIMEIT_START
+#if 0
+            __gmpn_mul_basecase(r, x, n, y, n);
+#else
+            mpn_mul_n(r, x, y, n);
+#endif
+            TIMEIT_STOP_VALUES(__, t1)
+            TIMEIT_START
+            flint_mpn_mul_n(s, x, y, n);
+            TIMEIT_STOP_VALUES(__, t2)
+
+            flint_printf("%g    %g   %.3fx\n", t1, t2, t1 / t2);
+
+            if (mpn_cmp(r, s, 2 * n) != 0)
+                flint_abort();
         }
     }
 
