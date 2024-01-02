@@ -261,7 +261,7 @@ _arb_sin_cos(arb_t zsin, arb_t zcos, const arf_t x, const mag_t xrad, slong prec
         }
         else
         {
-            mpn_sqr(ta, sina, wn);
+            flint_mpn_sqr(ta, sina, wn);
             /* 1 - s^2 (negation guaranteed to have borrow) */
             mpn_neg(ta, ta, 2 * wn);
             /* top limb of ta must be nonzero, so no need to normalize
@@ -320,15 +320,15 @@ _arb_sin_cos(arb_t zsin, arb_t zcos, const arf_t x, const mag_t xrad, slong prec
 
         if ((want_sin && !swapsincos) || (want_cos && swapsincos))
         {
-            mpn_mul_n(ta, sina, cosc, wn);
-            mpn_mul_n(tb, cosa, sinc, wn);
+            flint_mpn_mul_n(ta, sina, cosc, wn);
+            flint_mpn_mul_n(tb, cosa, sinc, wn);
             mpn_add_n(w, ta + wn, tb + wn, wn);
         }
 
         if ((want_cos && !swapsincos) || (want_sin && swapsincos))
         {
-            mpn_mul_n(ta, cosa, cosc, wn);
-            mpn_mul_n(tb, sina, sinc, wn);
+            flint_mpn_mul_n(ta, cosa, cosc, wn);
+            flint_mpn_mul_n(tb, sina, sinc, wn);
             mpn_sub_n(ta, ta + wn, tb + wn, wn);
         }
 
@@ -346,27 +346,27 @@ _arb_sin_cos(arb_t zsin, arb_t zcos, const arf_t x, const mag_t xrad, slong prec
         sind = arb_sin_cos_tab22[2 * p2] + ARB_SIN_COS_TAB2_LIMBS - wn;
         cosd = arb_sin_cos_tab22[2 * p2 + 1] + ARB_SIN_COS_TAB2_LIMBS - wn;
 
-        mpn_mul_n(ta, sinc, cosd, wn);
-        mpn_mul_n(tb, cosc, sind, wn);
+        flint_mpn_mul_n(ta, sinc, cosd, wn);
+        flint_mpn_mul_n(tb, cosc, sind, wn);
         mpn_add_n(sinb, ta + wn, tb + wn, wn);
 
-        mpn_mul_n(ta, cosc, cosd, wn);
-        mpn_mul_n(tb, sinc, sind, wn);
+        flint_mpn_mul_n(ta, cosc, cosd, wn);
+        flint_mpn_mul_n(tb, sinc, sind, wn);
         mpn_sub_n(cosb, ta + wn, tb + wn, wn);
 
         error2 = 2 * 1 + 2 * 1 + 3;
 
         if ((want_sin && !swapsincos) || (want_cos && swapsincos))
         {
-            mpn_mul_n(ta, sina, cosb, wn);
-            mpn_mul_n(tb, cosa, sinb, wn);
+            flint_mpn_mul_n(ta, sina, cosb, wn);
+            flint_mpn_mul_n(tb, cosa, sinb, wn);
             mpn_add_n(w, ta + wn, tb + wn, wn);
         }
 
         if ((want_cos && !swapsincos) || (want_sin && swapsincos))
         {
-            mpn_mul_n(ta, cosa, cosb, wn);
-            mpn_mul_n(tb, sina, sinb, wn);
+            flint_mpn_mul_n(ta, cosa, cosb, wn);
+            flint_mpn_mul_n(tb, sina, sinb, wn);
             mpn_sub_n(ta, ta + wn, tb + wn, wn);
         }
 

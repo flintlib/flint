@@ -109,9 +109,9 @@ arf_div(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec, arf_rnd_t rnd)
            tptr[sn + xn] is guaranteed to be zero in that case since the
            approximate quotient cannot be larger than the true quotient. */
         if (zn >= yn)
-            mpn_mul(tptr, zptr, zn, yptr, yn);
+            flint_mpn_mul(tptr, zptr, zn, yptr, yn);
         else
-            mpn_mul(tptr, yptr, yn, zptr, zn);
+            flint_mpn_mul(tptr, yptr, yn, zptr, zn);
 
         /* The quotient is not exact. Perturbing the approximate quotient
            and rounding gives the correct the result. */

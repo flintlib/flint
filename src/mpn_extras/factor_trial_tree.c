@@ -91,7 +91,7 @@ _factor_trial_tree_init(void)
             /* multiply entries in pairs */
 	        for (i = 0, j = 0; j < k/2; j++, i+=(2*n))
             {
-                mpn_mul_n(_factor_trial_tree[m + 1] + i,
+                flint_mpn_mul_n(_factor_trial_tree[m + 1] + i,
 		        _factor_trial_tree[m] + i,
 		        _factor_trial_tree[m] + i + n, n);
 	        }

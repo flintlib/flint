@@ -20,6 +20,8 @@
 #include "t-fmms1.c"
 #include "t-gcd_full.c"
 #include "t-mod_preinvn.c"
+#include "t-mul.c"
+#include "t-mul_n.c"
 #include "t-mulmod_2expp1.c"
 #include "t-mulmod_preinv1.c"
 #include "t-mulmod_preinvn.c"
@@ -36,6 +38,8 @@ test_struct tests[] =
     TEST_FUNCTION(flint_mpn_fmms1),
     TEST_FUNCTION(flint_mpn_gcd_full),
     TEST_FUNCTION(flint_mpn_mod_preinvn),
+    TEST_FUNCTION(flint_mpn_mul),
+    TEST_FUNCTION(flint_mpn_mul_n),
     TEST_FUNCTION(flint_mpn_mulmod_2expp1),
     TEST_FUNCTION(flint_mpn_mulmod_preinv1),
     TEST_FUNCTION(flint_mpn_mulmod_preinvn),

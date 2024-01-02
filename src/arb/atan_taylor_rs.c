@@ -10,6 +10,7 @@
 */
 
 #include "arb.h"
+#include "mpn_extras.h"
 
 /* See verify_taylor.py for code to generate tables and
    proof of correctness */
@@ -583,10 +584,10 @@ void _arb_atan_taylor_rs(mp_ptr y, mp_limb_t * error,
 
             /* higher index ---> */
             /* t = |          | x^2 (lo) | x^2 (hi) | */
-            mpn_sqr(t + xn, x, xn);
+            flint_mpn_sqr(t + xn, x, xn);
 
             /* t = | x^3 (lo) | x^3 (hi) | x^2 (hi) | */
-            mpn_mul_n(t, t + 2 * xn, x, xn);
+            flint_mpn_mul_n(t, t + 2 * xn, x, xn);
 
             /* y = x - x^3 / 3 */
             mpn_divrem_1(t, 0, t + xn, xn, 3);
@@ -618,13 +619,13 @@ void _arb_atan_taylor_rs(mp_ptr y, mp_limb_t * error,
 #define XPOW_WRITE(__k) (xpow + (m - (__k)) * xn)
 #define XPOW_READ(__k) (xpow + (m - (__k) + 1) * xn)
 
-        mpn_sqr(XPOW_WRITE(1), x, xn);
-        mpn_sqr(XPOW_WRITE(2), XPOW_READ(1), xn);
+        flint_mpn_sqr(XPOW_WRITE(1), x, xn);
+        flint_mpn_sqr(XPOW_WRITE(2), XPOW_READ(1), xn);
 
         for (k = 4; k <= m; k += 2)
         {
-            mpn_mul_n(XPOW_WRITE(k - 1), XPOW_READ(k / 2), XPOW_READ(k / 2 - 1), xn);
-            mpn_sqr(XPOW_WRITE(k), XPOW_READ(k / 2), xn);
+            flint_mpn_mul_n(XPOW_WRITE(k - 1), XPOW_READ(k / 2), XPOW_READ(k / 2 - 1), xn);
+            flint_mpn_sqr(XPOW_WRITE(k), XPOW_READ(k / 2), xn);
         }
 
         flint_mpn_zero(s, xn + 1);
@@ -672,7 +673,7 @@ void _arb_atan_taylor_rs(mp_ptr y, mp_limb_t * error,
                 /* Outer polynomial evaluation: multiply by (x^2)^m */
                 if (k != 0)
                 {
-                    mpn_mul(t, s, xn + 1, XPOW_READ(m), xn);
+                    flint_mpn_mul(t, s, xn + 1, XPOW_READ(m), xn);
                     flint_mpn_copyi(s, t + xn, xn + 1);
                 }
 
@@ -691,7 +692,7 @@ void _arb_atan_taylor_rs(mp_ptr y, mp_limb_t * error,
 
         /* finally divide by denominator and multiply by x */
         mpn_divrem_1(s, 0, s, xn + 1, odd_reciprocal_tab_denom[0]);
-        mpn_mul(t, s, xn + 1, x, xn);
+        flint_mpn_mul(t, s, xn + 1, x, xn);
         flint_mpn_copyi(y, t + xn, xn);
 
         /* error bound (ulp) */
