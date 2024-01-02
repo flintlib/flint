@@ -11,7 +11,7 @@
 
 #include "mpn_extras.h"
 
-mp_limb_t __gmpn_mul_basecase(mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t);
+void __gmpn_mul_basecase(mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t);
 
 /* Some helper macros that eventually should be public. */
 
@@ -857,7 +857,8 @@ flint_mpn_mul(mp_ptr z, mp_srcptr x, mp_size_t xn, mp_srcptr y, mp_size_t yn)
     }
     else if (xn <= 14)
     {
-        return __gmpn_mul_basecase(z, x, xn, y, yn);
+        __gmpn_mul_basecase(z, x, xn, y, yn);
+        return z[xn + yn - 1];
     }
     else if (yn < FLINT_MPN_MUL_THRESHOLD)
         return mpn_mul(z, x, xn, y, yn);
