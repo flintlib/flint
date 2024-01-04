@@ -1,3 +1,9 @@
+# Workflow to push documentation to website
+#
+# To work on the wheel building infrastructure on a fork, comment out:
+#
+# if: github.repository == 'flintlib/flint'
+
 name: Deploy
 
 on:
@@ -14,9 +20,7 @@ jobs:
   ##############################################################################
   build-doc:
     name: Push documentation to website
-
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
         with:
@@ -55,6 +59,7 @@ jobs:
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
 
       - name: "Push documentation to server"
+        if: github.repository == 'flintlib/flint'
         run: |
           cd doc/build
           ssh -t wbhart@opal6.opalstack.com 'mkdir ~/tmp'
