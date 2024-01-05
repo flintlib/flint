@@ -15,7 +15,7 @@ on:
       - v[1-9]+.[0-9]+.[0-9]    # allow v1.2.3
       - v[1-9]+.[0-9]+.[0-9]-*  # allow v1.2.3-beta3 etc.
     branches:
-      - trunk
+      - main
       - flint-*
   schedule:
     # Every day at 3:33 AM UTC
@@ -23,8 +23,8 @@ on:
 
 concurrency:
   # group by workflow and ref; the last slightly strange component ensures that for pull
-  # requests, we limit to 1 concurrent job, but for the trunk branch we don't
-  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/trunk' || github.run_number }}
+  # requests, we limit to 1 concurrent job, but for the main branch we don't
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/main' || github.run_number }}
   # Cancel intermediate builds, but only if it is a pull request build.
   cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 
