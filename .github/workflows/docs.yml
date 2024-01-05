@@ -1,3 +1,9 @@
+# Workflow to push documentation to website
+#
+# To work on the wheel building infrastructure on a fork, comment out:
+#
+# if: github.repository == 'flintlib/flint'
+
 name: Deploy
 
 on:
@@ -14,9 +20,8 @@ jobs:
   ##############################################################################
   build-doc:
     name: Push documentation to website
-
+    if: github.repository == 'flintlib/flint'
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
         with:
