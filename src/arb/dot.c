@@ -709,7 +709,7 @@ arb_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong xstep,
                 xtop = x1;
                 ytop = y1;
 
-                flint_mpn_mul_2x2(u3, u2, u1, u0, x1, x0, y1, y0);
+                FLINT_MPN_MUL_2X2(u3, u2, u1, u0, x1, x0, y1, y0);
 
                 u0 = (u0 != 0) || ((u1 << (FLINT_BITS - shift)) != 0);
                 u1 = (u1 >> shift) | (u2 << (FLINT_BITS - shift));
@@ -754,7 +754,7 @@ arb_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong xstep,
                     y1 = ARF_NOPTR_D(ym)[1];
                     xtop = x1;
                     ytop = y1;
-                    flint_mpn_mul_2x2(u3, u2, u1, u0, x1, x0, y1, y0);
+                    FLINT_MPN_MUL_2X2(u3, u2, u1, u0, x1, x0, y1, y0);
                 }
                 else if (xn == 1)
                 {
@@ -763,7 +763,7 @@ arb_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong xstep,
                     y1 = ARF_NOPTR_D(ym)[1];
                     xtop = x0;
                     ytop = y1;
-                    flint_mpn_mul_2x1(u3, u2, u1, y1, y0, x0);
+                    FLINT_MPN_MUL_2X1(u3, u2, u1, y1, y0, x0);
                     u0 = 0;
                 }
                 else
@@ -773,7 +773,7 @@ arb_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong xstep,
                     y0 = ARF_NOPTR_D(ym)[0];
                     xtop = x1;
                     ytop = y0;
-                    flint_mpn_mul_2x1(u3, u2, u1, x1, x0, y0);
+                    FLINT_MPN_MUL_2X1(u3, u2, u1, x1, x0, y0);
                     u0 = 0;
                 }
 

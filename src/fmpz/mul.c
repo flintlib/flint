@@ -61,7 +61,7 @@ flint_mpz_mul(mpz_ptr z, mpz_srcptr x, mpz_srcptr y)
         if (xn == 2)
         {
             mp_limb_t r3, r2, r1, r0;
-            flint_mpn_mul_2x2(r3, r2, r1, r0, xd[1], xd[0], yd[1], yd[0]);
+            FLINT_MPN_MUL_2X2(r3, r2, r1, r0, xd[1], xd[0], yd[1], yd[0]);
             zd[0] = r0;
             zd[1] = r1;
             zd[2] = r2;
@@ -93,7 +93,7 @@ flint_mpz_mul(mpz_ptr z, mpz_srcptr x, mpz_srcptr y)
         if (xn == 2)
         {
             mp_limb_t r2, r1, r0;
-            flint_mpn_mul_2x1(r2, r1, r0, xd[1], xd[0], yd[0]);
+            FLINT_MPN_MUL_2X1(r2, r1, r0, xd[1], xd[0], yd[0]);
             zd[0] = r0;
             zd[1] = r1;
             zd[2] = top = r2;

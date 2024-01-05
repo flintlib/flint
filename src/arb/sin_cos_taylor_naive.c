@@ -10,6 +10,7 @@
 */
 
 #include "arb.h"
+#include "mpn_extras.h"
 
 void
 _arb_sin_cos_taylor_naive(mp_ptr ysin, mp_ptr ycos, mp_limb_t * error,
@@ -56,7 +57,7 @@ _arb_sin_cos_taylor_naive(mp_ptr ysin, mp_ptr ycos, mp_limb_t * error,
             s2[nn] -= mpn_sub_n(s2, s2, t, nn);
 
         /* t = t * x / (k + 1) */
-        mpn_mul_n(u, t, v, nn);
+        flint_mpn_mul_n(u, t, v, nn);
         flint_mpn_copyi(t, u + nn, nn);
         mpn_divrem_1(t, 0, t, nn, k + 1);
     }

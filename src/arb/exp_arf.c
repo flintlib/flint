@@ -11,6 +11,7 @@
 
 #include "arb.h"
 #include "thread_support.h"
+#include "mpn_extras.h"
 
 #define TMP_ALLOC_LIMBS(__n) TMP_ALLOC((__n) * sizeof(mp_limb_t))
 
@@ -307,7 +308,7 @@ arb_exp_arf(arb_t z, const arf_t x, slong prec, int minus_one, slong maglim)
             error += UWORD(1) << (wprounded-wp);
 
             /* 1 + sinh^2, with wn + 1 limbs */
-            mpn_sqr(u, t, wn);
+            flint_mpn_sqr(u, t, wn);
             u[2 * wn] = 1;
 
             /* cosh, with wn + 1 limbs */
@@ -339,7 +340,7 @@ arb_exp_arf(arb_t z, const arf_t x, slong prec, int minus_one, slong maglim)
                 mpn_rshift(t, t, wn + 1, 1);
                 error = (error >> 1) + 2;
 
-                mpn_mul_n(u, t, arb_exp_tab1[p1] + ARB_EXP_TAB1_LIMBS - wn, wn);
+                flint_mpn_mul_n(u, t, arb_exp_tab1[p1] + ARB_EXP_TAB1_LIMBS - wn, wn);
 
                 /* (t + err1 * ulp) * (u + err2 * ulp) + 1ulp = t*u +
                    (err1*u + err2*t + t*u*ulp + 1) * ulp
@@ -366,13 +367,13 @@ arb_exp_arf(arb_t z, const arf_t x, slong prec, int minus_one, slong maglim)
                 mpn_rshift(t, t, wn + 1, 1);
                 error = (error >> 1) + 2;
 
-                mpn_mul_n(u, arb_exp_tab21[p1] + ARB_EXP_TAB2_LIMBS - wn,
+                flint_mpn_mul_n(u, arb_exp_tab21[p1] + ARB_EXP_TAB2_LIMBS - wn,
                              arb_exp_tab22[p2] + ARB_EXP_TAB2_LIMBS - wn, wn);
 
                 /* error of w <= 4 ulp */
                 flint_mpn_copyi(w, u + wn, wn);  /* todo: avoid with better alloc */
 
-                mpn_mul_n(u, t, w, wn);
+                flint_mpn_mul_n(u, t, w, wn);
 
                 /* (t + err1 * ulp) * (w + 4 * ulp) + 1ulp = t*u +
                    (err1*w + 4*t + t*w*ulp + 1) * ulp

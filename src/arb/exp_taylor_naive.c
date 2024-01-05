@@ -10,6 +10,7 @@
 */
 
 #include "arb.h"
+#include "mpn_extras.h"
 
 void
 _arb_exp_taylor_naive(mp_ptr y, mp_limb_t * error,
@@ -45,7 +46,7 @@ _arb_exp_taylor_naive(mp_ptr y, mp_limb_t * error,
         s[nn] += mpn_add_n(s, s, t, nn);
 
         /* t = t * x / (k + 1) */
-        mpn_mul_n(u, t, v, nn);
+        flint_mpn_mul_n(u, t, v, nn);
         flint_mpn_copyi(t, u + nn, nn);
         mpn_divrem_1(t, 0, t, nn, k + 1);
     }

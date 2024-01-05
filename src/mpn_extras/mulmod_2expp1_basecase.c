@@ -31,9 +31,9 @@ flint_mpn_mulmod_2expp1_internal(mp_ptr xp, mp_srcptr yp, mp_srcptr zp,
     flint_mpn_mul_large(tp, yp, n, zp, n);
 #else
     if (yp == zp)
-        mpn_sqr(tp, yp, n);
+        flint_mpn_sqr(tp, yp, n);
     else
-        mpn_mul_n(tp, yp, zp, n);
+        flint_mpn_mul_n(tp, yp, zp, n);
 #endif
 
     if (k == 0)
