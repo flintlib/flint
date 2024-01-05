@@ -12,8 +12,8 @@ Building FLINT requires:
 * MPFR, at least version 4.1.0 (https://mpfr.org/)
 * Either of the following build systems:
 
-  * GNU Make together with GNU Autotools
-  * CMake
+  * GNU Make together with GNU Autotools (Recommended)
+  * CMake (Recommended only for Windows users)
 
 On a typical Linux or Unix-like system where Autotools is available (see below
 for instructions using CMake), FLINT can be built and installed as follows:
@@ -195,10 +195,15 @@ It is also possible to override the default CC, AR and CFLAGS used by FLINT by
 passing ``CC=full_path_to_compiler``, etc., to FLINT's configure.
 
 
-CMake build
+CMake build for Windows users
 -------------------------------------------------------------------------------
 
-If you wish to install FLINT with CMake, simply type:
+For Windows users, we also provide a way to install FLINT using CMake. Note,
+however, that FLINT's CMake script only exists to provide Windows users a way to
+install FLINT. For UNIX-type systems, please use Autotools along with GNU Make
+instead, as described at the top of this page.
+
+If you wish to install FLINT with CMake on Windows, simply type:
 
 .. code-block:: bash
 
