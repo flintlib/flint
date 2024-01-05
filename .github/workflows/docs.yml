@@ -9,7 +9,7 @@ name: Deploy
 on:
   push:
     branches:
-      - trunk
+      - main
     paths:
       - 'doc/**'
       - '.github/workflows/docs.yml'
