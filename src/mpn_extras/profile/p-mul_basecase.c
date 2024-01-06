@@ -14,8 +14,13 @@
 #include "profiler.h"
 
 #if !FLINT_HAVE_ADX
-# error ADX must be activated
-#endif
+
+int main(void)
+{
+    return 0;
+}
+
+#else
 
 #define mpn_mul_basecase __gmpn_mul_basecase
 void mpn_mul_basecase(mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t);
@@ -65,3 +70,5 @@ int main(void)
 
     return 0;
 }
+
+#endif
