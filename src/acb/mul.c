@@ -253,4 +253,3 @@ acb_mul(acb_t z, const acb_t x, const acb_t y, slong prec)
 #undef br
 #undef cr
 #undef dr
-

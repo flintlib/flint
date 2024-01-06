@@ -118,4 +118,3 @@ for (l = 0; l < FLINT_MIN(16, len); l++)
 
     return 0;
 }
-

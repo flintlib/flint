@@ -46,4 +46,3 @@ acb_hypgeom_rising_ui_jet(acb_ptr res, const acb_t x, ulong n, slong len, slong 
         }
     }
 }
-

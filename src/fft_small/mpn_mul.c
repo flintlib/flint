@@ -1660,4 +1660,3 @@ flint_printf("      +: %wd\n", timer_overall->wall);
     flint_free(worker_struct_buffer);
     flint_give_back_threads(P.handles, P.nhandles);
 }
-

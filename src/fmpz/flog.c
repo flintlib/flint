@@ -62,4 +62,3 @@ fmpz_flog(const fmpz_t n, const fmpz_t b)
     fmpz_clear(t);
     return r;
 }
-

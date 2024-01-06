@@ -416,4 +416,3 @@ ca_get_fmpz(fmpz_t res, const ca_t x, ca_ctx_t ctx)
         return success;
     }
 }
-

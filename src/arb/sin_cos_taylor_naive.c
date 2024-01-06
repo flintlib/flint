@@ -81,4 +81,3 @@ _arb_sin_cos_taylor_naive(mp_ptr ysin, mp_ptr ycos, mp_limb_t * error,
     flint_free(u);
     flint_free(v);
 }
-

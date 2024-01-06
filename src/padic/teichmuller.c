@@ -106,4 +106,3 @@ void padic_teichmuller(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         padic_val(rop) = 0;
     }
 }
-

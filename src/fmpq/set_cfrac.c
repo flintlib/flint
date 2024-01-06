@@ -44,4 +44,3 @@ void fmpq_set_cfrac(fmpq_t x, const fmpz * c, slong n)
     _fmpz_mat22_clear(M);
     FLINT_ASSERT(n <= 0 || fmpq_is_canonical(x));
 }
-

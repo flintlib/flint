@@ -117,4 +117,3 @@ acb_div(acb_t z, const acb_t x, const acb_t y, slong prec)
 #undef c
 #undef d
 }
-

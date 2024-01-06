@@ -1415,4 +1415,3 @@ void fmpz_mpoly_remainder_strongtest(const fmpz_mpoly_t r, const fmpz_mpoly_t g,
 #endif
 
 #endif
-

@@ -17,4 +17,3 @@ arb_set_ui(arb_t x, ulong y)
     arf_set_ui(arb_midref(x), y);
     mag_zero(arb_radref(x));
 }
-

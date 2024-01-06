@@ -59,4 +59,3 @@ void _padic_lifts_pows(fmpz *pow, const slong *a, slong n, const fmpz_t p)
         fmpz_clear(t);
     }
 }
-

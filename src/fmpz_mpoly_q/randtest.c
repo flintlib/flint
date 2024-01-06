@@ -39,4 +39,3 @@ fmpz_mpoly_q_randtest(fmpz_mpoly_q_t res, flint_rand_t state,
 
     fmpz_mpoly_q_canonicalise(res, ctx);
 }
-

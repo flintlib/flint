@@ -78,4 +78,3 @@ slong fmpz_mod_mat_nullspace(fmpz_mod_mat_t X, const fmpz_mod_mat_t A)
 
     return nullity;
 }
-

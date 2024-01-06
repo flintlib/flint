@@ -203,4 +203,3 @@ int fmpz_mod_mpoly_factor_squarefree(
 {
     return fmpz_mod_mpoly_factor_separable(f, A, ctx, 0);
 }
-

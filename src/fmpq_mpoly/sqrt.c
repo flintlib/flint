@@ -42,4 +42,3 @@ fail:
     fmpz_clear(r);
     return 0;
 }
-

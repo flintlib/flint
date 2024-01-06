@@ -223,4 +223,3 @@ fmpz_poly_inv_series_basecase(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
     _fmpz_poly_set_length(Qinv, n);
     _fmpz_poly_normalise(Qinv);
 }
-

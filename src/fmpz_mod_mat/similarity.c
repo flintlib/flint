@@ -58,4 +58,3 @@ void fmpz_mod_mat_similarity(fmpz_mod_mat_t A, slong r, fmpz_t d)
 
     fmpz_mod_ctx_clear(ctx);
 }
-

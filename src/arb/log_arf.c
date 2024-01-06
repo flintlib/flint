@@ -392,4 +392,3 @@ arb_log_arf(arb_t z, const arf_t x, slong prec)
         TMP_END;
     }
 }
-

@@ -122,4 +122,3 @@ qqbar_guess(qqbar_t res, const acb_t z, slong max_deg, slong max_bits, int flags
 
     return found;
 }
-

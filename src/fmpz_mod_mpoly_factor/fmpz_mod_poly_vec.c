@@ -114,4 +114,3 @@ void _fmpz_mod_poly_vec_mul_fmpz_mod(
     for (i = 0; i < Alen; i++)
         fmpz_mod_poly_scalar_mul_fmpz(A + i, A + i, g, ctx);
 }
-

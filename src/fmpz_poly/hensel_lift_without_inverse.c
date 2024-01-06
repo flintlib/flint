@@ -96,4 +96,3 @@ void fmpz_poly_hensel_lift_without_inverse(fmpz_poly_t Gout, fmpz_poly_t Hout,
         f->coeffs, f->length, g->coeffs, g->length, h->coeffs, h->length,
         a->coeffs, a->length, b->coeffs, b->length, p, p1);
 }
-

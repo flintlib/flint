@@ -87,4 +87,3 @@ acb_dirichlet_zeta_rs_bound(mag_t err, const acb_t s, slong K)
     mag_clear(c3);
     arb_clear(a);
 }
-

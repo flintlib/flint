@@ -163,4 +163,3 @@ fmpq_poly_inv_series_newton(fmpq_poly_t Qinv, const fmpq_poly_t Q, slong n)
     _fmpq_poly_set_length(Qinv, n);
     _fmpq_poly_normalise(Qinv);
 }
-

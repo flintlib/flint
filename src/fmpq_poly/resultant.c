@@ -180,4 +180,3 @@ void fmpq_poly_resultant(fmpq_t r, const fmpq_poly_t f, const fmpq_poly_t g)
         }
     }
 }
-

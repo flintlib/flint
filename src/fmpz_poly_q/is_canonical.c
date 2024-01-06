@@ -29,4 +29,3 @@ int fmpz_poly_q_is_canonical(const fmpz_poly_q_t op)
     fmpz_poly_clear(t);
     return ans;
 }
-

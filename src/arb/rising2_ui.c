@@ -36,4 +36,3 @@ arb_rising2_ui(arb_t u, arb_t v, const arb_t x, ulong n, slong prec)
         *v = tmp[1];
     }
 }
-

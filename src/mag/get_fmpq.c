@@ -19,4 +19,3 @@ mag_get_fmpq(fmpq_t y, const mag_t x)
     arf_init_set_mag_shallow(t, x);
     arf_get_fmpq(y, t);
 }
-

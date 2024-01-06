@@ -18,4 +18,3 @@ void _fmpz_mod_vec_neg(fmpz * A, const fmpz * B, slong len,
     for (len--; len >= 0; len--)
         fmpz_mod_neg(A + len, B + len, ctx);
 }
-

@@ -17,4 +17,3 @@ ca_set_fmpq(ca_t x, const fmpq_t v, ca_ctx_t ctx)
     _ca_make_fmpq(x, ctx);
     fmpq_set(CA_FMPQ(x), v);
 }
-

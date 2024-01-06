@@ -19,4 +19,3 @@ qqbar_set_si(qqbar_t res, slong x)
     qqbar_set_fmpz(res, t);
     fmpz_clear(t);
 }
-

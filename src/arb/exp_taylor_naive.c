@@ -59,4 +59,3 @@ _arb_exp_taylor_naive(mp_ptr y, mp_limb_t * error,
     flint_free(u);
     flint_free(v);
 }
-

@@ -32,4 +32,3 @@ ulong _thread_pool_find_work_2(
 
     return a + (y - a*alpha)/beta;
 }
-

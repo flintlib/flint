@@ -68,4 +68,3 @@ void _fmpz_mpoly_compose_mat(fmpz_mpoly_t A,
     fmpz_mpoly_combine_like_terms(A, ctxAC);
     return;
 }
-

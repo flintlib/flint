@@ -108,4 +108,3 @@ void padic_inv(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         padic_val(rop) = - padic_val(op);
     }
 }
-

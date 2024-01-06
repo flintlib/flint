@@ -25,4 +25,3 @@ acb_poly_set_coeff_si(acb_poly_t poly, slong n, slong x)
     acb_set_si(poly->coeffs + n, x);
     _acb_poly_normalise(poly);
 }
-

@@ -59,4 +59,3 @@ arb_set_interval_arf(arb_t x, const arf_t a, const arf_t b, slong prec)
 
     arf_clear(t);
 }
-

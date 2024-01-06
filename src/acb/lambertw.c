@@ -850,4 +850,3 @@ acb_lambertw(acb_t res, const acb_t z, const fmpz_t k, int flags, slong prec)
 
     acb_clear(ez1);
 }
-

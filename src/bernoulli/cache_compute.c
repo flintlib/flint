@@ -65,4 +65,3 @@ bernoulli_cache_compute(slong n)
         bernoulli_cache_num = new_num;
     }
 }
-

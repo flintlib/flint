@@ -19,4 +19,3 @@ acb_get_unique_fmpz(fmpz_t z, const acb_t x)
 
     return arb_get_unique_fmpz(z, acb_realref(x));
 }
-

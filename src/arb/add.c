@@ -77,4 +77,3 @@ arb_add_fmpz_2exp(arb_t z, const arb_t x, const fmpz_t man, const fmpz_t exp, sl
     else
         mag_set(arb_radref(z), arb_radref(x));
 }
-

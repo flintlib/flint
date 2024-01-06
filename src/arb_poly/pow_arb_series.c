@@ -160,4 +160,3 @@ arb_poly_pow_arb_series(arb_poly_t h,
         _arb_poly_normalise(h);
     }
 }
-

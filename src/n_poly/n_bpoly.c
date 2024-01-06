@@ -153,4 +153,3 @@ void n_bpoly_one(n_bpoly_t A)
     A->length = 1;
     n_poly_one(A->coeffs + 0);
 }
-

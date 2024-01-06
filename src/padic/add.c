@@ -102,4 +102,3 @@ void padic_add(padic_t rop, const padic_t op1, const padic_t op2,
         }
     }
 }
-

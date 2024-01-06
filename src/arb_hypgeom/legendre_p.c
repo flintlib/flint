@@ -41,5 +41,3 @@ arb_hypgeom_legendre_p(arb_t res, const arb_t n, const arb_t m, const arb_t z, i
         acb_clear(v);
     }
 }
-
-

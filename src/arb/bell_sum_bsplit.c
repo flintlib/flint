@@ -109,4 +109,3 @@ arb_bell_sum_bsplit(arb_t res, const fmpz_t n,
         arb_clear(Q);
     }
 }
-

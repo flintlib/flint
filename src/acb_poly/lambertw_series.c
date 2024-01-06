@@ -93,4 +93,3 @@ acb_poly_lambertw_series(acb_poly_t res,
     _acb_poly_set_length(res, len);
     _acb_poly_normalise(res);
 }
-

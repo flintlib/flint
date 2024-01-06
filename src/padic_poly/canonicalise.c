@@ -37,4 +37,3 @@ void padic_poly_canonicalise(padic_poly_t poly, const fmpz_t p)
 {
     _padic_poly_canonicalise(poly->coeffs, &(poly->val), poly->length, p);
 }
-

@@ -45,4 +45,3 @@ int z_kronecker(slong a, slong n)
 
     return _n_jacobi_unsigned(ua, un, r);
 }
-

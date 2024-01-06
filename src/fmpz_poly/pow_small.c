@@ -47,4 +47,3 @@ _fmpz_poly_pow_small(fmpz * res, const fmpz * poly, slong len, ulong e)
         }
     }
 }
-

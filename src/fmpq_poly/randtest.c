@@ -103,4 +103,3 @@ void fmpq_poly_randtest_not_zero(fmpq_poly_t f, flint_rand_t state,
     if (f->length == 0)
         fmpq_poly_set_ui(f, 1);
 }
-

@@ -197,4 +197,3 @@ int fmpz_sqrtmod(fmpz_t b, const fmpz_t a, const fmpz_t p)
         return ans;
     }
 }
-

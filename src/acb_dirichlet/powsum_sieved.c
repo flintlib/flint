@@ -116,4 +116,3 @@ acb_dirichlet_powsum_sieved(acb_ptr z, const acb_t s, ulong n, slong len, slong 
     arb_clear(v);
     arb_clear(w);
 }
-

@@ -41,4 +41,3 @@ void _fq_vec_dot(fq_t res, const fq_struct * vec1,
 
    fmpz_poly_clear(t);
 }
-

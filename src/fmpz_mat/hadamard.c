@@ -256,4 +256,3 @@ fmpz_mat_hadamard(fmpz_mat_t A)
 
     return 1;
 }
-

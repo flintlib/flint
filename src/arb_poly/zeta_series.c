@@ -170,4 +170,3 @@ arb_poly_zeta_series(arb_poly_t res, const arb_poly_t f, const arb_t a, int defl
     _arb_poly_set_length(res, n);
     _arb_poly_normalise(res);
 }
-

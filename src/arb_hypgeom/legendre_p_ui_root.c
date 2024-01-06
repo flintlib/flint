@@ -238,4 +238,3 @@ arb_hypgeom_legendre_p_ui_root(arb_t res, arb_t weight, ulong n, ulong k, slong 
     mag_clear(pb);
     mag_clear(p2b);
 }
-

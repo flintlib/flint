@@ -107,4 +107,3 @@ void acb_modular_transform(acb_t w, const psl2z_t g, const acb_t z, slong prec)
 #undef x
 #undef y
 }
-

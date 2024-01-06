@@ -110,4 +110,3 @@ acb_hypgeom_chebyshev_u(acb_t res, const acb_t n, const acb_t z, slong prec)
     acb_clear(t);
     acb_clear(u);
 }
-

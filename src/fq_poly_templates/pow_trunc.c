@@ -94,4 +94,3 @@ TEMPLATE(T, poly_pow_trunc) (TEMPLATE(T, poly_t) res,
 }
 
 #endif
-

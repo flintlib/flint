@@ -269,4 +269,3 @@ acb_hypgeom_pfq_series_direct(acb_poly_t res,
     arb_poly_clear(C);
     arb_poly_clear(T);
 }
-

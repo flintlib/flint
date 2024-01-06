@@ -161,4 +161,3 @@ fmpq_mat_can_solve_dixon(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B)
 
     return success;
 }
-

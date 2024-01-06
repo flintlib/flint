@@ -55,4 +55,3 @@ acb_dirichlet_hurwitz(acb_t res, const acb_t s, const acb_t a, slong prec)
 
     _acb_poly_zeta_cpx_series(res, s, a, 0, 1, prec);
 }
-

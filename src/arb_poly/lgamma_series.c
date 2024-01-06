@@ -118,4 +118,3 @@ arb_poly_lgamma_series(arb_poly_t res, const arb_poly_t f, slong n, slong prec)
     _arb_poly_set_length(res, n);
     _arb_poly_normalise(res);
 }
-

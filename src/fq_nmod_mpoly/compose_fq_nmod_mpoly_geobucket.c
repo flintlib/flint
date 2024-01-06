@@ -58,4 +58,3 @@ int fq_nmod_mpoly_compose_fq_nmod_mpoly_geobucket(fq_nmod_mpoly_t A,
 
     return success;
 }
-

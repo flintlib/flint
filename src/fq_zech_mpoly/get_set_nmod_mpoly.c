@@ -78,4 +78,3 @@ void _fq_zech_mpoly_set_nmod_mpoly(
     for (i = 0; i < B->length; i++)
         fq_zech_set_ui(A->coeffs + i, B->coeffs[i], Actx->fqctx);
 }
-

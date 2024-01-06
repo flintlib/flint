@@ -14,4 +14,3 @@
 #include "flint.h"
 #include "ulong_extras.h"
 #include "mpoly.h"
-

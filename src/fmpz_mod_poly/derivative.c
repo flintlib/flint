@@ -49,4 +49,3 @@ void fmpz_mod_poly_derivative(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly,
         _fmpz_mod_poly_normalise(res);
     }
 }
-

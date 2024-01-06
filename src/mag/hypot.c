@@ -32,4 +32,3 @@ mag_hypot(mag_t z, const mag_t x, const mag_t y)
         mag_clear(t);
     }
 }
-

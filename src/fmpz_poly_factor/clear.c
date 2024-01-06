@@ -32,4 +32,3 @@ void fmpz_poly_factor_clear(fmpz_poly_factor_t fac)
 
     fmpz_clear(&(fac->c));
 }
-

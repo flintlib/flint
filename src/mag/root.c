@@ -55,4 +55,3 @@ mag_root(mag_t y, const mag_t x, ulong n)
         fmpz_clear(f);
     }
 }
-

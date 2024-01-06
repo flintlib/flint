@@ -36,4 +36,3 @@ acb_rising2_ui(acb_t u, acb_t v, const acb_t x, ulong n, slong prec)
         *v = tmp[1];
     }
 }
-

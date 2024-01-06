@@ -26,4 +26,3 @@ void fmpz_mod_mat_solve_triu(fmpz_mod_mat_t X, const fmpz_mod_mat_t U,
         fmpz_mod_mat_solve_triu_recursive(X, U, B, unit);
     }
 }
-

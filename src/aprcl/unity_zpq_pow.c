@@ -68,4 +68,3 @@ unity_zpq_pow_ui(unity_zpq f, const unity_zpq g, ulong pow)
 
     fmpz_clear(p);
 }
-

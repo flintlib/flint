@@ -104,4 +104,3 @@ arb_mat_solve_tril(arb_mat_t X, const arb_mat_t L,
     else
         arb_mat_solve_tril_recursive(X, L, B, unit, prec);
 }
-

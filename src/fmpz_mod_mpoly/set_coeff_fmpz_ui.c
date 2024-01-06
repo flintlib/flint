@@ -48,4 +48,3 @@ void fmpz_mod_mpoly_set_coeff_si_ui(fmpz_mod_mpoly_t poly,
     fmpz_mod_mpoly_set_coeff_fmpz_ui(poly, C, exp, ctx);
     fmpz_clear(C);
 }
-

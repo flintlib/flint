@@ -19,4 +19,3 @@ arb_zeta_ui_vec_even(arb_ptr x, ulong start, slong num, slong prec)
     for (i = 0; i < num; i++)
         arb_zeta_ui(x + i, start + 2 * i, prec);
 }
-

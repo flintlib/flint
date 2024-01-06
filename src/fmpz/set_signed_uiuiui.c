@@ -44,4 +44,3 @@ fmpz_set_signed_uiuiui(fmpz_t r, ulong hi, ulong mid, ulong lo)
         z->_mp_size = negate ? -3 : 3;
     }
 }
-

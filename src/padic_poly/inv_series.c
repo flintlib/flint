@@ -137,4 +137,3 @@ void padic_poly_inv_series(padic_poly_t Qinv, const padic_poly_t Q, slong n,
     if (Qalloc)
         flint_free(Qcopy);
 }
-

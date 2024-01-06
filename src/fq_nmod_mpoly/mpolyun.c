@@ -817,4 +817,3 @@ void fq_nmod_mpolyu_cvtfrom_mpolyun(
     }
     A->length = B->length;
 }
-

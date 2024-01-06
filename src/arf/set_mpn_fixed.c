@@ -38,4 +38,3 @@ _arf_set_mpn_fixed(arf_t z, mp_srcptr xp, mp_size_t xn,
         return inexact;
     }
 }
-

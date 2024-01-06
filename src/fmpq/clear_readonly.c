@@ -16,4 +16,3 @@ void fmpq_clear_readonly(fmpq_t f)
     fmpz_clear_readonly(fmpq_numref(f));
     fmpz_clear_readonly(fmpq_denref(f));
 }
-

@@ -12,4 +12,3 @@
 #define NMOD_VEC_INLINES_C
 
 #include "nmod_vec.h"
-

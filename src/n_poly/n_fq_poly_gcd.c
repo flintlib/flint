@@ -227,4 +227,3 @@ void n_fq_poly_gcd(
     fq_nmod_poly_clear(b, ctx);
 #endif
 }
-

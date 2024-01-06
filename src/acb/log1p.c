@@ -74,4 +74,3 @@ acb_log1p(acb_t r, const acb_t z, slong prec)
         acb_log(r, r, prec);
     }
 }
-

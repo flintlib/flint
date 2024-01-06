@@ -133,4 +133,3 @@ nmod_poly_resultant_euclidean(const nmod_poly_t f, const nmod_poly_t g)
 
     return r;
 }
-

@@ -86,5 +86,3 @@ void mpoly_monomials_shift_right_ffmpz(ulong * Aexps, flint_bitcnt_t Abits,
 
     TMP_END;
 }
-
-

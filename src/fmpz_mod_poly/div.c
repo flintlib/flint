@@ -84,4 +84,3 @@ void fmpz_mod_poly_div(fmpz_mod_poly_t Q, const fmpz_mod_poly_t A, const fmpz_mo
 
     fmpz_clear(invB);
 }
-

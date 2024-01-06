@@ -228,4 +228,3 @@ void fmpq_poly_xgcd(fmpq_poly_t G, fmpq_poly_t S, fmpq_poly_t T,
        }
     }
 }
-

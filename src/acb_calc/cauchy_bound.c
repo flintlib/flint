@@ -106,4 +106,3 @@ acb_calc_cauchy_bound(arb_t bound, acb_calc_func_t func, void * param,
     arb_clear(st);
     arb_clear(ct);
 }
-

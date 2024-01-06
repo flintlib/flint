@@ -39,4 +39,3 @@ arb_hurwitz_zeta(arb_t res, const arb_t s, const arb_t z, slong prec)
         arb_indeterminate(res);
     }
 }
-

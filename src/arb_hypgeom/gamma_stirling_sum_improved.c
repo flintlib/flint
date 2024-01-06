@@ -425,4 +425,3 @@ arb_hypgeom_gamma_stirling_sum_improved(arb_t s, const arb_t z, slong N, slong K
     mag_clear(zinv_mag);
     mag_clear(err);
 }
-

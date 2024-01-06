@@ -71,4 +71,3 @@ fmpz_poly_bound_roots(fmpz_t bound, const fmpz_poly_t poly)
 {
     _fmpz_poly_bound_roots(bound, poly->coeffs, poly->length);
 }
-

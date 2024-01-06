@@ -72,4 +72,3 @@ void padic_poly_set_coeff_padic(padic_poly_t poly, slong n, const padic_t x,
 
     _padic_poly_normalise(poly);
 }
-

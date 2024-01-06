@@ -47,4 +47,3 @@ partitions_leading_fmpz(arb_t res, const fmpz_t n, slong prec)
     arb_clear(t);
     fmpz_clear(c);
 }
-

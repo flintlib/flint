@@ -85,4 +85,3 @@ void qadic_ctx_init_conway(qadic_ctx_t ctx,
 
     flint_throw(FLINT_ERROR, "Exception (qadic_ctx_init_conway).  The polynomial for (p,d) = (%wd,%wd) is not present in the database.\n", *p, d);
 }
-

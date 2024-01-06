@@ -30,4 +30,3 @@ void fmpz_mpoly_factor_clear(fmpz_mpoly_factor_t f, const fmpz_mpoly_ctx_t ctx)
 
     fmpz_clear(f->constant);
 }
-

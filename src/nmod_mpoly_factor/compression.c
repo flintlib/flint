@@ -105,4 +105,3 @@ void nmod_mpoly_compression_undo(
     nmod_mpoly_sort_terms(A, Actx);
     nmod_mpoly_make_monic(A, A, Actx);
 }
-

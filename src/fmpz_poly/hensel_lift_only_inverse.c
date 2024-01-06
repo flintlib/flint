@@ -110,4 +110,3 @@ void fmpz_poly_hensel_lift_only_inverse(fmpz_poly_t Aout, fmpz_poly_t Bout,
     _fmpz_poly_normalise(Aout);
     _fmpz_poly_normalise(Bout);
 }
-

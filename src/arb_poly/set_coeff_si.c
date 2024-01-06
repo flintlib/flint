@@ -25,4 +25,3 @@ arb_poly_set_coeff_si(arb_poly_t poly, slong n, slong x)
     arb_set_si(poly->coeffs + n, x);
     _arb_poly_normalise(poly);
 }
-

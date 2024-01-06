@@ -147,4 +147,3 @@ nmod_mat_det(const nmod_mat_t A)
 
     return det;
 }
-

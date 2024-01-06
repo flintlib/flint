@@ -129,4 +129,3 @@ mag_atan_lower(mag_t res, const mag_t x)
         mag_set_d_lower(res, t);
     }
 }
-

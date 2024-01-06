@@ -95,4 +95,3 @@ void fq_zech_mpoly_evaluate_all_ui(fq_zech_t eval, const fq_zech_mpoly_t A,
     _fq_zech_mpoly_eval_all_fq_zech(eval, A->coeffs, A->exps, A->length,
                                         A->bits, vals, ctx->minfo, ctx->fqctx);
 }
-

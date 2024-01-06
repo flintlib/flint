@@ -88,4 +88,3 @@ fq_nmod_poly_mul_classical(fq_nmod_poly_t rop, const fq_nmod_poly_t op1,
 
     _fq_nmod_poly_set_length(rop, len, ctx);
 }
-

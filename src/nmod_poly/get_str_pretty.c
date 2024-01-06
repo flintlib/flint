@@ -104,4 +104,3 @@ char * nmod_poly_get_str_pretty(const nmod_poly_t poly, const char * x)
 
     return buf;
 }
-

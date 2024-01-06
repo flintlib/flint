@@ -32,4 +32,3 @@ arb_fmpz_poly_evaluate_acb(acb_t res, const fmpz_poly_t f, const acb_t a, slong 
 {
     _arb_fmpz_poly_evaluate_acb(res, f->coeffs, f->length, a, prec);
 }
-

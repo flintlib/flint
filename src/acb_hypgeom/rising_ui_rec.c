@@ -52,4 +52,3 @@ acb_hypgeom_rising_ui_rec(acb_t res, const acb_t x, ulong n, slong prec)
             acb_hypgeom_rising_ui_rs(res, x, n, 0, prec);
     }
 }
-

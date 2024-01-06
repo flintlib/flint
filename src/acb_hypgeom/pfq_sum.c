@@ -65,4 +65,3 @@ acb_hypgeom_pfq_sum_invz(acb_t s, acb_t t, acb_srcptr a, slong p,
             acb_hypgeom_pfq_sum_forward(s, t, a, p, b, q, z, n, prec);
     }
 }
-

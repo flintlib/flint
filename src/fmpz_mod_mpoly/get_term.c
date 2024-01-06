@@ -25,4 +25,3 @@ void fmpz_mod_mpoly_get_term(fmpz_mod_mpoly_t M, const fmpz_mod_mpoly_t A,
     fmpz_set(M->coeffs + 0, A->coeffs + i);
     _fmpz_mod_mpoly_set_length(M, 1, ctx);
 }
-

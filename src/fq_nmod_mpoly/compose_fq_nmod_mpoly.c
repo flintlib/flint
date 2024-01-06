@@ -71,4 +71,3 @@ matrix_no_good:
 
     return fq_nmod_mpoly_compose_fq_nmod_mpoly_geobucket(A, B, C, ctxB, ctxAC);
 }
-

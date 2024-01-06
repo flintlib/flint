@@ -29,4 +29,3 @@ acb_elliptic_invariants(acb_t g2, acb_t g3, const acb_t tau, slong prec)
     acb_clear(t);
     acb_clear(t + 1);
 }
-

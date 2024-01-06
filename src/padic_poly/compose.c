@@ -197,4 +197,3 @@ void padic_poly_compose(padic_poly_t rop,
         _padic_poly_normalise(rop);
     }
 }
-

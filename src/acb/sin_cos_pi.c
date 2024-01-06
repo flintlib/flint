@@ -63,4 +63,3 @@ acb_sin_cos_pi(acb_t s, acb_t c, const acb_t z, slong prec)
 #undef a
 #undef b
 }
-

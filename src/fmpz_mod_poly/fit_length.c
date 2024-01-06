@@ -22,4 +22,3 @@ void _fmpz_mod_poly_fit_length(fmpz_mod_poly_t f, slong len)
         f->alloc = alloc;
     }
 }
-

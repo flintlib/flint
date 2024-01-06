@@ -290,4 +290,3 @@ void _acb_dirichlet_euler_product_real_ui(arb_t res, ulong s,
     arb_clear(t);
     arb_clear(u);
 }
-

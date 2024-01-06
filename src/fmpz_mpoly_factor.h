@@ -603,4 +603,3 @@ void fmpz_mpoly_compression_undo(fmpz_mpoly_t A, flint_bitcnt_t Abits,
 #endif
 
 #endif
-

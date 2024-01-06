@@ -78,4 +78,3 @@ acb_modular_theta_const_sum(acb_t theta2, acb_t theta3, acb_t theta4,
     mag_clear(qmag);
     mag_clear(err);
 }
-

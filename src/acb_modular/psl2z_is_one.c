@@ -17,4 +17,3 @@ psl2z_is_one(const psl2z_t g)
     return fmpz_is_one(&g->a) && fmpz_is_zero(&g->b) &&
             fmpz_is_zero(&g->c) && fmpz_is_one(&g->d);
 }
-

@@ -1546,4 +1546,3 @@ int arb_fpwrap_cdouble_lambertw(complex_double * res, complex_double x, slong br
 /* todo: elliptic invariants, roots */
 /* todo: eisenstein series */
 /* todo: dirichlet functions requiring characters */
-

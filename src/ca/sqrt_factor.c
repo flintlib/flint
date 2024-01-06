@@ -184,4 +184,3 @@ ca_sqrt_factor(ca_t res, const ca_t x, ulong flags, ca_ctx_t ctx)
         ca_clear(t, ctx);
     }
 }
-

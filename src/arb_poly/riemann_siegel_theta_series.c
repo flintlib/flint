@@ -81,4 +81,3 @@ arb_poly_riemann_siegel_theta_series(arb_poly_t res,
     _arb_poly_set_length(res, n);
     _arb_poly_normalise(res);
 }
-

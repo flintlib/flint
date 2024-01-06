@@ -1631,4 +1631,3 @@ void fq_nmod_mpoly_remainder_strongtest(const fq_nmod_mpoly_t r, const fq_nmod_m
 #endif
 
 #endif
-

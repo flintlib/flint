@@ -23,4 +23,3 @@ void fmpz_mat_mul_fmpz_vec(
     for (i = A->r - 1; i >= 0; i--)
         _fmpz_vec_dot(c + i, A->rows[i], b, len);
 }
-

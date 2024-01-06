@@ -33,4 +33,3 @@ arb_poly_add_si(arb_poly_t res, const arb_poly_t x, slong y, slong prec)
         _arb_poly_normalise(res);
     }
 }
-

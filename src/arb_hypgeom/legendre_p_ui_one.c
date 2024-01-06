@@ -187,4 +187,3 @@ arb_hypgeom_legendre_p_ui_one(arb_t res, arb_t res_prime, ulong n,
     mag_clear(t);
     mag_clear(err);
 }
-

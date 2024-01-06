@@ -48,4 +48,3 @@ void fmpq_poly_canonicalise(fmpq_poly_t poly)
     _fmpq_poly_normalise(poly);
     _fmpq_poly_canonicalise(poly->coeffs, poly->den, poly->length);
 }
-

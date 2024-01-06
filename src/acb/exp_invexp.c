@@ -54,4 +54,3 @@ acb_exp_invexp(acb_t r, acb_t s, const acb_t z, slong prec)
 #undef a
 #undef b
 }
-

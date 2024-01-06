@@ -93,4 +93,3 @@ qqbar_add_si(qqbar_t res, const qqbar_t x, slong y)
     qqbar_add(res, x, t);
     qqbar_clear(t);
 }
-

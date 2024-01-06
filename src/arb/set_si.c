@@ -17,4 +17,3 @@ arb_set_si(arb_t x, slong y)
     arf_set_si(arb_midref(x), y);
     mag_zero(arb_radref(x));
 }
-

@@ -175,4 +175,3 @@ void qadic_norm_resultant(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
         padic_val(rop) = d * op->val;
     }
 }
-

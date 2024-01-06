@@ -45,4 +45,3 @@ gr_mat_write(gr_stream_t out, const gr_mat_t mat, gr_ctx_t ctx)
     gr_stream_write(out, "]");
     return status;
 }
-

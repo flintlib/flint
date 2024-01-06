@@ -96,4 +96,3 @@ mag_polylog_tail(mag_t u, const mag_t z, slong sigma, ulong d, ulong N)
     mag_clear(UN);
     mag_clear(t);
 }
-

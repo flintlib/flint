@@ -243,4 +243,3 @@ void _nmod_mpoly_set_n_bpoly_var1_zero(
 
     TMP_END;
 }
-

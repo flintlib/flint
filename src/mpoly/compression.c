@@ -358,4 +358,3 @@ void mpoly_compression_set(
 
     flint_randclear(state);
 }
-

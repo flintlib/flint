@@ -150,4 +150,3 @@ arf_submul_mpz(arf_ptr z, arf_srcptr x, const mpz_t y, slong prec, arf_rnd_t rnd
 
     return inexact;
 }
-

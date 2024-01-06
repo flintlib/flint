@@ -22,4 +22,3 @@ arb_contains_fmpz(const arb_t x, const fmpz_t y)
     arf_clear(t);
     return ans;
 }
-

@@ -41,4 +41,3 @@ void padic_set_fmpq(padic_t rop, const fmpq_t op, const padic_ctx_t ctx)
         fmpq_clear(t);
     }
 }
-

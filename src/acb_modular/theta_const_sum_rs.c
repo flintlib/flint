@@ -208,4 +208,3 @@ acb_modular_theta_const_sum_rs(acb_t theta2, acb_t theta3, acb_t theta4,
     _acb_vec_clear(qpow, M);
     flint_free(tab);
 }
-

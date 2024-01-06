@@ -60,4 +60,3 @@ ca_field_print(const ca_field_t K, ca_ctx_t ctx)
         flint_printf("}");
     }
 }
-

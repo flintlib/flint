@@ -43,4 +43,3 @@ unity_zpq_coeff_add_ui(unity_zpq f, slong i, slong j, ulong x)
         fmpz_sub(f->polys[j]->coeffs + i, f->polys[j]->coeffs + i,
                                                  fmpz_mod_ctx_modulus(f->ctx));
 }
-

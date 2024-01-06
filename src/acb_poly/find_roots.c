@@ -159,4 +159,3 @@ acb_poly_find_roots(acb_ptr roots,
     return _acb_poly_find_roots(roots, poly->coeffs, initial,
                 len, maxiter, prec);
 }
-

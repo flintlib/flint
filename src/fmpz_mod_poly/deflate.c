@@ -33,4 +33,3 @@ void fmpz_mod_poly_deflate(fmpz_mod_poly_t result, const fmpz_mod_poly_t input,
 
     _fmpz_mod_poly_set_length(result, res_length);
 }
-

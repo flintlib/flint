@@ -134,4 +134,3 @@ acb_barnes_g(acb_t res, const acb_t z, slong prec)
     if (real)
         arb_zero(acb_imagref(res));
 }
-

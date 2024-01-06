@@ -601,4 +601,3 @@ arb_sin_cos_arf_bb(arb_t zsin, arb_t zcos, const arf_t x, slong prec)
     arb_clear(wsin);
     arb_clear(tmp1);
 }
-

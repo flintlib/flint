@@ -61,4 +61,3 @@ void fmpq_poly_scalar_mul_fmpz(fmpq_poly_t rop, const fmpq_poly_t op, const fmpz
     _fmpq_poly_scalar_mul_fmpz(rop->coeffs, rop->den,
                                op->coeffs, op->den, op->length, c);
 }
-

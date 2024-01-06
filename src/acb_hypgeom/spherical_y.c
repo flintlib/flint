@@ -77,4 +77,3 @@ acb_hypgeom_spherical_y(acb_t res, slong n, slong m,
     acb_clear(t);
     acb_clear(u);
 }
-

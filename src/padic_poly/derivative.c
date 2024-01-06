@@ -49,4 +49,3 @@ void padic_poly_derivative(padic_poly_t rop,
         _padic_poly_normalise(rop);
     }
 }
-

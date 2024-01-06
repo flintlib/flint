@@ -634,4 +634,3 @@ fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A, flint_rand_t state)
     _perm_clear(P);
     _perm_clear(pivots);
 }
-

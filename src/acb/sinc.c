@@ -94,4 +94,3 @@ acb_sinc(acb_t res, const acb_t z, slong prec)
         _acb_sinc_diffbound(res, z, prec);
     }
 }
-

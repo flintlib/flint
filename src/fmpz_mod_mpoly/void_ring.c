@@ -128,4 +128,3 @@ void mpoly_void_ring_init_fmpz_mod_mpoly_ctx(
     R->pow_fmpz = fmpz_mod_mpoly_void_pow_fmpz;
     R->length = fmpz_mod_mpoly_void_length;
 }
-

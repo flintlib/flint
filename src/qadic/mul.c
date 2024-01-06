@@ -81,4 +81,3 @@ void qadic_mul(qadic_t x, const qadic_t y, const qadic_t z,
             fmpz_clear(pN);
     }
 }
-

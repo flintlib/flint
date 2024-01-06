@@ -16,4 +16,3 @@ qqbar_denominator(fmpz_t res, const qqbar_t y)
 {
     fmpz_set(res, QQBAR_COEFFS(y) + qqbar_degree(y));
 }
-

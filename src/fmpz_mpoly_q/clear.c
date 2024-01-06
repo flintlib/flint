@@ -17,4 +17,3 @@ fmpz_mpoly_q_clear(fmpz_mpoly_q_t res, const fmpz_mpoly_ctx_t ctx)
     fmpz_mpoly_clear(fmpz_mpoly_q_numref(res), ctx);
     fmpz_mpoly_clear(fmpz_mpoly_q_denref(res), ctx);
 }
-

@@ -72,4 +72,3 @@ void padic_val_fac(fmpz_t rop, const fmpz_t op, const fmpz_t p)
     fmpz_clear(s);
     fmpz_clear(t);
 }
-

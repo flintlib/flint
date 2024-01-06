@@ -88,4 +88,3 @@ acb_theta_jet_compose(acb_ptr res, acb_srcptr v, const acb_mat_t N,
     fmpz_clear(m);
     fmpz_clear(p);
 }
-

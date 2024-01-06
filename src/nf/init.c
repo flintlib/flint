@@ -101,4 +101,3 @@ void nf_init(nf_t nf, const fmpq_poly_t pol)
 
    fmpz_mul_si(fmpq_poly_numref(nf->traces), pow, deg);
 }
-

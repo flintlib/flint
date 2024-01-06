@@ -35,4 +35,3 @@ ca_set_d(ca_t res, double x, ca_ctx_t ctx)
 
     /* no need to free t */
 }
-

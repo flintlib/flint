@@ -17,4 +17,3 @@ slong fmpz_mod_mat_lu(slong * P, fmpz_mod_mat_t A, int rank_check)
 {
     return fmpz_mod_mat_lu_recursive(P, A, rank_check);
 }
-

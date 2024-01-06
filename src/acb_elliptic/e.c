@@ -43,4 +43,3 @@ acb_elliptic_e(acb_t res, const acb_t m, slong prec)
         acb_clear(t + 1);
     }
 }
-

@@ -26,4 +26,3 @@ void fmpq_mpoly_get_term_exp_si(slong * exp, const fmpq_mpoly_t A,
     mpoly_get_monomial_si(exp, A->zpoly->exps + N*i, A->zpoly->bits,
                                                              ctx->zctx->minfo);
 }
-

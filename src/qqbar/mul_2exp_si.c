@@ -61,4 +61,3 @@ qqbar_mul_2exp_si(qqbar_t res, const qqbar_t x, slong exp)
     if (g != 0)
         fmpz_poly_scalar_tdiv_2exp(QQBAR_POLY(res), QQBAR_POLY(res), g);
 }
-

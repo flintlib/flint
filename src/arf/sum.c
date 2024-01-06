@@ -192,4 +192,3 @@ arf_sum(arf_t s, arf_srcptr terms, slong len, slong prec, arf_rnd_t rnd)
 
     return res;
 }
-

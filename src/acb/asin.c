@@ -45,4 +45,3 @@ acb_asin(acb_t res, const acb_t z, slong prec)
         acb_clear(t);
     }
 }
-

@@ -57,4 +57,3 @@ acb_hypgeom_2f1_corner(acb_t res, const acb_t a, const acb_t b,
     acb_clear(aa); acb_clear(bb); acb_clear(cc);
     acb_clear(z1); acb_clear(z2); acb_clear(f1); acb_clear(f2);
 }
-

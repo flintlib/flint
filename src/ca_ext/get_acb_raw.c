@@ -129,4 +129,3 @@ ca_ext_get_acb_raw(acb_t res, ca_ext_t x, slong prec, ca_ctx_t ctx)
     acb_set(CA_EXT_FUNC_ENCLOSURE(x), res);
     CA_EXT_FUNC_PREC(x) = prec;
 }
-

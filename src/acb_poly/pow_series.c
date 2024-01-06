@@ -103,4 +103,3 @@ acb_poly_pow_series(acb_poly_t h,
         _acb_poly_normalise(h);
     }
 }
-

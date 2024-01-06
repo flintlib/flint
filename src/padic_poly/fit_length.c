@@ -34,4 +34,3 @@ void padic_poly_fit_length(padic_poly_t poly, slong len)
         poly->alloc = len;
     }
 }
-

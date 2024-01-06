@@ -74,4 +74,3 @@ bernoulli_rev_init(bernoulli_rev_t iter, ulong nmax)
     arb_clear(x);
     arf_clear(u);
 }
-

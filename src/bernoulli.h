@@ -112,4 +112,3 @@ void bernoulli_fmpq_ui(fmpq_t b, ulong n);
 #endif
 
 #endif
-

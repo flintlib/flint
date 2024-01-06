@@ -41,4 +41,3 @@ arb_sech(arb_t res, const arb_t x, slong prec)
         arb_inv(res, res, prec);
     }
 }
-

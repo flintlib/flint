@@ -126,4 +126,3 @@ slong fmpz_remove(fmpz_t rop, const fmpz_t op, const fmpz_t f)
     fmpz_set(rop, op);
     return _fmpz_remove(rop, f, finv);
 }
-

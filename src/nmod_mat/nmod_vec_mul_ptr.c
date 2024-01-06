@@ -37,4 +37,3 @@ void nmod_mat_nmod_vec_mul_ptr(
 
     TMP_END;
 }
-

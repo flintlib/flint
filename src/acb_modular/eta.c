@@ -65,4 +65,3 @@ acb_modular_eta(acb_t z, const acb_t tau, slong prec)
     acb_clear(q);
     acb_clear(q24);
 }
-

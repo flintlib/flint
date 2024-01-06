@@ -126,4 +126,3 @@ arb_poly_swinnerton_dyer_ui(arb_poly_t poly, ulong n, slong prec)
     _arb_poly_set_length(poly, N + 1);
     _arb_poly_normalise(poly);
 }
-

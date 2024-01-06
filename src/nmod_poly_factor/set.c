@@ -41,4 +41,3 @@ void nmod_poly_factor_set(nmod_poly_factor_t res, const nmod_poly_factor_t fac)
         }
     }
 }
-

@@ -73,4 +73,3 @@ acb_hypgeom_legendre_p_uiui_rec(acb_t res, ulong n, ulong m, const acb_t z, slon
     acb_clear(u);
     acb_clear(v);
 }
-

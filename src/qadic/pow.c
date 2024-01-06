@@ -180,4 +180,3 @@ void qadic_pow(qadic_t x, const qadic_t y, const fmpz_t e, const qadic_ctx_t ctx
         fmpz_clear(val);
     }
 }
-

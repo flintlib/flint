@@ -23,4 +23,3 @@ acb_poly_erf_series(acb_poly_t g, const acb_poly_t h, slong n, slong prec)
 {
     acb_hypgeom_erf_series(g, h, n, prec);
 }
-

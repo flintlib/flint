@@ -85,4 +85,3 @@ void nmod_mpoly_set_polyu1n(
 
     FLINT_ASSERT(nmod_mpoly_is_canonical(B, ctx));
 }
-

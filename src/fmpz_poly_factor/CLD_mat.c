@@ -135,4 +135,3 @@ slong _fmpz_poly_factor_CLD_mat(fmpz_mat_t res, const fmpz_poly_t f,
 
    return lo_n + hi_n;
 }
-

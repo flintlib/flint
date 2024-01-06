@@ -129,4 +129,3 @@ void fmpz_mod_poly_powmod_linear_fmpz_preinv(
     _fmpz_mod_poly_set_length(res, trunc);
     _fmpz_mod_poly_normalise(res);
 }
-

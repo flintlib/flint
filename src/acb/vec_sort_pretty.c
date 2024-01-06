@@ -50,4 +50,3 @@ void _acb_vec_sort_pretty(acb_ptr vec, slong len)
 {
     qsort(vec, len, sizeof(acb_struct), (__compar_fn_t) acb_cmp_pretty);
 }
-

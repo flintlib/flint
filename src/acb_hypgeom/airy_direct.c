@@ -287,4 +287,3 @@ acb_hypgeom_airy_direct(acb_t ai, acb_t aip, acb_t bi, acb_t bip, const acb_t z,
     arb_clear(bi0);
     arb_clear(bi1);
 }
-

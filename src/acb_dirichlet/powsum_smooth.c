@@ -199,4 +199,3 @@ acb_dirichlet_powsum_smooth(acb_ptr res, const acb_t s, ulong N, slong d, slong 
     arb_clear(log_n);
     flint_free(smooth);
 }
-

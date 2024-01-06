@@ -36,4 +36,3 @@ void fmpz_get_signed_uiui(mp_limb_t * hi, mp_limb_t * lo, const fmpz_t x)
     *lo = r0;
     *hi = r1;
 }
-

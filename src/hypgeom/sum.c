@@ -355,4 +355,3 @@ arb_hypgeom_infsum(arb_t P, arb_t Q, hypgeom_t hyp, slong target_prec, slong pre
     mag_clear(z);
     mag_clear(err);
 }
-

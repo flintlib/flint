@@ -31,5 +31,3 @@ void mpoly_pack_monomials_tight(ulong * exp1, const ulong * exp2,
         exp1[i] = e;
    }
 }
-
-

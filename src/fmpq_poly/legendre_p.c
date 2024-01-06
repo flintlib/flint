@@ -83,4 +83,3 @@ fmpq_poly_legendre_p(fmpq_poly_t poly, ulong n)
     _fmpq_poly_legendre_p(poly->coeffs, poly->den, n);
     _fmpq_poly_set_length(poly, n + 1);
 }
-

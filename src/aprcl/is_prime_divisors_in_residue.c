@@ -44,4 +44,3 @@ aprcl_is_prime_divisors_in_residue(const fmpz_t n, const fmpz_t s, ulong r)
 
     return result;
 }
-

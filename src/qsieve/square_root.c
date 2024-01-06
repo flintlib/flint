@@ -75,4 +75,3 @@ void qsieve_square_root(fmpz_t X, fmpz_t Y, qs_t qs_inf,
 
    fmpz_clear(pow);
 }
-

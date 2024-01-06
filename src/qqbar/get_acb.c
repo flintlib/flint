@@ -91,4 +91,3 @@ qqbar_get_acb(acb_t res, const qqbar_t x, slong prec)
         fmpz_clear(n);
     }
 }
-

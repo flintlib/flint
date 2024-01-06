@@ -161,4 +161,3 @@ CALCIUM_INLINE ulong calcium_fmpz_hash(const fmpz_t x)
 #endif
 
 #endif
-

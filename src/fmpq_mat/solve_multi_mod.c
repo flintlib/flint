@@ -200,4 +200,3 @@ fmpq_mat_solve_multi_mod(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B)
 
     return success;
 }
-

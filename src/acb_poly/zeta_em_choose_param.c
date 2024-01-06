@@ -120,4 +120,3 @@ _acb_poly_zeta_em_choose_param(mag_t bound, ulong * N, ulong * M, const acb_t s,
     mag_clear(Cbound);
     mag_clear(tol);
 }
-

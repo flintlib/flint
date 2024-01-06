@@ -42,4 +42,3 @@ ulong _fmpz_poly_deflation(const fmpz* a, slong len)
 
     return deflation;
 }
-

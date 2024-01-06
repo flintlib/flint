@@ -99,4 +99,3 @@ void fmpz_poly_sqr_karatsuba(fmpz_poly_t res, const fmpz_poly_t poly)
 
     _fmpz_poly_set_length(res, len);
 }
-

@@ -70,4 +70,3 @@ void fq_zech_mpolyl_lead_coeff(
             (cexps + N*i)[j] = 0;
     }
 }
-

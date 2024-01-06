@@ -48,4 +48,3 @@ void fmpz_poly_factor_init2(fmpz_poly_factor_t fac, slong alloc)
     fac->num   = 0;
     fac->alloc = alloc;
 }
-

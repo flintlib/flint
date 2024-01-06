@@ -266,4 +266,3 @@ void _fmpz_vec_dot_ptr(fmpz_t c, const fmpz * vec1,
 #endif
 
 #endif
-

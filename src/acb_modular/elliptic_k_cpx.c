@@ -17,4 +17,3 @@ acb_modular_elliptic_k_cpx(acb_ptr w, const acb_t m, slong len, slong prec)
 {
     acb_elliptic_k_jet(w, m, len, prec);
 }
-

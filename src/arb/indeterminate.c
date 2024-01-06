@@ -17,4 +17,3 @@ arb_indeterminate(arb_t x)
     arf_nan(arb_midref(x));
     mag_inf(arb_radref(x));
 }
-

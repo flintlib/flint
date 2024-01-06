@@ -23,4 +23,3 @@ acb_poly_get_unique_fmpz_poly(fmpz_poly_t res, const acb_poly_t src)
     _fmpz_poly_normalise(res);
     return success;
 }
-

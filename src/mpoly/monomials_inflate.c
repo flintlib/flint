@@ -48,4 +48,3 @@ void mpoly_monomials_inflate(ulong * Aexps, flint_bitcnt_t Abits,
 
     TMP_END;
 }
-

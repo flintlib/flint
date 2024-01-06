@@ -75,4 +75,3 @@ _arf_set_round_ui(arf_t x, ulong v, int sgnbit, slong prec, arf_rnd_t rnd)
         return inexact;
     }
 }
-

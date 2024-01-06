@@ -53,4 +53,3 @@ arb_poly_shift_left(arb_poly_t res, const arb_poly_t poly, slong n)
     _arb_poly_shift_left(res->coeffs, poly->coeffs, poly->length, n);
     _arb_poly_set_length(res, poly->length + n);
 }
-

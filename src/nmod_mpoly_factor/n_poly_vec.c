@@ -105,4 +105,3 @@ void _n_poly_vec_mod_remove_content(
     _n_poly_vec_mod_content(g, A, Alen, ctx);
     _n_poly_vec_mod_divexact_poly(A, Alen, g, ctx);
 }
-

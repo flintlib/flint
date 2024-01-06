@@ -38,4 +38,3 @@ void fmpz_mpoly_factor_init2(fmpz_mpoly_factor_t f, slong alloc,
 
     f->num = 0;
 }
-

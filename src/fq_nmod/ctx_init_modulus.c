@@ -79,4 +79,3 @@ fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx, const nmod_poly_t modulus,
 
     ctx->is_conway = 0;
 }
-

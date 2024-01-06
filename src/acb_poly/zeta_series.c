@@ -127,4 +127,3 @@ acb_poly_zeta_series(acb_poly_t res, const acb_poly_t f, const acb_t a, int defl
     _acb_poly_set_length(res, n);
     _acb_poly_normalise(res);
 }
-

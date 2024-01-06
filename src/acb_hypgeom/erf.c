@@ -345,4 +345,3 @@ acb_hypgeom_erf(acb_t res, const acb_t z, slong prec)
         acb_hypgeom_erf_1f1(res, z, prec, wp, more_imaginary);
     }
 }
-

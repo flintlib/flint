@@ -26,4 +26,3 @@ acb_mat_conjugate(acb_mat_t B, const acb_mat_t A)
         for (j = 0; j < acb_mat_ncols(A); j++)
             acb_conj(acb_mat_entry(B, i, j), acb_mat_entry(A, i, j));
 }
-

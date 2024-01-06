@@ -28,4 +28,3 @@ unity_zpq_scalar_mul_ui(unity_zpq f, const unity_zpq g, ulong s)
     for (i = 0; i < f->p; i++)
         fmpz_mod_poly_scalar_mul_ui(f->polys[i], g->polys[i], s, f->ctx);
 }
-

@@ -39,4 +39,3 @@ arb_poly_overlaps(const arb_poly_t poly1, const arb_poly_t poly2)
     else
         return _arb_poly_overlaps(poly2->coeffs, len2, poly1->coeffs, len1);
 }
-

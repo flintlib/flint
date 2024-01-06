@@ -1274,4 +1274,3 @@ gcd_is_trivial:
 
     goto cleanup;
 }
-

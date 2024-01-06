@@ -62,4 +62,3 @@ slong arb_rel_one_accuracy_bits(const arb_t x)
         return arb_rel_accuracy_bits(x);
     }
 }
-

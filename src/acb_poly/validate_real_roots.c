@@ -126,4 +126,3 @@ acb_poly_validate_real_roots(acb_srcptr roots, const acb_poly_t poly, slong prec
 {
     return _acb_poly_validate_real_roots(roots, poly->coeffs, poly->length, prec);
 }
-

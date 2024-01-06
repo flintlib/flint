@@ -92,4 +92,3 @@ void nmod_mat_init_nullspace_tr(nmod_mat_t X, nmod_mat_t tmp)
 
     flint_free(p);
 }
-

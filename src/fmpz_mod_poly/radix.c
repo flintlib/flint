@@ -220,4 +220,3 @@ void fmpz_mod_poly_radix(fmpz_mod_poly_struct **B, const fmpz_mod_poly_t F,
         }
     }
 }
-

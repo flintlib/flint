@@ -261,4 +261,3 @@ acb_hypgeom_dilog_continuation(acb_t res, const acb_t a, const acb_t z, slong pr
     mag_clear(err);
     mag_clear(am);
 }
-

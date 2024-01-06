@@ -108,4 +108,3 @@ void fq_nmod_mpoly_evaluate_all_fq_nmod(fq_nmod_t ev, const fq_nmod_mpoly_t A,
     _fq_nmod_mpoly_eval_all_fq_nmod(ev, A->coeffs, A->exps, A->length, A->bits,
                                                  vals, ctx->minfo, ctx->fqctx);
 }
-

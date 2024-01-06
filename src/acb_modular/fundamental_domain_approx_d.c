@@ -100,4 +100,3 @@ acb_modular_fundamental_domain_approx_d(psl2z_t g,
     fmpz_set_d(&g->c, c);
     fmpz_set_d(&g->d, d);
 }
-

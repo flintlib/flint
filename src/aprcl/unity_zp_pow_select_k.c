@@ -34,4 +34,3 @@ _unity_zp_pow_select_k(const fmpz_t n)
     if (bits <= 56651) return 10;
     return 11;
 }
-

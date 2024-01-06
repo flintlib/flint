@@ -42,4 +42,3 @@ void fmpz_poly_factor_set(fmpz_poly_factor_t res, const fmpz_poly_factor_t fac)
         }
     }
 }
-

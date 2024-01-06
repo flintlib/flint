@@ -47,4 +47,3 @@ _arb_poly_div_root(arb_ptr Q, arb_t R, arb_srcptr A,
     arb_clear(r);
     arb_clear(t);
 }
-

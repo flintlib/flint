@@ -368,4 +368,3 @@ acb_hypgeom_coulomb(acb_t F, acb_t G, acb_t Hpos, acb_t Hneg, const acb_t l, con
     acb_clear(eta2);
     acb_clear(z2);
 }
-

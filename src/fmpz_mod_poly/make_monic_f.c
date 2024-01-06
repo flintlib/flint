@@ -34,4 +34,3 @@ void fmpz_mod_poly_make_monic_f(fmpz_t f, fmpz_mod_poly_t res,
 
     fmpz_clear(inv);
 }
-

@@ -18,4 +18,3 @@ fq_bit_pack(fmpz_t f, const fq_t op, flint_bitcnt_t bit_size,
 {
     fmpz_poly_bit_pack(f, op, bit_size);
 }
-

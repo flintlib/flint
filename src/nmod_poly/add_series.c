@@ -32,4 +32,3 @@ void nmod_poly_add_series(nmod_poly_t res,
     _nmod_poly_set_length(res, max);
     _nmod_poly_normalise(res);
 }
-

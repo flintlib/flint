@@ -158,4 +158,3 @@ acb_modular_eisenstein(acb_ptr r, const acb_t tau, slong len, slong prec)
     acb_clear(t4);
     acb_clear(q);
 }
-

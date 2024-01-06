@@ -179,4 +179,3 @@ fmpq_poly_sin_cos_series(fmpq_poly_t res1, fmpq_poly_t res2, const fmpq_poly_t p
     _fmpq_poly_set_length(res2, n);
     _fmpq_poly_normalise(res2);
 }
-

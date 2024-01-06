@@ -63,4 +63,3 @@ mag_log1p(mag_t z, const mag_t x)
         }
     }
 }
-

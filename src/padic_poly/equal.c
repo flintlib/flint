@@ -25,4 +25,3 @@ int padic_poly_equal(const padic_poly_t f, const padic_poly_t g)
 
     return _fmpz_vec_equal(f->coeffs, g->coeffs, f->length);
 }
-

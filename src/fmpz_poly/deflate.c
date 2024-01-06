@@ -35,4 +35,3 @@ fmpz_poly_deflate(fmpz_poly_t result, const fmpz_poly_t input, ulong deflation)
 
     result->length = res_length;
 }
-

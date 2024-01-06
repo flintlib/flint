@@ -47,4 +47,3 @@ mag_binpow_uiui(mag_t b, ulong m, ulong n)
 
     mag_clear(t);
 }
-

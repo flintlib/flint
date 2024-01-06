@@ -640,4 +640,3 @@ acb_agm1_cpx(acb_ptr m, const acb_t z, slong len, slong prec)
         _acb_vec_clear(w, len);
     }
 }
-

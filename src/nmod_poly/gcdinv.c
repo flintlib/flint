@@ -113,4 +113,3 @@ void nmod_poly_gcdinv(nmod_poly_t G, nmod_poly_t S,
         }
     }
 }
-

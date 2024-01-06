@@ -282,4 +282,3 @@ acb_mat_mul_reorder(acb_mat_t C, const acb_mat_t A, const acb_mat_t B, slong pre
         arb_mat_clear(W);
     }
 }
-

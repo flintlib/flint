@@ -44,4 +44,3 @@ void fq_default_ctx_modulus(fmpz_mod_poly_t p, const fq_default_ctx_t ctx)
         fmpz_mod_poly_set(p, ctx->ctx.fq->modulus, mod);
     }
 }
-

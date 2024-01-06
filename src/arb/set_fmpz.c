@@ -17,4 +17,3 @@ arb_set_fmpz(arb_t x, const fmpz_t y)
     arf_set_fmpz(arb_midref(x), y);
     mag_zero(arb_radref(x));
 }
-

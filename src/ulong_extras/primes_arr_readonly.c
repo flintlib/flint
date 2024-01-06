@@ -25,4 +25,3 @@ const mp_limb_t * n_primes_arr_readonly(ulong num_primes)
 
     return _flint_primes[m];
 }
-

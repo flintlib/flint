@@ -182,4 +182,3 @@ int padic_exp_rectangular(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         return 1;
     }
 }
-

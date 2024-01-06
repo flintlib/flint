@@ -144,4 +144,3 @@ void d_mat_qr(d_mat_t Q, d_mat_t R, const d_mat_t A);
 #endif
 
 #endif
-

@@ -21,4 +21,3 @@ void fmpq_mpoly_factor_init(fmpq_mpoly_factor_t f, const fmpq_mpoly_ctx_t ctx)
     f->num   = 0;
     f->alloc = 0;
 }
-

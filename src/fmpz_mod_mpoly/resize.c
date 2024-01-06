@@ -36,4 +36,3 @@ void fmpz_mod_mpoly_resize(fmpz_mod_mpoly_t A, slong new_length,
 
     A->length = new_length;
 }
-

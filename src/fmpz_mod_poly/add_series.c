@@ -34,4 +34,3 @@ void fmpz_mod_poly_add_series(fmpz_mod_poly_t res,
     _fmpz_mod_poly_set_length(res, max);
     _fmpz_mod_poly_normalise(res);
 }
-

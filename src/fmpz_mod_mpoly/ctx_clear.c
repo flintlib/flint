@@ -16,4 +16,3 @@ void fmpz_mod_mpoly_ctx_clear(fmpz_mod_mpoly_ctx_t ctx)
     mpoly_ctx_clear(ctx->minfo);
     fmpz_mod_ctx_clear(ctx->ffinfo);
 }
-

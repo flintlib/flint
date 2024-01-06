@@ -28,4 +28,3 @@ acb_real_sqrtpos(acb_t res, const acb_t z, int analytic, slong prec)
         acb_indeterminate(res);
     }
 }
-

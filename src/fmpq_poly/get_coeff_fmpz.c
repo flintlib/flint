@@ -20,4 +20,3 @@ void fmpq_poly_get_coeff_fmpz(fmpz_t x, const fmpq_poly_t poly, slong n)
     else
         fmpz_set(x, poly->coeffs + n);
 }
-

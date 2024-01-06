@@ -167,4 +167,3 @@ TEST_FUNCTION_START(acb_theta_naive_reduce, state)
 
     TEST_FUNCTION_END(state);
 }
-

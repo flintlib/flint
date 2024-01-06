@@ -80,4 +80,3 @@ void fq_default_ctx_init_modulus(fq_default_ctx_t ctx,
 {
     fq_default_ctx_init_modulus_type(ctx, modulus, mod_ctx, var, 0);
 }
-

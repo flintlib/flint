@@ -65,4 +65,3 @@ arb_div_2expm1_ui(arb_t y, const arb_t x, ulong n, slong prec)
         arb_clear(t);
     }
 }
-

@@ -95,4 +95,3 @@ acb_mat_sqr_classical(acb_mat_t B, const acb_mat_t A, slong prec)
     acb_clear(p);
     acb_clear(s);
 }
-

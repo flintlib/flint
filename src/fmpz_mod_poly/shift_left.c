@@ -53,4 +53,3 @@ void fmpz_mod_poly_shift_left(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly,
     _fmpz_mod_poly_shift_left(res->coeffs, poly->coeffs, poly->length, n);
     _fmpz_mod_poly_set_length(res, poly->length + n);
 }
-

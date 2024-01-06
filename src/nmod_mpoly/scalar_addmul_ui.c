@@ -208,4 +208,3 @@ void nmod_mpoly_scalar_addmul_ui(
 
     TMP_END;
 }
-

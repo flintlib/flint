@@ -58,4 +58,3 @@ arb_poly_pow_ui(arb_poly_t res,
         }
     }
 }
-

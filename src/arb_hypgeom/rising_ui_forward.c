@@ -80,4 +80,3 @@ arb_hypgeom_rising_ui_forward(arb_t res, const arb_t x, ulong n, slong prec)
 
     arb_clear(t);
 }
-

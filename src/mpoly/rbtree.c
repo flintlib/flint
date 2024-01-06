@@ -482,4 +482,3 @@ Case5:
 
     return T->data + dsize*rax;
 }
-

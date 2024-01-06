@@ -194,4 +194,3 @@ void fq_zech_mpoly_evaluate_one_fq_zech(
     else
         _fq_zech_mpoly_evaluate_one_fq_zech_mp(A, B, var, val, ctx);
 }
-

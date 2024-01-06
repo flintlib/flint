@@ -16,4 +16,3 @@ void fmpz_mod_mpoly_div(fmpz_mod_mpoly_t Q, const fmpz_mod_mpoly_t A,
 {
     fmpz_mod_mpoly_div_monagan_pearce(Q, A, B, ctx);
 }
-

@@ -40,4 +40,3 @@ void nmod_mpoly_factor_init2(nmod_mpoly_factor_t f, slong alloc,
 
     f->num = 0;
 }
-

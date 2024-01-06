@@ -31,4 +31,3 @@ void fq_zech_mpoly_factor_clear(
 
     fq_zech_clear(f->constant, ctx->fqctx);
 }
-

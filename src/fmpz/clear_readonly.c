@@ -23,4 +23,3 @@ void fmpz_clear_readonly(fmpz_t f)
         *f = WORD(0);
     }
 }
-

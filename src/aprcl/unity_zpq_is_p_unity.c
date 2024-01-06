@@ -53,4 +53,3 @@ unity_zpq_is_p_unity_generator(const unity_zpq f)
 
     return 0;
 }
-

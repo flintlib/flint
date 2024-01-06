@@ -137,4 +137,3 @@ void get_memory_usage(meminfo_t meminfo)
 
     fclose(file);
 }
-

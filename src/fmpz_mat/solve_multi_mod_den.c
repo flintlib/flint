@@ -64,4 +64,3 @@ fmpz_mat_solve_multi_mod_den(fmpz_mat_t X, fmpz_t den,
     fmpq_mat_clear(Q);
     return success;
 }
-

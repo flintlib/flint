@@ -341,4 +341,3 @@ arb_exp_arf_bb(arb_t z, const arf_t x, slong prec, int minus_one)
 
     arb_set_round(z, z, prec);
 }
-

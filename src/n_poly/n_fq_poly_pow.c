@@ -27,4 +27,3 @@ void n_fq_poly_pow(
     fq_nmod_poly_clear(a, ctx);
     fq_nmod_poly_clear(b, ctx);
 }
-

@@ -313,4 +313,3 @@ unity_zp_ar4(fmpz_t * t)
     fmpz_mul(t[28], t[2], t[2]);        /* d5 = a2 * a2  */
     fmpz_add(t[9], t[28], t[29]);       /* c4 = d5 + d6  */
 }
-

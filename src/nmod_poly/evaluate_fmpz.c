@@ -53,4 +53,3 @@ nmod_poly_evaluate_fmpz(fmpz_t rop, const nmod_poly_t poly, const fmpz_t c)
 {
     _nmod_poly_evaluate_fmpz(rop, poly->coeffs, poly->length, c);
 }
-

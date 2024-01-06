@@ -12,4 +12,3 @@
 #define FMPZ_MOD_INLINES_C
 
 #include "fmpz_mod.h"
-

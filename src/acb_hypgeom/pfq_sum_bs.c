@@ -195,4 +195,3 @@ acb_hypgeom_pfq_sum_bs_invz(acb_t s, acb_t t,
     acb_clear(w);
     acb_clear(tmp);
 }
-

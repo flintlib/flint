@@ -22,4 +22,3 @@ void fmpz_mod_poly_init2(fmpz_mod_poly_t poly, slong alloc,
     poly->alloc = alloc;
     poly->length = 0;
 }
-

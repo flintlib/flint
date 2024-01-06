@@ -289,4 +289,3 @@ acb_hypgeom_pfq_series_sum_rs(acb_poly_t s, acb_poly_t t,
     acb_poly_clear(u);
     acb_poly_clear(v);
 }
-

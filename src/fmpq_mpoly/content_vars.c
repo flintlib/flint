@@ -36,4 +36,3 @@ int fmpq_mpoly_content_vars(
 
     return 1;
 }
-

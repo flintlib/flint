@@ -168,4 +168,3 @@ qqbar_scalar_op(qqbar_t res, const qqbar_t x, const fmpz_t a, const fmpz_t b, co
     fmpz_clear(G + 1);
     fmpz_clear(Gden);
 }
-

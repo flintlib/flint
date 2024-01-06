@@ -147,4 +147,3 @@ acb_dirichlet_zeta_jet(acb_t res, const acb_t s, int deflate, slong len, slong p
         }
     }
 }
-

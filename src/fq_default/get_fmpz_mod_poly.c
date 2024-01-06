@@ -49,4 +49,3 @@ void fq_default_get_fmpz_mod_poly(fmpz_mod_poly_t poly,
         fq_get_fmpz_mod_poly(poly, op->fq, ctx->ctx.fq);
     }
 }
-

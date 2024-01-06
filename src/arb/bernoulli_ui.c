@@ -42,4 +42,3 @@ arb_bernoulli_ui(arb_t b, ulong n, slong prec)
         }
     }
 }
-

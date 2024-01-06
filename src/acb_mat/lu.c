@@ -19,4 +19,3 @@ acb_mat_lu(slong * P, acb_mat_t LU, const acb_mat_t A, slong prec)
     else
         return acb_mat_lu_recursive(P, LU, A, prec);
 }
-

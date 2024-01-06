@@ -50,4 +50,3 @@ arb_hypgeom_rising(arb_t y, const arb_t x, const arb_t n, slong prec)
         arb_clear(t);
     }
 }
-

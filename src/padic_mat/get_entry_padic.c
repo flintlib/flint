@@ -20,4 +20,3 @@ void padic_mat_get_entry_padic(padic_t rop,
     padic_val(rop) = padic_mat_val(op);
     padic_reduce(rop, ctx);
 }
-

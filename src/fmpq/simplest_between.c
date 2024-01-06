@@ -116,4 +116,3 @@ void fmpq_simplest_between(fmpq_t mid, const fmpq_t l, const fmpq_t r)
                                fmpq_numref(l), fmpq_denref(l));
     }
 }
-

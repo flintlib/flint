@@ -237,4 +237,3 @@ int n_is_perfect_power(ulong * root, ulong n)
 
     return 0;
 }
-

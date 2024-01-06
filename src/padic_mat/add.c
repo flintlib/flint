@@ -111,4 +111,3 @@ void padic_mat_add(padic_mat_t C, const padic_mat_t A, const padic_mat_t B,
         _padic_mat_add(C, B, A, ctx);
     }
 }
-

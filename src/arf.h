@@ -1167,4 +1167,3 @@ void arf_approx_dot(arf_t res, const arf_t initial, int subtract,
 #endif
 
 #endif
-

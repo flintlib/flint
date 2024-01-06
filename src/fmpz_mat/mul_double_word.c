@@ -556,4 +556,3 @@ void _fmpz_mat_mul_double_word(
 
     _fmpz_mat_mul_double_word_internal(C, A, B, sign, Cbits);
 }
-

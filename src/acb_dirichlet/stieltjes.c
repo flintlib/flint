@@ -776,4 +776,3 @@ acb_dirichlet_stieltjes(acb_t res, const fmpz_t n, const acb_t a, slong prec)
         acb_dirichlet_stieltjes_em(res, n, a, prec);
     }
 }
-

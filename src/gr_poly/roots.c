@@ -10,4 +10,3 @@
 */
 
 #include "gr_poly.h"
-

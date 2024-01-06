@@ -17,4 +17,3 @@ void fmpz_mod_mpoly_ctx_init(fmpz_mod_mpoly_ctx_t ctx, slong nvars,
     mpoly_ctx_init(ctx->minfo, nvars, ord);
     fmpz_mod_ctx_init(ctx->ffinfo, modulus);
 }
-

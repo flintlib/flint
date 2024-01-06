@@ -118,4 +118,3 @@ mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p)
 
     return res;
 }
-

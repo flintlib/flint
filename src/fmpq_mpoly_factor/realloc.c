@@ -62,4 +62,3 @@ void fmpq_mpoly_factor_realloc(fmpq_mpoly_factor_t f, slong alloc,
 
     f->alloc = alloc;
 }
-

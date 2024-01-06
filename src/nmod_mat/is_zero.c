@@ -28,4 +28,3 @@ nmod_mat_is_zero(const nmod_mat_t mat)
 
     return 1;
 }
-

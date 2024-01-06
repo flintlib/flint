@@ -93,4 +93,3 @@ int qadic_log(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
         return ans;
     }
 }
-

@@ -43,4 +43,3 @@ acb_root_ui(acb_t res, const acb_t z, ulong n, slong prec)
         acb_exp(res, res, prec);
     }
 }
-

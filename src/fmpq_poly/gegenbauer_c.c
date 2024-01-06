@@ -97,4 +97,3 @@ fmpq_poly_gegenbauer_c(fmpq_poly_t poly, ulong n, const fmpq_t a)
     _fmpq_poly_normalise(poly);
     fmpq_poly_canonicalise(poly);
 }
-

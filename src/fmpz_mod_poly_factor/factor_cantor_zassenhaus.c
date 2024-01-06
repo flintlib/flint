@@ -73,4 +73,3 @@ void fmpz_mod_poly_factor_cantor_zassenhaus(fmpz_mod_poly_factor_t res,
     fmpz_mod_poly_clear(x, ctx);
     fmpz_mod_poly_factor_clear(tfac, ctx);
 }
-

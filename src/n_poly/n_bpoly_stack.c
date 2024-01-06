@@ -66,4 +66,3 @@ n_bpoly_struct ** n_bpoly_stack_fit_request(n_bpoly_stack_t S, slong k)
 
     return S->array + S->top;
 }
-

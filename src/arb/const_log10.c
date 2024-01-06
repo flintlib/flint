@@ -54,4 +54,3 @@ arb_const_log10_eval(arb_t s, slong prec)
 }
 
 ARB_DEF_CACHED_CONSTANT(arb_const_log10, arb_const_log10_eval)
-

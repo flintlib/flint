@@ -79,4 +79,3 @@ qqbar_cmp_im(const qqbar_t x, const qqbar_t y)
 
     return res;
 }
-

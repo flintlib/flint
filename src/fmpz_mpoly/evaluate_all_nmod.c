@@ -31,4 +31,3 @@ mp_limb_t fmpz_mpoly_evaluate_all_nmod(
 
     return eval;
 }
-

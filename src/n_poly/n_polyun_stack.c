@@ -54,4 +54,3 @@ n_polyun_struct ** n_polyun_stack_fit_request(n_polyun_stack_t S, slong k)
 
     return S->array + S->top;
 }
-

@@ -107,4 +107,3 @@ void nmod_mat_charpoly_berkowitz(nmod_poly_t cp, const nmod_mat_t mat)
     _nmod_poly_set_length(cp, mat->r + 1);
     _nmod_mat_charpoly_berkowitz(cp->coeffs, mat, mat->mod);
 }
-

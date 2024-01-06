@@ -103,4 +103,3 @@ slong _fmpz_poly_hensel_start_lift(fmpz_poly_factor_t lifted_fac, slong *link,
 
     return preve;
 }
-

@@ -69,4 +69,3 @@ TEST_FUNCTION_START(acb_theta_ql_all, state)
 
     TEST_FUNCTION_END(state);
 }
-

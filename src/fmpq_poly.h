@@ -755,4 +755,3 @@ int fmpq_poly_debug(const fmpq_poly_t poly);
 #endif
 
 #endif
-

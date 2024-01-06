@@ -85,4 +85,3 @@ arb_rising_fmpq_ui(arb_t y, const fmpq_t x, ulong n, slong prec)
         }
     }
 }
-

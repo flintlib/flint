@@ -114,4 +114,3 @@ void _padic_mat_canonicalise(padic_mat_t A, const padic_ctx_t ctx)
                                    &(A->val), *(ctx->p));
     }
 }
-

@@ -30,4 +30,3 @@ void fmpz_set_d_2exp(fmpz_t f, double m, slong exp)
    else
       fmpz_set_d(f, ldexp(m, exp));
 }
-

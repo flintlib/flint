@@ -58,4 +58,3 @@ TEST_FUNCTION_START(acb_mat_vector_mul, state)
 
     TEST_FUNCTION_END(state);
 }
-

@@ -144,4 +144,3 @@ qqbar_root_of_unity(qqbar_t res, slong p, ulong q)
 
     fmpq_clear(t);
 }
-

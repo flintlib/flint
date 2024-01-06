@@ -20,4 +20,3 @@ qqbar_set_fmpz(qqbar_t res, const fmpz_t x)
     fmpz_neg(QQBAR_COEFFS(res), x);
     acb_set_round_fmpz(QQBAR_ENCLOSURE(res), x, QQBAR_DEFAULT_PREC);
 }
-

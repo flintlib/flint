@@ -149,4 +149,3 @@ qqbar_enclosure_raw(acb_t res, const qqbar_t x, slong prec)
 {
     _qqbar_enclosure_raw(res, QQBAR_POLY(x), QQBAR_ENCLOSURE(x), prec);
 }
-

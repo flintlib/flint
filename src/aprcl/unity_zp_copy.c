@@ -25,4 +25,3 @@ unity_zp_copy(unity_zp f, const unity_zp g)
 
     fmpz_mod_poly_set(f->poly, g->poly, f->ctx);
 }
-

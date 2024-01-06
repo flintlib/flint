@@ -205,4 +205,3 @@ arb_hypgeom_rising_ui_rs(arb_t res, const arb_t x, ulong n, ulong m, slong prec)
     _arb_vec_clear(xpow, m + 1);
     TMP_END;
 }
-

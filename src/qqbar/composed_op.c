@@ -361,4 +361,3 @@ qqbar_binary_op(qqbar_t res, const qqbar_t x, const qqbar_t y, int op)
 
     qqbar_binary_op_without_guess(res, x, y, op);
 }
-

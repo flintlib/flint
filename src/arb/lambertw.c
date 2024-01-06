@@ -642,4 +642,3 @@ arb_lambertw(arb_t res, const arb_t x, int flags, slong prec)
     arb_clear(w);
     mag_clear(err);
 }
-

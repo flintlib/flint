@@ -102,4 +102,3 @@ arb_poly_rising_ui_series(arb_poly_t res, const arb_poly_t f, ulong r, slong tru
         _arb_poly_normalise(res);
     }
 }
-

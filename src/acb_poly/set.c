@@ -20,4 +20,3 @@ acb_poly_set(acb_poly_t dest, const acb_poly_t src)
     _acb_vec_set(dest->coeffs, src->coeffs, len);
     _acb_poly_set_length(dest, len);
 }
-

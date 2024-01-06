@@ -55,4 +55,3 @@ _fmpz_poly_mul_mid_default_mpn_ctx(fmpz * res, slong zl, slong zh, const fmpz * 
 {
     return _fmpz_poly_mul_mid_mpn_ctx(res, zl, zh, a, an, b, bn, get_default_mpn_ctx());
 }
-

@@ -84,4 +84,3 @@ void fq_default_ctx_init_modulus_nmod(fq_default_ctx_t ctx,
 {
     fq_default_ctx_init_modulus_nmod_type(ctx, modulus, var, 0);
 }
-

@@ -28,4 +28,3 @@ void fmpq_poly_set_fmpz_poly(fmpq_poly_t rop, const fmpz_poly_t op)
         fmpz_one(rop->den);
     }
 }
-

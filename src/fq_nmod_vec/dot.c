@@ -41,4 +41,3 @@ void _fq_nmod_vec_dot(fq_nmod_t res, const fq_nmod_struct * vec1,
 
    nmod_poly_clear(t);
 }
-

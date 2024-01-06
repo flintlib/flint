@@ -222,4 +222,3 @@ arf_get_fmpz_fixed_si(fmpz_t y, const arf_t x, slong e)
         return inexact;
     }
 }
-

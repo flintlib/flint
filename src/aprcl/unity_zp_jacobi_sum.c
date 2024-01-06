@@ -102,4 +102,3 @@ unity_zp_jacobi_sum_2q_two(unity_zp f, ulong q)
 
     _nmod_vec_clear(table);
 }
-

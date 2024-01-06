@@ -141,4 +141,3 @@ arb_pow(arb_t z, const arb_t x, const arb_t y, slong prec)
 
     _arb_pow_exp(z, x, s, y, prec);
 }
-

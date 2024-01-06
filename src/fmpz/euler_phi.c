@@ -60,4 +60,3 @@ fmpz_euler_phi(fmpz_t res, const fmpz_t n)
     fmpz_factor_euler_phi(res, fac);
     fmpz_factor_clear(fac);
 }
-

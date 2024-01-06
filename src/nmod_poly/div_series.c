@@ -164,4 +164,3 @@ nmod_poly_div_series(nmod_poly_t Q, const nmod_poly_t A,
     Q->length = n;
     _nmod_poly_normalise(Q);
 }
-

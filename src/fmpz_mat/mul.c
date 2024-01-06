@@ -282,4 +282,3 @@ fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
             fmpz_mat_mul_classical_inline(C, A, B);
     }
 }
-

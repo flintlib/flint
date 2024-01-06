@@ -29,4 +29,3 @@ void fmpz_mod_poly_neg(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly,
 
     _fmpz_mod_poly_neg(res->coeffs, poly->coeffs, poly->length, ctx);
 }
-

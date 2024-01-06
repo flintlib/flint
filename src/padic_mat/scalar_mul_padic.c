@@ -38,4 +38,3 @@ void padic_mat_scalar_mul_padic(padic_mat_t B,
     _padic_mat_scalar_mul_padic(B, A, c, ctx);
     _padic_mat_reduce(B, ctx);
 }
-

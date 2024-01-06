@@ -26,4 +26,3 @@ arb_mat_window_init(arb_mat_t window, const arb_mat_t mat,
     window->r = r2 - r1;
     window->c = c2 - c1;
 }
-

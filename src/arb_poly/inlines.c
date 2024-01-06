@@ -11,4 +11,3 @@
 
 #define ARB_POLY_INLINES_C
 #include "arb_poly.h"
-

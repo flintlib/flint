@@ -79,4 +79,3 @@ acb_elliptic_sigma(acb_t res, const acb_t z, const acb_t tau, slong prec)
 
     _acb_vec_clear(t, 8);
 }
-

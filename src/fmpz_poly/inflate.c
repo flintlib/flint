@@ -44,4 +44,3 @@ fmpz_poly_inflate(fmpz_poly_t result, const fmpz_poly_t input, ulong inflation)
         result->length = res_length;
     }
 }
-

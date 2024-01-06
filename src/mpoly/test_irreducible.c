@@ -1018,4 +1018,3 @@ int mpoly_test_irreducible(
 
     return result;
 }
-

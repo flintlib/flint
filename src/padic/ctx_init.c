@@ -47,4 +47,3 @@ void padic_ctx_init(padic_ctx_t ctx, const fmpz_t p, slong min, slong max,
 
     ctx->mode = mode;
 }
-

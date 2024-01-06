@@ -34,4 +34,3 @@ void nmod_mat_nmod_vec_mul(
     for (i = 1; i < len; i++)
         _nmod_vec_scalar_addmul_nmod(c, B->rows[i], ncols, a[i], B->mod);
 }
-

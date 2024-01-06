@@ -45,4 +45,3 @@ void nmod_poly_mat_set_nmod_mat(nmod_poly_mat_t pmat, const nmod_mat_t cmat)
         }
     }
 }
-

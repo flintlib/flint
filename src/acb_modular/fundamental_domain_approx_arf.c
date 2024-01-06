@@ -95,4 +95,3 @@ acb_modular_fundamental_domain_approx_arf(psl2z_t g,
     arf_clear(t);
     fmpz_clear(n);
 }
-

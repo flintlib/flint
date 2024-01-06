@@ -199,4 +199,3 @@ void qadic_inv(qadic_t x, const qadic_t y, const qadic_ctx_t ctx)
         _padic_poly_normalise(x);
     }
 }
-

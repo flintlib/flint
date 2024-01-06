@@ -253,4 +253,3 @@ acb_hypgeom_2f1_continuation(acb_t res, acb_t res1,
     mag_clear(goal);
     acb_clear(x);
 }
-

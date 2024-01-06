@@ -57,4 +57,3 @@ arb_poly_evaluate_acb_horner(acb_t res, const arb_poly_t f, const acb_t a, slong
 {
     _arb_poly_evaluate_acb_horner(res, f->coeffs, f->length, a, prec);
 }
-

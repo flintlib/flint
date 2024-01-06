@@ -49,4 +49,3 @@ int fmpz_multi_CRT(
 
     return success;
 }
-

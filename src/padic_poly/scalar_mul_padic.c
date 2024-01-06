@@ -55,4 +55,3 @@ void padic_poly_scalar_mul_padic(padic_poly_t rop, const padic_poly_t op,
                                      op->coeffs, op->val, op->length, c, ctx);
     }
 }
-

@@ -27,4 +27,3 @@ void fmpq_poly_set(fmpq_poly_t poly1, const fmpq_poly_t poly2)
         fmpz_set(poly1->den, poly2->den);
     }
 }
-

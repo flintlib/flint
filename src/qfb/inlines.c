@@ -12,4 +12,3 @@
 #define QFB_INLINES_C
 
 #include "qfb.h"
-

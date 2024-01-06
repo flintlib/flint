@@ -165,4 +165,3 @@ arb_fmpz_poly_gauss_period_minpoly(fmpz_poly_t res, ulong q, ulong n)
 
     flint_free(es);
 }
-

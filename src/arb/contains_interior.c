@@ -68,4 +68,3 @@ arb_contains_interior(const arb_t x, const arb_t y)
 
     return left_ok && right_ok;
 }
-

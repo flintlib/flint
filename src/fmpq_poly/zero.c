@@ -18,4 +18,3 @@ void fmpq_poly_zero(fmpq_poly_t poly)
     _fmpq_poly_set_length(poly, 0);
     fmpz_one(poly->den);
 }
-

@@ -619,4 +619,3 @@ int fmpz_mat_mul_blas(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 
     return _fmpz_mat_mul_blas(C, A, Abits, B, Bbits, sign, Cbits);
 }
-

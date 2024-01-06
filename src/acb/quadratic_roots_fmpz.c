@@ -49,4 +49,3 @@ acb_quadratic_roots_fmpz(acb_t r1, acb_t r2,
     fmpz_clear(d);
     return;
 }
-

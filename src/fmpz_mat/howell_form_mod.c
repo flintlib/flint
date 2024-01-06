@@ -42,4 +42,3 @@ fmpz_mat_howell_form_mod(fmpz_mat_t A, const fmpz_t mod)
     }
     return k;
 }
-

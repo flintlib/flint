@@ -54,4 +54,3 @@ void mpoly_main_variable_split_DEG(slong * ind, ulong * pexp, const ulong * Aexp
     while (s <= l1)
         ind[s++] = Alen;
 }
-

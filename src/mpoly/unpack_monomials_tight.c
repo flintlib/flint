@@ -41,4 +41,3 @@ void mpoly_unpack_monomials_tight(ulong * e1, ulong * e2, slong len,
 
    TMP_END;
 }
-

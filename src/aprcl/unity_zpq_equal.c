@@ -34,4 +34,3 @@ unity_zpq_equal(const unity_zpq f, const unity_zpq g)
 
     return 1;
 }
-

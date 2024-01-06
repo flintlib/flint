@@ -767,4 +767,3 @@ void _fq_zech_mpoly_set_fq_zech_bpoly_var1_zero(
 #endif
 
 #endif
-

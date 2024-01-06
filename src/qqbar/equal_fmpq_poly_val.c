@@ -109,4 +109,3 @@ qqbar_equal_fmpq_poly_val(const qqbar_t x, const fmpq_poly_t f, const qqbar_t y)
 
     return res;
 }
-

@@ -44,4 +44,3 @@ void fmpq_poly_inv(fmpq_poly_t poly1, const fmpq_poly_t poly2)
         _fmpq_poly_set_length(poly1, 1);
     }
 }
-

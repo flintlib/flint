@@ -127,4 +127,3 @@ acb_hypgeom_coulomb_series(acb_poly_t F, acb_poly_t G,
     if (Hpos != NULL) _acb_poly_normalise(Hpos);
     if (Hneg != NULL) _acb_poly_normalise(Hneg);
 }
-

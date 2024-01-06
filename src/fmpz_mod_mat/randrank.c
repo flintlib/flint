@@ -36,4 +36,3 @@ void fmpz_mod_mat_randrank(fmpz_mod_mat_t mat, flint_rand_t state, slong rank)
 
     _fmpz_vec_clear(diag, rank);
 }
-

@@ -269,4 +269,3 @@ int fmpz_mpoly_compose_fmpz_poly(fmpz_poly_t A, const fmpz_mpoly_t B,
         return _fmpz_mpoly_compose_fmpz_poly_mp(A, B, C, ctx);
     }
 }
-

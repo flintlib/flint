@@ -46,4 +46,3 @@ void fmpz_tpoly_clear(fmpz_tpoly_t A)
         flint_free(A->coeffs);
     }
 }
-

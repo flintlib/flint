@@ -143,4 +143,3 @@ void fmpz_mod_poly_pow(fmpz_mod_poly_t rop, const fmpz_mod_poly_t op, ulong e,
 
     _fmpz_mod_poly_normalise(rop);
 }
-

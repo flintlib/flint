@@ -94,4 +94,3 @@ acb_dirichlet_hurwitz_precomp_init_num(acb_dirichlet_hurwitz_precomp_t pre,
     acb_dirichlet_hurwitz_precomp_choose_param(&A, &K, &N, s, num_eval, prec);
     acb_dirichlet_hurwitz_precomp_init(pre, s, deflate, A, K, N, prec);
 }
-

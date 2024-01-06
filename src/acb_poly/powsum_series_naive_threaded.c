@@ -191,4 +191,3 @@ _acb_poly_powsum_series_naive_threaded(acb_ptr z,
     flint_give_back_threads(handles, num_workers);
     flint_free(args);
 }
-

@@ -94,4 +94,3 @@ fmpz_poly_mat_rref(fmpz_poly_mat_t R, fmpz_poly_t den, const fmpz_poly_mat_t A)
 
     return rank;
 }
-

@@ -428,4 +428,3 @@ arb_hypgeom_rgamma(arb_t y, const arb_t x, slong prec)
 
     arb_hypgeom_gamma_stirling(y, x, 1, prec);
 }
-

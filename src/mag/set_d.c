@@ -53,4 +53,3 @@ mag_set_d_lower(mag_t z, double c)
         MAG_SET_D_2EXP_LOWER(MAG_MAN(z), MAG_EXP(z), c, 0);
     }
 }
-

@@ -336,4 +336,3 @@ cleanup:
 
     flint_free(cmpmask);
 }
-

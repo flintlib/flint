@@ -202,4 +202,3 @@ void nmod_poly_roots(nmod_poly_factor_t r, const nmod_poly_t f,
     for (i = 0; i < FLINT_BITS + 3; i++)
         nmod_poly_clear(t + i);
 }
-

@@ -189,4 +189,3 @@ acb_hypgeom_dilog_transform(acb_t res, const acb_t z, int algorithm, slong prec)
     acb_clear(t);
     acb_clear(u);
 }
-

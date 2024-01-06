@@ -19,6 +19,3 @@ void fmpz_mpoly_deflation(fmpz * shift, fmpz * stride,
     mpoly_monomials_deflation(shift, stride, A->exps, A->bits, A->length,
                                                                    ctx->minfo);
 }
-
-
-

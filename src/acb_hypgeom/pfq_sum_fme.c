@@ -267,4 +267,3 @@ acb_hypgeom_pfq_sum_fme(acb_t s, acb_t t,
     acb_poly_clear(B);
     acb_poly_clear(C);
 }
-

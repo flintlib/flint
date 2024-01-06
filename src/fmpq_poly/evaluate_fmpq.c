@@ -54,4 +54,3 @@ fmpq_poly_evaluate_fmpq(fmpq_t res, const fmpq_poly_t poly, const fmpq_t a)
         fmpq_clear(t);
     }
 }
-

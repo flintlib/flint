@@ -267,4 +267,3 @@ void fmpz_poly_div_series_basecase(fmpz_poly_t Q, const fmpz_poly_t A,
     _fmpz_poly_set_length(Q, n);
     _fmpz_poly_normalise(Q);
 }
-

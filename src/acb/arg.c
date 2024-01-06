@@ -16,4 +16,3 @@ acb_arg(arb_t r, const acb_t z, slong prec)
 {
     arb_atan2(r, acb_imagref(z), acb_realref(z), prec);
 }
-

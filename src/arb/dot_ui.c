@@ -71,4 +71,3 @@ arb_dot_ui(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong xst
 
     TMP_END;
 }
-

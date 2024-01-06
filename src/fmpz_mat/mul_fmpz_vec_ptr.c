@@ -30,4 +30,3 @@ void fmpz_mat_mul_fmpz_vec_ptr(
             fmpz_addmul(ci, Ai + j, b[j]);
     }
 }
-

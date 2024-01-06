@@ -80,6 +80,3 @@ void fmpz_mpoly_inflate(fmpz_mpoly_t A, const fmpz_mpoly_t B,
     }
     return;
 }
-
-
-

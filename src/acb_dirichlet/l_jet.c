@@ -124,4 +124,3 @@ acb_dirichlet_l_jet(acb_ptr res, const acb_t s,
     acb_clear(a);
     acb_clear(w);
 }
-

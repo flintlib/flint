@@ -246,4 +246,3 @@ acb_pow_analytic(acb_t res, const acb_t z, const acb_t w, int analytic, slong pr
         acb_pow(res, z, w, prec);
     }
 }
-

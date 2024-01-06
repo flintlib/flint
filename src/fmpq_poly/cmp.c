@@ -81,4 +81,3 @@ int fmpq_poly_cmp(const fmpq_poly_t left, const fmpq_poly_t right)
     else
         return _fmpq_poly_cmp(left->coeffs, left->den, right->coeffs, right->den, len1);
 }
-

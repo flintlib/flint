@@ -16,4 +16,3 @@ void flint_mpz_clear_readonly(mpz_t z)
 {
     _fmpz_clear_readonly_mpz(z);
 }
-

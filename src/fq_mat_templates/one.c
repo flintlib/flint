@@ -26,4 +26,3 @@ TEMPLATE(T, mat_one)(TEMPLATE(T, mat_t) mat, const TEMPLATE(T, ctx_t) ctx)
 }
 
 #endif
-

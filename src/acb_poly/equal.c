@@ -25,4 +25,3 @@ acb_poly_equal(const acb_poly_t A, const acb_poly_t B)
 
     return 1;
 }
-

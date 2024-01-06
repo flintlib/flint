@@ -213,4 +213,3 @@ arb_bell_sum_taylor(arb_t res, const fmpz_t n,
 {
     _arb_bell_sum_taylor(res, n, a, b, mmag, prec + 5);
 }
-

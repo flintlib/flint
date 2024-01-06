@@ -41,4 +41,3 @@ void fmpz_mod_mat_randtriu(fmpz_mod_mat_t mat, flint_rand_t state, int unit)
         }
     }
 }
-

@@ -53,4 +53,3 @@ void fmpz_xor(fmpz_t f, const fmpz_t g, const fmpz_t h)
             }
         }
 }
-

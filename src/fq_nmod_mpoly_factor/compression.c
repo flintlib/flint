@@ -107,4 +107,3 @@ void fq_nmod_mpoly_compression_undo(
     fq_nmod_mpoly_sort_terms(A, Actx);
     fq_nmod_mpoly_make_monic(A, A, Actx);
 }
-

@@ -701,4 +701,3 @@ void _arb_atan_taylor_rs(mp_ptr y, mp_limb_t * error,
 
     TMP_END;
 }
-

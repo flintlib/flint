@@ -112,4 +112,3 @@ fq_nmod_poly_mullow_univariate (fq_nmod_poly_t rop,
         _fq_nmod_poly_normalise(rop, ctx);
     }
 }
-

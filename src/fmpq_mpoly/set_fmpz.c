@@ -54,4 +54,3 @@ void fmpq_mpoly_set_si(fmpq_mpoly_t A, slong c, const fmpq_mpoly_ctx_t ctx)
         fmpz_mpoly_one(A->zpoly, ctx->zctx);
     }
 }
-

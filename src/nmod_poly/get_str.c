@@ -43,4 +43,3 @@ char * nmod_poly_get_str(const nmod_poly_t poly)
 
     return buf;
 }
-

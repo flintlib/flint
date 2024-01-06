@@ -475,4 +475,3 @@ arb_atan_arf_bb(arb_t z, const arf_t x, slong prec)
     fmpz_clear(err);
     mag_clear(inp_err);
 }
-

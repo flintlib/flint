@@ -81,4 +81,3 @@ TEMPLATE(T, poly_sqrt_series)(TEMPLATE(T, poly_t) g, const TEMPLATE(T, poly_t) h
 }
 
 #endif
-

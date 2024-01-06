@@ -17,4 +17,3 @@ ca_neg_inf(ca_t x, ca_ctx_t ctx)
     ca_set_si(x, -1, ctx);
     x->field |= CA_INF;
 }
-

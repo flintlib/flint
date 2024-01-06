@@ -88,4 +88,3 @@ mag_pow_fmpz_lower(mag_t z, const mag_t x, const fmpz_t e)
         mag_clear(y);
     }
 }
-

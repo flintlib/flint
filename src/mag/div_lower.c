@@ -48,4 +48,3 @@ mag_div_lower(mag_t z, const mag_t x, const mag_t y)
         _fmpz_sub2_fast(MAG_EXPREF(z), MAG_EXPREF(x), MAG_EXPREF(y), fix);
     }
 }
-

@@ -224,4 +224,3 @@ arb_contains_nonnegative(const arb_t x)
         (arf_mag_cmpabs(arb_radref(x), arb_midref(x)) >= 0)
         || arf_is_nan(arb_midref(x));
 }
-

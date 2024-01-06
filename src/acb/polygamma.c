@@ -71,4 +71,3 @@ acb_polygamma(acb_t res, const acb_t s, const acb_t z, slong prec)
         acb_clear(u);
     }
 }
-

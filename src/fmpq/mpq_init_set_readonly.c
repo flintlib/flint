@@ -16,4 +16,3 @@ void flint_mpq_init_set_readonly(mpq_t z, const fmpq_t f)
     flint_mpz_init_set_readonly(mpq_numref(z), fmpq_numref(f));
     flint_mpz_init_set_readonly(mpq_denref(z), fmpq_denref(f));
 }
-

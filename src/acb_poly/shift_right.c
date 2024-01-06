@@ -51,4 +51,3 @@ acb_poly_shift_right(acb_poly_t res, const acb_poly_t poly, slong n)
     _acb_poly_shift_right(res->coeffs, poly->coeffs, poly->length, n);
     _acb_poly_set_length(res, poly->length - n);
 }
-

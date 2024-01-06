@@ -84,4 +84,3 @@ arb_mat_det(arb_t det, const arb_mat_t A, slong prec)
             arb_mat_det_precond(det, A, prec);
     }
 }
-

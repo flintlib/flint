@@ -25,4 +25,3 @@ unity_zp_swap(unity_zp f, unity_zp g)
 
     fmpz_mod_poly_swap(f->poly, g->poly, f->ctx);
 }
-

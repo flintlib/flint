@@ -26,4 +26,3 @@ void fmpq_mpoly_get_term_exp_ui(ulong * exp, const fmpq_mpoly_t A,
     mpoly_get_monomial_ui(exp, A->zpoly->exps + N*i, A->zpoly->bits,
                                                              ctx->zctx->minfo);
 }
-

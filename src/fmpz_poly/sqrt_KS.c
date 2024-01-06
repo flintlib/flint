@@ -132,4 +132,3 @@ fmpz_poly_sqrt_KS(fmpz_poly_t b, const fmpz_poly_t a)
 
     return result;
 }
-

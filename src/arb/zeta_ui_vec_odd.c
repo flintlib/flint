@@ -31,4 +31,3 @@ arb_zeta_ui_vec_odd(arb_ptr x, ulong start, slong num, slong prec)
     for (i = num_borwein; i < num; i++)
         arb_zeta_ui(x + i, start + 2 * i, prec);
 }
-
