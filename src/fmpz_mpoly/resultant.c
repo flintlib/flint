@@ -30,4 +30,3 @@ int fmpz_mpoly_resultant(fmpz_mpoly_t R, const fmpz_mpoly_t A,
 
     return success;
 }
-

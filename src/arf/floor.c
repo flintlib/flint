@@ -41,4 +41,3 @@ arf_floor(arf_t z, const arf_t x)
         }
     }
 }
-

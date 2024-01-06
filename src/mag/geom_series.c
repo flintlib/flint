@@ -45,4 +45,3 @@ mag_geom_series(mag_t res, const mag_t x, ulong n)
         mag_clear(t);
     }
 }
-

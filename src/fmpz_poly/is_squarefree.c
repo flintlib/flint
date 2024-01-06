@@ -53,4 +53,3 @@ int fmpz_poly_is_squarefree(const fmpz_poly_t poly)
 {
     return _fmpz_poly_is_squarefree(poly->coeffs, poly->length);
 }
-

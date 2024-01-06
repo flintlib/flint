@@ -77,4 +77,3 @@ void padic_mat_set_fmpq_mat(padic_mat_t B,
         fmpz_clear(t);
     }
 }
-

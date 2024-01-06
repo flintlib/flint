@@ -213,4 +213,3 @@ acb_elliptic_f(acb_t res, const acb_t phi, const acb_t m, int times_pi, slong pr
     acb_clear(w);
     acb_clear(r);
 }
-

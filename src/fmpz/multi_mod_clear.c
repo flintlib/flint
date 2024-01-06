@@ -26,4 +26,3 @@ void fmpz_multi_mod_clear(fmpz_multi_mod_t P)
     flint_free(P->prog);
     flint_free(P->moduli);
 }
-

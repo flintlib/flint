@@ -73,4 +73,3 @@ acb_dirichlet_hurwitz_precomp_eval(acb_t res,
     acb_clear(a);
     acb_clear(t);
 }
-

@@ -144,4 +144,3 @@ void fmpz_mod_poly_divrem_basecase(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
 
     fmpz_clear(invB);
 }
-

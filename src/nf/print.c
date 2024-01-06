@@ -16,4 +16,3 @@ void nf_print(const nf_t nf)
     flint_printf("Number field with defining polynomial ");
     fmpq_poly_print_pretty(nf->pol, "x");
 }
-

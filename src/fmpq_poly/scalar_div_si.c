@@ -77,4 +77,3 @@ void fmpq_poly_scalar_div_si(fmpq_poly_t rop, const fmpq_poly_t op, slong c)
     _fmpq_poly_scalar_div_si(rop->coeffs, rop->den,
                              op->coeffs, op->den, op->length, c);
 }
-

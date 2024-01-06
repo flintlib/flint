@@ -42,4 +42,3 @@ unity_zp_coeff_dec(unity_zp f, ulong ind)
         fmpz_add(f->poly->coeffs + ind, f->poly->coeffs + ind,
                                                  fmpz_mod_ctx_modulus(f->ctx));
 }
-

@@ -51,4 +51,3 @@ void fmpz_poly_hensel_lift(fmpz_poly_t G, fmpz_poly_t H,
     _fmpz_poly_normalise(A);
     _fmpz_poly_normalise(B);
 }
-

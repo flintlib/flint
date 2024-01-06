@@ -77,4 +77,3 @@ ulong n_clog_2exp(ulong n, ulong b)
 
     return r;
 }
-

@@ -1084,4 +1084,3 @@ mp_limb_t n_poly_mod_eval_step2(
     NMOD_RED3(t0, t2, t1, t0, mod);
     return t0;
 }
-

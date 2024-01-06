@@ -35,4 +35,3 @@ void fmpz_mod_mpoly_set_coeff_fmpz_monomial(fmpz_mod_mpoly_t A, const fmpz_t c,
     TMP_END;
     return;
 }
-

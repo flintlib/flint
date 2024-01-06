@@ -53,4 +53,3 @@ int fmpz_mod_mat_solve(fmpz_mod_mat_t X, const fmpz_mod_mat_t A,
 
     return result;
 }
-

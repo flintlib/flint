@@ -548,4 +548,3 @@ FEXPR_BUILTIN_INLINE slong fexpr_builtin_length(void)
 #endif
 
 #endif
-

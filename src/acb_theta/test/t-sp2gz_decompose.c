@@ -149,4 +149,3 @@ TEST_FUNCTION_START(acb_theta_sp2gz_decompose, state)
 
     TEST_FUNCTION_END(state);
 }
-

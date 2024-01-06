@@ -115,4 +115,3 @@ arb_root(arb_t res, const arb_t x, ulong k, slong prec)
 {
     arb_root_ui(res, x, k, prec);
 }
-

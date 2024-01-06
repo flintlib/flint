@@ -89,4 +89,3 @@ arf_root(arf_ptr z, arf_srcptr x, ulong k, slong prec, arf_rnd_t rnd)
 
     return inexact;
 }
-

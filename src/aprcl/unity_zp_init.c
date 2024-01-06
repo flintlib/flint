@@ -28,4 +28,3 @@ unity_zp_clear(unity_zp f)
     fmpz_mod_poly_clear(f->poly, f->ctx);
     fmpz_mod_ctx_clear(f->ctx);
 }
-

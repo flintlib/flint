@@ -647,5 +647,3 @@ void n_bpoly_mod_taylor_shift_gen0(n_bpoly_t A, mp_limb_t alpha, nmod_t ctx)
         }
     }
 }
-
-

@@ -23,4 +23,3 @@ int padic_mat_is_zero(const padic_mat_t A)
         return 0;
     }
 }
-

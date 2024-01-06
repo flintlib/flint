@@ -44,4 +44,3 @@ int fmpq_poly_is_canonical(const fmpq_poly_t poly)
 {
     return _fmpq_poly_is_canonical(poly->coeffs, poly->den, poly->length);
 }
-

@@ -149,4 +149,3 @@ acb_hypgeom_chi(acb_t res, const acb_t z, slong prec)
     else
         acb_hypgeom_chi_2f3(res, z, prec);
 }
-

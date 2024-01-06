@@ -20,4 +20,3 @@ arb_cot(arb_t y, const arb_t x, slong prec)
     arb_div(y, u, y, prec);
     arb_clear(u);
 }
-

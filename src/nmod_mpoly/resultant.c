@@ -30,4 +30,3 @@ int nmod_mpoly_resultant(nmod_mpoly_t R, const nmod_mpoly_t A,
 
     return success;
 }
-

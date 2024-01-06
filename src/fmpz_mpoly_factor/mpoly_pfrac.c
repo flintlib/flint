@@ -279,4 +279,3 @@ int fmpz_mpoly_pfrac(
 
     return 1;
 }
-

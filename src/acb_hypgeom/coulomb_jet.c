@@ -375,4 +375,3 @@ acb_hypgeom_coulomb_jet(acb_ptr F, acb_ptr G, acb_ptr Hpos, acb_ptr Hneg, const 
     _acb_hypgeom_coulomb_jet(F, G, Hpos, Hneg, l, eta, t, len, prec);
     acb_clear(t);
 }
-

@@ -22,4 +22,3 @@ void fmpq_poly_fit_length(fmpq_poly_t poly, slong len)
         fmpq_poly_realloc(poly, len);
     }
 }
-

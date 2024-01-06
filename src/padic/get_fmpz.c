@@ -38,4 +38,3 @@ void padic_get_fmpz(fmpz_t rop, const padic_t op, const padic_ctx_t ctx)
             fmpz_clear(pow);
     }
 }
-

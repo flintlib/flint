@@ -30,4 +30,3 @@ fmpz_mpoly_q_inv(fmpz_mpoly_q_t res, const fmpz_mpoly_q_t x, const fmpz_mpoly_ct
         fmpz_mpoly_neg(fmpz_mpoly_q_denref(res), fmpz_mpoly_q_denref(res), ctx);
     }
 }
-

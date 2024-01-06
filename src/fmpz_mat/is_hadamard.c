@@ -49,4 +49,3 @@ fmpz_mat_is_hadamard(const fmpz_mat_t A)
 
     return result;
 }
-

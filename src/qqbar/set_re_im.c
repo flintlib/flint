@@ -33,4 +33,3 @@ qqbar_set_re_im(qqbar_t res, const qqbar_t x, const qqbar_t y)
         qqbar_clear(u);
     }
 }
-

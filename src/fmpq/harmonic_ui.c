@@ -255,4 +255,3 @@ fmpq_harmonic_ui(fmpq_t x, ulong n)
 {
     _fmpq_harmonic_ui(fmpq_numref(x), fmpq_denref(x), n);
 }
-

@@ -27,4 +27,3 @@ qqbar_evaluate_fmpz_poly(qqbar_t res, const fmpz_poly_t poly, const qqbar_t x)
 {
     _qqbar_evaluate_fmpz_poly(res, poly->coeffs, poly->length, x);
 }
-

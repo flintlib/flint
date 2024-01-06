@@ -56,4 +56,3 @@ void fq_default_set_fmpz_poly(fq_default_t op,
         fq_set_fmpz_poly(op->fq, poly, ctx->ctx.fq);
     }
 }
-

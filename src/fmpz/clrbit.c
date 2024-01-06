@@ -29,4 +29,3 @@ void fmpz_clrbit(fmpz_t f, ulong i)
         _fmpz_demote_val(f);
     }
 }
-

@@ -131,4 +131,3 @@ void mpoly_to_mpolyl_perm_deflate(
 
     TMP_END;
 }
-

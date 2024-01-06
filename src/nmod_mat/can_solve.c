@@ -162,4 +162,3 @@ nmod_mat_can_solve(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B)
 {
     return nmod_mat_can_solve_inner(NULL, NULL, NULL, X, A, B);
 }
-

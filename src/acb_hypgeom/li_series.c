@@ -80,4 +80,3 @@ acb_hypgeom_li_series(acb_poly_t g, const acb_poly_t h, int offset, slong len, s
     _acb_poly_set_length(g, len);
     _acb_poly_normalise(g);
 }
-

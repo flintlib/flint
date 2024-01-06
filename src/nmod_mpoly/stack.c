@@ -183,4 +183,3 @@ nmod_mpolyn_struct ** nmod_poly_stack_fit_request_mpolyn(nmod_poly_stack_t S, sl
 
     return S->mpolyn_array + S->mpolyn_top;
 }
-

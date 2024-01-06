@@ -236,4 +236,3 @@ _arb_atan_sum_bs_powtab(fmpz_t T, fmpz_t Q, flint_bitcnt_t * Qexp,
     _fmpz_vec_clear(xpow, length);
     flint_free(xexp);
 }
-

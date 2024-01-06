@@ -18,4 +18,3 @@ void _fmpq_poly_normalise(fmpq_poly_t poly)
     for (i = poly->length - 1; (i >= 0) && !poly->coeffs[i]; i--) ;
     poly->length = i + 1;
 }
-

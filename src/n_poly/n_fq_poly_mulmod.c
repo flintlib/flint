@@ -34,4 +34,3 @@ void n_fq_poly_mulmod(
     fq_nmod_poly_clear(c, ctx);
     fq_nmod_poly_clear(m, ctx);
 }
-

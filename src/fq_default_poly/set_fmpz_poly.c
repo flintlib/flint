@@ -47,4 +47,3 @@ void fq_default_poly_set_fmpz_poly(fq_default_poly_t rop,
     fmpz_mod_poly_clear(mod_poly, mod);
     fmpz_mod_ctx_clear(mod);
 }
-

@@ -19,4 +19,3 @@ void fq_poly_factor_get_poly(fq_poly_t z,
 {
     fq_poly_set(z, fac->poly + i, ctx);
 }
-

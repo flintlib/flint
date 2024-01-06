@@ -11,4 +11,3 @@
 
 #define ACF_INLINES_C
 #include "acf.h"
-

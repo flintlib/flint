@@ -62,4 +62,3 @@ acb_poly_cosh_series(acb_poly_t g, const acb_poly_t h, slong n, slong prec)
     _acb_poly_set_length(g, n);
     _acb_poly_normalise(g);
 }
-

@@ -104,4 +104,3 @@ flint_mpn_mulmod_2expp1_basecase (mp_ptr xp, mp_srcptr yp, mp_srcptr zp, int c,
 
     return c;
 }
-

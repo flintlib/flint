@@ -45,4 +45,3 @@ char * fmpq_get_str(char * str, int b, const fmpq_t f)
 {
     return _fmpq_get_str(str, b, fmpq_numref(f), fmpq_denref(f));
 }
-

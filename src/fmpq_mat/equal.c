@@ -32,4 +32,3 @@ fmpq_mat_equal(const fmpq_mat_t mat1, const fmpq_mat_t mat2)
 
     return 1;
 }
-

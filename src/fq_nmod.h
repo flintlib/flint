@@ -221,4 +221,3 @@ void __fq_nmod_ctx_prime(fmpz_t p, fq_nmod_ctx_t ctx);
 #endif
 
 #endif
-

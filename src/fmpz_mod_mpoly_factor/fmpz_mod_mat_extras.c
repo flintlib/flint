@@ -92,4 +92,3 @@ void fmpz_mod_mat_init_nullspace_tr(fmpz_mod_mat_t X, fmpz_mod_mat_t tmp, const 
 
     flint_free(p);
 }
-

@@ -86,4 +86,3 @@ arb_get_rand_fmpq(fmpq_t q, flint_rand_t state, const arb_t x, slong bits)
     _arb_get_rand_fmpq(fmpq_numref(q), fmpq_denref(q), state, fmpq_denref(q), x);
     fmpq_canonicalise(q);
 }
-

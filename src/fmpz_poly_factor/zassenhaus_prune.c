@@ -129,4 +129,3 @@ int zassenhaus_prune_must_be_irreducible(const zassenhaus_prune_t Z)
 
     return 1;
 }
-

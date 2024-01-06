@@ -126,4 +126,3 @@ ca_ext_init_fxn(ca_ext_t res, calcium_func_code func, ca_srcptr x, slong nargs, 
 
     _ca_ext_init_func(res, ctx);
 }
-

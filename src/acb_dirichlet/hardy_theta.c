@@ -122,4 +122,3 @@ acb_dirichlet_hardy_theta(acb_ptr res, const acb_t t,
     acb_clear(y + 1);
     arb_clear(c);
 }
-

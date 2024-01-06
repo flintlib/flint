@@ -131,4 +131,3 @@ fmpz_mpoly_q_div_fmpz(fmpz_mpoly_q_t res, const fmpz_mpoly_q_t x, const fmpz_t y
         }
     }
 }
-

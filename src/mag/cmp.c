@@ -34,4 +34,3 @@ mag_cmp(const mag_t x, const mag_t y)
 
     return (c < 0) ? -1 : 1;
 }
-

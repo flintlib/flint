@@ -84,4 +84,3 @@ arf_rsqrt(arf_ptr z, arf_srcptr x, slong prec, arf_rnd_t rnd)
 
     return inexact;
 }
-

@@ -49,4 +49,3 @@ void fq_zech_mpoly_fit_length_reset_bits(
 
     A->bits = bits;
 }
-

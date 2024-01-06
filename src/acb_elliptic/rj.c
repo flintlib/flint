@@ -838,4 +838,3 @@ acb_elliptic_rj(acb_t res, const acb_t x, const acb_t y,
     /* Use integration as fallback */
     acb_elliptic_rj_integration(res, x, y, z, p, flags, prec);
 }
-

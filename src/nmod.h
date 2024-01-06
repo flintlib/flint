@@ -274,4 +274,3 @@ NMOD_INLINE mp_limb_t nmod_discrete_log_pohlig_hellman_primitive_root(
 #endif
 
 #endif
-

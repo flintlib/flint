@@ -217,4 +217,3 @@ acb_calc_integrate_taylor(acb_t res,
 
     return result;
 }
-

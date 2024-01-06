@@ -721,4 +721,3 @@ int nmod_mpoly_sqrt_heap(nmod_mpoly_t Q, const nmod_mpoly_t A,
 
     return success;
 }
-

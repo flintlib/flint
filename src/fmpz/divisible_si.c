@@ -34,4 +34,3 @@ fmpz_divisible_si(const fmpz_t f, slong g)
         return flint_mpz_divisible_ui_p(COEFF_TO_PTR(c), FLINT_ABS(g));
     }
 }
-

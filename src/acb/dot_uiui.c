@@ -103,4 +103,3 @@ acb_dot_uiui(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong x
 
     TMP_END;
 }
-

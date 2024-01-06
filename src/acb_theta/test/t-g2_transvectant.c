@@ -75,4 +75,3 @@ TEST_FUNCTION_START(acb_theta_g2_transvectant, state)
 
     TEST_FUNCTION_END(state);
 }
-

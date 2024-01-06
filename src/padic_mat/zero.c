@@ -17,4 +17,3 @@ void padic_mat_zero(padic_mat_t A)
     fmpz_mat_zero(padic_mat(A));
     A->val = 0;
 }
-

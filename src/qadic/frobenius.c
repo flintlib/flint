@@ -410,4 +410,3 @@ void qadic_frobenius(qadic_t rop, const qadic_t op, slong e, const qadic_ctx_t c
         _padic_poly_normalise(rop);
     }
 }
-

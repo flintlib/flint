@@ -17,4 +17,3 @@ arb_sec(arb_t res, const arb_t x, slong prec)
     arb_cos(res, x, prec + 4);
     arb_inv(res, res, prec);
 }
-

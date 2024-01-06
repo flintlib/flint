@@ -27,4 +27,3 @@ int fq_nmod_mpoly_discriminant(fq_nmod_mpoly_t R, const fq_nmod_mpoly_t A,
 
     return success;
 }
-

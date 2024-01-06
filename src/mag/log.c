@@ -223,4 +223,3 @@ mag_log_lower(mag_t z, const mag_t x)
         }
     }
 }
-

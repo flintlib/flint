@@ -451,4 +451,3 @@ int arb_mat_spd_is_lll_reduced(const arb_mat_t A, slong tol_exp, slong prec);
 #endif
 
 #endif
-

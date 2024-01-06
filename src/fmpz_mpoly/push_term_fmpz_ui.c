@@ -50,4 +50,3 @@ void fmpz_mpoly_push_term_si_ui(fmpz_mpoly_t A,
     _fmpz_mpoly_push_exp_ui(A, exp, ctx);
     fmpz_set_si(A->coeffs + A->length - 1, c);
 }
-

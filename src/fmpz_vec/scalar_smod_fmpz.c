@@ -33,4 +33,3 @@ void _fmpz_vec_scalar_smod_fmpz(fmpz *res, const fmpz *vec, slong len, const fmp
 
     fmpz_clear(pdiv2);
 }
-

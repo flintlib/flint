@@ -69,4 +69,3 @@ acb_dirichlet_hardy_z(acb_ptr res, const acb_t t,
     _acb_vec_clear(v, len);
     _acb_vec_clear(w, len);
 }
-

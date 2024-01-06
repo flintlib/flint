@@ -107,4 +107,3 @@ ca_sqrt(ca_t res, const ca_t x, ca_ctx_t ctx)
     ca_sqrt_factor(res, x, CA_FACTOR_POLY_SQF | CA_FACTOR_ZZ_SMOOTH, ctx);
 #endif
 }
-

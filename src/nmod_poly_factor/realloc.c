@@ -60,4 +60,3 @@ void nmod_poly_factor_realloc(nmod_poly_factor_t fac, slong alloc)
         fac->alloc = alloc;
     }
 }
-

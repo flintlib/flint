@@ -246,4 +246,3 @@ arb_agm(arb_t res, const arb_t x, const arb_t y, slong prec)
     mag_clear(err);
     mag_clear(err2);
 }
-

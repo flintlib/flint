@@ -165,4 +165,3 @@ _arf_set_round_mpn(arf_t y, slong * exp_shift, mp_srcptr x, mp_size_t xn,
 
     return inexact;
 }
-

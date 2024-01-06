@@ -210,4 +210,3 @@ mag_d_log_lower_bound(double x)
     else
         return mag_d_bad_log(x) * (1 + 1e-14);
 }
-

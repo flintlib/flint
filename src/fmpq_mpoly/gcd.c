@@ -41,4 +41,3 @@ FMPQ_MPOLY_GCD_EXT(gcd_hensel)
 FMPQ_MPOLY_GCD_EXT(gcd_subresultant)
 FMPQ_MPOLY_GCD_EXT(gcd_zippel)
 FMPQ_MPOLY_GCD_EXT(gcd_zippel2)
-

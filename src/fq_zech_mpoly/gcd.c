@@ -56,4 +56,3 @@ int fq_zech_mpoly_gcd(
 
     return success;
 }
-

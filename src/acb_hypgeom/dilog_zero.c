@@ -31,4 +31,3 @@ acb_hypgeom_dilog_zero(acb_t res, const acb_t z, slong prec)
         acb_clear(z0);
     }
 }
-

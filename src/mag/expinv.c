@@ -89,4 +89,3 @@ mag_expinv_lower(mag_t res, const mag_t x)
             _mag_exp_d(res, -ldexp(MAG_MAN(x), e - MAG_BITS), 0);
     }
 }
-

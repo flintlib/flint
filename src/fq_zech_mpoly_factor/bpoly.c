@@ -688,4 +688,3 @@ void fq_zech_mpoly_set_fq_zech_bpoly(
 
     fq_zech_mpoly_sort_terms(A, ctx);
 }
-

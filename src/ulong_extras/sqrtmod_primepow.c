@@ -321,4 +321,3 @@ slong n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, slong exp)
         return 2*a;
     }
 }
-

@@ -39,4 +39,3 @@ void fmpz_poly_q_canonicalise(fmpz_poly_q_t rop)
         fmpz_poly_neg(rop->den, rop->den);
     }
 }
-

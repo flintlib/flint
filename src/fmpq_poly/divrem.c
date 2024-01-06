@@ -158,4 +158,3 @@ void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R,
     _fmpq_poly_set_length(R, lenR);
     _fmpq_poly_normalise(R);
 }
-

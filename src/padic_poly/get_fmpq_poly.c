@@ -66,4 +66,3 @@ void padic_poly_get_fmpq_poly(fmpq_poly_t rop,
         _fmpq_poly_set_length(rop, len);
     }
 }
-

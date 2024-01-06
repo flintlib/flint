@@ -98,4 +98,3 @@ slong _fmpz_poly_hensel_continue_lift(fmpz_poly_factor_t lifted_fac,
 
     return new_prev;
 }
-

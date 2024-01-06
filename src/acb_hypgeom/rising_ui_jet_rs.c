@@ -180,4 +180,3 @@ acb_hypgeom_rising_ui_jet_rs(acb_ptr res, const acb_t x, ulong n, ulong m, slong
     _acb_vec_clear(tmp, 2 * len + (m + 1) * xmlen);
     TMP_END;
 }
-

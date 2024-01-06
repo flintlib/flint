@@ -25,4 +25,3 @@ void padic_mat_init2(padic_mat_t A, slong r, slong c, slong prec)
     A->val = 0;
     A->N   = prec;
 }
-

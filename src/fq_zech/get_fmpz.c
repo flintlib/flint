@@ -21,4 +21,3 @@ int fq_zech_get_fmpz(fmpz_t a, const fq_zech_t b, const fq_zech_ctx_t ctx)
     fmpz_set_ui(a, q);
     return 1;
 }
-

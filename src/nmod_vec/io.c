@@ -69,5 +69,3 @@ int _nmod_vec_fprint(FILE * f, mp_srcptr vec, slong len, nmod_t mod)
 {
     return _nmod_vec_fprint_pretty(f, vec, len, mod);
 }
-
-

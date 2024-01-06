@@ -56,4 +56,3 @@ int fmpz_mpoly_gcd_cofactors(
 
     return _fmpz_mpoly_gcd_algo(G, Abar, Bbar, A, B, ctx, MPOLY_GCD_USE_ALL);
 }
-

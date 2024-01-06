@@ -36,4 +36,3 @@ void fmpq_mpoly_scalar_div_si(fmpq_mpoly_t A,
     fmpq_mpoly_scalar_div_fmpz(A, B, C, ctx);
     fmpz_clear(C);
 }
-

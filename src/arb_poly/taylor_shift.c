@@ -61,4 +61,3 @@ arb_poly_taylor_shift(arb_poly_t g, const arb_poly_t f,
 
     _arb_poly_taylor_shift(g->coeffs, c, g->length, prec);
 }
-

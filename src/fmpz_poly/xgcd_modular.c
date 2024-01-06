@@ -223,4 +223,3 @@ fmpz_poly_xgcd_modular(fmpz_t r, fmpz_poly_t s, fmpz_poly_t t,
         }
     }
 }
-

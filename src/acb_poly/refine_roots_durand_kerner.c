@@ -151,4 +151,3 @@ _acb_poly_refine_roots_durand_kerner(acb_ptr roots,
     acb_clear(y);
     acb_clear(t);
 }
-

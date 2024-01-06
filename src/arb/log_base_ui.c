@@ -170,4 +170,3 @@ arb_log_base_ui(arb_t res, const arb_t x, ulong b, slong prec)
     arb_div(res, res, t, prec);
     arb_clear(t);
 }
-

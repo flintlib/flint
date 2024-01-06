@@ -66,4 +66,3 @@ const char * calcium_func_name(calcium_func_code func)
         default: return "<unknown function>";
     }
 }
-

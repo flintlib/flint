@@ -32,4 +32,3 @@ void fmpq_poly_init2(fmpq_poly_t poly, slong alloc)
     poly->alloc  = alloc;
     poly->length = 0;
 }
-

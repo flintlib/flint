@@ -1085,4 +1085,3 @@ void n_fq_evals_fmma(
 
     TMP_END;
 }
-

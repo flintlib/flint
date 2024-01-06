@@ -357,4 +357,3 @@ void unity_zpq_gauss_sum_sigma_pow(
 #endif
 
 #endif
-

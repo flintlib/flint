@@ -90,4 +90,3 @@ void mul_truncate_sqrt2(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
    flint_free(ii);
    if (i1 != i2) flint_free(jj);
 }
-

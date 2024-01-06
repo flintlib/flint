@@ -30,4 +30,3 @@ arf_is_int(const arf_t x)
     c = flint_ctz(xp[0]);
     return exp - xn * FLINT_BITS + c >= 0;
 }
-

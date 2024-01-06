@@ -27,4 +27,3 @@ arf_is_int_2exp_si(const arf_t x, slong e)
         return r;
     }
 }
-

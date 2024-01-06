@@ -21,4 +21,3 @@ n_mulmod_precomp_shoup(mp_limb_t w, mp_limb_t p)
    udiv_qrnnd(q, r, w, UWORD(0), p);
    return q;
 }
-

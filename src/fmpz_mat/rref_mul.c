@@ -147,4 +147,3 @@ fmpz_mat_rref_mul(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
 
     return rank;
 }
-

@@ -104,4 +104,3 @@ void fmpz_mat_charpoly_berkowitz(fmpz_poly_t cp, const fmpz_mat_t mat)
 
     _fmpz_mat_charpoly_berkowitz(cp->coeffs, mat);
 }
-

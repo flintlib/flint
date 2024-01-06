@@ -57,4 +57,3 @@ acb_hypgeom_2f1_choose(const acb_t z)
 
     return 6;
 }
-

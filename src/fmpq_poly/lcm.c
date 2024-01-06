@@ -119,4 +119,3 @@ void fmpq_poly_lcm(fmpq_poly_t L, const fmpq_poly_t A, const fmpq_poly_t B)
     _fmpq_poly_set_length(L, lenL);
     _fmpq_poly_normalise(L);
 }
-

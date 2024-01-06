@@ -59,4 +59,3 @@ _arb_poly_newton_step(arb_t xnew, arb_srcptr poly, slong len,
 
     return result;
 }
-

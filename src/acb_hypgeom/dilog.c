@@ -164,4 +164,3 @@ acb_hypgeom_dilog(acb_t res, const acb_t z, slong prec)
 
     acb_set_round(res, res, inprec);
 }
-

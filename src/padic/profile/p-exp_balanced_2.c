@@ -107,4 +107,3 @@ for (l = 0; l < len; l++)
 
     return 0;
 }
-

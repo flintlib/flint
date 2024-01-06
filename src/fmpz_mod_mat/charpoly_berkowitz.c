@@ -114,4 +114,3 @@ void fmpz_mod_mat_charpoly_berkowitz(fmpz_mod_poly_t cp,
     _fmpz_mod_poly_set_length(cp, fmpz_mod_mat_nrows(mat) + 1);
     _fmpz_mod_poly_normalise(cp);
 }
-

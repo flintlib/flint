@@ -143,4 +143,3 @@ fq_nmod_poly_mul_univariate (fq_nmod_poly_t rop,
         _fq_nmod_poly_set_length(rop, rlen, ctx);
     }
 }
-

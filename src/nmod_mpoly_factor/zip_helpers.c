@@ -317,4 +317,3 @@ int n_polyun_zip_solve(
     n_poly_clear(t);
     return 1;
 }
-

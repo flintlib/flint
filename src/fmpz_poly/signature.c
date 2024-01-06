@@ -123,4 +123,3 @@ void fmpz_poly_signature(slong * r1, slong * r2, const fmpz_poly_t poly)
 {
     _fmpz_poly_signature(r1, r2, poly->coeffs, poly->length);
 }
-

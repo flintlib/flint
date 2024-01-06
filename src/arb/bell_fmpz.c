@@ -363,4 +363,3 @@ arb_bell_ui(arb_t res, ulong n, slong prec)
     arb_bell_fmpz(res, t, prec);
     fmpz_clear(t);
 }
-

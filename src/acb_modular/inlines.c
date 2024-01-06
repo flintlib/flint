@@ -11,4 +11,3 @@
 
 #define ACB_MODULAR_INLINES_C
 #include "acb_modular.h"
-

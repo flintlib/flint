@@ -608,4 +608,3 @@ not_exact_division:
     Q->length = 0;
     goto cleanup;
 }
-

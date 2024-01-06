@@ -298,4 +298,3 @@ void fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t fac, const fmpz_poly_t G)
 }
 
 #undef TRACE_ZASSENHAUS
-

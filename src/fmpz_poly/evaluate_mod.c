@@ -48,4 +48,3 @@ mp_limb_t fmpz_poly_evaluate_mod(const fmpz_poly_t poly, mp_limb_t a,
         return _fmpz_poly_evaluate_mod(poly->coeffs, poly->length, a, n, ninv);
     }
 }
-

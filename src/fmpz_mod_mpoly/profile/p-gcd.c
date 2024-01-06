@@ -388,4 +388,3 @@ int main(int argc, char *argv[])
     flint_cleanup_master();
     return 0;
 }
-

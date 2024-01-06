@@ -2048,4 +2048,3 @@ slong n_polyun_stack_size(const n_polyun_stack_t S)
 #endif
 
 #endif
-

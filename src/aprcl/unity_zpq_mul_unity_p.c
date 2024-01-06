@@ -34,4 +34,3 @@ unity_zpq_mul_unity_p_pow(unity_zpq f, const unity_zpq g, slong k)
     for (i = 0; i < k; i++)
         _unity_zpq_mul_unity_p(f);
 }
-

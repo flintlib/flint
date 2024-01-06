@@ -19,4 +19,3 @@ arb_get_interval_arf(arf_t a, arf_t b, const arb_t x, slong prec)
     arf_sub(a, arb_midref(x), r, prec, ARF_RND_FLOOR);
     arf_add(b, arb_midref(x), r, prec, ARF_RND_CEIL);
 }
-

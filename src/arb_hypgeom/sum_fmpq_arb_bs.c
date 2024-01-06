@@ -156,4 +156,3 @@ arb_hypgeom_sum_fmpq_arb_bs(arb_t res, const fmpq * a, slong alen, const fmpq * 
     fmpz_clear(aden);
     fmpz_clear(bden);
 }
-

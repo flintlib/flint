@@ -177,4 +177,3 @@ acb_dirichlet_zeta_jet_rs(acb_ptr res, const acb_t s, slong len, slong prec)
         mag_clear(M);
     }
 }
-

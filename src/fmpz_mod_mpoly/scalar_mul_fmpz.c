@@ -128,4 +128,3 @@ void fmpz_mod_mpoly_scalar_mul_si(
     fmpz_mod_mpoly_scalar_mul_fmpz_mod(A, B, cc, ctx);
     fmpz_clear(cc);
 }
-

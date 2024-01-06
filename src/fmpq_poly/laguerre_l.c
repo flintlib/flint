@@ -57,4 +57,3 @@ fmpq_poly_laguerre_l(fmpq_poly_t poly, ulong n)
     _fmpq_poly_laguerre_l(poly->coeffs, poly->den, n);
     _fmpq_poly_set_length(poly, n + 1);
 }
-

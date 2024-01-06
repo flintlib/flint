@@ -131,4 +131,3 @@ void TEMPLATE(T, poly_invsqrt_series)(TEMPLATE(T, poly_t) g,
 }
 
 #endif
-

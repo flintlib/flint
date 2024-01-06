@@ -21,4 +21,3 @@ void fmpz_mod_poly_clear(fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
     if (poly->coeffs)
         flint_free(poly->coeffs);  /* clean up ordinary coeffs */
 }
-

@@ -75,4 +75,3 @@ partitions_rademacher_bound(arf_t b, const fmpz_t n, ulong N)
     arf_clear(u);
     fmpz_clear(n1);
 }
-

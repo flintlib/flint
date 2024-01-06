@@ -60,4 +60,3 @@ void fmpz_addmul_si(fmpz_t f, const fmpz_t g, slong x)
         _fmpz_demote_val(f);
     }
 }
-

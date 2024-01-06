@@ -82,4 +82,3 @@ slong acb_rel_one_accuracy_bits(const acb_t z)
         return acb_rel_accuracy_bits(z);
     }
 }
-

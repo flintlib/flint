@@ -97,4 +97,3 @@ acb_modular_fundamental_domain_approx(acb_t w, psl2z_t g, const acb_t z,
 
     acb_clear(t);
 }
-

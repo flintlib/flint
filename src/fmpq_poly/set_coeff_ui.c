@@ -41,4 +41,3 @@ void fmpq_poly_set_coeff_ui(fmpq_poly_t poly, slong n, ulong x)
             fmpq_poly_canonicalise(poly);
     }
 }
-

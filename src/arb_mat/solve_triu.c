@@ -104,4 +104,3 @@ arb_mat_solve_triu(arb_mat_t X, const arb_mat_t U,
     else
         arb_mat_solve_triu_recursive(X, U, B, unit, prec);
 }
-

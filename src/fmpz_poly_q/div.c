@@ -119,4 +119,3 @@ void fmpz_poly_q_div(fmpz_poly_q_t rop,
         fmpz_poly_neg(rop->den, rop->den);
     }
 }
-

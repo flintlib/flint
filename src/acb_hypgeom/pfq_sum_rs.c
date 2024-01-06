@@ -115,4 +115,3 @@ acb_hypgeom_pfq_sum_rs(acb_t res, acb_t term, acb_srcptr a, slong p,
     acb_clear(u);
     _acb_vec_clear(zpow, m + 1);
 }
-

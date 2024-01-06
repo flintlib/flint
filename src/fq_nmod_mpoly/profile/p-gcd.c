@@ -294,4 +294,3 @@ flint_printf("--------------------\ntotal time: %wd\n", total_super);
     flint_cleanup_master();
     return 0;
 }
-

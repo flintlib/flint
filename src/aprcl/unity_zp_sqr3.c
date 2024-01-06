@@ -118,4 +118,3 @@ unity_zp_sqr9(unity_zp f, const unity_zp g, fmpz_t * t)
     unity_zp_coeff_set_fmpz(f, 4, t[1]);    /*  y4 = a1 mod n   */
     unity_zp_coeff_set_fmpz(f, 5, t[8]);    /*  y5 = c2 mod n   */
 }
-

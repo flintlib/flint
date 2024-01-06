@@ -56,4 +56,3 @@ mp_limb_t fmpz_get_nmod(const fmpz_t aa, nmod_t mod)
 
     return (SA == 0 || r == 0) ? r : (mod.n - r);
 }
-

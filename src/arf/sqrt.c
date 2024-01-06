@@ -98,4 +98,3 @@ arf_sqrt_fmpz(arf_t z, const fmpz_t x, slong prec, arf_rnd_t rnd)
     arf_clear(t);
     return inexact;
 }
-

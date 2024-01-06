@@ -637,4 +637,3 @@ arb_hypgeom_erfc(arb_t res, const arb_t z, slong prec)
     arb_sub_ui(res, res, 1, prec);
     arb_neg(res, res);
 }
-

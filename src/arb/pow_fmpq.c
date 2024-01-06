@@ -44,4 +44,3 @@ arb_pow_fmpq(arb_t y, const arb_t x, const fmpq_t a, slong prec)
         }
     }
 }
-

@@ -43,4 +43,3 @@ int fmpq_mpoly_discriminant(fmpq_mpoly_t R, const fmpq_mpoly_t A,
 
     return success;
 }
-

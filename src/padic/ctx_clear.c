@@ -21,4 +21,3 @@ void padic_ctx_clear(padic_ctx_t ctx)
         _fmpz_vec_clear(ctx->pow, ctx->max - ctx->min);
     }
 }
-

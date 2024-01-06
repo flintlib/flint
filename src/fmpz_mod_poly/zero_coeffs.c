@@ -28,4 +28,3 @@ void fmpz_mod_poly_zero_coeffs(fmpz_mod_poly_t poly, slong i, slong j,
         _fmpz_mod_poly_normalise(poly);
     }
 }
-

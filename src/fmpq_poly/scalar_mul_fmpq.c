@@ -104,4 +104,3 @@ void fmpq_poly_scalar_mul_fmpq(fmpq_poly_t rop, const fmpq_poly_t op, const fmpq
                                    fmpq_numref(c), fmpq_denref(c));
     }
 }
-

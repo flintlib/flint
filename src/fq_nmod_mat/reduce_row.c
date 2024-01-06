@@ -144,4 +144,3 @@ slong fq_nmod_mat_reduce_row(fq_nmod_mat_t A, slong * P, slong * L,
 
    return -WORD(1);
 }
-

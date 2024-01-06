@@ -23,4 +23,3 @@ arb_mat_ones(arb_mat_t mat)
         for (j = 0; j < C; j++)
             arb_one(arb_mat_entry(mat, i, j));
 }
-

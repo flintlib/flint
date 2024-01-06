@@ -17,4 +17,3 @@ void padic_mat_transpose(padic_mat_t B, const padic_mat_t A)
     fmpz_mat_transpose(padic_mat(B), padic_mat(A));
     B->val = A->val;
 }
-

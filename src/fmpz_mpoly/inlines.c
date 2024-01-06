@@ -15,4 +15,3 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
-

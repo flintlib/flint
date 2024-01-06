@@ -160,4 +160,3 @@ void _fmpq_cfrac_list_append_ui(_fmpq_cfrac_list_t v, const ulong * a, slong n)
 
     FLINT_ASSERT(v->length <= v->limit);
 }
-

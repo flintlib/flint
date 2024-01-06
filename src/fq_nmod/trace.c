@@ -71,4 +71,3 @@ void fq_nmod_trace(fmpz_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 
     _fq_nmod_trace(rop, op->coeffs, op->length, ctx);
 }
-

@@ -60,4 +60,3 @@ void fq_nmod_mpoly_fit_length_fit_bits(
         }
     }
 }
-

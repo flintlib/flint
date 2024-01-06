@@ -69,4 +69,3 @@ slong fmpz_mat_reduce_row(fmpz_mod_mat_t A, slong * P, slong * L, slong m)
     fmpz_mod_ctx_clear(ctx);
     return res;
 }
-

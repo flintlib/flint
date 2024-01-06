@@ -63,4 +63,3 @@ acb_expm1(acb_t res, const acb_t z, slong prec)
         acb_sub_ui(res, res, 1, prec);
     }
 }
-

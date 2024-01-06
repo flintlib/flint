@@ -39,4 +39,3 @@ void nmod_poly_add_ui(nmod_poly_t res, const nmod_poly_t poly, ulong c)
         _nmod_poly_normalise(res);
    }
 }
-

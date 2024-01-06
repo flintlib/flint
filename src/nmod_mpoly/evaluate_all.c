@@ -103,4 +103,3 @@ ulong nmod_mpoly_evaluate_all_ui(const nmod_mpoly_t A,
     return _nmod_mpoly_eval_all_ui(A->coeffs, A->exps, A->length, A->bits,
                                                    vals, ctx->minfo, ctx->mod);
 }
-

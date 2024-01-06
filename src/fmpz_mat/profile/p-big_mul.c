@@ -241,4 +241,3 @@ int main(void)
     FLINT_TEST_CLEANUP(state);
     return 0;
 }
-

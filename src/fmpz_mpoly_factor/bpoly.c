@@ -183,4 +183,3 @@ void fmpz_mpoly_get_bpoly(
         fmpz_bpoly_set_coeff(A, Bexpx, Bexpy, B->coeffs + j);
     }
 }
-

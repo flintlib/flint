@@ -61,4 +61,3 @@ void fmpz_mpoly_realloc(fmpz_mpoly_t poly,
 
     poly->alloc = alloc;
 }
-

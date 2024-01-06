@@ -31,4 +31,3 @@ unity_zpq_gauss_sum(unity_zpq f, ulong q, ulong p)
         unity_zpq_coeff_add_ui(f, qpow, ppow, 1);
     }
 }
-

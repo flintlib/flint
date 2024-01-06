@@ -47,4 +47,3 @@ psl2z_randtest(psl2z_t g, flint_rand_t state, slong bits)
         fmpz_clear(t);
     }
 }
-

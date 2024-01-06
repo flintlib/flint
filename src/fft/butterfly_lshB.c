@@ -94,4 +94,3 @@ void butterfly_lshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1,
       mpn_addmod_2expp1_1(u + x, limbs - x, cy1);
   }
 }
-

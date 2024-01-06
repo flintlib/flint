@@ -13,4 +13,3 @@
 
 #include "flint.h"
 #include "qadic.h"
-

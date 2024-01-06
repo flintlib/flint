@@ -3470,4 +3470,3 @@ const mp_limb_t arb_sin_cos_tab22[2 * ARB_SIN_COS_TAB22_NUM][ARB_SIN_COS_TAB2_LI
   Z8(6d843aa5,68dad114,fa7dd2a0,2207284f,50bffa10,d862be6f,36f2b1d6,37bf5acb)
   Z8(28028625,d4aeb2b1,b86cbdad,1e98172a,073b41d4,693e6ead,4eddbbad,ffe1f896)
 }};
-

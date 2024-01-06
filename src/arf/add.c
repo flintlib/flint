@@ -253,4 +253,3 @@ arf_add_fmpz_2exp(arf_ptr z, arf_srcptr x, const fmpz_t y, const fmpz_t exp, slo
     fmpz_clear(yexp);
     return inexact;
 }
-

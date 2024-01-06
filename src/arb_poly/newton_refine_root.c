@@ -59,4 +59,3 @@ _arb_poly_newton_refine_root(arb_t r, arb_srcptr poly, slong len,
 
     }
 }
-

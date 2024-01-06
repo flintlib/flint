@@ -26,4 +26,3 @@ void fmpz_poly_q_clear(fmpz_poly_q_t rop)
         rop->den = NULL;
     }
 }
-

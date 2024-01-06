@@ -1068,4 +1068,3 @@ int fmpq_reconstruct_fmpz_2(fmpq_t res, const fmpz_t a, const fmpz_t m,
     return _fmpq_reconstruct_fmpz_2(fmpq_numref(res),
                                     fmpq_denref(res), a, m, N, D);
 }
-

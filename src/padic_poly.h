@@ -380,4 +380,3 @@ int padic_poly_is_reduced(const padic_poly_t op, const padic_ctx_t ctx);
 #endif
 
 #endif
-

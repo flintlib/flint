@@ -70,4 +70,3 @@ arb_poly_evaluate_rectangular(arb_t res, const arb_poly_t f, const arb_t a, slon
 {
     _arb_poly_evaluate_rectangular(res, f->coeffs, f->length, a, prec);
 }
-

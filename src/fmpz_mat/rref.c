@@ -22,4 +22,3 @@ fmpz_mat_rref(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
     else
         return fmpz_mat_rref_mul(R, den, A);
 }
-

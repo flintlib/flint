@@ -172,4 +172,3 @@ acb_modular_theta_const_sum_basecase(acb_t theta2, acb_t theta3, acb_t theta4,
     acb_clear(t2);
     mag_clear(qmag);
 }
-

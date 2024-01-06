@@ -22,4 +22,3 @@ acb_dirichlet_roots_clear(acb_dirichlet_roots_t t)
     flint_free(t->Z);
     acb_clear(t->z);
 }
-

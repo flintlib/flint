@@ -820,4 +820,3 @@ int fmpz_mpoly_factor_zippel(
 {
     return _factor(f, A, ctx, MPOLY_FACTOR_USE_ZIP);
 }
-

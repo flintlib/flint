@@ -97,4 +97,3 @@ acb_poly_sinh_cosh_series_exponential(acb_poly_t s, acb_poly_t c,
     _acb_poly_set_length(c, n);
     _acb_poly_normalise(c);
 }
-

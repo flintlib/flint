@@ -448,4 +448,3 @@ int qadic_debug(const qadic_t op);
 #endif
 
 #endif
-

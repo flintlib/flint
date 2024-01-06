@@ -314,4 +314,3 @@ void fmpz_mod_mat_invert_cols(fmpz_mod_mat_t mat, slong * perm)
 #endif
 
 #endif
-

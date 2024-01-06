@@ -704,4 +704,3 @@ int mag_dump_file(FILE * stream, const mag_t x);
 #endif
 
 #endif
-

@@ -53,4 +53,3 @@ void padic_mat_set_entry_padic(padic_mat_t rop, slong i, slong j,
         padic_mat_val(rop) = padic_val(op);
     }
 }
-

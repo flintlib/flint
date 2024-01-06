@@ -22,4 +22,3 @@ arb_poly_valuation(const arb_poly_t poly)
 
     return -1;
 }
-

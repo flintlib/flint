@@ -579,4 +579,3 @@ fexpr_vec_set_length(fexpr_vec_t vec, slong len)
 #endif
 
 #endif
-

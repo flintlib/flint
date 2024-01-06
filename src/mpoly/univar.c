@@ -922,4 +922,3 @@ int mpoly_univar_discriminant(
 
     return success;
 }
-

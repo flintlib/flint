@@ -865,4 +865,3 @@ flint_mpn_mul(mp_ptr z, mp_srcptr x, mp_size_t xn, mp_srcptr y, mp_size_t yn)
     else
         return flint_mpn_mul_large(z, x, xn, y, yn);
 }
-

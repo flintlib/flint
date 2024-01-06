@@ -106,4 +106,3 @@ arf_get_d(const arf_t x, arf_rnd_t rnd)
         return v;
     }
 }
-

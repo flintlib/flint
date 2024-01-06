@@ -2284,5 +2284,3 @@ const mp_limb_t arb_atan_tab22[1 << ARB_ATAN_TAB22_BITS][ARB_ATAN_TAB2_LIMBS] =
   Z8(bd5dd2e7,67fc724d,5ebae2bf,d635b446,682bf0ac,3da7f72b,901bb0d0,7fd76470)
   Z8(1016ad6e,9f4ebac7,26604410,67555f4a,07bc06ce,45be4112,7ea3cf61,07bf64ec)
 }};
-
-

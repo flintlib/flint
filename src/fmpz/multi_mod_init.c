@@ -23,4 +23,3 @@ void fmpz_multi_mod_init(fmpz_multi_mod_t P)
     P->temp1loc = 0;
     P->good = 0;
 }
-

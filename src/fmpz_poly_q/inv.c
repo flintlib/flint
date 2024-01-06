@@ -42,4 +42,3 @@ void fmpz_poly_q_inv(fmpz_poly_q_t rop, const fmpz_poly_q_t op)
         }
     }
 }
-

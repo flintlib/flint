@@ -51,4 +51,3 @@ arb_sqrtpos(arb_t z, const arb_t x, slong prec)
 
     arb_nonnegative_part(z, z);
 }
-

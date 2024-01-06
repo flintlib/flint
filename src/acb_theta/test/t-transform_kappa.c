@@ -59,4 +59,3 @@ TEST_FUNCTION_START(acb_theta_transform_kappa, state)
 
     TEST_FUNCTION_END(state);
 }
-

@@ -339,4 +339,3 @@ void padic_debug(const padic_t op);
 #endif
 
 #endif
-

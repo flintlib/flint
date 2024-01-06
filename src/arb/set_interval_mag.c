@@ -96,4 +96,3 @@ arb_set_interval_mag(arb_t res, const mag_t a, const mag_t b, slong prec)
         arb_mul_2exp_si(res, res, -1);
     }
 }
-

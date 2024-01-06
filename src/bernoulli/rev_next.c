@@ -171,4 +171,3 @@ bernoulli_rev_next(fmpz_t numer, fmpz_t denom, bernoulli_rev_t iter)
     arb_clear(z);
     arb_clear(h);
 }
-

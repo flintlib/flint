@@ -876,4 +876,3 @@ void _fmpz_poly_factor_cubic(fmpz_poly_factor_t fac,
 
     fmpz_poly_clear(p);
 }
-

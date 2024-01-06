@@ -26,4 +26,3 @@ void fmpz_mod_mat_solve_tril(fmpz_mod_mat_t X, const fmpz_mod_mat_t L,
         fmpz_mod_mat_solve_tril_recursive(X, L, B, unit);
     }
 }
-

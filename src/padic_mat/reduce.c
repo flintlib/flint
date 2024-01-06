@@ -47,4 +47,3 @@ void padic_mat_reduce(padic_mat_t mat, const padic_ctx_t ctx)
     _padic_mat_canonicalise(mat, ctx);
     _padic_mat_reduce(mat, ctx);
 }
-

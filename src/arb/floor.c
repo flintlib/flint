@@ -39,4 +39,3 @@ arb_floor(arb_t z, const arb_t x, slong prec)
         arf_clear(b);
     }
 }
-

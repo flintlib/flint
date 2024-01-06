@@ -158,4 +158,3 @@ void qadic_teichmuller(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
         _padic_poly_normalise(rop);
     }
 }
-

@@ -51,4 +51,3 @@ void padic_poly_set_fmpq_poly(padic_poly_t f,
         fmpz_clear(t);
     }
 }
-

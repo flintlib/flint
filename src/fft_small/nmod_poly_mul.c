@@ -1464,5 +1464,3 @@ void _nmod_poly_mul_mid(
     _nmod_poly_mul_mid_classical(z, zl, zh, a, an, b, bn, mod);
     return;
 }
-
-

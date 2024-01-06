@@ -144,4 +144,3 @@ void n_fq_bpoly_taylor_shift_gen0_n_fq(
 
     return;
 }
-

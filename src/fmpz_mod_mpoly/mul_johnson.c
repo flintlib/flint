@@ -553,4 +553,3 @@ void fmpz_mod_mpoly_mul_johnson(
 
     TMP_END;
 }
-

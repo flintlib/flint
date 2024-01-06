@@ -45,4 +45,3 @@ void fmpz_mpoly_compose_fmpz_mpoly_gen(fmpz_mpoly_t A,
 
     return;
 }
-

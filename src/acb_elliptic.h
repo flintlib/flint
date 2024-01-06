@@ -71,4 +71,3 @@ void acb_elliptic_inv_p(acb_t res, const acb_t z, const acb_t tau, slong prec);
 #endif
 
 #endif
-

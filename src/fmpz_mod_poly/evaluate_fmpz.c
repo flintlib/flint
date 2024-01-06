@@ -51,4 +51,3 @@ void fmpz_mod_poly_evaluate_fmpz(fmpz_t res, const fmpz_mod_poly_t poly,
         _fmpz_mod_poly_evaluate_fmpz(res, poly->coeffs, poly->length, a, ctx);
     }
 }
-

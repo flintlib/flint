@@ -259,4 +259,3 @@ int nmod_mpoly_compose_nmod_poly(nmod_poly_t A,
         return _nmod_mpoly_compose_nmod_poly_mp(A, B, C, ctx);
     }
 }
-

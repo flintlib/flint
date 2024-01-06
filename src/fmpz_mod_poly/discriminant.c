@@ -60,4 +60,3 @@ void fmpz_mod_poly_discriminant(fmpz_t d, const fmpz_mod_poly_t f,
     else
        _fmpz_mod_poly_discriminant(d, f->coeffs, len, ctx);
 }
-

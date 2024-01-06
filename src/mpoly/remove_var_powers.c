@@ -60,4 +60,3 @@ void mpoly_remove_var_powers(
 
     TMP_END;
 }
-

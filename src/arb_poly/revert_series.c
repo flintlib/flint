@@ -52,4 +52,3 @@ arb_poly_revert_series(arb_poly_t Qinv,
     _arb_poly_set_length(Qinv, n);
     _arb_poly_normalise(Qinv);
 }
-

@@ -41,4 +41,3 @@ arf_neg_round(arf_t y, const arf_t x, slong prec, arf_rnd_t rnd)
         }
     }
 }
-

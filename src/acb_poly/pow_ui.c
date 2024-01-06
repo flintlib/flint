@@ -58,4 +58,3 @@ acb_poly_pow_ui(acb_poly_t res,
         }
     }
 }
-

@@ -295,4 +295,3 @@ arb_lgamma(arb_t y, const arb_t x, slong prec)
 {
     arb_hypgeom_lgamma(y, x, prec);
 }
-

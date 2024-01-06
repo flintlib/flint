@@ -26,4 +26,3 @@ acb_elliptic_k(acb_t k, const acb_t m, slong prec)
     acb_mul_2exp_si(k, k, -1);
     acb_clear(t);
 }
-

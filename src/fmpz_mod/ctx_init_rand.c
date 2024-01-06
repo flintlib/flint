@@ -33,4 +33,3 @@ void fmpz_mod_ctx_init_rand_bits_prime(fmpz_mod_ctx_t ctx,
     fmpz_mod_ctx_init(ctx, m);
     fmpz_clear(m);
 }
-

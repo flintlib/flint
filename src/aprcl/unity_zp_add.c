@@ -26,4 +26,3 @@ unity_zp_add(unity_zp f, const unity_zp g, const unity_zp h)
                             fmpz_mod_ctx_modulus(h->ctx)));
     fmpz_mod_poly_add(f->poly, g->poly, h->poly, f->ctx);
 }
-

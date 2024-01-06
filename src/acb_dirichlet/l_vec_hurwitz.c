@@ -76,4 +76,3 @@ acb_dirichlet_l_vec_hurwitz(acb_ptr res, const acb_t s,
     acb_clear(qs);
     acb_clear(a);
 }
-

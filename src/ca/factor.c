@@ -216,4 +216,3 @@ ca_factor(ca_factor_t res, const ca_t x, ulong flags, ca_ctx_t ctx)
         }
     }
 }
-

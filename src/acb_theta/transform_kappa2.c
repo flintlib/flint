@@ -151,4 +151,3 @@ acb_theta_transform_kappa2(const fmpz_mat_t mat)
     flint_free(dec);
     return res & 3;
 }
-

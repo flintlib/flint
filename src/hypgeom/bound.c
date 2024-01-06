@@ -200,4 +200,3 @@ hypgeom_bound(mag_t error, int r,
 
     return n;
 }
-

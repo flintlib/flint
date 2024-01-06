@@ -47,4 +47,3 @@ _bernoulli_fmpq_ui_zeta(fmpz_t num, fmpz_t den, ulong n)
 
     arb_clear(t);
 }
-

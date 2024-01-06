@@ -23,4 +23,3 @@ qqbar_neg(qqbar_t res, const qqbar_t x)
 
     acb_neg(QQBAR_ENCLOSURE(res), QQBAR_ENCLOSURE(x));
 }
-

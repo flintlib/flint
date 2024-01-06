@@ -21,4 +21,3 @@ int fmpq_poly_is_monic(const fmpq_poly_t poly)
 {
     return _fmpq_poly_is_monic(poly->coeffs, poly->den, poly->length);
 }
-

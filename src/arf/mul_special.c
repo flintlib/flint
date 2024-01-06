@@ -35,4 +35,3 @@ arf_mul_special(arf_t z, const arf_t x, const arf_t y)
     else
         arf_neg_inf(z);
 }
-

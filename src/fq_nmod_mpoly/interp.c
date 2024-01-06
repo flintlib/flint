@@ -3663,5 +3663,3 @@ int fq_nmod_mpolyun_interp_mcrt_lg_mpolyu(
     fq_nmod_clear(inv_m_eval, ectx->fqctx);
     return changed;
 }
-
-

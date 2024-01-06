@@ -122,4 +122,3 @@ void padic_poly_sub(padic_poly_t f,
     _padic_poly_set_length(f, lenF);
     _padic_poly_normalise(f);
 }
-

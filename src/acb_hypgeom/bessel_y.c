@@ -102,4 +102,3 @@ acb_hypgeom_bessel_y(acb_t res, const acb_t nu, const acb_t z, slong prec)
 {
     acb_hypgeom_bessel_jy(NULL, res, nu, z, prec);
 }
-

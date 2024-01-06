@@ -19,4 +19,3 @@ void fmpz_poly_q_init(fmpz_poly_q_t rop)
     fmpz_poly_init(rop->den);
     fmpz_poly_set_si(rop->den, 1);
 }
-

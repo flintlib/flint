@@ -53,4 +53,3 @@ acb_exp_pi_i(acb_t r, const acb_t z, slong prec)
 #undef a
 #undef b
 }
-

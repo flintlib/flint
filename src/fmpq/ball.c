@@ -27,4 +27,3 @@ void _fmpq_ball_clear(_fmpq_ball_t x)
     fmpz_clear(x->right_num);
     fmpz_clear(x->right_den);
 }
-

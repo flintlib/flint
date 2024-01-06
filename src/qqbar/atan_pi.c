@@ -242,4 +242,3 @@ qqbar_atan_pi(slong * p, ulong * q, const qqbar_t x)
         return res;
     }
 }
-

@@ -238,4 +238,3 @@ _acb_dirichlet_refine_hardy_z_zero(arb_t res,
 
     arb_set_round(res, res, prec);
 }
-

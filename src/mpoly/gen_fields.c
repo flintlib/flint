@@ -46,4 +46,3 @@ void mpoly_gen_fields_fmpz(fmpz * gexp, slong var, const mpoly_ctx_t mctx)
     if (deg)
         fmpz_one(gexp + nvars);
 }
-

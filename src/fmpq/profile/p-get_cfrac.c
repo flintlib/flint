@@ -113,4 +113,3 @@ flint_printf("\n--- fib(1+2^%wd)/fib(2^%wd) (numerator bits = %wu) ---\n", i, i,
     flint_cleanup_master();
     return 0;
 }
-

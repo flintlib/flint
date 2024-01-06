@@ -34,4 +34,3 @@ void padic_poly_shift_right(padic_poly_t rop, const padic_poly_t op, slong n,
         /* TODO: Reduce */
     }
 }
-

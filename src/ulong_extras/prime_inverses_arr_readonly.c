@@ -25,4 +25,3 @@ const double * n_prime_inverses_arr_readonly(ulong num_primes)
 
     return _flint_prime_inverses[m];
 }
-

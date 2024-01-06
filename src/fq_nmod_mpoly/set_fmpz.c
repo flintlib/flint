@@ -43,4 +43,3 @@ void fq_nmod_mpoly_set_fmpz(
 {
     fq_nmod_mpoly_set_ui(A, fmpz_fdiv_ui(c, ctx->fqctx->mod.n), ctx);
 }
-

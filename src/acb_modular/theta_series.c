@@ -105,4 +105,3 @@ acb_modular_theta_series(acb_poly_t theta1, acb_poly_t theta2,
     if (theta3 != NULL) _acb_poly_normalise(theta3);
     if (theta4 != NULL) _acb_poly_normalise(theta4);
 }
-

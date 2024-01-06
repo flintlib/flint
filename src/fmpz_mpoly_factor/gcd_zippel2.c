@@ -2443,4 +2443,3 @@ gcd_is_trivial:
     success = 1;
     goto cleanup;
 }
-

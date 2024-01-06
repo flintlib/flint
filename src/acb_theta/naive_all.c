@@ -120,4 +120,3 @@ acb_theta_naive_all(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, sl
         acb_theta_naive_all_gen(th, zs, nb, tau, prec);
     }
 }
-

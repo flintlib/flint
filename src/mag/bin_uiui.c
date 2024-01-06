@@ -66,4 +66,3 @@ mag_bin_uiui(mag_t res, ulong n, ulong k)
 
     mag_clear(t);
 }
-

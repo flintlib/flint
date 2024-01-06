@@ -497,4 +497,3 @@ int fq_nmod_mpoly_factor_squarefree(
 {
     return fq_nmod_mpoly_factor_separable(f, A, ctx, 0);
 }
-

@@ -40,4 +40,3 @@ arb_poly_tan_series(arb_poly_t g, const arb_poly_t h, slong n, slong prec)
     _arb_poly_set_length(g, n);
     _arb_poly_normalise(g);
 }
-

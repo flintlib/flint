@@ -25,4 +25,3 @@ void padic_poly_set_fmpz_poly(padic_poly_t f, const fmpz_poly_t g,
     padic_poly_canonicalise(f, ctx->p);
     padic_poly_reduce(f, ctx);
 }
-

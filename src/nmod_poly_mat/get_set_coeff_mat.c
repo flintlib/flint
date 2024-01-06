@@ -30,4 +30,3 @@ void nmod_poly_mat_set_coeff_mat(nmod_poly_mat_t pmat,
             nmod_poly_set_coeff_ui(nmod_poly_mat_entry(pmat, i, j),
                     deg, nmod_mat_entry(coeff, i, j));
 }
-

@@ -20,4 +20,3 @@ void _fmpz_vec_scalar_mod_fmpz(fmpz *res, const fmpz *vec, slong len, const fmpz
     for (i = 0; i < len; i++)
         fmpz_mod(res + i, vec + i, p);
 }
-

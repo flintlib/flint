@@ -57,4 +57,3 @@ int fmpz_mpoly_compose_fmpz_mpoly_geobucket(fmpz_mpoly_t A,
 
     return success;
 }
-

@@ -112,4 +112,3 @@ ca_ext_cmp_repr(const ca_ext_t x, const ca_ext_t y, ca_ctx_t ctx)
 
     return 0;
 }
-

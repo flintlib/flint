@@ -80,4 +80,3 @@ int arf_cmp_d(const arf_t x, double y)
     arf_set_d(t, y);
     return arf_cmp(x, t);
 }
-

@@ -47,4 +47,3 @@ int fmpq_mpoly_gcd_cofactors(fmpq_mpoly_t G, fmpq_mpoly_t Abar,
 
     return 1;
 }
-

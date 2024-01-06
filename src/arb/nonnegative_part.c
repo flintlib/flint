@@ -46,4 +46,3 @@ arb_nonnegative_part(arb_t res, const arb_t x)
         arf_clear(t);
     }
 }
-

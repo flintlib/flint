@@ -707,4 +707,3 @@ acb_dirichlet_platt_multieval(arb_ptr out, const fmpz_t T, slong A, slong B,
         _fmpz_vec_clear(smk_points, N);
     }
 }
-

@@ -48,4 +48,3 @@ arb_bin_uiui(arb_t x, ulong n, ulong k, slong prec)
     arb_bin_ui(x, t, k, prec);
     arb_clear(t);
 }
-

@@ -143,4 +143,3 @@ int padic_log(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         return ans;
     }
 }
-

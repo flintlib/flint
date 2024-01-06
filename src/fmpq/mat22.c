@@ -206,4 +206,3 @@ void _fmpz_mat22_lmul_elem(_fmpz_mat22_t M, const fmpz_t q)
     fmpz_swap(M->_12, M->_22);
     M->det *= -1;
 }
-

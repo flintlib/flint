@@ -37,4 +37,3 @@ acb_get_mag(mag_t u, const acb_t z)
         mag_clear(v);
     }
 }
-

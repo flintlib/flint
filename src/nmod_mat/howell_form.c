@@ -43,4 +43,3 @@ nmod_mat_howell_form(nmod_mat_t A)
     }
     return k;
 }
-

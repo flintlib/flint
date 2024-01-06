@@ -29,4 +29,3 @@ int fmpz_tstbit(const fmpz_t f, ulong i)
         return mpz_tstbit(COEFF_TO_PTR(*f), i);
     }
 }
-

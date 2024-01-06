@@ -45,4 +45,3 @@ fmpz_mat_CRT_ui(fmpz_mat_t res, const fmpz_mat_t mat1,
 
     fmpz_clear(m1m2);
 }
-

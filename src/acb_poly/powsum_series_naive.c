@@ -98,4 +98,3 @@ _acb_poly_powsum_series_naive(acb_ptr z,
     acb_clear(qpow);
     acb_clear(negs);
 }
-

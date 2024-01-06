@@ -1825,4 +1825,3 @@ void nmod_mpoly_remainder_strongtest(const nmod_mpoly_t r, const nmod_mpoly_t g,
 #endif
 
 #endif
-

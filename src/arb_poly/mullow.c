@@ -145,4 +145,3 @@ arb_poly_mullow(arb_poly_t res, const arb_poly_t poly1,
     _arb_poly_set_length(res, n);
     _arb_poly_normalise(res);
 }
-

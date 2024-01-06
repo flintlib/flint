@@ -302,4 +302,3 @@ acb_hypgeom_legendre_q(acb_t res, const acb_t n, const acb_t m,
         flint_throw(FLINT_ERROR, "unsupported 'type' %d for legendre q\n", type);
     }
 }
-

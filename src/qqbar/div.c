@@ -189,4 +189,3 @@ qqbar_si_div(qqbar_t res, slong x, const qqbar_t y)
     qqbar_div(res, t, y);
     qqbar_clear(t);
 }
-

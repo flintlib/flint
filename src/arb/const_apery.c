@@ -37,4 +37,3 @@ arb_const_apery_eval(arb_t s, slong prec)
 }
 
 ARB_DEF_CACHED_CONSTANT(arb_const_apery, arb_const_apery_eval)
-

@@ -105,4 +105,3 @@ void fmpz_mod_poly_rem_basecase(fmpz_mod_poly_t R, const fmpz_mod_poly_t A,
 
     fmpz_clear(invB);
 }
-

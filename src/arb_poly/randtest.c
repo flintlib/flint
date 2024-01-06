@@ -28,4 +28,3 @@ arb_poly_randtest(arb_poly_t poly, flint_rand_t state, slong len, slong prec, sl
     _arb_poly_set_length(poly, len);
     _arb_poly_normalise(poly);
 }
-

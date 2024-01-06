@@ -136,4 +136,3 @@ void fq_nmod_mpoly_geobucket_sub(fq_nmod_mpoly_geobucket_t B, fq_nmod_mpoly_t p,
     fq_nmod_mpoly_swap(B->polys + i, B->temps + i, ctx);
     _fq_nmod_mpoly_geobucket_fix(B, i, ctx);
 }
-

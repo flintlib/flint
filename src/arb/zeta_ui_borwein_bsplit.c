@@ -178,4 +178,3 @@ arb_zeta_ui_borwein_bsplit(arb_t x, ulong s, slong prec)
 
     zeta_bsplit_clear(sum);
 }
-

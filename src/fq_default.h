@@ -1453,4 +1453,3 @@ FQ_DEFAULT_INLINE void fq_default_norm(fmpz_t rop,
 #endif
 
 #endif
-

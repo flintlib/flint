@@ -68,4 +68,3 @@ fmpz_divisor_sigma(fmpz_t res, ulong k, const fmpz_t n)
     fmpz_factor_divisor_sigma(res, k, fac);
     fmpz_factor_clear(fac);
 }
-

@@ -36,4 +36,3 @@ void mpn_negmod_2expp1(mp_limb_t* z, const mp_limb_t* a, mp_size_t limbs)
         }
     }
 }
-

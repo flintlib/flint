@@ -305,4 +305,3 @@ acb_dirichlet_zeta_deriv_bound(mag_t der1, mag_t der2, const acb_t s)
     mag_clear(R);
     mag_clear(M);
 }
-

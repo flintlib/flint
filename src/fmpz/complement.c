@@ -38,4 +38,3 @@ void fmpz_complement(fmpz_t r, const fmpz_t f)
         }
     }
 }
-

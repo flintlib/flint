@@ -22,4 +22,3 @@ void n_fq_polyun_set(n_fq_polyun_t A, const n_fq_polyun_t B, const fq_nmod_ctx_t
     }
     A->length = B->length;
 }
-

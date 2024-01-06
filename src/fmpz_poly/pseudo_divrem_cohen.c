@@ -134,4 +134,3 @@ fmpz_poly_pseudo_divrem_cohen(fmpz_poly_t Q, fmpz_poly_t R,
     else
         _fmpz_poly_set_length(R, lenr);
 }
-

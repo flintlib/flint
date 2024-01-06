@@ -409,4 +409,3 @@ _arf_add_mpn(arf_t z, mp_srcptr xp, mp_size_t xn, int xsgnbit, const fmpz_t xexp
     ARF_ADD_TMP_FREE(tmp, alloc)
     return inexact;
 }
-

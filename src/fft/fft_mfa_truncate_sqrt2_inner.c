@@ -225,4 +225,3 @@ void fft_mfa_truncate_sqrt2_inner(mp_limb_t ** ii, mp_limb_t ** jj, mp_size_t n,
     pthread_mutex_destroy(&mutex);
 #endif
 }
-

@@ -22,4 +22,3 @@ void _fmpz_mod_vec_mul(
     for (len--; len >= 0; len--)
         fmpz_mod_mul(A + len, B + len, C + len, ctx);
 }
-

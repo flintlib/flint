@@ -95,4 +95,3 @@ ca_get_acb_raw(acb_t res, const ca_t x, slong prec, ca_ctx_t ctx)
         }
     }
 }
-

@@ -174,4 +174,3 @@ fmpz_poly_resultant_modular(fmpz_t res, const fmpz_poly_t poly1,
             fmpz_neg(res, res);
    }
 }
-

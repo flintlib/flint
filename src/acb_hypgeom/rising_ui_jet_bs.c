@@ -83,4 +83,3 @@ acb_hypgeom_rising_ui_jet_bs(acb_ptr res, const acb_t x, ulong n, slong len, slo
 
     bsplit(res, x, 0, n, len, prec);
 }
-

@@ -53,4 +53,3 @@ void nf_elem_print_pretty(const nf_elem_t a, const nf_t nf, const char * var)
         fmpq_poly_print_pretty(NF_ELEM(a), var);
     }
 }
-

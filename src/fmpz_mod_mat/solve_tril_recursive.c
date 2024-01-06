@@ -53,4 +53,3 @@ void fmpz_mod_mat_solve_tril_recursive(fmpz_mod_mat_t X,
     fmpz_mod_mat_window_clear(XX);
     fmpz_mod_mat_window_clear(XY);
 }
-

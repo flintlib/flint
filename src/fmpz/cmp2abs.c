@@ -84,4 +84,3 @@ int fmpz_cmp2abs(const fmpz_t a, const fmpz_t b)
         }
     }
 }
-

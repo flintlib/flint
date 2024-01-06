@@ -126,4 +126,3 @@ arb_atan(arb_t res, const arb_t x, slong prec)
         mag_clear(u);
     }
 }
-

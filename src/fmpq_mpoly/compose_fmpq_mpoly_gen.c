@@ -22,4 +22,3 @@ void fmpq_mpoly_compose_fmpq_mpoly_gen(fmpq_mpoly_t A,
     fmpq_mpoly_reduce(A, ctxAC);
     return;
 }
-

@@ -36,4 +36,3 @@ void _fmpz_mod_vec_scalar_addmul_fmpz_mod(
         }
     }
 }
-

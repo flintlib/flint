@@ -101,4 +101,3 @@ acb_dirichlet_root(acb_t z, const acb_dirichlet_roots_t t, ulong k, slong prec)
     if (conjugate)
         arb_neg(acb_imagref(z), acb_imagref(z));
 }
-

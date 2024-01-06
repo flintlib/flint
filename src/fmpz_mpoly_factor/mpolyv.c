@@ -211,4 +211,3 @@ void _fmpz_mpoly_vec_mul_mpoly(
     for (i = 0; i < Alen; i++)
         fmpz_mpoly_mul(A + i, A + i, c, ctx);
 }
-

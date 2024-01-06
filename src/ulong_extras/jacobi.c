@@ -52,4 +52,3 @@ int n_jacobi(mp_limb_signed_t x, mp_limb_t y)
 {
     return _n_jacobi_unsigned(FLINT_ABS(x), y, FLINT_SIGN_EXT(x) & y);
 }
-

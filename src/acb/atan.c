@@ -109,4 +109,3 @@ acb_atan(acb_t r, const acb_t z, slong prec)
         acb_clear(u);
     }
 }
-

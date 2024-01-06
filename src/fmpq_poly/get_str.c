@@ -71,4 +71,3 @@ char * fmpq_poly_get_str(const fmpq_poly_t poly)
 
     return str;
 }
-

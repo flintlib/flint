@@ -11,4 +11,3 @@
 
 #define CA_VEC_INLINES_C
 #include "ca_vec.h"
-

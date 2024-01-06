@@ -22,4 +22,3 @@ acb_dirichlet_hurwitz_precomp_clear(acb_dirichlet_hurwitz_precomp_t pre)
         _acb_vec_clear(pre->coeffs, pre->N * pre->K);
     }
 }
-

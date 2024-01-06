@@ -84,4 +84,3 @@ void tuple_next(fmpz * alpha, slong n)
 
     fmpz_clear(sum);
 }
-

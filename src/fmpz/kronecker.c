@@ -37,4 +37,3 @@ int fmpz_kronecker(const fmpz_t a, const fmpz_t n)
 
     return r;
 }
-

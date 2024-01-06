@@ -106,4 +106,3 @@ void fmpz_multi_mod_precomp(
 
     TMP_END;
 }
-

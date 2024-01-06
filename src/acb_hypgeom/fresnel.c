@@ -230,4 +230,3 @@ acb_hypgeom_fresnel(acb_t res1, acb_t res2, const acb_t z, int normalized, slong
     acb_clear(w);
     arb_clear(c);
 }
-

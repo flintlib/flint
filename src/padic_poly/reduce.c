@@ -42,4 +42,3 @@ void padic_poly_reduce(padic_poly_t poly, const padic_ctx_t ctx)
         }
     }
 }
-

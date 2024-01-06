@@ -45,4 +45,3 @@ acb_mat_bound_inf_norm(mag_t b, const acb_mat_t A)
     mag_clear(s);
     mag_clear(t);
 }
-

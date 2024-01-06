@@ -84,4 +84,3 @@ mag_pow_ui_lower(mag_t z, const mag_t x, ulong e)
         mag_clear(y);
     }
 }
-

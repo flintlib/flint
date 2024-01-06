@@ -26,4 +26,3 @@ arf_get_si(const arf_t x, arf_rnd_t rnd)
     fmpz_clear(t);
     return v;
 }
-

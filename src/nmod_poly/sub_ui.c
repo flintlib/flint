@@ -39,4 +39,3 @@ void nmod_poly_sub_ui(nmod_poly_t res, const nmod_poly_t poly, ulong c)
 
    }
 }
-

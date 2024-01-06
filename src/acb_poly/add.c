@@ -41,4 +41,3 @@ acb_poly_add(acb_poly_t res, const acb_poly_t poly1,
     _acb_poly_set_length(res, max);
     _acb_poly_normalise(res);
 }
-

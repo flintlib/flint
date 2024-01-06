@@ -46,4 +46,3 @@ int fmpq_mpoly_set_str_pretty(fmpq_mpoly_t poly, const char * str,
 
     return ret;
 }
-

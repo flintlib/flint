@@ -18,4 +18,3 @@ ca_set_fmpz(ca_t x, const fmpz_t v, ca_ctx_t ctx)
     fmpz_set(CA_FMPQ_NUMREF(x), v);
     fmpz_one(CA_FMPQ_DENREF(x));
 }
-

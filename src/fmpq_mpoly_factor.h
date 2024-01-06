@@ -101,4 +101,3 @@ int fmpq_mpoly_factor_expand(fmpq_mpoly_t A,
 #endif
 
 #endif
-

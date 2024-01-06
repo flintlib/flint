@@ -710,4 +710,3 @@ arb_hypgeom_gamma_fmpz(arb_t y, const fmpz_t x, slong prec)
     *fmpq_denref(t) = WORD(1);
     arb_hypgeom_gamma_fmpq(y, t, prec);
 }
-

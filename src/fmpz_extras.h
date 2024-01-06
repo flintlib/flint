@@ -215,4 +215,3 @@ fmpz_allocated_bytes(const fmpz_t x)
 #endif
 
 #endif
-

@@ -33,4 +33,3 @@ acb_mat_randtest(acb_mat_t mat, flint_rand_t state, slong prec, slong mag_bits)
                 else
                     acb_zero(acb_mat_entry(mat, i, j));
 }
-

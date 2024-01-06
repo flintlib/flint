@@ -76,4 +76,3 @@ void fmpq_mat_fmpz_vec_mul_ptr(
 
     fmpq_clear(t);
 }
-

@@ -48,4 +48,3 @@ arb_tanh(arb_t y, const arb_t x, slong prec)
     arb_clear(t);
     arb_clear(u);
 }
-

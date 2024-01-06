@@ -80,4 +80,3 @@ arf_sosq(arf_t res, const arf_t a, const arf_t b, slong prec, arf_rnd_t rnd)
         return inexact;
     }
 }
-

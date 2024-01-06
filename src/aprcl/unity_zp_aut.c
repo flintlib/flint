@@ -42,4 +42,3 @@ unity_zp_aut(unity_zp f, const unity_zp g, ulong x)
     _unity_zp_reduce_cyclotomic(f);
     fmpz_clear(coeff);
 }
-

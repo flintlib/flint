@@ -75,4 +75,3 @@ int fmpz_fits_si(const fmpz_t f)
 #endif
     }
 }
-

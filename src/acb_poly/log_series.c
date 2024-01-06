@@ -38,4 +38,3 @@ acb_poly_log_series(acb_poly_t res, const acb_poly_t f, slong n, slong prec)
     _acb_poly_set_length(res, n);
     _acb_poly_normalise(res);
 }
-

@@ -30,4 +30,3 @@ void fmpz_mod_poly_sub_series(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
     _fmpz_mod_poly_set_length(res, max);
     _fmpz_mod_poly_normalise(res);
 }
-

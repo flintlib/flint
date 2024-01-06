@@ -217,4 +217,3 @@ void arb_hypgeom_sum_fmpq_imag_arb(arb_t res1, arb_t res2, const fmpq * a, slong
 #endif
 
 #endif
-

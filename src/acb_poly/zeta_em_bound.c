@@ -203,4 +203,3 @@ _acb_poly_zeta_em_bound1(mag_t bound,
     _arb_vec_get_mag(bound, vec, len);
     _arb_vec_clear(vec, len);
 }
-

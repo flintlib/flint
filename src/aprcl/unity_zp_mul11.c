@@ -135,4 +135,3 @@ unity_zp_mul11(unity_zp f, const unity_zp g, const unity_zp h, fmpz_t * t)
     fmpz_sub(t[0], t[44], t[1]);
     unity_zp_coeff_set_fmpz(f, 9, t[0]);    /*  y9 = a0 mod n   */
 }
-

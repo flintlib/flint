@@ -96,4 +96,3 @@ acb_log_analytic(acb_t res, const acb_t z, int analytic, slong prec)
         acb_log(res, z, prec);
     }
 }
-

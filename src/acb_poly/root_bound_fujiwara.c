@@ -58,4 +58,3 @@ acb_poly_root_bound_fujiwara(mag_t bound, acb_poly_t poly)
 {
     _acb_poly_root_bound_fujiwara(bound, poly->coeffs, poly->length);
 }
-

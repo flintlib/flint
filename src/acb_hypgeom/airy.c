@@ -306,4 +306,3 @@ acb_hypgeom_airy(acb_t ai, acb_t aip, acb_t bi, acb_t bip, const acb_t z, slong 
     if (bi != NULL) acb_set_round(bi, bi, prec);
     if (bip != NULL) acb_set_round(bip, bip, prec);
 }
-

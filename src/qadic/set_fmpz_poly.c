@@ -30,4 +30,3 @@ void qadic_set_fmpz_poly(qadic_t rop, const fmpz_poly_t op,
         qadic_reduce(rop, ctx);
     }
 }
-

@@ -104,4 +104,3 @@ void qadic_norm_analytic(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
         _fmpz_vec_clear(y, op->length);
     }
 }
-

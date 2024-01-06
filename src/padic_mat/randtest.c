@@ -51,4 +51,3 @@ void padic_mat_randtest(padic_mat_t mat, flint_rand_t state, const padic_ctx_t c
         _padic_mat_canonicalise(mat, ctx);
     }
 }
-

@@ -80,4 +80,3 @@ _arb_atan_taylor_naive(mp_ptr y, mp_limb_t * error,
     flint_free(x1);
     flint_free(x2);
 }
-

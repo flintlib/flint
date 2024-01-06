@@ -49,4 +49,3 @@ acb_acosh(acb_t res, const acb_t z, slong prec)
         acb_clear(u);
     }
 }
-

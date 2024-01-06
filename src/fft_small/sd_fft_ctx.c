@@ -162,4 +162,3 @@ void sd_fft_ctx_fit_depth(sd_fft_ctx_t Q, ulong depth)
         Q->w2tab_depth = k;
     }
 }
-

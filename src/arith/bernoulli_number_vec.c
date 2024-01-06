@@ -43,4 +43,3 @@ void arith_bernoulli_number_vec(fmpq * x, slong n)
 
     _fmpz_vec_clear(num, n * 2);
 }
-

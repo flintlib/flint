@@ -66,4 +66,3 @@ void mpoly_monomials_deflation(fmpz * shift, fmpz * stride,
 
     TMP_END;
 }
-

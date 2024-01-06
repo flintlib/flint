@@ -677,4 +677,3 @@ int fmpz_mod_mpoly_univar_discriminant(
 
     return success;
 }
-

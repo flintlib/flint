@@ -178,4 +178,3 @@ void _nmod_mpoly_vec_mul_mpoly(
     for (i = 0; i < Alen; i++)
         nmod_mpoly_mul(A + i, A + i, c, ctx);
 }
-

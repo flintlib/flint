@@ -45,4 +45,3 @@ int mpoly_is_proved_not_square(
         return !mpoly_monomial_halves_mp(t, t, N, Abits);
     }
 }
-

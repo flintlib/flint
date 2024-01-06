@@ -48,4 +48,3 @@ void padic_mat_get_fmpq_mat(fmpq_mat_t B,
         }
     }
 }
-

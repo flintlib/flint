@@ -55,4 +55,3 @@ arb_bernoulli_ui_zeta(arb_t b, ulong n, slong prec)
     arb_clear(t);
     arb_clear(u);
 }
-

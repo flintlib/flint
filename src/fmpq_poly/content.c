@@ -24,4 +24,3 @@ void fmpq_poly_content(fmpq_t res, const fmpq_poly_t poly)
 {
     _fmpq_poly_content(res, poly->coeffs, poly->den, poly->length);
 }
-

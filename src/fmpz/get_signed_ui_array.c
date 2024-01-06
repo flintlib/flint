@@ -40,4 +40,3 @@ void fmpz_get_signed_ui_array(mp_limb_t * r, slong n, const fmpz_t x)
     if (neg)
         mpn_neg(r, r, n);
 }
-

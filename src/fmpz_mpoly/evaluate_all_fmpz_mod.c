@@ -22,4 +22,3 @@ void fmpz_mpoly_evaluate_all_fmpz_mod(
     _fmpz_mod_mpoly_eval_all_fmpz_mod(ev, A->coeffs, A->exps, A->length,
                  A->bits, alphas, ctx->minfo, fpctx);
 }
-

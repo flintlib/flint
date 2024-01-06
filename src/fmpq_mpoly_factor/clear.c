@@ -29,4 +29,3 @@ void fmpq_mpoly_factor_clear(fmpq_mpoly_factor_t f, const fmpq_mpoly_ctx_t ctx)
 
     fmpq_clear(f->constant);
 }
-

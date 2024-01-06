@@ -161,4 +161,3 @@ fmpz_poly_taylor_shift_divconquer(fmpz_poly_t g, const fmpz_poly_t f,
 
     _fmpz_poly_taylor_shift_divconquer(g->coeffs, c, g->length);
 }
-

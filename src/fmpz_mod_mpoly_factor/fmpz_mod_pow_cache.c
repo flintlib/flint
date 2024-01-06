@@ -58,4 +58,3 @@ void fmpz_mod_pow_cache_mulpow_ui(
     fmpz_mod_mul(a, b, c->coeffs + e, ctx);
     return;
 }
-

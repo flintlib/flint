@@ -169,4 +169,3 @@ fmpz_poly_pow_trunc(fmpz_poly_t res, const fmpz_poly_t poly, ulong e, slong n)
     if (clear)
         flint_free(copy);
 }
-

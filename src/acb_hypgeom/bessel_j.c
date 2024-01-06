@@ -252,4 +252,3 @@ acb_hypgeom_bessel_j(acb_t res, const acb_t nu, const acb_t z, slong prec)
 
     mag_clear(zmag);
 }
-

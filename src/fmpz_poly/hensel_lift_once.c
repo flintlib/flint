@@ -43,4 +43,3 @@ void fmpz_poly_hensel_lift_once(fmpz_poly_factor_t lifted_fac,
     flint_free(link);
     flint_free(v);
 }
-

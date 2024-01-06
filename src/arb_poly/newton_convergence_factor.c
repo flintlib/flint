@@ -38,4 +38,3 @@ _arb_poly_newton_convergence_factor(arf_t convergence_factor,
     arb_clear(t);
     arb_clear(u);
 }
-

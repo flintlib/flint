@@ -41,4 +41,3 @@ acb_mat_transpose(acb_mat_t B, const acb_mat_t A)
                 acb_set(acb_mat_entry(B, i, j), acb_mat_entry(A, j, i));
     }
 }
-

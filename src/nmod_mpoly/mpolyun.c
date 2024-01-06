@@ -1196,4 +1196,3 @@ void nmod_mpolyn_divexact_last(
 
     n_poly_clear(r);
 }
-

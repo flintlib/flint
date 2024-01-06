@@ -80,4 +80,3 @@ acb_hypgeom_erfc_series(acb_poly_t g, const acb_poly_t h, slong len, slong prec)
     _acb_poly_set_length(g, len);
     _acb_poly_normalise(g);
 }
-

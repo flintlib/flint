@@ -51,4 +51,3 @@ void nmod_poly_shift_right(nmod_poly_t res, const nmod_poly_t poly, slong k)
         res->length = len;
     }
 }
-

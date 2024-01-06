@@ -63,4 +63,3 @@ unity_zpq_mul(unity_zpq f, const unity_zpq g, const unity_zpq h)
 
     fmpz_mod_poly_clear(temp, f->ctx);
 }
-

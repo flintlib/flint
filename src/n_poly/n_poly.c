@@ -71,4 +71,3 @@ void n_poly_set_coeff(n_poly_t poly, slong j, ulong c)
         poly->length = j + 1;
     }
 }
-
