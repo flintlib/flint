@@ -14,32 +14,54 @@
 */
 
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "arith.h"
+#include "profiler.h"
 
 int
 main(int argc, char * argv[])
 {
     fmpz_t x;
     ulong n;
+    slong i;
+    int quiet = 0;
+    slong num_threads = 1;
 
-    if (argc != 2)
+    if (argc < 2)
     {
-        flint_printf("usage: partitions n\n");
+        flint_printf("usage: partitions n [-quiet]\n");
         return 1;
     }
+
+    for (i = 2; i < argc; i++)
+    {
+        if (!strcmp(argv[i], "-quiet"))
+            quiet = 1;
+        else if (!strcmp(argv[i], "-threads"))
+            num_threads = atol(argv[i+1]);
+    }
+
+    flint_set_num_threads(num_threads);
 
     flint_sscanf(argv[1], "%wu", &n);
 
     flint_printf("p(%wu) = \n", n);
 
     fmpz_init(x);
+    TIMEIT_ONCE_START
     arith_number_of_partitions(x, n);
-    fmpz_print(x);
-    flint_printf("\n");
+    TIMEIT_ONCE_STOP
+    if (!quiet)
+    {
+        fmpz_print(x);
+        flint_printf("\n");
+    }
     fmpz_clear(x);
 
     return 0;
 }
+
