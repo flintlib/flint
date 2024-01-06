@@ -236,6 +236,17 @@ yes|no)
 esac],
 enable_gmp_internals="yes")
 
+AC_ARG_ENABLE(assembly,
+[AS_HELP_STRING([--enable-assembly],[Enable assembly routines (if available) [default=yes]])],
+[case $enableval in
+yes|no)
+    ;;
+*)
+    AC_MSG_ERROR([Bad value $enableval for --enable-assembly. Need yes or no.])
+    ;;
+esac],
+enable_assembly="yes")
+
 AC_ARG_ENABLE(avx2,
 [AS_HELP_STRING([--enable-avx2],[Enable AVX2 instructions [default=no]])],
 [case $enableval in
@@ -511,6 +522,8 @@ AC_ARG_VAR([TESTCFLAGS], [Choose different C compiler flags for tests [default=C
 AC_ARG_VAR(ABI, [Desired ABI])
 
 AC_ARG_VAR(LDCONFIG, [ldconfig tool])
+
+AC_ARG_VAR([M4], [m4 macro processor])
 
 ################################################################################
 # check programs and system
@@ -996,6 +1009,106 @@ fi
 CPPFLAGS="-I./src $CPPFLAGS"
 
 ################################################################################
+# Instruction sets
+################################################################################
+
+if test "$enable_assembly" = "yes";
+then
+    AC_MSG_CHECKING([if 64-bit ADX instructions is supported])
+    AC_COMPILE_IFELSE(
+        [AC_LANG_PROGRAM([], [
+#if !defined(__ADX__) || !defined(__GNUC__) || !defined(__x86_64__) || !(defined(__APPLE__) || defined(__unix__)) || defined(__CYGWIN__)
+#error Dead man
+error
+#endif
+         ])],
+        [AC_MSG_RESULT([yes])
+         AC_DEFINE(FLINT_HAVE_ADX,1,[Define if system supports 64-bit ADX instruction set with System V ABI])
+         has_adx="yes"],
+        [AC_MSG_RESULT([no])]
+    )
+fi
+
+################################################################################
+# Assembler
+################################################################################
+
+if test "$has_adx" = "yes" && test "$enable_assembly" = "yes";
+then
+    if test -z "$M4";
+    then
+        # Check for M4
+        AC_PATH_PROG([M4], [m4], [no])
+        if test "$M4" = "no";
+        then
+            AC_MSG_ERROR([Could not find M4 needed to generate assembly source code.])
+        fi
+    fi
+
+    AC_MSG_CHECKING([if assembler supports .size])
+    echo "	.size somestuff, 1" >> conftest.s
+    $CC -c conftest.s > conftest.out 2>&1
+    comstr="d""n""l"
+    if test "$?" = "0";
+    then
+        flint_as_size="yes"
+        AC_MSG_RESULT([yes])
+        case "$host_os" in
+            darwin*)
+                echo ["define(]\`[SIZE]'[,]\`[]'[)$comstr"] >> config.m4
+                ;;
+            *) 
+                echo ["define(]\`[SIZE]'[,]\`[.size	\$][1, \$][2-\$][1]'[)$comstr"] > config.m4
+                ;;
+        esac
+    else
+        flint_as_size="no"
+        AC_MSG_RESULT([no])
+        echo ["define(]\`[SIZE]'[,]\`[]'[)$comstr"] >> config.m4
+    fi
+    rm conftest.*
+
+    AC_MSG_CHECKING([for assembler .type function prefix])
+    flint_as_type=""
+    for func_prefix in "@" "%" "#";
+    do
+        echo "	.type	somestuff,${func_prefix}function" >> conftest.s
+        $CC -c conftest.s > conftest.out 2>&1
+        if test "$?" = "0";
+        then
+            flint_as_type="${func_prefix}"
+            break
+        fi
+    done
+    rm -f conftest.*
+
+    if test "$flint_as_type" = "";
+    then
+        AC_MSG_RESULT([no])
+        echo ["define(]\`[TYPE]'[,]\`[]'[)$comstr"] >> config.m4
+    else
+        AC_MSG_RESULT([${func_prefix}])
+        case "$host_os" in
+            darwin*)
+                echo ["define(]\`[TYPE]'[,]\`[.type	_\$][1, ]${func_prefix}[function]'[)$comstr"] >> config.m4
+                ;;
+            *) 
+                echo ["define(]\`[TYPE]'[,]\`[.type	\$][1, ]${func_prefix}[function]'[)$comstr"] >> config.m4
+                ;;
+        esac
+    fi
+
+    case "$host_os" in
+        darwin*)
+            echo ["define(]\`[FUNC]'[,]\`[_\$][1]'[)$comstr"] >> config.m4
+            ;;
+        *) 
+            echo ["define(]\`[FUNC]'[,]\`[\$][1]'[)$comstr"] >> config.m4
+            ;;
+    esac
+fi
+
+################################################################################
 # fft_small module
 ################################################################################
 
@@ -1186,6 +1299,13 @@ fi
 if test "$enable_gmp_internals" = "yes";
 then
     AC_DEFINE(FLINT_WANT_GMP_INTERNALS,1,[Define to enable use of GMP internals.])
+fi
+
+if test "$has_adx" = "yes" && test "$enable_assembly" = "yes";
+then
+    AC_SUBST(WANT_ADX_ASSEMBLY,1)
+else
+    AC_SUBST(WANT_ADX_ASSEMBLY,0)
 fi
 
 ################################################################################

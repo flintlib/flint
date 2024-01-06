@@ -58,3 +58,5 @@ configure
 libtool
 flint.pc
 autom4te.cache/
+config.m4
+src/mpn_extras/broadwell/*.s
