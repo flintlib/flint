@@ -557,7 +557,6 @@ DEPFLAGS = -MMD -MP -MF $(@:%=%.d)
 
 ifeq ($(WANT_ADX_ASSEMBLY),1)
 $(BUILD_DIR)/%.s: $(SRC_DIR)/%.asm | $(BUILD_DIR)/mpn_extras/broadwell
-	@echo "  M4  $(@:$(BUILD_DIR)/%=%)"
 	@$(M4) $< > $@
 endif
 
