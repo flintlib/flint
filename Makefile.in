@@ -411,14 +411,15 @@ $(foreach dir, $(DIRS), $(eval $(call xxx_merged_lobj_rule,$(dir))))
 MERGED_LOBJS:=$(foreach dir, $(DIRS),$(BUILD_DIR)/$(dir)_merged.lo)
 
 $(FLINT_DIR)/$(FLINT_LIB_FULL): $(MERGED_LOBJS)
-	$(CC) $(CFLAGS) -shared $(EXTRA_SHARED_FLAGS) $(MERGED_LOBJS) -o $(FLINT_LIB_FULL) $(LDFLAGS) $(LIBS)
+	@echo "Building $(FLINT_LIB_FULL)"
+	@$(CC) $(CFLAGS) -shared $(EXTRA_SHARED_FLAGS) $(MERGED_LOBJS) -o $(FLINT_LIB_FULL) $(LDFLAGS) $(LIBS)
 ifneq ($(FLINT_SOLIB), 0)
-	$(LDCONFIG) -n .
+	@$(LDCONFIG) -n .
 endif
-	$(RM_F) $(FLINT_LIB)
-	$(RM_F) $(FLINT_LIB_MAJOR)
-	$(LN_S) $(FLINT_LIB_FULL) $(FLINT_LIB)
-	$(LN_S) $(FLINT_LIB_FULL) $(FLINT_LIB_MAJOR)
+	@$(RM_F) $(FLINT_LIB)
+	@$(RM_F) $(FLINT_LIB_MAJOR)
+	@$(LN_S) $(FLINT_LIB_FULL) $(FLINT_LIB)
+	@$(LN_S) $(FLINT_LIB_FULL) $(FLINT_LIB_MAJOR)
 endif
 
 ifneq ($(STATIC), 0)
@@ -434,7 +435,8 @@ $(foreach dir, $(DIRS), $(eval $(call xxx_merged_obj_rule,$(dir))))
 MERGED_OBJS:=$(foreach dir, $(DIRS),$(BUILD_DIR)/$(dir)_merged.o)
 
 $(FLINT_DIR)/$(FLINT_LIB_STATIC): $(MERGED_OBJS)
-	$(AR) rcs $(FLINT_DIR)/$(FLINT_LIB_STATIC) $(MERGED_OBJS)
+	@echo "Building $(FLINT_LIB_STATIC)"
+	@$(AR) rcs $(FLINT_DIR)/$(FLINT_LIB_STATIC) $(MERGED_OBJS)
 endif
 
 ################################################################################
