@@ -1367,6 +1367,8 @@ void gr_ctx_init_real_algebraic_ca(gr_ctx_t ctx);
 void gr_ctx_init_complex_algebraic_ca(gr_ctx_t ctx);
 void gr_ctx_init_complex_extended_ca(gr_ctx_t ctx);
 void _gr_ctx_init_ca_from_ref(gr_ctx_t ctx, int which_ring, void * ca_ctx);
+void gr_ctx_ca_set_option(gr_ctx_t ctx, slong option, slong value);
+slong gr_ctx_ca_get_option(gr_ctx_t ctx, slong option);
 
 void gr_ctx_init_fq(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var);
 void gr_ctx_init_fq_nmod(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var);
