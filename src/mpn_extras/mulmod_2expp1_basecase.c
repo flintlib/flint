@@ -27,14 +27,10 @@ flint_mpn_mulmod_2expp1_internal(mp_ptr xp, mp_srcptr yp, mp_srcptr zp,
     n = BITS_TO_LIMBS(b);
     k = GMP_NUMB_BITS * n - b;
 
-#if 0
-    flint_mpn_mul_large(tp, yp, n, zp, n);
-#else
     if (yp == zp)
         flint_mpn_sqr(tp, yp, n);
     else
         flint_mpn_mul_n(tp, yp, zp, n);
-#endif
 
     if (k == 0)
     {

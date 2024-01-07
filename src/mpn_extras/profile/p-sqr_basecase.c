@@ -13,15 +13,6 @@
 #include "mpn_extras.h"
 #include "profiler.h"
 
-#if !FLINT_HAVE_ADX
-
-int main(void)
-{
-    return 0;
-}
-
-#else
-
 #define mpn_sqr_basecase __gmpn_sqr_basecase
 void mpn_sqr_basecase(mp_ptr, mp_srcptr, mp_size_t);
 
@@ -34,36 +25,37 @@ int main(void)
 
     for (mx = 1; mx <= 7; mx++)
     {
-        double t1, t2, t3, __;
+        double t1, t2, t3, __attribute__((unused)) __;
 
-        flint_printf("m = %2wd:", mx);
+        if (FLINT_HAVE_SQR_FUNC(mx))
+        {
+            flint_printf("m = %2wd:", mx);
 
-        mpn_random2(ap, mx);
+            mpn_random2(ap, mx);
 
-        TIMEIT_START
-        mpn_sqr_basecase(res1, ap, mx);
-        TIMEIT_STOP_VALUES(__, t1)
+            TIMEIT_START
+            mpn_sqr_basecase(res1, ap, mx);
+            TIMEIT_STOP_VALUES(__, t1)
 
-        TIMEIT_START
-        flint_mpn_sqr_basecase(res2, ap, mx);
-        TIMEIT_STOP_VALUES(__, t2)
+            TIMEIT_START
+            flint_mpn_sqr_basecase(res2, ap, mx);
+            TIMEIT_STOP_VALUES(__, t2)
 
-        TIMEIT_START
-        flint_mpn_mul_basecase(res2, ap, ap, mx, mx);
-        TIMEIT_STOP_VALUES(__, t3)
+            TIMEIT_START
+            flint_mpn_mul_basecase(res2, ap, ap, mx, mx);
+            TIMEIT_STOP_VALUES(__, t3)
 
-        flint_printf("%7.2fx", t1 / t2);
-        flint_printf("    %7.2fx", t1 / t3);
+            flint_printf("%7.2fx", t1 / t2);
+            flint_printf("    %7.2fx", t1 / t3);
 
-        /* if (mpn_cmp(res1, res2, 2 * mx) != 0) */
-        /*     flint_abort(); */
+            /* if (mpn_cmp(res1, res2, 2 * mx) != 0) */
+            /*     flint_abort(); */
 
-        flint_printf("\n\n");
+            flint_printf("\n\n");
+        }
     }
 
     flint_cleanup_master();
 
     return 0;
 }
-
-#endif
