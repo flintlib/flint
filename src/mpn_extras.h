@@ -27,8 +27,6 @@
 extern "C" {
 #endif
 
-#define FLINT_MPN_MUL_THRESHOLD 400
-
 #define MPN_NORM(a, an)                         \
     do {                                        \
         while ((an) != 0 && (a)[(an) - 1] == 0) \
@@ -49,8 +47,7 @@ extern "C" {
 
 #define BITS_TO_LIMBS(b) (((b) + GMP_NUMB_BITS - 1) / GMP_NUMB_BITS)
 
-double
-flint_mpn_get_d(mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp);
+/* Macros for few-limb arithmetic */
 
 #define FLINT_MPN_MUL_2X1(r2, r1, r0, a1, a0, b0)           \
     do {                                                    \
@@ -74,26 +71,134 @@ flint_mpn_get_d(mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp);
         r3 += r2 < t1;                                      \
     } while (0)
 
-#if FLINT_HAVE_ADX
-mp_limb_t flint_mpn_mul_basecase(mp_ptr res, mp_srcptr ap, mp_srcptr bp, slong alen, slong blen);
-mp_limb_t flint_mpn_sqr_basecase(mp_ptr res, mp_srcptr ap, slong alen);
+/* {s0,s1,s2} = u[0]v[n-1] + u[1]v[n-2] + ... */
+/* Assumes n >= 2 */
+#define NN_DOTREV_S3_1X1(s2, s1, s0, u, v, n) \
+    do { \
+        mp_limb_t __dt0, __dt1, __ds0, __ds1, __ds2; \
+        slong __i; \
+        FLINT_ASSERT((n) >= 2); \
+        umul_ppmm(__ds1, __ds0, (u)[0], (v)[(n) - 1]); \
+        umul_ppmm(__dt1, __dt0, (u)[1], (v)[(n) - 2]); \
+        add_sssaaaaaa(__ds2, __ds1, __ds0, 0, __ds1, __ds0, 0, __dt1, __dt0); \
+        for (__i = 2; __i < (n); __i++) \
+        { \
+            umul_ppmm(__dt1, __dt0, (u)[i], (v)[(n) - 1 - __i]); \
+            add_sssaaaaaa(__ds2, __ds1, __ds0, __ds2, __ds1, __ds0, 0, __dt1, __dt0); \
+        } \
+        (s0) = __ds0; (s1) = __ds1; (s2) = __ds2; \
+    } while (0) \
+
+/* {r0,r1,r2} = {s0,s1,s2} + u[0]v[n-1] + u[1]v[n-2] + ... */
+/* Assumes n >= 1. May have s2 != 0, but the final sum is assumed to fit in 3 limbs. */
+#define NN_DOTREV_S3_A3_1X1(r2, r1, r0, s2, s1, s0, u, v, n) \
+    do { \
+        mp_limb_t __dt0, __dt1, __ds0, __ds1, __ds2; \
+        slong __i; \
+        FLINT_ASSERT((n) >= 1); \
+        __ds0 = (s0); __ds1 = (s1); __ds2 = (s2); \
+        for (__i = 0; __i < (n); __i++) \
+        { \
+            umul_ppmm(__dt1, __dt0, (u)[__i], (v)[(n) - 1 - __i]); \
+            add_sssaaaaaa(__ds2, __ds1, __ds0, __ds2, __ds1, __ds0, 0, __dt1, __dt0); \
+        } \
+        (r0) = __ds0; (r1) = __ds1; (r2) = __ds2; \
+    } while (0) \
+
+#define NN_MUL_1X1 umul_ppmm
+
+/* {r0,r1} = {s0,s1} + x * y, with no carry-out. */
+#define NN_ADDMUL_S2_A2_1X1(r1, r0, s1, s0, x, y) \
+    do { \
+        mp_limb_t __dt0, __dt1; \
+        umul_ppmm(__dt1, __dt0, (x), (y)); \
+        add_ssaaaa(r1, r0, s1, s0, __dt1, __dt0); \
+    } while (0); \
+
+double
+flint_mpn_get_d(mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp);
+
+/* General multiplication */
+
+#ifdef FLINT_HAVE_FFT_SMALL
+#define FLINT_FFT_MUL_THRESHOLD 400
+#define FLINT_FFT_SQR_THRESHOLD 800
+#else
+/* FLINT's FFT can beat GMP below this threshold but apparently
+   not consistently. Something needs retuning? */
+#define FLINT_FFT_MUL_THRESHOLD 32000
+#define FLINT_FFT_SQR_THRESHOLD 32000
 #endif
 
-mp_limb_t flint_mpn_mul_large(mp_ptr r1, mp_srcptr i1, mp_size_t n1, mp_srcptr i2, mp_size_t n2);
+#if FLINT_HAVE_ADX
+#define FLINT_MPN_MUL_FUNC_TAB_WIDTH 9
+#define FLINT_HAVE_MUL_FUNC(n, m) ((n) <= 8 || ((n) <= 16 && (m) <= 8))
+#define FLINT_HAVE_MUL_N_FUNC(n) ((n) <= 8)
+#define FLINT_HAVE_SQR_FUNC(n) ((n) <= 7)
+#else
+#define FLINT_MPN_MUL_FUNC_TAB_WIDTH 8
+#define FLINT_HAVE_MUL_FUNC(n, m) ((n) <= 7 || ((n) <= 14 && (m) == 1))
+#define FLINT_HAVE_MUL_N_FUNC(n) ((n) <= 7)
+#define FLINT_HAVE_SQR_FUNC(n) (0)
+#endif
 
-void flint_mpn_mul_n(mp_ptr z, mp_srcptr x, mp_srcptr y, mp_size_t n);
+#define FLINT_MUL_USE_FUNC_TAB 1
 
-mp_limb_t flint_mpn_mul(mp_ptr z, mp_srcptr x, mp_size_t xn, mp_srcptr y, mp_size_t yn);
+typedef mp_limb_t (* flint_mpn_mul_func_t)(mp_ptr, mp_srcptr, mp_srcptr);
+typedef mp_limb_t (* flint_mpn_sqr_func_t)(mp_ptr, mp_srcptr);
 
-MPN_EXTRAS_INLINE void
-flint_mpn_sqr(mp_ptr z, mp_srcptr x, mp_size_t n)
+FLINT_DLL extern const flint_mpn_mul_func_t flint_mpn_mul_func_tab[][FLINT_MPN_MUL_FUNC_TAB_WIDTH];
+FLINT_DLL extern const flint_mpn_mul_func_t flint_mpn_mul_n_func_tab[];
+FLINT_DLL extern const flint_mpn_sqr_func_t flint_mpn_sqr_func_tab[];
+
+mp_limb_t flint_mpn_mul_basecase(mp_ptr r, mp_srcptr x, mp_srcptr y, mp_size_t xn, mp_size_t yn);
+mp_limb_t flint_mpn_sqr_basecase(mp_ptr r, mp_srcptr x, mp_size_t n);
+
+mp_limb_t _flint_mpn_mul(mp_ptr r, mp_srcptr x, mp_size_t xn, mp_srcptr y, mp_size_t yn);
+void _flint_mpn_mul_n(mp_ptr r, mp_srcptr x, mp_srcptr y, mp_size_t n);
+void _flint_mpn_sqr(mp_ptr r, mp_srcptr x, mp_size_t n);
+
+MPN_EXTRAS_INLINE mp_limb_t
+flint_mpn_mul(mp_ptr r, mp_srcptr x, mp_size_t xn, mp_srcptr y, mp_size_t yn)
 {
-    if (n < FLINT_MPN_MUL_THRESHOLD)
-        mpn_sqr(z, x, n);
+    FLINT_ASSERT(xn >= yn);
+    FLINT_ASSERT(yn >= 1);
+    FLINT_ASSERT(r != x);
+    FLINT_ASSERT(r != y);
+
+    if (FLINT_MUL_USE_FUNC_TAB && FLINT_HAVE_MUL_FUNC(xn, yn))
+        return flint_mpn_mul_func_tab[xn][yn](r, x, y);
     else
-        flint_mpn_mul_large(z, x, n, x, n);
+        return _flint_mpn_mul(r, x, xn, y, yn);
 }
 
+MPN_EXTRAS_INLINE void
+flint_mpn_mul_n(mp_ptr r, mp_srcptr x, mp_srcptr y, mp_size_t n)
+{
+    FLINT_ASSERT(n >= 1);
+    FLINT_ASSERT(r != x);
+    FLINT_ASSERT(r != y);
+
+    if (FLINT_MUL_USE_FUNC_TAB && FLINT_HAVE_MUL_N_FUNC(n))
+        flint_mpn_mul_n_func_tab[n](r, x, y);
+    else
+        _flint_mpn_mul_n(r, x, y, n);
+}
+
+MPN_EXTRAS_INLINE void
+flint_mpn_sqr(mp_ptr r, mp_srcptr x, mp_size_t n)
+{
+    FLINT_ASSERT(n >= 1);
+    FLINT_ASSERT(r != x);
+
+    if (FLINT_MUL_USE_FUNC_TAB && FLINT_HAVE_SQR_FUNC(n))
+        flint_mpn_sqr_func_tab[n](r, x);
+    else
+        _flint_mpn_sqr(r, x, n);
+}
+
+/* Like flint_mpn_mul but allow operands in either order, completely
+   inline some small products, and also check for squaring. */
 #define FLINT_MPN_MUL_WITH_SPECIAL_CASES(_z, _x, _xn, _y, _yn) \
     if ((_xn) == (_yn)) \
     { \
@@ -117,17 +222,11 @@ flint_mpn_sqr(mp_ptr z, mp_srcptr x, mp_size_t n)
     } \
     else if ((_xn) > (_yn)) \
     { \
-        if ((_yn) == 1) \
-            (_z)[(_xn) + (_yn) - 1] = mpn_mul_1((_z), (_x), (_xn), (_y)[0]); \
-        else \
-            flint_mpn_mul((_z), (_x), (_xn), (_y), (_yn)); \
+        flint_mpn_mul((_z), (_x), (_xn), (_y), (_yn)); \
     } \
     else \
     { \
-        if ((_xn) == 1) \
-            (_z)[(_xn) + (_yn) - 1] = mpn_mul_1((_z), (_y), (_yn), (_x)[0]); \
-        else \
-            flint_mpn_mul((_z), (_y), (_yn), (_x), (_xn)); \
+        flint_mpn_mul((_z), (_y), (_yn), (_x), (_xn)); \
     }
 
 /*
@@ -279,7 +378,6 @@ void flint_mpn_urandomb(mp_limb_t *rp, gmp_randstate_t state, flint_bitcnt_t n)
   str._mp_size = (n + FLINT_BITS - 1)/FLINT_BITS;
   mpz_rrandomb(&str,state,n);
 }
-
 
 /******************************************************************************
     Divisions where the quotient is expected to be small. All function do:

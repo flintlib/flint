@@ -13,15 +13,6 @@
 #include "mpn_extras.h"
 #include "profiler.h"
 
-#if !FLINT_HAVE_ADX
-
-int main(void)
-{
-    return 0;
-}
-
-#else
-
 #define mpn_mul_basecase __gmpn_mul_basecase
 void mpn_mul_basecase(mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t);
 
@@ -40,35 +31,39 @@ int main(void)
 
     for (mx = 1; mx <= 16; mx++)
     {
-        flint_printf("m = %2wd:", mx);
-
-        for (nx = 1; nx <= FLINT_MIN(mx, WORD(8)); nx++)
+        if (FLINT_HAVE_MUL_FUNC(mx, 1))
         {
-            double t1, t2, __;
+            flint_printf("m = %2wd:", mx);
 
-            mpn_random2(ap, mx);
-            mpn_random2(bp, nx);
+            for (nx = 1; nx <= FLINT_MIN(mx, WORD(8)); nx++)
+            {
+                double t1, t2, __attribute__((unused)) __;
 
-            TIMEIT_START
-            mpn_mul_basecase(res1, ap, mx, bp, nx);
-            TIMEIT_STOP_VALUES(__, t1)
+                if (FLINT_HAVE_MUL_FUNC(mx, nx))
+                {
+                    mpn_random2(ap, mx);
+                    mpn_random2(bp, nx);
 
-            TIMEIT_START
-            flint_mpn_mul_basecase(res2, ap, bp, mx, nx);
-            TIMEIT_STOP_VALUES(__, t2)
+                    TIMEIT_START
+                    mpn_mul_basecase(res1, ap, mx, bp, nx);
+                    TIMEIT_STOP_VALUES(__, t1)
 
-            flint_printf("%7.2fx", t1 / t2);
+                    TIMEIT_START
+                    flint_mpn_mul_basecase(res2, ap, bp, mx, nx);
+                    TIMEIT_STOP_VALUES(__, t2)
 
-            if (mpn_cmp(res1, res2, mx + nx) != 0)
-                flint_abort();
+                    flint_printf("%7.2fx", t1 / t2);
+
+                    if (mpn_cmp(res1, res2, mx + nx) != 0)
+                        flint_abort();
+                }
+            }
+
+            flint_printf("\n\n");
         }
-
-        flint_printf("\n\n");
     }
 
     flint_cleanup_master();
 
     return 0;
 }
-
-#endif
