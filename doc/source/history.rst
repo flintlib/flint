@@ -6,6 +6,118 @@ History and changes
 FLINT version history
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+2024 -- FLINT 3.1.0-dev
+-------------------------------------------------------------------------------
+
+Main contributors: Fredrik Johansson (FJ), Albin Ahlbäck (AA),
+Jean Kieffer (JK).
+
+* Features
+
+  * New module ``acb_theta`` for computing Riemann theta functions in any
+    characteristic (JK).
+  * ``flint_printf`` and related functions now supports printing common FLINT
+    types, e.g. using the format string ``%{fmpz}`` for ``fmpz_t`` (AA).
+  * Primality testing for Gaussian integers (``fmpzi_is_prime``,
+    ``fmpzi_is_probabprime``) (Mathieu Gouttenoire).
+  * Modular splitting evaluation of polynomials (``_gr_poly_evaluate_modular``)
+    (David Berghaus).
+  * Reversion of generic power series (``gr_poly_revert_series`` and variants) (FJ).
+  * Support inversion for ``gr`` vectors (FJ).
+  * Split generic division into ``gr_div`` and ``gr_div_nonunique`` to
+    make the semantics of division more precise (FJ).
+  * Added ``gr_ctx_is_zero_ring`` (FJ).
+  * Added ``nmod_divides`` (FJ).
+  * Reciprocal Fibonacci constant (``arb_const_reciprocal_fibonacci``) (FJ).
+  * Added functions for working with symmetric positive-definite matrices
+    (``fmpz_mat_is_spd``, ``arb_mat_spd_get_fmpz_mat``,
+    ``arb_mat_spd_is_lll_reduced``, ``arb_mat_spd_lll_reduce``,
+    ``arb_mat_randtest_cho``, ``arb_mat_randtest_spd``) (JK).
+  * Added several helper functions for ``arb`` and ``acb`` vectors and matrices
+    (``_arb_vec_contains``, ``_arb_vec_equal``, ``_arb_vec_overlaps``,
+    ``_arb_vec_printd``, ``_acb_vec_contains``, ``_acb_vec_equal``,
+    ``_acb_vec_get_imag``, ``_acb_vec_get_real``, ``_acb_vec_overlaps``,
+    ``_acb_vec_printd``, ``_acb_vec_set_real_imag``, ``_acb_vec_sqr``,
+    ``arb_mat_vector_mul_col``, ``arb_mat_vector_mul_row``
+    ``acb_mat_vector_mul_col``, ``acb_mat_vector_mul_row``
+    ``acb_mat_get_imag``, ``acb_mat_get_real``, ``acb_mat_onei``) (JK).
+  * Added ``acb_urandom`` and ``arb_randtest_positive`` (JK).
+  * Added ``acb_mul_i_pow_si`` (JK).
+  * Handle modulus 1 in ``fmpz_CRT`` functions (Fabian Gundlach).
+
+* Bugs
+
+  * Fixed threading problem in ``gr_method_tab_init``: FLINT would occasionally
+    crash when using generics-based internal code on machines with a large
+    number of threads (FJ, after debugging by Alexander Smirnov).
+  * Fixed comparison of ``gr`` vectors with ``fmpq`` elements (FJ).
+  * Fixed allocation bug in ``gr_mpoly_mul_monomial`` (FJ).
+  * Fixed aliasing in ``fmpzi_divrem_approx`` (FJ).
+  * Avoid division by zero in ``acb_poly_refine_roots_durand_kerner``:
+    in rare instances, computing roots of an integer polynomial could hang (FJ).
+  * Allow large arguments in ``arb_atan_frac_bsplit`` (FJ).
+  * Fixed printing large coefficients in ``nmod_mpoly`` (Alexander Smirnov, AA).
+
+* Performance
+
+  * FLINT is now built with ``-O3 -march=native`` by default (AA).
+  * Assembly routines are now used as intended on ARM64 when compiling with
+    GCC (AA).
+  * New basecase code for ``flint_mpn_mul``, ``flint_mpn_mul_n`` and
+    ``flint_mpn_sqr`` (generic C versions, assembly for x86-64).
+    This can yield up to a 2x speedup over GMP for short integer multiplications
+    when calling ``mpn`` functions directly, though few applications
+    currently benefit significantly due to wrapper overheads (some Arb benchmarks
+    run ~5% faster with this change). (AA, FJ).
+  * Strip trailing zeros in ``fmpz_poly_gcd``: this gives a 50x speedup
+    computing ``gcd(x^1000, x^1001)``.
+  * Use new formulas from Jorge Zuniga to compute Catalan's constant
+    and zeta(3) faster (FJ).
+  * Added benchmark script (``dev/bench.py``) (FJ).
+
+* Test code
+
+  * Unified test programs per module: compiling FLINT's test suite is now
+    an order of magnitude faster (AA).
+  * Improve use of test multiplier in some long-running unit tests (AA, FJ).
+  * Improved test coverage (AA, FJ).
+  * Allow ``gr_ctx_init_random`` to generate composite rings (FJ).
+
+* Maintenance
+
+  * Require GMP >= 6.2.1 and MPFR >= 4.1.0 (AA).
+  * Drop support for Itanium (AA).
+  * Drop support for MPIR (AA).
+  * Cleaned up ``longlong.h`` (AA).
+  * Removed ``ARB_VERSION``, ``ANTIC_VERSION``, ``CALCIUM_VERSION`` and
+    associated constants (AA).
+  * Removed ``_long_vec_print`` and ``_perm_print`` (use ``flint_printf``
+    instead) (AA).
+  * Removed unused functions ``d_mat_swap``, ``d_mat_is_zero``,
+    ``d_mat_is_approx_zero`` (AA).
+  * Removed ``fmpq_get_mpz_frac`` (AA).
+  * Introduce ``FLINT_SWAP`` macro to replace several older macros (FJ).
+  * Replaced ``invert_limb`` by ``n_preinvert_limb_prenorm`` (AA).
+  * Renamed ``_perm_set_one`` to ``_perm_one`` (AA).
+  * Only define some multithreaded "divides" function when the CPU is
+    strongly ordered (AA).
+  * Enable ``fft_small`` for MSVC builds (AA).
+  * Use binary files in ``qsieve`` (AA).
+  * Use C11 atomics in the ``fmpz`` memory manager (AA).
+  * Merged some repeated code in the ``mpoly`` modules (FJ).
+  * Replaced more functions by generics-based versions (FJ).
+  * Do not include ``pthread.h`` when opted out (AA).
+  * Test ARM NEON in CI (AA).
+  * Test examples in CI (AA).
+  * Detect MPFR and GMP internals in configure (AA).
+  * Add ``-lflint`` to PKG-CONFIG (Josh Rickmar).
+  * Silenced some GCC compiler warnings (AA).
+  * Unified exception handling (AA).
+  * Corrected some function signatures in the documentation
+    (Vincent Delecroix, Joel-Dahne, Edgar Costa).
+  * Other code cleanup and modernisation (AA).
+
+
 2023-11-10 -- FLINT 3.0.1
 -------------------------------------------------------------------------------
 
