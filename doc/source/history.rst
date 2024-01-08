@@ -115,6 +115,8 @@ Jean Kieffer (JK).
   * Unified exception handling (AA).
   * Corrected some function signatures in the documentation
     (Vincent Delecroix, Joel-Dahne, Edgar Costa).
+  * Rename the default Git-branch from ``trunk`` to ``main`` (FJ).
+  * Document some macros defined in ``flint.h`` (AA).
   * Other code cleanup and modernisation (AA).
 
 
