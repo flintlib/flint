@@ -142,7 +142,6 @@ HEADER_DIRS :=                                                              \
         perm                                                                \
         double_extras   d_vec           d_mat                               \
         mpn_extras                                                          \
-        mpf_vec                         mpf_mat                             \
         mpfr_vec                        mpfr_mat                            \
         nmod            nmod_vec        nmod_mat        nmod_poly           \
         fmpz            fmpz_vec        fmpz_mat        fmpz_poly           \
@@ -248,7 +247,7 @@ SINGLE_HEADERS :=                                                           \
                                                                             \
         crt_helpers.h   machine_vectors.h                                   \
                                                                             \
-        fq_zech_vec.h                                                       \
+        mpf-impl.h                      fq_zech_vec.h                       \
                                                                             \
         limb_types.h                    mpoly_types.h                       \
         fmpz_types.h                    fmpq_types.h                        \

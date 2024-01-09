@@ -20,11 +20,12 @@
 #define FMPZ_LLL_INLINE static inline
 #endif
 
+#include "fmpz_types.h"
 #include "d_mat.h"
-#include "mpf_mat.h"
+#include "mpf-impl.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 #if FLINT_BITS == 32

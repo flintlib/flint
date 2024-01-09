@@ -174,7 +174,6 @@ set(_BUILD_DIRS
     perm
     double_extras   d_vec           d_mat
     mpn_extras
-    mpf_vec                         mpf_mat
     mpfr_vec                        mpfr_mat
     nmod            nmod_vec        nmod_mat        nmod_poly
     fmpz            fmpz_vec        fmpz_mat        fmpz_poly
@@ -205,7 +204,7 @@ set(_BUILD_DIRS
     fmpz_mod_mpoly_factor           fmpq_mpoly_factor
     fq_nmod_mpoly_factor            fq_zech_mpoly_factor
 
-    fft             ${FFT_SMALL}    fmpz_poly_q    fmpz_lll
+    fft             ${FFT_SMALL}    fmpz_poly_q     fmpz_lll
     n_poly          arith           qsieve          aprcl
 
     nf              nf_elem         qfb
@@ -238,7 +237,7 @@ string(REGEX REPLACE "([A-Za-z0-9_-]+;|[A-Za-z0-9_-]+$)" "src/\\1" BUILD_DIRS "$
 
 set(_HEADERS
     NTL-interface.h flint.h longlong.h flint-config.h gmpcompat.h fft_tuning.h
-    profiler.h templates.h exception.h
+    profiler.h templates.h exception.h mpf-impl.h
 )
 string(REGEX REPLACE "([A-Za-z0-9_-]+\.h;|[A-Za-z0-9_-]+\.h$)" "src/\\1" HEADERS "${_HEADERS}")
 
