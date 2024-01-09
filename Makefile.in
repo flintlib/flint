@@ -911,3 +911,4 @@ print-%:
 	@echo "$*=$($*)"
 
 .PHONY: all library shared static examples checkexamples profile tests check tune valgrind clean distclean install uninstall dist %_TEST_RUN %_VALGRIND_RUN print-% coverage coverage_html
+.SILENT: $(mpn_extras_S_SOURCES)
