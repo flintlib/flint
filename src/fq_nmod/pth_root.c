@@ -26,6 +26,6 @@ fq_nmod_pth_root(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t ctx)
     fq_nmod_set(rop, op1, ctx);
     for (i = 0; i < d; i++)
     {
-        fq_nmod_pow(rop, rop, fq_nmod_ctx_prime(ctx), ctx);
+        fq_nmod_pow_ui(rop, rop, fq_nmod_ctx_prime(ctx), ctx);
     }
 }

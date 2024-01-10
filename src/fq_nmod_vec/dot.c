@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2019 William Hart
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -26,7 +27,7 @@ void _fq_nmod_vec_dot(fq_nmod_t res, const fq_nmod_struct * vec1,
       return;
    }
 
-   nmod_poly_init(t, ctx->p);
+   nmod_poly_init(t, fq_nmod_ctx_prime(ctx));
 
    nmod_poly_mul(res, vec1 + 0, vec2 + 0);
 

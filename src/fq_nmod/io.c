@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2023 Albin Ahlbäck
+    Copyright (C) 2023, 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -22,11 +22,7 @@ int fq_nmod_ctx_fprint(FILE * file, const fq_nmod_ctx_t ctx)
     int r;
     slong i, k;
 
-    r = flint_fprintf(file, "p = ");
-    if (r <= 0)
-        return r;
-
-    r = fmpz_fprint(file, fq_nmod_ctx_prime(ctx));
+    r = flint_fprintf(file, "p = %wu", fq_nmod_ctx_prime(ctx));
     if (r <= 0)
         return r;
 

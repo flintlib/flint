@@ -4,6 +4,7 @@
     Copyright (C) 2008 Richard Howell-Peak
     Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -205,7 +206,11 @@ TEMPLATE(T, poly_factor) (TEMPLATE(T, poly_factor_t) result,
                           const TEMPLATE(T, poly_t) input,
                           const TEMPLATE(T, ctx_t) ctx)
 {
-    flint_bitcnt_t bits = fmpz_bits(TEMPLATE(T, ctx_prime) (ctx));
+#if defined(FQ_NMOD_POLY_FACTOR_H) || defined(FQ_ZECH_POLY_FACTOR_H)
+    flint_bitcnt_t bits = FLINT_BIT_COUNT(TEMPLATE(T, ctx_prime)(ctx));
+#else
+    flint_bitcnt_t bits = fmpz_bits(TEMPLATE(T, ctx_prime)(ctx));
+#endif
     slong n = TEMPLATE(T, poly_degree) (input, ctx);
 
     result->num = 0;

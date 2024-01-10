@@ -46,8 +46,6 @@ fq_zech_ctx_struct;
 
 typedef fq_zech_ctx_struct fq_zech_ctx_t[1];
 
-#define fq_zech_ctx_prime(ctx)  fq_nmod_ctx_prime(ctx->fq_nmod_ctx)
-
 typedef struct
 {
     fq_zech_struct * entries;

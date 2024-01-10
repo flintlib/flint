@@ -45,7 +45,11 @@ TEST_TEMPLATE_FUNCTION_START(T, embed_composition_matrix, state)
         TEMPLATE(B, mat_init)(res, d, d, TEMPLATE(B, poly_modulus)(modulus));
 
         TEMPLATE(T, gen)(frob, ctx);
+#if defined(FQ_NMOD_H) || defined(FQ_ZECH_H)
+        TEMPLATE(T, pow_ui)(frob, frob, TEMPLATE(T, ctx_prime)(ctx), ctx);
+#else
         TEMPLATE(T, pow)(frob, frob, TEMPLATE(T, ctx_prime)(ctx), ctx);
+#endif
         TEMPLATE(T, embed_composition_matrix)(mat_frob, frob, ctx);
 
         TEMPLATE(T, randtest)(a, state, ctx);
@@ -53,7 +57,11 @@ TEST_TEMPLATE_FUNCTION_START(T, embed_composition_matrix, state)
 
         TEMPLATE(B, mat_mul)(res, mat_frob, mat_a);
 
+#if defined(FQ_NMOD_H) || defined(FQ_ZECH_H)
+        TEMPLATE(T, pow_ui)(a, a, TEMPLATE(T, ctx_prime)(ctx), ctx);
+#else
         TEMPLATE(T, pow)(a, a, TEMPLATE(T, ctx_prime)(ctx), ctx);
+#endif
         TEMPLATE(T, embed_composition_matrix)(mat_aq, a, ctx);
 
         if (!TEMPLATE(B, mat_equal)(res, mat_aq))

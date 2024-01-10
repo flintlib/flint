@@ -24,13 +24,20 @@ TEST_TEMPLATE_FUNCTION_START(T, ctx_init, state)
 
     for (i = 0; i < 3 * flint_test_multiplier(); i++)
     {
+#if defined(FQ_NMOD_H) || defined(FQ_ZECH_H)
+        ulong p;
+#else
         fmpz_t p;
+#endif
         slong d;
         TEMPLATE(T, ctx_t) ctx;
 
+#if defined(FQ_NMOD_H) || defined(FQ_ZECH_H)
+        p = n_randprime(state, 2 + n_randint(state, FLINT_MIN(FLINT_BITS - 1, 50)), 1);
+#else
         fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state,
-                                   FLINT_MIN(FLINT_BITS - 1, 50)), 1));
+        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, FLINT_MIN(FLINT_BITS - 1, 50)), 1));
+#endif
         d = n_randint(state, 20) + 1;
 
         TEMPLATE(T, ctx_init)(ctx, p, d, "a");
@@ -39,14 +46,22 @@ TEST_TEMPLATE_FUNCTION_START(T, ctx_init, state)
 
     for (i = 0; i < 3 * flint_test_multiplier(); i++)
     {
+#if defined(FQ_NMOD_H) || defined(FQ_ZECH_H)
+        ulong p;
+#else
         fmpz_t p;
+#endif
         slong d;
         TEMPLATE(T, ctx_t) ctx_conway, ctx_mod;
 
         TEMPLATE(T, t) a, b, lhs, rhs;
 
+#if defined(FQ_NMOD_H) || defined(FQ_ZECH_H)
+        p = n_randprime(state, 2 + n_randint(state, 3), 1);
+#else
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
+#endif
         d = n_randint(state, 10) + 1;
         TEMPLATE(T, ctx_init_conway)(ctx_conway, p, d, "a");
 

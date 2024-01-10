@@ -5,6 +5,7 @@
     Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2012 Lina Kulakova
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -27,7 +28,6 @@ TEMPLATE(T, poly_factor_squarefree) (TEMPLATE(T, poly_factor_t) res,
 {
     TEMPLATE(T, poly_t) f_d, g, g_1, r;
     TEMPLATE(T, t) x;
-    fmpz_t p;
     slong deg, i, p_ui;
 
     if (f->length <= 1)
@@ -43,9 +43,6 @@ TEMPLATE(T, poly_factor_squarefree) (TEMPLATE(T, poly_factor_t) res,
                                       res->poly + (res->num - 1), ctx);
         return;
     }
-
-    fmpz_init(p);
-    fmpz_set(p, TEMPLATE(T, ctx_prime) (ctx));
 
     deg = TEMPLATE(T, poly_degree) (f, ctx);
 
@@ -65,7 +62,11 @@ TEMPLATE(T, poly_factor_squarefree) (TEMPLATE(T, poly_factor_t) res,
         TEMPLATE(T, poly_t) h;
 
         /* We can do this since deg is a multiple of p in this case */
-        p_ui = fmpz_get_ui(p);
+#if defined(FQ_NMOD_POLY_FACTOR_H) || defined(FQ_ZECH_POLY_FACTOR_H)
+        p_ui = TEMPLATE(T, ctx_prime)(ctx);
+#else
+        p_ui = fmpz_get_ui(TEMPLATE(T, ctx_prime)(ctx));
+#endif
 
         TEMPLATE(T, poly_init) (h, ctx);
 
@@ -135,7 +136,11 @@ TEMPLATE(T, poly_factor_squarefree) (TEMPLATE(T, poly_factor_t) res,
 
             TEMPLATE(T, poly_init) (g_p, ctx);
 
-            p_ui = fmpz_get_ui(p);
+#if defined(FQ_NMOD_POLY_FACTOR_H) || defined(FQ_ZECH_POLY_FACTOR_H)
+            p_ui = TEMPLATE(T, ctx_prime)(ctx);
+#else
+            p_ui = fmpz_get_ui(TEMPLATE(T, ctx_prime)(ctx));
+#endif
 
             for (i = 0; i <= TEMPLATE(T, poly_degree) (g, ctx) / p_ui; i++)
             {
@@ -156,7 +161,6 @@ TEMPLATE(T, poly_factor_squarefree) (TEMPLATE(T, poly_factor_t) res,
         }
     }
 
-    fmpz_clear(p);
     TEMPLATE(T, clear) (x, ctx);
     TEMPLATE(T, poly_clear) (g_1, ctx);
     TEMPLATE(T, poly_clear) (f_d, ctx);

@@ -19,11 +19,11 @@
 /* from qadic/ctx_init_conway.c */
 extern int flint_conway_polynomials [];
 
-int _fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx, const fmpz_t p, slong d, const char *var)
+int _fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx, ulong p, slong d, const char *var)
 {
     unsigned int position;
 
-    if (fmpz_cmp_ui(p, 109987) > 0)
+    if (p > 109987)
     {
         return 0;
     }
@@ -31,7 +31,7 @@ int _fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx, const fmpz_t p, slong d, const c
     for (position = 0; flint_conway_polynomials[position] != 0; position += 3+flint_conway_polynomials[position+1])
     {
         /* Different prime? */
-        if (fmpz_cmp_ui(p, flint_conway_polynomials[position]))
+        if (p != flint_conway_polynomials[position])
             continue;
 
         /* Same degree? */
@@ -40,7 +40,7 @@ int _fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx, const fmpz_t p, slong d, const c
             nmod_poly_t mod;
             slong i;
 
-            nmod_poly_init(mod, fmpz_get_ui(p));
+            nmod_poly_init(mod, p);
 
             /* Copy the polynomial */
             for (i = 0; i < d; i++)
@@ -62,20 +62,19 @@ int _fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx, const fmpz_t p, slong d, const c
 }
 
 
-void fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx, const fmpz_t p, slong d, const char *var)
+void fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx, ulong p, slong d, const char *var)
 {
     int result;
-    if (fmpz_cmp_ui(p, 109987) > 0)
+
+    if (p > 109987)
     {
         flint_throw(FLINT_ERROR, "Exception (fq_nmod_ctx_init_conway).  Conway polynomials are only available for primes up to 109987.\n");
     }
 
     result = _fq_nmod_ctx_init_conway(ctx, p, d, var);
-    if (!result) {
+    if (!result)
         flint_throw(FLINT_ERROR, "Exception (fq_nmod_ctx_init_conway).  The polynomial for \n"
-                "(p,d) = (%s,%wd) is not present in the database.\n",
-                fmpz_get_str(NULL, 10, p), d);
-    }
+                "(p,d) = (%wu,%wd) is not present in the database.\n", p, d);
 
     ctx->is_conway = 1;
 }

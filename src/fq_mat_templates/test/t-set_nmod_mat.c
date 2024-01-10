@@ -39,7 +39,11 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_set_nmod_mat, state)
 
         TEMPLATE(T, mat_randtest)(a, state, ctx);
 
+#if defined(FQ_NMOD_MAT_H) || defined(FQ_ZECH_MAT_H)
+        nmod_mat_init(m, r, c, TEMPLATE(T, ctx_prime)(ctx));
+#else
         nmod_mat_init(m, r, c, fmpz_get_ui(TEMPLATE(T, ctx_prime)(ctx)));
+#endif
 
         nmod_mat_one(m);
 

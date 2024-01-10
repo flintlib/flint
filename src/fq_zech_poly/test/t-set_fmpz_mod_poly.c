@@ -36,7 +36,7 @@ TEST_FUNCTION_START(fq_zech_poly_set_fmpz_mod_poly, state)
         fq_zech_init(r, ctx);
         fq_zech_init(s, ctx);
         fq_zech_poly_init(a, ctx);
-        fmpz_mod_ctx_init(ctxp, fq_zech_ctx_prime(ctx));
+        fmpz_mod_ctx_init_ui(ctxp, fq_zech_ctx_prime(ctx));
         fmpz_mod_poly_init(b, ctxp);
         fmpz_init(p);
 

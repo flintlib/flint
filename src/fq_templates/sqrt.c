@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2020 William Hart
+    Copyright (C) 2024 William Hart
 
     This file is part of FLINT.
 
@@ -20,7 +21,11 @@ int TEMPLATE(T, sqrt)(TEMPLATE(T, t) rop, const TEMPLATE(T, t) op,
 
     if (TEMPLATE(T, is_zero)(op, ctx) || TEMPLATE(T, is_one)(op, ctx))
         TEMPLATE(T, set)(rop, op, ctx);
+#if defined(FQ_NMOD_H) || defined(FQ_ZECH_H)
+    else if (TEMPLATE(T, ctx_prime)(ctx) == 2)
+#else
     else if (fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) == 0)
+#endif
         TEMPLATE(T, pth_root)(rop, op, ctx);
     else
     {

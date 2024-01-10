@@ -58,7 +58,12 @@ TEST_TEMPLATE_FUNCTION_START(T, multiplicative_order, state)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) X, a;
-        fmpz_t ord, size, pm1;
+        fmpz_t ord, size;
+#if defined(FQ_NMOD_H) || defined(FQ_ZECH_H)
+        ulong pm1;
+#else
+        fmpz_t pm1;
+#endif
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
 
@@ -66,15 +71,24 @@ TEST_TEMPLATE_FUNCTION_START(T, multiplicative_order, state)
         TEMPLATE(T, init)(a, ctx);
         fmpz_init(ord);
         fmpz_init(size);
+#if !(defined(FQ_NMOD_H) || defined(FQ_ZECH_H))
         fmpz_init(pm1);
+#endif
 
         TEMPLATE(T, gen)(X, ctx);
         if (TEMPLATE(T, is_primitive)(X, ctx))
         {
+#if defined(FQ_NMOD_H) || defined(FQ_ZECH_H)
+            pm1 = TEMPLATE(T, ctx_prime)(ctx) - 1;
+            TEMPLATE(T, pow_ui)(a, X, pm1, ctx);
+            result = TEMPLATE(T, multiplicative_order)(ord, a, ctx);
+            fmpz_mul_ui(ord, ord, pm1);
+#else
             fmpz_sub_ui(pm1, TEMPLATE(T, ctx_prime)(ctx), 1);
             TEMPLATE(T, pow)(a, X, pm1, ctx);
             result = TEMPLATE(T, multiplicative_order)(ord, a, ctx);
             fmpz_mul(ord, ord, pm1);
+#endif
 
             TEMPLATE(T, ctx_order)(size, ctx);
             fmpz_sub(size, size, ord);
@@ -90,7 +104,9 @@ TEST_TEMPLATE_FUNCTION_START(T, multiplicative_order, state)
             }
         }
 
+#if !(defined(FQ_NMOD_H) || defined(FQ_ZECH_H))
         fmpz_clear(pm1);
+#endif
         fmpz_clear(ord);
         fmpz_clear(size);
         TEMPLATE(T, clear)(a, ctx);

@@ -15,7 +15,7 @@
 #include "nmod_poly.h"
 #include "fq_nmod.h"
 
-void fq_nmod_ctx_init(fq_nmod_ctx_t ctx, const fmpz_t p, slong d, const char *var)
+void fq_nmod_ctx_init(fq_nmod_ctx_t ctx, ulong p, slong d, const char *var)
 {
     flint_rand_t state;
     nmod_poly_t poly;
@@ -29,7 +29,7 @@ void fq_nmod_ctx_init(fq_nmod_ctx_t ctx, const fmpz_t p, slong d, const char *va
 
     flint_randinit(state);
 
-    nmod_poly_init2(poly, fmpz_get_ui(p), d + 1);
+    nmod_poly_init2(poly, p, d + 1);
     nmod_poly_randtest_sparse_irreducible(poly, state, d + 1);
 
     fq_nmod_ctx_init_modulus(ctx, poly, var);

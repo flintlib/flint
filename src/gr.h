@@ -1371,8 +1371,8 @@ void gr_ctx_ca_set_option(gr_ctx_t ctx, slong option, slong value);
 slong gr_ctx_ca_get_option(gr_ctx_t ctx, slong option);
 
 void gr_ctx_init_fq(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var);
-void gr_ctx_init_fq_nmod(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var);
-void gr_ctx_init_fq_zech(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var);
+void gr_ctx_init_fq_nmod(gr_ctx_t ctx, ulong p, slong d, const char * var);
+void gr_ctx_init_fq_zech(gr_ctx_t ctx, ulong p, slong d, const char * var);
 
 void _gr_ctx_init_fq_from_ref(gr_ctx_t ctx, const void * fq_ctx);
 void _gr_ctx_init_fq_nmod_from_ref(gr_ctx_t ctx, const void * fq_nmod_ctx);

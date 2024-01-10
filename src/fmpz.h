@@ -426,7 +426,8 @@ void fmpz_sqrtrem(fmpz_t f, fmpz_t r, const fmpz_t g);
 int fmpz_root(fmpz_t r, const fmpz_t f, slong n);
 
 int fmpz_divisible(const fmpz_t f, const fmpz_t g);
-int fmpz_divisible_si(const fmpz_t f, slong g);
+int fmpz_divisible_ui(const fmpz_t f, ulong g);
+FMPZ_INLINE int fmpz_divisible_si(const fmpz_t f, slong g) { return fmpz_divisible_ui(f, FLINT_ABS(g)); }
 int fmpz_divides(fmpz_t q, const fmpz_t g, const fmpz_t h);
 
 void fmpz_divexact(fmpz_t f, const fmpz_t g, const fmpz_t h);

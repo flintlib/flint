@@ -25,7 +25,7 @@ TEST_FUNCTION_START(fq_zech_mul_fmpz, state)
 
         for (i = 0; i < 200; i++)
         {
-            fmpz_t x;
+            fmpz_t x, p;
             fq_nmod_t aa, bb;
             fq_zech_t a, b, c;
 
@@ -33,7 +33,9 @@ TEST_FUNCTION_START(fq_zech_mul_fmpz, state)
             fq_nmod_init(bb, ctx->fq_nmod_ctx);
 
             fmpz_init(x);
-            fmpz_randtest_mod_signed(x, state, fq_zech_ctx_prime(ctx));
+            fmpz_init_set_ui(p, fq_zech_ctx_prime(ctx));
+            fmpz_randtest_mod_signed(x, state, p);
+            fmpz_clear(p);
 
             fq_nmod_randtest(aa, state, ctx->fq_nmod_ctx);
             fq_zech_set_fq_nmod(a, aa, ctx);
@@ -72,7 +74,7 @@ TEST_FUNCTION_START(fq_zech_mul_fmpz, state)
 
         for (i = 0; i < 200; i++)
         {
-            fmpz_t x;
+            fmpz_t x, p;
             fq_nmod_t aa, bb;
             fq_zech_t a, b;
 
@@ -80,7 +82,9 @@ TEST_FUNCTION_START(fq_zech_mul_fmpz, state)
             fq_nmod_init(bb, ctx->fq_nmod_ctx);
 
             fmpz_init(x);
-            fmpz_randtest_mod_signed(x, state, fq_zech_ctx_prime(ctx));
+            fmpz_init_set_ui(p, fq_zech_ctx_prime(ctx));
+            fmpz_randtest_mod_signed(x, state, p);
+            fmpz_clear(p);
 
             fq_nmod_randtest(aa, state, ctx->fq_nmod_ctx);
             fq_zech_set_fq_nmod(a, aa, ctx);

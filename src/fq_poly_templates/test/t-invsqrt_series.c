@@ -49,16 +49,26 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_invsqrt_series, state)
         TEMPLATE(T, poly_inv_series)(r, r, m, ctx);
         TEMPLATE(T, poly_truncate)(h, m, ctx);
 
-        result = (fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) == 0) || (TEMPLATE(T, poly_equal)(r, h, ctx));
+        result = TEMPLATE(T, poly_equal)(r, h, ctx);
+#if defined(FQ_NMOD_POLY_H) || defined(FQ_ZECH_POLY_H)
+        result = result || TEMPLATE(T, ctx_prime)(ctx) == 2;
+#else
+        result = result || fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) == 0;
+#endif
+
         if (!result)
         {
             flint_printf("FAIL:\n");
             TEMPLATE(T, poly_print)(h, ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print)(g, ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print)(r, ctx), flint_printf("\n\n");
+#if defined(FQ_NMOD_POLY_H) || defined(FQ_ZECH_POLY_H)
+            flint_printf("n = %wu\n", TEMPLATE(T, ctx_prime)(ctx));
+#else
             flint_printf("n = ");
             fmpz_print(TEMPLATE(T, ctx_prime)(ctx));
             flint_printf("\n");
+#endif
             fflush(stdout);
             flint_abort();
         }
@@ -98,15 +108,24 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_invsqrt_series, state)
         TEMPLATE(T, poly_invsqrt_series)(g, h, m, ctx);
         TEMPLATE(T, poly_invsqrt_series)(h, h, m, ctx);
 
-        result = (fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) == 0) || TEMPLATE(T, poly_equal)(g, h, ctx);
+        result = TEMPLATE(T, poly_equal)(g, h, ctx);
+#if defined(FQ_NMOD_POLY_H) || defined(FQ_ZECH_POLY_H)
+        result = result || TEMPLATE(T, ctx_prime)(ctx) == 2;
+#else
+        result = result || fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) == 0;
+#endif
         if (!result)
         {
             flint_printf("FAIL:\n");
             TEMPLATE(T, poly_print)(h, ctx), flint_printf("\n\n");
             TEMPLATE(T, poly_print)(g, ctx), flint_printf("\n\n");
+#if defined(FQ_NMOD_POLY_H) || defined(FQ_ZECH_POLY_H)
+            flint_printf("n = %wu\n", TEMPLATE(T, ctx_prime)(ctx));
+#else
             flint_printf("n = ");
             fmpz_print(TEMPLATE(T, ctx_prime)(ctx));
             flint_printf("\n");
+#endif
             flint_printf("m = %wd\n", m);
             fflush(stdout);
             flint_abort();

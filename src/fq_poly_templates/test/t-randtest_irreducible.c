@@ -37,7 +37,6 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_randtest_irreducible, state)
             flint_printf("poly:\n");
             TEMPLATE(T, poly_print_pretty) (poly, "x", ctx);
             flint_printf("\n");
-            fflush(stdout);
             flint_abort();
         }
 

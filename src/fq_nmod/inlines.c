@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2009 William Hart
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -11,10 +12,4 @@
 
 #define FQ_NMOD_INLINES_C
 
-#include "fmpz.h"
 #include "fq_nmod.h"
-
-void __fq_nmod_ctx_prime(fmpz_t p, fq_nmod_ctx_t ctx)
-{
-   fmpz_set(p, fq_nmod_ctx_prime(ctx));
-}

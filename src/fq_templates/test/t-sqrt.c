@@ -85,8 +85,13 @@ TEST_TEMPLATE_FUNCTION_START(T, sqrt, state)
                 flint_abort();
             }
 
+#if defined(FQ_NMOD_H) || defined(FQ_ZECH_H)
+            if (ctx->is_conway && TEMPLATE(T, ctx_prime)(ctx) != 2 &&
+                    !TEMPLATE(T, is_zero)(b, ctx))
+#else
             if (ctx->is_conway && fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) != 0 &&
                     !TEMPLATE(T, is_zero)(b, ctx))
+#endif
             {
                 TEMPLATE(T, gen)(x, ctx);
                 TEMPLATE(T, mul)(b, b, x, ctx);

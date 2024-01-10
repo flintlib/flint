@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2011, 2012 Sebastian Pancratz
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -144,7 +145,7 @@ void fq_nmod_pow(fq_nmod_t rop, const fq_nmod_t op, const fmpz_t e, const fq_nmo
             t = rop->coeffs;
         }
 
-        if (fmpz_cmpabs(e, fq_nmod_ctx_prime(ctx)) < 0)
+        if (fmpz_cmp_ui(e, fq_nmod_ctx_prime(ctx)) < 0)
             _fq_nmod_pow(t, op->coeffs, op->length, e, ctx);
         else
         {

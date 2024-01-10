@@ -4,6 +4,7 @@
     Copyright (C) 2018 Tommy Hofmann
     Copyright (C) 2015, 2019-2021 William Hart
     Copyright (C) 2021 Daniel Schultz
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 

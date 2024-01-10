@@ -82,7 +82,11 @@ TEST_TEMPLATE_FUNCTION_START(T, frobenius, state)
             fmpz_t t;
 
             fmpz_init(t);
+#if defined(FQ_NMOD_H) || defined(FQ_ZECH_H)
+            fmpz_ui_pow_ui(t, TEMPLATE(T, ctx_prime)(ctx), e);
+#else
             fmpz_pow_ui(t, TEMPLATE(T, ctx_prime)(ctx), e);
+#endif
             TEMPLATE(T, pow)(c, a, t, ctx);
             fmpz_clear(t);
         }

@@ -26,6 +26,9 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_factor_is_squarefree, state)
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) poly, Q, R, t;
         fmpz_t x;
+#if defined(FQ_NMOD_POLY_FACTOR_H) || defined(FQ_ZECH_POLY_FACTOR_H)
+        fmpz_t m;
+#endif
         slong i, num_factors, exp, max_exp;
         int v, result;
 
@@ -37,7 +40,13 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_factor_is_squarefree, state)
         TEMPLATE(T, poly_init) (R, ctx);
 
         fmpz_init(x);
-        fmpz_randtest_mod(x, state, TEMPLATE(T, ctx_prime) (ctx));
+#if defined(FQ_NMOD_POLY_FACTOR_H) || defined(FQ_ZECH_POLY_FACTOR_H)
+        fmpz_init_set_ui(m, TEMPLATE(T, ctx_prime)(ctx));
+        fmpz_randtest_mod(x, state, m);
+        fmpz_clear(m);
+#else
+        fmpz_randtest_mod(x, state, TEMPLATE(T, ctx_prime)(ctx));
+#endif
 
         TEMPLATE(T, poly_set_coeff_fmpz) (poly, 0, x, ctx);
         num_factors = n_randint(state, 5);

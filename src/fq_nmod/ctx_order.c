@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2023 Albin Ahlbäck
+    Copyright (C) 2023, 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -14,6 +14,5 @@
 
 void fq_nmod_ctx_order(fmpz_t f, const fq_nmod_ctx_t ctx)
 {
-    fmpz_set(f, fq_nmod_ctx_prime(ctx));
-    fmpz_pow_ui(f, f, fq_nmod_ctx_degree(ctx));
+    fmpz_ui_pow_ui(f, fq_nmod_ctx_prime(ctx), fq_nmod_ctx_degree(ctx));
 }

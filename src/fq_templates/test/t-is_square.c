@@ -58,20 +58,25 @@ TEST_TEMPLATE_FUNCTION_START(T, is_square, state)
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
 
+#if defined(FQ_NMOD_H) || defined(FQ_ZECH_H)
+        if (TEMPLATE(T, ctx_prime)(ctx) != 2)
+        {
+#else
         if (fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) != 0)
         {
+#endif
             TEMPLATE(T, init)(a, ctx);
             TEMPLATE(T, init)(b, ctx);
-	    TEMPLATE(T, init)(z, ctx);
+            TEMPLATE(T, init)(z, ctx);
 
             while (TEMPLATE(T, is_square)(z, ctx))
-	        TEMPLATE(T, randtest)(z, state, ctx);
+                TEMPLATE(T, randtest)(z, state, ctx);
 
-	    while (TEMPLATE(T, is_zero)(a, ctx))
+            while (TEMPLATE(T, is_zero)(a, ctx))
                 TEMPLATE(T, randtest)(a, state, ctx);
 
             TEMPLATE(T, sqr)(b, a, ctx);
-	    TEMPLATE(T, mul)(b, b, z, ctx);
+            TEMPLATE(T, mul)(b, b, z, ctx);
 
             result = (!TEMPLATE(T, is_square)(b, ctx));
             if (!result)

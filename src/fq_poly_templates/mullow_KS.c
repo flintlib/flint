@@ -2,6 +2,7 @@
     Copyright (C) 2008, 2009 William Hart
     Copyright (C) 2010, 2012 Sebastian Pancratz
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -35,8 +36,12 @@ _TEMPLATE(T, poly_mullow_KS) (TEMPLATE(T, struct) * rop,
         return;
     }
 
-    bits = 2 * fmpz_bits(TEMPLATE(T, ctx_prime) (ctx))
-        + FLINT_BIT_COUNT(d) + FLINT_BIT_COUNT(FLINT_MIN(len1, len2));
+    bits = FLINT_BIT_COUNT(d) + FLINT_BIT_COUNT(FLINT_MIN(len1, len2));
+#if defined(FQ_NMOD_POLY_H) || defined(FQ_ZECH_POLY_H)
+    bits += 2 * FLINT_BIT_COUNT(TEMPLATE(T, ctx_prime)(ctx));
+#else
+    bits += 2 * fmpz_bits(TEMPLATE(T, ctx_prime)(ctx));
+#endif
 
     f = _fmpz_vec_init(n + len1 + len2);
     g = f + n;

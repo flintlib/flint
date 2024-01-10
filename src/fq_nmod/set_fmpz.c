@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2023 Albin Ahlbäck
+    Copyright (C) 2023, 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -15,10 +15,9 @@
 
 void fq_nmod_set_fmpz(fq_nmod_t rop, const fmpz_t x, const fq_nmod_ctx_t ctx)
 {
-    fmpz_t rx;
-    fmpz_init(rx);
-    fmpz_mod(rx, x, fq_nmod_ctx_prime(ctx));
+    ulong rx;
+
+    rx = fmpz_fdiv_ui(x, fq_nmod_ctx_prime(ctx));
     nmod_poly_zero(rop);
-    nmod_poly_set_coeff_ui(rop, 0, fmpz_get_ui(rx));
-    fmpz_clear(rx);
+    nmod_poly_set_coeff_ui(rop, 0, rx);
 }

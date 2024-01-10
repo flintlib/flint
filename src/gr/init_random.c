@@ -114,13 +114,11 @@ gr_ctx_init_random_ring_finite_field(gr_ctx_t ctx, flint_rand_t state)
     switch (n_randint(state, 3))
     {
         case 0:
-            fmpz_set_ui(t, n_randtest_prime(state, 0));
-            gr_ctx_init_fq_nmod(ctx, t, 1 + n_randint(state, 4), NULL);
+            gr_ctx_init_fq_nmod(ctx, n_randtest_prime(state, 0), 1 + n_randint(state, 4), NULL);
             break;
 
         case 1:
-            fmpz_set_ui(t, n_randprime(state, 4, 0));
-            gr_ctx_init_fq_zech(ctx, t, 1 + n_randint(state, 3), NULL);
+            gr_ctx_init_fq_zech(ctx, n_randprime(state, 4, 0), 1 + n_randint(state, 3), NULL);
             break;
 
         case 2:

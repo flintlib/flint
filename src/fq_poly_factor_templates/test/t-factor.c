@@ -87,7 +87,11 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_factor, state)
                 TEMPLATE(T, poly_factor_with_berlekamp) (res, lead, pol1, ctx);
                 break;
             case 2:
+#if defined(FQ_NMOD_POLY_FACTOR_H) || defined(FQ_ZECH_POLY_FACTOR_H)
+                if (TEMPLATE(T, ctx_prime)(ctx) % 2 == 0)
+#else
                 if (fmpz_is_even(TEMPLATE(T, ctx_prime) (ctx)))
+#endif
                     TEMPLATE(T, poly_factor) (res, lead, pol1, ctx);
                 else
                     TEMPLATE(T, poly_factor_with_cantor_zassenhaus) (res, lead,

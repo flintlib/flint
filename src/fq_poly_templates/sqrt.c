@@ -1,6 +1,7 @@
 /*
-    Copyright 2021, 2022 William Hart
     Copyright (C) 2012 Fredrik Johansson
+    Copyright (C) 2021, 2022 William Hart
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -41,7 +42,11 @@ _TEMPLATE(T, poly_sqrt)(TEMPLATE(T, struct) * s, const TEMPLATE(T, struct) * p, 
     if (len % 2 == 0)
         return len == 0;
 
+#if defined(FQ_NMOD_POLY_H) || defined(FQ_ZECH_POLY_H)
+    if (TEMPLATE(T, ctx_prime)(ctx) == 2)
+#else
     if (fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) == 0)
+#endif
         return _TEMPLATE(T, poly_sqrt_2)(s, p, len, ctx);
 
     /* valuation must be even, and then can be reduced to 0 */
