@@ -78,7 +78,7 @@ TEST_FUNCTION_START(fq_zech_embed_matrices, state)
 
             m = degrees[i % 2];
 
-            fq_zech_ctx_init_random(ctx1, primes[i % 3], m, "a");
+            fq_zech_ctx_init_random_ui(ctx1, primes[i % 3], m, "a");
 
             n = m*j;
             if (m == 1) {

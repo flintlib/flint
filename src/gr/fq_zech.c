@@ -574,6 +574,6 @@ gr_ctx_init_fq_zech(gr_ctx_t ctx, ulong p, slong d, const char * var)
     fq_zech_ctx_struct * fq_zech_ctx;
 
     fq_zech_ctx = flint_malloc(sizeof(fq_zech_ctx_struct));
-    fq_zech_ctx_init(fq_zech_ctx, p, d, var == NULL ? "a" : var);
+    fq_zech_ctx_init_ui(fq_zech_ctx, p, d, var == NULL ? "a" : var);
     _gr_ctx_init_fq_zech_from_ref(ctx, fq_zech_ctx);
 }

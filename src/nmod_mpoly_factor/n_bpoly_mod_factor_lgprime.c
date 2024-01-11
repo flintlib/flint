@@ -738,7 +738,7 @@ void n_bpoly_mod_factor_lgprime(
     FLINT_ASSERT(Blenx > 1);
 
     deg = 2;
-    fq_nmod_ctx_init(ectx, ctx.n, deg, "y");
+    fq_nmod_ctx_init_ui(ectx, ctx.n, deg, "y");
     n_poly_init(final_alpha_pow);
     n_poly_init(curr_alpha_pow);
     n_poly_init(prev_alpha_pow);
@@ -778,7 +778,7 @@ next_alpha:
     deg++;
 
 	fq_nmod_ctx_clear(ectx);
-	fq_nmod_ctx_init(ectx, ctx.n, deg, "y");
+	fq_nmod_ctx_init_ui(ectx, ctx.n, deg, "y");
 
     n_poly_mock(alpha, ectx->modulus);
 

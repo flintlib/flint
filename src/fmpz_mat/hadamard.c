@@ -80,7 +80,7 @@ fmpz_mat_jacobsthal(fmpz_mat_t Q)
     if (!(d = n_is_prime_power(&p, q)) || q % 2 == 0)
         flint_throw(FLINT_ERROR, "Not an odd prime power in %s\n", __func__);
 
-    fq_nmod_ctx_init(ctx, p, d, "x");
+    fq_nmod_ctx_init_ui(ctx, p, d, "x");
     fq_nmod_init(x, ctx);
     fq_nmod_init(y, ctx);
     fq_nmod_init(x2, ctx);

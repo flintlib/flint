@@ -31,14 +31,13 @@
 extern "C" {
 #endif
 
-void fq_zech_ctx_init(fq_zech_ctx_t ctx, ulong p, slong d, const char * var);
+void fq_zech_ctx_init_ui(fq_zech_ctx_t ctx, ulong p, slong d, const char * var);
+int _fq_zech_ctx_init_conway_ui(fq_zech_ctx_t ctx, ulong p, slong d, const char * var);
+void fq_zech_ctx_init_conway_ui(fq_zech_ctx_t ctx, ulong p, slong d, const char * var);
+void fq_zech_ctx_init_random_ui(fq_zech_ctx_t ctx, ulong p, slong d, const char * var);
 
 int fq_zech_ctx_init_fq_nmod_ctx_check(fq_zech_ctx_t ctx, fq_nmod_ctx_t ctxn);
 void fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx, fq_nmod_ctx_t ctxn);
-
-int _fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, ulong p, slong d, const char * var);
-void fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, ulong p, slong d, const char * var);
-void fq_zech_ctx_init_random(fq_zech_ctx_t ctx, ulong p, slong d, const char * var);
 
 int fq_zech_ctx_init_modulus_check(fq_zech_ctx_t ctx, const nmod_poly_t modulus, const char * var);
 void fq_zech_ctx_init_modulus(fq_zech_ctx_t ctx, const nmod_poly_t modulus, const char * var);
@@ -279,6 +278,13 @@ void fq_zech_bit_pack(fmpz_t f, const fq_zech_t op, flint_bitcnt_t bit_size,
 
 void fq_zech_bit_unpack(fq_zech_t rop, const fmpz_t f, flint_bitcnt_t bit_size,
                    const fq_zech_ctx_t ctx);
+
+/* Deprecated functions ******************************************************/
+
+void fq_zech_ctx_init(fq_zech_ctx_t, fmpz_t, slong, const char *);
+int _fq_zech_ctx_init_conway(fq_zech_ctx_t, fmpz_t, slong, const char *);
+void fq_zech_ctx_init_conway(fq_zech_ctx_t, fmpz_t, slong, const char *);
+void fq_zech_ctx_init_random(fq_zech_ctx_t, fmpz_t, slong, const char *);
 
 #ifdef T
 #undef T

@@ -476,7 +476,7 @@ static void _set_estimates_medprime(
 
     flint_randinit(state);
 
-    fq_zech_ctx_init(medctx, smctx->mod.n, 1, "#");
+    fq_zech_ctx_init_ui(medctx, smctx->mod.n, 1, "#");
 
     d = n_clog(500, smctx->mod.n);
     d = FLINT_MAX(d, 1);
@@ -524,7 +524,7 @@ try_again:
         goto cleanup;
     }
 
-    fq_zech_ctx_init(medctx, smctx->mod.n, d, "#");
+    fq_zech_ctx_init_ui(medctx, smctx->mod.n, d, "#");
 
     for (j = 0; j < nvars; j++)
         fq_zech_rand_not_zero(alpha + j, state, medctx);

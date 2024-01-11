@@ -45,7 +45,7 @@ main(int argc, char** argv)
     d = atol(argv[2]);
     len = atol(argv[3]);
 
-    fq_nmod_ctx_init(ctx, p, d, "a");
+    fq_nmod_ctx_init_ui(ctx, p, d, "a");
     fq_zech_ctx_init_fq_nmod_ctx(ctx_zech, ctx);
 
     fq_nmod_poly_init(f, ctx);

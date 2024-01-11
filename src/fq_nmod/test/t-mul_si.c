@@ -25,7 +25,7 @@ TEST_FUNCTION_START(fq_nmod_mul_si, state)
         fmpz_t f;
 
         fmpz_init(f);
-        fq_nmod_ctx_init(ctx, 23, 1, "x");
+        fq_nmod_ctx_init_ui(ctx, 23, 1, "x");
 
         fq_nmod_init(rop, ctx);
 

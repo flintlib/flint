@@ -34,7 +34,7 @@ Context Management
 --------------------------------------------------------------------------------
 
 
-.. function:: void fq_zech_ctx_init(fq_zech_ctx_t ctx, ulong p, slong d, const char * var)
+.. function:: void fq_zech_ctx_init_ui(fq_zech_ctx_t ctx, ulong p, slong d, const char * var)
 
     Initialises the context for prime `p` and extension degree `d`,
     with name ``var`` for the generator.  By default, it will try
@@ -46,7 +46,7 @@ Context Management
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
 
-.. function:: int _fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, ulong p, slong d, const char * var)
+.. function:: int _fq_zech_ctx_init_conway_ui(fq_zech_ctx_t ctx, ulong p, slong d, const char * var)
 
     Attempts to initialise the context for prime `p` and extension
     degree `d`, with name ``var`` for the generator using a Conway
@@ -61,7 +61,7 @@ Context Management
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
 
-.. function:: void fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, ulong p, slong d, const char * var)
+.. function:: void fq_zech_ctx_init_conway_ui(fq_zech_ctx_t ctx, ulong p, slong d, const char * var)
 
     Initialises the context for prime `p` and extension degree `d`,
     with name ``var`` for the generator using a Conway polynomial
@@ -72,7 +72,7 @@ Context Management
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
 
-.. function:: void fq_zech_ctx_init_random(fq_zech_ctx_t ctx, ulong p, slong d, const char * var)
+.. function:: void fq_zech_ctx_init_random_ui(fq_zech_ctx_t ctx, ulong p, slong d, const char * var)
 
     Initialises the context for prime `p` and extension degree `d`,
     with name ``var`` for the generator using a random primitive

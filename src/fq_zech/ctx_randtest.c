@@ -26,7 +26,7 @@ fq_zech_ctx_randtest(fq_zech_ctx_t ctx, flint_rand_t state)
     else
         max_d = floor(log(n_pow(2, 11)) / log(p));
     d = n_randint(state, max_d - 1) + 2;
-    fq_zech_ctx_init_random(ctx, p, d, "a");
+    fq_zech_ctx_init_random_ui(ctx, p, d, "a");
 
     ctx->owns_fq_nmod_ctx = 1;
 }

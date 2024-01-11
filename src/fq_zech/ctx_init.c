@@ -37,28 +37,28 @@ _nmod_poly_evaluate_ui(mp_srcptr poly, slong len, ulong xd)
 }
 
 void
-fq_zech_ctx_init(fq_zech_ctx_t ctx, ulong p, slong d, const char *var)
+fq_zech_ctx_init_ui(fq_zech_ctx_t ctx, ulong p, slong d, const char *var)
 {
-    if (!_fq_zech_ctx_init_conway(ctx, p, d, var))
-        fq_zech_ctx_init_random(ctx, p, d, var);
+    if (!_fq_zech_ctx_init_conway_ui(ctx, p, d, var))
+        fq_zech_ctx_init_random_ui(ctx, p, d, var);
 }
 
 void
-fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, ulong p, slong d,
+fq_zech_ctx_init_conway_ui(fq_zech_ctx_t ctx, ulong p, slong d,
                         const char *var)
 {
     fq_nmod_ctx_struct * fq_nmod_ctx;
 
     fq_nmod_ctx = flint_malloc(sizeof(fq_nmod_ctx_struct));
 
-    fq_nmod_ctx_init_conway(fq_nmod_ctx, p, d, var);
+    fq_nmod_ctx_init_conway_ui(fq_nmod_ctx, p, d, var);
     fq_zech_ctx_init_fq_nmod_ctx(ctx, fq_nmod_ctx);
     ctx->owns_fq_nmod_ctx = 1;
     ctx->is_conway = 1;
 }
 
 int
-_fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, ulong p, slong d,
+_fq_zech_ctx_init_conway_ui(fq_zech_ctx_t ctx, ulong p, slong d,
                          const char *var)
 {
     int result;
@@ -66,7 +66,7 @@ _fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, ulong p, slong d,
 
     fq_nmod_ctx = flint_malloc(sizeof(fq_nmod_ctx_struct));
 
-    result = _fq_nmod_ctx_init_conway(fq_nmod_ctx, p, d, var);
+    result = _fq_nmod_ctx_init_conway_ui(fq_nmod_ctx, p, d, var);
     if (!result)
     {
         flint_free(fq_nmod_ctx);
@@ -81,7 +81,7 @@ _fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, ulong p, slong d,
 }
 
 void
-fq_zech_ctx_init_random(fq_zech_ctx_t ctx, ulong p, slong d,
+fq_zech_ctx_init_random_ui(fq_zech_ctx_t ctx, ulong p, slong d,
                         const char *var)
 {
     fq_nmod_ctx_struct * fq_nmod_ctx;
@@ -250,3 +250,10 @@ fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx, fq_nmod_ctx_t fq_nmod_ctx)
         flint_throw(FLINT_ERROR, "(fq_zech_ctx_init_fq_nmod_ctx): Polynomial is not primitive.\n");
     }
 }
+
+/* Deprecated functions ******************************************************/
+
+void fq_zech_ctx_init(fq_zech_ctx_t ctx, fmpz_t p, slong d, const char * var) { fq_zech_ctx_init_ui(ctx, fmpz_get_ui(p), d, var); }
+int _fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, fmpz_t p, slong d, const char * var) { return _fq_zech_ctx_init_conway_ui(ctx, fmpz_get_ui(p), d, var); }
+void fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, fmpz_t p, slong d, const char * var) { fq_zech_ctx_init_conway_ui(ctx, fmpz_get_ui(p), d, var); }
+void fq_zech_ctx_init_random(fq_zech_ctx_t ctx, fmpz_t p, slong d, const char * var) { fq_zech_ctx_init_random_ui(ctx, fmpz_get_ui(p), d, var); }

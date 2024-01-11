@@ -26,7 +26,7 @@ fq_nmod_ctx_randtest(fq_nmod_ctx_t ctx, flint_rand_t state)
 
     p = n_randprime(state, 2 + n_randint(state, 6), 1);
     d = n_randint(state, 10) + 1;
-    fq_nmod_ctx_init_conway(ctx, p, d, "a");
+    fq_nmod_ctx_init_conway_ui(ctx, p, d, "a");
 
     /* Test non-monic modulus */
     if (n_randint(state, 2))

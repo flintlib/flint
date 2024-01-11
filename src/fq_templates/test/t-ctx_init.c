@@ -40,7 +40,11 @@ TEST_TEMPLATE_FUNCTION_START(T, ctx_init, state)
 #endif
         d = n_randint(state, 20) + 1;
 
+#if defined(FQ_NMOD_H) || defined(FQ_ZECH_H)
+        TEMPLATE(T, ctx_init_ui)(ctx, p, d, "a");
+#else
         TEMPLATE(T, ctx_init)(ctx, p, d, "a");
+#endif
         TEMPLATE(T, ctx_clear)(ctx);
     }
 
@@ -63,7 +67,11 @@ TEST_TEMPLATE_FUNCTION_START(T, ctx_init, state)
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
 #endif
         d = n_randint(state, 10) + 1;
+#if defined(FQ_NMOD_H) || defined(FQ_ZECH_H)
+        TEMPLATE(T, ctx_init_conway_ui)(ctx_conway, p, d, "a");
+#else
         TEMPLATE(T, ctx_init_conway)(ctx_conway, p, d, "a");
+#endif
 
 #ifdef FQ_H
         TEMPLATE(T, ctx_init_modulus)(ctx_mod, ctx_conway->modulus, ctx_conway->ctxp, "a");

@@ -80,12 +80,12 @@ FQ_DEFAULT_INLINE void fq_default_ctx_init_type(fq_default_ctx_t ctx,
     if (type == FQ_DEFAULT_FQ_ZECH || (type == 0 && d > 1 && bits*d <= 16))
     {
         ctx->type = FQ_DEFAULT_FQ_ZECH;
-        fq_zech_ctx_init(ctx->ctx.fq_zech, *p, d, var);
+        fq_zech_ctx_init_ui(ctx->ctx.fq_zech, *p, d, var);
     }
     else if (type == FQ_DEFAULT_FQ_NMOD || (type == 0 && d > 1 && fmpz_abs_fits_ui(p)))
     {
         ctx->type = FQ_DEFAULT_FQ_NMOD;
-        fq_nmod_ctx_init(ctx->ctx.fq_nmod, *p, d, var);
+        fq_nmod_ctx_init_ui(ctx->ctx.fq_nmod, *p, d, var);
     }
     else if (type == FQ_DEFAULT_NMOD || (type == 0 && d == 1 && fmpz_abs_fits_ui(p)))
     {

@@ -43,7 +43,7 @@ static int _is_proved_not_square_medprime(
     if (edeg > max_degree)
         return 0;
 
-    fq_zech_ctx_init(fqctx, mod.n, edeg, "#");
+    fq_zech_ctx_init_ui(fqctx, mod.n, edeg, "#");
     fq_zech_init(eval, fqctx);
 
     TMP_START;

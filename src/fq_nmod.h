@@ -31,9 +31,9 @@ extern "C" {
 
 /* Context ********************************************************************/
 
-void fq_nmod_ctx_init(fq_nmod_ctx_t ctx, ulong prime, slong deg, const char * var);
-int _fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx, ulong prime, slong deg, const char * var);
-void fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx, ulong prime, slong deg, const char * var);
+void fq_nmod_ctx_init_ui(fq_nmod_ctx_t ctx, ulong prime, slong deg, const char * var);
+int _fq_nmod_ctx_init_conway_ui(fq_nmod_ctx_t ctx, ulong prime, slong deg, const char * var);
+void fq_nmod_ctx_init_conway_ui(fq_nmod_ctx_t ctx, ulong prime, slong deg, const char * var);
 void fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx, const nmod_poly_t modulus, const char * var);
 
 void fq_nmod_ctx_randtest(fq_nmod_ctx_t ctx, flint_rand_t state);
@@ -199,6 +199,12 @@ void fq_nmod_bit_pack(fmpz_t f, const fq_nmod_t op, flint_bitcnt_t bit_size,
 
 void fq_nmod_bit_unpack(fq_nmod_t rop, const fmpz_t f, flint_bitcnt_t bit_size,
                    const fq_nmod_ctx_t ctx);
+
+/* Deprecated functions ******************************************************/
+
+void fq_nmod_ctx_init(fq_nmod_ctx_t, fmpz_t, slong, const char *);
+int _fq_nmod_ctx_init_conway(fq_nmod_ctx_t, fmpz_t, slong, const char *);
+void fq_nmod_ctx_init_conway(fq_nmod_ctx_t, fmpz_t, slong, const char *);
 
 #ifdef T
 #undef T
