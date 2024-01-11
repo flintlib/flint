@@ -16,6 +16,26 @@
 #include "fq_nmod.h"
 #include "fq_zech.h"
 
+static ulong
+_nmod_poly_evaluate_ui(mp_srcptr poly, slong len, ulong xd)
+{
+    slong ix;
+    ulong res;
+
+    if (len == 0)
+        return 0;
+
+    res = poly[len - 1];
+
+    for (ix = len - 2; ix >= 0; ix--)
+    {
+        res *= xd;
+        res += poly[ix];
+    }
+
+    return res;
+}
+
 void
 fq_zech_ctx_init(fq_zech_ctx_t ctx, ulong p, slong d, const char *var)
 {
@@ -116,8 +136,8 @@ fq_zech_ctx_init_fq_nmod_ctx_check(fq_zech_ctx_t ctx,
     ulong i, n;
     fq_nmod_t r, gen;
     slong up, q;
-    fmpz_t order, result, p;
-    ulong result_ui;
+    fmpz_t order;
+    ulong result;
     mp_limb_t j, nz;
     mp_limb_t *n_reverse_table;
 
@@ -177,29 +197,23 @@ fq_zech_ctx_init_fq_nmod_ctx_check(fq_zech_ctx_t ctx,
     fq_nmod_one(r, ctx->fq_nmod_ctx);
     fq_nmod_gen(gen, ctx->fq_nmod_ctx);
 
-    fmpz_init(result);
-    fmpz_init_set_ui(p, fq_nmod_ctx_prime(fq_nmod_ctx));
-
     for (i = 0; i < ctx->qm1; i++)
     {
-        nmod_poly_evaluate_fmpz(result, r, p);
-        result_ui = fmpz_get_ui(result);
-        if (n_reverse_table[result_ui] != ctx->qm1)
+        result = _nmod_poly_evaluate_ui(r->coeffs, r->length, fq_nmod_ctx_prime(fq_nmod_ctx));
+        if (n_reverse_table[result] != ctx->qm1)
         {   /* clean up... */
             fq_nmod_clear(r, fq_nmod_ctx);
             fq_nmod_clear(gen, fq_nmod_ctx);
             flint_free(n_reverse_table);
             fmpz_clear(order);
-            fmpz_clear(p);
-            fmpz_clear(result);
             fq_zech_ctx_clear(ctx);
             return 0; /* failure: modulus not primitive */
         }
-        n_reverse_table[result_ui] = i;
-        ctx->eval_table[i] = result_ui;
+        n_reverse_table[result] = i;
+        ctx->eval_table[i] = result;
         if (r->length == 1)
         {
-            ctx->prime_field_table[result_ui] = i;
+            ctx->prime_field_table[result] = i;
         }
         fq_nmod_mul(r, r, gen, fq_nmod_ctx);
     }
@@ -224,8 +238,6 @@ fq_zech_ctx_init_fq_nmod_ctx_check(fq_zech_ctx_t ctx,
     fq_nmod_clear(gen, fq_nmod_ctx);
     flint_free(n_reverse_table);
     fmpz_clear(order);
-    fmpz_clear(p);
-    fmpz_clear(result);
 
     return 1; /* success */
 }
