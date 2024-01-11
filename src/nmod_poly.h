@@ -681,12 +681,6 @@ void nmod_poly_integral(nmod_poly_t x_int, const nmod_poly_t x);
 
 /* Evaluation  ***************************************************************/
 
-void _nmod_poly_evaluate_fmpz(fmpz_t rop,
-                             mp_srcptr poly, const slong len, const fmpz_t c);
-
-void nmod_poly_evaluate_fmpz(fmpz_t rop,
-                                       const nmod_poly_t poly, const fmpz_t c);
-
 mp_limb_t _nmod_poly_evaluate_nmod(mp_srcptr poly,
                                            slong len, mp_limb_t c, nmod_t mod);
 
