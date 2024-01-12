@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2015, 2019 William Hart
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -23,7 +24,7 @@ slong fq_nmod_mat_reduce_row_KS(fq_nmod_mat_t A, slong * P, slong * L,
    fmpz * mvec;
    fmpz_t mz, rz;
 
-   bits = FLINT_BIT_COUNT(ctx->p)*2 + FLINT_BIT_COUNT(m + 1) +
+   bits = 2 * FLINT_BIT_COUNT(fq_nmod_ctx_prime(ctx)) + FLINT_BIT_COUNT(m + 1) +
           FLINT_BIT_COUNT(fq_nmod_ctx_degree(ctx) + 1);
 
    fq_nmod_init(h, ctx);
@@ -67,8 +68,7 @@ slong fq_nmod_mat_reduce_row_KS(fq_nmod_mat_t A, slong * P, slong * L,
                fq_nmod_bit_unpack(fq_nmod_mat_entry(A, m, j),
                                             mvec + j, bits, ctx);
 
-               fq_nmod_mul(fq_nmod_mat_entry(A, m, j), fq_nmod_mat_entry(A, m, j), h, ctx
-);
+               fq_nmod_mul(fq_nmod_mat_entry(A, m, j), fq_nmod_mat_entry(A, m, j), h, ctx);
             }
 
             P[i] = m;
@@ -97,7 +97,7 @@ slong fq_nmod_mat_reduce_row(fq_nmod_mat_t A, slong * P, slong * L,
    if (m > 10 && fq_nmod_ctx_degree(ctx) > 6)
       return fq_nmod_mat_reduce_row_KS(A, P, L, m, ctx);
 
-   nmod_poly_init(h, ctx->p);
+   nmod_poly_init(h, fq_nmod_ctx_prime(ctx));
 
    for (i = 0; i < n; i++)
    {

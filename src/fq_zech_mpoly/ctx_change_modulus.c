@@ -14,9 +14,8 @@
 
 void fq_zech_mpoly_ctx_change_modulus(fq_zech_mpoly_ctx_t ctx, slong deg)
 {
-    fmpz_t P;
-    fmpz_init_set_ui(P, fq_zech_ctx_mod(ctx->fqctx).n);
+    ulong p;
+    p = fq_zech_ctx_mod(ctx->fqctx).n;
     fq_zech_ctx_clear(ctx->fqctx);
-    fq_zech_ctx_init(ctx->fqctx, P, deg, "#");
-    fmpz_clear(P);
+    fq_zech_ctx_init_ui(ctx->fqctx, p, deg, "#");
 }

@@ -11,11 +11,4 @@
 
 #define FQ_ZECH_INLINES_C
 
-#include "fmpz.h"
-#include "fq_nmod.h"
 #include "fq_zech.h"
-
-void __fq_zech_ctx_prime(fmpz_t p, fq_zech_ctx_t ctx)
-{
-   fmpz_set(p, fq_zech_ctx_prime(ctx));
-}

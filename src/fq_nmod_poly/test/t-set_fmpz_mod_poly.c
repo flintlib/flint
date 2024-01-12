@@ -36,7 +36,7 @@ TEST_FUNCTION_START(fq_nmod_poly_set_fmpz_mod_poly, state)
         fq_nmod_init(r, ctx);
         fq_nmod_init(s, ctx);
         fq_nmod_poly_init(a, ctx);
-        fmpz_mod_ctx_init(ctxp, fq_nmod_ctx_prime(ctx));
+        fmpz_mod_ctx_init_ui(ctxp, fq_nmod_ctx_prime(ctx));
         fmpz_mod_poly_init(b, ctxp);
         fmpz_init(p);
 

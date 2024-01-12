@@ -58,7 +58,7 @@ static void _frob_combine(
     fq_nmod_mpolyv_init(tfac, ectx);
     n_poly_init(c);
 
-    fmpz_pow_ui(q, fq_nmod_ctx_prime(ctx->fqctx), fq_nmod_ctx_degree(ctx->fqctx));
+    fmpz_ui_pow_ui(q, fq_nmod_ctx_prime(ctx->fqctx), fq_nmod_ctx_degree(ctx->fqctx));
 
     Af->length = 0;
     while (eAf->length > 0)

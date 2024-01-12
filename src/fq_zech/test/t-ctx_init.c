@@ -14,32 +14,29 @@
 #include "fq_nmod.h"
 #include "fq_zech.h"
 
-TEST_FUNCTION_START(fq_zech_ctx_init, state)
+TEST_FUNCTION_START(fq_zech_ctx_init_ui, state)
 {
-    slong primes[10] = { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29 };
+    ulong primes[10] = { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29 };
     slong exponents[10] = { 16, 10, 6, 5, 4, 4, 3, 3, 3, 3 };
     int i, j, random;
     slong d;
-    fmpz_t p, e;
+    fmpz_t e;
     fq_nmod_ctx_struct *fq_nmod_ctx;
     fq_nmod_t lhs, rhs, one;
     fq_zech_ctx_t ctx;
 
-    fmpz_init(p);
     fmpz_init(e);
 
     for (i = 0; i < 10; i++)
     {
-        fmpz_set_ui(p, primes[i]);
-
         for (d = 2; d < exponents[i]; d++)
         {
             for (random = 0; random <= 1; random++)
             {
                 if (random)
-                    fq_zech_ctx_init_random(ctx, p, d, "a");
+                    fq_zech_ctx_init_random_ui(ctx, primes[i], d, "a");
                 else
-                    fq_zech_ctx_init_conway(ctx, p, d, "a");
+                    fq_zech_ctx_init_conway_ui(ctx, primes[i], d, "a");
                 fq_nmod_ctx = ctx->fq_nmod_ctx;
                 fq_nmod_init(lhs, fq_nmod_ctx);
                 fq_nmod_init(rhs, fq_nmod_ctx);
@@ -95,7 +92,6 @@ TEST_FUNCTION_START(fq_zech_ctx_init, state)
         }
     }
 
-    fmpz_clear(p);
     fmpz_clear(e);
 
     TEST_FUNCTION_END(state);

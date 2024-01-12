@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
         fmpz_init_set_ui(p, UWORD(1) << (SMALL_FMPZ_BITCOUNT_MAX));
         fmpz_nextprime(p, p, 1);
 
-        fq_nmod_ctx_init(ctx, p, 6, "a");
+        fq_nmod_ctx_init_ui(ctx, p, 6, "a");
 
         fq_nmod_poly_init(f, ctx);
         fq_nmod_poly_init(g, ctx);

@@ -17,18 +17,16 @@
 void
 fq_zech_ctx_randtest(fq_zech_ctx_t ctx, flint_rand_t state)
 {
-    fmpz_t p;
     slong max_d, d;
+    ulong p;
 
-    fmpz_init(p);
-    fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 4), 1));
+    p = n_randprime(state, 2 + n_randint(state, 4), 1);
     if (n_randlimb(state) % 16 == 0)   /* slow */
-        max_d = floor(log(n_pow(2, 15)) / log(fmpz_get_ui(p)));
+        max_d = floor(log(n_pow(2, 15)) / log(p));
     else
-        max_d = floor(log(n_pow(2, 11)) / log(fmpz_get_ui(p)));
+        max_d = floor(log(n_pow(2, 11)) / log(p));
     d = n_randint(state, max_d - 1) + 2;
-    fq_zech_ctx_init_random(ctx, p, d, "a");
-    fmpz_clear(p);
+    fq_zech_ctx_init_random_ui(ctx, p, d, "a");
 
     ctx->owns_fq_nmod_ctx = 1;
 }

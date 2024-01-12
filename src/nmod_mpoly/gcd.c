@@ -470,15 +470,13 @@ static void _set_estimates_medprime(
     int * ignore;
     fq_zech_ctx_t medctx;
     slong d, max_degree = n_flog(1000000, smctx->mod.n);
-    fmpz_t P;
 
     if (max_degree < 2)
         return;
 
     flint_randinit(state);
 
-    fmpz_init_set_ui(P, smctx->mod.n);
-    fq_zech_ctx_init(medctx, P, 1, "#");
+    fq_zech_ctx_init_ui(medctx, smctx->mod.n, 1, "#");
 
     d = n_clog(500, smctx->mod.n);
     d = FLINT_MAX(d, 1);
@@ -526,8 +524,7 @@ try_again:
         goto cleanup;
     }
 
-    fq_zech_ctx_clear(medctx);
-    fq_zech_ctx_init(medctx, P, d, "#");
+    fq_zech_ctx_init_ui(medctx, smctx->mod.n, d, "#");
 
     for (j = 0; j < nvars; j++)
         fq_zech_rand_not_zero(alpha + j, state, medctx);
@@ -572,8 +569,6 @@ cleanup:
     flint_free(ignore);
 
     fq_zech_ctx_clear(medctx);
-
-    fmpz_clear(P);
 
     flint_randclear(state);
 

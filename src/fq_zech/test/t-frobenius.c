@@ -70,7 +70,7 @@ TEST_FUNCTION_START(fq_zech_frobenius, state)
 
             fq_zech_frobenius(b, a, fmpz_get_ui(e), ctx);
 
-            fmpz_pow_ui(e, fq_zech_ctx_prime(ctx), fmpz_get_ui(e));
+            fmpz_ui_pow_ui(e, fq_zech_ctx_prime(ctx), fmpz_get_ui(e));
             fq_zech_pow(c, a, e, ctx);
 
             result = (fq_zech_equal(b, c, ctx));

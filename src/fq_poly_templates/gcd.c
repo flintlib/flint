@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2013 Mike Hansen
     Copyright (C) 2023 Fredrik Johansson
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -25,7 +26,11 @@ _TEMPLATE(T, poly_gcd) (TEMPLATE(T, struct)*G,
     slong cutoff;
     slong lenG;
 
-    if (fmpz_bits(TEMPLATE(T, ctx_prime) (ctx)) <= 8)
+#if defined(FQ_NMOD_POLY_H) || defined(FQ_ZECH_POLY_H)
+    if (FLINT_BIT_COUNT(TEMPLATE(T, ctx_prime)(ctx)) <= 8)
+#else
+    if (fmpz_bits(TEMPLATE(T, ctx_prime)(ctx)) <= 8)
+#endif
         cutoff = TEMPLATE(CAP_T, POLY_SMALL_GCD_CUTOFF);
     else
         cutoff = TEMPLATE(CAP_T, POLY_GCD_CUTOFF);

@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -23,8 +24,13 @@ TEMPLATE(T, poly_randtest_irreducible) (TEMPLATE(T, poly_t) f,
     slong i, restart;
 
     /* Compute q */
-    fmpz_init_set(q, TEMPLATE(T, ctx_prime) (ctx));
-    fmpz_pow_ui(q, q, TEMPLATE(T, ctx_degree) (ctx));
+#if defined(FQ_NMOD_POLY_H) || defined(FQ_ZECH_POLY_H)
+    fmpz_init(q);
+    fmpz_ui_pow_ui(q, TEMPLATE(T, ctx_prime)(ctx), TEMPLATE(T, ctx_degree)(ctx));
+#else
+    fmpz_init_set(q, TEMPLATE(T, ctx_prime)(ctx));
+    fmpz_pow_ui(q, q, TEMPLATE(T, ctx_degree)(ctx));
+#endif
 
     TEMPLATE(T, poly_init) (x, ctx);
     TEMPLATE(T, poly_gen) (x, ctx);

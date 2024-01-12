@@ -13,9 +13,7 @@
 
 void fq_nmod_mpoly_ctx_change_modulus(fq_nmod_mpoly_ctx_t ctx, slong deg)
 {
-    fmpz_t P;
-    fmpz_init_set_ui(P, ctx->fqctx->mod.n);
+    ulong p = ctx->fqctx->mod.n;
     fq_nmod_ctx_clear(ctx->fqctx);
-    fq_nmod_ctx_init(ctx->fqctx, P, deg, "#");
-    fmpz_clear(P);
+    fq_nmod_ctx_init_ui(ctx->fqctx, p, deg, "#");
 }

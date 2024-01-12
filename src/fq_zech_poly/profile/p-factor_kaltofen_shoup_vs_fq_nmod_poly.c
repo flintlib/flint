@@ -52,7 +52,7 @@ main(int argc, char** argv)
     fmpz_set_str(temp, argv[3], 10);
     len = fmpz_get_si(temp);
 
-    fq_nmod_ctx_init(ctxn, p, ext, "a");
+    fq_nmod_ctx_init_ui(ctxn, p, ext, "a");
     fq_zech_ctx_init_fq_nmod_ctx(ctx, ctxn);
 
     fq_zech_poly_init(f, ctx);

@@ -14,11 +14,8 @@
 void fq_nmod_mpoly_ctx_init_deg(fq_nmod_mpoly_ctx_t ctx, slong nvars,
                                   const ordering_t ord, mp_limb_t p, slong deg)
 {
-    fmpz_t P;
     mpoly_ctx_init(ctx->minfo, nvars, ord);
-    fmpz_init_set_ui(P, p);
-    fq_nmod_ctx_init(ctx->fqctx, P, deg, "#");
-    fmpz_clear(P);
+    fq_nmod_ctx_init_ui(ctx->fqctx, p, deg, "#");
 }
 
 void fq_nmod_mpoly_ctx_init(fq_nmod_mpoly_ctx_t ctx, slong nvars,

@@ -16,11 +16,8 @@
 
 void fq_nmod_mul_fmpz(fq_nmod_t rop, const fq_nmod_t op, const fmpz_t x, const fq_nmod_ctx_t ctx)
 {
-    fmpz_t rx;
-    fmpz_init(rx);
+    ulong rx;
 
-    fmpz_mod(rx, x, fq_nmod_ctx_prime(ctx));
-    nmod_poly_scalar_mul_nmod(rop, op, fmpz_get_ui(rx));
-
-    fmpz_clear(rx);
+    rx = fmpz_fdiv_ui(x, fq_nmod_ctx_prime(ctx));
+    nmod_poly_scalar_mul_nmod(rop, op, rx);
 }

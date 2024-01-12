@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2011, 2021, 2022 William Hart
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -42,8 +43,12 @@ _TEMPLATE(T, poly_invsqrt_series_prealloc)(TEMPLATE(T, struct) * g,
     TEMPLATE(T, set_ui)(one, 1, ctx);
 
     TEMPLATE(T, set_ui)(inv2, 2, ctx);
+#if defined(FQ_NMOD_POLY_H) || defined(FQ_ZECH_POLY_H)
+    if (TEMPLATE(T, ctx_prime)(ctx) != 2)
+#else
     if (fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) != 0)
-       TEMPLATE(T, inv)(inv2, inv2, ctx);
+#endif
+        TEMPLATE(T, inv)(inv2, inv2, ctx);
 
     _TEMPLATE(T, poly_invsqrt_series_prealloc)(g, h, t, u, m, ctx);
 

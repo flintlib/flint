@@ -31,7 +31,7 @@ Context Management
 --------------------------------------------------------------------------------
 
 
-.. function:: void fq_nmod_ctx_init(fq_nmod_ctx_t ctx, const fmpz_t p, slong d, const char * var)
+.. function:: void fq_nmod_ctx_init_ui(fq_nmod_ctx_t ctx, ulong p, slong d, const char * var)
 
     Initialises the context for prime `p` and extension degree `d`,
     with name ``var`` for the generator.  By default, it will try
@@ -43,7 +43,7 @@ Context Management
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
 
-.. function:: int _fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx, const fmpz_t p, slong d, const char * var)
+.. function:: int _fq_nmod_ctx_init_conway_ui(fq_nmod_ctx_t ctx, ulong p, slong d, const char * var)
 
     Attempts to initialise the context for prime `p` and extension
     degree `d`, with name ``var`` for the generator using a Conway
@@ -58,7 +58,7 @@ Context Management
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
 
-.. function:: void fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx, const fmpz_t p, slong d, const char * var)
+.. function:: void fq_nmod_ctx_init_conway_ui(fq_nmod_ctx_t ctx, ulong p, slong d, const char * var)
 
     Initialises the context for prime `p` and extension degree `d`,
     with name ``var`` for the generator using a Conway polynomial
@@ -94,9 +94,9 @@ Context Management
     `[\mathbf{F}_{q} : \mathbf{F}_{p}]`, which
     is equal to `\log_{p} q`.
 
-.. function:: fmpz * fq_nmod_ctx_prime(const fq_nmod_ctx_t ctx)
+.. function:: ulong fq_nmod_ctx_prime(const fq_nmod_ctx_t ctx)
 
-    Returns a pointer to the prime `p` in the context.
+    Returns the prime `p` of the context.
 
 .. function:: void fq_nmod_ctx_order(fmpz_t f, const fq_nmod_ctx_t ctx)
 

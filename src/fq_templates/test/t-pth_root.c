@@ -33,7 +33,11 @@ TEST_TEMPLATE_FUNCTION_START(T, pth_root, state)
 
         TEMPLATE(T, randtest)(a, state, ctx);
         TEMPLATE(T, pth_root)(b, a, ctx);
+#if defined(FQ_NMOD_H) || defined(FQ_ZECH_H)
+        TEMPLATE(T, pow_ui)(b, b, TEMPLATE(T, ctx_prime)(ctx), ctx);
+#else
         TEMPLATE(T, pow)(b, b, TEMPLATE(T, ctx_prime)(ctx), ctx);
+#endif
 
         result = TEMPLATE(T, equal)(a, b, ctx);
         if (!result)

@@ -71,7 +71,6 @@ void
 fmpz_mat_jacobsthal(fmpz_mat_t Q)
 {
     int * quadratic;
-    fmpz_t pp;
     ulong r, c, q, p, d;
     fq_nmod_ctx_t ctx;
     fq_nmod_t x, y, x2;
@@ -81,8 +80,7 @@ fmpz_mat_jacobsthal(fmpz_mat_t Q)
     if (!(d = n_is_prime_power(&p, q)) || q % 2 == 0)
         flint_throw(FLINT_ERROR, "Not an odd prime power in %s\n", __func__);
 
-    fmpz_init_set_ui(pp, p);
-    fq_nmod_ctx_init(ctx, pp, d, "x");
+    fq_nmod_ctx_init_ui(ctx, p, d, "x");
     fq_nmod_init(x, ctx);
     fq_nmod_init(y, ctx);
     fq_nmod_init(x2, ctx);
@@ -123,7 +121,6 @@ fmpz_mat_jacobsthal(fmpz_mat_t Q)
     fq_nmod_clear(x2, ctx);
     fq_nmod_ctx_clear(ctx);
     flint_free(quadratic);
-    fmpz_clear(pp);
 }
 
 /* 0 -- not possible */

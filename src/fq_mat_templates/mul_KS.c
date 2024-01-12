@@ -42,7 +42,11 @@ TEMPLATE(T, mat_mul_KS) (TEMPLATE(T, mat_t) C,
     /* TODO: Make this generic based on say an TEMPLATE(T,
      * bits_needed) and TEMPLATE(T, bit_pack) */
     fmpz_init(beta);
+#if defined(FQ_NMOD_MAT_H) || defined(FQ_ZECH_MAT_H)
+    fmpz_set_ui(beta, TEMPLATE(T, ctx_prime) (ctx));
+#else
     fmpz_set(beta, TEMPLATE(T, ctx_prime) (ctx));
+#endif
     fmpz_sub_ui(beta, beta, 1);
     fmpz_mul(beta, beta, beta);
     fmpz_mul_si(beta, beta, A->c);

@@ -20,10 +20,11 @@ void _fq_nmod_poly_mul(fq_nmod_struct * rop,
 		                                  const fq_nmod_ctx_t ctx)
 {
    if (len1 <= 1 || len2 <= 1 ||
-      (fq_nmod_ctx_degree(ctx) == 2 && FLINT_MAX(len1, len2) <= 2) ||
-      FLINT_BIT_COUNT(fmpz_get_ui(fq_nmod_ctx_prime(ctx)))*
-         fq_nmod_ctx_degree(ctx)* FLINT_MAX(len1, len2) <= 8)
+           (fq_nmod_ctx_degree(ctx) == 2 && FLINT_MAX(len1, len2) <= 2) ||
+           FLINT_BIT_COUNT(fq_nmod_ctx_prime(ctx)) * fq_nmod_ctx_degree(ctx) * FLINT_MAX(len1, len2) <= 8)
+   {
       _fq_nmod_poly_mul_classical(rop, op1, len1, op2, len2, ctx);
+   }
    else
       _fq_nmod_poly_mul_univariate(rop, op1, len1, op2, len2, ctx);
 }
@@ -35,10 +36,11 @@ void fq_nmod_poly_mul(fq_nmod_poly_t rop, const fq_nmod_poly_t op1,
    slong len2 = fq_nmod_poly_length(op2, ctx);
 
    if (len1 <= 1 || len2 <= 1 ||
-      (fq_nmod_ctx_degree(ctx) == 2 && FLINT_MAX(len1, len2) <= 2) ||
-      FLINT_BIT_COUNT(fmpz_get_ui(fq_nmod_ctx_prime(ctx)))*
-         fq_nmod_ctx_degree(ctx)* FLINT_MAX(len1, len2) <= 8)
+           (fq_nmod_ctx_degree(ctx) == 2 && FLINT_MAX(len1, len2) <= 2) ||
+           FLINT_BIT_COUNT(fq_nmod_ctx_prime(ctx)) * fq_nmod_ctx_degree(ctx) * FLINT_MAX(len1, len2) <= 8)
+   {
       fq_nmod_poly_mul_classical(rop, op1, op2, ctx);
+   }
    else
       fq_nmod_poly_mul_univariate(rop, op1, op2, ctx);
 }

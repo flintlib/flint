@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2023 Albin Ahlbäck
+    Copyright (C) 2023, 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -23,7 +23,6 @@ typedef nmod_poly_struct fq_nmod_struct;
 
 typedef struct
 {
-    fmpz p;
     nmod_t mod;
 
     int sparse_modulus;
@@ -41,8 +40,6 @@ typedef struct
 fq_nmod_ctx_struct;
 
 typedef fq_nmod_ctx_struct fq_nmod_ctx_t[1];
-
-#define fq_nmod_ctx_prime(ctx)  (&((ctx)->p))
 
 typedef struct
 {

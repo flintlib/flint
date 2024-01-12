@@ -35,7 +35,7 @@ void _fq_nmod_frobenius(mp_limb_t *rop, const mp_limb_t *op, slong len, slong e,
         fmpz_t t;
 
         fmpz_init(t);
-        fmpz_pow_ui(t, fq_nmod_ctx_prime(ctx), e);
+        fmpz_ui_pow_ui(t, fq_nmod_ctx_prime(ctx), e);
         _fq_nmod_pow(rop, op, len, t, ctx);
         fmpz_clear(t);
     }

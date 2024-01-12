@@ -246,9 +246,9 @@ _gr_fq_nmod_sqrt(fq_nmod_t res, const fq_nmod_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_ctx_fq_nmod_prime(fmpz_t p, gr_ctx_t ctx)
+_gr_ctx_fq_nmod_prime(ulong * p, gr_ctx_t ctx)
 {
-    fmpz_set(p, fq_nmod_ctx_prime(FQ_CTX(ctx)));
+    *p = fq_nmod_ctx_prime(FQ_CTX(ctx));
     return GR_SUCCESS;
 }
 
@@ -675,16 +675,11 @@ _gr_ctx_init_fq_nmod_from_ref(gr_ctx_t ctx, const void * fq_nmod_ctx)
 }
 
 void
-gr_ctx_init_fq_nmod(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var)
+gr_ctx_init_fq_nmod(gr_ctx_t ctx, ulong p, slong d, const char * var)
 {
     fq_nmod_ctx_struct * fq_nmod_ctx;
 
-    if (fmpz_bits(p) > FLINT_BITS)
-    {
-        flint_throw(FLINT_ERROR, "gr_ctx_init_fq_nmod: expected a word-size p\n");
-    }
-
     fq_nmod_ctx = flint_malloc(sizeof(fq_nmod_ctx_struct));
-    fq_nmod_ctx_init(fq_nmod_ctx, p, d, var == NULL ? "a" : var);
+    fq_nmod_ctx_init_ui(fq_nmod_ctx, p, d, var == NULL ? "a" : var);
     _gr_ctx_init_fq_nmod_from_ref(ctx, fq_nmod_ctx);
 }

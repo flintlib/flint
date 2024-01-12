@@ -34,7 +34,11 @@ TEST_TEMPLATE_FUNCTION_START(T, embed_matrices, state)
 
         TEMPLATE(T, init)(gen, ctx);
         TEMPLATE(T, gen)(gen, ctx);
+#if defined(FQ_NMOD_EMBED_H) || defined(FQ_ZECH_EMBED_H)
+        TEMPLATE(T, pow_ui)(gen, gen, TEMPLATE(T, ctx_prime)(ctx), ctx);
+#else
         TEMPLATE(T, pow)(gen, gen, TEMPLATE(T, ctx_prime)(ctx), ctx);
+#endif
 
         TEMPLATE(B, mat_init)(embed, d, d, TEMPLATE(B, poly_modulus)(modulus));
         TEMPLATE(B, mat_init)(project, d, d, TEMPLATE(B, poly_modulus)(modulus));

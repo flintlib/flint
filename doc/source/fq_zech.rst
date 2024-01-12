@@ -3,23 +3,21 @@
 **fq_zech.h** -- finite fields (Zech logarithm representation)
 ===============================================================================
 
-We represent an element of the finite field as a power of a generator
-for the multiplicative group of the finite field. In particular, we
-use a root of `f(x)`, where `f(X) \in \mathbf{F}_p[X]` is a monic,
-irreducible polynomial of degree `n`, as a polynomial in
-`\mathbf{F}_p[X]` of degree less than `n`. The underlying data
-structure is just an ``mp_limb_t``.
+We represent an element of the finite field as a power of a generator for the
+multiplicative group of the finite field. In particular, we use a root of
+`f(x)`, where `f(X) \in \mathbf{F}_p[X]` is a monic, irreducible polynomial of
+degree `n`, as a polynomial in `\mathbf{F}_p[X]` of degree less than `n`. The
+underlying data structure is just an ``mp_limb_t``.
 
-The default choice for `f(X)` is the Conway polynomial for the pair
-`(p,n)`. Frank Luebeck's data base of Conway polynomials is made
-available in the file ``src/qadic/CPimport.txt``. If a Conway
-polynomial is not available, then a random irreducible polynomial will
-be chosen for `f(X)`. Additionally, the user is able to supply their
-own `f(X)`.
+The default choice for `f(X)` is the Conway polynomial for the pair `(p,n)`.
+Frank Luebeck's data base of Conway polynomials is made available in the file
+``src/qadic/CPimport.txt``. If a Conway polynomial is not available, then a
+random irreducible polynomial will be chosen for `f(X)`. Additionally, the user
+is able to supply their own `f(X)`.
 
-We required that the order of the field fits inside of an
-``mp_limb_t``; however, it is recommended that `p^n < 2^{20}` due to
-the time and memory needed to compute the Zech logarithm table.
+We required that the order of the field fits inside of an ``mp_limb_t``;
+however, it is recommended that `p^n < 2^{20}` due to the time and memory needed
+to compute the Zech logarithm table.
 
 Types, macros and constants
 -------------------------------------------------------------------------------
@@ -36,7 +34,7 @@ Context Management
 --------------------------------------------------------------------------------
 
 
-.. function:: void fq_zech_ctx_init(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char * var)
+.. function:: void fq_zech_ctx_init_ui(fq_zech_ctx_t ctx, ulong p, slong d, const char * var)
 
     Initialises the context for prime `p` and extension degree `d`,
     with name ``var`` for the generator.  By default, it will try
@@ -48,7 +46,7 @@ Context Management
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
 
-.. function:: int _fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char * var)
+.. function:: int _fq_zech_ctx_init_conway_ui(fq_zech_ctx_t ctx, ulong p, slong d, const char * var)
 
     Attempts to initialise the context for prime `p` and extension
     degree `d`, with name ``var`` for the generator using a Conway
@@ -63,7 +61,7 @@ Context Management
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
 
-.. function:: void fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char * var)
+.. function:: void fq_zech_ctx_init_conway_ui(fq_zech_ctx_t ctx, ulong p, slong d, const char * var)
 
     Initialises the context for prime `p` and extension degree `d`,
     with name ``var`` for the generator using a Conway polynomial
@@ -74,7 +72,7 @@ Context Management
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
 
-.. function:: void fq_zech_ctx_init_random(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char * var)
+.. function:: void fq_zech_ctx_init_random_ui(fq_zech_ctx_t ctx, ulong p, slong d, const char * var)
 
     Initialises the context for prime `p` and extension degree `d`,
     with name ``var`` for the generator using a random primitive
@@ -118,7 +116,7 @@ Context Management
 
     Clears all memory that has been allocated as part of the context.
 
-.. function:: const nmod_poly_struct* fq_zech_ctx_modulus(const fq_zech_ctx_t ctx)
+.. function:: const nmod_poly_struct * fq_zech_ctx_modulus(const fq_zech_ctx_t ctx)
 
     Returns a pointer to the modulus in the context.
 
@@ -128,9 +126,9 @@ Context Management
     `[\mathbf{F}_{q} : \mathbf{F}_{p}]`, which
     is equal to `\log_{p} q`.
 
-.. function:: fmpz * fq_zech_ctx_prime(const fq_zech_ctx_t ctx)
+.. function:: ulong fq_zech_ctx_prime(const fq_zech_ctx_t ctx)
 
-    Returns a pointer to the prime `p` in the context.
+    Returns the prime `p` of the context.
 
 .. function:: void fq_zech_ctx_order(fmpz_t f, const fq_zech_ctx_t ctx)
 

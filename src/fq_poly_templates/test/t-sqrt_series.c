@@ -30,8 +30,13 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_sqrt_series, state)
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
 
+#if defined(FQ_NMOD_POLY_H) || defined(FQ_ZECH_POLY_H)
+        if (TEMPLATE(T, ctx_prime)(ctx) != 2)
+        {
+#else
         if (fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) != 0)
         {
+#endif
             TEMPLATE(T, init)(one, ctx);
 
             TEMPLATE(T, poly_init)(h, ctx);
@@ -56,8 +61,12 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_sqrt_series, state)
                 TEMPLATE(T, poly_print)(h, ctx), flint_printf("\n\n");
                 TEMPLATE(T, poly_print)(g, ctx), flint_printf("\n\n");
                 TEMPLATE(T, poly_print)(r, ctx), flint_printf("\n\n");
+#if defined(FQ_NMOD_POLY_H) || defined(FQ_ZECH_POLY_H)
+                flint_printf("n = %wu\n", TEMPLATE(T, ctx_prime)(ctx));
+#else
                 flint_printf("n = ");
                 fmpz_print(TEMPLATE(T, ctx_prime)(ctx));
+#endif
                 flint_printf("\n");
                 fflush(stdout);
                 flint_abort();
@@ -83,8 +92,13 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_sqrt_series, state)
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
 
+#if defined(FQ_NMOD_POLY_H) || defined(FQ_ZECH_POLY_H)
+        if (TEMPLATE(T, ctx_prime)(ctx) != 2)
+        {
+#else
         if (fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) != 0)
         {
+#endif
             TEMPLATE(T, init)(one, ctx);
 
             TEMPLATE(T, poly_init)(h, ctx);
@@ -106,8 +120,12 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_sqrt_series, state)
                 flint_printf("FAIL:\n");
                 TEMPLATE(T, poly_print)(h, ctx), flint_printf("\n\n");
                 TEMPLATE(T, poly_print)(g, ctx), flint_printf("\n\n");
+#if defined(FQ_NMOD_POLY_H) || defined(FQ_ZECH_POLY_H)
+                flint_printf("n = %wu\n", TEMPLATE(T, ctx_prime)(ctx));
+#else
                 flint_printf("n = ");
                 fmpz_print(TEMPLATE(T, ctx_prime)(ctx));
+#endif
                 flint_printf("m = %wd\n", m);
                 fflush(stdout);
                 flint_abort();

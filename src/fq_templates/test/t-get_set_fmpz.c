@@ -41,7 +41,11 @@ TEST_TEMPLATE_FUNCTION_START(T, get_set_fmpz, state)
             FLINT_TEST(TEMPLATE(T, get_fmpz)(s, a, ctx));
 
             fmpz_sub(t, t, s);
+#if defined(FQ_NMOD_H) || defined(FQ_ZECH_H)
+            FLINT_TEST(fmpz_divisible_ui(t, TEMPLATE(T, ctx_prime(ctx))));
+#else
             FLINT_TEST(fmpz_divisible(t, TEMPLATE(T, ctx_prime(ctx))));
+#endif
 
             if (TEMPLATE(T, get_fmpz(t, a, ctx)))
             {

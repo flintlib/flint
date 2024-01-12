@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -15,29 +16,49 @@
 #include "fq_nmod.h"
 #include "fq_zech.h"
 
-void
-fq_zech_ctx_init(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char *var)
+static ulong
+_nmod_poly_evaluate_ui(mp_srcptr poly, slong len, ulong xd)
 {
-    if (!_fq_zech_ctx_init_conway(ctx, p, d, var))
-        fq_zech_ctx_init_random(ctx, p, d, var);
+    slong ix;
+    ulong res;
+
+    if (len == 0)
+        return 0;
+
+    res = poly[len - 1];
+
+    for (ix = len - 2; ix >= 0; ix--)
+    {
+        res *= xd;
+        res += poly[ix];
+    }
+
+    return res;
 }
 
 void
-fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, slong d,
+fq_zech_ctx_init_ui(fq_zech_ctx_t ctx, ulong p, slong d, const char *var)
+{
+    if (!_fq_zech_ctx_init_conway_ui(ctx, p, d, var))
+        fq_zech_ctx_init_random_ui(ctx, p, d, var);
+}
+
+void
+fq_zech_ctx_init_conway_ui(fq_zech_ctx_t ctx, ulong p, slong d,
                         const char *var)
 {
     fq_nmod_ctx_struct * fq_nmod_ctx;
 
     fq_nmod_ctx = flint_malloc(sizeof(fq_nmod_ctx_struct));
 
-    fq_nmod_ctx_init_conway(fq_nmod_ctx, p, d, var);
+    fq_nmod_ctx_init_conway_ui(fq_nmod_ctx, p, d, var);
     fq_zech_ctx_init_fq_nmod_ctx(ctx, fq_nmod_ctx);
     ctx->owns_fq_nmod_ctx = 1;
     ctx->is_conway = 1;
 }
 
 int
-_fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, slong d,
+_fq_zech_ctx_init_conway_ui(fq_zech_ctx_t ctx, ulong p, slong d,
                          const char *var)
 {
     int result;
@@ -45,7 +66,7 @@ _fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, slong d,
 
     fq_nmod_ctx = flint_malloc(sizeof(fq_nmod_ctx_struct));
 
-    result = _fq_nmod_ctx_init_conway(fq_nmod_ctx, p, d, var);
+    result = _fq_nmod_ctx_init_conway_ui(fq_nmod_ctx, p, d, var);
     if (!result)
     {
         flint_free(fq_nmod_ctx);
@@ -60,7 +81,7 @@ _fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, slong d,
 }
 
 void
-fq_zech_ctx_init_random(fq_zech_ctx_t ctx, const fmpz_t p, slong d,
+fq_zech_ctx_init_random_ui(fq_zech_ctx_t ctx, ulong p, slong d,
                         const char *var)
 {
     fq_nmod_ctx_struct * fq_nmod_ctx;
@@ -71,7 +92,7 @@ fq_zech_ctx_init_random(fq_zech_ctx_t ctx, const fmpz_t p, slong d,
 
     flint_randinit(state);
 
-    nmod_poly_init2(poly, fmpz_get_ui(p), d + 1);
+    nmod_poly_init2(poly, p, d + 1);
     nmod_poly_randtest_monic_primitive(poly, state, d + 1);
 
     fq_nmod_ctx_init_modulus(fq_nmod_ctx, poly, var);
@@ -115,8 +136,9 @@ fq_zech_ctx_init_fq_nmod_ctx_check(fq_zech_ctx_t ctx,
     ulong i, n;
     fq_nmod_t r, gen;
     slong up, q;
-    fmpz_t result, order;
-    mp_limb_t j, nz, result_ui;
+    fmpz_t order;
+    ulong result;
+    mp_limb_t j, nz;
     mp_limb_t *n_reverse_table;
 
     ctx->fq_nmod_ctx = fq_nmod_ctx;
@@ -131,7 +153,7 @@ fq_zech_ctx_init_fq_nmod_ctx_check(fq_zech_ctx_t ctx,
     }
 
     q = fmpz_get_ui(order);
-    up = fmpz_get_ui(fq_nmod_ctx_prime(fq_nmod_ctx));
+    up = fq_nmod_ctx_prime(fq_nmod_ctx);
 
     ctx->p = up;
     ctx->ppre = n_precompute_inverse(ctx->p);
@@ -175,27 +197,23 @@ fq_zech_ctx_init_fq_nmod_ctx_check(fq_zech_ctx_t ctx,
     fq_nmod_one(r, ctx->fq_nmod_ctx);
     fq_nmod_gen(gen, ctx->fq_nmod_ctx);
 
-    fmpz_init(result);
-
     for (i = 0; i < ctx->qm1; i++)
     {
-        nmod_poly_evaluate_fmpz(result, r, fq_nmod_ctx_prime(fq_nmod_ctx));
-        result_ui = fmpz_get_ui(result);
-        if (n_reverse_table[result_ui] != ctx->qm1)
+        result = _nmod_poly_evaluate_ui(r->coeffs, r->length, fq_nmod_ctx_prime(fq_nmod_ctx));
+        if (n_reverse_table[result] != ctx->qm1)
         {   /* clean up... */
             fq_nmod_clear(r, fq_nmod_ctx);
             fq_nmod_clear(gen, fq_nmod_ctx);
             flint_free(n_reverse_table);
-            fmpz_clear(result);
             fmpz_clear(order);
             fq_zech_ctx_clear(ctx);
             return 0; /* failure: modulus not primitive */
         }
-        n_reverse_table[result_ui] = i;
-        ctx->eval_table[i] = result_ui;
+        n_reverse_table[result] = i;
+        ctx->eval_table[i] = result;
         if (r->length == 1)
         {
-            ctx->prime_field_table[result_ui] = i;
+            ctx->prime_field_table[result] = i;
         }
         fq_nmod_mul(r, r, gen, fq_nmod_ctx);
     }
@@ -219,7 +237,6 @@ fq_zech_ctx_init_fq_nmod_ctx_check(fq_zech_ctx_t ctx,
     fq_nmod_clear(r, fq_nmod_ctx);
     fq_nmod_clear(gen, fq_nmod_ctx);
     flint_free(n_reverse_table);
-    fmpz_clear(result);
     fmpz_clear(order);
 
     return 1; /* success */
@@ -233,3 +250,10 @@ fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx, fq_nmod_ctx_t fq_nmod_ctx)
         flint_throw(FLINT_ERROR, "(fq_zech_ctx_init_fq_nmod_ctx): Polynomial is not primitive.\n");
     }
 }
+
+/* Deprecated functions ******************************************************/
+
+void fq_zech_ctx_init(fq_zech_ctx_t ctx, fmpz_t p, slong d, const char * var) { fq_zech_ctx_init_ui(ctx, fmpz_get_ui(p), d, var); }
+int _fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, fmpz_t p, slong d, const char * var) { return _fq_zech_ctx_init_conway_ui(ctx, fmpz_get_ui(p), d, var); }
+void fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, fmpz_t p, slong d, const char * var) { fq_zech_ctx_init_conway_ui(ctx, fmpz_get_ui(p), d, var); }
+void fq_zech_ctx_init_random(fq_zech_ctx_t ctx, fmpz_t p, slong d, const char * var) { fq_zech_ctx_init_random_ui(ctx, fmpz_get_ui(p), d, var); }

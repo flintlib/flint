@@ -730,7 +730,6 @@ void n_bpoly_mod_factor_lgprime(
     slong e[FLINT_BITS];
     slong old_nrows;
     slong zas_limit;
-    fmpz_t P;
     n_poly_t final_alpha_pow, curr_alpha_pow, prev_alpha_pow, next_alpha_pow;
     n_poly_t alpha, p1;
     fq_nmod_ctx_t ectx;
@@ -739,8 +738,7 @@ void n_bpoly_mod_factor_lgprime(
     FLINT_ASSERT(Blenx > 1);
 
     deg = 2;
-    fmpz_init_set_ui(P, ctx.n);
-    fq_nmod_ctx_init(ectx, P, deg, "y");
+    fq_nmod_ctx_init_ui(ectx, ctx.n, deg, "y");
     n_poly_init(final_alpha_pow);
     n_poly_init(curr_alpha_pow);
     n_poly_init(prev_alpha_pow);
@@ -780,7 +778,7 @@ next_alpha:
     deg++;
 
 	fq_nmod_ctx_clear(ectx);
-	fq_nmod_ctx_init(ectx, P, deg, "y");
+	fq_nmod_ctx_init_ui(ectx, ctx.n, deg, "y");
 
     n_poly_mock(alpha, ectx->modulus);
 
@@ -910,7 +908,6 @@ more:
 
 cleanup:
 
-    fmpz_clear(P);
     n_poly_clear(final_alpha_pow);
     n_poly_clear(curr_alpha_pow);
     n_poly_clear(prev_alpha_pow);

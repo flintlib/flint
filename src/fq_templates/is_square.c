@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2020 William Hart
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -20,8 +21,13 @@ int TEMPLATE(T, is_square)(const TEMPLATE(T, t) op,
     TEMPLATE(T, t) pow;
     int is_square = 0;
 
+#if defined(FQ_NMOD_H) || defined(FQ_ZECH_H)
+    if (TEMPLATE(T, is_zero)(op, ctx) || TEMPLATE(T, is_one)(op, ctx) ||
+		              TEMPLATE(T, ctx_prime)(ctx) == 2)
+#else
     if (TEMPLATE(T, is_zero)(op, ctx) || TEMPLATE(T, is_one)(op, ctx) ||
 		              fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) == 0)
+#endif
     {
         return 1;
     }

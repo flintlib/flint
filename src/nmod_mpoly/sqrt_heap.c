@@ -33,7 +33,6 @@ static int _is_proved_not_square_medprime(
     slong i;
     fq_zech_struct eval[1], * t, * alphas, ** alpha_ptrs;
     fq_zech_ctx_t fqctx;
-    fmpz_t p;
     slong edeg, max_degree = n_flog(1000000, mod.n);
     TMP_INIT;
 
@@ -44,8 +43,7 @@ static int _is_proved_not_square_medprime(
     if (edeg > max_degree)
         return 0;
 
-    fmpz_init_set_ui(p, mod.n);
-    fq_zech_ctx_init(fqctx, p, edeg, "#");
+    fq_zech_ctx_init_ui(fqctx, mod.n, edeg, "#");
     fq_zech_init(eval, fqctx);
 
     TMP_START;
@@ -81,7 +79,6 @@ next_p:
     if (!success && --count >= 0)
         goto next_p;
 
-    fmpz_clear(p);
     fq_zech_clear(eval, fqctx);
     fq_zech_ctx_clear(fqctx);
 

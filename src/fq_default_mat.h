@@ -627,15 +627,19 @@ void fq_default_mat_set_fmpz_mat(fq_default_mat_t mat1,
     fmpz_mod_mat_t mod_mat;
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fmpz_mod_mat_init(mod_mat, mat2->r, mat2->c,
-		                            fq_zech_ctx_prime(ctx->ctx.fq_zech));
+        fmpz_t prime;
+        fmpz_init_set_ui(prime, fq_zech_ctx_prime(ctx->ctx.fq_zech));
+        fmpz_mod_mat_init(mod_mat, mat2->r, mat2->c, prime);
+        fmpz_clear(prime);
         fmpz_mod_mat_set_fmpz_mat(mod_mat, mat2);
         fq_zech_mat_set_fmpz_mod_mat(mat1->fq_zech, mod_mat, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fmpz_mod_mat_init(mod_mat, mat2->r, mat2->c,
-		                            fq_nmod_ctx_prime(ctx->ctx.fq_nmod));
+        fmpz_t prime;
+        fmpz_init_set_ui(prime, fq_nmod_ctx_prime(ctx->ctx.fq_nmod));
+        fmpz_mod_mat_init(mod_mat, mat2->r, mat2->c, prime);
+        fmpz_clear(prime);
         fmpz_mod_mat_set_fmpz_mat(mod_mat, mat2);
         fq_nmod_mat_set_fmpz_mod_mat(mat1->fq_nmod, mod_mat, ctx->ctx.fq_nmod);
     }

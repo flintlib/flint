@@ -246,9 +246,9 @@ _gr_fq_zech_sqrt(fq_zech_t res, const fq_zech_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_ctx_fq_zech_prime(fmpz_t p, gr_ctx_t ctx)
+_gr_ctx_fq_zech_prime(ulong * p, gr_ctx_t ctx)
 {
-    fmpz_set(p, fq_zech_ctx_prime(FQ_CTX(ctx)));
+    *p = fq_zech_ctx_prime(FQ_CTX(ctx));
     return GR_SUCCESS;
 }
 
@@ -569,11 +569,11 @@ _gr_ctx_init_fq_zech_from_ref(gr_ctx_t ctx, const void * fq_zech_ctx)
 }
 
 void
-gr_ctx_init_fq_zech(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var)
+gr_ctx_init_fq_zech(gr_ctx_t ctx, ulong p, slong d, const char * var)
 {
     fq_zech_ctx_struct * fq_zech_ctx;
 
     fq_zech_ctx = flint_malloc(sizeof(fq_zech_ctx_struct));
-    fq_zech_ctx_init(fq_zech_ctx, p, d, var == NULL ? "a" : var);
+    fq_zech_ctx_init_ui(fq_zech_ctx, p, d, var == NULL ? "a" : var);
     _gr_ctx_init_fq_zech_from_ref(ctx, fq_zech_ctx);
 }

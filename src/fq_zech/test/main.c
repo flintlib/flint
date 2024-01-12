@@ -46,7 +46,7 @@ test_struct tests[] =
 {
     TEST_FUNCTION(fq_zech_add),
     TEST_FUNCTION(fq_zech_assign),
-    TEST_FUNCTION(fq_zech_ctx_init),
+    TEST_FUNCTION(fq_zech_ctx_init_ui),
     TEST_FUNCTION(fq_zech_div),
     TEST_FUNCTION(fq_zech_frobenius),
     TEST_FUNCTION(fq_zech_get_set_fmpz),

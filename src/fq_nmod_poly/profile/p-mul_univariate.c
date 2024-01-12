@@ -32,7 +32,7 @@ main(int argc, char** argv)
     lenf = atol(argv[3]);
     leng = atol(argv[4]);
 
-    fq_nmod_ctx_init(ctx, p, ext, "a");
+    fq_nmod_ctx_init_ui(ctx, p, ext, "a");
 
     fq_nmod_poly_init(f, ctx);
     fq_nmod_poly_init(g, ctx);

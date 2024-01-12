@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -23,9 +24,6 @@ fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx, const nmod_poly_t modulus,
     slong nz;
     int i, j;
     mp_limb_t inv;
-
-    fmpz_init(fq_nmod_ctx_prime(ctx));
-    fmpz_set_ui(fq_nmod_ctx_prime(ctx), modulus->mod.n);
 
     ctx->mod.n = modulus->mod.n;
     ctx->mod.ninv = modulus->mod.ninv;

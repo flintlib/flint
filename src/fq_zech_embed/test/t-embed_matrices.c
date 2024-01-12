@@ -37,7 +37,7 @@ TEST_FUNCTION_START(fq_zech_embed_matrices, state)
 
         fq_zech_init(gen, ctx);
         fq_zech_gen(gen, ctx);
-        fq_zech_pow(gen, gen, fq_zech_ctx_prime(ctx), ctx);
+        fq_zech_pow_ui(gen, gen, fq_zech_ctx_prime(ctx), ctx);
 
         nmod_mat_init(embed, d, d, nmod_poly_modulus(modulus));
         nmod_mat_init(project, d, d, nmod_poly_modulus(modulus));
@@ -75,13 +75,10 @@ TEST_FUNCTION_START(fq_zech_embed_matrices, state)
             nmod_poly_t modulus2;
             nmod_mat_t embed, project, comp, one;
             slong m, n;
-            fmpz_t p;
 
-            fmpz_init(p);
-            fmpz_set_si(p, primes[i % 3]);
             m = degrees[i % 2];
 
-            fq_zech_ctx_init_random(ctx1, p, m, "a");
+            fq_zech_ctx_init_random_ui(ctx1, primes[i % 3], m, "a");
 
             n = m*j;
             if (m == 1) {
@@ -130,7 +127,6 @@ TEST_FUNCTION_START(fq_zech_embed_matrices, state)
             fq_zech_ctx_clear(ctx1);
             fq_zech_clear(gen2, ctx2);
             fq_zech_ctx_clear(ctx2);
-            fmpz_clear(p);
         }
     }
 

@@ -5,6 +5,7 @@
     Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2012 Lina Kulakova
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -63,8 +64,13 @@ TEMPLATE(T, poly_factor_equal_deg_prob) (TEMPLATE(T, poly_t) factor,
     TEMPLATE(T, poly_inv_series_newton) (polinv, polinv, polinv->length, ctx);
 
     fmpz_init(exp);
+#if defined(FQ_NMOD_POLY_FACTOR_H) || defined(FQ_ZECH_POLY_FACTOR_H)
+    if (TEMPLATE(T, ctx_prime)(ctx) > 2)
+    {
+#else
     if (fmpz_cmp_ui(TEMPLATE(T, ctx_prime) (ctx), 2) > 0)
     {
+#endif
         /* compute a^{(q^d-1)/2} rem pol */
         fmpz_pow_ui(exp, q, d);
         fmpz_sub_ui(exp, exp, 1);

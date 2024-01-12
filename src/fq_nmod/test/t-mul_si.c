@@ -22,12 +22,10 @@ TEST_FUNCTION_START(fq_nmod_mul_si, state)
     {
         fq_nmod_t rop;
         fq_nmod_ctx_t ctx;
-        fmpz_t p;
         fmpz_t f;
 
         fmpz_init(f);
-        fmpz_init_set_si(p, 23);
-        fq_nmod_ctx_init(ctx, p, 1, "x");
+        fq_nmod_ctx_init_ui(ctx, 23, 1, "x");
 
         fq_nmod_init(rop, ctx);
 
@@ -48,7 +46,6 @@ TEST_FUNCTION_START(fq_nmod_mul_si, state)
         fq_nmod_clear(rop, ctx);
 
         fq_nmod_ctx_clear(ctx);
-        fmpz_clear(p);
         fmpz_clear(f);
     }
 

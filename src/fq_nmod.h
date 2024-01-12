@@ -2,6 +2,7 @@
     Copyright (C) 2011 Sebastian Pancratz
     Copyright (C) 2012 Andres Goens
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -30,33 +31,32 @@ extern "C" {
 
 /* Context ********************************************************************/
 
-void fq_nmod_ctx_init(fq_nmod_ctx_t ctx,
-                      const fmpz_t p, slong d, const char *var);
-
-int _fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx,
-                             const fmpz_t p, slong d, const char *var);
-
-void fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx,
-                             const fmpz_t p, slong d, const char *var);
-
-void fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx,
-                              const nmod_poly_t modulus,
-                              const char *var);
+void fq_nmod_ctx_init_ui(fq_nmod_ctx_t ctx, ulong prime, slong deg, const char * var);
+int _fq_nmod_ctx_init_conway_ui(fq_nmod_ctx_t ctx, ulong prime, slong deg, const char * var);
+void fq_nmod_ctx_init_conway_ui(fq_nmod_ctx_t ctx, ulong prime, slong deg, const char * var);
+void fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx, const nmod_poly_t modulus, const char * var);
 
 void fq_nmod_ctx_randtest(fq_nmod_ctx_t ctx, flint_rand_t state);
-
 void fq_nmod_ctx_randtest_reducible(fq_nmod_ctx_t ctx, flint_rand_t state);
 
 void fq_nmod_ctx_clear(fq_nmod_ctx_t ctx);
 
-FQ_NMOD_INLINE const nmod_poly_struct* fq_nmod_ctx_modulus(const fq_nmod_ctx_t ctx)
+FQ_NMOD_INLINE
+const nmod_poly_struct * fq_nmod_ctx_modulus(const fq_nmod_ctx_t ctx)
 {
     return ctx->modulus;
 }
 
-FQ_NMOD_INLINE slong fq_nmod_ctx_degree(const fq_nmod_ctx_t ctx)
+FQ_NMOD_INLINE
+slong fq_nmod_ctx_degree(const fq_nmod_ctx_t ctx)
 {
     return ctx->modulus->length - 1;
+}
+
+FQ_NMOD_INLINE
+ulong fq_nmod_ctx_prime(const fq_nmod_ctx_t ctx)
+{
+    return ctx->mod.n;
 }
 
 void fq_nmod_ctx_order(fmpz_t f, const fq_nmod_ctx_t ctx);
@@ -200,9 +200,11 @@ void fq_nmod_bit_pack(fmpz_t f, const fq_nmod_t op, flint_bitcnt_t bit_size,
 void fq_nmod_bit_unpack(fq_nmod_t rop, const fmpz_t f, flint_bitcnt_t bit_size,
                    const fq_nmod_ctx_t ctx);
 
-/* Inlines *******************************************************************/
+/* Deprecated functions ******************************************************/
 
-void __fq_nmod_ctx_prime(fmpz_t p, fq_nmod_ctx_t ctx);
+void fq_nmod_ctx_init(fq_nmod_ctx_t, fmpz_t, slong, const char *);
+int _fq_nmod_ctx_init_conway(fq_nmod_ctx_t, fmpz_t, slong, const char *);
+void fq_nmod_ctx_init_conway(fq_nmod_ctx_t, fmpz_t, slong, const char *);
 
 #ifdef T
 #undef T

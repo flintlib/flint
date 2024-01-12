@@ -18,6 +18,10 @@
 #include "templates.h"
 #include "fmpz_mod_mat.h"
 
+#if defined(FQ_NMOD_MAT_H) || defined(FQ_ZECH_MAT_H)
+# include "fmpz.h"
+#endif
+
 TEST_TEMPLATE_FUNCTION_START(T, mat_set_fmpz_mod_mat, state)
 {
     int i, result;
@@ -29,6 +33,9 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_set_fmpz_mod_mat, state)
         TEMPLATE(T, mat_t) a;
         fmpz_mod_mat_t m;
         slong r, c;
+#if defined(FQ_NMOD_MAT_H) || defined(FQ_ZECH_MAT_H)
+        fmpz_t p;
+#endif
 
         TEMPLATE(T, ctx_randtest)(ctx, state);
 
@@ -38,7 +45,13 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_set_fmpz_mod_mat, state)
 
         TEMPLATE(T, mat_randtest)(a, state, ctx);
 
+#if defined(FQ_NMOD_MAT_H) || defined(FQ_ZECH_MAT_H)
+        fmpz_init_set_ui(p, TEMPLATE(T, ctx_prime)(ctx));
+        fmpz_mod_mat_init(m, r, c, p);
+        fmpz_clear(p);
+#else
         fmpz_mod_mat_init(m, r, c, TEMPLATE(T, ctx_prime)(ctx));
+#endif
 
         fmpz_mod_mat_one(m);
 

@@ -21,14 +21,12 @@ fq_nmod_ctx_randtest(fq_nmod_ctx_t ctx, flint_rand_t state)
 {
     nmod_poly_t modulus;
     mp_limb_t x;
-    fmpz_t p;
+    ulong p;
     slong d;
 
-    fmpz_init(p);
-    fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 6), 1));
+    p = n_randprime(state, 2 + n_randint(state, 6), 1);
     d = n_randint(state, 10) + 1;
-    fq_nmod_ctx_init_conway(ctx, p, d, "a");
-    fmpz_clear(p);
+    fq_nmod_ctx_init_conway_ui(ctx, p, d, "a");
 
     /* Test non-monic modulus */
     if (n_randint(state, 2))

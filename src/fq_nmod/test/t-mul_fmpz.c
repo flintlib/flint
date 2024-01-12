@@ -30,14 +30,14 @@ TEST_FUNCTION_START(fq_nmod_mul_fmpz, state)
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d = n_randint(state, 10) + 1;
-        fq_nmod_ctx_init_conway(ctx, p, d, "a");
+        fq_nmod_ctx_init_conway_ui(ctx, fmpz_get_ui(p), d, "a");
 
         fq_nmod_init(a, ctx);
         fq_nmod_init(b, ctx);
         fmpz_init(x);
 
         fq_nmod_randtest(a, state, ctx);
-        fmpz_randtest_mod_signed(x,state,fq_nmod_ctx_prime(ctx));
+        fmpz_randtest_mod_signed(x, state, p);
         fq_nmod_mul_fmpz(b, a, x, ctx);
         fq_nmod_mul_fmpz(a, a, x, ctx);
 
@@ -72,7 +72,7 @@ TEST_FUNCTION_START(fq_nmod_mul_fmpz, state)
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d = n_randint(state, 10) + 1;
-        fq_nmod_ctx_init_conway(ctx, p, d, "a");
+        fq_nmod_ctx_init_conway_ui(ctx, fmpz_get_ui(p), d, "a");
 
         fq_nmod_init(a, ctx);
         fq_nmod_init(c, ctx);
@@ -80,7 +80,7 @@ TEST_FUNCTION_START(fq_nmod_mul_fmpz, state)
         nmod_poly_init(b, fmpz_get_ui(p));
 
         fq_nmod_randtest(a, state, ctx);
-        fmpz_randtest_mod_signed(x, state, fq_nmod_ctx_prime(ctx));
+        fmpz_randtest_mod_signed(x, state, p);
         fq_nmod_mul_fmpz(c, a, x, ctx);
 
         if (fmpz_cmp_ui(x, 0) < 0)
