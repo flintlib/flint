@@ -178,7 +178,7 @@ _artin_schreier_preimage(fmpz *rop, const fmpz *op, slong len,
         LU x = Pb, hence L y = Pb and U x = y.
      */
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         slong res = nmod_mat_lu(P, A, 0);
         FLINT_ASSERT(res == d - 1);

@@ -42,7 +42,7 @@ static int _try_lift(
     fmpz_mod_mpoly_init(t, ctx);
     fmpz_mod_mpoly_init(newq, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mod_mpoly_one(t, ctx);
     for (i = 0; i < pfac->length; i++)
         fmpz_mod_mpoly_mul(t, t, pfac->coeffs + i, ctx);
@@ -107,7 +107,7 @@ cleanup:
     fmpz_mod_mpoly_clear(t, ctx);
     fmpz_mod_mpoly_clear(newq, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success > 0)
     {
         fmpz_mod_mpoly_init(t, ctx);
@@ -234,7 +234,7 @@ next_alpha:
         fmpz_mod_mpoly_set(q, m < n ? Aevals + m : A, ctx);
         fmpz_mod_mpoly_set(p, Aevals + m - 1, ctx);
 
-    #ifdef FLINT_WANT_ASSERT
+    #if FLINT_WANT_ASSERT
         fmpz_mod_mpoly_one(t, ctx);
         for (i = 0; i < pfac->length; i++)
             fmpz_mod_mpoly_mul(t, t, pfac->coeffs + i, ctx);
@@ -283,7 +283,7 @@ next_alpha:
         {
             zassenhaus_subset_first(subset, len, k);
 
-        #ifdef FLINT_WANT_ASSERT
+        #if FLINT_WANT_ASSERT
             fmpz_mod_mpoly_one(t, ctx);
             for (i = 0; i < len; i++)
             {
@@ -373,7 +373,7 @@ cleanup:
     fmpz_mod_bpoly_clear(B, ctx->ffinfo);
     fmpz_mod_tpoly_clear(F, ctx->ffinfo);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success)
     {
         fmpz_mod_mpoly_init(t, ctx);
