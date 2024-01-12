@@ -215,6 +215,8 @@ References
 
 .. [LukPatWil1996] \R. F. Lukes and C. D. Patterson and H. C. Williams "Some results on pseudosquares" Math. Comp. 1996, no. 65, 361--372
 
+.. [Lüb2004] \F. Lübeck, "Conway polynomials for finite fields", RTWH Aachen, https://www.math.rwth-aachen.de/~Frank.Luebeck/data/ConwayPol/index.html, (accessed 2024-01-12)
+
 .. [MN2019] \P. Molin and C. Neurohr, "Computing period matrices and the Abel--Jacobi map of superelliptic curves", Math. Comp. 88:316 (2019), 847--888.
 
 .. [MP2006] \M. Monagan and R. Pearce. "Rational simplification modulo a polynomial ideal". Proceedings of the 2006 international symposium on Symbolic and algebraic computation - ISSAC '06. https://doi.org/10.1145/1145768.1145809

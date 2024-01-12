@@ -1085,6 +1085,18 @@ void  _nmod_poly_exp_expinv_series(mp_ptr f, mp_ptr g, mp_srcptr h, slong hlen, 
 void _nmod_poly_exp_series(mp_ptr f, mp_srcptr h, slong hlen, slong n, nmod_t mod);
 void nmod_poly_exp_series(nmod_poly_t f, const nmod_poly_t h, slong n);
 
+/* Special polynomials *******************************************************/
+
+int _nmod_poly_conway(mp_ptr op, ulong prime, slong deg);
+
+struct _prime_degree_struct
+{
+    ulong prime;
+    slong degree;
+};
+
+struct _prime_degree_struct _nmod_poly_conway_rand(flint_rand_t state);
+
 /* Products  *****************************************************************/
 
 void nmod_poly_product_roots_nmod_vec(nmod_poly_t poly, mp_srcptr xs, slong n);

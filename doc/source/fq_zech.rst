@@ -9,11 +9,11 @@ multiplicative group of the finite field. In particular, we use a root of
 degree `n`, as a polynomial in `\mathbf{F}_p[X]` of degree less than `n`. The
 underlying data structure is just an ``mp_limb_t``.
 
-The default choice for `f(X)` is the Conway polynomial for the pair `(p,n)`.
-Frank Luebeck's data base of Conway polynomials is made available in the file
-``src/qadic/CPimport.txt``. If a Conway polynomial is not available, then a
-random irreducible polynomial will be chosen for `f(X)`. Additionally, the user
-is able to supply their own `f(X)`.
+The default choice for `f(X)` is the Conway polynomial for the pair `(p,n)`,
+enabled by Frank Lübeck's data base of Conway polynomials using the
+:func:`_nmod_poly_conway` function. If a Conway polynomial is not available,
+then a random irreducible polynomial will be chosen for `f(X)`. Additionally,
+the user is able to supply their own `f(X)`.
 
 We required that the order of the field fits inside of an ``mp_limb_t``;
 however, it is recommended that `p^n < 2^{20}` due to the time and memory needed
