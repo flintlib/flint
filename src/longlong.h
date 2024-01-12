@@ -91,10 +91,10 @@ static inline int flint_clz(ulong x)
         : (xr < ((ulong) 1 << 3 * bits4) ? 2 * bits4 + 1 : 3 * bits4 + 1);
     else
     {
-        for (__a = FLINT_BITS - 8; __a > 0; __a -= 8)
-            if (((__xr >> __a) & 0xff) != 0)
+        for (a = FLINT_BITS - 8; a > 0; a -= 8)
+            if (((xr >> a) & 0xff) != 0)
                 break;
-        ++__a;
+        ++a;
     }
     return FLINT_BITS + 1 - a - __flint_clz_tab[xr >> a];
 }
@@ -108,23 +108,23 @@ static inline int flint_ctz(ulong x)
 
 /* Byte swap */
 #if !defined(byte_swap)
-# if FLINT_BITS == 64
+# if FLINT_BITS == 32
 #  define byte_swap(n) \
   do { \
       /* swap adjacent bytes */ \
-      n = (((n & 0xff00ff00) >> 8) | ((n & 0x00ff00ff) << 8)); \
+      (n) = ((((n) & 0xff00ff00) >> 8) | (((n) & 0x00ff00ff) << 8)); \
       /* swap adjacent words */ \
-      n = ((n >> 16) | (n << 16)); \
+      (n) = (((n) >> 16) | ((n) << 16)); \
   } while (0)
 # else
 #  define byte_swap(n) \
   do { \
       /* swap adjacent bytes */ \
-      n = (((n & 0xff00ff00ff00ff00) >> 8) | ((n & 0x00ff00ff00ff00ff) << 8)); \
+      (n) = ((((n) & 0xff00ff00ff00ff00) >> 8) | (((n) & 0x00ff00ff00ff00ff) << 8)); \
       /* swap adjacent words */ \
-      n = (((n & 0xffff0000ffff0000) >> 16) | ((n & 0x0000ffff0000ffff) << 16)); \
+      (n) = ((((n) & 0xffff0000ffff0000) >> 16) | (((n) & 0x0000ffff0000ffff) << 16)); \
       /* swap adjacent double words */ \
-      n = ((n >> 32) | (n << 32)); \
+      (n) = (((n) >> 32) | ((n) << 32)); \
   } while (0)
 # endif
 #endif
@@ -133,36 +133,40 @@ static inline int flint_ctz(ulong x)
 #if !defined(add_ssaaaa)
 # define add_ssaaaa(s1, s0, a1, a0, b1, b0) \
   do { \
+    ulong __t0 = (a0); \
     (s0) = (a0) + (b0); \
-    (s1) = (a1) + (b1) + ((ulong) (s0) < (ulong) (a0)); \
+    (s1) = (a1) + (b1) + ((ulong) (s0) < __t0); \
   } while (0)
 
 # define add_sssaaaaaa(s2, s1, s0, a2, a1, a0, b2, b1, b0) \
   do { \
-    (s0) = (a0) + (b0); \
-    (s1) = (a1) + (b1) + ((ulong) (s0) < (ulong) (a0)); \
-    (s2) = (a2) + (b2) + ((ulong) (s1) < (ulong) (a1)); \
+    mp_limb_t __t1, __t2; \
+    add_ssaaaa(__t1, s0, (mp_limb_t) 0, a0, (mp_limb_t) 0, b0); \
+    add_ssaaaa(__t2, s1, (mp_limb_t) 0, a1, (mp_limb_t) 0, b1); \
+    add_ssaaaa(s2, s1, (a2) + (b2), s1, __t2, __t1); \
   } while (0)
 
 # define add_ssssaaaaaaaa(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0) \
   do { \
-    (s0) = (a0) + (b0); \
-    (s1) = (a1) + (b1) + ((ulong) (s0) < (ulong) (a0)); \
-    (s2) = (a2) + (b2) + ((ulong) (s1) < (ulong) (a1)); \
-    (s3) = (a3) + (b3) + ((ulong) (s2) < (ulong) (a2)); \
+    mp_limb_t __u2; \
+    add_sssaaaaaa(__u2, s1, s0, (mp_limb_t) 0, a1, a0, (mp_limb_t) 0, b1, b0); \
+    add_ssaaaa(s3, s2, a3, a2, b3, b2); \
+    add_ssaaaa(s3, s2, s3, s2, (mp_limb_t) 0, __u2); \
   } while (0)
 
 # define sub_ddmmss(s1, s0, a1, a0, b1, b0) \
   do { \
+    ulong __t0 = (a0); \
     (s0) = (a0) - (b0); \
-    (s1) = (a1) - (b1) - ((ulong) (s0) > (ulong) (a0)); \
+    (s1) = (a1) - (b1) - ((ulong) (s0) > __t0); \
   } while (0)
 
-# define sub_dddmmmsss(s2, s1, s0, a2, a1, a0, b2, b1, b0) \
+# define sub_dddmmmsss(d2, d1, d0, m2, m1, m0, s2, s1, s0) \
   do { \
-    (s0) = (a0) - (b0); \
-    (s1) = (a1) - (b1) - ((ulong) (s0) > (ulong) (a0)); \
-    (s2) = (a2) - (b2) - ((ulong) (s1) > (ulong) (a1)); \
+    mp_limb_t __t1, __t2; \
+    sub_ddmmss(__t1, d0, (mp_limb_t) 0, m0, (mp_limb_t) 0, s0); \
+    sub_ddmmss(__t2, d1, (mp_limb_t) 0, m1, (mp_limb_t) 0, s1); \
+    sub_ddmmss(d2, d1, (m2) - (s2), d1, -__t2, -__t1); \
   } while (0)
 #endif
 
@@ -173,26 +177,26 @@ static inline int flint_ctz(ulong x)
     ulong __x0, __x1, __x2, __x3; \
     ulong __ul, __vl, __uh, __vh; \
     __ul = __ll_lowpart(u); \
-    __uh = __ll_highpart(v); \
+    __uh = __ll_highpart(u); \
     __vl = __ll_lowpart(v); \
     __vh = __ll_highpart(v); \
     __x0 = __ul * __vl; \
     __x1 = __ul * __vh; \
     __x2 = __uh * __vl; \
     __x3 = __uh * __vh; \
-    __x1 += __ll_highpart (__x0); /* this can't give carry */ \
+    __x1 += __ll_highpart(__x0); /* this can't give carry */ \
     __x1 += __x2; /* but this indeed can */ \
     if (__x1 < __x2) \
       __x3 += __ll_B; \
-    (w1) = __x3 + __ll_highpart (__x1); \
-    (w0) = (__x1 << FLINT_BITS / 2) + __ll_lowpart(__x0); \
+    (w1) = __x3 + __ll_highpart(__x1); \
+    (w0) = (__x1 << (FLINT_BITS / 2)) + __ll_lowpart(__x0); \
   } while (0)
 
 # define smul_ppmm(w1, w0, u, v) \
   do { \
-    ulong __w1; \
-    umul_ppmm (__w1, w0, u, v); \
-    (w1) = __w1 - (-((u) >> (FLINT_BITS - 1)) & (v)) - (-((v) >> (FLINT_BITS - 1)) & (v)); \
+    ulong __w1, __u = (u), __v = (v); \
+    umul_ppmm(__w1, w0, u, v); \
+    (w1) = __w1 - (-(__u >> (FLINT_BITS - 1)) & __v) - (-(__v >> (FLINT_BITS - 1)) & __u); \
   } while (0)
 #endif
 
@@ -286,11 +290,11 @@ static inline int flint_ctz(ulong x)
     _n10 = (nl); \
     _nmask = (slong) (_n10) >> (FLINT_BITS - 1); \
     _nadj = _n10 + (_nmask & (d)); \
-    umul_ppmm (_xh, _xl, di, _n2 - _nmask); \
-    add_ssaaaa (_xh, _xl, _xh, _xl, _n2, _nadj); \
+    umul_ppmm(_xh, _xl, di, _n2 - _nmask); \
+    add_ssaaaa(_xh, _xl, _xh, _xl, _n2, _nadj); \
     _q1 = ~_xh; \
-    umul_ppmm (_xh, _xl, _q1, d); \
-    add_ssaaaa (_xh, _xl, _xh, _xl, nh, nl); \
+    umul_ppmm(_xh, _xl, _q1, d); \
+    add_ssaaaa(_xh, _xl, _xh, _xl, nh, nl); \
     _xh -= (d); /* xh = 0 or -1 */ \
     (r) = _xl + ((d) & _xh); \
     (q) = _xh - _q1; \
