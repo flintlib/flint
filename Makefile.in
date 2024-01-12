@@ -747,22 +747,49 @@ endef
 $(foreach num, $(THREAD_LIST), $(eval $(call xxx_test_run_parallel,$(num))))
 endif
 
+# NOTE: One has to run `make check PYTHON=1' and `make check' separately.
 ifdef PYTHON
 ifeq ($(findstring linux,$(HOST_OS)),linux)
 check: library
 	@LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:$(ABS_FLINT_DIR) python3 $(SRC_DIR)/python/flint_ctypes.py
+	@echo ''
+	@echo 'All Python tests passed.'
 else
 check: library
 	@python3 $(SRC_DIR)/python/flint_ctypes.py
+	@echo ''
+	@echo 'All Python tests passed.'
 endif
 else ifdef MOD
 ifeq ($(NJOBS),)
 check: library $(patsubst %,%_TEST_RUN,$(foreach dir, $(MOD), $($(dir)_TESTS)))
+	@echo ''
+ifeq ($(words $(sort $(MOD))),0)
+	@echo 'No tests where performed.'
+else ifeq ($(words $(sort $(MOD))),1)
+	@echo 'All tests passed for $(sort $(MOD)).'
+else ifeq ($(words $(sort $(MOD))),2)
+	@echo 'All tests passed for $(firstword $(sort $(MOD))) and $(lastword $(sort $(MOD))).'
+else
+	@echo 'All tests passed for $(foreach dir,$(filter-out $(lastword $(filter-out $(lastword $(sort $(MOD))),$(sort $(MOD)))) $(lastword $(sort $(MOD))),$(sort $(MOD))),$(dir),) $(lastword $(filter-out $(lastword $(sort $(MOD))),$(sort $(MOD)))) and $(lastword $(sort $(MOD))).'
+endif
 else
 check: library $(foreach x_test,$(patsubst %,%_TEST_RUN,$(foreach dir,$(MOD),$($(dir)_TESTS))),$(foreach num,$(THREAD_LIST),$(x_test)_$(num)))
+	@echo ''
+ifeq ($(words $(sort $(MOD))),0)
+	@echo 'No tests where performed.'
+else ifeq ($(words $(sort $(MOD))),1)
+	@echo 'All tests passed for $(sort $(MOD)).'
+else ifeq ($(words $(sort $(MOD))),2)
+	@echo 'All tests passed for $(firstword $(sort $(MOD))) and $(lastword $(sort $(MOD))).'
+else
+	@echo 'All tests passed for $(foreach dir,$(filter-out $(lastword $(filter-out $(lastword $(sort $(MOD))),$(sort $(MOD)))) $(lastword $(sort $(MOD))),$(sort $(MOD))),$(dir),) $(lastword $(filter-out $(lastword $(sort $(MOD))),$(sort $(MOD)))) and $(lastword $(sort $(MOD))).'
+endif
 endif
 else
 check: library $(TESTS:%=%_TEST_RUN)
+	@echo ''
+	@echo 'All tests passed.'
 endif
 
 ################################################################################
@@ -841,6 +868,19 @@ ifneq ($(STATIC), 0)
 	$(CP) $(FLINT_DIR)/$(FLINT_LIB_STATIC) $(LIBDIR)
 endif
 	$(CP) $(HEADERS) $(INCLUDEDIR)/flint
+	@echo ""
+	@echo '############################################################'
+	@echo '# NOTE:                                                    #'
+	@echo '#                                                          #'
+	@echo '# Before installing FLINT, ensure its reliability and      #'
+	@echo '# functionality by running the command `make check'"'"'.       #'
+	@echo '#                                                          #'
+	@echo '# This will initiate a series of tests that validates the  #'
+	@echo '# execution of FLINT.  This verification is a crucial step #'
+	@echo '# in guaranteeing a stable and error-free execution of     #'
+	@echo '# your software.                                           #'
+	@echo '#                                                          #'
+	@echo '############################################################'
 
 uninstall:
 	$(RM_F) $(PKGCONFIGDIR)/flint.pc
