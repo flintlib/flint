@@ -1,5 +1,8 @@
 /*
+    Copyright (C) 2012 Andres Goens
+    Copyright (C) 2012 Sebastian Pancratz
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -11,10 +14,99 @@
 
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
+#include "fq_nmod.h"
 #include "fq.h"
 
+/* Assumes that everything fits inside a small fmpz */
 void
-fq_ctx_init(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var)
+fq_ctx_init_set_clear_small_fq_nmod_ctx(fq_ctx_t c1, fq_nmod_ctx_t c2)
+{
+    fmpz_mod_ctx_struct * ctxp = c1->ctxp;
+    fmpz_mod_poly_struct * m1 = c1->modulus;
+    fmpz_mod_poly_struct * i1 = c1->inv;
+    nmod_poly_struct * m2 = c2->modulus;
+    nmod_poly_struct * i2 = c2->inv;
+
+    /* Init c1->ctxp */
+    *ctxp->n = c2->mod.n;
+    ctxp->add_fxn = _fmpz_mod_add1;
+    ctxp->sub_fxn = _fmpz_mod_sub1;
+    ctxp->mul_fxn = _fmpz_mod_mul1;
+    ctxp->mod = c2->mod;
+    ctxp->n_limbs[0] = 0;
+    ctxp->n_limbs[1] = 0;
+    ctxp->n_limbs[2] = 0;
+    ctxp->ninv_huge = NULL;
+
+    c1->sparse_modulus = c2->sparse_modulus;
+    c1->is_conway = c2->is_conway;
+
+    c1->a = c2->a;
+    c1->j = c2->j;
+    c1->len = c2->len;
+
+    /* Init c1->modulus and c1->inv */
+    m1->coeffs = m2->coeffs;
+    m1->alloc = m2->alloc;
+    m1->length = m2->length;
+    i1->coeffs = i2->coeffs;
+    i1->alloc = i2->alloc;
+    i1->length = i2->length;
+
+    c1->var = c2->var;
+}
+
+int
+_fq_ctx_init_conway_ui(fq_ctx_t ctx, ulong p, slong d, const char * var)
+{
+    fq_nmod_ctx_t ctx2;
+
+    if (_fq_nmod_ctx_init_conway_ui(ctx2, p, d, var))
+    {
+        fq_ctx_init_set_clear_small_fq_nmod_ctx(ctx, ctx2);
+        return 1;
+    }
+    else
+        return 0;
+}
+
+void
+fq_ctx_init_conway_ui(fq_ctx_t ctx, ulong p, slong d, const char *var)
+{
+    int result;
+
+    result = _fq_ctx_init_conway_ui(ctx, p, d, var);
+
+    if (!result)
+        flint_throw(FLINT_ERROR, "Exception (fq_ctx_init_conway_ui).  The "
+                "polynomial for (p, d) = (%wu, %wd) is not present "
+                "in the database.\n", p, d);
+
+    ctx->is_conway = 1;
+}
+
+int
+_fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char * var)
+{
+    if (*p < 2 || *p > 109987) /* NOTE: This works. */
+        return 0;
+    else
+        return _fq_ctx_init_conway_ui(ctx, *p, d, var);
+}
+
+void
+fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char * var)
+{
+    if (*p < 2 || *p > 109987) /* NOTE: This works. */
+        flint_throw(FLINT_ERROR, "Exception (fq_ctx_init_conway).  The "
+                "polynomial for (p, d) = (%{fmpz}, %wd) is not present "
+                "in the database.\n", p, d);
+    else
+        fq_ctx_init_conway_ui(ctx, *p, d, var);
+}
+
+void
+fq_ctx_init(fq_ctx_t ctx, const fmpz_t p, slong d, const char * var)
 {
     flint_rand_t state;
     fmpz_mod_poly_t poly;
@@ -25,10 +117,8 @@ fq_ctx_init(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var)
         ctx->is_conway = 1;
 	    return;
     }
-    else
-    {
-	    ctx->is_conway = 0;
-    }
+
+    ctx->is_conway = 0;
 
     flint_randinit(state);
 

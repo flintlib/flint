@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -13,89 +14,64 @@
 #include "fmpz.h"
 #include "fq_nmod.h"
 
-extern int flint_conway_polynomials [];
-
-int _fq_nmod_ctx_init_conway_ui(fq_nmod_ctx_t ctx, ulong p, slong d, const char *var)
+int _fq_nmod_ctx_init_conway_ui(fq_nmod_ctx_t ctx, ulong p, slong d, const char * var)
 {
-    unsigned int position;
+    int ret;
+    ulong conway_poly[410]; /* Largest degree in database is 409 */
+    nmod_poly_struct tmp;
 
-    if (p > 109987)
-    {
+    ret = _nmod_poly_conway(conway_poly, p, d);
+
+    if (!ret)
         return 0;
-    }
 
-    for (position = 0; flint_conway_polynomials[position] != 0; position += 3+flint_conway_polynomials[position+1])
-    {
-        /* Different prime? */
-        if (p != flint_conway_polynomials[position])
-            continue;
+    nmod_poly_init(&tmp, p);
+    tmp.coeffs = conway_poly;
+    tmp.length = d + 1;
 
-        /* Same degree? */
-        if (d == flint_conway_polynomials[position+1])
-        {
-            nmod_poly_t mod;
-            slong i;
+    fq_nmod_ctx_init_modulus(ctx, &tmp, var);
 
-            nmod_poly_init(mod, p);
+    /* No need to clear tmp */
 
-            /* Copy the polynomial */
-            for (i = 0; i < d; i++)
-            {
-                int coeff = flint_conway_polynomials[position+2+i];
-                nmod_poly_set_coeff_ui(mod, i, coeff);
-            }
-
-            nmod_poly_set_coeff_ui(mod, d, 1);
-
-            fq_nmod_ctx_init_modulus(ctx, mod, var);
-
-            nmod_poly_clear(mod);
-            return 1;
-        }
-    }
-
-    return 0;
+    return 1;
 }
 
 
-void fq_nmod_ctx_init_conway_ui(fq_nmod_ctx_t ctx, ulong p, slong d, const char *var)
+void fq_nmod_ctx_init_conway_ui(fq_nmod_ctx_t ctx, ulong p, slong d, const char * var)
 {
-    int result;
-
-    if (p > 109987)
-    {
-        flint_throw(FLINT_ERROR, "Exception (fq_nmod_ctx_init_conway_ui).  Conway polynomials are only available for primes up to 109987.\n");
-    }
-
-    result = _fq_nmod_ctx_init_conway_ui(ctx, p, d, var);
-    if (!result)
-        flint_throw(FLINT_ERROR, "Exception (fq_nmod_ctx_init_conway_ui).  The polynomial for \n"
-                "(p,d) = (%wu,%wd) is not present in the database.\n", p, d);
+    if (!_fq_nmod_ctx_init_conway_ui(ctx, p, d, var))
+        flint_throw(FLINT_ERROR,
+                "Exception (fq_nmod_ctx_init_conway_ui).  "
+                "The polynomial for (p, d) = (%wu, %wd) is not present in the "
+                "database.\n", p, d);
 
     ctx->is_conway = 1;
 }
 
 void fq_nmod_ctx_init_ui(fq_nmod_ctx_t ctx, ulong p, slong d, const char *var)
 {
-    flint_rand_t state;
-    nmod_poly_t poly;
-
     if (_fq_nmod_ctx_init_conway_ui(ctx, p, d, var))
     {
         ctx->is_conway = 1;
-	return;
-    } else
+        return;
+    }
+    else
+    {
+        flint_rand_t state;
+        nmod_poly_t poly;
+
         ctx->is_conway = 0;
 
-    flint_randinit(state);
+        flint_randinit(state);
 
-    nmod_poly_init2(poly, p, d + 1);
-    nmod_poly_randtest_sparse_irreducible(poly, state, d + 1);
+        nmod_poly_init2(poly, p, d + 1);
+        nmod_poly_randtest_sparse_irreducible(poly, state, d + 1);
 
-    fq_nmod_ctx_init_modulus(ctx, poly, var);
+        fq_nmod_ctx_init_modulus(ctx, poly, var);
 
-    nmod_poly_clear(poly);
-    flint_randclear(state);
+        nmod_poly_clear(poly);
+        flint_randclear(state);
+    }
 }
 
 /* Deprecated functions ******************************************************/

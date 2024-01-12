@@ -2,6 +2,7 @@
     Copyright (C) 2011 Sebastian Pancratz
     Copyright (C) 2012 Andres Goens
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -11,41 +12,18 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
-#include "fmpz.h"
-#include "fmpz_mod.h"
-#include "fmpz_mod_poly.h"
+#include "fq_nmod.h"
 #include "fq.h"
 
+void fq_ctx_init_set_clear_small_fq_nmod_ctx(fq_ctx_t, fq_nmod_ctx_t);
+
+/* FIXME: Test big primes? */
 void
 fq_ctx_randtest(fq_ctx_t ctx, flint_rand_t state)
 {
-    fmpz_mod_poly_t modulus;
-    fmpz_t p, x;
-    slong d;
+    fq_nmod_ctx_t nmod_ctx;
 
-    fmpz_init(p);
-    fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 6), 1));
-    d = n_randint(state, 10) + 1;
-    fq_ctx_init_conway(ctx, p, d, "a");
-    fmpz_clear(p);
+    fq_nmod_ctx_randtest(nmod_ctx, state);
 
-    /* Test non-monic modulus */
-    if (n_randint(state, 2))
-    {
-        fmpz_mod_ctx_t ctxp;
-        fmpz_mod_ctx_init(ctxp, p);
-        fmpz_init_set(x, p);
-        fmpz_sub_ui(x, x, 1);
-        fmpz_mod_poly_init(modulus, ctxp);
-        fmpz_mod_poly_set(modulus, ctx->modulus, ctxp);
-        fmpz_randm(x, state, x);
-        fmpz_add_ui(x, x, 1);
-        fmpz_mod_poly_scalar_mul_fmpz(modulus, modulus, x, ctxp);
-        fq_ctx_clear(ctx);
-        fq_ctx_init_modulus(ctx, modulus, ctxp, "a");
-        fmpz_mod_poly_clear(modulus, ctxp);
-        fmpz_mod_ctx_clear(ctxp);
-        fmpz_clear(x);
-    }
+    fq_ctx_init_set_clear_small_fq_nmod_ctx(ctx, nmod_ctx);
 }

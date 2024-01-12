@@ -14,12 +14,10 @@
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
-#include "fmpz.h"
 #include "fq_nmod.h"
 
 void
-fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx, const nmod_poly_t modulus,
-                         const char *var)
+fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx, const nmod_poly_t modulus, const char * var)
 {
     slong nz;
     int i, j;

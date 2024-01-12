@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,16 +10,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
 #include "fq_nmod.h"
 #include "fq_zech.h"
 
 void
 fq_zech_ctx_clear(fq_zech_ctx_t ctx)
 {
+    /* NOTE: Only zech_log_table of the three tables was assigned by malloc */
     flint_free(ctx->zech_log_table);
-    flint_free(ctx->prime_field_table);
-    flint_free(ctx->eval_table);
 
     if (ctx->owns_fq_nmod_ctx)
     {

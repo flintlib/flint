@@ -2,6 +2,7 @@
     Copyright (C) 2011 Sebastian Pancratz
     Copyright (C) 2012 Andres Goens
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -11,26 +12,23 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
 #include "nmod_poly.h"
-#include "fmpz.h"
 #include "fq_nmod.h"
 
 void
 fq_nmod_ctx_randtest(fq_nmod_ctx_t ctx, flint_rand_t state)
 {
-    nmod_poly_t modulus;
-    mp_limb_t x;
-    ulong p;
-    slong d;
+    struct _prime_degree_struct pd;
 
-    p = n_randprime(state, 2 + n_randint(state, 6), 1);
-    d = n_randint(state, 10) + 1;
-    fq_nmod_ctx_init_conway_ui(ctx, p, d, "a");
+    pd = _nmod_poly_conway_rand(state);
+    fq_nmod_ctx_init_conway_ui(ctx, pd.prime, pd.degree, "a");
 
     /* Test non-monic modulus */
     if (n_randint(state, 2))
     {
+        nmod_poly_t modulus;
+        mp_limb_t x;
+
         nmod_poly_init(modulus, ctx->mod.n);
         nmod_poly_set(modulus, ctx->modulus);
         x = n_randint(state, ctx->mod.n - 1) + 1;

@@ -54,6 +54,9 @@ qadic_ctx_struct;
 
 typedef qadic_ctx_struct qadic_ctx_t[1];
 
+int _qadic_ctx_init_conway_ui(qadic_ctx_t ctx, ulong p, slong d,
+        slong min, slong max, const char * var, enum padic_print_mode mode);
+
 void qadic_ctx_init_conway(qadic_ctx_t ctx,
                            const fmpz_t p, slong d, slong min, slong max,
                            const char *var, enum padic_print_mode mode);

@@ -28,15 +28,15 @@ typedef fq_zech_struct fq_zech_t[1];
 
 typedef struct
 {
-    mp_limb_t qm1;              /* q - 1 */
-    mp_limb_t qm1o2;            /* (q - 1) / 2 or 1 when p == 2 */
-    mp_limb_t qm1opm1;          /* (q - 1) / (p - 1) */
-    mp_limb_t p;
+    ulong qm1;     /* q - 1 */
+    ulong qm1o2;   /* (q - 1) / 2 or 1 when p == 2 */
+    ulong qm1opm1; /* (q - 1) / (p - 1) */
+    ulong p;
     double ppre;
-    mp_limb_t prime_root;       /* primitive root for prime subfield */
-    mp_limb_t * zech_log_table;
-    mp_limb_t * prime_field_table;
-    mp_limb_t * eval_table;
+    ulong prime_root;       /* primitive root for prime subfield */
+    ulong * zech_log_table;
+    ulong * prime_field_table;
+    ulong * eval_table;
 
     fq_nmod_ctx_struct * fq_nmod_ctx;
     int owns_fq_nmod_ctx;

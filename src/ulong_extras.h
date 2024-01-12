@@ -66,6 +66,7 @@ ulong n_cbrt_chebyshev_approx(ulong n);
 ulong n_cbrtrem(ulong* remainder, ulong n);
 
 ulong n_pow(ulong n, ulong exp);
+ulong _n_pow_check(ulong n, ulong exp);
 ulong n_root(ulong n, ulong root);
 ulong n_rootrem(ulong* remainder, ulong n, ulong root);
 ulong n_root_estimate(double a, int n);
