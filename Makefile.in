@@ -841,6 +841,19 @@ ifneq ($(STATIC), 0)
 	$(CP) $(FLINT_DIR)/$(FLINT_LIB_STATIC) $(LIBDIR)
 endif
 	$(CP) $(HEADERS) $(INCLUDEDIR)/flint
+	@echo ""
+	@echo '############################################################'
+	@echo '# NOTE:                                                    #'
+	@echo '#                                                          #'
+	@echo '# Before installing FLINT, ensure its reliability and      #'
+	@echo '# functionality by running the command `make check'"'"'.       #'
+	@echo '#                                                          #'
+	@echo '# This will initiate a series of tests that validates the  #'
+	@echo '# execution of FLINT.  This verification is a crucial step #'
+	@echo '# in guaranteeing a stable and error-free execution of     #'
+	@echo '# your software.                                           #'
+	@echo '#                                                          #'
+	@echo '############################################################'
 
 uninstall:
 	$(RM_F) $(PKGCONFIGDIR)/flint.pc
