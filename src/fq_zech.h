@@ -60,7 +60,7 @@ slong fq_zech_ctx_degree(const fq_zech_ctx_t ctx)
     return ctx->fq_nmod_ctx->modulus->length - 1;
 }
 
-FLINT_FORCE_INLINE
+FQ_ZECH_INLINE
 ulong fq_zech_ctx_prime(const fq_zech_ctx_t ctx)
 {
     return ctx->fq_nmod_ctx->mod.n;
@@ -68,8 +68,8 @@ ulong fq_zech_ctx_prime(const fq_zech_ctx_t ctx)
 
 void fq_zech_ctx_order(fmpz_t f, const fq_zech_ctx_t ctx);
 
-FQ_ZECH_INLINE mp_limb_t
-fq_zech_ctx_order_ui(const fq_zech_ctx_t ctx)
+FQ_ZECH_INLINE
+ulong fq_zech_ctx_order_ui(const fq_zech_ctx_t ctx)
 {
     return ctx->qm1 + 1;
 }

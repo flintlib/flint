@@ -41,19 +41,19 @@ void fq_nmod_ctx_randtest_reducible(fq_nmod_ctx_t ctx, flint_rand_t state);
 
 void fq_nmod_ctx_clear(fq_nmod_ctx_t ctx);
 
-FLINT_FORCE_INLINE
+FQ_NMOD_INLINE
 const nmod_poly_struct * fq_nmod_ctx_modulus(const fq_nmod_ctx_t ctx)
 {
     return ctx->modulus;
 }
 
-FLINT_FORCE_INLINE
+FQ_NMOD_INLINE
 slong fq_nmod_ctx_degree(const fq_nmod_ctx_t ctx)
 {
     return ctx->modulus->length - 1;
 }
 
-FLINT_FORCE_INLINE
+FQ_NMOD_INLINE
 ulong fq_nmod_ctx_prime(const fq_nmod_ctx_t ctx)
 {
     return ctx->mod.n;
