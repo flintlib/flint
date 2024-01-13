@@ -134,10 +134,20 @@ int TEMPLATE5(test, T, label1, T, label2)(void)         \
     return 0;                                           \
 }
 
-#define TEST_FUNCTION_FAIL(msg, ...)                    \
-    printf("%6.2f   (" _RED_B "FAIL" _RESET ")\n", (_end_time_ - _start_time_) / CLOCKS_PER_SEC); \
-    flint_printf(msg, __VA_ARGS__);                     \
-    return 1;
+#define TEST_FUNCTION_FAIL(...)                         \
+do                                                      \
+{                                                       \
+    if (_label_len_ < 48)                               \
+        printf("%.48s%6.2f   (" _RED_B "FAIL" _RESET ")\n", \
+                _test_io_string_,                       \
+                (_end_time_ - _start_time_) / CLOCKS_PER_SEC); \
+    else                                                \
+        printf("%.*s\n%54.2f   (" _RED_B "FAIL" _RESET ")\n", \
+                _label_len_, _test_io_string_,          \
+                (_end_time_ - _start_time_) / CLOCKS_PER_SEC); \
+    flint_printf(__VA_ARGS__);                          \
+    return 1;                                           \
+} while (0)
 
 #define TEST_MAIN(tests)                                                    \
 int                                                                         \
