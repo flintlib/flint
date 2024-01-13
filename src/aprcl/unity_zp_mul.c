@@ -13,7 +13,7 @@
 #include "fmpz_mod_poly.h"
 #include "aprcl.h"
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
 # include "fmpz.h"
 # include "fmpz_mod.h"
 #endif

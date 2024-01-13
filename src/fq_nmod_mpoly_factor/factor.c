@@ -242,7 +242,7 @@ static int _factor_irred_compressed(
     ulong * strides, * texps;
     flint_bitcnt_t Abits;
     flint_rand_t state;
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fq_nmod_mpoly_t Aorg;
 
     fq_nmod_mpoly_init(Aorg, ctx);
@@ -403,7 +403,7 @@ static int _factor_irred_compressed(
 
         tot_deg = _deflate(A, tot_deg, strides, perm, ctx);
 
-        #ifdef FLINT_WANT_ASSERT
+        #if FLINT_WANT_ASSERT
         {
             fq_nmod_mpoly_t g;
             fq_nmod_mpoly_init(g, ctx);
@@ -536,7 +536,7 @@ cleanup:
     flint_free(strides);
     flint_free(perm);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success)
     {
         fq_nmod_mpoly_t prod;
@@ -668,7 +668,7 @@ static int _factor_irred(
     slong i, j;
     flint_bitcnt_t Abits;
     mpoly_compression_t M;
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fq_nmod_mpoly_t Aorg;
 
     fq_nmod_mpoly_init(Aorg, Actx);
@@ -772,7 +772,7 @@ static int _factor_irred(
 
 cleanup_less:
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success)
     {
         fq_nmod_mpoly_t prod;

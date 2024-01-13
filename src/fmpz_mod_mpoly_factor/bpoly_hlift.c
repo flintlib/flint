@@ -119,7 +119,7 @@ int fmpz_mod_bpoly_hlift2(
 
 cleanup:
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success > 0)
     {
         fmpz_mod_bpoly_t tp1, tp2;
@@ -344,7 +344,7 @@ int fmpz_mod_bpoly_hlift(
 
 cleanup:
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success > 0)
     {
         fmpz_mod_bpoly_t tp1, tp2;
