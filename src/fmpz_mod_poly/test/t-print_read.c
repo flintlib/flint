@@ -40,6 +40,8 @@ TEST_FUNCTION_START(fmpz_mod_poly_print_read, state)
 
     fmpz_mod_ctx_init_ui(ctx, 2);
 
+    fflush(stdout); /* Ensure buffer does not flow into child process */
+
     /* Randomise n polynomials, write to and read from a pipe */
     {
         fmpz_mod_poly_t *a;

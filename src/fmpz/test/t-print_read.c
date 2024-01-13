@@ -34,6 +34,8 @@ TEST_FUNCTION_START(fmpz_print_read, state)
     int fd[2];
     pid_t childpid;
 
+    fflush(stdout); /* Ensure buffer does not flow into child process */
+
     /* Randomise n integers, write to and read from a pipe */
     {
         fmpz *a;
