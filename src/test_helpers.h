@@ -62,6 +62,7 @@ int CAT(test, label)(void)                              \
     double FLINT_SET_BUT_UNUSED(_start_time_), FLINT_SET_BUT_UNUSED(_end_time_); \
     char _test_io_string_[128] = #label "                                                        "; \
     const int _label_len_ = sizeof(#label) - 1;         \
+    puts(#label "...");                                 \
     FLINT_TEST_INIT(state);                             \
     _start_time_ = clock();
 
@@ -72,6 +73,7 @@ int CAT(test, label)(void)                              \
     double FLINT_SET_BUT_UNUSED(_start_time_), FLINT_SET_BUT_UNUSED(_end_time_); \
     char _test_io_string_[128] = #label "                                                        "; \
     const int _label_len_ = sizeof(#label) - 1;         \
+    puts(#label "...");                                 \
     FLINT_TEST_INIT(state);                             \
     _start_time_ = clock();
 
@@ -81,6 +83,7 @@ int TEMPLATE3(test, T, label)(void)                     \
     double FLINT_SET_BUT_UNUSED(_start_time_), FLINT_SET_BUT_UNUSED(_end_time_); \
     char _test_io_string_[128] = TEMPLATE_STR(T) "_" #label "                                                      "; \
     const int _label_len_ = sizeof(TEMPLATE_STR(T) "_" #label) - 1; \
+    puts(TEMPLATE_STR(T) "_" #label "...");             \
     FLINT_TEST_INIT(state);                             \
     _start_time_ = clock();
 
@@ -90,6 +93,7 @@ int TEMPLATE5(test, T, label1, T, label2)(void)         \
     double FLINT_SET_BUT_UNUSED(_start_time_), FLINT_SET_BUT_UNUSED(_end_time_); \
     char _test_io_string_[128] = TEMPLATE_STR(T) "_" #label1 "_" TEMPLATE_STR(T) "_" #label2 "                                                  "; \
     const int _label_len_ = sizeof(TEMPLATE_STR(T) "_" #label1 "_" TEMPLATE_STR(T) "_" #label2) - 1; \
+    puts(TEMPLATE_STR(T) "_" #label1 "_" TEMPLATE_STR(T) "_" #label2 "..."); \
     FLINT_TEST_INIT(state);                             \
     _start_time_ = clock();
 
