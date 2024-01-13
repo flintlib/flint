@@ -225,6 +225,17 @@ yes|no)
 esac],
 enable_dependency_tracking="yes")
 
+AC_ARG_ENABLE(pretty-tests,
+[AS_HELP_STRING([--enable-pretty-tests],[Enable pretty printing for tests [default=yes]])],
+[case $enableval in
+yes|no)
+    ;;
+*)
+    AC_MSG_ERROR([Bad value $enableval for --enable-pretty-tests. Need yes or no.])
+    ;;
+esac],
+enable_pretty_tests="yes")
+
 AC_ARG_ENABLE(gmp-internals,
 [AS_HELP_STRING([--enable-gmp-internals],[Enable calling GMP internals directly [default=yes]])],
 [case $enableval in
@@ -1252,6 +1263,11 @@ then
     AC_SUBST(WANT_DEPS,1)
 else
     AC_SUBST(WANT_DEPS,0)
+fi
+
+if test "$enable_pretty_tests" = "yes";
+then
+    AC_DEFINE(FLINT_WANT_PRETTY_TESTS,1,[Define to enable pretty printing for tests.])
 fi
 
 if test "$with_ntl" = "yes";
