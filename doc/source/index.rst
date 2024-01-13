@@ -304,8 +304,6 @@ Floating-point support code
    double_interval.rst
    d_vec.rst
    d_mat.rst
-   mpf_vec.rst
-   mpf_mat.rst
    mpfr_vec.rst
    mpfr_mat.rst
 
