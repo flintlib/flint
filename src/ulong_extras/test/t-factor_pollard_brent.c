@@ -14,7 +14,7 @@
 
 TEST_FUNCTION_START(n_factor_pollard_brent, state)
 {
-    mp_limb_t prime1, prime2, primeprod, fac, modval;
+    ulong prime1, prime2, primeprod, fac, modval;
     int i, j, k, l, fails;
 
     fails = 0;
@@ -39,13 +39,10 @@ TEST_FUNCTION_START(n_factor_pollard_brent, state)
                 {
                     modval = primeprod % fac;
                     if (modval != 0)
-                    {
-                        flint_printf("FAIL : Wrong factor calculated\n");
-                        flint_printf("n : %wu\n", primeprod);
-                        flint_printf("Factor calculated: %wn\n", fac);
-                        fflush(stdout);
-                        flint_abort();
-                    }
+                        TEST_FUNCTION_FAIL(
+                                "n: %wu\n"
+                                "Factor calculated: %wn\n",
+                                primeprod, fac);
                 }
             }
         }
@@ -56,11 +53,7 @@ TEST_FUNCTION_START(n_factor_pollard_brent, state)
 #else
     if (fails > 2 * flint_test_multiplier())
 #endif
-    {
-        printf("FAIL : Pollard Rho - Brent failed too many times (%d times)\n", fails);
-        fflush(stdout);
-        flint_abort();
-    }
+        TEST_FUNCTION_FAIL("Pollard Rho - Brent failed too many times (%d times)\n", fails);
 
     TEST_FUNCTION_END(state);
 }

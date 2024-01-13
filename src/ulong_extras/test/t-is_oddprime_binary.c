@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2009 William Hart
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -10,68 +11,48 @@
 */
 
 #include "test_helpers.h"
-#include "gmpcompat.h"
 #include "ulong_extras.h"
 
 TEST_FUNCTION_START(n_is_oddprime_binary, state)
 {
-   int i, result;
-   slong cutoff = 100000;
+    slong ix;
+    slong cutoff = 100000;
+    int result;
 
-   for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that primes pass the test */
-   {
-      mp_limb_t d;
-      mpz_t d_m;
+    for (ix = 0; ix < 20000 * flint_test_multiplier(); ix++)
+    {
+        ulong d;
+        int type;
 
-      mpz_init(d_m);
+        type = n_randint(state, 2);
 
-      do
-      {
-         d = n_randint(state, cutoff) | 1;
-         if (d == UWORD(1)) d += 16; /* algorithm requires d >= 17 */
-         flint_mpz_set_ui(d_m, d);
-         mpz_nextprime(d_m, d_m);
-         d = flint_mpz_get_ui(d_m);
-      } while (d > cutoff);
+        /* NOTE: n_is_oddprime_binary(n) requires n to be odd and n > 16 */
+        if (type == 0)
+        {
+            /* Test that primes pass the test */
+            int bits = 5 + n_randint(state, 13);
+            do
+                d = n_randprime(state, bits, 1);
+            while (d > cutoff);
 
-      result = n_is_oddprime_binary(d);
+            result = n_is_oddprime_binary(d);
+        }
+        else
+        {
+            /* Test that not too many composites pass */
+            do
+                d = (17 + n_randint(state, cutoff - 17)) | 1;
+            while (n_is_probabprime(d));
 
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("d = %wu is declared composite\n", d);
-         fflush(stdout);
-         flint_abort();
-      }
+            result = !n_is_oddprime_binary(d);
+        }
 
-      mpz_clear(d_m);
-   }
+        if (!result)
+            TEST_FUNCTION_FAIL(
+                    "type %d\n"
+                    "d = %wu\n",
+                    type, d);
+    }
 
-   for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that not too many composites pass */
-   {
-      mp_limb_t d;
-      mpz_t d_m;
-
-      mpz_init(d_m);
-
-      do
-      {
-         d = (n_randint(state, cutoff) + 16) | 1;
-         flint_mpz_set_ui(d_m, d);
-      } while ((mpz_probab_prime_p(d_m, 12)) || (d > cutoff));
-
-      result = !n_is_oddprime_binary(d);
-
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("d = %wu is declared prime\n", d);
-         fflush(stdout);
-         flint_abort();
-      }
-
-      mpz_clear(d_m);
-   }
-
-   TEST_FUNCTION_END(state);
+    TEST_FUNCTION_END(state);
 }

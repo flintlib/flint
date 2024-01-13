@@ -14,32 +14,28 @@
 
 TEST_FUNCTION_START(n_factor_trial, state)
 {
-   int i, j, result;
+    slong ix, jx;
+    int result;
 
-   for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random numbers */
-   {
-      mp_limb_t n1, n2;
-      n_factor_t factors;
+    for (ix = 0; ix < 1000 * flint_test_multiplier(); ix++) /* Test random numbers */
+    {
+        ulong n1, n2;
+        n_factor_t factors;
 
-      n_factor_init(&factors);
+        n_factor_init(&factors);
 
-      n1 = n_randtest_not_zero(state);
-      n2 = n_factor_trial(&factors, n1, UWORD(10000));
+        n1 = n_randtest_not_zero(state);
+        n2 = n_factor_trial(&factors, n1, UWORD(10000));
 
-      for (j = 0; j < factors.num; j++)
-      {
-         n2 *= n_pow(factors.p[j], factors.exp[j]);
-      }
+        for (jx = 0; jx < factors.num; jx++)
+        {
+            n2 *= n_pow(factors.p[jx], factors.exp[jx]);
+        }
 
-      result = (n1 == n2);
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("n1 = %wu, n2 = %wu\n", n1, n2);
-         fflush(stdout);
-         flint_abort();
-      }
-   }
+        result = (n1 == n2);
+        if (!result)
+            TEST_FUNCTION_FAIL("n1 = %wu, n2 = %wu\n", n1, n2);
+    }
 
-   TEST_FUNCTION_END(state);
+    TEST_FUNCTION_END(state);
 }

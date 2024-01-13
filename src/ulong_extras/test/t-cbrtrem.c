@@ -38,14 +38,12 @@ TEST_FUNCTION_START(n_cbrtrem, state)
         result = ((a == i) && (b == j));
 
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("Passed Parameters : n = %wu", c);
-            flint_printf("Answer generated : base = %wu remainder = %wu", a, b);
-            flint_printf("Expected answer : base = %wu remainder = %wu", i, j);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Passed Parameters: n = %wu"
+                    "Answer generated: base = %wu remainder = %wu"
+                    "Expected answer: base = %wu remainder = %wu",
+                    c, a, b, i, j);
+
         mpz_clear(e);
         mpz_clear(f);
         mpz_clear(g);

@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2009 William Hart
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -10,64 +11,48 @@
 */
 
 #include "test_helpers.h"
-#include "gmpcompat.h"
 #include "ulong_extras.h"
 
 TEST_FUNCTION_START(n_is_oddprime_small, state)
 {
-   int i, result;
+    slong ix;
+    int result;
 
-   for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that primes pass the test */
-   {
-      mp_limb_t d;
-      mpz_t d_m;
+    for (ix = 0; ix < 10000 * flint_test_multiplier(); ix++)
+    {
+        ulong d;
+        int type;
 
-      mpz_init(d_m);
+        type = n_randint(state, 2);
 
-      do
-      {
-         d = n_randint(state, FLINT_ODDPRIME_SMALL_CUTOFF) | 1;
-         flint_mpz_set_ui(d_m, d);
-         mpz_nextprime(d_m, d_m);
-         d = flint_mpz_get_ui(d_m);
-      } while (d > FLINT_ODDPRIME_SMALL_CUTOFF);
+        if (type == 0)
+        {
+            /* Test that primes pass the test */
+            int bits = 2 + n_randint(state,
+                    FLINT_BIT_COUNT(FLINT_ODDPRIME_SMALL_CUTOFF - 1) - 1);
 
-      result = n_is_oddprime_small(d);
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("d = %wu is declared composite\n", d);
-         fflush(stdout);
-         flint_abort();
-      }
+            do
+                d = n_randprime(state, bits, 1);
+            while (d > FLINT_ODDPRIME_SMALL_CUTOFF);
 
-      mpz_clear(d_m);
-   }
+            result = n_is_oddprime_small(d);
+        }
+        else
+        {
+            /* Test that not too many composites pass */
+            do
+                d = n_randint(state, FLINT_ODDPRIME_SMALL_CUTOFF) | 1;
+            while (n_is_probabprime(d));
 
-   for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that not too many composites pass */
-   {
-      mp_limb_t d;
-      mpz_t d_m;
+            result = !n_is_oddprime_small(d);
+        }
 
-      mpz_init(d_m);
+        if (!result)
+            TEST_FUNCTION_FAIL(
+                    "type %d\n"
+                    "d = %wu\n",
+                    type, d);
+    }
 
-      do
-      {
-         d = n_randint(state, FLINT_ODDPRIME_SMALL_CUTOFF) | 1;
-         flint_mpz_set_ui(d_m, d);
-      } while ((mpz_probab_prime_p(d_m, 12)) || (d > FLINT_ODDPRIME_SMALL_CUTOFF));
-
-      result = !n_is_oddprime_small(d);
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("d = %wu is declared prime\n", d);
-         fflush(stdout);
-         flint_abort();
-      }
-
-      mpz_clear(d_m);
-   }
-
-   TEST_FUNCTION_END(state);
+    TEST_FUNCTION_END(state);
 }

@@ -30,13 +30,12 @@ TEST_FUNCTION_START(n_clog, state)
 
         result = (x < a && ((k > 0) ? ((a + b - 1) / b <= x) : (a <= 1)));
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("a = %wu\n", a);
-            flint_printf("b = %wu\n", b);
-            flint_printf("x = %wu\n", x);
-            flint_printf("k = %wu\n", k);
-        }
+            TEST_FUNCTION_FAIL(
+                    "a = %wu\n"
+                    "b = %wu\n"
+                    "x = %wu\n"
+                    "k = %wu\n",
+                    a, b, x, k);
     }
 
     TEST_FUNCTION_END(state);

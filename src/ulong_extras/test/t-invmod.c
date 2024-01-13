@@ -14,33 +14,29 @@
 
 TEST_FUNCTION_START(n_invmod, state)
 {
-   int i, result;
+    slong ix;
+    int result;
 
-   for (i = 0; i < 10000 * flint_test_multiplier(); i++)
-   {
-      mp_limb_t a, b, t, r, binv, ph, pl;
+    for (ix = 0; ix < 10000 * flint_test_multiplier(); ix++)
+    {
+        ulong a, b, t, r, binv, ph, pl;
 
-      do
-      {
-         a = n_randtest(state);
-         b = n_randtest(state);
-      } while ((a >= b) || (n_gcd(b, a) != UWORD(1)));
+        do
+        {
+            a = n_randtest(state);
+            b = n_randtest(state);
+        } while ((a >= b) || (n_gcd(b, a) != UWORD(1)));
 
-      t = n_invmod(a, b);
+        t = n_invmod(a, b);
 
-      binv = n_preinvert_limb(b);
-      umul_ppmm(ph, pl, t, a);
-      r = n_ll_mod_preinv(ph, pl, b, binv);
+        binv = n_preinvert_limb(b);
+        umul_ppmm(ph, pl, t, a);
+        r = n_ll_mod_preinv(ph, pl, b, binv);
 
-      result = (((r == UWORD(0)) && (b == UWORD(1))) || (r == UWORD(1)));
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("a = %wu, b = %wu, r = %wd\n", a, b, r);
-         fflush(stdout);
-         flint_abort();
-      }
-   }
+        result = ((r == UWORD(0) && b == UWORD(1)) || r == UWORD(1));
+        if (!result)
+            TEST_FUNCTION_FAIL("a = %wu, b = %wu, r = %wd\n", a, b, r);
+    }
 
-   TEST_FUNCTION_END(state);
+    TEST_FUNCTION_END(state);
 }

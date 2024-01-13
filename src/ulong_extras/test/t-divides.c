@@ -14,58 +14,48 @@
 
 TEST_FUNCTION_START(n_divides, state)
 {
-   int i, result;
+    int i, result;
 
-   /* test random values */
-   for (i = 0; i < 1000 * flint_test_multiplier(); i++)
-   {
-      mp_limb_t n, p, q;
-      int flag;
+    for (i = 0; i < 2000 * flint_test_multiplier(); i++)
+    {
+        mp_limb_t n, p, q;
+        int nbits, pbits;
+        int flag, type;
 
-      int nbits = n_randint(state, FLINT_BITS + 1);
-      int pbits = n_randint(state, FLINT_BITS + 1);
+        type = n_randint(state, 2);
+        pbits = n_randint(state, FLINT_BITS + 1);
 
-      n = n_randtest_bits(state, nbits);
-      p = n_randtest_bits(state, pbits);
+        if (type == 0)
+        {
+            /* test random values */
+            nbits = n_randint(state, FLINT_BITS + 1);
 
-      flag = n_divides(&q, n, p);
+            n = n_randtest_bits(state, nbits);
+            p = n_randtest_bits(state, pbits);
 
-      result = ((flag && ((p == 0 && n == 0) || p*q == n)) ||
-	       (!flag && q == 0 && ((p == 0 && n != 0) || p*q != n)));
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("n = %wu, p = %wu, q = %wu\n", n, p, q);
-         fflush(stdout);
-         flint_abort();
-      }
-   }
+            flag = n_divides(&q, n, p);
 
-   /* test known divisible values */
-   for (i = 0; i < 1000 * flint_test_multiplier(); i++)
-   {
-      mp_limb_t n, p, q, s;
-      int flag;
+            result = ((flag && ((p == 0 && n == 0) || p*q == n)) ||
+                    (!flag && q == 0 && ((p == 0 && n != 0) || p*q != n)));
+        }
+        else
+        {
+            /* test known divisible values */
+            ulong s;
+            int sbits = n_randint(state, FLINT_BITS - pbits + 1);
 
-      int pbits = n_randint(state, FLINT_BITS + 1);
-      int sbits = n_randint(state, FLINT_BITS - pbits + 1);
+            p = n_randtest_bits(state, pbits);
+            s = n_randtest_bits(state, sbits);
 
-      p = n_randtest_bits(state, pbits);
-      s = n_randtest_bits(state, sbits);
+            n = p * s;
 
-      n = p*s;
+            flag = n_divides(&q, n, p);
+            result = (flag && ((p == 0 && n == 0) || p*q == n));
+        }
 
-      flag = n_divides(&q, n, p);
-
-      result = (flag && ((p == 0 && n == 0) || p*q == n));
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("n = %wu, p = %wu, q = %wu\n", n, p, q);
-         fflush(stdout);
-         flint_abort();
-      }
-   }
+        if (!result)
+            TEST_FUNCTION_FAIL("n = %wu, p = %wu, q = %wu\n", n, p, q);
+    }
 
     TEST_FUNCTION_END(state);
 }

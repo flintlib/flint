@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2009 William Hart
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -14,86 +15,60 @@
 
 TEST_FUNCTION_START(n_factor_power235, state)
 {
-   int i, result;
+    slong ix;
+    int result;
 
-   for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random squares */
-   {
-      mp_limb_t factor, exp, n1, n2, bits;
+    for (ix = 0; ix < 3000 * flint_test_multiplier(); ix++)
+    {
+        ulong factor, exp, n1, n2, n1pow;
+        int bits, type;
 
-      bits = n_randint(state, FLINT_BITS/2) + 1;
-      n1 = n_randtest_bits(state, bits);
-      factor = n_factor_power235(&exp, n1*n1);
+        type = n_randint(state, 4);
 
-      n2 = n_pow(factor, exp);
+        if (type == 0)
+        {
+            /* Test random squares */
+            bits = n_randint(state, FLINT_BITS / 2) + 1;
+            n1 = n_randtest_bits(state, bits);
+            n1pow = n1 * n1;
+        }
+        else if (type == 1)
+        {
+            /* Test random cubes */
+            bits = n_randint(state, FLINT_BITS / 3) + 1;
+            n1 = n_randtest_bits(state, bits);
+            n1pow = n1 * n1 * n1;
+        }
+        else if (type == 2)
+        {
+            /* Test random fifth powers */
+            bits = n_randint(state, FLINT_BITS / 5) + 1;
+            n1 = n_randtest_bits(state, bits);
+            n1pow = n1 * n1 * n1 * n1 * n1;
+        }
+        else
+        {
+            /* Test non 235-powers */
+            do
+                n1 = n_randtest(state);
+            while (n_is_perfect_power235(n1));
 
-      result = (n1*n1 == n2);
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("factor = %wu, exp = %wu\n", factor, exp);
-         fflush(stdout);
-         flint_abort();
-      }
-   }
+            result = (!n_factor_power235(&exp, n1));
+        }
 
-   for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random cubes */
-   {
-      mp_limb_t factor, exp, n1, n2, bits;
+        if (type < 3)
+        {
+            factor = n_factor_power235(&exp, n1pow);
+            n2 = n_pow(factor, exp);
+            result = (n1pow == n2);
+        }
 
-      bits = n_randint(state, FLINT_BITS/3) + 1;
-      n1 = n_randtest_bits(state, bits);
-      factor = n_factor_power235(&exp, n1*n1*n1);
+        if (!result)
+            TEST_FUNCTION_FAIL(
+                    "type %d\n"
+                    "n1 = %wu, exp = %wu\n",
+                    type, n1, exp);
+    }
 
-      n2 = n_pow(factor, exp);
-
-      result = (n1*n1*n1 == n2);
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("factor = %wu, exp = %wu\n", factor, exp);
-         fflush(stdout);
-         flint_abort();
-      }
-   }
-
-   for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random fifth powers */
-   {
-      mp_limb_t factor, exp, n1, n2, bits;
-
-      bits = n_randint(state, FLINT_BITS/5) + 1;
-      n1 = n_randtest_bits(state, bits);
-      factor = n_factor_power235(&exp, n1*n1*n1*n1*n1);
-
-      n2 = n_pow(factor, exp);
-
-      result = (n1*n1*n1*n1*n1 == n2);
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("factor = %wu, exp = %wu\n", factor, exp);
-         fflush(stdout);
-         flint_abort();
-      }
-   }
-
-   for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test non 235-powers */
-   {
-      mp_limb_t exp, n1;
-
-      do
-      {
-         n1 = n_randtest(state);
-      } while (n_is_perfect_power235(n1));
-
-      result = (!n_factor_power235(&exp, n1));
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("n1 = %wu, exp = %wu\n", n1, exp);
-         fflush(stdout);
-         flint_abort();
-      }
-   }
-
-   TEST_FUNCTION_END(state);
+    TEST_FUNCTION_END(state);
 }

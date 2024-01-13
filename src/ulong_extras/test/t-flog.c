@@ -14,11 +14,12 @@
 
 TEST_FUNCTION_START(n_flog, state)
 {
-    int i, result;
+    slong ix;
+    int result;
 
-    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
+    for (ix = 0; ix < 10000 * flint_test_multiplier(); ix++)
     {
-        mp_limb_t a = 0, b = 0, k, x;
+        ulong a = 0, b = 0, k, x;
 
         while (a < 1)
             a = n_randtest(state);
@@ -30,13 +31,12 @@ TEST_FUNCTION_START(n_flog, state)
 
         result = (x <= a && a / b < x);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("a = %wu\n", a);
-            flint_printf("b = %wu\n", b);
-            flint_printf("x = %wu\n", x);
-            flint_printf("k = %wu\n", k);
-        }
+            TEST_FUNCTION_FAIL(
+                    "a = %wu\n"
+                    "b = %wu\n"
+                    "x = %wu\n"
+                    "k = %wu\n",
+                    a, b, x, k);
     }
 
     TEST_FUNCTION_END(state);

@@ -35,14 +35,11 @@ TEST_FUNCTION_START(n_factor_ecm, state)
                 {
                     mod = prod % f;
                     if ((mod != 0) || (f == prod) || (f == 1))
-                    {
-                        flint_printf("WRONG ANSWER from stage %d\n", result);
-                        flint_printf("Number : %wu = %wu * %wu\n", prod, prime1, prime2);
-                        flint_printf("Factor found : %wu", f);
-                        flint_printf("Aborting");
-                        fflush(stdout);
-                        flint_abort();
-                    }
+                        TEST_FUNCTION_FAIL(
+                                "Wrong answer from stage %d\n"
+                                "Number: %wu = %wu * %wu\n"
+                                "Factor found: %wu\n",
+                                result, prod, prime1, prime2, f);
                 }
                 else
                     fails += 1;
@@ -50,13 +47,8 @@ TEST_FUNCTION_START(n_factor_ecm, state)
         }
     }
 
-    if (fails > 2*flint_test_multiplier())
-    {
-        flint_printf("Too many unsuccessful factorizations, %d\n", fails);
-        flint_printf("Aborting\n");
-        fflush(stdout);
-        flint_abort();
-    }
+    if (fails > 2 * flint_test_multiplier())
+        TEST_FUNCTION_FAIL("Too many unsuccessful factorizations, %d\n", fails);
 
     TEST_FUNCTION_END(state);
 }

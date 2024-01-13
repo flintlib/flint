@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -14,20 +15,27 @@
 
 TEST_FUNCTION_START(n_euler_phi, state)
 {
-    int n, k, t;
+    slong ix;
+    int result;
 
-    for (n = 0; n < 20 * flint_test_multiplier(); n++)
+    for (ix = 0; ix < 100 * flint_test_multiplier(); ix++)
     {
-        t = 0;
-        for (k = 1; k <= n; k++)
-            t += (n_gcd(n, k) == 1);
-        if (t != n_euler_phi(n))
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("phi(%d) = %d, got %wu\n", n, t, n_euler_phi(n));
-            fflush(stdout);
-            flint_abort();
-        }
+        ulong nx, kx;
+        ulong r1, r2;
+
+        nx = n_randbits(state, n_randint(state, 18));
+        r1 = 0;
+
+        for (kx = 1; kx <= nx; kx++)
+            r1 += (n_gcd(nx, kx) == 1);
+
+        r2 = n_euler_phi(nx);
+
+        result = (r1 == r2);
+        if (!result)
+            TEST_FUNCTION_FAIL(
+                    "phi(%wu) = %wu, got %wu\n",
+                    nx, r1, r2);
     }
 
     TEST_FUNCTION_END(state);

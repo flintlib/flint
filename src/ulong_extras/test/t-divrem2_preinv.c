@@ -31,14 +31,11 @@ TEST_FUNCTION_START(n_divrem2_preinv, state)
 
         result = (q1 == q2 && r1 == r2);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("n = %wu, d = %wu, dinv = %wu\n", n, d, dinv);
-            flint_printf("q1 = %wu, q2 = %wu\n", q1, q2);
-            flint_printf("r1 = %wu, r2 = %wu\n", r1, r2);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "n = %wu, d = %wu, dinv = %wu\n"
+                    "q1 = %wu, q2 = %wu\n"
+                    "r1 = %wu, r2 = %wu\n",
+                    n, d, dinv, q1, q2, r1, r2);
     }
 
     TEST_FUNCTION_END(state);
