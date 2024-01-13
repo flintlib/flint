@@ -14,8 +14,8 @@ Jean Kieffer (JK).
 
 * Features
 
-  * New module ``acb_theta`` for computing Riemann theta functions in any
-    characteristic (JK).
+  * New module ``acb_theta`` for computing complex Riemann theta functions
+    with characteristics in any dimension (JK).
   * ``flint_printf`` and related functions now supports printing common FLINT
     types, e.g. using the format string ``%{fmpz}`` for ``fmpz_t`` (AA).
   * Primality testing for Gaussian integers (``fmpzi_is_prime``,
