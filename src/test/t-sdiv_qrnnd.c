@@ -42,32 +42,28 @@ TEST_FUNCTION_START(sdiv_qrnnd, state)
 
         /* check n = q*d + r */
         if (ph != nh || pl != nl)
-        {
-            flint_printf("FAIL: check identity\n");
-            flint_printf("nh = %wd, nl = %wd\n", nh, nl);
-            flint_printf("d = %wd\n", d);
-            flint_printf("q = %wd\n", q);
-            flint_printf("r = %wd\n", r);
-            flint_printf("ph = %wu, pl = %wu\n", ph, pl);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Check n = q * d + r failed\n"
+                    "nh = %wd, nl = %wd\n"
+                    "d = %wd\n"
+                    "q = %wd\n"
+                    "r = %wd\n"
+                    "ph = %wu, pl = %wu\n",
+                    nh, nl, d, q, r, ph, pl);
 
         /* check rounding of q was towards zero */
         if ((nsgn >= 0 && d > 0 && !(0 <= r && r < d)) ||
             (nsgn >= 0 && d < 0 && WORD_MAX + d >= 0 && !(0 <= r && r < -d)) ||
             (nsgn < 0 && d > 0 && WORD_MIN + d <= 0 && !(-d < r && r <= 0)) ||
             (nsgn < 0 && d < 0 && !(d < r && r <= 0)))
-        {
-            flint_printf("FAIL: check remainder\n");
-            flint_printf("nsgn: %d\n", nsgn);
-            flint_printf("nh = %wd, nl = %wd\n", nh, nl);
-            flint_printf("d = %wd\n", d);
-            flint_printf("q = %wd\n", q);
-            flint_printf("r = %wd\n", r);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Remainder check failed\n"
+                    "nsgn = %d\n"
+                    "nh = %wd, nl = %wd\n"
+                    "d = %wd\n"
+                    "q = %wd\n"
+                    "r = %wd\n",
+                    nsgn, nh, nl, d, q, r);
     }
 
     TEST_FUNCTION_END(state);

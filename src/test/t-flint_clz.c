@@ -14,27 +14,22 @@
 
 TEST_FUNCTION_START(flint_clz, state)
 {
-   int i, result;
+    int i, result;
 
-   for (i = 0; i < 100000 * flint_test_multiplier(); i++)
-   {
-      mp_limb_t n;
-      unsigned int count = 0;
+    for (i = 0; i < 100000 * flint_test_multiplier(); i++)
+    {
+        mp_limb_t n;
+        unsigned int count = 0;
 
-      n = n_randtest(state);
+        n = n_randtest(state);
 
-      if (n != 0)
-         count = flint_clz(n);
+        if (n != 0)
+            count = flint_clz(n);
 
-      result = ((n == UWORD(0)) || (((slong)(n << count) < WORD(0)) && (r_shift(n, FLINT_BITS-count) == UWORD(0))));
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("n = %wu, count = %u\n", n, count);
-         fflush(stdout);
-         flint_abort();
-      }
-   }
+        result = ((n == UWORD(0)) || (((slong)(n << count) < WORD(0)) && (r_shift(n, FLINT_BITS-count) == UWORD(0))));
+        if (!result)
+            TEST_FUNCTION_FAIL("n = %wu, count = %u\n", n, count);
+    }
 
-   TEST_FUNCTION_END(state);
+    TEST_FUNCTION_END(state);
 }

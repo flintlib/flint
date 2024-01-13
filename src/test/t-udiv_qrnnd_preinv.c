@@ -14,36 +14,33 @@
 
 TEST_FUNCTION_START(udiv_qrnnd_preinv, state)
 {
-   int i, result;
+    int i, result;
 
-   for (i = 0; i < 100000 * flint_test_multiplier(); i++)
-   {
-      mp_limb_t d, dinv, nh, nl, q1, r1, q2, r2, norm;
+    for (i = 0; i < 100000 * flint_test_multiplier(); i++)
+    {
+        mp_limb_t d, dinv, nh, nl, q1, r1, q2, r2, norm;
 
-      do
-      {
-         d = n_randtest_not_zero(state);
-         nh = n_randtest(state);
-         norm = flint_clz(d);
-         d <<= norm;
-      } while (nh >= d);
-      nl = n_randtest(state);
+        do
+        {
+            d = n_randtest_not_zero(state);
+            nh = n_randtest(state);
+            norm = flint_clz(d);
+            d <<= norm;
+        } while (nh >= d);
+        nl = n_randtest(state);
 
-      dinv = n_preinvert_limb_prenorm(d);
+        dinv = n_preinvert_limb_prenorm(d);
 
-      udiv_qrnnd_preinv(q1, r1, nh, nl, d, dinv);
-      udiv_qrnnd(q2, r2, nh, nl, d);
+        udiv_qrnnd_preinv(q1, r1, nh, nl, d, dinv);
+        udiv_qrnnd(q2, r2, nh, nl, d);
 
-      result = ((q1 == q2) && (r1 == r2));
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("nh = %wu, nl = %wu, d = %wu, dinv = %wu\n", nh, nl, d, dinv);
-         flint_printf("q1 = %wu, q2 = %wu, r1 = %wu, r2 = %wu\n", q1, q2, r1, r2);
-         fflush(stdout);
-         flint_abort();
-      }
-   }
+        result = ((q1 == q2) && (r1 == r2));
+        if (!result)
+            TEST_FUNCTION_FAIL(
+                    "nh = %wu, nl = %wu, d = %wu, dinv = %wu\n"
+                    "q1 = %wu, q2 = %wu, r1 = %wu, r2 = %wu\n",
+                    nh, nl, d, dinv, q1, q2, r1, r2);
+    }
 
-   TEST_FUNCTION_END(state);
+    TEST_FUNCTION_END(state);
 }

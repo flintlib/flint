@@ -35,15 +35,15 @@ TEST_FUNCTION_START(add_sssaaaaaa, state)
 
         result = ((s[2] == t[2]) && (s[1] == t[1]) && (s[0] == t[0]));
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("a[2] = %wu, a[1] = %wu, a[0] = %wu\n", a[2], a[1], a[0]);
-            flint_printf("b[2] = %wu, b[1] = %wu, b[0] = %wu\n", b[2], b[1], b[0]);
-            flint_printf("s[2] = %wu, s[1] = %wu, s[0] = %wu\n", s[2], s[1], s[0]);
-            flint_printf("t[2] = %wu, t[1] = %wu, t[0] = %wu\n", t[2], t[1], t[0]);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "a[2] = %wu, a[1] = %wu, a[0] = %wu\n"
+                    "b[2] = %wu, b[1] = %wu, b[0] = %wu\n"
+                    "s[2] = %wu, s[1] = %wu, s[0] = %wu\n"
+                    "t[2] = %wu, t[1] = %wu, t[0] = %wu\n",
+                    a[2], a[1], a[0],
+                    b[2], b[1], b[0],
+                    s[2], s[1], s[0],
+                    t[2], t[1], t[0]);
     }
 
     TEST_FUNCTION_END(state);
