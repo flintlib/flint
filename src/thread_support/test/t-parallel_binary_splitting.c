@@ -116,11 +116,9 @@ TEST_FUNCTION_START(thread_support_parallel_binary_splitting, state)
             fmpz_mul_ui(s, s, factors[i]);
 
         if (!fmpz_equal(r, s))
-        {
-            flint_printf("FAIL\n");
-            flint_printf("num_threads = %wd, i = %wd/%wd\n", flint_get_num_threads(), i, n);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "num_threads = %wd, i = %wd/%wd\n",
+                    flint_get_num_threads(), i, n);
 
         flint_free(factors);
         fmpz_clear(r);

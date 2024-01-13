@@ -54,11 +54,9 @@ TEST_FUNCTION_START(thread_support_parallel_do, state)
         for (i = 0; i < n; i++)
         {
             if (resx[i] != resy[i] || resx[i] != i * i)
-            {
-                flint_printf("FAIL\n");
-                flint_printf("num_threads = %wd, i = %wd/%wd\n", flint_get_num_threads(), i, n);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL(
+                        "num_threads = %wd, i = %wd/%wd\n",
+                        flint_get_num_threads(), i, n);
         }
 
         flint_free(resx);
