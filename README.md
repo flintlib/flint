@@ -50,12 +50,14 @@ on how to build FLINT.
 
 FLINT was started in 2007 by [David Harvey](https://web.maths.unsw.edu.au/~davidharvey/)
 and [William Hart](https://www.dpmms.cam.ac.uk/person/wh369).
-Later maintenance of the library was taken over solely by
-William Hart. Since 2022, FLINT is maintained by
-[Fredrik Johansson](https://fredrikj.net/).
+Maintenance was later taken over solely by William Hart who remained
+in charge of the project until 2022. A large number of authors have contributed to FLINT
+over the years; for a complete list, see https://flintlib.org/authors.html or the AUTHORS file.
 
-A large number of authors have contributed to FLINT.
-For a complete list, see: https://flintlib.org/authors.html
+The current maintainers are:
+
+* [Fredrik Johansson](https://fredrikj.net/) (fredrik.johansson@gmail.com) (project leader since 2022)
+* [Albin Ahlbäck](https://albinahlback.gitlab.io/) (albin.ahlback@gmail.com)
 
 ## License
 
