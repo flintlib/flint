@@ -141,6 +141,7 @@ int TEMPLATE5(test, T, label1, T, label2)(void)         \
 #define TEST_FUNCTION_FAIL(...)                         \
 do                                                      \
 {                                                       \
+    _end_time_ = clock();                               \
     if (_label_len_ < 48)                               \
         printf("%.48s%6.2f   (" _RED_B "FAIL" _RESET ")\n", \
                 _test_io_string_,                       \
