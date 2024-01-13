@@ -256,7 +256,7 @@ Vladimir Glazachev
 
   grants   Google Summer of Code 2015
 
-Dan Roche
+Daniel Roche
 
   Contributed randprime and nextprime functions for the fmpz
   module and some minpoly code.
@@ -530,7 +530,6 @@ John Palmieri
 Dima Pasechnik
 Julien Puydt
 Josh Rickmar
-Daniel Roche
 Erico Rolim Noguerira
 Julian Ruth
 Mahrud Sayrafi
@@ -539,7 +538,7 @@ Frithjof Schulze
 Marcello Seri
 Victor Shoup
 Tomás Oliveira e Silva
-Alexander Smirnov/
+Alexander Smirnov
 Bob Smith
 Ahmed Soliman
 Jaap Spies
