@@ -19,8 +19,8 @@ fields, p-adics).
 It includes some higher-level functionality for
 algebraic and analytic number theory.
 
-FLINT 2.0, released in 2011 was a complete rewrite of FLINT 1.x from scratch.
-FLINT 3, currently in development, incorporates
+FLINT 2, released in 2011 was a complete rewrite of FLINT 1.x from scratch.
+FLINT 3, released in 2023, incorporates
 the [Arb](https://arblib.org/), [Antic](https://github.com/flintlib/antic),
 [Calcium](https://fredrikj.net/calcium/)
 and [Generic-Rings](https://github.com/fredrik-johansson/generic-rings)
@@ -29,6 +29,22 @@ libraries, formerly developed separately.
 ## Documentation
 
 FLINT's online documentation: https://flintlib.org/doc/
+
+## Building from source
+
+This example assumes that [GMP](https://gmplib.org/), [MPFR](https://www.mpfr.org/)
+and the [GNU build system](https://www.gnu.org/software/automake/manual/html_node/GNU-Build-System.html)
+are already installed. See FLINT's documentation for further instructions
+on how to build FLINT.
+
+    git clone https://github.com/flintlib/flint.git && cd flint
+    ./bootstrap.sh
+    ./configure --disable-static       # ./configure --help for more options
+    make
+    make check                         # optional
+    make install                       # optional
+    make examples                      # optional
+    cd doc && make html && cd ..       # optional: documentation
 
 ## Authors
 
