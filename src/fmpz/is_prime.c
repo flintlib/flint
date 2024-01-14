@@ -16,7 +16,7 @@
 #include "aprcl.h"
 #include "mpn_extras.h"
 
-int fmpz_is_prime(const fmpz_t n)
+int _fmpz_is_prime(const fmpz_t n, int proved)
 {
    double logd;
    ulong p, ppi, limit;
@@ -28,21 +28,48 @@ int fmpz_is_prime(const fmpz_t n)
    fmpz_t F1, Fsqr, Fcub, R, t;
    int res = -1;
 
-   if (fmpz_cmp_ui(n, 1) <= 0)
-      return 0;
+    if (!COEFF_IS_MPZ(*n))
+    {
+       slong v = *n;
+       if (v <= 1)
+           return 0;
 
-   if (fmpz_abs_fits_ui(n))
-      return n_is_prime(fmpz_get_ui(n));
+       /* Note: we want n_is_prime rather than n_is_probabprime
+          even when proved == 0, because ns_is_prime handles general
+          input faster. */
+       return n_is_prime(v);
+   }
+   else
+   {
+      __mpz_struct * z;
+      mp_ptr d;
+      slong size, bits, trial_primes;
 
-   if (fmpz_is_even(n))
-      return 0;
+      z = COEFF_TO_PTR(*n);
+      size = z->_mp_size;
+      d = z->_mp_d;
 
-   if (flint_mpn_factor_trial(COEFF_TO_PTR(*n)->_mp_d, COEFF_TO_PTR(*n)->_mp_size, 1, fmpz_bits(n)))
-        return 0;
+      if (size < 0)
+          return 0;
+      if (size == 1)
+          return n_is_prime(d[0]);   /* As above */
+
+      if (d[0] % 2 == 0)
+          return 0;
+
+      bits = size * FLINT_BITS + FLINT_BIT_COUNT(d[size-1]);
+      trial_primes = bits;
+
+      if (flint_mpn_factor_trial(d, size, 1, trial_primes))
+           return 0;
+    }
 
    /* todo: use fmpz_is_perfect_power? */
    if (fmpz_is_square(n))
       return 0;
+
+   if (!proved)
+      return fmpz_is_probabprime_BPSW(n);
 
    /* Fast deterministic Miller-Rabin test up to about 81 bits. This choice of
       bases certifies primality for n < 3317044064679887385961981;
@@ -293,4 +320,16 @@ int fmpz_is_prime(const fmpz_t n)
    fmpz_clear(Fcub);
 
    return res;
+}
+
+int
+fmpz_is_probabprime(const fmpz_t n)
+{
+    return _fmpz_is_prime(n, 0);
+}
+
+int
+fmpz_is_prime(const fmpz_t n)
+{
+    return _fmpz_is_prime(n, 1);
 }
