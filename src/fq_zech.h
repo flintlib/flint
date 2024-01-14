@@ -66,8 +66,6 @@ ulong fq_zech_ctx_prime(const fq_zech_ctx_t ctx)
     return ctx->fq_nmod_ctx->mod.n;
 }
 
-void fq_zech_ctx_order(fmpz_t f, const fq_zech_ctx_t ctx);
-
 FQ_ZECH_INLINE
 ulong fq_zech_ctx_order_ui(const fq_zech_ctx_t ctx)
 {
@@ -285,6 +283,8 @@ void fq_zech_ctx_init(fq_zech_ctx_t, fmpz_t, slong, const char *);
 int _fq_zech_ctx_init_conway(fq_zech_ctx_t, fmpz_t, slong, const char *);
 void fq_zech_ctx_init_conway(fq_zech_ctx_t, fmpz_t, slong, const char *);
 void fq_zech_ctx_init_random(fq_zech_ctx_t, fmpz_t, slong, const char *);
+
+void fq_zech_ctx_order(fmpz_t, const fq_zech_ctx_t);
 
 #ifdef T
 #undef T
