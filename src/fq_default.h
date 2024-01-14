@@ -214,7 +214,7 @@ FQ_DEFAULT_INLINE void fq_default_ctx_order(fmpz_t f,
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_ctx_order(f, ctx->ctx.fq_zech);
+        fmpz_set_ui(f, fq_zech_ctx_order_ui(ctx->ctx.fq_zech));
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {

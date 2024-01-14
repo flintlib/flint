@@ -260,9 +260,9 @@ _gr_ctx_fq_zech_degree(slong * deg, gr_ctx_t ctx)
 }
 
 int
-_gr_ctx_fq_zech_order(fmpz_t q, gr_ctx_t ctx)
+_gr_ctx_fq_zech_order(ulong * q, gr_ctx_t ctx)
 {
-    fq_zech_ctx_order(q, FQ_CTX(ctx));
+    *q = fq_zech_ctx_order_ui(FQ_CTX(ctx));
     return GR_SUCCESS;
 }
 
