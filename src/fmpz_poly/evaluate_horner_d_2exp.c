@@ -36,7 +36,7 @@ dpe_t;
         (x).e += _e; \
     } while (0)
 
-static dpe_t dpe_set_d_exp(double x, slong e)
+FLINT_FORCE_INLINE dpe_t dpe_set_d_exp(double x, slong e)
 {
     dpe_t res;
     res.m = x;
@@ -45,14 +45,14 @@ static dpe_t dpe_set_d_exp(double x, slong e)
     return res;
 }
 
-static dpe_t dpe_set_fmpz(const fmpz_t x)
+FLINT_FORCE_INLINE dpe_t dpe_set_fmpz(const fmpz_t x)
 {
     dpe_t res;
     res.m = fmpz_get_d_2exp(&res.e, x);
     return res;
 }
 
-static dpe_t
+FLINT_FORCE_INLINE dpe_t
 dpe_add(dpe_t x, dpe_t y)
 {
     dpe_t res;
@@ -90,7 +90,7 @@ dpe_add(dpe_t x, dpe_t y)
     return res;
 }
 
-static dpe_t
+FLINT_FORCE_INLINE dpe_t
 dpe_mul(dpe_t x, dpe_t y)
 {
     dpe_t res;
@@ -102,24 +102,30 @@ dpe_mul(dpe_t x, dpe_t y)
     return res;
 }
 
-double _fmpz_poly_evaluate_horner_d_2exp2(slong * exp, const fmpz * poly, slong n, double d, slong dexp)
+double _fmpz_poly_evaluate_horner_d_2exp2_precomp(slong * exp, const double * poly, const slong * poly_exp, slong n, double d, slong dexp)
 {
     dpe_t s, t, x;
     slong i;
 
     if (d == 0.0)
-        return fmpz_get_d_2exp(exp, poly + 0);
+    {
+        *exp = poly_exp[0];
+        return poly[0];
+    }
 
     x = dpe_set_d_exp(d, dexp);
-    s = dpe_set_fmpz(poly + n - 1);
+
+    s.m = poly[n - 1];
+    s.e = poly_exp[n - 1];
 
     for (i = n - 2; i >= 0; i--)
     {
         s = dpe_mul(s, x);
 
-        if (!fmpz_is_zero(poly + i))
+        if (poly[i] != 0.0)
         {
-            t = dpe_set_fmpz(poly + i);
+            t.m = poly[i];
+            t.e = poly_exp[i];
             s = dpe_add(s, t);
         }
 
@@ -132,6 +138,34 @@ double _fmpz_poly_evaluate_horner_d_2exp2(slong * exp, const fmpz * poly, slong 
 
     *exp = s.e;
     return s.m;
+}
+
+double _fmpz_poly_evaluate_horner_d_2exp2(slong * exp, const fmpz * poly, slong n, double d, slong dexp)
+{
+    double * p;
+    slong * p_exp;
+    slong i;
+    double v;
+    TMP_INIT;
+
+    if (d == 0.0)
+        return fmpz_get_d_2exp(exp, poly + 0);
+
+    TMP_START;
+
+    p = TMP_ALLOC(n * sizeof(double));
+    p_exp = TMP_ALLOC(n * sizeof(slong));
+
+    for (i = 0; i < n; i++)
+    {
+        p[i] = fmpz_get_d_2exp(&p_exp[i], poly + i);
+    }
+
+    v = _fmpz_poly_evaluate_horner_d_2exp2_precomp(exp, p, p_exp, n, d, dexp);
+
+    TMP_END;
+
+    return v;
 }
 
 double _fmpz_poly_evaluate_horner_d_2exp(slong * exp, const fmpz * poly, slong n, double d)
