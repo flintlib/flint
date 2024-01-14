@@ -107,6 +107,29 @@ def arb_bench():
             time = float(line.split()[-1])
     add_result(["arb", "class_poly -1000000"], time)
 
+def fmpz_bench():
+    s = run("build/fmpz/profile/p-is_prime_bench")
+    for line in s.splitlines():
+        if "cpu/wall(s):" in line:
+            size = " ".join(line.split()[:3])
+            time = float(line.split()[-1])
+            add_result(["fmpz", "is_prime", size], time)
+
+    s = run("build/fmpz/profile/p-is_probabprime_bench")
+    for line in s.splitlines():
+        if "cpu/wall(s):" in line:
+            size = " ".join(line.split()[:3])
+            time = float(line.split()[-1])
+            add_result(["fmpz", "is_probabprime", size], time)
+
+    s = run("build/fmpz_factor/profile/p-factor_bench")
+    for line in s.splitlines():
+        if "cpu/wall(s):" in line:
+            size = " ".join(line.split()[:3])
+            time = float(line.split()[-1])
+            add_result(["fmpz", "factor", size], time)
+
+
 
 def fmpz_poly_bench():
     s = run("build/fmpz_poly_factor/profile/p-factor_hard")
@@ -142,6 +165,7 @@ def calcium_bench():
             time = float(line.split()[-1])
             add_result(["calcium", "huge_expr"], time)
 
+fmpz_bench()
 fmpz_poly_bench()
 nmod_mpoly_bench()
 fmpz_mpoly_bench()
