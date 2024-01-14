@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2010, 2016, 2020 William Hart
     Copyright (C) 2010 Andy Novocin
+    Copyright (C) 2024 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -15,10 +16,11 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
+#include "double_extras.h"
 
 #define CLD_EPS 0.00000001
 
-static double _log2(double n)
+FLINT_FORCE_INLINE double _log2(double n)
 {
     return log(n)/log(2);
 }
@@ -64,6 +66,10 @@ static int _d_cmp_2exp(double a, slong a_exp, double b, slong b_exp)
    }
 }
 
+double _fmpz_poly_evaluate_horner_d_2exp2_precomp(slong * exp, const double * poly,
+    const slong * poly_exp, slong n, double d, slong dexp);
+
+
 void fmpz_poly_CLD_bound(fmpz_t res, const fmpz_poly_t f, slong n)
 {
    /*
@@ -102,6 +108,9 @@ void fmpz_poly_CLD_bound(fmpz_t res, const fmpz_poly_t f, slong n)
    slong hi_exp = 0, lo_exp = 0;
    slong rbits, max_exp, rexp = 0;
    int too_much = 0;
+   double * hi_d, * hi_d_m, * lo_d, * lo_d_m;
+   slong * hi_d_exp, * lo_d_exp;
+   slong i;
 
    fmpz_poly_init(lo);
    fmpz_poly_init(hi);
@@ -114,6 +123,25 @@ void fmpz_poly_CLD_bound(fmpz_t res, const fmpz_poly_t f, slong n)
    fmpz_poly_shift_right(hi, f, n + 1);
    fmpz_poly_scalar_abs(hi, hi);
 
+   lo_d = flint_malloc(sizeof(double) * (2 * lo->length + 2 * hi->length));
+   lo_d_m = lo_d + lo->length;
+   hi_d = lo_d_m + lo->length;
+   hi_d_m = hi_d + hi->length;
+   lo_d_exp = flint_malloc(sizeof(slong) * (lo->length + hi->length));
+   hi_d_exp = lo_d_exp + lo->length;
+
+   for (i = 0; i < lo->length; i++)
+   {
+      lo_d[i] = fmpz_get_d(lo->coeffs + i);
+      lo_d_m[i] = fmpz_get_d_2exp(lo_d_exp + i, lo->coeffs + i);
+   }
+
+   for (i = 0; i < hi->length; i++)
+   {
+      hi_d[i] = fmpz_get_d(hi->coeffs + i);
+      hi_d_m[i] = fmpz_get_d_2exp(hi_d_exp + i, hi->coeffs + i);
+   }
+
    /* refine guess */
    while (1)
    {
@@ -125,20 +153,20 @@ void fmpz_poly_CLD_bound(fmpz_t res, const fmpz_poly_t f, slong n)
       {
          /* r is really 2^rpow * 2^rexp */
          double r = pow(2.0, rpow);
-         hi_eval = fmpz_poly_evaluate_horner_d_2exp2(&hi_exp, hi, r, rexp);
-         lo_eval = fmpz_poly_evaluate_horner_d_2exp2(&lo_exp, lo, 1/r, -rexp);
+         hi_eval = _fmpz_poly_evaluate_horner_d_2exp2_precomp(&hi_exp, hi_d_m, hi_d_exp, hi->length, r, rexp);
+         lo_eval = _fmpz_poly_evaluate_horner_d_2exp2_precomp(&lo_exp, lo_d_m, lo_d_exp, lo->length, 1/r, -rexp);
       }  /* if max exponent may overwhelm a double (with safety margin) */
       else if (max_exp > 950 || too_much) /* result of eval has large exponent */
       {
          double r = pow(2.0, rpow);
-         hi_eval = fmpz_poly_evaluate_horner_d_2exp(&hi_exp, hi, r);
-         lo_eval = fmpz_poly_evaluate_horner_d_2exp(&lo_exp, lo, 1/r);
+         hi_eval = _fmpz_poly_evaluate_horner_d_2exp2_precomp(&hi_exp, hi_d_m, hi_d_exp, hi->length, r, 0.0);
+         lo_eval = _fmpz_poly_evaluate_horner_d_2exp2_precomp(&lo_exp, lo_d_m, lo_d_exp, lo->length, 1/r, 0.0);
       }
       else /* everything can be handled with doubles */
       {
          double r = pow(2.0, rpow);
-         hi_eval = fmpz_poly_evaluate_horner_d(hi, r);
-         lo_eval = fmpz_poly_evaluate_horner_d(lo, 1/r);
+         hi_eval = d_polyval(hi_d, hi->length, r);
+         lo_eval = d_polyval(lo_d, lo->length, 1/r);
          hi_exp = lo_exp = 0;
       }
 
@@ -243,6 +271,8 @@ void fmpz_poly_CLD_bound(fmpz_t res, const fmpz_poly_t f, slong n)
 
 cleanup:
 
+   flint_free(lo_d);
+   flint_free(lo_d_exp);
    fmpz_poly_clear(lo);
    fmpz_poly_clear(hi);
 }
