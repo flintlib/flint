@@ -28,12 +28,7 @@ TEST_FUNCTION_START(flint_ctz, state)
 
       result = ((n == UWORD(0)) || (((n >> count) & UWORD(1)) && (l_shift(n, FLINT_BITS-count) == UWORD(0))));
       if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("n = %wu, count = %u\n", n, count);
-         fflush(stdout);
-         flint_abort();
-      }
+            TEST_FUNCTION_FAIL("n = %wu, count = %u\n", n, count);
    }
 
    TEST_FUNCTION_END(state);

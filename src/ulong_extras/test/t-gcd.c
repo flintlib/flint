@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2009, 2015 William Hart
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -16,89 +17,66 @@ TEST_FUNCTION_START(n_gcd, state)
 {
     int i, result;
 
-    /* test gcd(ac, bc) == gcd(a, b) */
+    if (n_gcd(0, 0) != 0)
+        TEST_FUNCTION_FAIL("gcd(0, 0) != 0\n");
+
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
-        ulong a, b, c, g, bits1, bits2, bits3, mbits;
+        ulong a, b, c, g;
+        int type;
 
-        bits1 = n_randint(state, FLINT_BITS - 1) + 1;
-        bits2 = n_randint(state, FLINT_BITS - 1) + 1;
-        mbits = FLINT_MAX(bits1, bits2);
+        type = n_randint(state, 30);
 
-        bits3 = mbits == FLINT_BITS ?
-            0 : n_randint(state, FLINT_BITS - mbits) + 1;
-
-        do
+        if (type == 0)
         {
-            a = n_randtest_bits(state, bits1);
-            b = n_randtest_bits(state, bits2);
-        } while (n_gcd(a, b) != UWORD(1));
+            /* gcd(a, 0) == a */
+            a = n_randtest(state);
+            b = 0;
+            c = 0;
+            g = n_gcd(a, b);
 
-        c = bits3 == 0 ? 1 : n_randtest_bits(state, bits3);
-
-        g = n_gcd(a * c, b * c);
-
-        result = (g == c);
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("gcd(ac, bc) != gcd(a, b)\n");
-            flint_printf("a = %wu, b = %wu, c = %wu, g = %wu\n", a, b, c, g);
-            fflush(stdout);
-            flint_abort();
+            result = (g == a);
         }
-    }
-
-    /* test gcd(a, 0) == a */
-    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
-    {
-        ulong a, g;
-
-        a = n_randtest(state);
-
-        g = n_gcd(a, 0);
-
-        result = (g == a);
-        if (!result)
+        else if (type == 1)
         {
-            flint_printf("FAIL:\n");
-            flint_printf("gcd(a, 0) != a\n");
-            flint_printf("a = %wu\n", a);
-            fflush(stdout);
-            flint_abort();
+            /* gcd(0, b) == b */
+            a = 0;
+            b = n_randtest(state);
+            c = 0;
+            g = n_gcd(a, b);
+
+            result = (g == b);
         }
-    }
-
-    /* test gcd(0, b) == b */
-    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
-    {
-        ulong b, g;
-
-        b = n_randtest(state);
-
-        g = n_gcd(0, b);
-
-        result = (g == b);
-        if (!result)
+        else
         {
-            flint_printf("FAIL:\n");
-            flint_printf("gcd(0, b) != b\n");
-            flint_printf("b = %wu\n", b);
-            fflush(stdout);
-            flint_abort();
-        }
-    }
+            /* gcd(ac, bc) == gcd(a, b) */
+            int bits1, bits2, bits3, mbits;
 
-    /* test gcd(0, 0) == 0 */
-    {
-        result = (n_gcd(0, 0) == 0);
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("gcd(0, 0) != 0\n");
-            fflush(stdout);
-            flint_abort();
+            bits1 = n_randint(state, FLINT_BITS - 1) + 1;
+            bits2 = n_randint(state, FLINT_BITS - 1) + 1;
+            mbits = FLINT_MAX(bits1, bits2);
+
+            bits3 = mbits == FLINT_BITS ?
+                0 : n_randint(state, FLINT_BITS - mbits) + 1;
+
+            do
+            {
+                a = n_randtest_bits(state, bits1);
+                b = n_randtest_bits(state, bits2);
+            } while (n_gcd(a, b) != UWORD(1));
+
+            c = bits3 == 0 ? 1 : n_randtest_bits(state, bits3);
+
+            g = n_gcd(a * c, b * c);
+
+            result = (g == c);
         }
+
+        if (!result)
+            TEST_FUNCTION_FAIL(
+                    "type %d\n"
+                    "a = %wu, b = %wu, c = %wu, g = %wu\n",
+                    type, a, b, c, g);
     }
 
     TEST_FUNCTION_END(state);

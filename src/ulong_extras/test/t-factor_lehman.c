@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2011 William Hart
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -14,71 +15,47 @@
 
 TEST_FUNCTION_START(n_factor_lehman, state)
 {
-   int i, result;
+    slong ix;
+    int result;
 
-   for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random numbers */
-   {
-      mp_limb_t n1, n2;
+    for (ix = 0; ix < 1000 * flint_test_multiplier(); ix++)
+    {
+        ulong n1, n2;
+        int type;
 
-      do
-      {
-         n1 = n_randtest_bits(state, n_randint(state, FLINT_BITS) + 1);
-      } while (n_is_prime(n1) || (n1 < UWORD(2))
-#if FLINT64 /* cannot compute enough primes */
-         || (n1 >= UWORD(10000000000000000))
-#endif
-         );
+        type = n_randint(state, 10);
 
-      n2 = n_factor_lehman(n1);
+        if (type == 0)
+        {
+            /* Test random products of two primes */
+            int bits1, bits2;
+            bits1 = 2 + n_randint(state, FLINT_MIN(FLINT_BITS, 53) - 3);
+            bits2 = 2 + n_randint(state, FLINT_MIN(FLINT_BITS, 53) - 1 - bits1);
 
-      result = ((n1%n2) == UWORD(0) && n1 != n2);
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("n1 = %wu, n2 = %wu\n", n1, n2);
-         fflush(stdout);
-         flint_abort();
-      }
-   }
-
-   for (i = 0; i < 100 * flint_test_multiplier(); i++) /* Test random products of two primes */
-   {
-      mp_limb_t n1, n2, n3, n, limit;
+            n1 = n_randprime(state, bits1, 1) * n_randprime(state, bits2, 1);
+        }
+        else
+        {
+            /* Test random numbers */
+            do
+            {
+                int bits = 2 + n_randint(state, FLINT_MIN(FLINT_BITS, 53) - 1);
+                n1 = n_randtest_bits(state, bits);
+            } while (n_is_prime(n1));
+        }
 
 #if FLINT64
-      limit = UWORD(100000000) - UWORD(100);
-#else
-      limit = UWORD(65535);
+        /* Test a specific bug (FIXME: What bug?) */
+        if (ix == 0)
+            n1 = UWORD(72528697) * UWORD(73339073);
 #endif
 
-      n1 = n_randtest(state) % (limit + 1);
-      n2 = n_randtest(state) % (limit + 1);
+        n2 = n_factor_lehman(n1);
 
-      n1 = n_nextprime(n1, 1);
-      n2 = n_nextprime(n2, 1);
+        result = ((n1 % n2) == UWORD(0) && n1 != n2);
+        if (!result)
+            TEST_FUNCTION_FAIL("n1 = %wu, n2 = %wu\n", n1, n2);
+    }
 
-      /* test a specific bug */
-#if FLINT64
-      if (i == 0)
-      {
-           n1 = 72528697;
-           n2 = 73339073;
-      }
-#endif
-
-      n = n1*n2;
-
-      n3 = n_factor_lehman(n);
-
-      result = ((n%n3) == UWORD(0) && n != n3);
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("n = %wd, n3 = %wu\n", n, n3);
-         fflush(stdout);
-         flint_abort();
-      }
-   }
-
-   TEST_FUNCTION_END(state);
+    TEST_FUNCTION_END(state);
 }

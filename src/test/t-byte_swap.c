@@ -14,69 +14,55 @@
 
 ulong byte_swap_naive(ulong n)
 {
-   ulong r = 0;
-   slong i;
+    ulong r = 0;
+    slong i;
 
-   for (i = 0; i < sizeof(ulong); i++)
-   {
-      r <<= 8;
-      r |= (n & 0xFF);
-      n >>= 8;
-   }
+    for (i = 0; i < sizeof(ulong); i++)
+    {
+        r <<= 8;
+        r |= (n & 0xFF);
+        n >>= 8;
+    }
 
-   return r;
+    return r;
 }
 
 TEST_FUNCTION_START(byte_swap, state)
 {
-   int i, result;
+    int i, result;
 
-   /* byte_swap(byte_swap(n)) == n */
-   for (i = 0; i < 10000 * flint_test_multiplier(); i++)
-   {
-      ulong n, r1, r2;
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
+    {
+        ulong n, r1, r2;
+        int cs;
 
-      n = n_randtest(state);
+        n = n_randtest(state);
+        r1 = n;
 
-      r1 = n;
+        cs = n_randint(state, 2);
 
-      r2 = n;
-      byte_swap(r2);
-      byte_swap(r2);
+        if (cs == 0)
+        {
+            /* byte_swap(byte_swap(n)) == n */
+            r2 = n;
+            byte_swap(r2);
+            byte_swap(r2);
+        }
+        else
+        {
+            /* byte_swap(n) == byte_swap_naive(n) */
+            r1 = n;
+            byte_swap(r1);
+            r2 = byte_swap_naive(n);
+        }
 
-      result = (r1 == r2);
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("byte_swap(byte_swap(n)) != n\n");
-         flint_printf("n = %wx, r1 = %wx, r2 = %wx\n", n, r1, r2);
-         fflush(stdout);
-         flint_abort();
-      }
-   }
+        result = (r1 == r2);
+        if (!result)
+            TEST_FUNCTION_FAIL(
+                    "case %d\n"
+                    "n = %wx, r1 = %wx, r2 = %wx\n",
+                    n, r1, r2);
+    }
 
-   /* byte_swap(n) == byte_swap_naive(n) */
-   for (i = 0; i < 10000 * flint_test_multiplier(); i++)
-   {
-      ulong n, r1, r2;
-
-      n = n_randtest(state);
-
-      r1 = n;
-      byte_swap(r1);
-
-      r2 = byte_swap_naive(n);
-
-      result = (r1 == r2);
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("byte_swap(n) != byte_swap_naive(n)\n");
-         flint_printf("n = %wx, r1 = %wx, r2 = %wx\n", n, r1, r2);
-         fflush(stdout);
-         flint_abort();
-      }
-   }
-
-   TEST_FUNCTION_END(state);
+    TEST_FUNCTION_END(state);
 }

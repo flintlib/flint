@@ -30,13 +30,10 @@ TEST_FUNCTION_START(n_div2_preinv, state)
 
         result = (q1 == q2);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("n = %wu, d = %wu, dinv = %wu\n", n, d, dinv);
-            flint_printf("q1 = %wu, q2 = %wu\n", q1, q2);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "n = %wu, d = %wu, dinv = %wu\n"
+                    "q1 = %wu, q2 = %wu\n",
+                    n, d, dinv, q1, q2);
     }
 
     TEST_FUNCTION_END(state);

@@ -176,25 +176,21 @@ TEST_FUNCTION_START(thread_pool, state)
 
             test1(x, n);
             if (!fmpz_equal(x, y))
-            {
-                flint_printf("n: %wu\n", n);
-                printf("x: "); fmpz_print(x); printf("\n");
-                printf("y: "); fmpz_print(y); printf("\n");
-                printf("test1 failed\n");
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL(
+                        "Test 1 failed\n"
+                        "n: %wu\n"
+                        "x: %{fmpz}\n"
+                        "y: %{fmpz}\n",
+                        n, x, y);
 
             test2(x, n);
             if (!fmpz_equal(x, y))
-            {
-                flint_printf("n: %wu\n", n);
-                printf("x: "); fmpz_print(x); printf("\n");
-                printf("y: "); fmpz_print(y); printf("\n");
-                printf("test2 failed\n");
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL(
+                        "Test 2 failed\n"
+                        "n: %wu\n"
+                        "x: %{fmpz}\n"
+                        "y: %{fmpz}\n",
+                        n, x, y);
         }
 
         fmpz_clear(y);

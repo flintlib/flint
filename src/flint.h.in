@@ -160,6 +160,7 @@ typedef struct __FLINT_FILE FLINT_FILE;
 #endif
 
 #if defined(_LONG_LONG_LIMB)
+# define _WORD_FMT "ll"
 # define WORD_FMT "%ll"
 # define WORD_WIDTH_FMT "%*ll"
 # define WORD(xx) (xx##LL)
@@ -171,6 +172,7 @@ typedef struct __FLINT_FILE FLINT_FILE;
 #  define WORD_MIN LLONG_MIN
 # endif
 #else
+# define _WORD_FMT "l"
 # define WORD_FMT "%l"
 # define WORD_WIDTH_FMT "%*l"
 # define WORD(xx) (xx##L)

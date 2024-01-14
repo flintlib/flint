@@ -43,18 +43,13 @@ TEST_FUNCTION_START(compute_primes, state)
         inverses = n_prime_inverses_arr_readonly(n + 1);
 
         if (primes[n] != ref_primes[n] || inverses[n] != ref_inverses[n])
-        {
-            flint_printf("FAIL!\n");
-            flint_printf("n = %wd, p1 = %wu, p2 = %wu\n", n, primes[n], ref_primes[n]);
-            flint_printf("inv1 = %g, inv2 = %g\n", inverses[n], ref_inverses[n]);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "n = %wd, p1 = %wu, p2 = %wu\n"
+                    "inv1 = %g, inv2 = %g\n",
+                    n, primes[n], ref_primes[n], inverses[n], ref_inverses[n]);
 
         if (n_randint(state, 20) == 0)
-        {
             n_cleanup_primes();
-        }
     }
 
     flint_free(ref_primes);

@@ -34,6 +34,8 @@ TEST_FUNCTION_START(fmpz_mat_print_read, state)
     int fd[2];
     pid_t childpid;
 
+    fflush(stdout); /* Ensure buffer does not flow into child process */
+
     /* Randomise k mats, write to and read from a pipe */
     {
         fmpz_mat_t *M;

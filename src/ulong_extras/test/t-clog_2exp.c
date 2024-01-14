@@ -44,11 +44,10 @@ TEST_FUNCTION_START(n_clog_2exp, state)
         ulong r = n_clog_2exp(t[i][0], t[i][1]);
 
         if (r != t[i][2])
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("clog_2exp(%wu, %wu) = %wu\n", t[i][0], t[i][1], t[i][2]);
-            flint_printf("but computed %wu\n", r);
-        }
+            TEST_FUNCTION_FAIL(
+                    "clog_2exp(%wu, %wu) = %wu\n"
+                    "but computed %wu\n",
+                    t[i][0], t[i][1], t[i][2], r);
     }
 
     TEST_FUNCTION_END(state);

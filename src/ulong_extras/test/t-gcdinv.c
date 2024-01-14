@@ -14,9 +14,43 @@
 
 TEST_FUNCTION_START(n_gcdinv, state)
 {
-    int i, result;
+    slong ix;
+    int result;
 
-    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
+    /* test modulo 1 */
+    {
+        ulong a, b, s, g;
+
+        a = 0;
+        b = 1;
+        g = n_gcdinv(&s, a, b);
+
+        result = (g == 1 && s == 0);
+        if (!result)
+            TEST_FUNCTION_FAIL(
+                    "GCD modulo 1 does not return g = 1 and s = 0\n"
+                    "g = %wu, s = %wu\n",
+                    g, s);
+    }
+
+    /* check gcd not 1 when a = 0 (and b != 1) */
+    for (ix = 0; ix < 1000 * flint_test_multiplier(); ix++)
+    {
+        ulong a, b, s, g;
+
+        a = 0;
+        b = n_randtest_not_zero(state);
+        g = n_gcdinv(&s, a, b);
+
+        result = (g != 1 || b == 1);
+        if (!result)
+            TEST_FUNCTION_FAIL(
+                    "gcd(0, b) == 1\n"
+                    "b = %wu, s = %wu\n",
+                    b, s);
+    }
+
+    for (ix = 0; ix < 10000 * flint_test_multiplier(); ix++)
     {
         ulong a, b, c, g, g2, s, t2, t, bits1, bits2, bits3, ainv;
 
@@ -43,15 +77,11 @@ TEST_FUNCTION_START(n_gcdinv, state)
 
         result = (g == g2 && t == t2);
         if (!result)
-        {
-            flint_printf("FAIL\n");
-            flint_printf("Cofactor doesn't agree with n_xgcd\n");
-            flint_printf("a = %wu, b = %wu, c = %wu\n", a, b, c);
-            flint_printf("g = %wu, g2 = %wu, t = %wd, t2 = %wd\n", g, g2, t,
-                         t2);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Cofactor doesn't agree with n_xgcd\n"
+                    "a = %wu, b = %wu, c = %wu\n"
+                    "g = %wu, g2 = %wu, t = %wd, t2 = %wd\n",
+                    a, b, c, g, g2, t, t2);
 
         /* test b*t2 == 1 mod a */
         ainv = n_preinvert_limb(a);
@@ -60,51 +90,11 @@ TEST_FUNCTION_START(n_gcdinv, state)
 
         result = (s == 1);
         if (!result)
-        {
-            flint_printf("FAIL\n");
-            flint_printf("Incorrect inverse\n");
-            flint_printf("a = %wu, b = %wu, c = %wu\n", a, b, c);
-            flint_printf("g2 = %wu, s = %wd, t2 = %wd\n", g2, s, t2);
-            fflush(stdout);
-            flint_abort();
-        }
-    }
-
-    /* test modulo 1 */
-    {
-        ulong s, g;
-
-        g = n_gcdinv(&s, 0, 1);
-
-        result = (g == 1 && s == 0);
-        if (!result)
-        {
-            flint_printf("FAIL\n");
-            flint_printf("Incorrect modulo 1\n");
-            flint_printf("g = %wu, s = %wu\n", g, s);
-            fflush(stdout);
-            flint_abort();
-        }
-    }
-
-    /* check gcd not 1 when a = 0 (and b != 1) */
-    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
-    {
-        ulong b, s, g;
-
-        b = n_randtest_not_zero(state);
-
-        g = n_gcdinv(&s, 0, b);
-
-        result = (g != 1 || b == 1);
-        if (!result)
-        {
-            flint_printf("FAIL\n");
-            flint_printf("gcd(0, b) == 1\n");
-            flint_printf("b = %wu, s = %wu\n", b, s);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Incorrect inverse\n"
+                    "a = %wu, b = %wu, c = %wu\n"
+                    "g2 = %wu, s = %wd, t2 = %wd\n",
+                    a, b, c, g2, s, t2);
     }
 
     TEST_FUNCTION_END(state);

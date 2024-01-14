@@ -38,13 +38,10 @@ TEST_FUNCTION_START(sub_ddmmss, state)
       result = ((dh2 == dh1) && (dl2 == dl1));
 
       if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("mh = %wu, ml = %wu, sh = %wu, sl = %wu\n", mh, ml, sh, sl);
-         flint_printf("dh2 = %wu, dh1 = %wu, dl2 = %wu, dl1 = %wu\n", dh2, dh1, dl2, dl1);
-         fflush(stdout);
-         flint_abort();
-      }
+          TEST_FUNCTION_FAIL(
+                  "mh = %wu, ml = %wu, sh = %wu, sl = %wu\n"
+                  "dh2 = %wu, dh1 = %wu, dl2 = %wu, dl1 = %wu\n",
+                  mh, ml, sh, sl, dh2, dh1, dl2, dl1);
    }
 
    TEST_FUNCTION_END(state);

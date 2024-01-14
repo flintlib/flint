@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2021 Daniel Schultz
-    Copyright (C) 2023 Albin Ahlbäck
+    Copyright (C) 2023, 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -13,7 +13,28 @@
 #ifndef TEST_HELPERS_H
 #define TEST_HELPERS_H
 
+#include <time.h>
+#include <string.h>
 #include "templates.h"
+#include "flint.h"
+
+#if FLINT_WANT_PRETTY_TESTS
+# define _RED "\033[0;31m"
+# define _RED_B "\033[1;31m"
+# define _GREEN "\033[0;32m"
+# define _GREEN_B "\033[1;32m"
+# define _YELLOW "\033[0;33m"
+# define _YELLOW_B "\033[1;33m"
+# define _RESET "\033[0m"
+#else
+# define _RED
+# define _RED_B
+# define _GREEN
+# define _GREEN_B
+# define _YELLOW
+# define _YELLOW_B
+# define _RESET
+#endif
 
 /* easy way to test a condition in test code */
 #define FLINT_TEST(e)                                   \
@@ -38,53 +59,100 @@ test_struct;
 #define TEST_FUNCTION_START(label, state)               \
 int CAT(test, label)(void)                              \
 {                                                       \
+    double FLINT_SET_BUT_UNUSED(_start_time_), FLINT_SET_BUT_UNUSED(_end_time_); \
+    char _test_io_string_[128] = #label "                                                        "; \
+    const int _label_len_ = sizeof(#label) - 1;         \
+    puts(#label "...");                                 \
     FLINT_TEST_INIT(state);                             \
-    printf(#label "....");                              \
-    fflush(stdout);                                     \
+    _start_time_ = clock();
 
-#define TEST_GR_FUNCTION_START(label, state, count_success, count_domain, count_unable)\
+#define TEST_GR_FUNCTION_START(label, state, count_success, count_domain, count_unable) \
 int CAT(test, label)(void)                              \
 {                                                       \
-    slong count_success = 0, count_unable = 0, count_domain = 0;\
+    slong count_success = 0, count_unable = 0, count_domain = 0; \
+    double FLINT_SET_BUT_UNUSED(_start_time_), FLINT_SET_BUT_UNUSED(_end_time_); \
+    char _test_io_string_[128] = #label "                                                        "; \
+    const int _label_len_ = sizeof(#label) - 1;         \
+    puts(#label "...");                                 \
     FLINT_TEST_INIT(state);                             \
-    printf(#label "....");                              \
-    fflush(stdout);                                     \
+    _start_time_ = clock();
 
 #define TEST_TEMPLATE_FUNCTION_START(T, label, state)   \
 int TEMPLATE3(test, T, label)(void)                     \
 {                                                       \
+    double FLINT_SET_BUT_UNUSED(_start_time_), FLINT_SET_BUT_UNUSED(_end_time_); \
+    char _test_io_string_[128] = TEMPLATE_STR(T) "_" #label "                                                      "; \
+    const int _label_len_ = sizeof(TEMPLATE_STR(T) "_" #label) - 1; \
+    puts(TEMPLATE_STR(T) "_" #label "...");             \
     FLINT_TEST_INIT(state);                             \
-    printf(TEMPLATE_STR(T) "_" #label "....");          \
-    fflush(stdout);                                     \
+    _start_time_ = clock();
 
 #define TEST_TEMPLATE2_FUNCTION_START(T, label1, label2, state)\
 int TEMPLATE5(test, T, label1, T, label2)(void)         \
 {                                                       \
+    double FLINT_SET_BUT_UNUSED(_start_time_), FLINT_SET_BUT_UNUSED(_end_time_); \
+    char _test_io_string_[128] = TEMPLATE_STR(T) "_" #label1 "_" TEMPLATE_STR(T) "_" #label2 "                                                  "; \
+    const int _label_len_ = sizeof(TEMPLATE_STR(T) "_" #label1 "_" TEMPLATE_STR(T) "_" #label2) - 1; \
+    puts(TEMPLATE_STR(T) "_" #label1 "_" TEMPLATE_STR(T) "_" #label2 "..."); \
     FLINT_TEST_INIT(state);                             \
-    printf(TEMPLATE_STR(T) "_" #label1 "_"              \
-           TEMPLATE_STR(T) "_" #label2 "....");         \
-    fflush(stdout);                                     \
+    _start_time_ = clock();
 
 #define TEST_FUNCTION_END(state)                        \
+    _end_time_ = clock();                               \
     FLINT_TEST_CLEANUP(state);                          \
-    printf("PASS\n");                                   \
+    if (_label_len_ < 48)                               \
+        printf("%.48s%6.2f   (" _GREEN_B "PASS" _RESET ")\n", \
+                _test_io_string_,                       \
+                (_end_time_ - _start_time_) / CLOCKS_PER_SEC); \
+    else                                                \
+        printf("%.*s\n%54.2f   (" _GREEN_B "PASS" _RESET ")\n", \
+                _label_len_, _test_io_string_,          \
+                (_end_time_ - _start_time_) / CLOCKS_PER_SEC); \
     return 0;                                           \
 }
 
-#define TEST_GR_FUNCTION_END(state, count_success, count_domain, count_unable)\
+#define TEST_GR_FUNCTION_END(state, count_success, count_domain, count_unable) \
+    _end_time_ = clock();                               \
     FLINT_TEST_CLEANUP(state);                          \
-    printf(" [" WORD_FMT "d success, "                  \
-                WORD_FMT "d domain, "                   \
-                WORD_FMT "d unable] PASS\n",            \
-                count_success, count_domain, count_unable);\
+    printf("%.*s\n  "                                   \
+            "%5" _WORD_FMT "d success, "                \
+            "%5" _WORD_FMT "d domain, "                 \
+            "%5" _WORD_FMT "d unable"                   \
+            "%11.2f   "                                 \
+            "(" _GREEN_B "PASS" _RESET ")\n",           \
+            _label_len_, _test_io_string_,              \
+            count_success, count_domain, count_unable,  \
+            (_end_time_ - _start_time_) / CLOCKS_PER_SEC); \
     return 0;                                           \
 }
 
 #define TEST_FUNCTION_END_SKIPPED(state)                \
     FLINT_TEST_CLEANUP(state);                          \
-    printf("SKIPPED\n");                                \
+    if (_label_len_ < 54)                               \
+        printf("%.*s(" _YELLOW_B "SKIPPED" _RESET ")\n", \
+                54, _test_io_string_);                  \
+    else                                                \
+        printf("%.*s\n%*s(" _YELLOW_B "SKIPPED" _RESET ")\n", \
+                _label_len_, _test_io_string_,          \
+                54, "");                                \
     return 0;                                           \
 }
+
+#define TEST_FUNCTION_FAIL(...)                         \
+do                                                      \
+{                                                       \
+    _end_time_ = clock();                               \
+    if (_label_len_ < 48)                               \
+        printf("%.48s%6.2f   (" _RED_B "FAIL" _RESET ")\n", \
+                _test_io_string_,                       \
+                (_end_time_ - _start_time_) / CLOCKS_PER_SEC); \
+    else                                                \
+        printf("%.*s\n%54.2f   (" _RED_B "FAIL" _RESET ")\n", \
+                _label_len_, _test_io_string_,          \
+                (_end_time_ - _start_time_) / CLOCKS_PER_SEC); \
+    flint_printf(__VA_ARGS__);                          \
+    return 1;                                           \
+} while (0)
 
 #define TEST_MAIN(tests)                                                    \
 int                                                                         \

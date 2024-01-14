@@ -38,7 +38,7 @@ apow_cmp(const apow_t * x, const apow_t * y)
 }
 
 /* set size of table m=sqrt(nk) to compute k logs in a group of size n */
-void
+static void
 bsgs_table_init(bsgs_t t, ulong a, ulong n, ulong m)
 {
     ulong k, ak;
@@ -59,7 +59,7 @@ bsgs_table_init(bsgs_t t, ulong a, ulong n, ulong m)
     qsort(t->table, m, sizeof(apow_t), (int(*)(const void*,const void*))apow_cmp);
 }
 
-void
+static void
 bsgs_table_clear(bsgs_t t)
 {
     flint_free(t->table);

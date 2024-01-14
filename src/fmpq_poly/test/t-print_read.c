@@ -34,6 +34,8 @@ TEST_FUNCTION_START(fmpq_poly_print_read, state)
     int fd[2];
     pid_t childpid;
 
+    fflush(stdout); /* Ensure buffer does not flow into child process */
+
     /* Randomise n polynomials, write to and read from a pipe */
     {
         fmpq_poly_t *a;

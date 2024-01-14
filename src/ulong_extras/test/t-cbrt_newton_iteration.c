@@ -37,12 +37,8 @@ TEST_FUNCTION_START(n_cbrt_newton_iteration, state)
 
         result = (val == ans);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("n = %wu, val = %wd, ans = %wu\n", n, val, ans);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("n = %wu, val = %wd, ans = %wu\n", n, val, ans);
+
         mpz_clear(mpz_n);
         mpz_clear(mpz_val);
     }
@@ -68,12 +64,8 @@ TEST_FUNCTION_START(n_cbrt_newton_iteration, state)
 
         result = (val == ans);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("n = %wu, val = %wd, ans = %wu\n", n, val, ans);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("n = %wu, val = %wd, ans = %wu\n", n, val, ans);
+
         mpz_clear(mpz_n);
         mpz_clear(mpz_val);
     }
@@ -100,12 +92,8 @@ TEST_FUNCTION_START(n_cbrt_newton_iteration, state)
 
         result = (val == ans);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("n = %wu, val = %wd, ans = %wu\n", n, val, ans);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("n = %wu, val = %wd, ans = %wu\n", n, val, ans);
+
         mpz_clear(mpz_n);
         mpz_clear(mpz_val);
     }
@@ -132,12 +120,8 @@ TEST_FUNCTION_START(n_cbrt_newton_iteration, state)
 
         result = (val == ans);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("n = %wu, val = %wd, ans = %wu\n", n, val, ans);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("n = %wu, val = %wd, ans = %wu\n", n, val, ans);
+
         mpz_clear(mpz_n);
         mpz_clear(mpz_val);
     }

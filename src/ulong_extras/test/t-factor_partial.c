@@ -14,34 +14,29 @@
 
 TEST_FUNCTION_START(n_factor_partial, state)
 {
-   int i, j, result;
+    int i, j, result;
 
-   for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random numbers */
-   {
-      mp_limb_t n1, n2, prod, limit;
-      n_factor_t factors;
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random numbers */
+    {
+        mp_limb_t n1, n2, prod, limit;
+        n_factor_t factors;
 
-      n_factor_init(&factors);
+        n_factor_init(&factors);
 
-      n1 = n_randtest_not_zero(state);
-      limit = n_sqrt(n1);
-      n2 = n_factor_partial(&factors, n1, limit, 0);
+        n1 = n_randtest_not_zero(state);
+        limit = n_sqrt(n1);
+        n2 = n_factor_partial(&factors, n1, limit, 0);
 
-      prod = 1;
-      for (j = 0; j < factors.num; j++)
-      {
-         prod *= n_pow(factors.p[j], factors.exp[j]);
-      }
+        prod = 1;
+        for (j = 0; j < factors.num; j++)
+        {
+            prod *= n_pow(factors.p[j], factors.exp[j]);
+        }
 
-      result = ((n1 == n2*prod) && ((prod > limit) || (n1 == 1)));
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("n1 = %wu, n2 = %wu\n", n1, n2);
-         fflush(stdout);
-         flint_abort();
-      }
-   }
+        result = ((n1 == n2 * prod) && ((prod > limit) || (n1 == 1)));
+        if (!result)
+            TEST_FUNCTION_FAIL("n1 = %wu, n2 = %wu\n", n1, n2);
+    }
 
-   TEST_FUNCTION_END(state);
+    TEST_FUNCTION_END(state);
 }

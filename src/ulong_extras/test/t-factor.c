@@ -16,15 +16,27 @@ TEST_FUNCTION_START(n_factor, state)
 {
     int i, j, result;
 
-    /* Test random numbers */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         mp_limb_t n1, n2;
         n_factor_t factors;
+        int type;
 
         n_factor_init(&factors);
 
-        n1 = n_randtest_not_zero(state);
+        type = n_randint(state, 2);
+
+        if (type == 0)
+        {
+            /* Test random numbers */
+            n1 = n_randtest_not_zero(state);
+        }
+        else
+        {
+            /* Test random prime */
+            n1 = n_randprime(state, 2 + n_randint(state, FLINT_BITS - 1), 1);
+        }
+
         n_factor(&factors, n1, 0);
 
         n2 = UWORD(1);
@@ -35,37 +47,7 @@ TEST_FUNCTION_START(n_factor, state)
 
         result = (n1 == n2);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("n1 = %wu, n2 = %wu\n", n1, n2);
-            fflush(stdout);
-            flint_abort();
-        }
-    }
-
-    {
-        mp_limb_t n1, n2;
-        n_factor_t factors;
-
-        n_factor_init(&factors);
-
-        n1 = UWORD(4253857039);
-        n_factor(&factors, n1, 0);
-
-        n2 = UWORD(1);
-        for (j = 0; j < factors.num; j++)
-        {
-            n2 *= n_pow(factors.p[j], factors.exp[j]);
-        }
-
-        result = (n1 == n2);
-        if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("n1 = %wu, n2 = %wu\n", n1, n2);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("n1 = %wu, n2 = %wu\n", n1, n2);
     }
 
     TEST_FUNCTION_END(state);

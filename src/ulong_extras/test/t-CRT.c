@@ -50,13 +50,12 @@ TEST_FUNCTION_START(n_CRT, state)
                 fmpz_CRT(r, a1, m1, a2, m2, 0);
                 if (fmpz_get_ui(r) != n_CRT(fmpz_get_ui(a1), fmpz_get_ui(m1),
                                             fmpz_get_ui(a2), fmpz_get_ui(m2)))
-                {
-                    flint_printf("FAIL\n:");
-                    flint_printf("a1: "); fmpz_print(a1); flint_printf("\n");
-                    flint_printf("m1: "); fmpz_print(m1); flint_printf("\n");
-                    flint_printf("a2: "); fmpz_print(a2); flint_printf("\n");
-                    flint_printf("m2: "); fmpz_print(m2); flint_printf("\n");
-                }
+                    TEST_FUNCTION_FAIL(
+                            "a1: %{fmpz}\n"
+                            "m1: %{fmpz}\n"
+                            "a2: %{fmpz}\n"
+                            "m2: %{fmpz}\n",
+                            a1, m1, a2, m2);
             }
         }
 
