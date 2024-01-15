@@ -2306,12 +2306,19 @@ Special polynomials
 
 .. type:: struct _prime_degree_struct
 
-.. function:: struct _prime_degree_struct _nmod_poly_conway_rand(flint_rand_t state)
+.. function:: struct _prime_degree_struct _nmod_poly_conway_rand(flint_rand_t state, int type)
 
     Returns a pseudorandom :type:`struct _prime_degree_struct` comprised of a
     prime of type :type:`ulong` in its first field and a degree of type
     :type:`slong` in the second field, that, when put into
     :func:`_nmod_poly_conway` will always succeed.
+
+    Here, ``type`` can be the following values: ``0`` where a small prime and
+    small degree is returned, ``1`` where a small prime and an unrestricted
+    degree (the highest degree appearing in the database is 409) is returned,
+    ``2`` where an unrestricted prime (the highest prime appearing in the
+    database is 409) and small degree is returned, and ``3`` where an
+    unrestricted prime and unrestricted degree is returned.
 
 
 Products

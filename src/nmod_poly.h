@@ -1095,7 +1095,7 @@ struct _prime_degree_struct
     slong degree;
 };
 
-struct _prime_degree_struct _nmod_poly_conway_rand(flint_rand_t state);
+struct _prime_degree_struct _nmod_poly_conway_rand(flint_rand_t state, int type);
 
 /* Products  *****************************************************************/
 

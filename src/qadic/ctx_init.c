@@ -61,7 +61,7 @@ int _qadic_ctx_init_conway_ui(qadic_ctx_t ctx, ulong p, slong d,
 
     ctx->len = num_nzcoeffs;
     ctx->j = idx_nzcoeffs;
-    ctx->a = nzcoeffs;
+    ctx->a = (fmpz *) nzcoeffs;
 
     /* Complete the initialisation of the context */
     padic_ctx_init(&ctx->pctx, (fmpz *) &p, min, max, mode);

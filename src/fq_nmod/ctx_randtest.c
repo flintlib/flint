@@ -19,8 +19,13 @@ void
 fq_nmod_ctx_randtest(fq_nmod_ctx_t ctx, flint_rand_t state)
 {
     struct _prime_degree_struct pd;
+    int type = n_randint(state, 100);
 
-    pd = _nmod_poly_conway_rand(state);
+    /* Mostly test small primes and small degrees */
+    if (type > 3)
+        type = 0;
+
+    pd = _nmod_poly_conway_rand(state, type);
     fq_nmod_ctx_init_conway_ui(ctx, pd.prime, pd.degree, "a");
 
     /* Test non-monic modulus */

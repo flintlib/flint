@@ -605,13 +605,26 @@ _nmod_poly_conway(mp_ptr op, ulong prime, slong deg)
 }
 
 struct _prime_degree_struct
-_nmod_poly_conway_rand(flint_rand_t state)
+_nmod_poly_conway_rand(flint_rand_t state, int type)
 {
     struct _prime_degree_struct pd;
 
-    do
-        pd.prime = n_randprime(state, 2 + n_randint(state, 16), 1);
-    while (pd.prime > 109987);
+    switch (type)
+    {
+        case 0: /* prime < 2^11, degree <= 8 */
+        case 1: /* prime < 2^11, degree whatever */
+            pd.prime = n_randprime(state, 2 + n_randint(state, 10), 1);
+            break;
+
+        case 2: /* prime whatever, degree <= 8 */
+        case 3: /* prime whatever, degree whatever */
+            do
+                pd.prime = n_randprime(state, 2 + n_randint(state, 16), 1);
+            while (pd.prime > 109987);
+            break;
+
+        default: flint_throw(FLINT_ERROR, "wrong type in %s", __func__);
+    }
 
     if (pd.prime < 260)
     {
@@ -645,9 +658,18 @@ _nmod_poly_conway_rand(flint_rand_t state)
 
         /* Now kx points to the starting degree for prime */
         jx = 0;
-        do
-            jx++;
-        while (degrees[kx + jx] != 1 && degrees[kx + jx] != 0);
+        if (type == 0 || type == 2)
+        {
+            do
+                jx++;
+            while (degrees[kx + jx] < 8);
+        }
+        else
+        {
+            do
+                jx++;
+            while (degrees[kx + jx] != 1 && degrees[kx + jx] != 0);
+        }
 
         /* The degrees we will be using are degrees[kx + 0], ...,
          * degrees[kx + jx - 1]. */
@@ -656,9 +678,19 @@ _nmod_poly_conway_rand(flint_rand_t state)
 #undef degrees
     }
     else if (pd.prime < 300)
-        pd.degree = 1 + n_randint(state, 12);
+    {
+        if (type == 0 || type == 2)
+            pd.degree = 1 + n_randint(state, 8);
+        else
+            pd.degree = 1 + n_randint(state, 12);
+    }
     else if (pd.prime < 1000)
-        pd.degree = 1 + n_randint(state, 9);
+    {
+        if (type == 0 || type == 2)
+            pd.degree = 1 + n_randint(state, 8);
+        else
+            pd.degree = 1 + n_randint(state, 9);
+    }
     else if (pd.prime < 3371)
     {
         switch (pd.prime)
