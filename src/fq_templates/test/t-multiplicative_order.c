@@ -30,7 +30,7 @@ TEST_TEMPLATE_FUNCTION_START(T, multiplicative_order, state)
         type = n_randint(state, 2);
 
         /* Test big primes and small degrees */
-        TEMPLATE(T, ctx_init_randtest)(ctx, state, 1);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         fmpz_init(ord);
         TEMPLATE(T, init)(a, ctx);

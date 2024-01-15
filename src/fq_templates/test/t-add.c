@@ -22,15 +22,23 @@ TEST_TEMPLATE_FUNCTION_START(T, add, state)
     slong ix;
     int result;
 
+#if defined(FQ_ZECH_H)
+    for (ix = 0; ix < 10 * flint_test_multiplier(); ix++)
+#else
     for (ix = 0; ix < 1000 * flint_test_multiplier(); ix++)
+#endif
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) a, b, c, x, y;
         int type;
 
-        type = n_randint(state, 5);
-
         TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
+
+#if defined(FQ_ZECH_H)
+        for (slong jx = 0; jx < 100; jx++)
+        {
+#endif
+        type = n_randint(state, 5);
 
         TEMPLATE(T, init)(a, ctx);
         if (type != 2)
@@ -108,6 +116,9 @@ TEST_TEMPLATE_FUNCTION_START(T, add, state)
         if (type == 4)
             TEMPLATE(T, clear)(y, ctx);
 
+#if defined(FQ_ZECH_H)
+        }
+#endif
         TEMPLATE(T, ctx_clear)(ctx);
     }
 

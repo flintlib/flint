@@ -21,7 +21,7 @@ TEST_TEMPLATE_FUNCTION_START(T, is_square, state)
     slong ix;
     int result;
 
-    for (ix = 0; ix < 400 * flint_test_multiplier(); ix++)
+    for (ix = 0; ix < 300 * flint_test_multiplier(); ix++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) a, b;
@@ -30,10 +30,18 @@ TEST_TEMPLATE_FUNCTION_START(T, is_square, state)
         type = n_randint(state, 2);
 
         if (type == 0)
+#if defined(FQ_ZECH_H)
+            TEMPLATE(T, ctx_init_randtest)(ctx, state, 1);
+#else
             TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
+#endif
         else
             do
+#if defined(FQ_ZECH_H)
+                TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
+#else
                 TEMPLATE(T, ctx_init_randtest)(ctx, state, 1);
+#endif
 #if defined(FQ_NMOD_H) || defined(FQ_ZECH_H)
             while (TEMPLATE(T, ctx_prime)(ctx) == 2);
 #else

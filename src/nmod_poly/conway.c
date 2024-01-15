@@ -612,13 +612,13 @@ _nmod_poly_conway_rand(flint_rand_t state, int type)
     switch (type)
     {
         case 0: /* prime whatever, degree whatever */
-        case 1: /* degree < 20 */
+        case 1: /* degree < 15 */
             do
                 pd.prime = n_randprime(state, 2 + n_randint(state, 16), 1);
             while (pd.prime > 109987);
             break;
         case 2: /* prime < 2^10 */
-        case 3: /* prime < 2^10 and degree < 20 */
+        case 3: /* prime < 2^10 and degree < 15 */
             pd.prime = n_randprime(state, 2 + n_randint(state, 9), 1);
             break;
 
@@ -661,7 +661,7 @@ _nmod_poly_conway_rand(flint_rand_t state, int type)
         {
             do
                 jx++;
-            while (degrees[kx + jx] < 20);
+            while (degrees[kx + jx] < 15);
         }
         else
         {

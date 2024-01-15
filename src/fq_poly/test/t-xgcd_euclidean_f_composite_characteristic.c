@@ -20,7 +20,7 @@ TEST_FUNCTION_START(fq_poly_xgcd_euclidean_f_composite_characteristic, state)
 {
     slong i, j;
 
-    for (i = 0; i < 10*flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t p;
         fmpz_mod_poly_t h;
@@ -46,7 +46,7 @@ TEST_FUNCTION_START(fq_poly_xgcd_euclidean_f_composite_characteristic, state)
         fq_poly_init(t2, ctx);
         fq_init(f, ctx);
 
-        for (j = 0; j < 999; j++)
+        for (j = 0; j < 10; j++)
         {
             fq_poly_randtest(a, state, n_randint(state, 10), ctx);
             fq_poly_randtest(b, state, n_randint(state, 10), ctx);

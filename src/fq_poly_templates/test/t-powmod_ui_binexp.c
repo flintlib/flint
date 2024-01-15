@@ -22,13 +22,13 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_ui_binexp, state)
     int i, result;
 
     /* Aliasing of res and a */
-    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, res1, t, f;
         ulong exp;
 
-        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         exp = n_randint(state, 50);
 
@@ -68,13 +68,13 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_ui_binexp, state)
     }
 
     /* Aliasing of res and f */
-    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, res1, t, f;
         ulong exp;
 
-        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         exp = n_randint(state, 50);
 
@@ -114,14 +114,14 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_ui_binexp, state)
     }
 
     /* No aliasing */
-    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, res1, res2, t, f;
         ulong exp;
         int j;
 
-        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         exp = n_randint(state, 50);
 
@@ -131,9 +131,9 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_ui_binexp, state)
         TEMPLATE(T, poly_init) (res2, ctx);
         TEMPLATE(T, poly_init) (t, ctx);
 
-        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 20), ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 30), ctx);
         TEMPLATE(T, poly_randtest_not_zero) (f, state,
-                                             n_randint(state, 20) + 1, ctx);
+                                             n_randint(state, 30) + 1, ctx);
 
         TEMPLATE(T, poly_powmod_ui_binexp) (res1, a, exp, f, ctx);
 
@@ -170,14 +170,14 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_ui_binexp, state)
     }
 
     /* Check that a^(b+c) = a^b * a^c */
-    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    for (i = 0; i < 30 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, res1, res2, res3, res4, t, f;
 
         ulong exp1, exp2, exp3;
 
-        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         exp1 = n_randint(state, 50);
         exp2 = n_randint(state, 50);
@@ -190,9 +190,9 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_ui_binexp, state)
         TEMPLATE(T, poly_init) (res4, ctx);
         TEMPLATE(T, poly_init) (t, ctx);
 
-        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 20), ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 30), ctx);
         TEMPLATE(T, poly_randtest_not_zero) (f, state,
-                                             n_randint(state, 20) + 1, ctx);
+                                             n_randint(state, 30) + 1, ctx);
 
         TEMPLATE(T, poly_powmod_ui_binexp) (res1, a, exp1, f, ctx);
         TEMPLATE(T, poly_powmod_ui_binexp) (res2, a, exp2, f, ctx);

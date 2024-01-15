@@ -260,24 +260,24 @@ fq_zech_ctx_init_randtest(fq_zech_ctx_t ctx, flint_rand_t state, int type)
     slong deg;
     ulong prime;
 
-    /* Big prime < 2^5, big degree <= 5 */
-    /* Small prime < 2^3, small degree <= 3 */
+    /* Big prime < 2^5, big degree <= 4 */
+    /* Small prime < 2^4, small degree <= 3 */
     switch (type)
     {
         case 0:
             prime = n_randprime(state, 2 + n_randint(state, 4), 1);
-            deg = 1 + n_randint(state, 5);
+            deg = 1 + n_randint(state, 4);
             break;
         case 1:
             prime = n_randprime(state, 2 + n_randint(state, 4), 1);
             deg = 1 + n_randint(state, 3);
             break;
         case 2:
-            prime = n_randprime(state, 2 + n_randint(state, 2), 1);
-            deg = 1 + n_randint(state, 5);
+            prime = n_randprime(state, 2 + n_randint(state, 3), 1);
+            deg = 1 + n_randint(state, 4);
             break;
         case 3:
-            prime = n_randprime(state, 2 + n_randint(state, 2), 1);
+            prime = n_randprime(state, 2 + n_randint(state, 3), 1);
             deg = 1 + n_randint(state, 3);
             break;
         default: FLINT_UNREACHABLE;

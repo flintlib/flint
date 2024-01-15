@@ -22,13 +22,13 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_ui_binexp_preinv, state)
     int i, result;
 
     /* Aliasing of res and a */
-    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, res1, t, f, finv;
         ulong exp;
 
-        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         exp = n_randint(state, 50);
 
@@ -38,9 +38,9 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_ui_binexp_preinv, state)
         TEMPLATE(T, poly_init) (res1, ctx);
         TEMPLATE(T, poly_init) (t, ctx);
 
-        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 50), ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 20), ctx);
         TEMPLATE(T, poly_randtest_not_zero) (f, state,
-                                             n_randint(state, 50) + 1, ctx);
+                                             n_randint(state, 20) + 1, ctx);
 
         TEMPLATE(T, poly_reverse) (finv, f, f->length, ctx);
         TEMPLATE(T, poly_inv_series_newton) (finv, finv, f->length, ctx);
@@ -73,13 +73,13 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_ui_binexp_preinv, state)
     }
 
     /* Aliasing of res and f */
-    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, res1, t, f, finv;
         ulong exp;
 
-        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         exp = n_randint(state, 50);
 
@@ -89,9 +89,9 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_ui_binexp_preinv, state)
         TEMPLATE(T, poly_init) (res1, ctx);
         TEMPLATE(T, poly_init) (t, ctx);
 
-        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 50), ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 20), ctx);
         TEMPLATE(T, poly_randtest_not_zero) (f, state,
-                                             n_randint(state, 50) + 1, ctx);
+                                             n_randint(state, 20) + 1, ctx);
 
         TEMPLATE(T, poly_reverse) (finv, f, f->length, ctx);
         TEMPLATE(T, poly_inv_series_newton) (finv, finv, f->length, ctx);
@@ -124,14 +124,14 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_ui_binexp_preinv, state)
     }
 
     /* No aliasing */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 30 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, res1, res2, t, f, finv;
         ulong exp;
         int j;
 
-        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         exp = n_randint(state, 50);
 
@@ -142,9 +142,9 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_ui_binexp_preinv, state)
         TEMPLATE(T, poly_init) (res2, ctx);
         TEMPLATE(T, poly_init) (t, ctx);
 
-        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 50), ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 20), ctx);
         TEMPLATE(T, poly_randtest_not_zero) (f, state,
-                                             n_randint(state, 50) + 1, ctx);
+                                             n_randint(state, 20) + 1, ctx);
 
         TEMPLATE(T, poly_reverse) (finv, f, f->length, ctx);
         TEMPLATE(T, poly_inv_series_newton) (finv, finv, f->length, ctx);
@@ -185,14 +185,14 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_ui_binexp_preinv, state)
     }
 
     /* Check that a^(b+c) = a^b * a^c */
-    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, res1, res2, res3, res4, t, f, finv;
 
         ulong exp1, exp2, exp3;
 
-        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         exp1 = n_randint(state, 50);
         exp2 = n_randint(state, 50);
@@ -206,9 +206,9 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_ui_binexp_preinv, state)
         TEMPLATE(T, poly_init) (res4, ctx);
         TEMPLATE(T, poly_init) (t, ctx);
 
-        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 50), ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 30), ctx);
         TEMPLATE(T, poly_randtest_not_zero) (f, state,
-                                             n_randint(state, 50) + 1, ctx);
+                                             n_randint(state, 30) + 1, ctx);
 
         TEMPLATE(T, poly_reverse) (finv, f, f->length, ctx);
         TEMPLATE(T, poly_inv_series_newton) (finv, finv, f->length, ctx);

@@ -29,7 +29,11 @@ TEST_TEMPLATE_FUNCTION_START(T, sqrt, state)
 
         type = n_randint(state, 2);
 
+#if defined(FQ_ZECH_H)
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
+#else
         TEMPLATE(T, ctx_init_randtest)(ctx, state, 1);
+#endif
 
         TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, init)(c, ctx);

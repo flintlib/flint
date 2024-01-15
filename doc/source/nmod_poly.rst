@@ -2314,10 +2314,10 @@ Special polynomials
     :func:`_nmod_poly_conway` will always succeed.
 
     Here, ``type`` can be the following values: ``0`` returns a random prime and
-    degree found in the database, ``1`` returns a degree less than `20` along
+    degree found in the database, ``1`` returns a degree less than `15` along
     with some prime found in the database, ``2`` returns a prime less than
     `2^{10}` along with some degree found in the database, and ``3`` returns a
-    prime less than `2^{10}` along with a degree less than `20`.
+    prime less than `2^{10}` along with a degree less than `15`.
 
 
 Products

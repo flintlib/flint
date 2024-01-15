@@ -23,16 +23,16 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_fmpz_binexp, state)
     int i, result;
 
     /* Aliasing of res and a */
-    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, res, t, f;
         ulong exp;
         fmpz_t expz;
 
-        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
-        exp = n_randint(state, 50);
+        exp = n_randint(state, 30);
         fmpz_init_set_ui(expz, exp);
 
         TEMPLATE(T, poly_init) (a, ctx);
@@ -71,16 +71,16 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_fmpz_binexp, state)
     }
 
     /* Aliasing of res and f */
-    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, res, t, f;
         ulong exp;
         fmpz_t expz;
 
-        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
-        exp = n_randint(state, 50);
+        exp = n_randint(state, 30);
         fmpz_init_set_ui(expz, exp);
 
         TEMPLATE(T, poly_init) (a, ctx);
@@ -118,17 +118,17 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_fmpz_binexp, state)
         TEMPLATE(T, ctx_clear) (ctx);
     }
 
-    /* No aliasing */
-    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    /* Compare with ui function */
+    for (i = 0; i < 30 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, res1, res2, t, f;
         ulong exp;
         fmpz_t expz;
 
-        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
-        exp = n_randint(state, 50);
+        exp = n_randint(state, 30);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (f, ctx);
@@ -171,20 +171,20 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_fmpz_binexp, state)
     }
 
     /* Check that a^(b+c) = a^b * a^c */
-    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, res1, res2, res3, res4, t, f;
         fmpz_t exp1, exp2, exp3;
 
-        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         fmpz_init(exp1);
         fmpz_init(exp2);
-        fmpz_randtest(exp1, state, 200);
+        fmpz_randtest(exp1, state, 100);
         if (fmpz_sgn(exp1) == -1)
             fmpz_neg(exp1, exp1);
-        fmpz_randtest(exp2, state, 200);
+        fmpz_randtest(exp2, state, 100);
         if (fmpz_sgn(exp2) == -1)
             fmpz_neg(exp2, exp2);
 

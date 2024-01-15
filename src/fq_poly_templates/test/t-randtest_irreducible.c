@@ -24,7 +24,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_randtest_irreducible, state)
         TEMPLATE(T, poly_t) poly;
         slong length;
 
-        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (poly, ctx);
 
