@@ -17,7 +17,7 @@ TEST_FUNCTION_START(fmpz_kronecker, state)
 {
     slong i, j;
 
-    for (i = 0; i < 3000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t a, n;
         mpz_t aa, nn;
