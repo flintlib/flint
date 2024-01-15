@@ -23,7 +23,7 @@ TEST_TEMPLATE_FUNCTION_START(T, is_invertible, state)
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) a;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, randtest)(a, state, ctx);

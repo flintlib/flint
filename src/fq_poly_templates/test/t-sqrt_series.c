@@ -28,7 +28,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_sqrt_series, state)
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) one;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
 #if defined(FQ_NMOD_POLY_H) || defined(FQ_ZECH_POLY_H)
         if (TEMPLATE(T, ctx_prime)(ctx) != 2)
@@ -90,7 +90,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_sqrt_series, state)
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) one;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
 #if defined(FQ_NMOD_POLY_H) || defined(FQ_ZECH_POLY_H)
         if (TEMPLATE(T, ctx_prime)(ctx) != 2)

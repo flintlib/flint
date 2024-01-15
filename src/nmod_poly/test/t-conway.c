@@ -284,7 +284,8 @@ TEST_FUNCTION_START(_nmod_poly_conway_rand, state)
         int result;
         struct _prime_degree_struct pd;
 
-        pd = _nmod_poly_conway_rand(state);
+        /* Test all primes and degrees */
+        pd = _nmod_poly_conway_rand(state, 0);
 
         result = _nmod_poly_conway(op, pd.prime, pd.degree);
 

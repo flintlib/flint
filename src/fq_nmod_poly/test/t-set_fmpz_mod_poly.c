@@ -32,7 +32,7 @@ TEST_FUNCTION_START(fq_nmod_poly_set_fmpz_mod_poly, state)
         fmpz_mod_ctx_t ctxp;
 
         len = n_randint(state, 15) + 1;
-        fq_nmod_ctx_randtest(ctx, state);
+        fq_nmod_ctx_init_randtest(ctx, state, 0);
         fq_nmod_init(r, ctx);
         fq_nmod_init(s, ctx);
         fq_nmod_poly_init(a, ctx);

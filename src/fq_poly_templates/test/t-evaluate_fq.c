@@ -29,7 +29,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_evaluate_fq, state)
         TEMPLATE(T, t) x, y, z;
 
         len = n_randint(state, 15) + 1;
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
         TEMPLATE(T, poly_init) (f, ctx);
         TEMPLATE(T, init) (x, ctx);
         TEMPLATE(T, init) (y, ctx);
@@ -76,7 +76,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_evaluate_fq, state)
         TEMPLATE(T, t) x, y, z;
 
         len = n_randint(state, 15) + 1;
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
         TEMPLATE(T, poly_init) (f, ctx);
         TEMPLATE(T, poly_init) (g, ctx);
         TEMPLATE(T, poly_init) (h, ctx);

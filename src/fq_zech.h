@@ -42,9 +42,8 @@ void fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx, fq_nmod_ctx_t ctxn);
 int fq_zech_ctx_init_modulus_check(fq_zech_ctx_t ctx, const nmod_poly_t modulus, const char * var);
 void fq_zech_ctx_init_modulus(fq_zech_ctx_t ctx, const nmod_poly_t modulus, const char * var);
 
-void fq_zech_ctx_randtest(fq_zech_ctx_t ctx, flint_rand_t state);
-
-void fq_zech_ctx_randtest_reducible(fq_zech_ctx_t ctx, flint_rand_t state);
+void fq_zech_ctx_init_randtest(fq_zech_ctx_t ctx, flint_rand_t state, int type);
+void fq_zech_ctx_init_randtest_reducible(fq_zech_ctx_t ctx, flint_rand_t state, int type);
 
 void fq_zech_ctx_clear(fq_zech_ctx_t ctx);
 

@@ -112,6 +112,19 @@ Context Management
     detected. Returns `0` if the Zech representation was successfully
     initialised.
 
+.. function:: void fq_zech_ctx_init_randtest(fq_zech_ctx_t ctx, flint_rand_t state, int type)
+
+    Initialises ``ctx`` to a random finite field, where the prime and degree is
+    set according to ``type``. If ``type`` is `0` the prime and degree may be
+    large, else if ``type`` is `1` the degree is small but the prime may be
+    large, else if ``type`` is `2` the prime is small but the degree may be
+    large, else if ``type`` is `3` both prime and degree are small.
+
+.. function:: void fq_zech_ctx_init_randtest_reducible(fq_zech_ctx_t ctx, flint_rand_t state, int type)
+
+    Since the Zech logarithm representation does not work with a non-irreducible
+    modulus, this function does the same as :func:`fq_zech_ctx_init_randtest`.
+
 .. function:: void fq_zech_ctx_clear(fq_zech_ctx_t ctx)
 
     Clears all memory that has been allocated as part of the context.
@@ -146,17 +159,6 @@ Context Management
 .. function:: void fq_zech_ctx_print(const fq_zech_ctx_t ctx)
 
     Prints the context information to {\tt{stdout}}.
-
-.. function:: void fq_zech_ctx_randtest(fq_zech_ctx_t ctx, flint_rand_t state)
-
-    Initializes ``ctx`` to a random finite field.  Assumes that
-    ``fq_zech_ctx_init`` has not been called on ``ctx`` already.
-
-.. function:: void fq_zech_ctx_randtest_reducible(fq_zech_ctx_t ctx, flint_rand_t state)
-
-    Since the Zech logarithm representation does not work with a
-    non-irreducible modulus, does the same as
-    ``fq_zech_ctx_randtest``.
 
 
 Memory management

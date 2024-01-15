@@ -22,7 +22,7 @@ TEST_FUNCTION_START(n_fq_poly_gcd, state)
         n_poly_t a, b, c, d, e;
         fq_nmod_poly_t A, B, C;
 
-        fq_nmod_ctx_randtest(ctx, state);
+        fq_nmod_ctx_init_randtest(ctx, state, 0);
 
         n_poly_init(a);
         n_poly_init(b);

@@ -37,10 +37,10 @@ int _fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char * var)
 void fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char * var);
 void fq_ctx_init_modulus(fq_ctx_t ctx, const fmpz_mod_poly_t modulus, const fmpz_mod_ctx_t ctxp, const char * var);
 
-void fq_ctx_clear(fq_ctx_t ctx);
+void fq_ctx_init_randtest(fq_ctx_t ctx, flint_rand_t state, int type);
+void fq_ctx_init_randtest_reducible(fq_ctx_t ctx, flint_rand_t state, int type);
 
-void fq_ctx_randtest(fq_ctx_t ctx, flint_rand_t state);
-void fq_ctx_randtest_reducible(fq_ctx_t ctx, flint_rand_t state);
+void fq_ctx_clear(fq_ctx_t ctx);
 
 FQ_INLINE const fmpz_mod_poly_struct* fq_ctx_modulus(const fq_ctx_t ctx)
 {

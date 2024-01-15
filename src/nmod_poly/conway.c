@@ -611,16 +611,15 @@ _nmod_poly_conway_rand(flint_rand_t state, int type)
 
     switch (type)
     {
-        case 0: /* prime < 2^11, degree <= 8 */
-        case 1: /* prime < 2^11, degree whatever */
-            pd.prime = n_randprime(state, 2 + n_randint(state, 10), 1);
-            break;
-
-        case 2: /* prime whatever, degree <= 8 */
-        case 3: /* prime whatever, degree whatever */
+        case 0: /* prime whatever, degree whatever */
+        case 1: /* degree < 20 */
             do
                 pd.prime = n_randprime(state, 2 + n_randint(state, 16), 1);
             while (pd.prime > 109987);
+            break;
+        case 2: /* prime < 2^10 */
+        case 3: /* prime < 2^10 and degree < 20 */
+            pd.prime = n_randprime(state, 2 + n_randint(state, 9), 1);
             break;
 
         default: flint_throw(FLINT_ERROR, "wrong type in %s", __func__);
@@ -658,11 +657,11 @@ _nmod_poly_conway_rand(flint_rand_t state, int type)
 
         /* Now kx points to the starting degree for prime */
         jx = 0;
-        if (type == 0 || type == 2)
+        if (type % 2 == 1)
         {
             do
                 jx++;
-            while (degrees[kx + jx] < 8);
+            while (degrees[kx + jx] < 20);
         }
         else
         {
@@ -679,17 +678,11 @@ _nmod_poly_conway_rand(flint_rand_t state, int type)
     }
     else if (pd.prime < 300)
     {
-        if (type == 0 || type == 2)
-            pd.degree = 1 + n_randint(state, 8);
-        else
-            pd.degree = 1 + n_randint(state, 12);
+        pd.degree = 1 + n_randint(state, 12);
     }
     else if (pd.prime < 1000)
     {
-        if (type == 0 || type == 2)
-            pd.degree = 1 + n_randint(state, 8);
-        else
-            pd.degree = 1 + n_randint(state, 9);
+        pd.degree = 1 + n_randint(state, 9);
     }
     else if (pd.prime < 3371)
     {

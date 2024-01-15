@@ -29,7 +29,7 @@ TEST_TEMPLATE_FUNCTION_START(T, is_invertible_f, state)
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) a, ainv, f, g;
 
-        TEMPLATE(T, ctx_randtest_reducible)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest_reducible)(ctx, state, 0);
 
         TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, init)(f, ctx);

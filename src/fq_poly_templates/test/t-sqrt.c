@@ -26,7 +26,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_sqrt, state)
         int square1, square2;
         TEMPLATE(T, ctx_t) ctx;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, poly_init)(a, ctx);
         TEMPLATE(T, poly_init)(b, ctx);
@@ -62,7 +62,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_sqrt, state)
         int square;
         TEMPLATE(T, ctx_t) ctx;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, poly_init)(a, ctx);
         TEMPLATE(T, poly_init)(b, ctx);
@@ -109,7 +109,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_sqrt, state)
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) t;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, init)(t, ctx);
 

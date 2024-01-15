@@ -25,7 +25,7 @@ TEST_FUNCTION_START(fq_embed_mono_dual_matrix, state)
         fmpz_mod_mat_t m2d, d2m, one, two;
         slong d;
 
-        fq_ctx_randtest(ctx, state);
+        fq_ctx_init_randtest(ctx, state, 0);
         d = fq_ctx_degree(ctx);
 
         fmpz_mod_mat_init(m2d, d, d, fq_ctx_prime(ctx));

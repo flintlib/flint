@@ -36,8 +36,8 @@ int _fq_nmod_ctx_init_conway_ui(fq_nmod_ctx_t ctx, ulong prime, slong deg, const
 void fq_nmod_ctx_init_conway_ui(fq_nmod_ctx_t ctx, ulong prime, slong deg, const char * var);
 void fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx, const nmod_poly_t modulus, const char * var);
 
-void fq_nmod_ctx_randtest(fq_nmod_ctx_t ctx, flint_rand_t state);
-void fq_nmod_ctx_randtest_reducible(fq_nmod_ctx_t ctx, flint_rand_t state);
+void fq_nmod_ctx_init_randtest(fq_nmod_ctx_t ctx, flint_rand_t state, int type);
+void fq_nmod_ctx_init_randtest_reducible(fq_nmod_ctx_t ctx, flint_rand_t state, int type);
 
 void fq_nmod_ctx_clear(fq_nmod_ctx_t ctx);
 

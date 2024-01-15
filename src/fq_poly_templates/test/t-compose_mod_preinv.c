@@ -26,7 +26,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_compose_mod_preinv, state)
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, b, c, cinv, d, e;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
@@ -86,7 +86,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_compose_mod_preinv, state)
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, b, c, cinv, d;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
@@ -140,7 +140,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_compose_mod_preinv, state)
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, b, c, cinv, d;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
@@ -194,7 +194,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_compose_mod_preinv, state)
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, b, c, cinv, d;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);

@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 #include "fmpz.h"
@@ -251,6 +252,46 @@ fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx, fq_nmod_ctx_t fq_nmod_ctx)
     if (!fq_zech_ctx_init_fq_nmod_ctx_check(ctx, fq_nmod_ctx))
         flint_throw(FLINT_ERROR, "(fq_zech_ctx_init_fq_nmod_ctx): "
                 "Polynomial is not primitive.\n");
+}
+
+void
+fq_zech_ctx_init_randtest(fq_zech_ctx_t ctx, flint_rand_t state, int type)
+{
+    slong deg;
+    ulong prime;
+
+    /* Big prime < 2^5, big degree <= 5 */
+    /* Small prime < 2^3, small degree <= 3 */
+    switch (type)
+    {
+        case 0:
+            prime = n_randprime(state, 2 + n_randint(state, 4), 1);
+            deg = 1 + n_randint(state, 5);
+            break;
+        case 1:
+            prime = n_randprime(state, 2 + n_randint(state, 4), 1);
+            deg = 1 + n_randint(state, 3);
+            break;
+        case 2:
+            prime = n_randprime(state, 2 + n_randint(state, 2), 1);
+            deg = 1 + n_randint(state, 5);
+            break;
+        case 3:
+            prime = n_randprime(state, 2 + n_randint(state, 2), 1);
+            deg = 1 + n_randint(state, 3);
+            break;
+        default: FLINT_UNREACHABLE;
+    }
+
+    fq_zech_ctx_init_random_ui(ctx, prime, deg, "a");
+
+    ctx->owns_fq_nmod_ctx = 1;
+}
+
+void
+fq_zech_ctx_init_randtest_reducible(fq_zech_ctx_t ctx, flint_rand_t state, int type)
+{
+    fq_zech_ctx_init_randtest(ctx, state, type);
 }
 
 /* Deprecated functions ******************************************************/

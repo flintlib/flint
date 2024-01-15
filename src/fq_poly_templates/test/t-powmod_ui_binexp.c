@@ -28,7 +28,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_ui_binexp, state)
         TEMPLATE(T, poly_t) a, res1, t, f;
         ulong exp;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         exp = n_randint(state, 50);
 
@@ -74,7 +74,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_ui_binexp, state)
         TEMPLATE(T, poly_t) a, res1, t, f;
         ulong exp;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         exp = n_randint(state, 50);
 
@@ -121,7 +121,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_ui_binexp, state)
         ulong exp;
         int j;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         exp = n_randint(state, 50);
 
@@ -177,7 +177,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_ui_binexp, state)
 
         ulong exp1, exp2, exp3;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         exp1 = n_randint(state, 50);
         exp2 = n_randint(state, 50);

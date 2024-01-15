@@ -2313,12 +2313,11 @@ Special polynomials
     :type:`slong` in the second field, that, when put into
     :func:`_nmod_poly_conway` will always succeed.
 
-    Here, ``type`` can be the following values: ``0`` where a small prime and
-    small degree is returned, ``1`` where a small prime and an unrestricted
-    degree (the highest degree appearing in the database is 409) is returned,
-    ``2`` where an unrestricted prime (the highest prime appearing in the
-    database is 409) and small degree is returned, and ``3`` where an
-    unrestricted prime and unrestricted degree is returned.
+    Here, ``type`` can be the following values: ``0`` returns a random prime and
+    degree found in the database, ``1`` returns a degree less than `20` along
+    with some prime found in the database, ``2`` returns a prime less than
+    `2^{10}` along with some degree found in the database, and ``3`` returns a
+    prime less than `2^{10}` along with a degree less than `20`.
 
 
 Products

@@ -35,7 +35,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_factor, state)
         slong length, num, i, j;
         ulong exp[5];
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, init) (randlead, ctx);
 
@@ -158,7 +158,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_factor, state)
         ulong inflation;
         int found;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, poly_init) (pol1, ctx);
         TEMPLATE(T, poly_init) (poly, ctx);

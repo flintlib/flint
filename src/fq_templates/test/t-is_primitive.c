@@ -26,7 +26,7 @@ TEST_TEMPLATE_FUNCTION_START(T, is_primitive, state)
         TEMPLATE(T, t) a;
         fmpz_t ord, field_ord;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 1);
 
         TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, randtest)(a, state, ctx);

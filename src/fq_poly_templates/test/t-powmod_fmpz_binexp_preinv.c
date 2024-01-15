@@ -30,7 +30,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_fmpz_binexp_preinv, state)
         ulong exp;
         fmpz_t expz;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         exp = n_randint(state, 50);
         fmpz_init_set_ui(expz, exp);
@@ -84,7 +84,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_fmpz_binexp_preinv, state)
         ulong exp;
         fmpz_t expz;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         exp = n_randint(state, 50);
         fmpz_init_set_ui(expz, exp);
@@ -138,7 +138,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_fmpz_binexp_preinv, state)
         ulong exp;
         fmpz_t expz;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         exp = n_randint(state, 50);
 
@@ -195,7 +195,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_fmpz_binexp_preinv, state)
         TEMPLATE(T, poly_t) a, res1, res2, res3, res4, t, f, finv;
         fmpz_t exp1, exp2, exp3;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         fmpz_init(exp1);
         fmpz_init(exp2);

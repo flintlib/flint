@@ -21,7 +21,7 @@ TEST_FUNCTION_START(fq_zech_mul_ui, state)
 
     for (j = 0; j < 50; j++)
     {
-        fq_zech_ctx_randtest(ctx, state);
+        fq_zech_ctx_init_randtest(ctx, state, 0);
 
         for (i = 0; i < 200; i++)
         {

@@ -28,7 +28,7 @@ TEST_FUNCTION_START(fq_embed_matrices, state)
         fmpz_mod_mat_t embed, project, one;
         slong d;
 
-        fq_ctx_randtest(ctx, state);
+        fq_ctx_init_randtest(ctx, state, 0);
         d = fq_ctx_degree(ctx);
         modulus = fq_ctx_modulus(ctx);
 
@@ -72,7 +72,7 @@ TEST_FUNCTION_START(fq_embed_matrices, state)
             fmpz_mod_mat_t embed, project, comp, one;
             slong m, n;
 
-            while (fq_ctx_randtest(ctx1, state),
+            while (fq_ctx_init_randtest(ctx1, state, 0),
                     m = fq_ctx_degree(ctx1),
                     m == 1)
             {

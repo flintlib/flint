@@ -27,7 +27,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_mulmod, state)
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, b, res, f;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
@@ -72,7 +72,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_mulmod, state)
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, b, f, res;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
@@ -117,7 +117,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_mulmod, state)
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, b, f, res;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
@@ -162,7 +162,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_mulmod, state)
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, b, res1, res2, t, f;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);

@@ -19,7 +19,7 @@ TEST_FUNCTION_START(fq_zech_sqr, state)
 
     for (j = 0; j < 10; j++)
     {
-        fq_zech_ctx_randtest(ctx, state);
+        fq_zech_ctx_init_randtest(ctx, state, 0);
 
         /* Check aliasing: a = a * a */
         for (i = 0; i < 200; i++)

@@ -27,7 +27,7 @@ TEST_TEMPLATE_FUNCTION_START(T, vec_zero, state)
         TEMPLATE(T, struct) * a;
         slong len = n_randint(state, 100);
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         a = _TEMPLATE(T, vec_init) (len, ctx);
         _TEMPLATE(T, vec_randtest) (a, state, len, ctx);

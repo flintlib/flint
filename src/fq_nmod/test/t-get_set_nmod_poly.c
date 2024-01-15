@@ -20,7 +20,7 @@ TEST_FUNCTION_START(fq_nmod_get_set_nmod_poly, state)
 
     for (j = 0; j < 10*flint_test_multiplier(); j++)
     {
-        fq_nmod_ctx_randtest(ctx, state);
+        fq_nmod_ctx_init_randtest(ctx, state, 0);
 
         for (i = 0; i < 100; i++)
         {

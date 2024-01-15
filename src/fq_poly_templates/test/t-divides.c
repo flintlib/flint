@@ -26,7 +26,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_divides, state)
 
         TEMPLATE(T, poly_t) a, b, c, q;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
         TEMPLATE(T, poly_init) (c, ctx);
@@ -69,7 +69,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_divides, state)
 
         TEMPLATE(T, poly_t) a, b, c;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
         TEMPLATE(T, poly_init) (c, ctx);
@@ -108,7 +108,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_divides, state)
 
         TEMPLATE(T, poly_t) a, b, c;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
         TEMPLATE(T, poly_init) (c, ctx);

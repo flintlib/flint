@@ -24,7 +24,7 @@ TEST_FUNCTION_START(fq_zech_get_set_fq_nmod, state)
         fq_zech_t a, b;
         fq_nmod_t c;
 
-        fq_zech_ctx_randtest(ctx, state);
+        fq_zech_ctx_init_randtest(ctx, state, 0);
         fq_zech_init(a, ctx);
         fq_zech_init(b, ctx);
         fq_nmod_init(c, ctx->fq_nmod_ctx);

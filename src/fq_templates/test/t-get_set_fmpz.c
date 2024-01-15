@@ -25,7 +25,7 @@ TEST_TEMPLATE_FUNCTION_START(T, get_set_fmpz, state)
         TEMPLATE(T, t) a, b;
         fmpz_t s, t;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
         TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, init)(b, ctx);
         fmpz_init(s);

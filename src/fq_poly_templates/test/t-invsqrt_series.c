@@ -28,7 +28,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_invsqrt_series, state)
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) c;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, init)(c, ctx);
 
@@ -90,7 +90,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_invsqrt_series, state)
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) c;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, init)(c, ctx);
 

@@ -30,7 +30,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_scalar_div_fq, state)
         TEMPLATE(T, t) x;
 
         len = n_randint(state, 15) + 1;
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
@@ -74,7 +74,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_scalar_div_fq, state)
         TEMPLATE(T, t) x;
 
         len = n_randint(state, 15) + 1;
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);

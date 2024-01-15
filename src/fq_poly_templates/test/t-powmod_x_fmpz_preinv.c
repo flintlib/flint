@@ -30,7 +30,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_x_fmpz_preinv, state)
         ulong exp;
         fmpz_t expz;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         exp = n_randint(state, 50);
         fmpz_init_set_ui(expz, exp);
@@ -78,7 +78,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_x_fmpz_preinv, state)
         ulong exp;
         fmpz_t expz;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         exp = n_randint(state, 50);
 

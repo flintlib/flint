@@ -1,4 +1,6 @@
 /*
+    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2012 Andres Goens
     Copyright (C) 2013 Mike Hansen
     Copyright (C) 2024 Albin Ahlbäck
 
@@ -72,6 +74,66 @@ void fq_nmod_ctx_init_ui(fq_nmod_ctx_t ctx, ulong p, slong d, const char *var)
         nmod_poly_clear(poly);
         flint_randclear(state);
     }
+}
+
+void
+fq_nmod_ctx_init_randtest(fq_nmod_ctx_t ctx, flint_rand_t state, int type)
+{
+    struct _prime_degree_struct pd;
+
+    pd = _nmod_poly_conway_rand(state, type);
+    fq_nmod_ctx_init_conway_ui(ctx, pd.prime, pd.degree, "a");
+
+    /* Test non-monic modulus */
+    if (n_randint(state, 2))
+    {
+        nmod_poly_t modulus;
+        mp_limb_t x;
+
+        nmod_poly_init(modulus, ctx->mod.n);
+        nmod_poly_set(modulus, ctx->modulus);
+        x = n_randint(state, ctx->mod.n - 1) + 1;
+        nmod_poly_scalar_mul_nmod(modulus, modulus, x);
+        fq_nmod_ctx_clear(ctx);
+        fq_nmod_ctx_init_modulus(ctx, modulus, "a");
+        nmod_poly_clear(modulus);
+    }
+}
+
+void
+fq_nmod_ctx_init_randtest_reducible(fq_nmod_ctx_t ctx, flint_rand_t state, int type)
+{
+    ulong prime;
+    slong deg;
+    nmod_poly_t mod;
+
+    /* Big prime < 2^20, big degree <= 30 */
+    /* Small prime < 2^10, small degree <= 15 */
+    switch (type)
+    {
+        case 0:
+            prime = n_randprime(state, 2 + n_randint(state, 19), 1);
+            deg = 1 + n_randint(state, 30);
+            break;
+        case 1:
+            prime = n_randprime(state, 2 + n_randint(state, 19), 1);
+            deg = 1 + n_randint(state, 15);
+            break;
+        case 2:
+            prime = n_randprime(state, 2 + n_randint(state, 9), 1);
+            deg = 1 + n_randint(state, 30);
+            break;
+        case 3:
+            prime = n_randprime(state, 2 + n_randint(state, 9), 1);
+            deg = 1 + n_randint(state, 15);
+            break;
+        default: FLINT_UNREACHABLE;
+    }
+
+    nmod_poly_init(mod, prime);
+    nmod_poly_randtest_monic(mod, state, deg + 1);
+    fq_nmod_ctx_init_modulus(ctx, mod, "a");
+    nmod_poly_clear(mod);
 }
 
 /* Deprecated functions ******************************************************/

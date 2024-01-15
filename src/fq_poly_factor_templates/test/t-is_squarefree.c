@@ -32,7 +32,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_factor_is_squarefree, state)
         slong i, num_factors, exp, max_exp;
         int v, result;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, poly_init) (poly, ctx);
         TEMPLATE(T, poly_init) (t, ctx);

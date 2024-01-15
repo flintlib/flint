@@ -31,7 +31,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_gcd_euclidean_f, state)
         TEMPLATE(T, t) f;
         TEMPLATE(T, poly_t) a, b, c, d;
 
-        TEMPLATE(T, ctx_randtest_reducible) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest_reducible)(ctx, state, 0);
         TEMPLATE(T, init) (f, ctx);
 
         TEMPLATE(T, poly_init) (a, ctx);

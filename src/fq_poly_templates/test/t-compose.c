@@ -26,7 +26,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_compose, state)
 
         TEMPLATE(T, poly_t) f, g, h;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
         TEMPLATE(T, poly_init) (f, ctx);
         TEMPLATE(T, poly_init) (g, ctx);
         TEMPLATE(T, poly_init) (h, ctx);
@@ -65,7 +65,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_compose, state)
 
         TEMPLATE(T, poly_t) f, g, h;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
         TEMPLATE(T, poly_init) (f, ctx);
         TEMPLATE(T, poly_init) (g, ctx);
         TEMPLATE(T, poly_init) (h, ctx);
@@ -105,7 +105,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_compose, state)
         TEMPLATE(T, poly_t) f, g, h, s, t;
         slong k;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
         TEMPLATE(T, poly_init) (f, ctx);
         TEMPLATE(T, poly_init) (g, ctx);
         TEMPLATE(T, poly_init) (h, ctx);

@@ -27,7 +27,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_set_trunc, state)
         TEMPLATE(T, poly_t) a, b, c, d, e;
         slong n;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);

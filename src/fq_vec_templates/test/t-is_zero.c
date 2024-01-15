@@ -27,7 +27,7 @@ TEST_TEMPLATE_FUNCTION_START(T, vec_is_zero, state)
         TEMPLATE(T, struct) * a;
         slong len = n_randint(state, 100);
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         a = _TEMPLATE(T, vec_init) (len, ctx);
         _TEMPLATE(T, vec_zero) (a, len, ctx);
@@ -53,7 +53,7 @@ TEST_TEMPLATE_FUNCTION_START(T, vec_is_zero, state)
         TEMPLATE(T, struct) * a;
         slong len = n_randint(state, 100) + 1;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         a = _TEMPLATE(T, vec_init) (len, ctx);
         TEMPLATE(T, one) (a + (len - 1), ctx);

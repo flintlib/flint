@@ -26,7 +26,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_pow_trunc_binexp, state)
         TEMPLATE(T, t) d;
         slong e, trunc;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, init) (d, ctx);
         TEMPLATE(T, poly_init) (a, ctx);
@@ -70,7 +70,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_pow_trunc_binexp, state)
         TEMPLATE(T, ctx_t) ctx;
         slong e, trunc;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);

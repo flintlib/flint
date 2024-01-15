@@ -26,7 +26,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_equal, state)
         TEMPLATE(T, t) x;
         slong m, n, j;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, init) (x, ctx);
 

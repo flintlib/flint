@@ -25,7 +25,7 @@ TEST_FUNCTION_START(fq_nmod_mul_ui, state)
         ulong x;
         fq_nmod_t a, b;
 
-        fq_nmod_ctx_randtest(ctx, state);
+        fq_nmod_ctx_init_randtest(ctx, state, 0);
 
         fq_nmod_init(a, ctx);
         fq_nmod_init(b, ctx);
@@ -60,7 +60,7 @@ TEST_FUNCTION_START(fq_nmod_mul_ui, state)
         fq_nmod_t a, c;
         nmod_poly_t b;
 
-        fq_nmod_ctx_randtest(ctx, state);
+        fq_nmod_ctx_init_randtest(ctx, state, 0);
 
         fq_nmod_init(a, ctx);
         fq_nmod_init(c, ctx);

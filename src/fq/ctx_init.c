@@ -1,6 +1,6 @@
 /*
+    Copyright (C) 2011, 2012 Sebastian Pancratz
     Copyright (C) 2012 Andres Goens
-    Copyright (C) 2012 Sebastian Pancratz
     Copyright (C) 2013 Mike Hansen
     Copyright (C) 2024 Albin Ahlbäck
 
@@ -12,6 +12,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 #include "fq_nmod.h"
@@ -41,15 +42,15 @@ fq_ctx_init_set_clear_small_fq_nmod_ctx(fq_ctx_t c1, fq_nmod_ctx_t c2)
     c1->sparse_modulus = c2->sparse_modulus;
     c1->is_conway = c2->is_conway;
 
-    c1->a = c2->a;
+    c1->a = (fmpz *) c2->a;
     c1->j = c2->j;
     c1->len = c2->len;
 
     /* Init c1->modulus and c1->inv */
-    m1->coeffs = m2->coeffs;
+    m1->coeffs = (fmpz *) m2->coeffs;
     m1->alloc = m2->alloc;
     m1->length = m2->length;
-    i1->coeffs = i2->coeffs;
+    i1->coeffs = (fmpz *) i2->coeffs;
     i1->alloc = i2->alloc;
     i1->length = i2->length;
 
@@ -131,4 +132,55 @@ fq_ctx_init(fq_ctx_t ctx, const fmpz_t p, slong d, const char * var)
     fmpz_mod_poly_clear(poly, ctxp);
     fmpz_mod_ctx_clear(ctxp);
     flint_randclear(state);
+}
+
+/* FIXME: Test super big primes? */
+void
+fq_ctx_init_randtest(fq_ctx_t ctx, flint_rand_t state, int type)
+{
+    fq_nmod_ctx_t nmod_ctx;
+
+    fq_nmod_ctx_init_randtest(nmod_ctx, state, type);
+
+    fq_ctx_init_set_clear_small_fq_nmod_ctx(ctx, nmod_ctx);
+}
+
+void
+fq_ctx_init_randtest_reducible(fq_ctx_t ctx, flint_rand_t state, int type)
+{
+    fmpz_mod_ctx_t ctxp;
+    fmpz_mod_poly_t mod;
+    ulong prime;
+    slong deg;
+
+    /* Big prime < 2^40, big degree <= 30 */
+    /* Small prime < 2^10, small degree <= 15 */
+    switch (type)
+    {
+        case 0:
+            prime = n_randprime(state, 2 + n_randint(state, 39), 1);
+            deg = 1 + n_randint(state, 30);
+            break;
+        case 1:
+            prime = n_randprime(state, 2 + n_randint(state, 39), 1);
+            deg = 1 + n_randint(state, 15);
+            break;
+        case 2:
+            prime = n_randprime(state, 2 + n_randint(state, 9), 1);
+            deg = 1 + n_randint(state, 30);
+            break;
+        case 3:
+            prime = n_randprime(state, 2 + n_randint(state, 9), 1);
+            deg = 1 + n_randint(state, 15);
+            break;
+        default: FLINT_UNREACHABLE;
+    }
+
+    fmpz_mod_ctx_init_ui(ctxp, prime);
+    fmpz_mod_poly_init(mod, ctxp);
+    fmpz_mod_poly_randtest_monic(mod, state, deg + 1, ctxp);
+    fq_ctx_init_modulus(ctx, mod, ctxp, "a");
+
+    fmpz_mod_poly_clear(mod, ctxp);
+    fmpz_mod_ctx_clear(ctxp);
 }
