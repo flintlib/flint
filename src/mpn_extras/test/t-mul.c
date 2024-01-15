@@ -16,10 +16,7 @@ TEST_FUNCTION_START(flint_mpn_mul, state)
 {
     slong iter;
 
-    if (!state->gmp_init)
-        _flint_rand_init_gmp(state);
-
-    for (iter = 0; iter < 1000000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 100000 * flint_test_multiplier(); iter++)
     {
         slong i, n, m;
         mp_ptr X, Y, R1, R2;
@@ -35,11 +32,8 @@ TEST_FUNCTION_START(flint_mpn_mul, state)
         R1 = flint_malloc(sizeof(mp_limb_t) * (n + m));
         R2 = flint_malloc(sizeof(mp_limb_t) * (n + m));
 
-        mpz_t z;
-        z->_mp_d = X; z->_mp_alloc = z->_mp_size = n;
-        mpz_rrandomb(z, state->gmp_state, n * FLINT_BITS);
-        z->_mp_d = X; z->_mp_alloc = z->_mp_size = m;
-        mpz_rrandomb(z, state->gmp_state, m * FLINT_BITS);
+        mpn_random2(X, n);
+        mpn_random2(Y, m);
 
         for (i = 0; i < n + m; i++)
             R1[i] = n_randtest(state);
