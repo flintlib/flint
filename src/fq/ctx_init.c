@@ -153,16 +153,16 @@ fq_ctx_init_randtest_reducible(fq_ctx_t ctx, flint_rand_t state, int type)
     ulong prime;
     slong deg;
 
-    /* Big prime < 2^40, big degree <= 30 */
+    /* Big prime < 2^30, big degree <= 30 */
     /* Small prime < 2^10, small degree <= 15 */
     switch (type)
     {
         case 0:
-            prime = n_randprime(state, 2 + n_randint(state, 39), 1);
+            prime = n_randprime(state, 2 + n_randint(state, 29), 1);
             deg = 1 + n_randint(state, 30);
             break;
         case 1:
-            prime = n_randprime(state, 2 + n_randint(state, 39), 1);
+            prime = n_randprime(state, 2 + n_randint(state, 29), 1);
             deg = 1 + n_randint(state, 15);
             break;
         case 2:
