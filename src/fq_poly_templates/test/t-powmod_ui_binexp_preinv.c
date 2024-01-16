@@ -3,6 +3,7 @@
     Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2012 Lina Kulakova
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -151,11 +152,14 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_ui_binexp_preinv, state)
 
         TEMPLATE(T, poly_powmod_ui_binexp_preinv) (res1, a, exp, f, finv, ctx);
 
-        TEMPLATE(T, poly_zero) (res2, ctx);
         TEMPLATE(T, poly_one) (res2, ctx);
 
-        for (j = 1; j <= exp; j++)
+        for (j = 0; j < exp; j++)
             TEMPLATE(T, poly_mulmod) (res2, res2, a, f, ctx);
+
+        /* NOTE: If exp is zero, then is it never reduced with respect to f */
+        if (exp == 0)
+            TEMPLATE(T, poly_rem)(res2, res2, f, ctx);
 
         result = (TEMPLATE(T, poly_equal) (res1, res2, ctx));
         if (!result)

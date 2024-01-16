@@ -3,6 +3,7 @@
     Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2012 Lina Kulakova
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -132,15 +133,15 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_fmpz_sliding_preinv, state)
         TEMPLATE(T, ctx_clear) (ctx);
     }
 
-    /* No aliasing */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    /* Compare with binexp */
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, res1, res2, t, f, finv;
         ulong exp;
         fmpz_t expz;
 
-        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         exp = n_randint(state, 50);
 
@@ -159,9 +160,8 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_fmpz_sliding_preinv, state)
         TEMPLATE(T, poly_reverse) (finv, f, f->length, ctx);
         TEMPLATE(T, poly_inv_series_newton) (finv, finv, f->length, ctx);
 
-        TEMPLATE(T, poly_powmod_fmpz_sliding_preinv) (res1, a, expz, 0, f,
-                                                      finv, ctx);
-        TEMPLATE(T, poly_powmod_fmpz_sliding_preinv) (res2, a, expz, 0, f, finv, ctx);  /* TODO: Fix */
+        TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(res1, a, expz, 0, f, finv, ctx);
+        TEMPLATE(T, poly_powmod_fmpz_binexp_preinv)(res2, a, expz, f, finv, ctx);
 
         result = (TEMPLATE(T, poly_equal) (res1, res2, ctx));
         if (!result)
@@ -191,7 +191,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_fmpz_sliding_preinv, state)
     }
 
     /* Check that a^(b+c) = a^b * a^c */
-    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, res1, res2, res3, res4, t, f, finv;

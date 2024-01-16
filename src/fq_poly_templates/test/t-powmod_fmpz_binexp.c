@@ -3,6 +3,7 @@
     Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2012 Lina Kulakova
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -51,13 +52,13 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_fmpz_binexp, state)
         if (!result)
         {
             flint_printf("FAIL:\n");
+            flint_printf("exp: %wu\n", exp);
             flint_printf("a:\n");
             TEMPLATE(T, poly_print) (a, ctx), flint_printf("\n\n");
             flint_printf("f:\n");
             TEMPLATE(T, poly_print) (f, ctx), flint_printf("\n\n");
             flint_printf("res:\n");
             TEMPLATE(T, poly_print) (res, ctx), flint_printf("\n\n");
-            fflush(stdout);
             flint_abort();
         }
 
@@ -99,13 +100,13 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_fmpz_binexp, state)
         if (!result)
         {
             flint_printf("FAIL:\n");
+            flint_printf("exp: %wu\n", exp);
             flint_printf("a:\n");
             TEMPLATE(T, poly_print) (a, ctx), flint_printf("\n\n");
             flint_printf("f:\n");
             TEMPLATE(T, poly_print) (f, ctx), flint_printf("\n\n");
             flint_printf("res:\n");
             TEMPLATE(T, poly_print) (res, ctx), flint_printf("\n\n");
-            fflush(stdout);
             flint_abort();
         }
 
@@ -119,7 +120,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_fmpz_binexp, state)
     }
 
     /* Compare with ui function */
-    for (i = 0; i < 30 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, res1, res2, t, f;
@@ -148,6 +149,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_fmpz_binexp, state)
         if (!result)
         {
             flint_printf("FAIL:\n");
+            flint_printf("exp: %wu\n", exp);
             flint_printf("a:\n");
             TEMPLATE(T, poly_print) (a, ctx), flint_printf("\n\n");
             flint_printf("f:\n");
@@ -156,7 +158,6 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_fmpz_binexp, state)
             TEMPLATE(T, poly_print) (res1, ctx), flint_printf("\n\n");
             flint_printf("res2:\n");
             TEMPLATE(T, poly_print) (res2, ctx), flint_printf("\n\n");
-            fflush(stdout);
             flint_abort();
         }
 
@@ -171,7 +172,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_fmpz_binexp, state)
     }
 
     /* Check that a^(b+c) = a^b * a^c */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, res1, res2, res3, res4, t, f;
@@ -181,10 +182,10 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_fmpz_binexp, state)
 
         fmpz_init(exp1);
         fmpz_init(exp2);
-        fmpz_randtest(exp1, state, 100);
+        fmpz_randtest(exp1, state, 80);
         if (fmpz_sgn(exp1) == -1)
             fmpz_neg(exp1, exp1);
-        fmpz_randtest(exp2, state, 100);
+        fmpz_randtest(exp2, state, 80);
         if (fmpz_sgn(exp2) == -1)
             fmpz_neg(exp2, exp2);
 
@@ -211,6 +212,9 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_fmpz_binexp, state)
         if (!result)
         {
             flint_printf("FAIL:\n");
+            flint_printf("exp1 = %{fmpz}\n", exp1);
+            flint_printf("exp2 = %{fmpz}\n", exp2);
+            flint_printf("exp3 = %{fmpz}\n", exp3);
             flint_printf("a:\n");
             TEMPLATE(T, poly_print) (a, ctx), flint_printf("\n\n");
             flint_printf("f:\n");
@@ -219,7 +223,6 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_fmpz_binexp, state)
             TEMPLATE(T, poly_print) (res3, ctx), flint_printf("\n\n");
             flint_printf("res4:\n");
             TEMPLATE(T, poly_print) (res4, ctx), flint_printf("\n\n");
-            fflush(stdout);
             flint_abort();
         }
 
