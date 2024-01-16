@@ -79,10 +79,11 @@ void fq_nmod_ctx_init_ui(fq_nmod_ctx_t ctx, ulong p, slong d, const char *var)
 void
 fq_nmod_ctx_init_randtest(fq_nmod_ctx_t ctx, flint_rand_t state, int type)
 {
-    struct _prime_degree_struct pd;
+    ulong prime;
+    slong degree;
 
-    pd = _nmod_poly_conway_rand(state, type);
-    fq_nmod_ctx_init_conway_ui(ctx, pd.prime, pd.degree, "a");
+    prime = _nmod_poly_conway_rand(&degree, state, type);
+    fq_nmod_ctx_init_conway_ui(ctx, prime, degree, "a");
 
     /* Test non-monic modulus */
     if (n_randint(state, 2))

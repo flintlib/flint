@@ -604,28 +604,28 @@ _nmod_poly_conway(mp_ptr op, ulong prime, slong deg)
         return 0;
 }
 
-struct _prime_degree_struct
-_nmod_poly_conway_rand(flint_rand_t state, int type)
+ulong
+_nmod_poly_conway_rand(slong * degree, flint_rand_t state, int type)
 {
-    struct _prime_degree_struct pd;
+    ulong prime;
 
     switch (type)
     {
         case 0: /* prime whatever, degree whatever */
         case 1: /* degree < 15 */
             do
-                pd.prime = n_randprime(state, 2 + n_randint(state, 16), 1);
-            while (pd.prime > 109987);
+                prime = n_randprime(state, 2 + n_randint(state, 16), 1);
+            while (prime > 109987);
             break;
         case 2: /* prime < 2^10 */
         case 3: /* prime < 2^10 and degree < 15 */
-            pd.prime = n_randprime(state, 2 + n_randint(state, 9), 1);
+            prime = n_randprime(state, 2 + n_randint(state, 9), 1);
             break;
 
         default: flint_throw(FLINT_ERROR, "wrong type in %s", __func__);
     }
 
-    if (pd.prime < 260)
+    if (prime < 260)
     {
         /* Find the position it corresponds to in __nmod_poly_cp_primes0, and
          * then generate degree based on __nmod_poly_cp_degrees0. */
@@ -634,14 +634,14 @@ _nmod_poly_conway_rand(flint_rand_t state, int type)
         slong ix = 0, jx, kx;
 
         /* Primes are offset by 2 in table */
-        pd.prime -= 2;
+        prime -= 2;
 
         /* Search for prime's index */
-        while (pd.prime != primes[ix])
+        while (prime != primes[ix])
             ix++;
 
         /* Reset prime */
-        pd.prime += 2;
+        prime += 2;
 
         /* Search for starting index of degrees for prime */
         kx = 0;
@@ -672,21 +672,21 @@ _nmod_poly_conway_rand(flint_rand_t state, int type)
 
         /* The degrees we will be using are degrees[kx + 0], ...,
          * degrees[kx + jx - 1]. */
-        pd.degree = degrees[kx + n_randint(state, jx)];
+        *degree = degrees[kx + n_randint(state, jx)];
 #undef primes
 #undef degrees
     }
-    else if (pd.prime < 300)
+    else if (prime < 300)
     {
-        pd.degree = 1 + n_randint(state, 12);
+        *degree = 1 + n_randint(state, 12);
     }
-    else if (pd.prime < 1000)
+    else if (prime < 1000)
     {
-        pd.degree = 1 + n_randint(state, 9);
+        *degree = 1 + n_randint(state, 9);
     }
-    else if (pd.prime < 3371)
+    else if (prime < 3371)
     {
-        switch (pd.prime)
+        switch (prime)
         {
             case 2689:
             case 2797:
@@ -694,20 +694,20 @@ _nmod_poly_conway_rand(flint_rand_t state, int type)
             case 3019:
             case 3163:
             case 3209:
-            case 3331: pd.degree = 1 + n_randint(state, 6);
+            case 3331: *degree = 1 + n_randint(state, 6);
                        break;
 
-            default: pd.degree = 1 + n_randint(state, 8);
-                     if (pd.degree == 8)
-                         pd.degree++;
+            default: *degree = 1 + n_randint(state, 8);
+                     if (*degree == 8)
+                         *degree += 1;
         }
     }
-    else if (pd.prime < 11000)
-        pd.degree = 1 + n_randint(state, 6);
-    else if (pd.prime < 65536)
-        pd.degree = 1 + n_randint(state, 4);
+    else if (prime < 11000)
+        *degree = 1 + n_randint(state, 6);
+    else if (prime < 65536)
+        *degree = 1 + n_randint(state, 4);
     else
-        pd.degree = 4;
+        *degree = 4;
 
-    return pd;
+    return prime;
 }

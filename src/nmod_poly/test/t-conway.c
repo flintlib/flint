@@ -21,6 +21,13 @@ typedef struct
 }
 conway_polynomial_t;
 
+typedef struct
+{
+    ulong prime;
+    slong degree;
+}
+prime_degree_t;
+
 /* As the source code splits it into 7 different cases, we need to check every
    case against some variation against CPimport.txt by Frank Lübeck. We do this
    by checking every available degree of some primes for each case. We also
@@ -171,7 +178,7 @@ TEST_FUNCTION_START(_nmod_poly_conway, state)
     };
 
     /* Expected errors */
-    struct _prime_degree_struct error_list[] =
+    prime_degree_t error_list[] =
     {
         {0, 1},
         {1, 1},
@@ -253,7 +260,7 @@ TEST_FUNCTION_START(_nmod_poly_conway, state)
                     prime, deg, op, deg + 1, coeffs, deg + 1);
     }
 
-    for (ix = 0; ix < sizeof(error_list) / sizeof(struct _prime_degree_struct); ix++)
+    for (ix = 0; ix < sizeof(error_list) / sizeof(prime_degree_t); ix++)
     {
         ulong prime;
         slong deg;
@@ -277,22 +284,23 @@ TEST_FUNCTION_START(_nmod_poly_conway, state)
 TEST_FUNCTION_START(_nmod_poly_conway_rand, state)
 {
     slong ix;
+    int result;
     ulong op[500];
 
     for (ix = 0; ix < 10000 * flint_test_multiplier(); ix++)
     {
-        int result;
-        struct _prime_degree_struct pd;
+        ulong prime;
+        slong degree;
 
         /* Test all primes and degrees */
-        pd = _nmod_poly_conway_rand(state, 0);
+        prime = _nmod_poly_conway_rand(&degree, state, 0);
 
-        result = _nmod_poly_conway(op, pd.prime, pd.degree);
+        result = _nmod_poly_conway(op, prime, degree);
 
         if (!result)
             flint_throw(FLINT_TEST_FAIL,
                     "Prime %wu and degree %wd not present in database.\n",
-                    pd.prime, pd.degree);
+                    prime, degree);
     }
 
     TEST_FUNCTION_END(state);

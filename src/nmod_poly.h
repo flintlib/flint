@@ -1089,13 +1089,7 @@ void nmod_poly_exp_series(nmod_poly_t f, const nmod_poly_t h, slong n);
 
 int _nmod_poly_conway(mp_ptr op, ulong prime, slong deg);
 
-struct _prime_degree_struct
-{
-    ulong prime;
-    slong degree;
-};
-
-struct _prime_degree_struct _nmod_poly_conway_rand(flint_rand_t state, int type);
+ulong _nmod_poly_conway_rand(slong * degree, flint_rand_t state, int type);
 
 /* Products  *****************************************************************/
 

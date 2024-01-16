@@ -2304,20 +2304,20 @@ Special polynomials
     Lübeck's database [Lüb2004]_, which has been compressed in FLINT. Returns
     `1` in case of success and returns `0` in case of failure.
 
-.. type:: struct _prime_degree_struct
+.. function:: ulong _nmod_poly_conway_rand(slong * degree, flint_rand_t state, int type)
 
-.. function:: struct _prime_degree_struct _nmod_poly_conway_rand(flint_rand_t state, int type)
-
-    Returns a pseudorandom :type:`struct _prime_degree_struct` comprised of a
-    prime of type :type:`ulong` in its first field and a degree of type
-    :type:`slong` in the second field, that, when put into
+    Returns a pseudorandom prime and sets ``degree`` that when put into
     :func:`_nmod_poly_conway` will always succeed.
 
-    Here, ``type`` can be the following values: ``0`` returns a random prime and
-    degree found in the database, ``1`` returns a degree less than `15` along
-    with some prime found in the database, ``2`` returns a prime less than
-    `2^{10}` along with some degree found in the database, and ``3`` returns a
-    prime less than `2^{10}` along with a degree less than `15`.
+    Here, ``type`` can be the following values:
+    * ``0`` for which there is a bijection between the image of this function
+      and the database of Conway polynomials,
+    * ``1`` returns a random prime found in the database and sets ``degree`` to
+      some degree less than `15` along with some prime found in the database,
+    * ``2`` returns a random prime less than `2^{10}` and sets ``degree`` to
+      some random degree found in the database,
+    * ``3`` returns a random prime less than `2^{10}` and sets ``degree`` to
+      some random degree less than `15`.
 
 
 Products
