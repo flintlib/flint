@@ -15,6 +15,8 @@
 #include "fmpq_poly.h"
 #include "gr.h"
 #include "gr_poly.h"
+#include "gr_vec.h"
+#include "gr_generic.h"
 
 int
 _gr_fmpq_poly_ctx_write(gr_stream_t out, gr_ctx_t ctx)
@@ -684,6 +686,7 @@ gr_method_tab_input _fmpq_poly_methods_input[] =
     {GR_METHOD_ZERO,            (gr_funcptr) _gr_fmpq_poly_zero},
     {GR_METHOD_ONE,             (gr_funcptr) _gr_fmpq_poly_one},
     {GR_METHOD_GEN,             (gr_funcptr) _gr_fmpq_poly_gen},
+    {GR_METHOD_GENS,            (gr_funcptr) gr_generic_gens_single},
     {GR_METHOD_IS_ZERO,         (gr_funcptr) _gr_fmpq_poly_is_zero},
     {GR_METHOD_IS_ONE,          (gr_funcptr) _gr_fmpq_poly_is_one},
     {GR_METHOD_IS_NEG_ONE,      (gr_funcptr) _gr_fmpq_poly_is_neg_one},

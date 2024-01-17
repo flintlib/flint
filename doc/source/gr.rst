@@ -471,10 +471,12 @@ Special values
     "generator" depends on the domain.
 
 .. function:: int gr_gens(gr_vec_t res, gr_ctx_t ctx)
+              int gr_gens_recursive(gr_vec_t res, gr_ctx_t ctx)
 
     Sets *res* to a vector containing the generators of this domain
     where this makes sense, for example in a multivariate polynomial
-    ring.
+    ring. The *recursive* version also includes any generators
+    of the base ring, and of any recursive base rings.
 
 Basic properties
 ........................................................................

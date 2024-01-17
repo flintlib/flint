@@ -93,6 +93,10 @@ WARN_UNUSED_RESULT int gr_generic_randtest_not_zero(gr_ptr x, flint_rand_t state
 
 WARN_UNUSED_RESULT int gr_generic_randtest_small(gr_ptr x, flint_rand_t state, gr_ctx_t ctx);
 
+WARN_UNUSED_RESULT int gr_generic_gens(gr_vec_t vec, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_gens_single(gr_vec_t vec, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_gens_recursive(gr_vec_t vec, gr_ctx_t ctx);
+
 WARN_UNUSED_RESULT truth_t gr_generic_is_zero(gr_srcptr x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT truth_t gr_generic_is_one(gr_srcptr x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT truth_t gr_generic_is_neg_one(gr_srcptr x, gr_ctx_t ctx);

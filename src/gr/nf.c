@@ -19,6 +19,7 @@
 #include "gr_generic.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
+#include "gr_generic.h"
 
 typedef struct
 {
@@ -543,6 +544,7 @@ gr_method_tab_input _nf_methods_input[] =
     {GR_METHOD_ZERO,            (gr_funcptr) _gr_nf_zero},
     {GR_METHOD_ONE,             (gr_funcptr) _gr_nf_one},
     {GR_METHOD_GEN,             (gr_funcptr) _gr_nf_gen},
+    {GR_METHOD_GENS,            (gr_funcptr) gr_generic_gens_single},
     {GR_METHOD_IS_ZERO,         (gr_funcptr) _gr_nf_is_zero},
     {GR_METHOD_IS_ONE,          (gr_funcptr) _gr_nf_is_one},
     {GR_METHOD_IS_NEG_ONE,      (gr_funcptr) _gr_nf_is_neg_one},

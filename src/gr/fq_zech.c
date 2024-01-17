@@ -18,6 +18,7 @@
 #include "fq_zech_mat.h"
 #include "gr.h"
 #include "gr_vec.h"
+#include "gr_generic.h"
 
 #define FQ_CTX(ring_ctx) ((fq_zech_ctx_struct *)(GR_CTX_DATA_AS_PTR(ring_ctx)))
 
@@ -505,6 +506,7 @@ gr_method_tab_input _fq_zech_methods_input[] =
     {GR_METHOD_ZERO,            (gr_funcptr) _gr_fq_zech_zero},
     {GR_METHOD_ONE,             (gr_funcptr) _gr_fq_zech_one},
     {GR_METHOD_GEN,             (gr_funcptr) _gr_fq_zech_gen},
+    {GR_METHOD_GENS,            (gr_funcptr) gr_generic_gens_single},
     {GR_METHOD_IS_ZERO,         (gr_funcptr) _gr_fq_zech_is_zero},
     {GR_METHOD_IS_ONE,          (gr_funcptr) _gr_fq_zech_is_one},
     {GR_METHOD_EQUAL,           (gr_funcptr) _gr_fq_zech_equal},

@@ -130,6 +130,56 @@ _gr_gr_mpoly_is_one(const gr_mpoly_t poly, gr_ctx_t ctx)
 }
 
 int
+_gr_gr_mpoly_gens(gr_vec_t res, gr_ctx_t ctx)
+{
+    slong i, n;
+    int status = GR_SUCCESS;
+
+    n = MPOLYNOMIAL_MCTX(ctx)->nvars;
+
+    gr_vec_set_length(res, n, ctx);
+    for (i = 0; i < n; i++)
+        status |= gr_mpoly_gen(((gr_mpoly_struct *) res->entries) + i, i, MPOLYNOMIAL_MCTX(ctx), MPOLYNOMIAL_ELEM_CTX(ctx));
+
+    return status;
+}
+
+int
+_gr_gr_mpoly_gens_recursive(gr_vec_t vec, gr_ctx_t ctx)
+{
+    int status;
+    gr_vec_t vec1;
+    slong i, n, m;
+
+    /* Get generators of the element ring */
+    gr_vec_init(vec1, 0, MPOLYNOMIAL_ELEM_CTX(ctx));
+    status = gr_gens_recursive(vec1, MPOLYNOMIAL_ELEM_CTX(ctx));
+    n = vec1->length;
+
+    m = MPOLYNOMIAL_MCTX(ctx)->nvars;
+
+    gr_vec_set_length(vec, n + m, ctx);
+
+    /* Promote to polynomials */
+    for (i = 0; i < n; i++)
+    {
+        status |= gr_mpoly_set_scalar(gr_vec_entry_ptr(vec, i, ctx),
+                gr_vec_entry_srcptr(vec1, i, MPOLYNOMIAL_ELEM_CTX(ctx)),
+                    MPOLYNOMIAL_MCTX(ctx), MPOLYNOMIAL_ELEM_CTX(ctx));
+    }
+
+    for (i = 0; i < m; i++)
+    {
+        status |= gr_mpoly_gen(((gr_mpoly_struct *) vec->entries) + n + i,
+            i, MPOLYNOMIAL_MCTX(ctx), MPOLYNOMIAL_ELEM_CTX(ctx));
+    }
+
+    gr_vec_clear(vec1, MPOLYNOMIAL_ELEM_CTX(ctx));
+
+    return status;
+}
+
+int
 _gr_gr_mpoly_zero(gr_mpoly_t res, gr_ctx_t ctx)
 {
     return gr_mpoly_zero(res, MPOLYNOMIAL_MCTX(ctx), MPOLYNOMIAL_ELEM_CTX(ctx));
@@ -224,6 +274,8 @@ gr_method_tab_input _gr__gr_gr_mpoly_methods_input[] =
     {GR_METHOD_SET_SHALLOW, (gr_funcptr) _gr_gr_mpoly_set_shallow},
     {GR_METHOD_RANDTEST,    (gr_funcptr) _gr_gr_mpoly_randtest},
     {GR_METHOD_WRITE,       (gr_funcptr) _gr_gr_mpoly_write},
+    {GR_METHOD_GENS,        (gr_funcptr) _gr_gr_mpoly_gens},
+    {GR_METHOD_GENS_RECURSIVE,       (gr_funcptr) _gr_gr_mpoly_gens_recursive},
     {GR_METHOD_ZERO,        (gr_funcptr) _gr_gr_mpoly_zero},
     {GR_METHOD_ONE,         (gr_funcptr) _gr_gr_mpoly_one},
     {GR_METHOD_IS_ZERO,     (gr_funcptr) _gr_gr_mpoly_is_zero},

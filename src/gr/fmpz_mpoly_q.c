@@ -151,7 +151,7 @@ _gr_fmpz_mpoly_q_one(fmpz_mpoly_q_t res, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-truth_t
+int
 _gr_fmpz_mpoly_q_gens(gr_vec_t res, gr_ctx_t ctx)
 {
     slong i, n;

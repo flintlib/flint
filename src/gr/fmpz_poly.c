@@ -19,6 +19,7 @@
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
+#include "gr_generic.h"
 #include "fmpz_poly_factor.h"
 
 #define FMPZ_POLY_CTX(ctx) POLYNOMIAL_CTX(ctx)
@@ -788,6 +789,7 @@ gr_method_tab_input _fmpz_poly_methods_input[] =
     {GR_METHOD_ZERO,            (gr_funcptr) _gr_fmpz_poly_zero},
     {GR_METHOD_ONE,             (gr_funcptr) _gr_fmpz_poly_one},
     {GR_METHOD_GEN,             (gr_funcptr) _gr_fmpz_poly_gen},
+    {GR_METHOD_GENS,            (gr_funcptr) gr_generic_gens_single},
     {GR_METHOD_IS_ZERO,         (gr_funcptr) _gr_fmpz_poly_is_zero},
     {GR_METHOD_IS_ONE,          (gr_funcptr) _gr_fmpz_poly_is_one},
     {GR_METHOD_IS_NEG_ONE,      (gr_funcptr) _gr_fmpz_poly_is_neg_one},

@@ -67,6 +67,8 @@ gr_poly_write(gr_stream_t out, const gr_poly_t poly, const char * x, gr_ctx_t ct
 
         if (i >= 1 && !strcmp(s, "1"))
         {
+            flint_free(s);
+
             if (printed_previously)
                 gr_stream_write(out, " + ");
 
@@ -80,6 +82,8 @@ gr_poly_write(gr_stream_t out, const gr_poly_t poly, const char * x, gr_ctx_t ct
         }
         else if (i >= 1 && !strcmp(s, "-1"))
         {
+            flint_free(s);
+
             if (printed_previously)
                 gr_stream_write(out, " - ");
             else

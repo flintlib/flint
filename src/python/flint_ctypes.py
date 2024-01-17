@@ -218,6 +218,13 @@ class gr_series_struct(ctypes.Structure):
                 ('length', c_slong),
                 ('error', c_slong)]
 
+class gr_mpoly_struct(ctypes.Structure):
+    _fields_ = [('coeffs', ctypes.c_void_p),
+                ('exps', ctypes.c_void_p),
+                ('length', c_slong),
+                ('bits', c_slong),
+                ('coeffs_alloc', c_slong),
+                ('exps_alloc', c_slong)]
 
 class psl2z_struct(ctypes.Structure):
     _fields_ = [('a', c_slong), ('b', c_slong),
@@ -800,8 +807,35 @@ class gr_ctx:
         """
         return ctx._constant(ctx, libgr.gr_gen, "gen")
 
-    def gens(ctx):
-        return ctx._op_vec_ctx(libgr.gr_gens, "gens")
+    def gens(ctx, recursive=False):
+        """
+        Gives a vector of generators of this ring. If recursive=True,
+        includes the generators of all base rings.
+
+            >>> ZZx.gens()
+            [x]
+            >>> PolynomialRing(QQ, "v").gens()
+            [v]
+            >>> FiniteField_fq(3, 2).gens()
+            [a]
+            >>> NumberField(ZZx.gen()**2+1).gens()
+            [a]
+            >>> ZZ.gens()
+            []
+            >>> PolynomialRing(PolynomialRing(ZZi, "x"), "y").gens(recursive=True)
+            [I, x, y]
+            >>> PolynomialRing_fmpz_mpoly(3).gens()
+            [x1, x2, x3]
+            >>> PolynomialRing(PowerSeriesRing(ZZ, var="b"), "t").gens()
+            [t]
+            >>> PolynomialRing(PowerSeriesRing(ZZ, var="b"), "t").gens(recursive=True)
+            [b, t]
+
+        """
+        if recursive:
+            return ctx._op_vec_ctx(libgr.gr_gens_recursive, "gens")
+        else:
+            return ctx._op_vec_ctx(libgr.gr_gens, "gens")
 
     def zero(ctx):
         """
@@ -4147,7 +4181,7 @@ class ComplexExtended_ca(gr_ctx_ca):
 
 
 class PolynomialRing_gr_poly(gr_ctx):
-    def __init__(self, coefficient_ring):
+    def __init__(self, coefficient_ring, var=None):
         assert isinstance(coefficient_ring, gr_ctx)
         gr_ctx.__init__(self)
         #if libgr.gr_ctx_is_ring(coefficient_ring._ref) != T_TRUE:
@@ -4157,30 +4191,37 @@ class PolynomialRing_gr_poly(gr_ctx):
         self._coefficient_ring = coefficient_ring
         self._elem_type = gr_poly
 
+        if var is not None:
+            self._set_gen_name(var)
+
     def __del__(self):
         self._coefficient_ring._decrement_refcount()
 
 
 class PowerSeriesRing_gr_series(gr_ctx):
-    def __init__(self, coefficient_ring, prec=6):
+    def __init__(self, coefficient_ring, prec=6, var=None):
         assert isinstance(coefficient_ring, gr_ctx)
         gr_ctx.__init__(self)
         libgr.gr_ctx_init_gr_series(self._ref, coefficient_ring._ref, prec)
         coefficient_ring._refcount += 1
         self._coefficient_ring = coefficient_ring
         self._elem_type = gr_series
+        if var is not None:
+            self._set_gen_name(var)
 
     def __del__(self):
         self._coefficient_ring._decrement_refcount()
 
 class PowerSeriesModRing_gr_series(gr_ctx):
-    def __init__(self, coefficient_ring, mod=6):
+    def __init__(self, coefficient_ring, mod=6, var=None):
         assert isinstance(coefficient_ring, gr_ctx)
         gr_ctx.__init__(self)
         libgr.gr_ctx_init_gr_series_mod(self._ref, coefficient_ring._ref, mod)
         coefficient_ring._refcount += 1
         self._coefficient_ring = coefficient_ring
         self._elem_type = gr_series
+        if var is not None:
+            self._set_gen_name(var)
 
     def __del__(self):
         self._coefficient_ring._decrement_refcount()
@@ -5818,6 +5859,31 @@ class PolynomialRing_fmpz_mpoly(gr_ctx):
         return ZZ
 
 
+
+class gr_mpoly(gr_elem):
+    _struct_type = gr_mpoly_struct
+
+class PolynomialRing_gr_mpoly(gr_ctx):
+    def __init__(self, coefficient_ring, nvars):
+        assert isinstance(coefficient_ring, gr_ctx)
+        gr_ctx.__init__(self)
+
+        gr_ctx.__init__(self)
+        nvars = gr_ctx._as_si(nvars)
+        assert nvars >= 0
+        libgr.gr_ctx_init_gr_mpoly(self._ref, coefficient_ring._ref, nvars, 0)
+        self._elem_type = fmpz_mpoly
+
+        coefficient_ring._refcount += 1
+        self._coefficient_ring = coefficient_ring
+        self._elem_type = gr_mpoly
+
+    def __del__(self):
+        self._coefficient_ring._decrement_refcount()
+
+
+
+
 class fmpz_mpoly_q(gr_elem):
     _struct_type = fmpz_mpoly_q_struct
 
@@ -6472,6 +6538,30 @@ def test_polynomial():
             for C in poly_types:
                 assert A(B([1,2,3])) == C([1,2,3])
 
+def test_gr_mpoly():
+    I, x, y, z = PolynomialRing_gr_mpoly(ZZi, 3).gens(recursive=True)
+    assert str(x) == "x"
+    assert str(y) == "y"
+    assert str(z) == "z"
+    assert str(x-y) == "x - y"
+    assert str(x+2*y) == "x + 2*y"
+    assert str(x-2*y) == "x - 2*y"
+    assert str(-x) == "-x"
+    assert str(-3*x) == "-3*x"
+    assert str(x+1) == "x + 1"
+    assert str(x-1) == "x - 1"
+    assert str(x+2) == "x + 2"
+    assert str(x-2) == "x - 2"
+    assert str(x*0) == "0"
+    assert str(x**0) == "1"
+    assert str(-x**0) == "-1"
+    assert str(-2*x**0) == "-2"
+    assert str(x*y*z) == "x*y*z"
+    assert str(x*y**2*z) == "x*y^2*z"
+    assert str(3*x*y**2*z) == "3*x*y^2*z"
+    assert str((1+I)*x + I*y) == "(1+I)*x + I*y"
+    assert str((1+I)*x - I*y) == "(1+I)*x - I*y"
+    assert str(x+1+I) == "x + (1+I)"
 
 def test_matrix():
     M = Mat(ZZ, 2)
@@ -7376,6 +7466,9 @@ def test_all():
     assert ZZp32(10001).sqrt() ** 2 == 10001
 
     assert abs(VecZZ([-3,2,5])) == [3, 2, 5]
+
+    b, t = PolynomialRing(PowerSeriesModRing(ZZ, 6, var="b"), "t").gens(recursive=True)
+    assert (5+2*b+3*t)**5 / (5+2*b+3*t)**5 == 1
 
 def test_float():
     assert RF(5).mul_2exp(-1) == RF(2.5)
