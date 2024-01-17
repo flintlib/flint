@@ -22,6 +22,10 @@
 extern "C" {
 #endif
 
+/* Check that a modulus n satisfies the assumptions for mulmod
+   documented in machine_vectors.h */
+int fft_small_mulmod_satisfies_bounds(ulong n);
+
 FLINT_INLINE ulong n_pow2(int k)
 {
     return UWORD(1) << k;
@@ -111,6 +115,7 @@ FLINT_INLINE slong z_min(slong a, slong b) {return FLINT_MIN(a, b);}
 
 FLINT_INLINE slong z_max(slong a, slong b) {return FLINT_MAX(a, b);}
 
+int fft_small_mulmod_satisfies_bounds(ulong n);
 
 void* flint_aligned_alloc(ulong alignment, ulong size);
 

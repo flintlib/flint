@@ -602,7 +602,16 @@ DEFINE_IT(vec1d)
 DEFINE_IT(vec4d)
 #undef DEFINE_IT
 
-/* mulmod(a, b, n, ninv): return a*b mod n in [-n,n] with assumptions */
+/*
+    mulmod(a, b, n, 1.0/n): return a*b mod n
+    assuming fft_small_mulmod_satisfies_bounds(n):
+     Products a*b in the range (-2*n^2, 2*n^2) are reduced to the range (-1*n, 1*n).
+     Products a*b in the range (-4*n^2, 4*n^2) are reduced to the range (-3/2*n, 3/2*n).
+    otherwise the more pessimistic:
+     Products a*b in the range (-2*n^2, 2*n^2) are reduced to the range (-9/8*n, 9/8*n).
+     Products a*b in the range (-4*n^2, 4*n^2) are reduced to the range (-7/4*n, 7/4*n).
+    floating point round mode is always assumed to be set to nearest
+*/
 #define DEFINE_IT(V) \
 FLINT_FORCE_INLINE V V##_mulmod(V a, V b, V n, V ninv) { \
     V h = V##_mul(a, b); \

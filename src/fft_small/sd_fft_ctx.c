@@ -57,6 +57,9 @@ void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp)
     double * t;
     double n, ninv;
 
+    if (!fft_small_mulmod_satisfies_bounds(pp))
+        flint_throw(FLINT_ERROR, "FFT prime %wu does not satisfy bounds for arithmetic", pp);
+
     Q->blk_sz = BLK_SZ;
     Q->p = pp;
     Q->pinv = 1.0/Q->p;
