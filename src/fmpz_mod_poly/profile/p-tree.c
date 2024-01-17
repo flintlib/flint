@@ -55,7 +55,7 @@ main(void)
     for (iter = 0; iter < 10; iter++)
     {
        tree = _fmpz_mod_poly_tree_alloc(len);
-       _fmpz_mod_poly_tree_build(tree, roots, len, N);
+       _fmpz_mod_poly_tree_build(tree, roots, len, ctx);
        _fmpz_mod_poly_tree_free(tree, len);
     }
 

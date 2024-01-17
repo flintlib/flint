@@ -56,7 +56,6 @@ double profile_it(ulong a_bits, ulong b_bits, ulong g_bits, flint_rand_t state)
 
 int main(void)
 {
-    ulong i;
     ulong a_bits, b_bits, g_bits;
     flint_rand_t state;
 

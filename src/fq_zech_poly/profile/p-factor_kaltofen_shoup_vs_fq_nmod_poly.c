@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdlib.h>
 #include <float.h>
 #include "flint.h"
 #include "fmpz.h"
@@ -33,7 +34,8 @@ main(int argc, char** argv)
 
     int c, n, len, ext, reps = 0;
     slong j;
-    fmpz_t p, temp;
+    ulong p;
+    fmpz_t temp;
     fq_zech_poly_t f, g;
     fq_nmod_poly_t fn;
     fq_zech_ctx_t ctx;
@@ -41,8 +43,7 @@ main(int argc, char** argv)
 
     FLINT_TEST_INIT(state);
 
-    fmpz_init(p);
-    fmpz_set_str(p, argv[1], 10);
+    p = strtoull(argv[1], NULL, 10);
 
     fmpz_init(temp);
 
@@ -134,7 +135,6 @@ main(int argc, char** argv)
     fq_nmod_poly_clear(fn, ctxn);
     fq_zech_ctx_clear(ctx);
     fq_nmod_ctx_clear(ctxn);
-    fmpz_clear(p);
     fmpz_clear(temp);
 
     FLINT_TEST_CLEANUP(state);

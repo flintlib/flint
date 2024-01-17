@@ -12,6 +12,10 @@
 #include "nmod_mpoly_factor.h"
 #include "profiler.h"
 
+#if defined(__GNUC__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Woverlength-strings"
+#endif
 
 slong check_omega(slong om, const nmod_mpoly_t p, const char ** vars, const nmod_mpoly_ctx_t ctx)
 {
@@ -1219,3 +1223,7 @@ int main(int argc, char *argv[])
     flint_cleanup_master();
     return 0;
 }
+
+#if defined(__GNUC__)
+# pragma GCC diagnostic pop
+#endif

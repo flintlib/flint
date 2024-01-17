@@ -10,6 +10,7 @@
 */
 
 #include "fmpz.h"
+#include "ulong_extras.h"
 #include "fq_nmod.h"
 #include "fq_nmod_poly.h"
 #include "fq_nmod_poly_factor.h"
@@ -21,7 +22,7 @@ int main(int argc, char *argv[])
     slong i;
 
     {
-        fmpz_t p;
+        ulong p;
         fq_nmod_ctx_t ctx;
         fq_nmod_t lc;
         fq_nmod_poly_t f, g;
@@ -31,8 +32,8 @@ int main(int argc, char *argv[])
 
         flint_randinit(randstate);
 
-        fmpz_init_set_ui(p, UWORD(1) << (SMALL_FMPZ_BITCOUNT_MAX));
-        fmpz_nextprime(p, p, 1);
+        p = UWORD(1) << (SMALL_FMPZ_BITCOUNT_MAX);
+        p = n_nextprime(p, 1);
 
         fq_nmod_ctx_init_ui(ctx, p, 6, "a");
 
@@ -73,7 +74,6 @@ int main(int argc, char *argv[])
         fq_nmod_poly_clear(g, ctx);
         fq_nmod_poly_clear(f, ctx);
         fq_nmod_ctx_clear(ctx);
-        fmpz_clear(p);
 
         flint_randclear(randstate);
     }

@@ -21,7 +21,7 @@
 #endif
 
 int
-main()
+main(void)
 {
     timeit_t t0;
 

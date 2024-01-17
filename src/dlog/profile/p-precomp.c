@@ -90,9 +90,6 @@ flog_gen(ulong p, ulong a, ulong num)
 int main(int argc, char *argv[])
 {
     int out = LOG;
-    slong iter, k, nv, nref, r, nr;
-    ulong minq, maxq;
-    ulong * rand;
     int nbits, nl = 5;
     int l[5] = { 1, 10, 100, 1000 , 5000};
 

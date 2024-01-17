@@ -15,7 +15,7 @@
 
 #define MAXN 15
 
-int main()
+int main(void)
 {
     flint_rand_t state;
     flint_randinit(state);

@@ -22,10 +22,6 @@ typedef void (*do_f) (acb_t res, const dirichlet_group_t G, const dirichlet_char
 int main(int argc, char *argv[])
 {
     int out;
-    ulong n, nref, maxq = 5000;
-    ulong * rand;
-    flint_rand_t state;
-    slong r, nr;
 
     int l, nf = 5;
     do_f func[5] = { acb_dirichlet_gauss_sum_naive,
