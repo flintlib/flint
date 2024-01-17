@@ -5,8 +5,6 @@
 #include "ca.h"
 #include "gr.h"
 
-#pragma GCC optimize("O1")
-
 int gr_sqrt_ui(gr_ptr x, ulong y, gr_ctx_t ctx)
 {
     int status = gr_set_ui(x, y, ctx);
