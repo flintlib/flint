@@ -94,7 +94,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_factor_roots, state)
         TEMPLATE(T, poly_t) f;
         TEMPLATE(T, poly_factor_t) r;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         TEMPLATE(T, poly_init)(f, ctx);
         TEMPLATE(T, poly_factor_init)(r, ctx);
 

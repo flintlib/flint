@@ -28,7 +28,7 @@ TEST_TEMPLATE_FUNCTION_START(T, embed_composition_matrix, state)
         TEMPLATE(B, mat_t) mat_frob, mat_a, mat_aq, res;
         slong d;
 
-        while (TEMPLATE(T, ctx_randtest)(ctx, state),
+        while (TEMPLATE(T, ctx_init_randtest)(ctx, state, 3),
                d = TEMPLATE(T, ctx_degree)(ctx),
                d == 1)
         {

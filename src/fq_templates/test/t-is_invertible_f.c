@@ -16,7 +16,8 @@
 
 TEST_TEMPLATE_FUNCTION_START(T, is_invertible_f, state)
 {
-    int i, result;
+    slong ix;
+    int result;
 
     /*
         Compare with the gcdinv function.
@@ -24,12 +25,16 @@ TEST_TEMPLATE_FUNCTION_START(T, is_invertible_f, state)
         N.B.  I checked by hand that this test shows both outcomes,
         i.e. trivial and non-trivial factors, sufficiently frequently.
      */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (ix = 0; ix < 100 * flint_test_multiplier(); ix++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) a, ainv, f, g;
 
-        TEMPLATE(T, ctx_randtest_reducible)(ctx, state);
+#if defined(FQ_ZECH_H)
+        TEMPLATE(T, ctx_init_randtest_reducible)(ctx, state, 1);
+#else
+        TEMPLATE(T, ctx_init_randtest_reducible)(ctx, state, 0);
+#endif
 
         TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, init)(f, ctx);
@@ -52,7 +57,6 @@ TEST_TEMPLATE_FUNCTION_START(T, is_invertible_f, state)
             flint_printf("\n\n");
             flint_printf("g = "), TEMPLATE(T, print_pretty)(g, ctx);
             flint_printf("\n\n");
-            fflush(stdout);
             flint_abort();
         }
 

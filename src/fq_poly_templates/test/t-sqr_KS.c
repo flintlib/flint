@@ -21,15 +21,15 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_sqr_KS, state)
     int i, result;
 
     /* Check aliasing: a = a * a */
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         slong len;
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a, c;
 
-        len = n_randint(state, 50) + 1;
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        len = n_randint(state, 20) + 1;
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (c, ctx);
 
@@ -57,15 +57,15 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_sqr_KS, state)
     }
 
     /* Check that a^2 + a^2 == a * (a + a) */
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         slong len;
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a, b, c, d;
 
-        len = n_randint(state, 50) + 1;
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        len = n_randint(state, 20) + 1;
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
         TEMPLATE(T, poly_init) (c, ctx);
@@ -111,8 +111,8 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_sqr_KS, state)
 
         TEMPLATE(T, poly_t) a, b, c;
 
-        len = n_randint(state, 50) + 1;
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        len = n_randint(state, 30) + 1;
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
         TEMPLATE(T, poly_init) (c, ctx);

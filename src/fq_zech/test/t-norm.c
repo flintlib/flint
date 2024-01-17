@@ -18,14 +18,16 @@
 
 TEST_FUNCTION_START(fq_zech_norm, state)
 {
-    int j, i, result;
-    fq_zech_ctx_t ctx;
+    slong ix, jx;
+    int result;
 
-    for (j = 0; j < 50; j++)
+    for (ix = 0; ix < 100 * flint_test_multiplier(); ix++)
     {
-        fq_zech_ctx_randtest(ctx, state);
+        fq_zech_ctx_t ctx;
 
-        for (i = 0; i < 200; i++)
+        fq_zech_ctx_init_randtest(ctx, state, 1);
+
+        for (jx = 0; jx < 10; jx++)
         {
             fmpz_t t1, t2;
             fq_nmod_t aa;

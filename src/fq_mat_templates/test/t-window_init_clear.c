@@ -27,7 +27,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_window_init_clear, state)
         slong rows = n_randint(state, 10);
         slong cols = n_randint(state, 10);
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, mat_init) (a, rows, cols, ctx);
         TEMPLATE(T, mat_randtest) (a, state, ctx);

@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2020 William Hart
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -17,21 +18,29 @@
 
 TEST_TEMPLATE_FUNCTION_START(T, sqrt, state)
 {
-    int j, i, result;
-    TEMPLATE(T, ctx_t) ctx;
+    slong ix;
+    int result;
 
-    for (j = 0; j < 10; j++)
+    for (ix = 0; ix < 300 * flint_test_multiplier(); ix++)
     {
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_t) ctx;
+        TEMPLATE(T, t) a, c;
+        int type;
 
-        /* Check aliasing: a = a * a */
-        for (i = 0; i < 200; i++)
+        type = n_randint(state, 2);
+
+#if defined(FQ_ZECH_H)
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
+#else
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 1);
+#endif
+
+        TEMPLATE(T, init)(a, ctx);
+        TEMPLATE(T, init)(c, ctx);
+
+        if (type == 0)
         {
-            TEMPLATE(T, t) a, c;
-
-            TEMPLATE(T, init)(a, ctx);
-            TEMPLATE(T, init)(c, ctx);
-
+            /* Check aliasing: a = a * a */
             TEMPLATE(T, randtest)(a, state, ctx);
 
             TEMPLATE(T, sqr)(c, a, ctx);
@@ -45,23 +54,15 @@ TEST_TEMPLATE_FUNCTION_START(T, sqrt, state)
                 flint_printf("FAIL (aliasing):\n\n");
                 flint_printf("a = "), TEMPLATE(T, print_pretty)(a, ctx), flint_printf("\n");
                 flint_printf("c = "), TEMPLATE(T, print_pretty)(c, ctx), flint_printf("\n");
-                fflush(stdout);
                 flint_abort();
             }
-
-            TEMPLATE(T, clear)(a, ctx);
-            TEMPLATE(T, clear)(c, ctx);
         }
-
-        /* Check sqrt(a^2) = a and that x*a^2 is not a square */
-        for (i = 0; i < 200; i++)
+        else
         {
-            int r;
-            TEMPLATE(T, t) a, b, c, d, x;
+            /* Check sqrt(a^2) = a and that x*a^2 is not a square */
+            TEMPLATE(T, t) b, d, x;
 
-            TEMPLATE(T, init)(a, ctx);
             TEMPLATE(T, init)(b, ctx);
-            TEMPLATE(T, init)(c, ctx);
             TEMPLATE(T, init)(d, ctx);
             TEMPLATE(T, init)(x, ctx);
 
@@ -69,19 +70,17 @@ TEST_TEMPLATE_FUNCTION_START(T, sqrt, state)
 
             TEMPLATE(T, sqr)(b, a, ctx);
 
-            r = TEMPLATE(T, sqrt)(c, b, ctx);
+            result = TEMPLATE(T, sqrt)(c, b, ctx);
             TEMPLATE(T, sqr)(d, c, ctx);
 
-            result = (r && TEMPLATE(T, equal)(d, b, ctx));
+            result = (result && TEMPLATE(T, equal)(d, b, ctx));
             if (!result)
             {
                 flint_printf("FAIL (sqrt(a^2) == a):\n\n");
-                flint_printf("r = %d\n", r);
                 flint_printf("a = "), TEMPLATE(T, print_pretty)(a, ctx), flint_printf("\n");
                 flint_printf("b = "), TEMPLATE(T, print_pretty)(b, ctx), flint_printf("\n");
                 flint_printf("c = "), TEMPLATE(T, print_pretty)(c, ctx), flint_printf("\n");
                 flint_printf("d = "), TEMPLATE(T, print_pretty)(c, ctx), flint_printf("\n");
-                fflush(stdout);
                 flint_abort();
             }
 
@@ -96,25 +95,23 @@ TEST_TEMPLATE_FUNCTION_START(T, sqrt, state)
                 TEMPLATE(T, gen)(x, ctx);
                 TEMPLATE(T, mul)(b, b, x, ctx);
 
-                r = TEMPLATE(T, sqrt)(c, b, ctx);
-
-                result = !r; /* check b is not a square */
+                result = !TEMPLATE(T, sqrt)(c, b, ctx); /* check b is not a square */
                 if (!result)
                 {
                     flint_printf("FAIL (a^2*x is nonsquare):\n\n");
                     flint_printf("a = "), TEMPLATE(T, print_pretty)(a, ctx), flint_printf("\n");
                     flint_printf("b = "), TEMPLATE(T, print_pretty)(b, ctx), flint_printf("\n");
-                    fflush(stdout);
                     flint_abort();
                 }
             }
 
-            TEMPLATE(T, clear)(a, ctx);
             TEMPLATE(T, clear)(b, ctx);
-            TEMPLATE(T, clear)(c, ctx);
             TEMPLATE(T, clear)(d, ctx);
             TEMPLATE(T, clear)(x, ctx);
         }
+
+        TEMPLATE(T, clear)(a, ctx);
+        TEMPLATE(T, clear)(c, ctx);
 
         TEMPLATE(T, ctx_clear)(ctx);
     }

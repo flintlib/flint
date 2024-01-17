@@ -27,7 +27,7 @@ TEST_TEMPLATE2_FUNCTION_START(T, poly_evaluate, vec_fast, state)
         TEMPLATE(T, struct) * x, * y, * z;
         slong j, n, npoints;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         npoints = n_randint(state, 10);
         n = n_randint(state, 10);

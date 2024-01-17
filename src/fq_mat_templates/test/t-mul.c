@@ -27,7 +27,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_mul, state)
         TEMPLATE(T, mat_t) A, B, C;
         slong m, n;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         m = n_randint(state, 20);
         n = n_randint(state, 20);
@@ -71,7 +71,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_mul, state)
         TEMPLATE(T, mat_t) A, B, C;
         slong m, n;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         m = n_randint(state, 20);
         n = n_randint(state, 20);
@@ -126,7 +126,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_mul, state)
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, mat_t) A, B, A_window;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, mat_init)(A, 2, 2, ctx);
         TEMPLATE(T, mat_init)(B, 2, 2, ctx);

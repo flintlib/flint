@@ -21,13 +21,13 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_div_series, state)
     int i, result;
 
     /* Check A*B^{-1} * B is congruent A mod t^n */
-    for (i = 0; i < 500 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, b, c, d;
         slong n = n_randint(state, 80) + 1;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);

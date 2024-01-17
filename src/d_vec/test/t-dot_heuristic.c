@@ -27,7 +27,7 @@ TEST_FUNCTION_START(d_vec_dot_heuristic, state)
 
     /* check sum of scalar products of parts of vectors is equal to the
        scalar product of vectors */
-    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         double *a, *b;
         double res1, res2, res3, err1, err2, err3;

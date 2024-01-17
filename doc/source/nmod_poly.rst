@@ -2294,6 +2294,32 @@ of polynomial multiplication.
     Set `g = \operatorname{tanh}(h) + O(x^n)`.
 
 
+Special polynomials
+--------------------------------------------------------------------------------
+
+.. function:: int _nmod_poly_conway(mp_ptr op, ulong prime, slong deg)
+
+    Sets ``op`` to the coefficients to the Conway polynomial `C_{p, d}`, where
+    `p` is ``prime`` and `d` is ``deg``. This is done by checking against Frank
+    Lübeck's database [Lüb2004]_, which has been compressed in FLINT. Returns
+    `1` in case of success and returns `0` in case of failure.
+
+.. function:: ulong _nmod_poly_conway_rand(slong * degree, flint_rand_t state, int type)
+
+    Returns a pseudorandom prime and sets ``degree`` that when put into
+    :func:`_nmod_poly_conway` will always succeed.
+
+    Here, ``type`` can be the following values:
+    * ``0`` for which there is a bijection between the image of this function
+      and the database of Conway polynomials,
+    * ``1`` returns a random prime found in the database and sets ``degree`` to
+      some degree less than `15` along with some prime found in the database,
+    * ``2`` returns a random prime less than `2^{10}` and sets ``degree`` to
+      some random degree found in the database,
+    * ``3`` returns a random prime less than `2^{10}` and sets ``degree`` to
+      some random degree less than `15`.
+
+
 Products
 --------------------------------------------------------------------------------
 

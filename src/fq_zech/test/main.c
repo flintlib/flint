@@ -16,7 +16,7 @@
 
 #include "t-add.c"
 #include "t-assign.c"
-#include "t-ctx_init.c"
+#include "t-ctx_init_ui.c"
 #include "t-div.c"
 #include "t-frobenius.c"
 #include "t-get_set_fmpz.c"

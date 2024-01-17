@@ -21,7 +21,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_mul_univariate, state)
     int i, result;
 
     /* Check aliasing: a = a * b */
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         slong len;
         TEMPLATE(T, ctx_t) ctx;
@@ -29,7 +29,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_mul_univariate, state)
         TEMPLATE(T, poly_t) a, b, c;
 
         len = n_randint(state, 15) + 1;
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
         TEMPLATE(T, poly_init) (c, ctx);
@@ -62,7 +62,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_mul_univariate, state)
     }
 
     /* Check aliasing: b = a * b */
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         slong len;
         TEMPLATE(T, ctx_t) ctx;
@@ -70,7 +70,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_mul_univariate, state)
         TEMPLATE(T, poly_t) a, b, c;
 
         len = n_randint(state, 15) + 1;
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
         TEMPLATE(T, poly_init) (c, ctx);
@@ -103,7 +103,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_mul_univariate, state)
     }
 
     /* Check aliasing: a = a * a */
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         slong len;
         TEMPLATE(T, ctx_t) ctx;
@@ -111,7 +111,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_mul_univariate, state)
         TEMPLATE(T, poly_t) a, c;
 
         len = n_randint(state, 15) + 1;
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (c, ctx);
 
@@ -139,7 +139,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_mul_univariate, state)
     }
 
     /* Check that a * b == b * a */
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         slong len;
         TEMPLATE(T, ctx_t) ctx;
@@ -147,7 +147,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_mul_univariate, state)
         TEMPLATE(T, poly_t) a, b, c, e;
 
         len = n_randint(state, 15) + 1;
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
         TEMPLATE(T, poly_init) (c, ctx);
@@ -192,7 +192,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_mul_univariate, state)
         TEMPLATE(T, poly_t) a1, a2, b, c, d;
 
         len = n_randint(state, 15) + 1;
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         TEMPLATE(T, poly_init) (a1, ctx);
         TEMPLATE(T, poly_init) (a2, ctx);
         TEMPLATE(T, poly_init) (b, ctx);

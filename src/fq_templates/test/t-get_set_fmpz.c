@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2021 Daniel Schultz
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -17,21 +18,25 @@
 
 TEST_TEMPLATE_FUNCTION_START(T, get_set_fmpz, state)
 {
-    slong i, j;
+    slong ix, jx;
 
-    for (i = 0; i < 100*flint_test_multiplier(); i++)
+    for (ix = 0; ix < 100 * flint_test_multiplier(); ix++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) a, b;
         fmpz_t s, t;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+#if defined(FQ_ZECH_H)
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
+#else
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
+#endif
         TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, init)(b, ctx);
         fmpz_init(s);
         fmpz_init(t);
 
-        for (j = 0; j < 100*flint_test_multiplier(); j++)
+        for (jx = 0; jx < 100 * flint_test_multiplier(); jx++)
         {
             TEMPLATE(T, randtest)(a, state, ctx);
             TEMPLATE(T, randtest)(b, state, ctx);

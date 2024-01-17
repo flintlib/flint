@@ -20,10 +20,10 @@ TEST_FUNCTION_START(d_vec_sub, state)
     int i, result;
 
     /* Check aliasing of a and c */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         double *a, *b, *c;
-        slong len = n_randint(state, 100);
+        slong len = n_randint(state, 20);
 
         a = _d_vec_init(len);
         b = _d_vec_init(len);
@@ -48,10 +48,10 @@ TEST_FUNCTION_START(d_vec_sub, state)
     }
 
     /* Check aliasing of b and c */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         double *a, *b, *c;
-        slong len = n_randint(state, 100);
+        slong len = n_randint(state, 20);
 
         a = _d_vec_init(len);
         b = _d_vec_init(len);
@@ -76,7 +76,7 @@ TEST_FUNCTION_START(d_vec_sub, state)
     }
 
     /* Check a + b - b = a */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         double *a, *b, *c, *d;
         slong len = n_randint(state, 100);

@@ -25,7 +25,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_solve, state)
 
     for (i = 0; i < 5 * flint_test_multiplier(); i++)
     {
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         m = n_randint(state, 50);
         n = n_randint(state, 50);
@@ -73,7 +73,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_solve, state)
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         m = 1 + n_randint(state, 20);
         n = 1 + n_randint(state, 20);

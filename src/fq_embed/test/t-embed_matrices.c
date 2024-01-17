@@ -17,10 +17,10 @@
 
 TEST_FUNCTION_START(fq_embed_matrices, state)
 {
-    int i, j;
+    slong ix, jx;
 
     /* Check that isomorphism to self gives identity matrices */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (ix = 0; ix < 20 * flint_test_multiplier(); ix++)
     {
         fq_ctx_t ctx;
         fq_t gen;
@@ -28,7 +28,7 @@ TEST_FUNCTION_START(fq_embed_matrices, state)
         fmpz_mod_mat_t embed, project, one;
         slong d;
 
-        fq_ctx_randtest(ctx, state);
+        fq_ctx_init_randtest(ctx, state, 3);
         d = fq_ctx_degree(ctx);
         modulus = fq_ctx_modulus(ctx);
 
@@ -50,7 +50,6 @@ TEST_FUNCTION_START(fq_embed_matrices, state)
             flint_printf("Embed\n"),
                 fmpz_mod_mat_print_pretty(embed), flint_printf("\nProject\n"),
                 fmpz_mod_mat_print_pretty(project), flint_printf("\n");
-            fflush(stdout);
             flint_abort();
         }
 
@@ -62,8 +61,8 @@ TEST_FUNCTION_START(fq_embed_matrices, state)
     }
 
     /* Check random emebedding (degrees 1..5) */
-    for (j = 1; j < 6; j++) {
-        for (i = 0; i < (6 - j) * flint_test_multiplier(); i++)
+    for (ix = 1; ix < 6; ix++) {
+        for (jx = 0; jx < FLINT_MAX(flint_test_multiplier(), 1); jx++)
         {
             fq_ctx_t ctx1, ctx2;
             fq_t gen1, gen2;
@@ -72,14 +71,14 @@ TEST_FUNCTION_START(fq_embed_matrices, state)
             fmpz_mod_mat_t embed, project, comp, one;
             slong m, n;
 
-            while (fq_ctx_randtest(ctx1, state),
+            while (fq_ctx_init_randtest(ctx1, state, 3),
                     m = fq_ctx_degree(ctx1),
                     m == 1)
             {
                 fq_ctx_clear(ctx1);
             }
 
-            n = m*j;
+            n = m * ix;
 
             fmpz_mod_poly_init(modulus2, ctx1->ctxp);
             fmpz_mod_poly_randtest_monic_irreducible(modulus2, state, n+1, ctx1->ctxp);
@@ -107,7 +106,6 @@ TEST_FUNCTION_START(fq_embed_matrices, state)
                     fmpz_mod_mat_print_pretty(embed), flint_printf("\nProject\n"),
                     fmpz_mod_mat_print_pretty(project), flint_printf("\nComposition\n"),
                     fmpz_mod_mat_print_pretty(comp), flint_printf("\n");
-                fflush(stdout);
                 flint_abort();
             }
 

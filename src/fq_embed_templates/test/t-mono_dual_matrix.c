@@ -27,7 +27,7 @@ TEST_TEMPLATE_FUNCTION_START(T, embed_mono_dual_matrix, state)
         TEMPLATE(B, mat_t) m2d, d2m, one, two;
         slong d;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         d = TEMPLATE(T, ctx_degree)(ctx);
         modulus = TEMPLATE(T, ctx_modulus)(ctx);
 

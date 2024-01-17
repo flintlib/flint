@@ -31,7 +31,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_set_nmod_poly, state)
         ulong p;
 
         len = n_randint(state, 15) + 1;
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         TEMPLATE(T, init)(r, ctx); TEMPLATE(T, init)(s, ctx);
         TEMPLATE(T, poly_init)(a, ctx);
 #if defined(FQ_NMOD_POLY_H) || defined(FQ_ZECH_POLY_H)

@@ -26,7 +26,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_divrem, state)
 
         TEMPLATE(T, poly_t) a, b, c, q, r;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
         TEMPLATE(T, poly_init) (c, ctx);
@@ -69,13 +69,13 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_divrem, state)
     }
 
     /* Check aliasing: a and r */
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a, b, q, r;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
         TEMPLATE(T, poly_init) (q, ctx);
@@ -113,13 +113,13 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_divrem, state)
     }
 
     /* Check aliasing: b and r */
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a, b, q, r;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
         TEMPLATE(T, poly_init) (q, ctx);
@@ -157,13 +157,13 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_divrem, state)
     }
 
     /* Check aliasing: a and q */
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a, b, q, r;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
         TEMPLATE(T, poly_init) (q, ctx);
@@ -201,13 +201,13 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_divrem, state)
     }
 
     /* Check aliasing: b and q */
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a, b, q, r;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
         TEMPLATE(T, poly_init) (q, ctx);

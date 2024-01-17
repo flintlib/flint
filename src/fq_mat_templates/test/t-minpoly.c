@@ -29,7 +29,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_minpoly, state)
     {
         m = n_randint(state, 10);
         n = m;
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (p1, ctx);
         TEMPLATE(T, poly_init) (p2, ctx);
@@ -65,7 +65,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_minpoly, state)
     {
         m = n_randint(state, 10);
         n = m;
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, init) (t, ctx);
         TEMPLATE(T, poly_init) (p1, ctx);

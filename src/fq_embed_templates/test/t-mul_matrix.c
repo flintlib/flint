@@ -28,7 +28,7 @@ TEST_TEMPLATE_FUNCTION_START(T, embed_mul_matrix, state)
         const TEMPLATE(B, poly_struct) *modulus;
         slong d;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         d = TEMPLATE(T, ctx_degree)(ctx);
         modulus = TEMPLATE(T, ctx_modulus)(ctx);
 

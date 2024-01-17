@@ -16,14 +16,16 @@
 
 TEST_FUNCTION_START(fq_zech_mul_ui, state)
 {
-    int j, i, result;
-    fq_zech_ctx_t ctx;
+    slong ix, jx;
+    int result;
 
-    for (j = 0; j < 50; j++)
+    for (ix = 0; ix < 100 * flint_test_multiplier(); ix++)
     {
-        fq_zech_ctx_randtest(ctx, state);
+        fq_zech_ctx_t ctx;
 
-        for (i = 0; i < 200; i++)
+        fq_zech_ctx_init_randtest(ctx, state, 1);
+
+        for (jx = 0; jx < 10; jx++)
         {
             mp_limb_t x;
             fq_nmod_t aa, bb;
@@ -70,7 +72,7 @@ TEST_FUNCTION_START(fq_zech_mul_ui, state)
             fq_nmod_clear(aa, ctx->fq_nmod_ctx);
         }
 
-        for (i = 0; i < 200; i++)
+        for (jx = 0; jx < 10; jx++)
         {
             mp_limb_t x;
             fq_nmod_t aa, bb;

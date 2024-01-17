@@ -21,13 +21,13 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_divrem_newton_n_preinv, state)
     int i, result;
 
     /* Check result of divrem */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, poly_t) a, b, binv, q, r, test;
 
         TEMPLATE(T, ctx_t) ctx;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
@@ -72,13 +72,13 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_divrem_newton_n_preinv, state)
     }
 
     /* Check aliasing of a and q */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < 5 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, poly_t) a, b, binv, q, r;
 
         TEMPLATE(T, ctx_t) ctx;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
@@ -120,13 +120,13 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_divrem_newton_n_preinv, state)
     }
 
     /* Check aliasing of b and q */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < 5 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, poly_t) a, b, binv, q, r;
 
         TEMPLATE(T, ctx_t) ctx;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
@@ -168,13 +168,13 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_divrem_newton_n_preinv, state)
     }
 
     /* Check aliasing of binv and q */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < 5 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, poly_t) a, b, binv, q, r;
 
         TEMPLATE(T, ctx_t) ctx;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
@@ -217,13 +217,13 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_divrem_newton_n_preinv, state)
     }
 
     /* Check aliasing of a and r */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < 5 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, poly_t) a, b, binv, q, r;
 
         TEMPLATE(T, ctx_t) ctx;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
@@ -264,13 +264,13 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_divrem_newton_n_preinv, state)
     }
 
     /* Check aliasing of b and r */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < 5 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, poly_t) a, b, binv, q, r;
 
         TEMPLATE(T, ctx_t) ctx;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
@@ -312,13 +312,13 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_divrem_newton_n_preinv, state)
     }
 
     /* Check aliasing of binv and r */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < 5 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, poly_t) a, b, binv, q, r;
 
         TEMPLATE(T, ctx_t) ctx;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);

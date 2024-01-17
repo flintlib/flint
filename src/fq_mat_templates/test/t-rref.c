@@ -79,7 +79,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_rref, state)
         slong *perm;
         int equal;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, init) (c, ctx);
 

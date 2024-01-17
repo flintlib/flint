@@ -29,7 +29,7 @@ TEST_TEMPLATE_FUNCTION_START(T, frobenius, state)
         TEMPLATE(T, t) a, b, c;
         slong e;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, init)(b, ctx);
@@ -68,7 +68,7 @@ TEST_TEMPLATE_FUNCTION_START(T, frobenius, state)
         TEMPLATE(T, t) a, b, c;
         slong e;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, init)(b, ctx);
@@ -118,7 +118,7 @@ TEST_TEMPLATE_FUNCTION_START(T, frobenius, state)
         TEMPLATE(T, t) a, b, s, s1, s2, lhs, rhs;
         slong e;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, init)(b, ctx);
@@ -173,7 +173,7 @@ TEST_TEMPLATE_FUNCTION_START(T, frobenius, state)
         TEMPLATE(T, t) a, b, s, s1, s2, lhs, rhs;
         slong e;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, init)(b, ctx);

@@ -37,7 +37,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_set_fmpz_mod_mat, state)
         fmpz_t p;
 #endif
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         r = n_randint(state, 10);
         c = n_randint(state, 10);

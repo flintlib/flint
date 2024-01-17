@@ -21,12 +21,12 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_compose_mod_preinv, state)
 {
     int i;
 
-    for (i = 0; i < 20 * flint_test_multiplier(); i++)
+    for (i = 0; i < 30 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, b, c, cinv, d, e;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
@@ -81,12 +81,12 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_compose_mod_preinv, state)
     }
 
     /* Test aliasing of res and a */
-    for (i = 0; i < 20 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, b, c, cinv, d;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
@@ -135,12 +135,12 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_compose_mod_preinv, state)
     }
 
     /* Test aliasing of res and b */
-    for (i = 0; i < 20 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, b, c, cinv, d;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
@@ -189,12 +189,12 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_compose_mod_preinv, state)
     }
 
     /* Test aliasing of res and c */
-    for (i = 0; i < 20 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, b, c, cinv, d;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);

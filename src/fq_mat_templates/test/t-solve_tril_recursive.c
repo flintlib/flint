@@ -27,7 +27,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_solve_tril_recursive, state)
         slong rows, cols;
         int unit;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         rows = n_randint(state, 50);
         cols = n_randint(state, 50);

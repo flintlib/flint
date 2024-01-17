@@ -9,11 +9,11 @@ multiplicative group of the finite field. In particular, we use a root of
 degree `n`, as a polynomial in `\mathbf{F}_p[X]` of degree less than `n`. The
 underlying data structure is just an ``mp_limb_t``.
 
-The default choice for `f(X)` is the Conway polynomial for the pair `(p,n)`.
-Frank Luebeck's data base of Conway polynomials is made available in the file
-``src/qadic/CPimport.txt``. If a Conway polynomial is not available, then a
-random irreducible polynomial will be chosen for `f(X)`. Additionally, the user
-is able to supply their own `f(X)`.
+The default choice for `f(X)` is the Conway polynomial for the pair `(p,n)`,
+enabled by Frank Lübeck's data base of Conway polynomials using the
+:func:`_nmod_poly_conway` function. If a Conway polynomial is not available,
+then a random irreducible polynomial will be chosen for `f(X)`. Additionally,
+the user is able to supply their own `f(X)`.
 
 We required that the order of the field fits inside of an ``mp_limb_t``;
 however, it is recommended that `p^n < 2^{20}` due to the time and memory needed
@@ -112,6 +112,19 @@ Context Management
     detected. Returns `0` if the Zech representation was successfully
     initialised.
 
+.. function:: void fq_zech_ctx_init_randtest(fq_zech_ctx_t ctx, flint_rand_t state, int type)
+
+    Initialises ``ctx`` to a random finite field, where the prime and degree is
+    set according to ``type``. If ``type`` is `0` the prime and degree may be
+    large, else if ``type`` is `1` the degree is small but the prime may be
+    large, else if ``type`` is `2` the prime is small but the degree may be
+    large, else if ``type`` is `3` both prime and degree are small.
+
+.. function:: void fq_zech_ctx_init_randtest_reducible(fq_zech_ctx_t ctx, flint_rand_t state, int type)
+
+    Since the Zech logarithm representation does not work with a non-irreducible
+    modulus, this function does the same as :func:`fq_zech_ctx_init_randtest`.
+
 .. function:: void fq_zech_ctx_clear(fq_zech_ctx_t ctx)
 
     Clears all memory that has been allocated as part of the context.
@@ -146,17 +159,6 @@ Context Management
 .. function:: void fq_zech_ctx_print(const fq_zech_ctx_t ctx)
 
     Prints the context information to {\tt{stdout}}.
-
-.. function:: void fq_zech_ctx_randtest(fq_zech_ctx_t ctx, flint_rand_t state)
-
-    Initializes ``ctx`` to a random finite field.  Assumes that
-    ``fq_zech_ctx_init`` has not been called on ``ctx`` already.
-
-.. function:: void fq_zech_ctx_randtest_reducible(fq_zech_ctx_t ctx, flint_rand_t state)
-
-    Since the Zech logarithm representation does not work with a
-    non-irreducible modulus, does the same as
-    ``fq_zech_ctx_randtest``.
 
 
 Memory management

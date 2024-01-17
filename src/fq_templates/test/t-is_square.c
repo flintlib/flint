@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2020 William Hart
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -17,56 +18,59 @@
 
 TEST_TEMPLATE_FUNCTION_START(T, is_square, state)
 {
-    int i, result;
+    slong ix;
+    int result;
 
-    /* Check is_square(a^2) == 1 */
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    for (ix = 0; ix < 300 * flint_test_multiplier(); ix++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) a, b;
+        int type;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        type = n_randint(state, 2);
+
+        if (type == 0)
+#if defined(FQ_ZECH_H)
+            TEMPLATE(T, ctx_init_randtest)(ctx, state, 1);
+#else
+            TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
+#endif
+        else
+            do
+#if defined(FQ_ZECH_H)
+                TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
+#else
+                TEMPLATE(T, ctx_init_randtest)(ctx, state, 1);
+#endif
+#if defined(FQ_NMOD_H) || defined(FQ_ZECH_H)
+            while (TEMPLATE(T, ctx_prime)(ctx) == 2);
+#else
+            while (fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) == 0);
+#endif
 
         TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, init)(b, ctx);
 
-        TEMPLATE(T, randtest)(a, state, ctx);
-
-        TEMPLATE(T, sqr)(b, a, ctx);
-
-        result = (TEMPLATE(T, is_square)(b, ctx));
-        if (!result)
+        if (type == 0)
         {
-            flint_printf("FAIL (is_square(a^2)):\n\n");
-            flint_printf("a = "), TEMPLATE(T, print_pretty)(a, ctx), flint_printf("\n");
-            flint_printf("b = "), TEMPLATE(T, print_pretty)(b, ctx), flint_printf("\n");
-            fflush(stdout);
-            flint_abort();
+            /* Check is_square(a^2) == 1 */
+            TEMPLATE(T, randtest)(a, state, ctx);
+            TEMPLATE(T, sqr)(b, a, ctx);
+
+            result = (TEMPLATE(T, is_square)(b, ctx));
+            if (!result)
+            {
+                flint_printf("FAIL (is_square(a^2)):\n\n");
+                flint_printf("a = "), TEMPLATE(T, print_pretty)(a, ctx), flint_printf("\n");
+                flint_printf("b = "), TEMPLATE(T, print_pretty)(b, ctx), flint_printf("\n");
+                flint_abort();
+            }
         }
-
-        TEMPLATE(T, clear)(a, ctx);
-        TEMPLATE(T, clear)(b, ctx);
-
-        TEMPLATE(T, ctx_clear)(ctx);
-    }
-
-    /* Check non-squares */
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
-    {
-        TEMPLATE(T, ctx_t) ctx;
-        TEMPLATE(T, t) a, b, z;
-
-        TEMPLATE(T, ctx_randtest)(ctx, state);
-
-#if defined(FQ_NMOD_H) || defined(FQ_ZECH_H)
-        if (TEMPLATE(T, ctx_prime)(ctx) != 2)
+        else
         {
-#else
-        if (fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) != 0)
-        {
-#endif
-            TEMPLATE(T, init)(a, ctx);
-            TEMPLATE(T, init)(b, ctx);
+            /* Check non-squares */
+            TEMPLATE(T, t) z;
+
             TEMPLATE(T, init)(z, ctx);
 
             while (TEMPLATE(T, is_square)(z, ctx))
@@ -84,16 +88,16 @@ TEST_TEMPLATE_FUNCTION_START(T, is_square, state)
                 flint_printf("FAIL (is_square(a^2)):\n\n");
                 flint_printf("a = "), TEMPLATE(T, print_pretty)(a, ctx), flint_printf("\n");
                 flint_printf("z = "), TEMPLATE(T, print_pretty)(z, ctx), flint_printf("\n");
-                fflush(stdout);
                 flint_abort();
             }
 
-            TEMPLATE(T, clear)(a, ctx);
-            TEMPLATE(T, clear)(b, ctx);
             TEMPLATE(T, clear)(z, ctx);
-
-            TEMPLATE(T, ctx_clear)(ctx);
         }
+
+        TEMPLATE(T, clear)(a, ctx);
+        TEMPLATE(T, clear)(b, ctx);
+
+        TEMPLATE(T, ctx_clear)(ctx);
     }
 
     TEST_FUNCTION_END(state);

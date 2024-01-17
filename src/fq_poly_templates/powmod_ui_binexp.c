@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -61,7 +62,6 @@ _TEMPLATE(T, poly_powmod_ui_binexp) (TEMPLATE(T, struct) * res,
     _TEMPLATE(T, vec_clear) (T, lenT + lenQ, ctx);
 }
 
-
 void
 TEMPLATE(T, poly_powmod_ui_binexp) (TEMPLATE(T, poly_t) res,
                                     const TEMPLATE(T, poly_t) poly, ulong e,
@@ -91,26 +91,29 @@ TEMPLATE(T, poly_powmod_ui_binexp) (TEMPLATE(T, poly_t) res,
         return;
     }
 
-    if (e <= 2)
+    if (e == UWORD(0))
     {
-        if (e == UWORD(0))
-        {
-            TEMPLATE(T, poly_fit_length) (res, 1, ctx);
-            TEMPLATE(T, one) (res->coeffs, ctx);
-            _TEMPLATE(T, poly_set_length) (res, 1, ctx);
-        }
-        else if (e == UWORD(1))
-        {
-            TEMPLATE(T, poly_set) (res, poly, ctx);
-        }
+        if (lenf == 1)
+            TEMPLATE(T, poly_zero)(res, ctx);
         else
-            TEMPLATE(T, poly_mulmod) (res, poly, poly, f, ctx);
+            TEMPLATE(T, poly_one)(res, ctx);
         return;
     }
 
     if (lenf == 1 || len == 0)
     {
         TEMPLATE(T, poly_zero) (res, ctx);
+        return;
+    }
+
+    if (e == UWORD(1))
+    {
+        TEMPLATE(T, poly_set) (res, poly, ctx);
+        return;
+    }
+    else if (e == UWORD(2))
+    {
+        TEMPLATE(T, poly_mulmod) (res, poly, poly, f, ctx);
         return;
     }
 

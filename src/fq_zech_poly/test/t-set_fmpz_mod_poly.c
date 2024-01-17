@@ -32,7 +32,7 @@ TEST_FUNCTION_START(fq_zech_poly_set_fmpz_mod_poly, state)
         fmpz_mod_ctx_t ctxp;
 
         len = n_randint(state, 15) + 1;
-        fq_zech_ctx_randtest(ctx, state);
+        fq_zech_ctx_init_randtest(ctx, state, 3);
         fq_zech_init(r, ctx);
         fq_zech_init(s, ctx);
         fq_zech_poly_init(a, ctx);

@@ -26,7 +26,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_invert_rows_cols, state)
         TEMPLATE(T, mat_t) A;
         TEMPLATE(T, mat_t) B;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         m = n_randint(state, 20);
         n = n_randint(state, 20);

@@ -22,12 +22,12 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_xgcd, state)
     /* Generic case, most likely co-prime arguments ***************************** */
 
     /* Compare with result from GCD and check correctness */
-    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    for (i = 0; i < 30 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, b, d, g, s, t, v, w;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
@@ -37,8 +37,8 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_xgcd, state)
         TEMPLATE(T, poly_init) (t, ctx);
         TEMPLATE(T, poly_init) (v, ctx);
         TEMPLATE(T, poly_init) (w, ctx);
-        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 100), ctx);
-        TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 100), ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 30), ctx);
+        TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 30), ctx);
 
         TEMPLATE(T, poly_gcd) (d, a, b, ctx);
         TEMPLATE(T, poly_xgcd) (g, s, t, a, b, ctx);
@@ -84,7 +84,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_xgcd, state)
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, b, d, f, g, s, t, v, w;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
@@ -150,12 +150,12 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_xgcd, state)
     }
 
     /* test aliasing of g and a */
-    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, b, g, s, t, v, w;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
@@ -164,8 +164,8 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_xgcd, state)
         TEMPLATE(T, poly_init) (t, ctx);
         TEMPLATE(T, poly_init) (v, ctx);
         TEMPLATE(T, poly_init) (w, ctx);
-        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 100), ctx);
-        TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 100), ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 20), ctx);
+        TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 20), ctx);
 
         TEMPLATE(T, poly_xgcd) (g, s, t, a, b, ctx);
         TEMPLATE(T, poly_xgcd) (a, v, w, a, b, ctx);
@@ -199,12 +199,12 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_xgcd, state)
     }
 
     /* test aliasing of g and b */
-    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, b, g, s, t, v, w;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
@@ -213,8 +213,8 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_xgcd, state)
         TEMPLATE(T, poly_init) (t, ctx);
         TEMPLATE(T, poly_init) (v, ctx);
         TEMPLATE(T, poly_init) (w, ctx);
-        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 100), ctx);
-        TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 100), ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 20), ctx);
+        TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 20), ctx);
 
         TEMPLATE(T, poly_xgcd) (g, s, t, a, b, ctx);
         TEMPLATE(T, poly_xgcd) (b, v, w, a, b, ctx);
@@ -248,12 +248,12 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_xgcd, state)
     }
 
     /* test aliasing of s and a */
-    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, b, d, g, s, t, w;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
@@ -262,8 +262,8 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_xgcd, state)
         TEMPLATE(T, poly_init) (t, ctx);
         TEMPLATE(T, poly_init) (d, ctx);
         TEMPLATE(T, poly_init) (w, ctx);
-        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 100), ctx);
-        TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 100), ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 20), ctx);
+        TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 20), ctx);
 
         TEMPLATE(T, poly_xgcd) (g, s, t, a, b, ctx);
         TEMPLATE(T, poly_xgcd) (d, a, w, a, b, ctx);
@@ -297,12 +297,12 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_xgcd, state)
     }
 
     /* test aliasing of s and b */
-    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, b, d, g, s, t, w;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
@@ -311,8 +311,8 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_xgcd, state)
         TEMPLATE(T, poly_init) (t, ctx);
         TEMPLATE(T, poly_init) (d, ctx);
         TEMPLATE(T, poly_init) (w, ctx);
-        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 100), ctx);
-        TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 100), ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 30), ctx);
+        TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 30), ctx);
 
         TEMPLATE(T, poly_xgcd) (g, s, t, a, b, ctx);
         TEMPLATE(T, poly_xgcd) (d, b, w, a, b, ctx);
@@ -346,12 +346,12 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_xgcd, state)
     }
 
     /* test aliasing of s and a */
-    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, b, d, g, s, t, w;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
@@ -360,8 +360,8 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_xgcd, state)
         TEMPLATE(T, poly_init) (t, ctx);
         TEMPLATE(T, poly_init) (d, ctx);
         TEMPLATE(T, poly_init) (w, ctx);
-        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 100), ctx);
-        TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 100), ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 30), ctx);
+        TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 30), ctx);
 
         TEMPLATE(T, poly_xgcd) (g, s, t, a, b, ctx);
         TEMPLATE(T, poly_xgcd) (d, w, a, a, b, ctx);
@@ -395,12 +395,12 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_xgcd, state)
     }
 
     /* test aliasing of t and b */
-    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, b, d, g, s, t, w;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
@@ -409,8 +409,8 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_xgcd, state)
         TEMPLATE(T, poly_init) (t, ctx);
         TEMPLATE(T, poly_init) (d, ctx);
         TEMPLATE(T, poly_init) (w, ctx);
-        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 100), ctx);
-        TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 100), ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 30), ctx);
+        TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 30), ctx);
 
         TEMPLATE(T, poly_xgcd) (g, s, t, a, b, ctx);
         TEMPLATE(T, poly_xgcd) (d, w, b, a, b, ctx);

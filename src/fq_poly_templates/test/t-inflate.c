@@ -26,7 +26,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_inflate, state)
         TEMPLATE(T, t) one;
         ulong inflation;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (poly1, ctx);
         TEMPLATE(T, poly_init) (poly2, ctx);

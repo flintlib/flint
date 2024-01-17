@@ -78,14 +78,14 @@ int TEMPLATE(T, sqrt)(TEMPLATE(T, t) rop, const TEMPLATE(T, t) op,
                 break;
             }
 
-	    if (TEMPLATE(T, is_one)(t, ctx))
+            if (TEMPLATE(T, is_one)(t, ctx))
                 break;
 
             i = 1;
-	    TEMPLATE(T, sqr)(temp, t, ctx);
+            TEMPLATE(T, sqr)(temp, t, ctx);
 
             while (i < M && !TEMPLATE(T, is_one)(temp, ctx))
-	    {
+            {
                 TEMPLATE(T, sqr)(temp, temp, ctx);
                 i++;
             }
@@ -93,7 +93,7 @@ int TEMPLATE(T, sqrt)(TEMPLATE(T, t) rop, const TEMPLATE(T, t) op,
             if (i == M)
             {
                 res = 0;
-		break;
+                break;
             }
 
             TEMPLATE(T, set)(b, c, ctx);

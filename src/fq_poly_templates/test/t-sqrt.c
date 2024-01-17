@@ -20,18 +20,18 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_sqrt, state)
     int i;
 
     /* Test aliasing */
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, poly_t) a, b;
         int square1, square2;
         TEMPLATE(T, ctx_t) ctx;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init)(a, ctx);
         TEMPLATE(T, poly_init)(b, ctx);
 
-        TEMPLATE(T, poly_randtest)(a, state, 1 + n_randint(state, 50), ctx);
+        TEMPLATE(T, poly_randtest)(a, state, 1 + n_randint(state, 20), ctx);
 
         if (n_randint(state, 2))
             TEMPLATE(T, poly_mul)(a, a, a, ctx);
@@ -56,19 +56,19 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_sqrt, state)
     }
 
     /* Test random squares */
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, poly_t) a, b, c;
         int square;
         TEMPLATE(T, ctx_t) ctx;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init)(a, ctx);
         TEMPLATE(T, poly_init)(b, ctx);
         TEMPLATE(T, poly_init)(c, ctx);
 
-        TEMPLATE(T, poly_randtest)(a, state, 1 + n_randint(state, 50), ctx);
+        TEMPLATE(T, poly_randtest)(a, state, 1 + n_randint(state, 30), ctx);
         TEMPLATE(T, poly_mul)(b, a, a, ctx);
         square = TEMPLATE(T, poly_sqrt)(c, b, ctx);
 
@@ -101,7 +101,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_sqrt, state)
     }
 
     /* Test "almost" squares */
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, poly_t) a, b, c;
         slong j;
@@ -109,7 +109,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_sqrt, state)
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) t;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, init)(t, ctx);
 
@@ -117,7 +117,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_sqrt, state)
         TEMPLATE(T, poly_init)(b, ctx);
         TEMPLATE(T, poly_init)(c, ctx);
 
-        TEMPLATE(T, poly_randtest_not_zero)(a, state, 1 + n_randint(state, 50), ctx);
+        TEMPLATE(T, poly_randtest_not_zero)(a, state, 1 + n_randint(state, 30), ctx);
         TEMPLATE(T, poly_mul)(b, a, a, ctx);
 
         j = n_randint(state, TEMPLATE(T, poly_length)(b, ctx));

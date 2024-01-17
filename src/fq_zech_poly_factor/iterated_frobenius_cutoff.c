@@ -10,20 +10,20 @@
 */
 
 #include "ulong_extras.h"
-#include "fmpz.h"
 #include "fq_zech.h"
-#include "fq_zech_mat.h"
+#include "fq_zech_poly_factor.h"
 
 int FQ_ZECH_POLY_ITERATED_FROBENIUS_CUTOFF(const fq_zech_ctx_t ctx, slong length)
 {
     int result;
-    fmpz_t q;
-    fmpz_init(q);
-    fq_zech_ctx_order(q, ctx);
-    if ( 2 * fmpz_sizeinbase(q, 2) < 3 * (n_sqrt(length) + 1))
+    ulong q;
+
+    q = fq_zech_ctx_order_ui(ctx);
+
+    if (2 * FLINT_BIT_COUNT(q) < 3 * (n_sqrt(length) + 1))
         result = 1;
     else
         result = 0;
-    fmpz_clear(q);
+
     return result;
 }

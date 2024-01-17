@@ -29,7 +29,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mul_ui, state)
         ulong x;
         TEMPLATE(T, t) a, b;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, init)(b, ctx);
@@ -64,7 +64,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mul_ui, state)
         TEMPLATE(T, t) a, c;
         fmpz_poly_t b;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, init)(c, ctx);

@@ -27,7 +27,7 @@ TEST_TEMPLATE_FUNCTION_START(T, embed, state)
         TEMPLATE(B, poly_t) minpoly;
         TEMPLATE(T, poly_t) minpoly_fq;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         TEMPLATE(T, init) (a, ctx);
         TEMPLATE(T, init) (b, ctx);
         TEMPLATE(T, init) (ev_a, ctx);

@@ -24,7 +24,7 @@ TEST_FUNCTION_START(fq_get_set_fmpz_poly, state)
         fq_t x, y;
         fmpz_poly_t z, t1, t2;
 
-        fq_ctx_randtest(ctx, state);
+        fq_ctx_init_randtest(ctx, state, 0);
         fq_init(x, ctx);
         fq_init(y, ctx);
         fmpz_poly_init(z);

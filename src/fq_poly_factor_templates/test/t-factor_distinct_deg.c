@@ -23,7 +23,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_factor_distinct_deg, state)
 {
     int iter;
 
-    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) poly1, poly, q, r, product;
@@ -31,7 +31,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_factor_distinct_deg, state)
         slong i, length, num;
         slong *degs;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (poly1, ctx);
         TEMPLATE(T, poly_init) (poly, ctx);

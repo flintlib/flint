@@ -21,7 +21,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_get_str, state)
     TEMPLATE(T, poly_t) a;
     TEMPLATE(T, ctx_t) ctx;
 
-    TEMPLATE(T, ctx_randtest) (ctx, state);
+    TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
     TEMPLATE(T, poly_init) (a, ctx);
     for (len = 0; len < 100; len++)

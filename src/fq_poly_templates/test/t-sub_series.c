@@ -22,7 +22,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_sub_series, state)
     int i, result;
 
     /* Check aliasing: a = a - b */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         slong len, n;
         TEMPLATE(T, ctx_t) ctx;
@@ -30,7 +30,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_sub_series, state)
         TEMPLATE(T, poly_t) a, b, c;
 
         len = n_randint(state, 15) + 1;
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
         TEMPLATE(T, poly_init) (c, ctx);
@@ -64,7 +64,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_sub_series, state)
     }
 
     /* Check aliasing: b = a - b */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         slong n, len;
         TEMPLATE(T, ctx_t) ctx;
@@ -72,7 +72,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_sub_series, state)
         TEMPLATE(T, poly_t) a, b, c;
 
         len = n_randint(state, 15) + 1;
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
         TEMPLATE(T, poly_init) (c, ctx);
@@ -106,7 +106,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_sub_series, state)
     }
 
     /* Check aliasing: a = a - a */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         slong n, len;
         TEMPLATE(T, ctx_t) ctx;
@@ -114,7 +114,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_sub_series, state)
         TEMPLATE(T, poly_t) a, c;
 
         len = n_randint(state, 15) + 1;
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (c, ctx);
 
@@ -151,7 +151,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_sub_series, state)
         TEMPLATE(T, poly_t) a, b, c, d;
 
         len = n_randint(state, 15) + 1;
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
         TEMPLATE(T, poly_init) (c, ctx);

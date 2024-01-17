@@ -32,7 +32,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_factor_cantor_zassenhaus, state)
         slong i, j, length, num;
         slong exp[5];
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (poly1, ctx);
         TEMPLATE(T, poly_init) (poly, ctx);

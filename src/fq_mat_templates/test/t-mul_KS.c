@@ -26,7 +26,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_mul_KS, state)
         TEMPLATE(T, mat_t) A, B, C;
         slong m, n;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         m = n_randint(state, 50);
         n = n_randint(state, 50);
@@ -70,7 +70,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_mul_KS, state)
         TEMPLATE(T, mat_t) A, B, C;
         slong m, n;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         m = n_randint(state, 50);
         n = n_randint(state, 50);

@@ -26,7 +26,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_submul, state)
 
         slong m, k, n;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         m = n_randint(state, 50);
         k = n_randint(state, 50);

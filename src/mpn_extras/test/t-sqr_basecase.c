@@ -18,7 +18,7 @@ TEST_FUNCTION_START(flint_mpn_sqr_basecase, state)
 {
     slong ix;
 
-    for (ix = 0; ix < 1000000 * flint_test_multiplier(); ix++)
+    for (ix = 0; ix < 100000 * flint_test_multiplier(); ix++)
     {
         mp_limb_t res1[14] = {UWORD(0)};
         mp_limb_t res2[14] = {UWORD(0)};

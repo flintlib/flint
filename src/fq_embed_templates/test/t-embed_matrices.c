@@ -28,7 +28,7 @@ TEST_TEMPLATE_FUNCTION_START(T, embed_matrices, state)
         TEMPLATE(B, mat_t) embed, project, one;
         slong d;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         d = TEMPLATE(T, ctx_degree)(ctx);
         modulus = TEMPLATE(T, ctx_modulus)(ctx);
 
@@ -77,7 +77,7 @@ TEST_TEMPLATE_FUNCTION_START(T, embed_matrices, state)
             TEMPLATE(B, mat_t) embed, project, comp, one;
             slong m, n;
 
-            while (TEMPLATE(T, ctx_randtest)(ctx1, state),
+            while (TEMPLATE(T, ctx_init_randtest)(ctx1, state, 3),
                     m = TEMPLATE(T, ctx_degree)(ctx1),
                     m == 1)
             {

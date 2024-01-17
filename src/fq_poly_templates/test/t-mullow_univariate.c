@@ -27,7 +27,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_mullow_univariate, state)
         TEMPLATE(T, poly_t) a, b, c, d;
         slong n;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);

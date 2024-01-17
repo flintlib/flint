@@ -28,7 +28,7 @@ TEST_TEMPLATE_FUNCTION_START(T, pow, state)
         TEMPLATE(T, t) a, b;
         fmpz_t e;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, init)(b, ctx);
@@ -65,7 +65,7 @@ TEST_TEMPLATE_FUNCTION_START(T, pow, state)
         TEMPLATE(T, t) a, b, c;
         fmpz_t e, f;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, init)(b, ctx);

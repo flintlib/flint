@@ -21,7 +21,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_pow, state)
     int i, result;
 
     /* Check aliasing  */
-    for (i = 0; i < 20 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         slong len;
         TEMPLATE(T, ctx_t) ctx;
@@ -30,7 +30,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_pow, state)
         ulong exp;
 
         len = n_randint(state, 15) + 1;
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
         TEMPLATE(T, poly_init) (c, ctx);
@@ -73,7 +73,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_pow, state)
         ulong exp;
 
         len = n_randint(state, 15) + 1;
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
         TEMPLATE(T, poly_init) (c, ctx);

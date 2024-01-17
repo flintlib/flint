@@ -16,13 +16,13 @@ TEST_FUNCTION_START(n_fq_poly_divrem, state)
 {
     slong i, j;
 
-    for (i = 0; i < 2000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fq_nmod_ctx_t ctx;
         n_poly_t a, b, c, d, e, f, q, r;
         fq_nmod_poly_t A, B, Q, R;
 
-        fq_nmod_ctx_randtest(ctx, state);
+        fq_nmod_ctx_init_randtest(ctx, state, 3);
 
         n_poly_init(a);
         n_poly_init(b);

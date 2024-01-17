@@ -26,7 +26,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_rank, state)
     {
         m = n_randint(state, 20);
         n = n_randint(state, 20);
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         for (r = 0; r <= FLINT_MIN(m, n); r++)
         {
@@ -50,7 +50,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_rank, state)
     {
         m = n_randint(state, 20);
         n = n_randint(state, 20);
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         for (r = 0; r <= FLINT_MIN(m, n); r++)
         {

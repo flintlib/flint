@@ -25,7 +25,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_concat_horizontal, state)
     	TEMPLATE(T, mat_t) window1, window2;
         slong c1, c2, r1;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         c1 = n_randint(state, 10);
         c2 = n_randint(state, 10);

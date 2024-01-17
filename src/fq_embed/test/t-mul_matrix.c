@@ -26,7 +26,7 @@ TEST_FUNCTION_START(fq_embed_mul_matrix, state)
         fmpz_mod_mat_t mat_a, mat_a_sq, mat_a_a;
         slong d;
 
-        fq_ctx_randtest(ctx, state);
+        fq_ctx_init_randtest(ctx, state, 0);
         d = fq_ctx_degree(ctx);
 
         fq_init(a, ctx);

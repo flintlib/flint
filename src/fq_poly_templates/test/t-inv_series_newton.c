@@ -27,7 +27,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_inv_series_newton, state)
         TEMPLATE(T, poly_t) a, b, c, one;
         slong n = n_randint(state, 80) + 1;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);

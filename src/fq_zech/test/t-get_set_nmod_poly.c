@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Mike Hansen
 
     This file is part of FLINT.
 
@@ -18,11 +19,11 @@ TEST_FUNCTION_START(fq_zech_get_set_nmod_poly, state)
     slong i, j;
     fq_zech_ctx_t ctx;
 
-    for (j = 0; j < 10*flint_test_multiplier(); j++)
+    for (j = 0; j < 100 * flint_test_multiplier(); j++)
     {
-        fq_zech_ctx_randtest(ctx, state);
+        fq_zech_ctx_init_randtest(ctx, state, 1);
 
-        for (i = 0; i < 100; i++)
+        for (i = 0; i < 10; i++)
         {
             fq_zech_t a, b;
             nmod_poly_t c, t;

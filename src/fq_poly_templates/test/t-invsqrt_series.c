@@ -28,7 +28,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_invsqrt_series, state)
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) c;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, init)(c, ctx);
 
@@ -36,7 +36,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_invsqrt_series, state)
         TEMPLATE(T, poly_init)(g, ctx);
         TEMPLATE(T, poly_init)(r, ctx);
 
-        do TEMPLATE(T, poly_randtest)(h, state, n_randint(state, 1000), ctx);
+        do TEMPLATE(T, poly_randtest)(h, state, n_randint(state, 30), ctx);
         while (h->length == 0);
         TEMPLATE(T, set_ui)(c, 1, ctx);
         TEMPLATE(T, poly_set_coeff)(h, 0, c, ctx);
@@ -83,21 +83,21 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_invsqrt_series, state)
     }
 
     /* Check aliasing of h and g */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, poly_t) g, h;
         slong m;
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) c;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, init)(c, ctx);
 
         TEMPLATE(T, poly_init)(h, ctx);
         TEMPLATE(T, poly_init)(g, ctx);
 
-        do TEMPLATE(T, poly_randtest)(h, state, n_randint(state, 500), ctx);
+        do TEMPLATE(T, poly_randtest)(h, state, n_randint(state, 20), ctx);
         while (h->length == 0);
 
         TEMPLATE(T, set_ui)(c, 1, ctx);

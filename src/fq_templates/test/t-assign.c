@@ -24,7 +24,11 @@ TEST_TEMPLATE_FUNCTION_START(T, assign, state)
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) x;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+#if defined(FQ_ZECH_H)
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 2);
+#else
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
+#endif
 
         TEMPLATE(T, init)(x, ctx);
 

@@ -27,7 +27,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_factor_is_irreducible_ben_or, state)
         slong length;
         int i, num;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (poly1, ctx);
         TEMPLATE(T, poly_init) (poly2, ctx);

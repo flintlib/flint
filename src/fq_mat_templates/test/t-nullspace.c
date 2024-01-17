@@ -31,7 +31,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_nullspace, state)
 
         for (r = 0; r <= FLINT_MIN(m, n); r++)
         {
-            TEMPLATE(T, ctx_randtest) (ctx, state);
+            TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
             d = n_randint(state, 2 * m * n + 1);
 
             TEMPLATE(T, mat_init) (A, m, n, ctx);

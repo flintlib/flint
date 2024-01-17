@@ -29,7 +29,7 @@ TEST_TEMPLATE_FUNCTION_START(T, norm, state)
         fmpz_t x, y;
         slong j;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 1);
 
         TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, init)(b, ctx);
@@ -65,7 +65,6 @@ TEST_TEMPLATE_FUNCTION_START(T, norm, state)
                 TEMPLATE(T, frobenius)(c, a, j, ctx);
                 flint_printf("sigma^%wd = ", j), TEMPLATE(T, print_pretty)(c, ctx), flint_printf("\n");
             }
-            fflush(stdout);
             flint_abort();
         }
 

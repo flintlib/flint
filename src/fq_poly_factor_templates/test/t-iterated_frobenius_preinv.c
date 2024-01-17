@@ -28,7 +28,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_factor_iterated_frobenius_preinv, state)
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) v, vinv, *h1, *h2;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         fmpz_init(q);
         TEMPLATE(T, ctx_order) (q, ctx);

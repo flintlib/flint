@@ -31,7 +31,7 @@ TEST_FUNCTION_START(fq_zech_embed_matrices, state)
         nmod_mat_t embed, project, one;
         slong d;
 
-        fq_zech_ctx_randtest(ctx, state);
+        fq_zech_ctx_init_randtest(ctx, state, 3);
         d = fq_zech_ctx_degree(ctx);
         modulus = fq_zech_ctx_modulus(ctx);
 

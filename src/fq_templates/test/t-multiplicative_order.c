@@ -17,101 +17,91 @@
 
 TEST_TEMPLATE_FUNCTION_START(T, multiplicative_order, state)
 {
-    int i, result;
+    slong ix;
+    int result;
 
-    /* Test that the computed multiplicative order is a multiple of the real one */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (ix = 0; ix < 100 * flint_test_multiplier(); ix++)
     {
         TEMPLATE(T, ctx_t) ctx;
-        TEMPLATE(T, t) a, tmp;
+        TEMPLATE(T, t) a, X;
         fmpz_t ord;
+        int type;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        type = n_randint(state, 2);
 
-        TEMPLATE(T, init)(a, ctx);
-        TEMPLATE(T, init)(tmp, ctx);
-        TEMPLATE(T, randtest)(a, state, ctx);
+        /* Test big primes and small degrees */
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         fmpz_init(ord);
-        result = TEMPLATE(T, multiplicative_order)(ord, a, ctx);
-        TEMPLATE(T, pow)(tmp, a, ord, ctx);
-
-        if (result && !TEMPLATE(T, is_one)(tmp, ctx))
-        {
-            flint_printf("FAIL:\n\n");
-            flint_printf("a = "), TEMPLATE(T, print_pretty)(a, ctx), flint_printf("\n");
-            flint_printf("ord = "), fmpz_print(ord), flint_printf("\n");
-            TEMPLATE(T, ctx_print)(ctx);
-            fflush(stdout);
-            flint_abort();
-        }
-
-        fmpz_clear(ord);
-        TEMPLATE(T, clear)(a, ctx);
-        TEMPLATE(T, clear)(tmp, ctx);
-
-        TEMPLATE(T, ctx_clear)(ctx);
-    }
-
-    /* Test that the computed multiplicative order is coherent with powering by p-1 */
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
-    {
-        TEMPLATE(T, ctx_t) ctx;
-        TEMPLATE(T, t) X, a;
-        fmpz_t ord, size;
-#if defined(FQ_NMOD_H) || defined(FQ_ZECH_H)
-        ulong pm1;
-#else
-        fmpz_t pm1;
-#endif
-
-        TEMPLATE(T, ctx_randtest)(ctx, state);
-
+        TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, init)(X, ctx);
-        TEMPLATE(T, init)(a, ctx);
-        fmpz_init(ord);
-        fmpz_init(size);
-#if !(defined(FQ_NMOD_H) || defined(FQ_ZECH_H))
-        fmpz_init(pm1);
-#endif
 
-        TEMPLATE(T, gen)(X, ctx);
-        if (TEMPLATE(T, is_primitive)(X, ctx))
+        if (type == 0)
         {
-#if defined(FQ_NMOD_H) || defined(FQ_ZECH_H)
-            pm1 = TEMPLATE(T, ctx_prime)(ctx) - 1;
-            TEMPLATE(T, pow_ui)(a, X, pm1, ctx);
+            /* Check that multiplicative order is a multiple of the real one */
+            TEMPLATE(T, randtest)(a, state, ctx);
             result = TEMPLATE(T, multiplicative_order)(ord, a, ctx);
-            fmpz_mul_ui(ord, ord, pm1);
-#else
-            fmpz_sub_ui(pm1, TEMPLATE(T, ctx_prime)(ctx), 1);
-            TEMPLATE(T, pow)(a, X, pm1, ctx);
-            result = TEMPLATE(T, multiplicative_order)(ord, a, ctx);
-            fmpz_mul(ord, ord, pm1);
-#endif
+            TEMPLATE(T, pow)(X, a, ord, ctx);
 
-            TEMPLATE(T, ctx_order)(size, ctx);
-            fmpz_sub(size, size, ord);
-
-            if (result && !fmpz_is_one(size))
+            if (result && !TEMPLATE(T, is_one)(X, ctx))
             {
                 flint_printf("FAIL:\n\n");
                 flint_printf("a = "), TEMPLATE(T, print_pretty)(a, ctx), flint_printf("\n");
                 flint_printf("ord = "), fmpz_print(ord), flint_printf("\n");
                 TEMPLATE(T, ctx_print)(ctx);
-                fflush(stdout);
                 flint_abort();
             }
         }
-
-#if !(defined(FQ_NMOD_H) || defined(FQ_ZECH_H))
-        fmpz_clear(pm1);
+        else
+        {
+            /* Check multiplicative order is coherent with powering by p - 1 */
+            fmpz_t size;
+#if defined(FQ_NMOD_H) || defined(FQ_ZECH_H)
+            ulong pm1;
+#else
+            fmpz_t pm1;
 #endif
+
+            fmpz_init(size);
+#if !(defined(FQ_NMOD_H) || defined(FQ_ZECH_H))
+            fmpz_init(pm1);
+#endif
+            TEMPLATE(T, gen)(X, ctx);
+            if (TEMPLATE(T, is_primitive)(X, ctx))
+            {
+#if defined(FQ_NMOD_H) || defined(FQ_ZECH_H)
+                pm1 = TEMPLATE(T, ctx_prime)(ctx) - 1;
+                TEMPLATE(T, pow_ui)(a, X, pm1, ctx);
+                result = TEMPLATE(T, multiplicative_order)(ord, a, ctx);
+                fmpz_mul_ui(ord, ord, pm1);
+#else
+                fmpz_sub_ui(pm1, TEMPLATE(T, ctx_prime)(ctx), 1);
+                TEMPLATE(T, pow)(a, X, pm1, ctx);
+                result = TEMPLATE(T, multiplicative_order)(ord, a, ctx);
+                fmpz_mul(ord, ord, pm1);
+#endif
+
+                TEMPLATE(T, ctx_order)(size, ctx);
+                fmpz_sub(size, size, ord);
+
+                if (result && !fmpz_is_one(size))
+                {
+                    flint_printf("FAIL:\n\n");
+                    flint_printf("a = "), TEMPLATE(T, print_pretty)(a, ctx), flint_printf("\n");
+                    flint_printf("ord = "), fmpz_print(ord), flint_printf("\n");
+                    TEMPLATE(T, ctx_print)(ctx);
+                    flint_abort();
+                }
+            }
+#if !(defined(FQ_NMOD_H) || defined(FQ_ZECH_H))
+            fmpz_clear(pm1);
+#endif
+            fmpz_clear(size);
+        }
+
         fmpz_clear(ord);
-        fmpz_clear(size);
         TEMPLATE(T, clear)(a, ctx);
         TEMPLATE(T, clear)(X, ctx);
-
         TEMPLATE(T, ctx_clear)(ctx);
     }
 

@@ -10,9 +10,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
 #include "ulong_extras.h"
-#include "fmpz.h"
 #include "nmod_poly.h"
+#include "fmpz.h"
 #include "fq_nmod.h"
 #include "fq_zech.h"
 
@@ -36,6 +37,48 @@ _nmod_poly_evaluate_ui(mp_srcptr poly, slong len, ulong xd)
     return res;
 }
 
+int
+_fq_zech_ctx_init_conway_ui(fq_zech_ctx_t ctx, ulong p, slong d, const char * var)
+{
+    int ret;
+    ulong conway_poly[410]; /* Largest degree in database is 409 */
+    fq_nmod_ctx_struct * ctx_fq_nmod;
+    nmod_poly_struct tmp;
+
+    ret = _nmod_poly_conway(conway_poly, p, d);
+
+    if (ret != 1 && ret != 0)
+        FLINT_UNREACHABLE;
+
+    if (!ret)
+        return 0; /* We do not change ctx->is_conway */
+
+    nmod_poly_init(&tmp, p);
+    tmp.coeffs = conway_poly;
+    tmp.length = d + 1;
+
+    ctx_fq_nmod = flint_malloc(sizeof(fq_nmod_ctx_struct));
+    fq_nmod_ctx_init_modulus(ctx_fq_nmod, &tmp, var);
+
+    ctx->is_conway = 1;
+    fq_zech_ctx_init_fq_nmod_ctx(ctx, ctx_fq_nmod);
+    ctx->owns_fq_nmod_ctx = 1;
+
+    /* No need to clear tmp */
+
+    return 1;
+}
+
+void
+fq_zech_ctx_init_conway_ui(fq_zech_ctx_t ctx, ulong p, slong d, const char * var)
+{
+    if (!_fq_zech_ctx_init_conway_ui(ctx, p, d, var))
+        flint_throw(FLINT_ERROR,
+                "Exception (fq_zech_ctx_init_conway_ui).  "
+                "The polynomial for (p, d) = (%wu, %wd) is not present in the "
+                "database.\n", p, d);
+}
+
 void
 fq_zech_ctx_init_ui(fq_zech_ctx_t ctx, ulong p, slong d, const char *var)
 {
@@ -44,71 +87,37 @@ fq_zech_ctx_init_ui(fq_zech_ctx_t ctx, ulong p, slong d, const char *var)
 }
 
 void
-fq_zech_ctx_init_conway_ui(fq_zech_ctx_t ctx, ulong p, slong d,
-                        const char *var)
-{
-    fq_nmod_ctx_struct * fq_nmod_ctx;
-
-    fq_nmod_ctx = flint_malloc(sizeof(fq_nmod_ctx_struct));
-
-    fq_nmod_ctx_init_conway_ui(fq_nmod_ctx, p, d, var);
-    fq_zech_ctx_init_fq_nmod_ctx(ctx, fq_nmod_ctx);
-    ctx->owns_fq_nmod_ctx = 1;
-    ctx->is_conway = 1;
-}
-
-int
-_fq_zech_ctx_init_conway_ui(fq_zech_ctx_t ctx, ulong p, slong d,
-                         const char *var)
-{
-    int result;
-    fq_nmod_ctx_struct * fq_nmod_ctx;
-
-    fq_nmod_ctx = flint_malloc(sizeof(fq_nmod_ctx_struct));
-
-    result = _fq_nmod_ctx_init_conway_ui(fq_nmod_ctx, p, d, var);
-    if (!result)
-    {
-        flint_free(fq_nmod_ctx);
-	ctx->is_conway = 0;
-        return result;
-    } else
-        ctx->is_conway = 1;
-
-    fq_zech_ctx_init_fq_nmod_ctx(ctx, fq_nmod_ctx);
-    ctx->owns_fq_nmod_ctx = 1;
-    return result;
-}
-
-void
-fq_zech_ctx_init_random_ui(fq_zech_ctx_t ctx, ulong p, slong d,
-                        const char *var)
+fq_zech_ctx_init_random_ui(fq_zech_ctx_t ctx, ulong p, slong d, const char * var)
 {
     fq_nmod_ctx_struct * fq_nmod_ctx;
     flint_rand_t state;
     nmod_poly_t poly;
+    ulong tmp_coeffs[FLINT_BITS]; /* p^d < 2^{FLINT_BITS} */
 
     fq_nmod_ctx = flint_malloc(sizeof(fq_nmod_ctx_struct));
 
     flint_randinit(state);
+    nmod_poly_init(poly, p);
 
-    nmod_poly_init2(poly, p, d + 1);
+    poly->coeffs = tmp_coeffs;
+    poly->alloc = FLINT_BITS; /* Ensure no reallocation in nmod_poly_randtest */
+    poly->length = d + 1;
+
     nmod_poly_randtest_monic_primitive(poly, state, d + 1);
 
     fq_nmod_ctx_init_modulus(fq_nmod_ctx, poly, var);
 
-    nmod_poly_clear(poly);
-    flint_randclear(state);
+    /* No need to clear poly */
+    /* No need to clear state */
 
     fq_zech_ctx_init_fq_nmod_ctx(ctx, fq_nmod_ctx);
+
     ctx->owns_fq_nmod_ctx = 1;
     ctx->is_conway = 0;
 }
 
 int
-fq_zech_ctx_init_modulus_check(fq_zech_ctx_t ctx,
-                         const nmod_poly_t modulus,
-                         const char *var)
+fq_zech_ctx_init_modulus_check(fq_zech_ctx_t ctx, const nmod_poly_t modulus, const char * var)
 {
     int primitive;
     fq_nmod_ctx_struct * fq_nmod_ctx;
@@ -118,42 +127,36 @@ fq_zech_ctx_init_modulus_check(fq_zech_ctx_t ctx,
     fq_nmod_ctx_init_modulus(fq_nmod_ctx, modulus, var);
     primitive = fq_zech_ctx_init_fq_nmod_ctx_check(ctx, fq_nmod_ctx);
     ctx->owns_fq_nmod_ctx = 1;
+
     return primitive;
 }
 
 void
-fq_zech_ctx_init_modulus(fq_zech_ctx_t ctx,
-		   const nmod_poly_t modulus,
-		   const char *var)
+fq_zech_ctx_init_modulus(fq_zech_ctx_t ctx, const nmod_poly_t modulus, const char * var)
 {
    fq_zech_ctx_init_modulus_check(ctx, modulus, var);
 }
 
 int
-fq_zech_ctx_init_fq_nmod_ctx_check(fq_zech_ctx_t ctx,
-                             fq_nmod_ctx_t fq_nmod_ctx)
+fq_zech_ctx_init_fq_nmod_ctx_check(fq_zech_ctx_t ctx, fq_nmod_ctx_t ctx2)
 {
     ulong i, n;
     fq_nmod_t r, gen;
     slong up, q;
-    fmpz_t order;
     ulong result;
-    mp_limb_t j, nz;
-    mp_limb_t *n_reverse_table;
+    ulong j, nz;
+    mp_ptr n_reverse_table;
 
-    ctx->fq_nmod_ctx = fq_nmod_ctx;
+    ctx->fq_nmod_ctx = ctx2;
     ctx->owns_fq_nmod_ctx = 0;
 
-    fmpz_init(order);
-    fq_nmod_ctx_order(order, fq_nmod_ctx);
+    up = fq_nmod_ctx_prime(ctx2);
 
-    if (fmpz_bits(order) > FLINT_BITS)
-    {
-        flint_throw(FLINT_ERROR, "Exception (fq_zech_ctx_init_fq_nmod_ctx). Requires q < 2^FLINT_BITS\n");
-    }
+    q = _n_pow_check(up, fq_nmod_ctx_degree(ctx2));
 
-    q = fmpz_get_ui(order);
-    up = fq_nmod_ctx_prime(fq_nmod_ctx);
+    if (!q)
+        flint_throw(FLINT_ERROR, "Exception (fq_zech_ctx_init_fq_nmod_ctx). "
+                "Requires q < 2^FLINT_BITS\n");
 
     ctx->p = up;
     ctx->ppre = n_precompute_inverse(ctx->p);
@@ -178,13 +181,14 @@ fq_zech_ctx_init_fq_nmod_ctx_check(fq_zech_ctx_t ctx,
  * 4. this is because if P(t) = (t-x_0)...(t-x_{d-1}), then the constant term of
  * P is the product of the x_i (ie the norm) and is equal to (-1)^d * a_0
  */
-    ctx->prime_root = (fq_nmod_ctx_degree(fq_nmod_ctx) & 1) ?
-        ctx->p - fq_nmod_ctx->a[0] : fq_nmod_ctx->a[0];
+    ctx->prime_root = (fq_nmod_ctx_degree(ctx2) & 1) ? up - ctx2->a[0] : ctx2->a[0];
 
-    ctx->zech_log_table = (mp_limb_t *) flint_malloc(q * sizeof(mp_limb_t));
-    ctx->prime_field_table = (mp_limb_t *) flint_malloc(up * sizeof(mp_limb_t));
-    n_reverse_table = (mp_limb_t *) flint_malloc(q * sizeof(mp_limb_t));
-    ctx->eval_table = (mp_limb_t *) flint_malloc(q * sizeof(mp_limb_t));
+    /* NOTE: Only malloc once for tables */
+    ctx->zech_log_table = flint_malloc(sizeof(ulong) * (2 * q + up));
+    ctx->prime_field_table = ctx->zech_log_table + q;
+    ctx->eval_table = ctx->prime_field_table + up;
+
+    n_reverse_table = flint_malloc(sizeof(ulong) * q);
 
     ctx->zech_log_table[ctx->qm1] = 0;
     ctx->prime_field_table[0] = ctx->qm1;
@@ -199,23 +203,24 @@ fq_zech_ctx_init_fq_nmod_ctx_check(fq_zech_ctx_t ctx,
 
     for (i = 0; i < ctx->qm1; i++)
     {
-        result = _nmod_poly_evaluate_ui(r->coeffs, r->length, fq_nmod_ctx_prime(fq_nmod_ctx));
+        result = _nmod_poly_evaluate_ui(r->coeffs, r->length, up);
+
         if (n_reverse_table[result] != ctx->qm1)
-        {   /* clean up... */
-            fq_nmod_clear(r, fq_nmod_ctx);
-            fq_nmod_clear(gen, fq_nmod_ctx);
+        {
+            fq_nmod_clear(r, ctx2);
+            fq_nmod_clear(gen, ctx2);
             flint_free(n_reverse_table);
-            fmpz_clear(order);
             fq_zech_ctx_clear(ctx);
             return 0; /* failure: modulus not primitive */
         }
+
         n_reverse_table[result] = i;
         ctx->eval_table[i] = result;
+
         if (r->length == 1)
-        {
             ctx->prime_field_table[result] = i;
-        }
-        fq_nmod_mul(r, r, gen, fq_nmod_ctx);
+
+        fq_nmod_mul(r, r, gen, ctx2);
     }
 
     i = 1;
@@ -234,10 +239,9 @@ fq_zech_ctx_init_fq_nmod_ctx_check(fq_zech_ctx_t ctx,
         ctx->zech_log_table[j] = n_reverse_table[nz];
     }
 
-    fq_nmod_clear(r, fq_nmod_ctx);
-    fq_nmod_clear(gen, fq_nmod_ctx);
+    fq_nmod_clear(r, ctx2);
+    fq_nmod_clear(gen, ctx2);
     flint_free(n_reverse_table);
-    fmpz_clear(order);
 
     return 1; /* success */
 }
@@ -246,9 +250,48 @@ void
 fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx, fq_nmod_ctx_t fq_nmod_ctx)
 {
     if (!fq_zech_ctx_init_fq_nmod_ctx_check(ctx, fq_nmod_ctx))
+        flint_throw(FLINT_ERROR, "(fq_zech_ctx_init_fq_nmod_ctx): "
+                "Polynomial is not primitive.\n");
+}
+
+void
+fq_zech_ctx_init_randtest(fq_zech_ctx_t ctx, flint_rand_t state, int type)
+{
+    slong deg;
+    ulong prime;
+
+    /* Big prime < 2^5, big degree <= 4 */
+    /* Small prime < 2^4, small degree <= 3 */
+    switch (type)
     {
-        flint_throw(FLINT_ERROR, "(fq_zech_ctx_init_fq_nmod_ctx): Polynomial is not primitive.\n");
+        case 0:
+            prime = n_randprime(state, 2 + n_randint(state, 4), 1);
+            deg = 1 + n_randint(state, 4);
+            break;
+        case 1:
+            prime = n_randprime(state, 2 + n_randint(state, 4), 1);
+            deg = 1 + n_randint(state, 3);
+            break;
+        case 2:
+            prime = n_randprime(state, 2 + n_randint(state, 3), 1);
+            deg = 1 + n_randint(state, 4);
+            break;
+        case 3:
+            prime = n_randprime(state, 2 + n_randint(state, 3), 1);
+            deg = 1 + n_randint(state, 3);
+            break;
+        default: FLINT_UNREACHABLE;
     }
+
+    fq_zech_ctx_init_random_ui(ctx, prime, deg, "a");
+
+    ctx->owns_fq_nmod_ctx = 1;
+}
+
+void
+fq_zech_ctx_init_randtest_reducible(fq_zech_ctx_t ctx, flint_rand_t state, int type)
+{
+    fq_zech_ctx_init_randtest(ctx, state, type);
 }
 
 /* Deprecated functions ******************************************************/

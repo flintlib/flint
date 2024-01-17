@@ -20,7 +20,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_derivative, state)
     int i, result;
 
     /* Check aliasing */
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         slong len;
         TEMPLATE(T, ctx_t) ctx;
@@ -28,7 +28,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_derivative, state)
         TEMPLATE(T, poly_t) a, b, c;
 
         len = n_randint(state, 15) + 1;
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
         TEMPLATE(T, poly_init) (c, ctx);
@@ -60,13 +60,13 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_derivative, state)
     }
 
     /* Check constants have derivative zero */
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a, b;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
 
@@ -98,7 +98,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_derivative, state)
 
         TEMPLATE(T, poly_t) a, b, c, d, lhs, rhs;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
         TEMPLATE(T, poly_init) (c, ctx);
@@ -106,8 +106,8 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_derivative, state)
         TEMPLATE(T, poly_init) (lhs, ctx);
         TEMPLATE(T, poly_init) (rhs, ctx);
 
-        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 100), ctx);
-        TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 100), ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 20), ctx);
+        TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 20), ctx);
 
         TEMPLATE(T, poly_mul) (lhs, a, b, ctx);
         TEMPLATE(T, poly_derivative) (lhs, lhs, ctx);

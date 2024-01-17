@@ -26,12 +26,12 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_compose, state)
 
         TEMPLATE(T, poly_t) f, g, h;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         TEMPLATE(T, poly_init) (f, ctx);
         TEMPLATE(T, poly_init) (g, ctx);
         TEMPLATE(T, poly_init) (h, ctx);
 
-        TEMPLATE(T, poly_randtest) (f, state, n_randint(state, 40), ctx);
+        TEMPLATE(T, poly_randtest) (f, state, n_randint(state, 20), ctx);
         TEMPLATE(T, poly_randtest) (g, state, n_randint(state, 20), ctx);
 
         TEMPLATE(T, poly_compose) (h, f, g, ctx);
@@ -65,12 +65,12 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_compose, state)
 
         TEMPLATE(T, poly_t) f, g, h;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         TEMPLATE(T, poly_init) (f, ctx);
         TEMPLATE(T, poly_init) (g, ctx);
         TEMPLATE(T, poly_init) (h, ctx);
 
-        TEMPLATE(T, poly_randtest) (f, state, n_randint(state, 40), ctx);
+        TEMPLATE(T, poly_randtest) (f, state, n_randint(state, 20), ctx);
         TEMPLATE(T, poly_randtest) (g, state, n_randint(state, 20), ctx);
 
         TEMPLATE(T, poly_compose) (h, f, g, ctx);
@@ -98,21 +98,21 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_compose, state)
     }
 
     /* Compare with the naive method */
-    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) f, g, h, s, t;
         slong k;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 1);
         TEMPLATE(T, poly_init) (f, ctx);
         TEMPLATE(T, poly_init) (g, ctx);
         TEMPLATE(T, poly_init) (h, ctx);
         TEMPLATE(T, poly_init) (s, ctx);
         TEMPLATE(T, poly_init) (t, ctx);
 
-        TEMPLATE(T, poly_randtest) (g, state, n_randint(state, 40), ctx);
+        TEMPLATE(T, poly_randtest) (g, state, n_randint(state, 20), ctx);
         TEMPLATE(T, poly_randtest) (h, state, n_randint(state, 20), ctx);
 
         TEMPLATE(T, poly_one) (t, ctx);

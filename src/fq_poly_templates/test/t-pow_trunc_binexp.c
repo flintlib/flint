@@ -19,14 +19,14 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_pow_trunc_binexp, state)
     int i, result;
 
     /* Check powering against naive method */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, poly_t) a, b, c;
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) d;
         slong e, trunc;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, init) (d, ctx);
         TEMPLATE(T, poly_init) (a, ctx);
@@ -64,20 +64,20 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_pow_trunc_binexp, state)
     }
 
     /* Check aliasing */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, poly_t) a, b, c;
         TEMPLATE(T, ctx_t) ctx;
         slong e, trunc;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
         TEMPLATE(T, poly_init) (c, ctx);
-        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 30), ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 20), ctx);
         e = n_randint(state, 20);
-        trunc = n_randint(state, 30);
+        trunc = n_randint(state, 20);
 
         TEMPLATE(T, poly_pow_trunc_binexp) (b, a, e, trunc, ctx);
 

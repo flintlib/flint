@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -95,32 +96,29 @@ TEMPLATE(T, poly_powmod_fmpz_binexp_preinv) (TEMPLATE(T, poly_t) res,
         return;
     }
 
-    if (fmpz_abs_fits_ui(e))
+    if (fmpz_is_zero(e))
     {
-        ulong exp = fmpz_get_ui(e);
-
-        if (exp <= 2)
-        {
-            if (exp == UWORD(0))
-            {
-                TEMPLATE(T, poly_fit_length) (res, 1, ctx);
-                TEMPLATE(T, one) (res->coeffs, ctx);
-                _TEMPLATE(T, poly_set_length) (res, 1, ctx);
-            }
-            else if (exp == UWORD(1))
-            {
-                TEMPLATE(T, poly_set) (res, poly, ctx);
-            }
-            else
-                TEMPLATE(T, poly_mulmod_preinv) (res, poly, poly, f, finv,
-                                                 ctx);
-            return;
-        }
+        if (lenf == 1)
+            TEMPLATE(T, poly_zero)(res, ctx);
+        else
+            TEMPLATE(T, poly_one)(res, ctx);
+        return;
     }
 
     if (lenf == 1 || len == 0)
     {
         TEMPLATE(T, poly_zero) (res, ctx);
+        return;
+    }
+
+    if (fmpz_is_one(e))
+    {
+        TEMPLATE(T, poly_set) (res, poly, ctx);
+        return;
+    }
+    else if (*e == WORD(2)) /* NOTE: This check works */
+    {
+        TEMPLATE(T, poly_mulmod) (res, poly, poly, f, ctx);
         return;
     }
 

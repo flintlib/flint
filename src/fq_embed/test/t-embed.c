@@ -36,14 +36,14 @@ TEST_FUNCTION_START(fq_embed, state)
     int i;
 
     /* Check isomorphism to self */
-    for (i = 0; i < 4 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) a, b, ev_a, ev_b;
         TEMPLATE(B, poly_t) minpoly;
         TEMPLATE(T, poly_t) minpoly_fq;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 1);
         TEMPLATE(T, init) (a, ctx);
         TEMPLATE(T, init) (b, ctx);
         TEMPLATE(T, init) (ev_a, ctx);
@@ -64,7 +64,6 @@ TEST_FUNCTION_START(fq_embed, state)
             flint_printf("a: "), TEMPLATE(T, print_pretty)(a, ctx), flint_printf("\n");
             flint_printf("b: "), TEMPLATE(T, print_pretty)(b, ctx), flint_printf("\n");
             flint_printf("minpoly: "), TEMPLATE(B, poly_print_pretty)(minpoly, "x", ctx->ctxp), flint_printf("\n");
-            fflush(stdout);
             flint_abort();
         }
 

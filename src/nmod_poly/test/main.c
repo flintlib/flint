@@ -33,6 +33,7 @@
 #include "t-compose_mod.c"
 #include "t-compose_mod_horner.c"
 #include "t-compose_series.c"
+#include "t-conway.c"
 #include "t-cosh_series.c"
 #include "t-cos_series.c"
 #include "t-deflate.c"
@@ -154,6 +155,8 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_poly_compose_mod),
     TEST_FUNCTION(nmod_poly_compose_mod_horner),
     TEST_FUNCTION(nmod_poly_compose_series),
+    TEST_FUNCTION(_nmod_poly_conway),
+    TEST_FUNCTION(_nmod_poly_conway_rand),
     TEST_FUNCTION(nmod_poly_cosh_series),
     TEST_FUNCTION(nmod_poly_cos_series),
     TEST_FUNCTION(nmod_poly_deflate),

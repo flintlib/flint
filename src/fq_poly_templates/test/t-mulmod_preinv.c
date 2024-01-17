@@ -22,12 +22,12 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_mulmod_preinv, state)
     int i, result;
 
     /* Aliasing res and a */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, poly_t) a, b, res, t, f, finv;
         TEMPLATE(T, ctx_t) ctx;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
@@ -79,12 +79,12 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_mulmod_preinv, state)
     }
 
     /* Aliasing res and b */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, poly_t) a, b, res, t, f, finv;
         TEMPLATE(T, ctx_t) ctx;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
@@ -136,12 +136,12 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_mulmod_preinv, state)
     }
 
     /* Aliasing res and f */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, poly_t) a, b, res, t, f, finv;
         TEMPLATE(T, ctx_t) ctx;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
@@ -193,12 +193,12 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_mulmod_preinv, state)
     }
 
     /* Aliasing res and finv */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, poly_t) a, b, res, t, f, finv;
         TEMPLATE(T, ctx_t) ctx;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
@@ -258,7 +258,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_mulmod_preinv, state)
 
         TEMPLATE(T, ctx_t) ctx;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);

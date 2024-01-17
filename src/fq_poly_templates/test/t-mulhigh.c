@@ -20,13 +20,13 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_mulhigh, state)
     int i, result;
 
     /* Compare with left truncated product of a and b */
-    for (i = 0; i < 20 * flint_test_multiplier(); i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, b, c;
         slong j, n;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);

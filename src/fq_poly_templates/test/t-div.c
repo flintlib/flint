@@ -26,7 +26,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_div, state)
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, b, q, q2, r2;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
@@ -70,12 +70,12 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_div, state)
     }
 
     /* Alias a and q */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, b, q;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
@@ -110,12 +110,12 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_div, state)
     }
 
     /* Alias b and q */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, b, q;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);

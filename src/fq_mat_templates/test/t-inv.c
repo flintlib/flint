@@ -25,7 +25,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_inv, state)
     {
         m = n_randint(state, 20);
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, mat_init)(A, m, m, ctx);
         TEMPLATE(T, mat_init)(B, m, m, ctx);
@@ -87,7 +87,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_inv, state)
     {
         m = 1 + n_randint(state, 20);
         r = n_randint(state, m);
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, mat_init)(A, m, m, ctx);
         TEMPLATE(T, mat_init)(B, m, m, ctx);

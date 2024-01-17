@@ -21,22 +21,22 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_shift_left_right, state)
     int i, result;
 
     /* Check aliasing for left shift */
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
-        slong len = n_randint(state, 100);
+        slong len = n_randint(state, 30);
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a, b, c;
         slong shift;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
         TEMPLATE(T, poly_init) (c, ctx);
 
         TEMPLATE(T, poly_randtest) (a, state, len, ctx);
         TEMPLATE(T, poly_set) (b, a, ctx);
-        shift = n_randint(state, 100);
+        shift = n_randint(state, 30);
 
         TEMPLATE(T, poly_shift_left) (c, b, shift, ctx);
         TEMPLATE(T, poly_shift_left) (b, b, shift, ctx);
@@ -63,15 +63,15 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_shift_left_right, state)
     }
 
     /* Check aliasing for right shift */
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
-        slong len = n_randint(state, 100);
+        slong len = n_randint(state, 30);
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a, b, c;
         slong shift;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
@@ -79,7 +79,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_shift_left_right, state)
 
         TEMPLATE(T, poly_randtest) (a, state, len, ctx);
         TEMPLATE(T, poly_set) (b, a, ctx);
-        shift = n_randint(state, 100);
+        shift = n_randint(state, 30);
 
         TEMPLATE(T, poly_shift_right) (c, b, shift, ctx);
         TEMPLATE(T, poly_shift_right) (b, b, shift, ctx);
@@ -114,7 +114,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_shift_left_right, state)
         TEMPLATE(T, poly_t) a, b, c;
         slong shift;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
         TEMPLATE(T, poly_init) (c, ctx);

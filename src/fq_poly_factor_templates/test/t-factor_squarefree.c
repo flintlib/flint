@@ -33,7 +33,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_factor_squarefree, state)
         slong exp[5], prod1;
         slong length, i, j, num;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (pol1, ctx);
         TEMPLATE(T, poly_init) (poly, ctx);

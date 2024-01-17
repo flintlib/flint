@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -15,15 +16,17 @@
 
 TEST_FUNCTION_START(fq_zech_frobenius, state)
 {
-    int j, i, result;
-    fq_zech_ctx_t ctx;
+    slong ix, jx;
+    int result;
 
-    for (j = 0; j < 10; j++)
+    for (ix = 0; ix < 100 * flint_test_multiplier(); ix++)
     {
-        fq_zech_ctx_randtest(ctx, state);
+        fq_zech_ctx_t ctx;
+
+        fq_zech_ctx_init_randtest(ctx, state, 2);
 
         /* Check aliasing: a = frob(a, e) */
-        for (i = 0; i < 100; i++)
+        for (jx = 0; jx < 10; jx++)
         {
             fq_zech_t a, b;
             fmpz_t e;
@@ -44,7 +47,6 @@ TEST_FUNCTION_START(fq_zech_frobenius, state)
                 flint_printf("FAIL (alias):\n\n");
                 flint_printf("a = "), fq_zech_print_pretty(a, ctx), flint_printf("\n");
                 flint_printf("b = "), fq_zech_print_pretty(b, ctx), flint_printf("\n");
-                fflush(stdout);
                 flint_abort();
             }
 
@@ -54,7 +56,7 @@ TEST_FUNCTION_START(fq_zech_frobenius, state)
         }
 
         /* Compare with exponentiation, for integral values */
-        for (i = 0; i < 100; i++)
+        for (jx = 0; jx < 10; jx++)
         {
             fq_zech_t a, b, c;
             fmpz_t e, f;
@@ -81,7 +83,6 @@ TEST_FUNCTION_START(fq_zech_frobenius, state)
                 flint_printf("b = "), fq_zech_print_pretty(b, ctx), flint_printf("\n");
                 flint_printf("c = "), fq_zech_print_pretty(b, ctx), flint_printf("\n");
                 flint_printf("e = "), fmpz_print(e), flint_printf("\n");
-                fflush(stdout);
                 flint_abort();
             }
 

@@ -118,7 +118,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_lu_recursive, state)
         slong m, n, r, d, rank;
         slong *P;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         m = n_randint(state, 20);
         n = n_randint(state, 20);

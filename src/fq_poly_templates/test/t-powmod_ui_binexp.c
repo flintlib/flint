@@ -3,6 +3,7 @@
     Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2012 Lina Kulakova
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -22,13 +23,13 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_ui_binexp, state)
     int i, result;
 
     /* Aliasing of res and a */
-    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, res1, t, f;
         ulong exp;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         exp = n_randint(state, 50);
 
@@ -68,13 +69,13 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_ui_binexp, state)
     }
 
     /* Aliasing of res and f */
-    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, res1, t, f;
         ulong exp;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         exp = n_randint(state, 50);
 
@@ -114,14 +115,14 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_ui_binexp, state)
     }
 
     /* No aliasing */
-    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, res1, res2, t, f;
         ulong exp;
         int j;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         exp = n_randint(state, 50);
 
@@ -131,17 +132,20 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_ui_binexp, state)
         TEMPLATE(T, poly_init) (res2, ctx);
         TEMPLATE(T, poly_init) (t, ctx);
 
-        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 20), ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 30), ctx);
         TEMPLATE(T, poly_randtest_not_zero) (f, state,
-                                             n_randint(state, 20) + 1, ctx);
+                                             n_randint(state, 30) + 1, ctx);
 
         TEMPLATE(T, poly_powmod_ui_binexp) (res1, a, exp, f, ctx);
 
-        TEMPLATE(T, poly_zero) (res2, ctx);
         TEMPLATE(T, poly_one) (res2, ctx);
 
-        for (j = 1; j <= exp; j++)
+        for (j = 0; j < exp; j++)
             TEMPLATE(T, poly_mulmod) (res2, res2, a, f, ctx);
+
+        /* NOTE: If exp is zero, then is it never reduced with respect to f */
+        if (exp == 0)
+            TEMPLATE(T, poly_rem)(res2, res2, f, ctx);
 
         result = (TEMPLATE(T, poly_equal) (res1, res2, ctx));
         if (!result)
@@ -170,14 +174,13 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_ui_binexp, state)
     }
 
     /* Check that a^(b+c) = a^b * a^c */
-    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, res1, res2, res3, res4, t, f;
-
         ulong exp1, exp2, exp3;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         exp1 = n_randint(state, 50);
         exp2 = n_randint(state, 50);
@@ -190,9 +193,9 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_ui_binexp, state)
         TEMPLATE(T, poly_init) (res4, ctx);
         TEMPLATE(T, poly_init) (t, ctx);
 
-        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 20), ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 30), ctx);
         TEMPLATE(T, poly_randtest_not_zero) (f, state,
-                                             n_randint(state, 20) + 1, ctx);
+                                             n_randint(state, 30) + 1, ctx);
 
         TEMPLATE(T, poly_powmod_ui_binexp) (res1, a, exp1, f, ctx);
         TEMPLATE(T, poly_powmod_ui_binexp) (res2, a, exp2, f, ctx);
@@ -204,6 +207,9 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_ui_binexp, state)
         if (!result)
         {
             flint_printf("FAIL:\n");
+            flint_printf("exp1: %wu\n", exp1);
+            flint_printf("exp2: %wu\n", exp2);
+            flint_printf("exp3: %wu\n", exp3);
             flint_printf("a:\n");
             TEMPLATE(T, poly_print) (a, ctx), flint_printf("\n\n");
             flint_printf("f:\n");
