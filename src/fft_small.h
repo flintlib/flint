@@ -111,6 +111,7 @@ FLINT_INLINE slong z_min(slong a, slong b) {return FLINT_MIN(a, b);}
 
 FLINT_INLINE slong z_max(slong a, slong b) {return FLINT_MAX(a, b);}
 
+int fft_small_mulmod_satisfies_bounds(ulong n);
 
 void* flint_aligned_alloc(ulong alignment, ulong size);
 
