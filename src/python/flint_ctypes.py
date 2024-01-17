@@ -403,6 +403,14 @@ class gr_ctx:
         self._str = None
         assert not status
 
+    def _set_gen_names(self, s):
+        arr = (ctypes.c_char_p * len(s))()
+        for i in range(len(s)):
+            arr[i] = ctypes.c_char_p(str(s[i]).encode('ascii'))
+        status = libflint.gr_ctx_set_gen_names(self._ref, arr)
+        self._str = None
+        assert not status
+
     def __call__(self, *args, **kwargs):
         kwargs['context'] = self
         return self._elem_type(*args, **kwargs)
@@ -5847,12 +5855,15 @@ class fmpz_mpoly(gr_elem):
 
 class PolynomialRing_fmpz_mpoly(gr_ctx):
 
-    def __init__(self, nvars):
+    def __init__(self, nvars, vars=None):
         gr_ctx.__init__(self)
         nvars = gr_ctx._as_si(nvars)
         assert nvars >= 0
         libgr.gr_ctx_init_fmpz_mpoly(self._ref, nvars, 0)
         self._elem_type = fmpz_mpoly
+        if vars is not None:
+            assert len(vars) == nvars
+            self._set_gen_names(vars)
 
     @property
     def _coefficient_ring(self):
@@ -5864,7 +5875,7 @@ class gr_mpoly(gr_elem):
     _struct_type = gr_mpoly_struct
 
 class PolynomialRing_gr_mpoly(gr_ctx):
-    def __init__(self, coefficient_ring, nvars):
+    def __init__(self, coefficient_ring, nvars, vars=None):
         assert isinstance(coefficient_ring, gr_ctx)
         gr_ctx.__init__(self)
 
@@ -5878,6 +5889,10 @@ class PolynomialRing_gr_mpoly(gr_ctx):
         self._coefficient_ring = coefficient_ring
         self._elem_type = gr_mpoly
 
+        if vars is not None:
+            assert len(vars) == nvars
+            self._set_gen_names(vars)
+
     def __del__(self):
         self._coefficient_ring._decrement_refcount()
 
@@ -5889,12 +5904,16 @@ class fmpz_mpoly_q(gr_elem):
 
 class FractionField_fmpz_mpoly_q(gr_ctx):
 
-    def __init__(self, nvars):
+    def __init__(self, nvars, vars=None):
         gr_ctx.__init__(self)
         nvars = gr_ctx._as_si(nvars)
         assert nvars >= 0
         libgr.gr_ctx_init_fmpz_mpoly_q(self._ref, nvars, 0)
         self._elem_type = fmpz_mpoly_q
+
+        if vars is not None:
+            assert len(vars) == nvars
+            self._set_gen_names(vars)
 
     @property
     def _coefficient_ring(self):
@@ -6537,31 +6556,6 @@ def test_polynomial():
         for B in poly_types + [VecZZ, VecQQ]:
             for C in poly_types:
                 assert A(B([1,2,3])) == C([1,2,3])
-
-def test_gr_mpoly():
-    I, x, y, z = PolynomialRing_gr_mpoly(ZZi, 3).gens(recursive=True)
-    assert str(x) == "x"
-    assert str(y) == "y"
-    assert str(z) == "z"
-    assert str(x-y) == "x - y"
-    assert str(x+2*y) == "x + 2*y"
-    assert str(x-2*y) == "x - 2*y"
-    assert str(-x) == "-x"
-    assert str(-3*x) == "-3*x"
-    assert str(x+1) == "x + 1"
-    assert str(x-1) == "x - 1"
-    assert str(x+2) == "x + 2"
-    assert str(x-2) == "x - 2"
-    assert str(x*0) == "0"
-    assert str(x**0) == "1"
-    assert str(-x**0) == "-1"
-    assert str(-2*x**0) == "-2"
-    assert str(x*y*z) == "x*y*z"
-    assert str(x*y**2*z) == "x*y^2*z"
-    assert str(3*x*y**2*z) == "3*x*y^2*z"
-    assert str((1+I)*x + I*y) == "(1+I)*x + I*y"
-    assert str((1+I)*x - I*y) == "(1+I)*x - I*y"
-    assert str(x+1+I) == "x + (1+I)"
 
 def test_matrix():
     M = Mat(ZZ, 2)
@@ -7491,6 +7485,38 @@ def test_mpoly():
     assert c == -72
     assert ((fac, exp) == ([1+x, y+z+1], [2, 1])) or ((fac, exp) == ([y+z+1, 1+x], [1, 2]))
     assert f.gcd(-100-100*x) == 4+4*x
+
+    assert str(PolynomialRing_fmpz_mpoly(2).gens()) == '[x1, x2]'
+    assert str(PolynomialRing_fmpz_mpoly(2, ["a", "b"]).gens()) == '[a, b]'
+    assert str(PolynomialRing_gr_mpoly(ZZi, 2).gens()) == '[x1, x2]'
+
+    I, x, y, z = PolynomialRing_gr_mpoly(ZZi, 3, ["x", "y", "z"]).gens(recursive=True)
+    assert str(x) == "x"
+    assert str(y) == "y"
+    assert str(z) == "z"
+    assert str(x-y) == "x - y"
+    assert str(x+2*y) == "x + 2*y"
+    assert str(x-2*y) == "x - 2*y"
+    assert str(-x) == "-x"
+    assert str(-3*x) == "-3*x"
+    assert str(x+1) == "x + 1"
+    assert str(x-1) == "x - 1"
+    assert str(x+2) == "x + 2"
+    assert str(x-2) == "x - 2"
+    assert str(x*0) == "0"
+    assert str(x**0) == "1"
+    assert str(-x**0) == "-1"
+    assert str(-2*x**0) == "-2"
+    assert str(x*y*z) == "x*y*z"
+    assert str(x*y**2*z) == "x*y^2*z"
+    assert str(3*x*y**2*z) == "3*x*y^2*z"
+    assert str((1+I)*x + I*y) == "(1+I)*x + I*y"
+    assert str((1+I)*x - I*y) == "(1+I)*x - I*y"
+    assert str(x+1+I) == "x + (1+I)"
+
+def test_mpoly_q():
+    assert str(FractionField_fmpz_mpoly_q(2).gens()) == '[x1, x2]'
+    assert str(FractionField_fmpz_mpoly_q(2, ["a", "b"]).gens()) == '[a, b]'
 
 def test_ca_notebook_examples():
     # algebraic number identity

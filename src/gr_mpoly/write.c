@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2020 Daniel Schultz
-    Copyright (C) 2022 Fredrik Johansson
+    Copyright (C) 2022, 2024 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -17,7 +17,7 @@
 #include "fmpz_vec.h"
 
 static char * _gr_mpoly_default_vars[8] = {
-    "x", "y", "z", "s", "t", "u", "v", "w"
+    "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8"
 };
 
 static int
