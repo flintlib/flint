@@ -121,7 +121,7 @@ int fft_small_mulmod_satisfies_bounds(ulong nn)
 {
     double n = nn;
     double ninv = 1.0/n;
-    double t1 = abs(fma(n, ninv, -1.0));  /* epsilon ~= t1/n  good enough */
+    double t1 = fabs(fma(n, ninv, -1.0));  /* epsilon ~= t1/n  good enough */
     double limit2, limit4;
     int B, ok, n1bits, n2bits;
     ulong n2hi, n2lo;
