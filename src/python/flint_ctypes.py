@@ -7514,6 +7514,14 @@ def test_mpoly():
     assert str((1+I)*x - I*y) == "(1+I)*x - I*y"
     assert str(x+1+I) == "x + (1+I)"
 
+    x, y = PolynomialRing_gr_mpoly(ZZx, 1, ["y"]).gens(recursive=True)
+    assert str(x+1) == "(x+1)"
+    assert str((x+1)*y) == "(x+1)*y"
+    assert str((x+1)*y + (x+2)) == "(x+1)*y + (x+2)"
+    assert str((x+1)*y**2 + (x+2)*y)
+    assert str((x+1)*y**2 - (x+2)*y) == "(x+1)*y^2 + (-x-2)*y"
+
+
 def test_mpoly_q():
     assert str(FractionField_fmpz_mpoly_q(2).gens()) == '[x1, x2]'
     assert str(FractionField_fmpz_mpoly_q(2, ["a", "b"]).gens()) == '[a, b]'
