@@ -1,3 +1,4 @@
+#include <math.h>
 #include "double_extras.h"
 #include "fft_small.h"
 
@@ -115,17 +116,18 @@ Analysis for 2^(prec - 4) < n < 2^(prec - 3) (aka 50 bit primes)
     want bound < 1   for |a*b| < 2*n^2  where  q_error = 1/2 + 2^-3
     want bound < 1.5 for |a*b| < 4*n^2  where  q_error = 1/2 + 2^-2
 */
+
 int fft_small_mulmod_satisfies_bounds(ulong nn)
 {
     double n = nn;
     double ninv = 1.0/n;
-    double t1 = abs(fmsub(n, ninv, 1.0));  /* epsilon ~= t1/n  good enough */
+    double t1 = abs(fma(n, ninv, -1.0));  /* epsilon ~= t1/n  good enough */
     double limit2, limit4;
-    int B, ok, nbits, n2bits;
+    int B, ok, n1bits, n2bits;
     ulong n2hi, n2lo;
 
     n1bits = n_nbits(nn);
-    UMUL_PPMM(n2hi, n2lo, nn, nn);
+    umul_ppmm(n2hi, n2lo, nn, nn);
     if (n2hi != 0)
        n2bits = FLINT_BITS + n_nbits(n2hi);
     else
@@ -143,7 +145,7 @@ int fft_small_mulmod_satisfies_bounds(ulong nn)
     limit4 = 4*n*t1 + ldexp(ninv, 2+n2bits-D_BITS-1) + 0.5 + ldexp(1.0, -(B+1));
 
     /* fudge the limits 1 and 3/2 because the above is double arithmetic */
-    ok = limit2 < 0.99 && limit4 < 1.49;
+    ok = (limit2 < 0.99) && (limit4 < 1.49);
     return ok;
 }
 
