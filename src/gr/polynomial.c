@@ -16,7 +16,9 @@
 #include "fmpz.h"
 #include "ulong_extras.h"
 #include "gr.h"
+#include "gr_vec.h"
 #include "gr_poly.h"
+#include "gr_generic.h"
 
 #ifdef __GNUC__
 # define strcmp __builtin_strcmp
@@ -233,6 +235,33 @@ polynomial_gen(gr_poly_t res, gr_ctx_t ctx)
     return gr_poly_gen(res, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
+int
+polynomial_gens_recursive(gr_vec_t vec, gr_ctx_t ctx)
+{
+    int status;
+    gr_vec_t vec1;
+    slong i, n;
+
+    /* Get generators of the element ring */
+    gr_vec_init(vec1, 0, POLYNOMIAL_ELEM_CTX(ctx));
+    status = gr_gens_recursive(vec1, POLYNOMIAL_ELEM_CTX(ctx));
+    n = vec1->length;
+
+    gr_vec_set_length(vec, n + 1, ctx);
+
+    /* Promote to polynomials */
+    for (i = 0; i < n; i++)
+        status |= gr_poly_set_scalar(gr_vec_entry_ptr(vec, i, ctx),
+                gr_vec_entry_srcptr(vec1, i, POLYNOMIAL_ELEM_CTX(ctx)),
+                POLYNOMIAL_ELEM_CTX(ctx));
+
+    status |= gr_poly_gen(gr_vec_entry_ptr(vec, n, ctx), POLYNOMIAL_ELEM_CTX(ctx));
+
+    gr_vec_clear(vec1, POLYNOMIAL_ELEM_CTX(ctx));
+
+    return status;
+}
+
 /*
 truth_t
 polynomial_is_zero(const gr_poly_t poly, gr_ctx_t ctx)
@@ -397,7 +426,9 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_ONE,         (gr_funcptr) polynomial_one},
     {GR_METHOD_NEG_ONE,     (gr_funcptr) polynomial_neg_one},
 
-    {GR_METHOD_GEN,         (gr_funcptr) polynomial_gen},
+    {GR_METHOD_GEN,            (gr_funcptr) polynomial_gen},
+    {GR_METHOD_GENS,           (gr_funcptr) gr_generic_gens_single},
+    {GR_METHOD_GENS_RECURSIVE, (gr_funcptr) polynomial_gens_recursive},
 
 /*
     {GR_METHOD_IS_ZERO,     (gr_funcptr) polynomial_is_zero},

@@ -15,6 +15,7 @@
 #include "qqbar.h"
 #include "fmpzi.h"
 #include "gr.h"
+#include "gr_generic.h"
 
 int
 _gr_fmpzi_ctx_write(gr_stream_t out, gr_ctx_t ctx)
@@ -998,6 +999,7 @@ gr_method_tab_input _fmpzi_methods_input[] =
 */
 
     {GR_METHOD_GEN,             (gr_funcptr) _gr_fmpzi_i},
+    {GR_METHOD_GENS,            (gr_funcptr) gr_generic_gens_single},
 
     {GR_METHOD_I,               (gr_funcptr) _gr_fmpzi_i},
     {GR_METHOD_PI,              (gr_funcptr) gr_not_in_domain},

@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2020 Daniel Schultz
-    Copyright (C) 2022 Fredrik Johansson
+    Copyright (C) 2022, 2024 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -11,11 +11,34 @@
 */
 
 #include <stdio.h>
+#include <ctype.h>
+#include <stdio.h>
 #include "gr_mpoly.h"
+#include "fmpz_vec.h"
 
 static char * _gr_mpoly_default_vars[8] = {
-    "x", "y", "z", "s", "t", "u", "v", "w"
+    "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8"
 };
+
+static int
+want_parens(const char * s)
+{
+    if (s[0] == '(' || s[0] == '[' || s[0] == '{')
+        return 0;
+
+    if (s[0] == '-')
+        s++;
+
+    while (s[0] != '\0')
+    {
+        if (!isalnum(s[0]) && s[0] != '.')
+            return 1;
+
+        s++;
+    }
+
+    return 0;
+}
 
 /* todo: error handling */
 int gr_mpoly_write_pretty(gr_stream_t out, const gr_mpoly_t A,
@@ -26,6 +49,7 @@ int gr_mpoly_write_pretty(gr_stream_t out, const gr_mpoly_t A,
     slong bits = A->bits;
     slong i, j, N;
     fmpz * exponents;
+    char * s;
     char ** x = (char **) x_in;
     TMP_INIT;
 
@@ -67,32 +91,88 @@ int gr_mpoly_write_pretty(gr_stream_t out, const gr_mpoly_t A,
 
     for (i = 0; i < len; i++)
     {
-        if (i > 0)
-        {
-            gr_stream_write(out, " + ");
-        }
+        int removed_coeff = 0;
 
-        gr_stream_write(out, "(");
-        gr_write(out, GR_ENTRY(A->coeffs, i, cctx->sizeof_elem), cctx);
-        gr_stream_write(out, ")");
+        gr_get_str(&s, GR_ENTRY(A->coeffs, i, cctx->sizeof_elem), cctx);
+
+        if (!strcmp(s, "1"))
+        {
+            flint_free(s);
+            if (i > 0)
+                gr_stream_write(out, " + ");
+            removed_coeff = 1;
+        }
+        else if (!strcmp(s, "-1"))
+        {
+            flint_free(s);
+
+            if (i > 0)
+                gr_stream_write(out, " - ");
+            else
+                gr_stream_write(out, "-");
+
+            removed_coeff = -1;
+        }
+        else
+        {
+            if (want_parens(s))
+            {
+                if (i > 0)
+                    gr_stream_write(out, " + ");
+
+                gr_stream_write(out, "(");
+                gr_stream_write_free(out, s);
+                gr_stream_write(out, ")");
+            }
+            else
+            {
+                if (i > 0 && s[0] == '-')
+                {
+                    gr_stream_write(out, " - ");
+                    gr_stream_write(out, s + 1);
+                    flint_free(s);
+                }
+                else
+                {
+                    if (i > 0)
+                        gr_stream_write(out, " + ");
+
+                    gr_stream_write_free(out, s);
+                }
+            }
+        }
 
         mpoly_get_monomial_ffmpz(exponents, exp + N*i, bits, mctx);
 
-        for (j = 0; j < mctx->nvars; j++)
+        if (_fmpz_vec_is_zero(exponents, mctx->nvars))
         {
-            int cmp = fmpz_cmp_ui(exponents + j, 1);
+            if (removed_coeff != 0)
+                gr_stream_write(out, "1");
+        }
+        else
+        {
+            int have_printed_var = 0;
 
-            if (cmp > 0)
+            for (j = 0; j < mctx->nvars; j++)
             {
-                gr_stream_write(out, "*");
-                gr_stream_write(out, x[j]);
-                gr_stream_write(out, "^");
-                gr_stream_write_fmpz(out, exponents + j);
-            }
-            else if (cmp == 0)
-            {
-                gr_stream_write(out, "*");
-                gr_stream_write(out, x[j]);
+                int cmp = fmpz_cmp_ui(exponents + j, 1);
+
+                if (cmp > 0)
+                {
+                    if (have_printed_var || !removed_coeff)
+                        gr_stream_write(out, "*");
+                    gr_stream_write(out, x[j]);
+                    gr_stream_write(out, "^");
+                    gr_stream_write_fmpz(out, exponents + j);
+                    have_printed_var = 1;
+                }
+                else if (cmp == 0)
+                {
+                    if (have_printed_var || !removed_coeff)
+                        gr_stream_write(out, "*");
+                    gr_stream_write(out, x[j]);
+                    have_printed_var = 1;
+                }
             }
         }
     }

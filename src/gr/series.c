@@ -9,9 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
 #include "fmpq.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
+#include "gr_generic.h"
 
 #ifdef __GNUC__
 # define strcmp __builtin_strcmp
@@ -133,20 +135,24 @@ gr_series_randtest(gr_series_t res, flint_rand_t state, slong len, gr_series_ctx
 }
 
 int
-gr_series_write(gr_stream_t out, const gr_series_t x, gr_series_ctx_t sctx, gr_ctx_t cctx)
+gr_series_write(gr_stream_t out, const gr_series_t x, const char * var, gr_series_ctx_t sctx, gr_ctx_t cctx)
 {
-    gr_poly_write(out, &x->poly, "x", cctx);
+    gr_poly_write(out, &x->poly, var, cctx);
 
     if (x->error != SERIES_ERR_EXACT)
     {
-        gr_stream_write(out, " + O(x^");
+        gr_stream_write(out, " + O(");
+        gr_stream_write(out, var);
+        gr_stream_write(out, "^");
         gr_stream_write_si(out, x->error);
         gr_stream_write(out, ")");
     }
 
     if (sctx->mod != SERIES_ERR_EXACT)
     {
-        gr_stream_write(out, " (mod x^");
+        gr_stream_write(out, " (mod ");
+        gr_stream_write(out, var);
+        gr_stream_write(out, "^");
         gr_stream_write_si(out, sctx->mod);
         gr_stream_write(out, ")");
     }
@@ -1728,6 +1734,14 @@ series_ctx_t;
 #define SERIES_SCTX(ring_ctx) (&(((series_ctx_t *)((ring_ctx)))->sctx))
 
 
+static void _gr_gr_series_ctx_clear(gr_ctx_t ctx)
+{
+    if (SERIES_CTX(ctx)->var != default_var)
+    {
+        flint_free(SERIES_CTX(ctx)->var);
+    }
+
+}
 
 static int _gr_gr_series_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
@@ -1735,12 +1749,16 @@ static int _gr_gr_series_ctx_write(gr_stream_t out, gr_ctx_t ctx)
     gr_ctx_write(out, SERIES_ELEM_CTX(ctx));
     if (ctx->which_ring == GR_CTX_GR_SERIES_MOD)
     {
-        gr_stream_write(out, " mod x^");
+        gr_stream_write(out, " mod ");
+        gr_stream_write(out, SERIES_CTX(ctx)->var);
+        gr_stream_write(out, "^");
         gr_stream_write_si(out, SERIES_SCTX(ctx)->mod);
     }
 
     gr_stream_write(out, " with precision ");
-    gr_stream_write(out, "O(x^");
+    gr_stream_write(out, "O(");
+    gr_stream_write(out, SERIES_CTX(ctx)->var);
+    gr_stream_write(out, "^");
     gr_stream_write_si(out, SERIES_SCTX(ctx)->prec);
     gr_stream_write(out, ")");
 
@@ -1752,9 +1770,50 @@ static void _gr_gr_series_clear(gr_series_t res, gr_ctx_t ctx) { gr_series_clear
 static void _gr_gr_series_swap(gr_series_t x, gr_series_t y, gr_ctx_t ctx) { gr_series_swap(x, y, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static int _gr_gr_series_zero(gr_series_t res, gr_ctx_t ctx) { return gr_series_zero(res, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static int _gr_gr_series_randtest(gr_series_t res, flint_rand_t state, gr_ctx_t ctx) { return gr_series_randtest(res, state, 6, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
-static int _gr_gr_series_write(gr_stream_t out, const gr_series_t x, gr_ctx_t ctx) { return gr_series_write(out, x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+static int _gr_gr_series_write(gr_stream_t out, const gr_series_t x, gr_ctx_t ctx) { return gr_series_write(out, x, SERIES_CTX(ctx)->var, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static int _gr_gr_series_one(gr_series_t res, gr_ctx_t ctx) { return gr_series_one(res, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static int _gr_gr_series_gen(gr_series_t res, gr_ctx_t ctx) { return gr_series_gen(res, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+
+int _gr_gr_series_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
+{
+    slong len;
+    len = strlen(s);
+
+    if (SERIES_CTX(ctx)->var == default_var)
+        SERIES_CTX(ctx)->var = NULL;
+
+    SERIES_CTX(ctx)->var = flint_realloc(SERIES_CTX(ctx)->var, len + 1);
+    memcpy(SERIES_CTX(ctx)->var, s, len + 1);
+    return GR_SUCCESS;
+}
+
+static int
+_gr_gr_series_gens_recursive(gr_vec_t vec, gr_ctx_t ctx)
+{
+    int status;
+    gr_vec_t vec1;
+    slong i, n;
+
+    /* Get generators of the element ring */
+    gr_vec_init(vec1, 0, SERIES_ELEM_CTX(ctx));
+    status = gr_gens_recursive(vec1, SERIES_ELEM_CTX(ctx));
+    n = vec1->length;
+
+    gr_vec_set_length(vec, n + 1, ctx);
+
+    /* Promote to series */
+    for (i = 0; i < n; i++)
+        status |= gr_poly_set_scalar(gr_vec_entry_ptr(vec, i, ctx),
+                gr_vec_entry_srcptr(vec1, i, SERIES_ELEM_CTX(ctx)),
+                SERIES_ELEM_CTX(ctx));
+
+    status |= gr_poly_gen(gr_vec_entry_ptr(vec, n, ctx), SERIES_ELEM_CTX(ctx));
+
+    gr_vec_clear(vec1, SERIES_ELEM_CTX(ctx));
+
+    return status;
+}
+
 static int _gr_gr_series_set(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return gr_series_set(res, x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static void _gr_gr_series_set_shallow(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { *res = *x; }
 static int _gr_gr_series_set_si(gr_series_t res, slong c, gr_ctx_t ctx) { return gr_series_set_si(res, c, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
@@ -1898,7 +1957,10 @@ gr_static_method_table _gr_series_methods;
 
 gr_method_tab_input _gr_series_methods_input[] =
 {
+    {GR_METHOD_CTX_CLEAR,   (gr_funcptr) _gr_gr_series_ctx_clear},
     {GR_METHOD_CTX_WRITE,   (gr_funcptr) _gr_gr_series_ctx_write},
+    {GR_METHOD_CTX_SET_GEN_NAME, (gr_funcptr) _gr_gr_series_ctx_set_gen_name},
+
     {GR_METHOD_INIT,        (gr_funcptr) _gr_gr_series_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) _gr_gr_series_clear},
     {GR_METHOD_SWAP,        (gr_funcptr) _gr_gr_series_swap},
@@ -1911,6 +1973,8 @@ gr_method_tab_input _gr_series_methods_input[] =
     {GR_METHOD_IS_ONE,      (gr_funcptr) _gr_gr_series_is_one},
     {GR_METHOD_EQUAL,       (gr_funcptr) _gr_gr_series_equal},
     {GR_METHOD_GEN,         (gr_funcptr) _gr_gr_series_gen},
+    {GR_METHOD_GENS,        (gr_funcptr) gr_generic_gens_single},
+    {GR_METHOD_GENS_RECURSIVE,  (gr_funcptr) _gr_gr_series_gens_recursive},
     {GR_METHOD_SET,         (gr_funcptr) _gr_gr_series_set},
     {GR_METHOD_SET_UI,      (gr_funcptr) _gr_gr_series_set_ui},
     {GR_METHOD_SET_SI,      (gr_funcptr) _gr_gr_series_set_si},

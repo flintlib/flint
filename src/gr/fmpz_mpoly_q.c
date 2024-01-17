@@ -20,6 +20,7 @@
 typedef struct
 {
     fmpz_mpoly_ctx_t mctx;
+    char ** vars;
 }
 _gr_fmpz_mpoly_ctx_t;
 
@@ -41,12 +42,12 @@ int _gr_fmpz_mpoly_q_ctx_write(gr_stream_t out, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-void
-_gr_fmpz_mpoly_q_ctx_clear(gr_ctx_t ctx)
-{
-    fmpz_mpoly_ctx_clear(MPOLYNOMIAL_MCTX(ctx));
-    flint_free(GR_CTX_DATA_AS_PTR(ctx));
-}
+/* Some methods are identical to their fmpz_mpoly counterparts */
+void _gr_fmpz_mpoly_ctx_clear(gr_ctx_t ctx);
+int _gr_fmpz_mpoly_ctx_set_gen_names(gr_ctx_t ctx, const char ** s);
+
+#define _gr_fmpz_mpoly_q_ctx_clear _gr_fmpz_mpoly_ctx_clear
+#define _gr_fmpz_mpoly_q_ctx_set_gen_names _gr_fmpz_mpoly_ctx_set_gen_names
 
 void
 _gr_fmpz_mpoly_q_init(fmpz_mpoly_q_t res, gr_ctx_t ctx)
@@ -98,21 +99,21 @@ _gr_fmpz_mpoly_q_write(gr_stream_t out, fmpz_mpoly_q_t f, gr_ctx_t ctx)
 {
     if (fmpz_mpoly_is_one(fmpz_mpoly_q_denref(f), MPOLYNOMIAL_MCTX(ctx)))
     {
-        gr_stream_write_free(out, fmpz_mpoly_get_str_pretty(fmpz_mpoly_q_numref(f), NULL, MPOLYNOMIAL_MCTX(ctx)));
+        gr_stream_write_free(out, fmpz_mpoly_get_str_pretty(fmpz_mpoly_q_numref(f), (const char **) MPOLYNOMIAL_CTX(ctx)->vars, MPOLYNOMIAL_MCTX(ctx)));
     }
     else if (fmpz_mpoly_is_fmpz(fmpz_mpoly_q_denref(f), MPOLYNOMIAL_MCTX(ctx)))
     {
         gr_stream_write(out, "(");
-        gr_stream_write_free(out, fmpz_mpoly_get_str_pretty(fmpz_mpoly_q_numref(f), NULL, MPOLYNOMIAL_MCTX(ctx)));
+        gr_stream_write_free(out, fmpz_mpoly_get_str_pretty(fmpz_mpoly_q_numref(f), (const char **) MPOLYNOMIAL_CTX(ctx)->vars, MPOLYNOMIAL_MCTX(ctx)));
         gr_stream_write(out, ")/");
-        gr_stream_write_free(out, fmpz_mpoly_get_str_pretty(fmpz_mpoly_q_denref(f), NULL, MPOLYNOMIAL_MCTX(ctx)));
+        gr_stream_write_free(out, fmpz_mpoly_get_str_pretty(fmpz_mpoly_q_denref(f), (const char **) MPOLYNOMIAL_CTX(ctx)->vars, MPOLYNOMIAL_MCTX(ctx)));
     }
     else
     {
         gr_stream_write(out, "(");
-        gr_stream_write_free(out, fmpz_mpoly_get_str_pretty(fmpz_mpoly_q_numref(f), NULL, MPOLYNOMIAL_MCTX(ctx)));
+        gr_stream_write_free(out, fmpz_mpoly_get_str_pretty(fmpz_mpoly_q_numref(f), (const char **) MPOLYNOMIAL_CTX(ctx)->vars, MPOLYNOMIAL_MCTX(ctx)));
         gr_stream_write(out, ")/(");
-        gr_stream_write_free(out, fmpz_mpoly_get_str_pretty(fmpz_mpoly_q_denref(f), NULL, MPOLYNOMIAL_MCTX(ctx)));
+        gr_stream_write_free(out, fmpz_mpoly_get_str_pretty(fmpz_mpoly_q_denref(f), (const char **) MPOLYNOMIAL_CTX(ctx)->vars, MPOLYNOMIAL_MCTX(ctx)));
         gr_stream_write(out, ")");
     }
 
@@ -151,7 +152,7 @@ _gr_fmpz_mpoly_q_one(fmpz_mpoly_q_t res, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-truth_t
+int
 _gr_fmpz_mpoly_q_gens(gr_vec_t res, gr_ctx_t ctx)
 {
     slong i, n;
@@ -525,6 +526,7 @@ gr_method_tab_input _gr_fmpz_mpoly_q_methods_input[] =
     {GR_METHOD_CTX_IS_FINITE,                   (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC,    (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_THREADSAFE,               (gr_funcptr) gr_generic_ctx_predicate_true},
+    {GR_METHOD_CTX_SET_GEN_NAMES,               (gr_funcptr) _gr_fmpz_mpoly_q_ctx_set_gen_names},
     {GR_METHOD_INIT,        (gr_funcptr) _gr_fmpz_mpoly_q_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) _gr_fmpz_mpoly_q_clear},
     {GR_METHOD_SWAP,        (gr_funcptr) _gr_fmpz_mpoly_q_swap},
@@ -594,6 +596,7 @@ gr_ctx_init_fmpz_mpoly_q(gr_ctx_t ctx, slong nvars, const ordering_t ord)
     ctx->size_limit = WORD_MAX;
 
     fmpz_mpoly_ctx_init(MPOLYNOMIAL_MCTX(ctx), nvars, ord);
+    MPOLYNOMIAL_CTX(ctx)->vars = NULL;
 
     ctx->methods = _gr_fmpz_mpoly_q_methods;
 

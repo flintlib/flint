@@ -20,6 +20,7 @@
 typedef struct
 {
     fmpz_mpoly_ctx_t mctx;
+    char ** vars;
 }
 _gr_fmpz_mpoly_ctx_t;
 
@@ -44,8 +45,45 @@ int _gr_fmpz_mpoly_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 void
 _gr_fmpz_mpoly_ctx_clear(gr_ctx_t ctx)
 {
+    if (MPOLYNOMIAL_CTX(ctx)->vars != NULL)
+    {
+        slong i;
+        for (i = 0; i < MPOLYNOMIAL_MCTX(ctx)->minfo->nvars; i++)
+            flint_free(MPOLYNOMIAL_CTX(ctx)->vars[i]);
+        flint_free(MPOLYNOMIAL_CTX(ctx)->vars);
+    }
+
     fmpz_mpoly_ctx_clear(MPOLYNOMIAL_MCTX(ctx));
     flint_free(GR_CTX_DATA_AS_PTR(ctx));
+}
+
+int
+_gr_fmpz_mpoly_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
+{
+    slong i, nvars, len;
+
+    nvars = MPOLYNOMIAL_MCTX(ctx)->minfo->nvars;
+
+    if (MPOLYNOMIAL_CTX(ctx)->vars == NULL)
+    {
+        MPOLYNOMIAL_CTX(ctx)->vars = flint_malloc(nvars * sizeof(char *));
+        for (i = 0; i < nvars; i++)
+            MPOLYNOMIAL_CTX(ctx)->vars[i] = NULL;
+    }
+    else
+    {
+        for (i = 0; i < nvars; i++)
+            flint_free(MPOLYNOMIAL_CTX(ctx)->vars[i]);
+    }
+
+    for (i = 0; i < nvars; i++)
+    {
+        len = strlen(s[i]);
+        MPOLYNOMIAL_CTX(ctx)->vars[i] = flint_realloc(MPOLYNOMIAL_CTX(ctx)->vars[i], len + 1);
+        memcpy(MPOLYNOMIAL_CTX(ctx)->vars[i], s[i], len + 1);
+    }
+
+    return GR_SUCCESS;
 }
 
 void
@@ -96,14 +134,7 @@ _gr_fmpz_mpoly_randtest_small(fmpz_mpoly_t res, flint_rand_t state, gr_ctx_t ctx
 int
 _gr_fmpz_mpoly_write(gr_stream_t out, fmpz_mpoly_t poly, gr_ctx_t ctx)
 {
-/*
-    if (out->fp != NULL)
-        fmpz_mpoly_fprint_pretty(out->fp, poly, NULL, MPOLYNOMIAL_MCTX(ctx));
-    else
-*/
-    gr_stream_write_free(out, fmpz_mpoly_get_str_pretty(poly, NULL, MPOLYNOMIAL_MCTX(ctx)));
-
-    /* todo: error handling */
+    gr_stream_write_free(out, fmpz_mpoly_get_str_pretty(poly, (const char **) MPOLYNOMIAL_CTX(ctx)->vars, MPOLYNOMIAL_MCTX(ctx)));
     return GR_SUCCESS;
 }
 
@@ -139,7 +170,7 @@ _gr_fmpz_mpoly_one(fmpz_mpoly_t res, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-truth_t
+int
 _gr_fmpz_mpoly_gens(gr_vec_t res, gr_ctx_t ctx)
 {
     slong i, n;
@@ -507,6 +538,7 @@ gr_method_tab_input _gr_fmpz_mpoly_methods_input[] =
     {GR_METHOD_CTX_IS_FINITE,                   (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC,    (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_THREADSAFE,               (gr_funcptr) gr_generic_ctx_predicate_true},
+    {GR_METHOD_CTX_SET_GEN_NAMES,               (gr_funcptr) _gr_fmpz_mpoly_ctx_set_gen_names},
     {GR_METHOD_INIT,        (gr_funcptr) _gr_fmpz_mpoly_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) _gr_fmpz_mpoly_clear},
     {GR_METHOD_SWAP,        (gr_funcptr) _gr_fmpz_mpoly_swap},
@@ -564,6 +596,7 @@ gr_ctx_init_fmpz_mpoly(gr_ctx_t ctx, slong nvars, const ordering_t ord)
     ctx->size_limit = WORD_MAX;
 
     fmpz_mpoly_ctx_init(MPOLYNOMIAL_MCTX(ctx), nvars, ord);
+    MPOLYNOMIAL_CTX(ctx)->vars = NULL;
 
     ctx->methods = _gr_fmpz_mpoly_methods;
 

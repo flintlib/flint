@@ -141,6 +141,23 @@ int gr_generic_randtest_small(gr_ptr x, flint_rand_t state, gr_ctx_t ctx)
     return status;
 }
 
+int gr_generic_gens(gr_vec_t vec, gr_ctx_t ctx)
+{
+    gr_vec_set_length(vec, 0, ctx);
+    return GR_SUCCESS;
+}
+
+int gr_generic_gens_single(gr_vec_t vec, gr_ctx_t ctx)
+{
+    gr_vec_set_length(vec, 1, ctx);
+    return gr_gen(vec->entries, ctx);
+}
+
+int gr_generic_gens_recursive(gr_vec_t vec, gr_ctx_t ctx)
+{
+    return gr_gens(vec, ctx);
+}
+
 /* Generic arithmetic functions */
 
 truth_t gr_generic_is_zero(gr_srcptr x, gr_ctx_t ctx)
@@ -2482,6 +2499,9 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_RANDTEST,                (gr_funcptr) gr_generic_randtest},
     {GR_METHOD_RANDTEST_NOT_ZERO,       (gr_funcptr) gr_generic_randtest_not_zero},
     {GR_METHOD_RANDTEST_SMALL,          (gr_funcptr) gr_generic_randtest_small},
+
+    {GR_METHOD_GENS,                    (gr_funcptr) gr_generic_gens},
+    {GR_METHOD_GENS_RECURSIVE,          (gr_funcptr) gr_generic_gens_recursive},
 
     {GR_METHOD_ZERO,                    (gr_funcptr) gr_generic_zero},
     {GR_METHOD_ONE,                     (gr_funcptr) gr_generic_one},

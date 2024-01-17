@@ -18,6 +18,7 @@ typedef struct
 {
     gr_ctx_struct * base_ring;
     mpoly_ctx_t mctx;
+    char ** vars;
 }
 _gr_gr_mpoly_ctx_t;
 
@@ -44,8 +45,45 @@ int _gr_gr_mpoly_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 void
 _gr_gr_mpoly_ctx_clear(gr_ctx_t ctx)
 {
+    if (MPOLYNOMIAL_CTX(ctx)->vars != NULL)
+    {
+        slong i;
+        for (i = 0; i < MPOLYNOMIAL_MCTX(ctx)->nvars; i++)
+            flint_free(MPOLYNOMIAL_CTX(ctx)->vars[i]);
+        flint_free(MPOLYNOMIAL_CTX(ctx)->vars);
+    }
+
     mpoly_ctx_clear(MPOLYNOMIAL_MCTX(ctx));
     flint_free(GR_CTX_DATA_AS_PTR(ctx));
+}
+
+int
+_gr_gr_mpoly_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
+{
+    slong i, nvars, len;
+
+    nvars = MPOLYNOMIAL_MCTX(ctx)->nvars;
+
+    if (MPOLYNOMIAL_CTX(ctx)->vars == NULL)
+    {
+        MPOLYNOMIAL_CTX(ctx)->vars = flint_malloc(nvars * sizeof(char *));
+        for (i = 0; i < nvars; i++)
+            MPOLYNOMIAL_CTX(ctx)->vars[i] = NULL;
+    }
+    else
+    {
+        for (i = 0; i < nvars; i++)
+            flint_free(MPOLYNOMIAL_CTX(ctx)->vars[i]);
+    }
+
+    for (i = 0; i < nvars; i++)
+    {
+        len = strlen(s[i]);
+        MPOLYNOMIAL_CTX(ctx)->vars[i] = flint_realloc(MPOLYNOMIAL_CTX(ctx)->vars[i], len + 1);
+        memcpy(MPOLYNOMIAL_CTX(ctx)->vars[i], s[i], len + 1);
+    }
+
+    return GR_SUCCESS;
 }
 
 truth_t
@@ -108,7 +146,7 @@ _gr_gr_mpoly_randtest(gr_mpoly_t res, flint_rand_t state, gr_ctx_t ctx)
 int
 _gr_gr_mpoly_write(gr_stream_t out, gr_mpoly_t poly, gr_ctx_t ctx)
 {
-    return gr_mpoly_write_pretty(out, poly, NULL, MPOLYNOMIAL_MCTX(ctx), MPOLYNOMIAL_ELEM_CTX(ctx));
+    return gr_mpoly_write_pretty(out, poly, (const char **) MPOLYNOMIAL_CTX(ctx)->vars, MPOLYNOMIAL_MCTX(ctx), MPOLYNOMIAL_ELEM_CTX(ctx));
 }
 
 truth_t
@@ -127,6 +165,56 @@ truth_t
 _gr_gr_mpoly_is_one(const gr_mpoly_t poly, gr_ctx_t ctx)
 {
     return gr_mpoly_is_one(poly, MPOLYNOMIAL_MCTX(ctx), MPOLYNOMIAL_ELEM_CTX(ctx));
+}
+
+int
+_gr_gr_mpoly_gens(gr_vec_t res, gr_ctx_t ctx)
+{
+    slong i, n;
+    int status = GR_SUCCESS;
+
+    n = MPOLYNOMIAL_MCTX(ctx)->nvars;
+
+    gr_vec_set_length(res, n, ctx);
+    for (i = 0; i < n; i++)
+        status |= gr_mpoly_gen(((gr_mpoly_struct *) res->entries) + i, i, MPOLYNOMIAL_MCTX(ctx), MPOLYNOMIAL_ELEM_CTX(ctx));
+
+    return status;
+}
+
+int
+_gr_gr_mpoly_gens_recursive(gr_vec_t vec, gr_ctx_t ctx)
+{
+    int status;
+    gr_vec_t vec1;
+    slong i, n, m;
+
+    /* Get generators of the element ring */
+    gr_vec_init(vec1, 0, MPOLYNOMIAL_ELEM_CTX(ctx));
+    status = gr_gens_recursive(vec1, MPOLYNOMIAL_ELEM_CTX(ctx));
+    n = vec1->length;
+
+    m = MPOLYNOMIAL_MCTX(ctx)->nvars;
+
+    gr_vec_set_length(vec, n + m, ctx);
+
+    /* Promote to polynomials */
+    for (i = 0; i < n; i++)
+    {
+        status |= gr_mpoly_set_scalar(gr_vec_entry_ptr(vec, i, ctx),
+                gr_vec_entry_srcptr(vec1, i, MPOLYNOMIAL_ELEM_CTX(ctx)),
+                    MPOLYNOMIAL_MCTX(ctx), MPOLYNOMIAL_ELEM_CTX(ctx));
+    }
+
+    for (i = 0; i < m; i++)
+    {
+        status |= gr_mpoly_gen(((gr_mpoly_struct *) vec->entries) + n + i,
+            i, MPOLYNOMIAL_MCTX(ctx), MPOLYNOMIAL_ELEM_CTX(ctx));
+    }
+
+    gr_vec_clear(vec1, MPOLYNOMIAL_ELEM_CTX(ctx));
+
+    return status;
 }
 
 int
@@ -218,12 +306,15 @@ gr_method_tab_input _gr__gr_gr_mpoly_methods_input[] =
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) _gr_gr_mpoly_ctx_is_integral_domain},
     {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) _gr_gr_mpoly_ctx_is_field},
     {GR_METHOD_CTX_IS_THREADSAFE,       (gr_funcptr) _gr_gr_mpoly_ctx_is_threadsafe},
+    {GR_METHOD_CTX_SET_GEN_NAMES,       (gr_funcptr) _gr_gr_mpoly_ctx_set_gen_names},
     {GR_METHOD_INIT,        (gr_funcptr) _gr_gr_mpoly_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) _gr_gr_mpoly_clear},
     {GR_METHOD_SWAP,        (gr_funcptr) _gr_gr_mpoly_swap},
     {GR_METHOD_SET_SHALLOW, (gr_funcptr) _gr_gr_mpoly_set_shallow},
     {GR_METHOD_RANDTEST,    (gr_funcptr) _gr_gr_mpoly_randtest},
     {GR_METHOD_WRITE,       (gr_funcptr) _gr_gr_mpoly_write},
+    {GR_METHOD_GENS,        (gr_funcptr) _gr_gr_mpoly_gens},
+    {GR_METHOD_GENS_RECURSIVE,       (gr_funcptr) _gr_gr_mpoly_gens_recursive},
     {GR_METHOD_ZERO,        (gr_funcptr) _gr_gr_mpoly_zero},
     {GR_METHOD_ONE,         (gr_funcptr) _gr_gr_mpoly_one},
     {GR_METHOD_IS_ZERO,     (gr_funcptr) _gr_gr_mpoly_is_zero},
@@ -251,6 +342,7 @@ gr_ctx_init_gr_mpoly(gr_ctx_t ctx, gr_ctx_t base_ring, slong nvars, const orderi
 
     MPOLYNOMIAL_ELEM_CTX(ctx) = base_ring;
     mpoly_ctx_init(MPOLYNOMIAL_MCTX(ctx), nvars, ord);
+    MPOLYNOMIAL_CTX(ctx)->vars = NULL;
 
     ctx->methods = _gr__gr_gr_mpoly_methods;
 
