@@ -139,7 +139,7 @@ sample_old(void * arg, ulong count)
 }
 
 int
-main()
+main(void)
 {
     double minnew, maxnew, minold, maxold;
     int bits;

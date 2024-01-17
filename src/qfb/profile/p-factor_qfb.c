@@ -21,7 +21,7 @@ int main(void)
    fmpz_t g, n, n0, p, L;
    slong iters, i, j, depth, jmax = 10;
    qfb_t pow, twopow;
-   ulong pr, nmodpr, mult, n0mod4;
+   ulong pr, nmodpr, mult;
    qfb_hash_t * qhash;
    int done;
 

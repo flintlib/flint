@@ -23,7 +23,7 @@
 #define MAX_LENGTH 40
 
 int
-main()
+main(void)
 {
     slong dim, len, i;
     int result;

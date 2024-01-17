@@ -21,7 +21,7 @@
 #endif
 
 int
-main()
+main(void)
 {
     fmpz_t p;
     slong d;

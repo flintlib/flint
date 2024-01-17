@@ -80,7 +80,6 @@ do_eratos(ulong *v, const dirichlet_group_t G, const dirichlet_char_t chi, slong
 int main(int argc, char *argv[])
 {
     int out;
-    ulong n, nref, maxq = 5000;
     ulong * rand;
     flint_rand_t state;
     slong r, nr;

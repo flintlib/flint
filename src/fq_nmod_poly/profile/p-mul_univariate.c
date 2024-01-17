@@ -15,14 +15,14 @@ main(int argc, char** argv)
     double s[nalgs];
 
     int c, n, lenf, leng, ext, reps = 0;
-    fmpz_t p, temp;
+    ulong p;
+    fmpz_t temp;
     fq_nmod_poly_t f, g, h;
     fq_nmod_ctx_t ctx;
 
     FLINT_TEST_INIT(state);
 
-    fmpz_init(p);
-    fmpz_set_str(p, argv[1], 10);
+    p = strtoull(argv[1], NULL, 10);
 
     fmpz_init(temp);
 
@@ -100,7 +100,6 @@ main(int argc, char** argv)
     fq_nmod_poly_clear(f, ctx);
     fq_nmod_poly_clear(g, ctx);
     fq_nmod_ctx_clear(ctx);
-    fmpz_clear(p);
     fmpz_clear(temp);
 
     FLINT_TEST_CLEANUP(state);

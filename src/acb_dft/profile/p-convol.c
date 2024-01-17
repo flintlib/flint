@@ -22,9 +22,7 @@ typedef void (*do_f) (acb_ptr z, acb_srcptr x, acb_srcptr y, slong len, slong pr
 int main(int argc, char *argv[])
 {
     int out;
-    ulong n, nref, maxq = 5000;
     flint_rand_t state;
-    slong r, nr;
 
     int l, nf = 5;
     do_f func[5] = {

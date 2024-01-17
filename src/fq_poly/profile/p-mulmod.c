@@ -36,7 +36,7 @@ sample(void *arg, ulong count)
 
     FLINT_TEST_INIT(state);
 
-    fq_ctx_randtest(ctx, state);
+    fq_ctx_init_randtest(ctx, state, 0);
 
     fq_poly_init2(a, n, ctx);
     fq_poly_init2(b, n, ctx);

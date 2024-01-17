@@ -50,7 +50,7 @@ static void
 check_q(ulong q, int odd, slong prec, slong digits, int onlymod)
 {
     slong s;
-    ulong k, len;
+    ulong k;
     dirichlet_group_t G;
     dirichlet_char_t x;
     acb_ptr theta, z;

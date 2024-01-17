@@ -49,7 +49,6 @@ void random_fmpq_poly(fmpq_poly_t pol, flint_rand_t state, slong length)
 void random_nf_elem(nf_elem_t a, flint_rand_t state, nf_t nf)
 {
    slong len = nf->pol->length - 1;
-   slong i;
 
    random_fmpq_poly(NF_ELEM(a), state, len);
 }

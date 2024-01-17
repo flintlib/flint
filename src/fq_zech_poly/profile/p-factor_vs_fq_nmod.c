@@ -27,7 +27,7 @@
 int
 main(int argc, char** argv)
 {
-    fmpz_t p;
+    ulong p;
     int c, n, reps = 0;
     slong d, len, i;
     fq_nmod_ctx_t ctx;
@@ -39,8 +39,7 @@ main(int argc, char** argv)
 
     FLINT_TEST_INIT(state);
 
-    fmpz_init(p);
-    fmpz_set_str(p, argv[1], 10);
+    p = strtoull(argv[1], NULL, 10);
 
     d = atol(argv[2]);
     len = atol(argv[3]);
@@ -129,7 +128,6 @@ main(int argc, char** argv)
 
     fq_nmod_ctx_clear(ctx);
     fq_zech_ctx_clear(ctx_zech);
-    fmpz_clear(p);
 
     FLINT_TEST_CLEANUP(state);
 

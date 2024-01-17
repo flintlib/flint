@@ -117,7 +117,7 @@ void profile_gcd(
 }
 
 
-void print_banner()
+void print_banner(void)
 {
     flint_printf("|    brown |   hensel |  zippel2 |   zippel |    super |\n");
     flint_printf("+----------+----------+----------+----------+----------+\n");

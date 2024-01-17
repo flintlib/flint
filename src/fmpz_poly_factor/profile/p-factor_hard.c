@@ -65,7 +65,7 @@ void factor_poly(const char * file_str, const char * name, slong wanted_factors)
     fmpz_poly_clear(f);
 }
 
-int main()
+int main(void)
 {
     flint_printf("\n");
     flint_set_num_threads(8);
