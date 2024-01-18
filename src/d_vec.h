@@ -12,16 +12,10 @@
 #ifndef D_VEC_H
 #define D_VEC_H
 
-#ifdef D_VEC_INLINES_C
-#define D_VEC_INLINE
-#else
-#define D_VEC_INLINE static inline
-#endif
-
 #include "flint.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /*  Memory management  *******************************************************/
