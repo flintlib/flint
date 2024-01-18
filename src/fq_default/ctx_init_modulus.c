@@ -63,6 +63,7 @@ void fq_default_ctx_init_modulus_type(fq_default_ctx_t ctx,
     {
         ctx->type = FQ_DEFAULT_FMPZ_MOD;
         fmpz_mod_ctx_init(ctx->ctx.fmpz_mod.mod, p);
+        fmpz_init(ctx->ctx.fmpz_mod.a);
         fmpz_mod_divides(ctx->ctx.fmpz_mod.a, modulus->coeffs + 0,
                                    modulus->coeffs + 1, ctx->ctx.fmpz_mod.mod);
         fmpz_mod_neg(ctx->ctx.fmpz_mod.a, ctx->ctx.fmpz_mod.a,
