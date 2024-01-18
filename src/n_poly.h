@@ -12,17 +12,10 @@
 #ifndef N_POLY_H
 #define N_POLY_H
 
-#ifdef N_POLY_INLINES_C
-#define N_POLY_INLINE
-#else
-#define N_POLY_INLINE static inline
-#endif
-
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 #include "fq_nmod.h"
-#include "fq_nmod_poly.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -152,7 +145,7 @@ typedef n_poly_polyun_stack_struct n_poly_polyun_stack_t[1];
 
 /*****************************************************************************/
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_poly_init(n_poly_t A)
 {
     A->length = 0;
@@ -160,7 +153,7 @@ void n_poly_init(n_poly_t A)
     A->coeffs = NULL;
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_poly_init2(n_poly_t A, slong alloc)
 {
     A->length = 0;
@@ -170,7 +163,7 @@ void n_poly_init2(n_poly_t A, slong alloc)
         A->coeffs = (mp_limb_t *) flint_malloc(alloc*sizeof(mp_limb_t));
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_poly_clear(n_poly_t A)
 {
     FLINT_ASSERT(A->alloc != 0 || A->coeffs == NULL);
@@ -184,7 +177,7 @@ void n_poly_realloc(n_poly_t A, slong len);
 
 void n_poly_print_pretty(const n_poly_t A, const char * x);
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_poly_fit_length(n_poly_t A, slong len)
 {
     if (len > A->alloc)
@@ -192,7 +185,7 @@ void n_poly_fit_length(n_poly_t A, slong len)
 }
 
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void nmod_poly_mock(nmod_poly_t a, const n_poly_t b, nmod_t mod)
 {
     a->coeffs = b->coeffs;
@@ -201,7 +194,7 @@ void nmod_poly_mock(nmod_poly_t a, const n_poly_t b, nmod_t mod)
     a->mod = mod;
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_poly_mock(n_poly_t a, const nmod_poly_t b)
 {
     a->coeffs = b->coeffs;
@@ -210,7 +203,7 @@ void n_poly_mock(n_poly_t a, const nmod_poly_t b)
 }
 
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_poly_set(n_poly_t A, const n_poly_t B)
 {
     n_poly_fit_length(A, B->length);
@@ -219,40 +212,40 @@ void n_poly_set(n_poly_t A, const n_poly_t B)
 }
 
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_poly_swap(n_poly_t A, n_poly_t B)
 {
     FLINT_SWAP(n_poly_struct, *A, *B);
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void _n_poly_normalise(n_poly_t A)
 {
     while (A->length > 0 && A->coeffs[A->length - 1] == 0)
         A->length--;
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 slong n_poly_degree(const n_poly_t A)
 {
     FLINT_ASSERT(A->length >= 0);
     return A->length - 1;
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 int n_poly_is_one(const n_poly_t A)
 {
     return A->length == 1 && A->coeffs[0] == 1;
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 mp_limb_t n_poly_lead(const n_poly_t A)
 {
     FLINT_ASSERT(A->length > 0);
     return A->coeffs[A->length - 1];
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_poly_one(n_poly_t A)
 {
     n_poly_fit_length(A, 1);
@@ -260,7 +253,7 @@ void n_poly_one(n_poly_t A)
     A->coeffs[0] = 1;
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_poly_set_ui(n_poly_t A, mp_limb_t c)
 {
     n_poly_fit_length(A, 1);
@@ -268,19 +261,19 @@ void n_poly_set_ui(n_poly_t A, mp_limb_t c)
     A->length = (c != 0);
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 int n_poly_is_zero(const n_poly_t poly)
 {
     return poly->length == 0;
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_poly_zero(n_poly_t res)
 {
     res->length = 0;
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 int n_poly_equal(const n_poly_t a, const n_poly_t b)
 {
     if (a->length != b->length)
@@ -299,7 +292,7 @@ int n_poly_equal(const n_poly_t a, const n_poly_t b)
 
 int n_poly_mod_is_canonical(const n_poly_t A, nmod_t mod);
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_poly_mod_make_monic(n_poly_t A, const n_poly_t B, nmod_t mod)
 {
     FLINT_ASSERT(B->length > 0);
@@ -308,19 +301,19 @@ void n_poly_mod_make_monic(n_poly_t A, const n_poly_t B, nmod_t mod)
     _nmod_poly_make_monic(A->coeffs, B->coeffs, B->length, mod);
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_poly_mod_taylor_shift(n_poly_t g, mp_limb_t c, nmod_t mod)
 {
     _nmod_poly_taylor_shift(g->coeffs, c, g->length, mod);
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 ulong n_poly_get_coeff(const n_poly_t poly, slong j)
 {
     return (j >= poly->length) ? 0 : poly->coeffs[j];
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_poly_set_coeff_nonzero(n_poly_t A, slong j, ulong c)
 {
     FLINT_ASSERT(c != 0);
@@ -337,7 +330,7 @@ void n_poly_set_coeff(n_poly_t A, slong e, ulong c);
 
 void n_poly_mod_set_coeff_ui(n_poly_t A, slong j, ulong c, nmod_t mod);
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_poly_set_nmod_poly(n_poly_t a, const nmod_poly_t b)
 {
     n_poly_fit_length(a, b->length);
@@ -345,7 +338,7 @@ void n_poly_set_nmod_poly(n_poly_t a, const nmod_poly_t b)
     a->length = b->length;
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void nmod_poly_set_n_poly(nmod_poly_t a, const n_poly_t b)
 {
     nmod_poly_fit_length(a, b->length);
@@ -353,7 +346,7 @@ void nmod_poly_set_n_poly(nmod_poly_t a, const n_poly_t b)
     a->length = b->length;
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_poly_shift_left(n_poly_t A, const n_poly_t B, slong k)
 {
     n_poly_fit_length(A, B->length + k);
@@ -361,7 +354,7 @@ void n_poly_shift_left(n_poly_t A, const n_poly_t B, slong k)
     A->length = B->length + k;
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_poly_shift_right(n_poly_t res, const n_poly_t poly, slong k)
 {
     if (k >= poly->length)
@@ -377,7 +370,7 @@ void n_poly_shift_right(n_poly_t res, const n_poly_t poly, slong k)
     }
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_poly_truncate(n_poly_t poly, slong len)
 {
     if (poly->length > len)
@@ -387,7 +380,7 @@ void n_poly_truncate(n_poly_t poly, slong len)
     }
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void _n_poly_mod_scalar_mul_nmod(n_poly_t A, const n_poly_t B, mp_limb_t c,
                                                                     nmod_t mod)
 {
@@ -397,7 +390,7 @@ void _n_poly_mod_scalar_mul_nmod(n_poly_t A, const n_poly_t B, mp_limb_t c,
     A->length = B->length;
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void _n_poly_mod_scalar_mul_nmod_inplace(n_poly_t A, mp_limb_t c, nmod_t mod)
 {
     _nmod_vec_scalar_mul_nmod(A->coeffs, A->coeffs, A->length, c, mod);
@@ -409,13 +402,13 @@ void n_poly_mod_scalar_mul_ui(n_poly_t A, const n_poly_t B,
 mp_limb_t n_poly_mod_eval_step2(n_poly_t Acur, const n_poly_t Ainc,
                                                                    nmod_t mod);
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 mp_limb_t n_poly_mod_evaluate_nmod(const n_poly_t A, mp_limb_t c, nmod_t mod)
 {
     return _nmod_poly_evaluate_nmod(A->coeffs, A->length, c, mod);
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_poly_mod_neg(n_poly_t A, const n_poly_t B, nmod_t mod)
 {
     n_poly_fit_length(A, B->length);
@@ -423,7 +416,7 @@ void n_poly_mod_neg(n_poly_t A, const n_poly_t B, nmod_t mod)
     A->length = B->length;
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_poly_mod_add(n_poly_t A, const n_poly_t B, const n_poly_t C, nmod_t mod)
 {
     slong Alen = FLINT_MAX(B->length, C->length);
@@ -436,7 +429,7 @@ void n_poly_mod_add(n_poly_t A, const n_poly_t B, const n_poly_t C, nmod_t mod)
 void n_poly_mod_add_ui(n_poly_t res, const n_poly_t poly, ulong c, nmod_t ctx);
 
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_poly_mod_sub(n_poly_t A, const n_poly_t B, const n_poly_t C, nmod_t mod)
 {
     slong Alen = FLINT_MAX(B->length, C->length);
@@ -446,7 +439,7 @@ void n_poly_mod_sub(n_poly_t A, const n_poly_t B, const n_poly_t C, nmod_t mod)
     _n_poly_normalise(A);
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_poly_mod_product_roots_nmod_vec(n_poly_t A, mp_srcptr r, slong n, nmod_t mod)
 {
     n_poly_fit_length(A, n + 1);
@@ -475,7 +468,7 @@ void n_poly_mod_eval2_pow(mp_limb_t * vp, mp_limb_t * vm,
 mp_limb_t n_poly_mod_div_root(n_poly_t Q,
                                     const n_poly_t A, mp_limb_t c, nmod_t ctx);
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void _n_poly_mod_mul(n_poly_t A, const n_poly_t B, const n_poly_t C, nmod_t ctx)
 {
     slong Blen = B->length;
@@ -500,7 +493,7 @@ void _n_poly_mod_mul(n_poly_t A, const n_poly_t B, const n_poly_t C, nmod_t ctx)
         _nmod_poly_mul(A->coeffs, C->coeffs, Clen, B->coeffs, Blen, ctx);
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void _n_poly_mod_div(n_poly_t Q, const n_poly_t A, const n_poly_t B, nmod_t mod)
 {
     const slong lenA = A->length, lenB = B->length;
@@ -516,7 +509,7 @@ void _n_poly_mod_div(n_poly_t Q, const n_poly_t A, const n_poly_t B, nmod_t mod)
     Q->length = lenA - lenB + 1;
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void _n_poly_mod_rem(n_poly_t R, const n_poly_t A, const n_poly_t B, nmod_t mod)
 {
     const slong lenA = A->length, lenB = B->length;
@@ -533,7 +526,7 @@ void _n_poly_mod_rem(n_poly_t R, const n_poly_t A, const n_poly_t B, nmod_t mod)
     _n_poly_normalise(R);
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void _n_poly_mod_divrem(n_poly_t Q, n_poly_t R, const n_poly_t A,
                                                   const n_poly_t B, nmod_t mod)
 {
@@ -603,13 +596,13 @@ void n_poly_mod_mulmod_preinv(n_poly_t A, const n_poly_t B,
 
 /*****************************************************************************/
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 nmod_t fq_nmod_ctx_mod(const fq_nmod_ctx_t ctx)
 {
     return ctx->modulus->mod;
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 int _n_fq_is_zero(const mp_limb_t * a, slong d)
 {
     do {
@@ -619,7 +612,7 @@ int _n_fq_is_zero(const mp_limb_t * a, slong d)
     return 1;
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void _n_fq_zero(mp_limb_t * a, slong d)
 {
     slong i;
@@ -627,7 +620,7 @@ void _n_fq_zero(mp_limb_t * a, slong d)
         a[i] = 0;
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 int _n_fq_is_one(const mp_limb_t * a, slong d)
 {
     slong i;
@@ -639,7 +632,7 @@ int _n_fq_is_one(const mp_limb_t * a, slong d)
     return 1;
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 int _n_fq_is_ui(const mp_limb_t * a, slong d)
 {
     slong i;
@@ -649,13 +642,13 @@ int _n_fq_is_ui(const mp_limb_t * a, slong d)
     return 1;
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 int n_fq_is_one(const mp_limb_t * a, const fq_nmod_ctx_t ctx)
 {
     return _n_fq_is_one(a, fq_nmod_ctx_degree(ctx));
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void _n_fq_one(mp_limb_t * a, slong d)
 {
     slong i;
@@ -664,7 +657,7 @@ void _n_fq_one(mp_limb_t * a, slong d)
         a[i] = 0;
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void _n_fq_set_nmod(mp_limb_t * a, mp_limb_t b, slong d)
 {
     slong i;
@@ -677,7 +670,7 @@ void n_fq_gen(
     mp_limb_t * a,
     const fq_nmod_ctx_t ctx);
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void _n_fq_set(
     mp_limb_t * a,          /* length d */
     const mp_limb_t * b,    /* length d */
@@ -690,7 +683,7 @@ void _n_fq_set(
     } while (i < d);
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void _n_fq_swap(
     mp_limb_t * a,      /* length d */
     mp_limb_t * b,      /* length d */
@@ -703,7 +696,7 @@ void _n_fq_swap(
     } while (i < d);
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 int _n_fq_equal(
     mp_limb_t * a,          /* length d */
     const mp_limb_t * b,    /* length d */
@@ -767,7 +760,7 @@ void n_fq_add_si(
     slong c,
     const fq_nmod_ctx_t ctx);
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_fq_add(
     mp_limb_t * a,          /* length d */
     const mp_limb_t * b,    /* length d */
@@ -791,7 +784,7 @@ void n_fq_sub_fq_nmod(
     const fq_nmod_t c,
     const fq_nmod_ctx_t ctx);
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_fq_sub(
     mp_limb_t * a,          /* length d */
     const mp_limb_t * b,    /* length d */
@@ -803,7 +796,7 @@ void n_fq_sub(
     _nmod_vec_sub(a, b, c, d, ctx->modulus->mod);
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void _n_fq_add(
     mp_limb_t * a,          /* length d */
     const mp_limb_t * b,    /* length d */
@@ -815,7 +808,7 @@ void _n_fq_add(
     _nmod_vec_add(a, b, c, d, mod);
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void _n_fq_sub(
     mp_limb_t * a,          /* length d */
     const mp_limb_t * b,    /* length d */
@@ -827,7 +820,7 @@ void _n_fq_sub(
     _nmod_vec_sub(a, b, c, d, mod);
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void _n_fq_neg(
     mp_limb_t * a,
     const mp_limb_t * b,
@@ -838,7 +831,7 @@ void _n_fq_neg(
     _nmod_vec_neg(a, b, d, mod);
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void _n_fq_mul_ui(
     mp_limb_t * a,          /* length d */
     const mp_limb_t * b,    /* length d */
@@ -872,7 +865,7 @@ void _n_fq_reduce(
     mp_limb_t * t);
 
 /* same itch as reduce */
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void _n_fq_reduce2(
     mp_limb_t * a,          /* length d */
     mp_limb_t * b,          /* length 2d-1 */
@@ -891,7 +884,7 @@ void _n_fq_reduce2(
 
 
 #define N_FQ_MUL_ITCH 4
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void _n_fq_mul(
     mp_limb_t * a,          /* length d */
     const mp_limb_t * b,    /* length d */
@@ -904,7 +897,7 @@ void _n_fq_mul(
     _n_fq_reduce2(a, t, ctx, t + 2*d);
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void _n_fq_addmul(
     mp_limb_t * a,          /* length d */
     const mp_limb_t * b,    /* length d */
@@ -1063,7 +1056,7 @@ void n_fq_poly_init2(n_fq_poly_t A, slong alloc, const fq_nmod_ctx_t ctx);
 
 void _n_fq_poly_one(n_fq_poly_t A, slong d);
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_fq_poly_one(n_fq_poly_t A, const fq_nmod_ctx_t ctx)
 {
     _n_fq_poly_one(A, fq_nmod_ctx_degree(ctx));
@@ -1075,7 +1068,7 @@ int n_fq_poly_is_canonical(
     const n_fq_poly_t a,
     const fq_nmod_ctx_t ctx);
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void _n_fq_poly_normalise(n_fq_poly_t A, slong d)
 {
     while (A->length > 0 && _n_fq_is_zero(A->coeffs + d*(A->length - 1), d))
@@ -1268,7 +1261,7 @@ void n_fq_poly_divrem_divconquer_(
     const fq_nmod_ctx_t ctx,
     n_poly_stack_t St);
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_fq_poly_divrem_(
     n_poly_t Q,
     n_poly_t R,
@@ -1342,7 +1335,7 @@ void n_fq_poly_eval_pow(
 
 /*****************************************************************************/
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_bpoly_init(n_bpoly_t A)
 {
     A->coeffs = NULL;
@@ -1352,7 +1345,7 @@ void n_bpoly_init(n_bpoly_t A)
 
 void n_bpoly_clear(n_bpoly_t A);
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_bpoly_swap(n_bpoly_t A, n_bpoly_t B)
 {
     n_bpoly_struct t = *A;
@@ -1363,7 +1356,7 @@ void n_bpoly_swap(n_bpoly_t A, n_bpoly_t B)
 void n_bpoly_print_pretty(const n_bpoly_t A,
                                         const char * xvar, const char * yvar);
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_bpoly_normalise(n_bpoly_t A)
 {
     while (A->length > 0 && n_poly_is_zero(A->coeffs + A->length - 1))
@@ -1372,20 +1365,20 @@ void n_bpoly_normalise(n_bpoly_t A)
 
 void n_bpoly_realloc(n_bpoly_t A, slong len);
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_bpoly_fit_length(n_bpoly_t A, slong len)
 {
     if (len > A->alloc)
         n_bpoly_realloc(A, len);
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_bpoly_zero(n_bpoly_t A)
 {
     A->length = 0;
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 int n_bpoly_is_zero(const n_bpoly_t A)
 {
     return A->length == 0;
@@ -1393,7 +1386,7 @@ int n_bpoly_is_zero(const n_bpoly_t A)
 
 void _n_bpoly_set(n_bpoly_t A, const n_bpoly_t B);
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_bpoly_set(n_bpoly_t A, const n_bpoly_t B)
 {
     if (A != B)
@@ -1412,7 +1405,7 @@ void n_bpoly_set_coeff_nonzero(n_bpoly_t A, slong e0, slong e1,
 void n_bpoly_mod_derivative_gen0(n_bpoly_t A, const n_bpoly_t B,
                                                                    nmod_t ctx);
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 mp_limb_t n_bpoly_get_coeff(const n_bpoly_t A, slong e0, slong e1)
 {
     if (e0 >= A->length)
@@ -1421,7 +1414,7 @@ mp_limb_t n_bpoly_get_coeff(const n_bpoly_t A, slong e0, slong e1)
         return n_poly_get_coeff(A->coeffs + e0, e1);
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 slong n_bpoly_degree0(const n_bpoly_t A)
 {
     return A->length - 1;
@@ -1437,7 +1430,7 @@ void n_bpoly_set_poly_gen0(n_bpoly_t A, const n_poly_t B);
 
 int n_bpoly_mod_is_canonical(const n_bpoly_t A, nmod_t mod);
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 ulong n_bpoly_bidegree(const n_bpoly_t A)
 {
     ulong x, y;
@@ -1593,7 +1586,7 @@ int n_fq_bpoly_is_canonical(const n_fq_bpoly_t A, const fq_nmod_ctx_t ctx);
 
 /*****************************************************************************/
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_tpoly_init(n_tpoly_t A)
 {
     A->coeffs = NULL;
@@ -1601,7 +1594,7 @@ void n_tpoly_init(n_tpoly_t A)
     A->length = 0;
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_tpoly_swap(n_tpoly_t A, n_tpoly_t B)
 {
     n_tpoly_struct t = *A;
@@ -1615,7 +1608,7 @@ void n_tpoly_clear(n_tpoly_t A);
 
 /*****************************************************************************/
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_polyu_init(n_polyu_t A)
 {
     A->coeffs = NULL;
@@ -1628,7 +1621,7 @@ void n_polyu_clear(n_polyu_t A);
 
 void n_polyu_realloc(n_polyu_t A, slong len);
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_polyu_fit_length(n_polyu_t A, slong len)
 {
     FLINT_ASSERT(A->alloc >= 0);
@@ -1636,7 +1629,7 @@ void n_polyu_fit_length(n_polyu_t A, slong len)
         n_polyu_realloc(A, len);
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_polyu_swap(n_polyu_t A, n_polyu_t B)
 {
     n_polyu_struct T = *B;
@@ -1730,7 +1723,7 @@ int nmod_eval_interp_set_degree_modulus(
     slong deg,
     nmod_t ctx);
 
-N_POLY_INLINE slong nmod_eval_interp_eval_length(nmod_eval_interp_t E)
+FLINT_FORCE_INLINE slong nmod_eval_interp_eval_length(nmod_eval_interp_t E)
 {
     return 1 + E->radix*E->d;
 }
@@ -1760,7 +1753,7 @@ void nmod_eval_interp_from_coeffs_n_fq_poly(
     const fq_nmod_ctx_t ctx);
 
 
-N_POLY_INLINE void nmod_evals_zero(n_poly_t a)
+FLINT_FORCE_INLINE void nmod_evals_zero(n_poly_t a)
 {
     a->length = 0;
 }
@@ -1777,7 +1770,7 @@ void nmod_evals_addmul(n_poly_t a, n_poly_t b, n_poly_t c, slong len,
 void nmod_evals_fmma(n_poly_t a, n_poly_t b, n_poly_t c,
                                 n_poly_t d, n_poly_t e, slong len, nmod_t ctx);
 
-N_POLY_INLINE void n_fq_evals_zero(n_fq_poly_t a)
+FLINT_FORCE_INLINE void n_fq_evals_zero(n_fq_poly_t a)
 {
     a->length = 0;
 }
@@ -1796,7 +1789,7 @@ void n_fq_evals_fmma(n_fq_poly_t a, n_fq_poly_t b, n_fq_poly_t c,
 
 /*****************************************************************************/
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_polyun_init(n_polyun_t A)
 {
     A->coeffs = NULL;
@@ -1811,7 +1804,7 @@ void n_polyun_clear(n_polyun_t A);
 
 void n_polyun_realloc(n_polyun_t A, slong len);
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_polyun_fit_length(n_polyun_t A, slong len)
 {
     if (len > A->alloc)
@@ -1820,7 +1813,7 @@ void n_polyun_fit_length(n_polyun_t A, slong len)
 
 int n_polyun_mod_is_canonical(const n_polyun_t A, nmod_t mod);
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_polyun_swap(n_polyun_t A, n_polyun_t B)
 {
     n_polyun_struct t = *B;
@@ -1845,7 +1838,7 @@ void n_fq_polyun_set(n_fq_polyun_t A, const n_fq_polyun_t B,
 
 int n_polyun_equal(const n_polyun_t A, const n_polyun_t B);
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_polyun_one(n_polyun_t A)
 {
     n_polyun_fit_length(A, 1);
@@ -1854,7 +1847,7 @@ void n_polyun_one(n_polyun_t A)
     n_poly_one(A->coeffs + 0);
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 ulong n_polyu1n_bidegree(n_polyun_t A)
 {
     ulong x = A->exps[0];
@@ -1910,7 +1903,7 @@ void n_poly_stack_clear(n_poly_stack_t S);
 
 n_poly_struct ** n_poly_stack_fit_request(n_poly_stack_t S, slong k);
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 mp_limb_t * n_poly_stack_vec_init(n_poly_stack_t S, slong len)
 {
     n_poly_struct * poly_top;
@@ -1920,14 +1913,14 @@ mp_limb_t * n_poly_stack_vec_init(n_poly_stack_t S, slong len)
     return poly_top->coeffs;
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_poly_stack_vec_clear(n_poly_stack_t S)
 {
     FLINT_ASSERT(S->top >= 1);
     S->top -= 1;
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 n_poly_struct ** n_poly_stack_request(n_poly_stack_t S, slong k)
 {
     n_poly_struct ** poly_top;
@@ -1936,7 +1929,7 @@ n_poly_struct ** n_poly_stack_request(n_poly_stack_t S, slong k)
     return poly_top;
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 n_poly_struct * n_poly_stack_take_top(n_poly_stack_t S)
 {
     /* assume the request for 1 has already been fitted */
@@ -1947,14 +1940,14 @@ n_poly_struct * n_poly_stack_take_top(n_poly_stack_t S)
     return poly_top[0];
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_poly_stack_give_back(n_poly_stack_t S, slong k)
 {
     FLINT_ASSERT(S->top >= k);
     S->top -= k;
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 slong n_poly_stack_size(const n_poly_stack_t S)
 {
     return S->top;
@@ -1968,7 +1961,7 @@ void n_bpoly_stack_clear(n_bpoly_stack_t S);
 
 n_bpoly_struct ** n_bpoly_stack_fit_request(n_bpoly_stack_t S, slong k);
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 n_bpoly_struct ** n_bpoly_stack_request(n_bpoly_stack_t S, slong k)
 {
     n_bpoly_struct ** bpoly_top;
@@ -1977,7 +1970,7 @@ n_bpoly_struct ** n_bpoly_stack_request(n_bpoly_stack_t S, slong k)
     return bpoly_top;
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 n_bpoly_struct * n_bpoly_stack_take_top(n_bpoly_stack_t S)
 {
     /* assume the request for 1 has already been fitted */
@@ -1988,14 +1981,14 @@ n_bpoly_struct * n_bpoly_stack_take_top(n_bpoly_stack_t S)
     return bpoly_top[0];
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_bpoly_stack_give_back(n_bpoly_stack_t S, slong k)
 {
     FLINT_ASSERT(S->top >= k);
     S->top -= k;
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 slong n_bpoly_stack_size(const n_bpoly_stack_t S)
 {
     return S->top;
@@ -2009,7 +2002,7 @@ void n_polyun_stack_clear(n_polyun_stack_t S);
 
 n_polyun_struct ** n_polyun_stack_fit_request(n_polyun_stack_t S, slong k);
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 n_polyun_struct ** n_polyun_stack_request(n_polyun_stack_t S, slong k)
 {
     n_polyun_struct ** polyun_top;
@@ -2018,7 +2011,7 @@ n_polyun_struct ** n_polyun_stack_request(n_polyun_stack_t S, slong k)
     return polyun_top;
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 n_polyun_struct * n_polyun_stack_take_top(n_polyun_stack_t S)
 {
     /* assume the request for 1 has already been fitted */
@@ -2029,14 +2022,14 @@ n_polyun_struct * n_polyun_stack_take_top(n_polyun_stack_t S)
     return polyun_top[0];
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 void n_polyun_stack_give_back(n_polyun_stack_t S, slong k)
 {
     FLINT_ASSERT(S->top >= k);
     S->top -= k;
 }
 
-N_POLY_INLINE
+FLINT_FORCE_INLINE
 slong n_polyun_stack_size(const n_polyun_stack_t S)
 {
     return S->top;
