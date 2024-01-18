@@ -18,7 +18,6 @@
 #define FQ_ZECH_MPOLY_FACTOR_INLINE static inline
 #endif
 
-#include "fq_zech.h"
 #include "fq_zech_mpoly.h"
 
 #ifdef __cplusplus
@@ -87,12 +86,7 @@ void fq_zech_bpoly_swap(fq_zech_bpoly_t A, fq_zech_bpoly_t B, const fq_zech_ctx_
     *B = t;
 }
 
-FQ_ZECH_MPOLY_FACTOR_INLINE
-void fq_zech_bpoly_normalise(fq_zech_bpoly_t A, const fq_zech_ctx_t ctx)
-{
-    while (A->length > 0 && fq_zech_poly_is_zero(A->coeffs + A->length - 1, ctx))
-        A->length--;
-}
+void fq_zech_bpoly_normalise(fq_zech_bpoly_t A, const fq_zech_ctx_t ctx);
 
 void fq_zech_bpoly_realloc(fq_zech_bpoly_t A, slong len, const fq_zech_ctx_t ctx);
 
@@ -117,14 +111,7 @@ int fq_zech_bpoly_is_zero(const fq_zech_bpoly_t A, const fq_zech_ctx_t ctx)
 
 int fq_zech_bpoly_equal(const fq_zech_bpoly_t A, const fq_zech_bpoly_t B, const fq_zech_ctx_t ctx);
 
-FQ_ZECH_MPOLY_FACTOR_INLINE
-void fq_zech_bpoly_get_coeff(fq_zech_t c, const fq_zech_bpoly_t A, slong e0, slong e1, const fq_zech_ctx_t ctx)
-{
-    if (e0 >= A->length)
-        fq_zech_zero(c, ctx);
-    else
-        fq_zech_poly_get_coeff(c, A->coeffs + e0, e1, ctx);
-}
+void fq_zech_bpoly_get_coeff(fq_zech_t c, const fq_zech_bpoly_t A, slong e0, slong e1, const fq_zech_ctx_t ctx);
 
 FQ_ZECH_MPOLY_FACTOR_INLINE
 slong fq_zech_bpoly_degree0(const fq_zech_bpoly_t A, const fq_zech_ctx_t ctx)
@@ -467,13 +454,7 @@ void fq_zech_mpoly_factor_swap(fq_zech_mpoly_factor_t A,
    *B = t;
 }
 
-FQ_ZECH_MPOLY_FACTOR_INLINE
-void fq_zech_mpoly_factor_one(fq_zech_mpoly_factor_t a,
-                                                 const fq_zech_mpoly_ctx_t ctx)
-{
-	fq_zech_one(a->constant, ctx->fqctx);
-	a->num = 0;
-}
+void fq_zech_mpoly_factor_one(fq_zech_mpoly_factor_t a, const fq_zech_mpoly_ctx_t ctx);
 
 int fq_zech_mpoly_factor_expand(fq_zech_mpoly_t A,
                 const fq_zech_mpoly_factor_t f, const fq_zech_mpoly_ctx_t ctx);
