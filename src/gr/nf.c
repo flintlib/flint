@@ -554,10 +554,10 @@ gr_method_tab_input _nf_methods_input[] =
     {GR_METHOD_SET_UI,          (gr_funcptr) _gr_nf_set_ui},
     {GR_METHOD_SET_FMPZ,        (gr_funcptr) _gr_nf_set_fmpz},
     {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_nf_set_other},
+    {GR_METHOD_SET_STR,     (gr_funcptr) gr_generic_set_str_balance_additions},
 
     {GR_METHOD_SET_FEXPR,       (gr_funcptr) _gr_nf_set_fexpr},
     {GR_METHOD_GET_FEXPR,       (gr_funcptr) _gr_nf_get_fexpr},
-
 
     {GR_METHOD_NEG,             (gr_funcptr) _gr_nf_neg},
 

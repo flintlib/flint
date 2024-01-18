@@ -141,6 +141,12 @@ int gr_generic_randtest_small(gr_ptr x, flint_rand_t state, gr_ctx_t ctx)
     return status;
 }
 
+slong _gr_generic_length(gr_srcptr x, gr_ctx_t ctx)
+{
+    return 0;
+}
+
+
 int gr_generic_gens(gr_vec_t vec, gr_ctx_t ctx)
 {
     gr_vec_set_length(vec, 0, ctx);
@@ -2493,6 +2499,8 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_SWAP,                    (gr_funcptr) gr_generic_swap},
     {GR_METHOD_SET_SHALLOW,             (gr_funcptr) gr_generic_set_shallow},
 
+    {_GR_METHOD_LENGTH,                 (gr_funcptr) _gr_generic_length},
+
     {GR_METHOD_WRITE,                   (gr_funcptr) gr_generic_write},
     {GR_METHOD_WRITE_N,                 (gr_funcptr) gr_generic_write_n},
 
@@ -2520,6 +2528,8 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_SET_FMPQ,                (gr_funcptr) gr_generic_set_fmpq},
 
     {GR_METHOD_SET_OTHER,               (gr_funcptr) gr_generic_set_other},
+
+    {GR_METHOD_SET_STR,                 (gr_funcptr) gr_generic_set_str},
 
     {GR_METHOD_GET_FEXPR_SERIALIZE,     (gr_funcptr) gr_generic_get_fexpr_serialize},
     {GR_METHOD_SET_FEXPR,               (gr_funcptr) gr_generic_set_fexpr},

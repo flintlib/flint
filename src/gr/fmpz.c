@@ -169,12 +169,12 @@ _gr_fmpz_set_other(fmpz_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 }
 
 int
-_gr_fmpz_set_str(fmpz_t res, const char * x, const gr_ctx_t ctx)
+_gr_fmpz_set_str(fmpz_t res, const char * x, gr_ctx_t ctx)
 {
-    if (fmpz_set_str(res, x, 10))
-        return GR_DOMAIN;
+    if (!fmpz_set_str(res, x, 10))
+        return GR_SUCCESS;
 
-    return GR_SUCCESS;
+    return gr_generic_set_str(res, x, ctx);
 }
 
 int

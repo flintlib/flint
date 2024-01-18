@@ -442,6 +442,9 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_SET_FMPZ,    (gr_funcptr) polynomial_set_fmpz},
     {GR_METHOD_SET_FMPQ,    (gr_funcptr) polynomial_set_fmpq},
     {GR_METHOD_SET_OTHER,   (gr_funcptr) polynomial_set_other},
+    /* todo: we actually want parse using sparse polynomials
+             before converting to the dense representation, to avoid O(n^2) behavior */
+    {GR_METHOD_SET_STR,     (gr_funcptr) gr_generic_set_str_balance_additions},
     {GR_METHOD_NEG,         (gr_funcptr) polynomial_neg},
     {GR_METHOD_ADD,         (gr_funcptr) polynomial_add},
     {GR_METHOD_SUB,         (gr_funcptr) polynomial_sub},

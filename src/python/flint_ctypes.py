@@ -4451,33 +4451,39 @@ class FiniteField_base(gr_ctx):
 
 
 class FiniteField_fq(FiniteField_base):
-    def __init__(self, p, n):
+    def __init__(self, p, n, var=None):
         gr_ctx.__init__(self)
         p = ZZ(p)
         n = int(n)
         assert p.is_prime()
         assert n >= 1
-        libgr.gr_ctx_init_fq(self._ref, p._ref, n, None)
+        if var is not None:
+            var = ctypes.c_char_p(str(var).encode('ascii'))
+        libgr.gr_ctx_init_fq(self._ref, p._ref, n, var)
         self._elem_type = fq
 
 class FiniteField_fq_nmod(FiniteField_base):
-    def __init__(self, p, n):
+    def __init__(self, p, n, var=None):
         gr_ctx.__init__(self)
-        p = ZZ(p)
+        p = self._as_ui(p)
         n = int(n)
-        assert p.is_prime()
+        assert ZZ(p).is_prime()
         assert n >= 1
-        libgr.gr_ctx_init_fq_nmod(self._ref, p._ref, n, None)
+        if var is not None:
+            var = ctypes.c_char_p(str(var).encode('ascii'))
+        libgr.gr_ctx_init_fq_nmod(self._ref, p, n, var)
         self._elem_type = fq_nmod
 
 class FiniteField_fq_zech(FiniteField_base):
-    def __init__(self, p, n):
+    def __init__(self, p, n, var=None):
         gr_ctx.__init__(self)
-        p = ZZ(p)
+        p = self._as_ui(p)
         n = int(n)
-        assert p.is_prime()
+        assert ZZ(p).is_prime()
         assert n >= 1
-        libgr.gr_ctx_init_fq_zech(self._ref, p._ref, n, None)
+        if var is not None:
+            var = ctypes.c_char_p(str(var).encode('ascii'))
+        libgr.gr_ctx_init_fq_zech(self._ref, p, n, var)
         self._elem_type = fq_zech
 
 
@@ -4512,12 +4518,14 @@ class fq_zech(fq_elem):
 
 
 class NumberField_nf(gr_ctx):
-    def __init__(self, pol):
+    def __init__(self, pol, var=None):
         pol = ZZx(pol)
         # assert pol.is_irreducible()
         gr_ctx.__init__(self)
         libgr.gr_ctx_init_nf_fmpz_poly(self._ref, pol._ref)
         self._elem_type = nf_elem
+        if var is not None:
+            self._set_gen_name(var)
 
 class nf_elem(gr_elem):
     _struct_type = nf_elem_struct
@@ -7521,10 +7529,35 @@ def test_mpoly():
     assert str((x+1)*y**2 + (x+2)*y)
     assert str((x+1)*y**2 - (x+2)*y) == "(x+1)*y^2 + (-x-2)*y"
 
+    assert str(FiniteField_fq(3, 2, "c").gen()) == "c"
+    assert str(FiniteField_fq_nmod(3, 2, "d").gen()) == "d"
+    assert str(FiniteField_fq_zech(3, 2, "e").gen()) == "e^1"
 
 def test_mpoly_q():
     assert str(FractionField_fmpz_mpoly_q(2).gens()) == '[x1, x2]'
     assert str(FractionField_fmpz_mpoly_q(2, ["a", "b"]).gens()) == '[a, b]'
+
+def test_set_str():
+    assert RR("1/4") == RR(1)/4
+    v = RR("pi ^ (1 / 2)")
+    assert 1.77 < v < 1.78
+    assert CC("1/2 + i/4") == 0.5+0.25j
+    assert CC("(-1)^(1/2)") == 1j
+    assert CF("(-1)^(1/2)") == 1j
+    assert abs(RF("2^(1/2)") ** 2) - 2 < 1e-14
+    assert CC_ca("i*pi/2").exp() == CC_ca.i()
+
+    assert ZZ("1 + 2^10") == 1025
+    x = ZZx.gen(); R = PolynomialRing_gr_mpoly(NumberField(x**3+x+1), 3, ["x", "y", "z"])
+    a, x, y, z = R.gens(recursive=True)
+    assert R("((a-x+1)*y + (a^2+1)*y^2 + z)^2") == ((a-x+1)*y + (a**2+1)*y**2 + z)**2
+    x = ZZx.gen()
+    R = NumberField(x**2+1, "b")
+    assert R("b-1") == R.gen()-1
+
+    R = FractionField_fmpz_mpoly_q(2, ["x", "y"])
+    x, y = R.gens()
+    assert R("(4+4*x-y*(-4))^2 / (1+x+y) / 16") == 1+x+y
 
 def test_ca_notebook_examples():
     # algebraic number identity
@@ -7567,6 +7600,8 @@ if __name__ == "__main__":
     for fname in dir():
         if fname.startswith("test_"):
             print(fname + "...", end="")
+            import sys
+            sys.stdout.flush()
             t1 = time()
             globals()[fname]()
             t2 = time()

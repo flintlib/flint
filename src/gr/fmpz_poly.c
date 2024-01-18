@@ -21,6 +21,7 @@
 #include "gr_poly.h"
 #include "gr_generic.h"
 #include "fmpz_poly_factor.h"
+#include "fmpz_mpoly.h"
 
 #define FMPZ_POLY_CTX(ctx) POLYNOMIAL_CTX(ctx)
 #define FMPZ_POLY_CTX_VAR(ctx) (FMPZ_POLY_CTX(ctx)->var)
@@ -214,16 +215,30 @@ _gr_fmpz_poly_set_other(fmpz_poly_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_c
     return GR_UNABLE;
 }
 
-/*
 int
 _gr_fmpz_poly_set_str(fmpz_poly_t res, const char * x, const gr_ctx_t ctx)
 {
-    if (fmpz_poly_set_str(res, x))
-        return GR_DOMAIN;
+    fmpz_mpoly_ctx_t fctx;
+    fmpz_mpoly_t f;
+    int status;
+    const char * vars[] = { "x" };
 
-    return GR_SUCCESS;
+    fmpz_mpoly_ctx_init(fctx, 1, ORD_LEX);
+    fmpz_mpoly_init(f, fctx);
+    if (!fmpz_mpoly_set_str_pretty(f, x, vars, fctx))
+    {
+        fmpz_mpoly_get_fmpz_poly(res, f, 0, fctx);
+        status = GR_SUCCESS;
+    }
+    else
+    {
+        status = GR_UNABLE;
+    }
+    fmpz_mpoly_clear(f, fctx);
+    fmpz_mpoly_ctx_clear(fctx);
+
+    return status;
 }
-*/
 
 int
 _gr_fmpz_poly_get_ui(ulong * res, const fmpz_poly_t x, const gr_ctx_t ctx)
@@ -799,7 +814,7 @@ gr_method_tab_input _fmpz_poly_methods_input[] =
     {GR_METHOD_SET_UI,          (gr_funcptr) _gr_fmpz_poly_set_ui},
     {GR_METHOD_SET_FMPZ,        (gr_funcptr) _gr_fmpz_poly_set_fmpz},
     {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_fmpz_poly_set_other},
-/*    {GR_METHOD_SET_STR,         (gr_funcptr) _gr_fmpz_poly_set_str}, */
+    {GR_METHOD_SET_STR,         (gr_funcptr) _gr_fmpz_poly_set_str},
     {GR_METHOD_GET_UI,          (gr_funcptr) _gr_fmpz_poly_get_ui},
     {GR_METHOD_GET_SI,          (gr_funcptr) _gr_fmpz_poly_get_si},
     {GR_METHOD_GET_FMPZ,        (gr_funcptr) _gr_fmpz_poly_get_fmpz},

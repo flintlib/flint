@@ -2310,6 +2310,7 @@ Special polynomials
     :func:`_nmod_poly_conway` will always succeed.
 
     Here, ``type`` can be the following values:
+
     * ``0`` for which there is a bijection between the image of this function
       and the database of Conway polynomials,
     * ``1`` returns a random prime found in the database and sets ``degree`` to

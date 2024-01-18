@@ -13,6 +13,7 @@
 
 #include "gr.h"
 #include "gr_mpoly.h"
+#include "gr_generic.h"
 
 typedef struct
 {
@@ -141,6 +142,12 @@ int
 _gr_gr_mpoly_randtest(gr_mpoly_t res, flint_rand_t state, gr_ctx_t ctx)
 {
     return gr_mpoly_randtest_bits(res, state, n_randint(state, 5), 1 + n_randint(state, 3), MPOLYNOMIAL_MCTX(ctx), MPOLYNOMIAL_ELEM_CTX(ctx));
+}
+
+slong
+_gr_gr_mpoly_length(const gr_mpoly_t x, gr_ctx_t ctx)
+{
+    return x->length;
 }
 
 int
@@ -312,6 +319,7 @@ gr_method_tab_input _gr__gr_gr_mpoly_methods_input[] =
     {GR_METHOD_SWAP,        (gr_funcptr) _gr_gr_mpoly_swap},
     {GR_METHOD_SET_SHALLOW, (gr_funcptr) _gr_gr_mpoly_set_shallow},
     {GR_METHOD_RANDTEST,    (gr_funcptr) _gr_gr_mpoly_randtest},
+    {_GR_METHOD_LENGTH,     (gr_funcptr) _gr_gr_mpoly_length},
     {GR_METHOD_WRITE,       (gr_funcptr) _gr_gr_mpoly_write},
     {GR_METHOD_GENS,        (gr_funcptr) _gr_gr_mpoly_gens},
     {GR_METHOD_GENS_RECURSIVE,       (gr_funcptr) _gr_gr_mpoly_gens_recursive},
@@ -325,6 +333,7 @@ gr_method_tab_input _gr__gr_gr_mpoly_methods_input[] =
     {GR_METHOD_SET_SI,      (gr_funcptr) _gr_gr_mpoly_set_si},
     {GR_METHOD_SET_FMPZ,    (gr_funcptr) _gr_gr_mpoly_set_fmpz},
     {GR_METHOD_SET_FMPQ,    (gr_funcptr) _gr_gr_mpoly_set_fmpq},
+    {GR_METHOD_SET_STR,     (gr_funcptr) gr_generic_set_str_balance_additions},
     {GR_METHOD_NEG,         (gr_funcptr) _gr_gr_mpoly_neg},
     {GR_METHOD_ADD,         (gr_funcptr) _gr_gr_mpoly_add},
     {GR_METHOD_SUB,         (gr_funcptr) _gr_gr_mpoly_sub},

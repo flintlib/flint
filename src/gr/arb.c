@@ -151,12 +151,12 @@ _gr_arb_set_fmpq(arb_t res, const fmpq_t v, const gr_ctx_t ctx)
 }
 
 int
-_gr_arb_set_str(arb_t res, const char * x, const gr_ctx_t ctx)
+_gr_arb_set_str(arb_t res, const char * x, gr_ctx_t ctx)
 {
-    if (arb_set_str(res, x, ARB_CTX_PREC(ctx)))
-        return GR_DOMAIN;
+    if (!arb_set_str(res, x, ARB_CTX_PREC(ctx)))
+        return GR_SUCCESS;
 
-    return GR_SUCCESS;
+    return gr_generic_set_str_ring_exponents(res, x, ctx);
 }
 
 int

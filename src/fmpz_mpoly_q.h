@@ -112,6 +112,8 @@ fmpz_mpoly_q_gen(fmpz_mpoly_q_t res, slong i, const fmpz_mpoly_ctx_t ctx)
 /* Input and output */
 
 void fmpz_mpoly_q_print_pretty(const fmpz_mpoly_q_t f, const char ** x, const fmpz_mpoly_ctx_t ctx);
+char * fmpz_mpoly_q_get_str_pretty(const fmpz_mpoly_q_t f, const char ** vars, const fmpz_mpoly_ctx_t ctx);
+int fmpz_mpoly_q_set_str_pretty(fmpz_mpoly_q_t res, const char * s, const char ** vars, fmpz_mpoly_ctx_t ctx);
 
 /* Random generation */
 
