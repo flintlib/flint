@@ -11,6 +11,8 @@
 
 #include "ulong_extras.h"
 #include "n_poly.h"
+#include "mpoly.h"
+#include "nmod_mpoly.h"
 #include "fq_nmod_mpoly.h"
 #include "fq_nmod_mpoly_factor.h"
 

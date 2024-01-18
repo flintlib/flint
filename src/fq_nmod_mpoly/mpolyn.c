@@ -10,6 +10,7 @@
 */
 
 #include "n_poly.h"
+#include "mpoly.h"
 #include "fq_nmod_mpoly.h"
 
 void fq_nmod_mpolyn_one(fq_nmod_mpolyn_t A, const fq_nmod_mpoly_ctx_t ctx)

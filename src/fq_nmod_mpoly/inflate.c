@@ -12,6 +12,7 @@
 #include "nmod_vec.h"
 #include "fmpz.h"
 #include "fq_nmod.h"
+#include "mpoly.h"
 #include "fq_nmod_mpoly.h"
 
 void fq_nmod_mpoly_inflate(

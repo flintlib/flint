@@ -12,6 +12,7 @@
 #include "fmpz.h"
 #include "fq_nmod.h"
 #include "n_poly.h"
+#include "mpoly.h"
 #include "fq_nmod_mpoly.h"
 
 void _fq_nmod_mpoly_evaluate_one_fq_nmod_sp(

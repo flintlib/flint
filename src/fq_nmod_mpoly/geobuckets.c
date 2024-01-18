@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpoly.h"
 #include "fq_nmod_mpoly.h"
-
 
 void fq_nmod_mpoly_geobucket_init(fq_nmod_mpoly_geobucket_t B,
                                                  const fq_nmod_mpoly_ctx_t ctx)

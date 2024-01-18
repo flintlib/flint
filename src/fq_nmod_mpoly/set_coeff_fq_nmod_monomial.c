@@ -10,6 +10,7 @@
 */
 
 #include "fmpz.h"
+#include "mpoly.h"
 #include "fq_nmod_mpoly.h"
 
 void fq_nmod_mpoly_set_coeff_fq_nmod_monomial(fq_nmod_mpoly_t A,

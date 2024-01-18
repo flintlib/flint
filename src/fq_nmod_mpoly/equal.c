@@ -10,6 +10,7 @@
 */
 
 #include "fq_nmod.h"
+#include "mpoly.h"
 #include "fq_nmod_mpoly.h"
 
 int fq_nmod_mpoly_equal(

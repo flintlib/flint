@@ -11,6 +11,7 @@
 
 #include "fq_nmod.h"
 #include "n_poly.h"
+#include "mpoly.h"
 #include "fq_nmod_mpoly.h"
 
 int fq_nmod_mpoly_is_gen(const fq_nmod_mpoly_t A,

@@ -13,6 +13,7 @@
 #define MPOLY_TYPES_H
 
 #include "fmpz_mod_types.h"
+#include "fq_nmod_types.h"
 #include "n_poly_types.h"
 
 #ifdef __cplusplus
@@ -75,6 +76,15 @@ typedef struct
 fmpz_mod_mpoly_ctx_struct;
 
 typedef fmpz_mod_mpoly_ctx_struct fmpz_mod_mpoly_ctx_t[1];
+
+typedef struct
+{
+    mpoly_ctx_t minfo;
+    fq_nmod_ctx_t fqctx;
+} fq_nmod_mpoly_ctx_struct;
+
+typedef fq_nmod_mpoly_ctx_struct fq_nmod_mpoly_ctx_t[1];
+
 
 typedef struct {
     slong elem_size;

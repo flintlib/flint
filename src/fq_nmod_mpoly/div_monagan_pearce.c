@@ -11,6 +11,7 @@
 
 #include "fq_nmod.h"
 #include "n_poly.h"
+#include "mpoly.h"
 #include "fq_nmod_mpoly.h"
 
 static int _fq_nmod_mpoly_div_monagan_pearce(

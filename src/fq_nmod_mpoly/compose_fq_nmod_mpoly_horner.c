@@ -12,6 +12,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fq_nmod.h"
+#include "mpoly.h"
 #include "fq_nmod_mpoly.h"
 
 typedef struct

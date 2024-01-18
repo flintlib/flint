@@ -12,6 +12,7 @@
 #include "ulong_extras.h"
 #include "fq_nmod.h"
 #include "n_poly.h"
+#include "mpoly.h"
 #include "fq_nmod_mpoly.h"
 
 #ifdef __GNUC__

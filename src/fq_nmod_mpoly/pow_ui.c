@@ -12,6 +12,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "n_poly.h"
+#include "mpoly.h"
 #include "fq_nmod_mpoly.h"
 
 int fq_nmod_mpoly_pow_ui(

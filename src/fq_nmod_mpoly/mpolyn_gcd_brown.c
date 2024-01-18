@@ -12,6 +12,7 @@
 #include "fq_nmod.h"
 #include "n_poly.h"
 #include "fq_nmod_poly.h"
+#include "mpoly.h"
 #include "fq_nmod_mpoly.h"
 
 int fq_nmod_mpolyn_gcd_brown_smprime_bivar(

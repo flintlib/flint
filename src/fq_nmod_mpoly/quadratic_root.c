@@ -12,6 +12,7 @@
 #include "nmod.h"
 #include "fq_nmod.h"
 #include "n_poly.h"
+#include "mpoly.h"
 #include "fq_nmod_mpoly.h"
 
 /* solve z^2+z=c */

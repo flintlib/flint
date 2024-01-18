@@ -9,8 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fq_zech.h"
+#include "mpoly.h"
 #include "fq_zech_mpoly.h"
 
 void fq_zech_mpoly_univar_init(fq_zech_mpoly_univar_t A,
@@ -70,6 +72,17 @@ void fq_zech_mpoly_univar_fit_length(fq_zech_mpoly_univar_t A,
         }
         A->alloc = new_alloc;
     }
+}
+
+int fq_zech_mpoly_univar_degree_fits_si(const fq_zech_mpoly_univar_t A, const fq_zech_mpoly_ctx_t ctx)
+{
+    return A->length == 0 || fmpz_fits_si(A->exps + 0);
+}
+
+slong fq_zech_mpoly_univar_get_term_exp_si(fq_zech_mpoly_univar_t A, slong i, const fq_zech_mpoly_ctx_t ctx)
+{
+    FLINT_ASSERT((ulong)i < (ulong)A->length);
+    return fmpz_get_si(A->exps + i);
 }
 
 void fq_zech_mpoly_univar_assert_canonical(fq_zech_mpoly_univar_t A,
