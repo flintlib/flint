@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "fmpz_mpoly.h"
 
 void fmpz_mpoly_fit_bits(fmpz_mpoly_t A,
@@ -27,4 +28,9 @@ void fmpz_mpoly_fit_bits(fmpz_mpoly_t A,
 
       A->bits = bits;
    }
+}
+
+slong fmpz_mpoly_max_bits(const fmpz_mpoly_t A)
+{
+    return _fmpz_vec_max_bits(A->coeffs, A->length);
 }

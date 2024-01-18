@@ -9,11 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
-
 
 void fmpz_mpoly_univar_init(fmpz_mpoly_univar_t A, const fmpz_mpoly_ctx_t ctx)
 {
@@ -122,6 +122,17 @@ void fmpz_mpoly_univar_set_coeff_ui(
 
     FLINT_ASSERT(0 && "unreachable");
     return;
+}
+
+int fmpz_mpoly_univar_degree_fits_si(const fmpz_mpoly_univar_t A, const fmpz_mpoly_ctx_t ctx)
+{
+    return A->length == 0 || fmpz_fits_si(A->exps + 0);
+}
+
+slong fmpz_mpoly_univar_get_term_exp_si(fmpz_mpoly_univar_t A, slong i, const fmpz_mpoly_ctx_t ctx)
+{
+    FLINT_ASSERT((ulong)i < (ulong)A->length);
+    return fmpz_get_si(A->exps + i);
 }
 
 void fmpz_mpoly_univar_assert_canonical(fmpz_mpoly_univar_t A, const fmpz_mpoly_ctx_t ctx)
