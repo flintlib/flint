@@ -14,12 +14,6 @@
 #include "fmpq_mat.h"
 
 void
-fmpq_mat_swap(fmpq_mat_t mat1, fmpq_mat_t mat2)
-{
-    FLINT_SWAP(fmpq_mat_struct, *mat1, *mat2);
-}
-
-void
 fmpq_mat_swap_entrywise(fmpq_mat_t mat1, fmpq_mat_t mat2)
 {
     slong i, j;
