@@ -19,10 +19,9 @@
 #endif
 
 #include "thread_pool.h"
-#include "fmpz.h"
-#include "mpoly.h"
 #include "nmod_types.h"
-#include "n_poly.h"
+#include "n_poly_types.h"
+#include "mpoly.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -275,11 +274,7 @@ void nmod_mpoly_ctx_init_rand(nmod_mpoly_ctx_t ctx, flint_rand_t state,
 
 void nmod_mpoly_ctx_clear(nmod_mpoly_ctx_t ctx);
 
-NMOD_MPOLY_INLINE
-void nmod_mpoly_ctx_set_modulus(nmod_mpoly_ctx_t ctx, mp_limb_t p)
-{
-    nmod_init(&ctx->mod, p);
-}
+void nmod_mpoly_ctx_set_modulus(nmod_mpoly_ctx_t ctx, mp_limb_t modulus);
 
 NMOD_MPOLY_INLINE
 slong nmod_mpoly_ctx_nvars(const nmod_mpoly_ctx_t ctx)
@@ -1142,12 +1137,7 @@ void nmod_mpoly_univar_swap(nmod_mpoly_univar_t A, nmod_mpoly_univar_t B, const 
     FLINT_SWAP(nmod_mpoly_univar_struct, *A, *B);
 }
 
-NMOD_MPOLY_INLINE
-int nmod_mpoly_univar_degree_fits_si(const nmod_mpoly_univar_t A,
-                                                    const nmod_mpoly_ctx_t ctx)
-{
-    return A->length == 0 || fmpz_fits_si(A->exps + 0);
-}
+int nmod_mpoly_univar_degree_fits_si(const nmod_mpoly_univar_t A, const nmod_mpoly_ctx_t ctx);
 
 NMOD_MPOLY_INLINE
 slong nmod_mpoly_univar_length(const nmod_mpoly_univar_t A,
@@ -1156,13 +1146,7 @@ slong nmod_mpoly_univar_length(const nmod_mpoly_univar_t A,
     return A->length;
 }
 
-NMOD_MPOLY_INLINE
-slong nmod_mpoly_univar_get_term_exp_si(nmod_mpoly_univar_t A, slong i,
-                                                    const nmod_mpoly_ctx_t ctx)
-{
-    FLINT_ASSERT((ulong)i < (ulong)A->length);
-    return fmpz_get_si(A->exps + i);
-}
+slong nmod_mpoly_univar_get_term_exp_si(nmod_mpoly_univar_t A, slong i, const nmod_mpoly_ctx_t ctx);
 
 NMOD_MPOLY_INLINE
 void nmod_mpoly_univar_get_term_coeff(nmod_mpoly_t c,
