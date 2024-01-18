@@ -57,9 +57,7 @@ void _ca_vec_swap(ca_ptr vec1, ca_ptr vec2, slong len, ca_ctx_t ctx);
 CA_VEC_INLINE void
 ca_vec_swap(ca_vec_t vec1, ca_vec_t vec2, ca_ctx_t ctx)
 {
-    ca_vec_struct t = *vec1;
-    *vec1 = *vec2;
-    *vec2 = t;
+    FLINT_SWAP(ca_vec_struct, *vec1, *vec2);
 }
 
 /* Length */
