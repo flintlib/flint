@@ -27,8 +27,6 @@
  extern "C" {
 #endif
 
-#define MPOLY_MIN_BITS (UWORD(8))    /* minimum number of bits to pack into */
-
 /* choose m so that (m + 1)/(n - m) ~= la/lb, i.e. m = (n*la - lb)/(la + lb) */
 MPOLY_INLINE slong mpoly_divide_threads(slong n, double la, double lb)
 {
@@ -1318,48 +1316,6 @@ void mpoly_from_mpolyl_perm_inflate(
 #define MPOLY_GCD_USE_PRS     16
 #define MPOLY_GCD_USE_ALL     31
 
-typedef struct
-{
-    ulong * Amax_exp;
-    ulong * Amin_exp;
-    ulong * Astride;
-    slong * Adeflate_deg;
-    slong * Alead_count;
-    slong * Atail_count;
-
-    ulong * Bmax_exp;
-    ulong * Bmin_exp;
-    ulong * Bstride;
-    slong * Bdeflate_deg;
-    slong * Blead_count;
-    slong * Btail_count;
-
-    ulong * Gmin_exp;
-    ulong * Abarmin_exp;
-    ulong * Bbarmin_exp;
-    ulong * Gstride;
-    slong * Gterm_count_est;
-    slong * Gdeflate_deg_bound;
-
-    flint_bitcnt_t Gbits, Abarbits, Bbarbits;
-
-    slong mvars;
-    slong Adeflate_tdeg;
-    slong Bdeflate_tdeg;
-
-    double Adensity;
-    double Bdensity;
-
-    double hensel_time, brown_time, zippel_time, zippel2_time;
-    slong * hensel_perm, * brown_perm, * zippel_perm, * zippel2_perm;
-    unsigned int can_use;
-    int Gdeflate_deg_bounds_are_nice; /* all of Gdeflate_deg_bound came from real gcd computations */
-
-    char * data;
-} mpoly_gcd_info_struct;
-
-typedef mpoly_gcd_info_struct mpoly_gcd_info_t[1];
-
 void mpoly_gcd_info_init(mpoly_gcd_info_t I, slong nvars);
 
 void mpoly_gcd_info_clear(mpoly_gcd_info_t I);
@@ -1492,28 +1448,6 @@ typedef struct {
 } mpoly_univar_struct;
 
 typedef mpoly_univar_struct mpoly_univar_t[1];
-
-typedef struct {
-    slong elem_size;
-    const void * ctx;
-    void (*init)(void *, const void *);
-    void (*clear)(void *, const void *);
-    int (*is_zero)(const void *, const void *);
-    void (*zero)(void *, const void *);
-    void (*one)(void *, const void *);
-    void (*set_fmpz)(void *, const fmpz_t, const void *);
-    void (*set)(void *, const void *, const void *);
-    void (*swap)(void *, void *, const void *);
-    void (*neg)(void *, const void *, const void *);
-    void (*add)(void *, const void *, const void *, const void *);
-    void (*sub)(void *, const void *, const void *, const void *);
-    void (*mul_fmpz)(void *, const void *, const fmpz_t, const void *);
-    void (*mul)(void *, const void *, const void *, const void *);
-    void (*divexact)(void *, const void *, const void *, const void *);
-    int (*divides)(void *, const void *, const void *, const void *);
-    int (*pow_fmpz)(void *, const void *, const fmpz_t, const void *);
-    slong (*length)(const void *, const void *);
-} mpoly_void_ring_t[1];
 
 void * mpoly_void_ring_elem_init(mpoly_void_ring_t R);
 

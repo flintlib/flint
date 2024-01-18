@@ -21,7 +21,7 @@
 #include "thread_pool.h"
 #include "nmod_types.h"
 #include "n_poly_types.h"
-#include "mpoly.h"
+#include "mpoly_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -456,74 +456,20 @@ int nmod_mpoly_is_one(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
 
 /* Degrees *******************************************************************/
 
-NMOD_MPOLY_INLINE
-int nmod_mpoly_degrees_fit_si(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
-{
-    return A->bits <= FLINT_BITS ? 1
-               : mpoly_degrees_fit_si(A->exps, A->length, A->bits, ctx->minfo);
-}
+int nmod_mpoly_degrees_fit_si(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx);
 
-NMOD_MPOLY_INLINE
-void nmod_mpoly_degrees_fmpz(fmpz ** degs, const nmod_mpoly_t A,
-                                                   const nmod_mpoly_ctx_t ctx)
-{
-    mpoly_degrees_pfmpz(degs, A->exps, A->length, A->bits, ctx->minfo);
-}
+void nmod_mpoly_degrees_fmpz(fmpz ** degs, const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx);
+void nmod_mpoly_degrees_si(slong * degs, const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx);
 
-NMOD_MPOLY_INLINE
-void nmod_mpoly_degrees_si(slong * degs, const nmod_mpoly_t A,
-                                                   const nmod_mpoly_ctx_t ctx)
-{
-    mpoly_degrees_si(degs, A->exps, A->length, A->bits, ctx->minfo);
-}
+void nmod_mpoly_degree_fmpz(fmpz_t deg, const nmod_mpoly_t A, slong var, const nmod_mpoly_ctx_t ctx);
+slong nmod_mpoly_degree_si(const nmod_mpoly_t A, slong var, const nmod_mpoly_ctx_t ctx);
 
-NMOD_MPOLY_INLINE
-void nmod_mpoly_degree_fmpz(fmpz_t deg, const nmod_mpoly_t A, slong var,
-                                                   const nmod_mpoly_ctx_t ctx)
-{
-    FLINT_ASSERT(0 <= var && var < ctx->minfo->nvars);
-    mpoly_degree_fmpz(deg, A->exps, A->length, A->bits, var, ctx->minfo);
-}
+int nmod_mpoly_total_degree_fits_si(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx);
 
-NMOD_MPOLY_INLINE
-slong nmod_mpoly_degree_si(const nmod_mpoly_t A, slong var,
-                                                   const nmod_mpoly_ctx_t ctx)
-{
-    FLINT_ASSERT(0 <= var && var < ctx->minfo->nvars);
-    return mpoly_degree_si(A->exps, A->length, A->bits, var, ctx->minfo);
-}
+void nmod_mpoly_total_degree_fmpz(fmpz_t td, const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx);
+slong nmod_mpoly_total_degree_si(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx);
 
-NMOD_MPOLY_INLINE
-int nmod_mpoly_total_degree_fits_si(const nmod_mpoly_t A,
-                                                    const nmod_mpoly_ctx_t ctx)
-{
-    return mpoly_total_degree_fits_si(A->exps, A->length, A->bits, ctx->minfo);
-}
-
-NMOD_MPOLY_INLINE
-void nmod_mpoly_total_degree_fmpz(fmpz_t td, const nmod_mpoly_t A,
-                                                    const nmod_mpoly_ctx_t ctx)
-{
-    mpoly_total_degree_fmpz(td, A->exps, A->length, A->bits, ctx->minfo);
-}
-
-NMOD_MPOLY_INLINE
-slong nmod_mpoly_total_degree_si(const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx)
-{
-    return mpoly_total_degree_si(A->exps, A->length, A->bits, ctx->minfo);
-}
-
-NMOD_MPOLY_INLINE
-void nmod_mpoly_used_vars(int * used, const nmod_mpoly_t A,
-                                                    const nmod_mpoly_ctx_t ctx)
-{
-    slong i;
-
-    for (i = 0; i < ctx->minfo->nvars; i++)
-        used[i] = 0;
-
-    mpoly_used_vars_or(used, A->exps, A->length, A->bits, ctx->minfo);
-}
+void nmod_mpoly_used_vars(int * used, const nmod_mpoly_t A, const nmod_mpoly_ctx_t ctx);
 
 /* Coefficients **************************************************************/
 
@@ -606,21 +552,8 @@ ulong nmod_mpoly_get_term_coeff_ui(const nmod_mpoly_t A, slong i,
 void nmod_mpoly_set_term_coeff_ui(nmod_mpoly_t A, slong i, ulong c,
                                                    const nmod_mpoly_ctx_t ctx);
 
-NMOD_MPOLY_INLINE
-int nmod_mpoly_term_exp_fits_ui(const nmod_mpoly_t A, slong i,
-                                                    const nmod_mpoly_ctx_t ctx)
-{
-    return A->bits <= FLINT_BITS ? 1
-                     : mpoly_term_exp_fits_ui(A->exps, A->bits, i, ctx->minfo);
-}
-
-NMOD_MPOLY_INLINE
-int nmod_mpoly_term_exp_fits_si(const nmod_mpoly_t A, slong i,
-                                                    const nmod_mpoly_ctx_t ctx)
-{
-    return A->bits <= FLINT_BITS ? 1
-                     : mpoly_term_exp_fits_si(A->exps, A->bits, i, ctx->minfo);
-}
+int nmod_mpoly_term_exp_fits_ui(const nmod_mpoly_t A, slong i, const nmod_mpoly_ctx_t ctx);
+int nmod_mpoly_term_exp_fits_si(const nmod_mpoly_t A, slong i, const nmod_mpoly_ctx_t ctx);
 
 void nmod_mpoly_get_term_exp_fmpz(fmpz ** exp, const nmod_mpoly_t A,
                                           slong i, const nmod_mpoly_ctx_t ctx);
