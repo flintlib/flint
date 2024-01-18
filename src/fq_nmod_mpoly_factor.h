@@ -18,6 +18,8 @@
 #define FQ_NMOD_MPOLY_FACTOR_INLINE static inline
 #endif
 
+#include "fmpz.h"
+#include "fq_nmod.h"
 #include "fq_nmod_mpoly.h"
 
 #ifdef __cplusplus

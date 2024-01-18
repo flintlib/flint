@@ -10,12 +10,16 @@
 */
 
 #include "thread_support.h"
-#include "nmod_mpoly.h"
-#include "nmod_mpoly_factor.h"
+#include "nmod.h"
+#include "fmpz.h"
 #include "fmpz_vec.h"
+#include "fq_nmod.h"
 #include "fq_nmod_mpoly.h"
 #include "fq_zech.h"
 #include "fq_zech_poly.h"
+#include "n_poly.h"
+#include "nmod_mpoly.h"
+#include "nmod_mpoly_factor.h"
 
 /*
     For each j, set out[j] to the evaluation of A at x_i = alpha[i] (i != j)

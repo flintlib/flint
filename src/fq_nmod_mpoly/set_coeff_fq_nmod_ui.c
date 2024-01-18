@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fq_nmod_mpoly.h"
 
 void fq_nmod_mpoly_set_coeff_fq_nmod_ui(fq_nmod_mpoly_t poly,

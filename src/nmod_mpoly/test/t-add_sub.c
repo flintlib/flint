@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "ulong_extras.h"
 #include "nmod_mpoly.h"
 
 TEST_FUNCTION_START(nmod_mpoly_add_sub, state)

@@ -9,6 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
+#include "n_poly.h"
 #include "fq_zech_poly_factor.h"
 #include "fq_zech_mpoly_factor.h"
 

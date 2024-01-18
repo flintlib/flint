@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fq_nmod.h"
 #include "fq_nmod_mpoly.h"
-
 
 int fq_nmod_mpoly_equal(
     const fq_nmod_mpoly_t A,

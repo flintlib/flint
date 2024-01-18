@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly.h"
-#include "nmod_mpoly.h"
+#include "n_poly.h"
+#include "fmpz_mpoly_factor.h"
 
 /*
     interp_reduce: map from Z to Z/pZ

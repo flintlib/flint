@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
 #include "fq_zech.h"
 #include "fq_zech_mpoly.h"
 

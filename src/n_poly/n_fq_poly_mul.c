@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fq_nmod.h"
 #include "n_poly.h"
-
 
 void _n_fq_poly_mul_(
     mp_limb_t * A,  /* length d*(Blen + Clen - 1) */

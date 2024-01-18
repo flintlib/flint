@@ -10,6 +10,9 @@
 */
 
 #include <string.h>
+#include "fmpz.h"
+#include "fq_nmod.h"
+#include "n_poly.h"
 #include "fq_nmod_mpoly.h"
 
 #define ALLOC_PER_VAR ((FLINT_BITS+4)/3)

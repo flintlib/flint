@@ -9,6 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
+#include "fmpz.h"
+#include "n_poly.h"
 #include "nmod_mpoly.h"
 
 mp_limb_t _nmod_mpoly_eval_all_ui(

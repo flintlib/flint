@@ -13,6 +13,7 @@
 
 #if FLINT_KNOW_STRONG_ORDER
 
+#include "nmod.h"
 #include "thread_support.h"
 #include "fmpz_mpoly.h"
 

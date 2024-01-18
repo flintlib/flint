@@ -18,6 +18,7 @@
 #define FQ_NMOD_MPOLY_INLINE static inline
 #endif
 
+#include "fq_nmod_types.h"
 #include "nmod_mpoly.h"
 
 #ifdef __cplusplus
@@ -511,12 +512,7 @@ FQ_NMOD_MPOLY_INLINE mp_limb_t * _fq_nmod_mpoly_leadcoeff(
     return A->coeffs + 0;
 }
 
-FQ_NMOD_MPOLY_INLINE int fq_nmod_mpoly_is_monic(const fq_nmod_mpoly_t A,
-                                                 const fq_nmod_mpoly_ctx_t ctx)
-{
-    return A->length > 0 &&
-           _n_fq_is_one(A->coeffs + 0, fq_nmod_ctx_degree(ctx->fqctx));
-}
+int fq_nmod_mpoly_is_monic(const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx);
 
 /* conversion ****************************************************************/
 
@@ -1026,12 +1022,7 @@ void fq_nmod_mpoly_univar_swap(fq_nmod_mpoly_univar_t A,
     FLINT_SWAP(fq_nmod_mpoly_univar_struct, *A, *B);
 }
 
-FQ_NMOD_MPOLY_INLINE
-int fq_nmod_mpoly_univar_degree_fits_si(const fq_nmod_mpoly_univar_t A,
-                                                 const fq_nmod_mpoly_ctx_t ctx)
-{
-    return A->length == 0 || fmpz_fits_si(A->exps + 0);
-}
+int fq_nmod_mpoly_univar_degree_fits_si(const fq_nmod_mpoly_univar_t A, const fq_nmod_mpoly_ctx_t ctx);
 
 FQ_NMOD_MPOLY_INLINE
 slong fq_nmod_mpoly_univar_length(const fq_nmod_mpoly_univar_t A,
@@ -1040,13 +1031,7 @@ slong fq_nmod_mpoly_univar_length(const fq_nmod_mpoly_univar_t A,
     return A->length;
 }
 
-FQ_NMOD_MPOLY_INLINE
-slong fq_nmod_mpoly_univar_get_term_exp_si(fq_nmod_mpoly_univar_t A, slong i,
-                                                 const fq_nmod_mpoly_ctx_t ctx)
-{
-    FLINT_ASSERT(i < (ulong)A->length);
-    return fmpz_get_si(A->exps + i);
-}
+slong fq_nmod_mpoly_univar_get_term_exp_si(fq_nmod_mpoly_univar_t A, slong i, const fq_nmod_mpoly_ctx_t ctx);
 
 FQ_NMOD_MPOLY_INLINE
 void fq_nmod_mpoly_univar_get_term_coeff(fq_nmod_mpoly_t c,
@@ -1221,7 +1206,8 @@ void fq_nmod_mpolyn_set(fq_nmod_mpolyn_t A, const fq_nmod_mpolyn_t B,
 FQ_NMOD_MPOLY_INLINE mp_limb_t * fq_nmod_mpolyn_leadcoeff(
                              fq_nmod_mpolyn_t A, const fq_nmod_mpoly_ctx_t ctx)
 {
-    slong d = fq_nmod_ctx_degree(ctx->fqctx);
+    /* slong d = fq_nmod_ctx_degree(ctx->fqctx); */
+    slong d = ctx->fqctx->modulus->length - 1;
     n_poly_struct * leadpoly;
     FLINT_ASSERT(A->length > 0);
     leadpoly = A->coeffs + 0;

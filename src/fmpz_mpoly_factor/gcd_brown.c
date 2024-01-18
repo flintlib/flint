@@ -9,8 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
+#include "n_poly.h"
 #include "fmpz_mpoly_factor.h"
-#include "nmod_mpoly_factor.h"
 
 /* max = max abs coeffs(A) */
 void fmpz_mpoly_height(

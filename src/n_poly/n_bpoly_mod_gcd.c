@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
 #include "n_poly.h"
-
 
 void n_bpoly_mod_interp_reduce_2sm_poly(
     n_poly_t Ap,

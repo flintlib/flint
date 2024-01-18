@@ -9,8 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
+#include "nmod_poly.h"
 #include "nmod_mpoly_factor.h"
-#include "fq_zech.h"
 #include "fq_zech_mpoly_factor.h"
 
 static void _frob_combine(

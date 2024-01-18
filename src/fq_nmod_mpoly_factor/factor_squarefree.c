@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_vec.h"
+#include "n_poly.h"
 #include "fq_nmod_mpoly_factor.h"
 
 #if FLINT_WANT_ASSERT

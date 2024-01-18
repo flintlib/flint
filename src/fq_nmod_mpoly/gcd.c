@@ -11,6 +11,7 @@
 
 #include "fmpz_vec.h"
 #include "fq_nmod_poly.h"
+#include "n_poly.h"
 #include "fq_nmod_mpoly.h"
 #include "fq_nmod_mpoly_factor.h"
 

@@ -9,8 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
+#include "n_poly.h"
 #include "fq_nmod_mpoly_factor.h"
-
 
 int fq_nmod_mpoly_factor_irred_smprime_wang(
     fq_nmod_mpolyv_t fac,

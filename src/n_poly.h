@@ -12,14 +12,18 @@
 #ifndef N_POLY_H
 #define N_POLY_H
 
-#include "nmod.h"
+#include "nmod_types.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
-#include "fq_nmod.h"
+#include "fq_nmod_types.h"
 #include "n_poly_types.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
+#endif
+
+#if !defined(FQ_NMOD_H)
+# define fq_nmod_ctx_degree(ctx) ((ctx)->modulus->length - 1)
 #endif
 
 /* n_polyun stack */
@@ -728,18 +732,12 @@ void _n_fq_neg(
     _nmod_vec_neg(a, b, d, mod);
 }
 
-FLINT_FORCE_INLINE
 void _n_fq_mul_ui(
     mp_limb_t * a,          /* length d */
     const mp_limb_t * b,    /* length d */
     mp_limb_t c,
     slong d,
-    nmod_t mod)
-{
-    if (c >= mod.n)
-        NMOD_RED(c, c, mod);
-    _nmod_vec_scalar_mul_nmod(a, b, d, c, mod);
-}
+    nmod_t mod);
 
 void _n_fq_madd2(
     mp_limb_t * a,          /* length 2d-1 */
@@ -1918,6 +1916,9 @@ slong n_polyun_stack_size(const n_polyun_stack_t S)
     return S->top;
 }
 
+#if !defined(FQ_NMOD_H)
+# undef fq_nmod_ctx_degree
+#endif
 
 #ifdef __cplusplus
 }

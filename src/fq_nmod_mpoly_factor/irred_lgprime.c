@@ -9,9 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly_factor.h"
+#include "n_poly.h"
 #include "fq_nmod_mpoly_factor.h"
-
 
 static void _map_poly(
     fq_nmod_mpoly_t eA,

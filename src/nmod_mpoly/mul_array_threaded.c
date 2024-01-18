@@ -10,6 +10,7 @@
 */
 
 #include "thread_support.h"
+#include "fmpz.h"
 #include "nmod_mpoly.h"
 
 /* improve locality */

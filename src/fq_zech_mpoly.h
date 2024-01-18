@@ -18,6 +18,7 @@
 #define FQ_ZECH_MPOLY_INLINE static inline
 #endif
 
+#include "fmpz.h"
 #include "fq_zech_poly.h"
 #include "fq_nmod_mpoly.h"
 

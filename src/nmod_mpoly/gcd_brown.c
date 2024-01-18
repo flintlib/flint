@@ -9,8 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
 #include "thread_pool.h"
+#include "nmod.h"
+#include "n_poly.h"
+#include "nmod_mpoly.h"
 
 typedef struct
 {

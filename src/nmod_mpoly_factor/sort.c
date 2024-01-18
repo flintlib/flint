@@ -11,6 +11,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include "fmpz.h"
 #include "nmod_mpoly_factor.h"
 
 typedef struct {

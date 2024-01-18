@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "n_poly.h"
 #include "fq_nmod_mpoly_factor.h"
 
 int compute_gcd(

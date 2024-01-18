@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fq_nmod.h"
 #include "n_poly.h"
-
 
 void n_fq_poly_add_si(
     n_fq_poly_t A,

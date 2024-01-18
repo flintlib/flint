@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "nmod.h"
 #include "nmod_mpoly.h"
 
 TEST_FUNCTION_START(nmod_mpoly_evaluate, state)

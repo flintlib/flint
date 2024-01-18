@@ -13,13 +13,8 @@
 #include "n_poly.h"
 #include "fq_nmod_mpoly.h"
 
-void fq_nmod_mpoly_one(fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
+int fq_nmod_mpoly_is_monic(const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
 {
-    slong d = fq_nmod_ctx_degree(ctx->fqctx);
-    slong N = mpoly_words_per_exp(A->bits, ctx->minfo);
-
-    fq_nmod_mpoly_fit_length(A, 1, ctx);
-    _n_fq_one(A->coeffs + d*0, d);
-    mpoly_monomial_zero(A->exps, N);
-    _fq_nmod_mpoly_set_length(A, 1, ctx);
+    return A->length > 0 &&
+           _n_fq_is_one(A->coeffs + 0, fq_nmod_ctx_degree(ctx->fqctx));
 }

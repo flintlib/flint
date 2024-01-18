@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "n_poly.h"
 #include "fq_nmod_mpoly_factor.h"
 
 int n_polyu_fq_is_canonical(

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fq_nmod.h"
 #include "fq_nmod_mpoly.h"
 
 static void fq_nmod_mpoly_void_init(void * a, const void * ctx)
