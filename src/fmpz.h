@@ -132,7 +132,7 @@ void fmpz_one(fmpz_t f)
 }
 
 void fmpz_set(fmpz_t f, const fmpz_t g);
-FMPZ_INLINE void fmpz_swap(fmpz_t f, fmpz_t g) { fmpz t = *f; *f = *g; *g = t; }
+FMPZ_INLINE void fmpz_swap(fmpz_t f, fmpz_t g) { FLINT_SWAP(fmpz, *f, *g); }
 
 slong fmpz_get_si(const fmpz_t f);
 ulong fmpz_get_ui(const fmpz_t f);
