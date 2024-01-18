@@ -998,16 +998,15 @@ fi
 AX_CHECK_COMPILE_FLAG([-std=c11],[DEFAULT_CFLAGS="-std=c11 $DEFAULT_CFLAGS"])
 AX_CHECK_COMPILE_FLAG([-pedantic],[DEFAULT_CFLAGS="-pedantic $DEFAULT_CFLAGS"])
 
-dnl NOTE: The following flags shouldn't be default. They are leftovers from
-dnl previous configure script
-AX_CHECK_COMPILE_FLAG([-funroll-loops],[DEFAULT_CFLAGS="-funroll-loops $DEFAULT_CFLAGS"])
-
 if test "$cflags_set" = "no";
 then
     CFLAGS="$save_CFLAGS $DEFAULT_CFLAGS"
+    AC_SUBST(UNROLL_LOOPS,1)
+    AC_DEFINE(FLINT_UNROLL_LOOPS, 1, [Define to locally unroll some loops])
 else
     CFLAGS="$save_CFLAGS"
     AX_CHECK_COMPILE_FLAG([$CFLAGS],[],AC_MSG_ERROR(["Couldn't compile with given CFLAGS!"]))
+    AC_SUBST(UNROLL_LOOPS,0)
 fi
 
 if test "$testcflags_set" = "no";

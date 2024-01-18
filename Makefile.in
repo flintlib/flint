@@ -94,6 +94,16 @@ ASM_OBJ_FLAGS:=$(filter-out -D%,$(CPPFLAGS) $(LIB_CPPFLAGS)) $(filter-out -funro
 ASM_LOBJ_FLAGS:=$(filter-out -D%,$(PIC_FLAG)) $(ASM_OBJ_FLAGS)
 endif
 
+UNROLL_LOOPS:=@UNROLL_LOOPS@
+ifeq ($(UNROLL_LOOPS), 1)
+ulong_extras_CFLAGS:=-funroll-loops
+nmod_CFLAGS:=-funroll-loops
+nmod_vec_CFLAGS:=-funroll-loops
+nmod_mat_CFLAGS:=-funroll-loops
+nmod_poly_CFLAGS:=-funroll-loops
+arith_CFLAGS:=-funroll-loops
+endif
+
 LDFLAGS:=@LDFLAGS@
 EXTRA_SHARED_FLAGS:=@EXTRA_SHARED_FLAGS@ $(foreach path, $(GMP_LIB_PATH) $(MPFR_LIB_PATH) $(BLAS_LIB_PATH) $(GC_LIB_PATH) $(NTL_LIB_PATH), @WL@-rpath,$(path))
 EXE_LDFLAGS:=$(LDFLAGS) $(foreach path, $(ABS_FLINT_DIR) $(GMP_LIB_PATH) $(MPFR_LIB_PATH) $(BLAS_LIB_PATH) $(GC_LIB_PATH) $(NTL_LIB_PATH), @WL@-rpath,$(path))
@@ -567,7 +577,7 @@ ifneq ($(STATIC), 0)
 define xxx_OBJS_rule
 $(BUILD_DIR)/$(1)/%.o: $(SRC_DIR)/$(1)/%.c | $(BUILD_DIR)/$(1)
 	@echo "  CC  $$(<:$(SRC_DIR)/%=%)"
-	@$(CC) $(CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $$< -o $$@ $$(DEPFLAGS)
+	@$(CC) $(CFLAGS) $($(1)_CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $$< -o $$@ $$(DEPFLAGS)
 endef
 
 ifeq ($(WANT_ADX_ASSEMBLY),1)
@@ -587,7 +597,7 @@ ifneq ($(SHARED), 0)
 define xxx_LOBJS_rule
 $(BUILD_DIR)/$(1)/%.lo: $(SRC_DIR)/$(1)/%.c | $(BUILD_DIR)/$(1)
 	@echo "  CC  $$(<:$(SRC_DIR)/%=%)"
-	@$(CC) $(PIC_FLAG) $(CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $$< -o $$@ $$(DEPFLAGS)
+	@$(CC) $(PIC_FLAG) $(CFLAGS) $($(1)_CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $$< -o $$@ $$(DEPFLAGS)
 endef
 
 ifeq ($(WANT_ADX_ASSEMBLY),1)
