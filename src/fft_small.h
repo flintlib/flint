@@ -26,39 +26,39 @@ extern "C" {
    documented in machine_vectors.h */
 int fft_small_mulmod_satisfies_bounds(ulong n);
 
-FLINT_INLINE ulong n_pow2(int k)
+FLINT_FORCE_INLINE ulong n_pow2(int k)
 {
     return UWORD(1) << k;
 }
 
-FLINT_INLINE ulong n_min(ulong a, ulong b)
+FLINT_FORCE_INLINE ulong n_min(ulong a, ulong b)
 {
     return FLINT_MIN(a, b);
 }
 
-FLINT_INLINE ulong n_max(ulong a, ulong b)
+FLINT_FORCE_INLINE ulong n_max(ulong a, ulong b)
 {
     return FLINT_MAX(a, b);
 }
 
-FLINT_INLINE ulong n_cdiv(ulong a, ulong b)
+FLINT_FORCE_INLINE ulong n_cdiv(ulong a, ulong b)
 {
     /* not technically correct because the addition can overflow */
     return (a + b - 1)/b;
 }
 
-FLINT_INLINE ulong n_round_up(ulong a, ulong b)
+FLINT_FORCE_INLINE ulong n_round_up(ulong a, ulong b)
 {
     return n_cdiv(a, b)*b;
 }
 
-FLINT_INLINE ulong n_round_down(ulong a, ulong b)
+FLINT_FORCE_INLINE ulong n_round_down(ulong a, ulong b)
 {
     return a/b*b;
 }
 
 /* 0 -> 0, 1 -> 1, [2,3] -> 3, [4,7] -> 7, [8,15] -> 15, ... */
-FLINT_INLINE ulong n_next_pow2m1(ulong a)
+FLINT_FORCE_INLINE ulong n_next_pow2m1(ulong a)
 {
     a |= a >> 1;
     a |= a >> 2;
@@ -71,11 +71,11 @@ FLINT_INLINE ulong n_next_pow2m1(ulong a)
     return a;
 }
 
-FLINT_INLINE ulong n_leading_zeros(ulong x) {
+FLINT_FORCE_INLINE ulong n_leading_zeros(ulong x) {
     return x == 0 ? FLINT_BITS : flint_clz(x);
 }
 
-FLINT_INLINE ulong n_trailing_zeros(ulong x) {
+FLINT_FORCE_INLINE ulong n_trailing_zeros(ulong x) {
     return x == 0 ? FLINT_BITS : flint_ctz(x);
 }
 
@@ -92,28 +92,28 @@ FLINT_INLINE ulong n_trailing_zeros(ulong x) {
     assuming x != 0:
         on x86 we want BSR + 1
 */
-FLINT_INLINE ulong n_nbits(ulong x) {
+FLINT_FORCE_INLINE ulong n_nbits(ulong x) {
     if (x == 0)
         return 0;
     return FLINT_BITS - flint_clz(x);
 }
 
-FLINT_INLINE ulong n_nbits_nz(ulong x) {
+FLINT_FORCE_INLINE ulong n_nbits_nz(ulong x) {
     FLINT_ASSERT(x != 0);
     return (flint_clz(x)^(FLINT_BITS-1)) + 1;
 }
 
-FLINT_INLINE ulong n_clog2(ulong x) {
+FLINT_FORCE_INLINE ulong n_clog2(ulong x) {
     return (x <= 2) ? (x == 2) : FLINT_BITS - flint_clz(x - 1);
 }
 
-FLINT_INLINE ulong n_flog2(ulong x) {
+FLINT_FORCE_INLINE ulong n_flog2(ulong x) {
     return (x <= 2) ? (x == 2) : FLINT_BITS - flint_clz(x);
 }
 
-FLINT_INLINE slong z_min(slong a, slong b) {return FLINT_MIN(a, b);}
+FLINT_FORCE_INLINE slong z_min(slong a, slong b) {return FLINT_MIN(a, b);}
 
-FLINT_INLINE slong z_max(slong a, slong b) {return FLINT_MAX(a, b);}
+FLINT_FORCE_INLINE slong z_max(slong a, slong b) {return FLINT_MAX(a, b);}
 
 int fft_small_mulmod_satisfies_bounds(ulong n);
 
@@ -205,39 +205,39 @@ typedef sd_fft_lctx_struct sd_fft_lctx_t[1];
     and stores in the fft (unspecified vec4d_load) need to support unaligned
     addresses.
 */
-FLINT_INLINE ulong sd_fft_ctx_blk_offset(ulong I)
+FLINT_FORCE_INLINE ulong sd_fft_ctx_blk_offset(ulong I)
 {
     return (I << LG_BLK_SZ) + 4*(I >> (BLK_SHIFT+2));
 }
 
-FLINT_INLINE ulong sd_fft_ctx_data_size(ulong depth)
+FLINT_FORCE_INLINE ulong sd_fft_ctx_data_size(ulong depth)
 {
     FLINT_ASSERT(depth >= LG_BLK_SZ);
     return sd_fft_ctx_blk_offset(n_pow2(depth - LG_BLK_SZ));
 }
 
-FLINT_INLINE double* sd_fft_ctx_blk_index(double* d, ulong I)
+FLINT_FORCE_INLINE double* sd_fft_ctx_blk_index(double* d, ulong I)
 {
     return d + sd_fft_ctx_blk_offset(I);
 }
 
-FLINT_INLINE double* sd_fft_lctx_blk_index(const sd_fft_lctx_t Q, ulong I)
+FLINT_FORCE_INLINE double* sd_fft_lctx_blk_index(const sd_fft_lctx_t Q, ulong I)
 {
     return Q->data + sd_fft_ctx_blk_offset(I);
 }
 
-FLINT_INLINE void sd_fft_ctx_set_index(double* d, ulong i, double x)
+FLINT_FORCE_INLINE void sd_fft_ctx_set_index(double* d, ulong i, double x)
 {
     sd_fft_ctx_blk_index(d, i/BLK_SZ)[i%BLK_SZ] = x;
 }
 
-FLINT_INLINE double sd_fft_ctx_get_index(double* d, ulong i)
+FLINT_FORCE_INLINE double sd_fft_ctx_get_index(double* d, ulong i)
 {
     return sd_fft_ctx_blk_index(d, i/BLK_SZ)[i%BLK_SZ];
 }
 
 /* slightly-worse-than-bit-reversed order of sd_{i}fft_basecase_4 */
-FLINT_INLINE double sd_fft_ctx_get_fft_index(double* d, ulong i)
+FLINT_FORCE_INLINE double sd_fft_ctx_get_fft_index(double* d, ulong i)
 {
     ulong j = i&(BLK_SZ-16);
     FLINT_ASSERT(BLK_SZ >= 16);
@@ -258,7 +258,7 @@ void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp);
 void sd_fft_ctx_fit_depth(sd_fft_ctx_t Q, ulong k);
 
 /* TODO: these should probably increment/decrement a ref count */
-FLINT_INLINE void sd_fft_lctx_init(sd_fft_lctx_t L, sd_fft_ctx_t Q, ulong depth)
+FLINT_FORCE_INLINE void sd_fft_lctx_init(sd_fft_lctx_t L, sd_fft_ctx_t Q, ulong depth)
 {
     L->p = Q->p;
     L->pinv = Q->pinv;
@@ -267,7 +267,7 @@ FLINT_INLINE void sd_fft_lctx_init(sd_fft_lctx_t L, sd_fft_ctx_t Q, ulong depth)
         L->w2tab[i] = Q->w2tab[i];
 }
 
-FLINT_INLINE void sd_fft_lctx_clear(sd_fft_lctx_t LQ, sd_fft_ctx_t Q)
+FLINT_FORCE_INLINE void sd_fft_lctx_clear(sd_fft_lctx_t LQ, sd_fft_ctx_t Q)
 {
 }
 
@@ -277,7 +277,7 @@ void sd_fft_lctx_point_sqr(const sd_fft_lctx_t Q,
                             double* a, ulong m_, ulong depth);
 
 
-FLINT_INLINE void sd_fft_lctx_fft_trunc(sd_fft_lctx_t Q, double* d, ulong depth, ulong itrunc, ulong otrunc)
+FLINT_FORCE_INLINE void sd_fft_lctx_fft_trunc(sd_fft_lctx_t Q, double* d, ulong depth, ulong itrunc, ulong otrunc)
 {
     FLINT_ASSERT(depth >= LG_BLK_SZ);
     FLINT_ASSERT(itrunc % BLK_SZ == 0);
@@ -287,7 +287,7 @@ FLINT_INLINE void sd_fft_lctx_fft_trunc(sd_fft_lctx_t Q, double* d, ulong depth,
     sd_fft_trunc(Q, 0, 1, depth - LG_BLK_SZ, 0, itrunc/BLK_SZ, otrunc/BLK_SZ);
 }
 
-FLINT_INLINE void sd_fft_lctx_ifft_trunc(sd_fft_lctx_t Q, double* d, ulong depth, ulong trunc)
+FLINT_FORCE_INLINE void sd_fft_lctx_ifft_trunc(sd_fft_lctx_t Q, double* d, ulong depth, ulong trunc)
 {
     FLINT_ASSERT(depth >= LG_BLK_SZ);
     FLINT_ASSERT(trunc % BLK_SZ == 0);
@@ -296,14 +296,14 @@ FLINT_INLINE void sd_fft_lctx_ifft_trunc(sd_fft_lctx_t Q, double* d, ulong depth
     sd_ifft_trunc(Q, 0, 1, depth - LG_BLK_SZ, 0, trunc/BLK_SZ, trunc/BLK_SZ, 0);
 }
 
-FLINT_INLINE void sd_fft_ctx_fft_trunc(sd_fft_ctx_t Q, double* d, ulong depth, ulong itrunc, ulong otrunc)
+FLINT_FORCE_INLINE void sd_fft_ctx_fft_trunc(sd_fft_ctx_t Q, double* d, ulong depth, ulong itrunc, ulong otrunc)
 {
     sd_fft_lctx_t QL;
     sd_fft_lctx_init(QL, Q, depth);
     sd_fft_lctx_fft_trunc(QL, d, depth, itrunc, otrunc);
 }
 
-FLINT_INLINE void sd_fft_ctx_ifft_trunc(sd_fft_ctx_t Q, double* d, ulong depth, ulong trunc)
+FLINT_FORCE_INLINE void sd_fft_ctx_ifft_trunc(sd_fft_ctx_t Q, double* d, ulong depth, ulong trunc)
 {
     sd_fft_lctx_t QL;
     sd_fft_lctx_init(QL, Q, depth);
@@ -318,7 +318,7 @@ FLINT_INLINE void sd_fft_ctx_ifft_trunc(sd_fft_ctx_t Q, double* d, ulong depth, 
 */
 
 /* look up w[2*j] */
-FLINT_INLINE double sd_fft_lctx_w2(const sd_fft_lctx_t Q, ulong j)
+FLINT_FORCE_INLINE double sd_fft_lctx_w2(const sd_fft_lctx_t Q, ulong j)
 {
     ulong j_bits, j_r;
     SET_J_BITS_AND_J_R(j_bits, j_r, j);
@@ -326,7 +326,7 @@ FLINT_INLINE double sd_fft_lctx_w2(const sd_fft_lctx_t Q, ulong j)
 }
 
 /* look up -w[2*j]^-1 */
-FLINT_INLINE double sd_fft_lctx_w2inv(const sd_fft_lctx_t Q, ulong j)
+FLINT_FORCE_INLINE double sd_fft_lctx_w2inv(const sd_fft_lctx_t Q, ulong j)
 {
     ulong j_bits, j_mr;
     SET_J_BITS_AND_J_MR(j_bits, j_mr, j);
@@ -337,7 +337,7 @@ FLINT_INLINE double sd_fft_lctx_w2inv(const sd_fft_lctx_t Q, ulong j)
 }
 
 /* look up w[jj] */
-FLINT_INLINE double sd_fft_ctx_w(const sd_fft_ctx_t Q, ulong jj)
+FLINT_FORCE_INLINE double sd_fft_ctx_w(const sd_fft_ctx_t Q, ulong jj)
 {
     ulong j = jj/2, j_bits, j_r;
     SET_J_BITS_AND_J_R(j_bits, j_r, j);
@@ -489,7 +489,7 @@ void _mul_precomp_init(
     nmod_t mod,
     mpn_ctx_t R);
 
-FLINT_INLINE void _mul_precomp_clear(mul_precomp_struct* M)
+FLINT_FORCE_INLINE void _mul_precomp_clear(mul_precomp_struct* M)
 {
     flint_aligned_free(M->bbuf);
 }
@@ -506,7 +506,7 @@ typedef struct {
     mul_precomp_struct rem_maker[1];
 } nmod_poly_divrem_precomp_struct;
 
-FLINT_INLINE void _nmod_poly_divrem_precomp_clear(nmod_poly_divrem_precomp_struct* M)
+FLINT_FORCE_INLINE void _nmod_poly_divrem_precomp_clear(nmod_poly_divrem_precomp_struct* M)
 {
     _mul_precomp_clear(M->quo_maker);
     _mul_precomp_clear(M->rem_maker);
