@@ -10,6 +10,7 @@
 */
 
 #include "nmod.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 int nmod_mpoly_equal_ui(const nmod_mpoly_t A,

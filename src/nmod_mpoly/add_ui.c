@@ -11,6 +11,7 @@
 
 #include "nmod.h"
 #include "nmod_vec.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 void nmod_mpoly_add_ui(nmod_mpoly_t A, const nmod_mpoly_t B,

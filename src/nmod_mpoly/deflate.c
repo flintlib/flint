@@ -10,6 +10,7 @@
 */
 
 #include "nmod_vec.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 void nmod_mpoly_deflate(

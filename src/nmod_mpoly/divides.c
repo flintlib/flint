@@ -11,6 +11,7 @@
 
 #include "thread_support.h"
 #include "nmod.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 static int _nmod_mpoly_divides_try_dense(

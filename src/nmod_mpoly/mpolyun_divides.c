@@ -10,6 +10,7 @@
 */
 
 #include "n_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 int _nmod_mpolyn_divides(

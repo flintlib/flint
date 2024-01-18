@@ -10,6 +10,7 @@
 */
 
 #include "nmod_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 /*

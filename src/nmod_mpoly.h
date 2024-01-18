@@ -20,7 +20,6 @@
 
 #include "thread_pool.h"
 #include "nmod_types.h"
-#include "n_poly_types.h"
 #include "mpoly_types.h"
 
 #ifdef __cplusplus
@@ -79,35 +78,6 @@ typedef struct
    flint_bitcnt_t bits;    /* default bits to construct coeffs */
 } nmod_mpolyu_struct;
 typedef nmod_mpolyu_struct nmod_mpolyu_t[1];
-
-/*
-    nmod_mpolyn_t
-    multivariates with n_poly_t coefficients
-*/
-typedef struct
-{
-   n_poly_struct * coeffs;
-   ulong * exps;
-   slong alloc;
-   slong length;
-   slong bits;
-} nmod_mpolyn_struct;
-typedef nmod_mpolyn_struct nmod_mpolyn_t[1];
-
-/*
-    nmod_mpolyun_t
-    sparse univariates with nmod_mpolyn_t coefficients
-        with uniform bits and LEX ordering
-*/
-typedef struct
-{
-    nmod_mpolyn_struct * coeffs;
-    ulong * exps;
-    slong alloc;
-    slong length;
-    flint_bitcnt_t bits;   /* default bits to construct coeffs */
-} nmod_mpolyun_struct;
-typedef nmod_mpolyun_struct nmod_mpolyun_t[1];
 
 /*
     nmod_mpolyd_t
@@ -1556,16 +1526,6 @@ int nmod_mpolyn_gcd_brown_lgprime(nmod_mpolyn_t G,
                                  nmod_mpolyn_t Abar, nmod_mpolyn_t Bbar,
                                  nmod_mpolyn_t A, nmod_mpolyn_t B, slong var,
                                                    const nmod_mpoly_ctx_t ctx);
-
-typedef enum {
-    nmod_gcds_success,
-    nmod_gcds_form_main_degree_too_high,
-    nmod_gcds_form_wrong,
-    nmod_gcds_no_solution,
-    nmod_gcds_scales_not_found,
-    nmod_gcds_eval_point_not_found,
-    nmod_gcds_eval_gcd_deg_too_high
-} nmod_gcds_ret_t;
 
 nmod_gcds_ret_t nmod_mpolyu_gcds_zippel(nmod_mpolyu_t G,
                            nmod_mpolyu_t A, nmod_mpolyu_t B, nmod_mpolyu_t f,

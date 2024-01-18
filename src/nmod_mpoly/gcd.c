@@ -14,11 +14,12 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fq_nmod.h"
-#include "fq_nmod_mpoly.h"
+#include "mpoly.h"
 #include "fq_zech.h"
 #include "fq_zech_poly.h"
 #include "n_poly.h"
 #include "nmod_mpoly.h"
+#include "fq_nmod_mpoly.h"
 #include "nmod_mpoly_factor.h"
 
 /*

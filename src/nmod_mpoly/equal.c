@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 int _nmod_mpoly_equal(const mp_limb_t * coeff1, const ulong * exp1,

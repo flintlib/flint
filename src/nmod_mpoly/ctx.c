@@ -10,6 +10,7 @@
 */
 
 #include "nmod.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 void nmod_mpoly_ctx_init(nmod_mpoly_ctx_t ctx, slong nvars,

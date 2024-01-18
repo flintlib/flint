@@ -12,8 +12,8 @@
 #ifndef MPOLY_TYPES_H
 #define MPOLY_TYPES_H
 
-#include "flint.h"
 #include "fmpz_mod_types.h"
+#include "n_poly_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -139,6 +139,45 @@ typedef struct
 } mpoly_gcd_info_struct;
 
 typedef mpoly_gcd_info_struct mpoly_gcd_info_t[1];
+
+/*
+    nmod_mpolyn_t
+    multivariates with n_poly_t coefficients
+*/
+typedef struct
+{
+   n_poly_struct * coeffs;
+   ulong * exps;
+   slong alloc;
+   slong length;
+   slong bits;
+} nmod_mpolyn_struct;
+typedef nmod_mpolyn_struct nmod_mpolyn_t[1];
+
+/*
+    nmod_mpolyun_t
+    sparse univariates with nmod_mpolyn_t coefficients
+        with uniform bits and LEX ordering
+*/
+typedef struct
+{
+    nmod_mpolyn_struct * coeffs;
+    ulong * exps;
+    slong alloc;
+    slong length;
+    flint_bitcnt_t bits;   /* default bits to construct coeffs */
+} nmod_mpolyun_struct;
+typedef nmod_mpolyun_struct nmod_mpolyun_t[1];
+
+typedef enum {
+    nmod_gcds_success,
+    nmod_gcds_form_main_degree_too_high,
+    nmod_gcds_form_wrong,
+    nmod_gcds_no_solution,
+    nmod_gcds_scales_not_found,
+    nmod_gcds_eval_point_not_found,
+    nmod_gcds_eval_gcd_deg_too_high
+} nmod_gcds_ret_t;
 
 #ifdef __cplusplus
 }

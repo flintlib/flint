@@ -10,6 +10,7 @@
 */
 
 #include "n_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 void nmod_mpolyn_init(nmod_mpolyn_t A, flint_bitcnt_t bits, const nmod_mpoly_ctx_t ctx)

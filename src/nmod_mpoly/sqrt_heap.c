@@ -16,8 +16,9 @@
 #endif
 
 #include "nmod.h"
-#include "nmod_mpoly.h"
 #include "fq_zech.h"
+#include "mpoly.h"
+#include "nmod_mpoly.h"
 #include "fq_zech_mpoly.h"
 
 static int _is_proved_not_square_medprime(

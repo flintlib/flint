@@ -12,6 +12,7 @@
 #include "thread_pool.h"
 #include "nmod.h"
 #include "n_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 typedef struct

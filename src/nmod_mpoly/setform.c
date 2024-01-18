@@ -10,6 +10,7 @@
 */
 
 #include "nmod_vec.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 /* setform copies the exponents and zeros the coefficients */

@@ -10,6 +10,7 @@
 */
 
 #include "n_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 int nmod_mpoly_is_nmod_poly(

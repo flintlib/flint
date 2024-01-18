@@ -10,6 +10,7 @@
 */
 
 #include "nmod.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 static int _nmod_mpoly_div_monagan_pearce1(

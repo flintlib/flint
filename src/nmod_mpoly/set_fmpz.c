@@ -11,6 +11,7 @@
 
 #include "nmod.h"
 #include "fmpz.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 void nmod_mpoly_set_ui(
