@@ -36,12 +36,12 @@ We get a more accurate estimate taking the square root of this.
 Further, at least for sufficiently large n,
 sigma_0(n) < exp(1.066 log(n) / log(log(n))).
 */
-static inline slong bernoulli_denom_size(slong n)
+FLINT_FORCE_INLINE slong bernoulli_denom_size(slong n)
 {
     return 0.5 * 1.4427 * log(n) * pow(n, 1.066 / log(log(n)));
 }
 
-static inline slong bernoulli_zeta_terms(ulong s, slong prec)
+FLINT_FORCE_INLINE slong bernoulli_zeta_terms(ulong s, slong prec)
 {
     slong N;
     N = pow(2.0, (prec + 1.0) / (s - 1.0));
@@ -49,7 +49,7 @@ static inline slong bernoulli_zeta_terms(ulong s, slong prec)
     return N;
 }
 
-static inline slong bernoulli_power_prec(slong i, ulong s1, slong wp)
+FLINT_FORCE_INLINE slong bernoulli_power_prec(slong i, ulong s1, slong wp)
 {
     slong p = wp - s1 * log(i) * 1.44269504088896341;
     return FLINT_MAX(p, 10);
@@ -59,7 +59,7 @@ static inline slong bernoulli_power_prec(slong i, ulong s1, slong wp)
    in practice since the denominator estimate is quite a bit larger
    than the true denominators
  */
-static inline slong bernoulli_global_prec(ulong nmax)
+FLINT_FORCE_INLINE slong bernoulli_global_prec(ulong nmax)
 {
     return arith_bernoulli_number_size(nmax) + bernoulli_denom_size(nmax);
 }
