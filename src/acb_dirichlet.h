@@ -14,12 +14,6 @@
 #ifndef ACB_DIRICHLET_H
 #define ACB_DIRICHLET_H
 
-#ifdef ACB_DIRICHLET_INLINES_C
-#define ACB_DIRICHLET_INLINE
-#else
-#define ACB_DIRICHLET_INLINE static inline
-#endif
-
 #include "acb.h"
 #include "dirichlet.h"
 
@@ -190,13 +184,13 @@ void acb_dirichlet_backlund_s_bound(mag_t res, const arb_t t);
 void acb_dirichlet_zeta_nzeros_gram(fmpz_t res, const fmpz_t n);
 slong acb_dirichlet_backlund_s_gram(const fmpz_t n);
 
-ACB_DIRICHLET_INLINE void
+FLINT_FORCE_INLINE void
 acb_dirichlet_hardy_z_zero(arb_t res, const fmpz_t n, slong prec)
 {
     acb_dirichlet_hardy_z_zeros(res, n, 1, prec);
 }
 
-ACB_DIRICHLET_INLINE void
+FLINT_FORCE_INLINE void
 acb_dirichlet_zeta_zero(acb_t res, const fmpz_t n, slong prec)
 {
     acb_dirichlet_zeta_zeros(res, n, 1, prec);
@@ -318,7 +312,7 @@ void acb_dirichlet_dft(acb_ptr w, acb_srcptr v, const dirichlet_group_t G, slong
 
 /* utils */
 
-ACB_DIRICHLET_INLINE void
+FLINT_FORCE_INLINE void
 acb_vec_printd(acb_srcptr vec, slong len, slong digits)
 {
     slong i;
