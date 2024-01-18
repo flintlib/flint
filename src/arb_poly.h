@@ -43,9 +43,7 @@ void _arb_poly_normalise(arb_poly_t poly);
 ARB_POLY_INLINE void
 arb_poly_swap(arb_poly_t poly1, arb_poly_t poly2)
 {
-    arb_poly_struct t = *poly1;
-    *poly1 = *poly2;
-    *poly2 = t;
+    FLINT_SWAP(arb_poly_struct, *poly1, *poly2);
 }
 
 void arb_poly_set(arb_poly_t poly, const arb_poly_t src);
@@ -646,24 +644,30 @@ arb_poly_allocated_bytes(const arb_poly_t x)
 
 
 /* counts zero bits in the binary representation of e */
-ARB_POLY_INLINE int
-n_zerobits(mp_limb_t e)
+FLINT_FORCE_INLINE int
+n_zerobits(ulong e)
 {
+#if defined(__GNUC__)
+# if defined(_LONG_LONG_LIMB)
+    return FLINT_BIT_COUNT(e) - __builtin_popcountll(e);
+# else
+    return FLINT_BIT_COUNT(e) - __builtin_popcountl(e);
+# endif
+#else
     int zeros = 0;
-
     while (e > 1)
     {
         zeros += !(e & 1);
         e >>= 1;
     }
-
     return zeros;
+#endif
 }
 
 /* Computes the length of the result when raising a polynomial of
    length *len* to the power *exp* and truncating to length *trunc*,
    without overflow. Assumes poly_len >= 1. */
-ARB_POLY_INLINE slong
+FLINT_FORCE_INLINE slong
 poly_pow_length(slong poly_len, ulong exp, slong trunc)
 {
     mp_limb_t hi, lo;
