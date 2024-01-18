@@ -12,12 +12,6 @@
 #ifndef ACB_DFT_H
 #define ACB_DFT_H
 
-#ifdef ACB_DFT_INLINES_C
-#define ACB_DFT_INLINE
-#else
-#define ACB_DFT_INLINE static inline
-#endif
-
 #include "ulong_extras.h"
 #include "acb.h"
 
@@ -206,7 +200,7 @@ void acb_dft_inverse(acb_ptr w, acb_srcptr v, slong len, slong prec);
 
 acb_dft_step_ptr _acb_dft_steps_prod(slong * m, slong num, slong prec);
 
-ACB_DFT_INLINE void
+FLINT_FORCE_INLINE void
 acb_dft_prod_init(acb_dft_prod_t t, slong * cyc, slong num, slong prec)
 {
     t->num = num;
@@ -218,7 +212,7 @@ void acb_dft_prod_clear(acb_dft_prod_t t);
 void _acb_dft_cyc_init_z_fac(acb_dft_cyc_t t, n_factor_t fac, slong dv, acb_ptr z, slong dz, slong len, slong prec);
 void _acb_dft_cyc_init(acb_dft_cyc_t t, slong dv, slong len, slong prec);
 
-ACB_DFT_INLINE void
+FLINT_FORCE_INLINE void
 acb_dft_cyc_init(acb_dft_cyc_t t, slong len, slong prec)
 {
     _acb_dft_cyc_init(t, 1, len, prec);
@@ -228,13 +222,13 @@ void acb_dft_cyc_clear(acb_dft_cyc_t t);
 
 void _acb_dft_naive_init(acb_dft_naive_t pol, slong dv, acb_ptr z, slong dz, slong len, slong prec);
 
-ACB_DFT_INLINE void
+FLINT_FORCE_INLINE void
 acb_dft_naive_init(acb_dft_naive_t pol, slong len, slong prec)
 {
     _acb_dft_naive_init(pol, 1, NULL, 0, len, prec);
 }
 
-ACB_DFT_INLINE void
+FLINT_FORCE_INLINE void
 acb_dft_naive_clear(acb_dft_naive_t pol)
 {
     if (pol->zclear)
@@ -243,13 +237,13 @@ acb_dft_naive_clear(acb_dft_naive_t pol)
 
 void _acb_dft_rad2_init(acb_dft_rad2_t t, slong dv, int e, slong prec);
 
-ACB_DFT_INLINE void
+FLINT_FORCE_INLINE void
 acb_dft_rad2_init(acb_dft_rad2_t t, int e, slong prec)
 {
     _acb_dft_rad2_init(t, 1, e, prec);
 }
 
-ACB_DFT_INLINE void
+FLINT_FORCE_INLINE void
 acb_dft_rad2_clear(acb_dft_rad2_t t)
 {
     _acb_vec_clear(t->z, t->nz);
@@ -257,13 +251,13 @@ acb_dft_rad2_clear(acb_dft_rad2_t t)
 
 void _acb_dft_bluestein_init(acb_dft_bluestein_t t, slong dv, slong n, slong prec);
 
-ACB_DFT_INLINE void
+FLINT_FORCE_INLINE void
 acb_dft_bluestein_init(acb_dft_bluestein_t t, slong n, slong prec)
 {
     _acb_dft_bluestein_init(t, 1, n, prec);
 }
 
-ACB_DFT_INLINE void
+FLINT_FORCE_INLINE void
 acb_dft_bluestein_clear(acb_dft_bluestein_t t)
 {
     if (t->n != 0)
@@ -280,13 +274,13 @@ void acb_dft_crt_clear(acb_dft_crt_t crt);
 
 /* utils, could be moved elsewhere */
 
-ACB_DFT_INLINE void
+FLINT_FORCE_INLINE void
 acb_swap_ri(acb_t x)
 {
     arb_swap(acb_realref(x), acb_imagref(x));
 }
 
-ACB_DFT_INLINE void
+FLINT_FORCE_INLINE void
 acb_vec_swap_ri(acb_ptr v, slong len)
 {
     slong k;
@@ -294,7 +288,7 @@ acb_vec_swap_ri(acb_ptr v, slong len)
         acb_swap_ri(v + k);
 }
 
-ACB_DFT_INLINE void
+FLINT_FORCE_INLINE void
 _acb_vec_kronecker_mul(acb_ptr z, acb_srcptr x, acb_srcptr y, slong len, slong prec)
 {
     slong k;
@@ -302,7 +296,7 @@ _acb_vec_kronecker_mul(acb_ptr z, acb_srcptr x, acb_srcptr y, slong len, slong p
         acb_mul(z + k, x + k, y + k, prec);
 }
 
-ACB_DFT_INLINE void
+FLINT_FORCE_INLINE void
 _acb_vec_kronecker_mul_step(acb_ptr z, acb_srcptr x, acb_srcptr y, slong step, slong len, slong prec)
 {
     slong k;
@@ -312,7 +306,7 @@ _acb_vec_kronecker_mul_step(acb_ptr z, acb_srcptr x, acb_srcptr y, slong step, s
     }
 }
 
-ACB_DFT_INLINE void
+FLINT_FORCE_INLINE void
 acb_vec_printd_index(acb_srcptr vec, slong len, slong digits)
 {
     slong i;
