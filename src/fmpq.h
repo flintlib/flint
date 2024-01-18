@@ -85,8 +85,7 @@ FMPQ_INLINE void fmpq_set(fmpq_t dest, const fmpq_t src)
 
 FMPQ_INLINE void fmpq_swap(fmpq_t op1, fmpq_t op2)
 {
-    fmpz_swap(fmpq_numref(op1), fmpq_numref(op2));
-    fmpz_swap(fmpq_denref(op1), fmpq_denref(op2));
+    FLINT_SWAP(fmpq, *op1, *op2);
 }
 
 FMPQ_INLINE void fmpq_neg(fmpq_t dest, const fmpq_t src)
@@ -373,11 +372,6 @@ void _fmpq_cfrac_list_push_back_zero(_fmpq_cfrac_list_t v);
 
 void _fmpq_cfrac_list_append_ui(_fmpq_cfrac_list_t v, const ulong * a, slong n);
 
-FMPQ_INLINE void _fmpq_cfrac_list_swap(_fmpq_cfrac_list_t a, _fmpq_cfrac_list_t b)
-{
-    FLINT_SWAP(_fmpq_cfrac_list_struct, *a, *a);
-}
-
 /*************** ball for closed interval [left, right] **********************/
 
 typedef struct {
@@ -391,7 +385,7 @@ void _fmpq_ball_init(_fmpq_ball_t x);
 
 void _fmpq_ball_clear(_fmpq_ball_t x);
 
-FMPQ_INLINE void _fmpq_ball_swap(_fmpq_ball_t x, _fmpq_ball_t y)
+FLINT_FORCE_INLINE void _fmpq_ball_swap(_fmpq_ball_t x, _fmpq_ball_t y)
 {
     FLINT_SWAP(_fmpq_ball_struct, *x, *y);
 }
