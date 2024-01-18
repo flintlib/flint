@@ -432,7 +432,19 @@ int flint_fscanf(FILE * f, const char * str, ...); /* flint version of fscanf */
 int flint_vfprintf(FILE * f, const char * str, va_list ap);
 #endif
 
-#include "exception.h"
+typedef enum
+{
+   FLINT_ERROR,     /* general error */
+   FLINT_OVERFLOW,  /* overflow */
+   FLINT_IMPINV,    /* impossible inverse */
+   FLINT_DOMERR,    /* domain error */
+   FLINT_DIVZERO,   /* divide by zero */
+   FLINT_EXPOF,     /* exponent overflow */
+   FLINT_INEXACT,   /* inexact error */
+   FLINT_TEST_FAIL  /* test fail */
+} flint_err_t;
+
+FLINT_NORETURN void flint_throw(flint_err_t exc, const char * msg, ...);
 
 FLINT_INLINE slong flint_mul_sizes(slong x, slong y)
 {

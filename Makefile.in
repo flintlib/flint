@@ -248,7 +248,7 @@ endif
 ################################################################################
 
 SINGLE_HEADERS :=                                                           \
-        flint.h         flint-config.h    exception.h     gmpcompat.h       \
+        flint.h         flint-config.h    gmpcompat.h                       \
         profiler.h      templates.h       fft_tuning.h                      \
                                                                             \
         longlong.h                        longlong_asm_clang.h              \
