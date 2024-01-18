@@ -68,6 +68,7 @@ static void fmpz_mpoly_ts_init(fmpz_mpoly_ts_t A,
     }
 }
 
+#if 0
 static void fmpz_mpoly_ts_print(const fmpz_mpoly_ts_t B, const char ** x,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
@@ -81,6 +82,7 @@ static void fmpz_mpoly_ts_print(const fmpz_mpoly_ts_t B, const char ** x,
 
     fmpz_mpoly_assert_canonical(A, ctx);
 }
+#endif
 
 static void fmpz_mpoly_ts_clear(fmpz_mpoly_ts_t A)
 {
