@@ -22,7 +22,6 @@
 #include <string.h>
 #include "thread_pool.h"
 #include "mpoly_types.h"
-#include "fmpz.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -1010,8 +1009,6 @@ slong mpoly_gen_offset_mp(slong var,
 
 slong mpoly_gen_monomial_offset_mp(ulong * mexp, slong var,
                                      flint_bitcnt_t bits, const mpoly_ctx_t mctx);
-
-void fmpz_mat_mul_vec(fmpz * v, const fmpz_mat_t M, fmpz * u);
 
 void mpoly_compose_mat_gen(fmpz_mat_t M, const slong * c,
                             const mpoly_ctx_t mctxB, const mpoly_ctx_t mctxAC);

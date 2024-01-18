@@ -19,6 +19,7 @@
 #define FMPZ_MPOLY_INLINE static inline
 #endif
 
+#include "fmpz.h"
 #include "fmpz_vec.h"
 #include "mpoly.h"
 

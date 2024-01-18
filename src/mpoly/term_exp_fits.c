@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "mpoly.h"
 
 int mpoly_term_exp_fits_ui(ulong * exps, flint_bitcnt_t bits,

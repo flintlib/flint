@@ -19,6 +19,7 @@
 #endif
 
 #include "thread_pool.h"
+#include "fmpz.h"
 #include "mpoly.h"
 #include "nmod_types.h"
 #include "n_poly.h"

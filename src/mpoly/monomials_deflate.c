@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "mpoly.h"
-
 
 void mpoly_monomials_deflate(ulong * Aexps, flint_bitcnt_t Abits,
                        const ulong * Bexps, flint_bitcnt_t Bbits, slong Blength,

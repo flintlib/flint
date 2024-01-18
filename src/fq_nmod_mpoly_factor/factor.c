@@ -10,6 +10,7 @@
 */
 
 #include "long_extras.h"
+#include "fq_nmod_poly.h"
 #include "fq_nmod_poly_factor.h"
 #include "fq_nmod_mpoly_factor.h"
 

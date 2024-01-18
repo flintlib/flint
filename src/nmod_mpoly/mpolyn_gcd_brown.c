@@ -10,8 +10,8 @@
 */
 
 #include "nmod_mpoly.h"
+#include "fq_nmod_poly.h"
 #include "fq_nmod_mpoly.h"
-
 
 int nmod_mpolyn_gcd_brown_smprime_bivar(
     nmod_mpolyn_t G,

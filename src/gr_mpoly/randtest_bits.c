@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "gr_mpoly.h"
 
 int gr_mpoly_randtest_bits(gr_mpoly_t A, flint_rand_t state,

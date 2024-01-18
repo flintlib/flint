@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "gr_mpoly.h"
 
 int gr_mpoly_set_coeff_scalar_fmpz(

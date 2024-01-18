@@ -19,6 +19,7 @@
 #endif
 
 #include "nmod_types.h"
+#include "fmpz.h"
 #include "fmpz_mod.h"
 #include "mpoly.h"
 
