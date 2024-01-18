@@ -12,12 +12,6 @@
 #ifndef CA_FIELD_H
 #define CA_FIELD_H
 
-#ifdef CA_FIELD_INLINES_C
-#define CA_FIELD_INLINE
-#else
-#define CA_FIELD_INLINE static inline
-#endif
-
 #include "ca.h"
 
 #ifdef __cplusplus
