@@ -67,9 +67,7 @@ void _ca_poly_normalise(ca_poly_t poly, ca_ctx_t ctx);
 CA_POLY_INLINE void
 ca_poly_swap(ca_poly_t poly1, ca_poly_t poly2, ca_ctx_t ctx)
 {
-    ca_poly_struct t = *poly1;
-    *poly1 = *poly2;
-    *poly2 = t;
+    FLINT_SWAP(ca_poly_struct, *poly1, *poly2);
 }
 
 /* Assignment and simple values */
