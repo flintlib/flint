@@ -116,7 +116,7 @@ outer_loop:
     }
     p = n_nextprime(p, 1);
 
-    nmod_mpoly_ctx_change_modulus(ctxp, p);
+    nmod_mpoly_ctx_set_modulus(ctxp, p);
 
     /* make sure mod p reduction does not kill both lc(A) and lc(B) */
     gammap = fmpz_get_nmod(gamma, ctxp->mod);
@@ -194,7 +194,7 @@ inner_loop:
     }
     p = n_nextprime(p, 1);
 
-    nmod_mpoly_ctx_change_modulus(ctxp, p);
+    nmod_mpoly_ctx_set_modulus(ctxp, p);
 
     /* make sure mod p reduction does not kill both lc(A) and lc(B) */
     gammap = fmpz_get_nmod(gamma, ctxp->mod);

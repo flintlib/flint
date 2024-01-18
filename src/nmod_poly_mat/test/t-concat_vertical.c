@@ -11,6 +11,7 @@
 */
 
 #include "test_helpers.h"
+#include "ulong_extras.h"
 #include "nmod_poly_mat.h"
 
 TEST_FUNCTION_START(nmod_poly_mat_concat_vertical, state)

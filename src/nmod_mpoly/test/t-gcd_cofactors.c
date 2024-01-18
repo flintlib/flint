@@ -10,6 +10,9 @@
 */
 
 #include "test_helpers.h"
+#include "ulong_extras.h"
+#include "fmpz.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 /* Defined in t-gcd.c, t-gcd_brown.c, t-gcd_cofactors.c, t-gcd_hensel.c,

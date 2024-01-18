@@ -10,6 +10,9 @@
 */
 
 #include "test_helpers.h"
+#include "ulong_extras.h"
+#include "nmod_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 void test_resultant(

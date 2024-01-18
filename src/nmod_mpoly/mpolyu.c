@@ -33,19 +33,6 @@ void nmod_mpolyu_clear(nmod_mpolyu_t A, const nmod_mpoly_ctx_t uctx)
 }
 
 
-void nmod_mpolyu_swap(nmod_mpolyu_t A, nmod_mpolyu_t B,
-                                                   const nmod_mpoly_ctx_t uctx)
-{
-   nmod_mpolyu_struct t = *A;
-   *A = *B;
-   *B = t;
-}
-
-void nmod_mpolyu_zero(nmod_mpolyu_t A, const nmod_mpoly_ctx_t uctx)
-{
-    A->length = 0;
-}
-
 int nmod_mpolyu_is_one(nmod_mpolyu_t A, const nmod_mpoly_ctx_t uctx)
 {
     if (A->length != 1 || A->exps[0] != UWORD(0))

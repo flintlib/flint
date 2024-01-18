@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "ulong_extras.h"
 #include "perm.h"
 #include "nmod_poly_mat.h"
 

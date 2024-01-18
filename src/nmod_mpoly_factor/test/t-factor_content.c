@@ -10,6 +10,8 @@
 */
 
 #include "test_helpers.h"
+#include "ulong_extras.h"
+#include "fmpz.h"
 #include "nmod_mpoly_factor.h"
 
 void check_content(const nmod_mpoly_t p, const nmod_mpoly_ctx_t ctx)

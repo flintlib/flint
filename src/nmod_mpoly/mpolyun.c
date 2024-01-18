@@ -81,13 +81,6 @@ void nmod_mpolyun_print_pretty(
     }
 }
 
-void nmod_mpolyun_swap(nmod_mpolyun_t A, nmod_mpolyun_t B)
-{
-   nmod_mpolyun_struct t = *A;
-   *A = *B;
-   *B = t;
-}
-
 void nmod_mpolyun_zero(nmod_mpolyun_t A, const nmod_mpoly_ctx_t ctx)
 {
     slong i;

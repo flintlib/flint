@@ -28,7 +28,7 @@
 extern "C" {
 #endif
 
-NMOD_MPOLY_INLINE
+FLINT_FORCE_INLINE
 mp_limb_t * nmod_mpoly_term_coeff_ref(nmod_mpoly_t A, slong i,
                                                     const nmod_mpoly_ctx_t ctx)
 {
@@ -39,13 +39,13 @@ mp_limb_t * nmod_mpoly_term_coeff_ref(nmod_mpoly_t A, slong i,
 
 /* Internal type definitions *************************************************/
 
-NMOD_MPOLY_INLINE n_poly_struct *
+FLINT_FORCE_INLINE n_poly_struct *
 evil_cast_nmod_poly_to_n_poly(nmod_poly_struct * a)
 {
     return (n_poly_struct *) a;
 }
 
-NMOD_MPOLY_INLINE const n_poly_struct *
+FLINT_FORCE_INLINE const n_poly_struct *
 evil_const_cast_nmod_poly_to_n_poly(const nmod_poly_struct * a)
 {
     return (const n_poly_struct *) a;
@@ -165,7 +165,7 @@ nmod_mpolyn_struct ** nmod_poly_stack_fit_request_mpolyn(
                                                  nmod_poly_stack_t S, slong k);
 
 
-NMOD_MPOLY_INLINE
+FLINT_FORCE_INLINE
 n_poly_struct ** nmod_poly_stack_request_poly(nmod_poly_stack_t S, slong k)
 {
     n_poly_struct ** poly_top;
@@ -174,7 +174,7 @@ n_poly_struct ** nmod_poly_stack_request_poly(nmod_poly_stack_t S, slong k)
     return poly_top;
 }
 
-NMOD_MPOLY_INLINE
+FLINT_FORCE_INLINE
 n_poly_struct * nmod_poly_stack_take_top_poly(nmod_poly_stack_t S)
 {
     /* assume the request for 1 has already been fitted */
@@ -185,21 +185,21 @@ n_poly_struct * nmod_poly_stack_take_top_poly(nmod_poly_stack_t S)
     return poly_top[0];
 }
 
-NMOD_MPOLY_INLINE
+FLINT_FORCE_INLINE
 void nmod_poly_stack_give_back_poly(nmod_poly_stack_t S, slong k)
 {
     FLINT_ASSERT(S->poly_top >= k);
     S->poly_top -= k;
 }
 
-NMOD_MPOLY_INLINE
+FLINT_FORCE_INLINE
 slong nmod_poly_stack_size_poly(const nmod_poly_stack_t S)
 {
     return S->poly_top;
 }
 
 
-NMOD_MPOLY_INLINE
+FLINT_FORCE_INLINE
 nmod_mpolyun_struct ** nmod_poly_stack_request_mpolyun(nmod_poly_stack_t S, slong k)
 {
     nmod_mpolyun_struct ** mpolyun_top;
@@ -208,7 +208,7 @@ nmod_mpolyun_struct ** nmod_poly_stack_request_mpolyun(nmod_poly_stack_t S, slon
     return mpolyun_top;
 }
 
-NMOD_MPOLY_INLINE
+FLINT_FORCE_INLINE
 nmod_mpolyun_struct * nmod_poly_stack_take_top_mpolyun(nmod_poly_stack_t S)
 {
     /* assume the request for 1 has already been fitted */
@@ -219,20 +219,20 @@ nmod_mpolyun_struct * nmod_poly_stack_take_top_mpolyun(nmod_poly_stack_t S)
     return mpolyun_top[0];
 }
 
-NMOD_MPOLY_INLINE
+FLINT_FORCE_INLINE
 void nmod_poly_stack_give_back_mpolyun(nmod_poly_stack_t S, slong k)
 {
     FLINT_ASSERT(S->mpolyun_top >= k);
     S->mpolyun_top -= k;
 }
 
-NMOD_MPOLY_INLINE
+FLINT_FORCE_INLINE
 slong nmod_poly_stack_size_mpolyun(const nmod_poly_stack_t S)
 {
     return S->mpolyun_top;
 }
 
-NMOD_MPOLY_INLINE
+FLINT_FORCE_INLINE
 nmod_mpolyn_struct ** nmod_poly_stack_request_mpolyn(nmod_poly_stack_t S, slong k)
 {
     nmod_mpolyn_struct ** mpolyn_top;
@@ -241,7 +241,7 @@ nmod_mpolyn_struct ** nmod_poly_stack_request_mpolyn(nmod_poly_stack_t S, slong 
     return mpolyn_top;
 }
 
-NMOD_MPOLY_INLINE
+FLINT_FORCE_INLINE
 nmod_mpolyn_struct * nmod_poly_stack_take_top_mpolyn(nmod_poly_stack_t S)
 {
     /* assume the request for 1 has already been fitted */
@@ -252,14 +252,14 @@ nmod_mpolyn_struct * nmod_poly_stack_take_top_mpolyn(nmod_poly_stack_t S)
     return mpolyn_top[0];
 }
 
-NMOD_MPOLY_INLINE
+FLINT_FORCE_INLINE
 void nmod_poly_stack_give_back_mpolyn(nmod_poly_stack_t S, slong k)
 {
     FLINT_ASSERT(S->mpolyn_top >= k);
     S->mpolyn_top -= k;
 }
 
-NMOD_MPOLY_INLINE
+FLINT_FORCE_INLINE
 slong nmod_poly_stack_size_mpolyn(const nmod_poly_stack_t S)
 {
     return S->mpolyn_top;
@@ -297,12 +297,6 @@ NMOD_MPOLY_INLINE
 mp_limb_t nmod_mpoly_ctx_modulus(const nmod_mpoly_ctx_t ctx)
 {
     return ctx->mod.n;
-}
-
-NMOD_MPOLY_INLINE
-void nmod_mpoly_ctx_change_modulus(nmod_mpoly_ctx_t ctx, mp_limb_t modulus)
-{
-    nmod_init(&ctx->mod, modulus);
 }
 
 /*  Memory management ********************************************************/
@@ -1143,12 +1137,9 @@ void nmod_mpoly_from_univar(nmod_mpoly_t A,
            const nmod_mpoly_univar_t B, slong var, const nmod_mpoly_ctx_t ctx);
 
 NMOD_MPOLY_INLINE
-void nmod_mpoly_univar_swap(nmod_mpoly_univar_t A, nmod_mpoly_univar_t B,
-                                                    const nmod_mpoly_ctx_t ctx)
+void nmod_mpoly_univar_swap(nmod_mpoly_univar_t A, nmod_mpoly_univar_t B, const nmod_mpoly_ctx_t ctx)
 {
-    nmod_mpoly_univar_struct t = *A;
-    *A = *B;
-    *B = t;
+    FLINT_SWAP(nmod_mpoly_univar_struct, *A, *B);
 }
 
 NMOD_MPOLY_INLINE
@@ -1271,12 +1262,9 @@ void nmod_mpolyd_ctx_init(nmod_mpolyd_ctx_t dctx, slong nvars);
 
 void nmod_mpolyd_ctx_clear(nmod_mpolyd_ctx_t dctx);
 
-NMOD_MPOLY_INLINE void nmod_mpolyd_swap(nmod_mpolyd_t poly1,
-                                nmod_mpolyd_t poly2)
+FLINT_FORCE_INLINE void nmod_mpolyd_swap(nmod_mpolyd_t poly1, nmod_mpolyd_t poly2)
 {
-   nmod_mpolyd_struct t = *poly1;
-   *poly1 = *poly2;
-   *poly2 = t;
+   FLINT_SWAP(nmod_mpolyd_struct, *poly1, *poly2);
 }
 
 int nmod_mpolyd_set_degbounds(nmod_mpolyd_t A, slong * bounds);
@@ -1320,10 +1308,17 @@ void nmod_mpolyu_init(nmod_mpolyu_t A, flint_bitcnt_t bits,
 
 void nmod_mpolyu_clear(nmod_mpolyu_t A, const nmod_mpoly_ctx_t uctx);
 
-void nmod_mpolyu_swap(nmod_mpolyu_t A, nmod_mpolyu_t B,
-                                                  const nmod_mpoly_ctx_t uctx);
+FLINT_FORCE_INLINE
+void nmod_mpolyu_swap(nmod_mpolyu_t A, nmod_mpolyu_t B, const nmod_mpoly_ctx_t uctx)
+{
+   FLINT_SWAP(nmod_mpolyu_struct, *A, *B);
+}
 
-void nmod_mpolyu_zero(nmod_mpolyu_t A, const nmod_mpoly_ctx_t uctx);
+FLINT_FORCE_INLINE
+void nmod_mpolyu_zero(nmod_mpolyu_t A, const nmod_mpoly_ctx_t uctx)
+{
+    A->length = 0;
+}
 
 int nmod_mpolyu_is_one(nmod_mpolyu_t A, const nmod_mpoly_ctx_t uctx);
 
@@ -1476,7 +1471,11 @@ void nmod_mpolyun_init(nmod_mpolyun_t A, flint_bitcnt_t bits,
 
 void nmod_mpolyun_clear(nmod_mpolyun_t A, const nmod_mpoly_ctx_t ctx);
 
-void nmod_mpolyun_swap(nmod_mpolyun_t A, nmod_mpolyun_t B);
+FLINT_FORCE_INLINE
+void nmod_mpolyun_swap(nmod_mpolyun_t A, nmod_mpolyun_t B)
+{
+    FLINT_SWAP(nmod_mpolyun_struct, *A, *B);
+}
 
 void nmod_mpolyun_zero(nmod_mpolyun_t A, const nmod_mpoly_ctx_t ctx);
 

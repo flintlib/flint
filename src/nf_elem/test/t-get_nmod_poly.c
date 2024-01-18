@@ -11,6 +11,8 @@
 */
 
 #include "test_helpers.h"
+#include "ulong_extras.h"
+#include "nmod.h"
 #include "nmod_poly.h"
 #include "nf_elem.h"
 
