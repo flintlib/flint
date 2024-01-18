@@ -1379,23 +1379,6 @@ int mpoly_test_irreducible(ulong * Aexps, flint_bitcnt_t Abits,
 int _mpoly_test_irreducible(slong * Aexps, slong stride, slong Alen,
                             slong nvars, flint_rand_t state, slong tries_left);
 
-typedef struct {
-    slong mvars;
-    slong nvars;
-    slong * exps;
-    slong exps_alloc;
-    slong * rest;
-    slong rest_alloc;
-    slong * umat;
-    slong * deltas;
-    slong * degs;
-    int is_trivial;
-    int is_perm;
-    int is_irred;
-} mpoly_compression_struct;
-
-typedef mpoly_compression_struct mpoly_compression_t[1];
-
 void mpoly_compression_init(mpoly_compression_t M);
 
 void mpoly_compression_clear(mpoly_compression_t M);

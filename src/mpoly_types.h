@@ -150,6 +150,23 @@ typedef struct
 
 typedef mpoly_gcd_info_struct mpoly_gcd_info_t[1];
 
+typedef struct {
+    slong mvars;
+    slong nvars;
+    slong * exps;
+    slong exps_alloc;
+    slong * rest;
+    slong rest_alloc;
+    slong * umat;
+    slong * deltas;
+    slong * degs;
+    int is_trivial;
+    int is_perm;
+    int is_irred;
+} mpoly_compression_struct;
+
+typedef mpoly_compression_struct mpoly_compression_t[1];
+
 /*
     nmod_mpolyn_t
     multivariates with n_poly_t coefficients
