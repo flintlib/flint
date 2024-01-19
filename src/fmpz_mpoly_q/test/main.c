@@ -20,6 +20,7 @@
 #include "t-div.c"
 #include "t-div_fmpq.c"
 #include "t-div_fmpz.c"
+#include "t-get_set_str.c"
 #include "t-inv.c"
 #include "t-mul.c"
 #include "t-mul_fmpq.c"
@@ -39,6 +40,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mpoly_q_div),
     TEST_FUNCTION(fmpz_mpoly_q_div_fmpq),
     TEST_FUNCTION(fmpz_mpoly_q_div_fmpz),
+    TEST_FUNCTION(fmpz_mpoly_q_get_set_str),
     TEST_FUNCTION(fmpz_mpoly_q_inv),
     TEST_FUNCTION(fmpz_mpoly_q_mul),
     TEST_FUNCTION(fmpz_mpoly_q_mul_fmpq),

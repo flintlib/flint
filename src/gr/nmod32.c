@@ -74,7 +74,7 @@ nmod32_randtest(nmod32_t res, flint_rand_t state, const gr_ctx_t ctx)
 int
 nmod32_write(gr_stream_t out, const nmod32_t x, const gr_ctx_t ctx)
 {
-    gr_stream_write_si(out, x[0]);
+    gr_stream_write_ui(out, x[0]);
     return GR_SUCCESS;
 }
 

@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_mpoly_q.h"
+#include "gr.h"
 
 void
 fmpz_mpoly_q_print_pretty(const fmpz_mpoly_q_t f, const char ** x, const fmpz_mpoly_ctx_t ctx)
@@ -33,4 +34,33 @@ fmpz_mpoly_q_print_pretty(const fmpz_mpoly_q_t f, const char ** x, const fmpz_mp
         fmpz_mpoly_print_pretty(fmpz_mpoly_q_denref(f), x, ctx);
         flint_printf(")");
     }
+}
+
+char * fmpz_mpoly_q_get_str_pretty(const fmpz_mpoly_q_t f, const char ** vars, const fmpz_mpoly_ctx_t ctx)
+{
+    gr_ctx_t grctx;
+    char * s;
+
+    gr_ctx_init_fmpz_mpoly_q(grctx, ctx->minfo->nvars, ctx->minfo->ord);
+    if (vars != NULL)
+        GR_MUST_SUCCEED(gr_ctx_set_gen_names(grctx, vars));
+    GR_MUST_SUCCEED(gr_get_str(&s, f, grctx));
+    gr_ctx_clear(grctx);
+
+    return s;
+}
+
+int
+fmpz_mpoly_q_set_str_pretty(fmpz_mpoly_q_t res, const char * s, const char ** vars, fmpz_mpoly_ctx_t ctx)
+{
+    gr_ctx_t grctx;
+    int ret;
+
+    gr_ctx_init_fmpz_mpoly_q(grctx, ctx->minfo->nvars, ctx->minfo->ord);
+    if (vars != NULL)
+        GR_MUST_SUCCEED(gr_ctx_set_gen_names(grctx, vars));
+    ret = (GR_SUCCESS == gr_set_str(res, s, grctx)) ? 0 : -1;
+
+    gr_ctx_clear(grctx);
+    return ret;
 }

@@ -167,6 +167,8 @@ typedef enum
     GR_METHOD_WRITE,
     GR_METHOD_WRITE_N,
 
+    _GR_METHOD_LENGTH,
+
     GR_METHOD_RANDTEST,
     GR_METHOD_RANDTEST_NOT_ZERO,
     GR_METHOD_RANDTEST_SMALL,
@@ -851,6 +853,7 @@ typedef int ((*gr_method_poly_binary_op)(gr_ptr, gr_srcptr, slong, gr_srcptr, sl
 typedef int ((*gr_method_poly_binary_binary_op)(gr_ptr, gr_ptr, gr_srcptr, slong, gr_srcptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_poly_binary_trunc_op)(gr_ptr, gr_srcptr, slong, gr_srcptr, slong, slong, gr_ctx_ptr));
 typedef int ((*gr_method_vec_ctx_op)(gr_vec_t, gr_ctx_ptr));
+typedef slong ((*_gr_method_get_si_op)(gr_srcptr, gr_ctx_ptr));
 
 #ifdef FEXPR_H
 typedef int ((*gr_method_get_fexpr_op)(fexpr_t, gr_srcptr, gr_ctx_ptr));
@@ -945,6 +948,7 @@ typedef int ((*gr_method_set_fexpr_op)(gr_ptr, fexpr_vec_t, gr_vec_t, const fexp
 #define GR_POLY_BINARY_BINARY_OP(ctx, NAME) (((gr_method_poly_binary_binary_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_POLY_BINARY_TRUNC_OP(ctx, NAME) (((gr_method_poly_binary_trunc_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_CTX_OP(ctx, NAME) (((gr_method_vec_ctx_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define _GR_GET_SI_OP(ctx, NAME) (((_gr_method_get_si_op *) ctx->methods)[_GR_METHOD_ ## NAME])
 #ifdef FEXPR_H
 #define GR_GET_FEXPR_OP(ctx, NAME) (((gr_method_get_fexpr_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_SET_FEXPR_OP(ctx, NAME) (((gr_method_set_fexpr_op *) ctx->methods)[GR_METHOD_ ## NAME])
@@ -992,6 +996,8 @@ GR_INLINE void gr_init(gr_ptr res, gr_ctx_t ctx) { GR_INIT_CLEAR_OP(ctx, INIT)(r
 GR_INLINE void gr_clear(gr_ptr res, gr_ctx_t ctx) { GR_INIT_CLEAR_OP(ctx, CLEAR)(res, ctx); }
 GR_INLINE void gr_swap(gr_ptr x, gr_ptr y, gr_ctx_t ctx) { GR_SWAP_OP(ctx, SWAP)(x, y, ctx); }
 GR_INLINE void gr_set_shallow(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { GR_VOID_UNARY_OP(ctx, SET_SHALLOW)(res, x, ctx); }
+
+GR_INLINE void _gr_length(gr_srcptr x, gr_ctx_t ctx) { _GR_GET_SI_OP(ctx, LENGTH)(x, ctx); }
 
 GR_INLINE WARN_UNUSED_RESULT int gr_randtest(gr_ptr x, flint_rand_t state, gr_ctx_t ctx) { return GR_RANDTEST(ctx, RANDTEST)(x, state, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_randtest_not_zero(gr_ptr x, flint_rand_t state, gr_ctx_t ctx) { return GR_RANDTEST(ctx, RANDTEST_NOT_ZERO)(x, state, ctx); }

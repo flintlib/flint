@@ -696,7 +696,7 @@ gr_method_tab_input _fmpq_poly_methods_input[] =
     {GR_METHOD_SET_UI,          (gr_funcptr) _gr_fmpq_poly_set_ui},
     {GR_METHOD_SET_FMPZ,        (gr_funcptr) _gr_fmpq_poly_set_fmpz},
     {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_fmpq_poly_set_other},
-/*    {GR_METHOD_SET_STR,         (gr_funcptr) _gr_fmpq_poly_set_str}, */
+    {GR_METHOD_SET_STR,         (gr_funcptr) gr_generic_set_str_balance_additions},
     {GR_METHOD_GET_UI,          (gr_funcptr) _gr_fmpq_poly_get_ui},
     {GR_METHOD_GET_SI,          (gr_funcptr) _gr_fmpq_poly_get_si},
     {GR_METHOD_GET_FMPZ,        (gr_funcptr) _gr_fmpq_poly_get_fmpz},

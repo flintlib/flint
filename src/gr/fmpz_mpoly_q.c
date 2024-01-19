@@ -16,6 +16,7 @@
 #include "fmpz_mpoly.h"
 #include "fmpz_mpoly_q.h"
 #include "fmpz_mpoly_factor.h"
+#include "gr_generic.h"
 
 typedef struct
 {
@@ -92,6 +93,12 @@ _gr_fmpz_mpoly_q_randtest_small(fmpz_mpoly_q_t res, flint_rand_t state, gr_ctx_t
 {
     fmpz_mpoly_q_randtest(res, state, n_randint(state, 3), 3, 1 + n_randint(state, 3), MPOLYNOMIAL_MCTX(ctx));
     return GR_SUCCESS;
+}
+
+slong
+_gr_fmpz_mpoly_q_length(const fmpz_mpoly_q_t x, gr_ctx_t ctx)
+{
+    return fmpz_mpoly_q_numref(x)->length + fmpz_mpoly_q_denref(x)->length;
 }
 
 int
@@ -533,6 +540,7 @@ gr_method_tab_input _gr_fmpz_mpoly_q_methods_input[] =
     {GR_METHOD_SET_SHALLOW, (gr_funcptr) _gr_fmpz_mpoly_q_set_shallow},
     {GR_METHOD_RANDTEST,    (gr_funcptr) _gr_fmpz_mpoly_q_randtest},
     {GR_METHOD_RANDTEST_SMALL,    (gr_funcptr) _gr_fmpz_mpoly_q_randtest_small},
+    {_GR_METHOD_LENGTH,     (gr_funcptr) _gr_fmpz_mpoly_q_length},
     {GR_METHOD_WRITE,       (gr_funcptr) _gr_fmpz_mpoly_q_write},
     {GR_METHOD_ZERO,        (gr_funcptr) _gr_fmpz_mpoly_q_zero},
     {GR_METHOD_ONE,         (gr_funcptr) _gr_fmpz_mpoly_q_one},
@@ -545,6 +553,7 @@ gr_method_tab_input _gr_fmpz_mpoly_q_methods_input[] =
     {GR_METHOD_SET_SI,      (gr_funcptr) _gr_fmpz_mpoly_q_set_si},
     {GR_METHOD_SET_FMPZ,    (gr_funcptr) _gr_fmpz_mpoly_q_set_fmpz},
     {GR_METHOD_SET_FMPQ,    (gr_funcptr) _gr_fmpz_mpoly_q_set_fmpq},
+    {GR_METHOD_SET_STR,     (gr_funcptr) gr_generic_set_str_balance_additions},
     {GR_METHOD_NEG,         (gr_funcptr) _gr_fmpz_mpoly_q_neg},
     {GR_METHOD_ADD,         (gr_funcptr) _gr_fmpz_mpoly_q_add},
     {GR_METHOD_ADD_SI,      (gr_funcptr) _gr_fmpz_mpoly_q_add_si},

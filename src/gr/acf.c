@@ -1182,7 +1182,7 @@ gr_method_tab_input _acf_methods_input[] =
     {GR_METHOD_SET_FMPZ,        (gr_funcptr) _gr_acf_set_fmpz},
     {GR_METHOD_SET_FMPQ,        (gr_funcptr) _gr_acf_set_fmpq},
     {GR_METHOD_SET_D,           (gr_funcptr) _gr_acf_set_d},
-/*    {GR_METHOD_SET_STR,         (gr_funcptr) _gr_acf_set_str}, */
+    {GR_METHOD_SET_STR,         (gr_funcptr) gr_generic_set_str_ring_exponents},
     {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_acf_set_other},
 
     {GR_METHOD_GET_FMPZ,        (gr_funcptr) _gr_acf_get_fmpz},

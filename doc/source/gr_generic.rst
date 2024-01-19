@@ -39,6 +39,30 @@
 .. function:: int gr_generic_set_other(gr_ptr res, gr_srcptr x, gr_ctx_t xctx, gr_ctx_t ctx)
               int gr_generic_set_fmpq(gr_ptr res, const fmpq_t y, gr_ctx_t ctx)
 
+Generic string parsing
+-----------------------------------------------------------------------------------------
+
+.. macro :: GR_PARSE_BALANCE_ADDITIONS
+
+.. macro :: GR_PARSE_RING_EXPONENTS
+
+.. function:: int gr_generic_set_str_expr(gr_ptr res, const char * s, int flags, gr_ctx_t ctx)
+              int gr_generic_set_str(gr_ptr res, const char * s, gr_ctx_t ctx)
+              int gr_generic_set_str_balance_additions(gr_ptr res, const char * s, gr_ctx_t ctx)
+              int gr_generic_set_str_ring_exponents(gr_ptr res, const char * s, gr_ctx_t ctx)
+
+    Parses expression string. Generators returned by :func:`gr_gens_recursive` are handled
+    automatically. We have the following flags:
+
+    * ``GR_PARSE_RING_EXPONENTS`` - by default, only (nonnegative) integer literals are allowed
+      for exponents. If this flag is set, exponents are parsed as arbitrary subexpressions
+      within the same ring.
+    * ``GR_PARSE_BALANCE_ADDITIONS`` - attempt to improve performance for huge sums
+      by reording additions (useful for polynomials)
+
+Generic arithmetic
+-----------------------------------------------------------------------------------------
+
 .. function:: int gr_generic_add_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
               int gr_generic_add_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
               int gr_generic_add_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
