@@ -1,5 +1,7 @@
 /*
     Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2014 Ashish Kedia
+    Copyright (C) 2023 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -11,6 +13,32 @@
 
 #include "ulong_extras.h"
 #include "nmod_mat.h"
+#include "fmpz.h"
+
+void
+nmod_mat_scalar_addmul_ui(nmod_mat_t dest, const nmod_mat_t X,
+                                          const nmod_mat_t Y, const mp_limb_t b)
+{
+    slong i, j;
+
+    if (b == UWORD(0))
+    {
+        if (dest != X)
+            nmod_mat_set(dest, X);
+        return;
+    }
+
+    for (i = 0; i < X->r; i++)
+    {
+        for (j = 0; j < X->c; j++)
+        {
+            nmod_mat_entry(dest, i, j) =
+                n_addmod(nmod_mat_entry(X, i, j),
+                    n_mulmod2_preinv(nmod_mat_entry(Y, i, j), b, Y->mod.n,
+                                                        Y->mod.ninv), X->mod.n);
+        }
+    }
+}
 
 #define UWORD_HALF (UWORD_MAX / 2 + 1)
 
@@ -48,4 +76,10 @@ nmod_mat_scalar_mul(nmod_mat_t B, const nmod_mat_t A, mp_limb_t c)
                 nmod_mat_entry(B, i, j) = n_mulmod2_preinv(
                     nmod_mat_entry(A, i, j), c, A->mod.n, A->mod.ninv);
     }
+}
+
+void
+nmod_mat_scalar_mul_fmpz(nmod_mat_t res, const nmod_mat_t M, const fmpz_t c)
+{
+    nmod_mat_scalar_mul(res, M, fmpz_get_nmod(c, res->mod));
 }
