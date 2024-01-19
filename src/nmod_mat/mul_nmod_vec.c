@@ -29,3 +29,30 @@ void nmod_mat_mul_nmod_vec(
         NMOD_VEC_DOT(c[i], j, len, Ai[j], b[j], mod, nlimbs);
     }
 }
+
+void nmod_mat_mul_nmod_vec_ptr(
+    mp_limb_t * const * c,
+    const nmod_mat_t A,
+    const mp_limb_t * const * b, slong blen)
+{
+    slong i;
+    slong len = FLINT_MIN(A->c, blen);
+    slong nrows = A->r;
+    mp_limb_t * bb, * cc;
+    TMP_INIT;
+
+    TMP_START;
+
+    bb = TMP_ARRAY_ALLOC(len, mp_limb_t);
+    cc = TMP_ARRAY_ALLOC(nrows, mp_limb_t);
+
+    for (i = 0; i < len; i++)
+        bb[i] = b[i][0];
+
+    nmod_mat_mul_nmod_vec(cc, A, bb, len);
+
+    for (i = 0; i < nrows; i++)
+        c[i][0] = cc[i];
+
+    TMP_END;
+}
