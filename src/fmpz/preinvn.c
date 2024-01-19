@@ -9,8 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "ulong_extras.h"
 #include "mpn_extras.h"
 #include "fmpz.h"
 
@@ -51,4 +49,9 @@ void fmpz_preinvn_init(fmpz_preinvn_t inv, const fmpz_t f)
    }
 
    inv->norm = norm;
+}
+
+void fmpz_preinvn_clear(fmpz_preinvn_t inv)
+{
+   flint_free(inv->dinv);
 }
