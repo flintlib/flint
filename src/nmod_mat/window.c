@@ -1,8 +1,8 @@
 /*
-    Copyright (C) 2008, 2009 William Hart.
-    Copyright (C) 2008, Richard Howell-Peak
-    Copyright (C) 2008, Martin Albrecht
-    Copyright (C) 2010, Fredrik Johansson
+    Copyright (C) 2008 2009 William Hart
+    Copyright (C) 2008 Richard Howell-Peak
+    Copyright (C) 2008 Martin Albrecht
+    Copyright (C) 2010 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -39,4 +39,11 @@ nmod_mat_window_init(nmod_mat_t window, const nmod_mat_t mat,
     window->r = r2 - r1;
     window->c = c2 - c1;
     window->mod = mat->mod;
+}
+
+void
+nmod_mat_window_clear(nmod_mat_t window)
+{
+    if (window->r > 0)
+        flint_free(window->rows);
 }
