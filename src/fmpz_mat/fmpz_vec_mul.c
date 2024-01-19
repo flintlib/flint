@@ -27,3 +27,19 @@ void fmpz_mat_fmpz_vec_mul(
             fmpz_addmul(c + i, a + j, fmpz_mat_entry(B, j, i));
     }
 }
+
+void fmpz_mat_fmpz_vec_mul_ptr(
+    fmpz * const * c,
+    const fmpz * const * a, slong alen,
+    const fmpz_mat_t B)
+{
+    slong i, j;
+    slong len = FLINT_MIN(B->r, alen);
+
+    for (i = B->c - 1; i >= 0; i--)
+    {
+        fmpz_zero(c[i]);
+        for (j = 0; j < len; j++)
+            fmpz_addmul(c[i], a[j], fmpz_mat_entry(B, j, i));
+    }
+}
