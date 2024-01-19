@@ -30,6 +30,10 @@ Utility functions
 
     Returns `1` if all limbs of ``(x, xsize)`` are zero, otherwise `0`.
 
+.. function:: mp_limb_t flint_mpn_sumdiff_n(mp_ptr s, mp_ptr d, mp_srcptr x, mp_srcptr y, mp_size_t n)
+
+    Simultaneously computes the sum ``s`` and difference ``d`` of ``(x, n)`` and ``(y, n)``,
+    returning carry multiplied by two plus borrow.
 
 Multiplication
 --------------------------------------------------------------------------------
