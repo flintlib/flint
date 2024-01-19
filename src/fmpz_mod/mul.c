@@ -161,3 +161,40 @@ void _fmpz_mod_mulN(fmpz_t a, const fmpz_t b, const fmpz_t c,
 
     FLINT_ASSERT(fmpz_mod_is_canonical(a, ctx));
 }
+
+void fmpz_mod_mul_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t c,
+                                                      const fmpz_mod_ctx_t ctx)
+{
+    FLINT_ASSERT(fmpz_mod_is_canonical(b, ctx));
+
+    fmpz_mul(a, b, c);
+
+    if (ctx->ninv_huge == NULL)
+        fmpz_mod(a, a, ctx->n);
+    else
+        fmpz_fdiv_r_preinvn(a, a, ctx->n, ctx->ninv_huge);
+
+    FLINT_ASSERT(fmpz_mod_is_canonical(a, ctx));
+}
+
+void fmpz_mod_mul_ui(fmpz_t a, const fmpz_t b, ulong c,
+                                                      const fmpz_mod_ctx_t ctx)
+{
+    FLINT_ASSERT(fmpz_mod_is_canonical(b, ctx));
+
+    fmpz_mul_ui(a, b, c);
+    fmpz_mod(a, a, ctx->n);
+
+    FLINT_ASSERT(fmpz_mod_is_canonical(a, ctx));
+}
+
+void fmpz_mod_mul_si(fmpz_t a, const fmpz_t b, slong c,
+                                                      const fmpz_mod_ctx_t ctx)
+{
+    FLINT_ASSERT(fmpz_mod_is_canonical(b, ctx));
+
+    fmpz_mul_si(a, b, c);
+    fmpz_mod(a, a, ctx->n);
+
+    FLINT_ASSERT(fmpz_mod_is_canonical(a, ctx));
+}
