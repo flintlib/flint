@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2010 William Hart
+    Copyright (C) 2010 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -37,4 +38,11 @@ fmpz_mat_init(fmpz_mat_t mat, slong rows, slong cols)
 
     mat->r = rows;
     mat->c = cols;
+}
+
+void
+fmpz_mat_init_set(fmpz_mat_t mat, const fmpz_mat_t src)
+{
+    fmpz_mat_init(mat, src->r, src->c);
+    fmpz_mat_set(mat, src);
 }
