@@ -13,6 +13,7 @@
 #include <stdlib.h>
 
 #include "mpoly.h"
+#include "fmpz_mpoly_q.h"
 #include "nf.h"
 #include "gr.h"
 
