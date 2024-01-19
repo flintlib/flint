@@ -21,3 +21,15 @@ fmpz_poly_get_coeff_fmpz(fmpz_t x, const fmpz_poly_t poly, slong n)
     else
         fmpz_zero(x);
 }
+
+slong
+fmpz_poly_get_coeff_si(const fmpz_poly_t poly, slong n)
+{
+    return (n < poly->length) ? fmpz_get_si(poly->coeffs + n) : WORD(0);
+}
+
+ulong
+fmpz_poly_get_coeff_ui(const fmpz_poly_t poly, slong n)
+{
+    return (n < poly->length) ? fmpz_get_ui(poly->coeffs + n) : UWORD(0);
+}
