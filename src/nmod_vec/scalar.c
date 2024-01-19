@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2010 William Hart
+    Copyright (C) 2010, 2015 William Hart
+    Copyright (C) 2015 Vladimir Glazachev
     Copyright (C) 2021 Fredrik Johansson
 
     This file is part of FLINT.
@@ -63,4 +64,43 @@ void _nmod_vec_scalar_addmul_nmod(mp_ptr res, mp_srcptr vec,
         _nmod_vec_scalar_addmul_nmod_shoup(res, vec, len, c, mod);
     else
         _nmod_vec_scalar_addmul_nmod_generic(res, vec, len, c, mod);
+}
+
+void _nmod_vec_scalar_mul_nmod_fullword(mp_ptr res, mp_srcptr vec,
+                               slong len, mp_limb_t c, nmod_t mod)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        NMOD_MUL_FULLWORD(res[i], vec[i], c, mod);
+}
+
+void _nmod_vec_scalar_mul_nmod_generic(mp_ptr res, mp_srcptr vec,
+                               slong len, mp_limb_t c, nmod_t mod)
+{
+    slong i;
+
+    for (i = 0; i < len; i++)
+        NMOD_MUL_PRENORM(res[i], vec[i], c << mod.norm, mod);
+}
+
+void _nmod_vec_scalar_mul_nmod(mp_ptr res, mp_srcptr vec,
+                               slong len, mp_limb_t c, nmod_t mod)
+{
+    if (NMOD_BITS(mod) == FLINT_BITS)
+        _nmod_vec_scalar_mul_nmod_fullword(res, vec, len, c, mod);
+    else if (len > 10)
+        _nmod_vec_scalar_mul_nmod_shoup(res, vec, len, c, mod);
+    else
+        _nmod_vec_scalar_mul_nmod_generic(res, vec, len, c, mod);
+}
+
+void _nmod_vec_scalar_mul_nmod_shoup(mp_ptr res, mp_srcptr vec,
+                               slong len, mp_limb_t c, nmod_t mod)
+{
+    slong i;
+    mp_limb_t w_pr;
+    w_pr = n_mulmod_precomp_shoup(c, mod.n);
+    for (i = 0; i < len; i++)
+        res[i] = n_mulmod_shoup(c, vec[i], w_pr, mod.n);
 }
