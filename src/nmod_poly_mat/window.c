@@ -34,3 +34,10 @@ nmod_poly_mat_window_init(nmod_poly_mat_t window, const nmod_poly_mat_t mat,
     window->c = c2 - c1;
     window->modulus = mat->modulus;
 }
+
+void
+nmod_poly_mat_window_clear(nmod_poly_mat_t window)
+{
+    if (window->r != 0)
+        flint_free(window->rows);
+}
