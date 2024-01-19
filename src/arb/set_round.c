@@ -23,3 +23,27 @@ arb_set_round(arb_t z, const arb_t x, slong prec)
     else
         mag_set(arb_radref(z), arb_radref(x));
 }
+
+void
+arb_set_round_fmpz_2exp(arb_t y, const fmpz_t x, const fmpz_t exp, slong prec)
+{
+    int inexact;
+    inexact = arf_set_round_fmpz_2exp(arb_midref(y), x, exp, prec, ARB_RND);
+
+    if (inexact)
+        arf_mag_set_ulp(arb_radref(y), arb_midref(y), prec);
+    else
+        mag_zero(arb_radref(y));
+}
+
+void
+arb_set_round_fmpz(arb_t y, const fmpz_t x, slong prec)
+{
+    int inexact;
+    inexact = arf_set_round_fmpz(arb_midref(y), x, prec, ARB_RND);
+
+    if (inexact)
+        arf_mag_set_ulp(arb_radref(y), arb_midref(y), prec);
+    else
+        mag_zero(arb_radref(y));
+}
