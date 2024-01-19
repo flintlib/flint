@@ -1,6 +1,7 @@
 /* This file is public domain. Author: Fredrik Johansson. */
 
 #include <stdlib.h>
+#include <string.h>
 #include "profiler.h"
 #include "ca.h"
 #include "ca_vec.h"
