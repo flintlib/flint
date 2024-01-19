@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2009 William Hart
     Copyright (C) 2018 Daniel Schultz
+    Copyright (C) 2023 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -87,4 +88,39 @@ int fmpz_pow_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t e)
         fmpz_pow_ui(a, b, fmpz_get_si(e));
     }
     return 1;
+}
+
+void
+fmpz_ui_pow_ui(fmpz_t x, ulong b, ulong e)
+{
+    if (e <= 1)
+    {
+        fmpz_set_ui(x, e == 0 ? 1 : b);
+    }
+    else if (e == 2)
+    {
+        mp_limb_t t[2];
+        umul_ppmm(t[1], t[0], b, b);
+        fmpz_set_uiui(x, t[1], t[0]);
+    }
+    else if (b <= 1)
+    {
+        fmpz_set_ui(x, b);
+    }
+    else
+    {
+        ulong bits = FLINT_BIT_COUNT(b);
+
+        if (e * bits <= FLINT_BITS)
+        {
+            fmpz_set_ui(x, n_pow(b, e));
+        }
+        else
+        {
+            __mpz_struct * z = _fmpz_promote(x);
+            flint_mpz_set_ui(z, b);
+            flint_mpz_pow_ui(z, z, e);
+            _fmpz_demote_val(x);
+        }
+    }
 }
