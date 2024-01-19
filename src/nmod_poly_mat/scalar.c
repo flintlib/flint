@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "nmod_poly.h"
 #include "nmod_poly_mat.h"
 
@@ -23,4 +22,16 @@ nmod_poly_mat_scalar_mul_nmod(nmod_poly_mat_t B, const nmod_poly_mat_t A,
         for (j = 0; j < nmod_poly_mat_ncols(B); j++)
             nmod_poly_scalar_mul_nmod(nmod_poly_mat_entry(B, i, j),
                                       nmod_poly_mat_entry(A, i, j), c);
+}
+
+void
+nmod_poly_mat_scalar_mul_nmod_poly(nmod_poly_mat_t B, const nmod_poly_mat_t A,
+                                                        const nmod_poly_t c)
+{
+    slong i, j;
+
+    for (i = 0; i < nmod_poly_mat_nrows(B); i++)
+        for (j = 0; j < nmod_poly_mat_ncols(B); j++)
+            nmod_poly_mul(nmod_poly_mat_entry(B, i, j),
+                          nmod_poly_mat_entry(A, i, j), c);
 }
