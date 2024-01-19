@@ -61,5 +61,19 @@ void mpoly_ctx_init(mpoly_ctx_t mctx, slong nvars, const ordering_t ord)
         }
         mctx->lut_fix_bits[bits - 1] = new_bits;
     }
+}
 
+void mpoly_ctx_clear(mpoly_ctx_t mctx)
+{
+    return;
+}
+
+void mpoly_ctx_init_rand(mpoly_ctx_t mctx, flint_rand_t state, slong max_nvars)
+{
+    ordering_t ord;
+    slong nvars;
+
+    ord = mpoly_ordering_randtest(state);
+    nvars = n_randint(state, max_nvars + 1);
+    mpoly_ctx_init(mctx, nvars, ord);
 }
