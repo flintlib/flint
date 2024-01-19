@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2015 Fredrik Johansson
+    Copyright (C) 2015, 2024 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -65,15 +65,15 @@ _arb_poly_swinnerton_dyer_ui(arb_ptr T, ulong n, slong trunc, slong prec)
     arb_one(one);
 
     square_roots = _arb_vec_init(n);
-    tmp1 = flint_malloc((N/2 + 1) * sizeof(arb_struct));
-    tmp2 = flint_malloc((N/2 + 1) * sizeof(arb_struct));
-    tmp3 = _arb_vec_init(N);
+    tmp1 = flint_malloc((N / 4 + 1) * sizeof(arb_struct));
+    tmp2 = flint_malloc((N / 4 + 1) * sizeof(arb_struct));
+    tmp3 = _arb_vec_init(N / 2);
 
     for (i = 0; i < n; i++)
         arb_sqrt_ui(square_roots + i, n_nth_prime(i + 1), prec);
 
-    /* Build linear factors */
-    for (i = 0; i < N; i++)
+    /* Build deflated quadratic factors */
+    for (i = 0; i < N / 2; i++)
     {
         arb_zero(T + i);
 
@@ -84,14 +84,17 @@ _arb_poly_swinnerton_dyer_ui(arb_ptr T, ulong n, slong trunc, slong prec)
             else
                 arb_sub(T + i, T + i, square_roots + j, prec);
         }
+
+        arb_sqr(T + i, T + i, prec);
+        arb_neg(T + i, T + i);
     }
 
     /* For each level... */
-    for (i = 0; i < n; i++)
+    for (i = 0; i < n - 1; i++)
     {
         slong stride = UWORD(1) << i;
 
-        for (j = 0; j < N; j += 2*stride)
+        for (j = 0; j < N / 2; j += 2 * stride)
         {
             for (k = 0; k < stride; k++)
             {
@@ -104,15 +107,24 @@ _arb_poly_swinnerton_dyer_ui(arb_ptr T, ulong n, slong trunc, slong prec)
 
             _arb_poly_mullow(tmp3, tmp1, stride + 1, tmp2, stride + 1,
                 FLINT_MIN(2 * stride, trunc), prec);
-            _arb_vec_set(T + j, tmp3, FLINT_MIN(2 * stride, trunc));
+            _arb_vec_swap(T + j, tmp3, FLINT_MIN(2 * stride, trunc));
         }
+    }
+
+    /* Inflate */
+    for (i = N - 2; i >= 0; i -= 2)
+    {
+        if (i < trunc)
+            arb_swap(T + i, T + i / 2);
+        if (i + 1 < trunc)
+            arb_zero(T + i + 1);
     }
 
     arb_one(T + N);
     _arb_vec_clear(square_roots, n);
     flint_free(tmp1);
     flint_free(tmp2);
-    _arb_vec_clear(tmp3, UWORD(1) << n);
+    _arb_vec_clear(tmp3, N / 2);
     arb_clear(one);
 }
 
