@@ -40,12 +40,6 @@ ulong arb_fmpz_poly_deflation(const fmpz_poly_t input);
 
 void arb_fmpz_poly_complex_roots(acb_ptr roots, const fmpz_poly_t poly, int flags, slong target_prec);
 
-FLINT_FORCE_INLINE
-void arb_fmpz_poly_cos_minpoly(fmpz_poly_t res, ulong n)
-{
-    fmpz_poly_cos_minpoly(res, n);
-}
-
 void arb_fmpz_poly_gauss_period_minpoly(fmpz_poly_t res, ulong q, ulong n);
 
 #ifdef __cplusplus
