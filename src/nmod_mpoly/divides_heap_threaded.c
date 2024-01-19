@@ -13,8 +13,10 @@
 
 #if FLINT_KNOW_STRONG_ORDER
 
-#include "nmod.h"
+#include "thread_pool.h"
 #include "thread_support.h"
+#include "nmod.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
 
 #define PROFILE_THIS 0

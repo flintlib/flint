@@ -21,6 +21,11 @@
 #include "nmod_types.h"
 #include "mpoly_types.h"
 
+#if FLINT_WANT_ASSERT
+# include "n_poly.h"
+# include "mpoly.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -10,10 +10,12 @@
 */
 
 #include "fmpz_vec.h"
-#include "fmpz_poly_factor.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_vec.h"
-#include "fmpz_mod_poly_factor.h"
 #include "fmpz_mod_mat.h"
+#include "fmpz_poly_factor.h"
+#include "fmpz_mod_poly_factor.h"
+#include "mpoly.h"
 #include "fmpz_mod_mpoly_factor.h"
 
 void fmpz_mod_tpoly_fit_length(

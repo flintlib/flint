@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_mat.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
 
 /* evaluate B(x_1,...,x_n) at x_i = y_c[i], y_j are vars of ctxAC */

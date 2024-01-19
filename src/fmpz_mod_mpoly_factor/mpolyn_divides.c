@@ -9,8 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_mpoly_factor.h"
 #include "long_extras.h"
+#include "mpoly.h"
+#include "fmpz_mod_mpoly_factor.h"
 
 static void _clear_dense_mock(
     fmpz_mod_poly_t D)

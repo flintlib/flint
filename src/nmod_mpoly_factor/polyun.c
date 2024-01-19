@@ -10,6 +10,7 @@
 */
 
 #include "n_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly_factor.h"
 
 /* assuming B is bivariate in x and y, put x on the outside, y inside */

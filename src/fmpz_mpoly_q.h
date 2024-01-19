@@ -22,7 +22,8 @@
 extern "C" {
 #endif
 
-#include "fmpq.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_mpoly.h"
 #include "acb_types.h"
 

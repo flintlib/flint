@@ -9,8 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fq_zech.h"
+#include "fq_zech_poly.h"
+#include "mpoly.h"
 #include "fq_zech_mpoly_factor.h"
-
 
 #if FLINT_WANT_ASSERT
 static void fq_zech_polyu_set_fq_zech_polyun(

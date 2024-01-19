@@ -11,6 +11,7 @@
 
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
+#include "mpoly.h"
 #include "fmpq_mpoly.h"
 
 int fmpq_mpoly_is_fmpq_poly(

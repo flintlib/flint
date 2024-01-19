@@ -11,7 +11,6 @@
 
 #include "fmpq_mpoly.h"
 
-
 void fmpq_mpoly_divrem(fmpq_mpoly_t Q, fmpq_mpoly_t R,
                           const fmpq_mpoly_t A, const fmpq_mpoly_t B,
                                                     const fmpq_mpoly_ctx_t ctx)

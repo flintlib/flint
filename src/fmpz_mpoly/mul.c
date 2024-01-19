@@ -11,7 +11,10 @@
 
 #include "thread_support.h"
 #include "long_extras.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
 
 static int _try_dense(int try_array, slong * Bdegs, slong * Cdegs,

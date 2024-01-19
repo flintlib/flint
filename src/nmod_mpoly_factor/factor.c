@@ -14,6 +14,7 @@
 #include "fmpz.h"
 #include "n_poly.h"
 #include "nmod_poly_factor.h"
+#include "mpoly.h"
 #include "nmod_mpoly_factor.h"
 
 static slong _deflate(

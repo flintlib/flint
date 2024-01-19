@@ -10,9 +10,11 @@
 */
 
 #include "fmpz_vec.h"
-#include "nmod_mpoly.h"
-#include "fmpz_mod_mpoly_factor.h"
+#include "fmpz_mod.h"
 #include "n_poly.h"
+#include "nmod_mpoly.h"
+#include "mpoly.h"
+#include "fmpz_mod_mpoly_factor.h"
 
 void fmpz_mod_mpolyn_interp_lift_sm_polyu1n(
     fmpz_mod_mpolyn_t F,

@@ -10,8 +10,9 @@
 */
 
 #include <stdio.h>
-#include "fmpz_mod_mpoly.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
+#include "fmpz_mod_mpoly.h"
 
 /* printing *******************************************************************/
 

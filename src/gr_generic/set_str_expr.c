@@ -11,6 +11,7 @@
 */
 
 #include <string.h>
+#include "fmpz.h"
 #include "mpoly.h"
 #include "gr.h"
 #include "gr_special.h"

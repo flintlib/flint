@@ -1,4 +1,4 @@
-/*
+/*r
     Copyright (C) 2018, 2021 Daniel Schultz
 
     This file is part of FLINT.
@@ -9,6 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
 
 void fmpz_pow_cache_init(fmpz_pow_cache_t T, const fmpz_t val)

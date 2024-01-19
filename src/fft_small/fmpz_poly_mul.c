@@ -10,15 +10,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "thread_pool.h"
 #include "thread_support.h"
 #include "nmod.h"
-#include "nmod_vec.h"
-#include "nmod_poly.h"
-#include "fft_small.h"
-#include "crt_helpers.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
-#include "fmpz_poly.h"
+#include "crt_helpers.h"
+#include "fft_small.h"
 
 static void _mod(
     double* abuf, ulong atrunc,

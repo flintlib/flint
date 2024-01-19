@@ -10,8 +10,10 @@
 */
 
 #include "fmpz_vec.h"
-#include "fmpz_mod_mpoly_factor.h"
+#include "fmpz_mod.h"
 #include "n_poly.h"
+#include "mpoly.h"
+#include "fmpz_mod_mpoly_factor.h"
 
 void fmpz_mod_polyu_init(fmpz_mod_polyu_t A)
 {

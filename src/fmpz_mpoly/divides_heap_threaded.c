@@ -13,8 +13,12 @@
 
 #if FLINT_KNOW_STRONG_ORDER
 
+#include "thread_pool.h"
 #include "thread_support.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "mpoly.h"
 
 /*
     a thread safe mpoly supports three mutating operations

@@ -11,6 +11,8 @@
 
 #include "gmpcompat.h"
 #include "nmod.h"
+#include "fmpz_mod.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 #include "fmpz_mod_mpoly.h"
 

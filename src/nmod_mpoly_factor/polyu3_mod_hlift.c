@@ -11,6 +11,7 @@
 
 #include "nmod.h"
 #include "n_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly_factor.h"
 
 #if FLINT_WANT_ASSERT

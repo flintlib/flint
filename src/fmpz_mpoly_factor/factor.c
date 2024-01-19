@@ -10,7 +10,10 @@
 */
 
 #include "ulong_extras.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "mpoly.h"
 #include "fmpz_mpoly_factor.h"
 
 /* A has degree 2 wrt gen(0) */

@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_vec.h"
+#include "mpoly.h"
 #include "fmpz_mod_mpoly.h"
 
 /* evaluate B(xbar) at xbar = C */

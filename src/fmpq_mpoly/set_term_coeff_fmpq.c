@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "fmpq_mpoly.h"
-
 
 void fmpq_mpoly_set_term_coeff_fmpq(fmpq_mpoly_t A,
                            slong i, const fmpq_t x, const fmpq_mpoly_ctx_t ctx)

@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_vec.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
 
 void fmpz_mpoly_fit_bits(fmpz_mpoly_t A,

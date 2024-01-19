@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpoly.h"
 #include "fmpz_mod_mpoly.h"
-
 
 void fmpz_mod_mpoly_geobucket_init(
     fmpz_mod_mpoly_geobucket_t B,

@@ -23,6 +23,7 @@ p-mul nthreads dense m n:
 */
 
 #include <stdlib.h>
+#include <string.h>
 #include "nmod_mpoly.h"
 #include "profiler.h"
 

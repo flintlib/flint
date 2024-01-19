@@ -9,8 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
+#include "mpoly.h"
 #include "fmpz_mpoly_factor.h"
-
 
 void fmpz_mpoly_compression_do(
     fmpz_mpoly_t L,

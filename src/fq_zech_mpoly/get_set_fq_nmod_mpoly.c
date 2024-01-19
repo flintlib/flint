@@ -12,6 +12,8 @@
 #include "fq_nmod.h"
 #include "fq_zech.h"
 #include "n_poly.h"
+#include "mpoly.h"
+#include "fq_nmod_mpoly.h"
 #include "fq_zech_mpoly.h"
 
 void _fq_zech_mpoly_get_fq_nmod_mpoly(

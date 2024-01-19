@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_mpoly_factor.h"
-
 
 void fmpz_mpoly_factor_print_pretty(const fmpz_mpoly_factor_t f,
                                 const char ** vars, const fmpz_mpoly_ctx_t ctx)

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "thread_pool.h"
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"

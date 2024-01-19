@@ -9,9 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpoly.h"
+#include "fq_zech.h"
+#include "fq_zech_poly.h"
 #include "fq_zech_mpoly_factor.h"
-#include "nmod_mpoly_factor.h"
-
 
 int fq_zech_mpoly_is_fq_zech_poly(
     const fq_zech_mpoly_t A,

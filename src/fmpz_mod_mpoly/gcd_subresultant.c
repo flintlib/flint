@@ -9,9 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpoly.h"
 #include "fmpz_mod_mpoly.h"
 #include "fmpz_mod_mpoly_factor.h"
-
 
 int fmpz_mod_mpoly_gcd_subresultant(
     fmpz_mod_mpoly_t G,

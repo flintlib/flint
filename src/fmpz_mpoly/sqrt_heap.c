@@ -20,6 +20,9 @@
 #include "mpn_extras.h"
 #include "nmod.h"
 #include "nmod_mpoly.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
 
 /*

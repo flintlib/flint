@@ -16,6 +16,7 @@
 #include <stdint.h>
 #include "nmod.h"
 #include "fmpz.h"
+#include "thread_pool.h"
 #include "thread_support.h"
 #include "cblas.h"
 

@@ -11,6 +11,7 @@
 
 #include "fmpz_vec.h"
 #include "fmpz_mat.h"
+#include "mpoly.h"
 #include "fmpz_mod_mpoly.h"
 
 /* essentially exps(A) = M*exps(B) */

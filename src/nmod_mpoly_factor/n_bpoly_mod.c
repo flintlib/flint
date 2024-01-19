@@ -11,6 +11,7 @@
 
 #include "nmod.h"
 #include "n_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly_factor.h"
 
 void nmod_mpoly_get_bpoly(

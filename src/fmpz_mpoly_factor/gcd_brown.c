@@ -10,7 +10,11 @@
 */
 
 #include "ulong_extras.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
 #include "n_poly.h"
+#include "mpoly.h"
+#include "nmod_mpoly_factor.h"
 #include "fmpz_mpoly_factor.h"
 
 /* max = max abs coeffs(A) */

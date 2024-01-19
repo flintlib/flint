@@ -10,9 +10,12 @@
 */
 
 #include "ulong_extras.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "nmod_poly_factor.h"
 #include "n_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly_factor.h"
 #include "fmpz_mpoly_factor.h"
 

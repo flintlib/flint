@@ -12,6 +12,10 @@
 #include "fq_nmod.h"
 #include "n_poly.h"
 
+#if FLINT_WANT_ASSERT
+# include "fq_nmod_poly.h"
+#endif
+
 void _n_fq_poly_mullow_(
     mp_limb_t * rop,
     const mp_limb_t * op1, slong len1,

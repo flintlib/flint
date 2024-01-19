@@ -12,6 +12,8 @@
 #include "nmod_vec.h"
 #include "nmod_mat.h"
 #include "nmod_poly.h"
+#include "fq_zech.h"
+#include "fq_zech_poly.h"
 #include "fmpz_poly_factor.h"
 #include "fq_zech_poly_factor.h"
 #include "nmod_mpoly_factor.h"

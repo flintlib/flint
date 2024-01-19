@@ -10,9 +10,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly.h"
 #include "long_extras.h"
-#include "fmpz_mod_mpoly.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "mpoly.h"
+#include "fmpz_mpoly.h"
 
 /*
 Dense algorithm (reference) for the k^th power:

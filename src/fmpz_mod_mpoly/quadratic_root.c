@@ -10,6 +10,7 @@
 */
 
 #include "nmod.h"
+#include "fmpz_mod.h"
 #include "nmod_mpoly.h"
 #include "fmpz_mod_mpoly.h"
 

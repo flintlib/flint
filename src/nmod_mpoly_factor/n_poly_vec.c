@@ -12,6 +12,10 @@
 #include "n_poly.h"
 #include "nmod_mpoly_factor.h"
 
+#if FLINT_WANT_ASSERT
+# include "ulong_extras.h"
+#endif
+
 slong _n_poly_vec_max_degree(const n_poly_struct * A, slong Alen)
 {
     slong i, len = 0;

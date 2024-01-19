@@ -11,6 +11,8 @@
 
 #include "nmod_poly.h"
 #include "fq_zech.h"
+#include "mpoly.h"
+#include "nmod_mpoly.h"
 #include "fq_zech_mpoly.h"
 
 /* TODO move this and make it faster */

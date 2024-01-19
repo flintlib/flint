@@ -10,6 +10,8 @@
 */
 
 #include "fmpz_vec.h"
+#include "fmpz_mod.h"
+#include "mpoly.h"
 #include "fmpz_mod_mpoly.h"
 
 int fmpz_mod_mpoly_pow_fmpz(fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_t B,

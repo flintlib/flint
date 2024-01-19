@@ -9,8 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mod.h"
+#include "mpoly.h"
 #include "fmpz_mod_mpoly.h"
-
 
 static slong _fmpz_mod_mpoly_derivative(
     fmpz * coeff1, ulong * exp1,

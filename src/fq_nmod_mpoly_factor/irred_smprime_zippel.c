@@ -10,7 +10,9 @@
 */
 
 #include "ulong_extras.h"
+#include "fq_nmod.h"
 #include "n_poly.h"
+#include "mpoly.h"
 #include "fq_nmod_mpoly_factor.h"
 
 static void _sort_and_delete_duplicates(

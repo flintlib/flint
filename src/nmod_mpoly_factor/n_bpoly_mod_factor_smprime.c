@@ -14,6 +14,7 @@
 #include "nmod_poly_factor.h"
 #include "fmpz_poly_factor.h"
 #include "n_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly_factor.h"
 
 static void n_bpoly_reverse_gens(n_bpoly_t a, const n_bpoly_t b)

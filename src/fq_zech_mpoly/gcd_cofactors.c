@@ -11,6 +11,7 @@
 
 #include "fq_zech.h"
 #include "fq_zech_vec.h"
+#include "fq_nmod_mpoly.h"
 #include "fq_zech_mpoly.h"
 
 static void _fq_zech_vec_scalar_div_fq_zech(

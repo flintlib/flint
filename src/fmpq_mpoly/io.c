@@ -10,6 +10,7 @@
 */
 
 #include <stdio.h>
+#include "mpoly.h"
 #include "fmpq_mpoly.h"
 
 /* printing *******************************************************************/

@@ -11,7 +11,10 @@
 */
 
 #include "test_helpers.h"
+#include "thread_pool.h"
 #include "thread_support.h"
+#include "fmpz.h"
+#include "mpoly.h"
 #include "fmpz_mpoly_factor.h"
 
 typedef struct

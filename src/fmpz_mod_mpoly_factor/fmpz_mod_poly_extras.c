@@ -9,9 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mod.h"
 #include "fmpz_mod_vec.h"
 #include "fmpz_mod_poly.h"
-#include "fmpz_mod_mpoly.h"
+#include "fmpz_mod_mpoly_factor.h"
 
 /* multiply A by (x^k + c) */
 void fmpz_mod_poly_shift_left_scalar_addmul_fmpz_mod(

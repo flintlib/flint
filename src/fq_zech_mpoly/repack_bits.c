@@ -10,6 +10,7 @@
 */
 
 #include "fq_zech.h"
+#include "mpoly.h"
 #include "fq_zech_mpoly.h"
 
 int fq_zech_mpoly_repack_bits(fq_zech_mpoly_t A, const fq_zech_mpoly_t B,

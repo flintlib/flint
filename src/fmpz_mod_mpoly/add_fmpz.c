@@ -10,6 +10,8 @@
 */
 
 #include "fmpz_vec.h"
+#include "fmpz_mod.h"
+#include "mpoly.h"
 #include "fmpz_mod_mpoly.h"
 
 void fmpz_mod_mpoly_add_fmpz_mod(

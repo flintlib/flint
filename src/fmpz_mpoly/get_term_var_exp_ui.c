@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
 
 ulong fmpz_mpoly_get_term_var_exp_ui(const fmpz_mpoly_t A, slong i,

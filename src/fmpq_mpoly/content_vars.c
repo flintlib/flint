@@ -11,7 +11,6 @@
 
 #include "fmpq_mpoly.h"
 
-
 int fmpq_mpoly_content_vars(
     fmpq_mpoly_t g,
     const fmpq_mpoly_t A,

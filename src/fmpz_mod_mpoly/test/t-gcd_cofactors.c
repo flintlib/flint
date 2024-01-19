@@ -11,6 +11,7 @@
 
 #include "test_helpers.h"
 #include "ulong_extras.h"
+#include "mpoly.h"
 #include "fmpz_mod_mpoly.h"
 
 /* Defined in t-gcd_brown.c, t-gcd_cofactors.c, t-gcd_hensel.c,

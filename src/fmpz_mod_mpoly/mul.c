@@ -9,10 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_mpoly.h"
 #include "ulong_extras.h"
 #include "long_extras.h"
-
+#include "mpoly.h"
+#include "fmpz_mod_mpoly.h"
 
 static int _try_dense(
     const fmpz * maxBfields,

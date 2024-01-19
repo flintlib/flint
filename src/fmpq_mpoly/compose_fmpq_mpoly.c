@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "fmpq_mpoly.h"
-
 
 int fmpq_mpoly_compose_fmpq_mpoly(fmpq_mpoly_t A,
                    const fmpq_mpoly_t B, fmpq_mpoly_struct * const * C,

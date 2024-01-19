@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "fmpq.h"
 #include "fmpz_mpoly_q.h"
 
 TEST_FUNCTION_START(fmpz_mpoly_q_add_fmpq, state)

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpoly.h"
 #include "fmpq_mpoly.h"
 
 void fmpq_mpoly_set_coeff_fmpq_monomial(fmpq_mpoly_t poly1, const fmpq_t c,

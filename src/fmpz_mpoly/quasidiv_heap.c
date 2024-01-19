@@ -10,6 +10,9 @@
 */
 
 #include "ulong_extras.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
 
 slong _fmpz_mpoly_quasidiv_heap1(fmpz_t scale,

@@ -9,8 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_mpoly.h"
 #include "gmpcompat.h"
+#include "fmpz_mod.h"
+#include "mpoly.h"
+#include "fmpz_mod_mpoly.h"
 
 static int _fmpz_mod_mpoly_divrem_monagan_pearce1_binomial(
     fmpz_mod_mpoly_t Q,

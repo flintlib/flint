@@ -9,8 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mod.h"
+#include "mpoly.h"
 #include "fmpz_mod_mpoly_factor.h"
-
 
 static void _fmpz_mod_poly_gcd_cofactors(
     fmpz_mod_poly_t G,

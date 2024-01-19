@@ -10,16 +10,14 @@
 */
 
 #include "fmpz.h"
-#include "fmpq.h"
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 #include "nmod_mat.h"
 #include "gr.h"
 #include "gr_vec.h"
-#include "gr_poly.h"
 #include "gr_mat.h"
-#include "ulong_extras.h"
+#include "gr_poly.h"
 
 #define NMOD_CTX_REF(ring_ctx) (((nmod_t *)((ring_ctx))))
 #define NMOD_CTX(ring_ctx) (*NMOD_CTX_REF(ring_ctx))

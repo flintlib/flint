@@ -11,7 +11,10 @@
 
 #include "nmod.h"
 #include "nmod_poly.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "mpoly.h"
 #include "fmpz_mpoly_factor.h"
 
 /*

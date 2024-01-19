@@ -12,6 +12,10 @@
 #include "fq_nmod.h"
 #include "n_poly.h"
 
+#if FLINT_WANT_ASSERT
+# include "fq_nmod_poly.h"
+#endif
+
 void _n_fq_poly_mul_(
     mp_limb_t * A,  /* length d*(Blen + Clen - 1) */
     const mp_limb_t * B, slong Blen,
