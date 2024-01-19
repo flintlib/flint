@@ -10,6 +10,7 @@
 */
 
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_vec.h"
 
@@ -34,5 +35,38 @@ void _fmpz_mod_vec_scalar_addmul_fmpz_mod(
             fmpz_addmul(A + len, B + len, c);
             fmpz_mod_set_fmpz(A + len, A + len, ctx);
         }
+    }
+}
+
+void _fmpz_mod_vec_scalar_div_fmpz_mod(
+    fmpz * A,
+    const fmpz * B,
+    slong len,
+    const fmpz_t c,
+    const fmpz_mod_ctx_t ctx)
+{
+    fmpz_t d;
+    fmpz_init(d);
+    fmpz_mod_inv(d, c, ctx);
+    for (len--; len >= 0; len--)
+        fmpz_mod_mul(A + len, B + len, d, ctx);
+    fmpz_clear(d);
+}
+
+void _fmpz_mod_vec_scalar_mul_fmpz_mod(
+    fmpz * A,
+    const fmpz * B,
+    slong len,
+    const fmpz_t c,
+    const fmpz_mod_ctx_t ctx)
+{
+    if (fmpz_is_one(c))
+    {
+        _fmpz_vec_set(A, B, len);
+    }
+    else
+    {
+        for (len--; len >= 0; len--)
+            fmpz_mod_mul(A + len, B + len, c, ctx);
     }
 }
