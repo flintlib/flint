@@ -11,7 +11,7 @@
 
 #include "acb_mat.h"
 
-static void
+FLINT_STATIC_NOINLINE void
 copy_re_shallow(arb_mat_t X, const acb_mat_t A)
 {
     slong M, N, i, j;
@@ -22,7 +22,7 @@ copy_re_shallow(arb_mat_t X, const acb_mat_t A)
             *arb_mat_entry(X, i, j) = *acb_realref(acb_mat_entry(A, i, j));
 }
 
-static void
+FLINT_STATIC_NOINLINE void
 copy_im_shallow(arb_mat_t X, const acb_mat_t A)
 {
     slong M, N, i, j;
@@ -33,7 +33,7 @@ copy_im_shallow(arb_mat_t X, const acb_mat_t A)
             *arb_mat_entry(X, i, j) = *acb_imagref(acb_mat_entry(A, i, j));
 }
 
-static void
+FLINT_STATIC_NOINLINE void
 clear_shallow(arb_mat_t X)
 {
     slong M, N, i, j;
