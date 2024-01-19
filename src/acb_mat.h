@@ -45,9 +45,7 @@ void acb_mat_clear(acb_mat_t mat);
 ACB_MAT_INLINE void
 acb_mat_swap(acb_mat_t mat1, acb_mat_t mat2)
 {
-    acb_mat_struct t = *mat1;
-    *mat1 = *mat2;
-    *mat2 = t;
+    FLINT_SWAP(acb_mat_struct, *mat1, *mat2);
 }
 
 ACB_MAT_INLINE void
