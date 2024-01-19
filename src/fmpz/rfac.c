@@ -9,8 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "ulong_extras.h"
 #include "fmpz.h"
 
 static inline ulong rfac(ulong x, ulong b)
@@ -113,5 +111,33 @@ fmpz_rfac_ui(fmpz_t r, const fmpz_t x, ulong n)
     else
     {
         _fmpz_rfac_ui(r, x, 0, n);
+    }
+}
+
+void
+fmpz_rfac_uiui(fmpz_t r, ulong x, ulong n)
+{
+    if (n == 0)
+    {
+        fmpz_one(r);
+    }
+    else if (n == 1)
+    {
+        fmpz_set_ui(r, x);
+    }
+    else if (x == 0)
+    {
+        fmpz_zero(r);
+    }
+    else if (x <= COEFF_MAX)
+    {
+        _fmpz_rfac_ui(r, (fmpz *) &x, 0, n);
+    }
+    else
+    {
+        fmpz_t tmp;
+        fmpz_init_set_ui(tmp, x);
+        fmpz_rfac_ui(r, tmp, n);
+        fmpz_clear(tmp);
     }
 }
