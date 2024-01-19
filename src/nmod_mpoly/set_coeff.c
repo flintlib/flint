@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Daniel Schultz
+    Copyright (C) 2017, 2018 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -100,6 +100,53 @@ void nmod_mpoly_set_coeff_ui_fmpz(
         fmpz_init(newexp + i);
         fmpz_set(newexp + i, exp[i]);
     }
+
+    _nmod_mpoly_set_coeff_ui_fmpz(A, c, newexp, ctx);
+
+    for (i = 0; i < nvars; i++)
+        fmpz_clear(newexp + i);
+
+    TMP_END;
+}
+
+void nmod_mpoly_set_coeff_ui_monomial(nmod_mpoly_t A, ulong c,
+                              const nmod_mpoly_t M, const nmod_mpoly_ctx_t ctx)
+{
+    slong i, nvars = ctx->minfo->nvars;
+    fmpz * texps;
+    TMP_INIT;
+
+    if (M->length != WORD(1))
+    {
+        flint_throw(FLINT_ERROR, "M not monomial in nmod_mpoly_set_coeff_ui_monomial");
+    }
+
+    TMP_START;
+    texps = (fmpz *) TMP_ALLOC(nvars*sizeof(fmpz));
+    for (i = 0; i < nvars; i++)
+        fmpz_init(texps + i);
+
+    mpoly_get_monomial_ffmpz(texps, M->exps + 0, M->bits, ctx->minfo);
+    _nmod_mpoly_set_coeff_ui_fmpz(A, c, texps, ctx);
+
+    for (i = 0; i < nvars; i++)
+        fmpz_clear(texps + i);
+
+    TMP_END;
+    return;
+}
+
+void nmod_mpoly_set_coeff_ui_ui(nmod_mpoly_t A,
+                        ulong c, const ulong * exp, const nmod_mpoly_ctx_t ctx)
+{
+    slong i, nvars = ctx->minfo->nvars;
+    fmpz * newexp;
+    TMP_INIT;
+
+    TMP_START;
+    newexp = (fmpz *) TMP_ALLOC(nvars*sizeof(fmpz));
+    for (i = 0; i < nvars; i++)
+        fmpz_init_set_ui(newexp + i, exp[i]);
 
     _nmod_mpoly_set_coeff_ui_fmpz(A, c, newexp, ctx);
 
