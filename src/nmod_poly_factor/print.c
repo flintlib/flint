@@ -3,6 +3,7 @@
     Copyright (C) 2007, 2008, 2009, 2010 William Hart
     Copyright (C) 2008 Richard Howell-Peak
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2021 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -23,6 +24,16 @@ nmod_poly_factor_print(const nmod_poly_factor_t fac)
     for (i = 0; i < fac->num; i++)
     {
         nmod_poly_print(fac->p + i);
+        flint_printf(" ^ %wd\n", fac->exp[i]);
+    }
+}
+
+void nmod_poly_factor_print_pretty(const nmod_poly_factor_t fac, const char *var)
+{
+    slong i;
+    for (i = 0; i < fac->num; i++)
+    {
+        nmod_poly_print_pretty(fac->p + i, var);
         flint_printf(" ^ %wd\n", fac->exp[i]);
     }
 }
