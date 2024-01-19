@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 ulong nmod_mpoly_get_coeff_ui_monomial(const nmod_mpoly_t A,

@@ -9,6 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
 
 void _fmpz_mpoly_push_exp_ui(fmpz_mpoly_t A,

@@ -11,6 +11,4 @@
 
 #define FMPZ_MPOLY_FACTOR_INLINES_C
 
-#include "flint.h"
-#include "ulong_extras.h"
 #include "fmpz_mpoly_factor.h"

@@ -14,6 +14,7 @@
 #include <string.h>
 #include <wchar.h> /* wchar_t and wint_t */
 #include "test_helpers.h"
+#include "nmod.h"
 #include "fmpz.h"
 #include "fmpz_mod.h"
 #include "fmpq.h"

@@ -11,7 +11,6 @@
 
 #include "fmpz_mod_mpoly_factor.h"
 
-
 slong _fmpz_mod_poly_vec_max_degree(const fmpz_mod_poly_struct * A,
                                          slong Alen, const fmpz_mod_ctx_t ctx)
 {

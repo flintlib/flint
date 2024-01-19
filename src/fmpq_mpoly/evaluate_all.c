@@ -9,6 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
+#include "mpoly.h"
 #include "fmpq_mpoly.h"
 
 static int _fmpz_mpoly_evaluate_all_tree_fmpq_sp(fmpq_t ev, const fmpz_mpoly_t poly,

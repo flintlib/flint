@@ -84,9 +84,9 @@ _arb_cos_pi_fmpq_algebraic(arb_t c, ulong p, ulong q, slong prec)
         arb_poly_init(fpoly);
 
         if (p % 2 == 0)
-            arb_fmpz_poly_cos_minpoly(poly, q);
+            fmpz_poly_cos_minpoly(poly, q);
         else
-            arb_fmpz_poly_cos_minpoly(poly, 2 * q);
+            fmpz_poly_cos_minpoly(poly, 2 * q);
 
         eval_extra_prec = fmpz_poly_max_bits(poly) * 2; /* heuristic */
         eval_extra_prec = FLINT_ABS(eval_extra_prec);

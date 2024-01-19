@@ -45,12 +45,14 @@ FLINT_FORCE_INLINE dpe_t dpe_set_d_exp(double x, slong e)
     return res;
 }
 
+#if 0
 FLINT_FORCE_INLINE dpe_t dpe_set_fmpz(const fmpz_t x)
 {
     dpe_t res;
     res.m = fmpz_get_d_2exp(&res.e, x);
     return res;
 }
+#endif
 
 FLINT_FORCE_INLINE dpe_t
 dpe_add(dpe_t x, dpe_t y)

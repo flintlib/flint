@@ -9,6 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "thread_pool.h"
+#include "fmpz.h"
 #include "mpoly.h"
 
 /* this file does not need to change with new orderings */

@@ -42,9 +42,7 @@ void _acb_poly_normalise(acb_poly_t poly);
 ACB_POLY_INLINE void
 acb_poly_swap(acb_poly_t poly1, acb_poly_t poly2)
 {
-    acb_poly_struct t = *poly1;
-    *poly1 = *poly2;
-    *poly2 = t;
+    FLINT_SWAP(acb_poly_struct, *poly1, *poly2);
 }
 
 ACB_POLY_INLINE slong acb_poly_length(const acb_poly_t poly)

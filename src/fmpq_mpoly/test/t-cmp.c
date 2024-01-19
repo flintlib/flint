@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "mpoly.h"
 #include "fmpq_mpoly.h"
 
 TEST_FUNCTION_START(fmpq_mpoly_cmp, state)

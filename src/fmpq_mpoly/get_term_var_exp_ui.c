@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpoly.h"
 #include "fmpq_mpoly.h"
 
 ulong fmpq_mpoly_get_term_var_exp_ui(const fmpq_mpoly_t A, slong i,

@@ -9,6 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 void nmod_mpoly_set_coeff_ui_monomial(nmod_mpoly_t A, ulong c,

@@ -11,7 +11,6 @@
 
 #include "fmpq_mpoly.h"
 
-
 /* Assumes divisor polys don't alias any output polys */
 void fmpq_mpoly_divrem_ideal(fmpq_mpoly_struct ** Q, fmpq_mpoly_t R,
               const fmpq_mpoly_t A, fmpq_mpoly_struct * const * B, slong len,

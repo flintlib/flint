@@ -18,9 +18,12 @@
 #define FMPZ_MOD_MPOLY_INLINE static inline
 #endif
 
-#include "nmod_types.h"
-#include "fmpz_mod.h"
-#include "mpoly.h"
+#include "fmpz.h"
+#include "mpoly_types.h"
+
+#if FLINT_WANT_ASSERT
+# include "mpoly.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -74,7 +77,7 @@ ordering_t fmpz_mod_mpoly_ctx_ord(const fmpz_mod_mpoly_ctx_t ctx)
 FMPZ_MOD_MPOLY_INLINE
 const fmpz * fmpz_mod_mpoly_ctx_modulus(const fmpz_mod_mpoly_ctx_t ctx)
 {
-    return fmpz_mod_ctx_modulus(ctx->ffinfo);
+    return ctx->ffinfo->n;
 }
 
 FMPZ_MOD_MPOLY_INLINE
@@ -262,76 +265,20 @@ int fmpz_mod_mpoly_is_one(const fmpz_mod_mpoly_t A,
 
 /* Degrees *******************************************************************/
 
-FMPZ_MOD_MPOLY_INLINE
-int fmpz_mod_mpoly_degrees_fit_si(const fmpz_mod_mpoly_t A,
-                                                const fmpz_mod_mpoly_ctx_t ctx)
-{
-    return A->bits <= FLINT_BITS ? 1
-               : mpoly_degrees_fit_si(A->exps, A->length, A->bits, ctx->minfo);
-}
+int fmpz_mod_mpoly_degrees_fit_si(const fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_ctx_t ctx);
 
-FMPZ_MOD_MPOLY_INLINE
-void fmpz_mod_mpoly_degrees_fmpz(fmpz ** degs, const fmpz_mod_mpoly_t A,
-                                                const fmpz_mod_mpoly_ctx_t ctx)
-{
-    mpoly_degrees_pfmpz(degs, A->exps, A->length, A->bits, ctx->minfo);
-}
+void fmpz_mod_mpoly_degrees_fmpz(fmpz ** degs, const fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_ctx_t ctx);
+void fmpz_mod_mpoly_degrees_si(slong * degs, const fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_ctx_t ctx);
 
-FMPZ_MOD_MPOLY_INLINE
-void fmpz_mod_mpoly_degrees_si(slong * degs, const fmpz_mod_mpoly_t A,
-                                                const fmpz_mod_mpoly_ctx_t ctx)
-{
-    mpoly_degrees_si(degs, A->exps, A->length, A->bits, ctx->minfo);
-}
+void fmpz_mod_mpoly_degree_fmpz(fmpz_t deg, const fmpz_mod_mpoly_t A, slong var, const fmpz_mod_mpoly_ctx_t ctx);
+slong fmpz_mod_mpoly_degree_si(const fmpz_mod_mpoly_t A, slong var, const fmpz_mod_mpoly_ctx_t ctx);
 
-FMPZ_MOD_MPOLY_INLINE
-void fmpz_mod_mpoly_degree_fmpz(fmpz_t deg, const fmpz_mod_mpoly_t A, slong var,
-                                                const fmpz_mod_mpoly_ctx_t ctx)
-{
-    FLINT_ASSERT(0 <= var && var < ctx->minfo->nvars);
-    mpoly_degree_fmpz(deg, A->exps, A->length, A->bits, var, ctx->minfo);
-}
+int fmpz_mod_mpoly_total_degree_fits_si(const fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_ctx_t ctx);
 
-FMPZ_MOD_MPOLY_INLINE
-slong fmpz_mod_mpoly_degree_si(const fmpz_mod_mpoly_t A, slong var,
-                                                const fmpz_mod_mpoly_ctx_t ctx)
-{
-    FLINT_ASSERT(0 <= var && var < ctx->minfo->nvars);
-    return mpoly_degree_si(A->exps, A->length, A->bits, var, ctx->minfo);
-}
+void fmpz_mod_mpoly_total_degree_fmpz(fmpz_t td, const fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_ctx_t ctx);
+slong fmpz_mod_mpoly_total_degree_si(const fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_ctx_t ctx);
 
-FMPZ_MOD_MPOLY_INLINE
-int fmpz_mod_mpoly_total_degree_fits_si(const fmpz_mod_mpoly_t A,
-                                                const fmpz_mod_mpoly_ctx_t ctx)
-{
-    return mpoly_total_degree_fits_si(A->exps, A->length, A->bits, ctx->minfo);
-}
-
-FMPZ_MOD_MPOLY_INLINE
-void fmpz_mod_mpoly_total_degree_fmpz(fmpz_t td, const fmpz_mod_mpoly_t A,
-                                                const fmpz_mod_mpoly_ctx_t ctx)
-{
-    mpoly_total_degree_fmpz(td, A->exps, A->length, A->bits, ctx->minfo);
-}
-
-FMPZ_MOD_MPOLY_INLINE
-slong fmpz_mod_mpoly_total_degree_si(const fmpz_mod_mpoly_t A,
-                                                const fmpz_mod_mpoly_ctx_t ctx)
-{
-    return mpoly_total_degree_si(A->exps, A->length, A->bits, ctx->minfo);
-}
-
-FMPZ_MOD_MPOLY_INLINE
-void fmpz_mod_mpoly_used_vars(int * used, const fmpz_mod_mpoly_t A,
-                                                const fmpz_mod_mpoly_ctx_t ctx)
-{
-    slong i;
-
-    for (i = 0; i < ctx->minfo->nvars; i++)
-        used[i] = 0;
-
-    mpoly_used_vars_or(used, A->exps, A->length, A->bits, ctx->minfo);
-}
+void fmpz_mod_mpoly_used_vars(int * used, const fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_ctx_t ctx);
 
 /* Coefficients **************************************************************/
 
@@ -430,21 +377,8 @@ void fmpz_mod_mpoly_set_term_coeff_ui(fmpz_mod_mpoly_t A, slong i,
 void fmpz_mod_mpoly_set_term_coeff_si(fmpz_mod_mpoly_t A, slong i,
                                       slong c, const fmpz_mod_mpoly_ctx_t ctx);
 
-FMPZ_MOD_MPOLY_INLINE
-int fmpz_mod_mpoly_term_exp_fits_ui(const fmpz_mod_mpoly_t A, slong i,
-                                                const fmpz_mod_mpoly_ctx_t ctx)
-{
-    return A->bits <= FLINT_BITS ? 1
-                     : mpoly_term_exp_fits_ui(A->exps, A->bits, i, ctx->minfo);
-}
-
-FMPZ_MOD_MPOLY_INLINE
-int fmpz_mod_mpoly_term_exp_fits_si(const fmpz_mod_mpoly_t A, slong i,
-                                                const fmpz_mod_mpoly_ctx_t ctx)
-{
-    return A->bits <= FLINT_BITS ? 1
-                     : mpoly_term_exp_fits_si(A->exps, A->bits, i, ctx->minfo);
-}
+int fmpz_mod_mpoly_term_exp_fits_ui(const fmpz_mod_mpoly_t A, slong i, const fmpz_mod_mpoly_ctx_t ctx);
+int fmpz_mod_mpoly_term_exp_fits_si(const fmpz_mod_mpoly_t A, slong i, const fmpz_mod_mpoly_ctx_t ctx);
 
 void fmpz_mod_mpoly_get_term_exp_fmpz(fmpz ** exp,
             const fmpz_mod_mpoly_t A, slong i, const fmpz_mod_mpoly_ctx_t ctx);

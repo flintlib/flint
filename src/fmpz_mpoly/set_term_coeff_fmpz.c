@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_mpoly.h"
 
 void fmpz_mpoly_set_term_coeff_fmpz(fmpz_mpoly_t A,

@@ -58,8 +58,7 @@ acf_set(acf_t z, const acf_t x)
 ACF_INLINE void
 acf_swap(acf_t z, acf_t x)
 {
-    arf_swap(acf_realref(z), acf_realref(x));
-    arf_swap(acf_imagref(z), acf_imagref(x));
+    FLINT_SWAP(acf_struct, *z, *x);
 }
 
 ACF_INLINE int

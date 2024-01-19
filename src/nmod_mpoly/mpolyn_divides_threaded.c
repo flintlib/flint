@@ -14,6 +14,8 @@
 #if FLINT_KNOW_STRONG_ORDER
 
 #include "thread_pool.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
 
 typedef struct _nmod_mpolyn_stripe_struct

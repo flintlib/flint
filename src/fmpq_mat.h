@@ -60,7 +60,12 @@ void fmpq_mat_init_set(fmpq_mat_t mat1, const fmpq_mat_t mat2);
 
 void fmpq_mat_clear(fmpq_mat_t mat);
 
-void fmpq_mat_swap(fmpq_mat_t mat1, fmpq_mat_t mat2);
+FMPQ_MAT_INLINE
+void fmpq_mat_swap(fmpq_mat_t mat1, fmpq_mat_t mat2)
+{
+    FLINT_SWAP(fmpq_mat_struct, *mat1, *mat2);
+}
+
 void fmpq_mat_swap_entrywise(fmpq_mat_t mat1, fmpq_mat_t mat2);
 
 /* Windows and concatenation */

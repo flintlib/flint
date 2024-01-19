@@ -9,7 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mod.h"
 #include "fmpz_mod_vec.h"
+#include "mpoly.h"
 #include "fmpz_mod_mpoly.h"
 
 /* c is assumed to be reduced and invertible mod n */

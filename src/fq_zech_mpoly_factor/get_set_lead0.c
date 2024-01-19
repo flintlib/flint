@@ -11,7 +11,6 @@
 
 #include "fq_zech_mpoly_factor.h"
 
-
 void _fq_zech_mpoly_get_lead0(
     fq_zech_mpoly_t c,
     const fq_zech_mpoly_t A,

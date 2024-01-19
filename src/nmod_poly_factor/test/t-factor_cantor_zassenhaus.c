@@ -13,6 +13,7 @@
 */
 
 #include "test_helpers.h"
+#include "ulong_extras.h"
 #include "nmod_poly.h"
 #include "nmod_poly_factor.h"
 

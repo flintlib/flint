@@ -11,6 +11,7 @@
 
 #include "long_extras.h"
 #include "fmpz_mod_poly.h"
+#include "mpoly.h"
 #include "fmpz_mod_mpoly.h"
 
 /*

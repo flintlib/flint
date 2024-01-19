@@ -23,7 +23,7 @@ extern "C" {
 
 /* The Siegel modular group */
 
-static inline slong
+FLINT_FORCE_INLINE slong
 sp2gz_dim(const fmpz_mat_t mat)
 {
     return fmpz_mat_nrows(mat) / 2;

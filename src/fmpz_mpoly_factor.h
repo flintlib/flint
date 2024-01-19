@@ -18,10 +18,8 @@
 #define FMPZ_MPOLY_FACTOR_INLINE static inline
 #endif
 
-#include "fmpq.h"
 #include "fmpz_poly_factor.h"
 #include "fmpz_mpoly.h"
-#include "nmod_mpoly.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -40,8 +38,8 @@ void tuple_next(fmpz * alpha, slong n);
 FMPZ_MPOLY_FACTOR_INLINE
 void fmpz_mpoly_factor_init(fmpz_mpoly_factor_t f, const fmpz_mpoly_ctx_t ctx)
 {
-    fmpz_init_set_ui(f->constant, 1);
-    fmpz_init_set_ui(f->constant_den, 1);
+    *f->constant = 1;
+    *f->constant_den = 1;
     f->poly  = NULL;
     f->exp   = NULL;
     f->num   = 0;
@@ -67,20 +65,8 @@ slong fmpz_mpoly_factor_length(const fmpz_mpoly_factor_t f,
     return f->num;
 }
 
-FMPZ_MPOLY_FACTOR_INLINE
-void fmpz_mpoly_factor_get_constant_fmpz(fmpz_t c,
-                      const fmpz_mpoly_factor_t f, const fmpz_mpoly_ctx_t ctx)
-{
-    fmpz_set(c, f->constant);
-}
-
-FMPZ_MPOLY_FACTOR_INLINE
-void fmpz_mpoly_factor_get_constant_fmpq(fmpq_t c,
-                      const fmpz_mpoly_factor_t f, const fmpz_mpoly_ctx_t ctx)
-{
-    fmpz_set(fmpq_numref(c), f->constant);
-    fmpz_set(fmpq_denref(c), f->constant_den);
-}
+void fmpz_mpoly_factor_get_constant_fmpz(fmpz_t c, const fmpz_mpoly_factor_t f, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_factor_get_constant_fmpq(fmpq_t c, const fmpz_mpoly_factor_t f, const fmpz_mpoly_ctx_t ctx);
 
 FMPZ_MPOLY_FACTOR_INLINE
 void fmpz_mpoly_factor_get_base(fmpz_mpoly_t p, const fmpz_mpoly_factor_t f,
@@ -98,13 +84,7 @@ void fmpz_mpoly_factor_swap_base(fmpz_mpoly_t p, fmpz_mpoly_factor_t f,
     fmpz_mpoly_swap(p, f->poly + i, ctx);
 }
 
-FMPZ_MPOLY_FACTOR_INLINE
-slong fmpz_mpoly_factor_get_exp_si(fmpz_mpoly_factor_t f,
-                                           slong i, const fmpz_mpoly_ctx_t ctx)
-{
-    FLINT_ASSERT(i < (ulong) f->num);
-    return fmpz_get_si(f->exp + i);
-}
+slong fmpz_mpoly_factor_get_exp_si(fmpz_mpoly_factor_t f, slong i, const fmpz_mpoly_ctx_t ctx);
 
 void fmpz_mpoly_factor_set(fmpz_mpoly_factor_t f,
                       const fmpz_mpoly_factor_t g, const fmpz_mpoly_ctx_t ctx);
@@ -133,27 +113,9 @@ void fmpz_mpoly_factor_swap(fmpz_mpoly_factor_t f, fmpz_mpoly_factor_t g,
    *g = t;
 }
 
-FMPZ_MPOLY_FACTOR_INLINE
-void fmpz_mpoly_factor_set_fmpz(fmpz_mpoly_factor_t f, const fmpz_t a,
-                                                    const fmpz_mpoly_ctx_t ctx)
-{
-    f->num = 0;
-    fmpz_set(f->constant, a);
-}
-
-FMPZ_MPOLY_FACTOR_INLINE
-void fmpz_mpoly_factor_zero(fmpz_mpoly_factor_t f, const fmpz_mpoly_ctx_t ctx)
-{
-    f->num = 0;
-    fmpz_zero(f->constant);
-}
-
-FMPZ_MPOLY_FACTOR_INLINE
-void fmpz_mpoly_factor_one(fmpz_mpoly_factor_t f, const fmpz_mpoly_ctx_t ctx)
-{
-    f->num = 0;
-    fmpz_one(f->constant);
-}
+void fmpz_mpoly_factor_set_fmpz(fmpz_mpoly_factor_t f, const fmpz_t a, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_factor_zero(fmpz_mpoly_factor_t f, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_factor_one(fmpz_mpoly_factor_t f, const fmpz_mpoly_ctx_t ctx);
 
 void fmpz_mpoly_factor_sort(fmpz_mpoly_factor_t f,
                                                    const fmpz_mpoly_ctx_t ctx);
@@ -177,27 +139,9 @@ int fmpz_mpoly_factor_matches(const fmpz_mpoly_t A,
     return matches;
 }
 
-FMPZ_MPOLY_FACTOR_INLINE
-void fmpz_mpoly_factor_append_fmpz_swap(fmpz_mpoly_factor_t f,
-                    fmpz_mpoly_t A, const fmpz_t e, const fmpz_mpoly_ctx_t ctx)
-{
-    slong i = f->num;
-    fmpz_mpoly_factor_fit_length(f, i + 1, ctx);
-    fmpz_mpoly_swap(f->poly + i, A, ctx);
-    fmpz_set(f->exp + i, e);
-    f->num = i + 1;
-}
+void fmpz_mpoly_factor_append_fmpz_swap(fmpz_mpoly_factor_t f, fmpz_mpoly_t A, const fmpz_t e, const fmpz_mpoly_ctx_t ctx);
 
-FMPZ_MPOLY_FACTOR_INLINE
-void fmpz_mpoly_factor_append_ui(fmpz_mpoly_factor_t f, const fmpz_mpoly_t A,
-                                           ulong e, const fmpz_mpoly_ctx_t ctx)
-{
-    slong i = f->num;
-    fmpz_mpoly_factor_fit_length(f, i + 1, ctx);
-    fmpz_mpoly_set(f->poly + i, A, ctx);
-    fmpz_set_ui(f->exp + i, e);
-    f->num = i + 1;
-}
+void fmpz_mpoly_factor_append_ui(fmpz_mpoly_factor_t f, const fmpz_mpoly_t A, ulong e, const fmpz_mpoly_ctx_t ctx);
 
 /*****************************************************************************/
 
@@ -511,13 +455,7 @@ int fmpz_bpoly_factor_ordered(
 
 /*****************************************************************************/
 
-FMPZ_MPOLY_FACTOR_INLINE
-void fmpz_mpoly_unit_normalize(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
-{
-    FLINT_ASSERT(A->length > 0);
-    if (fmpz_sgn(A->coeffs + 0) < 0)
-        fmpz_mpoly_neg(A, A, ctx);
-}
+void fmpz_mpoly_unit_normalize(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx);
 
 int _fmpz_mpoly_factor_squarefree(fmpz_mpoly_factor_t f,
                    fmpz_mpoly_t A, const fmpz_t e, const fmpz_mpoly_ctx_t ctx);

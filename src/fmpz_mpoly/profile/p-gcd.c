@@ -19,7 +19,9 @@ p-gcd nthreads sparse m1 n1 m2 n2:
 */
 
 #include <stdlib.h>
+#include <string.h>
 #include "profiler.h"
+#include "fmpz.h"
 #include "fmpz_mpoly.h"
 
 #define CALCULATE_MACHINE_EFFICIENCY 0

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpoly.h"
 #include "fq_nmod_mpoly.h"
 
 void fq_nmod_mpoly_set_term_exp_fmpz(fq_nmod_mpoly_t A,

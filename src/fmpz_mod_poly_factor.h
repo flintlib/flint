@@ -19,7 +19,6 @@
 #define FMPZ_MOD_POLY_FACTOR_INLINE static inline
 #endif
 
-#include "thread_pool.h"
 #include "fmpz_mod_types.h"
 
 #ifdef __cplusplus

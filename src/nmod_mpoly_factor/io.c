@@ -10,6 +10,8 @@
 */
 
 #include <stdio.h>
+#include "fmpz.h"
+#include "mpoly.h"
 #include "nmod_mpoly_factor.h"
 
 void nmod_mpoly_factor_print_pretty(const nmod_mpoly_factor_t f,

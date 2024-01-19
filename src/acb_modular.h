@@ -59,9 +59,7 @@ psl2z_clear(psl2z_t g)
 ACB_MODULAR_INLINE void
 psl2z_swap(psl2z_t f, psl2z_t g)
 {
-    psl2z_struct h = *f;
-    *f = *g;
-    *g = h;
+    FLINT_SWAP(psl2z_struct, *f, *g);
 }
 
 ACB_MODULAR_INLINE void

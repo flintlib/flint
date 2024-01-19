@@ -9,6 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "thread_pool.h"
+#include "nmod.h"
+#include "nmod_vec.h"
+#include "nmod_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 #include "nmod_mpoly_factor.h"
 
@@ -32,19 +37,6 @@ void nmod_mpolyu_clear(nmod_mpolyu_t A, const nmod_mpoly_ctx_t uctx)
     flint_free(A->exps);
 }
 
-
-void nmod_mpolyu_swap(nmod_mpolyu_t A, nmod_mpolyu_t B,
-                                                   const nmod_mpoly_ctx_t uctx)
-{
-   nmod_mpolyu_struct t = *A;
-   *A = *B;
-   *B = t;
-}
-
-void nmod_mpolyu_zero(nmod_mpolyu_t A, const nmod_mpoly_ctx_t uctx)
-{
-    A->length = 0;
-}
 
 int nmod_mpolyu_is_one(nmod_mpolyu_t A, const nmod_mpoly_ctx_t uctx)
 {

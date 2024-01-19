@@ -248,7 +248,7 @@ endif
 ################################################################################
 
 SINGLE_HEADERS :=                                                           \
-        flint.h         flint-config.h    exception.h     gmpcompat.h       \
+        flint.h         flint-config.h    gmpcompat.h                       \
         profiler.h      templates.h       fft_tuning.h                      \
                                                                             \
         longlong.h                        longlong_asm_clang.h              \
@@ -259,11 +259,11 @@ SINGLE_HEADERS :=                                                           \
                                                                             \
         mpf-impl.h                      fq_zech_vec.h                       \
                                                                             \
-        limb_types.h                    mpoly_types.h                       \
+        limb_types.h                    nmod_types.h                        \
         fmpz_types.h                    fmpq_types.h                        \
-        nmod_types.h                    fmpz_mod_types.h                    \
-        fq_types.h                      fq_nmod_types.h                     \
-        fq_zech_types.h                                                     \
+        fmpz_mod_types.h                fq_nmod_types.h                     \
+        fq_zech_types.h                 fq_types.h                          \
+        n_poly_types.h                  mpoly_types.h                       \
         arf_types.h                     acf_types.h                         \
         arb_types.h                     acb_types.h                         \
         NTL-interface.h

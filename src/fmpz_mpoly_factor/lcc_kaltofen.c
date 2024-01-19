@@ -9,9 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "mpoly.h"
 #include "fmpz_mpoly_factor.h"
-#include "n_poly.h"
 
 static void fmpz_mpoly_convert_perm(
     fmpz_mpoly_t A,

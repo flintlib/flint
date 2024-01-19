@@ -9,8 +9,33 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "nmod_mpoly_factor.h"
 
+slong nmod_mpoly_factor_get_exp_si(nmod_mpoly_factor_t f,
+                                           slong i, const nmod_mpoly_ctx_t ctx)
+{
+    FLINT_ASSERT(i < (ulong) f->num);
+    return fmpz_get_si(f->exp + i);
+}
+
+void nmod_mpoly_factor_set(nmod_mpoly_factor_t res,
+                     const nmod_mpoly_factor_t fac, const nmod_mpoly_ctx_t ctx)
+{
+    slong i;
+
+    if (res == fac)
+        return;
+
+    nmod_mpoly_factor_fit_length(res, fac->num, ctx);
+    res->constant = fac->constant;
+    for (i = 0; i < fac->num; i++)
+    {
+        nmod_mpoly_set(res->poly + i, fac->poly + i, ctx);
+        fmpz_set(res->exp + i, fac->exp + i);
+    }
+    res->num = fac->num;
+}
 
 void _nmod_mpoly_get_lead0(
     nmod_mpoly_t c,

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "mpoly.h"
 
 int mpoly_degrees_fit_si(const ulong * poly_exps, slong len,

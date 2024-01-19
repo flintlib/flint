@@ -9,12 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
-#include <math.h>
-#include "flint.h"
-#include "fmpz.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
-
 
 void fmpz_mpoly_geobucket_init(fmpz_mpoly_geobucket_t B,
                                                     const fmpz_mpoly_ctx_t ctx)

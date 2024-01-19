@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_mod_vec.h"
+#include "mpoly.h"
 #include "fmpz_mod_mpoly.h"
 #include "fmpz_mod_mpoly_factor.h"
 

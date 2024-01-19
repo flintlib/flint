@@ -9,9 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fft.h"
+#include "thread_pool.h"
 #include "thread_support.h"
+#include "fft.h"
 
 typedef struct
 {

@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "nmod_mpoly.h"
-
 
 ulong nmod_mpoly_get_term_ui_ui(const nmod_mpoly_t poly,
                                  const ulong * exp, const nmod_mpoly_ctx_t ctx)

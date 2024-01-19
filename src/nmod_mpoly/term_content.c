@@ -9,8 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
-
 
 void nmod_mpoly_term_content(nmod_mpoly_t M, const nmod_mpoly_t A,
                                                     const nmod_mpoly_ctx_t ctx)

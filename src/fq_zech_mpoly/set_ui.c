@@ -10,6 +10,7 @@
 */
 
 #include "fq_zech.h"
+#include "mpoly.h"
 #include "fq_zech_mpoly.h"
 
 void fq_zech_mpoly_set_ui(fq_zech_mpoly_t A, ulong c,

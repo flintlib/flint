@@ -9,9 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "n_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 #include "fq_nmod_mpoly.h"
-
 
 void nmod_mpolyun_init(
     nmod_mpolyun_t A,
@@ -79,13 +80,6 @@ void nmod_mpolyun_print_pretty(
         nmod_mpolyn_print_pretty(poly->coeffs + i,x,ctx);
         flint_printf(")*X^%wd",poly->exps[i]);
     }
-}
-
-void nmod_mpolyun_swap(nmod_mpolyun_t A, nmod_mpolyun_t B)
-{
-   nmod_mpolyun_struct t = *A;
-   *A = *B;
-   *B = t;
 }
 
 void nmod_mpolyun_zero(nmod_mpolyun_t A, const nmod_mpoly_ctx_t ctx)

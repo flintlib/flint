@@ -196,6 +196,8 @@ typedef struct __FLINT_FILE FLINT_FILE;
 
 #include "longlong.h"
 
+/* memory ********************************************************************/
+
 void * flint_malloc(size_t size);
 void * flint_realloc(void * ptr, size_t size);
 void * flint_calloc(size_t num, size_t size);
@@ -216,8 +218,9 @@ void __flint_get_memory_functions(void *(**alloc_func) (size_t),
 
 FLINT_NORETURN void flint_abort(void);
 
-/* If user want to set change abort function from `abort' */
 void flint_set_abort(void (*func)(void));
+
+/* threads *******************************************************************/
 
 int flint_get_num_threads(void);
 void flint_set_num_threads(int num_threads);
@@ -226,6 +229,10 @@ int flint_set_num_workers(int num_workers);
 void flint_reset_num_workers(int max_workers);
 int flint_set_thread_affinity(int * cpus, slong length);
 int flint_restore_thread_affinity(void);
+
+typedef int thread_pool_handle;
+
+/* randomization and test utilities ******************************************/
 
 FLINT_CONST double flint_test_multiplier(void);
 
@@ -316,6 +323,8 @@ ulong n_randtest_not_zero(flint_rand_t);
    flint_randclear(xxx); \
    flint_cleanup_master();
 
+/* comparison macros *********************************************************/
+
 #define FLINT_MAX(x, y) ((x) > (y) ? (x) : (y))
 #define FLINT_MIN(x, y) ((x) > (y) ? (y) : (x))
 #define FLINT_ABS(x) ((slong)(x) < 0 ? (-(x)) : (x))
@@ -341,6 +350,8 @@ mp_limb_t FLINT_BIT_COUNT(mp_limb_t x)
 #define FLINT_FLOG2(k)  (FLINT_BIT_COUNT(k) - 1)
 
 #define FLINT_CLOG2(k)  FLINT_BIT_COUNT((k) - 1)
+
+/* mpn macros ****************************************************************/
 
 #define flint_mpn_zero(xxx, nnn) \
     do \
@@ -372,11 +383,11 @@ mp_limb_t FLINT_BIT_COUNT(mp_limb_t x)
          (xxx)[ixxx] = yyy; \
    } while (0)
 
-/* common usage of flint_malloc */
+/* allocation macros *********************************************************/
+
 #define FLINT_ARRAY_ALLOC(n, T) (T *) flint_malloc((n)*sizeof(T))
 #define FLINT_ARRAY_REALLOC(p, n, T) (T *) flint_realloc(p, (n)*sizeof(T))
 
-/* temporary allocation */
 #define TMP_INIT \
    typedef struct __tmp_struct { \
       void * block; \
@@ -412,27 +423,45 @@ mp_limb_t FLINT_BIT_COUNT(mp_limb_t x)
       __tmp_root = __tmp_root->next; \
    }
 
+/* I/O ***********************************************************************/
+
 int parse_fmt(int * floating, const char * fmt);
 
-int flint_printf(const char * str, ...); /* flint version of printf */
-int flint_sprintf(char * s, const char * str, ...); /* flint version of sprintf */
-int flint_scanf(const char * str, ...); /* flint version of scanf */
-int flint_sscanf(const char * s, const char * str, ...); /* flint version of sscanf */
+int flint_printf(const char * str, ...);
+int flint_sprintf(char * s, const char * str, ...);
+int flint_scanf(const char * str, ...);
+int flint_sscanf(const char * s, const char * str, ...);
 
 #ifdef FLINT_HAVE_VA_LIST
-int flint_vprintf(const char * str, va_list ap); /* va_list version of flint_printf */
+int flint_vprintf(const char * str, va_list ap);
 #endif
 
 #ifdef FLINT_HAVE_FILE
-int flint_fprintf(FILE * f, const char * str, ...); /* flint version of fprintf */
-int flint_fscanf(FILE * f, const char * str, ...); /* flint version of fscanf */
+int flint_fprintf(FILE * f, const char * str, ...);
+int flint_fscanf(FILE * f, const char * str, ...);
 #endif
 
 #if defined(FLINT_HAVE_VA_LIST) && defined(FLINT_HAVE_FILE)
 int flint_vfprintf(FILE * f, const char * str, va_list ap);
 #endif
 
-#include "exception.h"
+/* exceptions ****************************************************************/
+
+typedef enum
+{
+   FLINT_ERROR,     /* general error */
+   FLINT_OVERFLOW,  /* overflow */
+   FLINT_IMPINV,    /* impossible inverse */
+   FLINT_DOMERR,    /* domain error */
+   FLINT_DIVZERO,   /* divide by zero */
+   FLINT_EXPOF,     /* exponent overflow */
+   FLINT_INEXACT,   /* inexact error */
+   FLINT_TEST_FAIL  /* test fail */
+} flint_err_t;
+
+FLINT_NORETURN void flint_throw(flint_err_t exc, const char * msg, ...);
+
+/* checked multiplication ****************************************************/
 
 FLINT_INLINE slong flint_mul_sizes(slong x, slong y)
 {
@@ -446,8 +475,7 @@ FLINT_INLINE slong flint_mul_sizes(slong x, slong y)
     return lo;
 }
 
-/* Defined ahead of nmod.h, fmpz.h and fmpq.h so that the types are usable in
- * prototypes without importing those headers */
+/* FLINT generic type definitions ********************************************/
 
 typedef struct
 {
@@ -471,6 +499,21 @@ typedef fmpq fmpq_t[1];
 
 #define fmpq_numref(__x) (&(__x)->num)
 #define fmpq_denref(__y) (&(__y)->den)
+
+/* fmpz macros ***************************************************************/
+
+/* The largest bit count for an fmpz to be small */
+#define SMALL_FMPZ_BITCOUNT_MAX (FLINT_BITS - 2)
+
+/* Minimum and maximum value for a small fmpz */
+#define COEFF_MIN (-((WORD(1) << SMALL_FMPZ_BITCOUNT_MAX) - WORD(1)))
+#define COEFF_MAX ((WORD(1) << SMALL_FMPZ_BITCOUNT_MAX) - WORD(1))
+
+/* Conversions between mpz_ptr and fmpz_t */
+#define PTR_TO_COEFF(x) (((ulong) (x) >> 2) | (WORD(1) << (FLINT_BITS - 2)))
+#define COEFF_TO_PTR(x) ((mpz_ptr) (((ulong)x) << 2))
+
+#define COEFF_IS_MPZ(x) (((x) >> SMALL_FMPZ_BITCOUNT_MAX) == WORD(1))
 
 #ifdef __cplusplus
 }

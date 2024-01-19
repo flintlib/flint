@@ -9,9 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_mpoly.h"
 #include "profiler.h"
-
+#include "mpoly.h"
+#include "fmpz_mod_mpoly.h"
 
 slong count = 0;
 slong total_super = 0;

@@ -11,7 +11,6 @@
 
 #include "fmpz_mod_mpoly_factor.h"
 
-
 int fmpz_mod_mpoly_factor_cmp(
     const fmpz_mod_mpoly_factor_t A,
     const fmpz_mod_mpoly_factor_t B,

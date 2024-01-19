@@ -10,6 +10,9 @@
 */
 
 #include "test_helpers.h"
+#include "ulong_extras.h"
+#include "fmpz.h"
+#include "mpoly.h"
 #include "nmod_mpoly_factor.h"
 
 /* Defined in t-factor.c, t-factor_wang.c, t-factor_zassenhaus.c and

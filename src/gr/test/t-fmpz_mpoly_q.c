@@ -11,6 +11,7 @@
 
 #include "test_helpers.h"
 #include "mpoly.h"
+#include "fmpz_mpoly_q.h"
 #include "gr.h"
 
 TEST_FUNCTION_START(gr_fmpz_mpoly_q, state)

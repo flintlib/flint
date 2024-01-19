@@ -10,6 +10,10 @@
 */
 
 #include <stdio.h>
+#include "fmpz.h"
+#include "fq_zech.h"
+#include "fq_zech_poly.h"
+#include "mpoly.h"
 #include "fq_zech_mpoly_factor.h"
 
 void fq_zech_mpoly_factor_print_pretty(

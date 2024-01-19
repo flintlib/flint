@@ -24,21 +24,6 @@
  extern "C" {
 #endif
 
-/* Macros ********************************************************************/
-
-/* The largest bit count for an fmpz to be small */
-#define SMALL_FMPZ_BITCOUNT_MAX (FLINT_BITS - 2)
-
-/* Minimum and maximum value for a small fmpz */
-#define COEFF_MIN (-((WORD(1) << SMALL_FMPZ_BITCOUNT_MAX) - WORD(1)))
-#define COEFF_MAX ((WORD(1) << SMALL_FMPZ_BITCOUNT_MAX) - WORD(1))
-
-/* Conversions between mpz_ptr and fmpz_t */
-#define PTR_TO_COEFF(x) (((ulong) (x) >> 2) | (WORD(1) << (FLINT_BITS - 2)))
-#define COEFF_TO_PTR(x) ((mpz_ptr) (((ulong)x) << 2))
-
-#define COEFF_IS_MPZ(x) (((x) >> SMALL_FMPZ_BITCOUNT_MAX) == WORD(1))  /* is x a pointer not an integer */
-
 /* Memory management *********************************************************/
 
 mpz_ptr _fmpz_new_mpz(void);
@@ -147,7 +132,7 @@ void fmpz_one(fmpz_t f)
 }
 
 void fmpz_set(fmpz_t f, const fmpz_t g);
-FMPZ_INLINE void fmpz_swap(fmpz_t f, fmpz_t g) { fmpz t = *f; *f = *g; *g = t; }
+FMPZ_INLINE void fmpz_swap(fmpz_t f, fmpz_t g) { FLINT_SWAP(fmpz, *f, *g); }
 
 slong fmpz_get_si(const fmpz_t f);
 ulong fmpz_get_ui(const fmpz_t f);

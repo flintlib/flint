@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
 #include "nmod_mpoly.h"
 
 void nmod_mpoly_set_term_coeff_ui(nmod_mpoly_t A, slong i, ulong c,

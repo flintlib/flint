@@ -10,6 +10,8 @@
 */
 
 #include "thread_support.h"
+#include "fmpz.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 static int _try_dense(int try_array, slong * Bdegs, slong * Cdegs,

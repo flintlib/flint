@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "mpoly.h"
-
 
 slong mpoly_degree_si(const ulong * exps,
                 slong len, flint_bitcnt_t bits, slong var, const mpoly_ctx_t mctx)

@@ -9,7 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "thread_pool.h"
 #include "thread_support.h"
+#include "fmpz.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 /* improve locality */

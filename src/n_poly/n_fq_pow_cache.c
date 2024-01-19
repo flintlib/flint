@@ -10,6 +10,7 @@
 */
 
 #include "fmpz.h"
+#include "fq_nmod.h"
 #include "n_poly.h"
 
 /* hold positive and negative powers of b */

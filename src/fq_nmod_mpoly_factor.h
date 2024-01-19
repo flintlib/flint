@@ -55,12 +55,7 @@ slong fq_nmod_mpoly_factor_length(const fq_nmod_mpoly_factor_t f,
     return f->num;
 }
 
-FQ_NMOD_MPOLY_FACTOR_INLINE
-void fq_nmod_mpoly_factor_get_constant_fq_nmod(fq_nmod_t c,
-                 const fq_nmod_mpoly_factor_t f, const fq_nmod_mpoly_ctx_t ctx)
-{
-    fq_nmod_set(c, f->constant, ctx->fqctx);
-}
+void fq_nmod_mpoly_factor_get_constant_fq_nmod(fq_nmod_t c, const fq_nmod_mpoly_factor_t f, const fq_nmod_mpoly_ctx_t ctx);
 
 FQ_NMOD_MPOLY_FACTOR_INLINE
 void fq_nmod_mpoly_factor_get_base(fq_nmod_mpoly_t p,
@@ -78,14 +73,7 @@ void fq_nmod_mpoly_factor_swap_base(fq_nmod_mpoly_t p,
     fq_nmod_mpoly_swap(p, f->poly + i, ctx);
 }
 
-FQ_NMOD_MPOLY_FACTOR_INLINE
-slong fq_nmod_mpoly_factor_get_exp_si(fq_nmod_mpoly_factor_t f,
-                                        slong i, const fq_nmod_mpoly_ctx_t ctx)
-{
-    FLINT_ASSERT(i < (ulong) f->num);
-    return fmpz_get_si(f->exp + i);
-}
-
+slong fq_nmod_mpoly_factor_get_exp_si(fq_nmod_mpoly_factor_t f, slong i, const fq_nmod_mpoly_ctx_t ctx);
 
 void fq_nmod_mpoly_factor_set(fq_nmod_mpoly_factor_t a,
                 const fq_nmod_mpoly_factor_t b, const fq_nmod_mpoly_ctx_t ctx);
@@ -126,13 +114,7 @@ void fq_nmod_mpoly_factor_swap(fq_nmod_mpoly_factor_t A,
    *B = t;
 }
 
-FQ_NMOD_MPOLY_FACTOR_INLINE
-void fq_nmod_mpoly_factor_one(fq_nmod_mpoly_factor_t a,
-                                                 const fq_nmod_mpoly_ctx_t ctx)
-{
-	fq_nmod_one(a->constant, ctx->fqctx);
-	a->num = 0;
-}
+void fq_nmod_mpoly_factor_one(fq_nmod_mpoly_factor_t a, const fq_nmod_mpoly_ctx_t ctx);
 
 int fq_nmod_mpoly_factor_expand(fq_nmod_mpoly_t A,
                 const fq_nmod_mpoly_factor_t f, const fq_nmod_mpoly_ctx_t ctx);

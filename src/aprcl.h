@@ -12,7 +12,6 @@
 #ifndef APRCL_H
 #define APRCL_H
 
-#include "thread_pool.h"
 #include "ulong_extras.h"
 #include "fmpz_types.h"
 #include "fmpz_mod_types.h"

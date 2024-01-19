@@ -9,7 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
+#include "fmpz.h"
 #include "fq_zech.h"
+#include "mpoly.h"
 #include "fq_zech_mpoly.h"
 
 slong _fq_zech_mpoly_derivative(fq_zech_struct * Acoeff,       ulong * Aexp,

@@ -9,13 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
+#include "fmpq.h"
+#include "fmpz_mpoly_q.h"
 #include "gr.h"
 #include "gr_vec.h"
-#include "fmpz_mpoly.h"
-#include "fmpz_mpoly.h"
-#include "fmpz_mpoly_q.h"
-#include "fmpz_mpoly_factor.h"
 #include "gr_generic.h"
 
 typedef struct

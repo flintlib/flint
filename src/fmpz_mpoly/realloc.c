@@ -10,9 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
-#include "flint.h"
 #include "fmpz.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
 
 void _fmpz_mpoly_realloc(fmpz ** poly, ulong ** exps,

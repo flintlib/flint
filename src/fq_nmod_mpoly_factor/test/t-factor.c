@@ -11,6 +11,7 @@
 */
 
 #include "test_helpers.h"
+#include "fmpz.h"
 #include "fq_nmod_mpoly_factor.h"
 
 /* Defined in t-factor.c, t-factor_wang.c, t-factor_zassenhaus.c,

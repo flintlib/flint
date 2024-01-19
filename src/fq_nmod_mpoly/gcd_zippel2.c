@@ -9,9 +9,17 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
+#include "fq_nmod.h"
+#include "n_poly.h"
+#include "mpoly.h"
+#include "nmod_mpoly.h"
 #include "fq_nmod_mpoly.h"
 #include "fq_nmod_mpoly_factor.h"
 
+#if FLINT_WANT_ASSERT
+# include "fq_nmod_poly.h"
+#endif
 
 void _fq_nmod_mpoly_monomial_evals_cache(
     n_fq_poly_t E,

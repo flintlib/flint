@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2017 Daniel Schultz
+    Copyright (C) 2020 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,9 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
+#include "fq_nmod.h"
+#include "fq_nmod_mpoly_factor.h"
 
-void nmod_mpoly_ctx_clear(nmod_mpoly_ctx_t ctx)
+void fq_nmod_mpoly_factor_get_constant_fq_nmod(fq_nmod_t c, const fq_nmod_mpoly_factor_t f, const fq_nmod_mpoly_ctx_t ctx)
 {
-    mpoly_ctx_clear(ctx->minfo);
+    fq_nmod_set(c, f->constant, ctx->fqctx);
 }

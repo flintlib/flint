@@ -9,6 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 slong _nmod_mpoly_sub1(mp_limb_t * coeff1,       ulong * exp1,

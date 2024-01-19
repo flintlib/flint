@@ -12,12 +12,6 @@
 #ifndef ARB_FPWRAP_H
 #define ARB_FPWRAP_H
 
-#ifdef ARB_FPWRAP_INLINES_C
-#define ARB_FPWRAP_INLINE
-#else
-#define ARB_FPWRAP_INLINE static inline
-#endif
-
 #include "flint.h"
 
 #ifdef __cplusplus

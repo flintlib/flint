@@ -9,8 +9,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
+#include "fq_nmod.h"
+#include "fq_nmod_poly.h"
+#include "n_poly.h"
+#include "mpoly.h"
+#include "nmod_mpoly.h"
 #include "fq_nmod_mpoly.h"
-
 
 int _fq_nmod_mpoly_compose_fq_nmod_poly_sp(fq_nmod_poly_t A, const fq_nmod_mpoly_t B,
                 fq_nmod_poly_struct * const * C, const fq_nmod_mpoly_ctx_t ctx)

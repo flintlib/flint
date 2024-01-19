@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_mpoly_factor.h"
-
 
 void tuple_print(fmpz * alpha, slong n)
 {

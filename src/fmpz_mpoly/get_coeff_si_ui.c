@@ -9,6 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
 
 slong fmpz_mpoly_get_coeff_si_ui(const fmpz_mpoly_t A,

@@ -1,6 +1,7 @@
 /* This file is public domain. Author: Fredrik Johansson. */
 
 #include <stdlib.h>
+#include <string.h>
 #include "profiler.h"
 #include "fmpq_mat.h"
 #include "ca.h"

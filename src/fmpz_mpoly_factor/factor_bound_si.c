@@ -9,8 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
 #include "long_extras.h"
+#include "fmpz.h"
+#include "fmpz_mpoly_factor.h"
 
 /*
     If |f|_infty <= A and degs hold the degrees of f, set B to a bound on

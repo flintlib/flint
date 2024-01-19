@@ -13,8 +13,12 @@
 
 #if FLINT_KNOW_STRONG_ORDER
 
+#include "thread_pool.h"
 #include "thread_support.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "mpoly.h"
 
 /*
     a thread safe mpoly supports three mutating operations
@@ -64,6 +68,7 @@ static void fmpz_mpoly_ts_init(fmpz_mpoly_ts_t A,
     }
 }
 
+#if 0
 static void fmpz_mpoly_ts_print(const fmpz_mpoly_ts_t B, const char ** x,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
@@ -77,6 +82,7 @@ static void fmpz_mpoly_ts_print(const fmpz_mpoly_ts_t B, const char ** x,
 
     fmpz_mpoly_assert_canonical(A, ctx);
 }
+#endif
 
 static void fmpz_mpoly_ts_clear(fmpz_mpoly_ts_t A)
 {

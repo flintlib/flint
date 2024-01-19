@@ -29,21 +29,21 @@ typedef int (*arb_calc_func_t)(arb_ptr out,
 
 /* Root-finding */
 
-static inline void
+FLINT_FORCE_INLINE void
 arf_interval_init(arf_interval_t v)
 {
     arf_init(&v->a);
     arf_init(&v->b);
 }
 
-static inline void
+FLINT_FORCE_INLINE void
 arf_interval_clear(arf_interval_t v)
 {
     arf_clear(&v->a);
     arf_clear(&v->b);
 }
 
-static inline arf_interval_ptr
+FLINT_FORCE_INLINE arf_interval_ptr
 _arf_interval_vec_init(slong n)
 {
     slong i;
@@ -55,7 +55,7 @@ _arf_interval_vec_init(slong n)
     return v;
 }
 
-static inline void
+FLINT_FORCE_INLINE void
 _arf_interval_vec_clear(arf_interval_ptr v, slong n)
 {
     slong i;
@@ -64,21 +64,21 @@ _arf_interval_vec_clear(arf_interval_ptr v, slong n)
     flint_free(v);
 }
 
-static inline void
+FLINT_FORCE_INLINE void
 arf_interval_set(arf_interval_t v, const arf_interval_t u)
 {
     arf_set(&v->a, &u->a);
     arf_set(&v->b, &u->b);
 }
 
-static inline void
+FLINT_FORCE_INLINE void
 arf_interval_swap(arf_interval_t v, arf_interval_t u)
 {
     arf_swap(&v->a, &u->a);
     arf_swap(&v->b, &u->b);
 }
 
-static inline void
+FLINT_FORCE_INLINE void
 arf_interval_get_arb(arb_t x, const arf_interval_t v, slong prec)
 {
     arb_set_interval_arf(x, &v->a, &v->b, prec);

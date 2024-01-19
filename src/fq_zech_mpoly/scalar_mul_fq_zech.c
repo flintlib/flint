@@ -10,6 +10,7 @@
 */
 
 #include "fq_zech.h"
+#include "mpoly.h"
 #include "fq_zech_mpoly.h"
 
 void fq_zech_mpoly_scalar_mul_fq_zech(

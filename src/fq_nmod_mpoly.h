@@ -18,40 +18,17 @@
 #define FQ_NMOD_MPOLY_INLINE static inline
 #endif
 
-#include "nmod_mpoly.h"
+#include "fq_nmod_types.h"
+#include "mpoly_types.h"
+
+#if FLINT_WANT_ASSERT
+# include "fq_nmod.h"
+# include "mpoly.h"
+#endif
 
 #ifdef __cplusplus
  extern "C" {
 #endif
-
-/*  Type definitions *********************************************************/
-
-/*
-    context object for fq_nmod_mpoly
-*/
-typedef struct
-{
-    mpoly_ctx_t minfo;
-    fq_nmod_ctx_t fqctx;
-} fq_nmod_mpoly_ctx_struct;
-
-typedef fq_nmod_mpoly_ctx_struct fq_nmod_mpoly_ctx_t[1];
-
-/*
-    fq_nmod_mpoly_t
-    sparse multivariates with fq_nmod coefficients
-*/
-typedef struct {
-    mp_limb_t * coeffs;
-    ulong * exps;
-    slong length;
-    flint_bitcnt_t bits;    /* number of bits per exponent */
-    slong coeffs_alloc;     /* abs size in mp_limb_t units */
-    slong exps_alloc;       /* abs size in ulong units */
-} fq_nmod_mpoly_struct;
-
-typedef fq_nmod_mpoly_struct fq_nmod_mpoly_t[1];
-
 
 /* Internal type definitions *************************************************/
 
@@ -399,76 +376,20 @@ int fq_nmod_mpoly_is_one(const fq_nmod_mpoly_t A,
 
 /* Degrees *******************************************************************/
 
-FQ_NMOD_MPOLY_INLINE
-int fq_nmod_mpoly_degrees_fit_si(const fq_nmod_mpoly_t A,
-                                                 const fq_nmod_mpoly_ctx_t ctx)
-{
-    return A->bits <= FLINT_BITS ? 1
-               : mpoly_degrees_fit_si(A->exps, A->length, A->bits, ctx->minfo);
-}
+int fq_nmod_mpoly_degrees_fit_si(const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx);
 
-FQ_NMOD_MPOLY_INLINE
-void fq_nmod_mpoly_degrees_fmpz(fmpz ** degs, const fq_nmod_mpoly_t A,
-                                                 const fq_nmod_mpoly_ctx_t ctx)
-{
-    mpoly_degrees_pfmpz(degs, A->exps, A->length, A->bits, ctx->minfo);
-}
+void fq_nmod_mpoly_degrees_fmpz(fmpz ** degs, const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx);
+void fq_nmod_mpoly_degrees_si(slong * degs, const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx);
 
-FQ_NMOD_MPOLY_INLINE
-void fq_nmod_mpoly_degrees_si(slong * degs, const fq_nmod_mpoly_t A,
-                                                 const fq_nmod_mpoly_ctx_t ctx)
-{
-    mpoly_degrees_si(degs, A->exps, A->length, A->bits, ctx->minfo);
-}
+void fq_nmod_mpoly_degree_fmpz(fmpz_t deg, const fq_nmod_mpoly_t A, slong var, const fq_nmod_mpoly_ctx_t ctx);
+slong fq_nmod_mpoly_degree_si(const fq_nmod_mpoly_t A, slong var, const fq_nmod_mpoly_ctx_t ctx);
 
-FQ_NMOD_MPOLY_INLINE
-void fq_nmod_mpoly_degree_fmpz(fmpz_t deg, const fq_nmod_mpoly_t A, slong var,
-                                                 const fq_nmod_mpoly_ctx_t ctx)
-{
-    FLINT_ASSERT(0 <= var && var < ctx->minfo->nvars);
-    mpoly_degree_fmpz(deg, A->exps, A->length, A->bits, var, ctx->minfo);
-}
+int fq_nmod_mpoly_total_degree_fits_si(const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx);
 
-FQ_NMOD_MPOLY_INLINE
-slong fq_nmod_mpoly_degree_si(const fq_nmod_mpoly_t A, slong var,
-                                                 const fq_nmod_mpoly_ctx_t ctx)
-{
-    FLINT_ASSERT(0 <= var && var < ctx->minfo->nvars);
-    return mpoly_degree_si(A->exps, A->length, A->bits, var, ctx->minfo);
-}
+void fq_nmod_mpoly_total_degree_fmpz(fmpz_t td, const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx);
+slong fq_nmod_mpoly_total_degree_si(const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx);
 
-FQ_NMOD_MPOLY_INLINE
-int fq_nmod_mpoly_total_degree_fits_si(const fq_nmod_mpoly_t A,
-                                                 const fq_nmod_mpoly_ctx_t ctx)
-{
-    return mpoly_total_degree_fits_si(A->exps, A->length, A->bits, ctx->minfo);
-}
-
-FQ_NMOD_MPOLY_INLINE
-void fq_nmod_mpoly_total_degree_fmpz(fmpz_t td, const fq_nmod_mpoly_t A,
-                                                 const fq_nmod_mpoly_ctx_t ctx)
-{
-    mpoly_total_degree_fmpz(td, A->exps, A->length, A->bits, ctx->minfo);
-}
-
-FQ_NMOD_MPOLY_INLINE
-slong fq_nmod_mpoly_total_degree_si(const fq_nmod_mpoly_t A,
-                                                 const fq_nmod_mpoly_ctx_t ctx)
-{
-    return mpoly_total_degree_si(A->exps, A->length, A->bits, ctx->minfo);
-}
-
-FQ_NMOD_MPOLY_INLINE
-void fq_nmod_mpoly_used_vars(int * used, const fq_nmod_mpoly_t A,
-                                                 const fq_nmod_mpoly_ctx_t ctx)
-{
-    slong i;
-
-    for (i = 0; i < ctx->minfo->nvars; i++)
-        used[i] = 0;
-
-    mpoly_used_vars_or(used, A->exps, A->length, A->bits, ctx->minfo);
-}
+void fq_nmod_mpoly_used_vars(int * used, const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx);
 
 /* Coefficients **************************************************************/
 
@@ -511,12 +432,7 @@ FQ_NMOD_MPOLY_INLINE mp_limb_t * _fq_nmod_mpoly_leadcoeff(
     return A->coeffs + 0;
 }
 
-FQ_NMOD_MPOLY_INLINE int fq_nmod_mpoly_is_monic(const fq_nmod_mpoly_t A,
-                                                 const fq_nmod_mpoly_ctx_t ctx)
-{
-    return A->length > 0 &&
-           _n_fq_is_one(A->coeffs + 0, fq_nmod_ctx_degree(ctx->fqctx));
-}
+int fq_nmod_mpoly_is_monic(const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx);
 
 /* conversion ****************************************************************/
 
@@ -559,21 +475,8 @@ void fq_nmod_mpoly_get_term_coeff_fq_nmod(fq_nmod_t c,
 void fq_nmod_mpoly_set_term_coeff_fq_nmod(fq_nmod_mpoly_t A,
                     slong i, const fq_nmod_t c, const fq_nmod_mpoly_ctx_t ctx);
 
-FQ_NMOD_MPOLY_INLINE
-int fq_nmod_mpoly_term_exp_fits_ui(const fq_nmod_mpoly_t A, slong i,
-                                                 const fq_nmod_mpoly_ctx_t ctx)
-{
-    return A->bits <= FLINT_BITS ? 1
-                     : mpoly_term_exp_fits_ui(A->exps, A->bits, i, ctx->minfo);
-}
-
-FQ_NMOD_MPOLY_INLINE
-int fq_nmod_mpoly_term_exp_fits_si(const fq_nmod_mpoly_t A, slong i,
-                                                 const fq_nmod_mpoly_ctx_t ctx)
-{
-    return A->bits <= FLINT_BITS ? 1
-                     : mpoly_term_exp_fits_si(A->exps, A->bits, i, ctx->minfo);
-}
+int fq_nmod_mpoly_term_exp_fits_ui(const fq_nmod_mpoly_t A, slong i, const fq_nmod_mpoly_ctx_t ctx);
+int fq_nmod_mpoly_term_exp_fits_si(const fq_nmod_mpoly_t A, slong i, const fq_nmod_mpoly_ctx_t ctx);
 
 void fq_nmod_mpoly_get_term_exp_fmpz(fmpz ** exp,
               const fq_nmod_mpoly_t A, slong i, const fq_nmod_mpoly_ctx_t ctx);
@@ -1026,12 +929,7 @@ void fq_nmod_mpoly_univar_swap(fq_nmod_mpoly_univar_t A,
     FLINT_SWAP(fq_nmod_mpoly_univar_struct, *A, *B);
 }
 
-FQ_NMOD_MPOLY_INLINE
-int fq_nmod_mpoly_univar_degree_fits_si(const fq_nmod_mpoly_univar_t A,
-                                                 const fq_nmod_mpoly_ctx_t ctx)
-{
-    return A->length == 0 || fmpz_fits_si(A->exps + 0);
-}
+int fq_nmod_mpoly_univar_degree_fits_si(const fq_nmod_mpoly_univar_t A, const fq_nmod_mpoly_ctx_t ctx);
 
 FQ_NMOD_MPOLY_INLINE
 slong fq_nmod_mpoly_univar_length(const fq_nmod_mpoly_univar_t A,
@@ -1040,13 +938,7 @@ slong fq_nmod_mpoly_univar_length(const fq_nmod_mpoly_univar_t A,
     return A->length;
 }
 
-FQ_NMOD_MPOLY_INLINE
-slong fq_nmod_mpoly_univar_get_term_exp_si(fq_nmod_mpoly_univar_t A, slong i,
-                                                 const fq_nmod_mpoly_ctx_t ctx)
-{
-    FLINT_ASSERT(i < (ulong)A->length);
-    return fmpz_get_si(A->exps + i);
-}
+slong fq_nmod_mpoly_univar_get_term_exp_si(fq_nmod_mpoly_univar_t A, slong i, const fq_nmod_mpoly_ctx_t ctx);
 
 FQ_NMOD_MPOLY_INLINE
 void fq_nmod_mpoly_univar_get_term_coeff(fq_nmod_mpoly_t c,
@@ -1221,7 +1113,8 @@ void fq_nmod_mpolyn_set(fq_nmod_mpolyn_t A, const fq_nmod_mpolyn_t B,
 FQ_NMOD_MPOLY_INLINE mp_limb_t * fq_nmod_mpolyn_leadcoeff(
                              fq_nmod_mpolyn_t A, const fq_nmod_mpoly_ctx_t ctx)
 {
-    slong d = fq_nmod_ctx_degree(ctx->fqctx);
+    /* slong d = fq_nmod_ctx_degree(ctx->fqctx); */
+    slong d = ctx->fqctx->modulus->length - 1;
     n_poly_struct * leadpoly;
     FLINT_ASSERT(A->length > 0);
     leadpoly = A->coeffs + 0;

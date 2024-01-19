@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "mpoly.h"
 #include "fq_nmod_mpoly.h"
 
 TEST_FUNCTION_START(fq_nmod_mpoly_cmp, state)

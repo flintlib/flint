@@ -10,6 +10,8 @@
 */
 
 #include "test_helpers.h"
+#include "fq_nmod.h"
+#include "fq_nmod_poly.h"
 #include "n_poly.h"
 
 TEST_FUNCTION_START(n_fq_poly_add, state)

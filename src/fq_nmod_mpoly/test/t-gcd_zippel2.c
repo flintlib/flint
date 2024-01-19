@@ -10,6 +10,8 @@
 */
 
 #include "test_helpers.h"
+#include "fq_nmod.h"
+#include "n_poly.h"
 #include "fq_nmod_mpoly.h"
 
 /* Defined in t-gcd_brown.c, t-gcd.c, t-gcd_cofactors.c, t-gcd_hensel.c,

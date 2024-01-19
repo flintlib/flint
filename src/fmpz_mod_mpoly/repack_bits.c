@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_vec.h"
+#include "mpoly.h"
 #include "fmpz_mod_mpoly.h"
 
 int fmpz_mod_mpoly_repack_bits(

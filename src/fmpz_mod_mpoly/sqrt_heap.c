@@ -9,9 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmpcompat.h"
+#include "nmod.h"
+#include "fmpz_mod.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 #include "fmpz_mod_mpoly.h"
-#include "gmpcompat.h"
 
 #ifdef __GNUC__
 # define sqrt __builtin_sqrt

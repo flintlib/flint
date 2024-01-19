@@ -9,8 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
-
 
 int fmpz_mpoly_pow_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B,
                                     const fmpz_t k, const fmpz_mpoly_ctx_t ctx)

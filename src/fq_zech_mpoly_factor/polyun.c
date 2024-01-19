@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fq_zech_poly.h"
 #include "fq_zech_mpoly_factor.h"
-
 
 void fq_zech_polyun_clear(fq_zech_polyun_t A, const fq_zech_ctx_t ctx)
 {

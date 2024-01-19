@@ -19,7 +19,6 @@
 #define FMPZ_MOD_MAT_INLINE static inline
 #endif
 
-#include "thread_pool.h"
 #include "fmpz_mat.h"
 #include "fmpz_mod_types.h"
 

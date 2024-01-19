@@ -9,10 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
+#include "fq_nmod.h"
+#include "fq_nmod_poly.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "fq_nmod_mpoly.h"
-
-
 
 void fq_nmod_mpolyun_init(
     fq_nmod_mpolyun_t A,

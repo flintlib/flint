@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_poly.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
 #include "fmpz_mpoly_factor.h"
 

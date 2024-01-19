@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "mpoly.h"
 
 int mpoly_is_gen(ulong * exps, slong var, flint_bitcnt_t bits,

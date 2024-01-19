@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fq_nmod_mpoly_factor.h"
 
 void fq_nmod_mpoly_factor_realloc(fq_nmod_mpoly_factor_t f, slong alloc,

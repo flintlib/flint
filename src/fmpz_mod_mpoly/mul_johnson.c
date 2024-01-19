@@ -12,6 +12,8 @@
 #include "gmpcompat.h"
 #include "mpn_extras.h"
 #include "fmpz_vec.h"
+#include "fmpz_mod.h"
+#include "mpoly.h"
 #include "fmpz_mod_mpoly.h"
 
 #ifdef fmpz_mod_ctx_get_modulus_mpz_read_only

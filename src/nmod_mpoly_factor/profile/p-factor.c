@@ -9,8 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly_factor.h"
 #include "profiler.h"
+#include "fmpz.h"
+#include "nmod_mpoly_factor.h"
 
 #if defined(__GNUC__)
 # pragma GCC diagnostic push

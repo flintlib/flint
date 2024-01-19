@@ -141,7 +141,8 @@ where `\alpha,\beta,\gamma,\delta` are `g\times g` blocks.
 
 .. function:: slong sp2gz_dim(const fmpz_mat_t mat)
 
-    Returns `g`, which is half the number of rows (or columns) of *mat*.
+    Returns `g`, which is half the number of rows (or columns) of *mat*. This is
+    an inline function only.
 
 .. function:: void sp2gz_set_blocks(fmpz_mat_t mat, const fmpz_mat_t alpha, const fmpz_mat_t beta, const fmpz_mat_t gamma, const fmpz_mat_t delta)
 

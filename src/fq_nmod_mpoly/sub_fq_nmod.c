@@ -9,6 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fq_nmod.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "fq_nmod_mpoly.h"
 
 void fq_nmod_mpoly_sub_fq_nmod(
@@ -21,7 +24,7 @@ void fq_nmod_mpoly_sub_fq_nmod(
     slong N = mpoly_words_per_exp(B->bits, ctx->minfo);
     slong Blen = B->length;
 
-fq_nmod_mpoly_assert_canonical(B, ctx);
+    fq_nmod_mpoly_assert_canonical(B, ctx);
 
     if (fq_nmod_is_zero(c, ctx->fqctx))
     {

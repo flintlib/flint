@@ -9,9 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
+#include "fmpz_mod.h"
 #include "nmod_mpoly.h"
 #include "fmpz_mod_mpoly.h"
-
 
 int fmpz_mod_mpoly_quadratic_root(
     fmpz_mod_mpoly_t Q,

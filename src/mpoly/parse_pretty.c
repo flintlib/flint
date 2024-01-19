@@ -10,6 +10,7 @@
 */
 
 #include <string.h>
+#include "fmpz.h"
 #include "mpoly.h"
 
 #define PREC_LOWEST    0

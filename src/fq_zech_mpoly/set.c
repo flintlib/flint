@@ -10,6 +10,7 @@
 */
 
 #include "fq_zech.h"
+#include "mpoly.h"
 #include "fq_zech_mpoly.h"
 
 void _fq_zech_mpoly_set(fq_zech_struct * coeff1, ulong * exps1,

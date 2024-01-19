@@ -10,6 +10,7 @@
 */
 
 #include "fq_zech.h"
+#include "mpoly.h"
 #include "fq_zech_mpoly.h"
 
 static slong _fq_zech_mpoly_divrem_monagan_pearce(slong * lenr,

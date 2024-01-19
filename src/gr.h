@@ -1421,6 +1421,9 @@ void gr_ctx_init_gr_poly(gr_ctx_t ctx, gr_ctx_t base_ring);
 #ifdef MPOLY_H
 void gr_ctx_init_fmpz_mpoly(gr_ctx_t ctx, slong nvars, const ordering_t ord);
 void gr_ctx_init_gr_mpoly(gr_ctx_t ctx, gr_ctx_t base_ring, slong nvars, const ordering_t ord);
+#endif
+
+#ifdef FMPZ_MPOLY_Q_H
 void gr_ctx_init_fmpz_mpoly_q(gr_ctx_t ctx, slong nvars, const ordering_t ord);
 #endif
 

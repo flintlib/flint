@@ -11,11 +11,11 @@
 
 #include <stdint.h>
 #include <string.h>
+#include "thread_pool.h"
 #include "thread_support.h"
-#include "ulong_extras.h"
 #include "nmod.h"
-#include "fft_small.h"
 #include "crt_helpers.h"
+#include "fft_small.h"
 
 void crt_data_init(crt_data_t C, ulong prime, ulong coeff_len, ulong nprimes)
 {

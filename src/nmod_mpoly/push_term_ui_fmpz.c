@@ -9,6 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 void _nmod_mpoly_push_exp_ffmpz(

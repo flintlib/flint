@@ -59,9 +59,7 @@ void bool_mat_clear(bool_mat_t mat);
 BOOL_MAT_INLINE void
 bool_mat_swap(bool_mat_t mat1, bool_mat_t mat2)
 {
-    bool_mat_struct t = *mat1;
-    *mat1 = *mat2;
-    *mat2 = t;
+    FLINT_SWAP(bool_mat_struct, *mat1, *mat2);
 }
 
 /* Conversions */

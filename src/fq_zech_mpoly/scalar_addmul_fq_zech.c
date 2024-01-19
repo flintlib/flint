@@ -10,6 +10,7 @@
 */
 
 #include "fq_zech.h"
+#include "mpoly.h"
 #include "fq_zech_mpoly.h"
 
 static slong _fq_zech_mpoly_scalar_addmul_fq_zech(

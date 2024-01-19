@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_mpoly_factor.h"
-
 
 int fmpz_mpoly_factor_add(
     fmpz_mpoly_factor_t A,

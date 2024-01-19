@@ -11,6 +11,7 @@
 
 #include "test_helpers.h"
 #include "long_extras.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
 
 TEST_FUNCTION_START(fmpz_mpoly_add_sub_si, state)

@@ -9,7 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
+#include "fmpz.h"
 #include "fmpz_vec.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 static int _nmod_mpoly_divides_monagan_pearce1(

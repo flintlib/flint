@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2020 Fredrik Johansson
+    Copyright (C) 2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,5 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#define CA_FIELD_INLINES_C
-#include "ca_field.h"
+#include "fq_nmod.h"
+#include "n_poly.h"
+#include "fq_nmod_mpoly.h"
+
+int fq_nmod_mpoly_is_monic(const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t ctx)
+{
+    return A->length > 0 &&
+           _n_fq_is_one(A->coeffs + 0, fq_nmod_ctx_degree(ctx->fqctx));
+}

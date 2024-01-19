@@ -9,7 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
 #include "nmod_mat.h"
+#include "nmod_poly.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 /* store in each coefficient the evaluation of the corresponding monomial */

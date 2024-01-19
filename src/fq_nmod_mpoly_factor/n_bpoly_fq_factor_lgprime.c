@@ -9,10 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fq_nmod.h"
 #include "nmod_mat.h"
 #include "fmpz_poly_factor.h"
-#include "nmod_mpoly_factor.h"
+#include "fq_nmod_poly.h"
 #include "fq_nmod_poly_factor.h"
+#include "n_poly.h"
+#include "nmod_mpoly_factor.h"
+#include "mpoly.h"
 #include "fq_nmod_mpoly_factor.h"
 
 static void n_fq_bpoly_eval_sm_to_lg(

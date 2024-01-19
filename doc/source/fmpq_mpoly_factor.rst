@@ -33,10 +33,6 @@ Basic manipulation
 --------------------------------------------------------------------------------
 
 
-.. function:: void fmpq_mpoly_factor_swap(fmpq_mpoly_factor_t f, fmpq_mpoly_factor_t g, const fmpq_mpoly_ctx_t ctx)
-
-    Efficiently swap *f* and *g*.
-
 .. function:: slong fmpq_mpoly_factor_length(const fmpq_mpoly_factor_t f, const fmpq_mpoly_ctx_t ctx)
 
     Return the length of the product in *f*.

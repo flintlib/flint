@@ -10,6 +10,7 @@
 */
 
 #include "fq_zech.h"
+#include "mpoly.h"
 #include "fq_zech_mpoly.h"
 
 int _fq_zech_mpoly_equal(const fq_zech_struct * coeff1, const ulong * exp1,

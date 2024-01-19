@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fq_nmod.h"
 #include "n_poly.h"
-
 
 static void _n_fq_poly_taylor_shift_horner_n_fq(
     mp_limb_t * poly,

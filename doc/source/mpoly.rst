@@ -64,11 +64,13 @@ Orderings
 Monomial arithmetic
 --------------------------------------------------------------------------------
 
+These functions in this section are **only provided as inline functions** as
+they are somewhat trivial. This is in order to minimize the FLINT binary.
 
 .. function:: void mpoly_monomial_add(ulong * exp_ptr, const ulong * exp2, const ulong * exp3, slong N)
 
     Set ``(exp_ptr, N)`` to the sum of the monomials ``(exp2, N)`` and
-    ``(exp3, N)``, assuming ``bits <= FLINT_BITS``
+    ``(exp3, N)``, assuming ``bits <= FLINT_BITS``.
 
 .. function:: void mpoly_monomial_add_mp(ulong * exp_ptr, const ulong * exp2, const ulong * exp3, slong N)
 
@@ -117,6 +119,8 @@ Monomial arithmetic
 Monomial comparison
 --------------------------------------------------------------------------------
 
+These functions in this section are **only provided as inline functions** as
+they are somewhat trivial. This is in order to minimize the FLINT binary.
 
 .. function:: int mpoly_monomial_is_zero(const ulong * exp, slong N)
 
@@ -150,6 +154,8 @@ Monomial comparison
 Monomial divisibility
 --------------------------------------------------------------------------------
 
+These functions in this section are **only provided as inline functions** as
+they are somewhat trivial. This is in order to minimize the FLINT binary.
 
 .. function:: int mpoly_monomial_divides(ulong * exp_ptr, const ulong * exp2, const ulong * exp3, slong N, ulong mask)
 

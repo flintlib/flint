@@ -9,7 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
+#include "fq_zech.h"
+#include "fq_zech_poly.h"
 #include "fq_zech_poly_factor.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "fq_zech_mpoly_factor.h"
 
 static void fq_zech_mpoly_delete_duplicate_terms(

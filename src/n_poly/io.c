@@ -10,8 +10,9 @@
 */
 
 #include <stdio.h>
-#include "mpoly.h"
+#include "fq_nmod.h"
 #include "n_poly.h"
+#include "mpoly.h"
 
 void n_polyu3_print_pretty(
     const n_polyu_t A,

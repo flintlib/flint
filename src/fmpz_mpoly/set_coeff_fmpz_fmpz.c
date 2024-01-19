@@ -9,6 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
 
 void _fmpz_mpoly_set_coeff_fmpz_fmpz(fmpz_mpoly_t poly,

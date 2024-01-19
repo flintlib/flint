@@ -10,9 +10,10 @@
 */
 
 #include "test_helpers.h"
+#include "thread_pool.h"
+#include "thread_support.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
-#include "thread_support.h"
 
 typedef struct
 {

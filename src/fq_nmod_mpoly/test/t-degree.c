@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "fmpz.h"
 #include "fq_nmod_mpoly.h"
 
 /* check various degree operations */

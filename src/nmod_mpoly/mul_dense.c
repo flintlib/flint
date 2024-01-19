@@ -10,6 +10,8 @@
 */
 
 #include "nmod_poly.h"
+#include "fmpz.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 int _nmod_mpoly_mul_dense(nmod_mpoly_t P,

@@ -10,6 +10,7 @@
 */
 
 #include <stdio.h>
+#include "mpoly.h"
 #include "fmpz_mod_mpoly_factor.h"
 
 /* printing *******************************************************************/

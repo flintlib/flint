@@ -9,8 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
-
 
 static slong _fmpz_mpoly_scalar_fmma1(
     fmpz * Acoeffs, ulong * Aexps,

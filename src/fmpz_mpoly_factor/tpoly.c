@@ -10,8 +10,6 @@
 */
 
 #include "fmpz_mpoly_factor.h"
-#include "nmod_mpoly_factor.h"
-
 
 void fmpz_tpoly_fit_length(fmpz_tpoly_t A, slong len)
 {

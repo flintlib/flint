@@ -10,6 +10,7 @@
 */
 
 #include "fq_zech.h"
+#include "mpoly.h"
 #include "fq_zech_mpoly.h"
 
 void _fq_zech_mpoly_fit_length(fq_zech_struct ** coeff,

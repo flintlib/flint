@@ -13,8 +13,9 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <stdio.h>
-#include "gr_mpoly.h"
+#include "fmpz.h"
 #include "fmpz_vec.h"
+#include "gr_mpoly.h"
 
 static char * _gr_mpoly_default_vars[8] = {
     "x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8"

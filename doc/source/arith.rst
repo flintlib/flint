@@ -439,6 +439,10 @@ Number of partitions
     starting with `p(0)`, modulo the modulus defined by ``mod``.
     Uses inversion of Euler's pentagonal series.
 
+.. function:: void trig_prod_init(trig_prod_t prod)
+
+    Initializes ``prod``. This is an inline function only.
+
 .. function:: void arith_hrr_expsum_factored(trig_prod_t prod, mp_limb_t k, mp_limb_t n)
 
     Symbolically evaluates the exponential sum

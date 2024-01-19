@@ -9,8 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
-
 
 void fmpz_mpoly_inflate(fmpz_mpoly_t A, const fmpz_mpoly_t B,
            const fmpz * shift, const fmpz * stride, const fmpz_mpoly_ctx_t ctx)

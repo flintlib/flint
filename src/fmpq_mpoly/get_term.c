@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpoly.h"
 #include "fmpq_mpoly.h"
 
 void fmpq_mpoly_get_term(fmpq_mpoly_t M, const fmpq_mpoly_t A,

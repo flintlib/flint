@@ -9,7 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_vec.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 void nmod_mpoly_univar_init(nmod_mpoly_univar_t A, const nmod_mpoly_ctx_t ctx)
@@ -119,6 +121,17 @@ void nmod_mpoly_univar_set_coeff_ui(
 
     FLINT_ASSERT(0 && "unreachable");
     return;
+}
+
+int nmod_mpoly_univar_degree_fits_si(const nmod_mpoly_univar_t A, const nmod_mpoly_ctx_t ctx)
+{
+    return A->length == 0 || fmpz_fits_si(A->exps + 0);
+}
+
+slong nmod_mpoly_univar_get_term_exp_si(nmod_mpoly_univar_t A, slong i, const nmod_mpoly_ctx_t ctx)
+{
+    FLINT_ASSERT((ulong)i < (ulong)A->length);
+    return fmpz_get_si(A->exps + i);
 }
 
 void nmod_mpoly_univar_assert_canonical(nmod_mpoly_univar_t A,

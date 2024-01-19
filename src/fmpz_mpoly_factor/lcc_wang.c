@@ -9,9 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "mpoly.h"
 #include "fmpz_mpoly_factor.h"
-#include "n_poly.h"
-
 
 int fmpz_mpoly_factor_lcc_wang(
     fmpz_mpoly_struct * lc_divs,

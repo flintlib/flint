@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 ulong nmod_mpoly_get_term_var_exp_ui(const nmod_mpoly_t A, slong i,

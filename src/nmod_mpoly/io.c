@@ -10,6 +10,9 @@
 */
 
 #include <stdio.h>
+#include "fmpz.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 /* printing *******************************************************************/
