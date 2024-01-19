@@ -1,6 +1,6 @@
 /*
-    Copyright (C) 2008-2009 William Hart
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2008, 2009 William Hart
+    Copyright (C) 2010, 2011 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -10,6 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod_mat.h"
+#include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_mat.h"
 
@@ -24,4 +26,25 @@ fmpz_mat_set(fmpz_mat_t mat1, const fmpz_mat_t mat2)
             for (i = 0; i < mat2->r; i++)
                 _fmpz_vec_set(mat1->rows[i], mat2->rows[i], mat2->c);
     }
+}
+
+void
+fmpz_mat_set_nmod_mat(fmpz_mat_t A, const nmod_mat_t Amod)
+{
+    slong i, j;
+
+    for (i = 0; i < Amod->r; i++)
+        for (j = 0; j < Amod->c; j++)
+            fmpz_set_ui_smod(fmpz_mat_entry(A, i, j),
+                             nmod_mat_entry(Amod, i, j), Amod->mod.n);
+}
+
+void
+fmpz_mat_set_nmod_mat_unsigned(fmpz_mat_t A, const nmod_mat_t Amod)
+{
+    slong i, j;
+
+    for (i = 0; i < Amod->r; i++)
+        for (j = 0; j < Amod->c; j++)
+            fmpz_set_ui(fmpz_mat_entry(A, i, j), nmod_mat_entry(Amod, i, j));
 }
