@@ -19,3 +19,17 @@ void fq_zech_mpoly_ctx_init_deg(fq_zech_mpoly_ctx_t ctx, slong nvars,
     mpoly_ctx_init(ctx->minfo, nvars, ord);
     fq_zech_ctx_init_ui(ctx->fqctx, p, deg, "#");
 }
+
+void fq_zech_mpoly_ctx_clear(fq_zech_mpoly_ctx_t ctx)
+{
+    mpoly_ctx_clear(ctx->minfo);
+    fq_zech_ctx_clear(ctx->fqctx);
+}
+
+void fq_zech_mpoly_ctx_change_modulus(fq_zech_mpoly_ctx_t ctx, slong deg)
+{
+    ulong p;
+    p = fq_zech_ctx_mod(ctx->fqctx).n;
+    fq_zech_ctx_clear(ctx->fqctx);
+    fq_zech_ctx_init_ui(ctx->fqctx, p, deg, "#");
+}
