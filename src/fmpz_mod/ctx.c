@@ -75,3 +75,44 @@ void fmpz_mod_ctx_init(fmpz_mod_ctx_t ctx, const fmpz_t n)
     }
 #endif
 }
+
+void fmpz_mod_ctx_init_ui(fmpz_mod_ctx_t ctx, ulong n)
+{
+    fmpz_t n_;
+    fmpz_init_set_ui(n_, n);
+    fmpz_mod_ctx_init(ctx, n_);
+    fmpz_clear(n_);
+}
+
+void fmpz_mod_ctx_clear(fmpz_mod_ctx_t ctx)
+{
+    if (ctx->ninv_huge != NULL)
+    {
+        fmpz_preinvn_clear(ctx->ninv_huge);
+        flint_free(ctx->ninv_huge);
+    }
+
+    fmpz_clear(ctx->n);
+}
+
+void fmpz_mod_ctx_init_rand_bits(fmpz_mod_ctx_t ctx,
+                                   flint_rand_t state, flint_bitcnt_t max_bits)
+{
+    fmpz_t m;
+    fmpz_init(m);
+    fmpz_randtest_unsigned(m, state, max_bits);
+    fmpz_add_ui(m, m, 2);
+    fmpz_mod_ctx_init(ctx, m);
+    fmpz_clear(m);
+}
+
+void fmpz_mod_ctx_init_rand_bits_prime(fmpz_mod_ctx_t ctx,
+                                   flint_rand_t state, flint_bitcnt_t max_bits)
+{
+    fmpz_t m;
+    fmpz_init(m);
+    fmpz_randtest_unsigned(m, state, max_bits);
+    fmpz_nextprime(m, m, 0);
+    fmpz_mod_ctx_init(ctx, m);
+    fmpz_clear(m);
+}
