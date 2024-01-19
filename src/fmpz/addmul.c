@@ -1,5 +1,7 @@
 /*
     Copyright (C) 2009 William Hart
+    Copyright (C) 2021 Daniel Schultz
+    Copyright (C) 2022 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -9,11 +11,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "gmpcompat.h"
+#include "mpn_extras.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
-#include "mpn_extras.h"
 
 #define MPZ_FIT_SIZE(z, nlimbs) \
     do { \
@@ -218,5 +219,108 @@ void fmpz_addmul(fmpz_t f, const fmpz_t g, const fmpz_t h)
         mf = _fmpz_promote_val(f);
         _flint_mpz_addmul_large(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2), 0);
         _fmpz_demote_val(f);  /* cancellation may have occurred	*/
+    }
+}
+
+void fmpz_addmul_si(fmpz_t f, const fmpz_t g, slong x)
+{
+    fmpz F, G;
+
+    G = *g;
+    if (x == 0 || G == 0)
+        return;
+
+    F = *f;
+    if (F == 0)
+    {
+        fmpz_mul_si(f, g, x);
+        return;
+    }
+
+    if (!COEFF_IS_MPZ(G))
+    {
+        ulong p1, p0;
+        smul_ppmm(p1, p0, G, x);
+
+        if (!COEFF_IS_MPZ(F))
+        {
+            ulong F1 = FLINT_SIGN_EXT(F);
+            add_ssaaaa(p1, p0, p1, p0, F1, F);
+            fmpz_set_signed_uiui(f, p1, p0);
+        }
+        else
+        {
+            mpz_ptr pF = COEFF_TO_PTR(F);
+            flint_mpz_add_signed_uiui(pF, pF, p1, p0);
+            _fmpz_demote_val(f);
+        }
+    }
+    else
+    {
+        mpz_ptr pG = COEFF_TO_PTR(G);
+        mpz_ptr pF = _fmpz_promote_val(f);
+
+        if (x < 0)
+            flint_mpz_submul_ui(pF, pG, -x);
+        else
+            flint_mpz_addmul_ui(pF, pG, x);
+
+        _fmpz_demote_val(f);
+    }
+}
+
+void fmpz_addmul_ui(fmpz_t f, const fmpz_t g, ulong x)
+{
+    fmpz F, G;
+
+    G = *g;
+    if (x == 0 || G == 0)
+        return;
+
+    F = *f;
+    if (F == 0)
+    {
+        fmpz_mul_ui(f, g, x);
+        return;
+    }
+
+    if (!COEFF_IS_MPZ(G))
+    {
+        ulong p1, p0;
+
+        if (x <= WORD_MAX)
+        {
+            smul_ppmm(p1, p0, G, x);
+        }
+        else
+        {
+            umul_ppmm(p1, p0, FLINT_ABS(G), x);
+            if (G < 0)
+            {
+                p1 = -p1 - (p0 != 0);
+                p0 = -p0;
+            }
+        }
+
+        if (!COEFF_IS_MPZ(F))
+        {
+            ulong F1 = FLINT_SIGN_EXT(F);
+            add_ssaaaa(p1, p0, p1, p0, F1, F);
+            fmpz_set_signed_uiui(f, p1, p0);
+        }
+        else
+        {
+            mpz_ptr pF = COEFF_TO_PTR(F);
+            flint_mpz_add_signed_uiui(pF, pF, p1, p0);
+            _fmpz_demote_val(f);
+        }
+    }
+    else
+    {
+        mpz_ptr pG = COEFF_TO_PTR(G);
+        mpz_ptr pF = _fmpz_promote_val(f);
+
+        flint_mpz_addmul_ui(pF, pG, x);
+        _fmpz_demote_val(f);
     }
 }
