@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Daniel Schultz
+    Copyright (C) 2018, 2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -12,6 +12,62 @@
 #include "mpoly.h"
 #include "nmod_mpoly.h"
 
+ulong nmod_mpoly_get_coeff_ui_fmpz(const nmod_mpoly_t A,
+                                fmpz * const * exp, const nmod_mpoly_ctx_t ctx)
+{
+    slong index;
+    index = mpoly_monomial_index_pfmpz(A->exps, A->bits, A->length,
+                                                              exp, ctx->minfo);
+    if (index < 0)
+    {
+        return 0;
+    }
+    else
+    {
+        FLINT_ASSERT(index < A->length);
+        return A->coeffs[index];
+    }
+}
+
+ulong nmod_mpoly_get_coeff_ui_monomial(const nmod_mpoly_t A,
+                             const nmod_mpoly_t M, const nmod_mpoly_ctx_t ctx)
+{
+    slong index;
+
+    if (M->length != WORD(1))
+    {
+        flint_throw(FLINT_ERROR, "M not monomial in nmod_mpoly_get_coeff_ui_monomial");
+    }
+
+    index = mpoly_monomial_index_monomial(A->exps, A->bits, A->length,
+                                                 M->exps, M->bits, ctx->minfo);
+    if (index < 0)
+    {
+        return 0;
+    }
+    else
+    {
+        FLINT_ASSERT(index < A->length);
+        return A->coeffs[index];
+    }
+}
+
+ulong nmod_mpoly_get_coeff_ui_ui(const nmod_mpoly_t A,
+                                 const ulong * exp, const nmod_mpoly_ctx_t ctx)
+{
+    slong index;
+    index = mpoly_monomial_index_ui(A->exps, A->bits, A->length,
+                                                              exp, ctx->minfo);
+    if (index < 0)
+    {
+        return 0;
+    }
+    else
+    {
+        FLINT_ASSERT(index < A->length);
+        return A->coeffs[index];
+    }
+}
 
 void nmod_mpoly_get_coeff_vars_ui(nmod_mpoly_t C, const nmod_mpoly_t A,
                          const slong * vars, const ulong * exps, slong length,
