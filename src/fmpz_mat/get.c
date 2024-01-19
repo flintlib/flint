@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2014 Abhinav Baid
 
     This file is part of FLINT.
 
@@ -9,8 +10,59 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <float.h>
 #include "fmpz.h"
 #include "fmpz_mat.h"
+
+int
+fmpz_mat_get_d_mat(d_mat_t B, const fmpz_mat_t A)
+{
+    slong i, j;
+    fmpz_t dmax;
+
+    fmpz_init(dmax);
+    fmpz_set_d(dmax, DBL_MAX);
+
+    for (i = 0; i < A->r; i++)
+    {
+        for (j = 0; j < A->c; j++)
+        {
+            if (fmpz_cmpabs(fmpz_mat_entry(A, i, j), dmax) > 0)
+            {
+                fmpz_clear(dmax);
+                return -1;
+            }
+            d_mat_entry(B, i, j) = fmpz_get_d(fmpz_mat_entry(A, i, j));
+        }
+    }
+    fmpz_clear(dmax);
+    return 0;
+}
+
+int
+fmpz_mat_get_d_mat_transpose(d_mat_t B, const fmpz_mat_t A)
+{
+    slong i, j;
+    fmpz_t dmax;
+
+    fmpz_init(dmax);
+    fmpz_set_d(dmax, DBL_MAX);
+
+    for (i = 0; i < A->r; i++)
+    {
+        for (j = 0; j < A->c; j++)
+        {
+            if (fmpz_cmpabs(fmpz_mat_entry(A, i, j), dmax) > 0)
+            {
+                fmpz_clear(dmax);
+                return -1;
+            }
+            d_mat_entry(B, j, i) = fmpz_get_d(fmpz_mat_entry(A, i, j));
+        }
+    }
+    fmpz_clear(dmax);
+    return 0;
+}
 
 void
 fmpz_mat_get_nmod_mat(nmod_mat_t Amod, const fmpz_mat_t A)
