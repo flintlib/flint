@@ -18,7 +18,6 @@
 #define FMPZ_MOD_MPOLY_FACTOR_INLINE static inline
 #endif
 
-#include "thread_pool.h"
 #include "fmpz_mod_poly.h"
 #include "fmpz_mod_mpoly.h"
 

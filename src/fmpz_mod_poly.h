@@ -19,7 +19,6 @@
 #define FMPZ_MOD_POLY_INLINE static inline
 #endif
 
-#include "thread_pool.h"
 #include "nmod_types.h"
 #include "fmpz_mod_types.h"
 

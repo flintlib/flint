@@ -19,7 +19,6 @@
 #define FQ_DEFAULT_POLY_FACTOR_INLINE static inline
 #endif
 
-#include "thread_pool.h"
 #include "nmod_poly_factor.h"
 #include "fmpz_mod_poly_factor.h"
 #include "fq_poly_factor.h"

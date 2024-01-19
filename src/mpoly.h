@@ -20,7 +20,6 @@
 #endif
 
 #include <string.h>
-#include "thread_pool.h"
 #include "mpoly_types.h"
 
 #ifdef __cplusplus

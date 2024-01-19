@@ -21,7 +21,6 @@
 #endif
 
 #include "nmod_types.h"
-#include "thread_pool.h"
 
 #ifdef __cplusplus
 extern "C" {

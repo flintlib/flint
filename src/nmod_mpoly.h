@@ -18,7 +18,6 @@
 #define NMOD_MPOLY_INLINE static inline
 #endif
 
-#include "thread_pool.h"
 #include "nmod_types.h"
 #include "mpoly_types.h"
 

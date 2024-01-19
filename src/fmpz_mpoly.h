@@ -19,7 +19,6 @@
 #define FMPZ_MPOLY_INLINE static inline
 #endif
 
-#include "thread_pool.h"
 #include "mpoly_types.h"
 
 #ifdef __cplusplus

@@ -14,8 +14,11 @@
 #define QSIEVE_H
 
 #include <stdint.h>
-#include "thread_pool.h"
 #include "fmpz_types.h"
+
+#if FLINT_USES_PTHREAD
+# include <pthread.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {
