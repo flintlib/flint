@@ -50,3 +50,31 @@ arb_set(arb_t x, const arb_t y)
         mag_set(arb_radref(x), arb_radref(y));
     }
 }
+
+void
+arb_set_d(arb_t x, double y)
+{
+    arf_set_d(arb_midref(x), y);
+    mag_zero(arb_radref(x));
+}
+
+void
+arb_set_fmpz(arb_t x, const fmpz_t y)
+{
+    arf_set_fmpz(arb_midref(x), y);
+    mag_zero(arb_radref(x));
+}
+
+void
+arb_set_si(arb_t x, slong y)
+{
+    arf_set_si(arb_midref(x), y);
+    mag_zero(arb_radref(x));
+}
+
+void
+arb_set_ui(arb_t x, ulong y)
+{
+    arf_set_ui(arb_midref(x), y);
+    mag_zero(arb_radref(x));
+}
