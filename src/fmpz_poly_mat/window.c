@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2014 Abhinav Baid
-    Copyright (C) 2015 Elena Sergeicheva
+    Copyright (C) 2015 Elena Sergeichave
 
     This file is part of FLINT.
 
@@ -37,4 +37,11 @@ fmpz_poly_mat_window_init(fmpz_poly_mat_t window, const fmpz_poly_mat_t mat, slo
 
     window->r = r2 - r1;
     window->c = c2 - c1;
+}
+
+void
+fmpz_poly_mat_window_clear(fmpz_poly_mat_t window)
+{
+    if (window->r != 0)
+        flint_free(window->rows);
 }
