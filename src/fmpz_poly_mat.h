@@ -18,7 +18,7 @@
 #define FMPZ_POLY_MAT_INLINE static inline
 #endif
 
-#include "fmpz_poly.h"
+#include "fmpz_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -59,7 +59,7 @@ fmpz_poly_mat_swap_entrywise(fmpz_poly_mat_t mat1, fmpz_poly_mat_t mat2)
 
     for (i = 0; i < fmpz_poly_mat_nrows(mat1); i++)
         for (j = 0; j < fmpz_poly_mat_ncols(mat1); j++)
-            fmpz_poly_swap(fmpz_poly_mat_entry(mat2, i, j), fmpz_poly_mat_entry(mat1, i, j));
+            FLINT_SWAP(fmpz_poly_struct, *fmpz_poly_mat_entry(mat2, i, j), *fmpz_poly_mat_entry(mat1, i, j));
 }
 
 void fmpz_poly_mat_set(fmpz_poly_mat_t mat1, const fmpz_poly_mat_t mat2);
