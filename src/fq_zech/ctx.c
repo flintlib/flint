@@ -294,6 +294,25 @@ fq_zech_ctx_init_randtest_reducible(fq_zech_ctx_t ctx, flint_rand_t state, int t
     fq_zech_ctx_init_randtest(ctx, state, type);
 }
 
+void
+fq_zech_ctx_clear(fq_zech_ctx_t ctx)
+{
+    /* NOTE: Only zech_log_table of the three tables was assigned by malloc */
+    flint_free(ctx->zech_log_table);
+
+    if (ctx->owns_fq_nmod_ctx)
+    {
+        fq_nmod_ctx_clear(ctx->fq_nmod_ctx);
+        flint_free(ctx->fq_nmod_ctx);
+    }
+}
+
+void
+fq_zech_ctx_order(fmpz_t f, const fq_zech_ctx_t ctx)
+{
+    fq_nmod_ctx_order(f, ctx->fq_nmod_ctx);
+}
+
 /* Deprecated functions ******************************************************/
 
 void fq_zech_ctx_init(fq_zech_ctx_t ctx, fmpz_t p, slong d, const char * var) { fq_zech_ctx_init_ui(ctx, fmpz_get_ui(p), d, var); }
