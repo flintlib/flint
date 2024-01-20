@@ -9,10 +9,18 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "fmpz_poly.h"
 #include "fmpz_poly_mat.h"
-#include "ulong_extras.h"
+
+void
+fmpz_poly_mat_randtest(fmpz_poly_mat_t A, flint_rand_t state, slong len, flint_bitcnt_t bits)
+{
+    slong i, j;
+
+    for (i = 0; i < A->r; i++)
+        for (j = 0; j < A->c; j++)
+            fmpz_poly_randtest(fmpz_poly_mat_entry(A, i, j), state, len, bits);
+}
 
 void
 fmpz_poly_mat_randtest_sparse(fmpz_poly_mat_t A, flint_rand_t state, slong len,
@@ -37,4 +45,14 @@ fmpz_poly_mat_randtest_sparse(fmpz_poly_mat_t A, flint_rand_t state, slong len,
             }
         }
     }
+}
+
+void
+fmpz_poly_mat_randtest_unsigned(fmpz_poly_mat_t A, flint_rand_t state, slong len, flint_bitcnt_t bits)
+{
+    slong i, j;
+
+    for (i = 0; i < A->r; i++)
+        for (j = 0; j < A->c; j++)
+            fmpz_poly_randtest_unsigned(fmpz_poly_mat_entry(A, i, j), state, len, bits);
 }
