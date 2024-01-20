@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "ulong_extras.h"
 #include "nmod_vec.h"
 #include "aprcl.h"
 

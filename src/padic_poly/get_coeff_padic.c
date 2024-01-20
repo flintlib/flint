@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "padic.h"
 #include "padic_poly.h"
 
 void padic_poly_get_coeff_padic(padic_t x, const padic_poly_t f, slong n,

@@ -18,23 +18,12 @@
 #define PADIC_MAT_INLINE static inline
 #endif
 
-#include "padic.h"
-#include "fmpz_mat.h"
 #include "fmpq_types.h"
+#include "padic_types.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
-
-
-typedef struct
-{
-    fmpz_mat_struct mat;
-    slong val;
-    slong N;
-} padic_mat_struct;
-
-typedef padic_mat_struct padic_mat_t[1];
 
 /* Macros  *******************************************************************/
 
@@ -94,77 +83,18 @@ void padic_mat_reduce(padic_mat_t A, const padic_ctx_t ctx);
 PADIC_MAT_INLINE int
 padic_mat_is_empty(const padic_mat_t A)
 {
-    return fmpz_mat_is_empty(padic_mat(A));
+    return padic_mat_nrows(A) == 0 || padic_mat_ncols(A) == 0;
 }
 
 PADIC_MAT_INLINE int
 padic_mat_is_square(const padic_mat_t A)
 {
-    return fmpz_mat_is_square(padic_mat(A));
+    return padic_mat_nrows(A) == padic_mat_ncols(A);
 }
 
-PADIC_MAT_INLINE int
-padic_mat_is_canonical(const padic_mat_t A, const padic_ctx_t ctx)
-{
-    if (fmpz_mat_is_zero(padic_mat(A)))
-    {
-        return (padic_mat_val(A) == 0);
-    }
-    else
-    {
-        slong i, j;
-        int canonical = 0;
+int padic_mat_is_canonical(const padic_mat_t A, const padic_ctx_t ctx);
 
-        for (i = 0; i < padic_mat(A)->r; i++)
-            for (j = 0; j < padic_mat(A)->c; j++)
-                if (!fmpz_divisible(padic_mat_entry(A, i, j), ctx->p))
-                    canonical = 1;
-        return canonical;
-    }
-}
-
-PADIC_MAT_INLINE int
-padic_mat_is_reduced(const padic_mat_t A, const padic_ctx_t ctx)
-{
-    if (padic_mat_is_empty(A))
-    {
-        return 1;
-    }
-    else if (fmpz_mat_is_zero(padic_mat(A)))
-    {
-        return (padic_mat_val(A) == 0);
-    }
-    else if (padic_mat_is_canonical(A, ctx))
-    {
-        const slong v = padic_mat_val(A);
-        const slong N = padic_mat_prec(A);
-
-        if (v >= N)
-        {
-            return 0;
-        }
-        else
-        {
-            slong i, j;
-            fmpz_t pN;
-            int reduced = 1;
-            int alloc = _padic_ctx_pow_ui(pN, N - v, ctx);
-
-            for (i = 0; (i < padic_mat_nrows(A)) && reduced; i++)
-                for (j = 0; (j < padic_mat_ncols(A)) && reduced; j++)
-                    reduced = (fmpz_cmp(padic_mat_entry(A, i, j), pN) < 0);
-
-            if (alloc)
-                fmpz_clear(pN);
-
-            return reduced;
-        }
-    }
-    else
-    {
-        return 0;
-    }
-}
+int padic_mat_is_reduced(const padic_mat_t A, const padic_ctx_t ctx);
 
 /* Basic assignment **********************************************************/
 
@@ -179,7 +109,7 @@ padic_mat_swap_entrywise(padic_mat_t mat1, padic_mat_t mat2)
 
     for (i = 0; i < padic_mat_nrows(mat1); i++)
         for (j = 0; j < padic_mat_ncols(mat1); j++)
-            fmpz_swap(padic_mat_entry(mat2, i, j), padic_mat_entry(mat1, i, j));
+            FLINT_SWAP(fmpz, *padic_mat_entry(mat2, i, j), *padic_mat_entry(mat1, i, j));
 }
 
 void padic_mat_zero(padic_mat_t A);

@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
     This file is part of FLINT.
 
@@ -9,9 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "gmpcompat.h"
-#include "ulong_extras.h"
 #include "fmpz.h"
 
 void
@@ -62,5 +61,58 @@ fmpz_divexact(fmpz_t f, const fmpz_t g, const fmpz_t h)
                 _fmpz_demote_val(f);  /* division by h may result in small value */
             }
         }
+    }
+}
+
+void fmpz_divexact_si(fmpz_t f, const fmpz_t g, slong h)
+{
+    fmpz c1 = *g;
+
+    if (h == 0)
+    {
+        flint_throw(FLINT_ERROR, "Exception (fmpz_divexact_si). Division by zero.\n");
+    }
+
+    if (!COEFF_IS_MPZ(c1))  /* g is small */
+    {
+        fmpz_set_si(f, c1 / h);
+    }
+    else  /* g is large */
+    {
+        __mpz_struct * mf = _fmpz_promote(f);
+
+        if (h > 0)
+        {
+            flint_mpz_divexact_ui(mf, COEFF_TO_PTR(c1), h);
+            _fmpz_demote_val(f);  /* division by h may result in small value */
+        }
+        else
+        {
+            flint_mpz_divexact_ui(mf, COEFF_TO_PTR(c1), -h);
+            _fmpz_demote_val(f);  /* division by h may result in small value */
+            fmpz_neg(f, f);
+        }
+    }
+}
+
+void fmpz_divexact_ui(fmpz_t f, const fmpz_t g, ulong h)
+{
+    fmpz c1 = *g;
+
+    if (h == 0)
+    {
+        flint_throw(FLINT_ERROR, "Exception (fmpz_divexact_ui). Division by zero.\n");
+    }
+
+    if (!COEFF_IS_MPZ(c1))  /* g is small */
+    {
+        fmpz_set_si(f, c1 / (slong) h);
+    }
+    else  /* g is large */
+    {
+        __mpz_struct * mf = _fmpz_promote(f);
+
+        flint_mpz_divexact_ui(mf, COEFF_TO_PTR(c1), h);
+        _fmpz_demote_val(f);  /* division by h may result in small value */
     }
 }

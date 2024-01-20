@@ -18,7 +18,7 @@
 #define NMOD_POLY_MAT_INLINE static inline
 #endif
 
-#include "nmod_poly.h"
+#include "nmod_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -48,7 +48,11 @@ void nmod_poly_mat_init(nmod_poly_mat_t mat, slong rows, slong cols, mp_limb_t n
 
 void nmod_poly_mat_init_set(nmod_poly_mat_t mat, const nmod_poly_mat_t src);
 
-void nmod_poly_mat_swap(nmod_poly_mat_t mat1, nmod_poly_mat_t mat2);
+NMOD_POLY_MAT_INLINE void
+nmod_poly_mat_swap(nmod_poly_mat_t mat1, nmod_poly_mat_t mat2)
+{
+    FLINT_SWAP(nmod_poly_mat_struct, *mat1, *mat2);
+}
 
 NMOD_POLY_MAT_INLINE void
 nmod_poly_mat_swap_entrywise(nmod_poly_mat_t mat1, nmod_poly_mat_t mat2)
@@ -57,7 +61,7 @@ nmod_poly_mat_swap_entrywise(nmod_poly_mat_t mat1, nmod_poly_mat_t mat2)
 
     for (i = 0; i < nmod_poly_mat_nrows(mat1); i++)
         for (j = 0; j < nmod_poly_mat_ncols(mat1); j++)
-            nmod_poly_swap(nmod_poly_mat_entry(mat2, i, j), nmod_poly_mat_entry(mat1, i, j));
+            FLINT_SWAP(nmod_poly_struct, *nmod_poly_mat_entry(mat2, i, j), *nmod_poly_mat_entry(mat1, i, j));
 }
 
 void nmod_poly_mat_set(nmod_poly_mat_t mat1, const nmod_poly_mat_t mat2);

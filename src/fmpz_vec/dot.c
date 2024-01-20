@@ -1,6 +1,6 @@
 /*
-    Copyright (C) 2010 William Hart
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2010, 2020 William Hart
+    Copyright (C) 2010, 2011 Fredrik Johansson
     Copyright (C) 2014 Abhinav Baid
 
     This file is part of FLINT.
@@ -22,4 +22,15 @@ _fmpz_vec_dot(fmpz_t res, const fmpz * vec1, const fmpz * vec2, slong len2)
     fmpz_zero(res);
     for (i = 0; i < len2; i++)
         fmpz_addmul(res, vec1 + i, vec2 + i);
+}
+
+void
+_fmpz_vec_dot_ptr(fmpz_t c, const fmpz * vec1, fmpz ** const vec2,
+                                                       slong offset, slong len)
+{
+    slong i;
+
+    fmpz_zero(c);
+    for (i = 0; i < len; i++)
+        fmpz_addmul(c, vec1 + i, vec2[i] + offset);
 }

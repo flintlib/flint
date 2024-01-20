@@ -9,9 +9,86 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "perm.h"
+#include "nmod_vec.h"
+#include "nmod_mat.h"
 #include "nmod_poly.h"
 #include "nmod_poly_mat.h"
+
+void
+nmod_poly_mat_det_fflu(nmod_poly_t det, const nmod_poly_mat_t A)
+{
+    slong n = nmod_poly_mat_nrows(A);
+
+    if (n == 0)
+        nmod_poly_one(det);
+    else
+    {
+        nmod_poly_mat_t tmp;
+        slong * perm;
+        nmod_poly_mat_init_set(tmp, A);
+        perm = _perm_init(n);
+
+        nmod_poly_mat_fflu(tmp, det, perm, tmp, 1);
+        if (_perm_parity(perm, n))
+            nmod_poly_neg(det, det);
+
+        _perm_clear(perm);
+        nmod_poly_mat_clear(tmp);
+    }
+}
+
+void
+nmod_poly_mat_det_interpolate(nmod_poly_t det, const nmod_poly_mat_t A)
+{
+    slong i, l, n, len;
+
+    nmod_mat_t X;
+    mp_ptr x, d;
+
+    n = A->r;
+
+    if (n == 0)
+    {
+        nmod_poly_one(det);
+        return;
+    }
+
+    l = nmod_poly_mat_max_length(A);
+
+    if (l == 0)
+    {
+        nmod_poly_zero(det);
+        return;
+    }
+
+    /* Bound degree based on Laplace expansion */
+    len = n*(l - 1) + 1;
+
+    /* Not enough points to interpolate */
+    if (len > nmod_poly_mat_modulus(A))
+    {
+        nmod_poly_mat_det_fflu(det, A);
+        return;
+    }
+
+    x = _nmod_vec_init(len);
+    d = _nmod_vec_init(len);
+    nmod_mat_init(X, n, n, nmod_poly_mat_modulus(A));
+
+    for (i = 0; i < len; i++)
+    {
+        x[i] = i;
+        nmod_poly_mat_evaluate_nmod(X, A, x[i]);
+        d[i] = nmod_mat_det(X);
+    }
+
+    nmod_poly_interpolate_nmod_vec(det, x, d, len);
+
+    _nmod_vec_clear(x);
+    _nmod_vec_clear(d);
+    nmod_mat_clear(X);
+}
 
 void
 nmod_poly_mat_det(nmod_poly_t det, const nmod_poly_mat_t A)

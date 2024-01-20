@@ -77,3 +77,71 @@ void _fmpz_mod_subN(fmpz_t a, const fmpz_t b, const fmpz_t c,
     }
     FLINT_ASSERT(fmpz_mod_is_canonical(a, ctx));
 }
+
+void fmpz_mod_sub_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t c,
+                                                      const fmpz_mod_ctx_t ctx)
+{
+    FLINT_ASSERT(fmpz_mod_is_canonical(b, ctx));
+
+    fmpz_sub(a, b, c);
+    fmpz_mod(a, a, ctx->n);
+
+    FLINT_ASSERT(fmpz_mod_is_canonical(a, ctx));
+}
+
+void fmpz_mod_sub_ui(fmpz_t a, const fmpz_t b, ulong c,
+                                                      const fmpz_mod_ctx_t ctx)
+{
+    FLINT_ASSERT(fmpz_mod_is_canonical(b, ctx));
+
+    fmpz_sub_ui(a, b, c);
+    fmpz_mod(a, a, ctx->n);
+
+    FLINT_ASSERT(fmpz_mod_is_canonical(a, ctx));
+}
+
+void fmpz_mod_sub_si(fmpz_t a, const fmpz_t b, slong c,
+                                                      const fmpz_mod_ctx_t ctx)
+{
+    FLINT_ASSERT(fmpz_mod_is_canonical(b, ctx));
+
+    fmpz_sub_si(a, b, c);
+    fmpz_mod(a, a, ctx->n);
+
+    FLINT_ASSERT(fmpz_mod_is_canonical(a, ctx));
+}
+
+void fmpz_mod_fmpz_sub(fmpz_t a, const fmpz_t b, const fmpz_t c,
+                                                      const fmpz_mod_ctx_t ctx)
+{
+    FLINT_ASSERT(fmpz_mod_is_canonical(c, ctx));
+
+    fmpz_sub(a, b, c);
+    fmpz_mod(a, a, ctx->n);
+
+    FLINT_ASSERT(fmpz_mod_is_canonical(a, ctx));
+}
+
+void fmpz_mod_ui_sub(fmpz_t a, ulong b, const fmpz_t c,
+                                                      const fmpz_mod_ctx_t ctx)
+{
+    FLINT_ASSERT(fmpz_mod_is_canonical(c, ctx));
+
+    fmpz_sub_ui(a, c, b);
+    fmpz_neg(a, a);
+    fmpz_mod(a, a, ctx->n);
+
+    FLINT_ASSERT(fmpz_mod_is_canonical(a, ctx));
+}
+
+void fmpz_mod_si_sub(fmpz_t a, slong b, const fmpz_t c,
+                                                      const fmpz_mod_ctx_t ctx)
+{
+    FLINT_ASSERT(fmpz_mod_is_canonical(c, ctx));
+
+    fmpz_sub_si(a, c, b);
+    fmpz_neg(a, a);
+    fmpz_mod(a, a, ctx->n);
+
+    FLINT_ASSERT(fmpz_mod_is_canonical(a, ctx));
+}

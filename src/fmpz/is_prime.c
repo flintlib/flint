@@ -10,11 +10,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "nmod_vec.h"
-#include "aprcl.h"
 #include "mpn_extras.h"
+#include "ulong_extras.h"
+#include "nmod_vec.h"
+#include "fmpz.h"
+#include "aprcl.h"
 
 int _fmpz_is_prime(const fmpz_t n, int proved)
 {

@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
 #include "ulong_extras.h"
+#include "fmpz.h"
 #include "fq_zech.h"
 
 void
@@ -23,4 +23,66 @@ fq_zech_mul(fq_zech_t rop, const fq_zech_t op1, const fq_zech_t op2,
         return;
     }
     rop->value = n_addmod(op1->value, op2->value, ctx->qm1);
+}
+
+void
+fq_zech_mul_fmpz(fq_zech_t rop, const fq_zech_t op, const fmpz_t x,
+                 const fq_zech_ctx_t ctx)
+{
+    mp_limb_t ux;
+    fmpz_t y;
+
+    fmpz_init(y);
+    fmpz_mod_ui(y, x, ctx->p);
+
+    ux = fmpz_get_ui(y);
+
+    fmpz_clear(y);
+
+    fq_zech_mul_ui(rop, op, ux, ctx);
+}
+
+void
+fq_zech_mul_si(fq_zech_t rop, const fq_zech_t op, slong x,
+               const fq_zech_ctx_t ctx)
+{
+    mp_limb_t y;
+    if (x == 0 || fq_zech_is_zero(op, ctx))
+    {
+        fq_zech_zero(rop, ctx);
+        return;
+    }
+    if (x < 0)
+    {
+        y = -x;
+        fq_zech_mul_ui(rop, op, y, ctx);
+        fq_zech_neg(rop, rop, ctx);
+    }
+    else
+    {
+        y = x;
+        fq_zech_mul_ui(rop, op, y, ctx);
+    }
+}
+
+void
+fq_zech_mul_ui(fq_zech_t rop, const fq_zech_t op, mp_limb_t x,
+               const fq_zech_ctx_t ctx)
+{
+    mp_limb_t b;
+
+    if (x == 0 || fq_zech_is_zero(op, ctx))
+    {
+        fq_zech_zero(rop, ctx);
+        return;
+    }
+
+    b = x;
+    if (x >= ctx->p)
+        b = n_mod2_precomp(x, ctx->p, ctx->ppre);
+
+    if (b == 0)
+        fq_zech_zero(rop, ctx);
+    else
+        rop->value = n_addmod(op->value, ctx->prime_field_table[b], ctx->qm1);
 }

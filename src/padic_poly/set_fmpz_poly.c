@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_poly.h"
+#include "fmpz_vec.h"
 #include "padic_poly.h"
 
 void padic_poly_set_fmpz_poly(padic_poly_t f, const fmpz_poly_t g,

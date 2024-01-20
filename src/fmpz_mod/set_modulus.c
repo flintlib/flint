@@ -16,3 +16,9 @@ void fmpz_mod_ctx_set_modulus(fmpz_mod_ctx_t ctx, const fmpz_t n)
     fmpz_mod_ctx_clear(ctx);
     fmpz_mod_ctx_init(ctx, n);
 }
+
+void fmpz_mod_ctx_set_modulus_ui(fmpz_mod_ctx_t ctx, ulong n)
+{
+    fmpz_mod_ctx_clear(ctx);
+    fmpz_mod_ctx_init_ui(ctx, n);
+}

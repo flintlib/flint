@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "padic_poly.h"
 
 void _padic_poly_canonicalise(fmpz *poly, slong *v, slong len, const fmpz_t p)

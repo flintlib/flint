@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2021 Daniel Schultz
+    Copyright (C) 2021 William Hart
 
     This file is part of FLINT.
 
@@ -24,4 +25,17 @@ void _fmpz_mod_vec_dot(
     for (len--; len >= 0; len--)
         fmpz_addmul(d, a + len, b + len);
     fmpz_mod_set_fmpz(d, d, ctx);
+}
+
+void _fmpz_mod_vec_dot_rev(fmpz_t r, const fmpz * a,
+		           const fmpz * b, slong len, const fmpz_mod_ctx_t ctx)
+{
+    slong i;
+
+    fmpz_zero(r);
+
+    for (i = 0; i < len; i++)
+        fmpz_addmul(r, a + i, b + len - i - 1);
+
+    fmpz_mod_set_fmpz(r, r, ctx);
 }

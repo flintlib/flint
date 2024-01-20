@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "fmpz_poly.h"
 #include "fmpz_poly_mat.h"
 
 TEST_FUNCTION_START(fmpz_poly_mat_det, state)

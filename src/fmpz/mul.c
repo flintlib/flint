@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2009, 2020 William Hart
     Copyright (C) 2021 Albin Ahlbäck
     Copyright (C) 2022 Fredrik Johansson
 
@@ -12,8 +12,8 @@
 */
 
 #include "gmpcompat.h"
-#include "fmpz.h"
 #include "mpn_extras.h"
+#include "fmpz.h"
 
 /* This can only be called from fmpz_mul, and assumes
    x and y are not small. */
@@ -191,4 +191,94 @@ fmpz_mul(fmpz_t f, const fmpz_t g, const fmpz_t h)
         flint_mpz_mul_si(mf, COEFF_TO_PTR(c1), c2);
     else
         flint_mpz_mul(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
+}
+
+void
+fmpz_mul_si(fmpz_t f, const fmpz_t g, slong x)
+{
+    fmpz c2 = *g;
+
+    if (!COEFF_IS_MPZ(c2)) /* c2 is small */
+    {
+        mp_limb_t th, tl;
+
+        /* limb by limb multiply (assembly for most CPU's) */
+        smul_ppmm(th, tl, c2, x);
+        fmpz_set_signed_uiui(f, th, tl);
+    }
+    else                        /* c2 is large */
+    {
+        __mpz_struct * mf;
+        if (!COEFF_IS_MPZ(*f))
+        {
+            if (x == 0)
+            {
+                *f = 0;
+                return;
+            }
+
+            mf = _fmpz_new_mpz();
+            *f = PTR_TO_COEFF(mf);
+        }
+        else
+        {
+            if (x == 0)
+            {
+                _fmpz_clear_mpz(*f);
+                *f = 0;
+                return;
+            }
+
+            mf = COEFF_TO_PTR(*f);
+        }
+
+        flint_mpz_mul_si(mf, COEFF_TO_PTR(c2), x);
+    }
+}
+
+void
+fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong x)
+{
+    fmpz c2 = *g;
+
+    if (!COEFF_IS_MPZ(c2)) /* c2 is small */
+    {
+        mp_limb_t th, tl;
+        mp_limb_t uc2 = FLINT_ABS(c2);
+
+        /* unsigned limb by limb multiply (assembly for most CPU's) */
+        umul_ppmm(th, tl, uc2, x);
+        if (c2 >= 0)
+            fmpz_set_uiui(f, th, tl);
+        else
+            fmpz_neg_uiui(f, th, tl);
+    }
+    else                        /* c2 is large */
+    {
+        __mpz_struct * mf;
+        if (!COEFF_IS_MPZ(*f))
+        {
+            if (x == 0)
+            {
+                *f = 0;
+                return;
+            }
+
+            mf = _fmpz_new_mpz();
+            *f = PTR_TO_COEFF(mf);
+        }
+        else
+        {
+            if (x == 0)
+            {
+                _fmpz_clear_mpz(*f);
+                *f = 0;
+                return;
+            }
+
+            mf = COEFF_TO_PTR(*f);
+        }
+
+        flint_mpz_mul_ui(mf, COEFF_TO_PTR(c2), x);
+    }
 }

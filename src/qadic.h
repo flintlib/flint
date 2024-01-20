@@ -18,6 +18,8 @@
 #define QADIC_INLINE static inline
 #endif
 
+#include "fmpz_vec.h"
+#include "padic.h"
 #include "padic_poly.h"
 
 #ifdef __cplusplus
