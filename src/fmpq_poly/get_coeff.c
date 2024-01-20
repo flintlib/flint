@@ -1,6 +1,6 @@
 /*
-    Copyright (C) 2011 Sebastian Pancratz
     Copyright (C) 2010 William Hart
+    Copyright (C) 2011 Sebastian Pancratz
 
     This file is part of FLINT.
 
@@ -24,4 +24,12 @@ void fmpq_poly_get_coeff_fmpq(fmpq_t x, const fmpq_poly_t poly, slong n)
     fmpz_set(fmpq_numref(x), poly->coeffs + n);
     fmpz_set(fmpq_denref(x), poly->den);
     fmpq_canonicalise(x);
+}
+
+void fmpq_poly_get_coeff_fmpz(fmpz_t x, const fmpq_poly_t poly, slong n)
+{
+    if (n >= poly->length)  /* Coefficient is beyond the end of poly */
+        fmpz_zero(x);
+    else
+        fmpz_set(x, poly->coeffs + n);
 }
