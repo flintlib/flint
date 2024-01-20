@@ -1,6 +1,6 @@
 /*
-    Copyright (C) 2011 Sebastian Pancratz
     Copyright (C) 2010 William Hart
+    Copyright (C) 2010, 2011 Sebastian Pancratz
 
     This file is part of FLINT.
 
@@ -10,7 +10,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fmpq.h"
@@ -77,5 +76,92 @@ void fmpq_poly_set_coeff_fmpq(fmpq_poly_t poly, slong n, const fmpq_t x)
 
         fmpz_clear(d);
         fmpz_clear(t);
+    }
+}
+
+void fmpq_poly_set_coeff_fmpz(fmpq_poly_t poly, slong n, const fmpz_t x)
+{
+    slong len = poly->length;
+    const int replace = (n < len && !fmpz_is_zero(poly->coeffs + n));
+
+    if (!replace && fmpz_is_zero(x))
+        return;
+
+    if (n + 1 > len)
+    {
+        fmpq_poly_fit_length(poly, n + 1);
+        _fmpq_poly_set_length(poly, n + 1);
+        flint_mpn_zero((mp_ptr) poly->coeffs + len, (n + 1) - len);
+    }
+
+    if (*poly->den == WORD(1))
+    {
+        fmpz_set(poly->coeffs + n, x);
+        if (replace)
+            _fmpq_poly_normalise(poly);
+    }
+    else
+    {
+        fmpz_mul(poly->coeffs + n, poly->den, x);
+        if (replace)
+            fmpq_poly_canonicalise(poly);
+    }
+}
+
+void fmpq_poly_set_coeff_si(fmpq_poly_t poly, slong n, slong x)
+{
+    slong len = poly->length;
+    const int replace = (n < len && !fmpz_is_zero(poly->coeffs + n));
+
+    if (!replace && (x == WORD(0)))
+        return;
+
+    if (n + 1 > len)
+    {
+        fmpq_poly_fit_length(poly, n + 1);
+        _fmpq_poly_set_length(poly, n + 1);
+        flint_mpn_zero((mp_ptr) poly->coeffs + len, (n + 1) - len);
+    }
+
+    if (*poly->den == WORD(1))
+    {
+        fmpz_set_si(poly->coeffs + n, x);
+        if (replace)
+            _fmpq_poly_normalise(poly);
+    }
+    else
+    {
+        fmpz_mul_si(poly->coeffs + n, poly->den, x);
+        if (replace)
+            fmpq_poly_canonicalise(poly);
+    }
+}
+
+void fmpq_poly_set_coeff_ui(fmpq_poly_t poly, slong n, ulong x)
+{
+    slong len = poly->length;
+    const int replace = (n < len && !fmpz_is_zero(poly->coeffs + n));
+
+    if (!replace && (x == UWORD(0)))
+        return;
+
+    if (n + 1 > len)
+    {
+        fmpq_poly_fit_length(poly, n + 1);
+        _fmpq_poly_set_length(poly, n + 1);
+        flint_mpn_zero((mp_ptr) poly->coeffs + len, (n + 1) - len);
+    }
+
+    if (*poly->den == WORD(1))
+    {
+        fmpz_set_ui(poly->coeffs + n, x);
+        if (replace)
+            _fmpq_poly_normalise(poly);
+    }
+    else
+    {
+        fmpz_mul_ui(poly->coeffs + n, poly->den, x);
+        if (replace)
+            fmpq_poly_canonicalise(poly);
     }
 }
