@@ -12,6 +12,7 @@
 #include "test_helpers.h"
 #include "ulong_extras.h"
 #include "fmpq_poly.h"
+#include "padic.h"
 #include "padic_poly.h"
 
 TEST_FUNCTION_START(padic_poly_add, state)

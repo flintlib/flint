@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include "fmpq.h"
+#include "padic.h"
 #include "padic_mat.h"
 
 /* printing *******************************************************************/

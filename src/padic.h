@@ -19,23 +19,16 @@
 #endif
 
 #include "fmpz.h"
+#include "padic_types.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 #define PADIC_DEFAULT_PREC WORD(20)
 
 #define PADIC_TEST_PREC_MIN WORD(-100)
 #define PADIC_TEST_PREC_MAX  WORD(100)
-
-typedef struct {
-    fmpz u;
-    slong v;
-    slong N;
-} padic_struct;
-
-typedef padic_struct padic_t[1];
 
 #define padic_val(x)   ((x)->v)
 #define padic_prec(x)  ((x)->N)
@@ -57,36 +50,6 @@ slong padic_get_prec(const padic_t x)
 {
    return x->N;
 }
-
-enum padic_print_mode
-{
-    PADIC_TERSE,
-    PADIC_SERIES,
-    PADIC_VAL_UNIT
-};
-
-typedef struct {
-
-    fmpz_t p;
-
-    double pinv;
-
-    fmpz *pow;
-    slong min;
-    slong max;
-
-    enum padic_print_mode mode;
-
-} padic_ctx_struct;
-
-typedef padic_ctx_struct padic_ctx_t[1];
-
-typedef struct {
-    slong n;
-    fmpz *pow;
-} padic_inv_struct;
-
-typedef padic_inv_struct padic_inv_t[1];
 
 /* Context *******************************************************************/
 
@@ -194,17 +157,7 @@ void padic_get_mpq(mpq_t rop, const padic_t op, const padic_ctx_t ctx);
 
 PADIC_INLINE void padic_swap(padic_t op1, padic_t op2)
 {
-    slong t;
-
-    fmpz_swap(padic_unit(op1), padic_unit(op2));
-
-    t              = padic_val(op1);
-    padic_val(op1) = padic_val(op2);
-    padic_val(op2) = t;
-
-    t               = padic_prec(op1);
-    padic_prec(op1) = padic_prec(op2);
-    padic_prec(op2) = t;
+    FLINT_SWAP(padic_struct, *op1, *op2);
 }
 
 PADIC_INLINE void padic_zero(padic_t rop)

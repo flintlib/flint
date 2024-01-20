@@ -9,7 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "padic.h"
 #include "padic_poly.h"
 
 void _padic_poly_add(fmpz *rop, slong *val, slong N,

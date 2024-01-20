@@ -1,6 +1,6 @@
 /*
-    Copyright (C) 2011, 2012 Sebastian Pancratz
     Copyright (C) 2009 William Hart
+    Copyright (C) 2011, 2012 Sebastian Pancratz
 
     This file is part of FLINT.
 
@@ -10,8 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-
-#include "flint.h"
+#include "padic.h"
 #include "padic_poly.h"
 
 void padic_poly_randtest_val(padic_poly_t f, flint_rand_t state,
