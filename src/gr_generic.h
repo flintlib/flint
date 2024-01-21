@@ -161,6 +161,7 @@ WARN_UNUSED_RESULT int gr_generic_mul_2exp_si(gr_ptr res, gr_srcptr x, slong y, 
 WARN_UNUSED_RESULT int gr_generic_mul_2exp_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_set_fmpz_2exp_fmpz(gr_ptr res, const fmpz_t x, const fmpz_t y, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_get_fmpz_2exp_fmpz(fmpz_t res1, fmpz_t res2, gr_ptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_set_fmpz_10exp_fmpz(gr_ptr res, const fmpz_t x, const fmpz_t y, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_generic_inv(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT truth_t gr_generic_is_invertible(gr_srcptr x, gr_ctx_t ctx);

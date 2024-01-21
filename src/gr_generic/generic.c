@@ -862,6 +862,48 @@ int gr_generic_get_fmpz_2exp_fmpz(fmpz_t res1, fmpz_t res2, gr_ptr x, gr_ctx_t c
     return status;
 }
 
+int gr_generic_set_fmpz_10exp_fmpz(gr_ptr res, const fmpz_t x, const fmpz_t y, gr_ctx_t ctx)
+{
+    if (fmpz_is_zero(y))
+    {
+        return gr_set_fmpz(res, x, ctx);
+    }
+    else if (fmpz_is_zero(x))
+    {
+        return gr_zero(res, ctx);
+    }
+    else
+    {
+        gr_ptr t;
+        int status;
+
+        GR_TMP_INIT(t, ctx);
+
+        status = gr_set_ui(t, 10, ctx);
+
+        if (fmpz_sgn(y) > 0)
+        {
+            status |= gr_pow_fmpz(t, t, y, ctx);
+            status |= gr_set_fmpz(res, x, ctx);
+            status |= gr_mul(res, res, t, ctx);
+        }
+        else
+        {
+            fmpz_t e;
+            fmpz_init(e);
+            fmpz_neg(e, y);
+            status |= gr_pow_fmpz(t, t, e, ctx);
+            status |= gr_set_fmpz(res, x, ctx);
+            status |= gr_div(res, res, t, ctx);
+            fmpz_clear(e);
+        }
+
+        GR_TMP_CLEAR(t, ctx);
+
+        return status;
+    }
+}
+
 int gr_generic_get_fexpr_serialize(fexpr_t res, gr_srcptr x, gr_ctx_t ctx)
 {
     return gr_get_fexpr(res, x, ctx);
@@ -2581,6 +2623,7 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_MUL_2EXP_FMPZ,           (gr_funcptr) gr_generic_mul_2exp_fmpz},
     {GR_METHOD_SET_FMPZ_2EXP_FMPZ,      (gr_funcptr) gr_generic_set_fmpz_2exp_fmpz},
     {GR_METHOD_GET_FMPZ_2EXP_FMPZ,      (gr_funcptr) gr_generic_get_fmpz_2exp_fmpz},
+    {GR_METHOD_SET_FMPZ_10EXP_FMPZ,     (gr_funcptr) gr_generic_set_fmpz_10exp_fmpz},
 
     {GR_METHOD_DIV_UI,                  (gr_funcptr) gr_generic_div_ui},
     {GR_METHOD_DIV_SI,                  (gr_funcptr) gr_generic_div_si},

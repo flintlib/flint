@@ -18,27 +18,30 @@
 #include "gr_vec.h"
 #include "gr_generic.h"
 
-#define PREC_LOWEST    0
-#define PREC_PLUS      1
-#define PREC_MINUS     1
-#define PREC_TIMES     2
-#define PREC_DIVIDES   2
-#define PREC_UPLUS     3
-#define PREC_UMINUS    3
-#define PREC_POWER     4
-#define PREC_HIGHEST 255
+#define PREC_LOWEST      0
+#define PREC_PLUS        1
+#define PREC_MINUS       1
+#define PREC_PLUSMINUS   1
+#define PREC_TIMES       2
+#define PREC_DIVIDES     2
+#define PREC_UPLUS       3
+#define PREC_UMINUS      3
+#define PREC_UPLUSMINUS  3
+#define PREC_POWER       4
+#define PREC_HIGHEST   255
 
-#define OP_TIMES    0
-#define OP_PLUS     1
-#define OP_MINUS    2
-#define OP_DIVIDES  3
-#define OP_LROUND   4
-#define OP_POWER    5
+#define OP_TIMES       0
+#define OP_PLUS        1
+#define OP_MINUS       2
+#define OP_DIVIDES     3
+#define OP_LROUND      4
+#define OP_POWER       5
+#define OP_PLUSMINUS   6
 
-#define FIX_INFIX       0
-#define FIX_PREFIX      1
-#define FIX_POSTFIX     2
-#define FIX_MATCHFIX    3
+#define FIX_INFIX      0
+#define FIX_PREFIX     1
+#define FIX_POSTFIX    2
+#define FIX_MATCHFIX   3
 
 typedef struct {
     gr_ctx_struct * R;
@@ -395,6 +398,17 @@ again:
             E->estore_len -= 1;
             E->stack_len -= 2;
         }
+        else if (_op_name(n2) == OP_PLUSMINUS)
+        {
+            if (GR_SUCCESS != gr_set_interval_mid_rad(E->tmp, GR_ENTRY(E->estore, n3, sz), GR_ENTRY(E->estore, n1, sz), E->R))
+            {
+                return -1;
+            }
+
+            gr_swap(GR_ENTRY(E->estore, n3, sz), E->tmp, E->R);
+            E->estore_len -= 1;
+            E->stack_len -= 2;
+        }
         else
         {
             flint_throw(FLINT_ERROR, "_pop_stack: internal error");
@@ -405,7 +419,21 @@ again:
     else if (_op_fix(n2) == FIX_PREFIX)
     {
         if (_op_name(n2) == OP_MINUS)
-            GR_MUST_SUCCEED(gr_neg(GR_ENTRY(E->estore, n1, sz), GR_ENTRY(E->estore, n1, sz), E->R));
+        {
+            if (GR_SUCCESS != gr_neg(GR_ENTRY(E->estore, n1, sz), GR_ENTRY(E->estore, n1, sz), E->R))
+                return -1;
+        }
+        else if (_op_name(n2) == OP_PLUSMINUS)
+        {
+            gr_ptr zero;
+            GR_TMP_INIT(zero, E->R);
+            if (GR_SUCCESS != gr_set_interval_mid_rad(GR_ENTRY(E->estore, n1, sz), zero, GR_ENTRY(E->estore, n1, sz), E->R))
+            {
+                GR_TMP_CLEAR(zero, E->R);
+                return -1;
+            }
+            GR_TMP_CLEAR(zero, E->R);
+        }
 
         E->stack[n-2] = -1-n1;
         E->stack_len -= 1;
@@ -453,24 +481,149 @@ static const char * _parse_int(fmpz_t c, const char * s, const char * end)
     return s;
 }
 
+FLINT_FORCE_INLINE int is_digit(int c)
+{
+    return '0' <= c && c <= '9';
+}
+
+static const char * _parse_decimal(fmpz_t c, fmpz_t d, const char * s, const char * end)
+{
+    char * buffer;
+    slong int_digits = 1;
+    slong frac_digits = 0;
+    slong exp_digits = 0;
+    slong i;
+    int exp_minus = 0;
+    const char * s_frac = s;
+    const char * s_exp = s;
+
+    TMP_INIT;
+
+    TMP_START;
+
+    while (s + int_digits < end && is_digit(s[int_digits]))
+        int_digits++;
+
+    s_frac = s + int_digits;
+
+    if (s_frac < end && s_frac[0] == '.')
+    {
+        /* skip the . */
+        s_frac++;
+        frac_digits = 0;
+
+        while (s_frac + frac_digits < end && is_digit(s_frac[frac_digits]))
+            frac_digits++;
+
+        s_exp = s_frac + frac_digits;
+    }
+    else
+    {
+        s_exp = s + int_digits;
+    }
+
+    if (s_exp + 1 < end && (s_exp[0] == 'e' || s_exp[0] == 'E') &&
+                        (is_digit(s_exp[1]) || (s_exp + 2 < end && (s_exp[1] == '+' || s_exp[1] == '-') && is_digit(s_exp[2]))))
+    {
+        /* skip the e or E */
+        s_exp++;
+
+        if (s_exp[0] == '-')
+        {
+            exp_minus = 1;
+            s_exp++;
+        }
+        else if (s_exp[0] == '+')
+        {
+            s_exp++;
+        }
+
+        exp_digits = 1;
+
+        while (s_exp + exp_digits < end && is_digit(s_exp[exp_digits]))
+            exp_digits++;
+    }
+
+    buffer = TMP_ALLOC((FLINT_MAX(int_digits + frac_digits, exp_digits) + 1) * sizeof(char));
+
+    if (exp_digits)
+    {
+        for (i = 0; i < exp_digits; i++)
+            buffer[i] = s_exp[i];
+        buffer[exp_digits] = '\0';
+
+        fmpz_set_str(d, buffer, 10);
+        if (exp_minus)
+            fmpz_neg(d, d);
+    }
+    else
+    {
+        fmpz_zero(d);
+    }
+
+    for (i = 0; i < int_digits; i++)
+        buffer[i] = s[i];
+
+    if (frac_digits)
+    {
+        for (i = 0; i < frac_digits; i++)
+            buffer[int_digits + i] = s_frac[i];
+
+        fmpz_sub_ui(d, d, frac_digits);
+    }
+
+    buffer[int_digits + frac_digits] = '\0';
+
+    fmpz_set_str(c, buffer, 10);
+
+    TMP_END;
+
+    return s_exp + exp_digits;
+}
+
 int _gr_parse_parse(gr_parse_t E, void * poly, const char * s, slong slen)
 {
     const char * send = s + slen;
-    fmpz_t c;
+    fmpz_t c, d;
     int ret;
 
     fmpz_init(c);
+    fmpz_init(d);
     E->tmp = poly;
 
     while (s < send)
     {
         if ('0' <= *s && *s <= '9')
         {
+#if 1
+            s = _parse_decimal(c, d, s, send);
+
+            if (fmpz_is_zero(d))
+            {
+                if (GR_SUCCESS != gr_set_fmpz(E->tmp, c, E->R))
+                    goto failed;
+
+                if (_gr_parse_push_expr(E))
+                    goto failed;
+            }
+            else
+            {
+                if (GR_SUCCESS != gr_set_fmpz_10exp_fmpz(E->tmp, c, d, E->R))
+                    goto failed;
+
+                if (_gr_parse_push_expr(E))
+                    goto failed;
+            }
+
+#else
             s = _parse_int(c, s, send);
 
-            GR_MUST_SUCCEED(gr_set_fmpz(E->tmp, c, E->R));
+            if (GR_SUCCESS != gr_set_fmpz(E->tmp, c, E->R))
+                goto failed;
+
             if (_gr_parse_push_expr(E))
                 goto failed;
+#endif
         }
         else if (*s == '^')
         {
@@ -515,18 +668,36 @@ int _gr_parse_parse(gr_parse_t E, void * poly, const char * s, slong slen)
         }
         else if (*s == '+')
         {
-            if (!gr_parse_top_is_expr(E))
+            if (s + 2 < send && s[1] == '/' && s[2] == '-')
             {
-                _gr_parse_push_op(E, _op_make(OP_PLUS, FIX_PREFIX, PREC_UPLUS));
+                if (!gr_parse_top_is_expr(E))
+                {
+                    _gr_parse_push_op(E, _op_make(OP_PLUSMINUS, FIX_PREFIX, PREC_UPLUSMINUS));
+                }
+                else
+                {
+                    if (_gr_parse_pop_prec(E, PREC_PLUSMINUS))
+                        goto failed;
+
+                    _gr_parse_push_op(E, _op_make(OP_PLUSMINUS, FIX_INFIX, PREC_PLUSMINUS));
+                }
+                s += 3;
             }
             else
             {
-                if (_gr_parse_pop_prec(E, PREC_PLUS))
-                    goto failed;
+                if (!gr_parse_top_is_expr(E))
+                {
+                    _gr_parse_push_op(E, _op_make(OP_PLUS, FIX_PREFIX, PREC_UPLUS));
+                }
+                else
+                {
+                    if (_gr_parse_pop_prec(E, PREC_PLUS))
+                        goto failed;
 
-                _gr_parse_push_op(E, _op_make(OP_PLUS, FIX_INFIX, PREC_PLUS));
+                    _gr_parse_push_op(E, _op_make(OP_PLUS, FIX_INFIX, PREC_PLUS));
+                }
+                s++;
             }
-            s++;
         }
         else if (*s == '-')
         {
@@ -558,7 +729,7 @@ int _gr_parse_parse(gr_parse_t E, void * poly, const char * s, slong slen)
         {
             s++;
         }
-        else if (*s == '(')
+        else if (*s == '(' || *s == '[')
         {
             if (gr_parse_top_is_expr(E))
                 goto failed;
@@ -566,7 +737,7 @@ int _gr_parse_parse(gr_parse_t E, void * poly, const char * s, slong slen)
             _gr_parse_push_op(E, _op_make(OP_LROUND, FIX_MATCHFIX, PREC_LOWEST));
             s++;
         }
-        else if (*s == ')')
+        else if (*s == ')' || *s == ']')
         {
             if (_gr_parse_pop_prec(E, PREC_LOWEST))
                 goto failed;
@@ -641,6 +812,7 @@ int _gr_parse_parse(gr_parse_t E, void * poly, const char * s, slong slen)
 done:
 
     fmpz_clear(c);
+    fmpz_clear(d);
     return ret;
 
 failed:

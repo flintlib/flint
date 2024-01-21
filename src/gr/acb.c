@@ -99,6 +99,26 @@ __gr_acb_write(gr_stream_t out, const acb_t x, slong digits, int flags, const gr
 {
     if (arb_is_zero(acb_imagref(x)))
     {
+        /* used by polynomial printing */
+        if (arb_is_exact(acb_realref(x)))
+        {
+            if (arf_is_zero(arb_midref(acb_realref(x))))
+            {
+                gr_stream_write(out, "0");
+                return GR_SUCCESS;
+            }
+            else if (arf_is_one(arb_midref(acb_realref(x))))
+            {
+                gr_stream_write(out, "1");
+                return GR_SUCCESS;
+            }
+            else if (arf_equal_si(arb_midref(acb_realref(x)), -1))
+            {
+                gr_stream_write(out, "-1");
+                return GR_SUCCESS;
+            }
+        }
+
         gr_stream_write_free(out, arb_get_str(acb_realref(x), digits, flags));
     }
     else if (arb_is_zero(acb_realref(x)))
@@ -267,6 +287,22 @@ _gr_acb_set_other(acb_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
     }
 
     return gr_generic_set_other(res, x, x_ctx, ctx);
+}
+
+int
+_gr_acb_set_interval_mid_rad(acb_t res, const acb_t m, const acb_t r, const gr_ctx_t ctx)
+{
+    mag_t rad1, rad2;
+    mag_init(rad1);
+    mag_init(rad2);
+    arb_get_mag(rad1, acb_realref(r));
+    arb_get_mag(rad2, acb_imagref(r));
+    acb_set(res, m);
+    arb_add_error_mag(acb_realref(res), rad1);
+    arb_add_error_mag(acb_imagref(res), rad2);
+    mag_clear(rad1);
+    mag_clear(rad2);
+    return GR_SUCCESS;
 }
 
 /* xxx: assumes that ctx are not read */
@@ -2028,6 +2064,7 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_acb_set_other},
     {GR_METHOD_SET_STR,         (gr_funcptr) gr_generic_set_str_ring_exponents},
     {GR_METHOD_SET_D,           (gr_funcptr) _gr_acb_set_d},
+    {GR_METHOD_SET_INTERVAL_MID_RAD,    (gr_funcptr) _gr_acb_set_interval_mid_rad},
     {GR_METHOD_GET_SI,          (gr_funcptr) _gr_acb_get_si},
     {GR_METHOD_GET_UI,          (gr_funcptr) _gr_acb_get_ui},
     {GR_METHOD_GET_FMPZ,        (gr_funcptr) _gr_acb_get_fmpz},
