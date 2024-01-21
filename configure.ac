@@ -641,7 +641,7 @@ case "$build_os" in
         LDCONFIG_N="/sbin/ldconfig -n"
         ;;
     netbsd* | openbsd*)
-        LDCONFIG_N="/sbin/ldconfig -m"
+        dnl LDCONFIG_N="/sbin/ldconfig -m"
         ;;
     *)
         ;;
