@@ -532,8 +532,6 @@ AC_ARG_VAR([TESTCFLAGS], [Choose different C compiler flags for tests [default=C
 
 AC_ARG_VAR(ABI, [Desired ABI])
 
-AC_ARG_VAR(LDCONFIG, [ldconfig tool])
-
 AC_ARG_VAR([M4], [m4 macro processor])
 
 ################################################################################
@@ -634,36 +632,28 @@ esac
 AC_CONFIG_FILES([src/fft_tuning.h:$fft_tuning_in],[],[fft_tuning_in="$fft_tuning_in"])
 AC_SUBST(FFT_TUNING_IN, $fft_tuning_in)
 
-if test -z "$LDCONFIG";
+AC_MSG_CHECKING(for ldconfig)
+LDCONFIG_N=""
+case "$build_os" in
+    linux*android*)
+        ;;
+    linux* | k*bsd*-gnu | gnu*)
+        LDCONFIG_N="/sbin/ldconfig -n"
+        ;;
+    netbsd* | openbsd*)
+        dnl LDCONFIG_N="/sbin/ldconfig -m"
+        ;;
+    *)
+        ;;
+esac
+if test "x$LDCONFIG_N" = "x";
 then
-    AC_MSG_CHECKING(for ldconfig)
-    case "$build_os" in
-        mingw*|cygwin|msys|darwin*|freebsd*)
-            LDCONFIG="true"
-            ;;
-        *)
-            LDCONFIG="true"
-            if test "$FLINT_SOLIB" = "1";
-            then
-                if test -x ldconfig > /dev/null 2>&1;
-                then
-                    LDCONFIG="ldconfig"
-                elif test -x /sbin/ldconfig;
-                then
-                    LDCONFIG="/sbin/ldconfig"
-                fi
-            fi
-            ;;
-    esac
-    if test "$LDCONFIG" = "true";
-    then
-        ldconfig_res="skipped"
-    else
-        ldconfig_res="$LDCONFIG"
-    fi
-    AC_MSG_RESULT($ldconfig_res)
+    ldconfig_res="skipped"
+else
+    ldconfig_res="$LDCONFIG_N"
 fi
-AC_SUBST(LDCONFIG)
+AC_MSG_RESULT($ldconfig_res)
+AC_SUBST(LDCONFIG_N)
 
 dnl FIXME: Improve this check to include more processors.
 AC_MSG_CHECKING([if memory is strongly-ordered])
