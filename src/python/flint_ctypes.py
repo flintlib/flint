@@ -339,7 +339,7 @@ class LogicContext(object):
         ...
         Traceback (most recent call last):
           ...
-        Undecidable: unable to decide x == y for x = [1.00000000000000 +/- 3.89e-16], y = 1.000000000000000 over Real numbers (arb, prec = 53)
+        Undecidable: unable to decide x == y for x = [1.00000000000000 +/- 3.89e-16], y = 1 over Real numbers (arb, prec = 53)
         >>> with pessimistic_logic:
         ...     a == 1
         ...
@@ -1276,7 +1276,7 @@ class gr_ctx:
             >>> CC.tan(1+1j)
             ([0.2717525853195117 +/- 9.11e-17] + [1.083923327338694 +/- 5.77e-16]*I)
             >>> x = RRser.gen(); RRser.tan(x)
-            1.000000000000000*x + [0.333333333333333 +/- 3.99e-16]*x^3 + [0.1333333333333333 +/- 8.32e-17]*x^5 + O(x^6)
+            x + [0.333333333333333 +/- 3.99e-16]*x^3 + [0.1333333333333333 +/- 8.32e-17]*x^5 + O(x^6)
         """
         return ctx._unary_op(x, libgr.gr_tan, "tan($x)")
 
@@ -1430,7 +1430,7 @@ class gr_ctx:
             >>> CC.asin(1+1j)
             ([0.66623943249252 +/- 5.40e-15] + [1.06127506190504 +/- 5.04e-15]*I)
             >>> x = RRser.gen(); RRser.asin(x)
-            1.000000000000000*x + [0.1666666666666667 +/- 7.04e-17]*x^3 + [0.0750000000000000 +/- 1.67e-17]*x^5 + O(x^6)
+            x + [0.1666666666666667 +/- 7.04e-17]*x^3 + [0.0750000000000000 +/- 1.67e-17]*x^5 + O(x^6)
         """
         return ctx._unary_op(x, libgr.gr_asin, "asin($x)")
 
@@ -1441,7 +1441,7 @@ class gr_ctx:
             >>> CC.acos(1+1j)
             ([0.90455689430238 +/- 2.07e-15] + [-1.06127506190504 +/- 5.04e-15]*I)
             >>> x = RRser.gen(); RRser.acos(x)
-            [1.570796326794897 +/- 5.54e-16] - 1.000000000000000*x + [-0.1666666666666667 +/- 7.04e-17]*x^3 + [-0.0750000000000000 +/- 1.67e-17]*x^5 + O(x^6)
+            [1.570796326794897 +/- 5.54e-16] - x + [-0.1666666666666667 +/- 7.04e-17]*x^3 + [-0.0750000000000000 +/- 1.67e-17]*x^5 + O(x^6)
         """
         return ctx._unary_op(x, libgr.gr_acos, "acos($x)")
 
@@ -1462,7 +1462,7 @@ class gr_ctx:
               ...
             FlintDomainError: atan(x) is not an element of {Complex numbers (acb, prec = 53)} for {x = 1.000000000000000*I}
             >>> x = RRser.gen(); RRser.atan(x)
-            1.000000000000000*x + [-0.3333333333333333 +/- 7.04e-17]*x^3 + [0.2000000000000000 +/- 4.45e-17]*x^5 + O(x^6)
+            x + [-0.3333333333333333 +/- 7.04e-17]*x^3 + [0.2000000000000000 +/- 4.45e-17]*x^5 + O(x^6)
 
         """
         return ctx._unary_op(x, libgr.gr_atan, "atan($x)")
@@ -1552,7 +1552,7 @@ class gr_ctx:
             >>> CC.asinh(1+1j)
             ([1.06127506190504 +/- 5.04e-15] + [0.66623943249252 +/- 5.40e-15]*I)
             >>> x = RRser.gen(); RRser.asinh(x)
-            1.000000000000000*x + [-0.1666666666666667 +/- 7.04e-17]*x^3 + [0.0750000000000000 +/- 1.67e-17]*x^5 + O(x^6)
+            x + [-0.1666666666666667 +/- 7.04e-17]*x^3 + [0.0750000000000000 +/- 1.67e-17]*x^5 + O(x^6)
         """
         return ctx._unary_op(x, libgr.gr_asinh, "asinh($x)")
 
@@ -1574,7 +1574,7 @@ class gr_ctx:
             >>> CC.atanh(1+1j)
             ([0.4023594781085251 +/- 8.52e-17] + [1.017221967897851 +/- 4.37e-16]*I)
             >>> x = RRser.gen(); RRser.atanh(x)
-            1.000000000000000*x + [0.3333333333333333 +/- 7.04e-17]*x^3 + [0.2000000000000000 +/- 4.45e-17]*x^5 + O(x^6)
+            x + [0.3333333333333333 +/- 7.04e-17]*x^3 + [0.2000000000000000 +/- 4.45e-17]*x^5 + O(x^6)
 
         """
         return ctx._unary_op(x, libgr.gr_atanh, "atanh($x)")
@@ -2704,7 +2704,7 @@ class gr_ctx:
             >>> QQ.stirling_s2_vec(5) / 3
             [0, 1/3, 5, 25/3, 10/3, 1/3]
             >>> RR.stirling_s2_vec(5, 3)
-            [0, 1.000000000000000, 15.00000000000000]
+            [0, 1, 15.00000000000000]
         """
         if length is None:
             length = n + 1
@@ -2892,7 +2892,7 @@ class gr_ctx:
 
             >>> chi = DirichletGroup(5)(3)
             >>> [CC.dirichlet_chi(n, chi) for n in range(5)]
-            [0, 1.000000000000000, -1.000000000000000*I, 1.000000000000000*I, -1.000000000000000]
+            [0, 1, -1.000000000000000*I, 1.000000000000000*I, -1]
         """
         n = ctx._as_fmpz(n)
         assert isinstance(chi, dirichlet_char)
@@ -2909,7 +2909,7 @@ class gr_ctx:
         Vector of values of the given Dirichlet character.
 
             >>> CC.dirichlet_chi_vec(DirichletGroup(4)(3), 5)
-            [0, 1.000000000000000, 0, -1.000000000000000, 0]
+            [0, 1, 0, -1, 0]
         """
         n = ctx._as_si(n)
         assert n >= 0
@@ -3659,7 +3659,7 @@ class gr_elem:
             >>> RR(-1).sqrt()
             Traceback (most recent call last):
               ...
-            FlintDomainError: sqrt(x) is not an element of {Real numbers (arb, prec = 53)} for {x = -1.000000000000000}
+            FlintDomainError: sqrt(x) is not an element of {Real numbers (arb, prec = 53)} for {x = -1}
             >>> RF(-1).sqrt()
             nan
 
@@ -4611,7 +4611,7 @@ class gr_poly(gr_elem):
 
             >>> f = RRx([1,RR.pi()])
             >>> f.monic()
-            [0.318309886183791 +/- 4.43e-16] + 1.000000000000000*x
+            [0.318309886183791 +/- 4.43e-16] + x
             >>> RRx([]).monic()   # the zero polynomial cannot be made monic
             Traceback (most recent call last):
               ...
@@ -5368,7 +5368,7 @@ class gr_mat(gr_elem):
             >>> MatZZ([[1,0,1],[0,0,0],[1,0,1]]).charpoly()
             -2*x^2 + x^3
             >>> MatRR([[1,0,1],[0,0,0],[1,0,1]]).charpoly()
-            -2.000000000000000*x^2 + 1.000000000000000*x^3
+            -2.000000000000000*x^2 + x^3
             >>> Mat(CC_ca)([[5,CC_ca.pi()],[1,-1]]).charpoly()
             (-8.14159 {-a-5 where a = 3.14159 [Pi]}) - 4*x + x^2
         """
@@ -7592,6 +7592,35 @@ def test_ca_notebook_examples():
     eps = ca(10, context=ctx) ** (-10000)
     assert (eps.exp() == 1) == False
 
+    assert ZZ("0.000") == 0
+    assert ZZ("3.0") == 3
+    assert ZZ("-0.03e+2") == -3
+    assert ZZ("0e-100000000000000") == 0
+    assert raises(lambda: ZZ("0.1"), FlintUnableError)
+
+    assert str(RR("(+/- 1e-3) + 0.1")) == "[0.1 +/- 1.01e-3]"
+    assert str(RR("1/2 +/- 1/100000")) == "[0.5000 +/- 1.01e-5]"
+    assert str(CC("(1+i) +/- (1e-5 + 1e-7*i)")) == "([1.0000 +/- 1.01e-5] + [1.000000 +/- 1.01e-7]*I)"
+    assert str(CC("-1e23 +/- -5e12")) == "[-1.000000000e+23 +/- 5.01e+12]"
+
+    assert RR("0.5 + 1") == 1.5
+    assert QQ("0.01") == QQ(1) / 100
+    assert QQ("1.01") == QQ(101) / 100
+    assert QQ("1.01e+1 + 1") == QQ(111) / 10
+    assert QQ("1.01e1 + 1") == QQ(111) / 10
+    assert QQ("1.01e-1 + 1") == QQ(1101) / 1000
+    assert RRx("0.75") == RRx(3)/4
+    assert CCx("0.75") == RRx(3)/4
+
+    assert str(RRx("(0.5 +/- 1e-10) + (0.6 +/- 1e-11)*x")) == "[0.500000000 +/- 1.01e-10] + [0.6000000000 +/- 1.01e-11]*x"
+    assert str(RRx("(1 + x + x^2) +/- 0.003")) == "[1.00 +/- 3.01e-3] + x + x^2"
+    assert str(RRx("(1 + x + x^2) +/- (0.003 + 0.004*x + 0.005*x^2 + 0.006*x^3)")) == "[1.00 +/- 3.01e-3] + [1.00 +/- 4.01e-3]*x + [1.00 +/- 5.01e-3]*x^2 + [+/- 6.01e-3]*x^3"
+    assert str(RRx("1 + (+/- 1e-10)*x")) == "1 + [+/- 1.01e-10]*x"
+
+    assert str(CCx("x +/- 1e-6*I*x")) == "(1.000000000000000 + [+/- 1.01e-6]*I)*x"
+
+    with optimistic_logic:
+        RRx(str(RRx("1+2*x")/3)) == RRx([1,2])/3
 
 if __name__ == "__main__":
     from time import time

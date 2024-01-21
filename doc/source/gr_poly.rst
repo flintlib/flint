@@ -70,6 +70,7 @@ Memory management
 .. function:: void gr_poly_clear(gr_poly_t poly, gr_ctx_t ctx)
 
 .. function:: gr_ptr gr_poly_entry_ptr(gr_poly_t poly, slong i, gr_ctx_t ctx)
+              gr_srcptr gr_poly_entry_srcptr(const gr_poly_t poly, slong i, gr_ctx_t ctx)
 
 .. function:: slong gr_poly_length(const gr_poly_t poly, gr_ctx_t ctx)
 
@@ -175,6 +176,11 @@ Shifting
 .. function:: int _gr_poly_shift_right(gr_ptr res, gr_srcptr poly, slong len, slong n, gr_ctx_t ctx)
               int gr_poly_shift_right(gr_poly_t res, const gr_poly_t poly, slong n, gr_ctx_t ctx)
 
+
+Scalar division
+--------------------------------------------------------------------------------
+
+.. function:: int gr_poly_div_scalar(gr_poly_t res, const gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx)
 
 Division with remainder
 --------------------------------------------------------------------------------

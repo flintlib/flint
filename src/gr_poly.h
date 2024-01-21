@@ -47,6 +47,12 @@ gr_poly_entry_ptr(gr_poly_t poly, slong i, gr_ctx_t ctx)
     return GR_ENTRY(poly->coeffs, i, ctx->sizeof_elem);
 }
 
+GR_POLY_INLINE gr_srcptr
+gr_poly_entry_srcptr(const gr_poly_t poly, slong i, gr_ctx_t ctx)
+{
+    return GR_ENTRY(poly->coeffs, i, ctx->sizeof_elem);
+}
+
 GR_POLY_INLINE slong gr_poly_length(const gr_poly_t poly, gr_ctx_t ctx)
 {
     return poly->length;
@@ -155,6 +161,8 @@ WARN_UNUSED_RESULT int _gr_poly_shift_right(gr_ptr res, gr_srcptr poly, slong le
 WARN_UNUSED_RESULT int gr_poly_shift_right(gr_poly_t res, const gr_poly_t poly, slong n, gr_ctx_t ctx);
 
 /* division */
+
+WARN_UNUSED_RESULT int gr_poly_div_scalar(gr_poly_t res, const gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_poly_inv(gr_poly_t res, const gr_poly_t poly, gr_ctx_t ctx);
 

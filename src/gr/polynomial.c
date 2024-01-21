@@ -212,6 +212,69 @@ polynomial_set_other(gr_poly_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 }
 
 int
+polynomial_set_interval_mid_rad(gr_poly_t res, const gr_poly_t m, const gr_poly_t r, gr_ctx_t ctx)
+{
+    if (r->length == 0)
+    {
+        return gr_poly_set(res, m, POLYNOMIAL_ELEM_CTX(ctx));
+    }
+    else
+    {
+        slong i, mlen, rlen, len;
+        int status = GR_SUCCESS;
+        gr_ptr zero = NULL;
+        gr_ctx_ptr cctx = POLYNOMIAL_ELEM_CTX(ctx);
+
+        if (res == r)
+        {
+            gr_poly_t t;
+            gr_poly_init(t, cctx);
+            status = polynomial_set_interval_mid_rad(t, m, r, ctx);
+            gr_poly_swap(res, t, cctx);
+            gr_poly_clear(t, cctx);
+            return status;
+        }
+
+        mlen = m->length;
+        rlen = r->length;
+        len = FLINT_MAX(mlen, rlen);
+
+        gr_poly_fit_length(res, len, cctx);
+        _gr_poly_set_length(res, len, cctx);
+
+        for (i = 0; i < len; i++)
+        {
+            if (i < mlen && i < rlen)
+            {
+                status |= gr_set_interval_mid_rad(gr_poly_entry_ptr(res, i, cctx),
+                        gr_poly_entry_srcptr(m, i, cctx),
+                        gr_poly_entry_srcptr(r, i, cctx), cctx);
+            }
+            else if (i < mlen)
+            {
+                status |= gr_set(gr_poly_entry_ptr(res, i, cctx),
+                            gr_poly_entry_srcptr(m, i, cctx), cctx);
+            }
+            else if (i < rlen)
+            {
+                if (zero == NULL)
+                    zero = gr_heap_init(cctx);
+
+                status |= gr_set_interval_mid_rad(gr_poly_entry_ptr(res, i, cctx),
+                        zero,
+                        gr_poly_entry_srcptr(r, i, cctx), cctx);
+            }
+        }
+
+        if (zero != NULL)
+            gr_heap_clear(zero, cctx);
+
+        _gr_poly_normalise(res, cctx);
+        return status;
+    }
+}
+
+int
 polynomial_zero(gr_poly_t res, gr_ctx_t ctx)
 {
     return gr_poly_zero(res, POLYNOMIAL_ELEM_CTX(ctx));
@@ -227,6 +290,17 @@ int
 polynomial_neg_one(gr_poly_t res, gr_ctx_t ctx)
 {
     return gr_poly_neg_one(res, POLYNOMIAL_ELEM_CTX(ctx));
+}
+
+int
+polynomial_i(gr_poly_t res, gr_ctx_t ctx)
+{
+    int status;
+    gr_poly_fit_length(res, 1, POLYNOMIAL_ELEM_CTX(ctx));
+    _gr_poly_set_length(res, 1, POLYNOMIAL_ELEM_CTX(ctx));
+    status = gr_i(res->coeffs, POLYNOMIAL_ELEM_CTX(ctx));
+    _gr_poly_normalise(res, POLYNOMIAL_ELEM_CTX(ctx));
+    return status;
 }
 
 int
@@ -313,27 +387,46 @@ polynomial_mul(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_c
     return gr_poly_mul(res, poly1, poly2, POLYNOMIAL_ELEM_CTX(ctx));
 }
 
-/* todo */
 int
 polynomial_div(gr_poly_t res, const gr_poly_t x, const gr_poly_t y, const gr_ctx_t ctx)
 {
-    gr_poly_t r;
-    int status;
-    gr_poly_init(r, POLYNOMIAL_ELEM_CTX(ctx));
-    status = gr_poly_divrem(res, r, x, y, POLYNOMIAL_ELEM_CTX(ctx));
-
-    if (status == GR_SUCCESS)
+    if (y->length == 1)
     {
-        truth_t is_zero = gr_poly_is_zero(r, POLYNOMIAL_ELEM_CTX(ctx));
-
-        if (is_zero == T_FALSE)
-            status = GR_DOMAIN;
-        if (is_zero == T_UNKNOWN)
-            status = GR_UNABLE;
+        if (res == y)
+        {
+            gr_ptr t;
+            int status = GR_SUCCESS;
+            GR_TMP_INIT(t, POLYNOMIAL_ELEM_CTX(ctx));
+            status |= gr_set(t, y->coeffs, POLYNOMIAL_ELEM_CTX(ctx));
+            status |= gr_poly_div_scalar(res, x, t, POLYNOMIAL_ELEM_CTX(ctx));
+            GR_TMP_CLEAR(t, POLYNOMIAL_ELEM_CTX(ctx));
+            return status;
+        }
+        else
+        {
+            return gr_poly_div_scalar(res, x, y->coeffs, POLYNOMIAL_ELEM_CTX(ctx));
+        }
     }
+    else
+    {
+        gr_poly_t r;
+        int status;
+        gr_poly_init(r, POLYNOMIAL_ELEM_CTX(ctx));
+        status = gr_poly_divrem(res, r, x, y, POLYNOMIAL_ELEM_CTX(ctx));
 
-    gr_poly_clear(r, POLYNOMIAL_ELEM_CTX(ctx));
-    return status;
+        if (status == GR_SUCCESS)
+        {
+            truth_t is_zero = gr_poly_is_zero(r, POLYNOMIAL_ELEM_CTX(ctx));
+
+            if (is_zero == T_FALSE)
+                status = GR_DOMAIN;
+            if (is_zero == T_UNKNOWN)
+                status = GR_UNABLE;
+        }
+
+        gr_poly_clear(r, POLYNOMIAL_ELEM_CTX(ctx));
+        return status;
+    }
 }
 
 int
@@ -425,6 +518,7 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_ZERO,        (gr_funcptr) polynomial_zero},
     {GR_METHOD_ONE,         (gr_funcptr) polynomial_one},
     {GR_METHOD_NEG_ONE,     (gr_funcptr) polynomial_neg_one},
+    {GR_METHOD_I,           (gr_funcptr) polynomial_i},
 
     {GR_METHOD_GEN,            (gr_funcptr) polynomial_gen},
     {GR_METHOD_GENS,           (gr_funcptr) gr_generic_gens_single},
@@ -442,6 +536,7 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_SET_FMPZ,    (gr_funcptr) polynomial_set_fmpz},
     {GR_METHOD_SET_FMPQ,    (gr_funcptr) polynomial_set_fmpq},
     {GR_METHOD_SET_OTHER,   (gr_funcptr) polynomial_set_other},
+    {GR_METHOD_SET_INTERVAL_MID_RAD,    (gr_funcptr) polynomial_set_interval_mid_rad},
     /* todo: we actually want parse using sparse polynomials
              before converting to the dense representation, to avoid O(n^2) behavior */
     {GR_METHOD_SET_STR,     (gr_funcptr) gr_generic_set_str_balance_additions},

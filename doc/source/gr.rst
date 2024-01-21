@@ -435,10 +435,14 @@ Assignment and conversions
     if *x* cannot be converted to the target type.
     For floating-point output types, the output may be rounded.
 
-.. function:: int gr_set_fmpz_2exp_fmpz(gr_ptr res, const fmpz_t x, const fmpz_t y, gr_ctx_t ctx)
+.. function:: int gr_set_fmpz_2exp_fmpz(gr_ptr res, const fmpz_t a, const fmpz_t b, gr_ctx_t ctx)
               int gr_get_fmpz_2exp_fmpz(fmpz_t res1, fmpz_t res2, gr_srcptr x, gr_ctx_t ctx)
 
-    Set or retrieve a dyadic number.
+    Set or retrieve a dyadic number `a \cdot 2^b`.
+
+.. function:: int gr_set_fmpz_10exp_fmpz(gr_ptr res, const fmpz_t a, const fmpz_t b, gr_ctx_t ctx)
+
+    Set to a decimal number `a \cdot 10^b`.
 
 .. function:: int gr_get_fexpr(fexpr_t res, gr_srcptr x, gr_ctx_t ctx)
               int gr_get_fexpr_serialize(fexpr_t res, gr_srcptr x, gr_ctx_t ctx)
@@ -838,6 +842,18 @@ Ordering methods
     of *x* is less than, equal or greater than the absolute value of *y*.
     This may return ``GR_DOMAIN`` if the ring is not an ordered ring.
 
+Enclosure and interval methods
+........................................................................
+
+.. function:: int gr_set_interval_mid_rad(gr_ptr res, gr_srcptr m, gr_srcptr r, gr_ctx_t ctx)
+
+    In ball representations of the real numbers, sets *res* to
+    the interval `m \pm r`.
+
+    In vector spaces over the real numbers represented using balls,
+    intervals are handled independently for the generators;
+    for example, in the complex numbers, `a + b i \pm (0.1 + 0.2 i)`
+    is equivalent to `(a \pm 0.1) + (b \pm 0.2) i`.
 
 Finite field methods
 ........................................................................
@@ -859,6 +875,7 @@ Finite field methods
 .. function:: truth_t gr_fq_is_primitive(gr_srcptr x, gr_ctx_t ctx)
 
 .. function:: int gr_fq_pth_root(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
 
 
 .. raw:: latex
