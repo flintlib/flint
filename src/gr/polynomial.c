@@ -225,13 +225,19 @@ polynomial_set_interval_mid_rad(gr_poly_t res, const gr_poly_t m, const gr_poly_
         gr_ptr zero = NULL;
         gr_ctx_ptr cctx = POLYNOMIAL_ELEM_CTX(ctx);
 
+        if (res == r)
+        {
+            gr_poly_t t;
+            gr_poly_init(t, cctx);
+            status = polynomial_set_interval_mid_rad(t, m, r, ctx);
+            gr_poly_swap(res, t, cctx);
+            gr_poly_clear(t, cctx);
+            return status;
+        }
+
         mlen = m->length;
         rlen = r->length;
         len = FLINT_MAX(mlen, rlen);
-
-        /* todo: aliasing... */
-        if (res == r)
-            return GR_UNABLE;
 
         gr_poly_fit_length(res, len, cctx);
         _gr_poly_set_length(res, len, cctx);
