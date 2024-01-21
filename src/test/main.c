@@ -21,6 +21,7 @@
 #include "t-flint_clz.c"
 #include "t-flint_ctz.c"
 #include "t-io.c"
+#include "t-memory_manager.c"
 #include "t-sdiv_qrnnd.c"
 #include "t-smul_ppmm.c"
 #include "t-sub_dddmmmsss.c"
@@ -41,6 +42,7 @@ test_struct tests[] =
     TEST_FUNCTION(flint_ctz),
     TEST_FUNCTION(flint_fprintf),
     TEST_FUNCTION(flint_printf),
+    TEST_FUNCTION(memory_manager),
     TEST_FUNCTION(sdiv_qrnnd),
     TEST_FUNCTION(smul_ppmm),
     TEST_FUNCTION(sub_dddmmmsss),
