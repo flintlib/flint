@@ -36,7 +36,7 @@
 # include "gc.h"
 #endif
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
 # include <assert.h>
 #endif
 
@@ -96,10 +96,10 @@ typedef struct __FLINT_FILE FLINT_FILE;
 #define slong mp_limb_signed_t
 #define flint_bitcnt_t ulong
 
-#ifdef FLINT_WANT_ASSERT
-#define FLINT_ASSERT(param) assert(param)
+#if FLINT_WANT_ASSERT
+# define FLINT_ASSERT(param) assert(param)
 #else
-#define FLINT_ASSERT(param)
+# define FLINT_ASSERT(param)
 #endif
 
 #if defined(__GNUC__)
