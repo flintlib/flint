@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "gmpcompat.h"
 #include "fmpz.h"
 
@@ -193,5 +192,4 @@ void _fmpz_clear_readonly_mpz(mpz_t z)
     {
         mpz_clear(z);
     }
-
 }

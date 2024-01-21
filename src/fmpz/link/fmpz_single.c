@@ -29,15 +29,15 @@
 #if FLINT_USES_PTHREAD
 typedef struct
 {
-   _Atomic(int) count;
-   pthread_t thread;
-   void * address;
+    _Atomic(int) count;
+    pthread_t thread;
+    void * address;
 } fmpz_block_header_s;
 #else
 typedef struct
 {
-   int count;
-   void * address;
+    int count;
+    void * address;
 } fmpz_block_header_s;
 #endif
 
@@ -60,16 +60,17 @@ static slong flint_page_mask;
 slong flint_get_page_size(void)
 {
 #if defined(__unix__)
-   return sysconf(_SC_PAGESIZE);
+    return sysconf(_SC_PAGESIZE);
 #elif defined(_WIN32) || defined(WIN32)
-   SYSTEM_INFO si;
-   GetSystemInfo(&si);
-   return si.dwPageSize;
+    SYSTEM_INFO si;
+    GetSystemInfo(&si);
+    return si.dwPageSize;
 #else
-   return 4096;
+    return 4096;
 #endif
 }
 
+static inline
 void * flint_align_ptr(void * ptr, slong size)
 {
     slong mask = ~(size - 1);
@@ -82,7 +83,6 @@ __mpz_struct * _fmpz_new_mpz(void)
     if (mpz_free_num == 0) /* allocate more mpz's */
     {
         void * aligned_ptr, * ptr;
-
         slong i, j, num, block_size, skip;
 
         flint_page_size = flint_get_page_size();
