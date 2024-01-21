@@ -117,10 +117,6 @@ FLINT_FORCE_INLINE slong z_max(slong a, slong b) {return FLINT_MAX(a, b);}
 
 int fft_small_mulmod_satisfies_bounds(ulong n);
 
-void* flint_aligned_alloc(ulong alignment, ulong size);
-
-void flint_aligned_free(void* p);
-
 /*
     The twiddle factors are split across FLINT_BITS tables:
 
