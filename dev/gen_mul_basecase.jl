@@ -649,8 +649,6 @@ end
 # sqr
 ###############################################################################
 
-# NOTE: Aliasing must work for squaring.
-
 # NOTE: Although this could be generally programmed, just like the mul case,
 # we can skip some instructions and additional storage when hardcoding each
 # case.
@@ -1254,8 +1252,8 @@ function function_body_sqr_7()
     return pre * body * post * "\n\tret\n"
 end
 
-# NOTE: This function is currently very slow. 
-# FIXME: Would it be smarter to use res as temporary storage?
+# STRATEGY: We compute (a1 B + a0)^2 = a1^2 B^2 + a0^2 + 2 a0 a1 B by
+# computing 2 a0 a1 B into stack, then adding that onto a1^2 B^2 + a0^2.
 function function_body_sqr_8()
     n = 8
 
@@ -1264,452 +1262,41 @@ function function_body_sqr_8()
 
     this_regs = [_regs[4:end - 1]; __regs]
 
-    w = [this_regs[1:11]; ["error w[$ix]" for ix in 12:2 * n - 2]]
+    w = [this_regs[1:3]; _regs[end]; this_regs[5:11]; ["error w[$ix]" for ix in 12:2 * n - 2]]
 
-    s1 = "error s1"
-    s2 = "error s2"
-    zero = _regs[end] # rax
+    s = ["error s[$ix]" for ix in 1:n]
+    zero = this_regs[4]
 
     pre = "\tmov\t0*8($ap), %rdx\n"
-    pre *= "\tvmovdqu\t0*8($ap), %ymm0\n"
-    pre *= "\tvmovdqu\t4*8($ap), %ymm1\n"
     post = ""
     for jx in 1:6
         pre = pre * "\tpush\t$(__regs[jx])\n"
         post = "\tpop\t$(__regs[jx])\n" * post
     end
 
-    as(m::Int) = "-$(n - m)*8(%rsp)"
-    ws(m::Int) = "-$(5 * n - 26 - m)*8(%rsp)"
-
     body = ""
-
-    # Move ap to stack, but because of high latency, delay it a bit
-    body *= "\txor\t$(reg_32_bit(zero)), $(reg_32_bit(zero))\n"
 
     # Calculate upper triangle
-    body *= "\tmulx\t1*8($ap), $(w[1]), $(w[4])\n" # a0 a1
-    body *= "\tmulx\t2*8($ap), $(w[2]), $(w[5])\n" # a0 a2
-    body *= "\tmulx\t3*8($ap), $(w[3]), $(w[6])\n" # a0 a3
-    body *= "\tvmovdqu\t%ymm0, $(as(0))\n"
-    body *= "\tvmovdqu\t%ymm1, $(as(4))\n"
-    body *= "\tadcx\t$(w[4]), $(w[2])\n"
-    body *= "\tadcx\t$(w[5]), $(w[3])\n"
-    body *= "\tmulx\t4*8($ap), $(w[4]), $(w[10])\n" # a0 a4
-    body *= "\tmulx\t5*8($ap), $(w[5]), $(w[11])\n" # a0 a5
-    body *= "\tadcx\t$(w[6]), $(w[4])\n"
-    body *= "\tadcx\t$(w[10]), $(w[5])\n"
-    body *= "\tmulx\t6*8($ap), $(w[6]), $(w[9])\n" # a0 a6
+    body *= "\txor\t$(reg_32_bit(zero)), $(reg_32_bit(zero))\n"
+    body *= "\tmulx\t4*8($ap), $(w[4]), $(s[1])\n" # a0 a4
+    body *= "\tmulx\t5*8($ap), $(w[5]), $(s[2])\n" # a0 a5
+    body *= "\tmulx\t6*8($ap), $(w[6]), $(s[3])\n" # a0 a6
     body *= "\tmulx\t7*8($ap), $(w[7]), $(w[8])\n" # a0 a7
+    body *= "\tadcx\t$(s[1]), $(w[5])\n"
+    body *= "\tadcx\t$(s[2]), $(w[6])\n"
+    body *= "\tadcx\t$(s[3]), $(w[7])\n"
+    body *= "\tadcx\t$(zero), $(w[8])\n"
+
     body *= "\tmov\t1*8($ap), %rdx\n"
-    body *= "\tadcx\t$(w[11]), $(w[6])\n"
-    body *= "\tadcx\t$(w[9]), $(w[7])\n"
-    body *= "\tadcx\t$zero, $(w[8])\n"
-
-    w[12] = ap
-    ap = "error ap"
-
-    body *= "\tmulx\t$(as(2)), $(w[12]), $(w[11])\n" # a1 a2
-    body *= "\tmulx\t$(as(3)), $(w[10]), $(w[9])\n" # a1 a3
-    body *= "\tadcx\t$(w[12]), $(w[3])\n" # ADCX
-    body *= "\tadcx\t$(w[11]), $(w[4])\n"
-    body *= "\tadox\t$(w[10]), $(w[4])\n" # ADOX
-    body *= "\tadox\t$(w[9]), $(w[5])\n"
-    body *= "\tmulx\t$(as(4)), $(w[12]), $(w[11])\n" # a1 a4
-    body *= "\tmulx\t$(as(5)), $(w[10]), $(w[9])\n" # a1 a5
-    body *= "\tadcx\t$(w[12]), $(w[5])\n" # ADCX
-    body *= "\tadcx\t$(w[11]), $(w[6])\n"
-    body *= "\tadox\t$(w[10]), $(w[6])\n" # ADOX
-    body *= "\tadox\t$(w[9]), $(w[7])\n"
-    body *= "\tmulx\t$(as(6)), $(w[12]), $(w[11])\n" # a1 a6
-    body *= "\tmulx\t$(as(7)), $(w[10]), $(w[9])\n" # a1 a7
-    body *= "\tadcx\t$(w[12]), $(w[7])\n" # ADCX
-    body *= "\tadcx\t$(w[11]), $(w[8])\n"
-    body *= "\tadox\t$(w[10]), $(w[8])\n" # ADOX
-    body *= "\tmov\t$(as(2)), %rdx\n"
-    body *= "\tadox\t$zero, $(w[9])\n"
-    body *= "\tadcx\t$zero, $(w[9])\n"
-
-    body *= "\tmulx\t$(as(3)), $(w[11]), $(w[10])\n" # a2 a3
-    body *= "\tadox\t$(w[11]), $(w[5])\n" # ADOX
-    body *= "\tadox\t$(w[10]), $(w[6])\n"
-    body *= "\tmulx\t$(as(4)), $(w[11]), $(w[10])\n" # a2 a4
-    body *= "\tadcx\t$(w[11]), $(w[6])\n" # ADCX
-    body *= "\tadcx\t$(w[10]), $(w[7])\n"
-    body *= "\tmulx\t$(as(5)), $(w[11]), $(w[10])\n" # a2 a5
-    body *= "\tadox\t$(w[11]), $(w[7])\n" # ADOX
-    body *= "\tadox\t$(w[10]), $(w[8])\n"
-    body *= "\tmulx\t$(as(6)), $(w[11]), $(w[10])\n" # a2 a6
-    body *= "\tadcx\t$(w[11]), $(w[8])\n" # ADCX
-    body *= "\tadcx\t$(w[10]), $(w[9])\n"
-    body *= "\tmulx\t$(as(7)), $(w[11]), $(w[10])\n" # a2 a7
-    body *= "\tadox\t$(w[11]), $(w[9])\n" # ADOX
-    body *= "\tadox\t$zero, $(w[10])\n"
-    body *= "\tmov\t$(as(3)), %rdx\n"
-    body *= "\tadcx\t$zero, $(w[10])\n"
-
-    body *= "\tmov\t$(w[6]), $(ws(0))\n"
-    w[13] = w[6]
-    w[6] = "error w[6]"
-
-    body *= "\tmulx\t$(as(4)), $(w[12]), $(w[11])\n" # a3 a4
-    body *= "\tadcx\t$(w[12]), $(w[7])\n" # ADCX
-    body *= "\tadcx\t$(w[11]), $(w[8])\n"
-    body *= "\tmulx\t$(as(5)), $(w[12]), $(w[11])\n" # a3 a5
-    body *= "\tadox\t$(w[12]), $(w[8])\n" # ADOX
-    body *= "\tadox\t$(w[11]), $(w[9])\n"
-    body *= "\tmulx\t$(as(6)), $(w[12]), $(w[11])\n" # a3 a6
-    body *= "\tadcx\t$(w[12]), $(w[9])\n" # ADCX
-    body *= "\tadcx\t$(w[11]), $(w[10])\n"
-    body *= "\tmulx\t$(as(7)), $(w[12]), $(w[11])\n" # a3 a7
-    body *= "\tadox\t$(w[12]), $(w[10])\n" # ADOX
-    body *= "\tadox\t$zero, $(w[11])\n"
-    body *= "\tmov\t$(as(4)), %rdx\n"
-    body *= "\tadcx\t$zero, $(w[11])\n"
-
-    body *= "\tmulx\t$(as(5)), $(w[13]), $(w[12])\n" # a4 a5
-    body *= "\tadcx\t$(w[13]), $(w[9])\n" # ADCX
-    body *= "\tadcx\t$(w[12]), $(w[10])\n"
-    body *= "\tmulx\t$(as(6)), $(w[13]), $(w[12])\n" # a4 a6
-    body *= "\tadox\t$(w[13]), $(w[10])\n" # ADOX
-    body *= "\tadox\t$(w[12]), $(w[11])\n"
-    body *= "\tmulx\t$(as(7)), $(w[13]), $(w[12])\n" # a4 a7
-    body *= "\tadcx\t$(w[13]), $(w[11])\n" # ADCX
-    body *= "\tadcx\t$zero, $(w[12])\n"
-    body *= "\tmov\t$(as(5)), %rdx\n"
-
-    w[14] = zero
-    zero = "error zero"
-
-    body *= "\tmulx\t$(as(6)), $(w[14]), $(w[13])\n" # a5 a6
-    body *= "\tadcx\t$(w[14]), $(w[11])\n" # ADCX
-    body *= "\tadcx\t$(w[13]), $(w[12])\n"
-    body *= "\tmulx\t$(as(7)), $(w[14]), $(w[13])\n" # a5 a7
-    body *= "\tmov\t$(w[11]), $(ws(1))\n"
-    body *= "\tmov\t\$0, %edx\n"
-    body *= "\tadox\t$(w[14]), $(w[12])\n" # ADOX
-    body *= "\tadox\t%rdx, $(w[13])\n"
-    body *= "\tmov\t$(as(6)), %rdx\n"
-
-    w[6] = w[11]
-    w[11] = "error w[11]"
-    body *= "\tmov\t$(ws(0)), $(w[6])\n"
-
-    body *= "\tmulx\t$(as(7)), %rdx, $(w[14])\n" # a6 a7
-    body *= "\tadcx\t%rdx, $(w[13])\n" # ADCX
-    body *= "\tadc\t\$0, $(w[14])\n"
-    body *= "\ttest\t%al, %al\n"
-
-    # Double upper triangle
-    body *= "\tmov\t$(as(0)), %rdx\n"
-    body *= "\tadcx\t$(w[1]), $(w[1])\n"
-    body *= "\tadcx\t$(w[2]), $(w[2])\n"
-    body *= "\tadcx\t$(w[3]), $(w[3])\n"
-    body *= "\tadcx\t$(w[4]), $(w[4])\n"
-    body *= "\tadcx\t$(w[5]), $(w[5])\n"
-    body *= "\tadcx\t$(w[6]), $(w[6])\n"
-    body *= "\tmov\t$(w[6]), $(ws(0))\n"
-    w[11] = w[6]
-    w[6] = "error w[6]"
-    body *= "\tadcx\t$(w[7]), $(w[7])\n"
-    body *= "\tadcx\t$(w[8]), $(w[8])\n"
-    body *= "\tmov\t$(ws(1)), $(w[11])\n"
-    body *= "\tadcx\t$(w[9]), $(w[9])\n"
-    body *= "\tadcx\t$(w[10]), $(w[10])\n"
-    body *= "\tadcx\t$(w[11]), $(w[11])\n"
-    body *= "\tadcx\t$(w[12]), $(w[12])\n"
-    body *= "\tmov\t$(w[11]), $(ws(1))\n"
-    s2 = w[11]
-    w[11] = "error w[11]"
-    body *= "\tadcx\t$(w[13]), $(w[13])\n"
-    body *= "\tadcx\t$(w[14]), $(w[14])\n"
-    body *= "\tvzeroupper\n"
-    # w[4] and w[11] are stored on stack
-
-    # Calculate diagonal and put into res
-    body *= "\tmulx\t%rdx, %rdx, $s2\n" # a0^2
-    body *= "\tmov\t%rdx, 0*8($res)\n"
-    body *= "\tadox\t$s2, $(w[1])\n"
-    body *= "\tmov\t$(as(1)), %rdx\n"
-    body *= "\tmov\t$(w[1]), 1*8($res)\n"
-    w[6] = w[1]
-    w[1] = "error w[1]"
-    body *= "\tmulx\t%rdx, %rdx, $s2\n" # a1^2
-    body *= "\tadox\t%rdx, $(w[2])\n"
-    body *= "\tmov\t$(ws(0)), $(w[6])\n"
-    body *= "\tadox\t$s2, $(w[3])\n"
-    body *= "\tmov\t$(as(2)), %rdx\n"
-    body *= "\tmov\t$(w[2]), 2*8($res)\n"
-    body *= "\tmov\t$(w[3]), 3*8($res)\n"
-    w[11], zero = w[2], w[3]
-    w[2:3] = ["error w[$ix]" for ix in 2:3]
-    body *= "\tmulx\t%rdx, %rdx, $s2\n" # a2^2
-    body *= "\tadox\t%rdx, $(w[4])\n"
-    body *= "\tadox\t$s2, $(w[5])\n"
-    body *= "\tmov\t$(as(3)), %rdx\n"
-    body *= "\tmov\t$(w[4]), 4*8($res)\n"
-    body *= "\tmov\t$(w[5]), 5*8($res)\n"
-    body *= "\tmov\t$(ws(1)), $(w[11])\n"
-    body *= "\tmulx\t%rdx, %rdx, $s2\n" # a3^2
-    body *= "\tadox\t%rdx, $(w[6])\n"
-    body *= "\tadox\t$s2, $(w[7])\n"
-    body *= "\tmov\t$(as(4)), %rdx\n"
-    body *= "\tmov\t$(w[6]), 6*8($res)\n"
-    body *= "\tmov\t$(w[7]), 7*8($res)\n"
-    body *= "\tmulx\t%rdx, %rdx, $s2\n" # a4^2
-    body *= "\tadox\t%rdx, $(w[8])\n"
-    body *= "\tadox\t$s2, $(w[9])\n"
-    body *= "\tmov\t$(as(5)), %rdx\n"
-    body *= "\tmov\t$(w[8]), 8*8($res)\n"
-    body *= "\tmov\t$(w[9]), 9*8($res)\n"
-    body *= "\tmulx\t%rdx, %rdx, $s2\n" # a5^2
-    body *= "\tadox\t%rdx, $(w[10])\n"
-    body *= "\tadox\t$s2, $(w[11])\n"
-    body *= "\tmov\t$(as(6)), %rdx\n"
-    body *= "\tmov\t$(w[10]), 10*8($res)\n"
-    body *= "\tmov\t$(w[11]), 11*8($res)\n"
-    body *= "\tmulx\t%rdx, %rdx, $s2\n" # a6^2
-    body *= "\tadox\t%rdx, $(w[12])\n"
-    body *= "\tadox\t$s2, $(w[13])\n"
-    body *= "\tmov\t$(as(7)), %rdx\n"
-    body *= "\tmov\t$(w[12]), 12*8($res)\n"
-    body *= "\tmov\t$(w[13]), 13*8($res)\n"
-    body *= "\tmov\t\$0, $(reg_32_bit(zero))\n"
-    body *= "\tmulx\t%rdx, %rdx, $s2\n" # a7^2
-    body *= "\tadox\t%rdx, $(w[14])\n"
-    body *= "\tadox\t$zero, $s2\n"
-    body *= "\tadcx\t$zero, $s2\n"
-    body *= "\tmov\t$(w[14]), 14*8($res)\n"
-    body *= "\tmov\t$s2, 15*8($res)\n"
-
-    return pre * body * post * "\n\tret\n"
-end
-
-# Do mul + addmul
-# DO NOT USE! Slow and currently wrong
-function function_body_sqr_7b()
-    n = 7
-
-    res = _regs[1]
-    ap = _regs[2]
-
-    this_regs = [_regs[4:end - 1]; __regs]
-
-    w = [this_regs[1:8]; ["error w[$ix]" for ix in 9:13]]
-    t = [this_regs[9:11]; __regs[end]; ["error t[$ix]" for ix in 5:10]]
-
-    pre = ""
-    post = ""
-    for jx in 1:6
-        pre = pre * "\tpush\t$(__regs[jx])\n"
-        post = "\tpop\t$(__regs[jx])\n" * post
-    end
-
-    body = ""
-
-    # NOTE: Use adox for adding result and adcx for upper triangle-ish
-
-    # Calculate res[0] and res[1]
-    # w1, ..., w8, t1, ..., t4 exist
-    body *= "\tmov\t0*8($ap), %rdx\n"
-    body *= "\txor\t$(reg_32_bit(w[8])), $(reg_32_bit(w[8]))\n"
-    body *= "\tmulx\t1*8($ap), $(w[1]), $(t[1])\n" # a0 a1
-    body *= "\tmulx\t2*8($ap), $(w[2]), $(t[2])\n" # a0 a2
-    body *= "\tmulx\t3*8($ap), $(w[3]), $(t[3])\n" # a0 a3
-    body *= "\tadcx\t$(t[1]), $(w[2])\n" # Collecting
-    body *= "\tadcx\t$(t[2]), $(w[3])\n"
-    body *= "\tmulx\t4*8($ap), $(w[4]), $(t[1])\n" # a0 a4
-    body *= "\tmulx\t5*8($ap), $(w[5]), $(t[2])\n" # a0 a5
-    body *= "\tadcx\t$(t[3]), $(w[4])\n"
-    body *= "\tadcx\t$(t[1]), $(w[5])\n"
-    body *= "\tmulx\t6*8($ap), $(w[6]), $(w[7])\n" # a0 a6
-    body *= "\tadcx\t$(t[2]), $(w[6])\n"
-    body *= "\tadcx\t$(w[8]), $(w[7])\n"
-    body *= "\tmulx\t%rdx, $(t[1]), $(t[2])\n" # a0^2
-    body *= "\tadcx\t$(w[1]), $(w[1])\n" # Doubling
-    body *= "\tadcx\t$(w[2]), $(w[2])\n"
-    body *= "\tadcx\t$(w[3]), $(w[3])\n"
-    body *= "\tadcx\t$(w[4]), $(w[4])\n"
-    body *= "\tadcx\t$(w[5]), $(w[5])\n"
-    body *= "\tadcx\t$(w[6]), $(w[6])\n"
-    body *= "\tadcx\t$(w[7]), $(w[7])\n"
-    body *= "\tadcx\t$(w[8]), $(w[8])\n"
-    body *= "\tadox\t$(t[2]), $(w[1])\n" # Result, carry will be stored in t4 in next paragraph
-    body *= "\tmov\t$(t[1]), 0*8($res)\n"
-    body *= "\tmov\t$(w[1]), 1*8($res)\n"
-    # w2, ..., w8 in use
-
-    # Calculate res[2] and res[3]
-    # w2, ..., w9, t1, ..., t4 exist
-    w[9] = w[1]
-    w[1] = "error w[1]"
-    body *= "\tmov\t1*8($ap), %rdx\n"
-    body *= "\tmov\t\$0, $(reg_32_bit(w[9]))\n" # Preserve flags
-    body *= "\tmov\t\$0, $(reg_32_bit(t[4]))\n"
-    body *= "\tmulx\t2*8($ap), $(t[1]), $(t[2])\n" # a1 a2
-    body *= "\tadcx\t$(t[1]), $(t[1])\n" # Double subset
-    body *= "\tadcx\t$(w[9]), $(t[4])\n" # Store carry from doubling
-    body *= "\tadcx\t$(t[1]), $(w[3])\n" # Add subset
-    body *= "\tadcx\t$(w[9]), $(t[4])\n" # Store carry from adding
-    body *= "\tmulx\t%rdx, $(t[1]), $(t[3])\n" # a1^2
-    body *= "\tadox\t$(t[1]), $(w[2])\n" # Result
-    body *= "\tadox\t$(t[3]), $(w[3])\n"
-    body *= "\tmov\t$(w[2]), 2*8($res)\n"
-    body *= "\tmov\t$(w[3]), 3*8($res)\n"
-    # w4, ..., w9 and t2, t4 in use
-    # t4 should be added onto res[4]
-    t[5:6] = w[2:3]
-    w[2:3] = ["error w[$ix]" for ix in 2:3]
-    body *= "\tmulx\t3*8($ap), $(t[1]), $(t[3])\n" # a1 a3
-    body *= "\tmulx\t4*8($ap), $(t[5]), $(t[6])\n" # a1 a4
-    body *= "\tadcx\t$(t[1]), $(t[2])\n" # Collect
-    body *= "\tadcx\t$(t[5]), $(t[3])\n"
-    body *= "\tmulx\t5*8($ap), $(t[1]), $(t[5])\n" # a1 a5
-    body *= "\tadcx\t$(t[1]), $(t[6])\n"
-    body *= "\tmulx\t6*8($ap), %rdx, $(t[1])\n" # a1 a6
-    body *= "\tadcx\t%rdx, $(t[5])\n"
-    body *= "\tadcx\t$(w[9]), $(t[1])\n"
-    body *= "\tmov\t\$0, %edx\n"
-    body *= "\tadcx\t$(t[2]), $(t[2])\n" # Double
-    body *= "\tadcx\t$(t[3]), $(t[3])\n"
-    body *= "\tadcx\t$(t[6]), $(t[6])\n"
-    body *= "\tadcx\t$(t[5]), $(t[5])\n"
-    body *= "\tadcx\t$(t[1]), $(t[1])\n"
-    body *= "\tadcx\t$(w[9]), $(w[9])\n"
-    body *= "\tadcx\t$(t[2]), $(w[4])\n" # Add
-    body *= "\tadcx\t$(t[3]), $(w[5])\n"
-    body *= "\tadcx\t$(t[6]), $(w[6])\n"
-    body *= "\tadcx\t$(t[5]), $(w[7])\n"
-    body *= "\tadcx\t$(t[1]), $(w[8])\n"
-    body *= "\tadcx\t%rdx, $(w[9])\n"
-    # w4, ..., w9 and t4 in use
-
-    # Calculate res[4] and res[5]
-    # w4, ..., w10, t1, ..., t5 exist
-    w[10] = t[6]
-    t[6] = "error t[6]"
-    body *= "\tmov\t2*8($ap), %rdx\n"
-    body *= "\tmov\t\$0, $(reg_32_bit(t[5]))\n"
-    body *= "\tmov\t\$0, $(reg_32_bit(w[10]))\n"
-    body *= "\tmulx\t3*8($ap), $(t[1]), $(t[2])\n" # a2 a3
-    body *= "\tadcx\t$(t[1]), $(t[1])\n" # Double subset
-    body *= "\tadcx\t$(w[10]), $(t[5])\n" # Store carry from doubling
-    body *= "\tadcx\t$(t[1]), $(w[5])\n" # Add subset
-    body *= "\tadcx\t$(w[10]), $(t[5])\n" # Store carry from adding
-    body *= "\tmulx\t%rdx, $(t[1]), $(t[3])\n" # a2^2
-    body *= "\tadcx\t$(t[4]), $(t[1])\n" # Add previous carry
-    body *= "\tadcx\t$(w[10]), $(t[3])\n"
-    body *= "\tadox\t$(t[1]), $(w[4])\n" # Result
-    body *= "\tadox\t$(t[3]), $(w[5])\n"
-    body *= "\tmov\t$(w[4]), 4*8($res)\n"
-    body *= "\tmov\t$(w[5]), 5*8($res)\n"
-    # w6, ..., w10 and t2, t5 in use
-    # t5 should be added onto res[6]
-    t[6:7] = w[4:5]
-    w[4:5] = ["error w[$ix]" for ix in 4:5]
-    body *= "\tmulx\t4*8($ap), $(t[1]), $(t[3])\n" # a2 a4
-    body *= "\tmulx\t5*8($ap), $(t[4]), $(t[6])\n" # a2 a5
-    body *= "\tadcx\t$(t[1]), $(t[2])\n" # Collect
-    body *= "\tadcx\t$(t[4]), $(t[3])\n"
-    body *= "\tmulx\t6*8($ap), $(t[1]), $(t[7])\n" # a2 a6
-    body *= "\tadcx\t$(t[1]), $(t[6])\n"
-    body *= "\tadcx\t$(w[10]), $(t[7])\n"
-    body *= "\tmov\t\$0, %edx\n"
-    body *= "\tadcx\t$(t[2]), $(t[2])\n" # Double
-    body *= "\tadcx\t$(t[3]), $(t[3])\n"
-    body *= "\tadcx\t$(t[6]), $(t[6])\n"
-    body *= "\tadcx\t$(t[7]), $(t[7])\n"
-    body *= "\tadcx\t$(w[10]), $(w[10])\n"
-    body *= "\tadcx\t$(t[2]), $(w[6])\n" # Add
-    body *= "\tadcx\t$(t[3]), $(w[7])\n"
-    body *= "\tadcx\t$(t[6]), $(w[8])\n"
-    body *= "\tadcx\t$(t[7]), $(w[9])\n"
-    body *= "\tadcx\t%rdx, $(w[10])\n"
-    # w6, ..., w10 and t5 in use
-
-    # Calculate res[6] and res[7]
-    # w6, ..., w11, t1, ..., t6 exist
-    w[11] = t[7]
-    t[7] = "error t[7]"
-    body *= "\tmov\t3*8($ap), %rdx\n"
-    body *= "\tmov\t\$0, $(reg_32_bit(w[11]))\n"
-    body *= "\tmulx\t4*8($ap), $(t[1]), $(t[4])\n" # a3 a4
-    body *= "\tmulx\t5*8($ap), $(t[2]), $(t[6])\n" # a3 a5
-    body *= "\tadcx\t$(t[4]), $(t[2])\n" # Collect
-    body *= "\tmulx\t6*8($ap), $(t[3]), $(t[4])\n" # a3 a6
-    body *= "\tadcx\t$(t[6]), $(t[3])\n"
-    body *= "\tadcx\t$(w[11]), $(t[4])\n"
-    body *= "\tadcx\t$(t[1]), $(t[1])\n" # Double
-    body *= "\tadcx\t$(t[2]), $(t[2])\n"
-    body *= "\tadcx\t$(t[3]), $(t[3])\n"
-    body *= "\tadcx\t$(t[4]), $(t[4])\n"
-    body *= "\tmulx\t%rdx, %rdx, $(t[6])\n" # a3^2
-    body *= "\tadox\t$(t[5]), %rdx\n" # Add previous carry
-    body *= "\tadox\t$(w[11]), $(t[6])\n"
-    body *= "\tadcx\t$(w[11]), $(w[11])\n" # Last double
-    body *= "\tadox\t%rdx, $(w[6])\n" # Result
-    body *= "\tadox\t$(t[6]), $(w[7])\n"
-    body *= "\tmov\t$(w[6]), 6*8($res)\n"
-    body *= "\tmov\t$(w[7]), 7*8($res)\n"
-    # w8, ..., w11 in use
-
-    # Calculate res[8] and res[9]
-    # w8, ..., w12, t1, ..., t7 exist
-    w[12], t[7] = w[6], w[7]
-    w[6:7] = ["error w[$ix]" for ix in 6:7]
-    body *= "\tmov\t4*8($ap), %rdx\n"
-    body *= "\tmov\t\$0, $(reg_32_bit(w[12]))\n"
-    body *= "\tmov\t\$0, $(reg_32_bit(t[7]))\n"
-    body *= "\tmulx\t5*8($ap), $(t[1]), $(t[4])\n" # a4 a5
-    body *= "\tmulx\t6*8($ap), $(t[2]), $(t[3])\n" # a4 a6
-    body *= "\tmulx\t%rdx, %rdx, $(t[5])\n" # a4^2
-    body *= "\tadcx\t$(t[4]), $(t[2])\n" # Collect
-    body *= "\tadcx\t$(w[12]), $(t[3])\n"
-    body *= "\tadcx\t$(t[1]), $(t[1])\n" # Double
-    body *= "\tadcx\t$(t[2]), $(t[2])\n"
-    body *= "\tadcx\t$(t[3]), $(t[3])\n"
-    body *= "\tadcx\t$(t[7]), $(t[7])\n"
-    body *= "\tadcx\t$(t[1]), $(w[9])\n" # Add
-    body *= "\tadcx\t$(t[2]), $(w[10])\n"
-    body *= "\tadcx\t$(t[3]), $(w[11])\n"
-    body *= "\tadcx\t$(t[7]), $(w[12])\n"
-    body *= "\tadox\t%rdx, $(w[8])\n" # Result
-    body *= "\tadox\t$(t[5]), $(w[9])\n"
-    body *= "\tmov\t$(w[8]), 8*8($res)\n"
-    body *= "\tmov\t$(w[9]), 9*8($res)\n"
-    # w10, ..., w12 in use
-
-    # Calculate res[10] and res[11]
-    # w10, ..., w13, t1, ..., t8 exist
-    w[13], t[8] = w[8], w[9]
-    w[8:9] = ["error w[$ix]" for ix in 8:9]
-    body *= "\tmov\t5*8($ap), %rdx\n"
-    body *= "\tmov\t\$0, $(reg_32_bit(w[13]))\n"
-    body *= "\tmov\t\$0, $(reg_32_bit(t[3]))\n"
-    body *= "\tmulx\t6*8($ap), $(t[1]), $(t[2])\n" # a5 a6
-    body *= "\tmulx\t%rdx, %rdx, $(t[4])\n" # a5^2
-    body *= "\tadcx\t$(t[1]), $(t[1])\n" # Double
-    body *= "\tadcx\t$(t[2]), $(t[2])\n"
-    body *= "\tadcx\t$(t[3]), $(t[3])\n"
-    body *= "\tadcx\t$(t[1]), $(w[11])\n" # Add
-    body *= "\tadcx\t$(t[2]), $(w[12])\n"
-    body *= "\tadcx\t$(t[3]), $(w[13])\n"
-    body *= "\tadox\t%rdx, $(w[10])\n" # Result
-    body *= "\tadox\t$(t[4]), $(w[11])\n"
-    body *= "\tmov\t$(w[10]), 10*8($res)\n"
-    body *= "\tmov\t$(w[11]), 11*8($res)\n"
-    # w12, w13 in use
-
-    # Calculate res[12] and res[13]
-    # w12, w13, t1, ..., t10 exist
-    t[9:10] = w[10:11]
-    w[10:11] = ["error w[$ix]" for ix in 10:11]
-    body *= "\tmov\t6*8($ap), %rdx\n"
-    body *= "\tmulx\t%rdx, $(t[1]), $(t[2])\n" # a6^2
-    body *= "\tadox\t$(t[1]), $(w[12])\n" # Result
-    body *= "\tadox\t$(t[2]), $(w[13])\n"
-    body *= "\tmov\t$(w[12]), 12*8($res)\n"
-    body *= "\tmov\t$(w[13]), 13*8($res)\n"
+    body *= "\tmulx\t4*8($ap), $(s[1]), $(s[2])\n" # a1 a4
+    body *= "\tmulx\t5*8($ap), $(s[3]), $(s[4])\n" # a1 a5
+    body *= "\tadox\t$(s[2]), $(s[3])\n"
+    body *= "\tadcx\t$(s[1]), $(w[5])\n"
+    body *= "\tadcx\t$(s[3]), $(w[6])\n"
+    body *= "\tmulx\t6*8($ap), $(s[1]), $(w[10])\n" # a1 a6
+    body *= "\tmulx\t7*8($ap), $(w[11]), $(w[9])\n" # a1 a7
+    body *= "\tadcx\t$(s[3]), $(w[7])\n"
+    body *= "\tadcx\t$(zero), $(w[8])\n"
 
     return pre * body * post * "\n\tret\n"
 end
