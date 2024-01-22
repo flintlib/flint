@@ -366,6 +366,30 @@ FMPZ_INLINE void fmpz_sub_si(fmpz_t f, const fmpz_t g, slong x)
 void fmpz_abs(fmpz_t f1, const fmpz_t f2);
 void fmpz_neg(fmpz_t f1, const fmpz_t f2);
 
+FMPZ_INLINE
+void fmpz_inplace_neg(fmpz_t f)
+{
+    if (!COEFF_IS_MPZ(*f))
+        *f = -*f;
+    else
+    {
+        mpz_ptr mf = COEFF_TO_PTR(*f);
+        mf->_mp_size = -mf->_mp_size;
+    }
+}
+
+FMPZ_INLINE
+void fmpz_inplace_abs(fmpz_t f)
+{
+    if (!COEFF_IS_MPZ(*f))
+        *f = FLINT_ABS(*f);
+    else
+    {
+        mpz_ptr mf = COEFF_TO_PTR(*f);
+        mf->_mp_size = FLINT_ABS(mf->_mp_size);
+    }
+}
+
 void fmpz_sqr(fmpz_t f, const fmpz_t g);
 
 void fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong x);

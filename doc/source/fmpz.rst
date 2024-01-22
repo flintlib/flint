@@ -715,12 +715,15 @@ Basic arithmetic
 
 
 .. function:: void fmpz_neg(fmpz_t f1, const fmpz_t f2)
+              void fmpz_abs(fmpz_t f1, const fmpz_t f2)
 
-    Sets `f_1` to `-f_2`.
+    Sets `f_1` to `-f_2` and the absolute value of `f_2`, respectively.
 
-.. function:: void fmpz_abs(fmpz_t f1, const fmpz_t f2)
+.. function:: void fmpz_inplace_neg(fmpz_t f1)
+              void fmpz_inplace_abs(fmpz_t f1)
 
-    Sets `f_1` to the absolute value of `f_2`.
+    Works like :func:`fmpz_neg` and :func:`fmpz_abs`, but acts inplace and
+    therefore faster as less checks has to be made.
 
 .. function:: void fmpz_add(fmpz_t f, const fmpz_t g, const fmpz_t h)
               void fmpz_add_ui(fmpz_t f, const fmpz_t g, ulong h)
