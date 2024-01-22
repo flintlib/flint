@@ -307,7 +307,18 @@ int fmpz_is_odd(const fmpz_t f)
         return mpz_odd_p(COEFF_TO_PTR(*f));
 }
 
-int fmpz_sgn(const fmpz_t f);
+FMPZ_INLINE
+int fmpz_sgn(const fmpz_t f)
+{
+    slong fs = *f;
+
+    if (fs == 0)
+        return 0;
+    else if (!COEFF_IS_MPZ(fs))
+        return fs > 0 ? 1 : -1;
+    else
+        return COEFF_TO_PTR(fs)->_mp_size > 0 ? 1 : -1;
+}
 
 int fmpz_abs_fits_ui(const fmpz_t f);
 int fmpz_fits_si(const fmpz_t f);
