@@ -96,49 +96,6 @@ fmpz_mul(fmpz_t res, const fmpz_t xp, const fmpz_t yp)
 }
 
 void
-fmpz_mul_si(fmpz_t f, const fmpz_t g, slong x)
-{
-    fmpz c2 = *g;
-
-    if (!COEFF_IS_MPZ(c2)) /* c2 is small */
-    {
-        mp_limb_t th, tl;
-
-        /* limb by limb multiply (assembly for most CPU's) */
-        smul_ppmm(th, tl, c2, x);
-        fmpz_set_signed_uiui(f, th, tl);
-    }
-    else                        /* c2 is large */
-    {
-        __mpz_struct * mf;
-        if (!COEFF_IS_MPZ(*f))
-        {
-            if (x == 0)
-            {
-                *f = 0;
-                return;
-            }
-
-            mf = _fmpz_new_mpz();
-            *f = PTR_TO_COEFF(mf);
-        }
-        else
-        {
-            if (x == 0)
-            {
-                _fmpz_clear_mpz(*f);
-                *f = 0;
-                return;
-            }
-
-            mf = COEFF_TO_PTR(*f);
-        }
-
-        flint_mpz_mul_si(mf, COEFF_TO_PTR(c2), x);
-    }
-}
-
-void
 fmpz_mul_ui(fmpz_t res, const fmpz_t xp, ulong ys)
 {
     slong xs = *xp;

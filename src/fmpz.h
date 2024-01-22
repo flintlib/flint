@@ -393,7 +393,13 @@ void fmpz_inplace_abs(fmpz_t f)
 void fmpz_sqr(fmpz_t f, const fmpz_t g);
 
 void fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong x);
-void fmpz_mul_si(fmpz_t f, const fmpz_t g, slong x);
+FMPZ_INLINE
+void fmpz_mul_si(fmpz_t f, const fmpz_t g, slong x)
+{
+    fmpz_mul_ui(f, g, FLINT_ABS(x));
+    if (x < 0)
+        fmpz_inplace_neg(f);
+}
 void fmpz_mul(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 FMPZ_INLINE void
