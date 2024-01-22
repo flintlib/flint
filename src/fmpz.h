@@ -233,15 +233,15 @@ void fmpz_get_signed_uiui(ulong * hi, ulong * lo, const fmpz_t x);
 FMPZ_INLINE void
 fmpz_set_signed_uiui(fmpz_t r, ulong hi, ulong lo)
 {
-    if (((slong) hi) < 0)
+    if ((slong) hi >= 0)
+    {
+        fmpz_set_uiui(r, hi, lo);
+    }
+    else
     {
         hi = -hi - (lo != 0);
         lo = -lo;
         fmpz_neg_uiui(r, hi, lo);
-    }
-    else
-    {
-        fmpz_set_uiui(r, hi, lo);
     }
 }
 
