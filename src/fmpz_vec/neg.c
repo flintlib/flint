@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2010 William Hart
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -16,7 +17,12 @@
 void
 _fmpz_vec_neg(fmpz * vec1, const fmpz * vec2, slong len2)
 {
-    slong i;
-    for (i = 0; i < len2; i++)
-        fmpz_neg(vec1 + i, vec2 + i);
+    slong ix;
+
+    if (vec1 == vec2)
+        for (ix = 0; ix < len2; ix++)
+            fmpz_inplace_neg(vec1 + ix);
+    else
+        for (ix = 0; ix < len2; ix++)
+            fmpz_neg(vec1 + ix, vec2 + ix);
 }
