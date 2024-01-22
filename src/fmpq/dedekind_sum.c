@@ -54,7 +54,7 @@ fmpq_dedekind_sum_naive(fmpq_t s, const fmpz_t h, const fmpz_t k)
     }
 
     fmpz_mul(fmpq_denref(s), k, k);
-    fmpz_mul_ui(fmpq_denref(s), fmpq_denref(s), 4);
+    fmpz_mul_2exp(fmpq_denref(s), fmpq_denref(s), 2);
     fmpq_canonicalise(s);
 
     fmpz_clear(i);

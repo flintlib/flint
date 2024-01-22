@@ -232,7 +232,7 @@ qqbar_pow_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y)
         {
             fmpz_mul_si(fmpq_numref(t), fmpq_numref(t), p);
             fmpz_mul_ui(fmpq_denref(t), fmpq_denref(t), q);
-            fmpz_mul_ui(r, fmpq_denref(t), 2);
+            fmpz_mul_2exp(r, fmpq_denref(t), 1);
             fmpz_fdiv_r(fmpq_numref(t), fmpq_numref(t), r);
             fmpq_canonicalise(t);
 

@@ -27,7 +27,7 @@ int fmpq_mpoly_discriminant(fmpq_mpoly_t R, const fmpq_mpoly_t A,
     {
         fmpz_t t;
         fmpz_init(t);
-        fmpz_mul_ui(t, Ax->exps + 0, 2);
+        fmpz_mul_2exp(t, Ax->exps + 0, 1);
         fmpz_sub_ui(t, t, 2);
         success = fmpq_pow_fmpz(R->content, A->content, t);
         fmpz_clear(t);

@@ -33,7 +33,7 @@ void _fmpz_poly_sqr_classical(fmpz *rop, const fmpz *op, slong len)
             _fmpz_vec_scalar_addmul_fmpz(rop + i + 1, op + 1, i - 1, op + i);
 
         for (i = 1; i < 2 * len - 2; i++)
-            fmpz_mul_ui(rop + i, rop + i, 2);
+            fmpz_mul_2exp(rop + i, rop + i, 1);
 
         for (i = 1; i < len - 1; i++)
             fmpz_addmul(rop + 2 * i, op + i, op + i);

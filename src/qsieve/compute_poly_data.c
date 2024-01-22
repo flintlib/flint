@@ -65,7 +65,7 @@ int qsieve_init_A(qs_t qs_inf)
     fmpz_init_set_ui(prod, 1);
 
     fmpz_fdiv_q_ui(lower_bound, qs_inf->target_A, 2);
-    fmpz_mul_ui(upper_bound, qs_inf->target_A, 2);
+    fmpz_mul_2exp(upper_bound, qs_inf->target_A, 1);
 
     bits = fmpz_bits(qs_inf->target_A);
 
@@ -685,7 +685,7 @@ void qsieve_init_poly_next(qs_t qs_inf, slong i)
 
     sign = (i >> v) & 2;
 
-    fmpz_mul_ui(temp, qs_inf->B_terms[v], UWORD(2));
+    fmpz_mul_2exp(temp, qs_inf->B_terms[v], 1);
 
     if (sign)
        fmpz_add(qs_inf->B, qs_inf->B, temp);

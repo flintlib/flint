@@ -50,7 +50,7 @@ _fmpz_poly_sqrtrem_classical(fmpz * res, fmpz * r, const fmpz * poly, slong len)
         if (r != poly)
            _fmpz_vec_set(r, poly, len);
 
-        fmpz_mul_ui(u, res + m - 1, 2);
+        fmpz_mul_2exp(u, res + m - 1, 1);
 
         for (i = 1; i < m; i++)
         {

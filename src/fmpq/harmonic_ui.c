@@ -198,7 +198,7 @@ harmonic_odd_direct(fmpz_t P, fmpz_t Q, ulong a, ulong b, ulong n, int d)
         }
 
         fmpz_mul_ui(P, P, (UWORD(1) << d) - UWORD(1));
-        fmpz_mul_ui(Q, Q, UWORD(1) << (d - 1));
+        fmpz_mul_2exp(Q, Q, d - 1);
     }
 }
 

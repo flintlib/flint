@@ -75,7 +75,7 @@ _fmpz_poly_sqrt_classical(fmpz * res, const fmpz * poly, slong len, int exact)
         fmpz_init(u);
         r = _fmpz_vec_init(len);
         _fmpz_vec_set(r, poly, len);
-        fmpz_mul_ui(u, res + m - 1, 2);
+        fmpz_mul_2exp(u, res + m - 1, 1);
 
         for (i = 1; i < (m + 1)/2; i++)
         {
