@@ -734,6 +734,10 @@ Basic arithmetic
 
     Sets `f` to `g - h`.
 
+.. function:: void fmpz_sqr(fmpz_t f, const fmpz_t g)
+
+    Sets `f` to `g^2`.
+
 .. function:: void fmpz_mul(fmpz_t f, const fmpz_t g, const fmpz_t h)
               void fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong h)
               void fmpz_mul_si(fmpz_t f, const fmpz_t g, slong h)
