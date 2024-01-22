@@ -58,7 +58,7 @@ void _padic_inv_precomp(fmpz_t rop, const fmpz_t op, const padic_inv_t S)
     }
     for (i--; i >= 0; i--)
     {
-        fmpz_mul(t, rop, rop);
+        fmpz_sqr(t, rop);
         fmpz_mul(t + 1, u + i, t);
         fmpz_mul_2exp(rop, rop, 1);
         fmpz_sub(rop, rop, t + 1);

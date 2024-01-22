@@ -86,10 +86,10 @@ fmpzi_sqr(fmpzi_t res, const fmpzi_t x)
 
                 /* a^2-b^2, (a+b)^2-a^2-b^2 */
                 fmpz_add(v, a, b);
-                fmpz_mul(u, v, v);
-                fmpz_mul(t, a, a);
+                fmpz_sqr(u, v);
+                fmpz_sqr(t, a);
                 fmpz_sub(u, u, t);
-                fmpz_mul(v, b, b);
+                fmpz_sqr(v, b);
                 fmpz_sub(t, t, v);
                 fmpz_sub(u, u, v);
 
@@ -100,8 +100,8 @@ fmpzi_sqr(fmpzi_t res, const fmpzi_t x)
         }
     }
 
-    fmpz_mul(t, a, a);
-    fmpz_mul(u, b, b);
+    fmpz_sqr(t, a);
+    fmpz_sqr(u, b);
     fmpz_sub(t, t, u);
     fmpz_mul(u, a, b);
     fmpz_mul_2exp(u, u, 1);

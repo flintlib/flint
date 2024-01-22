@@ -221,7 +221,7 @@ arith_stirling_number_2_vec_convolution(fmpz * res, ulong n, slong klen)
 
         _fmpz_poly_mullow(v, t, len, u, len, len);
 
-        fmpz_mul(t, t, t);
+        fmpz_sqr(t, t);
         for (k = 0; k < len; k++)
             fmpz_divexact(res + k + 1, v + k, t);
     }

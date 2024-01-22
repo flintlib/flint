@@ -49,7 +49,7 @@ _fmpz_factor_eval_multiexp(fmpz_t res, const fmpz * p, const ulong * e, slong le
                 q[j++] = p[i];
 
         _fmpz_vec_prod(tmp, q, j);
-        fmpz_mul(res, res, res);
+        fmpz_sqr(res, res);
         fmpz_mul(res, res, tmp);
         mask >>= 1;
     }

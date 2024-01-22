@@ -202,7 +202,7 @@ TEST_FUNCTION_START(fmpq_dedekind_sum, state)
         /* rhs */
         fmpz_mul(t, fmpq_numref(x), fmpq_denref(x));
         fmpz_sub(s, fmpq_numref(x), fmpq_denref(x));
-        fmpz_mul(s, s, s);
+        fmpz_sqr(s, s);
         fmpz_sub(s, s, t);
         fmpz_add_ui(s, s, 1);
 

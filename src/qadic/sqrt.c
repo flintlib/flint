@@ -546,7 +546,7 @@ _qadic_sqrt_p(fmpz *rop, const fmpz *op, slong len,
             if (e[i] & WORD(1))
             {
                 fmpz_mul(pow + i, t, pow + (i + 1));
-                fmpz_mul(t, t, t);
+                fmpz_sqr(t, t);
             }
             else
             {

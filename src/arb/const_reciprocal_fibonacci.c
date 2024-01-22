@@ -78,7 +78,7 @@ bsplit_basecase(bsplit_t res, slong n, slong n1, void * args)
     }
 
     fmpz_mul(f1f2, f1, f2);
-    fmpz_mul(f22, f2, f2);
+    fmpz_sqr(f22, f2);
 
     /* f4 = fib(4n+3) */
     fmpz_add(f4, f1f2, f22);

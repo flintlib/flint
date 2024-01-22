@@ -25,7 +25,7 @@ _padic_log_bsplit_series(fmpz_t P, fmpz_t B, fmpz_t T,
     }
     else if (b - a == 2)
     {
-        fmpz_mul(P, x, x);
+        fmpz_sqr(P, x);
         fmpz_set_si(B, a);
         fmpz_mul_si(B, B, a + 1);
         fmpz_mul_si(T, x, a + 1);
@@ -118,7 +118,7 @@ _padic_log_balanced(fmpz_t z, const fmpz_t y, slong v, const fmpz_t p, slong N)
 
     while (!fmpz_is_zero(t))
     {
-        fmpz_mul(pv, pv, pv);
+        fmpz_sqr(pv, pv);
         fmpz_fdiv_qr(t, r, t, pv);
 
         if (!fmpz_is_zero(t))

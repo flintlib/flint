@@ -43,7 +43,7 @@ _padic_exp_bsplit_series(fmpz_t P, fmpz_t Q, fmpz_t T,
     }
     else if (b - a == 2)
     {
-        fmpz_mul(P, x, x);
+        fmpz_sqr(P, x);
         fmpz_set_ui(Q, a);
         fmpz_mul_ui(Q, Q, a + 1);
         fmpz_mul_ui(T, x, a + 1);
@@ -177,7 +177,7 @@ void _padic_exp_balanced_p(fmpz_t rop, const fmpz_t xu, slong xv,
 
     while (!fmpz_is_zero(t))
     {
-        fmpz_mul(pw, pw, pw);
+        fmpz_sqr(pw, pw);
 
         fmpz_fdiv_r(r, t, pw);
         fmpz_sub(t, t, r);

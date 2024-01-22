@@ -134,8 +134,8 @@ arb_atan_frac_bsplit(arb_t s, const fmpz_t p, const fmpz_t q, int hyperbolic, sl
     N = FLINT_MAX(N, 1);
     N = FLINT_MIN(N, 4 * prec);
 
-    fmpz_mul(p2, p, p);
-    fmpz_mul(q2, q, q);
+    fmpz_sqr(p2, p);
+    fmpz_sqr(q2, q);
     bsplit(P, Q, R, p, q, p2, q2, !hyperbolic, 0, N, 0);
 
     mag_set_fmpz(err, p);

@@ -107,7 +107,7 @@ void _fmpz_poly_sqr(fmpz * res, const fmpz * poly, slong len)
 
     if (len == 1)
     {
-        fmpz_mul(res, poly, poly);
+        fmpz_sqr(res, poly);
         return;
     }
 

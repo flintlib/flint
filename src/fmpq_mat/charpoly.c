@@ -37,7 +37,7 @@ void _fmpq_mat_charpoly(fmpz * coeffs, fmpz_t den, const fmpq_mat_t mat)
    if (n > 1)
    {
       fmpz_mul(coeffs + 1, coeffs + 1, p);
-      fmpz_mul(den, p, p);
+      fmpz_sqr(den, p);
    } else
       fmpz_set(den, p);
 

@@ -122,9 +122,9 @@ _fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
        rational reconstruction routine.
      */
     if (fmpz_cmpabs(N, D) < 0)
-        fmpz_mul(bound, D, D);
+        fmpz_sqr(bound, D);
     else
-        fmpz_mul(bound, N, N);
+        fmpz_sqr(bound, N);
     fmpz_mul_ui(bound, bound, UWORD(2));  /* signs */
 
     crt_primes = fmpz_mat_dixon_get_crt_primes(&num_primes, A, p);

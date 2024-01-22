@@ -48,7 +48,7 @@ TEST_FUNCTION_START(fmpz_mul, state)
         {
             fmpz_set(a, b);
             mpz_set(d, e);
-            fmpz_mul(c, a, a);
+            fmpz_sqr(c, a);
         }
         else if (aliasing == 2)
         {

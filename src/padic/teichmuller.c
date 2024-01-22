@@ -72,7 +72,7 @@ void _padic_teichmuller(fmpz_t rop, const fmpz_t op, const fmpz_t p, slong N)
             /* Lift inv */
             if (i > 0)
             {
-                fmpz_mul(s, inv, inv);
+                fmpz_sqr(s, inv);
                 fmpz_mul(t, u + i, s);
                 fmpz_mul_2exp(inv, inv, 1);
                 fmpz_sub(inv, inv, t);

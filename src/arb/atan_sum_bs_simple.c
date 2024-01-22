@@ -17,7 +17,7 @@ bsplit(fmpz_t P, fmpz_t T, fmpz_t Q, flint_bitcnt_t * Qexp,
 {
     if (b - a == 1)
     {
-        fmpz_mul(P, x, x);
+        fmpz_sqr(P, x);
         fmpz_set(T, P);
 
         if (a % 2 == 0)

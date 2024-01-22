@@ -141,7 +141,7 @@ _ca_poly_mullow_same_nf(ca_ptr C, ca_srcptr A, slong Alen, ca_srcptr B, slong Bl
     if (squaring)
     {
         _fmpz_poly_sqrlow(ZC, ZA, Alen * m, len * m);
-        fmpz_mul(den, Aden, Aden);
+        fmpz_sqr(den, Aden);
     }
     else
     {

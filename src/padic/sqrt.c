@@ -71,7 +71,7 @@ static int _padic_sqrt_p(fmpz_t rop, const fmpz_t op, const fmpz_t p, slong N)
         }
         for (i--; i >= 1; i--)
         {
-            fmpz_mul(W, rop, rop);
+            fmpz_sqr(W, rop);
             fmpz_mul(W + 1, u + i, W);
             fmpz_sub_ui(W + 1, W + 1, 1);
 
@@ -150,7 +150,7 @@ static int _padic_sqrt_2(fmpz_t rop, const fmpz_t op, slong N)
         fmpz_one(rop);
         for (i = n - 2; i >= 1; i--)  /* z := z - z (a z^2 - 1) / 2 */
         {
-            fmpz_mul(W, rop, rop);
+            fmpz_sqr(W, rop);
             fmpz_mul(W + 1, u + i, W);
             fmpz_sub_ui(W + 1, W + 1, 1);
             fmpz_fdiv_q_2exp(W + 1, W + 1, 1);

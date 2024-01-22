@@ -127,7 +127,7 @@ void qfb_nucomp(qfb_t r, const qfb_t f, const qfb_t g, fmpz_t D, fmpz_t L)
       fmpz_mul_2exp(temp, ca, 1);
       fmpz_fdiv_r(cb, cb, temp);
 
-      fmpz_mul(cc, cb, cb);
+      fmpz_sqr(cc, cb);
       fmpz_sub(cc, cc, D);
       fmpz_divexact(cc, cc, ca);
       fmpz_fdiv_q_2exp(cc, cc, 2);

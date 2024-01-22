@@ -125,7 +125,7 @@ _aprcl_config_jacobi_reduce_s2(aprcl_config conf, const fmpz_t n)
 
             fmpz_pow_ui(p, conf->qs->p + i, conf->qs->exp[i]);
             fmpz_fdiv_q(new_s, conf->s, p);
-            fmpz_mul(new_s, new_s, new_s);
+            fmpz_sqr(new_s, new_s);
 
             if (fmpz_cmp(new_s, n) > 0)
                 if (w_max <= w[i])

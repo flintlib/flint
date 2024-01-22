@@ -36,7 +36,7 @@ TEST_FUNCTION_START(fmpz_sqrtmod, state)
 
         ans = fmpz_sqrtmod(b, a, p);
 
-        fmpz_mul(c, b, b);
+        fmpz_sqr(c, b);
         fmpz_mod(c, c, p);
 
         result = (ans == 0 || fmpz_equal(a, c)) && _fmpz_is_canonical(b);
@@ -77,7 +77,7 @@ TEST_FUNCTION_START(fmpz_sqrtmod, state)
             fmpz_randm(b, state, p);
         while (fmpz_is_zero(b));
 
-        fmpz_mul(a, b, b);
+        fmpz_sqr(a, b);
         fmpz_mod(a, a, p);
 
         /* check a special case */
@@ -89,7 +89,7 @@ TEST_FUNCTION_START(fmpz_sqrtmod, state)
 
         ans = fmpz_sqrtmod(c, a, p);
 
-        fmpz_mul(d, c, c);
+        fmpz_sqr(d, c);
         fmpz_mod(d, d, p);
 
         result = (ans && fmpz_equal(a, d)) && _fmpz_is_canonical(c);

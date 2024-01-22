@@ -243,7 +243,7 @@ void _qadic_frobenius_a(fmpz *rop, slong exp,
         if (e[i] & WORD(1))
         {
             fmpz_mul(pow + i, t, pow + (i + 1));
-            fmpz_mul(t, t, t);
+            fmpz_sqr(t, t);
         }
         else
         {

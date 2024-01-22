@@ -42,7 +42,7 @@ void _padic_lifts_pows(fmpz *pow, const slong *a, slong n, const fmpz_t p)
             if (a[i] & WORD(1))
             {
                 fmpz_mul(pow + i, t, pow + (i + 1));
-                fmpz_mul(t, t, t);
+                fmpz_sqr(t, t);
             }
             else
             {

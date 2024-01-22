@@ -82,7 +82,7 @@ static slong binary_sqrt(fmpz_t z, fmpz_t x, slong p)
     fmpz_fdiv_q_2exp(z, z, 1);
 
 #if FLINT_WANT_ASSERT
-    fmpz_mul(t, z, z);
+    fmpz_sqr(t, z);
     fmpz_mul(t, t, x);
     fmpz_sub_ui(t, t, 1);
     fmpz_fdiv_r_2exp(t, t, n);
@@ -93,7 +93,7 @@ static slong binary_sqrt(fmpz_t z, fmpz_t x, slong p)
     while (n < new_p - 1)
     {
         n = 2*n - 2;
-        fmpz_mul(t, z, z);
+        fmpz_sqr(t, z);
         fmpz_fdiv_r_2exp(tx, x, n + 1);
         fmpz_mul(s, tx, t);
         fmpz_sub_ui(s, s, 3);
@@ -105,7 +105,7 @@ static slong binary_sqrt(fmpz_t z, fmpz_t x, slong p)
         fmpz_swap(z, t);
 
     #if FLINT_WANT_ASSERT
-        fmpz_mul(t, z, z);
+        fmpz_sqr(t, z);
         fmpz_mul(t, t, x);
         fmpz_sub_ui(t, t, 1);
         fmpz_fdiv_r_2exp(t, t, n);
@@ -194,8 +194,8 @@ static void binary_cubic_lift_inv(
     slong n,
     fmpz_t t, fmpz_t t2)  /* temp */
 {
-    fmpz_mul(r2, r, r);
-    fmpz_mul(t, inv, inv);
+    fmpz_sqr(r2, r);
+    fmpz_sqr(t, inv);
     fmpz_mul_2exp(t2, r2, e + 1);
     fmpz_add(t2, t2, s);
     fmpz_mul_2exp(inv, inv, 1);
@@ -270,7 +270,7 @@ static slong binary_cubic_lift(
     }
 
 #if FLINT_WANT_ASSERT
-    fmpz_mul(r2, r, r);
+    fmpz_sqr(r2, r);
     fmpz_mul_2exp(c, r2, e);
     fmpz_add(c, c, a);
     fmpz_sub(c, c, s);
@@ -330,7 +330,7 @@ static slong binary_cubic_lift_continue(
     n *= 2;
 
 #if FLINT_WANT_ASSERT
-    fmpz_mul(r2, r, r);
+    fmpz_sqr(r2, r);
     fmpz_mul_2exp(c, r2, e);
     fmpz_add(c, c, a);
     fmpz_sub(c, c, s);
@@ -492,8 +492,8 @@ static int _fmpz_cubic_roots(fmpz * x, fmpz_t a, fmpz_t b)
     fmpz_init(z);
 
     /* d = b^2 - 4*a^3 = discriminant/-27 */
-    fmpz_mul(d, b, b);
-    fmpz_mul(t1, a, a);
+    fmpz_sqr(d, b);
+    fmpz_sqr(t1, a);
     fmpz_mul(t2, t1, a);
     fmpz_submul_ui(d, t2, 4);
 
@@ -703,7 +703,7 @@ try_again:
 
         FLINT_ASSERT(2*beta - 3*alpha >= 2);
 
-        fmpz_mul(d, r, r);
+        fmpz_sqr(d, r);
         fmpz_mul_2exp(d, d, 2*beta - 3*alpha - 2);
         fmpz_sub(d, d, s);
         sqrt_prec = binary_sqrt(z, d, cubic_prec);
@@ -818,7 +818,7 @@ void _fmpz_poly_factor_cubic(fmpz_poly_factor_t fac,
 
     /* A = b^2 - 3*a*c */
     fmpz_mul(ac, a, c);
-    fmpz_mul(b2, b, b);
+    fmpz_sqr(b2, b);
     fmpz_set(A, b2);
     fmpz_submul_ui(A, ac, 3);
 
@@ -827,7 +827,7 @@ void _fmpz_poly_factor_cubic(fmpz_poly_factor_t fac,
     fmpz_mul_ui(ac, ac, 9);
     fmpz_sub(B, ac, b2);
     fmpz_mul(B, B, b);
-    fmpz_mul(T, a, a);
+    fmpz_sqr(T, a);
     fmpz_mul(T, T, d);
     fmpz_submul_ui(B, T, 27);
 

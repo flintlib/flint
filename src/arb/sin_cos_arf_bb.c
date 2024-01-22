@@ -201,7 +201,7 @@ _arb_sin_sum_bs_powtab(fmpz_t T, fmpz_t Q, flint_bitcnt_t * Qexp,
     length = _arb_compute_bs_exponents(xexp, N);
 
     xpow = _fmpz_vec_init(length);
-    fmpz_mul(xpow, x, x);
+    fmpz_sqr(xpow, x);
 
     /* build x^i table */
     for (i = 1; i < length; i++)

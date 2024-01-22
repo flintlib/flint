@@ -32,7 +32,7 @@ void _fmpz_poly_sqr_kara_recursive(fmpz * out, fmpz * rev,
 
     if (len == 1)
     {
-        fmpz_mul(out, rev, rev);
+        fmpz_sqr(out, rev);
         fmpz_zero(out + 1);
         return;
     }
@@ -58,7 +58,7 @@ void _fmpz_poly_sqr_karatsuba(fmpz * res, const fmpz * poly, slong len)
 
     if (len == 1)
     {
-        fmpz_mul(res, poly, poly);
+        fmpz_sqr(res, poly);
         return;
     }
 

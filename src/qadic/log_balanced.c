@@ -181,7 +181,7 @@ void _qadic_log_balanced(fmpz *z, const fmpz *y, slong len,
 
     while (!_fmpz_vec_is_zero(t, d))
     {
-        fmpz_mul(pv, pv, pv);
+        fmpz_sqr(pv, pv);
 
         for (i = 0; i < d; i++)
         {

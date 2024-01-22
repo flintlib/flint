@@ -36,7 +36,7 @@ int fmpz_divisor_in_residue_class_lenstra(fmpz_t fac, const fmpz_t n, const fmpz
    fmpz_init(ns2);
 
    /* ns2 = n/s^2 */
-   fmpz_mul(ns2, s, s);
+   fmpz_sqr(ns2, s);
    fmpz_tdiv_q(ns2, n, ns2);
 
    /* initialise */
@@ -96,7 +96,7 @@ int fmpz_divisor_in_residue_class_lenstra(fmpz_t fac, const fmpz_t n, const fmpz
          fmpz_addmul(d, a1, r);
          fmpz_addmul(d, b1, r2);
          fmpz_set(d1, d); /* d1 = s1*s + a1*r + b1*r2 */
-         fmpz_mul(d, d, d);
+         fmpz_sqr(d, d);
          fmpz_mul(q, a1, b1);
          fmpz_mul(q, q, n);
          fmpz_submul_ui(d, q, 4);

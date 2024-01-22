@@ -282,7 +282,7 @@ TEST_FUNCTION_START(fmpz_factor, state)
     {
        randprime(x, state, 40);
 
-       fmpz_mul(n, x, x);
+       fmpz_sqr(n, x);
 
        fmpz_factor_init(factors);
 
@@ -303,7 +303,7 @@ TEST_FUNCTION_START(fmpz_factor, state)
     {
        randprime(x, state, 40);
 
-       fmpz_mul(n, x, x);
+       fmpz_sqr(n, x);
        fmpz_mul(n, n, x);
 
        fmpz_factor_init(factors);

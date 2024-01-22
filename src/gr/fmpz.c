@@ -371,7 +371,7 @@ _gr_fmpz_mul_two(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
 int
 _gr_fmpz_sqr(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
 {
-    fmpz_mul(res, x, x);
+    fmpz_sqr(res, x);
     return GR_SUCCESS;
 }
 

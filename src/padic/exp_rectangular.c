@@ -46,7 +46,7 @@ static void _padic_exp_small(fmpz_t rop, const fmpz_t u, slong v, slong n,
         fmpz_init(f);
         fmpz_pow_ui(f, p, v);
         fmpz_mul(rop, f, u);
-        fmpz_mul(f, rop, rop);
+        fmpz_sqr(f, rop);
         if (fmpz_is_odd(f))
             fmpz_add(f, f, pN);
         fmpz_fdiv_q_2exp(f, f, 1);

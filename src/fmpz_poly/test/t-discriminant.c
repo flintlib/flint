@@ -45,7 +45,7 @@ TEST_FUNCTION_START(fmpz_poly_discriminant, state)
         fmpz_poly_mul(p, f, g);
         fmpz_poly_discriminant(d, p);
         fmpz_poly_resultant(r, f, g);
-        fmpz_mul(r, r, r);
+        fmpz_sqr(r, r);
         fmpz_mul(c, c, r);
 
         result = (fmpz_equal(c, d));

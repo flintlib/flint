@@ -73,7 +73,7 @@ void _qadic_teichmuller(fmpz *rop, const fmpz *op, slong len,
             if (e[i] & WORD(1))
             {
                 fmpz_mul(pow + i, t, pow + (i + 1));
-                fmpz_mul(t, t, t);
+                fmpz_sqr(t, t);
             }
             else
             {
@@ -116,7 +116,7 @@ void _qadic_teichmuller(fmpz *rop, const fmpz *op, slong len,
             /* Lift inv */
             if (i > 0)
             {
-                fmpz_mul(t, inv, inv);
+                fmpz_sqr(t, inv);
                 fmpz_mul(t + 1, u + i, t);
                 fmpz_mul_2exp(inv, inv, 1);
                 fmpz_sub(inv, inv, t + 1);

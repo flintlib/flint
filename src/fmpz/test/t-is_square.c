@@ -29,7 +29,7 @@ TEST_FUNCTION_START(fmpz_is_square, state)
 
         fmpz_randtest(a, state, 200);
         if (n_randint(state, 2) == 0)
-            fmpz_mul(a, a, a);
+            fmpz_sqr(a, a);
 
         fmpz_get_mpz(b, a);
 

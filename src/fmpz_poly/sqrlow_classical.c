@@ -20,7 +20,7 @@ void _fmpz_poly_sqrlow_classical(fmpz *rop, const fmpz *op, slong len, slong n)
 {
     if (len == 1 || n == 1)  /* Special case */
     {
-        fmpz_mul(rop, op, op);
+        fmpz_sqr(rop, op);
     }
     else   /* Ordinary case */
     {

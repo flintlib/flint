@@ -142,7 +142,7 @@ _fmpz_powm_ui(fmpz_t res, const fmpz_t x, ulong e, const fmpz_t m)
     /* don't bother handling aliasing for the extremely unusual case where res == m */
     else if (e == 2 && res != m)
     {
-        fmpz_mul(res, x, x);
+        fmpz_sqr(res, x);
         fmpz_mod(res, res, m);
     }
     else if (e == 3 && res != m)
@@ -151,7 +151,7 @@ _fmpz_powm_ui(fmpz_t res, const fmpz_t x, ulong e, const fmpz_t m)
         {
             fmpz_t t;
             fmpz_init(t);
-            fmpz_mul(t, x, x);
+            fmpz_sqr(t, x);
             fmpz_mod(t, t, m);
             fmpz_mul(t, t, x);
             fmpz_mod(res, t, m);
@@ -159,7 +159,7 @@ _fmpz_powm_ui(fmpz_t res, const fmpz_t x, ulong e, const fmpz_t m)
         }
         else
         {
-            fmpz_mul(res, x, x);
+            fmpz_sqr(res, x);
             fmpz_mod(res, res, m);
             fmpz_mul(res, res, x);
             fmpz_mod(res, res, m);
@@ -167,9 +167,9 @@ _fmpz_powm_ui(fmpz_t res, const fmpz_t x, ulong e, const fmpz_t m)
     }
     else if (e == 4 && res != m)
     {
-        fmpz_mul(res, x, x);
+        fmpz_sqr(res, x);
         fmpz_mod(res, res, m);
-        fmpz_mul(res, res, res);
+        fmpz_sqr(res, res);
         fmpz_mod(res, res, m);
     }
     else if (fmpz_is_zero(x) || fmpz_is_one(x))

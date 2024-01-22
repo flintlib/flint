@@ -155,7 +155,7 @@ int _fmpz_is_prime(const fmpz_t n, int proved)
 
       if (res == 1)
       {
-         fmpz_mul(Fsqr, F1, F1);
+         fmpz_sqr(Fsqr, F1);
          if (fmpz_cmp(Fsqr, n) < 0)
          {
             fmpz_mul(Fcub, Fsqr, F1);
@@ -172,7 +172,7 @@ int _fmpz_is_prime(const fmpz_t n, int proved)
 
                fmpz_tdiv_qr(c2, c1, n1, F1); /* Let n = c2*F^2 + c1*F + 1 */
 
-               fmpz_mul(c1, c1, c1); /* check if c1^2 - 4*c2 is a square */
+               fmpz_sqr(c1, c1); /* check if c1^2 - 4*c2 is a square */
                fmpz_submul_ui(c1, c2, 4);
 
                if (fmpz_is_square(c1))
@@ -194,7 +194,7 @@ int _fmpz_is_prime(const fmpz_t n, int proved)
                if (res == 1)
                {
                   fmpz_sub_ui(Fm1, F2, 1); /* need F2 - 1 > sqrt(n) */
-                  fmpz_mul(Fsqr, Fm1, Fm1);
+                  fmpz_sqr(Fsqr, Fm1);
 
                   if (fmpz_cmp(Fsqr, n) <= 0)
                   {
@@ -213,7 +213,7 @@ int _fmpz_is_prime(const fmpz_t n, int proved)
                         fmpz_tdiv_qr(r1, r0, R, F2); /* R = r1*F2 + r0 */
 
                         /* check if x^2 + r0*x - r1 has positive integral root */
-                        fmpz_mul(t, r0, r0); /* b = sqrt(r0^2 - 4(-r1)) */
+                        fmpz_sqr(t, r0); /* b = sqrt(r0^2 - 4(-r1)) */
                         fmpz_addmul_ui(t, r1, 4);
                         fmpz_sqrtrem(b, r, t);
 
@@ -224,7 +224,7 @@ int _fmpz_is_prime(const fmpz_t n, int proved)
                         fmpz_sub(r0, r0, F2);
                         fmpz_add_ui(r1, r1, 1);
 
-                        fmpz_mul(t, r0, r0); /* b = sqrt((r0 - F2)^2 - 4(-r1 - 1)) */
+                        fmpz_sqr(t, r0); /* b = sqrt((r0 - F2)^2 - 4(-r1 - 1)) */
                         fmpz_addmul_ui(t, r1, 4);
                         fmpz_sqrtrem(b, r, t);
 
@@ -246,7 +246,7 @@ int _fmpz_is_prime(const fmpz_t n, int proved)
                         if (fmpz_is_even(F1) && fmpz_is_even(F2))
                            fmpz_tdiv_q_2exp(F, F, 1);
 
-                        fmpz_mul(Fsqr, F, F);
+                        fmpz_sqr(Fsqr, F);
 
                         if (fmpz_cmp(Fsqr, n) > 0) /* lcm(F1, F2) > sqrt(n) */
                         {

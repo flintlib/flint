@@ -33,7 +33,7 @@ void fmpz_lucas_chain(fmpz_t Vm, fmpz_t Vm1, const fmpz_t A,
           fmpz_sub(t, t, A);
           fmpz_mod(Vm, t, n);
 
-          fmpz_mul(t, Vm1, Vm1);
+          fmpz_sqr(t, Vm1);
           fmpz_sub_ui(t, t, 2);
           fmpz_mod(Vm1, t, n);
        } else /* 0 in binary repn */
@@ -42,7 +42,7 @@ void fmpz_lucas_chain(fmpz_t Vm, fmpz_t Vm1, const fmpz_t A,
           fmpz_sub(t, t, A);
           fmpz_mod(Vm1, t, n);
 
-          fmpz_mul(t, Vm, Vm);
+          fmpz_sqr(t, Vm);
           fmpz_sub_ui(t, t, 2);
           fmpz_mod(Vm, t, n);
        }
@@ -71,13 +71,13 @@ void fmpz_lucas_chain_full(fmpz_t Vm, fmpz_t Vm1, const fmpz_t A, const fmpz_t B
           fmpz_submul(t, Q, A);
           fmpz_mod(Vm, t, n);
 
-          fmpz_mul(Vm1, Vm1, Vm1);
+          fmpz_sqr(Vm1, Vm1);
           fmpz_mul_ui(t, Q, 2);
           fmpz_mul(t, t, B);
           fmpz_sub(Vm1, Vm1, t);
           fmpz_mod(Vm1, Vm1, n);
 
-          fmpz_mul(Q, Q, Q);
+          fmpz_sqr(Q, Q);
           fmpz_mul(Q, Q, B);
           fmpz_mod(Q, Q, n);
        } else /* 0 in binary repn */
@@ -86,11 +86,11 @@ void fmpz_lucas_chain_full(fmpz_t Vm, fmpz_t Vm1, const fmpz_t A, const fmpz_t B
           fmpz_submul(t, Q, A);
           fmpz_mod(Vm1, t, n);
 
-          fmpz_mul(t, Vm, Vm);
+          fmpz_sqr(t, Vm);
           fmpz_submul_ui(t, Q, 2);
           fmpz_mod(Vm, t, n);
 
-          fmpz_mul(Q, Q, Q);
+          fmpz_sqr(Q, Q);
           fmpz_mod(Q, Q, n);
        }
     }
@@ -113,8 +113,8 @@ void fmpz_lucas_chain_double(fmpz_t U2m, fmpz_t U2m1, const fmpz_t Um,
    fmpz_submul(t, Um, A);
    fmpz_mul(t, t, Um);
 
-   fmpz_mul(U2m1, Um1, Um1); /* U_{m+1}^2 - BU_m^2 */
-   fmpz_mul(t2, Um, Um);
+   fmpz_sqr(U2m1, Um1); /* U_{m+1}^2 - BU_m^2 */
+   fmpz_sqr(t2, Um);
    fmpz_submul(U2m1, t2, B);
    fmpz_mod(U2m1, U2m1, n);
 

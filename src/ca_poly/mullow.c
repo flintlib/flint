@@ -137,7 +137,7 @@ _ca_poly_sqrlow_fmpqs(ca_ptr res, ca_srcptr poly1, slong len1,
 
         _ca_vec_fmpq_vec_get_fmpz_vec_den(z1, den1, poly1, len1, ctx);
 
-        fmpz_mul(den1, den1, den1);
+        fmpz_sqr(den1, den1);
         _fmpz_poly_sqrlow(z3, z1, len1, n);
         _ca_vec_set_fmpz_vec_div_fmpz(res, z3, den1, n, ctx);
 

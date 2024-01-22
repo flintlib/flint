@@ -146,7 +146,7 @@ void _qadic_exp_balanced(fmpz *rop, const fmpz *x, slong v, slong len,
 
     while (!_fmpz_vec_is_zero(t, d))
     {
-        fmpz_mul(pw, pw, pw);
+        fmpz_sqr(pw, pw);
 
         for (i = 0; i < d; i++)
         {

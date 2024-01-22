@@ -62,7 +62,7 @@ TEST_FUNCTION_START(qsieve_primes_init, state)
            /* check if square root of kn modulo
                factor base prime p are correct   */
            fmpz_set_si(x, qs_inf->sqrts[j]);
-           fmpz_mul(y, x, x);
+           fmpz_sqr(y, x);
            fmpz_mod_ui(x, y, qs_inf->factor_base[j].p);
            fmpz_mod_ui(y, qs_inf->kn, qs_inf->factor_base[j].p);
 
@@ -110,7 +110,7 @@ TEST_FUNCTION_START(qsieve_primes_init, state)
        for (j = k; j < qs_inf->num_primes; j++)
        {
            fmpz_set_si(x, qs_inf->sqrts[j]);
-           fmpz_mul(y, x, x);
+           fmpz_sqr(y, x);
            fmpz_mod_ui(x, y, qs_inf->factor_base[j].p);
            fmpz_mod_ui(y, qs_inf->kn, qs_inf->factor_base[j].p);
 
@@ -157,7 +157,7 @@ TEST_FUNCTION_START(qsieve_primes_init, state)
        for (j = k; j < qs_inf->num_primes; j++)
        {
            fmpz_set_si(x, qs_inf->sqrts[j]);
-           fmpz_mul(y, x, x);
+           fmpz_sqr(y, x);
            fmpz_mod_ui(x, y, qs_inf->factor_base[j].p);
            fmpz_mod_ui(y, qs_inf->kn, qs_inf->factor_base[j].p);
 
@@ -204,7 +204,7 @@ TEST_FUNCTION_START(qsieve_primes_init, state)
        for (j = k; j < qs_inf->num_primes; j++)
        {
            fmpz_set_si(x, qs_inf->sqrts[j]);
-           fmpz_mul(y, x, x);
+           fmpz_sqr(y, x);
            fmpz_mod_ui(x, y, qs_inf->factor_base[j].p);
            fmpz_mod_ui(y, qs_inf->kn, qs_inf->factor_base[j].p);
 

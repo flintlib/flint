@@ -65,7 +65,7 @@ void qfb_prime_form(qfb_t r, fmpz_t D, fmpz_t p)
       } /* q = b/p */
 
       fmpz_mul(r->b, q, p);
-      fmpz_mul(q, q, q);
+      fmpz_sqr(q, q);
       fmpz_mul(q, q, p);
       fmpz_sub(q, q, s);
       fmpz_fdiv_q_2exp(r->c, q, 2);
