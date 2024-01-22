@@ -64,7 +64,7 @@ slong _num_roots_quartic_positive_discriminant(const fmpz * p)
         fmpz_mul(d, p + 4, p + 4);
         fmpz_mul(d, d, p + 4);
         fmpz_mul(d, d, p);
-        fmpz_mul_ui(d, d, 64);
+        fmpz_mul_2exp(d, d, 6);
 
         fmpz_mul(a, p + 4, p + 4);
         fmpz_mul(a, a, p + 2);
