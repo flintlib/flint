@@ -57,7 +57,7 @@ mp_limb_t _flint_mpn_mul(mp_ptr r, mp_srcptr x, mp_size_t xn, mp_srcptr y, mp_si
     else if (yn == 1)
         r[xn + yn - 1] = mpn_mul_1(r, x, xn, y[0]);
     else if (yn < FLINT_FFT_MUL_THRESHOLD)
-        mpn_mul(r, x, xn, y, yn);
+        return mpn_mul(r, x, xn, y, yn);
     else
         FFT_MUL(r, x, xn, y, yn);
 
