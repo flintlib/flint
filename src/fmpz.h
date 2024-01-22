@@ -440,7 +440,24 @@ fmpz_mul2_uiui(fmpz_t f, const fmpz_t g, ulong h1, ulong h2)
     }
 }
 
-void fmpz_mul_2exp(fmpz_t f, const fmpz_t g, ulong exp);
+void _fmpz_mul_2exp(fmpz_t f, fmpz g, ulong exp, const ulong * gabsptr);
+FMPZ_INLINE
+void fmpz_mul_2exp(fmpz_t rp, const fmpz_t xp, ulong exp)
+{
+    slong xs = *xp;
+    ulong xsabs;
+
+    xsabs = FLINT_ABS(xs);
+
+    if (FLINT_BITS - flint_clz(xsabs) + exp <= SMALL_FMPZ_BITCOUNT_MAX || xsabs == 0)
+    {
+        _fmpz_demote(rp);
+        *rp = xs << exp;
+        return;
+    }
+    else
+        _fmpz_mul_2exp(rp, xs, exp, &xsabs);
+}
 void fmpz_one_2exp(fmpz_t f, ulong exp);
 
 void fmpz_addmul(fmpz_t f, const fmpz_t g, const fmpz_t h);

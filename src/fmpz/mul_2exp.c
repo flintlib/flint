@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2009 William Hart
-    Copyright (C) 2022 Albin Ahlbäck
+    Copyright (C) 2022, 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -10,82 +10,57 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
 #include <string.h>
+#include "fmpz.h"
 
 void
-fmpz_mul_2exp(fmpz_t f, const fmpz_t g, ulong exp)
+_fmpz_mul_2exp(fmpz_t rp, fmpz xs, ulong exp, const ulong * xd)
 {
-    slong c1 = *g;
-    ulong c1abs, c1bits;
-    __mpz_struct * mf;
+    mpz_ptr rm;
+    mpz_srcptr xm;
+    slong rsz, xabssz, xsz;
+    mp_ptr rd;
+    slong limbshift;
 
-    if (c1 == 0)
+    rm = _fmpz_promote(rp);
+
+    if (!COEFF_IS_MPZ(xs))
     {
-        fmpz_zero(f);
-        return;
+        xm = NULL;
+        xsz = xs;
+        xabssz = 1;
+    }
+    else
+    {
+        xm = COEFF_TO_PTR(xs);
+        xd = xm->_mp_d;
+        xsz = xm->_mp_size;
+        xabssz = FLINT_ABS(xsz);
     }
 
-    c1abs = FLINT_ABS(c1);
-    c1bits = FLINT_BIT_COUNT(c1abs);
+    limbshift = exp / FLINT_BITS;
+    exp %= FLINT_BITS;
 
-    if (c1bits + exp <= SMALL_FMPZ_BITCOUNT_MAX)  /* Result fits inside a small fmpz */
+    rsz = xabssz + 1 + limbshift;
+
+    if (rm->_mp_alloc < rsz)
     {
-        if (COEFF_IS_MPZ(*f))
-            _fmpz_clear_mpz(*f);
-
-        *f = c1 << exp;
+        _mpz_realloc(rm, rsz);
+        if (xm == rm)
+            xd = xm->_mp_d;
     }
-    else if (c1bits <= SMALL_FMPZ_BITCOUNT_MAX)   /* g is small */
-    {
-        ulong expred = exp % FLINT_BITS;
-        int alloc = 1 + exp / FLINT_BITS + ((c1bits + expred) > FLINT_BITS);
-        mp_limb_t * limbs;
 
-        /* Ensure enough limbs are allocated for f */
-        if (!COEFF_IS_MPZ(*f))
-        {
-            /* TODO: Initialize the new mpz with alloc limbs instead of
-             * reallocating them. */
-            mf = _fmpz_new_mpz();
-            *f = PTR_TO_COEFF(mf);
-            _mpz_realloc(mf, alloc);
-        }
-        else
-        {
-            mf = COEFF_TO_PTR(*f);
-            if (mf->_mp_alloc < alloc)
-                _mpz_realloc(mf, alloc);
-        }
-        limbs = mf->_mp_d;
-        mf->_mp_size = (c1 > 0) ? alloc : -alloc;
-        memset(limbs, 0, sizeof(mp_limb_t) * alloc);
+    rd = rm->_mp_d;
 
-        if (c1bits + expred <= FLINT_BITS)
-        {
-            limbs[alloc - 1] = c1abs << expred;
-        }
-        else
-        {
-            limbs[alloc - 1] = c1abs >> (FLINT_BITS - expred);
-            limbs[alloc - 2] = c1abs << expred;
-        }
-    }
-    else                                /* g is large */
-    {
-        __mpz_struct * mg = COEFF_TO_PTR(c1);
+    if (exp != 0)
+        rd[rsz - 1] = mpn_lshift(rd + limbshift, xd, xabssz, exp);
+    else
+        memmove(rd + limbshift, xd, sizeof(mp_limb_t) * xabssz);
 
-        if (!COEFF_IS_MPZ(*f))
-        {
-            /* TODO: Initialize the new mpz with alloc limbs instead of
-             * reallocating them. */
-            mf = _fmpz_new_mpz();
-            *f = PTR_TO_COEFF(mf);
-            _mpz_realloc(mf, FLINT_ABS(mg->_mp_size) + exp / FLINT_BITS + 1);
-        }
-        else
-            mf = COEFF_TO_PTR(*f);
+    for (slong ix = 0; ix < limbshift; ix++)
+        rd[ix] = 0;
 
-        mpz_mul_2exp(mf, mg, exp);
-    }
+    rm->_mp_size = rsz - (rd[rsz - 1] == 0 || exp == 0);
+    if (xsz < 0)
+        rm->_mp_size = -rm->_mp_size;
 }
