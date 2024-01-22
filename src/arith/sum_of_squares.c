@@ -55,7 +55,7 @@ sum_of_four_squares(fmpz_t r, const fmpz_t n)
     if (v == 0)
     {
         arith_divisor_sigma(r, 1, n);
-        fmpz_mul_ui(r, r, 8);
+        fmpz_mul_2exp(r, r, 3);
     }
     else
     {
