@@ -518,10 +518,10 @@ static int _fmpz_cubic_roots(fmpz * x, fmpz_t a, fmpz_t b)
 
         fmpz_sqrt(t3, d);
         fmpz_add(t4, b, t3);
-        fmpz_mul_ui(t4, t4, 4);
+        fmpz_mul_2exp(t4, t4, 2);
         fmpz_root(t1, t4, 3);
         fmpz_sub(t4, b, t3);
-        fmpz_mul_ui(t4, t4, 4);
+        fmpz_mul_2exp(t4, t4, 2);
         fmpz_root(t2, t4, 3);
         fmpz_add(t1, t1, t2);
         fmpz_fdiv_q_2exp(x + 0, t1, 1);
@@ -658,7 +658,7 @@ static int _fmpz_cubic_roots(fmpz * x, fmpz_t a, fmpz_t b)
 
         if (fmpz_equal(t2, b))
         {
-            fmpz_mul_ui(a, a, 4);
+            fmpz_mul_2exp(a, a, 2);
             fmpz_submul(a, x + 0, x + 0);
             fmpz_mul_ui(a, a, 3);
             if (fmpz_is_square(a))

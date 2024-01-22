@@ -28,7 +28,7 @@ int _fmpz_poly_is_squarefree(const fmpz * poly, slong len)
 
         fmpz_mul(lhs, poly + 1, poly + 1);
         fmpz_mul(rhs, poly, poly + 2);
-        fmpz_mul_ui(rhs, rhs, 4);
+        fmpz_mul_2exp(rhs, rhs, 2);
 
         ans = !fmpz_equal(lhs, rhs);
         fmpz_clear(lhs);

@@ -238,7 +238,7 @@ int main(void)
         fmpz_init(n);
         fmpz_set_ui(n, 10);
         fmpz_pow_ui(n, n, 949);
-        fmpz_mul_ui(n, n, 4);
+        fmpz_mul_2exp(n, n, 2);
         fmpz_sub_ui(n, n, 9);
 
         flint_printf("950 digit prime : 10^949 * 4 - 9\n");

@@ -43,7 +43,7 @@ sum_of_two_squares(fmpz_t r, const fmpz_t n)
         }
     }
 
-    fmpz_mul_ui(r, r, 4);
+    fmpz_mul_2exp(r, r, 2);
     fmpz_factor_clear(fac);
 }
 
