@@ -31,7 +31,7 @@ void arith_euler_polynomial(fmpq_poly_t poly, ulong n)
     for (k = n; k >= 0; k--)
     {
         fmpz_mul(poly->coeffs + k, poly->coeffs + k, t);
-        fmpz_mul_ui(t, t, UWORD(2));
+        fmpz_mul_2exp(t, t, 1);
         fmpz_sub_ui(t, t, UWORD(2));
     }
     fmpz_zero(poly->coeffs + n + 1);

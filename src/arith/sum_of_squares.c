@@ -81,7 +81,7 @@ sum_of_squares_recursive(fmpz_t r, slong k, ulong n)
         arith_sum_of_squares(t, k - 1, u);
 
         if (j > 0)
-            fmpz_mul_ui(t, t, 2);
+            fmpz_mul_2exp(t, t, 1);
         fmpz_add(r, r, t);
 
         j += 2 * i + 1;

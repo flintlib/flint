@@ -34,7 +34,7 @@ TEST_FUNCTION_START(fmpz_cmp2abs, state)
         fmpz_randtest(b, state, 400);
         fmpz_addmul_ui(a, b, 2);
 
-        fmpz_mul_ui(b2, b, 2);
+        fmpz_mul_2exp(b2, b, 1);
         if (sign(fmpz_cmp2abs(a, b)) != sign(fmpz_cmpabs(a, b2)))
         {
             flint_printf("FAIL i = %wd\n", i);

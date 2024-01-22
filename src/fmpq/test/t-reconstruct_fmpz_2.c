@@ -77,7 +77,7 @@ TEST_FUNCTION_START(fmpq_reconstruct_fmpz_2, state)
         if (n_randint(state, 10))
         {
             fmpz_mul(mod, N, D);
-            fmpz_mul_ui(mod, mod, 2);
+            fmpz_mul_2exp(mod, mod, 1);
         }
         else
         {

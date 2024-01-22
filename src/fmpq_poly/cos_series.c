@@ -51,7 +51,7 @@ _fmpq_poly_cos_series_tangent(fmpz * g, fmpz_t gden,
     fmpz_init(uden);
 
     /* cos(x) = (1-tan(x/2)^2)/(1+tan(x/2)^2) */
-    fmpz_mul_ui(uden, hden, 2);
+    fmpz_mul_2exp(uden, hden, 1);
     _fmpq_poly_tan_series(t, tden, h, uden, hlen, n);
     _fmpq_poly_mullow(u, uden, t, tden, n, t, tden, n, n);
 

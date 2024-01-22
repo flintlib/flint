@@ -823,7 +823,7 @@ void _fmpz_poly_factor_cubic(fmpz_poly_factor_t fac,
     fmpz_submul_ui(A, ac, 3);
 
     /* B = (9*a*c-2*b^2)*b - 27*a^2*d */
-    fmpz_mul_ui(b2, b2, 2);
+    fmpz_mul_2exp(b2, b2, 1);
     fmpz_mul_ui(ac, ac, 9);
     fmpz_sub(B, ac, b2);
     fmpz_mul(B, B, b);

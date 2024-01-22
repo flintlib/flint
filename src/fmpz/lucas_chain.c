@@ -72,7 +72,7 @@ void fmpz_lucas_chain_full(fmpz_t Vm, fmpz_t Vm1, const fmpz_t A, const fmpz_t B
           fmpz_mod(Vm, t, n);
 
           fmpz_sqr(Vm1, Vm1);
-          fmpz_mul_ui(t, Q, 2);
+          fmpz_mul_2exp(t, Q, 1);
           fmpz_mul(t, t, B);
           fmpz_sub(Vm1, Vm1, t);
           fmpz_mod(Vm1, Vm1, n);

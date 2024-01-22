@@ -189,7 +189,7 @@ arb_bell_find_cutoffs(fmpz_t A, fmpz_t B, fmpz_t M, fmpz_t Mmag, const fmpz_t n,
     {
         /* do ternary search for M */
         fmpz_zero(a);
-        fmpz_mul_ui(b, n, 2);
+        fmpz_mul_2exp(b, n, 1);
         fmpz_zero(amag);
         fmpz_zero(bmag);
 
@@ -253,7 +253,7 @@ arb_bell_find_cutoffs(fmpz_t A, fmpz_t B, fmpz_t M, fmpz_t Mmag, const fmpz_t n,
     /* bisect for B */
     fmpz_set(a, M);
     fmpz_set(amag, Mmag);
-    fmpz_mul_ui(b, n, 2);
+    fmpz_mul_2exp(b, n, 1);
     fmpz_zero(bmag);
 
     while (_fmpz_sub_small(b, a) > 4)

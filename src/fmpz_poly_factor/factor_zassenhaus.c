@@ -204,7 +204,7 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
             */
             fmpz_mul(T, T, f->coeffs + f->length - 1);
             fmpz_abs(T, T);
-            fmpz_mul_ui(T, T, 2);
+            fmpz_mul_2exp(T, T, 1);
             fmpz_add_ui(T, T, 1);
             a = fmpz_clog_ui(T, p);
 

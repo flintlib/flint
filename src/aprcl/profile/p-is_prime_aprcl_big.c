@@ -174,7 +174,7 @@ int main(void)
         fmpz_init(n);
         fmpz_set_ui(n, 10);
         fmpz_pow_ui(n, n, 749);
-        fmpz_mul_ui(n, n, 2);
+        fmpz_mul_2exp(n, n, 1);
         fmpz_add_ui(n, n, 89);
 
         flint_printf("750 digit prime : 10^749 * 2 + 89\n");

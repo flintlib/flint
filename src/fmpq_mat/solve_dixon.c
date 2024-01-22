@@ -58,7 +58,7 @@ _fmpq_mat_solve_dixon(fmpq_mat_t X,
         fmpz_sqr(bound, D);
     else
         fmpz_sqr(bound, N);
-    fmpz_mul_ui(bound, bound, UWORD(2));  /* signs */
+    fmpz_mul_2exp(bound, bound, 1);  /* signs */
 
     crt_primes = fmpz_mat_dixon_get_crt_primes(&num_primes, A, p);
     A_mod = (nmod_mat_t *) flint_malloc(sizeof(nmod_mat_t) * num_primes);

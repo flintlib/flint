@@ -137,7 +137,7 @@ void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
    */
    fmpz_mul(B, B, f->coeffs + f->length - 1);
    fmpz_abs(B, B);
-   fmpz_mul_ui(B, B, 2);
+   fmpz_mul_2exp(B, B, 1);
    fmpz_add_ui(B, B, 1);
    a = fmpz_clog_ui(B, p);
 

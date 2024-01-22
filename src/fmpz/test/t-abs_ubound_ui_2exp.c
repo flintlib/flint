@@ -88,7 +88,7 @@ TEST_FUNCTION_START(fmpz_abs_ubound_ui_2exp, state)
             fmpz_t t;
             fmpz_init(t);
             fmpz_set_ui(t, man);
-            fmpz_mul_ui(t, t, 2);
+            fmpz_mul_2exp(t, t, 1);
             fmpz_sub_ui(t, t, 1);
             result = (exp == yexp + 1) && fmpz_equal(t, y);
             fmpz_clear(t);

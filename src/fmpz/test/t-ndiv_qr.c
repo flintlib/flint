@@ -127,7 +127,7 @@ TEST_FUNCTION_START(fmpz_ndiv_qr, state)
         multiplier = n_randint(state, 50);
         multiplier += (multiplier % 2 == 0);
         fmpz_mul_ui(a, a, multiplier);
-        fmpz_mul_ui(b, b, 2);
+        fmpz_mul_2exp(b, b, 1);
 
         if (n_randint(state, 2))
             fmpz_neg(a, a);

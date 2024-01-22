@@ -348,7 +348,7 @@ double_det(fmpz_t d1, fmpz_t d2, const fmpz_mat_t B, const fmpz_mat_t c,
             fmpz_set(bound, s1);
         else
             fmpz_set(bound, s2);
-        fmpz_mul_ui(bound, bound, UWORD(2));
+        fmpz_mul_2exp(bound, bound, 1);
 
         fmpz_one(prod);
         P = _perm_init(n);

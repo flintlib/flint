@@ -62,7 +62,7 @@ fmpz_mat_det_modular_given_divisor(fmpz_t det, const fmpz_mat_t A,
 
     /* Bound x = det(A) / d */
     fmpz_mat_det_bound(bound, A);
-    fmpz_mul_ui(bound, bound, UWORD(2));  /* accommodate sign */
+    fmpz_mul_2exp(bound, bound, 1);  /* accommodate sign */
     fmpz_cdiv_q(bound, bound, d);
 
     nmod_mat_init(Amod, n, n, 2);

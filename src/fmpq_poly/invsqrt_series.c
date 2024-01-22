@@ -48,7 +48,7 @@ _fmpq_poly_invsqrt_series(fmpz * rpoly, fmpz_t rden,
     _fmpq_poly_mullow(t, tden, u, uden, n, poly, den, len, n);
     _fmpz_vec_neg(t + m, t + m, n - m);
     _fmpz_vec_zero(t, m);
-    fmpz_mul_ui(tden, tden, UWORD(2));
+    fmpz_mul_2exp(tden, tden, 1);
     _fmpq_poly_canonicalise(t, tden, n);
 
     _fmpq_poly_add(rpoly, rden, rpoly, rden, m, t, tden, n);

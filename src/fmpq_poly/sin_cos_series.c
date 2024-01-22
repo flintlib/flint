@@ -109,7 +109,7 @@ _fmpq_poly_sin_cos_series_tangent(fmpz * S, fmpz_t Sden,
     /* cos(x) = (1-tan(x/2)^2)/(1+tan(x/2)^2) */
 
     /* t = tan(x/2), u = 1+tan(x/2)^2 */
-    fmpz_mul_ui(uden, Aden, 2);
+    fmpz_mul_2exp(uden, Aden, 1);
     _fmpq_poly_tan_series(t, tden, A, uden, Alen, n);
     _fmpq_poly_mullow(u, uden, t, tden, n, t, tden, n, n);
     fmpz_set(u, uden);
