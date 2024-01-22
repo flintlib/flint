@@ -165,6 +165,7 @@
 #include "t-size.c"
 #include "t-sizeinbase.c"
 #include "t-smod.c"
+#include "t-sqr.c"
 #include "t-sqrt.c"
 #include "t-sqrtmod.c"
 #include "t-sqrtrem.c"
@@ -335,6 +336,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_size),
     TEST_FUNCTION(fmpz_sizeinbase),
     TEST_FUNCTION(fmpz_smod),
+    TEST_FUNCTION(fmpz_sqr),
     TEST_FUNCTION(fmpz_sqrt),
     TEST_FUNCTION(fmpz_sqrtmod),
     TEST_FUNCTION(fmpz_sqrtrem),

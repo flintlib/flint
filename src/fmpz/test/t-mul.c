@@ -69,8 +69,12 @@ TEST_FUNCTION_START(fmpz_mul, state)
         if (!result)
         {
             flint_printf("FAIL:\n");
-            gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = %Zd\n", d, e, f, g);
-            fflush(stdout);
+            gmp_printf(
+                    "aliasing = %d\n"
+                    "d = %Zd, e = %Zd\n"
+                    "expected: %Zd\n"
+                    "got:      %Zd\n",
+                    aliasing, d, e, f, g);
             flint_abort();
         }
 

@@ -185,16 +185,18 @@ flint_mpn_mul_n(mp_ptr r, mp_srcptr x, mp_srcptr y, mp_size_t n)
         _flint_mpn_mul_n(r, x, y, n);
 }
 
-MPN_EXTRAS_INLINE void
+MPN_EXTRAS_INLINE mp_limb_t
 flint_mpn_sqr(mp_ptr r, mp_srcptr x, mp_size_t n)
 {
     FLINT_ASSERT(n >= 1);
     FLINT_ASSERT(r != x);
 
     if (FLINT_MUL_USE_FUNC_TAB && FLINT_HAVE_SQR_FUNC(n))
-        flint_mpn_sqr_func_tab[n](r, x);
+        return flint_mpn_sqr_func_tab[n](r, x);
     else
         _flint_mpn_sqr(r, x, n);
+
+    return r[2 * n - 1];
 }
 
 /* Like flint_mpn_mul but allow operands in either order, completely

@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2009, 2020 William Hart
-    Copyright (C) 2021 Albin Ahlbäck
+    Copyright (C) 2021, 2024 Albin Ahlbäck
     Copyright (C) 2022 Fredrik Johansson
 
     This file is part of FLINT.
@@ -15,182 +15,84 @@
 #include "mpn_extras.h"
 #include "fmpz.h"
 
-/* This can only be called from fmpz_mul, and assumes
-   x and y are not small. */
-static void
-flint_mpz_mul(mpz_ptr z, mpz_srcptr x, mpz_srcptr y)
+__GMP_DECLSPEC extern void * (*__gmp_allocate_func)(size_t);
+__GMP_DECLSPEC extern void   (*__gmp_free_func)(void *, size_t);
+
+#define GMP_ALLOCATE_LIMBS(nlimbs) __gmp_allocate_func(sizeof(mp_limb_t) * (nlimbs))
+#define GMP_FREE_LIMBS(ptr, nlimbs) __gmp_free_func(ptr, sizeof(mp_limb_t) * (nlimbs))
+
+void
+fmpz_mul(fmpz_t res, const fmpz_t xp, const fmpz_t yp)
 {
-    mp_size_t xn, yn, zn, sgn;
+    slong xs = *xp;
+    slong ys = *yp;
+    mpz_ptr mres;
+    mp_ptr resd;
     mp_srcptr xd, yd;
-    mp_ptr zd;
-    mp_limb_t top;
-    TMP_INIT;
+    mp_size_t xsz, ysz;
+    mp_size_t neg;
+    mp_limb_t upperlimb;
 
-    xn = x->_mp_size;
-    yn = y->_mp_size;
-    sgn = xn ^ yn;
-
-    xn = FLINT_ABS(xn);
-    yn = FLINT_ABS(yn);
-
-    if (xn < yn)
+    if ((!COEFF_IS_MPZ(xs) && !COEFF_IS_MPZ(ys)) || xs == 0 || ys == 0)
     {
-        mpz_srcptr t;
-        mp_size_t tn;
-
-        t = x;
-        x = y;
-        y = t;
-
-        tn = xn;
-        xn = yn;
-        yn = tn;
-    }
-
-    zn = xn + yn;
-    if (z->_mp_alloc < zn)
-        _mpz_realloc(z, zn);
-    zd = z->_mp_d;
-    /* Important: read after possibly resizing z, so that the
-       pointers are valid in case of aliasing. */
-    xd = x->_mp_d;
-    yd = y->_mp_d;
-
-    if (xn == yn)
-    {
-        if (xn == 2)
-        {
-            mp_limb_t r3, r2, r1, r0;
-            FLINT_MPN_MUL_2X2(r3, r2, r1, r0, xd[1], xd[0], yd[1], yd[0]);
-            zd[0] = r0;
-            zd[1] = r1;
-            zd[2] = r2;
-            zd[3] = r3;
-            zn -= (r3 == 0);
-            z->_mp_size = (sgn >= 0) ? zn : -zn;
-            return;
-        }
-
-        if (xn == 1)
-        {
-            mp_limb_t hi, lo;
-            umul_ppmm(hi, lo,  xd[0], yd[0]);
-            zd[0] = lo;
-            zd[1] = hi;
-            /* The result cannot be 1 limb, because that would
-               require a coefficient smaller than COEFF_MAX. */
-            FLINT_ASSERT(hi != 0);
-            z->_mp_size = (sgn >= 0) ? 2 : -2;
-            return;
-        }
-    }
-
-    /* Unlikely case since operands up to FLINT_BITS-2 bits get
-       caught in the fmpz fast path, but we should still optimize
-       for this, especially since we don't need to handle aliasing. */
-    if (yn == 1)
-    {
-        if (xn == 2)
-        {
-            mp_limb_t r2, r1, r0;
-            FLINT_MPN_MUL_2X1(r2, r1, r0, xd[1], xd[0], yd[0]);
-            zd[0] = r0;
-            zd[1] = r1;
-            zd[2] = top = r2;
-        }
-        else
-        {
-            top = zd[xn] = mpn_mul_1(zd, xd, xn, yd[0]);
-        }
-
-        zn -= (top == 0);
-        z->_mp_size = (sgn >= 0) ? zn : -zn;
+        ulong t[2];
+        smul_ppmm(t[1], t[0], xs, ys);
+        fmpz_set_signed_uiui(res, t[1], t[0]);
         return;
     }
 
-    TMP_START;
+    mres = _fmpz_promote(res);
 
-    /* In case of aliasing, we need to copy the input so that
-       we do not overwrite it during the multiplication. */
-    if (zd == xd)
+    if (!COEFF_IS_MPZ(xs))
+        FLINT_SWAP(slong, xs, ys);
+
     {
-        mp_ptr tmp = TMP_ALLOC(xn * sizeof(mp_limb_t));
-        flint_mpn_copyi(tmp, xd, xn);
-        xd = tmp;
-    }
-    else if (zd == yd)
-    {
-        mp_ptr tmp = TMP_ALLOC(yn * sizeof(mp_limb_t));
-        flint_mpn_copyi(tmp, yd, yn);
-        yd = tmp;
+        mpz_srcptr mxp = COEFF_TO_PTR(xs);
+        xd = mxp->_mp_d;
+        xsz = mxp->_mp_size;
     }
 
-    if (x == y)
+    if (!COEFF_IS_MPZ(ys))
     {
-        flint_mpn_sqr(zd, xd, xn);
-        top = zd[zn - 1];
+        ysz = ys > 0 ? 1 : -1;
+        ys = FLINT_ABS(ys);
+        yd = (mp_ptr) &ys;
     }
     else
     {
-        top = flint_mpn_mul(zd, xd, xn, yd, yn);
+        mpz_srcptr myp = COEFF_TO_PTR(ys);
+        yd = myp->_mp_d;
+        ysz = myp->_mp_size;
     }
 
-    zn -= (top == 0);
-    z->_mp_size = (sgn >= 0) ? zn : -zn;
+    neg = xsz ^ ysz;
+    xsz = FLINT_ABS(xsz);
+    ysz = FLINT_ABS(ysz);
 
-    TMP_END;
-}
-
-void
-fmpz_mul(fmpz_t f, const fmpz_t g, const fmpz_t h)
-{
-    __mpz_struct * mf;
-    fmpz c1 = *g;
-    fmpz c2 = *h;
-
-    if (!COEFF_IS_MPZ(c1))
+    if (xsz < ysz)
     {
-        if (!COEFF_IS_MPZ(c2))
-        {
-            ulong th, tl;
-            smul_ppmm(th, tl, c1, c2);
-            fmpz_set_signed_uiui(f, th, tl);
-            return;
-        }
-        else if (c1 != 0)
-        {
-            mf = _fmpz_promote(f);
-            flint_mpz_mul_si(mf, COEFF_TO_PTR(c2), c1);
-            return;
-        }
+        FLINT_SWAP(mp_size_t, xsz, ysz);
+        FLINT_SWAP(mp_srcptr, xd, yd);
     }
 
-    if (!COEFF_IS_MPZ(*f))
+    resd = mres->_mp_d;
+
+    /* flint_mpn_mul does not work with aliasing apart from when ysz == 1 */
+    if (mres->_mp_alloc < xsz + ysz || resd == xd || (resd == yd && ysz != 1))
+        resd = GMP_ALLOCATE_LIMBS(xsz + ysz + 1); /* Allocate one extra */
+
+    upperlimb = flint_mpn_mul(resd, xd, xsz, yd, ysz);
+    mres->_mp_size = xsz + ysz - (upperlimb == 0);
+    if (neg < 0)
+        mres->_mp_size = -mres->_mp_size;
+
+    if (resd != mres->_mp_d)
     {
-        if (c1 == 0 || c2 == 0)
-        {
-            *f = 0;
-            return;
-        }
-        mf = _fmpz_new_mpz();
-        (*f) = PTR_TO_COEFF(mf);
+        if (mres->_mp_alloc)
+            GMP_FREE_LIMBS(mres->_mp_d, mres->_mp_alloc);
+        mres->_mp_d = resd;
+        mres->_mp_alloc = xsz + ysz + 1;
     }
-    else
-    {
-        if (c1 == 0 || c2 == 0)
-        {
-            _fmpz_clear_mpz(*f);
-            *f = 0;
-            return;
-        }
-
-        mf = COEFF_TO_PTR(*f);
-    }
-
-    if (!COEFF_IS_MPZ(c2))
-        flint_mpz_mul_si(mf, COEFF_TO_PTR(c1), c2);
-    else
-        flint_mpz_mul(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
 }
 
 void
@@ -237,48 +139,62 @@ fmpz_mul_si(fmpz_t f, const fmpz_t g, slong x)
 }
 
 void
-fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong x)
+fmpz_mul_ui(fmpz_t res, const fmpz_t xp, ulong ys)
 {
-    fmpz c2 = *g;
+    slong xs = *xp;
 
-    if (!COEFF_IS_MPZ(c2)) /* c2 is small */
+    if (!COEFF_IS_MPZ(xs) || ys == 0) /* The latter is a hack */
     {
-        mp_limb_t th, tl;
-        mp_limb_t uc2 = FLINT_ABS(c2);
+        ulong rd[2];
+        ulong abs_xs = FLINT_ABS(xs);
 
-        /* unsigned limb by limb multiply (assembly for most CPU's) */
-        umul_ppmm(th, tl, uc2, x);
-        if (c2 >= 0)
-            fmpz_set_uiui(f, th, tl);
+        umul_ppmm(rd[1], rd[0], abs_xs, ys);
+
+        if (rd[1] == 0)
+        {
+            if (rd[0] <= COEFF_MAX)
+            {
+                _fmpz_demote(res);
+                *res = (xs >= 0) ? rd[0] : -rd[0];
+                return;
+            }
+            else
+            {
+                mpz_ptr mres = _fmpz_promote(res);
+                mres->_mp_d[0] = rd[0];
+                mres->_mp_size = (xs >= 0) ? 1 : -1;
+                return;
+            }
+        }
         else
-            fmpz_neg_uiui(f, th, tl);
+        {
+            mpz_ptr mres = _fmpz_promote(res);
+            mres->_mp_d[0] = rd[0];
+            mres->_mp_d[1] = rd[1];
+            mres->_mp_size = (xs >= 0) ? 2 : -2;
+            return;
+        }
     }
-    else                        /* c2 is large */
+    else
     {
-        __mpz_struct * mf;
-        if (!COEFF_IS_MPZ(*f))
-        {
-            if (x == 0)
-            {
-                *f = 0;
-                return;
-            }
+        mpz_ptr mres = _fmpz_promote(res);
+        mpz_srcptr mxp = COEFF_TO_PTR(xs);
+        mp_size_t sz = mxp->_mp_size;
+        mp_size_t abssz = FLINT_ABS(sz);
+        mp_limb_t carry;
 
-            mf = _fmpz_new_mpz();
-            *f = PTR_TO_COEFF(mf);
-        }
+        if (mres->_mp_alloc <= abssz)
+            _mpz_realloc(mres, abssz + 2); /* Allocate one extra */
+
+        /* flint_mpn_mul_N_1 works with aliasing and so does GMP's mpn_mul_1. */
+        if (FLINT_HAVE_MUL_FUNC(abssz, 1))
+            carry = flint_mpn_mul_func_tab[abssz][1](mres->_mp_d, mxp->_mp_d, &ys);
         else
-        {
-            if (x == 0)
-            {
-                _fmpz_clear_mpz(*f);
-                *f = 0;
-                return;
-            }
+            carry = mres->_mp_d[abssz] = mpn_mul_1(mres->_mp_d, mxp->_mp_d, abssz, ys);
 
-            mf = COEFF_TO_PTR(*f);
-        }
-
-        flint_mpz_mul_ui(mf, COEFF_TO_PTR(c2), x);
+        mres->_mp_size = abssz + (carry != 0);
+        if (sz < 0)
+            mres->_mp_size = -mres->_mp_size;
+        return;
     }
 }

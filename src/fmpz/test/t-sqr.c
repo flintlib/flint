@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -10,67 +10,67 @@
 */
 
 #include "test_helpers.h"
-#include "gmpcompat.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-TEST_FUNCTION_START(fmpz_mul_ui, state)
+TEST_FUNCTION_START(fmpz_sqr, state)
 {
-    int i, result;
+    slong ix;
+    int result;
 
-    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
+    for (ix = 0; ix < 10000 * flint_test_multiplier(); ix++)
     {
         fmpz_t a, b;
-        mpz_t d, e, f;
-        ulong x;
+        mpz_t c, d, e;
         int aliasing;
 
         fmpz_init(a);
         fmpz_init(b);
 
+        mpz_init(c);
         mpz_init(d);
         mpz_init(e);
-        mpz_init(f);
 
         fmpz_randtest(a, state, 200);
 
-        fmpz_get_mpz(d, a);
-        x = n_randtest(state);
+        fmpz_get_mpz(c, a);
 
         aliasing = n_randint(state, 2);
-        if (aliasing)
+
+        if (aliasing == 0)
         {
-            fmpz_mul_ui(b, a, x);
+            fmpz_sqr(b, a);
         }
         else
         {
             fmpz_set(b, a);
-            fmpz_mul_ui(b, b, x);
+            mpz_set(d, e);
+            fmpz_sqr(b, b);
         }
 
-        flint_mpz_mul_ui(e, d, x);
+        mpz_mul(d, c, c);
 
-        fmpz_get_mpz(f, b);
+        fmpz_get_mpz(e, b);
 
-        result = (mpz_cmp(e, f) == 0) && _fmpz_is_canonical(b);
+        result = (mpz_cmp(d, e) == 0) && _fmpz_is_canonical(b);
         if (!result)
         {
             flint_printf("FAIL:\n");
             gmp_printf(
                     "aliasing = %d\n"
-                    "d = %Zd, x = %Mu\n"
+                    "c = %Zd\n"
                     "expected: %Zd\n"
                     "got:      %Zd\n",
-                    aliasing, d, x, e, f);
+                    aliasing, c, d, e);
             flint_abort();
         }
 
         fmpz_clear(a);
         fmpz_clear(b);
 
+        mpz_clear(c);
         mpz_clear(d);
         mpz_clear(e);
-        mpz_clear(f);
     }
 
     TEST_FUNCTION_END(state);
