@@ -69,5 +69,8 @@ fmpz_factor_expand_multiexp(fmpz_t n, const fmpz_factor_t factor)
     else
         _fmpz_factor_eval_multiexp(n, factor->p, factor->exp, factor->num);
 
-    fmpz_mul_si(n, n, factor->sign);
+    if (factor->sign == 0)
+        fmpz_zero(n);
+    else if (factor->sign < 0)
+        fmpz_inplace_neg(n);
 }

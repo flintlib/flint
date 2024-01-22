@@ -218,7 +218,7 @@ TEST_FUNCTION_START(fmpz_xgcd_canonical_bezout, state)
 
         fmpz_randm(nd, state, maxval);
         fmpz_init_set(dsave, nd);
-        fmpz_mul_si(nf, nd, 2);
+        fmpz_mul_2exp(nf, nd, 1);
         if (n_randint(state, 2))
             fmpz_inplace_neg(nf);
         fmpz_randm(ng, state, maxval);
@@ -257,7 +257,7 @@ TEST_FUNCTION_START(fmpz_xgcd_canonical_bezout, state)
 
         fmpz_randm(nd, state, maxval);
         fmpz_init_set(dsave, nd);
-        fmpz_mul_si(ng, nd, 2);
+        fmpz_mul_2exp(ng, nd, 1);
         if (n_randint(state, 2))
             fmpz_inplace_neg(ng);
         fmpz_randm(nf, state, maxval);
@@ -341,9 +341,9 @@ TEST_FUNCTION_START(fmpz_xgcd_canonical_bezout, state)
         fmpz_mul(tmp, na, nf);
         fmpz_addmul(tmp, nb, ng);
 
-        fmpz_mul_si(na, na, 2);
+        fmpz_mul_2exp(na, na, 1);
         fmpz_mul(na, na, nd);
-        fmpz_mul_si(nb, nb, 2);
+        fmpz_mul_2exp(nb, nb, 1);
         fmpz_mul(nb, nb, nd);
 
         result = (fmpz_equal(tmp, nd)

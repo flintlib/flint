@@ -262,7 +262,8 @@ qqbar_set_fmpzi(qqbar_t res, const fmpzi_t x)
         fmpz_poly_fit_length(QQBAR_POLY(res), 3);
         _fmpz_poly_set_length(QQBAR_POLY(res), 3);
         fmpzi_norm(QQBAR_COEFFS(res), x);
-        fmpz_mul_si(QQBAR_COEFFS(res) + 1, fmpzi_realref(x), -2);
+        fmpz_mul_2exp(QQBAR_COEFFS(res) + 1, fmpzi_realref(x), 1);
+        fmpz_inplace_neg(QQBAR_COEFFS(res) + 1);
         fmpz_one(QQBAR_COEFFS(res) + 2);
         arb_set_round_fmpz(acb_realref(QQBAR_ENCLOSURE(res)), fmpzi_realref(x), QQBAR_DEFAULT_PREC);
         arb_set_round_fmpz(acb_imagref(QQBAR_ENCLOSURE(res)), fmpzi_imagref(x), QQBAR_DEFAULT_PREC);

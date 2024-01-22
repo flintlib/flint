@@ -586,7 +586,7 @@ static int _fmpz_cubic_roots(fmpz * x, fmpz_t a, fmpz_t b)
     prec = fmpz_bits(a)/2 + 3;
 
     fmpz_mul_si(ta, a, -3);
-    fmpz_mul_si(tb, b, -1);
+    fmpz_neg(tb, b);
 
     FLINT_ASSERT(!fmpz_is_zero(ta));
     FLINT_ASSERT(!fmpz_is_zero(tb));
