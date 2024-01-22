@@ -43,7 +43,7 @@ void fmpq_poly_randtest(fmpq_poly_t poly, flint_rand_t state,
     if (m & UWORD(2))
     {
         fmpz_randtest_not_zero(poly->den, state, FLINT_MAX(bits, 1));
-        fmpz_abs(poly->den, poly->den);
+        fmpz_inplace_abs(poly->den);
         fmpq_poly_canonicalise(poly);
     }
     else
@@ -81,7 +81,7 @@ void fmpq_poly_randtest_unsigned(fmpq_poly_t poly, flint_rand_t state,
     if (m & UWORD(2))
     {
         fmpz_randtest_not_zero(poly->den, state, FLINT_MAX(bits, 1));
-        fmpz_abs(poly->den, poly->den);
+        fmpz_inplace_abs(poly->den);
         fmpq_poly_canonicalise(poly);
     }
     else

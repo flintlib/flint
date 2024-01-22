@@ -98,7 +98,7 @@ gr_ctx_init_random_ring_integers_mod(gr_ctx_t ctx, flint_rand_t state)
         case 3:
             fmpz_init(t);
             fmpz_randtest_not_zero(t, state, 100);
-            fmpz_abs(t, t);
+            fmpz_inplace_abs(t);
             gr_ctx_init_fmpz_mod(ctx, t);
             fmpz_clear(t);
             break;

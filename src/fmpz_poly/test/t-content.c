@@ -34,7 +34,7 @@ TEST_FUNCTION_START(fmpz_poly_content, state)
 
         fmpz_poly_content(c, f);
         fmpz_poly_scalar_mul_fmpz(f, f, a);
-        fmpz_abs(a, a);
+        fmpz_inplace_abs(a);
         fmpz_mul(c, a, c);
         fmpz_poly_content(d, f);
 

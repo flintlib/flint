@@ -40,7 +40,7 @@ TEST_FUNCTION_START(fmpz_lll, state)
         fmpz_set_ui(fmpz_mat_entry(mat, 1, 0), 4);
         fmpz_set_ui(fmpz_mat_entry(mat, 2, 0), 6);
         fmpz_lll(mat, NULL, fl);
-        fmpz_abs(fmpz_mat_entry(mat, 2, 0), fmpz_mat_entry(mat, 2, 0));
+        fmpz_inplace_abs(fmpz_mat_entry(mat, 2, 0));
         fmpz_sub_ui(fmpz_mat_entry(mat, 2, 0), fmpz_mat_entry(mat, 2, 0), 2);
         if (!fmpz_mat_is_zero(mat))
         {

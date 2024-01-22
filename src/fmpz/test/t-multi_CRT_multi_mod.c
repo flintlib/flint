@@ -150,7 +150,7 @@ TEST_FUNCTION_START(fmpz_multi_CRT_multi_mod, state)
                     flint_abort();
                 }
 
-                fmpz_abs(p, p);
+                fmpz_inplace_abs(p);
                 fmpz_add(p, p, p);
                 fmpz_add_ui(p, p, 3);
                 fmpz_randtest_mod_signed(output, state, p);

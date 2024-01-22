@@ -195,7 +195,7 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap1(fmpz_t scale, fmpz_mpoly_struct ** pol
 
                 fmpz_gcd(gcd, acc_lg, poly3[w]->coeffs + 0);
                 fmpz_divexact(ns, poly3[w]->coeffs + 0, gcd);
-                fmpz_abs(ns, ns);
+                fmpz_inplace_abs(ns);
                 fmpz_mul(polyq[w]->coeffs + q_len[w], ns, acc_lg);
                 fmpz_divexact(polyq[w]->coeffs + q_len[w],
                             polyq[w]->coeffs + q_len[w], poly3[w]->coeffs + 0);
@@ -514,7 +514,7 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale, fmpz_mpoly_struct ** poly
 
                 fmpz_gcd(gcd, acc_lg, poly3[w]->coeffs + 0);
                 fmpz_divexact(ns, poly3[w]->coeffs + 0, gcd);
-                fmpz_abs(ns, ns);
+                fmpz_inplace_abs(ns);
                 fmpz_mul(polyq[w]->coeffs + q_len[w], ns, acc_lg);
                 fmpz_divexact(polyq[w]->coeffs + q_len[w],
                             polyq[w]->coeffs + q_len[w], poly3[w]->coeffs + 0);

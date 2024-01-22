@@ -62,8 +62,8 @@ slong fmpq_poly_remove(fmpq_poly_t q, const fmpq_poly_t poly1,
     for (i = 0; i < poly2->length; i++)
         fmpz_add(p2sum, p2sum, p2->coeffs + i);
 
-    fmpz_abs(p1sum, p1sum);
-    fmpz_abs(p2sum, p2sum);
+    fmpz_inplace_abs(p1sum);
+    fmpz_inplace_abs(p2sum);
 
     if (fmpz_is_zero(p2sum))
     {

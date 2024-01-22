@@ -111,7 +111,7 @@ void _fmpz_poly_signature(slong * r1, slong * r2, const fmpz * poly, slong len)
                 _fmpz_vec_scalar_divexact_fmpz(B, B, lenB, f);
                 fmpz_pow_ui(f, h, delta - 1);
                 fmpz_pow_ui(g, A + (lenA - 1), delta);
-                fmpz_abs(g, g);
+                fmpz_inplace_abs(g);
                 fmpz_divexact(h, g, f);
                 fmpz_abs(g, A + (lenA - 1));
             }

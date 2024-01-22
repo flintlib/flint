@@ -27,7 +27,7 @@ TEST_FUNCTION_START(fmpz_is_probabprime_BPSW, state)
 
         do {
            fmpz_randbits(p, state, n_randint(state, 330) + 2);
-           fmpz_abs(p, p);
+           fmpz_inplace_abs(p);
         } while (!fmpz_is_probabprime(p) || fmpz_cmp_ui(p, 2) == 0);
 
         result = fmpz_is_probabprime_BPSW(p);

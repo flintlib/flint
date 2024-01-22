@@ -23,7 +23,7 @@ void nf_elem_randtest(nf_elem_t a, flint_rand_t state,
         if (n_randint(state, 2))
         {
            fmpz_randtest_not_zero(LNF_ELEM_DENREF(a), state, bits);
-           fmpz_abs(LNF_ELEM_DENREF(a), LNF_ELEM_DENREF(a));
+           fmpz_inplace_abs(LNF_ELEM_DENREF(a));
 
            _fmpq_canonicalise(LNF_ELEM_NUMREF(a), LNF_ELEM_DENREF(a));
         } else
@@ -38,7 +38,7 @@ void nf_elem_randtest(nf_elem_t a, flint_rand_t state,
            fmpz_t d;
 
            fmpz_randtest_not_zero(QNF_ELEM_DENREF(a), state, bits);
-           fmpz_abs(QNF_ELEM_DENREF(a), QNF_ELEM_DENREF(a));
+           fmpz_inplace_abs(QNF_ELEM_DENREF(a));
 
            fmpz_init(d);
            fmpz_gcd(d, QNF_ELEM_NUMREF(a), QNF_ELEM_NUMREF(a) + 1);

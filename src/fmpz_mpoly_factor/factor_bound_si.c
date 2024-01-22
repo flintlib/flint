@@ -46,7 +46,7 @@ int fmpz_mpoly_factor_bound_si(fmpz_t B, const fmpz_t A,
     fmpz_add_ui(t, t, 1);
     fmpz_mul(B, A, t);
     fmpz_mul_2exp(B, B, n);
-    fmpz_abs(B, B);
+    fmpz_inplace_abs(B);
     fmpz_clear(t);
     return 1;
 }

@@ -467,7 +467,7 @@ arb_sin_cos_arf_bb(arb_t zsin, arb_t zcos, const arf_t x, slong prec)
 
     /* Convert x/2^q to a fixed-point number. */
     inexact = arf_get_fmpz_fixed_si(t, x, -wp + q);
-    fmpz_abs(t, t);
+    fmpz_inplace_abs(t);
 
     /* Aliasing of z and x is safe now that only use t. */
     /* Start with z = 1. */

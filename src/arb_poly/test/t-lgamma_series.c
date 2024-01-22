@@ -39,7 +39,7 @@ TEST_FUNCTION_START(arb_poly_lgamma_series, state)
         arb_poly_init(d);
 
         fmpq_poly_randtest_not_zero(A, state, m, qbits);
-        fmpz_abs(A->coeffs, A->coeffs);
+        fmpz_inplace_abs(A->coeffs);
         arb_poly_set_fmpq_poly(a, A, rbits1);
 
         arb_poly_lgamma_series(b, a, n1, rbits2);

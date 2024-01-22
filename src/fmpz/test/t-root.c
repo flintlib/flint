@@ -36,7 +36,7 @@ TEST_FUNCTION_START(fmpz_root, state)
 
         fmpz_randtest(g, state, 200);
         if ((n & 1) == 0)
-            fmpz_abs(g, g);
+            fmpz_inplace_abs(g);
         fmpz_get_mpz(mg, g);
 
         if (n_randint(state, 2))
@@ -84,7 +84,7 @@ TEST_FUNCTION_START(fmpz_root, state)
 
         fmpz_randtest(g, state, 200);
         if ((n & 1) == 0)
-            fmpz_abs(g, g);
+            fmpz_inplace_abs(g);
 
         fmpz_pow_ui(pow, g, n);
 

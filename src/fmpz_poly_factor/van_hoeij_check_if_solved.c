@@ -85,7 +85,7 @@ int fmpz_poly_factor_van_hoeij_check_if_solved(fmpz_mat_t M,
       }
 
       fmpz_poly_content(temp_lc, prod);
-      fmpz_abs(temp_lc, temp_lc);
+      fmpz_inplace_abs(temp_lc);
       fmpz_poly_scalar_divexact_fmpz(prod, prod, temp_lc);
 
       fmpz_poly_factor_insert(trial_factors, prod, 1);

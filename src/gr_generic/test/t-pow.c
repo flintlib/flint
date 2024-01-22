@@ -33,7 +33,7 @@ TEST_FUNCTION_START(gr_generic_pow, state)
     {
         fmpz_init(m);
         fmpz_randtest_not_zero(m, state, 100);
-        fmpz_abs(m, m);
+        fmpz_inplace_abs(m);
 
         gr_ctx_init_fmpz_mod(ZZn, m);
 

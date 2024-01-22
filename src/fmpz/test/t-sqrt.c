@@ -32,7 +32,7 @@ TEST_FUNCTION_START(fmpz_sqrt, state)
         mpz_init(mg);
 
         fmpz_randtest(g, state, 200);
-        fmpz_abs(g, g);
+        fmpz_inplace_abs(g);
         fmpz_get_mpz(mg, g);
 
         if (n_randint(state, 2))

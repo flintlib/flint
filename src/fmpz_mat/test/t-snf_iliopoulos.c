@@ -42,7 +42,7 @@ TEST_FUNCTION_START(fmpz_mat_snf_iliopoulos, state)
             fmpz_mat_randops(A, state, d);
 
         fmpz_mat_det(mod, A);
-        fmpz_abs(mod, mod);
+        fmpz_inplace_abs(mod);
 
         fmpz_mat_snf_iliopoulos(S, A, mod);
 

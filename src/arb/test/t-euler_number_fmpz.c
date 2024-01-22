@@ -31,12 +31,12 @@ TEST_FUNCTION_START(arb_euler_number_fmpz, state)
         if (iter % 100 == 0)
         {
             fmpz_randtest(n, state, 1 + n_randint(state, 1000));
-            fmpz_abs(n, n);
+            fmpz_inplace_abs(n);
         }
         else
         {
             fmpz_randtest(n, state, 1 + n_randint(state, 20));
-            fmpz_abs(n, n);
+            fmpz_inplace_abs(n);
         }
 
         prec1 = 2 + n_randint(state, 1000);

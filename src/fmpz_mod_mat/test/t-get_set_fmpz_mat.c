@@ -30,7 +30,7 @@ TEST_FUNCTION_START(fmpz_mod_mat_get_set_fmpz_mat, state)
 
         fmpz_init(mod);
         fmpz_randtest_not_zero(mod, state, 200);
-        fmpz_abs(mod, mod);
+        fmpz_inplace_abs(mod);
 
         fmpz_mod_mat_init(A, m, n, mod);
         fmpz_mod_mat_init(B, m, n, mod);

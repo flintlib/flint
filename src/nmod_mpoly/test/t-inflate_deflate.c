@@ -63,7 +63,7 @@ TEST_FUNCTION_START(nmod_mpoly_inflate_deflate, state)
             {
                 fmpz_randtest_unsigned(shifts + k, state, shift_bits);
                 fmpz_randtest_not_zero(strides + k, state, stride_bits);
-                fmpz_abs(strides + k, strides + k);
+                fmpz_inplace_abs(strides + k);
             }
 
             nmod_mpoly_inflate(h, f, shifts, strides, ctx);

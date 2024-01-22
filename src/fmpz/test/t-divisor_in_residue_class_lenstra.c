@@ -42,7 +42,7 @@ TEST_FUNCTION_START(fmpz_divisor_in_residue_class_lenstra, state)
 
            fmpz_root(s, p, 3); /* cube root of p */
            fmpz_randbits(r, state, (2*fmpz_bits(p))/3);
-           fmpz_abs(r, r);
+           fmpz_inplace_abs(r);
 
            fmpz_mul(s, s, r); /* s now between cube root and p */
 
@@ -93,7 +93,7 @@ TEST_FUNCTION_START(fmpz_divisor_in_residue_class_lenstra, state)
 
            fmpz_root(s, p, 3); /* cube root of p */
            fmpz_randbits(r, state, (2*fmpz_bits(p))/3);
-           fmpz_abs(r, r);
+           fmpz_inplace_abs(r);
 
            fmpz_mul(s, s, r); /* s now between cube root and p */
 

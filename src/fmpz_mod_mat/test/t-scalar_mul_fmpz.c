@@ -29,7 +29,7 @@ TEST_FUNCTION_START(fmpz_mod_mat_scalar_mul_fmpz, state)
         fmpz_init(c1);
         fmpz_init(mod);
         fmpz_randtest_not_zero(mod, state, 200);
-        fmpz_abs(mod, mod);
+        fmpz_inplace_abs(mod);
 
         fmpz_randtest(c, state, 200);
 

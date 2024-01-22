@@ -79,7 +79,7 @@ arb_get_rand_fmpq(fmpq_t q, flint_rand_t state, const arb_t x, slong bits)
 
     /* pick a denominator */
     fmpz_randbits(fmpq_denref(q), state, n_randint(state, bits + 1));
-    fmpz_abs(fmpq_denref(q), fmpq_denref(q));
+    fmpz_inplace_abs(fmpq_denref(q));
     if (fmpz_is_zero(fmpq_denref(q)))
         fmpz_one(fmpq_denref(q));
 

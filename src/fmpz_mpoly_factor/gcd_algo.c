@@ -455,7 +455,7 @@ static int _do_monomial_gcd(
 
     /* compute the coefficient of G */
     _fmpz_vec_content_chained(g, A->coeffs, A->length, B->coeffs + 0);
-    fmpz_abs(g, g);
+    fmpz_inplace_abs(g);
 
     if (B->exps[0] == 0 && mpoly_monomial_is_zero(B->exps,
                                      mpoly_words_per_exp(B->bits, ctx->minfo)))

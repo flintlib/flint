@@ -38,7 +38,7 @@ TEST_FUNCTION_START(fmpz_powm_ui, state)
 
         fmpz_randtest(a, state, 200);
         fmpz_randtest_not_zero(c, state, 200);
-        fmpz_abs(c, c);
+        fmpz_inplace_abs(c);
 
         fmpz_get_mpz(d, a);
         fmpz_get_mpz(m, c);

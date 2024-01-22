@@ -33,7 +33,7 @@ TEST_FUNCTION_START(fmpz_is_prime_pocklington, state)
 
         do {
            fmpz_randbits(p, state, n_randint(state, 330) + 2);
-           fmpz_abs(p, p);
+           fmpz_inplace_abs(p);
         } while (!fmpz_is_probabprime(p) || fmpz_cmp_ui(p, 2) == 0);
 
         logd = log(fmpz_get_d(p));

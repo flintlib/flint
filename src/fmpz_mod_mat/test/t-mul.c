@@ -27,7 +27,7 @@ TEST_FUNCTION_START(fmpz_mod_mat_mul, state)
 
         fmpz_init(mod);
         fmpz_randtest_not_zero(mod, state, 200);
-        fmpz_abs(mod, mod);
+        fmpz_inplace_abs(mod);
 
         flint_set_num_threads(n_randint(state, max_threads) + 1);
 

@@ -28,7 +28,7 @@ TEST_FUNCTION_START(fmpz_mod_mat_window_init_clear, state)
 
         fmpz_init(mod);
         fmpz_randtest_not_zero(mod, state, 100);
-        fmpz_abs(mod, mod);
+        fmpz_inplace_abs(mod);
         fmpz_mod_mat_init(a, rows, cols, mod);
         fmpz_mod_mat_randtest(a, state);
 

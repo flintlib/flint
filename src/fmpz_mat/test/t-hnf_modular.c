@@ -40,7 +40,7 @@ TEST_FUNCTION_START(fmpz_mat_hnf_modular, state)
 
         fmpz_mat_det(det, A);
         c = 1 + n_randint(state, 10);
-        fmpz_abs(det, det);
+        fmpz_inplace_abs(det);
         fmpz_mul_ui(det, det, c);
 
         for (i = 0; i < n; i++)

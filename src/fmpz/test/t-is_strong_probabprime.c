@@ -89,12 +89,12 @@ TEST_FUNCTION_START(fmpz_is_strong_probabprime, state)
 
         do {
            fmpz_randbits(p, state, n_randint(state, 330) + 2);
-           fmpz_abs(p, p);
+           fmpz_inplace_abs(p);
         } while (!fmpz_is_probabprime(p) || fmpz_cmp_ui(p, 2) == 0);
 
         do {
            fmpz_randbits(b, state, n_randint(state, 100) + 1);
-           fmpz_abs(b, b);
+           fmpz_inplace_abs(b);
         } while (fmpz_is_zero(b) || fmpz_is_one(b));
 
         result = fmpz_is_strong_probabprime(p, b);
@@ -131,7 +131,7 @@ TEST_FUNCTION_START(fmpz_is_strong_probabprime, state)
 
         do {
            fmpz_randbits(b, state, n_randint(state, 100) + 1);
-           fmpz_abs(b, b);
+           fmpz_inplace_abs(b);
         } while (fmpz_cmp_ui(b, 2) < 0);
 
         fmpz_mul(p, p, a);

@@ -39,6 +39,6 @@ fmpz_lcm(fmpz_t f, const fmpz_t g, const fmpz_t h)
     fmpz_gcd(t, g, h);
     fmpz_divexact(t, g, t);
     fmpz_mul(f, t, h);
-    fmpz_abs(f, f);
+    fmpz_inplace_abs(f);
     fmpz_clear(t);
 }

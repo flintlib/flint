@@ -19,7 +19,7 @@ ca_randtest_same_nf(ca_t res, flint_rand_t state, const ca_t x, slong bits, slon
         _ca_make_fmpq(res, ctx);
         fmpz_randtest(CA_FMPQ_NUMREF(res), state, bits);
         fmpz_randtest_not_zero(CA_FMPQ_DENREF(res), state, den_bits);
-        fmpz_abs(CA_FMPQ_DENREF(res), CA_FMPQ_DENREF(res));
+        fmpz_inplace_abs(CA_FMPQ_DENREF(res));
     }
     else if (CA_FIELD_IS_NF(CA_FIELD(x, ctx)))
     {
@@ -28,7 +28,7 @@ ca_randtest_same_nf(ca_t res, flint_rand_t state, const ca_t x, slong bits, slon
 
         fmpq_poly_randtest(p, state, qqbar_degree(CA_FIELD_NF_QQBAR(CA_FIELD(x, ctx))), bits);
         fmpz_randtest_not_zero(fmpq_poly_denref(p), state, den_bits);
-        fmpz_abs(fmpq_poly_denref(p), fmpq_poly_denref(p));
+        fmpz_inplace_abs(fmpq_poly_denref(p));
         fmpq_poly_canonicalise(p);
 
         ca_set(res, x, ctx);

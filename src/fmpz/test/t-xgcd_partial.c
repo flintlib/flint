@@ -36,13 +36,13 @@ TEST_FUNCTION_START(fmpz_xgcd_partial, state)
         fmpz_randtest_unsigned(L, state, 200);
 
         fmpz_set(t2, g);
-        fmpz_abs(t2, t2);
+        fmpz_inplace_abs(t2);
 
         fmpz_xgcd_partial(co2, co1, g, f, L);
 
         fmpz_mul(t1, co2, f);
         fmpz_submul(t1, co1, g);
-        fmpz_abs(t1, t1);
+        fmpz_inplace_abs(t1);
 
         result = fmpz_equal(t1, t2);
         if (!result)

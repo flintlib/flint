@@ -22,5 +22,5 @@ _fmpz_vec_lcm(fmpz_t res, const fmpz * vec, slong len)
     for (i = 0; i < len && !fmpz_is_zero(res); i++)
         fmpz_lcm(res, res, vec + i);
 
-    fmpz_abs(res, res);
+    fmpz_inplace_abs(res);
 }

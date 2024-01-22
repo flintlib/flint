@@ -91,7 +91,7 @@ TEST_FUNCTION_START(arb_hypgeom_airy_zero, state)
         fmpz_init(n);
 
         fmpz_randtest(n, state, 200);
-        fmpz_abs(n, n);
+        fmpz_inplace_abs(n);
         fmpz_add_ui(n, n, 1);
         prec1 = 2 + n_randtest(state) % 1000;
         prec2 = 2 + n_randtest(state) % 1000;

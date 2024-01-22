@@ -39,7 +39,7 @@ fmpz_mat_snf(fmpz_mat_t S, const fmpz_mat_t A)
         fmpz_mat_det(det, A);
         if (!fmpz_is_zero(det))
         {
-            fmpz_abs(det, det);
+            fmpz_inplace_abs(det);
             fmpz_mat_snf_iliopoulos(S, A, det);
         }
         else

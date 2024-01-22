@@ -33,7 +33,7 @@ TEST_FUNCTION_START(fmpq_simplest_between, state)
         fmpq_randtest(r, state, 1 + n_randint(state, 1000));
         fmpz_one(fmpq_numref(m));
         fmpz_randtest_not_zero(fmpq_denref(m), state, 1 + n_randint(state, 1000));
-        fmpz_abs(fmpq_denref(m), fmpq_denref(m));
+        fmpz_inplace_abs(fmpq_denref(m));
         fmpq_mul(l, l, m);
         fmpq_mul(r, r, m);
 

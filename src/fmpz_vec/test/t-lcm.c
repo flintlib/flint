@@ -42,7 +42,7 @@ TEST_FUNCTION_START(fmpz_vec_lcm, state)
         else
         {
             _fmpz_vec_scalar_mul_fmpz(f, f, len, a);
-            fmpz_abs(a, a);
+            fmpz_inplace_abs(a);
             fmpz_mul(c, a, c);
             _fmpz_vec_lcm(d, f, len);
             result = (fmpz_equal(c, d));

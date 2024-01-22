@@ -37,7 +37,7 @@ TEST_FUNCTION_START(fmpz_remove, state)
         fmpz_randtest_not_zero(a, state, 200);
         do {
             fmpz_randtest_not_zero(b, state, 200);
-            fmpz_abs(b, b);
+            fmpz_inplace_abs(b);
         } while (fmpz_is_one(b));
 
         fmpz_get_mpz(d, a);
@@ -111,7 +111,7 @@ TEST_FUNCTION_START(fmpz_remove, state)
         fmpz_randtest_not_zero(a, state, 200);
         do {
             fmpz_randtest_not_zero(b, state, 200);
-            fmpz_abs(b, b);
+            fmpz_inplace_abs(b);
         } while (fmpz_is_one(b));
 
         n = n_randint(state, 10);

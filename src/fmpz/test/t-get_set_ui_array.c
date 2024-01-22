@@ -36,7 +36,7 @@ TEST_FUNCTION_START(fmpz_get_set_ui_array, state)
         limb_count3 = n_randint(state, 2*max_limbs);
 
         fmpz_randtest(a, state, limb_count1*FLINT_BITS);
-        fmpz_abs(a, a);
+        fmpz_inplace_abs(a);
         fmpz_randtest(b, state, limb_count2*FLINT_BITS);
         fmpz_randtest(c, state, limb_count3*FLINT_BITS);
 

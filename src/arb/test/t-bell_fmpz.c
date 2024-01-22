@@ -29,14 +29,14 @@ TEST_FUNCTION_START(arb_bell_fmpz, state)
         if (iter % 100 == 0)
         {
             fmpz_randtest(n, state, 1 + n_randint(state, 100));
-            fmpz_abs(n, n);
+            fmpz_inplace_abs(n);
             prec1 = 2 + n_randint(state, 200);
             prec2 = 2 + n_randint(state, 200);
         }
         else
         {
             fmpz_randtest(n, state, 1 + n_randint(state, 20));
-            fmpz_abs(n, n);
+            fmpz_inplace_abs(n);
             prec1 = 2 + n_randint(state, 1000);
             prec2 = 2 + n_randint(state, 1000);
         }

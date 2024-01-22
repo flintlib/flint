@@ -33,7 +33,7 @@ TEST_FUNCTION_START(fmpz_mat_scalar_smod, state)
 
         do {
            fmpz_randtest(P, state, 100);
-           fmpz_abs(P, P);
+           fmpz_inplace_abs(P);
         } while (fmpz_is_zero(P));
 
         fmpz_mat_randtest(A, state, 100);

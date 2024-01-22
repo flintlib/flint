@@ -174,7 +174,7 @@ done:
                {
                   if (fmpz_cmpabs(pow->a, pow->b) != 0)
                   {
-                     fmpz_abs(pow->b, pow->b);
+                     fmpz_inplace_abs(pow->b);
                      fmpz_sub(g, pow->b, pow->a);
                      fmpz_sub(pow->a, g, pow->a);
                   }

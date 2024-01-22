@@ -49,7 +49,7 @@ void _fmpz_smod(
             cmp = fmpz_cmp2abs(m, r);
 
             if (cmp == 0)
-                fmpz_abs(r, r);
+                fmpz_inplace_abs(r);
             else if (cmp < 0)
                 fmpz_sub(r, r, m);
         }
@@ -62,7 +62,7 @@ void _fmpz_smod(
             cmp = fmpz_cmp2abs(t, r);
 
             if (cmp == 0)
-                fmpz_abs(r, r);
+                fmpz_inplace_abs(r);
             else if (cmp < 0)
                 fmpz_sub(r, r, t);
         }

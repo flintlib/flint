@@ -64,13 +64,13 @@ TEST_FUNCTION_START(fmpq_reconstruct_fmpz_2, state)
         if (n_randint(state, 2))
         {
             fmpz_randtest_not_zero(t, state, 2000);
-            fmpz_abs(t, t);
+            fmpz_inplace_abs(t);
             fmpz_mul(N, N, t);
         }
         if (n_randint(state, 2))
         {
             fmpz_randtest_not_zero(t, state, 2000);
-            fmpz_abs(t, t);
+            fmpz_inplace_abs(t);
             fmpz_mul(D, D, t);
         }
 
@@ -82,7 +82,7 @@ TEST_FUNCTION_START(fmpq_reconstruct_fmpz_2, state)
         else
         {
             fmpz_randbits(mod, state, FLINT_BITS * FMPQ_RECONSTRUCT_HGCD_CUTOFF + fmpz_bits(N) + n_randint(state, 10));
-            fmpz_abs(mod, mod);
+            fmpz_inplace_abs(mod);
         }
 
         do fmpz_add_ui(mod, mod, 1);

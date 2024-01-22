@@ -35,7 +35,7 @@ TEST_FUNCTION_START(fmpz_sqrtrem, state)
         mpz_init(mg);
 
         fmpz_randtest(g, state, 200);
-        fmpz_abs(g, g);
+        fmpz_inplace_abs(g);
         fmpz_get_mpz(mg, g);
 
         aliasing = n_randint(state, 3);

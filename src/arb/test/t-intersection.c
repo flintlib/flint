@@ -116,7 +116,7 @@ TEST_FUNCTION_START(arb_intersection, state)
         mag_get_fmpq(br, arb_radref(b));
 
         fmpq_sub(t, am, bm);
-        fmpz_abs(fmpq_numref(t), fmpq_numref(t));
+        fmpz_inplace_abs(fmpq_numref(t));
         fmpq_add(u, ar, br);
 
         c1 = arb_overlaps(a, b);

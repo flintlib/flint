@@ -35,7 +35,7 @@ TEST_FUNCTION_START(acb_dirichlet_stieltjes, state)
         {
             acb_one(a);
             fmpz_randtest(n, state, 1 + n_randint(state, 100));
-            fmpz_abs(n, n);
+            fmpz_inplace_abs(n);
             prec1 = 2 + n_randint(state, 100);
             prec2 = 2 + n_randint(state, 100);
         }
@@ -43,7 +43,7 @@ TEST_FUNCTION_START(acb_dirichlet_stieltjes, state)
         {
             acb_one(a);
             fmpz_randtest(n, state, 2 + n_randint(state, 12));
-            fmpz_abs(n, n);
+            fmpz_inplace_abs(n);
             prec1 = 2 + n_randint(state, 400);
             prec2 = 2 + n_randint(state, 400);
         }
@@ -51,7 +51,7 @@ TEST_FUNCTION_START(acb_dirichlet_stieltjes, state)
         {
             acb_randtest_precise(a, state, 400, 3);
             fmpz_randtest(n, state, 7);
-            fmpz_abs(n, n);
+            fmpz_inplace_abs(n);
             prec1 = 2 + n_randint(state, 400);
             prec2 = 2 + n_randint(state, 400);
         }

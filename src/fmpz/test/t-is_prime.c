@@ -71,7 +71,7 @@ TEST_FUNCTION_START(fmpz_is_prime, state)
 
         do {
             fmpz_randbits(p, state, n_randint(state, 160) + 2);
-            fmpz_abs(p, p);
+            fmpz_inplace_abs(p);
         } while (!fmpz_is_probabprime(p));
 
         r1 = fmpz_is_prime(p);

@@ -30,7 +30,7 @@ TEST_FUNCTION_START(fmpz_dlog, state)
         mpfr_init2(r, 53);
 
         fmpz_randtest_not_zero(x, state, 10000);
-        fmpz_abs(x, x);
+        fmpz_inplace_abs(x);
 
         y = fmpz_dlog(x);
 
