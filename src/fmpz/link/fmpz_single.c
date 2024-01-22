@@ -215,18 +215,6 @@ void _fmpz_cleanup(void)
     mpz_free_arr = NULL;
 }
 
-__mpz_struct * _fmpz_promote(fmpz_t f)
-{
-    if (!COEFF_IS_MPZ(*f)) /* f is small so promote it first */
-    {
-        __mpz_struct * mf = _fmpz_new_mpz();
-        (*f) = PTR_TO_COEFF(mf);
-        return mf;
-    }
-    else /* f is large already, just return the pointer */
-        return COEFF_TO_PTR(*f);
-}
-
 __mpz_struct * _fmpz_promote_val(fmpz_t f)
 {
     fmpz c = (*f);

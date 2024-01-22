@@ -32,7 +32,17 @@ void _fmpz_clear_mpz(fmpz f);
 void _fmpz_cleanup_mpz_content(void);
 void _fmpz_cleanup(void);
 
-mpz_ptr _fmpz_promote(fmpz_t f);
+FMPZ_INLINE mpz_ptr _fmpz_promote(fmpz_t f)
+{
+    if (!COEFF_IS_MPZ(*f))
+    {
+        mpz_ptr mf = _fmpz_new_mpz();
+        *f = PTR_TO_COEFF(mf);
+        return mf;
+    }
+    else
+        return COEFF_TO_PTR(*f);
+}
 mpz_ptr _fmpz_promote_val(fmpz_t f);
 
 FMPZ_INLINE
