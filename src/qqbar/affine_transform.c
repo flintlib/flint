@@ -45,7 +45,7 @@ _fmpq_poly_compose2(fmpz * res, const fmpz * poly1, const fmpz_t den1,
 
     _fmpz_vec_content(den, res, len);
     if (fmpz_sgn(res + len - 1) < 0)
-        fmpz_neg(den, den);
+        fmpz_inplace_neg(den);
     _fmpz_vec_scalar_divexact_fmpz(res, res, len, den);
 
     fmpz_clear(den);

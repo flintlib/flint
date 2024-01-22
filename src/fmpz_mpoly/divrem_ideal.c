@@ -311,7 +311,7 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce1(fmpz_mpoly_struct ** polyq,
                 if (small)
                 {
                     fmpz_set_signed_uiuiui(p2 + l, c[2], c[1], c[0]);
-                    fmpz_neg(p2 + l, p2 + l);
+                    fmpz_inplace_neg(p2 + l);
                 } else
                 {
                     fmpz_neg(p2 + l, qc);
@@ -657,7 +657,7 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** polyq,
                 if (small)
                 {
                     fmpz_set_signed_uiuiui(p2 + l, c[2], c[1], c[0]);
-                    fmpz_neg(p2 + l, p2 + l);
+                    fmpz_inplace_neg(p2 + l);
                 } else
                 {
                     fmpz_neg(p2 + l, qc);

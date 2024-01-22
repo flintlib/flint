@@ -754,7 +754,7 @@ _gr_fmpz_fib_fmpz(fmpz_t res, const fmpz_t n, gr_ctx_t ctx)
         {
             int status = _gr_fmpz_fib_ui(res, -i, ctx);
             if (!(i & 1))
-                fmpz_neg(res, res);
+                fmpz_inplace_neg(res);
             return status;
         }
     }
@@ -946,7 +946,7 @@ _gr_fmpz_vec_dot(fmpz_t res, const fmpz_t initial, int subtract, const fmpz * ve
         fmpz_addmul(res, vec1 + i, vec2 + i);
 
     if (subtract)
-        fmpz_neg(res, res);
+        fmpz_inplace_neg(res);
 
     return GR_SUCCESS;
 }
@@ -983,7 +983,7 @@ _gr_fmpz_vec_dot_rev(fmpz_t res, const fmpz_t initial, int subtract, const fmpz 
         fmpz_addmul(res, vec1 + i, vec2 + len - 1 - i);
 
     if (subtract)
-        fmpz_neg(res, res);
+        fmpz_inplace_neg(res);
 
     return GR_SUCCESS;
 }

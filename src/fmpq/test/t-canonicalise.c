@@ -61,7 +61,7 @@ TEST_FUNCTION_START(fmpq_canonicalise, state)
             flint_abort();
         }
 
-        fmpz_neg(&x->den, &x->den);
+        fmpz_inplace_neg(&x->den);
 
         if (fmpq_is_canonical(x))
         {

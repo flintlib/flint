@@ -112,7 +112,7 @@ void __euler_number_vec_multi_mod(fmpz * res, slong n)
             residues[j] = polys[j][k / 2];
         fmpz_multi_CRT_ui(res + k, residues, comb[i], temp[i], 0);
         if (k % 4)
-            fmpz_neg(res + k, res + k);
+            fmpz_inplace_neg(res + k);
     }
 
     /* Cleanup */

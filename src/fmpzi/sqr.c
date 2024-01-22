@@ -51,7 +51,7 @@ fmpzi_sqr(fmpzi_t res, const fmpzi_t x)
     if (ca == 0)
     {
         fmpz_mul(fmpzi_realref(res), b, b);
-        fmpz_neg(fmpzi_realref(res), fmpzi_realref(res));
+        fmpz_inplace_neg(fmpzi_realref(res));
         fmpz_zero(fmpzi_imagref(res));
         return;
     }

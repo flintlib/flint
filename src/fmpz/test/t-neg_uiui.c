@@ -31,7 +31,7 @@ TEST_FUNCTION_START(fmpz_neg_uiui, state)
         fmpz_set_ui(a, hi);
         fmpz_mul_2exp(a, a, FLINT_BITS);
         fmpz_add_ui(a, a, lo);
-        fmpz_neg(a, a);
+        fmpz_inplace_neg(a);
 
         fmpz_neg_uiui(b, hi, lo);
 

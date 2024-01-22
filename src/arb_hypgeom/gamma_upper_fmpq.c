@@ -161,7 +161,7 @@ upper_bsplit(arb_t M, arb_t S, arb_t Q, const fmpz_t ap, const fmpz_t aq, const 
         fmpz_t t;
         fmpz_init_set(t, ap);
         fmpz_submul_ui(t, aq, na + 1);
-        fmpz_neg(t, t);
+        fmpz_inplace_neg(t);
         arb_set_fmpz(M, t);
         arb_mul_fmpz(S, z, aq, prec);
         arb_neg(S, S);

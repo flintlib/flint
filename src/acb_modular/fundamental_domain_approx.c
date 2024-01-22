@@ -60,7 +60,7 @@ acb_modular_fundamental_domain_approx(acb_t w, psl2z_t g, const acb_t z,
     {
         arf_get_fmpz(&g->b, arb_midref(acb_realref(z)), ARF_RND_NEAR);
         acb_sub_fmpz(w, z, &g->b, prec);
-        fmpz_neg(&g->b, &g->b);
+        fmpz_inplace_neg(&g->b);
         return;
     }
 

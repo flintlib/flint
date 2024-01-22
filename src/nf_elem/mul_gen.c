@@ -29,7 +29,7 @@ void nf_elem_mul_gen(nf_elem_t a, const nf_elem_t b, const nf_t nf)
       else
       {
           _fmpq_mul(num, den, LNF_ELEM_NUMREF(b), LNF_ELEM_DENREF(b), fmpq_poly_numref(nf->pol), fmpq_poly_numref(nf->pol) + 1);
-          fmpz_neg(num, num);
+          fmpz_inplace_neg(num);
       }
 
       _fmpq_canonicalise(num, den);

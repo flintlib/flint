@@ -58,7 +58,7 @@ void padic_sub(padic_t rop, const padic_t op1, const padic_t op2,
             {
                 fmpz_mul(padic_unit(rop), f, padic_unit(op2));
                 fmpz_sub(padic_unit(rop), padic_unit(rop), padic_unit(op1));
-                fmpz_neg(padic_unit(rop), padic_unit(rop));
+                fmpz_inplace_neg(padic_unit(rop));
             }
             fmpz_clear(f);
 

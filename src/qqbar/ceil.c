@@ -17,7 +17,7 @@ qqbar_ceil(fmpz_t res, const qqbar_t x)
     if (qqbar_is_rational(x))
     {
         fmpz_fdiv_q(res, QQBAR_COEFFS(x), QQBAR_COEFFS(x) + 1);
-        fmpz_neg(res, res);
+        fmpz_inplace_neg(res);
     }
     else
     {

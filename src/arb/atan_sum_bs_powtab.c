@@ -40,7 +40,7 @@ bsplit(fmpz_t T, fmpz_t Q, flint_bitcnt_t * Qexp,
         fmpz_submul_ui(T, xpow + 1, 2 * a + 3);
 
         if (a % 2 == 1)
-            fmpz_neg(T, T);
+            fmpz_inplace_neg(T);
 
         fmpz_neg_ui(Q, 2 * a + 3);
         fmpz_mul_ui(Q, Q, 2 * a + 5);

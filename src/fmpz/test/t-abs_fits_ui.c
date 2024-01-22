@@ -46,14 +46,14 @@ TEST_FUNCTION_START(fmpz_abs_fits_ui, state)
     check(x, fmpz_abs_fits_ui(x), 1);
 
     fmpz_set_ui(x, UWORD_MAX);
-    fmpz_neg(x, x);
+    fmpz_inplace_neg(x);
     check(x, fmpz_abs_fits_ui(x), 1);
 
     fmpz_set_ui(x, UWORD_MAX);
     fmpz_add_ui(x, x, UWORD(1));
     check(x, fmpz_abs_fits_ui(x), 0);
 
-    fmpz_neg(x, x);
+    fmpz_inplace_neg(x);
     check(x, fmpz_abs_fits_ui(x), 0);
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
@@ -61,7 +61,7 @@ TEST_FUNCTION_START(fmpz_abs_fits_ui, state)
         fmpz_set_ui(x, UWORD(1));
         fmpz_mul_2exp(x, x, i);
         check(x, fmpz_abs_fits_ui(x), i < FLINT_BITS);
-        fmpz_neg(x, x);
+        fmpz_inplace_neg(x);
         check(x, fmpz_abs_fits_ui(x), i < FLINT_BITS);
     }
 

@@ -77,7 +77,7 @@ void randprime(fmpz_t p, flint_rand_t state, slong bits)
     fmpz_randbits(p, state, bits);
 
     if (fmpz_sgn(p) < 0)
-       fmpz_neg(p, p);
+       fmpz_inplace_neg(p);
 
     if (fmpz_is_even(p))
        fmpz_add_ui(p, p, 1);
@@ -152,14 +152,14 @@ TEST_FUNCTION_START(fmpz_factor_smooth, state)
     {
         fmpz_set_ui(x, n_randtest(state));
         if (n_randint(state, 2))
-            fmpz_neg(x, x);
+            fmpz_inplace_neg(x);
         checkb(x, 32);
     }
 
     /* Large negative integers */
     fmpz_set_ui(x, 10);
     fmpz_pow_ui(x, x, 100);
-    fmpz_neg(x, x);
+    fmpz_inplace_neg(x);
     checkb(x, 8);
     flint_mpz_fac_ui(y1, 50);
     mpz_neg(y1, y1);

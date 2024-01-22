@@ -26,12 +26,12 @@ void _fmpz_poly_product_roots_fmpq_vec(fmpz * poly,
 
         fmpz_set(poly + n, fmpq_denref(xs));
         fmpz_set(poly + n - 1, fmpq_numref(xs));
-        fmpz_neg(poly + n - 1, poly + n - 1);
+        fmpz_inplace_neg(poly + n - 1);
 
         for (i = 1; i < n; i++)
         {
             fmpz_mul(poly + n - i - 1, poly + n - i, fmpq_numref(xs + i));
-            fmpz_neg(poly + n - i - 1, poly + n - i - 1);
+            fmpz_inplace_neg(poly + n - i - 1);
             for (j = 0; j < i; j++)
             {
                 fmpz_mul(poly + n - i + j, poly + n - i + j, fmpq_denref(xs + i));

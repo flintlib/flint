@@ -19,7 +19,7 @@ qqbar_neg(qqbar_t res, const qqbar_t x)
     fmpz_poly_set(QQBAR_POLY(res), QQBAR_POLY(x));
 
     for (i = fmpz_poly_degree(QQBAR_POLY(res)) - 1; i >= 0; i -= 2)
-        fmpz_neg(QQBAR_COEFFS(res) + i, QQBAR_COEFFS(res) + i);
+        fmpz_inplace_neg(QQBAR_COEFFS(res) + i);
 
     acb_neg(QQBAR_ENCLOSURE(res), QQBAR_ENCLOSURE(x));
 }

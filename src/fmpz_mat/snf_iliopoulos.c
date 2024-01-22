@@ -85,7 +85,7 @@ static void _eliminate_col(fmpz_mat_t S, slong i, const fmpz_t mod)
         for (k = i + 1; k < m; k++)
         {
             fmpz_divexact(r1g, fmpz_mat_entry(S, k, i), g);
-            fmpz_neg(r1g, r1g);
+            fmpz_inplace_neg(r1g);
             for (j = i; j < n; j++)
                 fmpz_addmul(fmpz_mat_entry(S, k, j), r1g,
                         fmpz_mat_entry(S, i, j));
@@ -179,7 +179,7 @@ static void _eliminate_row(fmpz_mat_t S, slong i, const fmpz_t mod)
         for (k = i + 1; k < n; k++)
         {
             fmpz_divexact(r1g, fmpz_mat_entry(S, i, k), g);
-            fmpz_neg(r1g, r1g);
+            fmpz_inplace_neg(r1g);
             for (j = i; j < m; j++)
                 fmpz_addmul(fmpz_mat_entry(S, j, k), r1g,
                         fmpz_mat_entry(S, j, i));

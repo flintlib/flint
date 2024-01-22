@@ -97,7 +97,7 @@ _fmpz_poly_gcd_subresultant(fmpz * res, const fmpz * poly1, slong len1,
             _fmpz_poly_content(b, B, lenB);
             _fmpz_vec_scalar_divexact_fmpz(B, B, lenB, b);
             if (fmpz_sgn(B + (lenB - 1)) < 0)
-                fmpz_neg(d, d);
+                fmpz_inplace_neg(d);
             _fmpz_vec_scalar_mul_fmpz(res, B, lenB, d);
             if (len2 >= lenB)
                 _fmpz_vec_zero(res + lenB, len2 - lenB);

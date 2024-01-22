@@ -87,7 +87,7 @@ void fmpz_poly_sub_fmpz(fmpz_poly_t res, const fmpz_poly_t poly, fmpz_t c)
     if (poly->length == 0)
     {
         fmpz_poly_set_fmpz(res, c);
-        fmpz_neg(res->coeffs + 0, res->coeffs + 0);
+        fmpz_inplace_neg(res->coeffs + 0);
     }
     else
     {

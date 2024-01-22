@@ -27,7 +27,7 @@ void qfb_reduce(qfb_t r, qfb_t f, fmpz_t D)
       if (fmpz_cmp(r->c, r->a) < 0)
       {
          fmpz_swap(r->a, r->c);
-         fmpz_neg(r->b, r->b);
+         fmpz_inplace_neg(r->b);
 
          done = 0;
       }
@@ -50,7 +50,7 @@ void qfb_reduce(qfb_t r, qfb_t f, fmpz_t D)
 
    if (fmpz_cmpabs(r->a, r->b) == 0 || fmpz_cmp(r->a, r->c) == 0)
       if (fmpz_sgn(r->b) < 0)
-         fmpz_neg(r->b, r->b);
+         fmpz_inplace_neg(r->b);
 
    fmpz_clear(t);
 }

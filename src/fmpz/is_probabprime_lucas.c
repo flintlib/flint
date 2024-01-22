@@ -48,11 +48,11 @@ int fmpz_is_probabprime_lucas(const fmpz_t n)
          else
             fmpz_sub_ui(D, D, 2);
 
-         fmpz_neg(D, D);
+         fmpz_inplace_neg(D);
       } while (fmpz_jacobi(D, n) != -1); /* this ensures D, n coprime */
 
       fmpz_sub_ui(t, D, 1);
-      fmpz_neg(t, t);
+      fmpz_inplace_neg(t);
       fmpz_tdiv_q_2exp(Q, t, 2);
 
       fmpz_gcd(t, Q, n); /* require Q, n coprime */

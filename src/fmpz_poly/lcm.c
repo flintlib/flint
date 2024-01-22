@@ -30,7 +30,7 @@ void _fmpz_poly_lcm(fmpz * res, const fmpz * poly1, slong len1,
     if (lenW == 1)
     {
         if (fmpz_sgn(res + (len1 + len2 - 1 - 1)) < 0)
-            fmpz_neg(W + 0, W + 0);
+            fmpz_inplace_neg(W + 0);
         _fmpz_vec_scalar_divexact_fmpz(res, res, len1 + len2 - 1, W + 0);
     }
     else

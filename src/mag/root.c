@@ -48,7 +48,7 @@ mag_root(mag_t y, const mag_t x, ulong n)
         mag_log1p(y, y);
         mag_div_ui(y, y, n);
         mag_exp(y, y);
-        fmpz_neg(e, e);
+        fmpz_inplace_neg(e);
         mag_mul_2exp_fmpz(y, y, e);
 
         fmpz_clear(e);

@@ -366,7 +366,7 @@ _fmpz_mpoly_q_sub_fmpq(fmpz_mpoly_t res_num, fmpz_mpoly_t res_den,
     if (fmpz_mpoly_is_zero(x_num, ctx))
     {
         fmpz_mpoly_set_fmpz(res_num, y_num, ctx);
-        fmpz_neg(res_num->coeffs, res_num->coeffs);
+        fmpz_inplace_neg(res_num->coeffs);
         fmpz_mpoly_set_fmpz(res_den, y_den, ctx);
         return;
     }

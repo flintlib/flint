@@ -36,7 +36,7 @@ void fmpz_poly_factor_deflation(fmpz_poly_factor_t fac, const fmpz_poly_t G, int
     {
         fmpz_poly_content(&fac->c, G);
         if (fmpz_sgn(fmpz_poly_lead(G)) < 0)
-            fmpz_neg(&fac->c, &fac->c);
+            fmpz_inplace_neg(&fac->c);
         fmpz_poly_scalar_divexact_fmpz(g, G, &fac->c);
 
         if (lenG < 3)

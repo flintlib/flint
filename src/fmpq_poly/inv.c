@@ -24,8 +24,8 @@ void fmpq_poly_inv(fmpq_poly_t poly1, const fmpq_poly_t poly2)
         fmpz_swap(poly1->coeffs, poly1->den);
         if (fmpz_sgn(poly1->den) < 0)
         {
-            fmpz_neg(poly1->coeffs, poly1->coeffs);
-            fmpz_neg(poly1->den, poly1->den);
+            fmpz_inplace_neg(poly1->coeffs);
+            fmpz_inplace_neg(poly1->den);
         }
     }
     else

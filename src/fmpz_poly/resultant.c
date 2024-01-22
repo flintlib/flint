@@ -39,6 +39,6 @@ void fmpz_poly_resultant(fmpz_t res, const fmpz_poly_t poly1,
    {
         _fmpz_poly_resultant(res, poly2->coeffs, len2, poly1->coeffs, len1);
         if ((len1 > 1) && (!(len1 & WORD(1)) & !(len2 & WORD(1))))
-            fmpz_neg(res, res);
+            fmpz_inplace_neg(res);
    }
 }

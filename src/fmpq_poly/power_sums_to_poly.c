@@ -46,7 +46,7 @@ _fmpq_poly_power_sums_to_poly(fmpz * res, const fmpz * poly, const fmpz_t den,
                 fmpz_mul_ui(res + i, res + i, a);
             fmpz_mul_ui(f, f, a);
         }
-        fmpz_neg(res + d - k, res + d - k);
+        fmpz_inplace_neg(res + d - k);
         fmpz_mul(f, f, den);
 
         for (i = d - k + 1; i < d; i++)

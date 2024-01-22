@@ -36,7 +36,7 @@ acb_theta_g2_transvectant_lead(acb_t res, const acb_poly_t g, const acb_poly_t h
         fmpz_mul(num, num, f);
         if ((k - j) % 2 == 1)
         {
-            fmpz_neg(num, num);
+            fmpz_inplace_neg(num);
         }
         acb_mul_fmpz(&s[j], &s[j], num, prec);
     }

@@ -19,7 +19,7 @@ void fq_gen(fq_t rop, const fq_ctx_t ctx)
     {
         fmpz_poly_fit_length(rop, 1);
         fmpz_invmod(rop->coeffs, ctx->modulus->coeffs + 1, fq_ctx_prime(ctx));
-        fmpz_neg(rop->coeffs, rop->coeffs);
+        fmpz_inplace_neg(rop->coeffs);
         fmpz_mul(rop->coeffs, rop->coeffs, ctx->modulus->coeffs);
         fmpz_mod(rop->coeffs, rop->coeffs, fq_ctx_prime(ctx));
         _fmpz_poly_set_length(rop, !fmpz_is_zero(rop->coeffs));

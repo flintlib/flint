@@ -46,7 +46,7 @@ fmpz_mul_si_tdiv_q_2exp(fmpz_t f, const fmpz_t g, slong x, ulong exp)
        {
            fmpz_set_ui(f, prod[1] >> (exp - FLINT_BITS));
            if ((c2 ^ x) < WORD(0))
-               fmpz_neg(f, f);
+               fmpz_inplace_neg(f);
            return;
        }
 
@@ -60,7 +60,7 @@ fmpz_mul_si_tdiv_q_2exp(fmpz_t f, const fmpz_t g, slong x, ulong exp)
        {
            fmpz_set_ui(f, prod[0]);
            if ((c2 ^ x) < WORD(0))
-               fmpz_neg(f, f);
+               fmpz_inplace_neg(f);
            return;
        }
        else /* result takes two limbs */

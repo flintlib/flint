@@ -91,7 +91,7 @@ ca_is_gen_pow_fmpz_as_ext(fmpz_t exp, const ca_t x, ca_ctx_t ctx)
             if (num_used == 1)
             {
                 fmpz_mpoly_total_degree_fmpz(exp, fmpz_mpoly_q_denref(CA_MPOLY_Q(x)),  CA_FIELD_MCTX(K, ctx));
-                fmpz_neg(exp, exp);
+                fmpz_inplace_neg(exp);
                 return CA_FIELD_EXT_ELEM(K, which);
             }
         }

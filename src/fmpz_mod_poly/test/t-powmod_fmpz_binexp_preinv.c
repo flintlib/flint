@@ -232,9 +232,9 @@ TEST_FUNCTION_START(fmpz_mod_poly_powmod_fmpz_binexp_preinv, state)
         fmpz_init(exp1);
         fmpz_init(exp2);
         fmpz_randtest(exp1, state, 200);
-        if (fmpz_sgn(exp1) == -1) fmpz_neg(exp1, exp1);
+        if (fmpz_sgn(exp1) == -1) fmpz_inplace_neg(exp1);
         fmpz_randtest(exp2, state, 200);
-        if (fmpz_sgn(exp2) == -1) fmpz_neg(exp2, exp2);
+        if (fmpz_sgn(exp2) == -1) fmpz_inplace_neg(exp2);
 
         fmpz_mod_poly_init(a, ctx);
         fmpz_mod_poly_init(f, ctx);

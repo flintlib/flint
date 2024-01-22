@@ -33,7 +33,7 @@ void _fmpq_poly_canonicalise(fmpz * poly, fmpz_t den, slong len)
         fmpz_init(gcd);
         _fmpz_vec_content_chained(gcd, poly, len, den);
         if (fmpz_sgn(den) < 0)
-            fmpz_neg(gcd, gcd);
+            fmpz_inplace_neg(gcd);
         if (!fmpz_is_one(gcd))
         {
             _fmpz_vec_scalar_divexact_fmpz(poly, poly, len, gcd);

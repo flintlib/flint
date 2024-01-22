@@ -64,7 +64,7 @@ acb_theta_g2_transvectant(acb_poly_t res, const acb_poly_t g, const acb_poly_t h
         fmpz_bin_uiui(f, k, j);
         if ((k - j) % 2 == 1)
         {
-            fmpz_neg(f, f);
+            fmpz_inplace_neg(f);
         }
         acb_set_fmpz(x, f);
         acb_poly_scalar_mul(s, s, x, prec);

@@ -152,7 +152,7 @@ _arb_digits_as_float_str(char ** d, fmpz_t e, slong minfix, slong maxfix)
         else
         {
             (*d)[n + (n > 1) + 1] = '-';
-            fmpz_neg(e, e);
+            fmpz_inplace_neg(e);
         }
 
         fmpz_get_str((*d) + n + (n > 1) + 2, 10, e);  /* writes null byte */
@@ -253,7 +253,7 @@ _arb_digits_round_inplace(char * s, flint_bitcnt_t * shift, fmpz_t error, slong 
         }
 
         fmpz_set_str(error, s + n, 10);
-        fmpz_neg(error, error);
+        fmpz_inplace_neg(error);
 
         /* add 1 ulp to the leading digits */
         carry = 1;

@@ -25,7 +25,7 @@ _fmpz_poly_power_sums_to_poly(fmpz * res, const fmpz * poly, slong len)
         for (i = 1; i < k; i++)
             fmpz_addmul(res + d - k, res + d - k + i, poly + i);
         fmpz_divexact_si(res + d - k, res + d - k, k);
-        fmpz_neg(res + d - k, res + d - k);
+        fmpz_inplace_neg(res + d - k);
     }
     for (k = len; k <= d; k++)
     {
@@ -33,7 +33,7 @@ _fmpz_poly_power_sums_to_poly(fmpz * res, const fmpz * poly, slong len)
         for (i = 1; i < len; i++)
             fmpz_addmul(res + d - k, res + d - k + i, poly + i);
         fmpz_divexact_si(res + d - k, res + d - k, k);
-        fmpz_neg(res + d - k, res + d - k);
+        fmpz_inplace_neg(res + d - k);
     }
 }
 

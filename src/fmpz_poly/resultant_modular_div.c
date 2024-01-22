@@ -203,6 +203,6 @@ fmpz_poly_resultant_modular_div(fmpz_t res, const fmpz_poly_t poly1,
         _fmpz_poly_resultant_modular_div(res, poly2->coeffs, len2,
                                           poly1->coeffs, len1, divisor, nbits);
         if ((len1 > 1) && (!(len1 & WORD(1)) & !(len2 & WORD(1))))
-            fmpz_neg(res, res);
+            fmpz_inplace_neg(res);
     }
 }

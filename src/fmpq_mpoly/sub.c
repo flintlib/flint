@@ -35,7 +35,7 @@ void fmpq_mpoly_sub(fmpq_mpoly_t A, const fmpq_mpoly_t B,
 
     fmpq_gcd_cofactors(A->content, t1, t2, B->content, C->content);
 
-    fmpz_neg(t2, t2);
+    fmpz_inplace_neg(t2);
     fmpz_mpoly_scalar_fmma(A->zpoly, B->zpoly, t1, C->zpoly, t2, ctx->zctx);
 
     fmpz_clear(t1);

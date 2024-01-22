@@ -179,7 +179,7 @@ next_alpha:
         j = n - 1 - i;
         fmpz_cdiv_q_2exp(alpha + j, alphait + i, 1);
         if (fmpz_is_even(alphait + i))
-            fmpz_neg(alpha + j, alpha + j);
+            fmpz_inplace_neg(alpha + j);
     }
 
 got_alpha:

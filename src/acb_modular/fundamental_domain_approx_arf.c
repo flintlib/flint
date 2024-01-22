@@ -72,8 +72,8 @@ acb_modular_fundamental_domain_approx_arf(psl2z_t g,
 
             fmpz_swap(&g->a, &g->c);
             fmpz_swap(&g->b, &g->d);
-            fmpz_neg(&g->a, &g->a);
-            fmpz_neg(&g->b, &g->b);
+            fmpz_inplace_neg(&g->a);
+            fmpz_inplace_neg(&g->b);
 
             continue;
         }
@@ -84,10 +84,10 @@ acb_modular_fundamental_domain_approx_arf(psl2z_t g,
 
     if (fmpz_sgn(&g->c) < 0 || (fmpz_is_zero(&g->c) && fmpz_sgn(&g->d) < 0))
     {
-        fmpz_neg(&g->a, &g->a);
-        fmpz_neg(&g->b, &g->b);
-        fmpz_neg(&g->c, &g->c);
-        fmpz_neg(&g->d, &g->d);
+        fmpz_inplace_neg(&g->a);
+        fmpz_inplace_neg(&g->b);
+        fmpz_inplace_neg(&g->c);
+        fmpz_inplace_neg(&g->d);
     }
 
     arf_clear(x);

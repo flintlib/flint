@@ -152,7 +152,7 @@ ca_gamma(ca_t res, const ca_t x, ca_ctx_t ctx)
                         fmpz_mul_2exp(t, t, -2 * n);
                         fmpz_fac_ui(u, -2 * n);
                         if (n & 1)
-                            fmpz_neg(t, t);
+                            fmpz_inplace_neg(t);
                     }
 
                     ca_mul_fmpz(res, res, t, ctx);

@@ -87,7 +87,7 @@ gr_generic_chebyshev_u_fmpz(gr_ptr y, const fmpz_t n, gr_srcptr x, gr_ctx_t ctx)
 
         fmpz_init(n1);
         fmpz_add_ui(n1, n, 2);
-        fmpz_neg(n1, n1);
+        fmpz_inplace_neg(n1);
         status = gr_generic_chebyshev_u_fmpz(y, n1, x, ctx);
         status |= gr_neg(y, y, ctx);
         fmpz_clear(n1);
@@ -114,7 +114,7 @@ gr_generic_chebyshev_u_fmpz(gr_ptr y, const fmpz_t n, gr_srcptr x, gr_ctx_t ctx)
         fmpz_init(n1);
         fmpz_add_ui(n1, n, 1);
         if (fmpz_is_odd(n))
-            fmpz_neg(n1, n1);
+            fmpz_inplace_neg(n1);
         status |= gr_set_fmpz(y, n1, ctx);
         fmpz_clear(n1);
         return status;

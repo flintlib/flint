@@ -90,7 +90,7 @@ void fmpz_divexact_si(fmpz_t f, const fmpz_t g, slong h)
         {
             flint_mpz_divexact_ui(mf, COEFF_TO_PTR(c1), -h);
             _fmpz_demote_val(f);  /* division by h may result in small value */
-            fmpz_neg(f, f);
+            fmpz_inplace_neg(f);
         }
     }
 }

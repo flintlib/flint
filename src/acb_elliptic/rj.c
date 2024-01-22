@@ -174,7 +174,7 @@ acb_elliptic_rj_taylor_sum(acb_t res, const acb_t E2, const acb_t E3,
 
                     fmpz_divexact_ui(t, c2, 2 * N + 3);
                     if ((M + N) % 2)
-                        fmpz_neg(t, t);
+                        fmpz_inplace_neg(t);
 
                     acb_addmul_fmpz(s3, powtab + m3 * m2dim + m2, t, prec);
 

@@ -77,7 +77,7 @@ static slong binary_sqrt(fmpz_t z, fmpz_t x, slong p)
 
     fmpz_fdiv_r_2exp(z, x, n + 1);
     fmpz_sub_ui(z, z, 3);
-    fmpz_neg(z, z);
+    fmpz_inplace_neg(z);
     fmpz_fdiv_r_2exp(z, z, n + 1);
     fmpz_fdiv_q_2exp(z, z, 1);
 
@@ -97,7 +97,7 @@ static slong binary_sqrt(fmpz_t z, fmpz_t x, slong p)
         fmpz_fdiv_r_2exp(tx, x, n + 1);
         fmpz_mul(s, tx, t);
         fmpz_sub_ui(s, s, 3);
-        fmpz_neg(s, s);
+        fmpz_inplace_neg(s);
         fmpz_fdiv_r_2exp(s, s, n + 1);
         fmpz_fdiv_q_2exp(s, s, 1);
         fmpz_mul(t, z, s);
@@ -399,9 +399,9 @@ static void _fmpz_map_from_ZZ2(fmpz_t x, slong prec)
     fmpz_fdiv_r_2exp(x, x, prec);
     if (fmpz_bits(x) >= prec)
     {
-        fmpz_neg(x, x);
+        fmpz_inplace_neg(x);
         fmpz_fdiv_r_2exp(x, x, prec);
-        fmpz_neg(x, x);
+        fmpz_inplace_neg(x);
     }
 }
 
@@ -466,7 +466,7 @@ static int _fmpz_cubic_roots(fmpz * x, fmpz_t a, fmpz_t b)
     }
 
     if (sign_b < 0)
-        fmpz_neg(b, b);
+        fmpz_inplace_neg(b);
 
     /* b >= 2 now, and sign_b has the sign of the original b */
 
@@ -613,7 +613,7 @@ static int _fmpz_cubic_roots(fmpz * x, fmpz_t a, fmpz_t b)
         fmpz_mul_2exp(ta, ta, alpha - 2*beta3);
         binary_cubic_lift(r, s, inv, ta, tb, 0, prec);
         fmpz_mul_2exp(x + 0, r, beta3);
-        fmpz_neg(x + 0, x + 0);
+        fmpz_inplace_neg(x + 0);
         _fmpz_map_from_ZZ2(x + 0, prec);
 
         fmpz_mul(t1, x + 0, x + 0);
@@ -633,7 +633,7 @@ static int _fmpz_cubic_roots(fmpz * x, fmpz_t a, fmpz_t b)
 
             binary_cubic_lift(r, s, inv, ta, tb, 2*beta - 3*alpha, prec);
             fmpz_mul_2exp(x + 0, r, beta - alpha);
-            fmpz_neg(x + 0, x + 0);
+            fmpz_inplace_neg(x + 0);
             _fmpz_map_from_ZZ2(x + 0, prec);
 
             fmpz_mul(t1, x + 0, x + 0);
@@ -647,7 +647,7 @@ static int _fmpz_cubic_roots(fmpz * x, fmpz_t a, fmpz_t b)
         cubic_prec = binary_cubic_lift(r, s, inv, ta, tb, 2*beta - 3*alpha, prec);
 
         fmpz_mul_2exp(x + 0, r, beta - alpha);
-        fmpz_neg(x + 0, x + 0);
+        fmpz_inplace_neg(x + 0);
         _fmpz_map_from_ZZ2(x + 0, prec);
 
         fmpz_mul(t1, x + 0, x + 0);
@@ -750,9 +750,9 @@ cleanup:
 
     if (sign_b < 0)
     {
-        fmpz_neg(x + 0, x + 0);
-        fmpz_neg(x + 1, x + 1);
-        fmpz_neg(x + 2, x + 2);
+        fmpz_inplace_neg(x + 0);
+        fmpz_inplace_neg(x + 1);
+        fmpz_inplace_neg(x + 2);
     }
 
     fmpz_clear(d);

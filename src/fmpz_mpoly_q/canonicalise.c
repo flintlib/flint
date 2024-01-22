@@ -32,7 +32,7 @@ fmpz_mpoly_q_canonicalise(fmpz_mpoly_q_t res, const fmpz_mpoly_ctx_t ctx)
         fmpz_gcd(g, g, fmpz_mpoly_q_denref(res)->coeffs);
 
         if (fmpz_sgn(fmpz_mpoly_q_denref(res)->coeffs) < 0)
-            fmpz_neg(g, g);
+            fmpz_inplace_neg(g);
 
         if (!fmpz_is_one(g))
         {
@@ -51,7 +51,7 @@ fmpz_mpoly_q_canonicalise(fmpz_mpoly_q_t res, const fmpz_mpoly_ctx_t ctx)
         fmpz_gcd(g, g, fmpz_mpoly_q_numref(res)->coeffs);
 
         if (fmpz_sgn(fmpz_mpoly_q_denref(res)->coeffs) < 0)
-            fmpz_neg(g, g);
+            fmpz_inplace_neg(g);
 
         if (!fmpz_is_one(g))
         {

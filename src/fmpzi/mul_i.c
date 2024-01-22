@@ -17,7 +17,7 @@ fmpzi_mul_i(fmpzi_t z, const fmpzi_t x)
     if (z == x)
     {
         fmpz_swap(fmpzi_realref(z), fmpzi_imagref(z));
-        fmpz_neg(fmpzi_realref(z), fmpzi_realref(z));
+        fmpz_inplace_neg(fmpzi_realref(z));
     }
     else
     {

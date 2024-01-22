@@ -61,7 +61,7 @@ _fmpz_poly_eulerian_polynomial_series(fmpz * res, ulong n)
     tmp = _fmpz_vec_init(2 * m + 1);
     _fmpz_vec_binomials(tmp, n + 1, m);
     for (ix = 1; ix < m; ix += 2)
-        fmpz_neg(tmp + ix, tmp + ix);
+        fmpz_inplace_neg(tmp + ix);
     _fmpz_vec_powers(tmp + m, n, m + 1);
     _fmpz_poly_mullow(res, tmp, m, tmp + m + 1, m, m);
     _fmpz_vec_clear(tmp, 2 * m + 1);

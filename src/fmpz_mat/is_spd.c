@@ -67,7 +67,7 @@ fmpz_mat_is_spd_charpoly(const fmpz_mat_t A)
         fmpz_poly_get_coeff_fmpz(c, pol, d - k);
         if (k % 2 == 1)
         {
-            fmpz_neg(c, c);
+            fmpz_inplace_neg(c);
         }
         if (fmpz_cmp_si(c, 0) <= 0)
         {

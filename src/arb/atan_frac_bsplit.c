@@ -44,8 +44,8 @@ bsplit(fmpz_t p1, fmpz_t q1, fmpz_t r1,
 
         if (alternate)
         {
-            fmpz_neg(p1, p1);
-            fmpz_neg(q1, q1);
+            fmpz_inplace_neg(p1);
+            fmpz_inplace_neg(q1);
         }
     }
     else

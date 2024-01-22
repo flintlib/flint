@@ -42,7 +42,7 @@ arf_rsqrt(arf_ptr z, arf_srcptr x, slong prec, arf_rnd_t rnd)
     if (ARF_IS_POW2(x) && fmpz_is_odd(ARF_EXPREF(x)))
     {
         arf_set(z, x);
-        fmpz_neg(ARF_EXPREF(z), ARF_EXPREF(z));
+        fmpz_inplace_neg(ARF_EXPREF(z));
         fmpz_cdiv_q_2exp(ARF_EXPREF(z), ARF_EXPREF(z), 1);
         fmpz_add_ui(ARF_EXPREF(z), ARF_EXPREF(z), 1);
         return 0;
@@ -76,7 +76,7 @@ arf_rsqrt(arf_ptr z, arf_srcptr x, slong prec, arf_rnd_t rnd)
     flint_mpn_copyi(zptr, tmp + val, zn - val);
 
     fmpz_fdiv_q_2exp(ARF_EXPREF(z), ARF_EXPREF(x), 1);
-    fmpz_neg(ARF_EXPREF(z), ARF_EXPREF(z));
+    fmpz_inplace_neg(ARF_EXPREF(z));
 
     fmpz_add_si(ARF_EXPREF(z), ARF_EXPREF(z), zf->_mpfr_exp);
 

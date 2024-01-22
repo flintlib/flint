@@ -145,7 +145,7 @@ qqbar_fmpz_poly_composed_op(fmpz_poly_t res, const fmpz_poly_t A, const fmpz_pol
 
     if (op == OP_SUB)
         for (i = 1; i <= d2; i += 2)
-            fmpz_neg(P2->coeffs + i, P2->coeffs + i);
+            fmpz_inplace_neg(P2->coeffs + i);
 
     fmpq_poly_reverse(P1rev, P1, d1 + 1);
     fmpq_poly_derivative(P1drev, P1);

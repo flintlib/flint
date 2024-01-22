@@ -213,7 +213,7 @@ arith_stirling_number_1(fmpz_t s, ulong n, ulong k)
 {
     arith_stirling_number_1u(s, n, k);
     if ((n + k) % 2)
-        fmpz_neg(s, s);
+        fmpz_inplace_neg(s);
 }
 
 void
@@ -224,5 +224,5 @@ arith_stirling_number_1_vec(fmpz * row, ulong n, slong klen)
     arith_stirling_number_1u_vec(row, n, klen);
 
     for (k = (n + 1) % 2; k < klen; k += 2)
-        fmpz_neg(row + k, row + k);
+        fmpz_inplace_neg(row + k);
 }

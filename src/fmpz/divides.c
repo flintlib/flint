@@ -48,7 +48,7 @@ fmpz_divides(fmpz_t q, const fmpz_t g, const fmpz_t h)
             res = n_divides(&qz, c1, c2);
             fmpz_set_ui(q, qz);
             if (negate)
-                fmpz_neg(q, q);
+                fmpz_inplace_neg(q);
 
             return res;
         }

@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
         fmpz_pow_ui(D, D, exp);
         fmpz_add_ui(D, D, val + i);
         fmpz_mul_2exp(D, D, 2);
-        fmpz_neg(D, D);
+        fmpz_inplace_neg(D);
 
         if (qfb_exponent_grh(exponent, D, B1, B2))
         {

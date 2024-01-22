@@ -584,7 +584,7 @@ done:
     {
         fmpz_set_ui_array(n, B, Blen);
         if (mdet < 0)
-            fmpz_neg(n, n);
+            fmpz_inplace_neg(n);
     }
     else
     {
@@ -1027,7 +1027,7 @@ write_answer:
     if (M->det != 1)
     {
         FLINT_ASSERT(M->det == -1);
-        fmpz_neg(n, n);
+        fmpz_inplace_neg(n);
     }
 
     success = 0;

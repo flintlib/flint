@@ -126,7 +126,7 @@ static int roots_mod_prime_power(fmpz_mod_poly_factor_t x,
         for (i = 0; i < x1->length; i++)
         {
             fmpz_mod_poly_evaluate_fmpz(mfpe1, fpk, x1->coeffs + i, ctxpk);
-            fmpz_neg(mfpe1, mfpe1);
+            fmpz_inplace_neg(mfpe1);
             FLINT_ASSERT(fmpz_divisible(mfpe1, pe1));
             fmpz_divexact(mfpe1, mfpe1, pe1);
 

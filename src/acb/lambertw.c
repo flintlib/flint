@@ -759,7 +759,7 @@ acb_lambertw_left(acb_t res, const acb_t z, const fmpz_t k, slong prec)
         fmpz_t kk;
         fmpz_init(kk);
         fmpz_add_ui(kk, k, 1);
-        fmpz_neg(kk, kk);
+        fmpz_inplace_neg(kk);
 
         acb_conj(res, z);
         acb_lambertw(res, res, kk, 0, prec);
@@ -783,7 +783,7 @@ acb_lambertw_left(acb_t res, const acb_t z, const fmpz_t k, slong prec)
         arb_nonnegative_part(acb_imagref(zb), acb_imagref(zb));
 
         fmpz_add_ui(kk, k, 1);
-        fmpz_neg(kk, kk);
+        fmpz_inplace_neg(kk);
 
         acb_lambertw(za, za, k, 0, prec);
         acb_lambertw(zb, zb, kk, 0, prec);

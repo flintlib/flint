@@ -27,7 +27,7 @@ arf_rsqrt_naive(arf_t z, const arf_t x, slong prec, arf_rnd_t rnd)
         fmpz_init(t);
         fmpz_tdiv_q_2exp(t, ARF_EXPREF(x), 1);
         fmpz_mul_2exp(t, t, 1);
-        fmpz_neg(t, t);
+        fmpz_inplace_neg(t);
         arf_mul_2exp_fmpz(z, x, t);
         res = _arf_call_mpfr_func(z, NULL, (int (*)(void)) mpfr_rec_sqrt, z, NULL, prec, rnd);
         fmpz_tdiv_q_2exp(t, t, 1);

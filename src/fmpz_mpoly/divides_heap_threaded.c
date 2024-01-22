@@ -1184,7 +1184,7 @@ static slong _fmpz_mpoly_divides_stripe1(
                     small = 0;
                     fmpz_set_ui(Qcoeff + Qlen, qq);
                     if (ds != lc_sign)
-                        fmpz_neg(Qcoeff + Qlen, Qcoeff + Qlen);
+                        fmpz_inplace_neg(Qcoeff + Qlen);
                 }
             }
             else
@@ -1548,7 +1548,7 @@ static slong _fmpz_mpoly_divides_stripe(
                     small = 0;
                     fmpz_set_ui(Qcoeff + Qlen, qq);
                     if (ds != lc_sign)
-                        fmpz_neg(Qcoeff + Qlen, Qcoeff + Qlen);
+                        fmpz_inplace_neg(Qcoeff + Qlen);
                 }
             }
             else

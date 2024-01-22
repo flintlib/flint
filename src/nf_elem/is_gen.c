@@ -29,7 +29,7 @@ int nf_elem_is_gen(const nf_elem_t a, const nf_t nf)
 
 	  fmpz_mul(t1, LNF_ELEM_NUMREF(a), nf->pol->coeffs + 1);
 	  fmpz_mul(t2, LNF_ELEM_DENREF(a), nf->pol->coeffs);
-	  fmpz_neg(t1, t1);
+	  fmpz_inplace_neg(t1);
 
 	  is_gen = fmpz_equal(t1, t2);
 

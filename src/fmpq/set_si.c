@@ -26,7 +26,7 @@ void _fmpq_set_si(fmpz_t rnum, fmpz_t rden, slong p, ulong q)
         if (p < 0)
         {
             fmpz_set_ui(rnum, (-(ulong) p) / r);
-            fmpz_neg(rnum, rnum);
+            fmpz_inplace_neg(rnum);
         }
         else
             fmpz_set_si(rnum, p / r);

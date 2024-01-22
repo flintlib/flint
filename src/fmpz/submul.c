@@ -35,7 +35,7 @@ void fmpz_submul(fmpz_t f, const fmpz_t g, const fmpz_t h)
     if (c3 == 0)
     {
         fmpz_mul(f, g, h);
-        fmpz_neg(f, f);
+        fmpz_inplace_neg(f);
         return;
     }
 
@@ -89,7 +89,7 @@ void fmpz_submul_si(fmpz_t f, const fmpz_t g, slong x)
     if (F == 0)
     {
         fmpz_mul_si(f, g, x);
-        fmpz_neg(f, f);
+        fmpz_inplace_neg(f);
         return;
     }
 
@@ -138,7 +138,7 @@ void fmpz_submul_ui(fmpz_t f, const fmpz_t g, ulong x)
     if (F == 0)
     {
         fmpz_mul_ui(f, g, x);
-        fmpz_neg(f, f);
+        fmpz_inplace_neg(f);
         return;
     }
 

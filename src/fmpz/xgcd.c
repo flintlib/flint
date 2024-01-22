@@ -91,9 +91,9 @@ fmpz_xgcd(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
         }
 
         if (sign1 < 0)
-            fmpz_neg(a, a);
+            fmpz_inplace_neg(a);
         if (sign2 < 0)
-            fmpz_neg(b, b);
+            fmpz_inplace_neg(b);
 
         fmpz_clear(t1);
         fmpz_clear(t2);

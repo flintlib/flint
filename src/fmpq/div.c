@@ -39,8 +39,8 @@ _fmpq_div(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num, const fmpz_t op1den,
 
     if (fmpz_sgn(rden) < 0)
     {
-        fmpz_neg(rnum, rnum);
-        fmpz_neg(rden, rden);
+        fmpz_inplace_neg(rnum);
+        fmpz_inplace_neg(rden);
     }
 }
 
@@ -80,7 +80,7 @@ void fmpq_div_fmpz(fmpq_t res, const fmpq_t op, const fmpz_t x)
 
     if (fmpz_sgn(fmpq_denref(res)) < 0)
     {
-        fmpz_neg(fmpq_numref(res), fmpq_numref(res));
-        fmpz_neg(fmpq_denref(res), fmpq_denref(res));
+        fmpz_inplace_neg(fmpq_numref(res));
+        fmpz_inplace_neg(fmpq_denref(res));
     }
 }

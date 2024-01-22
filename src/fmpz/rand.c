@@ -98,7 +98,7 @@ fmpz_randtest(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
 
     m = n_randlimb(state);
     if (m & UWORD(1))
-        fmpz_neg(f, f);
+        fmpz_inplace_neg(f);
 }
 
 void
@@ -183,7 +183,7 @@ fmpz_randtest_mod_signed(fmpz_t f, flint_rand_t state, const fmpz_t m)
         fmpz_randtest_mod(t, state, t);
         if (n_randlimb(state) & UWORD(1))
         {
-            fmpz_neg(t, t);
+            fmpz_inplace_neg(t);
         }
         fmpz_set(f, t);
         fmpz_clear(t);

@@ -51,8 +51,8 @@ fmpq_set_fmpz_frac(fmpq_t res, const fmpz_t p, const fmpz_t q)
 
         if (fmpz_sgn(fmpq_denref(res)) < 0)
         {
-            fmpz_neg(fmpq_numref(res), fmpq_numref(res));
-            fmpz_neg(fmpq_denref(res), fmpq_denref(res));
+            fmpz_inplace_neg(fmpq_numref(res));
+            fmpz_inplace_neg(fmpq_denref(res));
         }
 
         fmpz_clear(t);

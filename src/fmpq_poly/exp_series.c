@@ -444,7 +444,7 @@ _fmpq_poly_exp_expinv_series(fmpz * B, fmpz_t Bden, fmpz * C, fmpz_t Cden,
         _fmpq_poly_exp_series(B, Bden, A, Aden, Alen, n);
         _fmpz_vec_set(C, B, n);
         for (i = Alen - 1; i < n; i += 2 * (Alen - 1))
-            fmpz_neg(C + i, C + i);
+            fmpz_inplace_neg(C + i);
         fmpz_set(Cden, Bden);
         return;
     }

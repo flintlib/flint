@@ -101,10 +101,10 @@ fmpz_rfac_ui(fmpz_t r, const fmpz_t x, ulong n)
         }
         else
         {
-            fmpz_neg(t, t);
+            fmpz_inplace_neg(t);
             fmpz_rfac_ui(r, t, n);
             if (n % 2 == 1)
-                fmpz_neg(r, r);
+                fmpz_inplace_neg(r);
         }
         fmpz_clear(t);
     }

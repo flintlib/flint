@@ -89,7 +89,7 @@ TEST_FUNCTION_START(fmpz_smod, state)
             flint_abort();
         }
 
-        fmpz_neg(e, e);
+        fmpz_inplace_neg(e);
         if (fmpz_cmp(e, d) >= 0)
         {
             flint_printf("FAIL: check -|b| < 2*smod(a,b)\n");

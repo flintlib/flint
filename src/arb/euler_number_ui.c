@@ -578,7 +578,7 @@ arb_fmpz_euler_number_ui_multi_mod(fmpz_t num, ulong n, double alpha)
     if (n % 4 == 2)
     {
         fmpz_sub(num, M, num);
-        fmpz_neg(num, num);
+        fmpz_inplace_neg(num);
     }
 
 #if TIMING

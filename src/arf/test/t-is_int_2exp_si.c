@@ -63,7 +63,7 @@ TEST_FUNCTION_START(arf_is_int_2exp_si, state)
         if (arf_is_finite(x) && !arf_is_zero(x))
         {
             arf_bot(t, x);
-            fmpz_neg(t, t);
+            fmpz_inplace_neg(t);
             arf_mul_2exp_fmpz(x, x, t);
             res1 = arf_is_int(x);
             arf_mul_2exp_si(y, x, -1);

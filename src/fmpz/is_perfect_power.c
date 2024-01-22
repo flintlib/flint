@@ -109,7 +109,7 @@ int fmpz_is_perfect_power(fmpz_t root, const fmpz_t f)
       {
          fmpz_set_ui(root, r);
          if (sgn < 0)
-            fmpz_neg(root, root);
+            fmpz_inplace_neg(root);
          return exp;
       }
    }

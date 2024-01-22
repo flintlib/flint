@@ -33,8 +33,8 @@ void _nf_elem_norm_div(fmpz_t rnum, fmpz_t rden, const nf_elem_t a, const nf_t n
         fmpz_mul(rden, rden, aden);
         if (fmpz_sgn(rden) == -1)
         {
-            fmpz_neg(rden, rden);
-            fmpz_neg(rnum, rnum);
+            fmpz_inplace_neg(rden);
+            fmpz_inplace_neg(rnum);
         }
     } else if (nf->flag & NF_QUADRATIC)
     {
@@ -67,8 +67,8 @@ void _nf_elem_norm_div(fmpz_t rnum, fmpz_t rden, const nf_elem_t a, const nf_t n
 
             if (fmpz_sgn(rden) < 0)
             {
-                fmpz_neg(rnum, rnum);
-                fmpz_neg(rden, rden);
+                fmpz_inplace_neg(rnum);
+                fmpz_inplace_neg(rden);
             }
         }
         fmpz_clear(one);
@@ -104,8 +104,8 @@ void _nf_elem_norm_div(fmpz_t rnum, fmpz_t rden, const nf_elem_t a, const nf_t n
 
             if (fmpz_sgn(rden) < 0)
             {
-                fmpz_neg(rnum, rnum);
-                fmpz_neg(rden, rden);
+                fmpz_inplace_neg(rnum);
+                fmpz_inplace_neg(rden);
             }
         }
 

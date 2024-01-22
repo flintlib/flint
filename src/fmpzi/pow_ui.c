@@ -44,7 +44,7 @@ fmpzi_pow_ui(fmpzi_t res, const fmpzi_t x, ulong exp)
         fmpz_pow_ui(fmpzi_realref(res), fmpzi_imagref(x), exp);
         fmpz_zero(fmpzi_imagref(res));
         if (exp % 4 >= 2)
-            fmpz_neg(fmpzi_realref(res), fmpzi_realref(res));
+            fmpz_inplace_neg(fmpzi_realref(res));
         if (exp % 2 == 1)
             fmpz_swap(fmpzi_realref(res), fmpzi_imagref(res));
         return;

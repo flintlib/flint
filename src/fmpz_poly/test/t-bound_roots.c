@@ -53,7 +53,7 @@ TEST_FUNCTION_START(fmpz_poly_bound_roots, state)
                 fmpz_set(bound, t);
 
             if (n_randint(state, 2))
-                fmpz_neg(p, p);
+                fmpz_inplace_neg(p);
 
             fmpz_poly_set_coeff_fmpz(g, 0, p);
             fmpz_poly_set_coeff_fmpz(g, 1, q);

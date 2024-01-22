@@ -36,9 +36,9 @@ void sample_ndiv_qr(void * arg, ulong count)
         fmpz_randm(a, state, nmax);
         fmpz_randm(b, state, nmax);
         if (n_randint(state, 2))
-            fmpz_neg(a, a);
+            fmpz_inplace_neg(a);
         if (n_randint(state, 2))
-            fmpz_neg(b, b);
+            fmpz_inplace_neg(b);
         if (fmpz_is_zero(b))
             fmpz_one(b);
         fmpz_ndiv_qr(q, r, a, b);
@@ -76,9 +76,9 @@ void sample_fdiv_qr(void * arg, ulong count)
         fmpz_randm(a, state, nmax);
         fmpz_randm(b, state, nmax);
         if (n_randint(state, 2))
-            fmpz_neg(a, a);
+            fmpz_inplace_neg(a);
         if (n_randint(state, 2))
-            fmpz_neg(b, b);
+            fmpz_inplace_neg(b);
         if (fmpz_is_zero(b))
             fmpz_one(b);
         fmpz_fdiv_qr(q, r, a, b);
@@ -116,9 +116,9 @@ void sample_cdiv_qr(void * arg, ulong count)
         fmpz_randm(a, state, nmax);
         fmpz_randm(b, state, nmax);
         if (n_randint(state, 2))
-            fmpz_neg(a, a);
+            fmpz_inplace_neg(a);
         if (n_randint(state, 2))
-            fmpz_neg(b, b);
+            fmpz_inplace_neg(b);
         if (fmpz_is_zero(b))
             fmpz_one(b);
         fmpz_cdiv_qr(q, r, a, b);
@@ -156,9 +156,9 @@ void sample_tdiv_qr(void * arg, ulong count)
         fmpz_randm(a, state, nmax);
         fmpz_randm(b, state, nmax);
         if (n_randint(state, 2))
-            fmpz_neg(a, a);
+            fmpz_inplace_neg(a);
         if (n_randint(state, 2))
-            fmpz_neg(b, b);
+            fmpz_inplace_neg(b);
         if (fmpz_is_zero(b))
             fmpz_one(b);
         fmpz_tdiv_qr(q, r, a, b);

@@ -157,7 +157,7 @@ ca_condense_field(ca_t res, ca_ctx_t ctx)
                                 if (fmpz_sgn(P->den) < 0)
                                 {
                                     _fmpz_vec_neg(P->coeffs, P->coeffs, P->length);
-                                    fmpz_neg(P->den, P->den);
+                                    fmpz_inplace_neg(P->den);
                                 }
                                 _ca_make_field_element(res, new_field, ctx);
                                 nf_elem_set_fmpq_poly(CA_NF_ELEM(res), P, CA_FIELD_NF(new_field));

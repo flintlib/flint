@@ -134,7 +134,7 @@ fmpz_mat_solve_fflu_precomp(fmpz_mat_t X,
                                     fmpz_set_uiui(XXx(j, k), p1h, p1l);
 
                                     if (sgn)
-                                        fmpz_neg(XXx(j, k), XXx(j, k));
+                                        fmpz_inplace_neg(XXx(j, k));
 
                                     if (i < c && piv[i - 1] < c)
                                     {
@@ -178,7 +178,7 @@ fmpz_mat_solve_fflu_precomp(fmpz_mat_t X,
                                 }
 
                                 if (sgn)
-                                    fmpz_neg(XXx(j, k), XXx(j, k));
+                                    fmpz_inplace_neg(XXx(j, k));
                             }
                         } else if (i > 0)
                         {
@@ -264,7 +264,7 @@ fmpz_mat_solve_fflu_precomp(fmpz_mat_t X,
                             goto cleanup;
 
                         if (sgn)
-                            fmpz_neg(XX(i, k), XX(i, k));
+                            fmpz_inplace_neg(XX(i, k));
 
                         small = 0;
                     } else

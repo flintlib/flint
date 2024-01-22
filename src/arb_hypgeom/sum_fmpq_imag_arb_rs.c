@@ -302,9 +302,9 @@ arb_hypgeom_sum_fmpq_imag_arb_rs(arb_t res_real, arb_t res_imag, const fmpq * a,
         l = j - jlen + 1;
 
         for (i = (2 - l) & 3; i < jlen; i += 4)
-            fmpz_neg(cs + i, cs + i);
+            fmpz_inplace_neg(cs + i);
         for (i = (3 - l) & 3; i < jlen; i += 4)
-            fmpz_neg(cs + i, cs + i);
+            fmpz_inplace_neg(cs + i);
 
         if (l % 2 == 0)
         {

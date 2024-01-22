@@ -116,7 +116,7 @@ int fmpz_mpoly_factor_content(
     FLINT_ASSERT(A->length > 0);
     _fmpz_vec_content(f->constant, A->coeffs, A->length);
     if (fmpz_sgn(A->coeffs + 0) < 0)
-        fmpz_neg(f->constant, f->constant);
+        fmpz_inplace_neg(f->constant);
     fmpz_mpoly_factor_fit_length(g, nvars, ctx);
     fmpz_mpoly_scalar_divexact_fmpz(g->poly + 0, A, f->constant, ctx);
 

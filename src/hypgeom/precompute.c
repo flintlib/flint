@@ -54,7 +54,7 @@ fmpz_cdiv_abs_q(fmpz_t q, const fmpz_t x, const fmpz_t y)
     else
     {
         fmpz_fdiv_q(q, x, y);
-        fmpz_neg(q, q);
+        fmpz_inplace_neg(q);
     }
 }
 

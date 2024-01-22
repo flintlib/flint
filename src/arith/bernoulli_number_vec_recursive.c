@@ -49,7 +49,7 @@ __ramanujan_even_common_denom(fmpz * num, fmpz * den, slong start, slong n)
 
         if (mcase == 4)
         {
-            fmpz_neg(num + m, num + m);
+            fmpz_inplace_neg(num + m);
             fmpz_divexact_ui(num + m, num + m, UWORD(2));
         }
 

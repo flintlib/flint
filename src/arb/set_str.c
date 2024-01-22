@@ -143,7 +143,7 @@ arb_set_float_str(arb_t res, const char * inp, slong prec)
         }
         else
         {
-            fmpz_neg(exp, exp);
+            fmpz_inplace_neg(exp);
             arb_pow_fmpz_binexp(t, t, exp, prec + 4);
             arb_div(res, res, t, prec);
         }

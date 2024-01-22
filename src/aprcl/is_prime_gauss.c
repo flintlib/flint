@@ -39,7 +39,7 @@ _aprcl_is_gausspower_2q_equal_first(ulong q, const fmpz_t n)
     /* nval = (\chi(-1) * q) = ((-1)^((q - 1) / 2) * q) */
     if ((q - 1) % 2 == 1)
     {
-        fmpz_neg(nval, nval);
+        fmpz_inplace_neg(nval);
         fmpz_add(nval, nval, n);
     }
 

@@ -27,7 +27,7 @@ TEST_FUNCTION_START(fmpz_vec_scalar_mul_fmpz, state)
         fmpz_init(n);
         fmpz_randtest(n, state, 100);
         if (n_randint(state, 2))
-            fmpz_neg(n, n);
+            fmpz_inplace_neg(n);
 
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);
@@ -60,7 +60,7 @@ TEST_FUNCTION_START(fmpz_vec_scalar_mul_fmpz, state)
         fmpz_init(n);
         fmpz_randtest(n, state, 100);
         if (n_randint(state, 2))
-            fmpz_neg(n, n);
+            fmpz_inplace_neg(n);
 
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);
@@ -106,9 +106,9 @@ TEST_FUNCTION_START(fmpz_vec_scalar_mul_fmpz, state)
         fmpz_randtest(n1, state, 100);
         fmpz_randtest(n2, state, 100);
         if (n_randint(state, 2))
-            fmpz_neg(n1, n1);
+            fmpz_inplace_neg(n1);
         if (n_randint(state, 2))
-            fmpz_neg(n2, n2);
+            fmpz_inplace_neg(n2);
 
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);

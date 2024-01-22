@@ -79,5 +79,5 @@ fmpz_poly_bit_pack(fmpz_t f, const fmpz_poly_t poly,
     _fmpz_demote_val(f);
 
     if (negate)
-        fmpz_neg(f, f);
+        fmpz_inplace_neg(f);
 }

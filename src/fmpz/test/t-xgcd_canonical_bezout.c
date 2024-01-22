@@ -64,10 +64,10 @@ TEST_FUNCTION_START(fmpz_xgcd_canonical_bezout, state)
     {
         fmpz_randm(ng, state, maxval);
         if (n_randint(state, 2))
-            fmpz_neg(ng, ng);
+            fmpz_inplace_neg(ng);
         fmpz_set(nf, ng);
         if (n_randint(state, 2))
-            fmpz_neg(nf, nf);
+            fmpz_inplace_neg(nf);
 
         fmpz_xgcd_canonical_bezout(nd, na, nb, nf, ng);
 
@@ -95,7 +95,7 @@ TEST_FUNCTION_START(fmpz_xgcd_canonical_bezout, state)
     {
         fmpz_randm(nf, state, maxval);
         if (n_randint(state, 2))
-            fmpz_neg(nf, nf);
+            fmpz_inplace_neg(nf);
         fmpz_zero(ng);
 
         fmpz_xgcd_canonical_bezout(nd, na, nb, nf, ng);
@@ -125,7 +125,7 @@ TEST_FUNCTION_START(fmpz_xgcd_canonical_bezout, state)
         fmpz_zero(nf);
         fmpz_randm(ng, state, maxval);
         if (n_randint(state, 2))
-            fmpz_neg(ng, ng);
+            fmpz_inplace_neg(ng);
 
         fmpz_xgcd_canonical_bezout(nd, na, nb, nf, ng);
 
@@ -153,10 +153,10 @@ TEST_FUNCTION_START(fmpz_xgcd_canonical_bezout, state)
     {
         fmpz_randm(nf, state, maxval);
         if (n_randint(state, 2))
-            fmpz_neg(nf, nf);
+            fmpz_inplace_neg(nf);
         fmpz_one(ng);
         if (n_randint(state, 2))
-            fmpz_neg(ng, ng);
+            fmpz_inplace_neg(ng);
 
         fmpz_xgcd_canonical_bezout(nd, na, nb, nf, ng);
 
@@ -183,10 +183,10 @@ TEST_FUNCTION_START(fmpz_xgcd_canonical_bezout, state)
     {
         fmpz_one(nf);
         if (n_randint(state, 2))
-            fmpz_neg(nf, nf);
+            fmpz_inplace_neg(nf);
         fmpz_randm(ng, state, maxval);
         if (n_randint(state, 2))
-            fmpz_neg(ng, ng);
+            fmpz_inplace_neg(ng);
         if (fmpz_is_zero(ng) || fmpz_is_pm1(ng))
             fmpz_set_si(ng, 3);
 
@@ -220,13 +220,13 @@ TEST_FUNCTION_START(fmpz_xgcd_canonical_bezout, state)
         fmpz_init_set(dsave, nd);
         fmpz_mul_si(nf, nd, 2);
         if (n_randint(state, 2))
-            fmpz_neg(nf, nf);
+            fmpz_inplace_neg(nf);
         fmpz_randm(ng, state, maxval);
         div2 = fmpz_val2(ng);
         fmpz_tdiv_q_2exp(ng, ng, div2); /* we still want gcd(2d, g) = d */
         fmpz_mul(ng, ng, nd);
         if (n_randint(state, 2))
-            fmpz_neg(ng, ng);
+            fmpz_inplace_neg(ng);
 
         fmpz_xgcd_canonical_bezout(nd, na, nb, nf, ng);
 
@@ -259,13 +259,13 @@ TEST_FUNCTION_START(fmpz_xgcd_canonical_bezout, state)
         fmpz_init_set(dsave, nd);
         fmpz_mul_si(ng, nd, 2);
         if (n_randint(state, 2))
-            fmpz_neg(ng, ng);
+            fmpz_inplace_neg(ng);
         fmpz_randm(nf, state, maxval);
         div2 = fmpz_val2(nf);
         fmpz_tdiv_q_2exp(nf, nf, div2); /* we still want gcd(2d, f) = d */
         fmpz_mul(nf, nf, nd);
         if (n_randint(state, 2))
-            fmpz_neg(nf, nf);
+            fmpz_inplace_neg(nf);
 
         fmpz_xgcd_canonical_bezout(nd, na, nb, nf, ng);
 

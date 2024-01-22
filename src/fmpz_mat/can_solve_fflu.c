@@ -74,7 +74,7 @@ fmpz_mat_can_solve_fflu(fmpz_mat_t X, fmpz_t den,
     {
         if (_perm_parity(perm, n))
         {
-           fmpz_neg(den, den);
+           fmpz_inplace_neg(den);
 
            fmpz_mat_neg(X, X);
         }

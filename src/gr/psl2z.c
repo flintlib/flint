@@ -103,10 +103,10 @@ _gr_psl2z_set_other(psl2z_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 
             if (fmpz_sgn(&res->c) < 0 || (fmpz_is_zero(&res->c) && fmpz_sgn(&res->d) < 0))
             {
-                fmpz_neg(&res->a, &res->a);
-                fmpz_neg(&res->b, &res->b);
-                fmpz_neg(&res->c, &res->c);
-                fmpz_neg(&res->d, &res->d);
+                fmpz_inplace_neg(&res->a);
+                fmpz_inplace_neg(&res->b);
+                fmpz_inplace_neg(&res->c);
+                fmpz_inplace_neg(&res->d);
             }
             fmpz_clear(det);
             return GR_SUCCESS;

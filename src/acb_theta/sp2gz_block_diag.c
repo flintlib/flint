@@ -28,7 +28,7 @@ sp2gz_block_diag(fmpz_mat_t mat, const fmpz_mat_t U)
 
     if (!fmpz_is_one(den))
     {
-        fmpz_neg(den, den);
+        fmpz_inplace_neg(den);
         fmpz_mat_neg(D, D);
     }
 

@@ -87,7 +87,7 @@ fmpz_mat_hnf_minors(fmpz_mat_t H, const fmpz_mat_t A)
         {
             for (j = k; j < n; j++)
             {
-                fmpz_neg(fmpz_mat_entry(H, k, j), fmpz_mat_entry(H, k, j));
+                fmpz_inplace_neg(fmpz_mat_entry(H, k, j));
             }
         }
         /* reduce above diagonal elements of each row i */

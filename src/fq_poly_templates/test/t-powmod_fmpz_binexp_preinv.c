@@ -202,10 +202,10 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_fmpz_binexp_preinv, state)
         fmpz_init(exp2);
         fmpz_randtest(exp1, state, 100);
         if (fmpz_sgn(exp1) == -1)
-            fmpz_neg(exp1, exp1);
+            fmpz_inplace_neg(exp1);
         fmpz_randtest(exp2, state, 100);
         if (fmpz_sgn(exp2) == -1)
-            fmpz_neg(exp2, exp2);
+            fmpz_inplace_neg(exp2);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (f, ctx);

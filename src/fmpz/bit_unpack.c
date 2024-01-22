@@ -60,7 +60,7 @@ fmpz_bit_unpack(fmpz_t coeff, mp_srcptr arr, flint_bitcnt_t shift,
 
         /* negate the coeff if necessary */
         if (negate)
-            fmpz_neg(coeff, coeff);
+            fmpz_inplace_neg(coeff);
 
         return (sign != (mp_limb_t) 0);
     }

@@ -34,8 +34,8 @@ TEST_FUNCTION_START(fmpz_xgcd, state)
         fmpz_randtest_unsigned(g, state, 200);
         fmpz_add_ui(g, g, 1);
         fmpz_randm(f, state, g);
-        if (n_randint(state, 2)) fmpz_neg(g, g);
-        if (n_randint(state, 2)) fmpz_neg(f, f);
+        if (n_randint(state, 2)) fmpz_inplace_neg(g);
+        if (n_randint(state, 2)) fmpz_inplace_neg(f);
 
         aliasing = n_randint(state, 5);
 

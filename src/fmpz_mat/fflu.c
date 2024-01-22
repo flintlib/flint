@@ -84,7 +84,7 @@ fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, slong * perm,
                                 fmpz_set_uiui(E(j, k), p1h, p1l);
 
                                 if (sgn)
-                                    fmpz_neg(E(j, k), E(j, k));
+                                    fmpz_inplace_neg(E(j, k));
 
                                 fmpz_divexact(E(j, k), E(j, k), den);
 
@@ -120,7 +120,7 @@ fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, slong * perm,
                             }
 
                             if (sgn)
-                                fmpz_neg(E(j, k), E(j, k));
+                                fmpz_inplace_neg(E(j, k));
                         }
                     }
                 }

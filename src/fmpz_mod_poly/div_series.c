@@ -70,7 +70,7 @@ _fmpz_mod_poly_div_series(fmpz * Q, const fmpz * A, slong Alen,
             if (i < Alen)
                 fmpz_sub(Q + i, A + i, Q + i);
             else
-                fmpz_neg(Q + i, Q + i);
+                fmpz_inplace_neg(Q + i);
 
             if (!fmpz_is_one(B + 0))
                 fmpz_mul(Q + i, Q + i, u);

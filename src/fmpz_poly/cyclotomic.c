@@ -36,7 +36,7 @@ _fmpz_poly_cyclotomic(fmpz * a, ulong n, mp_ptr factors,
     {
         _fmpz_poly_cyclotomic(a, n / 2, factors + 1, num_factors - 1, phi);
         for (i = 1; i <= D; i += 2)
-            fmpz_neg(a + i, a + i);
+            fmpz_inplace_neg(a + i);
         return;
     }
 

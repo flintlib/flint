@@ -62,13 +62,13 @@ void _fmpq_poly_legendre_p(fmpz * coeffs, fmpz_t den, ulong n)
         fmpz_mul_ui(r, r, L + 1);
     fmpz_fdiv_q_2exp(r, r, 2*L);
     if (L % 2)
-        fmpz_neg(r, r);
+        fmpz_inplace_neg(r);
 
     for (k = 1; k <= L; k++)
     {
         fmpz_mul2_uiui(r + 2, r, L + 1 - k, 2*k + 2*L - 1 + 2*odd);
         fmpz_divexact2_uiui(r + 2, r + 2, k, 2*k - 1 + 2*odd);
-        fmpz_neg(r + 2, r + 2);
+        fmpz_inplace_neg(r + 2);
         r += 2;
     }
 

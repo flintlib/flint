@@ -22,7 +22,7 @@ _fmpz_mat_det_bareiss(fmpz_t det, fmpz_mat_t tmp)
     fmpz_mat_fflu(tmp, det, perm, tmp, 1);
 
     if (_perm_parity(perm, n) == 1)
-        fmpz_neg(det, det);
+        fmpz_inplace_neg(det);
 
     _perm_clear(perm);
 }

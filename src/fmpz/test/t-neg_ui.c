@@ -28,7 +28,7 @@ TEST_FUNCTION_START(fmpz_neg_ui, state)
         fmpz_init(b);
 
         fmpz_set_ui(a, c);
-        fmpz_neg(a, a);
+        fmpz_inplace_neg(a);
 
         fmpz_neg_ui(b, c);
 

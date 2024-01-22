@@ -163,7 +163,7 @@ void fmpq_poly_sub_si(fmpq_poly_t res, const fmpq_poly_t poly, slong c)
     else if (poly->length == 0)
     {
         fmpq_poly_set_si(res, c);
-        fmpz_neg(res->coeffs + 0, res->coeffs + 0);
+        fmpz_inplace_neg(res->coeffs + 0);
     }
     else
     {
@@ -211,7 +211,7 @@ void fmpq_poly_sub_fmpz(fmpq_poly_t res, const fmpq_poly_t poly, const fmpz_t c)
     else if (poly->length == 0)
     {
         fmpq_poly_set_fmpz(res, c);
-        fmpz_neg(res->coeffs + 0, res->coeffs + 0);
+        fmpz_inplace_neg(res->coeffs + 0);
     }
     else
     {
@@ -255,7 +255,7 @@ void fmpq_poly_sub_fmpq(fmpq_poly_t res, const fmpq_poly_t poly, const fmpq_t c)
     else if (poly->length == 0)
     {
         fmpq_poly_set_fmpq(res, c);
-        fmpz_neg(res->coeffs + 0, res->coeffs + 0);
+        fmpz_inplace_neg(res->coeffs + 0);
     }
     else
     {

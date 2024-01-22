@@ -197,7 +197,7 @@ acb_pow_arb(acb_t z, const acb_t x, const arb_t y, slong prec)
                 }
                 else
                 {
-                    fmpz_neg(e, e);
+                    fmpz_inplace_neg(e);
                     acb_rsqrt(z, x, prec + fmpz_bits(e));
                     acb_pow_fmpz_binexp(z, z, e, prec);
                 }

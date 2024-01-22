@@ -91,7 +91,7 @@ _fmpz_poly_resultant_euclidean(fmpz_t res, const fmpz * poly1, slong len1,
 
         fmpz_mul(res, t, h);
         if (sgn < 0)
-            fmpz_neg(res, res);
+            fmpz_inplace_neg(res);
 
       cleanup:
 
@@ -123,6 +123,6 @@ fmpz_poly_resultant_euclidean(fmpz_t res, const fmpz_poly_t poly1,
     {
         _fmpz_poly_resultant_euclidean(res, poly2->coeffs, len2, poly1->coeffs, len1);
         if ((len1 > 1) && (!(len1 & WORD(1)) & !(len2 & WORD(1))))
-            fmpz_neg(res, res);
+            fmpz_inplace_neg(res);
     }
 }

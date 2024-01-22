@@ -303,7 +303,7 @@ acb_agm1_deriv_diff(acb_t Mz, acb_t Mzp, const acb_t z, slong prec)
     acb_sub(Mzp, u, v, prec);
     acb_mul_2exp_si(Mz, Mz, -1);
     acb_mul_2exp_si(Mzp, Mzp, -1);
-    fmpz_neg(hexp, hexp);
+    fmpz_inplace_neg(hexp);
     acb_mul_2exp_fmpz(Mzp, Mzp, hexp);
 
     /* add error */
@@ -314,7 +314,7 @@ acb_agm1_deriv_diff(acb_t Mz, acb_t Mzp, const acb_t z, slong prec)
     else
         acb_add_error_mag(Mz, err);
 
-    fmpz_neg(rexp, rexp);
+    fmpz_inplace_neg(rexp);
     mag_mul_2exp_fmpz(err, err, rexp);
 
     if (isreal)

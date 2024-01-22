@@ -21,7 +21,7 @@ void _fmpz_poly_discriminant(fmpz_t res, const fmpz * poly, slong len)
    _fmpz_poly_resultant(res, poly, len, der, len - 1);
 
    if ((len & 3) == 0 || (len & 3) == 3) /* degree is not 0, 1 mod 4 */
-      fmpz_neg(res, res);
+      fmpz_inplace_neg(res);
 
    if (!fmpz_is_one(poly + len - 1))
       fmpz_divexact(res, res, poly + len - 1);

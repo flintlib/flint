@@ -27,7 +27,7 @@ void fmpq_mpoly_reduce_easy(
     }
     else if (fmpz_sgn(A->zpoly->coeffs + 0) < 0)
     {
-        fmpz_neg(fmpq_numref(A->content), fmpq_numref(A->content));
+        fmpz_inplace_neg(fmpq_numref(A->content));
         _fmpz_vec_neg(A->zpoly->coeffs, A->zpoly->coeffs, A->zpoly->length);
     }
 

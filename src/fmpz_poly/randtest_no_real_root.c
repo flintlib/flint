@@ -27,7 +27,7 @@ void _quadratic(fmpz_poly_t p, flint_rand_t state, flint_bitcnt_t bits)
     fmpz_randtest_not_zero(c, state, bits);
 
     if (fmpz_sgn(a) != fmpz_sgn(c))
-        fmpz_neg(a, a);
+        fmpz_inplace_neg(a);
 
     /* now choose b so that b^2 < 4ac */
     fmpz_randtest(b, state, (fmpz_bits(a) + fmpz_bits(c))/2);
@@ -51,7 +51,7 @@ void _even(fmpz_poly_t p, flint_rand_t state, slong len, flint_bitcnt_t bits)
     for (i = 0; i <= n; i++)
     {
         if (fmpz_sgn(p->coeffs + i) == -1)
-            fmpz_neg(p->coeffs + i, p->coeffs + i);
+            fmpz_inplace_neg(p->coeffs + i);
     }
     for (i = n + 1; i < len; i++)
         fmpz_zero(p->coeffs + i);

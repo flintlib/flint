@@ -184,7 +184,7 @@ fmpzi_set_qqbar(fmpzi_t res, const qqbar_t x)
             fmpz_is_even(QQBAR_COEFFS(x) + 1) && fmpz_sgn(QQBAR_COEFFS(x)) > 0)
         {
             fmpz_tdiv_q_2exp(fmpzi_realref(res), QQBAR_COEFFS(x) + 1, 1);
-            fmpz_neg(fmpzi_realref(res), fmpzi_realref(res));
+            fmpz_inplace_neg(fmpzi_realref(res));
 
             fmpz_mul(fmpzi_imagref(res), fmpzi_realref(res), fmpzi_realref(res));
             fmpz_sub(fmpzi_imagref(res), QQBAR_COEFFS(x), fmpzi_imagref(res));
@@ -194,7 +194,7 @@ fmpzi_set_qqbar(fmpzi_t res, const qqbar_t x)
             {
                 fmpz_sqrt(fmpzi_imagref(res), fmpzi_imagref(res));
                 if (qqbar_sgn_im(x) < 0)
-                    fmpz_neg(fmpzi_imagref(res), fmpzi_imagref(res));
+                    fmpz_inplace_neg(fmpzi_imagref(res));
 
                 return 1;
             }

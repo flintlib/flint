@@ -221,7 +221,7 @@ fmpz_mat_strong_echelon_form_mod(fmpz_mat_t A, const fmpz_t mod)
             {
                 fmpz_xgcd(g, s, t, fmpz_mat_entry(A, row, col), fmpz_mat_entry(A, i, col));
                 fmpz_divexact(u, fmpz_mat_entry(A, i, col), g);
-                fmpz_neg(u, u);
+                fmpz_inplace_neg(u);
                 fmpz_divexact(v, fmpz_mat_entry(A, row, col), g);
 
                 for (k = col; k < m; k++)
@@ -291,7 +291,7 @@ fmpz_mat_strong_echelon_form_mod(fmpz_mat_t A, const fmpz_t mod)
                 continue;
             }
             fmpz_divexact(u, extra_row + row, g);
-            fmpz_neg(u, u);
+            fmpz_inplace_neg(u);
             fmpz_divexact(v, fmpz_mat_entry(A, row, row), g);
 
             for (k = row; k < m; k++)

@@ -266,7 +266,7 @@ ca_set_qqbar(ca_t res, const qqbar_t x, ca_ctx_t ctx)
 
             if (qqbar_sgn_im(x) < 0)
             {
-                fmpz_neg(D, D);
+                fmpz_inplace_neg(D);
             }
 
             fmpz_sub(res_num, D, b);
@@ -290,7 +290,7 @@ ca_set_qqbar(ca_t res, const qqbar_t x, ca_ctx_t ctx)
             fmpz_t A, B;
             ca_field_srcptr field;
 
-            fmpz_neg(D, D);
+            fmpz_inplace_neg(D);
 
             fmpz_init(A);
             fmpz_init(B);
@@ -301,7 +301,7 @@ ca_set_qqbar(ca_t res, const qqbar_t x, ca_ctx_t ctx)
             */
             _fmpz_factor_square_root(A, B, D, FACTOR_SMOOTH_BOUND);
             if (fmpz_sgn(D) < 0)
-                fmpz_neg(A, A);
+                fmpz_inplace_neg(A);
 
             field = ca_ctx_get_quadratic_field(ctx, A);
             _ca_make_field_element(res, field, ctx);

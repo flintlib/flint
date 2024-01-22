@@ -23,14 +23,14 @@ _fmpz_poly_power_sums_naive(fmpz * res, const fmpz * poly, slong len, slong n)
         fmpz_mul_ui(res + k, poly + len - 1 - k, k);
         for (i = 1; i < k; i++)
             fmpz_addmul(res + k, poly + len - 1 - k + i, res + i);
-        fmpz_neg(res + k, res + k);
+        fmpz_inplace_neg(res + k);
     }
     for (k = len; k < n; k++)
     {
         fmpz_zero(res + k);
         for (i = k - len + 1; i < k; i++)
             fmpz_addmul(res + k, poly + len - 1 - k + i, res + i);
-        fmpz_neg(res + k, res + k);
+        fmpz_inplace_neg(res + k);
     }
 }
 

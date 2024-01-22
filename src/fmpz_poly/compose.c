@@ -33,7 +33,7 @@ _fmpz_poly_compose(fmpz * res, const fmpz * poly1, slong len1,
         if (fmpz_equal_si(poly2 + 1, -1))
         {
             for (i = 1; i < len1; i += 2)
-                fmpz_neg(res + i, res + i);
+                fmpz_inplace_neg(res + i);
             return;
         }
         else if (!fmpz_is_one(poly2 + 1))

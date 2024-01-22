@@ -124,7 +124,7 @@ void fmpz_mat_snf_kannan_bachem(fmpz_mat_t S, const fmpz_mat_t A)
         while (!col_done);
 
         if (fmpz_sgn(fmpz_mat_entry(S, k, k)) < 0)
-            fmpz_neg(fmpz_mat_entry(S, k, k), fmpz_mat_entry(S, k, k));
+            fmpz_inplace_neg(fmpz_mat_entry(S, k, k));
     }
 
     fmpz_clear(r2g);

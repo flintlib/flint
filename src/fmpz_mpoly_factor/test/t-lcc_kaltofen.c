@@ -205,7 +205,7 @@ TEST_FUNCTION_START(fmpz_mpoly_factor_lcc_kaltofen, state)
         {
             fmpz_set_ui(alphas + j, n_urandint(state, 100));
             if (n_randint(state, 2))
-                fmpz_neg(alphas + j, alphas + j);
+                fmpz_inplace_neg(alphas + j);
         }
 
         had_zero = 0;

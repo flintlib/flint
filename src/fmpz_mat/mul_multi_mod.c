@@ -269,7 +269,7 @@ static void _crt_worker(void * varg)
             if (sign && (mpn_sub_n(U, M, T, Msize), mpn_cmp(U, T, Msize) < 0))
             {
                 fmpz_set_ui_array(&Crows[i][j], U, Msize);
-                fmpz_neg(&Crows[i][j], &Crows[i][j]);
+                fmpz_inplace_neg(&Crows[i][j]);
             }
             else
             {

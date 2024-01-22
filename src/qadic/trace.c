@@ -36,7 +36,7 @@ void _qadic_trace(fmpz_t rop, const fmpz *op, slong len,
             fmpz_addmul_ui(t + i, a + l, i);
         }
 
-        fmpz_neg(t + i, t + i);
+        fmpz_inplace_neg(t + i);
         fmpz_mod(t + i, t + i, pN);
     }
 

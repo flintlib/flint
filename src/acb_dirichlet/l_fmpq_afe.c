@@ -119,7 +119,7 @@ acb_dirichlet_afe_tail_bound(mag_t res, const fmpq_t sd2, slong N, ulong q, int 
             mag_set_ui(u, q);
             mag_div_lower(t, t, u);
 
-            fmpz_neg(sprime, sprime);
+            fmpz_inplace_neg(sprime);
             mag_pow_fmpz_lower(t, t, sprime);
             mag_inv(t, t);
         }

@@ -129,7 +129,7 @@ TEST_FUNCTION_START(acb_lambertw, state)
         if (!arb_contains_zero(acb_imagref(x1)))
         {
             acb_conj(x2, x1);
-            fmpz_neg(k, k);
+            fmpz_inplace_neg(k);
             if (flags == 2)
                 fmpz_sub_ui(k, k, 1);
 
@@ -137,7 +137,7 @@ TEST_FUNCTION_START(acb_lambertw, state)
 
             if (flags == 2)
                 fmpz_add_ui(k, k, 1);
-            fmpz_neg(k, k);
+            fmpz_inplace_neg(k);
             acb_conj(w2, w2);
 
             if (!acb_overlaps(w1, w2))

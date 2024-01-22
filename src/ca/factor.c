@@ -195,8 +195,8 @@ ca_factor(ca_factor_t res, const ca_t x, ulong flags, ca_ctx_t ctx)
 
             if (fmpz_sgn(fmpq_denref(content)) < 0)
             {
-                fmpz_neg(fmpq_numref(content), fmpq_numref(content));
-                fmpz_neg(fmpq_denref(content), fmpq_denref(content));
+                fmpz_inplace_neg(fmpq_numref(content));
+                fmpz_inplace_neg(fmpq_denref(content));
             }
 
             _ca_factor_fmpq(res, content, flags, ctx);

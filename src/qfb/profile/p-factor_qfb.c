@@ -40,7 +40,7 @@ int main(void)
       printf("Read failed\n");
       abort();
    }
-   fmpz_neg(n0, n0);
+   fmpz_inplace_neg(n0);
 
    iters = 10;
 

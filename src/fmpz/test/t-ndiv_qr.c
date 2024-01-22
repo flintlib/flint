@@ -130,9 +130,9 @@ TEST_FUNCTION_START(fmpz_ndiv_qr, state)
         fmpz_mul_2exp(b, b, 1);
 
         if (n_randint(state, 2))
-            fmpz_neg(a, a);
+            fmpz_inplace_neg(a);
         if (n_randint(state, 2))
-            fmpz_neg(b, b);
+            fmpz_inplace_neg(b);
         if (fmpz_is_zero(b))
             fmpz_one(b);
 

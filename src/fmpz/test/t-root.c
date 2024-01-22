@@ -129,8 +129,8 @@ TEST_FUNCTION_START(fmpz_root, state)
 
         if ((n & 1) != 0 && n_randint(state, 2) == 0)
         {
-            fmpz_neg(g, g);
-            fmpz_neg(pow, pow);
+            fmpz_inplace_neg(g);
+            fmpz_inplace_neg(pow);
         }
 
         exact = fmpz_root(f, pow, n);

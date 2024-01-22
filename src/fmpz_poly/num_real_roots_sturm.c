@@ -91,7 +91,7 @@ void _fmpz_poly_num_real_roots_sturm(slong * n_neg, slong * n_pos, const fmpz * 
         if (delta == 1)
         {
             fmpz_mul(b, g, h);
-            if (fmpz_sgn(b) < 0) fmpz_neg(b, b);
+            if (fmpz_sgn(b) < 0) fmpz_inplace_neg(b);
             _fmpz_vec_scalar_divexact_fmpz(B, B, lenB, b);
             fmpz_set(g, A + (lenA - 1));
             fmpz_set(h, g);
@@ -100,7 +100,7 @@ void _fmpz_poly_num_real_roots_sturm(slong * n_neg, slong * n_pos, const fmpz * 
         {
             fmpz_pow_ui(a, h, delta);
             fmpz_mul(b, g, a);
-            if (fmpz_sgn(b) < 0) fmpz_neg(b, b);
+            if (fmpz_sgn(b) < 0) fmpz_inplace_neg(b);
             _fmpz_vec_scalar_divexact_fmpz(B, B, lenB, b);
             fmpz_pow_ui(b, A + (lenA - 1), delta);
             fmpz_mul(g, h, b);

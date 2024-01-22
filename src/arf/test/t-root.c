@@ -33,7 +33,7 @@ arf_root_naive(arf_t z, const arf_t x, int k, slong prec, arf_rnd_t rnd)
     else
         fmpz_fdiv_q_ui(t, ARF_EXPREF(x), k);
     fmpz_mul_ui(t, t, k);
-    fmpz_neg(t, t);
+    fmpz_inplace_neg(t);
     arf_mul_2exp_fmpz(z, x, t);
 
     mpfr_init2(u, FLINT_MAX(2, arf_bits(z)));
@@ -44,7 +44,7 @@ arf_root_naive(arf_t z, const arf_t x, int k, slong prec, arf_rnd_t rnd)
     res = (mpfr_rootn_ui(v, u, k, arf_rnd_to_mpfr(rnd)) != 0);
     arf_set_mpfr(z, v);
 
-    fmpz_neg(t, t);
+    fmpz_inplace_neg(t);
     fmpz_tdiv_q_ui(t, t, k);
     arf_mul_2exp_fmpz(z, z, t);
 

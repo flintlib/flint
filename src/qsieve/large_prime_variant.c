@@ -294,7 +294,7 @@ relation_t qsieve_parse_relation(qs_t qs_inf)
 #endif
         fmpz_set_ui(rel.Y, abslimb);
         if (Ysz < 0)
-            fmpz_neg(rel.Y, rel.Y);
+            fmpz_inplace_neg(rel.Y);
     }
     else
     {

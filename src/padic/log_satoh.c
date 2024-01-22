@@ -33,10 +33,10 @@ void _padic_log_satoh(fmpz_t z, const fmpz_t y, slong v, const fmpz_t p, slong N
         fmpz_pow_ui(pNk, p, N + k);
 
         fmpz_sub_ui(t, y, 1);
-        fmpz_neg(t, t);
+        fmpz_inplace_neg(t);
         fmpz_powm(t, t, pk, pNk);
         fmpz_sub_ui(t, t, 1);
-        fmpz_neg(t, t);
+        fmpz_inplace_neg(t);
 
         /* TODO: Improve suggested valuation */
         _padic_log_rectangular(z, t, k + 1, p, N + k);
@@ -67,7 +67,7 @@ int padic_log_satoh(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 
         padic_get_fmpz(y, op, ctx);
         fmpz_sub_ui(y, y, 1);
-        fmpz_neg(y, y);
+        fmpz_inplace_neg(y);
 
         if (fmpz_is_zero(y))
         {

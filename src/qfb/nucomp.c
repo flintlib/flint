@@ -134,8 +134,8 @@ void qfb_nucomp(qfb_t r, const qfb_t f, const qfb_t g, fmpz_t D, fmpz_t L)
 
       if (fmpz_sgn(ca) < 0)
       {
-         fmpz_neg(ca, ca);
-         fmpz_neg(cc, cc);
+         fmpz_inplace_neg(ca);
+         fmpz_inplace_neg(cc);
       }
 
       fmpz_clear(m1); fmpz_clear(m2); fmpz_clear(r1); fmpz_clear(r2);

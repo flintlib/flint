@@ -833,9 +833,9 @@ gr_test_mul_2exp_fmpz(gr_ctx_t R, flint_rand_t state, int test_flags)
     else
     {
         status |= gr_set_ui(r2, 2, R);
-        fmpz_neg(y, y);
+        fmpz_inplace_neg(y);
         status |= gr_pow_fmpz(r2, r2, y, R);
-        fmpz_neg(y, y);
+        fmpz_inplace_neg(y);
         status |= gr_div(r2, x, r2, R);
     }
 

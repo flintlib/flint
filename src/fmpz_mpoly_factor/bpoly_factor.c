@@ -743,9 +743,9 @@ static void _recombine_naive(
 
             if (fmpz_bpoly_divides(Q, B, trymez))
             {
-                fmpz_neg(alpha, alpha);
+                fmpz_inplace_neg(alpha);
                 fmpz_bpoly_taylor_shift(trymez, alpha);
-                fmpz_neg(alpha, alpha);
+                fmpz_inplace_neg(alpha);
                 fmpz_tpoly_fit_length(F, F->length + 1);
                 fmpz_bpoly_swap(F->coeffs + F->length, trymez);
                 F->length++;
@@ -765,9 +765,9 @@ static void _recombine_naive(
         }
     }
 
-    fmpz_neg(alpha, alpha);
+    fmpz_inplace_neg(alpha);
     fmpz_bpoly_taylor_shift(B, alpha);
-    fmpz_neg(alpha, alpha);
+    fmpz_inplace_neg(alpha);
     if (B->length > 1)
     {
         fmpz_tpoly_fit_length(F, F->length + 1);
@@ -823,7 +823,7 @@ void fmpz_bpoly_factor(fmpz_poly_t c, fmpz_tpoly_t F, fmpz_bpoly_t B)
 
 next_alpha:
 
-    fmpz_neg(alpha, alpha);
+    fmpz_inplace_neg(alpha);
     fmpz_add_ui(alpha, alpha, fmpz_sgn(alpha) >= 0);
 
 got_alpha:

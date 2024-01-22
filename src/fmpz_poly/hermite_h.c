@@ -43,7 +43,7 @@ _fmpz_poly_hermite_h(fmpz * coeffs, ulong n)
     {
         fmpz_mul2_uiui(coeffs + k, coeffs + k+2, k+1, k+2);
         fmpz_divexact_ui(coeffs + k, coeffs + k, (n - k) << 1);
-        fmpz_neg(coeffs + k, coeffs + k);
+        fmpz_inplace_neg(coeffs + k);
     }
 }
 

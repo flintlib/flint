@@ -29,7 +29,7 @@ void qfb_prime_form(qfb_t r, fmpz_t D, fmpz_t p)
          fmpz_set_ui(r->b, m8);
 
       fmpz_sub_ui(s, D, m8);
-      fmpz_neg(s, s);
+      fmpz_inplace_neg(s);
       fmpz_fdiv_q_2exp(r->c, s, 3);
       fmpz_set(r->a, p);
 

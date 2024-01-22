@@ -39,7 +39,7 @@ TEST_FUNCTION_START(fmpz_neg, state)
         else
         {
             fmpz_set(b, a);
-            fmpz_neg(b, b);
+            fmpz_inplace_neg(b);
         }
 
         mpz_neg(c, c);

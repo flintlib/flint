@@ -128,7 +128,7 @@ void fmpz_mod_ui_sub(fmpz_t a, ulong b, const fmpz_t c,
     FLINT_ASSERT(fmpz_mod_is_canonical(c, ctx));
 
     fmpz_sub_ui(a, c, b);
-    fmpz_neg(a, a);
+    fmpz_inplace_neg(a);
     fmpz_mod(a, a, ctx->n);
 
     FLINT_ASSERT(fmpz_mod_is_canonical(a, ctx));
@@ -140,7 +140,7 @@ void fmpz_mod_si_sub(fmpz_t a, slong b, const fmpz_t c,
     FLINT_ASSERT(fmpz_mod_is_canonical(c, ctx));
 
     fmpz_sub_si(a, c, b);
-    fmpz_neg(a, a);
+    fmpz_inplace_neg(a);
     fmpz_mod(a, a, ctx->n);
 
     FLINT_ASSERT(fmpz_mod_is_canonical(a, ctx));

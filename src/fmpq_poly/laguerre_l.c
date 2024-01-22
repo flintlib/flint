@@ -28,7 +28,7 @@ void _fmpq_poly_laguerre_l(fmpz * coeffs, fmpz_t den, ulong n)
     {
         fmpz_one(coeffs);
         fmpz_one(coeffs + 1);
-        fmpz_neg(coeffs + 1, coeffs + 1);
+        fmpz_inplace_neg(coeffs + 1);
         fmpz_one(den);
         return;
     }
@@ -36,14 +36,14 @@ void _fmpq_poly_laguerre_l(fmpz * coeffs, fmpz_t den, ulong n)
     fmpz_init(c);
     fmpz_one(c);
     if (n%2 == 1)
-        fmpz_neg(c, c);
+        fmpz_inplace_neg(c);
     fmpz_set(coeffs + n, c);
 
     for (k = 0; k < n; k++)
     {
         fmpz_mul2_uiui(c, c, n-k, n-k);
         fmpz_divexact_ui(c, c, k+1);
-        fmpz_neg(c, c);
+        fmpz_inplace_neg(c);
         fmpz_set(coeffs + n - k - 1, c);
     }
     fmpz_set(den, coeffs);

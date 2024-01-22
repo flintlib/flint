@@ -214,7 +214,7 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, slong len1,
 
                     /* correct sign of leading term */
                     if (fmpz_sgn(res + hlen - 1) < 0)
-                        fmpz_neg(hc, hc);
+                        fmpz_inplace_neg(hc);
 
                     _fmpz_vec_scalar_divexact_fmpz(res, res, hlen, hc);
 
@@ -248,7 +248,7 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, slong len1,
 
                 /* correct sign of leading term */
                 if (fmpz_sgn(res + hlen - 1) < 0)
-                    fmpz_neg(hc, hc);
+                    fmpz_inplace_neg(hc);
 
                 /* divide by content */
                 _fmpz_vec_scalar_divexact_fmpz(res, res, hlen, hc);

@@ -123,7 +123,7 @@ cleanup1:
                         goto cleanup2;
                     }
 
-                    fmpz_neg(c, c);
+                    fmpz_inplace_neg(c);
                     fmpz_mpoly_q_inv(res, res, ctx);
                 }
 

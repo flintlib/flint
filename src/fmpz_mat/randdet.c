@@ -58,11 +58,11 @@ fmpz_mat_randdet(fmpz_mat_t mat, flint_rand_t state, const fmpz_t det)
     for (i = 0; i < 2*n; i++)
     {
         k = n_randint(state, n);
-        fmpz_neg(&diag[k], &diag[k]);
+        fmpz_inplace_neg(&diag[k]);
     }
 
     if (factor->sign == -1)
-        fmpz_neg(&diag[0], &diag[0]);
+        fmpz_inplace_neg(&diag[0]);
 
     parity = fmpz_mat_randpermdiag(mat, state, diag, n);
 
@@ -75,7 +75,7 @@ fmpz_mat_randdet(fmpz_mat_t mat, flint_rand_t state, const fmpz_t det)
             {
                 if (!fmpz_is_zero(mat->rows[i] + j))
                 {
-                    fmpz_neg(mat->rows[i] + j, mat->rows[i] + j);
+                    fmpz_inplace_neg(mat->rows[i] + j);
                     goto end;
                 }
             }

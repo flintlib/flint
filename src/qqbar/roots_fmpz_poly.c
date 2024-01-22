@@ -45,7 +45,7 @@ qqbar_roots_fmpz_poly(qqbar_ptr res, const fmpz_poly_t poly, int flags)
         fmpz_init(c);
         fmpz_poly_content(c, poly);
         if (fmpz_sgn(poly->coeffs + d) < 0)
-            fmpz_neg(c, c);
+            fmpz_inplace_neg(c);
 
         for (prec = QQBAR_DEFAULT_PREC; ; prec *= 2)
         {

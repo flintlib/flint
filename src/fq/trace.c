@@ -37,7 +37,7 @@ _fq_trace(fmpz_t rop, const fmpz * op, slong len, const fq_ctx_t ctx)
             fmpz_addmul_ui(t + i, ctx->a + l, i);
         }
 
-        fmpz_neg(t + i, t + i);
+        fmpz_inplace_neg(t + i);
         fmpz_mod(t + i, t + i, fq_ctx_prime(ctx));
     }
 

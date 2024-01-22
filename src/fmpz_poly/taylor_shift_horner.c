@@ -50,12 +50,12 @@ _fmpz_poly_taylor_shift_horner(fmpz * poly, const fmpz_t c, slong n)
             if (*c == WORD(-1))
             {
                 for (i = 1; i < n; i += 2)
-                    fmpz_neg(poly + i, poly + i);
+                    fmpz_inplace_neg(poly + i);
 
                 _fmpz_poly_taylor_shift_horner(poly, one, n);
 
                 for (i = 1; i < n; i += 2)
-                    fmpz_neg(poly + i, poly + i);
+                    fmpz_inplace_neg(poly + i);
             }
             else
             {

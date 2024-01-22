@@ -34,7 +34,7 @@ _fmpz_poly_legendre_pt(fmpz * coeffs, ulong n)
     fmpz_init(c);
     fmpz_one(c);
     if (n%2 == 1)
-        fmpz_neg(c, c);
+        fmpz_inplace_neg(c);
     facnp = n;
     facnm = n+1;
     fmpz_set(coeffs, c);
@@ -45,7 +45,7 @@ _fmpz_poly_legendre_pt(fmpz * coeffs, ulong n)
         --facnm;
         fmpz_mul2_uiui(c, c, facnp, facnm);
         fmpz_divexact2_uiui(c, c, k, k);
-        fmpz_neg(c, c);
+        fmpz_inplace_neg(c);
         fmpz_set(coeffs + k, c);
     }
 

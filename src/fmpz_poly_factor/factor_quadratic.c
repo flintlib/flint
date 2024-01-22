@@ -28,7 +28,7 @@ void _fmpz_poly_factor_quadratic(fmpz_poly_factor_t fac,
     fmpz_mul(D, a, c);
     fmpz_mul_2exp(D, D, 2);
     fmpz_submul(D, b, b);
-    fmpz_neg(D, D);
+    fmpz_inplace_neg(D);
 
     if (fmpz_is_square(D))
     {

@@ -131,7 +131,7 @@ TEST_FUNCTION_START(fmpz_poly_taylor_shift_horner, state)
 
         fmpz_set_si(c, n_randint(state, 2) ? 1 : -1);
         fmpz_poly_taylor_shift_horner(h1, f, c);
-        fmpz_neg(c, c);
+        fmpz_inplace_neg(c);
         taylor_simple(h2, h1, c);
 
         if (!fmpz_poly_equal(f, h2))

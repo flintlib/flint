@@ -96,15 +96,15 @@ void fmpz_xgcd_partial(fmpz_t co2, fmpz_t co1,
             fmpz_submul_ui(co1, co2, -bb1);
          fmpz_set(co2, r);
 
-         if (fmpz_sgn(r1) < 0) { fmpz_neg(co1, co1); fmpz_neg(r1, r1); }
-         if (fmpz_sgn(r2) < 0) { fmpz_neg(co2, co2); fmpz_neg(r2, r2); }
+         if (fmpz_sgn(r1) < 0) { fmpz_inplace_neg(co1); fmpz_inplace_neg(r1); }
+         if (fmpz_sgn(r2) < 0) { fmpz_inplace_neg(co2); fmpz_inplace_neg(r2); }
       }
    }
 
    if (fmpz_sgn(r2) < 0)
    {
-      fmpz_neg(co2, co2); fmpz_neg(co1, co1);
-      fmpz_neg(r2, r2);
+      fmpz_inplace_neg(co2); fmpz_inplace_neg(co1);
+      fmpz_inplace_neg(r2);
    }
 
    fmpz_clear(q); fmpz_clear(r);

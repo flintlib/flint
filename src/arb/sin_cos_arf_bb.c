@@ -37,7 +37,7 @@ bsplit(fmpz_t T, fmpz_t Q, flint_bitcnt_t * Qexp,
     {
         fmpz_mul2_uiui(T, xpow, (2 * a + 4), (2 * a + 5));
         fmpz_mul_2exp(T, T, 2 * r);
-        fmpz_neg(T, T);
+        fmpz_inplace_neg(T);
         fmpz_add(T, T, xpow + 1);
 
         cc = flint_ctz((2 * a + 4));
@@ -47,7 +47,7 @@ bsplit(fmpz_t T, fmpz_t Q, flint_bitcnt_t * Qexp,
 
         cc = flint_ctz((2 * a + 2));
         fmpz_mul2_uiui(Q, Q, (2 * a + 2) >> cc, (2 * a + 3));
-        fmpz_neg(Q, Q);
+        fmpz_inplace_neg(Q);
         *Qexp += 2 * r + cc;
     }
     else

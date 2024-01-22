@@ -111,7 +111,7 @@ minpoly_tab[MINPOLY_TAB_NUM][MINPOLY_TAB_MAX_LEN] = {
 #define CHEB_NEXT(y, x, m, k) \
     fmpz_mul2_uiui(y, x, m - 2*k + 1, m - 2*k + 2); \
     fmpz_divexact2_uiui(y, y, k, m - k); \
-    fmpz_neg(y, y);  \
+    fmpz_inplace_neg(y);  \
 
 /* Computes the monic integer polynomial
     n odd: 2 (T(s+1,x/2) - T(s,x/2)), s = (n - 1) / 2

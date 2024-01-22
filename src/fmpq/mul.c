@@ -265,7 +265,7 @@ _fmpq_mul_si(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q,
             /* not using fmpz_mul_si(...)  because of the special case g = -WORD_MIN */
             fmpz_mul_ui(rnum, p, a / g);
             if (r < 0)
-                fmpz_neg(rnum, rnum);
+                fmpz_inplace_neg(rnum);
             fmpz_divexact_ui(rden, q, g);
         }
     }

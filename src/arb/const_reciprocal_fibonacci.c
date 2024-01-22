@@ -102,7 +102,7 @@ bsplit_basecase(bsplit_t res, slong n, slong n1, void * args)
     else
         fmpz_add(t, f4, t);
     if ((n & 3) >> 1)
-        fmpz_neg(t, t);
+        fmpz_inplace_neg(t);
     arb_set_fmpz(res->R, t);
 
     res->a = n;

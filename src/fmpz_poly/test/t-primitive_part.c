@@ -58,7 +58,7 @@ TEST_FUNCTION_START(fmpz_poly_primitive_part, state)
 
         fmpz_poly_content(c, f);
         if (fmpz_sgn(f->coeffs + f->length - 1) < 0)
-            fmpz_neg(c, c);
+            fmpz_inplace_neg(c);
         fmpz_poly_primitive_part(g, f);
         fmpz_poly_scalar_mul_fmpz(g, g, c);
 

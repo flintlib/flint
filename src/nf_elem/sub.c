@@ -298,8 +298,8 @@ nf_elem_fmpq_sub(nf_elem_t a, const fmpq_t c, const nf_elem_t b, const nf_t nf)
                 fmpz_mul(den, den, d1);
 
                 fmpz_submul(num, d2, fmpq_numref(c));
-                fmpz_neg(num, num);
-                fmpz_neg(num + 1, num + 1);
+                fmpz_inplace_neg(num);
+                fmpz_inplace_neg(num + 1);
 
                 fmpz_clear(g);
                 fmpz_clear(d1);
@@ -398,7 +398,7 @@ nf_elem_fmpz_sub(nf_elem_t a, const fmpz_t c, const nf_elem_t b, const nf_t nf)
         const fmpz *const num2 = LNF_ELEM_NUMREF(b);
 
         _fmpq_sub_fmpz(num, den, num2, den2, c);
-        fmpz_neg(num, num);
+        fmpz_inplace_neg(num);
     }
     else if (nf->flag & NF_QUADRATIC)
     {

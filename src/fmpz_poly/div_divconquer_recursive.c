@@ -76,7 +76,7 @@ _fmpz_poly_div_divconquer_recursive(fmpz * Q, fmpz * temp,
         else
         {
             _fmpz_vec_sub(h + 1, r1, h + 1, n2 - 1);
-            fmpz_neg(h, h);
+            fmpz_inplace_neg(h);
             fmpz_add(h, h, A + lenB - 1);
         }
 

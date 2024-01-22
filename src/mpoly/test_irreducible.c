@@ -699,7 +699,7 @@ static int _test_colinear(
             continue;
 
         if (fmpz_sgn(sd) < 0)
-            fmpz_neg(g, g);
+            fmpz_inplace_neg(g);
         fmpz_divexact(sn, sn, g);
         fmpz_divexact(sd, sd, g);
 

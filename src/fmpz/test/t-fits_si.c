@@ -53,7 +53,7 @@ TEST_FUNCTION_START(fmpz_fits_si, state)
     check(x, fmpz_fits_si(x), 0);
 
     fmpz_set_ui(x, UWORD_MAX);
-    fmpz_neg(x, x);
+    fmpz_inplace_neg(x);
     check(x, fmpz_fits_si(x), 0);
 
     fmpz_set_si(x, WORD_MAX);
@@ -69,7 +69,7 @@ TEST_FUNCTION_START(fmpz_fits_si, state)
         fmpz_set_ui(x, 1);
         fmpz_mul_2exp(x, x, i);
         check(x, fmpz_fits_si(x), i < FLINT_BITS - 1);
-        fmpz_neg(x, x);
+        fmpz_inplace_neg(x);
         check(x, fmpz_fits_si(x), i < FLINT_BITS);  /* WORD_MIN fits */
     }
 

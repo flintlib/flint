@@ -253,7 +253,7 @@ fmpz_set_str(fmpz_t res, const char * str, int base)
             fmpz_set_str_bsplit_threaded(res, str, slen);
 
         if (neg)
-            fmpz_neg(res, res);
+            fmpz_inplace_neg(res);
     }
 
     return 0;

@@ -120,7 +120,7 @@ fmpz_mat_mod_is_in_howell_form(const fmpz_mat_t A, const fmpz_t mod)
                         if (fmpz_divisible(extra_row + j, fmpz_mat_entry(A, r, pivots[r])))
                         {
                             fmpz_divexact(g, extra_row + j, fmpz_mat_entry(A, r, pivots[r]));
-                            fmpz_neg(g, g);
+                            fmpz_inplace_neg(g);
                             _fmpz_vec_scalar_addmul_fmpz(extra_row, A->rows[r], A->c, g);
                         }
                     }

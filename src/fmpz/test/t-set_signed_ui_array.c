@@ -67,7 +67,7 @@ TEST_FUNCTION_START(fmpz_set_signed_ui_array, state)
             flint_abort();
         }
 
-        fmpz_neg(c, c);
+        fmpz_inplace_neg(c);
         if (fmpz_cmp(b, c) < 0)
         {
             flint_printf("FAIL: check answer >= -2^(n*FLINT_BITS - 1)\n");

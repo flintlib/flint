@@ -28,7 +28,7 @@ ca_conj_shallow(ca_t res, const ca_t x, ca_ctx_t ctx)
     else if (CA_IS_QQ_I(x, ctx))
     {
         ca_set(res, x, ctx);
-        fmpz_neg(QNF_ELEM_NUMREF(CA_NF_ELEM(res)) + 1, QNF_ELEM_NUMREF(CA_NF_ELEM(res)) + 1);
+        fmpz_inplace_neg(QNF_ELEM_NUMREF(CA_NF_ELEM(res)) + 1);
     }
     else
     {
@@ -229,13 +229,13 @@ void nf_elem_conj_imag(nf_elem_t a, const nf_elem_t b, const nf_t nf)
     }
     else if (nf->flag & NF_QUADRATIC)
     {
-        fmpz_neg(QNF_ELEM_NUMREF(a) + 1, QNF_ELEM_NUMREF(a) + 1);
+        fmpz_inplace_neg(QNF_ELEM_NUMREF(a) + 1);
     }
     else
     {
         slong i;
         for (i = 1; i < NF_ELEM(a)->length; i += 2)
-            fmpz_neg(NF_ELEM(a)->coeffs + i, NF_ELEM(a)->coeffs + i);
+            fmpz_inplace_neg(NF_ELEM(a)->coeffs + i);
     }
 }
 
@@ -254,7 +254,7 @@ ca_conj_deep(ca_t res, const ca_t x, ca_ctx_t ctx)
     else if (CA_IS_QQ_I(x, ctx))
     {
         ca_set(res, x, ctx);
-        fmpz_neg(QNF_ELEM_NUMREF(CA_NF_ELEM(res)) + 1, QNF_ELEM_NUMREF(CA_NF_ELEM(res)) + 1);
+        fmpz_inplace_neg(QNF_ELEM_NUMREF(CA_NF_ELEM(res)) + 1);
     }
     else
     {
@@ -366,7 +366,7 @@ ca_conj(ca_t res, const ca_t x, ca_ctx_t ctx)
     else if (CA_IS_QQ_I(x, ctx))
     {
         ca_set(res, x, ctx);
-        fmpz_neg(QNF_ELEM_NUMREF(CA_NF_ELEM(res)) + 1, QNF_ELEM_NUMREF(CA_NF_ELEM(res)) + 1);
+        fmpz_inplace_neg(QNF_ELEM_NUMREF(CA_NF_ELEM(res)) + 1);
     }
     /* todo: avoid duplicate computations with is_real/is_imaginary */
     else if (ca_check_is_real(x, ctx) == T_TRUE)

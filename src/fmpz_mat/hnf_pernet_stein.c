@@ -96,7 +96,7 @@ add_columns(fmpz_mat_t H, const fmpz_mat_t B, const fmpz_mat_t H1, flint_rand_t 
         fmpz_addmul(den, fmpz_mat_entry(B, n - 1, i), fmpz_mat_entry(k, i, 0));
     neg = (fmpz_sgn(den) < 0);
     if (neg)
-        fmpz_neg(den, den);
+        fmpz_inplace_neg(den);
 
     for (j = 0; j < B->c - H1->c; j++)
     {

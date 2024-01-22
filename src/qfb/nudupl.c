@@ -52,7 +52,7 @@ void qfb_nudupl(qfb_t r, const qfb_t f, fmpz_t D, fmpz_t L)
    {
       fmpz_neg(b1, f->b);
       qfb_nudupl_gcdinv(s, v2, t, b1, a1);
-      fmpz_neg(v2, v2);
+      fmpz_inplace_neg(v2);
    } else
       qfb_nudupl_gcdinv(s, v2, t, f->b, a1);
 
@@ -122,8 +122,8 @@ void qfb_nudupl(qfb_t r, const qfb_t f, fmpz_t D, fmpz_t L)
 
       if (fmpz_sgn(ca) < 0)
       {
-         fmpz_neg(ca, ca);
-         fmpz_neg(cc, cc);
+         fmpz_inplace_neg(ca);
+         fmpz_inplace_neg(cc);
       }
 
       fmpz_clear(m2); fmpz_clear(r1); fmpz_clear(r2);

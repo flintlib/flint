@@ -19,14 +19,14 @@ psl2z_inv(psl2z_t h, const psl2z_t g)
 
     if (fmpz_is_zero(&h->c) && fmpz_sgn(&h->a) > 0)
     {
-        fmpz_neg(&h->b, &h->b);
+        fmpz_inplace_neg(&h->b);
         fmpz_swap(&h->d, &h->a);
     }
     else
     {
         fmpz_swap(&h->a, &h->d);
-        fmpz_neg(&h->a, &h->a);
-        fmpz_neg(&h->d, &h->d);
+        fmpz_inplace_neg(&h->a);
+        fmpz_inplace_neg(&h->d);
     }
 }
 
@@ -84,10 +84,10 @@ psl2z_mul(psl2z_t h, const psl2z_t f, const psl2z_t g)
 
     if (fmpz_sgn(&h->c) < 0 || (fmpz_is_zero(&h->c) && fmpz_sgn(&h->d) < 0))
     {
-        fmpz_neg(&h->a, &h->a);
-        fmpz_neg(&h->b, &h->b);
-        fmpz_neg(&h->c, &h->c);
-        fmpz_neg(&h->d, &h->d);
+        fmpz_inplace_neg(&h->a);
+        fmpz_inplace_neg(&h->b);
+        fmpz_inplace_neg(&h->c);
+        fmpz_inplace_neg(&h->d);
     }
 }
 
@@ -112,16 +112,16 @@ psl2z_randtest(psl2z_t g, flint_rand_t state, slong bits)
         fmpz_divexact(&g->b, &g->b, t);
 
         if (fmpz_sgn(&g->c) < 0)
-            fmpz_neg(&g->c, &g->c);
+            fmpz_inplace_neg(&g->c);
         else
-            fmpz_neg(&g->b, &g->b);
+            fmpz_inplace_neg(&g->b);
 
         if (fmpz_is_zero(&g->c) && fmpz_sgn(&g->d) < 0)
         {
-            fmpz_neg(&g->a, &g->a);
-            fmpz_neg(&g->b, &g->b);
-            fmpz_neg(&g->c, &g->c);
-            fmpz_neg(&g->d, &g->d);
+            fmpz_inplace_neg(&g->a);
+            fmpz_inplace_neg(&g->b);
+            fmpz_inplace_neg(&g->c);
+            fmpz_inplace_neg(&g->d);
         }
 
         fmpz_clear(t);

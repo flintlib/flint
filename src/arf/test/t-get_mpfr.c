@@ -90,7 +90,7 @@ TEST_FUNCTION_START(arf_get_mpfr, state)
 
         mpfr_clear_flags();
 
-        fmpz_neg(e, e);
+        fmpz_inplace_neg(e);
 
         arf_set_si(x, 1);
         arf_mul_2exp_fmpz(x, x, e);

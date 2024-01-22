@@ -98,9 +98,9 @@ void _fmpz_mat22_shortest_l_infinity(
     fmpz_add(v22, v22, v21);
     fmpz_fdiv_q_2exp(v22, v22, 1);
     if (m->det < 0)
-        fmpz_neg(v12, v12);
+        fmpz_inplace_neg(v12);
     else
-        fmpz_neg(v22, v22);
+        fmpz_inplace_neg(v22);
     fmpz_mul(v11, m->_11, c);
     fmpz_mul(v21, m->_12, c);
 

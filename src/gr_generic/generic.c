@@ -383,7 +383,7 @@ int gr_generic_sub_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
     fmpz_t t;
     fmpz_init(t);
     fmpz_set_si(t, y);
-    fmpz_neg(t, t);
+    fmpz_inplace_neg(t);
     status = gr_add_fmpz(res, x, t, ctx);
     fmpz_clear(t);
     return status;

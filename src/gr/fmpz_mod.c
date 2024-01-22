@@ -432,7 +432,7 @@ _gr_fmpz_mod_vec_dot(fmpz_t res, const fmpz_t initial, int subtract, const fmpz 
         fmpz_addmul(res, vec1 + i, vec2 + i);
 
     if (subtract)
-        fmpz_neg(res, res);
+        fmpz_inplace_neg(res);
 
     fmpz_mod_set_fmpz(res, res, FMPZ_MOD_CTX(ctx));
 
@@ -472,7 +472,7 @@ _gr_fmpz_mod_vec_dot_rev(fmpz_t res, const fmpz_t initial, int subtract, const f
         fmpz_addmul(res, vec1 + i, vec2 + len - 1 - i);
 
     if (subtract)
-        fmpz_neg(res, res);
+        fmpz_inplace_neg(res);
 
     fmpz_mod_set_fmpz(res, res, FMPZ_MOD_CTX(ctx));
 

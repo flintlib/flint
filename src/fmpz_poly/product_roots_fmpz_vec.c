@@ -30,7 +30,7 @@ _fmpz_poly_product_roots_fmpz_vec(fmpz * poly, const fmpz * xs, slong n)
         for (i = 1; i < n; i++)
         {
             fmpz_mul(poly + n - i - 1, poly + n - i, xs + i);
-            fmpz_neg(poly + n - i - 1, poly + n - i - 1);
+            fmpz_inplace_neg(poly + n - i - 1);
             for (j = 0; j < i - 1; j++)
                 fmpz_submul(poly + n - i + j, poly + n - i + j + 1, xs + i);
             fmpz_sub(poly + n - 1, poly + n - 1, xs + i);

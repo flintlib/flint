@@ -27,7 +27,7 @@ TEST_FUNCTION_START(fmpz_vec_scalar_divexact_fmpz, state)
         fmpz_init(n);
         fmpz_randtest_not_zero(n, state, 100);
         if (n_randint(state, 2))
-            fmpz_neg(n, n);
+            fmpz_inplace_neg(n);
 
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);
@@ -61,7 +61,7 @@ TEST_FUNCTION_START(fmpz_vec_scalar_divexact_fmpz, state)
         fmpz_init(n);
         fmpz_randtest_not_zero(n, state, 100);
         if (n_randint(state, 2))
-            fmpz_neg(n, n);
+            fmpz_inplace_neg(n);
 
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);

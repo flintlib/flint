@@ -56,7 +56,7 @@ inline void fmpz_set_ZZ(fmpz_t rop, const ZZ& op)
         }
 
         if (op < WORD(0))
-            fmpz_neg(rop, rop);
+            fmpz_inplace_neg(rop);
     }
 }
 

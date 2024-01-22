@@ -37,7 +37,7 @@ void fmpz_fmms(fmpz_t f, const fmpz_t a, const fmpz_t b,
     if (s == 0 || t == 0)
     {
         fmpz_mul(f, c, d);
-        fmpz_neg(f, f);
+        fmpz_inplace_neg(f);
         return;
     }
 
@@ -62,7 +62,7 @@ void fmpz_fmms(fmpz_t f, const fmpz_t a, const fmpz_t b,
         {
             fmpz_mul(f, c, d);
             fmpz_submul(f, a, b);
-            fmpz_neg(f, f);
+            fmpz_inplace_neg(f);
         }
     }
     else

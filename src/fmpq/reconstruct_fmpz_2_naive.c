@@ -53,8 +53,8 @@ _fmpq_reconstruct_fmpz_2_naive(fmpz_t n, fmpz_t d,
 
     if (fmpz_sgn(d) < 0)
     {
-        fmpz_neg(n, n);
-        fmpz_neg(d, d);
+        fmpz_inplace_neg(n);
+        fmpz_inplace_neg(d);
     }
 
     if (fmpz_cmp(d, D) <= 0)

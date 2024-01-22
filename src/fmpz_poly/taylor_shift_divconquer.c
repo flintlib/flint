@@ -130,7 +130,7 @@ _fmpz_poly_taylor_shift_divconquer(fmpz * poly, const fmpz_t c, slong len)
         if (fmpz_cmp_si(c, -1) == 0)
         {
             for (k = len1 - 1; k >= 0; k -= 2)
-                fmpz_neg(tmp + k, tmp + k);
+                fmpz_inplace_neg(tmp + k);
         }
         else
         {

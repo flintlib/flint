@@ -22,7 +22,7 @@ acb_quadratic_roots_fmpz(acb_t r1, acb_t r2,
     fmpz_mul(d, a, c);
     fmpz_mul_2exp(d, d, 2);
     fmpz_submul(d, b, b);
-    fmpz_neg(d, d);
+    fmpz_inplace_neg(d);
 
     /* +/- sqrt(d) */
     acb_zero(r1);
@@ -32,7 +32,7 @@ acb_quadratic_roots_fmpz(acb_t r1, acb_t r2,
     }
     else
     {
-        fmpz_neg(d, d);
+        fmpz_inplace_neg(d);
         arb_sqrt_fmpz(acb_imagref(r1), d, prec + fmpz_bits(d) + 4);
     }
     acb_neg(r2, r1);

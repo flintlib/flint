@@ -76,7 +76,7 @@ void _fmpq_poly_scalar_div_fmpq(fmpz * rpoly, fmpz_t rden,
     if (fmpz_sgn(rden) < 0)
     {
         _fmpz_vec_neg(rpoly, rpoly, len);
-        fmpz_neg(rden, rden);
+        fmpz_inplace_neg(rden);
     }
 
     fmpz_clear(gcd1);
@@ -128,7 +128,7 @@ void _fmpq_poly_scalar_div_fmpz(fmpz * rpoly, fmpz_t rden, const fmpz * poly,
         _fmpz_vec_content_chained(d, poly, len, c);
 
         if (fmpz_sgn(c) < 0)
-            fmpz_neg(d, d);
+            fmpz_inplace_neg(d);
         _fmpz_vec_scalar_divexact_fmpz(rpoly, poly, len, d);
         fmpz_divexact(d, c, d);
         fmpz_mul(rden, den, d);
@@ -192,7 +192,7 @@ void _fmpq_poly_scalar_div_si(fmpz * rpoly, fmpz_t rden, const fmpz * poly,
         {
             ulong q = (- (ulong) c) / fmpz_get_ui(d);
 
-            fmpz_neg(d, d);
+            fmpz_inplace_neg(d);
             _fmpz_vec_scalar_divexact_fmpz(rpoly, poly, len, d);
             fmpz_mul_ui(rden, den, q);
         }

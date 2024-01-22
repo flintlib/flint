@@ -37,7 +37,7 @@ int main(void)
       printf("Read failed\n");
       abort();
    }
-   fmpz_neg(n, n);
+   fmpz_inplace_neg(n);
 
    printf("Enter a number of iterations: "); fflush(stdout);
    if (!scanf("%ld", &iters))

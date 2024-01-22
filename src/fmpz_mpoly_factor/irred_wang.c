@@ -268,7 +268,7 @@ got_alpha:
         {
             _fmpz_vec_content(q, fac->coeffs[i].coeffs, fac->coeffs[i].length);
             if (fmpz_sgn(fac->coeffs[i].coeffs + 0) < 0)
-                fmpz_neg(q, q);
+                fmpz_inplace_neg(q);
             fmpz_mpoly_scalar_divexact_fmpz(fac->coeffs + i,
                                             fac->coeffs + i, q, ctx);
         }

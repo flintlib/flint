@@ -206,11 +206,11 @@ _fmpz_poly_div_series_basecase(fmpz * Q, const fmpz * A, slong Alen,
                 if (fmpz_is_pm1(B + 0))
                 {
                     if (fmpz_is_one(B + 0))
-                        fmpz_neg(Q + i, Q + i);
+                        fmpz_inplace_neg(Q + i);
                 }
                 else
                 {
-                    fmpz_neg(Q + i, Q + i);
+                    fmpz_inplace_neg(Q + i);
                     fmpz_divexact_checked(Q + i, Q + i, B + 0);
                 }
             }

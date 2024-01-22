@@ -606,7 +606,7 @@ static int _try_monomial_cofactors(
     fmpz_gcd(t2, gA, gB);
     fmpz_divexact(t1, gA, t2);
     if (fmpz_sgn(A->coeffs + 0) < 0)
-        fmpz_neg(t1, t1);
+        fmpz_inplace_neg(t1);
 
     /* put B's cofactor coefficient in t2 */
     fmpz_divexact(gA, A->coeffs + 0, t1);

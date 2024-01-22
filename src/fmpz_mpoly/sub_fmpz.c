@@ -24,7 +24,7 @@ void fmpz_mpoly_sub_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B,
     {
         fmpz_mpoly_set_fmpz(A, c, ctx);
         if (A->length != 0)
-            fmpz_neg(A->coeffs, A->coeffs);
+            fmpz_inplace_neg(A->coeffs);
 
         return;
     }

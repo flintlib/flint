@@ -35,7 +35,7 @@ _fmpz_poly_chebyshev_t(fmpz * coeffs, ulong n)
     fmpz_zero(coeffs);
     fmpz_set_ui(coeffs + d, d ? n : 1);
     if (n % 4 >= 2)
-        fmpz_neg(coeffs + d, coeffs + d);
+        fmpz_inplace_neg(coeffs + d);
 
     m = n / 2;
 
@@ -44,7 +44,7 @@ _fmpz_poly_chebyshev_t(fmpz * coeffs, ulong n)
         i = 2 * k + d;
         fmpz_mul2_uiui(coeffs + i, coeffs + i - 2, 4*(m-k+1), n+k-m-1);
         fmpz_divexact2_uiui(coeffs + i, coeffs + i, n+2*k-2*m-1, n+2*k-2*m);
-        fmpz_neg(coeffs + i, coeffs + i);
+        fmpz_inplace_neg(coeffs + i);
         fmpz_zero(coeffs + i - 1);
     }
 }

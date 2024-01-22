@@ -37,8 +37,8 @@ void _fmpq_canonicalise(fmpz_t num, fmpz_t den)
 
     if (fmpz_sgn(den) < 0)
     {
-        fmpz_neg(num, num);
-        fmpz_neg(den, den);
+        fmpz_inplace_neg(num);
+        fmpz_inplace_neg(den);
     }
 }
 

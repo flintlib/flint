@@ -90,7 +90,7 @@ arb_log_newton(arb_t res, const arb_t x, slong prec)
             fmpz_t q;
             fmpz_init(q);
             fmpz_set(q, ARF_EXPREF(arb_midref(x)));
-            fmpz_neg(q, q);
+            fmpz_inplace_neg(q);
             arb_mul_2exp_fmpz(t, x, q);
             arb_log_newton(res, t, prec + 5 - ebits);
             arb_const_log2(t, prec + 5);

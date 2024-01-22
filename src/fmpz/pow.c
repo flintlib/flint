@@ -50,7 +50,7 @@ fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong exp)
         }
 
         if ((c1 < WORD(0)) && (exp & 1)) /* sign is -ve if exp odd and g -ve */
-            fmpz_neg(f, f);
+            fmpz_inplace_neg(f);
     }
     else
     {

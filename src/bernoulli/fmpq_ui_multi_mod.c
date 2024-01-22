@@ -244,7 +244,7 @@ _bernoulli_fmpq_ui_multi_mod(fmpz_t num, fmpz_t den, ulong n, double alpha)
     if (n % 4 == 0)
     {
         fmpz_sub(num, M, num);
-        fmpz_neg(num, num);
+        fmpz_inplace_neg(num);
     }
 
 #if TIMING

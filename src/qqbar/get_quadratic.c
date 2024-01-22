@@ -134,7 +134,7 @@ qqbar_get_quadratic(fmpz_t res_a, fmpz_t res_b, fmpz_t res_c, fmpz_t res_q, cons
     {
         fmpz_t A, B;
 
-        fmpz_neg(D, D);
+        fmpz_inplace_neg(D);
 
         fmpz_init(A);
         fmpz_init(B);
@@ -145,7 +145,7 @@ qqbar_get_quadratic(fmpz_t res_a, fmpz_t res_b, fmpz_t res_c, fmpz_t res_q, cons
         */
         _fmpz_factor_square_root(A, B, D, factoring);
         if (fmpz_sgn(D) < 0)
-            fmpz_neg(A, A);
+            fmpz_inplace_neg(A);
 
         fmpz_set(res_c, A);
 

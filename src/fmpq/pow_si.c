@@ -40,8 +40,8 @@ void _fmpq_pow_si(fmpz_t rnum, fmpz_t rden,
 
         if (fmpz_sgn(rden) < 0)
         {
-            fmpz_neg(rnum, rnum);
-            fmpz_neg(rden, rden);
+            fmpz_inplace_neg(rnum);
+            fmpz_inplace_neg(rden);
         }
     }
 }

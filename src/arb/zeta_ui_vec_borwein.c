@@ -48,7 +48,7 @@ arb_zeta_ui_vec_borwein(arb_ptr z, ulong start, slong num, ulong step, slong pre
         fmpz_ui_pow_ui(u, k, start);
         fmpz_tdiv_q(t, d, u);
         if (k % 2 == 0)
-            fmpz_neg(t, t);
+            fmpz_inplace_neg(t);
         fmpz_add(zeta, zeta, t);
 
         /* remaining k^s */

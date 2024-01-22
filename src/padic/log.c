@@ -103,7 +103,7 @@ int padic_log(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 
         padic_get_fmpz(x, op, ctx);
         fmpz_sub_ui(x, x, 1);
-        fmpz_neg(x, x);
+        fmpz_inplace_neg(x);
 
         if (fmpz_is_zero(x))
         {

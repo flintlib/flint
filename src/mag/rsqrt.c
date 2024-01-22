@@ -60,7 +60,7 @@ mag_rsqrt(mag_t y, const mag_t x)
             if (fmpz_is_odd(MAG_EXPREF(x)))
                 t *= 2.0;
             fmpz_fdiv_q_2exp(MAG_EXPREF(y), MAG_EXPREF(x), 1);
-            fmpz_neg(MAG_EXPREF(y), MAG_EXPREF(y));
+            fmpz_inplace_neg(MAG_EXPREF(y));
             t = (1.0 / sqrt(t)) * (1 + 1e-13);
             mag_set_d_2exp_fmpz(y, t, MAG_EXPREF(y));
         }
@@ -108,7 +108,7 @@ mag_rsqrt_lower(mag_t y, const mag_t x)
             if (fmpz_is_odd(MAG_EXPREF(x)))
                 t *= 2.0;
             fmpz_fdiv_q_2exp(MAG_EXPREF(y), MAG_EXPREF(x), 1);
-            fmpz_neg(MAG_EXPREF(y), MAG_EXPREF(y));
+            fmpz_inplace_neg(MAG_EXPREF(y));
             t = (1.0 / sqrt(t)) * (1 - 1e-13);
             mag_set_d_2exp_fmpz_lower(y, t, MAG_EXPREF(y));
         }

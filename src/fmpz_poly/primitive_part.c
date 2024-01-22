@@ -20,7 +20,7 @@ _fmpz_poly_primitive_part(fmpz * res, const fmpz * poly, slong len)
     fmpz_init(x);
     _fmpz_poly_content(x, poly, len);
     if (fmpz_sgn(poly + (len - 1)) < 0)
-        fmpz_neg(x, x);
+        fmpz_inplace_neg(x);
     _fmpz_vec_scalar_divexact_fmpz(res, poly, len, x);
     fmpz_clear(x);
 }

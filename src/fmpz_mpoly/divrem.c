@@ -271,7 +271,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
                     small = 0;
                     fmpz_set_ui(q_coeff + q_len, qq);
                     if (ds != lc_sign)
-                        fmpz_neg(q_coeff + q_len, q_coeff + q_len);
+                        fmpz_inplace_neg(q_coeff + q_len);
                 }
             }
             else
@@ -641,7 +641,7 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
                     small = 0;
                     fmpz_set_ui(q_coeff + q_len, qq);
                     if (ds != lc_sign)
-                        fmpz_neg(q_coeff + q_len, q_coeff + q_len);
+                        fmpz_inplace_neg(q_coeff + q_len);
                 }
             }
             else

@@ -151,7 +151,7 @@ TEST_FUNCTION_START(fmpz_factor_trial, state)
     /* Large negative integers */
     fmpz_set_ui(x, 10);
     fmpz_pow_ui(x, x, 100);
-    fmpz_neg(x, x);
+    fmpz_inplace_neg(x);
     check(x);
     flint_mpz_fac_ui(y1, 50);
     mpz_neg(y1, y1);

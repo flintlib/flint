@@ -26,7 +26,7 @@ void fmpq_inv(fmpq_t dest, const fmpq_t src)
 
     if (fmpz_sgn(&dest->den) < 0)
     {
-        fmpz_neg(&dest->den, &dest->den);
-        fmpz_neg(&dest->num, &dest->num);
+        fmpz_inplace_neg(&dest->den);
+        fmpz_inplace_neg(&dest->num);
     }
 }

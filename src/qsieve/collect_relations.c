@@ -392,7 +392,7 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
           /* set sign */
           if (fmpz_sgn(res) < 0)
           {
-              fmpz_neg(res, res);
+              fmpz_inplace_neg(res);
               small[2] = 1;
           } else
               small[2] = 0;
