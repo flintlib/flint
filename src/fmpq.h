@@ -100,6 +100,9 @@ FMPQ_INLINE void fmpq_abs(fmpq_t dest, const fmpq_t src)
     fmpz_set(fmpq_denref(dest), fmpq_denref(src));
 }
 
+FMPQ_INLINE void fmpq_inplace_neg(fmpq_t op) { fmpz_inplace_neg(fmpq_numref(op)); }
+FMPQ_INLINE void fmpq_inplace_abs(fmpq_t op) { fmpz_inplace_abs(fmpq_numref(op)); }
+
 int _fmpq_cmp(const fmpz_t p, const fmpz_t q, const fmpz_t r, const fmpz_t s);
 int fmpq_cmp(const fmpq_t x, const fmpq_t y);
 
