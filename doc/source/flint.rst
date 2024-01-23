@@ -253,7 +253,8 @@ Input/Output
     supported types are the base types :type:`ulong`, :type:`slong`,
     :type:`fmpz_t`, :type:`fmpq_t`, :type:`mag_t`, :type:`arf_t`, :type:`arb_t`
     and :type:`acb_t` as well as the context structures for modulo arithmetic
-    :type:`nmod_t` and :type:`fmpz_mod_ctx_t`.
+    :type:`nmod_t` and :type:`fmpz_mod_ctx_t`. We also support the GMP types
+    ``mpz_t`` and ``mpq_t``.
 
     We currently support printing vectors of pointers to the following base
     types: :type:`slong`, :type:`ulong`, :type:`fmpz`, :type:`fmpq`,
@@ -280,6 +281,8 @@ Input/Output
     acb_t bacb;
     nmod_t bnmod;
     fmpz_mod_ctx_t bfmpz_mod_ctx;
+    mpz_t bmpz;
+    mpq_t bmpq;
 
     /* Initialize and set variables */
 
@@ -293,7 +296,9 @@ Input/Output
         "arb: %{arb}\n"
         "acb: %{acb}\n"
         "nmod: %{nmod}\n"
-        "fmpz_mod_ctx: %{fmpz_mod_ctx}\n",
+        "fmpz_mod_ctx: %{fmpz_mod_ctx}\n"
+        "mpz: %{mpz}\n"
+        "mpq: %{mpq}\n",
         bulong,
         bslong,
         bfmpz,
@@ -303,7 +308,9 @@ Input/Output
         barb,
         bacb,
         bnmod,
-        bfmpz_mod_ctx);
+        bfmpz_mod_ctx,
+        bmpz,
+        bmpq);
 
 .. code-block:: c
 
