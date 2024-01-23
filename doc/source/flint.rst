@@ -405,7 +405,7 @@ Input/Output
 
     This functions is an extensions of the C standard library functions
     ``sprintf``. It is currently advised to not use this function as it is
-    currently not coherent with :func:``flint_printf``.
+    currently not coherent with :func:`flint_printf`.
 
 .. function:: int flint_scanf(const char * str, ...)
               int flint_fscanf(FILE * f, const char * str, ...)
@@ -424,7 +424,7 @@ Exceptions
 
 .. function:: void flint_set_abort(void (* func)(void))
 
-    Sets the :func:``flint_abort`` function to call ``func`` instead of
+    Sets the :func:`flint_abort` function to call ``func`` instead of
     ``abort``.
 
 .. enum:: flint_err_t
