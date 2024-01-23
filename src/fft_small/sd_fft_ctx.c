@@ -13,36 +13,6 @@
 #include "fft_small.h"
 #include "nmod.h"
 
-#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
-# include <malloc.h>
-# define aligned_alloc(alignment, size) _aligned_malloc(size, alignment)
-# define free _aligned_free
-#endif
-
-void * flint_aligned_alloc(ulong alignment, ulong size)
-{
-    void * p;
-
-    FLINT_ASSERT(size % alignment == 0);
-
-    p = aligned_alloc(alignment, size);
-
-    if (p == NULL)
-        flint_throw(FLINT_ERROR, "Unable to allocate %wu bytes with alignment %wu in %s\n", size, alignment, __func__);
-
-    return p;
-}
-
-void flint_aligned_free(void * p)
-{
-    free(p);
-}
-
-#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
-# undef aligned_alloc
-# undef free
-#endif
-
 void sd_fft_ctx_clear(sd_fft_ctx_t Q)
 {
     ulong k;

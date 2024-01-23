@@ -202,19 +202,41 @@ void * flint_malloc(size_t size);
 void * flint_realloc(void * ptr, size_t size);
 void * flint_calloc(size_t num, size_t size);
 void flint_free(void * ptr);
+void * flint_aligned_alloc(size_t alignment, size_t size);
+void flint_aligned_free(void * ptr);
 
 typedef void (*flint_cleanup_function_t)(void);
 void flint_register_cleanup_function(flint_cleanup_function_t cleanup_function);
 void flint_cleanup(void);
 void flint_cleanup_master(void);
 
-void __flint_set_memory_functions(void *(*alloc_func) (size_t),
-     void *(*calloc_func) (size_t, size_t), void *(*realloc_func) (void *, size_t),
-                                                              void (*free_func) (void *));
+void __flint_set_all_memory_functions(
+        void * (* alloc_func)(size_t),
+        void * (* calloc_func)(size_t, size_t),
+        void * (* realloc_func)(void *, size_t),
+        void (* free_func)(void *),
+        void * (* aligned_alloc_func)(size_t, size_t),
+        void (* aligned_free_func)(void *));
 
-void __flint_get_memory_functions(void *(**alloc_func) (size_t),
-     void *(**calloc_func) (size_t, size_t), void *(**realloc_func) (void *, size_t),
-                                                              void (**free_func) (void *));
+void __flint_get_all_memory_functions(
+        void * (** alloc_func)(size_t),
+        void * (** calloc_func)(size_t, size_t),
+        void * (** realloc_func)(void *, size_t),
+        void (** free_func)(void *),
+        void * (** aligned_alloc_func)(size_t, size_t),
+        void (** aligned_free_func)(void *));
+
+void __flint_set_memory_functions(
+        void * (* alloc_func)(size_t),
+        void * (* calloc_func)(size_t, size_t),
+        void * (* realloc_func)(void *, size_t),
+        void (* free_func)(void *));
+
+void __flint_get_memory_functions(
+        void * (** alloc_func)(size_t),
+        void * (** calloc_func)(size_t, size_t),
+        void * (** realloc_func)(void *, size_t),
+        void (** free_func)(void *));
 
 FLINT_NORETURN void flint_abort(void);
 
