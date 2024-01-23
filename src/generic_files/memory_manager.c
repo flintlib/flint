@@ -205,7 +205,8 @@ void _flint_aligned_free(void * p)
 void _flint_aligned_free2(void * p)
 {
     size_t * ptr = p;
-    free((char *) ptr - ptr[-1]);
+    if (ptr != NULL)
+        free((char *) ptr - ptr[-1]);
 }
 
 void flint_aligned_free(void * ptr)
