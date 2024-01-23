@@ -785,7 +785,7 @@ Internal Functions
 
 .. function:: int fmpz_mpoly_divides_heap_threaded(fmpz_mpoly_t Q, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
 
-    The same method as used as in :func:``fmpz_mpoly_divides_monagan_pearce``,
+    The same method as used as in :func:`fmpz_mpoly_divides_monagan_pearce`,
     but is also multi-threaded.
 
 .. note::
@@ -796,7 +796,7 @@ Internal Functions
     ``#ifdef fmpz_mpoly_divides_heap_threaded``.
 
     Note that, if the system is known to be strongly ordered, the underlying
-    algorithm for this function is utilized in :func:``fmpz_mpoly_divides``.
+    algorithm for this function is utilized in :func:`fmpz_mpoly_divides`.
     Hence, you may find it easier to use this function instead if the C
     preprocessor is not available.
 

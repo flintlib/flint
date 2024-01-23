@@ -530,7 +530,7 @@ The division functions assume that the modulus is prime.
     ``#ifdef nmod_mpoly_divides_heap_threaded``.
 
     Note that, if the system is known to be strongly ordered, the underlying
-    algorithm for this function is utilized in :func:``nmod_mpoly_divides``.
+    algorithm for this function is utilized in :func:`nmod_mpoly_divides`.
     Hence, you may find it easier to use this function instead if the C
     preprocessor is not available.
 
