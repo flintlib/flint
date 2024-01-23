@@ -81,7 +81,7 @@ arb_hypgeom_legendre_p_ui_root_initial(arb_t res, ulong n, ulong k, slong prec)
     arb_mul(psi, psi, psi, prec);
     arb_ui_div(psi, 11, psi, prec);
     arb_sub_ui(psi, psi, 1, prec);
-    arb_neg(psi, psi);
+    arb_inplace_neg(psi);
 
     /* (destroying t) */
     arb_mul(t, t, t, prec);
@@ -219,13 +219,13 @@ arb_hypgeom_legendre_p_ui_root(arb_t res, arb_t weight, ulong n, ulong k, slong 
         arb_mul(t, t, t, wp);
         arb_mul(u, res, res, wp);
         arb_sub_ui(u, u, 1, wp);
-        arb_neg(u, u);
+        arb_inplace_neg(u);
         arb_mul(t, t, u, wp);
         arb_ui_div(weight, 2, t, prec);
     }
 
     if (sign == -1)
-        arb_neg(res, res);
+        arb_inplace_neg(res);
 
     arb_set_round(res, res, prec);
 

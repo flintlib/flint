@@ -58,7 +58,7 @@ TEST_FUNCTION_START(acb_dirichlet_platt_ws_interpolation, state)
             arb_add_fmpz(t0, t0, T, prec);
             arb_set_ui(H, 1 + n_randint(state, 10000));
             arb_div_ui(H, H, 1000, prec);
-            arb_abs(H, H);
+            arb_inplace_abs(H);
 
             acb_dirichlet_platt_scaled_lambda(expected, t0, prec);
             acb_dirichlet_platt_ws_interpolation(observed, NULL, t0, vec,

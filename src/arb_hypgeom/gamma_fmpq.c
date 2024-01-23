@@ -117,7 +117,7 @@ arb_hypgeom_gamma_fmpq_stirling(arb_t y, const fmpq_t a, slong prec)
         arb_const_pi(v, wp);
         arb_mul(u, u, v, wp);
         arb_sub_ui(t, x, 1, wp);
-        arb_neg(t, t);
+        arb_inplace_neg(t);
         arb_add_ui(t, t, r, wp);
         arb_hypgeom_gamma_stirling_inner(v, t, n, wp);
         arb_exp(v, v, wp);

@@ -40,7 +40,7 @@ arb_zeta_ui_bernoulli(arb_t x, ulong n, slong prec)
 
     arb_div(t, t, f, wp);
     arb_mul(x, x, t, wp);
-    arb_abs(x, x);
+    arb_inplace_abs(x);
     arb_mul_2exp_si(x, x, -1);
 
     arb_clear(t);

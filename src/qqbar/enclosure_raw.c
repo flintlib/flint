@@ -31,7 +31,7 @@ _qqbar_enclosure_raw(acb_t res, const fmpz_poly_t poly, const acb_t zin, slong p
     {
         arb_set_fmpz(acb_realref(res), poly->coeffs);
         arb_div_fmpz(acb_realref(res), acb_realref(res), poly->coeffs + 1, prec);
-        arb_neg(acb_realref(res), acb_realref(res));
+        arb_inplace_neg(acb_realref(res));
         arb_zero(acb_imagref(res));
         return;
     }

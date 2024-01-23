@@ -35,7 +35,7 @@ arb_asinh(arb_t z, const arb_t x, slong prec)
         {
             arb_sub(t, t, x, prec + 4);
             arb_log1p(z, t, prec);
-            arb_neg(z, z);
+            arb_inplace_neg(z);
         }
 
         arb_clear(t);

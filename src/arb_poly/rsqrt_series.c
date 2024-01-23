@@ -31,7 +31,7 @@ _arb_poly_rsqrt_series(arb_ptr g,
         arb_div(g + 1, h + 1, h, prec);
         arb_mul(g + 1, g + 1, g, prec);
         arb_mul_2exp_si(g + 1, g + 1, -1);
-        arb_neg(g + 1, g + 1);
+        arb_inplace_neg(g + 1);
     }
     else if (_arb_vec_is_zero(h + 1, hlen - 2))
     {

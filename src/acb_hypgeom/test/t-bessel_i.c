@@ -39,7 +39,7 @@ TEST_FUNCTION_START(acb_hypgeom_bessel_i, state)
         {
             arb_zero(acb_imagref(nu));
             arb_zero(acb_imagref(z));
-            arb_abs(acb_realref(nu), acb_realref(nu));
+            arb_inplace_abs(acb_realref(nu));
         }
 
         switch (n_randint(state, 3))

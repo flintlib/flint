@@ -239,7 +239,7 @@ arb_atan_arf_bb(arb_t z, const arf_t x, slong prec)
         arf_t y;
         arf_init_neg_shallow(y, x);
         arb_atan_arf_bb(z, y, prec);
-        arb_neg(z, z);
+        arb_inplace_neg(z);
         return;
     }
 

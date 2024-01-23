@@ -101,7 +101,7 @@ arb_atan(arb_t res, const arb_t x, slong prec)
                 else
                 {
                     arb_set_interval_mag(res, t, u, prec);
-                    arb_neg(res, res);
+                    arb_inplace_neg(res);
                 }
             }
             else

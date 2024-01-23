@@ -53,7 +53,7 @@ arb_euler_number_fmpz(arb_t res, const fmpz_t n, slong prec)
         arb_mul_2exp_si(res, res, 1);
 
         if (fmpz_fdiv_ui(n, 4) == 2)
-            arb_neg(res, res);
+            arb_inplace_neg(res);
 
         arb_clear(t);
         fmpz_clear(m);

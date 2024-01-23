@@ -127,7 +127,7 @@ acb_dirichlet_zeta_rs_r(acb_t res, const acb_t s, slong K, slong prec)
 
         /* p = 1 + 2(N-a) */
         arb_sub_fmpz(p, a, N, wp);
-        arb_neg(p, p);
+        arb_inplace_neg(p);
         arb_mul_2exp_si(p, p, 1);
         arb_add_ui(p, p, 1, wp);
 
@@ -197,7 +197,7 @@ acb_dirichlet_zeta_rs_r(acb_t res, const acb_t s, slong K, slong prec)
     arb_const_pi(acb_imagref(u), wp);
     arb_mul_2exp_si(acb_imagref(u), acb_imagref(u), -3);
     arb_sub(acb_realref(u), acb_realref(u), acb_imagref(u), wp);
-    arb_neg(acb_realref(u), acb_realref(u));
+    arb_inplace_neg(acb_realref(u));
     arb_sin_cos(acb_imagref(U), acb_realref(U), acb_realref(u), wp);
 
     /* S = (-1)^(N-1) * U * a^(-sigma) * S */

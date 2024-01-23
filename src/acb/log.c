@@ -49,7 +49,7 @@ acb_log(acb_t r, const acb_t z, slong prec)
             arb_log(acb_realref(r), acb_realref(r), prec);
             arb_const_pi(acb_imagref(r), prec);
             arb_mul_2exp_si(acb_imagref(r), acb_imagref(r), -1);
-            arb_neg(acb_imagref(r), acb_imagref(r));
+            arb_inplace_neg(acb_imagref(r));
         }
         else
         {

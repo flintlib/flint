@@ -165,7 +165,7 @@ TEST_FUNCTION_START(acb_elliptic_rj, state)
                     arb_one(acb_imagref(y));
                 acb_conj(z, y);
                 arb_zero(acb_imagref(x));
-                arb_abs(acb_realref(x), acb_realref(x));
+                arb_inplace_abs(acb_realref(x));
             }
 
             acb_elliptic_rj(r1, x, y, z, p, 0, prec1);

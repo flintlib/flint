@@ -53,11 +53,11 @@ arb_sin_pi(arb_t y, const arb_t x, slong prec)
             break;
         case 2:
             arb_sin(y, t, prec);
-            arb_neg(y, y);
+            arb_inplace_neg(y);
             break;
         default:
             arb_cos(y, t, prec);
-            arb_neg(y, y);
+            arb_inplace_neg(y);
             break;
     }
 
@@ -105,11 +105,11 @@ arb_cos_pi(arb_t y, const arb_t x, slong prec)
             break;
         case 1:
             arb_sin(y, t, prec);
-            arb_neg(y, y);
+            arb_inplace_neg(y);
             break;
         case 2:
             arb_cos(y, t, prec);
-            arb_neg(y, y);
+            arb_inplace_neg(y);
             break;
         default:
             arb_sin(y, t, prec);
@@ -163,16 +163,16 @@ arb_sin_cos_pi(arb_t s, arb_t c, const arb_t x, slong prec)
             break;
         case 1:
             arb_sin_cos(c, s, t, prec);
-            arb_neg(c, c);
+            arb_inplace_neg(c);
             break;
         case 2:
             arb_sin_cos(s, c, t, prec);
-            arb_neg(s, s);
-            arb_neg(c, c);
+            arb_inplace_neg(s);
+            arb_inplace_neg(c);
             break;
         default:
             arb_sin_cos(c, s, t, prec);
-            arb_neg(s, s);
+            arb_inplace_neg(s);
             break;
     }
 

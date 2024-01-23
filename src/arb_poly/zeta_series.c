@@ -86,20 +86,20 @@ _arb_poly_zeta_series(arb_ptr res, arb_srcptr h, slong hlen, const arb_t a, int 
 
         /* s3 = gamma(1-s) */
         arb_sub_ui(f, h, 1, prec);
-        arb_neg(f, f);
+        arb_inplace_neg(f);
         arb_set_si(f + 1, -1);
         _arb_poly_gamma_series(s3, f, 2, len, prec);
 
         /* s4 = zeta(1-s) */
         arb_sub_ui(f, h, 1, prec);
-        arb_neg(f, f);
+        arb_inplace_neg(f);
         acb_set_arb(cs, f);
         acb_one(ca);
         _acb_poly_zeta_cpx_series(z, cs, ca, 0, len, prec);
         for (i = 0; i < len; i++)
             arb_set(s4 + i, acb_realref(z + i));
         for (i = 1; i < len; i += 2)
-            arb_neg(s4 + i, s4 + i);
+            arb_inplace_neg(s4 + i);
 
         _arb_poly_mullow(u, s1, len, s2, len, len, prec);
         _arb_poly_mullow(s1, s3, len, s4, len, len, prec);
@@ -109,7 +109,7 @@ _arb_poly_zeta_series(arb_ptr res, arb_srcptr h, slong hlen, const arb_t a, int 
         if (deflate)
         {
             arb_sub_ui(u, h, 1, prec);
-            arb_neg(u, u);
+            arb_inplace_neg(u);
             arb_inv(u, u, prec);
             for (i = 1; i < len; i++)
                 arb_mul(u + i, u + i - 1, u, prec);

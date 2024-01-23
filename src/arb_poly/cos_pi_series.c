@@ -26,7 +26,7 @@ _arb_poly_cos_pi_series(arb_ptr g, arb_srcptr h, slong hlen, slong n, slong prec
         arb_t t;
         arb_init(t);
         arb_sin_cos_pi(t, g, h, prec);
-        arb_neg(t, t);
+        arb_inplace_neg(t);
         arb_mul(g + 1, h + 1, t, prec);  /* safe since hlen >= 2 */
         arb_const_pi(t, prec);
         arb_mul(g + 1, g + 1, t, prec);

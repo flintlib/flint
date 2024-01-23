@@ -102,7 +102,7 @@ arb_atan_newton(arb_t res, const arb_t x, slong prec)
         arb_const_pi(res, prec + 15);
         arb_mul_2exp_si(res, res, -1);
         if (sgn < 0)
-            arb_neg(res, res);
+            arb_inplace_neg(res);
         arb_sub(res, res, t, prec);
         arb_clear(t);
         return;

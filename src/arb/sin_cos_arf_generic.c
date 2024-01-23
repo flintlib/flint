@@ -47,7 +47,7 @@ arb_sin_cos_taylor_sum_rs(arb_t s, const arb_t x, slong N, int cosine, slong pre
         arb_mul(s, x, x, prec / 2 + 4);
         arb_mul_2exp_si(s, s, -1);
         arb_sub_ui(s, s, 1, prec);
-        arb_neg(s, s);
+        arb_inplace_neg(s);
     }
     else if (!cosine && N <= 5) /* x - x^3/6 */
     {
@@ -228,7 +228,7 @@ arb_sin_cos_arf_rs_generic(arb_t res_sin, arb_t res_cos, const arf_t x, slong pr
         {
             arb_mul(t, s, s, wp);
             arb_sub_ui(t, t, 1, wp);
-            arb_neg(t, t);
+            arb_inplace_neg(t);
             arb_sqrt(res_cos, t, prec);
         }
     }
@@ -256,10 +256,10 @@ arb_sin_cos_arf_rs_generic(arb_t res_sin, arb_t res_cos, const arf_t x, slong pr
         {
             arb_mul(s, s, s, wp);
             arb_sub_ui(s, s, 1, wp);
-            arb_neg(s, s);
+            arb_inplace_neg(s);
             arb_sqrtpos(res_sin, s, prec);
             if (negate)
-                arb_neg(res_sin, res_sin);
+                arb_inplace_neg(res_sin);
         }
     }
 
@@ -324,7 +324,7 @@ arb_sin_cos_arf_generic(arb_t res_sin, arb_t res_cos, const arf_t x, slong prec)
         arb_const_pi(pi4, wp);
         arb_mul_2exp_si(pi4, pi4, -2);
         arb_set_arf(t, x);
-        arb_abs(t, t);
+        arb_inplace_abs(t);
 
         arb_set_round(v, t, mag + 10);
         arb_set_round(u, pi4, mag + 10);
@@ -371,9 +371,9 @@ arb_sin_cos_arf_generic(arb_t res_sin, arb_t res_cos, const arf_t x, slong prec)
         }
 
         if (sinnegative && res_sin != NULL)
-            arb_neg(res_sin, res_sin);
+            arb_inplace_neg(res_sin);
         if (cosnegative && res_cos != NULL)
-            arb_neg(res_cos, res_cos);
+            arb_inplace_neg(res_cos);
 
         arb_clear(t);
         fmpz_clear(q);

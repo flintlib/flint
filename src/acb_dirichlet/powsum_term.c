@@ -39,7 +39,7 @@ acb_dirichlet_powsum_term(acb_ptr res, arb_t log_prev, ulong * prev,
         *prev = k;
         arb_mul(w, log_prev, acb_imagref(s), prec);
         arb_sin_cos(acb_imagref(res), acb_realref(res), w, prec);
-        arb_neg(acb_imagref(res), acb_imagref(res));
+        arb_inplace_neg(acb_imagref(res));
 
         if (critical_line)
         {
@@ -49,7 +49,7 @@ acb_dirichlet_powsum_term(acb_ptr res, arb_t log_prev, ulong * prev,
         else
         {
             arb_mul(w, acb_realref(s), log_prev, prec);
-            arb_neg(w, w);
+            arb_inplace_neg(w);
             arb_exp(w, w, prec);
             acb_mul_arb(res, res, w, prec);
         }
@@ -59,7 +59,7 @@ acb_dirichlet_powsum_term(acb_ptr res, arb_t log_prev, ulong * prev,
 
     if (len > 1)
     {
-        arb_neg(log_prev, log_prev);
+        arb_inplace_neg(log_prev);
 
         for (i = 1; i < len; i++)
         {
@@ -67,6 +67,6 @@ acb_dirichlet_powsum_term(acb_ptr res, arb_t log_prev, ulong * prev,
             acb_div_ui(res + i, res + i, i, prec);
         }
 
-        arb_neg(log_prev, log_prev);
+        arb_inplace_neg(log_prev);
     }
 }

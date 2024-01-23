@@ -124,7 +124,7 @@ acb_hypgeom_fresnel_erf_error(acb_t res1, acb_t res2, const acb_t z, slong prec)
         arb_t t;
         arb_init(t);
         arb_mul(t, acb_realref(z), acb_imagref(z), prec);
-        arb_abs(t, t);
+        arb_inplace_abs(t);
         arb_mul_2exp_si(t, t, 2);
         arb_exp(t, t, prec);
         arb_get_mag(re, t);

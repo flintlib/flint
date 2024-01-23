@@ -467,7 +467,7 @@ stieltjes_tail_bound(mag_t bound, const arb_t N, const fmpz_t n1, const acb_t al
         arb_mul_2exp_si(x, x, 1);
         arb_const_pi(y, prec);
         arb_mul(y, y, x, prec);
-        arb_neg(y, y);
+        arb_inplace_neg(y);
         arb_exp(y, y, prec);
 
         /* |log|^(n+1) */

@@ -174,7 +174,7 @@ arb_log_hypot(arb_t res, const arb_t a, const arb_t b, slong prec)
                 mag_neg_log_lower(u, u);
                 mag_neg_log(t, t);
                 arb_set_interval_mag(res, u, t, prec);
-                arb_neg(res, res);
+                arb_inplace_neg(res);
             }
             else
             {

@@ -33,7 +33,7 @@ _arb_poly_inv_series(arb_ptr Qinv,
     {
         arb_mul(Qinv + 1, Qinv, Qinv, prec);
         arb_mul(Qinv + 1, Qinv + 1, Q + 1, prec);
-        arb_neg(Qinv + 1, Qinv + 1);
+        arb_inplace_neg(Qinv + 1);
     }
     else
     {

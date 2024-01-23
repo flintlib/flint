@@ -38,7 +38,7 @@ qqbar_inv(qqbar_t res, const qqbar_t x)
 
         arb_fmpz_div_fmpz(acb_realref(QQBAR_ENCLOSURE(res)),
             QQBAR_COEFFS(res), QQBAR_COEFFS(res) + 1, QQBAR_DEFAULT_PREC);
-        arb_neg(acb_realref(QQBAR_ENCLOSURE(res)), acb_realref(QQBAR_ENCLOSURE(res)));
+        arb_inplace_neg(acb_realref(QQBAR_ENCLOSURE(res)));
         arb_zero(acb_imagref(QQBAR_ENCLOSURE(res)));
     }
     else

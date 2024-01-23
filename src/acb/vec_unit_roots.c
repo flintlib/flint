@@ -63,7 +63,7 @@ _acb_vec_unit_roots(acb_ptr res, slong n, slong len, slong prec)
         for (k = n / 4 + 1; k <= n / 2 && k < len; k++)
         {
             acb_set(res + k, res + n / 2 - k);
-            arb_neg(acb_realref(res + k), acb_realref(res + k));
+            arb_inplace_neg(acb_realref(res + k));
         }
     }
 

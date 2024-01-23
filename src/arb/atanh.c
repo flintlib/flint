@@ -26,7 +26,7 @@ arb_atanh(arb_t z, const arb_t x, slong prec)
         arb_sub_ui(t, x, 1, prec + 4);
         arb_div(t, x, t, prec + 4);
         arb_mul_2exp_si(t, t, 1);
-        arb_neg(t, t);
+        arb_inplace_neg(t);
         arb_log1p(z, t, prec);
         arb_mul_2exp_si(z, z, -1);
 

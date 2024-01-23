@@ -112,16 +112,16 @@ arb_hypgeom_sum_fmpq_imag_arb_forward(arb_t s_real, arb_t s_imag, const fmpq * a
                 }
                 else if (k % 4 == 2)
                 {
-                    arb_neg(t, t);
+                    arb_inplace_neg(t);
                     arb_fma_si(s_real, s_real, den, t, prec);
-                    arb_neg(t, t);
+                    arb_inplace_neg(t);
                     arb_mul_si(s_imag, s_imag, den, prec);
                 }
                 else
                 {
-                    arb_neg(t, t);
+                    arb_inplace_neg(t);
                     arb_fma_si(s_imag, s_imag, den, t, prec);
-                    arb_neg(t, t);
+                    arb_inplace_neg(t);
                     arb_mul_si(s_real, s_real, den, prec);
                 }
 
@@ -218,16 +218,16 @@ arb_hypgeom_sum_fmpq_imag_arb_forward(arb_t s_real, arb_t s_imag, const fmpq * a
                 }
                 else if (k % 4 == 2)
                 {
-                    arb_neg(t, t);
+                    arb_inplace_neg(t);
                     arb_fma_fmpz(s_real, s_real, den, t, prec);
-                    arb_neg(t, t);
+                    arb_inplace_neg(t);
                     arb_mul_fmpz(s_imag, s_imag, den, prec);
                 }
                 else
                 {
-                    arb_neg(t, t);
+                    arb_inplace_neg(t);
                     arb_fma_fmpz(s_imag, s_imag, den, t, prec);
-                    arb_neg(t, t);
+                    arb_inplace_neg(t);
                     arb_mul_fmpz(s_real, s_real, den, prec);
                 }
 

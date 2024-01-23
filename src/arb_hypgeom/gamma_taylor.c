@@ -431,7 +431,7 @@ arb_hypgeom_gamma_taylor(arb_t res, const arb_t x, int reciprocal, slong prec)
                 }
 
                 if (r % 2)
-                    arb_neg(res, res);
+                    arb_inplace_neg(res);
             }
         }
 

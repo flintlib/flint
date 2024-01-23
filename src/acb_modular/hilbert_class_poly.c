@@ -48,7 +48,7 @@ bsplit(arb_poly_t pol, const arb_t sqrtD,
             arb_mul(pol->coeffs, acb_realref(z), acb_realref(z), prec);
             arb_addmul(pol->coeffs, acb_imagref(z), acb_imagref(z), prec);
             arb_mul_2exp_si(pol->coeffs + 1, acb_realref(z), 1);
-            arb_neg(pol->coeffs + 1, pol->coeffs + 1);
+            arb_inplace_neg(pol->coeffs + 1);
             arb_one(pol->coeffs + 2);
             _arb_poly_set_length(pol, 3);
         }

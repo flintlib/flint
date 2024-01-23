@@ -55,7 +55,7 @@ arb_mat_lu_classical(slong * P, arb_mat_t LU, const arb_mat_t A, slong prec)
         for (j = row + 1; j < m; j++)
         {
             arb_div(e, a[j] + col, d, prec);
-            arb_neg(e, e);
+            arb_inplace_neg(e);
             _arb_vec_scalar_addmul(a[j] + col,
                 a[row] + col, n - col, e, prec);
             arb_zero(a[j] + col);

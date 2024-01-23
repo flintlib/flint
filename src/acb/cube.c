@@ -24,7 +24,7 @@ acb_cube(acb_t r, const acb_t z, slong prec)
     else if (arb_is_zero(a))
     {
         arb_pow_ui(acb_imagref(r), b, 3, prec);
-        arb_neg(acb_imagref(r), acb_imagref(r));
+        arb_inplace_neg(acb_imagref(r));
         arb_zero(acb_realref(r));
     }
     else
@@ -44,7 +44,7 @@ acb_cube(acb_t r, const acb_t z, slong prec)
 
         /* u = -(b^2 - 3a^2) */
         arb_submul_ui(u, v, 3, prec);
-        arb_neg(u, u);
+        arb_inplace_neg(u);
 
         arb_mul(acb_realref(r), t, a, prec);
         arb_mul(acb_imagref(r), u, b, prec);

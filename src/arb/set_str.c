@@ -33,7 +33,7 @@ arb_set_float_str(arb_t res, const char * inp, slong prec)
     if (inp[0] == '-')
     {
         error = arb_set_float_str(res, inp + 1, prec);
-        arb_neg(res, res);
+        arb_inplace_neg(res);
         return error;
     }
 
@@ -225,7 +225,7 @@ arb_set_str(arb_t res, const char * inp, slong prec)
             last[0] = '\0';
 
             error = arb_set_float_str(rad, first, prec);
-            arb_abs(rad, rad);
+            arb_inplace_abs(rad);
             arb_add_error(res, rad);
         }
 

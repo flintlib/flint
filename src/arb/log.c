@@ -67,7 +67,7 @@ arb_log(arb_t res, const arb_t x, slong prec)
                     mag_neg_log_lower(u, u);
                     mag_neg_log(t, t);
                     arb_set_interval_mag(res, u, t, prec);
-                    arb_neg(res, res);
+                    arb_inplace_neg(res);
                 }
                 else
                 {

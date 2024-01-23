@@ -58,7 +58,7 @@ _arb_poly_digamma_series(arb_ptr res, arb_srcptr h, slong hlen, slong len, slong
             arb_const_euler(u, prec);
             arb_zeta_ui_vec(u + 1, 2, len - 1, prec);
             for (i = 0; i < len; i += 2)
-                arb_neg(u + i, u + i);
+                arb_inplace_neg(u + i);
         }
         else
         {
@@ -72,7 +72,7 @@ _arb_poly_digamma_series(arb_ptr res, arb_srcptr h, slong hlen, slong len, slong
             arb_const_euler(u, prec);
             arb_zeta_ui_vec(u + 1, 2, len - 1, prec);
             for (i = 0; i < len; i += 2)
-                arb_neg(u + i, u + i);
+                arb_inplace_neg(u + i);
 
             _arb_vec_add(u, u, t, len, wp);
         }
@@ -88,21 +88,21 @@ _arb_poly_digamma_series(arb_ptr res, arb_srcptr h, slong hlen, slong len, slong
             if (r != 0) /* otherwise t = 0 */
             {
                 arb_sub_ui(v, h, 1, wp);
-                arb_neg(v, v);
+                arb_inplace_neg(v);
                 arb_one(v + 1);
                 rflen = FLINT_MIN(len + 1, r + 1);
                 _arb_poly_rising_ui_series(u, v, 2, r, rflen, wp);
                 _arb_poly_derivative(v, u, rflen, wp);
                 _arb_poly_div_series(t, v, rflen - 1, u, rflen, len, wp);
                 for (i = 1; i < len; i += 2)
-                    arb_neg(t + i, t + i);
+                    arb_inplace_neg(t + i);
             }
 
             arb_sub_ui(zr, h, r + 1, wp);
-            arb_neg(zr, zr);
+            arb_inplace_neg(zr);
             _arb_poly_gamma_stirling_eval2(u, zr, n, len + 1, 1, wp);
             for (i = 1; i < len; i += 2)
-                arb_neg(u + i, u + i);
+                arb_inplace_neg(u + i);
 
             _arb_vec_sub(u, u, t, len, wp);
 

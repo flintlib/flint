@@ -361,7 +361,7 @@ acb_theta_ql_a0_steps(acb_ptr th, acb_srcptr t, acb_srcptr z, arb_srcptr d0,
     }
     if (res && hasz)
     {
-        arb_neg(f, f);
+        arb_inplace_neg(f);
         arb_exp(c, f, prec);
         _acb_vec_scalar_mul_arb(th + nbt * n, th + nbt * n, n * nbt, c, prec);
     }

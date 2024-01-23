@@ -38,7 +38,7 @@ arb_asin(arb_t z, const arb_t x, slong prec)
             else
             {
                 arb_const_pi(z, prec);
-                arb_neg(z, z);
+                arb_inplace_neg(z);
             }
 
             arb_mul_2exp_si(z, z, -1);

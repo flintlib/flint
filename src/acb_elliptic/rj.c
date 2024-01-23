@@ -638,7 +638,7 @@ acb_elliptic_rj_integration(acb_t res, const acb_t x, const acb_t y,
     arb_min(A, acb_realref(x), acb_realref(y), prec);
     arb_min(A, A, acb_realref(z), prec);
     arb_min(A, A, acb_realref(p), prec);
-    arb_neg(A, A);
+    arb_inplace_neg(A);
     arb_one(acb_realref(a));
     arb_max(A, A, acb_realref(a), prec);
     arb_add_ui(A, A, 2, prec);

@@ -45,7 +45,7 @@ TEST_FUNCTION_START(acb_modular_theta_jet, state)
 
         acb_randtest(z, state, prec0, e0);
         acb_randtest(tau, state, prec0, e0);
-        arb_abs(acb_imagref(tau), acb_imagref(tau));
+        arb_inplace_abs(acb_imagref(tau));
 
         for (i = 0; i < len1; i++)
         {

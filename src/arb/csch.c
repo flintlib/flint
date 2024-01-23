@@ -30,7 +30,7 @@ arb_csch(arb_t res, const arb_t x, slong prec)
             arb_mul(res, t, t, prec + 4);
             arb_sub_ui(res, res, 1, prec + 4);
             arb_div(res, t, res, prec);
-            arb_neg(res, res);
+            arb_inplace_neg(res);
         }
         else
         {

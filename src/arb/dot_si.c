@@ -32,7 +32,7 @@ arb_dot_si(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong xst
             {
                 arb_mul_si(res, x, y[0], prec);
                 if (subtract)
-                    arb_neg(res, res);
+                    arb_inplace_neg(res);
             }
             return;
         }

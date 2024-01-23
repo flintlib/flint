@@ -24,7 +24,7 @@ acb_zeta_si(acb_t z, slong s, slong prec)
     {
         arb_bernoulli_ui(acb_realref(z), 1-s, prec);
         arb_div_ui(acb_realref(z), acb_realref(z), 1-s, prec);
-        arb_neg(acb_realref(z), acb_realref(z));
+        arb_inplace_neg(acb_realref(z));
     }
 
     arb_zero(acb_imagref(z));

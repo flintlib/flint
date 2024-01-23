@@ -118,7 +118,7 @@ arb_mat_det_precond(arb_t det, const arb_mat_t A, slong prec)
 
         arb_mat_det_one_gershgorin(det, Uinv);
         if (_perm_parity(P, n))
-            arb_neg(det, det);
+            arb_inplace_neg(det);
 
         arb_div(det, det, detU, prec);
 

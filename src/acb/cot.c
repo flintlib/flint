@@ -22,7 +22,7 @@ acb_cot(acb_t r, const acb_t z, slong prec)
     else if (arb_is_zero(acb_realref(z)))
     {
         arb_coth(acb_imagref(r), acb_imagref(z), prec);
-        arb_neg(acb_imagref(r), acb_imagref(r));
+        arb_inplace_neg(acb_imagref(r));
         arb_zero(acb_realref(r));
     }
     else

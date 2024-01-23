@@ -90,7 +90,7 @@ arb_mat_approx_lu_classical(slong * P, arb_mat_t LU, const arb_mat_t A, slong pr
         for (j = row + 1; j < m; j++)
         {
             arf_mul(arb_midref(e), arb_midref(a[j] + col), d, prec, ARB_RND);
-            arb_neg(e, e);
+            arb_inplace_neg(e);
             _arb_vec_approx_scalar_addmul(a[j] + col,
                 a[row] + col, n - col, e, prec);
             arf_zero(arb_midref(a[j] + col));

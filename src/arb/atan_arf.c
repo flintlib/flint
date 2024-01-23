@@ -44,7 +44,7 @@ arb_atan_inf_eps(arb_t z, const arf_t x, slong prec)
     else
     {
         arb_const_pi(z, prec);
-        arb_neg(z, z);
+        arb_inplace_neg(z);
     }
 
     arb_mul_2exp_si(z, z, -1);
@@ -71,7 +71,7 @@ arb_atan_arf(arb_t z, const arf_t x, slong prec)
         {
             arb_const_pi(z, prec);
             arb_mul_2exp_si(z, z, -1);
-            arb_neg(z, z);
+            arb_inplace_neg(z);
         }
         else
         {
@@ -115,7 +115,7 @@ arb_atan_arf(arb_t z, const arf_t x, slong prec)
             arb_const_pi(z, prec);
             arb_mul_2exp_si(z, z, -2);
             if (negative)
-                arb_neg(z, z);
+                arb_inplace_neg(z);
             return;
         }
 

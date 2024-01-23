@@ -114,7 +114,7 @@ arb_hypgeom_erf_1f1b(arb_t res, const arb_t z, slong prec)
     mag_exp_tail(err, err, N);
     arb_add_error_mag(u, err);
 
-    arb_neg(t, t);
+    arb_inplace_neg(t);
     arb_exp(t, t, prec);
     arb_mul(u, u, t, prec);
     arb_const_sqrt_pi(t, prec);
@@ -161,7 +161,7 @@ arb_hypgeom_erf_asymp(arb_t res, const arb_t z, slong N, int complementary, slon
     sgn = arf_sgn(arb_midref(z));
 
     arb_sqr(t, z, prec2);
-    arb_neg(t, t);
+    arb_inplace_neg(t);
     _arb_hypgeom_gamma_upper_sum_rs_1(u, 1, 2, t, N, prec2);
 
     /* Error is bounded by first omitted term, rf(1/2,N) / z^(2N) <= N! / z^(2N) */
@@ -185,7 +185,7 @@ arb_hypgeom_erf_asymp(arb_t res, const arb_t z, slong N, int complementary, slon
         else
             arb_add_ui(res, res, 1, prec);
 
-        arb_neg(res, res);
+        arb_inplace_neg(res);
     }
 
     arb_clear(t);
@@ -429,14 +429,14 @@ arb_hypgeom_erf_bb(arb_t res, const arb_t z, int complementary, slong prec)
         if (sgn < 0)
         {
             arb_sub_ui(res, res, 2, prec);
-            arb_neg(res, res);
+            arb_inplace_neg(res);
         }
     }
     else
     {
         arb_sub_ui(res, res, 1, prec);
         if (sgn > 0)
-            arb_neg(res, res);
+            arb_inplace_neg(res);
     }
 
     mag_clear(tol);
@@ -563,7 +563,7 @@ arb_hypgeom_erfc(arb_t res, const arb_t z, slong prec)
     {
         arb_hypgeom_erf(res, z, prec + 5);
         arb_sub_ui(res, res, 1, prec);
-        arb_neg(res, res);
+        arb_inplace_neg(res);
         return;
     }
 
@@ -635,5 +635,5 @@ arb_hypgeom_erfc(arb_t res, const arb_t z, slong prec)
 
     arb_hypgeom_erf_1f1(res, z, wp, wp);
     arb_sub_ui(res, res, 1, prec);
-    arb_neg(res, res);
+    arb_inplace_neg(res);
 }

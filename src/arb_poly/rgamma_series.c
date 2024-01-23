@@ -46,11 +46,11 @@ _arb_poly_rgamma_series(arb_ptr res, arb_srcptr h, slong hlen, slong len, slong 
 
         /* use res[0] as tmp to allow aliasing */
         arb_sub_ui(res, h, 1, prec);
-        arb_neg(res, res);
+        arb_inplace_neg(res);
         arb_gamma(res, res, prec);
         arb_mul(res + 1, h + 1, res, prec);
         if (!even)
-            arb_neg(res + 1, res + 1);
+            arb_inplace_neg(res + 1);
 
         arb_zero(res);
         return;
@@ -108,11 +108,11 @@ _arb_poly_rgamma_series(arb_ptr res, arb_srcptr h, slong hlen, slong len, slong 
         {
             /* u = gamma(r+1-h) */
             arb_sub_ui(f, h, r + 1, wp);
-            arb_neg(f, f);
+            arb_inplace_neg(f);
             _arb_poly_gamma_stirling_eval(t, f, n, len, wp);
             _arb_poly_exp_series(u, t, len, len, wp);
             for (i = 1; i < len; i += 2)
-                arb_neg(u + i, u + i);
+                arb_inplace_neg(u + i);
 
             /* v = sin(pi x) */
             arb_set(f, h);
@@ -130,7 +130,7 @@ _arb_poly_rgamma_series(arb_ptr res, arb_srcptr h, slong hlen, slong len, slong 
             else
             {
                 arb_sub_ui(f, h, 1, wp);
-                arb_neg(f, f);
+                arb_inplace_neg(f);
                 arb_set_si(f + 1, -1);
                 rflen = FLINT_MIN(len, r + 1);
                 _arb_poly_rising_ui_series(v, f, FLINT_MIN(2, len), r, rflen, wp);

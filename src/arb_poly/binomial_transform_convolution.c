@@ -25,7 +25,7 @@ _arb_poly_binomial_transform_convolution(arb_ptr b, arb_srcptr a, slong alen, sl
 
     _arb_poly_borel_transform(c, a, alen, prec);
     for (i = 1; i < alen; i += 2)
-        arb_neg(c + i, c + i);
+        arb_inplace_neg(c + i);
 
     arb_one(d);
     for (i = 1; i < len; i++)

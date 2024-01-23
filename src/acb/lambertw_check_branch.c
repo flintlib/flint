@@ -43,13 +43,13 @@ _acb_lambertw_check_branch(const acb_t w, const fmpz_t k, slong prec)
         arb_cos(v, acb_imagref(w), prec);
     }
     arb_mul(t, t, acb_realref(w), prec);
-    arb_neg(v, v);
+    arb_inplace_neg(v);
 
     /* u = y / pi, with conjugate relation for k */
     arb_const_pi(u, prec);
     arb_div(u, acb_imagref(w), u, prec);
     if (fmpz_sgn(k) < 0)
-        arb_neg(u, u);
+        arb_inplace_neg(u);
 
     if (fmpz_is_zero(k))
     {
@@ -65,7 +65,7 @@ _acb_lambertw_check_branch(const acb_t w, const fmpz_t k, slong prec)
     else
     {
         arb_set_fmpz(a, k);
-        arb_abs(a, a);
+        arb_inplace_abs(a);
         arb_mul_2exp_si(a, a, 1);
         arb_add_ui(b, a, 1, prec);
         arb_sub_ui(a, a, 2, prec);

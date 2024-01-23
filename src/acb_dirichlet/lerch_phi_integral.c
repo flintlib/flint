@@ -47,7 +47,7 @@ integral_tail(mag_t bound, const acb_t z, const acb_t log_z, const acb_t s, cons
             arb_div(C, s1, C, prec);
             arb_mul_2exp_si(C, C, 1);
             arb_mul(s1, acb_realref(a), R, prec);
-            arb_neg(s1, s1);
+            arb_inplace_neg(s1);
             arb_exp(s1, s1, prec);
             arb_mul(C, C, s1, prec);
             arb_get_mag(bound, C);
@@ -363,7 +363,7 @@ _acb_dirichlet_lerch_phi_integral(acb_t res, const acb_t z, const acb_t s, const
 
                 /* max(0, -re(log(z))) + 1 */
                 arb_get_lbound_arf(arb_midref(left), acb_realref(log_z), prec);
-                arb_neg(left, left);
+                arb_inplace_neg(left);
                 if (arf_sgn(arb_midref(left)) < 0)
                     arb_one(left);
                 else
@@ -378,8 +378,8 @@ _acb_dirichlet_lerch_phi_integral(acb_t res, const acb_t z, const acb_t s, const
             }
         }
 
-        arb_neg(left, left);
-        arb_neg(bottom, bottom);
+        arb_inplace_neg(left);
+        arb_inplace_neg(bottom);
 
         acb_zero(t);
 

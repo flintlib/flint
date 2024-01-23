@@ -260,7 +260,7 @@ arb_lambertw_halley_step(arb_t res, const arb_t x, const arf_t w,
            compute e^t = e^w e^(t-w). */
         arb_set_arf(et, w);
         arb_sub_arf(et, et, t, prec);
-        arb_neg(et, et);
+        arb_inplace_neg(et);
         arb_exp(et, et, prec);
         arb_mul(et, et, ew, prec);
         arb_lambertw_bound_error(err, x, t, et, branch, prec);
@@ -439,7 +439,7 @@ arb_lambertw_initial(arf_t res, const arf_t x, int branch, slong prec)
         arb_mul_2exp_si(v, v, 1);
         arb_sqrt(v, v, wp);
         if (branch)
-            arb_neg(v, v);
+            arb_inplace_neg(v);
 
         for (k = 8; k >= 0; k--)
         {

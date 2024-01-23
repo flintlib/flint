@@ -108,7 +108,7 @@ bernoulli_rev_next(fmpz_t numer, fmpz_t denom, bernoulli_rev_t iter)
     arith_bernoulli_number_denom(denom, n);
     arb_mul_fmpz(z, z, denom, wp);
     if (n % 4 == 0)
-        arb_neg(z, z);
+        arb_inplace_neg(z);
 
     /* flint_printf("%wd: ", n); arb_printd(z, 5); flint_printf("\n"); */
 

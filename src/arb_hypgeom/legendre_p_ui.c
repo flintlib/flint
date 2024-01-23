@@ -99,9 +99,9 @@ arb_hypgeom_legendre_p_ui(arb_t res, arb_t res_prime, ulong n, const arb_t x, sl
         arb_neg(t, x);
         arb_hypgeom_legendre_p_ui(res, res_prime, n, t, prec);
         if (n % 2 == 1 && res != NULL)
-            arb_neg(res, res);
+            arb_inplace_neg(res);
         if (n % 2 == 0 && res_prime != NULL)
-            arb_neg(res_prime, res_prime);
+            arb_inplace_neg(res_prime);
         arb_clear(t);
         return;
     }
@@ -196,7 +196,7 @@ arb_hypgeom_legendre_p_ui(arb_t res, arb_t res_prime, ulong n, const arb_t x, sl
 
     arb_mul(x2sub1, x, x, 2 * prec);
     arb_sub_ui(x2sub1, x2sub1, 1, prec + 10);
-    arb_neg(x2sub1, x2sub1);
+    arb_inplace_neg(x2sub1);
 
     /* use series at 1 unless |x| < 1-eps */
     if (!arb_is_negative(xsub1) ||

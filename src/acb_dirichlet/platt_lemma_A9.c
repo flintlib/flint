@@ -110,7 +110,7 @@ _platt_lemma_A9_b(arb_t out,
     arb_sqr(x2, t0, prec);
     arb_mul_2exp_si(x2, x2, 2);
     arb_sub_ui(x2, x2, 1, prec);
-    arb_neg(x2, x2);
+    arb_inplace_neg(x2);
     arb_div(x2, x2, h, prec);
     arb_div(x2, x2, h, prec);
     arb_mul_2exp_si(x2, x2, -3);

@@ -71,12 +71,12 @@ arb_erfinv_approx_huge(arb_t res, const arb_t one_minus_x, slong prec)
     arb_const_sqrt_pi(eta, prec);
     arb_mul(eta, eta, one_minus_x, prec);
     arb_log(eta, eta, prec);
-    arb_neg(eta, eta);
+    arb_inplace_neg(eta);
     arb_log(l, eta, prec);
     arb_mul_ui(y, eta, 12, prec);
     arb_inv(y, y, prec);
     arb_mul_2exp_si(poly + 0, l, -1);
-    arb_neg(poly + 0, poly + 0);
+    arb_inplace_neg(poly + 0);
     c[0] = -2 * 3; c[1] = 3;
     _arb_fmpz_poly_evaluate_arb(poly + 1, c, 2, l, prec);
     c[0] = 14 * 9; c[1] = -6 * 9; c[2] = 9;
@@ -364,7 +364,7 @@ arb_hypgeom_erfinv(arb_t res, const arb_t x, slong prec)
     {
         arb_neg(res, x);
         arb_hypgeom_erfinv(res, res, prec);
-        arb_neg(res, res);
+        arb_inplace_neg(res);
         return;
     }
 
@@ -380,12 +380,12 @@ arb_hypgeom_erfinv(arb_t res, const arb_t x, slong prec)
     if (near_one)
     {
         arb_sub_ui(x1, x, 1, ARF_PREC_EXACT);
-        arb_neg(x1, x1);
+        arb_inplace_neg(x1);
     }
     else
     {
         arb_sub_ui(x1, x, 1, prec + 30);
-        arb_neg(x1, x1);
+        arb_inplace_neg(x1);
     }
 
     if (arb_is_positive(x1))
@@ -413,12 +413,12 @@ arb_hypgeom_erfinv(arb_t res, const arb_t x, slong prec)
         if (near_one)
         {
             arb_sub_ui(x1, xm, 1, ARF_PREC_EXACT);
-            arb_neg(x1, x1);
+            arb_inplace_neg(x1);
         }
         else
         {
             arb_sub_ui(x1, xm, 1, prec + 30);
-            arb_neg(x1, x1);
+            arb_inplace_neg(x1);
         }
 
         arb_hypgeom_erfinv_precise(res, xm, x1, near_one, prec);
@@ -471,7 +471,7 @@ arb_hypgeom_erfcinv(arb_t res, const arb_t x1, slong prec)
 
         arb_get_mid_arb(x1m, x1);
         arb_sub_ui(xm, x1m, 1, 2 * prec + 100);
-        arb_neg(xm, xm);
+        arb_inplace_neg(xm);
 
         arb_hypgeom_erfinv_precise(res, xm, x1m, 1, prec);
         arb_add_error_mag(res, err);
@@ -483,7 +483,7 @@ arb_hypgeom_erfcinv(arb_t res, const arb_t x1, slong prec)
     else
     {
         arb_sub_ui(x, x1, 1, 2 * prec + 100);
-        arb_neg(x, x);
+        arb_inplace_neg(x);
         arb_hypgeom_erfinv(res, x, prec);
     }
 

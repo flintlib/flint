@@ -97,7 +97,7 @@ acb_dirichlet_root(acb_t z, const acb_dirichlet_roots_t t, ulong k, slong prec)
     if (swap)
         arb_swap(acb_realref(z), acb_imagref(z));
     if (flip)
-        arb_neg(acb_realref(z), acb_realref(z));
+        arb_inplace_neg(acb_realref(z));
     if (conjugate)
-        arb_neg(acb_imagref(z), acb_imagref(z));
+        arb_inplace_neg(acb_imagref(z));
 }

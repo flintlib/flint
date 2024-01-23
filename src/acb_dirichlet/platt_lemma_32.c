@@ -39,7 +39,7 @@ acb_dirichlet_platt_lemma_32(arb_t out, const arb_t h, const arb_t t0,
 
     arb_mul(out, pi, x, prec);
     arb_add(out, out, x2, prec);
-    arb_neg(out, out);
+    arb_inplace_neg(out);
     arb_exp(out, out, prec);
     arb_mul(out, out, x1, prec);
 

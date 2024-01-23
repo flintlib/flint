@@ -261,7 +261,7 @@ arb_div_wide(arb_t z, const arb_t x, const arb_t y, slong prec)
             if ((arf_sgn(arb_midref(x)) < 0) ^ (arf_sgn(arb_midref(y)) < 0))
             {
                 arb_set_interval_mag(z, a, b, prec);
-                arb_neg(z, z);
+                arb_inplace_neg(z);
             }
             else
             {

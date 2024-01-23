@@ -94,7 +94,7 @@ acb_theta_naive_radius(arf_t R2, arf_t eps, const arb_mat_t C, slong ord, slong 
 
     /* Solve R2^((g-1)/2+ord) exp(-R2) \leq b */
     arb_log(b, b, lp);
-    arb_neg(b, b);
+    arb_inplace_neg(b);
     invert_lin_plus_log(R2, g - 1 + 2 * ord, b, lp);
 
     /* Max with 4, 2*ord for formula to be valid */

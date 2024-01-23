@@ -66,7 +66,7 @@ arb_hypgeom_legendre_p_ui_rec(arb_t res, arb_t res_prime, ulong n, const arb_t x
     wp += prec + 2 * FLINT_BIT_COUNT(n + 2); /* (n+2)^2 >= 0.75(n+1)(n+2)+1 */
 
     arb_mul(x2sub1, x, x, ARF_PREC_EXACT);
-    arb_neg(x2sub1, x2sub1);
+    arb_inplace_neg(x2sub1);
     arb_add_ui(x2sub1, x2sub1, 1, wp);
 
     error = arf_get_fmpz_fixed_si(fxx, arb_midref(x), -wp);

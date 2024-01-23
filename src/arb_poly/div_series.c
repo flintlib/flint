@@ -30,7 +30,7 @@ _arb_poly_div_series(arb_ptr Q, arb_srcptr A, slong Alen,
             arb_div(Q, A, B, prec);
             arb_div(Q + 1, Q, B, prec);
             arb_mul(Q + 1, Q + 1, B + 1, prec);
-            arb_neg(Q + 1, Q + 1);
+            arb_inplace_neg(Q + 1);
         }
         else
         {

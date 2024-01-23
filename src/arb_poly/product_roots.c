@@ -28,18 +28,18 @@ _arb_poly_product_roots(arb_ptr poly, arb_srcptr xs, slong n, slong prec)
     {
         arb_mul(poly, xs + 0, xs + 1, prec);
         arb_add(poly + 1, xs + 0, xs + 1, prec);
-        arb_neg(poly + 1, poly + 1);
+        arb_inplace_neg(poly + 1);
         arb_one(poly + 2);
     }
     else if (n == 3)
     {
         arb_mul(poly + 1, xs, xs + 1, prec);
         arb_mul(poly, poly + 1, xs + 2, prec);
-        arb_neg(poly, poly);
+        arb_inplace_neg(poly);
         arb_add(poly + 2, xs, xs + 1, prec);
         arb_addmul(poly + 1, poly + 2, xs + 2, prec);
         arb_add(poly + 2, poly + 2, xs + 2, prec);
-        arb_neg(poly + 2, poly + 2);
+        arb_inplace_neg(poly + 2);
         arb_one(poly + 3);
     }
     else

@@ -29,18 +29,18 @@ _arb_poly_product_roots_complex(arb_ptr poly, arb_srcptr r, slong rn,
     {
         arb_mul(poly, r + 0, r + 1, prec);
         arb_add(poly + 1, r + 0, r + 1, prec);
-        arb_neg(poly + 1, poly + 1);
+        arb_inplace_neg(poly + 1);
         arb_one(poly + 2);
     }
     else if (rn == 3 && cn == 0)
     {
         arb_mul(poly + 1, r, r + 1, prec);
         arb_mul(poly, poly + 1, r + 2, prec);
-        arb_neg(poly, poly);
+        arb_inplace_neg(poly);
         arb_add(poly + 2, r, r + 1, prec);
         arb_addmul(poly + 1, poly + 2, r + 2, prec);
         arb_add(poly + 2, poly + 2, r + 2, prec);
-        arb_neg(poly + 2, poly + 2);
+        arb_inplace_neg(poly + 2);
         arb_one(poly + 3);
     }
     else if (rn == 0 && cn == 1)
@@ -48,7 +48,7 @@ _arb_poly_product_roots_complex(arb_ptr poly, arb_srcptr r, slong rn,
         arb_mul(poly, acb_realref(c), acb_realref(c), prec);
         arb_addmul(poly, acb_imagref(c), acb_imagref(c), prec);
         arb_mul_2exp_si(poly + 1, acb_realref(c), 1);
-        arb_neg(poly + 1, poly + 1);
+        arb_inplace_neg(poly + 1);
         arb_one(poly + 2);
     }
     else if (rn == 1 && cn == 1)
@@ -56,11 +56,11 @@ _arb_poly_product_roots_complex(arb_ptr poly, arb_srcptr r, slong rn,
         arb_mul(poly + 1, acb_realref(c), acb_realref(c), prec);
         arb_addmul(poly + 1, acb_imagref(c), acb_imagref(c), prec);
         arb_mul(poly, poly + 1, r, prec);
-        arb_neg(poly, poly);
+        arb_inplace_neg(poly);
         arb_mul_2exp_si(poly + 2, acb_realref(c), 1);
         arb_addmul(poly + 1, poly + 2, r, prec);
         arb_add(poly + 2, poly + 2, r, prec);
-        arb_neg(poly + 2, poly + 2);
+        arb_inplace_neg(poly + 2);
         arb_one(poly + 3);
     }
     else

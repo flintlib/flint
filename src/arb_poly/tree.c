@@ -71,7 +71,7 @@ _arb_poly_tree_build(arb_ptr * tree, arb_srcptr roots, slong len, slong prec)
 
             arb_mul(pa + (3 * i), a, b, prec);
             arb_add(pa + (3 * i + 1), a, b, prec);
-            arb_neg(pa + (3 * i + 1), pa + (3 * i + 1));
+            arb_inplace_neg(pa + (3 * i + 1));
             arb_one(pa + (3 * i + 2));
         }
 

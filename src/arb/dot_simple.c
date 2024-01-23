@@ -43,5 +43,5 @@ arb_dot_simple(arb_t res, const arb_t initial, int subtract,
         arb_addmul(res, x + i * xstep, y + i * ystep, prec);
 
     if (subtract)
-        arb_neg(res, res);
+        arb_inplace_neg(res);
 }

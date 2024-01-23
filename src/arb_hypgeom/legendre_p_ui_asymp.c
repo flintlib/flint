@@ -310,7 +310,7 @@ arb_hypgeom_legendre_p_ui_asymp(arb_t res, arb_t res2, ulong n, const arb_t x, s
     /* w = 1 - (x/y)i */
     arb_one(acb_realref(w));
     arb_div(acb_imagref(w), x, y, prec);
-    arb_neg(acb_imagref(w), acb_imagref(w));
+    arb_inplace_neg(acb_imagref(w));
 
     acb_mul_2exp_si(w, w, -2);
     _acb_vec_set_powers(w4pow, w, m + 1, prec);
@@ -344,7 +344,7 @@ arb_hypgeom_legendre_p_ui_asymp(arb_t res, arb_t res2, ulong n, const arb_t x, s
         /* P' = n (P[n-1] - x P) / (1 - x^2) */
         arb_submul(u, t, x, prec);
         arb_mul(v, x, x, 2 * prec);
-        arb_neg(v, v);
+        arb_inplace_neg(v);
         arb_add_ui(v, v, 1, prec);
         arb_div(u, u, v, prec);
         arb_mul_ui(res2, u, n, prec);

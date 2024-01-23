@@ -156,7 +156,7 @@ acb_hypgeom_log_rising_ui_jet(acb_ptr res, const acb_t z, ulong r, slong len, sl
             arb_init(u);
 
             arb_floor(u, acb_realref(z), prec);
-            arb_neg(u, u);
+            arb_inplace_neg(u);
 
             arb_set_ui(t, r);
             arb_min(u, u, t, prec);

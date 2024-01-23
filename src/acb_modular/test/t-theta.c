@@ -35,7 +35,7 @@ TEST_FUNCTION_START(acb_modular_theta, state)
 
         acb_randtest(tau, state, prec0, e0);
         acb_randtest(z, state, prec0, e0);
-        arb_abs(acb_imagref(tau), acb_imagref(tau));
+        arb_inplace_abs(acb_imagref(tau));
 
         if (n_randint(state, 3) == 0)
             arb_set_si(acb_realref(tau), -10 + n_randint(state, 20));

@@ -24,7 +24,7 @@ acb_exp_pi_i(acb_t r, const acb_t z, slong prec)
     {
         arb_const_pi(acb_realref(r), prec);
         arb_mul(acb_realref(r), acb_realref(r), b, prec);
-        arb_neg(acb_realref(r), acb_realref(r));
+        arb_inplace_neg(acb_realref(r));
         arb_exp(acb_realref(r), acb_realref(r), prec);
         arb_zero(acb_imagref(r));
     }
@@ -38,7 +38,7 @@ acb_exp_pi_i(acb_t r, const acb_t z, slong prec)
 
         arb_const_pi(t, prec);
         arb_mul(t, t, b, prec);
-        arb_neg(t, t);
+        arb_inplace_neg(t);
         arb_exp(t, t, prec);
 
         arb_sin_cos_pi(u, v, a, prec);

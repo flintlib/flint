@@ -46,7 +46,7 @@ acb_dirichlet_zeta_rs_mid(acb_t res, const acb_t s, slong K, slong prec)
     {
         /* conj(R(conj(1-s))) */
         arb_sub_ui(acb_realref(t), acb_realref(s), 1, 10 * wp);
-        arb_neg(acb_realref(t), acb_realref(t));
+        arb_inplace_neg(acb_realref(t));
         arb_set(acb_imagref(t), acb_imagref(s));
         acb_dirichlet_zeta_rs_r(R2, t, K, wp);
         acb_conj(R2, R2);

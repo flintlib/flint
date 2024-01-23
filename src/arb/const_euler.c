@@ -239,7 +239,7 @@ euler_bsplit_2_basecase(euler_bsplit_2_t s, slong n1, slong n2, bsplit_args_t * 
         else
         {
             arb_si_pow_ui(P, 1 - 2*n1, 3, wp);
-            arb_neg(P, P);
+            arb_inplace_neg(P);
 
             arb_set_si(Q, 32 * n1);
             arb_mul_ui(Q, Q, N, wp);

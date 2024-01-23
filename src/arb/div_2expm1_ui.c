@@ -56,7 +56,7 @@ arb_div_2expm1_ui(arb_t y, const arb_t x, ulong n, slong prec)
 
         /* error bound: sum_{k>b} x * 2^(-k*n) <= x * 2^(-b*n - (n-1)) */
         arb_mul_2exp_si(t, x, -b*n - (n-1));
-        arb_abs(t, t);
+        arb_inplace_abs(t);
         arb_add_error(s, t);
 
         arb_set(y, s);

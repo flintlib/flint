@@ -74,7 +74,7 @@ acb_theta_naive_reduce_one(arb_ptr v, acb_ptr new_z, arb_ptr a, acb_t c, arb_t u
 
     arb_const_pi(u, prec);
     arb_mul(u, u, acb_imagref(c), prec);
-    arb_neg(u, u);
+    arb_inplace_neg(u);
     arb_exp(u, u, prec);
 
     /* Round to nearest vector a = 0 mod 2 to not mess with characteristics */

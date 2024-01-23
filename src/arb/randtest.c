@@ -59,7 +59,7 @@ arb_randtest_positive(arb_t x, flint_rand_t state, slong prec, slong mag_bits)
     }
     if (!arb_is_positive(x))
     {
-        arb_neg(x, x);
+        arb_inplace_neg(x);
     }
 }
 

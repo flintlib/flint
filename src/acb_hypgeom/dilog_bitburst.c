@@ -46,7 +46,7 @@ acb_hypgeom_dilog_bitburst(acb_t res, acb_t z0, const acb_t z, slong prec)
     acb_init(u);
 
     acb_sub_ui(t, z, 1, 30);
-    arb_abs(acb_imagref(t), acb_imagref(t));
+    arb_inplace_abs(acb_imagref(t));
 
     /* we don't want to end up on the branch cut */
     if (arb_contains_nonnegative(acb_realref(t))

@@ -63,7 +63,7 @@ acb_hypgeom_ci_asymp(acb_t res, const acb_t z, slong prec)
         {
             arb_const_pi(acb_imagref(t), prec);
             arb_mul_2exp_si(acb_imagref(t), acb_imagref(t), -1);
-            arb_neg(acb_imagref(t), acb_imagref(t));
+            arb_inplace_neg(acb_imagref(t));
         }
         else
         {

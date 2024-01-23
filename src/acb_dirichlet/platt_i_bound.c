@@ -112,7 +112,7 @@ acb_dirichlet_platt_i_bound_precomp(arb_t res,
     arb_sqr(x1, t0, prec);
     arb_mul_2exp_si(x1, x1, 2);
     arb_sub_ui(x1, x1, 1, prec);
-    arb_neg(x1, x1);
+    arb_inplace_neg(x1);
     arb_div(x1, x1, H, prec);
     arb_div(x1, x1, H, prec);
     arb_mul_2exp_si(x1, x1, -3);

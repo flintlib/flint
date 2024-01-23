@@ -26,7 +26,7 @@ acb_cot_pi(acb_t r, const acb_t z, slong prec)
         arb_const_pi(t, prec + 4);
         arb_mul(t, acb_imagref(z), t, prec + 4);
         arb_coth(acb_imagref(r), t, prec);
-        arb_neg(acb_imagref(r), acb_imagref(r));
+        arb_inplace_neg(acb_imagref(r));
         arb_zero(acb_realref(r));
         arb_clear(t);
     }

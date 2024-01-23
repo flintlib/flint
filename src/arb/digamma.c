@@ -74,7 +74,7 @@ arb_digamma(arb_t y, const arb_t x, slong prec)
     if (reflect)
     {
         arb_sub_ui(t, x, 1, wp);
-        arb_neg(t, t);
+        arb_inplace_neg(t);
         arb_cot_pi(v, x, wp);
         arb_const_pi(u, wp);
         arb_mul(v, v, u, wp);

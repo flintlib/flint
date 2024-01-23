@@ -29,7 +29,7 @@ _arb_mat_companion(arb_mat_t A, arb_srcptr poly, slong prec)
 
     arb_init(c);
     arb_inv(c, poly + n, prec);
-    arb_neg(c, c);
+    arb_inplace_neg(c);
     for (j = 0; j < n; j++)
         arb_mul(arb_mat_entry(A, n - 1, j), poly + j, c, prec);
     arb_clear(c);

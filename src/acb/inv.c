@@ -62,7 +62,7 @@ acb_inv(acb_t res, const acb_t z, slong prec)
     if (arb_is_zero(acb_realref(z)))
     {
         arb_inv(acb_imagref(res), acb_imagref(z), prec);
-        arb_neg(acb_imagref(res), acb_imagref(res));
+        arb_inplace_neg(acb_imagref(res));
         arb_zero(acb_realref(res));
         return;
     }

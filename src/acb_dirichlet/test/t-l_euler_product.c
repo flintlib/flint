@@ -43,7 +43,7 @@ TEST_FUNCTION_START(acb_dirichlet_l_euler_product, state)
         else
         {
             acb_randtest(s, state, 2 + n_randint(state, 200), 2);
-            arb_abs(acb_realref(s), acb_realref(s));
+            arb_inplace_abs(acb_realref(s));
             if (n_randint(state, 2))
                 acb_add_ui(s, s, n_randtest(state), prec);
         }

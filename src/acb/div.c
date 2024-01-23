@@ -50,7 +50,7 @@ acb_div(acb_t z, const acb_t x, const acb_t y, slong prec)
         if (arb_is_zero(b))
         {
             arb_div(acb_imagref(z), a, d, prec);
-            arb_neg(acb_imagref(z), acb_imagref(z));
+            arb_inplace_neg(acb_imagref(z));
             arb_zero(acb_realref(z));
         }
         else if (arb_is_zero(a))
@@ -63,7 +63,7 @@ acb_div(acb_t z, const acb_t x, const acb_t y, slong prec)
             arb_div(acb_realref(z), a, d, prec);
             arb_div(acb_imagref(z), b, d, prec);
             arb_swap(acb_realref(z), acb_imagref(z));
-            arb_neg(acb_imagref(z), acb_imagref(z));
+            arb_inplace_neg(acb_imagref(z));
         }
         else
         {
@@ -73,7 +73,7 @@ acb_div(acb_t z, const acb_t x, const acb_t y, slong prec)
             arb_div(acb_realref(z), a, t, prec);
             arb_div(acb_imagref(z), b, t, prec);
             arb_swap(acb_realref(z), acb_imagref(z));
-            arb_neg(acb_imagref(z), acb_imagref(z));
+            arb_inplace_neg(acb_imagref(z));
             arb_clear(t);
         }
     }

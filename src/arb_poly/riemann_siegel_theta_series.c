@@ -45,7 +45,7 @@ _arb_poly_riemann_siegel_theta_series(arb_ptr res,
     arb_const_pi(u, prec);
     arb_log(u, u, prec);
     arb_mul_2exp_si(u, u, -1);
-    arb_neg(u, u);
+    arb_inplace_neg(u);
     _arb_vec_scalar_addmul(res, h, hlen, u, prec);
 
     _acb_vec_clear(s, len);

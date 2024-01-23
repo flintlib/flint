@@ -53,7 +53,7 @@ acb_sin_cos_pi(acb_t s, acb_t c, const acb_t z, slong prec)
 
         arb_mul(acb_realref(c), ca, cb, prec);
         arb_mul(acb_imagref(c), sa, sb, prec);
-        arb_neg(acb_imagref(c), acb_imagref(c));
+        arb_inplace_neg(acb_imagref(c));
 
         arb_clear(sa);
         arb_clear(ca);

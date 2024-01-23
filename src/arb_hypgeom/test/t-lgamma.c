@@ -79,7 +79,7 @@ TEST_FUNCTION_START(arb_hypgeom_lgamma, state)
             arf_set_mag(arb_midref(b), arb_radref(z));
 
             if (n_randint(state, 2))
-                arb_neg(b, b);
+                arb_inplace_neg(b);
 
             arb_add(a, a, b, prec);
         }

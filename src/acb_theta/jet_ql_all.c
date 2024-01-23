@@ -42,7 +42,7 @@ acb_theta_jet_ql_all_red(acb_ptr dth, acb_srcptr z, const acb_mat_t tau, slong o
     acb_theta_jet_ql_radius(eps, err, c, rho, ord, g, prec);
     arb_set_arf(t, eps);
     arb_log_base_ui(t, t, 2, lp);
-    arb_neg(t, t);
+    arb_inplace_neg(t);
 
     /* we expect that the second bound holds if finite, but still check */
     if (!arb_is_finite(t) || (arf_cmpabs_2exp_si(arb_midref(t), 20) > 0))

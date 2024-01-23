@@ -86,7 +86,7 @@ _arb_poly_swinnerton_dyer_ui(arb_ptr T, ulong n, slong trunc, slong prec)
         }
 
         arb_sqr(T + i, T + i, prec);
-        arb_neg(T + i, T + i);
+        arb_inplace_neg(T + i);
     }
 
     /* For each level... */

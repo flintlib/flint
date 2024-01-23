@@ -32,7 +32,7 @@ TEST_FUNCTION_START(acb_dirichlet_zeta_rs_r, state)
             arb_randtest(acb_realref(s1), state, 2 + n_randint(state, 100), 2);
 
         arb_randtest(acb_imagref(s1), state, 2 + n_randint(state, 100), 2);
-        arb_abs(acb_imagref(s1), acb_imagref(s1));
+        arb_inplace_abs(acb_imagref(s1));
         arb_add_ui(acb_imagref(s1), acb_imagref(s1), n_randtest(state) % 1000000, 100);
 
         acb_randtest(z1, state, 2 + n_randint(state, 100), 3);

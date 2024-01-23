@@ -172,8 +172,8 @@ arb_sin_cos_pi_fmpq(arb_t s, arb_t c, const fmpq_t x, slong prec)
     else
         _arb_sin_cos_pi_fmpq_oct(c, s, v, w, prec);
 
-    if ((octant + 6) % 8 < 4)  arb_neg(c, c);
-    if (octant >= 4)           arb_neg(s, s);
+    if ((octant + 6) % 8 < 4)  arb_inplace_neg(c);
+    if (octant >= 4)           arb_inplace_neg(s);
 
     fmpz_clear(v);
     fmpz_clear(w);
@@ -196,7 +196,7 @@ arb_sin_pi_fmpq(arb_t s, const fmpq_t x, slong prec)
         _arb_cos_pi_fmpq_oct(s, v, w, prec);
 
     if (octant >= 4)
-        arb_neg(s, s);
+        arb_inplace_neg(s);
 
     fmpz_clear(v);
     fmpz_clear(w);
@@ -219,7 +219,7 @@ arb_cos_pi_fmpq(arb_t c, const fmpq_t x, slong prec)
         _arb_sin_pi_fmpq_oct(c, v, w, prec);
 
     if ((octant + 6) % 8 < 4)
-        arb_neg(c, c);
+        arb_inplace_neg(c);
 
     fmpz_clear(v);
     fmpz_clear(w);

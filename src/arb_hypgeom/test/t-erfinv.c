@@ -68,7 +68,7 @@ TEST_FUNCTION_START(arb_hypgeom_erfinv, state)
             arf_set_mag(arb_midref(w), arb_radref(x));
 
             if (n_randint(state, 2))
-                arb_neg(w, w);
+                arb_inplace_neg(w);
 
             arb_add(z, z, w, prec);
         }
@@ -142,7 +142,7 @@ TEST_FUNCTION_START(arb_hypgeom_erfinv, state)
             arf_set_mag(arb_midref(w), arb_radref(x));
 
             if (n_randint(state, 2))
-                arb_neg(w, w);
+                arb_inplace_neg(w);
 
             arb_add(z, z, w, prec);
         }

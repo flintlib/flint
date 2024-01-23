@@ -49,7 +49,7 @@ _arb_gaussian(arb_t res, const arb_t a, const arb_t b, const arb_t c,
     arb_div(z, z, c, prec);
     arb_sqr(z, z, prec);
     arb_mul_2exp_si(z, z, -1);
-    arb_neg(z, z);
+    arb_inplace_neg(z);
     arb_exp(z, z, prec);
     if (a == NULL)
         arb_set(res, z);
@@ -340,7 +340,7 @@ _interpolation_helper_raw(arb_t res,
     /* x = -N/2 - A*dt0 */
     arb_mul_si(x, dt0, A, prec);
     arb_add_si(x, x, N/2, prec);
-    arb_neg(x, x);
+    arb_inplace_neg(x);
 
     /* c = sin(pi*x) / pi */
     arb_sin_pi(c, x, prec);
@@ -364,7 +364,7 @@ _interpolation_helper_raw(arb_t res,
             arb_div(b, s, a, prec);
             if (i % 2)
             {
-                arb_neg(b, b);
+                arb_inplace_neg(b);
             }
             arb_add(accum2, accum2, b, prec);
         }

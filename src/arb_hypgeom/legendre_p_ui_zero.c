@@ -120,7 +120,7 @@ _arb_hypgeom_legendre_p_ui_zero(arb_t res, ulong n,
     arb_swap(res, s);
 
     if (d % 2 == 1)
-        arb_neg(res, res);
+        arb_inplace_neg(res);
 
     if (n % 2 == 0)
     {
@@ -210,7 +210,7 @@ arb_hypgeom_legendre_p_ui_zero(arb_t res, arb_t res2, ulong n,
     xpow = _arb_vec_init(m + 1);
 
     arb_mul(v, x, x, prec);
-    arb_neg(v, v);
+    arb_inplace_neg(v);
     _arb_vec_set_powers(xpow, v, m + 1, prec);
 
     /* todo: recycle prefactor */

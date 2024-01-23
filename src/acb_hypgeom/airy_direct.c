@@ -34,7 +34,7 @@ arb_const_airy_ai1_eval(arb_t y, slong prec)
     arb_root_ui(y, y, 3, prec + 5);
     fmpq_set_si(v, 1, 3); arb_gamma_fmpq(t, v, prec + 5);
     arb_mul(y, y, t, prec + 5);
-    arb_inv(y, y, prec); arb_neg(y, y);
+    arb_inv(y, y, prec); arb_inplace_neg(y);
     arb_clear(t); fmpq_clear(v);
 }
 

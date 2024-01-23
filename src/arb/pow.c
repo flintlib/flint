@@ -33,7 +33,7 @@ _arb_pow_exp(arb_t z, const arb_t x, sign_type negx, const arb_t y, slong prec)
     arb_exp(z, t, prec);
 
     if (negx == NEGATIVE_ODD)
-        arb_neg(z, z);
+        arb_inplace_neg(z);
 
     arb_clear(t);
 }

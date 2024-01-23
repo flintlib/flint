@@ -50,7 +50,7 @@ arb_bernoulli_ui_zeta(arb_t b, ulong n, slong prec)
     arb_mul_2exp_si(b, b, 1);
 
     if (n % 4 == 0)
-        arb_neg(b, b);
+        arb_inplace_neg(b);
 
     arb_clear(t);
     arb_clear(u);

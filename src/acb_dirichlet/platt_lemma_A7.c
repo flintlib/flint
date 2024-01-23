@@ -133,7 +133,7 @@ acb_dirichlet_platt_lemma_A7(arb_t out, slong sigma,
     arb_div(x2, t0, h, prec);
     arb_sqr(x2, x2, prec);
     arb_mul_2exp_si(x2, x2, -1);
-    arb_neg(x2, x2);
+    arb_inplace_neg(x2);
     arb_exp(x2, x2, prec);
 
     _platt_lemma_A7_S(S, sigma, t0, h, k, A, prec);

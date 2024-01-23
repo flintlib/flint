@@ -338,8 +338,8 @@ arb_hypgeom_infsum(arb_t P, arb_t Q, hypgeom_t hyp, slong target_prec, slong pre
 
     if (arf_sgn(arb_midref(Q)) < 0)
     {
-        arb_neg(P, P);
-        arb_neg(Q, Q);
+        arb_inplace_neg(P);
+        arb_inplace_neg(Q);
     }
 
     /* We have p/q = s + err i.e. (p + q*err)/q = s */

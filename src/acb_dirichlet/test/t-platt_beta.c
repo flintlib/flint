@@ -51,8 +51,8 @@ TEST_FUNCTION_START(acb_dirichlet_platt_beta, state)
         mbits = 2 + n_randint(state, 20);
         arb_randtest(t, state, prec, mbits);
         arb_randtest(t0, state, prec, mbits);
-        arb_abs(t, t);
-        arb_abs(t0, t0);
+        arb_inplace_abs(t);
+        arb_inplace_abs(t0);
         arb_add(x, t, t0, prec);
         arb_const_e(expe, prec);
         arb_exp(expe, expe, prec);
@@ -74,7 +74,7 @@ TEST_FUNCTION_START(acb_dirichlet_platt_beta, state)
         arb_pow(a, x, beta, prec);
         arb_mul_ui(a, a, 3, prec);
         acb_dirichlet_platt_scaled_lambda(c, t, prec);
-        arb_abs(c, c);
+        arb_inplace_abs(c);
         if (arb_gt(c, a))
         {
             flint_printf("FAIL: Lemma A.10 |f(t)|\n\n");

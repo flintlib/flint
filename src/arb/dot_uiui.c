@@ -72,7 +72,7 @@ arb_dot_uiui(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong x
                 arf_shallow_set_uiui(t, y[1], y[0]);
                 arb_mul_arf(res, x, t, prec);
                 if (subtract)
-                    arb_neg(res, res);
+                    arb_inplace_neg(res);
             }
             return;
         }

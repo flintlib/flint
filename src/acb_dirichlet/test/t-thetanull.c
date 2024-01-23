@@ -51,7 +51,7 @@ TEST_FUNCTION_START(acb_dirichlet_thetanull, state)
         arb_init(eq);
         arb_const_pi(eq, prec);
         arb_div_ui(eq, eq, q, prec);
-        arb_neg(eq, eq);
+        arb_inplace_neg(eq);
         arb_exp(eq, eq, prec);
 
         t = _arb_vec_init(nv);

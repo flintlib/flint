@@ -60,7 +60,7 @@ arb_atan2(arb_t r, const arb_t b, const arb_t a, slong prec)
         else if (arf_sgn(bm) < 0 && arf_cmpabs_mag(bm, br) > 0)
         {
             arb_const_pi(r, prec);
-            arb_neg(r, r);
+            arb_inplace_neg(r);
             arb_mul_2exp_si(r, r, -1);
         }
         else
@@ -99,7 +99,7 @@ arb_atan2(arb_t r, const arb_t b, const arb_t a, slong prec)
         arb_const_pi(t, prec);
         arb_mul_2exp_si(t, t, -1);
         arb_add(r, t, r, prec);
-        arb_neg(r, r);
+        arb_inplace_neg(r);
         arb_clear(t);
     }
     /* overlaps the nonpositive half-axis -- [-pi, pi] */

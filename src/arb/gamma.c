@@ -241,7 +241,7 @@ arb_gamma_stirling_eval(arb_t s, const arb_t z, slong nterms, int digamma, slong
 
     if (digamma)
     {
-        arb_neg(s, s);
+        arb_inplace_neg(s);
         arb_mul_2exp_si(zinv, zinv, -1);
         arb_sub(s, s, zinv, prec);
         arb_add(s, s, logz, prec);

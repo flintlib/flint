@@ -44,7 +44,7 @@ acb_exp_invexp(acb_t r, acb_t s, const acb_t z, slong prec)
 
         arb_mul(acb_realref(s), u, w, prec);
         arb_mul(acb_imagref(s), u, v, prec);
-        arb_neg(acb_imagref(s), acb_imagref(s));
+        arb_inplace_neg(acb_imagref(s));
 
         arb_clear(t);
         arb_clear(u);

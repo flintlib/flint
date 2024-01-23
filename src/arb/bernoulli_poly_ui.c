@@ -60,7 +60,7 @@ arb_bernoulli_poly_ui(arb_t res, ulong n, const arb_t x, slong prec)
         arb_bernoulli_ui(t, n, prec);
         arb_add(res, res, t, prec);
         if (negate)
-            arb_neg(res, res);
+            arb_inplace_neg(res);
 
         arb_clear(t);
         return;

@@ -163,7 +163,7 @@ acb_theta_eld_init_interval(acb_theta_eld_t E, const arb_mat_t C,
     }
 
     arb_div(ctr, &v[d - 1], arb_mat_entry(C, d - 1, d - 1), lp);
-    arb_neg(ctr, ctr);
+    arb_inplace_neg(ctr);
     res = acb_theta_eld_interval(&min, &mid, &max, ctr, rad);
 
     if (res)

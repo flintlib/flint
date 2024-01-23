@@ -366,7 +366,7 @@ acb_rsqrt_precise(acb_t y, const acb_t x, slong prec)
 
     arb_mul(c, t, v, prec);
     arb_mul(d, b, v, prec);
-    arb_neg(d, d);
+    arb_inplace_neg(d);
 
     arb_clear(r);
     arb_clear(t);
@@ -407,7 +407,7 @@ acb_rsqrt(acb_t y, const acb_t x, slong prec)
         {
             arb_neg(d, a);
             arb_rsqrt(d, d, prec);
-            arb_neg(d, d);
+            arb_inplace_neg(d);
             arb_zero(c);
             return;
         }
@@ -425,7 +425,7 @@ acb_rsqrt(acb_t y, const acb_t x, slong prec)
         else if (arb_is_nonpositive(b))
         {
             arb_mul_2exp_si(c, b, 1);
-            arb_neg(c, c);
+            arb_inplace_neg(c);
             arb_rsqrt(c, c, prec);
             arb_set(d, c);
             return;

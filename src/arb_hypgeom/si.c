@@ -41,7 +41,7 @@ _arb_hypgeom_si_asymp(arb_t res, const arb_t z, slong N, slong prec)
     {
         arb_neg(res, z);
         _arb_hypgeom_si_asymp(res, res, N, prec);
-        arb_neg(res, res);
+        arb_inplace_neg(res);
         return;
     }
 
@@ -115,7 +115,7 @@ _arb_hypgeom_si_1f2(arb_t res, const arb_t z, slong N, slong wp, slong prec)
 
     arb_sqr(u, z, wp);
     arb_mul_2exp_si(u, u, -2);
-    arb_neg(u, u);
+    arb_inplace_neg(u);
 
     *fmpq_numref(&a[0]) = 1;
     *fmpq_denref(&a[0]) = 2;

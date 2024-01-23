@@ -42,7 +42,7 @@ TEST_FUNCTION_START(arb_hypgeom_legendre_p_ui_deriv_bound, state)
 
         arb_mul(x2sub1, x, x, 2 * prec);
         arb_sub_ui(x2sub1, x2sub1, 1, 2 * prec);
-        arb_neg(x2sub1, x2sub1);
+        arb_inplace_neg(x2sub1);
 
         arb_hypgeom_legendre_p_ui_deriv_bound(m1, m2, n, x, x2sub1);
         arb_hypgeom_legendre_p_ui(y, z, n, x, prec);

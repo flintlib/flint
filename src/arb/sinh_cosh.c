@@ -57,7 +57,7 @@ arb_sinh_cosh_wide(arb_t s, arb_t c, const arb_t x, slong prec)
             else
             {
                 arb_set_interval_mag(s, t, u, prec);
-                arb_neg(s, s);
+                arb_inplace_neg(s);
             }
         }
     }

@@ -94,7 +94,7 @@ TEST_FUNCTION_START(arb_hypgeom_gamma_taylor, state)
             arf_set_mag(arb_midref(b), arb_radref(x));
 
             arb_sub_arf(a, a, arb_midref(x), prec + 30);
-            arb_neg(a, a);
+            arb_inplace_neg(a);
 
             arb_add_arf(b, b, arb_midref(x), prec + 30);
 

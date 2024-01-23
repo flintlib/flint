@@ -364,7 +364,7 @@ bound_tail(mag_t bound, const arb_t a1, const arb_t ba1, const arb_t z, const ar
 
         /* exp(-z*N) */
         arb_mul(s, N, z, prec);
-        arb_neg(s, s);
+        arb_inplace_neg(s);
 
         /* N^(a-1) */
         arb_log(u, N, prec);
@@ -491,12 +491,12 @@ arb_hypgeom_u_integration(arb_t res, const arb_t a, const arb_t b, const arb_t z
         arb_sub(c, a, b, prec);
         arb_add_ui(c, c, 1, prec);
         arb_sub_ui(d, b, 2, prec);
-        arb_neg(d, d);
+        arb_inplace_neg(d);
 
         if (_arb_hypgeom_u_integration(res2, c, d, z, prec))
         {
             arb_sub_ui(c, b, 1, prec);
-            arb_neg(c, c);
+            arb_inplace_neg(c);
             arb_pow(c, z, c, prec);
             arb_mul(res2, res2, c, prec);
         }

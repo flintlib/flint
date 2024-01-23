@@ -313,7 +313,7 @@ arb_sin_cos_fmpz_div_2exp_bsplit(arb_t wsin, arb_t wcos, const fmpz_t x, flint_b
     /* compute cos from sin */
     arb_mul(wcos, wsin, wsin, prec);
     arb_sub_ui(wcos, wcos, 1, prec);
-    arb_neg(wcos, wcos);
+    arb_inplace_neg(wcos);
     arb_sqrt(wcos, wcos, prec);
 
     fmpz_clear(T);
@@ -585,12 +585,12 @@ arb_sin_cos_arf_bb(arb_t zsin, arb_t zcos, const arf_t x, slong prec)
 
         arb_mul(tmp1, zcos, zcos, wp);
         arb_sub_ui(tmp1, tmp1, 1, wp);
-        arb_neg(tmp1, tmp1);
+        arb_inplace_neg(tmp1);
         arb_sqrt(zsin, tmp1, wp);
     }
 
     if (negative)
-        arb_neg(zsin, zsin);
+        arb_inplace_neg(zsin);
 
     arb_set_round(zsin, zsin, prec);
     arb_set_round(zcos, zcos, prec);

@@ -168,7 +168,7 @@ arb_hypgeom_gamma_stirling_sum_improved(arb_t s, const arb_t z, slong N, slong K
     arb_mul_2exp_si(u, u, 1);
     arb_mul(u, u, u, wp);
     arb_inv(u, u, wp);
-    arb_neg(u, u);
+    arb_inplace_neg(u);
 
     fmpz_init(kpow);
     upow = _arb_vec_init(m + 1);
@@ -251,7 +251,7 @@ arb_hypgeom_gamma_stirling_sum_improved(arb_t s, const arb_t z, slong N, slong K
     arb_set_round(t, z, wp);
     arb_mul(S3, S3, t, wp);
     arb_mul_2exp_si(S3, S3, 1);
-    arb_neg(S3, S3);
+    arb_inplace_neg(S3);
 
     arb_add_error_mag(S3, err);
 

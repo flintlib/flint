@@ -65,7 +65,7 @@ check_q(ulong q, int odd, slong prec, slong digits, int onlymod)
     arb_init(z1);
     arb_const_pi(z1, prec);
     arb_div_ui(z1, z1, q, prec);
-    arb_neg(z1, z1);
+    arb_inplace_neg(z1);
     arb_exp(z1, z1, prec);
 
     /* len = acb_dirichlet_theta_length_d(q, 1., prec); */

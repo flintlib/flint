@@ -15,5 +15,5 @@ void
 arb_neg_round(arb_t x, const arb_t y, slong prec)
 {
     arb_set_round(x, y, prec);
-    arb_neg(x, x);
+    arb_inplace_neg(x);
 }

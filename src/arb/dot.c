@@ -407,7 +407,7 @@ arb_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong xstep,
             {
                 arb_mul(res, x, y, prec);
                 if (subtract)
-                    arb_neg(res, res);
+                    arb_inplace_neg(res);
             }
             return;
         }

@@ -28,7 +28,7 @@ acb_inv_naive(acb_t z, const acb_t x, slong prec)
     else if (arb_is_zero(a))
     {
         arb_inv(d, b, prec);
-        arb_neg(d, d);
+        arb_inplace_neg(d);
         arb_zero(c);
     }
     else
@@ -42,7 +42,7 @@ acb_inv_naive(acb_t z, const acb_t x, slong prec)
         arb_div(c, a, t, prec);
         arb_div(d, b, t, prec);
 
-        arb_neg(d, d);
+        arb_inplace_neg(d);
 
         arb_clear(t);
     }

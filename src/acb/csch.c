@@ -26,7 +26,7 @@ acb_csch(acb_t res, const acb_t z, slong prec)
     else if (arb_is_zero(acb_realref(z)))
     {
         arb_csc(acb_imagref(res), acb_imagref(z), prec);
-        arb_neg(acb_imagref(res), acb_imagref(res));
+        arb_inplace_neg(acb_imagref(res));
         arb_zero(acb_realref(res));
     }
     else

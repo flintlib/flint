@@ -164,7 +164,7 @@ upper_bsplit(arb_t M, arb_t S, arb_t Q, const fmpz_t ap, const fmpz_t aq, const 
         fmpz_inplace_neg(t);
         arb_set_fmpz(M, t);
         arb_mul_fmpz(S, z, aq, prec);
-        arb_neg(S, S);
+        arb_inplace_neg(S);
         arb_set(Q, S);
         fmpz_clear(t);
     }
@@ -511,7 +511,7 @@ _arb_hypgeom_gamma_upper_singular_si_bsplit(arb_t res, slong n, const arb_t z, s
     arb_fac_ui(Q, n, prec);
     arb_div(M, M, Q, prec);
     if (n & 1)
-        arb_neg(M, M);
+        arb_inplace_neg(M);
 
     arb_sub(res, M, S, prec);
 

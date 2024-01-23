@@ -229,7 +229,7 @@ TEST_FUNCTION_START(arb_set_str, state)
                 arf_set_d(arb_midref(v), x);
                 mag_zero(arb_radref(v));
 
-                arb_abs(v, v);
+                arb_inplace_abs(v);
                 arb_add_error(u, v);
 
                 if (error != 0 || !arb_equal(t, u))

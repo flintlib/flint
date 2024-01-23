@@ -141,7 +141,7 @@ _arb_hypgeom_airy_zero(arb_t res, const fmpz_t n, int which, slong prec)
             arb_mul(u4, u4, u4, 10);
             arb_mul(u4, u4, u2, 10);
             arb_mul_ui(u4, u4, 477, 10);
-            arb_neg(u4, u4);
+            arb_inplace_neg(u4);
         }
 
         arb_mul_2exp_si(u4, u4, -1);
@@ -153,7 +153,7 @@ _arb_hypgeom_airy_zero(arb_t res, const fmpz_t n, int which, slong prec)
         arb_mul(z, z, z, wp);
         arb_mul(res, z, s, wp);
 
-        arb_neg(res, res);
+        arb_inplace_neg(res);
 
         arb_clear(z);
         arb_clear(u);

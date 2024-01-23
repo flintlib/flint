@@ -222,7 +222,7 @@ gamma_upper_taylor_bsplit(arb_mat_t M, arb_t Q,
         /* Q = -z0*(n+1)*(n+2)*aq */
         fmpz_mul2_uiui(t, aq, n + 1, n + 2);
         arb_mul_fmpz(Q, z0, t, prec);
-        arb_neg(Q, Q);
+        arb_inplace_neg(Q);
 
         /* x Q */
         arb_mul(arb_mat_entry(M, 0, 1), Q, x, prec);

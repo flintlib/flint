@@ -23,7 +23,7 @@ arb_coth(arb_t y, const arb_t x, slong prec)
     arb_mul_2exp_si(t, x, 1);
 
     if (!sign)
-        arb_neg(t, t);
+        arb_inplace_neg(t);
 
     if (arf_cmpabs_2exp_si(arb_midref(x), 1) > 0)
     {
@@ -43,7 +43,7 @@ arb_coth(arb_t y, const arb_t x, slong prec)
     }
 
     if (!sign)
-        arb_neg(y, y);
+        arb_inplace_neg(y);
 
     arb_clear(t);
     arb_clear(u);

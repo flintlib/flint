@@ -51,7 +51,7 @@ __arb_poly_sin_cos_series(arb_ptr s, arb_ptr c, arb_srcptr h, slong hlen, slong 
         }
 
         arb_mul(s + 1, c, t, prec);
-        arb_neg(t, t);
+        arb_inplace_neg(t);
         arb_mul(c + 1, s, t, prec);
         arb_clear(t);
     }

@@ -84,7 +84,7 @@ acb_dirichlet_theta_arb(acb_t res, const dirichlet_group_t G, const dirichlet_ch
     mag_init(e);
     mag_tail_kexpk2_arb(e, xt, len);
 
-    arb_neg(xt, xt);
+    arb_inplace_neg(xt);
     arb_exp(xt, xt, prec);
 
     /* TODO: tune this limit */

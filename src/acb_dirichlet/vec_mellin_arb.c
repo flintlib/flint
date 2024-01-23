@@ -38,7 +38,7 @@ acb_dirichlet_vec_mellin_arb(acb_ptr res, const dirichlet_group_t G, const diric
     {
         _acb_dirichlet_theta_argument_at_arb(xt, G->q, tk, prec);
         mag_tail_kexpk2_arb(e, xt, len);
-        arb_neg(xt, xt);
+        arb_inplace_neg(xt);
         arb_exp(xt, xt, prec);
         /* TODO: reduce len */
         acb_dirichlet_qseries_arb(res + k, a, xt, len, prec);

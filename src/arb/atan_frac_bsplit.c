@@ -102,7 +102,7 @@ arb_atan_frac_bsplit(arb_t s, const fmpz_t p, const fmpz_t q, int hyperbolic, sl
         fmpz_init(t);
         fmpz_neg(t, p);
         arb_atan_frac_bsplit(s, t, q, hyperbolic, prec);
-        arb_neg(s, s);
+        arb_inplace_neg(s);
         fmpz_clear(t);
         return;
     }

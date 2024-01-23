@@ -52,7 +52,7 @@ acb_sqrt(acb_t y, const acb_t x, slong prec)
         else if (arb_is_nonpositive(b))
         {
             arb_mul_2exp_si(c, b, -1);
-            arb_neg(c, c);
+            arb_inplace_neg(c);
             arb_sqrt(c, c, prec);
             arb_neg(d, c);
             return;
@@ -102,12 +102,12 @@ acb_sqrt(acb_t y, const acb_t x, slong prec)
             arb_mul_2exp_si(t, u, 1);
             arb_sqrt(t, t, wp);
             arb_div(c, b, t, prec);
-            arb_abs(c, c);
+            arb_inplace_abs(c);
 
             arb_set_round(d, t, prec);
             arb_mul_2exp_si(d, d, -1);
             if (sgn < 0)
-                arb_neg(d, d);
+                arb_inplace_neg(d);
             done = 1;
         }
         else
@@ -138,7 +138,7 @@ acb_sqrt(acb_t y, const acb_t x, slong prec)
         else if (arb_is_nonpositive(b))
         {
             arb_sqrtpos(d, u, prec);
-            arb_neg(d, d);
+            arb_inplace_neg(d);
         }
         else
         {

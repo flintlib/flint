@@ -19,7 +19,7 @@ qqbar_get_acb(acb_t res, const qqbar_t x, slong prec)
     {
         arb_set_fmpz(acb_realref(res), QQBAR_COEFFS(x));
         arb_div_fmpz(acb_realref(res), acb_realref(res), QQBAR_COEFFS(x) + 1, prec);
-        arb_neg(acb_realref(res), acb_realref(res));
+        arb_inplace_neg(acb_realref(res));
         arb_zero(acb_imagref(res));
     }
     else

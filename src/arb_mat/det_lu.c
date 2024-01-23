@@ -45,7 +45,7 @@ arb_mat_gauss_partial(arb_mat_t A, slong prec)
         for (j = row + 1; j < m; j++)
         {
             arb_div(e, a[j] + col, a[row] + col, prec);
-            arb_neg(e, e);
+            arb_inplace_neg(e);
             _arb_vec_scalar_addmul(a[j] + col + 1, a[row] + col + 1, n - col - 1, e, prec);
         }
 

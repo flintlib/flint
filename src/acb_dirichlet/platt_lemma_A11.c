@@ -30,7 +30,7 @@ _platt_lemma_A11_X(arb_t out,
     arb_div(x2, x2, h, prec);
     arb_sqr(x2, x2, prec);
     arb_mul_2exp_si(x2, x2, -3);
-    arb_neg(x2, x2);
+    arb_inplace_neg(x2);
     arb_exp(x2, x2, prec);
 
     arb_mul(out, x1, x2, prec);

@@ -63,7 +63,7 @@ _arb_cos_pi_fmpq_algebraic(arb_t c, ulong p, ulong q, slong prec)
         {
             _arb_cos_pi_fmpq_algebraic(c, q / 2 - p, q / 2, prec + extra);
             arb_sub_ui(c, c, 1, prec + extra);
-            arb_neg(c, c);
+            arb_inplace_neg(c);
         }
 
         arb_mul_2exp_si(c, c, -1);
@@ -176,7 +176,7 @@ _arb_sin_cos_pi_fmpq_algebraic(arb_t s, arb_t c, ulong p, ulong q, slong prec)
         _arb_sin_pi_fmpq_algebraic(s, p, q, wp);
         arb_mul(c, s, s, wp);
         arb_sub_ui(c, c, 1, wp);
-        arb_neg(c, c);
+        arb_inplace_neg(c);
         arb_sqrt(c, c, prec);
     }
     else
@@ -184,7 +184,7 @@ _arb_sin_cos_pi_fmpq_algebraic(arb_t s, arb_t c, ulong p, ulong q, slong prec)
         _arb_cos_pi_fmpq_algebraic(c, p, q, wp);
         arb_mul(s, c, c, wp);
         arb_sub_ui(s, s, 1, wp);
-        arb_neg(s, s);
+        arb_inplace_neg(s);
         arb_sqrt(s, s, prec);
     }
 }

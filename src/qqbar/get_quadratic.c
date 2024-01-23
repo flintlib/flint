@@ -182,7 +182,7 @@ qqbar_get_quadratic(fmpz_t res_a, fmpz_t res_b, fmpz_t res_c, fmpz_t res_q, cons
                 arb_sqrt_fmpz(r1, A, prec);
                 arb_mul_fmpz(r1, r1, B, prec);
                 arb_add_fmpz(r2, r1, b, prec);
-                arb_neg(r2, r2);
+                arb_inplace_neg(r2);
                 arb_sub_fmpz(r1, r1, b, prec);
                 arb_div_fmpz(r1, r1, a, prec);
                 arb_div_fmpz(r2, r2, a, prec);

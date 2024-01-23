@@ -51,7 +51,7 @@ arb_bernoulli_fmpz(arb_t res, const fmpz_t n, slong prec)
         arb_mul_2exp_si(res, res, 1);
 
         if (fmpz_fdiv_ui(n, 4) == 0)
-            arb_neg(res, res);
+            arb_inplace_neg(res);
 
         arb_clear(t);
     }

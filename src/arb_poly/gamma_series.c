@@ -32,7 +32,7 @@ _arb_poly_lgamma_series_at_one(arb_ptr u, slong len, slong prec)
         arb_div_ui(u + i, u + i, i, prec);
 
     for (i = 1; i < len; i += 2)
-        arb_neg(u + i, u + i);
+        arb_inplace_neg(u + i);
 }
 
 static void
@@ -125,7 +125,7 @@ _arb_poly_log_cpx_series(arb_ptr res, const arb_t c, slong num, slong prec)
         arb_div_ui(res + i, res + i, i, prec);
 
         if (i % 2 == 0)
-            arb_neg(res + i, res + i);
+            arb_inplace_neg(res + i);
     }
 }
 
@@ -284,12 +284,12 @@ _arb_poly_gamma_series(arb_ptr res, arb_srcptr h, slong hlen, slong len, slong p
         {
             /* u = 1/gamma(r+1-h) */
             arb_sub_ui(f, h, r + 1, wp);
-            arb_neg(f, f);
+            arb_inplace_neg(f);
             _arb_poly_gamma_stirling_eval(t, f, n, len, wp);
             _arb_vec_neg(t, t, len);
             _arb_poly_exp_series(u, t, len, len, wp);
             for (i = 1; i < len; i += 2)
-                arb_neg(u + i, u + i);
+                arb_inplace_neg(u + i);
 
             /* v = 1/sin(pi x) */
             arb_set(f, h);
@@ -308,7 +308,7 @@ _arb_poly_gamma_series(arb_ptr res, arb_srcptr h, slong hlen, slong len, slong p
             else
             {
                 arb_sub_ui(f, h, 1, wp);
-                arb_neg(f, f);
+                arb_inplace_neg(f);
                 arb_set_si(f + 1, -1);
                 rflen = FLINT_MIN(len, r + 1);
                 _arb_poly_rising_ui_series(u, f, FLINT_MIN(2, len), r, rflen, wp);
