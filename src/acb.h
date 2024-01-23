@@ -439,10 +439,23 @@ acb_neg(acb_t z, const acb_t x)
 }
 
 ACB_INLINE void
+acb_inplace_neg(acb_t z)
+{
+    arb_inplace_neg(acb_realref(z));
+    arb_inplace_neg(acb_imagref(z));
+}
+
+ACB_INLINE void
 acb_conj(acb_t z, const acb_t x)
 {
     arb_set(acb_realref(z), acb_realref(x));
     arb_neg(acb_imagref(z), acb_imagref(x));
+}
+
+ACB_INLINE void
+acb_inplace_conj(acb_t z)
+{
+    arb_inplace_neg(acb_imagref(z));
 }
 
 ACB_INLINE void
