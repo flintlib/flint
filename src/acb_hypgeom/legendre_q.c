@@ -48,8 +48,8 @@ _acb_hypgeom_legendre_q_double(acb_t res, const acb_t n, const acb_t m,
         acb_sub_ui(t, z, 1, prec);
         acb_mul_2exp_si(u, m, -1);
         acb_pow(v, t, u, prec);
-        acb_neg(t, t);
-        acb_neg(u, u);
+        acb_inplace_neg(t);
+        acb_inplace_neg(u);
         acb_pow(t, t, u, prec);
         acb_mul(t, t, v, prec);
 
@@ -58,12 +58,12 @@ _acb_hypgeom_legendre_q_double(acb_t res, const acb_t n, const acb_t m,
 
         acb_mul_2exp_si(u, m, -1);
         if (!acb_is_int(u))
-            acb_neg(t, t);
+            acb_inplace_neg(t);
 
         acb_sub_ui(u, z, 1, prec);
         acb_sqrt(u, u, prec);
         acb_sub_ui(v, z, 1, prec);
-        acb_neg(v, v);
+        acb_inplace_neg(v);
         acb_rsqrt(v, v, prec);
         acb_mul(u, u, v, prec);
         acb_hypgeom_legendre_p(v, n, m, z, 1, prec);
@@ -165,7 +165,7 @@ _acb_hypgeom_legendre_q_single(acb_t res, const acb_t n, const acb_t m,
     acb_gamma(z2, c, prec);
     acb_mul(t, t, z2, prec);
 
-    acb_neg(c, c);
+    acb_inplace_neg(c);
     acb_pow(z2, z, c, prec);
     acb_mul(t, t, z2, prec);
 
@@ -209,7 +209,7 @@ acb_hypgeom_legendre_q(acb_t res, const acb_t n, const acb_t m,
 
         /* t = 2F1((1-m-n)/2, (n-m)/2+1, 3/2, z^2) */
         acb_sub_ui(a, mn, 1, prec);
-        acb_neg(a, a);
+        acb_inplace_neg(a);
         acb_mul_2exp_si(a, a, -1);
         acb_mul_2exp_si(b, nm, -1);
         acb_add_ui(b, b, 1, prec);
@@ -260,7 +260,7 @@ acb_hypgeom_legendre_q(acb_t res, const acb_t n, const acb_t m,
         if (!acb_is_zero(m))
         {
             acb_sub_ui(u, z2, 1, prec);
-            acb_neg(u, u);
+            acb_inplace_neg(u);
             acb_neg(c, m);
             acb_mul_2exp_si(c, c, -1);
             acb_pow(u, u, c, prec);

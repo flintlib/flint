@@ -46,7 +46,7 @@ acb_chebyshev_u_ui(acb_t y, ulong n, const acb_t x, slong prec)
         acb_submul(b, a, x, prec);
         acb_mul(y, a, b, prec);
         acb_mul_2exp_si(y, y, 1);
-        acb_neg(y, y);
+        acb_inplace_neg(y);
     }
 
     acb_clear(a);

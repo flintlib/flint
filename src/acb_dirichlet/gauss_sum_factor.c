@@ -64,7 +64,7 @@ acb_dirichlet_gauss_sum_factor(acb_t res, const dirichlet_group_t G, const diric
     }
 
     if (G->q_even == 2)
-        acb_neg(res, res);
+        acb_inplace_neg(res);
 
     acb_clear(tmp);
 }

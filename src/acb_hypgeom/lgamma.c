@@ -138,13 +138,13 @@ acb_hypgeom_lgamma_taylor(acb_t res, const acb_t z, slong prec)
             if (k % 2 == 0)
             {
                 acb_log(t, t, wp);
-                acb_neg(t, t);
+                acb_inplace_neg(t);
             }
             else
             {
-                acb_neg(t, t);
+                acb_inplace_neg(t);
                 acb_log(t, t, wp);
-                acb_neg(t, t);
+                acb_inplace_neg(t);
             }
 
             if (k != 0)
@@ -167,7 +167,7 @@ acb_hypgeom_lgamma_taylor(acb_t res, const acb_t z, slong prec)
                 acb_log_sin_pi(res, z, wp);
                 acb_add(res, res, v, wp);
                 acb_add(res, res, t, wp);
-                acb_neg(res, res);
+                acb_inplace_neg(res);
 
                 arb_const_log_pi(acb_realref(t), wp);
                 arb_zero(acb_imagref(t));
@@ -235,7 +235,7 @@ acb_hypgeom_lgamma(acb_t y, const acb_t x, slong prec)
     {
         /* log gamma(x) = log rf(1-x, r) - log gamma(1-x+r) - log sin(pi x) + log(pi) */
         acb_sub_ui(u, x, 1, wp);
-        acb_neg(u, u);
+        acb_inplace_neg(u);
 
         acb_hypgeom_log_rising_ui(t, u, r, wp);
 

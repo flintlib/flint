@@ -62,7 +62,7 @@ acb_lambertw_halley_step(acb_t res, acb_t ew, const acb_t z, const acb_t w, slon
     acb_mul(t, ew, w, prec);
     acb_sub(u, t, z, prec);
     acb_mul(v, v, u, prec);
-    acb_neg(v, v);
+    acb_inplace_neg(v);
     acb_add(v, v, t, prec);
     acb_add(v, v, ew, prec);
     acb_div(t, u, v, prec);
@@ -190,7 +190,7 @@ acb_lambertw_initial_asymp(acb_t w, const acb_t z, const fmpz_t k, slong prec)
     acb_inv(t, L1, prec);
     acb_mul_2exp_si(w, L2, 1);
     acb_submul(w, L2, L2, prec);
-    acb_neg(w, w);
+    acb_inplace_neg(w);
     acb_mul(w, w, t, prec);
     acb_mul_2exp_si(w, w, -1);
     acb_add(w, w, L2, prec);
@@ -244,7 +244,7 @@ acb_lambertw_initial(acb_t res, const acb_t z, const acb_t ez1, const fmpz_t k, 
         acb_mul_ui(t, t, 3, prec);
         acb_sqrt(t, t, prec);
         if (!fmpz_is_zero(k))
-            acb_neg(t, t);
+            acb_inplace_neg(t);
         acb_lambertw_branchpoint_series(res, t, 0, prec);
         acb_clear(t);
         return 1;  /* todo: estimate */
@@ -472,7 +472,7 @@ acb_lambertw_try_near_branch_point(acb_t res, const acb_t z,
             acb_mul_2exp_si(t, ez1, 1);
             acb_sqrt(t, t, prec);
             if (!fmpz_is_zero(k))
-                acb_neg(t, t);
+                acb_inplace_neg(t);
             acb_lambertw_branchpoint_series(res, t, 1, prec);
             acb_clear(t);
             return 1;
@@ -515,7 +515,7 @@ acb_lambertw_cleared_cut_fix_small(acb_t res, const acb_t z,
             fmpz_init(kk);
             fmpz_neg(kk, k);
             acb_lambertw_cleared_cut(res, zz, kk, flags, prec);
-            acb_conj(res, res);
+            acb_inplace_conj(res);
             fmpz_clear(kk);
         }
     }
@@ -639,7 +639,7 @@ _acb_lambertw(acb_t res, const acb_t z, const acb_t ez1, const fmpz_t k, int fla
         if (!acb_lambertw_try_near_branch_point(res, zb, ezb1, kk, flags, goal))
             acb_lambertw_cleared_cut_fix_small(zb, zb, ezb1, kk, flags, goal);
 
-        acb_conj(zb, zb);
+        acb_inplace_conj(zb);
         acb_union(res, za, zb, prec);
 
         acb_clear(za);
@@ -677,7 +677,7 @@ acb_lambertw_middle(acb_t res, const acb_t z, slong prec)
     {
         acb_conj(res, z);
         acb_lambertw(res, res, k, 0, prec);
-        acb_conj(res, res);
+        acb_inplace_conj(res);
     }
     else if (arb_is_negative(acb_realref(z)))
     {
@@ -689,7 +689,7 @@ acb_lambertw_middle(acb_t res, const acb_t z, slong prec)
         {
             acb_conj(res, z);
             acb_lambertw(res, res, k, 0, prec);
-            acb_conj(res, res);
+            acb_inplace_conj(res);
         }
         else
         {
@@ -702,7 +702,7 @@ acb_lambertw_middle(acb_t res, const acb_t z, slong prec)
             arb_nonnegative_part(acb_imagref(zb), acb_imagref(zb));
             acb_lambertw(za, za, k, 0, prec);
             acb_lambertw(zb, zb, k, 0, prec);
-            acb_conj(zb, zb);
+            acb_inplace_conj(zb);
             acb_union(res, za, zb, prec);
             acb_clear(za);
             acb_clear(zb);
@@ -718,7 +718,7 @@ acb_lambertw_middle(acb_t res, const acb_t z, slong prec)
         {
             acb_conj(res, z);
             acb_lambertw(res, res, k, 0, prec);
-            acb_conj(res, res);
+            acb_inplace_conj(res);
         }
         else
         {
@@ -731,7 +731,7 @@ acb_lambertw_middle(acb_t res, const acb_t z, slong prec)
             arb_nonnegative_part(acb_imagref(zb), acb_imagref(zb));
             acb_lambertw(za, za, k, 0, prec);
             acb_lambertw(zb, zb, k, 0, prec);
-            acb_conj(zb, zb);
+            acb_inplace_conj(zb);
             acb_union(res, za, zb, prec);
             acb_clear(za);
             acb_clear(zb);
@@ -763,7 +763,7 @@ acb_lambertw_left(acb_t res, const acb_t z, const fmpz_t k, slong prec)
 
         acb_conj(res, z);
         acb_lambertw(res, res, kk, 0, prec);
-        acb_conj(res, res);
+        acb_inplace_conj(res);
 
         fmpz_clear(kk);
     }
@@ -787,7 +787,7 @@ acb_lambertw_left(acb_t res, const acb_t z, const fmpz_t k, slong prec)
 
         acb_lambertw(za, za, k, 0, prec);
         acb_lambertw(zb, zb, kk, 0, prec);
-        acb_conj(zb, zb);
+        acb_inplace_conj(zb);
 
         acb_union(res, za, zb, prec);
 

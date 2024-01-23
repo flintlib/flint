@@ -26,7 +26,7 @@ acb_asin(acb_t res, const acb_t z, slong prec)
 
         acb_mul(t, z, z, prec);
         acb_sub_ui(t, t, 1, prec);
-        acb_neg(t, t);
+        acb_inplace_neg(t);
         acb_sqrt(t, t, prec);
 
         if (acb_is_real(z) && acb_is_real(t))

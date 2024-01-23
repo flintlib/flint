@@ -31,7 +31,7 @@ acb_theta_ql_dupl(acb_ptr th2, acb_srcptr th0, acb_srcptr th,
         {
             if (acb_theta_char_dot(a, b, g) % 2 == 1)
             {
-                acb_neg(&v[b], &v[b]);
+                acb_inplace_neg(&v[b]);
             }
         }
         acb_theta_agm_mul_tight(v, th0, v, d0, d, g, prec);

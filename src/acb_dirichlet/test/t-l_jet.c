@@ -167,7 +167,7 @@ TEST_FUNCTION_START(acb_dirichlet_l_jet, state)
                     acb_add(vec1 + i, vec1 + i, t, prec1);
                 else
                     acb_sub(vec1 + i, vec1 + i, t, prec1);
-                acb_neg(t, t);
+                acb_inplace_neg(t);
             }
 
             acb_clear(t);

@@ -57,7 +57,7 @@ void acb_hypgeom_beta_lower(acb_t res,
     acb_init(u);
 
     acb_sub_ui(t, b, 1, prec);
-    acb_neg(t, t);
+    acb_inplace_neg(t);
     acb_add_ui(u, a, 1, prec);
 
     if (regularized)

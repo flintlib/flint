@@ -135,7 +135,7 @@ evaluate_sum(acb_t res, acb_t res1,
             acb_mul_ui(e, d, k+1, prec);
             acb_mul_ui(e, e, k, prec);
             acb_div(w, w, e, prec);
-            acb_neg(w, w);
+            acb_inplace_neg(w);
 
             acb_set(ck, cknext);
             acb_set(cknext, w);

@@ -35,7 +35,7 @@ TEST_FUNCTION_START(acb_modular_elliptic_e, state)
         acb_randtest(m, state, prec, 1 + n_randint(state, 100));
 
         acb_sub_ui(w, m, 1, prec);
-        acb_neg(w, w);
+        acb_inplace_neg(w);
         acb_const_pi(pi2, prec);
         acb_mul_2exp_si(pi2, pi2, -1);
 

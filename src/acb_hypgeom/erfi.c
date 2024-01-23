@@ -18,5 +18,5 @@ acb_hypgeom_erfi(acb_t res, const acb_t z, slong prec)
     acb_mul_onei(res, z);
     acb_hypgeom_erf(res, res, prec);
     acb_mul_onei(res, res);
-    acb_neg(res, res);
+    acb_inplace_neg(res);
 }

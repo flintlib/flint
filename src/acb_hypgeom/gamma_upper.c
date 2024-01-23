@@ -27,7 +27,7 @@ acb_hypgeom_gamma_upper_asymp(acb_t res, const acb_t s,
     acb_init(u);
 
     acb_sub_ui(t, s, 1, prec);
-    acb_neg(t, t);
+    acb_inplace_neg(t);
 
     acb_hypgeom_u_asymp(u, t, t, z, -1, prec);
 
@@ -37,7 +37,7 @@ acb_hypgeom_gamma_upper_asymp(acb_t res, const acb_t s,
     }
     else
     {
-        acb_neg(t, t);
+        acb_inplace_neg(t);
         acb_pow(t, z, t, prec);
         acb_mul(u, u, t, prec);
 
@@ -96,7 +96,7 @@ acb_hypgeom_gamma_upper_1f1a(acb_t res, const acb_t s,
             acb_rgamma(a, s, prec);
             acb_mul(t, t, a, prec);
             acb_sub_ui(res, t, 1, prec);
-            acb_neg(res, res);
+            acb_inplace_neg(res);
         }
         else
         {
@@ -148,7 +148,7 @@ acb_hypgeom_gamma_upper_1f1b(acb_t res, const acb_t s,
             acb_rgamma(a, s, prec);
             acb_mul(t, t, a, prec);
             acb_sub_ui(res, t, 1, prec);
-            acb_neg(res, res);
+            acb_inplace_neg(res);
         }
         else
         {
@@ -201,7 +201,7 @@ acb_hypgeom_gamma_upper_singular(acb_t res, slong s, const acb_t z, int regulari
     acb_sub(A, A, t, prec);
     acb_div_arb(A, A, f, prec);
     if (n % 2)
-        acb_neg(A, A);
+        acb_inplace_neg(A);
 
     /* (-1)^n z 2F2(1,1;2,2+n;-z) / (n+1)! */
     acb_set_si(a, 1);
@@ -213,7 +213,7 @@ acb_hypgeom_gamma_upper_singular(acb_t res, slong s, const acb_t z, int regulari
     arb_mul_ui(f, f, n + 1, prec);
     acb_div_arb(B, B, f, prec);
     if (n % 2)
-        acb_neg(B, B);
+        acb_inplace_neg(B);
 
     /* -sum((-z)^k / ((k-n) k!), k=0...n-1) */
     acb_set_si(a, -n);
@@ -407,7 +407,7 @@ acb_hypgeom_gamma_upper_nointegration(acb_t res, const acb_t s, const acb_t z, i
             if (arb_is_negative(acb_realref(s)))
             {
                 acb_inv(res, s, prec);
-                acb_neg(res, res);
+                acb_inplace_neg(res);
             }
             else
             {

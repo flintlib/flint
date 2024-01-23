@@ -43,7 +43,7 @@ acb_csch(acb_t res, const acb_t z, slong prec)
                 acb_mul(res, t, t, prec + 4);
                 acb_sub_ui(res, res, 1, prec + 4);
                 acb_div(res, t, res, prec);
-                acb_neg(res, res);
+                acb_inplace_neg(res);
             }
             else
             {

@@ -33,7 +33,7 @@ _acb_poly_zeta_cpx_series(acb_ptr z, const acb_t s, const acb_t a, int deflate, 
     if (acb_is_one(s) && deflate && d == 1)
     {
         acb_digamma(z, a, prec);
-        acb_neg(z, z);
+        acb_inplace_neg(z);
         if (!acb_is_finite(z))  /* todo: in digamma */
             acb_indeterminate(z);
         return;

@@ -54,7 +54,7 @@ acb_dirichlet_hurwitz_precomp_init(acb_dirichlet_hurwitz_precomp_t pre,
             acb_add_ui(pre->coeffs + k, s, k - 1, prec);
             acb_mul(pre->coeffs + k, pre->coeffs + k, pre->coeffs + k - 1, prec);
             acb_div_ui(pre->coeffs + k, pre->coeffs + k, k, prec);
-            acb_neg(pre->coeffs + k, pre->coeffs + k);
+            acb_inplace_neg(pre->coeffs + k);
         }
 
         for (i = 1; i < N; i++)

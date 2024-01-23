@@ -38,7 +38,7 @@ _acb_mat_conjugate_transpose(acb_mat_t B, const acb_mat_t A)
     acb_mat_transpose(B, A);
     for (i = 0; i < acb_mat_nrows(B); i++)
         for (j = 0; j < acb_mat_ncols(B); j++)
-            acb_conj(acb_mat_entry(B, i, j), acb_mat_entry(B, i, j));
+            acb_inplace_conj(acb_mat_entry(B, i, j));
 }
 
 static void

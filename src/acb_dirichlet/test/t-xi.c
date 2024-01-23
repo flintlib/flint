@@ -53,7 +53,7 @@ TEST_FUNCTION_START(acb_dirichlet_xi, state)
 
         /* check xi(s) = xi(1-s) */
         acb_sub_ui(c, a, 1, prec1);
-        acb_neg(c, c);
+        acb_inplace_neg(c);
         acb_dirichlet_xi(c, c, prec1);
 
         if (!acb_overlaps(b, c))

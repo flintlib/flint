@@ -38,7 +38,7 @@ acb_hypgeom_pfq(acb_t res, acb_srcptr a, slong p,
         acb_init(t);
         acb_neg(t, a);
         acb_sub_ui(res, z, 1, prec);
-        acb_neg(res, res);
+        acb_inplace_neg(res);
         acb_pow(res, res, t, prec);
         acb_clear(t);
     }

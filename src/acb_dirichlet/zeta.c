@@ -83,7 +83,7 @@ acb_dirichlet_zeta(acb_t res, const acb_t s, slong prec)
         acb_mul(u, u, v, wp);
 
         /* gamma(1-s) zeta(1-s) */
-        acb_neg(t, t);
+        acb_inplace_neg(t);
         acb_gamma(v, t, wp);
         acb_mul(u, u, v, wp);
         _acb_dirichlet_zeta(v, t, prec);

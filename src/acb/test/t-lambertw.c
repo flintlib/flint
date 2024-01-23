@@ -138,7 +138,7 @@ TEST_FUNCTION_START(acb_lambertw, state)
             if (flags == 2)
                 fmpz_add_ui(k, k, 1);
             fmpz_inplace_neg(k);
-            acb_conj(w2, w2);
+            acb_inplace_conj(w2);
 
             if (!acb_overlaps(w1, w2))
             {

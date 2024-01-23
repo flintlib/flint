@@ -93,7 +93,7 @@ _acb_poly_log_cpx_series(acb_ptr res, const acb_t c, slong num, slong prec)
         acb_div_ui(res + i, res + i, i, prec);
 
         if (i % 2 == 0)
-            acb_neg(res + i, res + i);
+            acb_inplace_neg(res + i);
     }
 }
 
@@ -240,12 +240,12 @@ _acb_poly_gamma_series(acb_ptr res, acb_srcptr h, slong hlen, slong len, slong p
     {
         /* u = 1/gamma(r+1-h) */
         acb_sub_ui(f, h, r + 1, wp);
-        acb_neg(f, f);
+        acb_inplace_neg(f);
         _acb_poly_gamma_stirling_eval(t, f, n, len, wp);
         _acb_vec_neg(t, t, len);
         _acb_poly_exp_series(u, t, len, len, wp);
         for (i = 1; i < len; i += 2)
-            acb_neg(u + i, u + i);
+            acb_inplace_neg(u + i);
 
         /* v = 1/sin(pi x) */
         acb_set(f, h);
@@ -264,7 +264,7 @@ _acb_poly_gamma_series(acb_ptr res, acb_srcptr h, slong hlen, slong len, slong p
         else
         {
             acb_sub_ui(f, h, 1, wp);
-            acb_neg(f, f);
+            acb_inplace_neg(f);
             acb_set_si(f + 1, -1);
             rflen = FLINT_MIN(len, r + 1);
             _acb_poly_rising_ui_series(u, f, FLINT_MIN(2, len), r, rflen, wp);

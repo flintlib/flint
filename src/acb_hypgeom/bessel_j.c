@@ -28,7 +28,7 @@ acb_hypgeom_bessel_j_asymp_prefactors_fallback(acb_t Ap, acb_t Am, acb_t C,
     acb_one(v);
     acb_mul_2exp_si(v, v, -1);
     acb_add(v, v, nu, prec);
-    acb_neg(v, v);
+    acb_inplace_neg(v);
 
     acb_mul_onei(t, z);  /* t = iz */
     acb_neg(u, t);       /* u = -iz */
@@ -72,7 +72,7 @@ acb_hypgeom_bessel_j_asymp_prefactors(acb_t Ap, acb_t Am, acb_t C,
         acb_mul_2exp_si(t, nu, 1);
         acb_add_ui(t, t, 1, prec);
         acb_mul_2exp_si(t, t, -2);
-        acb_neg(t, t);
+        acb_inplace_neg(t);
         acb_const_pi(u, prec);
         acb_mul(t, t, u, prec);
         acb_add(t, t, z, prec);
@@ -152,7 +152,7 @@ acb_hypgeom_bessel_j_asymp(acb_t res, const acb_t nu, const acb_t z, slong prec)
         acb_mul_onei(u, z);
         acb_mul_2exp_si(u, u, 1);
         acb_hypgeom_u_asymp(U2, s, t, u, -1, prec);
-        acb_neg(u, u);
+        acb_inplace_neg(u);
         acb_hypgeom_u_asymp(U1, s, t, u, -1, prec);
 
         acb_mul(res, A1, U1, prec);
@@ -190,7 +190,7 @@ acb_hypgeom_bessel_j_0f1(acb_t res, const acb_t nu, const acb_t z, slong prec)
 
         acb_mul_2exp_si(t, t, -1);
         if (!acb_is_int(t))
-            acb_neg(res, res);
+            acb_inplace_neg(res);
 
         acb_clear(t);
         return;
@@ -214,7 +214,7 @@ acb_hypgeom_bessel_j_0f1(acb_t res, const acb_t nu, const acb_t z, slong prec)
     /* -z^2/4 */
     acb_mul(w, z, z, prec);
     acb_mul_2exp_si(w, w, -2);
-    acb_neg(w, w);
+    acb_inplace_neg(w);
 
     acb_hypgeom_pfq_direct(t, NULL, 0, b, 2, w, -1, prec);
 

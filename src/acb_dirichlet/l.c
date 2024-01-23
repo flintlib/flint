@@ -93,10 +93,10 @@ acb_dirichlet_l(acb_t res, const acb_t s,
             acb_mul(t, t, u, prec);
 
             acb_sub_ui(u, s, 1, prec);
-            acb_neg(u, u);
-            acb_conj(u, u);
+            acb_inplace_neg(u);
+            acb_inplace_conj(u);
             acb_dirichlet_l_general(u, u, G, chi, prec);
-            acb_conj(u, u);
+            acb_inplace_conj(u);
             acb_mul(t, t, u, prec);
 
             if (dirichlet_char_is_real(G, chi) && acb_is_real(s))

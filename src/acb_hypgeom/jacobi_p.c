@@ -99,7 +99,7 @@ acb_hypgeom_jacobi_p(acb_t res, const acb_t n, const acb_t a, const acb_t b,
     acb_add(u, u, b, prec);
     acb_sub_ui(w, z, 1, prec);
     acb_mul_2exp_si(w, w, -1);
-    acb_neg(w, w);
+    acb_inplace_neg(w);
 
     acb_hypgeom_2f1(w, t, u, v, w, 0, prec);
 

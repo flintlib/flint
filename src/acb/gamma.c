@@ -86,7 +86,7 @@ acb_gamma_stirling_eval(acb_t s, const acb_t z, slong nterms, int digamma, slong
 
     if (digamma)
     {
-        acb_neg(s, s);
+        acb_inplace_neg(s);
         acb_mul_2exp_si(zinv, zinv, -1);
         acb_sub(s, s, zinv, prec);
         acb_add(s, s, logz, prec);

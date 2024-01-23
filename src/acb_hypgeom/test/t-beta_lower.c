@@ -89,10 +89,10 @@ TEST_FUNCTION_START(acb_hypgeom_beta_lower, state)
         }
 
         acb_sub_ui(t, z, 1, prec);
-        acb_neg(t, t);
+        acb_inplace_neg(t);
         acb_hypgeom_beta_lower(t, b, a, t, 1, prec);
         acb_sub_ui(t, t, 1, prec);
-        acb_neg(t, t);
+        acb_inplace_neg(t);
 
         if (!acb_overlaps(w, t))
         {

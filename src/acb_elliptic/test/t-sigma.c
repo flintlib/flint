@@ -111,7 +111,7 @@ TEST_FUNCTION_START(acb_elliptic_sigma, state)
 
         acb_randtest(tau, state, prec0, e0);
         if (arf_sgn(arb_midref(acb_imagref(tau))) < 0)
-            acb_neg(tau, tau);
+            acb_inplace_neg(tau);
 
         acb_one(e1);
         acb_mul_2exp_si(e1, e1, -1);
@@ -139,10 +139,10 @@ TEST_FUNCTION_START(acb_elliptic_sigma, state)
         acb_addmul_ui(u, tau, n, prec2);
         acb_add_ui(u, u, m, prec2);
         acb_mul(t, t, u, prec2);
-        acb_neg(t, t);
+        acb_inplace_neg(t);
         acb_exp(t, t, prec2);
         if ((m + n + m*n) % 2 == 1)
-            acb_neg(t, t);
+            acb_inplace_neg(t);
         acb_mul(p2, p2, t, prec2);
 
         if (!acb_overlaps(p1, p2))

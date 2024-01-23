@@ -263,7 +263,7 @@ acb_hypgeom_u_1f1(acb_t res, const acb_t a, const acb_t b, const acb_t z, slong 
         acb_sub(aa, a, b, prec);
         acb_add_ui(aa, aa, 1, prec);
         acb_sub_ui(aa + 1, b, 2, prec);
-        acb_neg(aa + 1, aa + 1);
+        acb_inplace_neg(aa + 1);
         acb_hypgeom_pfq_direct(v, aa, 1, aa + 1, 2, z, -1, prec);
 
         acb_sub_ui(aa + 1, b, 1, prec);

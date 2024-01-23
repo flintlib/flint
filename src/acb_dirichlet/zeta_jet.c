@@ -60,16 +60,16 @@ _acb_dirichlet_zeta_jet(acb_t t, const acb_t h, int deflate, slong len, slong pr
 
         /* s3 = gamma(1-s) */
         acb_sub_ui(f, hcopy, 1, prec);
-        acb_neg(f, f);
+        acb_inplace_neg(f);
         acb_set_si(f + 1, -1);
         _acb_poly_gamma_series(s3, f, 2, len, prec);
 
         /* s4 = zeta(1-s) */
         acb_sub_ui(f, hcopy, 1, prec);
-        acb_neg(f, f);
+        acb_inplace_neg(f);
         _acb_poly_zeta_cpx_series(s4, f, a, 0, len, prec);
         for (i = 1; i < len; i += 2)
-            acb_neg(s4 + i, s4 + i);
+            acb_inplace_neg(s4 + i);
 
         _acb_poly_mullow(u, s1, len, s2, len, len, prec);
         _acb_poly_mullow(s1, s3, len, s4, len, len, prec);
@@ -79,7 +79,7 @@ _acb_dirichlet_zeta_jet(acb_t t, const acb_t h, int deflate, slong len, slong pr
         if (deflate)
         {
             acb_sub_ui(u, hcopy, 1, prec);
-            acb_neg(u, u);
+            acb_inplace_neg(u);
             acb_inv(u, u, prec);
             for (i = 1; i < len; i++)
                 acb_mul(u + i, u + i - 1, u, prec);

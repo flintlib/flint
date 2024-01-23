@@ -83,7 +83,7 @@ acb_hypgeom_hermite_h(acb_t res, const acb_t n, const acb_t z, slong prec)
     if (use_asymp)
     {
         acb_mul_2exp_si(a, n, -1);
-        acb_neg(a, a);
+        acb_inplace_neg(a);
         acb_one(b);
         acb_mul_2exp_si(b, b, -1);
         acb_hypgeom_u_asymp(u, a, b, t, -1, prec);
@@ -96,11 +96,11 @@ acb_hypgeom_hermite_h(acb_t res, const acb_t n, const acb_t z, slong prec)
     {
         /* a = (1-n)/2 */
         acb_sub_ui(a, n, 1, prec);
-        acb_neg(a, a);
+        acb_inplace_neg(a);
         acb_mul_2exp_si(a, a, -1);
         /* c = -n/2 */
         acb_mul_2exp_si(c, n, -1);
-        acb_neg(c, c);
+        acb_inplace_neg(c);
 
         acb_rgamma(u, a, prec);
 

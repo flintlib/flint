@@ -155,7 +155,7 @@ acb_hypgeom_airy_asymp_sum(acb_t s0even, acb_t s0odd,
             {
                 _acb_mul4div2_ui(s1even, 6*k+1, 6*k-5, 6*k-7, FLINT_ABS(6*k-13), k, k-1, prec);
                 if (k == 2)
-                    acb_neg(s1even, s1even);
+                    acb_inplace_neg(s1even);
                 if (j == 0 && k < n)
                     acb_mul(s1even, s1even, z2pow + m, prec);
             }
@@ -310,7 +310,7 @@ acb_hypgeom_airy_asymp(acb_t ai, acb_t aip, acb_t bi, acb_t bip, const acb_t z, 
                 arb_one(acb_realref(w));
                 arb_sqrt_ui(acb_imagref(w), 3, prec);
                 acb_mul_2exp_si(w, w, -1);
-                acb_neg(w, w);
+                acb_inplace_neg(w);
                 acb_mul(t, w, z, prec);
                 acb_neg(u, zeta);
                 acb_hypgeom_airy_asymp_bound_factor(err2, t, u, n);
@@ -411,7 +411,7 @@ acb_hypgeom_airy_asymp(acb_t ai, acb_t aip, acb_t bi, acb_t bip, const acb_t z, 
             if (aip != NULL)
             {
                 acb_mul(aip, t, E1, prec);
-                acb_neg(aip, aip);
+                acb_inplace_neg(aip);
             }
 
             if (bip != NULL)
@@ -452,14 +452,14 @@ acb_hypgeom_airy_asymp(acb_t ai, acb_t aip, acb_t bi, acb_t bip, const acb_t z, 
             arb_sqrt_ui(acb_imagref(w), 3, prec);
             acb_mul_2exp_si(w, w, -1);
             acb_mul(t, z, w, prec);
-            acb_neg(t, t);
+            acb_inplace_neg(t);
             acb_mul_onei(u, zeta);
             acb_hypgeom_airy_asymp_bound_factor(err1, t, u, n);
 
             /* compute bound factor for -i zeta */
-            acb_conj(w, w);
+            acb_inplace_conj(w);
             acb_mul(t, z, w, prec);
-            acb_neg(t, t);
+            acb_inplace_neg(t);
             acb_div_onei(u, zeta);
             acb_hypgeom_airy_asymp_bound_factor(err2, t, u, n);
         }

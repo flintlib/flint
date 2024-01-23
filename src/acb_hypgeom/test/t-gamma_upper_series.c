@@ -107,7 +107,7 @@ TEST_FUNCTION_START(acb_hypgeom_gamma_upper_series, state)
             acb_poly_sub(D, C, D, bits2);
 
             acb_add_ui(t, s, 1, bits2);
-            acb_neg(t, t);
+            acb_inplace_neg(t);
             acb_poly_pow_acb_series(B, S, t, n1, bits2);
 
             acb_poly_mullow(C, D, B, n1, bits2);

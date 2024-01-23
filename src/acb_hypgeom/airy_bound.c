@@ -103,10 +103,10 @@ acb_hypgeom_airy_bound_arg_le_2pi3(mag_t A, mag_t B, const acb_t z, slong wp)
            attained on the positive real line, it's sufficient to consider
            the case centered on the midpoint */
         if (arf_sgn(arb_midref(acb_imagref(z))) >= 0)
-            acb_conj(z1, z1);
+            acb_inplace_conj(z1);
 
         acb_mul(z1, z1, z, wp);
-        acb_neg(zeta, zeta);   /* same effect regardless of exp(+/-2 pi i/3) */
+        acb_inplace_neg(zeta);   /* same effect regardless of exp(+/-2 pi i/3) */
 
         acb_hypgeom_airy_bound_9_7_17(B, z1, zeta);
         mag_mul_2exp_si(B, B, 1);
@@ -154,7 +154,7 @@ acb_hypgeom_airy_bound_arg_ge_2pi3(mag_t A, mag_t B, const acb_t z, slong wp)
         mag_t D;
         mag_init(D);
         acb_mul(z2, z2, zeta, wp);
-        acb_neg(zeta, zeta);
+        acb_inplace_neg(zeta);
         acb_hypgeom_airy_bound_9_7_17(D, z2, zeta);
         mag_add(A, A, D);
         mag_clear(D);

@@ -40,7 +40,7 @@ acb_hypgeom_bessel_i_asymp_prefactors(acb_t A, acb_t B, acb_t C,
         acb_neg(t, nu);
         acb_exp_pi_i(t, t, prec);
         acb_mul_onei(t, t);
-        acb_neg(t, t);
+        acb_inplace_neg(t);
     }
     else
     {
@@ -49,7 +49,7 @@ acb_hypgeom_bessel_i_asymp_prefactors(acb_t A, acb_t B, acb_t C,
         acb_neg(u, nu);
         acb_exp_pi_i(u, u, prec);
         acb_mul_onei(u, u);
-        acb_neg(u, u);
+        acb_inplace_neg(u);
 
         arb_union(acb_realref(t), acb_realref(t), acb_realref(u), prec);
         arb_union(acb_imagref(t), acb_imagref(t), acb_imagref(u), prec);
@@ -126,7 +126,7 @@ acb_hypgeom_bessel_i_asymp(acb_t res, const acb_t nu, const acb_t z, int scaled,
 
         acb_mul_2exp_si(u, z, 1);
         acb_hypgeom_u_asymp(U1, s, t, u, -1, prec);
-        acb_neg(u, u);
+        acb_inplace_neg(u);
         acb_hypgeom_u_asymp(U2, s, t, u, -1, prec);
 
         acb_mul(res, A1, U1, prec);

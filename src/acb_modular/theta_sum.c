@@ -391,14 +391,14 @@ acb_modular_theta_sum(acb_ptr theta1,
     */
 
     acb_mul_onei(theta1, theta1);
-    acb_neg(theta1, theta1);
+    acb_inplace_neg(theta1);
 
     for (r = 1; r < len; r++)
     {
         if (r % 4 == 0)
         {
             acb_mul_onei(theta1 + r, theta1 + r);
-            acb_neg(theta1 + r, theta1 + r);
+            acb_inplace_neg(theta1 + r);
         }
         else if (r % 4 == 1)
         {
@@ -410,21 +410,21 @@ acb_modular_theta_sum(acb_ptr theta1,
         {
             acb_mul_onei(theta1 + r, theta1 + r);
 
-            acb_neg(theta2 + r, theta2 + r);
-            acb_neg(theta3 + r, theta3 + r);
-            acb_neg(theta4 + r, theta4 + r);
+            acb_inplace_neg(theta2 + r);
+            acb_inplace_neg(theta3 + r);
+            acb_inplace_neg(theta4 + r);
         }
         else
         {
-            acb_neg(theta1 + r, theta1 + r);
+            acb_inplace_neg(theta1 + r);
 
             acb_mul_onei(theta2 + r, theta2 + r);
             acb_mul_onei(theta3 + r, theta3 + r);
             acb_mul_onei(theta4 + r, theta4 + r);
 
-            acb_neg(theta2 + r, theta2 + r);
-            acb_neg(theta3 + r, theta3 + r);
-            acb_neg(theta4 + r, theta4 + r);
+            acb_inplace_neg(theta2 + r);
+            acb_inplace_neg(theta3 + r);
+            acb_inplace_neg(theta4 + r);
         }
     }
 

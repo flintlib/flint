@@ -32,7 +32,7 @@ _acb_poly_rsqrt_series(acb_ptr g,
         acb_div(g + 1, h + 1, h, prec);
         acb_mul(g + 1, g + 1, g, prec);
         acb_mul_2exp_si(g + 1, g + 1, -1);
-        acb_neg(g + 1, g + 1);
+        acb_inplace_neg(g + 1);
     }
     else if (_acb_vec_is_zero(h + 1, hlen - 2))
     {

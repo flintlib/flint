@@ -152,7 +152,7 @@ _acb_poly_polylog_cpx_zeta(acb_ptr w, const acb_t s, const acb_t z, slong len, s
     _acb_poly_acb_pow_cpx(e1, t, v, len + (deflate_zeta || deflate_gamma), prec);
 
     /* e2 = (1/(2 pi i))^(v+x) */
-    acb_conj(t, t);
+    acb_inplace_conj(t);
     _acb_poly_acb_pow_cpx(e2, t, v, len + (deflate_zeta || deflate_gamma), prec);
 
     _acb_poly_mullow(e1z1, e1, len2, z1, len2, len2, prec);
@@ -168,7 +168,7 @@ _acb_poly_polylog_cpx_zeta(acb_ptr w, const acb_t s, const acb_t z, slong len, s
         acb_const_pi(e1 + 1, prec);
         acb_mul_2exp_si(e2, v, -1);
         if (!arb_is_int(acb_realref(e2)))
-            acb_neg(e1 + 1, e1 + 1);
+            acb_inplace_neg(e1 + 1);
         _acb_poly_sin_series(e2, e1, 2, len2, prec);
         _acb_poly_inv_series(e1, e2 + 1, len, len, prec);
         acb_const_pi(e2, prec);
@@ -204,7 +204,7 @@ _acb_poly_polylog_cpx_zeta(acb_ptr w, const acb_t s, const acb_t z, slong len, s
 
     /* correct signs (from s -> 1-s) */
     for (k = 1; k < len; k += 2)
-        acb_neg(w + k, w + k);
+        acb_inplace_neg(w + k);
 
     if (is_real)
         if (acb_is_finite(w))

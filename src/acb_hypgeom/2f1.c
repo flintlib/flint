@@ -21,7 +21,7 @@ _acb_hypgeom_2f1r_reduced(acb_t res,
     acb_init(t);
     acb_init(u);
     acb_sub_ui(t, z, 1, prec);
-    acb_neg(t, t);
+    acb_inplace_neg(t);
     acb_neg(u, b);
     acb_pow(t, t, u, prec);
     acb_rgamma(u, c, prec);

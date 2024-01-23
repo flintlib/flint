@@ -33,7 +33,7 @@ acb_dot_fmpz(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong x
             {
                 acb_mul_fmpz(res, x, y, prec);
                 if (subtract)
-                    acb_neg(res, res);
+                    acb_inplace_neg(res);
             }
             return;
         }

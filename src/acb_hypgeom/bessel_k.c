@@ -168,7 +168,7 @@ acb_hypgeom_bessel_k_0f1(acb_t res, const acb_t nu, const acb_t z, int scaled, s
         acb_one(b + 1);
         acb_hypgeom_pfq_direct(u, NULL, 0, b, 2, t, -1, prec);
         acb_sub_ui(b, nu, 1, prec);
-        acb_neg(b, b);
+        acb_inplace_neg(b);
         acb_hypgeom_pfq_direct(v, NULL, 0, b, 2, t, -1, prec);
 
         /* v = v * gamma(nu) / (z/2)^nu */

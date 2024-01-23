@@ -69,21 +69,21 @@ _acb_poly_digamma_series(acb_ptr res, acb_srcptr h, slong hlen, slong len, slong
         if (r != 0) /* otherwise t = 0 */
         {
             acb_sub_ui(v, h, 1, wp);
-            acb_neg(v, v);
+            acb_inplace_neg(v);
             acb_one(v + 1);
             rflen = FLINT_MIN(len + 1, r + 1);
             _acb_poly_rising_ui_series(u, v, 2, r, rflen, wp);
             _acb_poly_derivative(v, u, rflen, wp);
             _acb_poly_div_series(t, v, rflen - 1, u, rflen, len, wp);
             for (i = 1; i < len; i += 2)
-                acb_neg(t + i, t + i);
+                acb_inplace_neg(t + i);
         }
 
         acb_sub_ui(zr, h, r + 1, wp);
-        acb_neg(zr, zr);
+        acb_inplace_neg(zr);
         _acb_poly_gamma_stirling_eval2(u, zr, n, len + 1, 1, wp);
         for (i = 1; i < len; i += 2)
-            acb_neg(u + i, u + i);
+            acb_inplace_neg(u + i);
 
         _acb_vec_sub(u, u, t, len, wp);
 

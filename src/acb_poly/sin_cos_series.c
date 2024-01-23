@@ -49,7 +49,7 @@ __acb_poly_sin_cos_series(acb_ptr s, acb_ptr c, acb_srcptr h, slong hlen, slong 
             acb_sin_cos(s, c, h, prec);
         }
         acb_mul(s + 1, c, t, prec);
-        acb_neg(t, t);
+        acb_inplace_neg(t);
         acb_mul(c + 1, s, t, prec);
         acb_clear(t);
     }

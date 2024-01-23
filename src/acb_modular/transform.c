@@ -31,7 +31,7 @@ void acb_modular_transform(acb_t w, const psl2z_t g, const acb_t z, slong prec)
         /* b/(cz+d), where -bc = 1, c = 1 => -1/(z+d) */
         acb_add_fmpz(w, z, d, prec);
         acb_inv(w, w, prec);
-        acb_neg(w, w);
+        acb_inplace_neg(w);
     }
     else if (0)
     {

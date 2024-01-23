@@ -67,7 +67,7 @@ acb_hypgeom_bessel_jy(acb_t res1, acb_t res2, const acb_t nu, const acb_t z, slo
         acb_const_pi(u, prec);
         acb_div(t, t, u, prec);
         acb_mul_2exp_si(t, t, 1);
-        acb_neg(t, t);
+        acb_inplace_neg(t);
 
         phase(v, acb_realref(z), acb_imagref(z));
         acb_mul(u, jnu, v, prec);

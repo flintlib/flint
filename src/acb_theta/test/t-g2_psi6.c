@@ -45,7 +45,7 @@ TEST_FUNCTION_START(acb_theta_g2_psi6, state)
         acb_theta_g2_psi6(s, th2, prec);
         if (acb_theta_transform_kappa2(mat) % 2 == 1)
         {
-            acb_neg(s, s);
+            acb_inplace_neg(s);
         }
 
         if (!acb_overlaps(r, s))

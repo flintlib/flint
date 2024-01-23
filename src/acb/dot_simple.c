@@ -43,5 +43,5 @@ acb_dot_simple(acb_t res, const acb_t initial, int subtract,
         acb_addmul(res, x + i * xstep, y + i * ystep, prec);
 
     if (subtract)
-        acb_neg(res, res);
+        acb_inplace_neg(res);
 }

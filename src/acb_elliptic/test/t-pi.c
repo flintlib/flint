@@ -101,7 +101,7 @@ TEST_FUNCTION_START(acb_elliptic_pi, state)
 
             acb_modular_elliptic_e(r2, n, prec1);
             acb_sub_ui(t, n, 1, prec1);
-            acb_neg(t, t);
+            acb_inplace_neg(t);
             acb_div(r2, r2, t, prec1);
 
             if (!acb_overlaps(r1, r2))

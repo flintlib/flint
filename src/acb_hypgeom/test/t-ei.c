@@ -24,7 +24,7 @@ acb_hypgeom_ei_fallback(acb_t res, const acb_t z, slong prec)
     acb_zero(t);
     acb_neg(u, z);
     acb_hypgeom_gamma_upper(u, t, u, 0, prec);
-    acb_neg(u, u);
+    acb_inplace_neg(u);
 
     acb_log(t, z, prec);
     acb_mul_2exp_si(t, t, -1);

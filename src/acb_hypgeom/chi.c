@@ -35,7 +35,7 @@ acb_hypgeom_chi_asymp(acb_t res, const acb_t z, slong prec)
     {
         arb_div(acb_realref(t), acb_imagref(t), acb_imagref(z), prec);
         arb_zero(acb_imagref(t));
-        acb_neg(t, t);
+        acb_inplace_neg(t);
     }
     else
     {
@@ -47,7 +47,7 @@ acb_hypgeom_chi_asymp(acb_t res, const acb_t z, slong prec)
 
         acb_div(t, t, z, prec);
         acb_mul_2exp_si(t, t, -1);
-        acb_neg(t, t);
+        acb_inplace_neg(t);
     }
 
     if (acb_is_real(z))

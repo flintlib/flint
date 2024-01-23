@@ -24,7 +24,7 @@ bsplit(acb_ptr VA, const acb_t z, const acb_t z2,
         acb_mul_ui(VA + 3, a, (k+1)*(2*k+1), prec);
         acb_sub_ui(VA + 3, VA + 3, (k+1)*(k+1), prec);
         acb_mul(VA + 3, VA + 3, z, prec);
-        acb_neg(VA + 3, VA + 3);
+        acb_inplace_neg(VA + 3);
         acb_set(VA + 4, VA + 1);
         acb_zero(VA + 5);
         acb_set(VA + 6, VA + 1);
@@ -186,7 +186,7 @@ acb_hypgeom_dilog_continuation(acb_t res, const acb_t a, const acb_t z, slong pr
         acb_init(v);
 
         acb_div(u, log1a, a, prec);
-        acb_neg(u, u);
+        acb_inplace_neg(u);
 
         if (n >= 3)
         {
@@ -194,7 +194,7 @@ acb_hypgeom_dilog_continuation(acb_t res, const acb_t a, const acb_t z, slong pr
             acb_add(v, v, u, prec);
             acb_div(v, v, a, prec);
             acb_mul_2exp_si(v, v, -1);
-            acb_neg(v, v);
+            acb_inplace_neg(v);
             acb_mul(v, v, za2, prec);
         }
 
@@ -210,7 +210,7 @@ acb_hypgeom_dilog_continuation(acb_t res, const acb_t a, const acb_t z, slong pr
             acb_mul(t, t, v, prec);
             acb_addmul(u, t, za, prec);
             acb_mul_ui(t, a1a, (k - 1) * k, prec);
-            acb_neg(t, t);
+            acb_inplace_neg(t);
             acb_div(u, u, t, prec);
             acb_add(s, s, u, prec);
             acb_swap(v, u);
@@ -231,7 +231,7 @@ acb_hypgeom_dilog_continuation(acb_t res, const acb_t a, const acb_t z, slong pr
         bsplit(V, za, za2, a, a1a, 1, 1 + n, prec);
 
         acb_mul(V + 1, V + 4, log1a, prec);
-        acb_neg(V + 1, V + 1);
+        acb_inplace_neg(V + 1);
         acb_mul(V + 2, V + 5, za2, prec);
         acb_mul_2exp_si(V + 2, V + 2, -1);
         acb_mul(V + 1, V + 1, za, prec);

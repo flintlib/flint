@@ -201,28 +201,28 @@ _acb_hypgeom_coulomb_jet(acb_ptr F, acb_ptr G, acb_ptr Hpos, acb_ptr Hneg, const
     if (F != NULL)
     {
         acb_mul(F + 1, F + 1, R, prec);
-        acb_neg(F + 1, F + 1);
+        acb_inplace_neg(F + 1);
         acb_addmul(F + 1, F, S, prec);
     }
 
     if (G != NULL)
     {
         acb_mul(G + 1, G + 1, R, prec);
-        acb_neg(G + 1, G + 1);
+        acb_inplace_neg(G + 1);
         acb_addmul(G + 1, G, S, prec);
     }
 
     if (Hpos != NULL)
     {
         acb_mul(Hpos + 1, Hpos + 1, R, prec);
-        acb_neg(Hpos + 1, Hpos + 1);
+        acb_inplace_neg(Hpos + 1);
         acb_addmul(Hpos + 1, Hpos, S, prec);
     }
 
     if (Hneg != NULL)
     {
         acb_mul(Hneg + 1, Hneg + 1, R, prec);
-        acb_neg(Hneg + 1, Hneg + 1);
+        acb_inplace_neg(Hneg + 1);
         acb_addmul(Hneg + 1, Hneg, S, prec);
     }
 

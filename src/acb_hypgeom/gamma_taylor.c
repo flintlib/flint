@@ -288,7 +288,7 @@ acb_hypgeom_gamma_taylor(acb_t res, const acb_t z, int reciprocal, slong prec)
         }
 
         if (r % 2)
-            acb_neg(res, res);
+            acb_inplace_neg(res);
     }
 
     success = 1;

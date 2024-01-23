@@ -122,7 +122,7 @@ acb_mat_det_precond(acb_t det, const acb_mat_t A, slong prec)
             arb_zero(acb_imagref(det));
 
         if (_perm_parity(P, n))
-            acb_neg(det, det);
+            acb_inplace_neg(det);
 
         acb_div(det, det, detU, prec);
 

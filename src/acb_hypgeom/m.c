@@ -41,7 +41,7 @@ acb_hypgeom_m_asymp(acb_t res, const acb_t a, const acb_t b, const acb_t z, int 
     acb_mul(t, t, v, prec);
 
     /* z^(a-b) */
-    acb_neg(c, c);
+    acb_inplace_neg(c);
     acb_pow(v, z, c, prec);
     acb_mul(u, u, v, prec);
 

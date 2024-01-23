@@ -83,7 +83,7 @@ acb_elliptic_k_jet(acb_ptr w, const acb_t m, slong len, slong prec)
 
         acb_mul(w + k, w + k, t, prec);
         acb_div_ui(w + k, w + k, 4 * (n + 1) * (n + 2), prec);
-        acb_neg(w + k, w + k);
+        acb_inplace_neg(w + k);
     }
 
     acb_clear(t);

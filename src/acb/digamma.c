@@ -42,7 +42,7 @@ acb_digamma(acb_t y, const acb_t x, slong prec)
     if (reflect)
     {
         acb_sub_ui(t, x, 1, wp);
-        acb_neg(t, t);
+        acb_inplace_neg(t);
         acb_cot_pi(v, x, wp);
         arb_const_pi(acb_realref(u), wp);
         acb_mul_arb(v, v, acb_realref(u), wp);

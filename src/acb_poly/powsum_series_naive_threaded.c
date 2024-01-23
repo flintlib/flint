@@ -99,7 +99,7 @@ _acb_zeta_powsum_evaluator(void * arg_ptr)
             arb_div(acb_realref(u), acb_realref(u), f, arg.prec);
             arb_div(acb_imagref(u), acb_imagref(u), f, arg.prec);
             if (arg.d0 % 2)
-                acb_neg(u, u);
+                acb_inplace_neg(u);
         }
 
         acb_add(arg.z, arg.z, u, arg.prec);

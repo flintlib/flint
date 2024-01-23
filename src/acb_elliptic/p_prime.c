@@ -35,7 +35,7 @@ acb_elliptic_p_prime(acb_t r, const acb_t z, const acb_t tau, slong prec)
     /* (-2*pi*eta^2/theta1)^3*theta2*theta3*theta4 */
     acb_const_pi(t2, prec);
     acb_mul_2exp_si(t2, t2, 1);
-    acb_neg(t2, t2);
+    acb_inplace_neg(t2);
     acb_modular_eta(t3, tau, prec);
     acb_mul(t1, t3, t3, prec);
     acb_mul(t3, t1, t2, prec);

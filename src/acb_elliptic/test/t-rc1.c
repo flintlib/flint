@@ -33,7 +33,7 @@ TEST_FUNCTION_START(acb_elliptic_rc1, state)
         acb_randtest(a, state, 1 + n_randint(state, 300), 10);
         acb_add(r2, x, a, 200);
         acb_sub(r2, r2, a, 200);
-        acb_neg(r2, r2);
+        acb_inplace_neg(r2);
         if (n_randint(state, 2))
             acb_swap(x, r2);
 

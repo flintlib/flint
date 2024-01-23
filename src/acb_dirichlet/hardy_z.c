@@ -30,7 +30,7 @@ acb_dirichlet_hardy_z(acb_ptr res, const acb_t t,
         acb_neg(res, t);
         acb_dirichlet_hardy_z(res, res, G, chi, len, prec);
         for (k = 1; k < len; k += 2)
-            acb_neg(res + k, res + k);
+            acb_inplace_neg(res + k);
         return;
     }
 
@@ -55,7 +55,7 @@ acb_dirichlet_hardy_z(acb_ptr res, const acb_t t,
         if (k % 4 == 1)
             acb_mul_onei(w + k, w + k);
         else if (k % 4 == 2)
-            acb_neg(w + k, w + k);
+            acb_inplace_neg(w + k);
         else if (k % 4 == 3)
             acb_div_onei(w + k, w + k);
     }

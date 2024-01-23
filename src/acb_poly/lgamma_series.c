@@ -83,18 +83,18 @@ _acb_poly_lgamma_series(acb_ptr res, acb_srcptr h, slong hlen, slong len, slong 
         if (r != 0) /* otherwise t = 0 */
         {
             acb_sub_ui(u, h, 1, wp);
-            acb_neg(u, u);
+            acb_inplace_neg(u);
             acb_hypgeom_log_rising_ui_jet(t, u, r, len, wp);
             for (i = 1; i < len; i += 2)
-                acb_neg(t + i, t + i);
+                acb_inplace_neg(t + i);
         }
 
         acb_sub_ui(u, h, 1, wp);
-        acb_neg(u, u);
+        acb_inplace_neg(u);
         acb_add_ui(zr, u, r, wp);
         _acb_poly_gamma_stirling_eval(u, zr, n, len, wp);
         for (i = 1; i < len; i += 2)
-            acb_neg(u + i, u + i);
+            acb_inplace_neg(u + i);
 
         _acb_vec_sub(t, t, u, len, wp);
 

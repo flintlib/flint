@@ -60,7 +60,7 @@ acb_hypgeom_chebyshev_t(acb_t res, const acb_t n, const acb_t z, slong prec)
             acb_neg(a, n);
             acb_one(c);
             acb_mul_2exp_si(c, c, -1);
-            acb_neg(t, t);
+            acb_inplace_neg(t);
             acb_mul_2exp_si(t, t, -1);
             acb_hypgeom_2f1(res, a, n, c, t, 0, prec);
 

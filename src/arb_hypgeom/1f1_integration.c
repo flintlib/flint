@@ -216,7 +216,7 @@ integrand(acb_ptr out, const acb_t t, void * param, slong order, slong prec)
     acb_init(v);
 
     acb_sub_ui(v, t, 1, prec);
-    acb_neg(v, v);
+    acb_inplace_neg(v);
 
     if (order == 1)
     {

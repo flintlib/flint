@@ -71,7 +71,7 @@ _acb_poly_tree_build(acb_ptr * tree, acb_srcptr roots, slong len, slong prec)
 
             acb_mul(pa + (3 * i), a, b, prec);
             acb_add(pa + (3 * i + 1), a, b, prec);
-            acb_neg(pa + (3 * i + 1), pa + (3 * i + 1));
+            acb_inplace_neg(pa + (3 * i + 1));
             acb_one(pa + (3 * i + 2));
         }
 

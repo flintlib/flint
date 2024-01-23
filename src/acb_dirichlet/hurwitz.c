@@ -25,7 +25,7 @@ acb_dirichlet_hurwitz(acb_t res, const acb_t s, const acb_t a, slong prec)
     {
         acb_mul_2exp_si(res, a, 1);
         acb_sub_ui(res, res, 1, prec);
-        acb_neg(res, res);
+        acb_inplace_neg(res);
         acb_mul_2exp_si(res, res, -1);
         return;
     }

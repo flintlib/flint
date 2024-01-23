@@ -40,9 +40,9 @@ acb_elliptic_pi_reduced(acb_t r, const acb_t n,
     acb_mul(p, y, n, prec);
     acb_mul(y, y, m, prec);
     acb_sub_ui(y, y, 1, prec);
-    acb_neg(y, y);
+    acb_inplace_neg(y);
     acb_sub_ui(p, p, 1, prec);
-    acb_neg(p, p);
+    acb_inplace_neg(p);
     acb_one(rf);
     acb_one(rj);
 
@@ -79,7 +79,7 @@ acb_elliptic_pi(acb_t r, const acb_t n, const acb_t m, slong prec)
         arb_init(pi);
         arb_const_pi(pi, prec);
         acb_sub_ui(r, n, 1, prec);
-        acb_neg(r, r);
+        acb_inplace_neg(r);
         acb_rsqrt(r, r, prec);
         acb_mul_arb(r, r, pi, prec);
         acb_mul_2exp_si(r, r, -1);

@@ -39,7 +39,7 @@ acb_hypgeom_erf_1f1a(acb_t res, const acb_t z, slong prec)
     acb_one(b + 1);
 
     acb_mul(w, z, z, prec);
-    acb_neg(w, w);
+    acb_inplace_neg(w);
 
     acb_hypgeom_pfq_direct(t, a, 1, b, 2, w, -1, prec);
 
@@ -74,7 +74,7 @@ acb_hypgeom_erf_1f1b(acb_t res, const acb_t z, slong prec)
 
     acb_hypgeom_pfq_direct(t, a, 0, b, 1, w, -1, prec);
 
-    acb_neg(w, w);
+    acb_inplace_neg(w);
     acb_exp(w, w, prec);
     acb_mul(t, t, w, prec);
 
@@ -132,7 +132,7 @@ acb_hypgeom_erf_asymp(acb_t res, const acb_t z, int complementary, slong prec, s
 
     acb_hypgeom_u_asymp(u, a, a, t, -1, prec2);
 
-    acb_neg(t, t);
+    acb_inplace_neg(t);
     acb_exp(t, t, prec2);
     acb_mul(u, u, t, prec2);
 

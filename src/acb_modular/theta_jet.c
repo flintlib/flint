@@ -37,7 +37,7 @@ _acb_vec_mul_4th_root(acb_ptr y, acb_srcptr x, slong len, int r, slong prec)
         for (k = 0; k < len; k++)
         {
             acb_mul_onei(y + k, x + k);
-            acb_neg(y + k, y + k);
+            acb_inplace_neg(y + k);
         }
     }
     else
@@ -126,7 +126,7 @@ acb_modular_theta_jet(acb_ptr theta1, acb_ptr theta2,
 
             /* z' = -z/(c*tau+d) */
             acb_mul(z_prime, z, B, prec);
-            acb_neg(z_prime, z_prime);
+            acb_inplace_neg(z_prime);
 
             /* A = sqrt(i/(c*tau+d)) */
             acb_mul_onei(A, B);
@@ -144,7 +144,7 @@ acb_modular_theta_jet(acb_ptr theta1, acb_ptr theta2,
                 /* B[1] = -2*z*c/(c*tau+d) */
                 acb_mul(B + 1, B, z, prec);
                 acb_mul_2exp_si(B + 1, B + 1, 1);
-                acb_neg(B + 1, B + 1);
+                acb_inplace_neg(B + 1);
             }
 
             acb_mul(B, z_prime, z, prec);
@@ -183,7 +183,7 @@ acb_modular_theta_jet(acb_ptr theta1, acb_ptr theta2,
                     acb_mul_fmpz(u, tau, &g->c, prec);
                     acb_add_fmpz(u, u, &g->d, prec);
                     acb_inv(u, u, prec);
-                    acb_neg(u, u);
+                    acb_inplace_neg(u);
                     acb_mul_arb(u, u, nn, prec);
                     acb_sub(B + 1, B + 1, u, prec);
                 }
@@ -237,7 +237,7 @@ acb_modular_theta_jet(acb_ptr theta1, acb_ptr theta2,
             acb_mul_fmpz(z_prime, tau, &g->c, prec);
             acb_add_fmpz(z_prime, z_prime, &g->d, prec);
             acb_inv(z_prime, z_prime, prec);
-            acb_neg(z_prime, z_prime);
+            acb_inplace_neg(z_prime);
 
             acb_set(w, z_prime);
 

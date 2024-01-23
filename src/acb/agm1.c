@@ -51,7 +51,7 @@ sqrtmul(acb_t c, const acb_t a, const acb_t b, slong prec)
              arb_is_nonnegative(acb_imagref(b)))
     {
         acb_mul(c, a, b, prec);
-        acb_neg(c, c);
+        acb_inplace_neg(c);
         acb_sqrt(c, c, prec);
         acb_mul_onei(c, c);
     }
@@ -59,10 +59,10 @@ sqrtmul(acb_t c, const acb_t a, const acb_t b, slong prec)
              arb_is_nonpositive(acb_imagref(b)))
     {
         acb_mul(c, a, b, prec);
-        acb_neg(c, c);
+        acb_inplace_neg(c);
         acb_sqrt(c, c, prec);
         acb_mul_onei(c, c);
-        acb_neg(c, c);
+        acb_inplace_neg(c);
     }
     else
     {
@@ -585,7 +585,7 @@ acb_agm1_cpx(acb_ptr m, const acb_t z, slong len, slong prec)
         acb_inv(w, w, prec);
         acb_mul(t, w, w, prec);
         acb_mul(w + 1, w + 1, t, prec);
-        acb_neg(w + 1, w + 1);
+        acb_inplace_neg(w + 1);
 
         if (acb_is_one(z))
         {
@@ -596,7 +596,7 @@ acb_agm1_cpx(acb_ptr m, const acb_t z, slong len, slong prec)
                 acb_mul_ui(w + k, w + n + 0, (n+1)*(n+1), prec);
                 acb_addmul_ui(w + k, w + n + 1, 7+3*n*(3+n), prec);
                 acb_div_ui(w + k, w + k, 2*(n+2)*(n+2), prec);
-                acb_neg(w + k, w + k);
+                acb_inplace_neg(w + k);
             }
         }
         else
@@ -609,7 +609,7 @@ acb_agm1_cpx(acb_ptr m, const acb_t z, slong len, slong prec)
             acb_sub_ui(t, t, 1, prec);
             acb_sub(u, u, z, prec);
             acb_inv(u, u, prec);
-            acb_neg(u, u);
+            acb_inplace_neg(u);
 
             /* use differential equation for second derivative */
             acb_mul(w + 2, z, w + 0, prec);

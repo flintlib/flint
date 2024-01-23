@@ -595,7 +595,7 @@ acb_mat_approx_eig_triu_r(acb_mat_t ER, const acb_mat_t A, slong prec)
             }
 
             acb_approx_div(acb_mat_entry(ER, i, j), r, t, prec);
-            acb_neg(acb_mat_entry(ER, i, j), acb_mat_entry(ER, i, j));
+            acb_inplace_neg(acb_mat_entry(ER, i, j));
 
             acb_approx_mag(tm, r);
             mag_max(rmax, rmax, tm);
@@ -699,7 +699,7 @@ acb_mat_approx_eig_triu_l(acb_mat_t EL, const acb_mat_t A, slong prec)
             }
 
             acb_approx_div(acb_mat_entry(EL, i, j), r, t, prec);
-            acb_neg(acb_mat_entry(EL, i, j), acb_mat_entry(EL, i, j));
+            acb_inplace_neg(acb_mat_entry(EL, i, j));
 
             acb_approx_mag(tm, r);
             mag_max(rmax, rmax, tm);
@@ -906,7 +906,7 @@ acb_mat_approx_hessenberg_qr(acb_mat_t A, acb_mat_t Q, const mag_t tol, slong ma
                 }
                 else
                 {
-                    acb_neg(s, s);
+                    acb_inplace_neg(s);
                     acb_sqrt(s, s, prec);
                     acb_get_mid(s, s);
                     acb_mul_onei(s, s);

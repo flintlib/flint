@@ -26,7 +26,7 @@ eta1(acb_t res, acb_t theta1, const acb_t tau, slong prec)
     if (theta1 != NULL)
         acb_set(theta1, theta + 1);
     acb_div(res, theta + 3, theta + 1, prec);
-    acb_neg(res, res);
+    acb_inplace_neg(res);
     _acb_vec_clear(theta, 16);
     acb_clear(z);
 }

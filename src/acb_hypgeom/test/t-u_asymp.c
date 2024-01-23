@@ -69,7 +69,7 @@ TEST_FUNCTION_START(acb_hypgeom_u_asymp, state)
         acb_sub(a2, a, b, prec0);
         acb_add_ui(a2, a2, 1, prec0);
         acb_sub_ui(b2, b, 2, prec0);
-        acb_neg(b2, b2);
+        acb_inplace_neg(b2);
 
         acb_hypgeom_u_asymp(U1, a, b, z, n1, prec1);
         acb_hypgeom_u_asymp(U2, a2, b2, z, n2, prec2);
@@ -128,7 +128,7 @@ TEST_FUNCTION_START(acb_hypgeom_u_asymp, state)
         acb_sub(am, a, b, prec2);
         acb_add_ui(am, am, 1, prec2);
         acb_sub_ui(bm, b, 2, prec2);
-        acb_neg(bm, bm);
+        acb_inplace_neg(bm);
         acb_one(bm + 1);
         acb_hypgeom_pfq_direct(M2, am, 1, bm, 2, z, n2, prec2);
 
@@ -137,7 +137,7 @@ TEST_FUNCTION_START(acb_hypgeom_u_asymp, state)
         acb_rgamma(am, am, prec2);
         acb_mul(M1, M1, am, prec2);
         acb_sub_ui(am, b, 1, prec2);
-        acb_neg(am, am);
+        acb_inplace_neg(am);
         acb_gamma(am, am, prec2);
         acb_mul(M1, M1, am, prec2);
 
@@ -148,7 +148,7 @@ TEST_FUNCTION_START(acb_hypgeom_u_asymp, state)
         acb_mul(M2, M2, am, prec2);
 
         acb_sub_ui(am, b, 1, prec2);
-        acb_neg(am, am);
+        acb_inplace_neg(am);
         acb_pow(am, z, am, prec2);
         acb_mul(M2, M2, am, prec2);
 

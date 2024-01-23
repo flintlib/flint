@@ -39,7 +39,7 @@ acb_mat_dft(acb_mat_t res, int kind, slong prec)
         for (j = 0; j < c; j++)
         {
             acb_dirichlet_root(t, roots, i * j, prec);
-            acb_conj(t, t);
+            acb_inplace_conj(t);
             acb_mul(acb_mat_entry(res, i, j), t, v, prec);
         }
     }

@@ -24,7 +24,7 @@ _acb_dirichlet_xi(acb_t res, const acb_t s, slong prec)
     /* (s-1) * pi^(-s/2) * gamma(1 + s/2) * zeta(s) */
     acb_const_pi(pi, prec);
     acb_mul_2exp_si(z1, s, -1);
-    acb_neg(z1, z1);
+    acb_inplace_neg(z1);
     acb_pow(z1, pi, z1, prec);
     acb_mul_2exp_si(z2, s, -1);
     acb_add_ui(z2, z2, 1, prec);
@@ -58,7 +58,7 @@ void acb_dirichlet_xi(acb_t res, const acb_t s, slong prec)
         arb_contains_zero(acb_imagref(s))))
     {
         acb_sub_ui(res, s, 1, prec);
-        acb_neg(res, res);
+        acb_inplace_neg(res);
         _acb_dirichlet_xi(res, res, prec);
     }
     else

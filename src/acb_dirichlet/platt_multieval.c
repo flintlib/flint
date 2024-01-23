@@ -113,7 +113,7 @@ platt_g_base(acb_t out, const acb_t t, slong prec)
     acb_mul_arb(out, t, pi, prec);
     acb_mul_onei(out, out);
     acb_mul_2exp_si(out, out, 1);
-    acb_neg(out, out);
+    acb_inplace_neg(out);
     arb_clear(pi);
 }
 
@@ -402,7 +402,7 @@ _platt_smk(acb_ptr table, acb_ptr startvec, acb_ptr stopvec,
 
         acb_set_arb(z, t0);
         acb_mul_arb(z, z, a, prec);
-        acb_neg(z, z);
+        acb_inplace_neg(z);
         acb_exp_pi_i(z, z, prec);
         acb_mul_arb(z, z, rsqrtj, prec);
 

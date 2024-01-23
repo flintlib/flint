@@ -180,7 +180,7 @@ acb_hypgeom_gamma_stirling_sum_improved(acb_t s, const acb_t z, slong N, slong K
     acb_mul_2exp_si(u, u, 1);
     acb_mul(u, u, u, wp);
     acb_inv(u, u, wp);
-    acb_neg(u, u);
+    acb_inplace_neg(u);
 
     fmpz_init(kpow);
     upow = _acb_vec_init(m + 1);
@@ -263,7 +263,7 @@ acb_hypgeom_gamma_stirling_sum_improved(acb_t s, const acb_t z, slong N, slong K
     acb_set_round(t, z, wp);
     acb_mul(S3, S3, t, wp);
     acb_mul_2exp_si(S3, S3, 1);
-    acb_neg(S3, S3);
+    acb_inplace_neg(S3);
 
     acb_add_error_mag(S3, err);
 

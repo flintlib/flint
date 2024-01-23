@@ -228,7 +228,7 @@ integrand(acb_ptr out, const acb_t t, void * param, slong order, slong prec)
         {
             /* exp(-z t) */
             acb_mul_arb(s, t, z, prec);
-            acb_neg(s, s);
+            acb_inplace_neg(s);
             acb_exp(s, s, prec);
 
             /* t^(a-1) */
@@ -243,7 +243,7 @@ integrand(acb_ptr out, const acb_t t, void * param, slong order, slong prec)
         else
         {
             acb_mul_arb(s, t, z, prec);
-            acb_neg(s, s);
+            acb_inplace_neg(s);
 
             /* t^(a-1) */
             if (arb_is_zero(a1))

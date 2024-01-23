@@ -179,9 +179,9 @@ acb_calc_integrate_taylor(acb_t res,
         func(taylor_poly, m, param, N, prec);
         _acb_poly_integral(taylor_poly, taylor_poly, N + 1, prec);
         _acb_poly_evaluate(y2, taylor_poly, N + 1, x, prec);
-        acb_neg(x, x);
+        acb_inplace_neg(x);
         _acb_poly_evaluate(y1, taylor_poly, N + 1, x, prec);
-        acb_neg(x, x);
+        acb_inplace_neg(x);
 
         /* add truncation error */
         arb_add_error_arf(acb_realref(y1), err);

@@ -43,7 +43,7 @@ acb_chebyshev_u2_ui(acb_t a, acb_t b, ulong n, const acb_t x, slong prec)
         {
             acb_submul(b, x, a, prec);
             acb_mul(a, a, b, prec);
-            acb_neg(a, a);
+            acb_inplace_neg(a);
             acb_mul_2exp_si(a, a, 1);
             acb_mul(b, t, u, prec);
         }

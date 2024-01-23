@@ -55,7 +55,7 @@ TEST_FUNCTION_START(acb_tan, state)
         acb_add(d, a, c, prec1);
         acb_mul(c, a, c, prec1);
         acb_sub_ui(c, c, 1, prec1);
-        acb_neg(c, c);
+        acb_inplace_neg(c);
         acb_div(d, d, c, prec1);
 
         if (!acb_overlaps(b, d))

@@ -97,7 +97,7 @@ acb_theta_naive_all_g1(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
         acb_set(&th[4 * k + 1], &res[3]);
         acb_mul(&th[4 * k + 2], &res[1], q4, prec);
         acb_mul(&th[4 * k + 3], &res[0], q4, prec);
-        acb_neg(&th[4 * k + 3], &th[4 * k + 3]);
+        acb_inplace_neg(&th[4 * k + 3]);
     }
 
     acb_clear(q4);

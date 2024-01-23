@@ -45,7 +45,7 @@ TEST_FUNCTION_START(acb_hypgeom_chebyshev_u, state)
         acb_set_ui(c, 3);
         acb_mul_2exp_si(c, c, -1);
         acb_sub_ui(t, z, 1, prec);
-        acb_neg(t, t);
+        acb_inplace_neg(t);
         acb_mul_2exp_si(t, t, -1);
         acb_hypgeom_2f1(res2, a, b, c, t, 0, 2 + n_randint(state, 300));
         acb_add_ui(t, n, 1, prec);

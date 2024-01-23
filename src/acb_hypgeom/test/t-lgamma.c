@@ -80,9 +80,9 @@ TEST_FUNCTION_START(acb_hypgeom_lgamma, state)
             arf_set_mag(arb_midref(acb_imagref(b)), arb_radref(acb_imagref(z)));
 
             if (n_randint(state, 2))
-                acb_neg(b, b);
+                acb_inplace_neg(b);
             if (n_randint(state, 2))
-                acb_conj(b, b);
+                acb_inplace_conj(b);
 
             acb_add(a, a, b, prec);
         }

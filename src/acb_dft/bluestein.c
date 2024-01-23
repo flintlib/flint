@@ -66,7 +66,7 @@ _acb_vec_bluestein_factors(acb_ptr z, slong n, slong prec)
 
         acb_one(t + 0);
         acb_unit_root(t + 1, 2 * n, prec);
-        acb_conj(t + 1, t + 1);
+        acb_inplace_conj(t + 1);
         acb_set_si(t + n, -1);
         for (k = 2; k < n; k++)
             if (v[k])

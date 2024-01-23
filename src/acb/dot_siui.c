@@ -82,7 +82,7 @@ acb_dot_siui(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong x
                 arb_mul_arf(acb_realref(res), acb_realref(x), t, prec);
                 arb_mul_arf(acb_imagref(res), acb_imagref(x), t, prec);
                 if (subtract)
-                    acb_neg(res, res);
+                    acb_inplace_neg(res);
             }
             return;
         }

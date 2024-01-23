@@ -33,7 +33,7 @@ acb_hypgeom_chebyshev_u(acb_t res, const acb_t n, const acb_t z, slong prec)
         else
         {
             acb_chebyshev_u_ui(res, -2-k, z, prec);
-            acb_neg(res, res);
+            acb_inplace_neg(res);
         }
 
         return;
@@ -71,7 +71,7 @@ acb_hypgeom_chebyshev_u(acb_t res, const acb_t n, const acb_t z, slong prec)
         acb_add_ui(b, n, 2, prec);
         acb_set_ui(c, 3);
         acb_mul_2exp_si(c, c, -1);
-        acb_neg(t, t);
+        acb_inplace_neg(t);
         acb_mul_2exp_si(t, t, -1);
         acb_hypgeom_2f1(t, a, b, c, t, 0, prec);
         acb_mul(res, t, u, prec);
@@ -101,7 +101,7 @@ acb_hypgeom_chebyshev_u(acb_t res, const acb_t n, const acb_t z, slong prec)
             acb_acos(res, z, prec);
             acb_mul(res, res, u, prec);
             acb_sin(res, res, prec);
-            acb_neg(t, t);
+            acb_inplace_neg(t);
             acb_rsqrt(t, t, prec);
             acb_mul(res, res, t, prec);
         }

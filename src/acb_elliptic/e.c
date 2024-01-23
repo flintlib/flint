@@ -37,7 +37,7 @@ acb_elliptic_e(acb_t res, const acb_t m, slong prec)
         acb_add(t, t, t + 1, prec);
         acb_sub_ui(t + 1, m, 1, prec);
         acb_mul(res, t, t + 1, prec);
-        acb_neg(res, res);
+        acb_inplace_neg(res);
 
         acb_clear(t + 0);
         acb_clear(t + 1);

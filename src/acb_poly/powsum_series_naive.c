@@ -19,7 +19,7 @@ void _acb_poly_acb_invpow_cpx(acb_ptr res, const acb_t N, const acb_t c, slong t
     acb_init(logN);
     acb_log(logN, N, prec);
     acb_mul(res + 0, logN, c, prec);
-    acb_neg(res + 0, res + 0);
+    acb_inplace_neg(res + 0);
     acb_exp(res + 0, res + 0, prec);
 
     for (i = 1; i < trunc; i++)

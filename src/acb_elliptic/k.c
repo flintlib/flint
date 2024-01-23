@@ -18,7 +18,7 @@ acb_elliptic_k(acb_t k, const acb_t m, slong prec)
     acb_t t;
     acb_init(t);
     acb_sub_ui(t, m, 1, prec);
-    acb_neg(t, t);
+    acb_inplace_neg(t);
     acb_sqrt(t, t, prec);
     acb_agm1(k, t, prec);
     acb_const_pi(t, prec);

@@ -97,7 +97,7 @@ _acb_poly_find_roots(acb_ptr roots,
     {
         acb_inv(roots + 0, poly + 1, prec);
         acb_mul(roots + 0, roots + 0, poly + 0, prec);
-        acb_neg(roots + 0, roots + 0);
+        acb_inplace_neg(roots + 0);
         return 1;
     }
 

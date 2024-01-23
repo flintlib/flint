@@ -319,7 +319,7 @@ acb_dot(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong xstep,
             {
                 acb_mul(res, x, y, prec);
                 if (subtract)
-                    acb_neg(res, res);
+                    acb_inplace_neg(res);
             }
             return;
         }

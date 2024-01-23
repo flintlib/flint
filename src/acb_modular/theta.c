@@ -33,7 +33,7 @@ acb_mul_4th_root(acb_t y, const acb_t x, int r, slong prec)
     else if (r == 6)
     {
         acb_mul_onei(y, x);
-        acb_neg(y, y);
+        acb_inplace_neg(y);
     }
     else
     {
@@ -153,7 +153,7 @@ acb_modular_theta(acb_t theta1, acb_t theta2,
 
         /* -z/(c*tau+d) */
         acb_mul(z_prime, z, B, prec);
-        acb_neg(z_prime, z_prime);
+        acb_inplace_neg(z_prime);
 
         /* A = sqrt(i/(c*tau+d)) */
         acb_mul_onei(A, B);

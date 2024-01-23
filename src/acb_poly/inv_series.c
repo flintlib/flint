@@ -34,7 +34,7 @@ _acb_poly_inv_series(acb_ptr Qinv,
     {
         acb_mul(Qinv + 1, Qinv, Qinv, prec);
         acb_mul(Qinv + 1, Qinv + 1, Q + 1, prec);
-        acb_neg(Qinv + 1, Qinv + 1);
+        acb_inplace_neg(Qinv + 1);
     }
     else
     {

@@ -107,7 +107,7 @@ _acb_poly_zeta_em_sum(acb_ptr z, const acb_t s, const acb_t a, int deflate, ulon
             for (i = 1; i < d; i++)
                 acb_mul(u + i, u + i - 1, u + 0, prec);
             for (i = 1; i < d; i += 2)
-                acb_neg(u + i, u + i);
+                acb_inplace_neg(u + i);
             _acb_poly_mullow(v, u, d, t, d, d, prec);
             _acb_vec_add(sum, sum, v, d, prec);
             _acb_poly_acb_invpow_cpx(t, Na, s, d, prec);

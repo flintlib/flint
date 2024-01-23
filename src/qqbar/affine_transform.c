@@ -144,7 +144,7 @@ qqbar_scalar_op(qqbar_t res, const qqbar_t x, const fmpz_t a, const fmpz_t b, co
         if (!fmpz_is_one(c))
         {
             if (fmpz_equal_si(c, -1))
-                acb_neg(w, w);
+                acb_inplace_neg(w);
             else
                 acb_div_fmpz(w, w, c, prec);
         }

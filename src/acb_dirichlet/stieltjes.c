@@ -605,7 +605,7 @@ _acb_dirichlet_stieltjes_integral2(acb_t res, const fmpz_t n, const acb_t alpha,
     acb_const_pi(b, wp);
     acb_mul(v, v, b, wp);
     acb_div_fmpz(v, v, n1, wp);
-    acb_neg(v, v);
+    acb_inplace_neg(v);
 
     if (acb_is_real(alpha))
         arb_zero(acb_imagref(v));
@@ -636,7 +636,7 @@ _acb_dirichlet_stieltjes_integral(acb_t res, const fmpz_t n, const acb_t a, slon
 
     if (acb_is_real(a))
     {
-        acb_conj(alpha, alpha);
+        acb_inplace_conj(alpha);
         _acb_dirichlet_stieltjes_integral2(res, n, alpha, prec);
     }
     else
@@ -646,9 +646,9 @@ _acb_dirichlet_stieltjes_integral(acb_t res, const fmpz_t n, const acb_t a, slon
         acb_init(r2);
 
         _acb_dirichlet_stieltjes_integral2(r1, n, alpha, prec);
-        acb_conj(alpha, alpha);
+        acb_inplace_conj(alpha);
         _acb_dirichlet_stieltjes_integral2(r2, n, alpha, prec);
-        acb_conj(r2, r2);
+        acb_inplace_conj(r2);
         acb_add(res, r1, r2, prec);
         acb_mul_2exp_si(res, res, -1);
 
@@ -733,7 +733,7 @@ acb_dirichlet_stieltjes_em(acb_t res, const fmpz_t n, const acb_t a, slong prec)
         acb_mul_arb(res, z + nn, acb_realref(s), prec);
 
         if (fmpz_is_odd(n))
-            acb_neg(res, res);
+            acb_inplace_neg(res);
 
         acb_clear(s);
         _acb_vec_clear(z, nn + 1);

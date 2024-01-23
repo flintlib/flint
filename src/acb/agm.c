@@ -121,7 +121,7 @@ acb_agm(acb_t res, const acb_t a, const acb_t b, slong prec)
     }
     else
     {
-        acb_neg(u, u);
+        acb_inplace_neg(u);
         acb_sqrt(u, u, prec);
         acb_mul_onei(u, u);
     }
@@ -134,13 +134,13 @@ acb_agm(acb_t res, const acb_t a, const acb_t b, slong prec)
     }
     else if (arb_is_negative(acb_realref(v)))
     {
-        acb_neg(u, u);
+        acb_inplace_neg(u);
         agm_helper(res, t, u, prec);
     }
     else
     {
         agm_helper(v, t, u, prec);
-        acb_neg(u, u);
+        acb_inplace_neg(u);
         agm_helper(res, t, u, prec);
         acb_union(res, res, v, prec);
     }

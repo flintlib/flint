@@ -74,7 +74,7 @@ _platt_lambda(arb_t res, const arb_t t, slong prec)
 
     acb_const_pi(pi, prec);
     arb_mul_2exp_si(acb_imagref(s1), t, -1);
-    acb_neg(s1, s1);
+    acb_inplace_neg(s1);
     acb_pow(s1, pi, s1, prec);
 
     acb_mul_2exp_si(s2, s, -1);

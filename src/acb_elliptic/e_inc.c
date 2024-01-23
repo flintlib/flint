@@ -36,7 +36,7 @@ acb_elliptic_e_reduced(acb_t r, const acb_t z, const acb_t m, int times_pi, slon
     acb_mul(y, s, s, prec);
     acb_mul(y, y, m, prec);
     acb_sub_ui(y, y, 1, prec);
-    acb_neg(y, y);
+    acb_inplace_neg(y);
     acb_one(rf);
     acb_one(rd);
 

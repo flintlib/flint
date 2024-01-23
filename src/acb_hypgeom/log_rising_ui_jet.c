@@ -255,7 +255,7 @@ acb_hypgeom_log_rising_ui_jet(acb_ptr res, const acb_t z, ulong r, slong len, sl
     {
         acb_hypgeom_rising_ui_rec(res, z, r, prec);
         if (neg)
-            acb_neg(res, res);
+            acb_inplace_neg(res);
         acb_log(res, res, prec);
     }
     else

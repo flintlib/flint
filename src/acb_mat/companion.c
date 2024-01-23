@@ -29,7 +29,7 @@ _acb_mat_companion(acb_mat_t A, acb_srcptr poly, slong prec)
 
     acb_init(c);
     acb_inv(c, poly + n, prec);
-    acb_neg(c, c);
+    acb_inplace_neg(c);
     for (j = 0; j < n; j++)
         acb_mul(acb_mat_entry(A, n - 1, j), poly + j, c, prec);
     acb_clear(c);

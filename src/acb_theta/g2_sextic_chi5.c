@@ -62,7 +62,7 @@ acb_theta_g2_sextic_chi5(acb_poly_t res, acb_t chi5, const acb_mat_t tau, slong 
 
     if (acb_theta_g2_character(mat) == 1)
     {
-        acb_neg(det, det);
+        acb_inplace_neg(det);
     }
     acb_mul(chi5, chi5, det, prec);
 

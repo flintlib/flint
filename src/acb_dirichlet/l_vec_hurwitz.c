@@ -54,7 +54,7 @@ acb_dirichlet_l_vec_hurwitz(acb_ptr res, const acb_t s,
         }
 
         acb_mul(z, z, qs, prec);
-        acb_conj(z, z);
+        acb_inplace_conj(z);
 
         z++;
     } while (dirichlet_char_next(cn, G) >= 0);
@@ -64,7 +64,7 @@ acb_dirichlet_l_vec_hurwitz(acb_ptr res, const acb_t s,
     {
         slong k;
         for (k = 0; k < G->phi_q; k++)
-            acb_conj(res + k, res + k);
+            acb_inplace_conj(res + k);
     }
 
     /* restore pole for the principal character */

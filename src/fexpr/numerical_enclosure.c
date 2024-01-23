@@ -245,7 +245,7 @@ fexpr_get_acb_raw(acb_t res, const fexpr_t expr, slong prec)
         case FEXPR_Conjugate:
             REQUIRE_NARGS(1)
             success = fexpr_get_acb_raw(res, arg, prec);
-            acb_conj(res, res);
+            acb_inplace_conj(res);
             break;
 
         case FEXPR_Cos:
@@ -384,7 +384,7 @@ fexpr_get_acb_raw(acb_t res, const fexpr_t expr, slong prec)
         case FEXPR_Neg:
             REQUIRE_NARGS(1)
             success = fexpr_get_acb_raw(res, arg, prec);
-            acb_neg(res, res);
+            acb_inplace_neg(res);
             break;
 
         case FEXPR_Pos:

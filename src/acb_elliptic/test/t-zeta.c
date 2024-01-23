@@ -124,7 +124,7 @@ TEST_FUNCTION_START(acb_elliptic_zeta, state)
 
         acb_randtest(tau, state, prec0, e0);
         if (arf_sgn(arb_midref(acb_imagref(tau))) < 0)
-            acb_neg(tau, tau);
+            acb_inplace_neg(tau);
 
         acb_one(e1);
         acb_mul_2exp_si(e1, e1, -1);

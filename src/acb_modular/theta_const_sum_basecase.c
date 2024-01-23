@@ -93,7 +93,7 @@ acb_modular_theta_const_sum_basecase(acb_t theta2, acb_t theta3, acb_t theta4,
             acb_mul_2exp_si(q1, q1, 1);
             acb_add_ui(theta3, q1, 1, prec);
             acb_sub_ui(theta4, q1, 1, prec);
-            acb_neg(theta4, theta4);
+            acb_inplace_neg(theta4);
         }
 
         acb_clear(q1);

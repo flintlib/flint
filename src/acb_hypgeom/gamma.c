@@ -105,7 +105,7 @@ acb_hypgeom_gamma_stirling(acb_t y, const acb_t x, int reciprocal, slong prec)
     if (reflect)
     {
         acb_sub_ui(t, x, 1, wp);
-        acb_neg(t, t);
+        acb_inplace_neg(t);
         acb_hypgeom_rising_ui_rec(u, t, r, wp);
         arb_const_pi(acb_realref(v), wp);
         acb_mul_arb(u, u, acb_realref(v), wp);
@@ -124,7 +124,7 @@ acb_hypgeom_gamma_stirling(acb_t y, const acb_t x, int reciprocal, slong prec)
         else
         {
             /* gamma(x) = (rf(1-x, r) * pi) rgamma(1-x+r) csc(pi x) */
-            acb_neg(v, v);
+            acb_inplace_neg(v);
             acb_exp(v, v, wp);
             acb_csc_pi(t, x, wp);
             acb_mul(v, v, t, wp);
@@ -139,7 +139,7 @@ acb_hypgeom_gamma_stirling(acb_t y, const acb_t x, int reciprocal, slong prec)
         if (reciprocal)
         {
             /* rgamma(x) = rf(x,r) rgamma(x+r) */
-            acb_neg(u, u);
+            acb_inplace_neg(u);
             acb_exp(u, u, prec);
             acb_hypgeom_rising_ui_rec(v, x, r, wp);
             acb_mul(y, v, u, prec);

@@ -57,7 +57,7 @@ acb_dirichlet_eta(acb_t res, const acb_t s, slong prec)
         acb_pow(t, t, s, prec);
         acb_mul_2exp_si(t, t, 1);
         acb_sub_ui(t, t, 1, prec);
-        acb_neg(t, t);
+        acb_inplace_neg(t);
         acb_zeta(res, s, prec);
         acb_mul(res, res, t, prec);
         acb_clear(t);

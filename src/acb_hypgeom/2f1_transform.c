@@ -261,16 +261,16 @@ acb_hypgeom_2f1_transform_nolimit(acb_t res, const acb_t a, const acb_t b,
     acb_init(s);
 
     acb_add_si(s, z, -1, prec);   /* s = 1 - z */
-    acb_neg(s, s);
+    acb_inplace_neg(s);
 
     acb_sub(ba, b, a, prec);      /* ba = b - a */
     acb_sub(ca, c, a, prec);      /* ca = c - a */
     acb_sub(cb, c, b, prec);      /* cb = c - b */
     acb_sub(cab, ca, b, prec);    /* cab = c - a - b */
 
-    acb_add_si(ac1, ca, -1, prec); acb_neg(ac1, ac1); /* ac1 = a - c + 1 */
-    acb_add_si(bc1, cb, -1, prec); acb_neg(bc1, bc1); /* bc1 = b - c + 1 */
-    acb_add_si(ab1, ba, -1, prec); acb_neg(ab1, ab1); /* ab1 = a - b + 1 */
+    acb_add_si(ac1, ca, -1, prec); acb_inplace_neg(ac1); /* ac1 = a - c + 1 */
+    acb_add_si(bc1, cb, -1, prec); acb_inplace_neg(bc1); /* bc1 = b - c + 1 */
+    acb_add_si(ab1, ba, -1, prec); acb_inplace_neg(ab1); /* ab1 = a - b + 1 */
     acb_add_si(ba1, ba, 1, prec);                     /* ba1 = b - a + 1 */
 
     /* t = left term, u = right term (DLMF 15.8.1 - 15.8.5) */
@@ -297,13 +297,13 @@ acb_hypgeom_2f1_transform_nolimit(acb_t res, const acb_t a, const acb_t b,
     else if (which == 5)
     {
         acb_inv(w, z, prec);  /* w = 1-1/z */
-        acb_neg(w, w);
+        acb_inplace_neg(w);
         acb_add_si(w, w, 1, prec);
         acb_add(v, ac1, b, prec);       /* v = a+b-c+1 */
         acb_hypgeom_2f1_direct(t, a, ac1, v, w, 1, prec);
         acb_add_si(v, cab, 1, prec);    /* v = c-a-b+1 */
         acb_add_si(u, a, -1, prec);     /* u = 1-a */
-        acb_neg(u, u);
+        acb_inplace_neg(u);
         acb_hypgeom_2f1_direct(u, ca, u, v, w, 1, prec);
     }
     else
@@ -398,7 +398,7 @@ acb_hypgeom_2f1_transform(acb_t res, const acb_t a, const acb_t b,
 
         acb_sub_ui(t, z, 1, prec); /* t = z-1 */
         acb_div(u, z, t, prec); /* u = z/(z-1) */
-        acb_neg(t, t);
+        acb_inplace_neg(t);
         acb_neg(v, a);
         acb_pow(t, t, v, prec); /* t = (1-z)^-a */
         acb_sub(v, c, b, prec); /* v = c-b */

@@ -40,14 +40,14 @@ acb_log_sin_pi_half(acb_t res, const acb_t z, slong prec, int upper)
     else  /* i*pi*(z-0.5) + log((1-exp(-2i*pi*z))/2) */
     {
         acb_mul_2exp_si(t, zmid, 1);
-        acb_neg(t, t);
+        acb_inplace_neg(t);
 
         if (upper)
-            acb_conj(t, t);
+            acb_inplace_conj(t);
 
         acb_exp_pi_i(t, t, prec);
         acb_sub_ui(t, t, 1, prec);
-        acb_neg(t, t);
+        acb_inplace_neg(t);
 
         acb_mul_2exp_si(t, t, -1);
 
@@ -56,11 +56,11 @@ acb_log_sin_pi_half(acb_t res, const acb_t z, slong prec, int upper)
         acb_mul_2exp_si(u, u, -1);
         acb_sub(u, zmid, u, prec);
         if (upper)
-            acb_conj(u, u);
+            acb_inplace_conj(u);
         acb_mul_onei(u, u);
         acb_addmul_arb(t, u, pi, prec);
         if (upper)
-            acb_conj(t, t);
+            acb_inplace_conj(t);
     }
 
     if (upper)

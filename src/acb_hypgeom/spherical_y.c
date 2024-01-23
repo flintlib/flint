@@ -56,7 +56,7 @@ acb_hypgeom_spherical_y(acb_t res, slong n, slong m,
     acb_mul_si(u, u, m, prec);
     acb_exp(u, u, prec);
     if (m < 0 && m % 2)
-        acb_neg(u, u);
+        acb_inplace_neg(u);
     acb_mul(t, t, u, prec);
 
     /* sqrt((2n+1)/(4pi) (n-m)!/(n+m)!) */

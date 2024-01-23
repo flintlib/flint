@@ -28,7 +28,7 @@ acb_acos(acb_t res, const acb_t z, slong prec)
         {
             /* pure imaginary on (1,inf) */
             acb_asin(res, z, prec);
-            acb_neg(res, res);
+            acb_inplace_neg(res);
             arb_zero(acb_realref(res));
         }
         else

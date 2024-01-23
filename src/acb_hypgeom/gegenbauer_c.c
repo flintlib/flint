@@ -106,7 +106,7 @@ acb_hypgeom_gegenbauer_c(acb_t res, const acb_t n, const acb_t m,
     acb_add(c, c, m, prec);
     acb_sub_ui(t, z, 1, prec);
     acb_mul_2exp_si(t, t, -1);
-    acb_neg(t, t);
+    acb_inplace_neg(t);
 
     acb_hypgeom_2f1(t, a, b, c, t, 0, prec);
 

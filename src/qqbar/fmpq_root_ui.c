@@ -60,7 +60,7 @@ qqbar_fmpq_root_ui(qqbar_t res, const fmpq_t x, ulong b)
             fmpz_inplace_neg(QQBAR_COEFFS(res) + 0);
             fmpz_sqrt(QQBAR_COEFFS(res) + 1, fmpq_denref(x));
             acb_set_fmpz(QQBAR_ENCLOSURE(res), QQBAR_COEFFS(res) + 0);
-            acb_neg(QQBAR_ENCLOSURE(res), QQBAR_ENCLOSURE(res));
+            acb_inplace_neg(QQBAR_ENCLOSURE(res));
             acb_div_fmpz(QQBAR_ENCLOSURE(res), QQBAR_ENCLOSURE(res), QQBAR_COEFFS(res) + 1, QQBAR_DEFAULT_PREC);
         }
         else

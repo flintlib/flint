@@ -122,7 +122,7 @@ TEST_FUNCTION_START(acb_rsqrt, state)
 
         acb_log(c, a, FLINT_MIN(prec, 200));
         acb_mul_2exp_si(c, c, -1);
-        acb_neg(c, c);
+        acb_inplace_neg(c);
         acb_exp(c, c, FLINT_MIN(prec, 200));
 
         if (!acb_overlaps(c, b))

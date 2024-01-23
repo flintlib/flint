@@ -87,7 +87,7 @@ acb_dirichlet_hardy_theta(acb_ptr res, const acb_t t,
         arb_set_d(c, 0.5 + parity);
         arb_add(acb_realref(y), acb_realref(y), c, prec);
         acb_mul_2exp_si(y, y, -1);
-        acb_neg(y + 1, y + 1);
+        acb_inplace_neg(y + 1);
         _acb_poly_lgamma_series(v, y, FLINT_MIN(len, 2), len, prec);
 
         _acb_vec_sub(res, res, v, len, prec);

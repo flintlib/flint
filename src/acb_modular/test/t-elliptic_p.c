@@ -114,7 +114,7 @@ TEST_FUNCTION_START(acb_modular_elliptic_p, state)
 
         acb_randtest(tau, state, prec0, e0);
         if (arf_sgn(arb_midref(acb_imagref(tau))) < 0)
-            acb_neg(tau, tau);
+            acb_inplace_neg(tau);
 
         acb_randtest(z1, state, prec0, e0);
         acb_randtest(p1, state, prec0, e0);

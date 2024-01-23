@@ -401,7 +401,7 @@ TEST_FUNCTION_START(acb_calc_integrate, state)
             if (n_randint(state, 2))
             {
                 acb_swap(a, b);
-                acb_neg(ans, ans);
+                acb_inplace_neg(ans);
             }
             acb_calc_integrate(res, f_circle, NULL, a, b, goal, tol, opt, prec);
         }
@@ -414,7 +414,7 @@ TEST_FUNCTION_START(acb_calc_integrate, state)
             if (n_randint(state, 2))
             {
                 acb_swap(a, b);
-                acb_neg(ans, ans);
+                acb_inplace_neg(ans);
             }
             acb_calc_integrate(res, f_essing2, NULL, a, b, goal, tol, opt, prec);
         }
@@ -427,7 +427,7 @@ TEST_FUNCTION_START(acb_calc_integrate, state)
             if (n_randint(state, 2))
             {
                 acb_swap(a, b);
-                acb_neg(ans, ans);
+                acb_inplace_neg(ans);
             }
             acb_calc_integrate(res, f_helfgott, NULL, a, b, goal, tol, opt, prec);
         }
@@ -440,7 +440,7 @@ TEST_FUNCTION_START(acb_calc_integrate, state)
             if (n_randint(state, 2))
             {
                 acb_swap(a, b);
-                acb_neg(ans, ans);
+                acb_inplace_neg(ans);
             }
             acb_calc_integrate(res, f_rump, NULL, a, b, goal, tol, opt, prec);
         }
@@ -453,7 +453,7 @@ TEST_FUNCTION_START(acb_calc_integrate, state)
             if (n_randint(state, 2))
             {
                 acb_swap(a, b);
-                acb_neg(ans, ans);
+                acb_inplace_neg(ans);
             }
             acb_calc_integrate(res, f_spike, NULL, a, b, goal, tol, opt, prec);
         }

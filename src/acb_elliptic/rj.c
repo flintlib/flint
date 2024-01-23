@@ -438,7 +438,7 @@ acb_elliptic_rj_carlson(acb_t res, const acb_t x, const acb_t y,
     acb_mul(Z, Z, t, prec);
     acb_add(P, X, Y, prec);
     acb_add(P, P, Z, prec);
-    acb_neg(P, P);
+    acb_inplace_neg(P);
     acb_mul_2exp_si(P, P, -1);
 
     /* todo: improve for R_D */

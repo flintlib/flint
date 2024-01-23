@@ -22,7 +22,7 @@ acb_dirichlet_zeta_rs_mid(acb_t res, const acb_t s, slong K, slong prec)
         acb_init(t);
         acb_conj(t, s);
         acb_dirichlet_zeta_rs(res, t, K, prec);
-        acb_conj(res, res);
+        acb_inplace_conj(res);
         acb_clear(t);
         return;
     }
@@ -49,7 +49,7 @@ acb_dirichlet_zeta_rs_mid(acb_t res, const acb_t s, slong K, slong prec)
         arb_inplace_neg(acb_realref(t));
         arb_set(acb_imagref(t), acb_imagref(s));
         acb_dirichlet_zeta_rs_r(R2, t, K, wp);
-        acb_conj(R2, R2);
+        acb_inplace_conj(R2);
     }
 
     if (acb_is_finite(R1) && acb_is_finite(R2))

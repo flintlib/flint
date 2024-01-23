@@ -99,7 +99,7 @@ acb_dirichlet_lerch_phi(acb_t res, const acb_t z, const acb_t s, const acb_t a, 
     if (acb_is_zero(s))
     {
         acb_sub_ui(res, z, 1, prec + 5);
-        acb_neg(res, res);
+        acb_inplace_neg(res);
         acb_inv(res, res, prec);
         return;
     }

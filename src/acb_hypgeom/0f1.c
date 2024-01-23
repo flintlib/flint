@@ -40,7 +40,7 @@ acb_hypgeom_0f1_asymp(acb_t res, const acb_t a, const acb_t z, int regularized, 
     else
         acb_hypgeom_bessel_i_asymp(v, u, v, 0, prec);
 
-    acb_neg(u, u);
+    acb_inplace_neg(u);
     acb_pow(t, t, u, prec);
     acb_mul(v, v, t, prec);
 
@@ -68,9 +68,9 @@ acb_hypgeom_0f1_direct(acb_t res, const acb_t a, const acb_t z, int regularized,
             acb_init(t);
             acb_init(u);
             acb_sub_ui(t, a, 2, prec);
-            acb_neg(t, t);
+            acb_inplace_neg(t);
             acb_sub_ui(u, a, 1, prec);
-            acb_neg(u, u);
+            acb_inplace_neg(u);
             acb_pow(u, z, u, prec);
             /* this cannot recurse infinitely, because t will
                either be an exact positive integer, or inexact */

@@ -43,7 +43,7 @@ TEST_FUNCTION_START(acb_hypgeom_erfc, state)
             case 1:
                 acb_hypgeom_erf(b, a, prec1);
                 acb_sub_ui(b, b, 1, prec1);
-                acb_neg(b, b);
+                acb_inplace_neg(b);
                 break;
             default:
                 acb_hypgeom_erfc(b, a, prec1);
@@ -57,7 +57,7 @@ TEST_FUNCTION_START(acb_hypgeom_erfc, state)
             case 1:
                 acb_hypgeom_erf(c, a, prec2);
                 acb_sub_ui(c, c, 1, prec2);
-                acb_neg(c, c);
+                acb_inplace_neg(c);
                 break;
             default:
                 acb_hypgeom_erfc(c, a, prec2);

@@ -886,7 +886,7 @@ _arb_sin_cos_arf_precomp(arb_t res1, arb_t res2, const arf_t x, slong prec,
         if ((rel[0] & 3) == 1)
             acb_mul_onei(u, u);
         else if ((rel[0] & 3) == 2)
-            acb_neg(u, u);
+            acb_inplace_neg(u);
         else if ((rel[0] & 3) == 3)
             acb_div_onei(u, u);
 

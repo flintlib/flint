@@ -38,19 +38,19 @@ acb_hypgeom_si_asymp(acb_t res, const acb_t z, slong prec)
     {
         arb_div(acb_realref(t), acb_realref(t), acb_realref(z), prec);
         arb_zero(acb_imagref(t));
-        acb_neg(t, t);
+        acb_inplace_neg(t);
     }
     else
     {
         /* u = U(1,1,-iz) */
-        acb_neg(w, w);
+        acb_inplace_neg(w);
         acb_hypgeom_u_asymp(u, one, one, w, -1, prec);
         acb_inv(v, v, prec);
         acb_addmul(t, u, v, prec);
 
         acb_div(t, t, z, prec);
         acb_mul_2exp_si(t, t, -1);
-        acb_neg(t, t);
+        acb_inplace_neg(t);
     }
 
     if (arb_is_zero(acb_realref(z)))
@@ -108,7 +108,7 @@ acb_hypgeom_si_1f2(acb_t res, const acb_t z, slong prec)
 
     acb_mul(t, z, z, prec);
     acb_mul_2exp_si(t, t, -2);
-    acb_neg(t, t);
+    acb_inplace_neg(t);
     acb_hypgeom_pfq_direct(t, a, 1, b, 3, t, -1, prec);
     acb_mul(t, t, z, prec);
 

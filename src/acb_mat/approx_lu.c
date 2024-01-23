@@ -125,7 +125,7 @@ acb_mat_approx_lu_classical(slong * P, acb_mat_t LU, const acb_mat_t A, slong pr
         for (j = row + 1; j < m; j++)
         {
             _acb_approx_mul(e, a[j] + col, d, prec);
-            acb_neg(e, e);
+            acb_inplace_neg(e);
             _acb_vec_approx_scalar_addmul(a[j] + col,
                 a[row] + col, n - col, e, prec);
             acb_zero(a[j] + col);

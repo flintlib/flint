@@ -55,7 +55,7 @@ acb_mat_lu_classical(slong * P, acb_mat_t LU, const acb_mat_t A, slong prec)
         for (j = row + 1; j < m; j++)
         {
             acb_div(e, a[j] + col, d, prec);
-            acb_neg(e, e);
+            acb_inplace_neg(e);
             _acb_vec_scalar_addmul(a[j] + col,
                 a[row] + col, n - col, e, prec);
             acb_zero(a[j] + col);

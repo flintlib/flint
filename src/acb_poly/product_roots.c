@@ -28,18 +28,18 @@ _acb_poly_product_roots(acb_ptr poly, acb_srcptr xs, slong n, slong prec)
     {
         acb_mul(poly, xs + 0, xs + 1, prec);
         acb_add(poly + 1, xs + 0, xs + 1, prec);
-        acb_neg(poly + 1, poly + 1);
+        acb_inplace_neg(poly + 1);
         acb_one(poly + 2);
     }
     else if (n == 3)
     {
         acb_mul(poly + 1, xs, xs + 1, prec);
         acb_mul(poly, poly + 1, xs + 2, prec);
-        acb_neg(poly, poly);
+        acb_inplace_neg(poly);
         acb_add(poly + 2, xs, xs + 1, prec);
         acb_addmul(poly + 1, poly + 2, xs + 2, prec);
         acb_add(poly + 2, poly + 2, xs + 2, prec);
-        acb_neg(poly + 2, poly + 2);
+        acb_inplace_neg(poly + 2);
         acb_one(poly + 3);
     }
     else

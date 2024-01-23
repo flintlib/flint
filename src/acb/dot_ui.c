@@ -31,7 +31,7 @@ acb_dot_ui(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong xst
             {
                 acb_mul_ui(res, x, y[0], prec);
                 if (subtract)
-                    acb_neg(res, res);
+                    acb_inplace_neg(res);
             }
             return;
         }

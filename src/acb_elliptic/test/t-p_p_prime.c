@@ -38,7 +38,7 @@ TEST_FUNCTION_START(acb_elliptic_p_p_prime, state)
         acb_randtest(z, state, 1 + n_randint(state, 200), 1 + n_randint(state, 10));
         acb_randtest(tau, state, 1 + n_randint(state, 200), 1 + n_randint(state, 10));
         if (arf_sgn(arb_midref(acb_imagref(tau))) < 0)
-            acb_neg(tau, tau);
+            acb_inplace_neg(tau);
 
         acb_elliptic_p(p, z, tau, prec);
         acb_elliptic_p_prime(pp, z, tau, prec);

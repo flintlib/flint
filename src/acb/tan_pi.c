@@ -54,7 +54,7 @@ acb_tan_pi(acb_t r, const acb_t z, slong prec)
             }
             else
             {
-                acb_neg(t, t);
+                acb_inplace_neg(t);
                 acb_exp_pi_i(t, t, prec + 4);
                 acb_add_ui(r, t, 1, prec + 4);
                 acb_div(r, t, r, prec + 4);

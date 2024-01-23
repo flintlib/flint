@@ -151,7 +151,7 @@ _acb_hypgeom_coulomb(acb_t F, acb_t G, acb_t Hpos, acb_t Hneg, const acb_t l, co
     /* C = exp((-pi eta + lu + lv)/2) */
     acb_const_pi(C, prec);
     acb_mul(C, C, eta, prec);
-    acb_neg(C, C);
+    acb_inplace_neg(C);
 
     if (C_real)
     {
@@ -178,7 +178,7 @@ _acb_hypgeom_coulomb(acb_t F, acb_t G, acb_t Hpos, acb_t Hneg, const acb_t l, co
         acb_mul_2exp_si(z1, z1, -1);
         acb_sub(T1, T1, z1, prec);
         acb_mul_2exp_si(z1, z1, 1);
-        acb_neg(T1, T1);
+        acb_inplace_neg(T1);
         acb_exp(T1, T1, prec);
         acb_mul(T1, T1, U1, prec);
 
@@ -195,7 +195,7 @@ _acb_hypgeom_coulomb(acb_t F, acb_t G, acb_t Hpos, acb_t Hneg, const acb_t l, co
             acb_mul_2exp_si(z2, z2, -1);
             acb_sub(T2, T2, z2, prec);
             acb_mul_2exp_si(z2, z2, 1);
-            acb_neg(T2, T2);
+            acb_inplace_neg(T2);
             acb_exp(T2, T2, prec);
             acb_mul(T2, T2, U2, prec);
 

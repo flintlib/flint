@@ -121,7 +121,7 @@ TEST_FUNCTION_START(acb_elliptic_pi_inc, state)
             acb_mul(z2, z2, z2, prec1);
             acb_mul(z2, z2, n, prec1);
             acb_sub_ui(z2, z2, 1, prec1);
-            acb_neg(z2, z2);
+            acb_inplace_neg(z2);
             acb_rsqrt(z2, z2, prec1);
             acb_mul_2exp_si(z2, z2, -1);
             acb_mul_2exp_si(r3, z1, 1);

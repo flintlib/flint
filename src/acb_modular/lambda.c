@@ -51,7 +51,7 @@ acb_modular_lambda(acb_t r, const acb_t tau, slong prec)
     acb_mul(r, r, r, prec);
 
     if ((Rsum & 7) == 4)
-        acb_neg(r, r);
+        acb_inplace_neg(r);
 
     if (qpower == 1)
         acb_mul(r, r, q, prec);

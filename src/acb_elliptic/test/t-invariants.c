@@ -35,7 +35,7 @@ TEST_FUNCTION_START(acb_elliptic_invariants, state)
 
         acb_randtest(tau, state, 1 + n_randint(state, 200), 1 + n_randint(state, 10));
         if (arf_sgn(arb_midref(acb_imagref(tau))) < 0)
-            acb_neg(tau, tau);
+            acb_inplace_neg(tau);
 
         acb_elliptic_roots(e1, e2, e3, tau, prec);
         acb_elliptic_invariants(g2, g3, tau, prec);

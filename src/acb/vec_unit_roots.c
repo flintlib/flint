@@ -76,7 +76,7 @@ _acb_vec_unit_roots(acb_ptr res, slong n, slong len, slong prec)
     if (conj)
     {
         for (k = 1; k < len; k++)
-            acb_conj(res + k, res + k);
+            acb_inplace_conj(res + k);
     }
 
 }

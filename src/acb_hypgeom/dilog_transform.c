@@ -56,7 +56,7 @@ acb_hypgeom_dilog_transform(acb_t res, const acb_t z, int algorithm, slong prec)
         else
         {
             acb_sub_ui(t, z, 1, prec);
-            acb_neg(t, t);
+            acb_inplace_neg(t);
             acb_hypgeom_dilog_zero(u, t, prec);
             acb_log(t, t, prec);
             acb_log(res, z, prec);
@@ -82,7 +82,7 @@ acb_hypgeom_dilog_transform(acb_t res, const acb_t z, int algorithm, slong prec)
         {
             acb_div(u, z, t, prec);
             acb_hypgeom_dilog_zero(u, u, prec);
-            acb_neg(t, t);
+            acb_inplace_neg(t);
             acb_log(t, t, prec);
             acb_mul(t, t, t, prec);
             acb_mul_2exp_si(t, t, -1);
@@ -94,7 +94,7 @@ acb_hypgeom_dilog_transform(acb_t res, const acb_t z, int algorithm, slong prec)
     {
         /* Li_2(z) = Li_2(1/(1-z)) + log(1-z) [log(1-z)/2 - log(-z)] - pi^2/6 */
         acb_sub_ui(t, z, 1, prec);
-        acb_neg(t, t);
+        acb_inplace_neg(t);
 
         acb_inv(u, t, prec);
         acb_hypgeom_dilog_zero(u, u, prec);
@@ -169,8 +169,8 @@ acb_hypgeom_dilog_transform(acb_t res, const acb_t z, int algorithm, slong prec)
 
             if (arf_sgn(arb_midref(acb_imagref(z))) < 0)
             {
-                acb_conj(a, a);
-                acb_conj(u, u);
+                acb_inplace_conj(a);
+                acb_inplace_conj(u);
             }
 
             acb_hypgeom_dilog_bitburst(res, t, z, prec);

@@ -71,7 +71,7 @@ acb_dirichlet_zeta_bound_functional_equation(mag_t res, const acb_t s)
 
     /* gamma(1-s) */
     acb_sub_ui(z, s, 1, prec);
-    acb_neg(z, z);
+    acb_inplace_neg(z);
     acb_gamma(z, z, prec);
     acb_get_mag(res, z);
 

@@ -26,7 +26,7 @@ _acb_poly_cos_pi_series(acb_ptr g, acb_srcptr h, slong hlen, slong n, slong prec
         acb_t t;
         acb_init(t);
         acb_sin_cos_pi(t, g, h, prec);
-        acb_neg(t, t);
+        acb_inplace_neg(t);
         acb_mul(g + 1, h + 1, t, prec);  /* safe since hlen >= 2 */
         acb_const_pi(t, prec);
         acb_mul(g + 1, g + 1, t, prec);

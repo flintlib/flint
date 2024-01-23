@@ -100,7 +100,7 @@ TEST_FUNCTION_START(acb_hypgeom_bessel_y, state)
 
         acb_sub(r, yv, jv, prec);
         if (n % 2)
-            acb_neg(r, r);
+            acb_inplace_neg(r);
 
         acb_neg(yv1, z);
         acb_hypgeom_bessel_y(yv1, nu, yv1, prec);

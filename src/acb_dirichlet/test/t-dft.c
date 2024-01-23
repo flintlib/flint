@@ -92,7 +92,7 @@ TEST_FUNCTION_START(acb_dirichlet_dft, state)
             for (j = 0; j < len; j++)
             {
                 acb_dirichlet_root(chiy, roots, dirichlet_pairing_char(G, x, y), prec);
-                acb_conj(chiy, chiy);
+                acb_inplace_conj(chiy);
                 acb_addmul(w1 + i, chiy, v + j, prec);
                 dirichlet_char_next(y, G);
             }

@@ -78,13 +78,13 @@ _acb_modular_eta_sum_basecase(acb_t eta, const acb_t q, double log2q_approx, slo
         else if (N == 2)
         {
             acb_sub_ui(eta, q, 1, prec);
-            acb_neg(eta, eta);
+            acb_inplace_neg(eta);
         }
         else
         {
             acb_mul(eta, q, q, prec);
             acb_add(eta, eta, q, prec);
-            acb_neg(eta, eta);
+            acb_inplace_neg(eta);
             acb_add_ui(eta, eta, 1, prec);
         }
         return;

@@ -57,7 +57,7 @@ acb_elliptic_roots(acb_t e1, acb_t e2, acb_t e3, const acb_t tau, slong prec)
     acb_mul(e1, e1, t3, prec);
     acb_mul(e2, e2, t3, prec);
     acb_mul(e3, e3, t3, prec);
-    acb_neg(e3, e3);
+    acb_inplace_neg(e3);
 
     if (e1r)
         arb_zero(acb_imagref(e1));

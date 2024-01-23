@@ -45,7 +45,7 @@ acb_mat_gauss_partial(acb_mat_t A, slong prec)
         for (j = row + 1; j < m; j++)
         {
             acb_div(e, a[j] + col, a[row] + col, prec);
-            acb_neg(e, e);
+            acb_inplace_neg(e);
             _acb_vec_scalar_addmul(a[j] + col + 1, a[row] + col + 1, n - col - 1, e, prec);
         }
 

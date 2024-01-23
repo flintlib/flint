@@ -185,7 +185,7 @@ gl_worker(slong k, gl_work_t * args)
     acb_mul_arb(t, args->delta, args->x + k2, prec);
 
     if (k2 != k)
-        acb_neg(t, t);
+        acb_inplace_neg(t);
 
     acb_add(t, t, args->mid, prec);
     args->f(v + k, t, args->param, 0, prec);

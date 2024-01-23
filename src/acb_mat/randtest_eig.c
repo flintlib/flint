@@ -32,7 +32,7 @@ acb_mat_randtest_eig(acb_mat_t A, flint_rand_t state, acb_srcptr E, slong prec)
         for (j = i + 1; j < n; j++)
         {
             acb_neg(acb_mat_entry(Q, i, j), acb_mat_entry(Q, j, i));
-            acb_conj(acb_mat_entry(Q, i, j), acb_mat_entry(Q, i, j));
+            acb_inplace_conj(acb_mat_entry(Q, i, j));
         }
         arb_zero(acb_realref(acb_mat_entry(Q, i, i)));
     }
