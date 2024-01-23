@@ -16,8 +16,13 @@ acb_mat_neg(acb_mat_t dest, const acb_mat_t src)
 {
     slong i, j;
 
-    for (i = 0; i < acb_mat_nrows(src); i++)
-        for (j = 0; j < acb_mat_ncols(src); j++)
-            acb_neg(acb_mat_entry(dest, i, j),
-                acb_mat_entry(src, i, j));
+    if (dest == src)
+        for (i = 0; i < acb_mat_nrows(src); i++)
+            for (j = 0; j < acb_mat_ncols(src); j++)
+                acb_inplace_neg(acb_mat_entry(dest, i, j));
+    else
+        for (i = 0; i < acb_mat_nrows(src); i++)
+            for (j = 0; j < acb_mat_ncols(src); j++)
+                acb_neg(acb_mat_entry(dest, i, j),
+                        acb_mat_entry(src, i, j));
 }

@@ -16,8 +16,13 @@ arb_mat_neg(arb_mat_t dest, const arb_mat_t src)
 {
     slong i, j;
 
-    for (i = 0; i < arb_mat_nrows(src); i++)
-        for (j = 0; j < arb_mat_ncols(src); j++)
-            arb_neg(arb_mat_entry(dest, i, j),
-                arb_mat_entry(src, i, j));
+    if (dest == src)
+        for (i = 0; i < arb_mat_nrows(src); i++)
+            for (j = 0; j < arb_mat_ncols(src); j++)
+                arb_inplace_neg(arb_mat_entry(dest, i, j));
+    else
+        for (i = 0; i < arb_mat_nrows(src); i++)
+            for (j = 0; j < arb_mat_ncols(src); j++)
+                arb_neg(arb_mat_entry(dest, i, j),
+                        arb_mat_entry(src, i, j));
 }
