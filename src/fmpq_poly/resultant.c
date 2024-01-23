@@ -176,7 +176,7 @@ void fmpq_poly_resultant(fmpq_t r, const fmpq_poly_t f, const fmpq_poly_t g)
                                  f->coeffs, f->den, len1);
 
             if (((len1 | len2) & WORD(1)) == WORD(0))
-                fmpq_neg(r, r);
+                fmpq_inplace_neg(r);
         }
     }
 }

@@ -550,7 +550,7 @@ acb_dirichlet_l_fmpq_afe(acb_t res, const fmpq_t s, const dirichlet_group_t G, c
         else
         {
             fmpq_sub_ui(s2, s, 1);
-            fmpq_neg(s2, s2);
+            fmpq_inplace_neg(s2);
             acb_dirichlet_fmpq_sum_afe(S2, s2, G, chi, tol2, prec2);
             acb_conj(S2, S2);
         }

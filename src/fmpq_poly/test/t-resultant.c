@@ -39,7 +39,7 @@ TEST_FUNCTION_START(fmpq_poly_resultant, state)
         fmpq_poly_resultant(x, f, g);
         fmpq_poly_resultant(y, g, f);
         if ((fmpq_poly_degree(f) * fmpq_poly_degree(g)) % 2)
-            fmpq_neg(y, y);
+            fmpq_inplace_neg(y);
 
         result = fmpq_equal(x, y);
         if (!result)
@@ -143,7 +143,7 @@ TEST_FUNCTION_START(fmpq_poly_resultant, state)
         fmpq_poly_resultant(y, g, f);
 
         if ((fmpq_poly_degree(f) * fmpq_poly_degree(g)) % 2)
-            fmpq_neg(y, y);
+            fmpq_inplace_neg(y);
 
         result = fmpq_equal(x, y);
         if (!result)

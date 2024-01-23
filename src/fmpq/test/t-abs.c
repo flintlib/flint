@@ -34,7 +34,7 @@ TEST_FUNCTION_START(fmpq_abs, state)
         if (n_randint(state, 2)) /* test aliasing */
         {
             fmpq_set(b, a);
-            fmpq_abs(b, b);
+            fmpq_inplace_abs(b);
         }
         else
         {

@@ -64,7 +64,7 @@ fmpq_mpoly_fprint_pretty(FILE * file, const fmpq_mpoly_t A,
         r = flint_fprintf(file, (fmpq_sgn(c) >= 0) ? (i > 0 ? " + " : "")
                                                    : (i > 0 ? " - " : "-") );
 
-        fmpq_abs(c, c);
+        fmpq_inplace_abs(c);
         if (!fmpq_is_one(c))
         {
             first = 0;

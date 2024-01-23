@@ -38,7 +38,7 @@ TEST_FUNCTION_START(fmpq_poly_content, state)
         fmpq_poly_content(b, g);
         fmpq_poly_content(c, f);
         fmpq_mul(c, a, c);
-        fmpq_abs(c, c);
+        fmpq_inplace_abs(c);
 
         result = (fmpq_equal(b, c));
         if (!result)

@@ -48,7 +48,7 @@ void fmpq_mpoly_reduce(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
     {
         if (!fmpz_is_one(g))
         {
-            fmpq_neg(A->content, A->content);
+            fmpq_inplace_neg(A->content);
             _fmpz_vec_neg(A->zpoly->coeffs, A->zpoly->coeffs, A->zpoly->length);
         }
     }

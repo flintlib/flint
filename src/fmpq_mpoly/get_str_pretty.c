@@ -80,7 +80,7 @@ char * fmpq_mpoly_get_str_pretty(const fmpq_mpoly_t A,
         off += flint_sprintf(str + off, "%s", (fmpq_sgn(c) >= 0)
                                                    ? (i > 0 ? " + " : "")
                                                    : (i > 0 ? " - " : "-") );
-        fmpq_abs(c, c);
+        fmpq_inplace_abs(c);
         if (!fmpq_is_one(c))
         {
             first = 0;

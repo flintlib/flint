@@ -249,7 +249,7 @@ fmpq_set_decimal(fmpq_t res, const char * inp, slong max_bits)
     if (inp[0] == '-')
     {
         success = fmpq_set_decimal(res, inp + 1, max_bits);
-        fmpq_neg(res, res);
+        fmpq_inplace_neg(res);
         return success;
     }
 

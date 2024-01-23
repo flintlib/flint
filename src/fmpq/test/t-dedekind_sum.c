@@ -168,7 +168,7 @@ TEST_FUNCTION_START(fmpq_dedekind_sum, state)
         if (i % 2)
         {
             fmpq_randtest_not_zero(x, state, 2000);
-            fmpq_abs(x, x);
+            fmpq_inplace_abs(x);
         }
         else
         {

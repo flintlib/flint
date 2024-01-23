@@ -40,7 +40,7 @@ TEST_FUNCTION_START(qqbar_conjugates, state)
             qqbar_add(y, y, r + i);
 
         fmpq_set_fmpz_frac(s, QQBAR_COEFFS(x) + d - 1, QQBAR_COEFFS(x) + d);
-        fmpq_neg(s, s);
+        fmpq_inplace_neg(s);
 
         qqbar_set_fmpq(z, s);
 

@@ -115,7 +115,7 @@ add_columns(fmpz_mat_t H, const fmpz_mat_t B, const fmpz_mat_t H1, flint_rand_t 
         _fmpq_mul(fmpq_numref(alpha), fmpq_denref(alpha),
                 fmpq_numref(alpha), fmpq_denref(alpha), one, den);
         if (neg)
-            fmpq_neg(alpha, alpha);
+            fmpq_inplace_neg(alpha);
 
         /* x_i += alpha*k */
         for (i = 0; i < n; i++)

@@ -54,7 +54,7 @@ TEST_FUNCTION_START(acb_poly_interpolate_fast, state)
             for (i = 1; i < n; i++)
             {
                 fmpq_randtest_not_zero(u, state, qbits2);
-                fmpq_abs(u, u);
+                fmpq_inplace_abs(u);
                 fmpq_add(t, t, u);
                 acb_set_fmpq(xs + i, t, rbits2);
             }

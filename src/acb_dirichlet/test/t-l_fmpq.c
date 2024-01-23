@@ -41,7 +41,7 @@ TEST_FUNCTION_START(acb_dirichlet_l_fmpq, state)
 
         fmpq_randtest(x, state, 2 + n_randint(state, 100));
         if (fmpq_get_d(x) < -100.0)
-            fmpq_neg(x, x);
+            fmpq_inplace_neg(x);
         acb_set_fmpq(s, x, prec);
 
         if (n_randint(state, 2))

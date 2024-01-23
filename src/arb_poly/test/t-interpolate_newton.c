@@ -54,7 +54,7 @@ TEST_FUNCTION_START(arb_poly_interpolate_newton, state)
             for (i = 1; i < n; i++)
             {
                 fmpq_randtest_not_zero(u, state, qbits2);
-                fmpq_abs(u, u);
+                fmpq_inplace_abs(u);
                 fmpq_add(t, t, u);
                 arb_set_fmpq(xs + i, t, rbits2);
             }
