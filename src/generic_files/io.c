@@ -181,6 +181,8 @@ static size_t __ulong_fprint(FILE *, const ulong *, int);
 static size_t __slong_fprint(FILE *, const slong *, int);
 static size_t __fmpz_fprint(FILE *, const fmpz *, int);
 static size_t __fmpq_fprint(FILE *, const fmpq *, int);
+static size_t __mpz_fprint(FILE *, mpz_srcptr);
+static size_t __mpq_fprint(FILE *, mpq_srcptr);
 static size_t __mag_fprint(FILE *, mag_srcptr);
 static size_t __arf_fprint(FILE *, arf_srcptr);
 static size_t __arb_fprint(FILE *, arb_srcptr, int);
@@ -680,6 +682,16 @@ print_flint_type:
         else
             goto printpercentcurlybracket;
     }
+    else if (IS_FLINT_TYPE(ip, "mpz"))
+    {
+        res += __mpz_fprint(fs, va_arg(vlist, mpz_srcptr));
+        ip += STRING_LENGTH("mpz}");
+    }
+    else if (IS_FLINT_TYPE(ip, "mpq"))
+    {
+        res += __mpq_fprint(fs, va_arg(vlist, mpq_srcptr));
+        ip += STRING_LENGTH("mpq}");
+    }
     else
     {
 printpercentcurlybracket:
@@ -767,6 +779,18 @@ static size_t __fmpz_fprint(FILE * fs, const fmpz * ip, int flag)
 }
 #undef BASE
 
+static size_t __mpz_fprint(FILE * fs, mpz_srcptr ip)
+{
+    fmpz_t fip;
+
+    if ((ip->_mp_size == 1 || ip->_mp_size == -1) && ip->_mp_d[0] <= COEFF_MAX)
+        *fip = ip->_mp_size > 0 ? ip->_mp_d[0] : -ip->_mp_d[0];
+    else
+        *fip = PTR_TO_COEFF(ip);
+
+    return __fmpz_fprint(fs, fip, FLAG_NONE);
+}
+
 static size_t __fmpq_fprint(FILE * fs, const fmpq * ip, int flag)
 {
     size_t res = 0;
@@ -781,6 +805,23 @@ static size_t __fmpq_fprint(FILE * fs, const fmpq * ip, int flag)
     }
 
     return res;
+}
+
+static size_t __mpq_fprint(FILE * fs, mpq_srcptr ip)
+{
+    fmpq_t fip;
+
+    if ((ip->_mp_num._mp_size == 1 || ip->_mp_num._mp_size == -1) && ip->_mp_num._mp_d[0] <= COEFF_MAX)
+        *fmpq_numref(fip) = ip->_mp_num._mp_size > 0 ? ip->_mp_num._mp_d[0] : -ip->_mp_num._mp_d[0];
+    else
+        *fmpq_numref(fip) = PTR_TO_COEFF(&(ip->_mp_num));
+
+    if ((ip->_mp_den._mp_size == 1 || ip->_mp_den._mp_size == -1) && ip->_mp_den._mp_d[0] <= COEFF_MAX)
+        *fmpq_denref(fip) = ip->_mp_den._mp_size > 0 ? ip->_mp_den._mp_d[0] : -ip->_mp_den._mp_d[0];
+    else
+        *fmpq_denref(fip) = PTR_TO_COEFF(&(ip->_mp_den));
+
+    return __fmpq_fprint(fs, fip, FLAG_NONE);
 }
 
 #define DIGITS 6
