@@ -37,12 +37,7 @@ TEST_FUNCTION_START(z_kronecker, state)
         flint_mpz_set_si(nn, n);
 
         if (mpz_kronecker(aa, nn) != z_kronecker(a, n))
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("a = %wd, n = %wd\n", a, n);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("a = %wd, n = %wd\n", a, n);
     }
 
     mpz_clear(aa);
