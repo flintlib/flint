@@ -28,9 +28,9 @@ arf_add_naive(arf_t z, const arf_t x, const arf_t y, slong prec, arf_rnd_t rnd)
             arf_t eps;
             arf_init(eps);
             arf_mul_2exp_si(eps, x, -5000);
-            arf_abs(eps, eps);
+            arf_inplace_abs(eps);
             if (arf_sgn(y) < 0)
-                arf_neg(eps, eps);
+                arf_inplace_neg(eps);
             arf_add(z, x, eps, ARF_PREC_EXACT, ARF_RND_DOWN);
             inexact = arf_set_round(z, z, prec, rnd);
             arf_clear(eps);
@@ -40,9 +40,9 @@ arf_add_naive(arf_t z, const arf_t x, const arf_t y, slong prec, arf_rnd_t rnd)
             arf_t eps;
             arf_init(eps);
             arf_mul_2exp_si(eps, y, -5000);
-            arf_abs(eps, eps);
+            arf_inplace_abs(eps);
             if (arf_sgn(x) < 0)
-                arf_neg(eps, eps);
+                arf_inplace_neg(eps);
             arf_add(z, eps, y, ARF_PREC_EXACT, ARF_RND_DOWN);
             inexact = arf_set_round(z, z, prec, rnd);
             arf_clear(eps);

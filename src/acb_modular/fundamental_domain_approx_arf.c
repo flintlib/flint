@@ -67,7 +67,7 @@ acb_modular_fundamental_domain_approx_arf(psl2z_t g,
         if (arf_cmp(t, one_minus_eps) < 0)
         {
             arf_div(x, x, t, prec, ARF_RND_DOWN);
-            arf_neg(x, x);
+            arf_inplace_neg(x);
             arf_div(y, y, t, prec, ARF_RND_DOWN);
 
             fmpz_swap(&g->a, &g->c);

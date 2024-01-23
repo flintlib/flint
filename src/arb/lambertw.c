@@ -244,7 +244,7 @@ arb_lambertw_halley_step(arb_t res, const arb_t x, const arf_t w,
     arf_sub(u, t, arb_midref(x), prec, ARF_RND_DOWN);     /* u = w e^w - x */
 
     arf_mul(v, v, u, prec, ARF_RND_DOWN);
-    arf_neg(v, v);
+    arf_inplace_neg(v);
     arf_add(v, v, t, prec, ARF_RND_DOWN);
     arf_add(v, v, arb_midref(ew), prec, ARF_RND_DOWN);
 

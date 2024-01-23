@@ -47,7 +47,7 @@ _fexpr_parse_arf(arf_t res, const fexpr_t expr)
         fexpr_t t;
         fexpr_view_arg(t, expr, 0);
         success = _fexpr_parse_arf(res, t);
-        arf_neg(res, res);
+        arf_inplace_neg(res);
         return success;
     }
 

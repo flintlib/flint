@@ -120,7 +120,7 @@ _refine_hardy_z_zero_illinois(arb_t res, const arf_t ra, const arf_t rb, slong p
         }
 
         arf_sub(t, a, b, wp, ARF_RND_DOWN);
-        arf_abs(t, t);
+        arf_inplace_abs(t);
 
         if (arf_cmpabs_2exp_si(t, abs_tol) < 0)
             break;

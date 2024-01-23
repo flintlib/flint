@@ -19,7 +19,7 @@ arb_bound_exp_neg(mag_t b, const arb_t x)
     arb_init(t);
     arf_set_mag(arb_midref(t), arb_radref(x));
     arf_sub(arb_midref(t), arb_midref(x), arb_midref(t), MAG_BITS, ARF_RND_FLOOR);
-    arf_neg(arb_midref(t), arb_midref(t));
+    arf_inplace_neg(arb_midref(t));
     arb_exp(t, t, MAG_BITS);
     arb_get_mag(b, t);
     arb_clear(t);

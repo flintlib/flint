@@ -889,7 +889,7 @@ _gr_arf_atan(arf_t res, const arf_t x, const gr_ctx_t ctx)
         {
             _gr_arf_pi(res, ctx);
             arf_mul_2exp_si(res, res, -1);
-            arf_neg(res, res);
+            arf_inplace_neg(res);
         }
         else
         {

@@ -28,7 +28,7 @@ _acb_poly_reciprocal_majorant(arb_ptr res, acb_srcptr vec, slong len, slong prec
         else
         {
             acb_get_abs_ubound_arf(arb_midref(res + i), vec + i, prec);
-            arf_neg(arb_midref(res + i), arb_midref(res + i));
+            arf_inplace_neg(arb_midref(res + i));
             mag_zero(arb_radref(res + i));
         }
     }

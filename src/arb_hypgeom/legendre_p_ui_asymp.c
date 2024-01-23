@@ -189,7 +189,7 @@ arb_abs_le_ui(const arb_t x, ulong n)
 
     arf_init(u + 2);   /* no need to free */
     arf_set_ui(u + 2, n);
-    arf_neg(u + 2, u + 2);
+    arf_inplace_neg(u + 2);
 
     arf_init(t);
     arf_sum(t, u, 3, MAG_BITS, ARF_RND_DOWN);

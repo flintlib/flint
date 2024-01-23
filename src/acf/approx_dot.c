@@ -251,8 +251,8 @@ acf_approx_dot_simple(acf_t res, const acf_t initial, int subtract,
 
     if (subtract)
     {
-        arf_neg(acf_realref(res), acf_realref(res));
-        arf_neg(acf_imagref(res), acf_imagref(res));
+        arf_inplace_neg(acf_realref(res));
+        arf_inplace_neg(acf_imagref(res));
     }
 }
 

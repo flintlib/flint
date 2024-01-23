@@ -54,7 +54,7 @@ arf_approx_dot_simple(arf_t res, const arf_t initial, int subtract,
         arf_addmul(res, x + i * xstep, y + i * ystep, prec, rnd);
 
     if (subtract)
-        arf_neg(res, res);
+        arf_inplace_neg(res);
 }
 
 void

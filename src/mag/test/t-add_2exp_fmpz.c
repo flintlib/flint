@@ -35,7 +35,7 @@ TEST_FUNCTION_START(mag_add_2exp_fmpz, state)
         mag_init(zb);
 
         arf_randtest(x, state, MAG_BITS, 100);
-        arf_abs(x, x);
+        arf_inplace_abs(x);
 
         fmpz_randtest(e, state, 100);
         arf_one(y);

@@ -24,7 +24,7 @@ arb_get_abs_lbound_arf(arf_t u, const arb_t x, slong prec)
     else
     {
         arf_add(u, arb_midref(x), t, prec, ARF_RND_DOWN);
-        arf_neg(u, u);
+        arf_inplace_neg(u);
     }
 
     if (arf_sgn(u) < 0)

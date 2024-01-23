@@ -52,7 +52,7 @@ acf_approx_sqrt(acf_t y, const acf_t x, slong prec, arf_rnd_t rnd)
         else
         {
             arf_mul_2exp_si(c, b, -1);
-            arf_neg(c, c);
+            arf_inplace_neg(c);
             arf_sqrt(c, c, prec, rnd);
             arf_neg(d, c);
             return;
@@ -93,12 +93,12 @@ acf_approx_sqrt(acf_t y, const acf_t x, slong prec, arf_rnd_t rnd)
         arf_mul_2exp_si(t, u, 1);
         arf_sqrt(t, t, wp, rnd);
         arf_div(c, b, t, prec, rnd);
-        arf_abs(c, c);
+        arf_inplace_abs(c);
 
         arf_set_round(d, t, prec, rnd);
         arf_mul_2exp_si(d, d, -1);
         if (sgn < 0)
-            arf_neg(d, d);
+            arf_inplace_neg(d);
     }
 
     arf_clear(r);

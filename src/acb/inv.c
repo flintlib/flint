@@ -90,7 +90,7 @@ acb_inv(acb_t res, const acb_t z, slong prec)
         {
             _arb_arf_div_rounded_den(acb_realref(res), a, a2b2, inexact, prec);
             _arb_arf_div_rounded_den(acb_imagref(res), b, a2b2, inexact, prec);
-            arf_neg(arb_midref(acb_imagref(res)), arb_midref(acb_imagref(res)));
+            arf_inplace_neg(arb_midref(acb_imagref(res)));
         }
 
         arf_clear(a2b2);
@@ -179,7 +179,7 @@ acb_inv(acb_t res, const acb_t z, slong prec)
 
         _arb_arf_div_rounded_den_add_err(acb_realref(res), a, a2b2, inexact, prec);
         _arb_arf_div_rounded_den_add_err(acb_imagref(res), b, a2b2, inexact, prec);
-        arf_neg(arb_midref(acb_imagref(res)), arb_midref(acb_imagref(res)));
+        arf_inplace_neg(arb_midref(acb_imagref(res)));
 
         mag_clear(t);
         mag_clear(u);

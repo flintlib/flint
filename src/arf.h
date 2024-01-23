@@ -450,7 +450,7 @@ ARF_INLINE void
 arf_init_neg_shallow(arf_t z, const arf_t x)
 {
     *z = *x;
-    arf_neg(z, z);
+    arf_inplace_neg(z);
 }
 
 ARF_INLINE void
@@ -466,7 +466,7 @@ ARF_INLINE void
 arf_init_neg_mag_shallow(arf_t z, const mag_t x)
 {
     arf_init_set_mag_shallow(z, x);
-    arf_neg(z, z);
+    arf_inplace_neg(z);
 }
 
 ARF_INLINE int
@@ -809,7 +809,7 @@ arf_neg_mul(arf_t z, const arf_t x, const arf_t y, slong prec, arf_rnd_t rnd)
     if (arf_is_special(y))
     {
         arf_mul(z, x, y, prec, rnd);
-        arf_neg(z, z);
+        arf_inplace_neg(z);
         return 0;
     }
     else

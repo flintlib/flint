@@ -67,7 +67,7 @@ TEST_FUNCTION_START(acb_modular_fundamental_domain_approx, state)
 
             arf_set_ui_2exp_si(one_minus_eps, 1, -prec / 4);
             arf_sub_ui(one_minus_eps, one_minus_eps, 1, prec, ARF_RND_DOWN);
-            arf_neg(one_minus_eps, one_minus_eps);
+            arf_inplace_neg(one_minus_eps);
 
             acb_modular_fundamental_domain_approx(w, g, z, one_minus_eps, prec);
             acb_modular_transform(w2, g, z, prec);

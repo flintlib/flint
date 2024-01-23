@@ -22,5 +22,5 @@ arb_get_abs_ubound_arf(arf_t u, const arb_t x, slong prec)
     else
         arf_add(u, arb_midref(x), t, prec, ARF_RND_UP);
 
-    arf_abs(u, u);
+    arf_inplace_abs(u);
 }

@@ -31,7 +31,7 @@ TEST_FUNCTION_START(arb_set_interval_neg_pos_mag, state)
         mag_randtest_special(u, state, 1 + n_randint(state, 100));
         mag_randtest_special(v, state, 1 + n_randint(state, 100));
         arf_set_mag(a, u);
-        arf_neg(a, a);
+        arf_inplace_neg(a);
         arf_set_mag(b, v);
 
         arb_set_interval_neg_pos_mag(x, u, v, 2 + n_randint(state, 200));

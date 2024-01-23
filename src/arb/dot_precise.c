@@ -39,7 +39,7 @@ arb_dot_precise(arb_t res, const arb_t initial, int subtract,
 
         arf_mul(A + i, arb_midref(xp), arb_midref(yp), ARF_PREC_EXACT, ARF_RND_DOWN);
         if (subtract)
-            arf_neg(A + i, A + i);
+            arf_inplace_neg(A + i);
 
         arf_init_set_mag_shallow(t, arb_radref(xp));
         arf_init_set_mag_shallow(u, arb_radref(yp));
@@ -47,10 +47,10 @@ arb_dot_precise(arb_t res, const arb_t initial, int subtract,
         arf_mul(B + 3 * i, t, u, ARF_PREC_EXACT, ARF_RND_DOWN);
 
         arf_mul(B + 3 * i + 1, t, arb_midref(yp), ARF_PREC_EXACT, ARF_RND_DOWN);
-        arf_abs(B + 3 * i + 1, B + 3 * i + 1);
+        arf_inplace_abs(B + 3 * i + 1);
 
         arf_mul(B + 3 * i + 2, u, arb_midref(xp), ARF_PREC_EXACT, ARF_RND_DOWN);
-        arf_abs(B + 3 * i + 2, B + 3 * i + 2);
+        arf_inplace_abs(B + 3 * i + 2);
     }
 
     if (initial != NULL)

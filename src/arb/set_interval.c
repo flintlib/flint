@@ -248,7 +248,7 @@ arb_set_interval_neg_pos_mag(arb_t res, const mag_t a, const mag_t b, slong prec
 
         arf_set_ui(arb_midref(res), mman);
         if (negative)
-            arf_neg(arb_midref(res), arb_midref(res));
+            arf_inplace_neg(arb_midref(res));
         if (mman != 0)
             ARF_EXP(arb_midref(res)) += mexp - MAG_BITS - 1;
 

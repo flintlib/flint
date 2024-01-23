@@ -44,7 +44,7 @@ arb_hypgeom_erf_one_eps(arb_t res, const arb_t z)
     else
     {
         arf_one(arb_midref(res));
-        arf_neg(arb_midref(res), arb_midref(res));
+        arf_inplace_neg(arb_midref(res));
     }
 
     mag_clear(t);

@@ -73,7 +73,7 @@ acb_inv_mid(acb_t z, const acb_t x, slong prec)
     arf_div(e, a, t, prec, ARF_RND_DOWN);
     arf_div(f, b, t, prec, ARF_RND_DOWN);
 
-    arf_neg(f, f);
+    arf_inplace_neg(f);
 
 #undef a
 #undef b

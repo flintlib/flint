@@ -51,7 +51,7 @@ TEST_FUNCTION_START(arb_get_mpn_fixed_mod_pi4, state)
             arf_add(x, x, arb_midref(t), prec, ARF_RND_DOWN);
         }
 
-        arf_abs(x, x);
+        arf_inplace_abs(x);
 
         success = _arb_get_mpn_fixed_mod_pi4(w, q, &octant, &error, x, wn);
 

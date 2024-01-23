@@ -76,7 +76,7 @@ TEST_FUNCTION_START(mag_set_d_2exp_fmpz, state)
         fmpz_randtest(e, state, 100);
 
         arf_set_d(a, x);
-        arf_abs(a, a);
+        arf_inplace_abs(a);
         arf_mul_2exp_fmpz(a, a, e);
 
         mag_set_d_2exp_fmpz(m, x, e);

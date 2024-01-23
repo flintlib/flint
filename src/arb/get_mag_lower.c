@@ -82,7 +82,7 @@ _arb_get_mag_lower(mag_t z, const arf_t mid, const mag_t rad)
                 else
                 {
                     arf_add(t, mid, t, MAG_BITS, ARF_RND_DOWN);
-                    arf_neg(t, t);
+                    arf_inplace_neg(t);
                 }
 
                 if (arf_sgn(t) <= 0)

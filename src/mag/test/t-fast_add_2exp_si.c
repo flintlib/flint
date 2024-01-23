@@ -33,7 +33,7 @@ TEST_FUNCTION_START(mag_fast_add_2exp_si, state)
         mag_init(zb);
 
         arf_randtest(x, state, MAG_BITS, 15);
-        arf_abs(x, x);
+        arf_inplace_abs(x);
 
         e = n_randint(state, 10000) - n_randint(state, 10000);
         arf_set_ui_2exp_si(y, 1, e);

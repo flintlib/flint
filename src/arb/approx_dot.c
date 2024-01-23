@@ -58,7 +58,7 @@ arb_approx_dot_simple(arb_t res, const arb_t initial, int subtract,
         arf_addmul(arb_midref(res), arb_midref(x + i * xstep), arb_midref(y + i * ystep), prec, ARB_RND);
 
     if (subtract)
-        arf_neg(arb_midref(res), arb_midref(res));
+        arf_inplace_neg(arb_midref(res));
 }
 
 void

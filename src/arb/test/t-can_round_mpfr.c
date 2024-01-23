@@ -43,7 +43,7 @@ TEST_FUNCTION_START(arb_can_round_mpfr, state)
         }
 
         arf_randtest(arb_midref(t), state, mpfr_get_prec(x), 1 + n_randint(state, 10));
-        arf_abs(arb_midref(t), arb_midref(t));
+        arf_inplace_abs(arb_midref(t));
         arf_get_mpfr(x, arb_midref(t), MPFR_RNDN);
         arb_root_ui(t, t, 4, 2 + n_randint(state, 300));
 

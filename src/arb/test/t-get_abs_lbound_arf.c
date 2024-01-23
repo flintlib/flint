@@ -35,7 +35,7 @@ TEST_FUNCTION_START(arb_get_abs_lbound_arf, state)
         arb_get_rand_fmpq(q, state, x, 1 + n_randint(state, 200));
         arf_mul_fmpz(b2, b, fmpq_denref(q), ARF_PREC_EXACT, ARF_RND_DOWN);
         arf_set_fmpz(b3, fmpq_numref(q));
-        arf_abs(b3, b3);
+        arf_inplace_abs(b3);
 
         if (arf_cmp(b2, b3) > 0)
         {
@@ -52,7 +52,7 @@ TEST_FUNCTION_START(arb_get_abs_lbound_arf, state)
         arb_get_rand_fmpq(q, state, x, 1 + n_randint(state, 200));
         arf_mul_fmpz(b2, b, fmpq_denref(q), ARF_PREC_EXACT, ARF_RND_DOWN);
         arf_set_fmpz(b3, fmpq_numref(q));
-        arf_abs(b3, b3);
+        arf_inplace_abs(b3);
 
         if (arf_cmp(b2, b3) < 0)
         {

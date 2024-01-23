@@ -111,7 +111,7 @@ void _acb_dirichlet_euler_product_real_ui(arb_t res, ulong s,
             arf_init(t);
             arf_set_si_2exp_si(t, chi[2 % mod], -s);
             if (reciprocal)
-                arf_neg(t, t);
+                arf_inplace_neg(t);
             arb_add_arf(res, res, t, prec);
             arf_clear(t);
         }

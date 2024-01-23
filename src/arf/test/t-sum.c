@@ -74,7 +74,7 @@ TEST_FUNCTION_START(arf_sum, state)
         }
 
         arf_sub(err, s1, s2, ARF_PREC_EXACT, ARF_RND_DOWN);
-        arf_abs(err, err);
+        arf_inplace_abs(err);
 
         if (res1)
             arf_mag_set_ulp(err_bound, s1, prec);

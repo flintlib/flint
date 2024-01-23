@@ -106,13 +106,13 @@ TEST_FUNCTION_START(acb_inv, state)
         acb_zero(d);
         arf_set_mag(t, arb_radref(acb_realref(a)));
         if (n_randint(state, 2))
-            arf_neg(t, t);
+            arf_inplace_neg(t);
         arf_add(arb_midref(acb_realref(d)),
             arb_midref(acb_realref(a)), t, ARF_PREC_EXACT, ARF_RND_DOWN);
 
         arf_set_mag(t, arb_radref(acb_imagref(a)));
         if (n_randint(state, 2))
-            arf_neg(t, t);
+            arf_inplace_neg(t);
         arf_add(arb_midref(acb_imagref(d)),
             arb_midref(acb_imagref(a)), t, ARF_PREC_EXACT, ARF_RND_DOWN);
 

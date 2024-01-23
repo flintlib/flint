@@ -264,7 +264,7 @@ acb_rsqrt_wide(acb_t res, const acb_t z, slong prec)
         {
             arb_set_interval_mag(acb_realref(res), ax, bx, prec);
             arb_set_interval_mag(acb_imagref(res), cx, dx, prec);
-            arf_neg(arb_midref(acb_imagref(res)), arb_midref(acb_imagref(res)));
+            arf_inplace_neg(arb_midref(acb_imagref(res)));
         }
         else
         {

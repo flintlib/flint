@@ -251,8 +251,8 @@ acb_approx_dot_simple(acb_t res, const acb_t initial, int subtract,
 
     if (subtract)
     {
-        arf_neg(arb_midref(acb_realref(res)), arb_midref(acb_realref(res)));
-        arf_neg(arb_midref(acb_imagref(res)), arb_midref(acb_imagref(res)));
+        arf_inplace_neg(arb_midref(acb_realref(res)));
+        arf_inplace_neg(arb_midref(acb_imagref(res)));
     }
 }
 

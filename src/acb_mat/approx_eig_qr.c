@@ -379,7 +379,7 @@ acb_mat_approx_hessenberg_reduce_0(acb_mat_t A, acb_ptr T, slong prec)
 
         /* A[i,i-1] = -G scale */
         arf_mul(arb_midref(acb_realref(acb_mat_entry(A, i, i - 1))), G, scale, prec, ARF_RND_DOWN);
-        arf_neg(arb_midref(acb_realref(acb_mat_entry(A, i, i - 1))), arb_midref(acb_realref(acb_mat_entry(A, i, i - 1))));
+        arf_inplace_neg(arb_midref(acb_realref(acb_mat_entry(A, i, i - 1))));
         arf_zero(arb_midref(acb_imagref(acb_mat_entry(A, i, i - 1))));
 
         if (arf_is_zero(f))

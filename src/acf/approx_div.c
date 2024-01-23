@@ -34,7 +34,7 @@ acf_approx_inv(acf_t res, const acf_t x, slong prec, arf_rnd_t rnd)
         arf_sosq(t, acf_realref(x), acf_imagref(x), prec, rnd);
         arf_div(acf_realref(res), acf_realref(x), t, prec, rnd);
         arf_div(acf_imagref(res), acf_imagref(x), t, prec, rnd);
-        arf_neg(acf_imagref(res), acf_imagref(res));
+        arf_inplace_neg(acf_imagref(res));
 
         arf_clear(t);
     }
@@ -80,7 +80,7 @@ acf_approx_div(acf_t res, const acf_t x, const acf_t y, slong prec, arf_rnd_t rn
         if (arf_is_zero(b))
         {
             arf_div(acf_imagref(res), a, d, prec, rnd);
-            arf_neg(acf_imagref(res), acf_imagref(res));
+            arf_inplace_neg(acf_imagref(res));
             arf_zero(acf_realref(res));
         }
         else if (arf_is_zero(a))
@@ -93,7 +93,7 @@ acf_approx_div(acf_t res, const acf_t x, const acf_t y, slong prec, arf_rnd_t rn
             arf_div(acf_realref(res), a, d, prec, rnd);
             arf_div(acf_imagref(res), b, d, prec, rnd);
             arf_swap(acf_realref(res), acf_imagref(res));
-            arf_neg(acf_imagref(res), acf_imagref(res));
+            arf_inplace_neg(acf_imagref(res));
         }
         else
         {
@@ -103,7 +103,7 @@ acf_approx_div(acf_t res, const acf_t x, const acf_t y, slong prec, arf_rnd_t rn
             arf_div(acf_realref(res), a, t, prec, rnd);
             arf_div(acf_imagref(res), b, t, prec, rnd);
             arf_swap(acf_realref(res), acf_imagref(res));
-            arf_neg(acf_imagref(res), acf_imagref(res));
+            arf_inplace_neg(acf_imagref(res));
             arf_clear(t);
         }
     }

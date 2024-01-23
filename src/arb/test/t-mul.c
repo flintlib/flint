@@ -86,7 +86,7 @@ arb_mul_naive(arb_t z, const arb_t x, const arb_t y, slong prec)
 
         /* more accurate, but not what we are testing
         arf_sub(zr, zm_exact, zm_rounded, MAG_BITS, ARF_RND_UP);
-        arf_abs(zr, zr); */
+        arf_inplace_abs(zr); */
 
         fmpz_sub_ui(e, ARF_EXPREF(zm_rounded), prec);
         arf_one(zr);

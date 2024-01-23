@@ -57,7 +57,7 @@ TEST_FUNCTION_START(mag_neg_log, state)
             else
             {
                 arf_log(z, x, MAG_BITS, ARF_RND_UP);
-                arf_neg(z, z);
+                arf_inplace_neg(z);
             }
         }
         else
@@ -75,7 +75,7 @@ TEST_FUNCTION_START(mag_neg_log, state)
             else
             {
                 arf_log(z, x, 2 * MAG_BITS, ARF_RND_UP);
-                arf_neg(z, z);
+                arf_inplace_neg(z);
                 arf_set_ui(z2, 2);
                 arf_log(z2, z2, 2 * MAG_BITS, ARF_RND_UP);
                 arf_submul_fmpz(z, z2, n, 2 * MAG_BITS, ARF_RND_UP);
@@ -149,7 +149,7 @@ TEST_FUNCTION_START(mag_neg_log, state)
             else
             {
                 arf_log(z, x, MAG_BITS, ARF_RND_DOWN);
-                arf_neg(z, z);
+                arf_inplace_neg(z);
             }
         }
         else
@@ -167,7 +167,7 @@ TEST_FUNCTION_START(mag_neg_log, state)
             else
             {
                 arf_log(z, x, 2 * MAG_BITS, ARF_RND_DOWN);
-                arf_neg(z, z);
+                arf_inplace_neg(z);
                 arf_set_ui(z2, 2);
                 arf_log(z2, z2, 2 * MAG_BITS, ARF_RND_DOWN);
                 arf_submul_fmpz(z, z2, n, 2 * MAG_BITS, ARF_RND_DOWN);
