@@ -13,17 +13,12 @@
 #include "ulong_extras.h"
 
 #ifndef check
-#define check check
-void check(mp_limb_t n, int s1, int s2)
-{
-    if (s1 != s2)
-    {
-        flint_printf("FAIL:\n");
-        flint_printf("%wu: got %d instead of %d\n", n, s1, s2);
-        fflush(stdout);
-        flint_abort();
-    }
-}
+#define check(n, s1, s2) \
+do \
+{ \
+    if (s1 != s2) \
+        TEST_FUNCTION_FAIL("%wu: got %d instead of %d\n", n, s1, s2); \
+} while (0)
 #endif
 
 TEST_FUNCTION_START(n_moebius_mu, state)
@@ -66,12 +61,7 @@ TEST_FUNCTION_START(n_moebius_mu, state)
         s += n_moebius_mu(k);
 
     if (s != -23)
-    {
-        flint_printf("FAIL:\n");
-        flint_printf("expected mu(k), k <= 10000 to sum to %d (got %d)\n", -23, s);
-        fflush(stdout);
-        flint_abort();
-    }
+        TEST_FUNCTION_FAIL("expected mu(k), k <= 10000 to sum to %d (got %d)\n", -23, s);
 
     TEST_FUNCTION_END(state);
 }

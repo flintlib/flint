@@ -43,14 +43,11 @@ TEST_FUNCTION_START(n_revbin, state)
 
         result = (r == 0);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("b = %wu\n", b);
-            flint_printf("n = %wx\n", n);
-            flint_printf("r = %wx\n", r);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                "b = %wu\n"
+                "n = %wx\n"
+                "r = %wx\n",
+                b, n, r);
     }
 
     /* at most 8 bits */
@@ -73,16 +70,13 @@ TEST_FUNCTION_START(n_revbin, state)
 
                 result = (r1 == r2);
                 if (!result)
-                {
-                    flint_printf("FAIL:\n");
-                    flint_printf("b = %wu\n", b);
-                    flint_printf("n = %wx\n", n);
-                    flint_printf("d = %wx\n", d);
-                    flint_printf("r1 = %wx\n", r1);
-                    flint_printf("r2 = %wx\n", r2);
-                    fflush(stdout);
-                    flint_abort();
-                }
+                    TEST_FUNCTION_FAIL(
+                            "b = %wu\n"
+                            "n = %wx\n"
+                            "d = %wx\n"
+                            "r1 = %wx\n"
+                            "r2 = %wx\n"
+                            , b, n, d, r1, r2);
             }
         }
     }
@@ -109,16 +103,13 @@ TEST_FUNCTION_START(n_revbin, state)
 
             result = (r1 == r2);
             if (!result)
-            {
-                flint_printf("FAIL:\n");
-                flint_printf("b = %wu\n", b);
-                flint_printf("n = %wx\n", n);
-                flint_printf("d = %wx\n", d);
-                flint_printf("r1 = %wx\n", r1);
-                flint_printf("r2 = %wx\n", r2);
-                fflush(stdout);
-                flint_abort();
-            }
+                    TEST_FUNCTION_FAIL(
+                            "b = %wu\n"
+                            "n = %wx\n"
+                            "d = %wx\n"
+                            "r1 = %wx\n"
+                            "r2 = %wx\n"
+                            , b, n, d, r1, r2);
         }
     }
 

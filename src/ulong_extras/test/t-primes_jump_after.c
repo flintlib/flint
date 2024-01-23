@@ -36,12 +36,7 @@ TEST_FUNCTION_START(n_primes_jump_after, state)
                 q = n_nextprime(q, 0);
 
                 if (p != q)
-                {
-                    flint_printf("FAIL\n");
-                    flint_printf("p = %wu, q = %wu\n", p, q);
-                    fflush(stdout);
-                    flint_abort();
-                }
+                    TEST_FUNCTION_FAIL("p = %wu, q = %wu\n", p, q);
             }
         }
 

@@ -14,32 +14,29 @@
 
 TEST_FUNCTION_START(n_mod2_precomp, state)
 {
-   int i, result;
+    int i, result;
 
-   for (i = 0; i < 100000 * flint_test_multiplier(); i++)
-   {
-      mp_limb_t d, n, r1, r2;
-      double dpre;
+    for (i = 0; i < 100000 * flint_test_multiplier(); i++)
+    {
+        mp_limb_t d, n, r1, r2;
+        double dpre;
 
-      d = n_randtest_not_zero(state);
+        d = n_randtest_not_zero(state);
 
-      n = n_randtest(state);
+        n = n_randtest(state);
 
-      dpre = n_precompute_inverse(d);
+        dpre = n_precompute_inverse(d);
 
-      r1 = n_mod2_precomp(n, d, dpre);
-      r2 = n%d;
+        r1 = n_mod2_precomp(n, d, dpre);
+        r2 = n%d;
 
-      result = (r1 == r2);
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("n = %wu, d = %wu, dpre = %f\n", n, d, dpre);
-         flint_printf("r1 = %wu, r2 = %wu\n", r1, r2);
-         fflush(stdout);
-         flint_abort();
-      }
-   }
+        result = (r1 == r2);
+        if (!result)
+            TEST_FUNCTION_FAIL(
+                    "n = %wu, d = %wu, dpre = %f\n"
+                    "r1 = %wu, r2 = %wu\n",
+                    n, d, dpre, r1, r2);
+    }
 
-   TEST_FUNCTION_END(state);
+    TEST_FUNCTION_END(state);
 }

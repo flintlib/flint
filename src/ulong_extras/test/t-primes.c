@@ -30,12 +30,7 @@ TEST_FUNCTION_START(n_primes, state)
             q = n_nextprime(q, 0);
 
             if (p != q)
-            {
-                flint_printf("FAIL\n");
-                flint_printf("i = %wu, p = %wu, q = %wu\n", i, p, q);
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL("i = %wu, p = %wu, q = %wu\n", i, p, q);
         }
 
         n_primes_clear(iter);
@@ -59,12 +54,7 @@ TEST_FUNCTION_START(n_primes, state)
             s++;
 
         if (s != primepi[n])
-        {
-            flint_printf("FAIL\n");
-            flint_printf("pi(10^%wd) = %u, computed = %wu\n", n, primepi[n], s);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("pi(10^%wd) = %u, computed = %wu\n", n, primepi[n], s);
 
         n_primes_clear(iter);
     }

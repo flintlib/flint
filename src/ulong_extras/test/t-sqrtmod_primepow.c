@@ -54,22 +54,15 @@ TEST_FUNCTION_START(n_sqrtmod_primepow, state)
 
         result = btest & (i == num);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("p = %wu\n", p);
-            flint_printf("exp = %wd\n", exp);
-            flint_printf("a = %wu\n", a);
-            flint_printf("b = %wu\n", b);
-            flint_printf("num = %wd\n", num);
-
-            if (!btest)
-                flint_printf("Square root not found.\n");
-            if (i != num)
-                flint_printf("%wu not a square root of %wu mod %wu\n", sqrt[i], a, pow);
-
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "p = %wu\n"
+                    "exp = %wd\n"
+                    "a = %wu\n"
+                    "b = %wu\n"
+                    "num = %wd\n"
+                    "btest = %d\n"
+                    "i != num = %d\n",
+                    p, exp, a, b, num, btest, i != num);
 
         flint_free(sqrt);
     }
@@ -117,22 +110,15 @@ TEST_FUNCTION_START(n_sqrtmod_primepow, state)
 
         result = btest & (i == num);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("p = %wu\n", p);
-            flint_printf("exp = %wd\n", exp);
-            flint_printf("a = %wu\n", a);
-            flint_printf("b = %wu\n", b);
-            flint_printf("num = %wd\n", num);
-
-            if (!btest)
-                flint_printf("Square root not found.\n");
-            if (i != num)
-                flint_printf("%wu not a square root of %wu mod %wu\n", sqrt[i], a, pow);
-
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "p = %wu\n"
+                    "exp = %wd\n"
+                    "a = %wu\n"
+                    "b = %wu\n"
+                    "num = %wd\n"
+                    "btest = %d\n"
+                    "i != num = %d\n",
+                    p, exp, a, b, num, btest, i != num);
 
         flint_free(sqrt);
     }
@@ -156,12 +142,7 @@ TEST_FUNCTION_START(n_sqrtmod_primepow, state)
         while (n_sqrtmod_primepow(&sqrt, a, p, exp))
         {
             if (n_mulmod2_preinv(sqrt[0], sqrt[0], pow, pinv) != a)
-            {
-                flint_printf("FAIL:\n");
-                flint_printf("%wu^2 is not %wu mod %wu\n", sqrt[0], a, pow);
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL("%wu^2 is not %wu mod %wu\n", sqrt[0], a, pow);
 
             flint_free(sqrt);
             a = n_randtest(state) % pow;
@@ -175,16 +156,12 @@ TEST_FUNCTION_START(n_sqrtmod_primepow, state)
 
         result = (b == pow);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("p = %wu\n", p);
-            flint_printf("exp = %wd\n", exp);
-            flint_printf("a = %wu\n", a);
-            flint_printf("b = %wu\n", b);
-
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "p = %wu\n"
+                    "exp = %wd\n"
+                    "a = %wu\n"
+                    "b = %wu\n",
+                    p, exp, a, b);
 
         flint_free(sqrt);
     }

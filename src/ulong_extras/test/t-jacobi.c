@@ -15,39 +15,34 @@
 
 TEST_FUNCTION_START(n_jacobi, state)
 {
-   int i, result;
+    int i, result;
 
-   for (i = 0; i < 10000 * flint_test_multiplier(); i++)
-   {
-      mp_limb_t d;
-      mpz_t a_m, d_m;
-      mp_limb_signed_t a;
-      int r1, r2;
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
+    {
+        mp_limb_t d;
+        mpz_t a_m, d_m;
+        mp_limb_signed_t a;
+        int r1, r2;
 
-      mpz_init(a_m);
-      mpz_init(d_m);
+        mpz_init(a_m);
+        mpz_init(d_m);
 
-      a = n_randtest(state);
-      d = n_randtest_not_zero(state) | WORD(1);
+        a = n_randtest(state);
+        d = n_randtest_not_zero(state) | WORD(1);
 
-      r1 = n_jacobi(a, d);
+        r1 = n_jacobi(a, d);
 
-      flint_mpz_set_si(a_m, a);
-      flint_mpz_set_ui(d_m, d);
-      r2 = mpz_jacobi(a_m, d_m);
+        flint_mpz_set_si(a_m, a);
+        flint_mpz_set_ui(d_m, d);
+        r2 = mpz_jacobi(a_m, d_m);
 
-      result = (r1 == r2);
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("a = %wu, d = %wu\n", a, d);
-         fflush(stdout);
-         flint_abort();
-      }
+        result = (r1 == r2);
+        if (!result)
+            TEST_FUNCTION_FAIL("a = %wu, d = %wu\n", a, d);
 
-      mpz_clear(a_m);
-      mpz_clear(d_m);
-   }
+        mpz_clear(a_m);
+        mpz_clear(d_m);
+    }
 
-   TEST_FUNCTION_END(state);
+    TEST_FUNCTION_END(state);
 }

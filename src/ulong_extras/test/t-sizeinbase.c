@@ -38,12 +38,10 @@ TEST_FUNCTION_START(n_sizeinbase, state)
         size2 = strlen(str);
 
         if (size1 != size2)
-        {
-            flint_printf("FAIL: n = %wu, base = %d\n", n, base);
-            flint_printf("n_sizeinbase: %d, strlen: %d\n", size1, size2);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "n = %wu, base = %d\n"
+                    "n_sizeinbase: %d, strlen: %d\n",
+                    n, base, size1, size2);
     }
 
     flint_free(str);

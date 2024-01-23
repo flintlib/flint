@@ -12,23 +12,18 @@
 #include "test_helpers.h"
 #include "ulong_extras.h"
 
-void check_prime_pi_bound(mp_limb_t n, ulong ans)
-{
-    int ok, reasonable;
-    ulong lo, hi;
-    n_prime_pi_bounds(&lo, &hi, n);
-
-    ok = lo <= ans && ans <= hi;
-    reasonable = (n < 1000) || (ans/2 < lo && hi < ans*2);
-
-    if (ok && reasonable)
-        return;
-
-    flint_printf("FAIL:\n");
-    flint_printf("n = %wu: %wu < %wu < %wu\n", n, lo, ans, hi);
-    fflush(stdout);
-    flint_abort();
-}
+#define check_prime_pi_bound(n, ans) \
+do { \
+    int ok, reasonable; \
+    ulong lo, hi; \
+    n_prime_pi_bounds(&lo, &hi, n); \
+ \
+    ok = lo <= ans && ans <= hi; \
+    reasonable = (n < 1000) || (ans/2 < lo && hi < ans*2); \
+ \
+    if (!(ok && reasonable)) \
+        TEST_FUNCTION_FAIL("n = %wu: %wu < %wu < %wu\n", n, lo, ans, hi); \
+} while (0)
 
 TEST_FUNCTION_START(n_prime_pi_bounds, state)
 {

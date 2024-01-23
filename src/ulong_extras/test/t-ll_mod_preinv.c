@@ -38,15 +38,11 @@ TEST_FUNCTION_START(n_ll_mod_preinv, state)
 
         result = (r1 == r2);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("<nh, nl> = (m*d + r1) but <nh, nl> % d != r1\n");
-            flint_printf("nh = %wu, nl = %wu, d = %wu, dinv = %wu\n", nh, nl,
-                         d, dinv);
-            flint_printf("r1 = %wu, r2 = %wu\n", r1, r2);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "<nh, nl> = (m*d + r1) but <nh, nl> %% d != r1\n"
+                    "nh = %wu, nl = %wu, d = %wu, dinv = %wu\n"
+                    "r1 = %wu, r2 = %wu\n",
+                    nh, nl, d, dinv, r1, r2);
     }
 
     fmpz_init(n);
@@ -73,17 +69,11 @@ TEST_FUNCTION_START(n_ll_mod_preinv, state)
 
         result = (r1 == r2);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf
-                ("n = <nh, nl> but n % d does not agree with fmpz_fdiv_ui\n");
-            flint_printf("nh = %wu, nl = %wu, d = %wu, dinv = %wu\n", nh, nl,
-                         d, dinv);
-            flint_printf("r1 = %wu, r2 = %wu\n", r1, r2);
-            fmpz_clear(n);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "n = <nh, nl> but n % d does not agree with fmpz_fdiv_ui\n"
+                    "nh = %wu, nl = %wu, d = %wu, dinv = %wu\n"
+                    "r1 = %wu, r2 = %wu\n",
+                    nh, nl, d, dinv, r1, r2);
     }
 
     fmpz_clear(n);

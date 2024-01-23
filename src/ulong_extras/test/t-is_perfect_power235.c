@@ -21,75 +21,52 @@ TEST_FUNCTION_START(n_is_perfect_power235, state)
 
    for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test that square pass the test */
    {
-      bits = n_randint(state, FLINT_BITS/2) + 1;
-      d = n_randtest_bits(state, bits);
+       bits = n_randint(state, FLINT_BITS/2) + 1;
+       d = n_randtest_bits(state, bits);
 
-      result = n_is_perfect_power235(n_pow(d, 2));
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("d^2 = %wu is declared not a perfect power\n", d*d);
-         fflush(stdout);
-         flint_abort();
-      }
-
+       result = n_is_perfect_power235(n_pow(d, 2));
+       if (!result)
+           TEST_FUNCTION_FAIL("d^2 = %wu is declared not a perfect power\n", d * d);
    }
 
    for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test that cubes pass the test */
    {
-      bits = n_randint(state, FLINT_BITS/3) + 1;
-      d = n_randtest_bits(state, bits);
+       bits = n_randint(state, FLINT_BITS/3) + 1;
+       d = n_randtest_bits(state, bits);
 
-      result = n_is_perfect_power235(n_pow(d, 3));
+       result = n_is_perfect_power235(n_pow(d, 3));
 
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("d^3 = %wu is declared not a perfect power\n", d*d*d);
-         fflush(stdout);
-         flint_abort();
-      }
-
+       if (!result)
+           TEST_FUNCTION_FAIL("d^3 = %wu is declared not a perfect power\n", d * d * d);
    }
 
    for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test that fifth powers pass the test */
    {
-      bits = n_randint(state, FLINT_BITS/5) + 1;
-      d = n_randtest_bits(state, bits);
+       bits = n_randint(state, FLINT_BITS/5) + 1;
+       d = n_randtest_bits(state, bits);
 
-      result = n_is_perfect_power235(n_pow(d, 5));
+       result = n_is_perfect_power235(n_pow(d, 5));
 
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("d^5 = %wu is declared not a perfect power\n", d*d*d*d*d);
-         fflush(stdout);
-         flint_abort();
-      }
-
+       if (!result)
+           TEST_FUNCTION_FAIL("d^5 = %wu is declared not a perfect power\n", d * d * d * d * d);
    }
 
    for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that non prefect powers fail */
    {
-      mpz_t d_m;
-      mpz_init(d_m);
+       mpz_t d_m;
+       mpz_init(d_m);
 
-      do
-      {
-         d = n_randtest(state);
-         flint_mpz_set_ui(d_m, d);
-      } while (mpz_perfect_power_p(d_m));
+       do
+       {
+           d = n_randtest(state);
+           flint_mpz_set_ui(d_m, d);
+       } while (mpz_perfect_power_p(d_m));
 
-      result = !n_is_perfect_power235(d);
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("d = %wu is declared a perfect power\n", d);
-         fflush(stdout);
-         flint_abort();
-      }
+       result = !n_is_perfect_power235(d);
+       if (!result)
+           flint_printf("d = %wu is declared a perfect power\n", d);
 
-      mpz_clear(d_m);
+       mpz_clear(d_m);
    }
 
    TEST_FUNCTION_END(state);
