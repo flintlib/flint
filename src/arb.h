@@ -142,6 +142,18 @@ void arb_neg_round(arb_t x, const arb_t y, slong prec);
 void arb_abs(arb_t y, const arb_t x);
 void arb_nonnegative_abs(arb_t y, const arb_t x);
 
+ARB_INLINE
+void arb_inplace_neg(arb_t y)
+{
+    arf_inplace_neg(arb_midref(y));
+}
+
+ARB_INLINE
+void arb_inplace_abs(arb_t y)
+{
+    arf_inplace_abs(arb_midref(y));
+}
+
 void arb_sgn(arb_t res, const arb_t x);
 int arb_sgn_nonzero(const arb_t x);
 
