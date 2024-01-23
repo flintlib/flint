@@ -190,6 +190,30 @@ do                  \
 } while (0)
 #define ACB8_STRING "[-1.34 +/- 4.01e-3] - [3.14159 +/- 2.66e-6] * i"
 
+#define MPZ1_ENTRY 808
+#define MPZ1_INIT(x) mpz_init(x)
+#define MPZ1_CLEAR(x) mpz_clear(x)
+#define MPZ1_SET(x) mpz_set_si(x, MPZ1_ENTRY)
+#define MPZ1_STRING STR(MPZ1_ENTRY)
+
+#define MPZ2_ENTRY "18927346981726349871629387469182763489761289376419827364"
+#define MPZ2_INIT(x) mpz_init(x)
+#define MPZ2_CLEAR(x) mpz_clear(x)
+#define MPZ2_SET(x) mpz_set_str(x, MPZ2_ENTRY, 10)
+#define MPZ2_STRING MPZ2_ENTRY
+
+#define MPQ1_ENTRY "123 / 2"
+#define MPQ1_INIT(x) mpq_init(x)
+#define MPQ1_CLEAR(x) mpq_clear(x)
+#define MPQ1_SET(x) mpq_set_str(x, MPQ1_ENTRY, 10)
+#define MPQ1_STRING MPQ1_ENTRY
+
+#define MPQ2_ENTRY "26936026936026936026936026936026936026936026936026936026936026936026936026936 / 101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101"
+#define MPQ2_INIT(x) mpq_init(x)
+#define MPQ2_CLEAR(x) mpq_clear(x)
+#define MPQ2_SET(x) mpq_set_str(x, MPQ2_ENTRY, 10)
+#define MPQ2_STRING MPQ2_ENTRY
+
 /* Vectors *******************************************************************/
 /* NOTE: The lengths has to be put into flint_fprintf as slongs. GCC and MSVC
  * handles it without specifying them as slongs, but at least Clang messes it
@@ -440,6 +464,8 @@ TEST_FUNCTION_START(flint_fprintf, state)
         mag_t xmag1, xmag2, xmag3;
         arb_t xarb1, xarb2, xarb3;
         acb_t xacb1, xacb2, xacb3, xacb4, xacb5, xacb6, xacb7, xacb8;
+        mpz_t xmpz1, xmpz2;
+        mpq_t xmpq1, xmpq2;
 
         slong xslong_vec[SLONG_VEC_LEN];
         mp_ptr xnmod_vec;
@@ -486,6 +512,10 @@ TEST_FUNCTION_START(flint_fprintf, state)
         ACB6_INIT(xacb6);
         ACB7_INIT(xacb7);
         ACB8_INIT(xacb8);
+        MPZ1_INIT(xmpz1);
+        MPZ2_INIT(xmpz2);
+        MPQ1_INIT(xmpq1);
+        MPQ2_INIT(xmpq2);
 
         SLONG_VEC_INIT(xslong_vec);
         NMOD_VEC_INIT(xnmod_vec);
@@ -533,6 +563,10 @@ TEST_FUNCTION_START(flint_fprintf, state)
         ACB6_SET(xacb6);
         ACB7_SET(xacb7);
         ACB8_SET(xacb8);
+        MPZ1_SET(xmpz1);
+        MPZ2_SET(xmpz2);
+        MPQ1_SET(xmpq1);
+        MPQ2_SET(xmpq2);
 
         SLONG_VEC_SET(xslong_vec);
         NMOD_VEC_SET(xnmod_vec);
@@ -616,6 +650,10 @@ TEST_FUNCTION_START(flint_fprintf, state)
                 "real acb: " ACB6_STRING "\n"
                 "imaginary acb: " ACB7_STRING "\n"
                 "acb: " ACB8_STRING "\n"
+                "small mpz: " MPZ1_STRING "\n"
+                "big mpz: " MPZ2_STRING "\n"
+                "small mpq: " MPQ1_STRING "\n"
+                "big mpq: " MPQ2_STRING "\n"
                 "\n"
                 "We intersect with some other primitive types...\n"
                 "\n"
@@ -733,6 +771,10 @@ TEST_FUNCTION_START(flint_fprintf, state)
                 "real acb: %{acb}\n"
                 "imaginary acb: %{acb}\n"
                 "acb: %{acb}\n"
+                "small mpz: %{mpz}\n"
+                "big mpz: %{mpz}\n"
+                "small mpq: %{mpq}\n"
+                "big mpq: %{mpq}\n"
                 "\n"
                 "We intersect with some other primitive types...\n"
                 "\n"
@@ -803,6 +845,10 @@ TEST_FUNCTION_START(flint_fprintf, state)
                 xacb6,
                 xacb7,
                 xacb8,
+                xmpz1,
+                xmpz2,
+                xmpq1,
+                xmpq2,
                 xchar,
                 xshort,
                 10, xint,
@@ -965,6 +1011,8 @@ TEST_FUNCTION_START(flint_fprintf, state)
         ACB6_CLEAR(xacb6);
         ACB7_CLEAR(xacb7);
         ACB8_CLEAR(xacb8);
+        MPZ1_CLEAR(xmpz1);
+        MPZ2_CLEAR(xmpz2);
 
         SLONG_VEC_CLEAR(xslong_vec);
         NMOD_VEC_CLEAR(xnmod_vec);
