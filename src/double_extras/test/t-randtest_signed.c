@@ -25,12 +25,7 @@ TEST_FUNCTION_START(d_randtest_signed, state)
     {
         x = d_randtest_signed(state, 0, 0);
         if ((fabs(x) < 0.5 && x != 0) || fabs(x) >= 1)
-        {
-            flint_printf("FAIL\n");
-            flint_printf("x = %.17g\n", x);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("x = %.17g\n", x);
     }
 
     TEST_FUNCTION_END(state);

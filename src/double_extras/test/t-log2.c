@@ -27,14 +27,11 @@ TEST_FUNCTION_START(d_log2, state)
         res1 = d_log2(x) * log(2);
         res2 = log(x);
         if (fabs(res1 - res2) > D_EPS)
-        {
-            flint_printf("FAIL\n");
-            flint_printf("x = %.20g\n", x);
-            flint_printf("res1 = %.20g\n", res1);
-            flint_printf("res2 = %.20g\n", res2);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "x = %.20g\n"
+                    "res1 = %.20g\n"
+                    "res2 = %.20g\n",
+                    x, res1, res2);
     }
 
     TEST_FUNCTION_END(state);
