@@ -39,15 +39,12 @@ TEST_FUNCTION_START(nmod_mat_scalar_addmul_ui, state)
         nmod_mat_scalar_addmul_ui(D, B, A, x);
 
         if (!nmod_mat_equal(C, D))
-        {
-            flint_printf("FAIL\n");
-            nmod_mat_print_pretty(A);
-            nmod_mat_print_pretty(B);
-            nmod_mat_print_pretty(C);
-            nmod_mat_print_pretty(D);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "A = %{nmod_mat}\n"
+                    "B = %{nmod_mat}\n"
+                    "C = %{nmod_mat}\n"
+                    "D = %{nmod_mat}\n",
+                    A, B, C, D);
 
         nmod_mat_clear(A);
         nmod_mat_clear(B);

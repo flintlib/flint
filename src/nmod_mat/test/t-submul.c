@@ -52,31 +52,27 @@ TEST_FUNCTION_START(nmod_mat_submul, state)
         nmod_mat_sub(E, C, T);
 
         if (!nmod_mat_equal(D, E))
-        {
-            flint_printf("FAIL: results not equal\n");
-            nmod_mat_print_pretty(A);
-            nmod_mat_print_pretty(B);
-            nmod_mat_print_pretty(C);
-            nmod_mat_print_pretty(D);
-            nmod_mat_print_pretty(E);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Results not equal\n"
+                    "A = %{nmod_mat}\n"
+                    "B = %{nmod_mat}\n"
+                    "C = %{nmod_mat}\n"
+                    "D = %{nmod_mat}\n"
+                    "E = %{nmod_mat}\n",
+                    A, B, C, D, E);
 
         /* Check aliasing */
         nmod_mat_submul(C, C, A, B);
 
         if (!nmod_mat_equal(C, E))
-        {
-            flint_printf("FAIL: results not equal (aliasing)\n");
-            nmod_mat_print_pretty(A);
-            nmod_mat_print_pretty(B);
-            nmod_mat_print_pretty(C);
-            nmod_mat_print_pretty(D);
-            nmod_mat_print_pretty(E);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Results not equal (aliasing)\n"
+                    "A = %{nmod_mat}\n"
+                    "B = %{nmod_mat}\n"
+                    "C = %{nmod_mat}\n"
+                    "D = %{nmod_mat}\n"
+                    "E = %{nmod_mat}\n",
+                    A, B, C, D, E);
 
         nmod_mat_clear(A);
         nmod_mat_clear(B);

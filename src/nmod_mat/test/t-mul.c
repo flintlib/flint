@@ -97,26 +97,20 @@ TEST_FUNCTION_START(nmod_mat_mul, state)
         nmod_mat_mul_check(D, A, B);
 
         if (!nmod_mat_equal(C, D))
-        {
-            flint_printf("FAIL: results not equal\n");
-            nmod_mat_print_pretty(A);
-            nmod_mat_print_pretty(B);
-            nmod_mat_print_pretty(C);
-            nmod_mat_print_pretty(D);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Results not equal\n"
+                    "A = %{nmod_mat}\n"
+                    "B = %{nmod_mat}\n"
+                    "C = %{nmod_mat}\n"
+                    "D = %{nmod_mat}\n",
+                    A, B, C, D);
 
         if (n == k)
         {
             nmod_mat_mul(A, A, B);
 
             if (!nmod_mat_equal(A, C))
-            {
-                flint_printf("FAIL: aliasing failed\n");
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL("Aliasing failed\n");
         }
 
         nmod_mat_clear(A);
@@ -142,13 +136,11 @@ TEST_FUNCTION_START(nmod_mat_mul, state)
         nmod_mat_mul(A_window, B, A_window);
 
         if (!nmod_mat_equal(A, B))
-        {
-            flint_printf("FAIL: window aliasing failed\n");
-            nmod_mat_print_pretty(A); flint_printf("\n\n");
-            nmod_mat_print_pretty(B); flint_printf("\n\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Window aliasing failed\n"
+                    "A = %{nmod_mat}\n"
+                    "B = %{nmod_mat}\n",
+                    A, B);
 
         nmod_mat_window_clear(A_window);
         nmod_mat_clear(A);

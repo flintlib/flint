@@ -41,15 +41,11 @@ TEST_FUNCTION_START(nmod_mat_invert_rows_cols, state)
             for (j =0; j < A->c; j++)
             {
                 if (nmod_mat_entry(B, i, j) != nmod_mat_entry(A, A->r - i - 1, A->c - j - 1))
-                {
-                    flint_printf("FAIL: B != A\n");
-                    flint_printf("A:\n");
-                    nmod_mat_print_pretty(A);
-                    flint_printf("B:\n");
-                    nmod_mat_print_pretty(B);
-                    fflush(stdout);
-                    flint_abort();
-                }
+                    TEST_FUNCTION_FAIL(
+                            "B != A\n"
+                            "A = %{nmod_mat}\n"
+                            "B = %{nmod_mat}\n",
+                            A, B);
             }
         }
 

@@ -47,30 +47,22 @@ TEST_FUNCTION_START(nmod_mat_permute_rows, state)
         for (i = 0; i < m; i++)
         {
             if (perm_store && perm_store[i] != perm[perm_act[i]])
-            {
-                flint_throw(FLINT_TEST_FAIL,
+                TEST_FUNCTION_FAIL(
                         "auxiliary permutation not correctly permuted by perm_act\n"
                         "m = %wd\n"
                         "input permutation: %{slong*}\n"
                         "acting permutation: %{slong*}\n"
                         "resulting permutation: %{slong*}\n",
-                        m,
-                        perm, m,
-                        perm_act, m,
-                        perm_store, m);
-            }
+                        m, perm, m, perm_act, m, perm_store, m);
+
             for (j = 0; j < n; j++)
             {
                 if (nmod_mat_entry(matt, i, j) != nmod_mat_entry(mat, perm_act[i], j))
-                {
-                    flint_printf("FAIL: matrix not correctly row-permuted by perm_act\n");
-                    flint_printf("first matrix:\n");
-                    nmod_mat_print_pretty(mat);
-                    flint_printf("second matrix:\n");
-                    nmod_mat_print_pretty(matt);
-                    fflush(stdout);
-                    flint_abort();
-                }
+                    TEST_FUNCTION_FAIL(
+                            "matrix not correctly row-permuted by perm_act\n"
+                            "first matrix = %{nmod_mat}\n"
+                            "second matrix = %{nmod_mat}\n",
+                            mat, matt);
             }
         }
 

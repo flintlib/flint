@@ -61,7 +61,7 @@ TEST_FUNCTION_START(nmod_mat_mul_classical_threaded, state)
 
         slong m, k, n;
 
-	flint_set_num_threads(n_randint(state, max_threads) + 1);
+        flint_set_num_threads(n_randint(state, max_threads) + 1);
 
         m = n_randint(state, 50);
         k = n_randint(state, 50);
@@ -104,15 +104,13 @@ TEST_FUNCTION_START(nmod_mat_mul_classical_threaded, state)
         nmod_mat_mul_check(D, A, B);
 
         if (!nmod_mat_equal(C, D))
-        {
-            flint_printf("FAIL: results not equal\n");
-            nmod_mat_print_pretty(A);
-            nmod_mat_print_pretty(B);
-            nmod_mat_print_pretty(C);
-            nmod_mat_print_pretty(D);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Results not equal\n"
+                    "A = %{nmod_mat}\n"
+                    "B = %{nmod_mat}\n"
+                    "C = %{nmod_mat}\n"
+                    "D = %{nmod_mat}\n",
+                    A, B, C, D);
 
         nmod_mat_clear(A);
         nmod_mat_clear(B);

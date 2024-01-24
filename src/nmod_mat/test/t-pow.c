@@ -43,14 +43,12 @@ TEST_FUNCTION_START(nmod_mat_pow, state)
         nmod_mat_pow(A, A, exp);
 
         if (!(nmod_mat_equal(C, B) && nmod_mat_equal(C, A)))
-        {
-            flint_printf("FAIL: results not equal\n");fflush(stdout);
-            nmod_mat_print_pretty(A);
-            nmod_mat_print_pretty(B);
-            nmod_mat_print_pretty(C);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Results not equal\n"
+                    "A = %{nmod_mat}\n"
+                    "B = %{nmod_mat}\n"
+                    "C = %{nmod_mat}\n",
+                    A, B, C);
 
         nmod_mat_clear(A);
         nmod_mat_clear(B);

@@ -46,15 +46,13 @@ TEST_FUNCTION_START(nmod_mat_charpoly, state)
         nmod_mat_charpoly(g, D);
 
         if (!nmod_poly_equal(f, g))
-        {
-            flint_printf("FAIL: charpoly(AB) != charpoly(BA).\n");
-            flint_printf("Matrix A:\n"), nmod_mat_print_pretty(A), flint_printf("\n");
-            flint_printf("Matrix B:\n"), nmod_mat_print_pretty(B), flint_printf("\n");
-            flint_printf("cp(AB) = "), nmod_poly_print_pretty(f, "X"), flint_printf("\n");
-            flint_printf("cp(BA) = "), nmod_poly_print_pretty(g, "X"), flint_printf("\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "charpoly(AB) != charpoly(BA)\n"
+                    "A = %{nmod_mat}\n"
+                    "B = %{nmod_mat}\n"
+                    "cp(AB) = %{nmod_poly}\n"
+                    "cp(BA) = %{nmod_poly}\n",
+                    A, B, f, g);
 
         nmod_mat_clear(A);
         nmod_mat_clear(B);
@@ -88,14 +86,12 @@ TEST_FUNCTION_START(nmod_mat_charpoly, state)
         nmod_mat_charpoly(g, A);
 
         if (!nmod_poly_equal(f, g))
-        {
-            flint_printf("FAIL: charpoly(P^{-1}AP) != charpoly(A).\n");
-            flint_printf("Matrix A:\n"), nmod_mat_print_pretty(A), flint_printf("\n");
-            flint_printf("cp(A) = "), nmod_poly_print_pretty(f, "X"), flint_printf("\n");
-            flint_printf("cp(P^{-1}AP) = "), nmod_poly_print_pretty(g, "X"), flint_printf("\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "charpoly(P^{-1}AP) != charpoly(A)\n"
+                    "A = %{nmod_mat}\n"
+                    "cp(A) = %{nmod_poly}\n"
+                    "cp(P^{-1}AP) = %{nmod_poly}\n",
+                    A, f, g);
 
         nmod_mat_clear(A);
         nmod_poly_clear(f);

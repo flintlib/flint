@@ -33,12 +33,8 @@ TEST_FUNCTION_START(nmod_mat_rank, state)
             /* flint_printf("SPARSE %wd\n", r);
             nmod_mat_print_pretty(A); */
             if (r != nmod_mat_rank(A))
-            {
-                flint_printf("FAIL:\n");
-                flint_printf("wrong rank!\n");
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL("Wrong rank\n");
+
             nmod_mat_clear(A);
         }
     }
@@ -60,12 +56,8 @@ TEST_FUNCTION_START(nmod_mat_rank, state)
             flint_printf("DENSE %wd %wd\n", r, d);
             nmod_mat_print_pretty(A); */
             if (r != nmod_mat_rank(A))
-            {
-                flint_printf("FAIL:\n");
-                flint_printf("wrong rank!\n");
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL("Wrong rank\n");
+
             nmod_mat_clear(A);
         }
     }
