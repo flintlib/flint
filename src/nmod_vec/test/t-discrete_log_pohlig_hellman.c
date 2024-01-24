@@ -43,14 +43,7 @@ TEST_FUNCTION_START(nmod_vec_discrete_log_pohlig_hellman, state)
                 x = n_urandint(state, p - 1);
                 y = nmod_pow_ui(alpha, x, fpctx);
                 if (x != nmod_discrete_log_pohlig_hellman_run(L, y))
-                {
-
-                    printf("FAIL\n");
-                    flint_printf("modulo %wu log base %wu of %wu"
-                                           " should be %wu\n", p, alpha, y, x);
-                    fflush(stdout);
-                    flint_abort();
-                }
+                    TEST_FUNCTION_FAIL("modulo %wu log base %wu of %wu should be %wu\n", p, alpha, y, x);
             }
         }
         nmod_discrete_log_pohlig_hellman_clear(L);

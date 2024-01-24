@@ -49,12 +49,7 @@ TEST_FUNCTION_START(nmod_vec_scalar_mul_nmod, state)
 
         result = _nmod_vec_equal(vec, vec3, len);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("len = %wd, n = %wd\n", len, n);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("len = %wd, n = %wd\n", len, n);
 
         _nmod_vec_clear(vec);
         _nmod_vec_clear(vec2);
