@@ -237,9 +237,6 @@ void unity_zpq_coeff_set_ui(unity_zpq f, slong i, slong j, ulong x);
 void unity_zpq_coeff_add(unity_zpq f, slong i, slong j, const fmpz_t x);
 void unity_zpq_coeff_add_ui(unity_zpq f, slong i, slong j, ulong x);
 
-/* Scalar multiplication */
-void unity_zpq_scalar_mul_ui(unity_zpq f, const unity_zpq g, ulong s);
-
 /* Addition and multiplication */
 void unity_zpq_add(unity_zpq f, const unity_zpq g, const unity_zpq h);
 
