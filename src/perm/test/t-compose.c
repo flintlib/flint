@@ -36,8 +36,7 @@ TEST_FUNCTION_START(perm_compose, state)
         _perm_compose(c, binv, c, n);
 
         if (!_perm_equal(a, c, n))
-        {
-            flint_throw(FLINT_TEST_FAIL,
+            TEST_FUNCTION_FAIL(
                     "n = %wd\n"
                     "a = %{slong*}\n\n"
                     "b = %{slong*}\n\n"
@@ -48,7 +47,6 @@ TEST_FUNCTION_START(perm_compose, state)
                     b, n,
                     binv, n,
                     c, n);
-        }
 
         _perm_clear(a);
         _perm_clear(b);
@@ -74,8 +72,7 @@ TEST_FUNCTION_START(perm_compose, state)
         _perm_compose(b, b, a, n);
 
         if (!_perm_equal(b, c, n))
-        {
-            flint_throw(FLINT_TEST_FAIL,
+            TEST_FUNCTION_FAIL(
                     "n = %wd\n"
                     "a = %{slong*}\n\n"
                     "b = %{slong*}\n\n"
@@ -84,7 +81,6 @@ TEST_FUNCTION_START(perm_compose, state)
                     a, n,
                     b, n,
                     c, n);
-        }
 
         _perm_clear(a);
         _perm_clear(b);
