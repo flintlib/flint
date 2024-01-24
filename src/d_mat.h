@@ -107,12 +107,6 @@ void d_mat_transpose(d_mat_t B, const d_mat_t A);
 
 void d_mat_mul_classical(d_mat_t C, const d_mat_t A, const d_mat_t B);
 
-/* Gram-Schmidt Orthogonalisation and QR Decomposition  ********************************************************/
-
-void d_mat_gso(d_mat_t B, const d_mat_t A);
-
-void d_mat_qr(d_mat_t Q, d_mat_t R, const d_mat_t A);
-
 #ifdef __cplusplus
 }
 #endif
