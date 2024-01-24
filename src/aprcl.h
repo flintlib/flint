@@ -131,9 +131,6 @@ slong unity_zp_is_unity(unity_zp f);
 
 int unity_zp_equal(unity_zp f, unity_zp g);
 
-/* I/O */
-void unity_zp_print(const unity_zp f);
-
 /* Coefficient management */
 void unity_zp_coeff_set_fmpz(unity_zp f, ulong ind, const fmpz_t x);
 void unity_zp_coeff_set_ui(unity_zp f, ulong ind, ulong x);
