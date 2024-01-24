@@ -47,38 +47,20 @@ TEST_FUNCTION_START(d_mat_gso, state)
         {
             double norm = 0;
             for (l = 0; l < m; l++)
-            {
                 norm += d_mat_entry(A, l, j) * d_mat_entry(A, l, j);
-            }
+
             if (norm != 0 && fabs(norm - 1) > D_MAT_GSO_NORM_EPS)
-            {
-                flint_printf("FAIL:\n");
-                flint_printf("A:\n");
-                d_mat_print(A);
-                flint_printf("%g\n", norm);
-                flint_printf("%d\n", j);
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL("");
+
             for (k = j + 1; k < n; k++)
             {
 
                 dot = 0;
                 for (l = 0; l < m; l++)
-                {
                     dot += d_mat_entry(A, l, j) * d_mat_entry(A, l, k);
-                }
 
                 if (fabs(dot) > D_MAT_GSO_ORTHO_EPS)
-                {
-                    flint_printf("FAIL:\n");
-                    flint_printf("A:\n");
-                    d_mat_print(A);
-                    flint_printf("%g\n", dot);
-                    flint_printf("%d %d\n", j, k);
-                    fflush(stdout);
-                    flint_abort();
-                }
+                    TEST_FUNCTION_FAIL("");
             }
         }
 

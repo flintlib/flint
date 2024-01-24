@@ -28,11 +28,8 @@ TEST_FUNCTION_START(d_mat_is_square, state)
         d_mat_init(A, rows, cols);
 
         if (d_mat_is_square(A) != (rows == cols))
-        {
-            flint_printf("FAIL!\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("");
+
         d_mat_clear(A);
     }
 

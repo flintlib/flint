@@ -49,24 +49,14 @@ TEST_FUNCTION_START(d_mat_mul_classical, state)
         d_mat_mul_classical(G, E, C);
 
         if (!d_mat_approx_equal(F, G, D_MAT_MUL_CLASSICAL_EPS))
-        {
-            flint_printf("FAIL: results not equal\n");
-            d_mat_print(F);
-            d_mat_print(G);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("Results not equal\n");
 
         if (n == k)
         {
             d_mat_mul_classical(A, A, B);
 
             if (!d_mat_equal(A, E))
-            {
-                flint_printf("FAIL: aliasing failed\n");
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL("Aliasing failed\n");
         }
 
         d_mat_clear(A);

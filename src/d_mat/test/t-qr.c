@@ -53,37 +53,17 @@ TEST_FUNCTION_START(d_mat_qr, state)
         d_mat_mul_classical(B, Q, R);
 
         if (!d_mat_approx_equal(A, B, D_MAT_QR_EQ_EPS))
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("A:\n");
-            d_mat_print(A);
-            flint_printf("Q:\n");
-            d_mat_print(Q);
-            flint_printf("R:\n");
-            d_mat_print(R);
-            flint_printf("B:\n");
-            d_mat_print(B);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("");
 
         for (j = 0; j < n; j++)
         {
             double norm = 0;
             for (l = 0; l < m; l++)
-            {
                 norm += d_mat_entry(Q, l, j) * d_mat_entry(Q, l, j);
-            }
+
             if (norm != 0 && fabs(norm - 1) > D_MAT_QR_NORM_EPS)
-            {
-                flint_printf("FAIL:\n");
-                flint_printf("Q:\n");
-                d_mat_print(Q);
-                flint_printf("%g\n", norm);
-                flint_printf("%d\n", j);
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL("");
+
             for (k = j + 1; k < n; k++)
             {
 
@@ -94,15 +74,7 @@ TEST_FUNCTION_START(d_mat_qr, state)
                 }
 
                 if (fabs(dot) > D_MAT_QR_ORTHO_EPS)
-                {
-                    flint_printf("FAIL:\n");
-                    flint_printf("Q:\n");
-                    d_mat_print(Q);
-                    flint_printf("%g\n", dot);
-                    flint_printf("%d %d\n", j, k);
-                    fflush(stdout);
-                    flint_abort();
-                }
+                    TEST_FUNCTION_FAIL("");
             }
         }
 
