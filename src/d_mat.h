@@ -76,12 +76,6 @@ int d_mat_equal(const d_mat_t mat1, const d_mat_t mat2);
 int d_mat_approx_equal(const d_mat_t mat1, const d_mat_t mat2, double eps);
 
 D_MAT_INLINE
-int d_mat_is_empty(const d_mat_t mat)
-{
-    return (mat->r == 0) || (mat->c == 0);
-}
-
-D_MAT_INLINE
 int d_mat_is_square(const d_mat_t mat)
 {
     return (mat->r == mat->c);

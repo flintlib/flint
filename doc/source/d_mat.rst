@@ -87,12 +87,6 @@ Comparison
     the same dimensions and entries within ``eps`` of each other,
     and zero otherwise.
 
-.. function:: int d_mat_is_empty(const d_mat_t mat)
-
-    Returns a non-zero value if the number of rows or the number of
-    columns in ``mat`` is zero, and otherwise returns
-    zero.
-
 .. function:: int d_mat_is_square(const d_mat_t mat)
 
     Returns a non-zero value if the number of rows is equal to the
