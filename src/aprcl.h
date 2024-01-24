@@ -110,9 +110,7 @@ slong _aprcl_is_prime_jacobi_check_2k(const unity_zp j, const unity_zp j2_1, con
 
 int _aprcl_is_prime_jacobi_additional_test(const fmpz_t n, ulong p);
 
-/* Final division functions */
-int aprcl_is_prime_divisors_in_residue(const fmpz_t n, const fmpz_t s, ulong r);
-
+/* Final division function */
 int aprcl_is_prime_final_division(const fmpz_t n, const fmpz_t s, ulong r);
 
 /* Z[unity_root]/(n) operations **********************************************/
