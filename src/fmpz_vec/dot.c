@@ -22,6 +22,12 @@ _fmpz_vec_dot_general_naive(fmpz_t res, const fmpz_t initial,
 
     if (initial == NULL)
     {
+        if (len == 0)
+        {
+            fmpz_zero(res);
+            return;
+        }
+
         fmpz_mul(res, a, reverse ? b + len - 1 : b);
 
         if (subtract)

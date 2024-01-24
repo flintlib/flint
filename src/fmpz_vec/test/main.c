@@ -17,6 +17,7 @@
 #include "t-add.c"
 #include "t-content.c"
 #include "t-dot.c"
+#include "t-dot_general.c"
 #include "t-get_d_vec_2exp.c"
 #include "t-get_set_fft.c"
 #include "t-get_set_nmod_vec.c"
@@ -61,6 +62,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_vec_add),
     TEST_FUNCTION(fmpz_vec_content),
     TEST_FUNCTION(fmpz_vec_dot),
+    TEST_FUNCTION(fmpz_vec_dot_general),
     TEST_FUNCTION(fmpz_vec_get_d_vec_2exp),
     TEST_FUNCTION(fmpz_vec_get_set_fft),
     TEST_FUNCTION(fmpz_vec_get_set_nmod_vec),
