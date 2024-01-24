@@ -29,48 +29,44 @@ TEST_FUNCTION_START(flint_mpn_mulmod_2expp1, state)
     tb <<= b;
 
     for ( ; b < 600; b++, tb*=2) {
-       xn = BITS_TO_LIMBS(b);
-       k = xn*GMP_NUMB_BITS - b;
+        xn = BITS_TO_LIMBS(b);
+        k = xn*GMP_NUMB_BITS - b;
 
-       if (tb == 0 || tb > GMP_NUMB_MASK)
-          tb=1;
+        if (tb == 0 || tb > GMP_NUMB_MASK)
+            tb=1;
 
-       mpn_zero(dp, xn);
-       mpn_com(dp, dp, xn);
-       dp[xn-1] &= GMP_NUMB_MASK >> k; /* dp is 2^b-1 */
-       dn = xn;
-       dp[xn] = mpn_add_1(dp, dp, xn, 2);
+        mpn_zero(dp, xn);
+        mpn_com(dp, dp, xn);
+        dp[xn-1] &= GMP_NUMB_MASK >> k; /* dp is 2^b-1 */
+        dn = xn;
+        dp[xn] = mpn_add_1(dp, dp, xn, 2);
 
-       if (dp[dn] != 0)
-          dn++; /* dp is 2^b+1 */
+        if (dp[dn] != 0)
+            dn++; /* dp is 2^b+1 */
 
-       for (c = 0; c < 20; c++) {
-          mpn_random2(xp, xn);
-          mpn_random2(yp, xn);
-          xp[xn-1] &= GMP_NUMB_MASK >> k;
-          yp[xn-1] &= GMP_NUMB_MASK >> k;
-          mpn_mul_n(zp, xp, yp, xn);
-          zn = xn*2;
-          MPN_NORM(zp, zn);
+        for (c = 0; c < 20; c++) {
+            mpn_random2(xp, xn);
+            mpn_random2(yp, xn);
+            xp[xn-1] &= GMP_NUMB_MASK >> k;
+            yp[xn-1] &= GMP_NUMB_MASK >> k;
+            mpn_mul_n(zp, xp, yp, xn);
+            zn = xn*2;
+            MPN_NORM(zp, zn);
 
-          if (zn >= dn)
-             mpn_tdiv_qr(qp, rp, 0, zp, zn, dp, dn);
-          else
-             mpn_copyi(rp, zp, dn);
+            if (zn >= dn)
+                mpn_tdiv_qr(qp, rp, 0, zp, zn, dp, dn);
+            else
+                mpn_copyi(rp, zp, dn);
 
-          cc = tp[xn] = flint_mpn_mulmod_2expp1_basecase(tp, xp, yp, 0, b, qp);
+            cc = tp[xn] = flint_mpn_mulmod_2expp1_basecase(tp, xp, yp, 0, b, qp);
 
-          if (cc != 0 && dn == xn)
-             tp[xn-1] |= tb;
+            if (cc != 0 && dn == xn)
+                tp[xn-1] |= tb;
 
-          result = (mpn_cmp(tp, rp, dn) == 0);
-          if (!result) {
-             flint_printf("FAIL:\n");
-             flint_printf("b = %wd\n", b);
-             fflush(stdout);
-             flint_abort();
-          }
-       }
+            result = (mpn_cmp(tp, rp, dn) == 0);
+            if (!result)
+                TEST_FUNCTION_FAIL("b = %wd\n", b);
+        }
     }
 
     b = 1;
@@ -78,57 +74,52 @@ TEST_FUNCTION_START(flint_mpn_mulmod_2expp1, state)
     tb <<= b;
 
     for ( ; b < 600; b++, tb*=2) {
-       xn = BITS_TO_LIMBS(b);
-       k = xn*GMP_NUMB_BITS - b;
+        xn = BITS_TO_LIMBS(b);
+        k = xn*GMP_NUMB_BITS - b;
 
-       if (tb == 0 || tb > GMP_NUMB_MASK)
-          tb = 1;
+        if (tb == 0 || tb > GMP_NUMB_MASK)
+            tb = 1;
 
-       mpn_zero(dp, xn);
-       mpn_com(dp, dp, xn);
-       dp[xn-1] &= GMP_NUMB_MASK >> k; /* dp is 2^b-1 */
-       dn = xn;
-       dp[xn] = mpn_add_1(dp, dp, xn, 2);
+        mpn_zero(dp, xn);
+        mpn_com(dp, dp, xn);
+        dp[xn-1] &= GMP_NUMB_MASK >> k; /* dp is 2^b-1 */
+        dn = xn;
+        dp[xn] = mpn_add_1(dp, dp, xn, 2);
 
-       if (dp[dn] != 0)
-          dn++; /* dp is 2^b+1 */
+        if (dp[dn] != 0)
+            dn++; /* dp is 2^b+1 */
 
-       for (c = 0; c < 20; c++) {
-          mpn_random2(xp, xn);
-          mpn_zero(yp, xn); /* set yp to 2^b */
-          xp[xn-1] &= GMP_NUMB_MASK >> k;
-          yp[xn-1] &= GMP_NUMB_MASK >> k;
-          yn = xn;
+        for (c = 0; c < 20; c++) {
+            mpn_random2(xp, xn);
+            mpn_zero(yp, xn); /* set yp to 2^b */
+            xp[xn-1] &= GMP_NUMB_MASK >> k;
+            yp[xn-1] &= GMP_NUMB_MASK >> k;
+            yn = xn;
 
-          if (tb == 1)
-             yn++;
+            if (tb == 1)
+                yn++;
 
-          yp[yn-1] = tb;
+            yp[yn-1] = tb;
 
-          mpn_mul(zp, yp, yn, xp, xn);
-          zn = xn*2;
-          MPN_NORM(zp, zn);
-          mpn_zero(yp, xn); /* set yp to 2^b */
+            mpn_mul(zp, yp, yn, xp, xn);
+            zn = xn*2;
+            MPN_NORM(zp, zn);
+            mpn_zero(yp, xn); /* set yp to 2^b */
 
-          if (zn >= dn)
-             mpn_tdiv_qr(qp, rp, 0, zp, zn, dp, dn);
-          else
-             mpn_copyi(rp, zp, dn);
+            if (zn >= dn)
+                mpn_tdiv_qr(qp, rp, 0, zp, zn, dp, dn);
+            else
+                mpn_copyi(rp, zp, dn);
 
-          cc = tp[xn] = flint_mpn_mulmod_2expp1_basecase(tp, xp, yp, 1, b, qp);
+            cc = tp[xn] = flint_mpn_mulmod_2expp1_basecase(tp, xp, yp, 1, b, qp);
 
-          if (cc != 0 && dn == xn)
-             tp[xn-1] |= tb;
+            if (cc != 0 && dn == xn)
+                tp[xn-1] |= tb;
 
-          result = (mpn_cmp(tp, rp, dn) == 0);
-          if (!result)
-          {
-             flint_printf("FAIL:\n");
-             flint_printf("b = %wd\n", b);
-             fflush(stdout);
-             flint_abort();
-          }
-       }
+            result = (mpn_cmp(tp, rp, dn) == 0);
+            if (!result)
+                TEST_FUNCTION_FAIL("b = %wd\n", b);
+        }
     }
 
     b = 1;
@@ -136,56 +127,52 @@ TEST_FUNCTION_START(flint_mpn_mulmod_2expp1, state)
     tb <<= b;
 
     for ( ; b < 600; b++, tb*=2) {
-       xn = BITS_TO_LIMBS(b);
-       k = xn*GMP_NUMB_BITS - b;
+        xn = BITS_TO_LIMBS(b);
+        k = xn*GMP_NUMB_BITS - b;
 
-       if (tb == 0 || tb > GMP_NUMB_MASK)
-          tb = 1;
+        if (tb == 0 || tb > GMP_NUMB_MASK)
+            tb = 1;
 
-       mpn_zero(dp, xn);
-       mpn_com(dp, dp, xn);
-       dp[xn-1] &= GMP_NUMB_MASK >> k; /* dp is 2^b-1 */
-       dn = xn;
-       dp[xn] = mpn_add_1(dp, dp, xn, 2);
+        mpn_zero(dp, xn);
+        mpn_com(dp, dp, xn);
+        dp[xn-1] &= GMP_NUMB_MASK >> k; /* dp is 2^b-1 */
+        dn = xn;
+        dp[xn] = mpn_add_1(dp, dp, xn, 2);
 
-       if (dp[dn] != 0)
-          dn++; /* dp is 2^b+1 */
+        if (dp[dn] != 0)
+            dn++; /* dp is 2^b+1 */
 
-       for (c = 0; c < 20; c++) {
-          mpn_random2(xp, xn);
-          mpn_zero(yp, xn); /* set yp to 2^b */
-          xp[xn-1] &= GMP_NUMB_MASK >> k;
-          yp[xn-1] &= GMP_NUMB_MASK >> k;
-          yn = xn;
+        for (c = 0; c < 20; c++) {
+            mpn_random2(xp, xn);
+            mpn_zero(yp, xn); /* set yp to 2^b */
+            xp[xn-1] &= GMP_NUMB_MASK >> k;
+            yp[xn-1] &= GMP_NUMB_MASK >> k;
+            yn = xn;
 
-          if (tb == 1)
-             yn++;
+            if (tb == 1)
+                yn++;
 
-          yp[yn-1] = tb;
+            yp[yn-1] = tb;
 
-          mpn_mul(zp, yp, yn, xp, xn);
-          zn = xn*2;
-          MPN_NORM(zp, zn);
-          mpn_zero(yp, xn); /* set yp to 2^b */
+            mpn_mul(zp, yp, yn, xp, xn);
+            zn = xn*2;
+            MPN_NORM(zp, zn);
+            mpn_zero(yp, xn); /* set yp to 2^b */
 
-          if (zn >= dn)
-             mpn_tdiv_qr(qp, rp, 0, zp, zn, dp, dn);
-          else
-             mpn_copyi(rp, zp, dn);
+            if (zn >= dn)
+                mpn_tdiv_qr(qp, rp, 0, zp, zn, dp, dn);
+            else
+                mpn_copyi(rp, zp, dn);
 
-          cc = tp[xn] = flint_mpn_mulmod_2expp1_basecase(tp, yp, xp, 2, b, qp);
+            cc = tp[xn] = flint_mpn_mulmod_2expp1_basecase(tp, yp, xp, 2, b, qp);
 
-          if (cc != 0 && dn == xn)
-             tp[xn-1] |= tb;
+            if (cc != 0 && dn == xn)
+                tp[xn-1] |= tb;
 
-          result = (mpn_cmp(tp, rp, dn) == 0);
-          if (!result) {
-             flint_printf("FAIL\n");
-             flint_printf("b = %wd\n", b);
-             fflush(stdout);
-             flint_abort();
-          }
-       }
+            result = (mpn_cmp(tp, rp, dn) == 0);
+            if (!result)
+                TEST_FUNCTION_FAIL("b = %wd\n", b);
+        }
     }
 
     rp[0] = 1;
@@ -195,39 +182,35 @@ TEST_FUNCTION_START(flint_mpn_mulmod_2expp1, state)
     tb <<= b;
 
     for ( ; b < 600; b++, tb*=2) {
-       xn = BITS_TO_LIMBS(b);
-       k = xn*GMP_NUMB_BITS - b;
+        xn = BITS_TO_LIMBS(b);
+        k = xn*GMP_NUMB_BITS - b;
 
-       if (tb == 0 || tb > GMP_NUMB_MASK)
-          tb = 1;
+        if (tb == 0 || tb > GMP_NUMB_MASK)
+            tb = 1;
 
-       mpn_zero(dp, xn);
-       mpn_com(dp, dp, xn);
-       dp[xn-1] &= GMP_NUMB_MASK >> k; /* dp is 2^b-1 */
-       dn = xn;
-       dp[xn] = mpn_add_1(dp, dp, xn, 2);
+        mpn_zero(dp, xn);
+        mpn_com(dp, dp, xn);
+        dp[xn-1] &= GMP_NUMB_MASK >> k; /* dp is 2^b-1 */
+        dn = xn;
+        dp[xn] = mpn_add_1(dp, dp, xn, 2);
 
-       if (dp[dn] != 0)
-          dn++; /* dp is 2^b+1 */
+        if (dp[dn] != 0)
+            dn++; /* dp is 2^b+1 */
 
-       for (c = 0; c < 1; c++) {
-          mpn_zero(xp, xn);
-          mpn_zero(yp, xn); /* set xp, yp to 2^b */
-          xp[xn-1] &= GMP_NUMB_MASK >> k;
-          yp[xn-1] &= GMP_NUMB_MASK >> k;
-          cc = tp[xn] = flint_mpn_mulmod_2expp1_basecase(tp, yp, xp, 3, b, qp);
+        for (c = 0; c < 1; c++) {
+            mpn_zero(xp, xn);
+            mpn_zero(yp, xn); /* set xp, yp to 2^b */
+            xp[xn-1] &= GMP_NUMB_MASK >> k;
+            yp[xn-1] &= GMP_NUMB_MASK >> k;
+            cc = tp[xn] = flint_mpn_mulmod_2expp1_basecase(tp, yp, xp, 3, b, qp);
 
-          if (cc != 0 && dn == xn)
-             tp[xn-1] |= tb;
+            if (cc != 0 && dn == xn)
+                tp[xn-1] |= tb;
 
-          result = (mpn_cmp(tp, rp, dn) == 0);
-          if (!result) {
-             flint_printf("FAIL\n");
-             flint_printf("b = %wd\n", b);
-             fflush(stdout);
-             flint_abort();
-          }
-       }
+            result = (mpn_cmp(tp, rp, dn) == 0);
+            if (!result)
+                TEST_FUNCTION_FAIL("b = %wd\n", b);
+        }
     }
 
     gmp_randclear(rands);

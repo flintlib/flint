@@ -34,7 +34,7 @@ TEST_FUNCTION_START(flint_mpn_sqr_basecase, state)
         mpn_sqr(res2, ap, alen);
 
         if (mpn_cmp(res1, res2, 2 * alen) || ret1 != res1[2 * alen - 1])
-            flint_throw(FLINT_TEST_FAIL,
+            TEST_FUNCTION_FAIL(
                     "ix = %wd\n"
                     "alen = %wd\n"
                     "ap = %{ulong*}\n"

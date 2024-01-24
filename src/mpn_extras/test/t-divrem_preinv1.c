@@ -30,56 +30,53 @@ TEST_FUNCTION_START(flint_mpn_divrem_preinv1, state)
 
     for (i = 0; i < 10000; i++)
     {
-       do {
-          mpz_rrandomb(a, st, n_randint(state, 200));
-          do {
-             mpz_rrandomb(b, st, n_randint(state, 200));
-          } while (mpz_sgn(b) == 0);
+        do {
+            mpz_rrandomb(a, st, n_randint(state, 200));
+            do {
+                mpz_rrandomb(b, st, n_randint(state, 200));
+            } while (mpz_sgn(b) == 0);
 
-          s1 = a->_mp_size;
-          s2 = b->_mp_size;
-       } while (s1 < s2 || s2 < 2);
+            s1 = a->_mp_size;
+            s2 = b->_mp_size;
+        } while (s1 < s2 || s2 < 2);
 
-       mpz_set(a2, a);
+        mpz_set(a2, a);
 
-       /* normalise b */
-       b->_mp_d[b->_mp_size - 1] |= ((mp_limb_t) 1 << (GMP_LIMB_BITS - 1));
+        /* normalise b */
+        b->_mp_d[b->_mp_size - 1] |= ((mp_limb_t) 1 << (GMP_LIMB_BITS - 1));
 
-       d1 = b->_mp_d[b->_mp_size - 1];
-       d2 = b->_mp_d[b->_mp_size - 2];
+        d1 = b->_mp_d[b->_mp_size - 1];
+        d2 = b->_mp_d[b->_mp_size - 2];
 
-       mpz_fdiv_qr(q, r, a, b);
+        mpz_fdiv_qr(q, r, a, b);
 
-       inv = flint_mpn_preinv1(d1, d2);
+        inv = flint_mpn_preinv1(d1, d2);
 
-       q2->_mp_d = flint_malloc((s1 - s2 + 1)*sizeof(mp_limb_t));
+        q2->_mp_d = flint_malloc((s1 - s2 + 1)*sizeof(mp_limb_t));
 
-       q2->_mp_d[s1 - s2] = flint_mpn_divrem_preinv1(q2->_mp_d, a2->_mp_d, a2->_mp_size, b->_mp_d, b->_mp_size, inv);
+        q2->_mp_d[s1 - s2] = flint_mpn_divrem_preinv1(q2->_mp_d, a2->_mp_d, a2->_mp_size, b->_mp_d, b->_mp_size, inv);
 
-       /* normalise */
-       s1 -= (s2 - 1);
-       while (s1 && q2->_mp_d[s1 - 1] == 0) s1--;
-       q2->_mp_size = s1;
-       q2->_mp_alloc = s1;
+        /* normalise */
+        s1 -= (s2 - 1);
+        while (s1 && q2->_mp_d[s1 - 1] == 0) s1--;
+        q2->_mp_size = s1;
+        q2->_mp_alloc = s1;
 
-       while (s2 && a2->_mp_d[s2 - 1] == 0) s2--;
-       a2->_mp_size = s2;
+        while (s2 && a2->_mp_d[s2 - 1] == 0) s2--;
+        a2->_mp_size = s2;
 
-       result = (mpz_cmp(q, q2) == 0 && mpz_cmp(a2, r) == 0);
-       if (!result)
-       {
-          flint_printf("FAIL:\n");
-          gmp_printf("%Zd\n", a);
-          gmp_printf("%Zd\n", b);
-          gmp_printf("%Zd\n", q);
-          gmp_printf("%Zd\n", r);
-          gmp_printf("%Zd\n", q2);
-          gmp_printf("%Zd\n", a2);
-          fflush(stdout);
-          flint_abort();
-       }
+        result = (mpz_cmp(q, q2) == 0 && mpz_cmp(a2, r) == 0);
+        if (!result)
+            TEST_FUNCTION_FAIL(
+                    "%{mpz}\n"
+                    "%{mpz}\n"
+                    "%{mpz}\n"
+                    "%{mpz}\n"
+                    "%{mpz}\n"
+                    "%{mpz}\n",
+                    a, b, q, r, q2, a2);
 
-       flint_free(q2->_mp_d);
+        flint_free(q2->_mp_d);
     }
 
     mpz_clear(a);

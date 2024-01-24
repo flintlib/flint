@@ -52,32 +52,17 @@ TEST_FUNCTION_START(flint_mpn_fmms1, state)
         {
             fmpz_set_ui_array(T, y, yn);
             if (y[yn - 1] == 0 || !fmpz_equal(T, Y))
-            {
-                flint_printf("FAIL\n");
-                flint_printf("check positive answer, i = %wd\n", i);
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL("check positive answer, i = %wd\n", i);
         }
         else if (yn == 0)
         {
             if (!fmpz_is_zero(Y))
-            {
-                flint_printf("FAIL\n");
-                flint_printf("check zero answer, i = %wd\n", i);
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL("check zero answer, i = %wd\n", i);
         }
         else
         {
             if (fmpz_sgn(Y) >= 0 && fmpz_size(Y) <= n)
-            {
-                flint_printf("FAIL\n");
-                flint_printf("check failed answer, i = %wd\n", i);
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL("check failed answer, i = %wd\n", i);
         }
 
         flint_free(x1);
