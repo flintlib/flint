@@ -20,7 +20,6 @@
 #include "t-is_empty.c"
 #include "t-is_square.c"
 #include "t-mul_classical.c"
-#include "t-one.c"
 #include "t-transpose.c"
 #include "t-zero.c"
 
@@ -34,7 +33,6 @@ test_struct tests[] =
     TEST_FUNCTION(d_mat_is_empty),
     TEST_FUNCTION(d_mat_is_square),
     TEST_FUNCTION(d_mat_mul_classical),
-    TEST_FUNCTION(d_mat_one),
     TEST_FUNCTION(d_mat_transpose),
     TEST_FUNCTION(d_mat_zero)
 };

@@ -89,8 +89,6 @@ int d_mat_is_square(const d_mat_t mat)
 
 void d_mat_zero(d_mat_t mat);
 
-void d_mat_one(d_mat_t mat);
-
 /* Input and output  *********************************************************/
 
 void d_mat_print(const d_mat_t mat);
