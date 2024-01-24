@@ -74,7 +74,7 @@ TEST_FUNCTION_START(acb_dirichlet_l_vec_hurwitz, state)
                 flint_printf("\nL(1/2, %wu) multi = ", chi->n);
                 acb_printd(v + i, 20);
                 flint_printf("\n\n");
-                acb_vec_printd(v, G->phi_q, 10);
+                _acb_vec_printd(v, G->phi_q, 10);
                 flint_printf("\n\n");
                 flint_abort();
             }

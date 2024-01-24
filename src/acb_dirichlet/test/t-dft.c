@@ -27,9 +27,9 @@ check_vec_eq_prec(acb_srcptr w1, acb_srcptr w2, slong len, slong prec, slong dig
             flint_printf("q = %wu, size = %wd\n", q, len);
             flint_printf("\nDFT differ from index %wd / %wd \n", i, len);
             flint_printf("\n%s =\n", f1);
-            acb_vec_printd(w1, len, digits);
+            _acb_vec_printd(w1, len, digits);
             flint_printf("\n%s =\n", f2);
-            acb_vec_printd(w2, len, digits);
+            _acb_vec_printd(w2, len, digits);
             flint_printf("\n\n");
             flint_abort();
         }

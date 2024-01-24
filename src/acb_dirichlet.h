@@ -310,16 +310,6 @@ slong acb_dirichlet_platt_hardy_z_zeros(
 void acb_dirichlet_dft_index(acb_ptr w, acb_srcptr v, const dirichlet_group_t G, slong prec);
 void acb_dirichlet_dft(acb_ptr w, acb_srcptr v, const dirichlet_group_t G, slong prec);
 
-/* utils */
-
-FLINT_FORCE_INLINE void
-acb_vec_printd(acb_srcptr vec, slong len, slong digits)
-{
-    slong i;
-    for (i = 0; i < len; i++)
-        acb_printd(vec + i, digits), flint_printf("\n");
-}
-
 #ifdef __cplusplus
 }
 #endif
