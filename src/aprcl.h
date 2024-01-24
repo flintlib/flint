@@ -142,7 +142,6 @@ void unity_zp_coeff_inc(unity_zp f, ulong ind);
 void unity_zp_coeff_dec(unity_zp f, ulong ind);
 
 /* Scalar multiplication */
-void unity_zp_mul_scalar_fmpz(unity_zp f, const unity_zp g, const fmpz_t s);
 void unity_zp_mul_scalar_ui(unity_zp f, const unity_zp g, ulong s);
 
 /* Addition */
