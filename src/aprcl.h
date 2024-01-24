@@ -224,12 +224,6 @@ void unity_zpq_swap(unity_zpq f, unity_zpq g);
 /* Comparison */
 int unity_zpq_equal(const unity_zpq f, const unity_zpq g);
 
-slong unity_zpq_p_unity(const unity_zpq f);
-
-int unity_zpq_is_p_unity(const unity_zpq f);
-
-int unity_zpq_is_p_unity_generator(const unity_zpq f);
-
 /* Coefficient management */
 void unity_zpq_coeff_set_fmpz(unity_zpq f, slong i, slong j, const fmpz_t x);
 void unity_zpq_coeff_set_ui(unity_zpq f, slong i, slong j, ulong x);
