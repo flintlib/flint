@@ -15,6 +15,7 @@
 #include "fmpz_factor.h"
 #include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
+#include "fmpz_vec.h"
 #include "fmpz_mat.h"
 #include "fmpq.h"
 #include "gr.h"
@@ -917,74 +918,14 @@ _gr_fmpz_vec_sum(fmpz_t res, const fmpz * vec, slong len, gr_ctx_t ctx)
 int
 _gr_fmpz_vec_dot(fmpz_t res, const fmpz_t initial, int subtract, const fmpz * vec1, const fmpz * vec2, slong len, gr_ctx_t ctx)
 {
-    slong i;
-
-    if (len <= 0)
-    {
-        if (initial == NULL)
-            fmpz_zero(res);
-        else
-            fmpz_set(res, initial);
-        return GR_SUCCESS;
-    }
-
-    if (initial == NULL)
-    {
-        fmpz_mul(res, vec1, vec2);
-    }
-    else
-    {
-        if (subtract)
-            fmpz_neg(res, initial);
-        else
-            fmpz_set(res, initial);
-
-        fmpz_addmul(res, vec1, vec2);
-    }
-
-    for (i = 1; i < len; i++)
-        fmpz_addmul(res, vec1 + i, vec2 + i);
-
-    if (subtract)
-        fmpz_neg(res, res);
-
+    _fmpz_vec_dot_general(res, initial, subtract, vec1, vec2, 0, len);
     return GR_SUCCESS;
 }
 
 int
 _gr_fmpz_vec_dot_rev(fmpz_t res, const fmpz_t initial, int subtract, const fmpz * vec1, const fmpz * vec2, slong len, gr_ctx_t ctx)
 {
-    slong i;
-
-    if (len <= 0)
-    {
-        if (initial == NULL)
-            fmpz_zero(res);
-        else
-            fmpz_set(res, initial);
-        return GR_SUCCESS;
-    }
-
-    if (initial == NULL)
-    {
-        fmpz_mul(res, vec1, vec2 + len - 1);
-    }
-    else
-    {
-        if (subtract)
-            fmpz_neg(res, initial);
-        else
-            fmpz_set(res, initial);
-
-        fmpz_addmul(res, vec1, vec2 + len - 1);
-    }
-
-    for (i = 1; i < len; i++)
-        fmpz_addmul(res, vec1 + i, vec2 + len - 1 - i);
-
-    if (subtract)
-        fmpz_neg(res, res);
-
+    _fmpz_vec_dot_general(res, initial, subtract, vec1, vec2, 1, len);
     return GR_SUCCESS;
 }
 

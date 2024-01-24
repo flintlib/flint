@@ -25,6 +25,17 @@ with op = -1, computes D = C - A*B
 */
 
 static inline void
+_fmpz_vec_dot_ptr(fmpz_t c, const fmpz * vec1, fmpz ** const vec2,
+                                                       slong offset, slong len)
+{
+    slong i;
+
+    fmpz_zero(c);
+    for (i = 0; i < len; i++)
+        fmpz_addmul(c, vec1 + i, vec2[i] + offset);
+}
+
+static inline void
 _fmpz_mod_mat_addmul_basic_op(fmpz ** D, fmpz ** const C, fmpz ** const A,
                fmpz ** const B, slong m, slong k, slong n, int op, fmpz_t p)
 {
