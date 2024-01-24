@@ -45,14 +45,12 @@ TEST_FUNCTION_START(nmod_mat_minpoly, state)
         nmod_poly_divrem(q, r, g, f);
 
         if (!nmod_poly_is_zero(r))
-        {
-            flint_printf("FAIL: minpoly(A) does not divide charpoly(BA).\n");
-            flint_printf("Matrix A:\n"), nmod_mat_print_pretty(A), flint_printf("\n");
-            flint_printf("mp(A) = "), nmod_poly_print_pretty(f, "X"), flint_printf("\n");
-            flint_printf("cp(A) = "), nmod_poly_print_pretty(g, "X"), flint_printf("\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "minpoly(A) does not divide charpoly(BA)\n"
+                    "A = %{nmod_mat}\n"
+                    "mp(A) = %{nmod_poly}\n"
+                    "cp(A) = %{nmod_poly}\n",
+                    A, f, g);
 
         nmod_mat_clear(A);
         nmod_poly_clear(f);
@@ -95,14 +93,12 @@ TEST_FUNCTION_START(nmod_mat_minpoly, state)
         nmod_mat_minpoly(g, A);
 
         if (!nmod_poly_equal(f, g))
-        {
-            flint_printf("FAIL: minpoly(P^{-1}AP) != minpoly(A).\n");
-            flint_printf("Matrix A:\n"), nmod_mat_print_pretty(A), flint_printf("\n");
-            flint_printf("mp(A) = "), nmod_poly_print_pretty(f, "X"), flint_printf("\n");
-            flint_printf("mp(P^{-1}AP) = "), nmod_poly_print_pretty(g, "X"), flint_printf("\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "minpoly(P^{-1}AP) != minpoly(A)\n"
+                    "A = %{nmod_mat}\n"
+                    "mp(A) = %{nmod_poly}\n"
+                    "mp(P^{-1}AP) = %{nmod_poly}\n",
+                    A, f, g);
 
         nmod_mat_clear(A);
         nmod_poly_clear(f);

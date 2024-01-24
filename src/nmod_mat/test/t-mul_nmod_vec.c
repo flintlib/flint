@@ -64,15 +64,8 @@ TEST_FUNCTION_START(nmod_mat_mul_nmod_vec, state)
         nmod_mat_mul(C, A, B);
 
         for (j = 0; j < m; j++)
-        {
-            if (nmod_mat_entry(C, j, 0) != c[j] ||
-                nmod_mat_entry(C, j, 0) != cc[j][0])
-            {
-                flint_printf("FAIL: wrong answer\n");
-                fflush(stdout);
-                flint_abort();
-            }
-        }
+            if (nmod_mat_entry(C, j, 0) != c[j] || nmod_mat_entry(C, j, 0) != cc[j][0])
+                TEST_FUNCTION_FAIL("");
 
         nmod_mat_clear(A);
         nmod_mat_clear(B);

@@ -43,17 +43,14 @@ TEST_FUNCTION_START(nmod_mat_trace, state)
         trba = nmod_mat_trace(BA);
 
         if (trab != trba)
-        {
-            flint_printf("FAIL:\n");
-            nmod_mat_print_pretty(A), flint_printf("\n");
-            nmod_mat_print_pretty(B), flint_printf("\n");
-            nmod_mat_print_pretty(AB), flint_printf("\n");
-            nmod_mat_print_pretty(BA), flint_printf("\n");
-            flint_printf("tr(AB): %wu\n", trab);
-            flint_printf("tr(BA): %wu\n", trba);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "A = %{nmod_mat}\n"
+                    "B = %{nmod_mat}\n"
+                    "AB = %{nmod_mat}\n"
+                    "BA = %{nmod_mat}\n"
+                    "tr(AB) = %wu\n"
+                    "tr(BA) = %wu\n",
+                    A, B, AB, BA, trab, trba);
 
         nmod_mat_clear(A);
         nmod_mat_clear(B);

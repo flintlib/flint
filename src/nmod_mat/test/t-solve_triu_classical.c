@@ -41,33 +41,21 @@ TEST_FUNCTION_START(nmod_mat_solve_triu_classical, state)
         /* Check Y = A^(-1) * (A * X) = X */
         nmod_mat_solve_triu_classical(Y, A, B, unit);
         if (!nmod_mat_equal(Y, X))
-        {
-            flint_printf("FAIL!\n");
-            flint_printf("A:\n");
-            nmod_mat_print_pretty(A);
-            flint_printf("X:\n");
-            nmod_mat_print_pretty(X);
-            flint_printf("B:\n");
-            nmod_mat_print_pretty(B);
-            flint_printf("Y:\n");
-            nmod_mat_print_pretty(Y);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "A = %{nmod_mat}\n"
+                    "X = %{nmod_mat}\n"
+                    "B = %{nmod_mat}\n"
+                    "Y = %{nmod_mat}\n",
+                    A, X, B, Y);
 
         /* Check aliasing */
         nmod_mat_solve_triu_classical(B, A, B, unit);
         if (!nmod_mat_equal(B, X))
-        {
-            flint_printf("FAIL!\n");
-            flint_printf("aliasing test failed");
-            flint_printf("A:\n");
-            nmod_mat_print_pretty(A);
-            flint_printf("B:\n");
-            nmod_mat_print_pretty(B);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Aliasing test failed\n"
+                    "A = %{nmod_mat}\n"
+                    "B = %{nmod_mat}\n",
+                    A, B);
 
         nmod_mat_clear(A);
         nmod_mat_clear(B);

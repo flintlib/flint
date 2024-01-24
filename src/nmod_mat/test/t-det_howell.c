@@ -26,9 +26,9 @@ TEST_FUNCTION_START(nmod_mat_det_howell, state)
         fmpz_t Bdet;
         ulong t;
 
-	m = n_randint(state, 30);
+        m = n_randint(state, 30);
         mod = n_randtest(state);
-	mod += mod == 0;
+        mod += mod == 0;
 
         nmod_mat_init(A, m, m, mod);
         fmpz_mat_init(B, m, m);
@@ -58,12 +58,7 @@ TEST_FUNCTION_START(nmod_mat_det_howell, state)
         fmpz_mod_ui(Bdet, Bdet, mod);
 
         if (Adet != fmpz_get_ui(Bdet))
-        {
-            flint_printf("FAIL\n");
-	    flint_printf("Adet = %wu, Bdet = %wu\n", Adet, fmpz_get_ui(Bdet));
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("Adet = %wu, Bdet = %wu\n", Adet, fmpz_get_ui(Bdet));
 
         nmod_mat_clear(A);
         fmpz_mat_clear(B);

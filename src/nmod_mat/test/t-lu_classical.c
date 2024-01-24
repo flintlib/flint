@@ -36,7 +36,7 @@ void perm(nmod_mat_t A, slong * P)
 /* Defined in t-lu_classical.c, t-lu_classical_delayed.c and t-lu_recursive.c */
 #ifndef check
 #define check check
-void check(slong * P, nmod_mat_t LU, const nmod_mat_t A, slong rank)
+int check(slong * P, nmod_mat_t LU, const nmod_mat_t A, slong rank)
 {
     nmod_mat_t B, L, U;
     slong m, n, i, j;
@@ -51,17 +51,9 @@ void check(slong * P, nmod_mat_t LU, const nmod_mat_t A, slong rank)
     rank = FLINT_ABS(rank);
 
     for (i = rank; i < FLINT_MIN(m, n); i++)
-    {
         for (j = i; j < n; j++)
-        {
             if (nmod_mat_entry(LU, i, j) != 0)
-            {
-                flint_printf("FAIL: wrong shape!\n");
-                fflush(stdout);
-                flint_abort();
-            }
-        }
-    }
+                return 1;
 
     for (i = 0; i < m; i++)
     {
@@ -77,27 +69,20 @@ void check(slong * P, nmod_mat_t LU, const nmod_mat_t A, slong rank)
     perm(B, P);
 
     if (!nmod_mat_equal(A, B))
-    {
-        flint_printf("FAIL\n");
-        flint_printf("A:\n");
-        nmod_mat_print_pretty(A);
-        flint_printf("LU:\n");
-        nmod_mat_print_pretty(LU);
-        flint_printf("B:\n");
-        nmod_mat_print_pretty(B);
-        fflush(stdout);
-        flint_abort();
-    }
+        return 2;
 
     nmod_mat_clear(B);
     nmod_mat_clear(L);
     nmod_mat_clear(U);
+
+    return 0;
 }
 #endif
 
 TEST_FUNCTION_START(nmod_mat_lu_classical, state)
 {
     slong i;
+    int result;
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -126,19 +111,26 @@ TEST_FUNCTION_START(nmod_mat_lu_classical, state)
 
             rank = nmod_mat_lu_classical(P, LU, 0);
 
-            if (r != rank)
-            {
-                flint_printf("FAIL:\n");
-                flint_printf("wrong rank!\n");
-                flint_printf("A:");
-                nmod_mat_print_pretty(A);
-                flint_printf("LU:");
-                nmod_mat_print_pretty(LU);
-                fflush(stdout);
-                flint_abort();
-            }
+            result = (r == rank);
 
-            check(P, LU, A, rank);
+            if (!result)
+                TEST_FUNCTION_FAIL(
+                        "Wrong rank\n"
+                        "A = %{nmod_mat}\n"
+                        "LU = %{nmod_mat}\n",
+                        A, LU);
+
+            result = check(P, LU, A, rank);
+            if (result != 0)
+            {
+                if (result == 1)
+                    TEST_FUNCTION_FAIL("Wrong shape\n");
+                else if (result == 2)
+                    TEST_FUNCTION_FAIL(
+                        "A = %{nmod_mat}\n"
+                        "LU = %{nmod_mat}\n",
+                        A, LU);
+            }
 
             nmod_mat_clear(A);
             nmod_mat_clear(LU);

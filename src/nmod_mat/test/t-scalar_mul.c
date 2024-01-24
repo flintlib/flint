@@ -43,22 +43,14 @@ TEST_FUNCTION_START(nmod_mat_scalar_mul, state)
         nmod_mat_sub(D, C, D);
 
         if (!nmod_mat_equal(A, D))
-        {
-            flint_printf("FAIL\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("");
 
         /* Aliasing */
         nmod_mat_scalar_mul(C, A, c);
         nmod_mat_scalar_mul(A, A, c);
 
         if (!nmod_mat_equal(A, C))
-        {
-            flint_printf("FAIL\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("");
 
         nmod_mat_clear(A);
         nmod_mat_clear(B);

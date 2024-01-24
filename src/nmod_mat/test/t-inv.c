@@ -44,19 +44,12 @@ TEST_FUNCTION_START(nmod_mat_inv, state)
         nmod_mat_mul(C, A, B);
 
         if (!nmod_mat_equal(C, I) || !result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("A * A^-1 != I!\n");
-            flint_printf("A:\n");
-            nmod_mat_print_pretty(A);
-            flint_printf("A^-1:\n");
-            nmod_mat_print_pretty(B);
-            flint_printf("A * A^-1:\n");
-            nmod_mat_print_pretty(C);
-            flint_printf("\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "A * A^-1 != I\n"
+                    "A = %{nmod_mat}\n"
+                    "A^-1 = %{nmod_mat}\n"
+                    "A * A^-1 = %{nmod_mat}\n",
+                    A, B, C);
 
         /* Test aliasing */
         nmod_mat_set(C, A);
@@ -64,13 +57,10 @@ TEST_FUNCTION_START(nmod_mat_inv, state)
         nmod_mat_mul(B, A, C);
 
         if (!nmod_mat_equal(B, I))
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("aliasing failed!\n");
-            nmod_mat_print_pretty(C);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Aliasing failed\n"
+                    "A = %{nmod_mat}\n",
+                    C);
 
         nmod_mat_clear(A);
         nmod_mat_clear(B);
@@ -97,22 +87,12 @@ TEST_FUNCTION_START(nmod_mat_inv, state)
         result = nmod_mat_inv(B, A);
 
         if (result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("singular matrix reported as invertible\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("singular matrix reported as invertible\n");
 
         /* Aliasing */
         result = nmod_mat_inv(A, A);
         if (result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("singular matrix reported as invertible\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("singular matrix reported as invertible\n");
 
         nmod_mat_clear(A);
         nmod_mat_clear(B);

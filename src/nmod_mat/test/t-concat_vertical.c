@@ -42,17 +42,11 @@ TEST_FUNCTION_START(nmod_mat_concat_vertical, state)
         nmod_mat_window_init(window2, C, r1, 0, (r1+r2), c1);
 
         if (!(nmod_mat_equal(window1, A) && nmod_mat_equal(window2, B)))
-        {
-            flint_printf("A = \n");
-            nmod_mat_print_pretty(A);
-            flint_printf("B = \n");
-            nmod_mat_print_pretty(B);
-            flint_printf("A concat_vertical B = \n");
-            nmod_mat_print_pretty(C);
-            flint_printf("FAIL: results not equal\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "A = %{nmod_mat}\n"
+                    "B = %{nmod_mat}\n"
+                    "A concat_vertical B = %{nmod_mat}\n",
+                    A, B, C);
 
         nmod_mat_clear(A);
         nmod_mat_clear(B);

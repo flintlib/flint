@@ -16,13 +16,9 @@
 
 #include "t-entry.c"
 #include "t-equal.c"
-#include "t-gso.c"
 #include "t-init_clear.c"
-#include "t-is_empty.c"
 #include "t-is_square.c"
 #include "t-mul_classical.c"
-#include "t-one.c"
-#include "t-qr.c"
 #include "t-transpose.c"
 #include "t-zero.c"
 
@@ -32,13 +28,9 @@ test_struct tests[] =
 {
     TEST_FUNCTION(d_mat_entry),
     TEST_FUNCTION(d_mat_equal),
-    TEST_FUNCTION(d_mat_gso),
     TEST_FUNCTION(d_mat_init_clear),
-    TEST_FUNCTION(d_mat_is_empty),
     TEST_FUNCTION(d_mat_is_square),
     TEST_FUNCTION(d_mat_mul_classical),
-    TEST_FUNCTION(d_mat_one),
-    TEST_FUNCTION(d_mat_qr),
     TEST_FUNCTION(d_mat_transpose),
     TEST_FUNCTION(d_mat_zero)
 };

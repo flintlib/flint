@@ -43,21 +43,13 @@ TEST_FUNCTION_START(nmod_mat_solve, state)
         nmod_mat_mul(AX, A, X);
 
         if (!nmod_mat_equal(AX, B) || !solved)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("AX != B!\n");
-            flint_printf("A:\n");
-            nmod_mat_print_pretty(A);
-            flint_printf("B:\n");
-            nmod_mat_print_pretty(B);
-            flint_printf("X:\n");
-            nmod_mat_print_pretty(X);
-            flint_printf("AX:\n");
-            nmod_mat_print_pretty(AX);
-            flint_printf("\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "AX != B\n"
+                    "A = %{nmod_mat}\n"
+                    "B = %{nmod_mat}\n"
+                    "X = %{nmod_mat}\n"
+                    "AX = %{nmod_mat}\n",
+                    A, B, X, AX);
 
         nmod_mat_clear(A);
         nmod_mat_clear(B);
@@ -88,15 +80,12 @@ TEST_FUNCTION_START(nmod_mat_solve, state)
         solved = nmod_mat_solve(X, A, B);
 
         if (solved)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("singular system was 'solved'\n");
-            nmod_mat_print_pretty(A);
-            nmod_mat_print_pretty(X);
-            nmod_mat_print_pretty(B);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "singular system was 'solved'\n"
+                    "A = %{nmod_mat}\n"
+                    "B = %{nmod_mat}\n"
+                    "X = %{nmod_mat}\n",
+                    A, B, X);
 
         nmod_mat_clear(A);
         nmod_mat_clear(B);

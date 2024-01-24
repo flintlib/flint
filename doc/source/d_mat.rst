@@ -52,12 +52,6 @@ Basic assignment and manipulation
 
     Sets all entries of ``mat`` to 0.
 
-.. function:: void d_mat_one(d_mat_t mat)
-
-    Sets ``mat`` to the unit matrix, having ones on the main diagonal
-    and zeroes elsewhere. If ``mat`` is nonsquare, it is set to the
-    truncation of a unit matrix.
-
 
 Random matrix generation
 --------------------------------------------------------------------------------
@@ -93,12 +87,6 @@ Comparison
     the same dimensions and entries within ``eps`` of each other,
     and zero otherwise.
 
-.. function:: int d_mat_is_empty(const d_mat_t mat)
-
-    Returns a non-zero value if the number of rows or the number of
-    columns in ``mat`` is zero, and otherwise returns
-    zero.
-
 .. function:: int d_mat_is_square(const d_mat_t mat)
 
     Returns a non-zero value if the number of rows is equal to the
@@ -124,27 +112,3 @@ Matrix multiplication
     Sets ``C`` to the matrix product `C = A B`. The matrices must have
     compatible dimensions for matrix multiplication (an exception is raised
     otherwise). Aliasing is allowed.
-
-
-Gram-Schmidt Orthogonalisation and QR Decomposition
---------------------------------------------------------------------------------
-
-
-.. function:: void d_mat_gso(d_mat_t B, const d_mat_t A)
-
-    Takes a subset of `R^m` `S = {a_1, a_2, \ldots, a_n}` (as the columns of
-    a `m \times n` matrix ``A``) and generates an orthonormal set
-    `S' = {b_1, b_2, \ldots, b_n}` (as the columns of the `m \times n` matrix
-    ``B``) that spans the same subspace of `R^m` as `S`.
-
-    This uses an algorithm of Schwarz-Rutishauser. See pp. 9 of
-    https://people.inf.ethz.ch/gander/papers/qrneu.pdf
-    
-.. function:: void d_mat_qr(d_mat_t Q, d_mat_t R, const d_mat_t A)
-
-    Computes the `QR` decomposition of a matrix ``A`` using the Gram-Schmidt
-    process. (Sets ``Q`` and ``R`` such that `A = QR` where ``R`` is
-    an upper triangular matrix and ``Q`` is an orthogonal matrix.)
-
-    This uses an algorithm of Schwarz-Rutishauser. See pp. 9 of
-    https://people.inf.ethz.ch/gander/papers/qrneu.pdf

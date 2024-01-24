@@ -36,11 +36,7 @@ TEST_FUNCTION_START(nmod_mat_add, state)
         nmod_mat_sub(C, C, B);
 
         if (!nmod_mat_equal(C, A))
-        {
-            flint_printf("FAIL\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("");
 
         nmod_mat_clear(A);
         nmod_mat_clear(B);

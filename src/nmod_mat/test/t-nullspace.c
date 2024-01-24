@@ -44,36 +44,24 @@ TEST_FUNCTION_START(nmod_mat_nullspace, state)
             nulrank = nmod_mat_rank(ker);
 
             if (nullity != nulrank)
-            {
-                flint_printf("FAIL:\n");
-                flint_printf("rank(ker) != nullity!\n");
-                nmod_mat_print_pretty(A);
-                flint_printf("\n");
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL(
+                        "rank(ker) != nullity\n"
+                        "A = %{nmod_mat}\n",
+                        A);
 
             if (nullity + r != n)
-            {
-                flint_printf("FAIL:\n");
-                flint_printf("nullity + rank != n\n");
-                nmod_mat_print_pretty(A);
-                flint_printf("\n");
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL(
+                        "nullity + rank != n\n"
+                        "A = %{nmod_mat}\n",
+                        A);
 
             nmod_mat_mul(B, A, ker);
 
             if (nmod_mat_rank(B) != 0)
-            {
-                flint_printf("FAIL:\n");
-                flint_printf("A * ker != 0\n");
-                nmod_mat_print_pretty(A);
-                flint_printf("\n");
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL(
+                        "A * ker != 0\n"
+                        "A = %{nmod_mat}\n",
+                        A);
 
             nmod_mat_clear(A);
             nmod_mat_clear(ker);

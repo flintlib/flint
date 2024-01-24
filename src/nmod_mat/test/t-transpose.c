@@ -37,11 +37,7 @@ TEST_FUNCTION_START(nmod_mat_transpose, state)
         nmod_mat_transpose(C, B);
 
         if (!nmod_mat_equal(C, A))
-        {
-            flint_printf("FAIL: C != A\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("C != A\n");
 
         nmod_mat_clear(A);
         nmod_mat_clear(B);
@@ -74,11 +70,7 @@ TEST_FUNCTION_START(nmod_mat_transpose, state)
         nmod_mat_set(AT2, AT);
 
         if (!nmod_mat_equal(BT, AT2))
-        {
-            flint_printf("FAIL: AT != BT\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("AT != BT\n");
 
         nmod_mat_clear(A);
         nmod_mat_clear(AT);
@@ -105,11 +97,7 @@ TEST_FUNCTION_START(nmod_mat_transpose, state)
         nmod_mat_transpose(B, B);
 
         if (!nmod_mat_equal(B, A))
-        {
-            flint_printf("FAIL: B != A\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("B != A\n");
 
         nmod_mat_clear(A);
         nmod_mat_clear(B);

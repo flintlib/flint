@@ -110,9 +110,7 @@ slong _aprcl_is_prime_jacobi_check_2k(const unity_zp j, const unity_zp j2_1, con
 
 int _aprcl_is_prime_jacobi_additional_test(const fmpz_t n, ulong p);
 
-/* Final division functions */
-int aprcl_is_prime_divisors_in_residue(const fmpz_t n, const fmpz_t s, ulong r);
-
+/* Final division function */
 int aprcl_is_prime_final_division(const fmpz_t n, const fmpz_t s, ulong r);
 
 /* Z[unity_root]/(n) operations **********************************************/
@@ -131,9 +129,6 @@ slong unity_zp_is_unity(unity_zp f);
 
 int unity_zp_equal(unity_zp f, unity_zp g);
 
-/* I/O */
-void unity_zp_print(const unity_zp f);
-
 /* Coefficient management */
 void unity_zp_coeff_set_fmpz(unity_zp f, ulong ind, const fmpz_t x);
 void unity_zp_coeff_set_ui(unity_zp f, ulong ind, ulong x);
@@ -145,7 +140,6 @@ void unity_zp_coeff_inc(unity_zp f, ulong ind);
 void unity_zp_coeff_dec(unity_zp f, ulong ind);
 
 /* Scalar multiplication */
-void unity_zp_mul_scalar_fmpz(unity_zp f, const unity_zp g, const fmpz_t s);
 void unity_zp_mul_scalar_ui(unity_zp f, const unity_zp g, ulong s);
 
 /* Addition */
@@ -228,21 +222,12 @@ void unity_zpq_swap(unity_zpq f, unity_zpq g);
 /* Comparison */
 int unity_zpq_equal(const unity_zpq f, const unity_zpq g);
 
-slong unity_zpq_p_unity(const unity_zpq f);
-
-int unity_zpq_is_p_unity(const unity_zpq f);
-
-int unity_zpq_is_p_unity_generator(const unity_zpq f);
-
 /* Coefficient management */
 void unity_zpq_coeff_set_fmpz(unity_zpq f, slong i, slong j, const fmpz_t x);
 void unity_zpq_coeff_set_ui(unity_zpq f, slong i, slong j, ulong x);
 
 void unity_zpq_coeff_add(unity_zpq f, slong i, slong j, const fmpz_t x);
 void unity_zpq_coeff_add_ui(unity_zpq f, slong i, slong j, ulong x);
-
-/* Scalar multiplication */
-void unity_zpq_scalar_mul_ui(unity_zpq f, const unity_zpq g, ulong s);
 
 /* Addition and multiplication */
 void unity_zpq_add(unity_zpq f, const unity_zpq g, const unity_zpq h);

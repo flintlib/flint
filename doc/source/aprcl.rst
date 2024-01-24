@@ -173,13 +173,6 @@ Comparison
     Returns nonzero if `f = g` reduced by the `p^{exp}`-th cyclotomic
     polynomial.
 
-Output
-................................................................................
-
-.. function:: void unity_zp_print(const unity_zp f)
-
-    Prints the contents of the `f`.
-
 Coefficient management
 ................................................................................
 
@@ -208,11 +201,6 @@ Coefficient management
 
 Scalar multiplication
 ................................................................................
-
-.. function:: void unity_zp_mul_scalar_fmpz(unity_zp f, const unity_zp g, const fmpz_t s)
-
-    Sets `f` to `s \cdot g`. `f` and `g` must be initialized with
-    same `p`, `exp` and `n`.
 
 .. function:: void unity_zp_mul_scalar_ui(unity_zp f, const unity_zp g, ulong s)
 
@@ -361,18 +349,6 @@ Extended rings
 .. function:: int unity_zpq_equal(const unity_zpq f, const unity_zpq g)
 
     Returns nonzero if `f = g`.
-
-.. function:: slong unity_zpq_p_unity(const unity_zpq f)
-
-    If `f = \zeta_p^x` returns `x \in [0, p - 1]`; otherwise returns `p`.
-
-.. function:: int unity_zpq_is_p_unity(const unity_zpq f)
-
-    Returns nonzero if `f = \zeta_p^x`.
-
-.. function:: int unity_zpq_is_p_unity_generator(const unity_zpq f)
-
-    Returns nonzero if `f` is a generator of the cyclic group `\langle\zeta_p\rangle`.
 
 .. function:: void unity_zpq_coeff_set_fmpz(unity_zpq f, slong i, slong j, const fmpz_t x)
 
