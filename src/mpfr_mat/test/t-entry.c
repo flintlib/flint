@@ -40,11 +40,7 @@ TEST_FUNCTION_START(mpfr_mat_entry, state)
             for (k = 0; k < cols; k++)
             {
                 if (mpfr_cmp_si(mpfr_mat_entry(A, j, k), 3 * j + 7 * k) != 0)
-                {
-                    flint_printf("FAIL: get/set entry %wd, %wd\n", j, k);
-                    fflush(stdout);
-                    flint_abort();
-                }
+                    TEST_FUNCTION_FAIL("get/set entry %wd, %wd\n", j, k);
             }
         }
 

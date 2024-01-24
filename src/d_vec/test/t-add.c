@@ -35,11 +35,7 @@ TEST_FUNCTION_START(d_vec_add, state)
 
         result = (_d_vec_equal(a, c, len));
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("");
 
         _d_vec_clear(a);
         _d_vec_clear(b);
@@ -63,11 +59,7 @@ TEST_FUNCTION_START(d_vec_add, state)
 
         result = (_d_vec_equal(b, c, len));
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("");
 
         _d_vec_clear(a);
         _d_vec_clear(b);

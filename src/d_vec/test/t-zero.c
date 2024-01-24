@@ -33,11 +33,7 @@ TEST_FUNCTION_START(d_vec_zero, state)
 
         result = (_d_vec_is_zero(a, len));
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("");
 
         _d_vec_clear(a);
     }

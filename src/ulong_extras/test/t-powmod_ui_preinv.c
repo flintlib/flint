@@ -45,13 +45,10 @@ TEST_FUNCTION_START(n_powmod_ui_preinv, state)
 
         result = (r1 == r2);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("a = %wu, exp = %wu, d = %wu\n", a, exp, d);
-            flint_printf("r1 = %wu, r2 = %wu\n", r1, r2);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "a = %wu, exp = %wu, d = %wu\n"
+                    "r1 = %wu, r2 = %wu\n",
+                    a, exp, d, r1, r2);
 
         mpz_clear(a_m);
         mpz_clear(d_m);
@@ -73,12 +70,7 @@ TEST_FUNCTION_START(n_powmod_ui_preinv, state)
         /* 0^0 = 0 mod 1 and 0^0 = 1 mod d for d != 1 */
         result = (r == 1 || (d == 1 && r == 0));
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("0^0 != 1 mod %wd\n", d);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("0^0 != 1 mod %wd\n", d);
     }
 
     /* check 0^exp = 0 mod 1 */
@@ -95,12 +87,7 @@ TEST_FUNCTION_START(n_powmod_ui_preinv, state)
 
         result = (r == 0);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("0^%wd != 0 mod 1\n", exp);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("0^%wd != 0 mod 1\n", exp);
     }
 
     TEST_FUNCTION_END(state);

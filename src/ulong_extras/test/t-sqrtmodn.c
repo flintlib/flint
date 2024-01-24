@@ -48,21 +48,14 @@ TEST_FUNCTION_START(n_sqrtmodn, state)
 
         result = btest & (i == num);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("n = %wu\n", n);
-            flint_printf("a = %wu\n", a);
-            flint_printf("b = %wu\n", b);
-            flint_printf("num = %wd\n", num);
-
-            if (!btest)
-                flint_printf("Square root not found.\n");
-            if (i != num)
-                flint_printf("%wu not a square root of %wu mod %wu\n", sqrt[i], a, n);
-
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "n = %wu\n"
+                    "a = %wu\n"
+                    "b = %wu\n"
+                    "num = %wd\n"
+                    "btest = %d\n"
+                    "i != num = %d\n",
+                    n, a, b, num, btest, i != num);
 
         flint_free(sqrt);
     }
@@ -86,12 +79,7 @@ TEST_FUNCTION_START(n_sqrtmodn, state)
         while (n_sqrtmodn(&sqrt, a, &fac))
         {
             if (n_mulmod2_preinv(sqrt[0], sqrt[0], n, ninv) != a)
-            {
-                flint_printf("FAIL:\n");
-                flint_printf("%wu^2 is not %wu mod %wu\n", sqrt[0], a, n);
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL("%wu^2 is not %wu mod %wu\n", sqrt[0], a, n);
 
             flint_free(sqrt);
             a = n_randtest(state) % n;
@@ -105,15 +93,11 @@ TEST_FUNCTION_START(n_sqrtmodn, state)
 
         result = (b == n);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("n = %wu\n", n);
-            flint_printf("a = %wu\n", a);
-            flint_printf("b = %wu\n", b);
-
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "n = %wu\n"
+                    "a = %wu\n"
+                    "b = %wu\n",
+                    n, a, b);
 
         flint_free(sqrt);
     }

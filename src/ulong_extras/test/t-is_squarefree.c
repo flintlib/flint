@@ -13,17 +13,12 @@
 #include "ulong_extras.h"
 
 #ifndef check
-#define check check
-void check(mp_limb_t n, int s1, int s2)
-{
-    if (s1 != s2)
-    {
-        flint_printf("FAIL:\n");
-        flint_printf("%wu: got %d instead of %d\n", n, s1, s2);
-        fflush(stdout);
-        flint_abort();
-    }
-}
+#define check(n, s1, s2) \
+do \
+{ \
+    if (s1 != s2) \
+        TEST_FUNCTION_FAIL("%wu: got %d instead of %d\n", n, s1, s2); \
+} while (0)
 #endif
 
 TEST_FUNCTION_START(n_is_squarefree, state)
@@ -56,12 +51,7 @@ TEST_FUNCTION_START(n_is_squarefree, state)
         s += n_is_squarefree(k);
 
     if (s != 6083)
-    {
-        flint_printf("FAIL:\n");
-        flint_printf("expected %d squarefree numbers <= 10000 (got %d)\n", 6083, s);
-        fflush(stdout);
-        flint_abort();
-    }
+        TEST_FUNCTION_FAIL("expected %d squarefree numbers <= 10000 (got %d)\n", 6083, s);
 
     TEST_FUNCTION_END(state);
 }

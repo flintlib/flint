@@ -32,12 +32,7 @@ TEST_FUNCTION_START(n_primitive_root_prime, state)
         for (j = 0; j < factors.num; j++)
         {
             if (n_powmod_precomp(root, (p-1) / factors.p[j], p, pinv) == 1)
-            {
-                flint_printf("FAIL:\n");
-                flint_printf("%wu ** (%wu / %wu) == 1 mod %wu\n", root, p-1, factors.p[j], p);
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL("%wu ** (%wu / %wu) == 1 mod %wu\n", root, p-1, factors.p[j], p);
         }
     }
 

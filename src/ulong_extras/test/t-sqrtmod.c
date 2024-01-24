@@ -28,14 +28,11 @@ TEST_FUNCTION_START(n_sqrtmod, state)
 
         result = (b == 0 || n_mulmod2_preinv(b, b, p, pinv) == a);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("p = %wu\n", p);
-            flint_printf("a = %wu\n", a);
-            flint_printf("b = %wu\n", b);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "p = %wu\n"
+                    "a = %wu\n"
+                    "b = %wu\n",
+                    p, a, b);
     }
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random squares */
@@ -55,14 +52,11 @@ TEST_FUNCTION_START(n_sqrtmod, state)
 
         result = (n_mulmod2_preinv(b, b, p, pinv) == a);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("p = %wu\n", p);
-            flint_printf("a = %wu\n", a);
-            flint_printf("b = %wu\n", b);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "p = %wu\n"
+                    "a = %wu\n"
+                    "b = %wu\n",
+                    p, a, b);
     }
 
     TEST_FUNCTION_END(state);

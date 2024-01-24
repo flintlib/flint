@@ -33,13 +33,10 @@ TEST_FUNCTION_START(n_submod, state)
 
         result = (r1 == r2);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("a = %wu, b = %wu, d = %wu\n", a, b, d);
-            flint_printf("r1 = %wu, r2 = %wu\n", r1, r2);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "a = %wu, b = %wu, d = %wu\n"
+                    "r1 = %wu, r2 = %wu\n",
+                    a, b, d, r1, r2);
     }
 
     TEST_FUNCTION_END(state);

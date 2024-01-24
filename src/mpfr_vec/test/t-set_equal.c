@@ -30,11 +30,7 @@ TEST_FUNCTION_START(mpfr_vec_set_equal, state)
 
         result = (_mpfr_vec_equal(a, a, len));
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("");
 
         _mpfr_vec_clear(a, len);
     }
@@ -53,11 +49,7 @@ TEST_FUNCTION_START(mpfr_vec_set_equal, state)
 
         result = (_mpfr_vec_equal(a, b, len));
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("");
 
         _mpfr_vec_clear(a, len);
         _mpfr_vec_clear(b, len);
@@ -80,11 +72,7 @@ TEST_FUNCTION_START(mpfr_vec_set_equal, state)
 
         result = (!_mpfr_vec_equal(a, b, len));
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("");
 
         _mpfr_vec_clear(a, len);
         _mpfr_vec_clear(b, len);

@@ -46,12 +46,7 @@ TEST_FUNCTION_START(d_vec_dot, state)
 
         result = fabs(res1 + res2 - res3) < D_VEC_SP_EPS;
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            printf("%g\n", fabs(res1 + res2 - res3));
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("%g\n", fabs(res1 + res2 - res3));
 
         _d_vec_clear(a);
         _d_vec_clear(b);

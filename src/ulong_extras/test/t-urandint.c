@@ -51,13 +51,7 @@ TEST_FUNCTION_START(n_urandint, state)
         }
 
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("limit = %wu, deviation = %wd\n", limit, deviation);
-            flint_free(count);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("limit = %wu, deviation = %wd\n", limit, deviation);
     }
 
     flint_free(count);
@@ -108,13 +102,7 @@ TEST_FUNCTION_START(n_urandint, state)
         }
 
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("limit = %wu, deviation = %wd\n", limit, deviation);
-            flint_free(count_in_subrange);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("limit = %wu, deviation = %wd\n", limit, deviation);
     }
 
     flint_free(count_in_subrange);

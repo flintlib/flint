@@ -40,14 +40,13 @@ TEST_FUNCTION_START(flint_mpn_mul_n, state)
         mpn_mul_n(R2, X, Y, n);
 
         if (mpn_cmp(R1, R2, 2 * n) != 0)
-        {
-            flint_printf("FAIL: n = %wd\n", n);
-            flint_printf("X = "); flint_mpn_debug(X, n);
-            flint_printf("Y = "); flint_mpn_debug(Y, n);
-            flint_printf("R1 = "); flint_mpn_debug(R1, 2 * n);
-            flint_printf("R2 = "); flint_mpn_debug(R2, 2 * n);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "n = %wd\n"
+                    "X = %{ulong*}\n"
+                    "Y = %{ulong*}\n"
+                    "R1 = %{ulong*}\n"
+                    "R2 = %{ulong*}\n",
+                    n, X, n, Y, n, R1, 2 * n, R2, 2 * n);
 
         flint_free(X);
         flint_free(Y);

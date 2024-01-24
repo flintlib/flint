@@ -37,17 +37,9 @@ TEST_FUNCTION_START(d_mat_one, state)
             for (j = 0; j < n; j++)
             {
                 if (i == j && d_mat_entry(A, i, j) != 1)
-                {
-                    flint_printf("FAIL: entry not one\n");
-                    fflush(stdout);
-                    flint_abort();
-                }
+                    TEST_FUNCTION_FAIL("entry not one\n");
                 else if (i != j && d_mat_entry(A, i, j) != 0)
-                {
-                    flint_printf("FAIL: entry not zero\n");
-                    fflush(stdout);
-                    flint_abort();
-                }
+                    TEST_FUNCTION_FAIL("entry not zero\n");
             }
         }
 

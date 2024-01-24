@@ -34,14 +34,12 @@ TEST_FUNCTION_START(z_sizeinbase, state)
         result = (r1 == r2 || r1 + 1 == r2);
 
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            gmp_printf("b = %Zd\n", b);
-            flint_printf("base = %d\n", base);
-            flint_printf("r1 = %wu\n, r2 = %wu\n", (ulong) r1, (ulong) r2);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "b = %{mpz}\n"
+                    "base = %d\n"
+                    "r1 = %wu\n"
+                    "r2 = %wu\n",
+                    b, base, (ulong) r1, (ulong) r2);
 
         mpz_clear(b);
     }

@@ -29,11 +29,8 @@ TEST_FUNCTION_START(d_mat_is_empty, state)
         d_mat_init(A, rows, cols);
 
         if (d_mat_is_empty(A) != (rows == 0 || cols == 0))
-        {
-            flint_printf("FAIL!\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("");
+
         d_mat_clear(A);
     }
 

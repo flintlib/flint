@@ -36,12 +36,10 @@ TEST_FUNCTION_START(nmod_vec_nmod_pow_fmpz, state)
         c2 = nmod_pow_fmpz(b, exp2, mod);
 
         if (c1 != c2)
-        {
-            printf("FAIL\n");
-            flint_printf("check nmod_pow_fmpz matches nmod_pow_ui\ni = %wd\n", i);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "check nmod_pow_fmpz matches nmod_pow_ui\n"
+                    "i = %wd\n",
+                    i);
 
         fmpz_clear(exp2);
     }
@@ -69,12 +67,10 @@ TEST_FUNCTION_START(nmod_vec_nmod_pow_fmpz, state)
         c3 = nmod_pow_fmpz(b, exp3, mod);
 
         if (c3 != nmod_mul(c1, c2, mod))
-        {
-            printf("FAIL\n");
-            flint_printf("check b^e1*b^e2 = b^(e1+e2)\ni = %wd\n", i);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "check b^e1*b^e2 = b^(e1+e2)\n"
+                    "i = %wd\n",
+                    i);
 
         fmpz_clear(exp3);
         fmpz_clear(exp2);

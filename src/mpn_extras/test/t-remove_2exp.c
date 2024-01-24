@@ -33,11 +33,7 @@ TEST_FUNCTION_START(flint_mpn_remove_2exp, state)
             mpz_mul_2exp(a, a, zero);
             a->_mp_size = flint_mpn_remove_2exp(a->_mp_d, a->_mp_size, &check);
             if (check != zero || mpz_cmp(a,b))
-            {
-                gmp_printf("%d %d \n", zero, nonzero);
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL("%d %d \n", zero, nonzero);
         }
     }
 

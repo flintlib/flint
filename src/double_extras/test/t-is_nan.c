@@ -23,32 +23,18 @@ TEST_FUNCTION_START(d_is_nan, state)
     /* check non-zero value returned if x == NaN */
     x = D_NAN;
     if (!d_is_nan(x))
-    {
-        flint_printf("FAIL\n");
-        flint_printf("0 returned for %g\n", x);
-        fflush(stdout);
-        flint_abort();
-    }
+        TEST_FUNCTION_FAIL("0 returned for %g\n", x);
 
     /* check 0 returned if x != NaN */
     x = D_INF;
     if (d_is_nan(x))
-    {
-        flint_printf("FAIL\n");
-        flint_printf("Non-zero returned for %g\n", x);
-        fflush(stdout);
-        flint_abort();
-    }
+        TEST_FUNCTION_FAIL("Non-zero returned for %g\n", x);
+
     for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
     {
         x = d_randtest_signed(state, 0, 0);
         if (d_is_nan(x))
-        {
-            flint_printf("FAIL\n");
-            flint_printf("Non-zero returned for %g\n", x);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("Non-zero returned for %g\n", x);
     }
 
     TEST_FUNCTION_END(state);

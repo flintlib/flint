@@ -49,14 +49,12 @@ TEST_FUNCTION_START(n_root, state)
         result = (a == val);
 
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("Passed Parameters : n = %wu root = %wu", c, d);
-            flint_printf("Answer generated : base = %wu", a);
-            flint_printf("Expected answer : base = %wu", val);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Passed Parameters : n = %wu root = %wu\n"
+                    "Answer generated : base = %wu\n"
+                    "Expected answer : base = %wu\n",
+                    c, d, a, val);
+
         mpz_clear(e);
         mpz_clear(f);
         mpz_clear(g);
@@ -79,16 +77,11 @@ TEST_FUNCTION_START(n_root, state)
         result = (a == base);
 
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("Passed Parameters : n = %wu root = %wu", c, d);
-            printf("\n");
-            flint_printf("Answer generated : base = %wu", a);
-            printf("\n");
-            flint_printf("Expected answer : base = %wu", base);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Passed Parameters : n = %wu root = %wu\n"
+                    "Answer generated : base = %wu\n"
+                    "Expected answer : base = %wu\n",
+                    c, d, a, base);
     }
 
     /* n of type a^b + 1 */
@@ -108,16 +101,11 @@ TEST_FUNCTION_START(n_root, state)
         result = (a == base);
 
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("Passed Parameters : n = %wu root = %wu", c, d);
-            printf("\n");
-            flint_printf("Answer generated : base = %wu", a);
-            printf("\n");
-            flint_printf("Expected answer : base = %wu", base);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Passed Parameters : n = %wu root = %wu\n"
+                    "Answer generated : base = %wu\n"
+                    "Expected answer : base = %wu\n",
+                    c, d, a, base);
    }
 
     /* n of type a^b - 1 */
@@ -148,14 +136,11 @@ TEST_FUNCTION_START(n_root, state)
         result = (a == val);
 
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("Passed Parameters : n = %wu root = %wu", c, d);
-            flint_printf("Answer generated : base = %wu", a);
-            flint_printf("Expected answer : base = %wu", val);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Passed Parameters : n = %wu root = %wu\n"
+                    "Answer generated : base = %wu\n"
+                    "Expected answer : base = %wu\n",
+                    c, d, a, val);
 
         mpz_clear(e);
         mpz_clear(g);

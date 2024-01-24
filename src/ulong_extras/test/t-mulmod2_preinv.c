@@ -14,34 +14,31 @@
 
 TEST_FUNCTION_START(n_mulmod2_preinv, state)
 {
-   int i, result;
+    int i, result;
 
-   for (i = 0; i < 100000 * flint_test_multiplier(); i++)
-   {
-      ulong a, b, d, r1, r2, q, p1, p2, dinv;
+    for (i = 0; i < 100000 * flint_test_multiplier(); i++)
+    {
+        ulong a, b, d, r1, r2, q, p1, p2, dinv;
 
-      d = n_randtest_not_zero(state);
-      a = n_randtest(state) % d;
-      b = n_randtest(state) % d;
+        d = n_randtest_not_zero(state);
+        a = n_randtest(state) % d;
+        b = n_randtest(state) % d;
 
-      dinv = n_preinvert_limb(d);
+        dinv = n_preinvert_limb(d);
 
-      r1 = n_mulmod2_preinv(a, b, d, dinv);
+        r1 = n_mulmod2_preinv(a, b, d, dinv);
 
-      umul_ppmm(p1, p2, a, b);
-      p1 %= d;
-      udiv_qrnnd(q, r2, p1, p2, d);
+        umul_ppmm(p1, p2, a, b);
+        p1 %= d;
+        udiv_qrnnd(q, r2, p1, p2, d);
 
-      result = (r1 == r2);
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("a = %wu, b = %wu, d = %wu, dinv = %wu\n", a, b, d, dinv);
-         flint_printf("q = %wu, r1 = %wu, r2 = %wu\n", q, r1, r2);
-         fflush(stdout);
-         flint_abort();
-      }
-   }
+        result = (r1 == r2);
+        if (!result)
+            TEST_FUNCTION_FAIL(
+                    "a = %wu, b = %wu, d = %wu, dinv = %wu\n"
+                    "q = %wu, r1 = %wu, r2 = %wu\n",
+                    a, b, d, dinv, q, r1, r2);
+    }
 
-   TEST_FUNCTION_END(state);
+    TEST_FUNCTION_END(state);
 }

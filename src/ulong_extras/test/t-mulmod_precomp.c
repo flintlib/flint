@@ -14,36 +14,33 @@
 
 TEST_FUNCTION_START(n_mulmod_precomp, state)
 {
-   int i, result;
+    int i, result;
 
-   for (i = 0; i < 100000 * flint_test_multiplier(); i++)
-   {
-      mp_limb_t a, b, d, r1, r2, p1, p2, dinv;
-      double dpre;
+    for (i = 0; i < 100000 * flint_test_multiplier(); i++)
+    {
+        mp_limb_t a, b, d, r1, r2, p1, p2, dinv;
+        double dpre;
 
-      mp_limb_t bits = n_randint(state, FLINT_D_BITS) + 1;
-      d = n_randtest_bits(state, bits);
-      a = n_randtest(state) % d;
-      b = n_randtest(state) % d;
+        mp_limb_t bits = n_randint(state, FLINT_D_BITS) + 1;
+        d = n_randtest_bits(state, bits);
+        a = n_randtest(state) % d;
+        b = n_randtest(state) % d;
 
-      dpre = n_precompute_inverse(d);
+        dpre = n_precompute_inverse(d);
 
-      r1 = n_mulmod_precomp(a, b, d, dpre);
+        r1 = n_mulmod_precomp(a, b, d, dpre);
 
-      umul_ppmm(p1, p2, a, b);
-      dinv = n_preinvert_limb(d);
-      r2 = n_ll_mod_preinv(p1, p2, d, dinv);
+        umul_ppmm(p1, p2, a, b);
+        dinv = n_preinvert_limb(d);
+        r2 = n_ll_mod_preinv(p1, p2, d, dinv);
 
-      result = (r1 == r2);
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("a = %wu, b = %wu, d = %wu, dinv = %f\n", a, b, d, dpre);
-         flint_printf("r1 = %wu, r2 = %wu\n", r1, r2);
-         fflush(stdout);
-         flint_abort();
-      }
-   }
+        result = (r1 == r2);
+        if (!result)
+            TEST_FUNCTION_FAIL(
+                    "a = %wu, b = %wu, d = %wu, dinv = %f\n"
+                    "r1 = %wu, r2 = %wu\n",
+                    a, b, d, dpre, r1, r2);
+    }
 
-   TEST_FUNCTION_END(state);
+    TEST_FUNCTION_END(state);
 }

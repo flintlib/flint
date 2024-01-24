@@ -37,7 +37,7 @@ TEST_FUNCTION_START(flint_mpn_mul_basecase, state)
         ret2 = mpn_mul(res2, ap, alen, bp, blen);
 
         if (mpn_cmp(res1, res2, alen + blen) || ret1 != ret2)
-            flint_throw(FLINT_TEST_FAIL,
+            TEST_FUNCTION_FAIL(
                     "ix = %wd\n"
                     "alen = %wd\n"
                     "blen = %wd\n"

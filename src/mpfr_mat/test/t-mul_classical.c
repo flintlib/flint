@@ -38,11 +38,7 @@ TEST_FUNCTION_START(mpfr_mat_mul_classical, state)
         mpfr_mat_mul_classical(A, A, B, MPFR_RNDN);
 
         if (!mpfr_mat_equal(C, A))
-        {
-            flint_printf("FAIL: aliasing failed\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("aliasing failed\n");
 
         mpfr_mat_clear(A);
         mpfr_mat_clear(B);
@@ -70,11 +66,7 @@ TEST_FUNCTION_START(mpfr_mat_mul_classical, state)
         mpfr_mat_mul_classical(B, A, B, MPFR_RNDN);
 
         if (!mpfr_mat_equal(C, B))
-        {
-            flint_printf("FAIL: aliasing failed\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("aliasing failed\n");
 
         mpfr_mat_clear(A);
         mpfr_mat_clear(B);

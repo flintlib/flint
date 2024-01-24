@@ -39,8 +39,7 @@ TEST_FUNCTION_START(perm_parity, state)
         cp2 = _perm_parity(c, n);
 
         if (ap != ap2 || bp != bp2 || cp != cp2)
-        {
-            flint_throw(FLINT_TEST_FAIL,
+            TEST_FUNCTION_FAIL(
                     "n = %wd\n"
                     "a = %{slong*}\n\n"
                     "b = %{slong*}\n\n"
@@ -51,17 +50,7 @@ TEST_FUNCTION_START(perm_parity, state)
                     "ap2 = %d\n"
                     "bp2 = %d\n"
                     "cp2 = %d\n",
-                    n,
-                    a, n,
-                    b, n,
-                    c, n,
-                    ap,
-                    bp,
-                    cp,
-                    ap2,
-                    bp2,
-                    cp2);
-        }
+                    n, a, n, b, n, c, n, ap, bp, cp, ap2, bp2, cp2);
 
         _perm_clear(a);
         _perm_clear(b);

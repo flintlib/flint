@@ -31,21 +31,13 @@ TEST_FUNCTION_START(mpfr_mat_equal, state)
         mpfr_mat_init(E, m, n + 1, 200);
 
         if (mpfr_mat_equal(A, D) || mpfr_mat_equal(A, E))
-        {
-            flint_printf("FAIL: different dimensions should not be equal\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("different dimensions should not be equal\n");
 
         mpfr_mat_randtest(A, state);
         mpfr_mat_set(B, A);
 
         if (!mpfr_mat_equal(A, B))
-        {
-            flint_printf("FAIL: copied matrices should be equal\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("copied matrices should be equal\n");
 
         if (m && n)
         {
@@ -53,11 +45,7 @@ TEST_FUNCTION_START(mpfr_mat_equal, state)
             mpfr_add_ui(A->entries + j, A->entries + j, 1, MPFR_RNDN);
 
             if (mpfr_mat_equal(A, B))
-            {
-                flint_printf("FAIL: modified matrices should not be equal\n");
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL("modified matrices should not be equal\n");
         }
 
         mpfr_mat_clear(A);

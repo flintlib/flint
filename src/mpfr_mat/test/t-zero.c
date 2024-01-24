@@ -34,11 +34,7 @@ TEST_FUNCTION_START(mpfr_mat_zero, state)
             for (j = 0; j < n; j++)
             {
                 if (!mpfr_zero_p(mpfr_mat_entry(A, i, j)))
-                {
-                    flint_printf("FAIL: nonzero entry\n");
-                    fflush(stdout);
-                    flint_abort();
-                }
+                    TEST_FUNCTION_FAIL("nonzero entry\n");
             }
         }
 

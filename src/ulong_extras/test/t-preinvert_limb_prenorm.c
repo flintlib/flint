@@ -20,27 +20,22 @@
 
 TEST_FUNCTION_START(n_preinvert_limb_prenorm, state)
 {
-   int i, result;
+    int i, result;
 
-   for (i = 0; i < 100000 * flint_test_multiplier(); i++)
-   {
-      mp_limb_t n, ninv1, ninv2;
+    for (i = 0; i < 100000 * flint_test_multiplier(); i++)
+    {
+        mp_limb_t n, ninv1, ninv2;
 
-      n = n_randtest(state);
-      n |= (UWORD(1) << (FLINT_BITS - 1));
+        n = n_randtest(state);
+        n |= (UWORD(1) << (FLINT_BITS - 1));
 
-      ninv1 = n_preinvert_limb_prenorm(n);
-      invert_limb_naive(ninv2, n);
+        ninv1 = n_preinvert_limb_prenorm(n);
+        invert_limb_naive(ninv2, n);
 
-      result = (ninv1 == ninv2);
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("n = %wx, ninv1 = %wx, ninv2 = %wx\n", n, ninv1, ninv2);
-         fflush(stdout);
-         flint_abort();
-      }
-   }
+        result = (ninv1 == ninv2);
+        if (!result)
+            TEST_FUNCTION_FAIL("n = %wx, ninv1 = %wx, ninv2 = %wx\n", n, ninv1, ninv2);
+    }
 
-   TEST_FUNCTION_END(state)
+    TEST_FUNCTION_END(state)
 }

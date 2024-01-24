@@ -35,12 +35,7 @@ TEST_FUNCTION_START(nmod_divides, state)
 
         /* Claimed divisible, so check this. */
         if (!div || nmod_mul(z, x, mod) != xy)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("n = %wu, div = %d, x = %wu, y = %wu, z = %wu\n", n, div, x, y, z);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("n = %wu, div = %d, x = %wu, y = %wu, z = %wu\n", n, div, x, y, z);
 
         div = nmod_divides(&z, x, y, mod);
 
@@ -50,12 +45,7 @@ TEST_FUNCTION_START(nmod_divides, state)
             for (z = 0; z < n; z++)
             {
                 if (nmod_mul(z, y, mod) == x)
-                {
-                    flint_printf("FAIL (2):\n");
-                    flint_printf("n = %wu, div = %d, x = %wu, y = %wu, z = %wu\n", n, div, x, y, z);
-                    fflush(stdout);
-                    flint_abort();
-                }
+                    TEST_FUNCTION_FAIL("n = %wu, div = %d, x = %wu, y = %wu, z = %wu\n", n, div, x, y, z);
             }
         }
     }

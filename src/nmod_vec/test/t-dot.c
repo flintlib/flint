@@ -55,14 +55,11 @@ TEST_FUNCTION_START(nmod_vec_dot, state)
         flint_mpz_mod_ui(s, s, m);
 
         if (flint_mpz_get_ui(s) != res)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("m = %wu\n", m);
-            flint_printf("len = %wd\n", len);
-            flint_printf("limbs1 = %d\n", limbs1);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "m = %wu\n"
+                    "len = %wd\n"
+                    "limbs1 = %d\n",
+                    m, len, limbs1);
 
         mpz_clear(s);
         mpz_clear(t);
