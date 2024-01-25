@@ -10,28 +10,24 @@
 */
 
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
 void
 _fmpz_poly_power_sums_naive(fmpz * res, const fmpz * poly, slong len, slong n)
 {
-    slong i, k;
+    slong k;
 
     fmpz_set_ui(res, len - 1);
+
     for (k = 1; k < FLINT_MIN(n, len); k++)
     {
-        fmpz_mul_ui(res + k, poly + len - 1 - k, k);
-        for (i = 1; i < k; i++)
-            fmpz_addmul(res + k, poly + len - 1 - k + i, res + i);
-        fmpz_neg(res + k, res + k);
+        fmpz_mul_si(res + k, poly + len - 1 - k, -k);
+        _fmpz_vec_dot_general(res + k, res + k, 1, poly + len - 1 - k + 1, res + 1, 0, k - 1);
     }
+
     for (k = len; k < n; k++)
-    {
-        fmpz_zero(res + k);
-        for (i = k - len + 1; i < k; i++)
-            fmpz_addmul(res + k, poly + len - 1 - k + i, res + i);
-        fmpz_neg(res + k, res + k);
-    }
+        _fmpz_vec_dot_general(res + k, NULL, 1, poly, res + k - len + 1, 0, len - 1);
 }
 
 void

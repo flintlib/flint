@@ -174,8 +174,7 @@ void fmpz_mat_mul_classical(fmpz_mat_t C, const fmpz_mat_t A,
 
 void fmpz_mat_mul_strassen(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
 
-void fmpz_mat_mul_classical_inline(fmpz_mat_t C, const fmpz_mat_t A,
-    const fmpz_mat_t B);
+#define fmpz_mat_mul_classical_inline _Pragma("GCC error \"'fmpz_mat_mul_classical_inline' is deprecated. Use 'fmpz_mat_mul_classical' instead.\"")
 
 void _fmpz_mat_mul_fft(fmpz_mat_t C,
                                     const fmpz_mat_t A, slong abits,

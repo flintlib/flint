@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2010,2011 Fredrik Johansson
+    Copyright (C) 2010, 2011, 2024 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -10,38 +10,71 @@
 */
 
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_mat.h"
 
 void
 fmpz_mat_mul_classical(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 {
-    slong ar, bc, br;
-    slong i, j, k;
+    slong ar, br, bc, i, j;
 
-    ar = A->r;
-    br = B->r;
-    bc = B->c;
+    ar = fmpz_mat_nrows(A);
+    br = fmpz_mat_nrows(B);
+    bc = fmpz_mat_ncols(B);
 
-    if (br == 0)
+    if (ar == 0 || br == 0 || bc == 0)
     {
         fmpz_mat_zero(C);
         return;
     }
 
-    for (i = 0; i < ar; i++)
+    if (br == 1)
     {
-        for (j = 0; j < bc; j++)
+        for (i = 0; i < ar; i++)
         {
-            fmpz_mul(fmpz_mat_entry(C, i, j),
-                     fmpz_mat_entry(A, i, 0),
-                     fmpz_mat_entry(B, 0, j));
-
-            for (k = 1; k < br; k++)
+            for (j = 0; j < bc; j++)
             {
-                fmpz_addmul(fmpz_mat_entry(C, i, j),
-                            fmpz_mat_entry(A, i, k),
-                            fmpz_mat_entry(B, k, j));
+                fmpz_mul(fmpz_mat_entry(C, i, j),
+                                 fmpz_mat_entry(A, i, 0),
+                                 fmpz_mat_entry(B, 0, j));
             }
         }
+    }
+    else if (br == 2)
+    {
+        for (i = 0; i < ar; i++)
+        {
+            for (j = 0; j < bc; j++)
+            {
+                fmpz_fmma(fmpz_mat_entry(C, i, j),
+                                 fmpz_mat_entry(A, i, 0),
+                                 fmpz_mat_entry(B, 0, j),
+                                 fmpz_mat_entry(A, i, 1),
+                                 fmpz_mat_entry(B, 1, j));
+            }
+        }
+    }
+    else
+    {
+        fmpz * tmp;
+        TMP_INIT;
+
+        TMP_START;
+        tmp = TMP_ALLOC(sizeof(fmpz) * br * bc);
+
+        for (i = 0; i < br; i++)
+            for (j = 0; j < bc; j++)
+                tmp[j * br + i] = *fmpz_mat_entry(B, i, j);
+
+        for (i = 0; i < ar; i++)
+        {
+            for (j = 0; j < bc; j++)
+            {
+                _fmpz_vec_dot_general(fmpz_mat_entry(C, i, j),
+                    NULL, 0, fmpz_mat_entry(A, i, 0), tmp + j * br, 0, br);
+            }
+        }
+
+        TMP_END;
     }
 }

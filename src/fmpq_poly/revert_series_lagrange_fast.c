@@ -44,9 +44,9 @@ void
 _fmpq_poly_revert_series_lagrange_fast(fmpz * Qinv, fmpz_t den,
                         const fmpz * Q, const fmpz_t Qden, slong Qlen, slong n)
 {
-    slong i, j, k, m;
+    slong i, j, m;
     fmpz *R, *Rden, *S, *T, *dens, *tmp;
-    fmpz_t Sden, Tden, t;
+    fmpz_t Sden, Tden;
 
     if (Qlen <= 2)
     {
@@ -65,7 +65,6 @@ _fmpq_poly_revert_series_lagrange_fast(fmpz * Qinv, fmpz_t den,
 
     m = n_sqrt(n);
 
-    fmpz_init(t);
     dens = _fmpz_vec_init(n);
     R = _fmpz_vec_init((n - 1) * m);
     S = _fmpz_vec_init(n - 1);
@@ -103,12 +102,7 @@ _fmpq_poly_revert_series_lagrange_fast(fmpz * Qinv, fmpz_t den,
 
         for (j = 1; j < m && i + j < n; j++)
         {
-            fmpz_mul(t, S + 0, Ri(j) + i + j - 1);
-
-            for (k = 1; k <= i + j - 1; k++)
-                fmpz_addmul(t, S + k, Ri(j) + i + j - 1 - k);
-
-            fmpz_set(Qinv + i + j, t);
+            _fmpz_vec_dot_general(Qinv + i + j, NULL, 0, S, Ri(j), 1, i + j);
             fmpz_mul(dens + i + j, Sden, Rdeni(j));
             fmpz_mul_ui(dens + i + j, dens + i + j, i + j);
         }
@@ -126,7 +120,6 @@ _fmpq_poly_revert_series_lagrange_fast(fmpz * Qinv, fmpz_t den,
     _set_vec(Qinv, den, Qinv, dens, n);
     _fmpq_poly_canonicalise(Qinv, den, n);
 
-    fmpz_clear(t);
     _fmpz_vec_clear(dens, n);
     _fmpz_vec_clear(R, (n - 1) * m);
     _fmpz_vec_clear(S, n - 1);

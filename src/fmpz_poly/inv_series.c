@@ -220,13 +220,8 @@ _fmpz_poly_inv_series_basecase(fmpz * Qinv, const fmpz * Q, slong Qlen, slong n)
             }
             else
             {
-                fmpz_mul(Qinv + i, Q + 1, Qinv + i - 1);
-
-                for (j = 2; j < FLINT_MIN(i + 1, Qlen); j++)
-                    fmpz_addmul(Qinv + i, Q + j, Qinv + i - j);
-
-                if (neg)
-                    fmpz_neg(Qinv + i, Qinv + i);
+                slong l = FLINT_MIN(i, Qlen - 1);
+                _fmpz_vec_dot_general(Qinv + i, NULL, neg, Q + 1, Qinv + i - l, 1, l);
             }
         }
 

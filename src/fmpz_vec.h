@@ -256,10 +256,16 @@ void _fmpz_vec_lcm(fmpz_t res, const fmpz * vec, slong len);
 
 /*  Dot product  *************************************************************/
 
-void _fmpz_vec_dot(fmpz_t res, const fmpz * vec1, const fmpz * vec2, slong len2);
+void _fmpz_vec_dot_general_naive(fmpz_t res, const fmpz_t initial, int subtract,
+    const fmpz * a, const fmpz * b, int reverse, slong len);
+void _fmpz_vec_dot_general(fmpz_t res, const fmpz_t initial, int subtract,
+    const fmpz * a, const fmpz * b, int reverse, slong len);
 
-void _fmpz_vec_dot_ptr(fmpz_t c, const fmpz * vec1,
-		                 fmpz ** const vec2, slong offset, slong len);
+FMPZ_VEC_INLINE
+void _fmpz_vec_dot(fmpz_t res, const fmpz * vec1, const fmpz * vec2, slong len2)
+{
+    _fmpz_vec_dot_general(res, NULL, 0, vec1, vec2, 0, len2);
+}
 
 #ifdef __cplusplus
 }

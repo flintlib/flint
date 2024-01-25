@@ -11,6 +11,7 @@
 
 #include "ulong_extras.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
@@ -30,12 +31,16 @@ _fmpq_poly_power_sums_to_poly(fmpz * res, const fmpz * poly, const fmpz_t den,
     fmpz_one(f);
     for (k = 1; k <= d; k++)
     {
-        if(k < len)
+        if (k < len)
+        {
 			fmpz_mul(res + d - k, poly + k, f);
+            _fmpz_vec_dot_general(res + d - k, res + d - k, 0, res + d - k + 1, poly + 1, 0, k - 1);
+
+        }
 		else
-			fmpz_zero(res + d - k);
-        for (i = 1; i < FLINT_MIN(k, len); i++)
-            fmpz_addmul(res + d - k, res + d - k + i, poly + i);
+        {
+            _fmpz_vec_dot_general(res + d - k, NULL, 0, res + d - k + 1, poly + 1, 0, len - 1);
+        }
 
         a = n_gcd(FLINT_ABS(fmpz_fdiv_ui(res + d - k, k)), k);
         fmpz_divexact_ui(res + d - k, res + d - k, a);

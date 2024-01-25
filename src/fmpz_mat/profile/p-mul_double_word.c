@@ -71,7 +71,7 @@ int main(void)
 
             if (dim < 150)
             {
-                fmpz_mat_mul_classical_inline(D, A, B);
+                fmpz_mat_mul_classical(D, A, B);
 
                 if (!fmpz_mat_equal(D, E))
                 {

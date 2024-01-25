@@ -61,6 +61,7 @@ _fmpq_poly_sin_cos_series_basecase_can(fmpz * S, fmpz_t Sden,
         fmpz_zero(t);
         fmpz_zero(u);
 
+        /* todo: precompute A[j] * j, use dot products */
         for (j = 1; j < FLINT_MIN(Alen, k + 1); j++)
         {
             fmpz_mul_ui(v, A + j, j);

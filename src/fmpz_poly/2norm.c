@@ -10,15 +10,13 @@
 */
 
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
 void
 _fmpz_poly_2norm(fmpz_t res, const fmpz * poly, slong len)
 {
-    slong i;
-    fmpz_zero(res);
-    for (i = 0; i < len; i++)
-        fmpz_addmul(res, poly + i, poly + i);
+    _fmpz_vec_dot(res, poly, poly, len);
     fmpz_sqrt(res, res);
 }
 

@@ -40,7 +40,7 @@ _fmpq_poly_exp_series_basecase_deriv(fmpz * B, fmpz_t Bden,
     const fmpz * Aprime, const fmpz_t Aden, slong Alen, slong n)
 {
     fmpz_t t, u;
-    slong j, k;
+    slong k;
 
     Alen = FLINT_MIN(Alen, n);
 
@@ -55,11 +55,8 @@ _fmpq_poly_exp_series_basecase_deriv(fmpz * B, fmpz_t Bden,
 
     for (k = 1; k < n; k++)
     {
-        fmpz_mul(t, Aprime, B + k - 1);
-
-        for (j = 2; j < FLINT_MIN(Alen, k + 1); j++)
-            fmpz_addmul(t, Aprime + j - 1, B + k - j);
-
+        slong l = FLINT_MIN(Alen - 1, k);
+        _fmpz_vec_dot_general(t, NULL, 0, Aprime, B + k - l, 1, l);
         fmpz_mul_ui(u, Aden, k);
         fmpz_divexact(B + k, t, u);
     }

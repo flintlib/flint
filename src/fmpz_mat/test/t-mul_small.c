@@ -47,7 +47,7 @@ TEST_FUNCTION_START(fmpz_mat_mul_small, state)
         fmpz_mat_randtest(D, state, n_randint(state, 200) + 1);
 
         _fmpz_mat_mul_small(C, A, B);
-        fmpz_mat_mul_classical_inline(D, A, B);
+        fmpz_mat_mul_classical(D, A, B);
 
         if (!fmpz_mat_equal(C, D))
         {

@@ -19,6 +19,7 @@ TEST_FUNCTION_START(fmpz_mat_mul_classical, state)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         slong m, n, k;
+        slong i, j, h;
 
         m = n_randint(state, 50);
         n = n_randint(state, 50);
@@ -36,7 +37,13 @@ TEST_FUNCTION_START(fmpz_mat_mul_classical, state)
         fmpz_mat_randtest(C, state, n_randint(state, 200) + 1);
 
         fmpz_mat_mul_classical(C, A, B);
-        fmpz_mat_mul_classical_inline(D, A, B);
+
+        for (i = 0; i < D->r; i++)
+            for (j = 0; j < D->c; j++)
+                for (h = 0; h < B->r; h++)
+                    fmpz_addmul(fmpz_mat_entry(D, i, j),
+                        fmpz_mat_entry(A, i, h),
+                        fmpz_mat_entry(B, h, j));
 
         if (!fmpz_mat_equal(C, D))
         {

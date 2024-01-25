@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2008, 2009 William Hart
+    Copyright (C) 2024 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -18,26 +19,37 @@ void
 _fmpz_poly_mul_classical(fmpz * res, const fmpz * poly1,
                          slong len1, const fmpz * poly2, slong len2)
 {
-    if (len1 == 1 && len2 == 1) /* Special case if the length of both inputs is 1 */
+    slong i, top1, top2;
+
+    if (len1 == 1 && len2 == 1)
     {
         fmpz_mul(res, poly1, poly2);
+        return;
     }
-    else                        /* Ordinary case */
+
+    if (len1 == 1)
     {
-        slong i;
-
-        /* Set res[i] = poly1[i]*poly2[0] */
-        _fmpz_vec_scalar_mul_fmpz(res, poly1, len1, poly2);
-
-        /* Set res[i+len1-1] = in1[len1-1]*in2[i] */
-        _fmpz_vec_scalar_mul_fmpz(res + len1, poly2 + 1, len2 - 1,
-                                  poly1 + len1 - 1);
-
-        /* out[i+j] += in1[i]*in2[j] */
-        for (i = 0; i < len1 - 1; i++)
-            _fmpz_vec_scalar_addmul_fmpz(res + i + 1, poly2 + 1, len2 - 1,
-                                         poly1 + i);
+        _fmpz_vec_scalar_mul_fmpz(res, poly2, len2, poly1);
+        return;
     }
+
+    if (len2 == 1)
+    {
+        _fmpz_vec_scalar_mul_fmpz(res, poly1, len1, poly2);
+        return;
+    }
+
+    fmpz_mul(res, poly1, poly2);
+
+    for (i = 1; i < len1 + len2 - 2; i++)
+    {
+        top1 = FLINT_MIN(len1 - 1, i);
+        top2 = FLINT_MIN(len2 - 1, i);
+
+        _fmpz_vec_dot_general(res + i, NULL, 0, poly1 + i - top2, poly2 + i - top1, 1, top1 + top2 - i + 1);
+    }
+
+    fmpz_mul(res + len1 + len2 - 2, poly1 + len1 - 1, poly2 + len2 - 1);
 }
 
 void

@@ -11,6 +11,7 @@
 
 #include "fmpz.h"
 #include "fmpz_factor.h"
+#include "fmpz_vec.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_mat.h"
 #include "fmpz_mod_poly.h"
@@ -403,8 +404,6 @@ _gr_fmpz_mod_pow_fmpz(fmpz_t res, const fmpz_t x, const fmpz_t exp, const gr_ctx
 int
 _gr_fmpz_mod_vec_dot(fmpz_t res, const fmpz_t initial, int subtract, const fmpz * vec1, const fmpz * vec2, slong len, gr_ctx_t ctx)
 {
-    slong i;
-
     if (len <= 0)
     {
         if (initial == NULL)
@@ -414,28 +413,8 @@ _gr_fmpz_mod_vec_dot(fmpz_t res, const fmpz_t initial, int subtract, const fmpz 
         return GR_SUCCESS;
     }
 
-    if (initial == NULL)
-    {
-        fmpz_mul(res, vec1, vec2);
-    }
-    else
-    {
-        if (subtract)
-            fmpz_neg(res, initial);
-        else
-            fmpz_set(res, initial);
-
-        fmpz_addmul(res, vec1, vec2);
-    }
-
-    for (i = 1; i < len; i++)
-        fmpz_addmul(res, vec1 + i, vec2 + i);
-
-    if (subtract)
-        fmpz_neg(res, res);
-
+    _fmpz_vec_dot_general(res, initial, subtract, vec1, vec2, 0, len);
     fmpz_mod_set_fmpz(res, res, FMPZ_MOD_CTX(ctx));
-
     return GR_SUCCESS;
 }
 
@@ -443,8 +422,6 @@ _gr_fmpz_mod_vec_dot(fmpz_t res, const fmpz_t initial, int subtract, const fmpz 
 int
 _gr_fmpz_mod_vec_dot_rev(fmpz_t res, const fmpz_t initial, int subtract, const fmpz * vec1, const fmpz * vec2, slong len, gr_ctx_t ctx)
 {
-    slong i;
-
     if (len <= 0)
     {
         if (initial == NULL)
@@ -454,28 +431,8 @@ _gr_fmpz_mod_vec_dot_rev(fmpz_t res, const fmpz_t initial, int subtract, const f
         return GR_SUCCESS;
     }
 
-    if (initial == NULL)
-    {
-        fmpz_mul(res, vec1, vec2 + len - 1);
-    }
-    else
-    {
-        if (subtract)
-            fmpz_neg(res, initial);
-        else
-            fmpz_set(res, initial);
-
-        fmpz_addmul(res, vec1, vec2 + len - 1);
-    }
-
-    for (i = 1; i < len; i++)
-        fmpz_addmul(res, vec1 + i, vec2 + len - 1 - i);
-
-    if (subtract)
-        fmpz_neg(res, res);
-
+    _fmpz_vec_dot_general(res, initial, subtract, vec1, vec2, 1, len);
     fmpz_mod_set_fmpz(res, res, FMPZ_MOD_CTX(ctx));
-
     return GR_SUCCESS;
 }
 

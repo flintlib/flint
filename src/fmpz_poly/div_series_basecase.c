@@ -180,10 +180,9 @@ _fmpz_poly_div_series_basecase(fmpz * Q, const fmpz * A, slong Alen,
             }
             else
             {
-                fmpz_mul(Q + i, B + 1, Q + i - 1);
-
-                for (j = 2; j < FLINT_MIN(i + 1, Blen); j++)
-                    fmpz_addmul(Q + i, B + j, Q + i - j);
+                slong l = FLINT_MIN(i, Blen - 1);
+                /* todo: merge final subtraction */
+                _fmpz_vec_dot_general(Q + i, NULL, 0, B + 1, Q + i - l, 1, l);
             }
 
             if (i < Alen)
