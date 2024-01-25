@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fmpq.h"
 #include "fmpq_poly.h"
@@ -61,29 +62,20 @@ _fmpq_poly_power_sums(fmpz * res, fmpz_t rden, const fmpz * poly, slong len,
 
         for (k = 1; k < FLINT_MIN(n, len); k++)
         {
-            fmpz_mul_ui(res + k, poly + len - 1 - k, k);
+            fmpz_mul_si(res + k, poly + len - 1 - k, -k);
             fmpz_mul(res + k, res + k, rden);
-
-            for (i = 1; i < k - 1; i++)
-                fmpz_mul(res + i, res + i, poly + len - 1);
-            for (i = 1; i < k; i++)
-                fmpz_addmul(res + k, poly + len - 1 - k + i, res + i);
-            fmpz_neg(res + k, res + k);
+            _fmpz_vec_scalar_mul_fmpz(res + 1, res + 1, k - 2, poly + len - 1);
+            _fmpz_vec_dot_general(res + k, res + k, 1, poly + len - 1 - k + 1, res + 1, 0, k - 1);
             fmpz_mul(rden, rden, poly + len - 1);
         }
 
         for (k = len; k < n; k++)
         {
-            fmpz_zero(res + k);
-            for (i = k - len + 1; i < k - 1; i++)
-                fmpz_mul(res + i, res + i, poly + len - 1);
-            for (i = k - len + 1; i < k; i++)
-                fmpz_addmul(res + k, poly + len - 1 - k + i, res + i);
-            fmpz_neg(res + k, res + k);
+            _fmpz_vec_scalar_mul_fmpz(res + k - len + 1, res + k - len + 1, len - 2, poly + len - 1);
+            _fmpz_vec_dot_general(res + k, NULL, 1, poly, res + k - len + 1, 0, len - 1);
         }
 
-        for (i = n - len + 1; i < n - 1; i++)
-            fmpz_mul(res + i, res + i, poly + len - 1);
+        _fmpz_vec_scalar_mul_fmpz(res + n - len + 1, res + n - len + 1, len - 2, poly + len - 1);
         fmpz_one(rden);
 
         for (i = n - len; i > 0; i--)

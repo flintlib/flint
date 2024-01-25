@@ -78,6 +78,7 @@ nmod_poly_power_sums(nmod_poly_t res, const nmod_poly_t poly, slong n)
     }
 }
 
+/* todo: should use dot products */
 void
 _nmod_poly_power_sums_naive(mp_ptr res, mp_srcptr poly, slong len, slong n,
                             nmod_t mod)

@@ -68,10 +68,8 @@ void _fmpz_poly_resultant_modular(fmpz_t res, const fmpz * poly1, slong len1,
         fmpz_init(b1);
         fmpz_init(b2);
 
-        for (i = 0; i < len1; i++)
-            fmpz_addmul(b1, A + i, A + i);
-        for (i = 0; i < len2; i++)
-            fmpz_addmul(b2, B + i, B + i);
+        _fmpz_vec_dot(b1, A, A, len1);
+        _fmpz_vec_dot(b2, B, B, len2);
 
         fmpz_pow_ui(b1, b1, len2 - 1);
         fmpz_pow_ui(b2, b2, len1 - 1);

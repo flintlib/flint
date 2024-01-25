@@ -67,15 +67,12 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, slong len1,
 
     if (len1 < 64 && len2 < 64) /* compute the squares of the 2-norms */
     {
-        fmpz_set_ui(l, 0);
-        for (i = 0; i < len1; i++)
-            fmpz_addmul(l, A + i, A + i);
+        _fmpz_vec_dot(l, A, A, len1);
         nb1 = fmpz_bits(l);
-        fmpz_set_ui(l, 0);
-        for (i = 0; i < len2; i++)
-            fmpz_addmul(l, B + i, B + i);
+        _fmpz_vec_dot(l, B, B, len2);
         nb2 = fmpz_bits(l);
-    } else /* approximate to save time */
+    }
+    else /* approximate to save time */
     {
         nb1 = 2*bits1 + FLINT_BIT_COUNT(len1);
         nb2 = 2*bits2 + FLINT_BIT_COUNT(len2);
