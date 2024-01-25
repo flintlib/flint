@@ -164,7 +164,7 @@ _fmpz_vec_dot_general(fmpz_t res, const fmpz_t initial, int subtract,
 
     slong i;
 
-    if (len <= 1 && initial == NULL)
+    if (len <= 1)
     {
         if (initial == NULL)
         {
