@@ -87,7 +87,7 @@ TEST_FUNCTION_START(fmpz_mat_mul_double_word, state)
         fmpz_mat_randtest(C, state, n_randint(state, 200) + 1);
 
         _fmpz_mat_mul_double_word(C, A, B);
-        fmpz_mat_mul_classical_inline(D, A, B);
+        fmpz_mat_mul_classical(D, A, B);
 
         if (!fmpz_mat_equal(C, D))
         {
