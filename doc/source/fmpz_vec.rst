@@ -408,13 +408,22 @@ Gaussian content
 Dot product
 --------------------------------------------------------------------------------
 
+.. function:: void _fmpz_vec_dot_general_naive(fmpz_t res, const fmpz_t initial, int subtract, const fmpz * a, const fmpz * b, int reverse, slong len)
+              void _fmpz_vec_dot_general(fmpz_t res, const fmpz_t initial, int subtract, const fmpz * a, const fmpz * b, int reverse, slong len)
+
+    Computes the dot product of the vectors *a* and *b*, setting
+    *res* to `s + (-1)^{subtract} \sum_{i=0}^{len-1} a_i b_i`.
+    The initial term *s* is optional and can be
+    omitted by passing *NULL* (equivalently, `s = 0`).
+    The parameter *subtract* must be 0 or 1.
+    If the *reverse* flag is 1, the second vector is reversed.
+
+    Aliasing is allowed between ``res`` and ``initial`` but not
+    between ``res`` and the entries of ``a`` and ``b``.
+
+    The *naive* version is used for testing purposes.
 
 .. function:: void _fmpz_vec_dot(fmpz_t res, const fmpz * vec1, const fmpz * vec2, slong len2)
 
     Sets ``res`` to the dot product of ``(vec1, len2)`` and
     ``(vec2, len2)``.
-
-.. function:: void _fmpz_vec_dot_ptr(fmpz_t res, const fmpz * vec1, fmpz ** const vec2, slong offset, slong len)
-
-    Sets ``res`` to the dot product of ``len`` values at ``vec1`` and the
-    ``len`` values ``vec2[i] + offset`` for `0 \leq i < len`.
