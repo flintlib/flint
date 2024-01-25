@@ -69,6 +69,17 @@ Multiplication
     Return the normalized length of `y` if `y \ge 0` and `y` fits into `n` limbs. Otherwise, return `-1`.
     `y` may alias `x_1` but is not allowed to alias `x_2`.
 
+.. function:: mp_limb_t flint_mpn_mulhigh_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
+
+    Sets *{rp, n}* to the "high part" of *{xp, n}* times *{yp, n}* and returns
+    the *n*-th least significant limb, in the sense that the multiplication of
+    the *n - 1* lower limbs are never accounted for. Hence, the multiplication
+    is typically non-exact for sizes larger than one. The highest error
+    is *n + 2* ULP in the returned limb.
+
+    .. note:: This function may not exist on processors not supporting the ADX
+    instruction set.
+
 
 Divisibility
 --------------------------------------------------------------------------------

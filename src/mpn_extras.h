@@ -229,6 +229,27 @@ flint_mpn_sqr(mp_ptr r, mp_srcptr x, mp_size_t n)
         flint_mpn_mul((_z), (_y), (_yn), (_x), (_xn)); \
     }
 
+#if FLINT_HAVE_ADX
+# define FLINT_MPN_MULHIGH_N_FUNC_TAB_WIDTH 12
+#else
+# define FLINT_MPN_MULHIGH_N_FUNC_TAB_WIDTH 0
+#endif
+
+#define FLINT_HAVE_MULHIGH_N_FUNC(n) ((n) <= FLINT_MPN_MULHIGH_N_FUNC_TAB_WIDTH)
+
+FLINT_DLL extern const flint_mpn_mul_func_t flint_mpn_mulhigh_n_func_tab[];
+
+/* NOTE: Aliasing is allowed! */
+/* FIXME: How do we proceed for bigger n? */
+MPN_EXTRAS_INLINE
+mp_limb_t flint_mpn_mulhigh_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
+{
+    FLINT_ASSERT(n >= 1);
+    FLINT_ASSERT(FLINT_HAVE_MULHIGH_N_FUNC(n));
+
+    return flint_mpn_mulhigh_n_func_tab[n - 1](rp, xp, yp);
+}
+
 /*
     return the high limb of a two limb left shift by n < GMP_LIMB_BITS bits.
     Note: if GMP_NAIL_BITS != 0, the rest of flint is already broken anyways.
