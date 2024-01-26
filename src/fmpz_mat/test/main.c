@@ -76,6 +76,7 @@
 #include "t-mul_multi_mod.c"
 #include "t-mul_small.c"
 #include "t-mul_strassen.c"
+#include "t-mul_waksman.c"
 #include "t-multi_CRT_ui.c"
 #include "t-multi_CRT_ui_unsigned.c"
 #include "t-nullspace.c"
@@ -175,6 +176,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mat_mul_multi_mod),
     TEST_FUNCTION(fmpz_mat_mul_small),
     TEST_FUNCTION(fmpz_mat_mul_strassen),
+    TEST_FUNCTION(fmpz_mat_mul_waksman),
     TEST_FUNCTION(fmpz_mat_multi_CRT_ui),
     TEST_FUNCTION(fmpz_mat_multi_CRT_ui_unsigned),
     TEST_FUNCTION(fmpz_mat_nullspace),

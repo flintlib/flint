@@ -78,7 +78,7 @@ Multiplication
     is *n + 2* ULP in the returned limb.
 
     .. note:: This function may not exist on processors not supporting the ADX
-    instruction set.
+              instruction set.
 
 
 Divisibility

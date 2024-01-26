@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2016 Aaditya Thakkar
+    Copyright (C) 2024 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "fmpz_mat.h"
 
-TEST_FUNCTION_START(fmpz_mat_mul_strassen, state)
+TEST_FUNCTION_START(fmpz_mat_mul_waksman, state)
 {
     slong i;
 
@@ -35,7 +35,7 @@ TEST_FUNCTION_START(fmpz_mat_mul_strassen, state)
         fmpz_mat_randtest(B, state, n_randint(state, 200) + 1);
 
         fmpz_mat_mul_classical(C, A, B);
-        fmpz_mat_mul_strassen(D, A, B);
+        fmpz_mat_mul_waksman(D, A, B);
 
         if (!fmpz_mat_equal(C, D))
         {
