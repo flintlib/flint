@@ -105,7 +105,7 @@ Jean Kieffer (JK).
   * Use new formulas from Jorge Zuniga to compute Catalan's constant
     and zeta(3) faster (FJ).
   * Compressed the database of Conway polynomials to 10% of the
-    original size.
+    original size (AA).
   * Optimized context initializers for ``fq``, ``fq_zech``, ``fq_nmod``
     and ``qadic`` (AA).
   * Improved ``fmpz_is_probabprime`` for word-size input (FJ).
