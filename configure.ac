@@ -799,6 +799,9 @@ internals.])])
 
     AC_SEARCH_LIBS([__gmpn_modexact_1_odd],[gmp],
         [AC_DEFINE(FLINT_HAVE_MPN_MODEXACT_1_ODD,1,Define if system has mpn_modexact_1_odd)])
+
+    AC_SEARCH_LIBS([__gmpn_addmul_2],[gmp],
+        [AC_DEFINE(FLINT_HAVE_MPN_ADDMUL_2,1,Define if GMP has mpn_addmul_2)])
 fi
 
 if test "$enable_mpfr_check" = "yes";
