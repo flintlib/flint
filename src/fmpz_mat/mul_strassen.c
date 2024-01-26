@@ -25,9 +25,9 @@ void fmpz_mat_mul_strassen(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
     b = A->c;
     c = B->c;
 
-    if (a <= 4 || b <= 4 || c <= 4)
+    if (a <= 1 || b <= 1 || c <= 1)
     {
-        fmpz_mat_mul(C, A, B);
+        fmpz_mat_mul_classical(C, A, B);
         return;
     }
 

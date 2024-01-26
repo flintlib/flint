@@ -575,6 +575,16 @@ Matrix multiplication
     The matrices must have compatible dimensions for matrix multiplication.
     No aliasing is allowed.
 
+.. function:: void fmpz_mat_mul_waksman(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
+
+    Sets ``C`` to the matrix product `C = A B` computed using
+    Waksman multiplication, which does only `n^3/2 + O(n^2)`
+    products, but many additions. This is good for small matrices
+    with large entries.
+
+    The matrices must have compatible dimensions for matrix multiplication.
+    No aliasing is allowed.
+
 .. function:: void fmpz_mat_mul_strassen(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 
     Sets `C = AB`. Dimensions must be compatible for matrix multiplication.
