@@ -18,6 +18,11 @@ Jean Kieffer (JK).
     with characteristics in any dimension (JK).
   * ``flint_printf`` and related functions now supports printing common FLINT
     types, e.g. using the format string ``%{fmpz}`` for ``fmpz_t`` (AA).
+  * Generic expression parsing: ``gr_set_str`` supports parsing expressions
+    like ``a*x^2+1/3`` or ``(0.1 + 0.2*i) +/- (0.001 + 0.001*i)`` in
+    any ring (FJ).
+  * Added ``fmpz_mpoly_q_set_str_pretty`` and ``fmpz_mpoly_q_get_str_pretty``.
+  * Added ``flint_mpn_mulhigh`` (AA).
   * Primality testing for Gaussian integers (``fmpzi_is_prime``,
     ``fmpzi_is_probabprime``) (Mathieu Gouttenoire).
   * Modular splitting evaluation of polynomials (``_gr_poly_evaluate_modular``)
@@ -44,12 +49,22 @@ Jean Kieffer (JK).
   * Added ``acb_urandom`` and ``arb_randtest_positive`` (JK).
   * Added ``acb_mul_i_pow_si`` (JK).
   * Handle modulus 1 in ``fmpz_CRT`` functions (Fabian Gundlach).
+  * Added ``_nmod_poly_conway`` and ``_nmod_poly_conway_rand`` (AA).
+  * Added ``fft_small_mulmod_satisfies_bounds``. The function
+    ``sd_fft_ctx_init`` now verifies that the modulus satisfies the
+    assumptions for correct modular arithmetic. (Daniel Schultz).
+  * Allow setting generator names for ``gr_mpoly``, ``gr_series``,
+    ``fmpz_mpoly`` and ``fmpz_mpoly_q`` generic rings (FJ).
+  * Added ``gr_gens_recursive`` (FJ).
+  * Allow overriding ``flint_aligned_alloc`` (AA).
+  * Added ``_fmpz_vec_dot_general`` (FJ).
 
 * Bugs
 
-  * Fixed threading problem in ``gr_method_tab_init``: FLINT would occasionally
-    crash when using generics-based internal code on machines with a large
-    number of threads (FJ, after debugging by Alexander Smirnov).
+  * Fixed threading problem in ``gr_method_tab_init``: FLINT would
+    occasionally crash when calling generics-based internal code
+    when using a large number of threads
+    (FJ, after debugging by Alexander Smirnov).
   * Fixed comparison of ``gr`` vectors with ``fmpq`` elements (FJ).
   * Fixed allocation bug in ``gr_mpoly_mul_monomial`` (FJ).
   * Fixed aliasing in ``fmpzi_divrem_approx`` (FJ).
@@ -57,10 +72,18 @@ Jean Kieffer (JK).
     in rare instances, computing roots of an integer polynomial could hang (FJ).
   * Allow large arguments in ``arb_atan_frac_bsplit`` (FJ).
   * Fixed printing large coefficients in ``nmod_mpoly`` (Alexander Smirnov, AA).
+  * Fixed ``fq_*_poly_powmod`` (AA).
+  * Fixed initialization of ``fq_default_ctx`` (Claus Fieker, Tommy Hofmann).
+  * Fixed memory leak in ``gr_poly_write`` (FJ).
+  * Fixed printing ``nmod32`` elements on 32-bit systems (FJ).
+  * Fixed ``ldconfig`` for BSD systems (AA).
+  * Fixed ``FLINT_WANT_ASSERT`` for CMake (AA).
 
 * Performance
 
   * FLINT is now built with ``-O3 -march=native`` by default (AA).
+  * FLINT is no longer built with ``-funroll-loops`` by default except
+    for select modules. This reduces the library size by more than 20%. (AA).
   * Assembly routines are now used as intended on ARM64 when compiling with
     GCC (AA).
   * New basecase code for ``flint_mpn_mul``, ``flint_mpn_mul_n`` and
@@ -69,16 +92,34 @@ Jean Kieffer (JK).
     when calling ``mpn`` functions directly, though few applications
     currently benefit significantly due to wrapper overheads (some Arb benchmarks
     run ~5% faster with this change). (AA, FJ).
+  * Faster ``_fmpz_vec_dot`` (FJ).
+  * Faster basecase ``fmpz_poly`` and ``fmpz_mat`` basecase algorithms
+    based on dot products.
+  * Optimized ``fmpz_mat_mul_classical`` (FJ).
+  * Added ``fmpz_mat_mul_waksman``, speeding up ``fmpz_mat`` multiplication
+    for balanced matrices with huge entries (Éric Schost, Vincent Neiger, FJ).
   * Strip trailing zeros in ``fmpz_poly_gcd``: this gives a 50x speedup
     computing ``gcd(x^1000, x^1001)``.
+  * Faster CLD bound computation, speeding up ``fmpz_poly_factor``
+    for some polynomials.
   * Use new formulas from Jorge Zuniga to compute Catalan's constant
     and zeta(3) faster (FJ).
+  * Compressed the database of Conway polynomials to 10% of the
+    original size.
+  * Optimized context initializers for ``fq``, ``fq_zech``, ``fq_nmod``
+    and ``qadic`` (AA).
+  * Improved ``fmpz_is_probabprime`` for word-size input (FJ).
+  * Optimized header files (AA).
+  * Changed several internal helper functions to forced inlines (AA).
+  * Merged some sources files to speed up compilation (AA).
+  * Faster computation of Swinnerton-Dyer polynomials (FJ).
   * Added benchmark script (``dev/bench.py``) (FJ).
 
 * Test code
 
   * Unified test programs per module: compiling FLINT's test suite is now
     an order of magnitude faster (AA).
+  * Added pretty-printing and timing output for unit tests (AA).
   * Improve use of test multiplier in some long-running unit tests (AA, FJ).
   * Improved test coverage (AA, FJ).
   * Allow ``gr_ctx_init_random`` to generate composite rings (FJ).
@@ -93,9 +134,10 @@ Jean Kieffer (JK).
     associated constants (AA).
   * Removed ``_long_vec_print`` and ``_perm_print`` (use ``flint_printf``
     instead) (AA).
-  * Removed unused functions ``d_mat_swap``, ``d_mat_is_zero``,
-    ``d_mat_is_approx_zero`` (AA).
+  * Removed unused functions in the ``d_mat`` and ``aprcl`` modules (AA).
   * Removed ``fmpq_get_mpz_frac`` (AA).
+  * Removed ``arb_fmpz_poly_cos_minpoly`` (AA).
+  * Removed ``fmpz_mat_mul_classical_inline`` (FJ).
   * Introduce ``FLINT_SWAP`` macro to replace several older macros (FJ).
   * Replaced ``invert_limb`` by ``n_preinvert_limb_prenorm`` (AA).
   * Renamed ``_perm_set_one`` to ``_perm_one`` (AA).
