@@ -77,8 +77,10 @@ Multiplication
     is typically non-exact for sizes larger than one. The highest error
     is *n + 2* ULP in the returned limb.
 
-    .. note:: This function may not exist on processors not supporting the ADX
-              instruction set.
+.. note::
+
+    This function may not exist on processors not supporting the ADX instruction
+    set.
 
 
 Divisibility

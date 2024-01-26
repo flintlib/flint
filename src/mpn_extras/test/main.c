@@ -24,6 +24,7 @@
 #include "t-mul_n.c"
 #include "t-mul_basecase.c"
 #include "t-mulhigh_n.c"
+#include "t-mulhigh_normalised_n.c"
 #include "t-mulmod_2expp1.c"
 #include "t-mulmod_preinv1.c"
 #include "t-mulmod_preinvn.c"
@@ -45,6 +46,7 @@ test_struct tests[] =
     TEST_FUNCTION(flint_mpn_mul_n),
     TEST_FUNCTION(flint_mpn_mul_basecase),
     TEST_FUNCTION(flint_mpn_mulhigh_n),
+    TEST_FUNCTION(flint_mpn_mulhigh_normalised_n),
     TEST_FUNCTION(flint_mpn_mulmod_2expp1),
     TEST_FUNCTION(flint_mpn_mulmod_preinv1),
     TEST_FUNCTION(flint_mpn_mulmod_preinvn),

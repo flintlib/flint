@@ -25,6 +25,19 @@ mp_limb_t flint_mpn_mulhigh_10(mp_ptr, mp_srcptr, mp_srcptr);
 mp_limb_t flint_mpn_mulhigh_11(mp_ptr, mp_srcptr, mp_srcptr);
 mp_limb_t flint_mpn_mulhigh_12(mp_ptr, mp_srcptr, mp_srcptr);
 
+struct mp_limb_pair_t flint_mpn_mulhigh_normalised_1(mp_ptr, mp_srcptr, mp_srcptr);
+struct mp_limb_pair_t flint_mpn_mulhigh_normalised_2(mp_ptr, mp_srcptr, mp_srcptr);
+struct mp_limb_pair_t flint_mpn_mulhigh_normalised_3(mp_ptr, mp_srcptr, mp_srcptr);
+struct mp_limb_pair_t flint_mpn_mulhigh_normalised_4(mp_ptr, mp_srcptr, mp_srcptr);
+struct mp_limb_pair_t flint_mpn_mulhigh_normalised_5(mp_ptr, mp_srcptr, mp_srcptr);
+struct mp_limb_pair_t flint_mpn_mulhigh_normalised_6(mp_ptr, mp_srcptr, mp_srcptr);
+struct mp_limb_pair_t flint_mpn_mulhigh_normalised_7(mp_ptr, mp_srcptr, mp_srcptr);
+struct mp_limb_pair_t flint_mpn_mulhigh_normalised_8(mp_ptr, mp_srcptr, mp_srcptr);
+struct mp_limb_pair_t flint_mpn_mulhigh_normalised_9(mp_ptr, mp_srcptr, mp_srcptr);
+struct mp_limb_pair_t flint_mpn_mulhigh_normalised_10(mp_ptr, mp_srcptr, mp_srcptr);
+struct mp_limb_pair_t flint_mpn_mulhigh_normalised_11(mp_ptr, mp_srcptr, mp_srcptr);
+struct mp_limb_pair_t flint_mpn_mulhigh_normalised_12(mp_ptr, mp_srcptr, mp_srcptr);
+
 const flint_mpn_mul_func_t flint_mpn_mulhigh_n_func_tab[] =
 {
     flint_mpn_mulhigh_1,
@@ -39,6 +52,22 @@ const flint_mpn_mul_func_t flint_mpn_mulhigh_n_func_tab[] =
     flint_mpn_mulhigh_10,
     flint_mpn_mulhigh_11,
     flint_mpn_mulhigh_12
+};
+
+const flint_mpn_mulhigh_normalised_func_t flint_mpn_mulhigh_normalised_n_func_tab[] =
+{
+    flint_mpn_mulhigh_normalised_1,
+    flint_mpn_mulhigh_normalised_2,
+    flint_mpn_mulhigh_normalised_3,
+    flint_mpn_mulhigh_normalised_4,
+    flint_mpn_mulhigh_normalised_5,
+    flint_mpn_mulhigh_normalised_6,
+    flint_mpn_mulhigh_normalised_7,
+    flint_mpn_mulhigh_normalised_8,
+    flint_mpn_mulhigh_normalised_9,
+    flint_mpn_mulhigh_normalised_10,
+    flint_mpn_mulhigh_normalised_11,
+    flint_mpn_mulhigh_normalised_12
 };
 #else
 typedef int this_file_is_empty;

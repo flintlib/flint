@@ -237,7 +237,11 @@ flint_mpn_sqr(mp_ptr r, mp_srcptr x, mp_size_t n)
 
 #define FLINT_HAVE_MULHIGH_N_FUNC(n) ((n) <= FLINT_MPN_MULHIGH_N_FUNC_TAB_WIDTH)
 
+struct mp_limb_pair_t { mp_limb_t m1; mp_limb_t m2; };
+typedef struct mp_limb_pair_t (* flint_mpn_mulhigh_normalised_func_t)(mp_ptr, mp_srcptr, mp_srcptr);
+
 FLINT_DLL extern const flint_mpn_mul_func_t flint_mpn_mulhigh_n_func_tab[];
+FLINT_DLL extern const flint_mpn_mulhigh_normalised_func_t flint_mpn_mulhigh_normalised_n_func_tab[];
 
 /* NOTE: Aliasing is allowed! */
 /* FIXME: How do we proceed for bigger n? */
@@ -248,6 +252,15 @@ mp_limb_t flint_mpn_mulhigh_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n
     FLINT_ASSERT(FLINT_HAVE_MULHIGH_N_FUNC(n));
 
     return flint_mpn_mulhigh_n_func_tab[n - 1](rp, xp, yp);
+}
+
+FLINT_FORCE_INLINE
+struct mp_limb_pair_t flint_mpn_mulhigh_normalised_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
+{
+    FLINT_ASSERT(n >= 1);
+    FLINT_ASSERT(FLINT_HAVE_MULHIGH_N_FUNC(n));
+
+    return flint_mpn_mulhigh_normalised_n_func_tab[n - 1](rp, xp, yp);
 }
 
 /*
