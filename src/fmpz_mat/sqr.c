@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Fredrik Johansson
+    Copyright (C) 2012, 2024 Fredrik Johansson
     Copyright (C) 2015 Anubhav Srivastava
 
     This file is part of FLINT.
@@ -10,9 +10,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_mat.h"
-
-#define E fmpz_mat_entry
 
 void
 fmpz_mat_sqr(fmpz_mat_t B, const fmpz_mat_t A)
@@ -29,30 +28,16 @@ fmpz_mat_sqr(fmpz_mat_t B, const fmpz_mat_t A)
         return;
     }
 
-    if (n <= 12)
+    if (n <= 2)
     {
-        if (n <= 3)
-        {
-            fmpz_mat_sqr_bodrato(B, A);
-        }
-        else
-        {
-            fmpz_mat_mul(B, A, A);
-        }
+        fmpz_mat_sqr_bodrato(B, A);
+        return;
     }
+
+    ab = fmpz_mat_max_bits(A);
+
+    if ((n == 3 && ab >= 128) || (n == 4 && ab >= 1024))
+        fmpz_mat_sqr_bodrato(B, A);
     else
-    {
-        ab = fmpz_mat_max_bits(A);
-        ab = FLINT_ABS(ab);
-
-        if (5*(ab + ab) > n * n )
-        {
-            fmpz_mat_sqr_bodrato(B, A);
-        }
-        else
-        {
-            fmpz_mat_mul(B, A, A);
-        }
-
-    }
+        fmpz_mat_mul(B, A, A);
 }

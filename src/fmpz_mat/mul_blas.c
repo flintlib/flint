@@ -11,6 +11,8 @@
 
 #include "fmpz_mat.h"
 
+/* todo: squaring optimizations */
+
 #if FLINT_USES_BLAS && FLINT_BITS == 64
 
 #include <stdint.h>

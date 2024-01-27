@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2012 Fredrik Johansson
+    Copyright (C) 2012, 2024 Fredrik Johansson
     Copyright (C) 2015 Anubhav Srivastava
 
     This file is part of FLINT.
@@ -30,25 +30,55 @@ fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A)
     }
     else if (n == 2)
     {
-        fmpz_t t, u;
+        const fmpz a = *E(A, 0, 0);
+        const fmpz b = *E(A, 0, 1);
+        const fmpz c = *E(A, 1, 0);
+        const fmpz d = *E(A, 1, 1);
 
-        fmpz_init(t);
-        fmpz_init(u);
+        if (!COEFF_IS_MPZ(a) && !COEFF_IS_MPZ(b) &&
+            !COEFF_IS_MPZ(c) && !COEFF_IS_MPZ(d))
+        {
+            mp_limb_t s, t, u, v;
 
-        fmpz_add(t, E(A, 0, 0), E(A, 1, 1));
-        fmpz_mul(u, E(A, 0, 1), E(A, 1, 0));
+            smul_ppmm(s, t, a, a);
+            smul_ppmm(u, v, b, c);
+            add_ssaaaa(s, t, s, t, u, v);
+            fmpz_set_signed_uiui(E(B, 0, 0), s, t);
+            smul_ppmm(s, t, a, b);
+            smul_ppmm(u, v, b, d);
+            add_ssaaaa(s, t, s, t, u, v);
+            fmpz_set_signed_uiui(E(B, 0, 1), s, t);
+            smul_ppmm(s, t, a, c);
+            smul_ppmm(u, v, c, d);
+            add_ssaaaa(s, t, s, t, u, v);
+            fmpz_set_signed_uiui(E(B, 1, 0), s, t);
+            smul_ppmm(s, t, b, c);
+            smul_ppmm(u, v, d, d);
+            add_ssaaaa(s, t, s, t, u, v);
+            fmpz_set_signed_uiui(E(B, 1, 1), s, t);
+        }
+        else
+        {
+            fmpz_t t, u;
 
-        fmpz_mul(E(B, 0, 0), E(A, 0, 0), E(A, 0, 0));
-        fmpz_add(E(B, 0, 0), E(B, 0, 0), u);
+            fmpz_init(t);
+            fmpz_init(u);
 
-        fmpz_mul(E(B, 1, 1), E(A, 1, 1), E(A, 1, 1));
-        fmpz_add(E(B, 1, 1), E(B, 1, 1), u);
+            fmpz_add(t, E(A, 0, 0), E(A, 1, 1));
+            fmpz_mul(u, E(A, 0, 1), E(A, 1, 0));
 
-        fmpz_mul(E(B, 0, 1), E(A, 0, 1), t);
-        fmpz_mul(E(B, 1, 0), E(A, 1, 0), t);
+            fmpz_mul(E(B, 0, 0), E(A, 0, 0), E(A, 0, 0));
+            fmpz_add(E(B, 0, 0), E(B, 0, 0), u);
 
-        fmpz_clear(t);
-        fmpz_clear(u);
+            fmpz_mul(E(B, 1, 1), E(A, 1, 1), E(A, 1, 1));
+            fmpz_add(E(B, 1, 1), E(B, 1, 1), u);
+
+            fmpz_mul(E(B, 0, 1), E(A, 0, 1), t);
+            fmpz_mul(E(B, 1, 0), E(A, 1, 0), t);
+
+            fmpz_clear(t);
+            fmpz_clear(u);
+        }
     }
     else if (n == 3)
     {
@@ -71,28 +101,16 @@ fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A)
         fmpz_add(E(B, 2, 2), temp13, temp23);
         fmpz_addmul(E(B, 2, 2), E(A, 2, 2), E(A, 2, 2));
 
-
         fmpz_add(temp12, E(A, 0, 0), E(A, 1, 1));
         fmpz_add(temp13, E(A, 0, 0), E(A, 2, 2));
         fmpz_add(temp23, E(A, 1, 1), E(A, 2, 2));
 
-        fmpz_mul(E(B, 0, 1), temp12, E(A, 0, 1));
-        fmpz_addmul(E(B, 0, 1), E(A, 0, 2), E(A, 2, 1));
-
-        fmpz_mul(E(B, 0, 2), temp13, E(A, 0, 2));
-        fmpz_addmul(E(B, 0, 2), E(A, 0, 1), E(A, 1, 2));
-
-        fmpz_mul(E(B, 1, 0), temp12, E(A, 1, 0));
-        fmpz_addmul(E(B, 1, 0), E(A, 2, 0), E(A, 1, 2));
-
-        fmpz_mul(E(B, 1, 2), temp23, E(A, 1, 2));
-        fmpz_addmul(E(B, 1, 2), E(A, 1, 0), E(A, 0, 2));
-
-        fmpz_mul(E(B, 2, 0), temp13, E(A, 2, 0));
-        fmpz_addmul(E(B, 2, 0), E(A, 2, 1), E(A, 1, 0));
-
-        fmpz_mul(E(B, 2, 1), temp23, E(A, 2, 1));
-        fmpz_addmul(E(B, 2, 1), E(A, 0, 1), E(A, 2, 0));
+        fmpz_fmma(E(B, 0, 1), temp12, E(A, 0, 1), E(A, 0, 2), E(A, 2, 1));
+        fmpz_fmma(E(B, 0, 2), temp13, E(A, 0, 2), E(A, 0, 1), E(A, 1, 2));
+        fmpz_fmma(E(B, 1, 0), temp12, E(A, 1, 0), E(A, 2, 0), E(A, 1, 2));
+        fmpz_fmma(E(B, 1, 2), temp23, E(A, 1, 2), E(A, 1, 0), E(A, 0, 2));
+        fmpz_fmma(E(B, 2, 0), temp13, E(A, 2, 0), E(A, 2, 1), E(A, 1, 0));
+        fmpz_fmma(E(B, 2, 1), temp23, E(A, 2, 1), E(A, 0, 1), E(A, 2, 0));
 
         fmpz_clear(temp13);
         fmpz_clear(temp23);

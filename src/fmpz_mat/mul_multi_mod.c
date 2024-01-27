@@ -66,19 +66,26 @@ static void _mod_worker(void * varg)
         fmpz_comb_temp_init(comb_temp, comb);
 
         for (i = Astartrow; i < Astoprow; i++)
-        for (j = 0; j < k; j++)
         {
-            fmpz_multi_mod_ui(residues, &Arows[i][j], comb, comb_temp);
-            for (l = 0; l < num_primes; l++)
-                mod_A[l]->rows[i][j] = residues[l];
+            for (j = 0; j < k; j++)
+            {
+                fmpz_multi_mod_ui(residues, &Arows[i][j], comb, comb_temp);
+                for (l = 0; l < num_primes; l++)
+                    mod_A[l]->rows[i][j] = residues[l];
+            }
         }
 
-        for (i = Bstartrow; i < Bstoprow; i++)
-        for (j = 0; j < n; j++)
+        if (mod_B != NULL)
         {
-            fmpz_multi_mod_ui(residues, &Brows[i][j], comb, comb_temp);
-            for (l = 0; l < num_primes; l++)
-                mod_B[l]->rows[i][j] = residues[l];
+            for (i = Bstartrow; i < Bstoprow; i++)
+            {
+                for (j = 0; j < n; j++)
+                {
+                    fmpz_multi_mod_ui(residues, &Brows[i][j], comb, comb_temp);
+                    for (l = 0; l < num_primes; l++)
+                        mod_B[l]->rows[i][j] = residues[l];
+                }
+            }
         }
 
         flint_free(residues);
@@ -87,19 +94,26 @@ static void _mod_worker(void * varg)
     else
     {
         for (i = Astartrow; i < Astoprow; i++)
-        for (j = 0; j < k; j++)
         {
-            for (l = 0; l < num_primes; l++)
-                nmod_mat_entry(mod_A[l], i, j) = fmpz_get_nmod(&Arows[i][j],
-                                                                mod_A[l]->mod);
+            for (j = 0; j < k; j++)
+            {
+                for (l = 0; l < num_primes; l++)
+                    nmod_mat_entry(mod_A[l], i, j) = fmpz_get_nmod(&Arows[i][j],
+                                                                    mod_A[l]->mod);
+            }
         }
 
-        for (i = Bstartrow; i < Bstoprow; i++)
-        for (j = 0; j < n; j++)
+        if (mod_B != NULL)
         {
-            for (l = 0; l < num_primes; l++)
-                nmod_mat_entry(mod_B[l], i, j) = fmpz_get_nmod(&Brows[i][j],
-                                                                mod_A[l]->mod);
+            for (i = Bstartrow; i < Bstoprow; i++)
+            {
+                for (j = 0; j < n; j++)
+                {
+                    for (l = 0; l < num_primes; l++)
+                        nmod_mat_entry(mod_B[l], i, j) = fmpz_get_nmod(&Brows[i][j],
+                                                                        mod_A[l]->mod);
+                }
+            }
         }
     }
 }
@@ -302,6 +316,7 @@ void _fmpz_mat_mul_multi_mod(
     thread_pool_handle * handles;
     slong limit;
     ulong first_prime; /* not prime */
+    int squaring = (A == B);
 
     mainarg.m = m = A->r;
     mainarg.k = k = A->c;
@@ -346,12 +361,18 @@ void _fmpz_mat_mul_multi_mod(
     }
 
     mainarg.mod_A = FLINT_ARRAY_ALLOC(mainarg.num_primes, nmod_mat_t);
-    mainarg.mod_B = FLINT_ARRAY_ALLOC(mainarg.num_primes, nmod_mat_t);
+
+    if (squaring)
+        mainarg.mod_B = NULL;
+    else
+        mainarg.mod_B = FLINT_ARRAY_ALLOC(mainarg.num_primes, nmod_mat_t);
+
     mainarg.mod_C = FLINT_ARRAY_ALLOC(mainarg.num_primes, nmod_mat_t);
     for (i = 0; i < mainarg.num_primes; i++)
     {
         nmod_mat_init(mainarg.mod_A[i], A->r, A->c, mainarg.primes[i]);
-        nmod_mat_init(mainarg.mod_B[i], B->r, B->c, mainarg.primes[i]);
+        if (!squaring)
+            nmod_mat_init(mainarg.mod_B[i], B->r, B->c, mainarg.primes[i]);
         nmod_mat_init(mainarg.mod_C[i], C->r, C->c, mainarg.primes[i]);
     }
 
@@ -417,8 +438,7 @@ mod_single:
 
     /* mul */
     for (i = 0; i < mainarg.num_primes; i++)
-        nmod_mat_mul(mainarg.mod_C[i], mainarg.mod_A[i], mainarg.mod_B[i]);
-
+        nmod_mat_mul(mainarg.mod_C[i], mainarg.mod_A[i], squaring ? mainarg.mod_A[i] : mainarg.mod_B[i]);
 
     /* limit on the number of threads */
     limit = ((m + n)/64)*(1 + bits/1024);
@@ -470,12 +490,14 @@ crt_single:
     for (i = 0; i < mainarg.num_primes; i++)
     {
         nmod_mat_clear(mainarg.mod_A[i]);
-        nmod_mat_clear(mainarg.mod_B[i]);
+        if (!squaring)
+            nmod_mat_clear(mainarg.mod_B[i]);
         nmod_mat_clear(mainarg.mod_C[i]);
     }
 
     flint_free(mainarg.mod_A);
-    flint_free(mainarg.mod_B);
+    if (!squaring)
+        flint_free(mainarg.mod_B);
     flint_free(mainarg.mod_C);
     flint_free(mainarg.primes);
 }

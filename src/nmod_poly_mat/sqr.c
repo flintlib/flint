@@ -235,8 +235,7 @@ nmod_poly_mat_sqr_KS(nmod_poly_mat_t B, const nmod_poly_mat_t A)
             nmod_poly_bit_pack(fmpz_mat_entry(AA, i, j),
                                nmod_poly_mat_entry(A, i, j), bit_size);
 
-    /* Should use fmpz_mat_sqr */
-    fmpz_mat_mul(BB, AA, AA);
+    fmpz_mat_sqr(BB, AA);
 
     for (i = 0; i < n; i++)
         for (j = 0; j < n; j++)
