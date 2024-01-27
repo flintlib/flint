@@ -231,6 +231,8 @@ flint_mpn_sqr(mp_ptr r, mp_srcptr x, mp_size_t n)
 
 #if FLINT_HAVE_ADX
 # define FLINT_MPN_MULHIGH_N_FUNC_TAB_WIDTH 12
+# define FLINT_HAVE_MPN_MULHIGH_BASECASE 1
+mp_limb_t flint_mpn_mulhigh_basecase(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 #else
 # define FLINT_MPN_MULHIGH_N_FUNC_TAB_WIDTH 0
 #endif
