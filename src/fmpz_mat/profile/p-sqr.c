@@ -31,20 +31,22 @@ void sample(void * arg, ulong count)
     slong i, n = params->n, m = params->m ;
     slong bits = params->bits;
     int algorithm = params->algorithm;
-    fmpz_mat_t A, C;
+    fmpz_mat_t A, B, C;
     FLINT_TEST_INIT(state);
 
 
     fmpz_mat_init(A, m, n);
+    fmpz_mat_init(B, m, n);
     fmpz_mat_init(C, m, n);
 
     fmpz_mat_randbits(A, state, bits);
+    fmpz_mat_set(B, A);
 
     prof_start();
 
     if (algorithm == 0)
         for (i = 0; i < count; i++)
-            fmpz_mat_mul(C, A, A);
+            fmpz_mat_mul(C, A, B);
     else if (algorithm == 1)
         for (i = 0; i < count; i++)
             fmpz_mat_sqr(C, A);
@@ -53,6 +55,7 @@ void sample(void * arg, ulong count)
     prof_stop();
 
     fmpz_mat_clear(A);
+    fmpz_mat_clear(B);
     fmpz_mat_clear(C);
 
     flint_randclear(state);
@@ -64,13 +67,13 @@ int main(void)
     mat_mul_t params;
     slong bits, dim;
 
-    for (bits = 1; bits <=2000; bits = (slong) ((double) bits) + 100)
+    for (bits = 32; bits <= 65536; bits *= 2)
     {
         params.bits = bits;
 
         flint_printf("bits = %wd :\n", params.bits);
 
-        for (dim = 1; dim <= 312; dim = (slong) ((double) dim * 2.3) + 2)
+        for (dim = 1; dim <= 200; dim = FLINT_MAX(dim * 1.5, dim + 1))
         {
             params.n = dim;
             params.m = dim;
