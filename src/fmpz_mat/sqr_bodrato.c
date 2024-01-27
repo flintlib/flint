@@ -36,7 +36,7 @@ fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A)
         const fmpz d = *E(A, 1, 1);
 
         if (!COEFF_IS_MPZ(a) && !COEFF_IS_MPZ(b) &&
-            !COEFF_IS_MPZ(a) && !COEFF_IS_MPZ(b))
+            !COEFF_IS_MPZ(c) && !COEFF_IS_MPZ(d))
         {
             mp_limb_t s, t, u, v;
 
