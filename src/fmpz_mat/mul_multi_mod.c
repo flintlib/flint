@@ -66,21 +66,25 @@ static void _mod_worker(void * varg)
         fmpz_comb_temp_init(comb_temp, comb);
 
         for (i = Astartrow; i < Astoprow; i++)
-        for (j = 0; j < k; j++)
         {
-            fmpz_multi_mod_ui(residues, &Arows[i][j], comb, comb_temp);
-            for (l = 0; l < num_primes; l++)
-                mod_A[l]->rows[i][j] = residues[l];
+            for (j = 0; j < k; j++)
+            {
+                fmpz_multi_mod_ui(residues, &Arows[i][j], comb, comb_temp);
+                for (l = 0; l < num_primes; l++)
+                    mod_A[l]->rows[i][j] = residues[l];
+            }
         }
 
         if (mod_B != NULL)
         {
             for (i = Bstartrow; i < Bstoprow; i++)
-            for (j = 0; j < n; j++)
             {
-                fmpz_multi_mod_ui(residues, &Brows[i][j], comb, comb_temp);
-                for (l = 0; l < num_primes; l++)
-                    mod_B[l]->rows[i][j] = residues[l];
+                for (j = 0; j < n; j++)
+                {
+                    fmpz_multi_mod_ui(residues, &Brows[i][j], comb, comb_temp);
+                    for (l = 0; l < num_primes; l++)
+                        mod_B[l]->rows[i][j] = residues[l];
+                }
             }
         }
 
@@ -90,21 +94,25 @@ static void _mod_worker(void * varg)
     else
     {
         for (i = Astartrow; i < Astoprow; i++)
-        for (j = 0; j < k; j++)
         {
-            for (l = 0; l < num_primes; l++)
-                nmod_mat_entry(mod_A[l], i, j) = fmpz_get_nmod(&Arows[i][j],
-                                                                mod_A[l]->mod);
+            for (j = 0; j < k; j++)
+            {
+                for (l = 0; l < num_primes; l++)
+                    nmod_mat_entry(mod_A[l], i, j) = fmpz_get_nmod(&Arows[i][j],
+                                                                    mod_A[l]->mod);
+            }
         }
 
         if (mod_B != NULL)
         {
             for (i = Bstartrow; i < Bstoprow; i++)
-            for (j = 0; j < n; j++)
             {
-                for (l = 0; l < num_primes; l++)
-                    nmod_mat_entry(mod_B[l], i, j) = fmpz_get_nmod(&Brows[i][j],
-                                                                    mod_A[l]->mod);
+                for (j = 0; j < n; j++)
+                {
+                    for (l = 0; l < num_primes; l++)
+                        nmod_mat_entry(mod_B[l], i, j) = fmpz_get_nmod(&Brows[i][j],
+                                                                        mod_A[l]->mod);
+                }
             }
         }
     }
