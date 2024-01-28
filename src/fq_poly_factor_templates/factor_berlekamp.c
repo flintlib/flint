@@ -148,7 +148,7 @@ __TEMPLATE(T, poly_factor_berlekamp) (TEMPLATE(T, poly_factor_t) factors,
     TEMPLATE(T, poly_clear) (x_qi2, ctx);
 
     /* Row reduce Q - I */
-    nullity = n - TEMPLATE(T, mat_rref) (matrix, ctx);
+    nullity = n - TEMPLATE(T, mat_rref) (matrix, matrix, ctx);
 
     /* Find a basis for the nullspace */
     basis = flint_malloc(nullity * sizeof(TEMPLATE(T, poly_t)));

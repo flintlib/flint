@@ -30,7 +30,7 @@ TEMPLATE(T, mat_nullspace) (TEMPLATE(T, mat_t) X, const TEMPLATE(T, mat_t) A,
     p = flint_malloc(sizeof(slong) * FLINT_MAX(m, n));
 
     TEMPLATE(T, mat_init_set) (tmp, A, ctx);
-    rank = TEMPLATE(T, mat_rref) (tmp, ctx);
+    rank = TEMPLATE(T, mat_rref) (tmp, tmp, ctx);
     nullity = n - rank;
 
     TEMPLATE(T, mat_zero) (X, ctx);

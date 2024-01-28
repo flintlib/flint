@@ -343,9 +343,9 @@ Reduced row echelon form
 --------------------------------------------------------------------------------
 
 
-.. function:: slong fq_zech_mat_rref(fq_zech_mat_t A, const fq_zech_ctx_t ctx)
+.. function:: slong fq_zech_mat_rref(fq_zech_mat_t B, const fq_zech_mat_t A, const fq_zech_ctx_t ctx)
 
-    Puts `A` in reduced row echelon form and returns the rank of `A`.
+    Puts `B` in reduced row echelon form and returns the rank of `A`.
 
     The rref is computed by first obtaining an unreduced row echelon
     form via LU decomposition and then solving an additional

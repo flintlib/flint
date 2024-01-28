@@ -1134,28 +1134,29 @@ FQ_DEFAULT_MAT_INLINE int fq_default_mat_inv(fq_default_mat_t B,
 
 /* Solving *******************************************************************/
 
-FQ_DEFAULT_MAT_INLINE slong fq_default_mat_rref(fq_default_mat_t A,
+FQ_DEFAULT_MAT_INLINE slong fq_default_mat_rref(fq_default_mat_t B, const fq_default_mat_t A,
                                                     const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        return fq_zech_mat_rref(A->fq_zech, ctx->ctx.fq_zech);
+        return fq_zech_mat_rref(B->fq_zech, A->fq_zech, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        return fq_nmod_mat_rref(A->fq_nmod, ctx->ctx.fq_nmod);
+        return fq_nmod_mat_rref(B->fq_nmod, A->fq_nmod, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
-        return nmod_mat_rref(A->nmod);
+        nmod_mat_set(B->nmod, A->nmod);
+        return nmod_mat_rref(B->nmod);
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        return fmpz_mod_mat_rref(A->fmpz_mod, A->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        return fmpz_mod_mat_rref(B->fmpz_mod, A->fmpz_mod, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
-        return fq_mat_rref(A->fq, ctx->ctx.fq);
+        return fq_mat_rref(B->fq, A->fq, ctx->ctx.fq);
     }
 }
 
