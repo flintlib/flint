@@ -41,7 +41,7 @@ TEST_FUNCTION_START(fmpz_mod_mat_inv, state)
         fmpz_mod_mat_randrank(A, state, m, ctx);
         /* Dense or sparse? */
         if (n_randint(state, 2))
-            fmpz_mod_mat_randops(A, 1+n_randint(state, 1+m*m), state, ctx);
+            fmpz_mod_mat_randops(A, state, 1+n_randint(state, 1+m*m), ctx);
 
         result = fmpz_mod_mat_inv(B, A, ctx);
         fmpz_mod_mat_mul(C, A, B, ctx);
@@ -75,7 +75,7 @@ TEST_FUNCTION_START(fmpz_mod_mat_inv, state)
 
         /* Dense */
         if (n_randint(state, 2))
-            fmpz_mod_mat_randops(A, 1+n_randint(state, 1+m*m), state, ctx);
+            fmpz_mod_mat_randops(A, state, 1+n_randint(state, 1+m*m), ctx);
 
         FLINT_TEST(!fmpz_mod_mat_inv(B, A, ctx));
         FLINT_TEST(!fmpz_mod_mat_inv(A, A, ctx));

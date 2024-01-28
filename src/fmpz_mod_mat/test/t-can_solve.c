@@ -43,7 +43,7 @@ TEST_FUNCTION_START(fmpz_mod_mat_can_solve, state)
 
         /* Dense */
         if (n_randint(state, 2))
-            fmpz_mod_mat_randops(A, 1+n_randint(state, 1+m*m), state, ctx);
+            fmpz_mod_mat_randops(A, state, 1+n_randint(state, 1+m*m), ctx);
 
         solved = fmpz_mod_mat_can_solve(X, A, B, ctx);
         fmpz_mod_mat_mul(AX, A, X, ctx);

@@ -38,7 +38,7 @@ TEST_FUNCTION_START(nmod_mat_nullspace, state)
             nmod_mat_randrank(A, state, r);
             /* Densify */
             if (n_randlimb(state) % 2)
-                nmod_mat_randops(A, d, state);
+                nmod_mat_randops(A, state, d);
 
             nullity = nmod_mat_nullspace(ker, A);
             nulrank = nmod_mat_rank(ker);

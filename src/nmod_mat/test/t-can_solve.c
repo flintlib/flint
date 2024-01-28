@@ -39,7 +39,7 @@ TEST_FUNCTION_START(nmod_mat_can_solve, state)
 
         /* Dense */
         if (n_randint(state, 2))
-            nmod_mat_randops(A, 1+n_randint(state, 1+m*m), state);
+            nmod_mat_randops(A, state, 1+n_randint(state, 1+m*m));
 
         solved = nmod_mat_can_solve(X, A, B);
 

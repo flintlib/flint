@@ -38,7 +38,7 @@ TEST_FUNCTION_START(nmod_mat_inv, state)
         nmod_mat_randrank(A, state, m);
         /* Dense or sparse? */
         if (n_randint(state, 2))
-            nmod_mat_randops(A, 1+n_randint(state, 1+m*m), state);
+            nmod_mat_randops(A, state, 1+n_randint(state, 1+m*m));
 
         result = nmod_mat_inv(B, A);
         nmod_mat_mul(C, A, B);
@@ -82,7 +82,7 @@ TEST_FUNCTION_START(nmod_mat_inv, state)
 
         /* Dense */
         if (n_randint(state, 2))
-            nmod_mat_randops(A, 1+n_randint(state, 1+m*m), state);
+            nmod_mat_randops(A, state, 1+n_randint(state, 1+m*m));
 
         result = nmod_mat_inv(B, A);
 

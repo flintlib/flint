@@ -863,27 +863,27 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_randrank(fq_default_mat_t mat,
 
 FQ_DEFAULT_MAT_INLINE
 void fq_default_mat_randops(fq_default_mat_t mat,
-                   slong count, flint_rand_t state, const fq_default_ctx_t ctx)
+                   flint_rand_t state, slong count, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_mat_randops(mat->fq_zech, count, state, ctx->ctx.fq_zech);
+        fq_zech_mat_randops(mat->fq_zech, state, count, ctx->ctx.fq_zech);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_mat_randops(mat->fq_nmod, count, state, ctx->ctx.fq_nmod);
+        fq_nmod_mat_randops(mat->fq_nmod, state, count, ctx->ctx.fq_nmod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
-        nmod_mat_randops(mat->nmod, count, state);
+        nmod_mat_randops(mat->nmod, state, count);
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_mat_randops(mat->fmpz_mod, count, state, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_mat_randops(mat->fmpz_mod, state, count, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
-        fq_mat_randops(mat->fq, count, state, ctx->ctx.fq);
+        fq_mat_randops(mat->fq, state, count, ctx->ctx.fq);
     }
 }
 

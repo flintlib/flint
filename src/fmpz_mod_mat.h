@@ -106,7 +106,7 @@ void fmpz_mod_mat_randtril(fmpz_mod_mat_t mat, flint_rand_t state, int unit, con
 void fmpz_mod_mat_randtriu(fmpz_mod_mat_t mat, flint_rand_t state, int unit, const fmpz_mod_ctx_t ctx);
 
 FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_randops(fmpz_mod_mat_t mat, slong count, flint_rand_t state, const fmpz_mod_ctx_t ctx)
+void fmpz_mod_mat_randops(fmpz_mod_mat_t mat, flint_rand_t state, slong count, const fmpz_mod_ctx_t ctx)
 {
     fmpz_mat_randops(mat, state, count);
     _fmpz_mod_mat_reduce(mat, ctx);

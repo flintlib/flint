@@ -51,7 +51,7 @@ TEST_FUNCTION_START(fmpz_mod_mat_rank, state)
             d = n_randint(state, 2 * m * n + 1);
             fmpz_mod_mat_init(A, m, n, ctx);
             fmpz_mod_mat_randrank(A, state, r, ctx);
-            fmpz_mod_mat_randops(A, d, state, ctx);
+            fmpz_mod_mat_randops(A, state, d, ctx);
             FLINT_TEST(r == fmpz_mod_mat_rank(A, ctx));
             fmpz_mod_mat_clear(A, ctx);
         }

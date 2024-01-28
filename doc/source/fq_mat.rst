@@ -204,7 +204,7 @@ Random matrix generation
     The matrix can be transformed into a dense matrix with unchanged
     rank by subsequently calling :func:`fq_mat_randops`.
 
-.. function:: void fq_mat_randops(fq_mat_t mat, slong count, flint_rand_t state, const fq_ctx_t ctx)
+.. function:: void fq_mat_randops(fq_mat_t mat, flint_rand_t state, slong count, const fq_ctx_t ctx)
 
     Randomises ``mat`` by performing elementary row or column
     operations. More precisely, at most ``count`` random additions

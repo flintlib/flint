@@ -100,7 +100,7 @@ TEST_FUNCTION_START(fmpz_mod_mat_lu, state)
             if (n_randint(state, 2))
             {
                 d = n_randint(state, 2 * m * n + 1);
-                fmpz_mod_mat_randops(A, d, state, ctx);
+                fmpz_mod_mat_randops(A, state, d, ctx);
             }
 
             fmpz_mod_mat_init_set(LU, A, ctx);

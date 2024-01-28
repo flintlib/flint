@@ -37,13 +37,13 @@ TEST_FUNCTION_START(nmod_mat_det, state)
         {
             case 0:
                 nmod_mat_randrank(A, state, m);
-                nmod_mat_randops(A, n_randint(state, 2*m + 1), state);
+                nmod_mat_randops(A, state, n_randint(state, 2*m + 1));
                 break;
             case 1:
                 t = n_randint(state, m);
                 t = FLINT_MIN(t, m);
                 nmod_mat_randrank(A, state, t);
-                nmod_mat_randops(A, n_randint(state, 2*m + 1), state);
+                nmod_mat_randops(A, state, n_randint(state, 2*m + 1));
                 break;
             default:
                 nmod_mat_randtest(A, state);

@@ -40,7 +40,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_inv, state)
         TEMPLATE(T, mat_randrank)(A, state, m, ctx);
         /* Dense or sparse? */
         if (n_randint(state, 2))
-            TEMPLATE(T, mat_randops)(A, 1+n_randint(state, 1+m*m), state, ctx);
+            TEMPLATE(T, mat_randops)(A, state, 1+n_randint(state, 1+m*m), ctx);
 
         result = TEMPLATE(T, mat_inv)(B, A, ctx);
         TEMPLATE(T, mat_mul)(C, A, B, ctx);
@@ -96,7 +96,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_inv, state)
 
         /* Dense */
         if (n_randint(state, 2))
-            TEMPLATE(T, mat_randops)(A, 1+n_randint(state, 1+m*m), state, ctx);
+            TEMPLATE(T, mat_randops)(A, state, 1+n_randint(state, 1+m*m), ctx);
 
         result = TEMPLATE(T, mat_inv)(B, A, ctx);
 

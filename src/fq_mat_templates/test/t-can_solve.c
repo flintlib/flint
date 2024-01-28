@@ -43,7 +43,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_can_solve, state)
 
         /* Dense */
         if (n_randint(state, 2))
-            TEMPLATE(T, mat_randops)(A, 1+n_randint(state, 1+m*m), state, ctx);
+            TEMPLATE(T, mat_randops)(A, state, 1+n_randint(state, 1+m*m), ctx);
 
         solved = TEMPLATE(T, mat_can_solve)(X, A, B, ctx);
 

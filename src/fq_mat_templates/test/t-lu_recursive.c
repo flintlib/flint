@@ -131,7 +131,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_lu_recursive, state)
             if (n_randint(state, 2))
             {
                 d = n_randint(state, 2 * m * n + 1);
-                TEMPLATE(T, mat_randops) (A, d, state, ctx);
+                TEMPLATE(T, mat_randops) (A, state, d, ctx);
             }
 
             TEMPLATE(T, mat_init_set) (LU, A, ctx);

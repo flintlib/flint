@@ -41,7 +41,7 @@ TEST_FUNCTION_START(fmpz_mod_mat_nullspace, state)
             fmpz_mod_mat_randrank(A, state, r, ctx);
             /* Densify */
             if (n_randlimb(state) % 2)
-                fmpz_mod_mat_randops(A, d, state, ctx);
+                fmpz_mod_mat_randops(A, state, d, ctx);
 
             nullity = fmpz_mod_mat_nullspace(ker, A, ctx);
             nulrank = fmpz_mod_mat_rank(ker, ctx);

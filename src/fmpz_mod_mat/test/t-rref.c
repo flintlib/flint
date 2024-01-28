@@ -110,7 +110,7 @@ TEST_FUNCTION_START(fmpz_mod_mat_rref, state)
 
             fmpz_mod_mat_init(A, m, n, ctx);
             fmpz_mod_mat_randrank(A, state, r, ctx);
-            fmpz_mod_mat_randops(A, d, state, ctx);
+            fmpz_mod_mat_randops(A, state, d, ctx);
 
             rank = fmpz_mod_mat_rref(perm, A, ctx);
 

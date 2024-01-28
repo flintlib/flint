@@ -57,7 +57,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_rank, state)
             d = n_randint(state, 2 * m * n + 1);
             TEMPLATE(T, mat_init) (A, m, n, ctx);
             TEMPLATE(T, mat_randrank) (A, state, r, ctx);
-            TEMPLATE(T, mat_randops) (A, d, state, ctx);
+            TEMPLATE(T, mat_randops) (A, state, d, ctx);
             if (r != TEMPLATE(T, mat_rank) (A, ctx))
             {
                 flint_printf("FAIL:\n");
