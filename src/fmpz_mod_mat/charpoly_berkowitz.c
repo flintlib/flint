@@ -15,90 +15,15 @@
 #include "fmpz_mod_vec.h"
 #include "fmpz_mod_mat.h"
 #include "fmpz_mod_poly.h"
+#include "gr.h"
+#include "gr_mat.h"
 
 void _fmpz_mod_mat_charpoly_berkowitz(fmpz* cp, const fmpz_mod_mat_t mat,
                                                       const fmpz_mod_ctx_t ctx)
 {
-    const slong n = fmpz_mod_mat_nrows(mat);
-
-    if (fmpz_is_one(fmpz_mod_ctx_modulus(ctx)))
-    {
-        _fmpz_vec_zero(cp, n + 1);
-    }
-    else if (n == 0)
-    {
-        fmpz_one(cp + 0);
-    }
-    else if (n == 1)
-    {
-        fmpz_mod_neg(cp + 0, fmpz_mod_mat_entry(mat, 0, 0), ctx);
-        fmpz_one(cp + 1);
-    }
-    else if (n == 2)
-    {
-        fmpz_fmms(cp + 0, fmpz_mod_mat_entry(mat, 0, 0), fmpz_mod_mat_entry(mat, 1, 1),
-                          fmpz_mod_mat_entry(mat, 0, 1), fmpz_mod_mat_entry(mat, 1, 0));
-        fmpz_mod_set_fmpz(cp + 0, cp + 0, ctx);
-
-        fmpz_mod_add(cp + 1, fmpz_mod_mat_entry(mat, 0, 0),
-                             fmpz_mod_mat_entry(mat, 1, 1), ctx);
-        fmpz_mod_neg(cp + 1, cp + 1, ctx);
-
-        fmpz_one(cp + 2);
-    }
-    else
-    {
-        slong i, k, t;
-        fmpz* a, * A;
-        fmpz_t tmp;
-
-        fmpz_init(tmp);
-        a = _fmpz_vec_init(n*n);
-        A = a + (n - 1) * n;
-
-        _fmpz_vec_zero(cp, n + 1);
-        fmpz_mod_neg(cp + 0, fmpz_mod_mat_entry(mat, 0, 0), ctx);
-
-        for (t = 1; t < n; t++)
-        {
-            for (i = 0; i <= t; i++)
-            {
-                fmpz_set(a + 0 * n + i, fmpz_mod_mat_entry(mat, i, t));
-            }
-
-            fmpz_set(A + 0, fmpz_mod_mat_entry(mat, t, t));
-
-            for (k = 1; k < t; k++)
-            {
-                for (i = 0; i <= t; i++)
-                {
-                    _fmpz_mod_vec_dot(a + k * n + i, mat->mat->rows[i],
-                                                  a + (k - 1) * n, t + 1, ctx);
-                }
-
-                fmpz_set(A + k, a + k * n + t);
-            }
-
-            _fmpz_mod_vec_dot(A + t, mat->mat->rows[t], a + (t - 1) * n, t + 1, ctx);
-
-            for (k = 0; k <= t; k++)
-            {
-                _fmpz_mod_vec_dot_rev(tmp, A, cp, k, ctx);
-                fmpz_mod_sub(cp + k, cp + k, tmp, ctx);
-                fmpz_mod_sub(cp + k, cp + k, A + k, ctx);
-            }
-        }
-
-        /* Shift all coefficients up by one */
-        for (i = n; i > 0; i--)
-            fmpz_swap(cp + i, cp + i - 1);
-
-        fmpz_one(cp + 0);
-        _fmpz_mod_poly_reverse(cp, cp, n + 1, n + 1);
-
-        _fmpz_vec_clear(a, n*n);
-        fmpz_clear(tmp);
-    }
+    gr_ctx_t gr_ctx;
+    _gr_ctx_init_fmpz_mod_from_ref(gr_ctx, ctx);
+    GR_MUST_SUCCEED(_gr_mat_charpoly_berkowitz(cp, (const gr_mat_struct *) mat, gr_ctx));
 }
 
 void fmpz_mod_mat_charpoly_berkowitz(fmpz_mod_poly_t cp,

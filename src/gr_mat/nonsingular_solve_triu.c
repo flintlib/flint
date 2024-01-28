@@ -18,7 +18,8 @@ gr_mat_nonsingular_solve_triu_classical(gr_mat_t X,
         const gr_mat_t U, const gr_mat_t B, int unit, gr_ctx_t ctx)
 {
     slong i, j, n, m;
-    gr_ptr tmp, inv;
+    gr_ptr tmp;
+    gr_ptr inv = NULL;  /* silence compiler warning */
     gr_ptr s;
     int use_division = 0;
     int status = GR_SUCCESS;
@@ -27,12 +28,6 @@ gr_mat_nonsingular_solve_triu_classical(gr_mat_t X,
 
     n = U->r;
     m = B->c;
-
-    /* silence compiler warning. for whatever reason gcc
-       complains that inv may be uninitialized in this function
-       though exactly the same code in solve_tril generates
-       no warning. */
-    inv = NULL;
 
     if (!unit)
     {

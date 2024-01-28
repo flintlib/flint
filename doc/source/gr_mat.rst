@@ -288,7 +288,8 @@ Gaussian elimination
     zero but can be certified zero may be overwritten by exact zeros.
 
 .. function:: int gr_mat_lu_classical(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, gr_ctx_t ctx)
-              int gr_mat_lu_recursive(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, gr_ctx_t ctx)
+              int gr_mat_lu_recursive(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, slong cutoff, gr_ctx_t ctx)
+              int gr_mat_lu_generic(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, gr_ctx_t ctx)
               int gr_mat_lu(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, gr_ctx_t ctx)
 
     Computes a generalized LU decomposition `A = PLU` of a given
@@ -321,6 +322,10 @@ Gaussian elimination
     The *classical* version uses iterative Gaussian elimination.
     The *recursive* version uses a block recursive algorithm
     to take advantage of fast matrix multiplication.
+    The *cutoff* for switching to the classical algorithm is given
+    as an explicit input.
+    The *generic* version calls the recursive algorithm with a
+    default cutoff.
 
 .. function:: int gr_mat_fflu(slong * rank, slong * P, gr_mat_t LU, gr_ptr den, const gr_mat_t A, int rank_check, gr_ctx_t ctx)
 
