@@ -344,7 +344,7 @@ general_case:
 
         */
 
-        fmpz_mod_mat_rref(NULL, ML + s, ctx->ffinfo);
+        fmpz_mod_mat_rref(ML + s, ML + s, ctx->ffinfo);
 
         for (i = 0; i < n; i++)
             if (!fmpz_is_one(fmpz_mod_mat_entry(ML + s, i, i)))

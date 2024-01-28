@@ -19,6 +19,7 @@
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 #include "fmpz_mod_poly_factor.h"
+#include "fmpz_mod_mat.h"
 
 static void
 fmpz_mod_poly_to_fmpz_mat_col(fmpz_mat_t mat, slong col, fmpz_mod_poly_t poly)
@@ -69,7 +70,7 @@ __fmpz_mod_poly_factor_berlekamp(fmpz_mod_poly_factor_t factors,
     fmpz_mat_t matrix;
     fmpz_t coeff, q, mul, pow;
     slong i, nullity, col, row;
-    slong *shift, *perm;
+    slong *shift;
     fmpz_mod_poly_t *basis;
 
     if (f->length <= 2)
@@ -132,9 +133,7 @@ __fmpz_mod_poly_factor_berlekamp(fmpz_mod_poly_factor_t factors,
     fmpz_mod_poly_clear(x_pi2, ctx);
 
     /* Row reduce Q - I */
-    perm = _perm_init(n);
-    nullity = n - fmpz_mat_rref_mod(perm, matrix, p);
-    _perm_clear(perm);
+    nullity = n - fmpz_mod_mat_rref(matrix, matrix, ctx);
 
     /* Find a basis for the nullspace */
     basis =

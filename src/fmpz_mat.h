@@ -276,10 +276,6 @@ slong fmpz_mat_rref_mul(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A);
 int fmpz_mat_is_in_rref_with_rank(const fmpz_mat_t A, const fmpz_t den,
         slong rank);
 
-/* Modular gaussian elimination *********************************************/
-
-slong fmpz_mat_rref_mod(slong * perm, fmpz_mat_t A, const fmpz_t p);
-
 /* Modular Howell and strong echelon form ***********************************/
 
 slong fmpz_mat_howell_form_mod(fmpz_mat_t A, const fmpz_t mod);

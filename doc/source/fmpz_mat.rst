@@ -1147,21 +1147,6 @@ Row reduction
     ``rank``, returns 1 if so and 0 otherwise.
 
 
-Modular gaussian elimination
---------------------------------------------------------------------------------
-
-
-.. function:: slong fmpz_mat_rref_mod(slong * perm, fmpz_mat_t A, const fmpz_t p)
-
-    Uses fraction-free Gauss-Jordan elimination to set ``A``
-    to its reduced row echelon form and returns the rank of ``A``.
-    All computations are done modulo p.
-
-    Pivot elements are chosen with ``fmpz_mat_find_pivot_any``.
-    If ``perm`` is non-``NULL``, the permutation of
-    rows in the matrix will also be applied to ``perm``.
-
-
 Strong echelon form and Howell form
 --------------------------------------------------------------------------------
 

@@ -262,13 +262,10 @@ Gaussian elimination
 --------------------------------------------------------------------------------
 
 
-.. function:: slong fmpz_mod_mat_rref(slong * perm, fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx)
+.. function:: slong fmpz_mod_mat_rref(fmpz_mod_mat_t res, const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx)
 
-    Uses Gauss-Jordan elimination to set ``mat`` to its reduced row echelon
-    form and returns the rank of ``mat``.
-
-    If ``perm`` is non-``NULL``, the permutation of
-    rows in the matrix will also be applied to ``perm``.
+    Sets ``res`` to the reduced row echelon form of ``mat``
+    and returns the rank.
 
     The modulus is assumed to be prime.
 

@@ -86,7 +86,6 @@
 #include "t-rank.c"
 #include "t-rref.c"
 #include "t-rref_fflu.c"
-#include "t-rref_mod.c"
 #include "t-rref_mul.c"
 #include "t-scalar_addmul_fmpz.c"
 #include "t-scalar_addmul_nmod_mat_fmpz.c"
@@ -186,7 +185,6 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mat_rank),
     TEST_FUNCTION(fmpz_mat_rref),
     TEST_FUNCTION(fmpz_mat_rref_fflu),
-    TEST_FUNCTION(fmpz_mat_rref_mod),
     TEST_FUNCTION(fmpz_mat_rref_mul),
     TEST_FUNCTION(fmpz_mat_scalar_addmul_fmpz),
     TEST_FUNCTION(fmpz_mat_scalar_addmul_nmod_mat_fmpz),

@@ -1151,7 +1151,7 @@ FQ_DEFAULT_MAT_INLINE slong fq_default_mat_rref(fq_default_mat_t A,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        return fmpz_mod_mat_rref(NULL, A->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        return fmpz_mod_mat_rref(A->fmpz_mod, A->fmpz_mod, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
