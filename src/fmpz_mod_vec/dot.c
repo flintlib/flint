@@ -12,30 +12,19 @@
 
 #include "fmpz.h"
 #include "fmpz_mod.h"
+#include "fmpz_vec.h"
 #include "fmpz_mod_vec.h"
 
-void _fmpz_mod_vec_dot(
-    fmpz_t d,
-    const fmpz * a,
-    const fmpz * b,
-    slong len,
-    const fmpz_mod_ctx_t ctx)
+void _fmpz_mod_vec_dot(fmpz_t d, const fmpz * a,
+                   const fmpz * b, slong len, const fmpz_mod_ctx_t ctx)
 {
-    fmpz_zero(d);
-    for (len--; len >= 0; len--)
-        fmpz_addmul(d, a + len, b + len);
+    _fmpz_vec_dot(d, a, b, len);
     fmpz_mod_set_fmpz(d, d, ctx);
 }
 
 void _fmpz_mod_vec_dot_rev(fmpz_t r, const fmpz * a,
 		           const fmpz * b, slong len, const fmpz_mod_ctx_t ctx)
 {
-    slong i;
-
-    fmpz_zero(r);
-
-    for (i = 0; i < len; i++)
-        fmpz_addmul(r, a + i, b + len - i - 1);
-
+    _fmpz_vec_dot_general(r, NULL, 0, a, b, 1, len);
     fmpz_mod_set_fmpz(r, r, ctx);
 }
