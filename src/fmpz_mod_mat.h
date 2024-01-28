@@ -91,9 +91,24 @@ int fmpz_mod_mat_is_square(const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx)
 void fmpz_mod_mat_swap(fmpz_mod_mat_t mat1, fmpz_mod_mat_t mat2, const fmpz_mod_ctx_t ctx);
 void fmpz_mod_mat_swap_entrywise(fmpz_mod_mat_t mat1, fmpz_mod_mat_t mat2, const fmpz_mod_ctx_t ctx);
 
-void _fmpz_mod_mat_reduce(fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx);
-
 void fmpz_mod_mat_set(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, const fmpz_mod_ctx_t ctx);
+
+/* Conversions */
+
+FMPZ_MOD_MAT_INLINE
+void fmpz_mod_mat_set_nmod_mat(fmpz_mod_mat_t A, const nmod_mat_t B, const fmpz_mod_ctx_t ctx)
+{
+    fmpz_mat_set_nmod_mat_unsigned(A, B);
+}
+
+void fmpz_mod_mat_set_fmpz_mat(fmpz_mod_mat_t A, const fmpz_mat_t B, const fmpz_mod_ctx_t ctx);
+
+void fmpz_mod_mat_get_fmpz_mat(fmpz_mat_t A, const fmpz_mod_mat_t B, const fmpz_mod_ctx_t ctx);
+
+FMPZ_MOD_MAT_INLINE void _fmpz_mod_mat_reduce(fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx)
+{
+    fmpz_mod_mat_set_fmpz_mat(mat, mat, ctx);
+}
 
 /* Random matrix generation */
 
@@ -157,18 +172,6 @@ void fmpz_mod_mat_transpose(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, const fmpz
 {
     fmpz_mat_transpose(B, A);
 }
-
-/* Conversions */
-
-FMPZ_MOD_MAT_INLINE
-void fmpz_mod_mat_set_nmod_mat(fmpz_mod_mat_t A, const nmod_mat_t B, const fmpz_mod_ctx_t ctx)
-{
-    fmpz_mat_set_nmod_mat_unsigned(A, B);
-}
-
-void fmpz_mod_mat_set_fmpz_mat(fmpz_mod_mat_t A, const fmpz_mat_t B, const fmpz_mod_ctx_t ctx);
-
-void fmpz_mod_mat_get_fmpz_mat(fmpz_mat_t A, const fmpz_mod_mat_t B, const fmpz_mod_ctx_t ctx);
 
 /* Addition and subtraction */
 
