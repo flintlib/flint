@@ -14,13 +14,10 @@
 #include "fmpz_mod.h"
 #include "fmpz_mod_mat.h"
 
-void fmpz_mod_mat_similarity(fmpz_mod_mat_t A, slong r, fmpz_t d)
+void fmpz_mod_mat_similarity(fmpz_mod_mat_t A, slong r, fmpz_t d, const fmpz_mod_ctx_t ctx)
 {
-    slong n = A->mat->r, i, j;
+    slong n = A->r, i, j;
     fmpz_t t;
-    fmpz_mod_ctx_t ctx;
-
-    fmpz_mod_ctx_init(ctx, A->mod);
 
     fmpz_init(t);
 
@@ -55,6 +52,4 @@ void fmpz_mod_mat_similarity(fmpz_mod_mat_t A, slong r, fmpz_t d)
     }
 
     fmpz_clear(t);
-
-    fmpz_mod_ctx_clear(ctx);
 }

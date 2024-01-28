@@ -13,24 +13,24 @@
 
 #include "fmpz_mod_mat.h"
 
-slong fmpz_mod_mat_rank(const fmpz_mod_mat_t A)
+slong fmpz_mod_mat_rank(const fmpz_mod_mat_t A, const fmpz_mod_ctx_t ctx)
 {
     slong m, n, rank;
     slong *perm;
     fmpz_mod_mat_t tmp;
 
-    m = A->mat->r;
-    n = A->mat->c;
+    m = A->r;
+    n = A->c;
 
     if (m == 0 || n == 0)
         return 0;
 
-    fmpz_mod_mat_init_set(tmp, A);
+    fmpz_mod_mat_init_set(tmp, A, ctx);
     perm = flint_malloc(sizeof(slong) * m);
 
-    rank = fmpz_mod_mat_lu(perm, tmp, 0);
+    rank = fmpz_mod_mat_lu(perm, tmp, 0, ctx);
 
     flint_free(perm);
-    fmpz_mod_mat_clear(tmp);
+    fmpz_mod_mat_clear(tmp, ctx);
     return rank;
 }

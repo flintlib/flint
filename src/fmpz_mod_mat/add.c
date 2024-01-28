@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2017 Luca De Feo
+    Copyright (C) 2024 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -9,10 +10,16 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mod_vec.h"
 #include "fmpz_mod_mat.h"
 
-void fmpz_mod_mat_add(fmpz_mod_mat_t C, const fmpz_mod_mat_t A, const fmpz_mod_mat_t B)
+void fmpz_mod_mat_add(fmpz_mod_mat_t C, const fmpz_mod_mat_t A, const fmpz_mod_mat_t B, const fmpz_mod_ctx_t ctx)
 {
-    fmpz_mat_add(C->mat, A->mat, B->mat);
-    _fmpz_mod_mat_reduce(C);
+    slong i;
+    slong r = fmpz_mod_mat_nrows(A, ctx);
+    slong c = fmpz_mod_mat_ncols(A, ctx);
+
+    if (c != 0)
+        for (i = 0; i < r; i++)
+            _fmpz_mod_vec_add(C->rows[i], A->rows[i], B->rows[i], c, ctx);
 }

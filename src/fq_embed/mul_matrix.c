@@ -50,7 +50,7 @@ void fq_embed_mul_matrix(fmpz_mod_mat_t matrix,
         }
     }
 
-    _fmpz_mod_mat_reduce(matrix);
+    _fmpz_mod_mat_reduce(matrix, ctx->ctxp);
 
     fmpz_clear(lead);
 }

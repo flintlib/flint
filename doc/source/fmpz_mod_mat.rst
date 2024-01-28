@@ -296,7 +296,7 @@ Inverse
 --------------------------------------------------------------------------------
 
 
-.. function:: int fmpz_mod_mat_inv(fmpz_mod_mat_t B, fmpz_mod_mat_t A)
+.. function:: int fmpz_mod_mat_inv(fmpz_mod_mat_t B, const fmpz_mod_mat_t A)
 
     Sets `B = A^{-1}` and returns `1` if `A` is invertible. If `A` is singular,
     returns `0` and sets the elements of `B` to undefined values.

@@ -13,8 +13,7 @@
 #include "fmpz_mod_mat.h"
 
 void fmpz_mod_mat_window_init(fmpz_mod_mat_t window, const fmpz_mod_mat_t mat,
-                              slong r1, slong c1, slong r2, slong c2)
+                              slong r1, slong c1, slong r2, slong c2, const fmpz_mod_ctx_t ctx)
 {
-    fmpz_mat_window_init(window->mat, mat->mat, r1, c1, r2, c2);
-    fmpz_init_set(window->mod, mat->mod);
+    fmpz_mat_window_init(window, mat, r1, c1, r2, c2);
 }

@@ -11,8 +11,8 @@
 
 #include "fmpz_mod_mat.h"
 
-void fmpz_mod_mat_sqr(fmpz_mod_mat_t B, const fmpz_mod_mat_t A)
+void fmpz_mod_mat_sqr(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, const fmpz_mod_ctx_t ctx)
 {
-    fmpz_mat_sqr(B->mat, A->mat);
-    _fmpz_mod_mat_reduce(B);
+    fmpz_mat_sqr(B, A);
+    _fmpz_mod_mat_reduce(B, ctx);
 }

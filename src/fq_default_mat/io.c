@@ -28,7 +28,7 @@ int fq_default_mat_fprint(FILE * file, const fq_default_mat_t mat, const fq_defa
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
-        return fmpz_mod_mat_fprint(file, mat->fmpz_mod);
+        return fmpz_mod_mat_fprint(file, mat->fmpz_mod, ctx->ctx.fmpz_mod.mod);
     }
     else
     {
@@ -52,7 +52,7 @@ int fq_default_mat_fprint_pretty(FILE * file, const fq_default_mat_t mat, const 
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        return fmpz_mod_mat_fprint_pretty(file, mat->fmpz_mod);
+        return fmpz_mod_mat_fprint_pretty(file, mat->fmpz_mod, ctx->ctx.fmpz_mod.mod);
     }
     else
     {

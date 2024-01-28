@@ -11,7 +11,7 @@
 
 #include "fmpz_mod_mat.h"
 
-void fmpz_mod_mat_strong_echelon_form(fmpz_mod_mat_t mat)
+void fmpz_mod_mat_strong_echelon_form(fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx)
 {
-    fmpz_mat_strong_echelon_form_mod(mat->mat, mat->mod);
+    fmpz_mat_strong_echelon_form_mod(mat, ctx->n);
 }

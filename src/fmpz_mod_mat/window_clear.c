@@ -12,8 +12,7 @@
 #include "fmpz.h"
 #include "fmpz_mod_mat.h"
 
-void fmpz_mod_mat_window_clear(fmpz_mod_mat_t window)
+void fmpz_mod_mat_window_clear(fmpz_mod_mat_t window, const fmpz_mod_ctx_t ctx)
 {
-    fmpz_mat_window_clear(window->mat);
-    fmpz_clear(window->mod);
+    fmpz_mat_window_clear(window);
 }

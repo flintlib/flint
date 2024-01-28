@@ -11,8 +11,8 @@
 
 #include "fmpz_mod_mat.h"
 
-void fmpz_mod_mat_scalar_mul_ui(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, ulong c)
+void fmpz_mod_mat_scalar_mul_ui(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, ulong c, const fmpz_mod_ctx_t ctx)
 {
-    fmpz_mat_scalar_mul_ui(B->mat, A->mat, c);
-    _fmpz_mod_mat_reduce(B);
+    fmpz_mat_scalar_mul_ui(B, A, c);
+    _fmpz_mod_mat_reduce(B, ctx);
 }
