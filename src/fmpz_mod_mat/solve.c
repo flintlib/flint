@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2018 Tommy Hofmann
     Copyright (C) 2021 Daniel Schultz
+    Copyright (C) 2024 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -11,45 +12,15 @@
 */
 
 #include "fmpz_mod_mat.h"
+#include "gr.h"
+#include "gr_mat.h"
 
 int fmpz_mod_mat_solve(fmpz_mod_mat_t X, const fmpz_mod_mat_t A,
                                                         const fmpz_mod_mat_t B, const fmpz_mod_ctx_t ctx)
 {
-    slong i, rank, *perm;
-    fmpz_mod_mat_t LU;
-    int result;
-
-    if (fmpz_mod_mat_is_empty(A, ctx))
-        return 1;
-
-    fmpz_mod_mat_init_set(LU, A, ctx);
-
-    perm = flint_malloc(sizeof(slong) * A->r);
-    for (i = 0; i < A->r; i++)
-        perm[i] = i;
-
-    rank = fmpz_mod_mat_lu(perm, LU, 1, ctx);
-
-    if (rank == A->r)
-    {
-        fmpz_mod_mat_t PB;
-        fmpz_mod_mat_window_init(PB, B, 0, 0, B->r, B->c, ctx);
-        for (i = 0; i < A->r; i++)
-            PB->rows[i] = B->rows[perm[i]];
-
-        fmpz_mod_mat_solve_tril(X, LU, PB, 1, ctx);
-        fmpz_mod_mat_solve_triu(X, LU, X, 0, ctx);
-
-        fmpz_mod_mat_window_clear(PB, ctx);
-        result = 1;
-    }
-    else
-    {
-        result = 0;
-    }
-
-    fmpz_mod_mat_clear(LU, ctx);
-    flint_free(perm);
-
-    return result;
+    gr_ctx_t gr_ctx;
+    int status;
+    _gr_ctx_init_fmpz_mod_from_ref(gr_ctx, ctx);
+    status = gr_mat_nonsingular_solve_lu((gr_mat_struct *) X, (const gr_mat_struct *) A, (const gr_mat_struct *) B, gr_ctx);
+    return (status == GR_SUCCESS) ? 1 : 0;
 }
