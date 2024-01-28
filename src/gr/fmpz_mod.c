@@ -615,15 +615,8 @@ _gr_fmpz_mod_roots_gr_poly(gr_vec_t roots, gr_vec_t mult, const fmpz_mod_poly_t 
 int
 _gr_fmpz_mod_mat_mul(fmpz_mat_t res, const fmpz_mat_t x, const fmpz_mat_t y, gr_ctx_t ctx)
 {
-    fmpz_mod_mat_t MM;
-
     fmpz_mat_mul(res, x, y);
-
-    *MM->mat = *res;
-    *MM->mod = *(FMPZ_MOD_CTX(ctx)->n);
-
-    _fmpz_mod_mat_reduce(MM);
-
+    _fmpz_mod_mat_reduce(res, FMPZ_MOD_CTX(ctx));
     return GR_SUCCESS;
 }
 

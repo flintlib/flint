@@ -36,26 +36,26 @@ TEST_FUNCTION_START(fq_embed_matrices, state)
         fq_gen(gen, ctx);
         fq_pow(gen, gen, fq_ctx_prime(ctx), ctx);
 
-        fmpz_mod_mat_init(embed, d, d, fq_ctx_prime(ctx));
-        fmpz_mod_mat_init(project, d, d, fq_ctx_prime(ctx));
-        fmpz_mod_mat_init(one, d, d, fq_ctx_prime(ctx));
+        fmpz_mod_mat_init(embed, d, d, ctx->ctxp);
+        fmpz_mod_mat_init(project, d, d, ctx->ctxp);
+        fmpz_mod_mat_init(one, d, d, ctx->ctxp);
 
         fq_embed_matrices(embed, project, gen, ctx, gen, ctx, modulus);
-        fmpz_mod_mat_one(one);
+        fmpz_mod_mat_one(one, ctx->ctxp);
 
-        if (!fmpz_mod_mat_equal(embed, one) || !fmpz_mod_mat_equal(project, one)) {
+        if (!fmpz_mod_mat_equal(embed, one, ctx->ctxp) || !fmpz_mod_mat_equal(project, one, ctx->ctxp)) {
             flint_printf("FAIL:\n\n");
             flint_printf("CTX\n"), fq_ctx_print(ctx), flint_printf("\n");
             flint_printf("x^p: "), fq_print_pretty(gen, ctx), flint_printf("\n");
             flint_printf("Embed\n"),
-                fmpz_mod_mat_print_pretty(embed), flint_printf("\nProject\n"),
-                fmpz_mod_mat_print_pretty(project), flint_printf("\n");
+                fmpz_mod_mat_print_pretty(embed, ctx->ctxp), flint_printf("\nProject\n"),
+                fmpz_mod_mat_print_pretty(project, ctx->ctxp), flint_printf("\n");
             flint_abort();
         }
 
-        fmpz_mod_mat_clear(embed);
-        fmpz_mod_mat_clear(project);
-        fmpz_mod_mat_clear(one);
+        fmpz_mod_mat_clear(embed, ctx->ctxp);
+        fmpz_mod_mat_clear(project, ctx->ctxp);
+        fmpz_mod_mat_clear(one, ctx->ctxp);
         fq_clear(gen, ctx);
         fq_ctx_clear(ctx);
     }
@@ -89,30 +89,30 @@ TEST_FUNCTION_START(fq_embed_matrices, state)
             fmpz_mod_poly_init(minpoly, ctx1->ctxp);
             fq_embed_gens(gen1, gen2, minpoly, ctx1, ctx2);
 
-            fmpz_mod_mat_init(embed, n, m, fq_ctx_prime(ctx1));
-            fmpz_mod_mat_init(project, m, n, fq_ctx_prime(ctx1));
-            fmpz_mod_mat_init(comp, m, m, fq_ctx_prime(ctx1));
-            fmpz_mod_mat_init(one, m, m, fq_ctx_prime(ctx1));
+            fmpz_mod_mat_init(embed, n, m, ctx1->ctxp);
+            fmpz_mod_mat_init(project, m, n, ctx1->ctxp);
+            fmpz_mod_mat_init(comp, m, m, ctx1->ctxp);
+            fmpz_mod_mat_init(one, m, m, ctx1->ctxp);
 
             fq_embed_matrices(embed, project, gen1, ctx1, gen2, ctx2, minpoly);
 
-            fmpz_mod_mat_mul(comp, project, embed);
-            fmpz_mod_mat_one(one);
-            if (!fmpz_mod_mat_equal(comp, one)) {
+            fmpz_mod_mat_mul(comp, project, embed, ctx1->ctxp);
+            fmpz_mod_mat_one(one, ctx1->ctxp);
+            if (!fmpz_mod_mat_equal(comp, one, ctx1->ctxp)) {
                 flint_printf("FAIL:\n\n");
                 flint_printf("CTX 1\n"), fq_ctx_print(ctx1), flint_printf("\n");
                 flint_printf("CTX 2\n"), fq_ctx_print(ctx2), flint_printf("\n");
                 flint_printf("Embed\n"),
-                    fmpz_mod_mat_print_pretty(embed), flint_printf("\nProject\n"),
-                    fmpz_mod_mat_print_pretty(project), flint_printf("\nComposition\n"),
-                    fmpz_mod_mat_print_pretty(comp), flint_printf("\n");
+                    fmpz_mod_mat_print_pretty(embed, ctx1->ctxp), flint_printf("\nProject\n"),
+                    fmpz_mod_mat_print_pretty(project, ctx1->ctxp), flint_printf("\nComposition\n"),
+                    fmpz_mod_mat_print_pretty(comp, ctx1->ctxp), flint_printf("\n");
                 flint_abort();
             }
 
-            fmpz_mod_mat_clear(embed);
-            fmpz_mod_mat_clear(project);
-            fmpz_mod_mat_clear(comp);
-            fmpz_mod_mat_clear(one);
+            fmpz_mod_mat_clear(embed, ctx1->ctxp);
+            fmpz_mod_mat_clear(project, ctx1->ctxp);
+            fmpz_mod_mat_clear(comp, ctx1->ctxp);
+            fmpz_mod_mat_clear(one, ctx1->ctxp);
             fmpz_mod_poly_clear(minpoly, ctx1->ctxp);
             fmpz_mod_poly_clear(modulus2, ctx1->ctxp);
             fq_clear(gen1, ctx1);

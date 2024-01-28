@@ -13,11 +13,11 @@
 #include "fmpz_mod_mat.h"
 #include "fmpz_mod_mpoly_factor.h"
 
-int fmpz_mod_mat_is_reduced(const fmpz_mod_mat_t N)
+int fmpz_mod_mat_is_reduced(const fmpz_mod_mat_t N, const fmpz_mod_ctx_t ctx)
 {
     slong i, j, k = 0;
-    slong r = fmpz_mod_mat_ncols(N);
-    slong d = fmpz_mod_mat_nrows(N);
+    slong r = fmpz_mod_mat_ncols(N, ctx);
+    slong d = fmpz_mod_mat_nrows(N, ctx);
 
     for (i = 0; i < d; i++)
     for (j = 0; j < r; j++)
@@ -40,16 +40,16 @@ void fmpz_mod_mat_init_nullspace_tr(fmpz_mod_mat_t X, fmpz_mod_mat_t tmp, const 
     slong * pivots;
     slong * nonpivots;
 
-    m = fmpz_mod_mat_nrows(tmp);
-    n = fmpz_mod_mat_ncols(tmp);
+    m = fmpz_mod_mat_nrows(tmp, ctx);
+    n = fmpz_mod_mat_ncols(tmp, ctx);
 
     p = FLINT_ARRAY_ALLOC(FLINT_MAX(m, n), slong);
 
-    rank = fmpz_mod_mat_rref(NULL, tmp);
+    rank = fmpz_mod_mat_rref(NULL, tmp, ctx);
 
     nullity = n - rank;
 
-    fmpz_mod_mat_init(X, nullity, n, fmpz_mod_ctx_modulus(ctx));
+    fmpz_mod_mat_init(X, nullity, n, ctx);
 
     if (rank == 0)
     {
