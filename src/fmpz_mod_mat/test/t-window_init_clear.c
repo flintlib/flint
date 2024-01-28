@@ -20,17 +20,15 @@ TEST_FUNCTION_START(fmpz_mod_mat_window_init_clear, state)
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        fmpz_t mod;
+        fmpz_mod_ctx_t ctx;
         fmpz_mod_mat_t a, w;
         slong j, k, r1, r2, c1, c2;
         slong rows = n_randint(state, 10);
         slong cols = n_randint(state, 10);
 
-        fmpz_init(mod);
-        fmpz_randtest_not_zero(mod, state, 100);
-        fmpz_abs(mod, mod);
-        fmpz_mod_mat_init(a, rows, cols, mod);
-        fmpz_mod_mat_randtest(a, state);
+        fmpz_mod_ctx_init_rand_bits(ctx, state, 100);
+        fmpz_mod_mat_init(a, rows, cols, ctx);
+        fmpz_mod_mat_randtest(a, state, ctx);
 
         r2 = n_randint(state, rows + 1);
         c2 = n_randint(state, cols + 1);
@@ -43,15 +41,15 @@ TEST_FUNCTION_START(fmpz_mod_mat_window_init_clear, state)
         else
             c1 = 0;
 
-        fmpz_mod_mat_window_init(w, a, r1, c1, r2, c2);
+        fmpz_mod_mat_window_init(w, a, r1, c1, r2, c2, ctx);
 
         for (j = 0; j < r2 - r1; j++)
             for (k = 0; k < c2 - c1; k++)
                 fmpz_zero(fmpz_mod_mat_entry(w, j, k));
 
-        fmpz_mod_mat_window_clear(w);
-        fmpz_mod_mat_clear(a);
-        fmpz_clear(mod);
+        fmpz_mod_mat_window_clear(w, ctx);
+        fmpz_mod_mat_clear(a, ctx);
+        fmpz_mod_ctx_clear(ctx);
     }
 
     TEST_FUNCTION_END(state);

@@ -24,23 +24,21 @@ TEST_FUNCTION_START(fmpz_mod_mat_fmpz_vec_mul, state)
         fmpz * a, * c;
         fmpz ** aa, ** cc;
         slong j, m, n, alen;
-        fmpz_t mod;
+        fmpz_mod_ctx_t ctx;
 
-        fmpz_init(mod);
-        fmpz_randtest_not_zero(mod, state, 200);
-        fmpz_abs(mod, mod);
+        fmpz_mod_ctx_init_rand_bits(ctx, state, 200);
 
         m = n_randint(state, 50);
         n = n_randint(state, 50);
         alen = n_randint(state, 50);
 
-        fmpz_mod_mat_init(C, 1, n, mod);
-        fmpz_mod_mat_init(A, 1, m, mod);
-        fmpz_mod_mat_init(B, m, n, mod);
+        fmpz_mod_mat_init(C, 1, n, ctx);
+        fmpz_mod_mat_init(A, 1, m, ctx);
+        fmpz_mod_mat_init(B, m, n, ctx);
         c = _fmpz_vec_init(n);
         a = _fmpz_vec_init(alen);
 
-        fmpz_mod_mat_randtest(B, state);
+        fmpz_mod_mat_randtest(B, state, ctx);
         _fmpz_vec_randtest(c, state, n, n_randint(state, 200) + 1);
         _fmpz_vec_randtest(a, state, alen, n_randint(state, 200) + 1);
 
@@ -58,14 +56,14 @@ TEST_FUNCTION_START(fmpz_mod_mat_fmpz_vec_mul, state)
             fmpz_init_set(aa[j], a + j);
         }
 
-        fmpz_mod_mat_fmpz_vec_mul(c, a, alen, B);
-        fmpz_mod_mat_fmpz_vec_mul_ptr(cc, (const fmpz * const *)aa, alen, B);
+        fmpz_mod_mat_fmpz_vec_mul(c, a, alen, B, ctx);
+        fmpz_mod_mat_fmpz_vec_mul_ptr(cc, (const fmpz * const *)aa, alen, B, ctx);
 
         /* supposed to match mul of the chopped or zero-extended a */
         for (j = 0; j < m && j < alen; j++)
-            fmpz_mod(fmpz_mod_mat_entry(A, 0, j), a + j, mod);
+            fmpz_mod(fmpz_mod_mat_entry(A, 0, j), a + j, ctx->n);
 
-        fmpz_mod_mat_mul(C, A, B);
+        fmpz_mod_mat_mul(C, A, B, ctx);
 
         for (j = 0; j < n; j++)
         {
@@ -78,12 +76,12 @@ TEST_FUNCTION_START(fmpz_mod_mat_fmpz_vec_mul, state)
             }
         }
 
-        fmpz_clear(mod);
-        fmpz_mod_mat_clear(A);
-        fmpz_mod_mat_clear(B);
-        fmpz_mod_mat_clear(C);
+        fmpz_mod_mat_clear(A, ctx);
+        fmpz_mod_mat_clear(B, ctx);
+        fmpz_mod_mat_clear(C, ctx);
         _fmpz_vec_clear(c, n);
         _fmpz_vec_clear(a, alen);
+        fmpz_mod_ctx_clear(ctx);
 
         for (j = 0; j < n; j++)
         {

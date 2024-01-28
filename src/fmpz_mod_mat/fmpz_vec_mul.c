@@ -17,5 +17,5 @@ void fmpz_mod_mat_fmpz_vec_mul(fmpz * c, const fmpz * a, slong alen,
                                                         const fmpz_mod_mat_t B, const fmpz_mod_ctx_t ctx)
 {
     fmpz_mat_fmpz_vec_mul(c, a, alen, B);
-    _fmpz_mod_vec_set_fmpz_vec(c, c, alen, ctx);
+    _fmpz_mod_vec_set_fmpz_vec(c, c, fmpz_mod_mat_ncols(B, ctx), ctx);
 }

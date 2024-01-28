@@ -18,6 +18,6 @@ void fmpz_mod_mat_mul_fmpz_vec_ptr(fmpz * const * c,
 {
     slong i;
     fmpz_mat_mul_fmpz_vec_ptr(c, A, b, blen);
-    for (i = 0; i < blen; i++)
+    for (i = 0; i < fmpz_mod_mat_nrows(A, ctx); i++)
         fmpz_mod_set_fmpz(c[i], c[i], ctx);
 }

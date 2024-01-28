@@ -37,8 +37,8 @@ TEST_FUNCTION_START(fmpz_mod_mat_minpoly, state)
         fmpz_mod_poly_init(p2, ctx);
         fmpz_mod_poly_init(q, ctx);
         fmpz_mod_poly_init(r, ctx);
-        fmpz_mod_mat_init(A, m, n, fmpz_mod_ctx_modulus(ctx));
-        fmpz_mod_mat_randtest(A, state);
+        fmpz_mod_mat_init(A, m, n, ctx);
+        fmpz_mod_mat_randtest(A, state, ctx);
 
         fmpz_mod_mat_charpoly(p1, A, ctx);
         fmpz_mod_mat_minpoly(p2, A, ctx);
@@ -46,7 +46,7 @@ TEST_FUNCTION_START(fmpz_mod_mat_minpoly, state)
         fmpz_mod_poly_divrem(q, r, p1, p2, ctx);
         FLINT_TEST(fmpz_mod_poly_is_zero(r, ctx));
 
-        fmpz_mod_mat_clear(A);
+        fmpz_mod_mat_clear(A, ctx);
         fmpz_mod_poly_clear(p1, ctx);
         fmpz_mod_poly_clear(p2, ctx);
         fmpz_mod_poly_clear(q, ctx);
@@ -65,9 +65,9 @@ TEST_FUNCTION_START(fmpz_mod_mat_minpoly, state)
         fmpz_init(t);
         fmpz_mod_poly_init(p1, ctx);
         fmpz_mod_poly_init(p2, ctx);
-        fmpz_mod_mat_init(A, m, n, fmpz_mod_ctx_modulus(ctx));
-        fmpz_mod_mat_init(B, m, n, fmpz_mod_ctx_modulus(ctx));
-        fmpz_mod_mat_randtest(A, state);
+        fmpz_mod_mat_init(A, m, n, ctx);
+        fmpz_mod_mat_init(B, m, n, ctx);
+        fmpz_mod_mat_randtest(A, state, ctx);
 
         for (j = 0; j < n/2; j++)
         {
@@ -80,21 +80,21 @@ TEST_FUNCTION_START(fmpz_mod_mat_minpoly, state)
            }
         }
 
-        fmpz_mod_mat_set(B, A);
+        fmpz_mod_mat_set(B, A, ctx);
         fmpz_mod_mat_minpoly(p1, A, ctx);
 
         for (j = 0; j < n; j++)
         {
            fmpz_mod_set_ui(t, n_randint(state, 6) - 3, ctx);
-           fmpz_mod_mat_similarity(B, n_randint(state, n), t);
+           fmpz_mod_mat_similarity(B, n_randint(state, n), t, ctx);
         }
 
         fmpz_mod_mat_minpoly(p2, B, ctx);
         FLINT_TEST(fmpz_mod_poly_equal(p1, p2, ctx));
 
         fmpz_clear(t);
-        fmpz_mod_mat_clear(A);
-        fmpz_mod_mat_clear(B);
+        fmpz_mod_mat_clear(A, ctx);
+        fmpz_mod_mat_clear(B, ctx);
         fmpz_mod_poly_clear(p1, ctx);
         fmpz_mod_poly_clear(p2, ctx);
 

@@ -22,27 +22,25 @@ TEST_FUNCTION_START(fmpz_mod_mat_get_set_fmpz_mat, state)
     {
         fmpz_mod_mat_t A;
         fmpz_mod_mat_t B;
-        fmpz_t mod;
+        fmpz_mod_ctx_t ctx;
         fmpz_mat_t C;
 
         m = n_randint(state, 20);
         n = n_randint(state, 20);
 
-        fmpz_init(mod);
-        fmpz_randtest_not_zero(mod, state, 200);
-        fmpz_abs(mod, mod);
+        fmpz_mod_ctx_init_rand_bits(ctx, state, 200);
 
-        fmpz_mod_mat_init(A, m, n, mod);
-        fmpz_mod_mat_init(B, m, n, mod);
+        fmpz_mod_mat_init(A, m, n, ctx);
+        fmpz_mod_mat_init(B, m, n, ctx);
 
         fmpz_mat_init(C, m, n);
 
-        fmpz_mod_mat_randtest(A, state);
+        fmpz_mod_mat_randtest(A, state, ctx);
 
-        fmpz_mod_mat_get_fmpz_mat(C, A);
-        fmpz_mod_mat_set_fmpz_mat(B, C);
+        fmpz_mod_mat_get_fmpz_mat(C, A, ctx);
+        fmpz_mod_mat_set_fmpz_mat(B, C, ctx);
 
-        if (!fmpz_mod_mat_equal(A, B))
+        if (!fmpz_mod_mat_equal(A, B, ctx))
         {
             flint_printf("FAIL: matrices not equal!\n");
             fflush(stdout);
@@ -51,9 +49,9 @@ TEST_FUNCTION_START(fmpz_mod_mat_get_set_fmpz_mat, state)
 
         fmpz_mat_clear(C);
 
-        fmpz_mod_mat_clear(A);
-        fmpz_mod_mat_clear(B);
-        fmpz_clear(mod);
+        fmpz_mod_mat_clear(A, ctx);
+        fmpz_mod_mat_clear(B, ctx);
+        fmpz_mod_ctx_clear(ctx);
     }
 
     TEST_FUNCTION_END(state);
