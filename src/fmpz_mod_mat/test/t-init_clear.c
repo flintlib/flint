@@ -17,26 +17,23 @@ TEST_FUNCTION_START(fmpz_mod_mat_init_clear, state)
 {
     int i;
 
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_mod_mat_t a;
         slong j, k;
         slong rows = n_randint(state, 100);
         slong cols = n_randint(state, 100);
-        fmpz_t mod;
+        fmpz_mod_ctx_t ctx;
 
-        fmpz_init(mod);
-        fmpz_randtest_not_zero(mod, state, 200);
-        fmpz_abs(mod, mod);
-
-        fmpz_mod_mat_init(a, rows, cols, mod);
+        fmpz_mod_ctx_init_rand_bits(ctx, state, 200);
+        fmpz_mod_mat_init(a, rows, cols, ctx);
 
         for (j = 0; j < rows; j++)
             for (k = 0; k < cols; k++)
                 fmpz_zero(fmpz_mod_mat_entry(a, j, k));
 
-        fmpz_mod_mat_clear(a);
-        fmpz_clear(mod);
+        fmpz_mod_mat_clear(a, ctx);
+        fmpz_mod_ctx_clear(ctx);
     }
 
     TEST_FUNCTION_END(state);

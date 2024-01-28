@@ -22,10 +22,10 @@ void fmpz_mod_mat_minpoly(fmpz_mod_poly_t p, const fmpz_mod_mat_t X,
                                                       const fmpz_mod_ctx_t ctx)
 {
     gr_ctx_t gr_ctx;
-    slong n = fmpz_mod_mat_nrows(X);
+    slong n = fmpz_mod_mat_nrows(X, ctx);
 
-    if (n != fmpz_mod_mat_ncols(X))
-        flint_throw(FLINT_ERROR, "Exception (fmpz_mod_mat_charpoly). Non-square matrix.\n");
+    if (n != fmpz_mod_mat_ncols(X, ctx))
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mod_mat_minpoly). Non-square matrix.\n");
 
     _gr_ctx_init_fmpz_mod_from_ref(gr_ctx, ctx);
     GR_MUST_SUCCEED(gr_mat_minpoly_field((gr_poly_struct *) p, (const gr_mat_struct *) X, gr_ctx));

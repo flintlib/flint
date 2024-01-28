@@ -32,27 +32,27 @@ TEST_FUNCTION_START(fmpz_mod_mat_solve_triu, state)
         cols = n_randint(state, 50);
         unit = n_randint(state, 2);
 
-        fmpz_mod_mat_init(A, rows, rows, fmpz_mod_ctx_modulus(ctx));
-        fmpz_mod_mat_init(B, rows, cols, fmpz_mod_ctx_modulus(ctx));
-        fmpz_mod_mat_init(X, rows, cols, fmpz_mod_ctx_modulus(ctx));
-        fmpz_mod_mat_init(Y, rows, cols, fmpz_mod_ctx_modulus(ctx));
+        fmpz_mod_mat_init(A, rows, rows, ctx);
+        fmpz_mod_mat_init(B, rows, cols, ctx);
+        fmpz_mod_mat_init(X, rows, cols, ctx);
+        fmpz_mod_mat_init(Y, rows, cols, ctx);
 
-        fmpz_mod_mat_randtriu(A, state, unit);
-        fmpz_mod_mat_randtest(X, state);
-        fmpz_mod_mat_mul(B, A, X);
+        fmpz_mod_mat_randtriu(A, state, unit, ctx);
+        fmpz_mod_mat_randtest(X, state, ctx);
+        fmpz_mod_mat_mul(B, A, X, ctx);
 
         /* Check Y = A^(-1) * (A * X) = X */
-        fmpz_mod_mat_solve_triu(Y, A, B, unit);
-        FLINT_TEST(fmpz_mod_mat_equal(Y, X));
+        fmpz_mod_mat_solve_triu(Y, A, B, unit, ctx);
+        FLINT_TEST(fmpz_mod_mat_equal(Y, X, ctx));
 
         /* Check aliasing */
-        fmpz_mod_mat_solve_triu(B, A, B, unit);
-        FLINT_TEST(fmpz_mod_mat_equal(B, X));
+        fmpz_mod_mat_solve_triu(B, A, B, unit, ctx);
+        FLINT_TEST(fmpz_mod_mat_equal(B, X, ctx));
 
-        fmpz_mod_mat_clear(A);
-        fmpz_mod_mat_clear(B);
-        fmpz_mod_mat_clear(X);
-        fmpz_mod_mat_clear(Y);
+        fmpz_mod_mat_clear(A, ctx);
+        fmpz_mod_mat_clear(B, ctx);
+        fmpz_mod_mat_clear(X, ctx);
+        fmpz_mod_mat_clear(Y, ctx);
 
         fmpz_mod_ctx_clear(ctx);
     }

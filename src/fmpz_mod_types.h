@@ -33,12 +33,7 @@ fmpz_mod_ctx_struct;
 
 typedef fmpz_mod_ctx_struct fmpz_mod_ctx_t[1];
 
-typedef struct
-{
-    fmpz_mat_t mat;
-    fmpz_t mod;
-}
-fmpz_mod_mat_struct;
+typedef fmpz_mat_struct fmpz_mod_mat_struct;
 
 typedef fmpz_mod_mat_struct fmpz_mod_mat_t[1];
 

@@ -41,7 +41,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_nullspace, state)
             TEMPLATE(T, mat_randrank) (A, state, r, ctx);
             /* Densify */
             if (n_randlimb(state) % 2)
-                TEMPLATE(T, mat_randops) (A, d, state, ctx);
+                TEMPLATE(T, mat_randops) (A, state, d, ctx);
 
             nullity = TEMPLATE(T, mat_nullspace) (ker, A, ctx);
             nulrank = TEMPLATE(T, mat_rank) (ker, ctx);

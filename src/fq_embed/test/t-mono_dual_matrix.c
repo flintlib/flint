@@ -28,32 +28,32 @@ TEST_FUNCTION_START(fq_embed_mono_dual_matrix, state)
         fq_ctx_init_randtest(ctx, state, 0);
         d = fq_ctx_degree(ctx);
 
-        fmpz_mod_mat_init(m2d, d, d, fq_ctx_prime(ctx));
-        fmpz_mod_mat_init(d2m, d, d, fq_ctx_prime(ctx));
-        fmpz_mod_mat_init(one, d, d, fq_ctx_prime(ctx));
-        fmpz_mod_mat_init(two, d, d, fq_ctx_prime(ctx));
+        fmpz_mod_mat_init(m2d, d, d, ctx->ctxp);
+        fmpz_mod_mat_init(d2m, d, d, ctx->ctxp);
+        fmpz_mod_mat_init(one, d, d, ctx->ctxp);
+        fmpz_mod_mat_init(two, d, d, ctx->ctxp);
 
         fq_embed_mono_to_dual_matrix(m2d, ctx);
         fq_embed_dual_to_mono_matrix(d2m, ctx);
-        fmpz_mod_mat_mul(one, m2d, d2m);
+        fmpz_mod_mat_mul(one, m2d, d2m, ctx->ctxp);
 
-        fmpz_mod_mat_one(two);
+        fmpz_mod_mat_one(two, ctx->ctxp);
 
-        if (!fmpz_mod_mat_equal(one, two))
+        if (!fmpz_mod_mat_equal(one, two, ctx->ctxp))
         {
             flint_printf("FAIL:\n\n");
             flint_printf("CTX\n"), fq_ctx_print(ctx), flint_printf("\n");
             flint_printf("Mono -> Dual\n"),
-                fmpz_mod_mat_print_pretty(m2d), flint_printf("\nDual -> Mono\n"),
-                fmpz_mod_mat_print_pretty(d2m), flint_printf("\n");
+                fmpz_mod_mat_print_pretty(m2d, ctx->ctxp), flint_printf("\nDual -> Mono\n"),
+                fmpz_mod_mat_print_pretty(d2m, ctx->ctxp), flint_printf("\n");
             fflush(stdout);
             flint_abort();
         }
 
-        fmpz_mod_mat_clear(m2d);
-        fmpz_mod_mat_clear(d2m);
-        fmpz_mod_mat_clear(one);
-        fmpz_mod_mat_clear(two);
+        fmpz_mod_mat_clear(m2d, ctx->ctxp);
+        fmpz_mod_mat_clear(d2m, ctx->ctxp);
+        fmpz_mod_mat_clear(one, ctx->ctxp);
+        fmpz_mod_mat_clear(two, ctx->ctxp);
         fq_ctx_clear(ctx);
     }
 

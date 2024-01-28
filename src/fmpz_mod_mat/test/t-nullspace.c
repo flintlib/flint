@@ -34,26 +34,26 @@ TEST_FUNCTION_START(fmpz_mod_mat_nullspace, state)
             fmpz_mod_ctx_init_rand_bits_prime(ctx, state, 200);
             d = n_randint(state, 2 * m * n + 1);
 
-            fmpz_mod_mat_init(A, m, n, fmpz_mod_ctx_modulus(ctx));
-            fmpz_mod_mat_init(ker, n, n, fmpz_mod_ctx_modulus(ctx));
-            fmpz_mod_mat_init(B, m, n, fmpz_mod_ctx_modulus(ctx));
+            fmpz_mod_mat_init(A, m, n, ctx);
+            fmpz_mod_mat_init(ker, n, n, ctx);
+            fmpz_mod_mat_init(B, m, n, ctx);
 
-            fmpz_mod_mat_randrank(A, state, r);
+            fmpz_mod_mat_randrank(A, state, r, ctx);
             /* Densify */
             if (n_randlimb(state) % 2)
-                fmpz_mod_mat_randops(A, d, state);
+                fmpz_mod_mat_randops(A, state, d, ctx);
 
-            nullity = fmpz_mod_mat_nullspace(ker, A);
-            nulrank = fmpz_mod_mat_rank(ker);
+            nullity = fmpz_mod_mat_nullspace(ker, A, ctx);
+            nulrank = fmpz_mod_mat_rank(ker, ctx);
             FLINT_TEST(nullity == nulrank);
             FLINT_TEST(nullity + r == n);
 
-            fmpz_mod_mat_mul(B, A, ker);
-            FLINT_TEST(fmpz_mod_mat_rank(B) == 0);
+            fmpz_mod_mat_mul(B, A, ker, ctx);
+            FLINT_TEST(fmpz_mod_mat_rank(B, ctx) == 0);
 
-            fmpz_mod_mat_clear(A);
-            fmpz_mod_mat_clear(ker);
-            fmpz_mod_mat_clear(B);
+            fmpz_mod_mat_clear(A, ctx);
+            fmpz_mod_mat_clear(ker, ctx);
+            fmpz_mod_mat_clear(B, ctx);
 
             fmpz_mod_ctx_clear(ctx);
         }

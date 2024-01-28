@@ -2,6 +2,7 @@
     Copyright (C) 2018 Tommy Hofmann
     Copyright (C) 2020 William Hart
     Copyright (C) 2021 Daniel Schultz
+    Copyright (C) 2024 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -16,43 +17,41 @@
 #include "fmpz_mod_mat.h"
 
 int fmpz_mod_mat_can_solve(fmpz_mod_mat_t X, const fmpz_mod_mat_t A,
-                           const fmpz_mod_mat_t B)
+                           const fmpz_mod_mat_t B, const fmpz_mod_ctx_t ctx)
 {
     slong i, j, k, col, *pivots, rank, *perm;
     fmpz_mod_mat_t LU, LU2, PB;
     int result = 1;
 
-    if (A->mat->r != B->mat->r || A->mat->c != X->mat->r || X->mat->c != B->mat->c)
+    if (A->r != B->r || A->c != X->r || X->c != B->c)
     {
         return 0;
     }
 
-    if (A->mat->r == 0 || B->mat->c == 0)
+    if (A->r == 0 || B->c == 0)
     {
-        fmpz_mod_mat_zero(X);
-
+        fmpz_mod_mat_zero(X, ctx);
         return 1;
     }
 
-    if (A->mat->c == 0)
+    if (A->c == 0)
     {
-       fmpz_mod_mat_zero(X);
-
-       return fmpz_mod_mat_is_zero(B);
+       fmpz_mod_mat_zero(X, ctx);
+       return fmpz_mod_mat_is_zero(B, ctx);
     }
 
-    fmpz_mod_mat_init_set(LU, A);
-    perm = flint_malloc(sizeof(slong) * A->mat->r);
-    for (i = 0; i < A->mat->r; i++)
+    fmpz_mod_mat_init_set(LU, A, ctx);
+    perm = flint_malloc(sizeof(slong) * A->r);
+    for (i = 0; i < A->r; i++)
         perm[i] = i;
 
-    rank = fmpz_mod_mat_lu(perm, LU, 0);
+    rank = fmpz_mod_mat_lu(perm, LU, 0, ctx);
 
-    fmpz_mod_mat_window_init(PB, B, 0, 0, B->mat->r, B->mat->c);
-    for (i = 0; i < B->mat->r; i++)
-        PB->mat->rows[i] = B->mat->rows[perm[i]];
+    fmpz_mod_mat_window_init(PB, B, 0, 0, B->r, B->c, ctx);
+    for (i = 0; i < B->r; i++)
+        PB->rows[i] = B->rows[perm[i]];
 
-    fmpz_mod_mat_init(LU2, rank, rank, A->mod);
+    fmpz_mod_mat_init(LU2, rank, rank, ctx);
 
     pivots = flint_malloc(sizeof(slong)*rank);
 
@@ -65,63 +64,63 @@ int fmpz_mod_mat_can_solve(fmpz_mod_mat_t X, const fmpz_mod_mat_t A,
         pivots[i] = col;
 
         for (j = 0; j < rank; j++)
-            fmpz_mod_mat_set_entry(LU2, j, i, fmpz_mod_mat_entry(LU, j, col));
+            fmpz_mod_mat_set_entry(LU2, j, i, fmpz_mod_mat_entry(LU, j, col), ctx);
 
         col++;
     }
 
-    X->mat->r = rank;
-    PB->mat->r = rank;
-    LU->mat->r = rank;
-    fmpz_mod_mat_solve_tril(X, LU, PB, 1);
-    LU->mat->r = A->mat->r;
+    X->r = rank;
+    PB->r = rank;
+    LU->r = rank;
+    fmpz_mod_mat_solve_tril(X, LU, PB, 1, ctx);
+    LU->r = A->r;
 
-    if (A->mat->r > rank)
+    if (A->r > rank)
     {
         fmpz_mod_mat_t P;
 
-        LU->mat->rows += rank;
-        LU->mat->r = A->mat->r - rank;
-        X->mat->r = LU->mat->c;
+        LU->rows += rank;
+        LU->r = A->r - rank;
+        X->r = LU->c;
 
-        fmpz_mod_mat_init(P, LU->mat->r, B->mat->c, A->mod);
+        fmpz_mod_mat_init(P, LU->r, B->c, ctx);
 
-        fmpz_mod_mat_mul(P, LU, X);
+        fmpz_mod_mat_mul(P, LU, X, ctx);
 
-        PB->mat->r = LU->mat->r;
-        PB->mat->rows += rank;
+        PB->r = LU->r;
+        PB->rows += rank;
 
-        result = fmpz_mod_mat_equal(P, PB);
+        result = fmpz_mod_mat_equal(P, PB, ctx);
 
-        PB->mat->rows -= rank;
-        fmpz_mod_mat_clear(P);
+        PB->rows -= rank;
+        fmpz_mod_mat_clear(P, ctx);
 
-        LU->mat->rows -= rank;
+        LU->rows -= rank;
 
         if (!result)
         {
-            X->mat->r = A->mat->c;
-            fmpz_mod_mat_zero(X);
+            X->r = A->c;
+            fmpz_mod_mat_zero(X, ctx);
             goto cleanup;
         }
     }
 
-    fmpz_mod_mat_solve_triu(X, LU2, X, 0);
+    fmpz_mod_mat_solve_triu(X, LU2, X, 0, ctx);
 
-    X->mat->r = A->mat->c;
+    X->r = A->c;
 
     k = rank - 1;
-    for (i = A->mat->c - 1; i >= 0; i--)
+    for (i = A->c - 1; i >= 0; i--)
     {
         if (k < 0 || i != pivots[k])
         {
-            for (j = 0; j < B->mat->c; j++)
+            for (j = 0; j < B->c; j++)
                 fmpz_zero(fmpz_mod_mat_entry(X, i, j));
         }
         else
         {
-            for (j = 0; j < B->mat->c; j++)
-                fmpz_mod_mat_set_entry(X, i, j, fmpz_mod_mat_entry(X, k, j));
+            for (j = 0; j < B->c; j++)
+                fmpz_mod_mat_set_entry(X, i, j, fmpz_mod_mat_entry(X, k, j), ctx);
 
             k--;
         }
@@ -129,13 +128,13 @@ int fmpz_mod_mat_can_solve(fmpz_mod_mat_t X, const fmpz_mod_mat_t A,
 
 cleanup:
 
-    fmpz_mod_mat_clear(LU2);
+    fmpz_mod_mat_clear(LU2, ctx);
 
-    PB->mat->r = B->mat->r;
-    fmpz_mod_mat_window_clear(PB);
+    PB->r = B->r;
+    fmpz_mod_mat_window_clear(PB, ctx);
 
-    LU->mat->r = A->mat->r;
-    fmpz_mod_mat_clear(LU);
+    LU->r = A->r;
+    fmpz_mod_mat_clear(LU, ctx);
     flint_free(perm);
 
     flint_free(pivots);

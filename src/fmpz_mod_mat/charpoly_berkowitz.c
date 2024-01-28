@@ -29,13 +29,13 @@ void _fmpz_mod_mat_charpoly_berkowitz(fmpz* cp, const fmpz_mod_mat_t mat,
 void fmpz_mod_mat_charpoly_berkowitz(fmpz_mod_poly_t cp,
                             const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx)
 {
-    if (!fmpz_mod_mat_is_square(mat))
+    if (!fmpz_mod_mat_is_square(mat, ctx))
     {
         flint_throw(FLINT_ERROR, "Exception (fmpz_mod_mat_charpoly_berkowitz). Non-square matrix.\n");
     }
 
-    fmpz_mod_poly_fit_length(cp, fmpz_mod_mat_nrows(mat) + 1, ctx);
+    fmpz_mod_poly_fit_length(cp, fmpz_mod_mat_nrows(mat, ctx) + 1, ctx);
     _fmpz_mod_mat_charpoly_berkowitz(cp->coeffs, mat, ctx);
-    _fmpz_mod_poly_set_length(cp, fmpz_mod_mat_nrows(mat) + 1);
+    _fmpz_mod_poly_set_length(cp, fmpz_mod_mat_nrows(mat, ctx) + 1);
     _fmpz_mod_poly_normalise(cp);
 }

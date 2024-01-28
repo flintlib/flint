@@ -35,10 +35,10 @@ TEST_FUNCTION_START(fq_embed_composition_matrix, state)
 
         fq_init(frob, ctx);
         fq_init(a, ctx);
-        fmpz_mod_mat_init(mat_frob, d, d, fq_ctx_prime(ctx));
-        fmpz_mod_mat_init(mat_a, d, d, fq_ctx_prime(ctx));
-        fmpz_mod_mat_init(mat_aq, d, d, fq_ctx_prime(ctx));
-        fmpz_mod_mat_init(res, d, d, fq_ctx_prime(ctx));
+        fmpz_mod_mat_init(mat_frob, d, d, ctx->ctxp);
+        fmpz_mod_mat_init(mat_a, d, d, ctx->ctxp);
+        fmpz_mod_mat_init(mat_aq, d, d, ctx->ctxp);
+        fmpz_mod_mat_init(res, d, d, ctx->ctxp);
 
         fq_gen(frob, ctx);
         fq_pow(frob, frob, fq_ctx_prime(ctx), ctx);
@@ -47,30 +47,30 @@ TEST_FUNCTION_START(fq_embed_composition_matrix, state)
         fq_randtest(a, state, ctx);
         fq_embed_composition_matrix(mat_a, a, ctx);
 
-        fmpz_mod_mat_mul(res, mat_frob, mat_a);
+        fmpz_mod_mat_mul(res, mat_frob, mat_a, ctx->ctxp);
 
         fq_pow(a, a, fq_ctx_prime(ctx), ctx);
         fq_embed_composition_matrix(mat_aq, a, ctx);
 
-        if (!fmpz_mod_mat_equal(res, mat_aq))
+        if (!fmpz_mod_mat_equal(res, mat_aq, ctx->ctxp))
         {
             flint_printf("FAIL:\n\n");
             flint_printf("CTX\n"), fq_ctx_print(ctx), flint_printf("\n");
             flint_printf("x^q: "), fq_print_pretty(frob, ctx), flint_printf("\n");
             flint_printf("M(x^q)*M(a) = M(a^q)\n"),
-                fmpz_mod_mat_print_pretty(mat_frob), flint_printf("\n"),
-                fmpz_mod_mat_print_pretty(mat_a), flint_printf("\n"),
-                fmpz_mod_mat_print_pretty(mat_aq), flint_printf("\n"),
-                fmpz_mod_mat_print_pretty(res), flint_printf("\n");
+                fmpz_mod_mat_print_pretty(mat_frob, ctx->ctxp), flint_printf("\n"),
+                fmpz_mod_mat_print_pretty(mat_a, ctx->ctxp), flint_printf("\n"),
+                fmpz_mod_mat_print_pretty(mat_aq, ctx->ctxp), flint_printf("\n"),
+                fmpz_mod_mat_print_pretty(res, ctx->ctxp), flint_printf("\n");
 
             fflush(stdout);
             flint_abort();
         }
 
-        fmpz_mod_mat_clear(mat_frob);
-        fmpz_mod_mat_clear(mat_a);
-        fmpz_mod_mat_clear(mat_aq);
-        fmpz_mod_mat_clear(res);
+        fmpz_mod_mat_clear(mat_frob, ctx->ctxp);
+        fmpz_mod_mat_clear(mat_a, ctx->ctxp);
+        fmpz_mod_mat_clear(mat_aq, ctx->ctxp);
+        fmpz_mod_mat_clear(res, ctx->ctxp);
         fq_clear(frob, ctx);
         fq_clear(a, ctx);
         fq_ctx_clear(ctx);

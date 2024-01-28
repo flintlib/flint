@@ -30,10 +30,10 @@ TEST_FUNCTION_START(fmpz_mod_mat_rank, state)
 
         for (r = 0; r <= FLINT_MIN(m, n); r++)
         {
-            fmpz_mod_mat_init(A, m, n, fmpz_mod_ctx_modulus(ctx));
-            fmpz_mod_mat_randrank(A, state, r);
-            FLINT_TEST(r == fmpz_mod_mat_rank(A));
-            fmpz_mod_mat_clear(A);
+            fmpz_mod_mat_init(A, m, n, ctx);
+            fmpz_mod_mat_randrank(A, state, r, ctx);
+            FLINT_TEST(r == fmpz_mod_mat_rank(A, ctx));
+            fmpz_mod_mat_clear(A, ctx);
         }
 
         fmpz_mod_ctx_clear(ctx);
@@ -49,11 +49,11 @@ TEST_FUNCTION_START(fmpz_mod_mat_rank, state)
         for (r = 0; r <= FLINT_MIN(m, n); r++)
         {
             d = n_randint(state, 2 * m * n + 1);
-            fmpz_mod_mat_init(A, m, n, fmpz_mod_ctx_modulus(ctx));
-            fmpz_mod_mat_randrank(A, state, r);
-            fmpz_mod_mat_randops(A, d, state);
-            FLINT_TEST(r == fmpz_mod_mat_rank(A));
-            fmpz_mod_mat_clear(A);
+            fmpz_mod_mat_init(A, m, n, ctx);
+            fmpz_mod_mat_randrank(A, state, r, ctx);
+            fmpz_mod_mat_randops(A, state, d, ctx);
+            FLINT_TEST(r == fmpz_mod_mat_rank(A, ctx));
+            fmpz_mod_mat_clear(A, ctx);
         }
         fmpz_mod_ctx_clear(ctx);
     }

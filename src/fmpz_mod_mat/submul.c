@@ -16,11 +16,11 @@
 void fmpz_mod_mat_submul(fmpz_mod_mat_t D,
                          const fmpz_mod_mat_t C,
                          const fmpz_mod_mat_t A,
-                         const fmpz_mod_mat_t B)
+                         const fmpz_mod_mat_t B, const fmpz_mod_ctx_t ctx)
 {
     fmpz_mod_mat_t tmp;
-    fmpz_mod_mat_init(tmp, A->mat->r, B->mat->c, A->mod);
-    fmpz_mod_mat_mul(tmp, A, B);
-    fmpz_mod_mat_sub(D, C, tmp);
-    fmpz_mod_mat_clear(tmp);
+    fmpz_mod_mat_init(tmp, A->r, B->c, ctx);
+    fmpz_mod_mat_mul(tmp, A, B, ctx);
+    fmpz_mod_mat_sub(D, C, tmp, ctx);
+    fmpz_mod_mat_clear(tmp, ctx);
 }

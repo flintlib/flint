@@ -17,10 +17,7 @@
 #include "test_helpers.h"
 #include "templates.h"
 #include "fmpz_mod_mat.h"
-
-#if defined(FQ_NMOD_MAT_H) || defined(FQ_ZECH_MAT_H)
-# include "fmpz.h"
-#endif
+#include "fmpz_mod.h"
 
 TEST_TEMPLATE_FUNCTION_START(T, mat_set_fmpz_mod_mat, state)
 {
@@ -33,9 +30,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_set_fmpz_mod_mat, state)
         TEMPLATE(T, mat_t) a;
         fmpz_mod_mat_t m;
         slong r, c;
-#if defined(FQ_NMOD_MAT_H) || defined(FQ_ZECH_MAT_H)
-        fmpz_t p;
-#endif
+        fmpz_mod_ctx_t pctx;
 
         TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
@@ -46,14 +41,13 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_set_fmpz_mod_mat, state)
         TEMPLATE(T, mat_randtest)(a, state, ctx);
 
 #if defined(FQ_NMOD_MAT_H) || defined(FQ_ZECH_MAT_H)
-        fmpz_init_set_ui(p, TEMPLATE(T, ctx_prime)(ctx));
-        fmpz_mod_mat_init(m, r, c, p);
-        fmpz_clear(p);
+        fmpz_mod_ctx_init_ui(pctx, TEMPLATE(T, ctx_prime)(ctx));
 #else
-        fmpz_mod_mat_init(m, r, c, TEMPLATE(T, ctx_prime)(ctx));
+        fmpz_mod_ctx_init(pctx, TEMPLATE(T, ctx_prime)(ctx));
 #endif
 
-        fmpz_mod_mat_one(m);
+        fmpz_mod_mat_init(m, r, c, pctx);
+        fmpz_mod_mat_one(m, pctx);
 
         TEMPLATE(T, mat_set_fmpz_mod_mat)(a, m, ctx);
 
@@ -66,7 +60,8 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_set_fmpz_mod_mat, state)
             flint_abort();
         }
 
-        fmpz_mod_mat_clear(m);
+        fmpz_mod_mat_clear(m, pctx);
+        fmpz_mod_ctx_clear(pctx);
 
         TEMPLATE(T, mat_clear)(a, ctx);
 

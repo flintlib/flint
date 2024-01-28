@@ -28,35 +28,35 @@ TEST_FUNCTION_START(fmpz_mod_mat_inv, state)
 
         fmpz_mod_ctx_init_rand_bits_prime(ctx, state, 200);
 
-        fmpz_mod_mat_init(A, m, m, fmpz_mod_ctx_modulus(ctx));
-        fmpz_mod_mat_init(B, m, m, fmpz_mod_ctx_modulus(ctx));
-        fmpz_mod_mat_init(C, m, m, fmpz_mod_ctx_modulus(ctx));
-        fmpz_mod_mat_init(I, m, m, fmpz_mod_ctx_modulus(ctx));
+        fmpz_mod_mat_init(A, m, m, ctx);
+        fmpz_mod_mat_init(B, m, m, ctx);
+        fmpz_mod_mat_init(C, m, m, ctx);
+        fmpz_mod_mat_init(I, m, m, ctx);
 
         for (j = 0; j < m; j++)
             fmpz_one(fmpz_mod_mat_entry(I, j, j));
 
         /* Verify that A * A^-1 = I for random matrices */
 
-        fmpz_mod_mat_randrank(A, state, m);
+        fmpz_mod_mat_randrank(A, state, m, ctx);
         /* Dense or sparse? */
         if (n_randint(state, 2))
-            fmpz_mod_mat_randops(A, 1+n_randint(state, 1+m*m), state);
+            fmpz_mod_mat_randops(A, state, 1+n_randint(state, 1+m*m), ctx);
 
-        result = fmpz_mod_mat_inv(B, A);
-        fmpz_mod_mat_mul(C, A, B);
-        FLINT_TEST(result && fmpz_mod_mat_equal(C, I));
+        result = fmpz_mod_mat_inv(B, A, ctx);
+        fmpz_mod_mat_mul(C, A, B, ctx);
+        FLINT_TEST(result && fmpz_mod_mat_equal(C, I, ctx));
 
         /* Test aliasing */
-        fmpz_mod_mat_set(C, A);
-        fmpz_mod_mat_inv(A, A);
-        fmpz_mod_mat_mul(B, A, C);
-        FLINT_TEST(fmpz_mod_mat_equal(B, I));
+        fmpz_mod_mat_set(C, A, ctx);
+        fmpz_mod_mat_inv(A, A, ctx);
+        fmpz_mod_mat_mul(B, A, C, ctx);
+        FLINT_TEST(fmpz_mod_mat_equal(B, I, ctx));
 
-        fmpz_mod_mat_clear(A);
-        fmpz_mod_mat_clear(B);
-        fmpz_mod_mat_clear(C);
-        fmpz_mod_mat_clear(I);
+        fmpz_mod_mat_clear(A, ctx);
+        fmpz_mod_mat_clear(B, ctx);
+        fmpz_mod_mat_clear(C, ctx);
+        fmpz_mod_mat_clear(I, ctx);
 
         fmpz_mod_ctx_clear(ctx);
     }
@@ -68,20 +68,20 @@ TEST_FUNCTION_START(fmpz_mod_mat_inv, state)
         r = n_randint(state, m);
         fmpz_mod_ctx_init_rand_bits_prime(ctx, state, 200);
 
-        fmpz_mod_mat_init(A, m, m, fmpz_mod_ctx_modulus(ctx));
-        fmpz_mod_mat_init(B, m, m, fmpz_mod_ctx_modulus(ctx));
+        fmpz_mod_mat_init(A, m, m, ctx);
+        fmpz_mod_mat_init(B, m, m, ctx);
 
-        fmpz_mod_mat_randrank(A, state, r);
+        fmpz_mod_mat_randrank(A, state, r, ctx);
 
         /* Dense */
         if (n_randint(state, 2))
-            fmpz_mod_mat_randops(A, 1+n_randint(state, 1+m*m), state);
+            fmpz_mod_mat_randops(A, state, 1+n_randint(state, 1+m*m), ctx);
 
-        FLINT_TEST(!fmpz_mod_mat_inv(B, A));
-        FLINT_TEST(!fmpz_mod_mat_inv(A, A));
+        FLINT_TEST(!fmpz_mod_mat_inv(B, A, ctx));
+        FLINT_TEST(!fmpz_mod_mat_inv(A, A, ctx));
 
-        fmpz_mod_mat_clear(A);
-        fmpz_mod_mat_clear(B);
+        fmpz_mod_mat_clear(A, ctx);
+        fmpz_mod_mat_clear(B, ctx);
 
         fmpz_mod_ctx_clear(ctx);
     }

@@ -12,8 +12,8 @@
 #include "fmpz.h"
 #include "fmpz_mod_mat.h"
 
-void fmpz_mod_mat_randtest(fmpz_mod_mat_t mat, flint_rand_t state)
+void fmpz_mod_mat_randtest(fmpz_mod_mat_t mat, flint_rand_t state, const fmpz_mod_ctx_t ctx)
 {
-    fmpz_mat_randtest(mat->mat, state, fmpz_bits(mat->mod));
-    _fmpz_mod_mat_reduce(mat);
+    fmpz_mat_randtest(mat, state, fmpz_bits(ctx->n));
+    _fmpz_mod_mat_reduce(mat, ctx);
 }

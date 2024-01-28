@@ -51,7 +51,7 @@ TEST_FUNCTION_START(nmod_mat_rank, state)
             d = n_randint(state, 2*m*n + 1);
             nmod_mat_init(A, m, n, mod);
             nmod_mat_randrank(A, state, r);
-            nmod_mat_randops(A, d, state);
+            nmod_mat_randops(A, state, d);
             /*
             flint_printf("DENSE %wd %wd\n", r, d);
             nmod_mat_print_pretty(A); */

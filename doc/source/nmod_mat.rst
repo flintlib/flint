@@ -213,7 +213,7 @@ Random matrix generation
     The matrix can be transformed into a dense matrix with unchanged
     rank by subsequently calling :func:`nmod_mat_randops`.
 
-.. function:: void nmod_mat_randops(nmod_mat_t mat, slong count, flint_rand_t state)
+.. function:: void nmod_mat_randops(nmod_mat_t mat, flint_rand_t state, slong count)
 
     Randomises ``mat`` by performing elementary row or column
     operations. More precisely, at most ``count`` random additions

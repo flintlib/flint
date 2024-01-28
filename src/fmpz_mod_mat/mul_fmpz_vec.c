@@ -10,13 +10,12 @@
 */
 
 #include "fmpz.h"
+#include "fmpz_mod_vec.h"
 #include "fmpz_mod_mat.h"
 
 void fmpz_mod_mat_mul_fmpz_vec(fmpz* c, const fmpz_mod_mat_t A,
-                                                    const fmpz * b, slong blen)
+                                                    const fmpz * b, slong blen, const fmpz_mod_ctx_t ctx)
 {
-    slong i;
-    fmpz_mat_mul_fmpz_vec(c, A->mat, b, blen);
-    for (i = fmpz_mod_mat_nrows(A) - 1; i >= 0; i--)
-        fmpz_mod(c + i, c + i, A->mod);
+    fmpz_mat_mul_fmpz_vec(c, A, b, blen);
+    _fmpz_mod_vec_set_fmpz_vec(c, c, fmpz_mod_mat_nrows(A, ctx), ctx);
 }

@@ -15,8 +15,8 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, mat_randops) (TEMPLATE(T, mat_t) mat, slong count,
-                          flint_rand_t state, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, mat_randops) (TEMPLATE(T, mat_t) mat,
+                          flint_rand_t state, slong count, const TEMPLATE(T, ctx_t) ctx)
 {
     slong c, i, j, k;
     slong m = mat->r;

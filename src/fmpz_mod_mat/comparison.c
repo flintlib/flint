@@ -12,17 +12,17 @@
 #include "fmpz.h"
 #include "fmpz_mod_mat.h"
 
-int fmpz_mod_mat_equal(const fmpz_mod_mat_t mat1, const fmpz_mod_mat_t mat2)
+int fmpz_mod_mat_equal(const fmpz_mod_mat_t mat1, const fmpz_mod_mat_t mat2, const fmpz_mod_ctx_t ctx)
 {
-    return fmpz_equal(mat1->mod, mat2->mod) && fmpz_mat_equal(mat1->mat, mat2->mat);
+    return fmpz_mat_equal(mat1, mat2);
 }
 
-int fmpz_mod_mat_is_zero(const fmpz_mod_mat_t mat)
+int fmpz_mod_mat_is_zero(const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx)
 {
-    return fmpz_mat_is_zero(mat->mat);
+    return fmpz_mat_is_zero(mat);
 }
 
-int fmpz_mod_mat_is_one(const fmpz_mod_mat_t mat)
+int fmpz_mod_mat_is_one(const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx)
 {
-    return fmpz_is_one(mat->mod) || fmpz_mat_is_one(mat->mat);
+    return fmpz_is_one(ctx->n) || fmpz_mat_is_one(mat);
 }

@@ -53,7 +53,7 @@ _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_worker(void * arg_ptr)
     const fmpz * poly = arg.poly;
     const fmpz * polyinv = arg.polyinv;
     fmpz_mod_poly_struct * res = arg.res;
-    fmpz_mat_struct * C = arg.C->mat;
+    fmpz_mat_struct * C = arg.C;
     const fmpz_mod_ctx_struct * ctx = arg.ctx;
 
     while (1)
@@ -109,7 +109,6 @@ _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_str
     slong i, j, n, m, k, len2 = l, len1, shared_j = 0;
     fmpz * h;
     compose_vec_arg_t * args;
-    const fmpz * p = fmpz_mod_ctx_modulus(ctx);
 #if FLINT_USES_PTHREAD
     pthread_mutex_t mutex;
 #endif
@@ -122,9 +121,9 @@ _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_str
 
     k = len/m + 1;
 
-    fmpz_mod_mat_init(A, m, n, p);
-    fmpz_mod_mat_init(B, k*len2, m, p);
-    fmpz_mod_mat_init(C, k*len2, n, p);
+    fmpz_mod_mat_init(A, m, n, ctx);
+    fmpz_mod_mat_init(B, k*len2, m, ctx);
+    fmpz_mod_mat_init(C, k*len2, n, ctx);
 
     /* Set rows of B to the segments of polys */
     for (j = 0; j < len2; j++)
@@ -132,27 +131,27 @@ _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_str
         len1 = polys[j].length;
 
         for (i = 0; i < len1 / m; i++)
-            _fmpz_vec_set(B->mat->rows[i + j*k], polys[j].coeffs + i*m, m);
+            _fmpz_vec_set(B->rows[i + j*k], polys[j].coeffs + i*m, m);
 
-        _fmpz_vec_set(B->mat->rows[i + j*k], polys[j].coeffs + i*m,
+        _fmpz_vec_set(B->rows[i + j*k], polys[j].coeffs + i*m,
                       len1 % m);
     }
 
     /* Set rows of A to powers of last element of polys */
-    _fmpz_mod_poly_powers_mod_preinv_threaded_pool(A->mat->rows, g, glen,
+    _fmpz_mod_poly_powers_mod_preinv_threaded_pool(A->rows, g, glen,
 	               m, poly, len, polyinv, leninv, ctx, threads, num_threads);
 
     _fmpz_mod_mat_mul_classical_threaded_pool_op(C, NULL, B, A, 0,
-                                                         threads, num_threads);
+                                                         threads, num_threads, ctx);
 
     /* Evaluate block composition using the Horner scheme */
     if (n == 1)
     {
-        fmpz_mod_mul(h + 0, A->mat->rows[m - 1] + 0, A->mat->rows[1] + 0, ctx);
+        fmpz_mod_mul(h + 0, A->rows[m - 1] + 0, A->rows[1] + 0, ctx);
     }
     else
     {
-        _fmpz_mod_poly_mulmod_preinv(h, A->mat->rows[m - 1], n, A->mat->rows[1],
+        _fmpz_mod_poly_mulmod_preinv(h, A->rows[m - 1], n, A->rows[1],
                         n, poly, len, polyinv, leninv, ctx);
     }
 
@@ -207,9 +206,9 @@ _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_str
 
     _fmpz_vec_clear(h, n);
 
-    fmpz_mod_mat_clear(A);
-    fmpz_mod_mat_clear(B);
-    fmpz_mod_mat_clear(C);
+    fmpz_mod_mat_clear(A, ctx);
+    fmpz_mod_mat_clear(B, ctx);
+    fmpz_mod_mat_clear(C, ctx);
 }
 
 void

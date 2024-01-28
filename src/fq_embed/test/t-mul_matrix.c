@@ -30,9 +30,9 @@ TEST_FUNCTION_START(fq_embed_mul_matrix, state)
         d = fq_ctx_degree(ctx);
 
         fq_init(a, ctx);
-        fmpz_mod_mat_init(mat_a, d, d, fq_ctx_prime(ctx));
-        fmpz_mod_mat_init(mat_a_sq, d, d, fq_ctx_prime(ctx));
-        fmpz_mod_mat_init(mat_a_a, d, d, fq_ctx_prime(ctx));
+        fmpz_mod_mat_init(mat_a, d, d, ctx->ctxp);
+        fmpz_mod_mat_init(mat_a_sq, d, d, ctx->ctxp);
+        fmpz_mod_mat_init(mat_a_a, d, d, ctx->ctxp);
 
         fq_randtest(a, state, ctx);
         fq_embed_mul_matrix(mat_a, a, ctx);
@@ -40,24 +40,24 @@ TEST_FUNCTION_START(fq_embed_mul_matrix, state)
         fq_mul(a, a, a, ctx);
         fq_embed_mul_matrix(mat_a_sq, a, ctx);
 
-        fmpz_mod_mat_mul(mat_a_a, mat_a, mat_a);
+        fmpz_mod_mat_mul(mat_a_a, mat_a, mat_a, ctx->ctxp);
 
-        if (!fmpz_mod_mat_equal(mat_a_a, mat_a_sq))
+        if (!fmpz_mod_mat_equal(mat_a_a, mat_a_sq, ctx->ctxp))
         {
             flint_printf("FAIL:\n\n");
             flint_printf("CTX\n"), fq_ctx_print(ctx), flint_printf("\n");
             flint_printf("a^2: "), fq_print_pretty(a, ctx), flint_printf("\n");
             flint_printf("M(a)^2 = M(a^2)\n"),
-                fmpz_mod_mat_print_pretty(mat_a), flint_printf("^2\n=\n"),
-                fmpz_mod_mat_print_pretty(mat_a_a), flint_printf("\n=\n"),
-                fmpz_mod_mat_print_pretty(mat_a_sq), flint_printf("\n");
+                fmpz_mod_mat_print_pretty(mat_a, ctx->ctxp), flint_printf("^2\n=\n"),
+                fmpz_mod_mat_print_pretty(mat_a_a, ctx->ctxp), flint_printf("\n=\n"),
+                fmpz_mod_mat_print_pretty(mat_a_sq, ctx->ctxp), flint_printf("\n");
             fflush(stdout);
             flint_abort();
         }
 
-        fmpz_mod_mat_clear(mat_a);
-        fmpz_mod_mat_clear(mat_a_sq);
-        fmpz_mod_mat_clear(mat_a_a);
+        fmpz_mod_mat_clear(mat_a, ctx->ctxp);
+        fmpz_mod_mat_clear(mat_a_sq, ctx->ctxp);
+        fmpz_mod_mat_clear(mat_a_a, ctx->ctxp);
         fq_clear(a, ctx);
         fq_ctx_clear(ctx);
     }

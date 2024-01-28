@@ -13,34 +13,34 @@
 #include "fmpz_mod_mat.h"
 
 int fmpz_mod_mat_solve(fmpz_mod_mat_t X, const fmpz_mod_mat_t A,
-                                                        const fmpz_mod_mat_t B)
+                                                        const fmpz_mod_mat_t B, const fmpz_mod_ctx_t ctx)
 {
     slong i, rank, *perm;
     fmpz_mod_mat_t LU;
     int result;
 
-    if (fmpz_mod_mat_is_empty(A))
+    if (fmpz_mod_mat_is_empty(A, ctx))
         return 1;
 
-    fmpz_mod_mat_init_set(LU, A);
+    fmpz_mod_mat_init_set(LU, A, ctx);
 
-    perm = flint_malloc(sizeof(slong) * A->mat->r);
-    for (i = 0; i < A->mat->r; i++)
+    perm = flint_malloc(sizeof(slong) * A->r);
+    for (i = 0; i < A->r; i++)
         perm[i] = i;
 
-    rank = fmpz_mod_mat_lu(perm, LU, 1);
+    rank = fmpz_mod_mat_lu(perm, LU, 1, ctx);
 
-    if (rank == A->mat->r)
+    if (rank == A->r)
     {
         fmpz_mod_mat_t PB;
-        fmpz_mod_mat_window_init(PB, B, 0, 0, B->mat->r, B->mat->c);
-        for (i = 0; i < A->mat->r; i++)
-            PB->mat->rows[i] = B->mat->rows[perm[i]];
+        fmpz_mod_mat_window_init(PB, B, 0, 0, B->r, B->c, ctx);
+        for (i = 0; i < A->r; i++)
+            PB->rows[i] = B->rows[perm[i]];
 
-        fmpz_mod_mat_solve_tril(X, LU, PB, 1);
-        fmpz_mod_mat_solve_triu(X, LU, X, 0);
+        fmpz_mod_mat_solve_tril(X, LU, PB, 1, ctx);
+        fmpz_mod_mat_solve_triu(X, LU, X, 0, ctx);
 
-        fmpz_mod_mat_window_clear(PB);
+        fmpz_mod_mat_window_clear(PB, ctx);
         result = 1;
     }
     else
@@ -48,7 +48,7 @@ int fmpz_mod_mat_solve(fmpz_mod_mat_t X, const fmpz_mod_mat_t A,
         result = 0;
     }
 
-    fmpz_mod_mat_clear(LU);
+    fmpz_mod_mat_clear(LU, ctx);
     flint_free(perm);
 
     return result;

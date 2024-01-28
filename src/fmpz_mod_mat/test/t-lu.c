@@ -20,15 +20,15 @@ void perm(fmpz_mod_mat_t A, slong * P)
     slong i;
     fmpz ** tmp;
 
-    if (A->mat->c == 0 || A->mat->r == 0)
+    if (A->c == 0 || A->r == 0)
         return;
 
-    tmp = flint_malloc(sizeof(fmpz *) * A->mat->r);
+    tmp = flint_malloc(sizeof(fmpz *) * A->r);
 
-    for (i = 0; i < A->mat->r; i++)
-        tmp[P[i]] = A->mat->rows[i];
-    for (i = 0; i < A->mat->r; i++)
-        A->mat->rows[i] = tmp[i];
+    for (i = 0; i < A->r; i++)
+        tmp[P[i]] = A->rows[i];
+    for (i = 0; i < A->r; i++)
+        A->rows[i] = tmp[i];
 
     flint_free(tmp);
 }
@@ -39,12 +39,12 @@ void check(slong * P, fmpz_mod_mat_t LU, const fmpz_mod_mat_t A, slong rank,
     fmpz_mod_mat_t B, L, U;
     slong m, n, i, j;
 
-    m = A->mat->r;
-    n = A->mat->c;
+    m = A->r;
+    n = A->c;
 
-    fmpz_mod_mat_init(B, m, n, fmpz_mod_ctx_modulus(ctx));
-    fmpz_mod_mat_init(L, m, m, fmpz_mod_ctx_modulus(ctx));
-    fmpz_mod_mat_init(U, m, n, fmpz_mod_ctx_modulus(ctx));
+    fmpz_mod_mat_init(B, m, n, ctx);
+    fmpz_mod_mat_init(L, m, m, ctx);
+    fmpz_mod_mat_init(U, m, n, ctx);
 
     rank = FLINT_ABS(rank);
 
@@ -59,21 +59,21 @@ void check(slong * P, fmpz_mod_mat_t LU, const fmpz_mod_mat_t A, slong rank,
     for (i = 0; i < m; i++)
     {
         for (j = 0; j < FLINT_MIN(i, n); j++)
-            fmpz_mod_mat_set_entry(L, i, j, fmpz_mod_mat_entry(LU, i, j));
+            fmpz_mod_mat_set_entry(L, i, j, fmpz_mod_mat_entry(LU, i, j), ctx);
         if (i < rank)
             fmpz_one(fmpz_mod_mat_entry(L, i, i));
         for (j = i; j < n; j++)
-            fmpz_mod_mat_set_entry(U, i, j, fmpz_mod_mat_entry(LU, i, j));
+            fmpz_mod_mat_set_entry(U, i, j, fmpz_mod_mat_entry(LU, i, j), ctx);
     }
 
-    fmpz_mod_mat_mul(B, L, U);
+    fmpz_mod_mat_mul(B, L, U, ctx);
     perm(B, P);
 
-    FLINT_TEST(fmpz_mod_mat_equal(A, B));
+    FLINT_TEST(fmpz_mod_mat_equal(A, B, ctx));
 
-    fmpz_mod_mat_clear(B);
-    fmpz_mod_mat_clear(L);
-    fmpz_mod_mat_clear(U);
+    fmpz_mod_mat_clear(B, ctx);
+    fmpz_mod_mat_clear(L, ctx);
+    fmpz_mod_mat_clear(U, ctx);
 }
 
 TEST_FUNCTION_START(fmpz_mod_mat_lu, state)
@@ -94,26 +94,26 @@ TEST_FUNCTION_START(fmpz_mod_mat_lu, state)
 
         for (r = 0; r <= FLINT_MIN(m, n); r++)
         {
-            fmpz_mod_mat_init(A, m, n, fmpz_mod_ctx_modulus(ctx));
-            fmpz_mod_mat_randrank(A, state, r);
+            fmpz_mod_mat_init(A, m, n, ctx);
+            fmpz_mod_mat_randrank(A, state, r, ctx);
 
             if (n_randint(state, 2))
             {
                 d = n_randint(state, 2 * m * n + 1);
-                fmpz_mod_mat_randops(A, d, state);
+                fmpz_mod_mat_randops(A, state, d, ctx);
             }
 
-            fmpz_mod_mat_init_set(LU, A);
+            fmpz_mod_mat_init_set(LU, A, ctx);
             P = flint_malloc(sizeof(slong) * m);
 
-            rank = fmpz_mod_mat_lu(P, LU, 0);
+            rank = fmpz_mod_mat_lu(P, LU, 0, ctx);
 
             FLINT_TEST(r == rank);
 
             check(P, LU, A, rank, ctx);
 
-            fmpz_mod_mat_clear(A);
-            fmpz_mod_mat_clear(LU);
+            fmpz_mod_mat_clear(A, ctx);
+            fmpz_mod_mat_clear(LU, ctx);
             flint_free(P);
         }
 

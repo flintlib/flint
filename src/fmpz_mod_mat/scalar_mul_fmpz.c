@@ -10,15 +10,15 @@
 */
 
 #include "fmpz.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_mat.h"
 
-void fmpz_mod_mat_scalar_mul_fmpz(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, fmpz_t c)
+void fmpz_mod_mat_scalar_mul_fmpz(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, fmpz_t c, const fmpz_mod_ctx_t ctx)
 {
     fmpz_t d;
     fmpz_init(d);
-    fmpz_mod(d, c, A->mod);
-
-    fmpz_mat_scalar_mul_fmpz(B->mat, A->mat, d);
-    _fmpz_mod_mat_reduce(B);
+    fmpz_mod_set_fmpz(d, c, ctx);
+    fmpz_mat_scalar_mul_fmpz(B, A, d);
+    _fmpz_mod_mat_reduce(B, ctx);
     fmpz_clear(d);
 }

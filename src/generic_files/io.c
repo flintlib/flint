@@ -555,7 +555,7 @@ print_flint_type:
         else if (IS_FLINT_TYPE(ip, "fmpz_mod_mat"))
         {
             /* Print as if fmpz_mat */
-            res += __flint_mat_fprint(fs, va_arg(vlist, const fmpz_mod_mat_struct *)->mat, fmpz_type);
+            res += __flint_mat_fprint(fs, va_arg(vlist, const fmpz_mod_mat_struct *), fmpz_type);
             ip += STRING_LENGTH("fmpz_mod_mat}");
         }
         else if (IS_FLINT_TYPE(ip, "fmpz_mod_poly"))

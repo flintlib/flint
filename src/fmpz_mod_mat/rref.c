@@ -11,7 +11,7 @@
 
 #include "fmpz_mod_mat.h"
 
-slong fmpz_mod_mat_rref(slong * perm, fmpz_mod_mat_t mat)
+slong fmpz_mod_mat_rref(slong * perm, fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx)
 {
-    return fmpz_mat_rref_mod(perm, mat->mat, mat->mod);
+    return fmpz_mat_rref_mod(perm, mat, ctx->n);
 }

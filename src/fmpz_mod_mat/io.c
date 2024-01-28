@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include "fmpz_mod_mat.h"
 
-int fmpz_mod_mat_fprint(FILE * file, const fmpz_mod_mat_t mat) { return fmpz_mat_fprint(file, mat->mat); }
-int fmpz_mod_mat_fprint_pretty(FILE * file, const fmpz_mod_mat_t mat) { return fmpz_mat_fprint_pretty(file, mat->mat); }
-int fmpz_mod_mat_print(const fmpz_mod_mat_t mat) { return fmpz_mat_print(mat->mat); }
-void fmpz_mod_mat_print_pretty(const fmpz_mod_mat_t mat) { fmpz_mat_print_pretty(mat->mat); }
+int fmpz_mod_mat_fprint(FILE * file, const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx) { return fmpz_mat_fprint(file, mat); }
+int fmpz_mod_mat_fprint_pretty(FILE * file, const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx) { return fmpz_mat_fprint_pretty(file, mat); }
+int fmpz_mod_mat_print(const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx) { return fmpz_mat_print(mat); }
+void fmpz_mod_mat_print_pretty(const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx) { fmpz_mat_print_pretty(mat); }

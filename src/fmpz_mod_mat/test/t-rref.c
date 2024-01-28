@@ -24,12 +24,12 @@ check_rref(fmpz_mod_mat_t A)
     prev_row_zero = 0;
     prev_pivot = -1;
 
-    for (i = 0; i < A->mat->r; i++)
+    for (i = 0; i < A->r; i++)
     {
-        for (j = 0; j < A->mat->c; j++)
+        for (j = 0; j < A->c; j++)
         {
             /* Found nonzero entry */
-            if (!fmpz_is_zero(A->mat->rows[i] + j))
+            if (!fmpz_is_zero(A->rows[i] + j))
             {
                 if (prev_row_zero)
                 {
@@ -49,7 +49,7 @@ check_rref(fmpz_mod_mat_t A)
                 break;
             }
 
-            prev_row_zero = (j + 1 == A->mat->c);
+            prev_row_zero = (j + 1 == A->c);
         }
     }
 }
@@ -57,7 +57,7 @@ check_rref(fmpz_mod_mat_t A)
 TEST_FUNCTION_START(fmpz_mod_mat_rref, state)
 {
     fmpz_mod_mat_t A;
-    fmpz_t p;
+    fmpz_mod_ctx_t ctx;
     slong i, m, n, d, r, rank;
     slong *perm;
 
@@ -68,19 +68,18 @@ TEST_FUNCTION_START(fmpz_mod_mat_rref, state)
         n = n_randint(state, 10);
         perm = flint_malloc(FLINT_MAX(1, m) * sizeof(slong));
 
-        fmpz_init_set_ui(p, n_randtest_prime(state, 0));
+        fmpz_mod_ctx_init_rand_bits_prime(ctx, state, 100);
 
         for (r = 0; r <= FLINT_MIN(m, n); r++)
         {
-            fmpz_mod_mat_init(A, m, n, p);
+            fmpz_mod_mat_init(A, m, n, ctx);
+            fmpz_mod_mat_randrank(A, state, r, ctx);
 
-            fmpz_mod_mat_randrank(A, state, r);
-
-            rank = fmpz_mod_mat_rref(perm, A);
+            rank = fmpz_mod_mat_rref(perm, A, ctx);
 
             if (r < rank)
             {
-                fmpz_mod_mat_print_pretty(A);
+                fmpz_mod_mat_print_pretty(A, ctx);
                 flint_printf("FAIL:\n");
                 flint_printf("wrong rank!\n");
                 fflush(stdout);
@@ -89,10 +88,10 @@ TEST_FUNCTION_START(fmpz_mod_mat_rref, state)
 
             check_rref(A);
 
-            fmpz_mod_mat_clear(A);
+            fmpz_mod_mat_clear(A, ctx);
         }
 
-        fmpz_clear(p);
+        fmpz_mod_ctx_clear(ctx);
         flint_free(perm);
     }
 
@@ -103,20 +102,17 @@ TEST_FUNCTION_START(fmpz_mod_mat_rref, state)
         n = n_randint(state, 4);
         perm = flint_malloc(FLINT_MAX(1, m) * sizeof(slong));
 
-        fmpz_init_set_ui(p, n_randtest_prime(state, 0));
+        fmpz_mod_ctx_init_rand_bits_prime(ctx, state, 100);
 
         for (r = 0; r <= FLINT_MIN(m, n); r++)
         {
             d = n_randint(state, 2 * m * n + 1);
 
-            fmpz_mod_mat_init(A, m, n, p);
-            fmpz_mod_mat_randrank(A, state, r);
+            fmpz_mod_mat_init(A, m, n, ctx);
+            fmpz_mod_mat_randrank(A, state, r, ctx);
+            fmpz_mod_mat_randops(A, state, d, ctx);
 
-            fmpz_mat_randops(A->mat, state, d);
-
-            _fmpz_mod_mat_reduce(A);
-
-            rank = fmpz_mod_mat_rref(perm, A);
+            rank = fmpz_mod_mat_rref(perm, A, ctx);
 
             if (r < rank)
             {
@@ -128,10 +124,10 @@ TEST_FUNCTION_START(fmpz_mod_mat_rref, state)
 
             check_rref(A);
 
-            fmpz_mod_mat_clear(A);
+            fmpz_mod_mat_clear(A, ctx);
         }
 
-        fmpz_clear(p);
+        fmpz_mod_ctx_clear(ctx);
         flint_free(perm);
     }
 

@@ -20,7 +20,7 @@ void fq_get_fmpz_mod_mat(fmpz_mod_mat_t col,
 {
     slong i, n = fq_ctx_degree(ctx);
     for (i = 0; i < a->length; i++)
-        fmpz_mod_mat_set_entry(col, i, 0, a->coeffs + i);
+        fmpz_set(fmpz_mod_mat_entry(col, i, 0), a->coeffs + i);
     for ( ; i < n; i++)
         fmpz_zero(fmpz_mod_mat_entry(col, i, 0));
 }

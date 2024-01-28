@@ -27,11 +27,9 @@ TEST_FUNCTION_START(fmpz_mod_mat_mul_classical_threaded, state)
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
         fmpz_mod_mat_t A, B, C, D;
-        fmpz_t mod;
+        fmpz_mod_ctx_t ctx;
 
         slong m, k, n;
-
-        fmpz_init(mod);
 
         flint_set_num_threads(n_randint(state, max_threads) + 1);
 
@@ -41,37 +39,37 @@ TEST_FUNCTION_START(fmpz_mod_mat_mul_classical_threaded, state)
 
         /* We want to generate matrices with many entries close to half
            or full limbs with high probability, to stress overflow handling */
-        fmpz_randtest_not_zero(mod, state, 100);
+        fmpz_mod_ctx_init_rand_bits(ctx, state, 100);
 
-        fmpz_mod_mat_init(A, m, n, mod);
-        fmpz_mod_mat_init(B, n, k, mod);
-        fmpz_mod_mat_init(C, m, k, mod);
-        fmpz_mod_mat_init(D, m, k, mod);
+        fmpz_mod_mat_init(A, m, n, ctx);
+        fmpz_mod_mat_init(B, n, k, ctx);
+        fmpz_mod_mat_init(C, m, k, ctx);
+        fmpz_mod_mat_init(D, m, k, ctx);
 
-        fmpz_mod_mat_randtest(A, state);
-        fmpz_mod_mat_randtest(B, state);
-        fmpz_mod_mat_randtest(C, state);  /* make sure noise in the output is ok */
+        fmpz_mod_mat_randtest(A, state, ctx);
+        fmpz_mod_mat_randtest(B, state, ctx);
+        fmpz_mod_mat_randtest(C, state, ctx);  /* make sure noise in the output is ok */
 
-        fmpz_mod_mat_mul_classical_threaded(C, A, B);
-        fmpz_mod_mat_mul(D, A, B);
+        fmpz_mod_mat_mul_classical_threaded(C, A, B, ctx);
+        fmpz_mod_mat_mul(D, A, B, ctx);
 
-        if (!fmpz_mod_mat_equal(C, D))
+        if (!fmpz_mod_mat_equal(C, D, ctx))
         {
             flint_printf("FAIL: results not equal\n");
-            fmpz_mod_mat_print_pretty(A);
-            fmpz_mod_mat_print_pretty(B);
-            fmpz_mod_mat_print_pretty(C);
-            fmpz_mod_mat_print_pretty(D);
+            fmpz_mod_mat_print_pretty(A, ctx);
+            fmpz_mod_mat_print_pretty(B, ctx);
+            fmpz_mod_mat_print_pretty(C, ctx);
+            fmpz_mod_mat_print_pretty(D, ctx);
             fflush(stdout);
             flint_abort();
         }
 
-        fmpz_mod_mat_clear(A);
-        fmpz_mod_mat_clear(B);
-        fmpz_mod_mat_clear(C);
-        fmpz_mod_mat_clear(D);
+        fmpz_mod_mat_clear(A, ctx);
+        fmpz_mod_mat_clear(B, ctx);
+        fmpz_mod_mat_clear(C, ctx);
+        fmpz_mod_mat_clear(D, ctx);
 
-        fmpz_clear(mod);
+        fmpz_mod_ctx_clear(ctx);
     }
 
     TEST_FUNCTION_END(state);

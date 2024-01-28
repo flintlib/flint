@@ -14,23 +14,23 @@
 #include "fmpz.h"
 #include "fmpz_mod_mat.h"
 
-void fmpz_mod_mat_randtril(fmpz_mod_mat_t mat, flint_rand_t state, int unit)
+void fmpz_mod_mat_randtril(fmpz_mod_mat_t mat, flint_rand_t state, int unit, const fmpz_mod_ctx_t ctx)
 {
     fmpz* e;
     slong i, j;
 
-    for (i = 0; i < fmpz_mod_mat_nrows(mat); i++)
+    for (i = 0; i < fmpz_mod_mat_nrows(mat, ctx); i++)
     {
-        for (j = 0; j < fmpz_mod_mat_ncols(mat); j++)
+        for (j = 0; j < fmpz_mod_mat_ncols(mat, ctx); j++)
         {
             e = fmpz_mod_mat_entry(mat, i, j);
             if (j < i)
             {
-                fmpz_randm(e, state, mat->mod);
+                fmpz_randm(e, state, ctx->n);
             }
             else if (i == j)
             {
-                fmpz_randm(e, state, mat->mod);
+                fmpz_randm(e, state, ctx->n);
                 if (unit || fmpz_is_zero(e))
                     fmpz_one(e);
             }

@@ -10,10 +10,11 @@
 */
 
 #include "fmpz.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_mat.h"
 
-void fmpz_mod_mat_trace(fmpz_t trace, const fmpz_mod_mat_t mat)
+void fmpz_mod_mat_trace(fmpz_t trace, const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx)
 {
-    fmpz_mat_trace(trace, mat->mat);
-    fmpz_mod(trace, trace, mat->mod);
+    fmpz_mat_trace(trace, mat);
+    fmpz_mod_set_fmpz(trace, trace, ctx);
 }

@@ -12,8 +12,7 @@
 #include "fmpz.h"
 #include "fmpz_mod_mat.h"
 
-void fmpz_mod_mat_clear(fmpz_mod_mat_t mat)
+void fmpz_mod_mat_clear(fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx)
 {
-    fmpz_mat_clear(mat->mat);
-    fmpz_clear(mat->mod);
+    fmpz_mat_clear(mat);
 }

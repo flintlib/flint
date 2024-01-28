@@ -12,8 +12,7 @@
 #include "fmpz.h"
 #include "fmpz_mod_mat.h"
 
-void fmpz_mod_mat_init_set(fmpz_mod_mat_t mat, const fmpz_mod_mat_t src)
+void fmpz_mod_mat_init_set(fmpz_mod_mat_t mat, const fmpz_mod_mat_t src, const fmpz_mod_ctx_t ctx)
 {
-    fmpz_mat_init_set(mat->mat, src->mat);
-    fmpz_init_set(mat->mod, src->mod);
+    fmpz_mat_init_set(mat, src);
 }

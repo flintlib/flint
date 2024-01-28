@@ -14,6 +14,7 @@
 #include "thread_support.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_mat.h"
 
 #define FLINT_FMPZ_MUL_CLASSICAL_CACHE_SIZE 32768 /* size of L1 cache in words */
@@ -37,7 +38,7 @@ _fmpz_vec_dot_ptr(fmpz_t c, const fmpz * vec1, fmpz ** const vec2,
 
 static inline void
 _fmpz_mod_mat_addmul_basic_op(fmpz ** D, fmpz ** const C, fmpz ** const A,
-               fmpz ** const B, slong m, slong k, slong n, int op, fmpz_t p)
+               fmpz ** const B, slong m, slong k, slong n, int op, const fmpz_mod_ctx_t ctx)
 {
     slong i, j;
     fmpz_t c;
@@ -55,7 +56,7 @@ _fmpz_mod_mat_addmul_basic_op(fmpz ** D, fmpz ** const C, fmpz ** const A,
             else if (op == -1)
                 fmpz_sub(c, C[i] + j, c);
 
-            fmpz_mod(D[i] + j, c, p);
+            fmpz_mod_set_fmpz(D[i] + j, c, ctx);
         }
     }
 
@@ -74,11 +75,11 @@ typedef struct
     fmpz ** C;
     fmpz ** D;
     fmpz * tmp;
-    fmpz * p;
 #if FLINT_USES_PTHREAD
     pthread_mutex_t * mutex;
 #endif
     int op;
+    const fmpz_mod_ctx_struct * ctx;
 } fmpz_mod_mat_transpose_arg_t;
 
 void
@@ -94,8 +95,8 @@ _fmpz_mod_mat_addmul_transpose_worker(void * arg_ptr)
     fmpz ** const C = arg.C;
     fmpz ** D = arg.D;
     fmpz * tmp = arg.tmp;
-    fmpz * p = arg.p;
     int op = arg.op;
+    const fmpz_mod_ctx_struct * ctx = arg.ctx;
     fmpz_t c;
 
     fmpz_init(c);
@@ -134,12 +135,13 @@ _fmpz_mod_mat_addmul_transpose_worker(void * arg_ptr)
             {
                 _fmpz_vec_dot(c, A[i], tmp + j*k, k);
 
+                /* todo: use dot_general */
                 if (op == 1)
                     fmpz_add(c, C[i] + j, c);
                 else if (op == -1)
                     fmpz_sub(c, C[i] + j, c);
 
-                fmpz_mod(D[i] + j, c, p);
+                fmpz_mod_set_fmpz(D[i] + j, c, ctx);
             }
         }
     }
@@ -148,8 +150,8 @@ _fmpz_mod_mat_addmul_transpose_worker(void * arg_ptr)
 static inline void
 _fmpz_mod_mat_addmul_transpose_threaded_pool_op(fmpz ** D, fmpz ** const C,
                             fmpz ** const A, fmpz ** const B, slong m,
-                                       slong k, slong n, int op, fmpz_t p,
-                               thread_pool_handle * threads, slong num_threads)
+                                       slong k, slong n, int op,
+                               thread_pool_handle * threads, slong num_threads, const fmpz_mod_ctx_t ctx)
 {
     fmpz * tmp;
     slong i, j, block, nlimbs;
@@ -166,7 +168,7 @@ _fmpz_mod_mat_addmul_transpose_threaded_pool_op(fmpz ** D, fmpz ** const C,
         for (j = 0; j < n; j++)
             fmpz_set(tmp + j*k + i, B[i] + j);
 
-    nlimbs = fmpz_size(p);
+    nlimbs = fmpz_size(ctx->n);
 
     /* compute optimal block width */
     block = FLINT_MAX(FLINT_MIN(m/(num_threads + 1), n/(num_threads + 1)), 1);
@@ -188,11 +190,11 @@ _fmpz_mod_mat_addmul_transpose_threaded_pool_op(fmpz ** D, fmpz ** const C,
         args[i].C       = C;
         args[i].D       = D;
         args[i].tmp     = tmp;
-        args[i].p       = p;
 #if FLINT_USES_PTHREAD
         args[i].mutex   = &mutex;
 #endif
-	args[i].op      = op;
+        args[i].op      = op;
+        args[i].ctx     = ctx;
     }
 
 #if FLINT_USES_PTHREAD
@@ -224,58 +226,56 @@ _fmpz_mod_mat_addmul_transpose_threaded_pool_op(fmpz ** D, fmpz ** const C,
 void
 _fmpz_mod_mat_mul_classical_threaded_pool_op(fmpz_mod_mat_t D, const fmpz_mod_mat_t C,
                             const fmpz_mod_mat_t A, const fmpz_mod_mat_t B, int op,
-                               thread_pool_handle * threads, slong num_threads)
+                               thread_pool_handle * threads, slong num_threads, const fmpz_mod_ctx_t ctx)
 {
     slong m, k, n;
 
-    m = A->mat->r;
-    k = A->mat->c;
-    n = B->mat->c;
+    m = A->r;
+    k = A->c;
+    n = B->c;
 
-    _fmpz_mod_mat_addmul_transpose_threaded_pool_op(D->mat->rows,
-                (op == 0) ? NULL : C->mat->rows, A->mat->rows, B->mat->rows,
-                                    m, k, n, op, D->mod, threads, num_threads);
+    _fmpz_mod_mat_addmul_transpose_threaded_pool_op(D->rows,
+                (op == 0) ? NULL : C->rows, A->rows, B->rows,
+                                    m, k, n, op, threads, num_threads, ctx);
 }
 
 void
 fmpz_mod_mat_mul_classical_threaded_op(fmpz_mod_mat_t D, const fmpz_mod_mat_t C,
-            const fmpz_mod_mat_t A, const fmpz_mod_mat_t B, int op)
+            const fmpz_mod_mat_t A, const fmpz_mod_mat_t B, int op, const fmpz_mod_ctx_t ctx)
 {
     thread_pool_handle * threads;
     slong num_threads;
 
-    if (A->mat->c == 0)
+    if (A->c == 0)
     {
         if (op == 0)
-            fmpz_mod_mat_zero(D);
+            fmpz_mod_mat_zero(D, ctx);
         else
-            fmpz_mod_mat_set(D, C);
-
+            fmpz_mod_mat_set(D, C, ctx);
         return;
     }
 
-    if (A->mat->r < FMPZ_MOD_MAT_MUL_TRANSPOSE_CUTOFF
-        || A->mat->c < FMPZ_MOD_MAT_MUL_TRANSPOSE_CUTOFF
-        || B->mat->c < FMPZ_MOD_MAT_MUL_TRANSPOSE_CUTOFF)
+    if (A->r < FMPZ_MOD_MAT_MUL_TRANSPOSE_CUTOFF
+        || A->c < FMPZ_MOD_MAT_MUL_TRANSPOSE_CUTOFF
+        || B->c < FMPZ_MOD_MAT_MUL_TRANSPOSE_CUTOFF)
     {
-        _fmpz_mod_mat_addmul_basic_op(D->mat->rows,
-                                         (op == 0) ? NULL : C->mat->rows,
-                                      A->mat->rows, B->mat->rows, A->mat->r,
-                                             A->mat->c, B->mat->c, op, D->mod);
-
+        _fmpz_mod_mat_addmul_basic_op(D->rows,
+                                         (op == 0) ? NULL : C->rows,
+                                      A->rows, B->rows, A->r,
+                                             A->c, B->c, op, ctx);
         return;
     }
 
     num_threads = flint_request_threads(&threads, flint_get_num_threads());
 
-    _fmpz_mod_mat_mul_classical_threaded_pool_op(D, C, A, B, op, threads, num_threads);
+    _fmpz_mod_mat_mul_classical_threaded_pool_op(D, C, A, B, op, threads, num_threads, ctx);
 
     flint_give_back_threads(threads, num_threads);
 }
 
 void
 fmpz_mod_mat_mul_classical_threaded(fmpz_mod_mat_t C, const fmpz_mod_mat_t A,
-                                        const fmpz_mod_mat_t B)
+                                        const fmpz_mod_mat_t B, const fmpz_mod_ctx_t ctx)
 {
-    fmpz_mod_mat_mul_classical_threaded_op(C, NULL, A, B, 0);
+    fmpz_mod_mat_mul_classical_threaded_op(C, NULL, A, B, 0, ctx);
 }

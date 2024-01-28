@@ -13,12 +13,16 @@
 #include "thread_support.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
+#include "fmpz_mod_vec.h"
 #include "fmpz_mod_mat.h"
+
+/* todo: rewrite using parallel_do */
 
 typedef struct {
     slong startrow;
     slong stoprow;
     fmpz_mod_mat_struct * M;
+    const fmpz_mod_ctx_struct * ctx;
 } _worker_arg;
 
 static void _red_worker(void * varg)
@@ -27,16 +31,17 @@ static void _red_worker(void * varg)
     slong startrow = arg->startrow;
     slong stoprow = arg->stoprow;
     fmpz_mod_mat_struct * M = arg->M;
-    slong c = fmpz_mod_mat_ncols(M);
+    const fmpz_mod_ctx_struct * ctx = arg->ctx;
+    slong c = fmpz_mod_mat_ncols(M, ctx);
     slong i;
 
     for (i = startrow; i < stoprow; i++)
-        _fmpz_vec_scalar_mod_fmpz(M->mat->rows[i], M->mat->rows[i], c, M->mod);
+        _fmpz_mod_vec_set_fmpz_vec(M->rows[i], M->rows[i], c, ctx);
 }
 
-void _fmpz_mod_mat_reduce(fmpz_mod_mat_t M)
+void _fmpz_mod_mat_reduce(fmpz_mod_mat_t M, const fmpz_mod_ctx_t ctx)
 {
-    slong i, r = fmpz_mod_mat_nrows(M);
+    slong i, r = fmpz_mod_mat_nrows(M, ctx);
     thread_pool_handle * handles;
     slong num_workers;
     _worker_arg mainarg;
@@ -44,13 +49,14 @@ void _fmpz_mod_mat_reduce(fmpz_mod_mat_t M)
     slong limit;
 
     /* limit on threads */
-    limit = fmpz_size(M->mod) + r + fmpz_mod_mat_ncols(M);
+    limit = fmpz_size(ctx->n) + r + fmpz_mod_mat_ncols(M, ctx);
     limit = limit < 64 ? 0 : (limit - 64)/64;
     limit = FLINT_MIN(limit, r);
 
     mainarg.startrow = 0;
     mainarg.stoprow = r;
     mainarg.M = M;
+    mainarg.ctx = ctx;
 
     if (limit < 2)
     {
@@ -73,6 +79,7 @@ use_one_thread:
         args[i].startrow = (i + 0)*r/(num_workers + 1);
         args[i].stoprow = (i + 1)*r/(num_workers + 1);
         args[i].M = M;
+        args[i].ctx = ctx;
     }
 
     i = num_workers;

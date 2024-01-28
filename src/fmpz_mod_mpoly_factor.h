@@ -150,7 +150,7 @@ void fmpz_mod_poly_eval2_pow(fmpz_t evalp, fmpz_t evalm,
 
 /* fmpz_mod_mat extras *******************************************************/
 
-int fmpz_mod_mat_is_reduced(const fmpz_mod_mat_t N);
+int fmpz_mod_mat_is_reduced(const fmpz_mod_mat_t N, const fmpz_mod_ctx_t ctx);
 
 void fmpz_mod_mat_init_nullspace_tr(fmpz_mod_mat_t X,
                                  fmpz_mod_mat_t tmp, const fmpz_mod_ctx_t ctx);
