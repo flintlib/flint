@@ -13,12 +13,14 @@
 #include "fmpz_factor.h"
 #include "fmpz_vec.h"
 #include "fmpz_mod.h"
+#include "fmpz_mod_vec.h"
 #include "fmpz_mod_mat.h"
 #include "fmpz_mod_poly.h"
 #include "fmpz_mod_poly_factor.h"
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
+#include "gr_mat.h"
 
 typedef struct
 {
@@ -437,6 +439,14 @@ _gr_fmpz_mod_vec_dot_rev(fmpz_t res, const fmpz_t initial, int subtract, const f
 }
 
 int
+_gr_fmpz_mod_vec_addmul_scalar(fmpz * res, const fmpz * vec, slong len, const fmpz_t c, gr_ctx_t ctx)
+{
+    _fmpz_mod_vec_scalar_addmul_fmpz_mod(res, vec, len, c, FMPZ_MOD_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+
+int
 _gr_fmpz_mod_poly_mullow(fmpz * res,
     const fmpz * poly1, slong len1,
     const fmpz * poly2, slong len2, slong n, gr_ctx_t ctx)
@@ -617,6 +627,14 @@ _gr_fmpz_mod_mat_mul(fmpz_mat_t res, const fmpz_mat_t x, const fmpz_mat_t y, gr_
     return GR_SUCCESS;
 }
 
+/* todo: tune cutoff for different bit sizes */
+/* also tune cutoff for triangular solving */
+int
+_gr_fmpz_mod_mat_lu(slong * rank, slong * P, fmpz_mat_t LU, const fmpz_mat_t A, int rank_check, gr_ctx_t ctx)
+{
+    return gr_mat_lu_recursive(rank, P, (gr_mat_struct *) LU, (const gr_mat_struct *) A, rank_check, 8, ctx);
+}
+
 int _fmpz_mod_methods_initialized = 0;
 
 gr_static_method_table _fmpz_mod_methods;
@@ -675,12 +693,14 @@ gr_method_tab_input _fmpz_mod_methods_input[] =
     {GR_METHOD_POW_FMPZ,        (gr_funcptr) _gr_fmpz_mod_pow_fmpz},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_fmpz_mod_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_fmpz_mod_vec_dot_rev},
+    {GR_METHOD_VEC_ADDMUL_SCALAR,    (gr_funcptr) _gr_fmpz_mod_vec_addmul_scalar},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fmpz_mod_poly_mullow},
     {GR_METHOD_POLY_INV_SERIES, (gr_funcptr) _gr_fmpz_mod_poly_inv_series},
     {GR_METHOD_POLY_DIV_SERIES, (gr_funcptr) _gr_fmpz_mod_poly_div_series},
     {GR_METHOD_POLY_DIVREM,     (gr_funcptr) _gr_fmpz_mod_poly_divrem},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_fmpz_mod_roots_gr_poly},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_fmpz_mod_mat_mul},
+    {GR_METHOD_MAT_LU,          (gr_funcptr) _gr_fmpz_mod_mat_lu},
     {0,                         (gr_funcptr) NULL},
 };
 
