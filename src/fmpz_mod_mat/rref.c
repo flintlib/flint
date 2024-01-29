@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2019 Tommy Hofmann
+    Copyright (C) 2024 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -10,8 +11,14 @@
 */
 
 #include "fmpz_mod_mat.h"
+#include "gr.h"
+#include "gr_mat.h"
 
-slong fmpz_mod_mat_rref(slong * perm, fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx)
+slong fmpz_mod_mat_rref(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, const fmpz_mod_ctx_t ctx)
 {
-    return fmpz_mat_rref_mod(perm, mat, ctx->n);
+    gr_ctx_t gr_ctx;
+    slong rank;
+    _gr_ctx_init_fmpz_mod_from_ref(gr_ctx, ctx);
+    GR_MUST_SUCCEED(gr_mat_rref_lu(&rank, (gr_mat_struct *) B, (const gr_mat_struct *) A, gr_ctx));
+    return rank;
 }

@@ -29,7 +29,7 @@ slong fmpz_mod_mat_nullspace(fmpz_mod_mat_t X, const fmpz_mod_mat_t A, const fmp
     p = flint_malloc(sizeof(slong) * FLINT_MAX(m, n));
 
     fmpz_mod_mat_init_set(tmp, A, ctx);
-    rank = fmpz_mod_mat_rref(NULL, tmp, ctx);
+    rank = fmpz_mod_mat_rref(tmp, tmp, ctx);
     nullity = n - rank;
 
     fmpz_mod_mat_zero(X, ctx);

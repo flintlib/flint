@@ -94,7 +94,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_rref, state)
         TEMPLATE(T, mat_init_set) (B, A, ctx);
         TEMPLATE(T, mat_init_set) (C, A, ctx);
 
-        rank1 = TEMPLATE(T, mat_rref) (B, ctx);
+        rank1 = TEMPLATE(T, mat_rref) (B, B, ctx);
 
         if (!check_rref_form(perm, B, rank1, ctx))
         {
@@ -132,7 +132,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_rref, state)
             }
         }
 
-        rank2 = TEMPLATE(T, mat_rref) (D, ctx);
+        rank2 = TEMPLATE(T, mat_rref) (D, D, ctx);
         equal = (rank1 == rank2);
 
         if (equal)

@@ -687,7 +687,7 @@ pick_evaluation_point:
             }
 
         }
-        fq_nmod_mat_rref(ML + s, ctx->fqctx);
+        fq_nmod_mat_rref(ML + s, ML + s, ctx->fqctx);
 
         for (i = 0; i < (f->coeffs + s)->length; i++)
         {
@@ -716,7 +716,7 @@ pick_evaluation_point:
             fq_nmod_mat_window_clear(Mwindow, ctx->fqctx);
         }
 
-        nullity = l - fq_nmod_mat_rref(MF, ctx->fqctx);
+        nullity = l - fq_nmod_mat_rref(MF, MF, ctx->fqctx);
 
         if (nullity == 0)
         {

@@ -59,14 +59,12 @@ TEST_FUNCTION_START(fmpz_mod_mat_rref, state)
     fmpz_mod_mat_t A;
     fmpz_mod_ctx_t ctx;
     slong i, m, n, d, r, rank;
-    slong *perm;
 
     /* Maximally sparse matrices of given rank */
     for (i = 0; i < 10000; i++)
     {
         m = n_randint(state, 10);
         n = n_randint(state, 10);
-        perm = flint_malloc(FLINT_MAX(1, m) * sizeof(slong));
 
         fmpz_mod_ctx_init_rand_bits_prime(ctx, state, 100);
 
@@ -75,7 +73,7 @@ TEST_FUNCTION_START(fmpz_mod_mat_rref, state)
             fmpz_mod_mat_init(A, m, n, ctx);
             fmpz_mod_mat_randrank(A, state, r, ctx);
 
-            rank = fmpz_mod_mat_rref(perm, A, ctx);
+            rank = fmpz_mod_mat_rref(A, A, ctx);
 
             if (r < rank)
             {
@@ -92,7 +90,6 @@ TEST_FUNCTION_START(fmpz_mod_mat_rref, state)
         }
 
         fmpz_mod_ctx_clear(ctx);
-        flint_free(perm);
     }
 
     /* Dense */
@@ -100,7 +97,6 @@ TEST_FUNCTION_START(fmpz_mod_mat_rref, state)
     {
         m = n_randint(state, 5);
         n = n_randint(state, 4);
-        perm = flint_malloc(FLINT_MAX(1, m) * sizeof(slong));
 
         fmpz_mod_ctx_init_rand_bits_prime(ctx, state, 100);
 
@@ -112,7 +108,7 @@ TEST_FUNCTION_START(fmpz_mod_mat_rref, state)
             fmpz_mod_mat_randrank(A, state, r, ctx);
             fmpz_mod_mat_randops(A, state, d, ctx);
 
-            rank = fmpz_mod_mat_rref(perm, A, ctx);
+            rank = fmpz_mod_mat_rref(A, A, ctx);
 
             if (r < rank)
             {
@@ -128,7 +124,6 @@ TEST_FUNCTION_START(fmpz_mod_mat_rref, state)
         }
 
         fmpz_mod_ctx_clear(ctx);
-        flint_free(perm);
     }
 
     TEST_FUNCTION_END(state);

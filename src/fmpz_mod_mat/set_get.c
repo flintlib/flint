@@ -19,13 +19,6 @@ void fmpz_mod_mat_set_entry(fmpz_mod_mat_t mat, slong i, slong j, const fmpz_t v
     fmpz_set(fmpz_mat_entry(mat, i, j), val);
 }
 
-void fmpz_mod_mat_set_fmpz_mat(fmpz_mod_mat_t A, const fmpz_mat_t B, const fmpz_mod_ctx_t ctx)
-{
-    /* todo: an implementation of this function should actually replace _fmpz_mod_mat_reduce */
-    fmpz_mat_set(A, B);
-    _fmpz_mod_mat_reduce(A, ctx);
-}
-
 void fmpz_mod_mat_set(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, const fmpz_mod_ctx_t ctx)
 {
     fmpz_mat_set(B, A);

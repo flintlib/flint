@@ -1024,7 +1024,7 @@ static void _lattice(
         fmpz_mod_mat_init(T2, fmpz_mod_mat_nrows(T1, ctx), fmpz_mod_mat_ncols(N, ctx), ctx);
         fmpz_mod_mat_mul(T2, T1, N, ctx);
         fmpz_mod_mat_swap(T2, N, ctx);
-        fmpz_mod_mat_rref(NULL, N, ctx);
+        fmpz_mod_mat_rref(N, N, ctx);
 
         fmpz_mod_mat_clear(M, ctx);
         fmpz_mod_mat_clear(T1, ctx);

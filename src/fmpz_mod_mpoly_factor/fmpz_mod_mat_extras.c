@@ -45,7 +45,7 @@ void fmpz_mod_mat_init_nullspace_tr(fmpz_mod_mat_t X, fmpz_mod_mat_t tmp, const 
 
     p = FLINT_ARRAY_ALLOC(FLINT_MAX(m, n), slong);
 
-    rank = fmpz_mod_mat_rref(NULL, tmp, ctx);
+    rank = fmpz_mod_mat_rref(tmp, tmp, ctx);
 
     nullity = n - rank;
 
