@@ -15,10 +15,25 @@
 #include "double_extras.h"
 #include "d_vec.h"
 
+static int
+_check_results(double res1, double res2)
+{
+    if (d_is_nan(res2))
+        return d_is_nan(res1);
+    else
+#if !defined(_MSC_VER)
+        return res1 == res2;
+#else
+        /* MSVC's ldexp doesn't give the same result as multiplying by 2^e
+           for subnormals, so relax the test */
+        return (res1 == res2) || fabs(res1 - res2) < 1e-300;
+#endif
+}
+
 TEST_FUNCTION_START(d_mul_2exp, state)
 {
     double x, res1, res2;
-    int e, ok;
+    int e;
     slong iter;
 
     for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
@@ -29,12 +44,7 @@ TEST_FUNCTION_START(d_mul_2exp, state)
         res1 = d_mul_2exp(x, e);
         res2 = ldexp(x, e);
 
-        if (d_is_nan(res2))
-            ok = d_is_nan(res1);
-        else
-            ok = res1 == res2;
-
-        if (!ok)
+        if (!_check_results(res1, res2))
             TEST_FUNCTION_FAIL("x = %.20g\n res1 = %.20g\n res2 = %.20g\n", x, res1, res2);
     }
 
@@ -48,9 +58,7 @@ TEST_FUNCTION_START(d_mul_2exp, state)
         res1 = d_mul_2exp_inrange2(x, e);
         res2 = ldexp(x, e);
 
-        ok = res1 == res2;
-
-        if (!ok)
+        if (!(res1 == res2))
             TEST_FUNCTION_FAIL("x = %.20g\n res1 = %.20g\n res2 = %.20g\n", x, res1, res2);
     }
 
@@ -62,12 +70,7 @@ TEST_FUNCTION_START(d_mul_2exp, state)
         res1 = d_mul_2exp_inrange(x, e);
         res2 = ldexp(x, e);
 
-        if (d_is_nan(res2))
-            ok = d_is_nan(res1);
-        else
-            ok = res1 == res2;
-
-        if (!ok)
+        if (!_check_results(res1, res2))
             TEST_FUNCTION_FAIL("x = %.20g\n res1 = %.20g\n res2 = %.20g\n", x, res1, res2);
     }
 
@@ -89,12 +92,7 @@ TEST_FUNCTION_START(d_mul_2exp, state)
             res1 = r[i];
             res2 = ldexp(v[i], e);
 
-            if (d_is_nan(res2))
-                ok = d_is_nan(res1);
-            else
-                ok = res1 == res2;
-
-            if (!ok)
+            if (!_check_results(res1, res2))
                 TEST_FUNCTION_FAIL("x = %.20g\n res1 = %.20g\n res2 = %.20g\n", x, res1, res2);
         }
     }
