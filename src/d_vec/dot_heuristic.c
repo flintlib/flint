@@ -36,8 +36,8 @@ _d_vec_dot_heuristic(const double *vec1, const double *vec2, slong len2,
     {
         p = frexp(psum, &pexp);
         n = frexp(nsum, &nexp);
-        p = ldexp(1.0, pexp - D_BITS);
-        n = ldexp(1.0, nexp - D_BITS);
+        p = d_mul_2exp(1.0, pexp - D_BITS);
+        n = d_mul_2exp(1.0, nexp - D_BITS);
         d = FLINT_MAX(p, n);
         *err = 2 * len2 * d;
     }

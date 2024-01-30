@@ -18,6 +18,8 @@
 # include <math.h>
 #endif
 
+#include "double_extras.h"
+
 /* Block size for better cache locality. */
 #define BLOCK_SIZE 32
 
@@ -101,7 +103,7 @@ static inline slong _mag_get_exp(const mag_t x)
 static double
 mag_get_d_fixed_si(const mag_t x, slong e)
 {
-    return ldexp(MAG_MAN(x), MAG_EXP(x) - e - MAG_BITS);
+    return d_mul_2exp(MAG_MAN(x), MAG_EXP(x) - e - MAG_BITS);
 }
 
 void

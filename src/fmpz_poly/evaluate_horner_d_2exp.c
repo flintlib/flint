@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2016 William Hart
-    Copyright (C) 2021 Fredrik Johansson
+    Copyright (C) 2021, 2024 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -11,6 +11,7 @@
 */
 
 #include <math.h>
+#include <double_extras.h>
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
@@ -73,7 +74,7 @@ dpe_add(dpe_t x, dpe_t y)
         if (d > 53 + ADJUSTMENT_DELAY)
             return x;
 
-        res.m = x.m + ldexp(y.m, -d);
+        res.m = x.m + d_mul_2exp_inrange(y.m, -d);
         res.e = x.e;
     }
     else
@@ -83,7 +84,7 @@ dpe_add(dpe_t x, dpe_t y)
         if (d > 53 + ADJUSTMENT_DELAY)
             return y;
 
-        res.m = y.m + ldexp(x.m, -d);
+        res.m = y.m + d_mul_2exp_inrange(x.m, -d);
         res.e = y.e;
     }
 

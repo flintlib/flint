@@ -32,6 +32,6 @@ mag_get_d(const mag_t z)
     }
     else
     {
-        return ldexp(MAG_MAN(z), MAG_EXP(z) - MAG_BITS);
+        return d_mul_2exp(MAG_MAN(z), MAG_EXP(z) - MAG_BITS);
     }
 }

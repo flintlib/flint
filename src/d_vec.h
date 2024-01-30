@@ -12,7 +12,14 @@
 #ifndef D_VEC_H
 #define D_VEC_H
 
+#ifdef D_VEC_INLINES_C
+#define D_VEC_INLINE
+#else
+#define D_VEC_INLINE static inline
+#endif
+
 #include "flint.h"
+#include "double_extras.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,11 +52,31 @@ int _d_vec_is_zero(const double * vec, slong len);
 
 int _d_vec_is_approx_zero(const double * vec, slong len, double eps);
 
-/*  Addition  ****************************************************************/
+/*  Arithmetic  ****************************************************************/
 
 void _d_vec_add(double * res, const double * vec1, const double * vec2, slong len2);
 
 void _d_vec_sub(double * res, const double * vec1, const double * vec2, slong len2);
+
+D_VEC_INLINE
+void _d_vec_mul_2exp(double * res, const double * x, slong len, int e)
+{
+    slong i;
+
+    if (e >= D_MIN_NORMAL_EXPONENT && e <= D_MAX_NORMAL_EXPONENT)
+    {
+        double_uint64_u u;
+        u.i = ((int64_t) (e + D_EXPONENT_BIAS)) << D_EXPONENT_SHIFT;
+
+        for (i = 0; i < len; i++)
+            res[i] = x[i] * u.f;
+    }
+    else
+    {
+        for (i = 0; i < len; i++)
+            res[i] = ldexp(x[i], e);
+    }
+}
 
 /*  Dot product and norm  **************************************/
 

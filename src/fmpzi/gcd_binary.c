@@ -10,6 +10,7 @@
 */
 
 #include <math.h>
+#include "double_extras.h"
 #include "fmpzi.h"
 
 double
@@ -27,14 +28,14 @@ fmpzi_norm_approx_d_2exp(slong * exp, const fmpzi_t x)
         if (aexp >= bexp + 64)
             b = 0.0;
         else
-            b = ldexp(b, aexp - bexp);
+            b = d_mul_2exp(b, aexp - bexp);
     }
     else
     {
         if (bexp >= aexp + 64)
             a = 0.0;
         else
-            a = ldexp(a, bexp - aexp);
+            a = d_mul_2exp(a, bexp - aexp);
     }
 
     a = a * a + b * b;

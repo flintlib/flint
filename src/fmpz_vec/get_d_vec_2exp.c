@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2011, 2024 Fredrik Johansson
     Copyright (C) 2014 Abhinav Baid
 
     This file is part of FLINT.
@@ -12,18 +12,16 @@
 
 #include "fmpz.h"
 #include "fmpz_vec.h"
-
-#ifdef __GNUC__
-# define ldexp __builtin_ldexp
-#else
-# include <math.h>
-#endif
+#include "double_extras.h"
 
 slong
 _fmpz_vec_get_d_vec_2exp(double *appv, const fmpz * vec, slong len)
 {
     slong *exp, i, maxexp = 0L;
-    exp = (slong *) flint_malloc(len * sizeof(slong));
+    TMP_INIT;
+
+    TMP_START;
+    exp = TMP_ALLOC(len * sizeof(slong));
 
     for (i = 0; i < len; i++)
     {
@@ -33,8 +31,8 @@ _fmpz_vec_get_d_vec_2exp(double *appv, const fmpz * vec, slong len)
     }
 
     for (i = 0; i < len; i++)
-        appv[i] = ldexp(appv[i], exp[i] - maxexp);
+        appv[i] = d_mul_2exp(appv[i], exp[i] - maxexp);
 
-    flint_free(exp);
+    TMP_END;
     return maxexp;
 }

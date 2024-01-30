@@ -110,7 +110,7 @@ FUNC_HEAD
             {
                 /* test of the relaxed size-reduction condition */
                 tmp = fabs(d_mat_entry(mu, kappa, j));
-                tmp = ldexp(tmp, expo[kappa] - expo[j]);
+                tmp = d_mul_2exp(tmp, expo[kappa] - expo[j]);
 
                 if (tmp > halfplus)
                 {
@@ -124,7 +124,7 @@ FUNC_HEAD
                         {
                             for (k = zeros + 1; k < j; k++)
                             {
-                                tmp = ldexp(d_mat_entry(mu, j, k), exponent);
+                                tmp = d_mul_2exp(d_mat_entry(mu, j, k), exponent);
                                 d_mat_entry(mu, kappa, k) =
                                     d_mat_entry(mu, kappa, k) - tmp;
                             }
@@ -141,7 +141,7 @@ FUNC_HEAD
                         {
                             for (k = zeros + 1; k < j; k++)
                             {
-                                tmp = ldexp(d_mat_entry(mu, j, k), exponent);
+                                tmp = d_mul_2exp(d_mat_entry(mu, j, k), exponent);
                                 d_mat_entry(mu, kappa, k) =
                                     d_mat_entry(mu, kappa, k) + tmp;
                             }
@@ -157,7 +157,7 @@ FUNC_HEAD
                     }
                     else        /* we must have |X| >= 2 */
                     {
-                        tmp = ldexp(d_mat_entry(mu, kappa, j), -exponent);
+                        tmp = d_mul_2exp(d_mat_entry(mu, kappa, j), -exponent);
                         if ((tmp < (double) FMPZ_LLL_MAX_LONG)
                             && (tmp > (double) -FMPZ_LLL_MAX_LONG))
                         {
@@ -169,7 +169,7 @@ FUNC_HEAD
                             for (k = zeros + 1; k < j; k++)
                             {
                                 rtmp = tmp * d_mat_entry(mu, j, k);
-                                rtmp = ldexp(rtmp, exponent);
+                                rtmp = d_mul_2exp(rtmp, exponent);
                                 d_mat_entry(mu, kappa, k) =
                                     d_mat_entry(mu, kappa, k) - rtmp;
                             }
@@ -214,7 +214,7 @@ FUNC_HEAD
                                 {
                                     rtmp =
                                         ((double) xx) * d_mat_entry(mu, j, k);
-                                    rtmp = ldexp(rtmp, expo[j] - expo[kappa]);
+                                    rtmp = d_mul_2exp(rtmp, expo[j] - expo[kappa]);
                                     d_mat_entry(mu, kappa, k) =
                                         d_mat_entry(mu, kappa, k) - rtmp;
                                 }
@@ -242,7 +242,7 @@ FUNC_HEAD
                                     rtmp =
                                         ((double) xx) * d_mat_entry(mu, j, k);
                                     rtmp =
-                                        ldexp(rtmp,
+                                        d_mul_2exp(rtmp,
                                               exponent + expo[j] -
                                               expo[kappa]);
                                     d_mat_entry(mu, kappa, k) =
@@ -325,25 +325,25 @@ FUNC_HEAD
                 if (j > zeros + 2)
                 {
                     tmp =
-                        ldexp(d_mat_entry(mu, j, zeros + 1) * d_mat_entry(r,
+                        d_mul_2exp(d_mat_entry(mu, j, zeros + 1) * d_mat_entry(r,
                                                                           kappa,
                                                                           zeros
                                                                           + 1),
                               (expo[j] - expo[zeros + 1]));
                     rtmp = fmpz_get_d_2exp(&exp, fmpz_mat_entry(GM, kappa, j));
-                    rtmp = ldexp(rtmp, (exp - expo[kappa])) - tmp;
+                    rtmp = d_mul_2exp(rtmp, (exp - expo[kappa])) - tmp;
 
                     for (k = zeros + 2; k < j - 1; k++)
                     {
                         tmp =
-                            ldexp(d_mat_entry(mu, j, k) *
+                            d_mul_2exp(d_mat_entry(mu, j, k) *
                                   d_mat_entry(r, kappa, k),
                                   (expo[j] - expo[k]));
                         rtmp = rtmp - tmp;
                     }
 
                     tmp =
-                        ldexp(d_mat_entry(mu, j, j - 1) * d_mat_entry(r, kappa,
+                        d_mul_2exp(d_mat_entry(mu, j, j - 1) * d_mat_entry(r, kappa,
                                                                       j - 1),
                               (expo[j] - expo[j - 1]));
                     d_mat_entry(r, kappa, j) = rtmp - tmp;
@@ -351,7 +351,7 @@ FUNC_HEAD
                 else if (j == zeros + 2)
                 {
                     tmp =
-                        ldexp(d_mat_entry(mu, j, zeros + 1) * d_mat_entry(r,
+                        d_mul_2exp(d_mat_entry(mu, j, zeros + 1) * d_mat_entry(r,
                                                                           kappa,
                                                                           zeros
                                                                           + 1),
@@ -359,7 +359,7 @@ FUNC_HEAD
                     d_mat_entry(r, kappa, j) =
                         fmpz_get_d_2exp(&exp, fmpz_mat_entry(GM, kappa, j));
                     d_mat_entry(r, kappa, j) =
-                        ldexp(d_mat_entry(r, kappa, j),
+                        d_mul_2exp(d_mat_entry(r, kappa, j),
                               (exp - expo[kappa])) - tmp;
                 }
                 else
@@ -367,7 +367,7 @@ FUNC_HEAD
                     d_mat_entry(r, kappa, j) =
                         fmpz_get_d_2exp(&exp, fmpz_mat_entry(GM, kappa, j));
                     d_mat_entry(r, kappa, j) =
-                        ldexp(d_mat_entry(r, kappa, j), (exp - expo[kappa]));
+                        d_mul_2exp(d_mat_entry(r, kappa, j), (exp - expo[kappa]));
                 }
 
                 d_mat_entry(mu, kappa, j) =
@@ -401,7 +401,7 @@ FUNC_HEAD
             {
                 /* test of the relaxed size-reduction condition */
                 tmp = fabs(d_mat_entry(mu, kappa, j));
-                tmp = ldexp(tmp, expo[kappa] - expo[j]);
+                tmp = d_mul_2exp(tmp, expo[kappa] - expo[j]);
 
                 if (tmp > halfplus)
                 {
@@ -416,7 +416,7 @@ FUNC_HEAD
                             fmpz_set_ui(x + j - zeros - 1, 1);
                             for (k = zeros + 1; k < j; k++)
                             {
-                                tmp = ldexp(d_mat_entry(mu, j, k), exponent);
+                                tmp = d_mul_2exp(d_mat_entry(mu, j, k), exponent);
                                 d_mat_entry(mu, kappa, k) =
                                     d_mat_entry(mu, kappa, k) - tmp;
                             }
@@ -437,7 +437,7 @@ FUNC_HEAD
                             fmpz_set_si(x + j - zeros - 1, -WORD(1));
                             for (k = zeros + 1; k < j; k++)
                             {
-                                tmp = ldexp(d_mat_entry(mu, j, k), exponent);
+                                tmp = d_mul_2exp(d_mat_entry(mu, j, k), exponent);
                                 d_mat_entry(mu, kappa, k) =
                                     d_mat_entry(mu, kappa, k) + tmp;
                             }
@@ -456,7 +456,7 @@ FUNC_HEAD
                     }
                     else        /* we must have |X| >= 2 */
                     {
-                        tmp = ldexp(d_mat_entry(mu, kappa, j), -exponent);
+                        tmp = d_mul_2exp(d_mat_entry(mu, kappa, j), -exponent);
                         if ((tmp < (double) FMPZ_LLL_MAX_LONG)
                             && (tmp > (double) -FMPZ_LLL_MAX_LONG))
                         {
@@ -468,7 +468,7 @@ FUNC_HEAD
                             for (k = zeros + 1; k < j; k++)
                             {
                                 rtmp = tmp * d_mat_entry(mu, j, k);
-                                rtmp = ldexp(rtmp, exponent);
+                                rtmp = d_mul_2exp(rtmp, exponent);
                                 d_mat_entry(mu, kappa, k) =
                                     d_mat_entry(mu, kappa, k) - rtmp;
                             }
@@ -523,7 +523,7 @@ FUNC_HEAD
                                 {
                                     rtmp =
                                         ((double) xx) * d_mat_entry(mu, j, k);
-                                    rtmp = ldexp(rtmp, expo[j] - expo[kappa]);
+                                    rtmp = d_mul_2exp(rtmp, expo[j] - expo[kappa]);
                                     d_mat_entry(mu, kappa, k) =
                                         d_mat_entry(mu, kappa, k) - rtmp;
                                 }
@@ -557,7 +557,7 @@ FUNC_HEAD
                                     rtmp =
                                         ((double) xx) * d_mat_entry(mu, j, k);
                                     rtmp =
-                                        ldexp(rtmp,
+                                        d_mul_2exp(rtmp,
                                               exponent + expo[j] -
                                               expo[kappa]);
                                     d_mat_entry(mu, kappa, k) =
@@ -620,12 +620,12 @@ FUNC_HEAD
         } while (test);
 
         s[zeros + 1] = fmpz_get_d_2exp(&exp, fmpz_mat_entry(GM, kappa, kappa));
-        s[zeros + 1] = ldexp(s[zeros + 1], exp - expo[kappa]);
+        s[zeros + 1] = d_mul_2exp(s[zeros + 1], exp - expo[kappa]);
 
         for (k = zeros + 1; k < kappa - 1; k++)
         {
             tmp =
-                ldexp(d_mat_entry(mu, kappa, k) * d_mat_entry(r, kappa, k),
+                d_mul_2exp(d_mat_entry(mu, kappa, k) * d_mat_entry(r, kappa, k),
                       (expo[kappa] - expo[k]));
             s[k + 1] = s[k] - tmp;
         }
