@@ -628,9 +628,9 @@ static int nmod_mpolyu_gcdp_zippel_univar(
     nmod_mpolyu_cvtto_poly(b, B, ctx);
     nmod_poly_gcd(g, a, b);
     nmod_mpolyu_cvtfrom_poly(G, g, ctx);
-    nmod_poly_div(t, a, g);
+    nmod_poly_divexact(t, a, g);
     nmod_mpolyu_cvtfrom_poly(Abar, t, ctx);
-    nmod_poly_div(t, b, g);
+    nmod_poly_divexact(t, b, g);
     nmod_mpolyu_cvtfrom_poly(Bbar, t, ctx);
     nmod_poly_clear(a);
     nmod_poly_clear(b);

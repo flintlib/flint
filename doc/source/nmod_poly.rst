@@ -1032,6 +1032,12 @@ Division
 
     Computes the remainder `R` on polynomial division of `A` by `B`.
 
+.. function:: void _nmod_poly_divexact(mp_ptr Q, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod)
+              void nmod_poly_divexact(nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B)
+
+    Computes the quotient `Q` of `A` and `B` assuming that the division
+    is exact.
+
 .. function:: void _nmod_poly_inv_series_basecase(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nmod_t mod)
 
     Given ``Q`` of length ``Qlen`` whose leading coefficient is invertible

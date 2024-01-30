@@ -88,7 +88,7 @@ int nmod_mpoly_factor_lcc_wang(
             while (n_poly_degree(R) > 0)
             {
                 n_poly_mod_gcd(R, R, Q, ctx->mod);
-                n_poly_mod_div(Q, Q, R, ctx->mod);
+                n_poly_mod_divexact(Q, Q, R, ctx->mod);
                 if (n_poly_degree(Q) < 1)
                 {
                     success = 0;

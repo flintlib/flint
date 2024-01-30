@@ -42,7 +42,7 @@ try_again:
         goto try_again;
     }
 
-    nmod_poly_div(b, f, a);
+    nmod_poly_divexact(b, f, a);
 
     /* deg a >= deg b */
     if (nmod_poly_degree(a) < nmod_poly_degree(b))

@@ -48,6 +48,11 @@ _gr_poly_divexact_basecase(gr_ptr Q,
     slong sz = ctx->sizeof_elem;
     gr_ptr invB;
 
+    /* note: if we wanted to be clever, we could pick a pair of coefficients such
+             that the division is easy */
+    if (Alen == Blen)
+        return gr_divexact(Q, GR_ENTRY(A, Alen - 1, sz), GR_ENTRY(B, Blen - 1, sz), ctx);
+
     GR_TMP_INIT(invB, ctx);
 
     /* todo: we sometimes want to keep dividing, e.g. over RR with small coefficient */

@@ -164,8 +164,9 @@ void nmod_mat_minpoly_with_gens(nmod_poly_t p, const nmod_mat_t X, ulong * P)
       _nmod_poly_set_length(b, r1 + 1);
 
       nmod_poly_gcd(g, p, b);
+      /* todo: compute as (p * b) / g or (p / g) * b or p * (g / b) ? */
       nmod_poly_mul(p, p, b);
-      nmod_poly_div(p, p, g);
+      nmod_poly_divexact(p, p, g);
 
       if (first_poly && r2 < n)
       {

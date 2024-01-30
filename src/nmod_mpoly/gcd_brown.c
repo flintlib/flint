@@ -155,11 +155,11 @@ static void _splitworker_bivar(void * varg)
         else
         {
             n_poly_mod_gcd(Gevalp, Aevalp, Bevalp, ctx->mod);
-            n_poly_mod_div(Abarevalp, Aevalp, Gevalp, ctx->mod);
-            n_poly_mod_div(Bbarevalp, Bevalp, Gevalp, ctx->mod);
+            n_poly_mod_divexact(Abarevalp, Aevalp, Gevalp, ctx->mod);
+            n_poly_mod_divexact(Bbarevalp, Bevalp, Gevalp, ctx->mod);
             n_poly_mod_gcd(Gevalm, Aevalm, Bevalm, ctx->mod);
-            n_poly_mod_div(Abarevalm, Aevalm, Gevalm, ctx->mod);
-            n_poly_mod_div(Bbarevalm, Bevalm, Gevalm, ctx->mod);
+            n_poly_mod_divexact(Abarevalm, Aevalm, Gevalm, ctx->mod);
+            n_poly_mod_divexact(Bbarevalm, Bevalm, Gevalm, ctx->mod);
         }
 
         FLINT_ASSERT(Gevalp->length > 0);
@@ -874,8 +874,8 @@ int nmod_mpolyn_gcd_brown_smprime_threaded_pool(
 
     n_poly_init(cAbar);
     n_poly_init(cBbar);
-    n_poly_mod_div(cAbar, cA, cG, ctx->mod);
-    n_poly_mod_div(cBbar, cB, cG, ctx->mod);
+    n_poly_mod_divexact(cAbar, cA, cG, ctx->mod);
+    n_poly_mod_divexact(cBbar, cB, cG, ctx->mod);
 
     n_poly_init(gamma);
     n_poly_mod_gcd(gamma, nmod_mpolyn_leadcoeff_poly(A, ctx),

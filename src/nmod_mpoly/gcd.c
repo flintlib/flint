@@ -960,14 +960,14 @@ int _do_univar(
                                                  I->Gmin_exp, I->Gstride, ctx);
     if (Abar != NULL)
     {
-        nmod_poly_div(t, a, g);
+        nmod_poly_divexact(t, a, g);
         _nmod_mpoly_from_nmod_poly_inflate(Abar, I->Abarbits, t, v_in_both,
                                               I->Abarmin_exp, I->Gstride, ctx);
     }
 
     if (Bbar != NULL)
     {
-        nmod_poly_div(t, b, g);
+        nmod_poly_divexact(t, b, g);
         _nmod_mpoly_from_nmod_poly_inflate(Bbar, I->Bbarbits, t, v_in_both,
                                               I->Bbarmin_exp, I->Gstride, ctx);
     }

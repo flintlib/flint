@@ -165,6 +165,8 @@ gr_mat_minpoly_field(gr_poly_t p, const gr_mat_t X, gr_ctx_t ctx)
         }
         _gr_poly_set_length(b, r1 + 1, ctx);
 
+        /* todo: poly_divexact */
+        /* todo: compute as (p * b) / g or (p / g) * b or p * (g / b) ? */
         status |= gr_poly_gcd(g, p, b, ctx);
         status |= gr_poly_mul(p, p, b, ctx);
         status |= gr_poly_divrem(p, r, p, g, ctx);

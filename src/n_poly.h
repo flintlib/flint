@@ -411,6 +411,22 @@ void _n_poly_mod_div(n_poly_t Q, const n_poly_t A, const n_poly_t B, nmod_t mod)
 }
 
 FLINT_FORCE_INLINE
+void _n_poly_mod_divexact(n_poly_t Q, const n_poly_t A, const n_poly_t B, nmod_t mod)
+{
+    const slong lenA = A->length, lenB = B->length;
+    FLINT_ASSERT(lenB > 0);
+    FLINT_ASSERT(Q != A && Q != B);
+    if (lenA < lenB)
+    {
+        n_poly_zero(Q);
+        return;
+    }
+    n_poly_fit_length(Q, lenA - lenB + 1);
+    _nmod_poly_divexact(Q->coeffs, A->coeffs, lenA, B->coeffs, lenB, mod);
+    Q->length = lenA - lenB + 1;
+}
+
+FLINT_FORCE_INLINE
 void _n_poly_mod_rem(n_poly_t R, const n_poly_t A, const n_poly_t B, nmod_t mod)
 {
     const slong lenA = A->length, lenB = B->length;
@@ -471,6 +487,9 @@ void n_poly_mod_rem(n_poly_t R, const n_poly_t A, const n_poly_t B,
 
 void n_poly_mod_divrem(n_poly_t Q, n_poly_t R, const n_poly_t A,
                                                  const n_poly_t B, nmod_t mod);
+
+void n_poly_mod_divexact(n_poly_t Q, const n_poly_t A, const n_poly_t B,
+                                                                   nmod_t mod);
 
 void n_poly_mod_mulmod(n_poly_t res, const n_poly_t poly1,
                            const n_poly_t poly2, const n_poly_t f, nmod_t mod);

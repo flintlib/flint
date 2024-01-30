@@ -70,7 +70,7 @@ nmod_poly_mat_rref(nmod_poly_mat_t R, nmod_poly_t den, const nmod_poly_mat_t A)
                     nmod_poly_sub(tmp, tmp, tmp2);
                 }
 
-                nmod_poly_div(nmod_poly_mat_entry(R, i, nonpivots[k]),
+                nmod_poly_divexact(nmod_poly_mat_entry(R, i, nonpivots[k]),
                     tmp, nmod_poly_mat_entry(R, i, pivots[i]));
             }
         }

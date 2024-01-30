@@ -298,8 +298,8 @@ int n_polyu1n_mod_gcd_brown_smprime(
     _n_poly_vec_mod_remove_content(cB, B->coeffs, B->length, ctx);
 
     n_poly_mod_gcd(cG, cA, cB, ctx);
-    n_poly_mod_div(cAbar, cA, cG, ctx);
-    n_poly_mod_div(cBbar, cB, cG, ctx);
+    n_poly_mod_divexact(cAbar, cA, cG, ctx);
+    n_poly_mod_divexact(cBbar, cB, cG, ctx);
 
     n_poly_mod_gcd(gamma, A->coeffs + 0, B->coeffs + 0, ctx);
 
@@ -377,11 +377,11 @@ choose_prime: /* primes are v - alpha, v + alpha */
     else
     {
         n_poly_mod_gcd(Gevalp, Aevalp, Bevalp, ctx);
-        n_poly_mod_div(Abarevalp, Aevalp, Gevalp, ctx);
-        n_poly_mod_div(Bbarevalp, Bevalp, Gevalp, ctx);
+        n_poly_mod_divexact(Abarevalp, Aevalp, Gevalp, ctx);
+        n_poly_mod_divexact(Bbarevalp, Bevalp, Gevalp, ctx);
         n_poly_mod_gcd(Gevalm, Aevalm, Bevalm, ctx);
-        n_poly_mod_div(Abarevalm, Aevalm, Gevalm, ctx);
-        n_poly_mod_div(Bbarevalm, Bevalm, Gevalm, ctx);
+        n_poly_mod_divexact(Abarevalm, Aevalm, Gevalm, ctx);
+        n_poly_mod_divexact(Bbarevalm, Bevalm, Gevalm, ctx);
         gstab = astab = bstab = 0;
     }
 

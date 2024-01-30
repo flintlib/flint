@@ -116,7 +116,7 @@ choose_prime:
     _n_poly_mod_rem(C1evalp, t2, B1evalp, mod);
     _n_poly_mod_mul(t2, B2evalp, C1evalp, mod);
     n_poly_mod_sub(Aevalp, Aevalp, t2, mod);
-    _n_poly_mod_div(C2evalp, Aevalp, B1evalp, mod);
+    _n_poly_mod_divexact(C2evalp, Aevalp, B1evalp, mod);
 
     if (!n_poly_mod_invmod(t1, B2evalm, B1evalm, mod))
         goto bad_prime;
@@ -124,7 +124,7 @@ choose_prime:
     _n_poly_mod_rem(C1evalm, t2, B1evalm, mod);
     _n_poly_mod_mul(t2, B2evalm, C1evalm, mod);
     n_poly_mod_sub(Aevalm, Aevalm, t2, mod);
-    _n_poly_mod_div(C2evalm, Aevalm, B1evalm, mod);
+    _n_poly_mod_divexact(C2evalm, Aevalm, B1evalm, mod);
 
     /* update interpolants */
     if (n_poly_degree(modulus) > 0)

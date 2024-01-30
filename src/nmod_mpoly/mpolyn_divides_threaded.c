@@ -1817,7 +1817,7 @@ int nmod_mpolyn_divides_threaded_pool(
     qexps = (ulong *) TMP_ALLOC(N*sizeof(ulong));
 
     mpoly_monomial_sub(qexps + N*0, A->exps + N*0, B->exps + N*0, N);
-    n_poly_mod_div(qcoeff, A->coeffs + 0, B->coeffs + 0, ctx->mod); /* already checked */
+    n_poly_mod_divexact(qcoeff, A->coeffs + 0, B->coeffs + 0, ctx->mod); /* already checked */
 
     nmod_mpolyn_ts_init(H->polyQ, qcoeff, qexps, 1, H->bits, H->N, ctx);
 

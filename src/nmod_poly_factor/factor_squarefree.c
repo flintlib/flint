@@ -76,7 +76,7 @@ nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
         nmod_poly_t h, z;
 
         nmod_poly_gcd(g, f, f_d);
-        nmod_poly_div(g_1, f, g);
+        nmod_poly_divexact(g_1, f, g);
 
         i = 1;
 
@@ -87,7 +87,7 @@ nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
         while (!nmod_poly_is_one(g_1))
         {
             nmod_poly_gcd(h, g_1, g);
-            nmod_poly_div(z, g_1, h);
+            nmod_poly_divexact(z, g_1, h);
 
             /* out <- out.z */
             if (z->length > 1)
@@ -101,7 +101,7 @@ nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
 
             i++;
             nmod_poly_set(g_1, h);
-            nmod_poly_div(g, g, h);
+            nmod_poly_divexact(g, g, h);
         }
 
         nmod_poly_clear(h);

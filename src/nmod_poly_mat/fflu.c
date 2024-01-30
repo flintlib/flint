@@ -84,7 +84,7 @@ nmod_poly_mat_fflu(nmod_poly_mat_t B, nmod_poly_t den, slong * perm,
                 nmod_poly_mul(t, E(j, pivot_col), E(pivot_row, k));
                 nmod_poly_sub(E(j, k), E(j, k), t);
                 if (pivot_row > 0)
-                    nmod_poly_div(E(j, k), E(j, k), den);
+                    nmod_poly_divexact(E(j, k), E(j, k), den);
             }
         }
 
