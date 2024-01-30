@@ -40,6 +40,7 @@
 #include "t-derivative.c"
 #include "t-discriminant.c"
 #include "t-div.c"
+#include "t-divexact.c"
 #include "t-divides.c"
 #include "t-divides_classical.c"
 #include "t-div_newton_n_preinv.c"
@@ -163,6 +164,7 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_poly_derivative),
     TEST_FUNCTION(nmod_poly_discriminant),
     TEST_FUNCTION(nmod_poly_div),
+    TEST_FUNCTION(nmod_poly_divexact),
     TEST_FUNCTION(nmod_poly_divides),
     TEST_FUNCTION(nmod_poly_divides_classical),
     TEST_FUNCTION(nmod_poly_div_newton_n_preinv),

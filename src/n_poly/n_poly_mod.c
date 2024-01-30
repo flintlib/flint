@@ -339,6 +339,57 @@ void n_poly_mod_div(n_poly_t Q, const n_poly_t A, const n_poly_t B, nmod_t ctx)
     Q->length = A_len - B_len + 1;
 }
 
+void n_poly_mod_divexact(n_poly_t Q, const n_poly_t A, const n_poly_t B, nmod_t ctx)
+{
+    n_poly_t tQ;
+    mp_ptr q;
+    slong A_len, B_len;
+
+    B_len = B->length;
+
+    if (B_len == 0)
+    {
+        if (ctx.n == 1)
+        {
+            n_poly_set(Q, A);
+            return;
+        }
+        else
+        {
+            flint_throw(FLINT_ERROR, "Exception (n_poly_mod_divexact). Division by zero.\n");
+        }
+    }
+
+    A_len = A->length;
+
+    if (A_len < B_len)
+    {
+        n_poly_zero(Q);
+        return;
+    }
+
+    if (Q == A || Q == B)
+    {
+        n_poly_init2(tQ, A_len - B_len + 1);
+        q = tQ->coeffs;
+    }
+    else
+    {
+        n_poly_fit_length(Q, A_len - B_len + 1);
+        q = Q->coeffs;
+    }
+
+    _nmod_poly_divexact(q, A->coeffs, A_len, B->coeffs, B_len, ctx);
+
+    if (Q == A || Q == B)
+    {
+        n_poly_swap(tQ, Q);
+        n_poly_clear(tQ);
+    }
+
+    Q->length = A_len - B_len + 1;
+}
+
 void n_poly_mod_rem(n_poly_t R, const n_poly_t A, const n_poly_t B, nmod_t ctx)
 {
     const slong lenA = A->length, lenB = B->length;

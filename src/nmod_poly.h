@@ -603,6 +603,13 @@ void _nmod_poly_rem(mp_ptr R, mp_srcptr A, slong lenA,
 void nmod_poly_rem(nmod_poly_t R,
                                      const nmod_poly_t A, const nmod_poly_t B);
 
+void _nmod_poly_divexact(mp_ptr Q, mp_srcptr A, slong lenA,
+                                          mp_srcptr B, slong lenB, nmod_t mod);
+
+void nmod_poly_divexact(nmod_poly_t Q,
+                                     const nmod_poly_t A, const nmod_poly_t B);
+
+
 void _nmod_poly_inv_series_basecase(mp_ptr Qinv,
                                  mp_srcptr Q, slong Qlen, slong n, nmod_t mod);
 

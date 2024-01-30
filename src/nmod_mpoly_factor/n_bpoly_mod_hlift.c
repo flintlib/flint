@@ -140,7 +140,7 @@ int n_bpoly_mod_hlift2_cubic(
         n_poly_mod_rem(u, t, B0->coeffs + 0, ctx);
         n_poly_mod_mul(t, u, B1->coeffs + 0, ctx);
         n_poly_mod_sub(c, c, t, ctx);
-        n_poly_mod_div(v, c, B0->coeffs + 0, ctx);
+        n_poly_mod_divexact(v, c, B0->coeffs + 0, ctx);
 
         if (!n_poly_is_zero(u))
         {
@@ -275,7 +275,7 @@ int n_bpoly_mod_hlift2(
         n_poly_mod_rem(u, t, B0->coeffs + 0, ctx);
         n_poly_mod_mul(t, u, B1->coeffs + 0, ctx);
         n_poly_mod_sub(c, c, t, ctx);
-        n_poly_mod_div(v, c, B0->coeffs + 0, ctx);
+        n_poly_mod_divexact(v, c, B0->coeffs + 0, ctx);
 
         if (j < B0->length)
             n_poly_mod_add(B0->coeffs + j, B0->coeffs + j, u, ctx);
@@ -430,7 +430,7 @@ int n_bpoly_mod_hlift_cubic(
     for (k = 0; k < r; k++)
     {
         /* s[k] = (prod_{i!=k} B[i].coeffs[0])^-1 (mod B[k].coeffs[0]) */
-        n_poly_mod_div(t, A->coeffs + 0, B[k].coeffs + 0, ctx);
+        n_poly_mod_divexact(t, A->coeffs + 0, B[k].coeffs + 0, ctx);
         if (!n_poly_mod_invmod(s[k], t, B[k].coeffs + 0, ctx))
         {
             success = -1;

@@ -81,7 +81,7 @@ void n_bpoly_mod_divexact_last(n_bpoly_t A, const n_poly_t b, nmod_t ctx)
         if (A->coeffs[i].length < 1)
             continue;
 
-        n_poly_mod_div(t, A->coeffs + i, b, ctx);
+        n_poly_mod_divexact(t, A->coeffs + i, b, ctx);
         n_poly_swap(A->coeffs + i, t);
     }
 }

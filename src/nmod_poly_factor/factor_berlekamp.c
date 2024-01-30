@@ -210,7 +210,7 @@ __nmod_poly_factor_berlekamp(nmod_poly_factor_t factors,
 
         nmod_poly_init_mod(Q, f->mod);
 
-        nmod_poly_div(Q, f, g);
+        nmod_poly_divexact(Q, f, g);
 
         if (!nmod_poly_is_zero(Q))
             nmod_poly_make_monic(Q, Q);

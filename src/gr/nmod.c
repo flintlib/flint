@@ -1002,6 +1002,19 @@ _gr_nmod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA,
     }
 }
 
+int
+_gr_nmod_poly_divexact(mp_ptr Q, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, gr_ctx_t ctx)
+{
+    slong lenQ = lenA - lenB + 1;
+
+    if (lenB <= 40 || lenQ <= 20)
+        return _gr_poly_divexact_basecase(Q, A, lenA, B, lenB, ctx);
+    else if (lenB <= 60 || lenQ <= 60)
+        return _gr_poly_divexact_basecase_bidirectional(Q, A, lenA, B, lenB, ctx);
+    else
+        return _gr_poly_divexact_bidirectional(Q, A, lenA, B, lenB, ctx);
+}
+
 /* basecase -> Newton cutoffs */
 /* todo: better unbalanced tuning */
 
@@ -1434,6 +1447,7 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_VEC_RECIPROCALS, (gr_funcptr) _gr_nmod_vec_reciprocals},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_nmod_poly_mullow},
     {GR_METHOD_POLY_DIVREM,     (gr_funcptr) _gr_nmod_poly_divrem},
+    {GR_METHOD_POLY_DIVEXACT,   (gr_funcptr) _gr_nmod_poly_divexact},
     {GR_METHOD_POLY_INV_SERIES, (gr_funcptr) _gr_nmod_poly_inv_series},
     {GR_METHOD_POLY_INV_SERIES_BASECASE, (gr_funcptr) _gr_nmod_poly_inv_series_basecase},
     {GR_METHOD_POLY_DIV_SERIES, (gr_funcptr) _gr_nmod_poly_div_series},

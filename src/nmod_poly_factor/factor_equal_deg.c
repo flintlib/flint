@@ -38,7 +38,7 @@ nmod_poly_factor_equal_deg(nmod_poly_factor_t factors,
         flint_randclear(state);
 
         nmod_poly_init_mod(g, pol->mod);
-        nmod_poly_div(g, pol, f);
+        nmod_poly_divexact(g, pol, f);
 
         nmod_poly_factor_equal_deg(factors, f, d);
         nmod_poly_clear(f);

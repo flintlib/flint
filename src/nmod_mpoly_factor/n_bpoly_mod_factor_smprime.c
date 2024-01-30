@@ -437,7 +437,7 @@ static void _n_bpoly_mod_lift_build_steps(n_bpoly_mod_lift_t L, nmod_t ctx)
     for (k = 0; k < r; k++)
     {
         /* s[k] = (prod_{i!=k} B[i].coeffs[0])^-1 (mod B[k].coeffs[0]) */
-        n_poly_mod_div(t, A->coeffs + 0, B[k].coeffs + 0, ctx);
+        n_poly_mod_divexact(t, A->coeffs + 0, B[k].coeffs + 0, ctx);
         if (!n_poly_mod_invmod(s + k, t, B[k].coeffs + 0, ctx))
             flint_throw(FLINT_IMPINV, "n_bpoly_mod_lift: bad inverse");
 
