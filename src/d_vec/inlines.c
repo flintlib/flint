@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 2012 Fredrik Johansson
-    Copyright (C) 2014 Abhinav Baid
+    Copyright (C) 2015 William Hart
 
     This file is part of FLINT.
 
@@ -10,13 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "double_extras.h"
+#define D_VEC_INLINES_C
 
-int
-d_is_nan(double x)
-{
-    if (x != x)
-        return 1;
-    else
-        return 0;
-}
+#include "flint.h"
+#include "d_vec.h"

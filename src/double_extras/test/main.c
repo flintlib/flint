@@ -17,6 +17,7 @@
 #include "t-is_nan.c"
 #include "t-lambertw.c"
 #include "t-log2.c"
+#include "t-mul_2exp.c"
 #include "t-randtest.c"
 #include "t-randtest_signed.c"
 
@@ -27,6 +28,7 @@ test_struct tests[] =
     TEST_FUNCTION(d_is_nan),
     TEST_FUNCTION(d_lambertw),
     TEST_FUNCTION(d_log2),
+    TEST_FUNCTION(d_mul_2exp),
     TEST_FUNCTION(d_randtest),
     TEST_FUNCTION(d_randtest_signed)
 };

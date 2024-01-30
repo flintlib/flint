@@ -10,6 +10,7 @@
 */
 
 #include <math.h>
+#include "double_extras.h"
 #include "fmpzi.h"
 
 void
@@ -60,10 +61,10 @@ fmpzi_divrem_approx(fmpzi_t q, fmpzi_t r, const fmpzi_t x, const fmpzi_t y)
             c = fmpz_get_d_2exp(&cexp, fmpzi_realref(y));
             d = fmpz_get_d_2exp(&dexp, fmpzi_imagref(y));
 
-            a = ldexp(a, FLINT_MAX(aexp - xbits, -1024));
-            b = ldexp(b, FLINT_MAX(bexp - xbits, -1024));
-            c = ldexp(c, FLINT_MAX(cexp - xbits, -1024));
-            d = ldexp(d, FLINT_MAX(dexp - xbits, -1024));
+            a = d_mul_2exp(a, FLINT_MAX(aexp - xbits, -1024));
+            b = d_mul_2exp(b, FLINT_MAX(bexp - xbits, -1024));
+            c = d_mul_2exp(c, FLINT_MAX(cexp - xbits, -1024));
+            d = d_mul_2exp(d, FLINT_MAX(dexp - xbits, -1024));
         }
 
         t = a * c + b * d;

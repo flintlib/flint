@@ -13,6 +13,7 @@
 */
 
 #include <math.h>
+#include "double_extras.h"
 #include "gmpcompat.h"
 #include "fmpz.h"
 
@@ -32,23 +33,6 @@ fmpz_set(fmpz_t f, const fmpz_t g)
         __mpz_struct * mf = _fmpz_promote(f);
         mpz_set(mf, COEFF_TO_PTR(*g));
     }
-}
-
-void fmpz_set_d_2exp(fmpz_t f, double m, slong exp)
-{
-   int exp2;
-
-   m = frexp(m, &exp2);
-   exp += exp2;
-
-   if (exp >= 53)
-   {
-      fmpz_set_d(f, ldexp(m, 53));
-      fmpz_mul_2exp(f, f, exp - 53);
-   } else if (exp < 0)
-      fmpz_set_ui(f, 0);
-   else
-      fmpz_set_d(f, ldexp(m, exp));
 }
 
 #if FLINT64   /* 2^53 */
@@ -74,6 +58,23 @@ fmpz_set_d(fmpz_t f, double c)
         mpz_set_d(z, c);
         _fmpz_demote_val(f);
     }
+}
+
+void fmpz_set_d_2exp(fmpz_t f, double m, slong exp)
+{
+   int exp2;
+
+   m = frexp(m, &exp2);
+   exp += exp2;
+
+   if (exp >= 53)
+   {
+      fmpz_set_d(f, m * ldexp(1.0, 53));
+      fmpz_mul_2exp(f, f, exp - 53);
+   } else if (exp < 0)
+      fmpz_set_ui(f, 0);
+   else
+      fmpz_set_d(f, d_mul_2exp_inrange(m, exp));
 }
 
 void

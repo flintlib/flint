@@ -65,7 +65,7 @@ Comparison
     are within ``eps`` of each other, otherwise returns `0`.
 
 
-Addition and subtraction
+Arithmetic
 --------------------------------------------------------------------------------
 
 
@@ -77,6 +77,11 @@ Addition and subtraction
 .. function:: void _d_vec_sub(double * res, const double * vec1, const double * vec2, slong len2)
 
     Sets ``(res, len2)`` to ``(vec1, len2)`` minus ``(vec2, len2)``.
+
+
+.. function:: void _d_vec_mul_2exp(double * res, const double * vec, slong len, int e)
+
+    Sets ``(res, len)`` to ``(vec, len)`` multiplied by `2^e`.
 
 
 Dot product and norm
