@@ -26,6 +26,7 @@ TEST_FUNCTION_START(fmpz_mod_mat_scalar_mul_fmpz, state)
         m = n_randint(state, 20);
         n = n_randint(state, 20);
 
+        fmpz_init(c);
         fmpz_init(c1);
         fmpz_mod_ctx_init_rand_bits(ctx, state, 200);
 
