@@ -78,8 +78,6 @@
 #include "t-randtest_monic_primitive.c"
 #include "t-rem_basecase.c"
 #include "t-resultant.c"
-#include "t-resultant_euclidean.c"
-#include "t-resultant_hgcd.c"
 #include "t-scalar_div_fmpz.c"
 #include "t-scalar_mul_fmpz.c"
 #include "t-set_equal.c"
@@ -156,8 +154,6 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mod_poly_randtest_monic_primitive),
     TEST_FUNCTION(fmpz_mod_poly_rem_basecase),
     TEST_FUNCTION(fmpz_mod_poly_resultant),
-    TEST_FUNCTION(fmpz_mod_poly_resultant_euclidean),
-    TEST_FUNCTION(fmpz_mod_poly_resultant_hgcd),
     TEST_FUNCTION(fmpz_mod_poly_scalar_div_fmpz),
     TEST_FUNCTION(fmpz_mod_poly_scalar_mul_fmpz),
     TEST_FUNCTION(fmpz_mod_poly_set_equal),

@@ -1316,88 +1316,6 @@ Resultant
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fmpz_mod_poly_resultant_euclidean(fmpz_t res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, const fmpz_mod_ctx_t ctx)
-
-    Sets `r` to the resultant of ``(poly1, len1)`` and
-    ``(poly2, len2)`` using the Euclidean algorithm.
-
-    Assumes that ``len1 >= len2 > 0``.
-
-    Assumes that the modulus is prime.
-
-.. function:: void fmpz_mod_poly_resultant_euclidean(fmpz_t r, const fmpz_mod_poly_t f, const fmpz_mod_poly_t g, const fmpz_mod_ctx_t ctx)
-
-    Computes the resultant of `f` and `g` using the Euclidean algorithm.
-
-    For two non-zero polynomials `f(x) = a_m x^m + \dotsb + a_0` and
-    `g(x) = b_n x^n + \dotsb + b_0` of degrees `m` and `n`, the resultant
-    is defined to be
-
-    .. math::
-
-
-            a_m^n b_n^m \prod_{(x, y) : f(x) = g(y) = 0} (x - y).
-
-
-    For convenience, we define the resultant to be equal to zero if either
-    of the two polynomials is zero.
-
-.. function:: void _fmpz_mod_poly_resultant_hgcd(fmpz_t res, const fmpz * A, slong lenA, const fmpz * B, slong lenB, const fmpz_mod_ctx_t ctx)
-
-    Sets ``res`` to the resultant of ``(A, lenA)`` and
-    ``(B, lenB)`` using the half-gcd algorithm.
-
-    This algorithm computes the half-gcd as per
-    :func:`_fmpz_mod_poly_gcd_hgcd`
-    but additionally updates the resultant every time a division occurs. The
-    half-gcd algorithm computes the GCD recursively. Given inputs `a` and `b`
-    it lets ``m = len(a)/2`` and (recursively) performs all quotients in
-    the Euclidean algorithm which do not require the low `m` coefficients of
-    `a` and `b`.
-
-    This performs quotients in exactly the same order as the ordinary
-    Euclidean algorithm except that the low `m` coefficients of the polynomials
-    in the remainder sequence are not computed. A correction step after hgcd
-    has been called computes these low `m` coefficients (by matrix
-    multiplication by a transformation matrix also computed by hgcd).
-
-    This means that from the point of view of the resultant, all but the last
-    quotient performed by a recursive call to hgcd is an ordinary quotient as
-    per the usual Euclidean algorithm. However, the final quotient may give
-    a remainder of less than `m + 1` coefficients, which won't be corrected
-    until the hgcd correction step is performed afterwards.
-
-    To compute the adjustments to the resultant coming from this corrected
-    quotient, we save the relevant information in an ``nmod_poly_res_t``
-    struct at the time the quotient is performed so that when the correction
-    step is performed later, the adjustments to the resultant can be computed
-    at that time also.
-
-    The only time an adjustment to the resultant is not required after a
-    call to hgcd is if hgcd does nothing (the remainder may already have had
-    less than `m + 1` coefficients when hgcd was called).
-
-    Assumes that ``lenA >= lenB > 0``.
-
-    Assumes that the modulus is prime.
-
-.. function:: void fmpz_mod_poly_resultant_hgcd(fmpz_t res, const fmpz_mod_poly_t f, const fmpz_mod_poly_t g, const fmpz_mod_ctx_t ctx)
-
-    Computes the resultant of `f` and `g` using the half-gcd algorithm.
-
-    For two non-zero polynomials `f(x) = a_m x^m + \dotsb + a_0` and
-    `g(x) = b_n x^n + \dotsb + b_0` of degrees `m` and `n`, the resultant
-    is defined to be
-
-    .. math::
-
-
-            a_m^n b_n^m \prod_{(x, y) : f(x) = g(y) = 0} (x - y).
-
-
-    For convenience, we define the resultant to be equal to zero if either
-    of the two polynomials is zero.
-
 .. function:: void _fmpz_mod_poly_resultant(fmpz_t res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, const fmpz_mod_ctx_t ctx)
 
     Returns the resultant of ``(poly1, len1)`` and
@@ -1405,24 +1323,11 @@ Resultant
 
     Assumes that ``len1 >= len2 > 0``.
 
-    Assumes that the modulus is prime.
+    The complexity is only guaranteed to be quasilinear if the modulus is prime.
 
 .. function:: void fmpz_mod_poly_resultant(fmpz_t res, const fmpz_mod_poly_t f, const fmpz_mod_poly_t g, const fmpz_mod_ctx_t ctx)
 
     Computes the resultant of $f$ and $g$.
-
-    For two non-zero polynomials `f(x) = a_m x^m + \dotsb + a_0` and
-    `g(x) = b_n x^n + \dotsb + b_0` of degrees `m` and `n`, the resultant
-    is defined to be
-
-    .. math::
-
-
-            a_m^n b_n^m \prod_{(x, y) : f(x) = g(y) = 0} (x - y).
-
-
-    For convenience, we define the resultant to be equal to zero if either
-    of the two polynomials is zero.
 
 
 Discriminant
