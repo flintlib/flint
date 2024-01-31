@@ -557,6 +557,17 @@ GCD
 Resultant
 -------------------------------------------------------------------------------
 
+For two non-zero polynomials `f(x) = a_m x^m + \dotsb + a_0` and
+`g(x) = b_n x^n + \dotsb + b_0` of degrees `m` and `n`, the resultant
+is defined to be
+
+.. math::
+
+        a_m^n b_n^m \prod_{(x, y) : f(x) = g(y) = 0} (x - y).
+
+For convenience, we define the resultant to be equal to zero if either
+of the two polynomials is zero.
+
 .. function:: int _gr_poly_resultant_euclidean(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
               int gr_poly_resultant_euclidean(gr_ptr res, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx)
               int _gr_poly_resultant_hgcd(gr_ptr res, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, slong inner_cutoff, slong cutoff, gr_ctx_t ctx)
