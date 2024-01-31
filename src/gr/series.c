@@ -1774,6 +1774,16 @@ _gr_gr_series_ctx_is_ring(gr_ctx_t ctx)
     return gr_ctx_is_ring(SERIES_ELEM_CTX(ctx));
 }
 
+truth_t
+_gr_gr_series_ctx_is_commutative_ring(gr_ctx_t ctx)
+{
+    if (ctx->which_ring == GR_CTX_GR_SERIES_MOD && SERIES_SCTX(ctx)->mod == 0)
+        return T_TRUE;
+
+    return gr_ctx_is_commutative_ring(SERIES_ELEM_CTX(ctx));
+}
+
+
 static void _gr_gr_series_init(gr_series_t res, gr_ctx_t ctx) { gr_series_init(res, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static void _gr_gr_series_clear(gr_series_t res, gr_ctx_t ctx) { gr_series_clear(res, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static void _gr_gr_series_swap(gr_series_t x, gr_series_t y, gr_ctx_t ctx) { gr_series_swap(x, y, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
@@ -1970,6 +1980,7 @@ gr_method_tab_input _gr_series_methods_input[] =
     {GR_METHOD_CTX_WRITE,   (gr_funcptr) _gr_gr_series_ctx_write},
     {GR_METHOD_CTX_SET_GEN_NAME, (gr_funcptr) _gr_gr_series_ctx_set_gen_name},
     {GR_METHOD_CTX_IS_RING, (gr_funcptr) _gr_gr_series_ctx_is_ring},
+    {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) _gr_gr_series_ctx_is_commutative_ring},
 
     {GR_METHOD_INIT,        (gr_funcptr) _gr_gr_series_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) _gr_gr_series_clear},

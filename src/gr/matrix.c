@@ -81,14 +81,31 @@ int matrix_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 
 truth_t matrix_ctx_is_ring(gr_ctx_t ctx)
 {
-    truth_t shape_ok;
+    int shape_ok = (!MATRIX_CTX(ctx)->all_sizes && MATRIX_CTX(ctx)->nrows == MATRIX_CTX(ctx)->ncols);
 
-    shape_ok = (!MATRIX_CTX(ctx)->all_sizes && MATRIX_CTX(ctx)->nrows == MATRIX_CTX(ctx)->ncols) ? T_TRUE : T_FALSE;
+    if (!shape_ok)
+        return T_FALSE;
 
-    if (shape_ok == T_TRUE && MATRIX_CTX(ctx)->nrows == 0)
+    if (MATRIX_CTX(ctx)->nrows == 0)
         return T_TRUE;
 
-    return truth_and(shape_ok, gr_ctx_is_ring(MATRIX_CTX(ctx)->base_ring));
+    return gr_ctx_is_ring(MATRIX_CTX(ctx)->base_ring);
+}
+
+truth_t matrix_ctx_is_commutative_ring(gr_ctx_t ctx)
+{
+    int shape_ok = (!MATRIX_CTX(ctx)->all_sizes && MATRIX_CTX(ctx)->nrows == MATRIX_CTX(ctx)->ncols);
+
+    if (!shape_ok)
+        return T_FALSE;
+
+    if (MATRIX_CTX(ctx)->nrows == 0)
+        return T_TRUE;
+
+    if (MATRIX_CTX(ctx)->nrows == 1)
+        return gr_ctx_is_commutative_ring(MATRIX_CTX(ctx)->base_ring);
+
+    return gr_ctx_is_zero_ring(MATRIX_CTX(ctx)->base_ring);
 }
 
 /* todo: public */
@@ -494,6 +511,7 @@ gr_method_tab_input _gr_mat_methods_input[] =
 {
     {GR_METHOD_CTX_WRITE,   (gr_funcptr) matrix_ctx_write},
     {GR_METHOD_CTX_IS_RING, (gr_funcptr) matrix_ctx_is_ring},
+    {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) matrix_ctx_is_commutative_ring},
     {GR_METHOD_CTX_IS_THREADSAFE,       (gr_funcptr) matrix_ctx_is_threadsafe},
     {GR_METHOD_INIT,        (gr_funcptr) matrix_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) matrix_clear},

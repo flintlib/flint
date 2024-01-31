@@ -448,7 +448,53 @@ class gr_ctx:
             >>> PowerSeriesModRing(RF, 0).is_ring()    # is the zero ring
             True
         """
-        return self._ctx_predicate(libflint.gr_ctx_is_ring, "is_ring($x)")
+        return self._ctx_predicate(libflint.gr_ctx_is_ring, "is_ring")
+
+    def is_commutative_ring(self):
+        """
+        Return whether this structure is a commutative ring.
+
+            >>> QQbar.is_commutative_ring()
+            True
+            >>> CC.is_commutative_ring()
+            True
+            >>> PolynomialRing(QQ).is_commutative_ring()
+            True
+            >>> Mat(ZZ, 2).is_commutative_ring()
+            False
+            >>> PolynomialRing(Mat(ZZ, 2)).is_commutative_ring()
+            False
+            >>> PowerSeriesRing(QQ).is_commutative_ring()
+            True
+            >>> PowerSeriesRing(Mat(ZZ, 2)).is_commutative_ring()
+            False
+            >>> Mat(ZZ, 0).is_commutative_ring()
+            True
+            >>> Mat(ZZ, 1).is_commutative_ring()
+            True
+            >>> Mat(ZZ).is_commutative_ring()
+            False
+            >>> Mat(ZZ, 0, 1).is_commutative_ring()
+            False
+            >>> Mat(ZZmod(2), 2, 2).is_commutative_ring()
+            False
+            >>> Mat(ZZmod(1), 2, 2).is_commutative_ring()
+            True
+            >>> Mat(PowerSeriesModRing(ZZ, 0), 2, 2).is_commutative_ring()
+            True
+            >>> Mat(RF, 1).is_commutative_ring()
+            False
+            >>> Mat(RF, 0).is_commutative_ring()
+            True
+            >>> Vec(ZZ, 3).is_commutative_ring()
+            True
+            >>> Vec(Mat(ZZ, 2), 3).is_commutative_ring()
+            False
+            >>> FractionField_fmpz_mpoly_q(3).is_commutative_ring()
+            True
+
+        """
+        return self._ctx_predicate(libflint.gr_ctx_is_commutative_ring, "is_commutative_ring")
 
     def _set_gen_name(self, s):
         status = libflint.gr_ctx_set_gen_name(self._ref, ctypes.c_char_p(str(s).encode('ascii')))
