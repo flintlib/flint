@@ -7573,6 +7573,8 @@ def test_all():
     b, t = PolynomialRing(PowerSeriesModRing(ZZ, 6, var="b"), "t").gens(recursive=True)
     assert (5+2*b+3*t)**5 / (5+2*b+3*t)**5 == 1
 
+    assert CCser(1+ZZser.gen()) == 1 + RRser.gen()
+
 def test_float():
     assert RF(5).mul_2exp(-1) == RF(2.5)
     assert CF(2+3j).mul_2exp(-1) == CF(1+1.5j)
