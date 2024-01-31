@@ -14,6 +14,12 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 
+/* Important: fmpz_mod_poly currently relies on these tuning values.
+   If the are changed to accommodate other rings, fmpz_mod_poly_resultant
+   should override the tuning values. */
+#define HGCD_CUTOFF 200
+#define HGCD_INNER_CUTOFF 100
+
 int _gr_poly_resultant(gr_ptr res, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
 {
     int status = GR_SUCCESS;
@@ -21,9 +27,12 @@ int _gr_poly_resultant(gr_ptr res, gr_srcptr A, slong lenA, gr_srcptr B, slong l
     if (_gr_poly_resultant_small(res, A, lenA, B, lenB, ctx) == GR_SUCCESS)
         return GR_SUCCESS;
 
-    /* todo: hgcd algorithm selection */
-    status = _gr_poly_resultant_euclidean(res, A, lenA, B, lenB, ctx);
+    if (FLINT_MIN(lenA, lenB) >= HGCD_CUTOFF && gr_ctx_is_finite(ctx) == T_TRUE)
+        status = _gr_poly_resultant_hgcd(res, A, lenA, B, lenB, HGCD_INNER_CUTOFF, HGCD_CUTOFF, ctx);
+    else
+        status = _gr_poly_resultant_euclidean(res, A, lenA, B, lenB, ctx);
 
+    /* A division-free algorithm should succeed */
     if (status != GR_SUCCESS)
         status = _gr_poly_resultant_sylvester(res, A, lenA, B, lenB, ctx);
 

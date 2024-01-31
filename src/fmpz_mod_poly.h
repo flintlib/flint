@@ -666,39 +666,8 @@ void fmpz_mod_poly_minpoly(fmpz_mod_poly_t poly, const fmpz* seq, slong len, con
 
 /*  Resultant  ***************************************************************/
 
-void _fmpz_mod_poly_resultant_euclidean(fmpz_t res,
-                                    const fmpz *poly1, slong len1,
-                              const fmpz *poly2, slong len2, const fmpz_mod_ctx_t ctx);
-
-void fmpz_mod_poly_resultant_euclidean(fmpz_t r,
-                            const fmpz_mod_poly_t f, const fmpz_mod_poly_t g,
-                                                     const fmpz_mod_ctx_t ctx);
-
-void _fmpz_mod_poly_resultant_hgcd(fmpz_t res, const fmpz *A, slong lenA,
-                                  const fmpz *B, slong lenB, const fmpz_mod_ctx_t ctx);
-
-void fmpz_mod_poly_resultant_hgcd(fmpz_t res, const fmpz_mod_poly_t A,
-                            const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx);
-
-FMPZ_MOD_POLY_INLINE void
-_fmpz_mod_poly_resultant(fmpz_t res, const fmpz *poly1, slong len1,
-                     const fmpz *poly2, slong len2, const fmpz_mod_ctx_t ctx)
-{
-    if (len1 < FMPZ_MOD_POLY_GCD_CUTOFF)
-        _fmpz_mod_poly_resultant_euclidean(res, poly1, len1, poly2, len2, ctx);
-    else
-        _fmpz_mod_poly_resultant_hgcd(res, poly1, len1, poly2, len2, ctx);
-}
-
-FMPZ_MOD_POLY_INLINE void
-fmpz_mod_poly_resultant(fmpz_t res, const fmpz_mod_poly_t f,
-                             const fmpz_mod_poly_t g, const fmpz_mod_ctx_t ctx)
-{
-    if (FLINT_MAX(f->length, g->length) < FMPZ_MOD_POLY_GCD_CUTOFF)
-       fmpz_mod_poly_resultant_euclidean(res, f, g, ctx);
-    else
-       fmpz_mod_poly_resultant_hgcd(res, f, g, ctx);
-}
+void _fmpz_mod_poly_resultant(fmpz_t res, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_poly_resultant(fmpz_t res, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx);
 
 /*  Discriminant  ************************************************************/
 
