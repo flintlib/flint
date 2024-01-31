@@ -38,6 +38,9 @@ on:
   push:
     tags:
       - '*'
+  schedule:
+    # run each Tuesday at 01:00
+    - cron: '0 1 * * 2'
   workflow_dispatch:
     # Allow to run manually
 
