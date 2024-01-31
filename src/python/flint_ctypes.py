@@ -936,6 +936,10 @@ class gr_ctx:
             [t]
             >>> PolynomialRing(PowerSeriesRing(ZZ, var="b"), "t").gens(recursive=True)
             [b, t]
+            >>> PowerSeriesRing(ZZx, 3, var="y").gens()
+            [y]
+            >>> PowerSeriesRing(ZZx, 3, var="y").gens(recursive=True)
+            [x, y]
 
         """
         if recursive:
@@ -3956,6 +3960,9 @@ class gr_elem:
             Traceback (most recent call last):
               ...
             FlintUnableError: failed to compute exp(x) in {Rational field (fmpq)} for {x = 1}
+            >>> QQser.gen().exp()
+            1 + x + (1/2)*x^2 + (1/6)*x^3 + (1/24)*x^4 + (1/120)*x^5 + O(x^6)
+
         """
         return self._unary_op(self, libgr.gr_exp, "exp($x)")
 
@@ -3977,6 +3984,11 @@ class gr_elem:
             Traceback (most recent call last):
               ...
             FlintUnableError: failed to compute expm1(x) in {Rational field (fmpq)} for {x = 1}
+            >>> PowerSeriesModRing(RR, 4).gen().expm1()
+            x + 0.5000000000000000*x^2 + [0.1666666666666667 +/- 7.04e-17]*x^3 (mod x^4)
+            >>> (PowerSeriesModRing(RR, 2).gen() + 1).expm1()
+            [1.718281828459045 +/- 5.41e-16] + [2.718281828459045 +/- 5.41e-16]*x (mod x^2)
+
         """
         return self._unary_op(self, libgr.gr_expm1, "expm1($x)")
 
@@ -4014,6 +4026,11 @@ class gr_elem:
             FlintUnableError: failed to compute log(x) in {Rational field (fmpq)} for {x = 2}
             >>> RF(2).log()
             0.6931471805599453
+            >>> QQser(QQx([1, 1])).log()
+            x + (-1/2)*x^2 + (1/3)*x^3 + (-1/4)*x^4 + (1/5)*x^5 + O(x^6)
+            >>> QQser(1).log()
+            0
+
         """
         return self._unary_op(self, libgr.gr_log, "log($x)")
 
@@ -4305,7 +4322,12 @@ class PolynomialRing_gr_poly(gr_ctx):
 
 
 class PowerSeriesRing_gr_series(gr_ctx):
+
     def __init__(self, coefficient_ring, prec=6, var=None):
+        """
+            >>> PowerSeriesRing(QQ, 5, var="y")
+            Power series over Rational field (fmpq) with precision O(y^5)
+        """
         assert isinstance(coefficient_ring, gr_ctx)
         gr_ctx.__init__(self)
         libgr.gr_ctx_init_gr_series(self._ref, coefficient_ring._ref, prec)
