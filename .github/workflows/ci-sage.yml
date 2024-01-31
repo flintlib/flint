@@ -101,8 +101,7 @@ jobs:
     with:
       osversion_xcodeversion_toxenv_tuples: >-
         [["latest", "",           "homebrew-macos-usrlocal-minimal"],
-         ["latest", "",           "homebrew-macos-usrlocal-standard"],
-         ["13",     "xcode_15.0", "homebrew-macos-usrlocal-standard"]]
+         ["latest", "",           "homebrew-macos-usrlocal-standard"]]
       targets: SAGE_CHECK=no SAGE_CHECK_flint=yes flint
       # Standard setting: Test the current beta release of Sage:
       sage_repo:         sagemath/sage
