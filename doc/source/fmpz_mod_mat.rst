@@ -262,6 +262,10 @@ Gaussian elimination
 --------------------------------------------------------------------------------
 
 
+.. function:: void fmpz_mod_mat_det(fmpz_t res, const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx)
+
+    Set ``res`` to the determinant of the matrix ``mat``.
+
 .. function:: slong fmpz_mod_mat_rref(fmpz_mod_mat_t res, const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx)
 
     Sets ``res`` to the reduced row echelon form of ``mat``

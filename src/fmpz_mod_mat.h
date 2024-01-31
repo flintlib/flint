@@ -223,6 +223,8 @@ void fmpz_mod_mat_trace(fmpz_t trace, const fmpz_mod_mat_t mat, const fmpz_mod_c
 
 /* Gaussian elimination *********************************************/
 
+void fmpz_mod_mat_det(fmpz_t res, const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx);
+
 slong fmpz_mod_mat_rref(fmpz_mod_mat_t res, const fmpz_mod_mat_t mat, const fmpz_mod_ctx_t ctx);
 
 slong fmpz_mod_mat_reduce_row(fmpz_mod_mat_t A, slong * P, slong * L, slong m, const fmpz_mod_ctx_t ctx);

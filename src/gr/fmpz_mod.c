@@ -613,7 +613,7 @@ _gr_fmpz_mod_roots_gr_poly(gr_vec_t roots, gr_vec_t mult, const fmpz_mod_poly_t 
 }
 
 int
-_gr_fmpz_mod_mat_mul(fmpz_mat_t res, const fmpz_mat_t x, const fmpz_mat_t y, gr_ctx_t ctx)
+_gr_fmpz_mod_mat_mul(fmpz_mod_mat_t res, const fmpz_mod_mat_t x, const fmpz_mod_mat_t y, gr_ctx_t ctx)
 {
     fmpz_mat_mul(res, x, y);
     _fmpz_mod_mat_reduce(res, FMPZ_MOD_CTX(ctx));
@@ -623,9 +623,16 @@ _gr_fmpz_mod_mat_mul(fmpz_mat_t res, const fmpz_mat_t x, const fmpz_mat_t y, gr_
 /* todo: tune cutoff for different bit sizes */
 /* also tune cutoff for triangular solving */
 int
-_gr_fmpz_mod_mat_lu(slong * rank, slong * P, fmpz_mat_t LU, const fmpz_mat_t A, int rank_check, gr_ctx_t ctx)
+_gr_fmpz_mod_mat_lu(slong * rank, slong * P, fmpz_mod_mat_t LU, const fmpz_mod_mat_t A, int rank_check, gr_ctx_t ctx)
 {
     return gr_mat_lu_recursive(rank, P, (gr_mat_struct *) LU, (const gr_mat_struct *) A, rank_check, 8, ctx);
+}
+
+int
+_gr_fmpz_mod_mat_det(fmpz_t res, const fmpz_mod_mat_t mat, gr_ctx_t ctx)
+{
+    fmpz_mod_mat_det(res, mat, FMPZ_MOD_CTX(ctx));
+    return GR_SUCCESS;
 }
 
 int _fmpz_mod_methods_initialized = 0;
@@ -694,6 +701,7 @@ gr_method_tab_input _fmpz_mod_methods_input[] =
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_fmpz_mod_roots_gr_poly},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_fmpz_mod_mat_mul},
     {GR_METHOD_MAT_LU,          (gr_funcptr) _gr_fmpz_mod_mat_lu},
+    {GR_METHOD_MAT_DET,         (gr_funcptr) _gr_fmpz_mod_mat_det},
     {0,                         (gr_funcptr) NULL},
 };
 
