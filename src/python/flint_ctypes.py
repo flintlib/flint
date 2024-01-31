@@ -398,6 +398,58 @@ class gr_ctx:
                 libflint.flint_free(arr)
         return self._str
 
+    def _ctx_predicate(self, op, rstr):
+        truth = op(self._ref)
+        if _gr_logic == 3:
+            return Truth(truth)
+        if truth == T_TRUE: return True
+        if truth == T_FALSE: return False
+        if _gr_logic == 1: return True
+        if _gr_logic == -1: return False
+        if _gr_logic == 2: return None
+        raise Undecidable(f"unable to decide {rstr} for ctx = {self}")
+
+    def is_ring(self):
+        """
+        Return whether this structure is a ring.
+
+            >>> RR.is_ring()
+            True
+            >>> PolynomialRing(QQbar).is_ring()
+            True
+            >>> RF.is_ring()      # floats do not satisfy the ring laws
+            False
+            >>> Mat(ZZ, 2).is_ring()
+            True
+            >>> Mat(ZZ, 2, 3).is_ring()   # nonrectangular matrices
+            False
+            >>> Mat(ZZ).is_ring()       # matrices of mixed shape do not form a ring
+            False
+            >>> Mat(RF, 2).is_ring()
+            False
+            >>> Vec(RR, 3).is_ring()
+            True
+            >>> Vec(RR).is_ring()       # vectors of mixed length do not form a ring
+            False
+            >>> Vec(RF, 3).is_ring()
+            False
+            >>> Vec(RF, 0).is_ring()    # empty vectors form a ring
+            True
+            >>> DirichletGroup(3).is_ring()
+            False
+            >>> PSL2Z.is_ring()
+            False
+            >>> PolynomialRing(RF).is_ring()
+            False
+            >>> PowerSeriesRing(RF).is_ring()
+            False
+            >>> PowerSeriesModRing(RF, 1).is_ring()
+            False
+            >>> PowerSeriesModRing(RF, 0).is_ring()    # is the zero ring
+            True
+        """
+        return self._ctx_predicate(libflint.gr_ctx_is_ring, "is_ring($x)")
+
     def _set_gen_name(self, s):
         status = libflint.gr_ctx_set_gen_name(self._ref, ctypes.c_char_p(str(s).encode('ascii')))
         self._str = None
@@ -7561,6 +7613,8 @@ def test_set_str():
     R = FractionField_fmpz_mpoly_q(2, ["x", "y"])
     x, y = R.gens()
     assert R("(4+4*x-y*(-4))^2 / (1+x+y) / 16") == 1+x+y
+
+    assert RRx("1 +/- 0") == RR(1)
 
 def test_ca_notebook_examples():
     # algebraic number identity

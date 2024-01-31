@@ -275,6 +275,7 @@ gr_static_method_table _fexpr_methods;
 
 gr_method_tab_input _fexpr_methods_input[] =
 {
+    {GR_METHOD_CTX_IS_RING,     (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_WRITE,       (gr_funcptr) _gr_fexpr_ctx_write},
     {GR_METHOD_INIT,            (gr_funcptr) _gr_fexpr_init},
     {GR_METHOD_CLEAR,           (gr_funcptr) _gr_fexpr_clear},

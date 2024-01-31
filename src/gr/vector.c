@@ -63,6 +63,17 @@ int vector_gr_vec_ctx_write(gr_stream_t out, gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+truth_t vector_ctx_is_ring(gr_ctx_t ctx)
+{
+    if (VECTOR_CTX(ctx)->all_sizes)
+        return T_FALSE;
+
+    if (VECTOR_CTX(ctx)->n == 0)
+        return T_TRUE;
+
+    return gr_ctx_is_ring(ENTRY_CTX(ctx));
+}
+
 /* todo: public */
 truth_t gr_ctx_vector_gr_vec_is_fixed_size(gr_ctx_t ctx)
 {
@@ -677,6 +688,7 @@ gr_static_method_table _gr_vec_methods;
 
 gr_method_tab_input _gr_vec_methods_input[] =
 {
+    {GR_METHOD_CTX_IS_RING,     (gr_funcptr) vector_ctx_is_ring},
     {GR_METHOD_CTX_IS_THREADSAFE,    (gr_funcptr) vector_ctx_is_threadsafe},
 
     {GR_METHOD_CTX_WRITE,   (gr_funcptr) vector_gr_vec_ctx_write},

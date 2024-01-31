@@ -169,6 +169,7 @@ gr_static_method_table _psl2z_methods;
 
 gr_method_tab_input _psl2z_methods_input[] =
 {
+    {GR_METHOD_CTX_IS_RING,     (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_FINITE,
                             (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_MULTIPLICATIVE_GROUP,
