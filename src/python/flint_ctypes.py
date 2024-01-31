@@ -6630,6 +6630,9 @@ def test_floor_ceil_trunc_nint():
     assert QQ(3).trunc() == 3
     assert QQ(3).nint() == 3
 
+    assert RR(3).nint() == 3
+    assert 2.9 < RR("3.5 +/- 0.1").nint() < 4.1
+
     for R in [QQ, QQbar, QQbar_ca, AA, AA_ca, RR, RR_ca, CC, CC_ca, RF]:
         x = R(3) / 2
         assert x.floor() == 1

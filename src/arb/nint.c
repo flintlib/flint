@@ -46,5 +46,8 @@ arb_nint(arb_t res, const arb_t x, slong prec)
             arb_mul_2exp_si(u, u, -1);
             arb_sub_ui(res, res, 1, prec);
         }
+
+        arb_clear(t);
+        arb_clear(u);
     }
 }
