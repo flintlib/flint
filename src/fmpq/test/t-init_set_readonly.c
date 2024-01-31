@@ -17,7 +17,7 @@ TEST_FUNCTION_START(fmpq_init_set_readonly, state)
     int i;
 
     /* Create some small fmpq rationals, clear the mpq_t */
-    for (i = 0; i < 100000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_t f;
         mpq_t z;
@@ -39,7 +39,7 @@ TEST_FUNCTION_START(fmpq_init_set_readonly, state)
     }
 
     /* Create some small fmpq ratioals, do *not* clear the mpq_t */
-    for (i = 0; i < 100000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_t f;
         mpq_t z;
@@ -60,7 +60,7 @@ TEST_FUNCTION_START(fmpq_init_set_readonly, state)
     }
 
     /* Create some more fmpq rationals */
-    for (i = 0; i < 100000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_t f;
         mpq_t z;

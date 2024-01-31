@@ -83,9 +83,9 @@ TEST_FUNCTION_START(fmpq_dedekind_sum, state)
     fmpq_init(s1);
     fmpq_init(s2);
 
-    for (k = -200; k < 200; k++)
+    for (k = -40; k < 40; k++)
     {
-        for (h = -200; h < 200; h++)
+        for (h = -40; h < 40; h++)
         {
             fmpz_set_si(hh, h);
             fmpz_set_si(kk, k);

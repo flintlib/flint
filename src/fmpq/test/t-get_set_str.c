@@ -41,7 +41,7 @@ TEST_FUNCTION_START(fmpq_get_set_str, state)
     check_invalid("5/x3", 6);
     check_invalid("5/3x", 6);
 
-    for (i = 0; i < 100000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_t a, a2;
         mpq_t b;

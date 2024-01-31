@@ -15,70 +15,40 @@
 void numerical_test(fmpq_t res, slong n, double ans)
 {
     const double tol = 1e-13;
-    double err;
-
-    mpq_t tmp;
-    mpq_init(tmp);
+    double val, err;
 
     fmpq_harmonic_ui(res, n);
-    fmpq_get_mpq(tmp, res);
-    err = mpq_get_d(tmp) - ans;
-    err = FLINT_ABS(err);
+    val = fmpq_get_d(res);
+    err = FLINT_ABS(val - ans);
 
     if (err > tol)
     {
-        flint_printf("FAIL: %wd %.16f %.16f\n", n, mpq_get_d(tmp), ans);
+        flint_printf("FAIL: %wd %.16f %.16f\n", n, val, ans);
         fflush(stdout);
         flint_abort();
     }
-
-    mpq_clear(tmp);
-}
-
-void
-mpq_harmonic_balanced(mpq_t res, slong a, slong b)
-{
-    slong k;
-    mpq_t t;
-
-    mpq_init(t);
-
-    if (b - a < 50)
-    {
-        mpq_set_ui(res, 0, UWORD(1));
-        for (k = a; k <= b; k++)
-        {
-            mpq_set_ui(t, UWORD(1), k);
-            mpq_add(res, res, t);
-        }
-    }
-    else
-    {
-        mpq_harmonic_balanced(res, a, (a+b)/2);
-        mpq_harmonic_balanced(t, (a+b)/2+1, b);
-        mpq_add(res, res, t);
-    }
-
-    mpq_clear(t);
 }
 
 TEST_FUNCTION_START(fmpq_harmonic_ui, state)
 {
     ulong i;
-    mpq_t x, y;
-    fmpq_t t;
+    fmpq_t s, t, u;
 
+    fmpq_init(s);
     fmpq_init(t);
-    mpq_init(x);
-    mpq_init(y);
+    fmpq_init(u);
 
     for (i = 0; i < 1000; i++)
     {
-        mpq_harmonic_balanced(x, 1, i);
-        fmpq_harmonic_ui(t, i);
-        fmpq_get_mpq(y, t);
+        if (i > 0)
+        {
+            fmpq_set_si(u, 1, i);
+            fmpq_add(s, s, u);
+        }
 
-        if (!mpq_equal(x, y))
+        fmpq_harmonic_ui(t, i);
+
+        if (!fmpq_equal(t, s))
         {
             flint_printf("FAIL: %wd\n", i);
             fflush(stdout);
@@ -97,29 +67,33 @@ TEST_FUNCTION_START(fmpq_harmonic_ui, state)
     numerical_test(t, 10003, 9.7879059760583786652);
     numerical_test(t, 10004, 9.7880059360743722677);
 
-    numerical_test(t, 20000, 10.480728217229327573);
-    numerical_test(t, 30000, 10.886184992119899362);
-    numerical_test(t, 40000, 11.173862897945522882);
-    numerical_test(t, 50000, 11.397003949278482638);
-    numerical_test(t, 60000, 11.579323839415955783);
-    numerical_test(t, 70000, 11.733473328773164956);
-    numerical_test(t, 80000, 11.867003828544530692);
-    numerical_test(t, 90000, 11.984786169759202469);
-
     numerical_test(t, 100000, 12.090146129863427947);
-    numerical_test(t, 100001, 12.090156129763428947);
-    numerical_test(t, 100002, 12.090166129563432947);
-    numerical_test(t, 100003, 12.090176129263441947);
-    numerical_test(t, 100004, 12.090186128863457946);
 
-    numerical_test(t, 300000, 13.188755085205611713);
-    numerical_test(t, 500000, 13.699580042305528322);
-    numerical_test(t, 700000, 14.036051993212618803);
-    numerical_test(t, 900000, 14.287366262763433338);
+    if (flint_test_multiplier() > 10)
+    {
+        numerical_test(t, 20000, 10.480728217229327573);
+        numerical_test(t, 30000, 10.886184992119899362);
+        numerical_test(t, 40000, 11.173862897945522882);
+        numerical_test(t, 50000, 11.397003949278482638);
+        numerical_test(t, 60000, 11.579323839415955783);
+        numerical_test(t, 70000, 11.733473328773164956);
+        numerical_test(t, 80000, 11.867003828544530692);
+        numerical_test(t, 90000, 11.984786169759202469);
 
-    mpq_clear(x);
-    mpq_clear(y);
+        numerical_test(t, 100001, 12.090156129763428947);
+        numerical_test(t, 100002, 12.090166129563432947);
+        numerical_test(t, 100003, 12.090176129263441947);
+        numerical_test(t, 100004, 12.090186128863457946);
+
+        numerical_test(t, 300000, 13.188755085205611713);
+        numerical_test(t, 500000, 13.699580042305528322);
+        numerical_test(t, 700000, 14.036051993212618803);
+        numerical_test(t, 900000, 14.287366262763433338);
+    }
+
+    fmpq_clear(s);
     fmpq_clear(t);
+    fmpq_clear(u);
 
     TEST_FUNCTION_END(state);
 }

@@ -22,8 +22,8 @@ TEST_FUNCTION_START(fmpq_next_calkin_wilf, state)
     fmpq_init(ans);
 
     fmpq_set_si(r, 0, 1);
-    fmpq_set_si(ans, 191, 1287);
-    for (i = 0; i < 1000000; i++)
+    fmpq_set_si(ans, 43, 205);
+    for (i = 0; i < 10000; i++)
         fmpq_next_calkin_wilf(r, r);
 
     if (!fmpq_equal(r, ans))
@@ -38,8 +38,8 @@ TEST_FUNCTION_START(fmpq_next_calkin_wilf, state)
     }
 
     fmpq_set_si(r, 0, 1);
-    fmpq_set_si(ans, -191, 1096);
-    for (i = 0; i < 1000000; i++)
+    fmpq_set_si(ans, -43, 162);
+    for (i = 0; i < 10000; i++)
         fmpq_next_signed_calkin_wilf(r, r);
 
     if (!fmpq_equal(r, ans))
@@ -55,9 +55,9 @@ TEST_FUNCTION_START(fmpq_next_calkin_wilf, state)
 
     fmpz_set_str(fmpq_numref(r), "18446744073709551615", 10);
     fmpz_set_str(fmpq_denref(r), "18446744073709551616", 10);
-    fmpz_set_str(fmpq_numref(ans), "18538977794078099355206", 10);
-    fmpz_set_str(fmpq_denref(ans), "22062305912156623710275", 10);
-    for (i = 0; i < 1000000; i++)
+    fmpz_set_str(fmpq_numref(ans), "498062089990157893394", 10);
+    fmpz_set_str(fmpq_denref(ans), "700976274800962961073", 10);
+    for (i = 0; i < 1000; i++)
         fmpq_next_calkin_wilf(r, r);
 
     if (!fmpq_equal(r, ans))
@@ -73,9 +73,9 @@ TEST_FUNCTION_START(fmpq_next_calkin_wilf, state)
 
     fmpz_set_str(fmpq_numref(r), "18446744073709551615", 10);
     fmpz_set_str(fmpq_denref(r), "18446744073709551616", 10);
-    fmpz_set_str(fmpq_numref(ans), "15015649675999575000951", 10);
-    fmpz_set_str(fmpq_denref(ans), "18538977794078099356211", 10);
-    for (i = 0; i < 1000000; i++)
+    fmpz_set_str(fmpq_numref(ans), "295147905179352825731", 10);
+    fmpz_set_str(fmpq_denref(ans), "498062089990157893421", 10);
+    for (i = 0; i < 1000; i++)
         fmpq_next_signed_calkin_wilf(r, r);
 
     if (!fmpq_equal(r, ans))

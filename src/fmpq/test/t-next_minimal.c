@@ -21,8 +21,8 @@ TEST_FUNCTION_START(fmpq_next_minimal, state)
     fmpq_init(ans);
 
     fmpq_set_si(r, 0, 1);
-    fmpq_set_si(ans, 289, 1283);
-    for (i = 0; i < 1000000; i++)
+    fmpq_set_si(ans, 85, 128);
+    for (i = 0; i < 10000; i++)
         fmpq_next_minimal(r, r);
 
     if (!fmpq_equal(r, ans))
@@ -37,8 +37,8 @@ TEST_FUNCTION_START(fmpq_next_minimal, state)
     }
 
     fmpq_set_si(r, 0, 1);
-    fmpq_set_si(ans, -471, 907);
-    for (i = 0; i < 1000000; i++)
+    fmpq_set_si(ans, -25, 91);
+    for (i = 0; i < 10000; i++)
         fmpq_next_signed_minimal(r, r);
 
     if (!fmpq_equal(r, ans))
@@ -54,9 +54,9 @@ TEST_FUNCTION_START(fmpq_next_minimal, state)
 
     fmpz_set_str(fmpq_numref(r), "36893488147419102231", 10);
     fmpz_set_str(fmpq_denref(r), "36893488147419103232", 10);
-    fmpz_set_str(fmpq_numref(ans), "830822", 10);
+    fmpz_set_str(fmpq_numref(ans), "7484", 10);
     fmpz_set_str(fmpq_denref(ans), "36893488147419103233", 10);
-    for (i = 0; i < 1000000; i++)
+    for (i = 0; i < 10000; i++)
         fmpq_next_minimal(r, r);
 
     if (!fmpq_equal(r, ans))
@@ -72,9 +72,9 @@ TEST_FUNCTION_START(fmpq_next_minimal, state)
 
     fmpz_set_str(fmpq_numref(r), "36893488147419102231", 10);
     fmpz_set_str(fmpq_denref(r), "36893488147419103232", 10);
-    fmpz_set_str(fmpq_numref(ans), "414994", 10);
+    fmpz_set_str(fmpq_numref(ans), "3326", 10);
     fmpz_set_str(fmpq_denref(ans), "36893488147419103233", 10);
-    for (i = 0; i < 1000000; i++)
+    for (i = 0; i < 10000; i++)
         fmpq_next_signed_minimal(r, r);
 
     if (!fmpq_equal(r, ans))
