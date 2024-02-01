@@ -18,7 +18,7 @@ int fq_default_poly_fprint(FILE * file, const fq_default_poly_t poly, const fq_d
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        return fq_zech_poly_fprint(file, poly->fq_zech, ctx->ctx.fq_zech);
+        return fq_zech_poly_fprint(file, poly->fq_zech, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
@@ -43,7 +43,7 @@ int fq_default_poly_fprint_pretty(FILE * file, const fq_default_poly_t poly, con
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
         return fq_zech_poly_fprint_pretty(file,
-                                           poly->fq_zech, x, ctx->ctx.fq_zech);
+                                           poly->fq_zech, x, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {

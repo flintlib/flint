@@ -18,7 +18,7 @@ int fq_default_ctx_fprint(FILE * file, const fq_default_ctx_t ctx)
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        return fq_zech_ctx_fprint(file, ctx->ctx.fq_zech);
+        return fq_zech_ctx_fprint(file, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
@@ -48,7 +48,7 @@ int fq_default_fprint(FILE * file, const fq_default_t op, const fq_default_ctx_t
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        return fq_zech_fprint(file, op->fq_zech, ctx->ctx.fq_zech);
+        return fq_zech_fprint(file, op->fq_zech, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
@@ -72,7 +72,7 @@ int fq_default_fprint_pretty(FILE * file, const fq_default_t op, const fq_defaul
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        return fq_zech_fprint_pretty(file, op->fq_zech, ctx->ctx.fq_zech);
+        return fq_zech_fprint_pretty(file, op->fq_zech, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {

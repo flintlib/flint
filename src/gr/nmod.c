@@ -19,8 +19,19 @@
 #include "gr_mat.h"
 #include "gr_poly.h"
 
-#define NMOD_CTX_REF(ring_ctx) (((nmod_t *)((ring_ctx))))
+typedef struct
+{
+    nmod_t nmod;
+    ulong a;   /* when used as finite field with defining polynomial x - a */
+}
+_gr_nmod_ctx_struct;
+
+#define NMOD_CTX_REF(ring_ctx) (&((((_gr_nmod_ctx_struct *)(ring_ctx))->nmod)))
 #define NMOD_CTX(ring_ctx) (*NMOD_CTX_REF(ring_ctx))
+
+/* when used as finite field when defining polynomial x - a, allow storing the coefficient a */
+#define NMOD_CTX_A(ring_ctx) (&((((_gr_nmod_ctx_struct *)(ring_ctx))->a)))
+
 
 void
 _gr_nmod_ctx_write(gr_stream_t out, gr_ctx_t ctx)

@@ -16,7 +16,7 @@ int fq_default_mat_fprint(FILE * file, const fq_default_mat_t mat, const fq_defa
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        return fq_zech_mat_fprint(file, mat->fq_zech, ctx->ctx.fq_zech);
+        return fq_zech_mat_fprint(file, mat->fq_zech, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
@@ -40,7 +40,7 @@ int fq_default_mat_fprint_pretty(FILE * file, const fq_default_mat_t mat, const 
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        return fq_zech_mat_fprint_pretty(file, mat->fq_zech, ctx->ctx.fq_zech);
+        return fq_zech_mat_fprint_pretty(file, mat->fq_zech, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {

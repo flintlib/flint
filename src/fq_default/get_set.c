@@ -18,9 +18,9 @@ void fq_default_get_fmpz_mod_poly(fmpz_mod_poly_t poly,
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
         nmod_poly_t p;
-        ulong mod = fq_zech_ctx_prime(ctx->ctx.fq_zech);
+        ulong mod = fq_zech_ctx_prime(FQ_DEFAULT_CTX_FQ_ZECH(ctx));
         nmod_poly_init(p, mod);
-        fq_zech_get_nmod_poly(p, op->fq_zech, ctx->ctx.fq_zech);
+        fq_zech_get_nmod_poly(p, op->fq_zech, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
         fmpz_mod_poly_set_nmod_poly(poly, p);
         nmod_poly_clear(p);
     }
@@ -57,9 +57,9 @@ void fq_default_get_fmpz_poly(fmpz_poly_t poly,
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
         nmod_poly_t p;
-        ulong mod = fq_zech_ctx_prime(ctx->ctx.fq_zech);
+        ulong mod = fq_zech_ctx_prime(FQ_DEFAULT_CTX_FQ_ZECH(ctx));
         nmod_poly_init(p, mod);
-        fq_zech_get_nmod_poly(p, op->fq_zech, ctx->ctx.fq_zech);
+        fq_zech_get_nmod_poly(p, op->fq_zech, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
         fmpz_poly_set_nmod_poly(poly, p);
         nmod_poly_clear(p);
     }
@@ -96,10 +96,10 @@ void fq_default_set_fmpz_mod_poly(fq_default_t op,
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
         nmod_poly_t p;
-        ulong mod = fq_zech_ctx_prime(ctx->ctx.fq_zech);
+        ulong mod = fq_zech_ctx_prime(FQ_DEFAULT_CTX_FQ_ZECH(ctx));
         nmod_poly_init(p, mod);
         fmpz_mod_poly_get_nmod_poly(p, poly);
-        fq_zech_set_nmod_poly(op->fq_zech, p, ctx->ctx.fq_zech);
+        fq_zech_set_nmod_poly(op->fq_zech, p, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
         nmod_poly_clear(p);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
@@ -136,10 +136,10 @@ void fq_default_set_fmpz_poly(fq_default_t op,
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
         nmod_poly_t p;
-        ulong mod = fq_zech_ctx_prime(ctx->ctx.fq_zech);
+        ulong mod = fq_zech_ctx_prime(FQ_DEFAULT_CTX_FQ_ZECH(ctx));
         nmod_poly_init(p, mod);
         fmpz_poly_get_nmod_poly(p, poly);
-        fq_zech_set_nmod_poly(op->fq_zech, p, ctx->ctx.fq_zech);
+        fq_zech_set_nmod_poly(op->fq_zech, p, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
         nmod_poly_clear(p);
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)

@@ -19,7 +19,7 @@ void fq_default_poly_set_fmpz_poly(fq_default_poly_t rop,
     fmpz_mod_poly_t mod_poly;
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fmpz_mod_ctx_init_ui(mod, fq_zech_ctx_prime(ctx->ctx.fq_zech));
+        fmpz_mod_ctx_init_ui(mod, fq_zech_ctx_prime(FQ_DEFAULT_CTX_FQ_ZECH(ctx)));
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {

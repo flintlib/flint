@@ -12,6 +12,8 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "fmpz_mod.h"
+#include "fmpz_mod_poly.h"
 #include "gr.h"
 #include "fq.h"
 #include "fq_poly.h"
@@ -727,4 +729,30 @@ gr_ctx_init_fq(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var)
     fq_ctx = flint_malloc(sizeof(fq_ctx_struct));
     fq_ctx_init(fq_ctx, p, d, var == NULL ? "a" : var);
     _gr_ctx_init_fq_from_ref(ctx, fq_ctx);
+}
+
+int gr_ctx_init_fq_modulus_fmpz_mod_poly(gr_ctx_t ctx, const fmpz_mod_poly_t modulus, fmpz_mod_ctx_t mod_ctx, const char * var)
+{
+    fq_ctx_struct * fq_ctx;
+    fq_ctx = flint_malloc(sizeof(fq_ctx_struct));
+    fq_ctx_init_modulus(fq_ctx, modulus, mod_ctx, var == NULL ? "a" : var);
+    _gr_ctx_init_fq_from_ref(ctx, fq_ctx);
+    return GR_SUCCESS;
+}
+
+int gr_ctx_init_fq_modulus_nmod_poly(gr_ctx_t ctx, const nmod_poly_t modulus, const char * var)
+{
+    fmpz_mod_ctx_t fmod_ctx;
+    fmpz_mod_poly_t fmod;
+    fmpz_t p;
+    int status;
+    fmpz_init_set_ui(p, modulus->mod.n);
+    fmpz_mod_ctx_init(fmod_ctx, p);
+    fmpz_mod_poly_init(fmod, fmod_ctx);
+    fmpz_mod_poly_set_nmod_poly(fmod, modulus);
+    status = gr_ctx_init_fq_modulus_fmpz_mod_poly(ctx, fmod, fmod_ctx, var);
+    fmpz_mod_poly_clear(fmod, fmod_ctx);
+    fmpz_mod_ctx_clear(fmod_ctx);
+    fmpz_clear(p);
+    return status;
 }

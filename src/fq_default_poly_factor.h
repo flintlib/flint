@@ -50,7 +50,7 @@ void fq_default_poly_factor_init(fq_default_poly_factor_t fac,
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_poly_factor_init(fac->fq_zech, ctx->ctx.fq_zech);
+        fq_zech_poly_factor_init(fac->fq_zech, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
@@ -76,7 +76,7 @@ void fq_default_poly_factor_clear(fq_default_poly_factor_t fac,
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_poly_factor_clear(fac->fq_zech, ctx->ctx.fq_zech);
+        fq_zech_poly_factor_clear(fac->fq_zech, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
@@ -102,7 +102,7 @@ void fq_default_poly_factor_realloc(fq_default_poly_factor_t fac,
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_poly_factor_realloc(fac->fq_zech, alloc, ctx->ctx.fq_zech);
+        fq_zech_poly_factor_realloc(fac->fq_zech, alloc, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
@@ -128,7 +128,7 @@ void fq_default_poly_factor_fit_length(fq_default_poly_factor_t fac,
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_poly_factor_fit_length(fac->fq_zech, len, ctx->ctx.fq_zech);
+        fq_zech_poly_factor_fit_length(fac->fq_zech, len, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
@@ -206,7 +206,7 @@ void fq_default_poly_factor_set(fq_default_poly_factor_t res,
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_poly_factor_set(res->fq_zech, fac->fq_zech, ctx->ctx.fq_zech);
+        fq_zech_poly_factor_set(res->fq_zech, fac->fq_zech, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
@@ -233,7 +233,7 @@ void fq_default_poly_factor_insert(fq_default_poly_factor_t fac,
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
         fq_zech_poly_factor_insert(fac->fq_zech,
-                                         poly->fq_zech, exp, ctx->ctx.fq_zech);
+                                         poly->fq_zech, exp, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
@@ -262,7 +262,7 @@ void fq_default_poly_factor_get_poly(fq_default_poly_t poly,
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
         fq_zech_poly_factor_get_poly(poly->fq_zech,
-                                            fac->fq_zech, i, ctx->ctx.fq_zech);
+                                            fac->fq_zech, i, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
@@ -290,7 +290,7 @@ void fq_default_poly_factor_print(const fq_default_poly_factor_t fac,
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_poly_factor_print(fac->fq_zech, ctx->ctx.fq_zech);
+        fq_zech_poly_factor_print(fac->fq_zech, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
@@ -316,7 +316,7 @@ void fq_default_poly_factor_print_pretty(const fq_default_poly_factor_t fac,
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_poly_factor_print_pretty(fac->fq_zech, var, ctx->ctx.fq_zech);
+        fq_zech_poly_factor_print_pretty(fac->fq_zech, var, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
@@ -343,7 +343,7 @@ void fq_default_poly_factor_concat(fq_default_poly_factor_t res,
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_poly_factor_concat(res->fq_zech, fac->fq_zech, ctx->ctx.fq_zech);
+        fq_zech_poly_factor_concat(res->fq_zech, fac->fq_zech, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
@@ -370,7 +370,7 @@ void fq_default_poly_factor_pow(fq_default_poly_factor_t fac,
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        fq_zech_poly_factor_pow(fac->fq_zech, exp, ctx->ctx.fq_zech);
+        fq_zech_poly_factor_pow(fac->fq_zech, exp, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
@@ -396,7 +396,7 @@ int fq_default_poly_is_squarefree(const fq_default_poly_t f,
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        return fq_zech_poly_is_squarefree(f->fq_zech, ctx->ctx.fq_zech);
+        return fq_zech_poly_is_squarefree(f->fq_zech, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
@@ -423,7 +423,7 @@ void fq_default_poly_factor_squarefree(fq_default_poly_factor_t res,
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
         fq_zech_poly_factor_squarefree(res->fq_zech,
-		                                 f->fq_zech, ctx->ctx.fq_zech);
+		                                 f->fq_zech, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
@@ -451,7 +451,7 @@ int fq_default_poly_is_irreducible(const fq_default_poly_t f,
 {
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
-        return fq_zech_poly_is_irreducible(f->fq_zech, ctx->ctx.fq_zech);
+        return fq_zech_poly_is_irreducible(f->fq_zech, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
@@ -479,7 +479,7 @@ void fq_default_poly_factor_distinct_deg(fq_default_poly_factor_t res,
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
         fq_zech_poly_factor_distinct_deg(res->fq_zech,
-                                        poly->fq_zech, degs, ctx->ctx.fq_zech);
+                                        poly->fq_zech, degs, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
@@ -508,7 +508,7 @@ void fq_default_poly_factor_equal_deg(fq_default_poly_factor_t factors,
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
         fq_zech_poly_factor_equal_deg(factors->fq_zech,
-                                            pol->fq_zech, d, ctx->ctx.fq_zech);
+                                            pol->fq_zech, d, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
@@ -538,7 +538,7 @@ void fq_default_poly_factor(fq_default_poly_factor_t result,
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
         fq_zech_poly_factor(result->fq_zech,
-                     leading_coeff->fq_zech, input->fq_zech, ctx->ctx.fq_zech);
+                     leading_coeff->fq_zech, input->fq_zech, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
@@ -572,7 +572,7 @@ void fq_default_poly_factor_split_single(fq_default_poly_t linfactor,
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
         fq_zech_poly_factor_split_single(linfactor->fq_zech,
-                                             input->fq_zech, ctx->ctx.fq_zech);
+                                             input->fq_zech, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
@@ -601,7 +601,7 @@ void fq_default_poly_roots(fq_default_poly_factor_t r,
     if (ctx->type == FQ_DEFAULT_FQ_ZECH)
     {
         fq_zech_poly_roots(r->fq_zech,
-                              f->fq_zech, with_multiplicity, ctx->ctx.fq_zech);
+                              f->fq_zech, with_multiplicity, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
