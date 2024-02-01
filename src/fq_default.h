@@ -59,9 +59,9 @@ typedef struct
     int type;
     union ctx
     {
-        fq_ctx_t fq;
-        fq_nmod_ctx_t fq_nmod;
-        fq_zech_ctx_t fq_zech;
+        fq_ctx_t fq_UNUSED;
+        fq_nmod_ctx_t fq_nmod_UNUSED;
+        fq_zech_ctx_t fq_zech_UNUSED;
         struct {
             nmod_t mod;
             mp_limb_t a;    /* minpoly is x - a */
@@ -78,13 +78,8 @@ typedef fq_default_ctx_struct fq_default_ctx_t[1];
 #define FQ_DEFAULT_TYPE(ctx) ((ctx)->type)
 #define FQ_DEFAULT_GR_CTX(ctx) ((gr_ctx_struct *) ((ctx)->gr_ctx))
 
-#define FQ_DEFAULT_CTX_FQ_OLD(ctx) ((ctx)->ctx.fq)
 #define FQ_DEFAULT_CTX_FQ(ctx) ((fq_ctx_struct *) GR_CTX_DATA_AS_PTR(FQ_DEFAULT_GR_CTX(ctx)))
-
-#define FQ_DEFAULT_CTX_FQ_ZECH_OLD(ctx) ((ctx)->ctx.fq_zech)
 #define FQ_DEFAULT_CTX_FQ_ZECH(ctx) ((fq_zech_ctx_struct *) GR_CTX_DATA_AS_PTR(FQ_DEFAULT_GR_CTX(ctx)))
-
-#define FQ_DEFAULT_CTX_FQ_NMOD_OLD(ctx) ((ctx)->ctx.fq_nmod)
 #define FQ_DEFAULT_CTX_FQ_NMOD(ctx) ((fq_nmod_ctx_struct *) GR_CTX_DATA_AS_PTR(FQ_DEFAULT_GR_CTX(ctx)))
 
 #define FQ_DEFAULT_CTX_NMOD_OLD(ctx) ((ctx)->ctx.nmod)
@@ -141,29 +136,13 @@ void fq_default_ctx_init_modulus_nmod(fq_default_ctx_t ctx,
 
 FQ_DEFAULT_INLINE void fq_default_ctx_clear(fq_default_ctx_t ctx)
 {
-        if (!ctx->_gr_inited)
-            flint_abort();
+    if (!ctx->_gr_inited)
+        flint_abort();
 
-
-    if (FQ_DEFAULT_TYPE(ctx) == FQ_DEFAULT_FQ_ZECH)
-    {
-        fq_zech_ctx_clear(FQ_DEFAULT_CTX_FQ_ZECH_OLD(ctx));
-    }
-    else if (FQ_DEFAULT_TYPE(ctx) == FQ_DEFAULT_FQ_NMOD)
-    {
-        fq_nmod_ctx_clear(FQ_DEFAULT_CTX_FQ_NMOD_OLD(ctx));
-    }
-    else if (FQ_DEFAULT_TYPE(ctx) == FQ_DEFAULT_NMOD)
-    {
-    }
-    else if (FQ_DEFAULT_TYPE(ctx) == FQ_DEFAULT_FMPZ_MOD)
+    if (FQ_DEFAULT_TYPE(ctx) == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_ctx_clear(FQ_DEFAULT_CTX_FMPZ_MOD_OLD(ctx).mod);
         fmpz_clear(FQ_DEFAULT_CTX_FMPZ_MOD_OLD(ctx).a);
-    }
-    else
-    {
-        fq_ctx_clear(FQ_DEFAULT_CTX_FQ_OLD(ctx));
     }
 
     if (ctx->_gr_inited)

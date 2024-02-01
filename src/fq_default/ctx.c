@@ -23,17 +23,12 @@ void fq_default_ctx_init_type(fq_default_ctx_t ctx,
     if (type == FQ_DEFAULT_FQ_ZECH || (type == 0 && d > 1 && bits*d <= 16))
     {
         FQ_DEFAULT_TYPE(ctx) = FQ_DEFAULT_FQ_ZECH;
-
-        fq_zech_ctx_init_ui(FQ_DEFAULT_CTX_FQ_ZECH_OLD(ctx), *p, d, var);
-
         ctx->_gr_inited = 1;
         gr_ctx_init_fq_zech(FQ_DEFAULT_GR_CTX(ctx), *p, d, var);
     }
     else if (type == FQ_DEFAULT_FQ_NMOD || (type == 0 && d > 1 && fmpz_abs_fits_ui(p)))
     {
         FQ_DEFAULT_TYPE(ctx) = FQ_DEFAULT_FQ_NMOD;
-        fq_nmod_ctx_init_ui(FQ_DEFAULT_CTX_FQ_NMOD_OLD(ctx), *p, d, var);
-
         ctx->_gr_inited = 1;
         gr_ctx_init_fq_nmod(FQ_DEFAULT_GR_CTX(ctx), *p, d, var);
     }
@@ -60,8 +55,6 @@ void fq_default_ctx_init_type(fq_default_ctx_t ctx,
     else
     {
         FQ_DEFAULT_TYPE(ctx) = FQ_DEFAULT_FQ;
-        fq_ctx_init(FQ_DEFAULT_CTX_FQ_OLD(ctx), p, d, var);
-
         ctx->_gr_inited = 1;
         gr_ctx_init_fq(FQ_DEFAULT_GR_CTX(ctx), p, d, var);
     }
@@ -91,19 +84,7 @@ void fq_default_ctx_init_modulus_type(fq_default_ctx_t ctx,
     {
         if (gr_ctx_init_fq_zech_modulus_fmpz_mod_poly(FQ_DEFAULT_GR_CTX(ctx), modulus, mod_ctx, var) == GR_SUCCESS)
         {
-
-            nmod_poly_t nmodulus;
-            fq_nmod_ctx_struct * fq_nmod_ctx;
             ctx->type = FQ_DEFAULT_FQ_ZECH;
-            nmod_poly_init(nmodulus, fmpz_get_ui(p));
-            fmpz_mod_poly_get_nmod_poly(nmodulus, modulus);
-            fq_nmod_ctx = flint_malloc(sizeof(fq_nmod_ctx_struct));
-            fq_nmod_ctx_init_modulus(fq_nmod_ctx, nmodulus, var);
-            if (!fq_zech_ctx_init_fq_nmod_ctx_check(ctx->ctx.fq_zech, fq_nmod_ctx))
-                flint_abort();
-            ctx->ctx.fq_zech->owns_fq_nmod_ctx = 1;
-            nmod_poly_clear(nmodulus);
-
             ctx->_gr_inited = 1;
         }
         else
@@ -113,13 +94,7 @@ void fq_default_ctx_init_modulus_type(fq_default_ctx_t ctx,
     }
     else if (type == FQ_DEFAULT_FQ_NMOD || (type == 0 && d > 1 && fmpz_abs_fits_ui(p)))
     {
-        nmod_poly_t nmodulus;
         ctx->type = FQ_DEFAULT_FQ_NMOD;
-        nmod_poly_init(nmodulus, fmpz_get_ui(p));
-        fmpz_mod_poly_get_nmod_poly(nmodulus, modulus);
-        fq_nmod_ctx_init_modulus(ctx->ctx.fq_nmod, nmodulus, var);
-        nmod_poly_clear(nmodulus);
-
         GR_MUST_SUCCEED(gr_ctx_init_fq_nmod_modulus_fmpz_mod_poly(FQ_DEFAULT_GR_CTX(ctx), modulus, mod_ctx, var));
         ctx->_gr_inited = 1;
     }
@@ -155,8 +130,6 @@ void fq_default_ctx_init_modulus_type(fq_default_ctx_t ctx,
     else
     {
         ctx->type = FQ_DEFAULT_FQ;
-        fq_ctx_init_modulus(ctx->ctx.fq, modulus, mod_ctx, var);
-
         GR_MUST_SUCCEED(gr_ctx_init_fq_modulus_fmpz_mod_poly(FQ_DEFAULT_GR_CTX(ctx), modulus, mod_ctx, var));
         ctx->_gr_inited = 1;
     }
@@ -181,13 +154,7 @@ void fq_default_ctx_init_modulus_nmod_type(fq_default_ctx_t ctx,
     {
         if (gr_ctx_init_fq_zech_modulus_nmod_poly(FQ_DEFAULT_GR_CTX(ctx), modulus, var) == GR_SUCCESS)
         {
-            fq_nmod_ctx_struct * fq_nmod_ctx = flint_malloc(sizeof(fq_nmod_ctx_struct));
             ctx->type = FQ_DEFAULT_FQ_ZECH;
-            fq_nmod_ctx_init_modulus(fq_nmod_ctx, modulus, var);
-            if (!fq_zech_ctx_init_fq_nmod_ctx_check(ctx->ctx.fq_zech, fq_nmod_ctx))
-                flint_abort();
-            ctx->ctx.fq_zech->owns_fq_nmod_ctx = 1;
-
             ctx->_gr_inited = 1;
         }
         else
@@ -198,8 +165,6 @@ void fq_default_ctx_init_modulus_nmod_type(fq_default_ctx_t ctx,
     else if (type == FQ_DEFAULT_FQ_NMOD || (type == 0 && d > 1))
     {
         ctx->type = FQ_DEFAULT_FQ_NMOD;
-        fq_nmod_ctx_init_modulus(ctx->ctx.fq_nmod, modulus, var);
-
         GR_MUST_SUCCEED(gr_ctx_init_fq_nmod_modulus_nmod_poly(FQ_DEFAULT_GR_CTX(ctx), modulus, var));
         ctx->_gr_inited = 1;
     }
@@ -238,19 +203,7 @@ void fq_default_ctx_init_modulus_nmod_type(fq_default_ctx_t ctx,
     }
     else
     {
-        fmpz_mod_ctx_t fmod_ctx;
-        fmpz_mod_poly_t fmod;
-        fmpz_t p;
         ctx->type = FQ_DEFAULT_FQ;
-        fmpz_init_set_ui(p, modulus->mod.n);
-        fmpz_mod_ctx_init(fmod_ctx, p);
-        fmpz_mod_poly_init(fmod, fmod_ctx);
-        fmpz_mod_poly_set_nmod_poly(fmod, modulus);
-        fq_ctx_init_modulus(ctx->ctx.fq, fmod, fmod_ctx, var);
-        fmpz_mod_poly_clear(fmod, fmod_ctx);
-        fmpz_mod_ctx_clear(fmod_ctx);
-        fmpz_clear(p);
-
         GR_MUST_SUCCEED(gr_ctx_init_fq_modulus_nmod_poly(FQ_DEFAULT_GR_CTX(ctx), modulus, var));
         ctx->_gr_inited = 1;
     }
@@ -271,26 +224,26 @@ void fq_default_ctx_modulus(fmpz_mod_poly_t p, const fq_default_ctx_t ctx)
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        nmod_poly_struct const * mod = fq_nmod_ctx_modulus(ctx->ctx.fq_nmod);
+        nmod_poly_struct const * mod = fq_nmod_ctx_modulus(FQ_DEFAULT_CTX_FQ_NMOD(ctx));
         fmpz_mod_poly_set_nmod_poly(p, mod);
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
         _fmpz_mod_poly_fit_length(p, 2);
         _fmpz_mod_poly_set_length(p, 2);
-        fmpz_set_ui(p->coeffs + 0, nmod_neg(ctx->ctx.nmod.a, ctx->ctx.nmod.mod));
+        fmpz_set_ui(p->coeffs + 0, nmod_neg(FQ_DEFAULT_CTX_NMOD_A(ctx)[0], FQ_DEFAULT_CTX_NMOD(ctx)));
         fmpz_one(p->coeffs + 1);
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         _fmpz_mod_poly_fit_length(p, 2);
         _fmpz_mod_poly_set_length(p, 2);
-        fmpz_mod_neg(p->coeffs + 0, ctx->ctx.fmpz_mod.a, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_neg(p->coeffs + 0, FQ_DEFAULT_CTX_FMPZ_MOD_A(ctx), FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
         fmpz_one(p->coeffs + 1);
     }
     else
     {
-        fmpz_mod_ctx_struct const * mod = ctx->ctx.fq->ctxp;
-        fmpz_mod_poly_set(p, ctx->ctx.fq->modulus, mod);
+        fmpz_mod_ctx_struct const * mod = FQ_DEFAULT_CTX_FQ(ctx)->ctxp;
+        fmpz_mod_poly_set(p, FQ_DEFAULT_CTX_FQ(ctx)->modulus, mod);
     }
 }

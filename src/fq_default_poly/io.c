@@ -22,7 +22,7 @@ int fq_default_poly_fprint(FILE * file, const fq_default_poly_t poly, const fq_d
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        return fq_nmod_poly_fprint(file, poly->fq_nmod, ctx->ctx.fq_nmod);
+        return fq_nmod_poly_fprint(file, poly->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -34,7 +34,7 @@ int fq_default_poly_fprint(FILE * file, const fq_default_poly_t poly, const fq_d
     }
     else
     {
-        return fq_poly_fprint(file, poly->fq, ctx->ctx.fq);
+        return fq_poly_fprint(file, poly->fq, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -48,7 +48,7 @@ int fq_default_poly_fprint_pretty(FILE * file, const fq_default_poly_t poly, con
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
         return fq_nmod_poly_fprint_pretty(file,
-                                           poly->fq_nmod, x, ctx->ctx.fq_nmod);
+                                           poly->fq_nmod, x, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -61,7 +61,7 @@ int fq_default_poly_fprint_pretty(FILE * file, const fq_default_poly_t poly, con
     }
     else
     {
-        return fq_poly_fprint_pretty(file, poly->fq, x, ctx->ctx.fq);
+        return fq_poly_fprint_pretty(file, poly->fq, x, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 

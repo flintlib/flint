@@ -23,7 +23,7 @@ void fq_default_poly_set_fmpz_poly(fq_default_poly_t rop,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fmpz_mod_ctx_init_ui(mod, fq_nmod_ctx_prime(ctx->ctx.fq_nmod));
+        fmpz_mod_ctx_init_ui(mod, fq_nmod_ctx_prime(FQ_DEFAULT_CTX_FQ_NMOD(ctx)));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -39,7 +39,7 @@ void fq_default_poly_set_fmpz_poly(fq_default_poly_t rop,
     }
     else
     {
-        fmpz_mod_ctx_init(mod, fq_ctx_prime(ctx->ctx.fq));
+        fmpz_mod_ctx_init(mod, fq_ctx_prime(FQ_DEFAULT_CTX_FQ(ctx)));
     }
     fmpz_mod_poly_init(mod_poly, mod);
     fmpz_mod_poly_set_fmpz_poly(mod_poly, op, mod);

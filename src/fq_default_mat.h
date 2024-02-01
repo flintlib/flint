@@ -53,7 +53,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_init(fq_default_mat_t mat,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_mat_init(mat->fq_nmod, rows, cols, ctx->ctx.fq_nmod);
+        fq_nmod_mat_init(mat->fq_nmod, rows, cols, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -65,7 +65,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_init(fq_default_mat_t mat,
     }
     else
     {
-        fq_mat_init(mat->fq, rows, cols, ctx->ctx.fq);
+        fq_mat_init(mat->fq, rows, cols, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -78,7 +78,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_init_set(fq_default_mat_t mat,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_mat_init_set(mat->fq_nmod, src->fq_nmod, ctx->ctx.fq_nmod);
+        fq_nmod_mat_init_set(mat->fq_nmod, src->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -90,7 +90,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_init_set(fq_default_mat_t mat,
     }
     else
     {
-        fq_mat_init_set(mat->fq, src->fq, ctx->ctx.fq);
+        fq_mat_init_set(mat->fq, src->fq, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -103,7 +103,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_swap(fq_default_mat_t mat1,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_mat_swap(mat1->fq_nmod, mat2->fq_nmod, ctx->ctx.fq_nmod);
+        fq_nmod_mat_swap(mat1->fq_nmod, mat2->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -115,7 +115,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_swap(fq_default_mat_t mat1,
     }
     else
     {
-        fq_mat_swap(mat1->fq, mat2->fq, ctx->ctx.fq);
+        fq_mat_swap(mat1->fq, mat2->fq, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -128,7 +128,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_set(fq_default_mat_t mat1,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_mat_set(mat1->fq_nmod, mat2->fq_nmod, ctx->ctx.fq_nmod);
+        fq_nmod_mat_set(mat1->fq_nmod, mat2->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -140,7 +140,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_set(fq_default_mat_t mat1,
     }
     else
     {
-        fq_mat_set(mat1->fq, mat2->fq, ctx->ctx.fq);
+        fq_mat_set(mat1->fq, mat2->fq, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -153,7 +153,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_clear(fq_default_mat_t mat,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_mat_clear(mat->fq_nmod, ctx->ctx.fq_nmod);
+        fq_nmod_mat_clear(mat->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -165,7 +165,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_clear(fq_default_mat_t mat,
     }
     else
     {
-        fq_mat_clear(mat->fq, ctx->ctx.fq);
+        fq_mat_clear(mat->fq, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -178,7 +178,7 @@ FQ_DEFAULT_MAT_INLINE int fq_default_mat_equal(const fq_default_mat_t mat1,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        return fq_nmod_mat_equal(mat1->fq_nmod, mat2->fq_nmod, ctx->ctx.fq_nmod);
+        return fq_nmod_mat_equal(mat1->fq_nmod, mat2->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -190,7 +190,7 @@ FQ_DEFAULT_MAT_INLINE int fq_default_mat_equal(const fq_default_mat_t mat1,
     }
     else
     {
-        return fq_mat_equal(mat1->fq, mat2->fq, ctx->ctx.fq);
+        return fq_mat_equal(mat1->fq, mat2->fq, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -203,7 +203,7 @@ FQ_DEFAULT_MAT_INLINE int fq_default_mat_is_zero(const fq_default_mat_t mat,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        return fq_nmod_mat_is_zero(mat->fq_nmod, ctx->ctx.fq_nmod);
+        return fq_nmod_mat_is_zero(mat->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -215,7 +215,7 @@ FQ_DEFAULT_MAT_INLINE int fq_default_mat_is_zero(const fq_default_mat_t mat,
     }
     else
     {
-        return fq_mat_is_zero(mat->fq, ctx->ctx.fq);
+        return fq_mat_is_zero(mat->fq, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -228,7 +228,7 @@ FQ_DEFAULT_MAT_INLINE int fq_default_mat_is_one(const fq_default_mat_t mat,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        return fq_nmod_mat_is_one(mat->fq_nmod, ctx->ctx.fq_nmod);
+        return fq_nmod_mat_is_one(mat->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -240,7 +240,7 @@ FQ_DEFAULT_MAT_INLINE int fq_default_mat_is_one(const fq_default_mat_t mat,
     }
     else
     {
-        return fq_mat_is_one(mat->fq, ctx->ctx.fq);
+        return fq_mat_is_one(mat->fq, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -253,7 +253,7 @@ fq_default_mat_is_empty(const fq_default_mat_t mat, const fq_default_ctx_t ctx)
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        return fq_nmod_mat_is_empty(mat->fq_nmod, ctx->ctx.fq_nmod);
+        return fq_nmod_mat_is_empty(mat->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -265,7 +265,7 @@ fq_default_mat_is_empty(const fq_default_mat_t mat, const fq_default_ctx_t ctx)
     }
     else
     {
-        return fq_mat_is_empty(mat->fq, ctx->ctx.fq);
+        return fq_mat_is_empty(mat->fq, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -279,7 +279,7 @@ fq_default_mat_is_square(const fq_default_mat_t mat,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        return fq_nmod_mat_is_square(mat->fq_nmod, ctx->ctx.fq_nmod);
+        return fq_nmod_mat_is_square(mat->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -291,7 +291,7 @@ fq_default_mat_is_square(const fq_default_mat_t mat,
     }
     else
     {
-        return fq_mat_is_square(mat->fq, ctx->ctx.fq);
+        return fq_mat_is_square(mat->fq, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -307,7 +307,7 @@ fq_default_mat_entry(fq_default_t val, const fq_default_mat_t mat,
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
         fq_nmod_set(val->fq_nmod,
-                        fq_nmod_mat_entry(mat->fq_nmod, i, j), ctx->ctx.fq_nmod);
+                        fq_nmod_mat_entry(mat->fq_nmod, i, j), FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -319,7 +319,7 @@ fq_default_mat_entry(fq_default_t val, const fq_default_mat_t mat,
     }
     else
     {
-        fq_set(val->fq, fq_mat_entry(mat->fq, i, j), ctx->ctx.fq);
+        fq_set(val->fq, fq_mat_entry(mat->fq, i, j), FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -333,7 +333,7 @@ fq_default_mat_entry_set(fq_default_mat_t mat, slong i, slong j,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_mat_entry_set(mat->fq_nmod, i, j, x->fq_nmod, ctx->ctx.fq_nmod);
+        fq_nmod_mat_entry_set(mat->fq_nmod, i, j, x->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -345,7 +345,7 @@ fq_default_mat_entry_set(fq_default_mat_t mat, slong i, slong j,
     }
     else
     {
-        fq_mat_entry_set(mat->fq, i, j, x->fq, ctx->ctx.fq);
+        fq_mat_entry_set(mat->fq, i, j, x->fq, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -369,7 +369,7 @@ fq_default_mat_nrows(const fq_default_mat_t mat, const fq_default_ctx_t ctx)
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        return fq_nmod_mat_nrows(mat->fq_nmod, ctx->ctx.fq_nmod);
+        return fq_nmod_mat_nrows(mat->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -381,7 +381,7 @@ fq_default_mat_nrows(const fq_default_mat_t mat, const fq_default_ctx_t ctx)
     }
     else
     {
-        return fq_mat_nrows(mat->fq, ctx->ctx.fq);
+        return fq_mat_nrows(mat->fq, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -394,7 +394,7 @@ fq_default_mat_ncols(const fq_default_mat_t mat, const fq_default_ctx_t ctx)
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        return fq_nmod_mat_ncols(mat->fq_nmod, ctx->ctx.fq_nmod);
+        return fq_nmod_mat_ncols(mat->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -406,7 +406,7 @@ fq_default_mat_ncols(const fq_default_mat_t mat, const fq_default_ctx_t ctx)
     }
     else
     {
-        return fq_mat_ncols(mat->fq, ctx->ctx.fq);
+        return fq_mat_ncols(mat->fq, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -420,7 +420,7 @@ fq_default_mat_swap_rows(fq_default_mat_t mat,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_mat_swap_rows(mat->fq_nmod, perm, r, s, ctx->ctx.fq_nmod);
+        fq_nmod_mat_swap_rows(mat->fq_nmod, perm, r, s, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -432,7 +432,7 @@ fq_default_mat_swap_rows(fq_default_mat_t mat,
     }
     else
     {
-        fq_mat_swap_rows(mat->fq, perm, r, s, ctx->ctx.fq);
+        fq_mat_swap_rows(mat->fq, perm, r, s, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -446,7 +446,7 @@ fq_default_mat_invert_rows(fq_default_mat_t mat,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_mat_invert_rows(mat->fq_nmod, perm, ctx->ctx.fq_nmod);
+        fq_nmod_mat_invert_rows(mat->fq_nmod, perm, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -458,7 +458,7 @@ fq_default_mat_invert_rows(fq_default_mat_t mat,
     }
     else
     {
-        fq_mat_invert_rows(mat->fq, perm, ctx->ctx.fq);
+        fq_mat_invert_rows(mat->fq, perm, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -472,7 +472,7 @@ fq_default_mat_swap_cols(fq_default_mat_t mat,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_mat_swap_cols(mat->fq_nmod, perm, r, s, ctx->ctx.fq_nmod);
+        fq_nmod_mat_swap_cols(mat->fq_nmod, perm, r, s, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -484,7 +484,7 @@ fq_default_mat_swap_cols(fq_default_mat_t mat,
     }
     else
     {
-        fq_mat_swap_cols(mat->fq, perm, r, s, ctx->ctx.fq);
+        fq_mat_swap_cols(mat->fq, perm, r, s, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -498,7 +498,7 @@ fq_default_mat_invert_cols(fq_default_mat_t mat,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_mat_invert_cols(mat->fq_nmod, perm, ctx->ctx.fq_nmod);
+        fq_nmod_mat_invert_cols(mat->fq_nmod, perm, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -510,7 +510,7 @@ fq_default_mat_invert_cols(fq_default_mat_t mat,
     }
     else
     {
-        fq_mat_invert_cols(mat->fq, perm, ctx->ctx.fq);
+        fq_mat_invert_cols(mat->fq, perm, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -525,7 +525,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_zero(fq_default_mat_t A,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_mat_zero(A->fq_nmod, ctx->ctx.fq_nmod);
+        fq_nmod_mat_zero(A->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -537,7 +537,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_zero(fq_default_mat_t A,
     }
     else
     {
-        fq_mat_zero(A->fq, ctx->ctx.fq);
+        fq_mat_zero(A->fq, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -550,7 +550,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_one(fq_default_mat_t A,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_mat_one(A->fq_nmod, ctx->ctx.fq_nmod);
+        fq_nmod_mat_one(A->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -562,7 +562,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_one(fq_default_mat_t A,
     }
     else
     {
-        fq_mat_one(A->fq, ctx->ctx.fq);
+        fq_mat_one(A->fq, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -578,7 +578,7 @@ void fq_default_mat_set_nmod_mat(fq_default_mat_t mat1,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_mat_set_nmod_mat(mat1->fq_nmod, mat2, ctx->ctx.fq_nmod);
+        fq_nmod_mat_set_nmod_mat(mat1->fq_nmod, mat2, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -590,7 +590,7 @@ void fq_default_mat_set_nmod_mat(fq_default_mat_t mat1,
     }
     else
     {
-        fq_mat_set_nmod_mat(mat1->fq, mat2, ctx->ctx.fq);
+        fq_mat_set_nmod_mat(mat1->fq, mat2, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -604,7 +604,7 @@ void fq_default_mat_set_fmpz_mod_mat(fq_default_mat_t mat1,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_mat_set_fmpz_mod_mat(mat1->fq_nmod, mat2, ctx->ctx.fq_nmod);
+        fq_nmod_mat_set_fmpz_mod_mat(mat1->fq_nmod, mat2, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -616,7 +616,7 @@ void fq_default_mat_set_fmpz_mod_mat(fq_default_mat_t mat1,
     }
     else
     {
-        fq_mat_set_fmpz_mod_mat(mat1->fq, mat2, ctx->ctx.fq);
+        fq_mat_set_fmpz_mod_mat(mat1->fq, mat2, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -644,11 +644,11 @@ void fq_default_mat_set_fmpz_mat(fq_default_mat_t mat1,
 
         fmpz_mod_ctx_t ctx2;
         fmpz_t prime;
-        fmpz_init_set_ui(prime, fq_nmod_ctx_prime(ctx->ctx.fq_nmod));
+        fmpz_init_set_ui(prime, fq_nmod_ctx_prime(FQ_DEFAULT_CTX_FQ_NMOD(ctx)));
         fmpz_mod_ctx_init(ctx2, prime);
         fmpz_mod_mat_init(mod_mat, mat2->r, mat2->c, ctx2);
         fmpz_mod_mat_set_fmpz_mat(mod_mat, mat2, ctx2);
-        fq_nmod_mat_set_fmpz_mod_mat(mat1->fq_nmod, mod_mat, ctx->ctx.fq_nmod);
+        fq_nmod_mat_set_fmpz_mod_mat(mat1->fq_nmod, mod_mat, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
         fmpz_mod_mat_clear(mod_mat, ctx2);
         fmpz_mod_ctx_clear(ctx2);
         fmpz_clear(prime);
@@ -666,10 +666,10 @@ void fq_default_mat_set_fmpz_mat(fq_default_mat_t mat1,
     else
     {
         fmpz_mod_ctx_t ctx2;
-        fmpz_mod_ctx_init(ctx2, fq_ctx_prime(ctx->ctx.fq));
+        fmpz_mod_ctx_init(ctx2, fq_ctx_prime(FQ_DEFAULT_CTX_FQ(ctx)));
         fmpz_mod_mat_init(mod_mat, mat2->r, mat2->c, ctx2);
         fmpz_mod_mat_set_fmpz_mat(mod_mat, mat2, ctx2);
-        fq_mat_set_fmpz_mod_mat(mat1->fq, mod_mat, ctx->ctx.fq);
+        fq_mat_set_fmpz_mod_mat(mat1->fq, mod_mat, FQ_DEFAULT_CTX_FQ(ctx));
         fmpz_mod_mat_clear(mod_mat, ctx2);
         fmpz_mod_ctx_clear(ctx2);
     }
@@ -690,7 +690,7 @@ void fq_default_mat_window_init(fq_default_mat_t window,
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
         fq_nmod_mat_window_init(window->fq_nmod,
-                               mat->fq_nmod, r1, c1, r2, c2, ctx->ctx.fq_nmod);
+                               mat->fq_nmod, r1, c1, r2, c2, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -705,7 +705,7 @@ void fq_default_mat_window_init(fq_default_mat_t window,
     else
     {
         fq_mat_window_init(window->fq,
-                                         mat->fq, r1, c1, r2, c2, ctx->ctx.fq);
+                                         mat->fq, r1, c1, r2, c2, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -719,7 +719,7 @@ void fq_default_mat_window_clear(fq_default_mat_t window,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_mat_window_clear(window->fq_nmod, ctx->ctx.fq_nmod);
+        fq_nmod_mat_window_clear(window->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -731,7 +731,7 @@ void fq_default_mat_window_clear(fq_default_mat_t window,
     }
     else
     {
-        fq_mat_window_clear(window->fq, ctx->ctx.fq);
+        fq_mat_window_clear(window->fq, FQ_DEFAULT_CTX_FQ(ctx));
     }
 
 }
@@ -749,7 +749,7 @@ void fq_default_mat_concat_horizontal(fq_default_mat_t res,
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
         fq_nmod_mat_concat_horizontal(res->fq_nmod,
-                               mat1->fq_nmod, mat2->fq_nmod, ctx->ctx.fq_nmod);
+                               mat1->fq_nmod, mat2->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -762,7 +762,7 @@ void fq_default_mat_concat_horizontal(fq_default_mat_t res,
     }
     else
     {
-        fq_mat_concat_horizontal(res->fq, mat1->fq, mat2->fq, ctx->ctx.fq);
+        fq_mat_concat_horizontal(res->fq, mat1->fq, mat2->fq, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -779,7 +779,7 @@ void fq_default_mat_concat_vertical(fq_default_mat_t res,
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
         fq_nmod_mat_concat_vertical(res->fq_nmod,
-                               mat1->fq_nmod, mat2->fq_nmod, ctx->ctx.fq_nmod);
+                               mat1->fq_nmod, mat2->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -792,7 +792,7 @@ void fq_default_mat_concat_vertical(fq_default_mat_t res,
     }
     else
     {
-        fq_mat_concat_vertical(res->fq, mat1->fq, mat2->fq, ctx->ctx.fq);
+        fq_mat_concat_vertical(res->fq, mat1->fq, mat2->fq, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -819,7 +819,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_randtest(fq_default_mat_t mat,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_mat_randtest(mat->fq_nmod, state, ctx->ctx.fq_nmod);
+        fq_nmod_mat_randtest(mat->fq_nmod, state, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -831,7 +831,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_randtest(fq_default_mat_t mat,
     }
     else
     {
-        fq_mat_randtest(mat->fq, state, ctx->ctx.fq);
+        fq_mat_randtest(mat->fq, state, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -844,7 +844,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_randrank(fq_default_mat_t mat,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_mat_randrank(mat->fq_nmod, state, rank, ctx->ctx.fq_nmod);
+        fq_nmod_mat_randrank(mat->fq_nmod, state, rank, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -856,7 +856,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_randrank(fq_default_mat_t mat,
     }
     else
     {
-        fq_mat_randrank(mat->fq, state, rank, ctx->ctx.fq);
+        fq_mat_randrank(mat->fq, state, rank, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -871,7 +871,7 @@ void fq_default_mat_randops(fq_default_mat_t mat,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_mat_randops(mat->fq_nmod, state, count, ctx->ctx.fq_nmod);
+        fq_nmod_mat_randops(mat->fq_nmod, state, count, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -883,7 +883,7 @@ void fq_default_mat_randops(fq_default_mat_t mat,
     }
     else
     {
-        fq_mat_randops(mat->fq, state, count, ctx->ctx.fq);
+        fq_mat_randops(mat->fq, state, count, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -897,7 +897,7 @@ void fq_default_mat_randtril(fq_default_mat_t mat,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_mat_randtril(mat->fq_nmod, state, unit, ctx->ctx.fq_nmod);
+        fq_nmod_mat_randtril(mat->fq_nmod, state, unit, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -909,7 +909,7 @@ void fq_default_mat_randtril(fq_default_mat_t mat,
     }
     else
     {
-        fq_mat_randtril(mat->fq, state, unit, ctx->ctx.fq);
+        fq_mat_randtril(mat->fq, state, unit, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -923,7 +923,7 @@ void fq_default_mat_randtriu(fq_default_mat_t mat,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_mat_randtriu(mat->fq_nmod, state, unit, ctx->ctx.fq_nmod);
+        fq_nmod_mat_randtriu(mat->fq_nmod, state, unit, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -935,7 +935,7 @@ void fq_default_mat_randtriu(fq_default_mat_t mat,
     }
     else
     {
-        fq_mat_randtriu(mat->fq, state, unit, ctx->ctx.fq);
+        fq_mat_randtriu(mat->fq, state, unit, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -955,7 +955,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_add(fq_default_mat_t C,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_mat_add(C->fq_nmod, A->fq_nmod, B->fq_nmod, ctx->ctx.fq_nmod);
+        fq_nmod_mat_add(C->fq_nmod, A->fq_nmod, B->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -967,7 +967,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_add(fq_default_mat_t C,
     }
     else
     {
-        fq_mat_add(C->fq, A->fq, B->fq, ctx->ctx.fq);
+        fq_mat_add(C->fq, A->fq, B->fq, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -981,7 +981,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_sub(fq_default_mat_t C,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_mat_sub(C->fq_nmod, A->fq_nmod, B->fq_nmod, ctx->ctx.fq_nmod);
+        fq_nmod_mat_sub(C->fq_nmod, A->fq_nmod, B->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -993,7 +993,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_sub(fq_default_mat_t C,
     }
     else
     {
-        fq_mat_sub(C->fq, A->fq, B->fq, ctx->ctx.fq);
+        fq_mat_sub(C->fq, A->fq, B->fq, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -1006,7 +1006,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_neg(fq_default_mat_t B,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_mat_neg(B->fq_nmod, A->fq_nmod, ctx->ctx.fq_nmod);
+        fq_nmod_mat_neg(B->fq_nmod, A->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -1018,7 +1018,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_neg(fq_default_mat_t B,
     }
     else
     {
-        fq_mat_neg(B->fq, A->fq, ctx->ctx.fq);
+        fq_mat_neg(B->fq, A->fq, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -1034,7 +1034,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_submul(fq_default_mat_t D,
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
         fq_nmod_mat_submul(D->fq_nmod,
-                         C->fq_nmod, A->fq_nmod, B->fq_nmod, ctx->ctx.fq_nmod);
+                         C->fq_nmod, A->fq_nmod, B->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -1046,7 +1046,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_submul(fq_default_mat_t D,
     }
     else
     {
-        fq_mat_submul(D->fq, C->fq, A->fq, B->fq, ctx->ctx.fq);
+        fq_mat_submul(D->fq, C->fq, A->fq, B->fq, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -1064,7 +1064,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_mul(fq_default_mat_t C,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_mat_mul(C->fq_nmod, A->fq_nmod, B->fq_nmod, ctx->ctx.fq_nmod);
+        fq_nmod_mat_mul(C->fq_nmod, A->fq_nmod, B->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -1076,7 +1076,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_mul(fq_default_mat_t C,
     }
     else
     {
-        fq_mat_mul(C->fq, A->fq, B->fq, ctx->ctx.fq);
+        fq_mat_mul(C->fq, A->fq, B->fq, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -1089,7 +1089,7 @@ FQ_DEFAULT_MAT_INLINE slong fq_default_mat_lu(slong * P,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        return fq_nmod_mat_lu(P, A->fq_nmod, rank_check, ctx->ctx.fq_nmod);
+        return fq_nmod_mat_lu(P, A->fq_nmod, rank_check, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -1101,7 +1101,7 @@ FQ_DEFAULT_MAT_INLINE slong fq_default_mat_lu(slong * P,
     }
     else
     {
-        return fq_mat_lu(P, A->fq, rank_check, ctx->ctx.fq);
+        return fq_mat_lu(P, A->fq, rank_check, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -1116,7 +1116,7 @@ FQ_DEFAULT_MAT_INLINE int fq_default_mat_inv(fq_default_mat_t B,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        return fq_nmod_mat_inv(B->fq_nmod, A->fq_nmod, ctx->ctx.fq_nmod);
+        return fq_nmod_mat_inv(B->fq_nmod, A->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -1128,7 +1128,7 @@ FQ_DEFAULT_MAT_INLINE int fq_default_mat_inv(fq_default_mat_t B,
     }
     else
     {
-        return fq_mat_inv(B->fq, A->fq, ctx->ctx.fq);
+        return fq_mat_inv(B->fq, A->fq, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -1143,7 +1143,7 @@ FQ_DEFAULT_MAT_INLINE slong fq_default_mat_rref(fq_default_mat_t B, const fq_def
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        return fq_nmod_mat_rref(B->fq_nmod, A->fq_nmod, ctx->ctx.fq_nmod);
+        return fq_nmod_mat_rref(B->fq_nmod, A->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -1156,7 +1156,7 @@ FQ_DEFAULT_MAT_INLINE slong fq_default_mat_rref(fq_default_mat_t B, const fq_def
     }
     else
     {
-        return fq_mat_rref(B->fq, A->fq, ctx->ctx.fq);
+        return fq_mat_rref(B->fq, A->fq, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -1169,7 +1169,7 @@ FQ_DEFAULT_MAT_INLINE slong fq_default_mat_nullspace(fq_default_mat_t X,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        return fq_nmod_mat_nullspace(X->fq_nmod, A->fq_nmod, ctx->ctx.fq_nmod);
+        return fq_nmod_mat_nullspace(X->fq_nmod, A->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -1181,7 +1181,7 @@ FQ_DEFAULT_MAT_INLINE slong fq_default_mat_nullspace(fq_default_mat_t X,
     }
     else
     {
-        return fq_mat_nullspace(X->fq, A->fq, ctx->ctx.fq);
+        return fq_mat_nullspace(X->fq, A->fq, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -1194,7 +1194,7 @@ FQ_DEFAULT_MAT_INLINE slong fq_default_mat_rank(const fq_default_mat_t A,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        return fq_nmod_mat_rank(A->fq_nmod, ctx->ctx.fq_nmod);
+        return fq_nmod_mat_rank(A->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -1206,7 +1206,7 @@ FQ_DEFAULT_MAT_INLINE slong fq_default_mat_rank(const fq_default_mat_t A,
     }
     else
     {
-        return fq_mat_rank(A->fq, ctx->ctx.fq);
+        return fq_mat_rank(A->fq, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -1220,7 +1220,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_solve_tril(fq_default_mat_t X,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_mat_solve_tril(X->fq_nmod, L->fq_nmod, B->fq_nmod, unit, ctx->ctx.fq_nmod);
+        fq_nmod_mat_solve_tril(X->fq_nmod, L->fq_nmod, B->fq_nmod, unit, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -1232,7 +1232,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_solve_tril(fq_default_mat_t X,
     }
     else
     {
-        fq_mat_solve_tril(X->fq, L->fq, B->fq, unit, ctx->ctx.fq);
+        fq_mat_solve_tril(X->fq, L->fq, B->fq, unit, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -1246,7 +1246,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_solve_triu(fq_default_mat_t X,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_mat_solve_triu(X->fq_nmod, U->fq_nmod, B->fq_nmod, unit, ctx->ctx.fq_nmod);
+        fq_nmod_mat_solve_triu(X->fq_nmod, U->fq_nmod, B->fq_nmod, unit, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -1258,7 +1258,7 @@ FQ_DEFAULT_MAT_INLINE void fq_default_mat_solve_triu(fq_default_mat_t X,
     }
     else
     {
-        fq_mat_solve_triu(X->fq, U->fq, B->fq, unit, ctx->ctx.fq);
+        fq_mat_solve_triu(X->fq, U->fq, B->fq, unit, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -1276,7 +1276,7 @@ FQ_DEFAULT_MAT_INLINE int fq_default_mat_solve(fq_default_mat_t X,
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
         return fq_nmod_mat_solve(X->fq_nmod,
-                                     A->fq_nmod, C->fq_nmod, ctx->ctx.fq_nmod);
+                                     A->fq_nmod, C->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -1288,7 +1288,7 @@ FQ_DEFAULT_MAT_INLINE int fq_default_mat_solve(fq_default_mat_t X,
     }
     else
     {
-        return fq_mat_solve(X->fq, A->fq, C->fq, ctx->ctx.fq);
+        return fq_mat_solve(X->fq, A->fq, C->fq, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -1306,7 +1306,7 @@ FQ_DEFAULT_MAT_INLINE int fq_default_mat_can_solve(fq_default_mat_t X,
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
         return fq_nmod_mat_can_solve(X->fq_nmod,
-                                     A->fq_nmod, B->fq_nmod, ctx->ctx.fq_nmod);
+                                     A->fq_nmod, B->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -1318,7 +1318,7 @@ FQ_DEFAULT_MAT_INLINE int fq_default_mat_can_solve(fq_default_mat_t X,
     }
     else
     {
-        return fq_mat_can_solve(X->fq, A->fq, B->fq, ctx->ctx.fq);
+        return fq_mat_can_solve(X->fq, A->fq, B->fq, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -1334,7 +1334,7 @@ void fq_default_mat_similarity(fq_default_mat_t A, slong r,
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        fq_nmod_mat_similarity(A->fq_nmod, r, d->fq_nmod, ctx->ctx.fq_nmod);
+        fq_nmod_mat_similarity(A->fq_nmod, r, d->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -1346,7 +1346,7 @@ void fq_default_mat_similarity(fq_default_mat_t A, slong r,
     }
     else
     {
-        fq_mat_similarity(A->fq, r, d->fq, ctx->ctx.fq);
+        fq_mat_similarity(A->fq, r, d->fq, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 

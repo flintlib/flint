@@ -22,7 +22,7 @@ int fq_default_ctx_fprint(FILE * file, const fq_default_ctx_t ctx)
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        return fq_nmod_ctx_fprint(file, ctx->ctx.fq_nmod);
+        return fq_nmod_ctx_fprint(file, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -40,7 +40,7 @@ int fq_default_ctx_fprint(FILE * file, const fq_default_ctx_t ctx)
     }
     else
     {
-        return fq_ctx_fprint(file, ctx->ctx.fq);
+        return fq_ctx_fprint(file, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -52,7 +52,7 @@ int fq_default_fprint(FILE * file, const fq_default_t op, const fq_default_ctx_t
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        return fq_nmod_fprint(file, op->fq_nmod, ctx->ctx.fq_nmod);
+        return fq_nmod_fprint(file, op->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -64,7 +64,7 @@ int fq_default_fprint(FILE * file, const fq_default_t op, const fq_default_ctx_t
     }
     else
     {
-        return fq_fprint(file, op->fq, ctx->ctx.fq);
+        return fq_fprint(file, op->fq, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -76,7 +76,7 @@ int fq_default_fprint_pretty(FILE * file, const fq_default_t op, const fq_defaul
     }
     else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
     {
-        return fq_nmod_fprint_pretty(file, op->fq_nmod, ctx->ctx.fq_nmod);
+        return fq_nmod_fprint_pretty(file, op->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
@@ -88,7 +88,7 @@ int fq_default_fprint_pretty(FILE * file, const fq_default_t op, const fq_defaul
     }
     else
     {
-        return fq_fprint_pretty(file, op->fq, ctx->ctx.fq);
+        return fq_fprint_pretty(file, op->fq, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
