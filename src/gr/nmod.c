@@ -534,7 +534,7 @@ _gr_nmod_is_square(const ulong * x, gr_ctx_t ctx)
     if (y == 0)
         return T_FALSE;
     else
-        return T_UNKNOWN;
+        return T_TRUE;
 }
 
 int

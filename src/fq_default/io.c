@@ -12,6 +12,8 @@
 #include <stdio.h>
 #include "fq_default.h"
 
+#include "gr.h"
+
 /* printing *******************************************************************/
 
 int fq_default_ctx_fprint(FILE * file, const fq_default_ctx_t ctx)
@@ -26,7 +28,7 @@ int fq_default_ctx_fprint(FILE * file, const fq_default_ctx_t ctx)
     }
     else if (_FQ_DEFAULT_TYPE(ctx) == _FQ_DEFAULT_NMOD)
     {
-        return flint_fprintf(file, "p = %wu\n", FQ_DEFAULT_CTX_NMOD(ctx));
+        return flint_fprintf(file, "p = %wu\n", FQ_DEFAULT_CTX_NMOD(ctx).n);
     }
     else if (_FQ_DEFAULT_TYPE(ctx) == _FQ_DEFAULT_FMPZ_MOD)
     {
