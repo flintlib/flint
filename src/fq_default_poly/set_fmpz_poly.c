@@ -17,19 +17,19 @@ void fq_default_poly_set_fmpz_poly(fq_default_poly_t rop,
 {
     fmpz_mod_ctx_t mod;
     fmpz_mod_poly_t mod_poly;
-    if (ctx->type == FQ_DEFAULT_FQ_ZECH)
+    if (_FQ_DEFAULT_TYPE(ctx) == _FQ_DEFAULT_FQ_ZECH)
     {
         fmpz_mod_ctx_init_ui(mod, fq_zech_ctx_prime(FQ_DEFAULT_CTX_FQ_ZECH(ctx)));
     }
-    else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
+    else if (_FQ_DEFAULT_TYPE(ctx) == _FQ_DEFAULT_FQ_NMOD)
     {
         fmpz_mod_ctx_init_ui(mod, fq_nmod_ctx_prime(FQ_DEFAULT_CTX_FQ_NMOD(ctx)));
     }
-    else if (ctx->type == FQ_DEFAULT_NMOD)
+    else if (_FQ_DEFAULT_TYPE(ctx) == _FQ_DEFAULT_NMOD)
     {
         fmpz_mod_ctx_init_ui(mod, FQ_DEFAULT_CTX_NMOD(ctx).n);
     }
-    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    else if (_FQ_DEFAULT_TYPE(ctx) == _FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_init(mod_poly, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
         fmpz_mod_poly_set_fmpz_poly(mod_poly, op, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));

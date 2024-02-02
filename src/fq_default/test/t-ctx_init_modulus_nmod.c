@@ -136,7 +136,7 @@ TEST_FUNCTION_START(fq_default_ctx_init_modulus_nmod, state)
         nmod_poly_set_coeff_ui(mod, 0, 2);
         nmod_poly_set_coeff_ui(mod, 1, 1);
 
-        fq_default_ctx_init_modulus_nmod_type(ctx, mod, "x", FQ_DEFAULT_FMPZ_MOD);
+        fq_default_ctx_init_modulus_nmod_type(ctx, mod, "x", _FQ_DEFAULT_FMPZ_MOD);
 
         fmpz_init(pp);
         fmpz_set_ui(pp, 3);
