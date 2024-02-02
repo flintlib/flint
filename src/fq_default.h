@@ -107,6 +107,14 @@ FQ_DEFAULT_INLINE void fq_default_ctx_init(fq_default_ctx_t ctx,
     fq_default_ctx_init_type(ctx, p, d, var, 0);
 }
 
+FQ_DEFAULT_INLINE void * fq_default_ctx_inner(const fq_default_ctx_t ctx)
+{
+    if (_FQ_DEFAULT_TYPE(ctx) == _FQ_DEFAULT_NMOD)
+        return (void *) &FQ_DEFAULT_CTX_NMOD(ctx);
+    else
+        return (void *) GR_CTX_DATA_AS_PTR(ctx);
+}
+
 void fq_default_ctx_init_modulus_type(fq_default_ctx_t ctx,
                 const fmpz_mod_poly_t modulus, fmpz_mod_ctx_t mod_ctx,
                                                    const char * var, int type);
