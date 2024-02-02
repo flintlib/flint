@@ -38,9 +38,7 @@ TEST_FUNCTION_START(fq_default_ctx_init_modulus, state)
         fq_default_ctx_init_modulus(ctx, mod, mod_ctx, "x");
 
         fq_default_init(fq, ctx);
-
         fq_default_randtest(fq, state, ctx);
-
         fq_default_clear(fq, ctx);
 
         fq_default_ctx_clear(ctx);
@@ -74,9 +72,7 @@ TEST_FUNCTION_START(fq_default_ctx_init_modulus, state)
         fq_default_ctx_init_modulus(ctx, mod, mod_ctx, "x");
 
         fq_default_init(fq, ctx);
-
         fq_default_randtest(fq, state, ctx);
-
         fq_default_clear(fq, ctx);
 
         fq_default_ctx_clear(ctx);
@@ -109,9 +105,7 @@ TEST_FUNCTION_START(fq_default_ctx_init_modulus, state)
         fq_default_ctx_init_modulus(ctx, mod, mod_ctx, "x");
 
         fq_default_init(fq, ctx);
-
         fq_default_randtest(fq, state, ctx);
-
         fq_default_clear(fq, ctx);
 
         fq_default_ctx_clear(ctx);
