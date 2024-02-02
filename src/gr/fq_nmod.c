@@ -221,6 +221,33 @@ _gr_fq_nmod_div(fq_nmod_t res, const fq_nmod_t x, const fq_nmod_t y, const gr_ct
     }
 }
 
+int
+_gr_fq_nmod_sqr(fq_nmod_t res, const fq_nmod_t x, const gr_ctx_t ctx)
+{
+    fq_nmod_sqr(res, x, FQ_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fq_nmod_pow_ui(fq_nmod_t res, const fq_nmod_t x, ulong y, const gr_ctx_t ctx)
+{
+    fq_nmod_pow_ui(res, x, y, FQ_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fq_nmod_pow_fmpz(fq_nmod_t res, const fq_nmod_t x, const fmpz_t y, gr_ctx_t ctx)
+{
+    if (fmpz_sgn(y) < 0)
+    {
+        return gr_generic_pow_fmpz(res, x, y, ctx);
+    }
+    else
+    {
+        fq_nmod_pow(res, x, y, FQ_CTX(ctx));
+        return GR_SUCCESS;
+    }
+}
 
 truth_t
 _gr_fq_nmod_is_invertible(const fq_nmod_t x, const gr_ctx_t ctx)
@@ -638,6 +665,10 @@ gr_method_tab_input _fq_nmod_methods_input[] =
     {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) _gr_fq_nmod_is_invertible},
     {GR_METHOD_INV,             (gr_funcptr) _gr_fq_nmod_inv},
     {GR_METHOD_DIV,             (gr_funcptr) _gr_fq_nmod_div},
+    {GR_METHOD_SQR,             (gr_funcptr) _gr_fq_nmod_sqr},
+    {GR_METHOD_POW_UI,           (gr_funcptr) _gr_fq_nmod_pow_ui},
+    {GR_METHOD_POW_FMPZ,         (gr_funcptr) _gr_fq_nmod_pow_fmpz},
+
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_fq_nmod_is_square},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_fq_nmod_sqrt},
 

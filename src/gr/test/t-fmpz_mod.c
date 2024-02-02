@@ -22,11 +22,24 @@ TEST_FUNCTION_START(gr_fmpz_mod, state)
 
     fmpz_init(n);
 
+    for (iter = 0; iter < 1000; iter++)
+    {
+        fmpz_randtest_not_zero(n, state, 200);
+        fmpz_abs(n, n);
+        gr_ctx_init_fmpz_mod(ZZn, n);
+        if (n_randint(state, 2))
+            gr_ctx_fmpz_mod_set_primality(ZZn, fmpz_is_probabprime(n) ? T_TRUE : T_FALSE);
+        gr_test_ring(ZZn, 10, flags);
+        gr_ctx_clear(ZZn);
+    }
+
     for (iter = 0; iter < 100; iter++)
     {
         fmpz_randtest_not_zero(n, state, 200);
         fmpz_abs(n, n);
         gr_ctx_init_fmpz_mod(ZZn, n);
+        if (n_randint(state, 2))
+            gr_ctx_fmpz_mod_set_primality(ZZn, fmpz_is_probabprime(n) ? T_TRUE : T_FALSE);
         gr_test_ring(ZZn, 100, flags);
         gr_ctx_clear(ZZn);
     }

@@ -405,6 +405,48 @@ _gr_fmpz_mod_pow_fmpz(fmpz_t res, const fmpz_t x, const fmpz_t exp, const gr_ctx
     return fmpz_mod_pow_fmpz(res, x, exp, FMPZ_MOD_CTX(ctx)) ? GR_SUCCESS : GR_DOMAIN;
 }
 
+int
+_gr_fmpz_mod_sqrt(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
+{
+    if (fmpz_is_zero(x) || fmpz_is_one(x))
+    {
+        fmpz_set(res, x);
+        return GR_SUCCESS;
+    }
+    else if (FMPZ_MOD_IS_PRIME(ctx) == T_TRUE)
+    {
+        return fmpz_sqrtmod(res, x, FMPZ_MOD_CTX(ctx)->n) ? GR_SUCCESS : GR_DOMAIN;
+    }
+    else
+    {
+        /* todo: implement the general case */
+        return GR_UNABLE;
+    }
+}
+
+truth_t
+_gr_fmpz_mod_is_square(const fmpz_t x, const gr_ctx_t ctx)
+{
+    if (fmpz_is_zero(x) || fmpz_is_one(x))
+    {
+        return T_TRUE;
+    }
+    else if (FMPZ_MOD_IS_PRIME(ctx) == T_TRUE)
+    {
+        fmpz_t t;
+        truth_t ans;
+        fmpz_init(t);
+        ans = fmpz_sqrtmod(t, x, FMPZ_MOD_CTX(ctx)->n) ? T_TRUE : T_FALSE;
+        fmpz_clear(t);
+        return ans;
+    }
+    else
+    {
+        /* todo: implement the general case */
+        return T_UNKNOWN;
+    }
+}
+
 /* todo: len 1 */
 int
 _gr_fmpz_mod_vec_dot(fmpz_t res, const fmpz_t initial, int subtract, const fmpz * vec1, const fmpz * vec2, slong len, gr_ctx_t ctx)
@@ -694,6 +736,8 @@ gr_method_tab_input _fmpz_mod_methods_input[] =
     {GR_METHOD_INV,             (gr_funcptr) _gr_fmpz_mod_inv},
     {GR_METHOD_POW_UI,          (gr_funcptr) _gr_fmpz_mod_pow_ui},
     {GR_METHOD_POW_FMPZ,        (gr_funcptr) _gr_fmpz_mod_pow_fmpz},
+    {GR_METHOD_SQRT,            (gr_funcptr) _gr_fmpz_mod_sqrt},
+    {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_fmpz_mod_is_square},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_fmpz_mod_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_fmpz_mod_vec_dot_rev},
     {GR_METHOD_VEC_ADDMUL_SCALAR,    (gr_funcptr) _gr_fmpz_mod_vec_addmul_scalar},

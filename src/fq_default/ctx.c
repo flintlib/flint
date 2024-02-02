@@ -41,6 +41,7 @@ void fq_default_ctx_init_type(fq_default_ctx_t ctx,
         ctx->_gr_inited = 1;
         gr_ctx_init_nmod(FQ_DEFAULT_GR_CTX(ctx), fmpz_get_ui(p));
         NMOD_CTX_A(FQ_DEFAULT_GR_CTX(ctx))[0] = 0;
+        gr_ctx_nmod_set_primality(FQ_DEFAULT_GR_CTX(ctx), T_TRUE);
     }
     else if (type == FQ_DEFAULT_FMPZ_MOD || (type == 0 && d == 1))
     {
@@ -111,6 +112,7 @@ void fq_default_ctx_init_modulus_type(fq_default_ctx_t ctx,
         ctx->_gr_inited = 1;
         gr_ctx_init_nmod(FQ_DEFAULT_GR_CTX(ctx), fmpz_get_ui(p));
         NMOD_CTX_A(FQ_DEFAULT_GR_CTX(ctx))[0] = ctx->ctx.nmod.a;
+        gr_ctx_nmod_set_primality(FQ_DEFAULT_GR_CTX(ctx), T_TRUE);
     }
     else if (type == FQ_DEFAULT_FMPZ_MOD || (type == 0 && d == 1))
     {
@@ -181,6 +183,7 @@ void fq_default_ctx_init_modulus_nmod_type(fq_default_ctx_t ctx,
         ctx->_gr_inited = 1;
         gr_ctx_init_nmod(FQ_DEFAULT_GR_CTX(ctx), p);
         NMOD_CTX_A(FQ_DEFAULT_GR_CTX(ctx))[0] = ctx->ctx.nmod.a;
+        gr_ctx_nmod_set_primality(FQ_DEFAULT_GR_CTX(ctx), T_TRUE);
     }
     else if (type == FQ_DEFAULT_FMPZ_MOD || (type == 0 && d == 1))
     {

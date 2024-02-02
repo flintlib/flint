@@ -254,6 +254,33 @@ _gr_fq_div(fq_t res, const fq_t x, const fq_t y, const gr_ctx_t ctx)
     }
 }
 
+int
+_gr_fq_sqr(fq_t res, const fq_t x, const gr_ctx_t ctx)
+{
+    fq_sqr(res, x, FQ_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fq_pow_ui(fq_t res, const fq_t x, ulong y, const gr_ctx_t ctx)
+{
+    fq_pow_ui(res, x, y, FQ_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fq_pow_fmpz(fq_t res, const fq_t x, const fmpz_t y, gr_ctx_t ctx)
+{
+    if (fmpz_sgn(y) < 0)
+    {
+        return gr_generic_pow_fmpz(res, x, y, ctx);
+    }
+    else
+    {
+        fq_pow(res, x, y, FQ_CTX(ctx));
+        return GR_SUCCESS;
+    }
+}
 
 truth_t
 _gr_fq_is_invertible(const fq_t x, const gr_ctx_t ctx)
@@ -674,17 +701,23 @@ gr_method_tab_input _fq_methods_input[] =
     {GR_METHOD_MUL_SI,          (gr_funcptr) _gr_fq_mul_si},
     {GR_METHOD_MUL_FMPZ,        (gr_funcptr) _gr_fq_mul_fmpz},
 /*
-    todo ...
     {GR_METHOD_SI_MUL,          (gr_funcptr) _gr_fq_si_mul},
     {GR_METHOD_UI_MUL,          (gr_funcptr) _gr_fq_ui_mul},
     {GR_METHOD_FMPZ_MUL,        (gr_funcptr) _gr_fq_fmpz_mul},
+*/
+
+/*
     {GR_METHOD_MUL_OTHER,        (gr_funcptr) _gr_fq_mul_other},
     {GR_METHOD_OTHER_MUL,        (gr_funcptr) _gr_fq_other_mul},
 */
+    {GR_METHOD_SQR,             (gr_funcptr) _gr_fq_sqr},
+    {GR_METHOD_POW_UI,           (gr_funcptr) _gr_fq_pow_ui},
+    {GR_METHOD_POW_FMPZ,         (gr_funcptr) _gr_fq_pow_fmpz},
 
     {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) _gr_fq_is_invertible},
     {GR_METHOD_INV,             (gr_funcptr) _gr_fq_inv},
     {GR_METHOD_DIV,             (gr_funcptr) _gr_fq_div},
+
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_fq_is_square},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_fq_sqrt},
 

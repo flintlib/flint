@@ -355,8 +355,6 @@ FQ_DEFAULT_INLINE void fq_default_mul_ui(fq_default_t rop,
     GR_IGNORE(gr_mul_ui(rop, op, x, FQ_DEFAULT_GR_CTX(ctx)));
 }
 
-/* todo: verify all implementations define mul_fmpz, mul_si, mul_ui, sqr, pow_fmpz, pow_ui */
-
 FQ_DEFAULT_INLINE void fq_default_sqr(fq_default_t rop,
                              const fq_default_t op, const fq_default_ctx_t ctx)
 {
@@ -389,39 +387,22 @@ FQ_DEFAULT_INLINE void fq_default_pow_ui(fq_default_t rop,
 
 /* Roots *********************************************************************/
 
+FQ_DEFAULT_INLINE int fq_default_is_square(const fq_default_t op,
+		                                    const fq_default_ctx_t ctx)
+{
+    truth_t is_square = gr_is_square(op, FQ_DEFAULT_GR_CTX(ctx));
+    if (is_square == T_UNKNOWN)
+        flint_throw(FLINT_ERROR, "sqrt failed");
+    return (is_square == T_TRUE);
+}
+
 FQ_DEFAULT_INLINE int fq_default_sqrt(fq_default_t rop,
 		             const fq_default_t op, const fq_default_ctx_t ctx)
 {
-    if (FQ_DEFAULT_TYPE(ctx) == FQ_DEFAULT_FQ_ZECH)
-    {
-        return fq_zech_sqrt(rop->fq_zech, op->fq_zech, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
-    }
-    else if (FQ_DEFAULT_TYPE(ctx) == FQ_DEFAULT_FQ_NMOD)
-    {
-        return fq_nmod_sqrt(rop->fq_nmod, op->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
-    }
-    else if (FQ_DEFAULT_TYPE(ctx) == FQ_DEFAULT_NMOD)
-    {
-        if (op->nmod == 0)
-        {
-            rop->nmod = 0;
-            return 1;
-        }
-        else
-        {
-            rop->nmod = n_sqrtmod(op->nmod, FQ_DEFAULT_CTX_NMOD(ctx).n);
-            return rop->nmod != 0;
-        }
-    }
-    else if (FQ_DEFAULT_TYPE(ctx) == FQ_DEFAULT_FMPZ_MOD)
-    {
-        return fmpz_sqrtmod(rop->fmpz_mod, op->fmpz_mod,
-                                  fmpz_mod_ctx_modulus(FQ_DEFAULT_CTX_FMPZ_MOD(ctx)));
-    }
-    else
-    {
-        return fq_sqrt(rop->fq, op->fq, FQ_DEFAULT_CTX_FQ(ctx));
-    }
+    int status = gr_sqrt(rop, op, FQ_DEFAULT_GR_CTX(ctx));
+    if (status == GR_UNABLE)
+        flint_throw(FLINT_ERROR, "sqrt failed");
+    return (status == GR_SUCCESS);
 }
 
 FQ_DEFAULT_INLINE void fq_default_pth_root(fq_default_t rop,
@@ -446,36 +427,6 @@ FQ_DEFAULT_INLINE void fq_default_pth_root(fq_default_t rop,
     else
     {
         fq_pth_root(rop->fq, op1->fq, FQ_DEFAULT_CTX_FQ(ctx));
-    }
-}
-
-FQ_DEFAULT_INLINE int fq_default_is_square(const fq_default_t op,
-		                                    const fq_default_ctx_t ctx)
-{
-    if (FQ_DEFAULT_TYPE(ctx) == FQ_DEFAULT_FQ_ZECH)
-    {
-        return fq_zech_is_square(op->fq_zech, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
-    }
-    else if (FQ_DEFAULT_TYPE(ctx) == FQ_DEFAULT_FQ_NMOD)
-    {
-        return fq_nmod_is_square(op->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
-    }
-    else if (FQ_DEFAULT_TYPE(ctx) == FQ_DEFAULT_NMOD)
-    {
-        return op->nmod == 0 || n_sqrtmod(op->nmod, FQ_DEFAULT_CTX_NMOD(ctx).n) != 0;
-    }
-    else if (FQ_DEFAULT_TYPE(ctx) == FQ_DEFAULT_FMPZ_MOD)
-    {
-        int res;
-        fmpz_t t;
-        fmpz_init(t);
-        res = fmpz_sqrtmod(t, op->fmpz_mod, fmpz_mod_ctx_modulus(FQ_DEFAULT_CTX_FMPZ_MOD(ctx)));
-        fmpz_clear(t);
-        return res;
-    }
-    else
-    {
-        return fq_is_square(op->fq, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
@@ -586,76 +537,19 @@ FQ_DEFAULT_INLINE void fq_default_rand_not_zero(fq_default_t rop,
 FQ_DEFAULT_INLINE int fq_default_equal(const fq_default_t op1,
 		            const fq_default_t op2, const fq_default_ctx_t ctx)
 {
-    if (FQ_DEFAULT_TYPE(ctx) == FQ_DEFAULT_FQ_ZECH)
-    {
-        return fq_zech_equal(op1->fq_zech, op2->fq_zech, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
-    }
-    else if (FQ_DEFAULT_TYPE(ctx) == FQ_DEFAULT_FQ_NMOD)
-    {
-        return fq_nmod_equal(op1->fq_nmod, op2->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
-    }
-    else if (FQ_DEFAULT_TYPE(ctx) == FQ_DEFAULT_NMOD)
-    {
-        return op1->nmod == op2->nmod;
-    }
-    else if (FQ_DEFAULT_TYPE(ctx) == FQ_DEFAULT_FMPZ_MOD)
-    {
-        return fmpz_equal(op1->fmpz_mod, op2->fmpz_mod);
-    }
-    else
-    {
-        return fq_equal(op1->fq, op2->fq, FQ_DEFAULT_CTX_FQ(ctx));
-    }
+    return gr_equal(op1, op2, FQ_DEFAULT_GR_CTX(ctx)) == T_TRUE;
 }
 
 FQ_DEFAULT_INLINE int fq_default_is_zero(const fq_default_t op,
 		                                    const fq_default_ctx_t ctx)
 {
-    if (FQ_DEFAULT_TYPE(ctx) == FQ_DEFAULT_FQ_ZECH)
-    {
-        return fq_zech_is_zero(op->fq_zech, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
-    }
-    else if (FQ_DEFAULT_TYPE(ctx) == FQ_DEFAULT_FQ_NMOD)
-    {
-        return fq_nmod_is_zero(op->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
-    }
-    else if (FQ_DEFAULT_TYPE(ctx) == FQ_DEFAULT_NMOD)
-    {
-        return op->nmod == 0;
-    }
-    else if (FQ_DEFAULT_TYPE(ctx) == FQ_DEFAULT_FMPZ_MOD)
-    {
-        return fmpz_is_zero(op->fmpz_mod);
-    }
-    else
-    {
-        return fq_is_zero(op->fq, FQ_DEFAULT_CTX_FQ(ctx));
-    }
+    return gr_is_zero(op, FQ_DEFAULT_GR_CTX(ctx)) == T_TRUE;
 }
 
 FQ_DEFAULT_INLINE int fq_default_is_one(const fq_default_t op,
 		                                    const fq_default_ctx_t ctx)
 {
-    if (FQ_DEFAULT_TYPE(ctx) == FQ_DEFAULT_FQ_ZECH)
-    {
-        return fq_zech_is_one(op->fq_zech, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
-    }
-    else if (FQ_DEFAULT_TYPE(ctx) == FQ_DEFAULT_FQ_NMOD)
-    {
-        return fq_nmod_is_one(op->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
-    }
-    else if (FQ_DEFAULT_TYPE(ctx) == FQ_DEFAULT_NMOD)
-    {
-        return op->nmod == 1;
-    }
-    else if (FQ_DEFAULT_TYPE(ctx) == FQ_DEFAULT_FMPZ_MOD)
-    {
-        return fmpz_is_one(op->fmpz_mod);
-    }
-    else
-    {
-        return fq_is_one(op->fq, FQ_DEFAULT_CTX_FQ(ctx));
-    }
+    return gr_is_one(op, FQ_DEFAULT_GR_CTX(ctx)) == T_TRUE;
 }
 
 /* Assignments and conversions ***********************************************/
