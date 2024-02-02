@@ -65,7 +65,7 @@ typedef struct
         struct {
             nmod_t mod;
             mp_limb_t a;    /* minpoly is x - a */
-        } nmod;
+        } nmod_UNUSED;
         struct {
             fmpz_mod_ctx_t mod;
             fmpz_t a;       /* minpoly is x - a */
@@ -276,33 +276,6 @@ FQ_DEFAULT_INLINE void fq_default_clear(fq_default_t rop,
     gr_clear(rop, FQ_DEFAULT_GR_CTX(ctx));
 }
 
-/* Predicates ****************************************************************/
-
-FQ_DEFAULT_INLINE int fq_default_is_invertible(const fq_default_t op,
-		                                    const fq_default_ctx_t ctx)
-{
-    if (FQ_DEFAULT_TYPE(ctx) == FQ_DEFAULT_FQ_ZECH)
-    {
-        return fq_zech_is_invertible(op->fq_zech, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
-    }
-    else if (FQ_DEFAULT_TYPE(ctx) == FQ_DEFAULT_FQ_NMOD)
-    {
-        return fq_nmod_is_invertible(op->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
-    }
-    else if (FQ_DEFAULT_TYPE(ctx) == FQ_DEFAULT_NMOD)
-    {
-        return op->nmod != 0;
-    }
-    else if (FQ_DEFAULT_TYPE(ctx) == FQ_DEFAULT_FMPZ_MOD)
-    {
-        return !fmpz_is_zero(op->fmpz_mod);
-    }
-    else
-    {
-        return fq_is_invertible(op->fq, FQ_DEFAULT_CTX_FQ(ctx));
-    }
-}
-
 /* Basic arithmetic **********************************************************/
 
 /* GR_IGNORE(...) because we assume that basic arithmetic is well-implemented */
@@ -359,6 +332,16 @@ FQ_DEFAULT_INLINE void fq_default_sqr(fq_default_t rop,
                              const fq_default_t op, const fq_default_ctx_t ctx)
 {
     GR_IGNORE(gr_sqr(rop, op, FQ_DEFAULT_GR_CTX(ctx)));
+}
+
+FQ_DEFAULT_INLINE int fq_default_is_invertible(const fq_default_t op,
+		                                    const fq_default_ctx_t ctx)
+{
+    truth_t is_inv = gr_is_invertible(op, FQ_DEFAULT_GR_CTX(ctx));
+    if (is_inv == T_UNKNOWN)
+        flint_throw(FLINT_ERROR, "is_invertible failed");
+    return (is_inv == T_TRUE);
+
 }
 
 FQ_DEFAULT_INLINE void fq_default_inv(fq_default_t rop,
@@ -590,7 +573,7 @@ FQ_DEFAULT_INLINE void fq_default_one(fq_default_t rop,
     GR_IGNORE(gr_one(rop, FQ_DEFAULT_GR_CTX(ctx)));
 }
 
-/* todo: should this swap the fq_default_structs? */
+/* todo: should this swap the fq_default_struct? */
 FQ_DEFAULT_INLINE void fq_default_swap(fq_default_t op1,
 		                  fq_default_t op2, const fq_default_ctx_t ctx)
 {

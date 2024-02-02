@@ -26,7 +26,7 @@ int fq_default_ctx_fprint(FILE * file, const fq_default_ctx_t ctx)
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
-        return flint_fprintf(file, "p = %wu\n", ctx->ctx.nmod.mod.n);
+        return flint_fprintf(file, "p = %wu\n", FQ_DEFAULT_CTX_NMOD(ctx));
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {

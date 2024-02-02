@@ -58,7 +58,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_init(fq_default_poly_t poly,
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
-        nmod_poly_init(poly->nmod, ctx->ctx.nmod.mod.n);
+        nmod_poly_init(poly->nmod, FQ_DEFAULT_CTX_NMOD(ctx).n);
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
@@ -83,7 +83,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_init2(fq_default_poly_t poly,
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
-        nmod_poly_init2(poly->nmod, ctx->ctx.nmod.mod.n, alloc);
+        nmod_poly_init2(poly->nmod, FQ_DEFAULT_CTX_NMOD(ctx).n, alloc);
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
@@ -771,7 +771,7 @@ fq_default_poly_set_coeff_fmpz(fq_default_poly_t poly,
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
-        nmod_poly_set_coeff_ui(poly->nmod, n, fmpz_get_nmod(x, ctx->ctx.nmod.mod));
+        nmod_poly_set_coeff_ui(poly->nmod, n, fmpz_get_nmod(x, FQ_DEFAULT_CTX_NMOD(ctx)));
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
@@ -1079,12 +1079,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_add_si(fq_default_poly_t rop,
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
-        ulong xu = FLINT_ABS(c);
-        NMOD_RED(xu, xu, ctx->ctx.nmod.mod);
-        if (c < 0)
-            xu = nmod_neg(xu, ctx->ctx.nmod.mod);
-
-        nmod_poly_add_ui(rop->nmod, op1->nmod, xu);
+        nmod_poly_add_ui(rop->nmod, op1->nmod, nmod_set_si(c, FQ_DEFAULT_CTX_NMOD(ctx)));
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
@@ -1260,7 +1255,7 @@ void fq_default_poly_scalar_div_fq_default(fq_default_poly_t rop,
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
         nmod_poly_scalar_mul_nmod(rop->nmod, op->nmod,
-                                         nmod_inv(x->nmod, ctx->ctx.nmod.mod));
+                                         nmod_inv(x->nmod, FQ_DEFAULT_CTX_NMOD(ctx)));
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
@@ -1325,7 +1320,7 @@ void fq_default_poly_scalar_submul_fq_default(fq_default_poly_t rop,
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
         nmod_poly_scalar_addmul_nmod(rop->nmod, op->nmod,
-                                         nmod_neg(x->nmod, ctx->ctx.nmod.mod));
+                                         nmod_neg(x->nmod, FQ_DEFAULT_CTX_NMOD(ctx)));
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {

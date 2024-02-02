@@ -27,7 +27,7 @@ void fq_default_poly_set_fmpz_poly(fq_default_poly_t rop,
     }
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
-        fmpz_mod_ctx_init_ui(mod, ctx->ctx.nmod.mod.n);
+        fmpz_mod_ctx_init_ui(mod, FQ_DEFAULT_CTX_NMOD(ctx).n);
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
