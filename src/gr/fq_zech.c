@@ -16,6 +16,8 @@
 #include "fq_zech_poly.h"
 #include "fq_zech_poly_factor.h"
 #include "fq_zech_mat.h"
+#include "nmod_poly.h"
+#include "fmpz_mod_poly.h"
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_generic.h"
@@ -220,6 +222,33 @@ _gr_fq_zech_div(fq_zech_t res, const fq_zech_t x, const fq_zech_t y, const gr_ct
     }
 }
 
+int
+_gr_fq_zech_sqr(fq_zech_t res, const fq_zech_t x, const gr_ctx_t ctx)
+{
+    fq_zech_sqr(res, x, FQ_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fq_zech_pow_ui(fq_zech_t res, const fq_zech_t x, ulong y, const gr_ctx_t ctx)
+{
+    fq_zech_pow_ui(res, x, y, FQ_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fq_zech_pow_fmpz(fq_zech_t res, const fq_zech_t x, const fmpz_t y, gr_ctx_t ctx)
+{
+    if (fmpz_sgn(y) < 0)
+    {
+        return gr_generic_pow_fmpz(res, x, y, ctx);
+    }
+    else
+    {
+        fq_zech_pow(res, x, y, FQ_CTX(ctx));
+        return GR_SUCCESS;
+    }
+}
 
 truth_t
 _gr_fq_zech_is_invertible(const fq_zech_t x, const gr_ctx_t ctx)
@@ -527,6 +556,9 @@ gr_method_tab_input _fq_zech_methods_input[] =
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_fq_zech_is_square},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_fq_zech_sqrt},
 
+    {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_fq_zech_is_square},
+    {GR_METHOD_SQRT,            (gr_funcptr) _gr_fq_zech_sqrt},
+
     {GR_METHOD_CTX_FQ_PRIME,            (gr_funcptr) _gr_ctx_fq_zech_prime},
     {GR_METHOD_CTX_FQ_DEGREE,           (gr_funcptr) _gr_ctx_fq_zech_degree},
     {GR_METHOD_CTX_FQ_ORDER,            (gr_funcptr) _gr_ctx_fq_zech_order},
@@ -577,5 +609,47 @@ gr_ctx_init_fq_zech(gr_ctx_t ctx, ulong p, slong d, const char * var)
 
     fq_zech_ctx = flint_malloc(sizeof(fq_zech_ctx_struct));
     fq_zech_ctx_init_ui(fq_zech_ctx, p, d, var == NULL ? "a" : var);
+
     _gr_ctx_init_fq_zech_from_ref(ctx, fq_zech_ctx);
+}
+
+int
+gr_ctx_init_fq_zech_modulus_nmod_poly(gr_ctx_t ctx, const nmod_poly_t modulus, const char * var)
+{
+    fq_zech_ctx_struct * fq_zech_ctx;
+    fq_nmod_ctx_struct * fq_nmod_ctx;
+
+    fq_nmod_ctx = flint_malloc(sizeof(fq_nmod_ctx_struct));
+    fq_zech_ctx = flint_malloc(sizeof(fq_zech_ctx_struct));
+
+    fq_nmod_ctx_init_modulus(fq_nmod_ctx, modulus, var == NULL ? "a" : var);
+
+    if (fq_zech_ctx_init_fq_nmod_ctx_check(fq_zech_ctx, fq_nmod_ctx))
+    {
+        fq_zech_ctx->owns_fq_nmod_ctx = 1;
+        _gr_ctx_init_fq_zech_from_ref(ctx, fq_zech_ctx);
+        return GR_SUCCESS;
+    }
+    else
+    {
+        fq_nmod_ctx_clear(fq_nmod_ctx);
+        flint_free(fq_nmod_ctx);
+        return GR_DOMAIN;
+    }
+}
+
+int
+gr_ctx_init_fq_zech_modulus_fmpz_mod_poly(gr_ctx_t ctx, const fmpz_mod_poly_t modulus, fmpz_mod_ctx_t mod_ctx, const char * var)
+{
+    nmod_poly_t nmodulus;
+    int status;
+
+    if (!fmpz_abs_fits_ui(mod_ctx->n))
+        return GR_UNABLE;
+
+    nmod_poly_init(nmodulus, fmpz_get_ui(mod_ctx->n));
+    fmpz_mod_poly_get_nmod_poly(nmodulus, modulus);
+    status = gr_ctx_init_fq_zech_modulus_nmod_poly(ctx, nmodulus, var);
+    nmod_poly_clear(nmodulus);
+    return status;
 }

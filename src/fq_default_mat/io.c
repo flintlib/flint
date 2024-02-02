@@ -14,49 +14,49 @@
 
 int fq_default_mat_fprint(FILE * file, const fq_default_mat_t mat, const fq_default_ctx_t ctx)
 {
-    if (ctx->type == FQ_DEFAULT_FQ_ZECH)
+    if (_FQ_DEFAULT_TYPE(ctx) == _FQ_DEFAULT_FQ_ZECH)
     {
-        return fq_zech_mat_fprint(file, mat->fq_zech, ctx->ctx.fq_zech);
+        return fq_zech_mat_fprint(file, mat->fq_zech, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
     }
-    else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
+    else if (_FQ_DEFAULT_TYPE(ctx) == _FQ_DEFAULT_FQ_NMOD)
     {
-        return fq_nmod_mat_fprint(file, mat->fq_nmod, ctx->ctx.fq_nmod);
+        return fq_nmod_mat_fprint(file, mat->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
-    else if (ctx->type == FQ_DEFAULT_NMOD)
+    else if (_FQ_DEFAULT_TYPE(ctx) == _FQ_DEFAULT_NMOD)
     {
         return nmod_mat_fprint(file, mat->nmod);
     }
-    else if (ctx->type == FQ_DEFAULT_NMOD)
+    else if (_FQ_DEFAULT_TYPE(ctx) == _FQ_DEFAULT_NMOD)
     {
-        return fmpz_mod_mat_fprint(file, mat->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        return fmpz_mod_mat_fprint(file, mat->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
-        return fq_mat_fprint(file, mat->fq, ctx->ctx.fq);
+        return fq_mat_fprint(file, mat->fq, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 
 int fq_default_mat_fprint_pretty(FILE * file, const fq_default_mat_t mat, const fq_default_ctx_t ctx)
 {
-    if (ctx->type == FQ_DEFAULT_FQ_ZECH)
+    if (_FQ_DEFAULT_TYPE(ctx) == _FQ_DEFAULT_FQ_ZECH)
     {
-        return fq_zech_mat_fprint_pretty(file, mat->fq_zech, ctx->ctx.fq_zech);
+        return fq_zech_mat_fprint_pretty(file, mat->fq_zech, FQ_DEFAULT_CTX_FQ_ZECH(ctx));
     }
-    else if (ctx->type == FQ_DEFAULT_FQ_NMOD)
+    else if (_FQ_DEFAULT_TYPE(ctx) == _FQ_DEFAULT_FQ_NMOD)
     {
-        return fq_nmod_mat_fprint_pretty(file, mat->fq_nmod, ctx->ctx.fq_nmod);
+        return fq_nmod_mat_fprint_pretty(file, mat->fq_nmod, FQ_DEFAULT_CTX_FQ_NMOD(ctx));
     }
-    else if (ctx->type == FQ_DEFAULT_NMOD)
+    else if (_FQ_DEFAULT_TYPE(ctx) == _FQ_DEFAULT_NMOD)
     {
         return nmod_mat_fprint_pretty(file, mat->nmod);
     }
-    else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
+    else if (_FQ_DEFAULT_TYPE(ctx) == _FQ_DEFAULT_FMPZ_MOD)
     {
-        return fmpz_mod_mat_fprint_pretty(file, mat->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        return fmpz_mod_mat_fprint_pretty(file, mat->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
-        return fq_mat_fprint_pretty(file, mat->fq, ctx->ctx.fq);
+        return fq_mat_fprint_pretty(file, mat->fq, FQ_DEFAULT_CTX_FQ(ctx));
     }
 }
 

@@ -1362,6 +1362,7 @@ void gr_ctx_fmpz_mod_set_primality(gr_ctx_t ctx, truth_t is_prime);
 
 void gr_ctx_init_nmod(gr_ctx_t ctx, ulong n);
 void _gr_ctx_init_nmod(gr_ctx_t ctx, void * nmod_t_ref);
+void gr_ctx_nmod_set_primality(gr_ctx_t ctx, truth_t is_prime);
 
 void gr_ctx_init_nmod8(gr_ctx_t ctx, unsigned char n);
 void gr_ctx_init_nmod32(gr_ctx_t ctx, unsigned int n);

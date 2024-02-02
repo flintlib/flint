@@ -18,9 +18,23 @@
 #include "gr_vec.h"
 #include "gr_mat.h"
 #include "gr_poly.h"
+#include "gr_generic.h"
 
-#define NMOD_CTX_REF(ring_ctx) (((nmod_t *)((ring_ctx))))
+typedef struct
+{
+    nmod_t nmod;
+    ulong a;   /* when used as finite field with defining polynomial x - a */
+    truth_t is_prime;
+}
+_gr_nmod_ctx_struct;
+
+#define NMOD_CTX_REF(ring_ctx) (&((((_gr_nmod_ctx_struct *)(ring_ctx))->nmod)))
 #define NMOD_CTX(ring_ctx) (*NMOD_CTX_REF(ring_ctx))
+#define NMOD_IS_PRIME(ring_ctx) (((_gr_nmod_ctx_struct *)(ring_ctx))->is_prime)
+
+/* when used as finite field when defining polynomial x - a, allow storing the coefficient a */
+#define NMOD_CTX_A(ring_ctx) (&((((_gr_nmod_ctx_struct *)(ring_ctx))->a)))
+
 
 void
 _gr_nmod_ctx_write(gr_stream_t out, gr_ctx_t ctx)
@@ -30,11 +44,12 @@ _gr_nmod_ctx_write(gr_stream_t out, gr_ctx_t ctx)
     gr_stream_write(out, " (_gr_nmod)");
 }
 
-/* todo: n_is_prime is fast, but this should still be cached
-   or use a fixed table lookup */
 truth_t
 _gr_nmod_ctx_is_field(const gr_ctx_t ctx)
 {
+    if (NMOD_IS_PRIME(ctx) != T_UNKNOWN)
+        return NMOD_IS_PRIME(ctx);
+
     return n_is_prime(NMOD_CTX(ctx).n) ? T_TRUE : T_FALSE;
 }
 
@@ -490,9 +505,8 @@ _gr_nmod_sqrt(ulong * res, const ulong * x, gr_ctx_t ctx)
         return GR_SUCCESS;
     }
 
-    /* todo: caching prime status */
-    /* todo: handle non-primes */
-    if (!n_is_prime(NMOD_CTX(ctx).n))
+    /* todo: implement the general case */
+    if (gr_ctx_is_field(ctx) != T_TRUE)
         return GR_UNABLE;
 
     res[0] = n_sqrtmod(x[0], NMOD_CTX(ctx).n);
@@ -503,7 +517,47 @@ _gr_nmod_sqrt(ulong * res, const ulong * x, gr_ctx_t ctx)
         return GR_SUCCESS;
 }
 
-/* todo: pow_ui, ... */
+truth_t
+_gr_nmod_is_square(const ulong * x, gr_ctx_t ctx)
+{
+    ulong y;
+
+    if (x[0] <= 1)
+        return T_TRUE;
+
+    /* todo: implement the general case */
+    if (gr_ctx_is_field(ctx) != T_TRUE)
+        return T_UNKNOWN;
+
+    y = n_sqrtmod(x[0], NMOD_CTX(ctx).n);
+
+    if (y == 0)
+        return T_FALSE;
+    else
+        return T_TRUE;
+}
+
+int
+_gr_nmod_pow_ui(ulong * res, const ulong * x, ulong y, const gr_ctx_t ctx)
+{
+    res[0] = nmod_pow_ui(x[0], y, NMOD_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_nmod_pow_fmpz(ulong * res, const ulong * x, const fmpz_t y, gr_ctx_t ctx)
+{
+    if (fmpz_sgn(y) < 0)
+    {
+        return gr_generic_pow_fmpz(res, x, y, ctx);
+    }
+    else
+    {
+        res[0] = nmod_pow_fmpz(x[0], y, NMOD_CTX(ctx));
+        return GR_SUCCESS;
+    }
+}
+
 
 void
 _gr_nmod_vec_init(ulong * res, slong len, gr_ctx_t ctx)
@@ -1421,6 +1475,9 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_DIVIDES,         (gr_funcptr) _gr_nmod_divides},
     {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) _gr_nmod_is_invertible},
     {GR_METHOD_INV,             (gr_funcptr) _gr_nmod_inv},
+    {GR_METHOD_POW_UI,          (gr_funcptr) _gr_nmod_pow_ui},
+    {GR_METHOD_POW_FMPZ,        (gr_funcptr) _gr_nmod_pow_fmpz},
+    {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_nmod_is_square},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_nmod_sqrt},
     {GR_METHOD_VEC_INIT,        (gr_funcptr) _gr_nmod_vec_init},
     {GR_METHOD_VEC_CLEAR,       (gr_funcptr) _gr_nmod_vec_clear},
@@ -1467,6 +1524,7 @@ gr_ctx_init_nmod(gr_ctx_t ctx, ulong n)
     ctx->which_ring = GR_CTX_NMOD;
     ctx->sizeof_elem = sizeof(ulong);
     ctx->size_limit = WORD_MAX;
+    NMOD_IS_PRIME(ctx) = T_UNKNOWN;
 
     nmod_init(NMOD_CTX_REF(ctx), n);
 
@@ -1485,6 +1543,7 @@ _gr_ctx_init_nmod(gr_ctx_t ctx, void * nmod_t_ref)
     ctx->which_ring = GR_CTX_NMOD;
     ctx->sizeof_elem = sizeof(ulong);
     ctx->size_limit = WORD_MAX;
+    NMOD_IS_PRIME(ctx) = T_UNKNOWN;
 
     *NMOD_CTX_REF(ctx) = ((nmod_t *) nmod_t_ref)[0];
     ctx->methods = __gr_nmod_methods;
@@ -1494,4 +1553,10 @@ _gr_ctx_init_nmod(gr_ctx_t ctx, void * nmod_t_ref)
         gr_method_tab_init(__gr_nmod_methods, __gr_nmod_methods_input);
         __gr_nmod_methods_initialized = 1;
     }
+}
+
+void
+gr_ctx_nmod_set_primality(gr_ctx_t ctx, truth_t is_prime)
+{
+    NMOD_IS_PRIME(ctx) = is_prime;
 }

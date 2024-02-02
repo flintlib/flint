@@ -17,11 +17,15 @@ TEST_FUNCTION_START(gr_nmod, state)
 {
     gr_ctx_t ZZn;
     int flags = GR_TEST_ALWAYS_ABLE;
+    slong iter;
     ulong n;
 
-    for (n = 1; n < 100; n++)
+    for (iter = 0; iter < 100; iter++)
     {
-        gr_ctx_init_nmod(ZZn, n_randtest_not_zero(state));
+        n = n_randtest_not_zero(state);
+        gr_ctx_init_nmod(ZZn, n);
+        if (n_randint(state, 2))
+            gr_ctx_nmod_set_primality(ZZn, n_is_prime(n) ? T_TRUE : T_FALSE);
         gr_test_ring(ZZn, 100, flags);
         gr_ctx_clear(ZZn);
     }

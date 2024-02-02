@@ -12,6 +12,8 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "fmpz_mod.h"
+#include "fmpz_mod_poly.h"
 #include "gr.h"
 #include "fq.h"
 #include "fq_poly.h"
@@ -252,6 +254,33 @@ _gr_fq_div(fq_t res, const fq_t x, const fq_t y, const gr_ctx_t ctx)
     }
 }
 
+int
+_gr_fq_sqr(fq_t res, const fq_t x, const gr_ctx_t ctx)
+{
+    fq_sqr(res, x, FQ_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fq_pow_ui(fq_t res, const fq_t x, ulong y, const gr_ctx_t ctx)
+{
+    fq_pow_ui(res, x, y, FQ_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fq_pow_fmpz(fq_t res, const fq_t x, const fmpz_t y, gr_ctx_t ctx)
+{
+    if (fmpz_sgn(y) < 0)
+    {
+        return gr_generic_pow_fmpz(res, x, y, ctx);
+    }
+    else
+    {
+        fq_pow(res, x, y, FQ_CTX(ctx));
+        return GR_SUCCESS;
+    }
+}
 
 truth_t
 _gr_fq_is_invertible(const fq_t x, const gr_ctx_t ctx)
@@ -672,17 +701,23 @@ gr_method_tab_input _fq_methods_input[] =
     {GR_METHOD_MUL_SI,          (gr_funcptr) _gr_fq_mul_si},
     {GR_METHOD_MUL_FMPZ,        (gr_funcptr) _gr_fq_mul_fmpz},
 /*
-    todo ...
     {GR_METHOD_SI_MUL,          (gr_funcptr) _gr_fq_si_mul},
     {GR_METHOD_UI_MUL,          (gr_funcptr) _gr_fq_ui_mul},
     {GR_METHOD_FMPZ_MUL,        (gr_funcptr) _gr_fq_fmpz_mul},
+*/
+
+/*
     {GR_METHOD_MUL_OTHER,        (gr_funcptr) _gr_fq_mul_other},
     {GR_METHOD_OTHER_MUL,        (gr_funcptr) _gr_fq_other_mul},
 */
+    {GR_METHOD_SQR,             (gr_funcptr) _gr_fq_sqr},
+    {GR_METHOD_POW_UI,           (gr_funcptr) _gr_fq_pow_ui},
+    {GR_METHOD_POW_FMPZ,         (gr_funcptr) _gr_fq_pow_fmpz},
 
     {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) _gr_fq_is_invertible},
     {GR_METHOD_INV,             (gr_funcptr) _gr_fq_inv},
     {GR_METHOD_DIV,             (gr_funcptr) _gr_fq_div},
+
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_fq_is_square},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_fq_sqrt},
 
@@ -727,4 +762,30 @@ gr_ctx_init_fq(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var)
     fq_ctx = flint_malloc(sizeof(fq_ctx_struct));
     fq_ctx_init(fq_ctx, p, d, var == NULL ? "a" : var);
     _gr_ctx_init_fq_from_ref(ctx, fq_ctx);
+}
+
+int gr_ctx_init_fq_modulus_fmpz_mod_poly(gr_ctx_t ctx, const fmpz_mod_poly_t modulus, fmpz_mod_ctx_t mod_ctx, const char * var)
+{
+    fq_ctx_struct * fq_ctx;
+    fq_ctx = flint_malloc(sizeof(fq_ctx_struct));
+    fq_ctx_init_modulus(fq_ctx, modulus, mod_ctx, var == NULL ? "a" : var);
+    _gr_ctx_init_fq_from_ref(ctx, fq_ctx);
+    return GR_SUCCESS;
+}
+
+int gr_ctx_init_fq_modulus_nmod_poly(gr_ctx_t ctx, const nmod_poly_t modulus, const char * var)
+{
+    fmpz_mod_ctx_t fmod_ctx;
+    fmpz_mod_poly_t fmod;
+    fmpz_t p;
+    int status;
+    fmpz_init_set_ui(p, modulus->mod.n);
+    fmpz_mod_ctx_init(fmod_ctx, p);
+    fmpz_mod_poly_init(fmod, fmod_ctx);
+    fmpz_mod_poly_set_nmod_poly(fmod, modulus);
+    status = gr_ctx_init_fq_modulus_fmpz_mod_poly(ctx, fmod, fmod_ctx, var);
+    fmpz_mod_poly_clear(fmod, fmod_ctx);
+    fmpz_mod_ctx_clear(fmod_ctx);
+    fmpz_clear(p);
+    return status;
 }

@@ -60,9 +60,7 @@ TEST_FUNCTION_START(fq_default_ctx_init_modulus_nmod, state)
         fq_default_ctx_init_modulus_nmod_type(ctx, mod, "x", 3);
 
         fq_default_init(fq, ctx);
-
         fq_default_randtest(fq, state, ctx);
-
         fq_default_clear(fq, ctx);
 
         fq_default_ctx_clear(ctx);
@@ -108,7 +106,10 @@ TEST_FUNCTION_START(fq_default_ctx_init_modulus_nmod, state)
             flint_abort();
         }
 
+        fq_default_init(fq, ctx);
+        fq_default_randtest(fq, state, ctx);
         fq_default_clear(fq, ctx);
+
         fq_default_ctx_clear(ctx);
         fmpz_mod_poly_clear(mod2, mod_ctx);
         fmpz_mod_poly_clear(mod3, mod_ctx);
@@ -137,6 +138,7 @@ TEST_FUNCTION_START(fq_default_ctx_init_modulus_nmod, state)
         nmod_poly_set_coeff_ui(mod, 1, 1);
 
         fq_default_ctx_init_modulus_nmod_type(ctx, mod, "x", FQ_DEFAULT_FMPZ_MOD);
+        FLINT_TEST(fq_default_ctx_type(ctx) == FQ_DEFAULT_FMPZ_MOD);
 
         fmpz_init(pp);
         fmpz_set_ui(pp, 3);
@@ -157,7 +159,10 @@ TEST_FUNCTION_START(fq_default_ctx_init_modulus_nmod, state)
             flint_abort();
         }
 
+        fq_default_init(fq, ctx);
+        fq_default_randtest(fq, state, ctx);
         fq_default_clear(fq, ctx);
+
         fq_default_ctx_clear(ctx);
         fmpz_mod_poly_clear(mod2, mod_ctx);
         fmpz_mod_poly_clear(mod3, mod_ctx);
