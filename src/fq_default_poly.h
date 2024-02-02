@@ -62,7 +62,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_init(fq_default_poly_t poly,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_init(poly->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_init(poly->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -87,7 +87,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_init2(fq_default_poly_t poly,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_init2(poly->fmpz_mod, alloc, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_init2(poly->fmpz_mod, alloc, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -112,7 +112,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_realloc(fq_default_poly_t poly,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_realloc(poly->fmpz_mod, alloc, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_realloc(poly->fmpz_mod, alloc, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -137,7 +137,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_truncate(fq_default_poly_t poly,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_truncate(poly->fmpz_mod, len, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_truncate(poly->fmpz_mod, len, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -165,7 +165,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_set_trunc(fq_default_poly_t poly1,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_set_trunc(poly1->fmpz_mod,
-                                  poly2->fmpz_mod, len, ctx->ctx.fmpz_mod.mod);
+                                  poly2->fmpz_mod, len, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -190,7 +190,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_fit_length(fq_default_poly_t poly,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_fit_length(poly->fmpz_mod, len, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_fit_length(poly->fmpz_mod, len, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -241,7 +241,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_clear(fq_default_poly_t poly,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_clear(poly->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_clear(poly->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -269,7 +269,7 @@ fq_default_poly_length(const fq_default_poly_t poly,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        return fmpz_mod_poly_length(poly->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        return fmpz_mod_poly_length(poly->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -295,7 +295,7 @@ fq_default_poly_degree(const fq_default_poly_t poly,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        return fmpz_mod_poly_degree(poly->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        return fmpz_mod_poly_degree(poly->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -322,7 +322,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_randtest(fq_default_poly_t f,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_randtest(f->fmpz_mod, state, len, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_randtest(f->fmpz_mod, state, len, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -349,7 +349,7 @@ void fq_default_poly_randtest_not_zero(fq_default_poly_t f,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_randtest_not_zero(f->fmpz_mod, state, len,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -376,7 +376,7 @@ void fq_default_poly_randtest_monic(fq_default_poly_t f,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_randtest_monic(f->fmpz_mod, state, len,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -405,7 +405,7 @@ void fq_default_poly_randtest_irreducible(fq_default_poly_t f,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_randtest_irreducible(f->fmpz_mod, state, len,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -432,7 +432,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_set(fq_default_poly_t rop,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_set(rop->fmpz_mod, op->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_set(rop->fmpz_mod, op->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -460,7 +460,7 @@ void fq_default_poly_set_fq_default(fq_default_poly_t poly,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_set_fmpz(poly->fmpz_mod, c->fmpz_mod,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -485,7 +485,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_swap(fq_default_poly_t op1,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_swap(op1->fmpz_mod, op2->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_swap(op1->fmpz_mod, op2->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -510,7 +510,7 @@ fq_default_poly_zero(fq_default_poly_t poly, const fq_default_ctx_t ctx)
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_zero(poly->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_zero(poly->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -535,7 +535,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_one(fq_default_poly_t poly,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_one(poly->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_one(poly->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -561,7 +561,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_gen(fq_default_poly_t f,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_gen(f->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_gen(f->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -587,7 +587,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_make_monic(fq_default_poly_t rop,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_make_monic(rop->fmpz_mod, op->fmpz_mod,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -613,7 +613,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_reverse(fq_default_poly_t res,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_reverse(res->fmpz_mod, poly->fmpz_mod, n,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -639,7 +639,7 @@ ulong fq_default_poly_deflation(const fq_default_poly_t input,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        return fmpz_mod_poly_deflation(input->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        return fmpz_mod_poly_deflation(input->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -667,7 +667,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_deflate(fq_default_poly_t result,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_deflate(result->fmpz_mod, input->fmpz_mod, deflation,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -695,7 +695,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_inflate(fq_default_poly_t result,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_inflate(result->fmpz_mod, input->fmpz_mod, inflation,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -723,7 +723,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_get_coeff(fq_default_t x,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_get_coeff_fmpz(x->fmpz_mod, poly->fmpz_mod, n,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -749,7 +749,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_set_coeff(fq_default_poly_t poly,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_set_coeff_fmpz(poly->fmpz_mod, n, x->fmpz_mod,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -776,7 +776,7 @@ fq_default_poly_set_coeff_fmpz(fq_default_poly_t poly,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_set_coeff_fmpz(poly->fmpz_mod, n, x,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -828,7 +828,7 @@ void fq_default_poly_set_fmpz_mod_poly(fq_default_poly_t rop,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_set(rop->fmpz_mod, op, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_set(rop->fmpz_mod, op, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -861,7 +861,7 @@ int fq_default_poly_equal(const fq_default_poly_t poly1,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         return fmpz_mod_poly_equal(poly1->fmpz_mod, poly2->fmpz_mod,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -890,7 +890,7 @@ int fq_default_poly_equal_trunc(const fq_default_poly_t poly1,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         return fmpz_mod_poly_equal_trunc(poly1->fmpz_mod, poly2->fmpz_mod, n,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -916,7 +916,7 @@ fq_default_poly_is_zero(const fq_default_poly_t poly,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        return fmpz_mod_poly_is_zero(poly->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        return fmpz_mod_poly_is_zero(poly->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -941,7 +941,7 @@ fq_default_poly_is_one(const fq_default_poly_t op, const fq_default_ctx_t ctx)
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        return fmpz_mod_poly_is_one(op->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        return fmpz_mod_poly_is_one(op->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -966,7 +966,7 @@ fq_default_poly_is_unit(const fq_default_poly_t op, const fq_default_ctx_t ctx)
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        return fmpz_mod_poly_is_unit(op->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        return fmpz_mod_poly_is_unit(op->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -992,7 +992,7 @@ fq_default_poly_is_gen(const fq_default_poly_t poly,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        return fmpz_mod_poly_is_gen(poly->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        return fmpz_mod_poly_is_gen(poly->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -1058,7 +1058,7 @@ void fq_default_poly_add(fq_default_poly_t rop, const fq_default_poly_t op1,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_add(rop->fmpz_mod, op1->fmpz_mod, op2->fmpz_mod,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -1084,7 +1084,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_add_si(fq_default_poly_t rop,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_add_si(rop->fmpz_mod, op1->fmpz_mod, c,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -1114,7 +1114,7 @@ void fq_default_poly_add_series(fq_default_poly_t rop,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_add_series(rop->fmpz_mod, op1->fmpz_mod, op2->fmpz_mod, n,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -1143,7 +1143,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_sub(fq_default_poly_t rop,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_sub(rop->fmpz_mod, op1->fmpz_mod, op2->fmpz_mod,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -1172,7 +1172,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_sub_series(fq_default_poly_t rop,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_sub_series(rop->fmpz_mod, op1->fmpz_mod, op2->fmpz_mod, n,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -1197,7 +1197,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_neg(fq_default_poly_t rop,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_neg(rop->fmpz_mod, op->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_neg(rop->fmpz_mod, op->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -1229,7 +1229,7 @@ void fq_default_poly_scalar_mul_fq_default(fq_default_poly_t rop,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_scalar_mul_fmpz(rop->fmpz_mod, op->fmpz_mod, x->fmpz_mod,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -1261,9 +1261,9 @@ void fq_default_poly_scalar_div_fq_default(fq_default_poly_t rop,
     {
         fmpz_t t;
         fmpz_init(t);
-        fmpz_mod_inv(t, x->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_inv(t, x->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
         fmpz_mod_poly_scalar_mul_fmpz(rop->fmpz_mod, op->fmpz_mod, t,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
         fmpz_clear(t);
     }
     else
@@ -1294,7 +1294,7 @@ void fq_default_poly_scalar_addmul_fq_default(fq_default_poly_t rop,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_scalar_addmul_fmpz(rop->fmpz_mod, op->fmpz_mod,
-                                           x->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+                                           x->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -1326,9 +1326,9 @@ void fq_default_poly_scalar_submul_fq_default(fq_default_poly_t rop,
     {
         fmpz_t t;
         fmpz_init(t);
-        fmpz_mod_neg(t, x->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_neg(t, x->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
         fmpz_mod_poly_scalar_addmul_fmpz(rop->fmpz_mod, op->fmpz_mod, t,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
         fmpz_clear(t);
     }
     else
@@ -1360,7 +1360,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_mul(fq_default_poly_t rop,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_mul(rop->fmpz_mod, op1->fmpz_mod,
-                                         op2->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+                                         op2->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -1389,7 +1389,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_mullow(fq_default_poly_t rop,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_mullow(rop->fmpz_mod, op1->fmpz_mod, op2->fmpz_mod, n,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -1418,7 +1418,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_mulhigh(fq_default_poly_t rop,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_mulhigh(rop->fmpz_mod, op1->fmpz_mod, op2->fmpz_mod,
-                                                 start, ctx->ctx.fmpz_mod.mod);
+                                                 start, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -1447,7 +1447,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_mulmod(fq_default_poly_t res,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_mulmod(res->fmpz_mod, poly1->fmpz_mod, poly2->fmpz_mod,
-                                           f->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+                                           f->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -1474,7 +1474,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_sqr(fq_default_poly_t rop,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_sqr(rop->fmpz_mod, op->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_sqr(rop->fmpz_mod, op->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -1502,7 +1502,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_pow(fq_default_poly_t rop,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_pow(rop->fmpz_mod, op->fmpz_mod, e, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_pow(rop->fmpz_mod, op->fmpz_mod, e, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -1532,7 +1532,7 @@ void fq_default_poly_pow_trunc(fq_default_poly_t res,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_pow_trunc(res->fmpz_mod, poly->fmpz_mod, e, trunc,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -1562,7 +1562,7 @@ void fq_default_poly_powmod_fmpz_binexp(fq_default_poly_t res,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_powmod_fmpz_binexp(res->fmpz_mod, poly->fmpz_mod, e,
-                                           f->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+                                           f->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -1592,7 +1592,7 @@ void fq_default_poly_powmod_ui_binexp(fq_default_poly_t res,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_powmod_ui_binexp(res->fmpz_mod, poly->fmpz_mod, e,
-                                           f->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+                                           f->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -1621,7 +1621,7 @@ void fq_default_poly_shift_left(fq_default_poly_t rop,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_shift_left(rop->fmpz_mod, op->fmpz_mod, n,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -1648,7 +1648,7 @@ void fq_default_poly_shift_right(fq_default_poly_t rop,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_shift_right(rop->fmpz_mod, op->fmpz_mod, n,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -1676,7 +1676,7 @@ slong fq_default_poly_hamming_weight(const fq_default_poly_t op,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        return fmpz_mod_poly_hamming_weight(op->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        return fmpz_mod_poly_hamming_weight(op->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -1707,7 +1707,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_gcd(fq_default_poly_t rop,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_gcd(rop->fmpz_mod, op1->fmpz_mod, op2->fmpz_mod,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -1738,7 +1738,7 @@ fq_default_poly_xgcd(fq_default_poly_t G,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_xgcd(G->fmpz_mod, S->fmpz_mod, T->fmpz_mod, A->fmpz_mod,
-                                           B->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+                                           B->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -1766,7 +1766,7 @@ FQ_DEFAULT_POLY_INLINE ulong fq_default_poly_remove(fq_default_poly_t f,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         return fmpz_mod_poly_remove(f->fmpz_mod, g->fmpz_mod,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -1796,7 +1796,7 @@ fq_default_poly_divrem(fq_default_poly_t Q, fq_default_poly_t R,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_divrem(Q->fmpz_mod, R->fmpz_mod, A->fmpz_mod,
-                                           B->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+                                           B->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -1824,7 +1824,7 @@ fq_default_poly_rem(fq_default_poly_t R,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_rem(R->fmpz_mod, A->fmpz_mod, B->fmpz_mod,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -1852,7 +1852,7 @@ fq_default_poly_inv_series(fq_default_poly_t Qinv,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_inv_series(Qinv->fmpz_mod, Q->fmpz_mod, n,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -1881,7 +1881,7 @@ FQ_DEFAULT_POLY_INLINE void fq_default_poly_div_series(fq_default_poly_t Q,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_div_series(Q->fmpz_mod, A->fmpz_mod, B->fmpz_mod, n,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -1912,7 +1912,7 @@ FQ_DEFAULT_POLY_INLINE int fq_default_poly_divides(fq_default_poly_t Q,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         return fmpz_mod_poly_divides(Q->fmpz_mod, A->fmpz_mod, B->fmpz_mod,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -1941,7 +1941,7 @@ void fq_default_poly_derivative(fq_default_poly_t rop,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_derivative(rop->fmpz_mod, op->fmpz_mod,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -1969,7 +1969,7 @@ void fq_default_poly_invsqrt_series(fq_default_poly_t rop,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_invsqrt_series(rop->fmpz_mod, op->fmpz_mod, n, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_invsqrt_series(rop->fmpz_mod, op->fmpz_mod, n, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -1995,7 +1995,7 @@ void fq_default_poly_sqrt_series(fq_default_poly_t rop,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_poly_sqrt_series(rop->fmpz_mod, op->fmpz_mod, n, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_poly_sqrt_series(rop->fmpz_mod, op->fmpz_mod, n, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -2021,7 +2021,7 @@ int fq_default_poly_sqrt(fq_default_poly_t rop,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        return fmpz_mod_poly_sqrt(rop->fmpz_mod, op->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        return fmpz_mod_poly_sqrt(rop->fmpz_mod, op->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -2053,7 +2053,7 @@ void fq_default_poly_evaluate_fq_default(fq_default_t res,
     else if (ctx->type == FQ_DEFAULT_NMOD)
     {
         fmpz_mod_poly_evaluate_fmpz(res->fmpz_mod, f->fmpz_mod, a->fmpz_mod,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -2085,7 +2085,7 @@ void fq_default_poly_compose(fq_default_poly_t rop,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_compose(rop->fmpz_mod, op1->fmpz_mod, op2->fmpz_mod,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -2115,7 +2115,7 @@ void fq_default_poly_compose_mod(fq_default_poly_t res,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         fmpz_mod_poly_compose_mod(res->fmpz_mod, poly1->fmpz_mod,
-                      poly2->fmpz_mod, poly3->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+                      poly2->fmpz_mod, poly3->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -2153,7 +2153,7 @@ char * fq_default_poly_get_str_pretty(const fq_default_poly_t poly,
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         return fmpz_mod_poly_get_str_pretty(poly->fmpz_mod, x,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -2179,7 +2179,7 @@ char * fq_default_poly_get_str(const fq_default_poly_t poly,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        return fmpz_mod_poly_get_str(poly->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        return fmpz_mod_poly_get_str(poly->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -2209,7 +2209,7 @@ void fq_default_mat_charpoly(fq_default_poly_t p,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_mat_charpoly(p->fmpz_mod, M->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_mat_charpoly(p->fmpz_mod, M->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -2237,7 +2237,7 @@ void fq_default_mat_minpoly(fq_default_poly_t p,
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        fmpz_mod_mat_minpoly(p->fmpz_mod, X->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        fmpz_mod_mat_minpoly(p->fmpz_mod, X->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {

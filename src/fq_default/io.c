@@ -33,7 +33,7 @@ int fq_default_ctx_fprint(FILE * file, const fq_default_ctx_t ctx)
         int z = flint_fprintf(file, "p = ");
         if (z <= 0)
             return z;
-        z = fmpz_fprint(file, fmpz_mod_ctx_modulus(ctx->ctx.fmpz_mod.mod));
+        z = fmpz_fprint(file, fmpz_mod_ctx_modulus(FQ_DEFAULT_CTX_FMPZ_MOD(ctx)));
         if (z <= 0)
             return z;
         return flint_fprintf(file, "\n");

@@ -30,7 +30,7 @@ int fq_default_poly_fprint(FILE * file, const fq_default_poly_t poly, const fq_d
     }
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
-        return fmpz_mod_poly_fprint(file, poly->fmpz_mod, ctx->ctx.fmpz_mod.mod);
+        return fmpz_mod_poly_fprint(file, poly->fmpz_mod, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
@@ -57,7 +57,7 @@ int fq_default_poly_fprint_pretty(FILE * file, const fq_default_poly_t poly, con
     else if (ctx->type == FQ_DEFAULT_FMPZ_MOD)
     {
         return fmpz_mod_poly_fprint_pretty(file, poly->fmpz_mod, x,
-                                                        ctx->ctx.fmpz_mod.mod);
+                                                        FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
     }
     else
     {
