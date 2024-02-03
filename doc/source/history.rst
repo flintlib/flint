@@ -93,7 +93,7 @@ Jean Kieffer (JK).
     currently benefit significantly due to wrapper overheads (some Arb benchmarks
     run ~5% faster with this change). (AA, FJ).
   * Faster ``_fmpz_vec_dot`` (FJ).
-  * Faster basecase ``fmpz_poly`` and ``fmpz_mat`` basecase algorithms
+  * Faster ``fmpz_poly`` and ``fmpz_mat`` basecase algorithms
     based on dot products.
   * Optimized ``fmpz_mat_mul_classical`` (FJ).
   * Added ``fmpz_mat_mul_waksman``, speeding up ``fmpz_mat`` multiplication

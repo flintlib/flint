@@ -47,6 +47,7 @@
 #include "t-discriminant.c"
 #include "t-div_basecase.c"
 #include "t-div_divconquer.c"
+#include "t-divexact.c"
 #include "t-divhigh_smodp.c"
 #include "t-divides.c"
 #include "t-divlow_smodp.c"
@@ -224,6 +225,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_poly_discriminant),
     TEST_FUNCTION(fmpz_poly_div_basecase),
     TEST_FUNCTION(fmpz_poly_div_divconquer),
+    TEST_FUNCTION(fmpz_poly_divexact),
     TEST_FUNCTION(fmpz_poly_divhigh_smodp),
     TEST_FUNCTION(fmpz_poly_divides),
     TEST_FUNCTION(fmpz_poly_divlow_smodp),

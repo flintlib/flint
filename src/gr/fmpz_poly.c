@@ -509,7 +509,7 @@ _gr_fmpz_poly_divexact(fmpz_poly_t res, const fmpz_poly_t x, const fmpz_poly_t y
     }
     else
     {
-        fmpz_poly_div(res, x, y);
+        fmpz_poly_divexact(res, x, y);
         return GR_SUCCESS;
     }
 }

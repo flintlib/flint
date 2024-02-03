@@ -1824,6 +1824,10 @@ Euclidean division
     Computes the quotient ``(Q, len-1)`` of ``(A, len)`` upon
     division by `x - c`.
 
+.. function:: void _fmpz_poly_divexact(fmpz * Q, const fmpz * A, slong lenA, const fmpz * B, slong lenB)
+              void fmpz_poly_divexact(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B)
+
+    Like :func:`fmpz_poly_div`, but assumes that the division is exact.
 
 Division with precomputed inverse
 --------------------------------------------------------------------------------

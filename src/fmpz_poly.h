@@ -711,6 +711,9 @@ void _fmpz_poly_divrem_preinv(fmpz * Q, fmpz * A, slong len1,
 void fmpz_poly_divrem_preinv(fmpz_poly_t Q, fmpz_poly_t R,
             const fmpz_poly_t A, const fmpz_poly_t B, const fmpz_poly_t B_inv);
 
+void _fmpz_poly_divexact(fmpz * Q, const fmpz * A, slong lenA, const fmpz * B, slong lenB);
+void fmpz_poly_divexact(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B);
+
 fmpz ** _fmpz_poly_powers_precompute(const fmpz * B, slong len);
 
 void fmpz_poly_powers_precompute(fmpz_poly_powers_precomp_t pinv,
