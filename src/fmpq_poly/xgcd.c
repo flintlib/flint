@@ -76,8 +76,8 @@ void _fmpq_poly_xgcd(fmpz *G, fmpz_t denG,
         lenD = lenB - lenG + 1;
         C = _fmpz_vec_init(lenC + lenD);
         D = C + lenC;
-        _fmpz_poly_div(C, primA, lenA, G, lenG, 0);
-        _fmpz_poly_div(D, primB, lenB, G, lenG, 0);
+        _fmpz_poly_divexact(C, primA, lenA, G, lenG);
+        _fmpz_poly_divexact(D, primB, lenB, G, lenG);
     }
     else
     {

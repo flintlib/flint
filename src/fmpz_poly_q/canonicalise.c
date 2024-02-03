@@ -28,8 +28,8 @@ void fmpz_poly_q_canonicalise(fmpz_poly_q_t rop)
     fmpz_poly_gcd(gcd, rop->num, rop->den);
     if (!fmpz_poly_is_unit(gcd))
     {
-        fmpz_poly_div(rop->num, rop->num, gcd);
-        fmpz_poly_div(rop->den, rop->den, gcd);
+        fmpz_poly_divexact(rop->num, rop->num, gcd);
+        fmpz_poly_divexact(rop->den, rop->den, gcd);
     }
     fmpz_poly_clear(gcd);
 

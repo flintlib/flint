@@ -70,7 +70,7 @@ fmpz_poly_mat_rref(fmpz_poly_mat_t R, fmpz_poly_t den, const fmpz_poly_mat_t A)
                     fmpz_poly_sub(tmp, tmp, tmp2);
                 }
 
-                fmpz_poly_div(fmpz_poly_mat_entry(R, i, nonpivots[k]),
+                fmpz_poly_divexact(fmpz_poly_mat_entry(R, i, nonpivots[k]),
                     tmp, fmpz_poly_mat_entry(R, i, pivots[i]));
             }
         }

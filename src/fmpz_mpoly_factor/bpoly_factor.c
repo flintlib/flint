@@ -139,7 +139,7 @@ void fmpz_bpoly_make_primitive(fmpz_poly_t g, fmpz_bpoly_t A)
 
     for (i = 0; i < A->length; i++)
     {
-        fmpz_poly_div(q, A->coeffs + i, g);
+        fmpz_poly_divexact(q, A->coeffs + i, g);
         fmpz_poly_swap(A->coeffs + i, q);
     }
 
