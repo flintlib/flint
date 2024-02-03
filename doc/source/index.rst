@@ -13,8 +13,8 @@ Welcome to FLINT's documentation! FLINT is a C library for doing number theory.
 * Issue tracker: https://github.com/flintlib/flint/issues
 * Mailing list: https://groups.google.com/group/flint-devel
 
-FLINT is free software distributed under the
-GNU Lesser General Public License (LGPL), version 2.1 or later.
+FLINT is free software distributed under the GNU Lesser General Public License
+(LGPL), version 3 or later.
 
 
 Introduction

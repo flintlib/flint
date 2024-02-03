@@ -36,7 +36,7 @@ Requirements
 FLINT and following should compile on any machine with GCC and a standard
 GNU toolchain, though GCC 4.8 and following are recommended.
 
-Flint is specially optimised for x86 (32 and 64 bit) machines. There is also
+FLINT is specially optimised for x86 (32 and 64 bit) machines. There is also
 limited optimisation for ARM machines.
 
 As of version 3.0, FLINT requires GMP 6.2.1 or later, and MPFR 4.1.0 or later.
@@ -66,6 +66,9 @@ files.
 License
 -----------------------------------------------------------------------------
 
-FLINT is distributed under the LGPL License, version 2.1+. There is a copy
-of the license included in the repository and distribution tarballs.
+FLINT is distributed under the GNU Lesser General Public License (LGPL)
+version 3 or later. There is a copy of the license included in the repository
+and distribution tarballs.
 
+Note, however, that between FLINT version 2.6 and 3.1, it was distributed with
+LGPL version 2, and before that GPL version 2.

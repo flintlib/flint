@@ -10,25 +10,23 @@ Mailing list: https://groups.google.com/g/flint-devel
 
 ## Overview
 
-FLINT is a C library in support of computations in number theory.
-It's also a research project into algorithms in number theory.
-FLINT consists mainly of fast scalar and polynomial 
-arithmetic, factorization and linear algebra over many basic rings
-(integers, rationals, reals, finite fields, number
-fields, p-adics).
-It includes some higher-level functionality for
-algebraic and analytic number theory.
+FLINT is a C library in support of computations in number theory. It's also a
+research project into algorithms in number theory. FLINT consists mainly of fast
+scalar and polynomial arithmetic, factorization and linear algebra over many
+basic rings (integers, rationals, reals, finite fields, number fields, p-adics).
+It includes some higher-level functionality for algebraic and analytic number
+theory.
 
 FLINT 2, released in 2011 was a complete rewrite of FLINT 1.x from scratch.
-FLINT 3, released in 2023, incorporates
-the [Arb](https://arblib.org/), [Antic](https://github.com/flintlib/antic),
-[Calcium](https://fredrikj.net/calcium/)
-and [Generic-Rings](https://github.com/fredrik-johansson/generic-rings)
-libraries, formerly developed separately.
+FLINT 3, released in 2023, incorporates the [Arb](https://arblib.org/),
+[Antic](https://github.com/flintlib/antic),
+[Calcium](https://fredrikj.net/calcium/) and
+[Generic-Rings](https://github.com/fredrik-johansson/generic-rings) libraries,
+formerly developed separately.
 
 ## Documentation
 
-FLINT's online documentation: https://flintlib.org/doc/
+For FLINT's online documentation, see https://flintlib.org/doc/.
 
 ## Building from source
 
@@ -48,11 +46,12 @@ on how to build FLINT.
 
 ## Authors
 
-FLINT was started in 2007 by [David Harvey](https://web.maths.unsw.edu.au/~davidharvey/)
-and [William Hart](https://www.dpmms.cam.ac.uk/person/wh369).
-Maintenance was later taken over solely by William Hart who remained
-in charge of the project until 2022. A large number of authors have contributed to FLINT
-over the years; for a complete list, see https://flintlib.org/authors.html or the AUTHORS file.
+FLINT was started in 2007 by
+[David Harvey](https://web.maths.unsw.edu.au/~davidharvey/) and
+[William Hart](https://www.dpmms.cam.ac.uk/person/wh369). Maintenance was later
+taken over solely by William Hart who remained in charge of the project
+until 2022. A large number of authors have contributed to FLINT over the years;
+for a complete list, see https://flintlib.org/authors.html or the `AUTHORS` file.
 
 The current maintainers are:
 
@@ -61,6 +60,5 @@ The current maintainers are:
 
 ## License
 
-FLINT is distributed under LGPL 2.1 (GNU Lesser General Public License).
-See the LICENSE file.
-
+FLINT is distributed under LGPL (GNU Lesser General Public License) version 3 or
+later. See the `COPYING.LESSER` and `COPYING` files.
