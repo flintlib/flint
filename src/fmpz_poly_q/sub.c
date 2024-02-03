@@ -128,8 +128,8 @@ fmpz_poly_q_sub(fmpz_poly_q_t rop,
         fmpz_poly_init(r2);
         fmpz_poly_init(s2);
 
-        fmpz_poly_div(r2, op1->den, d);  /* +ve leading coeff */
-        fmpz_poly_div(s2, op2->den, d);  /* +ve leading coeff */
+        fmpz_poly_divexact(r2, op1->den, d);  /* +ve leading coeff */
+        fmpz_poly_divexact(s2, op2->den, d);  /* +ve leading coeff */
 
         fmpz_poly_mul(rop->num, op1->num, s2);
         fmpz_poly_mul(rop->den, op2->num, r2);  /* Using rop->den as temp */
@@ -148,8 +148,8 @@ fmpz_poly_q_sub(fmpz_poly_q_t rop,
 
             if (!fmpz_poly_is_one(r2))
             {
-                fmpz_poly_div(rop->num, rop->num, r2);
-                fmpz_poly_div(rop->den, rop->den, r2);
+                fmpz_poly_divexact(rop->num, rop->num, r2);
+                fmpz_poly_divexact(rop->den, rop->den, r2);
             }
         }
 

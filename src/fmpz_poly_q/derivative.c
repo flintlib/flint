@@ -36,7 +36,7 @@ void fmpz_poly_q_derivative(fmpz_poly_q_t rop, const fmpz_poly_q_t op)
     fmpz_poly_derivative(rhs, op->den);
     fmpz_poly_gcd(d, rhs, op->den);
     if (!fmpz_poly_is_one(d))
-        fmpz_poly_div(rhs, rhs, d);
+        fmpz_poly_divexact(rhs, rhs, d);
     fmpz_poly_mul(rhs, op->num, rhs);
 
     fmpz_poly_derivative(rop->num, op->num);
@@ -48,7 +48,7 @@ void fmpz_poly_q_derivative(fmpz_poly_q_t rop, const fmpz_poly_q_t op)
     else
     {
         fmpz_poly_init(lhs);
-        fmpz_poly_div(lhs, op->den, d);
+        fmpz_poly_divexact(lhs, op->den, d);
         fmpz_poly_mul(rop->num, rop->num, lhs);
         fmpz_poly_mul(rop->den, op->den, lhs);
         fmpz_poly_clear(lhs);

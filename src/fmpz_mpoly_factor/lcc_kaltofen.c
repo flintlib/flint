@@ -151,8 +151,8 @@ static void _make_bases_coprime(
         fmpz_poly_gcd(g, A->p + i, B->p + j);
         if (fmpz_poly_degree(g) > 0)
         {
-            fmpz_poly_div(A->p + i, A->p + i, g);
-            fmpz_poly_div(B->p + j, B->p + j, g);
+            fmpz_poly_divexact(A->p + i, A->p + i, g);
+            fmpz_poly_divexact(B->p + j, B->p + j, g);
             fmpz_poly_factor_fit_length(A, A->num + 1);
             fmpz_poly_set(A->p + A->num, g);
             A->exp[A->num] = A->exp[i];

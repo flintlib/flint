@@ -84,7 +84,7 @@ fmpz_poly_mat_fflu(fmpz_poly_mat_t B, fmpz_poly_t den, slong * perm,
                 fmpz_poly_mul(t, E(j, pivot_col), E(pivot_row, k));
                 fmpz_poly_sub(E(j, k), E(j, k), t);
                 if (pivot_row > 0)
-                    fmpz_poly_div(E(j, k), E(j, k), den);
+                    fmpz_poly_divexact(E(j, k), E(j, k), den);
             }
         }
 

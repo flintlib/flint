@@ -47,8 +47,8 @@ void fmpz_poly_factor_squarefree(fmpz_poly_factor_t fac, const fmpz_poly_t F)
             fmpz_poly_init(w);
             fmpz_poly_init(s);
 
-            fmpz_poly_div(v, f, d);
-            fmpz_poly_div(w, t1, d);
+            fmpz_poly_divexact(v, f, d);
+            fmpz_poly_divexact(w, t1, d);
 
             for (i = 1; ; i++)
             {
@@ -63,8 +63,8 @@ void fmpz_poly_factor_squarefree(fmpz_poly_factor_t fac, const fmpz_poly_t F)
                 }
 
                 fmpz_poly_gcd(d, v, s);
-                fmpz_poly_div(v, v, d);
-                fmpz_poly_div(w, s, d);
+                fmpz_poly_divexact(v, v, d);
+                fmpz_poly_divexact(w, s, d);
 
                 if (d->length > 1)
                     fmpz_poly_factor_insert(fac, d, i);
