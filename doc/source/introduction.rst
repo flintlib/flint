@@ -67,8 +67,8 @@ License
 -----------------------------------------------------------------------------
 
 FLINT is distributed under the GNU Lesser General Public License (LGPL)
-version 3. There is a copy of the license included in the repository and
-distribution tarballs.
+version 3 or later. There is a copy of the license included in the repository
+and distribution tarballs.
 
-Note, however, that before FLINT version 3.1, FLINT was distributed under LGPL
-version 2.
+Note, however, that between FLINT version 2.6 and 3.1, it was distributed with
+LGPL version 2, and before that GPL version 2.

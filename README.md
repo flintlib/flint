@@ -60,5 +60,5 @@ The current maintainers are:
 
 ## License
 
-FLINT is distributed under LGPL 3 (GNU Lesser General Public License). See the
-LICENSE file.
+FLINT is distributed under LGPL (GNU Lesser General Public License) version 3 or
+later. See the `COPYING.LESSER` and `COPYING` files.
