@@ -25,11 +25,14 @@ is to compute `1/\sqrt{640320}` instead of `\sqrt{640320}` at the end.
 Logarithms of integers
 -------------------------------------------------------------------------------
 
-We use the formulas
+The standalone constant `\log(2)` is computed using Zuniga's series [Zun2023b]_
 
 .. math::
 
-    \log(2) = \frac{3}{4} \sum_{k=0}^{\infty} \frac{(-1)^k (k!)^2}{2^k (2k+1)!}
+    \log(2) = \frac{1}{2} \sum_{n=1}^\infty \frac{1}{3888^n} \frac{(1794 n-297)}{n(2n-1)} \frac{n! (\tfrac{1}{2})_n}{(\tfrac{1}{6})_n (\tfrac{5}{6})_n}.
+
+Logarithms of other small integers are in certain situations
+computed using Machin-like formulas, e.g.:
 
 .. math::
 
