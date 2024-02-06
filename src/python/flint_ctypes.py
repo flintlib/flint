@@ -4209,13 +4209,42 @@ class GaussianIntegerRing_fmpzi(gr_ctx):
         libgr.gr_ctx_init_fmpzi(self._ref)
         self._elem_type = fmpzi
 
-class ComplexAlgebraicField_qqbar(gr_ctx):
+class QQbarField(gr_ctx):
+
+    def set_limits(self, deg_limit=-1, bits_limit=-1):
+        """
+        Set evaluation limits preventing the creation of excessively
+        large (degree or bits) algebraic numbers.
+        Warning: currently not all methods respect these limits.
+
+            >>> QQbar
+            Complex algebraic numbers (qqbar)
+            >>> QQbar.set_limits(deg_limit=6, bits_limit=100)
+            >>> QQbar
+            Complex algebraic numbers (qqbar), deg_limit = 6, bits_limit = 100
+            >>> QQbar(2).sqrt() + QQbar(3).sqrt() + QQbar(5).sqrt()
+            Traceback (most recent call last):
+              ...
+            FlintUnableError: failed to compute x + y in {Complex algebraic numbers (qqbar), deg_limit = 6, bits_limit = 100} for {x = Root a = 3.14626 of a^4-10*a^2+1}, {y = Root a = 2.23607 of a^2-5}
+            >>> (QQbar(2).sqrt() + 1) ** 100
+            Traceback (most recent call last):
+              ...
+            FlintUnableError: failed to compute x ** y in {Complex algebraic numbers (qqbar), deg_limit = 6, bits_limit = 100} for {x = Root a = 2.41421 of a^2-2*a-1}, {y = 100}
+            >>> QQbar.set_limits(deg_limit=-1, bits_limit=-1)
+            >>> (QQbar(2).sqrt() + 1) ** 100
+            Root a = 1.89482e+38 of a^2-189482250299273866835746159841800035874*a+1
+
+        """
+        libgr._gr_ctx_qqbar_set_limits(self._ref, deg_limit, bits_limit)
+        self._str = None
+
+class ComplexAlgebraicField_qqbar(QQbarField):
     def __init__(self):
         gr_ctx.__init__(self)
         libgr.gr_ctx_init_complex_qqbar(self._ref)
         self._elem_type = qqbar
 
-class RealAlgebraicField_qqbar(gr_ctx):
+class RealAlgebraicField_qqbar(QQbarField):
     def __init__(self):
         gr_ctx.__init__(self)
         libgr.gr_ctx_init_real_qqbar(self._ref)

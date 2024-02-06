@@ -10,65 +10,27 @@
 */
 
 #include "acb.h"
+#include "fmpz_mpoly.h"
 #include "fmpz_mpoly_q.h"
+#include "gr.h"
+#include "gr_generic.h"
 
-/* stupid algorithm, just to have something working... */
 void
 fmpz_mpoly_evaluate_acb(acb_t res, const fmpz_mpoly_t pol, acb_srcptr x, slong prec, const fmpz_mpoly_ctx_t ctx)
 {
-    slong i, j, len, nvars;
-    acb_t s, t, u;
-    ulong * exp; /* todo: support fmpz exponents */
+    gr_ctx_t CC;
+    gr_ctx_init_complex_acb(CC, prec);
 
-    len = fmpz_mpoly_length(pol, ctx);
-
-    if (len == 0)
+    if (pol->length <= 6 && pol->bits <= FLINT_BITS)
     {
-        acb_zero(res);
-        return;
+        if (gr_fmpz_mpoly_evaluate_iter(res, pol, x, ctx, CC) != GR_SUCCESS)
+            acb_indeterminate(res);
     }
-
-    if (len == 1 && fmpz_mpoly_is_fmpz(pol, ctx))
+    else
     {
-        acb_set_round_fmpz(res, pol->coeffs, prec);
-        return;
+        if (gr_fmpz_mpoly_evaluate_horner(res, pol, x, ctx, CC) != GR_SUCCESS)
+            acb_indeterminate(res);
     }
-
-    nvars = ctx->minfo->nvars;
-    exp = flint_malloc(sizeof(ulong) * nvars);
-
-    acb_init(s);
-    acb_init(t);
-    acb_init(u);
-
-    for (i = 0; i < len; i++)
-    {
-        fmpz_mpoly_get_term_exp_ui(exp, pol, i, ctx);
-
-        acb_one(t);
-
-        for (j = 0; j < nvars; j++)
-        {
-            if (exp[j] == 1)
-            {
-                acb_mul(t, t, x + j, prec);
-            }
-            else if (exp[j] >= 2)
-            {
-                acb_pow_ui(u, x + j, exp[j], prec);
-                acb_mul(t, t, u, prec);
-            }
-        }
-
-        acb_addmul_fmpz(s, t, pol->coeffs + i, prec);
-    }
-
-    acb_swap(res, s);
-
-    flint_free(exp);
-    acb_clear(s);
-    acb_clear(t);
-    acb_clear(u);
 }
 
 void
