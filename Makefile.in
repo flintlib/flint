@@ -569,6 +569,9 @@ DEPFLAGS = -MMD -MP -MF $(@:%=%.d)
 ifeq ($(WANT_ADX_ASSEMBLY),1)
 $(BUILD_DIR)/%.s: $(SRC_DIR)/%.asm | $(BUILD_DIR)/mpn_extras/broadwell
 	@$(M4) $< > $@
+
+$(BUILD_DIR)/%_pic.s: $(SRC_DIR)/%.asm | $(BUILD_DIR)/mpn_extras/broadwell
+	@$(M4) -DPIC $< > $@
 endif
 
 ################################################################################
@@ -603,7 +606,7 @@ $(BUILD_DIR)/$(1)/%.lo: $(SRC_DIR)/$(1)/%.c | $(BUILD_DIR)/$(1)
 endef
 
 ifeq ($(WANT_ADX_ASSEMBLY),1)
-%.lo: %.s
+%.lo: %_pic.s
 	@echo "  CC  $(<:$(BUILD_DIR)/%.s=%.asm)"
 	@$(CC) $(ASM_LOBJ_FLAGS) -c $< -o $@
 endif
