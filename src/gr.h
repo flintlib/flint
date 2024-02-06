@@ -1369,6 +1369,7 @@ void gr_ctx_init_nmod32(gr_ctx_t ctx, unsigned int n);
 
 void gr_ctx_init_real_qqbar(gr_ctx_t ctx);
 void gr_ctx_init_complex_qqbar(gr_ctx_t ctx);
+void _gr_ctx_qqbar_set_limits(gr_ctx_t ctx, slong deg_limit, slong bits_limit);
 
 void gr_ctx_init_real_arb(gr_ctx_t ctx, slong prec);
 void gr_ctx_init_complex_acb(gr_ctx_t ctx, slong prec);

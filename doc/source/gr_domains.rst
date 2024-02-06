@@ -154,6 +154,16 @@ Base rings and fields
     Initializes *ctx* to the field of real or complex algebraic
     numbers with elements of type :type:`qqbar_t`.
 
+.. function:: void _gr_ctx_qqbar_set_limits(gr_ctx_t ctx, slong deg_limit, slong bits_limit)
+
+    Limit degrees of intermediate operands of a *qqbar* context
+    to *deg_limit* and their bit sizes to *bits_limit* (approximately).
+    The limits refer to the sizes of resultants prior to
+    factorization (see :func:`qqbar_binop_within_limits`), so for example
+    adding two degree-100 algebraic numbers
+    requires a degree limit of at least 10000.
+    Warning: currently not all methods respect these limits.
+
 .. function:: void gr_ctx_init_real_arb(gr_ctx_t ctx, slong prec)
               void gr_ctx_init_complex_acb(gr_ctx_t ctx, slong prec)
 

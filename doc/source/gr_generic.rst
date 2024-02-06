@@ -144,7 +144,9 @@ Generic arithmetic
     Sets *res* to the value of the integer polynomial *f* evaluated
     at the argument *x*.
 
-.. function:: int gr_fmpz_mpoly_evaluate(gr_ptr res, const fmpz_mpoly_t f, gr_srcptr x, const fmpz_mpoly_ctx_t mctx, gr_ctx_t ctx)
+.. function:: int gr_fmpz_mpoly_evaluate_iter(gr_ptr res, const fmpz_mpoly_t f, gr_srcptr x, const fmpz_mpoly_ctx_t mctx, gr_ctx_t ctx)
+              int gr_fmpz_mpoly_evaluate_horner(gr_ptr res, const fmpz_mpoly_t f, gr_srcptr x, const fmpz_mpoly_ctx_t mctx, gr_ctx_t ctx)
+              int gr_fmpz_mpoly_evaluate(gr_ptr res, const fmpz_mpoly_t f, gr_srcptr x, const fmpz_mpoly_ctx_t mctx, gr_ctx_t ctx)
 
     Sets *res* to value of the multivariate polynomial *f* (with
     corresponding context object *mctx*) evaluated at the vector

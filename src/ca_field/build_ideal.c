@@ -19,8 +19,7 @@
 #include "qqbar.h"
 #include "fmpz_mpoly.h"
 
-int qqbar_mul_checked(qqbar_t res, const qqbar_t x, const qqbar_t y, slong deg_limit, slong bits_limit);
-int qqbar_pow_fmpz_checked(qqbar_t res, const qqbar_t x, const fmpz_t y, slong deg_limit, slong bits_limit);
+#include "gr.h"
 
 slong
 acb_multi_lindep(fmpz_mat_t rel, acb_srcptr vec, slong len, int check, slong prec)
@@ -573,26 +572,32 @@ ca_field_prove_multiplicative_relation(ca_field_t K, const fmpz * rel,
 
         qqbar_one(a);
 
+        /* qqbar arithmetic with (bogus) limits */
+        gr_ctx_t QQbar;
+        gr_ctx_init_complex_qqbar(QQbar);
+        _gr_ctx_qqbar_set_limits(QQbar, ctx->options[CA_OPT_QQBAR_DEG_LIMIT], ctx->options[CA_OPT_PREC_LIMIT] * 10);
+
         for (i = 0; i < num_powers; i++)
         {
             if (!fmpz_is_zero(rel + i))
             {
                 ca_ext_srcptr ext = CA_FIELD_EXT_ELEM(K, powers[i]);
 
-                /* xxx: bogus limits */
-                if (!qqbar_pow_fmpz_checked(b, CA_EXT_QQBAR(ext), rel + i, ctx->options[CA_OPT_QQBAR_DEG_LIMIT], ctx->options[CA_OPT_PREC_LIMIT] * 10))
+                if (gr_pow_fmpz(b, CA_EXT_QQBAR(ext), rel + i, QQbar) != GR_SUCCESS)
                 {
                     success = 0;
                     goto qqbar_end;
                 }
 
-                if (!qqbar_mul_checked(a, a, b, ctx->options[CA_OPT_QQBAR_DEG_LIMIT], ctx->options[CA_OPT_PREC_LIMIT] * 10))
+                if (gr_mul(a, a, b, QQbar) != GR_SUCCESS)
                 {
                     success = 0;
                     goto qqbar_end;
                 }
             }
         }
+
+        gr_ctx_clear(QQbar);
 
         /* (-1)^ */
         if (fmpz_is_odd(rel + num_powers))

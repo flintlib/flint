@@ -377,7 +377,7 @@ HornerFormReturn:
 
 /* todo: accept fmpz exponents */
 int
-gr_evaluate_fmpz_mpoly_iter(gr_ptr res, const fmpz_mpoly_t pol, gr_srcptr x, const fmpz_mpoly_ctx_t ctx, gr_ctx_t cactx)
+gr_fmpz_mpoly_evaluate_iter(gr_ptr res, const fmpz_mpoly_t pol, gr_srcptr x, const fmpz_mpoly_ctx_t ctx, gr_ctx_t cactx)
 {
     slong i, j, len, nvars;
     gr_ptr s, t, u;
@@ -433,5 +433,8 @@ gr_evaluate_fmpz_mpoly_iter(gr_ptr res, const fmpz_mpoly_t pol, gr_srcptr x, con
 int
 gr_fmpz_mpoly_evaluate(gr_ptr res, const fmpz_mpoly_t f, gr_srcptr x, const fmpz_mpoly_ctx_t ctx, gr_ctx_t cactx)
 {
-    return gr_fmpz_mpoly_evaluate_horner(res, f, x, ctx, cactx);
+    if (f->length <= 1 && f->bits <= FLINT_BITS)
+        return gr_fmpz_mpoly_evaluate_iter(res, f, x, ctx, cactx);
+    else
+        return gr_fmpz_mpoly_evaluate_horner(res, f, x, ctx, cactx);
 }

@@ -32,6 +32,13 @@ gr_qqbar_ctx;
 
 #define QQBAR_CTX(ring_ctx) ((gr_qqbar_ctx *)(ring_ctx))
 
+void
+_gr_ctx_qqbar_set_limits(gr_ctx_t ctx, slong deg_limit, slong bits_limit)
+{
+    QQBAR_CTX(ctx)->deg_limit = (deg_limit >= 0) ? deg_limit : WORD_MAX;
+    QQBAR_CTX(ctx)->bits_limit = (bits_limit >= 0) ? bits_limit : WORD_MAX;
+}
+
 int
 _gr_qqbar_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
@@ -39,6 +46,19 @@ _gr_qqbar_ctx_write(gr_stream_t out, gr_ctx_t ctx)
         gr_stream_write(out, "Real algebraic numbers (qqbar)");
     else
         gr_stream_write(out, "Complex algebraic numbers (qqbar)");
+
+    if (QQBAR_CTX(ctx)->deg_limit != WORD_MAX)
+    {
+        gr_stream_write(out, ", deg_limit = ");
+        gr_stream_write_si(out, QQBAR_CTX(ctx)->deg_limit);
+    }
+
+    if (QQBAR_CTX(ctx)->bits_limit != WORD_MAX)
+    {
+        gr_stream_write(out, ", bits_limit = ");
+        gr_stream_write_si(out, QQBAR_CTX(ctx)->bits_limit);
+    }
+
     return GR_SUCCESS;
 }
 
@@ -452,6 +472,10 @@ _gr_qqbar_neg(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 int
 _gr_qqbar_add(qqbar_t res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
 {
+    if (QQBAR_CTX(ctx)->deg_limit != WORD_MAX || QQBAR_CTX(ctx)->bits_limit != WORD_MAX)
+        if (!qqbar_binop_within_limits(x, y, QQBAR_CTX(ctx)->deg_limit, QQBAR_CTX(ctx)->bits_limit))
+            return GR_UNABLE;
+
     qqbar_add(res, x, y);
     return GR_SUCCESS;
 }
@@ -487,6 +511,10 @@ _gr_qqbar_add_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y, const gr_ctx_t 
 int
 _gr_qqbar_sub(qqbar_t res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
 {
+    if (QQBAR_CTX(ctx)->deg_limit != WORD_MAX || QQBAR_CTX(ctx)->bits_limit != WORD_MAX)
+        if (!qqbar_binop_within_limits(x, y, QQBAR_CTX(ctx)->deg_limit, QQBAR_CTX(ctx)->bits_limit))
+            return GR_UNABLE;
+
     qqbar_sub(res, x, y);
     return GR_SUCCESS;
 }
@@ -522,6 +550,10 @@ _gr_qqbar_sub_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y, const gr_ctx_t 
 int
 _gr_qqbar_mul(qqbar_t res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
 {
+    if (QQBAR_CTX(ctx)->deg_limit != WORD_MAX || QQBAR_CTX(ctx)->bits_limit != WORD_MAX)
+        if (!qqbar_binop_within_limits(x, y, QQBAR_CTX(ctx)->deg_limit, QQBAR_CTX(ctx)->bits_limit))
+            return GR_UNABLE;
+
     qqbar_mul(res, x, y);
     return GR_SUCCESS;
 }
@@ -577,6 +609,10 @@ _gr_qqbar_div(qqbar_t res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
     }
     else
     {
+        if (QQBAR_CTX(ctx)->deg_limit != WORD_MAX || QQBAR_CTX(ctx)->bits_limit != WORD_MAX)
+            if (!qqbar_binop_within_limits(x, y, QQBAR_CTX(ctx)->deg_limit, QQBAR_CTX(ctx)->bits_limit))
+                return GR_UNABLE;
+
         qqbar_div(res, x, y);
         return GR_SUCCESS;
     }
@@ -647,6 +683,32 @@ _gr_qqbar_is_invertible(const qqbar_t x, const gr_ctx_t ctx)
 int
 _gr_qqbar_pow_ui(qqbar_t res, const qqbar_t x, ulong exp, const gr_ctx_t ctx)
 {
+    if (QQBAR_CTX(ctx)->bits_limit != WORD_MAX && !(exp == 0 || exp == 1))
+    {
+        slong ebits = FLINT_BIT_COUNT(exp);
+
+        if (qqbar_is_zero(x) || qqbar_is_one(x))
+        {
+            qqbar_set(res, x);
+            return GR_SUCCESS;
+        }
+
+        if (qqbar_is_neg_one(x))
+        {
+            if (exp % 2 == 0)
+                qqbar_one(res);
+            else
+                qqbar_set(res, x);
+            return GR_SUCCESS;
+        }
+
+        if (ebits > SMALL_FMPZ_BITCOUNT_MAX)
+            return GR_UNABLE;
+
+        if ((double) exp * qqbar_height_bits(x) > QQBAR_CTX(ctx)->bits_limit)
+            return GR_UNABLE;
+    }
+
     qqbar_pow_ui(res, x, exp);
     return GR_SUCCESS;
 }
@@ -660,6 +722,32 @@ _gr_qqbar_pow_si(qqbar_t res, const qqbar_t x, slong exp, const gr_ctx_t ctx)
     }
     else
     {
+        if (QQBAR_CTX(ctx)->bits_limit != WORD_MAX && !(exp == 0 || exp == 1 || exp == -1))
+        {
+            slong ebits = FLINT_BIT_COUNT(FLINT_ABS(exp));
+
+            if (qqbar_is_zero(x) || qqbar_is_one(x))
+            {
+                qqbar_set(res, x);
+                return GR_SUCCESS;
+            }
+
+            if (qqbar_is_neg_one(x))
+            {
+                if (exp % 2 == 0)
+                    qqbar_one(res);
+                else
+                    qqbar_set(res, x);
+                return GR_SUCCESS;
+            }
+
+            if (ebits > SMALL_FMPZ_BITCOUNT_MAX)
+                return GR_UNABLE;
+
+            if ((double) FLINT_ABS(exp) * qqbar_height_bits(x) > QQBAR_CTX(ctx)->bits_limit)
+                return GR_UNABLE;
+        }
+
         qqbar_pow_si(res, x, exp);
         return GR_SUCCESS;
     }
@@ -674,6 +762,32 @@ _gr_qqbar_pow_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t exp, const gr_ctx_
     }
     else
     {
+        if (QQBAR_CTX(ctx)->bits_limit != WORD_MAX && !(fmpz_is_zero(exp) || fmpz_is_pm1(exp)))
+        {
+            slong ebits = fmpz_bits(exp);
+
+            if (qqbar_is_zero(x) || qqbar_is_one(x))
+            {
+                qqbar_set(res, x);
+                return GR_SUCCESS;
+            }
+
+            if (qqbar_is_neg_one(x))
+            {
+                if (fmpz_is_even(exp))
+                    qqbar_one(res);
+                else
+                    qqbar_set(res, x);
+                return GR_SUCCESS;
+            }
+
+            if (ebits > SMALL_FMPZ_BITCOUNT_MAX)
+                return GR_UNABLE;
+
+            if ((double) FLINT_ABS(*exp) * qqbar_height_bits(x) > QQBAR_CTX(ctx)->bits_limit)
+                return GR_UNABLE;
+        }
+
         qqbar_pow_fmpz(res, x, exp);
         return GR_SUCCESS;
     }

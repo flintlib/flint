@@ -76,6 +76,8 @@ WARN_UNUSED_RESULT int gr_fmpz_poly_evaluate(gr_ptr res, const fmpz_poly_t f, gr
 #endif
 
 #ifdef FMPZ_MPOLY_H
+WARN_UNUSED_RESULT int gr_fmpz_mpoly_evaluate_iter(gr_ptr res, const fmpz_mpoly_t pol, gr_srcptr x, const fmpz_mpoly_ctx_t mctx, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_fmpz_mpoly_evaluate_horner(gr_ptr res, const fmpz_mpoly_t pol, gr_srcptr x, const fmpz_mpoly_ctx_t mctx, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_fmpz_mpoly_evaluate(gr_ptr res, const fmpz_mpoly_t f, gr_srcptr x, const fmpz_mpoly_ctx_t mctx, gr_ctx_t ctx);
 #endif
 
