@@ -27,9 +27,10 @@
 
 typedef struct
 {
-    ulong *inds;
+    slong alloc;
     gr_ptr entries;
-    ulong nnz;
+    ulong *inds;
+    slong nnz;
 }
 gr_sparse_vec_struct;
 
@@ -41,7 +42,7 @@ GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_init(gr_sparse_vec_t v
 }
 
 GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_clear(gr_sparse_vec_t vec, gr_ctx_t ctx) {
-    gr_vec_clear(vec->entries, vec->nnz, ctx);
+    _gr_vec_clear(vec->entries, vec->alloc, ctx);
     flint_free(vec->inds);
     flint_free(vec->entries);
     memset(vec, 0, sizeof(gr_sparse_vec_t));
@@ -80,9 +81,10 @@ GR_SPARSE_VEC_INLINE slong gr_sparse_vec_nnz(const gr_sparse_vec_t vec, gr_ctx_t
 }
 
 void gr_sparse_vec_fit_nnz(gr_sparse_vec_t vec, slong len, gr_ctx_t ctx);
-void gr_sparse_vec_set_nnz(gr_sparse_vec_t vec, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_sparse_vec_set(gr_sparse_vec_t res, const gr_sparse_vec_t src, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_sparse_vec_append(gr_sparse_vec_t vec, gr_srcptr src, ulong ind, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_sparse_vec_update(gr_sparse_vec_t vec, const gr_sparse_vec_t src, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_sparse_vec_update_entries(gr_sparse_vec_t vec, gr_srcptr entries, const ulong* inds, slong nnz, gr_ctx_t ctx);
+//I think the below might be the same as "add"
 WARN_UNUSED_RESULT int gr_sparse_vec_extend(gr_sparse_vec_t vec, const gr_sparse_vec_t src, gr_ctx_t ctx);
 
 int gr_sparse_vec_write(gr_stream_t out, const gr_sparse_vec_t vec, gr_ctx_t ctx);
