@@ -30,6 +30,7 @@ typedef struct
     slong alloc;
     gr_ptr entries;
     ulong *inds;
+    slong len;
     slong nnz;
 }
 gr_sparse_vec_struct;
@@ -57,7 +58,7 @@ gr_sparse_vec_ind_ptr(gr_sparse_vec_t vec, slong i, gr_ctx_t ctx)
     return vec->inds + i;
 }
 
-GR_SPARSE_VEC_INLINE ulong *
+GR_SPARSE_VEC_INLINE const ulong *
 gr_sparse_vec_ind_srcptr(const gr_sparse_vec_t vec, slong i, gr_ctx_t ctx)
 {
     return vec->inds + i;
@@ -80,7 +81,8 @@ GR_SPARSE_VEC_INLINE slong gr_sparse_vec_nnz(const gr_sparse_vec_t vec, gr_ctx_t
     return vec->nnz;
 }
 
-void gr_sparse_vec_fit_nnz(gr_sparse_vec_t vec, slong len, gr_ctx_t ctx);
+void gr_sparse_vec_fit_nnz(gr_sparse_vec_t vec, slong nnz, gr_ctx_t ctx);
+void gr_sparse_vec_set_length(gr_sparse_vec_t vec, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_sparse_vec_set(gr_sparse_vec_t res, const gr_sparse_vec_t src, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_sparse_vec_update(gr_sparse_vec_t vec, const gr_sparse_vec_t src, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_sparse_vec_update_entries(gr_sparse_vec_t vec, gr_srcptr entries, const ulong* inds, slong nnz, gr_ctx_t ctx);
