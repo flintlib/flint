@@ -252,10 +252,16 @@ mp_limb_t flint_mpn_mulhigh_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n
 {
     FLINT_ASSERT(n >= 1);
 
+#if FLINT_HAVE_MPN_MULHIGH_BASECASE
     if (FLINT_HAVE_MULHIGH_N_FUNC(n))
         return flint_mpn_mulhigh_n_func_tab[n](rp, xp, yp);
     else
         return flint_mpn_mulhigh_basecase(rp, xp, yp, n);
+#else
+    FLINT_ASSERT(FLINT_HAVE_MULHIGH_N_FUNC(n));
+
+    return flint_mpn_mulhigh_n_func_tab[n](rp, xp, yp);
+#endif
 }
 
 FLINT_FORCE_INLINE
