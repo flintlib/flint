@@ -22,7 +22,7 @@ void mpfr_mulhigh_n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 
 int main(void)
 {
-#define N_MIN 6
+#define N_MIN 1
 #define N_MAX 64
 
     mp_limb_t rf[N_MAX];
@@ -43,7 +43,7 @@ int main(void)
         mpn_random2(yp, n);
 
         TIMEIT_START
-        flint_mpn_mulhigh_basecase(rf, xp, yp, n);
+        flint_mpn_mulhigh_n(rf, xp, yp, n);
         TIMEIT_STOP_VALUES(__, t1)
 
         TIMEIT_START

@@ -40,6 +40,7 @@ struct mp_limb_pair_t flint_mpn_mulhigh_normalised_12(mp_ptr, mp_srcptr, mp_srcp
 
 const flint_mpn_mul_func_t flint_mpn_mulhigh_n_func_tab[] =
 {
+    NULL,
     flint_mpn_mulhigh_1,
     flint_mpn_mulhigh_2,
     flint_mpn_mulhigh_3,
@@ -56,6 +57,7 @@ const flint_mpn_mul_func_t flint_mpn_mulhigh_n_func_tab[] =
 
 const flint_mpn_mulhigh_normalised_func_t flint_mpn_mulhigh_normalised_n_func_tab[] =
 {
+    NULL,
     flint_mpn_mulhigh_normalised_1,
     flint_mpn_mulhigh_normalised_2,
     flint_mpn_mulhigh_normalised_3,

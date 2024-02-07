@@ -13,7 +13,7 @@
 #include "mpn_extras.h"
 #include "profiler.h"
 
-#define MAXN 15
+#define MAXN 16
 
 int main(void)
 {
