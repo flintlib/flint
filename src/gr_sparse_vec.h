@@ -30,7 +30,7 @@ typedef struct
     slong alloc;
     gr_ptr entries;
     ulong *inds;
-    slong len;
+    slong length;
     slong nnz;
 }
 gr_sparse_vec_struct;
@@ -82,10 +82,72 @@ GR_SPARSE_VEC_INLINE slong gr_sparse_vec_nnz(const gr_sparse_vec_t vec, gr_ctx_t
 }
 
 void gr_sparse_vec_fit_nnz(gr_sparse_vec_t vec, slong nnz, gr_ctx_t ctx);
+slong gr_sparse_vec_length(const gr_sparse_vec_t vec) { return vec->length; }
 void gr_sparse_vec_set_length(gr_sparse_vec_t vec, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_sparse_vec_set(gr_sparse_vec_t res, const gr_sparse_vec_t src, gr_ctx_t ctx);
+
+slong _gr_sparse_vec_count_unique_inds(const ulong *inds0, slong nnz0, const ulong *inds1, slong nnz1);
+
+/* This is used for operations like add */
+#define GR_SPARSE_VEC_RIFFLE_TEMPLATE(STATUS, FUNC_A, FUNC_B, FUNC_AB, DEST_VEC, A_ENTRIES, A_INDS, A_NNZ, B_ENTRIES, B_INDS, B_NNZ, CTX) \
+{
+    slong sz = (CTX)->sizeof_elem;
+    slong new_nnz = _gr_sparse_vec_count_unique_inds((A_INDS), (A_NNZ), (B_INDS), (B_NNZ))
+    gr_sparse_vec_fit_nnz(DEST_VEC, new_nnz, (CTX));
+    /* We go backward through the destination, because it might be an in-place operation on a source */
+    slong a_ptr = (A_NNZ)-1;
+    slong b_ptr = (B_NNZ)-1;
+    slong v_ptr = new_nnz-1;;
+    while (a_ptr >= 0 && b_ptr >= 0 && (STATUS) == GR_SUCCESS)
+    {
+        a_ind = (A_INDS)[a_ptr];
+        b_ind = (B_INDS)[b_ptr];
+        if (a_ind > b_ind)
+        {
+            STATUS |= FUNC_A(GR_ENTRY((DEST_VEC)->entries, v_ptr, sz), GR_ENTRY((A_ENTRIES), a_ptr, sz), (CTX));
+            (DEST_VEC)->inds[v_ptr] = (A_INDS)[a_ptr];
+            a_ptr--;
+        }
+        else if (b_ind > a_ind)
+        {
+            STATUS |= FUNC_B(GR_ENTRY((DEST_VEC)->entries, v_ptr, sz), GR_ENTRY((B_ENTRIES), b_ptr, sz), (CTX));
+            (DEST_VEC)->inds[v_ptr] = (B_INDS)[b_ptr];
+            b_ptr--;
+        }
+        else
+        {
+            STATUS gr_set(GR_ENTRY(vec->entries, dest_ind, sz), GR_ENTRY(entries, si_ind, sz));
+            vec->inds[dest_ind] = sorted_inds[si_ind];
+            si_ind--;
+            vec_ind--;
+        }
+        v_ptr--;
+    }
+    vec->nnz = new_nnz;
+}
+
+
+#define GR_SPARSE_VEC_DENSE_VEC_OP(g, res, src, c, ctx) \
+{  \
+    int status = GR_SUCCESS; \
+    status = gr_vec_set(res, src, ctx); \
+    if(status == GR_SUCCESS) { \
+      status = g(res->entries, src->entries, len, c, ctx); \
+    } \
+    return status; \
+}
+
+int gr_sparse_vec_mul_scalar(gr_vec_t res, gr_vec_t src, gr_srcptr c, gr_ctx_t ctx) { GR_SPARSE_VEC_DENSE_VEC_OP(_gr_vec_mul_scalar, blah, src, c, ctx) } 
+int gr_sparse_vec_mul_scalar_si(gr_vec_t res, gr_vec_t src, slong c, gr_ctx_t ctx) { GR_SPARSE_VEC_DENSE_VEC_OP(_gr_vec_mul_scalar_si, res, src, c, ctx) }
+
+
+
 WARN_UNUSED_RESULT int gr_sparse_vec_update(gr_sparse_vec_t vec, const gr_sparse_vec_t src, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_sparse_vec_update_entries(gr_sparse_vec_t vec, gr_srcptr entries, const ulong* inds, slong nnz, gr_ctx_t ctx);
+
+
+
+
 //I think the below might be the same as "add"
 WARN_UNUSED_RESULT int gr_sparse_vec_extend(gr_sparse_vec_t vec, const gr_sparse_vec_t src, gr_ctx_t ctx);
 
