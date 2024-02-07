@@ -24,14 +24,14 @@
 #include "t-mul_n.c"
 #include "t-mul_basecase.c"
 #include "t-mulhigh_basecase.c"
-#include "t-mulhigh_n.c"
-#include "t-mulhigh_normalised_n.c"
+#include "t-mulhigh_normalised.c"
 #include "t-mulmod_2expp1.c"
 #include "t-mulmod_preinv1.c"
 #include "t-mulmod_preinvn.c"
 #include "t-remove_2exp.c"
 #include "t-remove_power.c"
 #include "t-sqr_basecase.c"
+#include "t-sqrhigh_basecase.c"
 
 /* Array of test functions ***************************************************/
 
@@ -47,14 +47,14 @@ test_struct tests[] =
     TEST_FUNCTION(flint_mpn_mul_n),
     TEST_FUNCTION(flint_mpn_mul_basecase),
     TEST_FUNCTION(flint_mpn_mulhigh_basecase),
-    TEST_FUNCTION(flint_mpn_mulhigh_n),
-    TEST_FUNCTION(flint_mpn_mulhigh_normalised_n),
+    TEST_FUNCTION(flint_mpn_mulhigh_normalised),
     TEST_FUNCTION(flint_mpn_mulmod_2expp1),
     TEST_FUNCTION(flint_mpn_mulmod_preinv1),
     TEST_FUNCTION(flint_mpn_mulmod_preinvn),
     TEST_FUNCTION(flint_mpn_remove_2exp),
     TEST_FUNCTION(flint_mpn_remove_power),
-    TEST_FUNCTION(flint_mpn_sqr_basecase)
+    TEST_FUNCTION(flint_mpn_sqr_basecase),
+    TEST_FUNCTION(flint_mpn_sqrhigh_basecase)
 };
 
 /* main function *************************************************************/

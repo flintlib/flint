@@ -12,7 +12,7 @@
 #include "mpn_extras.h"
 #include "profiler.h"
 
-#define N_MAX FLINT_MPN_MULHIGH_N_FUNC_TAB_WIDTH
+#define N_MAX FLINT_MPN_MULHIGH_NORMALISED_FUNC_TAB_WIDTH
 
 int main(void)
 {
@@ -37,11 +37,11 @@ int main(void)
             yp[n - 1] |= (UWORD(1) << (FLINT_BITS - 1));
 
             TIMEIT_START
-            flint_mpn_mulhigh_n(ru, xp, yp, n);
+            flint_mpn_mulhigh_basecase(ru, xp, yp, n);
             TIMEIT_STOP_VALUES(__, t1)
 
             TIMEIT_START
-            flint_mpn_mulhigh_normalised_n(rn, xp, yp, n);
+            flint_mpn_mulhigh_normalised(rn, xp, yp, n);
             TIMEIT_STOP_VALUES(__, t2)
 
             flint_printf("%7.2fx", t2 / t1);

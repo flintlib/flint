@@ -65,11 +65,11 @@ define(`r3',	   `%r12')
 
 .text
 
-.global	FUNC(flint_mpn_mulhigh_basecase)
+.global	FUNC(_flint_mpn_mulhigh_basecase)
 ALIGN(32)
-TYPE(flint_mpn_mulhigh_basecase)
+TYPE(_flint_mpn_mulhigh_basecase)
 
-FUNC(flint_mpn_mulhigh_basecase):
+FUNC(_flint_mpn_mulhigh_basecase):
 	.cfi_startproc
 	mov	bp_param, bp
 	lea	-1*8(ap,n,8), ap	# ap += n - 1
@@ -305,6 +305,6 @@ L(fin):	pop	%r14
 	pop	%rbx
 
 	ret
-.flint_mpn_mulhigh_basecase_end:
-SIZE(flint_mpn_mulhigh_basecase, .flint_mpn_mulhigh_basecase_end)
+._flint_mpn_mulhigh_basecase_end:
+SIZE(_flint_mpn_mulhigh_basecase, ._flint_mpn_mulhigh_basecase_end)
 .cfi_endproc

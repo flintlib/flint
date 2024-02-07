@@ -118,7 +118,7 @@ extern "C" {
 double
 flint_mpn_get_d(mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp);
 
-/* General multiplication */
+/* General multiplication ****************************************************/
 
 #ifdef FLINT_HAVE_FFT_SMALL
 #define FLINT_FFT_MUL_THRESHOLD 400
@@ -229,49 +229,104 @@ flint_mpn_sqr(mp_ptr r, mp_srcptr x, mp_size_t n)
         flint_mpn_mul((_z), (_y), (_yn), (_x), (_xn)); \
     }
 
-#if FLINT_HAVE_ADX
-# define FLINT_MPN_MULHIGH_N_FUNC_TAB_WIDTH 12
-# define FLINT_HAVE_MPN_MULHIGH_BASECASE 1
-mp_limb_t flint_mpn_mulhigh_basecase(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
-#else
-# define FLINT_MPN_MULHIGH_N_FUNC_TAB_WIDTH 0
-#endif
+/* High multiplication *******************************************************/
 
-#define FLINT_HAVE_MULHIGH_N_FUNC(n) ((n) <= FLINT_MPN_MULHIGH_N_FUNC_TAB_WIDTH)
+#define FLINT_HAVE_MULHIGH_FUNC(n) ((n) <= FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH)
+#define FLINT_HAVE_SQRHIGH_FUNC(n) ((n) <= FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH)
+#define FLINT_HAVE_MULHIGH_NORMALISED_FUNC(n) ((n) <= FLINT_MPN_MULHIGH_NORMALISED_FUNC_TAB_WIDTH)
 
 struct mp_limb_pair_t { mp_limb_t m1; mp_limb_t m2; };
 typedef struct mp_limb_pair_t (* flint_mpn_mulhigh_normalised_func_t)(mp_ptr, mp_srcptr, mp_srcptr);
 
-FLINT_DLL extern const flint_mpn_mul_func_t flint_mpn_mulhigh_n_func_tab[];
-FLINT_DLL extern const flint_mpn_mulhigh_normalised_func_t flint_mpn_mulhigh_normalised_n_func_tab[];
+FLINT_DLL extern const flint_mpn_mul_func_t flint_mpn_mulhigh_func_tab[];
+FLINT_DLL extern const flint_mpn_sqr_func_t flint_mpn_sqrhigh_func_tab[];
+FLINT_DLL extern const flint_mpn_mulhigh_normalised_func_t flint_mpn_mulhigh_normalised_func_tab[];
 
-/* NOTE: Aliasing is allowed! */
-/* FIXME: How do we proceed for bigger n? */
+#if FLINT_HAVE_ADX
+# define FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH 12
+# define FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH 8
+# define FLINT_MPN_MULHIGH_NORMALISED_FUNC_TAB_WIDTH 12
+
+# define FLINT_HAVE_NATIVE_MPN_MULHIGH_BASECASE 1
+# define FLINT_HAVE_NATIVE_MPN_SQRHIGH_BASECASE 1
+
+/* NOTE: This function only works for n >= 6 */
+mp_limb_t _flint_mpn_mulhigh_basecase(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
+
+/* NOTE: These two functions only works for n >= 8 */
+mp_limb_t _flint_mpn_sqrhigh_basecase_even(mp_ptr, mp_srcptr, mp_size_t);
+mp_limb_t _flint_mpn_sqrhigh_basecase_odd(mp_ptr, mp_srcptr, mp_size_t);
+
+/* TODO: Proceed with higher cases */
 MPN_EXTRAS_INLINE
-mp_limb_t flint_mpn_mulhigh_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
+mp_limb_t flint_mpn_mulhigh_basecase(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
 {
     FLINT_ASSERT(n >= 1);
 
-#if FLINT_HAVE_MPN_MULHIGH_BASECASE
-    if (FLINT_HAVE_MULHIGH_N_FUNC(n))
-        return flint_mpn_mulhigh_n_func_tab[n](rp, xp, yp);
+    if (FLINT_HAVE_MULHIGH_FUNC(n)) /* NOTE: Aliasing allowed here */
+        return flint_mpn_mulhigh_func_tab[n - 1](rp, xp, yp);
     else
-        return flint_mpn_mulhigh_basecase(rp, xp, yp, n);
-#else
-    FLINT_ASSERT(FLINT_HAVE_MULHIGH_N_FUNC(n));
-
-    return flint_mpn_mulhigh_n_func_tab[n](rp, xp, yp);
-#endif
+    {
+        FLINT_ASSERT(rp != xp && rp != yp);
+        return _flint_mpn_mulhigh_basecase(rp, xp, yp, n);
+    }
 }
 
-FLINT_FORCE_INLINE
-struct mp_limb_pair_t flint_mpn_mulhigh_normalised_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
+/* TODO: Proceed with higher cases */
+MPN_EXTRAS_INLINE
+mp_limb_t flint_mpn_sqrhigh_basecase(mp_ptr rp, mp_srcptr xp, mp_size_t n)
 {
     FLINT_ASSERT(n >= 1);
-    FLINT_ASSERT(FLINT_HAVE_MULHIGH_N_FUNC(n));
 
-    return flint_mpn_mulhigh_normalised_n_func_tab[n](rp, xp, yp);
+    if (FLINT_HAVE_SQRHIGH_FUNC(n)) /* NOTE: Aliasing allowed here */
+        return flint_mpn_sqrhigh_func_tab[n - 1](rp, xp);
+    else
+    {
+        FLINT_ASSERT(rp != xp);
+        if (n & 1)
+            return _flint_mpn_sqrhigh_basecase_odd(rp, xp, n >> 1);
+        else
+            return _flint_mpn_sqrhigh_basecase_even(rp, xp, n >> 1);
+    }
 }
+
+MPN_EXTRAS_INLINE
+struct mp_limb_pair_t flint_mpn_mulhigh_normalised(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
+{
+    FLINT_ASSERT(n >= 1);
+
+    if (FLINT_HAVE_MULHIGH_NORMALISED_FUNC(n))
+        return flint_mpn_mulhigh_normalised_func_tab[n - 1](rp, xp, yp);
+    else
+    {
+        struct mp_limb_pair_t ret;
+
+        FLINT_ASSERT(rp != xp && rp != yp);
+
+        /* TODO */
+        /* ret.m1 = flint_mpn_mulhigh(rp, xp, yp, n); */
+        ret.m1 = flint_mpn_mulhigh_basecase(rp, xp, yp, n);
+
+        if (rp[n - 1] >> (FLINT_BITS - 1))
+        {
+            ret.m2 = 0;
+        }
+        else
+        {
+            ret.m2 = 1;
+            mpn_lshift(rp, rp, n, 1);
+            rp[0] |= (ret.m1 >> (FLINT_BITS - 1));
+            ret.m1 <<= 1;
+        }
+
+        return ret;
+    }
+}
+#else
+# define FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH 0
+# define FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH 0
+# define FLINT_MPN_MULHIGH_NORMALISED_FUNC_TAB_WIDTH 0
+#endif
 
 /*
     return the high limb of a two limb left shift by n < GMP_LIMB_BITS bits.
