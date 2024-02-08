@@ -130,304 +130,102 @@ mp_limb_t flint_mpn_mul_16_6(mp_ptr, mp_srcptr, mp_srcptr);
 mp_limb_t flint_mpn_mul_16_7(mp_ptr, mp_srcptr, mp_srcptr);
 mp_limb_t flint_mpn_mul_16_8(mp_ptr, mp_srcptr, mp_srcptr);
 
-mp_limb_t flint_mpn_mul_9_9(mp_ptr res, mp_srcptr u, mp_srcptr v)
+static mp_limb_t _flint_mpn_mul_n_9(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
 {
-    flint_mpn_mul_9_8(res, u, v);
-    res[17] = mpn_addmul_1(res + 8, u, 9, v[8]);
-    return res[17];
+    flint_mpn_mul_func_tab[n][8](res, u, v);
+    res[n + 8] = mpn_addmul_1(res + 8, u, n, v[8]);
+    return res[n + 8];
 }
 
-mp_limb_t flint_mpn_mul_10_9(mp_ptr res, mp_srcptr u, mp_srcptr v)
+static mp_limb_t _flint_mpn_mul_n_10(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
 {
-    flint_mpn_mul_10_8(res, u, v);
-    res[18] = mpn_addmul_1(res + 8, u, 10, v[8]);
-    return res[18];
+    flint_mpn_mul_func_tab[n][8](res, u, v);
+    res[n + 8] = mpn_addmul_1(res + 8, u, n, v[8]);
+    res[n + 9] = mpn_addmul_1(res + 9, u, n, v[9]);
+    return res[n + 9];
 }
 
-mp_limb_t flint_mpn_mul_11_9(mp_ptr res, mp_srcptr u, mp_srcptr v)
+static mp_limb_t _flint_mpn_mul_n_11(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
 {
-    flint_mpn_mul_11_8(res, u, v);
-    res[19] = mpn_addmul_1(res + 8, u, 11, v[8]);
-    return res[19];
+    flint_mpn_mul_func_tab[n][8](res, u, v);
+    res[n + 8] = mpn_addmul_1(res + 8, u, n, v[8]);
+    res[n + 9] = mpn_addmul_1(res + 9, u, n, v[9]);
+    res[n + 10] = mpn_addmul_1(res + 10, u, n, v[10]);
+    return res[n + 10];
 }
 
-mp_limb_t flint_mpn_mul_12_9(mp_ptr res, mp_srcptr u, mp_srcptr v)
+static mp_limb_t _flint_mpn_mul_n_12(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
 {
-    flint_mpn_mul_12_8(res, u, v);
-    res[20] = mpn_addmul_1(res + 8, u, 12, v[8]);
-    return res[20];
+    flint_mpn_mul_func_tab[n][8](res, u, v);
+    res[n + 8] = mpn_addmul_1(res + 8, u, n, v[8]);
+    res[n + 9] = mpn_addmul_1(res + 9, u, n, v[9]);
+    res[n + 10] = mpn_addmul_1(res + 10, u, n, v[10]);
+    res[n + 11] = mpn_addmul_1(res + 11, u, n, v[11]);
+    return res[n + 11];
 }
 
-mp_limb_t flint_mpn_mul_13_9(mp_ptr res, mp_srcptr u, mp_srcptr v)
+static mp_limb_t _flint_mpn_mul_n_13(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
 {
-    flint_mpn_mul_13_8(res, u, v);
-    res[21] = mpn_addmul_1(res + 8, u, 13, v[8]);
-    return res[21];
+    flint_mpn_mul_func_tab[n][8](res, u, v);
+    res[n + 8] = mpn_addmul_1(res + 8, u, n, v[8]);
+    res[n + 9] = mpn_addmul_1(res + 9, u, n, v[9]);
+    res[n + 10] = mpn_addmul_1(res + 10, u, n, v[10]);
+    res[n + 11] = mpn_addmul_1(res + 11, u, n, v[11]);
+    res[n + 12] = mpn_addmul_1(res + 12, u, n, v[12]);
+    return res[n + 12];
 }
 
-mp_limb_t flint_mpn_mul_14_9(mp_ptr res, mp_srcptr u, mp_srcptr v)
+static mp_limb_t _flint_mpn_mul_n_14(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
 {
-    flint_mpn_mul_14_8(res, u, v);
-    res[22] = mpn_addmul_1(res + 8, u, 14, v[8]);
-    return res[22];
+    flint_mpn_mul_func_tab[n][8](res, u, v);
+    res[n + 8] = mpn_addmul_1(res + 8, u, n, v[8]);
+    res[n + 9] = mpn_addmul_1(res + 9, u, n, v[9]);
+    res[n + 10] = mpn_addmul_1(res + 10, u, n, v[10]);
+    res[n + 11] = mpn_addmul_1(res + 11, u, n, v[11]);
+    res[n + 12] = mpn_addmul_1(res + 12, u, n, v[12]);
+    res[n + 13] = mpn_addmul_1(res + 13, u, n, v[13]);
+    return res[n + 13];
 }
 
-mp_limb_t flint_mpn_mul_15_9(mp_ptr res, mp_srcptr u, mp_srcptr v)
-{
-    flint_mpn_mul_15_8(res, u, v);
-    res[23] = mpn_addmul_1(res + 8, u, 15, v[8]);
-    return res[23];
-}
+mp_limb_t flint_mpn_mul_9_9(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_9(res, u, v, 9); }
+mp_limb_t flint_mpn_mul_10_9(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_9(res, u, v, 10); }
+mp_limb_t flint_mpn_mul_11_9(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_9(res, u, v, 11); }
+mp_limb_t flint_mpn_mul_12_9(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_9(res, u, v, 12); }
+mp_limb_t flint_mpn_mul_13_9(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_9(res, u, v, 13); }
+mp_limb_t flint_mpn_mul_14_9(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_9(res, u, v, 14); }
+mp_limb_t flint_mpn_mul_15_9(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_9(res, u, v, 15); }
+mp_limb_t flint_mpn_mul_16_9(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_9(res, u, v, 16); }
 
-mp_limb_t flint_mpn_mul_16_9(mp_ptr res, mp_srcptr u, mp_srcptr v)
-{
-    flint_mpn_mul_16_8(res, u, v);
-    res[24] = mpn_addmul_1(res + 8, u, 16, v[8]);
-    return res[24];
-}
+mp_limb_t flint_mpn_mul_10_10(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_10(res, u, v, 10); }
+mp_limb_t flint_mpn_mul_11_10(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_10(res, u, v, 11); }
+mp_limb_t flint_mpn_mul_12_10(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_10(res, u, v, 12); }
+mp_limb_t flint_mpn_mul_13_10(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_10(res, u, v, 13); }
+mp_limb_t flint_mpn_mul_14_10(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_10(res, u, v, 14); }
+mp_limb_t flint_mpn_mul_15_10(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_10(res, u, v, 15); }
+mp_limb_t flint_mpn_mul_16_10(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_10(res, u, v, 16); }
 
+mp_limb_t flint_mpn_mul_11_11(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_11(res, u, v, 11); }
+mp_limb_t flint_mpn_mul_12_11(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_11(res, u, v, 12); }
+mp_limb_t flint_mpn_mul_13_11(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_11(res, u, v, 13); }
+mp_limb_t flint_mpn_mul_14_11(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_11(res, u, v, 14); }
+mp_limb_t flint_mpn_mul_15_11(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_11(res, u, v, 15); }
+mp_limb_t flint_mpn_mul_16_11(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_11(res, u, v, 16); }
 
-mp_limb_t flint_mpn_mul_10_10(mp_ptr res, mp_srcptr u, mp_srcptr v)
-{
-    flint_mpn_mul_10_8(res, u, v);
-    res[18] = mpn_addmul_1(res + 8, u, 10, v[8]);
-    res[19] = mpn_addmul_1(res + 9, u, 10, v[9]);
-    return res[19];
-}
+mp_limb_t flint_mpn_mul_12_12(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_12(res, u, v, 12); }
+mp_limb_t flint_mpn_mul_13_12(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_12(res, u, v, 13); }
+mp_limb_t flint_mpn_mul_14_12(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_12(res, u, v, 14); }
+mp_limb_t flint_mpn_mul_15_12(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_12(res, u, v, 15); }
+mp_limb_t flint_mpn_mul_16_12(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_12(res, u, v, 16); }
 
-mp_limb_t flint_mpn_mul_11_10(mp_ptr res, mp_srcptr u, mp_srcptr v)
-{
-    flint_mpn_mul_11_8(res, u, v);
-    res[19] = mpn_addmul_1(res + 8, u, 11, v[8]);
-    res[20] = mpn_addmul_1(res + 9, u, 11, v[9]);
-    return res[20];
-}
+mp_limb_t flint_mpn_mul_13_13(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_13(res, u, v, 13); }
+mp_limb_t flint_mpn_mul_14_13(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_13(res, u, v, 14); }
+mp_limb_t flint_mpn_mul_15_13(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_13(res, u, v, 15); }
+mp_limb_t flint_mpn_mul_16_13(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_13(res, u, v, 16); }
 
-mp_limb_t flint_mpn_mul_12_10(mp_ptr res, mp_srcptr u, mp_srcptr v)
-{
-    flint_mpn_mul_12_8(res, u, v);
-    res[20] = mpn_addmul_1(res + 8, u, 12, v[8]);
-    res[21] = mpn_addmul_1(res + 9, u, 12, v[9]);
-    return res[21];
-}
+mp_limb_t flint_mpn_mul_14_14(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_14(res, u, v, 14); }
+mp_limb_t flint_mpn_mul_15_14(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_14(res, u, v, 15); }
+mp_limb_t flint_mpn_mul_16_14(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_14(res, u, v, 16); }
 
-mp_limb_t flint_mpn_mul_13_10(mp_ptr res, mp_srcptr u, mp_srcptr v)
-{
-    flint_mpn_mul_13_8(res, u, v);
-    res[21] = mpn_addmul_1(res + 8, u, 13, v[8]);
-    res[22] = mpn_addmul_1(res + 9, u, 13, v[9]);
-    return res[22];
-}
-
-mp_limb_t flint_mpn_mul_14_10(mp_ptr res, mp_srcptr u, mp_srcptr v)
-{
-    flint_mpn_mul_14_8(res, u, v);
-    res[22] = mpn_addmul_1(res + 8, u, 14, v[8]);
-    res[23] = mpn_addmul_1(res + 9, u, 14, v[9]);
-    return res[23];
-}
-
-mp_limb_t flint_mpn_mul_15_10(mp_ptr res, mp_srcptr u, mp_srcptr v)
-{
-    flint_mpn_mul_15_8(res, u, v);
-    res[23] = mpn_addmul_1(res + 8, u, 15, v[8]);
-    res[24] = mpn_addmul_1(res + 9, u, 15, v[9]);
-    return res[24];
-}
-
-mp_limb_t flint_mpn_mul_16_10(mp_ptr res, mp_srcptr u, mp_srcptr v)
-{
-    flint_mpn_mul_16_8(res, u, v);
-    res[24] = mpn_addmul_1(res + 8, u, 16, v[8]);
-    res[25] = mpn_addmul_1(res + 9, u, 16, v[9]);
-    return res[25];
-}
-
-
-mp_limb_t flint_mpn_mul_11_11(mp_ptr res, mp_srcptr u, mp_srcptr v)
-{
-    flint_mpn_mul_11_8(res, u, v);
-    res[19] = mpn_addmul_1(res + 8, u, 11, v[8]);
-    res[20] = mpn_addmul_1(res + 9, u, 11, v[9]);
-    res[21] = mpn_addmul_1(res + 10, u, 11, v[10]);
-    return res[21];
-}
-
-mp_limb_t flint_mpn_mul_12_11(mp_ptr res, mp_srcptr u, mp_srcptr v)
-{
-    flint_mpn_mul_12_8(res, u, v);
-    res[20] = mpn_addmul_1(res + 8, u, 12, v[8]);
-    res[21] = mpn_addmul_1(res + 9, u, 12, v[9]);
-    res[22] = mpn_addmul_1(res + 10, u, 12, v[10]);
-    return res[22];
-}
-
-mp_limb_t flint_mpn_mul_13_11(mp_ptr res, mp_srcptr u, mp_srcptr v)
-{
-    flint_mpn_mul_13_8(res, u, v);
-    res[21] = mpn_addmul_1(res + 8, u, 13, v[8]);
-    res[22] = mpn_addmul_1(res + 9, u, 13, v[9]);
-    res[23] = mpn_addmul_1(res + 10, u, 13, v[10]);
-    return res[23];
-}
-
-mp_limb_t flint_mpn_mul_14_11(mp_ptr res, mp_srcptr u, mp_srcptr v)
-{
-    flint_mpn_mul_14_8(res, u, v);
-    res[22] = mpn_addmul_1(res + 8, u, 14, v[8]);
-    res[23] = mpn_addmul_1(res + 9, u, 14, v[9]);
-    res[24] = mpn_addmul_1(res + 10, u, 14, v[10]);
-    return res[24];
-}
-
-mp_limb_t flint_mpn_mul_15_11(mp_ptr res, mp_srcptr u, mp_srcptr v)
-{
-    flint_mpn_mul_15_8(res, u, v);
-    res[23] = mpn_addmul_1(res + 8, u, 15, v[8]);
-    res[24] = mpn_addmul_1(res + 9, u, 15, v[9]);
-    res[25] = mpn_addmul_1(res + 10, u, 15, v[10]);
-    return res[25];
-}
-
-mp_limb_t flint_mpn_mul_16_11(mp_ptr res, mp_srcptr u, mp_srcptr v)
-{
-    flint_mpn_mul_16_8(res, u, v);
-    res[24] = mpn_addmul_1(res + 8, u, 16, v[8]);
-    res[25] = mpn_addmul_1(res + 9, u, 16, v[9]);
-    res[26] = mpn_addmul_1(res + 10, u, 16, v[10]);
-    return res[26];
-}
-
-
-mp_limb_t flint_mpn_mul_12_12(mp_ptr res, mp_srcptr u, mp_srcptr v)
-{
-    flint_mpn_mul_12_8(res, u, v);
-    res[20] = mpn_addmul_1(res + 8, u, 12, v[8]);
-    res[21] = mpn_addmul_1(res + 9, u, 12, v[9]);
-    res[22] = mpn_addmul_1(res + 10, u, 12, v[10]);
-    res[23] = mpn_addmul_1(res + 11, u, 12, v[11]);
-    return res[23];
-}
-
-mp_limb_t flint_mpn_mul_13_12(mp_ptr res, mp_srcptr u, mp_srcptr v)
-{
-    flint_mpn_mul_13_8(res, u, v);
-    res[21] = mpn_addmul_1(res + 8, u, 13, v[8]);
-    res[22] = mpn_addmul_1(res + 9, u, 13, v[9]);
-    res[23] = mpn_addmul_1(res + 10, u, 13, v[10]);
-    res[24] = mpn_addmul_1(res + 11, u, 13, v[11]);
-    return res[24];
-}
-
-mp_limb_t flint_mpn_mul_14_12(mp_ptr res, mp_srcptr u, mp_srcptr v)
-{
-    flint_mpn_mul_14_8(res, u, v);
-    res[22] = mpn_addmul_1(res + 8, u, 14, v[8]);
-    res[23] = mpn_addmul_1(res + 9, u, 14, v[9]);
-    res[24] = mpn_addmul_1(res + 10, u, 14, v[10]);
-    res[25] = mpn_addmul_1(res + 11, u, 14, v[11]);
-    return res[25];
-}
-
-mp_limb_t flint_mpn_mul_15_12(mp_ptr res, mp_srcptr u, mp_srcptr v)
-{
-    flint_mpn_mul_15_8(res, u, v);
-    res[23] = mpn_addmul_1(res + 8, u, 15, v[8]);
-    res[24] = mpn_addmul_1(res + 9, u, 15, v[9]);
-    res[25] = mpn_addmul_1(res + 10, u, 15, v[10]);
-    res[26] = mpn_addmul_1(res + 11, u, 15, v[11]);
-    return res[26];
-}
-
-mp_limb_t flint_mpn_mul_16_12(mp_ptr res, mp_srcptr u, mp_srcptr v)
-{
-    flint_mpn_mul_16_8(res, u, v);
-    res[24] = mpn_addmul_1(res + 8, u, 16, v[8]);
-    res[25] = mpn_addmul_1(res + 9, u, 16, v[9]);
-    res[26] = mpn_addmul_1(res + 10, u, 16, v[10]);
-    res[27] = mpn_addmul_1(res + 11, u, 16, v[11]);
-    return res[27];
-}
-
-mp_limb_t flint_mpn_mul_13_13(mp_ptr res, mp_srcptr u, mp_srcptr v)
-{
-    flint_mpn_mul_13_8(res, u, v);
-    res[21] = mpn_addmul_1(res + 8, u, 13, v[8]);
-    res[22] = mpn_addmul_1(res + 9, u, 13, v[9]);
-    res[23] = mpn_addmul_1(res + 10, u, 13, v[10]);
-    res[24] = mpn_addmul_1(res + 11, u, 13, v[11]);
-    res[25] = mpn_addmul_1(res + 12, u, 13, v[12]);
-    return res[25];
-}
-
-mp_limb_t flint_mpn_mul_14_13(mp_ptr res, mp_srcptr u, mp_srcptr v)
-{
-    flint_mpn_mul_14_8(res, u, v);
-    res[22] = mpn_addmul_1(res + 8, u, 14, v[8]);
-    res[23] = mpn_addmul_1(res + 9, u, 14, v[9]);
-    res[24] = mpn_addmul_1(res + 10, u, 14, v[10]);
-    res[25] = mpn_addmul_1(res + 11, u, 14, v[11]);
-    res[26] = mpn_addmul_1(res + 12, u, 14, v[12]);
-    return res[26];
-}
-
-mp_limb_t flint_mpn_mul_15_13(mp_ptr res, mp_srcptr u, mp_srcptr v)
-{
-    flint_mpn_mul_15_8(res, u, v);
-    res[23] = mpn_addmul_1(res + 8, u, 15, v[8]);
-    res[24] = mpn_addmul_1(res + 9, u, 15, v[9]);
-    res[25] = mpn_addmul_1(res + 10, u, 15, v[10]);
-    res[26] = mpn_addmul_1(res + 11, u, 15, v[11]);
-    res[27] = mpn_addmul_1(res + 12, u, 15, v[12]);
-    return res[27];
-}
-
-mp_limb_t flint_mpn_mul_16_13(mp_ptr res, mp_srcptr u, mp_srcptr v)
-{
-    flint_mpn_mul_16_8(res, u, v);
-    res[24] = mpn_addmul_1(res + 8, u, 16, v[8]);
-    res[25] = mpn_addmul_1(res + 9, u, 16, v[9]);
-    res[26] = mpn_addmul_1(res + 10, u, 16, v[10]);
-    res[27] = mpn_addmul_1(res + 11, u, 16, v[11]);
-    res[28] = mpn_addmul_1(res + 12, u, 16, v[12]);
-    return res[28];
-}
-
-mp_limb_t flint_mpn_mul_14_14(mp_ptr res, mp_srcptr u, mp_srcptr v)
-{
-    flint_mpn_mul_14_8(res, u, v);
-    res[22] = mpn_addmul_1(res + 8, u, 14, v[8]);
-    res[23] = mpn_addmul_1(res + 9, u, 14, v[9]);
-    res[24] = mpn_addmul_1(res + 10, u, 14, v[10]);
-    res[25] = mpn_addmul_1(res + 11, u, 14, v[11]);
-    res[26] = mpn_addmul_1(res + 12, u, 14, v[12]);
-    res[27] = mpn_addmul_1(res + 13, u, 14, v[13]);
-    return res[27];
-}
-
-mp_limb_t flint_mpn_mul_15_14(mp_ptr res, mp_srcptr u, mp_srcptr v)
-{
-    flint_mpn_mul_15_8(res, u, v);
-    res[23] = mpn_addmul_1(res + 8, u, 15, v[8]);
-    res[24] = mpn_addmul_1(res + 9, u, 15, v[9]);
-    res[25] = mpn_addmul_1(res + 10, u, 15, v[10]);
-    res[26] = mpn_addmul_1(res + 11, u, 15, v[11]);
-    res[27] = mpn_addmul_1(res + 12, u, 15, v[12]);
-    res[28] = mpn_addmul_1(res + 13, u, 15, v[13]);
-    return res[28];
-}
-
-mp_limb_t flint_mpn_mul_16_14(mp_ptr res, mp_srcptr u, mp_srcptr v)
-{
-    flint_mpn_mul_16_8(res, u, v);
-    res[24] = mpn_addmul_1(res + 8, u, 16, v[8]);
-    res[25] = mpn_addmul_1(res + 9, u, 16, v[9]);
-    res[26] = mpn_addmul_1(res + 10, u, 16, v[10]);
-    res[27] = mpn_addmul_1(res + 11, u, 16, v[11]);
-    res[28] = mpn_addmul_1(res + 12, u, 16, v[12]);
-    res[29] = mpn_addmul_1(res + 13, u, 16, v[13]);
-    return res[29];
-}
 
 mp_limb_t flint_mpn_mul_15_15(mp_ptr res, mp_srcptr u, mp_srcptr v)
 {
