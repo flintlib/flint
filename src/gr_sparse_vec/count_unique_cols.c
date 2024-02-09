@@ -1,6 +1,7 @@
 #include "gr_sparse_vec.h"
 
-slong _gr_sparse_vec_count_unique_cols(const ulong *cols0, slong nnz0, const ulong *cols1, slong nnz1)
+slong
+_gr_sparse_vec_count_unique_cols(const ulong *cols0, slong nnz0, const ulong *cols1, slong nnz1)
 {
     slong ind0 = 0;
     slong ind1 = 0;
