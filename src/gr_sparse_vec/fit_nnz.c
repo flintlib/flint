@@ -16,7 +16,7 @@ gr_sparse_vec_fit_nnz(gr_sparse_vec_t vec, slong nnz, gr_ctx_t ctx)
             nnz = vec->length;
         vec->cols = flint_realloc(vec->cols, nnz * sizeof(ulong));
         vec->entries = flint_realloc(vec->entries, nnz * sz);
-        _gr_vec_init(GR_ENTRY(vec->entries, vec->alloc, sz), nnz - alloc, ctx);
+        _gr_vec_init(GR_ENTRY(vec->entries, alloc, sz), nnz - alloc, ctx);
         vec->alloc = len;
     }
 }
