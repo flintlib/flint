@@ -131,9 +131,9 @@ flint_mpn_get_d(mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp);
 #endif
 
 #if FLINT_HAVE_ADX
-#define FLINT_MPN_MUL_FUNC_TAB_WIDTH 9
-#define FLINT_HAVE_MUL_FUNC(n, m) ((n) <= 8 || ((n) <= 16 && (m) <= 8))
-#define FLINT_HAVE_MUL_N_FUNC(n) ((n) <= 8)
+#define FLINT_MPN_MUL_FUNC_TAB_WIDTH 17
+#define FLINT_HAVE_MUL_FUNC(n, m) ((n) <= 16)
+#define FLINT_HAVE_MUL_N_FUNC(n) ((n) <= 16)
 #define FLINT_HAVE_SQR_FUNC(n) ((n) <= 7)
 #else
 #define FLINT_MPN_MUL_FUNC_TAB_WIDTH 8
@@ -251,9 +251,17 @@ MPN_EXTRAS_INLINE
 mp_limb_t flint_mpn_mulhigh_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
 {
     FLINT_ASSERT(n >= 1);
+
+#if FLINT_HAVE_MPN_MULHIGH_BASECASE
+    if (FLINT_HAVE_MULHIGH_N_FUNC(n))
+        return flint_mpn_mulhigh_n_func_tab[n](rp, xp, yp);
+    else
+        return flint_mpn_mulhigh_basecase(rp, xp, yp, n);
+#else
     FLINT_ASSERT(FLINT_HAVE_MULHIGH_N_FUNC(n));
 
-    return flint_mpn_mulhigh_n_func_tab[n - 1](rp, xp, yp);
+    return flint_mpn_mulhigh_n_func_tab[n](rp, xp, yp);
+#endif
 }
 
 FLINT_FORCE_INLINE
@@ -262,7 +270,7 @@ struct mp_limb_pair_t flint_mpn_mulhigh_normalised_n(mp_ptr rp, mp_srcptr xp, mp
     FLINT_ASSERT(n >= 1);
     FLINT_ASSERT(FLINT_HAVE_MULHIGH_N_FUNC(n));
 
-    return flint_mpn_mulhigh_normalised_n_func_tab[n - 1](rp, xp, yp);
+    return flint_mpn_mulhigh_normalised_n_func_tab[n](rp, xp, yp);
 }
 
 /*

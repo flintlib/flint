@@ -130,6 +130,133 @@ mp_limb_t flint_mpn_mul_16_6(mp_ptr, mp_srcptr, mp_srcptr);
 mp_limb_t flint_mpn_mul_16_7(mp_ptr, mp_srcptr, mp_srcptr);
 mp_limb_t flint_mpn_mul_16_8(mp_ptr, mp_srcptr, mp_srcptr);
 
+static mp_limb_t _flint_mpn_mul_n_9(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
+{
+    flint_mpn_mul_func_tab[n][8](res, u, v);
+    res[n + 8] = mpn_addmul_1(res + 8, u, n, v[8]);
+    return res[n + 8];
+}
+
+static mp_limb_t _flint_mpn_mul_n_10(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
+{
+    flint_mpn_mul_func_tab[n][8](res, u, v);
+    res[n + 8] = mpn_addmul_1(res + 8, u, n, v[8]);
+    res[n + 9] = mpn_addmul_1(res + 9, u, n, v[9]);
+    return res[n + 9];
+}
+
+static mp_limb_t _flint_mpn_mul_n_11(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
+{
+    flint_mpn_mul_func_tab[n][8](res, u, v);
+    res[n + 8] = mpn_addmul_1(res + 8, u, n, v[8]);
+    res[n + 9] = mpn_addmul_1(res + 9, u, n, v[9]);
+    res[n + 10] = mpn_addmul_1(res + 10, u, n, v[10]);
+    return res[n + 10];
+}
+
+static mp_limb_t _flint_mpn_mul_n_12(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
+{
+    flint_mpn_mul_func_tab[n][8](res, u, v);
+    res[n + 8] = mpn_addmul_1(res + 8, u, n, v[8]);
+    res[n + 9] = mpn_addmul_1(res + 9, u, n, v[9]);
+    res[n + 10] = mpn_addmul_1(res + 10, u, n, v[10]);
+    res[n + 11] = mpn_addmul_1(res + 11, u, n, v[11]);
+    return res[n + 11];
+}
+
+static mp_limb_t _flint_mpn_mul_n_13(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
+{
+    flint_mpn_mul_func_tab[n][8](res, u, v);
+    res[n + 8] = mpn_addmul_1(res + 8, u, n, v[8]);
+    res[n + 9] = mpn_addmul_1(res + 9, u, n, v[9]);
+    res[n + 10] = mpn_addmul_1(res + 10, u, n, v[10]);
+    res[n + 11] = mpn_addmul_1(res + 11, u, n, v[11]);
+    res[n + 12] = mpn_addmul_1(res + 12, u, n, v[12]);
+    return res[n + 12];
+}
+
+static mp_limb_t _flint_mpn_mul_n_14(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
+{
+    flint_mpn_mul_func_tab[n][8](res, u, v);
+    res[n + 8] = mpn_addmul_1(res + 8, u, n, v[8]);
+    res[n + 9] = mpn_addmul_1(res + 9, u, n, v[9]);
+    res[n + 10] = mpn_addmul_1(res + 10, u, n, v[10]);
+    res[n + 11] = mpn_addmul_1(res + 11, u, n, v[11]);
+    res[n + 12] = mpn_addmul_1(res + 12, u, n, v[12]);
+    res[n + 13] = mpn_addmul_1(res + 13, u, n, v[13]);
+    return res[n + 13];
+}
+
+mp_limb_t flint_mpn_mul_9_9(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_9(res, u, v, 9); }
+mp_limb_t flint_mpn_mul_10_9(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_9(res, u, v, 10); }
+mp_limb_t flint_mpn_mul_11_9(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_9(res, u, v, 11); }
+mp_limb_t flint_mpn_mul_12_9(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_9(res, u, v, 12); }
+mp_limb_t flint_mpn_mul_13_9(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_9(res, u, v, 13); }
+mp_limb_t flint_mpn_mul_14_9(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_9(res, u, v, 14); }
+mp_limb_t flint_mpn_mul_15_9(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_9(res, u, v, 15); }
+mp_limb_t flint_mpn_mul_16_9(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_9(res, u, v, 16); }
+
+mp_limb_t flint_mpn_mul_10_10(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_10(res, u, v, 10); }
+mp_limb_t flint_mpn_mul_11_10(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_10(res, u, v, 11); }
+mp_limb_t flint_mpn_mul_12_10(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_10(res, u, v, 12); }
+mp_limb_t flint_mpn_mul_13_10(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_10(res, u, v, 13); }
+mp_limb_t flint_mpn_mul_14_10(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_10(res, u, v, 14); }
+mp_limb_t flint_mpn_mul_15_10(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_10(res, u, v, 15); }
+mp_limb_t flint_mpn_mul_16_10(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_10(res, u, v, 16); }
+
+mp_limb_t flint_mpn_mul_11_11(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_11(res, u, v, 11); }
+mp_limb_t flint_mpn_mul_12_11(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_11(res, u, v, 12); }
+mp_limb_t flint_mpn_mul_13_11(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_11(res, u, v, 13); }
+mp_limb_t flint_mpn_mul_14_11(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_11(res, u, v, 14); }
+mp_limb_t flint_mpn_mul_15_11(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_11(res, u, v, 15); }
+mp_limb_t flint_mpn_mul_16_11(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_11(res, u, v, 16); }
+
+mp_limb_t flint_mpn_mul_12_12(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_12(res, u, v, 12); }
+mp_limb_t flint_mpn_mul_13_12(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_12(res, u, v, 13); }
+mp_limb_t flint_mpn_mul_14_12(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_12(res, u, v, 14); }
+mp_limb_t flint_mpn_mul_15_12(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_12(res, u, v, 15); }
+mp_limb_t flint_mpn_mul_16_12(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_12(res, u, v, 16); }
+
+mp_limb_t flint_mpn_mul_13_13(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_13(res, u, v, 13); }
+mp_limb_t flint_mpn_mul_14_13(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_13(res, u, v, 14); }
+mp_limb_t flint_mpn_mul_15_13(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_13(res, u, v, 15); }
+mp_limb_t flint_mpn_mul_16_13(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_13(res, u, v, 16); }
+
+mp_limb_t flint_mpn_mul_14_14(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_14(res, u, v, 14); }
+mp_limb_t flint_mpn_mul_15_14(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_14(res, u, v, 15); }
+mp_limb_t flint_mpn_mul_16_14(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_14(res, u, v, 16); }
+
+
+mp_limb_t flint_mpn_mul_15_15(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t tmp[22], cy;
+    flint_mpn_mul_15_8(res, u, v);
+    flint_mpn_mul_15_7(tmp, u, v + 8);
+    cy = mpn_add_n(res + 8, res + 8, tmp, 15);
+    mpn_add_1(res + 23, tmp + 15, 7, cy);
+    return res[29];
+}
+
+mp_limb_t flint_mpn_mul_16_15(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t tmp[23], cy;
+    flint_mpn_mul_16_8(res, u, v);
+    flint_mpn_mul_16_7(tmp, u, v + 8);
+    cy = mpn_add_n(res + 8, res + 8, tmp, 16);
+    mpn_add_1(res + 24, tmp + 16, 7, cy);
+    return res[30];
+}
+
+mp_limb_t flint_mpn_mul_16_16(mp_ptr res, mp_srcptr u, mp_srcptr v)
+{
+    mp_limb_t tmp[24], cy;
+    flint_mpn_mul_16_8(res, u, v);
+    flint_mpn_mul_16_8(tmp, u, v + 8);
+    cy = mpn_add_n(res + 8, res + 8, tmp, 16);
+    mpn_add_1(res + 24, tmp + 16, 8, cy);
+    return res[31];
+}
+
 #else
 
 mp_limb_t flint_mpn_mul_1_1(mp_ptr res, mp_srcptr u, mp_srcptr v)
@@ -645,23 +772,23 @@ mp_limb_t flint_mpn_mul_14_1(mp_ptr res, mp_srcptr u, mp_srcptr v)
 #if FLINT_HAVE_ADX
 
 const flint_mpn_mul_func_t flint_mpn_mul_func_tab[][FLINT_MPN_MUL_FUNC_TAB_WIDTH] = {
-    {NULL, NULL,           NULL,      NULL,      NULL,      NULL,      NULL,      NULL,      NULL},
-    {NULL, MUL( 1,1),      NULL,      NULL,      NULL,      NULL,      NULL,      NULL,      NULL},
-    {NULL, MUL( 2,1), MUL( 2,2),      NULL,      NULL,      NULL,      NULL,      NULL,      NULL},
-    {NULL, MUL( 3,1), MUL( 3,2), MUL( 3,3),      NULL,      NULL,      NULL,      NULL,      NULL},
-    {NULL, MUL( 4,1), MUL( 4,2), MUL( 4,3), MUL( 4,4),      NULL,      NULL,      NULL,      NULL},
-    {NULL, MUL( 5,1), MUL( 5,2), MUL( 5,3), MUL( 5,4), MUL( 5,5),      NULL,      NULL,      NULL},
-    {NULL, MUL( 6,1), MUL( 6,2), MUL( 6,3), MUL( 6,4), MUL( 6,5), MUL( 6,6),      NULL,      NULL},
-    {NULL, MUL( 7,1), MUL( 7,2), MUL( 7,3), MUL( 7,4), MUL( 7,5), MUL( 7,6), MUL( 7,7),      NULL},
-    {NULL, MUL( 8,1), MUL( 8,2), MUL( 8,3), MUL( 8,4), MUL( 8,5), MUL( 8,6), MUL( 8,7), MUL( 8,8)},
-    {NULL, MUL( 9,1), MUL( 9,2), MUL( 9,3), MUL( 9,4), MUL( 9,5), MUL( 9,6), MUL( 9,7), MUL( 9,8)},
-    {NULL, MUL(10,1), MUL(10,2), MUL(10,3), MUL(10,4), MUL(10,5), MUL(10,6), MUL(10,7), MUL(10,8)},
-    {NULL, MUL(11,1), MUL(11,2), MUL(11,3), MUL(11,4), MUL(11,5), MUL(11,6), MUL(11,7), MUL(11,8)},
-    {NULL, MUL(12,1), MUL(12,2), MUL(12,3), MUL(12,4), MUL(12,5), MUL(12,6), MUL(12,7), MUL(12,8)},
-    {NULL, MUL(13,1), MUL(13,2), MUL(13,3), MUL(13,4), MUL(13,5), MUL(13,6), MUL(13,7), MUL(13,8)},
-    {NULL, MUL(14,1), MUL(14,2), MUL(14,3), MUL(14,4), MUL(14,5), MUL(14,6), MUL(14,7), MUL(14,8)},
-    {NULL, MUL(15,1), MUL(15,2), MUL(15,3), MUL(15,4), MUL(15,5), MUL(15,6), MUL(15,7), MUL(15,8)},
-    {NULL, MUL(16,1), MUL(16,2), MUL(16,3), MUL(16,4), MUL(16,5), MUL(16,6), MUL(16,7), MUL(16,8)},
+    {NULL, NULL,           NULL,      NULL,      NULL,      NULL,      NULL,      NULL,      NULL,      NULL,       NULL,       NULL,       NULL,       NULL,       NULL,       NULL,       NULL},
+    {NULL, MUL( 1,1),      NULL,      NULL,      NULL,      NULL,      NULL,      NULL,      NULL,      NULL,       NULL,       NULL,       NULL,       NULL,       NULL,       NULL,       NULL},
+    {NULL, MUL( 2,1), MUL( 2,2),      NULL,      NULL,      NULL,      NULL,      NULL,      NULL,      NULL,       NULL,       NULL,       NULL,       NULL,       NULL,       NULL,       NULL},
+    {NULL, MUL( 3,1), MUL( 3,2), MUL( 3,3),      NULL,      NULL,      NULL,      NULL,      NULL,      NULL,       NULL,       NULL,       NULL,       NULL,       NULL,       NULL,       NULL},
+    {NULL, MUL( 4,1), MUL( 4,2), MUL( 4,3), MUL( 4,4),      NULL,      NULL,      NULL,      NULL,      NULL,       NULL,       NULL,       NULL,       NULL,       NULL,       NULL,       NULL},
+    {NULL, MUL( 5,1), MUL( 5,2), MUL( 5,3), MUL( 5,4), MUL( 5,5),      NULL,      NULL,      NULL,      NULL,       NULL,       NULL,       NULL,       NULL,       NULL,       NULL,       NULL},
+    {NULL, MUL( 6,1), MUL( 6,2), MUL( 6,3), MUL( 6,4), MUL( 6,5), MUL( 6,6),      NULL,      NULL,      NULL,       NULL,       NULL,       NULL,       NULL,       NULL,       NULL,       NULL},
+    {NULL, MUL( 7,1), MUL( 7,2), MUL( 7,3), MUL( 7,4), MUL( 7,5), MUL( 7,6), MUL( 7,7),      NULL,      NULL,       NULL,       NULL,       NULL,       NULL,       NULL,       NULL,       NULL},
+    {NULL, MUL( 8,1), MUL( 8,2), MUL( 8,3), MUL( 8,4), MUL( 8,5), MUL( 8,6), MUL( 8,7), MUL( 8,8),      NULL,       NULL,       NULL,       NULL,       NULL,       NULL,       NULL,       NULL},
+    {NULL, MUL( 9,1), MUL( 9,2), MUL( 9,3), MUL( 9,4), MUL( 9,5), MUL( 9,6), MUL( 9,7), MUL( 9,8), MUL( 9,9),       NULL,       NULL,       NULL,       NULL,       NULL,       NULL,       NULL},
+    {NULL, MUL(10,1), MUL(10,2), MUL(10,3), MUL(10,4), MUL(10,5), MUL(10,6), MUL(10,7), MUL(10,8), MUL(10,9), MUL(10,10),       NULL,       NULL,       NULL,       NULL,       NULL,       NULL},
+    {NULL, MUL(11,1), MUL(11,2), MUL(11,3), MUL(11,4), MUL(11,5), MUL(11,6), MUL(11,7), MUL(11,8), MUL(11,9), MUL(11,10), MUL(11,11),       NULL,       NULL,       NULL,       NULL,       NULL},
+    {NULL, MUL(12,1), MUL(12,2), MUL(12,3), MUL(12,4), MUL(12,5), MUL(12,6), MUL(12,7), MUL(12,8), MUL(12,9), MUL(12,10), MUL(12,11), MUL(12,12),       NULL,       NULL,       NULL,       NULL},
+    {NULL, MUL(13,1), MUL(13,2), MUL(13,3), MUL(13,4), MUL(13,5), MUL(13,6), MUL(13,7), MUL(13,8), MUL(13,9), MUL(13,10), MUL(13,11), MUL(13,12), MUL(13,13),       NULL,       NULL,       NULL},
+    {NULL, MUL(14,1), MUL(14,2), MUL(14,3), MUL(14,4), MUL(14,5), MUL(14,6), MUL(14,7), MUL(14,8), MUL(14,9), MUL(14,10), MUL(14,11), MUL(14,12), MUL(14,13), MUL(14,14),       NULL,       NULL},
+    {NULL, MUL(15,1), MUL(15,2), MUL(15,3), MUL(15,4), MUL(15,5), MUL(15,6), MUL(15,7), MUL(15,8), MUL(15,9), MUL(15,10), MUL(15,11), MUL(15,12), MUL(15,13), MUL(15,14), MUL(15,15),       NULL},
+    {NULL, MUL(16,1), MUL(16,2), MUL(16,3), MUL(16,4), MUL(16,5), MUL(16,6), MUL(16,7), MUL(16,8), MUL(16,9), MUL(16,10), MUL(16,11), MUL(16,12), MUL(16,13), MUL(16,14), MUL(16,15), MUL(16,16)},
 };
 
 const flint_mpn_mul_func_t flint_mpn_mul_n_func_tab[] = {
@@ -674,6 +801,14 @@ const flint_mpn_mul_func_t flint_mpn_mul_n_func_tab[] = {
     MUL( 6, 6),
     MUL( 7, 7),
     MUL( 8, 8),
+    MUL( 9, 9),
+    MUL( 10, 10),
+    MUL( 11, 11),
+    MUL( 12, 12),
+    MUL( 13, 13),
+    MUL( 14, 14),
+    MUL( 15, 15),
+    MUL( 16, 16),
 };
 
 #else
