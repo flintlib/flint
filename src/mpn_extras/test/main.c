@@ -23,6 +23,7 @@
 #include "t-mul.c"
 #include "t-mul_n.c"
 #include "t-mul_basecase.c"
+#include "t-mul_toom22.c"
 #include "t-mulhigh_basecase.c"
 #include "t-mulhigh_n.c"
 #include "t-mulhigh_normalised_n.c"
@@ -46,6 +47,7 @@ test_struct tests[] =
     TEST_FUNCTION(flint_mpn_mul),
     TEST_FUNCTION(flint_mpn_mul_n),
     TEST_FUNCTION(flint_mpn_mul_basecase),
+    TEST_FUNCTION(flint_mpn_mul_toom22),
     TEST_FUNCTION(flint_mpn_mulhigh_basecase),
     TEST_FUNCTION(flint_mpn_mulhigh_n),
     TEST_FUNCTION(flint_mpn_mulhigh_normalised_n),
