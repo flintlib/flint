@@ -56,6 +56,10 @@ mp_limb_t _flint_mpn_mul(mp_ptr r, mp_srcptr x, mp_size_t xn, mp_srcptr y, mp_si
         __gmpn_mul_basecase(r, x, xn, y, yn);
     else if (yn == 1)
         r[xn + yn - 1] = mpn_mul_1(r, x, xn, y[0]);
+#if FLINT_HAVE_ADX
+    else if (yn <= 230 && 5 * yn >= 4 * xn)
+        flint_mpn_mul_toom22(r, x, xn, y, yn, NULL);
+#endif
     else if (yn < FLINT_FFT_MUL_THRESHOLD)
         mpn_mul(r, x, xn, y, yn);
     else
@@ -69,6 +73,10 @@ void _flint_mpn_mul_n(mp_ptr r, mp_srcptr x, mp_srcptr y, mp_size_t n)
     /* GMP's MUL_TOOM22_THRESHOLD is >= 16 on most machines */
     if (n <= 16)
         __gmpn_mul_basecase(r, x, n, y, n);
+#if FLINT_HAVE_ADX
+    else if (n <= 230)
+        flint_mpn_mul_toom22(r, x, n, y, n, NULL);
+#endif
     else if (n < FLINT_FFT_MUL_THRESHOLD)
         mpn_mul_n(r, x, y, n);
     else

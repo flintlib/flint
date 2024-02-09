@@ -154,6 +154,8 @@ FLINT_DLL extern const flint_mpn_sqr_func_t flint_mpn_sqr_func_tab[];
 mp_limb_t flint_mpn_mul_basecase(mp_ptr r, mp_srcptr x, mp_srcptr y, mp_size_t xn, mp_size_t yn);
 mp_limb_t flint_mpn_sqr_basecase(mp_ptr r, mp_srcptr x, mp_size_t n);
 
+void flint_mpn_mul_toom22(mp_ptr pp, mp_srcptr ap, mp_size_t an, mp_srcptr bp, mp_size_t bn, mp_ptr scratch);
+
 mp_limb_t _flint_mpn_mul(mp_ptr r, mp_srcptr x, mp_size_t xn, mp_srcptr y, mp_size_t yn);
 void _flint_mpn_mul_n(mp_ptr r, mp_srcptr x, mp_srcptr y, mp_size_t n);
 void _flint_mpn_sqr(mp_ptr r, mp_srcptr x, mp_size_t n);
