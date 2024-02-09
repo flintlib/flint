@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "gr_sparse_vec.h"
 
 typedef struct
@@ -5,7 +6,7 @@ typedef struct
     slong col;
     slong i;
 }
-gr_sparse_vec_slong_sorter_t
+gr_sparse_vec_slong_sorter_t;
 
 static int gr_sparse_vec_slong_sort(const void* a, const void* b)
 {
@@ -17,7 +18,7 @@ static int gr_sparse_vec_slong_sort(const void* a, const void* b)
 
 
 int
-gr_sparse_vec_set_from_entries(gr_sparse_vec_t vec, slong * cols, gr_srcptr entries, slong nnz)
+gr_sparse_vec_set_from_entries(gr_sparse_vec_t vec, slong * cols, gr_srcptr entries, slong nnz, gr_ctx_t ctx)
 {
     slong i,j,sz,new_nnz;
     int status;
@@ -41,7 +42,7 @@ gr_sparse_vec_set_from_entries(gr_sparse_vec_t vec, slong * cols, gr_srcptr entr
         if (si[i-1].col != si[i].col)
             new_nnz += 1;
     }
-    gr_sparse_vec_fit_nnz(vec, new_nnz, ctz);
+    gr_sparse_vec_fit_nnz(vec, new_nnz, ctx);
     sz = ctx->sizeof_elem;
     status = GR_SUCCESS;
     j = -1;
@@ -50,7 +51,7 @@ gr_sparse_vec_set_from_entries(gr_sparse_vec_t vec, slong * cols, gr_srcptr entr
         /* If it's a new column, do a set; otherwise do an accumulate */
         if (i == 0 || si[i-1].col != si[i].col)
         {
-            if (j == -1 || (T_FALSE == gr_is_zero(vec->entries, j, sz))) /* Only move to the next target if the current one is nonzero */
+            if (j == -1 || (T_TRUE != gr_is_zero(GR_ENTRY(vec->entries, j, sz), ctx))) /* Only move to the next target if the current one is nonzero */
             {
                 j++;
                 if (j >= new_nnz)
@@ -66,7 +67,7 @@ gr_sparse_vec_set_from_entries(gr_sparse_vec_t vec, slong * cols, gr_srcptr entr
         {
             if (vec->cols[j] != cols[si[i].i]) /* Consistency check that we're accumulating into the correct column */
                 status |= GR_UNABLE;
-            status |= gr_add(GR_ENTRY(vec->entries, j, sz), GR_ENTRY(entries, si[i].i, sz), ctx);
+            status |= gr_add(GR_ENTRY(vec->entries, j, sz), GR_ENTRY(vec->entries, j, sz), GR_ENTRY(entries, si[i].i, sz), ctx);
         }
     }
     vec->nnz = j;
@@ -75,11 +76,11 @@ gr_sparse_vec_set_from_entries(gr_sparse_vec_t vec, slong * cols, gr_srcptr entr
 }
 
 int
-gr_sparse_vec_set_from_entries_sorted_deduped(gr_sparse_vec_t vec, slong * sorted_dedup_cols, gr_srcptr entries, slong nnz)
+gr_sparse_vec_set_from_entries_sorted_deduped(gr_sparse_vec_t vec, slong * sorted_deduped_cols, gr_srcptr entries, slong nnz, gr_ctx_t ctx)
 {
     slong i,j,sz;
     int status;
-    gr_sparse_vec_fit_nnz(vec, nnz, ctz);
+    gr_sparse_vec_fit_nnz(vec, nnz, ctx);
     sz = ctx->sizeof_elem;
     j = 0;
     status = GR_SUCCESS;

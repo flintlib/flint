@@ -1,9 +1,10 @@
 #include "gr_sparse_vec.h"
 
 int
-gr_sparse_vec_to_dense(gr_ptr vec, gr_sparse_vec_t src, gr_ctx_t ctx);
+gr_sparse_vec_to_dense(gr_ptr vec, gr_sparse_vec_t src, gr_ctx_t ctx)
 {
-    slong i,j,sz,status,len;
+    slong i,j,sz,nnz,status,len;
+    status = GR_SUCCESS;
     sz = ctx->sizeof_elem;
     len = src->length;
     nnz = src->nnz;

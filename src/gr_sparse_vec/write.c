@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "gr_sparse_vec.h"
 
 int
@@ -9,10 +10,12 @@ gr_sparse_vec_write_nz(gr_stream_t out, const gr_sparse_vec_t vec, gr_ctx_t ctx)
     gr_stream_write(out, "gr_sparse_vec_t{");
     for (i = 0; i < nnz; i++)
     {
-        gr_stream_write(out, "(%ld: ", vec->cols[i]);
+        gr_stream_write(out, "(");
+        gr_stream_write_si(out, vec->cols[i]);
+        gr_stream_write(out, ": ");
         status |= gr_write(out, GR_ENTRY(vec->entries, i, sz), ctx);
-        gr_stream_write(out, ")", vec->cols[i]);
-        if (i < len - 1)
+        gr_stream_write(out, ")");
+        if (i < nnz - 1)
             gr_stream_write(out, ", ");
     }
     gr_stream_write(out, "}");

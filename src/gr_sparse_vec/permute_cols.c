@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "gr_sparse_vec.h"
 
 typedef struct
@@ -5,7 +6,7 @@ typedef struct
     slong col;
     slong i;
 }
-gr_sparse_vec_slong_sorter_t
+gr_sparse_vec_slong_sorter_t;
 
 static int gr_sparse_vec_slong_sort(const void* a, const void* b)
 {
@@ -17,7 +18,7 @@ static int gr_sparse_vec_slong_sort(const void* a, const void* b)
 int
 gr_sparse_vec_permute_cols(gr_sparse_vec_t vec, const gr_sparse_vec_t src, slong * p, gr_ctx_t ctx)
 {
-    slong i,j,sz,nnz;
+    slong i,sz,nnz;
     int status = GR_SUCCESS;
     gr_sparse_vec_slong_sorter_t *si;
     if (vec == src)
@@ -26,7 +27,7 @@ gr_sparse_vec_permute_cols(gr_sparse_vec_t vec, const gr_sparse_vec_t src, slong
         GR_MUST_SUCCEED(gr_sparse_vec_init(temp, src->length, ctx));
         GR_MUST_SUCCEED(gr_sparse_vec_set(temp, src, ctx));
         status |= gr_sparse_vec_permute_cols(temp, src, p, ctx);
-        status |= gr_sparse_set(vec, temp, ctx);
+        status |= gr_sparse_vec_set(vec, temp, ctx);
         status |= gr_sparse_vec_clear(temp, ctx);
         return status;
     }

@@ -3,10 +3,11 @@
 int
 gr_sparse_vec_slice(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong col_start, slong col_end, gr_ctx_t ctx)
 {
-    slong sz,i,nnz, i_start, i_end, status;
+    slong sz,i,nnz, new_nnz, i_start, i_end, status;
     nnz = src->nnz;
     sz = ctx->sizeof_elem;
     i_start = 0;
+    i_end = nnz;
     status = GR_SUCCESS;
     for (i = 0; i < nnz; i++)
     {

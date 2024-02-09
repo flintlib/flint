@@ -18,6 +18,7 @@
 #define GR_SPARSE_VEC_INLINE static __inline__
 #endif
 
+#include <string.h>
 #include "gr.h"
 #include "gr_vec.h"
 
@@ -72,15 +73,15 @@ GR_SPARSE_VEC_INLINE slong gr_sparse_vec_nnz(const gr_sparse_vec_t vec) { return
 
 WARN_UNUSED_RESULT int gr_sparse_vec_set(gr_sparse_vec_t res, const gr_sparse_vec_t src, gr_ctx_t ctx);
 
-WARN_UNUSED_RESULT int gr_sparse_vec_set_from_entries(gr_sparse_vec_t vec, slong * cols, gr_srcptr entries, slong nnz);
-WARN_UNUSED_RESULT int gr_sparse_vec_set_from_entries_sorted_deduped(gr_sparse_vec_t vec, slong * sorted_cols, gr_srcptr entries, slong nnz);
+WARN_UNUSED_RESULT int gr_sparse_vec_set_from_entries(gr_sparse_vec_t vec, slong * cols, gr_srcptr entries, slong nnz, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_sparse_vec_set_from_entries_sorted_deduped(gr_sparse_vec_t vec, slong * sorted_deduped_cols, gr_srcptr entries, slong nnz, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_sparse_vec_from_dense(gr_sparse_vec_t vec, gr_srcptr src, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_sparse_vec_to_dense(gr_ptr vec, gr_sparse_vec_t src, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_sparse_vec_slice(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong col_start, slong col_end, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_sparse_vec_permute_cols(gr_sparse_vec_t vec, const gr_sparse_vec_t src, slong * p, gr_ctx_t ctx);
 
 truth_t gr_sparse_vec_equal(const gr_sparse_vec_t vec1, const gr_sparse_vec_t vec2, gr_ctx_t ctx);
-GR_SPARSE_VEC_INLINE truth_t gr_sparse_vec_is_zero(const gr_sparse_vec_t vec, gr_ctx_t ctx) { return (vec->nnz == 0 ? T_TRUE ? T_FALSE); }
+GR_SPARSE_VEC_INLINE truth_t gr_sparse_vec_is_zero(const gr_sparse_vec_t vec, gr_ctx_t ctx) { return (vec->nnz == 0 ? T_TRUE : T_FALSE); }
 GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_zero(gr_sparse_vec_t vec, gr_ctx_t ctx) { vec->nnz = 0; return GR_SUCCESS; }
 
 int gr_sparse_vec_write_nz(gr_stream_t out, const gr_sparse_vec_t vec, gr_ctx_t ctx);
@@ -94,12 +95,12 @@ slong _gr_sparse_vec_count_unique_cols(const ulong *cols0, slong nnz0, const ulo
 
 
 
-#define GR_SPV_SWAP_INDS(VEC, I, J, CTX) \
-{                                        \
-    slong _temp = (VEC)->cols[I];        \
-    (VEC)->cols[I] = (VEC)->cols[J];     \
-    (VEC)->cols[J] = _temp;              \
-    gr_swap(GR_ENTRY((VEC)->entries, (I), ctx), GR_ENTRY((VEC)->entries, (J), ctx), ctx); \
+#define GR_SPV_SWAP_INDS(VEC, I, J, SZ, CTX) \
+{                                            \
+    slong _temp = (VEC)->cols[I];            \
+    (VEC)->cols[I] = (VEC)->cols[J];         \
+    (VEC)->cols[J] = _temp;                  \
+    gr_swap(GR_ENTRY((VEC)->entries, (I), (SZ)), GR_ENTRY((VEC)->entries, (J), (SZ)), (CTX)); \
 }
 
 
@@ -142,7 +143,7 @@ slong _gr_sparse_vec_count_unique_cols(const ulong *cols0, slong nnz0, const ulo
             a_ind--;                                                                                    \
             b_ind--;                                                                                    \
         }                                                                                               \
-        if (T_FALSE == gr_is_zero(GR_ENTRY((DEST_VEC)->entries, dest_ind, sz)))                         \
+        if (T_TRUE != gr_is_zero(GR_ENTRY((DEST_VEC)->entries, dest_ind, sz), (CTX)))                   \
             dest_ind--;                                                                                 \
     }                                                                                                   \
     /* Move the result to the beginning of the dest vec */                                              \
@@ -152,7 +153,7 @@ slong _gr_sparse_vec_count_unique_cols(const ulong *cols0, slong nnz0, const ulo
         new_nnz = (new_nnz-1) - dest_ind;                                                               \
         dest_ind++;                                                                                     \
         for (i = 0; i < new_nnz; i++)                                                                   \
-            GR_SPV_SWAP_INDS(DEST_VEC, i, dest_ind + i, CTX);                                           \
+            GR_SPV_SWAP_INDS(DEST_VEC, i, dest_ind + i, sz, CTX);                                       \
     }                                                                                                   \
     (DEST_VEC)->nnz = new_nnz;                                                                          \
     return status;
@@ -161,25 +162,25 @@ GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_neg_other(gr_ptr res, gr_srcptr s
 GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_negmul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return (gr_mul(res, x, y, ctx) | gr_neg(res, res, ctx)); }
 GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_negmul_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx) { return (gr_mul_si(res, x, y, ctx) | gr_neg(res, res, ctx)); }
 
-#define GR_SPV_RFL_UOP(F, Y, Y_ind) F(GR_ENTRY(res->entries, dest_ptr, sz), GR_ENTRY(Y->entries, Y_ind, sz), ctx)
-#define GR_SPV_RFL_BOP(F, Y, Y_ind, Z, Z_ind) F(GR_ENTRY(res->entries, dest_ptr, sz), GR_ENTRY(Y->entries, Y_ind, sz), GR_ENTRY(Z->entries, Z_ind, sz), ctx)
+#define GR_SPV_RFL_UOP(F, Y, Y_ind) F(GR_ENTRY(res->entries, dest_ind, sz), GR_ENTRY(Y->entries, Y_ind, sz), ctx)
+#define GR_SPV_RFL_BOP(F, Y, Y_ind, Z, Z_ind) F(GR_ENTRY(res->entries, dest_ind, sz), GR_ENTRY(Y->entries, Y_ind, sz), GR_ENTRY(Z->entries, Z_ind, sz), ctx)
 
 GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_update(gr_sparse_vec_t res, const gr_sparse_vec_t src, gr_ctx_t ctx) { GR_SPV_RFL_TEMPLATE(GR_SPV_RFL_UOP(gr_set, res, a_ind), GR_SPV_RFL_UOP(gr_set, src, b_ind), GR_SPV_RFL_UOP(gr_set, src, b_ind), res, res, src, ctx); }
 GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_add(gr_sparse_vec_t res, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, slong len, gr_ctx_t ctx) { GR_SPV_RFL_TEMPLATE(GR_SPV_RFL_UOP(gr_set, src1, a_ind), GR_SPV_RFL_UOP(gr_set, src2, b_ind), GR_SPV_RFL_BOP(gr_add, src1, a_ind, src2, b_ind), res, src1, src2, ctx); }
 GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_sub(gr_sparse_vec_t res, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, slong len, gr_ctx_t ctx) { GR_SPV_RFL_TEMPLATE(GR_SPV_RFL_UOP(gr_set, src1, a_ind), GR_SPV_RFL_UOP(gr_neg, src2, b_ind), GR_SPV_RFL_BOP(gr_sub, src1, a_ind, src2, b_ind), res, src1, src2, ctx); }
 
-#define GR_SPV_RFL_UOP_OTHER(F, Y, Y_ind, CTX2) F(GR_ENTRY(res->entries, dest_ptr, sz), GR_ENTRY(Y->entries, Y_ind, CTX2->sizeof_elem), CTX2, ctx)
-#define GR_SPV_RFL_BOP_OTHER(F, Y, Y_ind, Z, Z_ind, CTX2) F(GR_ENTRY(res->entries, dest_ptr, sz), GR_ENTRY(Y->entries, Y_ind, sz), GR_ENTRY(Z->entries, Z_ind, CTX2->sizeof_elem), CTX2, ctx)
+#define GR_SPV_RFL_UOP_OTHER(F, Y, Y_ind, CTX2) F(GR_ENTRY(res->entries, dest_ind, sz), GR_ENTRY(Y->entries, Y_ind, CTX2->sizeof_elem), CTX2, ctx)
+#define GR_SPV_RFL_BOP_OTHER(F, Y, Y_ind, Z, Z_ind, CTX2) F(GR_ENTRY(res->entries, dest_ind, sz), GR_ENTRY(Y->entries, Y_ind, sz), GR_ENTRY(Z->entries, Z_ind, CTX2->sizeof_elem), CTX2, ctx)
 
-GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_add_other(gr_sparse_vec_t res, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, gr_ctx_t ctx2, gr_ctx_t ctx) { GR_SPV_RFL_TEMPLATE(GR_SPV_RFL_UOP(gr_set, src1, a_ind), GR_SPV_RFL_UOP_OTHER(gr_set, src2, b_ind, ctx2), GR_SPV_RFL_BOP_OTHER(gr_add, src1, a_ind, src2, b_ind, ctx2), res, src1, src2, ctx); }
-GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_sub_other(gr_sparse_vec_t res, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, gr_ctx_t ctx2, gr_ctx_t ctx) { GR_SPV_RFL_TEMPLATE(GR_SPV_RFL_UOP(gr_set, src1, a_ind), GR_SPV_RFL_UOP_OTHER(gr_neg_other, src2, a_ind, ctx2), GR_SPV_RFL_BOP_OTHER(gr_sub, src1, a_ind, src2, b_ind, ctx2), res, src1, src2, ctx); }
+GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_add_other(gr_sparse_vec_t res, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, gr_ctx_t ctx2, gr_ctx_t ctx) { GR_SPV_RFL_TEMPLATE(GR_SPV_RFL_UOP(gr_set, src1, a_ind), GR_SPV_RFL_UOP_OTHER(gr_set_other, src2, b_ind, ctx2), GR_SPV_RFL_BOP_OTHER(gr_add_other, src1, a_ind, src2, b_ind, ctx2), res, src1, src2, ctx); }
+GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_sub_other(gr_sparse_vec_t res, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, gr_ctx_t ctx2, gr_ctx_t ctx) { GR_SPV_RFL_TEMPLATE(GR_SPV_RFL_UOP(gr_set, src1, a_ind), GR_SPV_RFL_UOP_OTHER(gr_neg_other, src2, a_ind, ctx2), GR_SPV_RFL_BOP_OTHER(gr_sub_other, src1, a_ind, src2, b_ind, ctx2), res, src1, src2, ctx); }
 
-#define GR_SPV_RFL_OTHER_BOP(F, Y, Y_ind, CTX2, Z, Z_ind) F(GR_ENTRY(res->entries, dest_ptr, sz), GR_ENTRY(Y->entries, Y_ind, CTX2->sizeof_elem), GR_ENTRY(Z->entries, Z_ind, sz), ctx)
+#define GR_SPV_RFL_OTHER_BOP(F, Y, Y_ind, CTX2, Z, Z_ind) F(GR_ENTRY(res->entries, dest_ind, sz), GR_ENTRY(Y->entries, Y_ind, CTX2->sizeof_elem), (CTX2), GR_ENTRY(Z->entries, Z_ind, sz), ctx)
 
 GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_other_add_sparse_vec(gr_sparse_vec_t res, const gr_sparse_vec_t src1, gr_ctx_t ctx1, const gr_sparse_vec_t src2, gr_ctx_t ctx) { GR_SPV_RFL_TEMPLATE(GR_SPV_RFL_UOP_OTHER(gr_set_other, src1, a_ind, ctx1), GR_SPV_RFL_UOP(gr_set, src2, b_ind), GR_SPV_RFL_OTHER_BOP(gr_other_add, src1, a_ind, ctx1, src2, b_ind), res, src1, src2, ctx); }
 GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_other_sub_sparse_vec(gr_sparse_vec_t res, const gr_sparse_vec_t src1, gr_ctx_t ctx1, const gr_sparse_vec_t src2, gr_ctx_t ctx) { GR_SPV_RFL_TEMPLATE(GR_SPV_RFL_UOP_OTHER(gr_set_other, src1, a_ind, ctx1), GR_SPV_RFL_UOP(gr_neg, src2, b_ind), GR_SPV_RFL_OTHER_BOP(gr_other_sub, src1, a_ind, ctx1, src2, b_ind), res, src1, src2, ctx); }
 
-#define GR_SPV_RFL_UOP_SCALAR(F, Y, Y_ind) F(GR_ENTRY(res->entries, dest_ptr, sz), GR_ENTRY(Y->entries, Y_ind, sz), c, ctx)
+#define GR_SPV_RFL_UOP_SCALAR(F, Y, Y_ind) F(GR_ENTRY(res->entries, dest_ind, sz), GR_ENTRY(Y->entries, Y_ind, sz), c, ctx)
 
 GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_addmul_scalar(gr_sparse_vec_t res, const gr_sparse_vec_t src, gr_srcptr c, gr_ctx_t ctx) { GR_SPV_RFL_TEMPLATE(GR_SPV_RFL_UOP(gr_set, res, a_ind), GR_SPV_RFL_UOP_SCALAR(gr_mul, src, b_ind), GR_SPV_RFL_UOP_SCALAR(gr_addmul, src, b_ind), res, res, src, ctx); }
 GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_submul_scalar(gr_sparse_vec_t res, const gr_sparse_vec_t src, gr_srcptr c, gr_ctx_t ctx) { GR_SPV_RFL_TEMPLATE(GR_SPV_RFL_UOP(gr_set, res, a_ind), GR_SPV_RFL_UOP_SCALAR(gr_negmul, src, b_ind), GR_SPV_RFL_UOP_SCALAR(gr_submul, src, b_ind), res, res, src, ctx); }
@@ -205,38 +206,35 @@ GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_dot(gr_ptr res, gr_src
 
 
 
-#define GR_SPARSE_VEC_DENSE_VEC_OP(dense_vec_op, res, src, c, ctx) \
-{  \
-    if(res->length != src->length) \
-    { \
-        return GR_DOMAIN; \
-    } \
-    if(res != src) { \
-    { \
-        gr_sparse_vec_fit_nnz(res, src->nnz, ctx); \
-        res->nnz = src->nnz; \
-        memcopy(res->cols, src->cols, nnz*sizeof(slong)); \
-
-    } \
+#define GR_SPARSE_VEC_DENSE_VEC_OP(dense_vec_op, res, src, c, ctx)     \
+    if(res->length != src->length)                                     \
+    {                                                                  \
+        return GR_DOMAIN;                                              \
+    }                                                                  \
+    if(res != src)                                                     \
+    {                                                                  \
+        gr_sparse_vec_fit_nnz(res, src->nnz, ctx);                     \
+        res->nnz = src->nnz;                                           \
+        memcpy(res->cols, src->cols, src->nnz*sizeof(slong));          \
+    }                                                                  \
     return dense_vec_op(res->entries, src->entries, src->nnz, c, ctx); \
-}
 
-int gr_sparse_vec_mul_scalar(gr_sparse_vec_t res, const gr_sparse_vec_t src, gr_srcptr c, gr_ctx_t ctx) { GR_SPARSE_VEC_DENSE_VEC_OP(_gr_vec_mul_scalar, res, src, c, ctx) } 
-int gr_sparse_vec_mul_scalar_si(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong c, gr_ctx_t ctx) { GR_SPARSE_VEC_DENSE_VEC_OP(_gr_vec_mul_scalar_si, res, src, c, ctx) }
-int gr_sparse_vec_mul_scalar_ui(gr_sparse_vec_t res, const gr_sparse_vec_t src, ulong c, gr_ctx_t ctx) { GR_SPARSE_VEC_DENSE_VEC_OP(_gr_vec_mul_scalar_ui, res, src, c, ctx) }
-int gr_sparse_vec_mul_scalar_fmpz(gr_sparse_vec_t res, const gr_sparse_vec_t src, const fmpz c, gr_ctx_t ctx) { GR_SPARSE_VEC_DENSE_VEC_OP(_gr_vec_mul_scalar_fmpz, res, src, c, ctx) }
-int gr_sparse_vec_mul_scalar_fmpq(gr_sparse_vec_t res, const gr_sparse_vec_t src, const fmpq c, gr_ctx_t ctx) { GR_SPARSE_VEC_DENSE_VEC_OP(_gr_vec_mul_scalar_fmpq, res, src, c, ctx) }
-int gr_sparse_vec_mul_scalar_2exp_si(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong c, gr_ctx_t ctx) { GR_SPARSE_VEC_DENSE_VEC_OP(_gr_vec_mul_scalar_2exp_si, res, src, c, ctx) }
-int gr_sparse_vec_div_scalar(gr_sparse_vec_t res, const gr_sparse_vec_t src, gr_srcptr c, gr_ctx_t ctx) { GR_SPARSE_VEC_DENSE_VEC_OP(_gr_vec_div_scalar, res, src, c, ctx) } 
-int gr_sparse_vec_div_scalar_si(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong c, gr_ctx_t ctx) { GR_SPARSE_VEC_DENSE_VEC_OP(_gr_vec_div_scalar_si, res, src, c, ctx) }
-int gr_sparse_vec_div_scalar_ui(gr_sparse_vec_t res, const gr_sparse_vec_t src, ulong c, gr_ctx_t ctx) { GR_SPARSE_VEC_DENSE_VEC_OP(_gr_vec_div_scalar_ui, res, src, c, ctx) }
-int gr_sparse_vec_div_scalar_fmpz(gr_sparse_vec_t res, const gr_sparse_vec_t src, const fmpz c, gr_ctx_t ctx) { GR_SPARSE_VEC_DENSE_VEC_OP(_gr_vec_div_scalar_fmpz, res, src, c, ctx) }
-int gr_sparse_vec_div_scalar_fmpq(gr_sparse_vec_t res, const gr_sparse_vec_t src, const fmpq c, gr_ctx_t ctx) { GR_SPARSE_VEC_DENSE_VEC_OP(_gr_vec_div_scalar_fmpq, res, src, c, ctx) }
-int gr_sparse_vec_divexact_scalar(gr_sparse_vec_t res, const gr_sparse_vec_t src, gr_srcptr c, gr_ctx_t ctx) { GR_SPARSE_VEC_DENSE_VEC_OP(_gr_vec_divexact_scalar, res, src, c, ctx) } 
-int gr_sparse_vec_divexact_scalar_si(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong c, gr_ctx_t ctx) { GR_SPARSE_VEC_DENSE_VEC_OP(_gr_vec_divexact_scalar_si, res, src, c, ctx) }
-int gr_sparse_vec_divexact_scalar_ui(gr_sparse_vec_t res, const gr_sparse_vec_t src, ulong c, gr_ctx_t ctx) { GR_SPARSE_VEC_DENSE_VEC_OP(_gr_vec_divexact_scalar_ui, res, src, c, ctx) }
-int gr_sparse_vec_divexact_scalar_fmpz(gr_sparse_vec_t res, const gr_sparse_vec_t src, const fmpz c, gr_ctx_t ctx) { GR_SPARSE_VEC_DENSE_VEC_OP(_gr_vec_divexact_scalar_fmpz, res, src, c, ctx) }
-int gr_sparse_vec_divexact_scalar_fmpq(gr_sparse_vec_t res, const gr_sparse_vec_t src, const fmpq c, gr_ctx_t ctx) { GR_SPARSE_VEC_DENSE_VEC_OP(_gr_vec_divexact_scalar_fmpq, res, src, c, ctx) }
+GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_mul_scalar(gr_sparse_vec_t res, const gr_sparse_vec_t src, gr_srcptr c, gr_ctx_t ctx) { GR_SPARSE_VEC_DENSE_VEC_OP(_gr_vec_mul_scalar, res, src, c, ctx) } 
+GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_mul_scalar_si(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong c, gr_ctx_t ctx) { GR_SPARSE_VEC_DENSE_VEC_OP(_gr_vec_mul_scalar_si, res, src, c, ctx) }
+GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_mul_scalar_ui(gr_sparse_vec_t res, const gr_sparse_vec_t src, ulong c, gr_ctx_t ctx) { GR_SPARSE_VEC_DENSE_VEC_OP(_gr_vec_mul_scalar_ui, res, src, c, ctx) }
+GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_mul_scalar_fmpz(gr_sparse_vec_t res, const gr_sparse_vec_t src, const fmpz_t c, gr_ctx_t ctx) { GR_SPARSE_VEC_DENSE_VEC_OP(_gr_vec_mul_scalar_fmpz, res, src, c, ctx) }
+GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_mul_scalar_fmpq(gr_sparse_vec_t res, const gr_sparse_vec_t src, const fmpq_t c, gr_ctx_t ctx) { GR_SPARSE_VEC_DENSE_VEC_OP(_gr_vec_mul_scalar_fmpq, res, src, c, ctx) }
+GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_mul_scalar_2exp_si(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong c, gr_ctx_t ctx) { GR_SPARSE_VEC_DENSE_VEC_OP(_gr_vec_mul_scalar_2exp_si, res, src, c, ctx) }
+GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_div_scalar(gr_sparse_vec_t res, const gr_sparse_vec_t src, gr_srcptr c, gr_ctx_t ctx) { GR_SPARSE_VEC_DENSE_VEC_OP(_gr_vec_div_scalar, res, src, c, ctx) } 
+GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_div_scalar_si(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong c, gr_ctx_t ctx) { GR_SPARSE_VEC_DENSE_VEC_OP(_gr_vec_div_scalar_si, res, src, c, ctx) }
+GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_div_scalar_ui(gr_sparse_vec_t res, const gr_sparse_vec_t src, ulong c, gr_ctx_t ctx) { GR_SPARSE_VEC_DENSE_VEC_OP(_gr_vec_div_scalar_ui, res, src, c, ctx) }
+GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_div_scalar_fmpz(gr_sparse_vec_t res, const gr_sparse_vec_t src, const fmpz_t c, gr_ctx_t ctx) { GR_SPARSE_VEC_DENSE_VEC_OP(_gr_vec_div_scalar_fmpz, res, src, c, ctx) }
+GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_div_scalar_fmpq(gr_sparse_vec_t res, const gr_sparse_vec_t src, const fmpq_t c, gr_ctx_t ctx) { GR_SPARSE_VEC_DENSE_VEC_OP(_gr_vec_div_scalar_fmpq, res, src, c, ctx) }
+GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_divexact_scalar(gr_sparse_vec_t res, const gr_sparse_vec_t src, gr_srcptr c, gr_ctx_t ctx) { GR_SPARSE_VEC_DENSE_VEC_OP(_gr_vec_divexact_scalar, res, src, c, ctx) } 
+GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_divexact_scalar_si(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong c, gr_ctx_t ctx) { GR_SPARSE_VEC_DENSE_VEC_OP(_gr_vec_divexact_scalar_si, res, src, c, ctx) }
+GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_divexact_scalar_ui(gr_sparse_vec_t res, const gr_sparse_vec_t src, ulong c, gr_ctx_t ctx) { GR_SPARSE_VEC_DENSE_VEC_OP(_gr_vec_divexact_scalar_ui, res, src, c, ctx) }
+GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_divexact_scalar_fmpz(gr_sparse_vec_t res, const gr_sparse_vec_t src, const fmpz_t c, gr_ctx_t ctx) { GR_SPARSE_VEC_DENSE_VEC_OP(_gr_vec_divexact_scalar_fmpz, res, src, c, ctx) }
+GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_divexact_scalar_fmpq(gr_sparse_vec_t res, const gr_sparse_vec_t src, const fmpq_t c, gr_ctx_t ctx) { GR_SPARSE_VEC_DENSE_VEC_OP(_gr_vec_divexact_scalar_fmpq, res, src, c, ctx) }
 
 
 

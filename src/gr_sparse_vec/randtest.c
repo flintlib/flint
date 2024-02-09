@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "gr_sparse_vec.h"
 
 static int
@@ -8,7 +9,7 @@ int_sorter(const void * a, const void * b)
 
 
 int
-_gr_vec_randtest(gr_sparse_vec_t vec, double density, slong len, flint_rand_t state, gr_ctx_t ctx)
+gr_sparse_vec_randtest(gr_sparse_vec_t vec, double density, slong len, flint_rand_t state, gr_ctx_t ctx)
 {
     int status = GR_SUCCESS;
     slong i, j, sz, nnz;
