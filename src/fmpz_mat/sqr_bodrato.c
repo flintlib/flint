@@ -44,16 +44,11 @@ fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A)
             smul_ppmm(u, v, b, c);
             add_ssaaaa(s, t, s, t, u, v);
             fmpz_set_signed_uiui(E(B, 0, 0), s, t);
-            smul_ppmm(s, t, a, b);
-            smul_ppmm(u, v, b, d);
-            add_ssaaaa(s, t, s, t, u, v);
+            smul_ppmm(s, t, a + d, b);
             fmpz_set_signed_uiui(E(B, 0, 1), s, t);
-            smul_ppmm(s, t, a, c);
-            smul_ppmm(u, v, c, d);
-            add_ssaaaa(s, t, s, t, u, v);
+            smul_ppmm(s, t, a + d, c);
             fmpz_set_signed_uiui(E(B, 1, 0), s, t);
-            smul_ppmm(s, t, b, c);
-            smul_ppmm(u, v, d, d);
+            smul_ppmm(s, t, d, d);
             add_ssaaaa(s, t, s, t, u, v);
             fmpz_set_signed_uiui(E(B, 1, 1), s, t);
         }
