@@ -5,10 +5,11 @@
 
 A :type:`gr_sparse_vec_t` is a represention of a vector over a generic
 ring which is optimized for the situation where there are many entries which
-are zero (the vector is sparse).  Internally, the vector records only
-the positions of the nonzeros and their values.  Although technically the
-type and all its functions will operate correctly with any density,
-a :type:`gr_vec_t` may be more efficient in the number of nonzeros is not small.
+are zero (the vector is *sparse*, or has *low density*).  Internally, the
+vector records only the positions of the nonzeros and their values.
+Although technically the type and all its functions will operate correctly
+with any density, a regular :type:`gr_vec_t` may be more efficient in the number
+of nonzeros is not small.
 
 Types and basic access
 --------------------------------------------------------------------------------
@@ -113,11 +114,11 @@ Setting and conversion
 
 .. function:: int gr_sparse_vec_randtest(gr_sparse_vec_t vec, double density, slong len, flint_rand_t state, gr_ctx_t ctx)
 
-    Initialize *vec* to a random vector with density (fraction of nonzeros) *density* and length *len*.
-    The algorithm is suitable when *density* is small.  Specifically, column indices
-    are generated randomly and deduped.  So if the density is
-    larger than ``1/sqrt(len)``, the true density of the returned vector is likely to be
-    lower than *density*.
+    Initialize *vec* to a random vector with density (fraction of nonzeros)
+    *density* and length *len*. The algorithm is suitable when *density* is small.
+    Specifically, column indices are generated randomly and deduped.  So if the
+    density is larger than ``1/sqrt(len)``, the true density of the returned vector
+    is likely to be lower than *density*.
 
 .. function:: int gr_sparse_vec_from_dense(gr_sparse_vec_t vec, gr_srcptr src, slong len, gr_ctx_t ctx)
 
@@ -125,17 +126,20 @@ Setting and conversion
     
 .. function:: int gr_sparse_vec_to_dense(gr_ptr vec, gr_sparse_vec_t src, gr_ctx_t ctx)
 
-    Convert the sparse vector *src* into a dense vector *vec*, which must have sufficient space.
+    Convert the sparse vector *src* into a dense vector *vec*, which must have
+    sufficient space (i.e. ``vec->length``).
 
 .. function:: int gr_sparse_vec_slice(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong col_start, slong col_end, gr_ctx_t ctx)
 
-    Set *res* to a copy of the slice of *src* given by any entries whose column indices
-    lie in the half open interval ``[col_start, col_end)``.  Column indices are shifted
-    by *col_start* (a column index of ``col_start`` would become ``0``).
+    Set *res* to a copy of the slice of *src* given by any entries whose
+    column indices lie in the half open interval ``[col_start, col_end)``.
+    Column indices are shifted by *col_start* (a column index of ``col_start``
+    would become ``0``).
 
 .. function:: int gr_sparse_vec_permute_cols(gr_sparse_vec_t vec, const gr_sparse_vec_t src, slong * p, gr_ctx_t ctx)
 
-    Set *vec* to a copy of *src* with the columns permuted.  The column indices are shifted as: ``vec[p[i]] = src[i]``.
+    Set *vec* to a copy of *src* with the columns permuted.  The column
+    indices are shifted as: ``vec[p[i]] = src[i]``.
 
 
 Comparison
@@ -147,7 +151,7 @@ Comparison
 
 .. function:: truth_t gr_sparse_vec_is_zero(const gr_sparse_vec_t vec, gr_ctx_t ctx) 
 
-    Return ``T_TRUE`` if *vec* represents the zero vector, and ``T_FALSE`` otherwise.
+    Return ``T_TRUE`` if *vec* represents the zero vector and ``T_FALSE`` otherwise.
 
 
 Output
@@ -163,6 +167,7 @@ Output
     Print the nonzeros of *vec* to ``stdout``.  See ``gr_sparse_vec_to_dense``
     if it is desired to print out the entire vector, zeros and all.
 
+
 Arithmetic
 --------------------------------------------------------------------------------
 
@@ -170,15 +175,19 @@ Arithmetic
               int gr_sparse_vec_sub(gr_sparse_vec_t res, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, slong len, gr_ctx_t ctx)
               int gr_sparse_vec_mul(gr_sparse_vec_t res, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, slong len, gr_ctx_t ctx)
     
-    Componentwise operations.  (We do not provide analogous multiplication or division routines due to issues with zero.)
+    Componentwise operations.  (We do not provide analogous division or exponentiation
+    routines due since sparse inputs to these operations would be undefined or
+    fully dense.)
 
 .. function:: int gr_sparse_vec_add_other(gr_sparse_vec_t res, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, gr_ctx_t ctx2, gr_ctx_t ctx)
               int gr_sparse_vec_sub_other(gr_sparse_vec_t res, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, gr_ctx_t ctx2, gr_ctx_t ctx)
+              int gr_sparse_vec_mul_other(gr_sparse_vec_t res, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, gr_ctx_t ctx2, gr_ctx_t ctx)
     
     Componentwise operations where the second input is allowed to have a different ring.
 
 .. function:: int gr_other_add_sparse_vec(gr_sparse_vec_t res, const gr_sparse_vec_t src1, gr_ctx_t ctx1, const gr_sparse_vec_t src2, gr_ctx_t ctx)
               int gr_other_sub_sparse_vec(gr_sparse_vec_t res, const gr_sparse_vec_t src1, gr_ctx_t ctx1, const gr_sparse_vec_t src2, gr_ctx_t ctx)
+              int gr_other_mul_sparse_vec(gr_sparse_vec_t res, const gr_sparse_vec_t src1, gr_ctx_t ctx1, const gr_sparse_vec_t src2, gr_ctx_t ctx)
     
     Componentwise operations where the first input is allowed to have a different ring.
 
@@ -193,6 +202,54 @@ Arithmetic
 
     Set *res* to -*src*
 
+
+Arithmetic into dense vectors
+--------------------------------------------------------------------------------
+
+.. function:: int gr_sparse_vec_update_to_dense(gr_ptr dres, const gr_sparse_vec_t src, gr_ctx_t ctx)
+              int gr_sparse_vec_add_to_dense(gr_ptr dres, gr_srcptr dvec1, const gr_sparse_vec_t svec2, gr_ctx_t ctx)
+              int gr_sparse_vec_sub_to_dense(gr_ptr dres, gr_srcptr dvec1, const gr_sparse_vec_t svec2, gr_ctx_t ctx)
+              int gr_sparse_vec_nz_mul_to_dense(gr_ptr dres, gr_srcptr dvec1, const gr_sparse_vec_t svec2, gr_ctx_t ctx)
+              int gr_sparse_vec_nz_div_to_dense(gr_ptr dres, gr_srcptr dvec1, const gr_sparse_vec_t svec2, gr_ctx_t ctx)
+              int gr_sparse_vec_addmul_scalar_to_dense(gr_ptr dres, const gr_sparse_vec_t svec, gr_srcptr c, gr_ctx_t ctx)
+              int gr_sparse_vec_submul_scalar_to_dense(gr_ptr dres, const gr_sparse_vec_t svec, gr_srcptr c, gr_ctx_t ctx)
+              int gr_sparse_vec_addmul_scalar_si_to_dense(gr_ptr dres, const gr_sparse_vec_t svec, slong c, gr_ctx_t ctx)
+              int gr_sparse_vec_submul_scalar_si_to_dense(gr_ptr dres, const gr_sparse_vec_t svec, slong c, gr_ctx_t ctx)
+              int gr_sparse_vec_addmul_scalar_fmpz_to_dense(gr_ptr dres, const gr_sparse_vec_t svec, const fmpz_t c, gr_ctx_t ctx)
+              int gr_sparse_vec_submul_scalar_fmpz_to_dense(gr_ptr dres, const gr_sparse_vec_t svec, const fmpz_t c, gr_ctx_t ctx)
+    
+    These functions facilitate accumulating a sparse vector into a dense
+    target.  They have one dense input, one sparse input, and a dense output.
+    For all functions, it is assumed that *dres* and *dvec1* have the same
+    length as *svec* or *svec2*, as appropriate.  The functions 
+    ``gr_sparse_vec_update_to_dense()`` (overwrite the entries in *dres*),
+    ``gr_sparse_vec_nz_mul_to_dense()``, and ``gr_sparse_vec_nz_div_to_dense()``
+    only operate on the locations for which *svec2* is nonzero.
+
+
+Componentwise multiplication and division
+--------------------------------------------------------------------------------
+
+.. function:: int gr_sparse_vec_mul_scalar(gr_sparse_vec_t res, const gr_sparse_vec_t src, gr_srcptr c, gr_ctx_t ctx)
+              int gr_sparse_vec_mul_scalar_si(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong c, gr_ctx_t ctx)
+              int gr_sparse_vec_mul_scalar_ui(gr_sparse_vec_t res, const gr_sparse_vec_t src, ulong c, gr_ctx_t ctx)
+              int gr_sparse_vec_mul_scalar_fmpz(gr_sparse_vec_t res, const gr_sparse_vec_t src, const fmpz_t c, gr_ctx_t ctx)
+              int gr_sparse_vec_mul_scalar_fmpq(gr_sparse_vec_t res, const gr_sparse_vec_t src, const fmpq_t c, gr_ctx_t ctx)
+              int gr_sparse_vec_mul_scalar_2exp_si(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong c, gr_ctx_t ctx)
+              int gr_sparse_vec_div_scalar(gr_sparse_vec_t res, const gr_sparse_vec_t src, gr_srcptr c, gr_ctx_t ctx)
+              int gr_sparse_vec_div_scalar_si(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong c, gr_ctx_t ctx)
+              int gr_sparse_vec_div_scalar_ui(gr_sparse_vec_t res, const gr_sparse_vec_t src, ulong c, gr_ctx_t ctx)
+              int gr_sparse_vec_div_scalar_fmpz(gr_sparse_vec_t res, const gr_sparse_vec_t src, const fmpz_t c, gr_ctx_t ctx)
+              int gr_sparse_vec_div_scalar_fmpq(gr_sparse_vec_t res, const gr_sparse_vec_t src, const fmpq_t c, gr_ctx_t ctx)
+              int gr_sparse_vec_divexact_scalar(gr_sparse_vec_t res, const gr_sparse_vec_t src, gr_srcptr c, gr_ctx_t ctx)
+              int gr_sparse_vec_divexact_scalar_si(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong c, gr_ctx_t ctx)
+              int gr_sparse_vec_divexact_scalar_ui(gr_sparse_vec_t res, const gr_sparse_vec_t src, ulong c, gr_ctx_t ctx)
+              int gr_sparse_vec_divexact_scalar_fmpz(gr_sparse_vec_t res, const gr_sparse_vec_t src, const fmpz_t c, gr_ctx_t ctx)
+              int gr_sparse_vec_divexact_scalar_fmpq(gr_sparse_vec_t res, const gr_sparse_vec_t src, const fmpq_t c, gr_ctx_t ctx)
+
+    Set *res* to be *src* multiplied or divided by *c*.
+    (Addition and subtraction are not provided because they would create
+    dense output.)
 
 Sum and product
 --------------------------------------------------------------------------------
@@ -209,7 +266,15 @@ Sum and product
 Dot products
 --------------------------------------------------------------------------------
 
-Hello
+.. function:: int gr_sparse_vec_dot(gr_ptr res, gr_srcptr c, int subtract, const gr_sparse_vec_t x, const gr_sparse_vec_t y, gr_ctx_t ctx)
+
+    Set *res* equal to `c \pm x \cdot y`.
+
+.. function:: int gr_sparse_vec_dot_rev(gr_ptr res, gr_srcptr c, int subtract, const gr_sparse_vec_t x, const gr_sparse_vec_t y, gr_ctx_t ctx)
+
+    Set *res* equal to `c \pm \sum_{i=0}^{n-1}x_iy_{n-1-i}`.
+
+
 
 
 .. raw:: latex

@@ -104,7 +104,7 @@ slong _gr_sparse_vec_count_unique_cols(const ulong *cols0, slong nnz0, const ulo
 
 /* This is used for operations like add which have to riffle through the entries of two vectors */
 /* It's an annoying macro that combines with the macros below.  This is so we can handle */
-/* Different arguments in different orders, etc */
+/* different arguments in different orders, etc */
 #define GR_SPV_RFL_TEMPLATE(FUNC_A, FUNC_B, FUNC_AB, DEST_VEC, A_VEC, B_VEC, CTX)                       \
     int status;                                                                                         \
     slong sz, new_nnz, a_ind, b_ind, dest_ind, a_nnz, b_nnz, i;                                         \
@@ -180,11 +180,13 @@ GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_mul(gr_sparse_vec_t re
 
 GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_add_other(gr_sparse_vec_t res, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, gr_ctx_t ctx2, gr_ctx_t ctx) { GR_SPV_RFL_TEMPLATE(GR_SPV_RFL_UOP(gr_set, src1, a_ind), GR_SPV_RFL_UOP_OTHER(gr_set_other, src2, b_ind, ctx2), GR_SPV_RFL_BOP_OTHER(gr_add_other, src1, a_ind, src2, b_ind, ctx2), res, src1, src2, ctx); }
 GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_sub_other(gr_sparse_vec_t res, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, gr_ctx_t ctx2, gr_ctx_t ctx) { GR_SPV_RFL_TEMPLATE(GR_SPV_RFL_UOP(gr_set, src1, a_ind), GR_SPV_RFL_UOP_OTHER(gr_neg_other, src2, a_ind, ctx2), GR_SPV_RFL_BOP_OTHER(gr_sub_other, src1, a_ind, src2, b_ind, ctx2), res, src1, src2, ctx); }
+GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_mul_other(gr_sparse_vec_t res, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, gr_ctx_t ctx2, gr_ctx_t ctx) { GR_SPV_RFL_TEMPLATE(GR_SPV_RFL_ZERO, GR_SPV_RFL_ZERO, GR_SPV_RFL_BOP_OTHER(gr_mul_other, src1, a_ind, src2, b_ind, ctx2), res, src1, src2, ctx); }
 
 #define GR_SPV_RFL_OTHER_BOP(F, Y, Y_ind, CTX2, Z, Z_ind) F(GR_ENTRY(res->entries, dest_ind, sz), GR_ENTRY(Y->entries, Y_ind, CTX2->sizeof_elem), (CTX2), GR_ENTRY(Z->entries, Z_ind, sz), ctx)
 
 GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_other_add_sparse_vec(gr_sparse_vec_t res, const gr_sparse_vec_t src1, gr_ctx_t ctx1, const gr_sparse_vec_t src2, gr_ctx_t ctx) { GR_SPV_RFL_TEMPLATE(GR_SPV_RFL_UOP_OTHER(gr_set_other, src1, a_ind, ctx1), GR_SPV_RFL_UOP(gr_set, src2, b_ind), GR_SPV_RFL_OTHER_BOP(gr_other_add, src1, a_ind, ctx1, src2, b_ind), res, src1, src2, ctx); }
 GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_other_sub_sparse_vec(gr_sparse_vec_t res, const gr_sparse_vec_t src1, gr_ctx_t ctx1, const gr_sparse_vec_t src2, gr_ctx_t ctx) { GR_SPV_RFL_TEMPLATE(GR_SPV_RFL_UOP_OTHER(gr_set_other, src1, a_ind, ctx1), GR_SPV_RFL_UOP(gr_neg, src2, b_ind), GR_SPV_RFL_OTHER_BOP(gr_other_sub, src1, a_ind, ctx1, src2, b_ind), res, src1, src2, ctx); }
+GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_other_mul_sparse_vec(gr_sparse_vec_t res, const gr_sparse_vec_t src1, gr_ctx_t ctx1, const gr_sparse_vec_t src2, gr_ctx_t ctx) { GR_SPV_RFL_TEMPLATE(GR_SPV_RFL_ZERO, GR_SPV_RFL_ZERO, GR_SPV_RFL_OTHER_BOP(gr_other_mul, src1, a_ind, ctx1, src2, b_ind), res, src1, src2, ctx); }
 
 #define GR_SPV_RFL_UOP_SCALAR(F, Y, Y_ind) F(GR_ENTRY(res->entries, dest_ind, sz), GR_ENTRY(Y->entries, Y_ind, sz), c, ctx)
 
