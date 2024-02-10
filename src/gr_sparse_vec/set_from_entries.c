@@ -18,7 +18,7 @@ static int gr_sparse_vec_slong_sort(const void* a, const void* b)
 
 
 int
-gr_sparse_vec_set_from_entries(gr_sparse_vec_t vec, slong * cols, gr_srcptr entries, slong nnz, gr_ctx_t ctx)
+gr_sparse_vec_set_from_entries(gr_sparse_vec_t vec, ulong * cols, gr_srcptr entries, slong nnz, gr_ctx_t ctx)
 {
     slong i,j,sz,new_nnz;
     int status;
@@ -51,7 +51,7 @@ gr_sparse_vec_set_from_entries(gr_sparse_vec_t vec, slong * cols, gr_srcptr entr
         /* If it's a new column, do a set; otherwise do an accumulate */
         if (i == 0 || si[i-1].col != si[i].col)
         {
-            if (j == -1 || (T_TRUE != gr_is_zero(GR_ENTRY(vec->entries, j, sz), ctx))) /* Only move to the next target if the current one is nonzero */
+            if (j == -1 || (T_FALSE == gr_is_zero(GR_ENTRY(vec->entries, j, sz), ctx))) /* Only move to the next target if the current one is nonzero */
             {
                 j++;
                 if (j >= new_nnz)
@@ -76,7 +76,7 @@ gr_sparse_vec_set_from_entries(gr_sparse_vec_t vec, slong * cols, gr_srcptr entr
 }
 
 int
-gr_sparse_vec_set_from_entries_sorted_deduped(gr_sparse_vec_t vec, slong * sorted_deduped_cols, gr_srcptr entries, slong nnz, gr_ctx_t ctx)
+gr_sparse_vec_set_from_entries_sorted_deduped(gr_sparse_vec_t vec, ulong * sorted_deduped_cols, gr_srcptr entries, slong nnz, gr_ctx_t ctx)
 {
     slong i,j,sz;
     int status;
