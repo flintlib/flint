@@ -13,6 +13,11 @@
 #include "fq_nmod.h"
 #include "n_poly.h"
 
+/* -O3 seems to result in worse code here. Check results for
+   nmod_mpoly_factor/profile/p-factor */
+
+#pragma GCC optimize ("-O2,-funroll-loops")
+
 /*
     conversion between polynomials in coefficient form and point-value form
     and arithmetic in point-value form

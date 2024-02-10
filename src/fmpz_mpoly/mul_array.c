@@ -15,6 +15,12 @@
 #include "mpoly.h"
 #include "fmpz_mpoly.h"
 
+/* Currently we do not -funroll-loops by default in the fmpz_mpoly module,
+   but it is worthwhile for the basic loops here. */
+#pragma GCC push_options
+#pragma GCC optimize("-funroll-loops")
+
+
 /*
     NOTE: this file is dirty - it assumes that a zero fmpz is zero
 */
@@ -123,6 +129,7 @@ void _fmpz_mpoly_addmul_array1_slong(ulong * poly1,
    The input polynomials are broken into blocks to improve
    cache efficiency.
 */
+
 void _fmpz_mpoly_addmul_array1_slong2(ulong * poly1,
                  const slong * poly2, const ulong * exp2, slong len2,
                            const slong * poly3, const ulong * exp3, slong len3)
@@ -137,13 +144,21 @@ void _fmpz_mpoly_addmul_array1_slong2(ulong * poly1,
       {
          for (i = ii; i < FLINT_MIN(ii + BLOCK, len2); i++)
          {
-            c2 = poly1 + 2*((slong) exp2[i]);
+            /* Hack: both the (slong) cast and writing as a shift by 1
+               instead of a multiply by 2 are needed to get GCC to
+               generate good code on Zen3. Check
+
+                   build/fmpz_mpoly/profile/p-mul 1 dense 30 20
+
+               before changing this. */
+            c2 = poly1 + (((slong) exp2[i]) << 1);
 
             if (poly2[i] != 0)
             {
                for (j = jj; j < FLINT_MIN(jj + BLOCK, len3); j++)
                {
-                  c = c2 + 2*((slong) exp3[j]);
+                  /* Hack. */
+                  c = c2 + (((slong) exp3[j]) << 1);
 
                   smul_ppmm(p[1], p[0], poly2[i], poly3[j]);
                   add_ssaaaa(c[1], c[0], c[1], c[0], p[1], p[0]);
@@ -153,6 +168,8 @@ void _fmpz_mpoly_addmul_array1_slong2(ulong * poly1,
       }
    }
 }
+
+#pragma GCC pop_options
 
 /*
    Addmul into a dense array poly1, given polys with coefficients

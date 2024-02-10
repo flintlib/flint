@@ -14,6 +14,10 @@
 #include "mpoly.h"
 #include "nmod_mpoly.h"
 
+/* Currently we do not -funroll-loops by default in the nmod_mpoly module,
+   but it is worthwhile for the functions in this file. */
+#pragma GCC optimize("-funroll-loops")
+
 /* improve locality */
 #define BLOCK 128
 #define MAX_ARRAY_SIZE (WORD(300000))
@@ -62,13 +66,22 @@ void _nmod_mpoly_addmul_array1_ulong2(ulong * poly1,
       {
          for (i = ii; i < FLINT_MIN(ii + BLOCK, len2); i++)
          {
-            c2 = poly1 + 2*((slong) exp2[i]);
+            /* Hack: both the (slong) cast and writing as a shift by 1
+               instead of a multiply by 2 are needed to get GCC to
+               generate good code on Zen3. Check
+
+                   build/nmod_mpoly/profile/p-mul 1 dense 30 20
+
+               before changing this. */
+            c2 = poly1 + (((slong) exp2[i]) << 1);
 
             if (poly2[i] != 0)
             {
                for (j = jj; j < FLINT_MIN(jj + BLOCK, len3); j++)
                {
-                  c = c2 + 2*((slong) exp3[j]);
+                  /* Hack. */
+                  c = c2 + (((slong) exp3[j]) << 1);
+
                   umul_ppmm(p[1], p[0], poly2[i], poly3[j]);
                   add_ssaaaa(c[1], c[0], c[1], c[0], p[1], p[0]);
                }
@@ -107,7 +120,6 @@ void _nmod_mpoly_addmul_array1_ulong3(ulong * poly1,
       }
    }
 }
-
 
 /****************************************************
     LEX
