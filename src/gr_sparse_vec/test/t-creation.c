@@ -9,7 +9,7 @@ test_init(gr_ctx_t ctx)
     gr_sparse_vec_t vec;
     int status = GR_SUCCESS;
     status |= gr_sparse_vec_init(vec, 5, ctx);
-    status |= gr_sparse_vec_clear(vec);
+    status |= gr_sparse_vec_clear(vec, ctx);
     return status;
 }
 

@@ -139,7 +139,7 @@ set(_BUILD_DIRS
     dirichlet       bernoulli       hypgeom
 
     gr              gr_generic      gr_vec          gr_mat
-    gr_poly         gr_mpoly        gr_special
+    gr_poly         gr_mpoly        gr_special      gr_sparse_vec
 
     calcium
     fmpz_mpoly_q
