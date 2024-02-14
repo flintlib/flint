@@ -79,6 +79,9 @@ WARN_UNUSED_RESULT int gr_sparse_vec_to_dense(gr_ptr vec, gr_sparse_vec_t src, g
 WARN_UNUSED_RESULT int gr_sparse_vec_slice(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong col_start, slong col_end, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_sparse_vec_permute_cols(gr_sparse_vec_t vec, const gr_sparse_vec_t src, slong * p, gr_ctx_t ctx);
 
+WARN_UNUSED_RESULT int gr_sparse_vec_find_entry(gr_ptr res, gr_sparse_vec_t vec, slong col, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_sparse_vec_set_entry(gr_sparse_vec_t vec, slong col, gr_srcptr entry, gr_ctx_t ctx);
+
 truth_t gr_sparse_vec_equal(const gr_sparse_vec_t vec1, const gr_sparse_vec_t vec2, gr_ctx_t ctx);
 GR_SPARSE_VEC_INLINE truth_t gr_sparse_vec_is_zero(const gr_sparse_vec_t vec, gr_ctx_t ctx) { return (vec->nnz == 0 ? T_TRUE : T_FALSE); }
 

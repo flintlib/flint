@@ -45,12 +45,12 @@ Types and basic access
 .. macro:: GR_SPARSE_VEC_COL(vec, i)
 
     Access the column index of the *i*-th nonzero.
-    There is no bounds checking.
+    There is no bounds checking. (See also `gr_sparse_vec_find_entry`)
 
 .. macro:: GR_SPARSE_VEC_ENTRY(vec, i, sz)
 
     Access the value of the *i*-th nonzero.
-    There is no bounds checking.
+    There is no bounds checking. (See also `gr_sparse_vec_find_entry`)
 
 .. function:: ulong * gr_sparse_vec_col_ptr(gr_sparse_vec_t vec, slong i, gr_ctx_t ctx)
               const ulong * gr_sparse_vec_col_srcptr(const gr_sparse_vec_t vec, slong i, gr_ctx_t ctx)
@@ -83,12 +83,28 @@ Types and basic access
     Get the number of nonzeros in *vec*
 
 
-Setting and conversion
+Getting, setting and conversion
 --------------------------------------------------------------------------------
 
 .. function:: int gr_sparse_vec_set(gr_sparse_vec_t res, const gr_sparse_vec_t src, gr_ctx_t ctx)
 
     Copy *src* to a copy of *res*
+
+.. function:: int gr_sparse_vec_set_entry(gr_sparse_vec_t vec, slong col, gr_srcptr entry, gr_ctx_t ctx)
+
+    Set the the value at column *col* to be *entry*.  Because of the way sparse
+    vectors are represented, it is not efficient to call this function
+    repeatedly (it is linear time in the number of nonzeros in *vec*). 
+    If possible, the entries to update should be batched up and
+    given using `gr_sparse_vec_update`, `gr_sparse_vec_set_from_entries`,
+    or `gr_sparse_vec_set_from_entries_sorted_deduped`.
+
+.. function:: int gr_sparse_vec_find_entry(gr_ptr res, gr_sparse_vec_t vec, slong col, gr_ctx_t ctx)
+
+    Set *res* to be the entry at column *col*.  If *col* is not a column
+    in which *vec* contains a nonzero, *res* is set to zero.
+    Because of the way sparse vectors are represented, this is not constant time.
+    (It is log time in the number of nonzeros in *vec*.)
 
 .. function:: int gr_sparse_vec_update(gr_sparse_vec_t res, const gr_sparse_vec_t src, gr_ctx_t ctx)
 
