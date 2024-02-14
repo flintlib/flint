@@ -88,7 +88,7 @@ jobs:
           lcov -j $(expr $(nproc) + 1) --capture --omit-lines "flint_throw" --omit-lines '^}$' --exclude "*test/t-*.c" --exclude "*test/main.c" --exclude "/usr/*" --directory build --output-file build/coverage/coverage.info
 
       - name: "Upload coverage data"
-        uses: codecov/codecov-action@v3.1.5
+        uses: codecov/codecov-action@v4
         if: github.repository == 'flintlib/flint'
         with:
           files: build/coverage/coverage.info
