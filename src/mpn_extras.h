@@ -264,7 +264,7 @@ mp_limb_t flint_mpn_mulhigh_basecase(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_s
     FLINT_ASSERT(n >= 1);
 
     if (FLINT_HAVE_MULHIGH_FUNC(n)) /* NOTE: Aliasing allowed here */
-        return flint_mpn_mulhigh_func_tab[n - 1](rp, xp, yp);
+        return flint_mpn_mulhigh_func_tab[n](rp, xp, yp);
     else
     {
         FLINT_ASSERT(rp != xp && rp != yp);
@@ -279,7 +279,7 @@ mp_limb_t flint_mpn_sqrhigh_basecase(mp_ptr rp, mp_srcptr xp, mp_size_t n)
     FLINT_ASSERT(n >= 1);
 
     if (FLINT_HAVE_SQRHIGH_FUNC(n)) /* NOTE: Aliasing allowed here */
-        return flint_mpn_sqrhigh_func_tab[n - 1](rp, xp);
+        return flint_mpn_sqrhigh_func_tab[n](rp, xp);
     else
     {
         FLINT_ASSERT(rp != xp);
@@ -296,7 +296,7 @@ struct mp_limb_pair_t flint_mpn_mulhigh_normalised(mp_ptr rp, mp_srcptr xp, mp_s
     FLINT_ASSERT(n >= 1);
 
     if (FLINT_HAVE_MULHIGH_NORMALISED_FUNC(n))
-        return flint_mpn_mulhigh_normalised_func_tab[n - 1](rp, xp, yp);
+        return flint_mpn_mulhigh_normalised_func_tab[n](rp, xp, yp);
     else
     {
         struct mp_limb_pair_t ret;

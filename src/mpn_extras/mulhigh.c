@@ -83,6 +83,7 @@ const flint_mpn_mulhigh_normalised_func_t flint_mpn_mulhigh_normalised_func_tab[
 
 const flint_mpn_sqr_func_t flint_mpn_sqrhigh_func_tab[] =
 {
+    NULL,
     flint_mpn_sqrhigh_1,
     flint_mpn_sqrhigh_2,
     flint_mpn_sqrhigh_3,
