@@ -7,5 +7,6 @@ Name: @PACKAGE_NAME@
 Description: Fast Library for Number Theory
 Version: @PACKAGE_VERSION@
 URL: https://flintlib.org/
+Requires: gmp >= 6.2.1 mpfr >= 4.1.0
 Cflags: -I${includedir}
-Libs: -L${libdir} -lflint -lgmp -lmpfr
+Libs: -L${libdir} -lflint
