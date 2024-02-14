@@ -99,3 +99,14 @@ define(`ALIGN',
 	`ifelse($1,`8',`.p2align	3, 0x90',
 		$1,`16',`.p2align	4, 0x90',
 		$1,`32',`.p2align	5, 0x90')')
+
+define(`TEXT', `.text')
+
+define(`JMPENT',`dnl
+ifdef(`PIC',
+	`.long	$1-$2'dnl
+,
+	`.quad	$1'dnl
+)')
+
+define(`JUMPTABSECT', `.section	.data.rel.ro.local,"a",@progbits')

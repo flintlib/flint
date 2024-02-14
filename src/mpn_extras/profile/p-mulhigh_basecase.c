@@ -82,36 +82,10 @@ int main(void)
                 (type == 2) ? "mpn_mul_basecase" : (type == 3) ? "mpn_mul_n" : "mpfr_mulhigh_n");
     }
 
-#undef N_MAX
-#define N_MAX FLINT_MPN_MULHIGH_N_FUNC_TAB_WIDTH
-
-#if 0
-    flint_printf("           GMP       MPFR\n");
-    for (n = 1; n <= N_MAX; n++)
-    {
-        double t1, t2, t3, __attribute__((unused)) __;
-        flint_printf("n = %2wd:", n);
-
-        mpn_random2(xp, n);
-        mpn_random2(yp, n);
-
-        TIMEIT_START
-        flint_mpn_mulhigh_n(rf, xp, yp, n);
-        TIMEIT_STOP_VALUES(__, t1)
-
-        TIMEIT_START
-        mpn_mul_basecase(rg, xp, n, yp, n);
-        TIMEIT_STOP_VALUES(__, t2)
-
-        TIMEIT_START
-        mpfr_mulhigh_n(rm, xp, yp, n);
-        TIMEIT_STOP_VALUES(__, t3)
-
-        flint_printf("%7.2fx  %7.2fx\n", t2 / t1, t3 / t1);
-    }
-#endif
-
     flint_cleanup_master();
 
     return 0;
 }
+
+#undef N_MIN
+#undef N_MAX
