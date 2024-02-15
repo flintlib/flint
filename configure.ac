@@ -3,7 +3,7 @@
 ################################################################################
 
 define(FLINT_COPYRIGHT,[[
-Copyright (C) 2023 Albin Ahlbäck
+Copyright (C) 2023, 2024 Albin Ahlbäck
 
 This file is part of FLINT.
 
@@ -23,6 +23,9 @@ define(FLINT_COPYRIGHT_C,[[/*
     by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */]])
+
+dnl TODO
+dnl * Move more stuff to acinclude.m4 to debloat this file.
 
 AC_COPYRIGHT(FLINT_COPYRIGHT)
 AH_TOP(FLINT_COPYRIGHT_C)
@@ -530,10 +533,6 @@ AC_PROG_MKDIR_P
 
 AC_ARG_VAR([TESTCFLAGS], [Choose different C compiler flags for tests [default=CFLAGS]. Can be useful to compile library at a specific optimization level while compiling tests fast.])
 
-AC_ARG_VAR(ABI, [Desired ABI])
-
-AC_ARG_VAR([M4], [m4 macro processor])
-
 ################################################################################
 # check programs and system
 ################################################################################
@@ -621,17 +620,6 @@ Windows-type systems."])
         ;;
 esac
 
-case "$host_cpu" in
-    x86_64|sparc64|powerpc64*)
-        fft_tuning_in="src/fft_tuning64.in"
-        ;;
-    *)
-        fft_tuning_in="src/fft_tuning32.in"
-        ;;
-esac
-AC_CONFIG_FILES([src/fft_tuning.h:$fft_tuning_in],[],[fft_tuning_in="$fft_tuning_in"])
-AC_SUBST(FFT_TUNING_IN, $fft_tuning_in)
-
 AC_MSG_CHECKING(for ldconfig)
 LDCONFIG_N=""
 case "$build_os" in
@@ -657,8 +645,8 @@ AC_SUBST(LDCONFIG_N)
 
 dnl FIXME: Improve this check to include more processors.
 AC_MSG_CHECKING([if memory is strongly-ordered])
-case "$host_cpu" in
-    x86_64|x86|i386|i586)
+case "$host" in
+    X86_PATTERN | X86_64_PATTERN)
         flint_know_strong_order="yes"
         AC_MSG_RESULT([yes])
         ;;
@@ -674,60 +662,54 @@ then
 fi
 
 ################################################################################
+# check GMP
+################################################################################
+
+FLINT_CHECK_GMP_H(6,2,1)
+FLINT_GMP_LONG_LONG_LIMB
+
+if test "$flint_cv_gmp_long_long_limb" = "yes";
+then
+    gmpcompat_h_in="gmpcompat-longlong.h.in"
+else
+    gmpcompat_h_in="gmpcompat.h.in"
+fi
+
+AC_CONFIG_FILES([src/gmpcompat.h:src/$gmpcompat_h_in],[],[gmpcompat_h_in="$gmpcompat_h_in"])
+AC_SUBST(GMPCOMPAT_H_IN, $gmpcompat_h_in)
+
+################################################################################
+# check MPFR
+################################################################################
+
+FLINT_CHECK_MPFR_H(4,1,0)
+
+################################################################################
+# check ABI
+################################################################################
+
+FLINT_ABI
+
+case "$flint_cv_abi" in
+    32)
+        fft_tuning_in="src/fft_tuning32.in"
+        ;;
+    64)
+        fft_tuning_in="src/fft_tuning64.in"
+        ;;
+esac
+AC_CONFIG_FILES([src/fft_tuning.h:$fft_tuning_in],[],[fft_tuning_in="$fft_tuning_in"])
+AC_SUBST(FFT_TUNING_IN, $fft_tuning_in)
+
+################################################################################
 # check headers
 ################################################################################
 
 # Mandatory headers
 # The following headers are checked previously:
 #   stdio.h stdlib.h stdint.h string.h
-AC_CHECK_HEADERS([stdarg.h math.h float.h errno.h mpfr.h gmp.h],,
+AC_CHECK_HEADERS([stdarg.h math.h float.h errno.h],,
                  AC_MSG_ERROR([Could not find a mandatory header!]))
-
-# Check that GMP >= 6.2.1
-AC_MSG_CHECKING([if version of GMP is greater than 6.2.1])
-AC_COMPILE_IFELSE(
-    [AC_LANG_PROGRAM(
-        [#include <gmp.h>],
-        [#if (__GNU_MP_VERSION < 6) \
-          || (__GNU_MP_VERSION == 6 && __GNU_MP_VERSION_MINOR < 2) \
-          || (__GNU_MP_VERSION == 6 && __GNU_MP_VERSION_MINOR == 2 && __GNU_MP_VERSION_PATCHLEVEL < 1)
-         # error GMP version 6.2.1 or later is required
-         #endif]
-    )],
-    AC_MSG_RESULT([yes]),
-    AC_MSG_RESULT([no])
-    AC_MSG_ERROR(["FLINT requires GMP version 6.2.1 or later."]))
-
-AC_MSG_CHECKING([if GMP defines mp_limb_t as unsigned long long int])
-AC_COMPILE_IFELSE(
-    [AC_LANG_PROGRAM(
-        [#include <gmp.h>],
-        [#if !defined(_LONG_LONG_LIMB)
-         # error mp_limb_t != unsigned long long int
-         #endif]
-    )],
-    AC_MSG_RESULT([yes])
-    gmpcompat_h_in="gmpcompat-longlong.h.in",
-    AC_MSG_RESULT([no])
-    gmpcompat_h_in="gmpcompat.h.in")
-
-AC_CONFIG_FILES([src/gmpcompat.h:src/$gmpcompat_h_in],[],[gmpcompat_h_in="$gmpcompat_h_in"])
-AC_SUBST(GMPCOMPAT_H_IN, $gmpcompat_h_in)
-
-# Check that MPFR >= 4.1.0
-AC_MSG_CHECKING([if version of MPFR is greater than 4.1.0])
-AC_COMPILE_IFELSE(
-    [AC_LANG_PROGRAM(
-        [#include <mpfr.h>],
-        [#if (MPFR_VERSION_MAJOR < 4) \
-          || (MPFR_VERSION_MAJOR == 4 && MPFR_VERSION_MINOR < 1) \
-          || (MPFR_VERSION_MAJOR == 4 && MPFR_VERSION_MINOR == 1 && MPFR_VERSION_PATCHLEVEL < 0)
-         # error MPFR version 4.1.0 or later is required
-         #endif]
-    )],
-    AC_MSG_RESULT([yes]),
-    AC_MSG_RESULT([no])
-    AC_MSG_ERROR(["FLINT requires MPFR version 4.2.0 or later."]))
 
 # Optional headers
 # The following headers are checked previously:
@@ -949,10 +931,10 @@ fi
 if test -n "$ABI";
 then
     AX_CHECK_COMPILE_FLAG([-m$ABI],
-    [save_CFLAGS="-m$ABI $save_CFLAGS"],
-    [AC_MSG_ERROR([$CC does not support the ABI flag -m$ABI])])
+        [save_CFLAGS="-m$ABI $save_CFLAGS"],
+        [AC_MSG_ERROR([$CC does not support the ABI flag -m$ABI])]
+    )
 fi
-AC_SUBST(ABI_FLAG)
 
 if test "$enable_avx2" = "yes";
 then
@@ -1012,106 +994,6 @@ fi
 CPPFLAGS="-I./src $CPPFLAGS"
 
 ################################################################################
-# Instruction sets
-################################################################################
-
-if test "$enable_assembly" = "yes";
-then
-    AC_MSG_CHECKING([if 64-bit ADX instructions is supported])
-    AC_COMPILE_IFELSE(
-        [AC_LANG_PROGRAM([], [
-#if !defined(__ADX__) || !defined(__GNUC__) || !defined(__x86_64__) || !(defined(__APPLE__) || defined(__unix__)) || defined(__CYGWIN__)
-#error Dead man
-error
-#endif
-         ])],
-        [AC_MSG_RESULT([yes])
-         AC_DEFINE(FLINT_HAVE_ADX,1,[Define if system supports 64-bit ADX instruction set with System V ABI])
-         has_adx="yes"],
-        [AC_MSG_RESULT([no])]
-    )
-fi
-
-################################################################################
-# Assembler
-################################################################################
-
-if test "$has_adx" = "yes" && test "$enable_assembly" = "yes";
-then
-    if test -z "$M4";
-    then
-        # Check for M4
-        AC_PATH_PROG([M4], [m4], [no])
-        if test "$M4" = "no";
-        then
-            AC_MSG_ERROR([Could not find M4 needed to generate assembly source code.])
-        fi
-    fi
-
-    AC_MSG_CHECKING([if assembler supports .size])
-    echo "	.size somestuff, 1" >> conftest.s
-    $CC -c conftest.s > conftest.out 2>&1
-    comstr="d""n""l"
-    if test "$?" = "0";
-    then
-        flint_as_size="yes"
-        AC_MSG_RESULT([yes])
-        case "$host_os" in
-            darwin*)
-                echo ["define(]\`[SIZE]'[,]\`[]'[)$comstr"] >> config.m4
-                ;;
-            *) 
-                echo ["define(]\`[SIZE]'[,]\`[.size	\$][1, \$][2-\$][1]'[)$comstr"] > config.m4
-                ;;
-        esac
-    else
-        flint_as_size="no"
-        AC_MSG_RESULT([no])
-        echo ["define(]\`[SIZE]'[,]\`[]'[)$comstr"] >> config.m4
-    fi
-    rm conftest.*
-
-    AC_MSG_CHECKING([for assembler .type function prefix])
-    flint_as_type=""
-    for func_prefix in "@" "%" "#";
-    do
-        echo "	.type	somestuff,${func_prefix}function" >> conftest.s
-        $CC -c conftest.s > conftest.out 2>&1
-        if test "$?" = "0";
-        then
-            flint_as_type="${func_prefix}"
-            break
-        fi
-    done
-    rm -f conftest.*
-
-    if test "$flint_as_type" = "";
-    then
-        AC_MSG_RESULT([no])
-        echo ["define(]\`[TYPE]'[,]\`[]'[)$comstr"] >> config.m4
-    else
-        AC_MSG_RESULT([${func_prefix}])
-        case "$host_os" in
-            darwin*)
-                echo ["define(]\`[TYPE]'[,]\`[.type	_\$][1, ]${func_prefix}[function]'[)$comstr"] >> config.m4
-                ;;
-            *) 
-                echo ["define(]\`[TYPE]'[,]\`[.type	\$][1, ]${func_prefix}[function]'[)$comstr"] >> config.m4
-                ;;
-        esac
-    fi
-
-    case "$host_os" in
-        darwin*)
-            echo ["define(]\`[FUNC]'[,]\`[_\$][1]'[)$comstr"] >> config.m4
-            ;;
-        *) 
-            echo ["define(]\`[FUNC]'[,]\`[\$][1]'[)$comstr"] >> config.m4
-            ;;
-    esac
-fi
-
-################################################################################
 # fft_small module
 ################################################################################
 
@@ -1140,32 +1022,16 @@ error
     )
 fi
 
-if test "$ac_cv_header_x86intrin_h" = "yes" && test "$ac_cv_header_immintrin_h" = "yes";
+if test "$ac_cv_header_x86intrin_h" = "yes" && test "$ac_cv_header_immintrin_h" = "yes" && test "$flint_cv_abi" = "64";
 then
     AC_COMPILE_IFELSE(
         [AC_LANG_PROGRAM([],[
-#ifndef __AVX2__
+#if !defined(__AVX2__) || !defined(__GNUC__)
 #error Dead man
 error
 #endif
-         ])],
-        [AC_COMPILE_IFELSE(
-            [AC_LANG_PROGRAM([],[
-#ifndef __GNUC__
-#error Dead man
-error
-#endif
-             ])],
-            [AC_COMPILE_IFELSE(
-                [AC_LANG_PROGRAM([#include <gmp.h>],[
-#if GMP_LIMB_BITS == 32
-#error Dead man
-error
-#endif
-                 ])],
-                [enable_fft_small="yes"]
-            )]
-        )]
+        ])],
+        enable_fft_small="yes"
     )
 fi
 
@@ -1177,6 +1043,90 @@ then
     AC_DEFINE(FLINT_HAVE_FFT_SMALL, 1, [Define to use the fft_small module])
 else
     AC_SUBST(FFT_SMALL, [\ \ \ \ \ \ \ \ \ \ \ \ ])
+fi
+
+################################################################################
+# Assembly
+################################################################################
+
+# SYSTEM V ABI
+if test "$enable_assembly" = "yes";
+then
+    AC_MSG_CHECKING([if System V ABI])
+    AC_COMPILE_IFELSE(
+        [AC_LANG_PROGRAM([], [
+#if !(defined(__APPLE__) || defined(__unix__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__)) || defined(__CYGWIN__)
+#error Dead man
+error
+#endif
+         ])],
+        [AC_MSG_RESULT([yes])],
+        [AC_MSG_RESULT([no, disabling assembly...])
+         enable_assembly="no"]
+    )
+fi
+
+# ADX instruction set
+if test "$enable_assembly" = "yes" && test "$host_cpu" = "x86_64";
+then
+    AC_MSG_CHECKING([if ADX instruction set is supported])
+    AC_COMPILE_IFELSE(
+        [AC_LANG_PROGRAM([], [
+#if !defined(__ADX__)
+#error Dead man
+error
+#endif
+         ])],
+        [AC_MSG_RESULT([yes])
+         AC_DEFINE(FLINT_HAVE_ADX,1,[Define if CPU supports ADX instruction set])
+         has_adx="yes"],
+        [AC_MSG_RESULT([no])]
+    )
+fi
+
+if test "$enable_assembly" = "yes";
+then
+    GMP_INIT(config.m4)
+
+    GMP_PROG_M4
+    GMP_PATH_NM
+
+    GMP_ASM_TEXT
+    GMP_ASM_DATA
+    GMP_ASM_LABEL_SUFFIX
+    GMP_ASM_GLOBL
+    GMP_ASM_GLOBL_ATTR
+    GMP_ASM_UNDERSCORE
+    GMP_ASM_RODATA
+    GMP_ASM_TYPE
+    GMP_ASM_SIZE
+    GMP_ASM_LSYM_PREFIX
+    GMP_ASM_ALIGN_LOG
+
+    case $host in
+        ARM64_PATTERN)dnl Currently not active
+            case $host in
+            *-*-darwin*)
+                GMP_INCLUDE_MPN(src/mpn_extras/arm64/darwin.m4)
+                ;;
+            *)
+                GMP_INCLUDE_MPN(src/mpn_extras/arm64/arm64-defs.m4)
+                ;;
+            esac
+            ;;
+        X86_64_PATTERN)
+            GMP_ASM_ALIGN_FILL_0x90
+            GMP_ASM_COFF_TYPE
+            GMP_INCLUDE_MPN(src/mpn_extras/broadwell/x86_64-defs.m4)
+            case $host in
+                *-*-darwin*)
+                    GMP_INCLUDE_MPN(src/mpn_extras/broadwell/darwin.m4)
+                    ;;
+            esac
+            ;;
+    esac
+
+    GMP_FINISH
 fi
 
 ################################################################################

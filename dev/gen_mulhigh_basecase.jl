@@ -92,30 +92,24 @@ end
 # Preamble
 ###############################################################################
 
-copyright = "#
-#   Copyright (C) 2024 Albin Ahlbäck
-#
-#   This file is part of FLINT.
-#
-#   FLINT is free software: you can redistribute it and/or modify it under
-#   the terms of the GNU Lesser General Public License (LGPL) as published
-#   by the Free Software Foundation; either version 3 of the License, or
-#   (at your option) any later version.  See <https://www.gnu.org/licenses/>.
-#\n"
+copyright = "dnl
+dnl Copyright (C) 2024 Albin Ahlbäck
+dnl
+dnl This file is part of FLINT.
+dnl
+dnl FLINT is free software: you can redistribute it and/or modify it under
+dnl the terms of the GNU Lesser General Public License (LGPL) as published
+dnl by the Free Software Foundation; either version 3 of the License, or
+dnl (at your option) any later version.  See <https://www.gnu.org/licenses/>.
+dnl\n"
 
-preamble = "include(`config.m4')dnl\ndnl\n.text\n"
+preamble = "include(`config.m4')\n\n\tTEXT\n"
 
 function function_pre_post(funname::String)
-    pre = ".global\tFUNC($funname)
-.p2align\t5, 0x90
-TYPE($funname)
+    pre = "\tALIGN(16)\n"
+    pre *= "PROLOGUE($funname)\n"
 
-FUNC($funname):
-\t.cfi_startproc\n"
-
-    post = ".$(funname)_end:
-SIZE($(funname), .$(funname)_end)
-.cfi_endproc\n"
+    post = "EPILOGUE()\n"
 
     return (pre, post)
 end
@@ -397,13 +391,13 @@ function mulhigh_normalised_1()
     body *= "\tmov\t\$0, %rdx\n"
     body *= "\ttest\t$r1, $r1\n"
     body *= "\tsetns\t$(R8("%rdx"))\n"
-    body *= "\tjs\t.Lcontinue\n"
+    body *= "\tjs\tL(1)\n"
 
     # If not normalised, shift by one
     body *= "\tadd\t$r0, $r0\n"
     body *= "\tadc\t$r1, $r1\n"
 
-    body *= ".Lcontinue:\n"
+    body *= "L(1):\n"
     body *= "\tmov\t$r1, 0*8($res)\n"
 
     return body * "\n\tret\n"
@@ -445,14 +439,14 @@ function mulhigh_normalised_2()
     body *= "\tmov\t\$0, %rdx\n"
     body *= "\ttest\t$r2, $r2\n"
     body *= "\tsetns\t$(R8("%rdx"))\n"
-    body *= "\tjs\t.Lcontinue\n"
+    body *= "\tjs\tL(2)\n"
 
     # If not normalised, shift by one
     body *= "\tadd\t$r0, $r0\n"
     body *= "\tadc\t$r1, $r1\n"
     body *= "\tadc\t$r2, $r2\n"
 
-    body *= ".Lcontinue:\n"
+    body *= "L(2):\n"
     body *= "\tmov\t$r1, 0*8($res)\n"
     body *= "\tmov\t$r2, 1*8($res)\n"
 
@@ -625,7 +619,7 @@ function mulhigh_normalised(n::Int; debug::Bool = false)
     body *= "\tmov\t\$0, %rdx\n"
     body *= "\ttest\t$(r(n)), $(r(n))\n"
     body *= "\tsetns\t$(R8("%rdx"))\n"
-    body *= "\tjs\t.Lcontinue\n"
+    body *= "\tjs\tL($n)\n"
 
     # If not normalised, shift by one
     body *= "\tadd\t$(r(0)), $(r(0))\n"
@@ -633,7 +627,7 @@ function mulhigh_normalised(n::Int; debug::Bool = false)
         body *= "\tadc\t$(r(ix)), $(r(ix))\n"
     end
 
-    body *= ".Lcontinue:\n"
+    body *= "L($n):\n"
     if n == 10 || n == 11
         res, zr = sc, "error zr"
         body *= "\tvmovq\t%xmm1, $res\n"
@@ -669,43 +663,40 @@ end
 # Generate file
 ###############################################################################
 
-function gen_mulhigh(m::Int, nofile::Bool = false)
+function gen_mulhigh(m::Int, file)
     (pre, post) = function_pre_post("flint_mpn_mulhigh_$m")
     functionbody = mulhigh(m)
 
-    str = "$copyright\n$preamble\n$pre$functionbody$post"
+    str = "$pre$functionbody$post\n"
 
-    if nofile
-        print(str)
-    else
-        path = String(@__DIR__) * "/../src/mpn_extras/broadwell/mulhigh_$m.asm"
-        file = open(path, "w")
-        write(file, str)
-        close(file)
-    end
+    write(file, str)
 end
 
-function gen_mulhigh_normalised(m::Int, nofile::Bool = false)
+function gen_mulhigh_normalised(m::Int, file)
     (pre, post) = function_pre_post("flint_mpn_mulhigh_normalised_$m")
     functionbody = mulhigh_normalised(m)
 
-    str = "$copyright\n$preamble\n$pre$functionbody$post"
+    str = "$pre$functionbody$post\n"
 
-    if nofile
-        print(str)
-    else
-        path = String(@__DIR__) * "/../src/mpn_extras/broadwell/mulhigh_normalised_$m.asm"
-        file = open(path, "w")
-        write(file, str)
-        close(file)
-    end
+    write(file, str)
 end
 
 function gen_all()
+    # mulhigh
+    path = String(@__DIR__) * "/../src/mpn_extras/broadwell/mulhigh_hard.asm"
+    file = open(path, "w")
+    write(file, "$copyright\n$preamble\n")
     for m in 1:12
-        gen_mulhigh(m)
+        gen_mulhigh(m, file)
     end
+    close(file)
+
+    # mulhigh_normalised
+    path = String(@__DIR__) * "/../src/mpn_extras/broadwell/mulhigh_normalised_hard.asm"
+    file = open(path, "w")
+    write(file, "$copyright\n$preamble\n")
     for m in 1:12
-        gen_mulhigh_normalised(m)
+        gen_mulhigh_normalised(m, file)
     end
+    close(file)
 end
