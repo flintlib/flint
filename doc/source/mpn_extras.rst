@@ -82,6 +82,11 @@ Multiplication
     This function may not exist on processors not supporting the ADX instruction
     set.
 
+.. function:: void flint_mpn_mul_toom22(mp_ptr pp, mp_srcptr ap, mp_size_t an, mp_srcptr bp, mp_size_t bn, mp_ptr scratch)
+
+    Toom-22 (Karatsuba) multiplication. The *scratch* space must have room for
+    `2 an + k` limbs where `k` is the number of limbs. If *NULL* is passed,
+    space will be allocated internally.
 
 Divisibility
 --------------------------------------------------------------------------------
