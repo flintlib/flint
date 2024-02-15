@@ -25,7 +25,7 @@ test_init_from_entries(flint_rand_t state, gr_ctx_t ctx)
     slong sz = ctx->sizeof_elem;
     slong N = 5;
     ulong cols[5] = {0, 2, 4, 6, 8};
-    status |= gr_vec_init(dvec, N, ctx);
+    gr_vec_init(dvec, N, ctx);
     status |= _gr_vec_randtest(GR_VEC_ENTRY(dvec, 0, sz), state, N, ctx);
     status |= gr_sparse_vec_init(vec, 2*N, ctx);
     status |= gr_sparse_vec_set_from_entries_sorted_deduped(vec, cols, GR_VEC_ENTRY(dvec, 0, sz), N, ctx);
@@ -34,11 +34,11 @@ test_init_from_entries(flint_rand_t state, gr_ctx_t ctx)
         status |= gr_sparse_vec_find_entry(temp, vec, i, ctx);
         if ((i & 1) == 1 && (T_TRUE != gr_is_zero(temp, ctx))) /* Odd cols should all be zero */
             return GR_TEST_FAIL;
-        if ((i & 1) == 0 && (T_TRUE != gr_equal(temp, GR_VEC_ENTRY(dvec, i>>1, ctx))))
+        if ((i & 1) == 0 && (T_TRUE != gr_equal(temp, GR_VEC_ENTRY(dvec, i>>1, sz), ctx)))
             return GR_TEST_FAIL;
     }
     GR_TMP_CLEAR(temp, ctx);
-    status |= gr_vec_clear(dvec, ctx);
+    gr_vec_clear(dvec, ctx);
     status |= gr_sparse_vec_clear(vec, ctx);
     return status;
 }

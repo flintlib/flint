@@ -8,7 +8,7 @@ typedef struct
 }
 gr_sparse_vec_slong_sorter_t;
 
-static int gr_sparse_vec_slong_sort(const void* a, const void* b)
+static int gr_sparse_vec_slong_cmp(const void* a, const void* b)
 {
     slong ak = ((gr_sparse_vec_slong_sorter_t*)(a))->col;
     slong bk = ((gr_sparse_vec_slong_sorter_t*)(b))->col;
@@ -29,7 +29,7 @@ gr_sparse_vec_set_from_entries(gr_sparse_vec_t vec, ulong * cols, gr_srcptr entr
         si[i].col = cols[i];
         si[i].i = i;
     }
-    qsort(si, nnz, sizeof(gr_sparse_vec_slong_sorter_t), gr_sparse_vec_slong_sort);
+    qsort(si, nnz, sizeof(gr_sparse_vec_slong_sorter_t), gr_sparse_vec_slong_cmp);
     /* Since the columns are sorted, we can just just the last to make sure all the columns fit */
     if (nnz > 0 && si[nnz-1].col >= vec->length)
     {
