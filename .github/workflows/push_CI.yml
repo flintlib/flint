@@ -1,0 +1,204 @@
+name: CI on push
+
+on:
+  push:
+    branches:
+      - main
+      - flint-*
+
+concurrency:
+  # group by workflow and ref; the last slightly strange component ensures that for pull
+  # requests, we limit to 1 concurrent job, but for the main branch we don't
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/main' || github.run_number }}
+  # Cancel intermediate builds, but only if it is a pull request build.
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
+
+jobs:
+  ##############################################################################
+  # freebsd with clang
+  ##############################################################################
+  freebsd-gcc:
+    name: FreeBSD Clang (x0.5)
+
+    runs-on: macos-latest
+    env:
+      FLINT_TEST_MULTIPLIER: "0.5"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Run tests on FreeBSD"
+        uses: cross-platform-actions/action@v0.22.0
+        timeout-minutes: 30
+        continue-on-error: true
+        with:
+          operating_system: freebsd
+          version: '13.2'
+          shell: bash
+          run: |
+            sudo pkg install -y pkgconf gmake gmp mpfr autoconf libtool automake
+            gmake --version
+            clang --version
+            autoconf --version
+            libtool --version
+            touch _is_setup
+
+            ./bootstrap.sh
+            touch _is_bootstrapped
+
+            ./configure \
+              CC=clang \
+              --with-gmp-include=$(pkgconf --variable=includedir gmp) \
+              --with-gmp-lib=$(pkgconf --variable=libdir gmp) \
+              --with-mpfr-include=$(pkgconf --variable=includedir mpfr) \
+              --with-mpfr-lib=$(pkgconf --variable=libdir mpfr) \
+              --disable-static \
+              --disable-debug
+            touch _is_configured
+
+            gmake -j$(expr $(sysctl -n hw.ncpu) + 1)
+            touch _is_library_built
+
+            gmake -j$(expr $(sysctl -n hw.ncpu) + 1) tests
+            touch _is_tests_built
+
+            gmake -j$(expr $(sysctl -n hw.ncpu) + 1) check
+            touch _is_checked
+
+        # Sometimes the FreeBSD runner cannot exit properly. We created files
+        # for each step to show that it was able to run the tests.
+      - if: always()
+        name: "Check that everything was okay"
+        run: |
+          if test ! -f _is_setup;
+          then
+            echo "Setup failed!"
+            exit 1
+          elif test ! -f _is_bootstrapped;
+          then
+            echo "Bootstrap failed!"
+            exit 2
+          elif test ! -f _is_configured;
+          then
+            echo "Configuration failed!"
+            exit 3
+          elif test ! -f _is_library_built;
+          then
+            echo "Building library failed!"
+            exit 4
+          elif test ! -f _is_tests_built;
+          then
+            echo "Building tests failed!"
+            exit 5
+          elif test ! -f _is_checked;
+          then
+            echo "Check failed!"
+            exit 6
+          fi
+          echo "All good!"
+
+
+
+  ##############################################################################
+  # cygwin with gcc
+  ##############################################################################
+  cygwin-gcc:
+    name: Cygwin GCC (x0.5)
+
+    runs-on: windows-latest
+
+    defaults:
+      run:
+        shell: C:\cygwin64\bin\bash.exe --login -o igncr '{0}'
+
+    env:
+      REPO: /cygdrive/d/a/flint/flint # FIXME: De-hardcode this
+      CC: "gcc"
+      FLINT_TEST_MULTIPLIER: "0.5"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Set up Cygwin"
+        uses: gap-actions/setup-cygwin@v1
+        with:
+          PKGS_TO_INSTALL: "dos2unix,gcc-core,make,libgmp-devel,libmpfr-devel,libtool,autoconf,automake"
+
+      - name: "Setup"
+        run: |
+          gcc --version
+          make --version
+          autoconf --version
+          libtool --version
+          echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
+
+      - name: "Configure"
+        run: |
+          cd ${REPO}
+          dos2unix configure
+          dos2unix bootstrap.sh
+          ./bootstrap.sh
+          ./configure \
+            CC=${CC} \
+            --disable-static \
+            --disable-debug
+
+      - name: "Compile library"
+        run: |
+          cd ${REPO}
+          ${MAKE}
+
+      - name: "Compile tests"
+        run: |
+          cd ${REPO}
+          $MAKE tests
+
+      - name: "Check"
+        run: |
+          cd ${REPO}
+          $MAKE check
+
+
+
+  #############################################################################
+  # ubuntu with gcc and cmake (no checks)
+  #############################################################################
+  ubuntu-cmake-gcc:
+    name: Ubuntu GCC, CMake (1x)
+
+    runs-on: ubuntu-latest
+
+    env:
+      LOCAL: ${{ github.workspace }}/local
+      LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Setup"
+        run: |
+          sudo apt-get install -y cmake
+          sudo apt-get install -y libgmp-dev
+          sudo apt-get install -y libmpfr-dev
+          gcc --version
+          make --version
+          cmake --version
+          echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
+
+      - name: "Configure"
+        run: |
+          mkdir build
+          cd build
+          cmake -G"Unix Makefiles" -DWITH_NTL=no -DBUILD_TESTING=yes \
+              -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=${LOCAL} ..
+
+      - name: "Compile library and tests"
+        run: |
+          cd build
+          $MAKE
+          ldd lib/libflint.so
+
+      - name: "Run tests"
+        run: |
+          cd build
+          ctest -j$(expr $(nproc) + 1) --output-on-failure --timeout 450

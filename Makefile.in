@@ -105,8 +105,8 @@ arith_CFLAGS:=-funroll-loops
 endif
 
 LDFLAGS:=@LDFLAGS@
-EXTRA_SHARED_FLAGS:=@EXTRA_SHARED_FLAGS@ $(foreach path, $(GMP_LIB_PATH) $(MPFR_LIB_PATH) $(BLAS_LIB_PATH) $(GC_LIB_PATH) $(NTL_LIB_PATH), @WL@-rpath,$(path))
-EXE_LDFLAGS:=$(LDFLAGS) $(foreach path, $(ABS_FLINT_DIR) $(GMP_LIB_PATH) $(MPFR_LIB_PATH) $(BLAS_LIB_PATH) $(GC_LIB_PATH) $(NTL_LIB_PATH), @WL@-rpath,$(path))
+EXTRA_SHARED_FLAGS:=@EXTRA_SHARED_FLAGS@ $(foreach path, $(sort $(GMP_LIB_PATH) $(MPFR_LIB_PATH) $(BLAS_LIB_PATH) $(GC_LIB_PATH) $(NTL_LIB_PATH)), @WL@-rpath,$(path))
+EXE_LDFLAGS:=$(LDFLAGS) $(foreach path, $(sort $(ABS_FLINT_DIR) $(GMP_LIB_PATH) $(MPFR_LIB_PATH) $(BLAS_LIB_PATH) $(GC_LIB_PATH) $(NTL_LIB_PATH)), @WL@-rpath,$(path))
 
 # Obtain level of parallel
 JOBS:=$(filter -j%,$(MAKEFLAGS))
