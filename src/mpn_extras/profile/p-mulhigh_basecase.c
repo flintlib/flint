@@ -32,7 +32,7 @@ int main(void)
     mp_limb_t yp[N_MAX];
     mp_size_t n;
 
-    flint_printf("Best of mpn_mul_n, mpn_mul_basecase and mpfr_mulhigh_n\nagainst flint_mpn_mulhigh_n_basecase:\n");
+    flint_printf("Best of mpn_mul_n, mpn_mul_basecase and mpfr_mulhigh_n\nagainst flint_mpn_mulhigh_basecase:\n");
     for (n = N_MIN; n <= N_MAX; n++)
     {
         double t1, t2, t3, t4, tmin, __attribute__((unused)) __;
@@ -43,7 +43,7 @@ int main(void)
         mpn_random2(yp, n);
 
         TIMEIT_START
-        flint_mpn_mulhigh_n(rf, xp, yp, n);
+        flint_mpn_mulhigh_basecase(rf, xp, yp, n);
         TIMEIT_STOP_VALUES(__, t1)
 
         TIMEIT_START
