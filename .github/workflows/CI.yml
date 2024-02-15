@@ -38,6 +38,6 @@ jobs:
           ./configure \
             CC=$(brew --prefix llvm@15)/bin/clang \
             --disable-static
-          sed -i '/(RM_TMP) tmp/d' mpn/Makeasm.am
+          sed -i '' '/(RM_TMP) tmp/d' mpn/Makeasm.am
           $MAKE
           cat mpn/tmp-sqr_basecase.s
