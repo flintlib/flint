@@ -1,6 +1,6 @@
 name: CI
 
-on: [push]
+on: push
 
 jobs:
   ##############################################################################
@@ -37,4 +37,5 @@ jobs:
             CC=$(brew --prefix llvm@15)/bin/clang \
             --disable-static
           $MAKE
+          cat mpn/tmp-sqr_basecase.s
           cat mpn/tmp-sqr_basecase.s
