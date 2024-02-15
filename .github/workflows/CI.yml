@@ -34,9 +34,9 @@ jobs:
         run: |
           git clone --depth=1 https://github.com/alisw/GMP.git
           cd gmp
-          ./.bootstrap
-          sed -i '' '/(RM_TMP) tmp/d' mpn/Makeasm.am
           cp mpn/x86_64/coreihwl/sqr_basecase.asm mpn/x86_64/coreisbr/sqr_basecase.asm
+          sed -i '' '/(RM_TMP) tmp/d' mpn/Makeasm.am
+          ./.bootstrap
           ./configure \
             CC=$(brew --prefix llvm@15)/bin/clang \
             --disable-static
