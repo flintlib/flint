@@ -41,15 +41,6 @@ one can write ``FLINT_SWAP(fmpz_poly_struct, *x, *y)`` to swap the content of
     Returns the sign of `x` where `x` is interpreted as a :type:`slong`, that
     is, returns `-1` if `x < 0`, `0` if `x = 0` and `1` if `x > 0`.
 
-.. function:: mp_limb_t FLINT_BIT_COUNT(mp_limb_t x)
-
-    Returns the number of binary bits required to represent an ``ulong x``.  If
-    `x` is zero, returns `0`.
-
-Derived from this there are the two macros ``FLINT_FLOG2(x)`` and
-``FLINT_CLOG2(x)`` which, for any `x \geq 1`, compute `\lfloor \log_2 x  \rfloor`
-and `\lceil \log_2 x \rceil`.
-
 To determine the current FLINT version a number of macros are available.
 For example, if the current FLINT version is ``2.4.0`` then
 ``__FLINT_VERSION`` will have the value `2`, ``__FLINT_MINOR``
