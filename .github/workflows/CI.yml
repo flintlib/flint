@@ -32,12 +32,13 @@ jobs:
 
       - name: "Bla"
         run: |
-          git clone --depth=1 https://github.com/ryepdx/gmp.git
+          git clone --depth=1 https://github.com/alisw/GMP.git
           cd gmp
           ./.bootstrap
+          sed -i '' '/(RM_TMP) tmp/d' mpn/Makeasm.am
+          cp mpn/x86_64/coreihwl/sqr_basecase.asm mpn/x86_64/coreisbr/sqr_basecase.asm
           ./configure \
             CC=$(brew --prefix llvm@15)/bin/clang \
             --disable-static
-          sed -i '' '/(RM_TMP) tmp/d' mpn/Makeasm.am
           $MAKE
           cat mpn/tmp-sqr_basecase.s
