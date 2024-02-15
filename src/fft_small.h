@@ -13,6 +13,7 @@
 #define FFT_SMALL_H
 
 #include "machine_vectors.h"
+#include "longlong.h"
 
 #define LG_BLK_SZ 8
 #define BLK_SZ 256

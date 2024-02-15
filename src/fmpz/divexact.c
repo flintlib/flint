@@ -116,3 +116,19 @@ void fmpz_divexact_ui(fmpz_t f, const fmpz_t g, ulong h)
         _fmpz_demote_val(f);  /* division by h may result in small value */
     }
 }
+
+void fmpz_divexact2_uiui(fmpz_t f, const fmpz_t g, ulong h1, ulong h2)
+{
+    mp_limb_t hi, lo;
+
+    umul_ppmm(hi, lo, h1, h2);
+    if (!hi)
+    {
+        fmpz_divexact_ui(f, g, lo);
+    }
+    else
+    {
+        fmpz_divexact_ui(f, g, h1);
+        fmpz_divexact_ui(f, f, h2);
+    }
+}

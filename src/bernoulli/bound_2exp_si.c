@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "longlong.h"
 #include "bernoulli.h"
 
 const short bernoulli_bound_tab[256] = {

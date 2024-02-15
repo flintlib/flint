@@ -10,6 +10,7 @@
 */
 
 #include <string.h>
+#include "longlong.h"
 #include "fmpz.h"
 #include "mpoly.h"
 #include "nmod_mpoly.h"

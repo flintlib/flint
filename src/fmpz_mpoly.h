@@ -1237,7 +1237,8 @@ void _fmpz_mpoly_to_fmpz_array(fmpz * p, const fmpz * coeffs,
 void _fmpz_mpoly_add_uiuiui_fmpz(ulong * c, const fmpz_t d);
 void _fmpz_mpoly_sub_uiuiui_fmpz(ulong * c, const fmpz_t d);
 
-FMPZ_MPOLY_INLINE
+#if defined(FLINT_LONGLONG_H)
+FLINT_FORCE_INLINE
 void _fmpz_mpoly_submul_uiuiui_fmpz(ulong * c, slong d1, slong d2)
 {
     ulong p[2], p2;
@@ -1246,7 +1247,7 @@ void _fmpz_mpoly_submul_uiuiui_fmpz(ulong * c, slong d1, slong d2)
     sub_dddmmmsss(c[2], c[1], c[0], c[2], c[1], c[0], p2, p[1], p[0]);
 }
 
-FMPZ_MPOLY_INLINE
+FLINT_FORCE_INLINE
 void _fmpz_mpoly_addmul_uiuiui_fmpz(ulong * c, slong d1, slong d2)
 {
     ulong p[2], p2;
@@ -1254,6 +1255,7 @@ void _fmpz_mpoly_addmul_uiuiui_fmpz(ulong * c, slong d1, slong d2)
     p2 = FLINT_SIGN_EXT(p[1]);
     add_sssaaaaaa(c[2], c[1], c[0], c[2], c[1], c[0], p2, p[1], p[0]);
 }
+#endif
 
 /******************************************************************************
 

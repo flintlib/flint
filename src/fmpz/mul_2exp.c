@@ -10,8 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
 #include <string.h>
+#include "longlong.h"
+#include "fmpz.h"
 
 void
 fmpz_mul_2exp(fmpz_t f, const fmpz_t g, ulong exp)

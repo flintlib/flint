@@ -13,6 +13,7 @@
 
 #if FLINT_KNOW_STRONG_ORDER
 
+#include "longlong.h"
 #include "thread_pool.h"
 #include "n_poly.h"
 #include "mpoly.h"
