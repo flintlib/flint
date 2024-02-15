@@ -1,5 +1,35 @@
+/* longlong.h -- definitions for mixed size 32/64 bit arithmetic.
+
+Copyright 1991-1994, 1996, 1997, 1999-2005, 2007-2009, 2011-2020 Free Software
+Foundation, Inc.
+
+This file is part of the GNU MP Library.
+
+The GNU MP Library is free software; you can redistribute it and/or modify
+it under the terms of either:
+
+  * the GNU Lesser General Public License as published by the Free
+    Software Foundation; either version 3 of the License, or (at your
+    option) any later version.
+
+or
+
+  * the GNU General Public License as published by the Free Software
+    Foundation; either version 2 of the License, or (at your option) any
+    later version.
+
+or both in parallel, as here.
+
+The GNU MP Library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received copies of the GNU General Public License and the
+GNU Lesser General Public License along with the GNU MP Library.  If not,
+see https://www.gnu.org/licenses/.  */
 /*
-    Copyright (C) 2023 Albin Ahlbäck
+    Copyright (C) 2023, 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -78,10 +108,17 @@
       "1" ((ulong)(m1)), _ASM_RME ((ulong)(s1)), \
       "2" ((ulong)(m0)), _ASM_RME ((ulong)(s0)))
 
-# define umul_ppmm(w1, w0, u, v) \
+# if defined(__BMI2__) && defined(__amd64__)
+#  define umul_ppmm(w1, w0, u, v) \
+  __asm__("mulx\t%3, %q0, %q1" \
+    : "=r" (w0), "=r" (w1) \
+    : "%d" ((ulong)(u)), "rm" ((ulong)(v)))
+# else
+#  define umul_ppmm(w1, w0, u, v) \
   __asm__(_ASM_MUL " %3" \
     : "=a" (w0), "=d" (w1) \
     : "%0" ((ulong)(u)), "rm" ((ulong)(v)))
+#endif
 
 # define smul_ppmm(w1, w0, u, v) \
   __asm__(_ASM_IMUL " %3" \
