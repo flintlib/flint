@@ -18,12 +18,12 @@ void mpn_sqr_basecase(mp_ptr, mp_srcptr, mp_size_t);
 
 int main(void)
 {
-    mp_limb_t res1[14];
-    mp_limb_t res2[14];
-    mp_limb_t ap[7];
+    mp_limb_t res1[28];
+    mp_limb_t res2[28];
+    mp_limb_t ap[14];
     slong mx;
 
-    for (mx = 1; mx <= 7; mx++)
+    for (mx = 1; mx <= 14; mx++)
     {
         double t1, t2, t3, __attribute__((unused)) __;
 

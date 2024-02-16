@@ -20,13 +20,13 @@ TEST_FUNCTION_START(flint_mpn_sqr_basecase, state)
 
     for (ix = 0; ix < 100000 * flint_test_multiplier(); ix++)
     {
-        mp_limb_t res1[14] = {UWORD(0)};
-        mp_limb_t res2[14] = {UWORD(0)};
+        mp_limb_t res1[28] = {UWORD(0)};
+        mp_limb_t res2[28] = {UWORD(0)};
         mp_limb_t ret1;
-        mp_limb_t ap[7];
+        mp_limb_t ap[14];
         slong alen;
 
-        alen = 1 + n_randint(state, 7);
+        alen = 1 + n_randint(state, 14);
 
         mpn_random2(ap, alen);
 
