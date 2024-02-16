@@ -30,7 +30,7 @@ gr_sparse_vec_set_from_entries(gr_sparse_vec_t vec, ulong * cols, gr_srcptr entr
         si[i].i = i;
     }
     qsort(si, nnz, sizeof(gr_sparse_vec_slong_sorter_t), gr_sparse_vec_slong_cmp);
-    /* Since the columns are sorted, we can just just the last to make sure all the columns fit */
+    /* Since the columns are sorted, we can just test the last to make sure all the columns fit */
     if (nnz > 0 && si[nnz-1].col >= vec->length)
     {
         flint_free(si);
