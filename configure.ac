@@ -30,7 +30,7 @@ dnl * Move more stuff to acinclude.m4 to debloat this file.
 AC_COPYRIGHT(FLINT_COPYRIGHT)
 AH_TOP(FLINT_COPYRIGHT_C)
 
-AC_PREREQ(2.59)
+AC_PREREQ(2.62)
 
 m4_define(FLINT_VERSION,m4_include([VERSION]))
 
