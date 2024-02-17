@@ -71,6 +71,15 @@ AS_VAR_POPDEF([CACHEVAR])dnl
 ])dnl AX_CXX_CHECK_COMPILE_FLAGS
 
 
+dnl Copyright (C) 2024 Albin Ahlbäck
+dnl
+dnl This file is part of FLINT.
+dnl
+dnl FLINT is free software: you can redistribute it and/or modify it under
+dnl the terms of the GNU Lesser General Public License (LGPL) as published
+dnl by the Free Software Foundation; either version 3 of the License, or
+dnl (at your option) any later version.  See <https://www.gnu.org/licenses/>.
+
 dnl  FLINT_CHECK_GMP_H(MAJOR, MINOR, PATCHLEVEL)
 dnl  -----------------------
 dnl  Checks that gmp.h can be found and that its version fullfills the version
@@ -173,6 +182,86 @@ else
     )
 fi
 ])
+])
+
+dnl  FLINT_SYSTEM_V_ABI([action-success][,action-fail])
+dnl  -----------------------
+dnl  Checks if System V ABI.
+dnl  Do "action-success" if this succeeds, "action-fail" if not.
+
+AC_DEFUN([FLINT_SYSTEM_V_ABI],
+[AC_CACHE_CHECK([if system uses System V ABI],
+                flint_cv_system_v_abi,
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[
+        #if !(defined(__APPLE__) || defined(__unix__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__)) || defined(__CYGWIN__)
+        #error Dead man
+        error
+        #endif
+    ])],
+    flint_cv_system_v_abi=yes,
+    flint_cv_system_v_abi=no
+))
+AS_VAR_IF(flint_cv_system_v_abi,yes,
+    [m4_default([$1], :)],
+    [m4_default([$2], :)])
+])
+
+
+dnl  FLINT_HAVE_ADX([action-success][,action-fail])
+dnl  -----------------------
+dnl  Checks if CPU supports the ADX instruction set.
+dnl  Do "action-success" if this succeeds, "action-fail" if not.
+
+AC_DEFUN([FLINT_HAVE_ADX],
+[AC_CACHE_CHECK([if ADX instruction set is supported by CPU],
+                flint_cv_have_adx,
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[
+        #if !defined(__ADX__)
+        #error Dead man
+        error
+        #endif
+    ])],
+    flint_cv_have_adx="yes",
+    flint_cv_have_adx="no")
+)
+AS_VAR_IF(flint_cv_have_adx,yes,
+    [m4_default([$1], :)],
+    [m4_default([$2], :)])
+])
+
+
+dnl  FLINT_HAVE_ASM([action-success][,action-fail])
+dnl  -----------------------
+dnl  Checks if system use FLINT's assembly.
+dnl  Do "action-success" if this succeeds, "action-fail" if not.
+
+AC_DEFUN([FLINT_HAVE_ASM],
+[AC_REQUIRE([FLINT_ABI])
+AC_REQUIRE([FLINT_SYSTEM_V_ABI])
+case $host in
+    X86_64_PATTERN)
+        AC_REQUIRE([FLINT_HAVE_ADX])
+        ;;
+esac
+
+AC_CACHE_CHECK([if system can use FLINT's assembly],
+                flint_cv_have_asm,
+[flint_cv_have_asm="no"
+if test "$flint_cv_abi" = "64" && test "$flint_cv_system_v_abi" = "yes";
+then
+    case $host in
+        X86_64_PATTERN)
+            if test "$flint_cv_have_adx" = "yes";
+            then
+                flint_cv_have_asm="yes"
+            fi
+            ;;
+    esac
+fi])
+
+AS_VAR_IF(flint_cv_have_asm,yes,
+    [m4_default([$1], :)],
+    [m4_default([$2], :)])
 ])
 
 

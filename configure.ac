@@ -1049,39 +1049,11 @@ fi
 # Assembly
 ################################################################################
 
-# SYSTEM V ABI
 if test "$enable_assembly" = "yes";
 then
-    AC_MSG_CHECKING([if System V ABI])
-    AC_COMPILE_IFELSE(
-        [AC_LANG_PROGRAM([], [
-#if !(defined(__APPLE__) || defined(__unix__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__)) || defined(__CYGWIN__)
-#error Dead man
-error
-#endif
-         ])],
-        [AC_MSG_RESULT([yes])],
-        [AC_MSG_RESULT([no, disabling assembly...])
-         enable_assembly="no"]
-    )
-fi
-
-# ADX instruction set
-if test "$enable_assembly" = "yes" && test "$host_cpu" = "x86_64";
-then
-    AC_MSG_CHECKING([if ADX instruction set is supported])
-    AC_COMPILE_IFELSE(
-        [AC_LANG_PROGRAM([], [
-#if !defined(__ADX__)
-#error Dead man
-error
-#endif
-         ])],
-        [AC_MSG_RESULT([yes])
-         AC_DEFINE(FLINT_HAVE_ADX,1,[Define if CPU supports ADX instruction set])
-         has_adx="yes"],
-        [AC_MSG_RESULT([no])]
-    )
+    FLINT_HAVE_ASM([enable_assembly="yes"],
+                   [enable_assembly="no"
+                    AC_MSG_WARN([FLINT currently only have assembly routines for System V-type systems for x86_64 processors with ADX instruction set. Disabling assembly...])])
 fi
 
 if test "$enable_assembly" = "yes";
@@ -1115,6 +1087,7 @@ then
             esac
             ;;
         X86_64_PATTERN)
+            AC_DEFINE([[FLINT_HAVE_ADX]],1,[Define if CPU supports ADX instruction set])
             GMP_ASM_ALIGN_FILL_0x90
             GMP_ASM_COFF_TYPE
             GMP_INCLUDE_MPN(src/mpn_extras/broadwell/x86_64-defs.m4)
