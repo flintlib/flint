@@ -62,31 +62,31 @@ PROLOGUE(flint_mpn_sqrhigh_3)
 	C 1 h d
 	C 2 x x d
 	mov	1*8(ap), %rdx
-	mulx	0*8(ap), s2, s2		C a1 a0
-	mulx	%rdx, s0, s1		C a1^2
+	mulx	0*8(ap), s1, s1		C a1 a0
+	mulx	%rdx, s0, s2		C a1^2
 
 	mov	2*8(ap), %rdx
 	mulx	0*8(ap), s3, s4		C a2 a0
 	mulx	1*8(ap), s5, ap		C a2 a1
 
-	add	s2, s3
+	add	s1, s3
 	adc	s5, s4
 	adc	$0, ap
-	xor	R32(s2), R32(s2)
+	xor	R32(s1), R32(s1)
 
 	add	s3, s3
 	adc	s4, s4
 	adc	ap, ap
-	adc	s2, s2
+	adc	s1, s1
 
 	add	s3, s0
-	adc	s4, s1
+	adc	s4, s2
 
 	mulx	%rdx, s3, s4		C a2^2
 
-	mov	s1, 0*8(rp)
+	mov	s2, 0*8(rp)
 	adc	ap, s3
-	adc	s2, s4
+	adc	s1, s4
 	mov	s3, 1*8(rp)
 	mov	s4, 2*8(rp)
 
@@ -102,48 +102,48 @@ PROLOGUE(flint_mpn_sqrhigh_4)
 	C 3 x x x d
 	mov	2*8(ap), %rdx
 	mulx	0*8(ap), s0, s0		C a2 a0
-	mulx	1*8(ap), s1, s2		C a2 a1
-	add	s1, s0
+	mulx	1*8(ap), s3, s2		C a2 a1
+	add	s3, s0
 	adc	$0, s2
 	C 0, 2
 
 	mov	3*8(ap), %rdx
-	mulx	0*8(ap), s3, s4		C a3 a0
-	mulx	1*8(ap), s1, s5		C a3 a1
-	add	s3, s0
+	mulx	0*8(ap), s1, s4		C a3 a0
+	mulx	1*8(ap), s3, s5		C a3 a1
+	add	s1, s0
 	adc	s4, s2
 	adc	$0, s5
-	xor	R32(s3), R32(s3)
-	add	s1, s2
+	xor	R32(s1), R32(s1)
+	add	s3, s2
 	mulx	2*8(ap), %rdx, s4	C a3 a2
 	adc	%rdx, s5
-	adc	s3, s4
+	adc	s1, s4
 	C 0, 2, 5, 4
 
 	add	s0, s0
 	adc	s2, s2
 	adc	s5, s5
 	adc	s4, s4
-	adc	R32(s3), R32(s3)
-	C 0, 2, 5, 4, 3
+	adc	R32(s1), R32(s1)
+	C 0, 2, 5, 4, 1
 
 	mov	1*8(ap), %rdx
-	mulx	%rdx, s1, s1		C a1^2
-	add	s1, s0
+	mulx	%rdx, s3, s3		C a1^2
+	add	s3, s0
 
 	mov	2*8(ap), %rdx
-	mulx	%rdx, %rdx, s1		C a2^2
+	mulx	%rdx, %rdx, s3		C a2^2
 	adc	%rdx, s2
-	adc	s1, s5
+	adc	s3, s5
 	mov	3*8(ap), %rdx
 	mov	s2, 0*8(rp)
 	mov	s5, 1*8(rp)
 
-	mulx	%rdx, %rdx, s1		C a3^2
+	mulx	%rdx, %rdx, s3		C a3^2
 	adc	%rdx, s4
-	adc	s1, s3
+	adc	s3, s1
 	mov	s4, 2*8(rp)
-	mov	s3, 3*8(rp)
+	mov	s1, 3*8(rp)
 
 	ret
 EPILOGUE()
