@@ -18,7 +18,7 @@
 
 #if defined(__GNUC__)
 # if defined(__AVX2__)
-#  include <x86intrin.h>
+#  include <immintrin.h>
 # elif defined(__ARM_NEON)
 #  include <arm_neon.h>
 # endif
