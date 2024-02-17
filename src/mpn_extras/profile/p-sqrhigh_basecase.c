@@ -17,7 +17,7 @@
 #endif
 
 #define N_MIN 1
-#define N_MAX 64
+#define N_MAX 128
 
 #define mpn_sqr_basecase __gmpn_sqr_basecase
 void mpn_sqr_basecase(mp_ptr, mp_srcptr, mp_size_t);
@@ -42,7 +42,7 @@ int main(void)
         TIMEIT_STOP_VALUES(__, t1)
 
         TIMEIT_START
-        mpn_sqr_basecase(rg, xp, n);
+        flint_mpn_sqr(rg, xp, n);
         TIMEIT_STOP_VALUES(__, t2)
 
         flint_printf("%7.2fx\n", t2 / t1);

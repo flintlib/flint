@@ -43,7 +43,7 @@ int main(void)
         mpn_random2(yp, n);
 
         TIMEIT_START
-        flint_mpn_mulhigh_n(rf, xp, yp, n);
+        flint_mpn_mulhigh_basecase(rf, xp, yp, n);
         TIMEIT_STOP_VALUES(__, t1)
 
         TIMEIT_START
