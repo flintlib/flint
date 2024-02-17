@@ -307,7 +307,8 @@ dnl  emacs and other editors will recognise it in their normal error message
 dnl  parsing.
 
 define(m4_warning,
-`m4_errprint_commas(m4_file_and_line`'$@)')
+`m4_errprint_commas(m4_file_and_line`'$@
+)')
 
 define(m4_error,
 `define(`m4_error_occurred',1)m4_warning($@)dnl
