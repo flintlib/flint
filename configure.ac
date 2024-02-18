@@ -14,7 +14,7 @@ by the Free Software Foundation; either version 3 of the License, or
 
 ]])
 define(FLINT_COPYRIGHT_C,[[/*
-    Copyright (C) 2023 Albin Ahlbäck
+    Copyright (C) 2023, 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -1033,7 +1033,7 @@ then
             esac
             ;;
         X86_64_PATTERN)
-            AC_DEFINE([[FLINT_HAVE_ADX]],1,[Define if CPU supports ADX instruction set])
+            AC_DEFINE([FLINT_HAVE_ADX],1,[Define if CPU supports ADX instruction set])
             GMP_ASM_ALIGN_FILL_0x90
             GMP_ASM_COFF_TYPE
             GMP_INCLUDE_MPN(src/mpn_extras/broadwell/x86_64-defs.m4)
@@ -1178,9 +1178,16 @@ then
     AC_DEFINE(FLINT_WANT_GMP_INTERNALS,1,[Define to enable use of GMP internals.])
 fi
 
-if test "$has_adx" = "yes" && test "$enable_assembly" = "yes";
+if test "$enable_assembly" = "yes";
 then
-    AC_SUBST(WANT_ADX_ASSEMBLY,1)
+    case $host in
+        X86_64_PATTERN)
+            AC_SUBST(WANT_ADX_ASSEMBLY,1)
+            ;;
+        *)
+            AC_SUBST(WANT_ADX_ASSEMBLY,0)
+            ;;
+    esac
 else
     AC_SUBST(WANT_ADX_ASSEMBLY,0)
 fi

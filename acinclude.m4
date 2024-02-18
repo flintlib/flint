@@ -219,25 +219,25 @@ AS_VAR_IF([flint_cv_system_v_abi],"yes",
 ])
 
 
-dnl  FLINT_HAVE_ADX([action-success][,action-fail])
+dnl  FLINT_CHECK_ADX([action-success][,action-fail])
 dnl  -----------------------
 dnl  Checks if CPU supports the ADX instruction set. Will only run if CPU is
 dnl  x86_64. Do "action-success" if this succeeds, "action-fail" if not.
 
-AC_DEFUN([FLINT_HAVE_ADX],
+AC_DEFUN([FLINT_CHECK_ADX],
 [AS_VAR_IF([host_cpu],"x86_64",
     [AC_CACHE_CHECK([if ADX instruction set is supported by CPU],
-                    flint_cv_have_adx,
+                    flint_cv_check_adx,
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[
             #if !defined(__ADX__)
             #error Dead man
             error
             #endif
         ])],
-        flint_cv_have_adx="yes",
-        flint_cv_have_adx="no")
+        flint_cv_check_adx="yes",
+        flint_cv_check_adx="no")
     )])
-AS_VAR_IF(flint_cv_have_adx,yes,
+AS_VAR_IF(flint_cv_check_adx,yes,
     [m4_default([$1], :)],
     [m4_default([$2], :)])
 ])
@@ -251,14 +251,14 @@ dnl  Do "action-success" if this succeeds, "action-fail" if not.
 AC_DEFUN([FLINT_HAVE_ASM],
 [AC_REQUIRE([FLINT_ABI])
 AC_REQUIRE([FLINT_SYSTEM_V_ABI])
-AC_REQUIRE([FLINT_HAVE_ADX])
+AC_REQUIRE([FLINT_CHECK_ADX])
 
 AC_CACHE_CHECK([if system can use FLINT's assembly],
                 flint_cv_have_asm,
 [flint_cv_have_asm="no"
 if test "$flint_cv_abi" = "64" && test "$flint_cv_system_v_abi" = "yes";
 then
-    if test "$flint_cv_have_adx" = "yes";
+    if test "$flint_cv_check_adx" = "yes";
     then
         flint_cv_have_asm="yes"
     fi
