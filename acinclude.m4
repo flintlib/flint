@@ -138,14 +138,14 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
 ])
 
 
-dnl  FLINT_GMP_LONG_LONG_LIMB
+dnl  FLINT_GMP_LONG_LONG_LIMB([action-success][,action-fail])
 dnl  -----------------------
 dnl  Check if GMP uses long long limb.
 
 AC_DEFUN([FLINT_GMP_LONG_LONG_LIMB],
 [AC_REQUIRE([FLINT_CHECK_GMP_H])
 AC_CACHE_CHECK([if GMP defines mp_limb_t as unsigned long long int],
-               flint_cv_gmp_long_long_limb,
+                flint_cv_gmp_long_long_limb,
 [AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
         [
         #include <gmp.h>
@@ -157,9 +157,12 @@ AC_CACHE_CHECK([if GMP defines mp_limb_t as unsigned long long int],
     )],
     flint_cv_gmp_long_long_limb="yes",
     flint_cv_gmp_long_long_limb="no"
-)]
-)]
-)
+)])
+
+AS_VAR_IF([flint_cv_gmp_long_long_limb],"yes",
+    [m4_default([$1], :)],
+    [m4_default([$2], :)])
+])
 
 
 dnl  FLINT_ABI

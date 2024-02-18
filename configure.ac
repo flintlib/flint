@@ -661,14 +661,8 @@ fi
 ################################################################################
 
 FLINT_CHECK_GMP_H(6,2,1)
-FLINT_GMP_LONG_LONG_LIMB
-
-if test "$flint_cv_gmp_long_long_limb" = "yes";
-then
-    gmpcompat_h_in="gmpcompat-longlong.h.in"
-else
-    gmpcompat_h_in="gmpcompat.h.in"
-fi
+FLINT_GMP_LONG_LONG_LIMB([gmpcompat_h_in="gmpcompat-longlong.h.in"],
+                         [gmpcompat_h_in="gmpcompat.h.in"])
 
 AC_CONFIG_FILES([src/gmpcompat.h:src/$gmpcompat_h_in],[],[gmpcompat_h_in="$gmpcompat_h_in"])
 AC_SUBST(GMPCOMPAT_H_IN, $gmpcompat_h_in)
