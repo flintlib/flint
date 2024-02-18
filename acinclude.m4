@@ -80,6 +80,15 @@ dnl the terms of the GNU Lesser General Public License (LGPL) as published
 dnl by the Free Software Foundation; either version 3 of the License, or
 dnl (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 
+define(X86_PATTERN,
+[[i?86*-*-* | k[5-8]*-*-* | pentium*-*-* | athlon-*-* | viac3*-*-* | geode*-*-* | atom-*-*]])
+
+define(X86_64_PATTERN,
+[[athlon64-*-* | k8-*-* | k10-*-* | bobcat-*-* | jaguar*-*-* | bulldozer*-*-* | piledriver*-*-* | steamroller*-*-* | excavator*-*-* | zen*-*-* | pentium4-*-* | atom-*-* | silvermont-*-* | goldmont-*-* | tremont-*-* | core2-*-* | corei*-*-* | x86_64-*-* | nano-*-* | nehalem*-*-* | westmere*-*-* | sandybridge*-*-* | ivybridge*-*-* | haswell*-*-* | broadwell*-*-* | skylake*-*-* | kabylake*-*-* | icelake*-*-* | tigerlake*-*-* | rocketlake*-*-* | alderlake*-*-* | raptorlake*-*-*]])
+
+define(ARM64_PATTERN,
+[[aarch64-*-*]])
+
 dnl  FLINT_CHECK_GMP_H(MAJOR, MINOR, PATCHLEVEL)
 dnl  -----------------------
 dnl  Checks that gmp.h can be found and that its version fullfills the version
@@ -198,10 +207,10 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[
         error
         #endif
     ])],
-    flint_cv_system_v_abi=yes,
-    flint_cv_system_v_abi=no
+    [flint_cv_system_v_abi="yes"],
+    [flint_cv_system_v_abi="no"]
 ))
-AS_VAR_IF(flint_cv_system_v_abi,yes,
+AS_VAR_IF([flint_cv_system_v_abi],"yes",
     [m4_default([$1], :)],
     [m4_default([$2], :)])
 ])
@@ -209,21 +218,22 @@ AS_VAR_IF(flint_cv_system_v_abi,yes,
 
 dnl  FLINT_HAVE_ADX([action-success][,action-fail])
 dnl  -----------------------
-dnl  Checks if CPU supports the ADX instruction set.
-dnl  Do "action-success" if this succeeds, "action-fail" if not.
+dnl  Checks if CPU supports the ADX instruction set. Will only run if CPU is
+dnl  x86_64. Do "action-success" if this succeeds, "action-fail" if not.
 
 AC_DEFUN([FLINT_HAVE_ADX],
-[AC_CACHE_CHECK([if ADX instruction set is supported by CPU],
-                flint_cv_have_adx,
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[
-        #if !defined(__ADX__)
-        #error Dead man
-        error
-        #endif
-    ])],
-    flint_cv_have_adx="yes",
-    flint_cv_have_adx="no")
-)
+[AS_VAR_IF([host_cpu],"x86_64",
+    [AC_CACHE_CHECK([if ADX instruction set is supported by CPU],
+                    flint_cv_have_adx,
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[
+            #if !defined(__ADX__)
+            #error Dead man
+            error
+            #endif
+        ])],
+        flint_cv_have_adx="yes",
+        flint_cv_have_adx="no")
+    )])
 AS_VAR_IF(flint_cv_have_adx,yes,
     [m4_default([$1], :)],
     [m4_default([$2], :)])
@@ -238,28 +248,117 @@ dnl  Do "action-success" if this succeeds, "action-fail" if not.
 AC_DEFUN([FLINT_HAVE_ASM],
 [AC_REQUIRE([FLINT_ABI])
 AC_REQUIRE([FLINT_SYSTEM_V_ABI])
-case $host in
-    X86_64_PATTERN)
-        AC_REQUIRE([FLINT_HAVE_ADX])
-        ;;
-esac
+AC_REQUIRE([FLINT_HAVE_ADX])
 
 AC_CACHE_CHECK([if system can use FLINT's assembly],
                 flint_cv_have_asm,
 [flint_cv_have_asm="no"
 if test "$flint_cv_abi" = "64" && test "$flint_cv_system_v_abi" = "yes";
 then
-    case $host in
-        X86_64_PATTERN)
-            if test "$flint_cv_have_adx" = "yes";
-            then
-                flint_cv_have_asm="yes"
-            fi
-            ;;
-    esac
+    if test "$flint_cv_have_adx" = "yes";
+    then
+        flint_cv_have_asm="yes"
+    fi
 fi])
 
-AS_VAR_IF(flint_cv_have_asm,yes,
+AS_VAR_IF([flint_cv_have_asm],"yes",
+    [m4_default([$1], :)],
+    [m4_default([$2], :)])
+])
+
+
+dnl  FLINT_HAVE_FFT_SMALL_ARM_H
+dnl  -----------------------
+dnl  Checks if system have headers for fft_small on Arm. Will only run if on
+dnl  arm64.
+
+AC_DEFUN([FLINT_HAVE_FFT_SMALL_ARM_H],
+[AS_VAR_IF([host_cpu],"aarch64",
+    [AC_CHECK_HEADER([arm_neon.h],flint_cv_have_fft_small_arm_h="yes")]
+)])
+
+
+dnl  FLINT_HAVE_FFT_SMALL_ARM_I
+dnl  -----------------------
+dnl  Checks if system supports Arm NEON instructions.
+
+AC_DEFUN([FLINT_HAVE_FFT_SMALL_ARM_I],
+[AS_VAR_IF([host_cpu],"aarch64",
+    [AC_CACHE_CHECK([if system have required Arm instruction set for fft_small],
+                     flint_cv_have_fft_small_arm_i,
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[
+            #ifndef __ARM_NEON
+            #error Dead man
+            error
+            #endif
+        ])],
+        flint_cv_have_fft_small_arm_i="yes",
+        flint_cv_have_fft_small_arm_i="no")
+    )]
+)])
+
+
+dnl  FLINT_HAVE_FFT_SMALL_X86_H
+dnl  -----------------------
+dnl  Checks if system have headers for fft_small on x86.
+
+AC_DEFUN([FLINT_HAVE_FFT_SMALL_X86_H],
+[AS_VAR_IF([host_cpu],"x86_64",
+    [AC_CHECK_HEADERS([x86gprintrin.h immintrin.h],
+        flint_cv_have_fft_small_x86_h="yes",
+        flint_cv_have_fft_small_x86_h="no")]
+)])
+
+
+dnl  FLINT_HAVE_FFT_SMALL_X86_I
+dnl  -----------------------
+dnl  Checks if system supports AVX2 instructions.
+
+AC_DEFUN([FLINT_HAVE_FFT_SMALL_X86_I],
+[AS_VAR_IF([host_cpu],"x86_64",
+    [AC_CACHE_CHECK([if system have required x86_64 instruction set for fft_small],
+                    flint_cv_have_fft_small_x86_i,
+        AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[
+                #if !defined(__AVX2__)
+                #error Dead man
+                error
+                #endif
+            ])],
+            flint_cv_have_fft_small_x86_i="yes",
+            flint_cv_have_fft_small_x86_i="no")
+    )]
+)])
+
+
+dnl  FLINT_CHECK_FFT_SMALL([action-success][,action-fail])
+dnl  -----------------------
+dnl  Checks if fft_small module is available.
+dnl  Do "action-success" if this succeeds, "action-fail" if not.
+
+AC_DEFUN([FLINT_CHECK_FFT_SMALL],
+[AC_REQUIRE([FLINT_ABI])
+AC_REQUIRE([FLINT_HAVE_FFT_SMALL_ARM_H])
+AC_REQUIRE([FLINT_HAVE_FFT_SMALL_ARM_I])
+AC_REQUIRE([FLINT_HAVE_FFT_SMALL_X86_H])
+AC_REQUIRE([FLINT_HAVE_FFT_SMALL_X86_I])
+
+AC_CACHE_CHECK([if system can use FLINT's fft_small module],
+                flint_cv_check_fft_small,
+[flint_cv_check_fft_small="no"
+if test "$flint_cv_abi" = "64";
+then
+    if test "$flint_cv_have_fft_small_arm_h" = "yes" && test "$flint_cv_have_fft_small_arm_i" = "yes";
+    then
+        flint_cv_check_fft_small="yes"
+    fi
+    if test "$flint_cv_have_fft_small_x86_h" = "yes" && test "$flint_cv_have_fft_small_x86_i" = "yes";
+    then
+        flint_cv_check_fft_small="yes"
+    fi
+fi
+])
+
+AS_VAR_IF([flint_cv_check_fft_small],"yes",
     [m4_default([$1], :)],
     [m4_default([$2], :)])
 ])
@@ -295,15 +394,6 @@ dnl
 dnl  You should have received copies of the GNU General Public License and the
 dnl  GNU Lesser General Public License along with the GNU MP Library.  If not,
 dnl  see https://www.gnu.org/licenses/.
-
-define(X86_PATTERN,
-[[i?86*-*-* | k[5-8]*-*-* | pentium*-*-* | athlon-*-* | viac3*-*-* | geode*-*-* | atom-*-*]])
-
-define(X86_64_PATTERN,
-[[athlon64-*-* | k8-*-* | k10-*-* | bobcat-*-* | jaguar*-*-* | bulldozer*-*-* | piledriver*-*-* | steamroller*-*-* | excavator*-*-* | zen*-*-* | pentium4-*-* | atom-*-* | silvermont-*-* | goldmont-*-* | tremont-*-* | core2-*-* | corei*-*-* | x86_64-*-* | nano-*-* | nehalem*-*-* | westmere*-*-* | sandybridge*-*-* | ivybridge*-*-* | haswell*-*-* | broadwell*-*-* | skylake*-*-* | kabylake*-*-* | icelake*-*-* | tigerlake*-*-* | rocketlake*-*-* | alderlake*-*-* | raptorlake*-*-*]])
-
-define(ARM64_PATTERN,
-[[aarch64-*-*]])
 
 dnl  GMP_INIT([M4-DEF-FILE])
 dnl  -----------------------

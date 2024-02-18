@@ -612,11 +612,8 @@ case "$host_os" in
     cygwin|mingw*|msys)
         if test "$DLLTOOL" = "false";
         then
-            AC_MSG_ERROR(["Couldn't find any dlltool that is required to create import libraries for
-Windows-type systems."])
+            AC_MSG_ERROR(["Couldn't find any dlltool that is required to create import libraries for Windows-type systems."])
         fi
-        ;;
-    *)
         ;;
 esac
 
@@ -630,8 +627,6 @@ case "$build_os" in
         ;;
     netbsd* | openbsd*)
         dnl LDCONFIG_N="/sbin/ldconfig -m"
-        ;;
-    *)
         ;;
 esac
 if test "x$LDCONFIG_N" = "x";
@@ -714,7 +709,7 @@ AC_CHECK_HEADERS([stdarg.h math.h float.h errno.h],,
 # Optional headers
 # The following headers are checked previously:
 #   unistd.h
-AC_CHECK_HEADERS([fenv.h alloca.h malloc.h sys/param.h windows.h arm_neon.h x86intrin.h immintrin.h pthread_np.h])
+AC_CHECK_HEADERS([fenv.h alloca.h malloc.h sys/param.h windows.h pthread_np.h])
 
 if test "$enable_pthread" = "yes";
 then
@@ -997,53 +992,10 @@ CPPFLAGS="-I./src $CPPFLAGS"
 # fft_small module
 ################################################################################
 
-enable_fft_small="no"
-
-AC_MSG_CHECKING([whether fft_small module is available])
-
-if test "$ac_cv_header_arm_neon_h" = "yes";
-then
-    AC_COMPILE_IFELSE(
-        [AC_LANG_PROGRAM([],[
-#ifndef __ARM_NEON
-#error Dead man
-error
-#endif
-         ])],
-        [AC_COMPILE_IFELSE(
-            [AC_LANG_PROGRAM([],[
-#ifndef __GNUC__
-#error Dead man
-error
-#endif
-             ])],
-            [enable_fft_small="yes"]
-        )]
-    )
-fi
-
-if test "$ac_cv_header_x86intrin_h" = "yes" && test "$ac_cv_header_immintrin_h" = "yes" && test "$flint_cv_abi" = "64";
-then
-    AC_COMPILE_IFELSE(
-        [AC_LANG_PROGRAM([],[
-#if !defined(__AVX2__) || !defined(__GNUC__)
-#error Dead man
-error
-#endif
-        ])],
-        enable_fft_small="yes"
-    )
-fi
-
-AC_MSG_RESULT([$enable_fft_small])
-
-if test "$enable_fft_small" = "yes";
-then
-    AC_SUBST(FFT_SMALL, [fft_small\ \ \ ])
-    AC_DEFINE(FLINT_HAVE_FFT_SMALL, 1, [Define to use the fft_small module])
-else
-    AC_SUBST(FFT_SMALL, [\ \ \ \ \ \ \ \ \ \ \ \ ])
-fi
+FLINT_CHECK_FFT_SMALL(
+    [AC_SUBST(FFT_SMALL, [fft_small\ \ \ ])
+     AC_DEFINE(FLINT_HAVE_FFT_SMALL, 1, [Define to use the fft_small module])],
+    [AC_SUBST(FFT_SMALL, [\ \ \ \ \ \ \ \ \ \ \ \ ])])
 
 ################################################################################
 # Assembly
