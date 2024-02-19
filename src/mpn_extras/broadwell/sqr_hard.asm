@@ -562,3 +562,215 @@ PROLOGUE(flint_mpn_sqr_7)
 
 	ret
 EPILOGUE()
+
+define(`m0',`-4*8(%rsp)')
+define(`m1',`-3*8(%rsp)')
+define(`m2',`-2*8(%rsp)')
+define(`m3',`-1*8(%rsp)')
+
+	ALIGN(16)
+PROLOGUE(flint_mpn_sqr_8)
+	mov	0*8(ap), %rdx
+	push	s5
+	push	s6
+	push	s7
+	push	s8
+	push	s9
+	push	s10
+
+	mulx	1*8(ap), sx, s1		C a0 a1
+	mulx	2*8(ap), s3, s7		C a0 a2
+	mulx	3*8(ap), s5, s4		C a0 a3
+	mulx	4*8(ap), s6, s2		C a0 a4
+	mov	sx, m0
+	add	s1, s3
+	adc	s7, s5
+	mov	s3, m1
+	mulx	5*8(ap), s7, sx		C a0 a5
+	mulx	6*8(ap), s8, s1		C a0 a6
+	mulx	7*8(ap), s9, s10	C a0 a7
+	adc	s4, s6
+	adc	s2, s7
+	adc	sx, s8
+	adc	s1, s9
+	adc	$0, s10
+	C (m0, m1,) 5, 6, 7, 8, 9, 10
+	C x, 1, 2, 3, 4
+
+	xor	R32(s0), R32(s0)
+	mov	1*8(ap), %rdx
+	mulx	2*8(ap), s1, s2		C a1 a2
+	mulx	3*8(ap), s3, s4		C a1 a3
+	adox	s1, s5
+	adox	s2, s6
+	adcx	s3, s6
+	adcx	s4, s7
+	mulx	4*8(ap), s1, s2		C a1 a4
+	mulx	5*8(ap), s3, s4		C a1 a5
+	mov	s5, m2
+	mov	s6, m3
+	adox	s1, s7
+	adox	s2, s8
+	adcx	s3, s8
+	adcx	s4, s9
+	mulx	6*8(ap), s1, s2		C a1 a6
+	mulx	7*8(ap), s3, s4		C a1 a7
+	adox	s1, s9
+	adox	s2, s10
+	adcx	s3, s10
+	adcx	s0, s4
+	adox	s0, s4
+	C (m0, m1, m2, m3,) 7, 8, 9, 10, 4
+	C x, 1, 2, 3, 5, 6
+
+	mov	2*8(ap), %rdx
+	mulx	3*8(ap), sx, s1		C a2 a3
+	mulx	4*8(ap), s2, s3		C a2 a4
+	mulx	5*8(ap), s5, s6		C a2 a5
+	adox	sx, s7
+	adox	s1, s8
+	adcx	s2, s8
+	adcx	s3, s9
+	adox	s5, s9
+	adox	s6, s10
+	mulx	6*8(ap), sx, s1		C a2 a6
+	mulx	7*8(ap), s2, s3		C a2 a7
+	adcx	sx, s10
+	adcx	s1, s4
+	adox	s2, s4
+	adox	s0, s3
+	adcx	s0, s3
+	C (m0, m1, m2, m3,) 7, 8, 9, 10, 4, 3
+	C x, 1, 2, 5, 6
+
+	mov	3*8(ap), %rdx
+	mulx	4*8(ap), sx, s1		C a3 a4
+	mulx	5*8(ap), s2, s5		C a3 a5
+	adox	sx, s9
+	adox	s1, s10
+	adcx	s2, s10
+	adcx	s5, s4
+	mulx	6*8(ap), sx, s1		C a3 a6
+	mulx	7*8(ap), s2, s5		C a3 a7
+	adox	sx, s4
+	adox	s1, s3
+	adcx	s2, s3
+	adcx	s0, s5
+	adox	s0, s5
+	C (m0, m1, m2, m3,) 7, 8, 9, 10, 4, 3, 5
+	C x, 1, 2, 6
+
+	mov	4*8(ap), %rdx
+	mulx	5*8(ap), s2, s6		C a4 a5
+	mulx	6*8(ap), sx, s1		C a4 a6
+	adcx	s2, s4
+	adcx	s6, s3
+	adox	sx, s3
+	adox	s1, s5
+	mulx	7*8(ap), s2, s6		C a4 a7
+	adcx	s2, s5
+	adcx	s0, s6
+	C (m0, m1, m2, m3,) 7, 8, 9, 10, 4, 3, 5, 6
+	C x, 1, 2
+
+	mov	5*8(ap), %rdx
+	mulx	6*8(ap), sx, s1		C a5 a6
+	mulx	7*8(ap), %rdx, s2	C a5 a7
+	adcx	sx, s5
+	adcx	s1, s6
+	adox	%rdx, s6
+	adox	s0, s2
+	C (m0, m1, m2, m3,) 7, 8, 9, 10, 4, 3, 5, 6, 2
+	C x, 1
+
+	mov	6*8(ap), %rdx
+	mulx	7*8(ap), sx, s1		C a6 a7
+	adcx	sx, s2
+	adcx	s0, s1
+	C (m0, m1, m2, m3,) 7, 8, 9, 10, 4, 3, 5, 6, 2, 1
+	C x
+
+	mov	0*8(ap), %rdx
+	mulx	%rdx, %rdx, sx		C a0^2
+	mov	%rdx, 0*8(rp)
+	adox	m0, sx
+	adcx	m0, sx
+	mov	sx, 1*8(rp)
+
+	mov	1*8(ap), %rdx
+	mulx	%rdx, %rdx, sx		C a1^2
+	adox	m1, %rdx
+	adcx	m1, %rdx
+	adox	m2, sx
+	adcx	m2, sx
+	mov	%rdx, 2*8(rp)
+	mov	sx, 3*8(rp)
+
+	mov	2*8(ap), %rdx
+	mulx	%rdx, %rdx, sx		C a2^2
+	adox	m3, %rdx
+	adcx	m3, %rdx
+	adox	s7, sx
+	adcx	s7, sx
+	mov	%rdx, 4*8(rp)
+	mov	sx, 5*8(rp)
+
+	mov	3*8(ap), %rdx
+	mulx	%rdx, s7, sx		C a3^2
+	adox	s8, s7
+	adcx	s8, s7
+	adox	s9, sx
+	adcx	s9, sx
+	mov	s7, 6*8(rp)
+	mov	sx, 7*8(rp)
+
+	mov	4*8(ap), %rdx
+	mulx	%rdx, s8, s9		C a4^2
+	adox	s10, s8
+	adcx	s10, s8
+	adox	s4, s9
+	adcx	s4, s9
+	mov	s8, 8*8(rp)
+	mov	s9, 9*8(rp)
+
+	mov	5*8(ap), %rdx
+	mulx	%rdx, s7, sx		C a5^2
+	adox	s3, s7
+	adcx	s3, s7
+	adox	s5, sx
+	adcx	s5, sx
+	mov	s7, 10*8(rp)
+	mov	sx, 11*8(rp)
+
+	mov	6*8(ap), %rdx
+	mulx	%rdx, s8, s9		C a6^2
+	adox	s6, s8
+	adcx	s6, s8
+	adox	s2, s9
+	adcx	s2, s9
+	mov	s8, 12*8(rp)
+	mov	s9, 13*8(rp)
+
+	mov	7*8(ap), %rdx
+	mulx	%rdx, s3, sx		C a7^2
+	adox	s1, s3
+	adcx	s1, s3
+	adox	s0, sx
+	adcx	s0, sx
+	mov	s3, 14*8(rp)
+	mov	sx, 15*8(rp)
+
+	pop	s10
+	pop	s9
+	pop	s8
+	pop	s7
+	pop	s6
+	pop	s5
+
+	ret
+EPILOGUE()
+
+undefine(`m0')
+undefine(`m1')
+undefine(`m2')
+undefine(`m3')

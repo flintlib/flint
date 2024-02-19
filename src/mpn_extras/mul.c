@@ -83,7 +83,10 @@ mp_limb_t _flint_mpn_sqr(mp_ptr r, mp_srcptr x, mp_size_t n)
     if (n < FLINT_FFT_SQR_THRESHOLD)
         mpn_sqr(r, x, n);
     else
+    {
+        /* TODO: Don't do a full multiplication here. */
         FFT_MUL(r, x, n, x, n);
+    }
 
     return r[2 * n - 1];
 }

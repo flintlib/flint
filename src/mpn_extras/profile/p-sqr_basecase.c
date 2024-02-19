@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2023 Fredrik Johansson
-    Copyright (C) 2023 Albin Ahlbäck
+    Copyright (C) 2023, 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -16,6 +16,8 @@
 
 #define mpn_sqr_basecase __gmpn_sqr_basecase
 void mpn_sqr_basecase(mp_ptr, mp_srcptr, mp_size_t);
+
+#define N_MAX FLINT_MPN_SQR_FUNC_TAB_WIDTH
 
 static void measure(mp_ptr rp1, mp_ptr rp2, mp_ptr ap, slong mx)
 {
@@ -41,9 +43,9 @@ static void measure(mp_ptr rp1, mp_ptr rp2, mp_ptr ap, slong mx)
 
 int main(int argc, char ** argv)
 {
-    mp_limb_t res1[14];
-    mp_limb_t res2[14];
-    mp_limb_t ap[7];
+    mp_limb_t res1[2 * N_MAX];
+    mp_limb_t res2[2 * N_MAX];
+    mp_limb_t ap[N_MAX];
     slong mx;
 
     if (argc == 2)
@@ -53,7 +55,7 @@ int main(int argc, char ** argv)
     }
 
     flint_printf("mpn_sqr_basecase / flint_mpn_sqr\n");
-    for (mx = 1; mx <= 7; mx++)
+    for (mx = 1; mx <= N_MAX; mx++)
         measure(res1, res2, ap, mx);
 
 end:
