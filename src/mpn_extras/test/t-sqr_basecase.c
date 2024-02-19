@@ -30,7 +30,7 @@ TEST_FUNCTION_START(flint_mpn_sqr_basecase, state)
 
         mpn_random2(ap, alen);
 
-        ret1 = flint_mpn_sqr_basecase(res1, ap, alen);
+        ret1 = flint_mpn_sqr(res1, ap, alen);
         mpn_sqr(res2, ap, alen);
 
         if (mpn_cmp(res1, res2, 2 * alen) || ret1 != res1[2 * alen - 1])
