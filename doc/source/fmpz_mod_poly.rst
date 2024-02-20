@@ -4,7 +4,7 @@
 ===============================================================================
 
 The :type:`fmpz_mod_poly_t` data type represents elements of
-`\\mathbb{Z}/n\\mathbb{Z}[x]` for a fixed modulus `n`. The
+`\mathbb{Z}/n\mathbb{Z}[x]` for a fixed modulus `n`. The
 :type:`fmpz_mod_poly` module provides routines for memory management,
 basic arithmetic and some higher level functions such as GCD, etc.
 
