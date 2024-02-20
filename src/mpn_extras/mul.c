@@ -14,6 +14,24 @@
 
 void __gmpn_mul_basecase(mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t);
 
+#if FLINT_HAVE_ADX
+/* We don't call mpn_mul_basecase directly because our own basecases
+   already cover small operands. */
+#define WANT_GMP_MUL_BASECASE 0
+#define BASECASE_LIMIT 0
+/* toom22 on top our own basecase beats GMP up to some point */
+#define WANT_TOOM22 1
+#define TOOM22_LIMIT 230
+#else
+/* As fallback where we don't have our own mul_basecase: */
+/* GMP's MUL_TOOM22_THRESHOLD is >= 16 on most machines */
+#define WANT_GMP_MUL_BASECASE 1
+#define BASECASE_LIMIT 16
+#define WANT_TOOM22 0
+#define TOOM22_LIMIT 0
+#endif
+
+
 #ifdef FLINT_HAVE_FFT_SMALL
 #include "fft_small.h"
 #define FFT_MUL mpn_mul_default_mpn_ctx
@@ -51,11 +69,12 @@ mp_limb_t _flint_mpn_mul(mp_ptr r, mp_srcptr x, mp_size_t xn, mp_srcptr y, mp_si
     }
     */
 
-    /* GMP's MUL_TOOM22_THRESHOLD is >= 16 on most machines */
-    if (xn <= 16)
+    if (WANT_GMP_MUL_BASECASE && xn <= BASECASE_LIMIT)
         __gmpn_mul_basecase(r, x, xn, y, yn);
     else if (yn == 1)
         r[xn + yn - 1] = mpn_mul_1(r, x, xn, y[0]);
+    else if (WANT_TOOM22 && yn <= TOOM22_LIMIT && 5 * yn >= 4 * xn)
+        flint_mpn_mul_toom22(r, x, xn, y, yn, NULL);
     else if (yn < FLINT_FFT_MUL_THRESHOLD)
         mpn_mul(r, x, xn, y, yn);
     else
@@ -66,9 +85,10 @@ mp_limb_t _flint_mpn_mul(mp_ptr r, mp_srcptr x, mp_size_t xn, mp_srcptr y, mp_si
 
 void _flint_mpn_mul_n(mp_ptr r, mp_srcptr x, mp_srcptr y, mp_size_t n)
 {
-    /* GMP's MUL_TOOM22_THRESHOLD is >= 16 on most machines */
-    if (n <= 16)
+    if (WANT_GMP_MUL_BASECASE && n <= BASECASE_LIMIT)
         __gmpn_mul_basecase(r, x, n, y, n);
+    else if (WANT_TOOM22 && n <= TOOM22_LIMIT)
+        flint_mpn_mul_toom22(r, x, n, y, n, NULL);
     else if (n < FLINT_FFT_MUL_THRESHOLD)
         mpn_mul_n(r, x, y, n);
     else
