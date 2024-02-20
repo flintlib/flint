@@ -132,7 +132,7 @@ flint_mpn_get_d(mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp);
 
 #if FLINT_HAVE_ADX
 #define FLINT_MPN_MUL_FUNC_TAB_WIDTH 17
-#define FLINT_MPN_SQR_FUNC_TAB_WIDTH 8
+#define FLINT_MPN_SQR_FUNC_TAB_WIDTH 9
 #define FLINT_HAVE_MUL_FUNC(n, m) ((n) <= 16)
 #define FLINT_HAVE_MUL_N_FUNC(n) ((n) <= 16)
 #define FLINT_HAVE_SQR_FUNC(n) ((n) <= FLINT_MPN_SQR_FUNC_TAB_WIDTH)

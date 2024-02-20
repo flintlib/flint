@@ -21,6 +21,7 @@ mp_limb_t flint_mpn_sqr_5(mp_ptr, mp_srcptr);
 mp_limb_t flint_mpn_sqr_6(mp_ptr, mp_srcptr);
 mp_limb_t flint_mpn_sqr_7(mp_ptr, mp_srcptr);
 mp_limb_t flint_mpn_sqr_8(mp_ptr, mp_srcptr);
+mp_limb_t flint_mpn_sqr_9(mp_ptr, mp_srcptr);
 
 const flint_mpn_sqr_func_t flint_mpn_sqr_func_tab[] = {
     NULL,
@@ -31,7 +32,8 @@ const flint_mpn_sqr_func_t flint_mpn_sqr_func_tab[] = {
     flint_mpn_sqr_5,
     flint_mpn_sqr_6,
     flint_mpn_sqr_7,
-    flint_mpn_sqr_8
+    flint_mpn_sqr_8,
+    flint_mpn_sqr_9
 };
 
 #else
