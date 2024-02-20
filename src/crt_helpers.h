@@ -13,7 +13,7 @@
 #define CRT_HELPERS_H
 
 #if defined(__GNUC__) && defined(__AVX2__)
-# include <x86gprintrin.h>
+# include <immintrin.h>
 #elif defined(_MSC_VER) && defined(__AVX2__)
 # include <intrin.h>
 #endif

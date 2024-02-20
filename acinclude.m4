@@ -307,7 +307,7 @@ dnl  Checks if system have headers for fft_small on x86.
 
 AC_DEFUN([FLINT_HAVE_FFT_SMALL_X86_H],
 [AS_VAR_IF([host_cpu],"x86_64",
-    [AC_CHECK_HEADERS([x86gprintrin.h immintrin.h],
+    [AC_CHECK_HEADERS([immintrin.h],
         flint_cv_have_fft_small_x86_h="yes",
         flint_cv_have_fft_small_x86_h="no")]
 )])
