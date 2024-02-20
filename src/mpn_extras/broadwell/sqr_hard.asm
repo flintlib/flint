@@ -1,5 +1,5 @@
 dnl
-dnl Copyright (C) 2023 Albin Ahlbäck
+dnl Copyright (C) 2023, 2024 Albin Ahlbäck
 dnl
 dnl This file is part of FLINT.
 dnl
@@ -563,10 +563,24 @@ PROLOGUE(flint_mpn_sqr_7)
 	ret
 EPILOGUE()
 
-define(`m0',`-4*8(%rsp)')
-define(`m1',`-3*8(%rsp)')
-define(`m2',`-2*8(%rsp)')
-define(`m3',`-1*8(%rsp)')
+dnl     <<  >>
+dnl -1      -x	<- Must be 0
+dnl  0   x-/-x
+dnl  1   x-/-x
+dnl  2   x-/-x
+dnl  3   x-/-x
+dnl  4   x-/-x
+dnl  5   x-/-x
+dnl  6   x-/-x
+dnl  7   x-/-x
+dnl  8   x-/-x
+dnl  9   x-/-x
+dnl 10   x-/-x
+dnl 11   x-/	<- s2
+dnl 12		<- s3
+dnl 13		<- s1
+
+define(`m',`eval($1-12)*8(%rsp)')
 
 	ALIGN(16)
 PROLOGUE(flint_mpn_sqr_8)
@@ -574,203 +588,226 @@ PROLOGUE(flint_mpn_sqr_8)
 	push	s5
 	push	s6
 	push	s7
-	push	s8
-	push	s9
-	push	s10
 
-	mulx	1*8(ap), sx, s1		C a0 a1
-	mulx	2*8(ap), s3, s7		C a0 a2
-	mulx	3*8(ap), s5, s4		C a0 a3
-	mulx	4*8(ap), s6, s2		C a0 a4
-	mov	sx, m0
-	add	s1, s3
-	adc	s7, s5
-	mov	s3, m1
-	mulx	5*8(ap), s7, sx		C a0 a5
-	mulx	6*8(ap), s8, s1		C a0 a6
-	mulx	7*8(ap), s9, s10	C a0 a7
-	adc	s4, s6
-	adc	s2, s7
-	adc	sx, s8
-	adc	s1, s9
-	adc	$0, s10
-	C (m0, m1,) 5, 6, 7, 8, 9, 10
-	C x, 1, 2, 3, 4
+	mulx	1*8(ap), sx, s0		C a0 a1
+	mulx	2*8(ap), s1, s2		C a0 a2
+	mulx	3*8(ap), s3, s4		C a0 a3
+	mov	sx, m(0)
+	add	s0, s1
+	adc	s2, s3
+	mov	s1, m(1)
+	mulx	4*8(ap), s5, s6		C a0 a4
+	mulx	5*8(ap), sx, s0		C a0 a5
+	mulx	6*8(ap), s2, s1		C a0 a6
+	adc	s4, s5
+	adc	s6, sx
+	mulx	7*8(ap), s4, s7		C a0 a7
+	adc	s0, s2
+	adc	s1, s4
+	adc	$0, s7
+	C m(0:1), 3, 5, x, 2, 4, 7
+	C 1, 6
 
 	xor	R32(s0), R32(s0)
 	mov	1*8(ap), %rdx
-	mulx	2*8(ap), s1, s2		C a1 a2
-	mulx	3*8(ap), s3, s4		C a1 a3
-	adox	s1, s5
-	adox	s2, s6
-	adcx	s3, s6
-	adcx	s4, s7
-	mulx	4*8(ap), s1, s2		C a1 a4
-	mulx	5*8(ap), s3, s4		C a1 a5
-	mov	s5, m2
-	mov	s6, m3
-	adox	s1, s7
-	adox	s2, s8
-	adcx	s3, s8
-	adcx	s4, s9
-	mulx	6*8(ap), s1, s2		C a1 a6
-	mulx	7*8(ap), s3, s4		C a1 a7
-	adox	s1, s9
-	adox	s2, s10
-	adcx	s3, s10
-	adcx	s0, s4
-	adox	s0, s4
-	C (m0, m1, m2, m3,) 7, 8, 9, 10, 4
-	C x, 1, 2, 3, 5, 6
-
-	mov	2*8(ap), %rdx
-	mulx	3*8(ap), sx, s1		C a2 a3
-	mulx	4*8(ap), s2, s3		C a2 a4
-	mulx	5*8(ap), s5, s6		C a2 a5
-	adox	sx, s7
-	adox	s1, s8
-	adcx	s2, s8
-	adcx	s3, s9
-	adox	s5, s9
-	adox	s6, s10
-	mulx	6*8(ap), sx, s1		C a2 a6
-	mulx	7*8(ap), s2, s3		C a2 a7
-	adcx	sx, s10
-	adcx	s1, s4
-	adox	s2, s4
-	adox	s0, s3
-	adcx	s0, s3
-	C (m0, m1, m2, m3,) 7, 8, 9, 10, 4, 3
-	C x, 1, 2, 5, 6
-
-	mov	3*8(ap), %rdx
-	mulx	4*8(ap), sx, s1		C a3 a4
-	mulx	5*8(ap), s2, s5		C a3 a5
-	adox	sx, s9
-	adox	s1, s10
-	adcx	s2, s10
-	adcx	s5, s4
-	mulx	6*8(ap), sx, s1		C a3 a6
-	mulx	7*8(ap), s2, s5		C a3 a7
-	adox	sx, s4
+	mulx	2*8(ap), s1, s6		C a1 a2
+	mov	s0, m(-1)
 	adox	s1, s3
-	adcx	s2, s3
+	adox	s6, s5
+	mulx	3*8(ap), s1, s6		C a1 a3
+	mov	s3, m(2)
+	adcx	s1, s5
+	adcx	s6, sx
+	mov	s5, m(3)
+	mulx	4*8(ap), s1, s6		C a1 a4
+	mulx	5*8(ap), s3, s5		C a1 a5
+	adox	s1, sx
+	adox	s6, s2
+	adcx	s3, s2
+	adcx	s5, s4
+	mulx	6*8(ap), s1, s6		C a1 a6
+	mulx	7*8(ap), s3, s5		C a1 a7
+	adox	s1, s4
+	adox	s6, s7
+	adcx	s3, s7
 	adcx	s0, s5
 	adox	s0, s5
-	C (m0, m1, m2, m3,) 7, 8, 9, 10, 4, 3, 5
-	C x, 1, 2, 6
+	C m(0:3), x, 2, 4, 7, 5
+	C 1, 3, 6
+
+	mov	2*8(ap), %rdx
+	mulx	3*8(ap), s1, s3		C a2 a3
+	adcx	s1, sx
+	adcx	s3, s2
+	mov	sx, m(4)
+	mulx	4*8(ap), s6, s1		C a2 a4
+	mulx	5*8(ap), s3, sx		C a2 a5
+	adox	s6, s2
+	adox	s1, s4
+	adcx	s3, s4
+	adcx	sx, s7
+	mulx	6*8(ap), s6, s1		C a2 a6
+	mulx	7*8(ap), s3, sx		C a2 a7
+	mov	s2, m(5)
+	adox	s6, s7
+	adox	s1, s5
+	adcx	s3, s5
+	adcx	s0, sx
+	adox	s0, sx
+	C m(0:5), 4, 7, 5, x
+	C 1, 2, 3, 6
+
+	mov	3*8(ap), %rdx
+	mulx	4*8(ap), s1, s2		C a3 a4
+	mulx	5*8(ap), s3, s6		C a3 a5
+	adox	s1, s4
+	adox	s2, s7
+	adcx	s3, s7
+	adcx	s6, s5
+	mov	s4, m(6)
+	mov	s7, m(7)
+	mulx	6*8(ap), s1, s2		C a3 a6
+	mulx	7*8(ap), s3, s4		C a3 a7
+	adox	s1, s5
+	adox	s2, sx
+	adcx	s3, sx
+	adcx	s0, s4
+	adox	s0, s4
+	C m(0:7), 5, x, 4
+	C 1, 2, 3, 6, 7
 
 	mov	4*8(ap), %rdx
-	mulx	5*8(ap), s2, s6		C a4 a5
-	mulx	6*8(ap), sx, s1		C a4 a6
-	adcx	s2, s4
-	adcx	s6, s3
-	adox	sx, s3
+	mulx	5*8(ap), s1, s2		C a4 a5
+	mulx	6*8(ap), s3, s6		C a4 a6
 	adox	s1, s5
-	mulx	7*8(ap), s2, s6		C a4 a7
-	adcx	s2, s5
-	adcx	s0, s6
-	C (m0, m1, m2, m3,) 7, 8, 9, 10, 4, 3, 5, 6
-	C x, 1, 2
+	adox	s2, sx
+	adcx	s3, sx
+	adcx	s6, s4
+	mulx	7*8(ap), s1, s2		C a4 a7
+	mov	s5, m(8)
+	mov	sx, m(9)
+	adox	s1, s4
+	adox	s0, s2
+	C m(0:9), 4, 2
+	C x, 1, 3, 5, 6, 7
 
 	mov	5*8(ap), %rdx
 	mulx	6*8(ap), sx, s1		C a5 a6
-	mulx	7*8(ap), %rdx, s2	C a5 a7
-	adcx	sx, s5
-	adcx	s1, s6
-	adox	%rdx, s6
-	adox	s0, s2
-	C (m0, m1, m2, m3,) 7, 8, 9, 10, 4, 3, 5, 6, 2
-	C x, 1
+	mulx	7*8(ap), s7, s3		C a5 a7
+	adox	sx, s4
+	adox	s1, s2
+	adcx	s7, s2
+	adox	s0, s3
+	mov	s4, m(10)
+	mov	s2, m(11)
+	C m(0:11), (2,) 3
+	C x, 1, 4, 5, 6, 7
 
 	mov	6*8(ap), %rdx
 	mulx	7*8(ap), sx, s1		C a6 a7
-	adcx	sx, s2
-	adcx	s0, s1
-	C (m0, m1, m2, m3,) 7, 8, 9, 10, 4, 3, 5, 6, 2, 1
-	C x
+	adc	sx, s3
+	adc	s0, s1
+	C m(0:11), (2,) 3, 1
+	C x, 4, 5, 6, 7
+
+	vmovdqu	m(-1), %ymm0
+	vmovdqu	m(0), %ymm1
+	vmovdqu	m(3), %ymm2
+	vmovdqu	m(4), %ymm3
+	vmovdqu	m(7), %ymm4
+	vmovdqu	m(8), %ymm5
+
+	vpsrlq	$63, %ymm0, %ymm0
+	vpsllq	$1, %ymm1, %ymm1
+	vpsrlq	$63, %ymm2, %ymm2
+	vpsllq	$1, %ymm3, %ymm3
+	vpsrlq	$63, %ymm4, %ymm4
+	vpsllq	$1, %ymm5, %ymm5
+
+	vpor	%ymm0, %ymm1, %ymm0
+	vpor	%ymm2, %ymm3, %ymm2
+	vpor	%ymm4, %ymm5, %ymm4
+
+	vmovdqu	%ymm0, m(0)
+	vmovdqu	%ymm2, m(4)
+	vmovdqu	%ymm4, m(8)
+
+	mov	$63, R32(s5)
+	mov	$1, R32(s6)
+
+	C s2 = sx or s2 = (s3 << 1) or (s2 >> 63)
+	shrx	s5, s2, s2
+	shlx	s6, s3, sx
+
+	C s3 = s4 or s3 = (s1 << 1) or (s3 >> 63)
+	shrx	s5, s3, s3
+	shlx	s6, s1, s4
+
+	C s1 =                          s1 >> 63
+	shrx	s5, s1, s1
 
 	mov	0*8(ap), %rdx
-	mulx	%rdx, %rdx, sx		C a0^2
-	mov	%rdx, 0*8(rp)
-	adox	m0, sx
-	adcx	m0, sx
-	mov	sx, 1*8(rp)
+	mulx	%rdx, s5, s6		C a0^2
+	or	sx, s2
+	or	s4, s3
+	add	m(0), s6
 
 	mov	1*8(ap), %rdx
-	mulx	%rdx, %rdx, sx		C a1^2
-	adox	m1, %rdx
-	adcx	m1, %rdx
-	adox	m2, sx
-	adcx	m2, sx
-	mov	%rdx, 2*8(rp)
-	mov	sx, 3*8(rp)
+	mulx	%rdx, s4, sx		C a1^2
+	mov	s5, 0*8(rp)
+	mov	s6, 1*8(rp)
+	adc	m(1), s4
+	adc	m(2), sx
+	mov	s4, 2*8(rp)
 
 	mov	2*8(ap), %rdx
-	mulx	%rdx, %rdx, sx		C a2^2
-	adox	m3, %rdx
-	adcx	m3, %rdx
-	adox	s7, sx
-	adcx	s7, sx
-	mov	%rdx, 4*8(rp)
-	mov	sx, 5*8(rp)
+	mulx	%rdx, s5, s6		C a2^2
+	mov	sx, 3*8(rp)
+	adc	m(3), s5
+	adc	m(4), s6
+	mov	s5, 4*8(rp)
 
 	mov	3*8(ap), %rdx
-	mulx	%rdx, s7, sx		C a3^2
-	adox	s8, s7
-	adcx	s8, s7
-	adox	s9, sx
-	adcx	s9, sx
-	mov	s7, 6*8(rp)
-	mov	sx, 7*8(rp)
+	mulx	%rdx, s4, sx		C a3^2
+	mov	s6, 5*8(rp)
+	adc	m(5), s4
+	adc	m(6), sx
+	mov	s4, 6*8(rp)
 
 	mov	4*8(ap), %rdx
-	mulx	%rdx, s8, s9		C a4^2
-	adox	s10, s8
-	adcx	s10, s8
-	adox	s4, s9
-	adcx	s4, s9
-	mov	s8, 8*8(rp)
-	mov	s9, 9*8(rp)
+	mulx	%rdx, s5, s6		C a4^2
+	mov	sx, 7*8(rp)
+	adc	m(7), s5
+	adc	m(8), s6
+	mov	s5, 8*8(rp)
 
 	mov	5*8(ap), %rdx
-	mulx	%rdx, s7, sx		C a5^2
-	adox	s3, s7
-	adcx	s3, s7
-	adox	s5, sx
-	adcx	s5, sx
-	mov	s7, 10*8(rp)
-	mov	sx, 11*8(rp)
+	mulx	%rdx, s4, sx		C a5^2
+	mov	s6, 9*8(rp)
+	adc	m(9), s4
+	adc	m(10), sx
+	mov	s4, 10*8(rp)
 
 	mov	6*8(ap), %rdx
-	mulx	%rdx, s8, s9		C a6^2
-	adox	s6, s8
-	adcx	s6, s8
-	adox	s2, s9
-	adcx	s2, s9
-	mov	s8, 12*8(rp)
-	mov	s9, 13*8(rp)
+	mulx	%rdx, s5, s6		C a6^2
+	mov	sx, 11*8(rp)
+	adc	m(11), s5
+	adc	s2, s6
+	mov	s5, 12*8(rp)
 
 	mov	7*8(ap), %rdx
-	mulx	%rdx, s3, sx		C a7^2
-	adox	s1, s3
-	adcx	s1, s3
-	adox	s0, sx
-	adcx	s0, sx
-	mov	s3, 14*8(rp)
+	mulx	%rdx, s4, sx		C a7^2
+	mov	s6, 13*8(rp)
+	adc	s3, s4
+	adc	s1, sx
+	mov	s4, 14*8(rp)
 	mov	sx, 15*8(rp)
 
-	pop	s10
-	pop	s9
-	pop	s8
+	vzeroupper
+
 	pop	s7
 	pop	s6
 	pop	s5
 
 	ret
 EPILOGUE()
-
-undefine(`m0')
-undefine(`m1')
-undefine(`m2')
-undefine(`m3')
