@@ -32,7 +32,7 @@ int main(void)
     mp_limb_t yp[N_MAX];
     mp_size_t n;
 
-    flint_printf("Best of mpn_mul_n, mpn_mul_basecase and mpfr_mulhigh_n\nagainst flint_mpn_mulhigh_n_basecase:\n");
+    flint_printf("Best of mpn_mul_n, mpn_mul_basecase and mpfr_mulhigh_n\nagainst flint_mpn_mulhigh_basecase:\n");
     for (n = N_MIN; n <= N_MAX; n++)
     {
         double t1, t2, t3, t4, tmin, __attribute__((unused)) __;

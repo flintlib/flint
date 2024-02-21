@@ -12,18 +12,10 @@
 #ifndef CRT_HELPERS_H
 #define CRT_HELPERS_H
 
-#if defined(__GNUC__)
-# if defined(__AVX2__)
-#  include <x86intrin.h>
-# elif defined(__ARM_NEON)
-#  include <arm_neon.h>
-# endif
-#elif defined(_MSC_VER)
-# if defined(__AVX2__)
-#  include <intrin.h>
-# elif defined(_M_ARM64)
-#  include <arm_neon.h>
-# endif
+#if defined(__GNUC__) && defined(__AVX2__)
+# include <immintrin.h>
+#elif defined(_MSC_VER) && defined(__AVX2__)
+# include <intrin.h>
 #endif
 
 #include "flint.h"

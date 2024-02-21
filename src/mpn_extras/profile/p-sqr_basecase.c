@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2023 Fredrik Johansson
-    Copyright (C) 2023 Albin Ahlbäck
+    Copyright (C) 2023, 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -10,51 +10,55 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdlib.h>
 #include "mpn_extras.h"
 #include "profiler.h"
 
 #define mpn_sqr_basecase __gmpn_sqr_basecase
 void mpn_sqr_basecase(mp_ptr, mp_srcptr, mp_size_t);
 
-int main(void)
+#define N_MAX FLINT_MPN_SQR_FUNC_TAB_WIDTH
+
+static void measure(mp_ptr rp1, mp_ptr rp2, mp_ptr ap, slong mx)
 {
-    mp_limb_t res1[28];
-    mp_limb_t res2[28];
-    mp_limb_t ap[14];
+    double t1, t2, __attribute__((unused)) __;
+
+    if (FLINT_HAVE_SQR_FUNC(mx))
+    {
+        flint_printf("m = %2wd:", mx);
+
+        mpn_random2(ap, mx);
+
+        TIMEIT_START
+        mpn_sqr_basecase(rp1, ap, mx);
+        TIMEIT_STOP_VALUES(__, t1)
+
+        TIMEIT_START
+        flint_mpn_sqr(rp2, ap, mx);
+        TIMEIT_STOP_VALUES(__, t2)
+
+        flint_printf("%7.2fx\n", t1 / t2);
+    }
+}
+
+int main(int argc, char ** argv)
+{
+    mp_limb_t res1[2 * N_MAX];
+    mp_limb_t res2[2 * N_MAX];
+    mp_limb_t ap[N_MAX];
     slong mx;
 
-    for (mx = 1; mx <= 14; mx++)
+    if (argc == 2)
     {
-        double t1, t2, t3, __attribute__((unused)) __;
-
-        if (FLINT_HAVE_SQR_FUNC(mx))
-        {
-            flint_printf("m = %2wd:", mx);
-
-            mpn_random2(ap, mx);
-
-            TIMEIT_START
-            mpn_sqr_basecase(res1, ap, mx);
-            TIMEIT_STOP_VALUES(__, t1)
-
-            TIMEIT_START
-            flint_mpn_sqr_basecase(res2, ap, mx);
-            TIMEIT_STOP_VALUES(__, t2)
-
-            TIMEIT_START
-            flint_mpn_mul_basecase(res2, ap, ap, mx, mx);
-            TIMEIT_STOP_VALUES(__, t3)
-
-            flint_printf("%7.2fx", t1 / t2);
-            flint_printf("    %7.2fx", t1 / t3);
-
-            /* if (mpn_cmp(res1, res2, 2 * mx) != 0) */
-            /*     flint_abort(); */
-
-            flint_printf("\n\n");
-        }
+        measure(res1, res2, ap, strtol(argv[1], NULL, 10));
+        goto end;
     }
 
+    flint_printf("mpn_sqr_basecase / flint_mpn_sqr\n");
+    for (mx = 1; mx <= N_MAX; mx++)
+        measure(res1, res2, ap, mx);
+
+end:
     flint_cleanup_master();
 
     return 0;

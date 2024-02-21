@@ -41,7 +41,6 @@ dnl   (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 dnl
 
 include(`config.m4')
-include(`src/mpn_extras/broadwell/asm-defs.m4')
 
 define(`rp',	   `%rdi')
 define(`ap',	   `%rsi')
@@ -61,18 +60,13 @@ define(`r1',	   `%rbx')
 define(`r2',	   `%rbp')
 define(`r3',	   `%r12')
 
-# Idea: Do similar to mpn_mullo_basecase for Skylake.
+dnl Idea: Do similar to mpn_mullo_basecase for Skylake.
 
-.text
-
-.global	FUNC(_flint_mpn_mulhigh_basecase)
-ALIGN(32)
-TYPE(_flint_mpn_mulhigh_basecase)
-
-FUNC(_flint_mpn_mulhigh_basecase):
-	.cfi_startproc
+	TEXT
+	ALIGN(32)
+PROLOGUE(_flint_mpn_mulhigh_basecase)
 	mov	bp_param, bp
-	lea	-1*8(ap,n,8), ap	# ap += n - 1
+	lea	-1*8(ap,n,8), ap	C ap += n - 1
 
 	push	%rbx
 	push	%rbp
@@ -80,12 +74,12 @@ FUNC(_flint_mpn_mulhigh_basecase):
 	push	%r13
 	push	%r14
 
-	# Initial triangle
-	#       h
-	#     h x
-	#   h x x
-	# h x x x
-	# x x x x
+	C Initial triangle
+	C       h
+	C     h x
+	C   h x x
+	C h x x x
+	C x x x x
 define(`s0', `jmpreg')
 define(`s1', `m')
 define(`s2', `mm')
@@ -147,19 +141,19 @@ undefine(`s1')
 undefine(`s2')
 undefine(`s3')
 
-	# Addmul chains
-	# - m = -8 * n_cur	(n_cur is the 4 at the start)
-	# - mm = -8 * (n - 1)	(where n is the original n)
-	# - n keeps track of how many loops to do in the addmul-loop.
-	# - nn keeps track of initial n between loops.
+	C Addmul chains
+	C - m = -8 * n_cur	(n_cur is the 4 at the start)
+	C - mm = -8 * (n - 1)	(where n is the original n)
+	C - n keeps track of how many loops to do in the addmul-loop.
+	C - nn keeps track of initial n between loops.
 	lea	-1*8(,n,8), R32(mm)
 	lea	4*8(bp), bp
 	lea	-3*8(ap), ap
-	mov	$-4*8, m		# m <- -8 * 4
-	neg	mm			# mm <- -8 * (n - 1)
+	mov	$-4*8, m		C m <- -8 * 4
+	neg	mm			C mm <- -8 * (n - 1)
 	mov	0*8(bp), %rdx
-	xor	R32(nn), R32(nn)	# nn <- 0
-	xor	R32(n), R32(n)		# n <- 0
+	xor	R32(nn), R32(nn)	C nn <- 0
+	xor	R32(n), R32(n)		C n <- 0
 	mulx	-2*8(ap), r1, r1
 	adcx	r1, rx
 
@@ -211,32 +205,32 @@ L(f2):	mulx	-1*8(ap), r2, r3
 
 L(end):	adox	0*8(rp), r2
 	mov	r2, 0*8(rp)
-	adox	n, r3		# n = 0
-	adc	n, r3		# n = 0
-	add	m, ap		# Reset ap
+	adox	n, r3		C n = 0
+	adc	n, r3		C n = 0
+	add	m, ap		C Reset ap
 	mov	r3, 1*8(rp)
 	lea	-1*8(m), m
-	lea	1*8(bp), bp	# Increase bp
-	lea	2*8(rp,m), rp	# Reset rp
-	mov	0*8(bp), %rdx	# Load bp
+	lea	1*8(bp), bp	C Increase bp
+	lea	2*8(rp,m), rp	C Reset rp
+	mov	0*8(bp), %rdx	C Load bp
 	cmp	R32(m), R32(mm)
 	jge	L(jmp)
-	# If |m| < |mm|: goto jmpreg, but first do high part
-	or	R32(nn), R32(n)	# Reset n, CF and OF
+	C If |m| < |mm|: goto jmpreg, but first do high part
+	or	R32(nn), R32(n)	C Reset n, CF and OF
 	mulx	-2*8(ap), r1, r1
 	adcx	r1, rx
 	jmp	*jmpreg
-	# If |m| > |mm|: goto fin
+	C If |m| > |mm|: goto fin
 L(jmp):	jg	L(fin)
-	# If |m| = |mm|: goto jmpreg
-	or	R32(nn), R32(n)	# Reset n, clear CF and OF
+	C If |m| = |mm|: goto jmpreg
+	or	R32(nn), R32(n)	C Reset n, clear CF and OF
 	jmp	*jmpreg
 
 	ALIGN(32)
 L(b2):	adox	-1*8(rp), r0
 	adcx	r1, r2
 	mov	r0, -1*8(rp)
-	jrcxz	L(end)	# Jump if n = 0
+	jrcxz	L(end)	C Jump if n = 0
 L(b1):	mulx	1*8(ap), r0, r1
 	adox	0*8(rp), r2
 	lea	-1(n), R32(n)
@@ -305,6 +299,4 @@ L(fin):	pop	%r14
 	pop	%rbx
 
 	ret
-._flint_mpn_mulhigh_basecase_end:
-SIZE(_flint_mpn_mulhigh_basecase, ._flint_mpn_mulhigh_basecase_end)
-.cfi_endproc
+EPILOGUE()

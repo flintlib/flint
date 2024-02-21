@@ -30,7 +30,7 @@ TEST_FUNCTION_START(flint_mpn_divrem_preinvn, state)
     gmp_randinit_default(st);
 
     /* test flint_mpn_divrem_preinvn alias r and a */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         size = n_randint(state, 200) + 1;
         size2 = n_randint(state, 200) + size;
@@ -83,7 +83,7 @@ TEST_FUNCTION_START(flint_mpn_divrem_preinvn, state)
     }
 
     /* test flint_mpn_divrem_preinvn */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         size = n_randint(state, 200) + 1;
         size2 = n_randint(state, 200) + size;

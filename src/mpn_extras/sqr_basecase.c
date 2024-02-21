@@ -20,7 +20,9 @@ mp_limb_t flint_mpn_sqr_4(mp_ptr, mp_srcptr);
 mp_limb_t flint_mpn_sqr_5(mp_ptr, mp_srcptr);
 mp_limb_t flint_mpn_sqr_6(mp_ptr, mp_srcptr);
 mp_limb_t flint_mpn_sqr_7(mp_ptr, mp_srcptr);
-
+mp_limb_t flint_mpn_sqr_8(mp_ptr, mp_srcptr);
+mp_limb_t flint_mpn_sqr_9(mp_ptr, mp_srcptr);
+mp_limb_t flint_mpn_sqr_10(mp_ptr, mp_srcptr);
 
 mp_limb_t flint_mpn_mul_7_2(mp_ptr, mp_srcptr, mp_srcptr);
 mp_limb_t flint_mpn_mul_7_3(mp_ptr, mp_srcptr, mp_srcptr);
@@ -29,40 +31,6 @@ mp_limb_t flint_mpn_mul_7_5(mp_ptr, mp_srcptr, mp_srcptr);
 mp_limb_t flint_mpn_mul_7_6(mp_ptr, mp_srcptr, mp_srcptr);
 mp_limb_t flint_mpn_mul_7_7(mp_ptr, mp_srcptr, mp_srcptr);
 mp_limb_t flint_mpn_mul_8_7(mp_ptr, mp_srcptr, mp_srcptr);
-
-mp_limb_t flint_mpn_sqr_8(mp_ptr res, mp_srcptr x)
-{
-    mp_limb_t t[8];
-    mp_limb_t b = x[7];
-    flint_mpn_sqr_7(res, x);
-    umul_ppmm(res[15], res[14], b, b);
-    t[7] = mpn_lshift(t, x, 7, 1);
-    res[15] += mpn_addmul_1(res + 7, t, 8, b);
-    return res[15];
-}
-
-mp_limb_t flint_mpn_sqr_9(mp_ptr res, mp_srcptr x)
-{
-    mp_limb_t t[10];
-    flint_mpn_sqr_7(res, x);
-    flint_mpn_sqr_2(res + 14, x + 7);
-    flint_mpn_mul_7_2(t, x, x + 7);
-    t[9] = 0;
-    res[17] += mpn_addmul_1(res + 7, t, 10, 2);
-    return res[17];
-}
-
-mp_limb_t flint_mpn_sqr_10(mp_ptr res, mp_srcptr x)
-{
-    mp_limb_t t[12];
-    flint_mpn_sqr_7(res, x);
-    flint_mpn_sqr_3(res + 14, x + 7);
-    flint_mpn_mul_7_3(t, x, x + 7);
-    t[10] = 0;
-    t[11] = 0;
-    res[19] += mpn_addmul_1(res + 7, t, 12, 2);
-    return res[19];
-}
 
 mp_limb_t flint_mpn_sqr_11(mp_ptr res, mp_srcptr x)
 {
@@ -128,7 +96,7 @@ const flint_mpn_sqr_func_t flint_mpn_sqr_func_tab[] = {
     flint_mpn_sqr_11,
     flint_mpn_sqr_12,
     flint_mpn_sqr_13,
-    flint_mpn_sqr_14,
+    flint_mpn_sqr_14
 };
 
 #else

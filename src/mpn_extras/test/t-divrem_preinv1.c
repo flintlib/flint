@@ -28,7 +28,7 @@ TEST_FUNCTION_START(flint_mpn_divrem_preinv1, state)
 
     gmp_randinit_default(st);
 
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         do {
             mpz_rrandomb(a, st, n_randint(state, 200));

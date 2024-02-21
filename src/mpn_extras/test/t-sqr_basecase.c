@@ -13,24 +13,24 @@
 #include "mpn_extras.h"
 
 #if FLINT_HAVE_ADX
-
+# define N_MAX FLINT_MPN_SQR_FUNC_TAB_WIDTH
 TEST_FUNCTION_START(flint_mpn_sqr_basecase, state)
 {
     slong ix;
 
     for (ix = 0; ix < 100000 * flint_test_multiplier(); ix++)
     {
-        mp_limb_t res1[28] = {UWORD(0)};
-        mp_limb_t res2[28] = {UWORD(0)};
+        mp_limb_t res1[2 * N_MAX] = {UWORD(0)};
+        mp_limb_t res2[2 * N_MAX] = {UWORD(0)};
         mp_limb_t ret1;
-        mp_limb_t ap[14];
+        mp_limb_t ap[N_MAX];
         slong alen;
 
-        alen = 1 + n_randint(state, 14);
+        alen = 1 + n_randint(state, N_MAX);
 
         mpn_random2(ap, alen);
 
-        ret1 = flint_mpn_sqr_basecase(res1, ap, alen);
+        ret1 = flint_mpn_sqr(res1, ap, alen);
         mpn_sqr(res2, ap, alen);
 
         if (mpn_cmp(res1, res2, 2 * alen) || ret1 != res1[2 * alen - 1])
@@ -46,6 +46,7 @@ TEST_FUNCTION_START(flint_mpn_sqr_basecase, state)
 
     TEST_FUNCTION_END(state);
 }
+# undef N_MAX
 #else
 TEST_FUNCTION_START(flint_mpn_sqr_basecase, state)
 {

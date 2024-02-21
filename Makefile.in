@@ -290,8 +290,14 @@ SOURCES := $(foreach dir,$(DIRS),$($(dir)_SOURCES))
 
 ifeq ($(WANT_ADX_ASSEMBLY),1)
 mpn_extras_ASM_SOURCES := $(wildcard $(SRC_DIR)/mpn_extras/broadwell/*.asm)
+mpn_extras_PIC_S_SOURCES := $(patsubst $(SRC_DIR)/%.asm,$(BUILD_DIR)/%_pic.s,$(mpn_extras_ASM_SOURCES))
 mpn_extras_S_SOURCES := $(patsubst $(SRC_DIR)/%.asm,$(BUILD_DIR)/%.s,$(mpn_extras_ASM_SOURCES))
+ifneq ($(SHARED), 0)
+mpn_extras_SOURCES += $(mpn_extras_PIC_S_SOURCES)
+endif
+ifneq ($(STATIC), 0)
 mpn_extras_SOURCES += $(mpn_extras_S_SOURCES)
+endif
 endif
 
 define xxx_PROF_SOURCES
@@ -349,7 +355,7 @@ $(1)_LOBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.lo,$(filter-out %.s, $($(
 endef
 $(foreach dir, $(DIRS), $(eval $(call xxx_LOBJS,$(dir))))
 ifeq ($(WANT_ADX_ASSEMBLY),1)
-mpn_extras_LOBJS += $(patsubst %.s,%.lo,$(mpn_extras_S_SOURCES))
+mpn_extras_LOBJS += $(patsubst %_pic.s,%.lo,$(mpn_extras_PIC_S_SOURCES))
 endif
 LOBJS := $(foreach dir, $(DIRS), $($(dir)_LOBJS))
 endif
@@ -567,10 +573,10 @@ DEPFLAGS = -MMD -MP -MF $(@:%=%.d)
 ################################################################################
 
 ifeq ($(WANT_ADX_ASSEMBLY),1)
-$(BUILD_DIR)/%.s: $(SRC_DIR)/%.asm | $(BUILD_DIR)/mpn_extras/broadwell
+$(BUILD_DIR)/%.s: $(SRC_DIR)/%.asm $(FLINT_DIR)/config.m4 $(SRC_DIR)/mpn_extras/asm-defs.m4 $(SRC_DIR)/mpn_extras/broadwell/x86_64-defs.m4 | $(BUILD_DIR)/mpn_extras/broadwell
 	@$(M4) $< > $@
 
-$(BUILD_DIR)/%_pic.s: $(SRC_DIR)/%.asm | $(BUILD_DIR)/mpn_extras/broadwell
+$(BUILD_DIR)/%_pic.s: $(SRC_DIR)/%.asm $(FLINT_DIR)/config.m4 $(SRC_DIR)/mpn_extras/asm-defs.m4 $(SRC_DIR)/mpn_extras/broadwell/x86_64-defs.m4 | $(BUILD_DIR)/mpn_extras/broadwell
 	@$(M4) -DPIC $< > $@
 endif
 
