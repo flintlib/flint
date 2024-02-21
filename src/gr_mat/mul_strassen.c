@@ -20,6 +20,10 @@
 /* todo: use fused add-mul operations when supported by
          the matrix interface in the future */
 
+/* The implemented sequence is not Strassen's nor Winograd's, but the sequence
+   proposed by Bodrato, which is equivalent to Winograd's, and can be easily
+   adapted to compute the square of a matrix. */
+
 int gr_mat_mul_strassen(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 {
     slong ar, ac, br, bc;
@@ -81,35 +85,35 @@ int gr_mat_mul_strassen(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t
 
     X1->c = anc;
 
-    status |= gr_mat_sub(X1, A11, A21, ctx);
-    status |= gr_mat_sub(X2, B22, B12, ctx);
+    status |= gr_mat_add(X1, A22, A12, ctx);
+    status |= gr_mat_add(X2, B22, B12, ctx);
     status |= gr_mat_mul(C21, X1, X2, ctx);
 
-    status |= gr_mat_add(X1, A21, A22, ctx);
-    status |= gr_mat_sub(X2, B12, B11, ctx);
+    status |= gr_mat_sub(X1, A22, A21, ctx);
+    status |= gr_mat_sub(X2, B22, B21, ctx);
     status |= gr_mat_mul(C22, X1, X2, ctx);
 
-    status |= gr_mat_sub(X1, X1, A11, ctx);
-    status |= gr_mat_sub(X2, B22, X2, ctx);
-    status |= gr_mat_mul(C12, X1, X2, ctx);
+    status |= gr_mat_add(X1, X1, A12, ctx);
+    status |= gr_mat_add(X2, X2, B12, ctx);
+    status |= gr_mat_mul(C11, X1, X2, ctx);
 
-    status |= gr_mat_sub(X1, A12, X1, ctx);
-    status |= gr_mat_mul(C11, X1, B22, ctx);
+    status |= gr_mat_sub(X1, X1, A11, ctx);
+    status |= gr_mat_mul(C12, X1, B12, ctx);
 
     X1->c = bnc;
-    status |= gr_mat_mul(X1, A11, B11, ctx);
-    status |= gr_mat_add(C12, X1, C12, ctx);
-    status |= gr_mat_add(C21, C12, C21, ctx);
+    status |= gr_mat_mul(X1, A12, B21, ctx);
+    status |= gr_mat_add(C11, C11, X1, ctx);
     status |= gr_mat_add(C12, C12, C22, ctx);
-    status |= gr_mat_add(C22, C21, C22, ctx);
-    status |= gr_mat_add(C12, C12, C11, ctx);
-    status |= gr_mat_sub(X2, X2, B21, ctx);
-    status |= gr_mat_mul(C11, A22, X2, ctx);
+    status |= gr_mat_sub(C12, C11, C12, ctx);
+    status |= gr_mat_sub(C11, C21, C11, ctx);
+    status |= gr_mat_sub(X2, X2, B11, ctx);
+    status |= gr_mat_mul(C21, A21, X2, ctx);
 
     gr_mat_clear(X2, ctx);
 
-    status |= gr_mat_sub(C21, C21, C11, ctx);
-    status |= gr_mat_mul(C11, A12, B21, ctx);
+    status |= gr_mat_sub(C21, C11, C21, ctx);
+    status |= gr_mat_add(C22, C22, C11, ctx);
+    status |= gr_mat_mul(C11, A11, B11, ctx);
 
     status |= gr_mat_add(C11, X1, C11, ctx);
 
