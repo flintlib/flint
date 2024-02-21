@@ -12,6 +12,16 @@ FLINT version history
 Main contributors: Fredrik Johansson (FJ), Albin Ahlbäck (AA),
 Jean Kieffer (JK).
 
+* License
+
+  * Changed license from "LGPL 2.1 or later" to "LGPL 3 or later".
+
+* Major interface changes
+
+  * The methods in the ``fmpz_mod_mat`` module now use a context object (FJ).
+  * Changed ``fq_mat_rref`` and others to allow separate input and
+    output matrices (FJ).
+
 * Features
 
   * New module ``acb_theta`` for computing complex Riemann theta functions
@@ -58,6 +68,20 @@ Jean Kieffer (JK).
   * Added ``gr_gens_recursive`` (FJ).
   * Allow overriding ``flint_aligned_alloc`` (AA).
   * Added ``_fmpz_vec_dot_general`` (FJ).
+  * Allow setting degree and bit size evaluation limits for the
+    ``gr`` ``qqbar`` context (FJ).
+  * Added ``nmod_poly_divexact`` and replaced several uses of
+    ``nmod_poly_div`` where an exact division is intended (FJ).
+  * Added ``fmpz_poly_divexact`` and replaced several uses of
+    ``fmpz_poly_div`` where an exact division is intended (FJ).
+  * Added ``fq_default_ctx_inner`` to access the internal context
+    object of a ``fq_default_ctx`` (FJ).
+  * Implemented ``gr_is_ring`` and ``gr_ctx_is_commutative_ring``
+    properly (FJ).
+  * Added ``d_mul_2exp_inrange``, ``d_mul_2exp_inrange2``, ``d_mul_2exp``
+    and ``_d_vec_mul_2exp`` (FJ).
+  * Added ``fmpz_mod_mat_det`` (FJ).
+  * Allow overriding ``gr_mat_lu`` (FJ).
 
 * Bugs
 
@@ -78,6 +102,7 @@ Jean Kieffer (JK).
   * Fixed printing ``nmod32`` elements on 32-bit systems (FJ).
   * Fixed ``ldconfig`` for BSD systems (AA).
   * Fixed ``FLINT_WANT_ASSERT`` for CMake (AA).
+  * Fixed memory leak in ``arb_nint`` (FJ).
 
 * Performance
 
@@ -92,23 +117,40 @@ Jean Kieffer (JK).
     when calling ``mpn`` functions directly, though few applications
     currently benefit significantly due to wrapper overheads (some Arb benchmarks
     run ~5% faster with this change). (AA, FJ).
+  * Added ``flint_mpn_mulhigh_basecase`` and ``flint_mpn_sqrhigh_basecase``
+    for Broadwell (AA).
+  * Use toom22 on top of custom basecase code for intermediate operands in
+    ``flint_mpn_mul`` (FJ, based on GMP code).
+  * Use ``mulx`` in ``umul_ppmm`` when available (AA).
   * Faster ``_fmpz_vec_dot`` (FJ).
+  * Faster ``_fmpz_mod_vec_dot`` (FJ)
   * Faster ``fmpz_poly`` and ``fmpz_mat`` basecase algorithms
     based on dot products.
   * Optimized ``fmpz_mat_mul_classical`` (FJ).
   * Added ``fmpz_mat_mul_waksman``, speeding up ``fmpz_mat`` multiplication
     for balanced matrices with huge entries (Éric Schost, Vincent Neiger, FJ).
+  * Tweaks to improve GCC's code generation for ``fmpz_mpoly`` and ``nmod_mpoly``
+    multiplication (FJ).
+  * Improved ``fmpz_mod_mat_set_fmpz_mat`` (FJ).
+  * Improved tuning for ``fmpz_mat_sqr`` (FJ).
+  * Improved ``fmpz_mat_sqr_bodrato`` with small coefficients (Marco Bodrato).
+  * Squaring optimizations in ``fmpz_mat_mul_multi_mod`` (FJ).
+  * Use Bodrato's sequence for Strassen multiplication (Marco Bodrato).
   * Strip trailing zeros in ``fmpz_poly_gcd``: this gives a 50x speedup
     computing ``gcd(x^1000, x^1001)``.
   * Faster CLD bound computation, speeding up ``fmpz_poly_factor``
     for some polynomials.
-  * Use new formulas from Jorge Zuniga to compute Catalan's constant
-    and zeta(3) faster (FJ).
+  * Use new formulas from Jorge Zuniga to compute log(2), Catalan's
+    constant and zeta(3) faster (FJ).
   * Compressed the database of Conway polynomials to 10% of the
     original size (AA).
   * Optimized context initializers for ``fq``, ``fq_zech``, ``fq_nmod``
     and ``qadic`` (AA).
+  * Avoid calls to the slow standard library function ``ldexp`` (FJ).
   * Improved ``fmpz_is_probabprime`` for word-size input (FJ).
+  * Make ``gr_poly_resultant`` use the quasilinear hgcd algorithm by
+    default over finite rings and remove obsolete ``fmpz_mod_poly``
+    implementations (FJ).
   * Optimized header files (AA).
   * Changed several internal helper functions to forced inlines (AA).
   * Merged some sources files to speed up compilation (AA).
@@ -138,6 +180,7 @@ Jean Kieffer (JK).
   * Removed ``fmpq_get_mpz_frac`` (AA).
   * Removed ``arb_fmpz_poly_cos_minpoly`` (AA).
   * Removed ``fmpz_mat_mul_classical_inline`` (FJ).
+  * Removed ``fmpz_mat_rref_mod`` (use ``fmpz_mod_mat_rref`` instead) (FJ).
   * Introduce ``FLINT_SWAP`` macro to replace several older macros (FJ).
   * Replaced ``invert_limb`` by ``n_preinvert_limb_prenorm`` (AA).
   * Renamed ``_perm_set_one`` to ``_perm_one`` (AA).
@@ -147,6 +190,7 @@ Jean Kieffer (JK).
   * Use binary files in ``qsieve`` (AA).
   * Use C11 atomics in the ``fmpz`` memory manager (AA).
   * Merged some repeated code in the ``mpoly`` modules (FJ).
+  * Refactored ``fq_default`` to use ``gr`` generics internally (FJ).
   * Replaced more functions by generics-based versions (FJ).
   * Do not include ``pthread.h`` when opted out (AA).
   * Test ARM NEON in CI (AA).
