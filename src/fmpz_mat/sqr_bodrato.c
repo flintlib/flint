@@ -140,6 +140,8 @@ fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A)
 
         if (bits + sign <= 2 * FLINT_BITS)
         {
+            bits = 2 * bits + FLINT_BIT_COUNT(n);
+
             /* todo: specialize for squaring */
             _fmpz_mat_mul_double_word_internal(B, A, A, sign, bits);
         }
