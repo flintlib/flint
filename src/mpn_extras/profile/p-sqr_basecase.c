@@ -21,7 +21,7 @@ void mpn_sqr_basecase(mp_ptr, mp_srcptr, mp_size_t);
 
 static void measure(mp_ptr rp1, mp_ptr rp2, mp_ptr ap, slong mx)
 {
-    double t1, t2, __attribute__((unused)) __;
+    double t1, t2, FLINT_SET_BUT_UNUSED(__);
 
     if (FLINT_HAVE_SQR_FUNC(mx))
     {

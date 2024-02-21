@@ -20,7 +20,7 @@ int main(void)
     mp_ptr r, x, y;
     mp_size_t n;
     slong i, nt;
-    double t, _;
+    double t, FLINT_SET_BUT_UNUSED(_);
 
     flint_printf("         n     mpn_mul    1 thread    2 threads    4 threads    8 threads\n");
 
