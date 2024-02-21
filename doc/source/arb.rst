@@ -142,11 +142,21 @@ Assignment and rounding
 
 .. function:: void arb_set_ui(arb_t y, ulong x)
 
-.. function:: void arb_set_d(arb_t y, double x)
-
 .. function:: void arb_set_fmpz(arb_t y, const fmpz_t x)
 
+.. function:: void arb_set_d(arb_t y, double x)
+
     Sets *y* to the value of *x* without rounding.
+
+.. note::
+
+    Be cautious when using :func:`arb_set_d` as it does not impose any error
+    bounds and will only convert a ``double`` to an ``arb_t``. For instance,
+    ``arb_set_d(x, 1.1)`` and ``arb_set_str(x, "1.1", prec)`` work very
+    differently, where the former will first create a ``double`` whose value is
+    the approximation of `1.1` (without any error bounds) which then sets *x* to
+    this approximated value with no error. This differs from ``arb_set_str``
+    which will impose an error bound based on the precision.
 
 .. function:: void arb_set_fmpz_2exp(arb_t y, const fmpz_t x, const fmpz_t e)
 
