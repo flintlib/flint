@@ -45,7 +45,8 @@ gr_sparse_vec_set_from_entries(gr_sparse_vec_t vec, ulong * cols, gr_srcptr entr
     gr_sparse_vec_fit_nnz(vec, new_nnz, ctx);
     sz = ctx->sizeof_elem;
     status = GR_SUCCESS;
-    j = -1;
+    j = -1; /* j tracks the current index we are going to put the nonzero in the sparse vector storage */
+    /* i tracks where in the column-sorted list of nonzeros we are pulling from */
     for (i = 0; i < nnz && status == GR_SUCCESS; i++)
     {
         /* If it's a new column, do a set; otherwise do an accumulate */
@@ -70,7 +71,8 @@ gr_sparse_vec_set_from_entries(gr_sparse_vec_t vec, ulong * cols, gr_srcptr entr
             status |= gr_add(GR_ENTRY(vec->entries, j, sz), GR_ENTRY(vec->entries, j, sz), GR_ENTRY(entries, si[i].i, sz), ctx);
         }
     }
-    vec->nnz = j;
+    /* Finally, figure out whether the last entry is zero (in which case it doesn't count), and set nnz accordingly */
+    vec->nnz = (T_FALSE == gr_is_zero(GR_ENTRY(vec->entries, j, sz), ctx) ? j+1 : j);
     flint_free(si);
     return status;
 }

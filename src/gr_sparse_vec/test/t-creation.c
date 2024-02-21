@@ -46,55 +46,63 @@ test_init_from_entries_sorted(flint_rand_t state, gr_ctx_t ctx)
 
 
 int
-test_init_from_entries_unsorted(flint_rand_t state, gr_ctx_t ctx)
+test_init_from_entries_unsorted_internal(ulong *cols, gr_srcptr entries, slong len, slong n_entries, gr_ctx_t ctx)
 {
-    slong i,j;
-    gr_sparse_vec_t vec;
-    gr_vec_t dvec;
-    gr_ptr temp, temp2;
-    GR_TMP_INIT2(temp, temp2, ctx);
+    /* Yes, this is quadratic time just to be careful */
     int status = GR_SUCCESS;
     slong sz = ctx->sizeof_elem;
-    slong N = 5;
-    ulong cols[5] = {8, 4, 3, 8, 1}; /* the locations of the duplicate are used later! */
-    gr_vec_init(dvec, N, ctx);
-    status |= _gr_vec_randtest(GR_VEC_ENTRY(dvec, 0, sz), state, N, ctx);
-    status |= gr_add(temp2, GR_VEC_ENTRY(dvec, 0, sz), GR_VEC_ENTRY(dvec, 3, sz), ctx);
-    status |= gr_sparse_vec_init(vec, 2*N, ctx);
-    status |= gr_sparse_vec_set_from_entries(vec, cols, GR_VEC_ENTRY(dvec, 0, sz), N, ctx);
+    slong i,j,col;
+    gr_sparse_vec_t vec;
+    gr_ptr temp, temp2;
+    GR_TMP_INIT2(temp, temp2, ctx);
+    status |= gr_sparse_vec_init(vec, len, ctx);
+    status |= gr_sparse_vec_set_from_entries(vec, cols, entries, n_entries, ctx);
     if (status != GR_SUCCESS)
-    {
-        flint_printf("Bad status after creating vectors\n");
         return GR_TEST_FAIL;
-    }
-    gr_print(temp2, ctx);
-    gr_vec_print(dvec, ctx);
-    gr_sparse_vec_print_nz(vec, ctx);
-    for (i = 0; i < 2*N; i++)
+    /* Scan through every column in the sparse vector */
+    for (i = 0; i < len; i++)
     {
-        status |= gr_sparse_vec_find_entry(temp, vec, i, ctx);
-        if (i == 8)
+        /* Scan through the entries to figure out what the correct value should be */
+        status |= gr_zero(temp, ctx);
+        for (j = 0; j < n_entries; j++)
         {
-            if (T_TRUE != gr_equal(temp, temp2, ctx))
-                return GR_TEST_FAIL;
+            if (cols[j] == i)
+                status |= gr_add(temp, temp, GR_ENTRY(entries, j, sz), ctx);
         }
-        else
-        {
-            for (j = 0; j < N; j++)
-            {
-                if (cols[j] == i)
-                {
-                    if (T_TRUE != gr_equal(temp, GR_VEC_ENTRY(dvec, j, sz), ctx))
-                        return GR_TEST_FAIL;
-                    break;
-                }
-            }
-        }
+        /* Check it */
+        status |= gr_sparse_vec_find_entry(temp2, vec, i, ctx);
+        if (T_TRUE != gr_equal(temp, temp2, ctx))
+            return GR_TEST_FAIL;
     }
     GR_TMP_CLEAR(temp, ctx);
     GR_TMP_CLEAR(temp2, ctx);
-    gr_vec_clear(dvec, ctx);
     status |= gr_sparse_vec_clear(vec, ctx);
+    return status;
+}
+
+
+
+int
+test_init_from_entries_unsorted(flint_rand_t state, gr_ctx_t ctx)
+{
+    slong i;
+    int status = GR_SUCCESS;
+    slong sz = ctx->sizeof_elem;
+    slong N = 5;
+    ulong cols[5] = {8, 4, 3, 8, 1};
+    gr_vec_t dvec;
+    gr_vec_init(dvec, N, ctx);
+    /* First test against random entries */
+    status |= _gr_vec_randtest(GR_VEC_ENTRY(dvec, 0, sz), state, N, ctx);
+    status |= test_init_from_entries_unsorted_internal(cols, GR_VEC_ENTRY(dvec, 0, sz), 2*N, N, ctx);
+
+    /* Next test against some adversarial entries */
+    slong entries_si[5] = {5, 0, 2, -5, 1};
+    for (i = 0; i < N; i++)
+        status |= gr_set_si(GR_VEC_ENTRY(dvec, i, sz), entries_si[i], ctx);
+    status |= test_init_from_entries_unsorted_internal(cols, GR_VEC_ENTRY(dvec, 0, sz), 2*N, N, ctx);
+
+    gr_vec_clear(dvec, ctx);
     return status;
 }
 
