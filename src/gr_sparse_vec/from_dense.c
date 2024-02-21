@@ -23,6 +23,7 @@ gr_sparse_vec_from_dense(gr_sparse_vec_t vec, gr_srcptr src, slong len, gr_ctx_t
             nnz++;
         }
     }
+    vec->length = len;
     vec->nnz = nnz;
     return status;
 }

@@ -11,7 +11,7 @@ gr_sparse_vec_to_dense(gr_ptr vec, gr_sparse_vec_t src, gr_ctx_t ctx)
     j = 0;
     for (i = 0; i < len; i++)
     {
-        /* if i is the column of the next nonzero in src, copy it is */
+        /* if i is the column of the next nonzero in src, copy it in */
         if (j < nnz && i == src->cols[j])
         {
             status |= gr_set(GR_ENTRY(vec, i, sz), GR_ENTRY(src->entries, j, sz), ctx);
