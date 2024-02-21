@@ -13,6 +13,9 @@
 #include "nmod_vec.h"
 #include "nmod_mat.h"
 
+/* gcc11 on x86_64 generates significantly worse code with -O3 */
+#pragma GCC optimize("-O2")
+
 /*
 with op = 0, computes D = A*B
 with op = 1, computes D = C + A*B
