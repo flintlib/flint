@@ -70,10 +70,10 @@ Jean Kieffer (JK).
   * Added ``_fmpz_vec_dot_general`` (FJ).
   * Allow setting degree and bit size evaluation limits for the
     ``gr`` ``qqbar`` context (FJ).
-  * Added ``nmod_poly_divexact`` and replaced several uses of
-    ``nmod_poly_div`` where an exact division is intended (FJ).
-  * Added ``fmpz_poly_divexact`` and replaced several uses of
-    ``fmpz_poly_div`` where an exact division is intended (FJ).
+  * Added ``nmod_poly_divexact`` and use this instead of ``nmod_poly_div``
+    where an exact division is intended to improve performance (FJ).
+  * Added ``fmpz_poly_divexact`` and use this instead of ``fmpz_poly_div``
+    where an exact division is intended to improve performance (FJ).
   * Added ``fq_default_ctx_inner`` to access the internal context
     object of a ``fq_default_ctx`` (FJ).
   * Implemented ``gr_is_ring`` and ``gr_ctx_is_commutative_ring``
@@ -116,9 +116,15 @@ Jean Kieffer (JK).
     This can yield up to a 2x speedup over GMP for short integer multiplications
     when calling ``mpn`` functions directly, though few applications
     currently benefit significantly due to wrapper overheads (some Arb benchmarks
-    run ~5% faster with this change). (AA, FJ).
+    run ~5% faster with this change) (AA, FJ).
+  * Added hardcoded low-level routines for high multiplications of two operands
+    of the same size for Broadwell-type CPUs -- ``flint_mpn_mulhigh_*`` and
+    ``flint_mpn_sqrhigh_*`` (AA).
+  * Added hardcoded low-level routines for high normalised multiplications of
+    two normalised operands of the same size for Broadwell-type CPUs --
+    ``flint_mpn_mulhigh_normalised_*`` (AA).
   * Added ``flint_mpn_mulhigh_basecase`` and ``flint_mpn_sqrhigh_basecase``
-    for Broadwell (AA).
+    for Broadwell-type CPUs (AA).
   * Use toom22 on top of custom basecase code for intermediate operands in
     ``flint_mpn_mul`` (FJ, based on GMP code).
   * Use ``mulx`` in ``umul_ppmm`` when available (AA).
@@ -155,7 +161,9 @@ Jean Kieffer (JK).
   * Changed several internal helper functions to forced inlines (AA).
   * Merged some sources files to speed up compilation (AA).
   * Faster computation of Swinnerton-Dyer polynomials (FJ).
-  * Added benchmark script (``dev/bench.py``) (FJ).
+  * Added benchmark script (``dev/bench.py``) that should be used to check
+    performance increases and regressions (FJ).
+  * Add special cases for Clang and MSVC in ``longlong.h`` (AA).
 
 * Test code
 
@@ -165,6 +173,7 @@ Jean Kieffer (JK).
   * Improve use of test multiplier in some long-running unit tests (AA, FJ).
   * Improved test coverage (AA, FJ).
   * Allow ``gr_ctx_init_random`` to generate composite rings (FJ).
+  * Fixed the test code of ``fq_*_poly_powmod`` (AA).
 
 * Maintenance
 
@@ -187,23 +196,28 @@ Jean Kieffer (JK).
   * Only define some multithreaded "divides" function when the CPU is
     strongly ordered (AA).
   * Enable ``fft_small`` for MSVC builds (AA).
-  * Use binary files in ``qsieve`` (AA).
+  * Use binary format instead of decimal format in ``qsieve``, removing the need
+    of conversions between said formats (AA).
   * Use C11 atomics in the ``fmpz`` memory manager (AA).
   * Merged some repeated code in the ``mpoly`` modules (FJ).
   * Refactored ``fq_default`` to use ``gr`` generics internally (FJ).
   * Replaced more functions by generics-based versions (FJ).
   * Do not include ``pthread.h`` when opted out (AA).
-  * Test ARM NEON in CI (AA).
+  * Test ARM NEON in CI via Github's Apple M1 runner (AA).
   * Test examples in CI (AA).
   * Detect MPFR and GMP internals in configure (AA).
   * Add ``-lflint`` to PKG-CONFIG (Josh Rickmar).
-  * Silenced some GCC compiler warnings (AA).
+  * Silence GCC compiler warnings (AA).
   * Unified exception handling (AA).
   * Corrected some function signatures in the documentation
     (Vincent Delecroix, Joel-Dahne, Edgar Costa).
   * Rename the default Git-branch from ``trunk`` to ``main`` (FJ).
   * Document some macros defined in ``flint.h`` (AA).
   * Other code cleanup and modernisation (AA).
+  * Major cleanup in ``configure.ac`` and ``acinclude.m4``.
+  * Use parts of GMP's configuration to configure assembly properly.
+  * Change instances of ``#ifdef FLINT_WANT_ASSERT``
+    to ``#if FLINT_WANT_ASSERT`` (AA).
 
 
 2023-11-10 -- FLINT 3.0.1
