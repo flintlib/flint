@@ -118,6 +118,16 @@ extern "C" {
 double
 flint_mpn_get_d(mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp);
 
+/* Addition ******************************************************************/
+
+#if FLINT_HAVE_ADX
+# define FLINT_HAVE_NATIVE_2ADD_N_INPLACE 1
+
+/* Simultaneously adds two n-limbed integers onto result and returns carry. */
+/* NOTE: Requires n >= 4 */
+mp_limb_t flint_mpn_2add_n_inplace(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
+#endif
+
 /* General multiplication ****************************************************/
 
 #ifdef FLINT_HAVE_FFT_SMALL
