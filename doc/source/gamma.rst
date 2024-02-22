@@ -83,11 +83,10 @@ We compute `\Gamma(1/3)` and `\Gamma(1/4)` rapidly to high precision using
 
 .. math::
 
-    \Gamma(1/3) = \left( \frac{12 \pi^4}{\sqrt{10}}
-        \sum_{k=0}^{\infty}
-        \frac{(6k)!(-1)^k}{(k!)^3 (3k)! 3^k 160^{3k}} \right)^{1/6}, \quad \quad
+    \frac{\pi}{\Gamma(1/3)^3} = \frac{1}{960 \cdot 10^{1/4}} \sum_{k=0}^{\infty} \left(-\frac{3^2}{2^9 \cdot 5^3}\right)^k (9108 k + 279) \frac{(1/12)_k (5/12)_k}{(k!)^2}, \quad \quad
     \Gamma(1/4) = \sqrt{\frac{(2\pi)^{3/2}}{\operatorname{agm}(1, \sqrt 2)}}.
 
+where the infinite series is due to Guillera.
 An alternative formula which could be used for `\Gamma(1/3)` is
 
 .. math::

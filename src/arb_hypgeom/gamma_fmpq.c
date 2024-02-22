@@ -27,25 +27,21 @@ arb_gamma_const_1_3_eval(arb_t s, slong prec)
 
     hypgeom_init(series);
 
-    fmpz_poly_set_str(series->A, "1  1");
+    fmpz_poly_set_str(series->A, "2  279 9108");
     fmpz_poly_set_str(series->B, "1  1");
-    fmpz_poly_set_str(series->P, "4  5 -46 108 -72");
-    fmpz_poly_set_str(series->Q, "4  0 0 0 512000");
+    fmpz_poly_set_str(series->P, "3  -77 216 -144");
+    fmpz_poly_set_str(series->Q, "3  0 0 1024000");
 
     prec += FLINT_CLOG2(prec);
 
     arb_hypgeom_infsum(s, t, series, wp, wp);
-
+    arb_mul_ui(t, t, 960, wp);
     arb_sqrt_ui(u, 10, wp);
+    arb_sqrt(u, u, wp);
     arb_mul(t, t, u, wp);
-
-    arb_const_pi(u, wp);
-    arb_pow_ui(u, u, 4, wp);
-    arb_mul_ui(u, u, 12, wp);
-    arb_mul(s, s, u, wp);
-
-    arb_div(s, s, t, wp);
-    arb_root_ui(s, s, 2, wp);
+    arb_div(s, t, s, wp);
+    arb_const_pi(t, wp);
+    arb_mul(s, s, t, wp);
     arb_root_ui(s, s, 3, prec);
 
     hypgeom_clear(series);

@@ -19,8 +19,7 @@ Jean Kieffer (JK).
 * Major interface changes
 
   * The methods in the ``fmpz_mod_mat`` module now use a context object (FJ).
-  * Changed ``fq_mat_rref`` and others to allow separate input and
-    output matrices (FJ).
+  * Changed ``fq_mat_rref`` and others to allow separate input and output matrices (FJ).
 
 * Features
 
@@ -129,9 +128,9 @@ Jean Kieffer (JK).
     ``flint_mpn_mul`` (FJ, based on GMP code).
   * Use ``mulx`` in ``umul_ppmm`` when available (AA).
   * Faster ``_fmpz_vec_dot`` (FJ).
-  * Faster ``_fmpz_mod_vec_dot`` (FJ)
+  * Faster ``_fmpz_mod_vec_dot`` (FJ).
   * Faster ``fmpz_poly`` and ``fmpz_mat`` basecase algorithms
-    based on dot products.
+    based on dot products (FJ).
   * Optimized ``fmpz_mat_mul_classical`` (FJ).
   * Added ``fmpz_mat_mul_waksman``, speeding up ``fmpz_mat`` multiplication
     for balanced matrices with huge entries (Éric Schost, Vincent Neiger, FJ).
@@ -143,11 +142,11 @@ Jean Kieffer (JK).
   * Squaring optimizations in ``fmpz_mat_mul_multi_mod`` (FJ).
   * Use Bodrato's sequence for Strassen multiplication (Marco Bodrato).
   * Strip trailing zeros in ``fmpz_poly_gcd``: this gives a 50x speedup
-    computing ``gcd(x^1000, x^1001)``.
+    computing ``gcd(x^1000, x^1001)`` (FJ).
   * Faster CLD bound computation, speeding up ``fmpz_poly_factor``
-    for some polynomials.
-  * Use new formulas from Jorge Zuniga to compute log(2), Catalan's
-    constant and zeta(3) faster (FJ).
+    for some polynomials (FJ).
+  * Use new formulas from Jorge Zuniga and Jesús Guillera to compute
+    log(2), Catalan's constant, zeta(3) and gamma(1/3) faster (FJ).
   * Compressed the database of Conway polynomials to 10% of the
     original size (AA).
   * Optimized context initializers for ``fq``, ``fq_zech``, ``fq_nmod``
