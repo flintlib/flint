@@ -34,7 +34,7 @@ TEST_FUNCTION_START(flint_mpn_sqrhigh_basecase, state)
 
         mpn_random2(xp, n);
 
-        rp1[0] = flint_mpn_mulhigh_basecase(rp1 + 1, xp, xp, n);
+        rp1[0] = flint_mpn_mulhigh(rp1 + 1, xp, xp, n);
         rp2[0] = flint_mpn_sqrhigh_basecase(rp2 + 1, xp, n);
 
         result = (mpn_cmp(rp1, rp2, n + 1) == 0);
