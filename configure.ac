@@ -983,12 +983,31 @@ fi
 CPPFLAGS="-I./src $CPPFLAGS"
 
 ################################################################################
+# Architecture
+################################################################################
+
+FLINT_ARCH
+
+################################################################################
 # fft_small module
 ################################################################################
 
 FLINT_CHECK_FFT_SMALL(
     [AC_SUBST(FFT_SMALL, [fft_small\ \ \ ])
-     AC_DEFINE(FLINT_HAVE_FFT_SMALL, 1, [Define to use the fft_small module])],
+     AC_DEFINE(FLINT_HAVE_FFT_SMALL, 1, [Define to use the fft_small module])
+
+     case $flint_cv_arch in
+         FAST_VROUNDPD_PATTERN)
+             fft_small_threshold="400"
+             ;;
+         SLOW_VROUNDPD_PATTERN)
+             fft_small_threshold="1540"
+             ;;
+         *)
+             fft_small_threshold="500"
+             ;;
+     esac
+     AC_DEFINE_UNQUOTED(FLINT_FFT_SMALL_THRESHOLD,[$fft_small_threshold],[Define to set threshold for when to use fft_small module])],
     [AC_SUBST(FFT_SMALL, [\ \ \ \ \ \ \ \ \ \ \ \ ])])
 
 ################################################################################

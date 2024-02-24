@@ -80,6 +80,8 @@ dnl the terms of the GNU Lesser General Public License (LGPL) as published
 dnl by the Free Software Foundation; either version 3 of the License, or
 dnl (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 
+dnl NOTE: The first two patterns are taken from GMP. The license is down below.
+
 define(X86_PATTERN,
 [[i?86*-*-* | k[5-8]*-*-* | pentium*-*-* | athlon-*-* | viac3*-*-* | geode*-*-* | atom-*-*]])
 
@@ -89,6 +91,71 @@ define(X86_64_PATTERN,
 define(ARM64_PATTERN,
 [[aarch64-*-*]])
 
+define(SLOW_VROUNDPD_PATTERN,
+[[haswell* | broadwell* | skylake* | kabylake* | icelake* | tigerlake* | rocketlake* | alderlake* | raptorlake*]])
+
+define(FAST_VROUNDPD_PATTERN,
+[[zen[2-4]* | sandybridge* | ivybridge*]])
+
+dnl  FLINT_PREPROC_IFELSE(input,[action-if-true],[action-if-false])
+dnl  -----------------------
+dnl  Runs preprocessor with CFLAGS.
+dnl
+dnl  FIXME: Autoconf states that some compilers do not accept CFLAGS in the
+dnl  preprocessor. Which ones is it? GCC and Clang certainly does. If it does
+dnl  not allow CFLAGS into preprocessor, we should just compile normally.
+
+AC_DEFUN([FLINT_PREPROC_IFELSE],
+[AC_REQUIRE([AC_PROG_CPP])
+save_ac_cpp="$ac_cpp"
+ac_cpp="$CPP $CFLAGS $CPPFLAGS"
+AC_PREPROC_IFELSE($@)
+ac_cpp="$ac_cpp"
+])
+
+
+dnl  FLINT_ARCH
+dnl  -----------------------
+dnl  Checks compiler for architectures.
+dnl
+dnl  NOTE: This has to be called after all CFLAGS has been gathered.
+dnl
+dnl  FIXME: Currently only Clang and GCC. Support more compilers?
+
+AC_DEFUN([FLINT_ARCH],
+[AC_CACHE_CHECK([for host architecture],
+                 flint_cv_arch,
+[flint_cv_arch="unknown"
+is_gnu="no"
+AC_PREPROC_IFELSE([AC_LANG_SOURCE([
+        #ifndef __GNUC__
+        # error
+        error
+        #endif
+        ])],
+        [is_gnu="yes"])
+
+dnl We only know how to proceed with GCC or Clang
+AS_VAR_IF([is_gnu],"yes",[
+    is_clang="no"
+    AC_PREPROC_IFELSE([AC_LANG_SOURCE([
+            #ifndef __clang__
+            # error
+            error
+            #endif
+            ])],
+            [is_clang="yes"])
+
+    AS_VAR_IF([is_clang],"yes",[
+        flint_cv_arch=[`echo | $CC -v $CFLAGS -E - 2>&1 | grep "cc1" | sed -n 's/.*-target-cpu \([^ ]*\).*/\1/p'`]
+    ],[
+        flint_cv_arch=[`echo | $CC -v $CFLAGS -E - 2>&1 | grep "cc1" | sed -n 's/.*-march=\([^ ]*\).*/\1/p'`]
+    ])
+])
+])
+])
+
+
 dnl  FLINT_CHECK_GMP_H(MAJOR, MINOR, PATCHLEVEL)
 dnl  -----------------------
 dnl  Checks that gmp.h can be found and that its version fullfills the version
@@ -97,7 +164,7 @@ dnl  requirement.
 AC_DEFUN([FLINT_CHECK_GMP_H],
 [AC_CHECK_HEADER([gmp.h],,AC_MSG_ERROR([Could not find gmp.h]))
 AC_MSG_CHECKING([if version of GMP is greater than $1.$2.$3])
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
+AC_PREPROC_IFELSE([AC_LANG_PROGRAM(
         [#include <gmp.h>
         ],[#if (__GNU_MP_VERSION < $1) \
           || (__GNU_MP_VERSION == $1 && __GNU_MP_VERSION_MINOR < $2) \
@@ -122,7 +189,7 @@ AC_DEFUN([FLINT_CHECK_MPFR_H],
 [AC_REQUIRE([FLINT_CHECK_GMP_H])
 AC_CHECK_HEADER([mpfr.h],,AC_MSG_ERROR([Could not find mpfr.h]))
 AC_MSG_CHECKING([if version of MPFR is greater than $1.$2.$3])
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
+AC_PREPROC_IFELSE([AC_LANG_PROGRAM(
         [#include <mpfr.h>
         ],[#if (MPFR_VERSION_MAJOR < $1) \
          || (MPFR_VERSION_MAJOR == $1 && MPFR_VERSION_MINOR < $2) \
@@ -146,7 +213,7 @@ AC_DEFUN([FLINT_GMP_LONG_LONG_LIMB],
 [AC_REQUIRE([FLINT_CHECK_GMP_H])
 AC_CACHE_CHECK([if GMP defines mp_limb_t as unsigned long long int],
                 flint_cv_gmp_long_long_limb,
-[AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
+[AC_PREPROC_IFELSE([AC_LANG_PROGRAM(
         [
         #include <gmp.h>
         ],[
@@ -179,7 +246,7 @@ AC_CACHE_CHECK([for desired ABI],
 then
     flint_cv_abi="$ABI"
 else
-    AC_COMPILE_IFELSE([AC_LANG_PROGRAM(
+    AC_PREPROC_IFELSE([AC_LANG_PROGRAM(
             [
             #include <gmp.h>
             ],[
@@ -204,7 +271,7 @@ dnl  Do "action-success" if this succeeds, "action-fail" if not.
 AC_DEFUN([FLINT_SYSTEM_V_ABI],
 [AC_CACHE_CHECK([if system uses System V ABI],
                 flint_cv_system_v_abi,
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[
+AC_PREPROC_IFELSE([AC_LANG_PROGRAM([],[
         #if !(defined(__APPLE__) || defined(__unix__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__)) || defined(__CYGWIN__)
         #error Dead man
         error
@@ -228,7 +295,7 @@ AC_DEFUN([FLINT_CHECK_ADX],
 [AS_VAR_IF([host_cpu],"x86_64",
     [AC_CACHE_CHECK([if ADX instruction set is supported by CPU],
                     flint_cv_check_adx,
-    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[
+    FLINT_PREPROC_IFELSE([AC_LANG_SOURCE([
             #if !defined(__ADX__)
             #error Dead man
             error
@@ -289,7 +356,7 @@ AC_DEFUN([FLINT_HAVE_FFT_SMALL_ARM_I],
 [AS_VAR_IF([host_cpu],"aarch64",
     [AC_CACHE_CHECK([if system have required Arm instruction set for fft_small],
                      flint_cv_have_fft_small_arm_i,
-    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[
+    FLINT_PREPROC_IFELSE([AC_LANG_SOURCE([
             #ifndef __ARM_NEON
             #error Dead man
             error
@@ -321,7 +388,7 @@ AC_DEFUN([FLINT_HAVE_FFT_SMALL_X86_I],
 [AS_VAR_IF([host_cpu],"x86_64",
     [AC_CACHE_CHECK([if system have required x86_64 instruction set for fft_small],
                     flint_cv_have_fft_small_x86_i,
-        AC_COMPILE_IFELSE([AC_LANG_PROGRAM([],[
+        FLINT_PREPROC_IFELSE([AC_LANG_SOURCE([
                 #if !defined(__AVX2__)
                 #error Dead man
                 error

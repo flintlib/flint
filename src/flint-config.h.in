@@ -15,6 +15,9 @@
 /* Define if system is strongly ordered */
 #undef FLINT_KNOW_STRONG_ORDER
 
+/* Define to set threshold for when to use fft_small module */
+#undef FLINT_FFT_SMALL_THRESHOLD
+
 /* Define if system has the ADX instruction set */
 #undef FLINT_HAVE_ADX
 
