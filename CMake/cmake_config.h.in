@@ -20,6 +20,9 @@
 
 #cmakedefine01 FLINT_KNOW_STRONG_ORDER
 
+/* Just set to some reasonable threshold */
+#define FLINT_FFT_SMALL_THRESHOLD 600
+
 #ifdef _MSC_VER
 # if defined(FLINT_BUILD_DLL)
 #  define FLINT_DLL __declspec(dllexport)

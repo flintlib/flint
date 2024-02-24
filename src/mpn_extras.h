@@ -121,26 +121,26 @@ flint_mpn_get_d(mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp);
 /* General multiplication ****************************************************/
 
 #ifdef FLINT_HAVE_FFT_SMALL
-#define FLINT_FFT_MUL_THRESHOLD 400
-#define FLINT_FFT_SQR_THRESHOLD 800
+# define FLINT_FFT_MUL_THRESHOLD FLINT_FFT_SMALL_THRESHOLD
+# define FLINT_FFT_SQR_THRESHOLD (2 * FLINT_FFT_SMALL_THRESHOLD)
 #else
 /* FLINT's FFT can beat GMP below this threshold but apparently
    not consistently. Something needs retuning? */
-#define FLINT_FFT_MUL_THRESHOLD 32000
-#define FLINT_FFT_SQR_THRESHOLD 32000
+# define FLINT_FFT_MUL_THRESHOLD 32000
+# define FLINT_FFT_SQR_THRESHOLD 32000
 #endif
 
 #if FLINT_HAVE_ADX
-#define FLINT_MPN_MUL_FUNC_TAB_WIDTH 17
-#define FLINT_MPN_SQR_FUNC_TAB_WIDTH 14
-#define FLINT_HAVE_MUL_FUNC(n, m) ((n) <= 16)
-#define FLINT_HAVE_MUL_N_FUNC(n) ((n) <= 16)
-#define FLINT_HAVE_SQR_FUNC(n) ((n) <= FLINT_MPN_SQR_FUNC_TAB_WIDTH)
+# define FLINT_MPN_MUL_FUNC_TAB_WIDTH 17
+# define FLINT_MPN_SQR_FUNC_TAB_WIDTH 14
+# define FLINT_HAVE_MUL_FUNC(n, m) ((n) <= 16)
+# define FLINT_HAVE_MUL_N_FUNC(n) ((n) <= 16)
+# define FLINT_HAVE_SQR_FUNC(n) ((n) <= FLINT_MPN_SQR_FUNC_TAB_WIDTH)
 #else
-#define FLINT_MPN_MUL_FUNC_TAB_WIDTH 8
-#define FLINT_HAVE_MUL_FUNC(n, m) ((n) <= 7 || ((n) <= 14 && (m) == 1))
-#define FLINT_HAVE_MUL_N_FUNC(n) ((n) <= 7)
-#define FLINT_HAVE_SQR_FUNC(n) (0)
+# define FLINT_MPN_MUL_FUNC_TAB_WIDTH 8
+# define FLINT_HAVE_MUL_FUNC(n, m) ((n) <= 7 || ((n) <= 14 && (m) == 1))
+# define FLINT_HAVE_MUL_N_FUNC(n) ((n) <= 7)
+# define FLINT_HAVE_SQR_FUNC(n) (0)
 #endif
 
 #define FLINT_MUL_USE_FUNC_TAB 1
