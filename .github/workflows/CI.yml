@@ -389,8 +389,6 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1.13.0
         with:
           arch: x86_64
-          toolset: 14.37.32822
-          vsversion: 17.6.0
 
       - name: "Configure"
         run: |
