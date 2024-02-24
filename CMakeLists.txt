@@ -451,6 +451,17 @@ set_target_properties(flint
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin"
 )
 
+# Install PkgConfig file
+set(prefix ${CMAKE_INSTALL_PREFIX})
+set(exec_prefix "\$\{prefix\}")
+set(includedir "\$\{prefix\}/include")
+set(libdir "\$\{prefix\}/${CMAKE_INSTALL_LIBDIR}")
+set(PACKAGE_NAME ${PROJECT_NAME})
+set(PACKAGE_VERSION ${PROJECT_VERSION})
+configure_file(flint.pc.in flint.pc @ONLY)
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/flint.pc DESTINATION lib/pkgconfig)
+
 if(BUILD_TESTING)
     set(FLINT_SRC ${CMAKE_CURRENT_SOURCE_DIR}/src) # To get src/test/main
     enable_testing()
