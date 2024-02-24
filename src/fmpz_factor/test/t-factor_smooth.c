@@ -69,33 +69,13 @@ void checkb(fmpz_t n, slong bits)
     fmpz_factor_clear(factor);
 }
 
-/* Defined in t-factor.c and t-factor_smooth.c */
-#ifndef randprime
-#define randprime randprime
-void randprime(fmpz_t p, flint_rand_t state, slong bits)
-{
-    fmpz_randbits(p, state, bits);
-
-    if (fmpz_sgn(p) < 0)
-       fmpz_neg(p, p);
-
-    if (fmpz_is_even(p))
-       fmpz_add_ui(p, p, 1);
-
-    while (!fmpz_is_probabprime(p))
-       fmpz_add_ui(p, p, 2);
-}
-#endif
-
 TEST_FUNCTION_START(fmpz_factor_smooth, state)
 {
-    int i, j;
+    int i;
     fmpz_t x, y, z, n;
     fmpz_factor_t factors;
-    mpz_t y1;
 
     fmpz_init(x);
-    mpz_init(y1);
 
     /* Some corner cases */
     fmpz_set_ui(x, UWORD_MAX);
@@ -110,45 +90,41 @@ TEST_FUNCTION_START(fmpz_factor_smooth, state)
     checkb(x, 32);
 
     /* Small integers */
-    for (i = -10000; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        fmpz_set_si(x, i);
+        slong b = n_randint(state, 10000);
+        if (n_randint(state, 2))
+            b = -b;
+
+        fmpz_set_si(x, b);
         checkb(x, 16);
     }
 
     /* Powers */
-    for (i = 1; i < 250; i++)
+    for (i = 1; i < 100 * flint_test_multiplier(); i++)
     {
-        for (j = 0; j < 250; j++)
-        {
-            fmpz_set_ui(x, i);
-            fmpz_pow_ui(x, x, j);
-            checkb(x, 10);
-        }
+        fmpz_set_ui(x, n_randint(state, 250));
+        fmpz_pow_ui(x, x, n_randint(state, 250));
+        checkb(x, 10);
     }
 
     /* Factorials */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-        flint_mpz_fac_ui(y1, i);
-        fmpz_set_mpz(x, y1);
+        fmpz_fac_ui(x, n_randint(state, 1000));
         checkb(x, 12);
     }
 
     /* Powers of factorials */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-        for (j = 1; j < 5; j++)
-        {
-            flint_mpz_fac_ui(y1, i);
-            fmpz_set_mpz(x, y1);
-            fmpz_pow_ui(x, x, j);
-            checkb(x, 12);
-        }
+        fmpz_fac_ui(x, n_randint(state, 100));
+        fmpz_pow_ui(x, x, n_randint(state, 5));
+        checkb(x, 12);
     }
 
     /* Whole limbs */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_set_ui(x, n_randtest(state));
         if (n_randint(state, 2))
@@ -157,16 +133,13 @@ TEST_FUNCTION_START(fmpz_factor_smooth, state)
     }
 
     /* Large negative integers */
-    fmpz_set_ui(x, 10);
-    fmpz_pow_ui(x, x, 100);
-    fmpz_neg(x, x);
-    checkb(x, 8);
-    flint_mpz_fac_ui(y1, 50);
-    mpz_neg(y1, y1);
-    fmpz_set_mpz(x, y1);
-    checkb(x, 8);
-
-    mpz_clear(y1);
+    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    {
+        fmpz_set_ui(x, 10 + n_randint(state, 10));
+        fmpz_pow_ui(x, x, n_randint(state, 100));
+        fmpz_neg(x, x);
+        checkb(x, 8);
+    }
 
     fmpz_init(y);
     fmpz_init(z);
@@ -174,9 +147,9 @@ TEST_FUNCTION_START(fmpz_factor_smooth, state)
 
     for (i = 0; i < 20; i++) /* Test random n, three factors */
     {
-       randprime(x, state, 40);
-       randprime(y, state, 40);
-       randprime(z, state, 40);
+       fmpz_randprime(x, state, 40, 0);
+       fmpz_randprime(y, state, 40, 0);
+       fmpz_randprime(z, state, 40, 0);
 
        fmpz_mul(n, x, y);
        fmpz_mul(n, n, z);
@@ -198,9 +171,9 @@ TEST_FUNCTION_START(fmpz_factor_smooth, state)
 
     for (i = 0; i < 20; i++) /* Test random n, small factors */
     {
-       randprime(x, state, 10);
-       randprime(y, state, 10);
-       randprime(z, state, 40);
+       fmpz_randprime(x, state, 10, 0);
+       fmpz_randprime(y, state, 10, 0);
+       fmpz_randprime(z, state, 40, 0);
 
        fmpz_mul(n, x, y);
        fmpz_mul(n, n, z);
@@ -222,7 +195,7 @@ TEST_FUNCTION_START(fmpz_factor_smooth, state)
 
     for (i = 0; i < 5; i++) /* Test random squares */
     {
-       randprime(x, state, 40);
+       fmpz_randprime(x, state, 40, 0);
 
        fmpz_mul(n, x, x);
 
@@ -243,7 +216,7 @@ TEST_FUNCTION_START(fmpz_factor_smooth, state)
 
     for (i = 0; i < 5; i++) /* Test random cubes */
     {
-       randprime(x, state, 40);
+       fmpz_randprime(x, state, 40, 0);
 
        fmpz_mul(n, x, x);
        fmpz_mul(n, n, x);
