@@ -6,7 +6,7 @@ History and changes
 FLINT version history
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-2024 -- FLINT 3.1.0-dev
+2024-02-25 -- FLINT 3.1.0
 -------------------------------------------------------------------------------
 
 Main contributors: Fredrik Johansson (FJ), Albin Ahlbäck (AA),
