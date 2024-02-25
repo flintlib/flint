@@ -7,7 +7,7 @@ Building FLINT requires:
 * MPFR (https://mpfr.org/)
 * Either of the following build systems:
   * GNU Make together with GNU Autotools
-  * CMake
+  * CMake (Only recommended for Windows users)
 
 On a typical Linux or Unix-like system where Autotools is available,
 FLINT can be built and installed as follows:
