@@ -14,6 +14,7 @@
 
 /* Include functions *********************************************************/
 
+#include "t-2add_n_inplace.c"
 #include "t-divides.c"
 #include "t-divrem_preinv1.c"
 #include "t-divrem_preinvn.c"
@@ -24,7 +25,7 @@
 #include "t-mul_n.c"
 #include "t-mul_basecase.c"
 #include "t-mul_toom22.c"
-#include "t-mulhigh_basecase.c"
+#include "t-mulhigh.c"
 #include "t-mulhigh_normalised.c"
 #include "t-mulmod_2expp1.c"
 #include "t-mulmod_preinv1.c"
@@ -38,6 +39,7 @@
 
 test_struct tests[] =
 {
+    TEST_FUNCTION(flint_mpn_2add_n_inplace),
     TEST_FUNCTION(flint_mpn_divides),
     TEST_FUNCTION(flint_mpn_divrem_preinv1),
     TEST_FUNCTION(flint_mpn_divrem_preinvn),
@@ -48,7 +50,7 @@ test_struct tests[] =
     TEST_FUNCTION(flint_mpn_mul_n),
     TEST_FUNCTION(flint_mpn_mul_basecase),
     TEST_FUNCTION(flint_mpn_mul_toom22),
-    TEST_FUNCTION(flint_mpn_mulhigh_basecase),
+    TEST_FUNCTION(flint_mpn_mulhigh),
     TEST_FUNCTION(flint_mpn_mulhigh_normalised),
     TEST_FUNCTION(flint_mpn_mulmod_2expp1),
     TEST_FUNCTION(flint_mpn_mulmod_preinv1),

@@ -37,7 +37,7 @@ int main(void)
             yp[n - 1] |= (UWORD(1) << (FLINT_BITS - 1));
 
             TIMEIT_START
-            flint_mpn_mulhigh_basecase(ru, xp, yp, n);
+            flint_mpn_mulhigh(ru, xp, yp, n);
             TIMEIT_STOP_VALUES(__, t1)
 
             TIMEIT_START
