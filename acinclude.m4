@@ -95,7 +95,7 @@ define(SLOW_VROUNDPD_PATTERN,
 [[haswell* | broadwell* | skylake* | kabylake* | icelake* | tigerlake* | rocketlake* | alderlake* | raptorlake*]])
 
 define(FAST_VROUNDPD_PATTERN,
-[[zen[2-4]* | sandybridge* | ivybridge*]])
+[[znver[2-4]* | sandybridge* | ivybridge*]])
 
 dnl  FLINT_PREPROC_IFELSE(input,[action-if-true],[action-if-false])
 dnl  -----------------------
