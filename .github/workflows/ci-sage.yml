@@ -123,7 +123,7 @@ jobs:
       from_docker_target: "with-targets"
       from_docker_tag: "dev"
       docker_targets: "with-targets"
-      targets: "build ptest-nodoc"
+      targets: "build msolve ptest-nodoc"
       tox_system_factors: >-
         ["debian-bookworm"]
       tox_packages_factors: >-
