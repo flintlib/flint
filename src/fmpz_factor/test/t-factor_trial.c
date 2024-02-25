@@ -97,12 +97,10 @@ void check(fmpz_t n)
 
 TEST_FUNCTION_START(fmpz_factor_trial, state)
 {
-    int i, j;
+    int i;
     fmpz_t x;
-    mpz_t y1;
 
     fmpz_init(x);
-    mpz_init(y1);
 
     /* Some corner cases */
     fmpz_set_si(x, COEFF_MAX);
@@ -111,54 +109,46 @@ TEST_FUNCTION_START(fmpz_factor_trial, state)
     check(x);
 
     /* Small integers */
-    for (i = -10000; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        fmpz_set_si(x, i);
+        slong b = n_randint(state, 10000);
+        if (n_randint(state, 2))
+            b = -b;
+        fmpz_set_si(x, b);
         check(x);
     }
 
     /* Powers */
-    for (i = 1; i < 250; i++)
+    for (i = 1; i < 100 * flint_test_multiplier(); i++)
     {
-        for (j = 0; j < 250; j++)
-        {
-            fmpz_set_ui(x, i);
-            fmpz_pow_ui(x, x, j);
-            check(x);
-        }
+        fmpz_set_ui(x, n_randint(state, 300));
+        fmpz_pow_ui(x, x, n_randint(state, 300));
+        check(x);
     }
 
     /* Factorials */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-        flint_mpz_fac_ui(y1, i);
-        fmpz_set_mpz(x, y1);
+        fmpz_fac_ui(x, n_randint(state, 1000));
         check(x);
     }
 
     /* Powers of factorials */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-        for (j = 1; j < 5; j++)
-        {
-            flint_mpz_fac_ui(y1, i);
-            fmpz_set_mpz(x, y1);
-            fmpz_pow_ui(x, x, j);
-            check(x);
-        }
+        fmpz_fac_ui(x, n_randint(state, 100));
+        fmpz_pow_ui(x, x, n_randint(state, 5));
+        check(x);
     }
 
     /* Large negative integers */
-    fmpz_set_ui(x, 10);
-    fmpz_pow_ui(x, x, 100);
-    fmpz_neg(x, x);
-    check(x);
-    flint_mpz_fac_ui(y1, 50);
-    mpz_neg(y1, y1);
-    fmpz_set_mpz(x, y1);
-    check(x);
-
-    mpz_clear(y1);
+    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    {
+        fmpz_set_ui(x, 10 + n_randint(state, 10));
+        fmpz_pow_ui(x, x, n_randint(state, 100));
+        fmpz_neg(x, x);
+        check(x);
+    }
 
     /* regression test */
     {
