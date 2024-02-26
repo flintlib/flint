@@ -69,6 +69,80 @@ arb_mul_arf(arb_t z, const arb_t x, const arf_t y, slong prec)
     }
 }
 
+#if FLINT_HAVE_ARF_MUL_RND_SLOPPY
+FLINT_STATIC_NOINLINE
+void _arb_mul_special(arb_t z, const arb_t x, const arb_t y)
+{
+    /* FIXME: Treat special cases. */
+}
+
+void
+arb_mul(arb_t z, const arb_t x, const arb_t y, slong prec)
+{
+    if (FLINT_LIKELY(!ARB_IS_SPECIAL(x) && !ARB_IS_SPECIAL(y)))
+    {
+        /* Neither x or y are zero, exact, NaN or infinity. */
+        mag_t zr, xm, ym;
+        int is_lagom;
+
+        is_lagom = (ARB_IS_LAGOM(x) && ARB_IS_LAGOM(y) && ARB_IS_LAGOM(z));
+        mag_init(zr);
+
+        if (is_lagom)
+        {
+            mag_fast_init_set_arf(xm, arb_midref(x));
+            mag_fast_init_set_arf(ym, arb_midref(y));
+
+            mag_fast_mul(zr, xm, arb_radref(y));
+            mag_fast_addmul(zr, ym, arb_radref(x));
+            mag_fast_addmul(zr, arb_radref(x), arb_radref(y));
+        }
+        else
+        {
+            mag_init_set_arf(xm, arb_midref(x));
+            mag_init_set_arf(ym, arb_midref(y));
+
+            mag_mul(zr, xm, arb_radref(y));
+            mag_addmul(zr, ym, arb_radref(x));
+            mag_addmul(zr, arb_radref(x), arb_radref(y));
+        }
+
+        /* NOTE: Should we check if precision is less than what x and y has to
+           offer? */
+        /* NOTE: This is inexact by nature (unless tails are zero). */
+        arf_mul_rnd_sloppy(arb_midref(z), arb_midref(x), arb_midref(y));
+
+        /* FIXME: arf_mul_rnd_sloppy uses rounded inputs in order to only
+         * evaluate an n-by-n high multiplication. This needs to be reflected on
+         * the mag. */
+
+        if (is_lagom)
+        {
+            arf_mag_fast_add_ulp(zr, zr, arb_midref(z), prec);
+            *arb_radref(z) = *zr;
+        }
+        else
+        {
+            arf_mag_add_ulp(arb_radref(z), zr, arb_midref(z), prec);
+            mag_clear(xm);
+            mag_clear(ym);
+            mag_clear(zr);
+        }
+    }
+    else if (arb_is_exact(x) || arb_is_exact(y))
+    {
+        if (arb_is_exact(x))
+            arb_mul_arf(z, y, arb_midref(x), prec);
+        else
+            arb_mul_arf(z, x, arb_midref(y), prec);
+    }
+    else
+    {
+        /* x and y cannot be exact, and some value has to special. */
+        _arb_mul_special(z, x, y);
+    }
+}
+#else
 void
 arb_mul(arb_t z, const arb_t x, const arb_t y, slong prec)
 {
@@ -132,6 +206,7 @@ arb_mul(arb_t z, const arb_t x, const arb_t y, slong prec)
         mag_clear(zr);
     }
 }
+#endif
 
 void
 arb_mul_si(arb_t z, const arb_t x, slong y, slong prec)
