@@ -268,6 +268,9 @@ FLINT_DLL extern const flint_mpn_mulhigh_normalised_func_t flint_mpn_mulhigh_nor
 # define FLINT_HAVE_NATIVE_MPN_MULHIGH_BASECASE 1
 # define FLINT_HAVE_NATIVE_MPN_SQRHIGH_BASECASE 1
 
+# define FLINT_HAVE_MPN_MULHIGH 1
+# define FLINT_HAVE_MPN_MULHIGH_NORMALISED 1
+
 /* NOTE: This function only works for n >= 6 */
 mp_limb_t _flint_mpn_mulhigh_basecase(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 
@@ -318,6 +321,8 @@ struct mp_limb_pair_t flint_mpn_mulhigh_normalised(mp_ptr rp, mp_srcptr xp, mp_s
     {
         struct mp_limb_pair_t ret;
 
+        /* FIXME: Currently _flint_mpn_mulhigh allows aliasing above a certain
+         * size. */
         FLINT_ASSERT(rp != xp && rp != yp);
 
         ret.m1 = _flint_mpn_mulhigh(rp, xp, yp, n);
