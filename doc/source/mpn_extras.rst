@@ -99,10 +99,6 @@ Divisibility
 
     This function is implemented as a macro.
 
-.. function:: mp_size_t flint_mpn_divexact_1(mp_ptr x, mp_size_t xsize, mp_limb_t d)
-
-    Divides `x` once by a known single-limb divisor, returns the new size.
-
 .. function:: mp_size_t flint_mpn_remove_2exp(mp_ptr x, mp_size_t xsize, flint_bitcnt_t * bits)
 
     Divides ``(x, xsize)`` by `2^n` where `n` is the number of trailing 
