@@ -20,6 +20,7 @@ include(CheckCCompilerFlag)
 include(CheckCSourceRuns)
 include(CheckIPOSupported)
 include(FindPkgConfig)
+include(CMakePackageConfigHelpers)
 
 # Source of truth for project version
 file(STRINGS VERSION FLINT_VERSION_FULL)
@@ -72,8 +73,10 @@ endif()
 
 # Find dependencies
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(GMP REQUIRED IMPORTED_TARGET gmp>=6.2.1)
-pkg_check_modules(MPFR REQUIRED IMPORTED_TARGET mpfr>=4.1.0)
+set(GMP_MIN_VERSION 6.2.1)
+set(MPFR_MIN_VERSION 4.1.0)
+pkg_check_modules(GMP REQUIRED IMPORTED_TARGET gmp>=${GMP_MIN_VERSION})
+pkg_check_modules(MPFR REQUIRED IMPORTED_TARGET mpfr>=${MPFR_MIN_VERSION})
 if (WITH_NTL)
     find_package(NTL REQUIRED)
 endif()
@@ -357,9 +360,13 @@ endif()
 
 # Include directories
 
-target_include_directories(flint PUBLIC 
-    ${CMAKE_CURRENT_SOURCE_DIR}/src ${GMP_INCLUDE_DIRS} ${MPFR_INCLUDE_DIRS}
-    ${CMAKE_CURRENT_BINARY_DIR} ${PThreads_INCLUDE_DIRS})
+target_include_directories(flint PUBLIC
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src;${CMAKE_CURRENT_BINARY_DIR}>"
+    "$<INSTALL_INTERFACE:include/flint>"
+    ${GMP_INCLUDE_DIRS}
+    ${MPFR_INCLUDE_DIRS}
+    ${PThreads_INCLUDE_DIRS}
+)
 
 if(FLINT_USES_BLAS)
     target_include_directories(flint PUBLIC ${CBLAS_INCLUDE_DIRS})
@@ -437,12 +444,37 @@ endif()
 include(GNUInstallDirs)
 
 install(TARGETS flint
-            RUNTIME DESTINATION "${CMAKE_INSTALL_FULL_BINDIR}"
-            ARCHIVE DESTINATION "${CMAKE_INSTALL_FULL_LIBDIR}"
-            LIBRARY DESTINATION "${CMAKE_INSTALL_FULL_LIBDIR}"
+            EXPORT flintTargets
+            RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+            ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+            LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
         )
 
 install(FILES ${HEADERS} DESTINATION include/flint)
+
+write_basic_package_version_file(
+  "${CMAKE_CURRENT_BINARY_DIR}/flintConfigVersion.cmake"
+  VERSION "${PROJECT_VERSION}"
+  COMPATIBILITY AnyNewerVersion
+)
+
+configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/flintConfig.cmake.in
+  "${CMAKE_CURRENT_BINARY_DIR}/flintConfig.cmake"
+  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/flint
+)
+
+install(FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/flintConfig.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/flintConfigVersion.cmake"
+        "CMake/FindCBLAS.cmake"
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/flint
+)
+
+install(EXPORT flintTargets
+        FILE flintTargets.cmake
+        NAMESPACE flint::
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/flint
+)
 
 set_target_properties(flint
     PROPERTIES
