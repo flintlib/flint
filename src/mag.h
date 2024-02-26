@@ -109,6 +109,7 @@ _fmpz_sub2_fast(fmpz_t z, const fmpz_t x, const fmpz_t y, slong c)
 /* Finite and with lagom big exponents. */
 #define MAG_IS_LAGOM(x) (MAG_EXP(x) >= MAG_MIN_LAGOM_EXP && \
                          MAG_EXP(x) <= MAG_MAX_LAGOM_EXP)
+#define MAG_IS_SPECIAL(x) (MAG_MAN(x) == 0)
 
 #define MAG_EXPREF(x) (&(x)->exp)
 #define MAG_EXP(x) ((x)->exp)
@@ -222,7 +223,7 @@ mag_one(mag_t x)
 MAG_INLINE int
 mag_is_special(const mag_t x)
 {
-    return MAG_MAN(x) == 0;
+    return MAG_IS_SPECIAL(x);
 }
 
 MAG_INLINE int

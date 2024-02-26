@@ -29,6 +29,7 @@ extern "C" {
 #define arb_radref(x) (&(x)->rad)
 
 #define ARB_IS_LAGOM(x) (ARF_IS_LAGOM(arb_midref(x)) && MAG_IS_LAGOM(arb_radref(x)))
+#define ARB_IS_SPECIAL(x) (ARF_IS_SPECIAL(arb_midref(x)) || MAG_IS_SPECIAL(arb_radref(x)))
 
 #define ARB_RND ARF_RND_DOWN
 
