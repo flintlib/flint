@@ -14,7 +14,7 @@
 
 #if FLINT_HAVE_MPN_MULHIGH_NORMALISED
 /* NOTE: Assumes no special values */
-slong
+void
 arf_mul_rnd_sloppy(arf_ptr z, arf_srcptr x, arf_srcptr y)
 {
     mp_size_t xn, yn, zn;
@@ -80,8 +80,6 @@ arf_mul_rnd_sloppy(arf_ptr z, arf_srcptr x, arf_srcptr y)
 
     ARF_XSIZE(z) = ARF_MAKE_XSIZE(yn, sgnbit);
     _fmpz_add2_fast(ARF_EXPREF(z), ARF_EXPREF(x), ARF_EXPREF(y), mulret.m2);
-
-    return mulret.m2;
 }
 #else
 typedef int fileisempty;

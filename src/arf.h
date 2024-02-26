@@ -778,7 +778,7 @@ int arf_mul_rnd_down(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec);
 
 #if FLINT_HAVE_MPN_MULHIGH_NORMALISED
 # define FLINT_HAVE_ARF_MUL_RND_SLOPPY 1
-slong arf_mul_rnd_sloppy(arf_ptr, arf_srcptr, arf_srcptr);
+void arf_mul_rnd_sloppy(arf_ptr, arf_srcptr, arf_srcptr);
 #endif
 
 ARF_INLINE int
