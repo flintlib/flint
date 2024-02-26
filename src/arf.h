@@ -776,6 +776,11 @@ int arf_mul_rnd_down(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec);
         ? arf_mul_rnd_down(z, x, y, prec)        \
         : arf_mul_rnd_any(z, x, y, prec, rnd))
 
+#if FLINT_HAVE_MPN_MULHIGH_NORMALISED
+# define FLINT_HAVE_ARF_MUL_RND_SLOPPY 1
+slong arf_mul_rnd_sloppy(arf_ptr, arf_srcptr, arf_srcptr);
+#endif
+
 ARF_INLINE int
 arf_neg_mul(arf_t z, const arf_t x, const arf_t y, slong prec, arf_rnd_t rnd)
 {
