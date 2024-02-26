@@ -404,15 +404,6 @@ int flint_mpn_zero_p(mp_srcptr x, mp_size_t xsize)
     return 1;
 }
 
-MPN_EXTRAS_INLINE
-mp_size_t flint_mpn_divexact_1(mp_ptr x, mp_size_t xsize, mp_limb_t d)
-{
-    mpn_divrem_1(x, 0, x, xsize, d);
-    if (x[xsize - 1] == UWORD(0))
-        xsize -= 1;
-    return xsize;
-}
-
 mp_limb_t flint_mpn_sumdiff_n(mp_ptr s, mp_ptr d, mp_srcptr x, mp_srcptr y, mp_size_t n);
 
 void flint_mpn_debug(mp_srcptr x, mp_size_t xsize);
