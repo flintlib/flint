@@ -263,6 +263,7 @@ SINGLE_HEADERS :=                                                           \
         fmpz_types.h                    fmpq_types.h                        \
         fmpz_mod_types.h                fq_nmod_types.h                     \
         fq_zech_types.h                 fq_types.h                          \
+        padic_types.h                                                       \
         n_poly_types.h                  mpoly_types.h                       \
         arf_types.h                     acf_types.h                         \
         arb_types.h                     acb_types.h                         \
