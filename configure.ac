@@ -1048,14 +1048,15 @@ then
     GMP_ASM_ALIGN_LOG
 
     case $host in
-        ARM64_PATTERN)dnl Currently not active
+        ARM64_PATTERN)
+            AC_DEFINE([FLINT_HAVE_ARMV8],1,[Define if CPU supports ARM v8-A instruction set])
             case $host in
-            *-*-darwin*)
-                GMP_INCLUDE_MPN(src/mpn_extras/arm64/darwin.m4)
-                ;;
-            *)
-                GMP_INCLUDE_MPN(src/mpn_extras/arm64/arm64-defs.m4)
-                ;;
+                *-*-darwin*)
+                    GMP_INCLUDE_MPN(src/mpn_extras/arm64/darwin.m4)
+                    ;;
+                *)
+                    GMP_INCLUDE_MPN(src/mpn_extras/arm64/arm64-defs.m4)
+                    ;;
             esac
             ;;
         X86_64_PATTERN)
@@ -1208,14 +1209,20 @@ if test "$enable_assembly" = "yes";
 then
     case $host in
         X86_64_PATTERN)
+            AC_SUBST(WANT_ASSEMBLY,1)
             AC_SUBST(WANT_ADX_ASSEMBLY,1)
+            AC_SUBST(WANT_ARMV8_ASSEMBLY,0)
             ;;
-        *)
+       ARM64_PATTERN)
+            AC_SUBST(WANT_ASSEMBLY,1)
             AC_SUBST(WANT_ADX_ASSEMBLY,0)
+            AC_SUBST(WANT_ARMV8_ASSEMBLY,1)
             ;;
     esac
 else
+    AC_SUBST(WANT_ASSEMBLY,0)
     AC_SUBST(WANT_ADX_ASSEMBLY,0)
+    AC_SUBST(WANT_ARMV8_ASSEMBLY,0)
 fi
 
 ################################################################################

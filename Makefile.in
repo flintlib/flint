@@ -69,6 +69,8 @@ WANT_DEPS:=@WANT_DEPS@
 WANT_CXX:=@WANT_CXX@
 
 WANT_ADX_ASSEMBLY:=@WANT_ADX_ASSEMBLY@
+WANT_ARMV8_ASSEMBLY:=@WANT_ARMV8_ASSEMBLY@
+WANT_ASSEMBLY:=@WANT_ASSEMBLY@
 
 GMP_LIB_PATH:=@GMP_LIB_PATH@
 MPFR_LIB_PATH:=@MPFR_LIB_PATH@
@@ -89,7 +91,7 @@ endif
 LIBS2:=-lflint $(LIBS)
 PIC_FLAG:=@PIC_FLAG@
 
-ifeq ($(WANT_ADX_ASSEMBLY),1)
+ifeq ($(WANT_ASSEMBLY),1)
 ASM_OBJ_FLAGS:=$(filter-out -D%,$(CPPFLAGS) $(LIB_CPPFLAGS)) $(filter-out -funroll-loops -pedantic, $(CFLAGS))
 ASM_LOBJ_FLAGS:=$(filter-out -D%,$(PIC_FLAG)) $(ASM_OBJ_FLAGS)
 endif
@@ -235,6 +237,10 @@ ifeq ($(WANT_ADX_ASSEMBLY),1)
 BUILD_DIRS +=                                                               \
         $(BUILD_DIR)/mpn_extras/broadwell
 endif
+ifeq ($(WANT_ARMV8_ASSEMBLY),1)
+BUILD_DIRS +=                                                               \
+        $(BUILD_DIR)/mpn_extras/arm64
+endif
 
 INSTALL_DIRS :=                                                             \
         $(DESTDIR)$(LIBDIR)             $(DESTDIR)$(INCLUDEDIR)/flint       \
@@ -289,8 +295,13 @@ fmpz_lll_SOURCES := $(filter-out $(SRC_DIR)/fmpz_lll/babai.c $(SRC_DIR)/fmpz_lll
 
 SOURCES := $(foreach dir,$(DIRS),$($(dir)_SOURCES))
 
+ifeq ($(WANT_ASSEMBLY),1)
 ifeq ($(WANT_ADX_ASSEMBLY),1)
 mpn_extras_ASM_SOURCES := $(wildcard $(SRC_DIR)/mpn_extras/broadwell/*.asm)
+endif
+ifeq ($(WANT_ARMV8_ASSEMBLY),1)
+mpn_extras_ASM_SOURCES := $(wildcard $(SRC_DIR)/mpn_extras/arm64/*.asm)
+endif
 mpn_extras_PIC_S_SOURCES := $(patsubst $(SRC_DIR)/%.asm,$(BUILD_DIR)/%_pic.s,$(mpn_extras_ASM_SOURCES))
 mpn_extras_S_SOURCES := $(patsubst $(SRC_DIR)/%.asm,$(BUILD_DIR)/%.s,$(mpn_extras_ASM_SOURCES))
 ifneq ($(SHARED), 0)
@@ -340,7 +351,7 @@ define xxx_OBJS
 $(1)_OBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(filter-out %.s,$($(1)_SOURCES)))
 endef
 $(foreach dir, $(DIRS), $(eval $(call xxx_OBJS,$(dir))))
-ifeq ($(WANT_ADX_ASSEMBLY),1)
+ifeq ($(WANT_ASSEMBLY),1)
 mpn_extras_OBJS += $(patsubst %.s,%.o,$(mpn_extras_S_SOURCES))
 endif
 OBJS := $(foreach dir, $(DIRS), $($(dir)_OBJS))
@@ -355,7 +366,7 @@ define xxx_LOBJS
 $(1)_LOBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.lo,$(filter-out %.s, $($(1)_SOURCES)))
 endef
 $(foreach dir, $(DIRS), $(eval $(call xxx_LOBJS,$(dir))))
-ifeq ($(WANT_ADX_ASSEMBLY),1)
+ifeq ($(WANT_ASSEMBLY),1)
 mpn_extras_LOBJS += $(patsubst %_pic.s,%.lo,$(mpn_extras_PIC_S_SOURCES))
 endif
 LOBJS := $(foreach dir, $(DIRS), $($(dir)_LOBJS))
@@ -580,6 +591,13 @@ $(BUILD_DIR)/%.s: $(SRC_DIR)/%.asm $(FLINT_DIR)/config.m4 $(SRC_DIR)/mpn_extras/
 $(BUILD_DIR)/%_pic.s: $(SRC_DIR)/%.asm $(FLINT_DIR)/config.m4 $(SRC_DIR)/mpn_extras/asm-defs.m4 $(SRC_DIR)/mpn_extras/broadwell/x86_64-defs.m4 | $(BUILD_DIR)/mpn_extras/broadwell
 	@$(M4) -DPIC $< > $@
 endif
+ifeq ($(WANT_ARMV8_ASSEMBLY),1)
+$(BUILD_DIR)/%.s: $(SRC_DIR)/%.asm $(FLINT_DIR)/config.m4 $(SRC_DIR)/mpn_extras/asm-defs.m4 $(SRC_DIR)/mpn_extras/arm64/arm64-defs.m4 | $(BUILD_DIR)/mpn_extras/arm64
+	@$(M4) $< > $@
+
+$(BUILD_DIR)/%_pic.s: $(SRC_DIR)/%.asm $(FLINT_DIR)/config.m4 $(SRC_DIR)/mpn_extras/asm-defs.m4 $(SRC_DIR)/mpn_extras/arm64/arm64-defs.m4 | $(BUILD_DIR)/mpn_extras/arm64
+	@$(M4) -DPIC $< > $@
+endif
 
 ################################################################################
 # objects
@@ -592,7 +610,7 @@ $(BUILD_DIR)/$(1)/%.o: $(SRC_DIR)/$(1)/%.c | $(BUILD_DIR)/$(1)
 	@$(CC) $(CFLAGS) $($(1)_CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $$< -o $$@ $$(DEPFLAGS)
 endef
 
-ifeq ($(WANT_ADX_ASSEMBLY),1)
+ifeq ($(WANT_ASSEMBLY),1)
 %.o: %.s
 	@echo "  CC  $(<:$(BUILD_DIR)/%.s=%.asm)"
 	@$(CC) $(ASM_OBJ_FLAGS) -c $< -o $@
@@ -612,7 +630,7 @@ $(BUILD_DIR)/$(1)/%.lo: $(SRC_DIR)/$(1)/%.c | $(BUILD_DIR)/$(1)
 	@$(CC) $(PIC_FLAG) $(CFLAGS) $($(1)_CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $$< -o $$@ $$(DEPFLAGS)
 endef
 
-ifeq ($(WANT_ADX_ASSEMBLY),1)
+ifeq ($(WANT_ASSEMBLY),1)
 %.lo: %_pic.s
 	@echo "  CC  $(<:$(BUILD_DIR)/%.s=%.asm)"
 	@$(CC) $(ASM_LOBJ_FLAGS) -c $< -o $@
