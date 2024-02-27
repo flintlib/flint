@@ -285,6 +285,11 @@ yes|no)
 esac],
 enable_avx512="no")
 
+AC_ARG_ENABLE(arch,
+[AS_HELP_STRING([--enable-arch[[=ARCH]]],[Enable and push -march=ARCH option to C compiler [default=native]])],
+[],
+enable_arch="native")
+
 # Note: This is maintainer level only. Currently only used for Nemo CI.
 AC_ARG_ENABLE(mpfr-check,[],
 [case $enableval in
@@ -507,10 +512,10 @@ then
         AX_CXX_CHECK_COMPILE_FLAG([-Wall],[CXXFLAGS="-Wall $CXXFLAGS"])
         AX_CXX_CHECK_COMPILE_FLAG([-Werror=implicit-function-declaration],[CXXFLAGS="-Werror=implicit-function-declaration $CXXFLAGS"])
         AX_CXX_CHECK_COMPILE_FLAG([-O2],[CXXFLAGS="-O2 $CXXFLAGS"])
-        if test "$host" = "$build";
+        if test "$enable_arch" != "no";
         then
-            AX_CXX_CHECK_COMPILE_FLAG([-march=native],[CXXFLAGS="-march=native $CXXFLAGS"])
-            fi
+            AX_CXX_CHECK_COMPILE_FLAG([-march=$enable_arch],[CXXFLAGS="-march=$enable_arch $CXXFLAGS"])
+        fi
         AX_CXX_CHECK_COMPILE_FLAG([-std=c++11],[CXXFLAGS="-std=c++11 $CXXFLAGS"],
             AC_MSG_ERROR([Couldn't compile with the C++11 standard needed by the NTL interface.])
         )
@@ -957,9 +962,9 @@ AX_CHECK_COMPILE_FLAG([-Wno-stringop-overread],[DEFAULT_CFLAGS="-Wno-stringop-ov
 AX_CHECK_COMPILE_FLAG([-Wno-stringop-overflow],[DEFAULT_CFLAGS="-Wno-stringop-overflow $DEFAULT_CFLAGS"])
 AX_CHECK_COMPILE_FLAG([-Werror=implicit-function-declaration],[DEFAULT_CFLAGS="-Werror=implicit-function-declaration $DEFAULT_CFLAGS"])
 AX_CHECK_COMPILE_FLAG([-O3],[DEFAULT_CFLAGS="-O3 $DEFAULT_CFLAGS"])
-if test "$host" = "$build";
+if test "$enable_arch" != "no";
 then
-    AX_CHECK_COMPILE_FLAG([-march=native],[DEFAULT_CFLAGS="-march=native $DEFAULT_CFLAGS"])
+    AX_CHECK_COMPILE_FLAG([-march=$enable_arch],[DEFAULT_CFLAGS="-march=$enable_arch $DEFAULT_CFLAGS"])
 fi
 AX_CHECK_COMPILE_FLAG([-std=c11],[DEFAULT_CFLAGS="-std=c11 $DEFAULT_CFLAGS"])
 AX_CHECK_COMPILE_FLAG([-pedantic],[DEFAULT_CFLAGS="-pedantic $DEFAULT_CFLAGS"])
