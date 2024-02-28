@@ -12,6 +12,12 @@
 #include "test_helpers.h"
 #include "mpn_extras.h"
 
+#define N_MIN 1
+#define N_MAX 15
+
+#define N_MIN_STOR (N_MAX + 1)
+#define N_MAX_STOR 1000
+
 TEST_FUNCTION_START(flint_mpn_mul, state)
 {
     slong iter;
@@ -22,9 +28,9 @@ TEST_FUNCTION_START(flint_mpn_mul, state)
         mp_ptr X, Y, R1, R2;
         mp_limb_t ret1, ret2;
 
-        n = 1 + n_randint(state, 15);
+        n = N_MIN + n_randint(state, N_MAX - N_MIN + 1);
         if (n_randint(state, 10000) == 0)
-            n = 1 + n_randint(state, 1000);
+            n = N_MIN_STOR + n_randint(state, N_MAX_STOR - N_MIN_STOR + 1);
         m = 1 + n_randint(state, n);
 
         X = flint_malloc(sizeof(mp_limb_t) * n);
