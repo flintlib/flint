@@ -143,23 +143,51 @@ mp_limb_t flint_mpn_2add_n_inplace(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 #if FLINT_HAVE_ADX
 # define FLINT_MPN_MUL_FUNC_TAB_WIDTH 17
 # define FLINT_MPN_SQR_FUNC_TAB_WIDTH 14
+
 # define FLINT_HAVE_MUL_FUNC(n, m) ((n) <= 16)
 # define FLINT_HAVE_MUL_N_FUNC(n) ((n) <= 16)
 # define FLINT_HAVE_SQR_FUNC(n) ((n) <= FLINT_MPN_SQR_FUNC_TAB_WIDTH)
+
+# define FLINT_MPN_MUL_HARD(rp, xp, xn, yp, yn) (flint_mpn_mul_func_tab[xn][yn](rp, xp, yp))
+# define FLINT_MPN_MUL_N_HARD(rp, xp, yp, n) (flint_mpn_mul_n_func_tab[n](rp, xp, yp))
+# define FLINT_MPN_SQR_HARD(rp, xp, n) (flint_mpn_sqr_func_tab[n](rp, xp))
+#elif FLINT_HAVE_ARMV8
+# define FLINT_MPN_MUL_FUNC_N_TAB_WIDTH 3
+# define FLINT_MPN_SQR_FUNC_TAB_WIDTH 0
+
+# define FLINT_HAVE_MUL_FUNC(n, m) FLINT_HAVE_MUL_N_FUNC(n)
+# define FLINT_HAVE_MUL_N_FUNC(n) ((n) <= FLINT_MPN_MUL_FUNC_N_TAB_WIDTH)
+# define FLINT_HAVE_SQR_FUNC(n) (0)
+
+# define FLINT_MPN_MUL_HARD(rp, xp, xn, yp, yn) (flint_mpn_mul_func_n_tab[xn](rp, xp, yp, yn))
+# define FLINT_MPN_MUL_N_HARD(rp, xp, yp, n) (flint_mpn_mul_func_n_tab[n](rp, xp, yp, n))
+# define FLINT_MPN_SQR_HARD(rp, xp, n) (flint_mpn_sqr_func_tab[n](rp, xp))
 #else
 # define FLINT_MPN_MUL_FUNC_TAB_WIDTH 8
+# define FLINT_MPN_SQR_FUNC_TAB_WIDTH 0
+
 # define FLINT_HAVE_MUL_FUNC(n, m) ((n) <= 7 || ((n) <= 14 && (m) == 1))
 # define FLINT_HAVE_MUL_N_FUNC(n) ((n) <= 7)
 # define FLINT_HAVE_SQR_FUNC(n) (0)
+
+# define FLINT_MPN_MUL_HARD(rp, xp, xn, yp, yn) (flint_mpn_mul_func_tab[xn][yn](rp, xp, yp))
+# define FLINT_MPN_MUL_N_HARD(rp, xp, yp, n) (flint_mpn_mul_n_func_tab[n](rp, xp, yp))
+# define FLINT_MPN_SQR_HARD(rp, xp, n) (flint_mpn_sqr_func_tab[n](rp, xp))
 #endif
 
 #define FLINT_MUL_USE_FUNC_TAB 1
 
 typedef mp_limb_t (* flint_mpn_mul_func_t)(mp_ptr, mp_srcptr, mp_srcptr);
+typedef mp_limb_t (* flint_mpn_mul_func_n_t)(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 typedef mp_limb_t (* flint_mpn_sqr_func_t)(mp_ptr, mp_srcptr);
 
+#ifdef FLINT_MPN_MUL_FUNC_N_TAB_WIDTH
+FLINT_DLL extern const flint_mpn_mul_func_n_t flint_mpn_mul_func_n_tab[];
+#else
 FLINT_DLL extern const flint_mpn_mul_func_t flint_mpn_mul_func_tab[][FLINT_MPN_MUL_FUNC_TAB_WIDTH];
 FLINT_DLL extern const flint_mpn_mul_func_t flint_mpn_mul_n_func_tab[];
+#endif
+
 FLINT_DLL extern const flint_mpn_sqr_func_t flint_mpn_sqr_func_tab[];
 
 void flint_mpn_mul_toom22(mp_ptr pp, mp_srcptr ap, mp_size_t an, mp_srcptr bp, mp_size_t bn, mp_ptr scratch);
@@ -177,7 +205,7 @@ flint_mpn_mul(mp_ptr r, mp_srcptr x, mp_size_t xn, mp_srcptr y, mp_size_t yn)
     FLINT_ASSERT(r != y);
 
     if (FLINT_MUL_USE_FUNC_TAB && FLINT_HAVE_MUL_FUNC(xn, yn))
-        return flint_mpn_mul_func_tab[xn][yn](r, x, y);
+        return FLINT_MPN_MUL_HARD(r, x, xn, y, yn);
     else
         return _flint_mpn_mul(r, x, xn, y, yn);
 }
@@ -190,7 +218,7 @@ flint_mpn_mul_n(mp_ptr r, mp_srcptr x, mp_srcptr y, mp_size_t n)
     FLINT_ASSERT(r != y);
 
     if (FLINT_MUL_USE_FUNC_TAB && FLINT_HAVE_MUL_N_FUNC(n))
-        flint_mpn_mul_n_func_tab[n](r, x, y);
+        FLINT_MPN_MUL_N_HARD(r, x, y, n);
     else
         _flint_mpn_mul_n(r, x, y, n);
 }
@@ -203,7 +231,7 @@ flint_mpn_sqr(mp_ptr r, mp_srcptr x, mp_size_t n)
     if (FLINT_MUL_USE_FUNC_TAB && FLINT_HAVE_SQR_FUNC(n))
     {
         /* NOTE: Aliasing allowed */
-        return flint_mpn_sqr_func_tab[n](r, x);
+        return FLINT_MPN_SQR_HARD(r, x, n);
     }
     else
     {

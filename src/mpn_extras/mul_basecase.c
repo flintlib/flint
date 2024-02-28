@@ -272,6 +272,10 @@ mp_limb_t flint_mpn_mul_16_16(mp_ptr res, mp_srcptr u, mp_srcptr v)
     return res[31];
 }
 
+#elif FLINT_HAVE_ARMV8
+mp_limb_t flint_mpn_mul_1n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
+mp_limb_t flint_mpn_mul_2n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
+mp_limb_t flint_mpn_mul_3n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 #else
 
 mp_limb_t flint_mpn_mul_1_1(mp_ptr res, mp_srcptr u, mp_srcptr v)
@@ -826,6 +830,13 @@ const flint_mpn_mul_func_t flint_mpn_mul_n_func_tab[] = {
     MUL( 16, 16),
 };
 
+#elif FLINT_HAVE_ARMV8
+const flint_mpn_mul_func_n_t flint_mpn_mul_func_n_tab[] = {
+    NULL,
+    flint_mpn_mul_1n,
+    flint_mpn_mul_2n,
+    flint_mpn_mul_3n
+};
 #else
 
 const flint_mpn_mul_func_t flint_mpn_mul_func_tab[][FLINT_MPN_MUL_FUNC_TAB_WIDTH] = {

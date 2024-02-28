@@ -72,7 +72,7 @@ see https://www.gnu.org/licenses/.  */
 #define TOOM22_MUL_N_REC(p, a, b, n, ws) \
     do { \
         if (FLINT_HAVE_MUL_N_FUNC(n)) \
-            flint_mpn_mul_n_func_tab[n](p, a, b); \
+            FLINT_MPN_MUL_N_HARD(p, a, b, n); \
         else \
             flint_mpn_mul_toom22(p, a, n, b, n, ws); \
     } while (0)
@@ -86,7 +86,7 @@ see https://www.gnu.org/licenses/.  */
 #define TOOM22_MUL_REC(p, a, an, b, bn, ws) \
     do { \
         if (FLINT_HAVE_MUL_FUNC(an, bn)) \
-            flint_mpn_mul_func_tab[an][bn](p, a, b); \
+            FLINT_MPN_MUL_HARD(p, a, an, b, bn); \
         else if (bn <= 12 || 4 * an >= 5 * bn) \
             flint_mpn_mul(p, a, an, b, bn); \
         else \
