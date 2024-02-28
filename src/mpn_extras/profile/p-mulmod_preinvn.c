@@ -15,6 +15,9 @@
 #include "mpn_extras.h"
 #include "ulong_extras.h"
 
+/* FIXME: Non-x86 systems do not have prof_* definitions! */
+#ifdef FLINT_NUM_CLOCKS
+
 #define mock_mulmod_preinvn(rxx, axx, bxx, nnn, nxx, ninv, norm)    \
    do {                                                             \
       mp_ptr __t;                                                   \
@@ -150,3 +153,6 @@ int main(void)
 
    return 0;
 }
+#else
+int main(void) { return 0; }
+#endif

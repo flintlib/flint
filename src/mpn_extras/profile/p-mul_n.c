@@ -20,8 +20,8 @@ int main(void)
 {
     flint_rand_t state;
     mp_limb_t x[MAXN2], y[MAXN2], r[2 * MAXN2], s[2 * MAXN2];
-    slong i, n, m;
-    double t1, t2, __attribute__((unused)) __;
+    slong i, n;
+    double t1, t2, FLINT_SET_BUT_UNUSED(__);
 
     flint_randinit(state);
 
