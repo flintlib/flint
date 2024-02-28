@@ -858,9 +858,3 @@ const flint_mpn_mul_func_t flint_mpn_mul_n_func_tab[] = {
 };
 
 #endif
-
-mp_limb_t
-flint_mpn_mul_basecase(mp_ptr r, mp_srcptr x, mp_srcptr y, mp_size_t xn, mp_size_t yn)
-{
-    return flint_mpn_mul_func_tab[xn][yn](r, x, y);
-}

@@ -108,9 +108,3 @@ const flint_mpn_sqr_func_t flint_mpn_sqr_func_tab[] = {
 };
 
 #endif
-
-mp_limb_t
-flint_mpn_sqr_basecase(mp_ptr r, mp_srcptr x, mp_size_t n)
-{
-    return flint_mpn_sqr_func_tab[n](r, x);
-}
