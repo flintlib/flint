@@ -115,7 +115,7 @@ More generally, we can define `n`-limb high products of `m`-limb and
 .. function:: void _flint_mpn_mulhigh_n_mulders_recursive(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
               void _flint_mpn_sqrhigh_mulders_recursive(mp_ptr res, mp_srcptr u, mp_size_t n)
 
-    Rough mulhigh implemented Mulders' recursive algorithm as described in [HZ2011]_.
+    Rough mulhigh implemented using Mulders' recursive algorithm as described in [HZ2011]_.
     Puts in *res[n], ..., res[2n-1]* an approximation of the `n` high limbs of *{u, n}* times *{v, n}*.
     The error is less than *n* ulps of *res[n]*. Assumes `2n` limbs are allocated at *res*;
     the low limbs will be used as scratch space.
