@@ -15,21 +15,20 @@
 /* TODO: Remove this preprocessor conditional */
 #if FLINT_HAVE_NATIVE_MPN_MULHIGH_BASECASE
 
-#define N_MAX (FLINT_MPN_MULHIGH_MUL_CUTOFF + 100)
+#define N_MAX (FLINT_MPN_SQRHIGH_SQR_CUTOFF + 100)
 
 #define rpcH (rpc + n - 1)
 
-TEST_FUNCTION_START(flint_mpn_mulhigh, state)
+TEST_FUNCTION_START(flint_mpn_sqrhigh, state)
 {
     slong ix;
     int result;
 
-    mp_ptr rp, rpc, xp, yp;
+    mp_ptr rp, rpc, xp;
 
     rp = flint_malloc(sizeof(mp_limb_t) * N_MAX);
     rpc = flint_malloc(2 * sizeof(mp_limb_t) * N_MAX);
     xp = flint_malloc(sizeof(mp_limb_t) * N_MAX);
-    yp = flint_malloc(sizeof(mp_limb_t) * N_MAX);
 
     for (ix = 0; ix < 100000 * flint_test_multiplier(); ix++)
     {
@@ -39,19 +38,18 @@ TEST_FUNCTION_START(flint_mpn_mulhigh, state)
 
         /* Trigger full multiplication in mulhigh */
         if (n_randint(state, 1000) == 0)
-            n = FLINT_MPN_MULHIGH_MUL_CUTOFF + n_randint(state, 50);
+            n = FLINT_MPN_SQRHIGH_SQR_CUTOFF + n_randint(state, 50);
         else if (n_randint(state, 100) == 0)
-            n = 1 + n_randint(state, FLINT_MPN_MULHIGH_MUL_CUTOFF);
+            n = 1 + n_randint(state, FLINT_MPN_SQRHIGH_SQR_CUTOFF);
         else
-            n = 1 + n_randint(state, 2 * FLINT_MPN_MULHIGH_MULDERS_CUTOFF);
+            n = 1 + n_randint(state, 2 * FLINT_MPN_SQRHIGH_MULDERS_CUTOFF);
 
         mpn_random2(xp, n);
-        mpn_random2(yp, n);
 
-        rp[0] = flint_mpn_mulhigh_n(rp + 1, xp, yp, n);
+        rp[0] = flint_mpn_sqrhigh(rp + 1, xp, n);
 
         /* Check upper bound */
-        flint_mpn_mul_n(rpc, xp, yp, n);
+        flint_mpn_sqr(rpc, xp, n);
 
         result = (mpn_cmp(rp, rpcH, n + 1) <= 0);
         if (!result)
@@ -63,10 +61,10 @@ TEST_FUNCTION_START(flint_mpn_mulhigh, state)
                     "yp = %{ulong*}\n"
                     "Upper bound: %{ulong*}\n"
                     "Got:         %{ulong*}\n",
-                    ix, n, xp, n, yp, n, rpcH, n + 1, rp, n + 1);
+                    ix, n, xp, n, rpcH, n + 1, rp, n + 1);
 
         /* Check lower bound */
-        lb = n + 2;
+        lb = 2 * n;
 
         borrow = mpn_sub_1(rpcH, rpcH, n + 1, lb);
         if (borrow)
@@ -79,16 +77,14 @@ TEST_FUNCTION_START(flint_mpn_mulhigh, state)
                     "ix = %wd\n"
                     "n = %wd\n"
                     "xp = %{ulong*}\n"
-                    "yp = %{ulong*}\n"
                     "Lower bound: %{ulong*}\n"
                     "Got:         %{ulong*}\n",
-                    ix, n, xp, n, yp, n, rpcH, n + 1, rp, n + 1);
+                    ix, n, xp, n, rpcH, n + 1, rp, n + 1);
     }
 
     flint_free(rp);
     flint_free(rpc);
     flint_free(xp);
-    flint_free(yp);
 
     TEST_FUNCTION_END(state);
 }
@@ -96,7 +92,7 @@ TEST_FUNCTION_START(flint_mpn_mulhigh, state)
 # undef N_MAX
 # undef N_MAX2
 #else
-TEST_FUNCTION_START(flint_mpn_mulhigh, state)
+TEST_FUNCTION_START(flint_mpn_sqrhigh, state)
 {
     TEST_FUNCTION_END_SKIPPED(state);
 }

@@ -39,7 +39,7 @@ TEST_FUNCTION_START(flint_mpn_mulhigh_normalised, state)
         xp[n - 1] |= (UWORD(1) << (FLINT_BITS - 1));
         yp[n - 1] |= (UWORD(1) << (FLINT_BITS - 1));
 
-        rp_u[0] = flint_mpn_mulhigh(rp_u + 1, xp, yp, n);
+        rp_u[0] = flint_mpn_mulhigh_n(rp_u + 1, xp, yp, n);
         res_norm = flint_mpn_mulhigh_normalised(rp_n + 1, xp, yp, n);
         retlimb = res_norm.m1;
         normalised = res_norm.m2;

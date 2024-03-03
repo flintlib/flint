@@ -268,43 +268,52 @@ FLINT_DLL extern const flint_mpn_mulhigh_normalised_func_t flint_mpn_mulhigh_nor
 # define FLINT_HAVE_NATIVE_MPN_MULHIGH_BASECASE 1
 # define FLINT_HAVE_NATIVE_MPN_SQRHIGH_BASECASE 1
 
+#define FLINT_MPN_MULHIGH_MULDERS_CUTOFF 50
+#define FLINT_MPN_MULHIGH_MUL_CUTOFF 2000
+#define FLINT_MPN_MULHIGH_K_TAB_SIZE 2048
+
 /* NOTE: This function only works for n >= 6 */
-mp_limb_t _flint_mpn_mulhigh_basecase(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
+mp_limb_t _flint_mpn_mulhigh_basecase(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n);
 
-/* NOTE: These two functions only works for n >= 8 */
-mp_limb_t _flint_mpn_sqrhigh_basecase_even(mp_ptr, mp_srcptr, mp_size_t);
-mp_limb_t _flint_mpn_sqrhigh_basecase_odd(mp_ptr, mp_srcptr, mp_size_t);
+mp_limb_t _flint_mpn_mulhigh_n_mulders(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n);
+mp_limb_t _flint_mpn_mulhigh_n_mul(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n);
+mp_limb_t _flint_mpn_mulhigh_n(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n);
 
-mp_limb_t _flint_mpn_mulhigh(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
-
-/* TODO: Proceed with higher cases */
 MPN_EXTRAS_INLINE
-mp_limb_t flint_mpn_mulhigh(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
+mp_limb_t flint_mpn_mulhigh_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
 {
     FLINT_ASSERT(n >= 1);
 
     if (FLINT_HAVE_MULHIGH_FUNC(n)) /* NOTE: Aliasing allowed here */
         return flint_mpn_mulhigh_func_tab[n](rp, xp, yp);
     else
-        return _flint_mpn_mulhigh(rp, xp, yp, n);
+        return _flint_mpn_mulhigh_n(rp, xp, yp, n);
 }
 
-/* TODO: Proceed with higher cases */
+#define FLINT_MPN_SQRHIGH_MULDERS_CUTOFF 90
+#define FLINT_MPN_SQRHIGH_SQR_CUTOFF 2000
+#define FLINT_MPN_SQRHIGH_K_TAB_SIZE 2048
+
+/* NOTE: These two functions only works for n >= 8 */
+mp_limb_t _flint_mpn_sqrhigh_basecase_even(mp_ptr, mp_srcptr, mp_size_t);
+mp_limb_t _flint_mpn_sqrhigh_basecase_odd(mp_ptr, mp_srcptr, mp_size_t);
+
+void _flint_mpn_sqrhigh_mulders_recursive(mp_ptr rp, mp_srcptr np, mp_size_t n);
+mp_limb_t _flint_mpn_sqrhigh_mulders(mp_ptr res, mp_srcptr u, mp_size_t n);
+mp_limb_t _flint_mpn_sqrhigh_basecase(mp_ptr rp, mp_srcptr xp, mp_size_t n);
+mp_limb_t flint_mpn_sqrhigh_basecase(mp_ptr rp, mp_srcptr xp, mp_size_t n);
+mp_limb_t _flint_mpn_sqrhigh_sqr(mp_ptr res, mp_srcptr u, mp_size_t n);
+mp_limb_t _flint_mpn_sqrhigh(mp_ptr, mp_srcptr, mp_size_t);
+
 MPN_EXTRAS_INLINE
-mp_limb_t flint_mpn_sqrhigh_basecase(mp_ptr rp, mp_srcptr xp, mp_size_t n)
+mp_limb_t flint_mpn_sqrhigh(mp_ptr rp, mp_srcptr xp, mp_size_t n)
 {
     FLINT_ASSERT(n >= 1);
 
     if (FLINT_HAVE_SQRHIGH_FUNC(n)) /* NOTE: Aliasing allowed here */
         return flint_mpn_sqrhigh_func_tab[n](rp, xp);
     else
-    {
-        FLINT_ASSERT(rp != xp);
-        if (n & 1)
-            return _flint_mpn_sqrhigh_basecase_odd(rp, xp, n >> 1);
-        else
-            return _flint_mpn_sqrhigh_basecase_even(rp, xp, n >> 1);
-    }
+        return _flint_mpn_sqrhigh(rp, xp, n);
 }
 
 MPN_EXTRAS_INLINE
@@ -320,7 +329,7 @@ struct mp_limb_pair_t flint_mpn_mulhigh_normalised(mp_ptr rp, mp_srcptr xp, mp_s
 
         FLINT_ASSERT(rp != xp && rp != yp);
 
-        ret.m1 = _flint_mpn_mulhigh(rp, xp, yp, n);
+        ret.m1 = _flint_mpn_mulhigh_n(rp, xp, yp, n);
 
         if (rp[n - 1] >> (FLINT_BITS - 1))
         {
