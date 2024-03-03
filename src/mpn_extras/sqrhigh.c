@@ -92,9 +92,6 @@ static const signed short flint_mpn_sqrhigh_k_tab[FLINT_MPN_SQRHIGH_K_TAB_SIZE] 
 1824, 1824, 1840, 1840, 1840, 1856, 1856, 1856, };
 
 void
-_flint_mpn_mulhigh_n_mulders_recursive(mp_ptr rp, mp_srcptr np, mp_srcptr mp, mp_size_t n);
-
-void
 _flint_mpn_sqrhigh_mulders_recursive(mp_ptr rp, mp_srcptr np, mp_size_t n)
 {
     mp_limb_t cy;

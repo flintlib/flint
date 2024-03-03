@@ -272,6 +272,8 @@ FLINT_DLL extern const flint_mpn_mulhigh_normalised_func_t flint_mpn_mulhigh_nor
 #define FLINT_MPN_MULHIGH_MUL_CUTOFF 2000
 #define FLINT_MPN_MULHIGH_K_TAB_SIZE 2048
 
+void _flint_mpn_mulhigh_n_mulders_recursive(mp_ptr rp, mp_srcptr np, mp_srcptr mp, mp_size_t n);
+
 /* NOTE: This function only works for n >= 6 */
 mp_limb_t _flint_mpn_mulhigh_basecase(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n);
 
