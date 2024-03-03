@@ -49,17 +49,52 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
-# Try to enable the fft_small module
-if("${CMAKE_C_COMPILER_ID}" MATCHES "Clang" OR "${CMAKE_C_COMPILER_ID}" MATCHES "GNU")
-    check_c_compiler_flag("-march=native" HAS_FLAG_GCC_MARCH_NATIVE)
-elseif("${CMAKE_C_COMPILER_ID}" MATCHES "MSVC")
-    # Check if AVX2 is available
-    check_c_compiler_flag("/arch:AVX2" HAS_FLAG_MSVC_AVX2)
-endif()
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED TRUE)
 
 # Build options
 option(BUILD_SHARED_LIBS "Build shared libs" on)
 option(WITH_NTL "Build tests for NTL interface or not" off)
+
+# MSVC has no equivalent to "-march=<arch>"
+if(NOT MSVC)
+    set(ENABLE_ARCH "native" CACHE STRING "Enable and push -march=ARCH option to C compiler")
+    if(NOT "${ENABLE_ARCH}" STREQUAL "NO")
+        check_c_compiler_flag("-march=${ENABLE_ARCH}" HAS_FLAG_ARCH)
+    endif()
+endif()
+
+if(MSVC)
+    set(avx2_flag "/arch:AVX2")
+else()
+    set(avx2_flag "-mavx2")
+endif()
+check_c_compiler_flag("${avx2_flag}" HAS_FLAG_AVX2)
+
+option(ENABLE_AVX2 "Enable AVX2 instructions" ${HAS_FLAG_AVX2})
+option(ENABLE_AVX512 "Enable AVX512 instructions" OFF)
+
+# Check if AVX2 is available
+
+if(ENABLE_AVX2)
+    if(HAS_FLAG_AVX2)
+        check_c_compiler_flag("-mfma" HAS_FLAG_MFMA)
+    else()
+        message(FATAL_ERROR "${CMAKE_C_COMPILER}} does not support the flag ${avx2_flag} needed for AVX2 instructions")
+    endif()
+endif()
+
+if(ENABLE_AVX512)
+    if(MSVC)
+        set(avx512_flag "/arch:AVX512")
+    else()
+        set(avx512_flag "-mavx512f")
+    endif()
+    check_c_compiler_flag("${avx512_flag}" HAS_FLAG_AVX512)
+    if(NOT HAS_FLAG_AVX512)
+        message(FATAL_ERROR "${CMAKE_C_COMPILER}} does not support the flag ${avx512_flag} needed for AVX512 instructions")
+    endif()
+endif()
 
 # Check if strongly ordered memory
 set(STRONGLY_ORDERED_CPUS x86_64 x86 i386 i586 AMD64)
@@ -109,14 +144,14 @@ else()
     set(FLINT_USES_PTHREAD ON CACHE BOOL "Use POSIX Threads.")
 endif()
 
-
 # Check if fft_small module is available
 message(STATUS "Checking whether fft_small module is available")
 set(CMAKE_REQUIRED_INCLUDES ${GMP_INCLUDE_DIRS})
-if(HAS_FLAG_GCC_MARCH_NATIVE)
-    set(CMAKE_REQUIRED_FLAGS "-march=native")
-elseif(HAS_FLAG_MSVC_AVX2)
-    set(CMAKE_REQUIRED_FLAGS "/arch:AVX2")
+if(HAS_FLAG_ARCH)
+    set(CMAKE_REQUIRED_FLAGS "-march=${ENABLE_ARCH}")
+endif()
+if(HAS_FLAG_AVX2)
+    set(CMAKE_REQUIRED_FLAGS "${avx2_flag}")
 endif()
 check_c_source_compiles([[
     #include <gmp.h>
@@ -386,10 +421,21 @@ if (HAS_FLAG_UNROLL_LOOPS)
     target_compile_options(flint PUBLIC "-funroll-loops")
 endif()
 
-if(HAS_FLAG_GCC_MARCH_NATIVE)
-    target_compile_options(flint PUBLIC "-march=native")
-elseif(HAS_FLAG_MSVC_AVX2)
-    target_compile_options(flint PUBLIC "/arch:AVX2")
+if(NOT "${ENABLE_ARCH}" STREQUAL "NO")
+    target_compile_options(flint PUBLIC "-march=${ENABLE_ARCH}")
+endif()
+
+if(ENABLE_AVX2)
+    target_compile_options(flint PUBLIC "${avx2_flag}")
+    target_compile_definitions(flint PUBLIC "FLINT_HAVE_AVX2")
+    if(HAS_FLAG_MFMA)
+        target_compile_options(flint PUBLIC "-mfma")
+    endif()
+endif()
+
+if(ENABLE_AVX512)
+    target_compile_options(flint PUBLIC "${avx512_flag}")
+    target_compile_definitions(flint PUBLIC "FLINT_HAVE_AVX512")
 endif()
 
 # Versioning
