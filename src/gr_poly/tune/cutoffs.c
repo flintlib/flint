@@ -78,7 +78,7 @@ void _nmod_poly_mul_mid_default_mpn_ctx(mp_ptr res, slong zl, slong zh, mp_srcpt
 #endif
 
 
-#if 0
+#if 1
 #define INFO "inv_series"
 #define SETUP random_input(A, state, len, ctx); \
               GR_IGNORE(gr_poly_set_coeff_si(A, 0, 1, ctx));

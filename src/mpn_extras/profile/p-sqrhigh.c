@@ -15,7 +15,7 @@
 
 /* TODO: Remove me when fully implemented */
 #if FLINT_HAVE_NATIVE_MPN_MULHIGH_BASECASE
-void mpfr_mulhigh_n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
+void mpfr_sqrhigh_n(mp_ptr, mp_srcptr, mp_size_t);
 
 #define N_MIN 1
 #define N_MAX 2100
@@ -46,31 +46,29 @@ int main(void)
     mp_limb_t rg[2 * N_MAX];
     mp_limb_t rm[2 * N_MAX];
     mp_limb_t xp[N_MAX];
-    mp_limb_t yp[N_MAX];
     mp_size_t n;
 
-    flint_printf("%.*s      mul_n / mulhigh_n || mpfr / flint\n", P, "                              ");
+    flint_printf("%.*s        sqr / sqrhigh || mpfr / flint\n", P, "                              ");
     for (n = N_MIN; n <= N_MAX; n = inc(n))
     {
         double t1, t2, t3, FLINT_SET_BUT_UNUSED(__);
         flint_printf("n = %" STR(P) "wd:", n);
 
         mpn_random2(xp, n);
-        mpn_random2(yp, n);
 
         TIMEIT_START
-        flint_mpn_mulhigh_n(rf, xp, yp, n);
+        flint_mpn_sqrhigh(rf, xp, n);
         TIMEIT_STOP_VALUES(__, t1)
 
         TIMEIT_START
-        flint_mpn_mul_n(rg, xp, yp, n);
+        flint_mpn_sqr(rg, xp, n);
         TIMEIT_STOP_VALUES(__, t2)
 
         TIMEIT_START
-        mpfr_mulhigh_n(rm, xp, yp, n);
+        mpfr_sqrhigh_n(rm, xp, n);
         TIMEIT_STOP_VALUES(__, t3)
 
-        flint_printf("   %7.3fx        ||  %7.3f\n", t2 / t1, t3 / t1);
+        flint_printf("   %7.3fx      ||  %7.3f\n", t2 / t1, t3 / t1);
     }
 
     flint_cleanup_master();
