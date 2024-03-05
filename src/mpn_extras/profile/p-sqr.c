@@ -14,10 +14,12 @@
 #include "mpn_extras.h"
 #include "profiler.h"
 
+#define N_MAX FLINT_MPN_SQR_FUNC_TAB_WIDTH
+
+#if N_MAX > 0
+
 #define mpn_sqr_basecase __gmpn_sqr_basecase
 void mpn_sqr_basecase(mp_ptr, mp_srcptr, mp_size_t);
-
-#define N_MAX FLINT_MPN_SQR_FUNC_TAB_WIDTH
 
 static void measure(mp_ptr rp1, mp_ptr rp2, mp_ptr ap, slong mx)
 {
@@ -63,3 +65,6 @@ end:
 
     return 0;
 }
+#else
+int main(void) { return 0; }
+#endif

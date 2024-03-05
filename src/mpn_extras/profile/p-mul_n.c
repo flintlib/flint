@@ -20,8 +20,8 @@ int main(void)
 {
     flint_rand_t state;
     mp_limb_t x[MAXN2], y[MAXN2], r[2 * MAXN2], s[2 * MAXN2];
-    slong i, n, m;
-    double t1, t2, __attribute__((unused)) __;
+    slong i, n;
+    double t1, t2, FLINT_SET_BUT_UNUSED(__);
 
     flint_randinit(state);
 
@@ -53,30 +53,6 @@ int main(void)
 
             if (mpn_cmp(r, s, 2 * n) != 0)
                 flint_abort();
-        }
-
-        flint_printf("mpn_mul vs flint_mpn_mul\n\n");
-
-        for (n = 1; n <= MAXN2; n = (n <= MAXN ? n + 1 : n * 1.2))
-        {
-            flint_printf("n = %wd    ", n);
-
-            for (m = 1; m <= n; m = (m <= MAXN ? m + 1 : m * 1.2))
-            {
-                TIMEIT_START
-                mpn_mul(r, x, n, y, m);
-                TIMEIT_STOP_VALUES(__, t1)
-                TIMEIT_START
-                flint_mpn_mul(s, x, n, y, m);
-                TIMEIT_STOP_VALUES(__, t2)
-
-                flint_printf("%.2f ", t1 / t2);
-
-                if (mpn_cmp(r, s, n + m) != 0)
-                    flint_abort();
-            }
-
-            flint_printf("\n");
         }
     }
 

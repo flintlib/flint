@@ -272,6 +272,22 @@ mp_limb_t flint_mpn_mul_16_16(mp_ptr res, mp_srcptr u, mp_srcptr v)
     return res[31];
 }
 
+#elif FLINT_HAVE_ARMV8
+mp_limb_t flint_mpn_mul_1n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
+mp_limb_t flint_mpn_mul_2n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
+mp_limb_t flint_mpn_mul_3n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
+mp_limb_t flint_mpn_mul_4n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
+mp_limb_t flint_mpn_mul_5n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
+mp_limb_t flint_mpn_mul_6n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
+mp_limb_t flint_mpn_mul_7n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
+mp_limb_t flint_mpn_mul_8n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
+mp_limb_t flint_mpn_mul_9n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
+mp_limb_t flint_mpn_mul_10n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
+mp_limb_t flint_mpn_mul_11n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
+mp_limb_t flint_mpn_mul_12n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
+mp_limb_t flint_mpn_mul_13n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
+mp_limb_t flint_mpn_mul_14n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
+mp_limb_t flint_mpn_mul_15n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 #else
 
 mp_limb_t flint_mpn_mul_1_1(mp_ptr res, mp_srcptr u, mp_srcptr v)
@@ -826,6 +842,25 @@ const flint_mpn_mul_func_t flint_mpn_mul_n_func_tab[] = {
     MUL( 16, 16),
 };
 
+#elif FLINT_HAVE_ARMV8
+const flint_mpn_mul_func_n_t flint_mpn_mul_func_n_tab[] = {
+    NULL,
+    flint_mpn_mul_1n,
+    flint_mpn_mul_2n,
+    flint_mpn_mul_3n,
+    flint_mpn_mul_4n,
+    flint_mpn_mul_5n,
+    flint_mpn_mul_6n,
+    flint_mpn_mul_7n,
+    flint_mpn_mul_8n,
+    flint_mpn_mul_9n,
+    flint_mpn_mul_10n,
+    flint_mpn_mul_11n,
+    flint_mpn_mul_12n,
+    flint_mpn_mul_13n,
+    flint_mpn_mul_14n,
+    flint_mpn_mul_15n,
+};
 #else
 
 const flint_mpn_mul_func_t flint_mpn_mul_func_tab[][FLINT_MPN_MUL_FUNC_TAB_WIDTH] = {
@@ -858,9 +893,3 @@ const flint_mpn_mul_func_t flint_mpn_mul_n_func_tab[] = {
 };
 
 #endif
-
-mp_limb_t
-flint_mpn_mul_basecase(mp_ptr r, mp_srcptr x, mp_srcptr y, mp_size_t xn, mp_size_t yn)
-{
-    return flint_mpn_mul_func_tab[xn][yn](r, x, y);
-}

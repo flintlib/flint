@@ -12,9 +12,7 @@
 #include "mpn_extras.h"
 #include "profiler.h"
 
-#if !FLINT_HAVE_ADX
-# error
-#endif
+#if FLINT_HAVE_NATIVE_MPN_SQRHIGH_BASECASE
 
 #define N_MIN 1
 #define N_MAX 128
@@ -55,3 +53,9 @@ int main(void)
 
 #undef N_MAX
 #undef N_MIN
+#else
+int main(void)
+{
+    return 0;
+}
+#endif

@@ -23,7 +23,6 @@
 #include "t-mod_preinvn.c"
 #include "t-mul.c"
 #include "t-mul_n.c"
-#include "t-mul_basecase.c"
 #include "t-mul_toom22.c"
 #include "t-mulhigh.c"
 #include "t-mulhigh_normalised.c"
@@ -32,7 +31,6 @@
 #include "t-mulmod_preinvn.c"
 #include "t-remove_2exp.c"
 #include "t-remove_power.c"
-#include "t-sqr_basecase.c"
 #include "t-sqrhigh_basecase.c"
 #include "t-sqrhigh.c"
 
@@ -49,7 +47,6 @@ test_struct tests[] =
     TEST_FUNCTION(flint_mpn_mod_preinvn),
     TEST_FUNCTION(flint_mpn_mul),
     TEST_FUNCTION(flint_mpn_mul_n),
-    TEST_FUNCTION(flint_mpn_mul_basecase),
     TEST_FUNCTION(flint_mpn_mul_toom22),
     TEST_FUNCTION(flint_mpn_mulhigh),
     TEST_FUNCTION(flint_mpn_mulhigh_normalised),
@@ -58,7 +55,6 @@ test_struct tests[] =
     TEST_FUNCTION(flint_mpn_mulmod_preinvn),
     TEST_FUNCTION(flint_mpn_remove_2exp),
     TEST_FUNCTION(flint_mpn_remove_power),
-    TEST_FUNCTION(flint_mpn_sqr_basecase),
     TEST_FUNCTION(flint_mpn_sqrhigh_basecase),
     TEST_FUNCTION(flint_mpn_sqrhigh)
 };

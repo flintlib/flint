@@ -12,48 +12,59 @@
 #include "test_helpers.h"
 #include "mpn_extras.h"
 
+#define N_MIN 1
+#define N_MAX 20
+
+#define WANT_BIG 1
+#define N_MIN_STOR (N_MAX + 1)
+#define N_MAX_STOR 1000
+
 TEST_FUNCTION_START(flint_mpn_mul, state)
 {
-    slong iter;
+    slong ix;
 
-    for (iter = 0; iter < 100000 * flint_test_multiplier(); iter++)
+    for (ix = 0; ix < 100000 * flint_test_multiplier(); ix++)
     {
-        slong i, n, m;
-        mp_ptr X, Y, R1, R2;
+        slong m, n;
+        mp_ptr xp, yp, rp1, rp2;
         mp_limb_t ret1, ret2;
 
-        n = 1 + n_randint(state, 15);
+        m = N_MIN + n_randint(state, N_MAX - N_MIN + 1);
+#if WANT_BIG
         if (n_randint(state, 10000) == 0)
-            n = 1 + n_randint(state, 1000);
-        m = 1 + n_randint(state, n);
+            n = N_MIN_STOR + n_randint(state, N_MAX_STOR - N_MIN_STOR + 1);
+#endif
+        n = 1 + n_randint(state, m);
 
-        X = flint_malloc(sizeof(mp_limb_t) * n);
-        Y = flint_malloc(sizeof(mp_limb_t) * m);
-        R1 = flint_malloc(sizeof(mp_limb_t) * (n + m));
-        R2 = flint_malloc(sizeof(mp_limb_t) * (n + m));
+        xp = flint_malloc(sizeof(mp_limb_t) * m);
+        yp = flint_malloc(sizeof(mp_limb_t) * n);
+        rp1 = flint_malloc(sizeof(mp_limb_t) * (m + n));
+        rp2 = flint_malloc(sizeof(mp_limb_t) * (m + n));
 
-        mpn_random2(X, n);
-        mpn_random2(Y, m);
+        mpn_random2(xp, m);
+        mpn_random2(yp, n);
 
-        for (i = 0; i < n + m; i++)
-            R1[i] = n_randtest(state);
+        mpn_random(rp2, m + n);
 
-        ret1 = flint_mpn_mul(R1, X, n, Y, m);
-        ret2 = mpn_mul(R2, X, n, Y, m);
+        ret1 = mpn_mul(rp1, xp, m, yp, n);
+        ret2 = flint_mpn_mul(rp2, xp, m, yp, n);
 
-        if (mpn_cmp(R1, R2, n + m) != 0 || ret1 != ret2)
+        if (mpn_cmp(rp1, rp2, m + n) != 0 || ret1 != ret2)
             TEST_FUNCTION_FAIL(
-                    "n = %wd\n"
-                    "X = %{ulong*}\n"
-                    "Y = %{ulong*}\n"
-                    "R1 = %{ulong*}\n"
-                    "R2 = %{ulong*}\n",
-                    n, X, n, Y, m, R1, n + m, R2, n + m);
+                    "ix = %wd\n"
+                    "(m, n) = (%wd, %wd)\n"
+                    "xp = %{ulong*}\n"
+                    "yp = %{ulong*}\n"
+                    "Expected ret: %{ulong}\n"
+                    "Got ret:      %{ulong}\n"
+                    "Expected rp: %{ulong*}\n"
+                    "Got rp:      %{ulong*}\n",
+                    ix, m, n, xp, m, yp, n, ret1, ret2, rp1, m + n, rp2, m + n);
 
-        flint_free(X);
-        flint_free(Y);
-        flint_free(R1);
-        flint_free(R2);
+        flint_free(xp);
+        flint_free(yp);
+        flint_free(rp1);
+        flint_free(rp2);
     }
 
     TEST_FUNCTION_END(state);
