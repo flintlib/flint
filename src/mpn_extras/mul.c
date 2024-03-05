@@ -26,7 +26,7 @@ void __gmpn_mul_basecase(mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t);
 # define WANT_GMP_MUL_BASECASE 0
 # define BASECASE_LIMIT 0
 # define WANT_TOOM22 1
-# define TOOM22_LIMIT 230
+# define TOOM22_LIMIT 483 /* Profiled on Apple M1 against native GMP 6.3.0 */
 #else
 /* As fallback where we don't have our own mul_basecase: */
 /* GMP's MUL_TOOM22_THRESHOLD is >= 16 on most machines */
