@@ -19,7 +19,6 @@ endif()
 include(CheckCCompilerFlag)
 include(CheckCSourceRuns)
 include(CheckIPOSupported)
-include(FindPkgConfig)
 include(CMakePackageConfigHelpers)
 
 # Source of truth for project version
@@ -107,11 +106,12 @@ else()
 endif()
 
 # Find dependencies
-find_package(PkgConfig REQUIRED)
 set(GMP_MIN_VERSION 6.2.1)
+find_package(gmp ${GMP_MIN_VERSION} REQUIRED)
+
 set(MPFR_MIN_VERSION 4.1.0)
-pkg_check_modules(GMP REQUIRED IMPORTED_TARGET gmp>=${GMP_MIN_VERSION})
-pkg_check_modules(MPFR REQUIRED IMPORTED_TARGET mpfr>=${MPFR_MIN_VERSION})
+find_package(mpfr ${MPFR_MIN_VERSION} REQUIRED)
+
 if (WITH_NTL)
     find_package(NTL REQUIRED)
 endif()
@@ -146,7 +146,7 @@ endif()
 
 # Check if fft_small module is available
 message(STATUS "Checking whether fft_small module is available")
-set(CMAKE_REQUIRED_INCLUDES ${GMP_INCLUDE_DIRS})
+set(CMAKE_REQUIRED_LIBRARIES gmp::gmp)
 if(HAS_FLAG_ARCH)
     set(CMAKE_REQUIRED_FLAGS "-march=${ENABLE_ARCH}")
 endif()
@@ -315,7 +315,7 @@ else()
 endif()
 
 # gmpcompat.h configuration
-set(CMAKE_REQUIRED_INCLUDES ${GMP_INCLUDE_DIRS})
+set(CMAKE_REQUIRED_LIBRARIES gmp::gmp)
 check_c_source_compiles([[#include <gmp.h>
   #ifndef _LONG_LONG_LIMB
   # error mp_limb_t != unsigned long long limb
@@ -387,10 +387,13 @@ list(APPEND HEADERS ${TEMP})
 
 add_library(flint ${SOURCES})
 target_link_libraries(flint PUBLIC
-    PkgConfig::GMP PkgConfig::MPFR ${PThreads_LIBRARIES})
+    gmp::gmp
+    mpfr::mpfr
+    ${PThreads_LIBRARIES}
+)
 
 if(FLINT_USES_BLAS)
-    target_link_libraries(flint PUBLIC ${CBLAS_LIBRARIES})
+    target_link_libraries(flint PUBLIC CBLAS::CBLAS)
 endif()
 
 # Include directories
@@ -398,14 +401,8 @@ endif()
 target_include_directories(flint PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src;${CMAKE_CURRENT_BINARY_DIR}>"
     "$<INSTALL_INTERFACE:include/flint>"
-    ${GMP_INCLUDE_DIRS}
-    ${MPFR_INCLUDE_DIRS}
     ${PThreads_INCLUDE_DIRS}
 )
-
-if(FLINT_USES_BLAS)
-    target_include_directories(flint PUBLIC ${CBLAS_INCLUDE_DIRS})
-endif()
 
 if(BUILD_SHARED_LIBS AND MSVC)
     # Export all functions automatically (except global data)
@@ -421,7 +418,7 @@ if (HAS_FLAG_UNROLL_LOOPS)
     target_compile_options(flint PUBLIC "-funroll-loops")
 endif()
 
-if(NOT "${ENABLE_ARCH}" STREQUAL "NO")
+if(NOT MSVC AND NOT "${ENABLE_ARCH}" STREQUAL "NO")
     target_compile_options(flint PUBLIC "-march=${ENABLE_ARCH}")
 endif()
 
@@ -513,6 +510,8 @@ install(FILES
         "${CMAKE_CURRENT_BINARY_DIR}/flintConfig.cmake"
         "${CMAKE_CURRENT_BINARY_DIR}/flintConfigVersion.cmake"
         "CMake/FindCBLAS.cmake"
+        "CMake/Findgmp.cmake"
+        "CMake/Findmpfr.cmake"
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/flint
 )
 

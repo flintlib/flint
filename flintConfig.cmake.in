@@ -1,15 +1,15 @@
 @PACKAGE_INIT@
 
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(GMP REQUIRED IMPORTED_TARGET gmp>=@GMP_MIN_VERSION@)
-pkg_check_modules(MPFR REQUIRED IMPORTED_TARGET mpfr>=@MPFR_MIN_VERSION@)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
 
-if(@CBLAS_FOUND@)
+find_package(gmp @GMP_MIN_VERSION@ REQUIRED)
+find_package(mpfr @MPFR_MIN_VERSION@ REQUIRED)
+
+if(@FLINT_USES_BLAS@)
   find_package(CBLAS REQUIRED)
 endif()
 
 if(NOT MSVC)
-  list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
   find_package(Threads REQUIRED)
 endif()
 
