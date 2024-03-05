@@ -158,9 +158,6 @@ int main(void)
         fmpz_clear(p);
     }
 
-    fq_poly_clear(f, ctx);
-    fq_poly_clear(g, ctx);
-    fq_poly_clear(h, ctx);
     FLINT_TEST_CLEANUP(state);
 
     return 0;
