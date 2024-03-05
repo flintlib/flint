@@ -1003,18 +1003,31 @@ FLINT_CHECK_FFT_SMALL(
     [AC_SUBST(FFT_SMALL, [fft_small\ \ \ ])
      AC_DEFINE(FLINT_HAVE_FFT_SMALL, 1, [Define to use the fft_small module])
 
+     dnl FIXME: Push different configuration files instead of hardcoding them here.
      case $flint_cv_arch in
          FAST_VROUNDPD_PATTERN)
-             fft_small_threshold="400"
+             dnl Zen 3
+             fft_small_mul_threshold="400"
+             fft_small_sqr_threshold="800"
              ;;
          SLOW_VROUNDPD_PATTERN)
-             fft_small_threshold="1540"
+             dnl Skylake
+             fft_small_mul_threshold="1540"
+             fft_small_sqr_threshold="3080"
+             ;;
+         ARM64_PATTERN)
+             dnl Apple M1
+             fft_small_threshold="810"
+             fft_small_threshold="865"
              ;;
          *)
-             fft_small_threshold="500"
+             dnl Be conservative here
+             fft_small_mul_threshold="800"
+             fft_small_sqr_threshold="1400"
              ;;
      esac
-     AC_DEFINE_UNQUOTED(FLINT_FFT_SMALL_THRESHOLD,[$fft_small_threshold],[Define to set threshold for when to use fft_small module])],
+     AC_DEFINE_UNQUOTED(FLINT_FFT_SMALL_MUL_THRESHOLD,[$fft_small_mul_threshold],[Define to set threshold for when to use multiplication with fft_small module])
+     AC_DEFINE_UNQUOTED(FLINT_FFT_SMALL_SQR_THRESHOLD,[$fft_small_sqr_threshold],[Define to set threshold for when to use squaring with fft_small module])],
     [AC_SUBST(FFT_SMALL, [\ \ \ \ \ \ \ \ \ \ \ \ ])])
 
 ################################################################################
