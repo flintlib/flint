@@ -418,7 +418,7 @@ if (HAS_FLAG_UNROLL_LOOPS)
     target_compile_options(flint PUBLIC "-funroll-loops")
 endif()
 
-if(NOT "${ENABLE_ARCH}" STREQUAL "NO")
+if(NOT MSVC AND NOT "${ENABLE_ARCH}" STREQUAL "NO")
     target_compile_options(flint PUBLIC "-march=${ENABLE_ARCH}")
 endif()
 
