@@ -23,7 +23,7 @@ considering `a`, `b` and `z` as column vectors.
 
 We encode a theta characteristic `a\in \{0,1\}^g` as the :type:`ulong` between
 `0` and `2^g-1` that has the corresponding expansion in base 2: thus `a =
-(1,0,0)` for `g = 3` will be numbered `8`. We also use this encoding to order
+(1,0,0)` for `g = 3` will be numbered `4`. We also use this encoding to order
 vectors of theta values throughout. Similarly, a pair of characteristics
 `(a,b)` is encoded as an :type:`ulong` between `0` and `2^{2g}-1`, where `a`
 corresponds to the `g` more significant bits. With these conventions, the
