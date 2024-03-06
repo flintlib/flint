@@ -2,7 +2,7 @@
     Copyright 2006-2010, 2012, 2014, 2018, 2020 Free Software Foundation, Inc.
     Contributed to the GNU project by Torbjorn Granlund.
 
-    Copyright 2024 Fredrik Johansson
+    Copyright (C) 2024 Fredrik Johansson
 
     This file is part of FLINT.
 
