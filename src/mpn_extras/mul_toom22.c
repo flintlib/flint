@@ -50,11 +50,7 @@ You should have received copies of the GNU General Public License and the
 GNU Lesser General Public License along with the GNU MP Library.  If not,
 see https://www.gnu.org/licenses/.  */
 
-#include "flint.h"
 #include "mpn_extras.h"
-
-/* Unoptimized */
-#define MPN_INCR_U(ptr, size, n)   mpn_add_1((ptr), (ptr), (size), (n))
 
 /* Evaluate in: -1, 0, +inf
 
