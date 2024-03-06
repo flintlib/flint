@@ -776,10 +776,28 @@ internals.])])
 internals.])])
 
     AC_SEARCH_LIBS([__gmpn_modexact_1_odd],[gmp],
-        [AC_DEFINE(FLINT_HAVE_MPN_MODEXACT_1_ODD,1,Define if system has mpn_modexact_1_odd)])
+        [AC_DEFINE(FLINT_HAVE_NATIVE_mpn_modexact_1_odd,1,Define if system has mpn_modexact_1_odd)])
 
     AC_SEARCH_LIBS([__gmpn_addmul_2],[gmp],
-        [AC_DEFINE(FLINT_HAVE_MPN_ADDMUL_2,1,Define if GMP has mpn_addmul_2)])
+        [AC_DEFINE(FLINT_HAVE_NATIVE_mpn_addmul_2,1,Define if GMP has mpn_addmul_2)])
+
+    AC_SEARCH_LIBS([__gmpn_add_n_sub_n],[gmp],
+        [AC_DEFINE(FLINT_HAVE_NATIVE_mpn_add_n_sub_n,1,Define if GMP has mpn_add_n_sub_n)])
+
+    AC_SEARCH_LIBS([__gmpn_add_nc],[gmp],
+        [AC_DEFINE(FLINT_HAVE_NATIVE_mpn_add_nc,1,Define if GMP has mpn_add_nc)])
+
+    AC_SEARCH_LIBS([__gmpn_sub_nc],[gmp],
+        [AC_DEFINE(FLINT_HAVE_NATIVE_mpn_sub_nc,1,Define if GMP has mpn_sub_nc)])
+
+    AC_SEARCH_LIBS([__gmpn_addlsh1_n_ip1],[gmp],
+        [AC_DEFINE(FLINT_HAVE_NATIVE_mpn_addlsh1_n_ip1,1,Define if GMP has mpn_addlsh1_n_ip1)])
+
+    AC_SEARCH_LIBS([__gmpn_rsh1sub_n],[gmp],
+        [AC_DEFINE(FLINT_HAVE_NATIVE_mpn_rsh1sub_n,1,Define if GMP has mpn_rsh1sub_n)])
+
+    AC_SEARCH_LIBS([__gmpn_rsh1add_n],[gmp],
+        [AC_DEFINE(FLINT_HAVE_NATIVE_mpn_rsh1add_n,1,Define if GMP has mpn_rsh1add_n)])
 fi
 
 if test "$enable_mpfr_check" = "yes";

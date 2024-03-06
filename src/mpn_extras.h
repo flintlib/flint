@@ -395,7 +395,7 @@ struct mp_limb_pair_t flint_mpn_mulhigh_normalised(mp_ptr rp, mp_srcptr xp, mp_s
     ((n) > 0 ? (((lo) >> (n)) | ((hi) << (GMP_LIMB_BITS - (n))))    \
              : (lo))
 
-#ifdef FLINT_HAVE_MPN_MODEXACT_1_ODD
+#if FLINT_HAVE_NATIVE_mpn_modexact_1_odd
 
 # define mpn_modexact_1_odd __gmpn_modexact_1_odd
 mp_limb_t mpn_modexact_1_odd(mp_srcptr, mp_size_t, mp_limb_t);
