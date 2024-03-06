@@ -17,7 +17,11 @@ src/flint.h
 src/flint-config.h
 src/gmpcompat.h
 build/
-config/
+config/*
+!config/config.guess
+!config/config.sub
+!config/configfsf.guess
+!config/configfsf.sub
 config.log
 confdefs.h
 conftest.*
