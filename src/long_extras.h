@@ -18,7 +18,7 @@
 #define LONG_EXTRAS_INLINE static inline
 #endif
 
-#include "flint.h"
+#include "longlong.h"
 
 #ifdef __cplusplus
  extern "C" {

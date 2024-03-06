@@ -24,6 +24,11 @@
 
 #include "limb_types.h"
 
+#ifdef FLINT_WANT_GMP_INTERNALS
+/* To define flint_ctz */
+# include "longlong.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

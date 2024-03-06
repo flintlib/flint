@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "longlong.h"
 #include "fmpq_mat.h"
 
 void fmpq_mat_init(fmpq_mat_t mat, slong rows, slong cols)

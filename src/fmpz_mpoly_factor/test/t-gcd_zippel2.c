@@ -11,6 +11,9 @@
 */
 
 #include "test_helpers.h"
+#include "longlong.h"
+#include "fmpz.h"
+#include "mpoly.h"
 #include "fmpz_mpoly_factor.h"
 
 /* Defined in t-gcd_brown.c, t-gcd_brown_threaded.c, t-gcd_subresultant.c,

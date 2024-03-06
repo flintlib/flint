@@ -935,20 +935,12 @@ void mpoly_max_degrees_tight(slong * max_exp,
    }
 }
 
-
-/* ceiling(log_4(x)) - 1 */
-FLINT_FORCE_INLINE
-slong mpoly_geobucket_clog4(slong x)
-{
-    if (x <= 4)
-        return 0;
-    /*
-        FLINT_BIT_COUNT returns unsigned int.
-        Signed division is not defined.
-        Do the calculation with unsigned ints and then convert to slong.
-    */
-    return (slong)((FLINT_BIT_COUNT(x - 1) - UWORD(1))/(UWORD(2)));
-}
+/* ceil(log_4(x)) - 1 */
+/* Needs inclusion of longlong.h */
+#define mpoly_geobucket_clog4(x) \
+    ((slong) (x) <= 4 \
+     ? WORD(0) \
+     : (slong) ((FLINT_BIT_COUNT((x) - 1) - UWORD(1)) >> 1))
 
 /* single-limb packings ******************************************************/
 
@@ -1033,13 +1025,9 @@ flint_bitcnt_t mpoly_exp_bits_required_ffmpz(const fmpz * user_exp,
                                                        const mpoly_ctx_t mctx);
 flint_bitcnt_t mpoly_exp_bits_required_pfmpz(fmpz * const * user_exp,
                                                        const mpoly_ctx_t mctx);
-
-FLINT_FORCE_INLINE
-flint_bitcnt_t mpoly_gen_pow_exp_bits_required(slong v, ulong e,
-                                                        const mpoly_ctx_t mctx)
-{
-    return 1 + FLINT_BIT_COUNT(e); /* only lex and deg supported */
-}
+/* Requires longlong.h */
+#define mpoly_gen_pow_exp_bits_required(v, e, mctx) \
+    ((flint_bitcnt_t) (1 + FLINT_BIT_COUNT(e)))
 
 int mpoly_is_poly(const ulong * Aexps, slong Alen,
                       flint_bitcnt_t Abits, slong var, const mpoly_ctx_t mctx);

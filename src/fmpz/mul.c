@@ -282,3 +282,19 @@ fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong x)
         flint_mpz_mul_ui(mf, COEFF_TO_PTR(c2), x);
     }
 }
+
+void fmpz_mul2_uiui(fmpz_t f, const fmpz_t g, ulong h1, ulong h2)
+{
+    mp_limb_t hi, lo;
+
+    umul_ppmm(hi, lo, h1, h2);
+    if (!hi)
+    {
+        fmpz_mul_ui(f, g, lo);
+    }
+    else
+    {
+        fmpz_mul_ui(f, g, h1);
+        fmpz_mul_ui(f, f, h2);
+    }
+}

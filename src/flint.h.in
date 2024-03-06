@@ -194,8 +194,6 @@ typedef struct __FLINT_FILE FLINT_FILE;
 # define FLINT_D_BITS 31
 #endif
 
-#include "longlong.h"
-
 /* memory ********************************************************************/
 
 void * flint_malloc(size_t size);
@@ -360,19 +358,6 @@ ulong n_randtest_not_zero(flint_rand_t);
 #define l_shift(in, shift) \
     ((shift == FLINT_BITS) ? WORD(0) : ((in) << (shift)))
 
-/* Beware when using the unsigned return value in signed arithmetic */
-static inline
-mp_limb_t FLINT_BIT_COUNT(mp_limb_t x)
-{
-   mp_limb_t zeros = FLINT_BITS;
-   if (x) zeros = flint_clz(x);
-   return FLINT_BITS - zeros;
-}
-
-#define FLINT_FLOG2(k)  (FLINT_BIT_COUNT(k) - 1)
-
-#define FLINT_CLOG2(k)  FLINT_BIT_COUNT((k) - 1)
-
 /* mpn macros ****************************************************************/
 
 #define flint_mpn_zero(xxx, nnn) \
@@ -482,20 +467,6 @@ typedef enum
 } flint_err_t;
 
 FLINT_NORETURN void flint_throw(flint_err_t exc, const char * msg, ...);
-
-/* checked multiplication ****************************************************/
-
-FLINT_INLINE slong flint_mul_sizes(slong x, slong y)
-{
-    ulong hi, lo;
-
-    umul_ppmm(hi, lo, (ulong) x, (ulong) y);
-
-    if (hi != 0 || lo > WORD_MAX)
-        flint_throw(FLINT_OVERFLOW, "Overflow creating size %wd x %wd object.\n", x, y);
-
-    return lo;
-}
 
 /* FLINT generic type definitions ********************************************/
 

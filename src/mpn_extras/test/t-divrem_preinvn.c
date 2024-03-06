@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "longlong.h"
 #include "mpn_extras.h"
 
 TEST_FUNCTION_START(flint_mpn_divrem_preinvn, state)

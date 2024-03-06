@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "longlong.h"
 #include "nmod_poly.h"
 
 void _nmod_poly_mulhigh(mp_ptr res, mp_srcptr poly1, slong len1,

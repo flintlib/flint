@@ -4,7 +4,7 @@
 
    Copyright 2009, 2015, 2016 William Hart
    Copyright 2011 Fredrik Johansson
-   Copyright 2023 Albin Ahlbäck
+   Copyright 2023, 2024 Albin Ahlbäck
 
    This file is free software; you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published by
@@ -29,13 +29,15 @@
 #ifndef FLINT_LONGLONG_H
 #define FLINT_LONGLONG_H
 
+#include "flint.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #if defined(__GNUC__)
 
-/* Trailing and leading zeros */
+/* trailing and leading zeros ************************************************/
 # ifndef _LONG_LONG_LIMB
 #  define flint_clz __builtin_clzl
 #  define flint_ctz __builtin_ctzl
@@ -44,19 +46,19 @@ extern "C" {
 #  define flint_ctz __builtin_ctzll
 # endif
 
-/* Byte swap */
+/* byte swap *****************************************************************/
 # define _FLINT_CAT_(X,Y) X##Y
 # define _FLINT_CAT(X,Y) _FLINT_CAT_(X,Y)
 # define byte_swap(x) do { (x) = _FLINT_CAT(__builtin_bswap, GMP_LIMB_BITS)(x); } while (0)
 
-/* Addition, subtraction and multiplication */
+/* addition, subtraction and multiplication **********************************/
 # if defined(__clang__)
 #  include "longlong_asm_clang.h"
 # else
 #  include "longlong_asm_gcc.h"
 # endif
 
-/* Division */
+/* division ******************************************************************/
 # include "longlong_div_gnu.h"
 
 #elif defined(_MSC_VER)
@@ -69,19 +71,22 @@ extern "C" {
 
 #endif
 
-/* Generics ******************************************************************/
+/*#############################################################################
+# Generics
+#############################################################################*/
+
+/* trailing and leading zeros, bit count *************************************/
 
 #define __ll_B ((ulong) 1 << (FLINT_BITS / 2))
 #define __ll_lowpart(t) ((ulong) (t) & (__ll_B - 1))
 #define __ll_highpart(t) ((ulong) (t) >> (FLINT_BITS / 2))
 
-/* Trailing and leading zeros */
 #if !defined(flint_ctz)
 # define NEED_CLZ_TAB
 FLINT_DLL extern const unsigned char __flint_clz_tab[128];
 
 # define flint_clz flint_clz
-static inline int flint_clz(ulong x)
+FLINT_FORCE_INLINE int flint_clz(ulong x)
 {
     mp_limb_t a, xr = x;
     const unsigned int bits4 = FLINT_BITS / 4;
@@ -100,11 +105,22 @@ static inline int flint_clz(ulong x)
 }
 
 # define flint_ctz flint_ctz
-static inline int flint_ctz(ulong x)
+FLINT_FORCE_INLINE int flint_ctz(ulong x)
 {
     return FLINT_BITS - 1 - flint_clz(x & -x);
 }
 #endif
+
+FLINT_FORCE_INLINE
+mp_limb_t FLINT_BIT_COUNT(mp_limb_t x)
+{
+    mp_limb_t zeros = FLINT_BITS;
+    if (x) zeros = flint_clz(x);
+    return FLINT_BITS - zeros;
+}
+
+#define FLINT_FLOG2(k) (FLINT_BIT_COUNT(k) - 1)
+#define FLINT_CLOG2(k) FLINT_BIT_COUNT((k) - 1)
 
 /* Byte swap */
 #if !defined(byte_swap)
@@ -129,7 +145,8 @@ static inline int flint_ctz(ulong x)
 # endif
 #endif
 
-/* Addition and subtraction */
+/* addition and subtraction **************************************************/
+
 #if !defined(add_ssaaaa)
 # define add_ssaaaa(s1, s0, a1, a0, b1, b0) \
   do { \
@@ -170,7 +187,8 @@ static inline int flint_ctz(ulong x)
   } while (0)
 #endif
 
-/* Multiplication */
+/* multiplication ************************************************************/
+
 #if !defined(umul_ppmm)
 # define umul_ppmm(w1, w0, u, v) \
   do { \
@@ -200,7 +218,21 @@ static inline int flint_ctz(ulong x)
   } while (0)
 #endif
 
-/* Division */
+FLINT_FORCE_INLINE
+slong flint_mul_sizes(slong x, slong y)
+{
+    ulong hi, lo;
+
+    umul_ppmm(hi, lo, (ulong) x, (ulong) y);
+
+    if (hi != 0 || lo > WORD_MAX)
+        flint_throw(FLINT_OVERFLOW, "Overflow creating size %wd x %wd object.\n", x, y);
+
+    return lo;
+}
+
+/* division ******************************************************************/
+
 #if !defined(udiv_qrnnd)
 # define udiv_qrnnd_int(q, r, n1, n0, d) \
   do { \

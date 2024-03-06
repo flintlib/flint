@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "longlong.h"
 #include "fmpz.h"
 
 void fmpz_fmms(fmpz_t f, const fmpz_t a, const fmpz_t b,

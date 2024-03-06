@@ -9,9 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "longlong.h"
 #include "mpoly.h"
 #include "nmod_mpoly.h"
-
 
 void nmod_mpoly_geobucket_init(nmod_mpoly_geobucket_t B,
                                                     const nmod_mpoly_ctx_t ctx)

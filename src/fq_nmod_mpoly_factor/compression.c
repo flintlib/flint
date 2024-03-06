@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "longlong.h"
 #include "fq_nmod.h"
 #include "n_poly.h"
 #include "mpoly.h"

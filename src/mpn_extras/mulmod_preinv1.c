@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "mpn_extras.h"
+#include "longlong.h"
 
 #if !defined(_MSC_VER)
 #pragma GCC diagnostic ignored "-Wunused-variable"

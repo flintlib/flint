@@ -15,6 +15,7 @@
 */
 
 #include <stdio.h>
+#include "longlong.h"
 #include "fmpz.h"
 #include "fmpz_mod_mat.h"
 #include "fq_nmod.h"

@@ -18,6 +18,7 @@
 #define MAG_INLINE static inline
 #endif
 
+#include "longlong.h"
 #include "fmpz_extras.h"
 #include "arb_types.h"
 
