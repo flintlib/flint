@@ -792,6 +792,9 @@ internals.])])
     AC_SEARCH_LIBS([__gmpn_sub_nc],[gmp],
         [AC_DEFINE(FLINT_HAVE_NATIVE_mpn_sub_nc,1,Define if GMP has mpn_sub_nc)])
 
+    AC_SEARCH_LIBS([__gmpn_addlsh1_n],[gmp],
+        [AC_DEFINE(FLINT_HAVE_NATIVE_mpn_addlsh1_n,1,Define if GMP has mpn_addlsh1_n)])
+
     AC_SEARCH_LIBS([__gmpn_addlsh1_n_ip1],[gmp],
         [AC_DEFINE(FLINT_HAVE_NATIVE_mpn_addlsh1_n_ip1,1,Define if GMP has mpn_addlsh1_n_ip1)])
 

@@ -56,6 +56,12 @@ see https://www.gnu.org/licenses/.  */
 
 #include "mpn_extras.h"
 
+#if FLINT_WANT_ASSERT
+# define FLINT_ASSERT_NOCARRY(x) FLINT_ASSERT((x) == UWORD(0))
+#else
+# define FLINT_ASSERT_NOCARRY(x) x
+#endif
+
 /* Evaluate in: -1, 0, +1, +inf
 
   <-s-><--n--><--n-->
@@ -137,16 +143,16 @@ flint_mpn_mul_toom32(mp_ptr pp,
 #else
     if (ap1_hi == 0 && mpn_cmp(ap1, a1, n) < 0)
     {
-        ASSERT_NOCARRY(mpn_sub_n(am1, a1, ap1, n));
+        FLINT_ASSERT_NOCARRY(mpn_sub_n(am1, a1, ap1, n));
         hi = 0;
         vm1_neg = 1;
     }
     else
     {
-        hi = ap1_hi - mpn_sub_n (am1, ap1, a1, n);
+        hi = ap1_hi - mpn_sub_n(am1, ap1, a1, n);
         vm1_neg = 0;
     }
-    ap1_hi += mpn_add_n (ap1, ap1, a1, n);
+    ap1_hi += mpn_add_n(ap1, ap1, a1, n);
 #endif
 
     /* Compute bp1 = b0 + b1 and bm1 = b0 - b1. */
@@ -168,12 +174,12 @@ flint_mpn_mul_toom32(mp_ptr pp,
 
         if (mpn_cmp(b0, b1, n) < 0)
         {
-            ASSERT_NOCARRY(mpn_sub_n(bm1, b1, b0, n));
+            FLINT_ASSERT_NOCARRY(mpn_sub_n(bm1, b1, b0, n));
             vm1_neg ^= 1;
         }
         else
         {
-            ASSERT_NOCARRY(mpn_sub_n(bm1, b0, b1, n));
+            FLINT_ASSERT_NOCARRY(mpn_sub_n(bm1, b0, b1, n));
         }
 #endif
     }
@@ -184,13 +190,13 @@ flint_mpn_mul_toom32(mp_ptr pp,
 
         if (mpn_zero_p(b0 + t, n - t) && mpn_cmp(b0, b1, t) < 0)
         {
-            ASSERT_NOCARRY(mpn_sub_n (bm1, b1, b0, t));
-            MPN_ZERO(bm1 + t, n - t);
+            FLINT_ASSERT_NOCARRY(mpn_sub_n(bm1, b1, b0, t));
+            flint_mpn_zero(bm1 + t, n - t);
             vm1_neg ^= 1;
         }
         else
         {
-            ASSERT_NOCARRY(mpn_sub (bm1, b0, n, b1, t));
+            FLINT_ASSERT_NOCARRY(mpn_sub(bm1, b0, n, b1, t));
         }
     }
 
@@ -215,7 +221,7 @@ flint_mpn_mul_toom32(mp_ptr pp,
 
     TOOM32_MUL_N_REC(vm1, am1, bm1, n, scratch_out);
     if (hi)
-        hi = mpn_add_n (vm1+n, vm1+n, bm1, n);
+        hi = mpn_add_n(vm1+n, vm1+n, bm1, n);
 
     vm1[2*n] = hi;
 
@@ -226,7 +232,7 @@ flint_mpn_mul_toom32(mp_ptr pp,
         mpn_rsh1sub_n(v1, v1, vm1, 2*n+1);
 #else
         mpn_sub_n(v1, v1, vm1, 2*n+1);
-        ASSERT_NOCARRY(mpn_rshift (v1, v1, 2*n+1, 1));
+        FLINT_ASSERT_NOCARRY(mpn_rshift(v1, v1, 2*n+1, 1));
 #endif
     }
     else
@@ -235,7 +241,7 @@ flint_mpn_mul_toom32(mp_ptr pp,
         mpn_rsh1add_n(v1, v1, vm1, 2*n+1);
 #else
         mpn_add_n(v1, v1, vm1, 2*n+1);
-        ASSERT_NOCARRY(mpn_rshift (v1, v1, 2*n+1, 1));
+        FLINT_ASSERT_NOCARRY(mpn_rshift(v1, v1, 2*n+1, 1));
 #endif
     }
 
@@ -273,18 +279,18 @@ flint_mpn_mul_toom32(mp_ptr pp,
      swapping the location of +1 and -1 values? */
   if (vm1_neg)
   {
-      cy = mpn_add_n (v1, v1, vm1, n);
-      hi += mpn_add_nc (pp + 2*n, pp + 2*n, vm1 + n, n, cy);
-      MPN_INCR_U (v1 + n, n+1, hi);
+      cy = mpn_add_n(v1, v1, vm1, n);
+      hi += mpn_add_nc(pp + 2*n, pp + 2*n, vm1 + n, n, cy);
+      MPN_INCR_U(v1 + n, n+1, hi);
   }
   else
   {
-      cy = mpn_sub_n (v1, v1, vm1, n);
-      hi += mpn_sub_nc (pp + 2*n, pp + 2*n, vm1 + n, n, cy);
-      MPN_DECR_U (v1 + n, n+1, hi);
+      cy = mpn_sub_n(v1, v1, vm1, n);
+      hi += mpn_sub_nc(pp + 2*n, pp + 2*n, vm1 + n, n, cy);
+      MPN_DECR_U(v1 + n, n+1, hi);
   }
 
-  TOOM32_MUL_N_REC (pp, a0, b0, n, scratch_out);
+  TOOM32_MUL_N_REC(pp, a0, b0, n, scratch_out);
   /* vinf, s+t limbs.  Use mpn_mul for now, to handle unbalanced operands */
   if (s > t)  flint_mpn_mul(pp+3*n, a2, s, b1, t);
   else        flint_mpn_mul(pp+3*n, b1, t, a2, s);
@@ -326,9 +332,9 @@ flint_mpn_mul_toom32(mp_ptr pp,
   {
       hi -= mpn_sub(pp + 2*n, pp + 2*n, 2*n, pp + 4*n, s+t-n);
 
-      ASSERT(hi >= 0); /* contribution of the middle terms >= 0 */
+      FLINT_ASSERT(hi >= 0); /* contribution of the middle terms >= 0 */
       MPN_INCR_U(pp + 4*n, s+t-n, hi);
   }
   else
-      ASSERT (hi == 0);
+      FLINT_ASSERT(hi == 0);
 }
