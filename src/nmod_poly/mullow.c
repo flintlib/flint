@@ -13,7 +13,7 @@
 #include "nmod.h"
 #include "nmod_poly.h"
 
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
 
 #include "fft_small.h"
 
@@ -51,7 +51,7 @@ void _nmod_poly_mullow(mp_ptr res, mp_srcptr poly1, slong len1,
 
     bits = NMOD_BITS(mod);
 
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
 
     if (len2 >= fft_mullow_tab[bits - 1])
     {

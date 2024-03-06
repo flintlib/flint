@@ -308,7 +308,7 @@ char * fmpz_get_str(char * str, int b, const fmpz_t f)
         if (str == NULL)
             str = flint_malloc(mpz_sizeinbase(COEFF_TO_PTR(*f), b) + 2);
 
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
         if (b == 10 && mpz_size(COEFF_TO_PTR(*f)) > 15000)
         {
             fmpz_get_str_bsplit_threaded(str, f);

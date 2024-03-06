@@ -14,7 +14,7 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
 #include "fft_small.h"
 #endif
 
@@ -114,7 +114,7 @@ void _fmpz_poly_sqr(fmpz * res, const fmpz * poly, slong len)
     bits = _fmpz_vec_max_bits(poly, len);
     bits = FLINT_ABS(bits);
 
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
     if (len >= 80 && (bits + bits <= 40 || bits + bits >= 128 || len >= 160))
         if (_fmpz_poly_mul_mid_default_mpn_ctx(res, 0, len + len - 1, poly, len, poly, len))
             return;
@@ -136,7 +136,7 @@ void _fmpz_poly_sqr(fmpz * res, const fmpz * poly, slong len)
         }
     }
 
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
 
     /* same as in mul.c */
     if (len <= 6 && bits <= 5000)

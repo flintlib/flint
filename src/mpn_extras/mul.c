@@ -37,7 +37,7 @@ void __gmpn_mul_basecase(mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t);
 #endif
 
 
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
 # include "fft_small.h"
 # define FFT_MUL mpn_mul_default_mpn_ctx
 #else

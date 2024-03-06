@@ -47,7 +47,7 @@ _fmpz_powm(fmpz_t res, const fmpz_t x, const fmpz_t e, const fmpz_t m)
     {
         fmpz_set(res, x);
     }
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
     else if (fmpz_bits(m) >= 70000)
     {
         gr_ctx_t gctx;
@@ -176,7 +176,7 @@ _fmpz_powm_ui(fmpz_t res, const fmpz_t x, ulong e, const fmpz_t m)
     {
         fmpz_set(res, x);
     }
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
     else if (fmpz_bits(m) >= 70000)
     {
         gr_ctx_t gctx;

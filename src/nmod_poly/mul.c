@@ -13,7 +13,7 @@
 #include "nmod.h"
 #include "nmod_poly.h"
 
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
 
 #include "fft_small.h"
 
@@ -47,7 +47,7 @@ void _nmod_poly_mul(mp_ptr res, mp_srcptr poly1, slong len1,
     bits = NMOD_BITS(mod);
     cutoff_len = FLINT_MIN(len1, 2 * len2);
 
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
 
     if (poly1 == poly2 && len1 == len2)
     {
