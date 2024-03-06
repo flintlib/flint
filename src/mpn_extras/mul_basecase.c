@@ -12,7 +12,7 @@
 
 #include "mpn_extras.h"
 
-#if FLINT_HAVE_ADX
+#if FLINT_HAVE_ASSEMBLY_x86_64_adx
 
 mp_limb_t flint_mpn_mul_1_1(mp_ptr, mp_srcptr, mp_srcptr);
 
@@ -272,7 +272,7 @@ mp_limb_t flint_mpn_mul_16_16(mp_ptr res, mp_srcptr u, mp_srcptr v)
     return res[31];
 }
 
-#elif FLINT_HAVE_ARMV8
+#elif FLINT_HAVE_ASSEMBLY_armv8
 mp_limb_t flint_mpn_mul_1n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 mp_limb_t flint_mpn_mul_2n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 mp_limb_t flint_mpn_mul_3n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
@@ -800,7 +800,7 @@ mp_limb_t flint_mpn_mul_14_1(mp_ptr res, mp_srcptr u, mp_srcptr v)
 #define MUL(mx, nx) _MUL(mx, nx)
 
 
-#if FLINT_HAVE_ADX
+#if FLINT_HAVE_ASSEMBLY_x86_64_adx
 
 const flint_mpn_mul_func_t flint_mpn_mul_func_tab[][FLINT_MPN_MUL_FUNC_TAB_WIDTH] = {
     {NULL, NULL,           NULL,      NULL,      NULL,      NULL,      NULL,      NULL,      NULL,      NULL,       NULL,       NULL,       NULL,       NULL,       NULL,       NULL,       NULL},
@@ -842,7 +842,7 @@ const flint_mpn_mul_func_t flint_mpn_mul_n_func_tab[] = {
     MUL( 16, 16),
 };
 
-#elif FLINT_HAVE_ARMV8
+#elif FLINT_HAVE_ASSEMBLY_armv8
 const flint_mpn_mul_func_n_t flint_mpn_mul_func_n_tab[] = {
     NULL,
     flint_mpn_mul_1n,

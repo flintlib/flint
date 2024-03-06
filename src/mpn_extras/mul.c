@@ -14,7 +14,7 @@
 
 void __gmpn_mul_basecase(mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t);
 
-#if FLINT_HAVE_ADX
+#if FLINT_HAVE_ASSEMBLY_x86_64_adx
 /* We don't call mpn_mul_basecase directly because our own basecases
    already cover small operands. */
 # define WANT_GMP_MUL_BASECASE 0
@@ -22,7 +22,7 @@ void __gmpn_mul_basecase(mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t);
 /* toom22 on top our own basecase beats GMP up to some point */
 # define WANT_TOOM22 1
 # define TOOM22_LIMIT 230
-#elif FLINT_HAVE_ARMV8
+#elif FLINT_HAVE_ASSEMBLY_armv8
 # define WANT_GMP_MUL_BASECASE 0
 # define BASECASE_LIMIT 0
 # define WANT_TOOM22 1

@@ -11,5 +11,4 @@
 
 #define FFT_INLINES_C
 
-#include "flint.h"
 #include "fft.h"

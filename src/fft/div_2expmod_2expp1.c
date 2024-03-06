@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "fft.h"
 
 /* WARNING: relies on GCC's handling of >> as arithmetic shift right */

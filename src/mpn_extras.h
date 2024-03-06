@@ -120,7 +120,7 @@ flint_mpn_get_d(mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp);
 
 /* Addition ******************************************************************/
 
-#if FLINT_HAVE_ADX
+#if FLINT_HAVE_ASSEMBLY_x86_64_adx
 /* Simultaneously adds two n-limbed integers onto result and returns carry. */
 /* NOTE: Requires n >= 4 */
 # define FLINT_HAVE_NATIVE_mpn_2add_n_inplace 1
@@ -199,7 +199,7 @@ mp_limb_t mpn_rsh1sub_n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 # define FLINT_FFT_SQR_THRESHOLD 32000
 #endif
 
-#if FLINT_HAVE_ADX
+#if FLINT_HAVE_ASSEMBLY_x86_64_adx
 # define FLINT_MPN_MUL_FUNC_TAB_WIDTH 17
 # define FLINT_MPN_SQR_FUNC_TAB_WIDTH 14
 
@@ -210,7 +210,7 @@ mp_limb_t mpn_rsh1sub_n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 # define FLINT_MPN_MUL_HARD(rp, xp, xn, yp, yn) (flint_mpn_mul_func_tab[xn][yn](rp, xp, yp))
 # define FLINT_MPN_MUL_N_HARD(rp, xp, yp, n) (flint_mpn_mul_n_func_tab[n](rp, xp, yp))
 # define FLINT_MPN_SQR_HARD(rp, xp, n) (flint_mpn_sqr_func_tab[n](rp, xp))
-#elif FLINT_HAVE_ARMV8
+#elif FLINT_HAVE_ASSEMBLY_armv8
 # define FLINT_MPN_MUL_FUNC_N_TAB_WIDTH 15
 # define FLINT_MPN_SQR_FUNC_TAB_WIDTH 0
 
@@ -348,7 +348,7 @@ FLINT_DLL extern const flint_mpn_mul_func_t flint_mpn_mulhigh_func_tab[];
 FLINT_DLL extern const flint_mpn_sqr_func_t flint_mpn_sqrhigh_func_tab[];
 FLINT_DLL extern const flint_mpn_mulhigh_normalised_func_t flint_mpn_mulhigh_normalised_func_tab[];
 
-#if FLINT_HAVE_ADX
+#if FLINT_HAVE_ASSEMBLY_x86_64_adx
 # define FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH 12
 # define FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH 8
 # define FLINT_MPN_MULHIGH_NORMALISED_FUNC_TAB_WIDTH 12

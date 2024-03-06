@@ -88,14 +88,73 @@ define(X86_PATTERN,
 define(X86_64_PATTERN,
 [[athlon64-*-* | k8-*-* | k10-*-* | bobcat-*-* | jaguar*-*-* | bulldozer*-*-* | piledriver*-*-* | steamroller*-*-* | excavator*-*-* | zen*-*-* | pentium4-*-* | atom-*-* | silvermont-*-* | goldmont-*-* | tremont-*-* | core2-*-* | corei*-*-* | x86_64-*-* | nano-*-* | nehalem*-*-* | westmere*-*-* | sandybridge*-*-* | ivybridge*-*-* | haswell*-*-* | broadwell*-*-* | skylake*-*-* | kabylake*-*-* | icelake*-*-* | tigerlake*-*-* | rocketlake*-*-* | alderlake*-*-* | raptorlake*-*-*]])
 
+define(X86_64_ADX_PATTERN,
+[[zen*-*-* | x86_64-v3*-*-* | broadwell*-*-* | skylake*-*-* | kabylake*-*-* | icelake*-*-* | tigerlake*-*-* | rocketlake*-*-* | alderlake*-*-* | raptorlake*-*-*]])
+
 define(ARM64_PATTERN,
-[[aarch64-*-*]])
+[[armcortexa53-*-* | armcortexa53neon-*-* | armcortexa55-*-* | armcortexa55neon-*-* | armcortexa57-*-* | armcortexa57neon-*-* | armcortexa7[2-9]-*-* | armcortexa7[2-9]neon-*-* | armexynosm1-*-* | armthunderx-*-* | armxgene1-*-* | aarch64*-*-* | applem[1-9]*-*-* | armv8*-*-*]])
 
 define(SLOW_VROUNDPD_PATTERN,
 [[haswell* | broadwell* | skylake* | kabylake* | icelake* | tigerlake* | rocketlake* | alderlake* | raptorlake*]])
 
 define(FAST_VROUNDPD_PATTERN,
 [[znver[2-4]* | sandybridge* | ivybridge*]])
+
+
+dnl  FLINT_CHECK_CPU_SET_T([action-if-true],[action-if-false])
+dnl  -----------------------
+dnl  Checks if cpu_set_t is supported.
+dnl
+dnl  FIXME: Does this cover all BSD systems?
+
+AC_DEFUN([FLINT_CHECK_CPU_SET_T],
+[AC_CACHE_CHECK([if cpu_set_t is supported],
+                flint_cv_check_cpu_set_t,
+[flint_cv_check_cpu_set_t="no"
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
+#define _GNU_SOURCE
+#include <sched.h>
+#include <pthread.h>
+],
+[cpu_set_t s;
+CPU_ZERO(&s);
+pthread_getaffinity_np(pthread_self(), sizeof(cpu_set_t), 0);])],
+[flint_cv_check_cpu_set_t="yes"])
+])
+AS_VAR_IF([flint_cv_check_cpu_set_t],"yes",
+    [m4_default([$1], :)],
+    [m4_default([$2], :)])
+])
+
+
+dnl  FLINT_CHECK_NTL([action-if-true],[action-if-false])
+dnl  -----------------------
+dnl  Checks if linking with NTL works.
+
+AC_DEFUN([FLINT_CHECK_NTL],
+[AC_REQUIRE([AC_PROG_CXX])
+AC_CACHE_CHECK([if linking with NTL works],
+                flint_cv_check_ntl,
+[flint_cv_check_ntl="no"
+save_LIBS="$LIBS"
+LIBS="-lntl $LIBS"
+AC_LANG_PUSH([C++])
+AC_LINK_IFELSE([AC_LANG_PROGRAM(
+    [[#include <NTL/ZZ.h>
+    ]], [NTL::ZZ a, b, c;
+    std::cin >> a;
+    std::cin >> b;
+    c = (a+1)*(b+1);
+    std::cout << c << "\n";])],
+    [flint_cv_check_ntl="yes"])
+AC_LANG_POP([C++])
+LIBS="$save_LIBS"
+])
+AS_VAR_IF([flint_cv_check_ntl],"yes",
+    [m4_default([$1], :)],
+    [m4_default([$2], :)])
+])
+
 
 dnl  FLINT_PREPROC_IFELSE(input,[action-if-true],[action-if-false])
 dnl  -----------------------
@@ -111,48 +170,6 @@ save_ac_cpp="$ac_cpp"
 ac_cpp="$CPP $CFLAGS $CPPFLAGS"
 AC_PREPROC_IFELSE($@)
 ac_cpp="$ac_cpp"
-])
-
-
-dnl  FLINT_ARCH
-dnl  -----------------------
-dnl  Checks compiler for architectures.
-dnl
-dnl  NOTE: This has to be called after all CFLAGS has been gathered.
-dnl
-dnl  FIXME: Currently only Clang and GCC. Support more compilers?
-
-AC_DEFUN([FLINT_ARCH],
-[AC_CACHE_CHECK([for host architecture],
-                 flint_cv_arch,
-[flint_cv_arch="unknown"
-is_gnu="no"
-AC_PREPROC_IFELSE([AC_LANG_SOURCE([
-        #ifndef __GNUC__
-        # error
-        error
-        #endif
-        ])],
-        [is_gnu="yes"])
-
-dnl We only know how to proceed with GCC or Clang
-AS_VAR_IF([is_gnu],"yes",[
-    is_clang="no"
-    AC_PREPROC_IFELSE([AC_LANG_SOURCE([
-            #ifndef __clang__
-            # error
-            error
-            #endif
-            ])],
-            [is_clang="yes"])
-
-    AS_VAR_IF([is_clang],"yes",[
-        flint_cv_arch=[`echo | $CC -v $CFLAGS -E - 2>&1 | grep "cc1" | sed -n 's/.*-target-cpu \([^ ]*\).*/\1/p'`]
-    ],[
-        flint_cv_arch=[`echo | $CC -v $CFLAGS -E - 2>&1 | grep "cc1" | sed -n 's/.*-march=\([^ ]*\).*/\1/p'`]
-    ])
-])
-])
 ])
 
 
@@ -261,104 +278,6 @@ else
     )
 fi
 ])
-])
-
-dnl  FLINT_SYSTEM_V_ABI([action-success][,action-fail])
-dnl  -----------------------
-dnl  Checks if System V ABI.
-dnl  Do "action-success" if this succeeds, "action-fail" if not.
-
-AC_DEFUN([FLINT_SYSTEM_V_ABI],
-[AC_CACHE_CHECK([if system uses System V ABI],
-                flint_cv_system_v_abi,
-AC_PREPROC_IFELSE([AC_LANG_PROGRAM([],[
-        #if !(defined(__APPLE__) || defined(__unix__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__)) || defined(__CYGWIN__)
-        #error Dead man
-        error
-        #endif
-    ])],
-    [flint_cv_system_v_abi="yes"],
-    [flint_cv_system_v_abi="no"]
-))
-AS_VAR_IF([flint_cv_system_v_abi],"yes",
-    [m4_default([$1], :)],
-    [m4_default([$2], :)])
-])
-
-
-dnl  FLINT_CHECK_ADX([action-success][,action-fail])
-dnl  -----------------------
-dnl  Checks if CPU supports the ADX instruction set. Will only run if host CPU
-dnl  is x86_64. Do "action-success" if this succeeds, "action-fail" if not.
-
-AC_DEFUN([FLINT_CHECK_ADX],
-[AS_VAR_IF([host_cpu],"x86_64",
-    [AC_CACHE_CHECK([if ADX instruction set is supported by CPU],
-                    flint_cv_check_adx,
-    FLINT_PREPROC_IFELSE([AC_LANG_SOURCE([
-            #if !defined(__ADX__)
-            #error Dead man
-            error
-            #endif
-        ])],
-        flint_cv_check_adx="yes",
-        flint_cv_check_adx="no")
-    )])
-AS_VAR_IF(flint_cv_check_adx,yes,
-    [m4_default([$1], :)],
-    [m4_default([$2], :)])
-])
-
-
-dnl  FLINT_CHECK_ARMV8([action-success][,action-fail])
-dnl  -----------------------
-dnl  Checks if CPU supports the ARM v8-A instruction set. Will only run if host
-dnl  CPU is aarch64. Do "action-success" if this succeeds, "action-fail" if not.
-
-AC_DEFUN([FLINT_CHECK_ARMV8],
-[AS_VAR_IF([host_cpu],"aarch64",
-    [AC_CACHE_CHECK([if ARM v8-A instruction set is supported by CPU],
-                    flint_cv_check_armv8a,
-    FLINT_PREPROC_IFELSE([AC_LANG_SOURCE([
-            #if __ARM_ARCH != 8
-            #error Dead man
-            error
-            #endif
-        ])],
-        flint_cv_check_armv8a="yes",
-        flint_cv_check_armv8a="no")
-    )])
-AS_VAR_IF(flint_cv_check_armv8a,yes,
-    [m4_default([$1], :)],
-    [m4_default([$2], :)])
-])
-
-
-dnl  FLINT_HAVE_ASM([action-success][,action-fail])
-dnl  -----------------------
-dnl  Checks if system use FLINT's assembly.
-dnl  Do "action-success" if this succeeds, "action-fail" if not.
-
-AC_DEFUN([FLINT_HAVE_ASM],
-[AC_REQUIRE([FLINT_ABI])
-AC_REQUIRE([FLINT_SYSTEM_V_ABI])
-AC_REQUIRE([FLINT_CHECK_ADX])
-AC_REQUIRE([FLINT_CHECK_ARMV8])
-
-AC_CACHE_CHECK([if system can use FLINT's assembly],
-                flint_cv_have_asm,
-[flint_cv_have_asm="no"
-if test "$flint_cv_abi" = "64" && test "$flint_cv_system_v_abi" = "yes";
-then
-    if test "$flint_cv_check_adx" = "yes" || test "$flint_cv_check_armv8a" = "yes";
-    then
-        flint_cv_have_asm="yes"
-    fi
-fi])
-
-AS_VAR_IF([flint_cv_have_asm],"yes",
-    [m4_default([$1], :)],
-    [m4_default([$2], :)])
 ])
 
 

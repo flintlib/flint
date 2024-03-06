@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "fft.h"
 
 void mpn_normmod_2expp1(mp_limb_t * t, mp_size_t limbs)
