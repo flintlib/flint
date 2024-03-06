@@ -121,7 +121,7 @@ flint_mpn_get_d(mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp);
 /* Addition ******************************************************************/
 
 #if FLINT_HAVE_ADX
-# define FLINT_HAVE_NATIVE_2ADD_N_INPLACE 1
+# define FLINT_HAVE_NATIVE_mpn_2add_n_inplace 1
 
 /* Simultaneously adds two n-limbed integers onto result and returns carry. */
 /* NOTE: Requires n >= 4 */
@@ -163,7 +163,7 @@ mp_limb_t flint_mpn_2add_n_inplace(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 # define FLINT_MPN_MUL_N_HARD(rp, xp, yp, n) (flint_mpn_mul_func_n_tab[n](rp, xp, yp, n))
 # define FLINT_MPN_SQR_HARD(rp, xp, n) (flint_mpn_sqr_func_tab[n](rp, xp))
 
-# define FLINT_HAVE_NATIVE_MUL_2 1
+# define FLINT_HAVE_NATIVE_mpn_mul_2 1
 mp_limb_t flint_mpn_mul_2(mp_ptr, mp_srcptr, mp_size_t, mp_srcptr);
 #else
 # define FLINT_MPN_MUL_FUNC_TAB_WIDTH 8
@@ -294,8 +294,8 @@ FLINT_DLL extern const flint_mpn_mulhigh_normalised_func_t flint_mpn_mulhigh_nor
 # define FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH 8
 # define FLINT_MPN_MULHIGH_NORMALISED_FUNC_TAB_WIDTH 12
 
-# define FLINT_HAVE_NATIVE_MPN_MULHIGH_BASECASE 1
-# define FLINT_HAVE_NATIVE_MPN_SQRHIGH_BASECASE 1
+# define FLINT_HAVE_NATIVE_mpn_mulhigh_basecase 1
+# define FLINT_HAVE_NATIVE_mpn_sqrhigh_basecase 1
 
 #define FLINT_MPN_MULHIGH_MULDERS_CUTOFF 50
 #define FLINT_MPN_MULHIGH_MUL_CUTOFF 2000

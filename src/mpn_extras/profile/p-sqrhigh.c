@@ -14,7 +14,7 @@
 #include "templates.h"
 
 /* TODO: Remove me when fully implemented */
-#if FLINT_HAVE_NATIVE_MPN_MULHIGH_BASECASE
+#if FLINT_HAVE_NATIVE_mpn_mulhigh_basecase
 void mpfr_sqrhigh_n(mp_ptr, mp_srcptr, mp_size_t);
 
 #define N_MIN 1

@@ -13,7 +13,7 @@
 #include "profiler.h"
 #include "templates.h"
 
-#if FLINT_HAVE_NATIVE_2ADD_N_INPLACE
+#if FLINT_HAVE_NATIVE_mpn_2add_n_inplace
 void mpfr_mulhigh_n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 
 #define N_MIN 4

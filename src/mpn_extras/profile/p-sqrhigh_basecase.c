@@ -12,7 +12,7 @@
 #include "mpn_extras.h"
 #include "profiler.h"
 
-#if FLINT_HAVE_NATIVE_MPN_SQRHIGH_BASECASE
+#if FLINT_HAVE_NATIVE_mpn_sqrhigh_basecase
 
 #define N_MIN 1
 #define N_MAX 128

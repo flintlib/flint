@@ -12,7 +12,7 @@
 #include "test_helpers.h"
 #include "mpn_extras.h"
 
-#if FLINT_HAVE_NATIVE_2ADD_N_INPLACE
+#if FLINT_HAVE_NATIVE_mpn_2add_n_inplace
 
 #define N_MIN 4
 #define N_MAX 100

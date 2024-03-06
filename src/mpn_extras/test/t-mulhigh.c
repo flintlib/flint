@@ -13,7 +13,7 @@
 #include "mpn_extras.h"
 
 /* TODO: Remove this preprocessor conditional */
-#if FLINT_HAVE_NATIVE_MPN_MULHIGH_BASECASE
+#if FLINT_HAVE_NATIVE_mpn_mulhigh_basecase
 
 #define N_MAX (FLINT_MPN_MULHIGH_MUL_CUTOFF + 100)
 
