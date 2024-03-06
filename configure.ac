@@ -749,17 +749,23 @@ fi
 ################################################################################
 
 AC_SEARCH_LIBS([atan2],[m],
-   [],
-   [AC_MSG_ERROR(["The C math library was not found!"])])
+    [],
+    [AC_MSG_ERROR(["The C math library was not found!"])])
 
 AC_SEARCH_LIBS([__gmpz_init],[gmp],
-   [],
-   [AC_MSG_ERROR(["GMP library was not found.  If you indeed have GMP installed, please
+    [],
+    [AC_MSG_ERROR(["GMP library was not found.  If you indeed have GMP installed, please
 submit a bug report to <https://github.com/flintlib/flint/issues/> so
 that we can either fix the issue or give a more proper error message."])])
 
+AC_SEARCH_LIBS([__gmpn_mul_basecase],[gmp],
+    [],
+    [AC_MSG_ERROR([`mpn_mul_basecase' was not found in the GMP library, which is required by FLINT.
+Please submit a bug report to <https://github.com/flintlib/flint/issues/>.])])
+
 if test "$enable_gmp_internals" = "yes";
 then
+    dnl The following functions should exist in the GMP library regardless.
     AC_SEARCH_LIBS([__gmpn_gcd_11],[gmp],
         [],
         [AC_MSG_ERROR(["`mpn_gcd_11' was not found in the GMP library. It is needed to enable GMP
@@ -770,11 +776,7 @@ internals."])])
         [AC_MSG_ERROR([`mpn_div_q' was not found in the GMP library. It is needed to enable GMP
 internals.])])
 
-    AC_SEARCH_LIBS([__gmpn_mul_basecase],[gmp],
-        [],
-        [AC_MSG_ERROR([`mpn_mul_basecase' was not found in the GMP library. It is needed to enable GMP
-internals.])])
-
+    dnl The following functions may or may not exist
     AC_SEARCH_LIBS([__gmpn_modexact_1_odd],[gmp],
         [AC_DEFINE(FLINT_HAVE_NATIVE_mpn_modexact_1_odd,1,Define if system has mpn_modexact_1_odd)])
 
