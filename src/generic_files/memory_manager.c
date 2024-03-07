@@ -44,8 +44,13 @@ static void * (* __flint_allocate_func)(size_t) = _flint_malloc;
 static void * (* __flint_callocate_func)(size_t, size_t) = _flint_calloc;
 static void * (* __flint_reallocate_func)(void *, size_t) = _flint_realloc;
 static void (* __flint_free_func)(void *) = _flint_free;
+#if HAVE_ALIGNED_ALLOC || HAVE__ALIGNED_MALLOC
 static void * (* __flint_aligned_allocate_func)(size_t, size_t) = _flint_aligned_alloc;
 static void (* __flint_aligned_free_func)(void *) = _flint_aligned_free;
+#else
+static void * (* __flint_aligned_allocate_func)(size_t, size_t) = _flint_aligned_alloc2;
+static void (* __flint_aligned_free_func)(void *) = _flint_aligned_free2;
+#endif
 
 FLINT_STATIC_NOINLINE void flint_memory_error(size_t size)
 {
@@ -147,10 +152,12 @@ void flint_free(void * ptr)
 
 void * _flint_aligned_alloc(size_t alignment, size_t size)
 {
-#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
+#if HAVE__ALIGNED_MALLOC
     return _aligned_malloc(size, alignment);
-#else
+#elif HAVE_ALIGNED_ALLOC
     return aligned_alloc(alignment, size);
+#else
+    return NULL;
 #endif
 }
 
@@ -163,7 +170,7 @@ void * _flint_aligned_alloc2(size_t alignment, size_t size)
 
     alloc_size = size + alignment;
 
-    alloc_ptr = malloc(alloc_size);
+    alloc_ptr = flint_malloc(alloc_size);
 
     /* Case 1: alloc_ptr aligned with (alignment, alignment - sizeof(ulong)).
                We only need `size + sizeof(ulong)' bytes.
@@ -195,10 +202,12 @@ FLINT_WARN_UNUSED void * flint_aligned_alloc(size_t alignment, size_t size)
 
 void _flint_aligned_free(void * p)
 {
-#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
+#if HAVE__ALIGNED_MALLOC
     _aligned_free(p);
-#else
+#elif HAVE_ALIGNED_ALLOC
     free(p);
+#else
+    return;
 #endif
 }
 
@@ -206,7 +215,7 @@ void _flint_aligned_free2(void * p)
 {
     size_t * ptr = p;
     if (ptr != NULL)
-        free((char *) ptr - ptr[-1]);
+        flint_free((char *) ptr - ptr[-1]);
 }
 
 void flint_aligned_free(void * ptr)

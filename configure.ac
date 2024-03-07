@@ -889,6 +889,8 @@ AC_MSG_ERROR([Couldn't find alloca, which is required for FLINT. Please submit a
 report to <https://github.com/flintlib/flint/issues/> and specify your
 operating system.])])
 
+AC_CHECK_FUNCS([aligned_alloc _aligned_malloc])
+
 ################################################################################
 # CFLAGS
 ################################################################################
