@@ -26,6 +26,13 @@
 # define FLINT_FFT_SMALL_SQR_THRESHOLD 1400
 #endif
 
+/* NOTE: Here we assume this is how it works. */
+#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
+# define HAVE__ALIGNED_MALLOC 1
+#else
+# define HAVE_ALIGNED_ALLOC 1
+#endif
+
 #ifdef _MSC_VER
 # if defined(FLINT_BUILD_DLL)
 #  define FLINT_DLL __declspec(dllexport)
