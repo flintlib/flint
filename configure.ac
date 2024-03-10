@@ -1125,18 +1125,24 @@ then
     CFLAGS="$save_CFLAGS $DEFAULT_CFLAGS"
     for flag in $gcc_cflags $gcc_warnings;
     do
-        AX_CHECK_COMPILE_FLAG([$flag])
+        AX_CHECK_COMPILE_FLAG([$flag],[CFLAGS="$CFLAGS $flag"])
     done
     for opt in $gcc_cflags_optlist;
     do
         eval tmp=\"\$gcc_cflags_${opt}\" # " Just to fix highlighting
         for flag in $tmp;
         do
-            AX_CHECK_COMPILE_FLAG([$flag])
+            AX_CHECK_COMPILE_FLAG([$flag],[CFLAGS="$CFLAGS $flag"])
         done
     done
-    AC_SUBST(UNROLL_LOOPS,1)
-    AC_DEFINE(FLINT_UNROLL_LOOPS, 1, [Define to locally unroll some loops])
+    AX_CHECK_COMPILE_FLAG([-funroll-loops],[unroll_loops="yes"])
+    if test "$unroll_loops" = "yes";
+    then
+        AC_SUBST(UNROLL_LOOPS,1)
+        AC_DEFINE(FLINT_UNROLL_LOOPS, 1, [Define to locally unroll some loops])
+    else
+        AC_SUBST(UNROLL_LOOPS,0)
+    fi
 else
     CFLAGS="$save_CFLAGS"
     AX_CHECK_COMPILE_FLAG([$CFLAGS],[],AC_MSG_ERROR(["Couldn't compile with given CFLAGS!"]))
