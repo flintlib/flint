@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "flint-mparam.h"
 #include "fft.h"
 
 static int fft_tuning_table[5][2] = FFT_TAB;

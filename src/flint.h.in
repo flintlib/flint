@@ -31,7 +31,6 @@
 #else
 # include "flint-config.h"
 #endif
-#include "flint-mparam.h"
 
 #if FLINT_USES_GC
 # include "gc.h"
