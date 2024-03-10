@@ -34,7 +34,7 @@ _nmod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA,
         gr_ctx_t ctx;
         _gr_ctx_init_nmod(ctx, &mod);
 
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
         GR_MUST_SUCCEED(_gr_poly_divrem_newton(Q, R, A, lenA, B, lenB, ctx));
 #else
         if (NMOD_BITS(mod) >= 16 && lenB >= 1024 && lenA <= 16384)

@@ -1045,7 +1045,7 @@ _gr_nmod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA,
     }
     else
     {
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
         return _gr_poly_divrem_newton(Q, R, A, lenA, B, lenB, ctx);
 #else
         if (NMOD_BITS(NMOD_CTX(ctx)) >= 16 && lenB >= 1024 && lenA <= 16384)
@@ -1072,7 +1072,7 @@ _gr_nmod_poly_divexact(mp_ptr Q, mp_srcptr A, slong lenA, mp_srcptr B, slong len
 /* basecase -> Newton cutoffs */
 /* todo: better unbalanced tuning */
 
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
 
 static const short inv_series_cutoff_tab[64] = {36, 37, 40, 44, 42, 46, 50, 81, 97,
   106, 133, 152, 292, 279, 279, 191, 191, 191, 191, 200, 191, 407, 388, 407, 407,
@@ -1148,7 +1148,7 @@ _gr_nmod_poly_div_series_basecase(ulong * res,
 
 /* todo: unbalanced cutoffs */
 
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
 
 static const short div_series_cutoff_tab[64] = {
   85, 81, 85, 89, 106, 145, 166, 182, 210, 337, 321, 321, 306, 321, 321, 306, 321, 321,
@@ -1187,7 +1187,7 @@ _gr_nmod_poly_div_series(ulong * res,
 
 /* todo: unbalanced cutoffs */
 
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
 
 static const short rsqrt_series_cutoff_tab[64] = {3, 22, 24, 42, 36, 40, 44,
     52, 89, 106, 139, 166, 174, 200, 191, 200, 191, 191, 191, 200, 306, 370,
@@ -1221,7 +1221,7 @@ _gr_nmod_poly_rsqrt_series(ulong * res,
         return _gr_poly_rsqrt_series_newton(res, f, flen, n, cutoff, ctx);
 }
 
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
 
 static const short sqrt_series_cutoff_tab[] = { 32767, 1353, 1353, 919,
     1289, 1228, 1491, 1228, 1491, 1289, 1420, 1420, 1228, 1289, 1420,
@@ -1260,7 +1260,7 @@ _gr_nmod_poly_sqrt_series(ulong * res,
         return _gr_poly_sqrt_series_newton(res, f, flen, n, cutoff, ctx);
 }
 
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
 
 static const short exp_series_mul_cutoff_tab[] = { 470, 470, 470, 470,
     470, 470, 470, 470, 470, 266, 266, 231, 279, 292, 292, 266, 266,
@@ -1281,7 +1281,7 @@ static const short exp_series_mul_cutoff_tab[] = {
 
 #endif
 
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
 
 static const short exp_series_newton_cutoff_tab[64] = { 470, 470, 470,
     470, 470, 470, 517, 597, 689, 759, 689, 723, 626, 723, 723, 723,

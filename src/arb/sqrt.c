@@ -132,7 +132,7 @@ arb_rsqrt_arf(arb_t res, const arf_t x, slong prec)
         return;
     }
 
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
     if (prec > RSQRT_NEWTON_CUTOFF)
     {
         arb_rsqrt_arf_newton(res, x, prec);
@@ -256,7 +256,7 @@ arb_sqrt_arf(arb_t res, const arf_t x, slong prec)
         return;
     }
 
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
     if (prec > SQRT_NEWTON_CUTOFF)
     {
         arb_sqrt_arf_newton(res, x, prec);
@@ -355,7 +355,7 @@ arb_sqrt(arb_t z, const arb_t x, slong prec)
             mag_clear(t);
             mag_clear(u);
         }
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
         else if (prec > SQRT_NEWTON_CUTOFF)
         {
             arb_sqrt_newton(z, x, prec);

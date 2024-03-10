@@ -55,6 +55,7 @@ extern "C" {
 # else
 #  include "longlong_asm_gcc.h"
 # endif
+# include "longlong_asm_gnu.h"
 
 /* Division */
 # include "longlong_div_gnu.h"
@@ -168,6 +169,21 @@ static inline int flint_ctz(ulong x)
     sub_ddmmss(__t2, d1, (mp_limb_t) 0, m1, (mp_limb_t) 0, s1); \
     sub_ddmmss(d2, d1, (m2) - (s2), d1, -__t2, -__t1); \
   } while (0)
+#endif
+
+#if !defined(MPN_INCR_U)
+# define MPN_INCR_U MPN_INCR_U
+# define MPN_DECR_U MPN_DECR_U
+FLINT_FORCE_INLINE void MPN_INCR_U(mp_ptr ptr, mp_size_t size, mp_limb_t incr)
+{
+    mp_limb_t cy = mpn_add_1(ptr, ptr, size, incr);
+    FLINT_ASSERT(cy == 0);
+}
+FLINT_FORCE_INLINE void MPN_DECR_U(mp_ptr ptr, mp_size_t size, mp_limb_t incr)
+{
+    mp_limb_t cy = mpn_sub_1(ptr, ptr, size, incr);
+    FLINT_ASSERT(cy == 0);
+}
 #endif
 
 /* Multiplication */

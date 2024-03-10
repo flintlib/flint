@@ -37,7 +37,7 @@ void __gmpn_mul_basecase(mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t);
 #endif
 
 
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
 # include "fft_small.h"
 # define FFT_MUL mpn_mul_default_mpn_ctx
 #else
@@ -47,34 +47,7 @@ void __gmpn_mul_basecase(mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t);
 
 mp_limb_t _flint_mpn_mul(mp_ptr r, mp_srcptr x, mp_size_t xn, mp_srcptr y, mp_size_t yn)
 {
-    /* Experimental: strip trailing zeros. Normally this should
-       be handled by the caller where appropriate, but there can be
-       situations where it helps to do so here. */
-    /*
-    while (xn > 1 && x[0] == 0)
-    {
-        xn--;
-        x++;
-        r[0] = 0;
-        r++;
-    }
-
-    while (yn > 1 && y[0] == 0)
-    {
-        yn--;
-        y++;
-        r[0] = 0;
-        r++;
-    }
-
-    if (xn < yn)
-    {
-        FLINT_SWAP(mp_srcptr, x, y);
-        FLINT_SWAP(mp_size_t, xn, yn);
-    }
-    */
-
-#if FLINT_MPN_MUL_FUNC_N_TAB_WIDTH && FLINT_HAVE_NATIVE_MUL_2
+#if FLINT_MPN_MUL_FUNC_N_TAB_WIDTH && FLINT_HAVE_NATIVE_mpn_mul_2
     if (yn == 1)
         r[xn + yn - 1] = mpn_mul_1(r, x, xn, y[0]);
     else if (yn == 2)

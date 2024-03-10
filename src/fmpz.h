@@ -482,7 +482,7 @@ slong fmpz_flog_ui(const fmpz_t x, ulong b);
 double fmpz_get_d_2exp(slong * exp, const fmpz_t f);
 void fmpz_set_d_2exp(fmpz_t f, double m, slong exp);
 
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
 #define MPZ_WANT_FLINT_DIVISION(a, b) (mpz_size(b) >= 1250 && mpz_size(a) - mpz_size(b) >= 1250)
 #else
 #define MPZ_WANT_FLINT_DIVISION(a, b) 0

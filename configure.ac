@@ -749,17 +749,23 @@ fi
 ################################################################################
 
 AC_SEARCH_LIBS([atan2],[m],
-   [],
-   [AC_MSG_ERROR(["The C math library was not found!"])])
+    [],
+    [AC_MSG_ERROR(["The C math library was not found!"])])
 
 AC_SEARCH_LIBS([__gmpz_init],[gmp],
-   [],
-   [AC_MSG_ERROR(["GMP library was not found.  If you indeed have GMP installed, please
+    [],
+    [AC_MSG_ERROR(["GMP library was not found.  If you indeed have GMP installed, please
 submit a bug report to <https://github.com/flintlib/flint/issues/> so
 that we can either fix the issue or give a more proper error message."])])
 
+AC_SEARCH_LIBS([__gmpn_mul_basecase],[gmp],
+    [],
+    [AC_MSG_ERROR([`mpn_mul_basecase' was not found in the GMP library, which is required by FLINT.
+Please submit a bug report to <https://github.com/flintlib/flint/issues/>.])])
+
 if test "$enable_gmp_internals" = "yes";
 then
+    dnl The following functions should exist in the GMP library regardless.
     AC_SEARCH_LIBS([__gmpn_gcd_11],[gmp],
         [],
         [AC_MSG_ERROR(["`mpn_gcd_11' was not found in the GMP library. It is needed to enable GMP
@@ -770,16 +776,33 @@ internals."])])
         [AC_MSG_ERROR([`mpn_div_q' was not found in the GMP library. It is needed to enable GMP
 internals.])])
 
-    AC_SEARCH_LIBS([__gmpn_mul_basecase],[gmp],
-        [],
-        [AC_MSG_ERROR([`mpn_mul_basecase' was not found in the GMP library. It is needed to enable GMP
-internals.])])
-
+    dnl The following functions may or may not exist
     AC_SEARCH_LIBS([__gmpn_modexact_1_odd],[gmp],
-        [AC_DEFINE(FLINT_HAVE_MPN_MODEXACT_1_ODD,1,Define if system has mpn_modexact_1_odd)])
+        [AC_DEFINE(FLINT_HAVE_NATIVE_mpn_modexact_1_odd,1,Define if system has mpn_modexact_1_odd)])
 
     AC_SEARCH_LIBS([__gmpn_addmul_2],[gmp],
-        [AC_DEFINE(FLINT_HAVE_MPN_ADDMUL_2,1,Define if GMP has mpn_addmul_2)])
+        [AC_DEFINE(FLINT_HAVE_NATIVE_mpn_addmul_2,1,Define if GMP has mpn_addmul_2)])
+
+    AC_SEARCH_LIBS([__gmpn_add_n_sub_n],[gmp],
+        [AC_DEFINE(FLINT_HAVE_NATIVE_mpn_add_n_sub_n,1,Define if GMP has mpn_add_n_sub_n)])
+
+    AC_SEARCH_LIBS([__gmpn_add_nc],[gmp],
+        [AC_DEFINE(FLINT_HAVE_NATIVE_mpn_add_nc,1,Define if GMP has mpn_add_nc)])
+
+    AC_SEARCH_LIBS([__gmpn_sub_nc],[gmp],
+        [AC_DEFINE(FLINT_HAVE_NATIVE_mpn_sub_nc,1,Define if GMP has mpn_sub_nc)])
+
+    AC_SEARCH_LIBS([__gmpn_addlsh1_n],[gmp],
+        [AC_DEFINE(FLINT_HAVE_NATIVE_mpn_addlsh1_n,1,Define if GMP has mpn_addlsh1_n)])
+
+    AC_SEARCH_LIBS([__gmpn_addlsh1_n_ip1],[gmp],
+        [AC_DEFINE(FLINT_HAVE_NATIVE_mpn_addlsh1_n_ip1,1,Define if GMP has mpn_addlsh1_n_ip1)])
+
+    AC_SEARCH_LIBS([__gmpn_rsh1sub_n],[gmp],
+        [AC_DEFINE(FLINT_HAVE_NATIVE_mpn_rsh1sub_n,1,Define if GMP has mpn_rsh1sub_n)])
+
+    AC_SEARCH_LIBS([__gmpn_rsh1add_n],[gmp],
+        [AC_DEFINE(FLINT_HAVE_NATIVE_mpn_rsh1add_n,1,Define if GMP has mpn_rsh1add_n)])
 fi
 
 if test "$enable_mpfr_check" = "yes";

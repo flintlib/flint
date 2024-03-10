@@ -24,7 +24,7 @@
 #define INV_NEWTON_CUTOFF 24000
 #define DIV_NEWTON_CUTOFF 70000
 
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
 #define WANT_NEWTON(prec, xbits, ybits) (prec) >= INV_NEWTON_CUTOFF && (ybits) > (prec) * 0.5 && ((xbits) < (prec) * 0.01 || (prec) >= DIV_NEWTON_CUTOFF)
 #else
 #define WANT_NEWTON(prec, xbits, ybits) 0
@@ -548,7 +548,7 @@ _arb_fmpz_divapprox_newton(fmpz_t res, const fmpz_t x, const fmpz_t y, slong exp
 void
 arb_fmpz_divapprox(fmpz_t res, const fmpz_t x, const fmpz_t y)
 {
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
     if (!COEFF_IS_MPZ(*x) || !COEFF_IS_MPZ(*y))
     {
         fmpz_tdiv_q(res, x, y);

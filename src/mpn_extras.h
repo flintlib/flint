@@ -121,11 +121,70 @@ flint_mpn_get_d(mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp);
 /* Addition ******************************************************************/
 
 #if FLINT_HAVE_ADX
-# define FLINT_HAVE_NATIVE_2ADD_N_INPLACE 1
-
 /* Simultaneously adds two n-limbed integers onto result and returns carry. */
 /* NOTE: Requires n >= 4 */
+# define FLINT_HAVE_NATIVE_mpn_2add_n_inplace 1
 mp_limb_t flint_mpn_2add_n_inplace(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
+#endif
+
+#if FLINT_HAVE_NATIVE_mpn_add_nc
+# define mpn_add_nc __gmpn_add_nc
+mp_limb_t mpn_add_nc(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t, mp_limb_t);
+#else
+FLINT_FORCE_INLINE mp_limb_t
+mpn_add_nc(mp_ptr rp, mp_srcptr up, mp_srcptr vp, mp_size_t n, mp_limb_t ci)
+{
+    mp_limb_t co;
+    co = mpn_add_n(rp, up, vp, n);
+    co += mpn_add_1(rp, rp, n, ci);
+    return co;
+}
+#endif
+
+#if FLINT_HAVE_NATIVE_mpn_sub_nc
+# define mpn_sub_nc __gmpn_sub_nc
+mp_limb_t mpn_sub_nc(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t, mp_limb_t);
+#else
+FLINT_FORCE_INLINE mp_limb_t
+mpn_sub_nc(mp_ptr rp, mp_srcptr up, mp_srcptr vp, mp_size_t n, mp_limb_t ci)
+{
+    mp_limb_t co;
+    co = mpn_sub_n(rp, up, vp, n);
+    co += mpn_sub_1(rp, rp, n, ci);
+    return co;
+}
+#endif
+
+#if FLINT_HAVE_NATIVE_mpn_add_n_sub_n
+/* mpn_add_n_sub_n basically only exists for IA64 and certain PowerPC and s390
+ * systems. We will assume that a native one does not exist. */
+# undef FLINT_HAVE_NATIVE_mpn_add_n_sub_n
+# define FLINT_HAVE_NATIVE_mpn_add_n_sub_n 0
+#endif
+
+/* Shifting ******************************************************************/
+
+#if FLINT_HAVE_NATIVE_mpn_addlsh1_n
+# define mpn_addlsh1_n __gmpn_addlsh1_n
+mp_limb_t mpn_addlsh1_n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
+#endif
+
+#if FLINT_HAVE_NATIVE_mpn_addlsh1_n_ip1
+# define mpn_addlsh1_n_ip1 __gmpn_addlsh1_n_ip1
+mp_limb_t mpn_addlsh1_n_ip1(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
+#elif FLINT_HAVE_NATIVE_mpn_addlsh1_n
+# define mpn_addlsh1_n_ip1(a,b,n) mpn_addlsh1_n(a,a,b,n)
+# define FLINT_HAVE_NATIVE_mpn_addlsh1_n_ip1 2
+#endif
+
+#if FLINT_HAVE_NATIVE_mpn_rsh1add_n
+# define mpn_rsh1add_n __gmpn_rsh1add_n
+mp_limb_t mpn_rsh1add_n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
+#endif
+
+#if FLINT_HAVE_NATIVE_mpn_rsh1sub_n
+# define mpn_rsh1sub_n __gmpn_rsh1sub_n
+mp_limb_t mpn_rsh1sub_n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 #endif
 
 /* General multiplication ****************************************************/
@@ -163,7 +222,7 @@ mp_limb_t flint_mpn_2add_n_inplace(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 # define FLINT_MPN_MUL_N_HARD(rp, xp, yp, n) (flint_mpn_mul_func_n_tab[n](rp, xp, yp, n))
 # define FLINT_MPN_SQR_HARD(rp, xp, n) (flint_mpn_sqr_func_tab[n](rp, xp))
 
-# define FLINT_HAVE_NATIVE_MUL_2 1
+# define FLINT_HAVE_NATIVE_mpn_mul_2 1
 mp_limb_t flint_mpn_mul_2(mp_ptr, mp_srcptr, mp_size_t, mp_srcptr);
 #else
 # define FLINT_MPN_MUL_FUNC_TAB_WIDTH 8
@@ -193,7 +252,8 @@ FLINT_DLL extern const flint_mpn_mul_func_t flint_mpn_mul_n_func_tab[];
 
 FLINT_DLL extern const flint_mpn_sqr_func_t flint_mpn_sqr_func_tab[];
 
-void flint_mpn_mul_toom22(mp_ptr pp, mp_srcptr ap, mp_size_t an, mp_srcptr bp, mp_size_t bn, mp_ptr scratch);
+void flint_mpn_mul_toom22(mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t, mp_ptr);
+void flint_mpn_mul_toom32(mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t, mp_ptr);
 
 mp_limb_t _flint_mpn_mul(mp_ptr r, mp_srcptr x, mp_size_t xn, mp_srcptr y, mp_size_t yn);
 void _flint_mpn_mul_n(mp_ptr r, mp_srcptr x, mp_srcptr y, mp_size_t n);
@@ -293,9 +353,6 @@ FLINT_DLL extern const flint_mpn_mulhigh_normalised_func_t flint_mpn_mulhigh_nor
 # define FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH 8
 # define FLINT_MPN_MULHIGH_NORMALISED_FUNC_TAB_WIDTH 12
 
-# define FLINT_HAVE_NATIVE_MPN_MULHIGH_BASECASE 1
-# define FLINT_HAVE_NATIVE_MPN_SQRHIGH_BASECASE 1
-
 #define FLINT_MPN_MULHIGH_MULDERS_CUTOFF 50
 #define FLINT_MPN_MULHIGH_MUL_CUTOFF 2000
 #define FLINT_MPN_MULHIGH_K_TAB_SIZE 2048
@@ -303,6 +360,7 @@ FLINT_DLL extern const flint_mpn_mulhigh_normalised_func_t flint_mpn_mulhigh_nor
 void _flint_mpn_mulhigh_n_mulders_recursive(mp_ptr rp, mp_srcptr np, mp_srcptr mp, mp_size_t n);
 
 /* NOTE: This function only works for n >= 6 */
+# define FLINT_HAVE_NATIVE_mpn_mulhigh_basecase 1
 mp_limb_t _flint_mpn_mulhigh_basecase(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n);
 
 mp_limb_t _flint_mpn_mulhigh_n_mulders(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n);
@@ -325,6 +383,7 @@ mp_limb_t flint_mpn_mulhigh_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n
 #define FLINT_MPN_SQRHIGH_K_TAB_SIZE 2048
 
 /* NOTE: These two functions only works for n >= 8 */
+# define FLINT_HAVE_NATIVE_mpn_sqrhigh_basecase 1
 mp_limb_t _flint_mpn_sqrhigh_basecase_even(mp_ptr, mp_srcptr, mp_size_t);
 mp_limb_t _flint_mpn_sqrhigh_basecase_odd(mp_ptr, mp_srcptr, mp_size_t);
 
@@ -394,7 +453,7 @@ struct mp_limb_pair_t flint_mpn_mulhigh_normalised(mp_ptr rp, mp_srcptr xp, mp_s
     ((n) > 0 ? (((lo) >> (n)) | ((hi) << (GMP_LIMB_BITS - (n))))    \
              : (lo))
 
-#ifdef FLINT_HAVE_MPN_MODEXACT_1_ODD
+#if FLINT_HAVE_NATIVE_mpn_modexact_1_odd
 
 # define mpn_modexact_1_odd __gmpn_modexact_1_odd
 mp_limb_t mpn_modexact_1_odd(mp_srcptr, mp_size_t, mp_limb_t);
