@@ -952,14 +952,16 @@ src/flint.h: src/flint.h.in config.status
 libtool: config.status
 	./config.status $@
 
-src/fmpz/fmpz.c: @FMPZ_C_IN@ config.status
-	./config.status $@
-
 src/gmpcompat.h: src/@GMPCOMPAT_H_IN@ config.status
 	./config.status $@
 
-src/flint-mparam.h: src/mpn_extras/@PARAM_PATH@/flint-mparam.h config.status
-	./config.status $@
+# The following two are only linked during configuration
+
+# src/fmpz/fmpz.c: @FMPZ_C_IN@ config.status
+# 	./config.status $@
+#
+# src/flint-mparam.h: src/mpn_extras/@PARAM_PATH@/flint-mparam.h config.status
+# 	./config.status $@
 
 ################################################################################
 # maintainer stuff
