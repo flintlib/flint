@@ -1197,6 +1197,10 @@ then
     then
         AC_MSG_WARN([Currently no assembly available for $host. Disabling assembly...])
         enable_assembly="no"
+    elif test "$flint_cv_abi" != "64";
+    then
+        AC_MSG_WARN([Currently no assembly available for 32-bit systems. Disabling assembly...])
+        enable_assembly="no"
     fi
 fi
 
