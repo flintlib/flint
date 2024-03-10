@@ -1068,7 +1068,8 @@ save_CFLAGS="$CFLAGS"
 CFLAGS=""
 
 # The following is needed for Clang to check for unknown options.
-AX_CHECK_COMPILE_FLAG([-Werror=unknown-warning-option], [CFLAGS="-Werror=unknown-warning-option"])
+FLINT_CLANG([AX_CHECK_COMPILE_FLAG([-Werror=unknown-warning-option],
+                                   [CFLAGS="-Werror=unknown-warning-option"])])
 
 if test "$enable_coverage" = "yes";
 then

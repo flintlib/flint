@@ -101,6 +101,28 @@ define(FAST_VROUNDPD_PATTERN,
 [[znver[2-4]* | sandybridge* | ivybridge*]])
 
 
+dnl  FLINT_CLANG([action-if-true],[action-if-false])
+dnl  -----------------------
+dnl  Checks if compiler is clang.
+
+AC_DEFUN([FLINT_CLANG],
+[AC_CACHE_CHECK([if compiler is Clang],
+                flint_cv_clang,
+[flint_cv_clang="no"
+AC_PREPROC_IFELSE([AC_LANG_PROGRAM([
+#ifndef __clang__
+#error
+error
+#endif
+],[])],
+[flint_cv_clang="yes"])
+])
+AS_VAR_IF([flint_cv_clang],"yes",
+    [m4_default([$1], :)],
+    [m4_default([$2], :)])
+])
+
+
 dnl  FLINT_CHECK_CPU_SET_T([action-if-true],[action-if-false])
 dnl  -----------------------
 dnl  Checks if cpu_set_t is supported.
@@ -287,9 +309,13 @@ dnl  Checks if system have headers for fft_small on Arm. Will only run if on
 dnl  arm64.
 
 AC_DEFUN([FLINT_HAVE_FFT_SMALL_ARM_H],
-[AS_VAR_IF([host_cpu],"aarch64",
-    [AC_CHECK_HEADER([arm_neon.h],flint_cv_have_fft_small_arm_h="yes")]
-)])
+[case $host in
+    ARM64_PATTERN)
+        AC_CHECK_HEADERS([arm_neon.h],
+            flint_cv_have_fft_small_arm_h="yes",
+            flint_cv_have_fft_small_arm_h="no")
+        ;;
+esac])
 
 
 dnl  FLINT_HAVE_FFT_SMALL_ARM_I
@@ -297,19 +323,20 @@ dnl  -----------------------
 dnl  Checks if system supports Arm NEON instructions.
 
 AC_DEFUN([FLINT_HAVE_FFT_SMALL_ARM_I],
-[AS_VAR_IF([host_cpu],"aarch64",
-    [AC_CACHE_CHECK([if system have required Arm instruction set for fft_small],
-                     flint_cv_have_fft_small_arm_i,
-    FLINT_PREPROC_IFELSE([AC_LANG_SOURCE([
-            #ifndef __ARM_NEON
-            #error Dead man
-            error
-            #endif
-        ])],
-        flint_cv_have_fft_small_arm_i="yes",
-        flint_cv_have_fft_small_arm_i="no")
-    )]
-)])
+[case $host in
+    ARM64_PATTERN)
+        AC_CACHE_CHECK([if system have required ARM instruction set for fft_small],
+                        flint_cv_have_fft_small_arm_i,
+            [FLINT_PREPROC_IFELSE([AC_LANG_SOURCE([
+                    #if !defined(__AVX2__)
+                    #error Dead man
+                    error
+                    #endif
+                ])],
+                flint_cv_have_fft_small_arm_i="yes",
+                flint_cv_have_fft_small_arm_i="no")])
+        ;;
+esac])
 
 
 dnl  FLINT_HAVE_FFT_SMALL_X86_H
@@ -317,11 +344,13 @@ dnl  -----------------------
 dnl  Checks if system have headers for fft_small on x86.
 
 AC_DEFUN([FLINT_HAVE_FFT_SMALL_X86_H],
-[AS_VAR_IF([host_cpu],"x86_64",
-    [AC_CHECK_HEADERS([immintrin.h],
-        flint_cv_have_fft_small_x86_h="yes",
-        flint_cv_have_fft_small_x86_h="no")]
-)])
+[case $host in
+    X86_64_PATTERN)
+        AC_CHECK_HEADERS([immintrin.h],
+            flint_cv_have_fft_small_x86_h="yes",
+            flint_cv_have_fft_small_x86_h="no")
+        ;;
+esac])
 
 
 dnl  FLINT_HAVE_FFT_SMALL_X86_I
@@ -329,19 +358,20 @@ dnl  -----------------------
 dnl  Checks if system supports AVX2 instructions.
 
 AC_DEFUN([FLINT_HAVE_FFT_SMALL_X86_I],
-[AS_VAR_IF([host_cpu],"x86_64",
-    [AC_CACHE_CHECK([if system have required x86_64 instruction set for fft_small],
-                    flint_cv_have_fft_small_x86_i,
-        FLINT_PREPROC_IFELSE([AC_LANG_SOURCE([
-                #if !defined(__AVX2__)
-                #error Dead man
-                error
-                #endif
-            ])],
-            flint_cv_have_fft_small_x86_i="yes",
-            flint_cv_have_fft_small_x86_i="no")
-    )]
-)])
+[case $host in
+    X86_64_PATTERN)
+        AC_CACHE_CHECK([if system have required x86_64 instruction set for fft_small],
+                        flint_cv_have_fft_small_x86_i,
+            [FLINT_PREPROC_IFELSE([AC_LANG_SOURCE([
+                    #if !defined(__AVX2__)
+                    #error Dead man
+                    error
+                    #endif
+                ])],
+                flint_cv_have_fft_small_x86_i="yes",
+                flint_cv_have_fft_small_x86_i="no")])
+        ;;
+esac])
 
 
 dnl  FLINT_CHECK_FFT_SMALL([action-success][,action-fail])
