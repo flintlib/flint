@@ -343,12 +343,8 @@ Please report at <https://github.com/flintlib/flint/issues/>])
     param_path="x86_64"
 
     case $host_cpu in
-      coreisbr | coreisbrnoavx | sandybridge | sandybridgenoavx)
-        gcc_cflags_arch="-march=sandybridge"
-        flint_cv_have_fft_small_x86_i="yes"
-        ;;
       coreiibr | coreiibrnoavx | ivybridge | ivybridgenoavx)
-        gcc_cflags_arch="-march=sandybridge"
+        gcc_cflags_arch="-march=ivybridge"
         flint_cv_have_fft_small_x86_i="yes"
         ;;
       coreihwl | coreihwlnoavx | haswell | haswellnoavx)
