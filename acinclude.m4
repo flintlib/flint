@@ -328,7 +328,7 @@ AC_DEFUN([FLINT_HAVE_FFT_SMALL_ARM_I],
         AC_CACHE_CHECK([if system have required ARM instruction set for fft_small],
                         flint_cv_have_fft_small_arm_i,
             [FLINT_PREPROC_IFELSE([AC_LANG_SOURCE([
-                    #if !defined(__AVX2__)
+                    #if !defined(__ARM_NEON)
                     #error Dead man
                     error
                     #endif
