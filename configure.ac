@@ -1283,10 +1283,10 @@ then
             AC_DEFINE([FLINT_HAVE_ASSEMBLY_x86_64_adx],1,[Define if x86_64 ADX assembly is available])
             GMP_ASM_ALIGN_FILL_0x90
             GMP_ASM_COFF_TYPE
-            GMP_INCLUDE_MPN(src/mpn_extras/broadwell/x86_64-defs.m4)
+            GMP_INCLUDE_MPN(src/mpn_extras/x86_64/x86_64-defs.m4)
             case $host in
                 *-*-darwin*)
-                    GMP_INCLUDE_MPN(src/mpn_extras/broadwell/darwin.m4)
+                    GMP_INCLUDE_MPN(src/mpn_extras/x86_64/darwin.m4)
                     ;;
             esac
             ;;
