@@ -537,7 +537,7 @@ set(PACKAGE_NAME ${PROJECT_NAME})
 set(PACKAGE_VERSION ${PROJECT_VERSION})
 configure_file(flint.pc.in flint.pc @ONLY)
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/flint.pc DESTINATION lib/pkgconfig)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/flint.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
 if(BUILD_TESTING)
     set(FLINT_SRC ${CMAKE_CURRENT_SOURCE_DIR}/src) # To get src/test/main
