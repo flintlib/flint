@@ -345,7 +345,7 @@ Please report at <https://github.com/flintlib/flint/issues/>])
     case $host_cpu in
       coreiibr | coreiibrnoavx | ivybridge | ivybridgenoavx)
         gcc_cflags_arch="-march=ivybridge"
-        flint_cv_have_fft_small_x86_i="yes"
+        # Ivybridge does not have AVX2
         ;;
       coreihwl | coreihwlnoavx | haswell | haswellnoavx)
         gcc_cflags_arch="-march=haswell"
