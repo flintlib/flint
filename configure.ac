@@ -282,8 +282,8 @@ Please report at <https://github.com/flintlib/flint/issues/>])
     # NOTE: We do not care if the user specifies noavx!
     gcc_cflags="$gcc_cflags"
     gcc_cflags_optlist="arch"
-    asm_path="broadwell"
-    param_path="broadwell"
+    asm_path="x86_64/broadwell"
+    param_path="x86_64/broadwell"
     flint_cv_have_fft_small_x86_i="yes"
 
     case $host_cpu in
@@ -330,6 +330,7 @@ Please report at <https://github.com/flintlib/flint/issues/>])
 	  *-*-mingw* | *-*-msys | *-*-cygwin)
         flint_nonstd_abi="yes"
         asm_path=""
+        param_path="x86_64"
 	    ;;
 	esac
 	;;
@@ -339,6 +340,7 @@ Please report at <https://github.com/flintlib/flint/issues/>])
     gcc_cflags="$gcc_cflags"
     gcc_cflags_optlist="arch"
     asm_path=""
+    param_path="x86_64"
 
     case $host_cpu in
       coreisbr | coreisbrnoavx | sandybridge | sandybridgenoavx)
@@ -368,9 +370,6 @@ Please report at <https://github.com/flintlib/flint/issues/>])
       x86_64v3)
         gcc_cflags_arch="-march=x86-64-v3"
         flint_cv_have_fft_small_x86_i="yes"
-        ;;
-      *)
-        flint_cv_have_fft_small_x86_i="no"
         ;;
     esac
 	;;
