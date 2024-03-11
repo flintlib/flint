@@ -186,21 +186,9 @@ case $host in
 
   ARM64_PATTERN)
     gcc_cflags="$gcc_cflags"
-    gcc_cflags_optlist="arch fpmode neon tune"
-    gcc_cflags_neon="-mfpu=neon"
+    gcc_cflags_optlist="arch tune"
     asm_path="arm64"
     param_path="arm64"
-
-    # This is needed for clang, which is not content with flags like -mfpu=neon
-    # alone.
-    case $host in
-      *-*-*eabi)
-        gcc_cflags_fpmode="-mfloat-abi=softfp"
-        ;;
-      *-*-*eabihf)
-        gcc_cflags_fpmode="-mfloat-abi=hard"
-        ;;
-    esac
 
     # NOTE: Cortex values where taken from
     # https://developer.arm.com/Processors/Cortex-XXX
