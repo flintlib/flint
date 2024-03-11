@@ -1,7 +1,15 @@
 #! /bin/sh
 #
-# GMP config.guess wrapper.
+# FLINT config.guess wrapper.
 
+#  Copyright (C) 2024 Albin Ahlbäck
+#
+#  This file is part of FLINT.
+#
+#  FLINT is free software: you can redistribute it and/or modify it under
+#  the terms of the GNU Lesser General Public License (LGPL) as published
+#  by the Free Software Foundation; either version 3 of the License, or
+#  (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 
 # Copyright 2000-2019 Free Software Foundation, Inc.
 #
@@ -175,7 +183,8 @@ EOF
 arm*-*-* | aarch64-*-*)
   if [ $( (uname -s) 2>/dev/null) = Darwin ]; then
       case $(system_profiler SPHardwareDataType | grep Chip) in
-	  *Apple\ M1)
+      *Apple\ M1 | *Apple\ M1\ \(Virtual\))
+        # The latter is for virtual CPUs, such as GitHub's virtual M1 runner
 	    exact_cpu="applem1";;
 	  *Apple\ M2)
 	    exact_cpu="applem2";;
