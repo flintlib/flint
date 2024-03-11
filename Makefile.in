@@ -760,6 +760,9 @@ tests: library $(TESTS)
 %_TEST_RUN: %
 	@$<
 
+%_TEST_RUN_ARGS: %
+	@$< $(ARGS)
+
 # Parallel running of same test file
 ifneq ($(NJOBS),)
 number_generator=$(words $2) $(if $(word $1,$2),,$(call number_generator,$1,w $2))
@@ -786,6 +789,15 @@ check: library
 	@echo 'All Python tests passed.'
 endif
 else ifdef MOD
+ifdef ARGS
+ifneq ($(words $(sort $(MOD))),1)
+$(error Can only check one modules with arguments.)
+else
+check: library $(patsubst %,%_TEST_RUN_ARGS, $($(sort $(MOD))_TESTS))
+	@echo ''
+	@echo 'All tests passed for $(sort $(MOD)).'
+endif
+else
 ifeq ($(NJOBS),)
 check: library $(patsubst %,%_TEST_RUN,$(foreach dir, $(MOD), $($(dir)_TESTS)))
 	@echo ''
@@ -809,6 +821,7 @@ else ifeq ($(words $(sort $(MOD))),2)
 	@echo 'All tests passed for $(firstword $(sort $(MOD))) and $(lastword $(sort $(MOD))).'
 else
 	@echo 'All tests passed for $(foreach dir,$(filter-out $(lastword $(filter-out $(lastword $(sort $(MOD))),$(sort $(MOD)))) $(lastword $(sort $(MOD))),$(sort $(MOD))),$(dir),) $(lastword $(filter-out $(lastword $(sort $(MOD))),$(sort $(MOD)))) and $(lastword $(sort $(MOD))).'
+endif
 endif
 endif
 else
@@ -952,11 +965,11 @@ src/flint.h: src/flint.h.in config.status
 libtool: config.status
 	./config.status $@
 
-src/gmpcompat.h: src/@GMPCOMPAT_H_IN@ config.status
-	./config.status $@
+# The following are only linked during configuration
 
-# The following two are only linked during configuration
-
+# src/gmpcompat.h: src/@GMPCOMPAT_H_IN@ config.status
+# 	./config.status $@
+# 
 # src/fmpz/fmpz.c: @FMPZ_C_IN@ config.status
 # 	./config.status $@
 #

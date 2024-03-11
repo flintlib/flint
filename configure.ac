@@ -877,7 +877,7 @@ FLINT_CHECK_GMP_H(6,2,1)
 FLINT_GMP_LONG_LONG_LIMB([gmpcompat_h_in="gmpcompat-longlong.h.in"],
                          [gmpcompat_h_in="gmpcompat.h.in"])
 
-AC_CONFIG_FILES([src/gmpcompat.h:src/$gmpcompat_h_in],[],[gmpcompat_h_in="$gmpcompat_h_in"])
+AC_CONFIG_LINKS([src/gmpcompat.h:src/$gmpcompat_h_in],[],[gmpcompat_h_in="$gmpcompat_h_in"])
 AC_SUBST(GMPCOMPAT_H_IN, $gmpcompat_h_in)
 
 ################################################################################
