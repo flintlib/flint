@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "fft.h"
 
 void ifft_negacyclic(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w,

@@ -24,8 +24,33 @@ define(FLINT_COPYRIGHT_C,[[/*
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */]])
 
-dnl TODO
-dnl * Move more stuff to acinclude.m4 to debloat this file.
+# Copyright 1996-2022 Free Software Foundation, Inc.
+# 
+# This file is part of the GNU MP Library.
+# 
+# The GNU MP Library is free software; you can redistribute it and/or modify
+# it under the terms of either:
+# 
+#   * the GNU Lesser General Public License as published by the Free
+#     Software Foundation; either version 3 of the License, or (at your
+#     option) any later version.
+# 
+# or
+# 
+#   * the GNU General Public License as published by the Free Software
+#     Foundation; either version 2 of the License, or (at your option) any
+#     later version.
+# 
+# or both in parallel, as here.
+# 
+# The GNU MP Library is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# for more details.
+# 
+# You should have received copies of the GNU General Public License and the
+# GNU Lesser General Public License along with the GNU MP Library.  If not,
+# see https://www.gnu.org/licenses/.
 
 AC_COPYRIGHT(FLINT_COPYRIGHT)
 AH_TOP(FLINT_COPYRIGHT_C)
@@ -137,6 +162,221 @@ dnl AC_CANONICAL_HOST
 ################################################################################
 
 AC_CONFIG_HEADERS(src/config.h src/flint-config.h)
+
+################################################################################
+# architecture specifics
+################################################################################
+
+gcc_cflags="-O3 -pedantic -std=c11"
+gcc_warnings="-Werror=implicit-function-declaration -Wall -Wno-stringop-overread -Wno-stringop-overflow"
+
+dnl We only try to provide specifics for those systems that currently supports
+dnl our assembly routines. If more combinations are wished for than what is
+dnl specified, please open up an issue at
+dnl <https://github.com/flintlib/flint/issues/> and we will consider it.
+dnl
+dnl For these systems we aim to provide:
+dnl
+dnl   gcc_cflags     flags for GCC-compatible compilers
+dnl
+dnl   asm_path       directory for assembly, relative to src/mpn_extras
+dnl   param_path     directory for flint-mparam.h, relative to src/mpn_extras
+
+case $host in
+
+  ARM64_PATTERN)
+    gcc_cflags="$gcc_cflags"
+    gcc_cflags_optlist="arch tune"
+    asm_path="arm64"
+    param_path="arm64"
+    flint_cv_have_fft_small_arm_i="yes"
+
+    # NOTE: Cortex values where taken from
+    # https://developer.arm.com/Processors/Cortex-XXX
+    case $host_cpu in
+      armcortexa35 | armcortexa35neon)
+        gcc_cflags_arch="-march=armv8-a"
+        gcc_cflags_tune="-mtune=cortex-a35"
+        ;;
+      armcortexa53 | armcortexa53neon)
+        gcc_cflags_arch="-march=armv8-a"
+        gcc_cflags_tune="-mtune=cortex-a53"
+        ;;
+      armcortexa55 | armcortexa55neon)
+        gcc_cflags_arch="-march=armv8.2-a"
+        gcc_cflags_tune="-mtune=cortex-a55"
+        ;;
+      armcortexa57 | armcortexa57neon)
+        gcc_cflags_arch="-march=armv8-a"
+        gcc_cflags_tune="-mtune=cortex-a57"
+        ;;
+      armcortexa72 | armcortexa72neon)
+        gcc_cflags_arch="-march=armv8-a"
+        gcc_cflags_tune="-mtune=cortex-a72"
+        ;;
+      armcortexa73 | armcortexa73neon)
+        gcc_cflags_arch="-march=armv8-a"
+        gcc_cflags_tune="-mtune=cortex-a73"
+        ;;
+      armcortexa75 | armcortexa75neon)
+        gcc_cflags_arch="-march=armv8.2-a"
+        gcc_cflags_tune="-mtune=cortex-a75"
+        ;;
+      armcortexa76 | armcortexa76neon)
+        gcc_cflags_arch="-march=armv8.2-a"
+        gcc_cflags_tune="-mtune=cortex-a76"
+        ;;
+      armcortexa77 | armcortexa77neon)
+        gcc_cflags_arch="-march=armv8.2-a"
+        gcc_cflags_tune="-mtune=cortex-a77"
+        ;;
+      armcortexa65 | armcortexa65neon)
+        gcc_cflags_arch="-march=armv8.2-a"
+        gcc_cflags_tune="-mtune=cortex-a65"
+        ;;
+      armcortexa34 | armcortexa34neon)
+        gcc_cflags_arch="-march=armv8-a"
+        gcc_cflags_tune="-mtune=cortex-a34"
+        ;;
+      armcortexa78 | armcortexa78neon)
+        gcc_cflags_arch="-march=armv8.2-a"
+        gcc_cflags_tune="-mtune=cortex-a78"
+        ;;
+      armexynosm1)
+        gcc_cflags_arch="-march=armv8-a"
+        gcc_cflags_tune="-mtune=exynos-m1"
+        ;;
+      armthunderx)
+        gcc_cflags_arch="-march=armv8-a"
+        gcc_cflags_tune="-mtune=thunderx"
+        ;;
+      armxgene1)
+        gcc_cflags_arch="-march=armv8-a"
+        gcc_cflags_tune="-mtune=xgene1"
+        ;;
+      applem1*)
+        gcc_cflags_arch="-march=armv8.5-a"
+        gcc_cflags_tune=""
+        ;;
+      applem2*)
+        gcc_cflags_arch="-march=armv8.6-a"
+        gcc_cflags_tune=""
+        ;;
+      applem3*)
+        gcc_cflags_arch="-march=armv8.6-a"
+        gcc_cflags_tune=""
+        ;;
+      aarch64* | armv8*)
+        gcc_cflags_arch="-march=armv8-a"
+        gcc_cflags_tune=""
+        ;;
+      *)
+        AC_MSG_ERROR([Error in deciding flags for $host.
+Please report at <https://github.com/flintlib/flint/issues/>])
+        ;;
+    esac
+    ;;
+
+
+  X86_64_ADX_PATTERN)
+    # NOTE: We do not care if the user specifies noavx!
+    gcc_cflags="$gcc_cflags"
+    gcc_cflags_optlist="arch"
+    asm_path="x86_64/broadwell"
+    param_path="x86_64/broadwell"
+    flint_cv_have_fft_small_x86_i="yes"
+
+    case $host_cpu in
+      zen | zennoavx)
+        gcc_cflags_arch="-march=znver1"
+        ;;
+      zen2 | zen2noavx)
+        gcc_cflags_arch="-march=znver2"
+        ;;
+      zen3 | zen3noavx)
+        gcc_cflags_arch="-march=znver3"
+        ;;
+      zen4 | zen4noavx)
+        gcc_cflags_arch="-march=znver4"
+        ;;
+      coreibwl | coreibwlnoavx | broadwell | broadwellnoavx)
+        gcc_cflags_arch="-march=broadwell"
+        ;;
+      skylake | skylakenoavx)
+        gcc_cflags_arch="-march=skylake"
+        ;;
+      kabylake | kabylakenoavx)
+        gcc_cflags_arch="-march=skylake"
+        ;;
+      icelake | icelakenoavx)
+        gcc_cflags_arch="-march=tigerlake"
+        ;;
+      rocketlake | rocketlakenoavx)
+        gcc_cflags_arch="-march=rocketlake"
+        ;;
+      alderlake | alderlakenoavx)
+        gcc_cflags_arch="-march=alderlake"
+        ;;
+      raptorlake | raptorlakenoavx)
+        gcc_cflags_arch="-march=alderlake"
+        ;;
+      *)
+        AC_MSG_ERROR([Error in deciding flags for $host.
+Please report at <https://github.com/flintlib/flint/issues/>])
+        ;;
+    esac
+
+    case $host in
+	  *-*-mingw* | *-*-msys | *-*-cygwin)
+        flint_nonstd_abi="yes"
+        asm_path=""
+        param_path="x86_64"
+	    ;;
+	esac
+	;;
+
+  X86_64_PATTERN)
+    # NOTE: We do not care if the user specifies noavx!
+    gcc_cflags="$gcc_cflags"
+    gcc_cflags_optlist="arch"
+    asm_path=""
+    param_path="x86_64"
+
+    case $host_cpu in
+      coreiibr | coreiibrnoavx | ivybridge | ivybridgenoavx)
+        gcc_cflags_arch="-march=ivybridge"
+        # Ivybridge does not have AVX2
+        ;;
+      coreihwl | coreihwlnoavx | haswell | haswellnoavx)
+        gcc_cflags_arch="-march=haswell"
+        flint_cv_have_fft_small_x86_i="yes"
+        ;;
+      piledriver | bd2 | piledrivernoavx | bd2noavx)
+        gcc_cflags_arch="-march=bdver2"
+        flint_cv_have_fft_small_x86_i="yes"
+        ;;
+      steamroller | bd3 | steamrollernoavx | bd3noavx)
+        gcc_cflags_arch="-march=bdver3"
+        flint_cv_have_fft_small_x86_i="yes"
+        ;;
+      excavator | bd4 | excavatornoavx | bd4noavx)
+        gcc_cflags_arch="-march=bdver4"
+        flint_cv_have_fft_small_x86_i="yes"
+        ;;
+      x86_64v3)
+        gcc_cflags_arch="-march=x86-64-v3"
+        flint_cv_have_fft_small_x86_i="yes"
+        ;;
+    esac
+	;;
+
+  *)
+    asm_path=""
+    param_path="generic"
+    gcc_cflags="$gcc_cflags"
+    ;;
+
+esac
 
 ################################################################################
 # features
@@ -284,11 +524,6 @@ yes|no)
     ;;
 esac],
 enable_avx512="no")
-
-AC_ARG_ENABLE(arch,
-[AS_HELP_STRING([--enable-arch[[=ARCH]]],[Enable and push -march=ARCH option to C compiler [default=native]])],
-[],
-enable_arch="native")
 
 # Note: This is maintainer level only. Currently only used for Nemo CI.
 AC_ARG_ENABLE(mpfr-check,[],
@@ -503,35 +738,6 @@ fi
 dnl NOTE: The following line is invoked from LT_INIT
 dnl AC_PROG_CC
 
-if test "$with_ntl" = "yes";
-then
-    AC_PROG_CXX
-    AC_LANG_PUSH(C++)
-    if test "$cxxflags_set" = "no";
-    then
-        AX_CXX_CHECK_COMPILE_FLAG([-Wall],[CXXFLAGS="-Wall $CXXFLAGS"])
-        AX_CXX_CHECK_COMPILE_FLAG([-Werror=implicit-function-declaration],[CXXFLAGS="-Werror=implicit-function-declaration $CXXFLAGS"])
-        AX_CXX_CHECK_COMPILE_FLAG([-O2],[CXXFLAGS="-O2 $CXXFLAGS"])
-        if test "$enable_arch" != "no";
-        then
-            AX_CXX_CHECK_COMPILE_FLAG([-march=$enable_arch],[CXXFLAGS="-march=$enable_arch $CXXFLAGS"])
-        fi
-        AX_CXX_CHECK_COMPILE_FLAG([-std=c++11],[CXXFLAGS="-std=c++11 $CXXFLAGS"],
-            AC_MSG_ERROR([Couldn't compile with the C++11 standard needed by the NTL interface.])
-        )
-        if test "$enable_debug" = "yes";
-        then
-            if "$ac_cv_prog_cxx_g" = "yes";
-            then
-                CXXFLAGS="-g $CXXFLAGS"
-            else
-                AC_MSG_ERROR([$CXX does not support the flag -g needed to generate debug information])
-            fi
-        fi
-    fi
-    AC_LANG_POP
-fi
-
 AC_PROG_MKDIR_P
 
 ################################################################################
@@ -686,17 +892,6 @@ FLINT_CHECK_MPFR_H(4,1,0)
 
 FLINT_ABI
 
-case "$flint_cv_abi" in
-    32)
-        fft_tuning_in="src/fft_tuning32.in"
-        ;;
-    64)
-        fft_tuning_in="src/fft_tuning64.in"
-        ;;
-esac
-AC_CONFIG_FILES([src/fft_tuning.h:$fft_tuning_in],[],[fft_tuning_in="$fft_tuning_in"])
-AC_SUBST(FFT_TUNING_IN, $fft_tuning_in)
-
 ################################################################################
 # check headers
 ################################################################################
@@ -738,6 +933,7 @@ fi
 
 if test "$with_ntl" = "yes";
 then
+    AC_PROG_CXX
     AC_LANG_PUSH([C++])
     AC_CHECK_HEADER([NTL/ZZ.h],,
                     AC_MSG_ERROR([Could not find NTL/ZZ.h!]))
@@ -853,26 +1049,9 @@ fi
 
 if test "$with_ntl" = "yes";
 then
-    AC_MSG_CHECKING([if linking simple code snippet of NTL works])
-    SAVE_libs="$LIBS"
-    LIBS="-lntl $LIBS"
-    AC_LANG_PUSH([C++])
-    dnl The following code snippet was taken from NTL's documentation
-    AC_LINK_IFELSE(
-        [AC_LANG_PROGRAM([[#include <NTL/ZZ.h>]],
-            [NTL::ZZ a, b, c;
-std::cin >> a;
-std::cin >> b;
-c = (a+1)*(b+1);
-std::cout << c << "\n";])],
-        AC_MSG_RESULT([yes]),
-        AC_MSG_RESULT([no])
-        [AC_MSG_ERROR([NTL library was not found.  If you indeed have NTL installed, please
+    FLINT_CHECK_NTL(,[AC_MSG_ERROR([NTL library was not found.  If you indeed have NTL installed, please
 submit a bug report to <https://github.com/flintlib/flint/issues/> so
-that we can either fix the issue or give a more proper error message.])]
-    )
-    AC_LANG_POP
-    LIBS="$SAVE_libs"
+that we can either fix the issue or give a more proper error message.])])
 fi
 
 ################################################################################
@@ -881,14 +1060,7 @@ fi
 
 AC_SUBST(PIC_FLAG,$pic_flag)
 
-AC_MSG_CHECKING([if cpu_set_t is supported])
-AC_LINK_IFELSE([AC_LANG_PROGRAM([#define _GNU_SOURCE
-#include <sched.h>
-#include <pthread.h>],
-[cpu_set_t s;CPU_ZERO(&s); pthread_getaffinity_np(pthread_self(), sizeof(cpu_set_t), 0);])],
-[AC_DEFINE(FLINT_USES_CPUSET,1,Define if system has cpu_set_t)
- AC_MSG_RESULT([yes])],
-[AC_MSG_RESULT([no])])
+FLINT_CHECK_CPU_SET_T([AC_DEFINE([FLINT_USES_CPUSET],1,Define if system has cpu_set_t)])
 
 # ensure alloca works
 AC_MSG_CHECKING([if alloca works])
@@ -922,7 +1094,8 @@ save_CFLAGS="$CFLAGS"
 CFLAGS=""
 
 # The following is needed for Clang to check for unknown options.
-AX_CHECK_COMPILE_FLAG([-Werror=unknown-warning-option], [CFLAGS="-Werror=unknown-warning-option"])
+FLINT_CLANG([AX_CHECK_COMPILE_FLAG([-Werror=unknown-warning-option],
+                                   [CFLAGS="-Werror=unknown-warning-option"])])
 
 if test "$enable_coverage" = "yes";
 then
@@ -974,31 +1147,36 @@ then
     [AC_MSG_ERROR([$CC does not support the flag -mavx512f needed for AVX512 instructions])])
 fi
 
-case $host_cpu in
-    sparc*)
-        AX_CHECK_COMPILE_FLAG(-mno-relax,[DEFAULT_CFLAGS="-mno-relax $DEFAULT_CFLAGS"])
-        ;;
-    *)
-        ;;
-esac
-
-AX_CHECK_COMPILE_FLAG([-Wall],[DEFAULT_CFLAGS="-Wall $DEFAULT_CFLAGS"])
-AX_CHECK_COMPILE_FLAG([-Wno-stringop-overread],[DEFAULT_CFLAGS="-Wno-stringop-overread $DEFAULT_CFLAGS"])
-AX_CHECK_COMPILE_FLAG([-Wno-stringop-overflow],[DEFAULT_CFLAGS="-Wno-stringop-overflow $DEFAULT_CFLAGS"])
-AX_CHECK_COMPILE_FLAG([-Werror=implicit-function-declaration],[DEFAULT_CFLAGS="-Werror=implicit-function-declaration $DEFAULT_CFLAGS"])
-AX_CHECK_COMPILE_FLAG([-O3],[DEFAULT_CFLAGS="-O3 $DEFAULT_CFLAGS"])
-if test "$enable_arch" != "no";
-then
-    AX_CHECK_COMPILE_FLAG([-march=$enable_arch],[DEFAULT_CFLAGS="-march=$enable_arch $DEFAULT_CFLAGS"])
-fi
-AX_CHECK_COMPILE_FLAG([-std=c11],[DEFAULT_CFLAGS="-std=c11 $DEFAULT_CFLAGS"])
-AX_CHECK_COMPILE_FLAG([-pedantic],[DEFAULT_CFLAGS="-pedantic $DEFAULT_CFLAGS"])
-
 if test "$cflags_set" = "no";
 then
-    CFLAGS="$save_CFLAGS $DEFAULT_CFLAGS"
-    AC_SUBST(UNROLL_LOOPS,1)
-    AC_DEFINE(FLINT_UNROLL_LOOPS, 1, [Define to locally unroll some loops])
+    for flag in $gcc_cflags $gcc_warnings;
+    do
+        AX_CHECK_COMPILE_FLAG([$flag],[save_CFLAGS="$flag $save_CFLAGS"])
+    done
+    for opt in $gcc_cflags_optlist;
+    do
+        eval tmp=\"\$gcc_cflags_${opt}\" # " Just to fix highlighting
+        for flag in $tmp;
+        do
+            if test opt = "arch";
+            then
+                AX_CHECK_COMPILE_FLAG([$flag],[save_CFLAGS="$flag $save_CFLAGS"],
+                                      [unset flint_cv_have_fft_small_x86_i
+                                       unset flint_cv_have_fft_small_arm_i])
+            else
+                AX_CHECK_COMPILE_FLAG([$flag],[save_CFLAGS="$flag $save_CFLAGS"])
+            fi
+        done
+    done
+    AX_CHECK_COMPILE_FLAG([-funroll-loops],[unroll_loops="yes"])
+    if test "$unroll_loops" = "yes";
+    then
+        AC_SUBST(UNROLL_LOOPS,1)
+        AC_DEFINE(FLINT_UNROLL_LOOPS, 1, [Define to locally unroll some loops])
+    else
+        AC_SUBST(UNROLL_LOOPS,0)
+    fi
+    CFLAGS="$save_CFLAGS"
 else
     CFLAGS="$save_CFLAGS"
     AX_CHECK_COMPILE_FLAG([$CFLAGS],[],AC_MSG_ERROR(["Couldn't compile with given CFLAGS!"]))
@@ -1013,12 +1191,6 @@ else
 fi
 
 CPPFLAGS="-I./src $CPPFLAGS"
-
-################################################################################
-# Architecture
-################################################################################
-
-FLINT_ARCH
 
 ################################################################################
 # fft_small module
@@ -1061,9 +1233,15 @@ FLINT_CHECK_FFT_SMALL(
 
 if test "$enable_assembly" = "yes";
 then
-    FLINT_HAVE_ASM([enable_assembly="yes"],
-                   [enable_assembly="no"
-                    AC_MSG_WARN([FLINT currently only have assembly routines for System V-type systems for x86_64 processors with ADX instruction set. Disabling assembly...])])
+    if test "x$asm_path" = "x";
+    then
+        AC_MSG_WARN([Currently no assembly available for $host. Disabling assembly...])
+        enable_assembly="no"
+    elif test "$flint_cv_abi" != "64";
+    then
+        AC_MSG_WARN([Currently no assembly available for 32-bit systems. Disabling assembly...])
+        enable_assembly="no"
+    fi
 fi
 
 if test "$enable_assembly" = "yes";
@@ -1087,7 +1265,7 @@ then
 
     case $host in
         ARM64_PATTERN)
-            AC_DEFINE([FLINT_HAVE_ARMV8],1,[Define if CPU supports ARM v8-A instruction set])
+            AC_DEFINE([FLINT_HAVE_ASSEMBLY_armv8],1,[Define if Arm v8 assembly is available])
             case $host in
                 *-*-darwin*)
                     GMP_INCLUDE_MPN(src/mpn_extras/arm64/darwin.m4)
@@ -1097,20 +1275,43 @@ then
                     ;;
             esac
             ;;
-        X86_64_PATTERN)
-            AC_DEFINE([FLINT_HAVE_ADX],1,[Define if CPU supports ADX instruction set])
+        X86_64_ADX_PATTERN)
+            AC_DEFINE([FLINT_HAVE_ASSEMBLY_x86_64_adx],1,[Define if x86_64 ADX assembly is available])
             GMP_ASM_ALIGN_FILL_0x90
             GMP_ASM_COFF_TYPE
-            GMP_INCLUDE_MPN(src/mpn_extras/broadwell/x86_64-defs.m4)
+            GMP_INCLUDE_MPN(src/mpn_extras/x86_64/x86_64-defs.m4)
             case $host in
                 *-*-darwin*)
-                    GMP_INCLUDE_MPN(src/mpn_extras/broadwell/darwin.m4)
+                    GMP_INCLUDE_MPN(src/mpn_extras/x86_64/darwin.m4)
                     ;;
             esac
             ;;
+        *)
+            AC_MSG_ERROR([Error in assembly. Report to <https://github.com/flintlib/flint/issues/>.])
     esac
 
     GMP_FINISH
+fi
+
+if test "$enable_assembly" = "yes";
+then
+    AC_SUBST(WANT_ASSEMBLY,1)
+    AC_SUBST(ASM_PATH,$asm_path)
+else
+    AC_SUBST(WANT_ASSEMBLY,0)
+    AC_SUBST(ASM_PATH,)
+fi
+
+################################################################################
+# parameters
+################################################################################
+
+if test -f src/mpn_extras/$param_path/flint-mparam.h;
+then
+    AC_CONFIG_LINKS([src/flint-mparam.h:src/mpn_extras/$param_path/flint-mparam.h],[],[param_path="$param_path"])
+    AC_SUBST(PARAM_PATH,$param_path)
+else
+    AC_MSG_ERROR([Error establishing flint-mparam.h from param_path = $param_path])
 fi
 
 ################################################################################
@@ -1159,7 +1360,7 @@ else
     fi
 fi
 
-AC_CONFIG_FILES([src/fmpz/fmpz.c:$fmpz_c],[],[fmpz_c="$fmpz_c"])
+AC_CONFIG_LINKS([src/fmpz/fmpz.c:$fmpz_c],[],[fmpz_c="$fmpz_c"])
 AC_SUBST(FMPZ_C_IN, $fmpz_c)
 
 if test "$enable_shared" = "yes";
@@ -1241,26 +1442,6 @@ fi
 if test "$enable_gmp_internals" = "yes";
 then
     AC_DEFINE(FLINT_WANT_GMP_INTERNALS,1,[Define to enable use of GMP internals.])
-fi
-
-if test "$enable_assembly" = "yes";
-then
-    case $host in
-        X86_64_PATTERN)
-            AC_SUBST(WANT_ASSEMBLY,1)
-            AC_SUBST(WANT_ADX_ASSEMBLY,1)
-            AC_SUBST(WANT_ARMV8_ASSEMBLY,0)
-            ;;
-       ARM64_PATTERN)
-            AC_SUBST(WANT_ASSEMBLY,1)
-            AC_SUBST(WANT_ADX_ASSEMBLY,0)
-            AC_SUBST(WANT_ARMV8_ASSEMBLY,1)
-            ;;
-    esac
-else
-    AC_SUBST(WANT_ASSEMBLY,0)
-    AC_SUBST(WANT_ADX_ASSEMBLY,0)
-    AC_SUBST(WANT_ARMV8_ASSEMBLY,0)
 fi
 
 ################################################################################

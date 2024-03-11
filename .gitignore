@@ -12,12 +12,15 @@
 src/fmpz/fmpz.c
 src/config.h
 src/config.h.in
-src/fft_tuning.h
 src/flint.h
 src/flint-config.h
 src/gmpcompat.h
 build/
-config/
+config/*
+!config/config.guess
+!config/config.sub
+!config/configfsf.guess
+!config/configfsf.sub
 config.log
 confdefs.h
 conftest.*
@@ -60,3 +63,4 @@ libtool
 flint.pc
 autom4te.cache/
 config.m4
+src/flint-mparam.h

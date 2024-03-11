@@ -13,7 +13,7 @@
 #include "mpn_extras.h"
 
 /* TODO: Remove this preprocessor conditional */
-#if FLINT_HAVE_ADX
+#if FLINT_HAVE_ASSEMBLY_x86_64_adx
 
 # define N_MAX 64
 

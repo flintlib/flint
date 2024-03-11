@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "fft.h"
 
 void fft_combine_limbs(mp_limb_t * res, mp_limb_t ** poly, slong length,

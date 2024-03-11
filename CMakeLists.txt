@@ -274,7 +274,7 @@ string(REGEX REPLACE "([A-Za-z0-9_-]+;|[A-Za-z0-9_-]+$)" "src/\\1" BUILD_DIRS "$
 # NOTE: Template directories are not supposed to be used.
 
 set(_HEADERS
-    NTL-interface.h flint.h longlong.h flint-config.h gmpcompat.h fft_tuning.h
+    NTL-interface.h flint.h longlong.h flint-config.h gmpcompat.h flint-mparam.h
     profiler.h templates.h mpf-impl.h
 )
 string(REGEX REPLACE "([A-Za-z0-9_-]+\.h;|[A-Za-z0-9_-]+\.h$)" "src/\\1" HEADERS "${_HEADERS}")
@@ -352,16 +352,10 @@ endif()
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     configure_file(
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/fft_tuning64.in
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/fft_tuning.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/mpn_extras/generic/flint-mparam.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/flint-mparam.h
         COPYONLY
     )   
-elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
-    configure_file(
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/fft_tuning32.in
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/fft_tuning.h
-        COPYONLY
-    )
 endif()
 
 

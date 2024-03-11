@@ -11,7 +11,7 @@
 
 #include "mpn_extras.h"
 
-#if FLINT_HAVE_ADX
+#if FLINT_HAVE_ASSEMBLY_x86_64_adx
 
 mp_limb_t flint_mpn_sqr_1(mp_ptr, mp_srcptr);
 mp_limb_t flint_mpn_sqr_2(mp_ptr, mp_srcptr);
