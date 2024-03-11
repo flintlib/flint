@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "flint-mparam.h"
 #include "mpn_extras.h"
 
 void __gmpn_mul_basecase(mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t);
@@ -36,13 +37,16 @@ void __gmpn_mul_basecase(mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t);
 # define TOOM22_LIMIT 0
 #endif
 
-
 #if FLINT_HAVE_FFT_SMALL
 # include "fft_small.h"
 # define FFT_MUL mpn_mul_default_mpn_ctx
+# define FFT_MUL_THRESHOLD FLINT_FFT_SMALL_MUL_THRESHOLD
+# define FFT_SQR_THRESHOLD FLINT_FFT_SMALL_SQR_THRESHOLD
 #else
 # include "fft.h"
 # define FFT_MUL flint_mpn_mul_fft_main
+# define FFT_MUL_THRESHOLD FLINT_FFT_MUL_THRESHOLD
+# define FFT_SQR_THRESHOLD FLINT_FFT_SQR_THRESHOLD
 #endif
 
 mp_limb_t _flint_mpn_mul(mp_ptr r, mp_srcptr x, mp_size_t xn, mp_srcptr y, mp_size_t yn)
@@ -62,7 +66,7 @@ mp_limb_t _flint_mpn_mul(mp_ptr r, mp_srcptr x, mp_size_t xn, mp_srcptr y, mp_si
 #endif
     else if (WANT_TOOM22 && yn <= TOOM22_LIMIT && 5 * yn >= 4 * xn)
         flint_mpn_mul_toom22(r, x, xn, y, yn, NULL);
-    else if (yn < FLINT_FFT_MUL_THRESHOLD)
+    else if (yn < FFT_MUL_THRESHOLD)
         mpn_mul(r, x, xn, y, yn);
     else
         FFT_MUL(r, x, xn, y, yn);
@@ -76,7 +80,7 @@ void _flint_mpn_mul_n(mp_ptr r, mp_srcptr x, mp_srcptr y, mp_size_t n)
         __gmpn_mul_basecase(r, x, n, y, n);
     else if (WANT_TOOM22 && n <= TOOM22_LIMIT)
         flint_mpn_mul_toom22(r, x, n, y, n, NULL);
-    else if (n < FLINT_FFT_MUL_THRESHOLD)
+    else if (n < FFT_MUL_THRESHOLD)
         mpn_mul_n(r, x, y, n);
     else
         FFT_MUL(r, x, n, y, n);
@@ -87,13 +91,10 @@ mp_limb_t _flint_mpn_sqr(mp_ptr r, mp_srcptr x, mp_size_t n)
     /* We cannot call __gmpn_sqr_basecase directly because it
        may not support n above a certain size. */
 
-    if (n < FLINT_FFT_SQR_THRESHOLD)
+    if (n < FFT_SQR_THRESHOLD)
         mpn_sqr(r, x, n);
     else
-    {
-        /* TODO: Don't do a full multiplication here. */
         FFT_MUL(r, x, n, x, n);
-    }
 
     return r[2 * n - 1];
 }

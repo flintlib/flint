@@ -189,16 +189,6 @@ mp_limb_t mpn_rsh1sub_n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 
 /* General multiplication ****************************************************/
 
-#if FLINT_HAVE_FFT_SMALL
-# define FLINT_FFT_MUL_THRESHOLD FLINT_FFT_SMALL_MUL_THRESHOLD
-# define FLINT_FFT_SQR_THRESHOLD FLINT_FFT_SMALL_SQR_THRESHOLD
-#else
-/* FLINT's FFT can beat GMP below this threshold but apparently
-   not consistently. Something needs retuning? */
-# define FLINT_FFT_MUL_THRESHOLD 32000
-# define FLINT_FFT_SQR_THRESHOLD 32000
-#endif
-
 #if FLINT_HAVE_ASSEMBLY_x86_64_adx
 # define FLINT_MPN_MUL_FUNC_TAB_WIDTH 17
 # define FLINT_MPN_SQR_FUNC_TAB_WIDTH 14

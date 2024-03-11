@@ -289,36 +289,47 @@ Please report at <https://github.com/flintlib/flint/issues/>])
     case $host_cpu in
       zen | zennoavx)
         gcc_cflags_arch="-march=znver1"
+        param_path="x86_64/zen3"
         ;;
       zen2 | zen2noavx)
         gcc_cflags_arch="-march=znver2"
+        param_path="x86_64/zen3"
         ;;
       zen3 | zen3noavx)
         gcc_cflags_arch="-march=znver3"
+        param_path="x86_64/zen3"
         ;;
       zen4 | zen4noavx)
         gcc_cflags_arch="-march=znver4"
+        param_path="x86_64/zen3"
         ;;
       coreibwl | coreibwlnoavx | broadwell | broadwellnoavx)
         gcc_cflags_arch="-march=broadwell"
+        param_path="x86_64/skylake"
         ;;
       skylake | skylakenoavx)
         gcc_cflags_arch="-march=skylake"
+        param_path="x86_64/skylake"
         ;;
       kabylake | kabylakenoavx)
         gcc_cflags_arch="-march=skylake"
+        param_path="x86_64/skylake"
         ;;
       icelake | icelakenoavx)
         gcc_cflags_arch="-march=tigerlake"
+        param_path="x86_64/skylake"
         ;;
       rocketlake | rocketlakenoavx)
         gcc_cflags_arch="-march=rocketlake"
+        param_path="x86_64/skylake"
         ;;
       alderlake | alderlakenoavx)
         gcc_cflags_arch="-march=alderlake"
+        param_path="x86_64/skylake"
         ;;
       raptorlake | raptorlakenoavx)
         gcc_cflags_arch="-march=alderlake"
+        param_path="x86_64/skylake"
         ;;
       *)
         AC_MSG_ERROR([Error in deciding flags for $host.
@@ -1198,33 +1209,7 @@ CPPFLAGS="-I./src $CPPFLAGS"
 
 FLINT_CHECK_FFT_SMALL(
     [AC_SUBST(FFT_SMALL, [fft_small\ \ \ ])
-     AC_DEFINE(FLINT_HAVE_FFT_SMALL, 1, [Define to use the fft_small module])
-
-     dnl FIXME: Push different configuration files instead of hardcoding them here.
-     case $flint_cv_arch in
-         FAST_VROUNDPD_PATTERN)
-             dnl Zen 3
-             fft_small_mul_threshold="400"
-             fft_small_sqr_threshold="800"
-             ;;
-         SLOW_VROUNDPD_PATTERN)
-             dnl Skylake
-             fft_small_mul_threshold="1540"
-             fft_small_sqr_threshold="3080"
-             ;;
-         ARM64_PATTERN)
-             dnl Apple M1
-             fft_small_threshold="810"
-             fft_small_threshold="865"
-             ;;
-         *)
-             dnl Be conservative here
-             fft_small_mul_threshold="800"
-             fft_small_sqr_threshold="1400"
-             ;;
-     esac
-     AC_DEFINE_UNQUOTED(FLINT_FFT_SMALL_MUL_THRESHOLD,[$fft_small_mul_threshold],[Define to set threshold for when to use multiplication with fft_small module])
-     AC_DEFINE_UNQUOTED(FLINT_FFT_SMALL_SQR_THRESHOLD,[$fft_small_sqr_threshold],[Define to set threshold for when to use squaring with fft_small module])],
+     AC_DEFINE(FLINT_HAVE_FFT_SMALL, 1, [Define to use the fft_small module])],
     [AC_SUBST(FFT_SMALL, [\ \ \ \ \ \ \ \ \ \ \ \ ])])
 
 ################################################################################

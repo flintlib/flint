@@ -14,6 +14,12 @@
 #ifndef FLINT_MPARAM_H
 #define FLINT_MPARAM_H
 
+#define FLINT_FFT_SMALL_MUL_THRESHOLD           1000
+#define FLINT_FFT_SMALL_SQR_THRESHOLD           1400
+
+#define FLINT_FFT_MUL_THRESHOLD                32000
+#define FLINT_FFT_SQR_THRESHOLD                32000
+
 #define FFT_TAB \
    { {4, 4}, {4, 3}, {3, 2}, {2, 1}, {2, 1} }
 
