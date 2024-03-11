@@ -9,13 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-/* Tuning for generic CPU. Is probably far from optimal. */
-
 #ifndef FLINT_MPARAM_H
 #define FLINT_MPARAM_H
 
-#define FLINT_FFT_SMALL_MUL_THRESHOLD           1000
-#define FLINT_FFT_SMALL_SQR_THRESHOLD           1400
+#define FLINT_FFT_SMALL_MUL_THRESHOLD            400
+#define FLINT_FFT_SMALL_SQR_THRESHOLD            800
 
 #define FLINT_FFT_MUL_THRESHOLD                32000
 #define FLINT_FFT_SQR_THRESHOLD                32000

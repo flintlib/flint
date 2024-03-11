@@ -20,12 +20,6 @@
 
 #cmakedefine01 FLINT_KNOW_STRONG_ORDER
 
-#if FLINT_HAVE_FFT_SMALL
-/* Just set to some reasonable threshold */
-# define FLINT_FFT_SMALL_MUL_THRESHOLD 800
-# define FLINT_FFT_SMALL_SQR_THRESHOLD 1400
-#endif
-
 /* NOTE: Here we assume this is how it works. */
 #if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
 # define HAVE__ALIGNED_MALLOC 1
