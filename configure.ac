@@ -189,6 +189,7 @@ case $host in
     gcc_cflags_optlist="arch tune"
     asm_path="arm64"
     param_path="arm64"
+    flint_cv_have_fft_small_arm_i="yes"
 
     # NOTE: Cortex values where taken from
     # https://developer.arm.com/Processors/Cortex-XXX
@@ -283,6 +284,7 @@ Please report at <https://github.com/flintlib/flint/issues/>])
     gcc_cflags_optlist="arch"
     asm_path="broadwell"
     param_path="broadwell"
+    flint_cv_have_fft_small_x86_i="yes"
 
     case $host_cpu in
       zen | zennoavx)
@@ -330,6 +332,47 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         asm_path=""
 	    ;;
 	esac
+	;;
+
+  X86_64_PATTERN)
+    # NOTE: We do not care if the user specifies noavx!
+    gcc_cflags="$gcc_cflags"
+    gcc_cflags_optlist="arch"
+    asm_path=""
+
+    case $host_cpu in
+      coreisbr | coreisbrnoavx | sandybridge | sandybridgenoavx)
+        gcc_cflags_arch="-march=sandybridge"
+        flint_cv_have_fft_small_x86_i="yes"
+        ;;
+      coreiibr | coreiibrnoavx | ivybridge | ivybridgenoavx)
+        gcc_cflags_arch="-march=sandybridge"
+        flint_cv_have_fft_small_x86_i="yes"
+        ;;
+      coreihwl | coreihwlnoavx | haswell | haswellnoavx)
+        gcc_cflags_arch="-march=haswell"
+        flint_cv_have_fft_small_x86_i="yes"
+        ;;
+      piledriver | bd2 | piledrivernoavx | bd2noavx)
+        gcc_cflags_arch="-march=bdver2"
+        flint_cv_have_fft_small_x86_i="yes"
+        ;;
+      steamroller | bd3 | steamrollernoavx | bd3noavx)
+        gcc_cflags_arch="-march=bdver3"
+        flint_cv_have_fft_small_x86_i="yes"
+        ;;
+      excavator | bd4 | excavatornoavx | bd4noavx)
+        gcc_cflags_arch="-march=bdver4"
+        flint_cv_have_fft_small_x86_i="yes"
+        ;;
+      x86_64v3)
+        gcc_cflags_arch="-march=x86-64-v3"
+        flint_cv_have_fft_small_x86_i="yes"
+        ;;
+      *)
+        flint_cv_have_fft_small_x86_i="no"
+        ;;
+    esac
 	;;
 
   *)
@@ -1120,7 +1163,14 @@ then
         eval tmp=\"\$gcc_cflags_${opt}\" # " Just to fix highlighting
         for flag in $tmp;
         do
-            AX_CHECK_COMPILE_FLAG([$flag],[save_CFLAGS="$flag $save_CFLAGS"])
+            if test opt = "arch";
+            then
+                AX_CHECK_COMPILE_FLAG([$flag],[save_CFLAGS="$flag $save_CFLAGS"],
+                                      [unset flint_cv_have_fft_small_x86_i
+                                       unset flint_cv_have_fft_small_arm_i])
+            else
+                AX_CHECK_COMPILE_FLAG([$flag],[save_CFLAGS="$flag $save_CFLAGS"])
+            fi
         done
     done
     AX_CHECK_COMPILE_FLAG([-funroll-loops],[unroll_loops="yes"])
