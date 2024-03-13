@@ -248,37 +248,7 @@ endif
 # headers
 ################################################################################
 
-SINGLE_HEADERS :=                                                           \
-        flint.h         flint-config.h    flint-mparam.h                    \
-                                                                            \
-        profiler.h      templates.h                                         \
-                                                                            \
-        longlong.h                        longlong_asm_clang.h              \
-        longlong_asm_gcc.h                longlong_asm_gnu.h                \
-        longlong_div_gnu.h                                                  \
-        longlong_msc_arm64.h              longlong_msc_x86.h                \
-                                                                            \
-        gmpcompat.h                                                         \
-                                                                            \
-        crt_helpers.h   machine_vectors.h                                   \
-                                                                            \
-        mpf-impl.h                      fq_zech_vec.h                       \
-                                                                            \
-        limb_types.h                    nmod_types.h                        \
-        fmpz_types.h                    fmpq_types.h                        \
-        fmpz_mod_types.h                fq_nmod_types.h                     \
-        fq_zech_types.h                 fq_types.h                          \
-        padic_types.h                                                       \
-        n_poly_types.h                  mpoly_types.h                       \
-        arf_types.h                     acf_types.h                         \
-        arb_types.h                     acb_types.h                         \
-        NTL-interface.h
-
-HEADERS :=  $(patsubst %,$(SRC_DIR)/%,                                      \
-                $(patsubst %,%,$(SINGLE_HEADERS))                           \
-                $(patsubst %,%.h,$(HEADER_DIRS))                            \
-                $(patsubst %,%.h,$(TEMPLATE_DIRS))                          \
-            )
+HEADERS := $(wildcard $(SRC_DIR)/*.h)
 
 ################################################################################
 # sources
