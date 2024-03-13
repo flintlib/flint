@@ -12,6 +12,9 @@
 #include "profiler.h"
 #include "mpn_extras.h"
 
+/* FIXME: Remove this preprocessor conditional */
+#if FLINT_HAVE_ASSEMBLY_x86_64_adx
+
 #undef TIMEIT_END_REPEAT
 #define TIMEIT_END_REPEAT(__timer, __reps) \
             } \
@@ -163,3 +166,6 @@ main()
     flint_free(X);
     flint_free(Z);
 }
+#else
+int main(void) { return 0; }
+#endif
