@@ -609,6 +609,41 @@ Polynomial roots
     of *mat* and then call :func:`qqbar_roots_fmpz_poly` with the same
     flags.
 
+.. function:: int _qqbar_roots_poly_squarefree(qqbar_ptr roots, qqbar_srcptr coeffs, slong len, slong deg_limit, slong bits_limit)
+
+    Writes to the vector *roots* the `d` roots of the polynomial
+    with algebraic number coefficients *coeffs* of length *len* (`d = len - 1`).
+
+    Given the polynomial `f = a_0 + \ldots + a_d x^d` with coefficients in
+    `\overline{\mathbb{Q}}`, we construct an annihilating polynomial with
+    coefficients in `\mathbb{Q}` as
+    `g = \prod (\tilde a_0 + \ldots + \tilde a_d x^d)`
+    where the product is taken over all
+    combinations of algebraic conjugates `\tilde a_k` of the input
+    coefficients.
+    The polynomial `g` is subsequently factored to find candidate
+    roots.
+
+    The leading coefficient `a_d` must be nonzero and the polynomial `f`
+    polynomial must be squarefree.
+    To compute roots of a general polynomial which may have repeated roots,
+    it is necessary to perform a squarefree factorization before calling
+    this function.
+    An option is to call :func:`gr_poly_roots` with a ``qqbar`` context object,
+    which wraps this function
+    and takes care of the initial squarefree factorization.
+
+    Since the product `g` can explode in size very quickly, the *deg_limit*
+    and *bits_limit* parameters allow bounding the degree and working precision.
+    The function returns 1 on success and 0 on failure indicating that
+    such a limit has been exceeded.
+    Setting nonpositive values for the limits removes the restrictions;
+    however, the function can still fail and return 0 in that case if `g`
+    exceeds machine size.
+
+Note: to compute algebraic number roots of polynomials of various other
+types, use :func:`gr_poly_roots_other`.
+
 Roots of unity and trigonometric functions
 -------------------------------------------------------------------------------
 
