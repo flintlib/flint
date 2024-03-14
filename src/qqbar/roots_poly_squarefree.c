@@ -71,6 +71,9 @@ bsprod(acb_poly_t res, slong a, slong b, slong deg, qqbar_srcptr coeffs, acb_ptr
         bsprod(f, a, a + (b - a) / 2, deg, coeffs, conj_roots, prec);
         bsprod(g, a + (b - a) / 2, b, deg, coeffs, conj_roots, prec);
         acb_poly_mul(res, f, g, prec);
+
+        acb_poly_clear(f);
+        acb_poly_clear(g);
     }
 }
 
@@ -117,6 +120,7 @@ _qqbar_roots_poly_squarefree(qqbar_ptr roots, qqbar_srcptr coeffs, slong len, sl
     }
 
     fmpz_init(den_bound);
+    fmpz_init(den);
 
     fmpz_one(den_bound);
     for (i = 0; i <= deg; i++)
@@ -145,21 +149,24 @@ _qqbar_roots_poly_squarefree(qqbar_ptr roots, qqbar_srcptr coeffs, slong len, sl
         qqbar_roots_fmpz_poly(roots, t, 0);
 
         fmpz_poly_clear(t);
-
+        fmpz_clear(den);
         fmpz_clear(den_bound);
         return 1;
     }
 
     deg_bound = conjugations * deg;
     if (deg_bound > deg_limit)
+    {
+        fmpz_clear(den);
+        fmpz_clear(den_bound);
         return 0;
+    }
 
     conj_roots = flint_malloc(sizeof(acb_ptr) * (deg + 1));
 
     for (i = 0; i <= deg; i++)
         conj_roots[i] = _acb_vec_init(qqbar_degree(coeffs + i));
 
-    fmpz_init(den);
     acb_poly_init(cpoly);
     acb_poly_init(ct);
     fmpz_poly_init(rpoly);
