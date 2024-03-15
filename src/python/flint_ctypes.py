@@ -5690,6 +5690,10 @@ class gr_mat(gr_elem):
             ([Root a = 5.37228 of a^2-5*a-2, Root a = -0.372281 of a^2-5*a-2], [1, 1])
             >>> Mat(ZZ)([[1,2],[3,4]]).eigenvalues(domain=RR)
             ([[-0.3722813232690143 +/- 3.01e-17], [5.372281323269014 +/- 3.31e-16]], [1, 1])
+            >>> Mat(QQbar)([[1, 0, QQbar.i()], [0, 0, 1], [1, 1, 1]]).eigenvalues()
+            ([Root a = 1.94721 + 0.604643*I of a^6-4*a^5+4*a^4+2*a^3-3*a^2+1, Root a = 0.654260 - 0.430857*I of a^6-4*a^5+4*a^4+2*a^3-3*a^2+1, Root a = -0.601467 - 0.173786*I of a^6-4*a^5+4*a^4+2*a^3-3*a^2+1], [1, 1, 1])
+            >>> Mat(ZZi)([[1, 0, ZZi.i()], [0, 0, 1], [1, 1, 1]]).eigenvalues(domain=QQbar)
+            ([Root a = 1.94721 + 0.604643*I of a^6-4*a^5+4*a^4+2*a^3-3*a^2+1, Root a = 0.654260 - 0.430857*I of a^6-4*a^5+4*a^4+2*a^3-3*a^2+1, Root a = -0.601467 - 0.173786*I of a^6-4*a^5+4*a^4+2*a^3-3*a^2+1], [1, 1, 1])
 
         The matrix must be square:
 
@@ -7714,6 +7718,21 @@ def test_set_str():
     assert R("(4+4*x-y*(-4))^2 / (1+x+y) / 16") == 1+x+y
 
     assert RRx("1 +/- 0") == RR(1)
+
+def test_qqbar_roots():
+    for R in [ZZ, QQ, ZZi, QQbar, AA, QQbar_ca, AA_ca, RR_ca, CC_ca]:
+        Rx = PolynomialRing(R)
+        assert Rx([-2,0,1]).roots(domain=AA) == ([AA(2).sqrt(), -AA(2).sqrt()], [1, 1])
+        assert Rx([2,0,1]).roots(domain=AA) == ([], [])
+        assert Rx([2,0,1]).roots(domain=QQbar) == ([QQbar(-2).sqrt(), -QQbar(-2).sqrt()], [1, 1])
+        assert (Rx([-2,0,1]) ** 2).roots(domain=AA) == ([AA(2).sqrt(), -AA(2).sqrt()], [2, 2])
+    Rx = PolynomialRing(QQbar, "x")
+    x = Rx.gen()
+    g = -QQbar(3).sqrt() + x
+    f = 2 + QQbar(2).sqrt()*x + x**2
+    h = g**2 * f
+    ((r1, r2, r3), (e1, e2, e3)) = h.roots(domain=QQbar)
+    assert (x-r1)**e1 * (x-r2)**e2 * (x-r3)**e3 == h
 
 def test_ca_notebook_examples():
     # algebraic number identity

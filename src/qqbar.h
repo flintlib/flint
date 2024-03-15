@@ -373,8 +373,8 @@ int qqbar_evaluate_fmpz_mpoly(qqbar_t res, const fmpz_mpoly_t f, qqbar_srcptr x,
 #define QQBAR_ROOTS_UNSORTED 2
 
 void qqbar_roots_fmpz_poly(qqbar_ptr res, const fmpz_poly_t poly, int flags);
-
 void qqbar_roots_fmpq_poly(qqbar_ptr res, const fmpq_poly_t poly, int flags);
+int _qqbar_roots_poly_squarefree(qqbar_ptr roots, qqbar_srcptr coeffs, slong len, slong deg_limit, slong bits_limit);
 
 void qqbar_eigenvalues_fmpz_mat(qqbar_ptr res, const fmpz_mat_t mat, int flags);
 
