@@ -117,12 +117,18 @@ jobs:
       FLINT_TEST_MULTIPLIER: "0.5"
 
     steps:
+      - name: Make Git to use LF
+        shell: pwsh
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+
       - uses: actions/checkout@v4
 
       - name: "Set up Cygwin"
         uses: gap-actions/setup-cygwin@v1
         with:
-          PKGS_TO_INSTALL: "dos2unix,gcc-core,make,libgmp-devel,libmpfr-devel,libtool,autoconf,automake"
+          PKGS_TO_INSTALL: "gcc-core,make,libgmp-devel,libmpfr-devel,libtool,autoconf,automake"
 
       - name: "Setup"
         run: |
@@ -135,8 +141,6 @@ jobs:
       - name: "Configure"
         run: |
           cd ${REPO}
-          dos2unix configure
-          dos2unix bootstrap.sh
           ./bootstrap.sh
           ./configure \
             CC=${CC} \
