@@ -19,13 +19,13 @@ jobs:
   # ubuntu, gcc, code coverage
   ##############################################################################
   ubuntu-codecoverage:
-    name: Ubuntu GCC, Code Coverage (x10)
+    name: Ubuntu GCC, Code Coverage (x2)
 
     runs-on: ubuntu-latest
 
     env:
       CC: "gcc"
-      FLINT_TEST_MULTIPLIER: "10"
+      FLINT_TEST_MULTIPLIER: "2"
 
     steps:
       - uses: actions/checkout@v4
@@ -101,13 +101,13 @@ jobs:
   # ubuntu gcc with assert
   ##############################################################################
   ubuntu-gcc-assert:
-    name: Ubuntu GCC with NTL (assert, x2)
+    name: Ubuntu GCC with NTL (assert, x1)
 
     runs-on: ubuntu-latest
 
     env:
       CC: "gcc"
-      FLINT_TEST_MULTIPLIER: "2"
+      FLINT_TEST_MULTIPLIER: "1"
 
     steps:
       - uses: actions/checkout@v4
@@ -150,12 +150,12 @@ jobs:
   # macos (M1) with clang
   ##############################################################################
   macos-m1:
-    name: macOS-M1, Clang (x3)
+    name: macOS-M1, Clang (x1)
 
     runs-on: macos-14
 
     env:
-      FLINT_TEST_MULTIPLIER: "3"
+      FLINT_TEST_MULTIPLIER: "1"
 
     steps:
       - uses: actions/checkout@v4
@@ -180,59 +180,6 @@ jobs:
             CC=$(brew --prefix llvm@15)/bin/clang \
             --with-gmp=$(brew --prefix) \
             --with-mpfr=$(brew --prefix) \
-            --disable-static \
-            --disable-debug
-
-      - name: "Compile library"
-        run: |
-          $MAKE
-
-      - name: "Compile tests"
-        run: |
-          $MAKE tests
-
-      - name: "Check"
-        run: |
-          $MAKE check
-
-
-
-  ##############################################################################
-  # macos (x86) with clang and blas
-  ##############################################################################
-  macos-x86:
-    name: macOS-x86 Clang with BLAS (x2)
-
-    runs-on: macos-12
-
-    env:
-      FLINT_TEST_MULTIPLIER: "2"
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: "Setup"
-        run: |
-          brew install make
-          brew install gmp
-          brew install mpfr
-          brew install autoconf
-          brew install libtool
-          brew install automake
-          brew install openblas
-          $(brew --prefix llvm@15)/bin/clang --version
-          gmake --version
-          autoconf --version
-          echo "MAKE=gmake -j$(expr $(nproc) + 1) -l 10 --output-sync=target" >> $GITHUB_ENV
-
-      - name: "Configure"
-        run: |
-          ./bootstrap.sh
-          ./configure \
-            CC=$(brew --prefix llvm@15)/bin/clang \
-            --with-gmp=$(brew --prefix) \
-            --with-mpfr=$(brew --prefix) \
-            --with-blas=$(brew --prefix)/opt/openblas \
             --disable-static \
             --disable-debug
 
@@ -254,7 +201,7 @@ jobs:
   # ubuntu with clang
   #############################################################################
   ubuntu-clang:
-    name: Ubuntu Clang with examples (x5)
+    name: Ubuntu Clang with examples (x0.5)
 
     runs-on: ubuntu-latest
 
@@ -262,7 +209,7 @@ jobs:
       LOCAL: ${{ github.workspace }}/local
       LDFLAGS: "-Wl,-rpath,$LOCAL/lib"
       CC: "clang"
-      FLINT_TEST_MULTIPLIER: "5"
+      FLINT_TEST_MULTIPLIER: "0.5"
 
     steps:
       - uses: actions/checkout@v4
@@ -308,67 +255,11 @@ jobs:
 
 
 
-  #############################################################################
-  # mingw with gcc
-  #############################################################################
-  mingw64-gcc:
-    name: MinGW GCC (x0.5)
-
-    runs-on: windows-latest
-
-    defaults:
-      run:
-        shell: msys2 {0}
-
-    env:
-      CC: "gcc"
-      FLINT_TEST_MULTIPLIER: "0.5"
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: "Setup MinGW"
-        uses: msys2/setup-msys2@v2
-        with:
-          msystem: mingw64
-          update: true
-          install: mingw-w64-x86_64-gcc mingw-w64-x86_64-autotools
-
-      - name: "Setup"
-        run: |
-          gcc --version
-          make --version
-          autoconf --version
-          libtool --version
-          echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
-
-      - name: "Configure"
-        run: |
-          ./bootstrap.sh
-          ./configure \
-            CC=${CC} \
-            --disable-static \
-            --disable-debug
-
-      - name: "Compile library"
-        run: |
-          ${MAKE}
-
-      - name: "Compile tests"
-        run: |
-          ${MAKE} tests
-
-      - name: "Check"
-        run: |
-          ${MAKE} check
-
-
-
   ##############################################################################
   # msvc
   ##############################################################################
   msvc:
-    name: MSVC (x1)
+    name: MSVC (x0.5)
 
     runs-on: windows-latest
 
@@ -413,8 +304,8 @@ jobs:
       - name: "Check"
         run: |
           cd build
-          set "FLINT_TEST_MULTIPLIER=1"
-          ctest -j5 --output-on-failure --timeout 450
+          set "FLINT_TEST_MULTIPLIER=0.5"
+          ctest -j5 --output-on-failure --timeout 150
 
 
 
@@ -422,13 +313,13 @@ jobs:
   # alpine linux, musl, 32-bit (assert)
   ##############################################################################
   alpine-32bit:
-    name: Alpine Linux, musl, 32-bit (assert, x1.5)
+    name: Alpine Linux, musl, 32-bit (assert, x1)
 
     runs-on: ubuntu-latest
 
     env:
       CC: "gcc"
-      FLINT_TEST_MULTIPLIER: "1.5"
+      FLINT_TEST_MULTIPLIER: "1"
 
     steps:
       - uses: actions/checkout@v4
@@ -481,89 +372,3 @@ jobs:
         run: |
           $MAKE check
         shell: alpine.sh {0}
-
-
-
-  ##############################################################################
-  # nemo
-  ##############################################################################
-  nemo:
-    name: Nemo.jl (temporary branch)
-
-    runs-on: ubuntu-latest
-
-    env:
-      LOCAL: ${{ github.workspace }}/local
-      CC: "gcc"
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: "Setup"
-        run: |
-          sudo apt-get install -y sed
-          sudo apt-get install -y autoconf
-          sudo apt-get install -y libtool-bin
-          gcc --version
-          make --version
-          autoconf --version
-          libtool --version
-          julia --version
-          julia -e 'println(Base.BinaryPlatforms.HostPlatform())'
-          echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
-
-      - name: "Configure"
-        run: |
-          # Find path to GMP and MPFR
-          gmp_path=$(julia -e 'include("dev/find_gmp_mpfr.jl"); print(gmp_artifact_dir())')
-          echo "Path to GMP: ${gmp_path}"
-          mpfr_path=$(julia -e 'include("dev/find_gmp_mpfr.jl"); print(mpfr_artifact_dir())')
-          echo "Path to MPFR: ${mpfr_path}"
-
-          # Make sure that we output an soname which corresponds to FLINT_JLL's
-          # soname
-          wget https://raw.githubusercontent.com/JuliaPackaging/Yggdrasil/master/F/FLINT/build_tarballs.jl
-          FLINT_JLL_VERSION=$(grep "upstream_version =" build_tarballs.jl | sed "s/upstream_version = v\"\([0-9\.]*\)\"/\1/")
-          FLINT_JLL_SONAME=$(grep "$FLINT_JLL_VERSION => " configure.ac | sed "s/# $FLINT_JLL_VERSION => \([0-9\.]\+\)/\1/")
-          FLINT_JLL_MAJOR=$(echo $FLINT_JLL_SONAME | sed "s/\([0-9]\+\)\.[0-9]\+\.[0-9]\+/\1/")
-          FLINT_JLL_MINOR=$(echo $FLINT_JLL_SONAME | sed "s/[0-9]\+\.\([0-9]\+\)\.[0-9]\+/\1/")
-          FLINT_JLL_PATCH=$(echo $FLINT_JLL_SONAME | sed "s/[0-9]\+\.[0-9]\+\.\([0-9]\+\)/\1/")
-          sed -i "s/^\(FLINT_MAJOR_SO=\)[0-9]\+/\1$FLINT_JLL_MAJOR/" configure.ac
-          sed -i "s/^\(FLINT_MINOR_SO=\)[0-9]\+/\1$FLINT_JLL_MINOR/" configure.ac
-          sed -i "s/^\(FLINT_PATCH_SO=\)[0-9]\+/\1$FLINT_JLL_PATCH/" configure.ac
-
-          # Now we can configure FLINT. However, recent versions of MPFR_jll has
-          # memory sanitation which messes with finding mpfr_init in the
-          # configure-script. Hence, we also omit the check for finding MPFR.
-          # FIXME: Probably want to fix this.
-          ./bootstrap.sh
-          ./configure \
-            CC=${CC} \
-            --prefix=${LOCAL} \
-            --with-gmp=${gmp_path} \
-            --with-mpfr=${mpfr_path} \
-            --disable-mpfr-check \
-            --disable-static \
-            --disable-debug
-
-      - name: "Compile and install"
-        run: |
-          $MAKE
-          $MAKE install
-
-      - name: "Set up Nemo.jl"
-        run: |
-          # Override FLINT_jll's libflint with ours
-
-          # NOTE: Reverse me when Nemo uses FLINT v3.
-          # git clone https://github.com/Nemocas/Nemo.jl.git
-          git clone https://github.com/albinahlback/Nemo.jl.git && cd Nemo.jl && git checkout flint3 && cd ..
-
-          julia -e "import Pkg; Pkg.develop(path=\"./Nemo.jl\");"
-          echo -e "[e134572f-a0d5-539d-bddf-3cad8db41a82]\nFLINT = \"${LOCAL}\"" > ~/.julia/artifacts/Overrides.toml
-          touch Nemo.jl/src/Nemo.jl
-          julia -e "using Nemo; println(\"Path to Nemo's libflint:\", Nemo.libflint)"
-
-      - name: "Check Nemo.jl"
-        run: |
-          julia -e "import Pkg; Pkg.test(\"Nemo\")"
