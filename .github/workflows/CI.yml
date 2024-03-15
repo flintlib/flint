@@ -407,13 +407,14 @@ jobs:
       - name: "Build"
         run: |
           cd build
-          cmake --build . --parallel
+          # NOTE: Number of threads for Github's CI runners are 4.
+          cmake --build . -j5
 
       - name: "Check"
         run: |
           cd build
           set "FLINT_TEST_MULTIPLIER=1"
-          ctest --parallel --output-on-failure --timeout 450
+          ctest -j5 --output-on-failure --timeout 450
 
 
 
