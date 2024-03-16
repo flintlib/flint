@@ -99,8 +99,8 @@ L(m2):	tst	n, #2
 
 	ldp	r0, r1, [ap], #2*8
 L(pre):	ldp	r2, r3, [ap], #2*8
-	stp	r11, r12, [sp,#-3*8]
-	str	r13, [sp,#-1*8]
+	stp	r11, r12, [sp, #-4*8]!
+	str	r13, [sp, #2*8]
 	b	L(ent)
 
 	ALIGN(16)
@@ -163,8 +163,8 @@ L(ent):	sub	n, n, #1
 	stp	r4, r5, [rp], #2*8
 	stp	r7, r10, [rp], #2*8
 
-	ldp	r11, r12, [sp,#-3*8]
-	ldr	r13, [sp,#-1*8]
+	ldr	r13, [sp, #2*8]
+	ldp	r11, r12, [sp], #4*8
 
 L(end):	stp	cy0, cy1, [rp]
 	mov	x0, cy1

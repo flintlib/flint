@@ -238,7 +238,7 @@ L(m4):	mul	r5, r0, r4	C a0 b0
 
 	cbz	n, L(f4)
 
-	stp	r14, r15, [sp,#-2*8]
+	stp	r14, r15, [sp, #-2*8]!
 L(a4):	ldr	r4, [bp], #1*8
 	mul	r5, r0, r4	C a0 b0
 	umulh	r7, r0, r4
@@ -267,7 +267,7 @@ L(a4):	ldr	r4, [bp], #1*8
 	str	r5, [rp], #1*8
 
 	cbnz	n, L(a4)
-	ldp	r14, r15, [sp,#-2*8]
+	ldp	r14, r15, [sp], #2*8
 
 L(f4):	stp	r6, r8, [rp]
 	stp	r10, r12, [rp,#2*8]
@@ -304,8 +304,8 @@ L(m5):	mul	r6, r0, r5	C a0 b0
 
 	cbz	n, L(f5)
 
-	stp	r14, r15, [sp,#-4*8]
-	stp	r16, r17, [sp,#-2*8]
+	stp	r14, r15, [sp, #-4*8]!
+	stp	r16, r17, [sp, #2*8]
 L(a5):	ldr	r5, [bp], #1*8
 	mul	r6, r0, r5	C a0 b0
 	umulh	r11, r0, r5
@@ -336,8 +336,8 @@ L(a5):	ldr	r5, [bp], #1*8
 	str	r6, [rp], #1*8
 
 	cbnz	n, L(a5)
-	ldp	r14, r15, [sp,#-4*8]
-	ldp	r16, r17, [sp,#-2*8]
+	ldp	r16, r17, [sp, #2*8]
+	ldp	r14, r15, [sp], #4*8
 
 L(f5):	stp	r7, r8, [rp]
 	stp	r10, r12, [rp,#2*8]
@@ -376,9 +376,9 @@ L(m6):	mul	r7, r0, r6	C a0 b0
 
 	cbz	n, L(f6)
 
-	stp	r14, r15, [sp,#-6*8]
-	stp	r16, r17, [sp,#-4*8]
-	stp	r18, r19, [sp,#-2*8]
+	stp	r14, r15, [sp, #-6*8]!
+	stp	r16, r17, [sp, #2*8]
+	stp	r18, r19, [sp, #4*8]
 L(a6):	ldr	r6, [bp], #1*8
 	mul	r12, r0, r6	C a0 b0
 	umulh	r14, r0, r6
@@ -414,9 +414,9 @@ L(a6):	ldr	r6, [bp], #1*8
 	str	r12, [rp], #1*8
 
 	cbnz	n, L(a6)
-	ldp	r14, r15, [sp,#-6*8]
-	ldp	r16, r17, [sp,#-4*8]
-	ldp	r18, r19, [sp,#-2*8]
+	ldp	r16, r17, [sp, #2*8]
+	ldp	r18, r19, [sp, #4*8]
+	ldp	r14, r15, [sp], #6*8
 
 L(f6):	stp	r8, r9, [rp]
 	stp	r11, r13, [rp,#2*8]
@@ -432,7 +432,7 @@ PROLOGUE(flint_mpn_mul_7n)
 	ldp	r4, r5, [ap,#4*8]
 	ldr	r6, [ap,#6*8]
 
-	stp	r14, r15, [sp,#-2*8]
+	stp	r14, r15, [sp, #-2*8]!
 
 L(m7):	mul	r8, r0, r7	C a0 b0
 	umulh	r9, r0, r7
@@ -461,9 +461,9 @@ L(m7):	mul	r8, r0, r7	C a0 b0
 
 	cbz	n, L(f7)
 
-	stp	r16, r17, [sp,#-8*8]
-	stp	r18, r19, [sp,#-6*8]
-	stp	r20, r21, [sp,#-4*8]
+	stp	r16, r17, [sp, #-6*8]!
+	stp	r18, r19, [sp, #2*8]
+	stp	r20, r21, [sp, #4*8]
 L(a7):	ldr	r7, [bp], #1*8
 	mul	r11, r0, r7	C a0 b0
 	umulh	ap, r0, r7
@@ -503,15 +503,15 @@ L(a7):	ldr	r7, [bp], #1*8
 	str	r11, [rp], #1*8
 
 	cbnz	n, L(a7)
-	ldp	r16, r17, [sp,#-8*8]
-	ldp	r18, r19, [sp,#-6*8]
-	ldp	r20, r21, [sp,#-4*8]
+	ldp	r18, r19, [sp, #2*8]
+	ldp	r20, r21, [sp, #4*8]
+	ldp	r16, r17, [sp], #6*8
 
 L(f7):	stp	r9, r14, [rp]
 	stp	r15, r12, [rp,#2*8]
 	stp	r8, r10, [rp,#4*8]
 	str	r13, [rp,#6*8]
-	ldp	r14, r15, [sp,#-2*8]
+	ldp	r14, r15, [sp], #2*8
 	mov	res, r13
 	ret
 EPILOGUE()
@@ -523,8 +523,8 @@ PROLOGUE(flint_mpn_mul_8n)
 	ldp	r4, r5, [ap,#4*8]
 	ldp	r6, r7, [ap,#6*8]
 
-	stp	r14, r15, [sp,#-4*8]
-	stp	r16, r17, [sp,#-2*8]
+	stp	r14, r15, [sp, #-4*8]!
+	stp	r16, r17, [sp, #2*8]
 
 L(m8):	mul	r9, r0, r8	C a0 b0
 	umulh	r10, r0, r8
@@ -556,10 +556,10 @@ L(m8):	mul	r9, r0, r8	C a0 b0
 
 	cbz	n, L(f8)
 
-	stp	r18, r19, [sp,#-10*8]
-	stp	r20, r21, [sp,#-8*8]
-	stp	r22, r23, [sp,#-6*8]
-	str	r24, [sp,#-11*8]
+	stp	r18, r19, [sp, #-8*8]!
+	stp	r20, r21, [sp, #2*8]
+	stp	r22, r23, [sp, #4*8]
+	str	r24, [sp, #6*8]
 L(a8):	ldr	r8, [bp], #1*8
 	mul	r13, r0, r8	C a0 b0
 	umulh	ap, r0, r8
@@ -604,16 +604,16 @@ L(a8):	ldr	r8, [bp], #1*8
 
 	cbnz	n, L(a8)
 
-	ldp	r18, r19, [sp,#-10*8]
-	ldp	r20, r21, [sp,#-8*8]
-	ldp	r22, r23, [sp,#-6*8]
-	ldr	r24, [sp,#-11*8]
+	ldp	r20, r21, [sp, #2*8]
+	ldp	r22, r23, [sp, #4*8]
+	ldr	r24, [sp, #6*8]
+	ldp	r18, r19, [sp], #8*8
 L(f8):	stp	r10, r14, [rp]
 	stp	r15, r16, [rp,#2*8]
 	stp	r17, r11, [rp,#4*8]
 	stp	r12, r9, [rp,#6*8]
-	ldp	r14, r15, [sp,#-4*8]
-	ldp	r16, r17, [sp,#-2*8]
+	ldp	r16, r17, [sp, #2*8]
+	ldp	r14, r15, [sp], #4*8
 	mov	res, r9
 	ret
 EPILOGUE()
@@ -664,10 +664,10 @@ L(m9):	mul	r5, r0, r4	C a0 b0
 
 	cbz	n, L(f9)
 
-	stp	r14, r15, [sp,#-8*8]
-	stp	r16, r17, [sp,#-6*8]
-	stp	r18, r19, [sp,#-4*8]
-	stp	r20, r21, [sp,#-2*8]
+	stp	r14, r15, [sp, #-8*8]!
+	stp	r16, r17, [sp, #2*8]
+	stp	r18, r19, [sp, #4*8]
+	stp	r20, r21, [sp, #6*8]
 	ldp	r0, r1, [ap]
 L(a9):	ldr	r4, [bp], #1*8
 	ldp	r2, r3, [ap,#2*8]
@@ -729,10 +729,10 @@ L(a9):	ldr	r4, [bp], #1*8
 	str	r14, [rp], #1*8
 
 	cbnz	n, L(a9)
-	ldp	r14, r15, [sp,#-8*8]
-	ldp	r16, r17, [sp,#-6*8]
-	ldp	r18, r19, [sp,#-4*8]
-	ldp	r20, r21, [sp,#-2*8]
+	ldp	r16, r17, [sp, #2*8]
+	ldp	r18, r19, [sp, #4*8]
+	ldp	r20, r21, [sp, #6*8]
+	ldp	r14, r15, [sp], #8*8
 
 L(f9):	stp	r6, r8, [rp]
 	stp	r10, r12, [rp,#2*8]
@@ -793,11 +793,11 @@ L(m10):	mul	r7, r0, r6	C a0 b0
 
 	cbz	n, L(f10)
 
-	stp	r14, r15, [sp,#-10*8]
-	stp	r16, r17, [sp,#-8*8]
-	stp	r18, r19, [sp,#-6*8]
-	stp	r20, r21, [sp,#-4*8]
-	stp	r22, r23, [sp,#-2*8]
+	stp	r14, r15, [sp, #-10*8]!
+	stp	r16, r17, [sp, #2*8]
+	stp	r18, r19, [sp, #4*8]
+	stp	r20, r21, [sp, #6*8]
+	stp	r22, r23, [sp, #8*8]
 L(a10):	ldp	r0, r1, [ap]
 	ldr	r14, [bp], #1*8
 	ldp	r2, r6, [ap,#2*8]
@@ -862,11 +862,11 @@ L(a10):	ldp	r0, r1, [ap]
 
 	cbnz	n, L(a10)
 
-	ldp	r14, r15, [sp,#-10*8]
-	ldp	r16, r17, [sp,#-8*8]
-	ldp	r18, r19, [sp,#-6*8]
-	ldp	r20, r21, [sp,#-4*8]
-	ldp	r22, r23, [sp,#-2*8]
+	ldp	r16, r17, [sp, #2*8]
+	ldp	r18, r19, [sp, #4*8]
+	ldp	r20, r21, [sp, #6*8]
+	ldp	r22, r23, [sp, #8*8]
+	ldp	r14, r15, [sp], #10*8
 
 L(f10):	stp	r8, r9, [rp]
 	stp	r10, r11, [rp,#2*8]
@@ -883,7 +883,7 @@ PROLOGUE(flint_mpn_mul_11n)
 	ldp	r2, r3, [ap,#2*8]
 	ldp	r4, r5, [ap,#4*8]
 
-	stp	r14, r15, [sp,#-2*8]
+	stp	r14, r15, [sp, #-2*8]!
 L(m11):	mul	r7, r0, r6	C a0 b0
 	umulh	r0, r0, r6
 	mul	r8, r1, r6	C a1 b0
@@ -932,11 +932,11 @@ L(m11):	mul	r7, r0, r6	C a0 b0
 
 	cbz	n, L(f11)
 
-	stp	r16, r17, [sp,#-10*8]
-	stp	r18, r19, [sp,#-8*8]
-	stp	r20, r21, [sp,#-6*8]
-	stp	r22, r23, [sp,#-4*8]
-	str	r24, [sp,#-11*8]
+	stp	r16, r17, [sp, #-10*8]!
+	stp	r18, r19, [sp, #2*8]
+	stp	r20, r21, [sp, #4*8]
+	stp	r22, r23, [sp, #6*8]
+	str	r24, [sp, #8*8]
 L(a11):	ldp	r0, r1, [ap]
 	ldr	r16, [bp], #1*8
 	ldp	r2, r3, [ap,#2*8]
@@ -1008,11 +1008,11 @@ L(a11):	ldp	r0, r1, [ap]
 
 	cbnz	n, L(a11)
 
-	ldp	r16, r17, [sp,#-10*8]
-	ldp	r18, r19, [sp,#-8*8]
-	ldp	r20, r21, [sp,#-6*8]
-	ldp	r22, r23, [sp,#-4*8]
-	ldr	r24, [sp,#-11*8]
+	ldp	r18, r19, [sp, #2*8]
+	ldp	r20, r21, [sp, #4*8]
+	ldp	r22, r23, [sp, #6*8]
+	ldr	r24, [sp, #8*8]
+	ldp	r16, r17, [sp], #10*8
 
 L(f11):	stp	r8, r9, [rp]
 	stp	r10, r11, [rp,#2*8]
@@ -1020,7 +1020,7 @@ L(f11):	stp	r8, r9, [rp]
 	stp	r14, r15, [rp,#6*8]
 	stp	r7, r5, [rp,#8*8]
 	str	r4, [rp,#10*8]
-	ldp	r14, r15, [sp,#-2*8]
+	ldp	r14, r15, [sp], #2*8
 	mov	res, r4
 	ret
 EPILOGUE()
@@ -1032,8 +1032,8 @@ PROLOGUE(flint_mpn_mul_12n)
 	ldp	r4, r5, [ap,#4*8]
 	ldp	r6, r7, [ap,#6*8]
 
-	stp	r14, r15, [sp,#-4*8]
-	stp	r16, r17, [sp,#-2*8]
+	stp	r14, r15, [sp, #-4*8]!
+	stp	r16, r17, [sp, #2*8]
 L(m12):	mul	r9, r0, r8	C a0 b0
 	umulh	r0, r0, r8
 	mul	r10, r1, r8	C a1 b0
@@ -1082,17 +1082,17 @@ L(m12):	mul	r9, r0, r8	C a0 b0
 
 	cbz	n, L(f12)
 
-	stp	r18, r19, [sp,#-10*8]
-	stp	r20, r21, [sp,#-8*8]
-	stp	r22, r23, [sp,#-6*8]
-	str	r24, [sp,#-11*8]
+	stp	r18, r19, [sp, #-12*8]!
+	stp	r20, r21, [sp, #2*8]
+	stp	r22, r23, [sp, #4*8]
+	str	r24, [sp, #6*8]
 L(a12):	ldp	r0, r1, [ap]
 	ldr	r18, [bp], #1*8
 	ldp	r2, r6, [ap,#2*8]
 	ldp	r7, r8, [ap,#4*8]
 
-	stp	r9, r4, [sp,#-15*8]
-	stp	r5, r3, [sp,#-13*8]
+	stp	r9, r4, [sp, #8*8]
+	stp	r5, r3, [sp, #10*8]
 
 	mul	r19, r0, r18	C a0 b0
 	umulh	r0, r0, r18
@@ -1141,8 +1141,8 @@ L(a12):	ldp	r0, r1, [ap]
 	cinc	r0, r0, cs
 	C 19, 20, 21, 22, 23, 24, 9, 4, 5, 3, 1, 2, 0
 
-	ldp	r6, r7, [sp,#-15*8]
-	ldp	r8, r18, [sp,#-13*8]
+	ldp	r6, r7, [sp, #8*8]
+	ldp	r8, r18, [sp, #10*8]
 
 	C 19, (10, 11, 12, 13, 14, 15, 16, 17, 9, 4, 5,  3)
 	C  <- (10, 11, 12, 13, 14, 15, 16, 17, 6, 7, 8, 18)
@@ -1165,10 +1165,10 @@ L(a12):	ldp	r0, r1, [ap]
 
 	cbnz	n, L(a12)
 
-	ldp	r18, r19, [sp,#-10*8]
-	ldp	r20, r21, [sp,#-8*8]
-	ldp	r22, r23, [sp,#-6*8]
-	ldr	r24, [sp,#-11*8]
+	ldp	r20, r21, [sp, #2*8]
+	ldp	r22, r23, [sp, #4*8]
+	ldr	r24, [sp, #6*8]
+	ldp	r18, r19, [sp], #12*8
 
 L(f12):	stp	r10, r11, [rp]
 	stp	r12, r13, [rp,#2*8]
@@ -1176,8 +1176,8 @@ L(f12):	stp	r10, r11, [rp]
 	stp	r16, r17, [rp,#6*8]
 	stp	r9, r4, [rp,#8*8]
 	stp	r5, r3, [rp,#10*8]
-	ldp	r14, r15, [sp,#-4*8]
-	ldp	r16, r17, [sp,#-2*8]
+	ldp	r16, r17, [sp, #2*8]
+	ldp	r14, r15, [sp], #4*8
 	mov	res, r3
 	ret
 EPILOGUE()
@@ -1189,8 +1189,8 @@ PROLOGUE(flint_mpn_mul_13n)
 	ldp	r4, r5, [ap,#4*8]
 	ldp	r6, r7, [ap,#6*8]
 
-	stp	r14, r15, [sp,#-4*8]
-	stp	r16, r17, [sp,#-2*8]
+	stp	r14, r15, [sp, #-4*8]!
+	stp	r16, r17, [sp, #2*8]
 L(m13):	mul	r9, r0, r8	C a0 b0
 	umulh	r0, r0, r8
 	mul	r10, r1, r8	C a1 b0
@@ -1245,19 +1245,19 @@ L(m13):	mul	r9, r0, r8	C a0 b0
 
 	cbz	n, L(f13)
 
-	stp	r18, r19, [sp,#-10*8]
-	stp	r20, r21, [sp,#-8*8]
-	stp	r22, r23, [sp,#-6*8]
-	str	r24, [sp,#-11*8]
+	stp	r18, r19, [sp, #-14*8]!
+	stp	r20, r21, [sp, #2*8]
+	stp	r22, r23, [sp, #4*8]
+	str	r24, [sp, #6*8]
 L(a13):	ldp	r0, r1, [ap]
 	ldr	r8, [bp], #1*8
 	ldp	r2, r3, [ap,#2*8]
 	ldp	r18, r19, [ap,#4*8]
 	ldp	r20, r21, [ap,#6*8]
 
-	stp	r17, r9, [sp,#-17*8]
-	stp	r5, r6, [sp,#-15*8]
-	stp	r7, r4, [sp,#-13*8]
+	stp	r17, r9, [sp, #8*8]
+	stp	r5, r6, [sp, #10*8]
+	stp	r7, r4, [sp, #12*8]
 
 	mul	r22, r0, r8	C a0 b0
 	umulh	r0, r0, r8
@@ -1309,8 +1309,8 @@ L(a13):	ldp	r0, r1, [ap]
 	cinc	r18, r18, cs
 	C 22, 23, 24, 17, 9, 5, 6, 7, 4, 19, 20, 21, 0, 18
 
-	ldp	r1, r2, [sp,#-17*8]
-	ldp	r3, r8, [sp,#-15*8]
+	ldp	r1, r2, [sp, #8*8]
+	ldp	r3, r8, [sp, #10*8]
 
 	C 22, (10, 11, 12, 13, 14, 15, 16, 17, 9,  5,  6,  7, 4)
 	C  <- (10, 11, 12, 13, 14, 15, 16,  1, 2,  3,  8,  X, X)
@@ -1318,7 +1318,7 @@ L(a13):	ldp	r0, r1, [ap]
 	adds	r22, r10, r22
 	adcs	r10, r11, r23
 	adcs	r11, r12, r24
-	ldp	r23, r24, [sp,#-13*8]
+	ldp	r23, r24, [sp, #12*8]
 	adcs	r12, r13, r17
 	adcs	r13, r14, r9
 	adcs	r14, r15, r5
@@ -1335,10 +1335,10 @@ L(a13):	ldp	r0, r1, [ap]
 
 	cbnz	n, L(a13)
 
-	ldp	r18, r19, [sp,#-10*8]
-	ldp	r20, r21, [sp,#-8*8]
-	ldp	r22, r23, [sp,#-6*8]
-	ldr	r24, [sp,#-11*8]
+	ldp	r20, r21, [sp, #2*8]
+	ldp	r22, r23, [sp, #4*8]
+	ldr	r24, [sp, #6*8]
+	ldp	r18, r19, [sp], #14*8
 
 L(f13):	stp	r10, r11, [rp]
 	stp	r12, r13, [rp,#2*8]
@@ -1347,8 +1347,8 @@ L(f13):	stp	r10, r11, [rp]
 	stp	r9, r5, [rp,#8*8]
 	stp	r6, r7, [rp,#10*8]
 	str	r4, [rp,#12*8]
-	ldp	r14, r15, [sp,#-4*8]
-	ldp	r16, r17, [sp,#-2*8]
+	ldp	r16, r17, [sp, #2*8]
+	ldp	r14, r15, [sp], #4*8
 	mov	res, r4
 	ret
 EPILOGUE()
@@ -1360,9 +1360,9 @@ PROLOGUE(flint_mpn_mul_14n)
 	ldp	r4, r5, [ap,#4*8]
 	ldp	r6, r7, [ap,#6*8]
 
-	stp	r14, r15, [sp,#-6*8]
-	stp	r16, r17, [sp,#-4*8]
-	stp	r18, r19, [sp,#-2*8]
+	stp	r14, r15, [sp, #-6*8]!
+	stp	r16, r17, [sp, #2*8]
+	stp	r18, r19, [sp, #4*8]
 L(m14):	mul	r9, r0, r8	C a0 b0
 	umulh	r0, r0, r8
 	mul	r10, r1, r8	C a1 b0
@@ -1420,19 +1420,19 @@ L(m14):	mul	r9, r0, r8	C a0 b0
 
 	cbz	n, L(f14)
 
-	stp	r20, r21, [sp,#-10*8]
-	stp	r22, r23, [sp,#-8*8]
-	str	r24, [sp,#-11*8]
+	stp	r20, r21, [sp, #-14*8]!
+	stp	r22, r23, [sp, #2*8]
+	str	r24, [sp, #4*8]
 L(a14):	ldp	r0, r1, [ap]
 	ldr	r8, [bp], #1*8
 	ldp	r2, r3, [ap,#2*8]
 	ldp	r4, r20, [ap,#4*8]
 	ldp	r21, r22, [ap,#6*8]
 
-	stp	r16, r17, [sp,#-19*8]
-	stp	r18, r19, [sp,#-17*8]
-	stp	r9, r6, [sp,#-15*8]
-	stp	r7, r5, [sp,#-13*8]
+	stp	r16, r17, [sp, #6*8]
+	stp	r18, r19, [sp, #8*8]
+	stp	r9, r6, [sp, #10*8]
+	stp	r7, r5, [sp, #12*8]
 
 	mul	r23, r0, r8	C a0 b0
 	umulh	r0, r0, r8
@@ -1488,8 +1488,8 @@ L(a14):	ldp	r0, r1, [ap]
 	C 23, 24, 16, 17, 18, 19, 9, 6, 7, 5, 4, 20, 21, 1, 0
 
 	C 2, 3, 8, 22
-	ldp	r2, r3, [sp,#-19*8]
-	ldp	r8, r22, [sp,#-17*8]
+	ldp	r2, r3, [sp, #6*8]
+	ldp	r8, r22, [sp, #8*8]
 
 	C 23, (10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 9,  6,  7, 5)
 	C  <- (10, 11, 12, 13, 14, 15,  2,  3,  8, 22, X,  X,  X, X)
@@ -1501,11 +1501,11 @@ L(a14):	ldp	r0, r1, [ap]
 	adcs	r12, r13, r17
 	adcs	r13, r14, r18
 	adcs	r14, r15, r19
-	ldp	r23, r24, [sp,#-15*8]
+	ldp	r23, r24, [sp,#10*8]
 	adcs	r15, r2, r9
 	adcs	r16, r3, r6
 	adcs	r17, r8, r7
-	ldp	r6, r7, [sp,#-13*8]
+	ldp	r6, r7, [sp,#12*8]
 	adcs	r18, r22, r5
 	adcs	r19, r23, r4
 	adcs	r9, r24, r20
@@ -1515,9 +1515,9 @@ L(a14):	ldp	r0, r1, [ap]
 
 	cbnz	n, L(a14)
 
-	ldp	r20, r21, [sp,#-10*8]
-	ldp	r22, r23, [sp,#-8*8]
-	ldr	r24, [sp,#-11*8]
+	ldp	r22, r23, [sp, #2*8]
+	ldr	r24, [sp, #4*8]
+	ldp	r20, r21, [sp], #14*8
 
 L(f14):	stp	r10, r11, [rp]
 	stp	r12, r13, [rp,#2*8]
@@ -1526,9 +1526,9 @@ L(f14):	stp	r10, r11, [rp]
 	stp	r18, r19, [rp,#8*8]
 	stp	r9, r6, [rp,#10*8]
 	stp	r7, r5, [rp,#12*8]
-	ldp	r14, r15, [sp,#-6*8]
-	ldp	r16, r17, [sp,#-4*8]
-	ldp	r18, r19, [sp,#-2*8]
+	ldp	r16, r17, [sp, #2*8]
+	ldp	r18, r19, [sp, #4*8]
+	ldp	r14, r15, [sp], #6*8
 	mov	res, r5
 	ret
 EPILOGUE()
@@ -1540,9 +1540,9 @@ PROLOGUE(flint_mpn_mul_15n)
 	ldp	r4, r5, [ap,#4*8]
 	ldp	r6, r7, [ap,#6*8]
 
-	stp	r14, r15, [sp,#-6*8]
-	stp	r16, r17, [sp,#-4*8]
-	stp	r18, r19, [sp,#-2*8]
+	stp	r14, r15, [sp, #-6*8]!
+	stp	r16, r17, [sp, #2*8]
+	stp	r18, r19, [sp, #4*8]
 L(m15):	mul	r9, r0, r8	C a0 b0
 	umulh	r0, r0, r8
 	mul	r10, r1, r8	C a1 b0
@@ -1604,19 +1604,19 @@ L(m15):	mul	r9, r0, r8	C a0 b0
 
 	cbz	n, L(f15)
 
-	stp	r20, r21, [sp,#-10*8]
-	stp	r22, r23, [sp,#-8*8]
-	str	r24, [sp,#-11*8]
+	stp	r20, r21, [sp, #-14*8]!
+	stp	r22, r23, [sp, #2*8]
+	str	r24, [sp, #4*8]
 L(a15):	ldp	r2, r3, [ap]
 	ldr	r8, [bp], #1*8
 	ldp	r4, r5, [ap,#2*8]
 	ldp	r20, r21, [ap,#4*8]
 	ldp	r22, r23, [ap,#6*8]
 
-	stp	r17, r18, [sp,#-19*8]
-	stp	r19, r9, [sp,#-17*8]
-	stp	r7, r0, [sp,#-15*8]
-	stp	r1, r6, [sp,#-13*8]
+	stp	r17, r18, [sp, #6*8]
+	stp	r19, r9, [sp, #8*8]
+	stp	r7, r0, [sp, #10*8]
+	stp	r1, r6, [sp, #12*8]
 
 	mul	r17, r2, r8	C a0 b0
 	umulh	r2, r2, r8
@@ -1678,7 +1678,7 @@ L(a15):	ldp	r2, r3, [ap]
 	C 17, 18, 19, 9, 7, 0, 1, 6, 24, 20, 21, 22, 3, 4, 23, 5
 
 	C 2, 8
-	ldp	r2, r8, [sp,#-19*8]
+	ldp	r2, r8, [sp, #6*8]
 
 	C 17, (10, 11, 12, 13, 14, 15, 16, 17, 18, 19,  9,  7, 0, 1,  6)
 	C  <- (10, 11, 12, 13, 14, 15, 16,  X,  X,  X,  X,  X, X, X,  X)
@@ -1687,13 +1687,13 @@ L(a15):	ldp	r2, r3, [ap]
 	adcs	r10, r11, r18
 	adcs	r11, r12, r19
 	str	r17, [rp], #1*8
-	ldp	r18, r19, [sp,#-17*8]
+	ldp	r18, r19, [sp, #8*8]
 	adcs	r12, r13, r9
 	adcs	r13, r14, r7
-	ldp	r9, r7, [sp,#-15*8]
+	ldp	r9, r7, [sp, #10*8]
 	adcs	r14, r15, r0
 	adcs	r15, r16, r1
-	ldp	r0, r1, [sp,#-13*8]
+	ldp	r0, r1, [sp, #12*8]
 	adcs	r16, r2, r6	C X
 	adcs	r17, r8, r24	C X
 	adcs	r18, r18, r20	C X
@@ -1706,9 +1706,9 @@ L(a15):	ldp	r2, r3, [ap]
 
 	cbnz	n, L(a15)
 
-	ldp	r20, r21, [sp,#-10*8]
-	ldp	r22, r23, [sp,#-8*8]
-	ldr	r24, [sp,#-11*8]
+	ldp	r22, r23, [sp, #2*8]
+	ldr	r24, [sp, #4*8]
+	ldp	r20, r21, [sp], #14*8
 
 L(f15):	stp	r10, r11, [rp]
 	stp	r12, r13, [rp,#2*8]
@@ -1718,9 +1718,9 @@ L(f15):	stp	r10, r11, [rp]
 	stp	r9, r7, [rp,#10*8]
 	stp	r0, r1, [rp,#12*8]
 	str	r6, [rp,#14*8]
-	ldp	r14, r15, [sp,#-6*8]
-	ldp	r16, r17, [sp,#-4*8]
-	ldp	r18, r19, [sp,#-2*8]
+	ldp	r16, r17, [sp, #2*8]
+	ldp	r18, r19, [sp, #4*8]
+	ldp	r14, r15, [sp], #6*8
 	mov	res, r6
 	ret
 EPILOGUE()
