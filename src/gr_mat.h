@@ -211,6 +211,21 @@ WARN_UNUSED_RESULT int gr_mat_hilbert(gr_mat_t mat, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_hadamard(gr_mat_t mat, gr_ctx_t ctx);
 /* todo: dft, dct */
 
+#define _GR_MAT_INIT_SHALLOW_TRANSPOSE(B, A, sz) { \
+    B->r = A->c; \
+    B->c = A->r; \
+    B->rows = flint_malloc(A->c * sizeof(gr_ptr)); \
+    B->entries = TMP_ALLOC(sz * A->c * A->r); \
+    for (j = 0; j < A->c; j++) \
+    { \
+        B->rows[j] = GR_ENTRY(B->entries, j * A->r, sz); \
+        for (i = 0; i < A->r; i++) \
+        { \
+            set_shallow(GR_MAT_ENTRY(B, j, i, sz), GR_MAT_ENTRY(B, i, j, sz), ctx); \
+        }
+    } \
+}
+
 WARN_UNUSED_RESULT int gr_mat_transpose(gr_mat_t B, const gr_mat_t A, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_mat_nonsingular_solve_tril_classical(gr_mat_t X, const gr_mat_t L, const gr_mat_t B, int unit, gr_ctx_t ctx);
