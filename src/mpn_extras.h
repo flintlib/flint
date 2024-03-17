@@ -339,9 +339,9 @@ FLINT_DLL extern const flint_mpn_sqr_func_t flint_mpn_sqrhigh_func_tab[];
 FLINT_DLL extern const flint_mpn_mulhigh_normalised_func_t flint_mpn_mulhigh_normalised_func_tab[];
 
 #if FLINT_HAVE_ASSEMBLY_x86_64_adx
-# define FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH 12
+# define FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH 9
 # define FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH 8
-# define FLINT_MPN_MULHIGH_NORMALISED_FUNC_TAB_WIDTH 12
+# define FLINT_MPN_MULHIGH_NORMALISED_FUNC_TAB_WIDTH 9
 
 #define FLINT_MPN_MULHIGH_MULDERS_CUTOFF 50
 #define FLINT_MPN_MULHIGH_MUL_CUTOFF 2000
