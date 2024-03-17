@@ -12,7 +12,7 @@ gr_sparse_vec_slice(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong col_st
     for (i = 0; i < nnz; i++)
     {
         /* If we find a valid column, start the interval */
-        if (src->cols[i] >= col_start)
+        if (src->inds[i] >= col_start)
         {
             i_start = i;
             break;
@@ -21,7 +21,7 @@ gr_sparse_vec_slice(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong col_st
     for (; i <= nnz; i++)
     {
         /* Note we will always do this; the first time we see a column outside the interval, or we run off the end, stop it */
-        if (i == nnz || src->cols[i] >= col_end)
+        if (i == nnz || src->inds[i] >= col_end)
         {
             i_end = i;
             break;
@@ -33,7 +33,7 @@ gr_sparse_vec_slice(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong col_st
     gr_sparse_vec_fit_nnz(res, new_nnz, ctx);
     for (i = i_start; i < i_end; i++)
     {
-        res->cols[i-i_start] = res->cols[i] - col_start;
+        res->inds[i-i_start] = res->inds[i] - col_start;
         status |= gr_set(GR_ENTRY(res->entries, i-i_start, sz), GR_ENTRY(src->entries, i, sz), ctx);
     }
     res->nnz = new_nnz;

@@ -17,17 +17,17 @@ test_conversion(flint_rand_t state, gr_ctx_t ctx)
     gr_vec_t dvec, dvec2;
     gr_vec_init(dvec, N, ctx);
     gr_vec_init(dvec2, N, ctx);
-    status |= gr_sparse_vec_init(vec, N, ctx);
+    gr_sparse_vec_init(vec, N, ctx);
 
     for (i = 0; i < n_tests; i++)
     {
         status |= _gr_vec_randtest(GR_VEC_ENTRY(dvec, 0, sz), state, N, ctx);
-        status |= gr_sparse_vec_from_dense(vec, GR_VEC_ENTRY(dvec, 0, sz), N, ctx);
-        status |= gr_sparse_vec_to_dense(GR_VEC_ENTRY(dvec2, 0, sz), vec, ctx);
+        status |= gr_sparse_vec_set_vec(vec, GR_VEC_ENTRY(dvec, 0, sz), N, ctx);
+        status |= gr_vec_set_sparse_vec(GR_VEC_ENTRY(dvec2, 0, sz), vec, ctx);
         if (T_TRUE != _gr_vec_equal(GR_VEC_ENTRY(dvec, 0, sz), GR_VEC_ENTRY(dvec2, 0, sz), N, ctx))
             return GR_TEST_FAIL;
     }
-    status |= gr_sparse_vec_clear(vec, ctx);
+    gr_sparse_vec_clear(vec, ctx);
     gr_vec_clear(dvec, ctx);
     gr_vec_clear(dvec2, ctx);
     return status;

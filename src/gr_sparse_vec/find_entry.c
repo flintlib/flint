@@ -15,13 +15,12 @@ gr_sparse_vec_find_entry(gr_ptr res, gr_sparse_vec_t vec, slong col, gr_ctx_t ct
 {
     slong i;
     slong sz = ctx->sizeof_elem;
-    slong nnz = vec->nnz;
     ulong* bs = NULL;
     if (col < 0 || col >= vec->length)
         return GR_DOMAIN;
-    bs = bsearch(&col, vec->cols, vec->nnz, sizeof(slong), gr_sparse_vec_ulong_cmp);
+    bs = bsearch(&col, vec->inds, vec->nnz, sizeof(slong), gr_sparse_vec_ulong_cmp);
     if (bs == NULL)
         return gr_zero(res, ctx);
-    i = (bs - vec->cols);
+    i = (bs - vec->inds);
     return gr_set(res, GR_ENTRY(vec->entries, i, sz), ctx);
 }

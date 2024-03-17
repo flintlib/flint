@@ -11,7 +11,7 @@ gr_sparse_vec_write_nz(gr_stream_t out, const gr_sparse_vec_t vec, gr_ctx_t ctx)
     for (i = 0; i < nnz; i++)
     {
         gr_stream_write(out, "(");
-        gr_stream_write_si(out, vec->cols[i]);
+        gr_stream_write_si(out, vec->inds[i]);
         gr_stream_write(out, ": ");
         status |= gr_write(out, GR_ENTRY(vec->entries, i, sz), ctx);
         gr_stream_write(out, ")");

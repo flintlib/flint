@@ -1,7 +1,7 @@
 #include "gr_sparse_vec.h"
 
 int
-gr_sparse_vec_from_dense(gr_sparse_vec_t vec, gr_srcptr src, slong len, gr_ctx_t ctx)
+gr_sparse_vec_set_vec(gr_sparse_vec_t vec, gr_srcptr src, slong len, gr_ctx_t ctx)
 {
     slong nnz,i,sz,status;
     sz = ctx->sizeof_elem;
@@ -18,7 +18,7 @@ gr_sparse_vec_from_dense(gr_sparse_vec_t vec, gr_srcptr src, slong len, gr_ctx_t
     {
         if (T_FALSE == gr_is_zero(GR_ENTRY(src, i, sz), ctx))
         {
-            vec->cols[nnz] = i;
+            vec->inds[nnz] = i;
             status |= gr_set(GR_ENTRY(vec->entries, nnz, sz), GR_ENTRY(src, i, sz), ctx);
             nnz++;
         }

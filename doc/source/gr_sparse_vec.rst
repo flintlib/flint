@@ -34,11 +34,11 @@ Types and basic access
     ``gr_sparse_vec_struct``, permitting a ``gr_sparse_vec_t`` to
     be passed by reference.
 
-.. function:: int gr_sparse_vec_init(gr_sparse_vec_t vec, slong len, gr_ctx_t ctx)
+.. function:: void gr_sparse_vec_init(gr_sparse_vec_t vec, slong len, gr_ctx_t ctx)
 
     Initializes *vec* to a vector of length *len* with no nonzeros.
 
-.. function:: int gr_sparse_vec_clear(gr_sparse_vec_t vec, gr_ctx_t ctx)
+.. function:: void gr_sparse_vec_clear(gr_sparse_vec_t vec, gr_ctx_t ctx)
 
     Clears the vector *vec*
 
@@ -136,11 +136,11 @@ Getting, setting and conversion
     density is larger than ``1/sqrt(len)``, the true density of the returned vector
     is likely to be lower than *density*.
 
-.. function:: int gr_sparse_vec_from_dense(gr_sparse_vec_t vec, gr_srcptr src, slong len, gr_ctx_t ctx)
+.. function:: int gr_sparse_vec_set_vec(gr_sparse_vec_t vec, gr_srcptr src, slong len, gr_ctx_t ctx)
 
     Convert the dense vector *src* of length *len* to the sparse vector *vec*.
     
-.. function:: int gr_sparse_vec_to_dense(gr_ptr vec, gr_sparse_vec_t src, gr_ctx_t ctx)
+.. function:: int gr_vec_set_sparse_vec(gr_ptr vec, gr_sparse_vec_t src, gr_ctx_t ctx)
 
     Convert the sparse vector *src* into a dense vector *vec*, which must have
     sufficient space (i.e. ``vec->length``).
@@ -175,12 +175,12 @@ Output
 
 .. function:: int gr_sparse_vec_write_nz(gr_stream_t out, const gr_sparse_vec_t vec, gr_ctx_t ctx)
 
-    Write the nonzeros of *vec* to the stream *out*.  See ``gr_sparse_vec_to_dense``
+    Write the nonzeros of *vec* to the stream *out*.  See ``gr_vec_set_sparse_vec``
     if it is desired to print out the entire vector, zeros and all.
 
 .. function:: int gr_sparse_vec_print_nz(const gr_sparse_vec_t vec, gr_ctx_t ctx)
 
-    Print the nonzeros of *vec* to ``stdout``.  See ``gr_sparse_vec_to_dense``
+    Print the nonzeros of *vec* to ``stdout``.  See ``gr_vec_set_sparse_vec``
     if it is desired to print out the entire vector, zeros and all.
 
 

@@ -17,10 +17,10 @@ gr_sparse_vec_set_entry(gr_sparse_vec_t vec, slong col, gr_srcptr entry, gr_ctx_
     ulong* bs = NULL;
     if (col < 0 || col >= vec->length)
         return GR_DOMAIN;
-    bs = bsearch(&col, vec->cols, vec->nnz, sizeof(slong), gr_sparse_vec_ulong_cmp);
+    bs = bsearch(&col, vec->inds, vec->nnz, sizeof(slong), gr_sparse_vec_ulong_cmp);
     if (bs != NULL)
     {
-        i = (bs - vec->cols);
+        i = (bs - vec->inds);
         return gr_set(GR_ENTRY(vec->entries, i, sz), entry, ctx);
     }
     else
@@ -29,7 +29,7 @@ gr_sparse_vec_set_entry(gr_sparse_vec_t vec, slong col, gr_srcptr entry, gr_ctx_
         gr_sparse_vec_fit_nnz(vec, vec->nnz+1, ctx);
         for (i = 0; i < nnz; i++)
         {
-            if (vec->cols[i] < col)
+            if (vec->inds[i] < col)
                 break;
         }
         /* Now if i < nnz, then we should put the entry right *after* it */
@@ -39,14 +39,14 @@ gr_sparse_vec_set_entry(gr_sparse_vec_t vec, slong col, gr_srcptr entry, gr_ctx_
         if (i < nnz)
         {
             /* If necessary, move everything up to make space */
-            memmove(vec->cols + i + 1, vec->cols + i, (vec->nnz - i)*sizeof(slong));
+            memmove(vec->inds + i + 1, vec->inds + i, (vec->nnz - i)*sizeof(slong));
             for (j = vec->nnz; j > i; j--)
             {
                 gr_swap(GR_ENTRY(vec->entries, j-1, sz), GR_ENTRY(vec->entries, j, sz), ctx);
             }
         }
         /* Now there's an available spot in index i */
-        vec->cols[i] = col;
+        vec->inds[i] = col;
         vec->nnz++;
         return gr_set(GR_ENTRY(vec->entries, i, sz), entry, ctx);
     }

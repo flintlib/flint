@@ -38,22 +38,20 @@ gr_sparse_vec_struct;
 
 typedef gr_sparse_vec_struct gr_sparse_vec_t[1];
 
-GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int
+GR_SPARSE_VEC_INLINE void
 gr_sparse_vec_init(gr_sparse_vec_t vec, slong len, gr_ctx_t ctx)
 {
     memset(vec, 0, sizeof(gr_sparse_vec_t));
     vec->length = len;
-    return GR_SUCCESS;
 }
 
-GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int
+GR_SPARSE_VEC_INLINE void
 gr_sparse_vec_clear(gr_sparse_vec_t vec, gr_ctx_t ctx)
 {
     _gr_vec_clear(vec->entries, vec->alloc, ctx);
     flint_free(vec->cols);
     flint_free(vec->entries);
     memset(vec, 0, sizeof(gr_sparse_vec_t));
-    return GR_SUCCESS;
 }
 
 #define GR_SPARSE_VEC_COL(vec, i) (vec)->cols[i]
@@ -73,9 +71,18 @@ GR_SPARSE_VEC_INLINE slong gr_sparse_vec_nnz(const gr_sparse_vec_t vec) { return
 WARN_UNUSED_RESULT int gr_sparse_vec_set(gr_sparse_vec_t res, const gr_sparse_vec_t src, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_sparse_vec_set_from_entries(gr_sparse_vec_t vec, ulong * cols, gr_srcptr entries, slong nnz, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_sparse_vec_set_from_entries_sorted_deduped(gr_sparse_vec_t vec, ulong * sorted_deduped_cols, gr_srcptr entries, slong nnz, gr_ctx_t ctx);
+GR_SPARSE_VEC_INLINE void gr_sparse_vec_swap(gr_sparse_vec_t res, gr_sparse_vec_t src, gr_ctx_t ctx)
+{
+    FLINT_SWAP(slong, res->alloc, src->alloc);
+    FLINT_SWAP(gr_ptr, res->entries, src->entries);
+    FLINT_SWAP(slong *, res->cols, src->cols);
+    FLINT_SWAP(slong, res->length, src->length);
+    FLINT_SWAP(slong, res->nnz, src->nnz);
+    
+}
 GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_zero(gr_sparse_vec_t vec, gr_ctx_t ctx) { vec->nnz = 0; return GR_SUCCESS; }
-WARN_UNUSED_RESULT int gr_sparse_vec_from_dense(gr_sparse_vec_t vec, gr_srcptr src, slong len, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_sparse_vec_to_dense(gr_ptr vec, gr_sparse_vec_t src, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_sparse_vec_set_vec(gr_sparse_vec_t vec, gr_srcptr src, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_vec_set_sparse_vec(gr_ptr vec, gr_sparse_vec_t src, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_sparse_vec_slice(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong col_start, slong col_end, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_sparse_vec_permute_cols(gr_sparse_vec_t vec, const gr_sparse_vec_t src, slong * p, gr_ctx_t ctx);
 

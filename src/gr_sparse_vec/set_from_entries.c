@@ -18,7 +18,7 @@ static int gr_sparse_vec_slong_cmp(const void* a, const void* b)
 
 
 int
-gr_sparse_vec_set_from_entries(gr_sparse_vec_t vec, ulong * cols, gr_srcptr entries, slong nnz, gr_ctx_t ctx)
+gr_sparse_vec_set_from_entries(gr_sparse_vec_t vec, ulong * inds, gr_srcptr entries, slong nnz, gr_ctx_t ctx)
 {
     slong i,j,sz,new_nnz;
     int status;
@@ -26,7 +26,7 @@ gr_sparse_vec_set_from_entries(gr_sparse_vec_t vec, ulong * cols, gr_srcptr entr
     si = flint_malloc(nnz * sizeof(gr_sparse_vec_slong_sorter_t));
     for (i = 0; i < nnz; i++)
     {
-        si[i].col = cols[i];
+        si[i].col = inds[i];
         si[i].i = i;
     }
     qsort(si, nnz, sizeof(gr_sparse_vec_slong_sorter_t), gr_sparse_vec_slong_cmp);
@@ -61,12 +61,12 @@ gr_sparse_vec_set_from_entries(gr_sparse_vec_t vec, ulong * cols, gr_srcptr entr
                     return GR_UNABLE;  /* This is consistency check */
                 }
             }
-            vec->cols[j] = si[i].col;
+            vec->inds[j] = si[i].col;
             status |= gr_set(GR_ENTRY(vec->entries, j, sz), GR_ENTRY(entries, si[i].i, sz), ctx);
         }
         else
         {
-            if (vec->cols[j] != cols[si[i].i]) /* Consistency check that we're accumulating into the correct column */
+            if (vec->inds[j] != inds[si[i].i]) /* Consistency check that we're accumulating into the correct column */
                 status |= GR_UNABLE;
             status |= gr_add(GR_ENTRY(vec->entries, j, sz), GR_ENTRY(vec->entries, j, sz), GR_ENTRY(entries, si[i].i, sz), ctx);
         }
@@ -78,7 +78,7 @@ gr_sparse_vec_set_from_entries(gr_sparse_vec_t vec, ulong * cols, gr_srcptr entr
 }
 
 int
-gr_sparse_vec_set_from_entries_sorted_deduped(gr_sparse_vec_t vec, ulong * sorted_deduped_cols, gr_srcptr entries, slong nnz, gr_ctx_t ctx)
+gr_sparse_vec_set_from_entries_sorted_deduped(gr_sparse_vec_t vec, ulong * sorted_deduped_inds, gr_srcptr entries, slong nnz, gr_ctx_t ctx)
 {
     slong i,j,sz;
     int status;
@@ -90,7 +90,7 @@ gr_sparse_vec_set_from_entries_sorted_deduped(gr_sparse_vec_t vec, ulong * sorte
     {
         if (T_FALSE == gr_is_zero(GR_ENTRY(entries, i, sz), ctx))
         {
-            vec->cols[j] = sorted_deduped_cols[i];
+            vec->inds[j] = sorted_deduped_inds[i];
             status |= gr_set(GR_ENTRY(vec->entries, j, sz), GR_ENTRY(entries, i, sz), ctx);
             j++;
         }
