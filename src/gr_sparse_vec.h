@@ -30,7 +30,7 @@ typedef struct
 {
     slong alloc;
     gr_ptr entries;
-    ulong *cols;
+    ulong *inds;
     slong length;
     slong nnz;
 }
@@ -49,16 +49,16 @@ GR_SPARSE_VEC_INLINE void
 gr_sparse_vec_clear(gr_sparse_vec_t vec, gr_ctx_t ctx)
 {
     _gr_vec_clear(vec->entries, vec->alloc, ctx);
-    flint_free(vec->cols);
+    flint_free(vec->inds);
     flint_free(vec->entries);
     memset(vec, 0, sizeof(gr_sparse_vec_t));
 }
 
-#define GR_SPARSE_VEC_COL(vec, i) (vec)->cols[i]
+#define GR_SPARSE_VEC_COL(vec, i) (vec)->inds[i]
 #define GR_SPARSE_VEC_ENTRY(vec, i, sz) GR_ENTRY((vec)->entries, i, sz)
 
-GR_SPARSE_VEC_INLINE ulong * gr_sparse_vec_col_ptr(gr_sparse_vec_t vec, slong i, gr_ctx_t ctx) { return vec->cols + i; }
-GR_SPARSE_VEC_INLINE const ulong * gr_sparse_vec_col_srcptr(const gr_sparse_vec_t vec, slong i, gr_ctx_t ctx) { return vec->cols + i; }
+GR_SPARSE_VEC_INLINE ulong * gr_sparse_vec_col_ptr(gr_sparse_vec_t vec, slong i, gr_ctx_t ctx) { return vec->inds + i; }
+GR_SPARSE_VEC_INLINE const ulong * gr_sparse_vec_col_srcptr(const gr_sparse_vec_t vec, slong i, gr_ctx_t ctx) { return vec->inds + i; }
 GR_SPARSE_VEC_INLINE gr_ptr gr_sparse_vec_entry_ptr(gr_sparse_vec_t vec, slong i, gr_ctx_t ctx) { return GR_SPARSE_VEC_ENTRY(vec, i, ctx->sizeof_elem); }
 GR_SPARSE_VEC_INLINE gr_srcptr gr_sparse_vec_entry_srcptr(const gr_sparse_vec_t vec, slong i, gr_ctx_t ctx) { return GR_SPARSE_VEC_ENTRY(vec, i, ctx->sizeof_elem); }
 
@@ -69,13 +69,13 @@ void gr_sparse_vec_set_length(gr_sparse_vec_t vec, slong len, gr_ctx_t ctx);
 GR_SPARSE_VEC_INLINE slong gr_sparse_vec_nnz(const gr_sparse_vec_t vec) { return vec->nnz; }
 
 WARN_UNUSED_RESULT int gr_sparse_vec_set(gr_sparse_vec_t res, const gr_sparse_vec_t src, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_sparse_vec_set_from_entries(gr_sparse_vec_t vec, ulong * cols, gr_srcptr entries, slong nnz, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_sparse_vec_set_from_entries_sorted_deduped(gr_sparse_vec_t vec, ulong * sorted_deduped_cols, gr_srcptr entries, slong nnz, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_sparse_vec_set_from_entries(gr_sparse_vec_t vec, ulong * inds, gr_srcptr entries, slong nnz, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_sparse_vec_set_from_entries_sorted_deduped(gr_sparse_vec_t vec, ulong * sorted_deduped_inds, gr_srcptr entries, slong nnz, gr_ctx_t ctx);
 GR_SPARSE_VEC_INLINE void gr_sparse_vec_swap(gr_sparse_vec_t res, gr_sparse_vec_t src, gr_ctx_t ctx)
 {
     FLINT_SWAP(slong, res->alloc, src->alloc);
     FLINT_SWAP(gr_ptr, res->entries, src->entries);
-    FLINT_SWAP(slong *, res->cols, src->cols);
+    FLINT_SWAP(slong *, res->inds, src->inds);
     FLINT_SWAP(slong, res->length, src->length);
     FLINT_SWAP(slong, res->nnz, src->nnz);
     
@@ -84,7 +84,7 @@ GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_zero(gr_sparse_vec_t v
 WARN_UNUSED_RESULT int gr_sparse_vec_set_vec(gr_sparse_vec_t vec, gr_srcptr src, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_vec_set_sparse_vec(gr_ptr vec, gr_sparse_vec_t src, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_sparse_vec_slice(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong col_start, slong col_end, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_sparse_vec_permute_cols(gr_sparse_vec_t vec, const gr_sparse_vec_t src, slong * p, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_sparse_vec_permute_inds(gr_sparse_vec_t vec, const gr_sparse_vec_t src, slong * p, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_sparse_vec_find_entry(gr_ptr res, gr_sparse_vec_t vec, slong col, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_sparse_vec_set_entry(gr_sparse_vec_t vec, slong col, gr_srcptr entry, gr_ctx_t ctx);
@@ -99,15 +99,15 @@ WARN_UNUSED_RESULT int gr_sparse_vec_randtest(gr_sparse_vec_t vec, double densit
 
 
 
-slong _gr_sparse_vec_count_unique_cols(const ulong *cols0, slong nnz0, const ulong *cols1, slong nnz1);
+slong _gr_sparse_vec_count_unique_inds(const ulong *inds0, slong nnz0, const ulong *inds1, slong nnz1);
 
 
 
 #define GR_SPV_SWAP_INDS(VEC, I, J, SZ, CTX) \
 {                                            \
-    slong _temp = (VEC)->cols[I];            \
-    (VEC)->cols[I] = (VEC)->cols[J];         \
-    (VEC)->cols[J] = _temp;                  \
+    slong _temp = (VEC)->inds[I];            \
+    (VEC)->inds[I] = (VEC)->inds[J];         \
+    (VEC)->inds[J] = _temp;                  \
     gr_swap(GR_ENTRY((VEC)->entries, (I), (SZ)), GR_ENTRY((VEC)->entries, (J), (SZ)), (CTX)); \
 }
 
@@ -125,7 +125,7 @@ slong _gr_sparse_vec_count_unique_cols(const ulong *cols0, slong nnz0, const ulo
     sz = (CTX)->sizeof_elem;                                                                            \
     a_nnz = (A_VEC)->nnz;                                                                               \
     b_nnz = (B_VEC)->nnz;                                                                               \
-    new_nnz = _gr_sparse_vec_count_unique_cols((A_VEC)->cols, a_nnz, (B_VEC)->cols, b_nnz);             \
+    new_nnz = _gr_sparse_vec_count_unique_inds((A_VEC)->inds, a_nnz, (B_VEC)->inds, b_nnz);             \
     gr_sparse_vec_fit_nnz((DEST_VEC), new_nnz, (CTX));                                                  \
     /* We go backward through the destination, because it might be an in-place operation on a source */ \
     a_ind = a_nnz-1;                                                                                    \
@@ -133,24 +133,24 @@ slong _gr_sparse_vec_count_unique_cols(const ulong *cols0, slong nnz0, const ulo
     dest_ind = new_nnz-1;                                                                               \
     while (a_ind >= 0 && b_ind >= 0 && status == GR_SUCCESS)                                            \
     {                                                                                                   \
-        a_col = (A_VEC)->cols[a_ind];                                                                   \
-        b_col = (B_VEC)->cols[b_ind];                                                                   \
+        a_col = (A_VEC)->inds[a_ind];                                                                   \
+        b_col = (B_VEC)->inds[b_ind];                                                                   \
         if (a_col > b_col)                                                                              \
         {                                                                                               \
             status |= (FUNC_A);                                                                         \
-            (DEST_VEC)->cols[dest_ind] = a_col;                                                         \
+            (DEST_VEC)->inds[dest_ind] = a_col;                                                         \
             a_ind--;                                                                                    \
         }                                                                                               \
         else if (b_col > a_col)                                                                         \
         {                                                                                               \
             status |= (FUNC_B);                                                                         \
-            (DEST_VEC)->cols[dest_ind] = b_col;                                                         \
+            (DEST_VEC)->inds[dest_ind] = b_col;                                                         \
             b_ind--;                                                                                    \
         }                                                                                               \
         else                                                                                            \
         {                                                                                               \
             status |= (FUNC_AB);                                                                        \
-            (DEST_VEC)->cols[dest_ind] = a_col;                                                         \
+            (DEST_VEC)->inds[dest_ind] = a_col;                                                         \
             a_ind--;                                                                                    \
             b_ind--;                                                                                    \
         }                                                                                               \
@@ -222,17 +222,17 @@ GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_nz_product(gr_ptr res,
     }                                               \
     return status;
 
-GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_update_to_dense(gr_ptr dres, const gr_sparse_vec_t src, gr_ctx_t ctx) { GR_SPV_INTO_DENSE_TEMPLATE(gr_set(GR_ENTRY(dres, src->cols[i], sz), GR_ENTRY(src->entries, i, sz), ctx), src, ctx) }
-GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_add_to_dense(gr_ptr dres, gr_srcptr dvec1, const gr_sparse_vec_t svec2, gr_ctx_t ctx) { GR_SPV_INTO_DENSE_TEMPLATE(gr_add(GR_ENTRY(dres, svec2->cols[i], sz), GR_ENTRY(dvec1, svec2->cols[i], sz), GR_ENTRY(svec2->entries, i, sz), ctx), svec2, ctx) }
-GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_sub_to_dense(gr_ptr dres, gr_srcptr dvec1, const gr_sparse_vec_t svec2, gr_ctx_t ctx) { GR_SPV_INTO_DENSE_TEMPLATE(gr_sub(GR_ENTRY(dres, svec2->cols[i], sz), GR_ENTRY(dvec1, svec2->cols[i], sz), GR_ENTRY(svec2->entries, i, sz), ctx), svec2, ctx) }
-GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_nz_mul_to_dense(gr_ptr dres, gr_srcptr dvec1, const gr_sparse_vec_t svec2, gr_ctx_t ctx) { GR_SPV_INTO_DENSE_TEMPLATE(gr_mul(GR_ENTRY(dres, svec2->cols[i], sz), GR_ENTRY(dvec1, svec2->cols[i], sz), GR_ENTRY(svec2->entries, i, sz), ctx), svec2, ctx) }
-GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_nz_div_to_dense(gr_ptr dres, gr_srcptr dvec1, const gr_sparse_vec_t svec2, gr_ctx_t ctx) { GR_SPV_INTO_DENSE_TEMPLATE(gr_div(GR_ENTRY(dres, svec2->cols[i], sz), GR_ENTRY(dvec1, svec2->cols[i], sz), GR_ENTRY(svec2->entries, i, sz), ctx), svec2, ctx) }
-GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_addmul_scalar_to_dense(gr_ptr dres, const gr_sparse_vec_t svec, gr_srcptr c, gr_ctx_t ctx) { GR_SPV_INTO_DENSE_TEMPLATE(gr_addmul(GR_ENTRY(dres, svec->cols[i], sz), GR_ENTRY(svec->entries, i, sz), c, ctx), svec, ctx) }
-GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_submul_scalar_to_dense(gr_ptr dres, const gr_sparse_vec_t svec, gr_srcptr c, gr_ctx_t ctx) { GR_SPV_INTO_DENSE_TEMPLATE(gr_submul(GR_ENTRY(dres, svec->cols[i], sz), GR_ENTRY(svec->entries, i, sz), c, ctx), svec, ctx) }
-GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_addmul_scalar_si_to_dense(gr_ptr dres, const gr_sparse_vec_t svec, slong c, gr_ctx_t ctx) { GR_SPV_INTO_DENSE_TEMPLATE(gr_addmul_si(GR_ENTRY(dres, svec->cols[i], sz), GR_ENTRY(svec->entries, i, sz), c, ctx), svec, ctx) }
-GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_submul_scalar_si_to_dense(gr_ptr dres, const gr_sparse_vec_t svec, slong c, gr_ctx_t ctx) { GR_SPV_INTO_DENSE_TEMPLATE(gr_submul_si(GR_ENTRY(dres, svec->cols[i], sz), GR_ENTRY(svec->entries, i, sz), c, ctx), svec, ctx) }
-GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_addmul_scalar_fmpz_to_dense(gr_ptr dres, const gr_sparse_vec_t svec, const fmpz_t c, gr_ctx_t ctx) { GR_SPV_INTO_DENSE_TEMPLATE(gr_addmul_fmpz(GR_ENTRY(dres, svec->cols[i], sz), GR_ENTRY(svec->entries, i, sz), c, ctx), svec, ctx) }
-GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_submul_scalar_fmpz_to_dense(gr_ptr dres, const gr_sparse_vec_t svec, const fmpz_t c, gr_ctx_t ctx) { GR_SPV_INTO_DENSE_TEMPLATE(gr_submul_fmpz(GR_ENTRY(dres, svec->cols[i], sz), GR_ENTRY(svec->entries, i, sz), c, ctx), svec, ctx) }
+GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_update_to_dense(gr_ptr dres, const gr_sparse_vec_t src, gr_ctx_t ctx) { GR_SPV_INTO_DENSE_TEMPLATE(gr_set(GR_ENTRY(dres, src->inds[i], sz), GR_ENTRY(src->entries, i, sz), ctx), src, ctx) }
+GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_add_to_dense(gr_ptr dres, gr_srcptr dvec1, const gr_sparse_vec_t svec2, gr_ctx_t ctx) { GR_SPV_INTO_DENSE_TEMPLATE(gr_add(GR_ENTRY(dres, svec2->inds[i], sz), GR_ENTRY(dvec1, svec2->inds[i], sz), GR_ENTRY(svec2->entries, i, sz), ctx), svec2, ctx) }
+GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_sub_to_dense(gr_ptr dres, gr_srcptr dvec1, const gr_sparse_vec_t svec2, gr_ctx_t ctx) { GR_SPV_INTO_DENSE_TEMPLATE(gr_sub(GR_ENTRY(dres, svec2->inds[i], sz), GR_ENTRY(dvec1, svec2->inds[i], sz), GR_ENTRY(svec2->entries, i, sz), ctx), svec2, ctx) }
+GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_nz_mul_to_dense(gr_ptr dres, gr_srcptr dvec1, const gr_sparse_vec_t svec2, gr_ctx_t ctx) { GR_SPV_INTO_DENSE_TEMPLATE(gr_mul(GR_ENTRY(dres, svec2->inds[i], sz), GR_ENTRY(dvec1, svec2->inds[i], sz), GR_ENTRY(svec2->entries, i, sz), ctx), svec2, ctx) }
+GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_nz_div_to_dense(gr_ptr dres, gr_srcptr dvec1, const gr_sparse_vec_t svec2, gr_ctx_t ctx) { GR_SPV_INTO_DENSE_TEMPLATE(gr_div(GR_ENTRY(dres, svec2->inds[i], sz), GR_ENTRY(dvec1, svec2->inds[i], sz), GR_ENTRY(svec2->entries, i, sz), ctx), svec2, ctx) }
+GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_addmul_scalar_to_dense(gr_ptr dres, const gr_sparse_vec_t svec, gr_srcptr c, gr_ctx_t ctx) { GR_SPV_INTO_DENSE_TEMPLATE(gr_addmul(GR_ENTRY(dres, svec->inds[i], sz), GR_ENTRY(svec->entries, i, sz), c, ctx), svec, ctx) }
+GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_submul_scalar_to_dense(gr_ptr dres, const gr_sparse_vec_t svec, gr_srcptr c, gr_ctx_t ctx) { GR_SPV_INTO_DENSE_TEMPLATE(gr_submul(GR_ENTRY(dres, svec->inds[i], sz), GR_ENTRY(svec->entries, i, sz), c, ctx), svec, ctx) }
+GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_addmul_scalar_si_to_dense(gr_ptr dres, const gr_sparse_vec_t svec, slong c, gr_ctx_t ctx) { GR_SPV_INTO_DENSE_TEMPLATE(gr_addmul_si(GR_ENTRY(dres, svec->inds[i], sz), GR_ENTRY(svec->entries, i, sz), c, ctx), svec, ctx) }
+GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_submul_scalar_si_to_dense(gr_ptr dres, const gr_sparse_vec_t svec, slong c, gr_ctx_t ctx) { GR_SPV_INTO_DENSE_TEMPLATE(gr_submul_si(GR_ENTRY(dres, svec->inds[i], sz), GR_ENTRY(svec->entries, i, sz), c, ctx), svec, ctx) }
+GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_addmul_scalar_fmpz_to_dense(gr_ptr dres, const gr_sparse_vec_t svec, const fmpz_t c, gr_ctx_t ctx) { GR_SPV_INTO_DENSE_TEMPLATE(gr_addmul_fmpz(GR_ENTRY(dres, svec->inds[i], sz), GR_ENTRY(svec->entries, i, sz), c, ctx), svec, ctx) }
+GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_submul_scalar_fmpz_to_dense(gr_ptr dres, const gr_sparse_vec_t svec, const fmpz_t c, gr_ctx_t ctx) { GR_SPV_INTO_DENSE_TEMPLATE(gr_submul_fmpz(GR_ENTRY(dres, svec->inds[i], sz), GR_ENTRY(svec->entries, i, sz), c, ctx), svec, ctx) }
 
 /***** TODO: 
 
@@ -252,7 +252,7 @@ GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_dot(gr_ptr res, gr_src
     {                                                                  \
         gr_sparse_vec_fit_nnz(res, src->nnz, ctx);                     \
         res->nnz = src->nnz;                                           \
-        memcpy(res->cols, src->cols, src->nnz*sizeof(slong));          \
+        memcpy(res->inds, src->inds, src->nnz*sizeof(slong));          \
     }                                                                  \
     return dense_vec_op(res->entries, src->entries, src->nnz, c, ctx); \
 
