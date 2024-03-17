@@ -222,7 +222,7 @@ WARN_UNUSED_RESULT int gr_mat_hadamard(gr_mat_t mat, gr_ctx_t ctx);
         for (i = 0; i < A->r; i++) \
         { \
             set_shallow(GR_MAT_ENTRY(B, j, i, sz), GR_MAT_ENTRY(B, i, j, sz), ctx); \
-        }
+        } \
     } \
 }
 
