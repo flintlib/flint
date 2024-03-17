@@ -28,7 +28,7 @@ int gr_lil_mat_swap_rows(gr_lil_mat_t mat, slong * perm, slong r, slong s, gr_ct
 
     if (mat->rows[r]->nnz != 0 || mat->rows[s]->nnz != 0)
     {
-        FLINT_SWAP(gr_ptr, mat->rows[r], mat->rows[s]);
+        gr_sparse_vec_swap(mat->rows[r], mat->rows[s], ctx);
     }
 
     return GR_SUCCESS;

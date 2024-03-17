@@ -11,7 +11,6 @@ gr_sparse_vec_set(gr_sparse_vec_t res, const gr_sparse_vec_t src, gr_ctx_t ctx)
         memcpy(res->inds, src->inds, nnz*sizeof(slong));
         status = _gr_vec_set(res->entries, src->entries, nnz, ctx);
         res->nnz = nnz;
-        res->alloc = nnz;
         res->length = src->length;
     }
     return status;

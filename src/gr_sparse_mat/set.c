@@ -44,22 +44,20 @@ int gr_csr_mat_set_lil_mat(gr_csr_mat_t res, const gr_lil_mat_t mat, gr_ctx_t ct
 {
     ulong row;
     int success = GR_SUCCESS;
-    gr_sparse_vec_struct *mat_row;
+    gr_sparse_vec_t res_row;
 
     if (res->r != mat->r || res->c != mat->c)
         return GR_DOMAIN;
 
     gr_csr_mat_fit_nnz(res, mat->nnz, ctx);
 
-    res->nnz = 0;
+    res->rows[0] = 0;
     for(row = 0; row < mat->r; row++) {
-        mat_row = mat->rows[row];
-        res->rows[row] = res->nnz;
-        memcpy(res->cols + res->nnz, mat_row->cols, mat_row->nnz);
-        success |= _gr_vec_set(GR_ENTRY(res->entries, res->nnz, ctx->sizeof_elem), mat_row->entries, mat_row->nnz, ctx);
-        res->nnz += mat_row->nnz;
+        res->rows[row+1] = res->rows[row] + mat->rows[row]->nnz;
+        _gr_csr_mat_borrow_row(res_row, res, row, ctx);
+        success |= gr_sparse_vec_set(res_row, mat->rows[row], ctx);
     }
-    res->rows[res->r] = res->nnz;
+    res->nnz = mat->nnz;
 
     return success;
 }
@@ -68,18 +66,14 @@ int gr_lil_mat_set_csr_mat(gr_lil_mat_t res, const gr_csr_mat_t mat, gr_ctx_t ct
 {
     ulong row;
     int success = GR_SUCCESS;
-    gr_sparse_vec_t tmp_vec;
+    gr_sparse_vec_t mat_row;
     
     if (res->r != mat->r || res->c != mat->c)
         return GR_DOMAIN;
 
-    tmp_vec->alloc = 0; // All memory borrowed
-    tmp_vec->length = mat->c;
     for(row = 0; row < mat->r; row++) {
-        tmp_vec->cols = mat->cols + mat->rows[row];
-        tmp_vec->entries = GR_ENTRY(mat->entries, mat->rows[row], ctx->sizeof_elem);
-        tmp_vec->nnz = mat->rows[row+1] - mat->rows[row];
-        success |= gr_sparse_vec_set(res->rows[row], tmp_vec, ctx);
+        _gr_csr_mat_borrow_row(mat_row, mat, row, ctx);
+        success |= gr_sparse_vec_set(res->rows[row], mat_row, ctx);
     }
     res->nnz = mat->nnz;
 

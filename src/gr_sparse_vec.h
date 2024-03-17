@@ -75,7 +75,7 @@ GR_SPARSE_VEC_INLINE void gr_sparse_vec_swap(gr_sparse_vec_t res, gr_sparse_vec_
 {
     FLINT_SWAP(slong, res->alloc, src->alloc);
     FLINT_SWAP(gr_ptr, res->entries, src->entries);
-    FLINT_SWAP(slong *, res->inds, src->inds);
+    FLINT_SWAP(ulong *, res->inds, src->inds);
     FLINT_SWAP(slong, res->length, src->length);
     FLINT_SWAP(slong, res->nnz, src->nnz);
     

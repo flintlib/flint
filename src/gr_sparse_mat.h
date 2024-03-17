@@ -211,13 +211,14 @@ gr_lil_mat_clear(gr_lil_mat_t mat, gr_ctx_t ctx) {
 
 
 GR_SPARSE_MAT_INLINE void
-_gr_csr_mat_borrow_row(gr_sparse_vec_t res, gr_csr_mat_t mat, slong r, gr_ctx_t ctx) {
+_gr_csr_mat_borrow_row(gr_sparse_vec_t res, const gr_csr_mat_t mat, slong r, gr_ctx_t ctx) {
     ulong offset;
 
     offset = mat->rows[r];
-    res->alloc = 0;
     res->nnz = mat->rows[r+1] - offset;
-    res->cols = mat->cols + offset;
+    res->alloc = res->nnz;
+    res->inds = mat->cols + offset;
+    res->length = mat->c;
     res->entries = GR_ENTRY(mat->entries, offset, ctx->sizeof_elem);
 }
 
