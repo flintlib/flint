@@ -26,7 +26,7 @@ TEST_FUNCTION_START(flint_mpn_mulhigh_normalised, state)
         mp_limb_t xp[N_MAX];
         mp_limb_t yp[N_MAX];
         mp_size_t n;
-        struct mp_limb_pair_t res_norm;
+        mp_limb_pair_t res_norm;
         mp_limb_t retlimb, normalised;
 
         n = 1 + n_randint(state, N_MAX);

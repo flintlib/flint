@@ -348,8 +348,8 @@ flint_mpn_sqr(mp_ptr r, mp_srcptr x, mp_size_t n)
 #define FLINT_HAVE_SQRHIGH_FUNC(n) ((n) <= FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH)
 #define FLINT_HAVE_MULHIGH_NORMALISED_FUNC(n) ((n) <= FLINT_MPN_MULHIGH_NORMALISED_FUNC_TAB_WIDTH)
 
-struct mp_limb_pair_t { mp_limb_t m1; mp_limb_t m2; };
-typedef struct mp_limb_pair_t (* flint_mpn_mulhigh_normalised_func_t)(mp_ptr, mp_srcptr, mp_srcptr);
+typedef struct { mp_limb_t m1; mp_limb_t m2; } mp_limb_pair_t;
+typedef mp_limb_pair_t (* flint_mpn_mulhigh_normalised_func_t)(mp_ptr, mp_srcptr, mp_srcptr);
 
 FLINT_DLL extern const flint_mpn_mul_func_t flint_mpn_mulhigh_func_tab[];
 FLINT_DLL extern const flint_mpn_sqr_func_t flint_mpn_sqrhigh_func_tab[];
@@ -442,7 +442,7 @@ mp_limb_t flint_mpn_sqrhigh(mp_ptr rp, mp_srcptr xp, mp_size_t n)
 }
 
 MPN_EXTRAS_INLINE
-struct mp_limb_pair_t flint_mpn_mulhigh_normalised(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
+mp_limb_pair_t flint_mpn_mulhigh_normalised(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
 {
     FLINT_ASSERT(n >= 1);
 
@@ -450,7 +450,7 @@ struct mp_limb_pair_t flint_mpn_mulhigh_normalised(mp_ptr rp, mp_srcptr xp, mp_s
         return flint_mpn_mulhigh_normalised_func_tab[n](rp, xp, yp);
     else
     {
-        struct mp_limb_pair_t ret;
+        mp_limb_pair_t ret;
 
         FLINT_ASSERT(rp != xp && rp != yp);
 
