@@ -1144,8 +1144,7 @@ fi
 if test "$enable_avx2" = "yes";
 then
     AX_CHECK_COMPILE_FLAG([-mavx2],
-    [save_CFLAGS="-mavx2 $save_CFLAGS"
-     AC_DEFINE(FLINT_HAVE_AVX2,1,[Define if system has AVX2])],
+    [save_CFLAGS="-mavx2 $save_CFLAGS"],
     [AC_MSG_ERROR([$CC does not support the flag -mavx2 needed for AVX2 instructions])])
     AX_CHECK_COMPILE_FLAG([-mfma], [save_CFLAGS="-mfma $save_CFLAGS"])
 fi
@@ -1153,8 +1152,7 @@ fi
 if test "$enable_avx512" = "yes";
 then
     AX_CHECK_COMPILE_FLAG([-mavx512f],
-    [save_CFLAGS="-mavx512f $save_CFLAGS"
-     AC_DEFINE(FLINT_HAVE_AVX512,1,[Define if system has AVX512])],
+    [save_CFLAGS="-mavx512f $save_CFLAGS"],
     [AC_MSG_ERROR([$CC does not support the flag -mavx512f needed for AVX512 instructions])])
 fi
 

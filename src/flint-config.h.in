@@ -21,12 +21,6 @@
 /* Define if system has the ADX instruction set */
 #undef FLINT_HAVE_ADX
 
-/* Define if system has AVX2 */
-#undef FLINT_HAVE_AVX2
-
-/* Define if system has AVX512 */
-#undef FLINT_HAVE_AVX512
-
 /* Define to use the fft_small module */
 #undef FLINT_HAVE_FFT_SMALL
 
