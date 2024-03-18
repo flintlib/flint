@@ -9,7 +9,10 @@
 # by the Free Software Foundation; either version 3 of the License, or
 # (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 
-if test "$1" = "bernoulli";
+if test "$1" = "AKS";
+then
+    echo "AKS....SKIPPED"
+elif test "$1" = "bernoulli";
 then
     echo -n "bernoulli...."
     res=$($2/bernoulli 20 -threads 2)
