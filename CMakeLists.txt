@@ -418,7 +418,6 @@ endif()
 
 if(ENABLE_AVX2)
     target_compile_options(flint PUBLIC "${avx2_flag}")
-    target_compile_definitions(flint PUBLIC "FLINT_HAVE_AVX2")
     if(HAS_FLAG_MFMA)
         target_compile_options(flint PUBLIC "-mfma")
     endif()
@@ -426,7 +425,6 @@ endif()
 
 if(ENABLE_AVX512)
     target_compile_options(flint PUBLIC "${avx512_flag}")
-    target_compile_definitions(flint PUBLIC "FLINT_HAVE_AVX512")
 endif()
 
 # Versioning
