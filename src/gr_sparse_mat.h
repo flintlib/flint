@@ -253,7 +253,7 @@ WARN_UNUSED_RESULT int gr_sparse_mat_randrank(gr_csr_mat_t mat, flint_rand_t sta
 
 #define gr_sparse_mat_is_empty(mat, ctx) (((mat->r == 0) || (mat->c == 0)) ? T_TRUE : T_FALSE)
 #define gr_sparse_mat_is_square(mat, ctx) ((mat->r == mat->c) ? T_TRUE : T_FALSE)
-#define gr_sparse_mat_is_zero(mat, ctx) ((mat->nnz == 0) ? T_TRUE : T_FALSE);
+#define gr_sparse_mat_is_zero(mat, ctx) ((mat->nnz == 0) ? T_TRUE : T_FALSE)
 
 truth_t gr_csr_mat_is_one(const gr_csr_mat_t mat, gr_ctx_t ctx);
 truth_t gr_csr_mat_is_neg_one(const gr_csr_mat_t mat, gr_ctx_t ctx);
@@ -426,6 +426,7 @@ GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_lil_mat_sub(gr_lil_mat_t res, con
     }
     return status;    
 }
+*/
 
 WARN_UNUSED_RESULT int gr_csr_mat_mul_vec(gr_vec_t v, const gr_csr_mat_t A, const gr_vec_t u, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_lil_mat_mul_vec(gr_vec_t v, const gr_lil_mat_t A, const gr_vec_t u, gr_ctx_t ctx);
@@ -436,7 +437,7 @@ WARN_UNUSED_RESULT int gr_lil_mat_mul_mat_transpose(gr_mat_t Ct, const gr_lil_ma
 WARN_UNUSED_RESULT int gr_csr_mat_mul_mat(gr_mat_t C, const gr_csr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_lil_mat_mul_mat(gr_mat_t C, const gr_lil_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
 
-
+/*
 WARN_UNUSED_RESULT int gr_sparse_mat_lu(slong * rank, slong * P, gr_csr_mat_t LU, const gr_csr_mat_t A, int rank_check, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_sparse_mat_fflu(slong * res_rank, slong * P, gr_csr_mat_t LU, gr_ptr den, const gr_csr_mat_t A, int rank_check, gr_ctx_t ctx);

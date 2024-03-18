@@ -222,24 +222,24 @@ Arithmetic
 Arithmetic into dense vectors
 --------------------------------------------------------------------------------
 
-.. function:: int gr_sparse_vec_update_to_dense(gr_ptr dres, const gr_sparse_vec_t src, gr_ctx_t ctx)
-              int gr_sparse_vec_add_to_dense(gr_ptr dres, gr_srcptr dvec1, const gr_sparse_vec_t svec2, gr_ctx_t ctx)
-              int gr_sparse_vec_sub_to_dense(gr_ptr dres, gr_srcptr dvec1, const gr_sparse_vec_t svec2, gr_ctx_t ctx)
-              int gr_sparse_vec_nz_mul_to_dense(gr_ptr dres, gr_srcptr dvec1, const gr_sparse_vec_t svec2, gr_ctx_t ctx)
-              int gr_sparse_vec_nz_div_to_dense(gr_ptr dres, gr_srcptr dvec1, const gr_sparse_vec_t svec2, gr_ctx_t ctx)
-              int gr_sparse_vec_addmul_scalar_to_dense(gr_ptr dres, const gr_sparse_vec_t svec, gr_srcptr c, gr_ctx_t ctx)
-              int gr_sparse_vec_submul_scalar_to_dense(gr_ptr dres, const gr_sparse_vec_t svec, gr_srcptr c, gr_ctx_t ctx)
-              int gr_sparse_vec_addmul_scalar_si_to_dense(gr_ptr dres, const gr_sparse_vec_t svec, slong c, gr_ctx_t ctx)
-              int gr_sparse_vec_submul_scalar_si_to_dense(gr_ptr dres, const gr_sparse_vec_t svec, slong c, gr_ctx_t ctx)
-              int gr_sparse_vec_addmul_scalar_fmpz_to_dense(gr_ptr dres, const gr_sparse_vec_t svec, const fmpz_t c, gr_ctx_t ctx)
-              int gr_sparse_vec_submul_scalar_fmpz_to_dense(gr_ptr dres, const gr_sparse_vec_t svec, const fmpz_t c, gr_ctx_t ctx)
+.. function:: int gr_vec_update_sparse_vec_nz(gr_ptr dres, const gr_sparse_vec_t src, gr_ctx_t ctx)
+              int gr_vec_add_sparse_vec(gr_ptr dres, gr_srcptr dvec1, const gr_sparse_vec_t svec2, gr_ctx_t ctx)
+              int gr_vec_sub_sparse_vec(gr_ptr dres, gr_srcptr dvec1, const gr_sparse_vec_t svec2, gr_ctx_t ctx)
+              int gr_vec_mul_sparse_vec_nz(gr_ptr dres, gr_srcptr dvec1, const gr_sparse_vec_t svec2, gr_ctx_t ctx)
+              int gr_vec_div_sparse_vec_nz(gr_ptr dres, gr_srcptr dvec1, const gr_sparse_vec_t svec2, gr_ctx_t ctx)
+              int gr_vec_addmul_sparse_vec_scalar(gr_ptr dres, const gr_sparse_vec_t svec, gr_srcptr c, gr_ctx_t ctx)
+              int gr_vec_submul_sparse_vec_scalar(gr_ptr dres, const gr_sparse_vec_t svec, gr_srcptr c, gr_ctx_t ctx)
+              int gr_vec_addmul_sparse_vec_scalar_si(gr_ptr dres, const gr_sparse_vec_t svec, slong c, gr_ctx_t ctx)
+              int gr_vec_submul_sparse_vec_scalar_si(gr_ptr dres, const gr_sparse_vec_t svec, slong c, gr_ctx_t ctx)
+              int gr_vec_addmul_sparse_vec_scalar_fmpz(gr_ptr dres, const gr_sparse_vec_t svec, const fmpz_t c, gr_ctx_t ctx)
+              int gr_vec_submul_sparse_vec_scalar_fmpz(gr_ptr dres, const gr_sparse_vec_t svec, const fmpz_t c, gr_ctx_t ctx)
     
     These functions facilitate accumulating a sparse vector into a dense
     target.  They have one dense input, one sparse input, and a dense output.
     For all functions, it is assumed that *dres* and *dvec1* have the same
     length as *svec* or *svec2*, as appropriate.  The functions 
-    ``gr_sparse_vec_update_to_dense()`` (overwrite the entries in *dres*),
-    ``gr_sparse_vec_nz_mul_to_dense()``, and ``gr_sparse_vec_nz_div_to_dense()``
+    ``gr_vec_update_sparse_vec_nz()`` (overwrite the entries in *dres*),
+    ``gr_vec_mul_sparse_vec_nz()``, and ``gr_vec_div_sparse_vec_nz()``
     only operate on the locations for which *svec2* is nonzero.
 
 
