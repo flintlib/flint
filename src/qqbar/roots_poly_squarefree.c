@@ -209,109 +209,6 @@ _qqbar_roots_poly_squarefree(qqbar_ptr roots, qqbar_srcptr coeffs, slong len, sl
         /* todo: reuse enclosures (refine numerical roots) */
         /* todo: compute next precision from coefficient magnitude */
 
-        if (prec > bits_limit)
-
-
-        if (prec > 1000000)
-            flint_abort();
-    }
-
-#if VERBOSE
-    flint_printf("rpoly: "); fmpz_poly_print(rpoly); flint_printf("\n\n");
-#endif
-
-    slong found;
-    slong num_candidates = fmpz_poly_degree(rpoly);
-    slong num_candidates2;
-
-    fmpz_poly_factor_t fac;
-    fmpz_poly_factor_init(fac);
-    fmpz_poly_factor(fac, rpoly);
-
-    acb_t y;
-    acb_init(y);
-
-    qqbar_ptr candidates;
-    slong * c_indices;
-    slong ci;
-
-    candidates = _qqbar_vec_init(num_candidates);
-    c_indices = flint_malloc(sizeof(slong) * num_candidates);
-
-    ci = 0;
-    for (i = 0; i < fac->num; i++)
-    {
-#if VERBOSE
-        flint_printf("factor: ");
-        fmpz_poly_print(fac->p + i); flint_printf("\n");
-#endif
-
-        qqbar_roots_fmpz_poly(candidates + ci, fac->p + i, QQBAR_ROOTS_IRREDUCIBLE | QQBAR_ROOTS_UNSORTED);
-        ci += fmpz_poly_degree(fac->p + i);
-    }
-
-    num_candidates2 = ci;
-
-#if VERBOSE
-    for (ci = 0; ci < num_candidates2; ci++)
-    {
-        flint_printf("candidate %wd: ", ci);
-        qqbar_print(candidates + ci); flint_printf("\n");
-    }
-#endif
-
-    initial_prec = QQBAR_DEFAULT_PREC;
-    for (prec = initial_prec; ; prec *= 2)
-    {
-        /* Check numerically for solutions to f(x) = 0. We will necessarily have
-           found >= deg. If found == deg, we have certainly isolated the
-           correct roots. Otherwise, we retry with higher precision.
-           This way we do not need exact qqbar arithmetic to validate f(x) = 0. */
-        found = 0;
-
-        acb_poly_fit_length(cpoly, deg + 1);
-        _acb_poly_set_length(cpoly, deg + 1);
-        for (i = 0; i <= deg; i++)
-        {
-            /* Todo: copy the original enclosures and reuse for refinement. */
-            qqbar_get_acb(cpoly->coeffs + i, coeffs + i, prec);
-        }
-
-        for (ci = 0; ci < num_candidates2; ci++)
-        {
-            /* Refine the candidate to the new precision */
-            if (prec != initial_prec)
-                _qqbar_enclosure_raw(QQBAR_ENCLOSURE(candidates + ci), QQBAR_POLY(candidates + ci), QQBAR_ENCLOSURE(candidates + ci), prec);
-
-            acb_poly_evaluate(y, cpoly, QQBAR_ENCLOSURE(candidates + ci), prec);
-
-            if (acb_contains_zero(y))
-            {
-                /* -- restart with higher precision */
-                if (found == deg)
-                {
-                    found = deg + 1;
-                    break;
-                }
-
-                c_indices[found] = ci;
-                found++;
-            }
-        }
-
-#if VERBOSE
-        flint_printf("prec %wd : found %wd / deg %wd\n", prec, found, deg);
-#endif
-
-        FLINT_ASSERT(found >= deg);
-
-        if (found == deg)
-        {
-            for (i = 0; i < deg; i++)
-                qqbar_set(roots + i, candidates + c_indices[i]);
-
-            break;
-        }
 
         if (prec > bits_limit)
         {
@@ -320,11 +217,122 @@ _qqbar_roots_poly_squarefree(qqbar_ptr roots, qqbar_srcptr coeffs, slong len, sl
         }
     }
 
-    _qqbar_vec_clear(candidates, fmpz_poly_degree(rpoly));
-    flint_free(c_indices);
+    if (success)
+    {
+    #if VERBOSE
+        flint_printf("rpoly: "); fmpz_poly_print(rpoly); flint_printf("\n\n");
+    #endif
 
-    fmpz_poly_factor_clear(fac);
-    acb_clear(y);
+        slong found;
+        slong num_candidates = fmpz_poly_degree(rpoly);
+        slong num_candidates2;
+
+        fmpz_poly_factor_t fac;
+        fmpz_poly_factor_init(fac);
+        fmpz_poly_factor(fac, rpoly);
+
+        acb_t y;
+        acb_init(y);
+
+        qqbar_ptr candidates;
+        slong * c_indices;
+        slong ci;
+
+        candidates = _qqbar_vec_init(num_candidates);
+        c_indices = flint_malloc(sizeof(slong) * num_candidates);
+
+        ci = 0;
+        for (i = 0; i < fac->num; i++)
+        {
+    #if VERBOSE
+            flint_printf("factor: ");
+            fmpz_poly_print(fac->p + i); flint_printf("\n");
+    #endif
+
+            qqbar_roots_fmpz_poly(candidates + ci, fac->p + i, QQBAR_ROOTS_IRREDUCIBLE | QQBAR_ROOTS_UNSORTED);
+            ci += fmpz_poly_degree(fac->p + i);
+        }
+
+        num_candidates2 = ci;
+
+    #if VERBOSE
+        for (ci = 0; ci < num_candidates2; ci++)
+        {
+            flint_printf("candidate %wd: ", ci);
+            qqbar_print(candidates + ci); flint_printf("\n");
+        }
+    #endif
+
+        initial_prec = QQBAR_DEFAULT_PREC;
+        for (prec = initial_prec; ; prec *= 2)
+        {
+            /* Check numerically for solutions to f(x) = 0. We will necessarily have
+               found >= deg. If found == deg, we have certainly isolated the
+               correct roots. Otherwise, we retry with higher precision.
+               This way we do not need exact qqbar arithmetic to validate f(x) = 0. */
+            found = 0;
+
+            acb_poly_fit_length(cpoly, deg + 1);
+            _acb_poly_set_length(cpoly, deg + 1);
+            for (i = 0; i <= deg; i++)
+            {
+                /* Todo: copy the original enclosures and reuse for refinement. */
+                qqbar_get_acb(cpoly->coeffs + i, coeffs + i, prec);
+            }
+
+            for (ci = 0; ci < num_candidates2; ci++)
+            {
+                /* Refine the candidate to the new precision */
+                if (prec != initial_prec)
+                    _qqbar_enclosure_raw(QQBAR_ENCLOSURE(candidates + ci), QQBAR_POLY(candidates + ci), QQBAR_ENCLOSURE(candidates + ci), prec);
+
+                acb_poly_evaluate(y, cpoly, QQBAR_ENCLOSURE(candidates + ci), prec);
+
+                if (acb_contains_zero(y))
+                {
+                    /* -- restart with higher precision */
+                    if (found == deg)
+                    {
+                        found = deg + 1;
+                        break;
+                    }
+
+                    c_indices[found] = ci;
+                    found++;
+                }
+            }
+
+    #if VERBOSE
+            flint_printf("prec %wd : found %wd / deg %wd\n", prec, found, deg);
+    #endif
+
+            FLINT_ASSERT(found >= deg);
+
+            if (found == deg)
+            {
+                for (i = 0; i < deg; i++)
+                    qqbar_set(roots + i, candidates + c_indices[i]);
+
+                break;
+            }
+
+            if (prec > bits_limit)
+            {
+                success = 0;
+                break;
+            }
+        }
+
+        _qqbar_vec_clear(candidates, fmpz_poly_degree(rpoly));
+        flint_free(c_indices);
+
+        fmpz_poly_factor_clear(fac);
+        acb_clear(y);
+    }
+
+    /* This could be optional, but it's probably cheap compared to the actual computations... */
+    if (success)
+        qsort(roots, deg, sizeof(qqbar_struct), (int (*)(const void *, const void *)) qqbar_cmp_root_order);
 
     for (i = 0; i <= deg; i++)
         _acb_vec_clear(conj_roots[i], qqbar_degree(coeffs + i));
@@ -335,9 +343,6 @@ _qqbar_roots_poly_squarefree(qqbar_ptr roots, qqbar_srcptr coeffs, slong len, sl
     fmpz_clear(den);
     fmpz_clear(den_bound);
     flint_free(conj_roots);
-
-    /* This could be optional, but it's probably cheap compared to the actual computations... */
-    qsort(roots, deg, sizeof(qqbar_struct), (int (*)(const void *, const void *)) qqbar_cmp_root_order);
 
     return success;
 }
