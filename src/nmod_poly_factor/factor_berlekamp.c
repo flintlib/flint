@@ -8,7 +8,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -210,7 +210,7 @@ __nmod_poly_factor_berlekamp(nmod_poly_factor_t factors,
 
         nmod_poly_init_mod(Q, f->mod);
 
-        nmod_poly_div(Q, f, g);
+        nmod_poly_divexact(Q, f, g);
 
         if (!nmod_poly_is_zero(Q))
             nmod_poly_make_monic(Q, Q);

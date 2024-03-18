@@ -5,17 +5,17 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <stdint.h>
 #include <string.h>
+#include "thread_pool.h"
 #include "thread_support.h"
-#include "ulong_extras.h"
 #include "nmod.h"
-#include "fft_small.h"
 #include "crt_helpers.h"
+#include "fft_small.h"
 
 void crt_data_init(crt_data_t C, ulong prime, ulong coeff_len, ulong nprimes)
 {
@@ -375,6 +375,8 @@ void slow_mpn_to_fft(
 
 #define aindex(i) (((i) < an) ? a[i] : (uint32_t)(0))
 
+#define N_CDIV(a, b) (((a) + (b) - 1) / (b))
+
 #define DEFINE_IT(NP) \
 FLINT_STATIC_NOINLINE void CAT(mpn_to_ffts_hard, NP)( \
     sd_fft_ctx_struct* Rffts, double* d, ulong dstride, \
@@ -384,10 +386,10 @@ FLINT_STATIC_NOINLINE void CAT(mpn_to_ffts_hard, NP)( \
     ulong bits) \
 { \
     ulong np = NP; \
-    ulong nvs = n_cdiv(np, VEC_SZ); \
-    vec4d X[nvs]; \
-    vec4d P[nvs]; \
-    vec4d PINV[nvs]; \
+    ulong nvs = N_CDIV(NP, VEC_SZ); \
+    vec4d X[N_CDIV(NP, VEC_SZ)]; \
+    vec4d P[N_CDIV(NP, VEC_SZ)]; \
+    vec4d PINV[N_CDIV(NP, VEC_SZ)]; \
  \
     for (ulong l = 0; l < nvs; l++) \
     { \
@@ -440,6 +442,7 @@ DEFINE_IT(7)
 DEFINE_IT(8)
 #undef DEFINE_IT
 #undef aindex
+#undef N_CDIV
 
 #define CODE(ir) \
 { \
@@ -474,6 +477,8 @@ DEFINE_IT(8)
         sd_fft_ctx_set_index(d + l*dstride, i+ir, vec4d_get_index(X[l/VEC_SZ], l%VEC_SZ)); \
 }
 
+#define N_CDIV(a, b) (((a) + (b) - 1) / (b))
+
 /* The the l^th fft ctx Rffts[l] is expected to have data at d + l*dstride */
 #define DEFINE_IT(NP, BITS) \
 static void CAT3(mpn_to_ffts, NP, BITS)( \
@@ -485,7 +490,7 @@ static void CAT3(mpn_to_ffts, NP, BITS)( \
 { \
     ulong np = NP; \
     ulong bits = BITS; \
-    ulong nvs = n_cdiv(np, VEC_SZ); \
+    ulong nvs = N_CDIV(NP, VEC_SZ); \
  \
     FLINT_ASSERT(bits >= FLINT_BITS); \
     FLINT_ASSERT(bits - 32 < MPN_CTX_TWO_POWER_TAB_SIZE); \
@@ -493,9 +498,9 @@ static void CAT3(mpn_to_ffts, NP, BITS)( \
     const uint32_t* a = (const uint32_t*)(a_); \
     ulong an = 2*an_; \
  \
-    vec4d X[nvs]; \
-    vec4d P[nvs]; \
-    vec4d PINV[nvs]; \
+    vec4d X[N_CDIV(NP, VEC_SZ)]; \
+    vec4d P[N_CDIV(NP, VEC_SZ)]; \
+    vec4d PINV[N_CDIV(NP, VEC_SZ)]; \
  \
     for (ulong l = 0; l < nvs; l++) \
     { \
@@ -561,6 +566,7 @@ DEFINE_IT(8,192)
 #undef DEFINE_IT
 #undef CODE
 #undef aindex
+#undef N_CDIV
 
 
 
@@ -812,7 +818,7 @@ ulong next_fft_number(ulong p)
     l = n_trailing_zeros(p - 1);
     q = p - (UWORD(2) << l);
     if (bits < 15)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
     if (n_nbits(q) == bits)
         return q;
     if (l < 5)
@@ -1654,4 +1660,3 @@ flint_printf("      +: %wd\n", timer_overall->wall);
     flint_free(worker_struct_buffer);
     flint_give_back_threads(P.handles, P.nhandles);
 }
-

@@ -5,11 +5,10 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "fft.h"
 
 /* negation mod 2^(FLINT_BITS*limbs) + 1 assuming normalized input */
@@ -36,4 +35,3 @@ void mpn_negmod_2expp1(mp_limb_t* z, const mp_limb_t* a, mp_size_t limbs)
         }
     }
 }
-

@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -71,9 +71,6 @@
 #include "t-pow_ui_trunc_binexp.c"
 #include "t-product_roots.c"
 #include "t-revert_series.c"
-#include "t-revert_series_lagrange.c"
-#include "t-revert_series_lagrange_fast.c"
-#include "t-revert_series_newton.c"
 #include "t-rgamma_series.c"
 #include "t-rising_ui_series.c"
 #include "t-root_bound_fujiwara.c"
@@ -156,9 +153,6 @@ test_struct tests[] =
     TEST_FUNCTION(acb_poly_pow_ui_trunc_binexp),
     TEST_FUNCTION(acb_poly_product_roots),
     TEST_FUNCTION(acb_poly_revert_series),
-    TEST_FUNCTION(acb_poly_revert_series_lagrange),
-    TEST_FUNCTION(acb_poly_revert_series_lagrange_fast),
-    TEST_FUNCTION(acb_poly_revert_series_newton),
     TEST_FUNCTION(acb_poly_rgamma_series),
     TEST_FUNCTION(acb_poly_rising_ui_series),
     TEST_FUNCTION(acb_poly_root_bound_fujiwara),

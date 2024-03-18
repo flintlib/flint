@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2016 Arb authors
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "arb_mat.h"
@@ -25,8 +25,7 @@ arb_mat_inv_cho_precomp(arb_mat_t X, const arb_mat_t L, slong prec)
     if (arb_mat_nrows(X) != arb_mat_nrows(L) ||
         arb_mat_ncols(X) != arb_mat_ncols(L))
     {
-        flint_printf("arb_mat_inv_cho_precomp: incompatible dimensions\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "arb_mat_inv_cho_precomp: incompatible dimensions\n");
     }
 
     if (arb_mat_is_empty(L))
@@ -43,8 +42,7 @@ arb_mat_inv_cho_precomp(arb_mat_t X, const arb_mat_t L, slong prec)
 
     if (X == L)
     {
-        flint_printf("arb_mat_inv_cho_precomp: unsupported aliasing\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "arb_mat_inv_cho_precomp: unsupported aliasing\n");
     }
 
     /* invert a 2x2 or larger matrix given its L * L^T decomposition */

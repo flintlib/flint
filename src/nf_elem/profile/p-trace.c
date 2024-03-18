@@ -1,18 +1,13 @@
-/*=============================================================================
-
-    This file is part of Antic.
-
-    Antic is free software: you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version. See <http://www.gnu.org/licenses/>.
-
-=============================================================================*/
-/******************************************************************************
-
+/*
     Copyright 2010 William Hart
 
-******************************************************************************/
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
+*/
 
 #include <math.h>
 #include "profiler.h"
@@ -54,7 +49,6 @@ void random_fmpq_poly(fmpq_poly_t pol, flint_rand_t state, slong length)
 void random_nf_elem(nf_elem_t a, flint_rand_t state, nf_t nf)
 {
    slong len = nf->pol->length - 1;
-   slong i;
 
    random_fmpq_poly(NF_ELEM(a), state, len);
 }

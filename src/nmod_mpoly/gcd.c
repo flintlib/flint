@@ -5,17 +5,23 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "thread_pool.h"
 #include "thread_support.h"
-#include "nmod_mpoly.h"
-#include "nmod_mpoly_factor.h"
+#include "nmod.h"
+#include "fmpz.h"
 #include "fmpz_vec.h"
-#include "fq_nmod_mpoly.h"
+#include "fq_nmod.h"
+#include "mpoly.h"
 #include "fq_zech.h"
 #include "fq_zech_poly.h"
+#include "n_poly.h"
+#include "nmod_mpoly.h"
+#include "fq_nmod_mpoly.h"
+#include "nmod_mpoly_factor.h"
 
 /*
     For each j, set out[j] to the evaluation of A at x_i = alpha[i] (i != j)
@@ -470,15 +476,13 @@ static void _set_estimates_medprime(
     int * ignore;
     fq_zech_ctx_t medctx;
     slong d, max_degree = n_flog(1000000, smctx->mod.n);
-    fmpz_t P;
 
     if (max_degree < 2)
         return;
 
     flint_randinit(state);
 
-    fmpz_init_set_ui(P, smctx->mod.n);
-    fq_zech_ctx_init(medctx, P, 1, "#");
+    fq_zech_ctx_init_ui(medctx, smctx->mod.n, 1, "#");
 
     d = n_clog(500, smctx->mod.n);
     d = FLINT_MAX(d, 1);
@@ -526,8 +530,7 @@ try_again:
         goto cleanup;
     }
 
-    fq_zech_ctx_clear(medctx);
-    fq_zech_ctx_init(medctx, P, d, "#");
+    fq_zech_ctx_init_ui(medctx, smctx->mod.n, d, "#");
 
     for (j = 0; j < nvars; j++)
         fq_zech_rand_not_zero(alpha + j, state, medctx);
@@ -572,8 +575,6 @@ cleanup:
     flint_free(ignore);
 
     fq_zech_ctx_clear(medctx);
-
-    fmpz_clear(P);
 
     flint_randclear(state);
 
@@ -959,14 +960,14 @@ int _do_univar(
                                                  I->Gmin_exp, I->Gstride, ctx);
     if (Abar != NULL)
     {
-        nmod_poly_div(t, a, g);
+        nmod_poly_divexact(t, a, g);
         _nmod_mpoly_from_nmod_poly_inflate(Abar, I->Abarbits, t, v_in_both,
                                               I->Abarmin_exp, I->Gstride, ctx);
     }
 
     if (Bbar != NULL)
     {
-        nmod_poly_div(t, b, g);
+        nmod_poly_divexact(t, b, g);
         _nmod_mpoly_from_nmod_poly_inflate(Bbar, I->Bbarbits, t, v_in_both,
                                               I->Bbarmin_exp, I->Gstride, ctx);
     }
@@ -995,7 +996,7 @@ static int _try_missing_var(
 
     nmod_mpoly_univar_init(Au, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     nmod_mpoly_to_univar(Au, B, var, ctx);
     FLINT_ASSERT(Au->length == 1);
 #endif
@@ -1702,7 +1703,7 @@ int _nmod_mpoly_gcd_algo_small(
     slong j;
     slong nvars = ctx->minfo->nvars;
     mpoly_gcd_info_t I;
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     nmod_mpoly_t T, Asave, Bsave;
 #endif
 
@@ -1711,7 +1712,7 @@ int _nmod_mpoly_gcd_algo_small(
     else if (B->length == 1)
         return _do_monomial_gcd(G, Abar, Bbar, A, B, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     nmod_mpoly_init(T, ctx);
     nmod_mpoly_init(Asave, ctx);
     nmod_mpoly_init(Bsave, ctx);
@@ -2078,7 +2079,7 @@ cleanup:
         FLINT_ASSERT(Bbar == NULL || nmod_mpoly_equal(T, Bbar, ctx));
     }
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     nmod_mpoly_clear(T, ctx);
     nmod_mpoly_clear(Asave, ctx);
     nmod_mpoly_clear(Bsave, ctx);
@@ -2270,4 +2271,3 @@ int nmod_mpoly_gcd(
 
     return _nmod_mpoly_gcd_algo(G, NULL, NULL, A, B, ctx, MPOLY_GCD_USE_ALL);
 }
-

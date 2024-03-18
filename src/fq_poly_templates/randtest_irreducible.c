@@ -1,11 +1,12 @@
 /*
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -23,8 +24,13 @@ TEMPLATE(T, poly_randtest_irreducible) (TEMPLATE(T, poly_t) f,
     slong i, restart;
 
     /* Compute q */
-    fmpz_init_set(q, TEMPLATE(T, ctx_prime) (ctx));
-    fmpz_pow_ui(q, q, TEMPLATE(T, ctx_degree) (ctx));
+#if defined(FQ_NMOD_POLY_H) || defined(FQ_ZECH_POLY_H)
+    fmpz_init(q);
+    fmpz_ui_pow_ui(q, TEMPLATE(T, ctx_prime)(ctx), TEMPLATE(T, ctx_degree)(ctx));
+#else
+    fmpz_init_set(q, TEMPLATE(T, ctx_prime)(ctx));
+    fmpz_pow_ui(q, q, TEMPLATE(T, ctx_degree)(ctx));
+#endif
 
     TEMPLATE(T, poly_init) (x, ctx);
     TEMPLATE(T, poly_gen) (x, ctx);

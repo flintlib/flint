@@ -3,12 +3,12 @@
     Copyright (C) 2015 Arb authors
     Copyright (C) 2019 Julian Rüth
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <stdio.h>
@@ -25,9 +25,10 @@ arf_set_fmpz_2exp_dump(arf_t x, const fmpz_t m, const fmpz_t e) {
         else if (fmpz_get_si(e) == -1) arf_pos_inf(x);
         else if (fmpz_get_si(e) == -2) arf_neg_inf(x);
         else if (fmpz_get_si(e) == -3) arf_nan(x);
-        else {
+        else
+        {
             /* Impossible to happen; all the special values have been treated above. */
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
         }
         return;
     }
@@ -47,7 +48,7 @@ arf_get_fmpz_2exp_dump(fmpz_t m, fmpz_t e, const arf_t x) {
         else
         {
             /* Impossible to happen; all the special values have been treated above. */
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
         }
         return;
     }
@@ -152,7 +153,8 @@ arf_dump_str(const arf_t x)
     fmpz_clear(mantissa);
     fmpz_clear(exponent);
 
-    if(strlen(res) != res_len) flint_abort(); /* assert */
+    if (strlen(res) != res_len)
+        flint_throw(FLINT_ERROR, "(%s): strlen(res) != res_len\n", __func__);
 
     return res;
 }

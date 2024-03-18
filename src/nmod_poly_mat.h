@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -15,10 +15,10 @@
 #ifdef NMOD_POLY_MAT_INLINES_C
 #define NMOD_POLY_MAT_INLINE
 #else
-#define NMOD_POLY_MAT_INLINE static __inline__
+#define NMOD_POLY_MAT_INLINE static inline
 #endif
 
-#include "nmod_poly.h"
+#include "nmod_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -48,7 +48,11 @@ void nmod_poly_mat_init(nmod_poly_mat_t mat, slong rows, slong cols, mp_limb_t n
 
 void nmod_poly_mat_init_set(nmod_poly_mat_t mat, const nmod_poly_mat_t src);
 
-void nmod_poly_mat_swap(nmod_poly_mat_t mat1, nmod_poly_mat_t mat2);
+NMOD_POLY_MAT_INLINE void
+nmod_poly_mat_swap(nmod_poly_mat_t mat1, nmod_poly_mat_t mat2)
+{
+    FLINT_SWAP(nmod_poly_mat_struct, *mat1, *mat2);
+}
 
 NMOD_POLY_MAT_INLINE void
 nmod_poly_mat_swap_entrywise(nmod_poly_mat_t mat1, nmod_poly_mat_t mat2)
@@ -57,7 +61,7 @@ nmod_poly_mat_swap_entrywise(nmod_poly_mat_t mat1, nmod_poly_mat_t mat2)
 
     for (i = 0; i < nmod_poly_mat_nrows(mat1); i++)
         for (j = 0; j < nmod_poly_mat_ncols(mat1); j++)
-            nmod_poly_swap(nmod_poly_mat_entry(mat2, i, j), nmod_poly_mat_entry(mat1, i, j));
+            FLINT_SWAP(nmod_poly_struct, *nmod_poly_mat_entry(mat2, i, j), *nmod_poly_mat_entry(mat1, i, j));
 }
 
 void nmod_poly_mat_set(nmod_poly_mat_t mat1, const nmod_poly_mat_t mat2);

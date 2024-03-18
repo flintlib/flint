@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -41,33 +41,21 @@ TEST_FUNCTION_START(nmod_mat_solve_tril_classical, state)
         /* Check Y = A^(-1) * (A * X) = X */
         nmod_mat_solve_tril_classical(Y, A, B, unit);
         if (!nmod_mat_equal(Y, X))
-        {
-            flint_printf("FAIL!\n");
-            flint_printf("A:\n");
-            nmod_mat_print_pretty(A);
-            flint_printf("X:\n");
-            nmod_mat_print_pretty(X);
-            flint_printf("B:\n");
-            nmod_mat_print_pretty(B);
-            flint_printf("Y:\n");
-            nmod_mat_print_pretty(Y);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "A = %{nmod_mat}\n"
+                    "X = %{nmod_mat}\n"
+                    "B = %{nmod_mat}\n"
+                    "Y = %{nmod_mat}\n",
+                    A, X, B, Y);
 
         /* Check aliasing */
         nmod_mat_solve_tril_classical(B, A, B, unit);
         if (!nmod_mat_equal(B, X))
-        {
-            flint_printf("FAIL!\n");
-            flint_printf("aliasing test failed");
-            flint_printf("A:\n");
-            nmod_mat_print_pretty(A);
-            flint_printf("B:\n");
-            nmod_mat_print_pretty(B);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Aliasing test failed\n"
+                    "A = %{nmod_mat}\n"
+                    "B = %{nmod_mat}\n",
+                    A, B);
 
         nmod_mat_clear(A);
         nmod_mat_clear(B);

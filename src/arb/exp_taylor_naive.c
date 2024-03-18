@@ -1,15 +1,16 @@
 /*
     Copyright (C) 2014 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "arb.h"
+#include "mpn_extras.h"
 
 void
 _arb_exp_taylor_naive(mp_ptr y, mp_limb_t * error,
@@ -45,7 +46,7 @@ _arb_exp_taylor_naive(mp_ptr y, mp_limb_t * error,
         s[nn] += mpn_add_n(s, s, t, nn);
 
         /* t = t * x / (k + 1) */
-        mpn_mul_n(u, t, v, nn);
+        flint_mpn_mul_n(u, t, v, nn);
         flint_mpn_copyi(t, u + nn, nn);
         mpn_divrem_1(t, 0, t, nn, k + 1);
     }
@@ -58,4 +59,3 @@ _arb_exp_taylor_naive(mp_ptr y, mp_limb_t * error,
     flint_free(u);
     flint_free(v);
 }
-

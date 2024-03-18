@@ -5,12 +5,17 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "thread_pool.h"
 #include "nmod_mpoly.h"
+
+#if FLINT_KNOW_STRONG_ORDER
+
+#include "thread_pool.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
 
 typedef struct _nmod_mpolyn_stripe_struct
@@ -1735,10 +1740,6 @@ int nmod_mpolyn_divides_threaded_pool(
     FLINT_ASSERT(B->bits == bits);
     FLINT_ASSERT(Q->bits == bits);
 
-#if !FLINT_KNOW_STRONG_ORDER
-    return nmod_mpolyn_divides(Q, A, B, ctx);
-#endif
-
     if (B->length < 2 || A->length < 2)
     {
         return nmod_mpolyn_divides(Q, A, B, ctx);
@@ -1816,7 +1817,7 @@ int nmod_mpolyn_divides_threaded_pool(
     qexps = (ulong *) TMP_ALLOC(N*sizeof(ulong));
 
     mpoly_monomial_sub(qexps + N*0, A->exps + N*0, B->exps + N*0, N);
-    n_poly_mod_div(qcoeff, A->coeffs + 0, B->coeffs + 0, ctx->mod); /* already checked */
+    n_poly_mod_divexact(qcoeff, A->coeffs + 0, B->coeffs + 0, ctx->mod); /* already checked */
 
     nmod_mpolyn_ts_init(H->polyQ, qcoeff, qexps, 1, H->bits, H->N, ctx);
 
@@ -1885,5 +1886,6 @@ cleanup1:
 
     return divides;
 }
-
-
+#else
+typedef int this_file_is_empty;
+#endif

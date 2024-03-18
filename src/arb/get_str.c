@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2015 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <string.h>
@@ -180,8 +180,7 @@ _arb_digits_round_inplace(char * s, flint_bitcnt_t * shift, fmpz_t error, slong 
 
     if (n < 1)
     {
-        flint_printf("_arb_digits_round_inplace: require n >= 1\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "_arb_digits_round_inplace: require n >= 1\n");
     }
 
     m = strlen(s);
@@ -250,8 +249,7 @@ _arb_digits_round_inplace(char * s, flint_bitcnt_t * shift, fmpz_t error, slong 
 
         if (!borrow)
         {
-            flint_printf("expected borrow!\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "expected borrow!\n");
         }
 
         fmpz_set_str(error, s + n, 10);
@@ -523,4 +521,3 @@ char * arb_get_str(const arb_t x, slong n, ulong flags)
 
     return res;
 }
-

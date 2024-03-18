@@ -9,12 +9,11 @@ irreducible polynomial of degree `n`, as a polynomial in
 `\mathbf{F}_p[X]` of degree less than `n`. The underlying data
 structure is an :type:`nmod_poly_t`.
 
-The default choice for `f(X)` is the Conway polynomial for the pair
-`(p,n)`. Frank Luebeck's data base of Conway polynomials is made
-available in the file ``src/qadic/CPimport.txt``. If a Conway
-polynomial is not available, then a random irreducible polynomial will
-be chosen for `f(X)`. Additionally, the user is able to supply their
-own `f(X)`.
+The default choice for `f(X)` is the Conway polynomial for the pair `(p,n)`,
+enabled by Frank Lübeck's data base of Conway polynomials using the
+:func:`_nmod_poly_conway` function. If a Conway polynomial is not available,
+then a random irreducible polynomial will be chosen for `f(X)`. Additionally,
+the user is able to supply their own `f(X)`.
 
 Types, macros and constants
 -------------------------------------------------------------------------------
@@ -31,7 +30,7 @@ Context Management
 --------------------------------------------------------------------------------
 
 
-.. function:: void fq_nmod_ctx_init(fq_nmod_ctx_t ctx, const fmpz_t p, slong d, const char *var)
+.. function:: void fq_nmod_ctx_init_ui(fq_nmod_ctx_t ctx, ulong p, slong d, const char * var)
 
     Initialises the context for prime `p` and extension degree `d`,
     with name ``var`` for the generator.  By default, it will try
@@ -43,7 +42,7 @@ Context Management
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
 
-.. function:: int _fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx, const fmpz_t p, slong d, const char *var)
+.. function:: int _fq_nmod_ctx_init_conway_ui(fq_nmod_ctx_t ctx, ulong p, slong d, const char * var)
 
     Attempts to initialise the context for prime `p` and extension
     degree `d`, with name ``var`` for the generator using a Conway
@@ -58,7 +57,7 @@ Context Management
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
 
-.. function:: void fq_nmod_ctx_init_conway(fq_nmod_ctx_t ctx, const fmpz_t p, slong d, const char *var)
+.. function:: void fq_nmod_ctx_init_conway_ui(fq_nmod_ctx_t ctx, ulong p, slong d, const char * var)
 
     Initialises the context for prime `p` and extension degree `d`,
     with name ``var`` for the generator using a Conway polynomial
@@ -69,7 +68,7 @@ Context Management
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
 
-.. function:: void fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx, const nmod_poly_t modulus, const char *var)
+.. function:: void fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx, const nmod_poly_t modulus, const char * var)
 
     Initialises the context for given ``modulus`` with name
     ``var`` for the generator.
@@ -79,6 +78,23 @@ Context Management
 
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
+
+.. function:: void fq_nmod_ctx_init_randtest(fq_nmod_ctx_t ctx, flint_rand_t state, int type)
+
+    Initialises ``ctx`` to a random finite field, where the prime and degree is
+    set according to ``type``. To see what prime and degrees may be output, see
+    ``type`` in :func:`_nmod_poly_conway_rand`.
+
+.. function:: void fq_nmod_ctx_init_randtest_reducible(fq_nmod_ctx_t ctx, flint_rand_t state, int type)
+
+    Initializes ``ctx`` to a random extension of a word-sized prime field, where
+    the prime and degree is set according to ``type``. If ``type`` is `0` the
+    prime and degree may be large, else if ``type`` is `1` the degree is small
+    but the prime may be large, else if ``type`` is `2` the prime is small but
+    the degree may be large, else if ``type`` is `3` both prime and degree are
+    small.
+
+    The modulus may or may not be irreducible.
 
 .. function:: void fq_nmod_ctx_clear(fq_nmod_ctx_t ctx)
 
@@ -94,9 +110,9 @@ Context Management
     `[\mathbf{F}_{q} : \mathbf{F}_{p}]`, which
     is equal to `\log_{p} q`.
 
-.. function:: fmpz * fq_nmod_ctx_prime(const fq_nmod_ctx_t ctx)
+.. function:: ulong fq_nmod_ctx_prime(const fq_nmod_ctx_t ctx)
 
-    Returns a pointer to the prime `p` in the context.
+    Returns the prime `p` of the context.
 
 .. function:: void fq_nmod_ctx_order(fmpz_t f, const fq_nmod_ctx_t ctx)
 
@@ -110,19 +126,6 @@ Context Management
 .. function:: void fq_nmod_ctx_print(const fq_nmod_ctx_t ctx)
 
     Prints the context information to ``stdout``.
-
-.. function:: void fq_nmod_ctx_randtest(fq_nmod_ctx_t ctx, flint_rand_t state)
-
-    Initializes ``ctx`` to a random finite field.  Assumes that
-    ``fq_nmod_ctx_init`` has not been called on ``ctx`` already.
-
-
-.. function:: void fq_nmod_ctx_randtest_reducible(fq_nmod_ctx_t ctx, flint_rand_t state)
-
-    Initializes ``ctx`` to a random extension of a word-sized prime
-    field.  The modulus may or may not be irreducible.  Assumes that
-    ``fq_nmod_ctx_init`` has not been called on ``ctx`` already.
-
 
 Memory management
 --------------------------------------------------------------------------------

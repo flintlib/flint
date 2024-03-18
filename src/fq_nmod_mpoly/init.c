@@ -5,10 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fq_nmod.h"
+#include "mpoly.h"
 #include "fq_nmod_mpoly.h"
 
 void fq_nmod_mpoly_init3(
@@ -46,4 +48,3 @@ void fq_nmod_mpoly_init2(
     flint_bitcnt_t bits = mpoly_fix_bits(MPOLY_MIN_BITS, ctx->minfo);
     fq_nmod_mpoly_init3(A, alloc, bits, ctx);
 }
-

@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -43,12 +43,7 @@ TEST_FUNCTION_START(nmod_vec_nmod, state)
         flint_mpz_mod_ui(z, z, m);
 
         if (flint_mpz_cmp_ui(z, c) != 0)
-        {
-            flint_printf("FAIL (add):\n");
-            flint_printf("m = %wu\n", m);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("(add) m = %wu\n", m);
 
         mpz_clear(x);
         mpz_clear(y);
@@ -80,12 +75,7 @@ TEST_FUNCTION_START(nmod_vec_nmod, state)
         flint_mpz_mod_ui(z, z, m);
 
         if (flint_mpz_cmp_ui(z, c) != 0)
-        {
-            flint_printf("FAIL (sub):\n");
-            flint_printf("m = %wu\n", m);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("(sub) m = %wu\n", m);
 
         mpz_clear(x);
         mpz_clear(y);
@@ -117,12 +107,7 @@ TEST_FUNCTION_START(nmod_vec_nmod, state)
         flint_mpz_mod_ui(z, z, m);
 
         if (flint_mpz_cmp_ui(z, c) != 0)
-        {
-            flint_printf("FAIL (mul):\n");
-            flint_printf("m = %wu\n", m);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("(mul) m = %wu\n", m);
 
         mpz_clear(x);
         mpz_clear(y);
@@ -157,12 +142,7 @@ TEST_FUNCTION_START(nmod_vec_nmod, state)
         flint_mpz_mod_ui(z, z, m);
 
         if (flint_mpz_cmp_ui(z, c) != 0)
-        {
-            flint_printf("FAIL (div):\n");
-            flint_printf("m = %wu\n", m);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("(div) m = %wu\n", m);
 
         mpz_clear(x);
         mpz_clear(y);
@@ -192,12 +172,7 @@ TEST_FUNCTION_START(nmod_vec_nmod, state)
         mpz_invert(z, y, z);
 
         if (flint_mpz_cmp_ui(z, c) != 0)
-        {
-            flint_printf("FAIL (div):\n");
-            flint_printf("m = %wu\n", m);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("(inv) m = %wu\n", m);
 
         mpz_clear(y);
         mpz_clear(z);
@@ -228,12 +203,7 @@ TEST_FUNCTION_START(nmod_vec_nmod, state)
         flint_mpz_powm_ui(z, y, exp, z);
 
         if (flint_mpz_cmp_ui(z, c) != 0)
-        {
-            flint_printf("FAIL (pow):\n");
-            flint_printf("m = %wu\n", m);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("(pow) m = %wu\n", m);
 
         mpz_clear(y);
         mpz_clear(z);

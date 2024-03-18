@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2022 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fmpzi.h"
@@ -24,8 +24,7 @@ fmpzi_divrem(fmpzi_t q, fmpzi_t r, const fmpzi_t x, const fmpzi_t y)
 
     if (ybits == 0)
     {
-        flint_printf("fmpzi_divrem: division by zero\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "fmpzi_divrem: division by zero\n");
     }
 
     if (xbits == 0)

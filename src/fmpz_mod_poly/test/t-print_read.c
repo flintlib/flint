@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -39,6 +39,8 @@ TEST_FUNCTION_START(fmpz_mod_poly_print_read, state)
     n = 100 * flint_test_multiplier();
 
     fmpz_mod_ctx_init_ui(ctx, 2);
+
+    fflush(stdout); /* Ensure buffer does not flow into child process */
 
     /* Randomise n polynomials, write to and read from a pipe */
     {

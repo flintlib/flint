@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -79,7 +79,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_rref, state)
         slong *perm;
         int equal;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, init) (c, ctx);
 
@@ -94,7 +94,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_rref, state)
         TEMPLATE(T, mat_init_set) (B, A, ctx);
         TEMPLATE(T, mat_init_set) (C, A, ctx);
 
-        rank1 = TEMPLATE(T, mat_rref) (B, ctx);
+        rank1 = TEMPLATE(T, mat_rref) (B, B, ctx);
 
         if (!check_rref_form(perm, B, rank1, ctx))
         {
@@ -132,7 +132,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_rref, state)
             }
         }
 
-        rank2 = TEMPLATE(T, mat_rref) (D, ctx);
+        rank2 = TEMPLATE(T, mat_rref) (D, D, ctx);
         equal = (rank1 == rank2);
 
         if (equal)

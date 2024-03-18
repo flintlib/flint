@@ -102,6 +102,7 @@
        arb_hypgeom.rst
        acb_elliptic.rst
        acb_modular.rst
+       acb_theta.rst
        dirichlet.rst
        acb_dirichlet.rst
        bernoulli.rst

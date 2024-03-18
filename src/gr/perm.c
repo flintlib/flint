@@ -5,8 +5,8 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "perm.h"
@@ -171,7 +171,7 @@ _gr_perm_set_other(perm_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 int
 _gr_perm_one(perm_t res, gr_ctx_t ctx)
 {
-    _perm_set_one(res->entries, PERM_N(ctx));
+    _perm_one(res->entries, PERM_N(ctx));
     return GR_SUCCESS;
 }
 

@@ -5,10 +5,15 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly_factor.h"
 #include "fmpz_mpoly_factor.h"
 
@@ -116,7 +121,7 @@ outer_loop:
     }
     p = n_nextprime(p, 1);
 
-    nmod_mpoly_ctx_change_modulus(ctxp, p);
+    nmod_mpoly_ctx_set_modulus(ctxp, p);
 
     /* make sure mod p reduction does not kill both lc(A) and lc(B) */
     gammap = fmpz_get_nmod(gamma, ctxp->mod);
@@ -194,7 +199,7 @@ inner_loop:
     }
     p = n_nextprime(p, 1);
 
-    nmod_mpoly_ctx_change_modulus(ctxp, p);
+    nmod_mpoly_ctx_set_modulus(ctxp, p);
 
     /* make sure mod p reduction does not kill both lc(A) and lc(B) */
     gammap = fmpz_get_nmod(gamma, ctxp->mod);
@@ -266,4 +271,3 @@ cleanup:
 
     return success;
 }
-

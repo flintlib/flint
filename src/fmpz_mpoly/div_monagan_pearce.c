@@ -6,11 +6,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "ulong_extras.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
 
 /*
@@ -93,7 +96,7 @@ slong _fmpz_mpoly_div_monagan_pearce1(fmpz ** polyq, ulong ** expq,
         lc_sign = FLINT_SIGN_EXT(poly3[0]);
         lc_norm = flint_clz(lc_abs);
         lc_n = lc_abs << lc_norm;
-        invert_limb(lc_i, lc_n);
+        lc_i = n_preinvert_limb_prenorm(lc_n);
     }
 
     while (heap_len > 1)
@@ -414,7 +417,7 @@ slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
         lc_sign = FLINT_SIGN_EXT(poly3[0]);
         lc_norm = flint_clz(lc_abs);
         lc_n = lc_abs << lc_norm;
-        invert_limb(lc_i, lc_n);
+        lc_i = n_preinvert_limb_prenorm(lc_n);
     }
 
     while (heap_len > 1)

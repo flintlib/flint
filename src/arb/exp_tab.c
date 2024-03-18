@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2014 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "arb.h"
@@ -1606,4 +1606,3 @@ const mp_limb_t arb_exp_tab22[ARB_EXP_TAB22_NUM][ARB_EXP_TAB2_LIMBS] =
   Z8(3ff6a04e,fac0f617,19c31758,9c3d1729,51d3f338,bc414a7f,2a31b689,90223629)
   Z8(0d371e0d,232759e7,95cc9009,6f7c685d,8bc8b40e,27bc7157,f26fd248,83ef2b15)
 }};
-

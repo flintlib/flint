@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -22,7 +22,7 @@
 
 int main(int argc, char* argv[])
 {
-    slong i, bit_bound;
+    slong bit_bound;
     mp_limb_t prime, res;
     fmpz_t x, y, prod;
 
@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
     fmpz_one(prod);
 
     prime = 0;
-    for (i = 0; fmpz_bits(prod) < bit_bound; i++)
+    while(fmpz_bits(prod) < bit_bound)
     {
         prime = n_nextprime(prime, 0);
         res = fmpz_fdiv_ui(x, prime);

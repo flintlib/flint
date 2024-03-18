@@ -20,3 +20,4 @@ ignore:
  - "src/*/inlines.c"
  - "src/test/t-*.c"
  - "src/*/test/t-*.c"
+ - "src/generic_files/exception.c"

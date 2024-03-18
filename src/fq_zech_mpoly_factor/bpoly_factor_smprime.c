@@ -5,14 +5,18 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod_vec.h"
 #include "nmod_mat.h"
+#include "nmod_poly.h"
+#include "fq_zech.h"
+#include "fq_zech_poly.h"
 #include "fmpz_poly_factor.h"
-#include "nmod_mpoly_factor.h"
 #include "fq_zech_poly_factor.h"
+#include "nmod_mpoly_factor.h"
 #include "fq_zech_mpoly_factor.h"
 
 int fq_zech_next(fq_zech_t x, const fq_zech_ctx_t ctx)
@@ -178,7 +182,7 @@ static void _hensel_lift_fac(
 
     for (i = 0; i < c->length; i++)
     {
-    #ifdef FLINT_WANT_ASSERT
+    #if FLINT_WANT_ASSERT
         {
             slong j;
             for (j = 0; j < p0; j++)
@@ -211,7 +215,7 @@ static void _hensel_lift_fac(
     fq_zech_bpoly_swap(G, t1, ctx);
     fq_zech_bpoly_swap(H, t2, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         slong j;
         fq_zech_bpoly_mul(t1, G, H, ctx);
@@ -270,7 +274,7 @@ static void _hensel_lift_inv(
 
     for (i = 0; i < c->length; i++)
     {
-    #ifdef FLINT_WANT_ASSERT
+    #if FLINT_WANT_ASSERT
         {
             slong j;
             for (j = 0; j < p0; j++)
@@ -303,7 +307,7 @@ static void _hensel_lift_inv(
     fq_zech_bpoly_swap(t1, B, ctx);
     fq_zech_bpoly_swap(t2, A, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fq_zech_bpoly_mul(t1, G, A, ctx);
     fq_zech_bpoly_mul(t2, H, B, ctx);
     fq_zech_bpoly_add(c, t1, t2, ctx);
@@ -882,4 +886,3 @@ cleanup:
 
     return success;
 }
-

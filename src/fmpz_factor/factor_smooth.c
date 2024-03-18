@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -119,8 +119,7 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
 
     if (bits <= 0)
     {
-        flint_printf("(fmpz_factor_smooth) Number of bits must be at least 1\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(fmpz_factor_smooth) Number of bits must be at least 1\n");
     }
 
     if (bits <= 15)
@@ -145,19 +144,22 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
                 continue;
 
             exp = 1;
-            xsize = flint_mpn_divexact_1(xd, xsize, p);
+            mpn_divexact_1(xd, xd, xsize, p);
+            xsize -= (xd[xsize - 1] == 0);
 
             /* Check if p^2 divides n */
             if (flint_mpn_divisible_1_odd(xd, xsize, p))
             {
-                xsize = flint_mpn_divexact_1(xd, xsize, p);
+                mpn_divexact_1(xd, xd, xsize, p);
+                xsize -= (xd[xsize - 1] == 0);
                 exp = 2;
             }
 
             /* If we're up to cubes, then maybe there are higher powers */
             if (exp == 2 && flint_mpn_divisible_1_odd(xd, xsize, p))
             {
-                xsize = flint_mpn_divexact_1(xd, xsize, p);
+                mpn_divexact_1(xd, xd, xsize, p);
+                xsize -= (xd[xsize - 1] == 0);
                 xsize = flint_mpn_remove_power_ascending(xd, xsize, &p, 1, &exp);
                 exp += 3;
             }
@@ -284,4 +286,3 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
     TMP_END;
     return ret;
 }
-

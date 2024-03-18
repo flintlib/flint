@@ -5,15 +5,17 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fmpz_vec.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_vec.h"
 #include "fmpz_mod_mat.h"
-#include "fmpz_mod_mpoly_factor.h"
 #include "n_poly.h"
+#include "mpoly.h"
+#include "fmpz_mod_mpoly_factor.h"
 
 static void fmpz_mod_mpoly_monomial_evals1(
     fmpz_mod_polyun_t E,
@@ -101,7 +103,7 @@ static int fmpz_mod_poly_add_zip_must_match(
 
 static fmpz * fmpz_mod_mat_row_ref(fmpz_mod_mat_t M, slong i)
 {
-    return M->mat->rows[i];
+    return M->rows[i];
 }
 
 
@@ -173,10 +175,10 @@ int fmpz_mod_mpolyl_gcds_zippel(
 
     ML = FLINT_ARRAY_ALLOC(Gmarkslen, fmpz_mod_mat_struct);
     for (i = 0; i < Gmarkslen; i++)
-        fmpz_mod_mat_init(ML + i, 0, 0, fmpz_mod_ctx_modulus(ctx->ffinfo));
+        fmpz_mod_mat_init(ML + i, 0, 0, ctx->ffinfo);
 
-    fmpz_mod_mat_init(MF, 0, l, fmpz_mod_ctx_modulus(ctx->ffinfo));
-    fmpz_mod_mat_init(Msol, l, 1, fmpz_mod_ctx_modulus(ctx->ffinfo));
+    fmpz_mod_mat_init(MF, 0, l, ctx->ffinfo);
+    fmpz_mod_mat_init(Msol, l, 1, ctx->ffinfo);
 
     fmpz_mod_poly_init(Aev, ctx->ffinfo);
     fmpz_mod_poly_init(Bev, ctx->ffinfo);
@@ -273,8 +275,8 @@ next_betas:
             goto next_betas;
     }
 
-    fmpz_mod_mat_clear(Msol);
-    fmpz_mod_mat_init(Msol, 1, l, fmpz_mod_ctx_modulus(ctx->ffinfo));
+    fmpz_mod_mat_clear(Msol, ctx->ffinfo);
+    fmpz_mod_mat_init(Msol, 1, l, ctx->ffinfo);
 
     s = perm[0];
     if (Gmarks[s + 1] - Gmarks[s] == 1)
@@ -298,11 +300,11 @@ next_betas:
 
 general_case:
 
-    fmpz_mod_mat_clear(Msol);
-    fmpz_mod_mat_init(Msol, 0, l, fmpz_mod_ctx_modulus(ctx->ffinfo));
+    fmpz_mod_mat_clear(Msol, ctx->ffinfo);
+    fmpz_mod_mat_init(Msol, 0, l, ctx->ffinfo);
 
-    fmpz_mod_mat_clear(MF);
-    fmpz_mod_mat_init(MF, 0, l, fmpz_mod_ctx_modulus(ctx->ffinfo));
+    fmpz_mod_mat_clear(MF, ctx->ffinfo);
+    fmpz_mod_mat_init(MF, 0, l, ctx->ffinfo);
 
     for (S = 0; S < Gmarkslen; S++)
     {
@@ -311,11 +313,11 @@ general_case:
 
         FLINT_ASSERT(n <= l);
 
-        if (fmpz_mod_mat_nrows(ML + s) != l ||
-            fmpz_mod_mat_ncols(ML + s) != l + n)
+        if (fmpz_mod_mat_nrows(ML + s, ctx->ffinfo) != l ||
+            fmpz_mod_mat_ncols(ML + s, ctx->ffinfo) != l + n)
         {
-            fmpz_mod_mat_clear(ML + s);
-            fmpz_mod_mat_init(ML + s, l, l + n, fmpz_mod_ctx_modulus(ctx->ffinfo));
+            fmpz_mod_mat_clear(ML + s, ctx->ffinfo);
+            fmpz_mod_mat_init(ML + s, l, l + n, ctx->ffinfo);
         }
 
         _fmpz_vec_set(fmpz_mod_mat_row_ref(ML + s, 0), HG->coeffs[s].coeffs, n);
@@ -342,49 +344,49 @@ general_case:
 
         */
 
-        fmpz_mod_mat_rref(NULL, ML + s);
+        fmpz_mod_mat_rref(ML + s, ML + s, ctx->ffinfo);
 
         for (i = 0; i < n; i++)
             if (!fmpz_is_one(fmpz_mod_mat_entry(ML + s, i, i)))
                 goto next_betas;
 
         /* delete zero rows from MF, matrix interface makes this fun */
-        i = fmpz_mod_mat_nrows(MF);
+        i = fmpz_mod_mat_nrows(MF, ctx->ffinfo);
         while (i > 1 && _fmpz_vec_is_zero(fmpz_mod_mat_row_ref(MF, i - 1), l))
             i--;
 
-        if (i < fmpz_mod_mat_nrows(MF))
+        if (i < fmpz_mod_mat_nrows(MF, ctx->ffinfo))
         {
-            fmpz_mod_mat_window_init(Mwindow, MF, 0, 0, i, l);
-            fmpz_mod_mat_init(MFtemp, i, l, fmpz_mod_ctx_modulus(ctx->ffinfo));
-            fmpz_mod_mat_set(MFtemp, Mwindow);
-            fmpz_mod_mat_swap(MF, MFtemp);
-            fmpz_mod_mat_clear(MFtemp);
-            fmpz_mod_mat_window_clear(Mwindow);
+            fmpz_mod_mat_window_init(Mwindow, MF, 0, 0, i, l, ctx->ffinfo);
+            fmpz_mod_mat_init(MFtemp, i, l, ctx->ffinfo);
+            fmpz_mod_mat_set(MFtemp, Mwindow, ctx->ffinfo);
+            fmpz_mod_mat_swap(MF, MFtemp, ctx->ffinfo);
+            fmpz_mod_mat_clear(MFtemp, ctx->ffinfo);
+            fmpz_mod_mat_window_clear(Mwindow, ctx->ffinfo);
         }
 
         /* appends rows to MF */
-        fmpz_mod_mat_window_init(Mwindow, ML + s, n, n, l, n + l);
-        fmpz_mod_mat_init(MFtemp, i + l - n, l, fmpz_mod_ctx_modulus(ctx->ffinfo));
-        fmpz_mod_mat_concat_vertical(MFtemp, MF, Mwindow);
-        fmpz_mod_mat_swap(MF, MFtemp);
-        fmpz_mod_mat_clear(MFtemp);
-        fmpz_mod_mat_window_clear(Mwindow);
+        fmpz_mod_mat_window_init(Mwindow, ML + s, n, n, l, n + l, ctx->ffinfo);
+        fmpz_mod_mat_init(MFtemp, i + l - n, l, ctx->ffinfo);
+        fmpz_mod_mat_concat_vertical(MFtemp, MF, Mwindow, ctx->ffinfo);
+        fmpz_mod_mat_swap(MF, MFtemp, ctx->ffinfo);
+        fmpz_mod_mat_clear(MFtemp, ctx->ffinfo);
+        fmpz_mod_mat_window_clear(Mwindow, ctx->ffinfo);
 
-        fmpz_mod_mat_clear(Msol);
+        fmpz_mod_mat_clear(Msol, ctx->ffinfo);
         fmpz_mod_mat_init_nullspace_tr(Msol, MF, ctx->ffinfo);
 
-        if (fmpz_mod_mat_nrows(Msol) < 1)
+        if (fmpz_mod_mat_nrows(Msol, ctx->ffinfo) < 1)
         {
             success = 0;
             goto cleanup;
         }
 
-        if (fmpz_mod_mat_nrows(Msol) == 1)
+        if (fmpz_mod_mat_nrows(Msol, ctx->ffinfo) == 1)
             break;
     }
 
-    if (fmpz_mod_mat_nrows(Msol) != 1)
+    if (fmpz_mod_mat_nrows(Msol, ctx->ffinfo) != 1)
     {
         if (--underdetermined_left >= 0)
             goto next_betas;
@@ -420,11 +422,11 @@ cleanup:
     flint_free(beta_caches);
 
     for (i = 0; i < Gmarkslen; i++)
-        fmpz_mod_mat_clear(ML + i);
+        fmpz_mod_mat_clear(ML + i, ctx->ffinfo);
     flint_free(ML);
 
-    fmpz_mod_mat_clear(MF);
-    fmpz_mod_mat_clear(Msol);
+    fmpz_mod_mat_clear(MF, ctx->ffinfo);
+    fmpz_mod_mat_clear(Msol, ctx->ffinfo);
 
     fmpz_mod_polyun_clear(Aeh_inc, ctx->ffinfo);
     fmpz_mod_polyun_clear(Aeh_cur, ctx->ffinfo);

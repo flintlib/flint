@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2014 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "mag.h"
@@ -49,4 +49,3 @@ mag_div(mag_t z, const mag_t x, const mag_t y)
         _fmpz_sub2_fast(MAG_EXPREF(z), MAG_EXPREF(x), MAG_EXPREF(y), fix);
     }
 }
-

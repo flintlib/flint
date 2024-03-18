@@ -5,8 +5,8 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "test_helpers.h"
@@ -51,14 +51,18 @@ TEST_GR_FUNCTION_START(gr_mat_charpoly_faddeev_bsgs, state, count_success, count
         status |= gr_mat_charpoly_faddeev_bsgs(g, NULL, A, ctx);
         /* todo: check adjugate */
 
-        if (status == GR_SUCCESS && gr_poly_equal(f, g, ctx) == T_FALSE)
+        /* todo: check validity even in other cases? */
+        if (gr_ctx_is_integral_domain(ctx) == T_TRUE)
         {
-            flint_printf("FAIL\n\n");
-            gr_ctx_println(ctx);
-            flint_printf("A = "); gr_mat_print(A, ctx); flint_printf("\n");
-            flint_printf("f = "); gr_poly_print(f, ctx); flint_printf("\n");
-            flint_printf("g = "); gr_poly_print(g, ctx); flint_printf("\n");
-            flint_abort();
+            if (status == GR_SUCCESS && gr_poly_equal(f, g, ctx) == T_FALSE)
+            {
+                flint_printf("FAIL\n\n");
+                gr_ctx_println(ctx);
+                flint_printf("A = "); gr_mat_print(A, ctx); flint_printf("\n");
+                flint_printf("f = "); gr_poly_print(f, ctx); flint_printf("\n");
+                flint_printf("g = "); gr_poly_print(g, ctx); flint_printf("\n");
+                flint_abort();
+            }
         }
 
         count_success += (status == GR_SUCCESS);

@@ -16,14 +16,14 @@ Parameter Taylor series
 To evaluate `\zeta(s,a)` for several nearby parameter values, the following
 Taylor expansion is useful:
 
-.. math ::
+.. math::
 
     \zeta(s,a+x) = \sum_{k=0}^{\infty} (-x)^k \frac{(s)_k}{k!} \zeta(s+k,a)
 
 We assume that `a \ge 1` is real and that `\sigma = \operatorname{re}(s)`
 with `K + \sigma > 1`. The tail is bounded by
 
-.. math ::
+.. math::
 
     \sum_{k=K}^{\infty} |x|^k \frac{|(s)_k|}{k!} \zeta(\sigma+k,a) \le
     \sum_{k=K}^{\infty}
@@ -32,7 +32,7 @@ with `K + \sigma > 1`. The tail is bounded by
 
 Denote the term on the right by `T(k)`. Then
 
-.. math ::
+.. math::
 
     \left|\frac{T(k+1)}{T(k)}\right| =
             \frac{|x|}{a}
@@ -46,7 +46,7 @@ Denote the term on the right by `T(k)`. Then
 
 and if `C < 1`,
 
-.. math ::
+.. math::
 
     \sum_{k=K}^{\infty} T(k) \le \frac{T(K)}{1-C}.
 

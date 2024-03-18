@@ -8,7 +8,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -20,7 +20,7 @@
 #define BERLEKAMP 1
 #define KALTOFEN 2
 
-static __inline__ void
+static inline void
 __nmod_poly_factor1(nmod_poly_factor_t res, const nmod_poly_t f, int algorithm)
 {
     if (algorithm == KALTOFEN)

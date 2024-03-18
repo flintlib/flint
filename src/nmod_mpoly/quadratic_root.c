@@ -5,10 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 /*
@@ -230,7 +232,7 @@ static int _nmod_mpoly_quadratic_root_heap(
         */
         FLINT_ASSERT(Qs == 0 || Qs == 1);
         FLINT_ASSERT(As <= Alen);
-    #ifdef FLINT_WANT_ASSERT
+    #if FLINT_WANT_ASSERT
         {
             slong Asleft = Alen, Qsleft = 1;
             for (i = 1; i < heap_len; i++)
@@ -412,4 +414,3 @@ int nmod_mpoly_quadratic_root(
 
     return success;
 }
-

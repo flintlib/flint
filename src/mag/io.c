@@ -3,12 +3,12 @@
     Copyright (C) 2015 Arb authors
     Copyright (C) 2019 Julian Rüth
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <stdio.h>
@@ -33,7 +33,7 @@ mag_set_arf_dump(mag_t x, const arf_t y)
         else
         {
             /* a mag cannot be negative infinity or NaN */
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
         }
     }
     else
@@ -44,7 +44,8 @@ mag_set_arf_dump(mag_t x, const arf_t y)
 
         arf_get_fmpz_2exp(mantissa, exponent, y);
 
-        if(fmpz_cmp_ui(mantissa, 1 << MAG_BITS) >= 0) flint_abort(); /* assert */
+        if (fmpz_cmp_ui(mantissa, 1 << MAG_BITS) >= 0)
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
         mag_set_ui(x, fmpz_get_ui(mantissa));
 

@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2016 Pascal Molin
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <stdlib.h>
@@ -50,7 +50,7 @@ static void
 check_q(ulong q, int odd, slong prec, slong digits, int onlymod)
 {
     slong s;
-    ulong k, len;
+    ulong k;
     dirichlet_group_t G;
     dirichlet_char_t x;
     acb_ptr theta, z;

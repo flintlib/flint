@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -25,7 +25,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_inv, state)
     {
         m = n_randint(state, 20);
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, mat_init)(A, m, m, ctx);
         TEMPLATE(T, mat_init)(B, m, m, ctx);
@@ -40,7 +40,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_inv, state)
         TEMPLATE(T, mat_randrank)(A, state, m, ctx);
         /* Dense or sparse? */
         if (n_randint(state, 2))
-            TEMPLATE(T, mat_randops)(A, 1+n_randint(state, 1+m*m), state, ctx);
+            TEMPLATE(T, mat_randops)(A, state, 1+n_randint(state, 1+m*m), ctx);
 
         result = TEMPLATE(T, mat_inv)(B, A, ctx);
         TEMPLATE(T, mat_mul)(C, A, B, ctx);
@@ -87,7 +87,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_inv, state)
     {
         m = 1 + n_randint(state, 20);
         r = n_randint(state, m);
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, mat_init)(A, m, m, ctx);
         TEMPLATE(T, mat_init)(B, m, m, ctx);
@@ -96,7 +96,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_inv, state)
 
         /* Dense */
         if (n_randint(state, 2))
-            TEMPLATE(T, mat_randops)(A, 1+n_randint(state, 1+m*m), state, ctx);
+            TEMPLATE(T, mat_randops)(A, state, 1+n_randint(state, 1+m*m), ctx);
 
         result = TEMPLATE(T, mat_inv)(B, A, ctx);
 

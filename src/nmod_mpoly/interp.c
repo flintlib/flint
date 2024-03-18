@@ -5,10 +5,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 /*
@@ -233,7 +236,7 @@ int nmod_mpolyn_interp_crt_2sm_poly(
     Texp = T->exps;
     Toff = 0;
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     u = n_poly_mod_evaluate_nmod(modulus, alpha, ctx->mod);
     u = nmod_mul(u, alpha, ctx->mod);
     u = nmod_mul(u, 2, ctx->mod);
@@ -523,6 +526,10 @@ int nmod_mpolyn_interp_crt_sm_bpoly(
 
 /*****************************************************************************/
 
+/* The following functions are currently undocumented, unused. */
+
+#if 0
+
 /*
     E = A(x_var = alpha)
     A is in Fp[x_0, ..., x_(var-2), x_(var-1)][x_var]
@@ -639,7 +646,6 @@ void nmod_mpolyn_interp_lift_sm_mpolyn(
     }
     A->length = Ai;
 }
-
 
 /*
     T = F + modulus*(A - F(x_var = alpha))
@@ -787,6 +793,8 @@ int nmod_mpolyn_interp_crt_sm_mpolyn(
     *lastdeg_ = FLINT_MAX(*lastdeg_, lastdeg);
     return changed;
 }
+
+#endif
 
 
 /****************************************************************************/
@@ -1058,7 +1066,7 @@ int nmod_mpolyn_interp_crt_2sm_mpolyn(
     int texp_set, cmp;
     mp_limb_t alpha = n_poly_get_coeff(alphapow, 1);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     u = n_poly_mod_evaluate_nmod(modulus, alpha, ctx->mod);
     u = nmod_mul(u, alpha, ctx->mod);
     u = nmod_mul(u, 2, ctx->mod);
@@ -1582,4 +1590,3 @@ int nmod_mpolyn_interp_mcrt_sm_mpoly(
     *lastdeg_ = lastdeg;
     return changed;
 }
-

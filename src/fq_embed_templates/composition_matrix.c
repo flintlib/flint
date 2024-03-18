@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -14,9 +14,19 @@
 
 #include "templates.h"
 
+#include "fmpz.h"
+#include "fmpz_mod_mat.h"
+
 /* The naming of these macros is an abuse */
 #define __nmod_poly_get_coeff(p, i) ((p)->coeffs[(i)])
 #define __fmpz_mod_poly_get_coeff(p, i) ((p)->coeffs + (i))
+
+#define __nmod_mat_zero nmod_mat_zero(matrix)
+#define __fmpz_mod_mat_zero fmpz_mod_mat_zero(matrix, ctx->ctxp)
+
+#define __nmod_mat_set_entry(c) nmod_mat_set_entry(matrix, i, j, c)
+#define __fmpz_mod_mat_set_entry(c) fmpz_mod_mat_set_entry(matrix, i, j, c, ctx->ctxp)
+
 
 void TEMPLATE(T, embed_composition_matrix_sub)(TEMPLATE(B, mat_t) matrix,
                                          const TEMPLATE(T, t) gen,
@@ -29,12 +39,15 @@ void TEMPLATE(T, embed_composition_matrix_sub)(TEMPLATE(B, mat_t) matrix,
     TEMPLATE(T, init)(tmp, ctx);
     TEMPLATE(T, one)(tmp, ctx);
 
-    TEMPLATE(B, mat_zero)(matrix);
+    __TEMPLATE(B, mat_zero);
+
     for (j = 0; j < trunc; j++)
     {
         for (i = 0; i < tmp->length; i++)
-            TEMPLATE(B, mat_set_entry)(matrix, i, j,
-                                       __TEMPLATE(B, poly_get_coeff)(tmp, i));
+        {
+            __TEMPLATE(B, mat_set_entry)(__TEMPLATE(B, poly_get_coeff)(tmp, i));
+        }
+
         if (j < len - 1)
             TEMPLATE(T, mul)(tmp, tmp, gen, ctx);
     }

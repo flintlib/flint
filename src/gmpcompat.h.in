@@ -1,0 +1,131 @@
+/*
+    Copyright (C) 2013 William Hart
+
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
+*/
+
+#ifndef GMP_COMPAT_H
+#define GMP_COMPAT_H
+
+#include "flint.h"
+
+#define FLINT_MPZ_REALLOC(z, len)       \
+    ((len) > ((z)->_mp_alloc)           \
+        ? (mp_ptr) _mpz_realloc(z, len) \
+        : ((z)->_mp_d))
+
+static inline
+void flint_mpz_add_uiui(mpz_ptr a, mpz_srcptr b, ulong c1, ulong c0)
+{
+    ulong d[2];
+    mpz_t c;
+    d[0] = c0;
+    d[1] = c1;
+    c->_mp_d = d;
+    c->_mp_alloc = 2;
+    c->_mp_size = d[1] != 0 ? 2 : d[0] != 0;
+    mpz_add(a, b, c);
+}
+
+static inline
+void flint_mpz_add_signed_uiui(mpz_ptr a, mpz_srcptr b, ulong c1, ulong c0)
+{
+    ulong d[2];
+    ulong c2 = FLINT_SIGN_EXT(c1);
+    mpz_t c;
+    sub_ddmmss(d[1], d[0], c2^c1, c2^c0, c2, c2);
+    c->_mp_d = d;
+    c->_mp_alloc = 2;
+    c->_mp_size = d[1] != 0 ? 2 : d[0] != 0;
+    if (c2 != 0)
+        c->_mp_size = -c->_mp_size;
+    mpz_add(a, b, c);
+}
+
+static inline
+void flint_mpz_add_uiuiui(mpz_ptr a, mpz_srcptr b, ulong c2, ulong c1, ulong c0)
+{
+    ulong d[3];
+    mpz_t c;
+    d[0] = c0;
+    d[1] = c1;
+    d[2] = c2;
+    c->_mp_d = d;
+    c->_mp_alloc = 3;
+    c->_mp_size = d[2] != 0 ? 3 : d[1] != 0 ? 2 : d[0] != 0;
+    mpz_add(a, b, c);
+}
+
+static inline
+void flint_mpz_add_signed_uiuiui(mpz_ptr a, mpz_srcptr b,
+                                                 ulong c2, ulong c1, ulong c0)
+{
+    ulong cs, d[3];
+    mpz_t c;
+    c->_mp_d = d;
+    c->_mp_alloc = 3;
+    cs = FLINT_SIGN_EXT(c2);
+    sub_dddmmmsss(d[2], d[1], d[0], cs^c2, cs^c1, cs^c0, cs, cs, cs);
+    c->_mp_size = d[2] != 0 ? 3 :
+                  d[1] != 0 ? 2 :
+                  d[0] != 0;
+    if (cs != 0)
+        c->_mp_size = -c->_mp_size;
+    mpz_add(a, b, c);
+}
+
+#define flint_mpz_get_si mpz_get_si
+#define flint_mpz_get_ui mpz_get_ui
+#define flint_mpz_set_si mpz_set_si
+#define flint_mpz_set_ui mpz_set_ui
+#define flint_mpz_init_set_si mpz_init_set_si
+#define flint_mpz_init_set_ui mpz_init_set_ui
+#define flint_mpz_add_ui mpz_add_ui
+#define flint_mpz_sub_ui mpz_sub_ui
+#define flint_mpz_mul_si mpz_mul_si
+#define flint_mpz_mul_ui mpz_mul_ui
+#define flint_mpz_addmul_ui mpz_addmul_ui
+#define flint_mpz_submul_ui mpz_submul_ui
+#define flint_mpz_ui_sub mpz_ui_sub
+#define flint_mpz_ui_pow_ui mpz_ui_pow_ui
+#define flint_mpz_cdiv_q_ui mpz_cdiv_q_ui
+#define flint_mpz_cdiv_r_ui mpz_cdiv_r_ui
+#define flint_mpz_cdiv_qr_ui mpz_cdiv_qr_ui
+#define flint_mpz_cdiv_ui mpz_cdiv_ui
+#define flint_mpz_fdiv_q_ui mpz_fdiv_q_ui
+#define flint_mpz_fdiv_r_ui mpz_fdiv_r_ui
+#define flint_mpz_fdiv_qr_ui mpz_fdiv_qr_ui
+#define flint_mpz_fdiv_ui mpz_fdiv_ui
+#define flint_mpz_tdiv_q_ui mpz_tdiv_q_ui
+#define flint_mpz_tdiv_r_ui mpz_tdiv_r_ui
+#define flint_mpz_tdiv_qr_ui mpz_tdiv_qr_ui
+#define flint_mpz_tdiv_ui mpz_tdiv_ui
+#define flint_mpz_mod_ui mpz_mod_ui
+#define flint_mpz_divexact_ui mpz_divexact_ui
+#define flint_mpz_divisible_ui_p mpz_divisible_ui_p
+#define flint_mpz_congruent_ui_p mpz_congruent_ui_p
+#define flint_mpz_powm_ui mpz_powm_ui
+#define flint_mpz_pow_ui mpz_pow_ui
+#define flint_mpz_fac_ui mpz_fac_ui
+#define flint_mpz_bin_uiui mpz_bin_uiui
+#define flint_mpz_fib_ui mpz_fib_ui
+#define flint_mpz_cmp_si mpz_cmp_si
+#define flint_mpz_cmp_ui mpz_cmp_ui
+#define flint_mpq_cmp_si mpq_cmp_si
+#define flint_mpq_cmp_ui mpq_cmp_ui
+#define flint_mpq_set_si mpq_set_si
+#define flint_mpq_set_ui mpq_set_ui
+
+#define flint_mpf_set_si mpf_set_si
+#define flint_mpf_set_ui mpf_set_ui
+#define flint_mpf_get_si mpf_get_si
+#define flint_mpf_cmp_ui mpf_cmp_ui
+#define flint_mpf_fits_slong_p mpf_fits_slong_p
+#define flint_mpf_get_d_2exp mpf_get_d_2exp
+
+#endif

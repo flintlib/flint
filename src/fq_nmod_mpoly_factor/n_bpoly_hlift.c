@@ -5,10 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fq_nmod.h"
+#include "n_poly.h"
 #include "fq_nmod_mpoly_factor.h"
 
 /*
@@ -65,7 +67,7 @@ int n_fq_bpoly_hlift2_cubic(
     n_fq_bpoly_taylor_shift_gen0_n_fq(B0, alpha, ctx);
     n_fq_bpoly_taylor_shift_gen0_n_fq(B1, alpha, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         n_fq_poly_t T;
         n_fq_poly_init(T);
@@ -126,7 +128,7 @@ int n_fq_bpoly_hlift2_cubic(
         nmod_eval_interp_to_coeffs_n_fq_poly(c, ce, E, ctx);
         n_fq_poly_sub(c, A->coeffs + j, c, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
         {
             n_fq_poly_t c_check;
             n_fq_poly_init(c_check);
@@ -189,7 +191,7 @@ int n_fq_bpoly_hlift2_cubic(
 
 cleanup:
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success > 0)
     {
         n_bpoly_t tp1, tp2;
@@ -253,7 +255,7 @@ int n_fq_bpoly_hlift2(
     n_fq_bpoly_taylor_shift_gen0_n_fq(B0, alpha, ctx);
     n_fq_bpoly_taylor_shift_gen0_n_fq(B1, alpha, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         n_poly_t T;
         n_poly_init(T);
@@ -332,7 +334,7 @@ int n_fq_bpoly_hlift2(
 
 cleanup:
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success > 0)
     {
         n_bpoly_t tp1, tp2;
@@ -421,7 +423,7 @@ int n_fq_bpoly_hlift(
         n_fq_bpoly_taylor_shift_gen0_fq_nmod(B + i, alpha, ctx);
 
     /* supposed to have A(alpha,x) = B0(alpha,x) * B1(alpha,x) * ... */
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         n_poly_t T;
         n_poly_init(T);
@@ -548,7 +550,7 @@ int n_fq_bpoly_hlift(
 
 cleanup:
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success > 0)
     {
         n_fq_bpoly_t tp1, tp2;

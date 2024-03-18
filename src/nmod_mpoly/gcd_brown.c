@@ -5,12 +5,15 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
 #include "thread_pool.h"
+#include "nmod.h"
+#include "n_poly.h"
+#include "mpoly.h"
+#include "nmod_mpoly.h"
 
 typedef struct
 {
@@ -152,11 +155,11 @@ static void _splitworker_bivar(void * varg)
         else
         {
             n_poly_mod_gcd(Gevalp, Aevalp, Bevalp, ctx->mod);
-            n_poly_mod_div(Abarevalp, Aevalp, Gevalp, ctx->mod);
-            n_poly_mod_div(Bbarevalp, Bevalp, Gevalp, ctx->mod);
+            n_poly_mod_divexact(Abarevalp, Aevalp, Gevalp, ctx->mod);
+            n_poly_mod_divexact(Bbarevalp, Bevalp, Gevalp, ctx->mod);
             n_poly_mod_gcd(Gevalm, Aevalm, Bevalm, ctx->mod);
-            n_poly_mod_div(Abarevalm, Aevalm, Gevalm, ctx->mod);
-            n_poly_mod_div(Bbarevalm, Bevalm, Gevalm, ctx->mod);
+            n_poly_mod_divexact(Abarevalm, Aevalm, Gevalm, ctx->mod);
+            n_poly_mod_divexact(Bbarevalm, Bevalm, Gevalm, ctx->mod);
         }
 
         FLINT_ASSERT(Gevalp->length > 0);
@@ -545,7 +548,7 @@ static slong _nmod_mpolyn_crt(
     if (exp_right)
         _find_edge(stop, count, exp_right, B, N);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     for (k = 0; k < count; k++)
     {
         FLINT_ASSERT(0 <= start[k]);
@@ -834,7 +837,7 @@ int nmod_mpolyn_gcd_brown_smprime_threaded_pool(
     _joinbase_t joinbase;
     n_poly_t t1;
     nmod_mpolyn_t T1, T2;
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     nmod_mpolyn_t Aorg, Borg;
 #endif
 
@@ -846,7 +849,7 @@ int nmod_mpolyn_gcd_brown_smprime_threaded_pool(
     FLINT_ASSERT(bits == A->bits);
     FLINT_ASSERT(bits == B->bits);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     nmod_mpolyn_init(Aorg, A->bits, ctx);
     nmod_mpolyn_init(Borg, B->bits, ctx);
     nmod_mpolyn_set(Aorg, A, ctx);
@@ -871,8 +874,8 @@ int nmod_mpolyn_gcd_brown_smprime_threaded_pool(
 
     n_poly_init(cAbar);
     n_poly_init(cBbar);
-    n_poly_mod_div(cAbar, cA, cG, ctx->mod);
-    n_poly_mod_div(cBbar, cB, cG, ctx->mod);
+    n_poly_mod_divexact(cAbar, cA, cG, ctx->mod);
+    n_poly_mod_divexact(cBbar, cB, cG, ctx->mod);
 
     n_poly_init(gamma);
     n_poly_mod_gcd(gamma, nmod_mpolyn_leadcoeff_poly(A, ctx),
@@ -1163,10 +1166,15 @@ compute_split:
     {
         nmod_mpolyn_content_last(t1, G, ctx);
         nmod_mpolyn_divexact_last(G, t1, ctx);
+#ifdef nmod_mpolyn_divides_threaded_pool
         success =            nmod_mpolyn_divides_threaded_pool(T1, A, G,
                                                     ctx, handles, num_handles);
         success = success && nmod_mpolyn_divides_threaded_pool(T2, B, G,
                                                     ctx, handles, num_handles);
+#else
+        success = nmod_mpolyn_divides(T1, A, G, ctx);
+        success = success && nmod_mpolyn_divides(T2, B, G, ctx);
+#endif
         if (success)
         {
             ulong temp;
@@ -1185,10 +1193,15 @@ successful_fix_lc:
     {
         nmod_mpolyn_content_last(t1, Abar, ctx);
         nmod_mpolyn_divexact_last(Abar, t1, ctx);
+#ifdef nmod_mpolyn_divides_threaded_pool
         success =            nmod_mpolyn_divides_threaded_pool(T1, A, Abar,
                                                     ctx, handles, num_handles);
         success = success && nmod_mpolyn_divides_threaded_pool(T2, B, T1,
                                                     ctx, handles, num_handles);
+#else
+        success = nmod_mpolyn_divides(T1, A, Abar, ctx);
+        success = success && nmod_mpolyn_divides(T2, B, T1, ctx);
+#endif
         if (success)
         {
             nmod_mpolyn_swap(T1, G);
@@ -1200,10 +1213,15 @@ successful_fix_lc:
     {
         nmod_mpolyn_content_last(t1, Bbar, ctx);
         nmod_mpolyn_divexact_last(Bbar, t1, ctx);
+#ifdef nmod_mpolyn_divides_threaded_pool
         success =            nmod_mpolyn_divides_threaded_pool(T1, B, Bbar,
                                                     ctx, handles, num_handles);
         success = success && nmod_mpolyn_divides_threaded_pool(T2, A, T1,
                                                     ctx, handles, num_handles);
+#else
+        success = nmod_mpolyn_divides(T1, B, Bbar, ctx);
+        success = success && nmod_mpolyn_divides(T2, A, T1, ctx);
+#endif
         if (success)
         {
             nmod_mpolyn_swap(T1, G);
@@ -1258,7 +1276,7 @@ cleanup_split:
 
 cleanup:
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success)
     {
         success = nmod_mpolyn_divides(T1, Aorg, G, ctx) &&
@@ -1300,4 +1318,3 @@ int nmod_mpoly_gcd_brown(
 
     return _nmod_mpoly_gcd_algo(G, NULL, NULL, A, B, ctx, MPOLY_GCD_USE_BROWN);
 }
-

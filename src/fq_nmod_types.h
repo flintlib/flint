@@ -1,11 +1,11 @@
 /*
-    Copyright (C) 2023 Albin Ahlbäck
+    Copyright (C) 2023, 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -23,7 +23,6 @@ typedef nmod_poly_struct fq_nmod_struct;
 
 typedef struct
 {
-    fmpz p;
     nmod_t mod;
 
     int sparse_modulus;
@@ -41,8 +40,6 @@ typedef struct
 fq_nmod_ctx_struct;
 
 typedef fq_nmod_ctx_struct fq_nmod_ctx_t[1];
-
-#define fq_nmod_ctx_prime(ctx)  (&((ctx)->p))
 
 typedef struct
 {
@@ -75,6 +72,17 @@ typedef struct
 fq_nmod_poly_factor_struct;
 
 typedef fq_nmod_poly_factor_struct fq_nmod_poly_factor_t[1];
+
+typedef struct {
+    mp_limb_t * coeffs;
+    ulong * exps;
+    slong length;
+    flint_bitcnt_t bits;    /* number of bits per exponent */
+    slong coeffs_alloc;     /* abs size in mp_limb_t units */
+    slong exps_alloc;       /* abs size in ulong units */
+} fq_nmod_mpoly_struct;
+
+typedef fq_nmod_mpoly_struct fq_nmod_mpoly_t[1];
 
 #ifdef __cplusplus
 }

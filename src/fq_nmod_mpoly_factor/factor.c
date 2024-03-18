@@ -5,12 +5,18 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
 #include "long_extras.h"
+#include "fmpz.h"
+#include "fq_nmod.h"
+#include "fq_nmod_poly.h"
 #include "fq_nmod_poly_factor.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "fq_nmod_mpoly_factor.h"
 
 static slong _deflate(
@@ -242,7 +248,7 @@ static int _factor_irred_compressed(
     ulong * strides, * texps;
     flint_bitcnt_t Abits;
     flint_rand_t state;
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fq_nmod_mpoly_t Aorg;
 
     fq_nmod_mpoly_init(Aorg, ctx);
@@ -403,7 +409,7 @@ static int _factor_irred_compressed(
 
         tot_deg = _deflate(A, tot_deg, strides, perm, ctx);
 
-        #ifdef FLINT_WANT_ASSERT
+        #if FLINT_WANT_ASSERT
         {
             fq_nmod_mpoly_t g;
             fq_nmod_mpoly_init(g, ctx);
@@ -536,7 +542,7 @@ cleanup:
     flint_free(strides);
     flint_free(perm);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success)
     {
         fq_nmod_mpoly_t prod;
@@ -668,7 +674,7 @@ static int _factor_irred(
     slong i, j;
     flint_bitcnt_t Abits;
     mpoly_compression_t M;
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fq_nmod_mpoly_t Aorg;
 
     fq_nmod_mpoly_init(Aorg, Actx);
@@ -772,7 +778,7 @@ static int _factor_irred(
 
 cleanup_less:
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success)
     {
         fq_nmod_mpoly_t prod;
@@ -1033,4 +1039,3 @@ int fq_nmod_mpoly_factor_zippel(
 {
     return fq_nmod_mpoly_factor_algo(f, A, ctx, MPOLY_FACTOR_USE_ZIP);
 }
-

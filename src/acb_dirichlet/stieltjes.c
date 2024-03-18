@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2018 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "acb_poly.h"
@@ -308,7 +308,7 @@ _f_stieltjes(acb_ptr res, const acb_t x, void * param, slong order, slong prec)
     const acb_struct * alpha;
 
     if (order > 1)
-        flint_abort();  /* Would be needed for Taylor method. */
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__); /* Would be needed for Taylor method. */
 
     n1 = ((const _stieltjes_param *) param)->n1;
     alpha = ((const _stieltjes_param *) param)->alpha;
@@ -754,8 +754,7 @@ acb_dirichlet_stieltjes(acb_t res, const fmpz_t n, const acb_t a, slong prec)
 
     if (fmpz_sgn(n) < 0)
     {
-        flint_printf("stieltjes constants only defined for n >= 0");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "stieltjes constants only defined for n >= 0");
     }
 
     /* undefined at a = 0, -1, -2, ... */
@@ -777,4 +776,3 @@ acb_dirichlet_stieltjes(acb_t res, const fmpz_t n, const acb_t a, slong prec)
         acb_dirichlet_stieltjes_em(res, n, a, prec);
     }
 }
-

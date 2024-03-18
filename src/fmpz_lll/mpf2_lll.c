@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -55,9 +55,7 @@ FUNC_HEAD
         {
             if (U->r != d)
             {
-                flint_printf
-                    ("Exception (fmpz_lll_mpf*). Incompatible dimensions of capturing matrix.\n");
-                flint_abort();
+                flint_throw(FLINT_ERROR, "(fmpz_lll_mpf*): Incompatible dimensions of capturing matrix.\n");
             }
         }
 
@@ -352,9 +350,7 @@ FUNC_HEAD
         {
             if (U->r != d)
             {
-                flint_printf
-                    ("Exception (fmpz_lll_mpf*). Incompatible dimensions of capturing matrix.\n");
-                flint_abort();
+                flint_throw(FLINT_ERROR, "(fmpz_lll_mpf*): Incompatible dimensions of capturing matrix.\n");
             }
             else if (U->c == d && n > d && fmpz_mat_is_one(U))
             {

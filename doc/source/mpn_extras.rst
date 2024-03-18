@@ -6,7 +6,6 @@
 Macros
 --------------------------------------------------------------------------------
 
-
 .. macro:: MPN_NORM(a, an)
 
     Normalise ``(a, an)`` so that either ``an`` is zero or 
@@ -30,6 +29,10 @@ Utility functions
 
     Returns `1` if all limbs of ``(x, xsize)`` are zero, otherwise `0`.
 
+.. function:: mp_limb_t flint_mpn_sumdiff_n(mp_ptr s, mp_ptr d, mp_srcptr x, mp_srcptr y, mp_size_t n)
+
+    Simultaneously computes the sum ``s`` and difference ``d`` of ``(x, n)`` and ``(y, n)``,
+    returning carry multiplied by two plus borrow.
 
 Multiplication
 --------------------------------------------------------------------------------
@@ -40,24 +43,27 @@ Multiplication
     and returns the top limb of the result.
     We require `xn \ge yn \ge 1`
     and that ``z`` is not aliased with either input operand.
-    This function uses FFT multiplication if the operands are large enough
-    and otherwise calls ``mpn_mul``.
+    This function is intended for all operand sizes. It will automatically
+    select an appropriate algorithm out of the following:
+
+    * A hardcoded multiplication function for small sizes.
+    * Karatsuba or Toom-Cook multiplication for intermediate sizes.
+    * FFT multiplication for huge sizes.
+    * A GMP fallback for cases where we do currently not have optimized code.
 
 .. function:: void flint_mpn_mul_n(mp_ptr z, mp_srcptr x, mp_srcptr y, mp_size_t n)
 
     Sets ``z`` to the product of ``(x, n)`` and ``(y, n)``.
     We require `n \ge 1`
     and that ``z`` is not aliased with either input operand.
-    This function uses FFT multiplication if the operands are large enough
-    and otherwise calls ``mpn_mul_n``.
+    The algorithm selection is similar to :func:`flint_mpn_mul`.
 
 .. function:: void flint_mpn_sqr(mp_ptr z, mp_srcptr x, mp_size_t n)
 
     Sets ``z`` to the square of ``(x, n)``.
     We require `n \ge 1`
-    and that ``z`` is not aliased with either input operand.
-    This function uses FFT multiplication if the operands are large enough
-    and otherwise calls ``mpn_sqr``.
+    and that ``z`` is not aliased with the input operand.
+    The algorithm selection is similar to :func:`flint_mpn_sqr`.
 
 .. function:: mp_size_t flint_mpn_fmms1(mp_ptr y, mp_limb_t a1, mp_srcptr x1, mp_limb_t a2, mp_srcptr x2, mp_size_t n)
 
@@ -65,6 +71,84 @@ Multiplication
     Return the normalized length of `y` if `y \ge 0` and `y` fits into `n` limbs. Otherwise, return `-1`.
     `y` may alias `x_1` but is not allowed to alias `x_2`.
 
+.. function:: void flint_mpn_mul_toom22(mp_ptr pp, mp_srcptr ap, mp_size_t an, mp_srcptr bp, mp_size_t bn, mp_ptr scratch)
+
+    Toom-22 (Karatsuba) multiplication. The *scratch* space must have room for
+    `2 \text{an} + k` limbs where `k` is the number of limbs. If *NULL* is passed,
+    space will be allocated internally.
+
+Truncating multiplication
+--------------------------------------------------------------------------------
+
+.. note::
+
+    Currently, the following function only exist on processors supporting the ADX
+    instruction set.
+
+Given two `n`-limb integers, a *high product* (or *mulhigh*) is an approximation
+of the leading `n` limbs of the full `2n`-limb product.
+In the basecase regime, a high product can be computed in roughly half the
+time of the full product, and in some fraction `0.5 < c < 1` of the time
+in the Toom-Cook regime. This speedup vanishes asymptotically in the FFT
+regime. Contrary to polynomial high products or integer low products, integer
+high products are not uniquely defined due to carry propagation.
+We make the following definitions:
+
+* *Rough mulhigh* accumulates at least `n + 1` limbs of partial products,
+  outputting `n` limbs where the `n - 1` most significant limbs are essentially
+  correct and the `n`-th most significant limb may have an error of `O(n)` ulp.
+  This is the version of mulhigh used in [HZ2011]_.
+* *Precise mulhigh* accumulates at least `n + 2` limbs of partial products,
+  outputting `n + 1` limbs where the `n` most significant limbs are essentially
+  correct and the `(n+1)`-th most significant limb may have an error of `O(n)` ulp.
+* *Exact mulhigh* is the exact truncation of the full product. This cannot be
+  computed faster than the full product in the worst case, but it can be
+  computed faster on average by performing a precise mulhigh, inspecting
+  the low output limb, and correcting with a low product when necessary.
+
+In all cases, a high product is either equal to or smaller than the high part
+of the full product.
+
+More generally, we can define `n`-limb high products of `m`-limb and
+`p`-limb integers where `m + p > n`, but this is not currently implemented.
+
+.. function:: void _flint_mpn_mulhigh_n_mulders_recursive(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
+              void _flint_mpn_sqrhigh_mulders_recursive(mp_ptr res, mp_srcptr u, mp_size_t n)
+
+    Rough mulhigh implemented using Mulders' recursive algorithm as described in [HZ2011]_.
+    Puts in *res[n], ..., res[2n-1]* an approximation of the `n` high limbs of *{u, n}* times *{v, n}*.
+    The error is less than *n* ulps of *res[n]*. Assumes `2n` limbs are allocated at *res*;
+    the low limbs will be used as scratch space.
+    The *sqrhigh* version implements squaring.
+
+.. function:: mp_limb_t _flint_mpn_mulhigh_basecase(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
+              mp_limb_t _flint_mpn_mulhigh_n_mulders(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
+              mp_limb_t _flint_mpn_mulhigh_n_mul(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
+              mp_limb_t flint_mpn_mulhigh_n(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
+
+    Precise mulhigh. Puts in *res[0], ..., res[n-1]* an approximation of the `n` high limbs of
+    *{u, n}* times *{v, n}*. and returns the `(n+1)`-th most significant limb.
+    The error is at most *n + 2* ulp in the returned limb.
+
+    * The *basecase* version implements the `O(n^2)` schoolbook algorithm.
+      The current implementation assumes that `n \ge 6`.
+    * The *mulders* version computes a rough mulhigh with one extra limb of precision
+      in temporary scratch space using :func:`_flint_mpn_mulhigh_n_mulders_recursive`
+      and then copies the high limbs to the output.
+    * The *mul* version computes a full product in temporary scratch space and
+      copies the high limbs to the output. The output is actually the exact
+      mulhigh.
+    * The default version looks up a hardcoded basecase multiplication routine
+      in a table for small *n*, and otherwise calls the *basecase*, *mulders*
+      or *mul* implementations.
+
+.. function:: mp_limb_t _flint_mpn_sqrhigh_basecase(mp_ptr res, mp_srcptr u, mp_size_t n)
+              mp_limb_t _flint_mpn_sqrhigh_mulders(mp_ptr res, mp_srcptr u, mp_size_t n)
+              mp_limb_t _flint_mpn_sqrhigh_sqr(mp_ptr res, mp_srcptr u, mp_size_t n)
+              mp_limb_t flint_mpn_sqrhigh(mp_ptr res, mp_srcptr u, mp_size_t n)
+
+    Squaring counterparts of :func:`flint_mpn_mulhigh_n`.
+    The basecase version currently assumes that `n \ge 8`.
 
 Divisibility
 --------------------------------------------------------------------------------
@@ -77,17 +161,13 @@ Divisibility
 
     This function is implemented as a macro.
 
-.. function:: mp_size_t flint_mpn_divexact_1(mp_ptr x, mp_size_t xsize, mp_limb_t d)
-
-    Divides `x` once by a known single-limb divisor, returns the new size.
-
-.. function:: mp_size_t flint_mpn_remove_2exp(mp_ptr x, mp_size_t xsize, flint_bitcnt_t *bits)
+.. function:: mp_size_t flint_mpn_remove_2exp(mp_ptr x, mp_size_t xsize, flint_bitcnt_t * bits)
 
     Divides ``(x, xsize)`` by `2^n` where `n` is the number of trailing 
     zero bits in `x`. The new size of `x` is returned, and `n` is stored in 
     the bits argument. `x` may not be zero.
 
-.. function:: mp_size_t flint_mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize, mp_ptr p, mp_size_t psize, ulong *exp)
+.. function:: mp_size_t flint_mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize, mp_ptr p, mp_size_t psize, ulong * exp)
 
     Divides ``(x, xsize)`` by the largest power `n` of ``(p, psize)`` 
     that is an exact divisor of `x`. The new size of `x` is returned, and 
@@ -243,7 +323,7 @@ Random Number Generation
 --------------------------------------------------------------------------------
 
 
-.. function:: void flint_mpn_rrandom(mp_limb_t *rp, gmp_randstate_t state, mp_size_t n)
+.. function:: void flint_mpn_rrandom(mp_limb_t * rp, gmp_randstate_t state, mp_size_t n)
 
     Generates a random number with ``n`` limbs and stores 
     it on ``rp``. The number it generates will tend to have
@@ -253,7 +333,7 @@ Random Number Generation
     numbers have proven to be more likely to trigger corner-case bugs.
     
 
-.. function:: void flint_mpn_urandomb(mp_limb_t *rp, gmp_randstate_t state, flint_bitcnt_t n)
+.. function:: void flint_mpn_urandomb(mp_limb_t * rp, gmp_randstate_t state, flint_bitcnt_t n)
 
     Generates a uniform random number of ``n`` bits and stores 
     it on ``rp``.

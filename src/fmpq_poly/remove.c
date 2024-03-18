@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -25,14 +25,12 @@ slong fmpq_poly_remove(fmpq_poly_t q, const fmpq_poly_t poly1,
 
     if (len2 == 0)
     {
-        flint_printf("Exception (fmpq_poly_remove). Division by zero.\n");
-	flint_abort();
+        flint_throw(FLINT_ERROR, "(fmpq_poly_remove): Division by zero.\n");
     }
 
     if (len2 == 1)
     {
-        flint_printf("Exception (fmpq_poly_remove). Divisor must not be a unit.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(fmpq_poly_remove): Divisor must not be a unit.\n");
     }
 
     if (len2 > len1)
@@ -113,4 +111,3 @@ cleanup:
 
     return i;
 }
-

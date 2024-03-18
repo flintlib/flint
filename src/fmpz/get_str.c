@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -163,7 +163,7 @@ fmpz_get_str_bsplit_threaded(char * s, const fmpz_t f)
     fmpz_preinvn_struct * preinv;
 
     if (!COEFF_IS_MPZ(*f))
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     if (s == NULL)
         s = flint_malloc(mpz_sizeinbase(COEFF_TO_PTR(*f), 10) + 2);
@@ -308,7 +308,7 @@ char * fmpz_get_str(char * str, int b, const fmpz_t f)
         if (str == NULL)
             str = flint_malloc(mpz_sizeinbase(COEFF_TO_PTR(*f), b) + 2);
 
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
         if (b == 10 && mpz_size(COEFF_TO_PTR(*f)) > 15000)
         {
             fmpz_get_str_bsplit_threaded(str, f);

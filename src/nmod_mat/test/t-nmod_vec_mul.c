@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -64,15 +64,8 @@ TEST_FUNCTION_START(nmod_mat_nmod_vec_mul, state)
         nmod_mat_mul(C, A, B);
 
         for (j = 0; j < n; j++)
-        {
-            if (nmod_mat_entry(C, 0, j) != c[j] ||
-                nmod_mat_entry(C, 0, j) != cc[j][0])
-            {
-                flint_printf("FAIL: wrong answer\n");
-                fflush(stdout);
-                flint_abort();
-            }
-        }
+            if (nmod_mat_entry(C, 0, j) != c[j] || nmod_mat_entry(C, 0, j) != cc[j][0])
+                TEST_FUNCTION_FAIL("");
 
         nmod_mat_clear(A);
         nmod_mat_clear(B);

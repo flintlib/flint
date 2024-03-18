@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -40,16 +40,13 @@ TEST_FUNCTION_START(nmod_vec_dot_bound_limbs, state)
         limbs2 = mpz_size(t);
 
         if (limbs1 != limbs2)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("m = %wu\n", m);
-            flint_printf("len = %wd\n", len);
-            flint_printf("limbs1 = %d\n", limbs1);
-            flint_printf("limbs2 = %d\n", limbs2);
-            gmp_printf("bound: %Zd\n", t);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "m = %wu\n"
+                    "len = %wd\n"
+                    "limbs1 = %d\n"
+                    "limbs2 = %d\n"
+                    "bound: %{mpz}\n",
+                    m, len, limbs1, limbs2, t);
 
         mpz_clear(t);
     }

@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -15,7 +15,6 @@
 /* Include functions *********************************************************/
 
 #include "t-addmul_rad_mag_fast.c"
-#include "t-bilinear_form.c"
 #include "t-charpoly.c"
 #include "t-cho.c"
 #include "t-companion.c"
@@ -59,7 +58,6 @@
 test_struct tests[] =
 {
     TEST_FUNCTION(arb_mat_addmul_rad_mag_fast),
-    TEST_FUNCTION(arb_mat_bilinear_form),
     TEST_FUNCTION(arb_mat_charpoly),
     TEST_FUNCTION(arb_mat_cho),
     TEST_FUNCTION(arb_mat_companion),

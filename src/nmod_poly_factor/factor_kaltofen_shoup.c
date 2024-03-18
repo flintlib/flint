@@ -1,11 +1,12 @@
 /*
     Copyright (C) 2012 Lina Kulakova
     Copyright (C) 2022 William Hart
+
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -33,12 +34,7 @@ void nmod_poly_factor_kaltofen_shoup(nmod_poly_factor_t res,
         return;
     }
 
-    if (!(degs = (slong *) flint_malloc(nmod_poly_degree(poly)*sizeof(slong))))
-    {
-        flint_printf("Exception (nmod_poly_factor_kaltofen_shoup): \n");
-        flint_printf("Not enough memory.\n");
-        flint_abort();
-    }
+    degs = flint_malloc(nmod_poly_degree(poly) * sizeof(slong));
 
     /* compute squarefree factorisation */
     nmod_poly_factor_init(sq_free);

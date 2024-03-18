@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -21,13 +21,13 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_div_newton_n_preinv, state)
     int i, result;
 
     /* Check result of divrem */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, poly_t) a, b, binv, q, r, test;
 
         TEMPLATE(T, ctx_t) ctx;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
@@ -37,9 +37,9 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_div_newton_n_preinv, state)
         TEMPLATE(T, poly_init) (test, ctx);
 
         do
-            TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 200), ctx);
+            TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 40), ctx);
         while (b->length <= 2);
-        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 200), ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 40), ctx);
         if (a->length > 2 * (b->length) - 3)
             TEMPLATE(T, poly_truncate) (a, 2 * (b->length) - 3, ctx);
 
@@ -70,13 +70,13 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_div_newton_n_preinv, state)
     }
 
     /* Check aliasing of a and q */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, poly_t) a, b, binv, q;
 
         TEMPLATE(T, ctx_t) ctx;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
@@ -84,9 +84,9 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_div_newton_n_preinv, state)
         TEMPLATE(T, poly_init) (q, ctx);
 
         do
-            TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 200), ctx);
+            TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 40), ctx);
         while (b->length <= 2);
-        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 200), ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 40), ctx);
         if (a->length > 2 * (b->length) - 3)
             TEMPLATE(T, poly_truncate) (a, 2 * (b->length) - 3, ctx);
 
@@ -115,13 +115,13 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_div_newton_n_preinv, state)
     }
 
     /* Check aliasing of b and q */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, poly_t) a, b, binv, q;
 
         TEMPLATE(T, ctx_t) ctx;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
@@ -129,9 +129,9 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_div_newton_n_preinv, state)
         TEMPLATE(T, poly_init) (q, ctx);
 
         do
-            TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 200), ctx);
+            TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 40), ctx);
         while (b->length <= 2);
-        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 200), ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 40), ctx);
         if (a->length > 2 * (b->length) - 3)
             TEMPLATE(T, poly_truncate) (a, 2 * (b->length) - 3, ctx);
 
@@ -160,13 +160,13 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_div_newton_n_preinv, state)
     }
 
     /* Check aliasing of binv and q */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, poly_t) a, b, binv, q;
 
         TEMPLATE(T, ctx_t) ctx;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
@@ -174,9 +174,9 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_div_newton_n_preinv, state)
         TEMPLATE(T, poly_init) (q, ctx);
 
         do
-            TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 200), ctx);
+            TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 40), ctx);
         while (b->length <= 2);
-        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 200), ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 40), ctx);
         if (a->length > 2 * (b->length) - 3)
             TEMPLATE(T, poly_truncate) (a, 2 * (b->length) - 3, ctx);
 

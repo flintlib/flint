@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2020 Fredrik Johansson
 
-    This file is part of Calcium.
+    This file is part of FLINT.
 
-    Calcium is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "ca_poly.h"
@@ -74,8 +74,7 @@ _ca_poly_mullow_same_nf(ca_ptr C, ca_srcptr A, slong Alen, ca_srcptr B, slong Bl
 
     if (!CA_FIELD_IS_NF(K))
     {
-        flint_printf("_ca_poly_mullow_same_nf: expected a number field\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "_ca_poly_mullow_same_nf: expected a number field\n");
     }
 
     squaring = (A == B) && (Alen == Blen);
@@ -85,7 +84,7 @@ _ca_poly_mullow_same_nf(ca_ptr C, ca_srcptr A, slong Alen, ca_srcptr B, slong Bl
 
     if (!get_lcm(Aden, A, Alen, K, WORD_MAX, ctx) || (!squaring && !get_lcm(Bden, B, Blen, K, WORD_MAX, ctx)))
     {
-        flint_abort();
+        flint_throw(FLINT_ERROR, "%s\n", __func__);
         /*
         fmpz_clear(Aden);
         fmpz_clear(Bden);

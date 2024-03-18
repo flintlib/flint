@@ -5,13 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <stdlib.h>
 #include "ulong_extras.h"
 #include "long_extras.h"
+#include "fmpz.h"
 #include "mpoly.h"
 
 typedef struct {
@@ -56,7 +57,7 @@ typedef struct {
 
 typedef point2d_set_struct point2d_set_t[1];
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
 static int point2d_set_is_canonical(const point2d_set_t A)
 {
     slong i;
@@ -146,7 +147,7 @@ static int _is_in_polygon(
     point2d p)
 {
     slong i, a, b, c;
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     int check;
 
     i = nV - 1;
@@ -370,7 +371,7 @@ static void point2d_set_merge(
 
 
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
 static int point2d_set_contains(const point2d_set_t A, slong x, slong y)
 {
     slong lo = 0;
@@ -418,7 +419,7 @@ int point2d_set_disjoint(
     slong Blen = B->length;
     slong lo, mid, hi;
     int cmp;
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     int check = 1;
 
     for (lo = 0; lo < Blen; lo++)
@@ -1018,4 +1019,3 @@ int mpoly_test_irreducible(
 
     return result;
 }
-

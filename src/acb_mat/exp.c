@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2012 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "double_extras.h"
@@ -50,8 +50,7 @@ acb_mat_exp(acb_mat_t B, const acb_mat_t A, slong prec)
 
     if (!acb_mat_is_square(A))
     {
-        flint_printf("acb_mat_exp: a square matrix is required!\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "acb_mat_exp: a square matrix is required!\n");
     }
 
     if (acb_mat_is_empty(A))
@@ -158,7 +157,8 @@ acb_mat_exp(acb_mat_t B, const acb_mat_t A, slong prec)
             fmpz_mat_t W;
             fmpz_mat_init(W, dim, dim);
             w = bool_mat_all_pairs_longest_walk(W, S);
-            if (w + 1 != nildegree) flint_abort(); /* assert */
+            if (w + 1 != nildegree)
+                flint_throw(FLINT_ERROR, "(%s)\n", __func__);
             for (i = 0; i < dim; i++)
             {
                 for (j = 0; j < dim; j++)

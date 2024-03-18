@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2022 Daniel Schultz
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fmpzi.h"
@@ -104,7 +104,7 @@ void _fmpz_mat22_shortest_l_infinity(
     fmpz_mul(v11, m->_11, c);
     fmpz_mul(v21, m->_12, c);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         fmpz_t tt;
         fmpz_init(tt);
@@ -446,4 +446,3 @@ void fmpzi_gcd_shortest(fmpzi_t g, const fmpzi_t a, const fmpzi_t b)
                         fmpzi_realref(b), fmpzi_imagref(b));
     fmpzi_canonicalise_unit(g, g);
 }
-

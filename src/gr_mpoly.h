@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -17,7 +17,7 @@
 #ifdef GR_MPOLY_INLINES_C
 #define GR_MPOLY_INLINE
 #else
-#define GR_MPOLY_INLINE static __inline__
+#define GR_MPOLY_INLINE static inline
 #endif
 
 #include "mpoly.h"

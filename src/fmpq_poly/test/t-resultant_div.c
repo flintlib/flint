@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -13,7 +13,10 @@
 #include "fmpq.h"
 #include "fmpq_poly.h"
 
-#pragma GCC diagnostic ignored "-Woverlength-strings"
+#ifdef __GNUC__
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Woverlength-strings"
+#endif
 
 TEST_FUNCTION_START(fmpq_poly_resultant_div, state)
 {
@@ -142,3 +145,6 @@ TEST_FUNCTION_START(fmpq_poly_resultant_div, state)
 
     TEST_FUNCTION_END(state);
 }
+#ifdef __GNUC__
+# pragma GCC diagnostic pop
+#endif

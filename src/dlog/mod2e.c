@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2016 Pascal Molin
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "nmod.h"
@@ -24,9 +24,7 @@ dlog_mod2e_1mod4(ulong b1, ulong e, ulong inv5, nmod_t pe)
     {
         if (b1 % pf != 1)
         {
-            flint_printf("ERROR dlog_mod2e: %wu %% %wu != 1 mod %wu\n\n",
-                    b1, pf, pe.n);
-            flint_abort();
+            flint_throw(FLINT_ERROR, "ERROR dlog_mod2e: %wu %% %wu != 1 mod %wu\n\n", b1, pf, pe.n);
         }
         xf = (b1 - 1) / pf;
         xf = (f == 2) ? xf % 4 : (xf % 2) * (pf1 / 2);

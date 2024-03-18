@@ -5,11 +5,16 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
+#include "fq_zech.h"
+#include "fq_zech_poly.h"
 #include "fq_zech_poly_factor.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "fq_zech_mpoly_factor.h"
 
 static void fq_zech_mpoly_delete_duplicate_terms(
@@ -268,7 +273,7 @@ int fq_zech_zip_find_coeffs_new(
             fq_zech_add(V0, V0, p0, ctx);
         }
         /* roots[i] should be a root of master */
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
         fq_zech_mul(p0, r, T, ctx);
         fq_zech_add(p0, p0, master + 0, ctx);
         FLINT_ASSERT(fq_zech_is_zero(p0, ctx));
@@ -892,7 +897,7 @@ int fq_zech_mpoly_hlift_zippel(
     FLINT_ASSERT(r > 1);
     FLINT_ASSERT(bits <= FLINT_BITS);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         fq_zech_mpoly_t T;
         slong j, * check_degs = FLINT_ARRAY_ALLOC(ctx->minfo->nvars, slong);
@@ -1373,7 +1378,7 @@ cleanup:
     fq_zech_mpoly_clear(m, ctx);
     fq_zech_mpoly_clear(mpow, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success)
     {
         fq_zech_mpoly_t prod;

@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2013 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "arb_poly.h"
@@ -21,7 +21,7 @@ void arb_hypgeom_gamma_stirling_choose_param(int * reflect, slong * r, slong * n
 
 void _arb_poly_gamma_stirling_eval(arb_ptr res, const arb_t z, slong n, slong num, slong prec);
 
-static __inline__ void
+static inline void
 _log_rising_ui_series(arb_ptr t, const arb_t x, slong r, slong len, slong prec)
 {
     slong rflen;
@@ -118,4 +118,3 @@ arb_poly_lgamma_series(arb_poly_t res, const arb_poly_t f, slong n, slong prec)
     _arb_poly_set_length(res, n);
     _arb_poly_normalise(res);
 }
-

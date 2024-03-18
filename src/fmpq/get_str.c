@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -21,8 +21,7 @@ char * _fmpq_get_str(char * str, int b, const fmpz_t num, const fmpz_t den)
 
         if (str == NULL)
         {
-            flint_printf("Exception (_fmpq_get_str). Not enough memory.\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "Exception (_fmpq_get_str). Not enough memory.\n");
         }
     }
 
@@ -46,4 +45,3 @@ char * fmpq_get_str(char * str, int b, const fmpq_t f)
 {
     return _fmpq_get_str(str, b, fmpq_numref(f), fmpq_denref(f));
 }
-

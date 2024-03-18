@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -136,8 +136,7 @@ int _padic_fprint(FILE * file, const fmpz_t u, slong v, const padic_ctx_t ctx)
     }
     else
     {
-        flint_printf("Exception (_padic_fprint).  Unknown print mode.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (_padic_fprint).  Unknown print mode.\n");
     }
 
     return 1;

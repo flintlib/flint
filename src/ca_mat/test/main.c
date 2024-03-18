@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -22,10 +22,7 @@
 #include "t-det.c"
 #include "t-dft.c"
 #include "t-diagonalization.c"
-/* NOTE: The following test can trigger a bug in MPIR */
-#ifndef FLINT_NO_CA_MAT_EXP_TEST
 #include "t-exp.c"
-#endif
 #include "t-inv.c"
 #include "t-jordan_blocks.c"
 #include "t-jordan_form.c"
@@ -58,9 +55,7 @@ test_struct tests[] =
     TEST_FUNCTION(ca_mat_det),
     TEST_FUNCTION(ca_mat_dft),
     TEST_FUNCTION(ca_mat_diagonalization),
-#ifndef FLINT_NO_CA_MAT_EXP_TEST
     TEST_FUNCTION(ca_mat_exp),
-#endif
     TEST_FUNCTION(ca_mat_inv),
     TEST_FUNCTION(ca_mat_jordan_blocks),
     TEST_FUNCTION(ca_mat_jordan_form),

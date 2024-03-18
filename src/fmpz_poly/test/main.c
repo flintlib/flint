@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -47,6 +47,7 @@
 #include "t-discriminant.c"
 #include "t-div_basecase.c"
 #include "t-div_divconquer.c"
+#include "t-divexact.c"
 #include "t-divhigh_smodp.c"
 #include "t-divides.c"
 #include "t-divlow_smodp.c"
@@ -150,9 +151,6 @@
 #include "t-resultant_modular_div.c"
 #include "t-reverse.c"
 #include "t-revert_series.c"
-#include "t-revert_series_lagrange.c"
-#include "t-revert_series_lagrange_fast.c"
-#include "t-revert_series_newton.c"
 #include "t-scalar_abs.c"
 #include "t-scalar_addmul_fmpz.c"
 #include "t-scalar_addmul_si.c"
@@ -227,6 +225,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_poly_discriminant),
     TEST_FUNCTION(fmpz_poly_div_basecase),
     TEST_FUNCTION(fmpz_poly_div_divconquer),
+    TEST_FUNCTION(fmpz_poly_divexact),
     TEST_FUNCTION(fmpz_poly_divhigh_smodp),
     TEST_FUNCTION(fmpz_poly_divides),
     TEST_FUNCTION(fmpz_poly_divlow_smodp),
@@ -330,9 +329,6 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_poly_resultant_modular_div),
     TEST_FUNCTION(fmpz_poly_reverse),
     TEST_FUNCTION(fmpz_poly_revert_series),
-    TEST_FUNCTION(fmpz_poly_revert_series_lagrange),
-    TEST_FUNCTION(fmpz_poly_revert_series_lagrange_fast),
-    TEST_FUNCTION(fmpz_poly_revert_series_newton),
     TEST_FUNCTION(fmpz_poly_scalar_abs),
     TEST_FUNCTION(fmpz_poly_scalar_addmul_fmpz),
     TEST_FUNCTION(fmpz_poly_scalar_addmul_si),

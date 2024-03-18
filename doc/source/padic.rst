@@ -202,11 +202,11 @@ reduced to the precision of ``rop``.
 
 .. function:: void padic_set_mpz(padic_t rop, const mpz_t op, const padic_ctx_t ctx)
 
-    Sets the `p`-adic number ``rop`` to the MPIR integer ``op``.
+    Sets the `p`-adic number ``rop`` to the GMP integer ``op``.
 
 .. function:: void padic_set_mpq(padic_t rop, const mpq_t op, const padic_ctx_t ctx)
 
-    Sets ``rop`` to the MPIR rational ``op``.
+    Sets ``rop`` to the GMP rational ``op``.
 
 .. function:: void padic_get_fmpz(fmpz_t rop, const padic_t op, const padic_ctx_t ctx)
 
@@ -220,13 +220,13 @@ reduced to the precision of ``rop``.
 
 .. function:: void padic_get_mpz(mpz_t rop, const padic_t op, const padic_ctx_t ctx)
 
-    Sets the MPIR integer ``rop`` to the `p`-adic integer ``op``.
+    Sets the GMP integer ``rop`` to the `p`-adic integer ``op``.
 
     If ``op`` is not a `p`-adic integer, raises an ``abort`` signal.
 
 .. function:: void padic_get_mpq(mpq_t rop, const padic_t op, const padic_ctx_t ctx)
 
-    Sets the MPIR rational ``rop`` to the value of ``op``.
+    Sets the GMP rational ``rop`` to the value of ``op``.
 
 .. function:: void padic_swap(padic_t op1, padic_t op2)
 
@@ -270,7 +270,7 @@ Arithmetic operations
 --------------------------------------------------------------------------------
 
 
-.. function:: slong * _padic_lifts_exps(slong *n, slong N)
+.. function:: slong * _padic_lifts_exps(slong * n, slong N)
 
     Given a positive integer `N` define the sequence 
     `a_0 = N, a_1 = \lceil a_0/2\rceil, \dotsc, a_{n-1} = \lceil a_{n-2}/2\rceil = 1`.
@@ -278,7 +278,7 @@ Arithmetic operations
 
     This function sets `n` and allocates and returns the array `a`.
 
-.. function:: void _padic_lifts_pows(fmpz *pow, const slong *a, slong n, const fmpz_t p)
+.. function:: void _padic_lifts_pows(fmpz * pow, const slong * a, slong n, const fmpz_t p)
 
     Given an array `a` as computed above, this function 
     computes the corresponding powers of `p`, that is, 
@@ -414,7 +414,7 @@ Exponential
 
     The `p`-adic exponential function is defined by the usual series 
 
-    .. math ::
+    .. math::
 
 
         \exp_p(x) = \sum_{i = 0}^{\infty} \frac{x^i}{i!}
@@ -450,7 +450,7 @@ Logarithm
 
     Returns `b` such that for all `i \geq b` we have 
 
-    .. math ::
+    .. math::
 
 
         i v - \operatorname{ord}_p(i) \geq N
@@ -469,7 +469,7 @@ Logarithm
 
     Computes 
 
-    .. math ::
+    .. math::
 
         z = - \sum_{i = 1}^{\infty} \frac{y^i}{i} \pmod{p^N},
 
@@ -478,7 +478,7 @@ Logarithm
     Note that this can be used to compute the `p`-adic logarithm 
     via the equation 
 
-    .. math ::
+    .. math::
 
         \log(x) & = \sum_{i=1}^{\infty} (-1)^{i-1} \frac{(x-1)^i}{i} \\
                 & = - \sum_{i=1}^{\infty} \frac{(1-x)^i}{i}.
@@ -499,7 +499,7 @@ Logarithm
 
     The `p`-adic logarithm function is defined by the usual series 
 
-    .. math ::
+    .. math::
 
         \log_p(x) = \sum_{i=1}^{\infty} (-1)^{i-1} \frac{(x-1)^i}{i}
 
@@ -524,7 +524,7 @@ Logarithm
     Uses an algorithm based on a result of Satoh, Skjernaa and Taguchi 
     that `\operatorname{ord}_p\bigl(a^{p^k} - 1\bigr) > k`, which implies that 
 
-    .. math ::
+    .. math::
 
         \log(a) \equiv p^{-k} \Bigl( \log\bigl(a^{p^k}\bigr) \pmod{p^{N+k}} 
                                                           \Bigr) \pmod{p^N}.

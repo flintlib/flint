@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -38,25 +38,18 @@ TEST_FUNCTION_START(nmod_mat_inv, state)
         nmod_mat_randrank(A, state, m);
         /* Dense or sparse? */
         if (n_randint(state, 2))
-            nmod_mat_randops(A, 1+n_randint(state, 1+m*m), state);
+            nmod_mat_randops(A, state, 1+n_randint(state, 1+m*m));
 
         result = nmod_mat_inv(B, A);
         nmod_mat_mul(C, A, B);
 
         if (!nmod_mat_equal(C, I) || !result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("A * A^-1 != I!\n");
-            flint_printf("A:\n");
-            nmod_mat_print_pretty(A);
-            flint_printf("A^-1:\n");
-            nmod_mat_print_pretty(B);
-            flint_printf("A * A^-1:\n");
-            nmod_mat_print_pretty(C);
-            flint_printf("\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "A * A^-1 != I\n"
+                    "A = %{nmod_mat}\n"
+                    "A^-1 = %{nmod_mat}\n"
+                    "A * A^-1 = %{nmod_mat}\n",
+                    A, B, C);
 
         /* Test aliasing */
         nmod_mat_set(C, A);
@@ -64,13 +57,10 @@ TEST_FUNCTION_START(nmod_mat_inv, state)
         nmod_mat_mul(B, A, C);
 
         if (!nmod_mat_equal(B, I))
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("aliasing failed!\n");
-            nmod_mat_print_pretty(C);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Aliasing failed\n"
+                    "A = %{nmod_mat}\n",
+                    C);
 
         nmod_mat_clear(A);
         nmod_mat_clear(B);
@@ -92,27 +82,17 @@ TEST_FUNCTION_START(nmod_mat_inv, state)
 
         /* Dense */
         if (n_randint(state, 2))
-            nmod_mat_randops(A, 1+n_randint(state, 1+m*m), state);
+            nmod_mat_randops(A, state, 1+n_randint(state, 1+m*m));
 
         result = nmod_mat_inv(B, A);
 
         if (result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("singular matrix reported as invertible\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("singular matrix reported as invertible\n");
 
         /* Aliasing */
         result = nmod_mat_inv(A, A);
         if (result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("singular matrix reported as invertible\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("singular matrix reported as invertible\n");
 
         nmod_mat_clear(A);
         nmod_mat_clear(B);

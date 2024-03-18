@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -15,13 +15,14 @@
 #ifdef D_VEC_INLINES_C
 #define D_VEC_INLINE
 #else
-#define D_VEC_INLINE static __inline__
+#define D_VEC_INLINE static inline
 #endif
 
 #include "flint.h"
+#include "double_extras.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /*  Memory management  *******************************************************/
@@ -51,11 +52,31 @@ int _d_vec_is_zero(const double * vec, slong len);
 
 int _d_vec_is_approx_zero(const double * vec, slong len, double eps);
 
-/*  Addition  ****************************************************************/
+/*  Arithmetic  ****************************************************************/
 
 void _d_vec_add(double * res, const double * vec1, const double * vec2, slong len2);
 
 void _d_vec_sub(double * res, const double * vec1, const double * vec2, slong len2);
+
+D_VEC_INLINE
+void _d_vec_mul_2exp(double * res, const double * x, slong len, int e)
+{
+    slong i;
+
+    if (e >= D_MIN_NORMAL_EXPONENT && e <= D_MAX_NORMAL_EXPONENT)
+    {
+        double_uint64_u u;
+        u.i = ((int64_t) (e + D_EXPONENT_BIAS)) << D_EXPONENT_SHIFT;
+
+        for (i = 0; i < len; i++)
+            res[i] = x[i] * u.f;
+    }
+    else
+    {
+        for (i = 0; i < len; i++)
+            res[i] = ldexp(x[i], e);
+    }
+}
 
 /*  Dot product and norm  **************************************/
 
@@ -72,4 +93,3 @@ double _d_vec_dot_thrice(const double * vec1, const double * vec2, slong len2, d
 #endif
 
 #endif
-

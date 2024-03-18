@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -46,8 +46,7 @@ slong _fmpz_poly_hensel_continue_lift(fmpz_poly_factor_t lifted_fac,
 
         if (fmpz_invmod(t, t, P) == 0)
         {
-            flint_printf("Exception (fmpz_poly_continue_hensel_lift).\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "Exception (fmpz_poly_continue_hensel_lift).\n");
         }
 
         fmpz_poly_scalar_mul_fmpz(monic_f, f, t);
@@ -99,4 +98,3 @@ slong _fmpz_poly_hensel_continue_lift(fmpz_poly_factor_t lifted_fac,
 
     return new_prev;
 }
-

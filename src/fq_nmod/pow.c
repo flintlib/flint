@@ -1,12 +1,13 @@
 /*
     Copyright (C) 2011, 2012 Sebastian Pancratz
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -114,8 +115,7 @@ void fq_nmod_pow(fq_nmod_t rop, const fq_nmod_t op, const fmpz_t e, const fq_nmo
 {
     if (fmpz_sgn(e) < 0)
     {
-        flint_printf("Exception (fq_nmod_pow).  e < 0.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fq_nmod_pow).  e < 0.\n");
     }
 
     if (fmpz_is_zero(e))
@@ -145,7 +145,7 @@ void fq_nmod_pow(fq_nmod_t rop, const fq_nmod_t op, const fmpz_t e, const fq_nmo
             t = rop->coeffs;
         }
 
-        if (fmpz_cmpabs(e, fq_nmod_ctx_prime(ctx)) < 0)
+        if (fmpz_cmp_ui(e, fq_nmod_ctx_prime(ctx)) < 0)
             _fq_nmod_pow(t, op->coeffs, op->length, e, ctx);
         else
         {

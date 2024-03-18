@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -28,7 +28,7 @@ TEST_TEMPLATE_FUNCTION_START(T, embed_mul_matrix, state)
         const TEMPLATE(B, poly_struct) *modulus;
         slong d;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         d = TEMPLATE(T, ctx_degree)(ctx);
         modulus = TEMPLATE(T, ctx_modulus)(ctx);
 

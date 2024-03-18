@@ -5,12 +5,17 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
 #include "nmod_mat.h"
+#include "fmpz.h"
+#include "fq_nmod.h"
+#include "fq_nmod_poly.h"
 #include "fq_nmod_poly_factor.h"
+#include "n_poly.h"
 #include "fq_nmod_mpoly.h"
 
 /*
@@ -357,7 +362,7 @@ void bad_n_fq_embed_lg_to_sm(
     out->length = emb->h->length - 1;
     _n_fq_poly_normalise(out, smd);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         fq_nmod_t in_;
         fq_nmod_poly_t out_, out_check;
@@ -455,7 +460,7 @@ void bad_n_fq_embed_sm_to_lg(
 
     n_poly_stack_clear(St);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         fq_nmod_t out_, out_check;
         fq_nmod_poly_t in_;

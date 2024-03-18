@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -143,8 +143,7 @@ fmpq_poly_inv_series_newton(fmpq_poly_t Qinv, const fmpq_poly_t Q, slong n)
 
     if (Qlen == 0)
     {
-        flint_printf("Exception (fmpq_poly_inv_series_newton). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpq_poly_inv_series_newton). Division by zero.\n");
     }
 
     if (Qinv != Q)
@@ -164,4 +163,3 @@ fmpq_poly_inv_series_newton(fmpq_poly_t Qinv, const fmpq_poly_t Q, slong n)
     _fmpq_poly_set_length(Qinv, n);
     _fmpq_poly_normalise(Qinv);
 }
-

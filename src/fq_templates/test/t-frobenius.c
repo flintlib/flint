@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -29,7 +29,7 @@ TEST_TEMPLATE_FUNCTION_START(T, frobenius, state)
         TEMPLATE(T, t) a, b, c;
         slong e;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, init)(b, ctx);
@@ -68,7 +68,7 @@ TEST_TEMPLATE_FUNCTION_START(T, frobenius, state)
         TEMPLATE(T, t) a, b, c;
         slong e;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, init)(b, ctx);
@@ -82,7 +82,11 @@ TEST_TEMPLATE_FUNCTION_START(T, frobenius, state)
             fmpz_t t;
 
             fmpz_init(t);
+#if defined(FQ_NMOD_H) || defined(FQ_ZECH_H)
+            fmpz_ui_pow_ui(t, TEMPLATE(T, ctx_prime)(ctx), e);
+#else
             fmpz_pow_ui(t, TEMPLATE(T, ctx_prime)(ctx), e);
+#endif
             TEMPLATE(T, pow)(c, a, t, ctx);
             fmpz_clear(t);
         }
@@ -114,7 +118,7 @@ TEST_TEMPLATE_FUNCTION_START(T, frobenius, state)
         TEMPLATE(T, t) a, b, s, s1, s2, lhs, rhs;
         slong e;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, init)(b, ctx);
@@ -169,7 +173,7 @@ TEST_TEMPLATE_FUNCTION_START(T, frobenius, state)
         TEMPLATE(T, t) a, b, s, s1, s2, lhs, rhs;
         slong e;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
 
         TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, init)(b, ctx);

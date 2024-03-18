@@ -5,12 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "test_helpers.h"
 #include "gr_mpoly.h"
+
+FLINT_DLL extern gr_static_method_table _ca_methods;
 
 TEST_FUNCTION_START(gr_mpoly_mul_johnson, state)
 {
@@ -36,9 +38,18 @@ TEST_FUNCTION_START(gr_mpoly_mul_johnson, state)
         gr_mpoly_init(k2, mctx, cctx);
         gr_mpoly_init(t, mctx, cctx);
 
-        len = n_randint(state, 100);
-        len1 = n_randint(state, 100);
-        len2 = n_randint(state, 100);
+        if (cctx->methods == _ca_methods)
+        {
+            len = n_randint(state, 10);
+            len1 = n_randint(state, 10);
+            len2 = n_randint(state, 10);
+        }
+        else
+        {
+            len = n_randint(state, 100);
+            len1 = n_randint(state, 100);
+            len2 = n_randint(state, 100);
+        }
 
         exp_bits = n_randint(state, 200) + 2;
         exp_bits1 = n_randint(state, 200) + 2;

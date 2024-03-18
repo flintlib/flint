@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2016 Pascal Molin
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "acb_dft.h"
@@ -21,8 +21,7 @@ _acb_dft_naive(acb_ptr w, acb_srcptr v, slong dv, acb_srcptr z, slong dz, slong 
 
     if (w == v)
     {
-        flint_printf("\n_acb_dft_naive: does not accept aliasing\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "\n_acb_dft_naive: does not accept aliasing\n");
     }
 
     for (i = 0, wi = w; i < len; i++, wi++)

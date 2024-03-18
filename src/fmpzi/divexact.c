@@ -1,15 +1,16 @@
 /*
     Copyright (C) 2022 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <math.h>
+#include "double_extras.h"
 #include "fmpzi.h"
 
 static void
@@ -72,8 +73,7 @@ fmpzi_divexact(fmpzi_t q, const fmpzi_t x, const fmpzi_t y)
 
     if (ybits == 0)
     {
-        flint_printf("fmpzi_divexact: division by zero\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "fmpzi_divexact: division by zero\n");
     }
 
     if (xbits == 0)
@@ -108,10 +108,10 @@ fmpzi_divexact(fmpzi_t q, const fmpzi_t x, const fmpzi_t y)
             c = fmpz_get_d_2exp(&cexp, fmpzi_realref(y));
             d = fmpz_get_d_2exp(&dexp, fmpzi_imagref(y));
 
-            a = ldexp(a, FLINT_MAX(aexp - xbits, -1024));
-            b = ldexp(b, FLINT_MAX(bexp - xbits, -1024));
-            c = ldexp(c, FLINT_MAX(cexp - xbits, -1024));
-            d = ldexp(d, FLINT_MAX(dexp - xbits, -1024));
+            a = d_mul_2exp(a, FLINT_MAX(aexp - xbits, -1024));
+            b = d_mul_2exp(b, FLINT_MAX(bexp - xbits, -1024));
+            c = d_mul_2exp(c, FLINT_MAX(cexp - xbits, -1024));
+            d = d_mul_2exp(d, FLINT_MAX(dexp - xbits, -1024));
         }
 
         t = a * c + b * d;

@@ -9,7 +9,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -19,12 +19,10 @@
 #ifdef NMOD_POLY_INLINES_C
 #define NMOD_POLY_INLINE
 #else
-#define NMOD_POLY_INLINE static __inline__
+#define NMOD_POLY_INLINE static inline
 #endif
 
-#include "nmod.h" /* for nmod_set_ui */
 #include "nmod_types.h"
-#include "thread_pool.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -210,12 +208,7 @@ void nmod_poly_reverse(nmod_poly_t output, const nmod_poly_t input, slong m);
 int nmod_poly_equal(const nmod_poly_t a, const nmod_poly_t b);
 
 int nmod_poly_equal_nmod(const nmod_poly_t poly, ulong cst);
-
-NMOD_POLY_INLINE
-int nmod_poly_equal_ui(const nmod_poly_t poly, ulong cst)
-{
-    return nmod_poly_equal_nmod(poly, nmod_set_ui(cst, poly->mod));
-}
+int nmod_poly_equal_ui(const nmod_poly_t poly, ulong cst);
 
 int nmod_poly_equal_trunc(const nmod_poly_t poly1, const nmod_poly_t poly2, slong n);
 
@@ -610,6 +603,13 @@ void _nmod_poly_rem(mp_ptr R, mp_srcptr A, slong lenA,
 void nmod_poly_rem(nmod_poly_t R,
                                      const nmod_poly_t A, const nmod_poly_t B);
 
+void _nmod_poly_divexact(mp_ptr Q, mp_srcptr A, slong lenA,
+                                          mp_srcptr B, slong lenB, nmod_t mod);
+
+void nmod_poly_divexact(nmod_poly_t Q,
+                                     const nmod_poly_t A, const nmod_poly_t B);
+
+
 void _nmod_poly_inv_series_basecase(mp_ptr Qinv,
                                  mp_srcptr Q, slong Qlen, slong n, nmod_t mod);
 
@@ -659,17 +659,13 @@ mp_limb_t nmod_poly_div_root(nmod_poly_t Q,
 
 /* Divisibility testing  *****************************************************/
 
-int _nmod_poly_divides_classical(mp_ptr Q, mp_srcptr A, slong lenA,
-                                          mp_srcptr B, slong lenB, nmod_t mod);
+int _nmod_poly_divides_classical(mp_ptr Q, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod);
+int nmod_poly_divides_classical(nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B);
 
-int nmod_poly_divides_classical(nmod_poly_t Q,
-		                     const nmod_poly_t A, const nmod_poly_t B);
+int _nmod_poly_divides(mp_ptr Q, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, nmod_t mod);
+int nmod_poly_divides(nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B);
 
-int _nmod_poly_divides(mp_ptr Q, mp_srcptr A, slong lenA,
-                                          mp_srcptr B, slong lenB, nmod_t mod);
-
-int nmod_poly_divides(nmod_poly_t Q,
-		                     const nmod_poly_t A, const nmod_poly_t B);
+ulong nmod_poly_remove(nmod_poly_t f, const nmod_poly_t p);
 
 /* Derivative  ***************************************************************/
 
@@ -684,12 +680,6 @@ void _nmod_poly_integral(mp_ptr
 void nmod_poly_integral(nmod_poly_t x_int, const nmod_poly_t x);
 
 /* Evaluation  ***************************************************************/
-
-void _nmod_poly_evaluate_fmpz(fmpz_t rop,
-                             mp_srcptr poly, const slong len, const fmpz_t c);
-
-void nmod_poly_evaluate_fmpz(fmpz_t rop,
-                                       const nmod_poly_t poly, const fmpz_t c);
 
 mp_limb_t _nmod_poly_evaluate_nmod(mp_srcptr poly,
                                            slong len, mp_limb_t c, nmod_t mod);
@@ -912,26 +902,8 @@ void _nmod_poly_compose_series(mp_ptr res, mp_srcptr poly1, slong len1,
 void nmod_poly_compose_series(nmod_poly_t res,
                     const nmod_poly_t poly1, const nmod_poly_t poly2, slong n);
 
-void _nmod_poly_revert_series_lagrange(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod);
-
-void nmod_poly_revert_series_lagrange(nmod_poly_t Qinv,
-                                 const nmod_poly_t Q, slong n);
-
-void _nmod_poly_revert_series_lagrange_fast(mp_ptr Qinv, mp_srcptr Q,
-    slong n, nmod_t mod);
-
-void nmod_poly_revert_series_lagrange_fast(nmod_poly_t Qinv,
-                                 const nmod_poly_t Q, slong n);
-
-void _nmod_poly_revert_series_newton(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod);
-
-void nmod_poly_revert_series_newton(nmod_poly_t Qinv,
-                                 const nmod_poly_t Q, slong n);
-
-void _nmod_poly_revert_series(mp_ptr Qinv, mp_srcptr Q, slong n, nmod_t mod);
-
-void nmod_poly_revert_series(nmod_poly_t Qinv,
-                                 const nmod_poly_t Q, slong n);
+void _nmod_poly_revert_series(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nmod_t mod);
+void nmod_poly_revert_series(nmod_poly_t Qinv, const nmod_poly_t Q, slong n);
 
 /* norms *********************************************************************/
 
@@ -1112,6 +1084,12 @@ void nmod_poly_log_series(nmod_poly_t res, const nmod_poly_t f, slong n);
 void  _nmod_poly_exp_expinv_series(mp_ptr f, mp_ptr g, mp_srcptr h, slong hlen, slong n, nmod_t mod);
 void _nmod_poly_exp_series(mp_ptr f, mp_srcptr h, slong hlen, slong n, nmod_t mod);
 void nmod_poly_exp_series(nmod_poly_t f, const nmod_poly_t h, slong n);
+
+/* Special polynomials *******************************************************/
+
+int _nmod_poly_conway(mp_ptr op, ulong prime, slong deg);
+
+ulong _nmod_poly_conway_rand(slong * degree, flint_rand_t state, int type);
 
 /* Products  *****************************************************************/
 

@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2012 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #ifndef BERNOULLI_H
@@ -36,12 +36,12 @@ We get a more accurate estimate taking the square root of this.
 Further, at least for sufficiently large n,
 sigma_0(n) < exp(1.066 log(n) / log(log(n))).
 */
-static __inline__ slong bernoulli_denom_size(slong n)
+FLINT_FORCE_INLINE slong bernoulli_denom_size(slong n)
 {
     return 0.5 * 1.4427 * log(n) * pow(n, 1.066 / log(log(n)));
 }
 
-static __inline__ slong bernoulli_zeta_terms(ulong s, slong prec)
+FLINT_FORCE_INLINE slong bernoulli_zeta_terms(ulong s, slong prec)
 {
     slong N;
     N = pow(2.0, (prec + 1.0) / (s - 1.0));
@@ -49,7 +49,7 @@ static __inline__ slong bernoulli_zeta_terms(ulong s, slong prec)
     return N;
 }
 
-static __inline__ slong bernoulli_power_prec(slong i, ulong s1, slong wp)
+FLINT_FORCE_INLINE slong bernoulli_power_prec(slong i, ulong s1, slong wp)
 {
     slong p = wp - s1 * log(i) * 1.44269504088896341;
     return FLINT_MAX(p, 10);
@@ -59,7 +59,7 @@ static __inline__ slong bernoulli_power_prec(slong i, ulong s1, slong wp)
    in practice since the denominator estimate is quite a bit larger
    than the true denominators
  */
-static __inline__ slong bernoulli_global_prec(ulong nmax)
+FLINT_FORCE_INLINE slong bernoulli_global_prec(ulong nmax)
 {
     return arith_bernoulli_number_size(nmax) + bernoulli_denom_size(nmax);
 }
@@ -112,4 +112,3 @@ void bernoulli_fmpq_ui(fmpq_t b, ulong n);
 #endif
 
 #endif
-

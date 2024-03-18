@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -86,9 +86,8 @@ main(void)
     {
         slong s[nalgs], sum;
 
-        s[0] = 0;
-        s[1] = 0;
-        s[2] = 0;
+        for (i = 0; i < nalgs; i++)
+            s[i] = 0;
         sum = 0;
 
         for (bits = bitslo, i = 0; bits <= bitshi; bits *= bitsh, i++)
@@ -153,12 +152,13 @@ main(void)
 
             if (none)
                 X[i][j] = -1;
-            else if (s[0] <= s[1] && s[0] <= s[2])
+            else if (s[0] <= s[1]) /* && s[0] <= s[2]) */
                 X[i][j] = 0;
-            else if (s[1] <= s[2])
-                X[i][j] = 1;
+            /* else if (s[1] <= s[2]) */
+            /*     X[i][j] = 1; */
             else
-                X[i][j] = 2;
+                X[i][j] = 1;
+                /* X[i][j] = 2; */
 
             if (s[0] != 0)
             {

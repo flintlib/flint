@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2020 Fredrik Johansson
 
-    This file is part of Calcium.
+    This file is part of FLINT.
 
-    Calcium is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #ifndef CA_POLY_H
@@ -15,7 +15,7 @@
 #ifdef CA_POLY_INLINES_C
 #define CA_POLY_INLINE
 #else
-#define CA_POLY_INLINE static __inline__
+#define CA_POLY_INLINE static inline
 #endif
 
 #include "ca_vec.h"
@@ -67,9 +67,7 @@ void _ca_poly_normalise(ca_poly_t poly, ca_ctx_t ctx);
 CA_POLY_INLINE void
 ca_poly_swap(ca_poly_t poly1, ca_poly_t poly2, ca_ctx_t ctx)
 {
-    ca_poly_struct t = *poly1;
-    *poly1 = *poly2;
-    *poly2 = t;
+    FLINT_SWAP(ca_poly_struct, *poly1, *poly2);
 }
 
 /* Assignment and simple values */

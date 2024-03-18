@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -22,21 +22,22 @@
 #include "fmpz.h"
 
 #if FLINT_USES_PTHREAD
+# include <pthread.h>
 # include <stdatomic.h>
 #endif
 
 #if FLINT_USES_PTHREAD
 typedef struct
 {
-   _Atomic(int) count;
-   pthread_t thread;
-   void * address;
+    _Atomic(int) count;
+    pthread_t thread;
+    void * address;
 } fmpz_block_header_s;
 #else
 typedef struct
 {
-   int count;
-   void * address;
+    int count;
+    void * address;
 } fmpz_block_header_s;
 #endif
 
@@ -59,16 +60,17 @@ static slong flint_page_mask;
 slong flint_get_page_size(void)
 {
 #if defined(__unix__)
-   return sysconf(_SC_PAGESIZE);
+    return sysconf(_SC_PAGESIZE);
 #elif defined(_WIN32) || defined(WIN32)
-   SYSTEM_INFO si;
-   GetSystemInfo(&si);
-   return si.dwPageSize;
+    SYSTEM_INFO si;
+    GetSystemInfo(&si);
+    return si.dwPageSize;
 #else
-   return 4096;
+    return 4096;
 #endif
 }
 
+static inline
 void * flint_align_ptr(void * ptr, slong size)
 {
     slong mask = ~(size - 1);
@@ -81,7 +83,6 @@ __mpz_struct * _fmpz_new_mpz(void)
     if (mpz_free_num == 0) /* allocate more mpz's */
     {
         void * aligned_ptr, * ptr;
-
         slong i, j, num, block_size, skip;
 
         flint_page_size = flint_get_page_size();
@@ -157,7 +158,7 @@ void _fmpz_clear_mpz(fmpz f)
         mpz_clear(ptr);
 
 #if FLINT_USES_PTHREAD
-       new_count = atomic_fetch_add(&(header_ptr->count), 1);
+       new_count = atomic_fetch_add(&(header_ptr->count), 1) + 1;
 #else
        new_count = ++header_ptr->count;
 #endif
@@ -196,7 +197,7 @@ void _fmpz_cleanup_mpz_content(void)
        ptr = (fmpz_block_header_s *) ptr->address;
 
 #if FLINT_USES_PTHREAD
-       new_count = atomic_fetch_add(&(ptr->count), 1);
+       new_count = atomic_fetch_add(&(ptr->count), 1) + 1;
 #else
        new_count = ++ptr->count;
 #endif

@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -30,12 +30,7 @@ TEST_FUNCTION_START(n_primes, state)
             q = n_nextprime(q, 0);
 
             if (p != q)
-            {
-                flint_printf("FAIL\n");
-                flint_printf("i = %wu, p = %wu, q = %wu\n", i, p, q);
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL("i = %wu, p = %wu, q = %wu\n", i, p, q);
         }
 
         n_primes_clear(iter);
@@ -59,12 +54,7 @@ TEST_FUNCTION_START(n_primes, state)
             s++;
 
         if (s != primepi[n])
-        {
-            flint_printf("FAIL\n");
-            flint_printf("pi(10^%wd) = %u, computed = %wu\n", n, primepi[n], s);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("pi(10^%wd) = %u, computed = %wu\n", n, primepi[n], s);
 
         n_primes_clear(iter);
     }

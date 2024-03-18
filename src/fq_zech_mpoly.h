@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -15,11 +15,12 @@
 #ifdef FQ_ZECH_MPOLY_INLINES_C
 #define FQ_ZECH_MPOLY_INLINE
 #else
-#define FQ_ZECH_MPOLY_INLINE static __inline__
+#define FQ_ZECH_MPOLY_INLINE static inline
 #endif
 
-#include "fq_zech_poly.h"
-#include "fq_nmod_mpoly.h"
+#include "fq_zech_types.h"
+#include "fq_nmod_types.h"
+#include "mpoly_types.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -140,9 +141,6 @@ typedef fq_zech_mpoly_geobucket_struct fq_zech_mpoly_geobucket_t[1];
 void fq_zech_mpoly_ctx_init_deg(fq_zech_mpoly_ctx_t ctx, slong nvars,
                                  const ordering_t ord, mp_limb_t p, slong deg);
 
-void fq_zech_mpoly_ctx_init(fq_zech_mpoly_ctx_t ctx, slong nvars,
-                              const ordering_t ord, const fq_zech_ctx_t fqctx);
-
 void fq_zech_mpoly_ctx_clear(fq_zech_mpoly_ctx_t ctx);
 
 FQ_ZECH_MPOLY_INLINE
@@ -203,26 +201,7 @@ void fq_zech_mpoly_truncate(fq_zech_mpoly_t A, slong newlen,
     }
 }
 
-FQ_ZECH_MPOLY_INLINE
-void fq_zech_mpoly_fit_bits(fq_zech_mpoly_t A, slong bits,
-                                                 const fq_zech_mpoly_ctx_t ctx)
-{
-    if (A->bits < bits)
-    {
-        if (A->alloc != 0)
-        {
-            slong N = mpoly_words_per_exp(bits, ctx->minfo);
-            ulong * t = (ulong *) flint_malloc(N*A->alloc*sizeof(ulong));
-            mpoly_repack_monomials(t, bits, A->exps, A->bits, A->length,
-                                                                   ctx->minfo);
-            flint_free(A->exps);
-            A->exps = t;
-        }
-
-        A->bits = bits;
-    }
-}
-
+void fq_zech_mpoly_fit_bits(fq_zech_mpoly_t A, slong bits, const fq_zech_mpoly_ctx_t ctx);
 
 /* Input/output **************************************************************/
 
@@ -304,63 +283,18 @@ int fq_zech_mpoly_is_one(const fq_zech_mpoly_t A,
 
 /* Degrees *******************************************************************/
 
-FQ_ZECH_MPOLY_INLINE
-int fq_zech_mpoly_degrees_fit_si(const fq_zech_mpoly_t A,
-                                                 const fq_zech_mpoly_ctx_t ctx)
-{
-    return A->bits <= FLINT_BITS ? 1
-               : mpoly_degrees_fit_si(A->exps, A->length, A->bits, ctx->minfo);
-}
+int fq_zech_mpoly_degrees_fit_si(const fq_zech_mpoly_t A, const fq_zech_mpoly_ctx_t ctx);
 
-FQ_ZECH_MPOLY_INLINE
-void fq_zech_mpoly_degrees_fmpz(fmpz ** degs, const fq_zech_mpoly_t A,
-                                                 const fq_zech_mpoly_ctx_t ctx)
-{
-    mpoly_degrees_pfmpz(degs, A->exps, A->length, A->bits, ctx->minfo);
-}
+void fq_zech_mpoly_degrees_fmpz(fmpz ** degs, const fq_zech_mpoly_t A, const fq_zech_mpoly_ctx_t ctx);
+void fq_zech_mpoly_degrees_si(slong * degs, const fq_zech_mpoly_t A, const fq_zech_mpoly_ctx_t ctx);
 
-FQ_ZECH_MPOLY_INLINE
-void fq_zech_mpoly_degrees_si(slong * degs, const fq_zech_mpoly_t A,
-                                                 const fq_zech_mpoly_ctx_t ctx)
-{
-    mpoly_degrees_si(degs, A->exps, A->length, A->bits, ctx->minfo);
-}
+void fq_zech_mpoly_degree_fmpz(fmpz_t deg, const fq_zech_mpoly_t A, slong var, const fq_zech_mpoly_ctx_t ctx);
+slong fq_zech_mpoly_degree_si(const fq_zech_mpoly_t A, slong var, const fq_zech_mpoly_ctx_t ctx);
 
-FQ_ZECH_MPOLY_INLINE
-void fq_zech_mpoly_degree_fmpz(fmpz_t deg, const fq_zech_mpoly_t A, slong var,
-                                                 const fq_zech_mpoly_ctx_t ctx)
-{
-    mpoly_degree_fmpz(deg, A->exps, A->length, A->bits, var, ctx->minfo);
-}
+int fq_zech_mpoly_total_degree_fits_si(const fq_zech_mpoly_t A, const fq_zech_mpoly_ctx_t ctx);
 
-FQ_ZECH_MPOLY_INLINE
-slong fq_zech_mpoly_degree_si(const fq_zech_mpoly_t A, slong var,
-                                                 const fq_zech_mpoly_ctx_t ctx)
-{
-    return mpoly_degree_si(A->exps, A->length, A->bits, var, ctx->minfo);
-}
-
-FQ_ZECH_MPOLY_INLINE
-int fq_zech_mpoly_total_degree_fits_si(const fq_zech_mpoly_t A,
-                                                 const fq_zech_mpoly_ctx_t ctx)
-{
-    return mpoly_total_degree_fits_si(A->exps, A->length, A->bits, ctx->minfo);
-}
-
-FQ_ZECH_MPOLY_INLINE
-void fq_zech_mpoly_total_degree_fmpz(fmpz_t td, const fq_zech_mpoly_t A,
-                                                 const fq_zech_mpoly_ctx_t ctx)
-{
-    mpoly_total_degree_fmpz(td, A->exps, A->length, A->bits, ctx->minfo);
-}
-
-FQ_ZECH_MPOLY_INLINE
-slong fq_zech_mpoly_total_degree_si(const fq_zech_mpoly_t A,
-                                                 const fq_zech_mpoly_ctx_t ctx)
-{
-    return mpoly_total_degree_si(A->exps, A->length, A->bits, ctx->minfo);
-}
-
+void fq_zech_mpoly_total_degree_fmpz(fmpz_t td, const fq_zech_mpoly_t A, const fq_zech_mpoly_ctx_t ctx);
+slong fq_zech_mpoly_total_degree_si(const fq_zech_mpoly_t A, const fq_zech_mpoly_ctx_t ctx);
 
 /* Coefficients **************************************************************/
 
@@ -430,21 +364,8 @@ void fq_zech_mpoly_get_term_coeff_fq_zech(fq_zech_t c,
 void fq_zech_mpoly_set_term_coeff_fq_zech(fq_zech_mpoly_t A,
                     slong i, const fq_zech_t c, const fq_zech_mpoly_ctx_t ctx);
 
-FQ_ZECH_MPOLY_INLINE
-int fq_zech_mpoly_term_exp_fits_ui(const fq_zech_mpoly_t A, slong i,
-                                                 const fq_zech_mpoly_ctx_t ctx)
-{
-    return A->bits <= FLINT_BITS ? 1
-                     : mpoly_term_exp_fits_ui(A->exps, A->bits, i, ctx->minfo);
-}
-
-FQ_ZECH_MPOLY_INLINE
-int fq_zech_mpoly_term_exp_fits_si(const fq_zech_mpoly_t A, slong i,
-                                                 const fq_zech_mpoly_ctx_t ctx)
-{
-    return A->bits <= FLINT_BITS ? 1
-                     : mpoly_term_exp_fits_si(A->exps, A->bits, i, ctx->minfo);
-}
+int fq_zech_mpoly_term_exp_fits_ui(const fq_zech_mpoly_t A, slong i, const fq_zech_mpoly_ctx_t ctx);
+int fq_zech_mpoly_term_exp_fits_si(const fq_zech_mpoly_t A, slong i, const fq_zech_mpoly_ctx_t ctx);
 
 void fq_zech_mpoly_get_term_exp_fmpz(fmpz ** exp,
               const fq_zech_mpoly_t A, slong i, const fq_zech_mpoly_ctx_t ctx);
@@ -735,12 +656,7 @@ void fq_zech_mpoly_univar_swap(fq_zech_mpoly_univar_t A,
     FLINT_SWAP(fq_zech_mpoly_univar_struct, *A, *B);
 }
 
-FQ_ZECH_MPOLY_INLINE
-int fq_zech_mpoly_univar_degree_fits_si(const fq_zech_mpoly_univar_t A,
-                                                 const fq_zech_mpoly_ctx_t ctx)
-{
-    return A->length == 0 || fmpz_fits_si(A->exps + 0);
-}
+int fq_zech_mpoly_univar_degree_fits_si(const fq_zech_mpoly_univar_t A, const fq_zech_mpoly_ctx_t ctx);
 
 FQ_ZECH_MPOLY_INLINE
 slong fq_zech_mpoly_univar_length(const fq_zech_mpoly_univar_t A,
@@ -749,13 +665,7 @@ slong fq_zech_mpoly_univar_length(const fq_zech_mpoly_univar_t A,
     return A->length;
 }
 
-FQ_ZECH_MPOLY_INLINE
-slong fq_zech_mpoly_univar_get_term_exp_si(fq_zech_mpoly_univar_t A, slong i,
-                                                 const fq_zech_mpoly_ctx_t ctx)
-{
-    FLINT_ASSERT((ulong)i < (ulong)A->length);
-    return fmpz_get_si(A->exps + i);
-}
+slong fq_zech_mpoly_univar_get_term_exp_si(fq_zech_mpoly_univar_t A, slong i, const fq_zech_mpoly_ctx_t ctx);
 
 FQ_ZECH_MPOLY_INLINE
 void fq_zech_mpoly_univar_get_term_coeff(fq_zech_mpoly_t c,
@@ -855,4 +765,3 @@ void fq_zech_mpolyu_one(fq_zech_mpolyu_t A,
 #endif
 
 #endif
-

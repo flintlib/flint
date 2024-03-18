@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -35,27 +35,19 @@ TEST_FUNCTION_START(nmod_mat_solve_vec, state)
 
         /* Dense */
         if (n_randint(state, 2))
-            nmod_mat_randops(A, 1+n_randint(state, 1+m*m), state);
+            nmod_mat_randops(A, state, 1+n_randint(state, 1+m*m));
 
         solved = nmod_mat_solve_vec(x->entries, A, b->entries);
         nmod_mat_mul(Ax, A, x);
 
         if (!nmod_mat_equal(Ax, b) || !solved)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("Ax != b!\n");
-            flint_printf("A:\n");
-            nmod_mat_print_pretty(A);
-            flint_printf("b:\n");
-            nmod_mat_print_pretty(b);
-            flint_printf("x:\n");
-            nmod_mat_print_pretty(x);
-            flint_printf("Ax:\n");
-            nmod_mat_print_pretty(Ax);
-            flint_printf("\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Ax != b\n"
+                    "A = %{nmod_mat}\n"
+                    "b = %{nmod_mat}\n"
+                    "x = %{nmod_mat}\n"
+                    "Ax = %{nmod_mat}\n",
+                    A, b, x, Ax);
 
         nmod_mat_clear(A);
         nmod_mat_clear(b);
@@ -80,17 +72,12 @@ TEST_FUNCTION_START(nmod_mat_solve_vec, state)
 
         /* Dense */
         if (n_randint(state, 2))
-            nmod_mat_randops(A, 1+n_randint(state, 1+m*m), state);
+            nmod_mat_randops(A, state, 1+n_randint(state, 1+m*m));
 
         solved = nmod_mat_solve_vec(x->entries, A, b->entries);
 
         if (solved)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("singular system was 'solved'\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("singular system was 'solved'\n");
 
         nmod_mat_clear(A);
         nmod_mat_clear(b);

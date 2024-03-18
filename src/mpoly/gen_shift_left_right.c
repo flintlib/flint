@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "mpoly.h"
 
 /*
@@ -24,14 +25,14 @@ void _mpoly_gen_shift_right(ulong * Aexp, flint_bitcnt_t Abits, slong Alength,
 {
     slong i, N;
     ulong *one;
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     ulong mask;
 #endif
     TMP_INIT;
 
     FLINT_ASSERT(Abits <= FLINT_BITS);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     mask = 0;
     for (i = 0; i < FLINT_BITS/Abits; i++)
         mask = (mask << Abits) + (UWORD(1) << (Abits - 1));
@@ -100,14 +101,14 @@ void _mpoly_gen_shift_left(ulong * Aexp, flint_bitcnt_t Abits, slong Alength,
 {
     slong i, N;
     ulong *one;
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     ulong mask;
 #endif
     TMP_INIT;
 
     FLINT_ASSERT(Abits <= FLINT_BITS);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     mask = 0;
     for (i = 0; i < FLINT_BITS/Abits; i++)
         mask = (mask << Abits) + (UWORD(1) << (Abits - 1));

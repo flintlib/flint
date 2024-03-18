@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2020 Fredrik Johansson
 
-    This file is part of Calcium.
+    This file is part of FLINT.
 
-    Calcium is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #ifndef FMPZ_MPOLY_Q_H
@@ -15,14 +15,15 @@
 #ifdef FMPZ_MPOLY_Q_INLINES_C
 #define FMPZ_MPOLY_Q_INLINE
 #else
-#define FMPZ_MPOLY_Q_INLINE static __inline__
+#define FMPZ_MPOLY_Q_INLINE static inline
 #endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "fmpq.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_mpoly.h"
 #include "acb_types.h"
 
@@ -112,6 +113,8 @@ fmpz_mpoly_q_gen(fmpz_mpoly_q_t res, slong i, const fmpz_mpoly_ctx_t ctx)
 /* Input and output */
 
 void fmpz_mpoly_q_print_pretty(const fmpz_mpoly_q_t f, const char ** x, const fmpz_mpoly_ctx_t ctx);
+char * fmpz_mpoly_q_get_str_pretty(const fmpz_mpoly_q_t f, const char ** vars, const fmpz_mpoly_ctx_t ctx);
+int fmpz_mpoly_q_set_str_pretty(fmpz_mpoly_q_t res, const char * s, const char ** vars, fmpz_mpoly_ctx_t ctx);
 
 /* Random generation */
 
@@ -249,8 +252,7 @@ fmpz_mpoly_gcd_assert_successful(fmpz_mpoly_t res, const fmpz_mpoly_t x, const f
 {
     if (!fmpz_mpoly_gcd(res, x, y, ctx))
     {
-        flint_printf("fmpz_mpoly_gcd failed\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "fmpz_mpoly_gcd failed\n");
     }
 }
 
@@ -295,4 +297,3 @@ void fmpz_mpoly_q_evaluate_acb(acb_t res, const fmpz_mpoly_q_t f, acb_srcptr x, 
 #endif
 
 #endif
-

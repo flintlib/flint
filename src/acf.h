@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2022 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #ifndef ACF_H
@@ -15,7 +15,7 @@
 #ifdef ACF_INLINES_C
 #define ACF_INLINE
 #else
-#define ACF_INLINE static __inline__
+#define ACF_INLINE static inline
 #endif
 
 #include "arf.h"
@@ -58,8 +58,7 @@ acf_set(acf_t z, const acf_t x)
 ACF_INLINE void
 acf_swap(acf_t z, acf_t x)
 {
-    arf_swap(acf_realref(z), acf_realref(x));
-    arf_swap(acf_imagref(z), acf_imagref(x));
+    FLINT_SWAP(acf_struct, *z, *x);
 }
 
 ACF_INLINE int

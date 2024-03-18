@@ -5,8 +5,8 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fmpz.h"
@@ -74,7 +74,7 @@ nmod8_randtest(nmod8_t res, flint_rand_t state, const gr_ctx_t ctx)
 int
 nmod8_write(gr_stream_t out, const nmod8_t x, const gr_ctx_t ctx)
 {
-    gr_stream_write_si(out, x[0]);
+    gr_stream_write_ui(out, x[0]);
     return GR_SUCCESS;
 }
 
@@ -261,7 +261,10 @@ nmod8_div(nmod8_t res, const nmod8_t x, const nmod8_t y, const gr_ctx_t ctx)
     int status;
 
     status = nmod8_inv(t, y, ctx);
-    nmod8_mul(res, x, t, ctx);
+
+    if (status == GR_SUCCESS)
+        nmod8_mul(res, x, t, ctx);
+
     return status;
 }
 
@@ -273,12 +276,57 @@ nmod8_div_si(nmod8_t res, const nmod8_t x, slong y, const gr_ctx_t ctx)
     return nmod8_div(res, x, t, ctx);
 }
 
+int
+nmod8_div_ui(nmod8_t res, const nmod8_t x, ulong y, const gr_ctx_t ctx)
+{
+    nmod8_t t;
+    nmod8_set_ui(t, y, ctx);
+    return nmod8_div(res, x, t, ctx);
+}
+
+int
+nmod8_div_fmpz(nmod8_t res, const nmod8_t x, const fmpz_t y, const gr_ctx_t ctx)
+{
+    nmod8_t t;
+    nmod8_set_fmpz(t, y, ctx);
+    return nmod8_div(res, x, t, ctx);
+}
+
 truth_t
 nmod8_is_invertible(const nmod8_t x, const gr_ctx_t ctx)
 {
     ulong r, g;
     g = n_gcdinv(&r, x[0], NMOD8_CTX(ctx).n);
     return (g == 1) ? T_TRUE : T_FALSE;
+}
+
+truth_t
+nmod8_divides(const nmod8_t x, const nmod8_t y, const gr_ctx_t ctx)
+{
+    ulong t;
+    return nmod_divides(&t, y[0], x[0], NMOD8_CTX(ctx)) ? T_TRUE : T_FALSE;
+}
+
+int
+nmod8_div_nonunique(nmod8_t res, const nmod8_t x, const nmod8_t y, const gr_ctx_t ctx)
+{
+    nmod8_t t;
+    int status;
+
+    status = nmod8_inv(t, y, ctx);
+
+    if (status == GR_SUCCESS)
+    {
+        nmod8_mul(res, x, t, ctx);
+    }
+    else
+    {
+        ulong t2;
+        status = nmod_divides(&t2, x[0], y[0], NMOD8_CTX(ctx)) ? GR_SUCCESS : GR_DOMAIN;
+        res[0] = t2;
+    }
+
+    return status;
 }
 
 void
@@ -528,6 +576,10 @@ gr_method_tab_input _nmod8_methods_input[] =
     {GR_METHOD_SQR,             (gr_funcptr) nmod8_sqr},
     {GR_METHOD_DIV,             (gr_funcptr) nmod8_div},
     {GR_METHOD_DIV_SI,          (gr_funcptr) nmod8_div_si},
+    {GR_METHOD_DIV_UI,          (gr_funcptr) nmod8_div_ui},
+    {GR_METHOD_DIV_FMPZ,        (gr_funcptr) nmod8_div_fmpz},
+    {GR_METHOD_DIV_NONUNIQUE,   (gr_funcptr) nmod8_div_nonunique},
+    {GR_METHOD_DIVIDES,         (gr_funcptr) nmod8_divides},
     {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) nmod8_is_invertible},
     {GR_METHOD_INV,             (gr_funcptr) nmod8_inv},
     {GR_METHOD_VEC_INIT,        (gr_funcptr) _nmod8_vec_init},

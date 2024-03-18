@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2018 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "acb_mat.h"
@@ -46,8 +46,7 @@ acb_mat_det(acb_t det, const acb_mat_t A, slong prec)
 
     if (!acb_mat_is_square(A))
     {
-        flint_printf("acb_mat_det: a square matrix is required!\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "acb_mat_det: a square matrix is required!\n");
     }
 
     n = acb_mat_nrows(A);

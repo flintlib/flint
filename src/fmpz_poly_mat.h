@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -15,10 +15,10 @@
 #ifdef FMPZ_POLY_MAT_INLINES_C
 #define FMPZ_POLY_MAT_INLINE
 #else
-#define FMPZ_POLY_MAT_INLINE static __inline__
+#define FMPZ_POLY_MAT_INLINE static inline
 #endif
 
-#include "fmpz_poly.h"
+#include "fmpz_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -59,7 +59,7 @@ fmpz_poly_mat_swap_entrywise(fmpz_poly_mat_t mat1, fmpz_poly_mat_t mat2)
 
     for (i = 0; i < fmpz_poly_mat_nrows(mat1); i++)
         for (j = 0; j < fmpz_poly_mat_ncols(mat1); j++)
-            fmpz_poly_swap(fmpz_poly_mat_entry(mat2, i, j), fmpz_poly_mat_entry(mat1, i, j));
+            FLINT_SWAP(fmpz_poly_struct, *fmpz_poly_mat_entry(mat2, i, j), *fmpz_poly_mat_entry(mat1, i, j));
 }
 
 void fmpz_poly_mat_set(fmpz_poly_mat_t mat1, const fmpz_poly_mat_t mat2);

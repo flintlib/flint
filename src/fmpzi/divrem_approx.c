@@ -1,15 +1,16 @@
 /*
     Copyright (C) 2022 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <math.h>
+#include "double_extras.h"
 #include "fmpzi.h"
 
 void
@@ -22,8 +23,7 @@ fmpzi_divrem_approx(fmpzi_t q, fmpzi_t r, const fmpzi_t x, const fmpzi_t y)
 
     if (ybits == 0)
     {
-        flint_printf("fmpzi_divrem_approx: division by zero\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "fmpzi_divrem_approx: division by zero\n");
     }
 
     if (xbits == 0)
@@ -61,10 +61,10 @@ fmpzi_divrem_approx(fmpzi_t q, fmpzi_t r, const fmpzi_t x, const fmpzi_t y)
             c = fmpz_get_d_2exp(&cexp, fmpzi_realref(y));
             d = fmpz_get_d_2exp(&dexp, fmpzi_imagref(y));
 
-            a = ldexp(a, FLINT_MAX(aexp - xbits, -1024));
-            b = ldexp(b, FLINT_MAX(bexp - xbits, -1024));
-            c = ldexp(c, FLINT_MAX(cexp - xbits, -1024));
-            d = ldexp(d, FLINT_MAX(dexp - xbits, -1024));
+            a = d_mul_2exp(a, FLINT_MAX(aexp - xbits, -1024));
+            b = d_mul_2exp(b, FLINT_MAX(bexp - xbits, -1024));
+            c = d_mul_2exp(c, FLINT_MAX(cexp - xbits, -1024));
+            d = d_mul_2exp(d, FLINT_MAX(dexp - xbits, -1024));
         }
 
         t = a * c + b * d;
@@ -81,29 +81,20 @@ fmpzi_divrem_approx(fmpzi_t q, fmpzi_t r, const fmpzi_t x, const fmpzi_t y)
 
         if (r != NULL)
         {
-            if (r == x)
-            {
-                fmpz_submul_si(fmpzi_realref(r), fmpzi_realref(y), qa);
-                fmpz_addmul_si(fmpzi_realref(r), fmpzi_imagref(y), qb);
-                fmpz_submul_si(fmpzi_realref(r), fmpzi_imagref(y), qa);
-                fmpz_addmul_si(fmpzi_realref(r), fmpzi_realref(y), qb);
+            fmpzi_t t, u;
 
-                fmpz_set_d(fmpzi_realref(q), qa);
-                fmpz_set_d(fmpzi_imagref(q), qb);
-            }
-            else
-            {
-                fmpzi_t t;
-                fmpzi_init(t);
+            fmpzi_init(t);
+            fmpzi_init(u);
 
-                fmpz_set_d(fmpzi_realref(q), qa);
-                fmpz_set_d(fmpzi_imagref(q), qb);
+            fmpz_set_d(fmpzi_realref(u), qa);
+            fmpz_set_d(fmpzi_imagref(u), qb);
 
-                fmpzi_mul(t, q, y);
-                fmpzi_sub(r, x, t);
+            fmpzi_mul(t, u, y);
+            fmpzi_sub(r, x, t);
+            fmpzi_swap(q, u);
 
-                fmpzi_clear(t);
-            }
+            fmpzi_clear(t);
+            fmpzi_clear(u);
         }
         else
         {

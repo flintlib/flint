@@ -5,13 +5,18 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly_factor.h"
 #include "profiler.h"
+#include "fmpz.h"
+#include "nmod_mpoly_factor.h"
 
+#if defined(__GNUC__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Woverlength-strings"
+#endif
 
 slong check_omega(slong om, const nmod_mpoly_t p, const char ** vars, const nmod_mpoly_ctx_t ctx)
 {
@@ -1219,3 +1224,7 @@ int main(int argc, char *argv[])
     flint_cleanup_master();
     return 0;
 }
+
+#if defined(__GNUC__)
+# pragma GCC diagnostic pop
+#endif

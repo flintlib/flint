@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -15,11 +15,11 @@
 #ifdef FMPQ_MPOLY_INLINES_C
 #define FMPQ_MPOLY_INLINE
 #else
-#define FMPQ_MPOLY_INLINE static __inline__
+#define FMPQ_MPOLY_INLINE static inline
 #endif
 
-#include "fmpq.h"
 #include "fmpq_types.h"
+#include "fmpq.h"
 #include "fmpz_mpoly.h"
 
 #ifdef __cplusplus
@@ -275,70 +275,18 @@ int fmpq_mpoly_is_one(const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
 
 /* Degrees *******************************************************************/
 
-FMPQ_MPOLY_INLINE
-int fmpq_mpoly_degrees_fit_si(const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
-{
-    return A->zpoly->bits <= FLINT_BITS ? 1
-                               : mpoly_degrees_fit_si(A->zpoly->exps,
-                                       A->zpoly->length, A->zpoly->bits,
-                                                             ctx->zctx->minfo);
-}
+int fmpq_mpoly_degrees_fit_si(const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx);
 
-FMPQ_MPOLY_INLINE
-void fmpq_mpoly_degrees_fmpz(fmpz ** degs, const fmpq_mpoly_t A,
-                                                   const fmpq_mpoly_ctx_t ctx)
-{
-    mpoly_degrees_pfmpz(degs, A->zpoly->exps, A->zpoly->length,
-                                             A->zpoly->bits, ctx->zctx->minfo);
-}
+void fmpq_mpoly_degrees_fmpz(fmpz ** degs, const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx);
+void fmpq_mpoly_degrees_si(slong * degs, const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx);
 
-FMPQ_MPOLY_INLINE
-void fmpq_mpoly_degrees_si(slong * degs, const fmpq_mpoly_t A,
-                                                   const fmpq_mpoly_ctx_t ctx)
-{
-    mpoly_degrees_si(degs, A->zpoly->exps, A->zpoly->length,
-                                             A->zpoly->bits, ctx->zctx->minfo);
-}
+void fmpq_mpoly_degree_fmpz(fmpz_t deg, const fmpq_mpoly_t A, slong var, const fmpq_mpoly_ctx_t ctx);
+slong fmpq_mpoly_degree_si(const fmpq_mpoly_t A, slong var, const fmpq_mpoly_ctx_t ctx);
 
-FMPQ_MPOLY_INLINE
-void fmpq_mpoly_degree_fmpz(fmpz_t deg, const fmpq_mpoly_t A, slong var,
-                                                   const fmpq_mpoly_ctx_t ctx)
-{
-    mpoly_degree_fmpz(deg, A->zpoly->exps, A->zpoly->length,
-                                        A->zpoly->bits, var, ctx->zctx->minfo);
-}
+int fmpq_mpoly_total_degree_fits_si(const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx);
 
-FMPQ_MPOLY_INLINE
-slong fmpq_mpoly_degree_si(const fmpq_mpoly_t A, slong var,
-                                                   const fmpq_mpoly_ctx_t ctx)
-{
-    return mpoly_degree_si(A->zpoly->exps, A->zpoly->length,
-                                        A->zpoly->bits, var, ctx->zctx->minfo);
-}
-
-FMPQ_MPOLY_INLINE
-int fmpq_mpoly_total_degree_fits_si(const fmpq_mpoly_t A,
-                                                    const fmpq_mpoly_ctx_t ctx)
-{
-    return mpoly_total_degree_fits_si(A->zpoly->exps, A->zpoly->length,
-                                             A->zpoly->bits, ctx->zctx->minfo);
-}
-
-FMPQ_MPOLY_INLINE
-void fmpq_mpoly_total_degree_fmpz(fmpz_t tdeg, const fmpq_mpoly_t A,
-                                                    const fmpq_mpoly_ctx_t ctx)
-{
-    mpoly_total_degree_fmpz(tdeg, A->zpoly->exps, A->zpoly->length,
-                                             A->zpoly->bits, ctx->zctx->minfo);
-}
-
-FMPQ_MPOLY_INLINE
-slong fmpq_mpoly_total_degree_si(const fmpq_mpoly_t A,
-                                                    const fmpq_mpoly_ctx_t ctx)
-{
-    return mpoly_total_degree_si(A->zpoly->exps, A->zpoly->length,
-                                             A->zpoly->bits, ctx->zctx->minfo);
-}
+void fmpq_mpoly_total_degree_fmpz(fmpz_t tdeg, const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx);
+slong fmpq_mpoly_total_degree_si(const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx);
 
 FMPQ_MPOLY_INLINE
 void fmpq_mpoly_used_vars(int * used, const fmpq_mpoly_t A,
@@ -430,23 +378,8 @@ void fmpq_mpoly_get_term_coeff_fmpq(fmpq_t c, const fmpq_mpoly_t A,
 void fmpq_mpoly_set_term_coeff_fmpq(fmpq_mpoly_t A,
                           slong i, const fmpq_t c, const fmpq_mpoly_ctx_t ctx);
 
-FMPQ_MPOLY_INLINE
-int fmpq_mpoly_term_exp_fits_ui(const fmpq_mpoly_t A,
-                                           slong i, const fmpq_mpoly_ctx_t ctx)
-{
-    return A->zpoly->bits <= FLINT_BITS ? 1
-                               : mpoly_term_exp_fits_ui(A->zpoly->exps,
-                                          A->zpoly->bits, i, ctx->zctx->minfo);
-}
-
-FMPQ_MPOLY_INLINE
-int fmpq_mpoly_term_exp_fits_si(const fmpq_mpoly_t A,
-                                           slong i, const fmpq_mpoly_ctx_t ctx)
-{
-    return A->zpoly->bits <= FLINT_BITS ? 1
-                               : mpoly_term_exp_fits_si(A->zpoly->exps,
-                                          A->zpoly->bits, i, ctx->zctx->minfo);
-}
+int fmpq_mpoly_term_exp_fits_ui(const fmpq_mpoly_t A, slong i, const fmpq_mpoly_ctx_t ctx);
+int fmpq_mpoly_term_exp_fits_si(const fmpq_mpoly_t A, slong i, const fmpq_mpoly_ctx_t ctx);
 
 void fmpq_mpoly_get_term_exp_fmpz(fmpz ** exps, const fmpq_mpoly_t A,
                                           slong i, const fmpq_mpoly_ctx_t ctx);

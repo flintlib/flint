@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -13,6 +13,7 @@
 #include <stdlib.h>
 
 #include "mpoly.h"
+#include "fmpz_mpoly_q.h"
 #include "nf.h"
 #include "gr.h"
 
@@ -56,6 +57,13 @@
 #include "t-series_fmpq.c"
 #include "t-series_fmpz.c"
 #include "t-series_nmod8.c"
+#include "t-vector_acb.c"
+#include "t-vector_arb.c"
+#include "t-vector_fmpz.c"
+#include "t-vector_fmpq.c"
+#include "t-vector_nmod.c"
+#include "t-vector_nmod8.c"
+#include "t-vector_nmod32.c"
 
 /* Array of test functions ***************************************************/
 
@@ -98,7 +106,14 @@ test_struct tests[] =
     TEST_FUNCTION(gr_series_arb),
     TEST_FUNCTION(gr_series_fmpq),
     TEST_FUNCTION(gr_series_fmpz),
-    TEST_FUNCTION(gr_series_nmod8)
+    TEST_FUNCTION(gr_series_nmod8),
+    TEST_FUNCTION(gr_vector_acb),
+    TEST_FUNCTION(gr_vector_arb),
+    TEST_FUNCTION(gr_vector_fmpz),
+    TEST_FUNCTION(gr_vector_fmpq),
+    TEST_FUNCTION(gr_vector_nmod),
+    TEST_FUNCTION(gr_vector_nmod8),
+    TEST_FUNCTION(gr_vector_nmod32),
 };
 
 /* main function *************************************************************/

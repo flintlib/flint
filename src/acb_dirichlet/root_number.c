@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2016 Pascal Molin
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "acb_dirichlet.h"
@@ -36,8 +36,7 @@ acb_dirichlet_root_number(acb_t res, const dirichlet_group_t G, const dirichlet_
 {
     if (dirichlet_conductor_char(G, chi) < G->q)
     {
-        flint_printf("root number: need primitive character\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "root number: need primitive character\n");
     }
     else if (G->num > 1)
     {

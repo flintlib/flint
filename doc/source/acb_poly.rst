@@ -414,30 +414,17 @@ Composition
     The underscore method does not support aliasing of the output
     with either input polynomial.
 
-.. function:: void _acb_poly_revert_series_lagrange(acb_ptr h, acb_srcptr f, slong flen, slong n, slong prec)
-
-.. function:: void acb_poly_revert_series_lagrange(acb_poly_t h, const acb_poly_t f, slong n, slong prec)
-
-.. function:: void _acb_poly_revert_series_newton(acb_ptr h, acb_srcptr f, slong flen, slong n, slong prec)
-
-.. function:: void acb_poly_revert_series_newton(acb_poly_t h, const acb_poly_t f, slong n, slong prec)
-
-.. function:: void _acb_poly_revert_series_lagrange_fast(acb_ptr h, acb_srcptr f, slong flen, slong n, slong prec)
-
-.. function:: void acb_poly_revert_series_lagrange_fast(acb_poly_t h, const acb_poly_t f, slong n, slong prec)
-
 .. function:: void _acb_poly_revert_series(acb_ptr h, acb_srcptr f, slong flen, slong n, slong prec)
-
-.. function:: void acb_poly_revert_series(acb_poly_t h, const acb_poly_t f, slong n, slong prec)
+              void acb_poly_revert_series(acb_poly_t h, const acb_poly_t f, slong n, slong prec)
 
     Sets `h` to the power series reversion of `f`, i.e. the expansion
     of the compositional inverse function `f^{-1}(x)`,
-    truncated to order `O(x^n)`, using respectively
-    Lagrange inversion, Newton iteration, fast Lagrange inversion,
-    and a default algorithm choice.
+    truncated to order `O(x^n)`.
+    Wraps :func:`_gr_poly_revert_series` which chooses automatically
+    between various algorithms.
 
     We require that the constant term in `f` is exactly zero and that the
-    linear term is nonzero. The underscore methods assume that *flen*
+    linear term is nonzero. The underscore method assumes that *flen*
     is at least 2, and do not support aliasing.
 
 Evaluation
@@ -738,7 +725,7 @@ Elementary functions
 
     Uses the formula
 
-    .. math ::
+    .. math::
 
         \tan^{-1}(f(x)) = \int f'(x) / (1+f(x)^2) dx,
 
@@ -918,7 +905,7 @@ Power sums
 
     Computes
 
-    .. math ::
+    .. math::
 
         z = S(s,a,n) = \sum_{k=0}^{n-1} \frac{q^k}{(k+a)^{s+t}}
 
@@ -931,7 +918,7 @@ Power sums
 
     Computes
 
-    .. math ::
+    .. math::
 
         z = S(s,1,n) \sum_{k=1}^n \frac{1}{k^{s+t}}
 
@@ -999,7 +986,7 @@ Zeta function
     In particular, expanding `\zeta(s,a) + 1/(1-s)` with `s = 1+x`
     gives the Stieltjes constants
 
-    .. math ::
+    .. math::
 
         \sum_{k=0}^{n-1} \frac{(-1)^k}{k!} \gamma_k(a) x^k`.
 
@@ -1073,7 +1060,7 @@ Root-finding
     Sets *bound* to an upper bound for the magnitude of all the complex
     roots of *poly*. Uses Fujiwara's bound
 
-    .. math ::
+    .. math::
 
         2 \max \left\{\left|\frac{a_{n-1}}{a_n}\right|,
                       \left|\frac{a_{n-2}}{a_n}\right|^{1/2},
@@ -1093,7 +1080,7 @@ Root-finding
     where `n` is the degree of `f`. Proof: assume that the distance
     to the nearest root exceeds `r = |f(m)/f'(m)| n`. Then
 
-    .. math ::
+    .. math::
 
         \left|\frac{f'(m)}{f(m)}\right| =
             \left|\sum_i \frac{1}{m-\zeta_i}\right|

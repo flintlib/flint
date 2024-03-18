@@ -7,10 +7,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "thread_pool.h"
 #include "thread_support.h"
 #include "ulong_extras.h"
 #include "nmod_vec.h"
@@ -199,18 +200,10 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
 
     num_threads = flint_request_threads(&threads, flint_get_num_threads());
 
-    h = (nmod_poly_struct *) flint_malloc((2*m + l + num_threads + 2)*
-                           sizeof(nmod_poly_struct));
-
-    if (h == NULL)
-    {
-        flint_printf("Exception (nmod_poly_factor_distinct_deg):\n");
-        flint_printf("Not enough memory.\n");
-        flint_abort();
-    }
+    h = flint_malloc((2 * m + l + num_threads + 2) * sizeof(nmod_poly_struct));
 
     for (i = 0; i < 2*m + l + 2 + num_threads; i++)
-       nmod_poly_init_mod(h + i, poly->mod);
+        nmod_poly_init_mod(h + i, poly->mod);
 
     H = h + (l + 1);
     I = H + m;

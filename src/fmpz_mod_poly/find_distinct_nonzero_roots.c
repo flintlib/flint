@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -70,7 +70,7 @@ void _fmpz_mod_poly_split_rabin(
         _fmpz_mod_poly_set_length(a, 2);
         _fmpz_mod_poly_set_length(b, 2);
 
-    #ifdef FLINT_WANT_ASSERT
+    #if FLINT_WANT_ASSERT
         fmpz_mod_add(T, a->coeffs + 0, b->coeffs + 0, ctx);
         fmpz_mod_mul(T, T, f->coeffs + 2, ctx);
         FLINT_ASSERT(fmpz_equal(T, f->coeffs + 1));

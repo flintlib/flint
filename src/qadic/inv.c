@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -155,8 +155,7 @@ void qadic_inv(qadic_t x, const qadic_t y, const qadic_ctx_t ctx)
 
     if (qadic_is_zero(y))
     {
-        flint_printf("Exception (qadic_inv).  Zero is not invertible.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (qadic_inv).  Zero is not invertible.\n");
     }
 
     /*
@@ -200,4 +199,3 @@ void qadic_inv(qadic_t x, const qadic_t y, const qadic_ctx_t ctx)
         _padic_poly_normalise(x);
     }
 }
-

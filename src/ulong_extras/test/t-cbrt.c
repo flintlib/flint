@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -37,12 +37,8 @@ TEST_FUNCTION_START(n_cbrt, state)
 
         result = (val == ans);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("n = %wu, val = %wd, ans = %wu\n", n, val, ans);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("n = %wu, val = %wd, ans = %wu\n", n, val, ans);
+
         mpz_clear(mpz_n);
         mpz_clear(mpz_val);
     }
@@ -69,12 +65,8 @@ TEST_FUNCTION_START(n_cbrt, state)
 
         result = (val == ans);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("n = %wu, val = %wd, ans = %wu\n", n, val, ans);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("n = %wu, val = %wd, ans = %wu\n", n, val, ans);
+
         mpz_clear(mpz_n);
         mpz_clear(mpz_val);
     }
@@ -101,12 +93,8 @@ TEST_FUNCTION_START(n_cbrt, state)
 
         result = (val == ans);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("n = %wu, val = %wd, ans = %wu\n", n, val, ans);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("n = %wu, val = %wd, ans = %wu\n", n, val, ans);
+
         mpz_clear(mpz_n);
         mpz_clear(mpz_val);
     }
@@ -133,12 +121,8 @@ TEST_FUNCTION_START(n_cbrt, state)
 
         result = (val == ans);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("n = %wu, val = %wd, ans = %wu\n", n, val, ans);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("n = %wu, val = %wd, ans = %wu\n", n, val, ans);
+
         mpz_clear(mpz_n);
         mpz_clear(mpz_val);
     }

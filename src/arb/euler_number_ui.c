@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2016, 2021 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "thread_support.h"
@@ -101,7 +101,7 @@ nmod_redc_init(nmod_redc_t * rmod, nmod_t mod)
     rmod->ninv = ninv2 & LOW_MASK;
 }
 
-static __inline__ ulong
+static inline ulong
 nmod_redc_fast(ulong x, ulong n, ulong ninv2)
 {
     ulong y = (x * ninv2) & LOW_MASK;
@@ -109,7 +109,7 @@ nmod_redc_fast(ulong x, ulong n, ulong ninv2)
     return z >> (FLINT_BITS / 2);
 }
 
-static __inline__ ulong
+static inline ulong
 nmod_redc(ulong x, ulong n, ulong ninv2)
 {
     ulong y = nmod_redc_fast(x, n, ninv2);
@@ -658,8 +658,7 @@ arb_fmpz_euler_number_ui(fmpz_t res, ulong n)
         arb_euler_number_ui_beta(x, n, mag + 5);
         if (!arb_get_unique_fmpz(res, x))
         {
-            flint_printf("arb_fmpz_euler_number_ui: unexpected inaccuracy\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "arb_fmpz_euler_number_ui: unexpected inaccuracy\n");
         }
         arb_clear(x);
     }

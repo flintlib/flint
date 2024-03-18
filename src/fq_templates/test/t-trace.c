@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -19,17 +19,18 @@
 
 TEST_TEMPLATE_FUNCTION_START(T, trace, state)
 {
-    int i, result;
+    slong ix;
+    int result;
 
     /* Compare with sum of Galois conjugates */
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    for (ix = 0; ix < 200 * flint_test_multiplier(); ix++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) a, b, c;
         fmpz_t x, y;
-        slong j;
+        slong jx;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 1);
 
         TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, init)(b, ctx);
@@ -42,9 +43,9 @@ TEST_TEMPLATE_FUNCTION_START(T, trace, state)
         TEMPLATE(T, trace)(x, a, ctx);
 
         TEMPLATE(T, zero)(b, ctx);
-        for (j = 0; j < TEMPLATE(T, ctx_degree)(ctx); j++)
+        for (jx = 0; jx < TEMPLATE(T, ctx_degree)(ctx); jx++)
         {
-            TEMPLATE(T, frobenius)(c, a, j, ctx);
+            TEMPLATE(T, frobenius)(c, a, jx, ctx);
             TEMPLATE(T, add)(b, b, c, ctx);
         }
 
@@ -59,12 +60,11 @@ TEST_TEMPLATE_FUNCTION_START(T, trace, state)
             flint_printf("b = "), TEMPLATE(T, print_pretty)(b, ctx), flint_printf("\n");
             flint_printf("c = "), TEMPLATE(T, print_pretty)(c, ctx), flint_printf("\n");
             flint_printf("x = "), fmpz_print(x), flint_printf("\n");
-            for (j = 0; j < TEMPLATE(T, ctx_degree)(ctx); j++)
+            for (jx = 0; jx < TEMPLATE(T, ctx_degree)(ctx); jx++)
             {
-                TEMPLATE(T, frobenius)(c, a, j, ctx);
-                flint_printf("sigma^%wd = ", j), TEMPLATE(T, print_pretty)(c, ctx), flint_printf("\n");
+                TEMPLATE(T, frobenius)(c, a, jx, ctx);
+                flint_printf("sigma^%wd = ", jx), TEMPLATE(T, print_pretty)(c, ctx), flint_printf("\n");
             }
-            fflush(stdout);
             flint_abort();
         }
 

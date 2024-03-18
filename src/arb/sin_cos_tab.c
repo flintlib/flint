@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2014 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "arb.h"
@@ -3470,4 +3470,3 @@ const mp_limb_t arb_sin_cos_tab22[2 * ARB_SIN_COS_TAB22_NUM][ARB_SIN_COS_TAB2_LI
   Z8(6d843aa5,68dad114,fa7dd2a0,2207284f,50bffa10,d862be6f,36f2b1d6,37bf5acb)
   Z8(28028625,d4aeb2b1,b86cbdad,1e98172a,073b41d4,693e6ead,4eddbbad,ffe1f896)
 }};
-

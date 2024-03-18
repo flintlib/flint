@@ -5,13 +5,16 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
 #include "nmod_mat.h"
 #include "nmod_poly_factor.h"
 #include "fmpz_poly_factor.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly_factor.h"
 
 static void n_bpoly_reverse_gens(n_bpoly_t a, const n_bpoly_t b)
@@ -149,7 +152,7 @@ static void _hensel_lift_fac(
     n_bpoly_swap(G, t1);
     n_bpoly_swap(H, t2);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     n_bpoly_mod_mul(t1, G, H, ctx);
     n_bpoly_mod_sub(c, f, t1, ctx);
     for (i = 0; i < c->length; i++)
@@ -222,7 +225,7 @@ static void _hensel_lift_inv(
     n_bpoly_swap(t1, B);
     n_bpoly_swap(t2, A);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     n_bpoly_mod_mul(t1, G, A, ctx);
     n_bpoly_mod_mul(t2, H, B, ctx);
     n_bpoly_mod_add(c, t1, t2, ctx);
@@ -434,7 +437,7 @@ static void _n_bpoly_mod_lift_build_steps(n_bpoly_mod_lift_t L, nmod_t ctx)
     for (k = 0; k < r; k++)
     {
         /* s[k] = (prod_{i!=k} B[i].coeffs[0])^-1 (mod B[k].coeffs[0]) */
-        n_poly_mod_div(t, A->coeffs + 0, B[k].coeffs + 0, ctx);
+        n_poly_mod_divexact(t, A->coeffs + 0, B[k].coeffs + 0, ctx);
         if (!n_poly_mod_invmod(s + k, t, B[k].coeffs + 0, ctx))
             flint_throw(FLINT_IMPINV, "n_bpoly_mod_lift: bad inverse");
 
@@ -617,7 +620,7 @@ void n_bpoly_mod_lift_combine(
     FLINT_ASSERT(nmod_mat_is_reduced(N));
 
     /* on input we should have a factorization of monicA mod y^order */
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         n_bpoly_t t1, t2;
         n_bpoly_init(t1);
@@ -718,7 +721,7 @@ void n_bpoly_mod_lift_combine(
         nmod_mat_entry(N, i, i) = 1;
 
     /* on output we should have a factorization of monicA mod y^order */
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         n_bpoly_t t1, t2;
         n_bpoly_init(t1);
@@ -1039,7 +1042,7 @@ static void n_bpoly_mod_lift_continue(
     for (k = 0; k < r; k++)
         n_bpoly_reverse_gens(Bfinal + k, B + k);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         n_bpoly_t t1, t2;
         n_bpoly_init(t1);

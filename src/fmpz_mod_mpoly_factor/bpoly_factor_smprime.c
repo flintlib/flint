@@ -5,15 +5,17 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fmpz_vec.h"
-#include "fmpz_poly_factor.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_vec.h"
-#include "fmpz_mod_poly_factor.h"
 #include "fmpz_mod_mat.h"
+#include "fmpz_poly_factor.h"
+#include "fmpz_mod_poly_factor.h"
+#include "mpoly.h"
 #include "fmpz_mod_mpoly_factor.h"
 
 void fmpz_mod_tpoly_fit_length(
@@ -175,7 +177,7 @@ static void _hensel_lift_fac(
     fmpz_mod_bpoly_swap(G, t1, ctx);
     fmpz_mod_bpoly_swap(H, t2, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mod_bpoly_mul(t1, G, H, ctx);
     fmpz_mod_bpoly_sub(c, f, t1, ctx);
     for (i = 0; i < c->length; i++)
@@ -251,7 +253,7 @@ static void _hensel_lift_inv(
     fmpz_mod_bpoly_swap(t1, B, ctx);
     fmpz_mod_bpoly_swap(t2, A, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mod_bpoly_mul(t1, G, A, ctx);
     fmpz_mod_bpoly_mul(t2, H, B, ctx);
     fmpz_mod_bpoly_add(c, t1, t2, ctx);
@@ -598,18 +600,18 @@ void fmpz_mod_bpoly_lift_combine(
     slong i, j, k, r, degx;
     fmpz_mod_bpoly_struct * A, * Bfinal, * U, * B;
     slong oldr = L->r;
-    slong newr = fmpz_mod_mat_nrows(N);
+    slong newr = fmpz_mod_mat_nrows(N, ctx);
     slong order = L->fac_lift_order;
     fmpz_mod_bpoly_struct * new_facs;
     fmpz_mod_bpoly_t T;
 
     FLINT_ASSERT(newr > 1);
     FLINT_ASSERT(newr < oldr);
-    FLINT_ASSERT(oldr == fmpz_mod_mat_ncols(N));
-    FLINT_ASSERT(fmpz_mod_mat_is_reduced(N));
+    FLINT_ASSERT(oldr == fmpz_mod_mat_ncols(N, ctx));
+    FLINT_ASSERT(fmpz_mod_mat_is_reduced(N, ctx));
 
     /* on input we should have a factorization of monicA mod y^order */
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         fmpz_mod_bpoly_t t1, t2;
         fmpz_mod_bpoly_init(t1, ctx);
@@ -702,13 +704,13 @@ void fmpz_mod_bpoly_lift_combine(
         _fmpz_mod_bpoly_lift_build_steps(L, ctx);
     }
 
-    fmpz_mod_mat_clear(N);
-    fmpz_mod_mat_init(N, L->r, L->r, fmpz_mod_ctx_modulus(ctx));
+    fmpz_mod_mat_clear(N, ctx);
+    fmpz_mod_mat_init(N, L->r, L->r, ctx);
     for (i = 0; i < L->r;  i++)
         fmpz_one(fmpz_mod_mat_entry(N, i, i));
 
     /* on output we should have a factorization of monicA mod y^order */
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         fmpz_mod_bpoly_t t1, t2;
         fmpz_mod_bpoly_init(t1, ctx);
@@ -924,7 +926,7 @@ static void fmpz_mod_bpoly_lift_continue(
     for (k = 0; k < r; k++)
         fmpz_mod_bpoly_reverse_vars(Bfinal + k, B + k, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         fmpz_mod_bpoly_t t1, t2;
         fmpz_mod_bpoly_init(t1, ctx);
@@ -990,7 +992,7 @@ static void _lattice(
 
     for (k = 0; k + 1 < A->length; k++)
     {
-        slong nrows = fmpz_mod_mat_nrows(N);
+        slong nrows = fmpz_mod_mat_nrows(N, ctx);
         slong lower = FLINT_MAX(CLD[k], *lattice_order);
 
         FLINT_ASSERT(nrows > 0);
@@ -1005,7 +1007,7 @@ static void _lattice(
         if (lift_order <= lower)
             continue;
 
-        fmpz_mod_mat_init(M, lift_order - lower, nrows, fmpz_mod_ctx_modulus(ctx));
+        fmpz_mod_mat_init(M, lift_order - lower, nrows, ctx);
 
         for (j = lower; j < lift_order; j++)
         {
@@ -1014,19 +1016,19 @@ static void _lattice(
 
             for (i = 0; i < nrows; i++)
                 _fmpz_mod_vec_dot(fmpz_mod_mat_entry(M, j - lower, i),
-                                                trow, N->mat->rows[i], r, ctx);
+                                                trow, N->rows[i], r, ctx);
         }
 
         fmpz_mod_mat_init_nullspace_tr(T1, M, ctx);
 
-        fmpz_mod_mat_init(T2, fmpz_mod_mat_nrows(T1), fmpz_mod_mat_ncols(N), fmpz_mod_ctx_modulus(ctx));
-        fmpz_mod_mat_mul(T2, T1, N);
-        fmpz_mod_mat_swap(T2, N);
-        fmpz_mod_mat_rref(NULL, N);
+        fmpz_mod_mat_init(T2, fmpz_mod_mat_nrows(T1, ctx), fmpz_mod_mat_ncols(N, ctx), ctx);
+        fmpz_mod_mat_mul(T2, T1, N, ctx);
+        fmpz_mod_mat_swap(T2, N, ctx);
+        fmpz_mod_mat_rref(N, N, ctx);
 
-        fmpz_mod_mat_clear(M);
-        fmpz_mod_mat_clear(T1);
-        fmpz_mod_mat_clear(T2);
+        fmpz_mod_mat_clear(M, ctx);
+        fmpz_mod_mat_clear(T1, ctx);
+        fmpz_mod_mat_clear(T2, ctx);
     }
 
     _fmpz_vec_clear(trow, r);
@@ -1063,15 +1065,15 @@ static int _zassenhaus(
     int success;
     fmpz_mod_bpoly_t Q, R, t1, t2;
     fmpz_mod_poly_t cont;
-    slong i, j, k, len, nrows = fmpz_mod_mat_nrows(N);
+    slong i, j, k, len, nrows = fmpz_mod_mat_nrows(N, ctx);
     slong * subset;
     fmpz_mod_bpoly_struct * gprod;
     fmpz_mod_bpoly_struct * f;
     fmpz_mod_bpoly_t A_copy;
-    int is_simple_check = (limit == 1 && r == fmpz_mod_mat_nrows(N));
+    int is_simple_check = (limit == 1 && r == fmpz_mod_mat_nrows(N, ctx));
 
-    FLINT_ASSERT(fmpz_mod_mat_is_reduced(N));
-    FLINT_ASSERT(fmpz_mod_mat_ncols(N) == r);
+    FLINT_ASSERT(fmpz_mod_mat_is_reduced(N, ctx));
+    FLINT_ASSERT(fmpz_mod_mat_ncols(N, ctx) == r);
 
     fmpz_mod_poly_init(cont, ctx);
     fmpz_mod_bpoly_init(Q, ctx);
@@ -1252,7 +1254,7 @@ int fmpz_mod_bpoly_factor_smprime(
     fmpz_mod_poly_factor_init(local_fac_best, ctx);
     fmpz_mod_poly_factor_init(local_fac_tmp, ctx);
     fmpz_mod_bpoly_init(monicA, ctx);
-    fmpz_mod_mat_init(N, 0, 0, fmpz_mod_ctx_modulus(ctx));
+    fmpz_mod_mat_init(N, 0, 0, ctx);
     CLD = FLINT_ARRAY_ALLOC(Alenx, slong);
     zassenhaus_prune_init(zas);
     fmpz_mod_bpoly_lift_init(L, ctx);
@@ -1361,8 +1363,8 @@ doit:
     fmpz_mod_bpoly_lift_continue(L, monicA, lift_order, ctx);
 
     /* the rows of N give the combinations of local factors */
-    fmpz_mod_mat_clear(N);
-    fmpz_mod_mat_init(N, r, r, fmpz_mod_ctx_modulus(ctx));
+    fmpz_mod_mat_clear(N, ctx);
+    fmpz_mod_mat_init(N, r, r, ctx);
     for (i = 0; i < r; i++)
         fmpz_one(fmpz_mod_mat_entry(N, i, i));
 
@@ -1371,29 +1373,29 @@ doit:
 
     lattice_order = 0;
     _lattice(N, L->lifted_fac, L->r, lift_order, CLD, &lattice_order, A, ctx);
-    if (fmpz_mod_mat_nrows(N) < 2)
+    if (fmpz_mod_mat_nrows(N, ctx) < 2)
         goto irreducible_shift;
-    if (!fmpz_mod_mat_is_reduced(N))
+    if (!fmpz_mod_mat_is_reduced(N, ctx))
         goto increase;
-    if (fmpz_mod_mat_nrows(N) < fmpz_mod_mat_ncols(N)/4*3)
+    if (fmpz_mod_mat_nrows(N, ctx) < fmpz_mod_mat_ncols(N, ctx)/4*3)
         fmpz_mod_bpoly_lift_combine(L, N, monicA, ctx);
 
 try_zas:
 
     /* zassenhaus only make sense if N is a nice 0-1 mat */
-    FLINT_ASSERT(fmpz_mod_mat_is_reduced(N));
+    FLINT_ASSERT(fmpz_mod_mat_is_reduced(N, ctx));
 
-    while (fmpz_mod_mat_nrows(N) > 2 && 2*L->fac_lift_order < final_order)
+    while (fmpz_mod_mat_nrows(N, ctx) > 2 && 2*L->fac_lift_order < final_order)
     {
         lift_order = 2*L->fac_lift_order;
         fmpz_mod_bpoly_make_monic_series(monicA, A, lift_order, ctx);
         fmpz_mod_bpoly_lift_continue(L, monicA, lift_order, ctx);
         _lattice(N, L->lifted_fac, L->r, lift_order, CLD, &lattice_order, A, ctx);
-        if (fmpz_mod_mat_nrows(N) < 2)
+        if (fmpz_mod_mat_nrows(N, ctx) < 2)
             goto irreducible_shift;
-        if (!fmpz_mod_mat_is_reduced(N))
+        if (!fmpz_mod_mat_is_reduced(N, ctx))
             goto increase;
-        if (fmpz_mod_mat_nrows(N) < fmpz_mod_mat_ncols(N)/4*3)
+        if (fmpz_mod_mat_nrows(N, ctx) < fmpz_mod_mat_ncols(N, ctx)/4*3)
             fmpz_mod_bpoly_lift_combine(L, N, monicA, ctx);
     }
 
@@ -1419,11 +1421,11 @@ more:
 
     /* increase precision until N is a nice 0-1 mat */
     _lattice(N, L->lifted_fac, L->r, lift_order, CLD, &lattice_order, A, ctx);
-    if (fmpz_mod_mat_nrows(N) < 2)
+    if (fmpz_mod_mat_nrows(N, ctx) < 2)
         goto irreducible_shift;
-    if (!fmpz_mod_mat_is_reduced(N))
+    if (!fmpz_mod_mat_is_reduced(N, ctx))
         goto increase;
-    if (fmpz_mod_mat_nrows(N) < fmpz_mod_mat_ncols(N)/4*3)
+    if (fmpz_mod_mat_nrows(N, ctx) < fmpz_mod_mat_ncols(N, ctx)/4*3)
         fmpz_mod_bpoly_lift_combine(L, N, monicA, ctx);
     goto try_zas;
 
@@ -1448,7 +1450,7 @@ cleanup:
     fmpz_clear(alpha_best);
     fmpz_clear(malpha_best);
 
-    fmpz_mod_mat_clear(N);
+    fmpz_mod_mat_clear(N, ctx);
     fmpz_mod_poly_clear(Aeval, ctx);
     fmpz_mod_poly_factor_clear(local_fac_best, ctx);
     fmpz_mod_poly_factor_clear(local_fac_tmp, ctx);

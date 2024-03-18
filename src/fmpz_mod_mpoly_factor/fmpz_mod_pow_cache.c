@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mod.h"
 #include "fmpz_mod_mpoly_factor.h"
 
 void fmpz_mod_pow_cache_start(
@@ -58,4 +59,3 @@ void fmpz_mod_pow_cache_mulpow_ui(
     fmpz_mod_mul(a, b, c->coeffs + e, ctx);
     return;
 }
-

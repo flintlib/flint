@@ -8,12 +8,12 @@ Quick start
 
 Building FLINT requires:
 
-* GMP (https://gmplib.org/)
-* MPFR (https://mpfr.org/)
+* GMP, at least version 6.2.1 (https://gmplib.org/)
+* MPFR, at least version 4.1.0 (https://mpfr.org/)
 * Either of the following build systems:
 
-  * GNU Make together with GNU Autotools
-  * CMake
+  * GNU Make together with GNU Autotools (Recommended)
+  * CMake (Recommended only for Windows users)
 
 On a typical Linux or Unix-like system where Autotools is available (see below
 for instructions using CMake), FLINT can be built and installed as follows:
@@ -137,10 +137,9 @@ FLINT with ``--enable-coverage``. Then run:
 .. code-block:: bash
 
     make -j N check
-    make coverage
+    make coverage_html
 
 This will place a coverage report in ``build/coverage``.
-
 
 Static or dynamic library only
 -------------------------------------------------------------------------------
@@ -196,10 +195,15 @@ It is also possible to override the default CC, AR and CFLAGS used by FLINT by
 passing ``CC=full_path_to_compiler``, etc., to FLINT's configure.
 
 
-CMake build
+CMake build for Windows users
 -------------------------------------------------------------------------------
 
-If you wish to install FLINT with CMake, simply type:
+For Windows users, we also provide a way to install FLINT using CMake. Note,
+however, that FLINT's CMake script only exists to provide Windows users a way to
+install FLINT. For UNIX-type systems, please use Autotools along with GNU Make
+instead, as described at the top of this page.
+
+If you wish to install FLINT with CMake on Windows, simply type:
 
 .. code-block:: bash
 
@@ -218,7 +222,7 @@ To uninstall FLINT with GNU make, type:
 
 Now to use FLINT, simply include the appropriate header files for the FLINT
 modules you wish to use in your C program.  Then compile your program,
-linking against the FLINT library, GMP/MPIR, MPFR and pthreads with the
+linking against the FLINT library, GMP, MPFR and pthreads with the
 options ``-lflint -lmpfr -lgmp -lpthread``.
 
 To clean up the local build files, use:

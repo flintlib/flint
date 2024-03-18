@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -36,8 +36,7 @@ void fq_nmod_inv(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 {
     if (fq_nmod_is_zero(op, ctx))
     {
-        flint_printf("Exception (fq_nmod_inv).  Zero is not invertible.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fq_nmod_inv).  Zero is not invertible.\n");
     }
     else
     {

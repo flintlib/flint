@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -194,8 +194,7 @@ slong n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, slong exp)
 
     if (exp < 0)
     {
-        flint_printf("Exception (n_sqrtmod_primepow). exp must be non-negative.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (n_sqrtmod_primepow). exp must be non-negative.\n");
     }
 
     if (exp == 0) /* special case, sqrt of 0 mod 1 */
@@ -322,4 +321,3 @@ slong n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, slong exp)
         return 2*a;
     }
 }
-

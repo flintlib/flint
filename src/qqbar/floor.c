@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2020 Fredrik Johansson
 
-    This file is part of Calcium.
+    This file is part of FLINT.
 
-    Calcium is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "qqbar.h"
@@ -56,8 +56,7 @@ qqbar_floor(fmpz_t res, const qqbar_t x)
 
                 if (!arb_get_unique_fmpz(res, v))
                 {
-                    flint_printf("qqbar_floor: either floor(x) or floor(x+1/2) should evaluate numerically\n");
-                    flint_abort();
+                    flint_throw(FLINT_ERROR, "qqbar_floor: either floor(x) or floor(x+1/2) should evaluate numerically\n");
                 }
 
                 qqbar_set_fmpz(u, res);
@@ -76,4 +75,3 @@ qqbar_floor(fmpz_t res, const qqbar_t x)
         arb_clear(v);
     }
 }
-

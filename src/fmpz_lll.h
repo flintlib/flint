@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -17,14 +17,15 @@
 #ifdef FMPZ_LLL_INLINES_C
 #define FMPZ_LLL_INLINE
 #else
-#define FMPZ_LLL_INLINE static __inline__
+#define FMPZ_LLL_INLINE static inline
 #endif
 
+#include "fmpz_types.h"
 #include "d_mat.h"
-#include "mpf_mat.h"
+#include "mpf-impl.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 #if FLINT_BITS == 32
@@ -165,4 +166,3 @@ void fmpz_lll_storjohann_ulll(fmpz_mat_t FM, slong new_size, const fmpz_lll_t fl
 #endif
 
 #endif
-

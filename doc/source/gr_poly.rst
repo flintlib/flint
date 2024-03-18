@@ -70,6 +70,7 @@ Memory management
 .. function:: void gr_poly_clear(gr_poly_t poly, gr_ctx_t ctx)
 
 .. function:: gr_ptr gr_poly_entry_ptr(gr_poly_t poly, slong i, gr_ctx_t ctx)
+              gr_srcptr gr_poly_entry_srcptr(const gr_poly_t poly, slong i, gr_ctx_t ctx)
 
 .. function:: slong gr_poly_length(const gr_poly_t poly, gr_ctx_t ctx)
 
@@ -175,6 +176,11 @@ Shifting
 .. function:: int _gr_poly_shift_right(gr_ptr res, gr_srcptr poly, slong len, slong n, gr_ctx_t ctx)
               int gr_poly_shift_right(gr_poly_t res, const gr_poly_t poly, slong n, gr_ctx_t ctx)
 
+
+Scalar division
+--------------------------------------------------------------------------------
+
+.. function:: int gr_poly_div_scalar(gr_poly_t res, const gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx)
 
 Division with remainder
 --------------------------------------------------------------------------------
@@ -453,6 +459,33 @@ Power series composition and reversion
     The underscore methods do not support aliasing of the output
     with either input polynomial, and do not zero-pad the result.
 
+.. function:: int _gr_poly_revert_series_lagrange(gr_ptr res, gr_srcptr f, slong flen, slong n, gr_ctx_t ctx)
+              int gr_poly_revert_series_lagrange(gr_poly_t res, const gr_poly_t f, slong n, gr_ctx_t ctx)
+              int _gr_poly_revert_series_lagrange_fast(gr_ptr res, gr_srcptr f, slong flen, slong n, gr_ctx_t ctx)
+              int gr_poly_revert_series_lagrange_fast(gr_poly_t res, const gr_poly_t f, slong n, gr_ctx_t ctx)
+              int _gr_poly_revert_series_newton(gr_ptr res, gr_srcptr f, slong flen, slong n, gr_ctx_t ctx)
+              int gr_poly_revert_series_newton(gr_poly_t res, const gr_poly_t f, slong n, gr_ctx_t ctx)
+              int _gr_poly_revert_series(gr_ptr res, gr_srcptr f, slong flen, slong n, gr_ctx_t ctx)
+              int gr_poly_revert_series(gr_poly_t res, const gr_poly_t f, slong n, gr_ctx_t ctx)
+
+    Sets *res* to the power series reversion `f^{-1}(x)` which satisfies
+    `f^{-1}(f(x)) = f(f^{-1}(x)) = x` mod `x^n`.
+    For the series reversion to exist, we require that the constant term
+    in `f` is zero and that the linear coefficient is invertible.
+    The flag ``GR_DOMAIN`` is returned otherwise.
+
+    The *lagrange* and *lagrange_fast* algorithms require the ability
+    to divide by `2, 3, \ldots, n-1` and will return
+    the ``GR_UNABLE`` flag in too small characteristic.
+
+    The underscore methods do not support aliasing of the output
+    with the input.
+
+    The Newton method is described in [BrentKung1978]_; the
+    *lagrange* algorithm implements the Lagrange inversion formula,
+    while the *lagrange_fast* algorithm implements the baby-step
+    giant-step algorithm described in [Joh2015b]_.
+
 Derivative and integral
 -------------------------------------------------------------------------------
 
@@ -482,7 +515,7 @@ GCD
     Computes the HGCD of `a` and `b`, that is, a matrix `M`, a sign `\sigma`
     and two polynomials `A` and `B` such that
 
-    .. math ::
+    .. math::
 
         (A,B)^t = \sigma M^{-1} (a,b)^t.
 
@@ -523,6 +556,17 @@ GCD
 
 Resultant
 -------------------------------------------------------------------------------
+
+For two non-zero polynomials `f(x) = a_m x^m + \dotsb + a_0` and
+`g(x) = b_n x^n + \dotsb + b_0` of degrees `m` and `n`, the resultant
+is defined to be
+
+.. math::
+
+        a_m^n b_n^m \prod_{(x, y) : f(x) = g(y) = 0} (x - y).
+
+For convenience, we define the resultant to be equal to zero if either
+of the two polynomials is zero.
 
 .. function:: int _gr_poly_resultant_euclidean(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
               int gr_poly_resultant_euclidean(gr_ptr res, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx)

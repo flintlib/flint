@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -50,13 +50,12 @@ TEST_FUNCTION_START(n_CRT, state)
                 fmpz_CRT(r, a1, m1, a2, m2, 0);
                 if (fmpz_get_ui(r) != n_CRT(fmpz_get_ui(a1), fmpz_get_ui(m1),
                                             fmpz_get_ui(a2), fmpz_get_ui(m2)))
-                {
-                    flint_printf("FAIL\n:");
-                    flint_printf("a1: "); fmpz_print(a1); flint_printf("\n");
-                    flint_printf("m1: "); fmpz_print(m1); flint_printf("\n");
-                    flint_printf("a2: "); fmpz_print(a2); flint_printf("\n");
-                    flint_printf("m2: "); fmpz_print(m2); flint_printf("\n");
-                }
+                    TEST_FUNCTION_FAIL(
+                            "a1: %{fmpz}\n"
+                            "m1: %{fmpz}\n"
+                            "a2: %{fmpz}\n"
+                            "m2: %{fmpz}\n",
+                            a1, m1, a2, m2);
             }
         }
 

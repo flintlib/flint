@@ -5,18 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #ifndef ARITH_H
 #define ARITH_H
-
-#ifdef ARITH_INLINES_C
-#define ARITH_INLINE
-#else
-#define ARITH_INLINE static __inline__
-#endif
 
 #include "fmpq_types.h"
 
@@ -184,7 +178,7 @@ typedef struct
 
 typedef trig_prod_struct trig_prod_t[1];
 
-ARITH_INLINE
+FLINT_FORCE_INLINE
 void trig_prod_init(trig_prod_t sum)
 {
     sum->n = 0;

@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -57,8 +57,7 @@ fmpz_poly_pseudo_rem_cohen(fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t
 
     if (B->length == 0)
     {
-        flint_printf("Exception (fmpz_poly_pseudo_rem_cohen). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_poly_pseudo_rem_cohen). Division by zero.\n");
     }
     if (A->length < B->length)
     {
@@ -90,4 +89,3 @@ fmpz_poly_pseudo_rem_cohen(fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t
     else
         _fmpz_poly_set_length(R, lenr);
 }
-

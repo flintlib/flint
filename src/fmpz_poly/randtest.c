@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -119,8 +119,7 @@ fmpz_poly_randtest_not_zero(fmpz_poly_t f, flint_rand_t state,
 {
     if ((bits == 0) || (len == 0))
     {
-        flint_printf("Exception (fmpz_poly_randtest_not_zero). bits or len is zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_poly_randtest_not_zero). bits or len is zero.\n");
     }
 
     fmpz_poly_randtest(f, state, len, bits);

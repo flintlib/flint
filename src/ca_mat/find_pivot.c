@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2020 Fredrik Johansson
 
-    This file is part of Calcium.
+    This file is part of FLINT.
 
-    Calcium is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "ca_mat.h"
@@ -47,7 +47,7 @@ ca_mat_find_pivot(slong * pivot_row, ca_mat_t mat, slong start_row, slong end_ro
     int unknown;
 
     if (end_row <= start_row)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s): end_row <= start_row\n", __func__);
 
     /* First find the simplest element that is not trivially zero. With high probability
        this will actually be nonzero. */

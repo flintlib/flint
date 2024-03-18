@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -14,11 +14,14 @@
 #define QSIEVE_H
 
 #include <stdint.h>
-#include "thread_pool.h"
 #include "fmpz_types.h"
 
+#if FLINT_USES_PTHREAD
+# include <pthread.h>
+#endif
+
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 #define QS_DEBUG 0 /* level of debug information printed, 0 = none */
@@ -351,13 +354,13 @@ int qsieve_relations_cmp(const void * a, const void * b);
 slong qsieve_merge_relations(qs_t qs_inf);
 
 void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime,
-                                                     fmpz_t Y, qs_poly_t poly);
+                                                     const fmpz_t Y, const qs_poly_t poly);
 
 hash_t * qsieve_get_table_entry(qs_t qs_inf, mp_limb_t prime);
 
 void qsieve_add_to_hashtable(qs_t qs_inf, mp_limb_t prime);
 
-relation_t qsieve_parse_relation(qs_t qs_inf, char * str);
+relation_t qsieve_parse_relation(qs_t qs_inf);
 
 relation_t qsieve_merge_relation(qs_t qs_inf, relation_t  a, relation_t  b);
 
@@ -370,7 +373,7 @@ void qsieve_insert_relation(qs_t qs_inf, relation_t * rel_list,
 
 int qsieve_process_relation(qs_t qs_inf);
 
-static __inline__ void insert_col_entry(la_col_t * col, slong entry)
+static inline void insert_col_entry(la_col_t * col, slong entry)
 {
    if (((col->weight >> 4) << 4) == col->weight) /* need more space */
    {
@@ -383,7 +386,7 @@ static __inline__ void insert_col_entry(la_col_t * col, slong entry)
    col->weight++;
 }
 
-static __inline__ void swap_cols(la_col_t * col2, la_col_t * col1)
+static inline void swap_cols(la_col_t * col2, la_col_t * col1)
 {
    la_col_t temp;
 
@@ -400,12 +403,12 @@ static __inline__ void swap_cols(la_col_t * col2, la_col_t * col1)
    col2->orig = temp.orig;
 }
 
-static __inline__ void clear_col(la_col_t * col)
+static inline void clear_col(la_col_t * col)
 {
    col->weight = 0;
 }
 
-static __inline__ void free_col(la_col_t * col)
+static inline void free_col(la_col_t * col)
 {
    if (col->weight) flint_free(col->data);
 }

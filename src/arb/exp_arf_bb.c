@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2014 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "thread_support.h"
@@ -121,7 +121,7 @@ pbasecase(arb_t res, slong a, slong b, pwork_t * work)
     }
     else
     {
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
     }
 }
 
@@ -170,7 +170,7 @@ arb_exp_arf_bb(arb_t z, const arf_t x, slong prec, int minus_one)
 
     if (arf_is_special(x))
     {
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
     }
 
     mag = arf_abs_bound_lt_2exp_si(x);
@@ -180,8 +180,7 @@ arb_exp_arf_bb(arb_t z, const arf_t x, slong prec, int minus_one)
        the main exp wrapper). */
     if (mag > 200 || mag < -2 * prec - 100)
     {
-        flint_printf("arb_exp_arf_bb: unexpectedly large/small input\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "arb_exp_arf_bb: unexpectedly large/small input\n");
     }
 
     if (prec < 100000000)
@@ -342,4 +341,3 @@ arb_exp_arf_bb(arb_t z, const arf_t x, slong prec, int minus_one)
 
     arb_set_round(z, z, prec);
 }
-

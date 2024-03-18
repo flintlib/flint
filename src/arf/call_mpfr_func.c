@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2023 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "mpfr.h"
@@ -30,8 +30,7 @@ int _arf_call_mpfr_func(arf_ptr r1, arf_ptr r2, int (*func)(void), arf_srcptr x,
     mpfr_init2(xx, 2 + arf_bits(x));
     if (arf_get_mpfr(xx, x, MPFR_RNDD))
     {
-        flint_printf("exception: unable to convert exactly to mpfr\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "exception: unable to convert exactly to mpfr\n");
     }
 
     if (y != NULL)
@@ -39,8 +38,7 @@ int _arf_call_mpfr_func(arf_ptr r1, arf_ptr r2, int (*func)(void), arf_srcptr x,
         mpfr_init2(yy, 2 + arf_bits(y));
         if (arf_get_mpfr(yy, y, MPFR_RNDD))
         {
-            flint_printf("exception: unable to convert exactly to mpfr\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "exception: unable to convert exactly to mpfr\n");
         }
     }
 
@@ -56,12 +54,11 @@ int _arf_call_mpfr_func(arf_ptr r1, arf_ptr r2, int (*func)(void), arf_srcptr x,
     else if (r2 == NULL && y != NULL)
         inexact = (((mpfr_func_1x2) func)(rr1, xx, yy, rrnd) != 0);
     else
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     if (mpfr_overflow_p() || mpfr_underflow_p())
     {
-        flint_printf("exception: mpfr overflow\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "exception: mpfr overflow\n");
     }
 
     if (r1 != NULL)

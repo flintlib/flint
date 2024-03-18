@@ -5,8 +5,8 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #ifndef GR_H
@@ -15,7 +15,7 @@
 #ifdef GR_INLINES_C
 #define GR_INLINE
 #else
-#define GR_INLINE static __inline__
+#define GR_INLINE static inline
 #endif
 
 #include "flint.h"
@@ -102,7 +102,7 @@ void gr_stream_write_fmpz(gr_stream_t out, const fmpz_t x);
 
 #define WARN_UNUSED_RESULT __attribute__((warn_unused_result))
 
-#define GR_MUST_SUCCEED(expr) do { if ((expr) != GR_SUCCESS) { flint_printf("GR_MUST_SUCCEED failure: %s", __FILE__); flint_abort(); } } while (0)
+#define GR_MUST_SUCCEED(expr) do { if ((expr) != GR_SUCCESS) { flint_throw(FLINT_ERROR, "GR_MUST_SUCCEED failure: %s", __FILE__); } } while (0)
 #define GR_IGNORE(expr) do { int ___unused = (expr); (void) ___unused; } while (0)
 
 typedef void * gr_ptr;
@@ -138,6 +138,7 @@ typedef enum
     GR_METHOD_CTX_IS_FINITE,
     GR_METHOD_CTX_IS_FINITE_CHARACTERISTIC,
     GR_METHOD_CTX_IS_ALGEBRAICALLY_CLOSED,
+    GR_METHOD_CTX_IS_ZERO_RING,
 
     /* ring properties related to orderings and norms */
     GR_METHOD_CTX_IS_ORDERED_RING,
@@ -165,6 +166,8 @@ typedef enum
 
     GR_METHOD_WRITE,
     GR_METHOD_WRITE_N,
+
+    _GR_METHOD_LENGTH,
 
     GR_METHOD_RANDTEST,
     GR_METHOD_RANDTEST_NOT_ZERO,
@@ -251,6 +254,7 @@ typedef enum
     GR_METHOD_MUL_2EXP_FMPZ,
     GR_METHOD_SET_FMPZ_2EXP_FMPZ,
     GR_METHOD_GET_FMPZ_2EXP_FMPZ,
+    GR_METHOD_SET_FMPZ_10EXP_FMPZ,
 
     GR_METHOD_IS_INVERTIBLE,
     GR_METHOD_INV,
@@ -262,6 +266,9 @@ typedef enum
     GR_METHOD_DIV_FMPQ,
     GR_METHOD_DIV_OTHER,
     GR_METHOD_OTHER_DIV,
+
+    GR_METHOD_DIV_NONUNIQUE,
+    GR_METHOD_DIVIDES,
 
     GR_METHOD_DIVEXACT,
     GR_METHOD_DIVEXACT_UI,
@@ -288,7 +295,6 @@ typedef enum
     GR_METHOD_FACTOR_PERFECT_POWER,
     GR_METHOD_ROOT_UI,
 
-    GR_METHOD_DIVIDES,
     GR_METHOD_EUCLIDEAN_DIV,
     GR_METHOD_EUCLIDEAN_REM,
     GR_METHOD_EUCLIDEAN_DIVREM,
@@ -339,6 +345,8 @@ typedef enum
     GR_METHOD_IS_NONNEGATIVE_REAL,
     GR_METHOD_IS_NEGATIVE_REAL,
     GR_METHOD_IS_NONPOSITIVE_REAL,
+
+    GR_METHOD_SET_INTERVAL_MID_RAD,
 
     /* todo: roots of unity */
     GR_METHOD_IS_ROOT_OF_UNITY,
@@ -601,6 +609,7 @@ typedef enum
 
     GR_METHOD_GEN,
     GR_METHOD_GENS,
+    GR_METHOD_GENS_RECURSIVE,
 
     /* Finite field methods */
     GR_METHOD_CTX_FQ_PRIME,
@@ -680,6 +689,7 @@ typedef enum
 
     /* Matrix methods (todo: rename -> GR_MAT) */
     GR_METHOD_MAT_MUL,
+    GR_METHOD_MAT_LU,
     GR_METHOD_MAT_DET,
     GR_METHOD_MAT_EXP,
     GR_METHOD_MAT_LOG,
@@ -847,6 +857,7 @@ typedef int ((*gr_method_poly_binary_op)(gr_ptr, gr_srcptr, slong, gr_srcptr, sl
 typedef int ((*gr_method_poly_binary_binary_op)(gr_ptr, gr_ptr, gr_srcptr, slong, gr_srcptr, slong, gr_ctx_ptr));
 typedef int ((*gr_method_poly_binary_trunc_op)(gr_ptr, gr_srcptr, slong, gr_srcptr, slong, slong, gr_ctx_ptr));
 typedef int ((*gr_method_vec_ctx_op)(gr_vec_t, gr_ctx_ptr));
+typedef slong ((*_gr_method_get_si_op)(gr_srcptr, gr_ctx_ptr));
 
 #ifdef FEXPR_H
 typedef int ((*gr_method_get_fexpr_op)(fexpr_t, gr_srcptr, gr_ctx_ptr));
@@ -941,6 +952,7 @@ typedef int ((*gr_method_set_fexpr_op)(gr_ptr, fexpr_vec_t, gr_vec_t, const fexp
 #define GR_POLY_BINARY_BINARY_OP(ctx, NAME) (((gr_method_poly_binary_binary_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_POLY_BINARY_TRUNC_OP(ctx, NAME) (((gr_method_poly_binary_trunc_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_CTX_OP(ctx, NAME) (((gr_method_vec_ctx_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define _GR_GET_SI_OP(ctx, NAME) (((_gr_method_get_si_op *) ctx->methods)[_GR_METHOD_ ## NAME])
 #ifdef FEXPR_H
 #define GR_GET_FEXPR_OP(ctx, NAME) (((gr_method_get_fexpr_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_SET_FEXPR_OP(ctx, NAME) (((gr_method_set_fexpr_op *) ctx->methods)[GR_METHOD_ ## NAME])
@@ -955,6 +967,7 @@ GR_INLINE truth_t gr_ctx_is_ring(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CT
 GR_INLINE truth_t gr_ctx_is_commutative_ring(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_COMMUTATIVE_RING)(ctx); }
 GR_INLINE truth_t gr_ctx_is_integral_domain(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_INTEGRAL_DOMAIN)(ctx); }
 GR_INLINE truth_t gr_ctx_is_field(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_FIELD)(ctx); }
+GR_INLINE truth_t gr_ctx_is_zero_ring(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_ZERO_RING)(ctx); }
 
 GR_INLINE truth_t gr_ctx_is_unique_factorization_domain(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_UNIQUE_FACTORIZATION_DOMAIN)(ctx); }
 GR_INLINE truth_t gr_ctx_is_finite(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_FINITE)(ctx); }
@@ -987,6 +1000,8 @@ GR_INLINE void gr_init(gr_ptr res, gr_ctx_t ctx) { GR_INIT_CLEAR_OP(ctx, INIT)(r
 GR_INLINE void gr_clear(gr_ptr res, gr_ctx_t ctx) { GR_INIT_CLEAR_OP(ctx, CLEAR)(res, ctx); }
 GR_INLINE void gr_swap(gr_ptr x, gr_ptr y, gr_ctx_t ctx) { GR_SWAP_OP(ctx, SWAP)(x, y, ctx); }
 GR_INLINE void gr_set_shallow(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { GR_VOID_UNARY_OP(ctx, SET_SHALLOW)(res, x, ctx); }
+
+GR_INLINE void _gr_length(gr_srcptr x, gr_ctx_t ctx) { _GR_GET_SI_OP(ctx, LENGTH)(x, ctx); }
 
 GR_INLINE WARN_UNUSED_RESULT int gr_randtest(gr_ptr x, flint_rand_t state, gr_ctx_t ctx) { return GR_RANDTEST(ctx, RANDTEST)(x, state, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_randtest_not_zero(gr_ptr x, flint_rand_t state, gr_ctx_t ctx) { return GR_RANDTEST(ctx, RANDTEST_NOT_ZERO)(x, state, ctx); }
@@ -1075,6 +1090,10 @@ GR_INLINE WARN_UNUSED_RESULT int gr_mul_2exp_si(gr_ptr res, gr_srcptr x, slong y
 GR_INLINE WARN_UNUSED_RESULT int gr_mul_2exp_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ(ctx, MUL_2EXP_FMPZ)(res, x, y, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_set_fmpz_2exp_fmpz(gr_ptr res, const fmpz_t x, const fmpz_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ_FMPZ(ctx, SET_FMPZ_2EXP_FMPZ)(res, x, y, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_get_fmpz_2exp_fmpz(fmpz_t res1, fmpz_t res2, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP_GET_FMPZ_FMPZ(ctx, GET_FMPZ_2EXP_FMPZ)(res1, res2, x, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_set_fmpz_10exp_fmpz(gr_ptr res, const fmpz_t x, const fmpz_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ_FMPZ(ctx, SET_FMPZ_10EXP_FMPZ)(res, x, y, ctx); }
+
+GR_INLINE WARN_UNUSED_RESULT int gr_inv(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, INV)(res, x, ctx); }
+GR_INLINE truth_t gr_is_invertible(gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_PREDICATE(ctx, IS_INVERTIBLE)(x, ctx); }
 
 GR_INLINE WARN_UNUSED_RESULT int gr_div(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, DIV)(res, x, y, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_div_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx) { return GR_BINARY_OP_UI(ctx, DIV_UI)(res, x, y, ctx); }
@@ -1084,6 +1103,9 @@ GR_INLINE WARN_UNUSED_RESULT int gr_div_fmpq(gr_ptr res, gr_srcptr x, const fmpq
 GR_INLINE WARN_UNUSED_RESULT int gr_div_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx) { return GR_BINARY_OP_OTHER(ctx, DIV_OTHER)(res, x, y, y_ctx, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_other_div(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, gr_ctx_t ctx) { return GR_OTHER_BINARY_OP(ctx, OTHER_DIV)(res, x, x_ctx, y, ctx); }
 
+GR_INLINE WARN_UNUSED_RESULT int gr_div_nonunique(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, DIV_NONUNIQUE)(res, x, y, ctx); }
+GR_INLINE truth_t gr_divides(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_PREDICATE(ctx, DIVIDES)(x, y, ctx); }
+
 GR_INLINE WARN_UNUSED_RESULT int gr_divexact(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, DIVEXACT)(res, x, y, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_divexact_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx) { return GR_BINARY_OP_UI(ctx, DIVEXACT_UI)(res, x, y, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_divexact_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx) { return GR_BINARY_OP_SI(ctx, DIVEXACT_SI)(res, x, y, ctx); }
@@ -1092,10 +1114,6 @@ GR_INLINE WARN_UNUSED_RESULT int gr_divexact_fmpq(gr_ptr res, gr_srcptr x, const
 GR_INLINE WARN_UNUSED_RESULT int gr_divexact_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx) { return GR_BINARY_OP_OTHER(ctx, DIVEXACT_OTHER)(res, x, y, y_ctx, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_other_divexact(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, gr_ctx_t ctx) { return GR_OTHER_BINARY_OP(ctx, OTHER_DIVEXACT)(res, x, x_ctx, y, ctx); }
 
-GR_INLINE WARN_UNUSED_RESULT int gr_inv(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, INV)(res, x, ctx); }
-GR_INLINE truth_t gr_is_invertible(gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_PREDICATE(ctx, IS_INVERTIBLE)(x, ctx); }
-
-GR_INLINE truth_t gr_divides(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_PREDICATE(ctx, DIVIDES)(x, y, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_euclidean_div(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, EUCLIDEAN_DIV)(res, x, y, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_euclidean_rem(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, EUCLIDEAN_REM)(res, x, y, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_euclidean_divrem(gr_ptr res1, gr_ptr res2, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_BINARY_OP(ctx, EUCLIDEAN_DIVREM)(res1, res2, x, y, ctx); }
@@ -1146,6 +1164,7 @@ GR_INLINE WARN_UNUSED_RESULT int gr_cmpabs_other(int * res, gr_srcptr x, gr_srcp
 
 GR_INLINE WARN_UNUSED_RESULT int gr_gen(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, GEN)(res, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_gens(gr_vec_t res, gr_ctx_t ctx) { return GR_VEC_CTX_OP(ctx, GENS)(res, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_gens_recursive(gr_vec_t res, gr_ctx_t ctx) { return GR_VEC_CTX_OP(ctx, GENS_RECURSIVE)(res, ctx); }
 
 GR_INLINE WARN_UNUSED_RESULT int gr_ctx_fq_prime(fmpz_t res, gr_ctx_t ctx) { return GR_CONSTANT_OP_GET_FMPZ(ctx, CTX_FQ_PRIME)(res, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_ctx_fq_degree(slong * res, gr_ctx_t ctx) { return GR_CONSTANT_OP_GET_SI(ctx, CTX_FQ_DEGREE)(res, ctx); }
@@ -1157,6 +1176,8 @@ GR_INLINE WARN_UNUSED_RESULT int gr_fq_norm(fmpz_t res, gr_srcptr x, gr_ctx_t ct
 GR_INLINE WARN_UNUSED_RESULT int gr_fq_trace(fmpz_t res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP_GET_FMPZ(ctx, FQ_TRACE)(res, x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT truth_t gr_fq_is_primitive(gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_PREDICATE(ctx, FQ_IS_PRIMITIVE)(x, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_fq_pth_root(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, FQ_PTH_ROOT)(res, x, ctx); }
+
+GR_INLINE WARN_UNUSED_RESULT int gr_set_interval_mid_rad(gr_ptr res, gr_srcptr m, gr_srcptr r, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, SET_INTERVAL_MID_RAD)(res, m, r, ctx); }
 
 GR_INLINE void _gr_vec_init(gr_ptr vec, slong len, gr_ctx_t ctx) { GR_VEC_INIT_CLEAR_OP(ctx, VEC_INIT)(vec, len, ctx); }
 GR_INLINE void _gr_vec_clear(gr_ptr vec, slong len, gr_ctx_t ctx) { GR_VEC_INIT_CLEAR_OP(ctx, VEC_CLEAR)(vec, len, ctx); }
@@ -1341,12 +1362,14 @@ void gr_ctx_fmpz_mod_set_primality(gr_ctx_t ctx, truth_t is_prime);
 
 void gr_ctx_init_nmod(gr_ctx_t ctx, ulong n);
 void _gr_ctx_init_nmod(gr_ctx_t ctx, void * nmod_t_ref);
+void gr_ctx_nmod_set_primality(gr_ctx_t ctx, truth_t is_prime);
 
 void gr_ctx_init_nmod8(gr_ctx_t ctx, unsigned char n);
 void gr_ctx_init_nmod32(gr_ctx_t ctx, unsigned int n);
 
 void gr_ctx_init_real_qqbar(gr_ctx_t ctx);
 void gr_ctx_init_complex_qqbar(gr_ctx_t ctx);
+void _gr_ctx_qqbar_set_limits(gr_ctx_t ctx, slong deg_limit, slong bits_limit);
 
 void gr_ctx_init_real_arb(gr_ctx_t ctx, slong prec);
 void gr_ctx_init_complex_acb(gr_ctx_t ctx, slong prec);
@@ -1361,10 +1384,12 @@ void gr_ctx_init_real_algebraic_ca(gr_ctx_t ctx);
 void gr_ctx_init_complex_algebraic_ca(gr_ctx_t ctx);
 void gr_ctx_init_complex_extended_ca(gr_ctx_t ctx);
 void _gr_ctx_init_ca_from_ref(gr_ctx_t ctx, int which_ring, void * ca_ctx);
+void gr_ctx_ca_set_option(gr_ctx_t ctx, slong option, slong value);
+slong gr_ctx_ca_get_option(gr_ctx_t ctx, slong option);
 
 void gr_ctx_init_fq(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var);
-void gr_ctx_init_fq_nmod(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var);
-void gr_ctx_init_fq_zech(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var);
+void gr_ctx_init_fq_nmod(gr_ctx_t ctx, ulong p, slong d, const char * var);
+void gr_ctx_init_fq_zech(gr_ctx_t ctx, ulong p, slong d, const char * var);
 
 void _gr_ctx_init_fq_from_ref(gr_ctx_t ctx, const void * fq_ctx);
 void _gr_ctx_init_fq_nmod_from_ref(gr_ctx_t ctx, const void * fq_nmod_ctx);
@@ -1405,6 +1430,9 @@ void gr_ctx_init_gr_poly(gr_ctx_t ctx, gr_ctx_t base_ring);
 #ifdef MPOLY_H
 void gr_ctx_init_fmpz_mpoly(gr_ctx_t ctx, slong nvars, const ordering_t ord);
 void gr_ctx_init_gr_mpoly(gr_ctx_t ctx, gr_ctx_t base_ring, slong nvars, const ordering_t ord);
+#endif
+
+#ifdef FMPZ_MPOLY_Q_H
 void gr_ctx_init_fmpz_mpoly_q(gr_ctx_t ctx, slong nvars, const ordering_t ord);
 #endif
 

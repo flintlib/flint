@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -15,27 +15,20 @@
 #ifdef PADIC_INLINES_C
 #define PADIC_INLINE
 #else
-#define PADIC_INLINE static __inline__
+#define PADIC_INLINE static inline
 #endif
 
 #include "fmpz.h"
+#include "padic_types.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 #define PADIC_DEFAULT_PREC WORD(20)
 
 #define PADIC_TEST_PREC_MIN WORD(-100)
 #define PADIC_TEST_PREC_MAX  WORD(100)
-
-typedef struct {
-    fmpz u;
-    slong v;
-    slong N;
-} padic_struct;
-
-typedef padic_struct padic_t[1];
 
 #define padic_val(x)   ((x)->v)
 #define padic_prec(x)  ((x)->N)
@@ -58,36 +51,6 @@ slong padic_get_prec(const padic_t x)
    return x->N;
 }
 
-enum padic_print_mode
-{
-    PADIC_TERSE,
-    PADIC_SERIES,
-    PADIC_VAL_UNIT
-};
-
-typedef struct {
-
-    fmpz_t p;
-
-    double pinv;
-
-    fmpz *pow;
-    slong min;
-    slong max;
-
-    enum padic_print_mode mode;
-
-} padic_ctx_struct;
-
-typedef padic_ctx_struct padic_ctx_t[1];
-
-typedef struct {
-    slong n;
-    fmpz *pow;
-} padic_inv_struct;
-
-typedef padic_inv_struct padic_inv_t[1];
-
 /* Context *******************************************************************/
 
 void padic_ctx_init(padic_ctx_t ctx, const fmpz_t p, slong min, slong max,
@@ -108,10 +71,7 @@ int _padic_ctx_pow_ui(fmpz_t rop, ulong e, const padic_ctx_t ctx)
         slong l = (slong) e;
         if (l < 0)
         {
-            flint_printf("Exception (_padic_ctx_pow_ui). Power too large.\n");
-            flint_printf("e = %wu\n", e);
-            flint_printf("l = %wd\n", l);
-            flint_abort();
+            flint_throw(FLINT_ERROR, "Exception (_padic_ctx_pow_ui). Power too large.\ne = %wu\nl = %wd\n", e, l);
         }
 
         fmpz_init(rop);
@@ -130,10 +90,7 @@ void padic_ctx_pow_ui(fmpz_t rop, ulong e, const padic_ctx_t ctx)
         slong l = (slong) e;
         if (l < 0)
         {
-            flint_printf("Exception (padic_ctx_pow_ui). Power too large.\n");
-            flint_printf("e = %wu\n", e);
-            flint_printf("l = %wd\n", l);
-            flint_abort();
+            flint_throw(FLINT_ERROR, "Exception (padic_ctx_pow_ui). Power too large.\ne = %wu\nl = %wd\n", e, l);
         }
 
         fmpz_pow_ui(rop, ctx->p, e);
@@ -200,17 +157,7 @@ void padic_get_mpq(mpq_t rop, const padic_t op, const padic_ctx_t ctx);
 
 PADIC_INLINE void padic_swap(padic_t op1, padic_t op2)
 {
-    slong t;
-
-    fmpz_swap(padic_unit(op1), padic_unit(op2));
-
-    t              = padic_val(op1);
-    padic_val(op1) = padic_val(op2);
-    padic_val(op2) = t;
-
-    t               = padic_prec(op1);
-    padic_prec(op1) = padic_prec(op2);
-    padic_prec(op2) = t;
+    FLINT_SWAP(padic_struct, *op1, *op2);
 }
 
 PADIC_INLINE void padic_zero(padic_t rop)
@@ -345,4 +292,3 @@ void padic_debug(const padic_t op);
 #endif
 
 #endif
-

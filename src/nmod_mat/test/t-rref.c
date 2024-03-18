@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -79,13 +79,11 @@ TEST_FUNCTION_START(nmod_mat_rref, state)
         rank1 = nmod_mat_rref(B);
 
         if (!check_rref_form(perm, B, rank1))
-        {
-            flint_printf("FAIL (malformed rref)\n");
-            nmod_mat_print_pretty(A); flint_printf("\n\n");
-            nmod_mat_print_pretty(B); flint_printf("\n\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Malformed rref\n"
+                    "A = %{nmod_mat}\n"
+                    "B = %{nmod_mat}\n",
+                    A, B);
 
         /* Concatenate the original matrix with the rref, scramble the rows,
            and check that the rref is the same */
@@ -122,14 +120,12 @@ TEST_FUNCTION_START(nmod_mat_rref, state)
         }
 
         if (!equal)
-        {
-            flint_printf("FAIL (rank1 = %wd, rank2 = %wd)!\n", rank1, rank2);
-            nmod_mat_print_pretty(A); flint_printf("\n\n");
-            nmod_mat_print_pretty(B); flint_printf("\n\n");
-            nmod_mat_print_pretty(D); flint_printf("\n\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "rank1 = %wd, rank2 = %wd\n"
+                    "A = %{nmod_mat}\n"
+                    "B = %{nmod_mat}\n"
+                    "D = %{nmod_mat}\n",
+                    rank1, rank2, A, B, D);
 
         _perm_clear(perm);
         nmod_mat_clear(A);

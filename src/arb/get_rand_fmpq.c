@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2012 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fmpq.h"
@@ -26,8 +26,7 @@ _arb_get_rand_fmpq(fmpz_t num, fmpz_t den, flint_rand_t state,
 
     if (COEFF_IS_MPZ(*exp))
     {
-        flint_printf("exception: arb_get_rand_fmpq: too large exponent\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "exception: arb_get_rand_fmpq: too large exponent\n");
     }
 
     if (*exp >= 0)
@@ -87,4 +86,3 @@ arb_get_rand_fmpq(fmpq_t q, flint_rand_t state, const arb_t x, slong bits)
     _arb_get_rand_fmpq(fmpq_numref(q), fmpq_denref(q), state, fmpq_denref(q), x);
     fmpq_canonicalise(q);
 }
-

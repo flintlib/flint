@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -15,7 +15,7 @@
 #ifdef LONG_EXTRAS_INLINES_C
 #define LONG_EXTRAS_INLINE
 #else
-#define LONG_EXTRAS_INLINE static __inline__
+#define LONG_EXTRAS_INLINE static inline
 #endif
 
 #include "flint.h"
@@ -74,4 +74,3 @@ int z_kronecker(slong a, slong n);
 #endif
 
 #endif
-

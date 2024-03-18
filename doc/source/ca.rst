@@ -931,7 +931,7 @@ Complex parts
 
     Sets *res* to the sign of *x*, defined by
 
-    .. math ::
+    .. math::
 
         \operatorname{sgn}(x) = \begin{cases} 0 & x = 0 \\ \frac{x}{|x|} & x \ne 0 \end{cases}
 
@@ -1498,19 +1498,19 @@ Superficial options (printing) can be changed at any time.
     Default representation of trigonometric functions.
     The following values are possible:
 
-    .. macro :: CA_TRIG_DIRECT
+    .. macro:: CA_TRIG_DIRECT
 
         Use the direct functions (with some exceptions).
 
-    .. macro :: CA_TRIG_EXPONENTIAL
+    .. macro:: CA_TRIG_EXPONENTIAL
 
         Use complex exponentials.
 
-    .. macro :: CA_TRIG_SINE_COSINE
+    .. macro:: CA_TRIG_SINE_COSINE
 
         Use sines and cosines.
 
-    .. macro :: CA_TRIG_TANGENT
+    .. macro:: CA_TRIG_TANGENT
 
         Use tangents.
 

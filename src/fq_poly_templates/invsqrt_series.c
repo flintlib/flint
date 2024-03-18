@@ -1,12 +1,13 @@
 /*
     Copyright (C) 2011, 2021, 2022 William Hart
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -42,8 +43,12 @@ _TEMPLATE(T, poly_invsqrt_series_prealloc)(TEMPLATE(T, struct) * g,
     TEMPLATE(T, set_ui)(one, 1, ctx);
 
     TEMPLATE(T, set_ui)(inv2, 2, ctx);
+#if defined(FQ_NMOD_POLY_H) || defined(FQ_ZECH_POLY_H)
+    if (TEMPLATE(T, ctx_prime)(ctx) != 2)
+#else
     if (fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) != 0)
-       TEMPLATE(T, inv)(inv2, inv2, ctx);
+#endif
+        TEMPLATE(T, inv)(inv2, inv2, ctx);
 
     _TEMPLATE(T, poly_invsqrt_series_prealloc)(g, h, t, u, m, ctx);
 
@@ -87,14 +92,12 @@ void TEMPLATE(T, poly_invsqrt_series)(TEMPLATE(T, poly_t) g,
 
     if (n == 0 || h->length == 0 || TEMPLATE(T, is_zero)(h->coeffs + 0, ctx))
     {
-        flint_printf("Exception (fq_poly_invsqrt). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fq_poly_invsqrt). Division by zero.\n");
     }
 
     if (!TEMPLATE(T, is_one)(h->coeffs + 0, ctx))
     {
-        flint_printf("Exception (fq_poly_invsqrt_series). Constant term != 1.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fq_poly_invsqrt_series). Constant term != 1.\n");
     }
 
     if (hlen < n)
@@ -133,4 +136,3 @@ void TEMPLATE(T, poly_invsqrt_series)(TEMPLATE(T, poly_t) g,
 }
 
 #endif
-

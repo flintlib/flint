@@ -298,7 +298,7 @@ Arithmetic
     `c` as the weighted arithmetic mean of the slopes,
     rounded to the nearest integer:
 
-    .. math ::
+    .. math::
 
         c = \left\lfloor
             \frac{(e_2 - e_1) + (f_2 + f_1)}{(a_2 - a_1) + (b_2 - b_1)}
@@ -413,27 +413,14 @@ Composition
     The underscore method does not support aliasing of the output
     with either input polynomial.
 
-.. function:: void _arb_poly_revert_series_lagrange(arb_ptr h, arb_srcptr f, slong flen, slong n, slong prec)
-
-.. function:: void arb_poly_revert_series_lagrange(arb_poly_t h, const arb_poly_t f, slong n, slong prec)
-
-.. function:: void _arb_poly_revert_series_newton(arb_ptr h, arb_srcptr f, slong flen, slong n, slong prec)
-
-.. function:: void arb_poly_revert_series_newton(arb_poly_t h, const arb_poly_t f, slong n, slong prec)
-
-.. function:: void _arb_poly_revert_series_lagrange_fast(arb_ptr h, arb_srcptr f, slong flen, slong n, slong prec)
-
-.. function:: void arb_poly_revert_series_lagrange_fast(arb_poly_t h, const arb_poly_t f, slong n, slong prec)
-
 .. function:: void _arb_poly_revert_series(arb_ptr h, arb_srcptr f, slong flen, slong n, slong prec)
-
-.. function:: void arb_poly_revert_series(arb_poly_t h, const arb_poly_t f, slong n, slong prec)
+              void arb_poly_revert_series(arb_poly_t h, const arb_poly_t f, slong n, slong prec)
 
     Sets `h` to the power series reversion of `f`, i.e. the expansion
     of the compositional inverse function `f^{-1}(x)`,
-    truncated to order `O(x^n)`, using respectively
-    Lagrange inversion, Newton iteration, fast Lagrange inversion,
-    and a default algorithm choice.
+    truncated to order `O(x^n)`.
+    Wraps :func:`_gr_poly_revert_series` which chooses automatically
+    between various algorithms.
 
     We require that the constant term in `f` is exactly zero and that the
     linear term is nonzero. The underscore methods assume that *flen*
@@ -525,7 +512,7 @@ Product trees
 
     Generates the polynomial
 
-    .. math ::
+    .. math::
 
         \left(\prod_{i=0}^{rn-1} (x-r_i)\right) \left(\prod_{i=0}^{cn-1} (x-c_i)(x-\bar{c_i})\right)
 
@@ -818,7 +805,7 @@ Powers and elementary functions
 
     Uses the formulas
 
-    .. math ::
+    .. math::
 
         \tan^{-1}(f(x)) = \int f'(x) / (1+f(x)^2) dx,
 
@@ -1009,7 +996,7 @@ Zeta function
     In particular, expanding `\zeta(s,a) + 1/(1-s)` with `s = 1+x`
     gives the Stieltjes constants
 
-    .. math ::
+    .. math::
 
         \sum_{k=0}^{n-1} \frac{(-1)^k}{k!} \gamma_k(a) x^k.
 
@@ -1023,7 +1010,7 @@ Zeta function
     Sets *res* to the series expansion of the Riemann-Siegel theta
     function
 
-    .. math ::
+    .. math::
 
         \theta(h) = \arg \left(\Gamma\left(\frac{2ih+1}{4}\right)\right) - \frac{\log \pi}{2} h
 
@@ -1040,7 +1027,7 @@ Zeta function
 
     Sets *res* to the series expansion of the Riemann-Siegel Z-function
 
-    .. math ::
+    .. math::
 
         Z(h) = e^{i\theta(h)} \zeta(1/2+ih).
 
@@ -1062,7 +1049,7 @@ Root-finding
     Sets *bound* to an upper bound for the magnitude of all the complex
     roots of *poly*. Uses Fujiwara's bound
 
-    .. math ::
+    .. math::
 
         2 \max \left\{\left|\frac{a_{n-1}}{a_n}\right|,
                       \left|\frac{a_{n-2}}{a_n}\right|^{1/2},

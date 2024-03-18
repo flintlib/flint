@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -82,20 +82,11 @@ TEST_FUNCTION_START(nmod_mat_mul_blas, state)
             nmod_mat_mul_classical(D, A, B);
 
             if (!nmod_mat_equal(C, D))
-            {
-                flint_printf("FAIL: results not equal\n");
-                flint_printf("m: %wd, k: %wd, n: %wd, mod: %wu\n", m, k, n, modulus);
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL("m: %wd, k: %wd, n: %wd, mod: %wu\n", m, k, n, modulus);
         }
 #if FLINT_USES_BLAS && FLINT_BITS == 64
         else
-        {
-            flint_printf("FAIL: blas should have worked\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("BLAS should have worked\n");
 #endif
 
         nmod_mat_clear(A);

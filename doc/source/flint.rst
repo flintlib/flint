@@ -31,6 +31,16 @@ to avoid problems with integer promotion.
 Similar to the previous macro, ``FLINT_MAX(x, y)`` returns the
 maximum of `x` and `y`.
 
+The macro ``FLINT_SWAP(T, x, y)`` swaps ``x`` and ``y``, where ``x`` and ``y``
+are of type ``T``. For instance, with ``x`` and ``y`` of type ``fmpz_poly_t`` ,
+one can write ``FLINT_SWAP(fmpz_poly_struct, *x, *y)`` to swap the content of
+``x`` with the content of ``y``.
+
+.. macro:: FLINT_SGN(x)
+
+    Returns the sign of `x` where `x` is interpreted as a :type:`slong`, that
+    is, returns `-1` if `x < 0`, `0` if `x = 0` and `1` if `x > 0`.
+
 .. function:: mp_limb_t FLINT_BIT_COUNT(mp_limb_t x)
 
     Returns the number of binary bits required to represent an ``ulong x``.  If
@@ -59,7 +69,7 @@ Integer types
 The *char*, *short* and *int* types are assumed to be two's complement
 types with exactly 8, 16 and 32 bits. This is not technically guaranteed
 by the C standard, but it is true on mainstream platforms.
-;
+
 Since the C types *long* and *unsigned long* do not have a standardized size
 in practice, FLINT defines *slong* and *ulong* types which are guaranteed
 to be 32 bits on a 32-bit system and 64 bits on a 64-bit system.
@@ -147,7 +157,7 @@ Random Numbers
 
     An array of length 1 of :type:`flint_rand_s`.
 
-.. function:: flint_rand_s * flint_rand_alloc()
+.. function:: flint_rand_s * flint_rand_alloc(void)
 
     Allocates a ``flint_rand_t`` object to be used like a heap-allocated
     ``flint_rand_t`` in external libraries.
@@ -156,7 +166,6 @@ Random Numbers
 .. function:: void flint_rand_free(flint_rand_s * state)
 
     Frees a random state object as allocated using :func:`flint_rand_alloc`.
-
 
 .. function:: void flint_randinit(flint_rand_t state)
 
@@ -225,17 +234,185 @@ Thread functions
 Input/Output
 -----------------
 
-.. function:: int flint_printf(const char * str, ...)
-              int flint_vprintf(const char * str, va_list ap)
-              int flint_fprintf(FILE * f, const char * str, ...)
-              int flint_sprintf(char * s, const char * str, ...)
+.. function:: int flint_printf(const char * format, ...)
+              int flint_fprintf(FILE * fs, const char * format, ...)
+              int flint_vprintf(const char * format, va_list vlist)
+              int flint_vfprintf(FILE * fs, const char * format, va_list vlist)
 
-    These are equivalent to the standard library functions ``printf``,
-    ``vprintf``, ``fprintf``, and ``sprintf`` with an additional length modifier
-    "w" for use with an :type:`mp_limb_t` type. This modifier can be used with
-    format specifiers "d", "x", or "u", thereby outputting the limb as a signed
-    decimal, hexadecimal, or unsigned decimal integer.
+    These functions are extensions of the C standard library functions
+    ``printf``, ``fprintf``, ``vprintf``, and ``vfprintf``.
 
+    The first extension is the addition of the length modifier ``w``, used for
+    printing the types :type:`ulong`, :type:`slong` and :type:`mp_limb_t`. As
+    these types are either defined as signed and unsigned ``long int`` or
+    ``long long int``, this comes in handy. Just like ``long int`` and ``long
+    long int``, the conversion format specifier are allowed to be ``d``, ``i``,
+    ``o``, ``x``, ``X`` and ``u``.
+
+    The second and final extension is printing of FLINT types. Currently
+    supported types are the base types :type:`ulong`, :type:`slong`,
+    :type:`fmpz_t`, :type:`fmpq_t`, :type:`mag_t`, :type:`arf_t`, :type:`arb_t`
+    and :type:`acb_t` as well as the context structures for modulo arithmetic
+    :type:`nmod_t` and :type:`fmpz_mod_ctx_t`. We also support the GMP types
+    ``mpz_t`` and ``mpq_t``.
+
+    We currently support printing vectors of pointers to the following base
+    types: :type:`slong`, :type:`ulong`, :type:`fmpz`, :type:`fmpq`,
+    :type:`mag_struct`, :type:`arf_struct`, :type:`arb_struct` and
+    :type:`acb_struct`.
+
+    We also support printing matrices of the following types:
+    :type:`nmod_mat_t`, :type:`fmpz_mat_t`, :type:`fmpq_mat_t`,
+    :type:`arb_mat_t` and :type:`acb_mat_t`.
+
+    Finally, we currently support printing polynomial of the following types:
+    :type:`nmod_poly_t`, :type:`fmpz_poly_t`, :type:`fmpq_poly_t`,
+    :type:`arb_poly_t` and :type:`acb_poly_t`.
+
+.. code-block:: c
+
+    ulong bulong;
+    slong bslong;
+    fmpz_t bfmpz;
+    fmpq_t bfmpq;
+    mag_t bmag;
+    arf_t barf;
+    arb_t barb;
+    acb_t bacb;
+    nmod_t bnmod;
+    fmpz_mod_ctx_t bfmpz_mod_ctx;
+    mpz_t bmpz;
+    mpq_t bmpq;
+
+    /* Initialize and set variables */
+
+    flint_printf(
+        "ulong: %{ulong}\n"
+        "slong: %{slong}\n"
+        "fmpz: %{fmpz}\n"
+        "fmpq: %{fmpq}\n"
+        "mag: %{mag}\n"
+        "arf: %{arf}\n"
+        "arb: %{arb}\n"
+        "acb: %{acb}\n"
+        "nmod: %{nmod}\n"
+        "fmpz_mod_ctx: %{fmpz_mod_ctx}\n"
+        "mpz: %{mpz}\n"
+        "mpq: %{mpq}\n",
+        bulong,
+        bslong,
+        bfmpz,
+        bfmpq,
+        bmag,
+        barf,
+        barb,
+        bacb,
+        bnmod,
+        bfmpz_mod_ctx,
+        bmpz,
+        bmpq);
+
+.. code-block:: c
+
+    slong * vslong; slong vslong_len;
+    mp_ptr vnmod; slong vnmod_len; /* The base type for nmod is ulong */
+    fmpz * vfmpz; slong vfmpz_len;
+    /* fmpz_mod vectors are given by the type `fmpz *' */
+    fmpq * vfmpq; slong vfmpq_len;
+    mag_ptr vmag; slong vmag_len;
+    arf_ptr varf; slong varf_len;
+    arb_ptr varb; slong varb_len;
+    acb_ptr vacb; slong vacb_len;
+
+    /* Initialize and set variables */
+
+    flint_printf(
+        "slong vector: %{slong*}\n"
+        "nmod vector: %{ulong*}\n"
+        "fmpz vector: %{fmpz*}\n"
+        "fmpq vector: %{fmpq*}\n"
+        "mag vector: %{mag*}\n"
+        "arf vector: %{arf*}\n"
+        "arb vector: %{arb*}\n"
+        "acb vector: %{acb*}\n"
+        vslong, vslong_len, /* They require a vector length specifier */
+        vnmod, vnmod_len,
+        vfmpz, vfmpz_len,
+        vfmpq, vfmpq_len,
+        vmag, vmag_len,
+        varf, varf_len,
+        varb, varb_len,
+        vacb, vacb_len);
+
+.. code-block:: c
+
+    nmod_mat_t mnmod;
+    fmpz_mat_t mfmpz;
+    fmpz_mod_mat_t mfmpz_mod;
+    fmpq_mat_t mfmpq;
+    arb_mat_t marb;
+    acb_mat_t macb;
+
+    /* Initialize and set variables */
+
+    flint_printf(
+        "nmod matrix: %{nmod_mat}\n"
+        "fmpz matrix: %{fmpz_mat}\n"
+        "fmpz_mod matrix: %{fmpz_mod_mat}\n"
+        "fmpq matrix: %{fmpq_mat}\n"
+        "arb vector: %{arb_mat}\n"
+        "acb vector: %{acb_mat}\n"
+        mnmod,
+        mfmpz,
+        mfmpz_mod,
+        mfmpq,
+        marb,
+        macb);
+
+.. code-block:: c
+
+    nmod_poly_t pnmod;
+    fmpz_poly_t pfmpz;
+    fmpz_mod_poly_t pfmpz_mod;
+    fmpq_poly_t pfmpq;
+    arb_poly_t parb;
+    acb_poly_t pacb;
+
+    /* Initialize and set variables */
+
+    flint_printf(
+        "nmod polynomial: %{nmod_poly}\n"
+        "fmpz polynomial: %{fmpz_poly}\n"
+        "fmpz_mod polynomial: %{fmpz_mod_poly}\n"
+        "fmpq polynomial: %{fmpq_poly}\n"
+        "arb polynomial: %{arb_poly}\n"
+        "acb polynomial: %{acb_poly}\n"
+        pnmod,
+        pfmpz,
+        pfmpz_mod,
+        pfmpq,
+        parb,
+        pacb);
+
+.. note::
+
+    Printing of FLINT types does not currently support any flags.
+
+.. note::
+
+    Any use of ``%n`` flags will be invalid, but will not generate any error.
+
+.. note::
+
+    Invalid formats using variable minimum field width and/or precision such as
+    ``"%* p"`` may be wrongly parsed, and may result in a different result
+    compared to the C standard library functions.
+
+.. function:: int flint_sprintf(char * s, const char * str, ...)
+
+    This functions is an extensions of the C standard library functions
+    ``sprintf``. It is currently advised to not use this function as it is
+    currently not coherent with :func:`flint_printf`.
 
 .. function:: int flint_scanf(const char * str, ...)
               int flint_fscanf(FILE * f, const char * str, ...)
@@ -248,13 +425,54 @@ Input/Output
 Exceptions
 -----------------
 
-When FLINT encounters a problem, mostly illegal input, it currently aborts.
-There is an experimental interface for generating proper exceptions
-``flint_throw``, but this is currently rarely used and experimental - you
-should expect this to change.
+.. function:: void flint_abort(void)
 
-At the end, all of FLINT's exceptions call ``abort()`` to terminate
-the program. Using ``flint_set_abort(void (*abort_func)(void))``, the
-user can install a function that will be called instead. Similar
-to the exceptions, this should be regarded as experimental.
+    FLINT version of the C standard function ``abort``.
 
+.. function:: void flint_set_abort(void (* func)(void))
+
+    Sets the :func:`flint_abort` function to call ``func`` instead of
+    ``abort``.
+
+.. enum:: flint_err_t
+
+    An error code with one of the following values
+
+    .. macro:: FLINT_ERROR
+
+        Describes a generic error.
+
+    .. macro:: FLINT_OVERFLOW
+
+        Describes an overflow.
+
+    .. macro:: FLINT_IMPINV
+
+        Describes an impossible inversion.
+
+    .. macro:: FLINT_DOMERR
+
+        Describes a domain error.
+
+    .. macro:: FLINT_DIVZERO
+
+        Describes a division by zero.
+
+    .. macro:: FLINT_EXPOF
+
+        Describes a exponent overflow.
+
+    .. macro:: FLINT_INEXACT
+
+        Describes an inexact operation.
+
+    .. macro:: FLINT_TEST_FAIL
+
+        Describes a test fail.
+
+.. function:: void flint_throw(flint_err_t exc, const char * msg, ...)
+
+    Throws an error of type ``exc`` with message ``msg`` and aborts via
+    :func:`flint_abort`. The printing back-end function is
+    :func:`flint_fprintf`, and so it allows for printing of FLINT types as
+    well.

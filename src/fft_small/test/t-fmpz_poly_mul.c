@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -58,7 +58,7 @@ TEST_FUNCTION_START(_fmpz_poly_mul_mid_mpn_ctx, state)
                     if (!fmpz_equal(c + i, d + i-zl))
                     {
                         flint_printf("(squaring) mulmid error at index %wu\n", i);
-                        flint_printf("abits=%wu, bbits=%wu\n", abits);
+                        flint_printf("abits=%wu\n", abits);
                         flint_printf("zl=%wu, zh=%wu, an=%wu\n", zl, zh, an);
                         flint_abort();
                     }

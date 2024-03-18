@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -72,8 +72,7 @@ n_primes_sieve_range(n_primes_t iter, mp_limb_t a, mp_limb_t b)
 
     if (a < 3 || b < a || len > FLINT_SIEVE_SIZE)
     {
-        flint_printf("invalid sieve range %wu,%wu!\n", a, b);
-        flint_abort();
+        flint_throw(FLINT_ERROR, "invalid sieve range %wu,%wu!\n", a, b);
     }
 
     bound = n_sqrt(b) + 1;

@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
     {
         flint_printf("usage: build/examples/pi digits [-condense n] [-threads n] [-constant name]\n");
         flint_printf("compute digits of pi (or other constants)\n");
-        flint_printf("supported: pi, e, log2, euler, catalan, khinchin, zeta3\n");
+        flint_printf("supported: pi, e, log2, euler, catalan, khinchin, zeta3, reciprocal_fibonacci\n");
         return 1;
     }
 
@@ -47,6 +47,8 @@ int main(int argc, char *argv[])
                 constant = 5;
             else if (!strcmp(argv[i+1], "zeta3"))
                 constant = 6;
+            else if (!strcmp(argv[i+1], "reciprocal_fibonacci"))
+                constant = 7;
             else
             {
                 flint_printf("unknown constant\n");
@@ -79,6 +81,8 @@ int main(int argc, char *argv[])
         arb_const_khinchin(x, prec);
     else if (constant == 6)
         arb_zeta_ui(x, 3, prec);
+    else if (constant == 7)
+        arb_const_reciprocal_fibonacci(x, prec);
     TIMEIT_ONCE_STOP
 
     SHOW_MEMORY_USAGE

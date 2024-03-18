@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -90,13 +90,11 @@ void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R,
 
     if (fmpq_poly_is_zero(poly2))
     {
-        flint_printf("Exception (fmpq_poly_divrem). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpq_poly_divrem). Division by zero.\n");
     }
     if (Q == R)
     {
-        flint_printf("Exception (fmpq_poly_divrem). Output arguments aliased.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpq_poly_divrem). Output arguments aliased.\n");
     }
 
     /* Deal with the various other cases of aliasing. */
@@ -160,4 +158,3 @@ void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R,
     _fmpq_poly_set_length(R, lenR);
     _fmpq_poly_normalise(R);
 }
-

@@ -5,14 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "flint-mparam.h"
 #include "fft.h"
-#include "ulong_extras.h"
-#include "fft_tuning.h"
 
 static int fft_tuning_table[5][2] = FFT_TAB;
 
@@ -82,4 +80,3 @@ void flint_mpn_mul_fft_main(mp_ptr r1, mp_srcptr i1, mp_size_t n1,
       mul_mfa_truncate_sqrt2(r1, i1, n1, i2, n2, depth, w);
    }
 }
-

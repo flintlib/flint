@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -97,15 +97,13 @@ nmod_poly_compose_mod_brent_kung_preinv(nmod_poly_t res,
 
     if (len3 == 0)
     {
-        flint_printf("Exception (nmod_poly_compose_mod_brent_kung_preinv). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(nmod_poly_compose_mod_brent_kung_preinv): Division by zero.\n");
     }
 
     if (len1 >= len3)
     {
-        flint_printf("Exception (nmod_poly_compose_mod_brent_kung_preinv). The degree of the \n"
-               "first polynomial must be smaller than that of the modulus.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(nmod_poly_compose_mod_brent_kung_preinv): "
+                "The degree of the first polynomial must be smaller than that of the modulus.\n");
     }
 
     if (len1 == 0 || len3 == 1)

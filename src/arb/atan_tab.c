@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2014 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "arb.h"
@@ -2284,5 +2284,3 @@ const mp_limb_t arb_atan_tab22[1 << ARB_ATAN_TAB22_BITS][ARB_ATAN_TAB2_LIMBS] =
   Z8(bd5dd2e7,67fc724d,5ebae2bf,d635b446,682bf0ac,3da7f72b,901bb0d0,7fd76470)
   Z8(1016ad6e,9f4ebac7,26604410,67555f4a,07bc06ce,45be4112,7ea3cf61,07bf64ec)
 }};
-
-

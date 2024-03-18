@@ -1,6 +1,7 @@
 /* This file is public domain. Author: Fredrik Johansson. */
 
 #include <stdlib.h>
+#include <string.h>
 #include "profiler.h"
 #include "ca.h"
 #include "ca_vec.h"
@@ -172,7 +173,7 @@ benchmark_DFT(slong N, int input, int verbose, slong qqbar_limit, slong gb, ca_c
     ca_clear(t, ctx);
 }
 
-void usage()
+void usage(void)
 {
     printf("usage: dft [-verbose] [-input i] [-limit B] [-timing T] [-nogb] N\n");
 }

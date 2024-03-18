@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -172,13 +172,11 @@ TEST_FUNCTION_START(nmod_mat_howell_form, state)
         r1 = nmod_mat_howell_form(B);
 
         if (!nmod_mat_is_in_howell_form(B))
-        {
-            flint_printf("FAIL (malformed Howell form)\n");
-            nmod_mat_print_pretty(A); flint_printf("\n\n");
-            nmod_mat_print_pretty(B); flint_printf("\n\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Malformed Howell form\n"
+                    "A = %{nmod_mat}\n"
+                    "B = %{nmod_mat}\n",
+                    A, B);
 
         _perm_randtest(perm, 2 * m, state);
 
@@ -217,14 +215,12 @@ TEST_FUNCTION_START(nmod_mat_howell_form, state)
         }
 
         if (!equal)
-        {
-            flint_printf("FAIL (r1 = %wd, r2 = %wd)!\n", r1, r2);
-            nmod_mat_print_pretty(A); flint_printf("\n\n");
-            nmod_mat_print_pretty(B); flint_printf("\n\n");
-            nmod_mat_print_pretty(D); flint_printf("\n\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "r1 = %wd, r2 = %wd\n"
+                    "A = %{nmod_mat}\n"
+                    "B = %{nmod_mat}\n"
+                    "D = %{nmod_mat}\n",
+                    r1, r2, A, B, D);
 
         _perm_clear(perm);
 

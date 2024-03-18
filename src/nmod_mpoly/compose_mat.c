@@ -5,16 +5,15 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_vec.h"
+#include "fmpz_mat.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
-
-#ifdef FLINT_WANT_ASSERT
-# include "fmpz_mat.h"
-#endif
 
 /* essentially exps(A) = M*exps(B) */
 void _nmod_mpoly_compose_mat(
@@ -47,7 +46,7 @@ void _nmod_mpoly_compose_mat(
     for (i = 0; i < Blen; i++)
     {
         mpoly_unpack_vec_fmpz(u, Bexp + BN*i, Bbits, ctxB->minfo->nfields, 1);
-        fmpz_mat_mul_vec(v, M, u);
+        fmpz_mat_mul_fmpz_vec(v, M, u, fmpz_mat_ncols(M));
         if (!fmpz_is_zero(v + ctxAC->minfo->nfields))
             continue;
         vbits = _fmpz_vec_max_bits(v, ctxAC->minfo->nfields);
@@ -67,4 +66,3 @@ void _nmod_mpoly_compose_mat(
     nmod_mpoly_combine_like_terms(A, ctxAC);
     return;
 }
-

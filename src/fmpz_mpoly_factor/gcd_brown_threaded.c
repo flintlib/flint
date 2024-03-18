@@ -5,15 +5,20 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "thread_pool.h"
-#include "nmod_mpoly.h"
-#include "fmpz_mpoly_factor.h"
+#include "ulong_extras.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpq.h"
 #include "fmpq_vec.h"
+#include "n_poly.h"
+#include "mpoly.h"
+#include "nmod_mpoly_factor.h"
+#include "fmpz_mpoly_factor.h"
 
 typedef struct
 {
@@ -339,6 +344,14 @@ static void _find_edge(
     }
 }
 
+/* NOTE: Here `input' has to be an array of size `count'.  It will be
+ * overwritten, and its initial element values do not matter.  It will contain
+ * dangling pointers after returning, that is, the values `input[ix]' will be
+ * invalid after returning.  Hence, we silence warnings about dangling pointers. */
+#if defined(__GNUC__) && !defined(__clang__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdangling-pointer"
+#endif
 static slong _fmpz_mpoly_crt(
     const fmpz_multi_CRT_t P,
     _joinworker_arg_struct * S,
@@ -384,7 +397,7 @@ static slong _fmpz_mpoly_crt(
     if (exp_right)
         _find_edge(stop, count, exp_right, B, N);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     for (k = 0; k < count; k++)
     {
         FLINT_ASSERT(0 <= start[k]);
@@ -511,6 +524,9 @@ static slong _fmpz_mpoly_crt(
 
     return lastdegree;
 }
+#if defined(__GNUC__) && !defined(__clang__)
+# pragma GCC diagnostic pop
+#endif
 
 
 typedef struct
@@ -1195,4 +1211,3 @@ cleanup_split:
 
     return success;
 }
-

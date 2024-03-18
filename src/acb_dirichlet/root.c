@@ -2,12 +2,12 @@
     Copyright (C) 2016 Pascal Molin
     Copyright (C) 2016 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fmpq.h"
@@ -89,7 +89,7 @@ acb_dirichlet_root(acb_t z, const acb_dirichlet_roots_t t, ulong k, slong prec)
         }
 
         if (k != 0)
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
         acb_set_round(z, z, prec);
     }
@@ -101,4 +101,3 @@ acb_dirichlet_root(acb_t z, const acb_dirichlet_roots_t t, ulong k, slong prec)
     if (conjugate)
         arb_neg(acb_imagref(z), acb_imagref(z));
 }
-

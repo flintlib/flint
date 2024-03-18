@@ -5,13 +5,17 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
+#include "fmpz.h"
+#include "fq_nmod.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly_factor.h"
 #include "fq_nmod_mpoly_factor.h"
-
 
 static void _fq_nmod_mpoly_set_nmod_mpoly(
     fq_nmod_mpoly_t A,
@@ -105,8 +109,7 @@ static void _frob_combine(
             {
                 if ((t->coeffs + d*i)[j] != 0)
                 {
-                    flint_printf("fatal error in _frob_combine");
-                    flint_abort();
+                    flint_throw(FLINT_ERROR, "fatal error in _frob_combine");
                 }
             }
             s->coeffs[i] = (t->coeffs + d*i)[0];
@@ -347,4 +350,3 @@ cleanup:
 
     return success;
 }
-

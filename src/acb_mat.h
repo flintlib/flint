@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2012 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #ifndef ACB_MAT_H
@@ -15,7 +15,7 @@
 #ifdef ACB_MAT_INLINES_C
 #define ACB_MAT_INLINE
 #else
-#define ACB_MAT_INLINE static __inline__
+#define ACB_MAT_INLINE static inline
 #endif
 
 #include "fmpq_types.h"
@@ -45,9 +45,7 @@ void acb_mat_clear(acb_mat_t mat);
 ACB_MAT_INLINE void
 acb_mat_swap(acb_mat_t mat1, acb_mat_t mat2)
 {
-    acb_mat_struct t = *mat1;
-    *mat1 = *mat2;
-    *mat2 = t;
+    FLINT_SWAP(acb_mat_struct, *mat1, *mat2);
 }
 
 ACB_MAT_INLINE void
@@ -467,4 +465,3 @@ acb_mat_allocated_bytes(const acb_mat_t x)
 #endif
 
 #endif
-

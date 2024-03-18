@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2022 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "acb_calc.h"
@@ -74,7 +74,7 @@ _integrand(acb_ptr res, const acb_t t, void * param, slong order, int negate_pow
     acb_t u, v;
 
     if (order > 1)
-        flint_abort();  /* Would be needed for Taylor method. */
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);  /* Would be needed for Taylor method. */
 
     z = ((acb_srcptr)(param)) + 0;
     s = ((acb_srcptr)(param)) + 1;

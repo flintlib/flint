@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -18,8 +18,8 @@
 #define FQ_INLINE
 #define FQ_TEMPLATES_INLINE
 #else
-#define FQ_INLINE static __inline__
-#define FQ_TEMPLATES_INLINE static __inline__
+#define FQ_INLINE static inline
+#define FQ_TEMPLATES_INLINE static inline
 #endif
 
 #include "fq_types.h"
@@ -30,15 +30,17 @@
 extern "C" {
 #endif
 
-void fq_ctx_init(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var);
-int _fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var);
-void fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var);
-void fq_ctx_init_modulus(fq_ctx_t ctx, const fmpz_mod_poly_t modulus, const fmpz_mod_ctx_t ctxp, const char *var);
+void fq_ctx_init(fq_ctx_t ctx, const fmpz_t p, slong d, const char * var);
+int _fq_ctx_init_conway_ui(fq_ctx_t ctx, ulong p, slong d, const char * var);
+void fq_ctx_init_conway_ui(fq_ctx_t ctx, ulong p, slong d, const char * var);
+int _fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char * var);
+void fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char * var);
+void fq_ctx_init_modulus(fq_ctx_t ctx, const fmpz_mod_poly_t modulus, const fmpz_mod_ctx_t ctxp, const char * var);
+
+void fq_ctx_init_randtest(fq_ctx_t ctx, flint_rand_t state, int type);
+void fq_ctx_init_randtest_reducible(fq_ctx_t ctx, flint_rand_t state, int type);
 
 void fq_ctx_clear(fq_ctx_t ctx);
-
-void fq_ctx_randtest(fq_ctx_t ctx, flint_rand_t state);
-void fq_ctx_randtest_reducible(fq_ctx_t ctx, flint_rand_t state);
 
 FQ_INLINE const fmpz_mod_poly_struct* fq_ctx_modulus(const fq_ctx_t ctx)
 {
@@ -50,7 +52,10 @@ FQ_INLINE slong fq_ctx_degree(const fq_ctx_t ctx)
     return ctx->modulus->length - 1;
 }
 
-const fmpz * fq_ctx_prime(const fq_ctx_t ctx);
+FQ_INLINE const fmpz * fq_ctx_prime(const fq_ctx_t ctx)
+{
+    return ctx->ctxp->n;
+}
 
 void fq_ctx_order(fmpz_t f, const fq_ctx_t ctx);
 
@@ -189,4 +194,3 @@ void __fq_ctx_prime(fmpz_t p, fq_ctx_t ctx);
 #endif
 
 #endif
-

@@ -6,14 +6,15 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "thread_pool.h"
+#include "thread_support.h"
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "nmod_mat.h"
-#include "thread_support.h"
 
 #define FLINT_MUL_CLASSICAL_CACHE_SIZE 32768 /* size of L1 cache in words */
 
@@ -23,7 +24,7 @@ with op = 1, computes D = C + A*B
 with op = -1, computes D = C - A*B
 */
 
-static __inline__ void
+static inline void
 _nmod_mat_addmul_basic_op(mp_ptr * D, mp_ptr * const C, mp_ptr * const A,
     mp_ptr * const B, slong m, slong k, slong n, int op, nmod_t mod, int nlimbs)
 {
@@ -126,7 +127,7 @@ _nmod_mat_addmul_transpose_worker(void * arg_ptr)
     }
 }
 
-static __inline__ void
+static inline void
 _nmod_mat_addmul_transpose_threaded_pool_op(mp_ptr * D, const mp_ptr * C,
                             const mp_ptr * A, const mp_ptr * B, slong m,
                           slong k, slong n, int op, nmod_t mod, int nlimbs,

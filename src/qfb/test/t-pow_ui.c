@@ -1,18 +1,13 @@
-/*=============================================================================
-
-    This file is part of Antic.
-
-    Antic is free software: you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version. See <http://www.gnu.org/licenses/>.
-
-=============================================================================*/
-/******************************************************************************
-
+/*
     Copyright (C) 2012 William Hart
 
-******************************************************************************/
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
+*/
 
 #include "test_helpers.h"
 #include "qfb.h"
@@ -67,7 +62,7 @@ TEST_FUNCTION_START(qfb_pow_ui, state)
         if (!result)
         {
            printf("FAIL:\n");
-           printf("exp = %lu\n", exp);
+           flint_printf("exp = %wu\n", exp);
            qfb_print(r); printf("\n");
            qfb_print(s); printf("\n");
            qfb_print(t); printf("\n");

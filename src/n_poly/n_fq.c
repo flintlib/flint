@@ -5,13 +5,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
+#include "nmod.h"
+#include "fq_nmod.h"
 #include "n_poly.h"
-#include "nmod_vec.h"
 
 #define MAC(h, m, l, a, b)                          \
 {                                                   \
@@ -371,6 +371,18 @@ void _n_fq_madd2(
         _nmod_poly_mul(t, b, d, c, d, ctx->mod);
         _nmod_vec_add(a, a, t, 2*d - 1, ctx->mod);
     }
+}
+
+void _n_fq_mul_ui(
+    mp_limb_t * a,          /* length d */
+    const mp_limb_t * b,    /* length d */
+    mp_limb_t c,
+    slong d,
+    nmod_t mod)
+{
+    if (c >= mod.n)
+        NMOD_RED(c, c, mod);
+    _nmod_vec_scalar_mul_nmod(a, b, d, c, mod);
 }
 
 void _n_fq_mul2(

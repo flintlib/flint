@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -52,8 +52,7 @@ int fmpz_mod_poly_invmod(fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
 
     if (lenP < 2)
     {
-        flint_printf("Exception (fmpz_mod_poly_invmod). lenP < 2.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mod_poly_invmod). lenP < 2.\n");
     }
     if (lenB == 0)
     {
@@ -93,4 +92,3 @@ int fmpz_mod_poly_invmod(fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
     _fmpz_mod_poly_normalise(A);
     return ans;
 }
-

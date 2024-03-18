@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -31,13 +31,13 @@ TEST_FUNCTION_START(fq_zech_embed_matrices, state)
         nmod_mat_t embed, project, one;
         slong d;
 
-        fq_zech_ctx_randtest(ctx, state);
+        fq_zech_ctx_init_randtest(ctx, state, 3);
         d = fq_zech_ctx_degree(ctx);
         modulus = fq_zech_ctx_modulus(ctx);
 
         fq_zech_init(gen, ctx);
         fq_zech_gen(gen, ctx);
-        fq_zech_pow(gen, gen, fq_zech_ctx_prime(ctx), ctx);
+        fq_zech_pow_ui(gen, gen, fq_zech_ctx_prime(ctx), ctx);
 
         nmod_mat_init(embed, d, d, nmod_poly_modulus(modulus));
         nmod_mat_init(project, d, d, nmod_poly_modulus(modulus));
@@ -75,13 +75,10 @@ TEST_FUNCTION_START(fq_zech_embed_matrices, state)
             nmod_poly_t modulus2;
             nmod_mat_t embed, project, comp, one;
             slong m, n;
-            fmpz_t p;
 
-            fmpz_init(p);
-            fmpz_set_si(p, primes[i % 3]);
             m = degrees[i % 2];
 
-            fq_zech_ctx_init_random(ctx1, p, m, "a");
+            fq_zech_ctx_init_random_ui(ctx1, primes[i % 3], m, "a");
 
             n = m*j;
             if (m == 1) {
@@ -130,7 +127,6 @@ TEST_FUNCTION_START(fq_zech_embed_matrices, state)
             fq_zech_ctx_clear(ctx1);
             fq_zech_clear(gen2, ctx2);
             fq_zech_ctx_clear(ctx2);
-            fmpz_clear(p);
         }
     }
 

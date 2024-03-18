@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -15,7 +15,7 @@
 #ifdef PERM_INLINES_C
 #define PERM_INLINE
 #else
-#define PERM_INLINE static __inline__
+#define PERM_INLINE static inline
 #endif
 
 
@@ -35,8 +35,7 @@ PERM_INLINE slong * _perm_init(slong n)
 
     if (!vec)
     {
-        flint_printf("ERROR (_perm_init).\n\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "ERROR (_perm_init).\n\n");
     }
 
     for (i = 0; i < n; i++)
@@ -71,7 +70,7 @@ PERM_INLINE void _perm_set(slong *res, const slong *vec, slong n)
         res[i] = vec[i];
 }
 
-PERM_INLINE void _perm_set_one(slong *vec, slong n)
+PERM_INLINE void _perm_one(slong *vec, slong n)
 {
     slong i;
 
@@ -90,8 +89,7 @@ PERM_INLINE void
 
         if (!t)
         {
-            flint_printf("ERROR (_perm_inv).\n\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "ERROR (_perm_inv).\n\n");
         }
 
         for (i = 0; i < n; i++)
@@ -141,37 +139,9 @@ int _perm_randtest(slong * vec, slong n, flint_rand_t state);
 
 int _perm_parity(const slong * vec, slong n);
 
-/* Input and output **********************************************************/
-
-PERM_INLINE  int _long_vec_print(const slong * vec, slong len)
-{
-    slong i;
-
-    flint_printf("%wd", len);
-    if (len > 0)
-    {
-        flint_printf(" ");
-        for (i = 0; i < len; i++)
-            flint_printf(" %wd", vec[i]);
-    }
-
-    return 1;
-}
-
-PERM_INLINE int _perm_print(const slong * vec, slong n)
-{
-    slong i;
-
-    flint_printf("%wd", n);
-    if (n > 0)
-    {
-        flint_printf(" ");
-        for (i = 0; i < n; i++)
-            flint_printf(" %wd", vec[i]);
-    }
-
-    return 1;
-}
+#define _long_vec_print _Pragma("GCC error \"'_long_vec_print(vec, len)' is deprecated. Use 'flint_printf(\"%{slong*}\", vec, len)' instead.\"")
+#define _perm_print _Pragma("GCC error \"'_perm_print(vec, len)' is deprecated. Use 'flint_printf(\"%{slong*}\", vec, len)' instead.\"")
+#define _perm_set_one _Pragma("GCC error \"'_perm_set_one' is deprecated. Use '_perm_one' instead.\"")
 
 #ifdef __cplusplus
 }

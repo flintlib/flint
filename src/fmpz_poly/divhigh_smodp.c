@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -30,8 +30,7 @@ void fmpz_poly_divhigh_smodp(fmpz * res, const fmpz_poly_t f,
    fmpz_gcdinv(d, cinv, g->coeffs + len_g - 1, p);
    if (!fmpz_is_one(d))
    {
-      flint_printf("Exception (fmpz_poly_divhigh_smodp). Impossible inverse.\n");
-      flint_abort();
+      flint_throw(FLINT_ERROR, "Exception (fmpz_poly_divhigh_smodp). Impossible inverse.\n");
    }
 
    for (k = n - 1, i = f->length - len_g; k >= 0; i--, k--)

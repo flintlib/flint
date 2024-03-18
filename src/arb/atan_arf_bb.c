@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2014 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "thread_support.h"
@@ -27,7 +27,7 @@ bs_num_terms(slong mag, slong prec)
     slong N;
 
     if (mag >= 0)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     N = 0;
 
@@ -231,7 +231,7 @@ arb_atan_arf_bb(arb_t z, const arf_t x, slong prec)
 
     if (arf_is_special(x))
     {
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
     }
 
     if (ARF_SGNBIT(x))
@@ -250,8 +250,7 @@ arb_atan_arf_bb(arb_t z, const arf_t x, slong prec)
        the main atan wrapper). */
     if (FLINT_ABS(mag) > 2 * prec + 100)
     {
-        flint_printf("arb_atan_arf_bb: unexpectedly large/small input\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "arb_atan_arf_bb: unexpectedly large/small input\n");
     }
 
     /* approximate by x - x^3 / 3 or pi/2 - 1/x + (1/3)/x^3 */
@@ -476,4 +475,3 @@ arb_atan_arf_bb(arb_t z, const arf_t x, slong prec)
     fmpz_clear(err);
     mag_clear(inp_err);
 }
-

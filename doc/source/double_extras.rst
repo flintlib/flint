@@ -33,6 +33,17 @@ Arithmetic
     ``len`` coefficients. Requires that ``len`` is nonzero.
 
 
+.. function:: double d_mul_2exp_inrange(double x, int i)
+              double d_mul_2exp_inrange2(double x, int i)
+              double d_mul_2exp(double x, int i)
+
+    Returns `x \cdot 2^i`.
+
+    The *inrange* version requires that `2^i` is in the normal exponent
+    range. The *inrange2* version additionally requires that both
+    `x` and `x \cdot 2^i` are in the normal exponent range,
+    and in particular also assumes that `x \ne 0`.
+
 
 Special functions
 --------------------------------------------------------------------------------

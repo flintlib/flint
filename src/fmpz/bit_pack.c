@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -89,7 +89,7 @@ fmpz_bit_pack(mp_ptr arr, flint_bitcnt_t shift, flint_bitcnt_t bits,
             size = FLINT_ABS(ptr->_mp_size);
 
             /* complement coefficient into arr */
-            mpn_com_n(arr, ptr->_mp_d, size);
+            mpn_com(arr, ptr->_mp_d, size);
 
             /* deal with +1 - borrow */
             if (!borrow)

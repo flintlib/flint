@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -26,7 +26,7 @@
 #ifdef __cplusplus
 void  GetSystemTimeAsFileTime(FILETIME*);
 
-static __inline__ int gettimeofday(struct timeval * p, void * tz)
+static inline int gettimeofday(struct timeval * p, void * tz)
 {
    union {
       slong slong ns100;
@@ -66,7 +66,7 @@ typedef struct
     slong wall;
 } timeit_t[1];
 
-static __inline__
+static inline
 void timeit_start(timeit_t t)
 {
     struct timeval tv;
@@ -75,7 +75,7 @@ void timeit_start(timeit_t t)
     t->cpu = - clock() * 1000 / CLOCKS_PER_SEC;
 }
 
-static __inline__
+static inline
 slong timeit_query_wall(timeit_t t)
 {
     struct timeval tv;
@@ -83,7 +83,7 @@ slong timeit_query_wall(timeit_t t)
     return t->wall + tv.tv_sec * 1000 + tv.tv_usec / 1000;
 }
 
-static __inline__
+static inline
 void timeit_stop(timeit_t t)
 {
     struct timeval tv;
@@ -92,7 +92,7 @@ void timeit_stop(timeit_t t)
     t->cpu += clock() * 1000 / CLOCKS_PER_SEC;
 }
 
-static __inline__
+static inline
 void timeit_start_us(timeit_t t)
 {
     struct timeval tv;
@@ -101,7 +101,7 @@ void timeit_start_us(timeit_t t)
 }
 
 
-static __inline__
+static inline
 void timeit_stop_us(timeit_t t)
 {
     struct timeval tv;
@@ -127,8 +127,8 @@ void timeit_stop_us(timeit_t t)
 FLINT_DLL extern double clock_last[FLINT_NUM_CLOCKS];
 FLINT_DLL extern double clock_accum[FLINT_NUM_CLOCKS];
 
-static __inline__
-double get_cycle_counter()
+static inline
+double get_cycle_counter(void)
 {
 #if defined( _MSC_VER )
     return (double)__rdtsc();
@@ -147,33 +147,33 @@ double get_cycle_counter()
 
 #define FLINT_CLOCK_SCALE_FACTOR (1000000.0 / FLINT_CLOCKSPEED)
 
-static __inline__
+static inline
 void init_clock(int n)
 {
    clock_accum[n] = 0.0;
 }
 
-static __inline__
-void init_all_clocks()
+static inline
+void init_all_clocks(void)
 {
    int i;
    for (i = 0; i < FLINT_NUM_CLOCKS; i++)
       clock_accum[i] = 0.0;
 }
 
-static __inline__
+static inline
 double get_clock(int n)
 {
    return clock_accum[n] * FLINT_CLOCK_SCALE_FACTOR;
 }
 
-static __inline__
+static inline
 void start_clock(int n)
 {
    clock_last[n] = get_cycle_counter();
 }
 
-static __inline__
+static inline
 void stop_clock(int n)
 {
    double now = get_cycle_counter();
@@ -186,14 +186,14 @@ void stop_clock(int n)
 
 ******************************************************************************/
 
-static __inline__
-void prof_start()
+static inline
+void prof_start(void)
 {
    start_clock(0);
 }
 
-static __inline__
-void prof_stop()
+static inline
+void prof_stop(void)
 {
    stop_clock(0);
 }
@@ -281,4 +281,3 @@ void prof_repeat(double* min, double* max, profile_target_t target, void* arg);
 #endif
 
 #endif
-

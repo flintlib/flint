@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -243,7 +243,7 @@ _fmpq_harmonic_ui(fmpz_t num, fmpz_t den, ulong n)
     {
         /* overflow */
         if ((slong) n < 0)
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
         harmonic_odd_balanced(num, den, 1, n + 1, n, 1);
         _fmpq_canonicalise(num, den);
@@ -255,4 +255,3 @@ fmpq_harmonic_ui(fmpq_t x, ulong n)
 {
     _fmpq_harmonic_ui(fmpq_numref(x), fmpq_denref(x), n);
 }
-

@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2013 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "thread_support.h"
@@ -89,7 +89,7 @@ static mp_limb_t primorial_tab[] = {
 #endif
 };
 
-static __inline__ int
+static inline int
 bound_primes(ulong k)
 {
     int i;
@@ -102,7 +102,7 @@ bound_primes(ulong k)
 }
 
 
-static __inline__ slong
+static inline slong
 log2_ceil(double x)
 {
     /* ceil(log2(n)) = bitcount(n-1);
@@ -284,7 +284,7 @@ partitions_hrr_sum_arb(arb_t x, const fmpz_t n, slong N0, slong N, int use_doubl
 
     if (fmpz_cmp_ui(n, 2) <= 0)
     {
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
     }
 
     nd = fmpz_get_d(n);

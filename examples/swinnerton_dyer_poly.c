@@ -4,31 +4,8 @@
 #include "profiler.h"
 #include "ca.h"
 #include "ca_vec.h"
+#include "ca_poly.h"
 #include "ulong_extras.h"
-
-void
-_ca_poly_mullow(ca_ptr res, ca_srcptr x, slong xlen,
-    ca_srcptr y, slong ylen, slong len, ca_ctx_t ctx)
-{
-    slong i, j;
-    ca_t t;
-
-    for (i = 0; i < len; i++)
-        ca_zero(res + i, ctx);
-
-    ca_init(t, ctx);
-
-    for (i = 0; i < xlen; i++)
-    {
-        for (j = 0; j < FLINT_MIN(ylen, len - i); j++)
-        {
-            ca_mul(t, x + i, y + j, ctx);
-            ca_add(res + i + j, res + i + j, t, ctx);
-        }
-    }
-
-    ca_clear(t, ctx);
-}
 
 void
 swinnerton_dyer_poly(ca_ptr T, ulong n, slong trunc, ca_ctx_t ctx)
@@ -44,15 +21,15 @@ swinnerton_dyer_poly(ca_ptr T, ulong n, slong trunc, ca_ctx_t ctx)
     ca_one(one, ctx);
 
     square_roots = _ca_vec_init(n, ctx);
-    tmp1 = flint_malloc((N/2 + 1) * sizeof(ca_struct));
-    tmp2 = flint_malloc((N/2 + 1) * sizeof(ca_struct));
-    tmp3 = _ca_vec_init(N, ctx);
+    tmp1 = flint_malloc((N / 4 + 1) * sizeof(ca_struct));
+    tmp2 = flint_malloc((N / 4 + 1) * sizeof(ca_struct));
+    tmp3 = _ca_vec_init(N / 2, ctx);
 
     for (i = 0; i < n; i++)
         ca_sqrt_ui(square_roots + i, n_nth_prime(i + 1), ctx);
 
-    /* Build linear factors */
-    for (i = 0; i < N; i++)
+    /* Build deflated quadratic factors */
+    for (i = 0; i < N / 2; i++)
     {
         ca_zero(T + i, ctx);
 
@@ -63,14 +40,17 @@ swinnerton_dyer_poly(ca_ptr T, ulong n, slong trunc, ca_ctx_t ctx)
             else
                 ca_sub(T + i, T + i, square_roots + j, ctx);
         }
+
+        ca_sqr(T + i, T + i, ctx);
+        ca_neg(T + i, T + i, ctx);
     }
 
     /* For each level... */
-    for (i = 0; i < n; i++)
+    for (i = 0; i < n - 1; i++)
     {
         slong stride = UWORD(1) << i;
 
-        for (j = 0; j < N; j += 2*stride)
+        for (j = 0; j < N / 2; j += 2*stride)
         {
             for (k = 0; k < stride; k++)
             {
@@ -87,11 +67,20 @@ swinnerton_dyer_poly(ca_ptr T, ulong n, slong trunc, ca_ctx_t ctx)
         }
     }
 
+    /* Inflate */
+    for (i = N - 2; i >= 0; i -= 2)
+    {
+        if (i < trunc)
+            ca_swap(T + i, T + i / 2, ctx);
+        if (i + 1 < trunc)
+            ca_zero(T + i + 1, ctx);
+    }
+
     ca_one(T + N, ctx);
     _ca_vec_clear(square_roots, n, ctx);
     flint_free(tmp1);
     flint_free(tmp2);
-    _ca_vec_clear(tmp3, UWORD(1) << n, ctx);
+    _ca_vec_clear(tmp3, N / 2, ctx);
     ca_clear(one, ctx);
 }
 

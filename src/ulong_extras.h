@@ -9,7 +9,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -19,7 +19,7 @@
 #ifdef ULONG_EXTRAS_INLINES_C
 #define ULONG_EXTRAS_INLINE
 #else
-#define ULONG_EXTRAS_INLINE static __inline__
+#define ULONG_EXTRAS_INLINE static inline
 #endif
 
 #include "limb_types.h"
@@ -66,6 +66,7 @@ ulong n_cbrt_chebyshev_approx(ulong n);
 ulong n_cbrtrem(ulong* remainder, ulong n);
 
 ulong n_pow(ulong n, ulong exp);
+ulong _n_pow_check(ulong n, ulong exp);
 ulong n_root(ulong n, ulong root);
 ulong n_rootrem(ulong* remainder, ulong n, ulong root);
 ulong n_root_estimate(double a, int n);
@@ -373,7 +374,6 @@ ulong n_factor_SQUFOF(ulong n, ulong iters);
 
 ulong n_factor_pp1(ulong n, ulong B1, ulong c);
 ulong n_factor_pp1_wrapper(ulong n);
-void n_factor_pp1_table_insert(slong bits, slong B1, slong count);
 
 int n_factor_pollard_brent_single(ulong *factor, ulong n, ulong ninv, ulong ai, ulong xi, ulong normbits, ulong max_iters);
 int n_factor_pollard_brent(ulong *factor, flint_rand_t state, ulong n_in, ulong max_tries, ulong max_iters);

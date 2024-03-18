@@ -5,13 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
+#include "fq_nmod.h"
 #include "n_poly.h"
 #include "fq_nmod_mpoly_factor.h"
-
 
 /* g is in Fq[gen(1)] */
 static void n_fq_bpoly_content_var0(
@@ -808,7 +809,7 @@ int n_fq_bpoly_gcd_brown_smprime(
     n_poly_struct * cA, * cB, * cG, * cAbar, * cBbar, * gamma;
     n_poly_struct * modulus, * alphapow, * r;
     int gstab, astab, bstab, use_stab;
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     n_fq_bpoly_t Asave, Bsave;
     const slong Sp_size_poly = n_poly_stack_size(Sp->poly_stack);
     const slong Sp_size_bpoly = n_bpoly_stack_size(Sp->bpoly_stack);
@@ -846,7 +847,7 @@ int n_fq_bpoly_gcd_brown_smprime(
     if (n_fq_bpoly_gcd_brown_smprime2p(G, Abar, Bbar, A, B, ctx, Sp,
                                            cA, cB, cG, cAbar, cBbar, gamma, r))
     {
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
         {
             n_fq_poly_struct * Glead = G->coeffs + G->length - 1;
             n_fq_bpoly_t P;
@@ -1037,7 +1038,7 @@ successful_put_content:
 
 cleanup:
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success)
     {
         n_fq_poly_struct * Glead = G->coeffs + G->length - 1;

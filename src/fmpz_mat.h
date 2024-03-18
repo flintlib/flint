@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -16,7 +16,7 @@
 #ifdef FMPZ_MAT_INLINES_C
 #define FMPZ_MAT_INLINE
 #else
-#define FMPZ_MAT_INLINE static __inline__
+#define FMPZ_MAT_INLINE static inline
 #endif
 
 #include "fmpz_types.h"
@@ -85,25 +85,16 @@ int fmpz_mat_is_square(const fmpz_mat_t mat)
 void fmpz_mat_zero(fmpz_mat_t mat);
 void fmpz_mat_one(fmpz_mat_t mat);
 
-/* Windows and concatenation */
+/* Windows and concatenation *************************************************/
 
-void fmpz_mat_window_init(fmpz_mat_t window, const fmpz_mat_t mat, slong r1,
-    slong c1, slong r2, slong c2);
-
+void fmpz_mat_window_init(fmpz_mat_t window, const fmpz_mat_t mat, slong r1, slong c1, slong r2, slong c2);
 void fmpz_mat_window_clear(fmpz_mat_t window);
 
-void fmpz_mat_concat_horizontal(fmpz_mat_t res,
-                           const fmpz_mat_t mat1,  const fmpz_mat_t mat2);
+void _fmpz_mat_window_readonly_init_strip_initial_zero_rows(fmpz_mat_t A, const fmpz_mat_t B);
+#define _fmpz_mat_window_readonly_clear(A) /* Do nothing */
 
-void fmpz_mat_concat_vertical(fmpz_mat_t res,
-                           const fmpz_mat_t mat1,  const fmpz_mat_t mat2);
-
-void _fmpz_mat_read_only_window_init_strip_initial_zero_rows(
-                                             fmpz_mat_t A, const fmpz_mat_t B);
-
-FMPZ_MAT_INLINE void _fmpz_mat_read_only_window_clear(fmpz_mat_t A)
-{
-}
+void fmpz_mat_concat_horizontal(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_mat_t mat2);
+void fmpz_mat_concat_vertical(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_mat_t mat2);
 
 /* Input and output  *********************************************************/
 
@@ -177,14 +168,11 @@ void fmpz_mat_scalar_mod_fmpz(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t m);
 /* Multiplication */
 
 void fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
-
-void fmpz_mat_mul_classical(fmpz_mat_t C, const fmpz_mat_t A,
-    const fmpz_mat_t B);
-
+void fmpz_mat_mul_classical(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
+void fmpz_mat_mul_waksman(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
 void fmpz_mat_mul_strassen(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
 
-void fmpz_mat_mul_classical_inline(fmpz_mat_t C, const fmpz_mat_t A,
-    const fmpz_mat_t B);
+#define fmpz_mat_mul_classical_inline _Pragma("GCC error \"'fmpz_mat_mul_classical_inline' is deprecated. Use 'fmpz_mat_mul_classical' instead.\"")
 
 void _fmpz_mat_mul_fft(fmpz_mat_t C,
                                     const fmpz_mat_t A, slong abits,
@@ -288,10 +276,6 @@ slong fmpz_mat_rref_mul(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A);
 int fmpz_mat_is_in_rref_with_rank(const fmpz_mat_t A, const fmpz_t den,
         slong rank);
 
-/* Modular gaussian elimination *********************************************/
-
-slong fmpz_mat_rref_mod(slong * perm, fmpz_mat_t A, const fmpz_t p);
-
 /* Modular Howell and strong echelon form ***********************************/
 
 slong fmpz_mat_howell_form_mod(fmpz_mat_t A, const fmpz_t mod);
@@ -349,8 +333,7 @@ void fmpz_mat_charpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
 {
    if (mat->r != mat->c)
    {
-       flint_printf("Exception (nmod_mat_charpoly).  Non-square matrix.\n");
-       flint_abort();
+       flint_throw(FLINT_ERROR, "Exception (nmod_mat_charpoly).  Non-square matrix.\n");
    }
 
    fmpz_mat_charpoly_modular(cp, mat);
@@ -373,8 +356,7 @@ void fmpz_mat_minpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
 {
    if (mat->r != mat->c)
    {
-       flint_printf("Exception (fmpz_mat_minpoly).  Non-square matrix.\n");
-       flint_abort();
+       flint_throw(FLINT_ERROR, "Exception (fmpz_mat_minpoly).  Non-square matrix.\n");
    }
 
    fmpz_mat_minpoly_modular(cp, mat);

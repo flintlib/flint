@@ -176,6 +176,21 @@ A separate ``int`` field holds the sign, which may be `-1`, `0` or `1`.
     https://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf
 
 
+Input and output
+--------------------------------------------------------------------------------
+
+.. function:: int fmpz_factor_fprint(FILE * fs, const fmpz_factor_t factor)
+              int fmpz_factor_print(const fmpz_factor_t factor)
+
+    Prints the factorization ``factor`` into ``fs`` or ``stdout``. If ``factor``
+    is zero, it prints ``0``. Else, it prints the factorization as
+    ``f_{1}^e_{1} * ... * f_{n}^e_{n}``, where ``f_{i}`` and ``e_{i}`` are the
+    `i`-th factor and exponent, where ``^e_{i}`` is omitted if `e_{i} = 1`. In
+    particular, if ``factor`` is `1` or `-1`, it prints ``1`` or ``-1``,
+    respectively.
+
+    Returns the number of characters written to file stream.
+
 Elliptic curve (ECM) method
 --------------------------------------------------------------------------------
 
@@ -211,11 +226,11 @@ Factoring of ``fmpz`` integers using ECM
     Sets the point `(x : z)` to two times `(x_0 : z_0)` modulo `n` according
     to the formula
 
-    .. math ::
+    .. math::
 
         x = (x_0 + z_0)^2 \cdot (x_0 - z_0)^2 \mod n,
 
-    .. math ::
+    .. math::
 
         z = 4 x_0 z_0 \left((x_0 - z_0)^2 + 4a_{24}x_0z_0\right) \mod n.
 
@@ -228,7 +243,7 @@ Factoring of ``fmpz`` integers using ECM
     Sets the point `(x : z)` to the sum of `(x_1 : z_1)` and `(x_2 : z_2)`
     modulo `n`, given the difference `(x_0 : z_0)` according to the formula
 
-    .. math ::
+    .. math::
 
         x = 4z_0(x_1x_2 - z_1z_2)^2 \mod n, \\ z = 4x_0(x_2z_1 - x_1z_2)^2 \mod n.
 
@@ -263,7 +278,7 @@ Factoring of ``fmpz`` integers using ECM
     The curve selected is of Montgomery form, the points selected satisfy the
     curve and are projective coordinates.
 
-.. function:: int fmpz_factor_ecm_stage_I(mp_ptr f, const mp_limb_t *prime_array, mp_limb_t num, mp_limb_t B1, mp_ptr n, ecm_t ecm_inf)
+.. function:: int fmpz_factor_ecm_stage_I(mp_ptr f, const mp_limb_t * prime_array, mp_limb_t num, mp_limb_t B1, mp_ptr n, ecm_t ecm_inf)
 
     Stage I implementation of the ECM algorithm.
 

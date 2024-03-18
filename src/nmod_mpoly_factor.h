@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -15,7 +15,7 @@
 #ifdef NMOD_MPOLY_FACTOR_INLINES_C
 #define NMOD_MPOLY_FACTOR_INLINE
 #else
-#define NMOD_MPOLY_FACTOR_INLINE static __inline__
+#define NMOD_MPOLY_FACTOR_INLINE static inline
 #endif
 
 #include "nmod_mpoly.h"
@@ -104,14 +104,7 @@ void nmod_mpoly_factor_swap_base(nmod_mpoly_t p, nmod_mpoly_factor_t f,
     nmod_mpoly_swap(p, f->poly + i, ctx);
 }
 
-NMOD_MPOLY_FACTOR_INLINE
-slong nmod_mpoly_factor_get_exp_si(nmod_mpoly_factor_t f,
-                                           slong i, const nmod_mpoly_ctx_t ctx)
-{
-    FLINT_ASSERT(i < (ulong) f->num);
-    return fmpz_get_si(f->exp + i);
-}
-
+slong nmod_mpoly_factor_get_exp_si(nmod_mpoly_factor_t f, slong i, const nmod_mpoly_ctx_t ctx);
 
 void nmod_mpoly_factor_append_ui(nmod_mpoly_factor_t f,
                     const nmod_mpoly_t A, ulong e, const nmod_mpoly_ctx_t ctx);
@@ -468,4 +461,3 @@ int n_polyun_zip_solve(nmod_mpoly_t A, n_polyun_t Z, n_polyun_t H,
 #endif
 
 #endif
-

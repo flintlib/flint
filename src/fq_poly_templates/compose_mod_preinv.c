@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -55,9 +55,7 @@ TEMPLATE(T, poly_compose_mod_preinv) (TEMPLATE(T, poly_t) res,
 
     if (len3 == 0)
     {
-        TEMPLATE_PRINTF("Exception: division by zero in %s_poly_compose_mod\n",
-                        T);
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s): Division by zero\n", __func__);
     }
 
     if (len1 == 0 || len3 == 1)

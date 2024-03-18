@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2020 Fredrik Johansson
 
-    This file is part of Calcium.
+    This file is part of FLINT.
 
-    Calcium is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "ca.h"
@@ -37,8 +37,7 @@ fmpz_mpoly_set_linear_three_term_si(fmpz_mpoly_t poly, slong a, slong xa, slong 
 
     if (xa == xb)
     {
-        flint_printf("fmpz_mpoly_set_linear_three_term_si\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "fmpz_mpoly_set_linear_three_term_si\n");
     }
 
     fmpz_mpoly_set_si(poly, c, ctx);
@@ -62,8 +61,7 @@ fmpz_mpoly_set_linear2_three_term_si(fmpz_mpoly_t poly, slong a, slong xa, slong
 
     if (xa == xb || xa == xa2)
     {
-        flint_printf("fmpz_mpoly_set_linear2_three_term_si\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "fmpz_mpoly_set_linear2_three_term_si\n");
     }
 
     fmpz_mpoly_set_si(poly, c, ctx);

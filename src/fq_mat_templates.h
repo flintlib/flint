@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -169,8 +169,8 @@ int TEMPLATE(T, mat_randpermdiag)(TEMPLATE(T, mat_t) mat, flint_rand_t state,
                               TEMPLATE(T, struct) * diag, slong n,
                               const TEMPLATE(T, ctx_t) ctx);
 
-void TEMPLATE(T, mat_randops)(TEMPLATE(T, mat_t) mat, slong count,
-                         flint_rand_t state, const TEMPLATE(T, ctx_t) ctx);
+void TEMPLATE(T, mat_randops)(TEMPLATE(T, mat_t) mat,
+                         flint_rand_t state, slong count, const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, mat_randtril)(TEMPLATE(T, mat_t) mat, flint_rand_t state,
                           int unit, const TEMPLATE(T, ctx_t) ctx);
@@ -244,7 +244,7 @@ int TEMPLATE(T, mat_inv)(TEMPLATE(T, mat_t) B, TEMPLATE(T, mat_t) A,
 
 /* Solving *******************************************************************/
 
-slong TEMPLATE(T, mat_rref)(TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx);
+slong TEMPLATE(T, mat_rref)(TEMPLATE(T, mat_t) B, const TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx);
 
 
 slong TEMPLATE(T, mat_reduce_row)(TEMPLATE(T, mat_t) A, slong * P, slong * L,

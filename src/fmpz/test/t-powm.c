@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -83,7 +83,7 @@ TEST_FUNCTION_START(fmpz_powm, state)
         result = (mpz_cmp(e, f) == 0) && _fmpz_is_canonical(b);
         if (!result)
         {
-            flint_printf("FAIL (cmp f with MPIR e := d^y mod m):\n");
+            flint_printf("FAIL (cmp f with GMP e := d^y mod m):\n");
             gmp_printf("d = %Zd, e = %Zd, f = %Zd, y = %Zd, m = %Zd\n", d, e, f, y, m);
             fflush(stdout);
             flint_abort();

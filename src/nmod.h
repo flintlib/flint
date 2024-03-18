@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -16,7 +16,7 @@
 #ifdef NMOD_INLINES_C
 #define NMOD_INLINE
 #else
-#define NMOD_INLINE static __inline__
+#define NMOD_INLINE static inline
 #endif
 
 #include "ulong_extras.h"
@@ -196,6 +196,8 @@ mp_limb_t nmod_div(mp_limb_t a, mp_limb_t b, nmod_t mod)
     return nmod_mul(a, n_invmod(b, mod.n), mod);
 }
 
+int nmod_divides(mp_limb_t * a, mp_limb_t b, mp_limb_t c, nmod_t mod);
+
 NMOD_INLINE
 mp_limb_t nmod_pow_ui(mp_limb_t a, ulong exp, nmod_t mod)
 {
@@ -272,4 +274,3 @@ NMOD_INLINE mp_limb_t nmod_discrete_log_pohlig_hellman_primitive_root(
 #endif
 
 #endif
-

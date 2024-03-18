@@ -3,12 +3,13 @@
     Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2012 Lina Kulakova
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -23,14 +24,14 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_fmpz_binexp_preinv, state)
     int i, result;
 
     /* Aliasing of res and a */
-    for (i = 0; i < 2.5 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, res, t, f, finv;
         ulong exp;
         fmpz_t expz;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         exp = n_randint(state, 50);
         fmpz_init_set_ui(expz, exp);
@@ -41,9 +42,9 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_fmpz_binexp_preinv, state)
         TEMPLATE(T, poly_init) (res, ctx);
         TEMPLATE(T, poly_init) (t, ctx);
 
-        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 50), ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 20), ctx);
         TEMPLATE(T, poly_randtest_not_zero) (f, state,
-                                             n_randint(state, 50) + 1, ctx);
+                                             n_randint(state, 20) + 1, ctx);
 
         TEMPLATE(T, poly_reverse) (finv, f, f->length, ctx);
         TEMPLATE(T, poly_inv_series_newton) (finv, finv, f->length, ctx);
@@ -77,14 +78,14 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_fmpz_binexp_preinv, state)
     }
 
     /* Aliasing of res and f */
-    for (i = 0; i < 2.5 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, res, t, f, finv;
         ulong exp;
         fmpz_t expz;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         exp = n_randint(state, 50);
         fmpz_init_set_ui(expz, exp);
@@ -95,9 +96,9 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_fmpz_binexp_preinv, state)
         TEMPLATE(T, poly_init) (res, ctx);
         TEMPLATE(T, poly_init) (t, ctx);
 
-        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 50), ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 20), ctx);
         TEMPLATE(T, poly_randtest_not_zero) (f, state,
-                                             n_randint(state, 50) + 1, ctx);
+                                             n_randint(state, 20) + 1, ctx);
 
         TEMPLATE(T, poly_reverse) (finv, f, f->length, ctx);
         TEMPLATE(T, poly_inv_series_newton) (finv, finv, f->length, ctx);
@@ -130,15 +131,15 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_fmpz_binexp_preinv, state)
         TEMPLATE(T, ctx_clear) (ctx);
     }
 
-    /* No aliasing */
-    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    /* Compare with ui function */
+    for (i = 0; i < 30 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, res1, res2, t, f, finv;
         ulong exp;
         fmpz_t expz;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         exp = n_randint(state, 50);
 
@@ -149,9 +150,9 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_fmpz_binexp_preinv, state)
         TEMPLATE(T, poly_init) (res2, ctx);
         TEMPLATE(T, poly_init) (t, ctx);
 
-        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 50), ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 20), ctx);
         TEMPLATE(T, poly_randtest_not_zero) (f, state,
-                                             n_randint(state, 50) + 1, ctx);
+                                             n_randint(state, 20) + 1, ctx);
         fmpz_init_set_ui(expz, exp);
 
         TEMPLATE(T, poly_reverse) (finv, f, f->length, ctx);
@@ -189,20 +190,20 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_fmpz_binexp_preinv, state)
     }
 
     /* Check that a^(b+c) = a^b * a^c */
-    for (i = 0; i < 5 * flint_test_multiplier(); i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, poly_t) a, res1, res2, res3, res4, t, f, finv;
         fmpz_t exp1, exp2, exp3;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         fmpz_init(exp1);
         fmpz_init(exp2);
-        fmpz_randtest(exp1, state, 200);
+        fmpz_randtest(exp1, state, 100);
         if (fmpz_sgn(exp1) == -1)
             fmpz_neg(exp1, exp1);
-        fmpz_randtest(exp2, state, 200);
+        fmpz_randtest(exp2, state, 100);
         if (fmpz_sgn(exp2) == -1)
             fmpz_neg(exp2, exp2);
 
@@ -215,9 +216,9 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_powmod_fmpz_binexp_preinv, state)
         TEMPLATE(T, poly_init) (res4, ctx);
         TEMPLATE(T, poly_init) (t, ctx);
 
-        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 50), ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 20), ctx);
         TEMPLATE(T, poly_randtest_not_zero) (f, state,
-                                             n_randint(state, 50) + 1, ctx);
+                                             n_randint(state, 20) + 1, ctx);
 
         TEMPLATE(T, poly_reverse) (finv, f, f->length, ctx);
         TEMPLATE(T, poly_inv_series_newton) (finv, finv, f->length, ctx);

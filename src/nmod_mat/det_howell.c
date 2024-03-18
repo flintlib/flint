@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -25,7 +25,7 @@
    Find s, t such that g = s*a - t*b is the gcd of a and b mod n and where
    s is a unit mod n. Assumes a and b are reduced mod n and no aliasing.
 */
-static __inline__ mp_limb_t
+static inline mp_limb_t
 _nmod_xgcd_unit(mp_limb_t * s, mp_limb_t * t, mp_limb_t a, mp_limb_t b, nmod_t mod)
 {
    mp_limb_t g, ag, bg;
@@ -51,7 +51,7 @@ _nmod_xgcd_unit(mp_limb_t * s, mp_limb_t * t, mp_limb_t a, mp_limb_t b, nmod_t m
    return g;
 }
 
-static __inline__ int
+static inline int
 _nmod_mat_pivot(nmod_mat_t A, slong start_row, slong col)
 {
     slong j;
@@ -167,8 +167,7 @@ nmod_mat_det_howell(const nmod_mat_t A)
 
     if (dim != A->c)
     {
-        flint_printf("Exception (nmod_mat_det_howell). Non-square matrix.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (nmod_mat_det_howell). Non-square matrix.\n");
     }
 
     nmod_mat_init_set(tmp, A);

@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -26,14 +26,22 @@ TEST_TEMPLATE_FUNCTION_START(T, pth_root, state)
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) a, b;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+#if defined(FQ_NMOD_H) || defined(FQ_ZECH_H)
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 1);
+#else
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
+#endif
 
         TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, init)(b, ctx);
 
         TEMPLATE(T, randtest)(a, state, ctx);
         TEMPLATE(T, pth_root)(b, a, ctx);
+#if defined(FQ_NMOD_H) || defined(FQ_ZECH_H)
+        TEMPLATE(T, pow_ui)(b, b, TEMPLATE(T, ctx_prime)(ctx), ctx);
+#else
         TEMPLATE(T, pow)(b, b, TEMPLATE(T, ctx_prime)(ctx), ctx);
+#endif
 
         result = TEMPLATE(T, equal)(a, b, ctx);
         if (!result)

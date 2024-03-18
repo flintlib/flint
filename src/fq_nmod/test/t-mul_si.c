@@ -5,12 +5,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "test_helpers.h"
 #include "long_extras.h"
+#include "nmod.h"
 #include "nmod_poly.h"
 #include "fmpz.h"
 #include "fq_nmod.h"
@@ -22,12 +23,10 @@ TEST_FUNCTION_START(fq_nmod_mul_si, state)
     {
         fq_nmod_t rop;
         fq_nmod_ctx_t ctx;
-        fmpz_t p;
         fmpz_t f;
 
         fmpz_init(f);
-        fmpz_init_set_si(p, 23);
-        fq_nmod_ctx_init(ctx, p, 1, "x");
+        fq_nmod_ctx_init_ui(ctx, 23, 1, "x");
 
         fq_nmod_init(rop, ctx);
 
@@ -48,7 +47,6 @@ TEST_FUNCTION_START(fq_nmod_mul_si, state)
         fq_nmod_clear(rop, ctx);
 
         fq_nmod_ctx_clear(ctx);
-        fmpz_clear(p);
         fmpz_clear(f);
     }
 
@@ -59,7 +57,7 @@ TEST_FUNCTION_START(fq_nmod_mul_si, state)
         slong x;
         fq_nmod_t a, b;
 
-        fq_nmod_ctx_randtest(ctx, state);
+        fq_nmod_ctx_init_randtest(ctx, state, 0);
 
         fq_nmod_init(a, ctx);
         fq_nmod_init(b, ctx);
@@ -94,7 +92,7 @@ TEST_FUNCTION_START(fq_nmod_mul_si, state)
         fq_nmod_t a, c;
 	    nmod_poly_t b;
 
-        fq_nmod_ctx_randtest(ctx, state);
+        fq_nmod_ctx_init_randtest(ctx, state, 0);
 
         fq_nmod_init(a, ctx);
         fq_nmod_init(c, ctx);

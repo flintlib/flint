@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2014 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "double_extras.h"
@@ -64,7 +64,7 @@ _mag_exp_d(mag_t res, double x, int roundup)
     if (u >= -0.375 && u <= 0.375)
         u = d_polyval(inverse_factorials, 11, u) + eps2;
     else
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     if (roundup)
         mag_set_d(res, u);
@@ -202,5 +202,3 @@ mag_exp_lower(mag_t y, const mag_t x)
         }
     }
 }
-
-

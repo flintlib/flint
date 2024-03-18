@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -25,8 +25,7 @@ fmpz_mat_randdet(fmpz_mat_t mat, flint_rand_t state, const fmpz_t det)
     n = mat->r;
     if (n != mat->c)
     {
-        flint_printf("Exception (fmpz_mat_randdet). Non-square matrix.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mat_randdet). Non-square matrix.\n");
     }
 
     if (n < 1)

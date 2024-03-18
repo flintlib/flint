@@ -5,13 +5,15 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
 #include "fmpq.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
+#include "gr_generic.h"
 
 #ifdef __GNUC__
 # define strcmp __builtin_strcmp
@@ -133,20 +135,24 @@ gr_series_randtest(gr_series_t res, flint_rand_t state, slong len, gr_series_ctx
 }
 
 int
-gr_series_write(gr_stream_t out, const gr_series_t x, gr_series_ctx_t sctx, gr_ctx_t cctx)
+gr_series_write(gr_stream_t out, const gr_series_t x, const char * var, gr_series_ctx_t sctx, gr_ctx_t cctx)
 {
-    gr_poly_write(out, &x->poly, "x", cctx);
+    gr_poly_write(out, &x->poly, var, cctx);
 
     if (x->error != SERIES_ERR_EXACT)
     {
-        gr_stream_write(out, " + O(x^");
+        gr_stream_write(out, " + O(");
+        gr_stream_write(out, var);
+        gr_stream_write(out, "^");
         gr_stream_write_si(out, x->error);
         gr_stream_write(out, ")");
     }
 
     if (sctx->mod != SERIES_ERR_EXACT)
     {
-        gr_stream_write(out, " (mod x^");
+        gr_stream_write(out, " (mod ");
+        gr_stream_write(out, var);
+        gr_stream_write(out, "^");
         gr_stream_write_si(out, sctx->mod);
         gr_stream_write(out, ")");
     }
@@ -587,8 +593,20 @@ gr_series_inv(gr_series_t res, const gr_series_t x, gr_series_ctx_t sctx, gr_ctx
     xerr = x->error;
     err = xerr;
 
+    if (xlen == 0 && sctx->mod == 0)
+        return gr_series_zero(res, sctx, cctx);
+
     if (xlen == 0 && xerr == SERIES_ERR_EXACT)
+    {
+        truth_t zero = gr_ctx_is_zero_ring(cctx);
+
+        if (zero == T_TRUE)
+            return gr_series_zero(res, sctx, cctx);
+        if (zero == T_UNKNOWN)
+            return GR_UNABLE;
+
         return GR_DOMAIN;
+    }
 
     if (xlen == 0 || xerr == 0)
         return GR_UNABLE;
@@ -1716,6 +1734,14 @@ series_ctx_t;
 #define SERIES_SCTX(ring_ctx) (&(((series_ctx_t *)((ring_ctx)))->sctx))
 
 
+static void _gr_gr_series_ctx_clear(gr_ctx_t ctx)
+{
+    if (SERIES_CTX(ctx)->var != default_var)
+    {
+        flint_free(SERIES_CTX(ctx)->var);
+    }
+
+}
 
 static int _gr_gr_series_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
@@ -1723,26 +1749,90 @@ static int _gr_gr_series_ctx_write(gr_stream_t out, gr_ctx_t ctx)
     gr_ctx_write(out, SERIES_ELEM_CTX(ctx));
     if (ctx->which_ring == GR_CTX_GR_SERIES_MOD)
     {
-        gr_stream_write(out, " mod x^");
+        gr_stream_write(out, " mod ");
+        gr_stream_write(out, SERIES_CTX(ctx)->var);
+        gr_stream_write(out, "^");
         gr_stream_write_si(out, SERIES_SCTX(ctx)->mod);
     }
 
     gr_stream_write(out, " with precision ");
-    gr_stream_write(out, "O(x^");
+    gr_stream_write(out, "O(");
+    gr_stream_write(out, SERIES_CTX(ctx)->var);
+    gr_stream_write(out, "^");
     gr_stream_write_si(out, SERIES_SCTX(ctx)->prec);
     gr_stream_write(out, ")");
 
     return GR_SUCCESS;
 }
 
+truth_t
+_gr_gr_series_ctx_is_ring(gr_ctx_t ctx)
+{
+    if (ctx->which_ring == GR_CTX_GR_SERIES_MOD && SERIES_SCTX(ctx)->mod == 0)
+        return T_TRUE;
+
+    return gr_ctx_is_ring(SERIES_ELEM_CTX(ctx));
+}
+
+truth_t
+_gr_gr_series_ctx_is_commutative_ring(gr_ctx_t ctx)
+{
+    if (ctx->which_ring == GR_CTX_GR_SERIES_MOD && SERIES_SCTX(ctx)->mod == 0)
+        return T_TRUE;
+
+    return gr_ctx_is_commutative_ring(SERIES_ELEM_CTX(ctx));
+}
+
+
 static void _gr_gr_series_init(gr_series_t res, gr_ctx_t ctx) { gr_series_init(res, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static void _gr_gr_series_clear(gr_series_t res, gr_ctx_t ctx) { gr_series_clear(res, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static void _gr_gr_series_swap(gr_series_t x, gr_series_t y, gr_ctx_t ctx) { gr_series_swap(x, y, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static int _gr_gr_series_zero(gr_series_t res, gr_ctx_t ctx) { return gr_series_zero(res, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static int _gr_gr_series_randtest(gr_series_t res, flint_rand_t state, gr_ctx_t ctx) { return gr_series_randtest(res, state, 6, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
-static int _gr_gr_series_write(gr_stream_t out, const gr_series_t x, gr_ctx_t ctx) { return gr_series_write(out, x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+static int _gr_gr_series_write(gr_stream_t out, const gr_series_t x, gr_ctx_t ctx) { return gr_series_write(out, x, SERIES_CTX(ctx)->var, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static int _gr_gr_series_one(gr_series_t res, gr_ctx_t ctx) { return gr_series_one(res, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static int _gr_gr_series_gen(gr_series_t res, gr_ctx_t ctx) { return gr_series_gen(res, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
+
+int _gr_gr_series_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
+{
+    slong len;
+    len = strlen(s);
+
+    if (SERIES_CTX(ctx)->var == default_var)
+        SERIES_CTX(ctx)->var = NULL;
+
+    SERIES_CTX(ctx)->var = flint_realloc(SERIES_CTX(ctx)->var, len + 1);
+    memcpy(SERIES_CTX(ctx)->var, s, len + 1);
+    return GR_SUCCESS;
+}
+
+static int
+_gr_gr_series_gens_recursive(gr_vec_t vec, gr_ctx_t ctx)
+{
+    int status;
+    gr_vec_t vec1;
+    slong i, n;
+
+    /* Get generators of the element ring */
+    gr_vec_init(vec1, 0, SERIES_ELEM_CTX(ctx));
+    status = gr_gens_recursive(vec1, SERIES_ELEM_CTX(ctx));
+    n = vec1->length;
+
+    gr_vec_set_length(vec, n + 1, ctx);
+
+    /* Promote to series */
+    for (i = 0; i < n; i++)
+        status |= gr_poly_set_scalar(gr_vec_entry_ptr(vec, i, ctx),
+                gr_vec_entry_srcptr(vec1, i, SERIES_ELEM_CTX(ctx)),
+                SERIES_ELEM_CTX(ctx));
+
+    status |= gr_poly_gen(gr_vec_entry_ptr(vec, n, ctx), SERIES_ELEM_CTX(ctx));
+
+    gr_vec_clear(vec1, SERIES_ELEM_CTX(ctx));
+
+    return status;
+}
+
 static int _gr_gr_series_set(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { return gr_series_set(res, x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
 static void _gr_gr_series_set_shallow(gr_series_t res, const gr_series_t x, gr_ctx_t ctx) { *res = *x; }
 static int _gr_gr_series_set_si(gr_series_t res, slong c, gr_ctx_t ctx) { return gr_series_set_si(res, c, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx)); }
@@ -1886,7 +1976,12 @@ gr_static_method_table _gr_series_methods;
 
 gr_method_tab_input _gr_series_methods_input[] =
 {
+    {GR_METHOD_CTX_CLEAR,   (gr_funcptr) _gr_gr_series_ctx_clear},
     {GR_METHOD_CTX_WRITE,   (gr_funcptr) _gr_gr_series_ctx_write},
+    {GR_METHOD_CTX_SET_GEN_NAME, (gr_funcptr) _gr_gr_series_ctx_set_gen_name},
+    {GR_METHOD_CTX_IS_RING, (gr_funcptr) _gr_gr_series_ctx_is_ring},
+    {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) _gr_gr_series_ctx_is_commutative_ring},
+
     {GR_METHOD_INIT,        (gr_funcptr) _gr_gr_series_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) _gr_gr_series_clear},
     {GR_METHOD_SWAP,        (gr_funcptr) _gr_gr_series_swap},
@@ -1899,12 +1994,15 @@ gr_method_tab_input _gr_series_methods_input[] =
     {GR_METHOD_IS_ONE,      (gr_funcptr) _gr_gr_series_is_one},
     {GR_METHOD_EQUAL,       (gr_funcptr) _gr_gr_series_equal},
     {GR_METHOD_GEN,         (gr_funcptr) _gr_gr_series_gen},
+    {GR_METHOD_GENS,        (gr_funcptr) gr_generic_gens_single},
+    {GR_METHOD_GENS_RECURSIVE,  (gr_funcptr) _gr_gr_series_gens_recursive},
     {GR_METHOD_SET,         (gr_funcptr) _gr_gr_series_set},
     {GR_METHOD_SET_UI,      (gr_funcptr) _gr_gr_series_set_ui},
     {GR_METHOD_SET_SI,      (gr_funcptr) _gr_gr_series_set_si},
     {GR_METHOD_SET_FMPZ,    (gr_funcptr) _gr_gr_series_set_fmpz},
     {GR_METHOD_SET_FMPQ,    (gr_funcptr) _gr_gr_series_set_fmpq},
     {GR_METHOD_SET_OTHER,   (gr_funcptr) _gr_gr_series_set_other},
+    {GR_METHOD_SET_STR,     (gr_funcptr) gr_generic_set_str_balance_additions},
     {GR_METHOD_NEG,         (gr_funcptr) _gr_gr_series_neg},
     {GR_METHOD_ADD,         (gr_funcptr) _gr_gr_series_add},
     {GR_METHOD_SUB,         (gr_funcptr) _gr_gr_series_sub},
@@ -1965,17 +2063,17 @@ gr_method_tab_input _gr_series_methods_input[] =
     {0,                     (gr_funcptr) NULL},
 };
 
-void
-gr_ctx_init_gr_series(gr_ctx_t ctx, gr_ctx_t base_ring, slong prec)
+static inline void
+_gr_ctx_init_gr_series(gr_ctx_t ctx, gr_ctx_t base_ring, int kind, slong mod, slong prec)
 {
-    ctx->which_ring = GR_CTX_GR_SERIES;
+    ctx->which_ring = kind;
     ctx->sizeof_elem = sizeof(gr_series_struct);
     ctx->size_limit = WORD_MAX;
 
     SERIES_CTX(ctx)->base_ring = (gr_ctx_struct *) base_ring;
     SERIES_CTX(ctx)->var = (char *) default_var;
-    SERIES_CTX(ctx)->sctx.mod = SERIES_ERR_EXACT;
-    SERIES_CTX(ctx)->sctx.prec = FLINT_MIN(FLINT_MAX(0, prec), SERIES_ERR_MAX);
+    SERIES_CTX(ctx)->sctx.mod = mod;
+    SERIES_CTX(ctx)->sctx.prec = prec;
 
     ctx->methods = _gr_series_methods;
 
@@ -1987,25 +2085,16 @@ gr_ctx_init_gr_series(gr_ctx_t ctx, gr_ctx_t base_ring, slong prec)
 }
 
 void
+gr_ctx_init_gr_series(gr_ctx_t ctx, gr_ctx_t base_ring, slong prec)
+{
+    _gr_ctx_init_gr_series(ctx, base_ring, GR_CTX_GR_SERIES, SERIES_ERR_EXACT, FLINT_MIN(FLINT_MAX(0, prec), SERIES_ERR_MAX));
+}
+
+void
 gr_ctx_init_gr_series_mod(gr_ctx_t ctx, gr_ctx_t base_ring, slong mod)
 {
-    ctx->which_ring = GR_CTX_GR_SERIES_MOD;
-    ctx->sizeof_elem = sizeof(gr_series_struct);
-    ctx->size_limit = WORD_MAX;
-
     if (mod >= SERIES_ERR_EXACT)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
-    SERIES_CTX(ctx)->base_ring = (gr_ctx_struct *) base_ring;
-    SERIES_CTX(ctx)->var = (char *) default_var;
-    SERIES_CTX(ctx)->sctx.mod = FLINT_MAX(0, mod);
-    SERIES_CTX(ctx)->sctx.prec = mod;
-
-    ctx->methods = _gr_series_methods;
-
-    if (!_gr_series_methods_initialized)
-    {
-        gr_method_tab_init(_gr_series_methods, _gr_series_methods_input);
-        _gr_series_methods_initialized = 1;
-    }
+    _gr_ctx_init_gr_series(ctx, base_ring, GR_CTX_GR_SERIES_MOD, FLINT_MAX(0, mod), mod);
 }

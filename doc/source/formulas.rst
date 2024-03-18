@@ -18,13 +18,13 @@ fixed), so for brevity we simply express the bounds in terms of `|a|`.
 
 **Theorem (generic first-order bound)**:
 
-.. math ::
+.. math::
 
     |f(x+a) - f(x)| \le \min(2 C_0, C_1 |a|)
 
 where
 
-.. math ::
+.. math::
 
     C_0 = \sup_{|t| \le |a|} |f(x+t)|, \quad C_1 = \sup_{|t| \le |a|} |f'(x+t)|.
 
@@ -32,21 +32,21 @@ The statement is valid with either `a, t \in \mathbb{R}` or `a, t \in \mathbb{C}
 
 **Theorem (product)**: For `x, y \in \mathbb{C}` and `a, b \in \mathbb{C}`,
 
-.. math ::
+.. math::
 
     \left| (x+a)(y+b) - x y \right| \le |xb| + |ya| + |ab|.
 
 **Theorem (quotient)**: For `x, y \in \mathbb{C}` and `a, b \in \mathbb{C}`
 with `|b| < |y|`,
 
-.. math ::
+.. math::
 
         \left| \frac{x}{y} - \frac{x+a}{y+b} \right|
         \le \frac{|xb|+|ya|}{|y| (|y|-|b|)}.
 
 **Theorem (square root)**: For `x, a \in \mathbb{R}` with `0 \le |a| \le x`,
 
-.. math ::
+.. math::
 
     \left| \sqrt{x+a} - \sqrt{x} \right|
         \le \sqrt{x} \left(1 - \sqrt{1-\frac{|a|}{x}}\right)
@@ -57,21 +57,21 @@ where the first inequality is an equality if `a \le 0`.
 
 **Theorem (reciprocal square root)**: For `x, a \in \mathbb{R}` with `0 \le |a| < x`,
 
-.. math ::
+.. math::
 
     \left| \frac{1}{\sqrt{x+a}} - \frac{1}{\sqrt{x}} \right|
         \le \frac{|a|}{2 (x-|a|)^{3/2}}.
 
 **Theorem (k-th root)**: For `k > 1` and `x, a \in \mathbb{R}` with `0 \le |a| \le x`,
 
-.. math ::
+.. math::
 
     \left| (x+a)^{1/k} - x^{1/k} \right|
         \le x^{1/k} \min\left(1, \frac{1}{k} \, \log\left(1+\frac{|a|}{x-|a|}\right)\right).
 
 *Proof*: The error is largest when `a = -r` is negative, and
 
-.. math ::
+.. math::
 
     x^{1/k} - (x-r)^{1/k} &= x^{1/k} [1 - (1-r/x)^{1/k}]
 
@@ -83,7 +83,7 @@ where the first inequality is an equality if `a \le 0`.
 
 **Theorem (logarithm)**: For `x, a \in \mathbb{R}` with `0 \le |a| < x`,
 
-.. math ::
+.. math::
 
     |\log(x+a) - \log(x)| \le \log\left(1 + \frac{|a|}{x-|a|}\right),
 
@@ -94,13 +94,13 @@ with equality if `a \le 0`.
 
 **Theorem (inverse tangent)**: For `x, a \in \mathbb{R}`,
 
-.. math ::
+.. math::
 
     |\operatorname{atan}(x+a) - \operatorname{atan}(x)| \le \min(\pi, C_1 |a|).
 
 where
 
-.. math ::
+.. math::
 
     C_1 = \sup_{|t| \le |a|} \frac{1}{1 + (x+t)^2}.
 
@@ -108,7 +108,7 @@ If `|a| < |x|`, then `C_1 = (1 + (|x| - |a|)^2)^{-1}` gives a monotone bound.
 
 An exact bound: if `|a| < |x|` or `|x(x+a)| < 1`, then
 
-.. math ::
+.. math::
 
     |\operatorname{atan}(x+a) - \operatorname{atan}(x)| =
         \operatorname{atan}\left(\frac{|a|}{1 + x(x+a)}\right).
@@ -121,14 +121,14 @@ Sums and series
 
 **Theorem (geometric bound)**: If `|c_k| \le C` and `|z| \le D < 1`, then
 
-.. math ::
+.. math::
 
     \left| \sum_{k=N}^{\infty} c_k z^k \right| \le \frac{C D^N}{1 - D}.
 
 **Theorem (integral bound)**: If `f(x)` is nonnegative and
 monotone decreasing, then
 
-.. math ::
+.. math::
 
     \int_N^{\infty} f(x) \le \sum_{k=N}^{\infty} f(k) \le f(N) + \int_N^{\infty} f(x) dx.
 
@@ -140,20 +140,20 @@ If `f(z) = \sum_{k=0}^{\infty} c_k z^k` is analytic (on an open
 subset of `\mathbb{C}` containing the disk `D = \{ z : |z| \le R \}`
 in its interior, where `R > 0`), then
 
-.. math ::
+.. math::
 
     c_k = \frac{1}{2\pi i} \int_{|z|=R} \frac{f(z)}{z^{k+1}}\, dz.
 
 **Corollary (derivative bound)**:
 
-.. math ::
+.. math::
 
     |c_k| \le \frac{C}{R^k}, \quad C = \max_{|z|=R} |f(z)|.
 
 **Corollary (Taylor series tail)**:
 If `0 \le r < R` and `|z| \le r`, then
 
-.. math ::
+.. math::
 
     \left|\sum_{k=N}^{\infty} c_k z^k\right| \le
         \frac{C D^N}{1-D}, \quad D = \left|\frac{r}{R}\right|.
@@ -164,21 +164,21 @@ Euler-Maclaurin formula
 **Theorem (Euler-Maclaurin)**:
 If `f(t)` is `2M`-times differentiable, then
 
-.. math ::
+.. math::
 
     \sum_{k=L}^U f(k) = S + I + T + R
 
-.. math ::
+.. math::
 
     S = \sum_{k=L}^{N-1} f(k), \quad I = \int_N^U f(t) dt,
 
-.. math ::
+.. math::
 
     T = \frac{1}{2} \left( f(N) + f(U) \right) + 
         \sum_{k=1}^M \frac{B_{2k}}{(2k)!}
         \left(f^{(2k-1)}(U) - f^{(2k-1)}(N)\right),
 
-.. math ::
+.. math::
 
     R = -\int_N^U \frac{B_{2M}(t - \lfloor t \rfloor)}{(2M)!} f^{(2M)}(t) dt.
 
@@ -186,7 +186,7 @@ If `f(t)` is `2M`-times differentiable, then
 
 **Theorem (remainder bound)**:
 
-.. math ::
+.. math::
 
     |R| \le \frac{4}{(2\pi)^{2M}} \int_N^U \left| f^{(2M)}(t) \right| dt.
 
@@ -195,7 +195,7 @@ If `f(t) = f(t,x) = \sum_{k=0}^{\infty} a_k(t) x^k` and
 `R = R(x) = \sum_{k=0}^{\infty} c_k x^k`
 are analytic functions of `x`, then
 
-.. math ::
+.. math::
 
     |c_k| \le \frac{4}{(2\pi)^{2M}} \int_N^U |a_k^{(2M)}(t)| dt.
 

@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -31,14 +31,14 @@ n_factorial_mod2_foolproof(ulong n, mp_limb_t p, mp_limb_t pinv)
 
 TEST_FUNCTION_START(n_factorial_fast_mod2_preinv, state)
 {
-    mp_limb_t n;
+    ulong n;
     int j;
 
-    for (n = 0; n < 100 * flint_test_multiplier(); n++)
+    for (n = 0; n < 500 * flint_test_multiplier(); n++)
     {
-        mp_limb_t p, pinv, x, y;
+        ulong p, pinv, x, y;
 
-        for (j = 0; j < 10; j++)
+        for (j = 0; j < 5; j++)
         {
             p = n_randtest_not_zero(state);
             pinv = n_preinvert_limb(p);
@@ -46,12 +46,12 @@ TEST_FUNCTION_START(n_factorial_fast_mod2_preinv, state)
             y = n_factorial_mod2_foolproof(n, p, pinv);
 
             if (x != y)
-            {
-                flint_printf("FAIL:\n");
-                flint_printf("n = %wu\np = %wu\nx = %wu\ny = %wu\n", n, p, x, y);
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL(
+                        "n = %wu\n"
+                        "p = %wu\n"
+                        "x = %wu\n"
+                        "y = %wu\n",
+                        n, p, x, y);
         }
     }
 

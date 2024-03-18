@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2012-2015 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "arb.h"
@@ -81,4 +81,3 @@ arb_add_error(arb_t x, const arb_t err)
     mag_add(arb_radref(x), arb_radref(x), u);
     mag_clear(u);
 }
-

@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2014 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "acb.h"
@@ -240,8 +240,7 @@ acb_modular_theta_sum(acb_ptr theta1,
             }
             else
             {
-                flint_printf("exponent not in addition sequence!\n");
-                flint_abort();
+                flint_throw(FLINT_ERROR, "exponent not in addition sequence!\n");
             }
         }
 
@@ -496,4 +495,3 @@ acb_modular_theta_sum(acb_ptr theta1,
     mag_clear(vmag);
     _mag_vec_clear(err, len);
 }
-

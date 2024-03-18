@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -44,9 +44,8 @@ mp_limb_t n_primitive_root_prime_prefactor(mp_limb_t p, n_factor_t * factors)
             return a;
         }
     }
-    flint_printf("Exception (n_primitive_root_prime_prefactor).  root not found.\n");
-    flint_abort();
-    return 0; /* cannot happen, but silence the compiler */
+
+    flint_throw(FLINT_ERROR, "Exception (n_primitive_root_prime_prefactor).  root not found.\n");
 }
 
 mp_limb_t n_primitive_root_prime(mp_limb_t p)

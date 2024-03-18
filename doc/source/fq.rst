@@ -9,12 +9,11 @@ irreducible polynomial of degree `n`, as a polynomial in
 `\mathbf{F}_p[X]` of degree less than `n`. The underlying data
 structure is an :type:`fmpz_poly_t`.
 
-The default choice for `f(X)` is the Conway polynomial for the pair
-`(p,n)`. Frank Luebeck's data base of Conway polynomials is made
-available in the file ``src/qadic/CPimport.txt``. If a Conway
-polynomial is not available, then a random irreducible polynomial will
-be chosen for `f(X)`. Additionally, the user is able to supply their
-own `f(X)`.
+The default choice for `f(X)` is the Conway polynomial for the pair `(p,n)`,
+enabled by Frank Lübeck's data base of Conway polynomials using the
+:func:`_nmod_poly_conway` function. If a Conway polynomial is not available,
+then a random irreducible polynomial will be chosen for `f(X)`. Additionally,
+the user is able to supply their own `f(X)`.
 
 Types, macros and constants
 -------------------------------------------------------------------------------
@@ -31,7 +30,7 @@ Context Management
 --------------------------------------------------------------------------------
 
 
-.. function:: void fq_ctx_init(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var)
+.. function:: void fq_ctx_init(fq_ctx_t ctx, const fmpz_t p, slong d, const char * var)
 
     Initialises the context for prime `p` and extension degree `d`,
     with name ``var`` for the generator.  By default, it will try
@@ -43,7 +42,7 @@ Context Management
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
 
-.. function:: int _fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var)
+.. function:: int _fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char * var)
 
     Attempts to initialise the context for prime `p` and extension
     degree `d`, with name ``var`` for the generator using a Conway
@@ -58,7 +57,7 @@ Context Management
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
 
-.. function:: void fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char *var)
+.. function:: void fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, slong d, const char * var)
 
     Initialises the context for prime `p` and extension degree `d`,
     with name ``var`` for the generator using a Conway polynomial
@@ -69,7 +68,7 @@ Context Management
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
 
-.. function:: void fq_ctx_init_modulus(fq_ctx_t ctx, const fmpz_mod_poly_t modulus, const fmpz_mod_ctx_t ctxp, const char *var)
+.. function:: void fq_ctx_init_modulus(fq_ctx_t ctx, const fmpz_mod_poly_t modulus, const fmpz_mod_ctx_t ctxp, const char * var)
 
     Initialises the context for given ``modulus`` with name
     ``var`` for the generator.
@@ -78,6 +77,23 @@ Context Management
 
     Assumes that the string ``var`` is a null-terminated string
     of length at least one.
+
+.. function:: void fq_ctx_init_randtest(fq_ctx_t ctx, flint_rand_t state, int type)
+
+    Initialises ``ctx`` to a random finite field, where the prime and degree is
+    set according to ``type``. To see what prime and degrees may be output, see
+    ``type`` in :func:`_nmod_poly_conway_rand`.
+
+.. function:: void fq_ctx_init_randtest_reducible(fq_ctx_t ctx, flint_rand_t state, int type)
+
+    Initializes ``ctx`` to a random extension of a prime field, where
+    the prime and degree is set according to ``type``. If ``type`` is `0` the
+    prime and degree may be large, else if ``type`` is `1` the degree is small
+    but the prime may be large, else if ``type`` is `2` the prime is small but
+    the degree may be large, else if ``type`` is `3` both prime and degree are
+    small.
+
+    The modulus may or may not be irreducible.
 
 .. function:: void fq_ctx_clear(fq_ctx_t ctx)
 
@@ -110,17 +126,6 @@ Context Management
 
     Prints the context information to ``stdout``.
 
-.. function:: void fq_ctx_randtest(fq_ctx_t ctx, flint_rand_t state)
-
-    Initializes ``ctx`` to a random finite field.  Assumes that
-    ``fq_ctx_init`` has not been called on ``ctx`` already.
-
-.. function:: void fq_ctx_randtest_reducible(fq_ctx_t ctx, flint_rand_t state)
-
-    Initializes ``ctx`` to a random extension of a prime field.
-    The modulus may or may not be irreducible.  Assumes that
-    ``fq_ctx_init`` has not been called on ``ctx`` already.
-
 
 Memory management
 --------------------------------------------------------------------------------
@@ -139,17 +144,17 @@ Memory management
 
     Clears the element ``rop``.
 
-.. function:: void _fq_sparse_reduce(fmpz *R, slong lenR, const fq_ctx_t ctx)
+.. function:: void _fq_sparse_reduce(fmpz * R, slong lenR, const fq_ctx_t ctx)
 
     Reduces ``(R, lenR)`` modulo the polynomial `f` given by the
     modulus of ``ctx``.
 
-.. function:: void _fq_dense_reduce(fmpz *R, slong lenR, const fq_ctx_t ctx)
+.. function:: void _fq_dense_reduce(fmpz * R, slong lenR, const fq_ctx_t ctx)
 
     Reduces ``(R, lenR)`` modulo the polynomial `f` given by the
     modulus of ``ctx`` using Newton division.
 
-.. function:: void _fq_reduce(fmpz *r, slong lenR, const fq_ctx_t ctx)
+.. function:: void _fq_reduce(fmpz * r, slong lenR, const fq_ctx_t ctx)
 
     Reduces ``(R, lenR)`` modulo the polynomial `f` given by the
     modulus of ``ctx``.  Does either sparse or dense reduction
@@ -211,7 +216,7 @@ Basic arithmetic
     Sets ``rop`` to the quotient of ``op1`` and ``op2``,
     reducing the output in the given context.
 
-.. function:: void _fq_inv(fmpz *rop, const fmpz *op, slong len, const fq_ctx_t ctx)
+.. function:: void _fq_inv(fmpz * rop, const fmpz * op, slong len, const fq_ctx_t ctx)
 
     Sets ``(rop, d)`` to the inverse of the non-zero element
     ``(op, len)``.
@@ -226,7 +231,7 @@ Basic arithmetic
      of ``ctx``.  If ``op`` is not invertible, then ``f`` is
      set to a factor of the modulus; otherwise, it is set to one.
 
-.. function:: void _fq_pow(fmpz *rop, const fmpz *op, slong len, const fmpz_t e, const fq_ctx_t ctx)
+.. function:: void _fq_pow(fmpz * rop, const fmpz * op, slong len, const fmpz_t e, const fq_ctx_t ctx)
 
     Sets ``(rop, 2*d-1)`` to ``(op,len)`` raised to the power `e`,
     reduced modulo `f(X)`, the modulus of ``ctx``.
@@ -282,7 +287,7 @@ Output
 --------------------------------------------------------------------------------
 
 
-.. function:: int fq_fprint_pretty(FILE *file, const fq_t op, const fq_ctx_t ctx)
+.. function:: int fq_fprint_pretty(FILE * file, const fq_t op, const fq_ctx_t ctx)
 
     Prints a pretty representation of ``op`` to ``file``.
 
@@ -448,7 +453,7 @@ Special functions
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fq_trace(fmpz_t rop, const fmpz *op, slong len, const fq_ctx_t ctx)
+.. function:: void _fq_trace(fmpz_t rop, const fmpz * op, slong len, const fq_ctx_t ctx)
 
     Sets ``rop`` to the trace of the non-zero element ``(op, len)``
     in `\mathbf{F}_{q}`.
@@ -464,7 +469,7 @@ Special functions
     `a` is equal to `\sum_{i=0}^{d-1} \Sigma^i (a)`, where `d =
     \log_{p} q`.
 
-.. function:: void _fq_norm(fmpz_t rop, const fmpz *op, slong len, const fq_ctx_t ctx)
+.. function:: void _fq_norm(fmpz_t rop, const fmpz * op, slong len, const fq_ctx_t ctx)
 
     Sets ``rop`` to the norm of the non-zero element ``(op, len)``
     in `\mathbf{F}_{q}`.
@@ -482,7 +487,7 @@ Special functions
 
     Algorithm selection is automatic depending on the input.
 
-.. function:: void _fq_frobenius(fmpz *rop, const fmpz *op, slong len, slong e, const fq_ctx_t ctx)
+.. function:: void _fq_frobenius(fmpz * rop, const fmpz * op, slong len, slong e, const fq_ctx_t ctx)
 
     Sets ``(rop, 2d-1)`` to the image of ``(op, len)`` under the
     Frobenius operator raised to the e-th power, assuming that neither

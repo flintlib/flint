@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -16,7 +16,7 @@ TEST_FUNCTION_START(sub_ddmmss, state)
 {
    int i, result;
 
-   for (i = 0; i < 1000000; i++)
+   for (i = 0; i < 100000 * flint_test_multiplier(); i++)
    {
       mp_limb_t dh1, dl1, dh2, dl2, mh, ml, sh, sl;
 
@@ -38,13 +38,10 @@ TEST_FUNCTION_START(sub_ddmmss, state)
       result = ((dh2 == dh1) && (dl2 == dl1));
 
       if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("mh = %wu, ml = %wu, sh = %wu, sl = %wu\n", mh, ml, sh, sl);
-         flint_printf("dh2 = %wu, dh1 = %wu, dl2 = %wu, dl1 = %wu\n", dh2, dh1, dl2, dl1);
-         fflush(stdout);
-         flint_abort();
-      }
+          TEST_FUNCTION_FAIL(
+                  "mh = %wu, ml = %wu, sh = %wu, sl = %wu\n"
+                  "dh2 = %wu, dh1 = %wu, dl2 = %wu, dl1 = %wu\n",
+                  mh, ml, sh, sl, dh2, dh1, dl2, dl1);
    }
 
    TEST_FUNCTION_END(state);

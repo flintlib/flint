@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -15,34 +15,31 @@
 
 TEST_FUNCTION_START(n_mulmod_shoup, state)
 {
-   int i, result;
+    int i, result;
 
-   for (i = 0; i < 10000 * flint_test_multiplier(); i++)
-   {
-      mp_limb_t a, b, d, r1, r2, q, p1, p2, w_pr;
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
+    {
+        mp_limb_t a, b, d, r1, r2, q, p1, p2, w_pr;
 
-      d = n_randtest_not_zero(state) / 2 + 1;
-      a = n_randtest(state) % d;
-      b = n_randtest(state) % d;
+        d = n_randtest_not_zero(state) / 2 + 1;
+        a = n_randtest(state) % d;
+        b = n_randtest(state) % d;
 
-      w_pr = n_mulmod_precomp_shoup(a, d);
+        w_pr = n_mulmod_precomp_shoup(a, d);
 
-      r1 = n_mulmod_shoup(a, b, w_pr, d);
+        r1 = n_mulmod_shoup(a, b, w_pr, d);
 
-      umul_ppmm(p1, p2, a, b);
-      p1 %= d;
-      udiv_qrnnd(q, r2, p1, p2, d);
+        umul_ppmm(p1, p2, a, b);
+        p1 %= d;
+        udiv_qrnnd(q, r2, p1, p2, d);
 
-      result = (r1 == r2);
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("a = %wu, b = %wu, d = %wu, w_pr = %wu\n", a, b, d, w_pr);
-         flint_printf("q = %wu, r1 = %wu, r2 = %wu\n", q, r1, r2);
-         fflush(stdout);
-         flint_abort();
-      }
-   }
+        result = (r1 == r2);
+        if (!result)
+            TEST_FUNCTION_FAIL(
+                    "a = %wu, b = %wu, d = %wu, w_pr = %wu\n"
+                    "q = %wu, r1 = %wu, r2 = %wu\n",
+                    a, b, d, w_pr, q, r1, r2);
+    }
 
-   TEST_FUNCTION_END(state);
+    TEST_FUNCTION_END(state);
 }

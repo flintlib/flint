@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -14,13 +14,10 @@
 #include "fmpz_mod.h"
 #include "fmpz_mod_mat.h"
 
-void fmpz_mod_mat_similarity(fmpz_mod_mat_t A, slong r, fmpz_t d)
+void fmpz_mod_mat_similarity(fmpz_mod_mat_t A, slong r, fmpz_t d, const fmpz_mod_ctx_t ctx)
 {
-    slong n = A->mat->r, i, j;
+    slong n = A->r, i, j;
     fmpz_t t;
-    fmpz_mod_ctx_t ctx;
-
-    fmpz_mod_ctx_init(ctx, A->mod);
 
     fmpz_init(t);
 
@@ -55,7 +52,4 @@ void fmpz_mod_mat_similarity(fmpz_mod_mat_t A, slong r, fmpz_t d)
     }
 
     fmpz_clear(t);
-
-    fmpz_mod_ctx_clear(ctx);
 }
-

@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -17,8 +17,7 @@ void fmpz_sqrt(fmpz_t f, const fmpz_t g)
 {
     if (fmpz_sgn(g) < 0)
     {
-        flint_printf("Exception (fmpz_sqrt). g is negative.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_sqrt). g is negative.\n");
     }
 
     if (!COEFF_IS_MPZ(*g))

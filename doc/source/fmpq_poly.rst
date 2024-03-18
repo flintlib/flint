@@ -586,11 +586,9 @@ Scalar multiplication and division
     Supports aliasing of ``(rpoly, den)`` and ``(poly, den)``.
     The ``fmpz_t``'s `r` and `s` may not be part of ``(rpoly, rden)``.
 
-.. function:: void fmpq_poly_scalar_mul_si(fmpq_poly_t rop, const fmpq_poly_t op, slong c)
-
-    Sets ``rop`` to `c` times ``op``.
-
-.. function:: void fmpq_poly_scalar_mul_ui(fmpq_poly_t rop, const fmpq_poly_t op, ulong c)
+.. function:: void fmpq_poly_scalar_mul_fmpq(fmpq_poly_t rop, const fmpq_poly_t op, const fmpq_t c)
+              void fmpq_poly_scalar_mul_si(fmpq_poly_t rop, const fmpq_poly_t op, slong c)
+              void fmpq_poly_scalar_mul_ui(fmpq_poly_t rop, const fmpq_poly_t op, ulong c)
 
     Sets ``rop`` to `c` times ``op``.
 
@@ -598,10 +596,6 @@ Scalar multiplication and division
 
     Sets ``rop`` to `c` times ``op``.  Assumes that the ``fmpz_t c``
     is not part of ``rop``.
-
-.. function:: void fmpq_poly_scalar_mul_mpq(fmpq_poly_t rop, const fmpq_poly_t op, const fmpq_t c)
-
-    Sets ``rop`` to `c` times ``op``.
 
 .. function:: void _fmpq_poly_scalar_div_fmpz(fmpz * rpoly, fmpz_t rden, const fmpz * poly, const fmpz_t den, slong len, const fmpz_t c)
 
@@ -919,7 +913,7 @@ Greatest common divisor
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fmpq_poly_gcd(fmpz *G, fmpz_t denG, const fmpz *A, slong lenA, const fmpz *B, slong lenB)
+.. function:: void _fmpq_poly_gcd(fmpz * G, fmpz_t denG, const fmpz * A, slong lenA, const fmpz * B, slong lenB)
 
     Computes the monic greatest common divisor `G` of `A` and `B`.
 
@@ -936,7 +930,7 @@ Greatest common divisor
 
     In the special case when `A = B = 0`, sets `G = 0`.
 
-.. function:: void _fmpq_poly_xgcd(fmpz *G, fmpz_t denG, fmpz *S, fmpz_t denS, fmpz *T, fmpz_t denT, const fmpz *A, const fmpz_t denA, slong lenA, const fmpz *B, const fmpz_t denB, slong lenB)
+.. function:: void _fmpq_poly_xgcd(fmpz * G, fmpz_t denG, fmpz * S, fmpz_t denS, fmpz * T, fmpz_t denT, const fmpz * A, const fmpz_t denA, slong lenA, const fmpz * B, const fmpz_t denB, slong lenB)
 
     Computes polynomials `G`, `S`, and `T` such that
     `G = \gcd(A, B) = S A + T B`, where `G` is the monic
@@ -959,7 +953,7 @@ Greatest common divisor
     scalar multiple of `G = A`, `S = 1`, and `T = 0`.  The case
     when `A = 0`, `B \neq 0` is handled similarly.
 
-.. function:: void _fmpq_poly_lcm(fmpz *L, fmpz_t denL, const fmpz *A, slong lenA, const fmpz *B, slong lenB)
+.. function:: void _fmpq_poly_lcm(fmpz * L, fmpz_t denL, const fmpz * A, slong lenA, const fmpz * B, slong lenB)
 
     Computes the monic least common multiple `L` of `A` and `B`.
 
@@ -976,7 +970,7 @@ Greatest common divisor
 
     In the special case when `A = B = 0`, sets `L = 0`.
 
-.. function:: void _fmpq_poly_resultant(fmpz_t rnum, fmpz_t rden, const fmpz *poly1, const fmpz_t den1, slong len1, const fmpz *poly2, const fmpz_t den2, slong len2)
+.. function:: void _fmpq_poly_resultant(fmpz_t rnum, fmpz_t rden, const fmpz * poly1, const fmpz_t den1, slong len1, const fmpz * poly2, const fmpz_t den2, slong len2)
 
     Sets ``(rnum, rden)`` to the resultant of the two input
     polynomials.
@@ -994,7 +988,7 @@ Greatest common divisor
     letting `x` and `y` denote the leading coefficients, the resultant
     is defined as
 
-    .. math ::
+    .. math::
 
 
          x^{\deg(f)} y^{\deg(g)} \prod_{1 \leq i, j \leq n} (r_i - s_j).
@@ -1708,7 +1702,7 @@ Input and output
     In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
 
-.. function:: int _fmpq_poly_print_pretty(const fmpz *poly, const fmpz_t den, slong len, const char * x)
+.. function:: int _fmpq_poly_print_pretty(const fmpz * poly, const fmpz_t den, slong len, const char * x)
 
 .. function:: int fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var)
 
@@ -1732,7 +1726,7 @@ Input and output
     In case of success, returns a positive value.  In case of failure,
     returns a non-positive value.
 
-.. function:: int _fmpq_poly_fprint_pretty(FILE * file, const fmpz *poly, const fmpz_t den, slong len, const char * x)
+.. function:: int _fmpq_poly_fprint_pretty(FILE * file, const fmpz * poly, const fmpz_t den, slong len, const char * x)
 
 .. function:: int fmpq_poly_fprint_pretty(FILE * file, const fmpq_poly_t poly, const char * var)
 

@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2023 Jean Kieffer
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "test_helpers.h"
@@ -17,8 +17,8 @@ TEST_FUNCTION_START(arb_mat_spd_lll_reduce, state)
 {
     slong iter;
 
-    /* Test: result satisfies arb_mat_spd_is_lll_reduced and
-       arb_mat_spd_is_lll_reduced returns 0 on more imprecise result */
+    /* Test: result satisfies arb_mat_spd_is_lll_reduced; U is I if starting
+       matrix was reduced */
     for (iter = 0; iter < 500 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 4);
@@ -29,13 +29,11 @@ TEST_FUNCTION_START(arb_mat_spd_lll_reduce, state)
         arb_mat_t R;
         arb_mat_t T;
         fmpz_mat_t U;
-        mag_t eps;
 
         arb_mat_init(M, g, g);
         arb_mat_init(R, g, g);
         arb_mat_init(T, g, g);
         fmpz_mat_init(U, g, g);
-        mag_init(eps);
 
         arb_mat_randtest_spd(M, state, prec, mag_bits);
         arb_mat_spd_lll_reduce(U, M, prec);
@@ -55,22 +53,19 @@ TEST_FUNCTION_START(arb_mat_spd_lll_reduce, state)
             flint_abort();
         }
 
-        mag_one(eps);
-        mag_mul_2exp_si(eps, eps, tol_exp);
-        arb_mat_add_error_mag(R, eps);
-
-        if (arb_mat_spd_is_lll_reduced(R, tol_exp, prec))
+        if (arb_mat_spd_is_lll_reduced(M, tol_exp, prec)
+            && !fmpz_mat_is_one(U))
         {
-            flint_printf("FAIL (error bounds)\n");
-            arb_mat_printd(R, 10);
-            flint_abort();
+            flint_printf("FAIL (identity)\n");
+            arb_mat_printd(M, 10);
+            fmpz_mat_print_pretty(U);
+            flint_printf("\n");
         }
 
         arb_mat_clear(M);
         arb_mat_clear(R);
         arb_mat_clear(T);
         fmpz_mat_clear(U);
-        mag_clear(eps);
     }
 
     TEST_FUNCTION_END(state);

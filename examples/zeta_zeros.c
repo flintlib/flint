@@ -21,7 +21,7 @@ void print_zeros(arb_srcptr p, const fmpz_t n, slong len, slong digits)
     fmpz_clear(k);
 }
 
-void print_help()
+void print_help(void)
 {
     flint_printf("zeta_zeros [-n n] [-count n] [-prec n] [-digits n] [-threads n] "
                  "[-platt] [-noplatt] [-v] [-verbose] [-h] [-help]\n\n");

@@ -1,14 +1,17 @@
-/*
+/*r
     Copyright (C) 2018, 2021 Daniel Schultz
 
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
 
 void fmpz_pow_cache_init(fmpz_pow_cache_t T, const fmpz_t val)

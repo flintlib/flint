@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2016 Pascal Molin
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "nmod.h"
@@ -33,10 +33,7 @@ dlog_single(ulong b, ulong a, const nmod_t mod, ulong n)
             ak = nmod_mul(ak, a, mod);
         }
 
-        flint_printf("FAIL[dlog single]: log(%wu,%wu) mod %wu not found (size %wu)\n",
-                b, a, mod.n, n);
-        flint_abort();
-        return 0; /* dummy return because flint_abort() is not declared noreturn */
+        flint_throw(FLINT_ERROR, "(dlog single): log(%wu,%wu) mod %wu not found (size %wu)\n", b, a, mod.n, n);
     }
     else
     {
@@ -55,9 +52,7 @@ dlog_quotient(const dlog_rho_t t, ulong e, ulong f, ulong g, ulong b)
 
     if (g == n.n)
     {
-        flint_printf("FAIL[dlog quotient]: trivial relation e = %wu, f = %wu mod %wu\n",
-                e, f, n.n);
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(dlog quotient): trivial relation e = %wu, f = %wu mod %wu\n", e, f, n.n);
     }
 
     nmod_init(&n, n.n / g);

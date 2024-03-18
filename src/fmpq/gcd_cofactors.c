@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -19,7 +19,7 @@ void _fmpq_gcd_cofactors(
     const fmpz_t nb, const fmpz_t db)
 {
     fmpz_t ng, dg, nabar, dabar, nbbar, dbbar;
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpq_t cqt_g;
     int input_is_canonical = _fmpq_is_canonical(na, da) &&
                              _fmpq_is_canonical(nb, db);
@@ -38,7 +38,7 @@ void _fmpq_gcd_cofactors(
         return;
     }
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpq_init(cqt_g);
     _fmpq_gcd(fmpq_numref(cqt_g), fmpq_denref(cqt_g), na, da, nb, db);
 #endif
@@ -61,7 +61,7 @@ void _fmpq_gcd_cofactors(
     fmpz_mul(dg_, da, dbbar);
     fmpz_swap(ng_, ng);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (input_is_canonical)
     {
         FLINT_ASSERT(fmpz_equal(fmpq_numref(cqt_g), ng_));

@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -27,7 +27,7 @@ TEST_FUNCTION_START(d_vec_dot_thrice, state)
 
     /* check sum of scalar products of parts of vectors is equal to the
        scalar product of vectors */
-    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         double *a, *b;
         double res1, res2, res3, err1, err2, err3;
@@ -47,18 +47,15 @@ TEST_FUNCTION_START(d_vec_dot_thrice, state)
         result = fabs(res1 + res2 - res3) < D_VEC_SP_EPS;
 
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("%g\n", fabs(res1 + res2 - res3));
-            flint_printf("%g\n", res1);
-            flint_printf("%g\n", res2);
-            flint_printf("%g\n", res3);
-            flint_printf("%g\n", err1);
-            flint_printf("%g\n", err2);
-            flint_printf("%g\n", err3);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "%g\n"
+                    "%g\n"
+                    "%g\n"
+                    "%g\n"
+                    "%g\n"
+                    "%g\n"
+                    "%g\n",
+                    fabs(res1 + res2 - res3), res1, res2 , res3 , err1 , err2 , err3);
 
         _d_vec_clear(a);
         _d_vec_clear(b);

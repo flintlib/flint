@@ -1,11 +1,12 @@
 /*
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -75,8 +76,7 @@ TEMPLATE(T, poly_powmod_ui_binexp_preinv) (TEMPLATE(T, poly_t) res,
 
     if (lenf == 0)
     {
-        TEMPLATE_PRINTF("Exception: %s_poly_powmod: divide by zero\n", T);
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s): Divide by zero\n", __func__);
     }
 
     if (len >= lenf)
@@ -91,26 +91,29 @@ TEMPLATE(T, poly_powmod_ui_binexp_preinv) (TEMPLATE(T, poly_t) res,
         return;
     }
 
-    if (e <= 2)
+    if (e == UWORD(0))
     {
-        if (e == UWORD(0))
-        {
-            TEMPLATE(T, poly_fit_length) (res, 1, ctx);
-            TEMPLATE(T, one) (res->coeffs, ctx);
-            _TEMPLATE(T, poly_set_length) (res, 1, ctx);
-        }
-        else if (e == UWORD(1))
-        {
-            TEMPLATE(T, poly_set) (res, poly, ctx);
-        }
+        if (lenf == 1)
+            TEMPLATE(T, poly_zero)(res, ctx);
         else
-            TEMPLATE(T, poly_mulmod_preinv) (res, poly, poly, f, finv, ctx);
+            TEMPLATE(T, poly_one)(res, ctx);
         return;
     }
 
     if (lenf == 1 || len == 0)
     {
         TEMPLATE(T, poly_zero) (res, ctx);
+        return;
+    }
+
+    if (e == UWORD(1))
+    {
+        TEMPLATE(T, poly_set) (res, poly, ctx);
+        return;
+    }
+    else if (e == UWORD(2))
+    {
+        TEMPLATE(T, poly_mulmod) (res, poly, poly, f, ctx);
         return;
     }
 

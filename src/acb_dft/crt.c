@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2016 Pascal Molin
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "nmod.h"
@@ -45,8 +45,7 @@ crt_print(const crt_t c)
     slong k;
     if (c->num == 0)
     {
-        flint_printf("trivial group\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "trivial group\n");
     }
     for (k = 0; k < c->num; k++)
         flint_printf("Z/%wuZ ", c->m[k]);

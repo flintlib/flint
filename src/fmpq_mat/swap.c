@@ -6,18 +6,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fmpq.h"
 #include "fmpq_mat.h"
-
-void
-fmpq_mat_swap(fmpq_mat_t mat1, fmpq_mat_t mat2)
-{
-    FLINT_SWAP(fmpq_mat_struct, *mat1, *mat2);
-}
 
 void
 fmpq_mat_swap_entrywise(fmpq_mat_t mat1, fmpq_mat_t mat2)

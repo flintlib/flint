@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -30,7 +30,7 @@ TEST_FUNCTION_START(fq_poly_set_fmpz_mod_poly, state)
         fmpz_t p;
 
         len = n_randint(state, 15) + 1;
-        fq_ctx_randtest(ctx, state);
+        fq_ctx_init_randtest(ctx, state, 0);
         fq_init(r, ctx);
         fq_init(s, ctx);
         fq_poly_init(a, ctx);

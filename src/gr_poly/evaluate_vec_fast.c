@@ -5,8 +5,8 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "gr_vec.h"
@@ -139,7 +139,7 @@ _gr_poly_tree_build(gr_ptr * tree, gr_srcptr roots, slong len, gr_ctx_t ctx)
 }
 
 /* This gives some speedup for small lengths. */
-static __inline__ int
+static inline int
 _gr_poly_rem_2(gr_ptr q, gr_ptr r, gr_srcptr a, slong al,
     gr_srcptr b, slong bl, gr_ctx_t ctx)
 {

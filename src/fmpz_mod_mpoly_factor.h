@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -15,10 +15,9 @@
 #ifdef FMPZ_MOD_MPOLY_FACTOR_INLINES_C
 #define FMPZ_MOD_MPOLY_FACTOR_INLINE
 #else
-#define FMPZ_MOD_MPOLY_FACTOR_INLINE static __inline__
+#define FMPZ_MOD_MPOLY_FACTOR_INLINE static inline
 #endif
 
-#include "thread_pool.h"
 #include "fmpz_mod_poly.h"
 #include "fmpz_mod_mpoly.h"
 
@@ -151,7 +150,7 @@ void fmpz_mod_poly_eval2_pow(fmpz_t evalp, fmpz_t evalm,
 
 /* fmpz_mod_mat extras *******************************************************/
 
-int fmpz_mod_mat_is_reduced(const fmpz_mod_mat_t N);
+int fmpz_mod_mat_is_reduced(const fmpz_mod_mat_t N, const fmpz_mod_ctx_t ctx);
 
 void fmpz_mod_mat_init_nullspace_tr(fmpz_mod_mat_t X,
                                  fmpz_mod_mat_t tmp, const fmpz_mod_ctx_t ctx);
@@ -1393,4 +1392,3 @@ int fmpz_mod_polyun_zip_solve(
 #endif
 
 #endif
-

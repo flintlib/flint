@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -23,9 +23,8 @@ fmpz_divexact_checked(fmpz_t Q, const fmpz_t A, const fmpz_t B)
     fmpz_fdiv_qr(Q, r, A, B);
     if (!fmpz_is_zero(r))
     {
-        fmpz_clear(r);
-        flint_printf("Not an exact division\n");
-        flint_abort();
+        fmpz_clear(r); /* flint_throw */
+        flint_throw(FLINT_ERROR, "Not an exact division\n");
     }
     /* no need to clear r */
 }
@@ -181,10 +180,9 @@ _fmpz_poly_div_series_basecase(fmpz * Q, const fmpz * A, slong Alen,
             }
             else
             {
-                fmpz_mul(Q + i, B + 1, Q + i - 1);
-
-                for (j = 2; j < FLINT_MIN(i + 1, Blen); j++)
-                    fmpz_addmul(Q + i, B + j, Q + i - j);
+                slong l = FLINT_MIN(i, Blen - 1);
+                /* todo: merge final subtraction */
+                _fmpz_vec_dot_general(Q + i, NULL, 0, B + 1, Q + i - l, 1, l);
             }
 
             if (i < Alen)
@@ -242,8 +240,7 @@ void fmpz_poly_div_series_basecase(fmpz_poly_t Q, const fmpz_poly_t A,
 
     if (Blen == 0)
     {
-        flint_printf("Exception (fmpz_poly_div_series_basecase). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_poly_div_series_basecase). Division by zero.\n");
     }
 
     if (Alen == 0)
@@ -269,4 +266,3 @@ void fmpz_poly_div_series_basecase(fmpz_poly_t Q, const fmpz_poly_t A,
     _fmpz_poly_set_length(Q, n);
     _fmpz_poly_normalise(Q);
 }
-

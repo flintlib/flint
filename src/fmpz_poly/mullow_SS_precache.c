@@ -5,14 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "flint-mparam.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fft.h"
-#include "fft_tuning.h"
 
 void fmpz_poly_mul_SS_precache_init(fmpz_poly_mul_precache_t pre,
                               slong len1, slong bits1, const fmpz_poly_t poly2)

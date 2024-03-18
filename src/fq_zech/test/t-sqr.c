@@ -1,11 +1,12 @@
 /*
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -14,15 +15,17 @@
 
 TEST_FUNCTION_START(fq_zech_sqr, state)
 {
-    int j, i, result;
-    fq_zech_ctx_t ctx;
+    slong ix, jx;
+    int result;
 
-    for (j = 0; j < 10; j++)
+    for (ix = 0; ix < 100 * flint_test_multiplier(); ix++)
     {
-        fq_zech_ctx_randtest(ctx, state);
+        fq_zech_ctx_t ctx;
+
+        fq_zech_ctx_init_randtest(ctx, state, 2);
 
         /* Check aliasing: a = a * a */
-        for (i = 0; i < 200; i++)
+        for (jx = 0; jx < 10; jx++)
         {
             fq_zech_t a, c;
 
@@ -40,7 +43,6 @@ TEST_FUNCTION_START(fq_zech_sqr, state)
                 flint_printf("FAIL (aliasing):\n\n");
                 flint_printf("a = "), fq_zech_print_pretty(a, ctx), flint_printf("\n");
                 flint_printf("c = "), fq_zech_print_pretty(c, ctx), flint_printf("\n");
-                fflush(stdout);
                 flint_abort();
             }
 
@@ -49,7 +51,7 @@ TEST_FUNCTION_START(fq_zech_sqr, state)
         }
 
         /* Check a^2 + a^2 = a(a + a) */
-        for (i = 0; i < 200; i++)
+        for (jx = 0; jx < 10; jx++)
         {
             fq_zech_t a, b, c, d;
 
@@ -74,7 +76,6 @@ TEST_FUNCTION_START(fq_zech_sqr, state)
                 flint_printf("b = "), fq_zech_print_pretty(b, ctx), flint_printf("\n");
                 flint_printf("c = "), fq_zech_print_pretty(c, ctx), flint_printf("\n");
                 flint_printf("d = "), fq_zech_print_pretty(d, ctx), flint_printf("\n");
-                fflush(stdout);
                 flint_abort();
             }
 

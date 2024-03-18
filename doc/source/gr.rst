@@ -435,10 +435,14 @@ Assignment and conversions
     if *x* cannot be converted to the target type.
     For floating-point output types, the output may be rounded.
 
-.. function:: int gr_set_fmpz_2exp_fmpz(gr_ptr res, const fmpz_t x, const fmpz_t y, gr_ctx_t ctx)
+.. function:: int gr_set_fmpz_2exp_fmpz(gr_ptr res, const fmpz_t a, const fmpz_t b, gr_ctx_t ctx)
               int gr_get_fmpz_2exp_fmpz(fmpz_t res1, fmpz_t res2, gr_srcptr x, gr_ctx_t ctx)
 
-    Set or retrieve a dyadic number.
+    Set or retrieve a dyadic number `a \cdot 2^b`.
+
+.. function:: int gr_set_fmpz_10exp_fmpz(gr_ptr res, const fmpz_t a, const fmpz_t b, gr_ctx_t ctx)
+
+    Set to a decimal number `a \cdot 10^b`.
 
 .. function:: int gr_get_fexpr(fexpr_t res, gr_srcptr x, gr_ctx_t ctx)
               int gr_get_fexpr_serialize(fexpr_t res, gr_srcptr x, gr_ctx_t ctx)
@@ -471,10 +475,12 @@ Special values
     "generator" depends on the domain.
 
 .. function:: int gr_gens(gr_vec_t res, gr_ctx_t ctx)
+              int gr_gens_recursive(gr_vec_t res, gr_ctx_t ctx)
 
     Sets *res* to a vector containing the generators of this domain
     where this makes sense, for example in a multivariate polynomial
-    ring.
+    ring. The *recursive* version also includes any generators
+    of the base ring, and of any recursive base rings.
 
 Basic properties
 ........................................................................
@@ -596,27 +602,6 @@ The default implementations of the following methods check for divisors
 Particular rings should override the methods when an inversion
 or division algorithm is available.
 
-.. function:: int gr_div(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
-              int gr_div_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
-              int gr_div_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
-              int gr_div_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
-              int gr_div_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
-              int gr_div_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx)
-              int gr_other_div(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, gr_ctx_t ctx)
-
-    Sets *res* to the quotient `x / y` if such an element exists
-    in the present ring. Returns the flag ``GR_DOMAIN`` if no such
-    quotient exists.
-    Returns the flag ``GR_UNABLE`` if the implementation is unable
-    to perform the computation.
-
-    When the ring is not a field, the definition of division may
-    vary depending on the ring. A ring implementation may define
-    `x / y = x y^{-1}` and return ``GR_DOMAIN`` when `y^{-1}` does not
-    exist; alternatively, it may attempt to solve the equation
-    `q y = x` (which, for example, gives the usual exact
-    division in `\mathbb{Z}`).
-
 .. function:: truth_t gr_is_invertible(gr_srcptr x, gr_ctx_t ctx)
 
     Returns whether *x* has a multiplicative inverse in the present ring,
@@ -630,9 +615,46 @@ or division algorithm is available.
     ``GR_UNABLE`` if the implementation is unable to perform
     the computation.
 
-.. function:: truth_t gr_divides(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+.. function:: int gr_div(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              int gr_div_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
+              int gr_div_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx)
+              int gr_div_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx)
+              int gr_div_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
+              int gr_div_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx)
+              int gr_other_div(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, gr_ctx_t ctx)
 
-    Returns whether *x* divides *y*.
+    Sets *res* to the quotient `x / y`. In a field, this returns
+    ``GR_DOMAIN`` if `y` is zero; in an integral domain,
+    it returns ``GR_DOMAIN`` if `y` is zero or if the quotient
+    does not exist. In a non-integral domain, we consider a quotient
+    to exist only if it is unique, and otherwise return ``GR_DOMAIN``;
+    see :func:`gr_div_nonunique` for a different behavior.
+
+    Returns the flag ``GR_UNABLE`` if the implementation is unable
+    to perform the computation.
+
+.. function:: int gr_div_nonunique(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+
+    Sets *res* to an arbitrary solution `q` of the equation `x = q y`.
+    Returns the flag ``GR_DOMAIN`` if no such solution exists.
+    Returns the flag ``GR_UNABLE`` if the implementation is unable
+    to perform the computation.
+    This method allows dividing `x / y` in some cases where :func:`gr_div` fails:
+
+    * `0 / 0` has solutions (for example, 0) in any ring.
+    * It allows solving division problems in nonintegral domains.
+      For example, it allows assigning a value to `6 / 2` in
+      `R = \mathbb{Z}/10\mathbb{Z}` even though `2^{-1}` does not exist
+      in `R`. In this case, both 3 and 8 are possible solutions, and which
+      one is chosen is unpredictable.
+
+.. function:: truth_t gr_divides(gr_srcptr d, gr_srcptr x, gr_ctx_t ctx)
+
+    Returns whether `d \mid x`; that is, whether there is an element `q`
+    such that `x = dq`. Note that this corresponds to divisibility
+    in the sense of :func:`gr_div_nonunique`, which is weaker than that
+    of :func:`gr_div`. For example, `0 \mid 0` is true even
+    in rings where `0 / 0` is undefined.
 
 .. function:: int gr_divexact(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
               int gr_divexact_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx)
@@ -820,6 +842,18 @@ Ordering methods
     of *x* is less than, equal or greater than the absolute value of *y*.
     This may return ``GR_DOMAIN`` if the ring is not an ordered ring.
 
+Enclosure and interval methods
+........................................................................
+
+.. function:: int gr_set_interval_mid_rad(gr_ptr res, gr_srcptr m, gr_srcptr r, gr_ctx_t ctx)
+
+    In ball representations of the real numbers, sets *res* to
+    the interval `m \pm r`.
+
+    In vector spaces over the real numbers represented using balls,
+    intervals are handled independently for the generators;
+    for example, in the complex numbers, `a + b i \pm (0.1 + 0.2 i)`
+    is equivalent to `(a \pm 0.1) + (b \pm 0.2) i`.
 
 Finite field methods
 ........................................................................
@@ -841,6 +875,7 @@ Finite field methods
 .. function:: truth_t gr_fq_is_primitive(gr_srcptr x, gr_ctx_t ctx)
 
 .. function:: int gr_fq_pth_root(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+
 
 
 .. raw:: latex

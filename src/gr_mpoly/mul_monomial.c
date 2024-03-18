@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -102,11 +102,12 @@ int gr_mpoly_mul_monomial(
         ulong * newAexps;
         flint_bitcnt_t newAbits = mpoly_fix_bits(Abits + 1, mctx);
         N = mpoly_words_per_exp(newAbits, mctx);
-        newAexps = FLINT_ARRAY_ALLOC(N*A->exps_alloc, ulong);
+        newAexps = FLINT_ARRAY_ALLOC(N*A->coeffs_alloc, ulong);
         mpoly_repack_monomials(newAexps, newAbits, A->exps, Abits, Blen, mctx);
         flint_free(A->exps);
         A->exps = newAexps;
         A->bits = newAbits;
+        A->exps_alloc = N*A->coeffs_alloc;
     }
 
 /* todo: when we can verify (quickly) that C is invertible */

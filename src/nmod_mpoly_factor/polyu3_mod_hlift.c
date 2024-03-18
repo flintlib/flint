@@ -5,14 +5,16 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly_factor.h"
 
-
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
 
 /* take last variable out of dense storage */
 static void n_polyu_set_n_polyun(n_polyu_t A, const n_polyun_t B)
@@ -403,7 +405,7 @@ int n_polyu3n_mod_interp_crt_2sm_bpoly(
     int texp_set, cmp;
     mp_limb_t alpha = alphapow->coeffs[1];
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     u = n_poly_mod_evaluate_nmod(modulus, alpha, mod);
     u = nmod_mul(u, alpha, mod);
     u = nmod_mul(u, 2, mod);
@@ -709,7 +711,7 @@ choose_prime:
 
 cleanup:
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success == 1)
     {
         n_polyu_t T1, T2, T3;
@@ -902,7 +904,7 @@ choose_prime:
 
 cleanup:
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success == 1)
     {
         n_polyu_t T1, T2, T3;
@@ -949,4 +951,3 @@ cleanup:
 
     return success;
 }
-

@@ -9,7 +9,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -30,9 +30,7 @@ fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor, flint_rand_t state,
 
     if (pol->length <= 1)
     {
-        flint_printf("Exception (fmpz_mod_poly_factor_equal_deg_prob): \n");
-        flint_printf("Input polynomial is linear.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mod_poly_factor_equal_deg_prob): Input polynomial is linear.\n");
     }
 
     fmpz_mod_poly_init(a, ctx);

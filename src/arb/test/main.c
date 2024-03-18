@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -61,6 +61,7 @@
 #include "t-const_log10.c"
 #include "t-const_log2.c"
 #include "t-const_pi.c"
+#include "t-const_reciprocal_fibonacci.c"
 #include "t-contains_arf.c"
 #include "t-contains.c"
 #include "t-contains_fmpq.c"
@@ -267,6 +268,7 @@ test_struct tests[] =
     TEST_FUNCTION(arb_const_log10),
     TEST_FUNCTION(arb_const_log2),
     TEST_FUNCTION(arb_const_pi),
+    TEST_FUNCTION(arb_const_reciprocal_fibonacci),
     TEST_FUNCTION(arb_contains_arf),
     TEST_FUNCTION(arb_contains),
     TEST_FUNCTION(arb_contains_fmpq),

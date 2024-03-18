@@ -1,17 +1,16 @@
 /*
-    Copyright (C) 2011, 2012 Sebastian Pancratz
     Copyright (C) 2009 William Hart
+    Copyright (C) 2011, 2012 Sebastian Pancratz
 
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-
-#include "flint.h"
+#include "padic.h"
 #include "padic_poly.h"
 
 void padic_poly_randtest_val(padic_poly_t f, flint_rand_t state,
@@ -92,8 +91,7 @@ void padic_poly_randtest_not_zero(padic_poly_t f, flint_rand_t state,
 
     if (len == 0)
     {
-        flint_printf("Exception (padic_poly_randtest_not_zero).  len == 0.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (padic_poly_randtest_not_zero).  len == 0.\n");
     }
 
     padic_poly_randtest(f, state, len, ctx);
@@ -108,4 +106,3 @@ void padic_poly_randtest_not_zero(padic_poly_t f, flint_rand_t state,
         f->val = f->N - 1;
     }
 }
-

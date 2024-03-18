@@ -5,8 +5,8 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "gr_special.h"
@@ -78,7 +78,7 @@ void _nmod_poly_mul_mid_default_mpn_ctx(mp_ptr res, slong zl, slong zh, mp_srcpt
 #endif
 
 
-#if 0
+#if 1
 #define INFO "inv_series"
 #define SETUP random_input(A, state, len, ctx); \
               GR_IGNORE(gr_poly_set_coeff_si(A, 0, 1, ctx));

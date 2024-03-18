@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -15,9 +15,11 @@
 #ifdef QADIC_INLINES_C
 #define QADIC_INLINE
 #else
-#define QADIC_INLINE static __inline__
+#define QADIC_INLINE static inline
 #endif
 
+#include "fmpz_vec.h"
+#include "padic.h"
 #include "padic_poly.h"
 
 #ifdef __cplusplus
@@ -53,6 +55,9 @@ typedef struct
 qadic_ctx_struct;
 
 typedef qadic_ctx_struct qadic_ctx_t[1];
+
+int _qadic_ctx_init_conway_ui(qadic_ctx_t ctx, ulong p, slong d,
+        slong min, slong max, const char * var, enum padic_print_mode mode);
 
 void qadic_ctx_init_conway(qadic_ctx_t ctx,
                            const fmpz_t p, slong d, slong min, slong max,
@@ -448,4 +453,3 @@ int qadic_debug(const qadic_t op);
 #endif
 
 #endif
-

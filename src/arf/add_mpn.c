@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2014 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "arf.h"
@@ -159,7 +159,7 @@ _arf_add_mpn(arf_t z, mp_srcptr xp, mp_size_t xn, int xsgnbit, const fmpz_t xexp
 
             if (cy)
             {
-                mpn_neg_n(t, t, 4);
+                mpn_neg(t, t, 4);
                 xsgnbit = ysgnbit;
             }
 
@@ -343,7 +343,7 @@ _arf_add_mpn(arf_t z, mp_srcptr xp, mp_size_t xn, int xsgnbit, const fmpz_t xexp
                     mpn_sub_n(tmp + wbase, tmp + wbase, xp + wbase, wn);
                     if (wbase != 0)
                     {
-                        cy = mpn_neg_n(tmp, xp, wbase);
+                        cy = mpn_neg(tmp, xp, wbase);
                         mpn_sub_1(tmp + wbase, tmp + wbase, wn, cy);
                     }
                 }
@@ -409,4 +409,3 @@ _arf_add_mpn(arf_t z, mp_srcptr xp, mp_size_t xn, int xsgnbit, const fmpz_t xexp
     ARF_ADD_TMP_FREE(tmp, alloc)
     return inexact;
 }
-

@@ -1,11 +1,12 @@
 /*
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -13,19 +14,14 @@
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
-#include "fmpz.h"
 #include "fq_nmod.h"
 
 void
-fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx, const nmod_poly_t modulus,
-                         const char *var)
+fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx, const nmod_poly_t modulus, const char * var)
 {
     slong nz;
     int i, j;
     mp_limb_t inv;
-
-    fmpz_init(fq_nmod_ctx_prime(ctx));
-    fmpz_set_ui(fq_nmod_ctx_prime(ctx), modulus->mod.n);
 
     ctx->mod.n = modulus->mod.n;
     ctx->mod.ninv = modulus->mod.ninv;
@@ -79,4 +75,3 @@ fq_nmod_ctx_init_modulus(fq_nmod_ctx_t ctx, const nmod_poly_t modulus,
 
     ctx->is_conway = 0;
 }
-

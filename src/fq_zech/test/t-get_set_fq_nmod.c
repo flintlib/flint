@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -16,20 +16,21 @@
 
 TEST_FUNCTION_START(fq_zech_get_set_fq_nmod, state)
 {
-    int i, j, result;
+    slong ix, jx;
+    int result;
 
-    for (i = 0; i < 100*flint_test_multiplier(); i++)
+    for (ix = 0; ix < 200 * flint_test_multiplier(); ix++)
     {
         fq_zech_ctx_t ctx;
         fq_zech_t a, b;
         fq_nmod_t c;
 
-        fq_zech_ctx_randtest(ctx, state);
+        fq_zech_ctx_init_randtest(ctx, state, 3);
         fq_zech_init(a, ctx);
         fq_zech_init(b, ctx);
         fq_nmod_init(c, ctx->fq_nmod_ctx);
 
-        for (j = 0; j < 20; j++)
+        for (jx = 0; jx < 20; jx++)
         {
             fq_zech_randtest(a, state, ctx);
             fq_zech_get_fq_nmod(c, a, ctx);
@@ -45,7 +46,6 @@ TEST_FUNCTION_START(fq_zech_get_set_fq_nmod, state)
                 flint_printf("b = "), fq_zech_print_pretty(b, ctx), flint_printf("\n");
                 flint_printf("c = "), fq_nmod_print_pretty(c, ctx->fq_nmod_ctx), flint_printf("\n");
                 flint_printf("table = %wd\n", ctx->eval_table[a->value]);
-                fflush(stdout);
                 flint_abort();
             }
         }

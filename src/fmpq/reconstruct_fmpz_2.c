@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -15,7 +15,6 @@
 #include "fmpq.h"
 
 #define FMPQ_RECONSTRUCT_ARRAY_LIMIT 12
-#define FMPQ_RECONSTRUCT_HGCD_CUTOFF 500
 
 /*
     hgcd for two-limb input, individual quotients not written
@@ -92,7 +91,7 @@ static slong _hgcd_uiui_no_write(
 
 fixed:
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
 
     /* should be ok */
 
@@ -158,7 +157,7 @@ fix:
     m22 = t2;
     det *= -1;
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     umul_ppmm(t1,t0, a0, q); t1 += a1*q;
     add_ssaaaa(t1,t0, t1,t0, b1,b0);
     b0 = a0;
@@ -558,8 +557,8 @@ gauss:
 
     /* (m11, m12) = (m12 + Q*m11, m11), use R for temp */
     mdet *= -1;
-    ex0 = (Qlen > m_len) ? mpn_mul(R, Q, Qlen, m11, m_len)
-                         : mpn_mul(R, m11, m_len, Q, Qlen);
+    ex0 = (Qlen > m_len) ? flint_mpn_mul(R, Q, Qlen, m11, m_len)
+                         : flint_mpn_mul(R, m11, m_len, Q, Qlen);
     m_len = Qlen + m_len - (ex0 == 0);
     ex0 = mpn_add_n(R, R, m12, m_len);
     R[m_len] = ex0;
@@ -927,7 +926,7 @@ int _fmpq_reconstruct_fmpz_2(fmpz_t n, fmpz_t d,
     mp_size_t Asize, Nsize;
     fmpz_t Q, R, A, B;
     _fmpz_mat22_t M; /* only need first row of matrix M */
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     int cqt_success;
     fmpz_t cqt_n, cqt_d;
 
@@ -1048,7 +1047,7 @@ write_answer:
 
 cleanup_assert:
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     FLINT_ASSERT(success == cqt_success);
     if (success)
     {
@@ -1069,4 +1068,3 @@ int fmpq_reconstruct_fmpz_2(fmpq_t res, const fmpz_t a, const fmpz_t m,
     return _fmpq_reconstruct_fmpz_2(fmpq_numref(res),
                                     fmpq_denref(res), a, m, N, D);
 }
-

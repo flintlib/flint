@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2014 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "acb_poly.h"
@@ -85,7 +85,8 @@ _acb_poly_zeta_em_choose_param(mag_t bound, ulong * N, ulong * M, const acb_t s,
             A *= 2;
             B *= 2;
 
-            if (B == 0) flint_abort();
+            if (B == 0)
+                flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
             _acb_poly_zeta_em_bound1(Bbound, s, a, B, choose_M(B, target), d, prec);
         }
@@ -119,4 +120,3 @@ _acb_poly_zeta_em_choose_param(mag_t bound, ulong * N, ulong * M, const acb_t s,
     mag_clear(Cbound);
     mag_clear(tol);
 }
-

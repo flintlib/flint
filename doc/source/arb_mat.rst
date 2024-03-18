@@ -250,7 +250,7 @@ Special matrices
     There are many different conventions for defining DCT matrices; here,
     we use the normalized "DCT-II" transform matrix
 
-    .. math ::
+    .. math::
 
         A_{j,k} = \sqrt{\frac{2}{n}} \cos\left(\frac{\pi j}{n} \left(k+\frac{1}{2}\right)\right)
 
@@ -402,12 +402,6 @@ Vector arithmetic
     dimensions of *A*.
 
     The underscore methods do not allow aliasing between *res* and *v*.
-
-.. function:: void arb_mat_bilinear_form(arb_t x, const arb_mat_t A, arb_srcptr v1, arb_srcptr v2, slong prec)
-
-    Sets *res* to the product `v_1^T A v_2`, where `v_1` and `v_2` are seen as
-    column vectors. The lengths of the vectors must match the dimensions of
-    *A*.
 
 Gaussian elimination and solving
 -------------------------------------------------------------------------------
@@ -714,7 +708,7 @@ Special functions
 
     Sets *B* to the exponential of the matrix *A*, defined by the Taylor series
 
-    .. math ::
+    .. math::
 
         \exp(A) = \sum_{k=0}^{\infty} \frac{A^k}{k!}.
 
@@ -724,7 +718,7 @@ Special functions
     The elementwise error when truncating the Taylor series after *N*
     terms is bounded by the error in the infinity norm, for which we have
 
-    .. math ::
+    .. math::
         \left\|\exp(2^{-r}A) - \sum_{k=0}^{N-1}
             \frac{\left(2^{-r} A\right)^k}{k!} \right\|_{\infty} =
         \left\|\sum_{k=N}^{\infty} \frac{\left(2^{-r} A\right)^k}{k!}\right\|_{\infty} \le
@@ -804,18 +798,17 @@ LLL reduction
 
 .. function:: void arb_mat_spd_lll_reduce(fmpz_mat_t U, const arb_mat_t A, slong prec)
 
-    Given a symmetric positive definite matrix *A*, compute a unimodular
-    transformation *U* such that *U^T A U* is close to being LLL-reduced. If
+    Given a symmetric positive definite matrix *A*, sets *U* to an invertible
+    matrix such that `U^T A U` is close to being LLL-reduced. If
     :func:`arb_mat_spd_get_fmpz_mat` succeeds at the chosen precision, we call
     :func:`fmpz_lll`, and otherwise set *U* to the identity matrix. The
     warnings of :func:`arf_get_fmpz` apply.
 
 .. function:: int arb_mat_spd_is_lll_reduced(const arb_mat_t A, slong tol_exp, slong prec)
 
-    Returns nonzero iff *A* is LLL-reduced with a tolerance of `\varepsilon =
-    2^{tol\_exp}`. This means the following. First, the error radius on
-    each entry of *A* must be at most `\varepsilon/16`. Then we consider the
-    matrix whose entries are `2^{\mathit{prec}}(1 + \varepsilon)^{i + j}
-    A_{i,j}` rounded to integers: it must be positive definite and pass
-    :func:`fmpz_mat_is_reduced` with default parameters. The warnings of
-    :func:`arf_get_fmpz` apply.
+    Given a symmetric positive definite matrix *A*, returns nonzero iff *A* is
+    certainly LLL-reduced with a tolerance of `\varepsilon = 2^{tol\_exp}`,
+    meaning that it satisfies the inequalities `|\mu_{j,k}|\leq \eta +
+    \varepsilon` and `(\delta - \varepsilon) \lVert b_{k-1}^*\rVert^2 \leq
+    \lVert b_k^*\rVert^2 + \mu_{k,k-1}^2 \lVert b_{k-1}^*\rVert^2` (with the
+    usual notation) for the default parameters `\eta = 0.51`, `\delta = 0.99`.

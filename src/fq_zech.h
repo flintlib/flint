@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -18,9 +18,9 @@
 # define FQ_TEMPLATES_INLINE
 #endif
 #else
-#define FQ_ZECH_INLINE static __inline__
+#define FQ_ZECH_INLINE static inline
 #ifndef FQ_TEMPLATES_INLINE
-# define FQ_TEMPLATES_INLINE static __inline__
+# define FQ_TEMPLATES_INLINE static inline
 #endif
 #endif
 
@@ -31,40 +31,42 @@
 extern "C" {
 #endif
 
-void fq_zech_ctx_init(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char *var);
+void fq_zech_ctx_init_ui(fq_zech_ctx_t ctx, ulong p, slong d, const char * var);
+int _fq_zech_ctx_init_conway_ui(fq_zech_ctx_t ctx, ulong p, slong d, const char * var);
+void fq_zech_ctx_init_conway_ui(fq_zech_ctx_t ctx, ulong p, slong d, const char * var);
+void fq_zech_ctx_init_random_ui(fq_zech_ctx_t ctx, ulong p, slong d, const char * var);
 
 int fq_zech_ctx_init_fq_nmod_ctx_check(fq_zech_ctx_t ctx, fq_nmod_ctx_t ctxn);
-
 void fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx, fq_nmod_ctx_t ctxn);
 
-int _fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char *var);
+int fq_zech_ctx_init_modulus_check(fq_zech_ctx_t ctx, const nmod_poly_t modulus, const char * var);
+void fq_zech_ctx_init_modulus(fq_zech_ctx_t ctx, const nmod_poly_t modulus, const char * var);
 
-void fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char *var);
-
-void fq_zech_ctx_init_random(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char *var);
-
-void fq_zech_ctx_init_modulus(fq_zech_ctx_t ctx,
-                              const nmod_poly_t modulus,
-                              const char *var);
-
-int fq_zech_ctx_init_modulus_check(fq_zech_ctx_t ctx,
-                              const nmod_poly_t modulus,
-                              const char *var);
-
-void fq_zech_ctx_randtest(fq_zech_ctx_t ctx, flint_rand_t state);
-
-void fq_zech_ctx_randtest_reducible(fq_zech_ctx_t ctx, flint_rand_t state);
+void fq_zech_ctx_init_randtest(fq_zech_ctx_t ctx, flint_rand_t state, int type);
+void fq_zech_ctx_init_randtest_reducible(fq_zech_ctx_t ctx, flint_rand_t state, int type);
 
 void fq_zech_ctx_clear(fq_zech_ctx_t ctx);
 
-const nmod_poly_struct * fq_zech_ctx_modulus(const fq_zech_ctx_t ctx);
+FQ_ZECH_INLINE
+const nmod_poly_struct * fq_zech_ctx_modulus(const fq_zech_ctx_t ctx)
+{
+    return ctx->fq_nmod_ctx->modulus;
+}
 
-slong fq_zech_ctx_degree(const fq_zech_ctx_t ctx);
+FQ_ZECH_INLINE
+slong fq_zech_ctx_degree(const fq_zech_ctx_t ctx)
+{
+    return ctx->fq_nmod_ctx->modulus->length - 1;
+}
 
-void fq_zech_ctx_order(fmpz_t f, const fq_zech_ctx_t ctx);
+FQ_ZECH_INLINE
+ulong fq_zech_ctx_prime(const fq_zech_ctx_t ctx)
+{
+    return ctx->fq_nmod_ctx->mod.n;
+}
 
-FQ_ZECH_INLINE mp_limb_t
-fq_zech_ctx_order_ui(const fq_zech_ctx_t ctx)
+FQ_ZECH_INLINE
+ulong fq_zech_ctx_order_ui(const fq_zech_ctx_t ctx)
 {
     return ctx->qm1 + 1;
 }
@@ -274,9 +276,14 @@ void fq_zech_bit_pack(fmpz_t f, const fq_zech_t op, flint_bitcnt_t bit_size,
 void fq_zech_bit_unpack(fq_zech_t rop, const fmpz_t f, flint_bitcnt_t bit_size,
                    const fq_zech_ctx_t ctx);
 
-/* Inlines *******************************************************************/
+/* Deprecated functions ******************************************************/
 
-void __fq_zech_ctx_prime(fmpz_t p, fq_zech_ctx_t ctx);
+void fq_zech_ctx_init(fq_zech_ctx_t, fmpz_t, slong, const char *);
+int _fq_zech_ctx_init_conway(fq_zech_ctx_t, fmpz_t, slong, const char *);
+void fq_zech_ctx_init_conway(fq_zech_ctx_t, fmpz_t, slong, const char *);
+void fq_zech_ctx_init_random(fq_zech_ctx_t, fmpz_t, slong, const char *);
+
+void fq_zech_ctx_order(fmpz_t, const fq_zech_ctx_t);
 
 #ifdef T
 #undef T

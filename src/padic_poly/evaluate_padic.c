@@ -5,11 +5,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
+#include "padic.h"
 #include "padic_poly.h"
 
 static void _fmpz_mod_poly_evaluate_fmpz_horner(fmpz_t res, const fmpz *poly, slong len,
@@ -202,4 +204,3 @@ void padic_poly_evaluate_padic(padic_t y, const padic_poly_t poly,
                                    padic_unit(x), padic_val(x), ctx);
     }
 }
-

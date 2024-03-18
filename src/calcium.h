@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2020 Fredrik Johansson
 
-    This file is part of Calcium.
+    This file is part of FLINT.
 
-    Calcium is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #ifndef CALCIUM_H
@@ -15,7 +15,7 @@
 #ifdef CALCIUM_INLINES_C
 #define CALCIUM_INLINE
 #else
-#define CALCIUM_INLINE static __inline__
+#define CALCIUM_INLINE static inline
 #endif
 
 #include "fmpz.h"
@@ -24,18 +24,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/* Global library definitions */
-
-const char * calcium_version(void);
-
-#define __CALCIUM_VERSION 0
-#define __CALCIUM_VERSION_MINOR 4
-#define __CALCIUM_VERSION_PATCHLEVEL 1
-#define CALCIUM_VERSION "0.4.0"
-#define __CALCIUM_RELEASE (__CALCIUM_VERSION * 10000 + \
-                         __CALCIUM_VERSION_MINOR * 100 + \
-                         __CALCIUM_VERSION_PATCHLEVEL)
 
 /* Input and output */
 
@@ -173,4 +161,3 @@ CALCIUM_INLINE ulong calcium_fmpz_hash(const fmpz_t x)
 #endif
 
 #endif
-

@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -178,8 +178,11 @@ _artin_schreier_preimage(fmpz *rop, const fmpz *op, slong len,
         LU x = Pb, hence L y = Pb and U x = y.
      */
 
-#ifdef FLINT_WANT_ASSERT
-    FLINT_ASSERT(nmod_mat_lu(P, A, 0) == d - 1);
+#if FLINT_WANT_ASSERT
+    {
+        slong res = nmod_mat_lu(P, A, 0);
+        FLINT_ASSERT(res == d - 1);
+    }
 #else
     nmod_mat_lu(P, A, 0);
 #endif

@@ -5,13 +5,21 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
+#include "fq_nmod.h"
+#include "n_poly.h"
+#include "mpoly.h"
+#include "nmod_mpoly.h"
 #include "fq_nmod_mpoly.h"
 #include "fq_nmod_mpoly_factor.h"
 
+#if FLINT_WANT_ASSERT
+# include "fq_nmod_poly.h"
+#endif
 
 void _fq_nmod_mpoly_monomial_evals_cache(
     n_fq_poly_t E,
@@ -181,7 +189,7 @@ void _fq_nmod_mpoly_monomial_evals2_cache(
     flint_free(caches);
     flint_free(off);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     Ai = 0;
     for (i = 0; i < E->length; i++)
         Ai += E->coeffs[i].length;
@@ -599,7 +607,7 @@ int fq_nmod_mpolyl_gcd_zippel_smprime(
     fq_nmod_mpoly_fit_length_reset_bits(rAbar, 1, bits, ctx);
     fq_nmod_mpoly_fit_length_reset_bits(rBbar, 1, bits, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         slong * tmp_degs = FLINT_ARRAY_ALLOC(nvars, slong);
 
@@ -1343,7 +1351,7 @@ static int newfq_nmod_mpolyn_interp_mcrt_lg_mpoly(
 {
     slong lgd = fq_nmod_ctx_degree(ectx->fqctx);
     slong i;
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     slong N = mpoly_words_per_exp(A->bits, ctx->minfo);
 #endif
     int changed = 0;
@@ -1447,7 +1455,7 @@ int fq_nmod_mpolyl_gcd_zippel_lgprime(
     fq_nmod_mpoly_fit_length_reset_bits(rAbar, 1, bits, smctx);
     fq_nmod_mpoly_fit_length_reset_bits(rBbar, 1, bits, smctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         slong * tmp_degs = FLINT_ARRAY_ALLOC(nvars, slong);
 
@@ -2406,4 +2414,3 @@ int fq_nmod_mpoly_gcd_zippel2(
 
     return _fq_nmod_mpoly_gcd_algo(G, NULL, NULL, A, B, ctx, MPOLY_GCD_USE_ZIPPEL2);
 }
-

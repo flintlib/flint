@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -25,21 +25,21 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_gcd_euclidean_f, state)
        N.B.  I checked by hand that this test shows both outcomes,
        i.e. trivial and non-trivial factors, sufficiently frequently.
      */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) f;
         TEMPLATE(T, poly_t) a, b, c, d;
 
-        TEMPLATE(T, ctx_randtest_reducible) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest_reducible)(ctx, state, 3);
         TEMPLATE(T, init) (f, ctx);
 
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
         TEMPLATE(T, poly_init) (c, ctx);
         TEMPLATE(T, poly_init) (d, ctx);
-        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 60), ctx);
-        TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 60), ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 30), ctx);
+        TEMPLATE(T, poly_randtest) (b, state, n_randint(state, 30), ctx);
 
         TEMPLATE(T, poly_gcd_euclidean_f) (f, c, a, b, ctx);
         if (!TEMPLATE(T, is_one) (f, ctx))

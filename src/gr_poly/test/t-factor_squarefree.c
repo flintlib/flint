@@ -5,8 +5,8 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "test_helpers.h"
@@ -32,6 +32,7 @@ TEST_FUNCTION_START(gr_poly_factor_squarefree, state)
         gr_vec_t exp;
         slong i, j;
         int status = GR_SUCCESS;
+        int attempts = 0;
 
         gr_ctx_init_random(ctx, state);
 
@@ -58,8 +59,12 @@ TEST_FUNCTION_START(gr_poly_factor_squarefree, state)
 
         c = gr_heap_init(ctx);
 
+        attempts = 0;
+
         do
         {
+            attempts++;
+
             if (ctx->methods == _ca_methods)
             {
                 ea = 1 + n_randint(state, 2);
@@ -81,6 +86,11 @@ TEST_FUNCTION_START(gr_poly_factor_squarefree, state)
                 status |= gr_poly_randtest(C, state, 3, ctx);
             }
 
+            if (ctx->which_ring != GR_CTX_FMPQ && attempts > 4)
+            {
+                status = GR_UNABLE;
+                break;
+            }
         }
         while (A->length < 2 || B->length < 2 || C->length < 2 ||
                gr_poly_gcd(G1, A, B, ctx) != GR_SUCCESS || (gr_poly_is_one(G1, ctx) != T_TRUE) ||
@@ -101,6 +111,7 @@ TEST_FUNCTION_START(gr_poly_factor_squarefree, state)
         {
             flint_printf("FAIL (unexpected failure)\n\n");
             flint_printf("P = "); gr_poly_print(P, ctx); flint_printf("\n");
+            flint_abort();
         }
 
         if (status == GR_SUCCESS)

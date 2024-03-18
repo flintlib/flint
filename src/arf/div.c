@@ -1,23 +1,18 @@
 /*
     Copyright (C) 2014 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "mpn_extras.h"
 #include "arf.h"
 
-#if !defined(__MPIR_VERSION)
-#define USE_GMP_DIV_Q 1
 void __gmpn_div_q(mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t, mp_ptr);
-#else
-#define USE_GMP_DIV_Q 0
-#endif
 
 void
 arf_div_special(arf_t z, const arf_t x, const arf_t y)
@@ -83,9 +78,7 @@ arf_div(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec, arf_rnd_t rnd)
     zn = tn - yn + 1;
     alloc = zn + (tn + 1);
 /* need tn + 1 extra temporary limbs, which we store at the end of tptr */
-#if USE_GMP_DIV_Q
     alloc += tn + 1;
-#endif
 
     ARF_MUL_TMP_ALLOC(tmp, alloc)
 
@@ -95,11 +88,7 @@ arf_div(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec, arf_rnd_t rnd)
     flint_mpn_zero(tptr, sn);
     flint_mpn_copyi(tptr + sn, xptr, xn);
 /* uses tn + 1 extra temporary limbs, tn limbs after tptr */
-#if USE_GMP_DIV_Q
     __gmpn_div_q(zptr, tptr, tn, yptr, yn, tptr + tn);
-#else
-    mpn_tdiv_q(zptr, tptr, tn, yptr, yn);
-#endif
 
     if (zptr[zn - 1] == 0)
     {
@@ -120,9 +109,9 @@ arf_div(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec, arf_rnd_t rnd)
            tptr[sn + xn] is guaranteed to be zero in that case since the
            approximate quotient cannot be larger than the true quotient. */
         if (zn >= yn)
-            mpn_mul(tptr, zptr, zn, yptr, yn);
+            flint_mpn_mul(tptr, zptr, zn, yptr, yn);
         else
-            mpn_mul(tptr, yptr, yn, zptr, zn);
+            flint_mpn_mul(tptr, yptr, yn, zptr, zn);
 
         /* The quotient is not exact. Perturbing the approximate quotient
            and rounding gives the correct the result. */
@@ -140,4 +129,3 @@ arf_div(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec, arf_rnd_t rnd)
 
     return inexact;
 }
-

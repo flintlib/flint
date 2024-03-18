@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2017, 2020 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "acb.h"
@@ -54,7 +54,7 @@ static const unsigned short den_ratio_tab[512] = {
     16,997,2,1,4,1,2,1009,8,1013,2,1,4076,1021,2,1
 };
 
-static __inline__ slong rj_fdiv(slong x, slong y)
+static inline slong rj_fdiv(slong x, slong y)
 {
     if (x < 0)
         return -1;
@@ -170,7 +170,7 @@ acb_elliptic_rj_taylor_sum(acb_t res, const acb_t E2, const acb_t E3,
                     N = 5 * m5 + 4 * m4 + 3 * m3 + 2 * m2;
 
                     if (N > NMAX)
-                        flint_abort();
+                        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
                     fmpz_divexact_ui(t, c2, 2 * N + 3);
                     if ((M + N) % 2)
@@ -533,7 +533,7 @@ RJ_integrand(acb_ptr res, const acb_t t, void * param, slong order, slong prec)
     int analytic, deflated;
 
     if (order > 1)
-        flint_abort();  /* Would be needed for Taylor method. */
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);  /* Would be needed for Taylor method. */
 
     x = ((acb_ptr) param);
     y = ((acb_ptr) param) + 1;
@@ -838,4 +838,3 @@ acb_elliptic_rj(acb_t res, const acb_t x, const acb_t y,
     /* Use integration as fallback */
     acb_elliptic_rj_integration(res, x, y, z, p, flags, prec);
 }
-

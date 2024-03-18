@@ -5,16 +5,19 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly_factor.h"
-#include "fmpz_mod_mpoly_factor.h"
+#include "nmod.h"
+#include "fmpz_vec.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_vec.h"
 #include "n_poly.h"
+#include "mpoly.h"
+#include "fmpz_mpoly.h"
 #include "nmod_mpoly_factor.h"
-#include "ulong_extras.h"
+#include "fmpz_mod_mpoly_factor.h"
 
 typedef struct {
     nmod_berlekamp_massey_struct * coeffs;
@@ -798,7 +801,7 @@ static int _fmpz_mod_bma_get_fmpz_mpoly2(
             fmpz_mod_add(V, V, temp, fpctx);
         }
         /* roots[i] should be a root of master */
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
         fmpz_mod_mul(temp, roots + i, T, fpctx);
         fmpz_mod_add(temp, temp, I->V1->coeffs + 0, fpctx);
         FLINT_ASSERT(fmpz_is_zero(temp));
@@ -2015,7 +2018,7 @@ pick_bma_prime:
 
         FLINT_ASSERT(GLambda_sp->pointcount == AbarLambda_sp->pointcount);
         FLINT_ASSERT(GLambda_sp->pointcount == BbarLambda_sp->pointcount);
-    #ifdef FLINT_WANT_ASSERT
+    #if FLINT_WANT_ASSERT
         {
             fmpz_t t;
             fmpz_init(t);
@@ -2443,4 +2446,3 @@ gcd_is_trivial:
     success = 1;
     goto cleanup;
 }
-

@@ -5,30 +5,25 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "test_helpers.h"
 #include "ulong_extras.h"
 
-void check_prime_bounds(ulong n, mp_limb_t ans)
-{
-    int ok, reasonable;
-    mp_limb_t lo, hi;
-    n_nth_prime_bounds(&lo, &hi, n);
-
-    ok = lo <= ans && ans <= hi;
-    reasonable = (n < 1000) || (ans/2 < lo && hi < ans*2);
-
-    if (ok && reasonable)
-        return;
-
-    flint_printf("FAIL:\n");
-    flint_printf("n = %wu: %wu < %wu < %wu\n", n, lo, ans, hi);
-    fflush(stdout);
-    flint_abort();
-}
+#define check_prime_bounds(n, ans) \
+do { \
+    int ok, reasonable; \
+    mp_limb_t lo, hi; \
+    n_nth_prime_bounds(&lo, &hi, n); \
+ \
+    ok = lo <= ans && ans <= hi; \
+    reasonable = (n < 1000) || (ans/2 < lo && hi < ans*2); \
+ \
+    if (!(ok && reasonable)) \
+        TEST_FUNCTION_FAIL("n = %wu: %wu < %wu < %wu\n", n, lo, ans, hi); \
+} while (0)
 
 TEST_FUNCTION_START(n_nth_prime_bounds, state)
 {

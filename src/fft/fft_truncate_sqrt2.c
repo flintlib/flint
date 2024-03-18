@@ -5,11 +5,10 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "fft.h"
 
 void fft_butterfly_sqrt2(mp_limb_t * s, mp_limb_t * t,
@@ -41,7 +40,7 @@ void fft_butterfly_sqrt2(mp_limb_t * s, mp_limb_t * t,
 
    flint_mpn_copyi(temp + y, t, limbs - y);
    temp[limbs] = 0;
-   if (y) cy = mpn_neg_n(temp, t + limbs - y, y);
+   if (y) cy = mpn_neg(temp, t + limbs - y, y);
    mpn_addmod_2expp1_1(temp + y, limbs - y, -t[limbs]);
    mpn_sub_1(temp + y, temp + y, limbs - y + 1, cy);
 

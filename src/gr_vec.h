@@ -5,8 +5,8 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #ifndef GR_VEC_H
@@ -15,7 +15,7 @@
 #ifdef GR_VEC_INLINES_C
 #define GR_VEC_INLINE
 #else
-#define GR_VEC_INLINE static __inline__
+#define GR_VEC_INLINE static inline
 #endif
 
 #include "gr.h"

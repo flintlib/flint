@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2020 Fredrik Johansson
 
-    This file is part of Calcium.
+    This file is part of FLINT.
 
-    Calcium is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #ifndef CA_EXT_H
@@ -15,7 +15,7 @@
 #ifdef CA_EXT_INLINES_C
 #define CA_EXT_INLINE
 #else
-#define CA_EXT_INLINE static __inline__
+#define CA_EXT_INLINE static inline
 #endif
 
 #include "ca.h"
@@ -62,8 +62,7 @@ CA_EXT_INLINE void ca_ext_get_arg(ca_t res, const ca_ext_t x, slong i, ca_ctx_t 
 {
     if (CA_EXT_HEAD(x) == CA_QQBar || i < 0 || i >= CA_EXT_FUNC_NARGS(x))
     {
-        flint_printf("ca_ext_get_arg: index out of range\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "ca_ext_get_arg: index out of range\n");
     }
     else
     {
@@ -93,4 +92,3 @@ ca_ext_ptr ca_ext_cache_insert(ca_ext_cache_t cache, const ca_ext_t x, ca_ctx_t 
 #endif
 
 #endif
-

@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2014 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "arf.h"
@@ -118,7 +118,7 @@ arf_mul_rnd_down(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec)
             y0 = ARF_NOPTR_D(y)[0];
             y1 = ARF_NOPTR_D(y)[1];
 
-            flint_mpn_mul_2x2(zz[3], zz[2], zz[1], zz[0], x1, x0, y1, y0);
+            FLINT_MPN_MUL_2X2(zz[3], zz[2], zz[1], zz[0], x1, x0, y1, y0);
 
             /* Likely case, must be inexact */
             if (prec <= 2 * FLINT_BITS)
@@ -167,7 +167,7 @@ arf_mul_rnd_down(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec)
         else
         {
             y0 = ARF_NOPTR_D(y)[0];
-            flint_mpn_mul_2x1(zz[2], zz[1], zz[0], x1, x0, y0);
+            FLINT_MPN_MUL_2X1(zz[2], zz[1], zz[0], x1, x0, y0);
         }
 
         zn = xn + yn;
@@ -194,25 +194,7 @@ arf_mul_rnd_down(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec)
         alloc = zn = xn + yn;
         ARF_MUL_TMP_ALLOC(tmp, alloc)
 
-        if (yn >= FLINT_MPN_MUL_THRESHOLD)
-        {
-            flint_mpn_mul_large(tmp, xptr, xn, yptr, yn);
-        }
-        else if (xn == yn)
-        {
-            if (xptr == yptr)
-                mpn_sqr(tmp, xptr, xn);
-            else
-                mpn_mul_n(tmp, xptr, yptr, yn);
-        }
-        else if (yn == 1)
-        {
-            tmp[zn - 1] = mpn_mul_1(tmp, xptr, xn, yptr[0]);
-        }
-        else
-        {
-            mpn_mul(tmp, xptr, xn, yptr, yn);
-        }
+        FLINT_MPN_MUL_WITH_SPECIAL_CASES(tmp, xptr, xn, yptr, yn);
 
         ret = _arf_set_round_mpn(z, &expfix, tmp, zn, sgnbit, prec, ARF_RND_DOWN);
         _fmpz_add2_fast(ARF_EXPREF(z), ARF_EXPREF(x), ARF_EXPREF(y), expfix);
@@ -276,4 +258,3 @@ arf_mul_mpz(arf_ptr z, arf_srcptr x, const mpz_t y, slong prec, arf_rnd_t rnd)
         return inexact;
     }
 }
-

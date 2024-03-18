@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -58,9 +58,8 @@ void _fmpz_poly_signature(slong * r1, slong * r2, const fmpz * poly, slong len)
 
 		if (lenA == 0)
 		{
-			flint_printf("Exception (fmpz_poly_signature). Non-squarefree polynomial detected.\n");
             _fmpz_vec_clear(w, 2 * len + 2);
-			flint_abort();
+			flint_throw(FLINT_ERROR, "(fmpz_poly_signature): Non-squarefree polynomial detected.\n");
 		}
 
         if ((fmpz_sgn(B + (lenB - 1)) > 0) || (delta & WORD(1)))
@@ -124,4 +123,3 @@ void fmpz_poly_signature(slong * r1, slong * r2, const fmpz_poly_t poly)
 {
     _fmpz_poly_signature(r1, r2, poly->coeffs, poly->length);
 }
-

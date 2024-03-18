@@ -5,14 +5,19 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "nmod_poly_factor.h"
-#include "fmpz_mpoly_factor.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly_factor.h"
+#include "fmpz_mpoly_factor.h"
 
 static void nmod_mpoly_get_eval_helper2(
     n_polyun_t EH,
@@ -755,7 +760,7 @@ next_alpha:
             fmpz_set_ui(alpha + i, 1 + (l & (mask - 1)));
     }
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mpoly_degrees_si(tdegs, A, ctx);
     for (i = 0; i < n + 1; i++)
         FLINT_ASSERT(degs[i] == tdegs[i]);
@@ -1083,4 +1088,3 @@ cleanup:
 
     return success;
 }
-

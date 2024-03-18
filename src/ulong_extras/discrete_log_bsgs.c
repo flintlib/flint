@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -38,7 +38,7 @@ apow_cmp(const apow_t * x, const apow_t * y)
 }
 
 /* set size of table m=sqrt(nk) to compute k logs in a group of size n */
-void
+static void
 bsgs_table_init(bsgs_t t, ulong a, ulong n, ulong m)
 {
     ulong k, ak;
@@ -59,7 +59,7 @@ bsgs_table_init(bsgs_t t, ulong a, ulong n, ulong m)
     qsort(t->table, m, sizeof(apow_t), (int(*)(const void*,const void*))apow_cmp);
 }
 
-void
+static void
 bsgs_table_clear(bsgs_t t)
 {
     flint_free(t->table);
@@ -81,9 +81,8 @@ n_discrete_log_bsgs_table(const bsgs_t t, ulong b)
             return i * t->m + x->k;
         c.ak = n_mulmod_precomp(c.ak, t->am, t->n, t->ninv);
     }
-    flint_printf("Exception (n_discrete_log_bsgs).  discrete log not found.\n");
-    flint_abort();
-    return 0; /* not reached, but silence the compiler */
+
+    flint_throw(FLINT_ERROR, "Exception (n_discrete_log_bsgs).  discrete log not found.\n");
 }
 
 ulong

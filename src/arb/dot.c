@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2018 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "arb.h"
@@ -200,8 +200,7 @@ _arb_dot_addmul_generic(mp_ptr sum, mp_ptr serr, mp_ptr tmp, mp_size_t sn,
     /* Sanity check; must conform to the pre-allocated memory! */
     if (nn > sn + 2)
     {
-        flint_printf("nn > sn + 2\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "nn > sn + 2\n");
     }
 
     /* Use mulhigh? */
@@ -710,7 +709,7 @@ arb_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong xstep,
                 xtop = x1;
                 ytop = y1;
 
-                flint_mpn_mul_2x2(u3, u2, u1, u0, x1, x0, y1, y0);
+                FLINT_MPN_MUL_2X2(u3, u2, u1, u0, x1, x0, y1, y0);
 
                 u0 = (u0 != 0) || ((u1 << (FLINT_BITS - shift)) != 0);
                 u1 = (u1 >> shift) | (u2 << (FLINT_BITS - shift));
@@ -755,7 +754,7 @@ arb_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong xstep,
                     y1 = ARF_NOPTR_D(ym)[1];
                     xtop = x1;
                     ytop = y1;
-                    flint_mpn_mul_2x2(u3, u2, u1, u0, x1, x0, y1, y0);
+                    FLINT_MPN_MUL_2X2(u3, u2, u1, u0, x1, x0, y1, y0);
                 }
                 else if (xn == 1)
                 {
@@ -764,7 +763,7 @@ arb_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong xstep,
                     y1 = ARF_NOPTR_D(ym)[1];
                     xtop = x0;
                     ytop = y1;
-                    flint_mpn_mul_2x1(u3, u2, u1, y1, y0, x0);
+                    FLINT_MPN_MUL_2X1(u3, u2, u1, y1, y0, x0);
                     u0 = 0;
                 }
                 else
@@ -774,7 +773,7 @@ arb_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong xstep,
                     y0 = ARF_NOPTR_D(ym)[0];
                     xtop = x1;
                     ytop = y0;
-                    flint_mpn_mul_2x1(u3, u2, u1, x1, x0, y0);
+                    FLINT_MPN_MUL_2X1(u3, u2, u1, x1, x0, y0);
                     u0 = 0;
                 }
 

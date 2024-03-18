@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2020 Fredrik Johansson
 
-    This file is part of Calcium.
+    This file is part of FLINT.
 
-    Calcium is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fmpz_poly_factor.h"
@@ -118,8 +118,7 @@ qqbar_fmpz_poly_composed_op(fmpz_poly_t res, const fmpz_poly_t A, const fmpz_pol
 
     if (d1 <= 0 || d2 <= 0)
     {
-        flint_printf("composed_op: inputs must not be constants\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "composed_op: inputs must not be constants\n");
     }
 
     n = d1 * d2 + 1;
@@ -138,8 +137,7 @@ qqbar_fmpz_poly_composed_op(fmpz_poly_t res, const fmpz_poly_t A, const fmpz_pol
     {
         if (fmpz_is_zero(P2->coeffs))
         {
-            flint_printf("composed_op: division by zero\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "composed_op: division by zero\n");
         }
 
         fmpq_poly_reverse(P2, P2, d2 + 1);
@@ -363,4 +361,3 @@ qqbar_binary_op(qqbar_t res, const qqbar_t x, const qqbar_t y, int op)
 
     qqbar_binary_op_without_guess(res, x, y, op);
 }
-

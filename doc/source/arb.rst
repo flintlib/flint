@@ -142,11 +142,21 @@ Assignment and rounding
 
 .. function:: void arb_set_ui(arb_t y, ulong x)
 
-.. function:: void arb_set_d(arb_t y, double x)
-
 .. function:: void arb_set_fmpz(arb_t y, const fmpz_t x)
 
+.. function:: void arb_set_d(arb_t y, double x)
+
     Sets *y* to the value of *x* without rounding.
+
+.. note::
+
+    Be cautious when using :func:`arb_set_d` as it does not impose any error
+    bounds and will only convert a ``double`` to an ``arb_t``. For instance,
+    ``arb_set_d(x, 1.1)`` and ``arb_set_str(x, "1.1", prec)`` work very
+    differently, where the former will first create a ``double`` whose value is
+    the approximation of `1.1` (without any error bounds) which then sets *x* to
+    this approximated value with no error. This differs from ``arb_set_str``
+    which will impose an error bound based on the precision.
 
 .. function:: void arb_set_fmpz_2exp(arb_t y, const fmpz_t x, const fmpz_t e)
 
@@ -874,7 +884,7 @@ Arithmetic
     Sets `z = x / y`, rounded to *prec* bits. If *y* contains zero, *z* is
     set to `0 \pm \infty`. Otherwise, error propagation uses the rule
 
-    .. math ::
+    .. math::
         \left| \frac{x}{y} - \frac{x+\xi_1 a}{y+\xi_2 b} \right| =
         \left|\frac{x \xi_2 b - y \xi_1 a}{y (y+\xi_2 b)}\right| \le
         \frac{|xb|+|ya|}{|y| (|y|-b)}
@@ -989,7 +999,7 @@ Powers and roots
     if input interval is `[m-r, m+r]` with `r \le m`, the error is largest at
     `m-r` where it satisfies
 
-    .. math ::
+    .. math::
 
         m^{1/k} - (m-r)^{1/k} = m^{1/k} [1 - (1-r/m)^{1/k}]
 
@@ -1311,6 +1321,11 @@ For further implementation details, see :ref:`algorithms_constants`.
 
     Computes Apery's constant `\zeta(3)`.
 
+.. function:: void arb_const_reciprocal_fibonacci(arb_t z, slong prec)
+
+    Computes the reciprocal Fibonacci constant `\sum_{n=1}^{\infty} 1/F_n`.
+
+
 Lambert W function
 -------------------------------------------------------------------------------
 
@@ -1351,7 +1366,7 @@ Gamma function and factorials
     compared to *prec*, it is more efficient to convert *x* to an approximation
     and use :func:`arb_rising_ui`.
 
-.. function :: void arb_rising2_ui(arb_t u, arb_t v, const arb_t x, ulong n, slong prec)
+.. function:: void arb_rising2_ui(arb_t u, arb_t v, const arb_t x, ulong n, slong prec)
 
     Letting `u(x) = x (x+1) (x+2) \cdots (x+n-1)`, simultaneously compute
     `u(x)` and `v(x) = u'(x)`.
@@ -1525,14 +1540,14 @@ Bernoulli numbers and polynomials
 
     For *n* from 0 to *len* - 1, sets entry *n* in the output vector *res* to
 
-    .. math ::
+    .. math::
 
         S_n(a,b) = \frac{1}{n+1}\left(B_{n+1}(b) - B_{n+1}(a)\right)
 
     where `B_n(x)` is a Bernoulli polynomial. If *a* and *b* are integers
     and `b \ge a`, this is equivalent to
 
-    .. math ::
+    .. math::
 
         S_n(a,b) = \sum_{k=a}^{b-1} k^n.
 
@@ -1760,7 +1775,7 @@ Internals for computing elementary functions
     Computes the arctangent of *x*.
     Initially, the argument-halving formula
 
-    .. math ::
+    .. math::
 
         \operatorname{atan}(x) = 2 \operatorname{atan}\left(\frac{x}{1+\sqrt{1+x^2}}\right)
 
@@ -1768,7 +1783,7 @@ Internals for computing elementary functions
     Then a version of the bit-burst algorithm is used.
     The functional equation
 
-    .. math ::
+    .. math::
 
         \operatorname{atan}(x) = \operatorname{atan}(p/q) +
             \operatorname{atan}(w),

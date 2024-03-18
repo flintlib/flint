@@ -2,7 +2,7 @@
 
 #include "arb_fpwrap.h"
 
-int main()
+int main(void)
 {
     double x, y;
     complex_double cx, cy;

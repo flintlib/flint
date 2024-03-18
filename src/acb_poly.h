@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2012 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #ifndef ACB_POLY_H
@@ -15,7 +15,7 @@
 #ifdef ACB_POLY_INLINES_C
 #define ACB_POLY_INLINE
 #else
-#define ACB_POLY_INLINE static __inline__
+#define ACB_POLY_INLINE static inline
 #endif
 
 #include "fmpq_types.h"
@@ -42,9 +42,7 @@ void _acb_poly_normalise(acb_poly_t poly);
 ACB_POLY_INLINE void
 acb_poly_swap(acb_poly_t poly1, acb_poly_t poly2)
 {
-    acb_poly_struct t = *poly1;
-    *poly1 = *poly2;
-    *poly2 = t;
+    FLINT_SWAP(acb_poly_struct, *poly1, *poly2);
 }
 
 ACB_POLY_INLINE slong acb_poly_length(const acb_poly_t poly)
@@ -388,15 +386,6 @@ void acb_poly_compose_series(acb_poly_t res,
                     const acb_poly_t poly2, slong n, slong prec);
 
 /* Reversion */
-
-void _acb_poly_revert_series_lagrange(acb_ptr Qinv, acb_srcptr Q, slong Qlen, slong n, slong prec);
-void acb_poly_revert_series_lagrange(acb_poly_t Qinv, const acb_poly_t Q, slong n, slong prec);
-
-void _acb_poly_revert_series_newton(acb_ptr Qinv, acb_srcptr Q, slong Qlen, slong n, slong prec);
-void acb_poly_revert_series_newton(acb_poly_t Qinv, const acb_poly_t Q, slong n, slong prec);
-
-void _acb_poly_revert_series_lagrange_fast(acb_ptr Qinv, acb_srcptr Q, slong Qlen, slong n, slong prec);
-void acb_poly_revert_series_lagrange_fast(acb_poly_t Qinv, const acb_poly_t Q, slong n, slong prec);
 
 void _acb_poly_revert_series(acb_ptr Qinv, acb_srcptr Q, slong Qlen, slong n, slong prec);
 void acb_poly_revert_series(acb_poly_t Qinv, const acb_poly_t Q, slong n, slong prec);

@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2013 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "arb.h"
@@ -84,9 +84,9 @@ _arb_cos_pi_fmpq_algebraic(arb_t c, ulong p, ulong q, slong prec)
         arb_poly_init(fpoly);
 
         if (p % 2 == 0)
-            arb_fmpz_poly_cos_minpoly(poly, q);
+            fmpz_poly_cos_minpoly(poly, q);
         else
-            arb_fmpz_poly_cos_minpoly(poly, 2 * q);
+            fmpz_poly_cos_minpoly(poly, 2 * q);
 
         eval_extra_prec = fmpz_poly_max_bits(poly) * 2; /* heuristic */
         eval_extra_prec = FLINT_ABS(eval_extra_prec);
@@ -188,4 +188,3 @@ _arb_sin_cos_pi_fmpq_algebraic(arb_t s, arb_t c, ulong p, ulong q, slong prec)
         arb_sqrt(s, s, prec);
     }
 }
-

@@ -5,8 +5,8 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <math.h>
@@ -686,12 +686,12 @@ _gr_fmpq_vec_is_zero(const fmpq * vec, slong len, gr_ctx_t ctx)
 }
 
 int
-_gr_fmpq_vec_equal(const fmpz * vec1, const fmpz * vec2, slong len, gr_ctx_t ctx)
+_gr_fmpq_vec_equal(const fmpq * vec1, const fmpq * vec2, slong len, gr_ctx_t ctx)
 {
     slong i;
 
     for (i = 0; i < len; i++)
-        if (!fmpz_equal(vec1 + i, vec2 + i))
+        if (!fmpq_equal(vec1 + i, vec2 + i))
             return T_FALSE;
 
     return T_TRUE;
@@ -982,7 +982,7 @@ _gr_fmpq_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, g
                     fmpz_swap(fmpq_denref(res_entries + j), fac->p[i].coeffs + 1);
 
                     if (fmpz_sgn(fmpq_denref(res_entries + j)) <= 0)
-                        flint_abort();
+                        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
                     fmpz_set_ui(mult_entries + j, fac->exp[i]);
                     j++;

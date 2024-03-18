@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2018 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "arb.h"
@@ -284,7 +284,7 @@ arb_approx_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong
                 y0 = ARF_NOPTR_D(ym)[0];
                 y1 = ARF_NOPTR_D(ym)[1];
 
-                flint_mpn_mul_2x2(u3, u2, u1, u0, x1, x0, y1, y0);
+                FLINT_MPN_MUL_2X2(u3, u2, u1, u0, x1, x0, y1, y0);
 
                 u1 = (u1 >> shift) | (u2 << (FLINT_BITS - shift));
                 u2 = (u2 >> shift) | (u3 << (FLINT_BITS - shift));
@@ -324,14 +324,14 @@ arb_approx_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong
                     x1 = ARF_NOPTR_D(xm)[1];
                     y0 = ARF_NOPTR_D(ym)[0];
                     y1 = ARF_NOPTR_D(ym)[1];
-                    flint_mpn_mul_2x2(u3, u2, u1, u0, x1, x0, y1, y0);
+                    FLINT_MPN_MUL_2X2(u3, u2, u1, u0, x1, x0, y1, y0);
                 }
                 else if (xn == 1)
                 {
                     x0 = ARF_NOPTR_D(xm)[0];
                     y0 = ARF_NOPTR_D(ym)[0];
                     y1 = ARF_NOPTR_D(ym)[1];
-                    flint_mpn_mul_2x1(u3, u2, u1, y1, y0, x0);
+                    FLINT_MPN_MUL_2X1(u3, u2, u1, y1, y0, x0);
                     u0 = 0;
                 }
                 else
@@ -339,7 +339,7 @@ arb_approx_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong
                     x0 = ARF_NOPTR_D(xm)[0];
                     x1 = ARF_NOPTR_D(xm)[1];
                     y0 = ARF_NOPTR_D(ym)[0];
-                    flint_mpn_mul_2x1(u3, u2, u1, x1, x0, y0);
+                    FLINT_MPN_MUL_2X1(u3, u2, u1, x1, x0, y0);
                     u0 = 0;
                 }
 

@@ -5,29 +5,34 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fmpz.h"
 #include "fmpz_factor.h"
+#include "fmpz_vec.h"
 #include "fmpz_mod.h"
+#include "fmpz_mod_vec.h"
 #include "fmpz_mod_mat.h"
 #include "fmpz_mod_poly.h"
 #include "fmpz_mod_poly_factor.h"
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
+#include "gr_mat.h"
 
 typedef struct
 {
     fmpz_mod_ctx_struct * ctx;
     truth_t is_prime;
+    fmpz a;    /* when used as finite field with defining polynomial x - a */
 }
-fmpz_mod_ctx_extended_struct;
+_gr_fmpz_mod_ctx_struct;
 
-#define FMPZ_MOD_CTX(ring_ctx) ((((fmpz_mod_ctx_extended_struct *)(ring_ctx))->ctx))
-#define FMPZ_MOD_IS_PRIME(ring_ctx) (((fmpz_mod_ctx_extended_struct *)(ring_ctx))->is_prime)
+#define FMPZ_MOD_CTX(ring_ctx) ((((_gr_fmpz_mod_ctx_struct *)(ring_ctx))->ctx))
+#define FMPZ_MOD_IS_PRIME(ring_ctx) (((_gr_fmpz_mod_ctx_struct *)(ring_ctx))->is_prime)
+#define FMPZ_MOD_CTX_A(ring_ctx) (&((((_gr_fmpz_mod_ctx_struct *)(ring_ctx))->a)))
 
 int
 _gr_fmpz_mod_ctx_write(gr_stream_t out, gr_ctx_t ctx)
@@ -43,6 +48,7 @@ _gr_fmpz_mod_ctx_clear(gr_ctx_t ctx)
 {
     fmpz_mod_ctx_clear(FMPZ_MOD_CTX(ctx));
     flint_free(FMPZ_MOD_CTX(ctx));
+    fmpz_clear(FMPZ_MOD_CTX_A(ctx));
 }
 
 truth_t
@@ -334,9 +340,50 @@ _gr_fmpz_mod_div(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
     status = _gr_fmpz_mod_inv(t, y, ctx);
     if (status == GR_SUCCESS)
         fmpz_mod_mul(res, x, t, FMPZ_MOD_CTX(ctx));
-
+    else
+        fmpz_zero(res);
     fmpz_clear(t);
+
     return status;
+}
+
+int
+_gr_fmpz_mod_div_nonunique(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
+{
+    int status;
+
+#if 1
+    status = fmpz_mod_divides(res, x, y, FMPZ_MOD_CTX(ctx)) ? GR_SUCCESS : GR_DOMAIN;
+#else
+    if (FMPZ_MOD_IS_PRIME(ctx) != T_TRUE)
+    {
+        status = fmpz_mod_divides(res, x, y, FMPZ_MOD_CTX(ctx)) ? GR_SUCCESS : GR_DOMAIN;
+    }
+    else
+    {
+        fmpz_t t;
+        fmpz_init(t);
+        status = _gr_fmpz_mod_inv(t, y, ctx);
+        if (status == GR_SUCCESS)
+            fmpz_mod_mul(res, x, t, FMPZ_MOD_CTX(ctx));
+        else
+            fmpz_zero(res);
+        fmpz_clear(t);
+    }
+#endif
+
+    return status;
+}
+
+truth_t
+_gr_fmpz_mod_divides(const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
+{
+    truth_t res;
+    fmpz_t t;
+    fmpz_init(t);
+    res = fmpz_mod_divides(t, y, x, FMPZ_MOD_CTX(ctx)) ? T_TRUE : T_FALSE;
+    fmpz_clear(t);
+    return res;
 }
 
 truth_t
@@ -358,12 +405,52 @@ _gr_fmpz_mod_pow_fmpz(fmpz_t res, const fmpz_t x, const fmpz_t exp, const gr_ctx
     return fmpz_mod_pow_fmpz(res, x, exp, FMPZ_MOD_CTX(ctx)) ? GR_SUCCESS : GR_DOMAIN;
 }
 
+int
+_gr_fmpz_mod_sqrt(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
+{
+    if (fmpz_is_zero(x) || fmpz_is_one(x))
+    {
+        fmpz_set(res, x);
+        return GR_SUCCESS;
+    }
+    else if (FMPZ_MOD_IS_PRIME(ctx) == T_TRUE)
+    {
+        return fmpz_sqrtmod(res, x, FMPZ_MOD_CTX(ctx)->n) ? GR_SUCCESS : GR_DOMAIN;
+    }
+    else
+    {
+        /* todo: implement the general case */
+        return GR_UNABLE;
+    }
+}
+
+truth_t
+_gr_fmpz_mod_is_square(const fmpz_t x, const gr_ctx_t ctx)
+{
+    if (fmpz_is_zero(x) || fmpz_is_one(x))
+    {
+        return T_TRUE;
+    }
+    else if (FMPZ_MOD_IS_PRIME(ctx) == T_TRUE)
+    {
+        fmpz_t t;
+        truth_t ans;
+        fmpz_init(t);
+        ans = fmpz_sqrtmod(t, x, FMPZ_MOD_CTX(ctx)->n) ? T_TRUE : T_FALSE;
+        fmpz_clear(t);
+        return ans;
+    }
+    else
+    {
+        /* todo: implement the general case */
+        return T_UNKNOWN;
+    }
+}
+
 /* todo: len 1 */
 int
 _gr_fmpz_mod_vec_dot(fmpz_t res, const fmpz_t initial, int subtract, const fmpz * vec1, const fmpz * vec2, slong len, gr_ctx_t ctx)
 {
-    slong i;
-
     if (len <= 0)
     {
         if (initial == NULL)
@@ -373,28 +460,8 @@ _gr_fmpz_mod_vec_dot(fmpz_t res, const fmpz_t initial, int subtract, const fmpz 
         return GR_SUCCESS;
     }
 
-    if (initial == NULL)
-    {
-        fmpz_mul(res, vec1, vec2);
-    }
-    else
-    {
-        if (subtract)
-            fmpz_neg(res, initial);
-        else
-            fmpz_set(res, initial);
-
-        fmpz_addmul(res, vec1, vec2);
-    }
-
-    for (i = 1; i < len; i++)
-        fmpz_addmul(res, vec1 + i, vec2 + i);
-
-    if (subtract)
-        fmpz_neg(res, res);
-
+    _fmpz_vec_dot_general(res, initial, subtract, vec1, vec2, 0, len);
     fmpz_mod_set_fmpz(res, res, FMPZ_MOD_CTX(ctx));
-
     return GR_SUCCESS;
 }
 
@@ -402,8 +469,6 @@ _gr_fmpz_mod_vec_dot(fmpz_t res, const fmpz_t initial, int subtract, const fmpz 
 int
 _gr_fmpz_mod_vec_dot_rev(fmpz_t res, const fmpz_t initial, int subtract, const fmpz * vec1, const fmpz * vec2, slong len, gr_ctx_t ctx)
 {
-    slong i;
-
     if (len <= 0)
     {
         if (initial == NULL)
@@ -413,30 +478,18 @@ _gr_fmpz_mod_vec_dot_rev(fmpz_t res, const fmpz_t initial, int subtract, const f
         return GR_SUCCESS;
     }
 
-    if (initial == NULL)
-    {
-        fmpz_mul(res, vec1, vec2 + len - 1);
-    }
-    else
-    {
-        if (subtract)
-            fmpz_neg(res, initial);
-        else
-            fmpz_set(res, initial);
-
-        fmpz_addmul(res, vec1, vec2 + len - 1);
-    }
-
-    for (i = 1; i < len; i++)
-        fmpz_addmul(res, vec1 + i, vec2 + len - 1 - i);
-
-    if (subtract)
-        fmpz_neg(res, res);
-
+    _fmpz_vec_dot_general(res, initial, subtract, vec1, vec2, 1, len);
     fmpz_mod_set_fmpz(res, res, FMPZ_MOD_CTX(ctx));
-
     return GR_SUCCESS;
 }
+
+int
+_gr_fmpz_mod_vec_addmul_scalar(fmpz * res, const fmpz * vec, slong len, const fmpz_t c, gr_ctx_t ctx)
+{
+    _fmpz_mod_vec_scalar_addmul_fmpz_mod(res, vec, len, c, FMPZ_MOD_CTX(ctx));
+    return GR_SUCCESS;
+}
+
 
 int
 _gr_fmpz_mod_poly_mullow(fmpz * res,
@@ -605,17 +658,25 @@ _gr_fmpz_mod_roots_gr_poly(gr_vec_t roots, gr_vec_t mult, const fmpz_mod_poly_t 
 }
 
 int
-_gr_fmpz_mod_mat_mul(fmpz_mat_t res, const fmpz_mat_t x, const fmpz_mat_t y, gr_ctx_t ctx)
+_gr_fmpz_mod_mat_mul(fmpz_mod_mat_t res, const fmpz_mod_mat_t x, const fmpz_mod_mat_t y, gr_ctx_t ctx)
 {
-    fmpz_mod_mat_t MM;
-
     fmpz_mat_mul(res, x, y);
+    _fmpz_mod_mat_reduce(res, FMPZ_MOD_CTX(ctx));
+    return GR_SUCCESS;
+}
 
-    *MM->mat = *res;
-    *MM->mod = *(FMPZ_MOD_CTX(ctx)->n);
+/* todo: tune cutoff for different bit sizes */
+/* also tune cutoff for triangular solving */
+int
+_gr_fmpz_mod_mat_lu(slong * rank, slong * P, fmpz_mod_mat_t LU, const fmpz_mod_mat_t A, int rank_check, gr_ctx_t ctx)
+{
+    return gr_mat_lu_recursive(rank, P, (gr_mat_struct *) LU, (const gr_mat_struct *) A, rank_check, 8, ctx);
+}
 
-    _fmpz_mod_mat_reduce(MM);
-
+int
+_gr_fmpz_mod_mat_det(fmpz_t res, const fmpz_mod_mat_t mat, gr_ctx_t ctx)
+{
+    fmpz_mod_mat_det(res, mat, FMPZ_MOD_CTX(ctx));
     return GR_SUCCESS;
 }
 
@@ -669,18 +730,25 @@ gr_method_tab_input _fmpz_mod_methods_input[] =
     {GR_METHOD_MUL_TWO,         (gr_funcptr) _gr_fmpz_mod_mul_two},
     {GR_METHOD_SQR,             (gr_funcptr) _gr_fmpz_mod_sqr},
     {GR_METHOD_DIV,             (gr_funcptr) _gr_fmpz_mod_div},
+    {GR_METHOD_DIV_NONUNIQUE,   (gr_funcptr) _gr_fmpz_mod_div_nonunique},
+    {GR_METHOD_DIVIDES,         (gr_funcptr) _gr_fmpz_mod_divides},
     {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) _gr_fmpz_mod_is_invertible},
     {GR_METHOD_INV,             (gr_funcptr) _gr_fmpz_mod_inv},
     {GR_METHOD_POW_UI,          (gr_funcptr) _gr_fmpz_mod_pow_ui},
     {GR_METHOD_POW_FMPZ,        (gr_funcptr) _gr_fmpz_mod_pow_fmpz},
+    {GR_METHOD_SQRT,            (gr_funcptr) _gr_fmpz_mod_sqrt},
+    {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_fmpz_mod_is_square},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_fmpz_mod_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_fmpz_mod_vec_dot_rev},
+    {GR_METHOD_VEC_ADDMUL_SCALAR,    (gr_funcptr) _gr_fmpz_mod_vec_addmul_scalar},
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _gr_fmpz_mod_poly_mullow},
     {GR_METHOD_POLY_INV_SERIES, (gr_funcptr) _gr_fmpz_mod_poly_inv_series},
     {GR_METHOD_POLY_DIV_SERIES, (gr_funcptr) _gr_fmpz_mod_poly_div_series},
     {GR_METHOD_POLY_DIVREM,     (gr_funcptr) _gr_fmpz_mod_poly_divrem},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_fmpz_mod_roots_gr_poly},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_fmpz_mod_mat_mul},
+    {GR_METHOD_MAT_LU,          (gr_funcptr) _gr_fmpz_mod_mat_lu},
+    {GR_METHOD_MAT_DET,         (gr_funcptr) _gr_fmpz_mod_mat_det},
     {0,                         (gr_funcptr) NULL},
 };
 
@@ -693,6 +761,7 @@ gr_ctx_init_fmpz_mod(gr_ctx_t ctx, const fmpz_t n)
     FMPZ_MOD_CTX(ctx) = flint_malloc(sizeof(fmpz_mod_ctx_struct));
     fmpz_mod_ctx_init(FMPZ_MOD_CTX(ctx), n);
     FMPZ_MOD_IS_PRIME(ctx) = T_UNKNOWN;
+    fmpz_init(FMPZ_MOD_CTX_A(ctx));
 
     ctx->size_limit = WORD_MAX;
 
@@ -713,6 +782,7 @@ _gr_ctx_init_fmpz_mod_from_ref(gr_ctx_t ctx, const void * fctx)
 
     FMPZ_MOD_CTX(ctx) = (fmpz_mod_ctx_struct *) fctx;
     FMPZ_MOD_IS_PRIME(ctx) = T_UNKNOWN;
+    fmpz_init(FMPZ_MOD_CTX_A(ctx));
 
     ctx->size_limit = WORD_MAX;
 

@@ -5,12 +5,16 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly_factor.h"
+#include "ulong_extras.h"
+#include "nmod_poly.h"
+#include "fmpz.h"
 #include "fq_zech.h"
+#include "mpoly.h"
+#include "nmod_mpoly_factor.h"
 #include "fq_zech_mpoly_factor.h"
 
 static void _frob_combine(
@@ -83,8 +87,7 @@ static void _frob_combine(
             fq_zech_get_nmod_poly(asdf, t->coeffs + i, ectx->fqctx);
             if (asdf->length != 1)
             {
-                flint_printf("fatal error in _frob_combine");
-                flint_abort();
+                flint_throw(FLINT_ERROR, "fatal error in _frob_combine");
             }
             s->coeffs[i] = asdf->coeffs[0];
             nmod_poly_clear(asdf);
@@ -350,4 +353,3 @@ cleanup:
 
     return success;
 }
-

@@ -26,6 +26,7 @@ Domain properties
               truth_t gr_ctx_is_algebraically_closed(gr_ctx_t ctx)
               truth_t gr_ctx_is_finite_characteristic(gr_ctx_t ctx)
               truth_t gr_ctx_is_ordered_ring(gr_ctx_t ctx)
+              truth_t gr_ctx_is_zero_ring(gr_ctx_t ctx)
 
     Returns whether the structure satisfies the respective
     mathematical property.
@@ -82,7 +83,8 @@ Base rings and fields
 .. function:: void gr_ctx_init_random(gr_ctx_t ctx, flint_rand_t state)
 
     Initializes *ctx* to a random ring. This will currently
-    only generate base rings.
+    only generate base rings and composite rings over certain
+    simple base rings.
 
 .. function:: void gr_ctx_init_fmpz(gr_ctx_t ctx)
 
@@ -119,24 +121,25 @@ Base rings and fields
     of integers modulo *n* where
     elements have type :type:`fmpz`. The modulus must be positive.
 
-.. function:: void gr_ctx_fmpz_mod_set_primality(gr_ctx_t ctx, truth_t is_prime)
+.. function:: void gr_ctx_nmod_set_primality(gr_ctx_t ctx, truth_t is_prime)
+              void gr_ctx_fmpz_mod_set_primality(gr_ctx_t ctx, truth_t is_prime)
 
-    For a ring initialized with :func:`gr_ctx_init_fmpz_mod`,
+    For a ring initialized with :func:`gr_ctx_init_nmod`
+    or :func:`gr_ctx_init_fmpz_mod` respectively,
     indicate whether the modulus is prime. This can speed up
     some computations.
 
 .. function:: void gr_ctx_init_fq(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var)
-              void gr_ctx_init_fq_nmod(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var)
-              void gr_ctx_init_fq_zech(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var)
+              void gr_ctx_init_fq_nmod(gr_ctx_t ctx, ulong p, slong d, const char * var)
+              void gr_ctx_init_fq_zech(gr_ctx_t ctx, ulong p, slong d, const char * var)
 
     Initializes *ctx* to the finite field `\mathbb{F}_q`
     where `q = p^d`. It is assumed (not checked) that *p* is prime.
     The variable name *var* can be ``NULL`` to use a default.
 
     The corresponding element types are ``fq_t``, ``fq_nmod_t``, ``fq_zech_t``.
-    The ``fq_nmod`` context requires `p < 2^{64}` while ``fq_zech``
-    requires `q < 2^{64}` (and in practice a much smaller value
-    than this).
+    The ``fq_zech`` context requires `q < 2^{64}` (and in practice a much
+    smaller value than this).
 
 .. function:: void gr_ctx_init_nf(gr_ctx_t ctx, const fmpq_poly_t poly)
               void gr_ctx_init_nf_fmpz_poly(gr_ctx_t ctx, const fmpz_poly_t poly)
@@ -150,6 +153,16 @@ Base rings and fields
 
     Initializes *ctx* to the field of real or complex algebraic
     numbers with elements of type :type:`qqbar_t`.
+
+.. function:: void _gr_ctx_qqbar_set_limits(gr_ctx_t ctx, slong deg_limit, slong bits_limit)
+
+    Limit degrees of intermediate operands of a *qqbar* context
+    to *deg_limit* and their bit sizes to *bits_limit* (approximately).
+    The limits refer to the sizes of resultants prior to
+    factorization (see :func:`qqbar_binop_within_limits`), so for example
+    adding two degree-100 algebraic numbers
+    requires a degree limit of at least 10000.
+    Warning: currently not all methods respect these limits.
 
 .. function:: void gr_ctx_init_real_arb(gr_ctx_t ctx, slong prec)
               void gr_ctx_init_complex_acb(gr_ctx_t ctx, slong prec)

@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -42,17 +42,11 @@ TEST_FUNCTION_START(nmod_mat_concat_horizontal, state)
         nmod_mat_window_init(window2, C, 0, c1, r1, c1 + c2);
 
         if (!(nmod_mat_equal(window1, A) && nmod_mat_equal(window2, B)))
-        {
-            flint_printf("A = \n");
-            nmod_mat_print_pretty(A);
-            flint_printf("B = \n");
-            nmod_mat_print_pretty(B);
-            flint_printf("A concat_horizontal B = \n");
-            nmod_mat_print_pretty(C);
-            flint_printf("FAIL: results not equal\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "A = %{nmod_mat}\n"
+                    "B = %{nmod_mat}\n"
+                    "A concat_horizontal B = %{nmod_mat}\n",
+                    A, B, C);
 
         nmod_mat_clear(A);
         nmod_mat_clear(B);

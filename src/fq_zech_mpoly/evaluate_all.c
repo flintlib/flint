@@ -5,11 +5,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fq_zech.h"
+#include "mpoly.h"
 #include "fq_zech_mpoly.h"
 
 void _fq_zech_mpoly_eval_all_fq_zech(
@@ -95,4 +97,3 @@ void fq_zech_mpoly_evaluate_all_ui(fq_zech_t eval, const fq_zech_mpoly_t A,
     _fq_zech_mpoly_eval_all_fq_zech(eval, A->coeffs, A->exps, A->length,
                                         A->bits, vals, ctx->minfo, ctx->fqctx);
 }
-

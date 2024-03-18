@@ -78,6 +78,11 @@ Context Management
     Returns `1` if the context contains an ``fq_zech`` context, `2` if it
     contains an ``fq_mod`` context and `3` if it contains an ``fq`` context.
 
+.. function:: void * fq_default_ctx_inner(const fq_default_ctx_t ctx)
+
+    Returns a pointer to the internal context object of type
+    ``fq_ctx_t``, ``fq_zech_ctx_t``, ``fmpz_mod_ctx_t``, etc.
+
 .. function:: slong fq_default_ctx_degree(const fq_default_ctx_t ctx)
 
     Returns the degree of the field extension
@@ -240,7 +245,7 @@ Output
 --------------------------------------------------------------------------------
 
 
-.. function:: int fq_default_fprint_pretty(FILE *file, const fq_default_t op, const fq_default_ctx_t ctx)
+.. function:: int fq_default_fprint_pretty(FILE * file, const fq_default_t op, const fq_default_ctx_t ctx)
 
     Prints a pretty representation of ``op`` to ``file``.
 

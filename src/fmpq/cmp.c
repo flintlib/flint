@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -42,11 +42,9 @@ _fmpq_cmp(const fmpz_t p, const fmpz_t q, const fmpz_t r, const fmpz_t s)
     if (s1 != s2)
         return s1 < s2 ? -1 : 1;
 
-    if (s1 == 0)
-        return -s2;
-
-    if (s2 == 0)
-        return -s1;
+    /* NOTE: If `p' and `r' was zero, then we stepped into the first
+     * if-statement. Else, if `p' or `r' was zero, then s1 != s2. Hence, at this
+     * stage `p' and `r' has to be non-zero. */
 
     bp = fmpz_bits(p);
     bq = fmpz_bits(q);
@@ -214,11 +212,9 @@ _fmpq_cmp_ui(const fmpz_t p, const fmpz_t q, ulong c)
     if (s1 != s2)
         return s1 < s2 ? -1 : 1;
 
-    if (s1 == 0)
-        return -s2;
-
-    if (s2 == 0)
-        return -s1;
+    /* NOTE: If `p' and `r' was zero, then we stepped into the first
+     * if-statement. Else, if `p' or `r' was zero, then s1 != s2. Hence, at this
+     * stage `p' and `r' has to be non-zero. */
 
     bp = fmpz_bits(p);
     bq = fmpz_bits(q);

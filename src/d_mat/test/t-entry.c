@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -31,25 +31,13 @@ TEST_FUNCTION_START(d_mat_entry, state)
         d_mat_init(A, rows, cols);
 
         for (j = 0; j < rows; j++)
-        {
             for (k = 0; k < cols; k++)
-            {
                 d_mat_entry(A, j, k) = 3 * j + 7 * k;
-            }
-        }
 
         for (j = 0; j < rows; j++)
-        {
             for (k = 0; k < cols; k++)
-            {
                 if (d_mat_entry(A, j, k) != 3 * j + 7 * k)
-                {
-                    flint_printf("FAIL: get/set entry %wd, %wd\n", j, k);
-                    fflush(stdout);
-                    flint_abort();
-                }
-            }
-        }
+                    TEST_FUNCTION_FAIL("get/set entry %wd, %wd\n", j, k);
 
         d_mat_clear(A);
     }

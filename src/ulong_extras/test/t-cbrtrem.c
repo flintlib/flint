@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -38,14 +38,12 @@ TEST_FUNCTION_START(n_cbrtrem, state)
         result = ((a == i) && (b == j));
 
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("Passed Parameters : n = %wu", c);
-            flint_printf("Answer generated : base = %wu remainder = %wu", a, b);
-            flint_printf("Expected answer : base = %wu remainder = %wu", i, j);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Passed Parameters: n = %wu"
+                    "Answer generated: base = %wu remainder = %wu"
+                    "Expected answer: base = %wu remainder = %wu",
+                    c, a, b, i, j);
+
         mpz_clear(e);
         mpz_clear(f);
         mpz_clear(g);

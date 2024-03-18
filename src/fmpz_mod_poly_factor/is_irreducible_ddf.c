@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -56,12 +56,7 @@ int fmpz_mod_poly_is_irreducible_ddf(const fmpz_mod_poly_t poly,
     fmpz_mod_poly_init(vinv, ctx);
     fmpz_mod_poly_init(tmp, ctx);
 
-    if (!(h = flint_malloc((2 * m + l + 1) * sizeof(fmpz_mod_poly_struct))))
-    {
-        flint_printf("Exception (fmpz_mod_poly_is_irreducible_ddf): \n");
-        flint_printf("Not enough memory.\n");
-        flint_abort();
-    }
+    h = flint_malloc((2 * m + l + 1) * sizeof(fmpz_mod_poly_struct));
     H = h + (l + 1);
     I = H + m;
 

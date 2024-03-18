@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2021 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #ifndef DOUBLE_INTERVAL_H
@@ -15,7 +15,7 @@
 #ifdef DOUBLE_INTERVAL_INLINES_C
 #define DOUBLE_INTERVAL_INLINE
 #else
-#define DOUBLE_INTERVAL_INLINE static __inline__
+#define DOUBLE_INTERVAL_INLINE static inline
 #endif
 
 #include <math.h>
@@ -36,8 +36,7 @@ di_t;
 #define DI_CHECK(__x) \
     if (!(__x.a <= __x.b)) \
     { \
-        flint_printf("di_t endpoints %g, %g not ordered\n", __x.a, __x.b); \
-        flint_abort(); \
+        flint_throw(FLINT_ERROR, "di_t endpoints %g, %g not ordered\n", __x.a, __x.b); \
     } \
 
 DOUBLE_INTERVAL_INLINE
@@ -47,8 +46,7 @@ di_t di_interval(double a, double b)
 
     if (!(a <= b))
     {
-        flint_printf("di_interval endpoints %g, %g not ordered\n", a, b);
-        flint_abort();
+        flint_throw(FLINT_ERROR, "di_interval endpoints %g, %g not ordered\n", a, b);
     }
 
     res.a = a;
@@ -220,4 +218,3 @@ di_t di_randtest(flint_rand_t state)
 #endif
 
 #endif
-

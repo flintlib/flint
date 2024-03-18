@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -14,7 +14,7 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
 #include "fft_small.h"
 #endif
 
@@ -118,7 +118,7 @@ _fmpz_poly_mul(fmpz * res, const fmpz * poly1,
     bits1 = FLINT_ABS(bits1);
     bits2 = FLINT_ABS(bits2);
 
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
     if (len2 >= 80 && (bits1 + bits2 <= 40 || bits1 + bits2 >= 128 || len2 >= 100))
         if (_fmpz_poly_mul_mid_default_mpn_ctx(res, 0, len1 + len2 - 1, poly1, len1, poly2, len2))
             return;
@@ -141,7 +141,7 @@ _fmpz_poly_mul(fmpz * res, const fmpz * poly1,
         }
     }
 
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
 
     if (len2 <= 6 && FLINT_MIN(bits1, bits2) <= 5000)
         _fmpz_poly_mul_classical(res, poly1, len1, poly2, len2);

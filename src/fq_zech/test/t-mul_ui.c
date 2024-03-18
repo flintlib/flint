@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -16,14 +16,16 @@
 
 TEST_FUNCTION_START(fq_zech_mul_ui, state)
 {
-    int j, i, result;
-    fq_zech_ctx_t ctx;
+    slong ix, jx;
+    int result;
 
-    for (j = 0; j < 50; j++)
+    for (ix = 0; ix < 100 * flint_test_multiplier(); ix++)
     {
-        fq_zech_ctx_randtest(ctx, state);
+        fq_zech_ctx_t ctx;
 
-        for (i = 0; i < 200; i++)
+        fq_zech_ctx_init_randtest(ctx, state, 1);
+
+        for (jx = 0; jx < 10; jx++)
         {
             mp_limb_t x;
             fq_nmod_t aa, bb;
@@ -70,7 +72,7 @@ TEST_FUNCTION_START(fq_zech_mul_ui, state)
             fq_nmod_clear(aa, ctx->fq_nmod_ctx);
         }
 
-        for (i = 0; i < 200; i++)
+        for (jx = 0; jx < 10; jx++)
         {
             mp_limb_t x;
             fq_nmod_t aa, bb;

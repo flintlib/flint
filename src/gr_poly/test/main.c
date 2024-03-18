@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -55,6 +55,7 @@
 #include "t-resultant_euclidean.c"
 #include "t-resultant_hgcd.c"
 #include "t-resultant_sylvester.c"
+#include "t-revert_series.c"
 #include "t-roots.c"
 #include "t-roots_other.c"
 #include "t-rsqrt_series.c"
@@ -113,6 +114,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_poly_resultant_euclidean),
     TEST_FUNCTION(gr_poly_resultant_hgcd),
     TEST_FUNCTION(gr_poly_resultant_sylvester),
+    TEST_FUNCTION(gr_poly_revert_series),
     TEST_FUNCTION(gr_poly_roots),
     TEST_FUNCTION(gr_poly_roots_other),
     TEST_FUNCTION(gr_poly_rsqrt_series),

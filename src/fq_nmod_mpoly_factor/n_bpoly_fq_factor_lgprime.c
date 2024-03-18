@@ -5,14 +5,18 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fq_nmod.h"
 #include "nmod_mat.h"
 #include "fmpz_poly_factor.h"
-#include "nmod_mpoly_factor.h"
+#include "fq_nmod_poly.h"
 #include "fq_nmod_poly_factor.h"
+#include "n_poly.h"
+#include "nmod_mpoly_factor.h"
+#include "mpoly.h"
 #include "fq_nmod_mpoly_factor.h"
 
 static void n_fq_bpoly_eval_sm_to_lg(
@@ -500,7 +504,7 @@ static void _hensel_lift_fac(
     n_poly_init(tq);
     n_poly_init(tr);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     n_fq_bpoly_mul(t1, g, a, ctx);
     n_fq_bpoly_mul(t2, h, b, ctx);
     n_fq_bpoly_add(c, t1, t2, ctx);
@@ -546,7 +550,7 @@ static void _hensel_lift_fac(
     n_bpoly_swap(G, t1);
     n_bpoly_swap(H, t2);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         n_poly_t p01;
         n_poly_init(p01);
@@ -594,7 +598,7 @@ static void _hensel_lift_inv(
     n_poly_init(tq);
     n_poly_init(tr);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         n_fq_bpoly_mul(t1, G, A, ctx);
         n_fq_bpoly_mul(t2, H, B, ctx);
@@ -649,7 +653,7 @@ static void _hensel_lift_inv(
     n_bpoly_swap(t1, B);
     n_bpoly_swap(t2, A);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         n_poly_t p01;
         n_poly_init(p01);
@@ -936,4 +940,3 @@ cleanup:
 
     return success;
 }
-

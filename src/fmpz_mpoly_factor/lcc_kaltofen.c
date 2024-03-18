@@ -5,13 +5,15 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "mpoly.h"
 #include "fmpz_mpoly_factor.h"
-#include "n_poly.h"
 
 static void fmpz_mpoly_convert_perm(
     fmpz_mpoly_t A,
@@ -149,8 +151,8 @@ static void _make_bases_coprime(
         fmpz_poly_gcd(g, A->p + i, B->p + j);
         if (fmpz_poly_degree(g) > 0)
         {
-            fmpz_poly_div(A->p + i, A->p + i, g);
-            fmpz_poly_div(B->p + j, B->p + j, g);
+            fmpz_poly_divexact(A->p + i, A->p + i, g);
+            fmpz_poly_divexact(B->p + j, B->p + j, g);
             fmpz_poly_factor_fit_length(A, A->num + 1);
             fmpz_poly_set(A->p + A->num, g);
             A->exp[A->num] = A->exp[i];
@@ -434,8 +436,7 @@ void fmpz_mpoly_factor_divexact_mpoly_pow_ui(
         sgn = fmpz_sgn(A->exp + A->num);
         if (sgn < 0)
         {
-            flint_printf("non-exact division fmpz_mpoly_factor_divexact_mpoly_pow_ui");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "non-exact division fmpz_mpoly_factor_divexact_mpoly_pow_ui");
         }
         else if (sgn > 0)
         {
@@ -456,8 +457,7 @@ void fmpz_mpoly_factor_divexact_mpoly_pow_ui(
 
     if (!fmpz_mpoly_is_fmpz(b, ctx))
     {
-        flint_printf("non-exact division fmpz_mpoly_factor_divexact_mpoly_pow_ui");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "non-exact division fmpz_mpoly_factor_divexact_mpoly_pow_ui");
     }
 
     fmpz_mpoly_clear(b_copy, ctx);
@@ -730,4 +730,3 @@ cleanup:
 
     return success;
 }
-

@@ -5,12 +5,16 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fq_nmod.h"
 #include "n_poly.h"
 
+#if FLINT_WANT_ASSERT
+# include "fq_nmod_poly.h"
+#endif
 
 #define N_FQ_POLY_DIVREM_BASECASE_ITCH \
     FLINT_MAX(FLINT_MAX(4, N_FQ_MUL_ITCH), 2 + (N_FQ_REDUCE_ITCH))
@@ -313,7 +317,7 @@ void n_fq_poly_divrem_divconquer_(
     mp_limb_t * tmp, * invB;
     n_poly_t Qt, Rt;
     mp_limb_t * q, * r;
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fq_nmod_poly_t QQ, RR, AA, BB;
 #endif
 
@@ -324,7 +328,7 @@ void n_fq_poly_divrem_divconquer_(
         return;
     }
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fq_nmod_poly_init(QQ, ctx);
     fq_nmod_poly_init(RR, ctx);
     fq_nmod_poly_init(AA, ctx);
@@ -385,7 +389,7 @@ void n_fq_poly_divrem_divconquer_(
 
     n_poly_stack_vec_clear(St);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     n_fq_poly_get_fq_nmod_poly(AA, Q, ctx);
     n_fq_poly_get_fq_nmod_poly(BB, R, ctx);
     FLINT_ASSERT(fq_nmod_poly_equal(AA, QQ, ctx));

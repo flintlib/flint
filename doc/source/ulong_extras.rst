@@ -11,7 +11,7 @@ The module includes functions for square roots, factorisation and
 primality testing. Almost all the functions in this module are highly
 developed and extremely well optimised.
 
-The basic type is the ``mp_limb_t`` as defined by MPIR. Functions
+The basic type is the ``mp_limb_t`` as defined by GMP. Functions
 which take a precomputed inverse either have the suffix ``preinv`` and
 take an ``mp_limb_t`` precomputed inverse as computed by
 ``n_preinvert_limb`` or have the suffix ``_precomp`` and accept a
@@ -700,7 +700,7 @@ Prime number generation and counting
     Currently, this function simply extends the table of cached primes up to
     an upper limit and then performs a binary search.
 
-.. function:: void n_prime_pi_bounds(ulong *lo, ulong *hi, ulong n)
+.. function:: void n_prime_pi_bounds(ulong * lo, ulong * hi, ulong n)
 
     Calculates lower and upper bounds for the value of the prime counting
     function ``lo <= pi(n) <= hi``. If ``lo`` and ``hi`` point to
@@ -725,7 +725,7 @@ Prime number generation and counting
     This function simply ensures that the table of cached primes is large
     enough and then looks up the entry.
 
-.. function:: void n_nth_prime_bounds(ulong *lo, ulong *hi, ulong n)
+.. function:: void n_nth_prime_bounds(ulong * lo, ulong * hi, ulong n)
 
     Calculates lower and upper bounds for the  `n`\th prime number `p_n` ,
     ``lo <= p_n <= hi``. If ``lo`` and ``hi`` point to the same
@@ -734,7 +734,7 @@ Prime number generation and counting
 
     We use the following estimates, valid for `n > 5` :
 
-    .. math ::
+    .. math::
 
         p_n  & >  n (\ln n + \ln \ln n - 1) \\
         p_n  & <  n (\ln n + \ln \ln n) \\
@@ -864,7 +864,7 @@ Primality testing
     Tests if `n` is a strong probable prime to the base `a`. We require
     that `d` is set to the largest odd factor of `n - 1` and ``npre``
     is a precomputed inverse of `n` computed with :func:`n_preinvert_limb`.
-    We require a to be reduced modulo `n` and not `0` and `n` to be odd.
+    We require `a` to be reduced modulo `n` and non-zero, and `n` to be odd.
 
     If we write `n - 1 = 2^s d` where `d` is odd then `n` is a strong
     probable prime to the base `a` (an `a`-SPRP) if either `a^d = 1 \pmod n`
@@ -1018,7 +1018,7 @@ Square root and perfect power testing
     `1` are considered squares. No guarantees are made about `r` or `k`
     being the minimum possible value.
 
-.. function:: ulong n_rootrem(ulong* remainder, ulong n, ulong root)
+.. function:: ulong n_rootrem(ulong * remainder, ulong n, ulong root)
 
     This function uses the Newton iteration method to calculate the nth root of
     a number.
@@ -1062,7 +1062,7 @@ Square root and perfect power testing
     https://mpmath.org, using the function chebyfit. x is multiplied
     by ``2^exp`` and the cube root of 1, 2 or 4 (according to ``exp%3``).
 
-.. function:: ulong n_cbrtrem(ulong* remainder, ulong n)
+.. function:: ulong n_cbrtrem(ulong * remainder, ulong n)
 
     This function returns the integer truncation of the cube root of `n`.
     Remainder is set as `n` minus the cube of the value returned.
@@ -1149,7 +1149,7 @@ Factorisation
     `0` for ``start``. By default this adds factors to an already existing
     ``n_factor_t`` or to a newly initialised one.
 
-.. function:: ulong n_factor_power235(ulong *exp, ulong n)
+.. function:: ulong n_factor_power235(ulong * exp, ulong n)
 
     Returns `0` if `n` is not a perfect square, cube or fifth power.
     Otherwise it returns the root and sets ``exp`` to either `2`,
@@ -1303,7 +1303,7 @@ Factorisation
     the time for ``n_factor`` on numbers that reach the ``n_factor_pp1``
     stage, i.e. after trial factoring and one line factoring.
 
-.. function:: int n_factor_pollard_brent_single(mp_limb_t *factor, mp_limb_t n, mp_limb_t ninv, mp_limb_t ai, mp_limb_t xi, mp_limb_t normbits, mp_limb_t max_iters)
+.. function:: int n_factor_pollard_brent_single(mp_limb_t * factor, mp_limb_t n, mp_limb_t ninv, mp_limb_t ai, mp_limb_t xi, mp_limb_t normbits, mp_limb_t max_iters)
 
     Pollard Rho algorithm (with Brent modification) for integer factorization.
     Assumes that the `n` is not prime. `factor` is set as the factor if found.
@@ -1322,7 +1322,7 @@ Factorisation
     suggested by Richard Brent in the paper, available at
     https://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf
 
-.. function:: int n_factor_pollard_brent(mp_limb_t *factor, flint_rand_t state, mp_limb_t n_in, mp_limb_t max_tries, mp_limb_t max_iters)
+.. function:: int n_factor_pollard_brent(mp_limb_t * factor, flint_rand_t state, mp_limb_t n_in, mp_limb_t max_tries, mp_limb_t max_iters)
 
     Pollard Rho algorithm, modified as suggested by Richard Brent. Makes a call to
     :func:`n_factor_pollard_brent_single`. The input parameters ai and xi for
@@ -1428,7 +1428,7 @@ Elliptic curve method for factorization of ``mp_limb_t``
 --------------------------------------------------------------------------------
 
 
-.. function:: void n_factor_ecm_double(mp_limb_t *x, mp_limb_t *z, mp_limb_t x0, mp_limb_t z0, mp_limb_t n, n_ecm_t n_ecm_inf)
+.. function:: void n_factor_ecm_double(mp_limb_t * x, mp_limb_t * z, mp_limb_t x0, mp_limb_t z0, mp_limb_t n, n_ecm_t n_ecm_inf)
 
     Sets the point `(x : z)` to two times `(x_0 : z_0)` modulo `n` according
     to the formula
@@ -1440,7 +1440,7 @@ Elliptic curve method for factorization of ``mp_limb_t``
     This group doubling is valid only for points expressed in
     Montgomery projective coordinates.
 
-.. function:: void n_factor_ecm_add(mp_limb_t *x, mp_limb_t *z, mp_limb_t x1, mp_limb_t z1, mp_limb_t x2, mp_limb_t z2, mp_limb_t x0, mp_limb_t z0, mp_limb_t n, n_ecm_t n_ecm_inf)
+.. function:: void n_factor_ecm_add(mp_limb_t * x, mp_limb_t * z, mp_limb_t x1, mp_limb_t z1, mp_limb_t x2, mp_limb_t z2, mp_limb_t x0, mp_limb_t z0, mp_limb_t n, n_ecm_t n_ecm_inf)
 
     Sets the point `(x : z)` to the sum of `(x_1 : z_1)` and `(x_2 : z_2)`
     modulo `n`, given the difference `(x_0 : z_0)` according to the formula
@@ -1448,7 +1448,7 @@ Elliptic curve method for factorization of ``mp_limb_t``
     This group doubling is valid only for points expressed in
     Montgomery projective coordinates.
 
-.. function:: void n_factor_ecm_mul_montgomery_ladder(mp_limb_t *x, mp_limb_t *z, mp_limb_t x0, mp_limb_t z0, mp_limb_t k, mp_limb_t n, n_ecm_t n_ecm_inf)
+.. function:: void n_factor_ecm_mul_montgomery_ladder(mp_limb_t * x, mp_limb_t * z, mp_limb_t x0, mp_limb_t z0, mp_limb_t k, mp_limb_t n, n_ecm_t n_ecm_inf)
 
     Montgomery ladder algorithm for scalar multiplication of elliptic points.
 
@@ -1456,7 +1456,7 @@ Elliptic curve method for factorization of ``mp_limb_t``
 
     Valid only for points expressed in Montgomery projective coordinates.
 
-.. function:: int n_factor_ecm_select_curve(mp_limb_t *f, mp_limb_t sigma, mp_limb_t n, n_ecm_t n_ecm_inf)
+.. function:: int n_factor_ecm_select_curve(mp_limb_t * f, mp_limb_t sigma, mp_limb_t n, n_ecm_t n_ecm_inf)
 
     Selects a random elliptic curve given a random integer ``sigma``,
     according to Suyama's parameterization. If the factor is found while
@@ -1471,7 +1471,7 @@ Elliptic curve method for factorization of ``mp_limb_t``
     The curve selected is of Montgomery form, the points selected satisfy the
     curve and are projective coordinates.
 
-.. function:: int n_factor_ecm_stage_I(mp_limb_t *f, const mp_limb_t *prime_array, mp_limb_t num, mp_limb_t B1, mp_limb_t n, n_ecm_t n_ecm_inf)
+.. function:: int n_factor_ecm_stage_I(mp_limb_t * f, const mp_limb_t * prime_array, mp_limb_t num, mp_limb_t B1, mp_limb_t n, n_ecm_t n_ecm_inf)
 
     Stage I implementation of the ECM algorithm.
 
@@ -1481,7 +1481,7 @@ Elliptic curve method for factorization of ``mp_limb_t``
 
     If the factor is found, `1` is returned, otherwise `0`.
 
-.. function:: int n_factor_ecm_stage_II(mp_limb_t *f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P, mp_limb_t n, n_ecm_t n_ecm_inf)
+.. function:: int n_factor_ecm_stage_II(mp_limb_t * f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P, mp_limb_t n, n_ecm_t n_ecm_inf)
 
     Stage II implementation of the ECM algorithm.
 
@@ -1491,7 +1491,7 @@ Elliptic curve method for factorization of ``mp_limb_t``
 
     If the factor is found, `1` is returned, otherwise `0`.
 
-.. function:: int n_factor_ecm(mp_limb_t *f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2, flint_rand_t state, mp_limb_t n)
+.. function:: int n_factor_ecm(mp_limb_t * f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2, flint_rand_t state, mp_limb_t n)
 
     Outer wrapper function for the ECM algorithm. It factors `n` which
     must fit into a ``mp_limb_t``.

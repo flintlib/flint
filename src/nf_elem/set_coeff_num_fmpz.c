@@ -1,18 +1,13 @@
-/*=============================================================================
-
-    This file is part of Antic.
-
-    Antic is free software: you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version. See <http://www.gnu.org/licenses/>.
-
-=============================================================================*/
-/******************************************************************************
-
+/*
     Copyright (C) 2014 William Hart
 
-******************************************************************************/
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
+*/
 
 #include "nf_elem.h"
 
@@ -20,8 +15,7 @@ void _nf_elem_set_coeff_num_fmpz(nf_elem_t a, slong i, const fmpz_t b, const nf_
 {
     if (i > 2*(fmpq_poly_degree(nf->pol) - 1))
     {
-        flint_printf("Degree out of range\n");
-	flint_abort();
+        flint_throw(FLINT_ERROR, "(%s): Degree out of range\n", __func__);
     }
 
     if (nf->flag & NF_LINEAR)

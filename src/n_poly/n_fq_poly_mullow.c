@@ -5,12 +5,16 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fq_nmod.h"
 #include "n_poly.h"
 
+#if FLINT_WANT_ASSERT
+# include "fq_nmod_poly.h"
+#endif
 
 void _n_fq_poly_mullow_(
     mp_limb_t * rop,
@@ -88,7 +92,7 @@ void n_fq_poly_mullow_(
     slong Blen = B->length;
     slong Clen = C->length;
     const slong m = FLINT_MIN(order, Blen + Clen - 1);
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fq_nmod_poly_t AA, BB, CC;
 #endif
 
@@ -111,7 +115,7 @@ void n_fq_poly_mullow_(
         return;
     }
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fq_nmod_poly_init(AA, ctx);
     fq_nmod_poly_init(BB, ctx);
     fq_nmod_poly_init(CC, ctx);
@@ -125,7 +129,7 @@ void n_fq_poly_mullow_(
     A->length = m;
     _n_fq_poly_normalise(A, d);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     n_fq_poly_get_fq_nmod_poly(BB, A, ctx);
     FLINT_ASSERT(fq_nmod_poly_equal(BB, AA, ctx));
     fq_nmod_poly_clear(AA, ctx);

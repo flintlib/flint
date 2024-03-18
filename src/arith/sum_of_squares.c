@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -119,7 +119,6 @@ arith_sum_of_squares(fmpz_t r, ulong k, const fmpz_t n)
         sum_of_squares_series(r, k, fmpz_get_ui(n));
     else
     {
-        flint_printf("Exception (arith_sum_of_squares). n is too large.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (arith_sum_of_squares). n is too large.\n");
     }
 }

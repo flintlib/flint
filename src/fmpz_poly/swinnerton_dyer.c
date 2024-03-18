@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -26,7 +26,7 @@ _fmpz_poly_swinnerton_dyer(fmpz * T, ulong n)
         arb_poly_init(t);
         arb_poly_swinnerton_dyer_ui(t, n, 0);
         if (!_arb_vec_get_unique_fmpz_vec(T, t->coeffs, t->length))
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
         arb_poly_clear(t);
     }
 }
@@ -39,4 +39,3 @@ fmpz_poly_swinnerton_dyer(fmpz_poly_t poly, ulong n)
     _fmpz_poly_swinnerton_dyer(poly->coeffs, n);
     _fmpz_poly_set_length(poly, N + 1);
 }
-

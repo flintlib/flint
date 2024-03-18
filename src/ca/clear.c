@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2020 Fredrik Johansson
 
-    This file is part of Calcium.
+    This file is part of FLINT.
 
-    Calcium is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "ca.h"
@@ -58,9 +58,7 @@ ca_clear(ca_t x, ca_ctx_t ctx)
 #if CHECK_DATA
             if (nf_elem_is_rational(CA_NF_ELEM(x), CA_FIELD_NF(field)))
             {
-                ca_print(x, ctx); printf("\n");
-                flint_printf("ca_clear: nf_elem is rational!\n");
-                flint_abort();
+                flint_throw(FLINT_ERROR, "ca_clear: nf_elem is rational:\n\nx = %s\n", ca_get_str(x, ctx));
             }
 #endif
 
@@ -71,9 +69,7 @@ ca_clear(ca_t x, ca_ctx_t ctx)
 #if CHECK_DATA
             if (fmpz_mpoly_q_is_fmpq(CA_MPOLY_Q(x), CA_FIELD_MCTX(field, ctx)))
             {
-                ca_print(x, ctx); printf("\n");
-                flint_printf("ca_clear: mpoly_q is rational!\n");
-                flint_abort();
+                flint_throw(FLINT_ERROR, "ca_clear: mpoly_q is rational:\n\nx = %s\n", ca_get_str(x, ctx));
             }
 #endif
 
@@ -82,4 +78,3 @@ ca_clear(ca_t x, ca_ctx_t ctx)
         }
     }
 }
-

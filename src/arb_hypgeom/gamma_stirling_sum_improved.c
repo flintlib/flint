@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2021 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "arb_hypgeom.h"
@@ -425,4 +425,3 @@ arb_hypgeom_gamma_stirling_sum_improved(arb_t s, const arb_t z, slong N, slong K
     mag_clear(zinv_mag);
     mag_clear(err);
 }
-

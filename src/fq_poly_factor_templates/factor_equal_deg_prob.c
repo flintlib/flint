@@ -5,12 +5,13 @@
     Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2012 Lina Kulakova
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -34,9 +35,7 @@ TEMPLATE(T, poly_factor_equal_deg_prob) (TEMPLATE(T, poly_t) factor,
 
     if (pol->length <= 1)
     {
-        TEMPLATE_PRINTF("Exception (%s_poly_factor_equal_deg_prob): \n", T);
-        flint_printf("Input polynomial is linear.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (" TEMPLATE_STR(T) "_poly_factor_equal_deg_prob): Input polynomial is linear.\n");
     }
 
     fmpz_init(q);
@@ -65,8 +64,13 @@ TEMPLATE(T, poly_factor_equal_deg_prob) (TEMPLATE(T, poly_t) factor,
     TEMPLATE(T, poly_inv_series_newton) (polinv, polinv, polinv->length, ctx);
 
     fmpz_init(exp);
+#if defined(FQ_NMOD_POLY_FACTOR_H) || defined(FQ_ZECH_POLY_FACTOR_H)
+    if (TEMPLATE(T, ctx_prime)(ctx) > 2)
+    {
+#else
     if (fmpz_cmp_ui(TEMPLATE(T, ctx_prime) (ctx), 2) > 0)
     {
+#endif
         /* compute a^{(q^d-1)/2} rem pol */
         fmpz_pow_ui(exp, q, d);
         fmpz_sub_ui(exp, exp, 1);

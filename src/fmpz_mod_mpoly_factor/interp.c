@@ -5,12 +5,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mod.h"
+#include "mpoly.h"
 #include "fmpz_mod_mpoly_factor.h"
-
 
 /*
     E = A(v = alpha)
@@ -347,7 +348,7 @@ int fmpz_mod_polyu1n_interp_crt_2sm_poly(
     Texps = T->exps;
     Ti = 0;
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mod_poly_evaluate_fmpz(u, modulus, alphapow->coeffs + 1, ctx);
     fmpz_mod_mul(u, u, alphapow->coeffs + 1, ctx);
     fmpz_mod_add(u, u, u, ctx);
@@ -971,7 +972,7 @@ int fmpz_mod_mpolyn_interp_crt_2sm_mpolyn(
     fmpz_init(FvalueA);
     fmpz_init(FvalueB);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mod_poly_evaluate_fmpz(u, modulus, alphapow->coeffs + 1, ctx->ffinfo);
     fmpz_mod_mul(u, u, alphapow->coeffs + 1, ctx->ffinfo);
     fmpz_mod_add(u, u, u, ctx->ffinfo);
@@ -1315,4 +1316,3 @@ int fmpz_mod_mpolyn_interp_mcrt_sm_mpoly(
     *lastdeg = lastlen - 1;
     return changed;
 }
-

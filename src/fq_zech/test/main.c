@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -16,7 +16,7 @@
 
 #include "t-add.c"
 #include "t-assign.c"
-#include "t-ctx_init.c"
+#include "t-ctx_init_ui.c"
 #include "t-div.c"
 #include "t-frobenius.c"
 #include "t-get_set_fmpz.c"
@@ -46,7 +46,7 @@ test_struct tests[] =
 {
     TEST_FUNCTION(fq_zech_add),
     TEST_FUNCTION(fq_zech_assign),
-    TEST_FUNCTION(fq_zech_ctx_init),
+    TEST_FUNCTION(fq_zech_ctx_init_ui),
     TEST_FUNCTION(fq_zech_div),
     TEST_FUNCTION(fq_zech_frobenius),
     TEST_FUNCTION(fq_zech_get_set_fmpz),

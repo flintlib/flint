@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -51,7 +51,7 @@ static void _fmpz_vec_get_fft_coeff(mp_limb_t ** coeffs_f,
 
     if (signed_c) /* write out FFT coefficient, ensuring sign is correct */
     {
-        mpn_neg_n(coeffs_f[i], coeff, size_j);
+        mpn_neg(coeffs_f[i], coeff, size_j);
         flint_mpn_store(coeffs_f[i] + size_j, size_f - size_j, WORD(-1));
     }
     else

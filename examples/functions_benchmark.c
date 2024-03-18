@@ -92,7 +92,7 @@ slong limit[] = {
     1e7,
 };
 
-int main()
+int main(void)
 {
     arb_t x, y, res;
     slong n, prec;

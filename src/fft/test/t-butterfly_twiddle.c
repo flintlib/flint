@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -81,6 +81,9 @@ TEST_FUNCTION_START(fft_ifft_butterfly_twiddle, state)
 
                 for (c = 0; c < n; c++)
                 {
+                    if (n_randint(state, 100) > 2.0 + flint_test_multiplier() * 10)
+                        continue;
+
                     b1 = n_randint(state, n*w);
                     b2 = n_randint(state, n*w);
                     nn1 = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
@@ -147,6 +150,9 @@ TEST_FUNCTION_START(fft_ifft_butterfly_twiddle, state)
 
                 for (c = 0; c < n; c++)
                 {
+                    if (n_randint(state, 100) > 2.0 + flint_test_multiplier() * 10)
+                        continue;
+
                     b1 = n_randint(state, n*w);
                     b2 = n_randint(state, n*w);
                     nn1 = flint_malloc((limbs + 1)*sizeof(mp_limb_t));

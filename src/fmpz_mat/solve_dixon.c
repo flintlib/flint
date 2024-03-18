@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -216,8 +216,7 @@ fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
 
     if (!fmpz_mat_is_square(A))
     {
-        flint_printf("Exception (fmpz_mat_solve_dixon). Non-square system matrix.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mat_solve_dixon). Non-square system matrix.\n");
     }
 
     if (fmpz_mat_is_empty(A) || fmpz_mat_is_empty(B))

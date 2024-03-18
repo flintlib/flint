@@ -5,13 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "test_helpers.h"
 #include "nmod_mpoly.h"
 
+#if defined(nmod_mpoly_divides_heap_threaded)
 TEST_FUNCTION_START(nmod_mpoly_divides_heap_threaded, state)
 {
     int i, j, result, result2, max_threads = 5, tmul = 30;
@@ -428,3 +429,9 @@ TEST_FUNCTION_START(nmod_mpoly_divides_heap_threaded, state)
 
     TEST_FUNCTION_END(state);
 }
+#else
+TEST_FUNCTION_START(nmod_mpoly_divides_heap_threaded, state)
+{
+    TEST_FUNCTION_END_SKIPPED(state);
+}
+#endif

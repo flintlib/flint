@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2022 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #ifndef FMPZI_H
@@ -15,7 +15,7 @@
 #ifdef FMPZI_INLINES_C
 #define FMPZI_INLINE
 #else
-#define FMPZI_INLINE static __inline__
+#define FMPZI_INLINE static inline
 #endif
 
 #include "fmpz.h"
@@ -82,15 +82,7 @@ fmpzi_swap(fmpzi_t x, fmpzi_t y)
     FLINT_SWAP(fmpzi_struct, *x, *y);
 }
 
-FMPZI_INLINE void
-fmpzi_print(const fmpzi_t x)
-{
-    fmpz_print(fmpzi_realref(x));
-    if (fmpz_sgn(fmpzi_imagref(x)) >= 0)
-        flint_printf("+");
-    fmpz_print(fmpzi_imagref(x));
-    flint_printf("*I");
-}
+void fmpzi_print(const fmpzi_t x);
 
 FMPZI_INLINE void
 fmpzi_set_si_si(fmpzi_t res, slong a, slong b)

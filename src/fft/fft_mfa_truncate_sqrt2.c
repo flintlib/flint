@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "thread_pool.h"
 #include "thread_support.h"
 #include "ulong_extras.h"
 #include "fft.h"
@@ -39,9 +40,9 @@ void fft_butterfly_twiddle(mp_limb_t * u, mp_limb_t * v,
 
    butterfly_lshB(u, v, s, t, limbs, x, y);
    mpn_mul_2expmod_2expp1(u, u, limbs, b1);
-   if (negate2) mpn_neg_n(u, u, limbs + 1);
+   if (negate2) mpn_neg(u, u, limbs + 1);
    mpn_mul_2expmod_2expp1(v, v, limbs, b2);
-   if (negate1) mpn_neg_n(v, v, limbs + 1);
+   if (negate1) mpn_neg(v, v, limbs + 1);
 }
 
 void fft_radix2_twiddle(mp_limb_t ** ii, mp_size_t is,

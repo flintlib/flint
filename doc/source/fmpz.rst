@@ -5,11 +5,11 @@
 
 By default, an :type:`fmpz_t` is implemented as an array of
 :type:`fmpz`'s of length one to allow passing by reference as one can
-do with GMP/ MPIR's :type:`mpz_t` type. The :type:`fmpz_t` type is
+do with GMP's :type:`mpz_t` type. The :type:`fmpz_t` type is
 simply a single limb, though the user does not need to be aware of
 this except in one specific case outlined below.
 
-In all respects, :type:`fmpz_t`'s act precisely like GMP/ MPIR's
+In all respects, :type:`fmpz_t`'s act precisely like GMP's
 ``mpz_t``'s, with automatic memory management, however, in the first
 place only one limb is used to implement them. Once an :type:`fmpz_t`
 overflows a limb then a multiprecision integer is automatically
@@ -108,54 +108,54 @@ Types, macros and constants
 
 .. macro:: COEFF_MAX
 
-   the largest (positive) value an ``fmpz`` can be if just an ``slong``.
+   The largest (positive) value an ``fmpz`` can be if just an ``slong``.
 
 .. macro:: COEFF_MIN
 
-   the smallest (negative) value an ``fmpz`` can be if just an ``slong``.
+   The smallest (negative) value an ``fmpz`` can be if just an ``slong``.
 
 .. function:: fmpz PTR_TO_COEFF(__mpz_struct * ptr)
 
-   a macro to convert an ``mpz_t`` (or more generally any ``__mpz_struct *``)
+   A macro to convert an ``mpz_t`` (or more generally any ``__mpz_struct *``)
    to an ``fmpz`` (shifts the pointer right by `2` and sets the second most
    significant bit).
 
 .. function:: __mpz_struct * COEFF_TO_PTR(fmpz f)
 
-   a macro to convert an ``fmpz`` which represents a pointer into an actual
+   A macro to convert an ``fmpz`` which represents a pointer into an actual
    pointer to an ``__mpz_struct`` (i.e. to an ``mpz_t``).
 
-.. function:: int COEFF_IS_MPZ(fmpz f)
+.. macro:: COEFF_IS_MPZ(f)
 
-   a macro which returns `1` if `f` represents an ``mpz_t``, otherwise `0` is
+   A macro which returns `1` if `f` represents an ``mpz_t``, otherwise `0` is
    returned.
 
 .. function:: __mpz_struct * _fmpz_new_mpz(void)
 
-   initialises a new ``mpz_t`` and returns a pointer to it. This is only used
+   Initialises a new ``mpz_t`` and returns a pointer to it. This is only used
    internally.
 
 .. function:: void _fmpz_clear_mpz(fmpz f)
 
-   clears the ``mpz_t`` "pointed to" by the ``fmpz`` `f`. This is only used
+   Clears the ``mpz_t`` "pointed to" by the ``fmpz`` `f`. This is only used
    internally.
 
 .. function:: void _fmpz_cleanup_mpz_content()
 
-   this function does nothing in the reentrant version of ``fmpz``.
+   This function does nothing in the reentrant version of ``fmpz``.
 
 .. function:: void _fmpz_cleanup()
 
-   this function does nothing in the reentrant version of ``fmpz``.
+   This function does nothing in the reentrant version of ``fmpz``.
 
 .. function:: __mpz_struct * _fmpz_promote(fmpz_t f)
 
-   if `f` doesn't represent an ``mpz_t``, initialise one and associate it to
+   If `f` doesn't represent an ``mpz_t``, initialise one and associate it to
    `f`.
 
 .. function:: __mpz_struct * _fmpz_promote_val(fmpz_t f)
 
-   if `f` doesn't represent an ``mpz_t``, initialise one and associate it to
+   If `f` doesn't represent an ``mpz_t``, initialise one and associate it to
    `f`, but preserve the value of `f`.
 
    This function is for internal use. The resulting ``fmpz`` will be backed by
@@ -165,12 +165,12 @@ Types, macros and constants
 
 .. function:: void _fmpz_demote(fmpz_t f)
 
-   if `f` represents an ``mpz_t`` clear it and make `f` just represent an
+   If `f` represents an ``mpz_t`` clear it and make `f` just represent an
    ``slong``.
 
 .. function:: void _fmpz_demote_val(fmpz_t f)
 
-   if `f` represents an ``mpz_t`` and its value will fit in an ``slong``,
+   If `f` represents an ``mpz_t`` and its value will fit in an ``slong``,
    preserve the value in `f` which we make to represent an ``slong``, and
    clear the ``mpz_t``.
 
@@ -332,7 +332,7 @@ Conversion
 
     Sets the ``mpz_t`` `x` to the same value as `f`.
 
-.. function:: int fmpz_get_mpn(mp_ptr *n, fmpz_t n_in)
+.. function:: int fmpz_get_mpn(mp_ptr * n, fmpz_t n_in)
 
     Sets the ``mp_ptr`` `n` to the same value as `n_{in}`. Returned
     integer is number of limbs allocated to `n`, minimum number of limbs
@@ -525,7 +525,7 @@ Input and output
 
     This convention is adopted in light of the return values of
     ``scanf`` from the standard library and ``mpz_inp_str``
-    from MPIR.
+    from GMP.
 
 .. function:: int fmpz_fread(FILE * file, fmpz_t f)
 
@@ -538,9 +538,9 @@ Input and output
 
     This convention is adopted in light of the return values of
     ``scanf`` from the standard library and ``mpz_inp_str``
-    from MPIR.
+    from GMP.
 
-.. function:: size_t fmpz_inp_raw(fmpz_t x, FILE *fin )
+.. function:: size_t fmpz_inp_raw(fmpz_t x, FILE * fin)
 
     Reads a multiprecision integer from the stream ``file``.  The
     format is raw binary format write by :func:`fmpz_out_raw`.
@@ -551,35 +551,16 @@ Input and output
     This function calls the ``mpz_inp_raw`` function in library gmp. So that it
     can read the raw data written by ``mpz_inp_raw`` directly.
 
-.. function:: int fmpz_print(const fmpz_t x)
+.. function:: int fmpz_fprint(FILE * fs, const fmpz_t x)
+              int fmpz_print(const fmpz_t x)
 
-    Prints the value `x` to ``stdout``, without a carriage return (CR).
-    The value is printed as either `0`, the decimal digits of a
-    positive integer, or a minus sign followed by the digits of
-    a negative integer.
+    Prints the value `x` to ``fs`` or ``stdout``, without a carriage return.
+    The value is printed as either `0`, the decimal digits of a positive
+    integer, or a minus sign followed by the digits of a negative integer.
 
-    In case of success, returns a positive number.  In case of failure,
-    returns a non-positive number.
+    Returns the number of characters written to file stream.
 
-    This convention is adopted in light of the return values of
-    ``flint_printf`` from the standard library and ``mpz_out_str``
-    from MPIR.
-
-.. function:: int fmpz_fprint(FILE * file, const fmpz_t x)
-
-    Prints the value `x` to ``file``, without a carriage return (CR).
-    The value is printed as either `0`, the decimal digits of a
-    positive integer, or a minus sign followed by the digits of
-    a negative integer.
-
-    In case of success, returns a positive number.  In case of failure,
-    returns a non-positive number.
-
-    This convention is adopted in light of the return values of
-    ``flint_printf`` from the standard library and ``mpz_out_str``
-    from MPIR.
-
-.. function:: size_t fmpz_out_raw(FILE *fout, const fmpz_t x )
+.. function:: size_t fmpz_out_raw(FILE * fout, const fmpz_t x )
 
     Writes the value `x` to ``file``.
     The value is written in raw binary format. The integer is written in
@@ -592,7 +573,7 @@ Input and output
     In case of success, return a positive number, indicating number of bytes written.
     In case of failure, return 0.
 
-    The output of this can also be read by ``mpz_inp_raw`` from GMP >= 2,
+    The output of this can also be read by ``mpz_inp_raw`` from GMP,
     since this function calls the ``mpz_inp_raw`` function in library gmp.
 
 
@@ -1084,7 +1065,7 @@ Greatest common divisor
     canonical solution to satisfy one of the following if one of the given
     conditions apply:
 
-    .. math ::
+    .. math::
 
         \operatorname{xgcd}(\pm g, g) &= \bigl(|g|, 0, \operatorname{sgn}(g)\bigr)
 
@@ -1106,7 +1087,7 @@ Greatest common divisor
     If the pair `(f, g)` does not satisfy any of these conditions, the solution
     `(d, a, b)` will satisfy the following:
 
-    .. math ::
+    .. math::
 
         |a| < \Bigl| \frac{g}{2 d} \Bigr|,
         \qquad |b| < \Bigl| \frac{f}{2 d} \Bigr|.
@@ -1613,12 +1594,10 @@ Primality testing
 
     Finds the next prime number larger than `n`.
 
-    If ``proved`` is nonzero, then the integer returned is
-    guaranteed to actually be prime. Otherwise if `n` fits in
-    ``FLINT_BITS - 3`` bits ``n_nextprime`` is called, and if not then
-    the GMP ``mpz_nextprime`` function is called. Up to and including
-    GMP 6.1.2 this used Miller-Rabin iterations, and thereafter uses
-    a BPSW test.
+    If ``proved`` is nonzero, then the integer returned is guaranteed to
+    actually be prime. Otherwise if `n` fits in ``FLINT_BITS - 3`` bits
+    ``n_nextprime`` is called, and if not then the GMP ``mpz_nextprime``
+    function is called which uses a BPSW test.
 
 Special functions
 --------------------------------------------------------------------------------

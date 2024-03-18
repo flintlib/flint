@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -15,7 +15,7 @@
 #ifdef MPFR_MAT_INLINES_C
 #define MPFR_MAT_INLINE
 #else
-#define MPFR_MAT_INLINE static __inline__
+#define MPFR_MAT_INLINE static inline
 #endif
 
 #include "flint.h"
@@ -90,4 +90,3 @@ void mpfr_mat_mul_classical(mpfr_mat_t C, const mpfr_mat_t A, const mpfr_mat_t B
 #endif
 
 #endif
-

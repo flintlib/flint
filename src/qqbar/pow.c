@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2021 Fredrik Johansson
 
-    This file is part of Calcium.
+    This file is part of FLINT.
 
-    Calcium is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "ulong_extras.h"
@@ -211,8 +211,7 @@ qqbar_pow_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y)
     {
         if (fmpq_sgn(y) <= 0)
         {
-            flint_printf("qqbar_pow_fmpq: division by zero\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "qqbar_pow_fmpq: division by zero\n");
         }
 
         qqbar_zero(res);
@@ -239,8 +238,7 @@ qqbar_pow_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y)
 
             if (COEFF_IS_MPZ(*fmpq_denref(t)))
             {
-                flint_printf("qqbar_pow: excessive exponent\n");
-                flint_abort();
+                flint_throw(FLINT_ERROR, "qqbar_pow: excessive exponent\n");
             }
 
             qqbar_root_of_unity(res, *fmpq_numref(t), *fmpq_denref(t));
@@ -249,8 +247,7 @@ qqbar_pow_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y)
         {
             if (COEFF_IS_MPZ(*fmpq_numref(t)) || COEFF_IS_MPZ(*fmpq_denref(t)))
             {
-                flint_printf("qqbar_pow: excessive exponent\n");
-                flint_abort();
+                flint_throw(FLINT_ERROR, "qqbar_pow: excessive exponent\n");
             }
 
             p = *fmpq_numref(t);

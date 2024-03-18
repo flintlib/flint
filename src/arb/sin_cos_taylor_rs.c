@@ -1,15 +1,16 @@
 /*
     Copyright (C) 2014 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "arb.h"
+#include "mpn_extras.h"
 
 /* See verify_taylor.py for code to generate tables and
    proof of correctness */
@@ -35,8 +36,7 @@ void _arb_sin_cos_taylor_rs(mp_ptr ysin, mp_ptr ycos,
 
     if (2 * N >= FACTORIAL_TAB_SIZE - 1)
     {
-        flint_printf("_arb_sin_cos_taylor_rs: N too large!\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "_arb_sin_cos_taylor_rs: N too large!\n");
     }
 
     if (N <= 1)
@@ -73,13 +73,13 @@ void _arb_sin_cos_taylor_rs(mp_ptr ysin, mp_ptr ycos,
 #define XPOW_WRITE(__k) (xpow + (m - (__k)) * xn)
 #define XPOW_READ(__k) (xpow + (m - (__k) + 1) * xn)
 
-        mpn_sqr(XPOW_WRITE(1), x, xn);
-        mpn_sqr(XPOW_WRITE(2), XPOW_READ(1), xn);
+        flint_mpn_sqr(XPOW_WRITE(1), x, xn);
+        flint_mpn_sqr(XPOW_WRITE(2), XPOW_READ(1), xn);
 
         for (k = 4; k <= m; k += 2)
         {
-            mpn_mul_n(XPOW_WRITE(k - 1), XPOW_READ(k / 2), XPOW_READ(k / 2 - 1), xn);
-            mpn_sqr(XPOW_WRITE(k), XPOW_READ(k / 2), xn);
+            flint_mpn_mul_n(XPOW_WRITE(k - 1), XPOW_READ(k / 2), XPOW_READ(k / 2 - 1), xn);
+            flint_mpn_sqr(XPOW_WRITE(k), XPOW_READ(k / 2), xn);
         }
 
         for (cosorsin = sinonly; cosorsin < 2; cosorsin++)
@@ -119,7 +119,7 @@ void _arb_sin_cos_taylor_rs(mp_ptr ysin, mp_ptr ycos,
                     /* Outer polynomial evaluation: multiply by x^m */
                     if (k != 0)
                     {
-                        mpn_mul(t, s, xn + 1, XPOW_READ(m), xn);
+                        flint_mpn_mul(t, s, xn + 1, XPOW_READ(m), xn);
                         flint_mpn_copyi(s, t + xn, xn + 1);
                     }
 
@@ -152,7 +152,7 @@ void _arb_sin_cos_taylor_rs(mp_ptr ysin, mp_ptr ycos,
             else
             {
                 mpn_divrem_1(s, 0, s, xn + 1, factorial_tab_denom[0]);
-                mpn_mul(t, s, xn + 1, x, xn);
+                flint_mpn_mul(t, s, xn + 1, x, xn);
                 flint_mpn_copyi(ysin, t + xn, xn);
             }
         }
@@ -163,4 +163,3 @@ void _arb_sin_cos_taylor_rs(mp_ptr ysin, mp_ptr ycos,
 
     TMP_END;
 }
-

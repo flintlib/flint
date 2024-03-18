@@ -5,8 +5,8 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fexpr.h"
@@ -275,6 +275,7 @@ gr_static_method_table _fexpr_methods;
 
 gr_method_tab_input _fexpr_methods_input[] =
 {
+    {GR_METHOD_CTX_IS_RING,     (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_WRITE,       (gr_funcptr) _gr_fexpr_ctx_write},
     {GR_METHOD_INIT,            (gr_funcptr) _gr_fexpr_init},
     {GR_METHOD_CLEAR,           (gr_funcptr) _gr_fexpr_clear},

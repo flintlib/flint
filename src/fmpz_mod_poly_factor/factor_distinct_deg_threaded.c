@@ -7,10 +7,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "thread_pool.h"
 #include "thread_support.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
@@ -241,7 +242,7 @@ void fmpz_mod_poly_factor_distinct_deg_threaded_with_frob(
     fmpz_mod_poly_set_coeff_ui(h + 0, 1, 1, ctx);
     fmpz_mod_poly_set(h + 1, frob, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mod_poly_powmod_x_fmpz_preinv(tmp, p, v, vinv, ctx);
     FLINT_ASSERT(fmpz_mod_poly_equal(tmp, h + 1, ctx));
 #endif

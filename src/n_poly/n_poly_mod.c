@@ -5,12 +5,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "n_poly.h"
 #include "mpn_extras.h"
+#include "nmod.h"
+#include "n_poly.h"
 
 int n_poly_mod_is_canonical(const n_poly_t A, nmod_t mod)
 {
@@ -250,8 +251,7 @@ void n_poly_mod_mulmod(n_poly_t res, const n_poly_t poly1,
 
     if (lenf == 0)
     {
-        flint_printf("Exception (nmod_poly_mulmod). Divide by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (nmod_poly_mulmod). Divide by zero.\n");
     }
 
     if (lenf == 1 || len1 == 0 || len2 == 0)
@@ -305,8 +305,7 @@ void n_poly_mod_div(n_poly_t Q, const n_poly_t A, const n_poly_t B, nmod_t ctx)
         }
         else
         {
-            flint_printf("Exception (n_poly_mod_div). Division by zero.\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "Exception (n_poly_mod_div). Division by zero.\n");
         }
     }
 
@@ -340,6 +339,57 @@ void n_poly_mod_div(n_poly_t Q, const n_poly_t A, const n_poly_t B, nmod_t ctx)
     Q->length = A_len - B_len + 1;
 }
 
+void n_poly_mod_divexact(n_poly_t Q, const n_poly_t A, const n_poly_t B, nmod_t ctx)
+{
+    n_poly_t tQ;
+    mp_ptr q;
+    slong A_len, B_len;
+
+    B_len = B->length;
+
+    if (B_len == 0)
+    {
+        if (ctx.n == 1)
+        {
+            n_poly_set(Q, A);
+            return;
+        }
+        else
+        {
+            flint_throw(FLINT_ERROR, "Exception (n_poly_mod_divexact). Division by zero.\n");
+        }
+    }
+
+    A_len = A->length;
+
+    if (A_len < B_len)
+    {
+        n_poly_zero(Q);
+        return;
+    }
+
+    if (Q == A || Q == B)
+    {
+        n_poly_init2(tQ, A_len - B_len + 1);
+        q = tQ->coeffs;
+    }
+    else
+    {
+        n_poly_fit_length(Q, A_len - B_len + 1);
+        q = Q->coeffs;
+    }
+
+    _nmod_poly_divexact(q, A->coeffs, A_len, B->coeffs, B_len, ctx);
+
+    if (Q == A || Q == B)
+    {
+        n_poly_swap(tQ, Q);
+        n_poly_clear(tQ);
+    }
+
+    Q->length = A_len - B_len + 1;
+}
+
 void n_poly_mod_rem(n_poly_t R, const n_poly_t A, const n_poly_t B, nmod_t ctx)
 {
     const slong lenA = A->length, lenB = B->length;
@@ -348,8 +398,7 @@ void n_poly_mod_rem(n_poly_t R, const n_poly_t A, const n_poly_t B, nmod_t ctx)
 
     if (lenB == 0)
     {
-        flint_printf("Exception (nmod_poly_rem). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (nmod_poly_rem). Division by zero.\n");
     }
     if (lenA < lenB)
     {
@@ -398,8 +447,7 @@ void n_poly_mod_divrem(n_poly_t Q, n_poly_t R,
         }
         else
         {
-            flint_printf("Exception (n_poly_mod_divrem). Division by zero.");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "Exception (n_poly_mod_divrem). Division by zero.");
         }
     }
 
@@ -695,8 +743,7 @@ void n_poly_mod_mulmod_preinv(
 
     if (lenf <= len1 || lenf <= len2)
     {
-        flint_printf("n_poly_mod_mulmod_preinv: Input is larger than modulus.");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "n_poly_mod_mulmod_preinv: Input is larger than modulus.");
     }
 
     if (lenf == 1 || len1 == 0 || len2 == 0)
@@ -772,8 +819,7 @@ void n_poly_mod_div_series(n_poly_t Q, const n_poly_t A, const n_poly_t B,
 
     if (order < 1 || Blen == 0 || B->coeffs[0] == 0)
     {
-        flint_printf("Exception (n_poly_div_series). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (n_poly_div_series). Division by zero.\n");
     }
 
     if (Alen == 0)
@@ -1090,4 +1136,3 @@ mp_limb_t n_poly_mod_eval_step2(
     NMOD_RED3(t0, t2, t1, t0, mod);
     return t0;
 }
-

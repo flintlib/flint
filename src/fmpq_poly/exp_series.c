@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -40,7 +40,7 @@ _fmpq_poly_exp_series_basecase_deriv(fmpz * B, fmpz_t Bden,
     const fmpz * Aprime, const fmpz_t Aden, slong Alen, slong n)
 {
     fmpz_t t, u;
-    slong j, k;
+    slong k;
 
     Alen = FLINT_MIN(Alen, n);
 
@@ -55,11 +55,8 @@ _fmpq_poly_exp_series_basecase_deriv(fmpz * B, fmpz_t Bden,
 
     for (k = 1; k < n; k++)
     {
-        fmpz_mul(t, Aprime, B + k - 1);
-
-        for (j = 2; j < FLINT_MIN(Alen, k + 1); j++)
-            fmpz_addmul(t, Aprime + j - 1, B + k - j);
-
+        slong l = FLINT_MIN(Alen - 1, k);
+        _fmpz_vec_dot_general(t, NULL, 0, Aprime, B + k - l, 1, l);
         fmpz_mul_ui(u, Aden, k);
         fmpz_divexact(B + k, t, u);
     }
@@ -197,7 +194,7 @@ static void
 MULLOW(fmpz * z, fmpz_t zden, const fmpz * x, const fmpz_t xden, slong xn, const fmpz * y, const fmpz_t yden, slong yn, slong n)
 {
     if (xn + yn - 1 < n)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     if (xn >= yn)
         _fmpz_poly_mullow(z, x, xn, y, yn, n);
@@ -489,8 +486,7 @@ void fmpq_poly_exp_series(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
 
     if (!fmpz_is_zero(poly->coeffs))
     {
-        flint_printf("Exception (fmpq_poly_exp_series). Constant term != 0.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpq_poly_exp_series). Constant term != 0.\n");
     }
 
     fmpq_poly_fit_length(res, n);
@@ -518,8 +514,7 @@ void fmpq_poly_exp_expinv_series(fmpq_poly_t res1, fmpq_poly_t res2, const fmpq_
 
     if (!fmpz_is_zero(poly->coeffs))
     {
-        flint_printf("Exception (fmpq_poly_exp_expinv_series). Constant term != 0.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpq_poly_exp_expinv_series). Constant term != 0.\n");
     }
 
     fmpq_poly_fit_length(res1, n);

@@ -5,13 +5,15 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly_factor.h"
+#include "fmpz.h"
+#include "fq_nmod.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "fq_nmod_mpoly_factor.h"
-
 
 static void _map_poly(
     fq_nmod_mpoly_t eA,
@@ -58,7 +60,7 @@ static void _frob_combine(
     fq_nmod_mpolyv_init(tfac, ectx);
     n_poly_init(c);
 
-    fmpz_pow_ui(q, fq_nmod_ctx_prime(ctx->fqctx), fq_nmod_ctx_degree(ctx->fqctx));
+    fmpz_ui_pow_ui(q, fq_nmod_ctx_prime(ctx->fqctx), fq_nmod_ctx_degree(ctx->fqctx));
 
     Af->length = 0;
     while (eAf->length > 0)
@@ -108,8 +110,7 @@ static void _frob_combine(
             bad_n_fq_embed_lg_to_sm(c, t->coeffs + lgd*i, emb);
             if (c->length != 1)
             {
-                flint_printf("fatal error in _frob_combine");
-                flint_abort();
+                flint_throw(FLINT_ERROR, "fatal error in _frob_combine");
             }
             _n_fq_set(s->coeffs + smd*i, c->coeffs + smd*0, smd);
         }
@@ -355,4 +356,3 @@ cleanup:
 
     return success;
 }
-

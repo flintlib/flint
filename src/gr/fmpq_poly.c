@@ -5,8 +5,8 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fmpz.h"
@@ -15,6 +15,8 @@
 #include "fmpq_poly.h"
 #include "gr.h"
 #include "gr_poly.h"
+#include "gr_vec.h"
+#include "gr_generic.h"
 
 int
 _gr_fmpq_poly_ctx_write(gr_stream_t out, gr_ctx_t ctx)
@@ -684,6 +686,7 @@ gr_method_tab_input _fmpq_poly_methods_input[] =
     {GR_METHOD_ZERO,            (gr_funcptr) _gr_fmpq_poly_zero},
     {GR_METHOD_ONE,             (gr_funcptr) _gr_fmpq_poly_one},
     {GR_METHOD_GEN,             (gr_funcptr) _gr_fmpq_poly_gen},
+    {GR_METHOD_GENS,            (gr_funcptr) gr_generic_gens_single},
     {GR_METHOD_IS_ZERO,         (gr_funcptr) _gr_fmpq_poly_is_zero},
     {GR_METHOD_IS_ONE,          (gr_funcptr) _gr_fmpq_poly_is_one},
     {GR_METHOD_IS_NEG_ONE,      (gr_funcptr) _gr_fmpq_poly_is_neg_one},
@@ -693,7 +696,7 @@ gr_method_tab_input _fmpq_poly_methods_input[] =
     {GR_METHOD_SET_UI,          (gr_funcptr) _gr_fmpq_poly_set_ui},
     {GR_METHOD_SET_FMPZ,        (gr_funcptr) _gr_fmpq_poly_set_fmpz},
     {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_fmpq_poly_set_other},
-/*    {GR_METHOD_SET_STR,         (gr_funcptr) _gr_fmpq_poly_set_str}, */
+    {GR_METHOD_SET_STR,         (gr_funcptr) gr_generic_set_str_balance_additions},
     {GR_METHOD_GET_UI,          (gr_funcptr) _gr_fmpq_poly_get_ui},
     {GR_METHOD_GET_SI,          (gr_funcptr) _gr_fmpq_poly_get_si},
     {GR_METHOD_GET_FMPZ,        (gr_funcptr) _gr_fmpq_poly_get_fmpz},

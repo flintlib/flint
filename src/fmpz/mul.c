@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2009, 2020 William Hart
     Copyright (C) 2021 Albin Ahlbäck
     Copyright (C) 2022 Fredrik Johansson
 
@@ -7,13 +7,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "gmpcompat.h"
-#include "fmpz.h"
 #include "mpn_extras.h"
+#include "fmpz.h"
 
 /* This can only be called from fmpz_mul, and assumes
    x and y are not small. */
@@ -61,7 +61,7 @@ flint_mpz_mul(mpz_ptr z, mpz_srcptr x, mpz_srcptr y)
         if (xn == 2)
         {
             mp_limb_t r3, r2, r1, r0;
-            flint_mpn_mul_2x2(r3, r2, r1, r0, xd[1], xd[0], yd[1], yd[0]);
+            FLINT_MPN_MUL_2X2(r3, r2, r1, r0, xd[1], xd[0], yd[1], yd[0]);
             zd[0] = r0;
             zd[1] = r1;
             zd[2] = r2;
@@ -93,7 +93,7 @@ flint_mpz_mul(mpz_ptr z, mpz_srcptr x, mpz_srcptr y)
         if (xn == 2)
         {
             mp_limb_t r2, r1, r0;
-            flint_mpn_mul_2x1(r2, r1, r0, xd[1], xd[0], yd[0]);
+            FLINT_MPN_MUL_2X1(r2, r1, r0, xd[1], xd[0], yd[0]);
             zd[0] = r0;
             zd[1] = r1;
             zd[2] = top = r2;
@@ -191,4 +191,94 @@ fmpz_mul(fmpz_t f, const fmpz_t g, const fmpz_t h)
         flint_mpz_mul_si(mf, COEFF_TO_PTR(c1), c2);
     else
         flint_mpz_mul(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
+}
+
+void
+fmpz_mul_si(fmpz_t f, const fmpz_t g, slong x)
+{
+    fmpz c2 = *g;
+
+    if (!COEFF_IS_MPZ(c2)) /* c2 is small */
+    {
+        mp_limb_t th, tl;
+
+        /* limb by limb multiply (assembly for most CPU's) */
+        smul_ppmm(th, tl, c2, x);
+        fmpz_set_signed_uiui(f, th, tl);
+    }
+    else                        /* c2 is large */
+    {
+        __mpz_struct * mf;
+        if (!COEFF_IS_MPZ(*f))
+        {
+            if (x == 0)
+            {
+                *f = 0;
+                return;
+            }
+
+            mf = _fmpz_new_mpz();
+            *f = PTR_TO_COEFF(mf);
+        }
+        else
+        {
+            if (x == 0)
+            {
+                _fmpz_clear_mpz(*f);
+                *f = 0;
+                return;
+            }
+
+            mf = COEFF_TO_PTR(*f);
+        }
+
+        flint_mpz_mul_si(mf, COEFF_TO_PTR(c2), x);
+    }
+}
+
+void
+fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong x)
+{
+    fmpz c2 = *g;
+
+    if (!COEFF_IS_MPZ(c2)) /* c2 is small */
+    {
+        mp_limb_t th, tl;
+        mp_limb_t uc2 = FLINT_ABS(c2);
+
+        /* unsigned limb by limb multiply (assembly for most CPU's) */
+        umul_ppmm(th, tl, uc2, x);
+        if (c2 >= 0)
+            fmpz_set_uiui(f, th, tl);
+        else
+            fmpz_neg_uiui(f, th, tl);
+    }
+    else                        /* c2 is large */
+    {
+        __mpz_struct * mf;
+        if (!COEFF_IS_MPZ(*f))
+        {
+            if (x == 0)
+            {
+                *f = 0;
+                return;
+            }
+
+            mf = _fmpz_new_mpz();
+            *f = PTR_TO_COEFF(mf);
+        }
+        else
+        {
+            if (x == 0)
+            {
+                _fmpz_clear_mpz(*f);
+                *f = 0;
+                return;
+            }
+
+            mf = COEFF_TO_PTR(*f);
+        }
+
+        flint_mpz_mul_ui(mf, COEFF_TO_PTR(c2), x);
+    }
 }

@@ -5,11 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "thread_pool.h"
 #include "thread_support.h"
+#include "nmod.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 static int _nmod_mpoly_divides_try_dense(
@@ -133,6 +136,7 @@ int _nmod_mpoly_divides_threaded_pool(
         goto cleanup;
     }
 
+#ifdef _nmod_mpoly_divides_heap_threaded_pool
     if (num_handles > 0)
     {
         divides = _nmod_mpoly_divides_heap_threaded_pool(Q, A, B, ctx,
@@ -142,6 +146,9 @@ int _nmod_mpoly_divides_threaded_pool(
     {
         divides = nmod_mpoly_divides_monagan_pearce(Q, A, B, ctx);
     }
+#else
+    divides = nmod_mpoly_divides_monagan_pearce(Q, A, B, ctx);
+#endif
 
 cleanup:
 
@@ -191,4 +198,3 @@ int nmod_mpoly_divides(
 
     return divides;
 }
-

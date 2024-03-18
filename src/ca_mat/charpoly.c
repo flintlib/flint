@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2020 Fredrik Johansson
 
-    This file is part of Calcium.
+    This file is part of FLINT.
 
-    Calcium is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "ca_mat.h"
@@ -40,8 +40,7 @@ void ca_mat_charpoly(ca_poly_t cp, const ca_mat_t mat, ca_ctx_t ctx)
 {
     if (mat->r != mat->c)
     {
-        flint_printf("Exception (ca_mat_charpoly).  Non-square matrix.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (ca_mat_charpoly).  Non-square matrix.\n");
     }
 
     ca_poly_fit_length(cp, mat->r + 1, ctx);

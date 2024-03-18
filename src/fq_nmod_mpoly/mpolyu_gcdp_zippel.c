@@ -5,12 +5,18 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod_poly.h"
 #include "nmod_mpoly.h"
+#include "fmpz.h"
+#include "fq_nmod.h"
 #include "fq_nmod_mat.h"
+#include "fq_nmod_poly.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "fq_nmod_mpoly.h"
 
 int fq_nmod_next(fq_nmod_t alpha, const fq_nmod_ctx_t fqctx)
@@ -681,7 +687,7 @@ pick_evaluation_point:
             }
 
         }
-        fq_nmod_mat_rref(ML + s, ctx->fqctx);
+        fq_nmod_mat_rref(ML + s, ML + s, ctx->fqctx);
 
         for (i = 0; i < (f->coeffs + s)->length; i++)
         {
@@ -710,7 +716,7 @@ pick_evaluation_point:
             fq_nmod_mat_window_clear(Mwindow, ctx->fqctx);
         }
 
-        nullity = l - fq_nmod_mat_rref(MF, ctx->fqctx);
+        nullity = l - fq_nmod_mat_rref(MF, MF, ctx->fqctx);
 
         if (nullity == 0)
         {
@@ -1527,4 +1533,3 @@ finished:
 
     return success;
 }
-

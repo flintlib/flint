@@ -1,18 +1,13 @@
-/*=============================================================================
-
-    This file is part of Antic.
-
-    Antic is free software: you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version. See <http://www.gnu.org/licenses/>.
-
-=============================================================================*/
-/******************************************************************************
-
+/*
     Copyright 2012 William Hart
 
-******************************************************************************/
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
+*/
 
 #include <stdlib.h>
 #include "profiler.h"
@@ -26,7 +21,7 @@ int main(void)
    fmpz_t g, n, n0, p, L;
    slong iters, i, j, depth, jmax = 10;
    qfb_t pow, twopow;
-   ulong pr, nmodpr, mult, n0mod4;
+   ulong pr, nmodpr, mult;
    qfb_hash_t * qhash;
    int done;
 
@@ -203,8 +198,15 @@ done:
 
          mult += 2;
 
+    /* GCC really wants to complain about this one */
+#if defined(__GNUC__) && !defined(__clang__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
          qfb_hash_clear(qhash, depth);
-
+#if defined(__GNUC__) && !defined(__clang__)
+# pragma GCC diagnostic pop
+#endif
       }
 
       iters *= 2;

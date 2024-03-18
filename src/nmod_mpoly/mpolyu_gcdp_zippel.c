@@ -5,11 +5,15 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
 #include "nmod_mat.h"
+#include "nmod_poly.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 /* store in each coefficient the evaluation of the corresponding monomial */
@@ -624,9 +628,9 @@ static int nmod_mpolyu_gcdp_zippel_univar(
     nmod_mpolyu_cvtto_poly(b, B, ctx);
     nmod_poly_gcd(g, a, b);
     nmod_mpolyu_cvtfrom_poly(G, g, ctx);
-    nmod_poly_div(t, a, g);
+    nmod_poly_divexact(t, a, g);
     nmod_mpolyu_cvtfrom_poly(Abar, t, ctx);
-    nmod_poly_div(t, b, g);
+    nmod_poly_divexact(t, b, g);
     nmod_mpolyu_cvtfrom_poly(Bbar, t, ctx);
     nmod_poly_clear(a);
     nmod_poly_clear(b);

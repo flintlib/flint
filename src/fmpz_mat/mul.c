@@ -1,12 +1,12 @@
 /*
-    Copyright (C) 2010,2011,2018 Fredrik Johansson
+    Copyright (C) 2010, 2011, 2018, 2024 Fredrik Johansson
     Copyright (C) 2016 Aaditya Thakkar
 
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -138,13 +138,12 @@ fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 
     if (br == 1)
     {
-        for (i = 0; i < ar; i++)
-            for (j = 0; j < bc; j++)
-                fmpz_mul(fmpz_mat_entry(C, i, j),
-                    fmpz_mat_entry(A, i, 0), fmpz_mat_entry(B, 0, j));
+        fmpz_mat_mul_classical(C, A, B);
         return;
     }
 
+    /* todo: use Strassen, Waksman or FFT when entries are huge
+       and the matrix is not structured */
     if (br == 2)
     {
         for (i = 0; i < ar; i++)
@@ -157,6 +156,7 @@ fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 
     dim = FLINT_MIN(ar, bc);
     dim = FLINT_MIN(dim, br);
+
     /* TODO: for space reasons maybe just call strassen here if dim > 10000 */
 
     abits = fmpz_mat_max_bits(A);
@@ -274,12 +274,21 @@ fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
     }
     else
     {
+        /* want balanced entries for mul_waksman */
+        /* todo: should check for structured matrices (favor mul_classical) */
+        slong min_bits = FLINT_MIN(abits, bbits);
+        slong max_bits = FLINT_MAX(abits, bbits);
+
         if (dim >= 3 * FLINT_BIT_COUNT(cbits))  /* tuning param */
             _fmpz_mat_mul_multi_mod(C, A, B, sign, cbits);
+        else if (dim < 20 && ((dim == 2 && min_bits >= 5000 && max_bits <= 1.1 * min_bits)
+                              || (max_bits <= 1.6 * min_bits && ((dim == 3 && min_bits >= 3000)
+                              || (dim >= 4 && min_bits >= 1000)
+                              || (dim >= 12 && min_bits >= 500)))))
+            fmpz_mat_mul_waksman(C, A, B);
         else if (abits >= 500 && bbits >= 500 && dim >= 8)  /* tuning param */
             fmpz_mat_mul_strassen(C, A, B);
         else
-            fmpz_mat_mul_classical_inline(C, A, B);
+            fmpz_mat_mul_classical(C, A, B);
     }
 }
-

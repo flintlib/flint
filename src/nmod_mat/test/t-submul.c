@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -52,31 +52,27 @@ TEST_FUNCTION_START(nmod_mat_submul, state)
         nmod_mat_sub(E, C, T);
 
         if (!nmod_mat_equal(D, E))
-        {
-            flint_printf("FAIL: results not equal\n");
-            nmod_mat_print_pretty(A);
-            nmod_mat_print_pretty(B);
-            nmod_mat_print_pretty(C);
-            nmod_mat_print_pretty(D);
-            nmod_mat_print_pretty(E);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Results not equal\n"
+                    "A = %{nmod_mat}\n"
+                    "B = %{nmod_mat}\n"
+                    "C = %{nmod_mat}\n"
+                    "D = %{nmod_mat}\n"
+                    "E = %{nmod_mat}\n",
+                    A, B, C, D, E);
 
         /* Check aliasing */
         nmod_mat_submul(C, C, A, B);
 
         if (!nmod_mat_equal(C, E))
-        {
-            flint_printf("FAIL: results not equal (aliasing)\n");
-            nmod_mat_print_pretty(A);
-            nmod_mat_print_pretty(B);
-            nmod_mat_print_pretty(C);
-            nmod_mat_print_pretty(D);
-            nmod_mat_print_pretty(E);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Results not equal (aliasing)\n"
+                    "A = %{nmod_mat}\n"
+                    "B = %{nmod_mat}\n"
+                    "C = %{nmod_mat}\n"
+                    "D = %{nmod_mat}\n"
+                    "E = %{nmod_mat}\n",
+                    A, B, C, D, E);
 
         nmod_mat_clear(A);
         nmod_mat_clear(B);

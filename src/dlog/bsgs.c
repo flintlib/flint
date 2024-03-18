@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2016 Pascal Molin
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <stdlib.h>
@@ -28,9 +28,8 @@ dlog_bsgs(const dlog_bsgs_t t, ulong b)
             return i * t->m + x->k;
         c.ak = nmod_mul(c.ak, t->am, t->mod);
     }
-    flint_printf("Exception (dlog_bsgs).  discrete log not found.\n");
-    flint_printf("   table size %wu, cosize %wu mod %wu. %wu not found (a^-m=%wu)\n",
+
+    flint_throw(FLINT_ERROR, "Exception (dlog_bsgs).  discrete log not found.\n"
+            "   table size %wu, cosize %wu mod %wu. %wu not found (a^-m=%wu)\n",
             t->m, t->g, t->mod.n, b, t->am);
-    flint_abort();
-    return 0; /* dummy return because flint_abort() is not declared noreturn */
 }

@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -35,8 +35,7 @@ arith_bell_number_nmod_fallback(ulong n, nmod_t mod)
 
     if (n > WORD_MAX / 4)
     {
-        flint_printf("arith_bell_number_nmod: too large n\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "arith_bell_number_nmod: too large n\n");
     }
 
     bvec = flint_malloc(sizeof(mp_limb_t) * (n + 1));

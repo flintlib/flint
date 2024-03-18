@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -81,8 +81,6 @@ fmpz_mat_det_cofactor(fmpz_t det, const fmpz_mat_t A)
         case 2:  _fmpz_mat_det_cofactor_2x2(det, A);     break;
         case 3:  _fmpz_mat_det_cofactor_3x3(det, A);     break;
         case 4:  _fmpz_mat_det_cofactor_4x4(det, A);     break;
-        default:
-            flint_printf("Exception (fmpz_mat_det_cofactor). dim > 4 not implemented.");
-            flint_abort();
+        default: flint_throw(FLINT_ERROR, "Exception (fmpz_mat_det_cofactor). dim > 4 not implemented.");
     }
 }

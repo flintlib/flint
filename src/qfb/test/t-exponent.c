@@ -1,18 +1,13 @@
-/*=============================================================================
-
-    This file is part of Antic.
-
-    Antic is free software: you can redistribute it and/or modify it under
-    the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version. See <http://www.gnu.org/licenses/>.
-
-=============================================================================*/
-/******************************************************************************
-
+/*
     Copyright (C) 2012 William Hart
 
-******************************************************************************/
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
+*/
 
 #include "test_helpers.h"
 #include "qfb.h"
@@ -57,7 +52,7 @@ TEST_FUNCTION_START(qfb_exponent, state)
               printf("FAIL:\n");
               printf("Exponent does not divide class number\n");
               printf("Discriminant: "); fmpz_print(D); printf("\n");
-              printf("%ld does not divide %ld\n", e, num);
+              flint_printf("%wd does not divide %wd\n", e, num);
               flint_abort();
            }
 
@@ -72,7 +67,7 @@ TEST_FUNCTION_START(qfb_exponent, state)
                  printf("Exponent does not annihilate form\n");
                  printf("Discriminant: "); fmpz_print(D); printf("\n");
                  printf("Form: "); qfb_print(forms + i1); printf("\n");
-                 printf("Exponent: %ld\n", e);
+                 flint_printf("Exponent: %wd\n", e);
                  flint_abort();
               }
            }

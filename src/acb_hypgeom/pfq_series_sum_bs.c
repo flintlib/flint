@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2016 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "acb_poly.h"
@@ -170,7 +170,8 @@ acb_hypgeom_pfq_series_sum_bs(acb_poly_t s, acb_poly_t t,
         }
 
         /* We should now have start <= n. */
-        if (start > n) flint_abort();
+        if (start > n)
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
         acb_hypgeom_pfq_series_sum_forward(s, t, a, p, b, q, z,
             regularized, start, len, prec);
@@ -204,4 +205,3 @@ acb_hypgeom_pfq_series_sum_bs(acb_poly_t s, acb_poly_t t,
     acb_poly_clear(v);
     acb_poly_clear(w);
 }
-

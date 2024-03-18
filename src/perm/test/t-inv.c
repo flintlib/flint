@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -33,14 +33,15 @@ TEST_FUNCTION_START(perm_inv, state)
         _perm_inv(c, b, n);
 
         if (!_perm_equal(a, c, n))
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("a: "); _perm_print(a, n); flint_printf("\n\n");
-            flint_printf("b: "); _perm_print(b, n); flint_printf("\n\n");
-            flint_printf("c: "); _perm_print(c, n); flint_printf("\n\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "n = %wd\n"
+                    "a = %{slong*}\n\n"
+                    "b = %{slong*}\n\n"
+                    "c = %{slong*}\n\n",
+                    n,
+                    a, n,
+                    b, n,
+                    c, n);
 
         _perm_clear(a);
         _perm_clear(b);
@@ -63,13 +64,13 @@ TEST_FUNCTION_START(perm_inv, state)
         _perm_inv(a, a, n);
 
         if (!_perm_equal(a, b, n))
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("a: "); _perm_print(a, n); flint_printf("\n\n");
-            flint_printf("b: "); _perm_print(b, n); flint_printf("\n\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "n = %wd\n"
+                    "a = %{slong*}\n\n"
+                    "b = %{slong*}\n\n",
+                    n,
+                    a, n,
+                    b, n);
 
         _perm_clear(a);
         _perm_clear(b);

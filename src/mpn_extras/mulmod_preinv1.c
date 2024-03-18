@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -33,9 +33,9 @@ void flint_mpn_mulmod_preinv1(mp_ptr r,
       t = flint_malloc(5*n*sizeof(mp_limb_t));
 
    if (a == b)
-      mpn_sqr(t, a, n);
+      flint_mpn_sqr(t, a, n);
    else
-      mpn_mul_n(t, a, b, n);
+      flint_mpn_mul_n(t, a, b, n);
 
    if (norm)
       mpn_rshift(t, t, 2*n, norm);

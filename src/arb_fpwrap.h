@@ -1,22 +1,16 @@
 /*
     Copyright (C) 2021 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #ifndef ARB_FPWRAP_H
 #define ARB_FPWRAP_H
-
-#ifdef ARB_FPWRAP_INLINES_C
-#define ARB_FPWRAP_INLINE
-#else
-#define ARB_FPWRAP_INLINE static __inline__
-#endif
 
 #include "flint.h"
 
@@ -334,4 +328,3 @@ int arb_fpwrap_cdouble_modular_delta(complex_double * res, complex_double tau, i
 #endif
 
 #endif
-

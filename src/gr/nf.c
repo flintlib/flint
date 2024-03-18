@@ -5,8 +5,8 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <stdlib.h>
@@ -19,6 +19,7 @@
 #include "gr_generic.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
+#include "gr_generic.h"
 
 typedef struct
 {
@@ -543,6 +544,7 @@ gr_method_tab_input _nf_methods_input[] =
     {GR_METHOD_ZERO,            (gr_funcptr) _gr_nf_zero},
     {GR_METHOD_ONE,             (gr_funcptr) _gr_nf_one},
     {GR_METHOD_GEN,             (gr_funcptr) _gr_nf_gen},
+    {GR_METHOD_GENS,            (gr_funcptr) gr_generic_gens_single},
     {GR_METHOD_IS_ZERO,         (gr_funcptr) _gr_nf_is_zero},
     {GR_METHOD_IS_ONE,          (gr_funcptr) _gr_nf_is_one},
     {GR_METHOD_IS_NEG_ONE,      (gr_funcptr) _gr_nf_is_neg_one},
@@ -552,10 +554,10 @@ gr_method_tab_input _nf_methods_input[] =
     {GR_METHOD_SET_UI,          (gr_funcptr) _gr_nf_set_ui},
     {GR_METHOD_SET_FMPZ,        (gr_funcptr) _gr_nf_set_fmpz},
     {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_nf_set_other},
+    {GR_METHOD_SET_STR,     (gr_funcptr) gr_generic_set_str_balance_additions},
 
     {GR_METHOD_SET_FEXPR,       (gr_funcptr) _gr_nf_set_fexpr},
     {GR_METHOD_GET_FEXPR,       (gr_funcptr) _gr_nf_get_fexpr},
-
 
     {GR_METHOD_NEG,             (gr_funcptr) _gr_nf_neg},
 

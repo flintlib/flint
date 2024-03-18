@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -30,4 +30,3 @@ void nmod_poly_mat_set_coeff_mat(nmod_poly_mat_t pmat,
             nmod_poly_set_coeff_ui(nmod_poly_mat_entry(pmat, i, j),
                     deg, nmod_mat_entry(coeff, i, j));
 }
-

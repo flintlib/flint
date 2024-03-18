@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2012 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #ifndef ARB_POLY_H
@@ -15,7 +15,7 @@
 #ifdef ARB_POLY_INLINES_C
 #define ARB_POLY_INLINE
 #else
-#define ARB_POLY_INLINE static __inline__
+#define ARB_POLY_INLINE static inline
 #endif
 
 #include "fmpq_types.h"
@@ -43,9 +43,7 @@ void _arb_poly_normalise(arb_poly_t poly);
 ARB_POLY_INLINE void
 arb_poly_swap(arb_poly_t poly1, arb_poly_t poly2)
 {
-    arb_poly_struct t = *poly1;
-    *poly1 = *poly2;
-    *poly2 = t;
+    FLINT_SWAP(arb_poly_struct, *poly1, *poly2);
 }
 
 void arb_poly_set(arb_poly_t poly, const arb_poly_t src);
@@ -350,15 +348,6 @@ void arb_poly_compose_series(arb_poly_t res,
 
 /* Reversion */
 
-void _arb_poly_revert_series_lagrange(arb_ptr Qinv, arb_srcptr Q, slong Qlen, slong n, slong prec);
-void arb_poly_revert_series_lagrange(arb_poly_t Qinv, const arb_poly_t Q, slong n, slong prec);
-
-void _arb_poly_revert_series_newton(arb_ptr Qinv, arb_srcptr Q, slong Qlen, slong n, slong prec);
-void arb_poly_revert_series_newton(arb_poly_t Qinv, const arb_poly_t Q, slong n, slong prec);
-
-void _arb_poly_revert_series_lagrange_fast(arb_ptr Qinv, arb_srcptr Q, slong Qlen, slong n, slong prec);
-void arb_poly_revert_series_lagrange_fast(arb_poly_t Qinv, const arb_poly_t Q, slong n, slong prec);
-
 void _arb_poly_revert_series(arb_ptr Qinv, arb_srcptr Q, slong Qlen, slong n, slong prec);
 void arb_poly_revert_series(arb_poly_t Qinv, const arb_poly_t Q, slong n, slong prec);
 
@@ -655,24 +644,30 @@ arb_poly_allocated_bytes(const arb_poly_t x)
 
 
 /* counts zero bits in the binary representation of e */
-ARB_POLY_INLINE int
-n_zerobits(mp_limb_t e)
+FLINT_FORCE_INLINE int
+n_zerobits(ulong e)
 {
+#if defined(__GNUC__)
+# if defined(_LONG_LONG_LIMB)
+    return FLINT_BIT_COUNT(e) - __builtin_popcountll(e);
+# else
+    return FLINT_BIT_COUNT(e) - __builtin_popcountl(e);
+# endif
+#else
     int zeros = 0;
-
     while (e > 1)
     {
         zeros += !(e & 1);
         e >>= 1;
     }
-
     return zeros;
+#endif
 }
 
 /* Computes the length of the result when raising a polynomial of
    length *len* to the power *exp* and truncating to length *trunc*,
    without overflow. Assumes poly_len >= 1. */
-ARB_POLY_INLINE slong
+FLINT_FORCE_INLINE slong
 poly_pow_length(slong poly_len, ulong exp, slong trunc)
 {
     mp_limb_t hi, lo;
@@ -715,4 +710,3 @@ poly_pow_length(slong poly_len, ulong exp, slong trunc)
 #endif
 
 #endif
-

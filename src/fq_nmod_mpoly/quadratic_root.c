@@ -5,10 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
+#include "fq_nmod.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "fq_nmod_mpoly.h"
 
 /* solve z^2+z=c */
@@ -21,7 +25,7 @@ static int _quadratic_root_const(
     mp_limb_t * t, * p, * u, * cp, * ut, * up, * ct;
     int success;
     TMP_INIT;
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     mp_limb_t * c_org = FLINT_ARRAY_ALLOC(d, mp_limb_t);
     _n_fq_set(c_org, c, d);
 #endif
@@ -62,7 +66,7 @@ static int _quadratic_root_const(
     }
 
     success = _n_fq_is_zero(ct, d);
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success)
     {
         _n_fq_add(ut, ut, up, d, fqctx->mod);
@@ -337,7 +341,7 @@ static int _fq_nmod_mpoly_quadratic_root_heap(
         */
         FLINT_ASSERT(Qs == 0 || Qs == 1);
         FLINT_ASSERT(As <= Alen);
-    #ifdef FLINT_WANT_ASSERT
+    #if FLINT_WANT_ASSERT
         {
             slong Asleft = Alen, Qsleft = 1;
             for (i = 1; i < heap_len; i++)
@@ -532,4 +536,3 @@ int fq_nmod_mpoly_quadratic_root(
 
     return success;
 }
-

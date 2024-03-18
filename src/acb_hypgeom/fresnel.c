@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2016 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "acb.h"
@@ -230,4 +230,3 @@ acb_hypgeom_fresnel(acb_t res1, acb_t res2, const acb_t z, int normalized, slong
     acb_clear(w);
     arb_clear(c);
 }
-

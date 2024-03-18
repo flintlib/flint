@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -15,30 +15,16 @@
 #ifdef PADIC_POLY_INLINES_C
 #define PADIC_POLY_INLINE
 #else
-#define PADIC_POLY_INLINE static __inline__
+#define PADIC_POLY_INLINE static inline
 #endif
 
-#include "padic.h"
-#include "fmpz_vec.h"
 #include "fmpq_types.h"
+#include "padic_types.h"
+#include "fmpz.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
-
-
-/*  Type definitions  ********************************************************/
-
-typedef struct
-{
-    fmpz *coeffs;
-    slong alloc;
-    slong length;
-    slong val;
-    slong N;
-} padic_poly_struct;
-
-typedef padic_poly_struct padic_poly_t[1];
 
 /*  Helper functions  ********************************************************/
 
@@ -332,25 +318,6 @@ void padic_poly_compose_pow(padic_poly_t rop, const padic_poly_t op, slong k,
 
 /*  Input and output  ********************************************************/
 
-PADIC_POLY_INLINE int padic_poly_debug(const padic_poly_t poly)
-{
-    flint_printf("(alloc = %wd, length = %wd, val = %wd, N = %wd, vec = ",
-        poly->alloc, poly->length, poly->val, poly->N);
-    if (poly->coeffs)
-    {
-        flint_printf("{");
-        _fmpz_vec_print(poly->coeffs, poly->alloc);
-        flint_printf("}");
-    }
-    else
-    {
-        flint_printf("NULL");
-    }
-    flint_printf(")");
-
-    return 1;
-}
-
 #ifdef FLINT_HAVE_FILE
 int _padic_poly_fprint(FILE * file, const fmpz * poly, slong val, slong len, const padic_ctx_t ctx);
 int padic_poly_fprint(FILE * file, const padic_poly_t poly, const padic_ctx_t ctx);
@@ -362,6 +329,8 @@ int _padic_poly_print(const fmpz * poly, slong val, slong len, const padic_ctx_t
 int padic_poly_print(const padic_poly_t poly, const padic_ctx_t ctx);
 int _padic_poly_print_pretty(const fmpz * poly, slong val, slong len, const char * var, const padic_ctx_t ctx);
 int padic_poly_print_pretty(const padic_poly_t poly, const char * var, const padic_ctx_t ctx);
+
+int padic_poly_debug(const padic_poly_t poly);
 
 /*  Testing  *****************************************************************/
 
@@ -380,4 +349,3 @@ int padic_poly_is_reduced(const padic_poly_t op, const padic_ctx_t ctx);
 #endif
 
 #endif
-

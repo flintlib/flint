@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -38,42 +38,30 @@ TEST_FUNCTION_START(nmod_mat_nullspace, state)
             nmod_mat_randrank(A, state, r);
             /* Densify */
             if (n_randlimb(state) % 2)
-                nmod_mat_randops(A, d, state);
+                nmod_mat_randops(A, state, d);
 
             nullity = nmod_mat_nullspace(ker, A);
             nulrank = nmod_mat_rank(ker);
 
             if (nullity != nulrank)
-            {
-                flint_printf("FAIL:\n");
-                flint_printf("rank(ker) != nullity!\n");
-                nmod_mat_print_pretty(A);
-                flint_printf("\n");
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL(
+                        "rank(ker) != nullity\n"
+                        "A = %{nmod_mat}\n",
+                        A);
 
             if (nullity + r != n)
-            {
-                flint_printf("FAIL:\n");
-                flint_printf("nullity + rank != n\n");
-                nmod_mat_print_pretty(A);
-                flint_printf("\n");
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL(
+                        "nullity + rank != n\n"
+                        "A = %{nmod_mat}\n",
+                        A);
 
             nmod_mat_mul(B, A, ker);
 
             if (nmod_mat_rank(B) != 0)
-            {
-                flint_printf("FAIL:\n");
-                flint_printf("A * ker != 0\n");
-                nmod_mat_print_pretty(A);
-                flint_printf("\n");
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL(
+                        "A * ker != 0\n"
+                        "A = %{nmod_mat}\n",
+                        A);
 
             nmod_mat_clear(A);
             nmod_mat_clear(ker);

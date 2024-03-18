@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2012, 2013, 2022 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "thread_support.h"
@@ -228,7 +228,7 @@ euler_bsplit_2_basecase(euler_bsplit_2_t s, slong n1, slong n2, bsplit_args_t * 
         arb_ptr T = s->T;
 
         if (n2 - n1 != 1)
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
         if (n1 == 0)
         {
@@ -345,7 +345,7 @@ arb_log_ui_smooth(arb_t s, ulong n, slong prec)
     while (m % 5 == 0) { m /= 5; k++; }
 
     if (m != 1)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     arb_init(t);
 
@@ -488,4 +488,3 @@ arb_const_euler(arb_t res, slong prec)
         arb_const_euler_brent_mcmillan(res, prec);
     }
 }
-

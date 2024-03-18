@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -29,8 +29,7 @@ fmpz_mat_CRT_ui(fmpz_mat_t res, const fmpz_mat_t mat1,
 
     if (c == 0)
     {
-        flint_printf("Exception (fmpz_mat_CRT_ui). m1 not invertible modulo m2.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mat_CRT_ui). m1 not invertible modulo m2.\n");
     }
 
     fmpz_init(m1m2);
@@ -46,4 +45,3 @@ fmpz_mat_CRT_ui(fmpz_mat_t res, const fmpz_mat_t mat1,
 
     fmpz_clear(m1m2);
 }
-

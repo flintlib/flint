@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -123,8 +123,7 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
     mmax = ((B2 - P/2) + P - 1)/P;      /* ceil */
     if (mmax < mmin)
     {
-       flint_printf("Exception (ecm). B1 > B2 encountered.\n");
-       flint_abort();
+       flint_throw(FLINT_ERROR, "Exception (ecm). B1 > B2 encountered.\n");
     }
     maxj = (P + 1)/2;
     mdiff = mmax - mmin + 1;

@@ -5,8 +5,8 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "gr_vec.h"
@@ -83,8 +83,17 @@ _gr_poly_sqrt_series_basecase(gr_ptr res, gr_srcptr f, slong flen, slong len, gr
 
             if (!is_one)
             {
+#if defined(__GNUC__) && !defined(__clang__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
                 if (have_inv)
+                {
+#if defined(__GNUC__) && !defined(__clang__)
+# pragma GCC diagnostic pop
+#endif
                     status |= gr_mul(GR_ENTRY(res, i, sz), GR_ENTRY(res, i, sz), rinv, ctx);
+                }
                 else
                 {
                     status |= gr_div(GR_ENTRY(res, i, sz), GR_ENTRY(res, i, sz), res, ctx);

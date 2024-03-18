@@ -85,7 +85,7 @@ Factoring algorithms
     have no repeated factors.  None of the returned factors will have
     the same exponent. That is we return `g_i` and unique `e_i` such that
 
-    .. math ::
+    .. math::
 
 
         F = c \prod_{i} g_i^{e_i}

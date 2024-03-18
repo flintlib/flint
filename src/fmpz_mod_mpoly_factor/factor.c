@@ -5,11 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_poly_factor.h"
+#include "mpoly.h"
 #include "nmod_mpoly_factor.h"
 #include "fmpz_mod_mpoly_factor.h"
 
@@ -37,7 +40,7 @@ static int _factor_irred_compressed(
     slong nvars = ctx->minfo->nvars;
     flint_bitcnt_t Abits;
     flint_rand_t state;
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mod_mpoly_t Aorg;
 #endif
 
@@ -62,7 +65,7 @@ static int _factor_irred_compressed(
         return 0;
     }
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mod_mpoly_init(Aorg, ctx);
     fmpz_mod_mpoly_set(Aorg, A, ctx);
 #endif
@@ -136,7 +139,7 @@ static int _factor_irred_compressed(
         fmpz_mod_mpoly_init(lcA, ctx);
         fmpz_mod_mpoly_factor_init(lcAf, ctx);
 
-        #ifdef FLINT_WANT_ASSERT
+        #if FLINT_WANT_ASSERT
         {
             fmpz_mod_mpoly_t g;
             fmpz_mod_mpoly_init(g, ctx);
@@ -219,7 +222,7 @@ static int _factor_irred_compressed(
 
     flint_randclear(state);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success)
     {
         fmpz_mod_mpoly_t prod;
@@ -354,7 +357,7 @@ static int _factor_irred(
     slong i, j;
     flint_bitcnt_t Abits;
     mpoly_compression_t M;
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mod_mpoly_t Aorg;
 
     fmpz_mod_mpoly_init(Aorg, Actx);
@@ -459,7 +462,7 @@ static int _factor_irred(
 
 cleanup_less:
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success)
     {
         fmpz_mod_mpoly_t prod;

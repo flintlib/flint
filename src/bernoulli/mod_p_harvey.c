@@ -475,7 +475,7 @@ ulong bernsum_pow2(ulong p, ulong pinv, ulong k, ulong g, ulong n)
       ninv2 = -1/n mod F
 */
 #define LOW_MASK ((UWORD(1) << (FLINT_BITS / 2)) - 1)
-static __inline__ ulong RedcFast(ulong x, ulong n, ulong ninv2)
+static inline ulong RedcFast(ulong x, ulong n, ulong ninv2)
 {
     ulong y = (x * ninv2) & LOW_MASK;
     ulong z = x + (n * y);
@@ -485,7 +485,7 @@ static __inline__ ulong RedcFast(ulong x, ulong n, ulong ninv2)
 /*
    Same as RedcFast(), but reduces output into [0, n).
 */
-static __inline__ ulong Redc(ulong x, ulong n, ulong ninv2)
+static inline ulong Redc(ulong x, ulong n, ulong ninv2)
 {
     ulong y = RedcFast(x, n, ninv2);
     if (y >= n)
@@ -888,4 +888,3 @@ ulong bernoulli_mod_p_harvey(ulong k, ulong p)
 
     return n_mulmod2_preinv(x, k % p, p, pinv);
 }
-

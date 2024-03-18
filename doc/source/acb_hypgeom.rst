@@ -5,7 +5,7 @@
 
 The generalized hypergeometric function is formally defined by
 
-.. math ::
+.. math::
 
     {}_pF_q(a_1,\ldots,a_p;b_1,\ldots,b_q;z) =
     \sum_{k=0}^\infty \frac{(a_1)_k\dots(a_p)_k}{(b_1)_k\dots(b_q)_k} \frac {z^k} {k!}.
@@ -120,13 +120,13 @@ Convergent series
 
 In this section, we define
 
-.. math ::
+.. math::
 
     T(k) = \frac{\prod_{i=0}^{p-1} (a_i)_k}{\prod_{i=0}^{q-1} (b_i)_k} z^k
 
 and
 
-.. math ::
+.. math::
 
     {}_pf_{q}(a_0,\ldots,a_{p-1}; b_0 \ldots b_{q-1}; z) = {}_{p+1}F_{q}(a_0,\ldots,a_{p-1},1; b_0 \ldots b_{q-1}; z) = \sum_{k=0}^{\infty} T(k)
 
@@ -197,7 +197,7 @@ or remove a 1 from the `a_i` parameters if there is one.
 
     Computes
 
-    .. math ::
+    .. math::
 
         {}_pf_{q}(z)
             = \sum_{k=0}^{\infty} T(k)
@@ -337,7 +337,7 @@ Confluent hypergeometric functions
     The *asymp* version uses the asymptotic expansions of Bessel
     functions, together with the connection formulas
 
-    .. math ::
+    .. math::
 
         \frac{{}_0F_1(a,z)}{\Gamma(a)} = (-z)^{(1-a)/2} J_{a-1}(2 \sqrt{-z}) =
                                          z^{(1-a)/2} I_{a-1}(2 \sqrt{z}).
@@ -364,7 +364,7 @@ Error functions and Fresnel integrals
 
     Computes the error function respectively using
 
-    .. math ::
+    .. math::
 
         \operatorname{erf}(z) &= \frac{2z}{\sqrt{\pi}}
             {}_1F_1(\tfrac{1}{2}, \tfrac{3}{2}, -z^2)
@@ -451,18 +451,18 @@ Bessel functions
     via :func:`acb_hypgeom_u_asymp`.
     For all complex `\nu, z`, we have
 
-    .. math ::
+    .. math::
 
         J_{\nu}(z) = \frac{z^{\nu}}{2^{\nu} e^{iz} \Gamma(\nu+1)}
             {}_1F_1(\nu+\tfrac{1}{2}, 2\nu+1, 2iz) = A_{+} B_{+} + A_{-} B_{-}
 
     where
 
-    .. math ::
+    .. math::
 
         A_{\pm} = z^{\nu} (z^2)^{-\tfrac{1}{2}-\nu} (\mp i z)^{\tfrac{1}{2}+\nu} (2 \pi)^{-1/2} = (\pm iz)^{-1/2-\nu} z^{\nu} (2 \pi)^{-1/2}
 
-    .. math ::
+    .. math::
 
         B_{\pm} = e^{\pm i z} U^{*}(\nu+\tfrac{1}{2}, 2\nu+1, \mp 2iz).
 
@@ -475,7 +475,7 @@ Bessel functions
 
     Computes the Bessel function of the first kind from
 
-    .. math ::
+    .. math::
 
         J_{\nu}(z) = \frac{1}{\Gamma(\nu+1)} \left(\frac{z}{2}\right)^{\nu}
                      {}_0F_1\left(\nu+1, -\frac{z^2}{4}\right).
@@ -490,13 +490,13 @@ Bessel functions
     Computes the Bessel function of the second kind `Y_{\nu}(z)` from the
     formula
 
-    .. math ::
+    .. math::
 
         Y_{\nu}(z) = \frac{\cos(\nu \pi) J_{\nu}(z) - J_{-\nu}(z)}{\sin(\nu \pi)}
 
     unless `\nu = n` is an integer in which case the limit value
 
-    .. math ::
+    .. math::
 
         Y_n(z) = -\frac{2}{\pi} \left( i^n K_n(iz) +
             \left[\log(iz)-\log(z)\right] J_n(z) \right)
@@ -528,7 +528,7 @@ Modified Bessel functions
     asymptotic series (see :func:`acb_hypgeom_bessel_j_asymp`),
     the convergent series
 
-    .. math ::
+    .. math::
 
         I_{\nu}(z) = \frac{1}{\Gamma(\nu+1)} \left(\frac{z}{2}\right)^{\nu}
                      {}_0F_1\left(\nu+1, \frac{z^2}{4}\right),
@@ -543,7 +543,7 @@ Modified Bessel functions
     Computes the modified Bessel function of the second kind via
     via :func:`acb_hypgeom_u_asymp`. For all `\nu` and all `z \ne 0`, we have
 
-    .. math ::
+    .. math::
 
         K_{\nu}(z) = \left(\frac{2z}{\pi}\right)^{-1/2} e^{-z}
             U^{*}(\nu+\tfrac{1}{2}, 2\nu+1, 2z).
@@ -556,7 +556,7 @@ Modified Bessel functions
     as a power series truncated to length *len*,
     given `\nu, z \in \mathbb{C}[[x]]`. Uses the formula
 
-    .. math ::
+    .. math::
 
         K_{\nu}(z) = \frac{1}{2} \frac{\pi}{\sin(\pi \nu)} \left[
                     \left(\frac{z}{2}\right)^{-\nu}
@@ -577,7 +577,7 @@ Modified Bessel functions
 
     Computes the modified Bessel function of the second kind from
 
-    .. math ::
+    .. math::
 
         K_{\nu}(z) = \frac{1}{2} \left[
                     \left(\frac{z}{2}\right)^{-\nu}
@@ -686,7 +686,7 @@ Coulomb wave functions
 
 Coulomb wave functions are solutions of the Coulomb wave equation
 
-.. math ::
+.. math::
 
     y'' + \left(1 - \frac{2 \eta}{z} - \frac{\ell(\ell+1)}{z^2}\right) y = 0
 
@@ -759,19 +759,19 @@ Incomplete gamma and beta functions
 
     The different methods respectively implement the formulas
 
-    .. math ::
+    .. math::
 
         \Gamma(s,z) = e^{-z} U(1-s,1-s,z)
 
-    .. math ::
+    .. math::
 
         \Gamma(s,z) = \Gamma(s) - \frac{z^s}{s} {}_1F_1(s, s+1, -z)
 
-    .. math ::
+    .. math::
 
         \Gamma(s,z) = \Gamma(s) - \frac{z^s e^{-z}}{s} {}_1F_1(1, s+1, z)
 
-    .. math ::
+    .. math::
 
         \Gamma(s,z) = \frac{(-1)^n}{n!} (\psi(n+1) - \log(z))
                     + \frac{(-1)^n}{(n+1)!} z \, {}_2F_2(1,1,2,2+n,-z)
@@ -822,11 +822,11 @@ Incomplete gamma and beta functions
     In general, the integral must be interpreted using analytic continuation.
     The precise definitions for all parameter values are
 
-    .. math ::
+    .. math::
 
         B(a,b;z) = \frac{z^a}{a} {}_2F_1(a, 1-b, a+1, z)
 
-    .. math ::
+    .. math::
 
         I(a,b;z) = \frac{\Gamma(a+b)}{\Gamma(b)} z^a {}_2{\widetilde F}_1(a, 1-b, a+1, z).
 
@@ -863,12 +863,12 @@ The branch cut conventions of the following functions match Mathematica.
     Computes the exponential integral `\operatorname{Ei}(z)`, respectively
     using
 
-    .. math ::
+    .. math::
 
         \operatorname{Ei}(z) = -e^z U(1,1,-z) - \log(-z)
             + \frac{1}{2} \left(\log(z) - \log\left(\frac{1}{z}\right) \right)
 
-    .. math ::
+    .. math::
 
         \operatorname{Ei}(z) = z {}_2F_2(1, 1; 2, 2; z) + \gamma
             + \frac{1}{2} \left(\log(z) - \log\left(\frac{1}{z}\right) \right)
@@ -891,13 +891,13 @@ The branch cut conventions of the following functions match Mathematica.
     Computes the sine integral `\operatorname{Si}(z)`, respectively
     using
 
-    .. math ::
+    .. math::
 
         \operatorname{Si}(z) = \frac{i}{2} \left[
             e^{iz} U(1,1,-iz) - e^{-iz} U(1,1,iz) + 
             \log(-iz) - \log(iz) \right]
 
-    .. math ::
+    .. math::
 
         \operatorname{Si}(z) = z {}_1F_2(\tfrac{1}{2}; \tfrac{3}{2}, \tfrac{3}{2}; -\tfrac{z^2}{4})
 
@@ -919,13 +919,13 @@ The branch cut conventions of the following functions match Mathematica.
     Computes the cosine integral `\operatorname{Ci}(z)`, respectively
     using
 
-    .. math ::
+    .. math::
 
         \operatorname{Ci}(z) = \log(z) - \frac{1}{2} \left[
             e^{iz} U(1,1,-iz) + e^{-iz} U(1,1,iz) + 
             \log(-iz) + \log(iz) \right]
 
-    .. math ::
+    .. math::
 
         \operatorname{Ci}(z) = -\tfrac{z^2}{4}
             {}_2F_3(1, 1; 2, 2, \tfrac{3}{2}; -\tfrac{z^2}{4})
@@ -962,13 +962,13 @@ The branch cut conventions of the following functions match Mathematica.
     Computes the hyperbolic cosine integral `\operatorname{Chi}(z)`, respectively
     using
 
-    .. math ::
+    .. math::
 
         \operatorname{Chi}(z) = -\frac{1}{2} \left[
             e^{z} U(1,1,-z) + e^{-z} U(1,1,z) + 
             \log(-z) - \log(z) \right]
 
-    .. math ::
+    .. math::
 
         \operatorname{Chi}(z) = \tfrac{z^2}{4}
             {}_2F_3(1, 1; 2, 2, \tfrac{3}{2}; \tfrac{z^2}{4})
@@ -1003,7 +1003,7 @@ Gauss hypergeometric function
 
 The following methods compute the Gauss hypergeometric function
 
-.. math ::
+.. math::
 
     F(z) = {}_2F_1(a,b,c,z) = \sum_{k=0}^{\infty} \frac{(a)_k (b)_k}{(c)_k} \frac{z^k}{k!}
 
@@ -1096,11 +1096,11 @@ Orthogonal polynomials and functions
 
     Computes the Chebyshev polynomial (or Chebyshev function) of first or second kind
 
-    .. math ::
+    .. math::
 
         T_n(z) = {}_2F_1\left(-n,n,\frac{1}{2},\frac{1-z}{2}\right)
 
-    .. math ::
+    .. math::
 
         U_n(z) = (n+1) {}_2F_1\left(-n,n+2,\frac{3}{2},\frac{1-z}{2}\right).
 
@@ -1113,7 +1113,7 @@ Orthogonal polynomials and functions
 
     Computes the Jacobi polynomial (or Jacobi function)
 
-    .. math ::
+    .. math::
 
         P_n^{(a,b)}(z)=\frac{(a+1)_n}{\Gamma(n+1)} {}_2F_1\left(-n,n+a+b+1,a+1,\frac{1-z}{2}\right).
 
@@ -1126,7 +1126,7 @@ Orthogonal polynomials and functions
 
     Computes the Gegenbauer polynomial (or Gegenbauer function)
 
-    .. math ::
+    .. math::
 
         C_n^{m}(z)=\frac{(2m)_n}{\Gamma(n+1)} {}_2F_1\left(-n,2m+n,m+\frac{1}{2},\frac{1-z}{2}\right).
 
@@ -1139,7 +1139,7 @@ Orthogonal polynomials and functions
 
     Computes the Laguerre polynomial (or Laguerre function)
 
-    .. math ::
+    .. math::
 
         L_n^{m}(z)=\frac{(m+1)_n}{\Gamma(n+1)} {}_1F_1\left(-n,m+1,z\right).
 
@@ -1158,7 +1158,7 @@ Orthogonal polynomials and functions
 
     Computes the Hermite polynomial (or Hermite function)
 
-    .. math ::
+    .. math::
 
         H_n(z) = 2^n \sqrt{\pi} \left(
             \frac{1}{\Gamma((1-n)/2)} {}_1F_1\left(-\frac{n}{2},\frac{1}{2},z^2\right)
@@ -1174,14 +1174,14 @@ Orthogonal polynomials and functions
     Many different branch cut conventions appear in the literature.
     If *type* is 0, the version
 
-    .. math ::
+    .. math::
 
         P_n^m(z) = \frac{(1+z)^{m/2}}{(1-z)^{m/2}}
             \mathbf{F}\left(-n, n+1, 1-m, \frac{1-z}{2}\right)
 
     is computed, and if *type* is 1, the alternative version
 
-    .. math ::
+    .. math::
 
         {\mathcal P}_n^m(z) = \frac{(z+1)^{m/2}}{(z-1)^{m/2}}
             \mathbf{F}\left(-n, n+1, 1-m, \frac{1-z}{2}\right).
@@ -1198,7 +1198,7 @@ Orthogonal polynomials and functions
     Many different branch cut conventions appear in the literature.
     If *type* is 0, the version
 
-    .. math ::
+    .. math::
 
         Q_n^m(z) = \frac{\pi}{2 \sin(\pi m)}
             \left( \cos(\pi m) P_n^m(z) -
@@ -1206,7 +1206,7 @@ Orthogonal polynomials and functions
 
     is computed, and if *type* is 1, the alternative version
 
-    .. math ::
+    .. math::
 
         \mathcal{Q}_n^m(z) = \frac{\pi}{2 \sin(\pi m)} e^{\pi i m}
             \left( \mathcal{P}_n^m(z) -
@@ -1237,7 +1237,7 @@ Orthogonal polynomials and functions
     latitude angle *theta*, and longitude angle *phi*, normalized
     such that
 
-    .. math ::
+    .. math::
 
         Y_n^m(\theta, \phi) = \sqrt{\frac{2n+1}{4\pi} \frac{(n-m)!}{(n+m)!}} e^{im\phi} P_n^m(\cos(\theta)).
 
@@ -1251,7 +1251,7 @@ Dilogarithm
 The dilogarithm function
 is given by `\operatorname{Li}_2(z) = -\int_0^z \frac{\log(1-t)}{t} dt = z {}_3F_2(1,1,1,2,2,z)`.
 
-.. function :: void acb_hypgeom_dilog_bernoulli(acb_t res, const acb_t z, slong prec)
+.. function:: void acb_hypgeom_dilog_bernoulli(acb_t res, const acb_t z, slong prec)
 
     Computes the dilogarithm using a series expansion in `w = \log(z)`,
     with rate of convergence `|w/(2\pi)|^n`. This provides good convergence

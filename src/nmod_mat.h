@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -17,11 +17,10 @@
 #ifdef NMOD_MAT_INLINES_C
 #define NMOD_MAT_INLINE
 #else
-#define NMOD_MAT_INLINE static __inline__
+#define NMOD_MAT_INLINE static inline
 #endif
 
 #include "nmod_types.h"
-#include "thread_pool.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -95,7 +94,7 @@ void nmod_mat_randfull(nmod_mat_t mat, flint_rand_t state);
 int nmod_mat_randpermdiag(nmod_mat_t mat, flint_rand_t state,
                  mp_srcptr diag, slong n);
 void nmod_mat_randrank(nmod_mat_t, flint_rand_t state, slong rank);
-void nmod_mat_randops(nmod_mat_t mat, slong count, flint_rand_t state);
+void nmod_mat_randops(nmod_mat_t mat, flint_rand_t state, slong count);
 void nmod_mat_randtril(nmod_mat_t mat, flint_rand_t state, int unit);
 void nmod_mat_randtriu(nmod_mat_t mat, flint_rand_t state, int unit);
 
@@ -359,4 +358,3 @@ void nmod_mat_set_entry(nmod_mat_t mat, slong i, slong j, mp_limb_t x);
 #endif
 
 #endif
-

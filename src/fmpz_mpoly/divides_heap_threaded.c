@@ -5,13 +5,20 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mpoly.h"
+
+#if FLINT_KNOW_STRONG_ORDER
+
+#include "thread_pool.h"
 #include "thread_support.h"
 #include "ulong_extras.h"
-#include "fmpz_mpoly.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "mpoly.h"
 
 /*
     a thread safe mpoly supports three mutating operations
@@ -34,9 +41,9 @@ typedef struct _fmpz_mpoly_ts_struct
 typedef fmpz_mpoly_ts_struct fmpz_mpoly_ts_t[1];
 
 /* Bcoeff is changed */
-void fmpz_mpoly_ts_init(fmpz_mpoly_ts_t A,
-                              fmpz * Bcoeff, ulong * Bexp, slong Blen,
-                                                    flint_bitcnt_t bits, slong N)
+static void fmpz_mpoly_ts_init(fmpz_mpoly_ts_t A,
+        fmpz * Bcoeff, ulong * Bexp, slong Blen,
+        flint_bitcnt_t bits, slong N)
 {
     slong i;
     flint_bitcnt_t idx = FLINT_BIT_COUNT(Blen);
@@ -61,7 +68,8 @@ void fmpz_mpoly_ts_init(fmpz_mpoly_ts_t A,
     }
 }
 
-void fmpz_mpoly_ts_print(const fmpz_mpoly_ts_t B, const char ** x,
+#if 0
+static void fmpz_mpoly_ts_print(const fmpz_mpoly_ts_t B, const char ** x,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
     fmpz_mpoly_t A;
@@ -74,8 +82,9 @@ void fmpz_mpoly_ts_print(const fmpz_mpoly_ts_t B, const char ** x,
 
     fmpz_mpoly_assert_canonical(A, ctx);
 }
+#endif
 
-void fmpz_mpoly_ts_clear(fmpz_mpoly_ts_t A)
+static void fmpz_mpoly_ts_clear(fmpz_mpoly_ts_t A)
 {
     slong i;
 
@@ -95,7 +104,7 @@ void fmpz_mpoly_ts_clear(fmpz_mpoly_ts_t A)
     }
 }
 
-void fmpz_mpoly_ts_clear_poly(fmpz_mpoly_t Q, fmpz_mpoly_ts_t A)
+static void fmpz_mpoly_ts_clear_poly(fmpz_mpoly_t Q, fmpz_mpoly_ts_t A)
 {
     if (Q->alloc != 0)
     {
@@ -126,7 +135,7 @@ void fmpz_mpoly_ts_clear_poly(fmpz_mpoly_t Q, fmpz_mpoly_ts_t A)
 
 
 /* put B on the end of A - Bcoeff is changed*/
-void fmpz_mpoly_ts_append(fmpz_mpoly_ts_t A,
+static void fmpz_mpoly_ts_append(fmpz_mpoly_ts_t A,
                              fmpz * Bcoeff, ulong * Bexps, slong Blen, slong N)
 {
 /* TODO: this needs barriers on non-x86 */
@@ -330,7 +339,7 @@ static void divides_heap_base_add_chunk(divides_heap_base_t H, divides_heap_chun
     saveD: 0 means we can modify coeffs of input D
            1 means we must not modify coeffs of input D
 */
-slong _fmpz_mpoly_mulsub_stripe1(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc,
+static slong _fmpz_mpoly_mulsub_stripe1(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc,
                          const fmpz * Dcoeff, const ulong * Dexp, slong Dlen, int saveD,
                          const fmpz * Bcoeff, const ulong * Bexp, slong Blen,
                          const fmpz * Ccoeff, const ulong * Cexp, slong Clen,
@@ -606,7 +615,7 @@ slong _fmpz_mpoly_mulsub_stripe1(fmpz ** A_coeff, ulong ** A_exp, slong * A_allo
 }
 
 
-slong _fmpz_mpoly_mulsub_stripe(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc,
+static slong _fmpz_mpoly_mulsub_stripe(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc,
                          const fmpz * Dcoeff, const ulong * Dexp, slong Dlen, int saveD,
                          const fmpz * Bcoeff, const ulong * Bexp, slong Blen,
                          const fmpz * Ccoeff, const ulong * Cexp, slong Clen,
@@ -911,7 +920,7 @@ slong _fmpz_mpoly_mulsub_stripe(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc
     Q = stripe of A/B (assume A != 0)
     return Qlen = 0 if exact division is impossible
 */
-slong _fmpz_mpoly_divides_stripe1(
+static slong _fmpz_mpoly_divides_stripe1(
                         fmpz ** Q_coeff,     ulong ** Q_exp, slong * Q_alloc,
                     const fmpz * Acoeff, const ulong * Aexp, slong Alen,
                     const fmpz * Bcoeff, const ulong * Bexp, slong Blen,
@@ -998,7 +1007,7 @@ slong _fmpz_mpoly_divides_stripe1(
         lc_sign = FLINT_SIGN_EXT(Bcoeff[0]);
         lc_norm = flint_clz(lc_abs);
         lc_n = lc_abs << lc_norm;
-        invert_limb(lc_i, lc_n);
+        lc_i = n_preinvert_limb_prenorm(lc_n);
     }
 
     while (heap_len > 1)
@@ -1248,7 +1257,7 @@ not_exact_division:
     goto cleanup;
 }
 
-slong _fmpz_mpoly_divides_stripe(
+static slong _fmpz_mpoly_divides_stripe(
                         fmpz ** Q_coeff,     ulong ** Q_exp, slong * Q_alloc,
                     const fmpz * Acoeff, const ulong * Aexp, slong Alen,
                     const fmpz * Bcoeff, const ulong * Bexp, slong Blen,
@@ -1349,7 +1358,7 @@ slong _fmpz_mpoly_divides_stripe(
         lc_sign = FLINT_SIGN_EXT(Bcoeff[0]);
         lc_norm = flint_clz(lc_abs);
         lc_n = lc_abs << lc_norm;
-        invert_limb(lc_i, lc_n);
+        lc_i = n_preinvert_limb_prenorm(lc_n);
     }
 
     while (heap_len > 1)
@@ -1945,21 +1954,21 @@ static void worker_loop(void * varg)
 #if FLINT_USES_PTHREAD
             pthread_mutex_lock(&H->mutex);
 #endif
-	    if (L->lock != -1)
+            if (L->lock != -1)
             {
                 L->lock = -1;
 #if FLINT_USES_PTHREAD
                 pthread_mutex_unlock(&H->mutex);
 #endif
-		trychunk(W, L);
+                trychunk(W, L);
 #if FLINT_USES_PTHREAD
                 pthread_mutex_lock(&H->mutex);
 #endif
-		L->lock = 0;
+                L->lock = 0;
 #if FLINT_USES_PTHREAD
                 pthread_mutex_unlock(&H->mutex);
 #endif
-		break;
+                break;
             }
             else
             {
@@ -2003,10 +2012,6 @@ int _fmpz_mpoly_divides_heap_threaded_pool(
     ulong * texps, * qexps;
     divides_heap_base_t H;
     TMP_INIT;
-
-#if !FLINT_KNOW_STRONG_ORDER
-    return fmpz_mpoly_divides_monagan_pearce(Q, A, B, ctx);
-#endif
 
     if (B->length < 2 || A->length < 2)
     {
@@ -2245,3 +2250,6 @@ int fmpz_mpoly_divides_heap_threaded(
 
     return divides;
 }
+#else
+typedef int this_file_is_empty;
+#endif

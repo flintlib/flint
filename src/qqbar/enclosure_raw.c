@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2020 Fredrik Johansson
 
-    This file is part of Calcium.
+    This file is part of FLINT.
 
-    Calcium is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "arb_fmpz_poly.h"
@@ -60,8 +60,7 @@ _qqbar_enclosure_raw(acb_t res, const fmpz_poly_t poly, const acb_t zin, slong p
 
         if (step > 40 || prec > 1000000000)
         {
-            flint_printf("qqbar_enclosure_raw: root refinement not converging\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "qqbar_enclosure_raw: root refinement not converging\n");
         }
 
         prec *= 2;
@@ -102,9 +101,7 @@ _qqbar_enclosure_raw(acb_t res, const fmpz_poly_t poly, const acb_t zin, slong p
 */
 
             if (!fmpz_poly_is_squarefree(poly))
-            {
-                flint_abort();
-            }
+                flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
             arb_fmpz_poly_complex_roots(roots, poly, 0, 2 * prec);
 
@@ -152,4 +149,3 @@ qqbar_enclosure_raw(acb_t res, const qqbar_t x, slong prec)
 {
     _qqbar_enclosure_raw(res, QQBAR_POLY(x), QQBAR_ENCLOSURE(x), prec);
 }
-

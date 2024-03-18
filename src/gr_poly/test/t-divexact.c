@@ -5,8 +5,8 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "test_helpers.h"
@@ -97,6 +97,7 @@ TEST_FUNCTION_START(gr_poly_divexact, state)
                     || (ctx->which_ring == GR_CTX_FMPZ && status != GR_SUCCESS)))
             {
                 flint_printf("FAIL\n\n");
+                flint_printf("%d\n", status);
                 gr_ctx_println(ctx);
                 flint_printf("A = "); gr_poly_print(A, ctx); flint_printf("\n");
                 flint_printf("B = "); gr_poly_print(B, ctx); flint_printf("\n");

@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -53,7 +53,6 @@ main(void)
 {
     int i, j, len1, len2;
     int X[rows][cols];
-    double T[rows][cols][nalgs];
     fmpz_poly_t f, g, h;
     FLINT_TEST_INIT(state);
 
@@ -121,9 +120,6 @@ main(void)
                     s[c] += t[c]->cpu;
                 reps += loops;
             }
-
-            for (c = 0; c < nalgs; c++)
-                T[i][j][c] = s[c] / (double) reps;
 
             if (s[0] <= s[1])
                 X[i][j] = 0;

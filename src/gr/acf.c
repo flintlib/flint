@@ -5,8 +5,8 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fmpz_poly_factor.h"
@@ -1182,7 +1182,7 @@ gr_method_tab_input _acf_methods_input[] =
     {GR_METHOD_SET_FMPZ,        (gr_funcptr) _gr_acf_set_fmpz},
     {GR_METHOD_SET_FMPQ,        (gr_funcptr) _gr_acf_set_fmpq},
     {GR_METHOD_SET_D,           (gr_funcptr) _gr_acf_set_d},
-/*    {GR_METHOD_SET_STR,         (gr_funcptr) _gr_acf_set_str}, */
+    {GR_METHOD_SET_STR,         (gr_funcptr) gr_generic_set_str_ring_exponents},
     {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_acf_set_other},
 
     {GR_METHOD_GET_FMPZ,        (gr_funcptr) _gr_acf_get_fmpz},

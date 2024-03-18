@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2014 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "ulong_extras.h"
@@ -30,7 +30,7 @@ acb_hypgeom_pfq_sum_rs(acb_t res, acb_t term, acb_srcptr a, slong p,
     }
 
     if (n < 0)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     m = n_sqrt(n);
     m = FLINT_MIN(m, 150);
@@ -115,4 +115,3 @@ acb_hypgeom_pfq_sum_rs(acb_t res, acb_t term, acb_srcptr a, slong p,
     acb_clear(u);
     _acb_vec_clear(zpow, m + 1);
 }
-

@@ -5,12 +5,13 @@
     Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2012 Lina Kulakova
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -77,7 +78,7 @@ __TEMPLATE(T, poly_factor_berlekamp) (TEMPLATE(T, poly_factor_t) factors,
 
     TEMPLATE(T, mat_t) matrix;
     TEMPLATE(T, t) mul, coeff, neg_one;
-    fmpz_t p, q, s, pow;
+    fmpz_t q, s, pow;
     slong i, nullity, col, row;
     slong *shift;
 
@@ -93,7 +94,6 @@ __TEMPLATE(T, poly_factor_berlekamp) (TEMPLATE(T, poly_factor_t) factors,
     TEMPLATE(T, init) (neg_one, ctx);
     TEMPLATE(T, init) (mul, ctx);
 
-    fmpz_init_set(p, TEMPLATE(T, ctx_prime) (ctx));
     fmpz_init(q);
     TEMPLATE(T, ctx_order) (q, ctx);
 
@@ -107,8 +107,13 @@ __TEMPLATE(T, poly_factor_berlekamp) (TEMPLATE(T, poly_factor_t) factors,
 
     /* pow = (q-1)/2 */
     fmpz_init(pow);
-    if (fmpz_cmp_ui(p, 3) > 0)
+#if defined(FQ_NMOD_POLY_FACTOR_H) || defined(FQ_ZECH_POLY_FACTOR_H)
+    if (TEMPLATE(T, ctx_prime)(ctx) > UWORD(3))
     {
+#else
+    if (fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 3) > 0)
+    {
+#endif
         fmpz_set(pow, s);
         fmpz_divexact_ui(pow, pow, 2);
     }
@@ -143,7 +148,7 @@ __TEMPLATE(T, poly_factor_berlekamp) (TEMPLATE(T, poly_factor_t) factors,
     TEMPLATE(T, poly_clear) (x_qi2, ctx);
 
     /* Row reduce Q - I */
-    nullity = n - TEMPLATE(T, mat_rref) (matrix, ctx);
+    nullity = n - TEMPLATE(T, mat_rref) (matrix, matrix, ctx);
 
     /* Find a basis for the nullspace */
     basis = flint_malloc(nullity * sizeof(TEMPLATE(T, poly_t)));
@@ -212,7 +217,11 @@ __TEMPLATE(T, poly_factor_berlekamp) (TEMPLATE(T, poly_factor_t) factors,
             if (TEMPLATE(T, poly_length) (g, ctx) != 1)
                 break;
 
-            if (fmpz_cmp_ui(p, 3) > 0)
+#if defined(FQ_NMOD_POLY_FACTOR_H) || defined(FQ_ZECH_POLY_FACTOR_H)
+            if (TEMPLATE(T, ctx_prime)(ctx) > UWORD(3))
+#else
+            if (fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 3) > 0)
+#endif
                 TEMPLATE(T, poly_powmod_fmpz_binexp) (power, factor, pow, f,
                                                       ctx);
             else
@@ -262,7 +271,6 @@ __TEMPLATE(T, poly_factor_berlekamp) (TEMPLATE(T, poly_factor_t) factors,
     TEMPLATE(T, clear) (neg_one, ctx);
     TEMPLATE(T, clear) (mul, ctx);
     fmpz_clear(pow);
-    fmpz_clear(p);
     fmpz_clear(q);
     fmpz_clear(s);
 }

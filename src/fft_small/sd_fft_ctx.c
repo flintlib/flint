@@ -5,32 +5,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <stdlib.h>
 #include "fft_small.h"
 #include "nmod.h"
-
-void * flint_aligned_alloc(ulong alignment, ulong size)
-{
-    void * p;
-
-    FLINT_ASSERT(size % alignment == 0);
-
-    p = aligned_alloc(alignment, size);
-
-    if (p == NULL)
-        flint_throw(FLINT_ERROR, "Unable to allocate %wu bytes with alignment %wu in %s\n", size, alignment, __func__);
-
-    return p;
-}
-
-void flint_aligned_free(void * p)
-{
-    free(p);
-}
 
 void sd_fft_ctx_clear(sd_fft_ctx_t Q)
 {
@@ -45,6 +26,9 @@ void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp)
     ulong N, i, k, l;
     double * t;
     double n, ninv;
+
+    if (!fft_small_mulmod_satisfies_bounds(pp))
+        flint_throw(FLINT_ERROR, "FFT prime %wu does not satisfy bounds for arithmetic", pp);
 
     Q->blk_sz = BLK_SZ;
     Q->p = pp;
@@ -151,4 +135,3 @@ void sd_fft_ctx_fit_depth(sd_fft_ctx_t Q, ulong depth)
         Q->w2tab_depth = k;
     }
 }
-

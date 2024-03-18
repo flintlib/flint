@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2018 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "arb_mat.h"
@@ -18,6 +18,8 @@
 # include <math.h>
 #endif
 
+#include "double_extras.h"
+
 /* Block size for better cache locality. */
 #define BLOCK_SIZE 32
 
@@ -28,7 +30,7 @@
    slack for accumulated sums. */
 #define DOUBLE_MAX_OFFSET 900
 
-static __inline__ double dot8(const double * A, const double * B)
+static inline double dot8(const double * A, const double * B)
 {
     return ((A[0] * B[0] + A[1] * B[1]) + (A[2] * B[2] + A[3] * B[3])) +
            ((A[4] * B[4] + A[5] * B[5]) + (A[6] * B[6] + A[7] * B[7]));
@@ -90,7 +92,7 @@ _d_mat_addmul(double * C, const double * A, const double * B, slong ar, slong ac
 }
 
 /* We use WORD_MIN to represent zero here. */
-static __inline__ slong _mag_get_exp(const mag_t x)
+static inline slong _mag_get_exp(const mag_t x)
 {
     if (mag_is_special(x))
         return WORD_MIN;
@@ -101,7 +103,7 @@ static __inline__ slong _mag_get_exp(const mag_t x)
 static double
 mag_get_d_fixed_si(const mag_t x, slong e)
 {
-    return ldexp(MAG_MAN(x), MAG_EXP(x) - e - MAG_BITS);
+    return d_mul_2exp(MAG_MAN(x), MAG_EXP(x) - e - MAG_BITS);
 }
 
 void
@@ -283,4 +285,3 @@ _arb_mat_addmul_rad_mag_fast(arb_mat_t C, mag_srcptr A, mag_srcptr B,
     flint_free(BB);
     flint_free(CC);
 }
-

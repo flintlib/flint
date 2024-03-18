@@ -1,22 +1,16 @@
 /*
     Copyright (C) 2017 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #ifndef ARB_FMPZ_POLY_H
 #define ARB_FMPZ_POLY_H
-
-#ifdef ARB_FMPZ_POLY_INLINES_C
-#define ARB_FMPZ_POLY_INLINE
-#else
-#define ARB_FMPZ_POLY_INLINE static __inline__
-#endif
 
 #include "fmpz_poly.h"
 #include "acb_types.h"
@@ -45,12 +39,6 @@ void arb_fmpz_poly_deflate(fmpz_poly_t result, const fmpz_poly_t input, ulong de
 ulong arb_fmpz_poly_deflation(const fmpz_poly_t input);
 
 void arb_fmpz_poly_complex_roots(acb_ptr roots, const fmpz_poly_t poly, int flags, slong target_prec);
-
-ARB_FMPZ_POLY_INLINE
-void arb_fmpz_poly_cos_minpoly(fmpz_poly_t res, ulong n)
-{
-    fmpz_poly_cos_minpoly(res, n);
-}
 
 void arb_fmpz_poly_gauss_period_minpoly(fmpz_poly_t res, ulong q, ulong n);
 

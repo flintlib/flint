@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -19,7 +19,7 @@ TEST_FUNCTION_START(fmpq_reconstruct_fmpz_2, state)
     int i;
 
     /* check successful reconstructions */
-    for (i = 0; i < 1000*flint_test_multiplier(); i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         int success;
         fmpq_t x, y;
@@ -74,26 +74,32 @@ TEST_FUNCTION_START(fmpq_reconstruct_fmpz_2, state)
             fmpz_mul(D, D, t);
         }
 
-        fmpz_mul(mod, N, D);
-        fmpz_mul_ui(mod, mod, 2);
+        if (n_randint(state, 10))
+        {
+            fmpz_mul(mod, N, D);
+            fmpz_mul_ui(mod, mod, 2);
+        }
+        else
+        {
+            fmpz_randbits(mod, state, FLINT_BITS * FMPQ_RECONSTRUCT_HGCD_CUTOFF + fmpz_bits(N) + n_randint(state, 10));
+            fmpz_abs(mod, mod);
+        }
+
         do fmpz_add_ui(mod, mod, 1);
         while (!fmpq_mod_fmpz(res, x, mod));
 
         success = fmpq_reconstruct_fmpz_2(y, res, mod, N, D);
 
         if (!success || !fmpq_equal(x, y))
-        {
-            flint_printf("FAIL: reconstruction failed\n");
-            flint_printf("success = %d\n", success);
-            flint_printf("x = "); fmpq_print(x); flint_printf("\n");
-            flint_printf("N = "); fmpz_print(N); flint_printf("\n");
-            flint_printf("D = "); fmpz_print(D); flint_printf("\n");
-            flint_printf("mod = "); fmpz_print(mod); flint_printf("\n");
-            flint_printf("res = "); fmpz_print(res); flint_printf("\n");
-            flint_printf("y = "); fmpq_print(y); flint_printf("\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            flint_throw(FLINT_TEST_FAIL,
+                    "success = %d\n"
+                    "x = %{fmpq}\n"
+                    "N = %{fmpz}\n"
+                    "D = %{fmpz}\n"
+                    "mod = %{fmpz}\n"
+                    "res = %{fmpz}\n"
+                    "y = %{fmpq}\n",
+                    success, x, N, D, mod, res, y);
 
         fmpq_clear(x);
         fmpq_clear(y);
@@ -169,12 +175,7 @@ TEST_FUNCTION_START(fmpq_reconstruct_fmpz_2, state)
                                                fmpq_denref(y), res, mod, N, D);
 
         if (success1 != success2 || (success1 && !fmpq_equal(x, y)))
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("check match with naive: i = %wd\n", i);
-            fflush(stdout);
-            flint_abort();
-        }
+            flint_throw(FLINT_TEST_FAIL, "check match with naive: i = %wd\n", i);
 
         fmpq_clear(x);
         fmpq_clear(y);

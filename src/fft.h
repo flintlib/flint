@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -15,7 +15,7 @@
 #ifdef FFT_INLINES_C
 #define FFT_INLINE
 #else
-#define FFT_INLINE static __inline__
+#define FFT_INLINE static inline
 #endif
 
 #include "flint.h"
@@ -24,59 +24,13 @@
  extern "C" {
 #endif
 
-#if defined(__MPIR_VERSION)
-
-#if !defined(__MPIR_RELEASE ) || __MPIR_RELEASE < 20600
-#define mpn_sumdiff_n __MPN(sumdiff_n)
-FLINT_DLL extern
-mp_limb_t mpn_sumdiff_n(mp_ptr, mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
-#endif
-
-#else
-
-FFT_INLINE
-mp_limb_t mpn_sumdiff_n(mp_ptr s, mp_ptr d, mp_srcptr x, mp_srcptr y, mp_size_t n)
-{
-    mp_limb_t ret;
-    mp_ptr t;
-
-    if (n == 0)
-        return 0;
-
-    if ((s == x && d == y) || (s == y && d == x))
-    {
-        t = (mp_ptr) flint_malloc(n * sizeof(mp_limb_t));
-        ret = mpn_sub_n(t, x, y, n);
-        ret += 2 * mpn_add_n(s, x, y, n);
-        flint_mpn_copyi(d, t, n);
-        flint_free(t);
-        return ret;
-    }
-
-    if (s == x || s == y)
-    {
-        ret = mpn_sub_n(d, x, y, n);
-        ret += 2 * mpn_add_n(s, x, y, n);
-        return ret;
-    }
-
-    ret = 2 * mpn_add_n(s, x, y, n);
-    ret += mpn_sub_n(d, x, y, n);
-    return ret;
-}
-
-#endif
+/* defined in mpn_extras.h */
+mp_limb_t flint_mpn_sumdiff_n(mp_ptr s, mp_ptr d, mp_srcptr x, mp_srcptr y, mp_size_t n);
 
 #define fft_sumdiff(t, u, r, s, n) \
-   (n == 0 ? 0 : mpn_sumdiff_n(t, u, r, s, n))
+   (n == 0 ? 0 : flint_mpn_sumdiff_n(t, u, r, s, n))
 
-
-#define SWAP_PTRS(xx, yy) \
-   do { \
-      mp_limb_t * __ptr = xx; \
-      xx = yy; \
-      yy = __ptr; \
-   } while (0)
+#define SWAP_PTRS(xx, yy) FLINT_SWAP(mp_ptr, xx, yy)
 
 /* used for generating random values mod p in test code */
 /* NOTE: One needs to include mpn_extras.h for this macro. */
@@ -274,4 +228,3 @@ void fft_convolution_precache(mp_limb_t ** ii, mp_limb_t ** jj,
 #endif
 
 #endif
-

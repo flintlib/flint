@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -32,12 +32,7 @@ TEST_FUNCTION_START(n_primitive_root_prime, state)
         for (j = 0; j < factors.num; j++)
         {
             if (n_powmod_precomp(root, (p-1) / factors.p[j], p, pinv) == 1)
-            {
-                flint_printf("FAIL:\n");
-                flint_printf("%wu ** (%wu / %wu) == 1 mod %wu\n", root, p-1, factors.p[j], p);
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL("%wu ** (%wu / %wu) == 1 mod %wu\n", root, p-1, factors.p[j], p);
         }
     }
 

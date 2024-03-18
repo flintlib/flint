@@ -6,11 +6,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <stdio.h>
+#include "fmpz.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
 
 /* printing *******************************************************************/
@@ -166,10 +168,12 @@ void fmpz_mpoly_remainder_test(const fmpz_mpoly_t r, const fmpz_mpoly_t g,
 
         if (divides && fmpz_cmpabs(g->coeffs + 0, r->coeffs + i) <= 0)
         {
-            flint_printf("fmpz_mpoly_remainder_test FAILED i = %wd\n", i);
-            flint_printf("rem ");fmpz_mpoly_print_pretty(r, NULL, ctx); printf("\n\n");
-            flint_printf("den ");fmpz_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "fmpz_mpoly_remainder_test FAILED i = %wd\n"
+                                     "rem %s\n\n"
+                                     "den %s\n\n",
+                                     i,
+                                     fmpz_mpoly_get_str_pretty(r, NULL, ctx),
+                                     fmpz_mpoly_get_str_pretty(g, NULL, ctx));
         }
     }
 
@@ -219,51 +223,15 @@ void fmpz_mpoly_remainder_strongtest(const fmpz_mpoly_t r, const fmpz_mpoly_t g,
 
         if (divides)
         {
-            flint_printf("fmpz_mpoly_remainder_strongtest FAILED i = %wd\n", i);
-            flint_printf("rem ");fmpz_mpoly_print_pretty(r, NULL, ctx); printf("\n\n");
-            flint_printf("den ");fmpz_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "fmpz_mpoly_remainder_strongtest FAILED i = %wd\n"
+                                     "rem %s\n\n"
+                                     "den %s\n\n",
+                                     i,
+                                     fmpz_mpoly_get_str_pretty(r, NULL, ctx),
+                                     fmpz_mpoly_get_str_pretty(g, NULL, ctx));
         }
     }
 
     flint_free(rexp);
     flint_free(gexp);
-}
-
-void fmpz_mpolyd_print(fmpz_mpolyd_t poly)
-{
-    int first = 0;
-    slong i, j;
-    slong degb_prod;
-
-    degb_prod = WORD(1);
-    for (j = 0; j < poly->nvars; j++) {
-        degb_prod *= poly->deg_bounds[j];
-    }
-
-    first = 1;
-    for (i = 0; i < degb_prod; i++) {
-        ulong k = i;
-
-        if (fmpz_is_zero(poly->coeffs + i))
-            continue;
-
-        if (!first)
-            printf(" + ");
-
-        fmpz_print(poly->coeffs + i);
-
-        for (j = poly->nvars - 1; j >= 0; j--)
-        {
-            ulong m = poly->deg_bounds[j];
-            ulong e = k % m;
-            k = k / m;
-            flint_printf("*x%d^%wd", j, e);
-        }
-        FLINT_ASSERT(k == 0);
-        first = 0;
-    }
-
-    if (first)
-        flint_printf("0");
 }

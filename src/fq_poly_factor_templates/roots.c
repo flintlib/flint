@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -45,14 +45,22 @@ try_again:
 
     if (!fmpz_is_zero(halfq))
     {
+#if defined(FQ_NMOD_POLY_FACTOR_H) || defined(FQ_ZECH_POLY_FACTOR_H)
+        FLINT_ASSERT(TEMPLATE(T, ctx_prime)(ctx) > 2);
+#else
         FLINT_ASSERT(fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) > 0);
+#endif
         TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(t, a, halfq, 0, f, t2, ctx);
         TEMPLATE(T, poly_add_si)(t, t, -1, ctx);
     }
     else
     {
         /* it is important that coeff(a, x^1) is random */
+#if defined(FQ_NMOD_POLY_FACTOR_H) || defined(FQ_ZECH_POLY_FACTOR_H)
+        FLINT_ASSERT(TEMPLATE(T, ctx_prime)(ctx) == 2);
+#else
         FLINT_ASSERT(fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) == 0);
+#endif
         TEMPLATE(T, poly_set)(t, a, ctx);
         for (i = TEMPLATE(T, ctx_degree)(ctx); i > 1; i--)
         {
@@ -144,7 +152,11 @@ static void _TEMPLATE(T, poly_push_roots)(
 
     if (!fmpz_is_zero(halfq))
     {
+#if defined(FQ_NMOD_POLY_FACTOR_H) || defined(FQ_ZECH_POLY_FACTOR_H)
+        FLINT_ASSERT(TEMPLATE(T, ctx_prime)(ctx) > 2);
+#else
         FLINT_ASSERT(fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) > 0);
+#endif
         TEMPLATE(T, poly_powmod_fmpz_sliding_preinv)(t, a, halfq, 0, f, t2, ctx);
         TEMPLATE(T, poly_add_si)(t, t, -1, ctx);
         TEMPLATE(T, poly_gcd)(a, t, f, ctx);
@@ -152,7 +164,11 @@ static void _TEMPLATE(T, poly_push_roots)(
     }
     else
     {
+#if defined(FQ_NMOD_POLY_FACTOR_H) || defined(FQ_ZECH_POLY_FACTOR_H)
+        FLINT_ASSERT(TEMPLATE(T, ctx_prime)(ctx) == 2);
+#else
         FLINT_ASSERT(fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) == 0);
+#endif
         TEMPLATE(T, poly_set)(t, a, ctx);
         for (i = TEMPLATE(T, ctx_degree)(ctx); i > 1; i--)
         {

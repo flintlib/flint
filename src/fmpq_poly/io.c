@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -290,8 +290,7 @@ int fmpq_poly_fread(FILE * file, fmpq_poly_t poly)
     }
     if (!mpz_fits_slong_p(t))
     {
-        flint_printf("Exception (fmpz_poly_fread). Length does not fit into a slong.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_poly_fread). Length does not fit into a slong.\n");
     }
     len = flint_mpz_get_si(t);
     mpz_clear(t);
@@ -333,4 +332,3 @@ int fmpq_poly_debug(const fmpq_poly_t poly)
 
     return 1;
 }
-

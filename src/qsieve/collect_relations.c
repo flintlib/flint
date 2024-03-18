@@ -7,10 +7,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "thread_pool.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "qsieve.h"
@@ -242,9 +243,9 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
    fmpz_add(res, res, C); /* res = AX^2 + 2BX + C */
 
 #if QS_DEBUG & 128
-   printf("res = "); fmpz_print(res); printf("\n");
+   flint_printf("res = "); fmpz_print(res); flint_printf("\n");
    flint_printf("Poly: "); fmpz_print(qs_inf->A); flint_printf("*x^2 + 2*");
-   fmpz_print(poly->B); flint_printf("*x + "); fmpz_print(C); printf("\n");
+   fmpz_print(poly->B); flint_printf("*x + "); fmpz_print(C); flint_printf("\n");
    flint_printf("x = %wd\n", i - qs_inf->sieve_size / 2);
 #endif
 
@@ -356,7 +357,7 @@ slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_
       {
 #if QS_DEBUG
          if (qs_inf->full_relation % 100 == 0)
-            printf("%ld relations\n", qs_inf->full_relation);
+            flint_printf("%ld relations\n", qs_inf->full_relation);
 #endif
          /* set sign amongst small factors */
          if (fmpz_cmp_si(res, -1) == 0)

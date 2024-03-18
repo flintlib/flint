@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -16,7 +16,7 @@
 #ifdef FMPQ_INLINES_C
 #define FMPQ_INLINE
 #else
-#define FMPQ_INLINE static __inline__
+#define FMPQ_INLINE static inline
 #endif
 
 #include "fmpz.h"
@@ -24,6 +24,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#define FMPQ_RECONSTRUCT_HGCD_CUTOFF 500
 
 FMPQ_INLINE void fmpq_init(fmpq_t x)
 {
@@ -83,8 +85,7 @@ FMPQ_INLINE void fmpq_set(fmpq_t dest, const fmpq_t src)
 
 FMPQ_INLINE void fmpq_swap(fmpq_t op1, fmpq_t op2)
 {
-    fmpz_swap(fmpq_numref(op1), fmpq_numref(op2));
-    fmpz_swap(fmpq_denref(op1), fmpq_denref(op2));
+    FLINT_SWAP(fmpq, *op1, *op2);
 }
 
 FMPQ_INLINE void fmpq_neg(fmpq_t dest, const fmpq_t src)
@@ -170,8 +171,6 @@ void flint_mpq_clear_readonly(mpq_t z);
 void fmpq_init_set_readonly(fmpq_t f, const mpq_t z);
 
 void fmpq_clear_readonly(fmpq_t f);
-
-void fmpq_init_set_mpz_frac_readonly(fmpq_t z, const mpz_t num, const mpz_t den);
 
 char * _fmpq_get_str(char * str, int b, const fmpz_t num, const fmpz_t den);
 char * fmpq_get_str(char * str, int b, const fmpq_t x);
@@ -373,13 +372,6 @@ void _fmpq_cfrac_list_push_back_zero(_fmpq_cfrac_list_t v);
 
 void _fmpq_cfrac_list_append_ui(_fmpq_cfrac_list_t v, const ulong * a, slong n);
 
-FMPQ_INLINE void _fmpq_cfrac_list_swap(_fmpq_cfrac_list_t a, _fmpq_cfrac_list_t b)
-{
-    _fmpq_cfrac_list_struct t = *a;
-    *a = *b;
-    *b = t;
-}
-
 /*************** ball for closed interval [left, right] **********************/
 
 typedef struct {
@@ -393,11 +385,9 @@ void _fmpq_ball_init(_fmpq_ball_t x);
 
 void _fmpq_ball_clear(_fmpq_ball_t x);
 
-FMPQ_INLINE void _fmpq_ball_swap(_fmpq_ball_t x, _fmpq_ball_t y)
+FLINT_FORCE_INLINE void _fmpq_ball_swap(_fmpq_ball_t x, _fmpq_ball_t y)
 {
-   _fmpq_ball_struct t = *x;
-   *x = *y;
-   *y = t;
+    FLINT_SWAP(_fmpq_ball_struct, *x, *y);
 }
 
 int _fmpq_ball_gt_one(const _fmpq_ball_t x);
@@ -413,6 +403,8 @@ void fmpq_denominator(fmpz_t n, const fmpq_t q);
 fmpz * fmpq_numerator_ptr(fmpq_t q);
 fmpz * fmpq_denominator_ptr(fmpq_t q);
 int fmpq_equal_fmpz(fmpq_t q, fmpz_t n);
+
+#define fmpq_init_set_mpz_frac_readonly _Pragma("GCC error \"'fmpq_init_set_mpz_frac_readonly' is deprecated.\"")
 
 #ifdef __cplusplus
 }

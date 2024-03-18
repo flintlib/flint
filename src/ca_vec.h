@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2020 Fredrik Johansson
 
-    This file is part of Calcium.
+    This file is part of FLINT.
 
-    Calcium is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #ifndef CA_VEC_H
@@ -15,7 +15,7 @@
 #ifdef CA_VEC_INLINES_C
 #define CA_VEC_INLINE
 #else
-#define CA_VEC_INLINE static __inline__
+#define CA_VEC_INLINE static inline
 #endif
 
 #include "ca.h"
@@ -57,9 +57,7 @@ void _ca_vec_swap(ca_ptr vec1, ca_ptr vec2, slong len, ca_ctx_t ctx);
 CA_VEC_INLINE void
 ca_vec_swap(ca_vec_t vec1, ca_vec_t vec2, ca_ctx_t ctx)
 {
-    ca_vec_struct t = *vec1;
-    *vec1 = *vec2;
-    *vec2 = t;
+    FLINT_SWAP(ca_vec_struct, *vec1, *vec2);
 }
 
 /* Length */

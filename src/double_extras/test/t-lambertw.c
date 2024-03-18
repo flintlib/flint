@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -100,13 +100,7 @@ TEST_FUNCTION_START(d_lambertw, state)
         mpfr_abs(t, t, MPFR_RNDA);
 
         if (mpfr_get_d(t, MPFR_RNDA) > tol)
-        {
-            flint_printf("FAIL\n");
-            flint_printf("x = %.17g, w = %.17g, error = %g\n", x, w,
-                mpfr_get_d(t, MPFR_RNDA));
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("x = %.17g, w = %.17g, error = %g\n", x, w, mpfr_get_d(t, MPFR_RNDA));
 
 #if 0
         if (mpfr_cmp(t, max_err) > 0)

@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -44,11 +44,10 @@ TEST_FUNCTION_START(n_clog_2exp, state)
         ulong r = n_clog_2exp(t[i][0], t[i][1]);
 
         if (r != t[i][2])
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("clog_2exp(%wu, %wu) = %wu\n", t[i][0], t[i][1], t[i][2]);
-            flint_printf("but computed %wu\n", r);
-        }
+            TEST_FUNCTION_FAIL(
+                    "clog_2exp(%wu, %wu) = %wu\n"
+                    "but computed %wu\n",
+                    t[i][0], t[i][1], t[i][2], r);
     }
 
     TEST_FUNCTION_END(state);

@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -30,13 +30,10 @@ TEST_FUNCTION_START(n_div2_preinv, state)
 
         result = (q1 == q2);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("n = %wu, d = %wu, dinv = %wu\n", n, d, dinv);
-            flint_printf("q1 = %wu, q2 = %wu\n", q1, q2);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "n = %wu, d = %wu, dinv = %wu\n"
+                    "q1 = %wu, q2 = %wu\n",
+                    n, d, dinv, q1, q2);
     }
 
     TEST_FUNCTION_END(state);

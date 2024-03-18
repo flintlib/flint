@@ -1,17 +1,17 @@
 /*
     Copyright (C) 2014 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "arb.h"
 
-static __inline__ void
+static inline void
 _arf_set_inline(arf_t y, const arf_t x)
 {
     /* Fast path */
@@ -51,3 +51,30 @@ arb_set(arb_t x, const arb_t y)
     }
 }
 
+void
+arb_set_d(arb_t x, double y)
+{
+    arf_set_d(arb_midref(x), y);
+    mag_zero(arb_radref(x));
+}
+
+void
+arb_set_fmpz(arb_t x, const fmpz_t y)
+{
+    arf_set_fmpz(arb_midref(x), y);
+    mag_zero(arb_radref(x));
+}
+
+void
+arb_set_si(arb_t x, slong y)
+{
+    arf_set_si(arb_midref(x), y);
+    mag_zero(arb_radref(x));
+}
+
+void
+arb_set_ui(arb_t x, ulong y)
+{
+    arf_set_ui(arb_midref(x), y);
+    mag_zero(arb_radref(x));
+}

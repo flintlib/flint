@@ -315,7 +315,7 @@ Input and output
     Prints the given matrix to ``stdout``.  For further details,
     see :func:`fmpz_mat_fprint_pretty`.
 
-.. function:: int fmpz_mat_fread(FILE* file, fmpz_mat_t mat)
+.. function:: int fmpz_mat_fread(FILE * file, fmpz_mat_t mat)
 
     Reads a matrix from the stream ``file``, storing the result
     in ``mat``.  The expected format is the number of rows, a
@@ -571,6 +571,16 @@ Matrix multiplication
 
     Sets ``C`` to the matrix product `C = A B` computed using
     classical matrix algorithm.
+
+    The matrices must have compatible dimensions for matrix multiplication.
+    No aliasing is allowed.
+
+.. function:: void fmpz_mat_mul_waksman(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
+
+    Sets ``C`` to the matrix product `C = A B` computed using
+    Waksman multiplication, which does only `n^3/2 + O(n^2)`
+    products, but many additions. This is good for small matrices
+    with large entries.
 
     The matrices must have compatible dimensions for matrix multiplication.
     No aliasing is allowed.
@@ -1135,21 +1145,6 @@ Row reduction
 
     Checks that the matrix `A/den` is in reduced row echelon form of rank
     ``rank``, returns 1 if so and 0 otherwise.
-
-
-Modular gaussian elimination
---------------------------------------------------------------------------------
-
-
-.. function:: slong fmpz_mat_rref_mod(slong * perm, fmpz_mat_t A, const fmpz_t p)
-
-    Uses fraction-free Gauss-Jordan elimination to set ``A``
-    to its reduced row echelon form and returns the rank of ``A``.
-    All computations are done modulo p.
-
-    Pivot elements are chosen with ``fmpz_mat_find_pivot_any``.
-    If ``perm`` is non-``NULL``, the permutation of
-    rows in the matrix will also be applied to ``perm``.
 
 
 Strong echelon form and Howell form

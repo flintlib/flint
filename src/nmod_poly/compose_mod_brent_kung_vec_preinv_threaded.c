@@ -7,13 +7,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#if FLINT_USES_PTHREAD
-#include <pthread.h>
-#endif
+#include "thread_pool.h"
 #include "thread_support.h"
 #include "ulong_extras.h"
 #include "nmod_vec.h"
@@ -276,20 +274,15 @@ nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(nmod_poly_struct * res,
     {
         if (polys[i].length >= len2)
         {
-            flint_printf
-                ("Exception (nmod_poly_compose_mod_brent_kung_vec_preinv_threaded)."
-                 "The degree of the first polynomial must be smaller than that of the "
-                 " modulus\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(nmod_poly_compose_mod_brent_kung_vec_preinv_threaded): "
+                 "The degree of the first polynomial must be smaller than that of the modulus\n");
         }
     }
 
     if (n > len1)
     {
-        flint_printf
-            ("Exception (nmod_poly_compose_mod_brent_kung_vec_preinv_threaded)."
-             "n is larger than the length of polys\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(nmod_poly_compose_mod_brent_kung_vec_preinv_threaded): "
+                "n is larger than the length of polys\n");
     }
 
     if (n == 0)

@@ -3,34 +3,33 @@
 **fmpq.h** -- rational numbers
 ===============================================================================
 
-The :type:`fmpq_t` data type represents rational numbers as fractions
-of multiprecision integers.
+The :type:`fmpq_t` data type represents rational numbers as fractions of
+multiprecision integers.
 
 An :type:`fmpq_t` is an array of length 1 of type :type:`fmpq`, with
-:type:`fmpq` being implemented as a pair of :type:`fmpz`'s
-representing numerator and denominator.
+:type:`fmpq` being implemented as a pair of :type:`fmpz`'s representing
+numerator and denominator.
 
-This format is designed to allow rational numbers with small
-numerators or denominators to be stored and manipulated efficiently.
-When components no longer fit in single machine words, the cost of
-:type:`fmpq_t` arithmetic is roughly the same as that of ``mpq_t``
-arithmetic, plus a small amount of overhead.
+This format is designed to allow rational numbers with small numerators or
+denominators to be stored and manipulated efficiently. When components no
+longer fit in single machine words, the cost of :type:`fmpq_t` arithmetic is
+roughly the same as that of ``mpq_t`` arithmetic, plus a small amount of
+overhead.
 
-A fraction is said to be in canonical form if the numerator and
-denominator have no common factor and the denominator is positive.
-Except where otherwise noted, all functions in the :type:`fmpq` module
-assume that inputs are in canonical form, and produce outputs in
-canonical form. The user can manipulate the numerator and denominator
-of an :type:`fmpq_t` as arbitrary integers, but then becomes
-responsible for canonicalising the number (for example by calling
+A fraction is said to be in canonical form if the numerator and denominator
+have no common factor and the denominator is positive. Except where otherwise
+noted, all functions in the :type:`fmpq` module assume that inputs are in
+canonical form, and produce outputs in canonical form. The user can manipulate
+the numerator and denominator of an :type:`fmpq_t` as arbitrary integers, but
+then becomes responsible for canonicalising the number (for example by calling
 ``fmpq_canonicalise``) before passing it to any library function.
 
-For most operations, both a function operating on :type:`fmpq_t`'s and
-an underscore version operating on :type:`fmpz_t` components are
-provided. The underscore functions may perform less error checking,
-and may impose limitations on aliasing between the input and output
-variables, but generally assume that the components are in canonical
-form just like the non-underscore functions.
+For most operations, both a function operating on :type:`fmpq_t`'s and an
+underscore version operating on :type:`fmpz_t` components are provided. The
+underscore functions may perform less error checking, and may impose
+limitations on aliasing between the input and output variables, but generally
+assume that the components are in canonical form just like the non-underscore
+functions.
 
 Types, macros and constants
 -------------------------------------------------------------------------------
@@ -101,8 +100,7 @@ Basic assignment
 
 .. function:: void fmpq_set(fmpq_t dest, const fmpq_t src)
 
-    Sets ``dest`` to a copy of ``src``. No canonicalisation
-    is performed.
+    Sets ``dest`` to a copy of ``src``. No canonicalisation is performed.
 
 .. function:: void fmpq_swap(fmpq_t op1, fmpq_t op2)
 
@@ -142,31 +140,23 @@ Comparison
     Returns nonzero if ``res`` has value `\pm{1}` and zero otherwise.
 
 .. function:: int fmpq_equal(const fmpq_t x, const fmpq_t y)
+              int fmpq_equal_fmpz(const fmpq_t x, const fmpz_t y)
+              int fmpq_equal_si(fmpq_t x, slong y)
+              int fmpq_equal_ui(fmpq_t x, ulong y)
 
     Returns nonzero if ``x`` and ``y`` are equal, and zero otherwise.
-    Assumes that ``x`` and ``y`` are both in canonical form.
 
 .. function:: int fmpq_sgn(const fmpq_t x)
 
-    Returns the sign of the rational number `x`.
+    Returns the sign of the rational number `x`. That is, returns `-1` if
+    `x < 0`, `1` if `x > 0` and `0` if `x = 0`.
 
 .. function:: int fmpq_cmp(const fmpq_t x, const fmpq_t y)
               int fmpq_cmp_fmpz(const fmpq_t x, const fmpz_t y)
+              int fmpq_cmp_si(const fmpq_t x, slong y)
               int fmpq_cmp_ui(const fmpq_t x, ulong y)
 
     Returns negative if `x < y`, zero if `x = y`, and positive if `x > y`.
-
-.. function:: int fmpq_cmp_si(const fmpq_t x, slong y)
-
-     Returns negative if `x < y`, zero if `x = y`, and positive if `x > y`.
-
-.. function:: int fmpq_equal_ui(fmpq_t x, ulong y)
-
-    Returns `1` if `x = y`, otherwise returns `0`.
-
-.. function:: int fmpq_equal_si(fmpq_t x, slong y)
-
-    Returns `1` if `x = y`, otherwise returns `0`.
 
 .. function:: void fmpq_height(fmpz_t height, const fmpq_t x)
 
@@ -184,9 +174,9 @@ Conversion
 
 .. function:: void fmpq_set_fmpz_frac(fmpq_t res, const fmpz_t p, const fmpz_t q)
 
-    Sets ``res`` to the canonical form of the fraction ``p / q``.
-    This is equivalent to assigning the numerator and denominator
-    separately and calling ``fmpq_canonicalise``.
+    Sets ``res`` to the canonical form of the fraction ``p / q``. This is
+    equivalent to assigning the numerator and denominator separately and
+    calling ``fmpq_canonicalise``.
 
 .. function:: void fmpq_get_mpz_frac(mpz_t a, mpz_t b, fmpq_t c)
 
@@ -223,13 +213,6 @@ Conversion
 
     Returns 0 if no error occurs. Otherwise returns -1 and ``dest`` is
     set to zero.
-
-.. function:: void fmpq_init_set_mpz_frac_readonly(fmpq_t z, const mpz_t p, const mpz_t q)
-
-    Assuming ``z`` is an ``fmpz_t`` which will not be cleaned up,
-    this temporarily copies ``p`` and ``q`` into the numerator and
-    denominator of ``z`` for read only operations only. The user must not
-    run ``fmpq_clear`` on ``z``.
 
 .. function:: double fmpq_get_d(const fmpq_t f)
 
@@ -362,35 +345,35 @@ Random number generation
 
 .. function:: void fmpq_randtest(fmpq_t res, flint_rand_t state, flint_bitcnt_t bits)
 
-    Sets ``res`` to a random value, with numerator and denominator
-    having up to ``bits`` bits. The fraction will be in canonical
-    form. This function has an increased probability of generating
-    special values which are likely to trigger corner cases.
+    Sets ``res`` to a random value, with numerator and denominator having up to
+    ``bits`` bits. The resulting fraction will be in canonical form. This
+    function has an increased probability of generating special values which
+    are likely to trigger corner cases.
 
 .. function:: void _fmpq_randtest(fmpz_t num, fmpz_t den, flint_rand_t state, flint_bitcnt_t bits)
 
-    Does the same thing as ``fmpq_randtest``, but for numerator
-    and denominator given explicitly as ``fmpz_t`` variables. Aliasing
-    of ``num`` and ``den`` is not allowed.
+    Does the same thing as ``fmpq_randtest``, but for numerator and denominator
+    given explicitly as ``fmpz_t`` variables. Aliasing of ``num`` and ``den``
+    is not allowed.
 
 .. function:: void fmpq_randtest_not_zero(fmpq_t res, flint_rand_t state, flint_bitcnt_t bits)
 
-    As per ``fmpq_randtest``, but the result will not be `0`.
-    If ``bits`` is set to `0`, an exception will result.
+    As per ``fmpq_randtest``, but the result will not be `0`. If ``bits`` is
+    set to `0`, an exception will result.
 
 .. function:: void fmpq_randbits(fmpq_t res, flint_rand_t state, flint_bitcnt_t bits)
 
-    Sets ``res`` to a random value, with numerator and denominator
-    both having exactly ``bits`` bits before canonicalisation,
-    and then puts ``res`` in canonical form. Note that as a result
-    of the canonicalisation, the resulting numerator and denominator can
-    be slightly smaller than ``bits`` bits.
+    Sets ``res`` to a random value, with numerator and denominator both having
+    exactly ``bits`` bits before canonicalisation, and then puts ``res`` in
+    canonical form. Note that as a result of the canonicalisation, the
+    resulting numerator and denominator can be slightly smaller than ``bits``
+    bits.
 
 .. function:: void _fmpq_randbits(fmpz_t num, fmpz_t den, flint_rand_t state, flint_bitcnt_t bits)
 
-    Does the same thing as ``fmpq_randbits``, but for numerator
-    and denominator given explicitly as ``fmpz_t`` variables. Aliasing
-    of ``num`` and ``den`` is not allowed.
+    Does the same thing as ``fmpq_randbits``, but for numerator and denominator
+    given explicitly as ``fmpz_t`` variables. Aliasing of ``num`` and ``den``
+    is not allowed.
 
 
 
@@ -402,11 +385,9 @@ Arithmetic
               void fmpq_mul(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
               void fmpq_div(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
 
-    Sets ``res`` respectively to ``op1 + op2``, ``op1 - op2``,
-    ``op1 * op2``, or ``op1 / op2``. Assumes that the inputs
-    are in canonical form, and produces output in canonical form.
-    Division by zero results in an error.
-    Aliasing between any combination of the variables is allowed.
+    Sets ``res`` respectively to ``op1 + op2``, ``op1 - op2``, ``op1 * op2``,
+    or ``op1 / op2``. Division by zero results in an error. Aliasing between
+    any combination of the variables is allowed.
 
 .. function:: void _fmpq_add(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num, const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den)
               void _fmpq_sub(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num, const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den)
@@ -427,8 +408,8 @@ Arithmetic
               void _fmpq_sub_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, const fmpz_t r)
 
     Sets ``(rnum, rden)`` to the canonical form of the sum or difference
-    respectively of the fractions represented by ``(p, q)`` and
-    ``(r, 1)``. Numerators may not be aliased with denominators.
+    respectively of the fractions represented by ``(p, q)`` and ``(r, 1)``.
+    Numerators may not be aliased with denominators.
 
 .. function:: void fmpq_add_si(fmpq_t res, const fmpq_t op1, slong c)
               void fmpq_sub_si(fmpq_t res, const fmpq_t op1, slong c)
@@ -459,30 +440,27 @@ Arithmetic
 .. function:: void fmpq_addmul(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
               void fmpq_submul(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
 
-    Sets ``res`` to ``res + op1 * op2`` or ``res - op1 * op2``
-    respectively, placing the result in canonical form. Aliasing
-    between any combination of the variables is allowed.
+    Sets ``res`` to ``res + op1 * op2`` or ``res - op1 * op2``, respectively.
+    Aliasing between any combination of the variables is allowed.
 
 .. function:: void _fmpq_addmul(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num, const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den)
               void _fmpq_submul(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num, const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den)
 
     Sets ``(rnum, rden)`` to the canonical form of the fraction
-    ``(rnum, rden)`` + ``(op1num, op1den)`` * ``(op2num, op2den)`` or
-    ``(rnum, rden)`` - ``(op1num, op1den)`` * ``(op2num, op2den)``
+    ``(rnum, rden) + (op1num, op1den) * (op2num, op2den)`` or
+    ``(rnum, rden) - (op1num, op1den) * (op2num, op2den)``
     respectively. Aliasing between any combination of the variables is allowed,
     whilst no numerator is aliased with a denominator.
 
 .. function:: void fmpq_inv(fmpq_t dest, const fmpq_t src)
 
-    Sets ``dest`` to ``1 / src``. The result is placed in canonical
-    form, assuming that ``src`` is already in canonical form.
+    Sets ``dest`` to ``1 / src``.
 
 .. function:: void _fmpq_pow_si(fmpz_t rnum, fmpz_t rden, const fmpz_t opnum, const fmpz_t opden, slong e)
               void fmpq_pow_si(fmpq_t res, const fmpq_t op, slong e)
 
-    Sets ``res`` to ``op`` raised to the power `e`, where `e`
-    is a ``slong``.  If `e` is `0` and ``op`` is `0`, then
-    ``res`` will be set to `1`.
+    Sets ``res`` to ``op`` raised to the power `e`, where `e` is a ``slong``.
+    If `e` is `0` and ``op`` is `0`, then ``res`` will be set to `1`.
 
 .. function:: int fmpq_pow_fmpz(fmpq_t a, const fmpq_t b, const fmpz_t e)
 
@@ -509,35 +487,38 @@ Arithmetic
 
 .. function:: void _fmpq_gcd(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, const fmpz_t r, const fmpz_t s)
 
-    Set ``(rnum, rden)`` to the gcd of ``(p, q)`` and ``(r, s)``
-    which we define to be the canonicalisation of `\operatorname{gcd}(ps, qr)/(qs)`.
-    (This is apparently Euclid's original definition and is stable under scaling of
-    numerator and denominator. It also agrees with the gcd on the integers.
-    Note that it does not agree with gcd as defined in ``fmpq_poly``.)
-    This definition agrees with the result as output by Sage and Pari/GP.
+    Set ``(rnum, rden)`` to the gcd of ``(p, q)`` and ``(r, s)`` which we
+    define to be the canonicalisation of `\operatorname{gcd}(ps, qr)/(qs)`.
+    Does not assume that ``(rnum, rden)``, ``(p, q)`` or ``(r, s)`` are
+    canonical. (This is apparently Euclid's original definition and is stable
+    under scaling of numerator and denominator. It also agrees with the gcd on
+    the integers. Note that it does not agree with gcd as defined in
+    ``fmpq_poly``.) This definition agrees with the result as output by Sage
+    and Pari/GP.
 
 .. function:: void fmpq_gcd(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
 
-    Set ``res`` to the gcd of ``op1`` and ``op2``. See the low
-    level function ``_fmpq_gcd`` for our definition of gcd.
+    Set ``res`` to the gcd of ``op1`` and ``op2``. See the low level function
+    ``_fmpq_gcd`` for our definition of gcd.
 
 .. function:: void _fmpq_gcd_cofactors(fmpz_t gnum, fmpz_t gden, fmpz_t abar, fmpz_t bbar, const fmpz_t anum, const fmpz_t aden, const fmpz_t bnum, const fmpz_t bden)
               void fmpq_gcd_cofactors(fmpq_t g, fmpz_t abar, fmpz_t bbar, const fmpq_t a, const fmpq_t b)
 
-    Set `g` to `\operatorname{gcd}(a,b)` as per :func:`fmpq_gcd` and also compute `\overline{a} = a/g` and `\overline{b} = b/g`.
-    Unlike :func:`fmpq_gcd`, this function requires canonical inputs.
+    Set `g` to `\operatorname{gcd}(a,b)` as per :func:`fmpq_gcd` and also
+    compute `\overline{a} = a/g` and `\overline{b} = b/g`. Unlike
+    :func:`_fmpq_gcd`, :func:`_fmpq_gcd_cofactors` requires canonical inputs.
 
 .. function:: void _fmpq_add_small(fmpz_t rnum, fmpz_t rden, slong p1, ulong q1, slong p2, ulong q2)
 
-    Sets ``(rnum, rden)`` to the sum of ``(p1, q1)`` and ``(p2, q2)``.
-    Assumes that ``(p1, q1)`` and ``(p2, q2)`` are in canonical form
-    and that all inputs are between ``COEFF_MIN`` and ``COEFF_MAX``.
+    Sets ``(rnum, rden)`` to the sum of ``(p1, q1)`` and ``(p2, q2)``. Assumes
+    that ``(p1, q1)`` and ``(p2, q2)`` are in canonical form and that all
+    inputs are between ``COEFF_MIN`` and ``COEFF_MAX``.
 
 .. function:: void _fmpq_mul_small(fmpz_t rnum, fmpz_t rden, slong p1, ulong q1, slong p2, ulong q2)
 
     Sets ``(rnum, rden)`` to the product of ``(p1, q1)`` and ``(p2, q2)``.
-    Assumes that ``(p1, q1)`` and ``(p2, q2)`` are in canonical form
-    and that all inputs are between ``COEFF_MIN`` and ``COEFF_MAX``.
+    Assumes that ``(p1, q1)`` and ``(p2, q2)`` are in canonical form and that
+    all inputs are between ``COEFF_MIN`` and ``COEFF_MAX``.
 
 
 Modular reduction and rational reconstruction
@@ -581,72 +562,75 @@ Rational enumeration
 .. function:: void _fmpq_next_minimal(fmpz_t rnum, fmpz_t rden, const fmpz_t num, const fmpz_t den)
               void fmpq_next_minimal(fmpq_t res, const fmpq_t x)
 
-    Given `x` which is assumed to be nonnegative and in canonical form, sets
-    ``res`` to the next rational number in the sequence obtained by
-    enumerating all positive denominators `q`, for each `q` enumerating
-    the numerators `1 \le p < q` in order and generating both `p/q` and `q/p`,
-    but skipping all `\gcd(p,q) \ne 1`. Starting with zero, this generates
-    every nonnegative rational number once and only once, with the first
-    few entries being:
+    Given `x = \mathtt{num} / \mathtt{den}`, assumed to be nonnegative and in
+    canonical form, sets ``res`` to the next rational number in the sequence
+    obtained by enumerating all positive denominators `q`, for each `q`
+    enumerating the numerators `1 \le p < q` in order and generating both `p/q`
+    and `q/p`, but skipping all `\gcd(p,q) \ne 1`. Starting with zero, this
+    generates every nonnegative rational number once and only once, with the
+    first few entries being:
 
     `0, 1, 1/2, 2, 1/3, 3, 2/3, 3/2, 1/4, 4, 3/4, 4/3, 1/5, 5, 2/5, \ldots.`
 
-    This enumeration produces the rational numbers in order of
-    minimal height. It has the disadvantage of being somewhat slower to
-    compute than the Calkin-Wilf enumeration.
+    This enumeration produces the rational numbers in order of minimal height.
+    It has the disadvantage of being somewhat slower to compute than the
+    Calkin-Wilf enumeration.
 
 .. function:: void _fmpq_next_signed_minimal(fmpz_t rnum, fmpz_t rden, const fmpz_t num, const fmpz_t den)
               void fmpq_next_signed_minimal(fmpq_t res, const fmpq_t x)
 
-    Given a signed rational number `x` assumed to be in canonical form, sets
-    ``res`` to the next element in the minimal-height sequence
-    generated by ``fmpq_next_minimal`` but with negative numbers
-    interleaved:
-
-    `0, 1, -1, 1/2, -1/2, 2, -2, 1/3, -1/3, \ldots.`
-
-    Starting with zero, this generates every rational number once
-    and only once, in order of minimal height.
-
-.. function:: void _fmpq_next_calkin_wilf(fmpz_t rnum, fmpz_t rden, const fmpz_t num, const fmpz_t den)
-              void fmpq_next_calkin_wilf(fmpq_t res, const fmpq_t x)
-
-    Given `x` which is assumed to be nonnegative and in canonical form, sets
-    ``res`` to the next number in the breadth-first traversal of the
-    Calkin-Wilf tree. Starting with zero, this generates every nonnegative
-    rational number once and only once, with the first few entries being:
-
-    `0, 1, 1/2, 2, 1/3, 3/2, 2/3, 3, 1/4, 4/3, 3/5, 5/2, 2/5, \ldots.`
-
-    Despite the appearance of the initial entries, the Calkin-Wilf
-    enumeration does not produce the rational numbers in order of height:
-    some small fractions will appear late in the sequence. This order
-    has the advantage of being faster to produce than the minimal-height
-    order.
-
-.. function:: void _fmpq_next_signed_calkin_wilf(fmpz_t rnum, fmpz_t rden, const fmpz_t num, const fmpz_t den)
-               void fmpq_next_signed_calkin_wilf(fmpq_t res, const fmpq_t x)
-
-    Given a signed rational number `x` assumed to be in canonical form, sets
-    ``res`` to the next element in the Calkin-Wilf sequence with
+    Given a signed rational number `x = \mathtt{num} / \mathtt{den}`, assumed to
+    be in canonical form, sets ``res`` to the next element in the
+    minimal-height sequence generated by ``fmpq_next_minimal`` but with
     negative numbers interleaved:
 
     `0, 1, -1, 1/2, -1/2, 2, -2, 1/3, -1/3, \ldots.`
 
-    Starting with zero, this generates every rational number once
-    and only once, but not in order of minimal height.
+    Starting with zero, this generates every rational number once and only
+    once, in order of minimal height.
+
+.. function:: void _fmpq_next_calkin_wilf(fmpz_t rnum, fmpz_t rden, const fmpz_t num, const fmpz_t den)
+              void fmpq_next_calkin_wilf(fmpq_t res, const fmpq_t x)
+
+    Given `x = \mathtt{num} / \mathtt{den}`, which is assumed to be nonnegative
+    and in canonical form, sets ``res`` to the next number in the breadth-first
+    traversal of the Calkin-Wilf tree. Starting with zero, this generates every
+    nonnegative rational number once and only once, with the first few entries
+    being:
+
+    `0, 1, 1/2, 2, 1/3, 3/2, 2/3, 3, 1/4, 4/3, 3/5, 5/2, 2/5, \ldots.`
+
+    Despite the appearance of the initial entries, the Calkin-Wilf enumeration
+    does not produce the rational numbers in order of height: some small
+    fractions will appear late in the sequence. This order has the advantage of
+    being faster to produce than the minimal-height order.
+
+.. function:: void _fmpq_next_signed_calkin_wilf(fmpz_t rnum, fmpz_t rden, const fmpz_t num, const fmpz_t den)
+              void fmpq_next_signed_calkin_wilf(fmpq_t res, const fmpq_t x)
+
+    Given a signed rational number `x = \mathtt{num} / \mathtt{den}`, assumed
+    to be in canonical form, sets ``res`` to the next element in the
+    Calkin-Wilf sequence with negative numbers interleaved:
+
+    `0, 1, -1, 1/2, -1/2, 2, -2, 1/3, -1/3, \ldots.`
+
+    Starting with zero, this generates every rational number once and only
+    once, but not in order of minimal height.
 
 .. function:: void fmpq_farey_neighbors(fmpq_t l, fmpq_t r, const fmpq_t x, const fmpz_t Q)
 
     Set `l` and `r` to the fractions directly below and above `x` in the Farey sequence of order `Q`.
-    This function will throw if `x` is not canonical or `Q` is less than the denominator of `x`.
+    This function will throw if `Q` is less than the denominator of `x`.
 
-.. function:: void fmpq_simplest_between(fmpq_t x, const fmpq_t l, const fmpq_t r)
-              void _fmpq_simplest_between(fmpz_t x_num, fmpz_t x_den, const fmpz_t l_num, const fmpz_t l_den, const fmpz_t r_num, const fmpz_t r_den)
+.. function:: void _fmpq_simplest_between(fmpz_t x_num, fmpz_t x_den, const fmpz_t l_num, const fmpz_t l_den, const fmpz_t r_num, const fmpz_t r_den)
+              void fmpq_simplest_between(fmpq_t x, const fmpq_t l, const fmpq_t r)
 
-    Set `x` to the simplest fraction in the closed interval `[l, r]`. The underscore version makes the additional assumption that `l \le r`.
-    The endpoints `l` and `r` do not need to be reduced, but their denominators do need to be positive.
-    `x` will always be returned in canonical form. A canonical fraction `a_1/b_1` is defined to be simpler than `a_2/b_2` iff `b_1<b_2` or `b_1=b_2` and `a_1<a_2`.
+    Set `x` to the simplest fraction in the closed interval `[l, r]`. The
+    underscore version makes the additional assumption that `l \le r`. The
+    endpoints `l` and `r` do not need to be canonical, but their denominators
+    do need to be positive. `x` will always be returned in canonical form. A
+    canonical fraction `a_1/b_1` is defined to be simpler than `a_2/b_2` iff
+    `b_1<b_2` or `b_1=b_2` and `a_1<a_2`.
 
 
 Continued fractions
@@ -656,61 +640,63 @@ Continued fractions
 .. function:: slong fmpq_get_cfrac(fmpz * c, fmpq_t rem, const fmpq_t x, slong n)
               slong fmpq_get_cfrac_naive(fmpz * c, fmpq_t rem, const fmpq_t x, slong n)
 
-    Generates up to `n` terms of the (simple) continued fraction expansion
-    of `x`, writing the coefficients to the vector `c` and the remainder `r`
-    to the ``rem`` variable. The return value is the number `k` of
-    generated terms. The output satisfies
+    Generates up to `n` terms of the (simple) continued fraction expansion of
+    `x`, writing the coefficients to the vector `c` and the remainder `r` to
+    the ``rem`` variable. The return value is the number `k` of generated
+    terms. The output satisfies
 
-    .. math ::
+    .. math::
 
         x = c_0 + \cfrac{1}{c_1 + \cfrac{1}{c_2 +
             \cfrac{1}{ \ddots + \cfrac{1}{c_{k-1} + r }}}}
 
-    If `r` is zero, the continued fraction expansion is complete.
-    If `r` is nonzero, `1/r` can be passed back as input to generate
-    `c_k, c_{k+1}, \ldots`. Calls to ``fmpq_get_cfrac`` can therefore
-    be chained to generate the continued fraction incrementally,
-    extracting any desired number of coefficients at a time.
+    If `r` is zero, the continued fraction expansion is complete. If `r` is
+    nonzero, `1/r` can be passed back as input to generate `c_k, c_{k+1},
+    \ldots`. Calls to ``fmpq_get_cfrac`` can therefore be chained to generate
+    the continued fraction incrementally, extracting any desired number of
+    coefficients at a time.
 
     In general, a rational number has exactly two continued fraction
     expansions. By convention, we generate the shorter one. The longer
-    expansion can be obtained by replacing the last coefficient
-    `a_{k-1}` by the pair of coefficients `a_{k-1} - 1, 1`.
+    expansion can be obtained by replacing the last coefficient `a_{k-1}` by
+    the pair of coefficients `a_{k-1} - 1, 1`.
 
-    The behaviour of this function in corner cases is as follows:
-        - if `x` is infinite (anything over 0), ``rem`` will be zero and the return is `k=0` regardless of `n`.
+    The behavior of this function in corner cases is as follows:
+        - if `x` is infinite (anything over 0), ``rem`` will be zero and the
+          return is `k=0` regardless of `n`.
         - else (if `x` is finite),
-            - if `n \le 0`, ``rem`` will be `1/x` (allowing for infinite in the case `x=0`) and the return is `k=0`
-            - else (if `n > 0`), ``rem`` will finite and the return is `0 < k \le n`.
+            - if `n \le 0`, ``rem`` will be `1/x` (allowing for infinite in the
+              case `x=0`) and the return is `k=0`
+            - else (if `n > 0`), ``rem`` will finite and the return is
+              `0 < k \le n`.
 
-    Essentially, if this function is called with canonical `x` and `n > 0`, then ``rem`` will be canonical.
-    Therefore, applications relying on canonical ``fmpq_t``'s should not call this function with `n \le 0`.
+    Essentially, if this function is called with canonical `x` and `n > 0`,
+    then ``rem`` will be canonical. Therefore, applications relying on
+    canonical ``fmpq_t``'s should not call this function with `n \le 0`.
 
 .. function:: void fmpq_set_cfrac(fmpq_t x, const fmpz * c, slong n)
 
     Sets `x` to the value of the continued fraction
 
-    .. math ::
+    .. math::
 
         x = c_0 + \cfrac{1}{c_1 + \cfrac{1}{c_2 +
             \cfrac{1}{ \ddots + \cfrac{1}{c_{n-1}}}}}
 
-    where all `c_i` except `c_0` should be nonnegative.
-    It is assumed that `n > 0`.
+    where all `c_i` except `c_0` should be nonnegative. It is assumed that
+    `n > 0`.
 
-    For large `n`, this function implements a subquadratic algorithm.
-    The convergents are given by a chain product of 2 by 2 matrices.
-    This product is split in half recursively to balance the size
-    of the coefficients.
+    For large `n`, this function implements a subquadratic algorithm. The
+    convergents are given by a chain product of 2 by 2 matrices. This product
+    is split in half recursively to balance the size of the coefficients.
 
 .. function:: slong fmpq_cfrac_bound(const fmpq_t x)
 
-    Returns an upper bound for the number of terms in the continued
-    fraction expansion of `x`. The computed bound is not necessarily sharp.
+    Returns an upper bound for the number of terms in the continued fraction
+    expansion of `x`. The computed bound is not necessarily sharp.
 
-    We use the fact that the smallest denominator
-    that can give a continued fraction of length `n` is the Fibonacci
-    number `F_{n+1}`.
+    We use the fact that the smallest denominator that can give a continued
+    fraction of length `n` is the Fibonacci number `F_{n+1}`.
 
 
 Special functions
@@ -732,14 +718,14 @@ Most of the definitions and relations used in the following section
 are given by Apostol [Apostol1997]_. The Dedekind sum `s(h,k)` is
 defined for all integers `h` and `k` as
 
-.. math ::
+.. math::
 
      s(h,k) = \sum_{i=1}^{k-1} \left(\left(\frac{i}{k}\right)\right)
      \left(\left(\frac{hi}{k}\right)\right)
 
 where
 
-.. math ::
+.. math::
 
     ((x))=\begin{cases}
     x-\lfloor x\rfloor-1/2 &\mbox{if }
@@ -749,7 +735,7 @@ where
 
 If `0 < h < k` and `(h,k) = 1`, this reduces to
 
-.. math ::
+.. math::
 
     s(h,k) = \sum_{i=1}^{k-1} \frac{i}{k}
         \left(\frac{hi}{k}-\left\lfloor\frac{hi}{k}\right\rfloor
@@ -760,7 +746,7 @@ Letting `r_0 = k`, `r_1 = h`, `r_2, r_3, \ldots, r_n, r_{n+1} = 1`
 be the remainder sequence in the Euclidean algorithm for
 computing GCD of `h` and `k`,
 
-.. math ::
+.. math::
     s(h,k) = \frac{1-(-1)^n}{8} - \frac{1}{12} \sum_{i=1}^{n+1}
     (-1)^i \left(\frac{1+r_i^2+r_{i-1}^2}{r_i r_{i-1}}\right).
 

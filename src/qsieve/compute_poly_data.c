@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -285,11 +285,11 @@ int qsieve_init_A(qs_t qs_inf)
             first_subset[j] = curr_subset[j]; /* save 1st tuple for restarts */
 
 #if QS_DEBUG
-        printf("First A_ind = (");
+        flint_printf("First A_ind = (");
         for (i = 0; i < s - 1; i++)
-            printf("%ld, ", A_ind[i]);
-        printf("%ld", A_ind[s - 1]);
-        printf(")\n");
+            flint_printf("%ld, ", A_ind[i]);
+        flint_printf("%ld", A_ind[s - 1]);
+        flint_printf(")\n");
 #endif
     }
 
@@ -509,11 +509,11 @@ int qsieve_next_A(qs_t qs_inf)
     }
 
 #if QS_DEBUG
-    printf("A_ind = (");
+    flint_printf("A_ind = (");
     for (i = 0; i < s - 1; i++)
-        printf("%ld, ", A_ind[i]);
-    printf("%ld", A_ind[s - 1]);
-    printf(")\n");
+        flint_printf("%ld, ", A_ind[i]);
+    flint_printf("%ld", A_ind[s - 1]);
+    flint_printf(")\n");
 #endif
 
     qs_inf->h = h;
@@ -743,8 +743,7 @@ void qsieve_compute_C(fmpz_t C, qs_t qs_inf, qs_poly_t poly)
     fmpz_mod(r, C, qs_inf->A);
     if (!fmpz_is_zero(r))
     {
-       flint_printf("B^2 - kn not divisible by A\n");
-       flint_abort();
+       flint_throw(FLINT_ERROR, "B^2 - kn not divisible by A\n");
     }
 #endif
 

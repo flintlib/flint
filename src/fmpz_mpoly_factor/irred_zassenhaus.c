@@ -5,13 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fmpz_mpoly_factor.h"
-#include "nmod_mpoly_factor.h"
 
 /*
     return:
@@ -42,7 +43,7 @@ static int _try_lift(
     fmpz_mpoly_init(t, ctx);
     fmpz_mpoly_init(newq, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mpoly_one(t, ctx);
     for (i = 0; i < pfac->length; i++)
         fmpz_mpoly_mul(t, t, pfac->coeffs + i, ctx);
@@ -107,7 +108,7 @@ cleanup:
     fmpz_mpoly_clear(t, ctx);
     fmpz_mpoly_clear(newq, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success > 0)
     {
         fmpz_mpoly_init(t, ctx);
@@ -241,7 +242,7 @@ got_alpha:
         fmpz_mpoly_set(q, m < n ? Aevals + m : A, ctx);
         fmpz_mpoly_set(p, Aevals + m - 1, ctx);
 
-    #ifdef FLINT_WANT_ASSERT
+    #if FLINT_WANT_ASSERT
         fmpz_mpoly_one(t, ctx);
         for (i = 0; i < pfac->length; i++)
             fmpz_mpoly_mul(t, t, pfac->coeffs + i, ctx);
@@ -290,7 +291,7 @@ got_alpha:
         {
             zassenhaus_subset_first(subset, len, k);
 
-        #ifdef FLINT_WANT_ASSERT
+        #if FLINT_WANT_ASSERT
             fmpz_mpoly_one(t, ctx);
             for (i = 0; i < len; i++)
             {
@@ -387,7 +388,7 @@ cleanup:
 
     FLINT_ASSERT(success == 0 || success == 1);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success)
     {
         fmpz_mpoly_init(t, ctx);

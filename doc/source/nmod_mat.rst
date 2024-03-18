@@ -213,7 +213,7 @@ Random matrix generation
     The matrix can be transformed into a dense matrix with unchanged
     rank by subsequently calling :func:`nmod_mat_randops`.
 
-.. function:: void nmod_mat_randops(nmod_mat_t mat, slong count, flint_rand_t state)
+.. function:: void nmod_mat_randops(nmod_mat_t mat, flint_rand_t state, slong count)
 
     Randomises ``mat`` by performing elementary row or column
     operations. More precisely, at most ``count`` random additions
@@ -483,7 +483,7 @@ Triangular solving
 
     Uses the block inversion formula
 
-    .. math ::
+    .. math::
         \begin{pmatrix} A & 0 \\ C & D \end{pmatrix}^{-1}
         \begin{pmatrix} X \\ Y \end{pmatrix} =
         \begin{pmatrix} A^{-1} X \\ D^{-1} ( Y - C A^{-1} X ) \end{pmatrix}
@@ -519,7 +519,7 @@ Triangular solving
 
     Uses the block inversion formula
 
-    .. math ::
+    .. math::
         \begin{pmatrix} A & B \\ 0 & D \end{pmatrix}^{-1}
         \begin{pmatrix} X \\ Y \end{pmatrix} =
         \begin{pmatrix} A^{-1} (X - B D^{-1} Y) \\ D^{-1} Y \end{pmatrix}

@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -17,6 +17,7 @@
 #include "t-add_sub_neg.c"
 #include "t-can_solve.c"
 #include "t-charpoly.c"
+#include "t-det.c"
 #include "t-fmpz_vec_mul.c"
 #include "t-get_set_fmpz_mat.c"
 #include "t-howell_form.c"
@@ -47,6 +48,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mod_mat_add_sub_neg),
     TEST_FUNCTION(fmpz_mod_mat_can_solve),
     TEST_FUNCTION(fmpz_mod_mat_charpoly),
+    TEST_FUNCTION(fmpz_mod_mat_det),
     TEST_FUNCTION(fmpz_mod_mat_fmpz_vec_mul),
     TEST_FUNCTION(fmpz_mod_mat_get_set_fmpz_mat),
     TEST_FUNCTION(fmpz_mod_mat_howell_form),

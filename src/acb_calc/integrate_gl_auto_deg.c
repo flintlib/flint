@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2017 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "thread_support.h"
@@ -90,7 +90,7 @@ acb_calc_gl_node(arb_ptr x, arb_ptr w, slong i, slong k, slong prec)
     int all;
 
     if (i < 0 || i >= GL_STEPS || prec < 2)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     if (gl_cache == NULL)
         gl_init();
@@ -98,7 +98,7 @@ acb_calc_gl_node(arb_ptr x, arb_ptr w, slong i, slong k, slong prec)
     n = gl_steps[i];
 
     if (k >= n)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     all = (k < 0);
 
@@ -339,7 +339,7 @@ acb_calc_integrate_gl_auto_deg(acb_t res, slong * eval_count,
         }
 
         if (best_n == -1)
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
         for (i = 0; i < GL_STEPS; i++)
             if (gl_steps[i] == best_n)
@@ -423,4 +423,3 @@ acb_calc_integrate_gl_auto_deg(acb_t res, slong * eval_count,
 
     return status;
 }
-

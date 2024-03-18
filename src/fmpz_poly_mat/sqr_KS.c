@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -48,8 +48,7 @@ fmpz_poly_mat_sqr_KS(fmpz_poly_mat_t B, const fmpz_poly_mat_t A)
             fmpz_poly_bit_pack(fmpz_mat_entry(AA, i, j),
                                fmpz_poly_mat_entry(A, i, j), bit_size);
 
-    /* Should use fmpz_mat_sqr */
-    fmpz_mat_mul(BB, AA, AA);
+    fmpz_mat_sqr(BB, AA);
 
     for (i = 0; i < n; i++)
         for (j = 0; j < n; j++)

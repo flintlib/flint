@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2021 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <mpfr.h>
@@ -187,7 +187,7 @@ arb_ui_pow_ui(arb_t res, ulong a, ulong exp, slong prec)
                         mp_limb_t y0, y1;
                         y0 = yman[0];
                         y1 = yman[1];
-                        flint_mpn_mul_2x1(yman[2], yman[1], yman[0], y1, y0, aodd);
+                        FLINT_MPN_MUL_2X1(yman[2], yman[1], yman[0], y1, y0, aodd);
                         yn += (yman[2] != 0);
                     }
                 }
@@ -198,7 +198,7 @@ arb_ui_pow_ui(arb_t res, ulong a, ulong exp, slong prec)
                    wp_limbs, we might want to go to the floating-point
                    code here */
                 yexp_lo *= 2;
-                mpn_sqr(tmp, yman, yn);
+                flint_mpn_sqr(tmp, yman, yn);
                 yn = 2 * yn;
                 yn -= (tmp[yn - 1] == 0);
 
@@ -299,7 +299,7 @@ arb_ui_pow_ui(arb_t res, ulong a, ulong exp, slong prec)
         }
 
         if (yn < wp_limbs)
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
         /* y = y * a */
         if (exp & (UWORD(1) << i))
@@ -322,7 +322,7 @@ arb_ui_pow_ui(arb_t res, ulong a, ulong exp, slong prec)
                and there was no multiplication by a, but in that case
                there are 0 leading zeros anyway */
             if (yn == wp_limbs)
-                flint_abort();
+                flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
             if (tmp[yn - 1] >> (FLINT_BITS - 2))
             {

@@ -170,7 +170,7 @@ benchmark(slong num_primes, slong prime_bits)
     fmpz_clear(res);
 }
 
-int main()
+int main(void)
 {
     slong len, bits;
 

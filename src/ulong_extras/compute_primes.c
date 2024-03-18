@@ -7,16 +7,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
-
-#include "flint.h"
 #include "ulong_extras.h"
 
-#if FLINT_REENTRANT && !FLINT_USES_TLS
+#if FLINT_REENTRANT && !FLINT_USES_TLS && FLINT_USES_PTHREAD
 #include <pthread.h>
 
 static pthread_once_t primes_initialised = PTHREAD_ONCE_INIT;
@@ -43,7 +40,7 @@ FLINT_TLS_PREFIX mp_limb_t * _flint_primes[FLINT_BITS];
 FLINT_TLS_PREFIX double * _flint_prime_inverses[FLINT_BITS];
 FLINT_TLS_PREFIX int _flint_primes_used = 0;
 
-#if FLINT_REENTRANT && !FLINT_USES_TLS
+#if FLINT_REENTRANT && !FLINT_USES_TLS && FLINT_USES_PTHREAD
 void n_compute_primes_init()
 {
    pthread_mutex_init(&primes_lock, NULL);
@@ -56,7 +53,7 @@ n_compute_primes(ulong num_primes)
     int i, m;
     ulong num_computed;
 
-#if FLINT_REENTRANT && !FLINT_USES_TLS
+#if FLINT_REENTRANT && !FLINT_USES_TLS && FLINT_USES_PTHREAD
     pthread_once(&primes_initialised, n_compute_primes_init);
     pthread_mutex_lock(&primes_lock);
 #endif
@@ -91,8 +88,7 @@ n_compute_primes(ulong num_primes)
         _flint_primes_used = m + 1;
     }
 
-#if FLINT_REENTRANT && !FLINT_USES_TLS
+#if FLINT_REENTRANT && !FLINT_USES_TLS && FLINT_USES_PTHREAD
     pthread_mutex_unlock(&primes_lock);
 #endif
 }
-

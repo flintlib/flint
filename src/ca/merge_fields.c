@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2020 Fredrik Johansson
 
-    This file is part of Calcium.
+    This file is part of FLINT.
 
-    Calcium is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "ca.h"
@@ -61,8 +61,7 @@ ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx)
 
     if (CA_IS_SPECIAL(x) || CA_IS_SPECIAL(y))
     {
-        flint_printf("ca_merge_fields: inputs must be field elements, not special values\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "ca_merge_fields: inputs must be field elements, not special values\n");
     }
 
     xfield = CA_FIELD(x, ctx);
@@ -77,8 +76,7 @@ ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx)
 
     if (x == resx || y == resy)
     {
-        flint_printf("ca_merge_fields: aliasing not implemented!\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "ca_merge_fields: aliasing not implemented!\n");
     }
 
     xlen = CA_FIELD_LENGTH(xfield);
@@ -116,7 +114,7 @@ ca_merge_fields(ca_t resx, ca_t resy, const ca_t x, const ca_t y, ca_ctx_t ctx)
             if (cmp == 0)
             {
                 if (CA_FIELD_EXT_ELEM(xfield, ix) != CA_FIELD_EXT_ELEM(yfield, iy))
-                    flint_abort();
+                    flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
                 ext[ext_len] = CA_FIELD_EXT_ELEM(xfield, ix);
                 xgen_map[ix] = ext_len;

@@ -35,7 +35,7 @@ The field ``var`` contains the name of a generator
 of the extension, which is used when printing the 
 elements.
 
-.. function:: void qadic_ctx_init(qadic_ctx_t ctx, const fmpz_t p, slong d, slong min, slong max, const char *var, enum padic_print_mode mode)
+.. function:: void qadic_ctx_init(qadic_ctx_t ctx, const fmpz_t p, slong d, slong min, slong max, const char * var, enum padic_print_mode mode)
 
     Initialises the context ``ctx`` with prime `p`, extension degree `d`, 
     variable name ``var`` and printing mode ``mode``. The defining polynomial
@@ -58,7 +58,7 @@ elements.
     to `p^N`.
 
 
-.. function:: void qadic_ctx_init_conway(qadic_ctx_t ctx, const fmpz_t p, slong d, slong min, slong max, const char *var, enum padic_print_mode mode)
+.. function:: void qadic_ctx_init_conway(qadic_ctx_t ctx, const fmpz_t p, slong d, slong min, slong max, const char * var, enum padic_print_mode mode)
 
     Initialises the context ``ctx`` with prime `p`, extension degree `d`, 
     variable name ``var`` and printing mode ``mode``. The defining polynomial
@@ -110,7 +110,7 @@ Memory management
 
     Clears the element ``rop``.
 
-.. function:: void _fmpz_poly_reduce(fmpz *R, slong lenR, const fmpz *a, const slong *j, slong len)
+.. function:: void _fmpz_poly_reduce(fmpz * R, slong lenR, const fmpz * a, const slong * j, slong len)
 
     Reduces a polynomial ``(R, lenR)`` modulo a sparse monic 
     polynomial `f(X) = \sum_{i} a_{i} X^{j_{i}}` of degree at 
@@ -121,7 +121,7 @@ Memory management
 
     Allows zero-padding in ``(R, lenR)``.
 
-.. function:: void _fmpz_mod_poly_reduce(fmpz *R, slong lenR, const fmpz *a, const slong *j, slong len, const fmpz_t p)
+.. function:: void _fmpz_mod_poly_reduce(fmpz * R, slong lenR, const fmpz * a, const slong * j, slong len, const fmpz_t p)
 
     Reduces a polynomial ``(R, lenR)`` modulo a sparse monic 
     polynomial `f(X) = \sum_{i} a_{i} X^{j_{i}}` of degree at 
@@ -259,7 +259,7 @@ Basic arithmetic
     Sets ``rop`` to the product of ``op1`` and ``op2``, 
     reducing the output in the given context.
 
-.. function:: void _qadic_inv(fmpz *rop, const fmpz *op, slong len, const fmpz *a, const slong *j, slong lena, const fmpz_t p, slong N)
+.. function:: void _qadic_inv(fmpz * rop, const fmpz * op, slong len, const fmpz * a, const slong * j, slong lena, const fmpz_t p, slong N)
 
     Sets ``(rop, d)`` to the inverse of ``(op, len)`` 
     modulo `f(X)` given by ``(a,j,lena)`` and `p^N`.
@@ -275,7 +275,7 @@ Basic arithmetic
 
     Sets ``rop`` to the inverse of ``op``, reduced in the given context.
 
-.. function:: void _qadic_pow(fmpz *rop, const fmpz *op, slong len, const fmpz_t e, const fmpz *a, const slong *j, slong lena, const fmpz_t p)
+.. function:: void _qadic_pow(fmpz * rop, const fmpz * op, slong len, const fmpz_t e, const fmpz * a, const slong * j, slong lena, const fmpz_t p)
 
     Sets ``(rop, 2*d-1)`` to ``(op,len)`` raised to the power `e`, 
     reduced modulo `f(X)` given by ``(a, j, lena)`` and `p`, which 
@@ -313,7 +313,7 @@ Special functions
 --------------------------------------------------------------------------------
 
 
-.. function:: void _qadic_exp_rectangular(fmpz *rop, const fmpz *op, slong v, slong len, const fmpz *a, const slong *j, slong lena, const fmpz_t p, slong N, const fmpz_t pN)
+.. function:: void _qadic_exp_rectangular(fmpz * rop, const fmpz * op, slong v, slong len, const fmpz * a, const slong * j, slong lena, const fmpz_t p, slong N, const fmpz_t pN)
 
     Sets ``(rop, 2*d - 1)`` to the exponential of ``(op, v, len)`` 
     reduced modulo `p^N`, assuming that the series converges.
@@ -328,7 +328,7 @@ Special functions
     and sets ``rop`` to its value reduced modulo in the given 
     context.
 
-.. function:: void _qadic_exp_balanced(fmpz *rop, const fmpz *x, slong v, slong len, const fmpz *a, const slong *j, slong lena, const fmpz_t p, slong N, const fmpz_t pN)
+.. function:: void _qadic_exp_balanced(fmpz * rop, const fmpz * x, slong v, slong len, const fmpz * a, const slong * j, slong lena, const fmpz_t p, slong N, const fmpz_t pN)
 
     Sets ``(rop, d)`` to the exponential of ``(op, v, len)`` 
     reduced modulo `p^N`, assuming that the series converges.
@@ -344,7 +344,7 @@ Special functions
     and sets ``rop`` to its value reduced modulo in the given 
     context.
 
-.. function:: void _qadic_exp(fmpz *rop, const fmpz *op, slong v, slong len, const fmpz *a, const slong *j, slong lena, const fmpz_t p, slong N, const fmpz_t pN)
+.. function:: void _qadic_exp(fmpz * rop, const fmpz * op, slong v, slong len, const fmpz * a, const slong * j, slong lena, const fmpz_t p, slong N, const fmpz_t pN)
 
     Sets ``(rop, 2*d - 1)`` to the exponential of ``(op, v, len)`` 
     reduced modulo `p^N`, assuming that the series converges.
@@ -362,11 +362,11 @@ Special functions
     The exponential series converges if the valuation of ``op`` 
     is at least `2` or `1` when `p` is even or odd, respectively.
 
-.. function:: void _qadic_log_rectangular(fmpz *z, const fmpz *y, slong v, slong len, const fmpz *a, const slong *j, slong lena, const fmpz_t p, slong N, const fmpz_t pN)
+.. function:: void _qadic_log_rectangular(fmpz * z, const fmpz * y, slong v, slong len, const fmpz * a, const slong * j, slong lena, const fmpz_t p, slong N, const fmpz_t pN)
 
     Computes 
 
-    .. math ::
+    .. math::
 
         z = - \sum_{i = 1}^{\infty} \frac{y^i}{i} \pmod{p^N}.
 
@@ -375,7 +375,7 @@ Special functions
     Note that this can be used to compute the `p`-adic logarithm 
     via the equation 
 
-    .. math ::
+    .. math::
 
         \log(x) & = \sum_{i=1}^{\infty} (-1)^{i-1} \frac{(x-1)^i}{i} \\
                 & = - \sum_{i=1}^{\infty} \frac{(1-x)^i}{i}.
@@ -395,11 +395,11 @@ Special functions
     Returns whether the `p`-adic logarithm function converges at 
     ``op``, and if so sets ``rop`` to its value.
 
-.. function:: void _qadic_log_balanced(fmpz *z, const fmpz *y, slong len, const fmpz *a, const slong *j, slong lena, const fmpz_t p, slong N, const fmpz_t pN)
+.. function:: void _qadic_log_balanced(fmpz * z, const fmpz * y, slong len, const fmpz * a, const slong * j, slong lena, const fmpz_t p, slong N, const fmpz_t pN)
 
     Computes `(z, d)` as 
 
-    .. math ::
+    .. math::
 
 
         z = - \sum_{i = 1}^{\infty} \frac{y^i}{i} \pmod{p^N}.
@@ -416,11 +416,11 @@ Special functions
     Returns whether the `p`-adic logarithm function converges at 
     ``op``, and if so sets ``rop`` to its value.
 
-.. function:: void _qadic_log(fmpz *z, const fmpz *y, slong v, slong len, const fmpz *a, const slong *j, slong lena, const fmpz_t p, slong N, const fmpz_t pN)
+.. function:: void _qadic_log(fmpz * z, const fmpz * y, slong v, slong len, const fmpz * a, const slong * j, slong lena, const fmpz_t p, slong N, const fmpz_t pN)
 
     Computes `(z, d)` as 
 
-    .. math ::
+    .. math::
 
         z = - \sum_{i = 1}^{\infty} \frac{y^i}{i} \pmod{p^N}.
 
@@ -428,7 +428,7 @@ Special functions
     Note that this can be used to compute the `p`-adic logarithm 
     via the equation 
 
-    .. math ::
+    .. math::
 
         \log(x) & = \sum_{i=1}^{\infty} (-1)^{i-1} \frac{(x-1)^i}{i} \\
                 & = - \sum_{i=1}^{\infty} \frac{(1-x)^i}{i}.
@@ -450,7 +450,7 @@ Special functions
 
     The `p`-adic logarithm function is defined by the usual series 
 
-    .. math ::
+    .. math::
 
 
         \log_p(x) = \sum_{i=1}^{\infty} (-1)^{i-1} \frac{(x-1)^i}{i}
@@ -459,7 +459,7 @@ Special functions
     but this only converges when `\operatorname{ord}_p(x)` is at least `2` or `1` 
     when `p = 2` or `p > 2`, respectively.
 
-.. function:: void _qadic_frobenius_a(fmpz *rop, slong e, const fmpz *a, const slong *j, slong lena, const fmpz_t p, slong N)
+.. function:: void _qadic_frobenius_a(fmpz * rop, slong e, const fmpz * a, const slong * j, slong lena, const fmpz_t p, slong N)
 
     Computes `\sigma^e(X) \bmod{p^N}` where `X` is such that 
     `\mathbf{Q}_q \cong \mathbf{Q}_p[X]/(f(X))`.
@@ -472,7 +472,7 @@ Special functions
     Sets ``(rop, 2*d-1)``, although the actual length of the 
     output will be at most `d`.
 
-.. function:: void _qadic_frobenius(fmpz *rop, const fmpz *op, slong len, slong e, const fmpz *a, const slong *j, slong lena, const fmpz_t p, slong N)
+.. function:: void _qadic_frobenius(fmpz * rop, const fmpz * op, slong len, slong e, const fmpz * a, const slong * j, slong lena, const fmpz_t p, slong N)
 
     Sets ``(rop, 2*d-1)`` to `\Sigma` evaluated at ``(op, len)``.
 
@@ -495,7 +495,7 @@ Special functions
 
     This functionality is implemented as ``GaloisImage()`` in Magma.
 
-.. function:: void _qadic_teichmuller(fmpz *rop, const fmpz *op, slong len, const fmpz *a, const slong *j, slong lena, const fmpz_t p, slong N)
+.. function:: void _qadic_teichmuller(fmpz * rop, const fmpz * op, slong len, const fmpz * a, const slong * j, slong lena, const fmpz_t p, slong N)
 
     Sets ``(rop, d)`` to the Teichmüller lift of ``(op, len)`` 
     modulo `p^N`.
@@ -514,7 +514,7 @@ Special functions
 
     Raises an exception if the valuation of ``op`` is negative.
 
-.. function:: void _qadic_trace(fmpz_t rop, const fmpz *op, slong len, const fmpz *a, const slong *j, slong lena, const fmpz_t pN)
+.. function:: void _qadic_trace(fmpz_t rop, const fmpz * op, slong len, const fmpz * a, const slong * j, slong lena, const fmpz_t pN)
               void qadic_trace(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 
     Sets ``rop`` to the trace of ``op``.
@@ -525,7 +525,7 @@ Special functions
     `\operatorname{Gal}(\mathbf{Q}_q / \mathbf{Q}_p)` then the trace of `a` is equal to 
     `\sum_{i=0}^{d-1} \Sigma^i (a)`.
 
-.. function:: void _qadic_norm(fmpz_t rop, const fmpz *op, slong len, const fmpz *a, const slong *j, slong lena, const fmpz_t p, slong N)
+.. function:: void _qadic_norm(fmpz_t rop, const fmpz * op, slong len, const fmpz * a, const slong * j, slong lena, const fmpz_t p, slong N)
 
     Sets ``rop`` to the norm of the element ``(op,len)`` 
     in `\mathbf{Z}_q` to precision `N`, where ``len`` is at 
@@ -548,7 +548,7 @@ Special functions
     Whenever ``op`` has valuation greater than `(p-1)^{-1}`, this 
     routine computes its norm ``rop`` via 
 
-    .. math ::
+    .. math::
 
 
         \operatorname{Norm} (x) = \exp \Bigl( \bigl( \operatorname{Trace} \log (x) \bigr) \Bigr).
@@ -567,7 +567,7 @@ Special functions
 
     Sets ``rop`` to the norm of ``op``, using the formula 
 
-    .. math ::
+    .. math::
 
 
         \operatorname{Norm}(x) = \ell(f)^{-\deg(a)} \operatorname{Res}(f(X), a(X)),
@@ -586,7 +586,7 @@ Output
 --------------------------------------------------------------------------------
 
 
-.. function:: int qadic_fprint_pretty(FILE *file, const qadic_t op, const qadic_ctx_t ctx)
+.. function:: int qadic_fprint_pretty(FILE * file, const qadic_t op, const qadic_ctx_t ctx)
 
     Prints a pretty representation of ``op`` to ``file``.
 

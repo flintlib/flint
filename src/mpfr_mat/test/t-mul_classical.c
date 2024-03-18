@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -38,11 +38,7 @@ TEST_FUNCTION_START(mpfr_mat_mul_classical, state)
         mpfr_mat_mul_classical(A, A, B, MPFR_RNDN);
 
         if (!mpfr_mat_equal(C, A))
-        {
-            flint_printf("FAIL: aliasing failed\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("aliasing failed\n");
 
         mpfr_mat_clear(A);
         mpfr_mat_clear(B);
@@ -70,11 +66,7 @@ TEST_FUNCTION_START(mpfr_mat_mul_classical, state)
         mpfr_mat_mul_classical(B, A, B, MPFR_RNDN);
 
         if (!mpfr_mat_equal(C, B))
-        {
-            flint_printf("FAIL: aliasing failed\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("aliasing failed\n");
 
         mpfr_mat_clear(A);
         mpfr_mat_clear(B);

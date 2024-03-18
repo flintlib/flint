@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2012 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "double_extras.h"
@@ -16,7 +16,7 @@
 #define LOG2 0.69314718055994530942
 #define EXP1 2.7182818284590452354
 
-static __inline__ double d_root(double x, int r)
+static inline double d_root(double x, int r)
 {
     if (r == 1)
         return x;
@@ -39,8 +39,7 @@ hypgeom_estimate_terms(const mag_t z, int r, slong prec)
     {
         if (t >= 1)
         {
-            flint_printf("z must be smaller than 1\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "z must be smaller than 1\n");
         }
 
         y = (log(1-t) - prec * LOG2) / log(t) + 1;
@@ -51,12 +50,10 @@ hypgeom_estimate_terms(const mag_t z, int r, slong prec)
         y = (prec * LOG2) / (r * d_lambertw(y)) + 1;
     }
 
-    if (y >= WORD_MAX / 2)
+    if (y >= (double) (WORD_MAX / 2))
     {
-        flint_printf("error: series will converge too slowly\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "error: series will converge too slowly\n");
     }
 
     return y;
 }
-

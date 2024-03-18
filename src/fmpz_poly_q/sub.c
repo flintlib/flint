@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -128,8 +128,8 @@ fmpz_poly_q_sub(fmpz_poly_q_t rop,
         fmpz_poly_init(r2);
         fmpz_poly_init(s2);
 
-        fmpz_poly_div(r2, op1->den, d);  /* +ve leading coeff */
-        fmpz_poly_div(s2, op2->den, d);  /* +ve leading coeff */
+        fmpz_poly_divexact(r2, op1->den, d);  /* +ve leading coeff */
+        fmpz_poly_divexact(s2, op2->den, d);  /* +ve leading coeff */
 
         fmpz_poly_mul(rop->num, op1->num, s2);
         fmpz_poly_mul(rop->den, op2->num, r2);  /* Using rop->den as temp */
@@ -148,8 +148,8 @@ fmpz_poly_q_sub(fmpz_poly_q_t rop,
 
             if (!fmpz_poly_is_one(r2))
             {
-                fmpz_poly_div(rop->num, rop->num, r2);
-                fmpz_poly_div(rop->den, rop->den, r2);
+                fmpz_poly_divexact(rop->num, rop->num, r2);
+                fmpz_poly_divexact(rop->den, rop->den, r2);
             }
         }
 

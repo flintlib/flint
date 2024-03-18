@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2012, 2022 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "thread_support.h"
@@ -14,7 +14,7 @@
 #include "arb.h"
 #include "hypgeom.h"
 
-static __inline__ void
+static inline void
 fmpz_poly_evaluate_si(fmpz_t y, const fmpz_poly_t poly, slong x)
 {
     fmpz_set_si(y, x);
@@ -170,7 +170,7 @@ bsplit_merge(bsplit_res_t * res, bsplit_res_t * left, bsplit_res_t * right, bspl
     int cont = b != args->b;
 
     if (res != left)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     if (arb_is_one(B) && arb_is_one(B2))
     {
@@ -355,4 +355,3 @@ arb_hypgeom_infsum(arb_t P, arb_t Q, hypgeom_t hyp, slong target_prec, slong pre
     mag_clear(z);
     mag_clear(err);
 }
-

@@ -5,12 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fq_nmod.h"
 #include "n_poly.h"
-
 
 static void _n_fq_poly_taylor_shift_horner_n_fq(
     mp_limb_t * poly,
@@ -144,4 +144,3 @@ void n_fq_bpoly_taylor_shift_gen0_n_fq(
 
     return;
 }
-

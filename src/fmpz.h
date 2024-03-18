@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -15,33 +15,14 @@
 #ifdef FMPZ_INLINES_C
 #define FMPZ_INLINE
 #else
-#define FMPZ_INLINE static __inline__
+#define FMPZ_INLINE static inline
 #endif
 
 #include "fmpz_types.h"
 
-#if FLINT_USES_PTHREAD
-#include <pthread.h>
-#endif
-
 #ifdef __cplusplus
  extern "C" {
 #endif
-
-/* Macros ********************************************************************/
-
-/* The largest bit count for an fmpz to be small */
-#define SMALL_FMPZ_BITCOUNT_MAX (FLINT_BITS - 2)
-
-/* Minimum and maximum value for a small fmpz */
-#define COEFF_MIN (-((WORD(1) << SMALL_FMPZ_BITCOUNT_MAX) - WORD(1)))
-#define COEFF_MAX ((WORD(1) << SMALL_FMPZ_BITCOUNT_MAX) - WORD(1))
-
-/* Conversions between mpz_ptr and fmpz_t */
-#define PTR_TO_COEFF(x) (((ulong) (x) >> 2) | (WORD(1) << (FLINT_BITS - 2)))
-#define COEFF_TO_PTR(x) ((mpz_ptr) (((ulong)x) << 2))
-
-#define COEFF_IS_MPZ(x) (((x) >> SMALL_FMPZ_BITCOUNT_MAX) == WORD(1))  /* is x a pointer not an integer */
 
 /* Memory management *********************************************************/
 
@@ -151,7 +132,7 @@ void fmpz_one(fmpz_t f)
 }
 
 void fmpz_set(fmpz_t f, const fmpz_t g);
-FMPZ_INLINE void fmpz_swap(fmpz_t f, fmpz_t g) { fmpz t = *f; *f = *g; *g = t; }
+FMPZ_INLINE void fmpz_swap(fmpz_t f, fmpz_t g) { FLINT_SWAP(fmpz, *f, *g); }
 
 slong fmpz_get_si(const fmpz_t f);
 ulong fmpz_get_ui(const fmpz_t f);
@@ -430,7 +411,8 @@ void fmpz_sqrtrem(fmpz_t f, fmpz_t r, const fmpz_t g);
 int fmpz_root(fmpz_t r, const fmpz_t f, slong n);
 
 int fmpz_divisible(const fmpz_t f, const fmpz_t g);
-int fmpz_divisible_si(const fmpz_t f, slong g);
+int fmpz_divisible_ui(const fmpz_t f, ulong g);
+FMPZ_INLINE int fmpz_divisible_si(const fmpz_t f, slong g) { return fmpz_divisible_ui(f, FLINT_ABS(g)); }
 int fmpz_divides(fmpz_t q, const fmpz_t g, const fmpz_t h);
 
 void fmpz_divexact(fmpz_t f, const fmpz_t g, const fmpz_t h);
@@ -500,7 +482,7 @@ slong fmpz_flog_ui(const fmpz_t x, ulong b);
 double fmpz_get_d_2exp(slong * exp, const fmpz_t f);
 void fmpz_set_d_2exp(fmpz_t f, double m, slong exp);
 
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
 #define MPZ_WANT_FLINT_DIVISION(a, b) (mpz_size(b) >= 1250 && mpz_size(a) - mpz_size(b) >= 1250)
 #else
 #define MPZ_WANT_FLINT_DIVISION(a, b) 0

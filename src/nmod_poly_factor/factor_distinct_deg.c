@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -56,14 +56,7 @@ void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
     nmod_poly_init_mod(vinv, poly->mod);
     nmod_poly_init_mod(tmp, poly->mod);
 
-    if (!(h = (nmod_poly_struct *)
-              flint_malloc((2*m + l + 1)*sizeof(nmod_poly_struct))))
-    {
-        flint_printf("Exception (nmod_poly_factor_distinct_deg):\n");
-        flint_printf("Not enough memory.\n");
-        flint_abort();
-    }
-
+    h = flint_malloc((2 * m + l + 1) * sizeof(nmod_poly_struct));
     H = h + (l + 1);
     I = H + m;
 

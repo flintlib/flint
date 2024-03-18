@@ -5,10 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mod.h"
+#include "mpoly.h"
 #include "fmpz_mod_mpoly.h"
 
 void _fmpz_mod_mpoly_set_coeff_fmpz_fmpz(
@@ -95,11 +97,19 @@ void fmpz_mod_mpoly_set_coeff_fmpz_fmpz(
 
     TMP_START;
 
-    newexp = (fmpz *) TMP_ALLOC(nvars*sizeof(fmpz));
+    newexp = TMP_ALLOC(nvars * sizeof(fmpz));
     for (i = 0; i < nvars; i++)
         newexp[i] = *exp[i];
 
+    /* GCC really wants to complain about this one */
+#if defined(__GNUC__) && !defined(__clang__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
     _fmpz_mod_mpoly_set_coeff_fmpz_fmpz(A, c, newexp, ctx);
+#if defined(__GNUC__) && !defined(__clang__)
+# pragma GCC diagnostic pop
+#endif
 
     TMP_END;
 }
@@ -121,4 +131,3 @@ void fmpz_mod_mpoly_set_coeff_si_fmpz(fmpz_mod_mpoly_t poly,
     fmpz_mod_mpoly_set_coeff_fmpz_fmpz(poly, C, exp, ctx);
     fmpz_clear(C);
 }
-

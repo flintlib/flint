@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -76,8 +76,8 @@ void _fmpq_poly_xgcd(fmpz *G, fmpz_t denG,
         lenD = lenB - lenG + 1;
         C = _fmpz_vec_init(lenC + lenD);
         D = C + lenC;
-        _fmpz_poly_div(C, primA, lenA, G, lenG, 0);
-        _fmpz_poly_div(D, primB, lenB, G, lenG, 0);
+        _fmpz_poly_divexact(C, primA, lenA, G, lenG);
+        _fmpz_poly_divexact(D, primB, lenB, G, lenG);
     }
     else
     {
@@ -126,8 +126,7 @@ void fmpq_poly_xgcd(fmpq_poly_t G, fmpq_poly_t S, fmpq_poly_t T,
 {
     if (G == S || G == T || S == T)
     {
-        flint_printf("Exception (fmpq_poly_xgcd). Output arguments aliased.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpq_poly_xgcd). Output arguments aliased.\n");
     }
 
     if (A->length < B->length)
@@ -229,4 +228,3 @@ void fmpq_poly_xgcd(fmpq_poly_t G, fmpq_poly_t S, fmpq_poly_t T,
        }
     }
 }
-

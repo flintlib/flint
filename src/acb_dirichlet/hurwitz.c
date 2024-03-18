@@ -1,12 +1,12 @@
 /*
     Copyright (C) 2017 Fredrik Johansson
 
-    This file is part of Arb.
+    This file is part of FLINT.
 
-    Arb is free software: you can redistribute it and/or modify it under
+    FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
-    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "acb_poly.h"
@@ -55,4 +55,3 @@ acb_dirichlet_hurwitz(acb_t res, const acb_t s, const acb_t a, slong prec)
 
     _acb_poly_zeta_cpx_series(res, s, a, 0, 1, prec);
 }
-

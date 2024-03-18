@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -15,8 +15,10 @@
 # include <math.h>
 #endif
 
-#include "nmod_mpoly.h"
+#include "nmod.h"
 #include "fq_zech.h"
+#include "mpoly.h"
+#include "nmod_mpoly.h"
 #include "fq_zech_mpoly.h"
 
 static int _is_proved_not_square_medprime(
@@ -33,7 +35,6 @@ static int _is_proved_not_square_medprime(
     slong i;
     fq_zech_struct eval[1], * t, * alphas, ** alpha_ptrs;
     fq_zech_ctx_t fqctx;
-    fmpz_t p;
     slong edeg, max_degree = n_flog(1000000, mod.n);
     TMP_INIT;
 
@@ -44,8 +45,7 @@ static int _is_proved_not_square_medprime(
     if (edeg > max_degree)
         return 0;
 
-    fmpz_init_set_ui(p, mod.n);
-    fq_zech_ctx_init(fqctx, p, edeg, "#");
+    fq_zech_ctx_init_ui(fqctx, mod.n, edeg, "#");
     fq_zech_init(eval, fqctx);
 
     TMP_START;
@@ -81,7 +81,6 @@ next_p:
     if (!success && --count >= 0)
         goto next_p;
 
-    fmpz_clear(p);
     fq_zech_clear(eval, fqctx);
     fq_zech_ctx_clear(fqctx);
 
@@ -721,4 +720,3 @@ int nmod_mpoly_sqrt_heap(nmod_mpoly_t Q, const nmod_mpoly_t A,
 
     return success;
 }
-

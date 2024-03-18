@@ -5,11 +5,16 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
+#include "nmod_poly.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "mpoly.h"
 #include "fmpz_mpoly_factor.h"
 
 /*
@@ -730,7 +735,7 @@ static int _try_missing_var(
     fmpz_mpoly_init(tG, ctx);
     fmpz_mpoly_univar_init(Au, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mpoly_to_univar(Au, B, var, ctx);
     FLINT_ASSERT(Au->length == 1);
 #endif
@@ -1435,7 +1440,7 @@ static int _fmpz_mpoly_gcd_algo_small(
     slong j;
     slong nvars = ctx->minfo->nvars;
     mpoly_gcd_info_t I;
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mpoly_t T, Asave, Bsave;
 #endif
 
@@ -1450,7 +1455,7 @@ static int _fmpz_mpoly_gcd_algo_small(
     if (B->length == 1)
         return _do_monomial_gcd(G, Abar, Bbar, A, B, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mpoly_init(T, ctx);
     fmpz_mpoly_init(Asave, ctx);
     fmpz_mpoly_init(Bsave, ctx);
@@ -1746,7 +1751,7 @@ cleanup:
         FLINT_ASSERT(Bbar == NULL || fmpz_mpoly_equal(T, Bbar, ctx));
     }
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mpoly_clear(T, ctx);
     fmpz_mpoly_clear(Asave, ctx);
     fmpz_mpoly_clear(Bsave, ctx);
@@ -1907,4 +1912,3 @@ int _fmpz_mpoly_gcd_algo(
     else
         return _fmpz_mpoly_gcd_algo_large(G, Abar, Bbar, A, B, ctx, algo);
 }
-
