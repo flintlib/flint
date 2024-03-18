@@ -181,6 +181,11 @@ dnl   gcc_cflags     flags for GCC-compatible compilers
 dnl
 dnl   asm_path       directory for assembly, relative to src/mpn_extras
 dnl   param_path     directory for flint-mparam.h, relative to src/mpn_extras
+dnl
+dnl For x86_64 systems, we can also set:
+dnl
+dnl   have_avx512    system has AVX512F and AVX512DQ (we assume this implies have_avx2)
+dnl   have_avx2      system has AVX2 and FMA
 
 case $host in
 
@@ -279,56 +284,93 @@ Please report at <https://github.com/flintlib/flint/issues/>])
 
 
   X86_64_ADX_PATTERN)
-    # NOTE: We do not care if the user specifies noavx!
     gcc_cflags="$gcc_cflags"
     gcc_cflags_optlist="arch"
     asm_path="x86_64/broadwell"
     param_path="x86_64/broadwell"
-    flint_cv_have_fft_small_x86_i="yes"
+
+    have_avx512="no"
+    have_avx2="yes"
 
     case $host_cpu in
-      zen | zennoavx)
+      zen)
         gcc_cflags_arch="-march=znver1"
         param_path="x86_64/zen3"
         ;;
-      zen2 | zen2noavx)
+      zen2)
         gcc_cflags_arch="-march=znver2"
         param_path="x86_64/zen3"
         ;;
-      zen3 | zen3noavx)
+      zen3)
         gcc_cflags_arch="-march=znver3"
         param_path="x86_64/zen3"
         ;;
-      zen4 | zen4noavx)
+      zen4)
         gcc_cflags_arch="-march=znver4"
         param_path="x86_64/zen3"
+        have_avx512="yes"
         ;;
-      coreibwl | coreibwlnoavx | broadwell | broadwellnoavx)
+      coreibwl | broadwell)
         gcc_cflags_arch="-march=broadwell"
         param_path="x86_64/skylake"
         ;;
-      skylake | skylakenoavx)
+      skylake)
         gcc_cflags_arch="-march=skylake"
         param_path="x86_64/skylake"
         ;;
-      kabylake | kabylakenoavx)
+      skylake_server)
+        gcc_cflags_arch="-march=skylake-avx512"
+        param_path="x86_64/skylake"
+        have_avx512="yes"
+        ;;
+      cannonlake)
+        gcc_cflags_arch="-march=cannonlake"
+        param_path="x86_64/skylake"
+        have_avx512="yes"
+        ;;
+      kabylake)
         gcc_cflags_arch="-march=skylake"
         param_path="x86_64/skylake"
         ;;
-      icelake | icelakenoavx)
-        gcc_cflags_arch="-march=tigerlake"
+      icelake)
+        gcc_cflags_arch="-march=icelake-client"
         param_path="x86_64/skylake"
+        have_avx512="yes"
         ;;
-      rocketlake | rocketlakenoavx)
+      icelake_server)
+        gcc_cflags_arch="-march=icelake-server"
+        param_path="x86_64/skylake"
+        have_avx512="yes"
+        ;;
+      rocketlake)
         gcc_cflags_arch="-march=rocketlake"
         param_path="x86_64/skylake"
+        have_avx512="yes"
         ;;
-      alderlake | alderlakenoavx)
+      tigerlake)
+        gcc_cflags_arch="-march=tigerlake"
+        param_path="x86_64/skylake"
+        have_avx512="yes"
+        ;;
+      alderlake)
         gcc_cflags_arch="-march=alderlake"
         param_path="x86_64/skylake"
         ;;
-      raptorlake | raptorlakenoavx)
+      raptorlake)
         gcc_cflags_arch="-march=alderlake"
+        param_path="x86_64/skylake"
+        ;;
+      knightslanding)
+        gcc_cflags_arch="-march=knl"
+        param_path="x86_64/skylake"
+        ;;
+      sapphirerapids)
+        gcc_cflags_arch="-march=sapphirerapids"
+        param_path="x86_64/skylake"
+        have_avx512="yes"
+        ;;
+      cometlake)
+        gcc_cflags_arch="-march=kabylake"
         param_path="x86_64/skylake"
         ;;
       *)
@@ -344,6 +386,16 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         param_path="x86_64"
 	    ;;
 	esac
+
+    if test "$have_avx512" = "yes";
+    then
+        have_avx2="yes"
+    fi
+
+    if test "$have_avx2" = "yes";
+    then
+        flint_cv_have_fft_small_x86_i="yes"
+    fi
 	;;
 
   X86_64_PATTERN)
@@ -354,31 +406,41 @@ Please report at <https://github.com/flintlib/flint/issues/>])
     param_path="x86_64"
 
     case $host_cpu in
-      coreiibr | coreiibrnoavx | ivybridge | ivybridgenoavx)
+      coreiibr | ivybridge)
         gcc_cflags_arch="-march=ivybridge"
-        # Ivybridge does not have AVX2
         ;;
-      coreihwl | coreihwlnoavx | haswell | haswellnoavx)
+      coreihwl | haswell)
         gcc_cflags_arch="-march=haswell"
-        flint_cv_have_fft_small_x86_i="yes"
         ;;
-      piledriver | bd2 | piledrivernoavx | bd2noavx)
+      piledriver | bd2)
         gcc_cflags_arch="-march=bdver2"
-        flint_cv_have_fft_small_x86_i="yes"
         ;;
-      steamroller | bd3 | steamrollernoavx | bd3noavx)
+      steamroller | bd3)
         gcc_cflags_arch="-march=bdver3"
-        flint_cv_have_fft_small_x86_i="yes"
         ;;
-      excavator | bd4 | excavatornoavx | bd4noavx)
+      excavator | bd4)
         gcc_cflags_arch="-march=bdver4"
-        flint_cv_have_fft_small_x86_i="yes"
+        have_avx2="yes"
         ;;
       x86_64v3)
         gcc_cflags_arch="-march=x86-64-v3"
-        flint_cv_have_fft_small_x86_i="yes"
+        have_avx2="yes"
+        ;;
+      x86_64v4)
+        gcc_cflags_arch="-march=x86-64-v4"
+        have_avx512="yes"
         ;;
     esac
+
+    if test "$have_avx512" = "yes";
+    then
+        have_avx2="yes"
+    fi
+
+    if test "$have_avx2" = "yes";
+    then
+        flint_cv_have_fft_small_x86_i="yes"
+    fi
 	;;
 
   *)
