@@ -20,13 +20,13 @@ Types and basic access
         
     This struct contains:
 
-    * A pointer to an `slong` array of column indices (``cols``) of nonzeros (we think of the vector as a row)
+    * A pointer to an `slong` array of indices (``inds``) of nonzeros.
     * A :type:`gr_ptr` array of values of nonzeros (``entries``).
-    * `slong` values to record the number of nonzeros (``nnz``), the nominal length of the vector (the dimension of the vector space) (``length``), and the space allocated in the ``cols`` and ``entries`` arrays.
+    * `slong` values to record the number of nonzeros (``nnz``), the nominal length of the vector (the dimension of the vector space) (``length``), and the space allocated in the ``inds`` and ``entries`` arrays.
 
     We always require:
 
-    * The ``cols`` are sorted into strictly increasing order
+    * The ``inds`` are sorted into strictly increasing order
     * The ``entries`` are nonzero (meaning, ``gr_is_zero(GR_ENTRY(vec->entries, i, ctx->sizeof_elem), ctx)`` returns ``T_FALSE`` for ``0 <= i < vec->nnz``).
     * We have ``nnz <= alloc <= length``.
     
@@ -112,16 +112,16 @@ Getting, setting and conversion
     in *src* are overwritten with their values in *src*.  Any columns in *res* which do
     not appear in *src* are left unchanged.
 
-.. function:: int gr_sparse_vec_set_from_entries(gr_sparse_vec_t vec, ulong * cols, gr_srcptr entries, slong nnz, gr_ctx_t ctx)
+.. function:: int gr_sparse_vec_set_from_entries(gr_sparse_vec_t vec, ulong * inds, gr_srcptr entries, slong nnz, gr_ctx_t ctx)
 
-    Set *vec* to the sparse data given by *cols* and *entries* of length *nnz*.  No assumption
+    Set *vec* to the sparse data given by *inds* and *entries* of length *nnz*.  No assumption
     is made that the columns are sorted nor that the entries are nonzero.  The values associated
     with duplicate columns are added together.
 
-.. function:: int gr_sparse_vec_set_from_entries_sorted_deduped(gr_sparse_vec_t vec, ulong * sorted_deduped_cols, gr_srcptr entries, slong nnz, gr_ctx_t ctx)
+.. function:: int gr_sparse_vec_set_from_entries_sorted_deduped(gr_sparse_vec_t vec, ulong * sorted_deduped_inds, gr_srcptr entries, slong nnz, gr_ctx_t ctx)
 
-    Set *vec* to the sparse data given by *sorted_deduped_cols* and *entries*.  The
-    *sorted_deduped_cols* must be in strictly increasing order.  It is not required
+    Set *vec* to the sparse data given by *sorted_deduped_inds* and *entries*.  The
+    *sorted_deduped_inds* must be in strictly increasing order.  It is not required
     that the values in *entries* are nonzero.
 
 .. function:: int gr_sparse_vec_zero(gr_sparse_vec_t vec, gr_ctx_t ctx)
@@ -152,7 +152,7 @@ Getting, setting and conversion
     Column indices are shifted by *col_start* (a column index of ``col_start``
     would become ``0``).
 
-.. function:: int gr_sparse_vec_permute_cols(gr_sparse_vec_t vec, const gr_sparse_vec_t src, slong * p, gr_ctx_t ctx)
+.. function:: int gr_sparse_vec_permute_inds(gr_sparse_vec_t vec, const gr_sparse_vec_t src, slong * p, gr_ctx_t ctx)
 
     Set *vec* to a copy of *src* with the columns permuted.  The column
     indices are shifted as: ``vec[p[i]] = src[i]``.
