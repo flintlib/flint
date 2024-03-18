@@ -841,27 +841,6 @@ case "$host_os" in
         ;;
 esac
 
-AC_MSG_CHECKING(for ldconfig)
-LDCONFIG_N=""
-case "$build_os" in
-    linux*android*)
-        ;;
-    linux* | k*bsd*-gnu | gnu*)
-        LDCONFIG_N="/sbin/ldconfig -n"
-        ;;
-    netbsd* | openbsd*)
-        dnl LDCONFIG_N="/sbin/ldconfig -m"
-        ;;
-esac
-if test "x$LDCONFIG_N" = "x";
-then
-    ldconfig_res="skipped"
-else
-    ldconfig_res="$LDCONFIG_N"
-fi
-AC_MSG_RESULT($ldconfig_res)
-AC_SUBST(LDCONFIG_N)
-
 dnl FIXME: Improve this check to include more processors.
 AC_MSG_CHECKING([if memory is strongly-ordered])
 case "$host" in

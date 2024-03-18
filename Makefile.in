@@ -48,7 +48,6 @@ CC:=@CC@
 CXX:=@CC@
 DLLTOOL:=@DLLTOOL@
 LD:=@LD@
-LDCONFIG_N:=@LDCONFIG_N@
 LN_S:=@LN_S@
 M4:=@M4@
 MKDIR_P:=@MKDIR_P@
@@ -404,11 +403,6 @@ MERGED_LOBJS:=$(foreach dir, $(DIRS),$(BUILD_DIR)/$(dir)_merged.lo)
 $(FLINT_DIR)/$(FLINT_LIB_FULL): $(MERGED_LOBJS)
 	@echo "Building $(FLINT_LIB_FULL)"
 	@$(CC) $(CFLAGS) -shared $(EXTRA_SHARED_FLAGS) $(MERGED_LOBJS) -o $(FLINT_LIB_FULL) $(LDFLAGS) $(LIBS)
-ifneq ($(FLINT_SOLIB), 0)
-ifneq ($(LDCONFIG_N),)
-	@$(LDCONFIG_N) ./
-endif
-endif
 	@$(RM_F) $(FLINT_LIB)
 	@$(RM_F) $(FLINT_LIB_MAJOR)
 	@$(LN_S) $(FLINT_LIB_FULL) $(FLINT_LIB)
