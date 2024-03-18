@@ -213,7 +213,7 @@ PROLOGUE(flint_mpn_sqr_5)
 	mov	0*8(ap), %rdx
 	add	sx, sx
 	adc	s3, s3
-	mov	sx, -1*8(%rsp)
+	push	sx
 	adc	s5, s5
 	adc	s6, s6
 	mulx	%rdx, %rdx, sx		C a0^2
@@ -225,7 +225,7 @@ PROLOGUE(flint_mpn_sqr_5)
 	C x, 3, 5, 6, 7, 4, 2, 1, 0
 
 	mov	%rdx, 0*8(rp)
-	add	-1*8(%rsp), sx
+	add	0*8(%rsp), sx
 	mov	sx, 1*8(rp)
 
 	mov	1*8(ap), %rdx
@@ -236,6 +236,7 @@ PROLOGUE(flint_mpn_sqr_5)
 
 	mov	2*8(ap), %rdx
 	mulx	%rdx, s3, sx		C a2^2
+	lea	1*8(%rsp), %rsp
 	mov	s5, 3*8(rp)
 	adc	s3, s6
 	adc	sx, s7
@@ -331,7 +332,7 @@ PROLOGUE(flint_mpn_sqr_6)
 	add	sx, sx
 	adc	s3, s3
 	mov	0*8(ap), %rdx
-	mov	sx, -1*8(%rsp)
+	push	sx
 	adc	s5, s5
 	adc	s6, s6
 	mulx	%rdx, %rdx, sx
@@ -345,7 +346,7 @@ PROLOGUE(flint_mpn_sqr_6)
 	C x, 3, 5, 6, 7, 8, 9, 2, 1, 4, 0
 
 	mov	%rdx, 0*8(rp)
-	add	-1*8(%rsp), sx
+	add	0*8(%rsp), sx
 	mov	sx, 1*8(rp)
 
 	mov	1*8(ap), %rdx
@@ -356,6 +357,7 @@ PROLOGUE(flint_mpn_sqr_6)
 
 	mov	2*8(ap), %rdx
 	mulx	%rdx, s3, sx		C a2^2
+	lea	1*8(%rsp), %rsp
 	mov	s5, 3*8(rp)
 	adc	s3, s6
 	adc	sx, s7
@@ -407,10 +409,10 @@ PROLOGUE(flint_mpn_sqr_7)
 	mulx	2*8(ap), s3, s2		C a0 a2
 	mulx	3*8(ap), s5, s4		C a0 a3
 	mulx	4*8(ap), s6, s10	C a0 a4
-	mov	sx, -2*8(%rsp)
+	push	sx
 	adox	s1, s3
 	adox	s2, s5
-	mov	s3, -1*8(%rsp)
+	push	s3
 	mulx	5*8(ap), s7, s1		C a0 a5
 	mulx	6*8(ap), s8, s9		C a0 a6
 	adox	s4, s6
@@ -487,12 +489,12 @@ PROLOGUE(flint_mpn_sqr_7)
 	C (-, -,) 5, 6, 7, 8, 9, 10, 3, 1, 4, 2
 	C x
 
-	shlq	-2*8(%rsp)
-	mov	-1*8(%rsp), sx
+	shlq	1*8(%rsp)
+	mov	0*8(%rsp), sx
 	mov	0*8(ap), %rdx
 	adc	sx, sx
 	adc	s5, s5
-	mov	sx, -1*8(%rsp)
+	mov	sx, 0*8(%rsp)
 	adc	s6, s6
 	adc	s7, s7
 	mulx	%rdx, %rdx, sx
@@ -507,13 +509,13 @@ PROLOGUE(flint_mpn_sqr_7)
 	C (-, -,) 5, 6, 7, 8, 9, 10, 3, 1, 4, 2, 0
 	C x
 
-	add	-2*8(%rsp), sx
+	add	1*8(%rsp), sx
 	mov	%rdx, 0*8(rp)
 	mov	sx, 1*8(rp)
 
 	mov	1*8(ap), %rdx
 	mulx	%rdx, %rdx, sx		C a1^2
-	adc	-1*8(%rsp), %rdx
+	adc	0*8(%rsp), %rdx
 	mov	%rdx, 2*8(rp)
 	adc	sx, s5
 
@@ -526,6 +528,7 @@ PROLOGUE(flint_mpn_sqr_7)
 
 	mov	3*8(ap), %rdx
 	mulx	%rdx, s5, sx		C a3^2
+	lea	2*8(%rsp), %rsp
 	mov	s7, 5*8(rp)
 	adc	s5, s8
 	adc	sx, s9
@@ -563,11 +566,6 @@ PROLOGUE(flint_mpn_sqr_7)
 	ret
 EPILOGUE()
 
-define(`m0',`-4*8(%rsp)')
-define(`m1',`-3*8(%rsp)')
-define(`m2',`-2*8(%rsp)')
-define(`m3',`-1*8(%rsp)')
-
 	ALIGN(16)
 PROLOGUE(flint_mpn_sqr_8)
 	mov	0*8(ap), %rdx
@@ -582,10 +580,10 @@ PROLOGUE(flint_mpn_sqr_8)
 	mulx	2*8(ap), s3, s7		C a0 a2
 	mulx	3*8(ap), s5, s4		C a0 a3
 	mulx	4*8(ap), s6, s2		C a0 a4
-	mov	sx, m0
+	push	sx
 	add	s1, s3
 	adc	s7, s5
-	mov	s3, m1
+	push	s3
 	mulx	5*8(ap), s7, sx		C a0 a5
 	mulx	6*8(ap), s8, s1		C a0 a6
 	mulx	7*8(ap), s9, s10	C a0 a7
@@ -594,7 +592,7 @@ PROLOGUE(flint_mpn_sqr_8)
 	adc	sx, s8
 	adc	s1, s9
 	adc	$0, s10
-	C (m0, m1,) 5, 6, 7, 8, 9, 10
+	C (-, -,) 5, 6, 7, 8, 9, 10
 	C x, 1, 2, 3, 4
 
 	xor	R32(s0), R32(s0)
@@ -607,8 +605,8 @@ PROLOGUE(flint_mpn_sqr_8)
 	adcx	s4, s7
 	mulx	4*8(ap), s1, s2		C a1 a4
 	mulx	5*8(ap), s3, s4		C a1 a5
-	mov	s5, m2
-	mov	s6, m3
+	push	s5
+	push	s6
 	adox	s1, s7
 	adox	s2, s8
 	adcx	s3, s8
@@ -620,7 +618,7 @@ PROLOGUE(flint_mpn_sqr_8)
 	adcx	s3, s10
 	adcx	s0, s4
 	adox	s0, s4
-	C (m0, m1, m2, m3,) 7, 8, 9, 10, 4
+	C (-, -, -, -,) 7, 8, 9, 10, 4
 	C x, 1, 2, 3, 5, 6
 
 	mov	2*8(ap), %rdx
@@ -640,7 +638,7 @@ PROLOGUE(flint_mpn_sqr_8)
 	adox	s2, s4
 	adox	s0, s3
 	adcx	s0, s3
-	C (m0, m1, m2, m3,) 7, 8, 9, 10, 4, 3
+	C (-, -, -, -,) 7, 8, 9, 10, 4, 3
 	C x, 1, 2, 5, 6
 
 	mov	3*8(ap), %rdx
@@ -657,7 +655,7 @@ PROLOGUE(flint_mpn_sqr_8)
 	adcx	s2, s3
 	adcx	s0, s5
 	adox	s0, s5
-	C (m0, m1, m2, m3,) 7, 8, 9, 10, 4, 3, 5
+	C (-, -, -, -,) 7, 8, 9, 10, 4, 3, 5
 	C x, 1, 2, 6
 
 	mov	4*8(ap), %rdx
@@ -670,7 +668,7 @@ PROLOGUE(flint_mpn_sqr_8)
 	mulx	7*8(ap), s2, s6		C a4 a7
 	adcx	s2, s5
 	adcx	s0, s6
-	C (m0, m1, m2, m3,) 7, 8, 9, 10, 4, 3, 5, 6
+	C (-, -, -, -,) 7, 8, 9, 10, 4, 3, 5, 6
 	C x, 1, 2
 
 	mov	5*8(ap), %rdx
@@ -680,36 +678,36 @@ PROLOGUE(flint_mpn_sqr_8)
 	adcx	s1, s6
 	adox	%rdx, s6
 	adox	s0, s2
-	C (m0, m1, m2, m3,) 7, 8, 9, 10, 4, 3, 5, 6, 2
+	C (-, -, -, -,) 7, 8, 9, 10, 4, 3, 5, 6, 2
 	C x, 1
 
 	mov	6*8(ap), %rdx
 	mulx	7*8(ap), sx, s1		C a6 a7
 	adcx	sx, s2
 	adcx	s0, s1
-	C (m0, m1, m2, m3,) 7, 8, 9, 10, 4, 3, 5, 6, 2, 1
+	C (-, -, -, -,) 7, 8, 9, 10, 4, 3, 5, 6, 2, 1
 	C x
 
 	mov	0*8(ap), %rdx
 	mulx	%rdx, %rdx, sx		C a0^2
 	mov	%rdx, 0*8(rp)
-	adox	m0, sx
-	adcx	m0, sx
+	adox	3*8(%rsp), sx
+	adcx	3*8(%rsp), sx
 	mov	sx, 1*8(rp)
 
 	mov	1*8(ap), %rdx
 	mulx	%rdx, %rdx, sx		C a1^2
-	adox	m1, %rdx
-	adcx	m1, %rdx
-	adox	m2, sx
-	adcx	m2, sx
+	adox	2*8(%rsp), %rdx
+	adcx	2*8(%rsp), %rdx
+	adox	1*8(%rsp), sx
+	adcx	1*8(%rsp), sx
 	mov	%rdx, 2*8(rp)
 	mov	sx, 3*8(rp)
 
 	mov	2*8(ap), %rdx
 	mulx	%rdx, %rdx, sx		C a2^2
-	adox	m3, %rdx
-	adcx	m3, %rdx
+	adox	0*8(%rsp), %rdx
+	adcx	0*8(%rsp), %rdx
 	adox	s7, sx
 	adcx	s7, sx
 	mov	%rdx, 4*8(rp)
@@ -717,6 +715,7 @@ PROLOGUE(flint_mpn_sqr_8)
 
 	mov	3*8(ap), %rdx
 	mulx	%rdx, s7, sx		C a3^2
+	lea	4*8(%rsp), %rsp
 	adox	s8, s7
 	adcx	s8, s7
 	adox	s9, sx
@@ -770,12 +769,7 @@ PROLOGUE(flint_mpn_sqr_8)
 	ret
 EPILOGUE()
 
-undefine(`m0')
-undefine(`m1')
-undefine(`m2')
-undefine(`m3')
-
-define(`m',`eval($1-16)*8(%rsp)')
+define(`m',`eval($1+1)*8(%rsp)')
 
 	ALIGN(16)
 PROLOGUE(flint_mpn_sqr_9)
@@ -790,6 +784,7 @@ PROLOGUE(flint_mpn_sqr_9)
 	mulx	3*8(ap), s3, s4		C a0 a3
 	mulx	4*8(ap), s5, s6		C a0 a4
 	mulx	5*8(ap), s7, s8		C a0 a5
+	lea	-17*8(%rsp), %rsp
 	add	s0, s1
 	adc	s2, s3
 	movq	$0, m(-1)
@@ -1038,6 +1033,7 @@ PROLOGUE(flint_mpn_sqr_9)
 	mov	sx, 17*8(rp)
 
 	vzeroupper
+	lea	17*8(%rsp), %rsp
 
 	pop	s8
 	pop	s7
@@ -1049,7 +1045,7 @@ EPILOGUE()
 
 undefine(`m')
 
-define(`m',`eval($1-16)*8(%rsp)')
+define(`m',`eval($1+1)*8(%rsp)')
 define(`r',`eval($1+8)*8(rp)')
 
 	ALIGN(16)
@@ -1066,6 +1062,7 @@ PROLOGUE(flint_mpn_sqr_10)
 	mulx	3*8(ap), s3, s4		C a0 a3
 	mulx	4*8(ap), s5, s6		C a0 a4
 	mulx	5*8(ap), s7, s8		C a0 a5
+	lea	-17*8(%rsp), %rsp
 	lea	-8*8(rp), rp
 	add	s0, s1
 	adc	s2, s3
@@ -1359,6 +1356,7 @@ PROLOGUE(flint_mpn_sqr_10)
 	adc	s3, sx
 
 	vzeroupper
+	lea	17*8(%rsp), %rsp
 
 	mov	s0, r(18)
 	mov	sx, r(19)

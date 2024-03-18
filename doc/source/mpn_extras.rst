@@ -80,11 +80,6 @@ Multiplication
 Truncating multiplication
 --------------------------------------------------------------------------------
 
-.. note::
-
-    Currently, the following function only exist on processors supporting the ADX
-    instruction set.
-
 Given two `n`-limb integers, a *high product* (or *mulhigh*) is an approximation
 of the leading `n` limbs of the full `2n`-limb product.
 In the basecase regime, a high product can be computed in roughly half the
@@ -131,7 +126,8 @@ More generally, we can define `n`-limb high products of `m`-limb and
     The error is at most *n + 2* ulp in the returned limb.
 
     * The *basecase* version implements the `O(n^2)` schoolbook algorithm.
-      The current implementation assumes that `n \ge 6`.
+      On x86-64 machines with ADX, the basecase version currently assumes
+      that `n \ge 6`.
     * The *mulders* version computes a rough mulhigh with one extra limb of precision
       in temporary scratch space using :func:`_flint_mpn_mulhigh_n_mulders_recursive`
       and then copies the high limbs to the output.
@@ -148,7 +144,9 @@ More generally, we can define `n`-limb high products of `m`-limb and
               mp_limb_t flint_mpn_sqrhigh(mp_ptr res, mp_srcptr u, mp_size_t n)
 
     Squaring counterparts of :func:`flint_mpn_mulhigh_n`.
-    The basecase version currently assumes that `n \ge 8`.
+
+    On x86-64 machines with ADX, the basecase version currently assumes
+    that `n \ge 8`.
 
 Divisibility
 --------------------------------------------------------------------------------
