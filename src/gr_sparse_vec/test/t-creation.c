@@ -32,7 +32,7 @@ test_init_from_entries_sorted(flint_rand_t state, gr_ctx_t ctx)
     status |= gr_sparse_vec_set_from_entries_sorted_deduped(vec, inds, GR_VEC_ENTRY(dvec, 0, sz), N, ctx);
     for (i = 0; i < 2*N; i++)
     {
-        status |= gr_sparse_vec_find_entry(temp, vec, i, ctx);
+        status |= gr_sparse_vec_get_entry(temp, vec, i, ctx);
         if ((i & 1) == 1 && (T_TRUE != gr_is_zero(temp, ctx))) /* Odd inds should all be zero */
             return GR_TEST_FAIL;
         if ((i & 1) == 0 && (T_TRUE != gr_equal(temp, GR_VEC_ENTRY(dvec, i>>1, sz), ctx)))
@@ -70,7 +70,7 @@ test_init_from_entries_unsorted_internal(ulong *inds, gr_srcptr entries, slong l
                 status |= gr_add(temp, temp, GR_ENTRY(entries, j, sz), ctx);
         }
         /* Check it */
-        status |= gr_sparse_vec_find_entry(temp2, vec, i, ctx);
+        status |= gr_sparse_vec_get_entry(temp2, vec, i, ctx);
         if (T_TRUE != gr_equal(temp, temp2, ctx))
             return GR_TEST_FAIL;
     }
