@@ -69,3 +69,6 @@ TEST_FUNCTION_START(flint_mpn_mul, state)
 
     TEST_FUNCTION_END(state);
 }
+
+#undef N_MIN
+#undef N_MAX

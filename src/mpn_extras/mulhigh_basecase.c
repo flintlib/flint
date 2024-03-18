@@ -104,7 +104,7 @@ mp_limb_t _flint_mpn_mulhigh_basecase(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_s
     for (i = 2; i < n; i++)
         res[i] = mpn_addmul_1(res, u + n - i, i, v[i]);
 
-    mpn_add(res, res, n - 1, t, 2);
+    mpn_add(res, res, n, t, 2);
     return low;
 }
 
