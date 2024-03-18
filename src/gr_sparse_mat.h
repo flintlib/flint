@@ -250,7 +250,7 @@ WARN_UNUSED_RESULT int gr_sparse_mat_randops(gr_csr_mat_t mat, flint_rand_t stat
 WARN_UNUSED_RESULT int gr_sparse_mat_randpermdiag(int * parity, gr_csr_mat_t mat, flint_rand_t state, gr_ptr diag, slong n, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_sparse_mat_randrank(gr_csr_mat_t mat, flint_rand_t state, slong rank, gr_ctx_t ctx);
 */
-/*
+
 #define gr_sparse_mat_is_empty(mat, ctx) (((mat->r == 0) || (mat->c == 0)) ? T_TRUE : T_FALSE)
 #define gr_sparse_mat_is_square(mat, ctx) ((mat->r == mat->c) ? T_TRUE : T_FALSE)
 #define gr_sparse_mat_is_zero(mat, ctx) ((mat->nnz == 0) ? T_TRUE : T_FALSE);
@@ -263,11 +263,24 @@ truth_t gr_lil_mat_is_one(const gr_lil_mat_t mat, gr_ctx_t ctx);
 truth_t gr_lil_mat_is_neg_one(const gr_lil_mat_t mat, gr_ctx_t ctx);
 truth_t gr_lil_mat_equal(const gr_lil_mat_t mat1, const gr_lil_mat_t mat2, gr_ctx_t ctx);
 
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int 
+GR_SPARSE_MAT_INLINE void 
 gr_csr_mat_zero(gr_csr_mat_t res, gr_ctx_t ctx) {
     res->nnz = 0;
     memset(res->rows, 0, (res->r + 1) * sizeof(ulong));
 }
+
+GR_SPARSE_MAT_INLINE void 
+gr_lil_mat_zero(gr_lil_mat_t res, gr_ctx_t ctx) {
+    int row;
+
+    res->nnz = 0;
+    for(row = 0; row < res->r; ++row)
+    {
+        gr_sparse_vec_zero(res->rows[row], ctx);
+    }
+}
+
+/*
 GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_csr_mat_one(gr_csr_mat_t res, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_csr_mat_set_scalar(gr_csr_mat_t res, gr_srcptr c, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_csr_mat_set_ui(gr_csr_mat_t res, ulong v, gr_ctx_t ctx);

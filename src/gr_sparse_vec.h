@@ -80,7 +80,7 @@ GR_SPARSE_VEC_INLINE void gr_sparse_vec_swap(gr_sparse_vec_t res, gr_sparse_vec_
     FLINT_SWAP(slong, res->nnz, src->nnz);
     
 }
-GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int gr_sparse_vec_zero(gr_sparse_vec_t vec, gr_ctx_t ctx) { vec->nnz = 0; return GR_SUCCESS; }
+GR_SPARSE_VEC_INLINE void gr_sparse_vec_zero(gr_sparse_vec_t vec, gr_ctx_t ctx) { vec->nnz = 0; }
 WARN_UNUSED_RESULT int gr_sparse_vec_set_vec(gr_sparse_vec_t vec, gr_srcptr src, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_vec_set_sparse_vec(gr_ptr vec, gr_sparse_vec_t src, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_sparse_vec_slice(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong col_start, slong col_end, gr_ctx_t ctx);
