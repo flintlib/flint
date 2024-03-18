@@ -1261,6 +1261,7 @@ int main(int argc, char *argv[])
                 acb_set_d_d(a, -1, -1);
                 acb_set_d_d(b, -1, 1);
                 acb_calc_integrate(s, f_rsqrt, NULL, a, b, goal, tol, options, prec);
+                break;
 
             case 36:
                 if (goal < 0)
