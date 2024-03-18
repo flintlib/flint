@@ -14,49 +14,46 @@
 truth_t
 gr_csr_mat_is_neg_one(const gr_csr_mat_t mat, gr_ctx_t ctx)
 {
-    int row;
+    slong row, idx;
+    gr_method_unary_predicate is_zero = GR_UNARY_PREDICATE(ctx, IS_ZERO);
     gr_method_unary_predicate is_neg_one = GR_UNARY_PREDICATE(ctx, IS_NEG_ONE);
     truth_t this_eq;
+    truth_t ret = T_TRUE;
     slong sz = ctx->sizeof_elem;
     
-    if (mat->r != mat->nnz)
-        return T_FALSE;
-
     for (row = 0; row < mat->r; ++row)
     {
-        if (mat->cols[row] != row)
-            return T_FALSE;
-
-        this_eq = is_neg_one(GR_ENTRY(mat->entries, row, sz), ctx);
-
-        if (this_eq == T_FALSE)
-            return T_FALSE;
-        else if (this_eq == T_UNKNOWN)
-            return T_UNKNOWN;
+        for (idx = mat->rows[row]; idx < mat->rows[row+1]; idx++)
+        {
+            this_eq = (mat->cols[idx] == row ? is_neg_one : is_zero)(GR_ENTRY(mat->entries, idx, sz), ctx);
+            if (this_eq == T_FALSE)
+                return T_FALSE;
+            else
+                ret = T_UNKNOWN;
+        }
     }
-    return T_TRUE;
+    return ret;
 }
 
 truth_t gr_lil_mat_is_neg_one(const gr_lil_mat_t mat, gr_ctx_t ctx)
 {
-    int row;
+    slong row, idx;
+    gr_method_unary_predicate is_zero = GR_UNARY_PREDICATE(ctx, IS_ZERO);
     gr_method_unary_predicate is_neg_one = GR_UNARY_PREDICATE(ctx, IS_NEG_ONE);
     truth_t this_eq;
+    truth_t ret = T_TRUE;
+    slong sz = ctx->sizeof_elem;
     
-    if (mat->r != mat->nnz)
-        return T_FALSE;
-
     for (row = 0; row < mat->r; ++row)
     {
-        if (mat->rows[row]->nnz != 1 || mat->rows[row]->inds[0] != row)
-            return T_FALSE;
-
-        this_eq = is_neg_one(mat->rows[row]->entries, ctx);
-
-        if (this_eq == T_FALSE)
-            return T_FALSE;
-        else if (this_eq == T_UNKNOWN)
-            return T_UNKNOWN;
+        for (idx = 0; idx < mat->rows[row]->nnz; idx++)
+        {
+            this_eq = (mat->rows[row]->inds[idx] == row ? is_neg_one : is_zero)(GR_ENTRY(mat->rows[row]->entries, idx, sz), ctx);
+            if (this_eq == T_FALSE)
+                return T_FALSE;
+            else
+                ret = T_UNKNOWN;
+        }
     }
-    return T_TRUE;
+    return ret;
 }

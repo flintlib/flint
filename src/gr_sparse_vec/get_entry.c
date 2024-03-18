@@ -11,7 +11,7 @@ static int gr_sparse_vec_ulong_cmp(const void* a, const void* b)
 
 
 int
-gr_sparse_vec_find_entry(gr_ptr res, gr_sparse_vec_t vec, slong col, gr_ctx_t ctx)
+gr_sparse_vec_get_entry(gr_ptr res, gr_sparse_vec_t vec, slong col, gr_ctx_t ctx)
 {
     slong i;
     slong sz = ctx->sizeof_elem;

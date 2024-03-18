@@ -14,63 +14,71 @@
 truth_t
 gr_csr_mat_equal(const gr_csr_mat_t mat1, const gr_csr_mat_t mat2, gr_ctx_t ctx)
 {
-    slong i, r, c, nnz;
+    slong row;
+    gr_sparse_vec_t tmp1, tmp2;
+    truth_t row_is_eq;
+    truth_t ret = T_TRUE;
 
-    r = gr_sparse_mat_nrows(mat1, ctx);
-    c = gr_sparse_mat_ncols(mat1, ctx);
-    nnz = gr_sparse_mat_nnz(mat1, ctx);
-
-    if (r != gr_mat_nrows(mat2, ctx) ||
-        c != gr_mat_ncols(mat2, ctx) ||
-        nnz != gr_sparse_mat_nnz(mat2, ctx))
+    if (gr_mat_is_compatible(mat1, mat2, ctx) == T_FALSE)
     {
         return T_FALSE;
     }
-
-    if (r == 0 || c == 0)
-        return T_TRUE;
-
-    // TODO: can use memcmp?
-    for (i = 0; i < nnz; ++i)
+    for (row = 0; row < mat1->r; row++)
     {
-        if (mat1->cols[i] != mat2->cols[i])
+        _gr_csr_mat_borrow_row(tmp1, mat1, row, ctx);
+        _gr_csr_mat_borrow_row(tmp2, mat2, row, ctx);
+        row_is_eq = gr_sparse_vec_equal(tmp1, tmp2, ctx);
+        if (row_is_eq == T_FALSE)
             return T_FALSE;
+        else if (row_is_eq == T_UNKNOWN)
+            ret = T_UNKNOWN;
     }
-
-    return _gr_vec_equal(
-        mat1->entries,
-        mat2->entries,
-        nnz,
-        ctx
-    );
+    return ret;
 }
 
 truth_t
 gr_lil_mat_equal(const gr_lil_mat_t mat1, const gr_lil_mat_t mat2, gr_ctx_t ctx)
 {
-    slong i, r, c, nnz;
+    slong row;
     truth_t row_is_eq;
+    truth_t ret = T_TRUE;
 
-    r = gr_sparse_mat_nrows(mat1, ctx);
-    c = gr_sparse_mat_ncols(mat1, ctx);
-    nnz = gr_sparse_mat_nnz(mat1, ctx);
-
-    if (r != gr_mat_nrows(mat2, ctx) ||
-        c != gr_mat_ncols(mat2, ctx) ||
-        nnz != gr_sparse_mat_nnz(mat2, ctx))
+    if (gr_mat_is_compatible(mat1, mat2, ctx) == T_FALSE)
     {
         return T_FALSE;
     }
-
-    if (r == 0 || c == 0)
-        return T_TRUE;
-
-    for (i = 0; i < r; ++i)
+    for (row = 0; row < mat1->r; row++)
     {
-        row_is_eq = gr_sparse_vec_equal(mat1->rows[i], mat2->rows[i], ctx);
-        if (row_is_eq != T_TRUE)
-            break;
+        row_is_eq = gr_sparse_vec_equal(mat1->rows[row], mat2->rows[row], ctx);
+        if (row_is_eq == T_FALSE)
+            return T_FALSE;
+        else if (row_is_eq == T_UNKNOWN)
+            ret = T_UNKNOWN;
     }
-
-    return row_is_eq;
+    return ret;
 }
+
+truth_t
+gr_csr_mat_equal_lil_mat(const gr_csr_mat_t mat1, const gr_lil_mat_t mat2, gr_ctx_t ctx)
+{
+    slong row;
+    gr_sparse_vec_t tmp;
+    truth_t row_is_eq;
+    truth_t ret = T_TRUE;
+
+    if (gr_mat_is_compatible(mat1, mat2, ctx) == T_FALSE)
+    {
+        return T_FALSE;
+    }
+    for (row = 0; row < mat1->r; row++)
+    {
+        _gr_csr_mat_borrow_row(tmp, mat1, row, ctx);
+        row_is_eq = gr_sparse_vec_equal(tmp, mat2->rows[row], ctx);
+        if (row_is_eq == T_FALSE)
+            return T_FALSE;
+        else if (row_is_eq == T_UNKNOWN)
+            ret = T_UNKNOWN;
+    }
+    return ret;
+}
+

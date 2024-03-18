@@ -99,17 +99,9 @@ WARN_UNUSED_RESULT int gr_mat_randops(gr_mat_t mat, flint_rand_t state, slong co
 WARN_UNUSED_RESULT int gr_mat_randpermdiag(int * parity, gr_mat_t mat, flint_rand_t state, gr_ptr diag, slong n, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_randrank(gr_mat_t mat, flint_rand_t state, slong rank, gr_ctx_t ctx);
 
-GR_MAT_INLINE truth_t
-gr_mat_is_empty(const gr_mat_t mat, gr_ctx_t ctx)
-{
-    return ((mat->r == 0) || (mat->c == 0)) ? T_TRUE : T_FALSE;
-}
-
-GR_MAT_INLINE truth_t
-gr_mat_is_square(const gr_mat_t mat, gr_ctx_t ctx)
-{
-    return (mat->r == mat->c) ? T_TRUE : T_FALSE;
-}
+#define gr_mat_is_compatible(mat1, mat2, ctx) (((mat1)->r == (mat2)->r && (mat1)->c == (mat2)->c) ? T_TRUE : T_FALSE)
+#define gr_mat_is_empty(mat, ctx) ((((mat)->r == 0) || ((mat)->c == 0)) ? T_TRUE : T_FALSE)
+#define gr_mat_is_square(mat, ctx) (((mat)->r == (mat)->c) ? T_TRUE : T_FALSE)
 
 truth_t gr_mat_equal(const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx);
 truth_t gr_mat_is_zero(const gr_mat_t mat, gr_ctx_t ctx);

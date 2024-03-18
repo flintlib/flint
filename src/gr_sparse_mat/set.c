@@ -16,7 +16,7 @@ int gr_csr_mat_set(gr_csr_mat_t res, const gr_csr_mat_t mat, gr_ctx_t ctx) {
 
     if (res != mat)
     {
-        if (res->r != mat->r || res->c != mat->c)
+        if (gr_mat_is_compatible(res, mat, ctx) == T_FALSE)
         {
             return GR_DOMAIN;
         }
@@ -35,7 +35,8 @@ int gr_lil_mat_set(gr_lil_mat_t res, const gr_lil_mat_t mat, gr_ctx_t ctx) {
 
     if (res != mat)
     {
-        if (res->r != mat->r || res->c != mat->c) {
+        if (gr_mat_is_compatible(res, mat, ctx) == T_FALSE)
+        {
             return GR_DOMAIN;
         }
         res->nnz = mat->nnz;
@@ -53,7 +54,7 @@ int gr_csr_mat_set_lil_mat(gr_csr_mat_t res, const gr_lil_mat_t mat, gr_ctx_t ct
     int success = GR_SUCCESS;
     gr_sparse_vec_t res_row;
 
-    if (res->r != mat->r || res->c != mat->c)
+    if (gr_mat_is_compatible(res, mat, ctx) == T_FALSE)
         return GR_DOMAIN;
 
     gr_csr_mat_fit_nnz(res, mat->nnz, ctx);
@@ -75,7 +76,7 @@ int gr_lil_mat_set_csr_mat(gr_lil_mat_t res, const gr_csr_mat_t mat, gr_ctx_t ct
     int success = GR_SUCCESS;
     gr_sparse_vec_t mat_row;
     
-    if (res->r != mat->r || res->c != mat->c)
+    if (gr_mat_is_compatible(res, mat, ctx) == T_FALSE)
         return GR_DOMAIN;
 
     for(row = 0; row < mat->r; row++) {
@@ -83,6 +84,65 @@ int gr_lil_mat_set_csr_mat(gr_lil_mat_t res, const gr_csr_mat_t mat, gr_ctx_t ct
         success |= gr_sparse_vec_set(res->rows[row], mat_row, ctx);
     }
     res->nnz = mat->nnz;
+
+    return success;
+}
+
+int gr_csr_mat_set_mat(gr_csr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
+{
+    ulong row, col;
+    slong nnz, sz;
+    int success = GR_SUCCESS;
+    gr_method_unary_predicate is_zero = GR_UNARY_PREDICATE(ctx, IS_ZERO);
+    
+    if (gr_mat_is_compatible(res, mat, ctx) == T_FALSE)
+        return GR_DOMAIN;
+
+    // Get number of nonzero entries
+    sz = ctx->sizeof_elem;
+    nnz = 0;
+    for (row = 0; row < mat->r; ++row)
+        for (col = 0; col < mat->c; ++col)
+            if (is_zero(GR_MAT_ENTRY(mat, row, col, sz), ctx) != T_TRUE)
+                nnz++;
+    gr_csr_mat_fit_nnz(res, nnz, ctx);
+
+    // Construct sparse matrix from nonzeroes
+    res->rows[0] = 0;
+    nnz = 0;
+    for(row = 0; row < mat->r; row++)
+    {
+        for (col = 0; col < mat->c; ++col)
+        {
+            if (is_zero(GR_MAT_ENTRY(mat, row, col, sz), ctx) != T_TRUE)
+            {
+                res->cols[nnz] = col;
+                success |= gr_set(GR_ENTRY(res->entries, nnz, sz), GR_MAT_ENTRY(mat, row, col, sz), ctx); 
+                ++nnz;       
+            }
+        }
+        res->rows[row + 1] = nnz;
+    }
+    res->nnz = nnz;
+
+    return success;
+}
+
+int gr_lil_mat_set_mat(gr_lil_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
+{
+    ulong row;
+    slong sz;
+    int success = GR_SUCCESS;
+    
+    if (gr_mat_is_compatible(res, mat, ctx) == T_FALSE)
+        return GR_DOMAIN;
+
+    sz = ctx->sizeof_elem;
+    res->nnz = 0;
+    for(row = 0; row < mat->r; row++) {
+        success |= gr_sparse_vec_set_vec(res->rows[row], GR_MAT_ENTRY(mat, row, 0, sz), mat->c, ctx);
+        res->nnz += res->rows[row]->nnz;
+    }
 
     return success;
 }

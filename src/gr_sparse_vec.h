@@ -15,7 +15,7 @@
 #ifdef GR_SPARSE_VEC_INLINES_C
 #define GR_SPARSE_VEC_INLINE
 #else
-#define GR_SPARSE_VEC_INLINE static __inline__
+#define GR_SPARSE_VEC_INLINE static inline
 #endif
 
 #include <string.h>
@@ -86,11 +86,11 @@ WARN_UNUSED_RESULT int gr_vec_set_sparse_vec(gr_ptr vec, gr_sparse_vec_t src, gr
 WARN_UNUSED_RESULT int gr_sparse_vec_slice(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong ind_start, slong ind_end, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_sparse_vec_permute_inds(gr_sparse_vec_t vec, const gr_sparse_vec_t src, slong * p, gr_ctx_t ctx);
 
-WARN_UNUSED_RESULT int gr_sparse_vec_find_entry(gr_ptr res, gr_sparse_vec_t vec, slong ind, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_sparse_vec_get_entry(gr_ptr res, gr_sparse_vec_t vec, slong ind, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_sparse_vec_set_entry(gr_sparse_vec_t vec, slong ind, gr_srcptr entry, gr_ctx_t ctx);
 
 truth_t gr_sparse_vec_equal(const gr_sparse_vec_t vec1, const gr_sparse_vec_t vec2, gr_ctx_t ctx);
-GR_SPARSE_VEC_INLINE truth_t gr_sparse_vec_is_zero(const gr_sparse_vec_t vec, gr_ctx_t ctx) { return (vec->nnz == 0 ? T_TRUE : T_FALSE); }
+GR_SPARSE_VEC_INLINE truth_t gr_sparse_vec_is_zero(const gr_sparse_vec_t vec, gr_ctx_t ctx) { return _gr_vec_is_zero(vec->entries, vec->nnz, ctx); }
 
 int gr_sparse_vec_write_nz(gr_stream_t out, const gr_sparse_vec_t vec, gr_ctx_t ctx);
 int gr_sparse_vec_print_nz(const gr_sparse_vec_t vec, gr_ctx_t ctx);
@@ -205,7 +205,7 @@ gr_sparse_vec_update(gr_sparse_vec_t res, const gr_sparse_vec_t src, gr_ctx_t ct
 }
 
 GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int
-gr_sparse_vec_add(gr_sparse_vec_t res, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, slong len, gr_ctx_t ctx)
+gr_sparse_vec_add(gr_sparse_vec_t res, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, gr_ctx_t ctx)
 {
     GR_SPV_RFL_TEMPLATE(
         GR_SPV_RFL_UOP(gr_set, src1, a_nzidx), 
@@ -216,7 +216,7 @@ gr_sparse_vec_add(gr_sparse_vec_t res, const gr_sparse_vec_t src1, const gr_spar
 }
 
 GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int
-gr_sparse_vec_sub(gr_sparse_vec_t res, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, slong len, gr_ctx_t ctx) 
+gr_sparse_vec_sub(gr_sparse_vec_t res, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, gr_ctx_t ctx) 
 {
     GR_SPV_RFL_TEMPLATE(
         GR_SPV_RFL_UOP(gr_set, src1, a_nzidx),
@@ -230,7 +230,7 @@ gr_sparse_vec_sub(gr_sparse_vec_t res, const gr_sparse_vec_t src1, const gr_spar
 #define GR_SPV_RFL_ZERO gr_zero(GR_ENTRY(res->entries, dest_ind, sz), ctx)
 
 GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int 
-gr_sparse_vec_mul(gr_sparse_vec_t res, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, slong len, gr_ctx_t ctx)
+gr_sparse_vec_mul(gr_sparse_vec_t res, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, gr_ctx_t ctx)
 {
     GR_SPV_RFL_TEMPLATE(
         GR_SPV_RFL_ZERO,

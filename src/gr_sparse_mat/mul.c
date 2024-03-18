@@ -28,7 +28,7 @@ int gr_csr_mat_mul_vec(gr_vec_t v, const gr_csr_mat_t A, const gr_vec_t u, gr_ct
     if (gr_sparse_mat_ncols(A, ctx) != gr_vec_length(u, ctx) || ar != gr_vec_length(v, ctx))
         return GR_DOMAIN;
 
-    if (gr_sparse_mat_is_zero(A, ctx) == T_TRUE)
+    if (gr_csr_mat_is_zero(A, ctx) == T_TRUE)
     {
         return _gr_vec_zero(v->entries, v->length, ctx);
     }
@@ -67,7 +67,7 @@ int gr_lil_mat_mul_vec(gr_vec_t v, const gr_lil_mat_t A, const gr_vec_t u, gr_ct
         return GR_DOMAIN;
 
 
-    if (gr_sparse_mat_is_zero(A, ctx) == T_TRUE)
+    if (gr_lil_mat_is_zero(A, ctx) == T_TRUE)
     {
         return _gr_vec_zero(v->entries, v->length, ctx);
     }
@@ -124,7 +124,7 @@ int gr_csr_mat_mul_mat_transpose(gr_mat_t Ct, const gr_csr_mat_t A, const gr_mat
 
     status = gr_mat_zero(Ct, ctx);
 
-    if (gr_sparse_mat_is_zero(A, ctx))
+    if (gr_csr_mat_is_zero(A, ctx))
     {
         return status;
     }
@@ -159,7 +159,7 @@ int gr_lil_mat_mul_mat_transpose(gr_mat_t Ct, const gr_lil_mat_t A, const gr_mat
 
     status = gr_mat_zero(Ct, ctx);
 
-    if (gr_sparse_mat_is_zero(A, ctx))
+    if (gr_lil_mat_is_zero(A, ctx))
     {
         return status;
     }
@@ -191,7 +191,7 @@ int gr_csr_mat_mul_mat(gr_mat_t C, const gr_csr_mat_t A, const gr_mat_t B, gr_ct
     if (gr_sparse_mat_ncols(A, ctx) != gr_mat_nrows(B, ctx) || ar != gr_mat_nrows(C, ctx) || bc != gr_mat_ncols(C, ctx))
         return GR_DOMAIN;
 
-    if (gr_sparse_mat_is_zero(A, ctx))
+    if (gr_csr_mat_is_zero(A, ctx))
     {
         return gr_mat_zero(C, ctx);
     }
@@ -234,7 +234,7 @@ int gr_lil_mat_mul_mat(gr_mat_t C, const gr_lil_mat_t A, const gr_mat_t B, gr_ct
     if (gr_sparse_mat_ncols(A, ctx) != gr_mat_nrows(B, ctx) || ar != gr_mat_nrows(C, ctx) || bc != gr_mat_ncols(C, ctx))
         return GR_DOMAIN;
 
-    if (gr_sparse_mat_is_zero(A, ctx))
+    if (gr_lil_mat_is_zero(A, ctx))
     {
         return gr_mat_zero(C, ctx);
     }
