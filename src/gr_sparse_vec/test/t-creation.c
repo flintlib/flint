@@ -51,7 +51,7 @@ test_init_from_entries_unsorted_internal(ulong *inds, gr_srcptr entries, slong l
     /* Yes, this is quadratic time just to be careful */
     int status = GR_SUCCESS;
     slong sz = ctx->sizeof_elem;
-    slong i,j,col;
+    slong i,j;
     gr_sparse_vec_t vec;
     gr_ptr temp, temp2;
     GR_TMP_INIT2(temp, temp2, ctx);
