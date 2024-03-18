@@ -83,7 +83,7 @@ extern "C" {
         add_sssaaaaaa(__ds2, __ds1, __ds0, 0, __ds1, __ds0, 0, __dt1, __dt0); \
         for (__i = 2; __i < (n); __i++) \
         { \
-            umul_ppmm(__dt1, __dt0, (u)[i], (v)[(n) - 1 - __i]); \
+            umul_ppmm(__dt1, __dt0, (u)[__i], (v)[(n) - 1 - __i]); \
             add_sssaaaaaa(__ds2, __ds1, __ds0, __ds2, __ds1, __ds0, 0, __dt1, __dt0); \
         } \
         (s0) = __ds0; (s1) = __ds1; (s2) = __ds2; \
