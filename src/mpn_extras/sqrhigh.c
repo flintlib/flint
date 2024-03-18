@@ -111,10 +111,7 @@ _flint_mpn_sqrhigh_mulders_recursive(mp_ptr rp, mp_srcptr np, mp_size_t n)
 
     if (k == 0)
     {
-        if (n & 1)
-            rp[n - 1] = _flint_mpn_sqrhigh_basecase_odd(rp + n, np, n >> 1);
-        else
-            rp[n - 1] = _flint_mpn_sqrhigh_basecase_even(rp + n, np, n >> 1);
+        rp[n - 1] = _flint_mpn_sqrhigh_basecase(rp + n, np, n);
         return;
     }
 
@@ -170,17 +167,6 @@ _flint_mpn_sqrhigh_sqr(mp_ptr res, mp_srcptr u, mp_size_t n)
     return bot;
 }
 
-mp_limb_t _flint_mpn_sqrhigh_basecase(mp_ptr rp, mp_srcptr xp, mp_size_t n)
-{
-    FLINT_ASSERT(n >= 1);
-    FLINT_ASSERT(rp != xp);
-
-    if (n & 1)
-        return _flint_mpn_sqrhigh_basecase_odd(rp, xp, n >> 1);
-    else
-        return _flint_mpn_sqrhigh_basecase_even(rp, xp, n >> 1);
-}
-
 mp_limb_t flint_mpn_sqrhigh_basecase(mp_ptr rp, mp_srcptr xp, mp_size_t n)
 {
     FLINT_ASSERT(n >= 1);
@@ -188,13 +174,7 @@ mp_limb_t flint_mpn_sqrhigh_basecase(mp_ptr rp, mp_srcptr xp, mp_size_t n)
     if (FLINT_HAVE_SQRHIGH_FUNC(n)) /* NOTE: Aliasing allowed here */
         return flint_mpn_sqrhigh_func_tab[n](rp, xp);
     else
-    {
-        FLINT_ASSERT(rp != xp);
-        if (n & 1)
-            return _flint_mpn_sqrhigh_basecase_odd(rp, xp, n >> 1);
-        else
-            return _flint_mpn_sqrhigh_basecase_even(rp, xp, n >> 1);
-    }
+        return _flint_mpn_sqrhigh_basecase(rp, xp, n);
 }
 
 mp_limb_t

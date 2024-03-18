@@ -89,6 +89,23 @@ extern "C" {
         (s0) = __ds0; (s1) = __ds1; (s2) = __ds2; \
     } while (0) \
 
+/* Like NN_DOTREV_S3_1X1 but summing only over the high parts of the products. */
+#define NN_DOTREV_S3_1X1_HIGH(s2, s1, u, v, n) \
+    do { \
+        mp_limb_t __dt0, __dt1, __ds0, __ds1, __ds2; \
+        slong __i; \
+        FLINT_ASSERT((n) >= 2); \
+        umul_ppmm(__ds1, __ds0, (u)[0], (v)[(n) - 1]); \
+        umul_ppmm(__dt1, __dt0, (u)[1], (v)[(n) - 2]); \
+        add_ssaaaa(__ds2, __ds1, 0, __ds1, 0, __dt1); \
+        for (__i = 2; __i < (n); __i++) \
+        { \
+            umul_ppmm(__dt1, __dt0, (u)[__i], (v)[(n) - 1 - __i]); \
+            add_ssaaaa(__ds2, __ds1, __ds2, __ds1, 0, __dt1); \
+        } \
+        (s1) = __ds1; (s2) = __ds2; \
+    } while (0) \
+
 /* {r0,r1,r2} = {s0,s1,s2} + u[0]v[n-1] + u[1]v[n-2] + ... */
 /* Assumes n >= 1. May have s2 != 0, but the final sum is assumed to fit in 3 limbs. */
 #define NN_DOTREV_S3_A3_1X1(r2, r1, r0, s2, s1, s0, u, v, n) \
@@ -342,6 +359,11 @@ FLINT_DLL extern const flint_mpn_mulhigh_normalised_func_t flint_mpn_mulhigh_nor
 # define FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH 12
 # define FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH 8
 # define FLINT_MPN_MULHIGH_NORMALISED_FUNC_TAB_WIDTH 12
+#else
+# define FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH 16
+# define FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH 2
+# define FLINT_MPN_MULHIGH_NORMALISED_FUNC_TAB_WIDTH 0
+#endif
 
 #define FLINT_MPN_MULHIGH_MULDERS_CUTOFF 50
 #define FLINT_MPN_MULHIGH_MUL_CUTOFF 2000
@@ -349,7 +371,7 @@ FLINT_DLL extern const flint_mpn_mulhigh_normalised_func_t flint_mpn_mulhigh_nor
 
 void _flint_mpn_mulhigh_n_mulders_recursive(mp_ptr rp, mp_srcptr np, mp_srcptr mp, mp_size_t n);
 
-/* NOTE: This function only works for n >= 6 */
+/* NOTE: The x86_64_adx version of this function only works for n >= 6 */
 # define FLINT_HAVE_NATIVE_mpn_mulhigh_basecase 1
 mp_limb_t _flint_mpn_mulhigh_basecase(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n);
 
@@ -372,10 +394,34 @@ mp_limb_t flint_mpn_mulhigh_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n
 #define FLINT_MPN_SQRHIGH_SQR_CUTOFF 2000
 #define FLINT_MPN_SQRHIGH_K_TAB_SIZE 2048
 
-/* NOTE: These two functions only works for n >= 8 */
+/* NOTE: The x86_64_adx versions of these functions only works for n >= 6 */
 # define FLINT_HAVE_NATIVE_mpn_sqrhigh_basecase 1
+
+#if FLINT_HAVE_ASSEMBLY_x86_64_adx
+
 mp_limb_t _flint_mpn_sqrhigh_basecase_even(mp_ptr, mp_srcptr, mp_size_t);
 mp_limb_t _flint_mpn_sqrhigh_basecase_odd(mp_ptr, mp_srcptr, mp_size_t);
+
+MPN_EXTRAS_INLINE mp_limb_t _flint_mpn_sqrhigh_basecase(mp_ptr rp, mp_srcptr xp, mp_size_t n)
+{
+    FLINT_ASSERT(n >= 1);
+    FLINT_ASSERT(rp != xp);
+
+    if (n & 1)
+        return _flint_mpn_sqrhigh_basecase_odd(rp, xp, n >> 1);
+    else
+        return _flint_mpn_sqrhigh_basecase_even(rp, xp, n >> 1);
+}
+
+#else
+
+/* todo */
+MPN_EXTRAS_INLINE mp_limb_t _flint_mpn_sqrhigh_basecase(mp_ptr res, mp_srcptr u, mp_size_t n)
+{
+    return _flint_mpn_mulhigh_basecase(res, u, u, n);
+}
+
+#endif
 
 void _flint_mpn_sqrhigh_mulders_recursive(mp_ptr rp, mp_srcptr np, mp_size_t n);
 mp_limb_t _flint_mpn_sqrhigh_mulders(mp_ptr res, mp_srcptr u, mp_size_t n);
@@ -425,11 +471,6 @@ struct mp_limb_pair_t flint_mpn_mulhigh_normalised(mp_ptr rp, mp_srcptr xp, mp_s
         return ret;
     }
 }
-#else
-# define FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH 0
-# define FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH 0
-# define FLINT_MPN_MULHIGH_NORMALISED_FUNC_TAB_WIDTH 0
-#endif
 
 /*
     return the high limb of a two limb left shift by n < GMP_LIMB_BITS bits.
