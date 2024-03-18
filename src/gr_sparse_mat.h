@@ -290,11 +290,27 @@ WARN_UNUSED_RESULT int gr_csr_mat_set_fmpq(gr_csr_mat_t res, const fmpq_t v, gr_
 
 WARN_UNUSED_RESULT int gr_csr_mat_set_fmpz_csr_mat(gr_csr_mat_t res, const fmpz_csr_mat_t mat, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_csr_mat_set_fmpq_csr_mat(gr_csr_mat_t res, const fmpq_csr_mat_t mat, gr_ctx_t ctx);
+*/
 
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_csr_mat_neg(gr_csr_mat_t res, const gr_csr_mat_t mat, gr_ctx_t ctx)
+GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int 
+gr_csr_mat_neg(gr_csr_mat_t res, const gr_csr_mat_t mat, gr_ctx_t ctx)
+{
+    int status = GR_SUCCESS;
+
+    if (res->c != mat->c || res->r != mat->r)
+    {
+        return GR_DOMAIN;
+    }
+    status |= gr_csr_mat_set(res, mat, ctx);
+    status |= _gr_vec_neg(res->entries, res->entries, res->nnz, ctx);
+    return status;
+}
+
+GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int 
+gr_lil_mat_neg(gr_lil_mat_t res, const gr_lil_mat_t mat, gr_ctx_t ctx)
 {
     int row;
-    int status;
+    int status = GR_SUCCESS;
 
     if (res->c != mat->c || res->r != mat->r)
     {
@@ -302,12 +318,11 @@ GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_csr_mat_neg(gr_csr_mat_t res, con
     }
     res->nnz = mat->nnz;
     for (row = 0; row < res->r; row++) {
-        status |= gr_sparse_vec_neg(res->rows[i], res->mat[i], ctx);
-        res->nnz += res->rows[i].nnz;
+        status |= gr_sparse_vec_neg(res->rows[row], mat->rows[row], ctx);
     }
     return status;
 }
-
+/*
 GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_lil_mat_add(gr_lil_mat_t res, const gr_lil_mat_t mat1, const gr_lil_mat_t mat2, gr_ctx_t ctx)
 {
     int row;

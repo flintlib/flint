@@ -12,16 +12,20 @@
 #include "gr_sparse_mat.h"
 
 int gr_csr_mat_set(gr_csr_mat_t res, const gr_csr_mat_t mat, gr_ctx_t ctx) {
-    int status;
+    int status = GR_SUCCESS;
 
-    if (res->r != mat->r || res->c != mat->c) {
-        return GR_DOMAIN;
+    if (res != mat)
+    {
+        if (res->r != mat->r || res->c != mat->c)
+        {
+            return GR_DOMAIN;
+        }
+        res->nnz = mat->nnz;
+        gr_csr_mat_fit_nnz(res, mat->nnz, ctx);
+        memcpy(res->rows, mat->rows, mat->r * sizeof(ulong));
+        memcpy(res->cols, mat->cols, mat->nnz * sizeof(ulong));
+        status = _gr_vec_set(res->entries, mat->entries, mat->nnz, ctx);
     }
-    res->nnz = mat->nnz;
-    gr_csr_mat_fit_nnz(res, mat->nnz, ctx);
-    memcpy(res->rows, mat->rows, mat->r * sizeof(ulong));
-    memcpy(res->cols, mat->cols, mat->nnz * sizeof(ulong));
-    status = _gr_vec_set(res->entries, mat->entries, mat->nnz, ctx);
     return status;
 }
 
@@ -29,13 +33,16 @@ int gr_lil_mat_set(gr_lil_mat_t res, const gr_lil_mat_t mat, gr_ctx_t ctx) {
     ulong row;
     int success = GR_SUCCESS;
 
-    if (res->r != mat->r || res->c != mat->c) {
-        return GR_DOMAIN;
-    }
-    res->nnz = mat->nnz;
+    if (res != mat)
+    {
+        if (res->r != mat->r || res->c != mat->c) {
+            return GR_DOMAIN;
+        }
+        res->nnz = mat->nnz;
 
-    for (row = 0; row < mat->r; ++row) {
-        success |= gr_sparse_vec_set(res->rows[row], mat->rows[row], ctx);
+        for (row = 0; row < mat->r; ++row) {
+            success |= gr_sparse_vec_set(res->rows[row], mat->rows[row], ctx);
+        }
     }
     return success;
 }

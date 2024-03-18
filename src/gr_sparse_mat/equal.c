@@ -15,7 +15,6 @@ truth_t
 gr_csr_mat_equal(const gr_csr_mat_t mat1, const gr_csr_mat_t mat2, gr_ctx_t ctx)
 {
     slong i, r, c, nnz;
-    size_t sz = ctx->sizeof_elem;
 
     r = gr_sparse_mat_nrows(mat1, ctx);
     c = gr_sparse_mat_ncols(mat1, ctx);
@@ -51,7 +50,6 @@ gr_lil_mat_equal(const gr_lil_mat_t mat1, const gr_lil_mat_t mat2, gr_ctx_t ctx)
 {
     slong i, r, c, nnz;
     truth_t row_is_eq;
-    size_t sz = ctx->sizeof_elem;
 
     r = gr_sparse_mat_nrows(mat1, ctx);
     c = gr_sparse_mat_ncols(mat1, ctx);
