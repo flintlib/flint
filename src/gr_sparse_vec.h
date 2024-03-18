@@ -54,13 +54,13 @@ gr_sparse_vec_clear(gr_sparse_vec_t vec, gr_ctx_t ctx)
     memset(vec, 0, sizeof(gr_sparse_vec_t));
 }
 
-#define GR_SPARSE_VEC_COL(vec, i) (vec)->inds[i]
-#define GR_SPARSE_VEC_ENTRY(vec, i, sz) GR_ENTRY((vec)->entries, i, sz)
+#define GR_SPARSE_VEC_IND(vec, nzidx) (vec)->inds[nzidx]
+#define GR_SPARSE_VEC_ENTRY(vec, nzidx, sz) GR_ENTRY((vec)->entries, nzidx, sz)
 
-GR_SPARSE_VEC_INLINE ulong * gr_sparse_vec_col_ptr(gr_sparse_vec_t vec, slong i, gr_ctx_t ctx) { return vec->inds + i; }
-GR_SPARSE_VEC_INLINE const ulong * gr_sparse_vec_col_srcptr(const gr_sparse_vec_t vec, slong i, gr_ctx_t ctx) { return vec->inds + i; }
-GR_SPARSE_VEC_INLINE gr_ptr gr_sparse_vec_entry_ptr(gr_sparse_vec_t vec, slong i, gr_ctx_t ctx) { return GR_SPARSE_VEC_ENTRY(vec, i, ctx->sizeof_elem); }
-GR_SPARSE_VEC_INLINE gr_srcptr gr_sparse_vec_entry_srcptr(const gr_sparse_vec_t vec, slong i, gr_ctx_t ctx) { return GR_SPARSE_VEC_ENTRY(vec, i, ctx->sizeof_elem); }
+GR_SPARSE_VEC_INLINE ulong * gr_sparse_vec_ind_ptr(gr_sparse_vec_t vec, slong nzidx, gr_ctx_t ctx) { return vec->inds + nzidx; }
+GR_SPARSE_VEC_INLINE const ulong * gr_sparse_vec_ind_srcptr(const gr_sparse_vec_t vec, slong nzidx, gr_ctx_t ctx) { return vec->inds + nzidx; }
+GR_SPARSE_VEC_INLINE gr_ptr gr_sparse_vec_entry_ptr(gr_sparse_vec_t vec, slong nzidx, gr_ctx_t ctx) { return GR_SPARSE_VEC_ENTRY(vec, nzidx, ctx->sizeof_elem); }
+GR_SPARSE_VEC_INLINE gr_srcptr gr_sparse_vec_entry_srcptr(const gr_sparse_vec_t vec, slong nzidx, gr_ctx_t ctx) { return GR_SPARSE_VEC_ENTRY(vec, nzidx, ctx->sizeof_elem); }
 
 void gr_sparse_vec_fit_nnz(gr_sparse_vec_t vec, slong nnz, gr_ctx_t ctx);
 void gr_sparse_vec_shrink_to_nnz(gr_sparse_vec_t vec, gr_ctx_t ctx);
@@ -83,11 +83,11 @@ GR_SPARSE_VEC_INLINE void gr_sparse_vec_swap(gr_sparse_vec_t res, gr_sparse_vec_
 GR_SPARSE_VEC_INLINE void gr_sparse_vec_zero(gr_sparse_vec_t vec, gr_ctx_t ctx) { vec->nnz = 0; }
 WARN_UNUSED_RESULT int gr_sparse_vec_set_vec(gr_sparse_vec_t vec, gr_srcptr src, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_vec_set_sparse_vec(gr_ptr vec, gr_sparse_vec_t src, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_sparse_vec_slice(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong col_start, slong col_end, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_sparse_vec_slice(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong ind_start, slong ind_end, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_sparse_vec_permute_inds(gr_sparse_vec_t vec, const gr_sparse_vec_t src, slong * p, gr_ctx_t ctx);
 
-WARN_UNUSED_RESULT int gr_sparse_vec_find_entry(gr_ptr res, gr_sparse_vec_t vec, slong col, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_sparse_vec_set_entry(gr_sparse_vec_t vec, slong col, gr_srcptr entry, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_sparse_vec_find_entry(gr_ptr res, gr_sparse_vec_t vec, slong ind, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_sparse_vec_set_entry(gr_sparse_vec_t vec, slong ind, gr_srcptr entry, gr_ctx_t ctx);
 
 truth_t gr_sparse_vec_equal(const gr_sparse_vec_t vec1, const gr_sparse_vec_t vec2, gr_ctx_t ctx);
 GR_SPARSE_VEC_INLINE truth_t gr_sparse_vec_is_zero(const gr_sparse_vec_t vec, gr_ctx_t ctx) { return (vec->nnz == 0 ? T_TRUE : T_FALSE); }
@@ -115,14 +115,14 @@ slong _gr_sparse_vec_count_unique_inds(const ulong *inds0, slong nnz0, const ulo
     proceeds, for a given index, we need one function FUNC_A if only A_VEC
     has a nonzero element at that index, another function FUNC_B if only
     B_VEC has a nonzero element, and a third function FUNC_AB if both are nonzero.
-    During this process, we maintain a triple of indices a_ind, b_ind, and
+    During this process, we maintain a triple of indices a_nzidx, b_nzidx, and
     dest_ind, which are used when calling this macro to indicate what element(s)
     to refer to when calling the appropriate function.
 */
 #define GR_SPV_RFL_TEMPLATE(FUNC_A, FUNC_B, FUNC_AB, DEST_VEC, A_VEC, B_VEC, CTX)                       \
     int status;                                                                                         \
-    slong sz, new_nnz, a_ind, b_ind, dest_ind, a_nnz, b_nnz, i;                                         \
-    ulong a_col, b_col;                                                                                 \
+    slong sz, new_nnz, a_nzidx, b_nzidx, dest_ind, a_nnz, b_nnz, i;                                         \
+    ulong a_ind, b_ind;                                                                                 \
     if ((DEST_VEC)->length != (A_VEC)->length || (A_VEC)->length != (B_VEC)->length)                    \
         return GR_DOMAIN;                                                                               \
     status = GR_SUCCESS;                                                                                \
@@ -132,31 +132,31 @@ slong _gr_sparse_vec_count_unique_inds(const ulong *inds0, slong nnz0, const ulo
     new_nnz = _gr_sparse_vec_count_unique_inds((A_VEC)->inds, a_nnz, (B_VEC)->inds, b_nnz);             \
     gr_sparse_vec_fit_nnz((DEST_VEC), new_nnz, (CTX));                                                  \
     /* We go backward through the destination, because it might be an in-place operation on a source */ \
-    a_ind = a_nnz-1;                                                                                    \
-    b_ind = b_nnz-1;                                                                                    \
+    a_nzidx = a_nnz-1;                                                                                    \
+    b_nzidx = b_nnz-1;                                                                                    \
     dest_ind = new_nnz-1;                                                                               \
-    while (a_ind >= 0 && b_ind >= 0 && status == GR_SUCCESS)                                            \
+    while (a_nzidx >= 0 && b_nzidx >= 0 && status == GR_SUCCESS)                                            \
     {                                                                                                   \
-        a_col = (A_VEC)->inds[a_ind];                                                                   \
-        b_col = (B_VEC)->inds[b_ind];                                                                   \
-        if (a_col > b_col)                                                                              \
+        a_ind = (A_VEC)->inds[a_nzidx];                                                                   \
+        b_ind = (B_VEC)->inds[b_nzidx];                                                                   \
+        if (a_ind > b_ind)                                                                              \
         {                                                                                               \
             status |= (FUNC_A);                                                                         \
-            (DEST_VEC)->inds[dest_ind] = a_col;                                                         \
-            a_ind--;                                                                                    \
+            (DEST_VEC)->inds[dest_ind] = a_ind;                                                         \
+            a_nzidx--;                                                                                    \
         }                                                                                               \
-        else if (b_col > a_col)                                                                         \
+        else if (b_ind > a_ind)                                                                         \
         {                                                                                               \
             status |= (FUNC_B);                                                                         \
-            (DEST_VEC)->inds[dest_ind] = b_col;                                                         \
-            b_ind--;                                                                                    \
+            (DEST_VEC)->inds[dest_ind] = b_ind;                                                         \
+            b_nzidx--;                                                                                    \
         }                                                                                               \
         else                                                                                            \
         {                                                                                               \
             status |= (FUNC_AB);                                                                        \
-            (DEST_VEC)->inds[dest_ind] = a_col;                                                         \
-            a_ind--;                                                                                    \
-            b_ind--;                                                                                    \
+            (DEST_VEC)->inds[dest_ind] = a_ind;                                                         \
+            a_nzidx--;                                                                                    \
+            b_nzidx--;                                                                                    \
         }                                                                                               \
         if (T_TRUE != gr_is_zero(GR_ENTRY((DEST_VEC)->entries, dest_ind, sz), (CTX)))                   \
             dest_ind--;                                                                                 \
@@ -197,9 +197,9 @@ gr_sparse_vec_update(gr_sparse_vec_t res, const gr_sparse_vec_t src, gr_ctx_t ct
 {
     // All function are set to src value if possible, otherwise res value
     GR_SPV_RFL_TEMPLATE(
-        GR_SPV_RFL_UOP(gr_set, res, a_ind), 
-        GR_SPV_RFL_UOP(gr_set, src, b_ind), 
-        GR_SPV_RFL_UOP(gr_set, src, b_ind),
+        GR_SPV_RFL_UOP(gr_set, res, a_nzidx), 
+        GR_SPV_RFL_UOP(gr_set, src, b_nzidx), 
+        GR_SPV_RFL_UOP(gr_set, src, b_nzidx),
         res, res, src, ctx
     ); 
 }
@@ -208,9 +208,9 @@ GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int
 gr_sparse_vec_add(gr_sparse_vec_t res, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, slong len, gr_ctx_t ctx)
 {
     GR_SPV_RFL_TEMPLATE(
-        GR_SPV_RFL_UOP(gr_set, src1, a_ind), 
-        GR_SPV_RFL_UOP(gr_set, src2, b_ind), 
-        GR_SPV_RFL_BOP(gr_add, src1, a_ind, src2, b_ind), 
+        GR_SPV_RFL_UOP(gr_set, src1, a_nzidx), 
+        GR_SPV_RFL_UOP(gr_set, src2, b_nzidx), 
+        GR_SPV_RFL_BOP(gr_add, src1, a_nzidx, src2, b_nzidx), 
         res, src1, src2, ctx
     );
 }
@@ -219,9 +219,9 @@ GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int
 gr_sparse_vec_sub(gr_sparse_vec_t res, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, slong len, gr_ctx_t ctx) 
 {
     GR_SPV_RFL_TEMPLATE(
-        GR_SPV_RFL_UOP(gr_set, src1, a_ind),
-        GR_SPV_RFL_UOP(gr_neg, src2, b_ind),
-        GR_SPV_RFL_BOP(gr_sub, src1, a_ind, src2, b_ind),
+        GR_SPV_RFL_UOP(gr_set, src1, a_nzidx),
+        GR_SPV_RFL_UOP(gr_neg, src2, b_nzidx),
+        GR_SPV_RFL_BOP(gr_sub, src1, a_nzidx, src2, b_nzidx),
         res, src1, src2, ctx
     );
 }
@@ -235,7 +235,7 @@ gr_sparse_vec_mul(gr_sparse_vec_t res, const gr_sparse_vec_t src1, const gr_spar
     GR_SPV_RFL_TEMPLATE(
         GR_SPV_RFL_ZERO,
         GR_SPV_RFL_ZERO,
-        GR_SPV_RFL_BOP(gr_mul, src1, a_ind, src2, b_ind),
+        GR_SPV_RFL_BOP(gr_mul, src1, a_nzidx, src2, b_nzidx),
         res, src1, src2, ctx
     );
 }
@@ -252,9 +252,9 @@ GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int
 gr_sparse_vec_add_other(gr_sparse_vec_t res, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, gr_ctx_t ctx2, gr_ctx_t ctx)
 {
     GR_SPV_RFL_TEMPLATE(
-        GR_SPV_RFL_UOP(gr_set, src1, a_ind), 
-        GR_SPV_RFL_UOP_OTHER(gr_set_other, src2, b_ind, ctx2),
-        GR_SPV_RFL_BOP_OTHER(gr_add_other, src1, a_ind, src2, b_ind, ctx2),
+        GR_SPV_RFL_UOP(gr_set, src1, a_nzidx), 
+        GR_SPV_RFL_UOP_OTHER(gr_set_other, src2, b_nzidx, ctx2),
+        GR_SPV_RFL_BOP_OTHER(gr_add_other, src1, a_nzidx, src2, b_nzidx, ctx2),
         res, src1, src2, ctx
     );
 }
@@ -263,9 +263,9 @@ GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int
 gr_sparse_vec_sub_other(gr_sparse_vec_t res, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, gr_ctx_t ctx2, gr_ctx_t ctx)
 {
     GR_SPV_RFL_TEMPLATE(
-        GR_SPV_RFL_UOP(gr_set, src1, a_ind),
-        GR_SPV_RFL_UOP_OTHER(gr_neg_other, src2, a_ind, ctx2),
-        GR_SPV_RFL_BOP_OTHER(gr_sub_other, src1, a_ind, src2, b_ind, ctx2),
+        GR_SPV_RFL_UOP(gr_set, src1, a_nzidx),
+        GR_SPV_RFL_UOP_OTHER(gr_neg_other, src2, a_nzidx, ctx2),
+        GR_SPV_RFL_BOP_OTHER(gr_sub_other, src1, a_nzidx, src2, b_nzidx, ctx2),
         res, src1, src2, ctx
     );
 }
@@ -276,7 +276,7 @@ gr_sparse_vec_mul_other(gr_sparse_vec_t res, const gr_sparse_vec_t src1, const g
     GR_SPV_RFL_TEMPLATE(
         GR_SPV_RFL_ZERO,
         GR_SPV_RFL_ZERO,
-        GR_SPV_RFL_BOP_OTHER(gr_mul_other, src1, a_ind, src2, b_ind, ctx2),
+        GR_SPV_RFL_BOP_OTHER(gr_mul_other, src1, a_nzidx, src2, b_nzidx, ctx2),
         res, src1, src2, ctx
     );
 }
@@ -285,9 +285,9 @@ GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int
 gr_other_add_sparse_vec(gr_sparse_vec_t res, const gr_sparse_vec_t src1, gr_ctx_t ctx1, const gr_sparse_vec_t src2, gr_ctx_t ctx)
 {
     GR_SPV_RFL_TEMPLATE(
-        GR_SPV_RFL_UOP_OTHER(gr_set_other, src1, a_ind, ctx1),
-        GR_SPV_RFL_UOP(gr_set, src2, b_ind),
-        GR_SPV_RFL_OTHER_BOP(gr_other_add, src1, a_ind, ctx1, src2, b_ind),
+        GR_SPV_RFL_UOP_OTHER(gr_set_other, src1, a_nzidx, ctx1),
+        GR_SPV_RFL_UOP(gr_set, src2, b_nzidx),
+        GR_SPV_RFL_OTHER_BOP(gr_other_add, src1, a_nzidx, ctx1, src2, b_nzidx),
         res, src1, src2, ctx
     );
 }
@@ -296,9 +296,9 @@ GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int
 gr_other_sub_sparse_vec(gr_sparse_vec_t res, const gr_sparse_vec_t src1, gr_ctx_t ctx1, const gr_sparse_vec_t src2, gr_ctx_t ctx)
 {
     GR_SPV_RFL_TEMPLATE(
-        GR_SPV_RFL_UOP_OTHER(gr_set_other, src1, a_ind, ctx1),
-        GR_SPV_RFL_UOP(gr_neg, src2, b_ind),
-        GR_SPV_RFL_OTHER_BOP(gr_other_sub, src1, a_ind, ctx1, src2, b_ind),
+        GR_SPV_RFL_UOP_OTHER(gr_set_other, src1, a_nzidx, ctx1),
+        GR_SPV_RFL_UOP(gr_neg, src2, b_nzidx),
+        GR_SPV_RFL_OTHER_BOP(gr_other_sub, src1, a_nzidx, ctx1, src2, b_nzidx),
         res, src1, src2, ctx
     );
 }
@@ -309,7 +309,7 @@ gr_other_mul_sparse_vec(gr_sparse_vec_t res, const gr_sparse_vec_t src1, gr_ctx_
     GR_SPV_RFL_TEMPLATE(
         GR_SPV_RFL_ZERO,
         GR_SPV_RFL_ZERO,
-        GR_SPV_RFL_OTHER_BOP(gr_other_mul, src1, a_ind, ctx1, src2, b_ind),
+        GR_SPV_RFL_OTHER_BOP(gr_other_mul, src1, a_nzidx, ctx1, src2, b_nzidx),
         res, src1, src2, ctx
     );
 }
@@ -323,9 +323,9 @@ gr_other_mul_sparse_vec(gr_sparse_vec_t res, const gr_sparse_vec_t src1, gr_ctx_
 */
 #define GR_SPV_ACCUM_TEMPLATE(ELEM_OP, ELEM_ACCUM_OP, RES, SRC, C, CTX) \
     GR_SPV_RFL_TEMPLATE(                                                \
-        GR_SPV_RFL_UOP(gr_set, RES, a_ind),                             \
-        GR_SPV_RFL_UOP_SCALAR(ELEM_OP, SRC, b_ind, C, CTX),             \
-        GR_SPV_RFL_UOP_SCALAR(ELEM_ACCUM_OP, SRC, b_ind, C, CTX),       \
+        GR_SPV_RFL_UOP(gr_set, RES, a_nzidx),                             \
+        GR_SPV_RFL_UOP_SCALAR(ELEM_OP, SRC, b_nzidx, C, CTX),             \
+        GR_SPV_RFL_UOP_SCALAR(ELEM_ACCUM_OP, SRC, b_nzidx, C, CTX),       \
         RES, RES, SRC, CTX\
     )
 
@@ -428,7 +428,7 @@ GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int
 gr_sparse_vec_dot(gr_ptr res, gr_srcptr initial, int subtract, const gr_sparse_vec_t vec1, const gr_sparse_vec_t vec2, gr_ctx_t ctx)
 {
     int status;
-    slong idx1, idx2;
+    slong nzidx1, nzidx2;
     slong sz = ctx->sizeof_elem;
     
     if (vec1->length != vec2->length)
@@ -436,23 +436,23 @@ gr_sparse_vec_dot(gr_ptr res, gr_srcptr initial, int subtract, const gr_sparse_v
         return GR_DOMAIN;
     }
     status = gr_set(res, initial, ctx);
-    for (idx1 = 0, idx2 = 0; idx1 < vec1->nnz && idx2 < vec2->nnz; )
+    for (nzidx1 = 0, nzidx2 = 0; nzidx1 < vec1->nnz && nzidx2 < vec2->nnz; )
     {
-        if (vec1->inds[idx1] < vec2->inds[idx2])
+        if (vec1->inds[nzidx1] < vec2->inds[nzidx2])
         {
-            idx1++;
+            nzidx1++;
         }
-        else if (vec1->inds[idx1] > vec2->inds[idx2])
+        else if (vec1->inds[nzidx1] > vec2->inds[nzidx2])
         {
-            idx2++;
+            nzidx2++;
         }
         else if (subtract)
         {
-            status |= gr_submul(res, GR_ENTRY(vec1->entries, idx1, sz), GR_ENTRY(vec2->entries, idx1, sz), ctx);
+            status |= gr_submul(res, GR_ENTRY(vec1->entries, nzidx1, sz), GR_ENTRY(vec2->entries, nzidx1, sz), ctx);
         }
         else
         {
-            status |= gr_addmul(res, GR_ENTRY(vec1->entries, idx1, sz), GR_ENTRY(vec2->entries, idx1, sz), ctx);
+            status |= gr_addmul(res, GR_ENTRY(vec1->entries, nzidx1, sz), GR_ENTRY(vec2->entries, nzidx1, sz), ctx);
         }
     }
     return status;
@@ -462,7 +462,7 @@ GR_SPARSE_VEC_INLINE WARN_UNUSED_RESULT int
 gr_sparse_vec_dot_vec(gr_ptr res, gr_srcptr initial, int subtract, const gr_sparse_vec_t vec1, const gr_vec_t vec2, gr_ctx_t ctx)
 {
     int status;
-    slong idx;
+    slong nzidx;
     slong sz = ctx->sizeof_elem;
     
     if (vec1->length != vec2->length)
@@ -470,15 +470,15 @@ gr_sparse_vec_dot_vec(gr_ptr res, gr_srcptr initial, int subtract, const gr_spar
         return GR_DOMAIN;
     }
     status = gr_set(res, initial, ctx);
-    for (idx = 0; idx < vec1->nnz; idx++)
+    for (nzidx = 0; nzidx < vec1->nnz; nzidx++)
     {
         if (subtract)
         {
-            status |= gr_submul(res, GR_ENTRY(vec1->entries, idx, sz), GR_ENTRY(vec2->entries, vec1->inds[idx], sz), ctx);
+            status |= gr_submul(res, GR_ENTRY(vec1->entries, nzidx, sz), GR_ENTRY(vec2->entries, vec1->inds[nzidx], sz), ctx);
         }
         else
         {
-            status |= gr_addmul(res, GR_ENTRY(vec1->entries, idx, sz), GR_ENTRY(vec2->entries, vec1->inds[idx], sz), ctx);
+            status |= gr_addmul(res, GR_ENTRY(vec1->entries, nzidx, sz), GR_ENTRY(vec2->entries, vec1->inds[nzidx], sz), ctx);
         }
     }
     return status;

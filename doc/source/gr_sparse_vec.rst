@@ -42,9 +42,9 @@ Types and basic access
 
     Clears the vector *vec*
 
-.. macro:: GR_SPARSE_VEC_COL(vec, i)
+.. macro:: GR_SPARSE_VEC_IND(vec, i)
 
-    Access the column index of the *i*-th nonzero.
+    Access the index of the *i*-th nonzero.
     There is no bounds checking. (See also `gr_sparse_vec_find_entry`)
 
 .. macro:: GR_SPARSE_VEC_ENTRY(vec, i, sz)
@@ -52,12 +52,12 @@ Types and basic access
     Access the value of the *i*-th nonzero.
     There is no bounds checking. (See also `gr_sparse_vec_find_entry`)
 
-.. function:: ulong * gr_sparse_vec_col_ptr(gr_sparse_vec_t vec, slong i, gr_ctx_t ctx)
-              const ulong * gr_sparse_vec_col_srcptr(const gr_sparse_vec_t vec, slong i, gr_ctx_t ctx)
+.. function:: ulong * gr_sparse_vec_ind_ptr(gr_sparse_vec_t vec, slong i, gr_ctx_t ctx)
+              const ulong * gr_sparse_vec_ind_srcptr(const gr_sparse_vec_t vec, slong i, gr_ctx_t ctx)
               gr_ptr gr_sparse_vec_entry_ptr(gr_sparse_vec_t vec, slong i, gr_ctx_t ctx)
               gr_srcptr gr_sparse_vec_entry_srcptr(const gr_sparse_vec_t vec, slong i, gr_ctx_t ctx)
 
-    Get pointers to the column indices and entries.
+    Get pointers to the specified indices and entries.
 
 .. function:: void gr_sparse_vec_fit_nnz(gr_sparse_vec_t vec, slong nnz, gr_ctx_t ctx)
 
@@ -75,7 +75,7 @@ Types and basic access
 .. function:: void gr_sparse_vec_set_length(gr_sparse_vec_t vec, slong len, gr_ctx_t ctx)
 
     Set the nominal length of the vector *vec* to *len*.  If *len* is smaller than
-    the current length of *vec*, any entries whose column indices are at least *len*
+    the current length of *vec*, any entries whose indices are at least *len*
     are truncated.  That is, the number of nonzeros can change.
 
 .. function:: slong gr_sparse_vec_nnz(const gr_sparse_vec_t vec)
@@ -90,33 +90,33 @@ Getting, setting and conversion
 
     Copy *src* to a copy of *res*
 
-.. function:: int gr_sparse_vec_set_entry(gr_sparse_vec_t vec, slong col, gr_srcptr entry, gr_ctx_t ctx)
+.. function:: int gr_sparse_vec_set_entry(gr_sparse_vec_t vec, slong ind, gr_srcptr entry, gr_ctx_t ctx)
 
-    Set the the value at column *col* to be *entry*.  Because of the way sparse
+    Set the the value at index *ind* to be *entry*.  Because of the way sparse
     vectors are represented, it is not efficient to call this function
     repeatedly (it is linear time in the number of nonzeros in *vec*). 
     If possible, the entries to update should be batched up and
     given using `gr_sparse_vec_update`, `gr_sparse_vec_set_from_entries`,
     or `gr_sparse_vec_set_from_entries_sorted_deduped`.
 
-.. function:: int gr_sparse_vec_find_entry(gr_ptr res, gr_sparse_vec_t vec, slong col, gr_ctx_t ctx)
+.. function:: int gr_sparse_vec_find_entry(gr_ptr res, gr_sparse_vec_t vec, slong ind, gr_ctx_t ctx)
 
-    Set *res* to be the entry at column *col*.  If *col* is not a column
+    Set *res* to be the entry at index *ind*.  If *ind* is not a index
     in which *vec* contains a nonzero, *res* is set to zero.
     Because of the way sparse vectors are represented, this is not constant time.
     (It is log time in the number of nonzeros in *vec*.)
 
 .. function:: int gr_sparse_vec_update(gr_sparse_vec_t res, const gr_sparse_vec_t src, gr_ctx_t ctx)
 
-    Update *res* with the nonzeros in *src*.  That is, any columns in *res* which also appear
-    in *src* are overwritten with their values in *src*.  Any columns in *res* which do
+    Update *res* with the nonzeros in *src*.  That is, any index in *res* which also appear
+    in *src* are overwritten with their values in *src*.  Any indices in *res* which do
     not appear in *src* are left unchanged.
 
 .. function:: int gr_sparse_vec_set_from_entries(gr_sparse_vec_t vec, ulong * inds, gr_srcptr entries, slong nnz, gr_ctx_t ctx)
 
     Set *vec* to the sparse data given by *inds* and *entries* of length *nnz*.  No assumption
-    is made that the columns are sorted nor that the entries are nonzero.  The values associated
-    with duplicate columns are added together.
+    is made that the indices are sorted nor that the entries are nonzero.  The values associated
+    with duplicate indices are added together.
 
 .. function:: int gr_sparse_vec_set_from_entries_sorted_deduped(gr_sparse_vec_t vec, ulong * sorted_deduped_inds, gr_srcptr entries, slong nnz, gr_ctx_t ctx)
 
@@ -132,7 +132,7 @@ Getting, setting and conversion
 
     Initialize *vec* to a random vector with density (fraction of nonzeros)
     *density* and length *len*. The algorithm is suitable when *density* is small.
-    Specifically, column indices are generated randomly and deduped.  So if the
+    Specifically, indices are generated randomly and deduped.  So if the
     density is larger than ``1/sqrt(len)``, the true density of the returned vector
     is likely to be lower than *density*.
 
@@ -145,16 +145,16 @@ Getting, setting and conversion
     Convert the sparse vector *src* into a dense vector *vec*, which must have
     sufficient space (i.e. ``vec->length``).
 
-.. function:: int gr_sparse_vec_slice(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong col_start, slong col_end, gr_ctx_t ctx)
+.. function:: int gr_sparse_vec_slice(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong ind_start, slong ind_end, gr_ctx_t ctx)
 
     Set *res* to a copy of the slice of *src* given by any entries whose
-    column indices lie in the half open interval ``[col_start, col_end)``.
-    Column indices are shifted by *col_start* (a column index of ``col_start``
+    indices lie in the half open interval ``[ind_start, ind_end)``.
+    Column indices are shifted by *ind_start* (a index of ``ind_start``
     would become ``0``).
 
 .. function:: int gr_sparse_vec_permute_inds(gr_sparse_vec_t vec, const gr_sparse_vec_t src, slong * p, gr_ctx_t ctx)
 
-    Set *vec* to a copy of *src* with the columns permuted.  The column
+    Set *vec* to a copy of *src* with the indices permuted.  The
     indices are shifted as: ``vec[p[i]] = src[i]``.
 
 
