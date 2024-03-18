@@ -109,13 +109,13 @@ _flint_mpn_mulhigh_n_mulders_recursive(mp_ptr rp, mp_srcptr np, mp_srcptr mp, mp
     else
         k = 3 * (n / 4);
 
-    FLINT_ASSERT(k >= (n + 4) / 2);
-
     if (k == 0)
     {
         rp[n - 1] = _flint_mpn_mulhigh_basecase(rp + n, np, mp, n);
         return;
     }
+
+    FLINT_ASSERT(k >= (n + 4) / 2);
 
     if (k == n)
     {

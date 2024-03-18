@@ -15,7 +15,7 @@
 /* TODO: Remove this preprocessor conditional */
 #if FLINT_HAVE_NATIVE_mpn_mulhigh_basecase
 
-#define N_MAX (FLINT_MPN_SQRHIGH_SQR_CUTOFF + 100)
+#define N_MAX FLINT_MAX(FLINT_MPN_SQRHIGH_SQR_CUTOFF + 50, 2 * FLINT_MPN_SQRHIGH_MULDERS_CUTOFF)
 
 #define rpcH (rpc + n - 1)
 
@@ -26,7 +26,7 @@ TEST_FUNCTION_START(flint_mpn_sqrhigh, state)
 
     mp_ptr rp, rpc, xp;
 
-    rp = flint_malloc(sizeof(mp_limb_t) * N_MAX);
+    rp = flint_malloc(sizeof(mp_limb_t) * (N_MAX + 1));
     rpc = flint_malloc(2 * sizeof(mp_limb_t) * N_MAX);
     xp = flint_malloc(sizeof(mp_limb_t) * N_MAX);
 
@@ -38,7 +38,7 @@ TEST_FUNCTION_START(flint_mpn_sqrhigh, state)
 
         /* Trigger full multiplication in mulhigh */
         if (n_randint(state, 1000) == 0)
-            n = FLINT_MPN_SQRHIGH_SQR_CUTOFF + n_randint(state, 50);
+            n = 1 + FLINT_MPN_SQRHIGH_SQR_CUTOFF + n_randint(state, 50);
         else if (n_randint(state, 100) == 0)
             n = 1 + n_randint(state, FLINT_MPN_SQRHIGH_SQR_CUTOFF);
         else
@@ -88,9 +88,8 @@ TEST_FUNCTION_START(flint_mpn_sqrhigh, state)
 
     TEST_FUNCTION_END(state);
 }
-# undef N_MIN
 # undef N_MAX
-# undef N_MAX2
+# undef rpcH
 #else
 TEST_FUNCTION_START(flint_mpn_sqrhigh, state)
 {
