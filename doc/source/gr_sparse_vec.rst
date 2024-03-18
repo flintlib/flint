@@ -80,7 +80,7 @@ Types and basic access
 
 .. function:: slong gr_sparse_vec_nnz(const gr_sparse_vec_t vec)
 
-    Get the number of nonzeros in *vec*
+    Get the number of nonzeros in *vec*.
 
 
 Getting, setting and conversion
@@ -88,7 +88,7 @@ Getting, setting and conversion
 
 .. function:: int gr_sparse_vec_set(gr_sparse_vec_t res, const gr_sparse_vec_t src, gr_ctx_t ctx)
 
-    Copy *src* to a copy of *res*
+    Set *src* to a copy of *res*.
 
 .. function:: int gr_sparse_vec_set_entry(gr_sparse_vec_t vec, slong ind, gr_srcptr entry, gr_ctx_t ctx)
 
@@ -235,12 +235,13 @@ Arithmetic into dense vectors
               int gr_vec_submul_sparse_vec_scalar_fmpz(gr_ptr dres, const gr_sparse_vec_t svec, const fmpz_t c, gr_ctx_t ctx)
     
     These functions facilitate accumulating a sparse vector into a dense
-    target.  They have one dense input, one sparse input, and a dense output.
+    target.  They have one dense input, one sparse input, and a dense output
+    (where the dense input and output are the same for the fused operations).
     For all functions, it is assumed that *dres* and *dvec1* have the same
-    length as *svec* or *svec2*, as appropriate.  The functions 
-    ``gr_vec_update_sparse_vec_nz()`` (overwrite the entries in *dres*),
-    ``gr_vec_mul_sparse_vec_nz()``, and ``gr_vec_div_sparse_vec_nz()``
-    only operate on the locations for which *svec2* is nonzero.
+    length as *svec* or *svec2*, as appropriate.  All functions only modify
+    the locations in *dres* at which the sparse vector has a nonzero value:
+    in particular, the functions *gr_vec_mul_sparse_vec_nz* and
+    *gr_vec_div_sparse_vec_nz* behave very differently from their dense counterparts.
 
 
 Componentwise multiplication and division
@@ -286,9 +287,9 @@ Dot products
 
     Set *res* equal to `c \pm x \cdot y`.
 
-.. function:: int gr_sparse_vec_dot_rev(gr_ptr res, gr_srcptr c, int subtract, const gr_sparse_vec_t x, const gr_sparse_vec_t y, gr_ctx_t ctx)
+.. function:: int gr_sparse_vec_dot_vec(gr_ptr res, gr_srcptr c, int subtract, const gr_sparse_vec_t x, const gr_vec_t y, gr_ctx_t ctx)
 
-    Set *res* equal to `c \pm \sum_{i=0}^{n-1}x_iy_{n-1-i}`.
+    Set *res* equal to `c \pm x \cdot y`.
 
 
 
