@@ -95,6 +95,8 @@ mp_limb_t _flint_mpn_mulhigh_basecase(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_s
     mp_limb_t b, a, low, t[2];
     slong i;
 
+    FLINT_ASSERT(n >= 3);
+
     NN_DOTREV_S3_1X1_HIGH(b, a, u, v, n - 1);
     NN_DOTREV_S3_A3_1X1(b, a, low, 0, b, a, u, v, n);
     t[0] = a;

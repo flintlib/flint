@@ -454,7 +454,7 @@ struct mp_limb_pair_t flint_mpn_mulhigh_normalised(mp_ptr rp, mp_srcptr xp, mp_s
 
         FLINT_ASSERT(rp != xp && rp != yp);
 
-        ret.m1 = _flint_mpn_mulhigh_n(rp, xp, yp, n);
+        ret.m1 = flint_mpn_mulhigh_n(rp, xp, yp, n);
 
         if (rp[n - 1] >> (FLINT_BITS - 1))
         {
