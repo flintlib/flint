@@ -2,8 +2,8 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include "acb_dirichlet.h"
-#include "profiler.h"
+#include <flint/acb_dirichlet.h>
+#include <flint/profiler.h>
 
 int main(int argc, char *argv[])
 {
