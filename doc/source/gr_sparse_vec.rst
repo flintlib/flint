@@ -24,12 +24,12 @@ Types and basic access
     * an `slong` value ``nnz``, the number of nonzero elements in vector,
     * an `slong` value ``alloc``, the maximum number of nonzero element currently storable in the vector,
     * a pointer to an `slong` array of indices (``inds``) of nonzeros.
-    * a :type:`gr_ptr` array of values of nonzeros (``entries``).
+    * a :type:`gr_ptr` array of values of nonzeros (``nzs``).
 
     The methods for sparse vectors maintain the following properties:
 
     * the indices ``inds`` are unique and sorted into strictly increasing order;
-    * the ``entries`` are nonzero (``gr_is_zero(entry, ctx)`` does not return ``T_TRUE``).
+    * the ``nzs`` are nonzero (``gr_is_zero(entry, ctx)`` does not return ``T_TRUE``).
     * ``nnz <= alloc <= length``.
     
     A ``gr_sparse_vec_t`` is defined as an array of length one of type
@@ -136,29 +136,29 @@ Getting, setting and conversion
     (using `gr_sparse_vec_set_from_entries` or `gr_sparse_vec_set_from_entries_sorted_deduped`)
     passed to `gr_sparse_vec_update`.
 
-.. function:: int gr_sparse_vec_set(gr_sparse_vec_t res, const gr_sparse_vec_t src, gr_ctx_t ctx)
+.. function:: int gr_sparse_vec_set(gr_sparse_vec_t dst, const gr_sparse_vec_t src, gr_ctx_t ctx)
 
-    Set *src* to a copy of *res*.
+    Set *dst* to a copy of *src*.
 
-.. function:: int gr_sparse_vec_slice(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong ind_start, slong ind_end, gr_ctx_t ctx)
+.. function:: int gr_sparse_vec_slice(gr_sparse_vec_t dst, const gr_sparse_vec_t src, slong ind_start, slong ind_end, gr_ctx_t ctx)
 
-    Set *res* to a copy of the slice of *src* given by any entries whose
+    Set *dst* to a copy of the slice of *src* given by any entries whose
     indices lie in the half open interval ``[ind_start, ind_end)``.
     Column indices are shifted by *ind_start* (a index of ``ind_start``
     would become ``0``).
 
-.. function:: int gr_sparse_vec_set_vec(gr_sparse_vec_t vec, gr_srcptr src, slong len, gr_ctx_t ctx)
+.. function:: int gr_sparse_vec_set_vec(gr_sparse_vec_t dst, gr_srcptr src, slong len, gr_ctx_t ctx)
 
-    Set *vec* from the (raw) dense vector *src* of length *len*.
+    Set *dst* from the (raw) dense vector *src* of length *len*.
     
-.. function:: int gr_vec_set_sparse_vec(gr_ptr vec, gr_sparse_vec_t src, gr_ctx_t ctx)
+.. function:: int gr_vec_set_sparse_vec(gr_ptr dst, gr_sparse_vec_t src, gr_ctx_t ctx)
 
-    Set the raw vector *vec* from sparse vector *src*. *vec* must have
-    sufficient space (i.e. ``vec->length``).
+    Set the raw vector *dst* from sparse vector *src*. *dst* must have
+    sufficient space (i.e., ``vec->length``).
 
-.. function:: void gr_sparse_vec_swap(gr_sparse_vec_t res, gr_sparse_vec_t src, gr_ctx_t ctx)
+.. function:: void gr_sparse_vec_swap(gr_sparse_vec_t vec1, gr_sparse_vec_t vec2, gr_ctx_t ctx)
 
-    Swap the sparse vectors *res* and *src*. The entries are swapped as pointers, so
+    Swap the sparse vectors *vec1* and *vec2*. The entries are swapped as pointers, so
     no additional allociation or copying is performed.
 
 .. function:: int gr_sparse_vec_zero(gr_sparse_vec_t vec, gr_ctx_t ctx)
@@ -203,40 +203,40 @@ Output
 Arithmetic
 --------------------------------------------------------------------------------
 
-.. function:: int gr_sparse_vec_neg(gr_sparse_vec_t res, const gr_sparse_vec_t src, gr_ctx_t ctx)
+.. function:: int gr_sparse_vec_neg(gr_sparse_vec_t dst, const gr_sparse_vec_t src, gr_ctx_t ctx)
 
-    Set *res* to -*src*
+    Set *dst* to -*src*
 
-.. function:: int gr_sparse_vec_update(gr_sparse_vec_t res, const gr_sparse_vec_t src, gr_ctx_t ctx)
+.. function:: int gr_sparse_vec_update(gr_sparse_vec_t dst, const gr_sparse_vec_t src, gr_ctx_t ctx)
 
-    Update *res* with the nonzeros in *src*.  That is, any index in *res* which also appear
-    in *src* are overwritten with their values in *src*.  Any indices in *res* which do
+    Update *dst* with the nonzeros in *src*.  That is, any index in *dst* which also appear
+    in *src* are overwritten with their values in *src*.  Any indices in *dst* which do
     not appear in *src* are left unchanged.
 
-.. function:: int gr_sparse_vec_add(gr_sparse_vec_t res, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, slong len, gr_ctx_t ctx)
-              int gr_sparse_vec_sub(gr_sparse_vec_t res, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, slong len, gr_ctx_t ctx)
-              int gr_sparse_vec_mul(gr_sparse_vec_t res, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, slong len, gr_ctx_t ctx)
+.. function:: int gr_sparse_vec_add(gr_sparse_vec_t dst, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, slong len, gr_ctx_t ctx)
+              int gr_sparse_vec_sub(gr_sparse_vec_t dst, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, slong len, gr_ctx_t ctx)
+              int gr_sparse_vec_mul(gr_sparse_vec_t dst, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, slong len, gr_ctx_t ctx)
     
     Componentwise operations.  (We do not provide analogous division or exponentiation
     routines due since sparse inputs to these operations would be undefined or
     fully dense.)
 
-.. function:: int gr_sparse_vec_add_other(gr_sparse_vec_t res, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, gr_ctx_t ctx2, gr_ctx_t ctx)
-              int gr_sparse_vec_sub_other(gr_sparse_vec_t res, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, gr_ctx_t ctx2, gr_ctx_t ctx)
-              int gr_sparse_vec_mul_other(gr_sparse_vec_t res, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, gr_ctx_t ctx2, gr_ctx_t ctx)
+.. function:: int gr_sparse_vec_add_other(gr_sparse_vec_t dst, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, gr_ctx_t ctx2, gr_ctx_t ctx)
+              int gr_sparse_vec_sub_other(gr_sparse_vec_t dst, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, gr_ctx_t ctx2, gr_ctx_t ctx)
+              int gr_sparse_vec_mul_other(gr_sparse_vec_t dst, const gr_sparse_vec_t src1, const gr_sparse_vec_t src2, gr_ctx_t ctx2, gr_ctx_t ctx)
     
     Componentwise operations where the second input is allowed to have a different ring.
 
-.. function:: int gr_other_add_sparse_vec(gr_sparse_vec_t res, const gr_sparse_vec_t src1, gr_ctx_t ctx1, const gr_sparse_vec_t src2, gr_ctx_t ctx)
-              int gr_other_sub_sparse_vec(gr_sparse_vec_t res, const gr_sparse_vec_t src1, gr_ctx_t ctx1, const gr_sparse_vec_t src2, gr_ctx_t ctx)
-              int gr_other_mul_sparse_vec(gr_sparse_vec_t res, const gr_sparse_vec_t src1, gr_ctx_t ctx1, const gr_sparse_vec_t src2, gr_ctx_t ctx)
+.. function:: int gr_other_add_sparse_vec(gr_sparse_vec_t dst, const gr_sparse_vec_t src1, gr_ctx_t ctx1, const gr_sparse_vec_t src2, gr_ctx_t ctx)
+              int gr_other_sub_sparse_vec(gr_sparse_vec_t dst, const gr_sparse_vec_t src1, gr_ctx_t ctx1, const gr_sparse_vec_t src2, gr_ctx_t ctx)
+              int gr_other_mul_sparse_vec(gr_sparse_vec_t dst, const gr_sparse_vec_t src1, gr_ctx_t ctx1, const gr_sparse_vec_t src2, gr_ctx_t ctx)
     
     Componentwise operations where the first input is allowed to have a different ring.
 
-.. function:: int gr_sparse_vec_addmul_scalar(gr_sparse_vec_t res, const gr_sparse_vec_t src, gr_srcptr c, gr_ctx_t ctx)
-              int gr_sparse_vec_submul_scalar(gr_sparse_vec_t res, const gr_sparse_vec_t src, gr_srcptr c, gr_ctx_t ctx)
-              int gr_sparse_vec_addmul_scalar_si(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong c, gr_ctx_t ctx)
-              int gr_sparse_vec_submul_scalar_si(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong c, gr_ctx_t ctx)
+.. function:: int gr_sparse_vec_addmul_scalar(gr_sparse_vec_t dst, const gr_sparse_vec_t src, gr_srcptr c, gr_ctx_t ctx)
+              int gr_sparse_vec_submul_scalar(gr_sparse_vec_t dst, const gr_sparse_vec_t src, gr_srcptr c, gr_ctx_t ctx)
+              int gr_sparse_vec_addmul_scalar_si(gr_sparse_vec_t dst, const gr_sparse_vec_t src, slong c, gr_ctx_t ctx)
+              int gr_sparse_vec_submul_scalar_si(gr_sparse_vec_t dst, const gr_sparse_vec_t src, slong c, gr_ctx_t ctx)
     
     Componentwise add and sub mul, with different options for the scalar.
 
@@ -269,24 +269,24 @@ Arithmetic into dense vectors
 Scalar multiplication and division
 --------------------------------------------------------------------------------
 
-.. function:: int gr_sparse_vec_mul_scalar(gr_sparse_vec_t res, const gr_sparse_vec_t src, gr_srcptr c, gr_ctx_t ctx)
-              int gr_sparse_vec_mul_scalar_si(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong c, gr_ctx_t ctx)
-              int gr_sparse_vec_mul_scalar_ui(gr_sparse_vec_t res, const gr_sparse_vec_t src, ulong c, gr_ctx_t ctx)
-              int gr_sparse_vec_mul_scalar_fmpz(gr_sparse_vec_t res, const gr_sparse_vec_t src, const fmpz_t c, gr_ctx_t ctx)
-              int gr_sparse_vec_mul_scalar_fmpq(gr_sparse_vec_t res, const gr_sparse_vec_t src, const fmpq_t c, gr_ctx_t ctx)
-              int gr_sparse_vec_mul_scalar_2exp_si(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong c, gr_ctx_t ctx)
-              int gr_sparse_vec_div_scalar(gr_sparse_vec_t res, const gr_sparse_vec_t src, gr_srcptr c, gr_ctx_t ctx)
-              int gr_sparse_vec_div_scalar_si(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong c, gr_ctx_t ctx)
-              int gr_sparse_vec_div_scalar_ui(gr_sparse_vec_t res, const gr_sparse_vec_t src, ulong c, gr_ctx_t ctx)
-              int gr_sparse_vec_div_scalar_fmpz(gr_sparse_vec_t res, const gr_sparse_vec_t src, const fmpz_t c, gr_ctx_t ctx)
-              int gr_sparse_vec_div_scalar_fmpq(gr_sparse_vec_t res, const gr_sparse_vec_t src, const fmpq_t c, gr_ctx_t ctx)
-              int gr_sparse_vec_divexact_scalar(gr_sparse_vec_t res, const gr_sparse_vec_t src, gr_srcptr c, gr_ctx_t ctx)
-              int gr_sparse_vec_divexact_scalar_si(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong c, gr_ctx_t ctx)
-              int gr_sparse_vec_divexact_scalar_ui(gr_sparse_vec_t res, const gr_sparse_vec_t src, ulong c, gr_ctx_t ctx)
-              int gr_sparse_vec_divexact_scalar_fmpz(gr_sparse_vec_t res, const gr_sparse_vec_t src, const fmpz_t c, gr_ctx_t ctx)
-              int gr_sparse_vec_divexact_scalar_fmpq(gr_sparse_vec_t res, const gr_sparse_vec_t src, const fmpq_t c, gr_ctx_t ctx)
+.. function:: int gr_sparse_vec_mul_scalar(gr_sparse_vec_t dst, const gr_sparse_vec_t src, gr_srcptr c, gr_ctx_t ctx)
+              int gr_sparse_vec_mul_scalar_si(gr_sparse_vec_t dst, const gr_sparse_vec_t src, slong c, gr_ctx_t ctx)
+              int gr_sparse_vec_mul_scalar_ui(gr_sparse_vec_t dst, const gr_sparse_vec_t src, ulong c, gr_ctx_t ctx)
+              int gr_sparse_vec_mul_scalar_fmpz(gr_sparse_vec_t dst, const gr_sparse_vec_t src, const fmpz_t c, gr_ctx_t ctx)
+              int gr_sparse_vec_mul_scalar_fmpq(gr_sparse_vec_t dst, const gr_sparse_vec_t src, const fmpq_t c, gr_ctx_t ctx)
+              int gr_sparse_vec_mul_scalar_2exp_si(gr_sparse_vec_t dst, const gr_sparse_vec_t src, slong c, gr_ctx_t ctx)
+              int gr_sparse_vec_div_scalar(gr_sparse_vec_t dst, const gr_sparse_vec_t src, gr_srcptr c, gr_ctx_t ctx)
+              int gr_sparse_vec_div_scalar_si(gr_sparse_vec_t dst, const gr_sparse_vec_t src, slong c, gr_ctx_t ctx)
+              int gr_sparse_vec_div_scalar_ui(gr_sparse_vec_t dst, const gr_sparse_vec_t src, ulong c, gr_ctx_t ctx)
+              int gr_sparse_vec_div_scalar_fmpz(gr_sparse_vec_t dst, const gr_sparse_vec_t src, const fmpz_t c, gr_ctx_t ctx)
+              int gr_sparse_vec_div_scalar_fmpq(gr_sparse_vec_t dst, const gr_sparse_vec_t src, const fmpq_t c, gr_ctx_t ctx)
+              int gr_sparse_vec_divexact_scalar(gr_sparse_vec_t dst, const gr_sparse_vec_t src, gr_srcptr c, gr_ctx_t ctx)
+              int gr_sparse_vec_divexact_scalar_si(gr_sparse_vec_t dst, const gr_sparse_vec_t src, slong c, gr_ctx_t ctx)
+              int gr_sparse_vec_divexact_scalar_ui(gr_sparse_vec_t dst, const gr_sparse_vec_t src, ulong c, gr_ctx_t ctx)
+              int gr_sparse_vec_divexact_scalar_fmpz(gr_sparse_vec_t dst, const gr_sparse_vec_t src, const fmpz_t c, gr_ctx_t ctx)
+              int gr_sparse_vec_divexact_scalar_fmpq(gr_sparse_vec_t dst, const gr_sparse_vec_t src, const fmpq_t c, gr_ctx_t ctx)
 
-    Set *res* to be *src* multiplied or divided by *c*.
+    Set *dst* to be *src* multiplied or divided by *c*.
     (Addition and subtraction are not provided because they would create
     dense output.)
 
