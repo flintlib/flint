@@ -25,7 +25,7 @@ gr_csr_mat_is_neg_one(const gr_csr_mat_t mat, gr_ctx_t ctx)
     {
         for (idx = mat->rows[row]; idx < mat->rows[row+1]; idx++)
         {
-            this_eq = (mat->cols[idx] == row ? is_neg_one : is_zero)(GR_ENTRY(mat->entries, idx, sz), ctx);
+            this_eq = (mat->cols[idx] == row ? is_neg_one : is_zero)(GR_ENTRY(mat->nzs, idx, sz), ctx);
             if (this_eq == T_FALSE)
                 return T_FALSE;
             else
@@ -46,9 +46,9 @@ truth_t gr_lil_mat_is_neg_one(const gr_lil_mat_t mat, gr_ctx_t ctx)
     
     for (row = 0; row < mat->r; ++row)
     {
-        for (idx = 0; idx < mat->rows[row]->nnz; idx++)
+        for (idx = 0; idx < mat->rows[row].nnz; idx++)
         {
-            this_eq = (mat->rows[row]->inds[idx] == row ? is_neg_one : is_zero)(GR_ENTRY(mat->rows[row]->entries, idx, sz), ctx);
+            this_eq = (mat->rows[row].inds[idx] == row ? is_neg_one : is_zero)(GR_ENTRY(mat->rows[row].nzs, idx, sz), ctx);
             if (this_eq == T_FALSE)
                 return T_FALSE;
             else

@@ -11,41 +11,65 @@
 
 #include "gr_sparse_mat.h"
 
-int gr_mat_set_csr_mat(gr_mat_t res, const gr_csr_mat_t mat, gr_ctx_t ctx)
+int gr_mat_set_csr_mat(gr_mat_t dst, const gr_csr_mat_t src, gr_ctx_t ctx)
 {
     ulong row, nz;
-    int success = GR_SUCCESS;
+    int status = GR_SUCCESS;
     size_t sz = ctx->sizeof_elem;
 
-    if (res->r != mat->r || res->c != mat->c)
+    if (dst->r != src->r || dst->c != src->c)
         return GR_DOMAIN;
 
-    success |= gr_mat_zero(res, ctx);
-    for (row = 0; row < mat->r; ++row)
+    status |= gr_mat_zero(dst, ctx);
+    for (row = 0; row < src->r; ++row)
     {
-        for (nz = mat->rows[row]; nz < mat->rows[row + 1]; ++nz)
+        for (nz = src->rows[row]; nz < src->rows[row + 1]; ++nz)
         {
-            success |= gr_set(
-                GR_MAT_ENTRY(res, row, mat->cols[nz], sz), 
-                GR_ENTRY(mat->entries, nz, sz), 
+            status |= gr_set(
+                GR_MAT_ENTRY(dst, row, src->cols[nz], sz), 
+                GR_ENTRY(src->nzs, nz, sz), 
                 ctx
             );
         }
     }
-    return success;
+    return status;
 }
 
-int gr_mat_set_lil_mat(gr_mat_t res, const gr_lil_mat_t mat, gr_ctx_t ctx)
+int gr_mat_set_lil_mat(gr_mat_t dst, const gr_lil_mat_t src, gr_ctx_t ctx)
 {
     ulong row;
-    int success = GR_SUCCESS;
+    int status = GR_SUCCESS;
 
-    if (res->r != mat->r || res->c != mat->c)
+    if (dst->r != src->r || dst->c != src->c)
         return GR_DOMAIN;
 
-    for (row = 0; row < mat->r; ++row)
+    for (row = 0; row < src->r; ++row)
     {
-        success |= gr_vec_set_sparse_vec(res->rows[row], mat->rows[row], ctx);
+        status |= gr_vec_set_sparse_vec(dst->rows[row], &src->rows[row], ctx);
     }
-    return success;
+    return status;
+}
+
+int gr_mat_set_coo_mat(gr_mat_t dst, const gr_coo_mat_t src, gr_ctx_t ctx)
+{
+    ulong nz;
+    int status = GR_SUCCESS;
+    gr_ptr dst_entry;
+    gr_srcptr src_entry;
+    size_t sz = ctx->sizeof_elem;
+
+    if (dst->r != src->r || dst->c != src->c)
+        return GR_DOMAIN;
+
+    status |= gr_mat_zero(dst, ctx);
+    for (nz = 0; nz < src->nnz; ++nz)
+    {
+        dst_entry = GR_MAT_ENTRY(dst, src->rows[nz], src->cols[nz], sz);
+        src_entry = GR_ENTRY(src->nzs, nz, sz);
+        if (src->is_canonical)
+            status |= gr_set(dst_entry, src_entry, ctx);
+        else
+            status |= gr_add(dst_entry, dst_entry, src_entry, ctx);
+    }
+    return status;
 }

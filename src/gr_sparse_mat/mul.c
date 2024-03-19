@@ -87,7 +87,7 @@ int gr_lil_mat_mul_vec(gr_vec_t v, const gr_lil_mat_t A, const gr_vec_t u, gr_ct
     status |= _gr_vec_zero(v->entries, v->length, ctx);
     for (i = 0; i < ar; ++i) {
         res = gr_vec_entry_ptr(v, i, ctx);
-        status |= gr_sparse_vec_dot_vec(res, res, 0, A->rows[i], u, ctx);
+        status |= gr_sparse_vec_dot_vec(res, res, 0, &A->rows[i], u, ctx);
     }
 
     return status;

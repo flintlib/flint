@@ -17,21 +17,21 @@ gr_sparse_vec_equal(const gr_sparse_vec_t vec1, const gr_sparse_vec_t vec2, gr_c
         if (vec1->inds[i1] < vec2->inds[i2])
         {
             // In vector => either known or maybe nonzero
-            if (is_zero(GR_ENTRY(vec1->entries, i1, sz), ctx) == T_FALSE)
+            if (is_zero(GR_ENTRY(vec1->nzs, i1, sz), ctx) == T_FALSE)
                 return T_FALSE;
             else
                 ret = T_UNKNOWN; // Have maybe zero vs known zero
         }
         else if (vec1->inds[i1] > vec2->inds[i2])
         {
-            if (is_zero(GR_ENTRY(vec2->entries, i2, sz), ctx) == T_FALSE)
+            if (is_zero(GR_ENTRY(vec2->nzs, i2, sz), ctx) == T_FALSE)
                 return T_FALSE;
             else
                 ret = T_UNKNOWN; // Have maybe zero vs known zero
         }
         else
         {
-            cur_test = gr_equal(GR_ENTRY(vec1->entries, i1, sz), GR_ENTRY(vec2->entries, i2, sz), ctx);
+            cur_test = gr_equal(GR_ENTRY(vec1->nzs, i1, sz), GR_ENTRY(vec2->nzs, i2, sz), ctx);
             if (cur_test == T_FALSE)
                 return T_FALSE;
             else if (cur_test == T_UNKNOWN)

@@ -1,7 +1,18 @@
+/*
+    Copyright (C) 2024 Kartik Venkatram and Alden Walker
+
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
+
 #include "gr_sparse_vec.h"
 
 int
-gr_sparse_vec_slice(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong col_start, slong col_end, gr_ctx_t ctx)
+gr_sparse_vec_slice(gr_sparse_vec_t dst, const gr_sparse_vec_t src, slong col_start, slong col_end, gr_ctx_t ctx)
 {
     slong sz,i,nnz, new_nnz, i_start, i_end, status;
     nnz = src->nnz;
@@ -27,15 +38,15 @@ gr_sparse_vec_slice(gr_sparse_vec_t res, const gr_sparse_vec_t src, slong col_st
             break;
         }
     }
-    /* We are messing with the internals of res; this should be ok even if it is also src */
+    /* We are messing with the internals of dst; this should be ok even if it is also src */
     new_nnz = i_end - i_start;
-    res->length = col_end - col_start;
-    gr_sparse_vec_fit_nnz(res, new_nnz, ctx);
+    dst->length = col_end - col_start;
+    gr_sparse_vec_fit_nnz(dst, new_nnz, ctx);
     for (i = i_start; i < i_end; i++)
     {
-        res->inds[i-i_start] = res->inds[i] - col_start;
-        status |= gr_set(GR_ENTRY(res->entries, i-i_start, sz), GR_ENTRY(src->entries, i, sz), ctx);
+        dst->inds[i-i_start] = dst->inds[i] - col_start;
+        status |= gr_set(GR_ENTRY(dst->nzs, i-i_start, sz), GR_ENTRY(src->nzs, i, sz), ctx);
     }
-    res->nnz = new_nnz;
+    dst->nnz = new_nnz;
     return status;
 }

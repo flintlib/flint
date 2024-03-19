@@ -27,7 +27,7 @@ gr_sparse_vec_set_entry(gr_sparse_vec_t vec, slong col, gr_srcptr entry, gr_ctx_
             memmove(vec->inds + i, vec->inds + i + 1, (vec->nnz - i - 1)*sizeof(slong));
             for (j = i; j < vec->nnz; j++)
             {
-                gr_swap(GR_ENTRY(vec->entries, j, sz), GR_ENTRY(vec->entries, j + 1, sz), ctx);
+                gr_swap(GR_ENTRY(vec->nzs, j, sz), GR_ENTRY(vec->nzs, j + 1, sz), ctx);
             }                        
             --vec->nnz;
             return GR_SUCCESS;
@@ -52,10 +52,10 @@ gr_sparse_vec_set_entry(gr_sparse_vec_t vec, slong col, gr_srcptr entry, gr_ctx_
         memmove(vec->inds + i + 1, vec->inds + i, (vec->nnz - i)*sizeof(slong));
         for (j = vec->nnz; j > i; j--)
         {
-            gr_swap(GR_ENTRY(vec->entries, j-1, sz), GR_ENTRY(vec->entries, j, sz), ctx);
+            gr_swap(GR_ENTRY(vec->nzs, j-1, sz), GR_ENTRY(vec->nzs, j, sz), ctx);
         }
         vec->inds[i] = col;
         ++vec->nnz;
     }
-    return gr_set(GR_ENTRY(vec->entries, i, sz), entry, ctx);
+    return gr_set(GR_ENTRY(vec->nzs, i, sz), entry, ctx);
 }

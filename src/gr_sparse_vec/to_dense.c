@@ -14,7 +14,7 @@ gr_vec_set_sparse_vec(gr_ptr vec, gr_sparse_vec_t src, gr_ctx_t ctx)
         /* if i is the column of the next nonzero in src, copy it in */
         if (j < nnz && i == src->inds[j])
         {
-            status |= gr_set(GR_ENTRY(vec, i, sz), GR_ENTRY(src->entries, j, sz), ctx);
+            status |= gr_set(GR_ENTRY(vec, i, sz), GR_ENTRY(src->nzs, j, sz), ctx);
             j++;
         }
         else

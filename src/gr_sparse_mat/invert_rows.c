@@ -39,7 +39,7 @@ int gr_csr_mat_invert_rows(gr_csr_mat_t mat, slong * perm, gr_ctx_t ctx)
     {
         k = nnz - j - 1;
         FLINT_SWAP(ulong, mat->cols[j], mat->cols[k]);
-        gr_swap(GR_ENTRY(mat->entries, j, sz), GR_ENTRY(mat->entries, k, sz), ctx);
+        gr_swap(GR_ENTRY(mat->nzs, j, sz), GR_ENTRY(mat->nzs, k, sz), ctx);
     }
 
     // Reverse columns and elements in each row
@@ -51,7 +51,7 @@ int gr_csr_mat_invert_rows(gr_csr_mat_t mat, slong * perm, gr_ctx_t ctx)
         {
             k = mat->rows[i+1] - j - 1;
             FLINT_SWAP(ulong, mat->cols[j], mat->cols[k]);
-            gr_swap(GR_ENTRY(mat->entries, j, sz), GR_ENTRY(mat->entries, k, sz), ctx);
+            gr_swap(GR_ENTRY(mat->nzs, j, sz), GR_ENTRY(mat->nzs, k, sz), ctx);
         }
     }
     return status;

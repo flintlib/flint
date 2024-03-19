@@ -1,9 +1,18 @@
+/*
+    Copyright (C) 2024 Kartik Venkatram and Alden Walker
+
+    This file is part of FLINT.
+
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 2.1 of the License, or
+    (at your option) any later version.  See <http://www.gnu.org/licenses/>.
+*/
+
 #include "test_helpers.h"
 #include "gr_sparse_vec.h"
 
 #define CHECK_TEST(x, name) { if (GR_SUCCESS != (x)) { flint_printf("FAIL %s\n", (name)); flint_abort(); } }
-
-
 
 int
 test_conversion(flint_rand_t state, gr_ctx_t ctx)
@@ -13,11 +22,13 @@ test_conversion(flint_rand_t state, gr_ctx_t ctx)
     slong n_tests = 20;
     slong sz = ctx->sizeof_elem;
     int status = GR_SUCCESS;
-    gr_sparse_vec_t vec;
+    gr_sparse_vec_t vec, vec2;
     gr_vec_t dvec, dvec2;
+
     gr_vec_init(dvec, N, ctx);
     gr_vec_init(dvec2, N, ctx);
     gr_sparse_vec_init(vec, N, ctx);
+    gr_sparse_vec_init(vec2, N, ctx);
 
     for (i = 0; i < n_tests; i++)
     {

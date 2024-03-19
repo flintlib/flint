@@ -19,7 +19,7 @@ gr_sparse_vec_set_vec(gr_sparse_vec_t vec, gr_srcptr src, slong len, gr_ctx_t ct
         if (T_FALSE == gr_is_zero(GR_ENTRY(src, i, sz), ctx))
         {
             vec->inds[nnz] = i;
-            status |= gr_set(GR_ENTRY(vec->entries, nnz, sz), GR_ENTRY(src, i, sz), ctx);
+            status |= gr_set(GR_ENTRY(vec->nzs, nnz, sz), GR_ENTRY(src, i, sz), ctx);
             nnz++;
         }
     }

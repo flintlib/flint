@@ -43,7 +43,7 @@ gr_sparse_vec_permute_inds(gr_sparse_vec_t vec, const gr_sparse_vec_t src, slong
     for (i = 0; i < nnz; i++)
     {
         vec->inds[i] = si[i].col;
-        status |= gr_set(GR_ENTRY(vec->entries, i, sz), GR_ENTRY(src->entries, si[i].i, sz), ctx);
+        status |= gr_set(GR_ENTRY(vec->nzs, i, sz), GR_ENTRY(src->nzs, si[i].i, sz), ctx);
     }
     flint_free(si);
     return status;

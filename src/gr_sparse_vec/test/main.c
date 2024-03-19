@@ -3,15 +3,17 @@
 
 /* Include functions *********************************************************/
 
-#include "t-creation.c"
+#include "t-init.c"
 #include "t-conversion.c"
+#include "t-randtest.c"
 
 /* Array of test functions ***************************************************/
 
 test_struct tests[] =
 {
-    TEST_FUNCTION(gr_sparse_vec_creation),
+    TEST_FUNCTION(gr_sparse_vec_init),
     TEST_FUNCTION(gr_sparse_vec_conversion),
+    TEST_FUNCTION(gr_sparse_vec_randtest),
 };
 
 /* main function *************************************************************/

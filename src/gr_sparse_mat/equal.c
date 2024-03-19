@@ -49,7 +49,7 @@ gr_lil_mat_equal(const gr_lil_mat_t mat1, const gr_lil_mat_t mat2, gr_ctx_t ctx)
     }
     for (row = 0; row < mat1->r; row++)
     {
-        row_is_eq = gr_sparse_vec_equal(mat1->rows[row], mat2->rows[row], ctx);
+        row_is_eq = gr_sparse_vec_equal(&mat1->rows[row], &mat2->rows[row], ctx);
         if (row_is_eq == T_FALSE)
             return T_FALSE;
         else if (row_is_eq == T_UNKNOWN)
@@ -73,7 +73,7 @@ gr_csr_mat_equal_lil_mat(const gr_csr_mat_t mat1, const gr_lil_mat_t mat2, gr_ct
     for (row = 0; row < mat1->r; row++)
     {
         _gr_csr_mat_borrow_row(tmp, mat1, row, ctx);
-        row_is_eq = gr_sparse_vec_equal(tmp, mat2->rows[row], ctx);
+        row_is_eq = gr_sparse_vec_equal(tmp, &mat2->rows[row], ctx);
         if (row_is_eq == T_FALSE)
             return T_FALSE;
         else if (row_is_eq == T_UNKNOWN)
