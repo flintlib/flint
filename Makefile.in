@@ -433,6 +433,9 @@ endif
 $(BUILD_DIRS) $(INSTALL_DIRS):
 	$(MKDIR_P) $@
 
+$(BUILD_DIR)/include: $(HEADERS)
+	$(MKDIR_P) $@/flint && $(CP) $(HEADERS) $@/flint
+
 ################################################################################
 # inclusions
 ################################################################################
@@ -685,13 +688,13 @@ endif
 $(foreach dir, $(DIRS), $(eval $(call xxx_TUNES_rule,$(dir))))
 
 ifeq ($(SHARED), 0)
-$(BUILD_DIR)/examples/%$(EXEEXT): $(FLINT_DIR)/examples/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/examples
+$(BUILD_DIR)/examples/%$(EXEEXT): $(FLINT_DIR)/examples/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/examples $(BUILD_DIR)/include
 	@echo "  CC  $(<:$(SRC_DIR)/%=%)"
-	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
+	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS) -I$(BUILD_DIR)/include
 else
-$(BUILD_DIR)/examples/%$(EXEEXT): $(FLINT_DIR)/examples/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/examples
+$(BUILD_DIR)/examples/%$(EXEEXT): $(FLINT_DIR)/examples/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/examples $(BUILD_DIR)/include
 	@echo "  CC  $(<:$(SRC_DIR)/%=%)"
-	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
+	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS) -I$(BUILD_DIR)/include
 endif
 
 ################################################################################
