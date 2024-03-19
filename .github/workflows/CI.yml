@@ -33,8 +33,9 @@ jobs:
     steps:
       - name: "Rescale multiplier"
         run: |
-          echo "FLINT_TEST_MULTIPLIER=$((${FLINT_TEST_MULTIPLIER} * ${GLOBAL_MULTIPLIER}))"
-          echo "FLINT_TEST_MULTIPLIER=$((${FLINT_TEST_MULTIPLIER} * ${GLOBAL_MULTIPLIER}))" >> $GITHUB_ENV
+          FLINT_TEST_MULTIPLIER=$(echo "${FLINT_TEST_MULTIPLIER} * ${GLOBAL_MULTIPLIER}" | bc)
+          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}"
+          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}" >> $GITHUB_ENV
 
       - uses: actions/checkout@v4
 
@@ -120,8 +121,9 @@ jobs:
     steps:
       - name: "Rescale multiplier"
         run: |
-          echo "FLINT_TEST_MULTIPLIER=$((${FLINT_TEST_MULTIPLIER} * ${GLOBAL_MULTIPLIER}))"
-          echo "FLINT_TEST_MULTIPLIER=$((${FLINT_TEST_MULTIPLIER} * ${GLOBAL_MULTIPLIER}))" >> $GITHUB_ENV
+          FLINT_TEST_MULTIPLIER=$(echo "${FLINT_TEST_MULTIPLIER} * ${GLOBAL_MULTIPLIER}" | bc)
+          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}"
+          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}" >> $GITHUB_ENV
 
       - uses: actions/checkout@v4
 
@@ -173,8 +175,9 @@ jobs:
     steps:
       - name: "Rescale multiplier"
         run: |
-          echo "FLINT_TEST_MULTIPLIER=$((${FLINT_TEST_MULTIPLIER} * ${GLOBAL_MULTIPLIER}))"
-          echo "FLINT_TEST_MULTIPLIER=$((${FLINT_TEST_MULTIPLIER} * ${GLOBAL_MULTIPLIER}))" >> $GITHUB_ENV
+          FLINT_TEST_MULTIPLIER=$(echo "${FLINT_TEST_MULTIPLIER} * ${GLOBAL_MULTIPLIER}" | bc)
+          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}"
+          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}" >> $GITHUB_ENV
 
       - uses: actions/checkout@v4
 
@@ -231,8 +234,9 @@ jobs:
     steps:
       - name: "Rescale multiplier"
         run: |
-          echo "FLINT_TEST_MULTIPLIER=$((${FLINT_TEST_MULTIPLIER} * ${GLOBAL_MULTIPLIER}))"
-          echo "FLINT_TEST_MULTIPLIER=$((${FLINT_TEST_MULTIPLIER} * ${GLOBAL_MULTIPLIER}))" >> $GITHUB_ENV
+          FLINT_TEST_MULTIPLIER=$(echo "${FLINT_TEST_MULTIPLIER} * ${GLOBAL_MULTIPLIER}" | bc)
+          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}"
+          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}" >> $GITHUB_ENV
 
       - uses: actions/checkout@v4
 
@@ -292,8 +296,9 @@ jobs:
     steps:
       - name: "Rescale multiplier"
         run: |
-          echo "FLINT_TEST_MULTIPLIER=$((${FLINT_TEST_MULTIPLIER} * ${GLOBAL_MULTIPLIER}))"
-          echo "FLINT_TEST_MULTIPLIER=$((${FLINT_TEST_MULTIPLIER} * ${GLOBAL_MULTIPLIER}))" >> $GITHUB_ENV
+          FLINT_TEST_MULTIPLIER=$(echo "${FLINT_TEST_MULTIPLIER} * ${GLOBAL_MULTIPLIER}" | bc)
+          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}"
+          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}" >> $GITHUB_ENV
 
       - uses: actions/checkout@v4
 
@@ -359,8 +364,9 @@ jobs:
     steps:
       - name: "Rescale multiplier"
         run: |
-          echo "FLINT_TEST_MULTIPLIER=$((${FLINT_TEST_MULTIPLIER} * ${GLOBAL_MULTIPLIER}))"
-          echo "FLINT_TEST_MULTIPLIER=$((${FLINT_TEST_MULTIPLIER} * ${GLOBAL_MULTIPLIER}))" >> $GITHUB_ENV
+          FLINT_TEST_MULTIPLIER=$(echo "${FLINT_TEST_MULTIPLIER} * ${GLOBAL_MULTIPLIER}" | bc)
+          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}"
+          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}" >> $GITHUB_ENV
 
       - uses: actions/checkout@v4
 
@@ -482,8 +488,9 @@ jobs:
     steps:
       - name: "Rescale multiplier"
         run: |
-          echo "FLINT_TEST_MULTIPLIER=$((${FLINT_TEST_MULTIPLIER} * ${GLOBAL_MULTIPLIER}))"
-          echo "FLINT_TEST_MULTIPLIER=$((${FLINT_TEST_MULTIPLIER} * ${GLOBAL_MULTIPLIER}))" >> $GITHUB_ENV
+          FLINT_TEST_MULTIPLIER=$(echo "${FLINT_TEST_MULTIPLIER} * ${GLOBAL_MULTIPLIER}" | bc)
+          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}"
+          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}" >> $GITHUB_ENV
 
       - uses: actions/checkout@v4
 
