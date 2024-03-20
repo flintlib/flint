@@ -233,8 +233,8 @@ slong _gr_sparse_vec_count_unique_inds(const ulong *inds0, slong nnz0, const ulo
     a_nz_idx = a_nnz-1;                                                                                    \
     b_nz_idx = b_nnz-1;                                                                                    \
     dest_nz_idx = new_nnz-1;                                                                               \
-    while (a_nz_idx >= -1 && b_nz_idx >= -1 && status == GR_SUCCESS)                                            \
-    {                                                                                                      \               
+    while (a_nz_idx >= -1 && b_nz_idx >= -1 && status == GR_SUCCESS)                                       \
+    {                                                                                                      \
         if (a_nz_idx == -1 && b_nz_idx == -1) break;                                                       \
         a_ind = (A_VEC)->inds[a_nz_idx];                                                                   \
         b_ind = (B_VEC)->inds[b_nz_idx];                                                                   \
@@ -380,7 +380,7 @@ gr_sparse_vec_sub_other(gr_sparse_vec_t dst, const gr_sparse_vec_t src1, const g
 {
     GR_SPV_RFL_TEMPLATE(
         GR_SPV_RFL_UOP(gr_set, dst, dest_nz_idx, src1, a_nz_idx),
-        GR_SPV_RFL_UOP_OTHER(gr_neg_other, dst, dest_nz_idx, src2, a_nz_idx, ctx2),
+        GR_SPV_RFL_UOP_OTHER(gr_neg_other, dst, dest_nz_idx, src2, b_nz_idx, ctx2),
         GR_SPV_RFL_BOP_OTHER(gr_sub_other, dst, dest_nz_idx, src1, a_nz_idx, src2, b_nz_idx, ctx2),
         dst, src1, src2, ctx
     );

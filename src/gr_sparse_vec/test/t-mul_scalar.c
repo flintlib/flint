@@ -48,43 +48,70 @@ int
 
 test_accum_mul_scalar(flint_rand_t state, gr_ctx_t ctx)
 {
-    slong i, j, k, l, c;
+    slong i, j, k, l, m, c;
     slong N = 20;
     slong n_tests = 20;
-    int status = GR_SUCCESS;
+    int status;
     slong sz = ctx->sizeof_elem;
-    gr_sparse_vec_t vec, vec2;
-    gr_ptr dvec, dvec2, dvec3;
+    gr_sparse_vec_t vec, vec2, vec3;
+    gr_ptr dvec, dvec2, dvec3, dvec4;
     gr_ptr temp;
+    gr_ctx_t ctx2;
     truth_t eq;
 
+    gr_ctx_init_fmpz(ctx2);
     GR_TMP_INIT(temp, ctx);
     dvec = flint_malloc(N * sz);
     dvec2 = flint_malloc(N * sz);
     dvec3 = flint_malloc(N * sz);
+    dvec4 = flint_malloc(N * ctx2->sizeof_elem);
     _gr_vec_init(dvec, N, ctx);
     _gr_vec_init(dvec2, N, ctx);
     _gr_vec_init(dvec3, N, ctx);
+    _gr_vec_init(dvec4, N, ctx2);
     gr_sparse_vec_init(vec, N, ctx);
     gr_sparse_vec_init(vec2, N, ctx);
+    gr_sparse_vec_init(vec3, N, ctx2);
 
-    for (i = 0; i < 8 * n_tests; i++)
+    for (i = 0; i < 36 * n_tests; i++)
     {
-        j = i % 2; // Which type of scalar
-        k = (i / 2) % 2; // Into sparse or dense
-        l = (i / 4) % 2; // Add or subtract
-        status |= gr_sparse_vec_randtest(vec, 10, 0, state, ctx);
+        status = GR_SUCCESS;
+        //flint_printf("%d\n", i);
+        j = i % 3; // Which type of scalar
+        k = (i / 3) % 2; // Into sparse or dense
+        l = (i / 6) % 2; // Add or subtract
+        m = (i / 12) % 3; // For plain add/subtract, also check other ctx usage
+        if ((j > 0 || k > 0) && m > 0) continue;
 
+        //flint_printf("Setting up vectors\n");        
+        //flint_printf("\tRandomizing vec\n");        
+        status |= gr_sparse_vec_randtest(vec, 10, 0, state, ctx);
         if (k == 0)
         {
+            //flint_printf("\tCopying vec into dvec\n");        
             status |= gr_vec_set_sparse_vec(dvec, vec, ctx);
-            status |= gr_sparse_vec_randtest(vec2, 10, 0, state, ctx);
-            status |= gr_vec_set_sparse_vec(dvec2, vec2, ctx);
+            if (m > 0)
+            {
+                //flint_printf("\tRandomizing vec3\n");        
+                status |= gr_sparse_vec_randtest(vec3, 10, 0, state, ctx2);
+                //flint_printf("\tCopying vec3 into dvec4\n");        
+                status |= gr_vec_set_sparse_vec(dvec4, vec3, ctx2);
+            }
+            else
+            {
+                //flint_printf("\tRandomizing vec2\n");        
+                status |= gr_sparse_vec_randtest(vec2, 10, 0, state, ctx);
+                //flint_printf("\tCopying vec2 into dvec2\n");        
+                status |= gr_vec_set_sparse_vec(dvec2, vec2, ctx);
+            }
         }
         else
         {
+            //flint_printf("\tRandomizing dvec\n");        
             status |= _gr_vec_randtest(dvec, state, N, ctx);
+            //flint_printf("\tCopying dvec into dvec2\n");        
             status |= _gr_vec_set(dvec2, dvec, N, ctx);
+            //flint_printf("\tCopying vec into dvec3\n");        
             status |= gr_vec_set_sparse_vec(dvec3, vec, ctx);
         }
         //flint_printf("\nBefore:\n");
@@ -93,26 +120,88 @@ test_accum_mul_scalar(flint_rand_t state, gr_ctx_t ctx)
         //flint_printf("\ndvec = "); _gr_vec_print(dvec, N, ctx); flint_printf("\n");
         //flint_printf("\ndvec2 = "); _gr_vec_print(dvec2, N, ctx); flint_printf("\n");
 
+        //flint_printf("Doing op\n");        
         switch(j)
         {
         case 0: 
+            // Scalar = 1 => add or sub
+            if (k == 0)
+            {
+                if (m == 0)
+                {
+                    if (l == 0)
+                    {
+                        status |= gr_sparse_vec_add(vec, vec, vec2, ctx);
+                        status |= _gr_vec_add(dvec, dvec, dvec2, N, ctx);
+                    }
+                    else
+                    {
+                        status |= gr_sparse_vec_sub(vec, vec, vec2, ctx);
+                        status |= _gr_vec_sub(dvec, dvec, dvec2, N, ctx);
+                    }
+                }
+                else if (m == 1)
+                {
+                    if (l == 0)
+                    {
+                        status |= gr_sparse_vec_add_other(vec, vec, vec3, ctx2, ctx);
+                        status |= _gr_vec_add_other(dvec, dvec, dvec4, ctx2, N, ctx);
+                    }
+                    else
+                    {
+                        status |= gr_sparse_vec_sub_other(vec, vec, vec3, ctx2, ctx);
+                        status |= _gr_vec_sub_other(dvec, dvec, dvec4, ctx2, N, ctx);
+                    }
+                }
+                else
+                {
+                    if (l == 0)
+                    {
+                        status |= gr_other_add_sparse_vec(vec, vec3, ctx2, vec, ctx);
+                        status |= _gr_other_add_vec(dvec, dvec4, ctx2, dvec, N, ctx);
+                    }
+                    else
+                    {
+                        status |= gr_other_sub_sparse_vec(vec, vec3, ctx2, vec, ctx);
+                        status |= _gr_other_sub_vec(dvec, dvec4, ctx2, dvec, N, ctx);
+                    }
+                }
+            }
+            else
+            {
+                if (l == 0) 
+                {
+                    status |= gr_vec_add_sparse_vec(dvec, dvec, vec, ctx);
+                    status |= _gr_vec_add(dvec2, dvec2, dvec3, N, ctx);
+                }
+                else
+                {
+                    status |= gr_vec_sub_sparse_vec(dvec, dvec, vec, ctx);
+                    status |= _gr_vec_sub(dvec2, dvec2, dvec3, N, ctx);
+                }
+            }
+            break;
+        case 1: 
             status |= gr_randtest_not_zero(temp, state, ctx);
             //flint_printf("\nc = "); gr_println(temp, ctx); flint_printf("\n");
             TEST_ACCUM_MUL_SCALAR(status, k, l, scalar, vec, vec2, dvec, dvec2, dvec3, temp, ctx)
             break;
-        case 1:
+        case 2:
             //flint_printf("Testing scalar_si\n");
             c = n_randint(state, 0);
             TEST_ACCUM_MUL_SCALAR(status, k, l, scalar_si, vec, vec2, dvec, dvec2, dvec3, c, ctx)
             break;
         }
+        //flint_printf("Checking\n");        
         //flint_printf("\nAfter:\n");
         //flint_printf("\nvec = "); gr_sparse_vec_print_nz(vec, ctx); flint_printf("\n");
-        gr_sparse_vec_set_vec(vec2, dvec, N, ctx);
+        //status |= gr_sparse_vec_set_vec(vec2, dvec, N, ctx);
         //flint_printf("\nvec2 = "); gr_sparse_vec_print_nz(vec2, ctx); flint_printf("\n");
         //flint_printf("\ndvec = "); _gr_vec_print(dvec, N, ctx); flint_printf("\n");
         //flint_printf("\ndvec2 = "); _gr_vec_print(dvec2, N, ctx); flint_printf("\n");
- 
+        if (status == GR_UNABLE)
+            continue;
+
 
         if (k == 0)
             status |= gr_vec_set_sparse_vec(dvec2, vec, ctx);
@@ -120,8 +209,8 @@ test_accum_mul_scalar(flint_rand_t state, gr_ctx_t ctx)
         if (eq == T_FALSE || status != GR_SUCCESS)
         {
             flint_printf(
-                "\ni = %d, j = %d, k = %d, l = %d, equal = %d, status = %d\n",
-                i, j, k, l, eq, status
+                "\ni = %d, j = %d, k = %d, l = %d, m = %d, equal = %d, status = %d\n",
+                i, j, k, l, m, eq, status
             );
             gr_ctx_println(ctx);
             flint_printf("dvec = "); _gr_vec_print(dvec, N, ctx); flint_printf("\n");
@@ -132,13 +221,17 @@ test_accum_mul_scalar(flint_rand_t state, gr_ctx_t ctx)
 
     gr_sparse_vec_clear(vec, ctx);
     gr_sparse_vec_clear(vec2, ctx);
+    gr_sparse_vec_clear(vec3, ctx2);
     _gr_vec_clear(dvec, N, ctx);
     _gr_vec_clear(dvec2, N, ctx);
     _gr_vec_clear(dvec3, N, ctx);
+    _gr_vec_clear(dvec4, N, ctx2);
     flint_free(dvec);
     flint_free(dvec2);
     flint_free(dvec3);
+    flint_free(dvec4);
     GR_TMP_CLEAR(temp, ctx);
+    gr_ctx_clear(ctx2);
     return status;
 }
 
@@ -168,7 +261,7 @@ test_mul_div_scalar(flint_rand_t state, gr_ctx_t ctx)
     ulong uc;
     slong N = 100;
     slong n_tests = 20;
-    int status = GR_SUCCESS;
+    int status;
     slong sz = ctx->sizeof_elem;
     gr_sparse_vec_t vec, vec2;
     gr_ptr dvec, dvec2;
@@ -244,6 +337,12 @@ test_mul_div_scalar(flint_rand_t state, gr_ctx_t ctx)
                 }
             }
             break;
+        }
+        // If any operation not allowed, just skip test
+        if (status == GR_UNABLE)
+        {
+            status = GR_SUCCESS;
+            continue;
         }
         //gr_sparse_vec_print_nz(vec, ctx); flint_printf("\n");
         //gr_sparse_vec_print_nz(vec2, ctx); flint_printf("\n");
