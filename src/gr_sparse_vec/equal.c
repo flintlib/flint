@@ -21,6 +21,7 @@ gr_sparse_vec_equal(const gr_sparse_vec_t vec1, const gr_sparse_vec_t vec2, gr_c
                 return T_FALSE;
             else
                 ret = T_UNKNOWN; // Have maybe zero vs known zero
+            i1++;
         }
         else if (vec1->inds[i1] > vec2->inds[i2])
         {
@@ -28,6 +29,7 @@ gr_sparse_vec_equal(const gr_sparse_vec_t vec1, const gr_sparse_vec_t vec2, gr_c
                 return T_FALSE;
             else
                 ret = T_UNKNOWN; // Have maybe zero vs known zero
+            i2++;
         }
         else
         {
@@ -36,6 +38,7 @@ gr_sparse_vec_equal(const gr_sparse_vec_t vec1, const gr_sparse_vec_t vec2, gr_c
                 return T_FALSE;
             else if (cur_test == T_UNKNOWN)
                 ret = T_UNKNOWN;
+            i1++; i2++;
         }
     }
     

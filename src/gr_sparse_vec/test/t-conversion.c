@@ -30,24 +30,48 @@ test_conversion(flint_rand_t state, gr_ctx_t ctx)
     gr_sparse_vec_init(vec, N, ctx);
     gr_sparse_vec_init(vec2, N, ctx);
 
+    //flint_printf("Testing copy\n");
+    for (i = 0; i < n_tests; i++)
+    {
+        status |= gr_sparse_vec_randtest(vec, 10, 0, state, ctx);
+        status |= gr_sparse_vec_set(vec2, vec, ctx);
+        if (T_FALSE == gr_sparse_vec_equal(vec, vec2, ctx))
+        {
+            gr_sparse_vec_print_nz(vec, ctx); flint_printf("\n");
+            gr_sparse_vec_print_nz(vec2, ctx); flint_printf("\n");
+            return GR_TEST_FAIL;
+        }
+    }
+
+    //flint_printf("Testing from/to dense vec\n");
     for (i = 0; i < n_tests; i++)
     {
         status |= _gr_vec_randtest(GR_VEC_ENTRY(dvec, 0, sz), state, N, ctx);
         status |= gr_sparse_vec_set_vec(vec, GR_VEC_ENTRY(dvec, 0, sz), N, ctx);
         status |= gr_vec_set_sparse_vec(GR_VEC_ENTRY(dvec2, 0, sz), vec, ctx);
-        if (T_TRUE != _gr_vec_equal(GR_VEC_ENTRY(dvec, 0, sz), GR_VEC_ENTRY(dvec2, 0, sz), N, ctx))
+        if (T_FALSE == _gr_vec_equal(GR_VEC_ENTRY(dvec, 0, sz), GR_VEC_ENTRY(dvec2, 0, sz), N, ctx))
+        {
+            gr_vec_print(dvec, ctx); flint_printf("\n");
+            gr_vec_print(dvec2, ctx); flint_printf("\n");
             return GR_TEST_FAIL;
+        }
     }
 
+    //flint_printf("Testing from/to sparse vec\n");
     for (i = 0; i < n_tests; i++)
     {
         status |= gr_sparse_vec_randtest(vec, 10, 0, state, ctx);
         status |= gr_vec_set_sparse_vec(GR_VEC_ENTRY(dvec, 0, sz), vec, ctx);
         status |= gr_sparse_vec_set_vec(vec2, GR_VEC_ENTRY(dvec, 0, sz), N, ctx);
-        if (T_TRUE != gr_sparse_vec_equal(vec, vec2, ctx))
+        if (T_FALSE == gr_sparse_vec_equal(vec, vec2, ctx))
+        {
+            gr_sparse_vec_print_nz(vec, ctx); flint_printf("\n");
+            gr_sparse_vec_print_nz(vec2, ctx); flint_printf("\n");
             return GR_TEST_FAIL;
+        }
     }
     gr_sparse_vec_clear(vec, ctx);
+    gr_sparse_vec_clear(vec2, ctx);
     gr_vec_clear(dvec, ctx);
     gr_vec_clear(dvec2, ctx);
     return status;
@@ -59,7 +83,15 @@ TEST_FUNCTION_START(gr_sparse_vec_conversion, state)
     gr_ctx_t ctx;
     for (i = 0; i < 16; ++i)
     {
-        gr_ctx_init_random(ctx, state);
+        while (1)
+        {
+            gr_ctx_init_random(ctx, state);
+            if (gr_ctx_is_zero_ring(ctx) == T_TRUE)
+                gr_ctx_clear(ctx);
+            else
+                break;
+        }
+        //gr_ctx_println(ctx);
         CHECK_TEST(test_conversion(state, ctx), "Conversion from and to dense");
         gr_ctx_clear(ctx);
     }
