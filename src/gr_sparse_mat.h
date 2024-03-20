@@ -557,51 +557,9 @@ gr_lil_mat_update(gr_lil_mat_t dst, const gr_lil_mat_t src, gr_ctx_t ctx)
     return status;
 }
 
-
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int 
-gr_csr_mat_permute_cols(gr_csr_mat_t mat, slong * perm, gr_ctx_t ctx)
-{
-    slong row;
-    gr_sparse_vec_t tmp;
-    int status = GR_SUCCESS;
-
-    for (row = 0; row < mat->r; ++row)
-    {
-        _gr_csr_mat_borrow_row(tmp, mat, row, ctx);
-        status |= gr_sparse_vec_permute_inds(tmp, tmp, perm, ctx);
-    }
-    return status;
-}
-
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int 
-gr_lil_mat_permute_cols(gr_lil_mat_t mat, slong * perm, gr_ctx_t ctx)
-{
-    slong row;
-    int status = GR_SUCCESS;
-
-    for (row = 0; row < mat->r; ++row)
-    {
-        status |= gr_sparse_vec_permute_inds(&mat->rows[row], &mat->rows[row], perm, ctx);
-    }
-    return status;
-}
-
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int 
-gr_coo_mat_permute_cols(gr_coo_mat_t mat, slong * perm, gr_ctx_t ctx)
-{
-    slong nz_idx;
-    int status = GR_SUCCESS;
-
-    for (nz_idx = 0; nz_idx < mat->nnz; ++nz_idx)
-    {
-        mat->cols[nz_idx] = perm[mat->cols[nz_idx]];
-    }
-    if (mat->is_canonical)
-    {
-        gr_coo_mat_canonicalize(mat, ctx);
-    }
-    return status;
-}
+WARN_UNUSED_RESULT int gr_csr_mat_permute_cols(gr_csr_mat_t mat, slong * perm, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_lil_mat_permute_cols(gr_lil_mat_t mat, slong * perm, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_coo_mat_permute_cols(gr_coo_mat_t mat, slong * perm, gr_ctx_t ctx);
 
 void gr_lil_mat_window_init(gr_lil_mat_t window, const gr_lil_mat_t mat, slong r1, slong c1, slong r2, slong c2, gr_ctx_t ctx);
 
@@ -696,23 +654,12 @@ WARN_UNUSED_RESULT int gr_csr_mat_set_fmpq_csr_mat(gr_csr_mat_t res, const fmpq_
  * Output
 **/
 
-WARN_UNUSED_RESULT int 
-gr_csr_mat_write_nz(gr_stream_t out, const gr_csr_mat_t mat, gr_ctx_t ctx);
-
-WARN_UNUSED_RESULT int 
-gr_lil_mat_write_nz(gr_stream_t out, const gr_lil_mat_t mat, gr_ctx_t ctx);
-
-WARN_UNUSED_RESULT int 
-gr_coo_mat_write_nz(gr_stream_t out, const gr_coo_mat_t mat, gr_ctx_t ctx);
-
-WARN_UNUSED_RESULT int 
-gr_csr_mat_print_nz(const gr_csr_mat_t mat, gr_ctx_t ctx);
-
-WARN_UNUSED_RESULT int 
-gr_lil_mat_print_nz(const gr_lil_mat_t mat, gr_ctx_t ctx);
-
-WARN_UNUSED_RESULT int 
-gr_coo_mat_print_nz(const gr_coo_mat_t mat, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_csr_mat_write_nz(gr_stream_t out, const gr_csr_mat_t mat, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_lil_mat_write_nz(gr_stream_t out, const gr_lil_mat_t mat, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_coo_mat_write_nz(gr_stream_t out, const gr_coo_mat_t mat, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_csr_mat_print_nz(const gr_csr_mat_t mat, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_lil_mat_print_nz(const gr_lil_mat_t mat, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_coo_mat_print_nz(const gr_coo_mat_t mat, gr_ctx_t ctx);
 
 /**
  * Arithmetic
