@@ -62,7 +62,7 @@ jobs:
           else
             version=$(cat VERSION)
             if [ ${TAG_NAME} = "nightly" ] ; then
-              version=${version}-$(date +"%Y%M%d")
+              version=${version}-$(date +"%Y%m%d")
             fi
           fi
           echo "version=${version}"
@@ -158,8 +158,13 @@ jobs:
       TAG_NAME: ${{ needs.version_and_tag.outputs.tag_name }}
       GH_REPO: ${{ github.repository }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     permissions:
       contents: write
+
+    # so it only publishes releases on the main repository
+    if: github.repository == 'flintlib/flint'
+
     steps:
       - name: "Download archive from previous job"
         uses: actions/download-artifact@v3
