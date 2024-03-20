@@ -718,183 +718,54 @@ gr_coo_mat_print_nz(const gr_coo_mat_t mat, gr_ctx_t ctx);
  * Arithmetic
 **/
 
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int 
-gr_csr_mat_neg(gr_csr_mat_t dst, const gr_csr_mat_t src, gr_ctx_t ctx)
-{
-    int status = GR_SUCCESS;
+WARN_UNUSED_RESULT int gr_csr_mat_neg(gr_csr_mat_t dst, const gr_csr_mat_t src, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_lil_mat_neg(gr_lil_mat_t dst, const gr_lil_mat_t src, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_coo_mat_neg(gr_coo_mat_t dst, const gr_coo_mat_t src, gr_ctx_t ctx);
 
-    if (gr_mat_is_compatible(dst, src, ctx) == T_FALSE)
-    {
-        return GR_DOMAIN;
-    }
-    status |= gr_csr_mat_set(dst, src, ctx);
-    status |= _gr_vec_neg(dst->nzs, dst->nzs, dst->nnz, ctx);
-    return status;
-}
+WARN_UNUSED_RESULT int gr_lil_mat_add(gr_lil_mat_t dst, const gr_lil_mat_t mat1, const gr_lil_mat_t mat2, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_lil_mat_sub(gr_lil_mat_t dst, const gr_lil_mat_t mat1, const gr_lil_mat_t mat2, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_lil_mat_mul(gr_lil_mat_t dst, const gr_lil_mat_t mat1, const gr_lil_mat_t mat2, gr_ctx_t ctx);
 
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int 
-gr_lil_mat_neg(gr_lil_mat_t dst, const gr_lil_mat_t src, gr_ctx_t ctx)
-{
-    int row;
-    int status = GR_SUCCESS;
-
-    if (gr_mat_is_compatible(dst, src, ctx) == T_FALSE)
-    {
-        return GR_DOMAIN;
-    }
-    dst->nnz = src->nnz;
-    for (row = 0; row < dst->r; row++) {
-        status |= gr_sparse_vec_neg(&dst->rows[row], &src->rows[row], ctx);
-    }
-    return status;
-}
-
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int 
-gr_coo_mat_neg(gr_coo_mat_t dst, const gr_coo_mat_t src, gr_ctx_t ctx)
-{
-    int status = GR_SUCCESS;
-
-    if (gr_mat_is_compatible(dst, src, ctx) == T_FALSE)
-    {
-        return GR_DOMAIN;
-    }
-    status |= gr_coo_mat_set(dst, src, ctx);
-    status |= _gr_vec_neg(dst->nzs, dst->nzs, dst->nnz, ctx);
-    return status;
-}
-
-#define GR_LIL_MAT_BOP(FUNC, RES, MAT1, MAT2, CTX) { \
-    int row; \
-    int status = GR_SUCCESS; \
-                \
-    if (gr_mat_is_compatible(RES, MAT1, CTX) == T_FALSE || gr_mat_is_compatible(RES, MAT2, CTX) == T_FALSE) \
-    { \
-        return GR_DOMAIN; \
-    } \
-    (RES)->nnz = 0; \
-    for (row = 0; row < (RES)->r; row++) { \
-        status |= FUNC(&(RES)->rows[row], &(MAT1)->rows[row], &(MAT2)->rows[row], CTX); \
-        dst->nnz += dst->rows[row].nnz; \
-    } \
-    return status; \
-}
-
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int 
-gr_lil_mat_add(gr_lil_mat_t dst, const gr_lil_mat_t mat1, const gr_lil_mat_t mat2, gr_ctx_t ctx)
-{
-    GR_LIL_MAT_BOP(gr_sparse_vec_add, dst, mat1, mat2, ctx)
-}
-
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int 
-gr_lil_mat_sub(gr_lil_mat_t dst, const gr_lil_mat_t mat1, const gr_lil_mat_t mat2, gr_ctx_t ctx)
-{
-    GR_LIL_MAT_BOP(gr_sparse_vec_sub, dst, mat1, mat2, ctx)
-}
-
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int 
-gr_lil_mat_mul(gr_lil_mat_t dst, const gr_lil_mat_t mat1, const gr_lil_mat_t mat2, gr_ctx_t ctx)
-{
-    GR_LIL_MAT_BOP(gr_sparse_vec_mul, dst, mat1, mat2, ctx)
-}
-
-#define GR_LIL_MAT_ACCUM_OP(FUNC, RES, MAT, C, CTX) { \
-    int row; \
-    int status = GR_SUCCESS; \
-                \
-    if (gr_mat_is_compatible(RES, MAT, CTX) == T_FALSE) \
-    { \
-        return GR_DOMAIN; \
-    } \
-    (RES)->nnz = 0; \
-    for (row = 0; row < (RES)->r; row++) { \
-        status |= FUNC(&(RES)->rows[row], &(MAT)->rows[row], C, CTX); \
-        (RES)->nnz += (RES)->rows[row].nnz; \
-    } \
-    return status; \
-}
-
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_lil_mat_addmul_scalar(gr_lil_mat_t dst, const gr_lil_mat_t src, gr_srcptr c, gr_ctx_t ctx)
-{
-    GR_LIL_MAT_ACCUM_OP(gr_sparse_vec_addmul_scalar, dst, src, c, ctx)
-}
-
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_lil_mat_submul_scalar(gr_lil_mat_t dst, const gr_lil_mat_t src, gr_srcptr c, gr_ctx_t ctx)
-{
-    GR_LIL_MAT_ACCUM_OP(gr_sparse_vec_submul_scalar, dst, src, c, ctx)
-}
+WARN_UNUSED_RESULT int gr_lil_mat_addmul_scalar(gr_lil_mat_t dst, const gr_lil_mat_t src, gr_srcptr c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_lil_mat_submul_scalar(gr_lil_mat_t dst, const gr_lil_mat_t src, gr_srcptr c, gr_ctx_t ctx);
 
 /**
  * Component-wise multiplication and division
 **/
 
-#define GR_CSR_MAT_DENSE_VEC_OP(dense_vec_op, dst, src, c, ctx)     \
-    if(dst->r != src->r || dst->c != src->c)                           \
-    {                                                                  \
-        return GR_DOMAIN;                                              \
-    }                                                                  \
-    if(dst != src)                                                     \
-    {                                                                  \
-        gr_csr_mat_fit_nnz(dst, src->nnz, ctx);                     \
-        dst->nnz = src->nnz;                                           \
-        memcpy(dst->rows, src->rows, src->r*sizeof(ulong));          \
-        memcpy(dst->cols, src->cols, src->nnz*sizeof(ulong));          \
-    }                                                                  \
-    return dense_vec_op(dst->nzs, src->nzs, src->nnz, c, ctx); \
+WARN_UNUSED_RESULT int gr_csr_mat_mul_scalar(gr_csr_mat_t dst, const gr_csr_mat_t src, gr_srcptr c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_csr_mat_mul_scalar_si(gr_csr_mat_t dst, const gr_csr_mat_t src, slong c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_csr_mat_mul_scalar_ui(gr_csr_mat_t dst, const gr_csr_mat_t src, ulong c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_csr_mat_mul_scalar_fmpz(gr_csr_mat_t dst, const gr_csr_mat_t src, const fmpz_t c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_csr_mat_mul_scalar_fmpq(gr_csr_mat_t dst, const gr_csr_mat_t src, const fmpq_t c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_csr_mat_mul_scalar_2exp_si(gr_csr_mat_t dst, const gr_csr_mat_t src, slong c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_csr_mat_div_scalar(gr_csr_mat_t dst, const gr_csr_mat_t src, gr_srcptr c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_csr_mat_div_scalar_si(gr_csr_mat_t dst, const gr_csr_mat_t src, slong c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_csr_mat_div_scalar_ui(gr_csr_mat_t dst, const gr_csr_mat_t src, ulong c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_csr_mat_div_scalar_fmpz(gr_csr_mat_t dst, const gr_csr_mat_t src, const fmpz_t c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_csr_mat_div_scalar_fmpq(gr_csr_mat_t dst, const gr_csr_mat_t src, const fmpq_t c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_csr_mat_divexact_scalar(gr_csr_mat_t dst, const gr_csr_mat_t src, gr_srcptr c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_csr_mat_divexact_scalar_si(gr_csr_mat_t dst, const gr_csr_mat_t src, slong c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_csr_mat_divexact_scalar_ui(gr_csr_mat_t dst, const gr_csr_mat_t src, ulong c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_csr_mat_divexact_scalar_fmpz(gr_csr_mat_t dst, const gr_csr_mat_t src, const fmpz_t c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_csr_mat_divexact_scalar_fmpq(gr_csr_mat_t dst, const gr_csr_mat_t src, const fmpq_t c, gr_ctx_t ctx);
 
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_csr_mat_mul_scalar(gr_csr_mat_t dst, const gr_csr_mat_t src, gr_srcptr c, gr_ctx_t ctx) { GR_CSR_MAT_DENSE_VEC_OP(_gr_vec_mul_scalar, dst, src, c, ctx) } 
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_csr_mat_mul_scalar_si(gr_csr_mat_t dst, const gr_csr_mat_t src, slong c, gr_ctx_t ctx) { GR_CSR_MAT_DENSE_VEC_OP(_gr_vec_mul_scalar_si, dst, src, c, ctx) }
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_csr_mat_mul_scalar_ui(gr_csr_mat_t dst, const gr_csr_mat_t src, ulong c, gr_ctx_t ctx) { GR_CSR_MAT_DENSE_VEC_OP(_gr_vec_mul_scalar_ui, dst, src, c, ctx) }
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_csr_mat_mul_scalar_fmpz(gr_csr_mat_t dst, const gr_csr_mat_t src, const fmpz_t c, gr_ctx_t ctx) { GR_CSR_MAT_DENSE_VEC_OP(_gr_vec_mul_scalar_fmpz, dst, src, c, ctx) }
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_csr_mat_mul_scalar_fmpq(gr_csr_mat_t dst, const gr_csr_mat_t src, const fmpq_t c, gr_ctx_t ctx) { GR_CSR_MAT_DENSE_VEC_OP(_gr_vec_mul_scalar_fmpq, dst, src, c, ctx) }
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_csr_mat_mul_scalar_2exp_si(gr_csr_mat_t dst, const gr_csr_mat_t src, slong c, gr_ctx_t ctx) { GR_CSR_MAT_DENSE_VEC_OP(_gr_vec_mul_scalar_2exp_si, dst, src, c, ctx) }
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_csr_mat_div_scalar(gr_csr_mat_t dst, const gr_csr_mat_t src, gr_srcptr c, gr_ctx_t ctx) { GR_CSR_MAT_DENSE_VEC_OP(_gr_vec_div_scalar, dst, src, c, ctx) } 
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_csr_mat_div_scalar_si(gr_csr_mat_t dst, const gr_csr_mat_t src, slong c, gr_ctx_t ctx) { GR_CSR_MAT_DENSE_VEC_OP(_gr_vec_div_scalar_si, dst, src, c, ctx) }
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_csr_mat_div_scalar_ui(gr_csr_mat_t dst, const gr_csr_mat_t src, ulong c, gr_ctx_t ctx) { GR_CSR_MAT_DENSE_VEC_OP(_gr_vec_div_scalar_ui, dst, src, c, ctx) }
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_csr_mat_div_scalar_fmpz(gr_csr_mat_t dst, const gr_csr_mat_t src, const fmpz_t c, gr_ctx_t ctx) { GR_CSR_MAT_DENSE_VEC_OP(_gr_vec_div_scalar_fmpz, dst, src, c, ctx) }
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_csr_mat_div_scalar_fmpq(gr_csr_mat_t dst, const gr_csr_mat_t src, const fmpq_t c, gr_ctx_t ctx) { GR_CSR_MAT_DENSE_VEC_OP(_gr_vec_div_scalar_fmpq, dst, src, c, ctx) }
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_csr_mat_divexact_scalar(gr_csr_mat_t dst, const gr_csr_mat_t src, gr_srcptr c, gr_ctx_t ctx) { GR_CSR_MAT_DENSE_VEC_OP(_gr_vec_divexact_scalar, dst, src, c, ctx) } 
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_csr_mat_divexact_scalar_si(gr_csr_mat_t dst, const gr_csr_mat_t src, slong c, gr_ctx_t ctx) { GR_CSR_MAT_DENSE_VEC_OP(_gr_vec_divexact_scalar_si, dst, src, c, ctx) }
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_csr_mat_divexact_scalar_ui(gr_csr_mat_t dst, const gr_csr_mat_t src, ulong c, gr_ctx_t ctx) { GR_CSR_MAT_DENSE_VEC_OP(_gr_vec_divexact_scalar_ui, dst, src, c, ctx) }
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_csr_mat_divexact_scalar_fmpz(gr_csr_mat_t dst, const gr_csr_mat_t src, const fmpz_t c, gr_ctx_t ctx) { GR_CSR_MAT_DENSE_VEC_OP(_gr_vec_divexact_scalar_fmpz, dst, src, c, ctx) }
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_csr_mat_divexact_scalar_fmpq(gr_csr_mat_t dst, const gr_csr_mat_t src, const fmpq_t c, gr_ctx_t ctx) { GR_CSR_MAT_DENSE_VEC_OP(_gr_vec_divexact_scalar_fmpq, dst, src, c, ctx) }
-
-#define GR_LIL_MAT_DENSE_VEC_OP(dense_vec_op, dst, src, c, ctx)   {  \
-    int status = GR_SUCCESS;                                          \
-    int row;                                                           \
-    if(dst->r != src->r || dst->c != src->c)                           \
-    {                                                                  \
-        return GR_DOMAIN;                                              \
-    }                                                                  \
-    dst->nnz = src->nnz;                                               \
-    for (row = 0; row < src->r; ++row)                                  \
-    {                                                                  \
-        if(dst != src)                                                     \
-        {                                                                  \
-            gr_sparse_vec_fit_nnz(&dst->rows[row], src->rows[row].nnz, ctx);                     \
-            dst->rows[row].nnz = src->rows[row].nnz;                                           \
-            memcpy(dst->rows[row].inds, src->rows[row].inds, src->rows[row].nnz*sizeof(ulong));          \
-        }                                                                  \
-        status |= dense_vec_op(dst->rows[row].nzs, src->rows[row].nzs, src->rows[row].nnz, c, ctx); \
-    }                                                                  \
-    return status; \
-}
-
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_lil_mat_mul_scalar(gr_lil_mat_t dst, const gr_lil_mat_t src, gr_srcptr c, gr_ctx_t ctx) { GR_LIL_MAT_DENSE_VEC_OP(_gr_vec_mul_scalar, dst, src, c, ctx) } 
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_lil_mat_mul_scalar_si(gr_lil_mat_t dst, const gr_lil_mat_t src, slong c, gr_ctx_t ctx) { GR_LIL_MAT_DENSE_VEC_OP(_gr_vec_mul_scalar_si, dst, src, c, ctx) }
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_lil_mat_mul_scalar_ui(gr_lil_mat_t dst, const gr_lil_mat_t src, ulong c, gr_ctx_t ctx) { GR_LIL_MAT_DENSE_VEC_OP(_gr_vec_mul_scalar_ui, dst, src, c, ctx) }
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_lil_mat_mul_scalar_fmpz(gr_lil_mat_t dst, const gr_lil_mat_t src, const fmpz_t c, gr_ctx_t ctx) { GR_LIL_MAT_DENSE_VEC_OP(_gr_vec_mul_scalar_fmpz, dst, src, c, ctx) }
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_lil_mat_mul_scalar_fmpq(gr_lil_mat_t dst, const gr_lil_mat_t src, const fmpq_t c, gr_ctx_t ctx) { GR_LIL_MAT_DENSE_VEC_OP(_gr_vec_mul_scalar_fmpq, dst, src, c, ctx) }
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_lil_mat_mul_scalar_2exp_si(gr_lil_mat_t dst, const gr_lil_mat_t src, slong c, gr_ctx_t ctx) { GR_LIL_MAT_DENSE_VEC_OP(_gr_vec_mul_scalar_2exp_si, dst, src, c, ctx) }
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_lil_mat_div_scalar(gr_lil_mat_t dst, const gr_lil_mat_t src, gr_srcptr c, gr_ctx_t ctx) { GR_LIL_MAT_DENSE_VEC_OP(_gr_vec_div_scalar, dst, src, c, ctx) } 
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_lil_mat_div_scalar_si(gr_lil_mat_t dst, const gr_lil_mat_t src, slong c, gr_ctx_t ctx) { GR_LIL_MAT_DENSE_VEC_OP(_gr_vec_div_scalar_si, dst, src, c, ctx) }
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_lil_mat_div_scalar_ui(gr_lil_mat_t dst, const gr_lil_mat_t src, ulong c, gr_ctx_t ctx) { GR_LIL_MAT_DENSE_VEC_OP(_gr_vec_div_scalar_ui, dst, src, c, ctx) }
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_lil_mat_div_scalar_fmpz(gr_lil_mat_t dst, const gr_lil_mat_t src, const fmpz_t c, gr_ctx_t ctx) { GR_LIL_MAT_DENSE_VEC_OP(_gr_vec_div_scalar_fmpz, dst, src, c, ctx) }
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_lil_mat_div_scalar_fmpq(gr_lil_mat_t dst, const gr_lil_mat_t src, const fmpq_t c, gr_ctx_t ctx) { GR_LIL_MAT_DENSE_VEC_OP(_gr_vec_div_scalar_fmpq, dst, src, c, ctx) }
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_lil_mat_divexact_scalar(gr_lil_mat_t dst, const gr_lil_mat_t src, gr_srcptr c, gr_ctx_t ctx) { GR_LIL_MAT_DENSE_VEC_OP(_gr_vec_divexact_scalar, dst, src, c, ctx) } 
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_lil_mat_divexact_scalar_si(gr_lil_mat_t dst, const gr_lil_mat_t src, slong c, gr_ctx_t ctx) { GR_LIL_MAT_DENSE_VEC_OP(_gr_vec_divexact_scalar_si, dst, src, c, ctx) }
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_lil_mat_divexact_scalar_ui(gr_lil_mat_t dst, const gr_lil_mat_t src, ulong c, gr_ctx_t ctx) { GR_LIL_MAT_DENSE_VEC_OP(_gr_vec_divexact_scalar_ui, dst, src, c, ctx) }
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_lil_mat_divexact_scalar_fmpz(gr_lil_mat_t dst, const gr_lil_mat_t src, const fmpz_t c, gr_ctx_t ctx) { GR_LIL_MAT_DENSE_VEC_OP(_gr_vec_divexact_scalar_fmpz, dst, src, c, ctx) }
-GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_lil_mat_divexact_scalar_fmpq(gr_lil_mat_t dst, const gr_lil_mat_t src, const fmpq_t c, gr_ctx_t ctx) { GR_LIL_MAT_DENSE_VEC_OP(_gr_vec_divexact_scalar_fmpq, dst, src, c, ctx) }
+WARN_UNUSED_RESULT int gr_lil_mat_mul_scalar(gr_lil_mat_t dst, const gr_lil_mat_t src, gr_srcptr c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_lil_mat_mul_scalar_si(gr_lil_mat_t dst, const gr_lil_mat_t src, slong c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_lil_mat_mul_scalar_ui(gr_lil_mat_t dst, const gr_lil_mat_t src, ulong c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_lil_mat_mul_scalar_fmpz(gr_lil_mat_t dst, const gr_lil_mat_t src, const fmpz_t c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_lil_mat_mul_scalar_fmpq(gr_lil_mat_t dst, const gr_lil_mat_t src, const fmpq_t c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_lil_mat_mul_scalar_2exp_si(gr_lil_mat_t dst, const gr_lil_mat_t src, slong c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_lil_mat_div_scalar(gr_lil_mat_t dst, const gr_lil_mat_t src, gr_srcptr c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_lil_mat_div_scalar_si(gr_lil_mat_t dst, const gr_lil_mat_t src, slong c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_lil_mat_div_scalar_ui(gr_lil_mat_t dst, const gr_lil_mat_t src, ulong c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_lil_mat_div_scalar_fmpz(gr_lil_mat_t dst, const gr_lil_mat_t src, const fmpz_t c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_lil_mat_div_scalar_fmpq(gr_lil_mat_t dst, const gr_lil_mat_t src, const fmpq_t c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_lil_mat_divexact_scalar(gr_lil_mat_t dst, const gr_lil_mat_t src, gr_srcptr c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_lil_mat_divexact_scalar_si(gr_lil_mat_t dst, const gr_lil_mat_t src, slong c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_lil_mat_divexact_scalar_ui(gr_lil_mat_t dst, const gr_lil_mat_t src, ulong c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_lil_mat_divexact_scalar_fmpz(gr_lil_mat_t dst, const gr_lil_mat_t src, const fmpz_t c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_lil_mat_divexact_scalar_fmpq(gr_lil_mat_t dst, const gr_lil_mat_t src, const fmpq_t c, gr_ctx_t ctx);
 
 /**
  * Sum and product
