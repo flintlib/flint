@@ -825,6 +825,8 @@ Infinities and extended values
               int gr_undefined(gr_ptr res, gr_ctx_t ctx)
               int gr_unknown(gr_ptr res, gr_ctx_t ctx)
 
+    Sets *res* to the signed positive infinity `+\infty`, signed negative infinity `-\infty`, unsigned infinity `{\tilde \infty}`, *Undefined*, or *Unknown*, respectively.
+
 Ordering methods
 ........................................................................
 
