@@ -65,7 +65,7 @@ typedef struct
     ulong * rows;
     ulong * cols;
     gr_ptr nzs;
-    int is_canonical;
+    truth_t is_canonical;
 }
 gr_coo_mat_struct;
 
@@ -156,6 +156,22 @@ gr_coo_mat_row_ptr(gr_coo_mat_t mat, slong nz_idx)
 }
 
 GR_SPARSE_MAT_INLINE const ulong * 
+gr_coo_mat_row_srcptr(const gr_coo_mat_t mat, slong nz_idx)
+{
+    if (nz_idx < 0 || nz_idx >= mat->nnz)
+        return NULL;
+    return GR_COO_MAT_ROW(mat, nz_idx);
+}
+
+GR_SPARSE_MAT_INLINE const ulong * 
+gr_coo_mat_col_ptr(gr_coo_mat_t mat, slong nz_idx)
+{
+    if (nz_idx < 0 || nz_idx >= mat->nnz)
+        return NULL;
+    return GR_COO_MAT_COL(mat, nz_idx);
+}
+
+GR_SPARSE_MAT_INLINE const ulong * 
 gr_coo_mat_col_srcptr(const gr_coo_mat_t mat, slong nz_idx)
 {
     if (nz_idx < 0 || nz_idx >= mat->nnz)
@@ -217,9 +233,10 @@ gr_lil_mat_init(gr_lil_mat_t mat, slong rows, slong cols, gr_ctx_t ctx) {
 
 GR_SPARSE_MAT_INLINE void
 gr_coo_mat_init(gr_coo_mat_t mat, slong rows, slong cols, gr_ctx_t ctx) {
-    memset(mat, 0, sizeof(gr_lil_mat_t));
+    memset(mat, 0, sizeof(gr_coo_mat_t));
     mat->r = rows;
     mat->c = cols;
+    mat->is_canonical = T_TRUE;
 }
 
 GR_SPARSE_MAT_INLINE void
@@ -274,43 +291,31 @@ gr_coo_mat_swap(gr_coo_mat_t mat1, gr_coo_mat_t mat2, gr_ctx_t ctx)
     FLINT_SWAP(gr_coo_mat_struct, *mat1, *mat2);
 }
 
-void
-gr_csr_mat_fit_nnz(gr_csr_mat_t mat, slong nnz, gr_ctx_t ctx);
-
-void
-gr_lil_mat_fit_nnz(gr_coo_mat_t mat, slong *nnz, gr_ctx_t ctx);
-
-void
-gr_coo_mat_fit_nnz(gr_coo_mat_t mat, slong nnz, gr_ctx_t ctx);
+void gr_csr_mat_fit_nnz(gr_csr_mat_t mat, slong nnz, gr_ctx_t ctx);
+void gr_lil_mat_fit_nnz(gr_coo_mat_t mat, slong *nnz, gr_ctx_t ctx);
+void gr_coo_mat_fit_nnz(gr_coo_mat_t mat, slong nnz, gr_ctx_t ctx);
 
 
-void
-gr_csr_mat_shrink_to_nnz(gr_csr_mat_t mat, gr_ctx_t ctx);
-
-void
-gr_lil_mat_shrink_to_nnz(gr_lil_mat_t mat, gr_ctx_t ctx);
-
-void
-gr_coo_mat_shrink_to_nnz(gr_coo_mat_t mat, gr_ctx_t ctx);
+void gr_csr_mat_shrink_to_nnz(gr_csr_mat_t mat, gr_ctx_t ctx);
+void gr_lil_mat_shrink_to_nnz(gr_lil_mat_t mat, gr_ctx_t ctx);
+void gr_coo_mat_shrink_to_nnz(gr_coo_mat_t mat, gr_ctx_t ctx);
 
 
-void
-gr_csr_mat_set_cols(gr_csr_mat_t mat, slong cols, gr_ctx_t ctx);
+void gr_csr_mat_set_cols(gr_csr_mat_t mat, slong cols, gr_ctx_t ctx);
+void gr_lil_mat_set_cols(gr_lil_mat_t mat, slong cols, gr_ctx_t ctx);
+void gr_coo_mat_set_cols(gr_coo_mat_t mat, slong cols, gr_ctx_t ctx);
 
-void
-gr_lil_mat_set_cols(gr_lil_mat_t mat, slong cols, gr_ctx_t ctx);
+int gr_coo_mat_from_entries(gr_coo_mat_t mat, ulong *rows, ulong *cols, gr_srcptr entries, slong nnz, truth_t is_canonical, gr_ctx_t ctx);
 
-void
-gr_coo_mat_set_cols(gr_coo_mat_t mat, slong cols, gr_ctx_t ctx);
+truth_t gr_coo_mat_is_canonical(gr_coo_mat_t mat, gr_ctx_t ctx);
 
-int
-gr_coo_mat_from_entries(gr_coo_mat_t mat, ulong *rows, ulong *cols, gr_srcptr entries, slong nnz, int is_canonical, gr_ctx_t ctx);
-
-int
-gr_coo_mat_canonicalize(gr_coo_mat_t mat, gr_ctx_t ctx);
+int gr_coo_mat_canonicalize(gr_coo_mat_t mat, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int 
-gr_coo_mat_randtest(gr_coo_mat_t mat, ulong nnz, flint_rand_t state, gr_ctx_t ctx);
+gr_coo_mat_randtest(gr_coo_mat_t mat, slong nnz, int replacement, truth_t is_canonical, flint_rand_t state, gr_ctx_t ctx);
+
+WARN_UNUSED_RESULT int 
+gr_coo_mat_randtest_prob(gr_coo_mat_t mat, double prob, flint_rand_t state, gr_ctx_t ctx);
 
 /**
  * Getting, setting, and conversion
@@ -332,7 +337,7 @@ GR_SPARSE_MAT_INLINE void
 _gr_coo_mat_borrow_row(gr_sparse_vec_t res, gr_coo_mat_t mat, slong r, gr_ctx_t ctx) {
     ulong offset, nnz;
 
-    if (!mat->is_canonical)
+    if (mat->is_canonical == T_FALSE)
         gr_coo_mat_canonicalize(mat, ctx);
     
     // Binary search to find start and end of row
@@ -346,32 +351,17 @@ _gr_coo_mat_borrow_row(gr_sparse_vec_t res, gr_coo_mat_t mat, slong r, gr_ctx_t 
     res->nzs = GR_ENTRY(mat->nzs, offset, ctx->sizeof_elem);
 }
 
-gr_ptr 
-gr_csr_mat_find_entry(gr_csr_mat_t mat, slong row, slong col, gr_ctx_t ctx);
+gr_ptr gr_csr_mat_find_entry(gr_csr_mat_t mat, slong row, slong col, gr_ctx_t ctx);
+gr_ptr gr_lil_mat_find_entry(gr_lil_mat_t mat, slong row, slong col, gr_ctx_t ctx);
+gr_ptr gr_coo_mat_find_entry(gr_coo_mat_t mat, slong row, slong col, gr_ctx_t ctx);
 
-gr_ptr 
-gr_lil_mat_find_entry(gr_lil_mat_t mat, slong row, slong col, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_csr_mat_get_entry(gr_ptr res, gr_csr_mat_t mat, slong row, slong col, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_lil_mat_get_entry(gr_ptr res, gr_lil_mat_t mat, slong row, slong col, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_coo_mat_get_entry(gr_ptr res, gr_coo_mat_t mat, slong row, slong col, gr_ctx_t ctx);
 
-gr_ptr 
-gr_coo_mat_find_entry(gr_coo_mat_t mat, slong row, slong col, gr_ctx_t ctx);
-
-WARN_UNUSED_RESULT int 
-gr_csr_mat_get_entry(gr_ptr res, gr_csr_mat_t mat, slong row, slong col, gr_ctx_t ctx);
-
-WARN_UNUSED_RESULT int 
-gr_lil_mat_get_entry(gr_ptr res, gr_lil_mat_t mat, slong row, slong col, gr_ctx_t ctx);
-
-WARN_UNUSED_RESULT int 
-gr_coo_mat_get_entry(gr_ptr res, gr_coo_mat_t mat, slong row, slong col, gr_ctx_t ctx);
-
-WARN_UNUSED_RESULT int 
-gr_csr_mat_set_entry(gr_csr_mat_t mat, slong row, slong col, gr_srcptr entry, gr_ctx_t ctx);
-
-WARN_UNUSED_RESULT int 
-gr_lil_mat_set_entry(gr_lil_mat_t mat, slong row, slong col, gr_srcptr entry, gr_ctx_t ctx);
-
-WARN_UNUSED_RESULT int 
-gr_coo_mat_set_entry(gr_coo_mat_t mat, slong row, slong col, gr_srcptr entry, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_csr_mat_set_entry(gr_csr_mat_t mat, slong row, slong col, gr_srcptr entry, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_lil_mat_set_entry(gr_lil_mat_t mat, slong row, slong col, gr_srcptr entry, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_coo_mat_set_entry(gr_coo_mat_t mat, slong row, slong col, gr_srcptr entry, gr_ctx_t ctx);
 
 
 GR_SPARSE_MAT_INLINE void 
@@ -620,7 +610,7 @@ gr_lil_mat_is_zero(const gr_lil_mat_t mat, gr_ctx_t ctx)
 GR_SPARSE_MAT_INLINE truth_t 
 gr_coo_mat_is_zero(gr_coo_mat_t mat, gr_ctx_t ctx)
 {
-    if (!mat->is_canonical)
+    if (mat->is_canonical == T_FALSE)
         gr_coo_mat_canonicalize(mat, ctx);
     return _gr_vec_is_zero(mat->nzs, mat->nnz, ctx);
 }

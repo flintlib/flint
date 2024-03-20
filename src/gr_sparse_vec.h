@@ -71,7 +71,7 @@ void gr_sparse_vec_fit_nnz(gr_sparse_vec_t vec, slong nnz, gr_ctx_t ctx);
 void gr_sparse_vec_shrink_to_nnz(gr_sparse_vec_t vec, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int
-gr_sparse_vec_from_entries(gr_sparse_vec_t vec, ulong * inds, gr_srcptr entries, slong nnz, int is_canonical, gr_ctx_t ctx);
+gr_sparse_vec_from_entries(gr_sparse_vec_t vec, ulong * inds, gr_srcptr entries, slong nnz, truth_t is_canonical, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int 
 gr_sparse_vec_randtest(gr_sparse_vec_t vec, slong nnz, int replacement, flint_rand_t state, gr_ctx_t ctx);

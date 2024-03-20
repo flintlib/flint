@@ -66,7 +66,7 @@ int gr_mat_set_coo_mat(gr_mat_t dst, const gr_coo_mat_t src, gr_ctx_t ctx)
     {
         dst_entry = GR_MAT_ENTRY(dst, src->rows[nz], src->cols[nz], sz);
         src_entry = GR_ENTRY(src->nzs, nz, sz);
-        if (src->is_canonical)
+        if (src->is_canonical == T_TRUE)
             status |= gr_set(dst_entry, src_entry, ctx);
         else
             status |= gr_add(dst_entry, dst_entry, src_entry, ctx);

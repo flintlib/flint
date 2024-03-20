@@ -14,26 +14,17 @@
 truth_t
 gr_csr_mat_equal(const gr_csr_mat_t mat1, const gr_csr_mat_t mat2, gr_ctx_t ctx)
 {
-    slong row;
-    gr_sparse_vec_t tmp1, tmp2;
-    truth_t row_is_eq;
-    truth_t ret = T_TRUE;
-
-    if (gr_mat_is_compatible(mat1, mat2, ctx) == T_FALSE)
+    if 
+    (
+        gr_mat_is_compatible(mat1, mat2, ctx) == T_FALSE || 
+        mat1->nnz != mat2->nnz ||
+        memcmp(mat1->rows, mat2->rows, mat1->r * sizeof(ulong)) ||
+        memcmp(mat1->cols, mat2->cols, mat1->nnz * sizeof(ulong))
+    )
     {
         return T_FALSE;
     }
-    for (row = 0; row < mat1->r; row++)
-    {
-        _gr_csr_mat_borrow_row(tmp1, mat1, row, ctx);
-        _gr_csr_mat_borrow_row(tmp2, mat2, row, ctx);
-        row_is_eq = gr_sparse_vec_equal(tmp1, tmp2, ctx);
-        if (row_is_eq == T_FALSE)
-            return T_FALSE;
-        else if (row_is_eq == T_UNKNOWN)
-            ret = T_UNKNOWN;
-    }
-    return ret;
+    return _gr_vec_equal(mat1->nzs, mat2->nzs, mat1->nnz, ctx);
 }
 
 truth_t
@@ -43,7 +34,7 @@ gr_lil_mat_equal(const gr_lil_mat_t mat1, const gr_lil_mat_t mat2, gr_ctx_t ctx)
     truth_t row_is_eq;
     truth_t ret = T_TRUE;
 
-    if (gr_mat_is_compatible(mat1, mat2, ctx) == T_FALSE)
+    if (gr_mat_is_compatible(mat1, mat2, ctx) == T_FALSE || mat1->nnz != mat2->nnz)
     {
         return T_FALSE;
     }
@@ -58,6 +49,30 @@ gr_lil_mat_equal(const gr_lil_mat_t mat1, const gr_lil_mat_t mat2, gr_ctx_t ctx)
     return ret;
 }
 
+truth_t gr_coo_mat_equal(const gr_coo_mat_t mat1, const gr_coo_mat_t mat2, gr_ctx_t ctx)
+{
+    slong i;
+
+    if (gr_mat_is_compatible(mat1, mat2, ctx) == T_FALSE)
+    {
+        return T_FALSE;
+    }
+    if (mat1->is_canonical == T_FALSE || mat2->is_canonical == T_FALSE)
+    {
+        return T_UNKNOWN;
+    }
+    if 
+    (
+        mat1->nnz != mat2->nnz ||
+        memcmp(mat1->rows, mat2->rows, mat1->nnz * sizeof(ulong)) ||
+        memcmp(mat1->cols, mat2->cols, mat1->nnz * sizeof(ulong))
+    )
+    {
+        return T_FALSE;
+    }
+    return _gr_vec_equal(mat1->nzs, mat2->nzs, mat1->nnz, ctx);
+}
+
 truth_t
 gr_csr_mat_equal_lil_mat(const gr_csr_mat_t mat1, const gr_lil_mat_t mat2, gr_ctx_t ctx)
 {
@@ -66,7 +81,7 @@ gr_csr_mat_equal_lil_mat(const gr_csr_mat_t mat1, const gr_lil_mat_t mat2, gr_ct
     truth_t row_is_eq;
     truth_t ret = T_TRUE;
 
-    if (gr_mat_is_compatible(mat1, mat2, ctx) == T_FALSE)
+    if (gr_mat_is_compatible(mat1, mat2, ctx) == T_FALSE || mat1->nnz != mat2->nnz)
     {
         return T_FALSE;
     }

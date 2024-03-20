@@ -68,10 +68,10 @@ Types and basic access
 
     Reallocate the storage in *vec* down the current number of nonzeros.
 
-.. function:: int gr_sparse_vec_from_entries(gr_sparse_vec_t vec, ulong * inds, gr_srcptr entries, slong nnz, int is_canonical, gr_ctx_t ctx)
+.. function:: int gr_sparse_vec_from_entries(gr_sparse_vec_t vec, ulong * inds, gr_srcptr entries, slong nnz, truth_t is_canonical, gr_ctx_t ctx)
 
     Construct *vec* from the sparse data given by *inds* and *entries* of length *nnz*.
-    If ``is_canonical`` is true, the indices are assumed to be sorted and unique, and
+    If ``is_canonical`` is `T_TRUE`, the indices are assumed to be sorted and unique, and
     the entries are assumed to be nonzero. Otherwise, the function will sort and compress
     the entries to leave the vector in sorted, unique, nonzero form.
 

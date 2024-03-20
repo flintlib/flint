@@ -10,51 +10,52 @@
 */
 
 #include "test_helpers.h"
-#include "gr_sparse_vec.h"
+#include "gr_sparse_mat.h"
 
 #define CHECK_TEST(x, name) { if (GR_SUCCESS != (x)) { flint_printf("FAIL %s\n", (name)); flint_abort(); } }
 
 int test_randtest(flint_rand_t state, gr_ctx_t ctx)
 {
     slong i;
-    slong N = 1024;
+    slong M = 16;
+    slong N = 64;
     slong n_tests = 10;
     int status = GR_SUCCESS;
-    gr_sparse_vec_t vec;
-    gr_sparse_vec_init(vec, N, ctx);
+    gr_coo_mat_t mat;
+    gr_coo_mat_init(mat, M, N, ctx);
 
     //flint_printf("Testing w/o replacement\n");
     for (i = 0; i < n_tests; i++)
     {
-        status |= gr_sparse_vec_randtest(vec, 128, 0, state, ctx);
-        if (!gr_sparse_vec_is_valid(vec, ctx) || vec->nnz != 128)
+        status |= gr_coo_mat_randtest(mat, 128, 0, T_TRUE, state, ctx);
+        if (gr_coo_mat_is_canonical(mat, ctx) == T_FALSE || mat->nnz != 128)
             return GR_TEST_FAIL;
     }
 
     //flint_printf("Testing w/ replacement\n");
     for (i = 0; i < n_tests; i++)
     {
-        status |= gr_sparse_vec_randtest(vec, 32, 1, state, ctx);
-        if (!gr_sparse_vec_is_valid(vec, ctx) || vec->nnz > 32 || vec->nnz < 24)
+        status |= gr_coo_mat_randtest(mat, 32, 1, T_TRUE, state, ctx);
+        if (gr_coo_mat_is_canonical(mat, ctx) == T_FALSE || mat->nnz > 32 || mat->nnz < 24)
             return GR_TEST_FAIL;
     }
 
     //flint_printf("Testing w/ prob\n");
     for (i = 0; i < n_tests; i++)
     {
-        status |= gr_sparse_vec_randtest_prob(vec, 0.125, state, ctx);
-        if (!gr_sparse_vec_is_valid(vec, ctx) || vec->nnz > 192 || vec->nnz < 64)
+        status |= gr_coo_mat_randtest_prob(mat, 0.125, state, ctx);
+        if (gr_coo_mat_is_canonical(mat, ctx) == T_FALSE || mat->nnz > 192 || mat->nnz < 64)
         {
-            gr_sparse_vec_print_nz(vec, ctx); flint_printf("%ld\n", vec->nnz);
+            status |= gr_coo_mat_print_nz(mat, ctx); flint_printf("%ld\n", mat->nnz);
             return GR_TEST_FAIL;
         }
             
     }
-    gr_sparse_vec_clear(vec, ctx);
+    gr_coo_mat_clear(mat, ctx);
     return status;
 }
 
-TEST_FUNCTION_START(gr_sparse_vec_randtest, state)
+TEST_FUNCTION_START(gr_sparse_mat_randtest, state)
 {   
     int i;
     gr_ctx_t ctx;
@@ -71,7 +72,7 @@ TEST_FUNCTION_START(gr_sparse_vec_randtest, state)
         }
         //gr_ctx_print(ctx); flint_printf("\n");
 
-        CHECK_TEST(test_randtest(state, ctx), "Test random sparse vector generation");
+        CHECK_TEST(test_randtest(state, ctx), "Test random sparse matrix generation");
         gr_ctx_clear(ctx);
     }
     TEST_FUNCTION_END(state);

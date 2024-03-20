@@ -46,8 +46,26 @@ static sparse_mat_index_t * _sort_coords(ulong * rows, ulong * cols, slong num)
     return si;
 }
 
-int
-gr_coo_mat_canonicalize(gr_coo_mat_t mat, gr_ctx_t ctx)
+truth_t gr_coo_mat_is_canonical(gr_coo_mat_t mat, gr_ctx_t ctx)
+{
+    slong i, sz;
+    gr_method_unary_predicate is_zero = GR_UNARY_PREDICATE(ctx, IS_ZERO);
+    sz = ctx->sizeof_elem;
+
+    for (i = 0; i < mat->nnz; ++i)
+    {
+        // Check that indices are unique and in order
+        if (i > 0 && (mat->rows[i] < mat->rows[i-1] || (mat->rows[i] == mat->rows[i-1] && mat->cols[i] <= mat->cols[i-1])))
+            return T_FALSE;
+
+        // Check that entries are not known to be zero
+        if (is_zero(GR_ENTRY(mat->nzs, i, sz), ctx) == T_TRUE)
+            return T_FALSE;
+    }
+    return T_TRUE;
+}
+
+int gr_coo_mat_canonicalize(gr_coo_mat_t mat, gr_ctx_t ctx)
 {
     slong i, j, k, sz, nnz;
     int status = GR_SUCCESS;
@@ -56,10 +74,12 @@ gr_coo_mat_canonicalize(gr_coo_mat_t mat, gr_ctx_t ctx)
     gr_ptr entry;
     gr_method_unary_predicate is_zero = GR_UNARY_PREDICATE(ctx, IS_ZERO);
 
-    if (mat->is_canonical)
+    if (mat->is_canonical == T_TRUE)
         return GR_SUCCESS;
 
     sz = ctx->sizeof_elem;
+    
+    //gr_coo_mat_print_nz(mat, ctx);
     
     // Get sorted order for matrices indices (and inverse mapping)
     si = _sort_coords(mat->rows, mat->cols, mat->nnz);
@@ -85,6 +105,7 @@ gr_coo_mat_canonicalize(gr_coo_mat_t mat, gr_ctx_t ctx)
     }
     flint_free(si);
     flint_free(inv_si);
+    //gr_coo_mat_print_nz(mat, ctx);
 
     // Compress duplicated entries
     nnz = 0;
@@ -101,9 +122,16 @@ gr_coo_mat_canonicalize(gr_coo_mat_t mat, gr_ctx_t ctx)
                 entry = GR_ENTRY(mat->nzs, nnz, sz);
                 ++nnz;
             }
+            mat->rows[nnz-1] = mat->rows[i];
+            mat->cols[nnz-1] = mat->cols[i];
             status |= gr_set(entry, GR_ENTRY(mat->nzs, i, sz), ctx);
         }
     }
+    if (entry != NULL && is_zero(entry, ctx) == T_TRUE)
+        --nnz;
+    mat->nnz = nnz;
+    //gr_coo_mat_print_nz(mat, ctx);
+    mat->is_canonical = gr_coo_mat_is_canonical(mat, ctx);
     return status;
 }
 

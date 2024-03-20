@@ -33,7 +33,7 @@ static sparse_vec_index_t * _sort_inds(ulong * inds, slong num)
 }
 
 int
-gr_sparse_vec_from_entries(gr_sparse_vec_t vec, ulong * inds, gr_srcptr entries, slong nnz, int is_canonical, gr_ctx_t ctx)
+gr_sparse_vec_from_entries(gr_sparse_vec_t vec, ulong * inds, gr_srcptr entries, slong nnz, truth_t is_canonical, gr_ctx_t ctx)
 {
     slong i;
     slong sz = ctx->sizeof_elem;
@@ -47,7 +47,7 @@ gr_sparse_vec_from_entries(gr_sparse_vec_t vec, ulong * inds, gr_srcptr entries,
             return GR_DOMAIN;
 
     gr_sparse_vec_fit_nnz(vec, nnz, ctx);
-    if (is_canonical)
+    if (is_canonical == T_TRUE)
     {
         // Just copy data
         memcpy(vec->inds, inds, nnz * sizeof(ulong));

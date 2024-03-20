@@ -48,7 +48,7 @@ int gr_coo_mat_permute_cols(gr_coo_mat_t mat, slong * perm, gr_ctx_t ctx)
     {
         mat->cols[nz_idx] = perm[mat->cols[nz_idx]];
     }
-    if (mat->is_canonical)
+    if (mat->is_canonical == T_TRUE)
     {
         gr_coo_mat_canonicalize(mat, ctx);
     }

@@ -164,7 +164,7 @@ int gr_csr_mat_set_coo_mat(gr_csr_mat_t dst, const gr_coo_mat_t src, gr_ctx_t ct
     sz = ctx->sizeof_elem;
 
     gr_csr_mat_fit_nnz(dst, src->nnz, ctx);
-    if (src->is_canonical)
+    if (src->is_canonical == T_TRUE)
     {
         // Just copy over the data and set the row offsets
         dst->rows[0] = 0;
@@ -172,10 +172,12 @@ int gr_csr_mat_set_coo_mat(gr_csr_mat_t dst, const gr_coo_mat_t src, gr_ctx_t ct
         for (i = 0; i < src->nnz; ++i)
             while (row != src->rows[i]) 
                 dst->rows[++row] = i;
+        while (row < dst->r)
+            dst->rows[++row] = i;
 
-        dst->rows[dst->r] = src->nnz;
         memcpy(dst->cols, src->cols, src->nnz * sizeof(ulong));
         status |= _gr_vec_set(dst->nzs, src->nzs, src->nnz, ctx);
+        //_gr_vec_print(dst->nzs, src->nnz, ctx);
         dst->nnz = src->nnz;
     }
     else
@@ -218,7 +220,7 @@ int gr_csr_mat_set_coo_mat(gr_csr_mat_t dst, const gr_coo_mat_t src, gr_ctx_t ct
 
 int gr_lil_mat_set_coo_mat(gr_lil_mat_t dst, const gr_coo_mat_t src, gr_ctx_t ctx)
 {
-    slong i, prev_i, sz, nnz, row, row_start_idx, row_end_idx;
+    slong i, sz, nnz, row, row_start_idx, row_end_idx;
     int status = GR_SUCCESS;
     sparse_mat_index_t * si;
     gr_method_unary_predicate is_zero = GR_UNARY_PREDICATE(ctx, IS_ZERO);
@@ -234,17 +236,18 @@ int gr_lil_mat_set_coo_mat(gr_lil_mat_t dst, const gr_coo_mat_t src, gr_ctx_t ct
     }
 
     sz = ctx->sizeof_elem;
-    if (src->is_canonical)
+    if (src->is_canonical == T_TRUE)
     {
-        prev_i = i = 0;
+        row_start_idx = row_end_idx = 0;
         for (row = 0; row < dst->r; ++row)
         {
-            while (i < src->nnz && src->rows[i] == row) ++i;
+            while (row_end_idx < src->nnz && src->rows[row_end_idx] == row) ++row_end_idx;
             status |= gr_sparse_vec_from_entries(
-                &dst->rows[row], src->cols + prev_i, GR_ENTRY(src->nnz, prev_i, sz), i - prev_i, 1, ctx
+                &dst->rows[row], src->cols + row_start_idx, GR_ENTRY(src->nzs, row_start_idx, sz), row_end_idx - row_start_idx, T_TRUE, ctx
             );
-            prev_i = i;
+            row_start_idx = row_end_idx;
         }
+        dst->nnz = src->nnz;
     }
     else
     {
@@ -253,6 +256,7 @@ int gr_lil_mat_set_coo_mat(gr_lil_mat_t dst, const gr_coo_mat_t src, gr_ctx_t ct
 
         // Construct rows one by one
         row_start_idx = 0;
+        dst->nnz = 0;
         for (row = 0; row < dst->r; ++row)
         {
             // Get range of indicies in current row and estimate of nonzeroes
@@ -282,10 +286,12 @@ int gr_lil_mat_set_coo_mat(gr_lil_mat_t dst, const gr_coo_mat_t src, gr_ctx_t ct
                         ++nnz;
                     }
                     // Store to entry and update current column
+                    dst->rows[row].inds[nnz - 1] = si[i].col;
                     status |= gr_set(entry, si[i].entry, ctx);
                 }
             }
             dst->rows[row].nnz = nnz;
+            dst->nnz += nnz;
             row_start_idx = row_end_idx;
         }
     }
@@ -298,6 +304,7 @@ int gr_coo_mat_set_lil_mat(gr_coo_mat_t dst, const gr_lil_mat_t src, gr_ctx_t ct
     ulong row, i;
     slong sz;
     int status = GR_SUCCESS;
+    gr_sparse_vec_struct *vec;
 
     if (gr_mat_is_compatible(dst, src, ctx) == T_FALSE)
         return GR_DOMAIN;
@@ -308,15 +315,16 @@ int gr_coo_mat_set_lil_mat(gr_coo_mat_t dst, const gr_lil_mat_t src, gr_ctx_t ct
 
     dst->nnz = 0;
     for(row = 0; row < src->r; row++) {
-        for (i = 0; i < src->rows[row].nnz; ++i)
+        vec = &src->rows[row];
+        for (i = 0; i < vec->nnz; ++i)
             dst->rows[dst->nnz + i] = row;
         
-        memcpy(dst->cols + dst->nnz, src->rows[i].inds, src->rows[i].nnz);
-        status |= _gr_vec_set(GR_ENTRY(dst->nzs, dst->nnz, sz), src->rows[i].nzs, src->rows[i].nnz, ctx);
-        dst->nnz += src->rows[i].nnz;
+        memcpy(dst->cols + dst->nnz, vec->inds, vec->nnz * sizeof(ulong));
+        status |= _gr_vec_set(GR_ENTRY(dst->nzs, dst->nnz, sz), vec->nzs, vec->nnz, ctx);
+        dst->nnz += vec->nnz;
     }
     dst->nnz = src->nnz;
-    dst->is_canonical = 1;
+    dst->is_canonical = T_TRUE;
     return status;
 }
 
@@ -333,10 +341,10 @@ int gr_coo_mat_set_csr_mat(gr_coo_mat_t dst, const gr_csr_mat_t src, gr_ctx_t ct
     dst->nnz = 0;
     for(row = 0; row < dst->r; ++row)
         while (dst->nnz < src->rows[row + 1])
-            src->rows[dst->nnz++] = row;
+            dst->rows[dst->nnz++] = row;
     memcpy(dst->cols, src->cols, src->nnz * sizeof(ulong));
     status |= _gr_vec_set(dst->nzs, src->nzs, src->nnz, ctx);
-    dst->is_canonical = 1;
+    dst->is_canonical = T_TRUE;
 
     return status;
 }
