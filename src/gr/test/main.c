@@ -52,6 +52,7 @@
 #include "t-polynomial_nmod8.c"
 #include "t-psl2z.c"
 #include "t-qqbar.c"
+#include "t-series.c"
 #include "t-series_acb.c"
 #include "t-series_arb.c"
 #include "t-series_fmpq.c"
@@ -102,6 +103,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_polynomial_nmod8),
     TEST_FUNCTION(gr_psl2z),
     TEST_FUNCTION(gr_qqbar),
+    TEST_FUNCTION(gr_series),
     TEST_FUNCTION(gr_series_acb),
     TEST_FUNCTION(gr_series_arb),
     TEST_FUNCTION(gr_series_fmpq),
