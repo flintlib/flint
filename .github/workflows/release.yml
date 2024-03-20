@@ -62,7 +62,7 @@ jobs:
           else
             version=$(cat VERSION)
             if [ ${TAG_NAME} = "nightly" ] ; then
-              version=${version}-$(date +"%Y%M%d")
+              version=${version}-$(date +"%Y%m%d")
             fi
           fi
           echo "version=${version}"
