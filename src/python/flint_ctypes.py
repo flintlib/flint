@@ -496,6 +496,23 @@ class gr_ctx:
         """
         return self._ctx_predicate(libflint.gr_ctx_is_commutative_ring, "is_commutative_ring")
 
+    def is_zero_ring(self):
+        """
+        Return whether this structure is the zero ring.
+
+            >>> ZZ.is_zero_ring()
+            False
+            >>> ZZmod(1).is_zero_ring()
+            True
+            >>> Mat(ZZ, 0).is_zero_ring()
+            True
+            >>> PowerSeriesModRing(ZZ, 0).is_zero_ring()
+            True
+            >>> Vec(ZZ, 0).is_zero_ring()
+            True
+        """
+        return self._ctx_predicate(libflint.gr_ctx_is_zero_ring, "is_zero_ring")
+
     def _set_gen_name(self, s):
         status = libflint.gr_ctx_set_gen_name(self._ref, ctypes.c_char_p(str(s).encode('ascii')))
         self._str = None
