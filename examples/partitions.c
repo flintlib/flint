@@ -17,10 +17,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "arith.h"
-#include "profiler.h"
+#include <flint/flint.h>
+#include <flint/fmpz.h>
+#include <flint/arith.h>
+#include <flint/profiler.h>
 
 int
 main(int argc, char * argv[])

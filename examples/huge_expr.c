@@ -1,9 +1,9 @@
 /* This file is public domain. Author: Fredrik Johansson. */
 
 #include <string.h>
-#include "profiler.h"
-#include "ca.h"
-#include "gr.h"
+#include <flint/profiler.h>
+#include <flint/ca.h>
+#include <flint/gr.h>
 
 int gr_sqrt_ui(gr_ptr x, ulong y, gr_ctx_t ctx)
 {

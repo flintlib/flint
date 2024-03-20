@@ -16,9 +16,9 @@
 
 #include <time.h>
 #include <stdlib.h>
-#include "fmpz.h"
-#include "fq.h"
-#include "fq_poly.h"
+#include <flint/fmpz.h>
+#include <flint/fq.h>
+#include <flint/fq_poly.h>
 
 int main(void)
 {

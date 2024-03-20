@@ -1,11 +1,11 @@
 /* This file is public domain. Author: Fredrik Johansson. */
 
 #include <stdlib.h>
-#include "profiler.h"
-#include "ca.h"
-#include "ca_vec.h"
-#include "ca_poly.h"
-#include "ulong_extras.h"
+#include <flint/profiler.h>
+#include <flint/ca.h>
+#include <flint/ca_vec.h>
+#include <flint/ca_poly.h>
+#include <flint/ulong_extras.h>
 
 void
 swinnerton_dyer_poly(ca_ptr T, ulong n, slong trunc, ca_ctx_t ctx)

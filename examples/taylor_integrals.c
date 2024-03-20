@@ -1,10 +1,10 @@
 /* This file is public domain. Author: Fredrik Johansson. */
 
 #include <stdlib.h>
-#include "acb_poly.h"
-#include "arb_calc.h"
-#include "acb_calc.h"
-#include "profiler.h"
+#include <flint/acb_poly.h>
+#include <flint/arb_calc.h>
+#include <flint/acb_calc.h>
+#include <flint/profiler.h>
 
 int
 sinx(acb_ptr out, const acb_t inp, void * params, slong order, slong prec)

@@ -1,13 +1,13 @@
 /* This file is public domain. Author: Fredrik Johansson. */
 
-#include "profiler.h"
-#include "fmpq.h"
-#include "arb.h"
-#include "arb_hypgeom.h"
-#include "acb.h"
-#include "acb_modular.h"
-#include "partitions.h"
-#include "bernoulli.h"
+#include <flint/profiler.h>
+#include <flint/fmpq.h>
+#include <flint/arb.h>
+#include <flint/arb_hypgeom.h>
+#include <flint/acb.h>
+#include <flint/acb_modular.h>
+#include <flint/partitions.h>
+#include <flint/bernoulli.h>
 
 #define TIMEIT_ONCE_STOP_VALUES(tcpu, twall) \
         } while (0); \
