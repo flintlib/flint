@@ -496,6 +496,23 @@ class gr_ctx:
         """
         return self._ctx_predicate(libflint.gr_ctx_is_commutative_ring, "is_commutative_ring")
 
+    def is_zero_ring(self):
+        """
+        Return whether this structure is the zero ring.
+
+            >>> ZZ.is_zero_ring()
+            False
+            >>> ZZmod(1).is_zero_ring()
+            True
+            >>> Mat(ZZ, 0).is_zero_ring()
+            True
+            >>> PowerSeriesModRing(ZZ, 0).is_zero_ring()
+            True
+            >>> Vec(ZZ, 0).is_zero_ring()
+            True
+        """
+        return self._ctx_predicate(libflint.gr_ctx_is_zero_ring, "is_zero_ring")
+
     def _set_gen_name(self, s):
         status = libflint.gr_ctx_set_gen_name(self._ref, ctypes.c_char_p(str(s).encode('ascii')))
         self._str = None
@@ -7796,6 +7813,123 @@ def test_ca_notebook_examples():
 
     with optimistic_logic:
         RRx(str(RRx("1+2*x")/3)) == RRx([1,2])/3
+
+def test_gr_series():
+
+    x = QQser.gen()
+    # default prec is 6
+    O6 = x**6
+    On = lambda n: QQser(PowerSeriesRing(QQ, n, "x").gen() ** n)
+    O0 = On(0)
+    O1 = On(1)
+    O2 = On(2)
+    O3 = On(3)
+    O4 = On(4)
+    O5 = On(5)
+
+    assert x / x == 1
+    assert (2 * x) / (3 * x) == QQ(2) / 3
+    assert (2 + 2*x) / (1 + x) == 2
+    assert str(x / (x.exp() - 1)) == "1 + (-1/2)*x + (1/12)*x^2 + (-1/720)*x^4 + O(x^5)"
+
+    assert str(x**6 / 1) == "0 + O(x^6)"
+    assert str(x**6 / x) == "0 + O(x^5)"
+    assert str(x**6 / x**5) == "0 + O(x^1)"
+    assert str(x**6 / x**5) == "0 + O(x^1)"
+
+    assert str(1 / (1 + x)) == "1 - x + x^2 - x^3 + x^4 - x^5 + O(x^6)"
+    assert str(1 / (1 + x + O5)) == "1 - x + x^2 - x^3 + x^4 + O(x^5)"
+    assert str((1 + O5) / (1 + x)) == "1 - x + x^2 - x^3 + x^4 + O(x^5)"
+    assert str((1 + O5) / (1 + x + O4)) == "1 - x + x^2 - x^3 + O(x^4)"
+    assert str((1 + O4) / (1 + x + O5)) == "1 - x + x^2 - x^3 + O(x^4)"
+    assert str(x / (x + x**2)) == "1 - x + x^2 - x^3 + x^4 - x^5 + O(x^6)"
+    assert str(x / (x + x**2 + O5)) == "1 - x + x^2 - x^3 + O(x^4)"
+    assert str((x + O5) / (x + x**2)) == "1 - x + x^2 - x^3 + O(x^4)"
+    assert str((x + O5) / (x + x**2 + O4)) == "1 - x + x^2 + O(x^3)"
+    assert str((x + O4) / (x + x**2 + O5)) == "1 - x + x^2 + O(x^3)"
+
+    assert str(O5 / 1) == "0 + O(x^5)"
+    assert str(O5 / x) == "0 + O(x^4)"
+    assert str(O5 / x**4) == "0 + O(x^1)"
+    assert str(O5 / x**5) == "0 + O(x^0)"
+    assert raises(lambda: O5 / x**6, FlintUnableError)
+
+    assert raises(lambda: (0 * x) / 0, FlintDomainError)
+    assert raises(lambda: x / 0, FlintDomainError)
+
+    assert raises(lambda: O0 / 0, FlintDomainError)
+    assert raises(lambda: O1 / 0, FlintDomainError)
+
+    assert raises(lambda: 0 / O0, FlintUnableError)
+    assert raises(lambda: 0 / O0, FlintUnableError)
+    assert raises(lambda: 0 / O1, FlintUnableError)
+    assert raises(lambda: 0 / O2, FlintUnableError)
+
+    assert raises(lambda: O0 / O0, FlintUnableError)
+    assert raises(lambda: O1 / O0, FlintUnableError)
+    assert raises(lambda: O0 / O1, FlintUnableError)
+
+    assert raises(lambda: 1 / O0, FlintUnableError)
+    assert raises(lambda: 1 / O1, FlintDomainError)
+    assert raises(lambda: 1 / O2, FlintDomainError)
+
+    assert raises(lambda: x / O0, FlintUnableError)
+    assert raises(lambda: x / O1, FlintUnableError)
+    assert raises(lambda: x / O2, FlintDomainError)
+
+    assert raises(lambda: x**2 / O0, FlintUnableError)
+    assert raises(lambda: x**2 / O1, FlintUnableError)
+    assert raises(lambda: x**2 / O2, FlintUnableError)
+    assert raises(lambda: (x**0) / 0, FlintDomainError)
+
+    assert raises(lambda: x**3 / O2, FlintUnableError)
+    assert raises(lambda: x**3 / O3, FlintUnableError)
+
+    R = RRser
+    x = R.gen()
+    a = R(RR("0 +/- 1e-10"))
+    On = lambda n: QQser(PowerSeriesRing(QQ, n, "x").gen() ** n)
+    O6 = x**6
+    O0 = On(0)
+    O1 = On(1)
+    O2 = On(2)
+    O3 = On(3)
+    O4 = On(4)
+    O5 = On(5)
+
+    assert raises(lambda: a == 0, Undecidable)
+    assert raises(lambda: a * x == 0, Undecidable)
+    assert not (a + x == 0)
+    assert (a + x != 0)
+
+    assert raises(lambda: 1 / a, FlintUnableError)
+    assert raises(lambda: 1 / (a * x), FlintDomainError)
+    assert raises(lambda: (a * x) / (a * x**2), FlintUnableError)
+    assert raises(lambda: (a * x + x**3) / (a * x**2), FlintUnableError)
+    assert raises(lambda: (x**3) / (a * x**4), FlintDomainError)
+    assert raises(lambda: (a * x + x**3) / (a * x**2), FlintUnableError)
+
+    R = PowerSeriesModRing(QQ, 6)
+    x = R.gen()
+
+    assert x**6 == 0
+    assert x**5 != 0
+    assert x / x == 1
+    assert str(1 / (1 + x)) == "1 - x + x^2 - x^3 + x^4 - x^5 (mod x^6)"
+    assert str(x / (x + x**2)) == "1 - x + x^2 - x^3 + x^4 - x^5 (mod x^6)"
+
+    # note: nonunique quotient, currently permitted
+    assert str(x / (x.exp() - 1)) == "1 + (-1/2)*x + (1/12)*x^2 + (-1/720)*x^4 + (1/720)*x^5 (mod x^6)"
+
+    assert raises(lambda: x / 0, FlintDomainError)
+
+    x = PowerSeriesRing(ZZmod(1)).gen()
+    assert x + x == 0
+    assert x - x == 0
+    assert x * x == 0
+    assert x / x == 0
+
+
 
 if __name__ == "__main__":
     from time import time

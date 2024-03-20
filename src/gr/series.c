@@ -409,19 +409,7 @@ gr_series_is_one(const gr_series_t x, gr_series_ctx_t sctx, gr_ctx_t cctx)
         return T_TRUE;
 
     if (xlen == 0)
-    {
-        /* deal with characteristic 0 */
-        if (gr_ctx_is_finite_characteristic(cctx) != T_FALSE)
-        {
-            gr_ptr tmp;
-            GR_TMP_INIT(tmp, cctx);
-            is_one = gr_is_one(tmp, cctx);
-            GR_TMP_CLEAR(tmp, cctx);
-            return is_one;
-        }
-
-        return T_FALSE;
-    }
+        return gr_ctx_is_zero_ring(cctx);
 
     is_one = gr_is_one(x->poly.coeffs, cctx);
 
@@ -624,36 +612,185 @@ gr_series_inv(gr_series_t res, const gr_series_t x, gr_series_ctx_t sctx, gr_ctx
     return status;
 }
 
-/* todo: handle valuations */
+truth_t
+gr_series_coeff_is_zero(const gr_series_t x, slong i, gr_series_ctx_t sctx, gr_ctx_t cctx)
+{
+    if (i >= x->error)
+        return T_UNKNOWN;
+
+    if (i >= x->poly.length)
+        return T_TRUE;
+
+    if (i < 0)
+        return T_TRUE;
+
+    return gr_is_zero(gr_poly_entry_srcptr(&x->poly, i, cctx), cctx);
+}
+
 int
 gr_series_div(gr_series_t res, const gr_series_t x, const gr_series_t y, gr_series_ctx_t sctx, gr_ctx_t cctx)
 {
-    slong len, ylen, xerr, yerr, err;
+    slong len, xlen, ylen, xerr, yerr, err;
     int status = GR_SUCCESS;
+    truth_t is_zero;
+    slong val;
 
+    xlen = x->poly.length;
     ylen = y->poly.length;
     xerr = x->error;
     yerr = y->error;
 
-    if (ylen == 0 && yerr == SERIES_ERR_EXACT)
-        return GR_DOMAIN;
+    /* Divide out common leading zeros. */
+    /* TODO: for power series mods, this results in non-unique
+             quotients. Should be done when calling gr_div_nonunique
+             but not when calling gr_div. */
+    val = 0;
+    while (val < FLINT_MAX(xlen, ylen))
+    {
+        is_zero = gr_series_coeff_is_zero(y, val, sctx, cctx);
+        if (is_zero == T_UNKNOWN)
+            return GR_UNABLE;
+        if (is_zero == T_FALSE)
+            break;
 
-    if (ylen == 0 || yerr == 0)
+        is_zero = gr_series_coeff_is_zero(x, val, sctx, cctx);
+        if (is_zero == T_UNKNOWN)
+            return GR_UNABLE;
+        if (is_zero == T_FALSE)
+            return GR_DOMAIN;
+
+        val++;
+    }
+
+    xlen = FLINT_MAX(xlen - val, 0);
+    ylen = FLINT_MAX(ylen - val, 0);
+
+    if (xerr != SERIES_ERR_EXACT) xerr -= val;
+    if (yerr != SERIES_ERR_EXACT) yerr -= val;
+
+    /* x / 0 = GR_DOMAIN, unless we are in the zero ring. */
+    if (ylen == 0 && yerr == SERIES_ERR_EXACT)
+    {
+        is_zero = gr_ctx_is_zero_ring(cctx);
+
+        if (is_zero == T_FALSE)
+            return GR_DOMAIN;
+        else if (is_zero == T_UNKNOWN)
+            return GR_UNABLE;
+        else
+            return GR_SUCCESS;
+    }
+
+    /* If y = 0 + O(t^n), we do not know anything. */
+    if (ylen <= 0 || yerr == 0)
         return GR_UNABLE;
 
     err = FLINT_MIN(xerr, yerr);
     err = FLINT_MIN(err, sctx->prec);
+    /* terms >= t^mod are zero by definition. */
+    if (err >= sctx->mod)
+        err = SERIES_ERR_EXACT;
+
+    if (err <= 0)
+    {
+        status |= gr_poly_zero(&res->poly, cctx);
+        res->error = 0;
+        return status;
+    }
 
     len = FLINT_MIN(sctx->mod, sctx->prec);
     len = FLINT_MIN(len, err);
 
-    /* terms >= x^mod are zero by definition */
-    if (err >= sctx->mod)
-        err = SERIES_ERR_EXACT;
+    /* If we have an exact polynomial division, see if we have an exact result. */
+    /* TODO: Special case for length 1 divisor. */
+    /* TODO: If the polynomials are short compared to the precision, try
+             a checked polynomial division before doing a power series division. */
+    if (xerr == SERIES_ERR_EXACT && yerr == SERIES_ERR_EXACT && sctx->prec != SERIES_ERR_EXACT)
+    {
+        gr_poly_t t, u;
 
-    res->error = err;
-    status |= gr_poly_div_series(&res->poly, &x->poly, &y->poly, len, cctx);
-    return status;
+        gr_poly_init(t, cctx);
+        gr_poly_init(u, cctx);
+
+        if (val == 0)
+        {
+            /* Compute one extra coefficient to quickly discard most inexact divisions */
+            status |= gr_poly_div_series(t, &x->poly, &y->poly, len + 1, cctx);
+
+            if (t->length <= len)
+            {
+                if (status == GR_SUCCESS)
+                {
+                    status |= gr_poly_mul(u, t, &y->poly, cctx);
+                    if (gr_poly_equal(&x->poly, u, cctx) == T_TRUE)
+                        err = SERIES_ERR_EXACT;
+                }
+            }
+        }
+        else
+        {
+            gr_poly_t xb, yb;
+
+            xb->coeffs = (gr_ptr) gr_poly_entry_srcptr(&x->poly, val, cctx);
+            xb->length = xlen;
+            yb->coeffs = (gr_ptr) gr_poly_entry_srcptr(&y->poly, val, cctx);
+            yb->length = ylen;
+
+            status |= gr_poly_div_series(t, xb, yb, len + 1, cctx);
+
+            if (t->length <= len)
+            {
+                if (status == GR_SUCCESS)
+                {
+                    status |= gr_poly_mul(u, t, yb, cctx);
+                    if (gr_poly_equal(xb, u, cctx) == T_TRUE)
+                        err = SERIES_ERR_EXACT;
+                }
+            }
+        }
+
+        status |= gr_poly_truncate(t, t, len, cctx);
+
+        gr_poly_swap(&res->poly, t, cctx);
+        res->error = err;
+
+        gr_poly_clear(t, cctx);
+        gr_poly_clear(u, cctx);
+        return status;
+    }
+
+    if (val == 0)
+    {
+        res->error = err;
+        status |= gr_poly_div_series(&res->poly, &x->poly, &y->poly, len, cctx);
+        return status;
+    }
+    else
+    {
+        gr_poly_t xb, yb;
+
+        xb->coeffs = (gr_ptr) gr_poly_entry_srcptr(&x->poly, val, cctx);
+        xb->length = xlen;
+        yb->coeffs = (gr_ptr) gr_poly_entry_srcptr(&y->poly, val, cctx);
+        yb->length = ylen;
+
+        if (x == res || y == res)
+        {
+            gr_series_t t;
+            gr_series_init(t, sctx, cctx);
+            t->error = err;
+            status |= gr_poly_div_series(&t->poly, xb, yb, len, cctx);
+            gr_series_swap(res, t, sctx, cctx);
+            gr_series_clear(t, sctx, cctx);
+            return status;
+        }
+        else
+        {
+            res->error = err;
+            status |= gr_poly_div_series(&res->poly, xb, yb, len, cctx);
+            return status;
+        }
+    }
 }
 
 int
