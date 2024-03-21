@@ -728,7 +728,7 @@ typedef enum
     GR_CTX_FMPZ_POLY, GR_CTX_FMPQ_POLY, GR_CTX_GR_POLY,
     GR_CTX_FMPZ_MPOLY, GR_CTX_GR_MPOLY,
     GR_CTX_FMPZ_MPOLY_Q,
-    GR_CTX_GR_SERIES, GR_CTX_GR_SERIES_MOD, GR_CTX_SERIES_MOD_GR_POLY,
+    GR_CTX_GR_SERIES, GR_CTX_SERIES_MOD_GR_POLY,
     GR_CTX_GR_MAT,
     GR_CTX_GR_VEC,
     GR_CTX_PSL2Z, GR_CTX_DIRICHLET_GROUP, GR_CTX_PERM,
@@ -1449,7 +1449,6 @@ series_mod_ctx_t;
 
 typedef struct
 {
-    slong mod;      /* exact truncation */
     slong prec;     /* default approximate truncation */
 }
 gr_series_ctx_struct;
@@ -1473,7 +1472,6 @@ series_ctx_t;
 #define SERIES_MOD_N(ring_ctx) (SERIES_MOD_CTX(ring_ctx)->n)
 
 void gr_ctx_init_gr_series(gr_ctx_t ctx, gr_ctx_t base_ring, slong prec);
-void gr_ctx_init_gr_series_mod(gr_ctx_t ctx, gr_ctx_t base_ring, slong mod);
 void gr_ctx_init_series_mod_gr_poly(gr_ctx_t ctx, gr_ctx_t base_ring, slong n);
 
 /* Generic vectors */

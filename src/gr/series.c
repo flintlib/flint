@@ -140,27 +140,13 @@ gr_series_write(gr_stream_t out, const gr_series_t x, const char * var, gr_serie
         gr_stream_write(out, ")");
     }
 
-    if (sctx->mod != SERIES_ERR_EXACT)
-    {
-        gr_stream_write(out, " (mod ");
-        gr_stream_write(out, var);
-        gr_stream_write(out, "^");
-        gr_stream_write_si(out, sctx->mod);
-        gr_stream_write(out, ")");
-    }
-
     return GR_SUCCESS;
 }
 
 int
 gr_series_one(gr_series_t res, gr_series_ctx_t sctx, gr_ctx_t cctx)
 {
-    if (sctx->mod == 0)
-    {
-        res->error = SERIES_ERR_EXACT;
-        return gr_poly_zero(&res->poly, cctx);
-    }
-    else if (sctx->prec == 0)
+    if (sctx->prec == 0)
     {
         res->error = 0;
         return gr_poly_zero(&res->poly, cctx);
@@ -182,14 +168,11 @@ gr_series_set(gr_series_t res, const gr_series_t x, gr_series_ctx_t sctx, gr_ctx
     res->error = x->error;
     status |= gr_poly_set(&res->poly, &x->poly, cctx);
 
-    trunc = FLINT_MIN(sctx->prec, sctx->mod);
-    trunc = FLINT_MIN(trunc, res->error);
+    trunc = FLINT_MIN(sctx->prec, res->error);
     len = res->poly.length;
 
     if (len > trunc)
     {
-        if (len <= sctx->mod)
-            res->error = SERIES_ERR_EXACT;
         if (len > sctx->prec)
             res->error = FLINT_MIN(res->error, sctx->prec);
 
@@ -223,14 +206,11 @@ gr_series_neg(gr_series_t res, const gr_series_t x, gr_series_ctx_t sctx, gr_ctx
     res->error = x->error;
     status |= gr_poly_neg(&res->poly, &x->poly, cctx);
 
-    trunc = FLINT_MIN(sctx->prec, sctx->mod);
-    trunc = FLINT_MIN(trunc, res->error);
+    trunc = FLINT_MIN(sctx->prec, res->error);
     len = res->poly.length;
 
     if (len > trunc)
     {
-        if (len <= sctx->mod)
-            res->error = SERIES_ERR_EXACT;
         if (len > sctx->prec)
             res->error = FLINT_MIN(res->error, sctx->prec);
 
@@ -397,9 +377,6 @@ gr_series_is_one(const gr_series_t x, gr_series_ctx_t sctx, gr_ctx_t cctx)
     if (x->error <= 0)
         return T_UNKNOWN;
 
-    if (sctx->mod == 0)
-        return T_TRUE;
-
     if (xlen == 0)
         return gr_ctx_is_zero_ring(cctx);
 
@@ -439,7 +416,6 @@ gr_series_equal(const gr_series_t x, const gr_series_t y, gr_series_ctx_t sctx, 
     err = FLINT_MIN(xerr, yerr);
 
     len = FLINT_MAX(xlen, ylen);
-    len = FLINT_MIN(len, sctx->mod);
     len = FLINT_MIN(len, err);
 
     /* compare exactly or within the error bound */
@@ -450,10 +426,6 @@ gr_series_equal(const gr_series_t x, const gr_series_t y, gr_series_ctx_t sctx, 
 
     if (equal == T_FALSE)
         return T_FALSE;
-
-    /* terms >= x^mod are zero by definition */
-    if (err >= sctx->mod && equal == T_TRUE)
-        return T_TRUE;
 
     return T_UNKNOWN;
 }
@@ -477,13 +449,8 @@ gr_series_add(gr_series_t res, const gr_series_t x, const gr_series_t y, gr_seri
     if (len > sctx->prec)
         err = FLINT_MIN(err, sctx->prec);
 
-    len = FLINT_MIN(len, sctx->mod);
     len = FLINT_MIN(len, sctx->prec);
     len = FLINT_MIN(len, err);
-
-    /* terms >= x^mod are zero by definition */
-    if (err >= sctx->mod)
-        err = SERIES_ERR_EXACT;
 
     res->error = err;
     status |= gr_poly_add_series(&res->poly, &x->poly, &y->poly, len, cctx);
@@ -509,13 +476,8 @@ gr_series_sub(gr_series_t res, const gr_series_t x, const gr_series_t y, gr_seri
     if (len > sctx->prec)
         err = FLINT_MIN(err, sctx->prec);
 
-    len = FLINT_MIN(len, sctx->mod);
     len = FLINT_MIN(len, sctx->prec);
     len = FLINT_MIN(len, err);
-
-    /* terms >= x^mod are zero by definition */
-    if (err >= sctx->mod)
-        err = SERIES_ERR_EXACT;
 
     res->error = err;
     status |= gr_poly_sub_series(&res->poly, &x->poly, &y->poly, len, cctx);
@@ -550,13 +512,8 @@ gr_series_mul(gr_series_t res, const gr_series_t x, const gr_series_t y, gr_seri
     if (len > sctx->prec)
         err = FLINT_MIN(err, sctx->prec);
 
-    len = FLINT_MIN(len, sctx->mod);
     len = FLINT_MIN(len, sctx->prec);
     len = FLINT_MIN(len, err);
-
-    /* terms >= x^mod are zero by definition */
-    if (err >= sctx->mod)
-        err = SERIES_ERR_EXACT;
 
     res->error = err;
     status |= gr_poly_mullow(&res->poly, &x->poly, &y->poly, len, cctx);
@@ -573,9 +530,6 @@ gr_series_inv(gr_series_t res, const gr_series_t x, gr_series_ctx_t sctx, gr_ctx
     xerr = x->error;
     err = xerr;
 
-    if (xlen == 0 && sctx->mod == 0)
-        return gr_series_zero(res, sctx, cctx);
-
     if (xlen == 0 && xerr == SERIES_ERR_EXACT)
     {
         truth_t zero = gr_ctx_is_zero_ring(cctx);
@@ -591,13 +545,8 @@ gr_series_inv(gr_series_t res, const gr_series_t x, gr_series_ctx_t sctx, gr_ctx
     if (xlen == 0 || xerr == 0)
         return GR_UNABLE;
 
-    len = FLINT_MIN(sctx->mod, sctx->prec);
-    len = FLINT_MIN(len, err);
+    len = FLINT_MIN(sctx->prec, err);
     err = len;
-
-    /* terms >= x^mod are zero by definition */
-    if (err >= sctx->mod)
-        err = SERIES_ERR_EXACT;
 
     res->error = err;
     status |= gr_poly_inv_series(&res->poly, &x->poly, len, cctx);
@@ -679,9 +628,6 @@ gr_series_div(gr_series_t res, const gr_series_t x, const gr_series_t y, gr_seri
 
     err = FLINT_MIN(xerr, yerr);
     err = FLINT_MIN(err, sctx->prec);
-    /* terms >= t^mod are zero by definition. */
-    if (err >= sctx->mod)
-        err = SERIES_ERR_EXACT;
 
     if (err <= 0)
     {
@@ -690,8 +636,7 @@ gr_series_div(gr_series_t res, const gr_series_t x, const gr_series_t y, gr_seri
         return status;
     }
 
-    len = FLINT_MIN(sctx->mod, sctx->prec);
-    len = FLINT_MIN(len, err);
+    len = FLINT_MIN(sctx->prec, err);
 
     /* If we have an exact polynomial division, see if we have an exact result. */
     /* TODO: Special case for length 1 divisor. */
@@ -804,13 +749,8 @@ gr_series_sqrt(gr_series_t res, const gr_series_t x, gr_series_ctx_t sctx, gr_ct
     if (xlen > 1 && gr_is_zero(x->poly.coeffs, cctx) != T_FALSE)
         return GR_UNABLE;
 
-    len = FLINT_MIN(sctx->mod, sctx->prec);
-    len = FLINT_MIN(len, err);
+    len = FLINT_MIN(sctx->prec, err);
     err = len;
-
-    /* terms >= x^mod are zero by definition */
-    if (err >= sctx->mod)
-        err = SERIES_ERR_EXACT;
 
     res->error = err;
     status |= gr_poly_sqrt_series(&res->poly, &x->poly, len, cctx);
@@ -829,8 +769,7 @@ gr_series_ ## func(gr_series_t res, const gr_series_t x, gr_series_ctx_t sctx, g
     xerr = x->error; \
     err = xerr; \
  \
-    len = FLINT_MIN(sctx->mod, sctx->prec); \
-    len = FLINT_MIN(len, err); \
+    len = FLINT_MIN(sctx->prec, err); \
     err = len; \
  \
     if (xlen <= 1 && xerr == SERIES_ERR_EXACT) \
@@ -838,9 +777,6 @@ gr_series_ ## func(gr_series_t res, const gr_series_t x, gr_series_ctx_t sctx, g
         len = FLINT_MIN(len, 1); \
         err = SERIES_ERR_EXACT; \
     } \
- \
-    if (err >= sctx->mod) \
-        err = SERIES_ERR_EXACT; \
  \
     res->error = err; \
     status |= gr_poly_ ## func ## _series(&res->poly, &x->poly, len, cctx); \
@@ -883,13 +819,9 @@ gr_series_ ## func(gr_series_t res, const gr_series_t x, gr_series_ctx_t sctx, g
     xerr = x->error; \
     err = xerr; \
  \
-    len = FLINT_MIN(sctx->mod, sctx->prec); \
-    len = FLINT_MIN(len, err); \
+    len = FLINT_MIN(sctx->prec, err); \
     err = len; \
  \
-    if (err >= sctx->mod) \
-        err = SERIES_ERR_EXACT; \
-  \
     if (xlen <= 1 && xerr == SERIES_ERR_EXACT) \
     { \
         len = FLINT_MIN(len, 1); \
@@ -943,12 +875,8 @@ gr_series_fresnel(gr_series_t res1, gr_series_t res2, const gr_series_t x, int n
     xerr = x->error;
     err = xerr;
 
-    len = FLINT_MIN(sctx->mod, sctx->prec);
-    len = FLINT_MIN(len, err);
+    len = FLINT_MIN(sctx->prec, err);
     err = len;
-
-    if (err >= sctx->mod)
-        err = SERIES_ERR_EXACT;
 
     if (xlen <= 1 && xerr == SERIES_ERR_EXACT)
     {
@@ -1011,12 +939,8 @@ gr_series_airy(gr_series_t res1, gr_series_t res2, gr_series_t res3, gr_series_t
     xerr = x->error;
     err = xerr;
 
-    len = FLINT_MIN(sctx->mod, sctx->prec);
-    len = FLINT_MIN(len, err);
+    len = FLINT_MIN(sctx->prec, err);
     err = len;
-
-    if (err >= sctx->mod)
-        err = SERIES_ERR_EXACT;
 
     if (xlen <= 1 && xerr == SERIES_ERR_EXACT)
     {
@@ -1106,12 +1030,8 @@ gr_series_log_integral(gr_series_t res, const gr_series_t x, int offset, gr_seri
     xerr = x->error;
     err = xerr;
 
-    len = FLINT_MIN(sctx->mod, sctx->prec);
-    len = FLINT_MIN(len, err);
+    len = FLINT_MIN(sctx->prec, err);
     err = len;
-
-    if (err >= sctx->mod)
-        err = SERIES_ERR_EXACT;
 
     if (xlen <= 1 && xerr == SERIES_ERR_EXACT)
     {
@@ -1153,12 +1073,8 @@ gr_series_gamma_upper(gr_series_t res, const gr_series_t s, const gr_series_t x,
     xerr = x->error;
     err = xerr;
 
-    len = FLINT_MIN(sctx->mod, sctx->prec);
-    len = FLINT_MIN(len, err);
+    len = FLINT_MIN(sctx->prec, err);
     err = len;
-
-    if (err >= sctx->mod)
-        err = SERIES_ERR_EXACT;
 
     if (xlen <= 1 && xerr == SERIES_ERR_EXACT)
     {
@@ -1212,12 +1128,8 @@ gr_series_gamma_lower(gr_series_t res, const gr_series_t s, const gr_series_t x,
     xerr = x->error;
     err = xerr;
 
-    len = FLINT_MIN(sctx->mod, sctx->prec);
-    len = FLINT_MIN(len, err);
+    len = FLINT_MIN(sctx->prec, err);
     err = len;
-
-    if (err >= sctx->mod)
-        err = SERIES_ERR_EXACT;
 
     if (xlen <= 1 && xerr == SERIES_ERR_EXACT)
     {
@@ -1271,12 +1183,8 @@ gr_series_beta_lower(gr_series_t res, const gr_series_t a, const gr_series_t b, 
     xerr = x->error;
     err = xerr;
 
-    len = FLINT_MIN(sctx->mod, sctx->prec);
-    len = FLINT_MIN(len, err);
+    len = FLINT_MIN(sctx->prec, err);
     err = len;
-
-    if (err >= sctx->mod)
-        err = SERIES_ERR_EXACT;
 
     if (xlen <= 1 && xerr == SERIES_ERR_EXACT)
     {
@@ -1338,12 +1246,8 @@ gr_series_polylog(gr_series_t res, const gr_series_t s, const gr_series_t z, gr_
     xerr = s->error;
     err = xerr;
 
-    len = FLINT_MIN(sctx->mod, sctx->prec);
-    len = FLINT_MIN(len, err);
+    len = FLINT_MIN(sctx->prec, err);
     err = len;
-
-    if (err >= sctx->mod)
-        err = SERIES_ERR_EXACT;
 
     if (xlen <= 1 && xerr == SERIES_ERR_EXACT)
     {
@@ -1386,12 +1290,8 @@ gr_series_hurwitz_zeta(gr_series_t res, const gr_series_t s, const gr_series_t z
     xerr = s->error;
     err = xerr;
 
-    len = FLINT_MIN(sctx->mod, sctx->prec);
-    len = FLINT_MIN(len, err);
+    len = FLINT_MIN(sctx->prec, err);
     err = len;
-
-    if (err >= sctx->mod)
-        err = SERIES_ERR_EXACT;
 
     if (xlen <= 1 && xerr == SERIES_ERR_EXACT)
     {
@@ -1434,12 +1334,8 @@ gr_series_dirichlet_l(gr_series_t res, const dirichlet_group_t G, const dirichle
     xerr = x->error;
     err = xerr;
 
-    len = FLINT_MIN(sctx->mod, sctx->prec);
-    len = FLINT_MIN(len, err);
+    len = FLINT_MIN(sctx->prec, err);
     err = len;
-
-    if (err >= sctx->mod)
-        err = SERIES_ERR_EXACT;
 
     if (xlen <= 1 && xerr == SERIES_ERR_EXACT)
     {
@@ -1474,12 +1370,8 @@ gr_series_dirichlet_hardy_theta(gr_series_t res, const dirichlet_group_t G, cons
     xerr = x->error;
     err = xerr;
 
-    len = FLINT_MIN(sctx->mod, sctx->prec);
-    len = FLINT_MIN(len, err);
+    len = FLINT_MIN(sctx->prec, err);
     err = len;
-
-    if (err >= sctx->mod)
-        err = SERIES_ERR_EXACT;
 
     if (xlen <= 1 && xerr == SERIES_ERR_EXACT)
     {
@@ -1514,12 +1406,8 @@ gr_series_dirichlet_hardy_z(gr_series_t res, const dirichlet_group_t G, const di
     xerr = x->error;
     err = xerr;
 
-    len = FLINT_MIN(sctx->mod, sctx->prec);
-    len = FLINT_MIN(len, err);
+    len = FLINT_MIN(sctx->prec, err);
     err = len;
-
-    if (err >= sctx->mod)
-        err = SERIES_ERR_EXACT;
 
     if (xlen <= 1 && xerr == SERIES_ERR_EXACT)
     {
@@ -1554,12 +1442,8 @@ gr_series_jacobi_theta(gr_series_t res1, gr_series_t res2, gr_series_t res3, gr_
     xerr = x->error;
     err = xerr;
 
-    len = FLINT_MIN(sctx->mod, sctx->prec);
-    len = FLINT_MIN(len, err);
+    len = FLINT_MIN(sctx->prec, err);
     err = len;
-
-    if (err >= sctx->mod)
-        err = SERIES_ERR_EXACT;
 
     if (xlen <= 1 && xerr == SERIES_ERR_EXACT)
     {
@@ -1640,12 +1524,8 @@ gr_series_agm1(gr_series_t res, const gr_series_t x, gr_series_ctx_t sctx, gr_ct
     xerr = x->error;
     err = xerr;
 
-    len = FLINT_MIN(sctx->mod, sctx->prec);
-    len = FLINT_MIN(len, err);
+    len = FLINT_MIN(sctx->prec, err);
     err = len;
-
-    if (err >= sctx->mod)
-        err = SERIES_ERR_EXACT;
 
     if (xlen <= 1 && xerr == SERIES_ERR_EXACT)
     {
@@ -1680,12 +1560,8 @@ gr_series_elliptic_k(gr_series_t res, const gr_series_t x, gr_series_ctx_t sctx,
     xerr = x->error;
     err = xerr;
 
-    len = FLINT_MIN(sctx->mod, sctx->prec);
-    len = FLINT_MIN(len, err);
+    len = FLINT_MIN(sctx->prec, err);
     err = len;
-
-    if (err >= sctx->mod)
-        err = SERIES_ERR_EXACT;
 
     if (xlen <= 1 && xerr == SERIES_ERR_EXACT)
     {
@@ -1720,12 +1596,8 @@ gr_series_weierstrass_p(gr_series_t res, const gr_series_t x, const gr_series_t 
     xerr = x->error;
     err = xerr;
 
-    len = FLINT_MIN(sctx->mod, sctx->prec);
-    len = FLINT_MIN(len, err);
+    len = FLINT_MIN(sctx->prec, err);
     err = len;
-
-    if (err >= sctx->mod)
-        err = SERIES_ERR_EXACT;
 
     if (xlen <= 1 && xerr == SERIES_ERR_EXACT)
     {
@@ -1786,12 +1658,8 @@ gr_series_hypgeom_pfq(gr_series_t res, const gr_series_vec_t a, const gr_series_
     for (i = 0; i < q; i++)
         err = FLINT_MIN(err, b->entries[i].error);
 
-    len = FLINT_MIN(sctx->mod, sctx->prec);
-    len = FLINT_MIN(len, err);
+    len = FLINT_MIN(sctx->prec, err);
     err = len;
-
-    if (err >= sctx->mod)
-        err = SERIES_ERR_EXACT;
 
     aa = GR_TMP_ALLOC(sizeof(acb_poly_struct) * (p + q + 1));
 
@@ -1863,39 +1731,24 @@ static int _gr_gr_series_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
     gr_stream_write(out, "Power series over ");
     gr_ctx_write(out, SERIES_ELEM_CTX(ctx));
-    if (ctx->which_ring == GR_CTX_GR_SERIES_MOD)
-    {
-        gr_stream_write(out, " mod ");
-        gr_stream_write(out, SERIES_CTX(ctx)->var);
-        gr_stream_write(out, "^");
-        gr_stream_write_si(out, SERIES_SCTX(ctx)->mod);
-    }
-
     gr_stream_write(out, " with precision ");
     gr_stream_write(out, "O(");
     gr_stream_write(out, SERIES_CTX(ctx)->var);
     gr_stream_write(out, "^");
     gr_stream_write_si(out, SERIES_SCTX(ctx)->prec);
     gr_stream_write(out, ")");
-
     return GR_SUCCESS;
 }
 
 truth_t
 _gr_gr_series_ctx_is_ring(gr_ctx_t ctx)
 {
-    if (ctx->which_ring == GR_CTX_GR_SERIES_MOD && SERIES_SCTX(ctx)->mod == 0)
-        return T_TRUE;
-
     return gr_ctx_is_ring(SERIES_ELEM_CTX(ctx));
 }
 
 truth_t
 _gr_gr_series_ctx_is_commutative_ring(gr_ctx_t ctx)
 {
-    if (ctx->which_ring == GR_CTX_GR_SERIES_MOD && SERIES_SCTX(ctx)->mod == 0)
-        return T_TRUE;
-
     return gr_ctx_is_commutative_ring(SERIES_ELEM_CTX(ctx));
 }
 
@@ -2035,8 +1888,7 @@ _gr_gr_series_set_other(gr_series_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t c
     {
         return gr_series_set_scalar(res, x, SERIES_SCTX(ctx), SERIES_ELEM_CTX(ctx));
     }
-    else if ((x_ctx->which_ring == GR_CTX_GR_SERIES || x_ctx->which_ring == GR_CTX_GR_SERIES_MOD)
-        && !strcmp(SERIES_CTX(x_ctx)->var, SERIES_CTX(ctx)->var))
+    else if (x_ctx->which_ring == GR_CTX_GR_SERIES && !strcmp(SERIES_CTX(x_ctx)->var, SERIES_CTX(ctx)->var))
     {
         int status = GR_SUCCESS;
 
@@ -2179,7 +2031,7 @@ gr_method_tab_input _gr_series_methods_input[] =
 };
 
 static inline void
-_gr_ctx_init_gr_series(gr_ctx_t ctx, gr_ctx_t base_ring, int kind, slong mod, slong prec)
+_gr_ctx_init_gr_series(gr_ctx_t ctx, gr_ctx_t base_ring, int kind, slong prec)
 {
     ctx->which_ring = kind;
     ctx->sizeof_elem = sizeof(gr_series_struct);
@@ -2187,7 +2039,6 @@ _gr_ctx_init_gr_series(gr_ctx_t ctx, gr_ctx_t base_ring, int kind, slong mod, sl
 
     SERIES_CTX(ctx)->base_ring = (gr_ctx_struct *) base_ring;
     SERIES_CTX(ctx)->var = (char *) default_var;
-    SERIES_CTX(ctx)->sctx.mod = mod;
     SERIES_CTX(ctx)->sctx.prec = prec;
 
     ctx->methods = _gr_series_methods;
@@ -2202,14 +2053,5 @@ _gr_ctx_init_gr_series(gr_ctx_t ctx, gr_ctx_t base_ring, int kind, slong mod, sl
 void
 gr_ctx_init_gr_series(gr_ctx_t ctx, gr_ctx_t base_ring, slong prec)
 {
-    _gr_ctx_init_gr_series(ctx, base_ring, GR_CTX_GR_SERIES, SERIES_ERR_EXACT, FLINT_MIN(FLINT_MAX(0, prec), SERIES_ERR_MAX));
-}
-
-void
-gr_ctx_init_gr_series_mod(gr_ctx_t ctx, gr_ctx_t base_ring, slong mod)
-{
-    if (mod >= SERIES_ERR_EXACT)
-        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
-
-    _gr_ctx_init_gr_series(ctx, base_ring, GR_CTX_GR_SERIES_MOD, FLINT_MAX(0, mod), mod);
+    _gr_ctx_init_gr_series(ctx, base_ring, GR_CTX_GR_SERIES, prec);
 }
