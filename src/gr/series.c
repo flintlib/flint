@@ -424,6 +424,9 @@ gr_series_equal(const gr_series_t x, const gr_series_t y, gr_series_ctx_t sctx, 
     else
         equal = _gr_poly_equal2(y->poly.coeffs, FLINT_MIN(ylen, len), x->poly.coeffs, FLINT_MIN(xlen, len), cctx);
 
+    if (err == SERIES_ERR_EXACT && equal == T_TRUE)
+        return T_TRUE;
+
     if (equal == T_FALSE)
         return T_FALSE;
 
