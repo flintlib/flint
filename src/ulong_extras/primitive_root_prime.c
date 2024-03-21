@@ -19,16 +19,16 @@ ulong n_primitive_root_prime_prefactor(ulong p, n_factor_t * factors)
         return 1;
 
     // compute the divisions "(p-1) / factors" once for all
-    ulong * exps = FLINT_ARRAY_ALLOC(factors->num, ulong);
+    mp_limb_signed_t * exps = FLINT_ARRAY_ALLOC(factors->num, mp_limb_signed_t);
     for (slong i = 0; i < factors->num; i++)
         exps[i] = (p-1) / factors->p[i];
 
-    // try 2, 3, ..., p-2
+    // try 2, 3, ..., p-1
     const ulong pinv = n_preinvert_limb(p);
-    for (ulong a = 2; a < p-1; a++)
+    for (ulong a = 2; a < p; a++)
     {
         slong i = 0;
-        while ((i < factors->num) && (1 == n_powmod2_preinv(a, exps[i], p, pinv)))
+        while ((i < factors->num) && (1 != n_powmod2_preinv(a, exps[i], p, pinv)))
             i += 1;
         if (i == factors->num)
         {
