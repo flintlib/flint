@@ -4386,14 +4386,14 @@ class PowerSeriesRing_gr_series(gr_ctx):
     def __del__(self):
         self._coefficient_ring._decrement_refcount()
 
-class PowerSeriesModRing_gr_series(gr_ctx):
-    def __init__(self, coefficient_ring, mod=6, var=None):
+class PowerSeriesModRing_gr_poly(gr_ctx):
+    def __init__(self, coefficient_ring, mod, var=None):
         assert isinstance(coefficient_ring, gr_ctx)
         gr_ctx.__init__(self)
-        libgr.gr_ctx_init_gr_series_mod(self._ref, coefficient_ring._ref, mod)
+        libgr.gr_ctx_init_series_mod_gr_poly(self._ref, coefficient_ring._ref, mod)
         coefficient_ring._refcount += 1
         self._coefficient_ring = coefficient_ring
-        self._elem_type = gr_series
+        self._elem_type = gr_poly
         if var is not None:
             self._set_gen_name(var)
 
@@ -6609,7 +6609,7 @@ libflint.fexpr_get_decimal_str.restype = ctypes.c_void_p
 
 PolynomialRing = PolynomialRing_gr_poly
 PowerSeriesRing = PowerSeriesRing_gr_series
-PowerSeriesModRing = PowerSeriesModRing_gr_series
+PowerSeriesModRing = PowerSeriesModRing_gr_poly
 
 NumberField = NumberField_nf
 
@@ -7885,6 +7885,12 @@ def test_gr_series():
     assert raises(lambda: x**3 / O2, FlintUnableError)
     assert raises(lambda: x**3 / O3, FlintUnableError)
 
+    R2 = PowerSeriesModRing(QQ, 3)
+    assert R2(3 + O4) == R2(3)
+    assert R2(3 + O3) == R2(3)
+    assert raises(lambda: R2(3 + O2), FlintUnableError)
+
+
     R = RRser
     x = R.gen()
     a = R(RR("0 +/- 1e-10"))
@@ -7909,25 +7915,27 @@ def test_gr_series():
     assert raises(lambda: (x**3) / (a * x**4), FlintDomainError)
     assert raises(lambda: (a * x + x**3) / (a * x**2), FlintUnableError)
 
-    R = PowerSeriesModRing(QQ, 6)
-    x = R.gen()
-
-    assert x**6 == 0
-    assert x**5 != 0
-    assert x / x == 1
-    assert str(1 / (1 + x)) == "1 - x + x^2 - x^3 + x^4 - x^5 (mod x^6)"
-    assert str(x / (x + x**2)) == "1 - x + x^2 - x^3 + x^4 - x^5 (mod x^6)"
-
-    # note: nonunique quotient, currently permitted
-    assert str(x / (x.exp() - 1)) == "1 + (-1/2)*x + (1/12)*x^2 + (-1/720)*x^4 + (1/720)*x^5 (mod x^6)"
-
-    assert raises(lambda: x / 0, FlintDomainError)
-
     x = PowerSeriesRing(ZZmod(1)).gen()
     assert x + x == 0
     assert x - x == 0
     assert x * x == 0
     assert x / x == 0
+
+
+    R = PowerSeriesModRing(QQ, 6)
+    x = R.gen()
+
+    assert x**6 == 0
+    assert x**5 != 0
+    assert str(1 / (1 + x)) == "1 - x + x^2 - x^3 + x^4 - x^5 (mod x^6)"
+
+    # Deflating quotients are nonunique and not supported by / by default
+    assert raises(lambda: x / x, FlintDomainError)
+    # assert x / x == 1
+    # assert str(x / (x + x**2)) == "1 - x + x^2 - x^3 + x^4 - x^5 (mod x^6)"
+    # assert str(x / (x.exp() - 1)) == "1 + (-1/2)*x + (1/12)*x^2 + (-1/720)*x^4 + (1/720)*x^5 (mod x^6)"
+
+    assert raises(lambda: x / 0, FlintDomainError)
 
 
 

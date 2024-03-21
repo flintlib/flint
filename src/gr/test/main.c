@@ -57,6 +57,7 @@
 #include "t-series_arb.c"
 #include "t-series_fmpq.c"
 #include "t-series_fmpz.c"
+#include "t-series_mod_gr_poly.c"
 #include "t-series_nmod8.c"
 #include "t-vector_acb.c"
 #include "t-vector_arb.c"
@@ -108,6 +109,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_series_arb),
     TEST_FUNCTION(gr_series_fmpq),
     TEST_FUNCTION(gr_series_fmpz),
+    TEST_FUNCTION(gr_series_mod_gr_poly),
     TEST_FUNCTION(gr_series_nmod8),
     TEST_FUNCTION(gr_vector_acb),
     TEST_FUNCTION(gr_vector_arb),

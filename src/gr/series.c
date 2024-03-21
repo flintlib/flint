@@ -21,6 +21,20 @@
 # include <string.h>
 #endif
 
+#define SERIES_ERR_EXACT WORD_MAX
+#define SERIES_ERR_MAX WORD_MAX / 4
+
+typedef struct
+{
+    gr_poly_struct poly;
+    slong error;
+}
+gr_series_struct;
+
+typedef gr_series_struct gr_series_t[1];
+
+
+
 /* arb wrappers todo: elementary functions; pfq, coulomb, zeta/dirichlet deflated */
 
 static const char * default_var = "x";
@@ -66,28 +80,6 @@ gr_poly_sub_series(gr_poly_t res, const gr_poly_t poly1,
     _gr_poly_normalise(res, ctx);
     return status;
 }
-
-#define SERIES_ERR_EXACT WORD_MAX
-#define SERIES_ERR_MAX WORD_MAX / 4
-
-typedef struct
-{
-    gr_poly_struct poly;
-    slong error;
-}
-gr_series_struct;
-
-typedef gr_series_struct gr_series_t[1];
-
-typedef struct
-{
-    slong mod;      /* exact truncation */
-    slong prec;     /* default approximate truncation */
-}
-gr_series_ctx_struct;
-
-typedef gr_series_ctx_struct gr_series_ctx_t[1];
-
 
 void
 gr_series_init(gr_series_t res, gr_series_ctx_t sctx, gr_ctx_t cctx)
@@ -1858,19 +1850,6 @@ gr_series_hypgeom_pfq(gr_series_t res, const gr_series_vec_t a, const gr_series_
     return status;
 }
 
-typedef struct
-{
-    gr_ctx_struct * base_ring;
-    gr_series_ctx_struct sctx;
-    char * var;
-}
-series_ctx_t;
-
-#define SERIES_CTX(ring_ctx) ((series_ctx_t *)((ring_ctx)))
-#define SERIES_ELEM_CTX(ring_ctx) (SERIES_CTX(ring_ctx)->base_ring)
-#define SERIES_SCTX(ring_ctx) (&(((series_ctx_t *)((ring_ctx)))->sctx))
-
-
 static void _gr_gr_series_ctx_clear(gr_ctx_t ctx)
 {
     if (SERIES_CTX(ctx)->var != default_var)
@@ -2118,7 +2097,6 @@ gr_method_tab_input _gr_series_methods_input[] =
     {GR_METHOD_CTX_SET_GEN_NAME, (gr_funcptr) _gr_gr_series_ctx_set_gen_name},
     {GR_METHOD_CTX_IS_RING, (gr_funcptr) _gr_gr_series_ctx_is_ring},
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) _gr_gr_series_ctx_is_commutative_ring},
-
     {GR_METHOD_INIT,        (gr_funcptr) _gr_gr_series_init},
     {GR_METHOD_CLEAR,       (gr_funcptr) _gr_gr_series_clear},
     {GR_METHOD_SWAP,        (gr_funcptr) _gr_gr_series_swap},

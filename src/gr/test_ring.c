@@ -1757,6 +1757,8 @@ gr_test_is_invertible(gr_ctx_t R, flint_rand_t state, int test_flags)
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
         flint_printf("\n");
+        gr_ctx_println(R);
+        flint_printf("is_invertible\n");
         flint_printf("x = \n"); gr_println(x, R);
         flint_printf("x ^ -1 = \n"); gr_println(x_inv, R);
         flint_printf("status = %d, invertible = %d\n", status, invertible);
@@ -2675,6 +2677,7 @@ gr_test_sqrt(gr_ctx_t R, flint_rand_t state, int test_flags)
     int status = GR_SUCCESS;
     gr_ptr x, y, y2;
     int perfect;
+    char * fail_str = "";
 
     GR_TMP_INIT3(x, y, y2, R);
 
@@ -2700,16 +2703,19 @@ gr_test_sqrt(gr_ctx_t R, flint_rand_t state, int test_flags)
 
     if (status == GR_SUCCESS && gr_equal(y2, x, R) == T_FALSE)
     {
+        fail_str = "y2 == x is FALSE\n";
         status = GR_TEST_FAIL;
     }
 
     if (status == GR_DOMAIN && perfect)
     {
+        fail_str = "status is GR_DOMAIN but input is a perfect square\n";
         status = GR_TEST_FAIL;
     }
 
     if (status == GR_SUCCESS && perfect && gr_is_square(x, R) == T_FALSE)
     {
+        fail_str = "is_square(x) returns T_FALSE but input is a perfect square\n";
         status = GR_TEST_FAIL;
     }
 
@@ -2719,6 +2725,7 @@ gr_test_sqrt(gr_ctx_t R, flint_rand_t state, int test_flags)
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
         flint_printf("FAIL: sqrt\n");
+        flint_printf("%s\n", fail_str);
         flint_printf("R = "); gr_ctx_println(R);
         flint_printf("x = \n"); gr_println(x, R);
         flint_printf("y = \n"); gr_println(y, R);
