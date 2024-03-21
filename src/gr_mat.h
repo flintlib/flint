@@ -100,8 +100,12 @@ WARN_UNUSED_RESULT int gr_mat_randpermdiag(int * parity, gr_mat_t mat, flint_ran
 WARN_UNUSED_RESULT int gr_mat_randrank(gr_mat_t mat, flint_rand_t state, slong rank, gr_ctx_t ctx);
 
 #define gr_mat_is_compatible(mat1, mat2, ctx) (((mat1)->r == (mat2)->r && (mat1)->c == (mat2)->c) ? T_TRUE : T_FALSE)
-#define gr_mat_is_empty(mat, ctx) ((((mat)->r == 0) || ((mat)->c == 0)) ? T_TRUE : T_FALSE)
-#define gr_mat_is_square(mat, ctx) (((mat)->r == (mat)->c) ? T_TRUE : T_FALSE)
+
+GR_MAT_INLINE truth_t gr_mat_is_empty(const gr_mat_t mat, gr_ctx_t ctx)
+{ return (((mat)->r == 0) || ((mat)->c == 0)) ? T_TRUE : T_FALSE; }
+
+GR_MAT_INLINE truth_t gr_mat_is_square(const gr_mat_t mat, gr_ctx_t ctx)
+{ return ((mat)->r == (mat)->c) ? T_TRUE : T_FALSE; }
 
 truth_t gr_mat_equal(const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx);
 truth_t gr_mat_is_zero(const gr_mat_t mat, gr_ctx_t ctx);
@@ -127,11 +131,40 @@ WARN_UNUSED_RESULT int gr_mat_sub(gr_mat_t res, const gr_mat_t mat1, const gr_ma
 
 /* todo: test, wrap; div; more conversions */
 WARN_UNUSED_RESULT int gr_mat_add_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_add_scalar_si(gr_mat_t res, const gr_mat_t mat, slong x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_add_scalar_ui(gr_mat_t res, const gr_mat_t mat, ulong x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_add_scalar_fmpz(gr_mat_t res, const gr_mat_t mat, fmpz_t x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_add_scalar_fmpq(gr_mat_t res, const gr_mat_t mat, fmpq_t x, gr_ctx_t ctx);
+
 WARN_UNUSED_RESULT int gr_mat_sub_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_sub_scalar_si(gr_mat_t res, const gr_mat_t mat, slong x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_sub_scalar_ui(gr_mat_t res, const gr_mat_t mat, ulong x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_sub_scalar_fmpz(gr_mat_t res, const gr_mat_t mat, fmpz_t x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_sub_scalar_fmpq(gr_mat_t res, const gr_mat_t mat, fmpq_t x, gr_ctx_t ctx);
+
 WARN_UNUSED_RESULT int gr_mat_mul_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_mul_scalar_si(gr_mat_t res, const gr_mat_t mat, slong x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_mul_scalar_ui(gr_mat_t res, const gr_mat_t mat, ulong x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_mul_scalar_fmpz(gr_mat_t res, const gr_mat_t mat, fmpz_t x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_mul_scalar_fmpq(gr_mat_t res, const gr_mat_t mat, fmpq_t x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_mul_scalar_2exp_si(gr_mat_t res, const gr_mat_t mat, slong e, gr_ctx_t ctx);
+
+WARN_UNUSED_RESULT int gr_mat_div_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_div_scalar_si(gr_mat_t res, const gr_mat_t mat, slong x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_div_scalar_ui(gr_mat_t res, const gr_mat_t mat, ulong x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_div_scalar_fmpz(gr_mat_t res, const gr_mat_t mat, fmpz_t x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_div_scalar_fmpq(gr_mat_t res, const gr_mat_t mat, fmpq_t x, gr_ctx_t ctx);
+
+WARN_UNUSED_RESULT int gr_mat_divexact_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_divexact_scalar_si(gr_mat_t res, const gr_mat_t mat, slong x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_divexact_scalar_ui(gr_mat_t res, const gr_mat_t mat, ulong x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_divexact_scalar_fmpz(gr_mat_t res, const gr_mat_t mat, fmpz_t x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_divexact_scalar_fmpq(gr_mat_t res, const gr_mat_t mat, fmpq_t x, gr_ctx_t ctx);
+
 WARN_UNUSED_RESULT int gr_mat_addmul_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_submul_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_mat_div_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t ctx);
+
+WARN_UNUSED_RESULT int gr_mat_mul_vec(gr_ptr v, const gr_mat_t A, gr_srcptr u, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_mat_mul_classical(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_mul_strassen(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
@@ -206,20 +239,26 @@ WARN_UNUSED_RESULT int gr_mat_hilbert(gr_mat_t mat, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_hadamard(gr_mat_t mat, gr_ctx_t ctx);
 /* todo: dft, dct */
 
-#define _GR_MAT_INIT_SHALLOW_TRANSPOSE(B, A, sz) { \
-    B->r = A->c; \
-    B->c = A->r; \
-    B->rows = flint_malloc(A->c * sizeof(gr_ptr)); \
-    B->entries = TMP_ALLOC(sz * A->c * A->r); \
+#define _GR_MAT_SHALLOW_TRANSPOSE(AT, A, sz) { \
     for (j = 0; j < A->c; j++) \
     { \
-        B->rows[j] = GR_ENTRY(B->entries, j * A->r, sz); \
         for (i = 0; i < A->r; i++) \
         { \
-            set_shallow(GR_MAT_ENTRY(B, j, i, sz), GR_MAT_ENTRY(B, i, j, sz), ctx); \
+            set_shallow(GR_MAT_ENTRY(AT, j, i, sz), GR_MAT_ENTRY(A, i, j, sz), ctx); \
         } \
     } \
 }
+
+#define _GR_MAT_INIT_SHALLOW_TRANSPOSE(AT, A, sz) { \
+    AT->r = A->c; \
+    AT->c = A->r; \
+    AT->rows = flint_malloc(AT->r * sizeof(gr_ptr)); \
+    AT->entries = TMP_ALLOC(sz * A->c * A->r); \
+    for (j = 0; j < A->c; j++) \
+        AT->rows[j] = GR_ENTRY(AT->entries, j * A->r, sz); \
+    _GR_MAT_SHALLOW_TRANSPOSE(AT, A, sz) \
+}
+
 
 WARN_UNUSED_RESULT int gr_mat_transpose(gr_mat_t B, const gr_mat_t A, gr_ctx_t ctx);
 

@@ -22,7 +22,7 @@
     {                                                                  \
         gr_csr_mat_fit_nnz(dst, src->nnz, ctx);                     \
         dst->nnz = src->nnz;                                           \
-        memcpy(dst->rows, src->rows, src->r*sizeof(ulong));          \
+        memcpy(dst->rows, src->rows, (src->r+1)*sizeof(ulong));          \
         memcpy(dst->cols, src->cols, src->nnz*sizeof(ulong));          \
     }                                                                  \
     return dense_vec_op(dst->nzs, src->nzs, src->nnz, c, ctx); \
@@ -113,3 +113,52 @@ int gr_lil_mat_divexact_scalar_fmpz(gr_lil_mat_t dst, const gr_lil_mat_t src, co
 { GR_LIL_MAT_DENSE_VEC_OP(_gr_vec_divexact_scalar_fmpz, dst, src, c, ctx) }
 int gr_lil_mat_divexact_scalar_fmpq(gr_lil_mat_t dst, const gr_lil_mat_t src, const fmpq_t c, gr_ctx_t ctx)
 { GR_LIL_MAT_DENSE_VEC_OP(_gr_vec_divexact_scalar_fmpq, dst, src, c, ctx) }
+
+
+#define GR_COO_MAT_DENSE_VEC_OP(dense_vec_op, dst, src, c, ctx)     \
+    if(dst->r != src->r || dst->c != src->c)                           \
+    {                                                                  \
+        return GR_DOMAIN;                                              \
+    }                                                                  \
+    if(dst != src)                                                     \
+    {                                                                  \
+        gr_coo_mat_fit_nnz(dst, src->nnz, ctx);                     \
+        dst->nnz = src->nnz;                                           \
+        memcpy(dst->rows, src->rows, src->nnz*sizeof(ulong));          \
+        memcpy(dst->cols, src->cols, src->nnz*sizeof(ulong));          \
+        dst->is_canonical = src->is_canonical;                         \
+    }                                                                  \
+    return dense_vec_op(dst->nzs, src->nzs, src->nnz, c, ctx); \
+
+int gr_coo_mat_mul_scalar(gr_coo_mat_t dst, const gr_coo_mat_t src, gr_srcptr c, gr_ctx_t ctx)
+{ GR_COO_MAT_DENSE_VEC_OP(_gr_vec_mul_scalar, dst, src, c, ctx) } 
+int gr_coo_mat_mul_scalar_si(gr_coo_mat_t dst, const gr_coo_mat_t src, slong c, gr_ctx_t ctx)
+{ GR_COO_MAT_DENSE_VEC_OP(_gr_vec_mul_scalar_si, dst, src, c, ctx) }
+int gr_coo_mat_mul_scalar_ui(gr_coo_mat_t dst, const gr_coo_mat_t src, ulong c, gr_ctx_t ctx)
+{ GR_COO_MAT_DENSE_VEC_OP(_gr_vec_mul_scalar_ui, dst, src, c, ctx) }
+int gr_coo_mat_mul_scalar_fmpz(gr_coo_mat_t dst, const gr_coo_mat_t src, const fmpz_t c, gr_ctx_t ctx)
+{ GR_COO_MAT_DENSE_VEC_OP(_gr_vec_mul_scalar_fmpz, dst, src, c, ctx) }
+int gr_coo_mat_mul_scalar_fmpq(gr_coo_mat_t dst, const gr_coo_mat_t src, const fmpq_t c, gr_ctx_t ctx)
+{ GR_COO_MAT_DENSE_VEC_OP(_gr_vec_mul_scalar_fmpq, dst, src, c, ctx) }
+int gr_coo_mat_mul_scalar_2exp_si(gr_coo_mat_t dst, const gr_coo_mat_t src, slong c, gr_ctx_t ctx)
+{ GR_COO_MAT_DENSE_VEC_OP(_gr_vec_mul_scalar_2exp_si, dst, src, c, ctx) }
+int gr_coo_mat_div_scalar(gr_coo_mat_t dst, const gr_coo_mat_t src, gr_srcptr c, gr_ctx_t ctx)
+{ GR_COO_MAT_DENSE_VEC_OP(_gr_vec_div_scalar, dst, src, c, ctx) } 
+int gr_coo_mat_div_scalar_si(gr_coo_mat_t dst, const gr_coo_mat_t src, slong c, gr_ctx_t ctx)
+{ GR_COO_MAT_DENSE_VEC_OP(_gr_vec_div_scalar_si, dst, src, c, ctx) }
+int gr_coo_mat_div_scalar_ui(gr_coo_mat_t dst, const gr_coo_mat_t src, ulong c, gr_ctx_t ctx)
+{ GR_COO_MAT_DENSE_VEC_OP(_gr_vec_div_scalar_ui, dst, src, c, ctx) }
+int gr_coo_mat_div_scalar_fmpz(gr_coo_mat_t dst, const gr_coo_mat_t src, const fmpz_t c, gr_ctx_t ctx)
+{ GR_COO_MAT_DENSE_VEC_OP(_gr_vec_div_scalar_fmpz, dst, src, c, ctx) }
+int gr_coo_mat_div_scalar_fmpq(gr_coo_mat_t dst, const gr_coo_mat_t src, const fmpq_t c, gr_ctx_t ctx)
+{ GR_COO_MAT_DENSE_VEC_OP(_gr_vec_div_scalar_fmpq, dst, src, c, ctx) }
+int gr_coo_mat_divexact_scalar(gr_coo_mat_t dst, const gr_coo_mat_t src, gr_srcptr c, gr_ctx_t ctx)
+{ GR_COO_MAT_DENSE_VEC_OP(_gr_vec_divexact_scalar, dst, src, c, ctx) } 
+int gr_coo_mat_divexact_scalar_si(gr_coo_mat_t dst, const gr_coo_mat_t src, slong c, gr_ctx_t ctx)
+{ GR_COO_MAT_DENSE_VEC_OP(_gr_vec_divexact_scalar_si, dst, src, c, ctx) }
+int gr_coo_mat_divexact_scalar_ui(gr_coo_mat_t dst, const gr_coo_mat_t src, ulong c, gr_ctx_t ctx)
+{ GR_COO_MAT_DENSE_VEC_OP(_gr_vec_divexact_scalar_ui, dst, src, c, ctx) }
+int gr_coo_mat_divexact_scalar_fmpz(gr_coo_mat_t dst, const gr_coo_mat_t src, const fmpz_t c, gr_ctx_t ctx)
+{ GR_COO_MAT_DENSE_VEC_OP(_gr_vec_divexact_scalar_fmpz, dst, src, c, ctx) }
+int gr_coo_mat_divexact_scalar_fmpq(gr_coo_mat_t dst, const gr_coo_mat_t src, const fmpq_t c, gr_ctx_t ctx)
+{ GR_COO_MAT_DENSE_VEC_OP(_gr_vec_divexact_scalar_fmpq, dst, src, c, ctx) }

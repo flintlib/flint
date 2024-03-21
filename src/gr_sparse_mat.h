@@ -661,7 +661,7 @@ WARN_UNUSED_RESULT int gr_coo_mat_neg(gr_coo_mat_t dst, const gr_coo_mat_t src, 
 
 WARN_UNUSED_RESULT int gr_lil_mat_add(gr_lil_mat_t dst, const gr_lil_mat_t mat1, const gr_lil_mat_t mat2, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_lil_mat_sub(gr_lil_mat_t dst, const gr_lil_mat_t mat1, const gr_lil_mat_t mat2, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_lil_mat_mul(gr_lil_mat_t dst, const gr_lil_mat_t mat1, const gr_lil_mat_t mat2, gr_ctx_t ctx);
+//WARN_UNUSED_RESULT int gr_lil_mat_mul(gr_lil_mat_t dst, const gr_lil_mat_t mat1, const gr_lil_mat_t mat2, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_lil_mat_addmul_scalar(gr_lil_mat_t dst, const gr_lil_mat_t src, gr_srcptr c, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_lil_mat_submul_scalar(gr_lil_mat_t dst, const gr_lil_mat_t src, gr_srcptr c, gr_ctx_t ctx);
@@ -703,6 +703,23 @@ WARN_UNUSED_RESULT int gr_lil_mat_divexact_scalar_si(gr_lil_mat_t dst, const gr_
 WARN_UNUSED_RESULT int gr_lil_mat_divexact_scalar_ui(gr_lil_mat_t dst, const gr_lil_mat_t src, ulong c, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_lil_mat_divexact_scalar_fmpz(gr_lil_mat_t dst, const gr_lil_mat_t src, const fmpz_t c, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_lil_mat_divexact_scalar_fmpq(gr_lil_mat_t dst, const gr_lil_mat_t src, const fmpq_t c, gr_ctx_t ctx);
+
+WARN_UNUSED_RESULT int gr_coo_mat_mul_scalar(gr_coo_mat_t dst, const gr_coo_mat_t src, gr_srcptr c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_coo_mat_mul_scalar_si(gr_coo_mat_t dst, const gr_coo_mat_t src, slong c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_coo_mat_mul_scalar_ui(gr_coo_mat_t dst, const gr_coo_mat_t src, ulong c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_coo_mat_mul_scalar_fmpz(gr_coo_mat_t dst, const gr_coo_mat_t src, const fmpz_t c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_coo_mat_mul_scalar_fmpq(gr_coo_mat_t dst, const gr_coo_mat_t src, const fmpq_t c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_coo_mat_mul_scalar_2exp_si(gr_coo_mat_t dst, const gr_coo_mat_t src, slong c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_coo_mat_div_scalar(gr_coo_mat_t dst, const gr_coo_mat_t src, gr_srcptr c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_coo_mat_div_scalar_si(gr_coo_mat_t dst, const gr_coo_mat_t src, slong c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_coo_mat_div_scalar_ui(gr_coo_mat_t dst, const gr_coo_mat_t src, ulong c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_coo_mat_div_scalar_fmpz(gr_coo_mat_t dst, const gr_coo_mat_t src, const fmpz_t c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_coo_mat_div_scalar_fmpq(gr_coo_mat_t dst, const gr_coo_mat_t src, const fmpq_t c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_coo_mat_divexact_scalar(gr_coo_mat_t dst, const gr_coo_mat_t src, gr_srcptr c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_coo_mat_divexact_scalar_si(gr_coo_mat_t dst, const gr_coo_mat_t src, slong c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_coo_mat_divexact_scalar_ui(gr_coo_mat_t dst, const gr_coo_mat_t src, ulong c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_coo_mat_divexact_scalar_fmpz(gr_coo_mat_t dst, const gr_coo_mat_t src, const fmpz_t c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_coo_mat_divexact_scalar_fmpq(gr_coo_mat_t dst, const gr_coo_mat_t src, const fmpq_t c, gr_ctx_t ctx);
 
 /**
  * Sum and product
@@ -759,8 +776,8 @@ GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_coo_mat_nz_product(gr_ptr res, co
  * Matrix multiplication
 **/
 
-WARN_UNUSED_RESULT int gr_csr_mat_mul_vec(gr_vec_t v, const gr_csr_mat_t A, const gr_vec_t u, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_lil_mat_mul_vec(gr_vec_t v, const gr_lil_mat_t A, const gr_vec_t u, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_csr_mat_mul_vec(gr_ptr v, const gr_csr_mat_t A, gr_srcptr u, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_lil_mat_mul_vec(gr_ptr v, const gr_lil_mat_t A, gr_srcptr u, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_csr_mat_mul_mat_transpose(gr_mat_t Ct, const gr_csr_mat_t A, const gr_mat_t Bt, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_lil_mat_mul_mat_transpose(gr_mat_t Ct, const gr_lil_mat_t A, const gr_mat_t Bt, gr_ctx_t ctx);

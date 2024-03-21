@@ -9,6 +9,7 @@
     (at your option) any later version.  See <http://www.gnu.org/licenses/>.
 */
 
+#include "stdlib.h"
 #include "gr_sparse_mat.h"
 
 typedef struct

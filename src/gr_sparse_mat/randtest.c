@@ -15,9 +15,9 @@ int gr_coo_mat_randtest(gr_coo_mat_t mat, slong nnz, int replacement, truth_t is
     int status = GR_SUCCESS;
     slong i, j, sz, len;
     sz = ctx->sizeof_elem;
-    len = mat->r * mat->c;
+    len = flint_mul_sizes(mat->r, mat->c);
 
-    if (nnz < 0 || nnz > mat->r * mat->c)
+    if (nnz < 0 || nnz > len)
         return GR_DOMAIN;
 
     // Make space
@@ -77,8 +77,9 @@ int
 gr_coo_mat_randtest_prob(gr_coo_mat_t mat, double prob, flint_rand_t state, gr_ctx_t ctx)
 {
     int status = GR_SUCCESS;
-    slong i, j, sz;
+    slong i, j, sz, len;
     sz = ctx->sizeof_elem;
+    len = flint_mul_sizes(mat->r, mat->c);
 
     if (prob < 0 || prob > 1)
         return GR_DOMAIN;
@@ -91,12 +92,12 @@ gr_coo_mat_randtest_prob(gr_coo_mat_t mat, double prob, flint_rand_t state, gr_c
     }
     if (prob == 1)
     {
-        status |= gr_coo_mat_randtest(mat, mat->r * mat->c, 0, T_TRUE, state, ctx);
+        status |= gr_coo_mat_randtest(mat, len, 0, T_TRUE, state, ctx);
         return status;
     }
 
     // Allocate space for expected number of nonzeroes, and expand as needed
-    gr_coo_mat_fit_nnz(mat, prob * mat->r * mat->c, ctx);
+    gr_coo_mat_fit_nnz(mat, prob * len, ctx);
 
     // TODO: for low probability, should be able to do this faster
     mat->nnz = 0;

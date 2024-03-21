@@ -294,8 +294,8 @@ int test_accum_mul_scalar(flint_rand_t state, gr_ctx_t ctx)
         STATUS |= _gr_vec_mul_##TYPE(DVEC2, DVEC, N, C, CTX); \
         if (K == 2) \
         { \
-            STATUS |= gr_sparse_vec_divexact_##TYPE(VEC2, VEC, C, CTX); \
-            STATUS |= _gr_vec_divexact_##TYPE(DVEC2, DVEC, N, C, CTX); \
+            STATUS |= gr_sparse_vec_divexact_##TYPE(VEC2, VEC2, C, CTX); \
+            STATUS |= _gr_vec_divexact_##TYPE(DVEC2, DVEC2, N, C, CTX); \
         } \
     } \
 }

@@ -18,7 +18,7 @@ gr_csr_mat_equal(const gr_csr_mat_t mat1, const gr_csr_mat_t mat2, gr_ctx_t ctx)
     (
         gr_mat_is_compatible(mat1, mat2, ctx) == T_FALSE || 
         mat1->nnz != mat2->nnz ||
-        memcmp(mat1->rows, mat2->rows, mat1->r * sizeof(ulong)) ||
+        memcmp(mat1->rows, mat2->rows, (mat1->r + 1) * sizeof(ulong)) ||
         memcmp(mat1->cols, mat2->cols, mat1->nnz * sizeof(ulong))
     )
     {
@@ -51,8 +51,6 @@ gr_lil_mat_equal(const gr_lil_mat_t mat1, const gr_lil_mat_t mat2, gr_ctx_t ctx)
 
 truth_t gr_coo_mat_equal(const gr_coo_mat_t mat1, const gr_coo_mat_t mat2, gr_ctx_t ctx)
 {
-    slong i;
-
     if (gr_mat_is_compatible(mat1, mat2, ctx) == T_FALSE)
     {
         return T_FALSE;
