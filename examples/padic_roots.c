@@ -1,3 +1,5 @@
+/* This file is public domain. Author: Hartmut Monien. */
+
 #include <stdlib.h>
 
 #include "flint.h"
@@ -27,14 +29,14 @@ typedef struct
 
 typedef fmpz_poly_roots_fq_struct fmpz_poly_roots_fq_t[1];
 
-void fmpz_poly_roots_fq_init (fmpz_poly_roots_fq_t roots, fq_ctx_t fctx);
-void fmpz_poly_roots_fq_clear (fmpz_poly_roots_fq_t roots, fq_ctx_t fctx);
-int fmpz_poly_roots_fq_print (fmpz_poly_roots_fq_t roots, fq_ctx_t fctx);
-int fmpz_poly_roots_fq_fprint_pretty (FILE * file, fmpz_poly_roots_fq_t roots,
-				      fq_ctx_t fctx);
-int fmpz_poly_roots_fq_print_pretty (fmpz_poly_roots_fq_t roots,
+void fmpz_poly_roots_fq_init(fmpz_poly_roots_fq_t roots, fq_ctx_t fctx);
+void fmpz_poly_roots_fq_clear(fmpz_poly_roots_fq_t roots, fq_ctx_t fctx);
+int fmpz_poly_roots_fq_print(fmpz_poly_roots_fq_t roots, fq_ctx_t fctx);
+int fmpz_poly_roots_fq_fprint_pretty(FILE * file, fmpz_poly_roots_fq_t roots,
 				     fq_ctx_t fctx);
-void fmpz_poly_roots_fq (fmpz_poly_roots_fq_t roots, fmpz_poly_t poly,
+int fmpz_poly_roots_fq_print_pretty(fmpz_poly_roots_fq_t roots,
+				    fq_ctx_t fctx);
+void fmpz_poly_roots_fq(fmpz_poly_roots_fq_t roots, fmpz_poly_t poly,
 			 fq_ctx_t fctx);
 
 
@@ -178,7 +180,7 @@ padic_hensel_iteration (fmpz_poly_t poly,
   padic_init2 (y1, prec);
   do
     {
-      // Horner evaluation of poly and poly' at x
+      /* Horner evaluation of poly and poly' at x */
       padic_set_fmpz (y0, poly->coeffs + poly->length - 1, ctx);
       padic_zero (y1);
       for (slong j = poly->length - 2; j >= 0; j--)
@@ -189,7 +191,7 @@ padic_hensel_iteration (fmpz_poly_t poly,
 	  padic_set_fmpz (tmp, poly->coeffs + j, ctx);
 	  padic_add (y0, y0, tmp, ctx);
 	}
-      // Newton step: x -> x - poly / poly'
+      /* Newton step: x -> x - poly / poly' */
       padic_inv (y1, y1, ctx);
       padic_mul (y1, y1, y0, ctx);
       padic_sub (x, x, y1, ctx);
@@ -250,7 +252,7 @@ void
 _padic_roots (fmpz_poly_t poly, fq_ctx_t fctx, padic_ctx_t pctx, slong prec)
 {
   slong j, level, js, ns = 1, nr = 0, nz = 0, n = fmpz_poly_degree (poly);
-  fmpz_poly_struct * s = _fmpz_poly_vec_init (n);
+  fmpz_poly_struct *s = _fmpz_poly_vec_init (n);
   padic_struct
     * x0 = _padic_vec_init2 (n, prec), *xs = _padic_vec_init2 (n, prec);
   fmpz_poly_roots_fq_t froots;
@@ -263,7 +265,6 @@ _padic_roots (fmpz_poly_t poly, fq_ctx_t fctx, padic_ctx_t pctx, slong prec)
   padic_zero (xs);
   for (level = 0; level < PADIC_DEFAULT_PREC; level++)
     {
-      // flint_printf("level %wd\n", level);
       for (js = 0; js < ns; js++)
 	{
 	  if (!fmpz_poly_is_zero (s + js))
@@ -272,11 +273,9 @@ _padic_roots (fmpz_poly_t poly, fq_ctx_t fctx, padic_ctx_t pctx, slong prec)
 	      fmpz_poly_roots_fq (froots, s + js, fctx);
 	      for (j = 0; j < froots->num; j++)
 		{
-		  //flint_printf("froots->num: %d, j : %d\n", froots->num, j);
 		  fmpz_poly_get_coeff_fmpz (zero, froots->x0 + j, 0);
 		  if (*(froots->multiplicity + j) > 1)
 		    {
-		      // flint_printf("multiplity: %wd\n", *(froots->multiplicity+j) ), 
 		      padic_set_fmpz (xs + n - 1 - nr, zero, pctx);
 		      padic_shift (xs + n - 1 - nr, xs + n - 1 - nr, level,
 				   pctx);
@@ -307,15 +306,12 @@ _padic_roots (fmpz_poly_t poly, fq_ctx_t fctx, padic_ctx_t pctx, slong prec)
 		    }
 		  else
 		    {
-		      // flint_printf("multiplicity 1\n");
 		      padic_set_fmpz (x0 + nz, zero, pctx);
 		      if (!fmpz_is_zero (zero))
 			{
 			  padic_shift (x0 + nz, x0 + nz, level, pctx);
 			}
 		      padic_add (x0 + nz, x0 + nz, xs + js, pctx);
-		      // padic_print(x0+nz, pctx);
-		      // flint_printf("\n");
 		      padic_hensel_iteration (poly, x0 + nz, pctx, prec);
 		      padic_print (x0 + nz, pctx);
 		      flint_printf (" (1)\n");
@@ -377,44 +373,52 @@ padic_roots (fmpz_poly_t poly, padic_ctx_t pctx, slong prec)
   fq_ctx_clear (fctx);
 }
 
-// example polynomials
+/* example polynomials */
 
-char polys[] =
-  "3  -2774119 -2468 1\n"
-  "3  6 -7 1\n"
-  "4  -156 188 -33 1\n"
-  "3  -11 0 1\n"
-  "3  -30 1 1\n"
-  "4  -17576 2028 -78 1\n"
-  "10  -362880 1026576 -1172700 723680 -269325 63273 -9450 870 -45 1\n"
-  "12 -39916800 120543840 -150917976 105258076 -45995730 13339535 -2637558 357423 -32670 1925 -66 1\n"
-  "9  44100 -103740 103429 -57034 19019 -3928 491 -34 1\n"
-  "5  83521 -19652 1734 -68 1\n"
-  "12  22370117 15978655 10666271 5010005 1846306 575366 142702 28538 4585 523 35 1\n"
-  "4  0 -11 0 1\n"
-  "7  3 1 0 0 1 0 1\n"
-  "11  23 -74 89 -68 35 0 -14 8 -2 -1 1\n" "4  -12 0 0 1\n";
+char * polys[] = {
+  "3  -2774119 -2468 1", 
+  "3  6 -7 1", 
+  "4  -156 188 -33 1", 
+  "3  -11 0 1", 
+  "3  -30 1 1", 
+  "4  -17576 2028 -78 1", 
+  "10  -362880 1026576 -1172700 723680 -269325 63273 -9450 870 -45 1", 
+  "12  -39916800 120543840 -150917976 105258076 -45995730 13339535 -2637558 357423 -32670 1925 -66 1", 
+  "9  44100 -103740 103429 -57034 19019 -3928 491 -34 1", 
+  "5  83521 -19652 1734 -68 1", 
+  "12  22370117 15978655 10666271 5010005 1846306 575366 142702 28538 4585 523 35 1", 
+  "4  0 -11 0 1", 
+  "7  3 1 0 0 1 0 1", 
+  "11  23 -74 89 -68 35 0 -14 8 -2 -1 1", 
+  "4  -12 0 0 1", 
+};
 
 int
 main (int argc, char *argv[])
 {
 
   const slong np = sizeof (polys) / sizeof (polys[0]);
+  flint_printf("# examples: %d\n", np);
   
   ulong n = 7;
-  
-  if( argc != 2 ) {
-    flint_printf("usage: %s p (prime)\n", argv[0]);
-    flint_printf("find roots of polynomials over p-adic field Z[p].\n");
-    exit(1);
-  } else {
-    n = atoi (argv[1]);
-    if( !n_is_prime(n) ) {
-      flint_printf("%d is not a prime as required for p-adic field.\n", n);
-      exit(1);
-    }
-  };
 
+  if (argc != 2)
+    {
+      flint_printf ("usage: %s p (prime)\n", argv[0]);
+      flint_printf ("find roots of polynomials over p-adic field Z[p].\n");
+      exit (1);
+    }
+  else
+    {
+      n = atoi (argv[1]);
+      if (!n_is_prime (n))
+	{
+	  flint_printf ("%d is not a prime as required for p-adic field.\n",
+			n);
+	  exit (1);
+	}
+    };
+  
   fmpz_t p;
   fmpz_init (p);
   fmpz_set_ui (p, n);
@@ -425,22 +429,19 @@ main (int argc, char *argv[])
   fmpz_poly_t poly;
   fmpz_poly_init (poly);
 
-  // use this to read from "poly_data" string.
-  
-  FILE *poly_data = fmemopen (polys, np, "r");
+  /* use this to read from "poly_data" string. */
 
   flint_printf ("reading polynomials:\n");
 
-  while (fmpz_poly_fread (poly_data, poly))
+  for (slong j=0; j<sizeof(polys)/sizeof(polys[0]); j++)
     {
-      flint_printf("polynomial:\n\n");
+      flint_printf ("polynomial:\n\n");
+      fmpz_poly_set_str(poly, polys[j]);
       fmpz_poly_print_pretty (poly, "x");
       flint_printf ("\n\nroots with multiplicity:\n\n");
       padic_roots (poly, pctx, 64);
       flint_printf ("\n");
     }
-
-  fclose (poly_data);
 
   fmpz_poly_clear (poly);
   fmpz_clear (p);
