@@ -58,7 +58,7 @@ int gr_csr_mat_set(gr_csr_mat_t dst, const gr_csr_mat_t src, gr_ctx_t ctx) {
         }
         dst->nnz = src->nnz;
         gr_csr_mat_fit_nnz(dst, src->nnz, ctx);
-        memcpy(dst->rows, src->rows, src->r * sizeof(ulong));
+        memcpy(dst->rows, src->rows, (src->r+1) * sizeof(ulong));
         memcpy(dst->cols, src->cols, src->nnz * sizeof(ulong));
         status = _gr_vec_set(dst->nzs, src->nzs, src->nnz, ctx);
     }
