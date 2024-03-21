@@ -185,6 +185,23 @@ then
     fi
     echo "PASS"
     exit 0
+elif test "$1" = "integrals_double_exp";
+then
+    echo -n "integrals using double exponential...."
+    res=$($2/integrals_double_exp)
+    if test "$?" != "0";
+    then
+        echo "FAIL"
+        exit 1
+    fi
+    echo "$res" | perl -0ne 'if (/result = 0.88622692545275801364908374167057/g) {$found=1; last} END {exit !$found }'
+    if test "$?" != "0";
+    then
+	echo "FAIL"
+        exit 2
+    fi
+    echo "PASS"
+    exit 0     
 elif test "$1" = "keiper_li";
 then
     echo "keiper_li....SKIPPED"
