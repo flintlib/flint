@@ -53,13 +53,13 @@ gr_poly_entry_srcptr(const gr_poly_t poly, slong i, gr_ctx_t ctx)
     return GR_ENTRY(poly->coeffs, i, ctx->sizeof_elem);
 }
 
-GR_POLY_INLINE slong gr_poly_length(const gr_poly_t poly, gr_ctx_t ctx)
+GR_POLY_INLINE slong gr_poly_length(const gr_poly_t poly, gr_ctx_t FLINT_UNUSED(ctx))
 {
     return poly->length;
 }
 
 GR_POLY_INLINE void
-gr_poly_swap(gr_poly_t poly1, gr_poly_t poly2, gr_ctx_t ctx)
+gr_poly_swap(gr_poly_t poly1, gr_poly_t poly2, gr_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_SWAP(gr_poly_struct, *poly1, *poly2);
 }

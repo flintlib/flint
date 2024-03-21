@@ -9,11 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "ulong_extras.h"
 
 static void
-mark(char * sieve, mp_limb_t a, slong len, mp_limb_t p)
+mark(char * sieve, mp_limb_t a, ulong len, mp_limb_t p)
 {
     mp_limb_t t;
 
@@ -36,11 +35,11 @@ mark(char * sieve, mp_limb_t a, slong len, mp_limb_t p)
     }
 }
 
-void
+static void
 n_sieve_odd(char * sieve, ulong n, mp_limb_t a,
     unsigned int * sieve_primes, mp_limb_t bound)
 {
-    slong i;
+    ulong i;
     mp_limb_t p;
 
     for (i = 0; i < n / 2; i++)

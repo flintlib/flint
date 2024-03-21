@@ -12,9 +12,9 @@
 #include "fmpq.h"
 
 #if FLINT_BITS == 64
-#define FMPQ_HARMONIC_UI_TAB_SIZE 47
+# define FMPQ_HARMONIC_UI_TAB_SIZE 47
 #else
-#define FMPQ_HARMONIC_UI_TAB_SIZE 25
+# define FMPQ_HARMONIC_UI_TAB_SIZE 25
 #endif
 
 static const mp_limb_t fmpq_harmonic_ui_tab_num[] =
@@ -118,7 +118,7 @@ harmonic_odd_direct(fmpz_t P, fmpz_t Q, ulong a, ulong b, ulong n, int d)
     {
         for (k = b - 1 - (b % 2); k > 0; k -= 2)
         {
-            while (k <= (n >> d))
+            while ((ulong) k <= (n >> d))
                 d++;
 
             r = (UWORD(1) << d) - UWORD(1);
@@ -162,7 +162,7 @@ harmonic_odd_direct(fmpz_t P, fmpz_t Q, ulong a, ulong b, ulong n, int d)
     {
         a += (a % 2 == 0);
 
-        for (k = a; k < b; k += 2)
+        for (k = a; (ulong) k < b; k += 2)
         {
             umul_ppmm(t, u, p, k);
             v = 0;

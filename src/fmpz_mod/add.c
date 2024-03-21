@@ -30,7 +30,7 @@ void _fmpz_mod_add1(fmpz_t a, const fmpz_t b, const fmpz_t c,
 }
 
 void _fmpz_mod_add2s(fmpz_t a, const fmpz_t b, const fmpz_t c,
-                                                     const fmpz_mod_ctx_t ctx)
+                                                     const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
 {
     mp_limb_t a0, b0, c0;
 

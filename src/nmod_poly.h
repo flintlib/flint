@@ -22,6 +22,7 @@
 #define NMOD_POLY_INLINE static inline
 #endif
 
+#include "mpn_extras.h"
 #include "nmod_types.h"
 
 #ifdef __cplusplus
@@ -387,7 +388,7 @@ void _nmod_poly_KS2_recover_reduce2(mp_ptr res, slong s, mp_srcptr op1,
                                   mp_srcptr op2, slong n, ulong b, nmod_t mod);
 
 void _nmod_poly_KS2_recover_reduce2b(mp_ptr res, slong s, mp_srcptr op1,
-                                  mp_srcptr op2, slong n, ulong b, nmod_t mod);
+                                  mp_srcptr op2, slong n, ulong FLINT_UNUSED(b), nmod_t mod);
 
 void _nmod_poly_KS2_recover_reduce3(mp_ptr res, slong s, mp_srcptr op1,
                                   mp_srcptr op2, slong n, ulong b, nmod_t mod);
@@ -637,9 +638,9 @@ void _nmod_poly_div_series(mp_ptr Q, mp_srcptr A, slong Alen,
 void nmod_poly_div_series(nmod_poly_t Q, const nmod_poly_t A,
                                                  const nmod_poly_t B, slong n);
 
-void _nmod_poly_div_newton_n_preinv (mp_ptr Q,
-                   mp_srcptr A, slong lenA, mp_srcptr B, slong lenB,
-                                    mp_srcptr Binv, slong lenBinv, nmod_t mod);
+void _nmod_poly_div_newton_n_preinv(mp_ptr Q, mp_srcptr A, slong lenA,
+        mp_srcptr FLINT_UNUSED(B), slong lenB, mp_srcptr Binv,
+        slong lenBinv, nmod_t mod);
 
 void nmod_poly_div_newton_n_preinv (nmod_poly_t Q,
              const nmod_poly_t A, const nmod_poly_t B, const nmod_poly_t Binv);
@@ -847,10 +848,11 @@ void nmod_poly_compose_mod_brent_kung_preinv(nmod_poly_t res,
                     const nmod_poly_t poly1, const nmod_poly_t poly2,
                     const nmod_poly_t poly3, const nmod_poly_t poly3inv);
 
-void _nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
-                 const nmod_poly_struct * polys, slong len1, slong l,
-                 mp_srcptr g, slong glen, mp_srcptr poly, slong len,
-		 mp_srcptr polyinv,slong leninv, nmod_t mod);
+void
+_nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
+        const nmod_poly_struct * polys, slong FLINT_UNUSED(lenpolys), slong l,
+        mp_srcptr g, slong glen, mp_srcptr poly, slong len,
+        mp_srcptr polyinv, slong leninv, nmod_t mod);
 
 void nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
                     const nmod_poly_struct * polys, slong len1, slong n,
@@ -867,10 +869,15 @@ nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * res
                                                                 slong num_threads);
 
 void _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(
-                 nmod_poly_struct * res, const nmod_poly_struct * polys,
-                 slong lenpolys, slong l, mp_srcptr g, slong glen,
-                 mp_srcptr poly, slong len, mp_srcptr polyinv, slong leninv,
-                 nmod_t mod, thread_pool_handle * threads, slong num_threads);
+        nmod_poly_struct * res,
+        const nmod_poly_struct * polys,
+        slong FLINT_UNUSED(lenpolys), slong l,
+        mp_srcptr g, slong glen,
+        mp_srcptr poly, slong len,
+        mp_srcptr polyinv, slong leninv,
+        nmod_t mod,
+        thread_pool_handle * threads,
+        slong num_threads);
 
 void nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(nmod_poly_struct * res,
                                             const nmod_poly_struct * polys,
@@ -1165,13 +1172,10 @@ void _nmod_poly_multi_crt_run_p(nmod_poly_struct * outputs,
 
 /* Inflation and deflation ***************************************************/
 
-ulong nmod_poly_deflation(const nmod_poly_t input);
+slong nmod_poly_deflation(const nmod_poly_t input);
 
-void nmod_poly_deflate(nmod_poly_t result, const nmod_poly_t input,
-    ulong deflation);
-
-void nmod_poly_inflate(nmod_poly_t result, const nmod_poly_t input,
-    ulong inflation);
+void nmod_poly_deflate(nmod_poly_t result, const nmod_poly_t input, slong deflation);
+void nmod_poly_inflate(nmod_poly_t result, const nmod_poly_t input, slong inflation);
 
 /* Characteristic polynomial and minimal polynomial */
 /* FIXME: These should be moved to nmod_mat.h. */

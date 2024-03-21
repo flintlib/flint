@@ -13,10 +13,10 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-ulong
+slong
 nmod_poly_deflation(const nmod_poly_t input)
 {
-    ulong deflation;
+    slong deflation;
     slong i, coeff;
 
     if (input->length <= 1)

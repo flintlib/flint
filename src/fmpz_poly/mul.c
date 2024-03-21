@@ -10,12 +10,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpn_extras.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
 #if FLINT_HAVE_FFT_SMALL
-#include "fft_small.h"
+# include "fft_small.h"
 #endif
 
 void

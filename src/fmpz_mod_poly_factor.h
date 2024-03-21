@@ -57,7 +57,7 @@ void fmpz_mod_poly_factor_set(fmpz_mod_poly_factor_t res,
 
 FMPZ_MOD_POLY_FACTOR_INLINE
 void fmpz_mod_poly_factor_swap(fmpz_mod_poly_factor_t a,
-                            fmpz_mod_poly_factor_t b, const fmpz_mod_ctx_t ctx)
+                            fmpz_mod_poly_factor_t b, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
 {
     fmpz_mod_poly_factor_struct t = *a;
     *a = *b;

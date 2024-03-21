@@ -120,7 +120,7 @@ _fmpz_vec_scalar_addmul_si(fmpz * vec1, const fmpz * vec2, slong len2, slong c)
 void
 _fmpz_vec_scalar_addmul_ui(fmpz * vec1, const fmpz * vec2, slong len2, ulong c)
 {
-    ulong ix;
+    slong ix;
 
     for (ix = 0; ix < len2; ix++)
         fmpz_addmul_ui(vec1 + ix, vec2 + ix, c);

@@ -24,7 +24,7 @@
 void _thread_pool_distribute_work_2(
     slong start, slong stop,
     slong * Astart, slong * Astop, slong Alen,
-    slong * Bstart, slong * Bstop, slong Blen)
+    slong * Bstart, slong * Bstop, slong FLINT_UNUSED(Blen))
 {
     FLINT_ASSERT(0 <= start);
     FLINT_ASSERT(start <= stop);

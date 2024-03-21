@@ -15,7 +15,7 @@
 #include "fmpq_poly.h"
 
 fmpq_poly_struct *
-_fmpq_poly_powers_precompute(const fmpz * B, const fmpz_t denB, slong len)
+_fmpq_poly_powers_precompute(const fmpz * B, const fmpz_t FLINT_UNUSED(denB), slong len)
 {
    slong i;
    fmpq_poly_struct * powers = flint_malloc(sizeof(fmpq_poly_struct)*(2*len - 1));

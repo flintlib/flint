@@ -152,7 +152,7 @@ _nmod_poly_interpolate_nmod_vec_fast_precomp(mp_ptr poly, mp_srcptr ys,
     for (i = 0; i < len; i++)
         poly[i] = nmod_mul(weights[i], ys[i], mod);
 
-    for (i = 0; i < FLINT_CLOG2(len); i++)
+    for (i = 0; i < (slong) FLINT_CLOG2(len); i++)
     {
         pow = (WORD(1) << i);
         pa = tree[i];

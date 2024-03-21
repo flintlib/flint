@@ -56,7 +56,7 @@ int _fmpz_mod_poly_fprint(FILE * file, const fmpz *poly, slong len,
 int fmpz_mod_poly_fprint(FILE * file, const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx) { return _fmpz_mod_poly_fprint(file, poly->coeffs, poly->length, fmpz_mod_ctx_modulus(ctx)); }
 int _fmpz_mod_poly_print(const fmpz *poly, slong len, const fmpz_t p) { return _fmpz_mod_poly_fprint(stdout, poly, len, p); }
 int fmpz_mod_poly_print(const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx) { return fmpz_mod_poly_fprint(stdout, poly, ctx); }
-int fmpz_mod_poly_fprint_pretty(FILE * file, const fmpz_mod_poly_t poly, const char * x, const fmpz_mod_ctx_t ctx) { return _fmpz_poly_fprint_pretty(file, poly->coeffs, poly->length, x); }
+int fmpz_mod_poly_fprint_pretty(FILE * file, const fmpz_mod_poly_t poly, const char * x, const fmpz_mod_ctx_t FLINT_UNUSED(ctx)) { return _fmpz_poly_fprint_pretty(file, poly->coeffs, poly->length, x); }
 int fmpz_mod_poly_print_pretty(const fmpz_mod_poly_t poly, const char * x, const fmpz_mod_ctx_t ctx) { return fmpz_mod_poly_fprint_pretty(stdout, poly, x, ctx); }
 
 /* reading ********************************************************************/
