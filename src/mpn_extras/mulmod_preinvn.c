@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2012 William Hart
+    Copyright (C) 2024 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -13,7 +14,11 @@
 #include "mpn_extras.h"
 
 /*
-   TODO: speedup mpir's mullow and mulhigh and use instead of mul/mul_n
+TODO:
+ * fixed-length code for more small n
+ * note: 1x1 cannot use nmod_mul because the inverses are defined
+         differently
+ * use mullow
 */
 
 void flint_mpn_mulmod_preinvn(mp_ptr r,
@@ -21,14 +26,11 @@ void flint_mpn_mulmod_preinvn(mp_ptr r,
         mp_srcptr d, mp_srcptr dinv, ulong norm)
 {
    mp_limb_t cy, p1, p2, b0, b1;
-   mp_ptr t;
-   TMP_INIT;
-
-   TMP_START;
-   t = TMP_ALLOC(5*n*sizeof(mp_limb_t));
 
    if (n == 2)
    {
+      mp_limb_t t[10];
+
       if (norm)
       {
          /* mpn_rshift(b, b, n, norm) */
@@ -83,6 +85,12 @@ void flint_mpn_mulmod_preinvn(mp_ptr r,
       }
    } else
    {
+     mp_ptr t;
+     TMP_INIT;
+
+     TMP_START;
+     t = TMP_ALLOC(5*n*sizeof(mp_limb_t));
+
       if (a == b)
          flint_mpn_sqr(t, a, n);
       else
@@ -91,7 +99,7 @@ void flint_mpn_mulmod_preinvn(mp_ptr r,
       if (norm)
          mpn_rshift(t, t, 2*n, norm);
 
-      flint_mpn_mul_n(t + 3*n, t + n, dinv, n);
+      flint_mpn_mul_or_mulhigh_n(t + 3*n, t + n, dinv, n);
       mpn_add_n(t + 4*n, t + 4*n, t + n, n);
 
       flint_mpn_mul_n(t + 2*n, t + 4*n, d, n);
@@ -102,7 +110,7 @@ void flint_mpn_mulmod_preinvn(mp_ptr r,
 
       if (mpn_cmp(r, d, n) >= 0)
          mpn_sub_n(r, r, d, n);
-   }
 
-   TMP_END;
+     TMP_END;
+   }
 }
