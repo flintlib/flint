@@ -10,12 +10,12 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
-#include "profiler.h"
-#include "arb_hypgeom.h"
-#include "acb_hypgeom.h"
-#include "acb_dirichlet.h"
-#include "acb_modular.h"
-#include "acb_calc.h"
+#include <flint/profiler.h>
+#include <flint/arb_hypgeom.h>
+#include <flint/acb_hypgeom.h>
+#include <flint/acb_dirichlet.h>
+#include <flint/acb_modular.h>
+#include <flint/acb_calc.h>
 
 /* ------------------------------------------------------------------------- */
 /*  Example integrands                                                       */
@@ -1261,6 +1261,7 @@ int main(int argc, char *argv[])
                 acb_set_d_d(a, -1, -1);
                 acb_set_d_d(b, -1, 1);
                 acb_calc_integrate(s, f_rsqrt, NULL, a, b, goal, tol, options, prec);
+                break;
 
             case 36:
                 if (goal < 0)

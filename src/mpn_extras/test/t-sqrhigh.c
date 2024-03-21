@@ -15,9 +15,22 @@
 /* TODO: Remove this preprocessor conditional */
 #if FLINT_HAVE_NATIVE_mpn_mulhigh_basecase
 
-#define N_MAX (FLINT_MPN_SQRHIGH_SQR_CUTOFF + 100)
+#define N_MAX FLINT_MAX(FLINT_MPN_SQRHIGH_SQR_CUTOFF + 50, 2 * FLINT_MPN_SQRHIGH_MULDERS_CUTOFF)
 
 #define rpcH (rpc + n - 1)
+
+/* Defined in t-mulhigh.c and t-sqrhigh.c */
+#ifndef lower_bound
+# define lower_bound lower_bound
+static ulong lower_bound(ulong n)
+{
+    /* These are calculated by hand lower bound for the returned limb */
+    if (n < 3)
+        return 0;
+    else
+        return 4 * n - 8;
+}
+#endif
 
 TEST_FUNCTION_START(flint_mpn_sqrhigh, state)
 {
@@ -26,7 +39,7 @@ TEST_FUNCTION_START(flint_mpn_sqrhigh, state)
 
     mp_ptr rp, rpc, xp;
 
-    rp = flint_malloc(sizeof(mp_limb_t) * N_MAX);
+    rp = flint_malloc(sizeof(mp_limb_t) * (N_MAX + 1));
     rpc = flint_malloc(2 * sizeof(mp_limb_t) * N_MAX);
     xp = flint_malloc(sizeof(mp_limb_t) * N_MAX);
 
@@ -34,11 +47,10 @@ TEST_FUNCTION_START(flint_mpn_sqrhigh, state)
     {
         mp_limb_t borrow;
         mp_size_t n;
-        mp_limb_t lb;
 
         /* Trigger full multiplication in mulhigh */
         if (n_randint(state, 1000) == 0)
-            n = FLINT_MPN_SQRHIGH_SQR_CUTOFF + n_randint(state, 50);
+            n = 1 + FLINT_MPN_SQRHIGH_SQR_CUTOFF + n_randint(state, 50);
         else if (n_randint(state, 100) == 0)
             n = 1 + n_randint(state, FLINT_MPN_SQRHIGH_SQR_CUTOFF);
         else
@@ -64,9 +76,7 @@ TEST_FUNCTION_START(flint_mpn_sqrhigh, state)
                     ix, n, xp, n, rpcH, n + 1, rp, n + 1);
 
         /* Check lower bound */
-        lb = 2 * n;
-
-        borrow = mpn_sub_1(rpcH, rpcH, n + 1, lb);
+        borrow = mpn_sub_1(rpcH, rpcH, n + 1, lower_bound(n));
         if (borrow)
             mpn_zero(rpcH, n + 1);
 
@@ -88,9 +98,8 @@ TEST_FUNCTION_START(flint_mpn_sqrhigh, state)
 
     TEST_FUNCTION_END(state);
 }
-# undef N_MIN
 # undef N_MAX
-# undef N_MAX2
+# undef rpcH
 #else
 TEST_FUNCTION_START(flint_mpn_sqrhigh, state)
 {

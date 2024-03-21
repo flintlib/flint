@@ -32,7 +32,7 @@ TEST_FUNCTION_START(flint_mpn_mul, state)
         m = N_MIN + n_randint(state, N_MAX - N_MIN + 1);
 #if WANT_BIG
         if (n_randint(state, 10000) == 0)
-            n = N_MIN_STOR + n_randint(state, N_MAX_STOR - N_MIN_STOR + 1);
+            m = N_MIN_STOR + n_randint(state, N_MAX_STOR - N_MIN_STOR + 1);
 #endif
         n = 1 + n_randint(state, m);
 
@@ -69,3 +69,6 @@ TEST_FUNCTION_START(flint_mpn_mul, state)
 
     TEST_FUNCTION_END(state);
 }
+
+#undef N_MIN
+#undef N_MAX

@@ -102,7 +102,7 @@ itanium | itanium2)
   test_cpu=ia64 ;;
 pentium | pentiummmx | pentiumpro | pentium[234m] | k[567] | k6[23] | geode | athlon | viac3*)
   test_cpu=i386 ;;
-athlon64 | atom | silvermont | goldmont | tremont | core2 | corei* | opteron | k[89] | k10 | bobcat | jaguar* | bulldozer* | piledriver* | steamroller* | excavator* | zen* | nano | nehalem | westmere | sandybridge* | ivybridge* | haswell* | broadwell* | skylake* | kabylake* | icelake* | rocketlake* | tigerlake* | alderlake* | raptorlake* | knightslanding | x86_64v[1234])
+athlon64 | atom | silvermont | goldmont | tremont | core2 | corei* | opteron | k[89] | k10 | bobcat | jaguar* | bulldozer* | piledriver* | steamroller* | excavator* | zen[1234] | nano | nehalem | westmere | sandybridge | ivybridge | haswell | broadwell | skylake | skylake_server | cannonlake | kabylake | icelake | icelake_server | rocketlake | tigerlake | alderlake | raptorlake | knightslanding | sapphirerapids | cometlake | x86_64v[1234])
   test_cpu=x86_64 ;;
 power[2-9] | power1[0-9] | power2sc)
   test_cpu=power ;;

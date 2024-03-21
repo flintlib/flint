@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2023 Albin Ahlbäck
+    Copyright (C) 2023, 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -12,26 +12,50 @@
 /* Define if system is big endian. */
 #undef FLINT_BIG_ENDIAN
 
-/* Define if system is strongly ordered */
-#undef FLINT_KNOW_STRONG_ORDER
+/* Define if Arm v8 assembly is available */
+#undef FLINT_HAVE_ASSEMBLY_armv8
 
-/* Define to set threshold for when to use fft_small module */
-#undef FLINT_FFT_SMALL_THRESHOLD
-
-/* Define if system has the ADX instruction set */
-#undef FLINT_HAVE_ADX
-
-/* Define if system has AVX2 */
-#undef FLINT_HAVE_AVX2
-
-/* Define if system has AVX512 */
-#undef FLINT_HAVE_AVX512
+/* Define if x86_64 ADX assembly is available */
+#undef FLINT_HAVE_ASSEMBLY_x86_64_adx
 
 /* Define to use the fft_small module */
 #undef FLINT_HAVE_FFT_SMALL
 
+/* Define if GMP has mpn_add_n_sub_n */
+#undef FLINT_HAVE_NATIVE_mpn_add_n_sub_n
+
+/* Define if GMP has mpn_add_nc */
+#undef FLINT_HAVE_NATIVE_mpn_add_nc
+
+/* Define if GMP has mpn_addlsh1_n */
+#undef FLINT_HAVE_NATIVE_mpn_addlsh1_n
+
+/* Define if GMP has mpn_addlsh1_n_ip1 */
+#undef FLINT_HAVE_NATIVE_mpn_addlsh1_n_ip1
+
+/* Define if GMP has mpn_addmul_2 */
+#undef FLINT_HAVE_NATIVE_mpn_addmul_2
+
+/* Define if system has mpn_modexact_1_odd */
+#undef FLINT_HAVE_NATIVE_mpn_modexact_1_odd
+
+/* Define if GMP has mpn_rsh1add_n */
+#undef FLINT_HAVE_NATIVE_mpn_rsh1add_n
+
+/* Define if GMP has mpn_rsh1sub_n */
+#undef FLINT_HAVE_NATIVE_mpn_rsh1sub_n
+
+/* Define if GMP has mpn_sub_nc */
+#undef FLINT_HAVE_NATIVE_mpn_sub_nc
+
+/* Define if system is strongly ordered */
+#undef FLINT_KNOW_STRONG_ORDER
+
 /* Define to enable reentrant. */
 #undef FLINT_REENTRANT
+
+/* Define to locally unroll some loops */
+#undef FLINT_UNROLL_LOOPS
 
 /* Define to enable BLAS. */
 #undef FLINT_USES_BLAS
@@ -53,3 +77,6 @@
 
 /* Define to enable use of GMP internals. */
 #undef FLINT_WANT_GMP_INTERNALS
+
+/* Define to enable pretty printing for tests. */
+#undef FLINT_WANT_PRETTY_TESTS

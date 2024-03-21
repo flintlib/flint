@@ -112,3 +112,19 @@ for n in range(8, 17):
     print()
     #mulnm(n, 2)
     #print()
+
+def mulhigh_n(n):
+    print("mp_limb_t flint_mpn_mulhigh_%i_generic(mp_ptr res, mp_srcptr u, mp_srcptr v)" % n)
+    print("{")
+    print("    mp_limb_t b, a, low;")
+    print("    NN_DOTREV_S3_1X1_HIGH(b, a, u, v, %i);" % (n - 1))
+    print("    NN_DOTREV_S3_A3_1X1(b, a, low, 0, b, a, u, v, %i);" % n)
+    for i in range(n - 2):
+        print("    NN_DOTREV_S3_A3_1X1(b, a, res[%i], 0, b, a, u + %i, v + %i, %i);" % (i, i + 1, i + 1, n - i - 1))
+    print("    NN_ADDMUL_S2_A2_1X1(res[%i], res[%i], b, a, u[%i], v[%i]);" % (n - 1, n - 2, n - 1, n - 1))
+    print("    return low;")
+    print("}")
+
+for n in range(3, 21):
+    mulhigh_n(n)
+    print()

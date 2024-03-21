@@ -124,6 +124,8 @@ gr_test_set_ui(gr_ctx_t R, flint_rand_t state, int test_flags)
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
         flint_printf("\n");
+        flint_printf("set_ui\n");
+        gr_ctx_println(R);
         flint_printf("a = %wu\n", a);
         flint_printf("b = %wu\n", b);
         flint_printf("c = %wu\n", c);
@@ -180,6 +182,8 @@ gr_test_set_si(gr_ctx_t R, flint_rand_t state, int test_flags)
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
         flint_printf("\n");
+        flint_printf("set_si\n");
+        gr_ctx_println(R);
         flint_printf("a = %wd\n", a);
         flint_printf("b = %wd\n", b);
         flint_printf("c = %wd\n", c);
@@ -238,6 +242,8 @@ gr_test_set_fmpz(gr_ctx_t R, flint_rand_t state, int test_flags)
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
         flint_printf("\n");
+        flint_printf("set_fmpz\n");
+        gr_ctx_println(R);
         flint_printf("a = "); fmpz_print(a); flint_printf("\n");
         flint_printf("b = "); fmpz_print(b); flint_printf("\n");
         flint_printf("c = "); fmpz_print(c); flint_printf("\n");
@@ -300,6 +306,7 @@ gr_test_set_fmpq(gr_ctx_t R, flint_rand_t state, int test_flags)
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
         flint_printf("\n");
+        flint_printf("set_fmpq\n");
         gr_ctx_println(R);
         flint_printf("a = "); fmpq_print(a); flint_printf("\n");
         flint_printf("b = "); fmpq_print(b); flint_printf("\n");

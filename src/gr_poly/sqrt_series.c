@@ -20,7 +20,7 @@ _gr_poly_sqrt_series_generic(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_
 
     status = _gr_poly_sqrt_series_newton(res, f, flen, len, 2, ctx);
 
-    if (status != GR_SUCCESS && gr_ctx_is_field(ctx) == T_FALSE)
+    if (status == GR_DOMAIN && gr_ctx_is_field(ctx) != T_TRUE)
         return GR_UNABLE;
 
     return status;

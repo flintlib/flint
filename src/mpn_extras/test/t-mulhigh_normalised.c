@@ -12,9 +12,6 @@
 #include "test_helpers.h"
 #include "mpn_extras.h"
 
-/* TODO: Remove this preprocessor conditional */
-#if FLINT_HAVE_ASSEMBLY_x86_64_adx
-
 # define N_MAX 64
 
 TEST_FUNCTION_START(flint_mpn_mulhigh_normalised, state)
@@ -29,7 +26,7 @@ TEST_FUNCTION_START(flint_mpn_mulhigh_normalised, state)
         mp_limb_t xp[N_MAX];
         mp_limb_t yp[N_MAX];
         mp_size_t n;
-        struct mp_limb_pair_t res_norm;
+        mp_limb_pair_t res_norm;
         mp_limb_t retlimb, normalised;
 
         n = 1 + n_randint(state, N_MAX);
@@ -91,9 +88,3 @@ TEST_FUNCTION_START(flint_mpn_mulhigh_normalised, state)
     TEST_FUNCTION_END(state);
 }
 # undef N_MAX
-#else
-TEST_FUNCTION_START(flint_mpn_mulhigh_normalised, state)
-{
-    TEST_FUNCTION_END_SKIPPED(state);
-}
-#endif

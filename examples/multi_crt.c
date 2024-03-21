@@ -16,9 +16,9 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "ulong_extras.h"
+#include <flint/flint.h>
+#include <flint/fmpz.h>
+#include <flint/ulong_extras.h>
 
 int main(int argc, char* argv[])
 {

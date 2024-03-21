@@ -2,11 +2,11 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include "arb_poly.h"
-#include "arb_calc.h"
-#include "acb_hypgeom.h"
-#include "acb_dirichlet.h"
-#include "profiler.h"
+#include <flint/arb_poly.h>
+#include <flint/arb_calc.h>
+#include <flint/acb_hypgeom.h>
+#include <flint/acb_dirichlet.h>
+#include <flint/profiler.h>
 
 slong eval_count = 0;
 

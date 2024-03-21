@@ -89,7 +89,7 @@ define(X86_64_PATTERN,
 [[athlon64-*-* | k8-*-* | k10-*-* | bobcat-*-* | jaguar*-*-* | bulldozer*-*-* | piledriver*-*-* | steamroller*-*-* | excavator*-*-* | zen*-*-* | pentium4-*-* | atom-*-* | silvermont-*-* | goldmont-*-* | tremont-*-* | core2-*-* | corei*-*-* | x86_64-*-* | nano-*-* | nehalem*-*-* | westmere*-*-* | sandybridge*-*-* | ivybridge*-*-* | haswell*-*-* | broadwell*-*-* | skylake*-*-* | kabylake*-*-* | icelake*-*-* | tigerlake*-*-* | rocketlake*-*-* | alderlake*-*-* | raptorlake*-*-* | x86_64v[1234]-*-*]])
 
 define(X86_64_ADX_PATTERN,
-[[zen*-*-* | broadwell*-*-* | skylake*-*-* | kabylake*-*-* | icelake*-*-* | tigerlake*-*-* | rocketlake*-*-* | alderlake*-*-* | raptorlake*-*-*]])
+[[zen[1234]-*-* | coreibwl-*-* | broadwell-*-* | skylake-*-* | skylake_server-*-* | cannonlake-*-* | kabylake-*-* | icelake-*-* | icelake_server-*-* | rocketlake-*-* | tigerlake-*-* | alderlake-*-* | raptorlake-*-* | knightslanding-*-* | sapphirerapids-*-* | cometlake-*-*]])
 
 define(ARM64_PATTERN,
 [[armcortexa53-*-* | armcortexa53neon-*-* | armcortexa55-*-* | armcortexa55neon-*-* | armcortexa57-*-* | armcortexa57neon-*-* | armcortexa7[2-9]-*-* | armcortexa7[2-9]neon-*-* | armexynosm1-*-* | armthunderx-*-* | armxgene1-*-* | aarch64*-*-* | applem[1-9]*-*-* | armv8*-*-*]])

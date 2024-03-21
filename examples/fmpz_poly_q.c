@@ -17,10 +17,10 @@
 #include <stdio.h>
 #include <gmp.h>
 
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
-#include "fmpz_poly_q.h"
+#include <flint/flint.h>
+#include <flint/fmpz.h>
+#include <flint/fmpz_poly.h>
+#include <flint/fmpz_poly_q.h>
 
 int main(int argc, char* argv[])
 {

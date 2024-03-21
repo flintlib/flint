@@ -13,11 +13,11 @@
 #include <string.h>
 #include <stdlib.h>
 #include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_mpoly.h"
-#include "fmpz_mpoly_factor.h"
-#include "profiler.h"
+#include <flint/flint.h>
+#include <flint/fmpz.h>
+#include <flint/fmpz_mpoly.h>
+#include <flint/fmpz_mpoly_factor.h>
+#include <flint/profiler.h>
 
 int
 main(int argc, char * argv[])

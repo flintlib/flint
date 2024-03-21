@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2022 Daniel Schultz
+    Copyright (C) 2024 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -17,6 +18,92 @@
 #include "crt_helpers.h"
 #include "fft_small.h"
 
+/*
+The following profiles are hardcoded.
+
+    np bits  n m
+     4   84  4 3
+     4   88  4 3
+     4   92  4 3
+     5  112  4 4
+     5  116  4 4
+     5  120  4 4
+     6  136  5 4
+     6  140  5 4
+     6  144  5 4
+     7  160  6 5
+     7  164  6 5
+     7  168  6 5
+     8  184  7 6
+     8  188  7 6
+     8  192  7 6
+
+Here np is the number of primes {p[0], p[1], ...p[np-1]}. By default the
+following 50-bit primes are used:
+
+    p[0] = 1108307720798209
+    p[1] = 659706976665601
+    p[2] = 1086317488242689
+    p[3] = 910395627798529
+    p[4] = 699289395265537
+    p[5] = 1022545813831681
+    p[6] = 1013749720809473
+    p[7] = 868614185943041
+
+We suppose that the inputs to multiply are
+
+    {a[0], ..., a[an-1]}  and  {b[0], ..., b[bn-1]}
+
+in base 2^64. They will be converted to
+
+   {a'[0], ..., a'[an'-1]}  and  {b'[0], ..., a'[bn'-1]}.
+
+in base 2^bits, where an' = ceil(64*an/bits) and
+bn' = ceil(64*bn/bits). The code for performing the conversion
+actually processes the inputs as base 2^32 arrays of twice the lengths.
+
+Each dot product in the convolution of a' and b' is bounded by
+
+    bn' * (2^bits-1)^2
+
+and we need this to be smaller than prod_primes = p[0], ..., p[np-1]
+for the CRT reconstruction. A slight relaxation of this inequality is
+
+    ceil(64*bn/bits) * 2^(2*bits) <= prod_primes.
+
+The function crt_data_find_bn_bound determines an upper bound for
+permissible bn such that this holds. Numerical values of the bn bounds
+are as follows:
+
+    np = 4, bits =  84, bn <= 2536637511
+    np = 4, bits =  88, bn <= 10380583
+    np = 4, bits =  92, bn <= 42390
+    np = 5, bits = 112, bn <= 32822700
+    np = 5, bits = 116, bn <= 132790
+    np = 5, bits = 120, bn <= 534
+    np = 6, bits = 136, bn <= 144789875
+    np = 6, bits = 140, bn <= 582218
+    np = 6, bits = 144, bn <= 2337
+    np = 7, bits = 160, bn <= 613493872
+    np = 7, bits = 164, bn <= 2456369
+    np = 7, bits = 168, bn <= 9826
+    np = 8, bits = 184, bn <= 2177184315
+    np = 8, bits = 188, bn <= 8689506
+    np = 8, bits = 192, bn <= 34662
+
+Note that we do not require an >= bn for correctness, but for highly
+unbalanced multiplications calling mpn_ctx_mpn_mul with operands
+in this order gives a better bound.
+
+The profile parameters n and m describe the size of CRT operands.
+Let P = p[0] * ... * p[n-1]. One CRT sum has the form
+
+    s = f[0]*x[0] + ... + f[np-1]*x[np-1]
+
+where x[i] is a single limb, f[i] has m limbs, and the limb count n
+is large enough to hold s <= P * np.
+*/
+
 void crt_data_init(crt_data_t C, ulong prime, ulong coeff_len, ulong nprimes)
 {
     C->prime = prime;
@@ -29,8 +116,6 @@ void crt_data_clear(crt_data_t C)
 {
     flint_free(C->data);
 }
-
-
 
 /*
     need  ceil(64*bn/bits) <= prod_primes/2^(2*bits)
@@ -987,7 +1072,7 @@ void mpn_ctx_init(mpn_ctx_t R, ulong p)
     R->profiles[i].bits      = bits_; \
     R->profiles[i].bn_bound  = crt_data_find_bn_bound(R->crts + np_ - 1, bits_); \
     R->profiles[i].to_ffts   = CAT3(mpn_to_ffts, np_, bits_); \
-/*flint_printf("profile np = %wu, bits = %3wu, bn <= 0x%16wx\n", R->profiles[i].np, R->profiles[i].bits, R->profiles[i].bn_bound);*/ \
+/*flint_printf("profile np = %wu, bits = %3wu, bn <= %wu\n", R->profiles[i].np, R->profiles[i].bits, R->profiles[i].bn_bound); */ \
     R->profiles_size = i + 1;
 
     PUSH_PROFILE(4, 84, 4,3);

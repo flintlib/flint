@@ -2,9 +2,9 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include "arb_mat.h"
-#include "acb_mat.h"
-#include "profiler.h"
+#include <flint/arb_mat.h>
+#include <flint/acb_mat.h>
+#include <flint/profiler.h>
 
 int main(int argc, char *argv[])
 {
