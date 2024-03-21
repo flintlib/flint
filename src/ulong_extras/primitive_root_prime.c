@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Vincent Neiger
 
     This file is part of FLINT.
 
@@ -12,7 +13,7 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-mp_limb_t n_primitive_root_prime_prefactor(ulong p, n_factor_t * factors)
+ulong n_primitive_root_prime_prefactor(ulong p, n_factor_t * factors)
 {
     if (p == 2)
         return 1;
@@ -40,12 +41,10 @@ mp_limb_t n_primitive_root_prime_prefactor(ulong p, n_factor_t * factors)
     flint_throw(FLINT_ERROR, "Exception (n_primitive_root_prime_prefactor).  root not found.\n");
 }
 
-mp_limb_t n_primitive_root_prime(ulong p)
+ulong n_primitive_root_prime(ulong p)
 {
     n_factor_t factors;
     n_factor_init(&factors);
     n_factor(&factors, p - 1, 1);
-
-    mp_limb_t a = n_primitive_root_prime_prefactor(p, &factors);
-    return a;
+    return n_primitive_root_prime_prefactor(p, &factors);
 }
