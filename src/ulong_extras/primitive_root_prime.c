@@ -12,51 +12,40 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-mp_limb_t n_primitive_root_prime_prefactor(mp_limb_t p, n_factor_t * factors)
+mp_limb_t n_primitive_root_prime_prefactor(ulong p, n_factor_t * factors)
 {
-    slong i;
-    int found;
-    mp_limb_t result, a, pm1;
-    double pinv;
-
     if (p == 2)
-    {
         return 1;
-    }
 
-    pm1 = p - 1;
-    pinv = n_precompute_inverse(p);
+    // compute the divisions "(p-1) / factors" once for all
+    ulong * exps = FLINT_ARRAY_ALLOC(factors->num, ulong);
+    for (slong i = 0; i < factors->num; i++)
+        exps[i] = (p-1) / factors->p[i];
 
-    for (a = 2; a < p; a++)
+    // try 2, 3, ..., p-2
+    const ulong pinv = n_preinvert_limb(p);
+    for (ulong a = 2; a < p-1; a++)
     {
-        found = 1;
-        for (i = 0; i < factors->num; i++)
+        slong i = 0;
+        while ((i < factors->num) && (1 == n_powmod2_preinv(a, exps[i], p, pinv)))
+            i += 1;
+        if (i == factors->num)
         {
-            result = n_powmod_precomp(a, pm1 / factors->p[i], p, pinv);
-            if (result == 1)
-            {
-                found = 0;
-                break;
-            }
-        }
-        if (found)
-        {
+            flint_free(exps);
             return a;
         }
     }
 
+    flint_free(exps);
     flint_throw(FLINT_ERROR, "Exception (n_primitive_root_prime_prefactor).  root not found.\n");
 }
 
-mp_limb_t n_primitive_root_prime(mp_limb_t p)
+mp_limb_t n_primitive_root_prime(ulong p)
 {
-    mp_limb_t a;
     n_factor_t factors;
-
     n_factor_init(&factors);
     n_factor(&factors, p - 1, 1);
 
-    a = n_primitive_root_prime_prefactor(p, &factors);
-
+    mp_limb_t a = n_primitive_root_prime_prefactor(p, &factors);
     return a;
 }
