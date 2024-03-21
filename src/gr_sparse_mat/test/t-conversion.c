@@ -62,7 +62,7 @@ int test_conversion(flint_rand_t state, gr_ctx_t ctx)
         }
     }
 
-    //flint_printf("Testing from/to sparse mat\n");
+    // flint_printf("Testing from/to sparse mat\n");
     for (i = 0; i < n_tests; i++)
     {
         status |= gr_coo_mat_randtest(mat, 10, 0, T_TRUE, state, ctx);
@@ -76,19 +76,19 @@ int test_conversion(flint_rand_t state, gr_ctx_t ctx)
         }
     }
 
-    //flint_printf("Testing coo -> csr -> lil -> coo\n");
+    // flint_printf("Testing coo -> csr -> lil -> mat -> csr\n");
     for (i = 0; i < 2 * n_tests; i++)
     {
         status |= gr_coo_mat_randtest(mat, 10, 0, (i % 2) ? T_FALSE : T_TRUE, state, ctx);
-        //flint_printf("\n\ncoo_mat = "); status |= gr_coo_mat_print_nz(mat, ctx);
+        // flint_printf("\n\ncoo_mat = "); status |= gr_coo_mat_print_nz(mat, ctx);
         status |= gr_csr_mat_set_coo_mat(csr_mat, mat, ctx);
-        //flint_printf("\n\ncsr_mat = "); status |= gr_csr_mat_print_nz(csr_mat, ctx);
+        // flint_printf("\n\ncsr_mat = "); status |= gr_csr_mat_print_nz(csr_mat, ctx);
         status |= gr_lil_mat_set_csr_mat(lil_mat, csr_mat, ctx);
-        //flint_printf("\n\nlil_mat = "); status |= gr_lil_mat_print_nz(lil_mat, ctx);
-        status |= gr_coo_mat_set_lil_mat(mat2, lil_mat, ctx);
-        //flint_printf("\n\ncoo_mat = "); status |= gr_coo_mat_print_nz(mat2, ctx);
-        status |= gr_csr_mat_set_coo_mat(csr_mat2, mat2, ctx);
-        //flint_printf("\n\ncsr_mat = "); status |= gr_csr_mat_print_nz(csr_mat2, ctx);
+        // flint_printf("\n\nlil_mat = "); status |= gr_lil_mat_print_nz(lil_mat, ctx);
+        status |= gr_mat_set_lil_mat(dmat, lil_mat, ctx);
+        // flint_printf("\n\nmat = "); status |= gr_mat_print(dmat, ctx);
+        status |= gr_csr_mat_set_mat(csr_mat2, dmat, ctx);
+        // flint_printf("\n\ncsr_mat = "); status |= gr_csr_mat_print_nz(csr_mat2, ctx);
         if (T_FALSE == gr_csr_mat_equal(csr_mat, csr_mat2, ctx))
         {
             status |= gr_csr_mat_print_nz(csr_mat, ctx); flint_printf("\n");
@@ -97,19 +97,19 @@ int test_conversion(flint_rand_t state, gr_ctx_t ctx)
         }
     }
 
-    //flint_printf("Testing coo -> lil -> csr -> coo\n");
+    // flint_printf("Testing coo -> lil -> csr -> mat -> lil\n");
     for (i = 0; i < 2 * n_tests; i++)
     {
         status |= gr_coo_mat_randtest(mat, 10, 0, (i % 2) ? T_FALSE : T_TRUE, state, ctx);
-        //flint_printf("\n\ncoo_mat = "); status |= gr_coo_mat_print_nz(mat, ctx); flint_printf("\nnnz = %d\n", mat->nnz);
+        // flint_printf("\n\ncoo_mat = "); status |= gr_coo_mat_print_nz(mat, ctx); flint_printf("\nnnz = %d\n", mat->nnz);
         status |= gr_lil_mat_set_coo_mat(lil_mat, mat, ctx);
-        //flint_printf("\n\nlil_mat = "); status |= gr_lil_mat_print_nz(lil_mat, ctx); flint_printf("\nnnz = %d\n", lil_mat->nnz);
+        // flint_printf("\n\nlil_mat = "); status |= gr_lil_mat_print_nz(lil_mat, ctx); flint_printf("\nnnz = %d\n", lil_mat->nnz);
         status |= gr_csr_mat_set_lil_mat(csr_mat, lil_mat, ctx);
-        //flint_printf("\n\ncsr_mat = "); status |= gr_csr_mat_print_nz(csr_mat, ctx); flint_printf("\nnnz = %d\n", csr_mat->nnz);
-        status |= gr_coo_mat_set_csr_mat(mat2, csr_mat, ctx);
-        //flint_printf("\n\ncoo_mat = "); status |= gr_coo_mat_print_nz(mat2, ctx); flint_printf("\nnnz = %d\n", mat2->nnz);
-        status |= gr_lil_mat_set_coo_mat(lil_mat2, mat2, ctx);
-        //flint_printf("\n\nlil_mat = "); status |= gr_lil_mat_print_nz(lil_mat2, ctx); flint_printf("\nnnz = %d\n", lil_mat2->nnz);
+        // flint_printf("\n\ncsr_mat = "); status |= gr_csr_mat_print_nz(csr_mat, ctx); flint_printf("\nnnz = %d\n", csr_mat->nnz);
+        status |= gr_mat_set_csr_mat(dmat, csr_mat, ctx);
+        // flint_printf("\n\nmat = "); status |= gr_mat_print(dmat, ctx);
+        status |= gr_lil_mat_set_mat(lil_mat2, dmat, ctx);
+        // flint_printf("\n\nlil_mat = "); status |= gr_lil_mat_print_nz(lil_mat2, ctx); flint_printf("\nnnz = %d\n", lil_mat2->nnz);
         if (T_FALSE == gr_lil_mat_equal(lil_mat, lil_mat2, ctx))
         {
             status |= gr_lil_mat_print_nz(lil_mat, ctx); flint_printf("\n");

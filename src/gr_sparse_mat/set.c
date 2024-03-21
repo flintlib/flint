@@ -192,24 +192,30 @@ int gr_csr_mat_set_coo_mat(gr_csr_mat_t dst, const gr_coo_mat_t src, gr_ctx_t ct
         entry = NULL;
         for (i = 0; i < src->nnz; ++i)
         {   
+            //flint_printf("(%d, %d)\n", si[i].row, si[i].col);
+
             // Check if we can just accumulate
             if(i > 0 && si[i-1].row == si[i].row && si[i-1].col == si[i].col)
                 status |= gr_add(entry, entry, si[i].entry, ctx);
             else
             {
+                // Advance row offsets as needed
+
                 // If previous entry does not exist or is not zero, advance to the next one
                 if (entry == NULL || is_zero(entry, ctx) != T_TRUE)
                 {
                     entry = GR_ENTRY(dst->nzs, nnz, sz);
                     ++nnz;
                 }
-                status |= gr_set(entry, si[i].entry, ctx);
-
-                // Advance row offsets as needed
                 while (row != si[i].row) 
-                    dst->rows[++row] = nnz;
+                    dst->rows[++row] = nnz - 1;
+                dst->cols[nnz - 1] = si[i].col;
+                status |= gr_set(entry, si[i].entry, ctx);
             }
         }
+        if (entry != NULL && is_zero(entry, ctx) == T_TRUE)
+            --nnz;
+
         // Set remaining row offsets and overall number of nonzeroes
         while (row < dst->r)
             dst->rows[++row] = nnz;
@@ -263,6 +269,7 @@ int gr_lil_mat_set_coo_mat(gr_lil_mat_t dst, const gr_coo_mat_t src, gr_ctx_t ct
             for (row_end_idx = row_start_idx; row_end_idx < src->nnz; ++row_end_idx)
                 if (si[row_end_idx].row != row)
                     break;
+            //flint_printf("(%d, %d)\n", row_start_idx, row_end_idx);
             gr_sparse_vec_fit_nnz(&dst->rows[row], row_end_idx - row_start_idx, ctx);
 
             // Add nonzeroes to row
@@ -270,6 +277,7 @@ int gr_lil_mat_set_coo_mat(gr_lil_mat_t dst, const gr_coo_mat_t src, gr_ctx_t ct
             nnz = 0;
             for (i = row_start_idx; i < row_end_idx; ++i)
             {
+                //flint_printf("\t(%d, %d)\n", si[i].row, si[i].col);
                 // Skip zero entries
                 if (is_zero(si[i].entry, ctx) == T_TRUE)
                     continue;
@@ -290,6 +298,8 @@ int gr_lil_mat_set_coo_mat(gr_lil_mat_t dst, const gr_coo_mat_t src, gr_ctx_t ct
                     status |= gr_set(entry, si[i].entry, ctx);
                 }
             }
+            if (entry != NULL && is_zero(entry, ctx) == T_TRUE)
+                --nnz;
             dst->rows[row].nnz = nnz;
             dst->nnz += nnz;
             row_start_idx = row_end_idx;
