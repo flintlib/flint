@@ -28,7 +28,7 @@ double flint_test_multiplier(void)
         {
             _flint_test_multiplier = strtod(s, NULL);
 
-            if (!(_flint_test_multiplier >= 0.0 && _flint_test_multiplier <= 1000.0))
+            if (!(_flint_test_multiplier >= 0.0 && _flint_test_multiplier <= 100000.0))
                 _flint_test_multiplier = 1.0;
         }
     }

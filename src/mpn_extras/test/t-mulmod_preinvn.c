@@ -29,14 +29,14 @@ TEST_FUNCTION_START(flint_mpn_mulmod_preinvn, state)
 
     gmp_randinit_default(st);
 
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
-        size = n_randint(state, 200) + 1;
+        size = n_randint(state, 20) + 1;
 
-        mpz_rrandomb(a, st, size);
-        mpz_rrandomb(b, st, size);
+        mpz_rrandomb(a, st, size * FLINT_BITS);
+        mpz_rrandomb(b, st, size * FLINT_BITS);
         do {
-            mpz_rrandomb(d, st, size);
+            mpz_rrandomb(d, st, size * FLINT_BITS);
         } while (mpz_sgn(d) == 0);
 
         size_d = d->_mp_size;

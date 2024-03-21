@@ -390,6 +390,22 @@ mp_limb_t flint_mpn_mulhigh_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n
         return _flint_mpn_mulhigh_n(rp, xp, yp, n);
 }
 
+/* We just want the high n limbs, but rp has low limbs available
+   which can be used for scratch space or for doing a full multiply
+   without temporary allocations. */
+MPN_EXTRAS_INLINE
+void flint_mpn_mul_or_mulhigh_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
+{
+    FLINT_ASSERT(n >= 1);
+
+    if (FLINT_HAVE_MULHIGH_FUNC(n))
+        rp[n - 1] = flint_mpn_mulhigh_func_tab[n](rp + n, xp, yp);
+    else if (n < FLINT_MPN_MULHIGH_MUL_CUTOFF)
+        rp[n - 1] = _flint_mpn_mulhigh_n(rp + n, xp, yp, n);
+    else
+        flint_mpn_mul_n(rp, xp, yp, n);
+}
+
 #define FLINT_MPN_SQRHIGH_MULDERS_CUTOFF 90
 #define FLINT_MPN_SQRHIGH_SQR_CUTOFF 2000
 #define FLINT_MPN_SQRHIGH_K_TAB_SIZE 2048

@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2013 William Hart
+    Copyright (C) 2024 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -13,7 +14,10 @@
 #include "mpn_extras.h"
 
 /*
-   TODO: speedup mpir's mullow and mulhigh and use instead of mul/mul_n
+TODO:
+ * fixed-length code for small n
+ * use unbalanced mulhigh in the second loop
+ * use mullow
 */
 
 void flint_mpn_mod_preinvn(mp_ptr rp, mp_srcptr ap, mp_size_t m,
@@ -39,7 +43,7 @@ void flint_mpn_mod_preinvn(mp_ptr rp, mp_srcptr ap, mp_size_t m,
    /* 2n by n division */
    while (m >= 2*n)
    {
-      flint_mpn_mul_n(t, dinv, r + n, n);
+      flint_mpn_mul_or_mulhigh_n(t, dinv, r + n, n);
       cy = mpn_add_n(t + 2*n, t + n, r + n, n);
 
       flint_mpn_mul_n(t, d, t + 2*n, n);
