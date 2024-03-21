@@ -12,8 +12,6 @@
 
 #include "flint.h"
 #include "ulong_extras.h"
-#include <flint/limb_types.h>
-#include <flint/ulong_extras.h>
 
 ulong n_primitive_root_prime_prefactor(ulong p, n_factor_t * factors)
 {
