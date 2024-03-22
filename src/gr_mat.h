@@ -171,6 +171,10 @@ WARN_UNUSED_RESULT int gr_mat_mul_strassen(gr_mat_t C, const gr_mat_t A, const g
 WARN_UNUSED_RESULT int gr_mat_mul_generic(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
 
+WARN_UNUSED_RESULT int gr_mat_addmul_classical(gr_mat_t D, const gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_addmul_generic(gr_mat_t D, const gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_addmul(gr_mat_t D, const gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
+
 /* todo */
 GR_MAT_INLINE WARN_UNUSED_RESULT int
 gr_mat_sqr(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)

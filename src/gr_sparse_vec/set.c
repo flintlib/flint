@@ -4,7 +4,7 @@ int
 gr_sparse_vec_set(gr_sparse_vec_t dst, const gr_sparse_vec_t src, gr_ctx_t ctx)
 {
     int status = GR_SUCCESS;
-    if (dst->length != src->length)
+    if (dst->length < src->length)
         return GR_DOMAIN;
 
     if (dst != src)

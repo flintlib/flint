@@ -773,6 +773,11 @@ GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_coo_mat_nz_product(gr_ptr res, co
 { return _gr_vec_product(res, mat->nzs, mat->nnz, ctx); }
 
 /**
+ * Transpose
+*/
+int gr_lil_mat_transpose(gr_lil_mat_t B, const gr_lil_mat_t A, gr_ctx_t ctx);
+
+/**
  * Matrix multiplication
 **/
 
@@ -784,6 +789,43 @@ WARN_UNUSED_RESULT int gr_lil_mat_mul_mat_transpose(gr_mat_t Ct, const gr_lil_ma
 
 WARN_UNUSED_RESULT int gr_csr_mat_mul_mat(gr_mat_t C, const gr_csr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_lil_mat_mul_mat(gr_mat_t C, const gr_lil_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
+
+/**
+ * Solving, nullvector, and nullspace computation
+**/
+
+WARN_UNUSED_RESULT int gr_lil_mat_solve_lanczos(gr_ptr x, const gr_lil_mat_t M, gr_srcptr b, flint_rand_t state, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_lil_mat_solve_block_lanczos(gr_ptr x, const gr_lil_mat_t M, gr_srcptr b, slong block_size, flint_rand_t state, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_lil_mat_solve_wiedemann(gr_ptr x, const gr_lil_mat_t M, gr_srcptr b, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_lil_mat_solve_block_wiedemann(gr_ptr x, const gr_lil_mat_t M, gr_srcptr b, slong block_size, flint_rand_t state, gr_ctx_t ctx);
+
+WARN_UNUSED_RESULT int gr_lil_mat_nullvector_lanczos(gr_ptr x, const gr_lil_mat_t M, flint_rand_t state, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_lil_mat_nullvector_block_lanczos(gr_ptr x, const gr_lil_mat_t M, slong block_size, flint_rand_t state, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_lil_mat_nullvector_wiedemann(gr_ptr x, const gr_lil_mat_t M, flint_rand_t state, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_lil_mat_nullvector_block_wiedemann(gr_ptr x, const gr_lil_mat_t M, slong block_size, flint_rand_t state, gr_ctx_t ctx);
+
+WARN_UNUSED_RESULT int gr_lil_mat_nullspace(gr_mat_t X, const gr_lil_mat_t M, flint_rand_t state, slong max_iters, const char *algorithm, slong block_size, gr_ctx_t ctx);
+
+GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_lil_mat_nullspace_lanczos(gr_mat_t X, const gr_lil_mat_t M, flint_rand_t state, slong max_iters, gr_ctx_t ctx)
+{
+    return gr_lil_mat_nullspace(X, M, state, max_iters, "lanczos", 1, ctx);
+}
+
+GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_lil_mat_nullspace_wiedemann(gr_mat_t X, const gr_lil_mat_t M, flint_rand_t state, slong max_iters, gr_ctx_t ctx)
+{
+    return gr_lil_mat_nullspace(X, M, state, max_iters, "wiedemann", 1, ctx);
+}
+
+GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_lil_mat_nullspace_block_lanczos(gr_mat_t X, const gr_lil_mat_t M, flint_rand_t state, slong max_iters, slong block_size, gr_ctx_t ctx)
+{
+    return gr_lil_mat_nullspace(X, M, state, max_iters, "block lanczos", block_size, ctx);
+}
+
+GR_SPARSE_MAT_INLINE WARN_UNUSED_RESULT int gr_lil_mat_nullspace_block_wiedemann(gr_mat_t X, const gr_lil_mat_t M, flint_rand_t state, slong max_iters, slong block_size, gr_ctx_t ctx)
+{
+    return gr_lil_mat_nullspace(X, M, state, max_iters, "block wiedemann", block_size, ctx);
+}
+
 
 /*
 WARN_UNUSED_RESULT int gr_sparse_mat_lu(slong * rank, slong * P, gr_csr_mat_t LU, const gr_csr_mat_t A, int rank_check, gr_ctx_t ctx);
