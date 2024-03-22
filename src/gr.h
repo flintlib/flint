@@ -1486,8 +1486,8 @@ vector_ctx_t;
 
 #define VECTOR_CTX(ring_ctx) ((vector_ctx_t *)((ring_ctx)))
 
-void gr_ctx_init_vector_gr_vec(gr_ctx_t ctx, gr_ctx_t base_ring);
-void gr_ctx_init_vector_space_gr_vec(gr_ctx_t ctx, gr_ctx_t base_ring, slong n);
+void gr_ctx_init_vector_gr_vec(gr_ctx_t ctx, gr_ctx_t base_type);
+void gr_ctx_init_vector_space_gr_vec(gr_ctx_t ctx, gr_ctx_t base_type, slong n);
 
 /* Generic matrix ring */
 
@@ -1503,7 +1503,7 @@ matrix_ctx_t;
 #define MATRIX_CTX(ring_ctx) ((matrix_ctx_t *)((ring_ctx)))
 
 void gr_ctx_init_matrix_domain(gr_ctx_t ctx, gr_ctx_t base_ring);
-void gr_ctx_init_matrix_space(gr_ctx_t ctx, gr_ctx_t base_ring, slong nrows, slong ncols);
+void gr_ctx_init_matrix_space(gr_ctx_t ctx, gr_ctx_t base_ring, slong n, slong m);
 
 GR_INLINE void gr_ctx_init_matrix_ring(gr_ctx_t ctx, gr_ctx_t base_ring, slong n)
 {

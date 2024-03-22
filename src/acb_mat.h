@@ -92,7 +92,7 @@ void acb_mat_set_real_imag(acb_mat_t mat, const arb_mat_t re, const arb_mat_t im
 
 void acb_mat_randtest(acb_mat_t mat, flint_rand_t state, slong prec, slong mag_bits);
 
-void acb_mat_randtest_eig(acb_mat_t A, flint_rand_t state, acb_srcptr E, slong prec);
+void acb_mat_randtest_eig(acb_mat_t mat, flint_rand_t state, acb_srcptr E, slong prec);
 
 /* I/O */
 
@@ -184,11 +184,11 @@ void acb_mat_onei(acb_mat_t mat);
 
 void acb_mat_indeterminate(acb_mat_t mat);
 
-void acb_mat_dft(acb_mat_t res, int kind, slong prec);
+void acb_mat_dft(acb_mat_t mat, int type, slong prec);
 
-void acb_mat_transpose(acb_mat_t mat1, const acb_mat_t mat2);
+void acb_mat_transpose(acb_mat_t dest, const acb_mat_t src);
 
-void acb_mat_conjugate(acb_mat_t mat1, const acb_mat_t mat2);
+void acb_mat_conjugate(acb_mat_t dest, const acb_mat_t src);
 
 ACB_MAT_INLINE void
 acb_mat_conjugate_transpose(acb_mat_t mat1, const acb_mat_t mat2)
@@ -203,7 +203,7 @@ void acb_mat_bound_inf_norm(mag_t b, const acb_mat_t A);
 
 void acb_mat_frobenius_norm(arb_t res, const acb_mat_t A, slong prec);
 
-void acb_mat_bound_frobenius_norm(mag_t b, const acb_mat_t A);
+void acb_mat_bound_frobenius_norm(mag_t res, const acb_mat_t A);
 
 /* Arithmetic */
 
@@ -223,7 +223,7 @@ void acb_mat_mul_entrywise(acb_mat_t res, const acb_mat_t mat1, const acb_mat_t 
 void acb_mat_sqr_classical(acb_mat_t res, const acb_mat_t mat, slong prec);
 void acb_mat_sqr(acb_mat_t res, const acb_mat_t mat, slong prec);
 
-void acb_mat_pow_ui(acb_mat_t B, const acb_mat_t A, ulong exp, slong prec);
+void acb_mat_pow_ui(acb_mat_t res, const acb_mat_t mat, ulong exp, slong prec);
 
 /* Scalar arithmetic */
 
@@ -405,7 +405,7 @@ int acb_mat_solve(acb_mat_t X, const acb_mat_t A, const acb_mat_t B, slong prec)
 
 int acb_mat_solve_precond(acb_mat_t X, const acb_mat_t A, const acb_mat_t B, slong prec);
 
-void acb_mat_approx_mul(acb_mat_t C, const acb_mat_t A, const acb_mat_t B, slong prec);
+void acb_mat_approx_mul(acb_mat_t res, const acb_mat_t mat1, const acb_mat_t mat2, slong prec);
 void acb_mat_approx_solve_triu(acb_mat_t X, const acb_mat_t U, const acb_mat_t B, int unit, slong prec);
 void acb_mat_approx_solve_tril(acb_mat_t X, const acb_mat_t L, const acb_mat_t B, int unit, slong prec);
 int acb_mat_approx_lu(slong * P, acb_mat_t LU, const acb_mat_t A, slong prec);
@@ -451,8 +451,8 @@ void acb_mat_companion(acb_mat_t mat, const acb_poly_t poly, slong prec);
 
 void acb_mat_trace(acb_t trace, const acb_mat_t mat, slong prec);
 
-void _acb_mat_diag_prod(acb_t res, const acb_mat_t A, slong a, slong b, slong prec);
-void acb_mat_diag_prod(acb_t res, const acb_mat_t A, slong prec);
+void _acb_mat_diag_prod(acb_t res, const acb_mat_t mat, slong a, slong b, slong prec);
+void acb_mat_diag_prod(acb_t res, const acb_mat_t mat, slong prec);
 
 ACB_MAT_INLINE slong
 acb_mat_allocated_bytes(const acb_mat_t x)

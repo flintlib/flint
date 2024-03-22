@@ -242,9 +242,9 @@ void _padic_exp(fmpz_t rop, const fmpz_t u, slong v, const fmpz_t p, slong N);
 void _padic_exp_rectangular(fmpz_t rop, const fmpz_t u, slong v, const fmpz_t p, slong N);
 void _padic_exp_balanced(fmpz_t rop, const fmpz_t u, slong v, const fmpz_t p, slong N);
 
-int padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx);
-int padic_exp_rectangular(padic_t rop, const padic_t op, const padic_ctx_t ctx);
-int padic_exp_balanced(padic_t rop, const padic_t op, const padic_ctx_t ctx);
+int padic_exp(padic_t y, const padic_t x, const padic_ctx_t ctx);
+int padic_exp_rectangular(padic_t y, const padic_t x, const padic_ctx_t ctx);
+int padic_exp_balanced(padic_t y, const padic_t x, const padic_ctx_t ctx);
 
 /* Logarithm *****************************************************************/
 
@@ -266,9 +266,9 @@ void _padic_teichmuller(fmpz_t rop, const fmpz_t op, const fmpz_t p, slong N);
 
 void padic_teichmuller(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 
-ulong padic_val_fac_ui_2(ulong N);
+ulong padic_val_fac_ui_2(ulong n);
 
-ulong padic_val_fac_ui(ulong N, const fmpz_t p);
+ulong padic_val_fac_ui(ulong n, const fmpz_t p);
 
 void padic_val_fac(fmpz_t rop, const fmpz_t op, const fmpz_t p);
 

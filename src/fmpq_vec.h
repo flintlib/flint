@@ -26,7 +26,7 @@ extern "C" {
 
 /*  Memory management  *******************************************************/
 
-fmpq * _fmpq_vec_init(slong len);
+fmpq * _fmpq_vec_init(slong n);
 void _fmpq_vec_clear(fmpq * vec, slong len);
 
 /*  Randomisation  ***********************************************************/

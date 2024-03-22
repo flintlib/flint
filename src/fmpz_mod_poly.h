@@ -154,13 +154,13 @@ void fmpz_mod_poly_randtest_monic_irreducible(fmpz_mod_poly_t f,
 void fmpz_mod_poly_randtest_monic_primitive(fmpz_mod_poly_t f,
                       flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx);
 
-void fmpz_mod_poly_randtest_trinomial(fmpz_mod_poly_t f, flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_poly_randtest_trinomial(fmpz_mod_poly_t poly, flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx);
 
 int fmpz_mod_poly_randtest_trinomial_irreducible(fmpz_mod_poly_t f,
                             flint_rand_t state, slong len, slong max_attempts,
                                                      const fmpz_mod_ctx_t ctx);
 
-void fmpz_mod_poly_randtest_pentomial(fmpz_mod_poly_t f, flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_poly_randtest_pentomial(fmpz_mod_poly_t poly, flint_rand_t state, slong len, const fmpz_mod_ctx_t ctx);
 
 int fmpz_mod_poly_randtest_pentomial_irreducible(fmpz_mod_poly_t f,
                             flint_rand_t state, slong len, slong max_attempts,
@@ -246,9 +246,9 @@ void fmpz_mod_poly_inflate(fmpz_mod_poly_t result, const fmpz_mod_poly_t input, 
 
 /*  Conversion ***************************************************************/
 
-void fmpz_mod_poly_set_ui(fmpz_mod_poly_t f, ulong x, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_poly_set_ui(fmpz_mod_poly_t f, ulong c, const fmpz_mod_ctx_t ctx);
 void fmpz_mod_poly_set_nmod_poly(fmpz_mod_poly_t f, const nmod_poly_t g);
-void fmpz_mod_poly_set_fmpz(fmpz_mod_poly_t poly, const fmpz_t c, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_poly_set_fmpz(fmpz_mod_poly_t f, const fmpz_t c, const fmpz_mod_ctx_t ctx);
 void fmpz_mod_poly_set_fmpz_poly(fmpz_mod_poly_t f, const fmpz_poly_t g, const fmpz_mod_ctx_t ctx);
 
 void fmpz_mod_poly_get_nmod_poly(nmod_poly_t f, const fmpz_mod_poly_t g);
@@ -299,7 +299,7 @@ void _fmpz_mod_poly_scalar_mul_fmpz(fmpz *res, const fmpz *poly, slong len, cons
 void fmpz_mod_poly_scalar_mul_fmpz(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, const fmpz_t x, const fmpz_mod_ctx_t ctx);
 void _fmpz_mod_poly_scalar_mul_ui(fmpz *res, const fmpz *poly, slong len, ulong x, const fmpz_mod_ctx_t ctx);
 void fmpz_mod_poly_scalar_mul_ui(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, ulong x, const fmpz_mod_ctx_t ctx);
-void fmpz_mod_poly_scalar_addmul_fmpz(fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_t x, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_poly_scalar_addmul_fmpz(fmpz_mod_poly_t rop, const fmpz_mod_poly_t op, const fmpz_t x, const fmpz_mod_ctx_t ctx);
 
 /*  Scalar division ****************************************************/
 
@@ -667,7 +667,7 @@ void fmpz_mod_poly_minpoly(fmpz_mod_poly_t poly, const fmpz* seq, slong len, con
 /*  Resultant  ***************************************************************/
 
 void _fmpz_mod_poly_resultant(fmpz_t res, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_mod_ctx_t ctx);
-void fmpz_mod_poly_resultant(fmpz_t res, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_poly_resultant(fmpz_t res, const fmpz_mod_poly_t f, const fmpz_mod_poly_t g, const fmpz_mod_ctx_t ctx);
 
 /*  Discriminant  ************************************************************/
 

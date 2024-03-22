@@ -89,7 +89,7 @@ void fq_nmod_sub(fq_nmod_t rop, const fq_nmod_t op1,
 
 void fq_nmod_sub_one(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t ctx);
 
-void fq_nmod_neg(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t ctx);
+void fq_nmod_neg(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 
 void fq_nmod_mul(fq_nmod_t rop,
             const fq_nmod_t op1, const fq_nmod_t op2, const fq_nmod_ctx_t ctx);
@@ -105,7 +105,7 @@ void fq_nmod_mul_ui(fq_nmod_t rop,
 
 void fq_nmod_sqr(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 
-void fq_nmod_inv(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t ctx);
+void fq_nmod_inv(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 
 void _fq_nmod_pow(mp_limb_t *rop, const mp_limb_t *op,
                            slong len, const fmpz_t e, const fq_nmod_ctx_t ctx);
@@ -118,7 +118,7 @@ void fq_nmod_pow_ui(fq_nmod_t rop,
 
 /* Roots ********************************************************************/
 
-int fq_nmod_sqrt(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx);
+int fq_nmod_sqrt(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t ctx);
 
 void fq_nmod_pth_root(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t ctx);
 
@@ -152,7 +152,7 @@ void fq_nmod_set_ui(fq_nmod_t rop, const ulong x, const fq_nmod_ctx_t ctx);
 void fq_nmod_set_fmpz(fq_nmod_t rop, const fmpz_t x, const fq_nmod_ctx_t ctx);
 void fq_nmod_set_nmod_poly(fq_nmod_t a, const nmod_poly_t b, const fq_nmod_ctx_t ctx);
 
-int fq_nmod_get_fmpz(fmpz_t a, const fq_nmod_t b, const fq_nmod_ctx_t ctx);
+int fq_nmod_get_fmpz(fmpz_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 void fq_nmod_get_nmod_poly(nmod_poly_t a, const fq_nmod_t b, const fq_nmod_ctx_t ctx);
 
 void fq_nmod_swap(fq_nmod_t op1, fq_nmod_t op2, const fq_nmod_ctx_t ctx);

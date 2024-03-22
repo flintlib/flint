@@ -162,13 +162,13 @@ void acb_modular_theta_series(acb_poly_t theta1, acb_poly_t theta2,
     acb_poly_t theta3, acb_poly_t theta4, const acb_poly_t z, const acb_t tau,
         slong len, slong prec);
 
-void acb_modular_j(acb_t z, const acb_t tau, slong prec);
+void acb_modular_j(acb_t r, const acb_t tau, slong prec);
 
 int acb_modular_epsilon_arg(const psl2z_t g);
 
 void acb_modular_eta_sum(acb_t eta, const acb_t q, slong prec);
 
-void acb_modular_eta(acb_t z, const acb_t tau, slong prec);
+void acb_modular_eta(acb_t r, const acb_t tau, slong prec);
 
 void acb_modular_lambda(acb_t r, const acb_t tau, slong prec);
 
@@ -176,15 +176,15 @@ void acb_modular_delta(acb_t r, const acb_t tau, slong prec);
 
 void acb_modular_eisenstein(acb_ptr r, const acb_t tau, slong len, slong prec);
 
-void acb_modular_elliptic_p(acb_t r, const acb_t z, const acb_t tau, slong prec);
+void acb_modular_elliptic_p(acb_t wp, const acb_t z, const acb_t tau, slong prec);
 
-void acb_modular_elliptic_p_zpx(acb_ptr r, const acb_t z, const acb_t tau, slong len, slong prec);
+void acb_modular_elliptic_p_zpx(acb_ptr wp, const acb_t z, const acb_t tau, slong len, slong prec);
 
-void acb_modular_elliptic_k(acb_t k, const acb_t m, slong prec);
+void acb_modular_elliptic_k(acb_t w, const acb_t m, slong prec);
 
 void acb_modular_elliptic_k_cpx(acb_ptr w, const acb_t m, slong len, slong prec);
 
-void acb_modular_elliptic_e(acb_t res, const acb_t m, slong prec);
+void acb_modular_elliptic_e(acb_t w, const acb_t m, slong prec);
 
 void acb_modular_hilbert_class_poly(fmpz_poly_t res, slong D);
 

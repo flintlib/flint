@@ -262,7 +262,7 @@ fexpr_is_zero(const fexpr_t expr)
 void fexpr_set_si(fexpr_t res, slong c);
 void fexpr_set_ui(fexpr_t res, ulong c);
 void fexpr_set_fmpz(fexpr_t res, const fmpz_t c);
-int fexpr_get_fmpz(fmpz_t c, const fexpr_t x);
+int fexpr_get_fmpz(fmpz_t res, const fexpr_t expr);
 void fexpr_set_fmpq(fexpr_t res, const fmpq_t x);
 
 FEXPR_INLINE void
@@ -311,7 +311,7 @@ fexpr_is_builtin_symbol(const fexpr_t expr, slong i)
 }
 
 /* todo: document, test */
-int fexpr_is_builtin_call(const fexpr_t expr, slong i);
+int fexpr_is_builtin_call(const fexpr_t expr, slong id);
 int fexpr_is_any_builtin_call(const fexpr_t expr);
 
 FEXPR_INLINE slong
@@ -334,10 +334,10 @@ fexpr_nargs(const fexpr_t expr)
 }
 
 void fexpr_func(fexpr_t res, const fexpr_t expr);
-void fexpr_view_func(fexpr_t res, const fexpr_t expr);
+void fexpr_view_func(fexpr_t view, const fexpr_t expr);
 
 void fexpr_arg(fexpr_t res, const fexpr_t expr, slong i);
-void fexpr_view_arg(fexpr_t res, const fexpr_t expr, slong i);
+void fexpr_view_arg(fexpr_t view, const fexpr_t expr, slong i);
 
 FEXPR_INLINE void
 fexpr_view_next(fexpr_t view)
@@ -354,8 +354,8 @@ void fexpr_call4(fexpr_t res, const fexpr_t f, const fexpr_t x1, const fexpr_t x
 
 void fexpr_call_vec(fexpr_t res, const fexpr_t f, fexpr_srcptr args, slong len);
 
-void fexpr_call_builtin1(fexpr_t res, slong f, const fexpr_t x);
-void fexpr_call_builtin2(fexpr_t res, slong f, const fexpr_t x, const fexpr_t y);
+void fexpr_call_builtin1(fexpr_t res, slong f, const fexpr_t x1);
+void fexpr_call_builtin2(fexpr_t res, slong f, const fexpr_t x1, const fexpr_t x2);
 
 /* Subexpressions and replacement */
 
@@ -376,7 +376,7 @@ char * fexpr_get_str(const fexpr_t expr);
 #define FEXPR_LATEX_SMALL 1
 #define FEXPR_LATEX_LOGIC 2
 
-void fexpr_write_latex(calcium_stream_t out, const fexpr_t expr, ulong flags);
+void fexpr_write_latex(calcium_stream_t stream, const fexpr_t expr, ulong flags);
 void fexpr_print_latex(const fexpr_t expr, ulong flags);
 char * fexpr_get_str_latex(const fexpr_t expr, ulong flags);
 

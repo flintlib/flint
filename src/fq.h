@@ -84,7 +84,7 @@ void fq_sub(fq_t rop, const fq_t op1, const fq_t op2, const fq_ctx_t ctx);
 
 void fq_sub_one(fq_t rop, const fq_t op1, const fq_ctx_t ctx);
 
-void fq_neg(fq_t rop, const fq_t op1, const fq_ctx_t ctx);
+void fq_neg(fq_t rop, const fq_t op, const fq_ctx_t ctx);
 
 void fq_mul(fq_t rop, const fq_t op1, const fq_t op2, const fq_ctx_t ctx);
 void fq_mul_fmpz(fq_t rop, const fq_t op, const fmpz_t x, const fq_ctx_t ctx);
@@ -93,15 +93,15 @@ void fq_mul_ui(fq_t rop, const fq_t op, ulong x, const fq_ctx_t ctx);
 
 void fq_sqr(fq_t rop, const fq_t op, const fq_ctx_t ctx);
 
-void fq_inv(fq_t rop, const fq_t op1, const fq_ctx_t ctx);
+void fq_inv(fq_t rop, const fq_t op, const fq_ctx_t ctx);
 
 void _fq_pow(fmpz *rop, const fmpz *op, slong len, const fmpz_t e, const fq_ctx_t ctx);
-void fq_pow(fq_t rop, const fq_t op1, const fmpz_t e, const fq_ctx_t ctx);
+void fq_pow(fq_t rop, const fq_t op, const fmpz_t e, const fq_ctx_t ctx);
 void fq_pow_ui(fq_t rop, const fq_t op, const ulong e, const fq_ctx_t ctx);
 
 /* Roots *********************************************************************/
 
-int fq_sqrt(fq_t rop, const fq_t op, const fq_ctx_t ctx);
+int fq_sqrt(fq_t rop, const fq_t op1, const fq_ctx_t ctx);
 
 void fq_pth_root(fq_t rop, const fq_t op1, const fq_ctx_t ctx);
 
@@ -132,7 +132,7 @@ void fq_set_fmpz(fq_t rop, const fmpz_t x, const fq_ctx_t ctx);
 void fq_set_fmpz_poly(fq_t a, const fmpz_poly_t b, const fq_ctx_t ctx);
 void fq_set_fmpz_mod_poly(fq_t a, const fmpz_mod_poly_t b, const fq_ctx_t ctx);
 
-int fq_get_fmpz(fmpz_t a, const fq_t b, const fq_ctx_t ctx);
+int fq_get_fmpz(fmpz_t rop, const fq_t op, const fq_ctx_t ctx);
 void fq_get_fmpz_poly(fmpz_poly_t a, const fq_t b, const fq_ctx_t ctx);
 void fq_get_fmpz_mod_poly(fmpz_mod_poly_t a, const fq_t b, const fq_ctx_t ctx);
 

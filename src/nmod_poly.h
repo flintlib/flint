@@ -342,7 +342,7 @@ void nmod_poly_sub_series(nmod_poly_t res,
 
 void nmod_poly_sub_ui(nmod_poly_t res, const nmod_poly_t poly, ulong c);
 
-void nmod_poly_neg(nmod_poly_t res, const nmod_poly_t poly1);
+void nmod_poly_neg(nmod_poly_t res, const nmod_poly_t poly);
 
 /* Scalar multiplication and division  ***************************************/
 
@@ -984,12 +984,12 @@ mp_limb_t nmod_poly_resultant_euclidean(const nmod_poly_t f, const nmod_poly_t g
 mp_limb_t _nmod_poly_resultant_hgcd(mp_srcptr A, slong lenA,
                          mp_srcptr B, slong lenB, nmod_t mod);
 
-mp_limb_t nmod_poly_resultant_hgcd(const nmod_poly_t A, const nmod_poly_t B);
+mp_limb_t nmod_poly_resultant_hgcd(const nmod_poly_t f, const nmod_poly_t g);
 
 mp_limb_t _nmod_poly_resultant(mp_srcptr A, slong lenA,
                          mp_srcptr B, slong lenB, nmod_t mod);
 
-mp_limb_t nmod_poly_resultant(const nmod_poly_t A, const nmod_poly_t B);
+mp_limb_t nmod_poly_resultant(const nmod_poly_t f, const nmod_poly_t g);
 
 
 slong _nmod_poly_gcdinv(mp_limb_t *G, mp_limb_t *S,
@@ -1016,9 +1016,9 @@ void _nmod_poly_sqrt_series(mp_ptr g, mp_srcptr h, slong hlen, slong n, nmod_t m
 
 void nmod_poly_sqrt_series(nmod_poly_t g, const nmod_poly_t h, slong n);
 
-int _nmod_poly_sqrt(mp_ptr s, mp_srcptr p, slong len, nmod_t mod);
+int _nmod_poly_sqrt(mp_ptr s, mp_srcptr p, slong n, nmod_t mod);
 
-int nmod_poly_sqrt(nmod_poly_t b, const nmod_poly_t a);
+int nmod_poly_sqrt(nmod_poly_t s, const nmod_poly_t p);
 
 /* Power sums ****************************************************************/
 
@@ -1078,12 +1078,12 @@ void nmod_poly_cosh_series(nmod_poly_t g, const nmod_poly_t h, slong n);
 void _nmod_poly_tanh_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod);
 void nmod_poly_tanh_series(nmod_poly_t g, const nmod_poly_t h, slong n);
 
-void _nmod_poly_log_series(mp_ptr res, mp_srcptr f, slong flen, slong n, nmod_t mod);
-void nmod_poly_log_series(nmod_poly_t res, const nmod_poly_t f, slong n);
+void _nmod_poly_log_series(mp_ptr g, mp_srcptr h, slong hlen, slong n, nmod_t mod);
+void nmod_poly_log_series(nmod_poly_t g, const nmod_poly_t h, slong n);
 
 void  _nmod_poly_exp_expinv_series(mp_ptr f, mp_ptr g, mp_srcptr h, slong hlen, slong n, nmod_t mod);
 void _nmod_poly_exp_series(mp_ptr f, mp_srcptr h, slong hlen, slong n, nmod_t mod);
-void nmod_poly_exp_series(nmod_poly_t f, const nmod_poly_t h, slong n);
+void nmod_poly_exp_series(nmod_poly_t g, const nmod_poly_t h, slong n);
 
 /* Special polynomials *******************************************************/
 

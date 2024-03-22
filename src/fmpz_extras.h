@@ -199,7 +199,7 @@ fmpz_min(fmpz_t z, const fmpz_t x, const fmpz_t y)
         (zn) = FLINT_ABS(zn); \
     }
 
-void fmpz_lshift_mpn(fmpz_t z, mp_srcptr d, mp_size_t dn, int sgnbit, flint_bitcnt_t shift);
+void fmpz_lshift_mpn(fmpz_t z, mp_srcptr src, mp_size_t n, int negative, flint_bitcnt_t shift);
 
 static inline slong
 fmpz_allocated_bytes(const fmpz_t x)

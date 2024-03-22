@@ -120,7 +120,7 @@ void unity_zp_init(unity_zp f, ulong p, ulong exp, const fmpz_t n);
 void unity_zp_clear(unity_zp f);
 
 void unity_zp_copy(unity_zp f, const unity_zp g);
-void unity_zp_swap(unity_zp f, unity_zp g);
+void unity_zp_swap(unity_zp f, unity_zp q);
 
 void unity_zp_set_zero(unity_zp f);
 
@@ -217,7 +217,7 @@ void unity_zpq_clear(unity_zpq f);
 
 void unity_zpq_copy(unity_zpq f, const unity_zpq g);
 
-void unity_zpq_swap(unity_zpq f, unity_zpq g);
+void unity_zpq_swap(unity_zpq f, unity_zpq q);
 
 /* Comparison */
 int unity_zpq_equal(const unity_zpq f, const unity_zpq g);
@@ -236,11 +236,11 @@ void unity_zpq_mul(unity_zpq f, const unity_zpq g, const unity_zpq h);
 
 void _unity_zpq_mul_unity_p(unity_zpq f);
 
-void unity_zpq_mul_unity_p_pow(unity_zpq f, const unity_zpq g, slong p);
+void unity_zpq_mul_unity_p_pow(unity_zpq f, const unity_zpq g, slong k);
 
 /* Powering */
 void unity_zpq_pow(unity_zpq f, const unity_zpq g, const fmpz_t p);
-void unity_zpq_pow_ui(unity_zpq f, const unity_zpq g, ulong pow);
+void unity_zpq_pow_ui(unity_zpq f, const unity_zpq g, ulong p);
 
 /* Gauss sum computation */
 void unity_zpq_gauss_sum(unity_zpq f, ulong q, ulong p);

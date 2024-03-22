@@ -92,13 +92,13 @@ padic_mat_is_square(const padic_mat_t A)
     return padic_mat_nrows(A) == padic_mat_ncols(A);
 }
 
-int padic_mat_is_canonical(const padic_mat_t A, const padic_ctx_t ctx);
+int padic_mat_is_canonical(const padic_mat_t A, const padic_ctx_t p);
 
 int padic_mat_is_reduced(const padic_mat_t A, const padic_ctx_t ctx);
 
 /* Basic assignment **********************************************************/
 
-void padic_mat_set(padic_mat_t B, const padic_mat_t A, const padic_ctx_t ctx);
+void padic_mat_set(padic_mat_t B, const padic_mat_t A, const padic_ctx_t p);
 
 void padic_mat_swap(padic_mat_t A, padic_mat_t B);
 

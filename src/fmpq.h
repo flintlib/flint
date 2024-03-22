@@ -107,10 +107,10 @@ int _fmpq_cmp_fmpz(const fmpz_t p, const fmpz_t q, const fmpz_t r);
 int fmpq_cmp_fmpz(const fmpq_t x, const fmpz_t y);
 
 int _fmpq_cmp_ui(const fmpz_t p, const fmpz_t q, ulong c);
-int fmpq_cmp_ui(const fmpq_t x, ulong c);
+int fmpq_cmp_ui(const fmpq_t x, ulong y);
 
 int _fmpq_cmp_si(const fmpz_t p, const fmpz_t q, slong c);
-int fmpq_cmp_si(const fmpq_t x, slong c);
+int fmpq_cmp_si(const fmpq_t x, slong y);
 
 void _fmpq_canonicalise(fmpz_t num, fmpz_t den);
 void fmpq_canonicalise(fmpq_t res);
@@ -156,7 +156,7 @@ FMPQ_INLINE void fmpq_get_mpq(mpq_t dest, const fmpq_t src)
     fmpz_get_mpz(mpq_denref(dest), fmpq_denref(src));
 }
 
-double fmpq_get_d(const fmpq_t a);
+double fmpq_get_d(const fmpq_t f);
 
 #ifdef __MPFR_H
 int fmpq_get_mpfr(mpfr_t r, const fmpq_t x, mpfr_rnd_t rnd);
@@ -231,7 +231,7 @@ void fmpq_mul(fmpq_t res, const fmpq_t op1, const fmpq_t op2);
 void fmpq_mul_fmpz(fmpq_t res, const fmpq_t op, const fmpz_t x);
 
 void _fmpq_pow_si(fmpz_t rnum, fmpz_t rden, const fmpz_t opnum, const fmpz_t opden, slong e);
-void fmpq_pow_si(fmpq_t rop, const fmpq_t op, slong e);
+void fmpq_pow_si(fmpq_t res, const fmpq_t op, slong e);
 
 int fmpq_pow_fmpz(fmpq_t a, const fmpq_t b, const fmpz_t e);
 
@@ -258,10 +258,10 @@ int fmpq_mod_fmpz(fmpz_t res, const fmpq_t x, const fmpz_t mod);
 void _fmpq_gcd(fmpz_t rnum, fmpz_t rden, const fmpz_t p, const fmpz_t q, const fmpz_t r, const fmpz_t s);
 void fmpq_gcd(fmpq_t res, const fmpq_t op1, const fmpq_t op2);
 
-void _fmpq_gcd_cofactors(fmpz_t ng, fmpz_t dg, fmpz_t A, fmpz_t B, const fmpz_t na, const fmpz_t da, const fmpz_t nb, const fmpz_t db);
-void fmpq_gcd_cofactors(fmpq_t g, fmpz_t A, fmpz_t B, const fmpq_t a, const fmpq_t b);
+void _fmpq_gcd_cofactors(fmpz_t gnum, fmpz_t gden, fmpz_t abar, fmpz_t bbar, const fmpz_t anum, const fmpz_t aden, const fmpz_t bnum, const fmpz_t bden);
+void fmpq_gcd_cofactors(fmpq_t g, fmpz_t abar, fmpz_t bbar, const fmpq_t a, const fmpq_t b);
 
-int _fmpq_reconstruct_fmpz(fmpz_t num, fmpz_t den, const fmpz_t a, const fmpz_t m);
+int _fmpq_reconstruct_fmpz(fmpz_t n, fmpz_t d, const fmpz_t a, const fmpz_t m);
 int fmpq_reconstruct_fmpz(fmpq_t res, const fmpz_t a, const fmpz_t m);
 
 int _fmpq_reconstruct_fmpz_2_naive(fmpz_t n, fmpz_t d, const fmpz_t a, const fmpz_t m, const fmpz_t N, const fmpz_t D);
@@ -284,10 +284,10 @@ void fmpq_next_minimal(fmpq_t res, const fmpq_t x);
 void _fmpq_next_signed_minimal(fmpz_t rnum, fmpz_t rden, const fmpz_t num, const fmpz_t den);
 void fmpq_next_signed_minimal(fmpq_t res, const fmpq_t x);
 
-void fmpq_farey_neighbors(fmpq_t left, fmpq_t right, const fmpq_t mid, const fmpz_t Q);
+void fmpq_farey_neighbors(fmpq_t l, fmpq_t r, const fmpq_t x, const fmpz_t Q);
 
-void _fmpq_simplest_between(fmpz_t mid_num, fmpz_t mid_den, const fmpz_t l_num, const fmpz_t l_den, const fmpz_t r_num, const fmpz_t r_den);
-void fmpq_simplest_between(fmpq_t mid, const fmpq_t l, const fmpq_t r);
+void _fmpq_simplest_between(fmpz_t x_num, fmpz_t x_den, const fmpz_t l_num, const fmpz_t l_den, const fmpz_t r_num, const fmpz_t r_den);
+void fmpq_simplest_between(fmpq_t x, const fmpq_t l, const fmpq_t r);
 
 slong fmpq_get_cfrac_naive(fmpz * c, fmpq_t rem, const fmpq_t x, slong n);
 slong fmpq_get_cfrac(fmpz * c, fmpq_t rem, const fmpq_t x, slong n);
@@ -402,7 +402,7 @@ void fmpq_numerator(fmpz_t n, const fmpq_t q);
 void fmpq_denominator(fmpz_t n, const fmpq_t q);
 fmpz * fmpq_numerator_ptr(fmpq_t q);
 fmpz * fmpq_denominator_ptr(fmpq_t q);
-int fmpq_equal_fmpz(fmpq_t q, fmpz_t n);
+int fmpq_equal_fmpz(const fmpq_t x, const fmpz_t y);
 
 #define fmpq_init_set_mpz_frac_readonly _Pragma("GCC error \"'fmpq_init_set_mpz_frac_readonly' is deprecated.\"")
 

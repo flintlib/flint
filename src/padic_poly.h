@@ -67,9 +67,9 @@ void padic_poly_init2(padic_poly_t poly, slong alloc, slong prec);
 
 void padic_poly_clear(padic_poly_t poly);
 
-void padic_poly_realloc(padic_poly_t f, slong alloc, const fmpz_t p);
+void padic_poly_realloc(padic_poly_t poly, slong alloc, const fmpz_t p);
 
-void padic_poly_fit_length(padic_poly_t f, slong len);
+void padic_poly_fit_length(padic_poly_t poly, slong len);
 
 PADIC_POLY_INLINE
 void _padic_poly_set_length(padic_poly_t poly, slong len)
@@ -84,13 +84,13 @@ void _padic_poly_set_length(padic_poly_t poly, slong len)
     poly->length = len;
 }
 
-void _padic_poly_normalise(padic_poly_t f);
+void _padic_poly_normalise(padic_poly_t poly);
 
 void _padic_poly_canonicalise(fmpz *poly, slong *v, slong len, const fmpz_t p);
 
 void padic_poly_canonicalise(padic_poly_t poly, const fmpz_t p);
 
-void padic_poly_reduce(padic_poly_t f, const padic_ctx_t ctx);
+void padic_poly_reduce(padic_poly_t poly, const padic_ctx_t ctx);
 
 PADIC_POLY_INLINE
 void padic_poly_truncate(padic_poly_t poly, slong n, const fmpz_t p)
@@ -202,7 +202,7 @@ void padic_poly_set_coeff_padic(padic_poly_t f, slong n, const padic_t c,
 
 /*  Comparison  **************************************************************/
 
-int padic_poly_equal(const padic_poly_t f, const padic_poly_t g);
+int padic_poly_equal(const padic_poly_t poly1, const padic_poly_t poly2);
 
 PADIC_POLY_INLINE int padic_poly_is_zero(const padic_poly_t poly)
 {

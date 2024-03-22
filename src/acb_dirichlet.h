@@ -24,12 +24,12 @@ extern "C" {
 void acb_dirichlet_powsum_term(acb_ptr res, arb_t log_prev, ulong * prev,
     const acb_t s, ulong k, int integer, int critical_line, slong len, slong prec);
 
-void acb_dirichlet_powsum_sieved(acb_ptr z, const acb_t s, ulong n, slong len, slong prec);
-void acb_dirichlet_powsum_smooth(acb_ptr z, const acb_t s, ulong n, slong len, slong prec);
+void acb_dirichlet_powsum_sieved(acb_ptr res, const acb_t s, ulong n, slong len, slong prec);
+void acb_dirichlet_powsum_smooth(acb_ptr res, const acb_t s, ulong n, slong len, slong prec);
 
 void acb_dirichlet_zeta_bound(mag_t res, const acb_t s);
 void acb_dirichlet_zeta_deriv_bound(mag_t der1, mag_t der2, const acb_t s);
-void acb_dirichlet_zeta_rs_f_coeffs(acb_ptr c, const arb_t p, slong N, slong prec);
+void acb_dirichlet_zeta_rs_f_coeffs(acb_ptr f, const arb_t p, slong n, slong prec);
 void acb_dirichlet_zeta_rs_d_coeffs(arb_ptr d, const arb_t sigma, slong k, slong prec);
 void acb_dirichlet_zeta_rs_bound(mag_t err, const acb_t s, slong K);
 void acb_dirichlet_zeta_rs_r(acb_t res, const acb_t s, slong K, slong prec);
@@ -93,9 +93,9 @@ acb_dirichlet_roots_struct;
 
 typedef acb_dirichlet_roots_struct acb_dirichlet_roots_t[1];
 
-void acb_dirichlet_roots_init(acb_dirichlet_roots_t t, ulong order, slong num, slong prec);
-void acb_dirichlet_roots_clear(acb_dirichlet_roots_t t);
-void acb_dirichlet_root(acb_t z, const acb_dirichlet_roots_t t, ulong n, slong prec);
+void acb_dirichlet_roots_init(acb_dirichlet_roots_t roots, ulong n, slong num, slong prec);
+void acb_dirichlet_roots_clear(acb_dirichlet_roots_t roots);
+void acb_dirichlet_root(acb_t res, const acb_dirichlet_roots_t roots, ulong k, slong prec);
 
 void acb_dirichlet_chi(acb_t res, const dirichlet_group_t G, const dirichlet_char_t chi, ulong n, slong prec);
 void acb_dirichlet_chi_vec(acb_ptr v, const dirichlet_group_t G, const dirichlet_char_t chi, slong nv, slong prec);
@@ -106,7 +106,7 @@ void acb_dirichlet_qseries_arb_powers_naive(acb_t res, const arb_t x, int parity
 void acb_dirichlet_qseries_arb_powers_smallorder(acb_t res, const arb_t x, int parity, const ulong *a, const acb_dirichlet_roots_t z, slong len, slong prec);
 
 ulong acb_dirichlet_theta_length_d(ulong q, double x, slong prec);
-ulong acb_dirichlet_theta_length(ulong q, const arb_t x, slong prec);
+ulong acb_dirichlet_theta_length(ulong q, const arb_t t, slong prec);
 void mag_tail_kexpk2_arb(mag_t res, const arb_t a, ulong n);
 
 void _acb_dirichlet_theta_argument_at_arb(arb_t xt, ulong q, const arb_t t, slong prec);
@@ -161,10 +161,10 @@ void acb_dirichlet_hardy_z(acb_ptr res, const acb_t t,
     const dirichlet_group_t G, const dirichlet_char_t chi,
     slong len, slong prec);
 
-void _acb_dirichlet_hardy_theta_series(acb_ptr res, acb_srcptr s, slong slen, const dirichlet_group_t G, const dirichlet_char_t chi, slong len, slong prec);
-void acb_dirichlet_hardy_theta_series(acb_poly_t res, const acb_poly_t s, const dirichlet_group_t G, const dirichlet_char_t chi, slong len, slong prec);
-void _acb_dirichlet_hardy_z_series(acb_ptr res, acb_srcptr s, slong slen, const dirichlet_group_t G, const dirichlet_char_t chi, slong len, slong prec);
-void acb_dirichlet_hardy_z_series(acb_poly_t res, const acb_poly_t s, const dirichlet_group_t G, const dirichlet_char_t chi, slong len, slong prec);
+void _acb_dirichlet_hardy_theta_series(acb_ptr res, acb_srcptr t, slong tlen, const dirichlet_group_t G, const dirichlet_char_t chi, slong len, slong prec);
+void acb_dirichlet_hardy_theta_series(acb_poly_t res, const acb_poly_t t, const dirichlet_group_t G, const dirichlet_char_t chi, slong len, slong prec);
+void _acb_dirichlet_hardy_z_series(acb_ptr res, acb_srcptr t, slong tlen, const dirichlet_group_t G, const dirichlet_char_t chi, slong len, slong prec);
+void acb_dirichlet_hardy_z_series(acb_poly_t res, const acb_poly_t t, const dirichlet_group_t G, const dirichlet_char_t chi, slong len, slong prec);
 
 void acb_dirichlet_gram_point(arb_t res, const fmpz_t n, const dirichlet_group_t G, const dirichlet_char_t chi, slong prec);
 ulong acb_dirichlet_turing_method_bound(const fmpz_t p);
