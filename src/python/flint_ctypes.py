@@ -6048,10 +6048,12 @@ class fmpq_poly(gr_elem):
 
 class PolynomialRing_fmpz_poly(gr_ctx):
 
-    def __init__(self):
+    def __init__(self, var=None):
         gr_ctx.__init__(self)
         libgr.gr_ctx_init_fmpz_poly(self._ref)
         self._elem_type = fmpz_poly
+        if var is not None:
+            self._set_gen_name(var)
 
     @property
     def _coefficient_ring(self):
@@ -6060,10 +6062,12 @@ class PolynomialRing_fmpz_poly(gr_ctx):
 
 class PolynomialRing_fmpq_poly(gr_ctx):
 
-    def __init__(self):
+    def __init__(self, var=None):
         gr_ctx.__init__(self)
         libgr.gr_ctx_init_fmpq_poly(self._ref)
         self._elem_type = fmpq_poly
+        if var is not None:
+            self._set_gen_name(var)
 
 ZZx_fmpz_poly = PolynomialRing_fmpz_poly()
 QQx_fmpq_poly = PolynomialRing_fmpq_poly()
@@ -7997,7 +8001,21 @@ def test_gr_series():
 
     assert raises(lambda: x / 0, FlintDomainError)
 
-
+def test_gen_name():
+    for R in [NumberField(ZZx.gen() ** 2 + 1, "b"),
+              PolynomialRing_fmpz_poly("b"),
+              PolynomialRing_fmpq_poly("b"),
+              PolynomialRing_gr_poly(QQbar, "b"),
+              PowerSeriesRing_gr_series(ZZ, var="b"),
+              PowerSeriesModRing_gr_poly(ZZ, 3, "b"),
+              FiniteField_fq(3, 2, "b"),
+              FiniteField_fq_nmod(3, 2, "b"),
+              FiniteField_fq_zech(3, 2, "b")]:
+        assert str(R.gen()) in ["b", "b^1", "b (mod b^3)"]
+        R._set_gen_name("c")
+        assert str(R.gen()) in ["c", "c^1", "c (mod c^3)"]
+        R._set_gen_names(["d"])
+        assert str(R.gen()) in ["d", "d^1", "d (mod d^3)"]
 
 if __name__ == "__main__":
     from time import time
