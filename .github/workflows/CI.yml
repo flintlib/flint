@@ -106,6 +106,47 @@ jobs:
 
 
   ##############################################################################
+  # gcc build check no regressions
+  ##############################################################################
+  gcc-build-regression-check:
+    name: GCC build regression check (no tests)
+
+    runs-on: ubuntu-latest
+
+    env:
+      CC: "gcc"
+      CFLAGS: "-march=native -std=c11 -Wall -Wextra -Werror"
+      MODULES: "build/thread_pool_merged.lo build/thread_support_merged.lo build/ulong_extras_merged.lo build/long_extras_merged.lo build/perm_merged.lo build/double_extras_merged.lo build/d_vec_merged.lo build/d_mat_merged.lo build/mpn_extras_merged.lo build/mpfr_vec_merged.lo build/mpfr_mat_merged.lo build/nmod_merged.lo build/nmod_vec_merged.lo build/nmod_mat_merged.lo build/nmod_poly_merged.lo build/fmpz_merged.lo build/fmpz_vec_merged.lo build/fmpz_mat_merged.lo build/fmpz_poly_merged.lo build/fmpz_mod_merged.lo build/fmpz_mod_vec_merged.lo build/fmpz_mod_mat_merged.lo build/fmpz_mod_poly_merged.lo build/fmpq_merged.lo build/fmpq_vec_merged.lo build/fmpq_mat_merged.lo build/fmpq_poly_merged.lo"
+      # Everything until finite fields
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Setup"
+        run: |
+          sudo apt-get install -y libgmp-dev libmpfr-dev autoconf libtool-bin
+          gcc --version
+          make --version
+          autoconf --version
+          libtool --version
+          echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
+
+      - name: "Configure"
+        run: |
+          ./bootstrap.sh
+          ./configure \
+            CC=${CC} \
+            CFLAGS="${CFLAGS}" \
+            --disable-static \
+            --disable-debug
+
+      - name: "Check regression in a subset of modules"
+        run: |
+          $MAKE $MODULES
+
+
+
+  ##############################################################################
   # ubuntu gcc with assert
   ##############################################################################
   ubuntu-gcc-assert:
