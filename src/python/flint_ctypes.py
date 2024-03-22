@@ -4028,6 +4028,9 @@ class gr_elem:
             32
             >>> RF(0.5).exp10()
             3.162277660168380
+            >>> x = PowerSeriesModRing(QQ, 5).gen(); x.exp()
+            1 + x + (1/2)*x^2 + (1/6)*x^3 + (1/24)*x^4 (mod x^5)
+
         """
         return self._unary_op(self, libgr.gr_exp10, "exp10($x)")
 
@@ -4047,6 +4050,8 @@ class gr_elem:
             x + (-1/2)*x^2 + (1/3)*x^3 + (-1/4)*x^4 + (1/5)*x^5 + O(x^6)
             >>> QQser(1).log()
             0
+            >>> x = PowerSeriesModRing(QQ, 5).gen(); (1+x).log()
+            x + (-1/2)*x^2 + (1/3)*x^3 + (-1/4)*x^4 (mod x^5)
 
         """
         return self._unary_op(self, libgr.gr_log, "log($x)")
@@ -4071,6 +4076,10 @@ class gr_elem:
         return self._unary_op(self, libgr.gr_cos, "cos($x)")
 
     def tan(self):
+        """
+            >>> x = PowerSeriesModRing(QQ, 5).gen(); x.tan()
+            x + (1/3)*x^3 (mod x^5)
+        """
         return self._unary_op(self, libgr.gr_tan, "tan($x)")
 
     def sinh(self):
@@ -4082,8 +4091,52 @@ class gr_elem:
     def tanh(self):
         return self._unary_op(self, libgr.gr_tanh, "tanh($x)")
 
+    def asin(self):
+        """
+            >>> x = PowerSeriesModRing(QQ, 5).gen(); x.asin()
+            x + (1/6)*x^3 (mod x^5)
+        """
+        return self._unary_op(self, libgr.gr_asin, "asin($x)")
+
+    def acos(self):
+        """
+            >>> x = PowerSeriesModRing(QQ, 5).gen(); x.acos()
+            Traceback (most recent call last):
+              ...
+            FlintUnableError: failed to compute acos(x) in {Power series over Rational field (fmpq) mod x^5} for {x = x (mod x^5)}
+            >>> x = PowerSeriesModRing(RR_ca, 5).gen(); x.acos()
+            (1.57080 {(a)/2 where a = 3.14159 [Pi]}) - x + (-0.166667 {-1/6})*x^3 (mod x^5)
+        """
+        return self._unary_op(self, libgr.gr_acos, "acos($x)")
+
     def atan(self):
+        """
+            >>> x = PowerSeriesModRing(QQ, 5).gen(); x.atan()
+            x + (-1/3)*x^3 (mod x^5)
+        """
         return self._unary_op(self, libgr.gr_atan, "atan($x)")
+
+    def asinh(self):
+        """
+            >>> x = PowerSeriesModRing(QQ, 5).gen(); x.asinh()
+            x + (-1/6)*x^3 (mod x^5)
+        """
+        return self._unary_op(self, libgr.gr_asinh, "asinh($x)")
+
+    def acosh(self):
+        """
+            >>> x = PowerSeriesModRing(CC, 3).gen(); x.acosh()
+            [1.570796326794897 +/- 5.54e-16]*I + (-1.000000000000000*I)*x (mod x^3)
+        """
+        return self._unary_op(self, libgr.gr_acosh, "acosh($x)")
+
+    def atanh(self):
+        """
+            >>> x = PowerSeriesModRing(QQ, 5).gen(); x.atanh()
+            x + (1/3)*x^3 (mod x^5)
+        """
+        return self._unary_op(self, libgr.gr_atanh, "atanh($x)")
+
 
     def exp_pi_i(self):
         r"""
@@ -7885,11 +7938,16 @@ def test_gr_series():
     assert raises(lambda: x**3 / O2, FlintUnableError)
     assert raises(lambda: x**3 / O3, FlintUnableError)
 
-    R2 = PowerSeriesModRing(QQ, 3)
-    assert R2(3 + O4) == R2(3)
-    assert R2(3 + O3) == R2(3)
-    assert raises(lambda: R2(3 + O2), FlintUnableError)
+    R3 = PowerSeriesModRing(QQ, 3)
+    assert R3(3 + O4) == R3(3)
+    assert R3(3 + O3) == R3(3)
+    assert raises(lambda: R3(3 + O2), FlintUnableError)
 
+    R2 = PowerSeriesModRing(QQ, 2)
+    R2b = PowerSeriesModRing(QQ, 2)
+    assert R2(R3(5)) == 5
+    assert R2(2) + R2b(3) == 5
+    assert raises(lambda: R3(R2(5)), FlintDomainError)
 
     R = RRser
     x = R.gen()
