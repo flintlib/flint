@@ -9,6 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdlib.h>
+#include <string.h>
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
@@ -24,6 +26,8 @@
 
 #define FQ_CTX(ring_ctx) ((fq_ctx_struct *)(GR_CTX_DATA_AS_PTR(ring_ctx)))
 
+static const char * default_var = "a";
+
 void
 _gr_fq_ctx_clear(gr_ctx_t ctx)
 {
@@ -36,6 +40,21 @@ _gr_fq_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
     gr_stream_write(out, "Finite field (fq)");
     return GR_SUCCESS;
+}
+
+int _gr_fq_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
+{
+    slong len;
+    len = strlen(s);
+
+    FQ_CTX(ctx)->var = flint_realloc(FQ_CTX(ctx)->var, len + 1);
+    memcpy(FQ_CTX(ctx)->var, s, len + 1);
+    return GR_SUCCESS;
+}
+
+int _gr_fq_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
+{
+    return _gr_fq_ctx_set_gen_name(ctx, s[0]);
 }
 
 void
@@ -658,6 +677,8 @@ gr_method_tab_input _fq_methods_input[] =
 {
     {GR_METHOD_CTX_CLEAR,       (gr_funcptr) _gr_fq_ctx_clear},
     {GR_METHOD_CTX_WRITE,       (gr_funcptr) _gr_fq_ctx_write},
+    {GR_METHOD_CTX_SET_GEN_NAME,    (gr_funcptr) _gr_fq_ctx_set_gen_name},
+    {GR_METHOD_CTX_SET_GEN_NAMES,   (gr_funcptr) _gr_fq_ctx_set_gen_names},
     {GR_METHOD_CTX_IS_RING,     (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) gr_generic_ctx_predicate_true},
@@ -760,7 +781,7 @@ gr_ctx_init_fq(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var)
 {
     fq_ctx_struct * fq_ctx;
     fq_ctx = flint_malloc(sizeof(fq_ctx_struct));
-    fq_ctx_init(fq_ctx, p, d, var == NULL ? "a" : var);
+    fq_ctx_init(fq_ctx, p, d, var == NULL ? default_var : var);
     _gr_ctx_init_fq_from_ref(ctx, fq_ctx);
 }
 
@@ -768,7 +789,7 @@ int gr_ctx_init_fq_modulus_fmpz_mod_poly(gr_ctx_t ctx, const fmpz_mod_poly_t mod
 {
     fq_ctx_struct * fq_ctx;
     fq_ctx = flint_malloc(sizeof(fq_ctx_struct));
-    fq_ctx_init_modulus(fq_ctx, modulus, mod_ctx, var == NULL ? "a" : var);
+    fq_ctx_init_modulus(fq_ctx, modulus, mod_ctx, var == NULL ? default_var : var);
     _gr_ctx_init_fq_from_ref(ctx, fq_ctx);
     return GR_SUCCESS;
 }
