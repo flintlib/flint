@@ -132,7 +132,7 @@ else
     cxxflags_set="no"
 fi
 
-LT_INIT
+LT_INIT([disable-static])
 
 if test "$cflags_set" = "no";
 then

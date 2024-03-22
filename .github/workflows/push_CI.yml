@@ -54,7 +54,6 @@ jobs:
               --with-gmp-lib=$(pkgconf --variable=libdir gmp) \
               --with-mpfr-include=$(pkgconf --variable=includedir mpfr) \
               --with-mpfr-lib=$(pkgconf --variable=libdir mpfr) \
-              --disable-static \
               --disable-debug
             touch _is_configured
 
@@ -148,7 +147,6 @@ jobs:
           ./bootstrap.sh
           ./configure \
             CC=${CC} \
-            --disable-static \
             --disable-debug
 
       - name: "Compile library"
