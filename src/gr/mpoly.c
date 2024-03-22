@@ -87,6 +87,13 @@ _gr_gr_mpoly_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
     return GR_SUCCESS;
 }
 
+/* todo: everything is a ring when there are 0 vars? */
+truth_t
+_gr_gr_mpoly_ctx_is_ring(gr_ctx_t ctx)
+{
+    return gr_ctx_is_ring(MPOLYNOMIAL_ELEM_CTX(ctx));
+}
+
 truth_t
 _gr_gr_mpoly_ctx_is_commutative_ring(gr_ctx_t ctx)
 {
@@ -308,7 +315,7 @@ gr_method_tab_input _gr__gr_gr_mpoly_methods_input[] =
 {
     {GR_METHOD_CTX_WRITE,   (gr_funcptr) _gr_gr_mpoly_ctx_write},
     {GR_METHOD_CTX_CLEAR,   (gr_funcptr) _gr_gr_mpoly_ctx_clear},
-    {GR_METHOD_CTX_IS_RING,     (gr_funcptr) gr_generic_ctx_predicate_true},  /* todo: matrices over semirings? */
+    {GR_METHOD_CTX_IS_RING,     (gr_funcptr) _gr_gr_mpoly_ctx_is_ring},
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) _gr_gr_mpoly_ctx_is_commutative_ring},
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) _gr_gr_mpoly_ctx_is_integral_domain},
     {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) _gr_gr_mpoly_ctx_is_field},
