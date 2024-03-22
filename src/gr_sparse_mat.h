@@ -292,7 +292,7 @@ gr_coo_mat_swap(gr_coo_mat_t mat1, gr_coo_mat_t mat2, gr_ctx_t ctx)
 }
 
 void gr_csr_mat_fit_nnz(gr_csr_mat_t mat, slong nnz, gr_ctx_t ctx);
-void gr_lil_mat_fit_nnz(gr_coo_mat_t mat, slong *nnz, gr_ctx_t ctx);
+void gr_lil_mat_fit_nnz(gr_lil_mat_t mat, slong *nnz, gr_ctx_t ctx);
 void gr_coo_mat_fit_nnz(gr_coo_mat_t mat, slong nnz, gr_ctx_t ctx);
 
 
@@ -560,14 +560,14 @@ gr_lil_mat_window_clear(gr_lil_mat_t window, gr_ctx_t ctx)
 }
 
 WARN_UNUSED_RESULT int gr_lil_mat_swap_rows(gr_lil_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_coo_mat_swap_rows(gr_coo_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx);
+//WARN_UNUSED_RESULT int gr_coo_mat_swap_rows(gr_coo_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx);
 
-WARN_UNUSED_RESULT int gr_lil_mat_permute_rows(gr_lil_mat_t mat, const slong * perm, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_coo_mat_permute_rows(gr_coo_mat_t mat, const slong * perm, gr_ctx_t ctx);
+//WARN_UNUSED_RESULT int gr_lil_mat_permute_rows(gr_lil_mat_t mat, const slong * perm, gr_ctx_t ctx);
+//WARN_UNUSED_RESULT int gr_coo_mat_permute_rows(gr_coo_mat_t mat, const slong * perm, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_csr_mat_invert_rows(gr_csr_mat_t mat, slong * perm, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_lil_mat_invert_rows(gr_lil_mat_t mat, slong * perm, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_coo_mat_invert_rows(gr_coo_mat_t mat, slong * perm, gr_ctx_t ctx);
+//WARN_UNUSED_RESULT int gr_coo_mat_invert_rows(gr_coo_mat_t mat, slong * perm, gr_ctx_t ctx);
 
 /*
 WARN_UNUSED_RESULT int gr_lil_mat_concat_horizontal(gr_lil_mat_t res, const gr_lil_mat_t mat1, const gr_lil_mat_t mat2, gr_ctx_t ctx);
@@ -661,7 +661,7 @@ WARN_UNUSED_RESULT int gr_coo_mat_neg(gr_coo_mat_t dst, const gr_coo_mat_t src, 
 
 WARN_UNUSED_RESULT int gr_lil_mat_add(gr_lil_mat_t dst, const gr_lil_mat_t mat1, const gr_lil_mat_t mat2, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_lil_mat_sub(gr_lil_mat_t dst, const gr_lil_mat_t mat1, const gr_lil_mat_t mat2, gr_ctx_t ctx);
-//WARN_UNUSED_RESULT int gr_lil_mat_mul(gr_lil_mat_t dst, const gr_lil_mat_t mat1, const gr_lil_mat_t mat2, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_lil_mat_mul(gr_lil_mat_t dst, const gr_lil_mat_t mat1, const gr_lil_mat_t mat2, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_lil_mat_addmul_scalar(gr_lil_mat_t dst, const gr_lil_mat_t src, gr_srcptr c, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_lil_mat_submul_scalar(gr_lil_mat_t dst, const gr_lil_mat_t src, gr_srcptr c, gr_ctx_t ctx);
@@ -720,6 +720,22 @@ WARN_UNUSED_RESULT int gr_coo_mat_divexact_scalar_si(gr_coo_mat_t dst, const gr_
 WARN_UNUSED_RESULT int gr_coo_mat_divexact_scalar_ui(gr_coo_mat_t dst, const gr_coo_mat_t src, ulong c, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_coo_mat_divexact_scalar_fmpz(gr_coo_mat_t dst, const gr_coo_mat_t src, const fmpz_t c, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_coo_mat_divexact_scalar_fmpq(gr_coo_mat_t dst, const gr_coo_mat_t src, const fmpq_t c, gr_ctx_t ctx);
+
+/**
+ * Arithmetic into dense matrices
+*/
+
+WARN_UNUSED_RESULT int gr_mat_update_lil_mat_nz(gr_mat_t dst, const gr_lil_mat_t src, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_add_lil_mat(gr_mat_t dst, const gr_mat_t src1, const gr_lil_mat_t src2, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_sub_lil_mat(gr_mat_t dst, const gr_mat_t src1, const gr_lil_mat_t src2, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_mul_lil_mat_nz(gr_mat_t dst, const gr_mat_t src1, const gr_lil_mat_t src2, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_div_lil_mat_nz(gr_mat_t dst, const gr_mat_t src1, const gr_lil_mat_t src2, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_addmul_lil_mat_scalar(gr_mat_t dst, const gr_lil_mat_t src, gr_srcptr c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_submul_lil_mat_scalar(gr_mat_t dst, const gr_lil_mat_t src, gr_srcptr c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_addmul_lil_mat_scalar_si(gr_mat_t dst, const gr_lil_mat_t src, slong c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_submul_lil_mat_scalar_si(gr_mat_t dst, const gr_lil_mat_t src, slong c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_addmul_lil_mat_scalar_fmpz(gr_mat_t dst, const gr_lil_mat_t src, const fmpz_t c, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_submul_lil_mat_scalar_fmpz(gr_mat_t dst, const gr_lil_mat_t src, const fmpz_t c, gr_ctx_t ctx);
 
 /**
  * Sum and product

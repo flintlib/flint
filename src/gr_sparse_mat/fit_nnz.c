@@ -27,6 +27,15 @@ gr_csr_mat_fit_nnz(gr_csr_mat_t mat, slong nnz, gr_ctx_t ctx)
 }
 
 void
+gr_lil_mat_fit_nnz(gr_lil_mat_t mat, slong *nnz, gr_ctx_t ctx)
+{
+    int row;
+
+    for (row = 0; row < mat->r; ++row)
+        gr_sparse_vec_fit_nnz(&mat->rows[row], nnz[row], ctx);
+}
+
+void
 gr_coo_mat_fit_nnz(gr_coo_mat_t mat, slong nnz, gr_ctx_t ctx)
 {
     slong alloc = mat->alloc;
