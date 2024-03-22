@@ -20,7 +20,7 @@
 slong _fmpz_mod_poly_xgcd(fmpz *G, fmpz *S, fmpz *T,
                                    const fmpz *A, slong lenA,
                                    const fmpz *B, slong lenB,
-                                   const fmpz_t invB, const fmpz_mod_ctx_t ctx)
+                                   const fmpz_t FLINT_UNUSED(invB), const fmpz_mod_ctx_t ctx)
 {
     if (lenB == 1)
     {

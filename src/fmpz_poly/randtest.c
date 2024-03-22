@@ -64,16 +64,16 @@ fmpz_poly_randtest_irreducible2(fmpz_poly_t pol, flint_rand_t state, slong len, 
         slong i;
         fmpz_poly_factor_t fac;
 
-        do {
+        do
             fmpz_poly_randtest(pol, state, len, bits);
-        } while (fmpz_poly_degree(pol) < 1);
+        while (fmpz_poly_degree(pol) < 1);
 
         fmpz_poly_factor_init(fac);
         fmpz_poly_factor(fac, pol);
 
         i = n_randint(state, fac->num);
 
-        if (FLINT_ABS(fmpz_poly_max_bits(fac->p + i)) <= bits)
+        if ((ulong) FLINT_ABS(fmpz_poly_max_bits(fac->p + i)) <= bits)
         {
             fmpz_poly_set(pol, fac->p + i);
             fmpz_poly_factor_clear(fac);

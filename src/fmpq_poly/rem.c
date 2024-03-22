@@ -16,7 +16,7 @@
 
 void _fmpq_poly_rem(fmpz * R, fmpz_t r,
                     const fmpz * A, const fmpz_t a, slong lenA,
-          const fmpz * B, const fmpz_t b, slong lenB, const fmpz_preinvn_t inv)
+          const fmpz * B, const fmpz_t FLINT_UNUSED(b), slong lenB, const fmpz_preinvn_t inv)
 {
     slong lenR;
     ulong d;

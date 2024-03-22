@@ -16,8 +16,7 @@ void _fmpz_poly_fibonacci(fmpz * coeffs, ulong n)
 {
     fmpz * r;
     int even;
-    slong k;
-    ulong L;
+    ulong k, L;
 
     if (n == 0) return;
 

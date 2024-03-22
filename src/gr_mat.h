@@ -70,7 +70,7 @@ WARN_UNUSED_RESULT int gr_mat_init_set(gr_mat_t res, const gr_mat_t mat, gr_ctx_
 void gr_mat_clear(gr_mat_t mat, gr_ctx_t ctx);
 
 GR_MAT_INLINE void
-gr_mat_swap(gr_mat_t mat1, gr_mat_t mat2, gr_ctx_t ctx)
+gr_mat_swap(gr_mat_t mat1, gr_mat_t mat2, gr_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_SWAP(gr_mat_struct, *mat1, *mat2);
 }
@@ -83,7 +83,7 @@ WARN_UNUSED_RESULT int gr_mat_invert_cols(gr_mat_t mat, slong * perm, gr_ctx_t c
 void gr_mat_window_init(gr_mat_t window, const gr_mat_t mat, slong r1, slong c1, slong r2, slong c2, gr_ctx_t ctx);
 
 GR_MAT_INLINE void
-gr_mat_window_clear(gr_mat_t window, gr_ctx_t ctx)
+gr_mat_window_clear(gr_mat_t window, gr_ctx_t FLINT_UNUSED(ctx))
 {
     flint_free(window->rows);
 }
@@ -100,13 +100,13 @@ WARN_UNUSED_RESULT int gr_mat_randpermdiag(int * parity, gr_mat_t mat, flint_ran
 WARN_UNUSED_RESULT int gr_mat_randrank(gr_mat_t mat, flint_rand_t state, slong rank, gr_ctx_t ctx);
 
 GR_MAT_INLINE truth_t
-gr_mat_is_empty(const gr_mat_t mat, gr_ctx_t ctx)
+gr_mat_is_empty(const gr_mat_t mat, gr_ctx_t FLINT_UNUSED(ctx))
 {
     return ((mat->r == 0) || (mat->c == 0)) ? T_TRUE : T_FALSE;
 }
 
 GR_MAT_INLINE truth_t
-gr_mat_is_square(const gr_mat_t mat, gr_ctx_t ctx)
+gr_mat_is_square(const gr_mat_t mat, gr_ctx_t FLINT_UNUSED(ctx))
 {
     return (mat->r == mat->c) ? T_TRUE : T_FALSE;
 }

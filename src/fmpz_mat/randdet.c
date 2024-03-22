@@ -47,7 +47,7 @@ fmpz_mat_randdet(fmpz_mat_t mat, flint_rand_t state, const fmpz_t det)
     /* Form diagonal entries that multiply to the determinant */
     for (i = 0; i < factor->num; i++)
     {
-        for (j = 0; j < factor->exp[i]; j++)
+        for (j = 0; j < (slong) factor->exp[i]; j++)
         {
             k = n_randint(state, n);
             fmpz_mul(&diag[k], &diag[k], &factor->p[i]);

@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "ulong_extras.h"
 
 slong n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, slong exp)
@@ -155,14 +154,14 @@ slong n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, slong exp)
         {
            s = flint_realloc(s, a*sizeof(mp_limb_t));
 
-           for (i = 1; i < a; i++)
+           for (i = 1; (ulong) i < a; i++)
               s[i] = s[i - 1] + r;
 
         } else if (num == 2) /* two roots */
         {
            s = flint_realloc(s, 2*a*sizeof(mp_limb_t));
 
-           for (i = 1; i < a; i++)
+           for (i = 1; (ulong) i < a; i++)
            {
               s[2*i] = s[2*i - 2] + r;
               s[2*i + 1] = s[2*i - 1] + r;
@@ -171,7 +170,7 @@ slong n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, slong exp)
         {
            s = flint_realloc(s, 4*a*sizeof(mp_limb_t));
 
-           for (i = 1; i < a; i++)
+           for (i = 1; (ulong) i < a; i++)
            {
               s[4*i] = s[4*i - 4] + r;
               s[4*i + 1] = s[4*i - 3] + r;
@@ -188,9 +187,9 @@ slong n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, slong exp)
 
 slong n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, slong exp)
 {
-    mp_limb_t r, ex, pow, k, a1, pinv, powinv;
+    mp_limb_t r, pow, a1, pinv, powinv;
     mp_limb_t * s;
-    slong i, num;
+    slong i, ex, k, num;
 
     if (exp < 0)
     {
@@ -310,7 +309,7 @@ slong n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, slong exp)
 
         s = flint_realloc(s, 2*a*sizeof(mp_limb_t));
 
-        for (i = 1; i < a; i++)
+        for (i = 1; (ulong) i < a; i++)
         {
             s[2*i] = s[2*i - 2] + r;
             s[2*i + 1] = s[2*i - 1] + r;

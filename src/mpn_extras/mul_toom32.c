@@ -102,7 +102,7 @@ flint_mpn_mul_toom32(mp_ptr pp,
     /* Required, to ensure that s + t >= n. */
     FLINT_ASSERT(bn + 2 <= an && an + 6 <= 3*bn);
 
-    n = 2 * an >= 3 * bn ? (an + 2) / (size_t) 3 : (bn + 1) >> 1;
+    n = 2 * an >= 3 * bn ? (an + 2) / (size_t) 3 : ((ulong) bn + 1) >> 1;
 
     s = an - 2 * n;
     t = bn - n;
@@ -336,5 +336,7 @@ flint_mpn_mul_toom32(mp_ptr pp,
       MPN_INCR_U(pp + 4*n, s+t-n, hi);
   }
   else
+  {
       FLINT_ASSERT(hi == 0);
+  }
 }

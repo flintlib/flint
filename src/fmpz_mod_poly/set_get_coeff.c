@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpn_extras.h"
 #include "fmpz.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
@@ -90,7 +91,7 @@ void fmpz_mod_poly_set_coeff_fmpz(fmpz_mod_poly_t poly, slong n, const fmpz_t x,
 /* Getters ********************************************************************/
 
 void fmpz_mod_poly_get_coeff_fmpz(fmpz_t x, const fmpz_mod_poly_t poly,
-                                             slong n, const fmpz_mod_ctx_t ctx)
+                                             slong n, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
 {
     if (n < poly->length)
         fmpz_set(x, poly->coeffs + n);

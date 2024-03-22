@@ -41,7 +41,8 @@ n_factor_ecm(mp_limb_t *f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
              flint_rand_t state, mp_limb_t n)
 {
     mp_limb_t P, num, maxD, mmin, mmax, mdiff, prod, maxj, sig;
-    int i, j, ret;
+    ulong i, j;
+    int ret;
     n_ecm_t n_ecm_inf;
 
     const mp_limb_t *prime_array;
@@ -422,7 +423,7 @@ n_factor_ecm_stage_I(mp_limb_t *f, const mp_limb_t *prime_array, mp_limb_t num,
                      mp_limb_t B1, mp_limb_t n, n_ecm_t n_ecm_inf)
 {
     mp_limb_t times;
-    int i, j, p;
+    ulong i, j, p;
 
     for (i = 0; i < num; i++)
     {
@@ -455,7 +456,8 @@ n_factor_ecm_stage_II(mp_limb_t *f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
 
     mp_limb_t g, Qx, Qz, Rx, Rz, Qdx, Qdz, a, b;
     mp_limb_t mmin, mmax, maxj, Q0x2, Q0z2;
-    int i, j, ret;
+    ulong i, j;
+    int ret;
     mp_ptr arrx, arrz;
 
     mmin = (B1 + (P/2)) / P;

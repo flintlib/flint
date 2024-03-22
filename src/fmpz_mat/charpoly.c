@@ -166,7 +166,7 @@ void _fmpz_mat_charpoly_modular(fmpz * rop, const fmpz_mat_t op)
 
         fmpz_init_set_ui(m, 1);
 
-        for ( ; fmpz_bits(m) < bound; )
+        for ( ; (slong) fmpz_bits(m) < bound; )
         {
             nmod_mat_t mat;
             nmod_poly_t poly;

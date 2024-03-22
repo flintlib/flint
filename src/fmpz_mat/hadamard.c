@@ -169,13 +169,12 @@ fmpz_mat_set2x2(fmpz_mat_t A, slong i, slong j,
 int
 fmpz_mat_hadamard(fmpz_mat_t A)
 {
-    slong n, m, i, j;
-    mp_limb_t q;
+    mp_limb_t m, n, q;
     int kind;
 
     n = fmpz_mat_nrows(A);
 
-    if (n != fmpz_mat_ncols(A))
+    if ((slong) n != fmpz_mat_ncols(A))
         return 0;
 
     if (n == 0)
@@ -200,6 +199,8 @@ fmpz_mat_hadamard(fmpz_mat_t A)
 
         if (kind == 1)
         {
+            ulong i, j;
+
             fmpz_zero(fmpz_mat_entry(A, 0, 0));
 
             for (i = 0; i < q; i++)
@@ -221,6 +222,8 @@ fmpz_mat_hadamard(fmpz_mat_t A)
         }
         else
         {
+            ulong i, j;
+
             for (i = 0; i < q + 1; i++)
             {
                 for (j = 0; j < q + 1; j++)
@@ -243,6 +246,7 @@ fmpz_mat_hadamard(fmpz_mat_t A)
 
     for ( ; m < n; m *= 2)
     {
+        ulong i;
         for (i = 0; i < m; i++)
         {
             _fmpz_vec_set(A->rows[i] + m, A->rows[i], m);

@@ -59,7 +59,7 @@ static mp_limb_t bsearch_uint(mp_limb_t n, const unsigned int *t, int tlen)
   return t[lo];
 }
 
-mp_limb_t n_nextprime(mp_limb_t n, int proved)
+mp_limb_t n_nextprime(mp_limb_t n, int FLINT_UNUSED(proved))
 {
     ulong i, index;
 

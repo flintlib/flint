@@ -49,8 +49,8 @@ static mp_limb_t fft_combine_bits_signed(
     for (i = 0; i < alen; i++)
     {
         /* add the i^th coeffs a[i] */
-        mp_limb_t q = (bits*i)/FLINT_BITS;
-        mp_limb_t r = (bits*i)%FLINT_BITS;
+        slong q = (bits*i)/FLINT_BITS;
+        slong r = (bits*i)%FLINT_BITS;
         mp_limb_t s;
         mp_limb_t halflimb = UWORD(1) << (FLINT_BITS - 1);
 
@@ -77,7 +77,7 @@ static mp_limb_t fft_combine_bits_signed(
 
         if (q < zn)
         {
-            size_t new_zout = FLINT_MIN(zn, q + limbs + 1);
+            slong new_zout = FLINT_MIN(zn, q + limbs + 1);
             FLINT_ASSERT(new_zout >= zout);
 
             while (zout < new_zout)
@@ -193,7 +193,7 @@ static void _either_fft_or_mfa(
     slong limbs,
     int use_mfa)
 {
-    ulong trunc2, rs, s, u;
+    ulong trunc2, rs, s;
     slong l;
 
     if (use_mfa)
@@ -207,6 +207,8 @@ static void _either_fft_or_mfa(
         trunc2 = (trunc - 2*n)/n1;
         for (s = 0; s < trunc2; s++)
         {
+            slong u;
+
             rs = n_revbin(s, depth - depth/2 + 1);
             for (u = 0; u < n1; u++)
             {
@@ -357,7 +359,7 @@ void _fmpz_mat_mul_truncate_sqrt2(
     FLINT_ASSERT(j1 + j2 - 1 <= 4*n);
 
     trunc = j1 + j2 - 1;
-    trunc = FLINT_MAX(trunc, 2*n + 1);
+    trunc = FLINT_MAX(trunc, (ulong) 2*n + 1);
     if (use_mfa)
     {
         sqrt = UWORD(1) << (depth/2);
@@ -390,11 +392,13 @@ void _fmpz_mat_mul_truncate_sqrt2(
     for (i = 0; i < M; i++)
     for (j = 0; j < N; j++)
     {
+        ulong ux;
+
         if (use_mfa)
         {
             ulong trunc2, rs, s, u;
 
-            for (l = 0; l < 2*n; l++)
+            for (l = 0; l < 2 * n; l++)
             {
                 _dot(Ccoeffs[l], Acoeffs + (i*K + 0)*4*n + l, 4*n,
                                  Bcoeffs + (0*N + j)*4*n + l, N*4*n,
@@ -420,21 +424,21 @@ void _fmpz_mat_mul_truncate_sqrt2(
         }
         else
         {
-            for (l = 0; l < trunc; l++)
+            for (ux = 0; ux < trunc; ux++)
             {
-                _dot(Ccoeffs[l], Acoeffs + (i*K + 0)*4*n + l, 4*n,
-                                 Bcoeffs + (0*N + j)*4*n + l, N*4*n,
-                     K, limbs, t, temp);
+                _dot(Ccoeffs[ux], Acoeffs + (i*K + 0)*4*n + ux, 4*n,
+                        Bcoeffs + (0*N + j)*4*n + ux, N*4*n,
+                        K, limbs, t, temp);
             }
 
             ifft_truncate_sqrt2(Ccoeffs, n, w, &t1, &t2, &t3, trunc);
         }
 
         /* pointwise scalar division by 4*n */
-        for (l = 0; l < trunc; l++)
+        for (ux = 0; ux < trunc; ux++)
         {
-            mpn_div_2expmod_2expp1(Ccoeffs[l], Ccoeffs[l], limbs, depth + 2);
-            mpn_normmod_2expp1(Ccoeffs[l], limbs);
+            mpn_div_2expmod_2expp1(Ccoeffs[ux], Ccoeffs[ux], limbs, depth + 2);
+            mpn_normmod_2expp1(Ccoeffs[ux], limbs);
         }
 
         fft_combine_bits_fmpz(fmpz_mat_entry(C, i, j), Ccoeffs,

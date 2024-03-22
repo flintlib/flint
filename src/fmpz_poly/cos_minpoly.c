@@ -21,7 +21,7 @@
 #define MINPOLY_TAB_NUM 65
 #define MINPOLY_TAB_MAX_LEN 24
 
-static const char
+static const unsigned char
 minpoly_len_tab[MINPOLY_TAB_NUM] = {
     1, 2, 2, 2, 2, 3, 2, 4, 3, 4, 3, 6, 3, 7, 4, 5, 5, 9, 4, 10, 5, 7, 6,
     12, 5, 11, 7, 10, 7, 15, 5, 16, 9, 11, 9, 13, 7, 19, 10, 13, 9, 21, 7,

@@ -121,7 +121,7 @@ _fmpz_poly_taylor_shift_horner(fmpz * poly, const fmpz_t c, slong n)
 
         TMP_END;
     }
-    else if (n >= 3 + FLINT_BIT_COUNT(bits) && bits <= 100 * FLINT_BITS)
+    else if (n >= 3 + (slong) FLINT_BIT_COUNT(bits) && bits <= 100 * FLINT_BITS)
     {
         slong B = BLOCK_SIZE, ii, jj, d;
         mp_ptr t;

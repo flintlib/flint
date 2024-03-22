@@ -12,7 +12,7 @@
 #include "fmpz_mod_poly.h"
 
 void fmpz_mod_poly_init2(fmpz_mod_poly_t poly, slong alloc,
-                                                      const fmpz_mod_ctx_t ctx)
+                                                      const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
 {
     if (alloc)                  /* allocate space for alloc small coeffs */
         poly->coeffs = (fmpz *) flint_calloc(alloc, sizeof(fmpz));

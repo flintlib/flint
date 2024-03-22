@@ -16,8 +16,8 @@
 #include "ulong_extras.h"
 
 void _nmod_poly_div_newton_n_preinv(mp_ptr Q, mp_srcptr A, slong lenA,
-                                     mp_srcptr B, slong lenB, mp_srcptr Binv,
-                                     slong lenBinv, nmod_t mod)
+        mp_srcptr FLINT_UNUSED(B), slong lenB, mp_srcptr Binv,
+        slong lenBinv, nmod_t mod)
 {
     const slong lenQ = lenA - lenB + 1;
     mp_ptr Arev;

@@ -13,7 +13,7 @@
 #include "fmpz_mod_poly.h"
 
 ulong
-fmpz_mod_poly_deflation(const fmpz_mod_poly_t input, const fmpz_mod_ctx_t ctx)
+fmpz_mod_poly_deflation(const fmpz_mod_poly_t input, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
 {
     return _fmpz_poly_deflation(input->coeffs, input->length);
 }

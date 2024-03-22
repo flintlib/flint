@@ -23,6 +23,7 @@ extern "C" {
 #endif
 
 #include "mpoly_types.h"
+#include "mpn_extras.h"
 #include "calcium.h"
 
 #define FEXPR_TYPE_SMALL_INT     UWORD(0)

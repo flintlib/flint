@@ -19,7 +19,7 @@
 slong _fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz *G, fmpz *S,
                                    const fmpz *A, slong lenA,
                                    const fmpz *B, slong lenB,
-                                   const fmpz_t invA, const fmpz_mod_ctx_t ctx)
+                                   const fmpz_t FLINT_UNUSED(invA), const fmpz_mod_ctx_t ctx)
 {
 	_fmpz_vec_zero(G, lenA);
     _fmpz_vec_zero(S, lenB - 1);

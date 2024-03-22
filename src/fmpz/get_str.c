@@ -10,14 +10,13 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include <string.h>
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "thread_pool.h"
 #include "thread_support.h"
-#include "string.h"
 
 /*
     Notes:
@@ -248,7 +247,7 @@ char * fmpz_get_str(char * str, int b, const fmpz_t f)
 
         /* Need a special case for zero, which may as well handle
            single digits. */
-        if (d < FLINT_MIN(b, 10))
+        if ((slong) d < FLINT_MIN(b, 10))
         {
             if (str == NULL)
                 str = flint_malloc(3);

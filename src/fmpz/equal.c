@@ -34,6 +34,6 @@ int fmpz_equal_ui(const fmpz_t f, ulong g)
 {
     fmpz c = *f;
 
-    return !COEFF_IS_MPZ(c) ? ((c >= 0) & (c == g)) :
+    return !COEFF_IS_MPZ(c) ? ((c >= 0) & ((ulong) c == g)) :
                               !flint_mpz_cmp_ui(COEFF_TO_PTR(c), g);
 }

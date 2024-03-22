@@ -123,7 +123,7 @@ void _fmpq_poly_integral_offset(fmpz * rpoly, fmpz_t rden,
         {
             c = _fmpz_gcd_small(poly + k, k + m);
 
-            if (c == k + m)
+            if (c == (ulong) (k + m))
             {
                 fmpz_divexact_ui(rpoly + k, poly + k, k + m);
                 divisors[k] = 1;
@@ -408,7 +408,7 @@ _fmpq_poly_exp_series(fmpz * B, fmpz_t Bden,
         return;
     }
 
-    if (Alen <= 12 || n <= 10 + 1000 / n_sqrt(fmpz_bits(Aden)))
+    if (Alen <= 12 || n <= 10 + 1000 / (slong) n_sqrt(fmpz_bits(Aden)))
     {
         _fmpq_poly_exp_series_basecase(B, Bden, A, Aden, Alen, n);
     }
@@ -447,7 +447,7 @@ _fmpq_poly_exp_expinv_series(fmpz * B, fmpz_t Bden, fmpz * C, fmpz_t Cden,
     }
 
     /* todo: tweak tuning for this function */
-    if (Alen <= 12 || n <= 10 + 1000 / n_sqrt(fmpz_bits(Aden)))
+    if (Alen <= 12 || n <= 10 + 1000 / (slong) n_sqrt(fmpz_bits(Aden)))
     {
         _fmpq_poly_exp_series_basecase(B, Bden, A, Aden, Alen, n);
         _fmpq_poly_inv_series(C, Cden, B, Bden, n, n);
