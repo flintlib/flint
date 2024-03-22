@@ -69,7 +69,6 @@ jobs:
           ./configure \
             CC=${CC} \
             --enable-avx2 \
-            --disable-static \
             --enable-coverage
 
       - name: "Compile library"
@@ -137,7 +136,6 @@ jobs:
           ./configure \
             CC=${CC} \
             CFLAGS="${CFLAGS}" \
-            --disable-static \
             --disable-debug
 
       - name: "Check regression in a subset of modules"
@@ -183,7 +181,6 @@ jobs:
             CC=${CC} \
             --with-ntl \
             --enable-assert \
-            --disable-static \
             --disable-debug
 
       - name: "Compile library"
@@ -241,7 +238,6 @@ jobs:
             CC=$(brew --prefix llvm@15)/bin/clang \
             --with-gmp=$(brew --prefix) \
             --with-mpfr=$(brew --prefix) \
-            --disable-static \
             --disable-debug
 
       - name: "Compile library"
@@ -302,7 +298,6 @@ jobs:
             --with-gmp=$(brew --prefix) \
             --with-mpfr=$(brew --prefix) \
             --with-blas=$(brew --prefix)/opt/openblas \
-            --disable-static \
             --disable-debug
 
       - name: "Compile library"
@@ -357,7 +352,6 @@ jobs:
           ./bootstrap.sh
           ./configure \
             CC=${CC} \
-            --disable-static \
             --disable-debug
 
       - name: "Compile library"
@@ -430,7 +424,6 @@ jobs:
           ./bootstrap.sh
           ./configure \
             CC=${CC} \
-            --disable-static \
             --disable-debug
 
       - name: "Compile library"
@@ -564,7 +557,6 @@ jobs:
           ./configure \
             CC=${CC} \
             --enable-assert \
-            --disable-static \
             --disable-debug
         shell: alpine.sh {0}
 
@@ -646,7 +638,6 @@ jobs:
             --with-gmp=${gmp_path} \
             --with-mpfr=${mpfr_path} \
             --disable-mpfr-check \
-            --disable-static \
             --disable-debug
 
       - name: "Compile and install"
