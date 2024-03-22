@@ -439,6 +439,8 @@ class gr_ctx:
             False
             >>> PSL2Z.is_ring()
             False
+            >>> SymmetricGroup(5).is_ring()
+            False
             >>> PolynomialRing(RF).is_ring()
             False
             >>> PowerSeriesRing(RF).is_ring()

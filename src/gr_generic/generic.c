@@ -2518,7 +2518,7 @@ const gr_method_tab_input _gr_generic_methods[] =
 {
     {GR_METHOD_CTX_CLEAR,               (gr_funcptr) gr_generic_ctx_clear},
 
-    {GR_METHOD_CTX_IS_RING,             (gr_funcptr) gr_generic_ctx_predicate_true},
+    {GR_METHOD_CTX_IS_RING,             (gr_funcptr) gr_generic_ctx_predicate},
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate},
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) gr_generic_ctx_predicate},
     {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) gr_generic_ctx_predicate},
