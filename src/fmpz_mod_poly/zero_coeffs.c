@@ -13,7 +13,7 @@
 #include "fmpz_mod_poly.h"
 
 void fmpz_mod_poly_zero_coeffs(fmpz_mod_poly_t poly, slong i, slong j,
-                                                      const fmpz_mod_ctx_t ctx)
+                                                      const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
 {
     if (i < 0)
         i = 0;

@@ -19,6 +19,19 @@
 
 #define rpcH (rpc + n - 1)
 
+/* Defined in t-mulhigh.c and t-sqrhigh.c */
+#ifndef lower_bound
+# define lower_bound lower_bound
+static ulong lower_bound(ulong n)
+{
+    /* These are calculated by hand lower bound for the returned limb */
+    if (n < 3)
+        return 0;
+    else
+        return 4 * n - 8;
+}
+#endif
+
 TEST_FUNCTION_START(flint_mpn_mulhigh, state)
 {
     slong ix;
@@ -35,7 +48,6 @@ TEST_FUNCTION_START(flint_mpn_mulhigh, state)
     {
         mp_limb_t borrow;
         mp_size_t n;
-        mp_limb_t lb;
 
         /* Trigger full multiplication in mulhigh */
         if (n_randint(state, 1000) == 0)
@@ -66,9 +78,7 @@ TEST_FUNCTION_START(flint_mpn_mulhigh, state)
                     ix, n, xp, n, yp, n, rpcH, n + 1, rp, n + 1);
 
         /* Check lower bound */
-        lb = n + 2;
-
-        borrow = mpn_sub_1(rpcH, rpcH, n + 1, lb);
+        borrow = mpn_sub_1(rpcH, rpcH, n + 1, lower_bound(n));
         if (borrow)
             mpn_zero(rpcH, n + 1);
 

@@ -254,7 +254,8 @@ void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp);
 void sd_fft_ctx_fit_depth(sd_fft_ctx_t Q, ulong k);
 
 /* TODO: these should probably increment/decrement a ref count */
-FLINT_FORCE_INLINE void sd_fft_lctx_init(sd_fft_lctx_t L, sd_fft_ctx_t Q, ulong depth)
+FLINT_FORCE_INLINE
+void sd_fft_lctx_init(sd_fft_lctx_t L, sd_fft_ctx_t Q, ulong depth)
 {
     L->p = Q->p;
     L->pinv = Q->pinv;
@@ -263,7 +264,8 @@ FLINT_FORCE_INLINE void sd_fft_lctx_init(sd_fft_lctx_t L, sd_fft_ctx_t Q, ulong 
         L->w2tab[i] = Q->w2tab[i];
 }
 
-FLINT_FORCE_INLINE void sd_fft_lctx_clear(sd_fft_lctx_t LQ, sd_fft_ctx_t Q)
+FLINT_FORCE_INLINE
+void sd_fft_lctx_clear(sd_fft_lctx_t FLINT_UNUSED(LQ), sd_fft_ctx_t FLINT_UNUSED(Q))
 {
 }
 

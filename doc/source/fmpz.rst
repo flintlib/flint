@@ -114,13 +114,13 @@ Types, macros and constants
 
    The smallest (negative) value an ``fmpz`` can be if just an ``slong``.
 
-.. function:: fmpz PTR_TO_COEFF(__mpz_struct * ptr)
+.. function:: fmpz PTR_TO_COEFF(mpz_ptr ptr)
 
-   A macro to convert an ``mpz_t`` (or more generally any ``__mpz_struct *``)
+   A macro to convert an ``mpz_t`` (or more generally any ``mpz_ptr``)
    to an ``fmpz`` (shifts the pointer right by `2` and sets the second most
    significant bit).
 
-.. function:: __mpz_struct * COEFF_TO_PTR(fmpz f)
+.. function:: mpz_ptr COEFF_TO_PTR(fmpz f)
 
    A macro to convert an ``fmpz`` which represents a pointer into an actual
    pointer to an ``__mpz_struct`` (i.e. to an ``mpz_t``).
@@ -130,7 +130,7 @@ Types, macros and constants
    A macro which returns `1` if `f` represents an ``mpz_t``, otherwise `0` is
    returned.
 
-.. function:: __mpz_struct * _fmpz_new_mpz(void)
+.. function:: mpz_ptr _fmpz_new_mpz(void)
 
    Initialises a new ``mpz_t`` and returns a pointer to it. This is only used
    internally.
@@ -148,12 +148,12 @@ Types, macros and constants
 
    This function does nothing in the reentrant version of ``fmpz``.
 
-.. function:: __mpz_struct * _fmpz_promote(fmpz_t f)
+.. function:: mpz_ptr _fmpz_promote(fmpz_t f)
 
    If `f` doesn't represent an ``mpz_t``, initialise one and associate it to
    `f`.
 
-.. function:: __mpz_struct * _fmpz_promote_val(fmpz_t f)
+.. function:: mpz_ptr _fmpz_promote_val(fmpz_t f)
 
    If `f` doesn't represent an ``mpz_t``, initialise one and associate it to
    `f`, but preserve the value of `f`.
@@ -471,7 +471,7 @@ Conversion
         fmpz_t f;
         ...
         {
-            __mpz_struct *z;
+            mpz_ptr z;
 
             z = _fmpz_promote_val(f);
             foo(..., z);

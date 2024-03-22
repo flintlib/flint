@@ -12,8 +12,8 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-static inline
-slong _fmpz_poly_num_real_roots_quadratic(const fmpz * pol, slong len)
+FLINT_FORCE_INLINE
+slong _fmpz_poly_num_real_roots_quadratic(const fmpz * pol)
 {
     if ((fmpz_sgn(pol) * fmpz_sgn(pol + 2) < 0) ||
         (2*fmpz_bits(pol + 1) > fmpz_bits(pol) + fmpz_bits(pol + 2) + 3))
@@ -114,7 +114,7 @@ slong _fmpz_poly_num_real_roots(const fmpz * pol, slong len)
     if (len == 2)
         return i + 1;
     if (len == 3)
-        return i + _fmpz_poly_num_real_roots_quadratic(pol, len);
+        return i + _fmpz_poly_num_real_roots_quadratic(pol);
     if (len <= 5)
     {
         int s;

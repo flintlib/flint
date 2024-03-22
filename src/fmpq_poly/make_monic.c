@@ -14,7 +14,7 @@
 #include "fmpq_poly.h"
 
 void _fmpq_poly_make_monic(fmpz * rpoly, fmpz_t rden,
-                      const fmpz * poly, const fmpz_t den, slong len)
+                      const fmpz * poly, const fmpz_t FLINT_UNUSED(den), slong len)
 {
     _fmpz_poly_primitive_part(rpoly, poly, len);
     fmpz_set(rden, rpoly + (len - 1));

@@ -18,7 +18,7 @@
 #include "fmpz_mod_poly.h"
 
 void _fmpz_mod_poly_div_newton_n_preinv (fmpz* Q, const fmpz* A, slong lenA,
-                                   const fmpz* B, slong lenB, const fmpz* Binv,
+                                   const fmpz* FLINT_UNUSED(B), slong lenB, const fmpz* Binv,
                                    slong lenBinv, const fmpz_mod_ctx_t ctx)
 {
     const slong lenQ = lenA - lenB + 1;

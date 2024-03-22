@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 
@@ -71,7 +70,7 @@ _fmpz_tdiv_qr_correction(fmpz_t q, fmpz_t r, const fmpz_t a, const fmpz_t b)
 }
 
 static void
-_fmpz_fdiv_qr_correction(fmpz_t q, fmpz_t r, const fmpz_t a, const fmpz_t b)
+_fmpz_fdiv_qr_correction(fmpz_t q, fmpz_t r, const fmpz_t FLINT_UNUSED(a), const fmpz_t b)
 {
     while (fmpz_sgn(r) < 0)
     {
@@ -93,7 +92,7 @@ _fmpz_fdiv_qr_correction(fmpz_t q, fmpz_t r, const fmpz_t a, const fmpz_t b)
 }
 
 static void
-_fmpz_cdiv_qr_correction(fmpz_t q, fmpz_t r, const fmpz_t a, const fmpz_t b)
+_fmpz_cdiv_qr_correction(fmpz_t q, fmpz_t r, const fmpz_t FLINT_UNUSED(a), const fmpz_t b)
 {
     while (fmpz_sgn(r) > 0)
     {

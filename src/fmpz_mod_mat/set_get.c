@@ -14,24 +14,24 @@
 
 /* Setters ********************************************************************/
 
-void fmpz_mod_mat_set_entry(fmpz_mod_mat_t mat, slong i, slong j, const fmpz_t val, const fmpz_mod_ctx_t ctx)
+void fmpz_mod_mat_set_entry(fmpz_mod_mat_t mat, slong i, slong j, const fmpz_t val, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
 {
     fmpz_set(fmpz_mat_entry(mat, i, j), val);
 }
 
-void fmpz_mod_mat_set(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, const fmpz_mod_ctx_t ctx)
+void fmpz_mod_mat_set(fmpz_mod_mat_t B, const fmpz_mod_mat_t A, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
 {
     fmpz_mat_set(B, A);
 }
 
 /* Getters ********************************************************************/
 
-void fmpz_mod_mat_get_entry(fmpz_t x, const fmpz_mod_mat_t mat, slong i, slong j, const fmpz_mod_ctx_t ctx)
+void fmpz_mod_mat_get_entry(fmpz_t x, const fmpz_mod_mat_t mat, slong i, slong j, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
 {
     fmpz_set(x, fmpz_mod_mat_entry(mat, i, j));
 }
 
-void fmpz_mod_mat_get_fmpz_mat(fmpz_mat_t A, const fmpz_mod_mat_t B, const fmpz_mod_ctx_t ctx)
+void fmpz_mod_mat_get_fmpz_mat(fmpz_mat_t A, const fmpz_mod_mat_t B, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
 {
     fmpz_mat_set(A, B);
 }

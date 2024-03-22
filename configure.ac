@@ -132,7 +132,7 @@ else
     cxxflags_set="no"
 fi
 
-LT_INIT
+LT_INIT([disable-static])
 
 if test "$cflags_set" = "no";
 then
@@ -996,6 +996,11 @@ fi
 # check libraries
 ################################################################################
 
+# With certain CFLAGS, the compiler may return an error, thinking that the
+# compiler has not found the function in the library.
+save_CFLAGS="$CFLAGS"
+CFLAGS=""
+
 AC_SEARCH_LIBS([atan2],[m],
     [],
     [AC_MSG_ERROR(["The C math library was not found!"])])
@@ -1141,9 +1146,6 @@ AC_CHECK_FUNCS([aligned_alloc _aligned_malloc])
 ################################################################################
 # CFLAGS
 ################################################################################
-
-save_CFLAGS="$CFLAGS"
-CFLAGS=""
 
 # The following is needed for Clang to check for unknown options.
 FLINT_CLANG([AX_CHECK_COMPILE_FLAG([-Werror=unknown-warning-option],

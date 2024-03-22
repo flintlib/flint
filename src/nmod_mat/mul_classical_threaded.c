@@ -312,11 +312,11 @@ _nmod_mat_addmul_packed_worker(void * arg_ptr)
     }
 }
 
-/* requires nlimbs = 1 */
-void
+/* Assumes nlimbs = 1 */
+static void
 _nmod_mat_addmul_packed_threaded_pool_op(mp_ptr * D,
       const mp_ptr * C, const mp_ptr * A, const mp_ptr * B,
-          slong M, slong N, slong K, int op, nmod_t mod, int nlimbs,
+          slong M, slong N, slong K, int op, nmod_t mod,
                                thread_pool_handle * threads, slong num_threads)
 {
     slong i, j, k;
@@ -433,7 +433,7 @@ _nmod_mat_mul_classical_threaded_pool_op(nmod_mat_t D, const nmod_mat_t C,
     if (nlimbs == 1 && m > 10 && k > 10 && n > 10)
     {
         _nmod_mat_addmul_packed_threaded_pool_op(D->rows, (op == 0) ? NULL : C->rows,
-            A->rows, B->rows, m, k, n, op, D->mod, nlimbs, threads, num_threads);
+            A->rows, B->rows, m, k, n, op, D->mod, threads, num_threads);
     }
     else
     {

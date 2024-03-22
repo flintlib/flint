@@ -119,7 +119,7 @@ _nmod_poly_KS2_recover_reduce2(mp_ptr res, slong s, mp_srcptr op1,
 */
 void
 _nmod_poly_KS2_recover_reduce2b(mp_ptr res, slong s, mp_srcptr op1,
-                          mp_srcptr op2, slong n, ulong b,
+                          mp_srcptr op2, slong n, ulong FLINT_UNUSED(b),
                           nmod_t mod)
 {
    /*

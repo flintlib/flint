@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Vincent Neiger
 
     This file is part of FLINT.
 
@@ -18,20 +19,19 @@ TEST_FUNCTION_START(n_primitive_root_prime, state)
 
     for (i = 0; i < 100; i++)
     {
-        n_factor_t factors;
-        mp_limb_t p, root;
-        double pinv;
+        ulong p = n_randtest_prime(state, 1);
+        ulong pinv = n_preinvert_limb(p);
 
+        n_factor_t factors;
         n_factor_init(&factors);
-        p = n_randtest_prime(state, 1);
-        pinv = n_precompute_inverse(p);
         n_factor(&factors, p - 1, 1);
 
+        ulong root;
         root = n_primitive_root_prime(p);
 
         for (j = 0; j < factors.num; j++)
         {
-            if (n_powmod_precomp(root, (p-1) / factors.p[j], p, pinv) == 1)
+            if (n_powmod2_preinv(root, (p-1) / factors.p[j], p, pinv) == 1)
                 TEST_FUNCTION_FAIL("%wu ** (%wu / %wu) == 1 mod %wu\n", root, p-1, factors.p[j], p);
         }
     }

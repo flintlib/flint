@@ -13,14 +13,14 @@
 #include "fmpz_mod_poly.h"
 
 char *
-fmpz_mod_poly_get_str(const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
+fmpz_mod_poly_get_str(const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
 {
     return _fmpz_poly_get_str(poly->coeffs, poly->length);
 }
 
 char *
 fmpz_mod_poly_get_str_pretty(const fmpz_mod_poly_t poly, const char * x,
-                                                      const fmpz_mod_ctx_t ctx)
+                                                      const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
 {
     return _fmpz_poly_get_str_pretty(poly->coeffs, poly->length, x);
 }

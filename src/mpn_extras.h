@@ -27,6 +27,40 @@
 extern "C" {
 #endif
 
+/* mpn macros ****************************************************************/
+
+FLINT_FORCE_INLINE
+void flint_mpn_zero(mp_ptr xp, mp_size_t n)
+{
+    mp_size_t ix;
+    for (ix = 0; ix < n; ix++)
+        xp[ix] = UWORD(0);
+}
+
+FLINT_FORCE_INLINE
+void flint_mpn_copyi(mp_ptr xp, mp_srcptr yp, mp_size_t n)
+{
+    mp_size_t ix;
+    for (ix = 0; ix < n; ix++)
+        xp[ix] = yp[ix];
+}
+
+FLINT_FORCE_INLINE
+void flint_mpn_copyd(mp_ptr xp, mp_srcptr yp, mp_size_t n)
+{
+    mp_size_t ix;
+    for (ix = n - 1; ix >= 0; ix--)
+        xp[ix] = yp[ix];
+}
+
+FLINT_FORCE_INLINE
+void flint_mpn_store(mp_ptr xp, mp_size_t n, mp_limb_t y)
+{
+    mp_size_t ix;
+    for (ix = 0; ix < n; ix++)
+        xp[ix] = y;
+}
+
 #define MPN_NORM(a, an)                         \
     do {                                        \
         while ((an) != 0 && (a)[(an) - 1] == 0) \
@@ -34,16 +68,10 @@ extern "C" {
     } while (0)
 
 #define MPN_SWAP(a, an, b, bn) \
-    do {                       \
-        mp_ptr __t;            \
-        mp_size_t __tn;        \
-        __t = (a);             \
-        (a) = (b);             \
-        (b) = __t;             \
-        __tn = (an);           \
-        (an) = (bn);           \
-        (bn) = __tn;           \
-    } while (0)
+  do { \
+    FLINT_SWAP(mp_ptr, a, b); \
+    FLINT_SWAP(mp_size_t, an, bn); \
+  } while (0)
 
 #define BITS_TO_LIMBS(b) (((b) + GMP_NUMB_BITS - 1) / GMP_NUMB_BITS)
 
@@ -388,6 +416,22 @@ mp_limb_t flint_mpn_mulhigh_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n
         return flint_mpn_mulhigh_func_tab[n](rp, xp, yp);
     else
         return _flint_mpn_mulhigh_n(rp, xp, yp, n);
+}
+
+/* We just want the high n limbs, but rp has low limbs available
+   which can be used for scratch space or for doing a full multiply
+   without temporary allocations. */
+MPN_EXTRAS_INLINE
+void flint_mpn_mul_or_mulhigh_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
+{
+    FLINT_ASSERT(n >= 1);
+
+    if (FLINT_HAVE_MULHIGH_FUNC(n))
+        rp[n - 1] = flint_mpn_mulhigh_func_tab[n](rp + n, xp, yp);
+    else if (n < FLINT_MPN_MULHIGH_MUL_CUTOFF)
+        rp[n - 1] = _flint_mpn_mulhigh_n(rp + n, xp, yp, n);
+    else
+        flint_mpn_mul_n(rp, xp, yp, n);
 }
 
 #define FLINT_MPN_SQRHIGH_MULDERS_CUTOFF 90

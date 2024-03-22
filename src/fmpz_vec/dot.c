@@ -128,7 +128,7 @@ void _fmpz_set_mpn(fmpz_t res, mp_srcptr x, mp_size_t xn, int neg)
     if (xn <= 1 && x[0] <= COEFF_MAX)
     {
         _fmpz_demote(res);
-        *res = neg ? -(slong) x[0] : x[0];
+        *res = neg ? -x[0] : x[0];
     }
     else
     {

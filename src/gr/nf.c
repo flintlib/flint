@@ -54,6 +54,11 @@ int _gr_nf_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
     return GR_SUCCESS;
 }
 
+int _gr_nf_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
+{
+    return _gr_nf_ctx_set_gen_name(ctx, s[0]);
+}
+
 void
 _gr_nf_ctx_clear(gr_ctx_t ctx)
 {
@@ -535,6 +540,7 @@ gr_method_tab_input _nf_methods_input[] =
     {GR_METHOD_CTX_IS_CANONICAL,
                                 (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_SET_GEN_NAME, (gr_funcptr) _gr_nf_ctx_set_gen_name},
+    {GR_METHOD_CTX_SET_GEN_NAMES,(gr_funcptr) _gr_nf_ctx_set_gen_names},
     {GR_METHOD_INIT,            (gr_funcptr) _gr_nf_init},
     {GR_METHOD_CLEAR,           (gr_funcptr) _gr_nf_clear},
     {GR_METHOD_SWAP,            (gr_funcptr) _gr_nf_swap},

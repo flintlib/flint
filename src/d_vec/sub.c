@@ -16,7 +16,7 @@
 void
 _d_vec_sub(double *res, const double *vec1, const double *vec2, slong len2)
 {
-    ulong i;
+    slong i;
     for (i = 0; i < len2; i++)
         res[i] = vec1[i] - vec2[i];
 }

@@ -16,7 +16,7 @@
 void
 _nmod_poly_taylor_shift(mp_ptr poly, mp_limb_t c, slong len, nmod_t mod)
 {
-    if (len < 100 || len > mod.n)
+    if (len < 100 || (ulong) len > mod.n)
         _nmod_poly_taylor_shift_horner(poly, c, len, mod);
     else if ((c == 1 || c == mod.n - 1) && len < 1000)
         _nmod_poly_taylor_shift_horner(poly, c, len, mod);

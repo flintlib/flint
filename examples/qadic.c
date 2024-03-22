@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "qadic.h"
+#include <flint/qadic.h>
 
 int main(void)
 {

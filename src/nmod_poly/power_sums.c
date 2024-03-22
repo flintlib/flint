@@ -26,7 +26,7 @@ void
 nmod_poly_power_sums(nmod_poly_t res, const nmod_poly_t poly, slong n)
 {
     slong len = poly->length;
-    size_t i = 0;
+    slong i = 0;
 
     if (len == 0)
     {

@@ -14,7 +14,7 @@
 
 const double * n_prime_inverses_arr_readonly(ulong num_primes)
 {
-    int m;
+    slong m;
 
     if (num_primes < 1)
         return NULL;

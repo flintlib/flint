@@ -9,12 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "ulong_extras.h"
 
 void n_factor_insert(n_factor_t * factors, mp_limb_t p, ulong exp)
 {
-   ulong i;
+   slong i;
 
    for (i = 0; i < factors->num; i++)
    {
@@ -24,7 +23,8 @@ void n_factor_insert(n_factor_t * factors, mp_limb_t p, ulong exp)
    if (i != factors->num)
    {
       factors->exp[i] += exp;
-   } else
+   }
+   else
    {
       factors->p[i] = p;
       factors->exp[i] = exp;

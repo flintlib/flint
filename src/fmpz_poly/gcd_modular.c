@@ -195,7 +195,7 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, slong len1,
             }
             else
             {
-                if (pbits + unlucky >= bound) /* if we reach the bound with one prime */
+                if (pbits + unlucky >= (ulong) bound) /* if we reach the bound with one prime */
                 {
                     _fmpz_vec_content(hc, res, hlen);
 
@@ -251,7 +251,7 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, slong len1,
                 _fmpz_vec_scalar_divexact_fmpz(res, res, hlen, hc);
             }
 
-            if (fmpz_bits(modulus) + unlucky >= bound)
+            if (fmpz_bits(modulus) + unlucky >= (ulong) bound)
                 break;
 
             /* are we done? */

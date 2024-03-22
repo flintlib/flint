@@ -245,7 +245,7 @@ n_is_probabprime_fibonacci(mp_limb_t n)
     mp_limb_t m;
     n_pair_t V;
 
-    if (FLINT_ABS((mp_limb_signed_t) n) <= UWORD(3))
+    if ((ulong) FLINT_ABS((slong) n) <= UWORD(3))
     {
         if (n >= UWORD(2))
             return 1;
@@ -350,7 +350,8 @@ lchain2_preinv(mp_limb_t m, mp_limb_t a, mp_limb_t n, mp_limb_t ninv)
 int
 n_is_probabprime_lucas(mp_limb_t n)
 {
-    int i, D, Q;
+    int i;
+    slong D, Q;
     mp_limb_t A;
     mp_limb_t left, right;
     n_pair_t V;
@@ -368,7 +369,7 @@ n_is_probabprime_lucas(mp_limb_t n)
         D = 5 + 2 * i;
         if (n_gcd(D, n % D) != UWORD(1))
         {
-            if (n == D)
+            if (n == (ulong) D)
                 continue;
             else
                 return 0;
@@ -400,7 +401,7 @@ n_is_probabprime_lucas(mp_limb_t n)
     {
         if (n < UWORD(52))
         {
-            while (Q >= n)
+            while ((ulong) Q >= n)
                 Q -= n;
             A = n_submod(n_invmod(Q, n), UWORD(2), n);
         }

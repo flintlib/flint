@@ -1,9 +1,9 @@
 /* This file is public domain. Author: Fredrik Johansson. */
 
-#include "profiler.h"
-#include "ca.h"
-#include "ca_ext.h"
-#include "ca_field.h"
+#include <flint/profiler.h>
+#include <flint/ca.h>
+#include <flint/ca_ext.h>
+#include <flint/ca_field.h>
 
 #define START(expr) flint_printf(">>> "); flint_printf(expr)
 #define OUT \

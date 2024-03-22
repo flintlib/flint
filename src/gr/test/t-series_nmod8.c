@@ -31,7 +31,7 @@ TEST_FUNCTION_START(gr_series_nmod8, state)
     for (i = 0; i < 5; i++)
     {
         gr_ctx_init_nmod8(ZZn, 1 + n_randtest(state) % 255);
-        gr_ctx_init_gr_series_mod(ZZnx, ZZn, i);
+        gr_ctx_init_series_mod_gr_poly(ZZnx, ZZn, i);
         gr_test_ring(ZZnx, 100, flags);
         gr_ctx_clear(ZZnx);
         gr_ctx_clear(ZZn);

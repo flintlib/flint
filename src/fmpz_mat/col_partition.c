@@ -27,7 +27,8 @@ typedef const col_hash_struct * col_hash_srcptr;
 void
 fmpz_mat_col_hash(col_hash_ptr col_h, fmpz_mat_t M)
 {
-    ulong i, j, hash;
+    slong i, j;
+    ulong hash;
 
     for (i = 0; i < M->c; i++)
     {

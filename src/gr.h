@@ -728,7 +728,7 @@ typedef enum
     GR_CTX_FMPZ_POLY, GR_CTX_FMPQ_POLY, GR_CTX_GR_POLY,
     GR_CTX_FMPZ_MPOLY, GR_CTX_GR_MPOLY,
     GR_CTX_FMPZ_MPOLY_Q,
-    GR_CTX_GR_SERIES, GR_CTX_GR_SERIES_MOD,
+    GR_CTX_GR_SERIES, GR_CTX_SERIES_MOD_GR_POLY,
     GR_CTX_GR_MAT,
     GR_CTX_GR_VEC,
     GR_CTX_PSL2Z, GR_CTX_DIRICHLET_GROUP, GR_CTX_PERM,
@@ -1437,9 +1437,42 @@ void gr_ctx_init_fmpz_mpoly_q(gr_ctx_t ctx, slong nvars, const ordering_t ord);
 #endif
 
 /* Generic series */
+/* TODO: move parts of this to its own module */
+
+typedef struct
+{
+    gr_ctx_struct * base_ring;
+    slong n;
+    char * var;
+}
+series_mod_ctx_t;
+
+typedef struct
+{
+    slong prec;     /* default approximate truncation */
+}
+gr_series_ctx_struct;
+
+typedef gr_series_ctx_struct gr_series_ctx_t[1];
+
+typedef struct
+{
+    gr_ctx_struct * base_ring;
+    gr_series_ctx_struct sctx;
+    char * var;
+}
+series_ctx_t;
+
+#define SERIES_CTX(ring_ctx) ((series_ctx_t *)((ring_ctx)))
+#define SERIES_ELEM_CTX(ring_ctx) (SERIES_CTX(ring_ctx)->base_ring)
+#define SERIES_SCTX(ring_ctx) (&(((series_ctx_t *)((ring_ctx)))->sctx))
+
+#define SERIES_MOD_CTX(ring_ctx) ((series_mod_ctx_t *)((ring_ctx)))
+#define SERIES_MOD_ELEM_CTX(ring_ctx) (SERIES_MOD_CTX(ring_ctx)->base_ring)
+#define SERIES_MOD_N(ring_ctx) (SERIES_MOD_CTX(ring_ctx)->n)
 
 void gr_ctx_init_gr_series(gr_ctx_t ctx, gr_ctx_t base_ring, slong prec);
-void gr_ctx_init_gr_series_mod(gr_ctx_t ctx, gr_ctx_t base_ring, slong mod);
+void gr_ctx_init_series_mod_gr_poly(gr_ctx_t ctx, gr_ctx_t base_ring, slong n);
 
 /* Generic vectors */
 

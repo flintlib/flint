@@ -12,7 +12,7 @@
 #include "fmpz.h"
 #include "fmpz_mod_poly.h"
 
-void fmpz_mod_poly_truncate(fmpz_mod_poly_t poly, slong len, const fmpz_mod_ctx_t ctx)
+void fmpz_mod_poly_truncate(fmpz_mod_poly_t poly, slong len, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
 {
     if (poly->length > len)
     {

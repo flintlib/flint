@@ -130,7 +130,7 @@ slong _fmpz_mat_minpoly_modular(fmpz * rop, const fmpz_mat_t op)
             See Lemma 3.1 in Dumas, "Bounds on the coefficients of the
             characteristic and minimal polynomials", 2007.
         */
-        slong bound;
+        ulong bound;
         double b1, b2, b3, bb;
 
         slong pbits  = FLINT_BITS - 1, i, j;
@@ -165,7 +165,7 @@ slong _fmpz_mat_minpoly_modular(fmpz * rop, const fmpz_mat_t op)
             if (b3 < b2)
                b2 = b3;
 
-            bound = n <= bb ? (slong) ceil(n*b1) : (slong) ceil(n*b2);
+            bound = n <= bb ? (ulong) ceil(n*b1) : (ulong) ceil(n*b2);
             bound = bound + 1;
 
             fmpz_clear(b);

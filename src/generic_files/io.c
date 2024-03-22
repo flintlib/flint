@@ -71,7 +71,7 @@ static char * __mag_get_str(mag_srcptr ip, slong digits)
     return str;
 }
 
-static int __never_is(const void * ip)
+static int __never_is(const void * FLINT_UNUSED(ip))
 {
     return 0;
 }
@@ -183,8 +183,8 @@ static size_t __fmpz_fprint(FILE *, const fmpz *, int);
 static size_t __fmpq_fprint(FILE *, const fmpq *, int);
 static size_t __mpz_fprint(FILE *, mpz_srcptr);
 static size_t __mpq_fprint(FILE *, mpq_srcptr);
-static size_t __mag_fprint(FILE *, mag_srcptr);
-static size_t __arf_fprint(FILE *, arf_srcptr);
+static size_t __mag_fprint(FILE *, mag_srcptr, int);
+static size_t __arf_fprint(FILE *, arf_srcptr, int);
 static size_t __arb_fprint(FILE *, arb_srcptr, int);
 static size_t __acb_fprint(FILE *, acb_srcptr, int);
 static size_t __nmod_fprint(FILE *, nmod_t);
@@ -598,7 +598,7 @@ print_flint_type:
     {
         if (IS_FLINT_TYPE(ip, "arf"))
         {
-            res += __arf_fprint(fs, va_arg(vlist, arf_srcptr));
+            res += __arf_fprint(fs, va_arg(vlist, arf_srcptr), 0);
             ip += STRING_LENGTH("arf}");
         }
         else if (IS_FLINT_TYPE(ip, "arf*"))
@@ -615,7 +615,7 @@ print_flint_type:
     {
         if (IS_FLINT_TYPE(ip, "mag"))
         {
-            res += __mag_fprint(fs, va_arg(vlist, mag_srcptr));
+            res += __mag_fprint(fs, va_arg(vlist, mag_srcptr), 0);
             ip += STRING_LENGTH("mag}");
         }
         else if (IS_FLINT_TYPE(ip, "mag*"))
@@ -753,12 +753,12 @@ int flint_vprintf(const char * str, va_list vlist)
 
 /* TODO: Add option to print in different basis? */
 
-static size_t __ulong_fprint(FILE * fs, const ulong * ip, int flag)
+static size_t __ulong_fprint(FILE * fs, const ulong * ip, int FLINT_UNUSED(flag))
 {
     return fprintf(fs, WORD_FMT "u", *ip);
 }
 
-static size_t __slong_fprint(FILE * fs, const slong * ip, int flag)
+static size_t __slong_fprint(FILE * fs, const slong * ip, int FLINT_UNUSED(flag))
 {
     return fprintf(fs, WORD_FMT "d", *ip);
 }
@@ -825,7 +825,7 @@ static size_t __mpq_fprint(FILE * fs, mpq_srcptr ip)
 }
 
 #define DIGITS 6
-static size_t __mag_fprint(FILE * fs, mag_srcptr ip)
+static size_t __mag_fprint(FILE * fs, mag_srcptr ip, int FLINT_UNUSED(flag))
 {
     size_t res;
     char * str;
@@ -844,7 +844,7 @@ static size_t __mag_fprint(FILE * fs, mag_srcptr ip)
     return res;
 }
 
-static size_t __arf_fprint(FILE * fs, arf_srcptr ip)
+static size_t __arf_fprint(FILE * fs, arf_srcptr ip, int FLINT_UNUSED(flag))
 {
     size_t res;
     char * str;

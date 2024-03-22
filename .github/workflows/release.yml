@@ -1,0 +1,216 @@
+# This workflow takes care of creating release archives for the
+# Flint distribution. It is run for all PR and branch pushes as usual,
+# but also on tags whose name starts with `vX.Y` with X, Y numbers
+# (the idea is to use v1.2.3 or v1.2.3-beta3)
+#
+# For builds triggered by a tag, the tag is turned into a GitHub release and
+# the produced archives are attached to that.
+name: "Wrap releases"
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Tag name for release'
+        required: false
+        default: nightly
+  push:
+    tags:
+      - v[1-9]+.[0-9]+.[0-9]    # allow v1.2.3
+      - v[1-9]+.[0-9]+.[0-9]-*  # allow v1.2.3-beta3 etc.
+  schedule:
+    # Every day at 3:33 AM UTC
+    - cron: '33 3 * * *'
+
+concurrency:
+  # group by workflow and ref; the last slightly strange component ensures that for pull
+  # requests, we limit to 1 concurrent job, but for the main branch we don't
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/main' || github.run_number }}
+  # Cancel intermediate builds, but only if it is a pull request build.
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
+
+jobs:
+  version_and_tag:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get-version.outputs.version }}
+      tag_name: ${{ steps.get-tag_name.outputs.tag_name }}
+
+    steps:
+      - uses: actions/checkout@v4
+      # figure out TAG_NAME
+      - if: github.event_name == 'push'
+        run: |
+          TAG_NAME=${{ github.ref }}
+          echo "TAG_NAME=${TAG_NAME#refs/tags/}" >> $GITHUB_ENV
+      - if: github.event_name == 'workflow_dispatch'
+        run: echo "TAG_NAME=${{ github.event.inputs.tag_name }}" >> $GITHUB_ENV
+      - if: github.event_name == 'schedule'
+        run: echo 'TAG_NAME=nightly' >> $GITHUB_ENV
+      - id: get-tag_name
+        run: |
+          echo "tag_name=${TAG_NAME}"
+          echo "tag_name=${TAG_NAME}" >>  $GITHUB_OUTPUT
+
+      - name: "Record FLINT version"
+        id: get-version
+        run: |
+          # special treatment for tags: these are used for actual releases, so
+          # we force the version in the VERSION file and in the tag to match
+          if ${{ startsWith(github.ref, 'refs/tags/v') }} ; then
+            version=${GITHUB_REF#refs/tags/v}
+          else
+            version=$(cat VERSION)
+            if [ ${TAG_NAME} = "nightly" ] ; then
+              version=${version}-$(date +"%Y%m%d")
+            fi
+          fi
+          echo "version=${version}"
+          echo "version=${version}" >> $GITHUB_OUTPUT
+
+
+  make-archive:
+    runs-on: ubuntu-latest
+    needs: version_and_tag
+    env:
+      FLINT_VERSION: ${{ needs.version_and_tag.outputs.version }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Setup"
+        run: |
+          sudo apt-get install -y autoconf libtool-bin
+          autoconf --version
+          libtool --version
+
+
+      - name: "Bootstrap"
+        run: |
+          ./bootstrap.sh
+
+      - name: "Create source archive"
+        run: dev/make_dist.sh ${FLINT_VERSION}
+
+      - name: "Upload source archive as artifact"
+        uses: actions/upload-artifact@v3
+        with:
+          if-no-files-found: error
+          name: flint
+          path: flint-${{ env.FLINT_VERSION }}.*
+          retention-days: 1
+
+  test-archive:
+    needs: [version_and_tag, make-archive]
+    runs-on: ubuntu-latest
+    env:
+      FLINT_VERSION: ${{ needs.version_and_tag.outputs.version }}
+      TAG_NAME: ${{ needs.version_and_tag.outputs.tag_name }}
+    steps:
+      - name: "Download archive from previous job"
+        uses: actions/download-artifact@v3
+        with:
+          name: flint
+
+      - name: "Setup"
+        run: |
+          sudo apt-get install -y libgmp-dev libmpfr-dev
+          # now *remove* autotools to verify we can build with out it
+          sudo apt-get remove -y autoconf
+          sudo apt-get remove -y automake
+          sudo apt-get remove -y libtool-bin
+          echo "MAKE=make -j$(expr $(nproc) + 1) --output-sync=target" >> $GITHUB_ENV
+
+      - name: "Extract"
+        run: |
+          tar -xf flint-${FLINT_VERSION}.tar.gz
+          mv flint-${FLINT_VERSION} flint # to simplify code
+
+      - name: "Configure"
+        run: |
+          cd flint
+          # *no* call to bootstrap.sh !
+          ./configure
+
+      - name: "Compile library"
+        run: |
+          cd flint
+          $MAKE
+          ldd libflint.so
+
+      - name: "Compile tests"
+        run: |
+          cd flint
+          export FLINT_TEST_MULTIPLIER=0.1
+          $MAKE tests
+
+      - name: "Check"
+        run: |
+          cd flint
+          export FLINT_TEST_MULTIPLIER=0.1
+          $MAKE check
+
+  upload-archive:
+    needs: [version_and_tag, make-archive, test-archive]
+    runs-on: ubuntu-latest
+    env:
+      FLINT_VERSION: ${{ needs.version_and_tag.outputs.version }}
+      TAG_NAME: ${{ needs.version_and_tag.outputs.tag_name }}
+      GH_REPO: ${{ github.repository }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    permissions:
+      contents: write
+
+    # so it only publishes releases on the main repository
+    if: github.repository == 'flintlib/flint'
+
+    steps:
+      - name: "Download archive from previous job"
+        uses: actions/download-artifact@v3
+        with:
+          name: flint
+
+
+      # figure out SUBJECT and PRERELEASE
+      - if: env.TAG_NAME == 'nightly'
+        run: |
+          (echo 'SUBJECT=FLINT nightly release';
+           echo 'PRERELEASE=--prerelease') >> $GITHUB_ENV
+          gh release delete nightly --yes || true
+          git push origin :nightly || true
+
+
+      - if: env.TAG_NAME != 'nightly'
+        run: |
+          (echo 'SUBJECT=FLINT release';
+           echo 'PRERELEASE=') >> $GITHUB_ENV
+          gh release delete stable --yes || true
+          git push origin :stable || true
+
+      - name: Generate checksums
+        run: |
+          printf '## SHA256 Checksums\n```\n' > $RUNNER_TEMP/notes.md
+          for ext in tar.gz tar.xz zip; do
+            fn=flint-${FLINT_VERSION}.$ext
+            # `sha256sum` outputs <sha> <path>,
+            sha256sum $fn >> $RUNNER_TEMP/notes.md
+          done
+          printf '```\n' >> $RUNNER_TEMP/notes.md
+
+          #       - name: Release
+          #         uses: softprops/action-gh-release@v1
+          #         with:
+          #           fail_on_unmatched_files: true
+          #           files: |
+          #             flint-${{ needs.make-archive.outputs.get-version }}.tar.gz
+          #             flint-${{ needs.make-archive.outputs.get-version }}.tar.xz
+          #             flint-${{ needs.make-archive.outputs.get-version }}.zip
+
+      - name: Release
+        run: |
+          gh release create $TAG_NAME $PRERELEASE --notes-file "$RUNNER_TEMP/notes.md" --title "$SUBJECT" --target $GITHUB_SHA flint-${FLINT_VERSION}.{tar.gz,tar.xz,zip}
+
+# TODO: we could / should perhaps also test `make install` ?
+# TODO: also trigger a documentation build and upload the result?
+# TODO: if desired, we could e.g. also upload the archive to a server via scp

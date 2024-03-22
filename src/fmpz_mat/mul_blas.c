@@ -587,11 +587,11 @@ int _fmpz_mat_mul_blas(
 #else
 
 int _fmpz_mat_mul_blas(
-    fmpz_mat_t C,
-    const fmpz_mat_t A, flint_bitcnt_t Abits,
-    const fmpz_mat_t B, flint_bitcnt_t Bbits,
-    int sign,
-    flint_bitcnt_t Cbits)
+    fmpz_mat_t FLINT_UNUSED(C),
+    const fmpz_mat_t FLINT_UNUSED(A), flint_bitcnt_t FLINT_UNUSED(Abits),
+    const fmpz_mat_t FLINT_UNUSED(B), flint_bitcnt_t FLINT_UNUSED(Bbits),
+    int FLINT_UNUSED(sign),
+    flint_bitcnt_t FLINT_UNUSED(Cbits))
 {
     return 0;
 }

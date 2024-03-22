@@ -19,10 +19,10 @@
 #include <stdio.h>
 #include <time.h>
 #include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_mod.h"
-#include "fmpz_mod_poly.h"
+#include <flint/flint.h>
+#include <flint/fmpz.h>
+#include <flint/fmpz_mod.h>
+#include <flint/fmpz_mod_poly.h>
 
 int main(void)
 {

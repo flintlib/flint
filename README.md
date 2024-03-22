@@ -37,7 +37,7 @@ on how to build FLINT.
 
     git clone https://github.com/flintlib/flint.git && cd flint
     ./bootstrap.sh
-    ./configure --disable-static       # ./configure --help for more options
+    ./configure                        # ./configure --help for more options
     make
     make check                         # optional
     make install                       # optional
