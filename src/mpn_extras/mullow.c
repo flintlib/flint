@@ -11,17 +11,31 @@
 
 #include "mpn_extras.h"
 
-/*
+#if FLINT_HAVE_ASSEMBLY_x86_64_adx
+mp_limb_t flint_mpn_mullow_1(mp_ptr, mp_srcptr, mp_srcptr);
+mp_limb_t flint_mpn_mullow_2(mp_ptr, mp_srcptr, mp_srcptr);
+mp_limb_t flint_mpn_mullow_3(mp_ptr, mp_srcptr, mp_srcptr);
+mp_limb_t flint_mpn_mullow_4(mp_ptr, mp_srcptr, mp_srcptr);
+mp_limb_t flint_mpn_mullow_5(mp_ptr, mp_srcptr, mp_srcptr);
+mp_limb_t flint_mpn_mullow_6(mp_ptr, mp_srcptr, mp_srcptr);
+mp_limb_t flint_mpn_mullow_7(mp_ptr, mp_srcptr, mp_srcptr);
+mp_limb_t flint_mpn_mullow_8(mp_ptr, mp_srcptr, mp_srcptr);
 
-  0_1_2_3_4_5
-0|x x x x x x
-1|x x x x x l
-2|x x x x l
-3|x x x l
-4|x x l
-5|x l
-
-*/
+const flint_mpn_mul_func_t flint_mpn_mullow_func_tab[] =
+{
+    NULL,
+    flint_mpn_mullow_1,
+    flint_mpn_mullow_2,
+    flint_mpn_mullow_3,
+    flint_mpn_mullow_4,
+    flint_mpn_mullow_5,
+    flint_mpn_mullow_6,
+    flint_mpn_mullow_7,
+    flint_mpn_mullow_8
+};
+#else
+const flint_mpn_mul_func_t flint_mpn_mullow_func_tab[] = { NULL };
+#endif
 
 mp_limb_t
 flint_mpn_mullow_basecase(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)

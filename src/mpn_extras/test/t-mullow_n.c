@@ -12,12 +12,10 @@
 #include "test_helpers.h"
 #include "mpn_extras.h"
 
-/* TODO: Currently only checks basecase */
-
 #define N_MIN 1
-#define N_MAX 40
+#define N_MAX FLINT_MPN_MULLOW_FUNC_TAB_WIDTH
 
-TEST_FUNCTION_START(flint_mpn_mullow, state)
+TEST_FUNCTION_START(flint_mpn_mullow_n, state)
 {
     slong ix;
     int result;
@@ -39,7 +37,7 @@ TEST_FUNCTION_START(flint_mpn_mullow, state)
         mpn_random2(xp, n);
         mpn_random2(yp, n);
 
-        ret = flint_mpn_mullow_basecase(rp, xp, yp, n);
+        ret = flint_mpn_mullow_n(rp, xp, yp, n);
         flint_mpn_mul_n(rpf, xp, yp, n);
 
         result = (mpn_cmp(rp, rpf, n) == 0 && ret == rpf[n]);
@@ -49,11 +47,11 @@ TEST_FUNCTION_START(flint_mpn_mullow, state)
                     "n = %wd\n"
                     "xp = %{ulong*}\n"
                     "yp = %{ulong*}\n"
-                    "ret    = %{ulong}\n"
-                    "rpf[n] = %{ulong}\n"
+                    "Exp ret: %{ulong}\n"
+                    "Got ret: %{ulong}\n"
                     "Expected: %{ulong*}\n"
                     "Got:      %{ulong*}\n",
-                    ix, n, xp, n, yp, n, ret, rpf[n], rpf, n, rp, n);
+                    ix, n, xp, n, yp, n, rpf[n], ret, rpf, n, rp, n);
     }
 
     flint_free(rp);

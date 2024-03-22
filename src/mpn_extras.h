@@ -372,7 +372,32 @@ flint_mpn_sqr(mp_ptr r, mp_srcptr x, mp_size_t n)
 
 /* Low multiplication ********************************************************/
 
+#define FLINT_HAVE_MULLOW_FUNC(n) ((n) <= FLINT_MPN_MULLOW_FUNC_TAB_WIDTH)
+
+FLINT_DLL extern const flint_mpn_mul_func_t flint_mpn_mullow_func_tab[];
+
 mp_limb_t flint_mpn_mullow_basecase(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
+
+#if FLINT_HAVE_ASSEMBLY_x86_64_adx
+# define FLINT_MPN_MULLOW_FUNC_TAB_WIDTH 8
+#else
+# define FLINT_MPN_MULLOW_FUNC_TAB_WIDTH 0
+#endif
+
+/* TODO: Fix higher stuff */
+MPN_EXTRAS_INLINE
+mp_limb_t flint_mpn_mullow_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
+{
+    FLINT_ASSERT(n >= 1);
+
+    if (FLINT_HAVE_MULLOW_FUNC(n))
+    {
+        FLINT_ASSERT(rp != xp);
+        return flint_mpn_mullow_func_tab[n](rp, xp, yp);
+    }
+    else
+        return flint_mpn_mullow_basecase(rp, xp, yp, n);
+}
 
 /* High multiplication *******************************************************/
 
