@@ -37,6 +37,7 @@ const flint_mpn_mul_func_t flint_mpn_mullow_func_tab[] =
 const flint_mpn_mul_func_t flint_mpn_mullow_func_tab[] = { NULL };
 #endif
 
+#if !FLINT_HAVE_NATIVE_mpn_mullow_basecase
 mp_limb_t
 flint_mpn_mullow_basecase(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
 {
@@ -53,3 +54,4 @@ flint_mpn_mullow_basecase(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
 
     return ret;
 }
+#endif

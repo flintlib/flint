@@ -13,7 +13,7 @@
 #include "mpn_extras.h"
 
 #define N_MIN 1
-#define N_MAX FLINT_MPN_MULLOW_FUNC_TAB_WIDTH
+#define N_MAX 30
 
 TEST_FUNCTION_START(flint_mpn_mullow_n, state)
 {
@@ -22,11 +22,6 @@ TEST_FUNCTION_START(flint_mpn_mullow_n, state)
 
     mp_ptr rp, rpf, xp, yp;
 
-    rp = flint_malloc(sizeof(mp_limb_t) * N_MAX);
-    rpf = flint_malloc(2 * sizeof(mp_limb_t) * N_MAX);
-    xp = flint_malloc(sizeof(mp_limb_t) * N_MAX);
-    yp = flint_malloc(sizeof(mp_limb_t) * N_MAX);
-
     for (ix = 0; ix < 100000 * flint_test_multiplier(); ix++)
     {
         mp_limb_t ret;
@@ -34,8 +29,16 @@ TEST_FUNCTION_START(flint_mpn_mullow_n, state)
 
         n = N_MIN + n_randint(state, N_MAX - N_MIN + 1);
 
+        rp = flint_malloc(sizeof(mp_limb_t) * n);
+        rpf = flint_malloc(2 * sizeof(mp_limb_t) * n);
+        xp = flint_malloc(sizeof(mp_limb_t) * n);
+        yp = flint_malloc(sizeof(mp_limb_t) * n);
+
         mpn_random2(xp, n);
         mpn_random2(yp, n);
+
+        if (ix < 1)
+            continue;
 
         ret = flint_mpn_mullow_n(rp, xp, yp, n);
         flint_mpn_mul_n(rpf, xp, yp, n);
@@ -52,12 +55,12 @@ TEST_FUNCTION_START(flint_mpn_mullow_n, state)
                     "Expected: %{ulong*}\n"
                     "Got:      %{ulong*}\n",
                     ix, n, xp, n, yp, n, rpf[n], ret, rpf, n, rp, n);
-    }
 
-    flint_free(rp);
-    flint_free(rpf);
-    flint_free(xp);
-    flint_free(yp);
+        flint_free(rp);
+        flint_free(rpf);
+        flint_free(xp);
+        flint_free(yp);
+    }
 
     TEST_FUNCTION_END(state);
 }

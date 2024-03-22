@@ -380,6 +380,7 @@ mp_limb_t flint_mpn_mullow_basecase(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 
 #if FLINT_HAVE_ASSEMBLY_x86_64_adx
 # define FLINT_MPN_MULLOW_FUNC_TAB_WIDTH 8
+# define FLINT_HAVE_NATIVE_mpn_mullow_basecase 1
 #else
 # define FLINT_MPN_MULLOW_FUNC_TAB_WIDTH 0
 #endif
