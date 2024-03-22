@@ -73,7 +73,7 @@ static int compute_nWi_S(slong *rk, gr_mat_t nWi, int *S, const gr_mat_t Torig, 
         for (i = 0; i < b; ++i)
         {
             status |= gr_neg(cc, gr_mat_entry_ptr(X, P[i], pc, ctx), ctx);
-            if (i == j || cc == 0) continue;
+            if (i == j || gr_is_zero(cc, ctx) == T_TRUE) continue;
             status |= _gr_vec_addmul_scalar(T->rows[P[i]], T->rows[pc], T->c, cc, ctx);
             status |= _gr_vec_addmul_scalar(nWi->rows[P[i]], nWi->rows[pc], nWi->c, cc, ctx);
         }
@@ -120,7 +120,7 @@ int gr_lil_mat_solve_block_lanczos(gr_ptr x, const gr_lil_mat_t M, gr_srcptr b, 
     gr_mat_t DEF; /* Used to store coefficient matrices D, E, and F */
     gr_mat_t I, tmp; /* I_{b x b}, tmp used as scratch */
     gr_ptr Mtb, SStVtMtb, WiSStVtMtb, VSStWiSStVtMtb; /* Intermediate elements in x update */
-    int status = GR_SUCCESS;
+    int status = GR_UNABLE;
 
     // TODO: handle this
     if (x == b)
@@ -129,7 +129,7 @@ int gr_lil_mat_solve_block_lanczos(gr_ptr x, const gr_lil_mat_t M, gr_srcptr b, 
     r = gr_sparse_mat_nrows(M, ctx);
     c = gr_sparse_mat_ncols(M, ctx);
 
-    if (_gr_vec_is_zero(b, r, ctx))
+    if (_gr_vec_is_zero(b, r, ctx) == T_TRUE)
     {
         status |= _gr_vec_zero(x, c, ctx);
         return GR_SUCCESS;

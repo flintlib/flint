@@ -120,6 +120,7 @@ int test_add_sub(flint_rand_t state, gr_ctx_t ctx)
     gr_lil_mat_init(lil_mat, M, N, ctx);
     gr_lil_mat_init(lil_mat2, M, N, ctx);
 
+    //flint_printf("Testing add sub\n");
     for (i = 0; i < 2 * n_tests; i++)
     {
         status = GR_SUCCESS;
@@ -193,6 +194,7 @@ int test_accum_mul_scalar(flint_rand_t state, gr_ctx_t ctx)
     gr_lil_mat_init(lil_mat, M, N, ctx);
     gr_lil_mat_init(lil_mat2, M, N, ctx);
 
+    //flint_printf("Testing addmul submul\n");
     for (i = 0; i < 2 * n_tests; i++)
     {
         status = GR_SUCCESS;
@@ -276,6 +278,9 @@ int test_mul_div_scalar(flint_rand_t state, gr_ctx_t ctx)
     fmpq_t fmpq_c;
     truth_t eq;
 
+    fmpz_init(fmpz_c);
+    fmpq_init(fmpq_c);
+
     GR_TMP_INIT(gr_c, ctx);
     gr_mat_init(dmat, M, N, ctx);
     gr_mat_init(dmat2, M, N, ctx);
@@ -286,6 +291,7 @@ int test_mul_div_scalar(flint_rand_t state, gr_ctx_t ctx)
     gr_lil_mat_init(lil_mat, M, N, ctx);
     gr_lil_mat_init(lil_mat2, M, N, ctx);
 
+    //flint_printf("Testing mul div scalar\n");
     for (i = 0; i < 54 * n_tests; i++)
     {
         j = i % 6; // Which type of scalar

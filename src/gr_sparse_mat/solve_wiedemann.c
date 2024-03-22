@@ -109,24 +109,27 @@ static int make_sequences(gr_ptr *s, slong ns, slong len, const gr_lil_mat_t M, 
 }
 
 /* Compute x = \Sigma_{i = 0}^{L-1} s_i * M^i * b = 0 */
-static int make_sum(gr_ptr x, gr_ptr *s, slong L, const gr_lil_mat_t M, gr_srcptr b, gr_ctx_t ctx)
+static int make_sum(gr_ptr x, gr_ptr s, slong L, const gr_lil_mat_t M, gr_srcptr b, gr_ctx_t ctx)
 {
-    slong i, r;
+    slong i, r, sz;
     gr_ptr y, My;
     int status;
 
+    sz = ctx->sizeof_elem;
     r = gr_sparse_mat_nrows(M, ctx);
 
     GR_TMP_INIT_VEC(y, r, ctx);
     GR_TMP_INIT_VEC(My, r, ctx);
     status = _gr_vec_set(y, b, r, ctx);
 
-    status = _gr_vec_mul_scalar(x, b, r, s[0], ctx);
+    //flint_printf("\t\tScaling\n");
+    status = _gr_vec_mul_scalar(x, b, r, s, ctx);
     for (i = 1; i < L; ++i) 
     {
+        //flint_printf("\t\tIterating %d\n", i);
         status |= gr_lil_mat_mul_vec(My, M, y, ctx);
         status |= _gr_vec_set(y, My, r, ctx);
-        status |= _gr_vec_addmul_scalar(x, y, r, s[i], ctx);
+        status |= _gr_vec_addmul_scalar(x, y, r, GR_ENTRY(s, i, sz), ctx);
     }
     GR_TMP_CLEAR_VEC(y, r, ctx);
     GR_TMP_CLEAR_VEC(My, r, ctx);
@@ -151,7 +154,7 @@ int gr_lil_mat_solve_wiedemann(gr_ptr x, const gr_lil_mat_t M, gr_srcptr b, gr_c
     r = gr_sparse_mat_nrows(M, ctx);
     c = gr_sparse_mat_ncols(M, ctx);
 
-    if (_gr_vec_is_zero(b, c, ctx))
+    if (_gr_vec_is_zero(b, c, ctx) == T_TRUE)
     {
         return _gr_vec_zero(x, c, ctx);
     }
@@ -166,23 +169,29 @@ int gr_lil_mat_solve_wiedemann(gr_ptr x, const gr_lil_mat_t M, gr_srcptr b, gr_c
     for (i = 0; i < ns; ++i)
         GR_TMP_INIT_VEC(s[i], len, ctx);
 
+    //flint_printf("Make sequences\n");
     status |= make_sequences(s, ns, len, M, b, ctx);
 
     /* Don't have block Berlekamp yet, just try each one */
     for (i = 0; i < ns; ++i)
     {
         /* Get minimal polynomial */
+        //flint_printf("Finding minimal polynomial for index %d\n", i);
         status |= find_min_poly(&L, s[i], len, ctx);
         if (gr_is_zero(s[i], ctx) == T_TRUE) continue;
 
         /* \sum_{j = 0}^L s_ijM^jb = 0 */
         /* => x = -1/s[0]\sum_{j = 0}^{L-1} s_i(j-1) M^jb solves Mx = b */
+        //flint_printf("\tMaking sum\n");
         status |= make_sum(x, GR_ENTRY(s[i], 1, sz), L, M, b, ctx);
+        //flint_printf("\tInverting\n");
         status |= gr_inv(coeff, s[i], ctx);
         status |= gr_neg(coeff, coeff, ctx);
+        //flint_printf("\tScaling\n");
         status |= _gr_vec_mul_scalar(x, x, r, coeff, ctx);
 
         /* Check if successful */
+        //flint_printf("\tChecking result\n");
         status |= gr_lil_mat_mul_vec(Mx, M, x, ctx);
         if (_gr_vec_equal(Mx, b, r, ctx) != T_FALSE)
             break;
@@ -201,15 +210,12 @@ int gr_lil_mat_solve_wiedemann(gr_ptr x, const gr_lil_mat_t M, gr_srcptr b, gr_c
 
 int gr_lil_mat_nullvector_wiedemann(gr_ptr x, const gr_lil_mat_t M, flint_rand_t state, gr_ctx_t ctx) 
 {
-    slong i, L, r, c, sz, ns, len;
+    slong i, L, r, c, ns, len;
     gr_ptr *s; 
     gr_ptr Mx, b;
     int status = GR_SUCCESS;
 
     // TODO: handle this
-    if (x == b)
-        return GR_DOMAIN;
-    /* TBD: reduce to square */
      if (M->r != M->c)
         return GR_DOMAIN;
 

@@ -12,8 +12,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <gmp.h>
-#include "flint.h"
 #include "gr_sparse_mat.h"
 
 int gr_lil_mat_transpose(gr_lil_mat_t B, const gr_lil_mat_t A, gr_ctx_t ctx)
@@ -26,16 +24,22 @@ int gr_lil_mat_transpose(gr_lil_mat_t B, const gr_lil_mat_t A, gr_ctx_t ctx)
     r = gr_sparse_mat_nrows(A, ctx);
     c = gr_sparse_mat_ncols(A, ctx);
 
+    if (r != gr_sparse_mat_ncols(B, ctx) || c != gr_sparse_mat_nrows(B, ctx))
+        return GR_DOMAIN;
 
+    // TODO: handle
+    if (A == B)
+        return GR_DOMAIN;
+    
     /* Get number of nnzs in each column of A (thus each row of B) */
     for (j = 0; j < c; ++j) 
     {
-        B->rows[c].nnz = 0;
+        B->rows[j].nnz = 0;
     }
-    for (i = 0; i < A->r; ++r) 
+    for (i = 0; i < A->r; ++i) 
     {
-        Arow = &A->rows[r];
-        for (nz_idx = 0; nz_idx < A->rows[r].nnz; ++nz_idx) 
+        Arow = &A->rows[i];
+        for (nz_idx = 0; nz_idx < A->rows[i].nnz; ++nz_idx) 
         {
             B->rows[Arow->inds[nz_idx]].nnz += 1;
         }
@@ -43,20 +47,20 @@ int gr_lil_mat_transpose(gr_lil_mat_t B, const gr_lil_mat_t A, gr_ctx_t ctx)
     /* Allocate space for nnz and reset counters */
     for (j = 0; j < c; ++j) 
     {
-        Brow = &B->rows[c];
+        Brow = &B->rows[j];
         gr_sparse_vec_fit_nnz(Brow, Brow->nnz, ctx);
         Brow->nnz = 0;
     }
     /* Put entries into transposed matrix */
     for (i = 0; i < r; ++i)
     {
-        Arow = &A->rows[r];
+        Arow = &A->rows[i];
         for (nz_idx = 0; nz_idx < Arow->nnz; ++nz_idx) 
         {
-            Brow = &B->rows[Arow->inds[i]];
-            Brow->inds[Brow->nnz] = r;
+            Brow = &B->rows[Arow->inds[nz_idx]];
+            Brow->inds[Brow->nnz] = i;
             status |= gr_set(GR_ENTRY(Brow->nzs, Brow->nnz, sz), GR_ENTRY(Arow->nzs, nz_idx, sz), ctx);
-            Brow->nnz++;   
+            (Brow->nnz)++;   
         }
     }
     return status;
