@@ -23,7 +23,7 @@ test_add_sub_mul(flint_rand_t state, gr_ctx_t ctx)
     slong i, k, l, m;
     slong N = 20;
     slong n_tests = 20;
-    int status;
+    int status = GR_SUCCESS;
     gr_sparse_vec_t vec, vec2, vec_other;
     gr_ptr dvec, dvec2, dvec3, dvec_other;
     gr_ptr temp;
@@ -202,7 +202,7 @@ int test_accum_mul_scalar(flint_rand_t state, gr_ctx_t ctx)
     slong i, j, k, l, c;
     slong N = 20;
     slong n_tests = 20;
-    int status;
+    int status = GR_SUCCESS;
     gr_sparse_vec_t vec, vec2, vec_other;
     gr_ptr dvec, dvec2, dvec3;
     gr_ptr temp;
@@ -306,7 +306,7 @@ int test_mul_div_scalar(flint_rand_t state, gr_ctx_t ctx)
     ulong uc;
     slong N = 100;
     slong n_tests = 20;
-    int status;
+    int status = GR_SUCCESS;
     gr_sparse_vec_t vec, vec2;
     gr_ptr dvec, dvec2;
     gr_ptr temp;

@@ -14,8 +14,7 @@
 
 #define CHECK_TEST(x, name) { if (GR_SUCCESS != (x)) { flint_printf("FAIL %s\n", (name)); flint_abort(); } }
 
-int
-test_init(gr_ctx_t ctx)
+int test_init(gr_ctx_t ctx)
 {
     gr_sparse_vec_t vec;
     gr_sparse_vec_init(vec, 5, ctx);
@@ -42,8 +41,7 @@ test_init_from_entries_canonical(flint_rand_t state, gr_ctx_t ctx)
 
     //flint_printf("Running init test\n");
     GR_TMP_INIT(temp, ctx);
-    entries = flint_malloc(N * sz);
-    _gr_vec_init(entries, N, ctx);
+    GR_TMP_INIT_VEC(entries, N, ctx);
     for (i = 0; i < N; ++i)
         status |= gr_randtest_not_zero(GR_ENTRY(entries, i, sz), state, ctx);
     if (status != GR_SUCCESS)
@@ -78,8 +76,7 @@ test_init_from_entries_canonical(flint_rand_t state, gr_ctx_t ctx)
         }
     }
     gr_sparse_vec_clear(vec, ctx);
-    _gr_vec_clear(entries, N, ctx);
-    flint_free(entries);
+    GR_TMP_CLEAR_VEC(entries, N, ctx);
     return status;
 }
 
@@ -94,7 +91,9 @@ test_init_from_entries_internal(ulong *inds, gr_srcptr entries, slong len, slong
 
     GR_TMP_INIT2(temp, temp2, ctx);
     gr_sparse_vec_init(vec, len, ctx);
-    status |= gr_sparse_vec_from_entries(vec, inds, entries, num, 0, ctx);
+    //flint_printf("entries: "); status |= _gr_vec_print(entries, num, ctx); flint_printf("\n");
+    status |= gr_sparse_vec_from_entries(vec, inds, entries, num, T_FALSE, ctx);
+    //flint_printf("vec: "); status |= gr_sparse_vec_print_nz(vec, ctx); flint_printf("\n");
     if (status != GR_SUCCESS)
         return GR_TEST_FAIL;
 
@@ -117,8 +116,11 @@ test_init_from_entries_internal(ulong *inds, gr_srcptr entries, slong len, slong
         )
             {
                 flint_printf("Failed on %d!\n", i);
+                gr_ctx_println(ctx);
                 gr_println(temp, ctx);
                 gr_println(temp2, ctx);
+                if (temp3 != NULL)
+                    gr_println(temp3, ctx);
                 return GR_TEST_FAIL;
             }
     }
@@ -136,9 +138,9 @@ test_init_from_entries(flint_rand_t state, gr_ctx_t ctx)
     slong sz = ctx->sizeof_elem;
     slong N = 5;
     ulong inds[5] = {8, 4, 3, 8, 1};
-    gr_ptr entries = flint_malloc(N * sz);
+    gr_ptr entries;
 
-    _gr_vec_init(entries, N, ctx);
+    GR_TMP_INIT_VEC(entries, N, ctx);
 
     status |= _gr_vec_randtest(entries, state, N, ctx);
     status |= test_init_from_entries_internal(inds, entries, 2*N, N, ctx);
@@ -149,8 +151,7 @@ test_init_from_entries(flint_rand_t state, gr_ctx_t ctx)
         status |= gr_set_si(GR_ENTRY(entries, i, sz), entries_si[i], ctx);
     status |= test_init_from_entries_internal(inds, entries, 2*N, N, ctx);
 
-    _gr_vec_clear(entries, N, ctx);
-    flint_free(entries);
+    GR_TMP_CLEAR_VEC(entries, N, ctx);
     return status;
 }
 

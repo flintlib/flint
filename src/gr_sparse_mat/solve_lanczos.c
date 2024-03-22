@@ -56,21 +56,18 @@ int gr_lil_mat_solve_lanczos(gr_ptr x, const gr_lil_mat_t M, gr_srcptr b, flint_
         /* Compute M^T M v_j and check if it is orthogonal to v_j */
         status |= gr_lil_mat_mul_vec(Mv, M, v[j], ctx);
         status |= gr_lil_mat_mul_vec(Av, Mt, Mv, ctx);
-        status |= gr_zero(vtAv[j], ctx);
-        status |= _gr_vec_dot(vtAv[j], vtAv[j], 0, v[j], Av, c, ctx);
+        status |= _gr_vec_dot(vtAv[j], NULL, 0, v[j], Av, c, ctx);
         if (gr_is_zero(vtAv[j], ctx) == T_TRUE) break; /* Can't make any more progress */
 
         /* Update putative solution by <v_j, M^T b>/delta_j * v_j */
-        status |= gr_zero(tmp, ctx);
-        status |= _gr_vec_dot(tmp, tmp, 0, v[j], Mtb, c, ctx);
+        status |= _gr_vec_dot(tmp, NULL, 0, v[j], Mtb, c, ctx);
         status |= gr_div(vMtb, tmp, vtAv[j], ctx);
         status |= _gr_vec_addmul_scalar(x, v[j], c, vMtb, ctx);
 
         /* v_{j+1} = MtMv - alpha*v_j - beta*v_{j-1}, where */
         /*    alpha = <Mv_j, Mv_j>/delta_j, and */
         /*    beta = delta_j/delta_{j-1} */
-        status |= gr_zero(AvtAv, ctx);
-        status |= _gr_vec_dot(AvtAv, AvtAv, 0, Av, Av, c, ctx);
+        status |= _gr_vec_dot(AvtAv, NULL, 0, Av, Av, c, ctx);
         status |= gr_div(tmp, vtAv[j], vtAv[1-j], ctx);
         status |= gr_neg(tmp, tmp, ctx);
         status |= _gr_vec_mul_scalar(v[1-j], v[1-j], M->c, tmp, ctx);
