@@ -13,6 +13,18 @@
 
 /* todo: characteristic 2, ... */
 
+static truth_t
+_char_two(gr_ctx_t ctx)
+{
+    gr_ptr t;
+    truth_t res;
+    GR_TMP_INIT(t, ctx);
+    GR_MUST_SUCCEED(gr_set_ui(t, 2, ctx));
+    res = gr_is_zero(t, ctx);
+    GR_TMP_CLEAR(t, ctx);
+    return res;
+}
+
 int
 _gr_poly_sqrt_series_generic(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx)
 {
@@ -20,7 +32,7 @@ _gr_poly_sqrt_series_generic(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_
 
     status = _gr_poly_sqrt_series_newton(res, f, flen, len, 2, ctx);
 
-    if (status == GR_DOMAIN && gr_ctx_is_field(ctx) != T_TRUE)
+    if (status == GR_DOMAIN && (gr_ctx_is_field(ctx) != T_TRUE || _char_two(ctx) != T_FALSE))
         return GR_UNABLE;
 
     return status;
