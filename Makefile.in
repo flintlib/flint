@@ -45,7 +45,7 @@ EXEEXT:=@EXEEXT@
 
 AR:=@AR@
 CC:=@CC@
-CXX:=@CC@
+CXX:=@CXX@
 DLLTOOL:=@DLLTOOL@
 LD:=@LD@
 LN_S:=@LN_S@
