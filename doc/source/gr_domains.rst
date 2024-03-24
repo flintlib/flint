@@ -101,6 +101,12 @@ Base rings and fields
     Initializes *ctx* to the ring of Gaussian integers
     `\mathbb{Z}[i]` with elements of type :type:`fmpzi_t`.
 
+.. function:: void gr_ctx_init_nmod(gr_ctx_t ctx, ulong n)
+
+    Initializes *ctx* to the ring `\mathbb{Z}/n\mathbb{Z}`
+    of integers modulo *n* where
+    elements have type :type:`ulong`. We require `n \ne 0`.
+
 .. function:: void gr_ctx_init_nmod8(gr_ctx_t ctx, unsigned char n)
               void gr_ctx_init_nmod32(gr_ctx_t ctx, unsigned int n)
 
@@ -109,11 +115,12 @@ Base rings and fields
     elements have type :type:`uint8` or :type:`uint32`. The modulus must be
     nonzero.
 
-.. function:: void gr_ctx_init_nmod(gr_ctx_t ctx, ulong n)
+    .. note ::
 
-    Initializes *ctx* to the ring `\mathbb{Z}/n\mathbb{Z}`
-    of integers modulo *n* where
-    elements have type :type:`ulong`. We require `n \ne 0`.
+        Presently, many operations for these types are not as optimized
+        as those for full-word ``nmods``. It is currently recommended
+        to use :func:`gr_ctx_init_nmod` for best performance unless
+        one specifically wants to minimize memory usage.
 
 .. function:: void gr_ctx_init_fmpz_mod(gr_ctx_t ctx, const fmpz_t n)
 
