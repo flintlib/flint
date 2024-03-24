@@ -215,7 +215,7 @@ TEMPLATE(T, poly_factor) (TEMPLATE(T, poly_factor_t) result,
 
     result->num = 0;
 
-    if (n < 10 + 50 / bits)
+    if (n < (slong) (10 + 50 / bits))
         __TEMPLATE(T, poly_factor_deflation) (result, leading_coeff, input,
                                               ZASSENHAUS, ctx);
     else

@@ -17,7 +17,7 @@
 #include "fmpz_mod_poly.h"
 
 void
-fmpz_mod_poly_factor_init(fmpz_mod_poly_factor_t fac, const fmpz_mod_ctx_t ctx)
+fmpz_mod_poly_factor_init(fmpz_mod_poly_factor_t fac, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
 {
     fac->alloc = 0;
     fac->num = 0;

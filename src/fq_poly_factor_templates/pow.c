@@ -20,7 +20,7 @@
 
 void
 TEMPLATE(T, poly_factor_pow) (TEMPLATE(T, poly_factor_t) fac, slong exp,
-                              const TEMPLATE(T, ctx_t) ctx)
+                              const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx))
 {
     slong i;
 

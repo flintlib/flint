@@ -113,7 +113,7 @@ fmpz_factor_ecm_select_curve(mp_ptr f, mp_ptr sig, mp_ptr n, ecm_t ecm_inf)
     gcdlimbs = mpn_gcdext(tempf, tempi, &invlimbs, tempv, sz, tempn, ecm_inf->n_size);
 
     if (!(gcdlimbs == 1 && tempf[0] == ecm_inf->one[0]) &&
-        !(gcdlimbs == ecm_inf->n_size && mpn_cmp(tempf, n, ecm_inf->n_size) == 0))
+        !(gcdlimbs == (mp_size_t) ecm_inf->n_size && mpn_cmp(tempf, n, ecm_inf->n_size) == 0))
     {
         /* Found factor */
         flint_mpn_copyi(f, tempf, gcdlimbs);

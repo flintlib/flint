@@ -22,7 +22,7 @@ void fq_nmod_init2(fq_nmod_t rop, const fq_nmod_ctx_t ctx)
     nmod_poly_init2_preinv(rop, ctx->mod.n, ctx->mod.ninv, fq_nmod_ctx_degree(ctx));
 }
 
-void fq_nmod_clear(fq_nmod_t rop, const fq_nmod_ctx_t ctx)
+void fq_nmod_clear(fq_nmod_t rop, const fq_nmod_ctx_t FLINT_UNUSED(ctx))
 {
     nmod_poly_clear(rop);
 }

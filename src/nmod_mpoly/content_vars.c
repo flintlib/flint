@@ -140,7 +140,7 @@ int nmod_mpoly_content_vars(
 
     for (i = 0; i < num_vars; i++)
     {
-        if (vars[i] >= (ulong) ctx->minfo->nvars)
+        if ((ulong) vars[i] >= (ulong) ctx->minfo->nvars)
             flint_throw(FLINT_ERROR, "nmod_mpoly_content_vars: variable out of range");
     }
 

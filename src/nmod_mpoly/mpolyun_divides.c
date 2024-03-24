@@ -105,10 +105,10 @@ int _nmod_mpolyn_divides(
             {
                 *store++ = x->i;
                 *store++ = x->j;
-                if (x->i != -WORD(1))
+                if (x->i != -UWORD(1))
                     hind[x->i] |= WORD(1);
 
-                if (x->i == -WORD(1))
+                if (x->i == -UWORD(1))
                 {
                     n_poly_mod_add(acc, acc, A->coeffs + x->j, ctx->mod);
                 }
@@ -619,10 +619,10 @@ int nmod_mpolyun_divides(
             {
                 *store++ = x->i;
                 *store++ = x->j;
-                if (x->i != -WORD(1))
+                if (x->i != -UWORD(1))
                     hind[x->i] |= WORD(1);
 
-                if (x->i == -WORD(1))
+                if (x->i == -UWORD(1))
                 {
                     _nmod_mpolyn_add(S, T, Acoeff + x->j, N, ctx);
                 }

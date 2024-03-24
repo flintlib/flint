@@ -15,8 +15,8 @@
 #include "padic_poly.h"
 
 void _padic_poly_sub(fmpz *rop, slong *val, slong N,
-                     const fmpz *op1, slong val1, slong len1, slong N1,
-                     const fmpz *op2, slong val2, slong len2, slong N2,
+                     const fmpz *op1, slong val1, slong len1, slong FLINT_UNUSED(N1),
+                     const fmpz *op2, slong val2, slong len2, slong FLINT_UNUSED(N2),
                      const padic_ctx_t ctx)
 {
     const slong len = FLINT_MAX(len1, len2);

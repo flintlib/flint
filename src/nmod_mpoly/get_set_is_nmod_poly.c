@@ -65,8 +65,8 @@ int nmod_mpoly_get_n_poly(
     }
     else
     {
-        slong j, off;
-        ulong check, wpf = Bbits/FLINT_BITS;
+        slong off;
+        ulong j, check, wpf = Bbits/FLINT_BITS;
 
         off = mpoly_gen_offset_mp(var, Bbits, ctx->minfo);
 

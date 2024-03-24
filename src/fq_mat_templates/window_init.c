@@ -21,7 +21,7 @@ void
 TEMPLATE(T, mat_window_init) (TEMPLATE(T, mat_t) window,
                               const TEMPLATE(T, mat_t) mat,
                               slong r1, slong c1, slong r2, slong c2,
-                              const TEMPLATE(T, ctx_t) ctx)
+                              const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx))
 {
     slong i;
     window->entries = NULL;

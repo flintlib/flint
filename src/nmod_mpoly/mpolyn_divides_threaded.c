@@ -102,7 +102,7 @@ typedef nmod_mpolyn_ts_struct nmod_mpolyn_ts_t[1];
 /* Bcoeff is changed */
 static void nmod_mpolyn_ts_init(nmod_mpolyn_ts_t A,
                         n_poly_struct * Bcoeff, ulong * Bexp, slong Blen,
-                      flint_bitcnt_t bits, slong N, const nmod_mpoly_ctx_t ctx)
+                      flint_bitcnt_t bits, slong N, const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     slong i;
     flint_bitcnt_t idx = FLINT_BIT_COUNT(Blen);
@@ -187,7 +187,7 @@ static void nmod_mpolyn_ts_clear_poly(nmod_mpolyn_t Q, nmod_mpolyn_ts_t A)
 /* put B on the end of A - Bcoeff is changed*/
 static void nmod_mpolyn_ts_append(nmod_mpolyn_ts_t A,
                        n_poly_struct * Bcoeff, ulong * Bexps, slong Blen,
-                                           slong N, const nmod_mpoly_ctx_t ctx)
+                                           slong N, const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
 /* TODO: this needs barriers on non-x86 */
 
@@ -386,7 +386,7 @@ static void divides_heap_base_add_chunk(divides_heap_base_t H, divides_heap_chun
 
 static void _nmod_mpolyn_fit_length(n_poly_struct ** coeffs,
                             ulong ** exps, slong * alloc, slong length,
-                                    slong N, const nmod_mpoly_ctx_t ctx)
+                                    slong N, const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     slong i;
     slong old_alloc = *alloc;
@@ -993,10 +993,10 @@ static slong _nmod_mpolyn_divides_stripe1(
             {
                 *store++ = x->i;
                 *store++ = x->j;
-                if (x->i != -WORD(1))
+                if (x->i != -UWORD(1))
                     hind[x->i] |= WORD(1);
 
-                if (x->i == -WORD(1))
+                if (x->i == -UWORD(1))
                 {
                     n_poly_mod_add(acc_lg, acc_lg, Acoeff + x->j, S->ctx->mod);
                 }
@@ -1242,10 +1242,10 @@ static slong _nmod_mpolyn_divides_stripe(
             {
                 *store++ = x->i;
                 *store++ = x->j;
-                if (x->i != -WORD(1))
+                if (x->i != -UWORD(1))
                     hind[x->i] |= WORD(1);
 
-                if (x->i == -WORD(1))
+                if (x->i == -UWORD(1))
                 {
                     n_poly_mod_add(acc_lg, acc_lg, Acoeff + x->j, S->ctx->mod);
                 }

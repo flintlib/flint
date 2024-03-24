@@ -12,7 +12,7 @@
 #include "nmod_mpoly.h"
 
 ulong nmod_mpoly_get_term_coeff_ui(const nmod_mpoly_t A, slong i,
-                                                    const nmod_mpoly_ctx_t ctx)
+                                                    const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     if ((ulong) i >= (ulong) A->length)
     {

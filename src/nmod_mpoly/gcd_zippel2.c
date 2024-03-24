@@ -374,7 +374,7 @@ static void n_fq_poly_eval_step_sep(
     _n_fq_zip_eval_step(res, cur->coeffs, inc->coeffs, A->coeffs, A->length, ctx);
 }
 
-void static n_bpoly_mod_eval_step_sep(
+static void n_bpoly_mod_eval_step_sep(
     n_bpoly_t E,
     n_polyun_t cur,
     const n_polyun_t inc,

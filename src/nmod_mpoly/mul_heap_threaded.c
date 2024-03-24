@@ -23,10 +23,10 @@
     this functions reallocates A and returns the length of A
     version for N == 1
 */
-void _nmod_mpoly_mul_heap_part1(
+static void _nmod_mpoly_mul_heap_part1(
     nmod_mpoly_t A,
     const mp_limb_t * Bcoeff, const ulong * Bexp, slong Blen,
-    const mp_limb_t * Ccoeff, const ulong * Cexp, slong Clen,
+    const mp_limb_t * Ccoeff, const ulong * Cexp, slong FLINT_UNUSED(Clen),
     slong * start,
     slong * end,
     slong * hind,
@@ -163,10 +163,10 @@ void _nmod_mpoly_mul_heap_part1(
 }
 
 
-void _nmod_mpoly_mul_heap_part(
+static void _nmod_mpoly_mul_heap_part(
     nmod_mpoly_t A,
     const mp_limb_t * Bcoeff, const ulong * Bexp, slong Blen,
-    const mp_limb_t * Ccoeff, const ulong * Cexp, slong Clen,
+    const mp_limb_t * Ccoeff, const ulong * Cexp, slong FLINT_UNUSED(Clen),
     slong * start,
     slong * end,
     slong * hind,
@@ -590,7 +590,7 @@ static void _join_worker(void * varg)
     }
 }
 
-void _nmod_mpoly_mul_heap_threaded(
+static void _nmod_mpoly_mul_heap_threaded(
     nmod_mpoly_t A,
     const mp_limb_t * Bcoeff, const ulong * Bexp, slong Blen,
     const mp_limb_t * Ccoeff, const ulong * Cexp, slong Clen,

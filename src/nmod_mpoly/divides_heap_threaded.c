@@ -920,7 +920,7 @@ static int _nmod_mpoly_divides_stripe1(
                 *store++ = x->i;
                 *store++ = x->j;
 
-                if (x->i == -WORD(1))
+                if (x->i == -UWORD(1))
                 {
                     add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0,
                                     WORD(0), WORD(0), S->mod.n - Acoeff[x->j]);
@@ -1164,7 +1164,7 @@ static int _nmod_mpoly_divides_stripe(
                 *store++ = x->i;
                 *store++ = x->j;
 
-                if (x->i == -WORD(1))
+                if (x->i == -UWORD(1))
                 {
                     add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0,
                                  WORD(0), WORD(0), S->mod.n - Acoeff[x->j]);
@@ -1483,7 +1483,7 @@ static void trychunk(worker_arg_t W, divides_heap_chunk_t L)
     nmod_mpoly_struct * T2 = W->polyT2;
 
     mask = 0;
-    for (i = 0; i < FLINT_BITS/H->bits; i++)
+    for (i = 0; (ulong) i < FLINT_BITS/H->bits; i++)
         mask = (mask << H->bits) + (UWORD(1) << (H->bits - 1));
 
     /* return if this section has already finished processing */
@@ -1832,7 +1832,7 @@ int _nmod_mpoly_divides_heap_threaded_pool(
     mpoly_monomial_add_mp(texps, qexps + N*0, Bexp + N*1, N);
 
     mask = 0;
-    for (i = 0; i < FLINT_BITS/exp_bits; i++)
+    for (i = 0; (ulong) i < FLINT_BITS/exp_bits; i++)
         mask = (mask << exp_bits) + (UWORD(1) << (exp_bits - 1));
 
     k = 1;

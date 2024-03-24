@@ -31,7 +31,8 @@ slong _fmpz_poly_factor_CLD_mat(fmpz_mat_t res, const fmpz_poly_t f,
       initialised to be of size (r + 1, 2k).
    */
 
-   slong i, zeroes, bound, lo_n, hi_n, r = lifted_fac->num;
+   ulong i, lo_n, hi_n, bound;
+   slong zeroes, r = lifted_fac->num;
    slong bit_r = FLINT_MAX(r, 20);
    fmpz_poly_t gd, gcld, temp;
    fmpz_poly_t trunc_f, trunc_fac; /* don't initialise trunc_f, trunc_fac */
@@ -80,7 +81,7 @@ slong _fmpz_poly_factor_CLD_mat(fmpz_mat_t res, const fmpz_poly_t f,
 
    if (lo_n > 0)
    {
-      for (i = 0; i < r; i++)
+      for (i = 0; (slong) i < r; i++)
       {
          zeroes = 0;
          while (fmpz_is_zero(lifted_fac->p[i].coeffs + zeroes))
@@ -99,7 +100,7 @@ slong _fmpz_poly_factor_CLD_mat(fmpz_mat_t res, const fmpz_poly_t f,
 
       fmpz_poly_attach_shift(trunc_f, f, f->length - hi_n);
 
-      for (i = 0; i < r; i++)
+      for (i = 0; (slong) i < r; i++)
       {
          slong len = lifted_fac->p[i].length - hi_n - 1;
 

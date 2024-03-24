@@ -20,7 +20,7 @@ void
 _TEMPLATE(T, poly_div_newton_n_preinv) (
     TEMPLATE(T, struct) *Q,
     const TEMPLATE(T, struct) *A, slong lenA,
-    const TEMPLATE(T, struct) *B, slong lenB,
+    const TEMPLATE(T, struct) * FLINT_UNUSED(B), slong lenB,
     const TEMPLATE(T, struct) * Binv, slong lenBinv,
     const TEMPLATE(T, ctx_t) ctx)
 {

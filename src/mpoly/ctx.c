@@ -63,7 +63,7 @@ void mpoly_ctx_init(mpoly_ctx_t mctx, slong nvars, const ordering_t ord)
     }
 }
 
-void mpoly_ctx_clear(mpoly_ctx_t mctx)
+void mpoly_ctx_clear(mpoly_ctx_t FLINT_UNUSED(mctx))
 {
     return;
 }

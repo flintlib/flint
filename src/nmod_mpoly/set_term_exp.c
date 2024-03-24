@@ -18,7 +18,7 @@ void nmod_mpoly_set_term_exp_fmpz(nmod_mpoly_t A, slong i,
     slong N;
     flint_bitcnt_t exp_bits;
 
-    if (i >= (ulong) A->length)
+    if (i >= A->length)
     {
         flint_throw(FLINT_ERROR, "nmod_mpoly_set_term_exp_fmpz: index out of range");
     }
@@ -37,7 +37,7 @@ void nmod_mpoly_set_term_exp_ui(nmod_mpoly_t A, slong i,
     slong N;
     flint_bitcnt_t exp_bits;
 
-    if (i >= (ulong) A->length)
+    if (i >= A->length)
     {
         flint_throw(FLINT_ERROR, "nmod_mpoly_set_term_exp_ui: index is out of range");
     }

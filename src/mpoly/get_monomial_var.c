@@ -28,7 +28,7 @@ ulong mpoly_get_monomial_var_exp_ui_mp(const ulong * poly_exps,
                         slong var, flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     slong offset;
-    slong j;
+    ulong j;
     ulong wpf = bits/FLINT_BITS;
     ulong r, check;
 
@@ -49,7 +49,7 @@ slong mpoly_get_monomial_var_exp_si_mp(const ulong * poly_exps,
                         slong var, flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     slong offset;
-    slong j;
+    ulong j;
     ulong wpf = bits/FLINT_BITS;
     ulong r, check;
 

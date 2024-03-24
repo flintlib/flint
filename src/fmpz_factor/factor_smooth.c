@@ -246,7 +246,7 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
                         }
 
                         /* if what remains is below the bound, just factor it */
-                        if (fmpz_sizeinbase(n2, 2) < bits)
+                        if (fmpz_sizeinbase(n2, 2) < (ulong) bits)
                         {
                             fmpz_factor_no_trial(factor, n2);
 

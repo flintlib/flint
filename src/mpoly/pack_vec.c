@@ -104,7 +104,7 @@ void mpoly_pack_vec_fmpz(ulong * exp1, const fmpz * exp2, flint_bitcnt_t bits,
             {
                 __mpz_struct * mpz = COEFF_TO_PTR(*exp2);
                 FLINT_ASSERT(mpz->_mp_size <= words_per_field);
-                while (size < mpz->_mp_size)
+                while ((int) size < mpz->_mp_size)
                     *exp1++ = mpz->_mp_d[size++];
             }
             while (size++ < words_per_field)

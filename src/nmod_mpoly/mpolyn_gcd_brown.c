@@ -218,11 +218,11 @@ choose_prime: /* primes are v - alpha, v + alpha */
     if (n_poly_degree(modulus) > 0)
     {
         FLINT_ASSERT(G->length > 0);
-        if (n_poly_degree(Gevalp) > ((G->exps + N*0)[off]>>shift))
+        if ((ulong) n_poly_degree(Gevalp) > ((G->exps + N*0)[off]>>shift))
         {
             goto choose_prime;
         }
-        else if (n_poly_degree(Gevalp) < ((G->exps + N*0)[off]>>shift))
+        else if ((ulong) n_poly_degree(Gevalp) < ((G->exps + N*0)[off]>>shift))
         {
             n_poly_one(modulus);
         }
