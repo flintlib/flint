@@ -90,7 +90,7 @@ int _nmod_mpoly_compose_nmod_poly_sp(nmod_poly_t A, const nmod_mpoly_t B,
         flint_bitcnt_t varibits = FLINT_BIT_COUNT(degrees[i]);
 
         mpoly_gen_offset_shift_sp(&off, &shift, i, bits, ctx->minfo);
-        for (j = 0; j < varibits; j++)
+        for (j = 0; (ulong) j < varibits; j++)
         {
             offs[k] = off;
             masks[k] = UWORD(1) << (shift + j);

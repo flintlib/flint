@@ -27,7 +27,7 @@ fq_zech_ctx_fprint(FILE * file, const fq_zech_ctx_t ctx)
 
 void fq_zech_ctx_print(const fq_zech_ctx_t ctx) { fq_zech_ctx_fprint(stdout, ctx); }
 
-int fq_zech_fprint(FILE * file, const fq_zech_t op, const fq_zech_ctx_t ctx) { return flint_fprintf(file, "%wd", op->value); }
+int fq_zech_fprint(FILE * file, const fq_zech_t op, const fq_zech_ctx_t FLINT_UNUSED(ctx)) { return flint_fprintf(file, "%wd", op->value); }
 void fq_zech_print(const fq_zech_t op, const fq_zech_ctx_t ctx) { fq_zech_fprint(stdout, op, ctx); }
 int fq_zech_fprint_pretty(FILE * file, const fq_zech_t op, const fq_zech_ctx_t ctx) { return flint_fprintf(file, "%s^%wd", ctx->fq_nmod_ctx->var, op->value); }
 void fq_zech_print_pretty(const fq_zech_t op, const fq_zech_ctx_t ctx) { fq_zech_fprint_pretty(stdout, op, ctx); }

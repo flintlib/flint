@@ -16,7 +16,8 @@
 ulong _nmod_mpoly_get_term_ui_fmpz(const nmod_mpoly_t poly,
                                   const fmpz * exp, const nmod_mpoly_ctx_t ctx)
 {
-    slong N, index, exp_bits;
+    slong N, index;
+    ulong exp_bits;
     ulong * cmpmask, * packed_exp;
     int exists;
     TMP_INIT;

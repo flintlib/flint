@@ -23,7 +23,7 @@
 void
 nmod_poly_mat_sqr(nmod_poly_mat_t C, const nmod_poly_mat_t A)
 {
-    slong dim = A->r;
+    ulong dim = A->r;
 
     if (dim < KS_MIN_DIM)
     {
@@ -31,7 +31,7 @@ nmod_poly_mat_sqr(nmod_poly_mat_t C, const nmod_poly_mat_t A)
     }
     else
     {
-        slong Alen;
+        ulong Alen;
         mp_limb_t mod = nmod_poly_mat_modulus(A);
 
         Alen = nmod_poly_mat_max_length(A);
@@ -128,7 +128,7 @@ nmod_poly_mat_sqr_interpolate(nmod_poly_mat_t C, const nmod_poly_mat_t A)
     len = 2 * A_len - 1;
     nmod_init(&mod, nmod_poly_mat_modulus(A));
 
-    if (mod.n < len)
+    if (mod.n < (ulong) len)
     {
         flint_throw(FLINT_ERROR, "(nmod_poly_mat_sqr_interpolate): Characteristic is too small.\n");
     }

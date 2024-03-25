@@ -28,7 +28,7 @@ extern "C" {
 /* Factoring  ****************************************************************/
 
 void fmpz_mod_poly_factor_init(fmpz_mod_poly_factor_t fac,
-                                                     const fmpz_mod_ctx_t ctx);
+                                                     const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
 
 typedef struct
 {
@@ -79,7 +79,7 @@ void fmpz_mod_poly_factor_concat(fmpz_mod_poly_factor_t res,
                    const fmpz_mod_poly_factor_t fac, const fmpz_mod_ctx_t ctx);
 
 void fmpz_mod_poly_factor_pow(fmpz_mod_poly_factor_t fac, slong exp,
-                                                     const fmpz_mod_ctx_t ctx);
+                                                     const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
 
 int fmpz_mod_poly_is_irreducible(const fmpz_mod_poly_t f,
                                                      const fmpz_mod_ctx_t ctx);

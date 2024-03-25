@@ -236,7 +236,7 @@ void mpoly_gcd_info_measure_hensel(
     mpoly_gcd_info_t I,
     slong Alength,
     slong Blength,
-    const mpoly_ctx_t mctx)
+    const mpoly_ctx_t FLINT_UNUSED(mctx))
 {
     slong i, k;
     slong m = I->mvars;
@@ -321,7 +321,7 @@ void mpoly_gcd_info_measure_brown(
     mpoly_gcd_info_t I,
     slong Alength,
     slong Blength,
-    const mpoly_ctx_t mctx)
+    const mpoly_ctx_t FLINT_UNUSED(mctx))
 {
     slong i, k;
     slong m = I->mvars;
@@ -397,7 +397,7 @@ void mpoly_gcd_info_measure_bma(
     mpoly_gcd_info_t I,
     slong Alength,
     slong Blength,
-    const mpoly_ctx_t mctx)
+    const mpoly_ctx_t FLINT_UNUSED(mctx))
 {
     slong i, j, k;
     slong m = I->mvars;
@@ -555,9 +555,9 @@ void mpoly_gcd_info_measure_bma(
 
 void mpoly_gcd_info_measure_zippel(
     mpoly_gcd_info_t I,
-    slong Alength,
-    slong Blength,
-    const mpoly_ctx_t mctx)
+    slong FLINT_UNUSED(Alength),
+    slong FLINT_UNUSED(Blength),
+    const mpoly_ctx_t FLINT_UNUSED(mctx))
 {
     slong i, j, k;
     slong m = I->mvars;
@@ -575,15 +575,15 @@ void mpoly_gcd_info_measure_zippel(
         main_var = 0;
         j = I->zippel_perm[main_var];
         count = FLINT_MIN(I->Atail_count[j], I->Alead_count[j]);
-        count = FLINT_MIN(count, I->Btail_count[j]);
-        count = FLINT_MIN(count, I->Blead_count[j]);
+        count = FLINT_MIN(count, (ulong) I->Btail_count[j]);
+        count = FLINT_MIN(count, (ulong) I->Blead_count[j]);
         deg = FLINT_MAX(I->Adeflate_deg[j], I->Bdeflate_deg[j]);
         for (i = 1; i < m; i++)
         {
             j = perm[i];
             new_count = FLINT_MIN(I->Atail_count[j], I->Alead_count[j]);
-            new_count = FLINT_MIN(new_count, I->Btail_count[j]);
-            new_count = FLINT_MIN(new_count, I->Blead_count[j]);
+            new_count = FLINT_MIN(new_count, (ulong) I->Btail_count[j]);
+            new_count = FLINT_MIN(new_count, (ulong) I->Blead_count[j]);
             new_deg = FLINT_MAX(I->Adeflate_deg[j], I->Bdeflate_deg[j]);
             if (new_count < count || (new_count == count && new_deg < deg))
             {
@@ -634,9 +634,9 @@ void mpoly_gcd_info_measure_zippel(
 
 void mpoly_gcd_info_measure_zippel2(
     mpoly_gcd_info_t I,
-    slong Alength,
-    slong Blength,
-    const mpoly_ctx_t mctx)
+    slong FLINT_UNUSED(Alength),
+    slong FLINT_UNUSED(Blength),
+    const mpoly_ctx_t FLINT_UNUSED(mctx))
 {
     slong i, j, k;
     slong m = I->mvars;

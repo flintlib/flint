@@ -30,7 +30,7 @@ typedef fmpz_poly_t fmpz_list_t;
     Map b via the projection.
 */
 static void map_down(fmpz_mod_poly_t a, const fmpz_mod_ctx_t ctxa,
-               const fmpz_mod_poly_t b, const fmpz_mod_ctx_t ctxb)
+               const fmpz_mod_poly_t b, const fmpz_mod_ctx_t FLINT_UNUSED(ctxb))
 {
     slong i;
 

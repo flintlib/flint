@@ -12,7 +12,7 @@
 #include "fmpz_poly.h"
 #include "fq.h"
 
-void fq_init(fq_t rop, const fq_ctx_t ctx)
+void fq_init(fq_t rop, const fq_ctx_t FLINT_UNUSED(ctx))
 {
     fmpz_poly_init(rop);
 }

@@ -17,7 +17,7 @@
 
 void
 fmpz_mod_poly_factor_pow(fmpz_mod_poly_factor_t fac, slong exp,
-                                                      const fmpz_mod_ctx_t ctx)
+                                                      const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
 {
     slong i;
 

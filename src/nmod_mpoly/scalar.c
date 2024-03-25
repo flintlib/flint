@@ -141,7 +141,8 @@ void nmod_mpoly_scalar_addmul_ui(
     mp_limb_t d,
     const nmod_mpoly_ctx_t ctx)
 {
-    slong Abits, N;
+    ulong Abits;
+    slong N;
     ulong * Bexps = B->exps, * Cexps = C->exps;
     ulong * cmpmask;
     int freeBexps = 0, freeCexps = 0;

@@ -455,7 +455,7 @@ void _fmpz_mpoly_to_fmpz_array(fmpz * p, const fmpz * coeffs,
    to be zero on input. The quotient are appended to the existing terms in
    that polys.
 */
-slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
+static slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
                                            slong * alloc, slong len1,
                       const fmpz * poly2, const ulong * exp2, slong len2,
                       const fmpz * poly3, const ulong * exp3, slong len3,
@@ -476,7 +476,7 @@ slong _fmpz_mpoly_divides_array_tight(fmpz ** poly1, ulong ** exp1,
    TMP_START;
 
    /* check there are at least as many zero exponents in dividend as divisor */
-   if (exp2[len2 - 1] < min3)
+   if (exp2[len2 - 1] < (ulong) min3)
       goto cleanup; /* not an exact quotient */
 
    prods = (slong *) TMP_ALLOC((num + 1)*sizeof(slong));
@@ -781,7 +781,7 @@ cleanup:
    the length of its output if the quotient is exact, or zero if not. It is
    assumed that poly2 is not zero.
 */
-slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
+static slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
          slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2,
                         const fmpz * poly3, const ulong * exp3, slong len3,
                                           slong * mults, slong num, slong bits)
@@ -873,7 +873,7 @@ slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
 
       for (j = 0; j < n3[i]; j++)
       {
-         if (e3[i3[i] + j] > max_exp)
+         if (e3[i3[i] + j] > (ulong) max_exp)
             max_exp = e3[i3[i] + j];
       }
 

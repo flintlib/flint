@@ -13,7 +13,7 @@
 #include "fq_nmod.h"
 
 char *
-fq_nmod_get_str(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
+fq_nmod_get_str(const fq_nmod_t op, const fq_nmod_ctx_t FLINT_UNUSED(ctx))
 {
     return nmod_poly_get_str(op);
 }

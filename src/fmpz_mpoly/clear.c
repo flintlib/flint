@@ -12,7 +12,7 @@
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 
-void fmpz_mpoly_clear(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_clear(fmpz_mpoly_t poly, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     slong i;
 

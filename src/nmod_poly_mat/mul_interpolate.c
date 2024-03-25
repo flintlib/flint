@@ -48,7 +48,7 @@ nmod_poly_mat_mul_interpolate(nmod_poly_mat_t C, const nmod_poly_mat_t A,
     len = A_len + B_len - 1;
     nmod_init(&mod, nmod_poly_mat_modulus(A));
 
-    if (mod.n < len)
+    if (mod.n < (ulong) len)
     {
         flint_throw(FLINT_ERROR, "(nmod_poly_mat_mul_interpolate): Characteristic is too small.\n");
     }

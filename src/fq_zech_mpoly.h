@@ -185,7 +185,7 @@ void fq_zech_mpoly_clear(fq_zech_mpoly_t A,
 
 FQ_ZECH_MPOLY_INLINE
 void _fq_zech_mpoly_set_length(fq_zech_mpoly_t A, slong newlen,
-                                                 const fq_zech_mpoly_ctx_t ctx)
+                                                 const fq_zech_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_ASSERT(newlen <= A->alloc);
     A->length = newlen;
@@ -193,7 +193,7 @@ void _fq_zech_mpoly_set_length(fq_zech_mpoly_t A, slong newlen,
 
 FQ_ZECH_MPOLY_INLINE
 void fq_zech_mpoly_truncate(fq_zech_mpoly_t A, slong newlen,
-                                                 const fq_zech_mpoly_ctx_t ctx)
+                                                 const fq_zech_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     if (A->length > newlen)
     {
@@ -233,7 +233,7 @@ int fq_zech_mpoly_equal(const fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
 
 FQ_ZECH_MPOLY_INLINE
 void fq_zech_mpoly_swap(fq_zech_mpoly_t A, fq_zech_mpoly_t B,
-                                                 const fq_zech_mpoly_ctx_t ctx)
+                                                 const fq_zech_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_SWAP(fq_zech_mpoly_struct, *A, *B);
 }
@@ -272,7 +272,7 @@ void fq_zech_mpoly_one(fq_zech_mpoly_t A, const fq_zech_mpoly_ctx_t ctx)
 }
 
 FQ_ZECH_MPOLY_INLINE
-int fq_zech_mpoly_is_zero(const fq_zech_mpoly_t A, const fq_zech_mpoly_ctx_t ctx)
+int fq_zech_mpoly_is_zero(const fq_zech_mpoly_t A, const fq_zech_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
    return A->length == 0;
 }
@@ -331,7 +331,7 @@ void fq_zech_mpoly_get_coeff_vars_ui(fq_zech_mpoly_t C,
                                   slong length, const fq_zech_mpoly_ctx_t ctx);
 
 FQ_ZECH_MPOLY_INLINE fq_zech_struct * fq_zech_mpoly_leadcoeff(
-                        const fq_zech_mpoly_t A, const fq_zech_mpoly_ctx_t ctx)
+                        const fq_zech_mpoly_t A, const fq_zech_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_ASSERT(A->length > 0);
     return A->coeffs + 0;
@@ -350,7 +350,7 @@ int fq_zech_mpoly_is_canonical(const fq_zech_mpoly_t A,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
 FQ_ZECH_MPOLY_INLINE
-slong fq_zech_mpoly_length(const fq_zech_mpoly_t A, const fq_zech_mpoly_ctx_t ctx)
+slong fq_zech_mpoly_length(const fq_zech_mpoly_t A, const fq_zech_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     return A->length;
 }
@@ -651,7 +651,7 @@ void fq_zech_mpoly_from_univar(fq_zech_mpoly_t A,
 
 FQ_ZECH_MPOLY_INLINE
 void fq_zech_mpoly_univar_swap(fq_zech_mpoly_univar_t A,
-                       fq_zech_mpoly_univar_t B, const fq_zech_mpoly_ctx_t ctx)
+                       fq_zech_mpoly_univar_t B, const fq_zech_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_SWAP(fq_zech_mpoly_univar_struct, *A, *B);
 }
@@ -660,7 +660,7 @@ int fq_zech_mpoly_univar_degree_fits_si(const fq_zech_mpoly_univar_t A, const fq
 
 FQ_ZECH_MPOLY_INLINE
 slong fq_zech_mpoly_univar_length(const fq_zech_mpoly_univar_t A,
-                                                 const fq_zech_mpoly_ctx_t ctx)
+                                                 const fq_zech_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     return A->length;
 }

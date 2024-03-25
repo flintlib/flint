@@ -18,7 +18,7 @@ void nmod_mpoly_get_term_monomial(nmod_mpoly_t M, const nmod_mpoly_t A,
     flint_bitcnt_t bits = A->bits;
     slong N = mpoly_words_per_exp(bits, ctx->minfo);
 
-    if (i >= (ulong) A->length)
+    if (i >= A->length)
     {
         flint_throw(FLINT_ERROR, "nmod_mpoly_get_term_monomial: index out of range");
     }

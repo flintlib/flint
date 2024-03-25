@@ -104,7 +104,7 @@ int _fmpz_mpoly_compose_fmpz_poly_sp(fmpz_poly_t A, const fmpz_mpoly_t B,
         flint_bitcnt_t varibits = FLINT_BIT_COUNT(degrees[i]);
 
         mpoly_gen_offset_shift_sp(&off, &shift, i, bits, ctx->minfo);
-        for (j = 0; j < varibits; j++)
+        for (j = 0; (flint_bitcnt_t) j < varibits; j++)
         {
             offs[k] = off;
             masks[k] = UWORD(1) << (shift + j);

@@ -162,8 +162,8 @@ continue_outer_sp:;
         {
             offset = mpoly_gen_offset_mp(vars[i], A->bits, ctx->minfo);
             minoffset = FLINT_MIN(minoffset, offset);
-            maxoffset = FLINT_MAX(maxoffset, offset + wpf - 1);
-            for (j = 0; j < wpf; j++)
+            maxoffset = FLINT_MAX(maxoffset, (slong) (offset + wpf - 1));
+            for (j = 0; (ulong) j < wpf; j++)
                 tmask[offset + j] = -UWORD(1);
         }
         FLINT_ASSERT(minoffset < N);

@@ -72,7 +72,7 @@ int fmpz_mod_poly_is_irreducible_ddf(const fmpz_mod_poly_t poly,
     fmpz_mod_poly_powmod_x_fmpz_preinv(h[1], p, v, vinv, ctx);
     if (fmpz_sizeinbase(p, 2) > ((n_sqrt(v->length - 1) + 1) * 3) / 4)
     {
-        for (i= 1; i < FLINT_BIT_COUNT (l); i++)
+        for (i= 1; i < (slong) FLINT_BIT_COUNT (l); i++)
             fmpz_mod_poly_compose_mod_brent_kung_vec_preinv (*(h + 1 +
                                                              (1 << (i - 1))),
                                                              *(h + 1),

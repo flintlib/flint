@@ -56,7 +56,7 @@ void mpoly_ctx_init_rand(mpoly_ctx_t mctx, flint_rand_t state, slong max_nvars);
 
 void mpoly_monomial_randbits_fmpz(fmpz * exp, flint_rand_t state, flint_bitcnt_t exp_bits, const mpoly_ctx_t mctx);
 
-void mpoly_ctx_clear(mpoly_ctx_t mctx);
+void mpoly_ctx_clear(mpoly_ctx_t FLINT_UNUSED(mctx));
 
 /*
     number of words used by an exponent vector packed into "bits" bits:
@@ -391,7 +391,8 @@ FLINT_FORCE_INLINE
 void mpoly_monomial_max(ulong * exp1, const ulong * exp2, const ulong * exp3,
                                       flint_bitcnt_t bits, slong N, ulong mask)
 {
-    ulong i, s, m;
+    ulong s, m;
+    slong i;
     for (i = 0; i < N; i++)
     {
         s = mask + exp2[i] - exp3[i];
@@ -417,7 +418,8 @@ FLINT_FORCE_INLINE
 void mpoly_monomial_min(ulong * exp1, const ulong * exp2, const ulong * exp3,
                                       flint_bitcnt_t bits, slong N, ulong mask)
 {
-    ulong i, s, m;
+    ulong s, m;
+    slong i;
     for (i = 0; i < N; i++)
     {
         s = mask + exp2[i] - exp3[i];
@@ -431,11 +433,12 @@ FLINT_FORCE_INLINE
 void mpoly_monomial_max_mp(ulong * exp1, const ulong * exp2, const ulong * exp3,
                                                   flint_bitcnt_t bits, slong N)
 {
-    slong i, j;
+    slong i;
+    flint_bitcnt_t j;
     for (i = 0; i < N; i += bits/FLINT_BITS)
     {
         const ulong * t = exp2;
-        for (j = bits/FLINT_BITS - 1; j >= 0; j--)
+        for (j = bits/FLINT_BITS - 1; (slong) j >= 0; j--)
         {
             if (exp3[i + j] != exp2[i + j])
             {
@@ -455,11 +458,12 @@ FLINT_FORCE_INLINE
 void mpoly_monomial_min_mp(ulong * exp1, const ulong * exp2, const ulong * exp3,
                                                      flint_bitcnt_t bits, slong N)
 {
-    slong i, j;
+    slong i;
+    flint_bitcnt_t j;
     for (i = 0; i < N; i += bits/FLINT_BITS)
     {
         const ulong * t = exp2;
-        for (j = bits/FLINT_BITS - 1; j >= 0; j--)
+        for (j = bits/FLINT_BITS - 1; (slong) j >= 0; j--)
         {
             if (exp3[i + j] != exp2[i + j])
             {
@@ -985,7 +989,7 @@ void mpoly_gen_fields_ui(ulong * exp, slong var,
 void mpoly_gen_fields_fmpz(fmpz * exp, slong var,
                                                        const mpoly_ctx_t mctx);
 
-flint_bitcnt_t mpoly_gen_bits_required(slong var, const mpoly_ctx_t mctx);
+flint_bitcnt_t mpoly_gen_bits_required(slong FLINT_UNUSED(var), const mpoly_ctx_t FLINT_UNUSED(mctx));
 
 /* return the index in the fields where the generator of index v is stored */
 FLINT_FORCE_INLINE slong mpoly_gen_index(slong v, const mpoly_ctx_t mctx)
@@ -1035,8 +1039,8 @@ flint_bitcnt_t mpoly_exp_bits_required_pfmpz(fmpz * const * user_exp,
                                                        const mpoly_ctx_t mctx);
 
 FLINT_FORCE_INLINE
-flint_bitcnt_t mpoly_gen_pow_exp_bits_required(slong v, ulong e,
-                                                        const mpoly_ctx_t mctx)
+flint_bitcnt_t mpoly_gen_pow_exp_bits_required(slong FLINT_UNUSED(v), ulong e,
+                                                        const mpoly_ctx_t FLINT_UNUSED(mctx))
 {
     return 1 + FLINT_BIT_COUNT(e); /* only lex and deg supported */
 }
@@ -1338,19 +1342,19 @@ slong mpoly_gcd_info_get_brown_upper_limit(const mpoly_gcd_info_t I,
                                                        slong var, slong bound);
 
 void mpoly_gcd_info_measure_hensel(mpoly_gcd_info_t I,
-                         slong Alength, slong Blength, const mpoly_ctx_t mctx);
+                         slong Alength, slong Blength, const mpoly_ctx_t FLINT_UNUSED(mctx));
 
 void mpoly_gcd_info_measure_brown(mpoly_gcd_info_t I,
-                         slong Alength, slong Blength, const mpoly_ctx_t mctx);
+                         slong Alength, slong Blength, const mpoly_ctx_t FLINT_UNUSED(mctx));
 
 void mpoly_gcd_info_measure_bma(mpoly_gcd_info_t I,
-                         slong Alength, slong Blength, const mpoly_ctx_t mctx);
+                         slong Alength, slong Blength, const mpoly_ctx_t FLINT_UNUSED(mctx));
 
 void mpoly_gcd_info_measure_zippel(mpoly_gcd_info_t I,
-                         slong Alength, slong Blength, const mpoly_ctx_t mctx);
+                         slong FLINT_UNUSED(Alength), slong FLINT_UNUSED(Blength), const mpoly_ctx_t FLINT_UNUSED(mctx));
 
 void mpoly_gcd_info_measure_zippel2(mpoly_gcd_info_t I,
-                         slong Alength, slong Blength, const mpoly_ctx_t mctx);
+                         slong FLINT_UNUSED(Alength), slong FLINT_UNUSED(Blength), const mpoly_ctx_t FLINT_UNUSED(mctx));
 
 int mpoly_monomial_cofactors(fmpz * Abarexps, fmpz * Bbarexps,
                                     const ulong * Aexps, flint_bitcnt_t Abits,
@@ -1499,7 +1503,7 @@ int mpoly_parse_parse(mpoly_parse_t E, void * res,
 */
 MPOLY_INLINE
 void mpoly_main_variable_terms1(slong * i1, slong * n1, const ulong * exp1,
-                          slong l1, slong len1, slong k, slong num, slong bits)
+                          slong l1, slong len1, slong k, slong FLINT_UNUSED(num), slong bits)
 {
    slong i, j = 0;
    slong shift = bits*(k - 1);

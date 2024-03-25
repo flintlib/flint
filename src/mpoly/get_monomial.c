@@ -147,7 +147,7 @@ void mpoly_get_monomial_ui_mp(ulong * user_exps, const ulong * poly_exps,
         *exp1 = *exp2;
         exp1 += dir;
 
-        for (j = 1; j < words_per_field; j++)
+        for (j = 1; (ulong) j < words_per_field; j++)
             check_mask |= exp2[j];
 
         exp2 += words_per_field;
@@ -187,7 +187,7 @@ void mpoly_get_monomial_si_mp(slong * user_exps, const ulong * poly_exps,
         exp1 += dir;
 
         check_mask |= FLINT_SIGN_EXT(exp2[0]);
-        for (j = 1; j < words_per_field; j++)
+        for (j = 1; (ulong) j < words_per_field; j++)
             check_mask |= exp2[j];
 
         exp2 += words_per_field;

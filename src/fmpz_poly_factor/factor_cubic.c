@@ -397,7 +397,7 @@ static void _fmpz_map_from_ZZ2(fmpz_t x, slong prec)
 {
     FLINT_ASSERT(prec > 0);
     fmpz_fdiv_r_2exp(x, x, prec);
-    if (fmpz_bits(x) >= prec)
+    if ((slong) fmpz_bits(x) >= prec)
     {
         fmpz_neg(x, x);
         fmpz_fdiv_r_2exp(x, x, prec);
@@ -715,7 +715,7 @@ try_again:
             goto cleanup;
         }
 
-        if (sqrt_prec + alpha2 < prec)
+        if (sqrt_prec + (slong) alpha2 < prec)
         {
             cubic_prec = binary_cubic_lift_continue(r, s, inv, ta, tb,
                                                  2*beta - 3*alpha, cubic_prec);

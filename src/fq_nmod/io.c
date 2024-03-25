@@ -70,7 +70,7 @@ int fq_nmod_ctx_fprint(FILE * file, const fq_nmod_ctx_t ctx)
 
 void fq_nmod_ctx_print(const fq_nmod_ctx_t ctx) { fq_nmod_ctx_fprint(stdout, ctx); }
 
-int fq_nmod_fprint(FILE * file, const fq_nmod_t op, const fq_nmod_ctx_t ctx) { return nmod_poly_fprint(file, op); }
-void fq_nmod_print(const fq_nmod_t op, const fq_nmod_ctx_t ctx) { nmod_poly_print(op); }
+int fq_nmod_fprint(FILE * file, const fq_nmod_t op, const fq_nmod_ctx_t FLINT_UNUSED(ctx)) { return nmod_poly_fprint(file, op); }
+void fq_nmod_print(const fq_nmod_t op, const fq_nmod_ctx_t FLINT_UNUSED(ctx)) { nmod_poly_print(op); }
 int fq_nmod_fprint_pretty(FILE * file, const fq_nmod_t op, const fq_nmod_ctx_t ctx) { return nmod_poly_fprint_pretty(file, op, ctx->var); }
 void fq_nmod_print_pretty(const fq_nmod_t op, const fq_nmod_ctx_t ctx) { nmod_poly_print_pretty(op, ctx->var); }

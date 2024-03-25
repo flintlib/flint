@@ -12,7 +12,7 @@
 #include "nmod_poly.h"
 #include "fq_nmod.h"
 
-void fq_nmod_neg(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
+void fq_nmod_neg(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t FLINT_UNUSED(ctx))
 {
     slong len = op->length;
 
