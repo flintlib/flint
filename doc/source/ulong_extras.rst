@@ -1075,6 +1075,12 @@ Factorisation
 
     Initializes factors.
 
+.. function:: ulong n_factor_evaluate(const n_factor_t * factors)
+
+    Returns the evaluation of ``factors``,
+    i.e. `p_{1}^{e_{1}} \cdots p_{n}^{e_{n}}` assuming that it fits in a limb.
+    In case the evaluation does not fit in a limb, it returns `0`.
+
 .. function:: int n_remove(ulong * n, ulong p)
 
     Removes the highest possible power of `p` from `n`, replacing
