@@ -58,6 +58,14 @@ int _gr_vec_print(gr_srcptr vec, slong len, gr_ctx_t ctx);
 int gr_vec_print(const gr_vec_t vec, gr_ctx_t ctx);
 
 GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_zero(gr_ptr vec, slong len, gr_ctx_t ctx) { return GR_VEC_CONSTANT_OP(ctx, VEC_ZERO)(vec, len, ctx); }
+GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_one(gr_ptr vec, slong pos, slong len, gr_ctx_t ctx)
+{
+    int status;
+    if (pos < 0 || len < 0 || pos >= len)
+        return GR_DOMAIN;
+    status = GR_VEC_CONSTANT_OP(ctx, VEC_ZERO)(vec, len, ctx);
+    return status | gr_one(GR_ENTRY(vec, pos, ctx->sizeof_elem), ctx);
+}
 GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_set(gr_ptr res, gr_srcptr src, slong len, gr_ctx_t ctx) { return GR_VEC_OP(ctx, VEC_SET)(res, src, len, ctx); }
 GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_neg(gr_ptr res, gr_srcptr src, slong len, gr_ctx_t ctx) { return GR_VEC_OP(ctx, VEC_NEG)(res, src, len, ctx); }
 

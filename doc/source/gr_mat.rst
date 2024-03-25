@@ -199,17 +199,23 @@ Basic row, column and entry operations
     ``c`` is the number of columns of ``mat``. If ``perm`` is non-``NULL``, the
     permutation of the columns will also be applied to ``perm``.
 
-.. function:: truth_t gr_mat_is_empty(const gr_mat_t mat, gr_ctx_t ctx)
+.. macro:: gr_mat_is_empty(mat, ctx)
 
     Returns whether *mat* is an empty matrix, having either zero
     rows or zero column. This predicate is always decidable (even if
     the underlying ring is not computable), returning
     ``T_TRUE`` or ``T_FALSE``.
 
-.. function:: truth_t gr_mat_is_square(const gr_mat_t mat, gr_ctx_t ctx)
+.. macro:: gr_mat_is_square(mat, ctx)
 
     Returns whether *mat* is a square matrix, having the same number
     of rows as columns (not the same thing as being a perfect square!).
+    This predicate is always decidable (even if the underlying ring
+    is not computable), returning ``T_TRUE`` or ``T_FALSE``.
+
+.. macro:: gr_mat_is_compatible(mat1, mat2, ctx)
+
+    Returns whether *mat1* and *mat2* have the same dimensions.
     This predicate is always decidable (even if the underlying ring
     is not computable), returning ``T_TRUE`` or ``T_FALSE``.
 
