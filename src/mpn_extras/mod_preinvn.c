@@ -68,7 +68,7 @@ void flint_mpn_mod_preinvn(mp_ptr rp, mp_srcptr ap, mp_size_t m,
       if (rp != ap)
          mpn_copyi(rp, ap, size);
 
-      flint_mpn_mul(t, dinv, n, rp + n, size);
+      flint_mpn_mul_or_mulhigh_n(t + n - size, dinv + n - size, rp + n, size);
       cy = mpn_add_n(t + 2*n, t + n, rp + n, size);
 
       flint_mpn_mul(t, d, n, t + 2*n, size);
