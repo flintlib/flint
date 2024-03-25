@@ -5,7 +5,7 @@ on:
   push:
 
 env:
-  GLOBAL_MULTIPLIER: 0.1
+  GLOBAL_MULTIPLIER: 1
 
 concurrency:
   # group by workflow and ref; the last slightly strange component ensures that for pull
@@ -262,8 +262,6 @@ jobs:
     env:
       FLINT_TEST_MULTIPLIER: "2"
 
-    if: false # temporary disabled
-
     steps:
       - name: "Rescale multiplier"
         run: |
@@ -390,15 +388,7 @@ jobs:
       CC: "gcc"
       FLINT_TEST_MULTIPLIER: "0.5"
 
-    if: false # temporary disabled
-
     steps:
-      - name: "Rescale multiplier"
-        run: |
-          FLINT_TEST_MULTIPLIER=$(echo "${FLINT_TEST_MULTIPLIER} * ${GLOBAL_MULTIPLIER}" | bc)
-          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}"
-          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}" >> $GITHUB_ENV
-
       - uses: actions/checkout@v4
 
       - name: "Setup MinGW"
@@ -406,7 +396,13 @@ jobs:
         with:
           msystem: mingw64
           update: true
-          install: mingw-w64-x86_64-gcc mingw-w64-x86_64-autotools
+          install: bc mingw-w64-x86_64-gcc mingw-w64-x86_64-autotools
+
+      - name: "Rescale multiplier"
+        run: |
+          FLINT_TEST_MULTIPLIER=$(echo "${FLINT_TEST_MULTIPLIER} * ${GLOBAL_MULTIPLIER}" | bc)
+          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}"
+          echo "FLINT_TEST_MULTIPLIER=${FLINT_TEST_MULTIPLIER}" >> $GITHUB_ENV
 
       - name: "Setup"
         run: |
@@ -446,7 +442,7 @@ jobs:
     runs-on: windows-latest
     env:
       FLINT_TEST_MULTIPLIER: 1
-      TIMEOUT: 450
+      TIMEOUT: 150
 
     steps:
       - name: "Rescale multiplier (powershell)"
@@ -585,8 +581,6 @@ jobs:
     env:
       LOCAL: ${{ github.workspace }}/local
       CC: "gcc"
-
-    if: false # temporarily disabled
 
     steps:
       - uses: actions/checkout@v4

@@ -31,6 +31,7 @@
 #include "t-divrem2_preinv.c"
 #include "t-euler_phi.c"
 #include "t-factor.c"
+#include "t-factor_evaluate.c"
 #include "t-factor_ecm.c"
 #include "t-factorial_fast_mod2_preinv.c"
 #include "t-factorial_mod2_preinv.c"
@@ -128,6 +129,7 @@ test_struct tests[] =
     TEST_FUNCTION(n_divrem2_preinv),
     TEST_FUNCTION(n_euler_phi),
     TEST_FUNCTION(n_factor),
+    TEST_FUNCTION(n_factor_evaluate),
     TEST_FUNCTION(n_factor_ecm),
     TEST_FUNCTION(n_factorial_fast_mod2_preinv),
     TEST_FUNCTION(n_factorial_mod2_preinv),
