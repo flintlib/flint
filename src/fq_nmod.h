@@ -105,7 +105,7 @@ void fq_nmod_mul_ui(fq_nmod_t rop,
 
 void fq_nmod_sqr(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 
-void fq_nmod_inv(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t ctx);
+void fq_nmod_inv(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 
 void _fq_nmod_pow(mp_limb_t *rop, const mp_limb_t *op,
                            slong len, const fmpz_t e, const fq_nmod_ctx_t ctx);
@@ -118,7 +118,7 @@ void fq_nmod_pow_ui(fq_nmod_t rop,
 
 /* Roots ********************************************************************/
 
-int fq_nmod_sqrt(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx);
+int fq_nmod_sqrt(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t ctx);
 
 void fq_nmod_pth_root(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t ctx);
 

@@ -269,7 +269,7 @@ ca_field_ptr _ca_ctx_get_field_fxy(ca_ctx_t ctx, calcium_func_code func, const c
 void ca_init(ca_t x, ca_ctx_t ctx);
 void ca_clear(ca_t x, ca_ctx_t ctx);
 void ca_swap(ca_t x, ca_t y, ca_ctx_t ctx);
-void _ca_make_field_element(ca_t x, ca_field_srcptr field, ca_ctx_t ctx);
+void _ca_make_field_element(ca_t x, ca_field_srcptr new_index, ca_ctx_t ctx);
 
 CA_INLINE void
 _ca_make_fmpq(ca_t x, ca_ctx_t ctx)
@@ -297,31 +297,31 @@ _ca_function_fxy(ca_t res, calcium_func_code func, const ca_t x, const ca_t y, c
 void ca_set(ca_t res, const ca_t x, ca_ctx_t ctx);
 void ca_transfer(ca_t res, ca_ctx_t res_ctx, const ca_t src, ca_ctx_t src_ctx);
 
-void ca_zero(ca_t x, ca_ctx_t ctx);
-void ca_one(ca_t x, ca_ctx_t ctx);
-void ca_neg_one(ca_t x, ca_ctx_t ctx);
+void ca_zero(ca_t res, ca_ctx_t ctx);
+void ca_one(ca_t res, ca_ctx_t ctx);
+void ca_neg_one(ca_t res, ca_ctx_t ctx);
 
-void ca_set_si(ca_t x, slong v, ca_ctx_t ctx);
-void ca_set_ui(ca_t x, ulong v, ca_ctx_t ctx);
-void ca_set_fmpz(ca_t x, const fmpz_t v, ca_ctx_t ctx);
-void ca_set_fmpq(ca_t x, const fmpq_t v, ca_ctx_t ctx);
+void ca_set_si(ca_t res, slong v, ca_ctx_t ctx);
+void ca_set_ui(ca_t res, ulong v, ca_ctx_t ctx);
+void ca_set_fmpz(ca_t res, const fmpz_t v, ca_ctx_t ctx);
+void ca_set_fmpq(ca_t res, const fmpq_t v, ca_ctx_t ctx);
 void ca_set_d(ca_t res, double x, ca_ctx_t ctx);
 void ca_set_d_d(ca_t res, double x, double y, ca_ctx_t ctx);
 
-void ca_i(ca_t x, ca_ctx_t ctx);
-void ca_neg_i(ca_t x, ca_ctx_t ctx);
+void ca_i(ca_t res, ca_ctx_t ctx);
+void ca_neg_i(ca_t res, ca_ctx_t ctx);
 void ca_pi(ca_t res, ca_ctx_t ctx);
 void ca_pi_i(ca_t res, ca_ctx_t ctx);
 void ca_euler(ca_t res, ca_ctx_t ctx);
 
-void ca_unknown(ca_t x, ca_ctx_t ctx);
+void ca_unknown(ca_t res, ca_ctx_t ctx);
 
-void ca_undefined(ca_t x, ca_ctx_t ctx);
-void ca_uinf(ca_t x, ca_ctx_t ctx);
-void ca_pos_inf(ca_t x, ca_ctx_t ctx);
-void ca_neg_inf(ca_t x, ca_ctx_t ctx);
-void ca_pos_i_inf(ca_t x, ca_ctx_t ctx);
-void ca_neg_i_inf(ca_t x, ca_ctx_t ctx);
+void ca_undefined(ca_t res, ca_ctx_t ctx);
+void ca_uinf(ca_t res, ca_ctx_t ctx);
+void ca_pos_inf(ca_t res, ca_ctx_t ctx);
+void ca_neg_inf(ca_t res, ca_ctx_t ctx);
+void ca_pos_i_inf(ca_t res, ca_ctx_t ctx);
+void ca_neg_i_inf(ca_t res, ca_ctx_t ctx);
 
 void ca_set_qqbar(ca_t res, const qqbar_t x, ca_ctx_t ctx);
 int ca_can_evaluate_qqbar(const ca_t x, ca_ctx_t ctx);

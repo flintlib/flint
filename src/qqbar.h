@@ -302,14 +302,14 @@ qqbar_sqr(qqbar_t res, const qqbar_t x)
 
 void qqbar_inv(qqbar_t res, const qqbar_t x);
 
-void qqbar_mul_2exp_si(qqbar_t res, const qqbar_t x, slong exp);
+void qqbar_mul_2exp_si(qqbar_t res, const qqbar_t x, slong e);
 
-void qqbar_pow_ui(qqbar_t res, const qqbar_t x, ulong e);
+void qqbar_pow_ui(qqbar_t res, const qqbar_t x, ulong n);
 void qqbar_pow_si(qqbar_t res, const qqbar_t x, slong n);
 void qqbar_pow_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t n);
 void qqbar_pow_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t n);
 
-int qqbar_pow(qqbar_t res, const qqbar_t x, const qqbar_t e);
+int qqbar_pow(qqbar_t res, const qqbar_t x, const qqbar_t y);
 
 /* Check if x = (p/q)^(1/n), p > 0 */
 int _qqbar_fast_detect_simple_principal_surd(const qqbar_t x);
@@ -336,8 +336,8 @@ qqbar_rsqrt(qqbar_t res, const qqbar_t x)
     qqbar_inv(res, res);
 }
 
-void qqbar_fmpq_root_ui(qqbar_t res, const fmpq_t x, ulong b);
-void qqbar_fmpq_pow_si_ui(qqbar_t res, const fmpq_t x, slong a, ulong b);
+void qqbar_fmpq_root_ui(qqbar_t res, const fmpq_t x, ulong n);
+void qqbar_fmpq_pow_si_ui(qqbar_t res, const fmpq_t x, slong m, ulong n);
 
 /* Numerical enclosure */
 
@@ -365,9 +365,9 @@ void _qqbar_evaluate_fmpz_poly(qqbar_t res, const fmpz * poly, slong len, const 
 
 void qqbar_evaluate_fmpz_poly(qqbar_t res, const fmpz_poly_t poly, const qqbar_t x);
 
-int qqbar_evaluate_fmpz_mpoly_iter(qqbar_t res, const fmpz_mpoly_t f, qqbar_srcptr x, slong deg_limit, slong bits_limit, const fmpz_mpoly_ctx_t ctx);
-int qqbar_evaluate_fmpz_mpoly_horner(qqbar_t res, const fmpz_mpoly_t f, qqbar_srcptr x, slong deg_limit, slong bits_limit, const fmpz_mpoly_ctx_t ctx);
-int qqbar_evaluate_fmpz_mpoly(qqbar_t res, const fmpz_mpoly_t f, qqbar_srcptr x, slong deg_limit, slong bits_limit, const fmpz_mpoly_ctx_t ctx);
+int qqbar_evaluate_fmpz_mpoly_iter(qqbar_t res, const fmpz_mpoly_t poly, qqbar_srcptr x, slong deg_limit, slong bits_limit, const fmpz_mpoly_ctx_t ctx);
+int qqbar_evaluate_fmpz_mpoly_horner(qqbar_t res, const fmpz_mpoly_t poly, qqbar_srcptr x, slong deg_limit, slong bits_limit, const fmpz_mpoly_ctx_t ctx);
+int qqbar_evaluate_fmpz_mpoly(qqbar_t res, const fmpz_mpoly_t poly, qqbar_srcptr x, slong deg_limit, slong bits_limit, const fmpz_mpoly_ctx_t ctx);
 
 #define QQBAR_ROOTS_IRREDUCIBLE 1
 #define QQBAR_ROOTS_UNSORTED 2
@@ -422,7 +422,7 @@ int qqbar_express_in_field(fmpq_poly_t res, const qqbar_t alpha, const qqbar_t x
 
 /* Conversions to radicals and expressions */
 
-void qqbar_get_quadratic(fmpz_t res_a, fmpz_t res_b, fmpz_t res_c, fmpz_t res_q, const qqbar_t x, int factoring);
+void qqbar_get_quadratic(fmpz_t a, fmpz_t b, fmpz_t c, fmpz_t q, const qqbar_t x, int factoring);
 
 #ifdef FEXPR_H
 
@@ -463,9 +463,9 @@ void qqbar_binary_op(qqbar_t res, const qqbar_t x, const qqbar_t y, int op);
 
 int _qqbar_validate_uniqueness(acb_t res, const fmpz_poly_t poly, const acb_t z, slong max_prec);
 
-int _qqbar_validate_existence_uniqueness(acb_t res, const fmpz_poly_t poly, const acb_t z, slong prec);
+int _qqbar_validate_existence_uniqueness(acb_t res, const fmpz_poly_t poly, const acb_t z, slong max_prec);
 
-void _qqbar_enclosure_raw(acb_t res, const fmpz_poly_t poly, const acb_t zin, slong prec);
+void _qqbar_enclosure_raw(acb_t res, const fmpz_poly_t poly, const acb_t z, slong prec);
 
 void qqbar_enclosure_raw(acb_t res, const qqbar_t x, slong prec);
 

@@ -80,7 +80,7 @@ mp_limb_t arith_bell_number_nmod(ulong n, nmod_t mod);
 void arith_bell_number_nmod_vec(mp_ptr b, slong n, nmod_t mod);
 void arith_bell_number_nmod_vec_recursive(mp_ptr b, slong n, nmod_t mod);
 int arith_bell_number_nmod_vec_series(mp_ptr b, slong n, nmod_t mod);
-void arith_bell_number_nmod_vec_ogf(mp_ptr res, slong len, nmod_t mod);
+void arith_bell_number_nmod_vec_ogf(mp_ptr b, slong n, nmod_t mod);
 
 
 /* Euler numbers *************************************************************/

@@ -88,13 +88,13 @@ ca_mat_is_square(const ca_mat_t mat)
 void ca_mat_set(ca_mat_t dest, const ca_mat_t src, ca_ctx_t ctx);
 void ca_mat_set_fmpz_mat(ca_mat_t dest, const fmpz_mat_t src, ca_ctx_t ctx);
 void ca_mat_set_fmpq_mat(ca_mat_t dest, const fmpq_mat_t src, ca_ctx_t ctx);
-void ca_mat_set_ca(ca_mat_t y, const ca_t x, ca_ctx_t ctx);
+void ca_mat_set_ca(ca_mat_t mat, const ca_t c, ca_ctx_t ctx);
 
 void ca_mat_transfer(ca_mat_t res, ca_ctx_t res_ctx, const ca_mat_t src, ca_ctx_t src_ctx);
 
 /* Random generation */
 
-void ca_mat_randtest(ca_mat_t mat, flint_rand_t state, slong len, slong bits, ca_ctx_t ctx);
+void ca_mat_randtest(ca_mat_t mat, flint_rand_t state, slong depth, slong bits, ca_ctx_t ctx);
 void ca_mat_randtest_rational(ca_mat_t mat, flint_rand_t state, slong bits, ca_ctx_t ctx);
 void ca_mat_randops(ca_mat_t mat, flint_rand_t state, slong count, ca_ctx_t ctx);
 
@@ -111,7 +111,7 @@ void ca_mat_ones(ca_mat_t mat, ca_ctx_t ctx);
 void ca_mat_pascal(ca_mat_t mat, int triangular, ca_ctx_t ctx);
 void ca_mat_stirling(ca_mat_t mat, int kind, ca_ctx_t ctx);
 void ca_mat_hilbert(ca_mat_t mat, ca_ctx_t ctx);
-void ca_mat_dft(ca_mat_t res, int type, ca_ctx_t ctx);
+void ca_mat_dft(ca_mat_t mat, int type, ca_ctx_t ctx);
 
 /* Comparisons and properties */
 
@@ -121,25 +121,25 @@ truth_t ca_mat_check_is_one(const ca_mat_t A, ca_ctx_t ctx);
 
 /* Conjugate and transpose */
 
-void ca_mat_transpose(ca_mat_t B, const ca_mat_t A, ca_ctx_t ctx);
-void ca_mat_conj(ca_mat_t B, const ca_mat_t A, ca_ctx_t ctx);
-void ca_mat_conj_transpose(ca_mat_t mat1, const ca_mat_t mat2, ca_ctx_t ctx);
+void ca_mat_transpose(ca_mat_t res, const ca_mat_t A, ca_ctx_t ctx);
+void ca_mat_conj(ca_mat_t res, const ca_mat_t A, ca_ctx_t ctx);
+void ca_mat_conj_transpose(ca_mat_t res, const ca_mat_t A, ca_ctx_t ctx);
 
 /* Arithmetic */
 
-void ca_mat_add_ca(ca_mat_t y, const ca_mat_t a, const ca_t x, ca_ctx_t ctx);
-void ca_mat_sub_ca(ca_mat_t y, const ca_mat_t a, const ca_t x, ca_ctx_t ctx);
-void ca_mat_addmul_ca(ca_mat_t y, const ca_mat_t a, const ca_t x, ca_ctx_t ctx);
-void ca_mat_submul_ca(ca_mat_t y, const ca_mat_t a, const ca_t x, ca_ctx_t ctx);
+void ca_mat_add_ca(ca_mat_t B, const ca_mat_t A, const ca_t c, ca_ctx_t ctx);
+void ca_mat_sub_ca(ca_mat_t B, const ca_mat_t A, const ca_t c, ca_ctx_t ctx);
+void ca_mat_addmul_ca(ca_mat_t B, const ca_mat_t A, const ca_t c, ca_ctx_t ctx);
+void ca_mat_submul_ca(ca_mat_t B, const ca_mat_t A, const ca_t c, ca_ctx_t ctx);
 
-void ca_mat_neg(ca_mat_t dest, const ca_mat_t src, ca_ctx_t ctx);
-void ca_mat_add(ca_mat_t res, const ca_mat_t mat1, const ca_mat_t mat2, ca_ctx_t ctx);
-void ca_mat_sub(ca_mat_t res, const ca_mat_t mat1, const ca_mat_t mat2, ca_ctx_t ctx);
+void ca_mat_neg(ca_mat_t res, const ca_mat_t A, ca_ctx_t ctx);
+void ca_mat_add(ca_mat_t res, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx);
+void ca_mat_sub(ca_mat_t res, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx);
 
-void ca_mat_mul(ca_mat_t C, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx);
+void ca_mat_mul(ca_mat_t res, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx);
 
-void ca_mat_mul_classical(ca_mat_t C, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx);
-void ca_mat_mul_same_nf(ca_mat_t C, const ca_mat_t A, const ca_mat_t B, ca_field_t K, ca_ctx_t ctx);
+void ca_mat_mul_classical(ca_mat_t res, const ca_mat_t A, const ca_mat_t B, ca_ctx_t ctx);
+void ca_mat_mul_same_nf(ca_mat_t res, const ca_mat_t A, const ca_mat_t B, ca_field_t K, ca_ctx_t ctx);
 
 CA_MAT_INLINE void
 ca_mat_mul_si(ca_mat_t B, const ca_mat_t A, slong c, ca_ctx_t ctx)
@@ -231,8 +231,8 @@ void ca_mat_pow_ui_binexp(ca_mat_t B, const ca_mat_t A, ulong exp, ca_ctx_t ctx)
 
 /* Polynomial evaluation */
 
-void _ca_mat_ca_poly_evaluate(ca_mat_t y, ca_srcptr poly, slong len, const ca_mat_t x, ca_ctx_t ctx);
-void ca_mat_ca_poly_evaluate(ca_mat_t res, const ca_poly_t f, const ca_mat_t a, ca_ctx_t ctx);
+void _ca_mat_ca_poly_evaluate(ca_mat_t res, ca_srcptr poly, slong len, const ca_mat_t A, ca_ctx_t ctx);
+void ca_mat_ca_poly_evaluate(ca_mat_t res, const ca_poly_t poly, const ca_mat_t A, ca_ctx_t ctx);
 
 /* Trace */
 
@@ -308,7 +308,7 @@ void ca_mat_adjugate(ca_mat_t adj, ca_t det, const ca_mat_t A, ca_ctx_t ctx);
 void _ca_mat_charpoly_berkowitz(ca_ptr cp, const ca_mat_t mat, ca_ctx_t ctx);
 void ca_mat_charpoly_berkowitz(ca_poly_t cp, const ca_mat_t mat, ca_ctx_t ctx);
 
-int _ca_mat_charpoly_danilevsky(ca_ptr p, const ca_mat_t A, ca_ctx_t ctx);
+int _ca_mat_charpoly_danilevsky(ca_ptr cp, const ca_mat_t mat, ca_ctx_t ctx);
 int ca_mat_charpoly_danilevsky(ca_poly_t cp, const ca_mat_t mat, ca_ctx_t ctx);
 
 void _ca_mat_charpoly(ca_ptr cp, const ca_mat_t mat, ca_ctx_t ctx);
@@ -316,7 +316,7 @@ void ca_mat_charpoly(ca_poly_t cp, const ca_mat_t mat, ca_ctx_t ctx);
 
 
 
-int ca_mat_companion(ca_mat_t A, const ca_poly_t poly, ca_ctx_t ctx);
+int ca_mat_companion(ca_mat_t mat, const ca_poly_t poly, ca_ctx_t ctx);
 
 /* Eigenvalues and eigenvectors */
 

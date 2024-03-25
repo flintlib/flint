@@ -93,7 +93,7 @@ void nmod_mat_randtest(nmod_mat_t mat, flint_rand_t state);
 void nmod_mat_randfull(nmod_mat_t mat, flint_rand_t state);
 int nmod_mat_randpermdiag(nmod_mat_t mat, flint_rand_t state,
                  mp_srcptr diag, slong n);
-void nmod_mat_randrank(nmod_mat_t, flint_rand_t state, slong rank);
+void nmod_mat_randrank(nmod_mat_t mat, flint_rand_t state, slong rank);
 void nmod_mat_randops(nmod_mat_t mat, flint_rand_t state, slong count);
 void nmod_mat_randtril(nmod_mat_t mat, flint_rand_t state, int unit);
 void nmod_mat_randtriu(nmod_mat_t mat, flint_rand_t state, int unit);
@@ -127,14 +127,14 @@ int nmod_mat_is_square(const nmod_mat_t mat)
 }
 
 
-void nmod_mat_set(nmod_mat_t B, const nmod_mat_t A);
+void nmod_mat_set(nmod_mat_t mat, const nmod_mat_t src);
 void nmod_mat_transpose(nmod_mat_t B, const nmod_mat_t A);
 
 /* Addition and subtraction */
 
 void nmod_mat_add(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 void nmod_mat_sub(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
-void nmod_mat_neg(nmod_mat_t B, const nmod_mat_t A);
+void nmod_mat_neg(nmod_mat_t A, const nmod_mat_t B);
 
 /* Matrix-scalar arithmetic */
 
