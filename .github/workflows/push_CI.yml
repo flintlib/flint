@@ -24,14 +24,12 @@ jobs:
     env:
       FLINT_TEST_MULTIPLIER: "0.5"
 
-    if: false # temporarily disabled
-
     steps:
       - uses: actions/checkout@v4
 
       - name: "Run tests on FreeBSD"
         uses: cross-platform-actions/action@v0.22.0
-        timeout-minutes: 30
+        timeout-minutes: 15
         continue-on-error: true
         with:
           operating_system: freebsd
@@ -107,8 +105,6 @@ jobs:
     name: Cygwin GCC (x0.5)
 
     runs-on: windows-latest
-
-    if: false # temporarily disabled
 
     defaults:
       run:
