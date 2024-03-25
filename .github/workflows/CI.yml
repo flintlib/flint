@@ -3,9 +3,6 @@ name: CI
 on:
   pull_request:
   push:
-    branches:
-      - main
-      - flint-*
 
 env:
   GLOBAL_MULTIPLIER: 0.1
