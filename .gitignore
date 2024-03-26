@@ -65,3 +65,4 @@ autom4te.cache/
 config.m4
 src/flint-mparam.h
 .gdb_history
+vgcore.*
