@@ -56,6 +56,7 @@ RM_F:=rm -f
 RM_RF:=rm -rf
 CP:=cp
 CP_A:=cp -a
+GDB:=gdb
 
 STATIC:=@STATIC@
 SHARED:=@SHARED@
@@ -498,6 +499,16 @@ else
 -include $(BUILD_DIR)/test/*.d
 -include $(BUILD_DIR)/*/test/*.d
 endif
+else ifeq ($(MAKECMDGOALS), debug)
+ifdef MOD
+$(warning Dependency tracking only set to cover the test executables of $(MOD).)
+-include $(foreach dir, $(MOD), $(BUILD_DIR)/$(dir)/test/*.d)
+else
+-include $(BUILD_DIR)/*/*.o.d
+-include $(BUILD_DIR)/*/*.lo.d
+-include $(BUILD_DIR)/test/*.d
+-include $(BUILD_DIR)/*/test/*.d
+endif
 else ifeq ($(MAKECMDGOALS), tune)
 -include $(BUILD_DIR)/*/*.o.d
 -include $(BUILD_DIR)/*/*.lo.d
@@ -799,6 +810,25 @@ check: library $(TESTS:%=%_TEST_RUN)
 endif
 
 ################################################################################
+# debugging
+################################################################################
+
+%_TEST_DBG_RUN_ARGS: %
+	@$(GDB) --args $< $(ARGS)
+
+ifdef MOD
+ifdef ARGS
+DEBUG:=1
+debug: library $(patsubst %,%_TEST_DBG_RUN_ARGS, $($(sort $(MOD))_TESTS))
+endif
+endif
+
+ifneq ($(DEBUG),1)
+debug:
+	$(error Can only run debugger with one module and one argument at a time)
+endif
+
+################################################################################
 # tuning
 ################################################################################
 
@@ -952,11 +982,11 @@ dist:
 	dev/make_dist.sh $(FLINT_VERSION)
 
 ################################################################################
-# debugging
+# makefile debugging
 ################################################################################
 
 print-%:
 	@echo "$*=$($*)"
 
-.PHONY: all library shared static examples checkexamples profile tests check tune valgrind clean distclean install uninstall dist %_TEST_RUN %_VALGRIND_RUN print-% coverage coverage_html
-.SILENT: $(mpn_extras_S_SOURCES)
+.PHONY: all library shared static examples checkexamples profile tests check tune valgrind clean distclean install uninstall dist %_TEST_RUN %_TEST_RUN_% %_TEST_DGB_RUN_ARGS %_VALGRIND_RUN print-% coverage coverage_html debug
+.PRECIOUS: $(mpn_extras_PIC_S_SOURCES) $(mpn_extras_S_SOURCES)
