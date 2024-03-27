@@ -20,7 +20,7 @@ TEST_FUNCTION_START(gr_mpn_mod, state)
     fmpz_t n;
     slong iter;
     /* int flags = GR_TEST_ALWAYS_ABLE; */
-    int flags = 0;
+    int flags = GR_TEST_VERBOSE;
 
     fmpz_init(n);
 
