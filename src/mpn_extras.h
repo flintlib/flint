@@ -247,11 +247,11 @@ mp_limb_t mpn_rsh1sub_n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 # define FLINT_MPN_SQR_HARD(rp, xp, n) (flint_mpn_sqr_func_tab[n](rp, xp))
 #elif FLINT_HAVE_ASSEMBLY_armv8
 # define FLINT_MPN_MUL_FUNC_N_TAB_WIDTH 15
-# define FLINT_MPN_SQR_FUNC_TAB_WIDTH 0
+# define FLINT_MPN_SQR_FUNC_TAB_WIDTH 9
 
 # define FLINT_HAVE_MUL_FUNC(n, m) FLINT_HAVE_MUL_N_FUNC(n)
 # define FLINT_HAVE_MUL_N_FUNC(n) ((n) <= FLINT_MPN_MUL_FUNC_N_TAB_WIDTH)
-# define FLINT_HAVE_SQR_FUNC(n) (0)
+# define FLINT_HAVE_SQR_FUNC(n) ((n) <= FLINT_MPN_SQR_FUNC_TAB_WIDTH)
 
 # define FLINT_MPN_MUL_HARD(rp, xp, xn, yp, yn) (flint_mpn_mul_func_n_tab[xn](rp, xp, yp, yn))
 # define FLINT_MPN_MUL_N_HARD(rp, xp, yp, n) (flint_mpn_mul_func_n_tab[n](rp, xp, yp, n))
@@ -417,6 +417,19 @@ FLINT_DLL extern const flint_mpn_mulhigh_normalised_func_t flint_mpn_mulhigh_nor
 # define FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH 9
 # define FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH 8
 # define FLINT_MPN_MULHIGH_NORMALISED_FUNC_TAB_WIDTH 9
+
+/* NOTE: This function only works for n >= 6 */
+# define FLINT_HAVE_NATIVE_mpn_mulhigh_basecase 1
+
+/* NOTE: The x86_64_adx versions of these functions only works for n >= 6 */
+# define FLINT_HAVE_NATIVE_mpn_sqrhigh_basecase 1
+#elif FLINT_HAVE_ASSEMBLY_armv8
+# define FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH 8
+# define FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH 8
+# define FLINT_MPN_MULHIGH_NORMALISED_FUNC_TAB_WIDTH 0
+
+/* NOTE: This function only works for n > 8 */
+# define FLINT_HAVE_NATIVE_mpn_mulhigh_basecase 1
 #else
 # define FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH 16
 # define FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH 2
@@ -429,8 +442,6 @@ FLINT_DLL extern const flint_mpn_mulhigh_normalised_func_t flint_mpn_mulhigh_nor
 
 void _flint_mpn_mulhigh_n_mulders_recursive(mp_ptr rp, mp_srcptr np, mp_srcptr mp, mp_size_t n);
 
-/* NOTE: The x86_64_adx version of this function only works for n >= 6 */
-# define FLINT_HAVE_NATIVE_mpn_mulhigh_basecase 1
 mp_limb_t _flint_mpn_mulhigh_basecase(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n);
 
 mp_limb_t _flint_mpn_mulhigh_n_mulders(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n);
@@ -468,9 +479,6 @@ void flint_mpn_mul_or_mulhigh_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t
 #define FLINT_MPN_SQRHIGH_SQR_CUTOFF 2000
 #define FLINT_MPN_SQRHIGH_K_TAB_SIZE 2048
 
-/* NOTE: The x86_64_adx versions of these functions only works for n >= 6 */
-# define FLINT_HAVE_NATIVE_mpn_sqrhigh_basecase 1
-
 #if FLINT_HAVE_ASSEMBLY_x86_64_adx
 
 mp_limb_t _flint_mpn_sqrhigh_basecase_even(mp_ptr, mp_srcptr, mp_size_t);
@@ -499,8 +507,6 @@ MPN_EXTRAS_INLINE mp_limb_t _flint_mpn_sqrhigh_basecase(mp_ptr res, mp_srcptr u,
 
 void _flint_mpn_sqrhigh_mulders_recursive(mp_ptr rp, mp_srcptr np, mp_size_t n);
 mp_limb_t _flint_mpn_sqrhigh_mulders(mp_ptr res, mp_srcptr u, mp_size_t n);
-mp_limb_t _flint_mpn_sqrhigh_basecase(mp_ptr rp, mp_srcptr xp, mp_size_t n);
-mp_limb_t flint_mpn_sqrhigh_basecase(mp_ptr rp, mp_srcptr xp, mp_size_t n);
 mp_limb_t _flint_mpn_sqrhigh_sqr(mp_ptr res, mp_srcptr u, mp_size_t n);
 mp_limb_t _flint_mpn_sqrhigh(mp_ptr, mp_srcptr, mp_size_t);
 

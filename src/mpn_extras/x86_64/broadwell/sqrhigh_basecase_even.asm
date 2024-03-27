@@ -409,12 +409,10 @@ undefine(`ld3')
 	pop	%rbx
 
 	ret
-
+EPILOGUE()
 	JUMPTABSECT
 	ALIGN(8)
 L(etab):JMPENT(	L(ep0), L(etab))
 	JMPENT(	L(ep1), L(etab))
 	JMPENT(	L(ep2), L(etab))
 	JMPENT(	L(ep3), L(etab))
-	TEXT
-EPILOGUE()

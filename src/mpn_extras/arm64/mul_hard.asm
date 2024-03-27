@@ -519,102 +519,120 @@ EPILOGUE()
 PROLOGUE(flint_mpn_mul_8n)
 	ldr	r8, [bp], #1*8
 	ldp	r0, r1, [ap]
-	ldp	r2, r3, [ap,#2*8]
-	ldp	r4, r5, [ap,#4*8]
-	ldp	r6, r7, [ap,#6*8]
-
-	stp	r14, r15, [sp, #-4*8]!
+	ldp	r2, r3, [ap, #2*8]
+	stp	r14, r15, [sp, #-6*8]!
+	ldp	r4, r5, [ap, #4*8]
+	ldp	r6, r7, [ap, #6*8]
 	stp	r16, r17, [sp, #2*8]
+	stp	r18, r19, [sp, #4*8]
 
-L(m8):	mul	r9, r0, r8	C a0 b0
+L(m8):	mul	r9, r0, r8
 	umulh	r10, r0, r8
-	mul	r11, r1, r8	C a1 b0
-	umulh	r14, r1, r8
-	mul	ap, r2, r8	C a2 b0
-	umulh	r15, r2, r8
-	mul	r12, r3, r8	C a3 b0
+	mul	r11, r1, r8
+	umulh	r12, r1, r8
+	mul	r13, r2, r8
+	umulh	r14, r2, r8
+	mul	r15, r3, r8
 	umulh	r16, r3, r8
-	mul	r13, r4, r8	C a4 b0
-	umulh	r17, r4, r8
+	mul	r17, r4, r8
+	umulh	r18, r4, r8
+	mul	r19, r5, r8
+	umulh	ap, r5, r8
+	C 9, (10, 11), (12, 13), (14, 15), (16, 17), (18, 19), ap
+
 	str	r9, [rp], #1*8
 	sub	n, n, #1
 	adds	r10, r10, r11
-	adcs	r14, r14, ap
-	adcs	r15, r15, r12
-	adcs	r16, r16, r13
-	mul	r9, r5, r8	C a5 b0
-	umulh	r11, r5, r8
-	mul	ap, r6, r8	C a6 b0
-	umulh	r12, r6, r8
-	mul	r13, r7, r8	C a7 b0
-	umulh	r8, r7, r8
-	adcs	r17, r17, r9
-	adcs	r11, r11, ap
+
+	mul	r9, r6, r8
+	umulh	r11, r6, r8
+
 	adcs	r12, r12, r13
-	cinc	r9, r8, cs
-	C 10, 14, 15, 16, 17, 11, 12, 9
+	adcs	r14, r14, r15
+
+	mul	r13, r7, r8
+	umulh	r15, r7, r8
+	C 10, 12, 14, (16, 17), (18, 19), (ap, 9), (11, 13), 15
 
 	cbz	n, L(f8)
 
-	stp	r18, r19, [sp, #-8*8]!
-	stp	r20, r21, [sp, #2*8]
-	stp	r22, r23, [sp, #4*8]
-	str	r24, [sp, #6*8]
+	stp	r20, r21, [sp, #-6*8]!
+	stp	r22, r23, [sp, #2*8]
+	str	r24, [sp, #4*8]
+
 L(a8):	ldr	r8, [bp], #1*8
-	mul	r13, r0, r8	C a0 b0
-	umulh	ap, r0, r8
-	mul	r18, r1, r8	C a1 b0
-	umulh	r19, r1, r8
-	mul	r20, r2, r8	C a2 b0
-	umulh	r21, r2, r8
-	mul	r22, r3, r8	C a3 b0
-	umulh	r23, r3, r8
-	mul	r24, r4, r8	C a4 b0
-	adds	ap, ap, r18
-	adcs	r19, r19, r20
-	adcs	r21, r21, r22
-	adcs	r23, r23, r24
+	adcs	r16, r16, r17
+	adcs	r18, r18, r19
+	adcs	ap, ap, r9
+	adcs	r11, r11, r13
+	cinc	r15, r15, cs
+	C 10, 12, 14, 16, 18, ap, 11, 15
+	C Free: 20, 21, 22, 23, 24, 17, 19, 9, 13
+
+	mul	r20, r0, r8
+	mul	r21, r1, r8
+	mul	r22, r2, r8
+	mul	r23, r3, r8
+	mul	r17, r4, r8
+	mul	r19, r5, r8
+	mul	r9, r6, r8
+	mul	r13, r7, r8
+
+	adds	r20, r20, r10
+	umulh	r24, r7, r8
+
+	C (10, 20), (12, 21), (14, 22), (16, 23), (18, 17), (ap, 19), (11, 9), (15, 13), 24
+
+	adcs	r21, r21, r12
+	umulh	r10, r0, r8
+
+	adcs	r22, r22, r14
+	umulh	r12, r1, r8
+
+	adcs	r23, r23, r16
+	umulh	r14, r2, r8
+
+	adcs	r17, r17, r18
+	umulh	r16, r3, r8
+
+	adcs	r19, r19, ap
 	umulh	r18, r4, r8
-	mul	r20, r5, r8	C a5 b0
-	umulh	r22, r5, r8
-	mul	r24, r6, r8	C a6 b0
+
+	adcs	r9, r9, r11
+	umulh	ap, r5, r8
+
+	adcs	r13, r13, r15
+	umulh	r11, r6, r8
+
+	str	r20, [rp], #1*8
+
+	cinc	r15, r24, cs
+
+	adds	r10, r10, r21
+	adcs	r12, r12, r22
+	adcs	r14, r14, r23
+	C 10, 12, 14, (16, 17), (18, 19), (ap, 9), (11, 13), 15
+
 	sub	n, n, #1
-	adcs	r18, r18, r20
-	adcs	r22, r22, r24
-	umulh	r20, r6, r8
-	mul	r24, r7, r8	C a7 b0
-	umulh	r8, r7, r8
-	adcs	r20, r20, r24
-	cinc	r8, r8, cs
-	C 13, ap, 19, 21, 23, 18, 22, 20, 8
-
-	C (13, (10, 14, 15, 16, 17, 11, 12, 9))
-	C <- (10, 14, 15, 16, 17, 11, 12, 9) + (13, ap, 19, 21, 23, 18, 22, 20, 8)
-	adds	r13, r10, r13
-	adcs	r10, r14, ap
-	adcs	r14, r15, r19
-	adcs	r15, r16, r21
-	adcs	r16, r17, r23
-	adcs	r17, r11, r18
-	adcs	r11, r12, r22
-	adcs	r12, r9, r20
-	cinc	r9, r8, cs
-
-	str	r13, [rp], #1*8
-
 	cbnz	n, L(a8)
 
-	ldp	r20, r21, [sp, #2*8]
-	ldp	r22, r23, [sp, #4*8]
-	ldr	r24, [sp, #6*8]
-	ldp	r18, r19, [sp], #8*8
-L(f8):	stp	r10, r14, [rp]
-	stp	r15, r16, [rp,#2*8]
-	stp	r17, r11, [rp,#4*8]
-	stp	r12, r9, [rp,#6*8]
+	ldp	r22, r23, [sp, #2*8]
+	ldr	r24, [sp, #4*8]
+	ldp	r20, r21, [sp], #6*8
+L(f8):	adcs	r16, r16, r17
+	adcs	r18, r18, r19
+	stp	r10, r12, [rp]
+	adcs	ap, ap, r9
+	adcs	r11, r11, r13
+	stp	r14, r16, [rp, #2*8]
+	cinc	r15, r15, cs
 	ldp	r16, r17, [sp, #2*8]
-	ldp	r14, r15, [sp], #4*8
-	mov	res, r9
+	stp	r18, ap, [rp, #4*8]
+	ldp	r18, r19, [sp, #4*8]
+	stp	r11, r15, [rp, #6*8]
+	mov	res, r15
+	ldp	r14, r15, [sp], #6*8
+
 	ret
 EPILOGUE()
 
