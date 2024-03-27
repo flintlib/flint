@@ -178,6 +178,10 @@ class ca_struct(ctypes.Structure):
 class nmod_struct(ctypes.Structure):
     _fields_ = [('val', c_ulong)]
 
+# todo: want different structure for each size
+class mpn_mod_struct(ctypes.Structure):
+    _fields_ = [('val', c_ulong * 16)]
+
 class nmod_poly_struct(ctypes.Structure):
     _fields_ = [('coeffs', ctypes.c_void_p),
                 ('alloc', c_slong),
@@ -4637,6 +4641,30 @@ class IntegersMod_nmod(gr_ctx):
 class nmod(gr_elem):
     _struct_type = nmod_struct
 
+
+class IntegersMod_mpn_mod(gr_ctx):
+    def __init__(self, n):
+        n = self._as_fmpz(n)
+        # todo: error handling (must handle cleanup when ctx has not been initialized
+        assert n >= (1 << FLINT_BITS) and n < (1 << (8 * FLINT_BITS))
+        gr_ctx.__init__(self)
+        libgr.gr_ctx_init_mpn_mod(self._ref, n._ref)
+        self._elem_type = mpn_mod
+
+class mpn_mod(gr_elem):
+    _struct_type = mpn_mod_struct
+
+
+class IntegersMod_fmpz_mod(gr_ctx):
+    def __init__(self, n):
+        n = self._as_fmpz(n)
+        assert n >= 1
+        gr_ctx.__init__(self)
+        libgr.gr_ctx_init_fmpz_mod(self._ref, n._ref)
+        self._elem_type = fmpz_mod
+
+class fmpz_mod(gr_elem):
+    _struct_type = fmpz_struct
 
 
 """
