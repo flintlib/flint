@@ -16,11 +16,11 @@
 
 TEST_FUNCTION_START(gr_mpn_mod, state)
 {
-    gr_ctx_t ZZn, MatZZn;
+    gr_ctx_t ZZn, VecZZn, MatZZn, ZZnx;
     fmpz_t n;
     slong iter;
     /* int flags = GR_TEST_ALWAYS_ABLE; */
-    int flags = GR_TEST_VERBOSE;
+    int flags = 0;
 
     fmpz_init(n);
 
@@ -84,6 +84,23 @@ TEST_FUNCTION_START(gr_mpn_mod, state)
             gr_test_ring(MatZZn, 3, flags);
             gr_ctx_clear(MatZZn);
         }
+
+        /* test vectors */
+        if (n_randint(state, 10) == 0)
+        {
+            gr_ctx_init_vector_space_gr_vec(VecZZn, ZZn, 1 + n_randint(state, 5));
+            gr_test_ring(VecZZn, 3, flags);
+            gr_ctx_clear(VecZZn);
+        }
+
+        /* test polynomials */
+        if (n_randint(state, 10) == 0)
+        {
+            gr_ctx_init_gr_poly(ZZnx, ZZn);
+            gr_test_ring(ZZnx, 3, flags);
+            gr_ctx_clear(ZZnx);
+        }
+
 
         gr_ctx_clear(ZZn);
     }

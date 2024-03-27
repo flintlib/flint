@@ -447,9 +447,9 @@ _gr_mpn_mod_set_other(mp_ptr res, gr_ptr v, gr_ctx_t v_ctx, gr_ctx_t ctx)
     {
         mp_size_t n = MPN_MOD_CTX_NLIMBS(ctx);
 
-        if (fmpz_size(FMPZ_MOD_CTX(ctx)->n) == n)
+        if (fmpz_size(FMPZ_MOD_CTX(v_ctx)->n) == n)
         {
-            mp_srcptr vd = COEFF_TO_PTR(*(FMPZ_MOD_CTX(ctx)->n))->_mp_d;
+            mp_srcptr vd = COEFF_TO_PTR(*(FMPZ_MOD_CTX(v_ctx)->n))->_mp_d;
 
             if (flint_mpn_equal_p(vd, MPN_MOD_CTX_MODULUS(ctx), n))
                 return _gr_mpn_mod_set_fmpz(res, v, ctx);

@@ -8029,6 +8029,20 @@ def test_gr_series():
 
     assert raises(lambda: x / 0, FlintDomainError)
 
+def test_integers_mod():
+    R = IntegersMod_mpn_mod(10**20 + 1)
+    c = ZZ(2) ** 4321
+    assert R(3) * c == R(c) * 3
+    assert R(3) + c == R(c) + 3
+    assert R(3) - c == -(R(c) - 3)
+    assert IntegersMod_mpn_mod(10**20)(IntegersMod_mpn_mod(10**20)(17)) == 17
+    assert IntegersMod_mpn_mod(10**20)(IntegersMod_fmpz_mod(10**20)(17)) == 17
+    assert raises(lambda: IntegersMod_mpn_mod(10**20)(IntegersMod_fmpz_mod(10**20 + 1)(17)), NotImplementedError)
+    assert raises(lambda: IntegersMod_mpn_mod(10**20)(IntegersMod_fmpz_mod(10**50)(17)), NotImplementedError)
+    assert raises(lambda: IntegersMod_mpn_mod(10**20)(IntegersMod_mpn_mod(10**20 + 1)(17)), NotImplementedError)
+    assert raises(lambda: IntegersMod_mpn_mod(10**20)(IntegersMod_mpn_mod(10**50)(17)), NotImplementedError)
+
+
 def test_gen_name():
     for R in [NumberField(ZZx.gen() ** 2 + 1, "b"),
               PolynomialRing_fmpz_poly("b"),
