@@ -19,7 +19,7 @@
 
 /* for wide add_ssss.... macros. todo; these ought to be provided
    everywhere */
-#if defined(__AVX2__)
+#if FLINT_BITS == 64 && defined(__AVX2__)
 #include "crt_helpers.h"
 #endif
 
