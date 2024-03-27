@@ -1084,7 +1084,6 @@ _gr_mpn_mod_scalar_mul_vec(mp_ptr res, mp_srcptr y, mp_srcptr x, slong len, gr_c
 int
 _gr_mpn_mod_vec_addmul_scalar(mp_ptr res, mp_srcptr x, slong len, mp_srcptr y, gr_ctx_t ctx)
 {
-
     mp_size_t n = MPN_MOD_CTX_NLIMBS(ctx);
     slong i;
 
@@ -1108,7 +1107,7 @@ _gr_mpn_mod_vec_addmul_scalar(mp_ptr res, mp_srcptr x, slong len, mp_srcptr y, g
 
         for (i = 0; i < len; i++)
         {
-            _gr_mpn_mod_mul(t, x + i * n, y + i * n, ctx);
+            _gr_mpn_mod_mul(t, x + i * n, y, ctx);
             _gr_mpn_mod_add(res + i * n, res + i * n, t, ctx);
         }
     }
@@ -1352,6 +1351,8 @@ gr_method_tab_input _mpn_mod_methods_input[] =
     {GR_METHOD_DIVIDES,         (gr_funcptr) _gr_mpn_mod_divides},
     {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) _gr_mpn_mod_is_invertible},
 */
+
+
     {GR_METHOD_INV,             (gr_funcptr) _gr_mpn_mod_inv},
 /*
     {GR_METHOD_POW_SI,          (gr_funcptr) _gr_mpn_mod_pow_si},
@@ -1373,6 +1374,7 @@ gr_method_tab_input _mpn_mod_methods_input[] =
     {GR_METHOD_VEC_MUL_SCALAR,  (gr_funcptr) _gr_mpn_mod_vec_mul_scalar},
     {GR_METHOD_VEC_ADDMUL_SCALAR,    (gr_funcptr) _gr_mpn_mod_vec_addmul_scalar},
     {GR_METHOD_SCALAR_MUL_VEC,  (gr_funcptr) _gr_mpn_mod_scalar_mul_vec},
+
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _gr_mpn_mod_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _gr_mpn_mod_vec_dot_rev},
 
@@ -1384,7 +1386,9 @@ gr_method_tab_input _mpn_mod_methods_input[] =
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_mpn_mod_roots_gr_poly},
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_mpn_mod_mat_mul},
 */
+
     {GR_METHOD_MAT_LU,          (gr_funcptr) _gr_mpn_mod_mat_lu},
+
 /*
     {GR_METHOD_MAT_DET,         (gr_funcptr) _gr_mpn_mod_mat_det},
 */

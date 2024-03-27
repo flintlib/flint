@@ -16,7 +16,7 @@
 
 TEST_FUNCTION_START(gr_mpn_mod, state)
 {
-    gr_ctx_t ZZn;
+    gr_ctx_t ZZn, MatZZn;
     fmpz_t n;
     slong iter;
     /* int flags = GR_TEST_ALWAYS_ABLE; */
@@ -76,9 +76,17 @@ TEST_FUNCTION_START(gr_mpn_mod, state)
             gr_ctx_mpn_mod_set_primality(ZZn, fmpz_is_probabprime(n) ? T_TRUE : T_FALSE);
 
         gr_test_ring(ZZn, 5, flags);
+
+        /* test matrices */
+        if (n_randint(state, 10) == 0)
+        {
+            gr_ctx_init_matrix_ring(MatZZn, ZZn, 1 + n_randint(state, 5));
+            gr_test_ring(MatZZn, 3, flags);
+            gr_ctx_clear(MatZZn);
+        }
+
         gr_ctx_clear(ZZn);
     }
-
 
 
     fmpz_clear(n);
