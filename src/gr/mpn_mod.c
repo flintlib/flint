@@ -1751,6 +1751,35 @@ _gr_mpn_mod_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx
         return _gr_mpn_mod_mat_mul_multi_mod(C, A, B, ctx);
 }
 
+/* roughly 2x the subclassical multiplication cutoff */
+static const int mpn_mod_mat_solve_tri_cutoff[MPN_MOD_MAX_LIMBS + 1] =
+{
+    0, 0, 700, 170, 170, 150, 150, 150, 130, 130, 110, 110, 100, 90, 90, 90, 90,
+};
+
+int
+_gr_mpn_mod_mat_nonsingular_solve_tril(gr_mat_t X, const gr_mat_t L, const gr_mat_t B, int unit, gr_ctx_t ctx)
+{
+    slong cutoff = mpn_mod_mat_solve_tri_cutoff[MPN_MOD_CTX_NLIMBS(ctx)];
+
+    if (B->r < cutoff || B->c < cutoff)
+        return gr_mat_nonsingular_solve_tril_classical(X, L, B, unit, ctx);
+    else
+        return gr_mat_nonsingular_solve_tril_recursive(X, L, B, unit, ctx);
+}
+
+int
+_gr_mpn_mod_mat_nonsingular_solve_triu(gr_mat_t X, const gr_mat_t U, const gr_mat_t B, int unit, gr_ctx_t ctx)
+{
+    slong cutoff = mpn_mod_mat_solve_tri_cutoff[MPN_MOD_CTX_NLIMBS(ctx)];
+
+    /* todo: tune thresholds */
+    if (B->r < cutoff || B->c < cutoff)
+        return gr_mat_nonsingular_solve_triu_classical(X, U, B, unit, ctx);
+    else
+        return gr_mat_nonsingular_solve_triu_recursive(X, U, B, unit, ctx);
+}
+
 
 /* todo: optimize for when 2n rather than 2n+1 limbs suffice */
 int
@@ -1928,23 +1957,34 @@ _gr_mpn_mod_mat_lu_classical_delayed(slong * res_rank, slong * P, gr_mat_t A, co
     return status;
 }
 
+/* todo: retune this when arithmetic is more optimized */
+
 static const unsigned int mpn_mod_mat_lu_delayed_cutoff[MPN_MOD_MAX_LIMBS + 1] =
 {
     0, 0, 23, 8, 7, 7, 7, 7, 6, 6, 6, 6, 5, 5, 5, 5, 5,
 };
 
-/* todo: retune this when arithmetic is more optimized */
+static const unsigned int mpn_mod_mat_lu_recursive_cutoff[MPN_MOD_MAX_LIMBS + 1] =
+{
+    0, 0, 2000, 1500, 1000, 600, 600, 500, 400, 400, 300, 300, 300, 300, 250, 250, 250,
+};
+
 int
 _gr_mpn_mod_mat_lu(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, gr_ctx_t ctx)
 {
-    slong cutoff, nlimbs = MPN_MOD_CTX_NLIMBS(ctx);
+    slong d, cutoff, nlimbs = MPN_MOD_CTX_NLIMBS(ctx);
 
-    cutoff = (slong) mpn_mod_mat_lu_delayed_cutoff[nlimbs];
+    d = FLINT_MIN(A->r, A->c);
 
-    if (gr_mat_nrows(A, ctx) < cutoff || gr_mat_ncols(A, ctx) < cutoff)
+    cutoff = mpn_mod_mat_lu_delayed_cutoff[nlimbs];
+    if (d < cutoff)
         return gr_mat_lu_classical(rank, P, LU, A, rank_check, ctx);
-    else
+
+    cutoff = mpn_mod_mat_lu_recursive_cutoff[nlimbs];
+    if (d < cutoff)
         return _gr_mpn_mod_mat_lu_classical_delayed(rank, P, LU, A, rank_check, ctx);
+
+    return gr_mat_lu_recursive(rank, P, LU, A, rank_check, cutoff / 2, ctx);
 }
 
 
@@ -2055,6 +2095,8 @@ gr_method_tab_input _mpn_mod_methods_input[] =
 */
 
     {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_mpn_mod_mat_mul},
+    {GR_METHOD_MAT_NONSINGULAR_SOLVE_TRIL,                 (gr_funcptr) _gr_mpn_mod_mat_nonsingular_solve_tril},
+    {GR_METHOD_MAT_NONSINGULAR_SOLVE_TRIU,                 (gr_funcptr) _gr_mpn_mod_mat_nonsingular_solve_triu},
     {GR_METHOD_MAT_LU,          (gr_funcptr) _gr_mpn_mod_mat_lu},
 
 /*
