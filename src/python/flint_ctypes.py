@@ -178,6 +178,10 @@ class ca_struct(ctypes.Structure):
 class nmod_struct(ctypes.Structure):
     _fields_ = [('val', c_ulong)]
 
+# todo: want different structure for each size
+class mpn_mod_struct(ctypes.Structure):
+    _fields_ = [('val', c_ulong * 16)]
+
 class nmod_poly_struct(ctypes.Structure):
     _fields_ = [('coeffs', ctypes.c_void_p),
                 ('alloc', c_slong),
@@ -4638,6 +4642,30 @@ class nmod(gr_elem):
     _struct_type = nmod_struct
 
 
+class IntegersMod_mpn_mod(gr_ctx):
+    def __init__(self, n):
+        n = self._as_fmpz(n)
+        # todo: error handling (must handle cleanup when ctx has not been initialized
+        assert n >= (1 << FLINT_BITS) and n < (1 << (8 * FLINT_BITS))
+        gr_ctx.__init__(self)
+        libgr.gr_ctx_init_mpn_mod(self._ref, n._ref)
+        self._elem_type = mpn_mod
+
+class mpn_mod(gr_elem):
+    _struct_type = mpn_mod_struct
+
+
+class IntegersMod_fmpz_mod(gr_ctx):
+    def __init__(self, n):
+        n = self._as_fmpz(n)
+        assert n >= 1
+        gr_ctx.__init__(self)
+        libgr.gr_ctx_init_fmpz_mod(self._ref, n._ref)
+        self._elem_type = fmpz_mod
+
+class fmpz_mod(gr_elem):
+    _struct_type = fmpz_struct
+
 
 """
 .. function:: int gr_ctx_fq_prime(fmpz_t p, gr_ctx_t ctx)
@@ -8000,6 +8028,20 @@ def test_gr_series():
     # assert str(x / (x.exp() - 1)) == "1 + (-1/2)*x + (1/12)*x^2 + (-1/720)*x^4 + (1/720)*x^5 (mod x^6)"
 
     assert raises(lambda: x / 0, FlintDomainError)
+
+def test_integers_mod():
+    R = IntegersMod_mpn_mod(10**20 + 1)
+    c = ZZ(2) ** 4321
+    assert R(3) * c == R(c) * 3
+    assert R(3) + c == R(c) + 3
+    assert R(3) - c == -(R(c) - 3)
+    assert IntegersMod_mpn_mod(10**20)(IntegersMod_mpn_mod(10**20)(17)) == 17
+    assert IntegersMod_mpn_mod(10**20)(IntegersMod_fmpz_mod(10**20)(17)) == 17
+    assert raises(lambda: IntegersMod_mpn_mod(10**20)(IntegersMod_fmpz_mod(10**20 + 1)(17)), NotImplementedError)
+    assert raises(lambda: IntegersMod_mpn_mod(10**20)(IntegersMod_fmpz_mod(10**50)(17)), NotImplementedError)
+    assert raises(lambda: IntegersMod_mpn_mod(10**20)(IntegersMod_mpn_mod(10**20 + 1)(17)), NotImplementedError)
+    assert raises(lambda: IntegersMod_mpn_mod(10**20)(IntegersMod_mpn_mod(10**50)(17)), NotImplementedError)
+
 
 def test_gen_name():
     for R in [NumberField(ZZx.gen() ** 2 + 1, "b"),

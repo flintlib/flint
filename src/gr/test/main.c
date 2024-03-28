@@ -39,6 +39,7 @@
 #include "t-matrix_fmpq.c"
 #include "t-matrix_fmpz.c"
 #include "t-matrix_nmod8.c"
+#include "t-mpn_mod.c"
 #include "t-mpoly_nmod8.c"
 #include "t-nf.c"
 #include "t-nmod32.c"
@@ -92,6 +93,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_matrix_fmpz),
     TEST_FUNCTION(gr_matrix_nmod8),
     TEST_FUNCTION(gr_mpoly_nmod8),
+    TEST_FUNCTION(gr_mpn_mod),
     TEST_FUNCTION(gr_nf),
     TEST_FUNCTION(gr_nmod32),
     TEST_FUNCTION(gr_nmod8),
