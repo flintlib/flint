@@ -32,7 +32,17 @@
 
 #define UI_ABS_SI(x) (((slong)(x) < 0) ? (-(ulong)(x)) : ((ulong)(x)))
 
+/* Single limbs are already dealt with well by nmod, and excluding them
+   allows avoiding various special cases. */
 #define MPN_MOD_MIN_LIMBS 2
+
+/* This should be small enough that we can stack-allocate mpn_mods
+   and temporary buffers a small multiple of the size.
+
+   For bigger sizes, use fmpz_mod.
+
+   Before resizing this, make sure that any lookup tables that go up
+   to MPN_MOD_MAX_LIMBS (such as tuning tables) are large enough. */
 #define MPN_MOD_MAX_LIMBS 16
 
 typedef struct
@@ -1115,7 +1125,8 @@ _gr_mpn_mod_vec_addmul_scalar(mp_ptr res, mp_srcptr x, slong len, mp_srcptr y, g
     return GR_SUCCESS;
 }
 
-/* todo: length 1 */
+/* todo: optimize for length 1, 2 */
+/* todo: optimize for when 2n rather than 2n+1 limbs suffice */
 int
 _gr_mpn_mod_vec_dot(mp_ptr res, mp_srcptr initial, int subtract, mp_srcptr vec1, mp_srcptr vec2, slong len, gr_ctx_t ctx)
 {
@@ -1134,31 +1145,54 @@ _gr_mpn_mod_vec_dot(mp_ptr res, mp_srcptr initial, int subtract, mp_srcptr vec1,
         return GR_SUCCESS;
     }
 
-    switch (n)
+    if (n == 2)
     {
-        case 2:
-            FLINT_MPN_MUL_2X2(s[3], s[2], s[1], s[0], vec1[1], vec1[0], vec2[1], vec2[0]);
-            s[4] = 0;
-            for (i = 1; i < len; i++)
-            {
-                FLINT_MPN_MUL_2X2(t[3], t[2], t[1], t[0], vec1[2 * i + 1], vec1[2 * i], vec2[2 * i + 1], vec2[2 * i]);
-#if defined(add_sssssaaaaaaaaaa)
-                add_sssssaaaaaaaaaa(s[4], s[3], s[2], s[1], s[0], s[4], s[3], s[2], s[1], s[0], 0, t[3], t[2], t[1], t[0]);
-#else
-                s[2 * n] += mpn_add_n(s, s, t, 2 * n);
-#endif
-            }
+        mp_limb_t A0, A1, B0, B1;
+        mp_limb_t p3, p2, p1, p0;
+        mp_limb_t s4, s3, s2, s1, s0;
+        mp_limb_t u2, u1;
+        mp_limb_t v3, v2;
 
-            break;
+        s4 = s3 = s2 = s1 = s0 = 0;
+        u2 = u1 = 0;
+        v3 = v2 = 0;
 
-        default:
-            flint_mpn_mul_n(s, vec1, vec2, n);
-            s[2 * n] = 0;
-            for (i = 1; i < len; i++)
-            {
-                flint_mpn_mul_n(t, vec1 + i * n, vec2 + i * n, n);
-                s[2 * n] += mpn_add_n(s, s, t, 2 * n);
-            }
+        for (i = 0; i < len; i++)
+        {
+            A0 = vec1[2 * i + 0];
+            A1 = vec1[2 * i + 1];
+            B0 = vec2[2 * i + 0];
+            B1 = vec2[2 * i + 1];
+
+            umul_ppmm(p2, p1, A1, B0);
+            add_sssaaaaaa(s3, s2, s1, s3, s2, s1, UWORD(0), p2, p1);
+            umul_ppmm(p1, p0, B0, A0);
+            add_sssaaaaaa(u2, u1, s0, u2, u1, s0, UWORD(0), p1, p0);
+            umul_ppmm(p2, p1, B1, A0);
+            add_sssaaaaaa(s3, s2, s1, s3, s2, s1, UWORD(0), p2, p1);
+            umul_ppmm(p3, p2, B1, A1);
+            add_sssaaaaaa(s4, v3, v2, s4, v3, v2, UWORD(0), p3, p2);
+        }
+
+        /* s3 is small, so this doesn't overflow */
+        add_sssaaaaaa(s3, s2, s1, s3, s2, s1, UWORD(0), u2, u1);
+        add_sssaaaaaa(s4, s3, s2, s4, s3, s2, UWORD(0), v3, v2);
+
+        s[0] = s0;
+        s[1] = s1;
+        s[2] = s2;
+        s[3] = s3;
+        s[4] = s4;
+    }
+    else
+    {
+        flint_mpn_mul_n(s, vec1, vec2, n);
+        s[2 * n] = 0;
+        for (i = 1; i < len; i++)
+        {
+            flint_mpn_mul_n(t, vec1 + i * n, vec2 + i * n, n);
+            s[2 * n] += mpn_add_n(s, s, t, 2 * n);
+        }
     }
 
     sn = 2 * n + (s[2 * n] != 0);
@@ -1189,6 +1223,8 @@ _gr_mpn_mod_vec_dot(mp_ptr res, mp_srcptr initial, int subtract, mp_srcptr vec1,
     return GR_SUCCESS;
 }
 
+/* todo: optimize for length 1, 2 */
+/* todo: optimize for when 2n rather than 2n+1 limbs suffice */
 int
 _gr_mpn_mod_vec_dot_rev(mp_ptr res, mp_srcptr initial, int subtract, mp_srcptr vec1, mp_srcptr vec2, slong len, gr_ctx_t ctx)
 {
@@ -1207,31 +1243,54 @@ _gr_mpn_mod_vec_dot_rev(mp_ptr res, mp_srcptr initial, int subtract, mp_srcptr v
         return GR_SUCCESS;
     }
 
-    switch (n)
+    if (n == 2)
     {
-        case 2:
-            FLINT_MPN_MUL_2X2(s[3], s[2], s[1], s[0], vec1[1], vec1[0], vec2[2 * len - 1], vec2[2 * len - 2]);
-            s[4] = 0;
-            for (i = 1; i < len; i++)
-            {
-                FLINT_MPN_MUL_2X2(t[3], t[2], t[1], t[0], vec1[2 * i + 1], vec1[2 * i], vec2[2 * (len - i - 1) + 1], vec2[2 * (len - i - 1)]);
-#if defined(add_sssssaaaaaaaaaa)
-                add_sssssaaaaaaaaaa(s[4], s[3], s[2], s[1], s[0], s[4], s[3], s[2], s[1], s[0], 0, t[3], t[2], t[1], t[0]);
-#else
-                s[2 * n] += mpn_add_n(s, s, t, 2 * n);
-#endif
-            }
+        mp_limb_t A0, A1, B0, B1;
+        mp_limb_t p3, p2, p1, p0;
+        mp_limb_t s4, s3, s2, s1, s0;
+        mp_limb_t u2, u1;
+        mp_limb_t v3, v2;
 
-            break;
+        s4 = s3 = s2 = s1 = s0 = 0;
+        u2 = u1 = 0;
+        v3 = v2 = 0;
 
-        default:
-            flint_mpn_mul_n(s, vec1, vec2 + (len - 1) * n, n);
-            s[2 * n] = 0;
-            for (i = 1; i < len; i++)
-            {
-                flint_mpn_mul_n(t, vec1 + i * n, vec2 + (len - i - 1) * n, n);
-                s[2 * n] += mpn_add_n(s, s, t, 2 * n);
-            }
+        for (i = 0; i < len; i++)
+        {
+            A0 = vec1[2 * i + 0];
+            A1 = vec1[2 * i + 1];
+            B0 = vec2[2 * (len - 1 - i) + 0];
+            B1 = vec2[2 * (len - 1 - i) + 1];
+
+            umul_ppmm(p2, p1, A1, B0);
+            add_sssaaaaaa(s3, s2, s1, s3, s2, s1, UWORD(0), p2, p1);
+            umul_ppmm(p1, p0, B0, A0);
+            add_sssaaaaaa(u2, u1, s0, u2, u1, s0, UWORD(0), p1, p0);
+            umul_ppmm(p2, p1, B1, A0);
+            add_sssaaaaaa(s3, s2, s1, s3, s2, s1, UWORD(0), p2, p1);
+            umul_ppmm(p3, p2, B1, A1);
+            add_sssaaaaaa(s4, v3, v2, s4, v3, v2, UWORD(0), p3, p2);
+        }
+
+        /* s3 is small, so this doesn't overflow */
+        add_sssaaaaaa(s3, s2, s1, s3, s2, s1, UWORD(0), u2, u1);
+        add_sssaaaaaa(s4, s3, s2, s4, s3, s2, UWORD(0), v3, v2);
+
+        s[0] = s0;
+        s[1] = s1;
+        s[2] = s2;
+        s[3] = s3;
+        s[4] = s4;
+    }
+    else
+    {
+        flint_mpn_mul_n(s, vec1, vec2 + (len - 1) * n, n);
+        s[2 * n] = 0;
+        for (i = 1; i < len; i++)
+        {
+            flint_mpn_mul_n(t, vec1 + i * n, vec2 + (len - i - 1) * n, n);
+            s[2 * n] += mpn_add_n(s, s, t, 2 * n);
+        }
     }
 
     sn = 2 * n + (s[2 * n] != 0);
@@ -1263,20 +1322,234 @@ _gr_mpn_mod_vec_dot_rev(mp_ptr res, mp_srcptr initial, int subtract, mp_srcptr v
 }
 
 /* todo: retune this when arithmetic is more optimized */
+static const unsigned char mpn_mod_mat_mul_strassen_even_cutoff[MPN_MOD_MAX_LIMBS + 1] =
+{
+    0, 0, 120, 110, 80, 60, 50, 40, 30, 30, 26, 26, 24, 24, 22, 20, 20,
+};
+
+static const unsigned char mpn_mod_mat_mul_strassen_odd_cutoff[MPN_MOD_MAX_LIMBS + 1] =
+{
+    0, 0, 120, 110, 80, 60, 50, 40, 30, 30, 26, 26, 24, 24, 22, 20, 20,
+};
+
+int
+_gr_mpn_mod_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+{
+    slong ar = A->r;
+
+    if (ar < 20)
+        return gr_mat_mul_classical(C, A, B, ctx);
+
+    slong ac = A->c;
+    slong bc = B->c;
+    slong cutoff;
+    slong n = MPN_MOD_CTX_NLIMBS(ctx);
+
+    if ((ar | ac | bc) & 1)
+        cutoff = mpn_mod_mat_mul_strassen_odd_cutoff[n];
+    else
+        cutoff = mpn_mod_mat_mul_strassen_even_cutoff[n];
+
+    if (ar < cutoff || ac < cutoff || bc < cutoff)
+        return gr_mat_mul_classical(C, A, B, ctx);
+    else
+        return gr_mat_mul_strassen(C, A, B, ctx);
+}
+
+
+/* todo: optimize for when 2n rather than 2n+1 limbs suffice */
+int
+_gr_mpn_mod_mat_lu_classical_delayed(slong * res_rank, slong * P, gr_mat_t A, const gr_mat_t A_in, int rank_check, gr_ctx_t ctx)
+{
+    mp_limb_t d[MPN_MOD_MAX_LIMBS];
+    mp_limb_t e[MPN_MOD_MAX_LIMBS];
+    mp_limb_t f[MPN_MOD_MAX_LIMBS];
+    mp_ptr * a;
+    mp_ptr tmprow;
+    slong n = MPN_MOD_CTX_NLIMBS(ctx);
+    slong i, j, nrows, ncols, rank, row, col, pivot_row, tmp_index;
+    int status = GR_SUCCESS;
+    mp_ptr tmp_ptr, b;
+    TMP_INIT;
+
+    nrows = A->r;
+    ncols = A->c;
+
+    if (nrows == 0 || ncols == 0)
+    {
+        *res_rank = 0;
+        return GR_SUCCESS;
+    }
+
+    a = (mp_ptr *) A->rows;
+
+    if (A != A_in)
+    {
+        for (i = 0; i < nrows; i++)
+            flint_mpn_copyi(a[i], A_in->rows[i], n * ncols);
+    }
+
+    rank = row = col = 0;
+
+    for (i = 0; i < nrows; i++)
+        P[i] = i;
+
+    TMP_START;
+    b = TMP_ALLOC((2 * n + 1) * sizeof(mp_limb_t) * (nrows + 1) * ncols);
+    tmprow = b + (2 * n + 1) * (nrows * ncols);
+
+#define UNREDUCED(ii, jj) (b + (2 * n + 1) * ((ii) * ncols + (jj)))
+#define REDUCED(ii, jj) (a[ii] + ((jj) * n))
+#define TMPROW(ii) (tmprow + (2 * n + 1) * (ii))
+
+    flint_mpn_zero(tmprow, (2 * n + 1) * ncols);
+
+    for (i = 0; i < nrows; i++)
+    {
+        for (j = 0; j < ncols; j++)
+        {
+            flint_mpn_copyi(UNREDUCED(i, j), REDUCED(i, j), n);
+            flint_mpn_zero(UNREDUCED(i, j) + n, n + 1);
+        }
+    }
+
+    while (row < nrows && col < ncols)
+    {
+        /* reduce current column */
+        /* can be skipped on the first iteration */
+        if (col != 0)
+            for (j = row; j < nrows; j++)
+                _gr_mpn_mod_set_mpn(REDUCED(j, col), UNREDUCED(j, col), 2 * n + 1, ctx);
+
+        pivot_row = -1;
+        for (i = row; i < nrows; i++)
+        {
+            if (!flint_mpn_zero_p(REDUCED(i, col), n) != 0)
+            {
+                pivot_row = i;
+                break;
+            }
+        }
+
+        /* There is certainly no nonzero pivot element. */
+        if (pivot_row == -1)
+        {
+            if (rank_check)
+            {
+                rank = 0;
+                break;
+            }
+
+            col++;
+            continue;
+        }
+
+        /* swap rows */
+        if (pivot_row != row)
+        {
+            tmp_ptr = a[pivot_row];
+            a[pivot_row] = a[row];
+            a[row] = tmp_ptr;
+
+            tmp_index = P[pivot_row];
+            P[pivot_row] = P[row];
+            P[row] = tmp_index;
+
+            /* swap rows in unreduced submatrix, and reduce new pivot row */
+            for (j = col + 1; j < ncols; j++)
+            {
+                _gr_mpn_mod_set_mpn(REDUCED(row, j), UNREDUCED(pivot_row, j), 2 * n + 1, ctx);
+                flint_mpn_copyi(UNREDUCED(pivot_row, j), UNREDUCED(row, j), 2 * n + 1);
+            }
+        }
+        else if (row != 0)
+        {
+            /* Reduce current pivot row. */
+            for (j = col + 1; j < ncols; j++)
+                _gr_mpn_mod_set_mpn(REDUCED(row, j), UNREDUCED(row, j), 2 * n + 1, ctx);
+        }
+
+        rank++;
+
+        /* Eliminate remaining submatrix. */
+
+        /* Must be able to invert pivot element. */
+        status = _gr_mpn_mod_inv(d, REDUCED(row, col), ctx);
+        if (status != GR_SUCCESS)
+            break;
+
+        for (i = row + 1; i < nrows; i++)
+        {
+            _gr_mpn_mod_mul(e, REDUCED(i, col), d, ctx);
+            _gr_mpn_mod_neg(f, e, ctx);
+
+#if defined(add_sssssaaaaaaaaaa)
+            if (n == 2)
+            {
+                for (j = col + 1; j < ncols; j++)
+                {
+                    mp_limb_t t[4];
+                    FLINT_MPN_MUL_2X2(t[3], t[2], t[1], t[0], REDUCED(row, j)[1], REDUCED(row, j)[0], f[1], f[0]);
+                    add_sssssaaaaaaaaaa(UNREDUCED(i, j)[4], UNREDUCED(i, j)[3], UNREDUCED(i, j)[2], UNREDUCED(i, j)[1], UNREDUCED(i, j)[0],
+                                        UNREDUCED(i, j)[4], UNREDUCED(i, j)[3], UNREDUCED(i, j)[2], UNREDUCED(i, j)[1], UNREDUCED(i, j)[0],
+                                        0, t[3], t[2], t[1], t[0]);
+                }
+
+                REDUCED(i, col)[0] = 0;
+                REDUCED(i, col)[1] = 0;
+                REDUCED(i, rank - 1)[0] = e[0];
+                REDUCED(i, rank - 1)[1] = e[1];
+            }
+            else
+#endif
+            {
+                if (col + 1 < ncols)
+                {
+#if 1
+                    for (j = col + 1; j < ncols; j++)
+                        flint_mpn_mul_n(TMPROW(j), REDUCED(row, j), f, n);
+
+                    mpn_add_n(UNREDUCED(i, col + 1), UNREDUCED(i, col + 1), TMPROW(col + 1), (2 * n + 1) * (ncols - col - 1));
+#else
+                    for (j = col + 1; j < ncols; j++)
+                    {
+                        flint_mpn_mul_n(t, REDUCED(row, j), f, n);
+                        mpn_add_n(UNREDUCED(i, j), UNREDUCED(i, j), t, 2 * n + 1);
+                    }
+#endif
+                }
+
+                flint_mpn_zero(REDUCED(i, col), n);
+                flint_mpn_copyi(REDUCED(i, rank - 1), e, n);
+            }
+        }
+        row++;
+        col++;
+    }
+
+    *res_rank = rank;
+
+    TMP_END;
+    return status;
+}
+
+static const unsigned char mpn_mod_mat_lu_delayed_cutoff[MPN_MOD_MAX_LIMBS + 1] =
+{
+    0, 0, 23, 8, 7, 7, 7, 7, 6, 6, 6, 6, 5, 5, 5, 5, 5,
+};
+
+/* todo: retune this when arithmetic is more optimized */
 int
 _gr_mpn_mod_mat_lu(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, gr_ctx_t ctx)
 {
-    slong cutoff;
+    slong cutoff, nlimbs = MPN_MOD_CTX_NLIMBS(ctx);
 
-    if (MPN_MOD_CTX_NLIMBS(ctx) == 2)
-        cutoff = 14;
-    else
-        cutoff = 4;
+    cutoff = (slong) mpn_mod_mat_lu_delayed_cutoff[nlimbs];
 
-    if (gr_mat_nrows(A, ctx) <= 2 * cutoff || gr_mat_ncols(A, ctx) <= 2 * cutoff)
+    if (gr_mat_nrows(A, ctx) < cutoff || gr_mat_ncols(A, ctx) < cutoff)
         return gr_mat_lu_classical(rank, P, LU, A, rank_check, ctx);
     else
-        return gr_mat_lu_recursive(rank, P, LU, A, rank_check, cutoff, ctx);
+        return _gr_mpn_mod_mat_lu_classical_delayed(rank, P, LU, A, rank_check, ctx);
 }
 
 
@@ -1384,9 +1657,9 @@ gr_method_tab_input _mpn_mod_methods_input[] =
     {GR_METHOD_POLY_DIV_SERIES, (gr_funcptr) _gr_mpn_mod_poly_div_series},
     {GR_METHOD_POLY_DIVREM,     (gr_funcptr) _gr_mpn_mod_poly_divrem},
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) _gr_mpn_mod_roots_gr_poly},
-    {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_mpn_mod_mat_mul},
 */
 
+    {GR_METHOD_MAT_MUL,         (gr_funcptr) _gr_mpn_mod_mat_mul},
     {GR_METHOD_MAT_LU,          (gr_funcptr) _gr_mpn_mod_mat_lu},
 
 /*
