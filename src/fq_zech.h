@@ -117,7 +117,7 @@ void fq_zech_sub(fq_zech_t rop, const fq_zech_t op1, const fq_zech_t op2,
 void fq_zech_sub_one(fq_zech_t rop, const fq_zech_t op1,
                      const fq_zech_ctx_t ctx);
 
-void fq_zech_neg(fq_zech_t rop, const fq_zech_t op1, const fq_zech_ctx_t ctx);
+void fq_zech_neg(fq_zech_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx);
 
 void fq_zech_mul(fq_zech_t rop, const fq_zech_t op1, const fq_zech_t op2,
                  const fq_zech_ctx_t ctx);
@@ -133,7 +133,7 @@ void fq_zech_mul_ui(fq_zech_t rop, const fq_zech_t op, ulong x,
 
 void fq_zech_sqr(fq_zech_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx);
 
-void fq_zech_inv(fq_zech_t rop, const fq_zech_t op1, const fq_zech_ctx_t ctx);
+void fq_zech_inv(fq_zech_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx);
 
 void _fq_zech_pow(fmpz * rop, const fmpz * op, slong len, const fmpz_t e,
                   const fmpz * a, const slong *j, slong lena, const fmpz_t p);
@@ -152,7 +152,7 @@ int fq_zech_sqrt(fq_zech_t rop, const fq_zech_t op1,
 void fq_zech_pth_root(fq_zech_t rop,
 		                 const fq_zech_t op1, const fq_zech_ctx_t ctx);
 
-int fq_zech_is_square(const fq_zech_t op1, const fq_zech_ctx_t ctx);
+int fq_zech_is_square(const fq_zech_t op, const fq_zech_ctx_t ctx);
 
 /* Randomisation *************************************************************/
 
@@ -283,7 +283,7 @@ int _fq_zech_ctx_init_conway(fq_zech_ctx_t, fmpz_t, slong, const char *);
 void fq_zech_ctx_init_conway(fq_zech_ctx_t, fmpz_t, slong, const char *);
 void fq_zech_ctx_init_random(fq_zech_ctx_t, fmpz_t, slong, const char *);
 
-void fq_zech_ctx_order(fmpz_t, const fq_zech_ctx_t);
+void fq_zech_ctx_order(fmpz_t f, const fq_zech_ctx_t ctx);
 
 #ifdef T
 #undef T

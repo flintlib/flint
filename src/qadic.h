@@ -352,13 +352,13 @@ void _qadic_inv(fmpz *rop, const fmpz *op, slong len,
                 const fmpz *a, const slong *j, slong lena,
                 const fmpz_t p, slong N);
 
-void qadic_inv(qadic_t x, const qadic_t y, const qadic_ctx_t ctx);
+void qadic_inv(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx);
 
 void _qadic_pow(fmpz *rop, const fmpz *op, slong len, const fmpz_t e,
                 const fmpz *a, const slong *j, slong lena,
                 const fmpz_t p);
 
-void qadic_pow(qadic_t x, const qadic_t y, const fmpz_t e, const qadic_ctx_t ctx);
+void qadic_pow(qadic_t rop, const qadic_t op, const fmpz_t e, const qadic_ctx_t ctx);
 
 /* Special functions *********************************************************/
 

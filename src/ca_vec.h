@@ -49,7 +49,7 @@ ca_vec_entry_ptr(ca_vec_t vec, slong i)
 ca_ptr _ca_vec_init(slong len, ca_ctx_t ctx);
 void ca_vec_init(ca_vec_t vec, slong len, ca_ctx_t ctx);
 
-void _ca_vec_clear(ca_ptr v, slong len, ca_ctx_t ctx);
+void _ca_vec_clear(ca_ptr vec, slong len, ca_ctx_t ctx);
 void ca_vec_clear(ca_vec_t vec, ca_ctx_t ctx);
 
 void _ca_vec_swap(ca_ptr vec1, ca_ptr vec2, slong len, ca_ctx_t ctx);
@@ -69,7 +69,7 @@ slong ca_vec_length(const ca_vec_t vec, ca_ctx_t ctx)
 }
 
 void _ca_vec_fit_length(ca_vec_t vec, slong len, ca_ctx_t ctx);
-void ca_vec_set_length(ca_vec_t res, slong len, ca_ctx_t ctx);
+void ca_vec_set_length(ca_vec_t vec, slong len, ca_ctx_t ctx);
 
 /* Assignment */
 
@@ -100,7 +100,7 @@ void _ca_vec_undefined(ca_ptr vec, slong len, ca_ctx_t ctx)
 /* Input and output */
 
 void ca_vec_print(const ca_vec_t vec, ca_ctx_t ctx);
-void ca_vec_printn(const ca_vec_t vec, slong digits, ca_ctx_t ctx);
+void ca_vec_printn(const ca_vec_t poly, slong digits, ca_ctx_t ctx);
 
 /* List operations */
 
@@ -121,8 +121,8 @@ void _ca_vec_add(ca_ptr res, ca_srcptr vec1, ca_srcptr vec2, slong len, ca_ctx_t
 void _ca_vec_sub(ca_ptr res, ca_srcptr vec1, ca_srcptr vec2, slong len, ca_ctx_t ctx);
 void _ca_vec_scalar_mul_ca(ca_ptr res, ca_srcptr src, slong len, const ca_t c, ca_ctx_t ctx);
 void _ca_vec_scalar_div_ca(ca_ptr res, ca_srcptr src, slong len, const ca_t c, ca_ctx_t ctx);
-void _ca_vec_scalar_addmul_ca(ca_ptr res, ca_srcptr vec, slong len, const ca_t c, ca_ctx_t ctx);
-void _ca_vec_scalar_submul_ca(ca_ptr res, ca_srcptr vec, slong len, const ca_t c, ca_ctx_t ctx);
+void _ca_vec_scalar_addmul_ca(ca_ptr res, ca_srcptr src, slong len, const ca_t c, ca_ctx_t ctx);
+void _ca_vec_scalar_submul_ca(ca_ptr res, ca_srcptr src, slong len, const ca_t c, ca_ctx_t ctx);
 
 /* Comparisons and predicates */
 

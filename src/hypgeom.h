@@ -44,14 +44,14 @@ void hypgeom_clear(hypgeom_t hyp);
 
 void hypgeom_precompute(hypgeom_t hyp);
 
-slong hypgeom_estimate_terms(const mag_t z, int r, slong prec);
+slong hypgeom_estimate_terms(const mag_t z, int r, slong d);
 
 slong hypgeom_bound(mag_t error, int r,
     slong C, slong D, slong K, const mag_t TK, const mag_t z, slong prec);
 
 void arb_hypgeom_sum(arb_t P, arb_t Q, const hypgeom_t hyp, slong n, slong prec);
 
-void arb_hypgeom_infsum(arb_t P, arb_t Q, hypgeom_t hyp, slong target_prec, slong prec);
+void arb_hypgeom_infsum(arb_t P, arb_t Q, hypgeom_t hyp, slong tol, slong prec);
 
 #ifdef __cplusplus
 }

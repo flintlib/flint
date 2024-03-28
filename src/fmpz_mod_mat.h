@@ -257,7 +257,7 @@ void fmpz_mod_mat_strong_echelon_form(fmpz_mod_mat_t mat, const fmpz_mod_ctx_t c
 
 /* Transforms ****************************************************************/
 
-void fmpz_mod_mat_similarity(fmpz_mod_mat_t A, slong r, fmpz_t d, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_mat_similarity(fmpz_mod_mat_t M, slong r, fmpz_t d, const fmpz_mod_ctx_t ctx);
 
 /* Permutations ************************************************************/
 

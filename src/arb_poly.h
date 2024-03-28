@@ -46,13 +46,13 @@ arb_poly_swap(arb_poly_t poly1, arb_poly_t poly2)
     FLINT_SWAP(arb_poly_struct, *poly1, *poly2);
 }
 
-void arb_poly_set(arb_poly_t poly, const arb_poly_t src);
+void arb_poly_set(arb_poly_t dest, const arb_poly_t src);
 
-void arb_poly_set_round(arb_poly_t poly, const arb_poly_t src, slong prec);
+void arb_poly_set_round(arb_poly_t dest, const arb_poly_t src, slong prec);
 
-void arb_poly_set_trunc(arb_poly_t res, const arb_poly_t poly, slong n);
+void arb_poly_set_trunc(arb_poly_t dest, const arb_poly_t src, slong n);
 
-void arb_poly_set_trunc_round(arb_poly_t res, const arb_poly_t poly, slong n, slong prec);
+void arb_poly_set_trunc_round(arb_poly_t dest, const arb_poly_t src, slong n, slong prec);
 
 /* Basic manipulation */
 
@@ -100,11 +100,11 @@ arb_poly_one(arb_poly_t poly)
     _arb_poly_set_length(poly, 1);
 }
 
-void arb_poly_set_coeff_si(arb_poly_t poly, slong n, slong x);
+void arb_poly_set_coeff_si(arb_poly_t poly, slong n, slong c);
 
-void arb_poly_set_coeff_arb(arb_poly_t poly, slong n, const arb_t x);
+void arb_poly_set_coeff_arb(arb_poly_t poly, slong n, const arb_t c);
 
-void arb_poly_get_coeff_arb(arb_t x, const arb_poly_t poly, slong n);
+void arb_poly_get_coeff_arb(arb_t v, const arb_poly_t poly, slong n);
 
 #define arb_poly_get_coeff_ptr(poly, n) \
     ((n) < (poly)->length ? (poly)->coeffs + (n) : NULL)
@@ -146,9 +146,9 @@ arb_poly_set_arb(arb_poly_t poly, const arb_t c)
     _arb_poly_set_length(poly, !arb_is_zero(poly->coeffs));
 }
 
-void arb_poly_set_si(arb_poly_t poly, slong c);
+void arb_poly_set_si(arb_poly_t poly, slong src);
 
-int arb_poly_get_unique_fmpz_poly(fmpz_poly_t res, const arb_poly_t src);
+int arb_poly_get_unique_fmpz_poly(fmpz_poly_t z, const arb_poly_t x);
 
 /* Comparisons */
 
@@ -166,7 +166,7 @@ int arb_poly_overlaps(const arb_poly_t poly1, const arb_poly_t poly2);
 
 /* Bounds */
 
-void _arb_poly_majorant(arb_ptr res, arb_srcptr vec, slong len, slong prec);
+void _arb_poly_majorant(arb_ptr res, arb_srcptr poly, slong len, slong prec);
 
 void arb_poly_majorant(arb_poly_t res, const arb_poly_t poly, slong prec);
 
@@ -191,7 +191,7 @@ _arb_poly_add(arb_ptr res, arb_srcptr poly1, slong len1,
 void arb_poly_add(arb_poly_t res, const arb_poly_t poly1,
               const arb_poly_t poly2, slong prec);
 
-void arb_poly_add_si(arb_poly_t res, const arb_poly_t poly, slong c, slong prec);
+void arb_poly_add_si(arb_poly_t C, const arb_poly_t A, slong B, slong prec);
 
 void _arb_poly_sub(arb_ptr res, arb_srcptr poly1, slong len1,
     arb_srcptr poly2, slong len2, slong prec);
@@ -288,7 +288,7 @@ _arb_poly_mul_monic(arb_ptr res, arb_srcptr poly1, slong len1,
 void _arb_poly_inv_series(arb_ptr Qinv,
     arb_srcptr Q, slong Qlen, slong len, slong prec);
 
-void arb_poly_inv_series(arb_poly_t Qinv, const arb_poly_t Q, slong n, slong prec);
+void arb_poly_inv_series(arb_poly_t Q, const arb_poly_t A, slong n, slong prec);
 
 void  _arb_poly_div_series(arb_ptr Q, arb_srcptr A, slong Alen,
     arb_srcptr B, slong Blen, slong n, slong prec);
@@ -334,7 +334,7 @@ void _arb_poly_tree_build(arb_ptr * tree, arb_srcptr roots, slong len, slong pre
 
 /* Composition */
 
-void _arb_poly_taylor_shift(arb_ptr poly, const arb_t c, slong n, slong prec);
+void _arb_poly_taylor_shift(arb_ptr g, const arb_t c, slong n, slong prec);
 void arb_poly_taylor_shift(arb_poly_t g, const arb_poly_t f, const arb_t c, slong prec);
 void _arb_poly_compose(arb_ptr res, arb_srcptr poly1, slong len1, arb_srcptr poly2, slong len2, slong prec);
 void arb_poly_compose(arb_poly_t res, const arb_poly_t poly1, const arb_poly_t poly2, slong prec);
@@ -348,19 +348,19 @@ void arb_poly_compose_series(arb_poly_t res,
 
 /* Reversion */
 
-void _arb_poly_revert_series(arb_ptr Qinv, arb_srcptr Q, slong Qlen, slong n, slong prec);
-void arb_poly_revert_series(arb_poly_t Qinv, const arb_poly_t Q, slong n, slong prec);
+void _arb_poly_revert_series(arb_ptr h, arb_srcptr f, slong flen, slong n, slong prec);
+void arb_poly_revert_series(arb_poly_t h, const arb_poly_t f, slong n, slong prec);
 
 /* Evaluation and interpolation */
 
-void _arb_poly_evaluate_horner(arb_t res, arb_srcptr f, slong len, const arb_t a, slong prec);
-void arb_poly_evaluate_horner(arb_t res, const arb_poly_t f, const arb_t a, slong prec);
+void _arb_poly_evaluate_horner(arb_t y, arb_srcptr f, slong len, const arb_t x, slong prec);
+void arb_poly_evaluate_horner(arb_t y, const arb_poly_t f, const arb_t x, slong prec);
 
-void _arb_poly_evaluate_rectangular(arb_t y, arb_srcptr poly, slong len, const arb_t x, slong prec);
-void arb_poly_evaluate_rectangular(arb_t res, const arb_poly_t f, const arb_t a, slong prec);
+void _arb_poly_evaluate_rectangular(arb_t y, arb_srcptr f, slong len, const arb_t x, slong prec);
+void arb_poly_evaluate_rectangular(arb_t y, const arb_poly_t f, const arb_t x, slong prec);
 
-void _arb_poly_evaluate(arb_t res, arb_srcptr f, slong len, const arb_t a, slong prec);
-void arb_poly_evaluate(arb_t res, const arb_poly_t f, const arb_t a, slong prec);
+void _arb_poly_evaluate(arb_t y, arb_srcptr f, slong len, const arb_t x, slong prec);
+void arb_poly_evaluate(arb_t y, const arb_poly_t f, const arb_t x, slong prec);
 
 void _arb_poly_evaluate2_horner(arb_t y, arb_t z, arb_srcptr f, slong len, const arb_t x, slong prec);
 void arb_poly_evaluate2_horner(arb_t y, arb_t z, const arb_poly_t f, const arb_t x, slong prec);
@@ -528,49 +528,49 @@ void arb_poly_sinh_series(arb_poly_t s, const arb_poly_t h, slong n, slong prec)
 void _arb_poly_cosh_series(arb_ptr c, arb_srcptr h, slong hlen, slong n, slong prec);
 void arb_poly_cosh_series(arb_poly_t c, const arb_poly_t h, slong n, slong prec);
 
-void _arb_poly_sin_cos_series(arb_ptr s, arb_ptr c, arb_srcptr h, slong hlen, slong len, slong prec);
+void _arb_poly_sin_cos_series(arb_ptr s, arb_ptr c, arb_srcptr h, slong hlen, slong n, slong prec);
 void arb_poly_sin_cos_series(arb_poly_t s, arb_poly_t c, const arb_poly_t h, slong n, slong prec);
-void _arb_poly_sin_cos_pi_series(arb_ptr s, arb_ptr c, arb_srcptr h, slong hlen, slong len, slong prec);
+void _arb_poly_sin_cos_pi_series(arb_ptr s, arb_ptr c, arb_srcptr h, slong hlen, slong n, slong prec);
 void arb_poly_sin_cos_pi_series(arb_poly_t s, arb_poly_t c, const arb_poly_t h, slong n, slong prec);
 
-void _arb_poly_sin_series(arb_ptr g, arb_srcptr h, slong hlen, slong n, slong prec);
+void _arb_poly_sin_series(arb_ptr s, arb_srcptr h, slong hlen, slong n, slong prec);
 
-void arb_poly_sin_series(arb_poly_t g, const arb_poly_t h, slong n, slong prec);
+void arb_poly_sin_series(arb_poly_t s, const arb_poly_t h, slong n, slong prec);
 
-void _arb_poly_cos_series(arb_ptr g, arb_srcptr h, slong hlen, slong n, slong prec);
+void _arb_poly_cos_series(arb_ptr c, arb_srcptr h, slong hlen, slong n, slong prec);
 
-void arb_poly_cos_series(arb_poly_t g, const arb_poly_t h, slong n, slong prec);
+void arb_poly_cos_series(arb_poly_t c, const arb_poly_t h, slong n, slong prec);
 
-void _arb_poly_sin_pi_series(arb_ptr g, arb_srcptr h, slong hlen, slong n, slong prec);
+void _arb_poly_sin_pi_series(arb_ptr s, arb_srcptr h, slong hlen, slong n, slong prec);
 
-void arb_poly_sin_pi_series(arb_poly_t g, const arb_poly_t h, slong n, slong prec);
+void arb_poly_sin_pi_series(arb_poly_t s, const arb_poly_t h, slong n, slong prec);
 
-void _arb_poly_cos_pi_series(arb_ptr g, arb_srcptr h, slong hlen, slong n, slong prec);
+void _arb_poly_cos_pi_series(arb_ptr c, arb_srcptr h, slong hlen, slong n, slong prec);
 
-void arb_poly_cos_pi_series(arb_poly_t g, const arb_poly_t h, slong n, slong prec);
+void arb_poly_cos_pi_series(arb_poly_t c, const arb_poly_t h, slong n, slong prec);
 
-void _arb_poly_cot_pi_series(arb_ptr g, arb_srcptr h, slong hlen, slong n, slong prec);
+void _arb_poly_cot_pi_series(arb_ptr c, arb_srcptr h, slong hlen, slong n, slong prec);
 
-void arb_poly_cot_pi_series(arb_poly_t g, const arb_poly_t h, slong n, slong prec);
+void arb_poly_cot_pi_series(arb_poly_t c, const arb_poly_t h, slong n, slong prec);
 
 void _arb_poly_tan_series(arb_ptr g, arb_srcptr h, slong hlen, slong len, slong prec);
 
 void arb_poly_tan_series(arb_poly_t g, const arb_poly_t h, slong n, slong prec);
 
-void _arb_poly_sinc_series(arb_ptr g, arb_srcptr h, slong hlen, slong n, slong prec);
-void arb_poly_sinc_series(arb_poly_t g, const arb_poly_t h, slong n, slong prec);
+void _arb_poly_sinc_series(arb_ptr s, arb_srcptr h, slong hlen, slong n, slong prec);
+void arb_poly_sinc_series(arb_poly_t s, const arb_poly_t h, slong n, slong prec);
 
-void _arb_poly_sinc_pi_series(arb_ptr g, arb_srcptr h, slong hlen, slong n, slong prec);
-void arb_poly_sinc_pi_series(arb_poly_t g, const arb_poly_t h, slong n, slong prec);
+void _arb_poly_sinc_pi_series(arb_ptr s, arb_srcptr h, slong hlen, slong n, slong prec);
+void arb_poly_sinc_pi_series(arb_poly_t s, const arb_poly_t h, slong n, slong prec);
 
-void _arb_poly_evaluate_acb_horner(acb_t res, arb_srcptr f, slong len, const acb_t x, slong prec);
-void arb_poly_evaluate_acb_horner(acb_t res, const arb_poly_t f, const acb_t a, slong prec);
+void _arb_poly_evaluate_acb_horner(acb_t y, arb_srcptr f, slong len, const acb_t x, slong prec);
+void arb_poly_evaluate_acb_horner(acb_t y, const arb_poly_t f, const acb_t x, slong prec);
 
-void _arb_poly_evaluate_acb_rectangular(acb_t y, arb_srcptr poly, slong len, const acb_t x, slong prec);
-void arb_poly_evaluate_acb_rectangular(acb_t res, const arb_poly_t f, const acb_t a, slong prec);
+void _arb_poly_evaluate_acb_rectangular(acb_t y, arb_srcptr f, slong len, const acb_t x, slong prec);
+void arb_poly_evaluate_acb_rectangular(acb_t y, const arb_poly_t f, const acb_t x, slong prec);
 
-void _arb_poly_evaluate_acb(acb_t res, arb_srcptr f, slong len, const acb_t x, slong prec);
-void arb_poly_evaluate_acb(acb_t res, const arb_poly_t f, const acb_t a, slong prec);
+void _arb_poly_evaluate_acb(acb_t y, arb_srcptr f, slong len, const acb_t x, slong prec);
+void arb_poly_evaluate_acb(acb_t y, const arb_poly_t f, const acb_t x, slong prec);
 
 void _arb_poly_evaluate2_acb_horner(acb_t y, acb_t z, arb_srcptr f, slong len, const acb_t x, slong prec);
 void arb_poly_evaluate2_acb_horner(acb_t y, acb_t z, const arb_poly_t f, const acb_t x, slong prec);
@@ -584,32 +584,32 @@ void arb_poly_evaluate2_acb(acb_t y, acb_t z, const arb_poly_t f, const acb_t x,
 void _arb_poly_lambertw_series(arb_ptr res, arb_srcptr z, slong zlen, int flags, slong len, slong prec);
 void arb_poly_lambertw_series(arb_poly_t res, const arb_poly_t z, int flags, slong len, slong prec);
 
-void _arb_poly_gamma_series(arb_ptr res, arb_srcptr h, slong hlen, slong len, slong prec);
-void arb_poly_gamma_series(arb_poly_t res, const arb_poly_t f, slong n, slong prec);
+void _arb_poly_gamma_series(arb_ptr res, arb_srcptr h, slong hlen, slong n, slong prec);
+void arb_poly_gamma_series(arb_poly_t res, const arb_poly_t h, slong n, slong prec);
 
-void _arb_poly_rgamma_series(arb_ptr res, arb_srcptr h, slong hlen, slong len, slong prec);
-void arb_poly_rgamma_series(arb_poly_t res, const arb_poly_t f, slong n, slong prec);
+void _arb_poly_rgamma_series(arb_ptr res, arb_srcptr h, slong hlen, slong n, slong prec);
+void arb_poly_rgamma_series(arb_poly_t res, const arb_poly_t h, slong n, slong prec);
 
-void _arb_poly_lgamma_series(arb_ptr res, arb_srcptr h, slong hlen, slong len, slong prec);
-void arb_poly_lgamma_series(arb_poly_t res, const arb_poly_t f, slong n, slong prec);
+void _arb_poly_lgamma_series(arb_ptr res, arb_srcptr h, slong hlen, slong n, slong prec);
+void arb_poly_lgamma_series(arb_poly_t res, const arb_poly_t h, slong n, slong prec);
 
-void _arb_poly_digamma_series(arb_ptr res, arb_srcptr h, slong hlen, slong len, slong prec);
-void arb_poly_digamma_series(arb_poly_t res, const arb_poly_t f, slong n, slong prec);
+void _arb_poly_digamma_series(arb_ptr res, arb_srcptr h, slong hlen, slong n, slong prec);
+void arb_poly_digamma_series(arb_poly_t res, const arb_poly_t h, slong n, slong prec);
 
 void _arb_poly_rising_ui_series(arb_ptr res, arb_srcptr f, slong flen, ulong r, slong trunc, slong prec);
 void arb_poly_rising_ui_series(arb_poly_t res, const arb_poly_t f, ulong r, slong trunc, slong prec);
 
 void _arb_poly_zeta_series(arb_ptr res, arb_srcptr h, slong hlen, const arb_t a, int deflate, slong len, slong prec);
-void arb_poly_zeta_series(arb_poly_t res, const arb_poly_t f, const arb_t a, int deflate, slong n, slong prec);
+void arb_poly_zeta_series(arb_poly_t res, const arb_poly_t s, const arb_t a, int deflate, slong n, slong prec);
 
-void _arb_poly_riemann_siegel_theta_series(arb_ptr res, arb_srcptr h, slong hlen, slong len, slong prec);
+void _arb_poly_riemann_siegel_theta_series(arb_ptr res, arb_srcptr h, slong hlen, slong n, slong prec);
 void arb_poly_riemann_siegel_theta_series(arb_poly_t res, const arb_poly_t h, slong n, slong prec);
 
-void _arb_poly_riemann_siegel_z_series(arb_ptr res, arb_srcptr h, slong hlen, slong len, slong prec);
+void _arb_poly_riemann_siegel_z_series(arb_ptr res, arb_srcptr h, slong hlen, slong n, slong prec);
 void arb_poly_riemann_siegel_z_series(arb_poly_t res, const arb_poly_t h, slong n, slong prec);
 
 slong _arb_poly_swinnerton_dyer_ui_prec(ulong n);
-void _arb_poly_swinnerton_dyer_ui(arb_ptr T, ulong n, slong trunc, slong prec);
+void _arb_poly_swinnerton_dyer_ui(arb_ptr poly, ulong n, slong trunc, slong prec);
 void arb_poly_swinnerton_dyer_ui(arb_poly_t poly, ulong n, slong prec);
 
 /* Root-finding */

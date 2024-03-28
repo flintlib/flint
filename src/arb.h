@@ -123,7 +123,7 @@ void arb_indeterminate(arb_t x);
 
 int arb_is_finite(const arb_t x);
 
-void arb_set(arb_t x, const arb_t y);
+void arb_set(arb_t y, const arb_t x);
 
 ARB_INLINE void
 arb_swap(arb_t x, arb_t y)
@@ -131,18 +131,18 @@ arb_swap(arb_t x, arb_t y)
     FLINT_SWAP(arb_struct, *x, *y);
 }
 
-void arb_set_round(arb_t z, const arb_t x, slong prec);
+void arb_set_round(arb_t y, const arb_t x, slong prec);
 
 void arb_trim(arb_t y, const arb_t x);
 
 void arb_neg(arb_t y, const arb_t x);
 
-void arb_neg_round(arb_t x, const arb_t y, slong prec);
+void arb_neg_round(arb_t y, const arb_t x, slong prec);
 
 void arb_abs(arb_t y, const arb_t x);
 void arb_nonnegative_abs(arb_t y, const arb_t x);
 
-void arb_sgn(arb_t res, const arb_t x);
+void arb_sgn(arb_t y, const arb_t x);
 int arb_sgn_nonzero(const arb_t x);
 
 void _arb_digits_round_inplace(char * s, flint_bitcnt_t * shift, fmpz_t error, slong n, arf_rnd_t rnd);
@@ -163,13 +163,13 @@ arb_set_arf(arb_t x, const arf_t y)
     mag_zero(arb_radref(x));
 }
 
-void arb_set_si(arb_t x, slong y);
+void arb_set_si(arb_t y, slong x);
 
-void arb_set_ui(arb_t x, ulong y);
+void arb_set_ui(arb_t y, ulong x);
 
-void arb_set_d(arb_t x, double y);
+void arb_set_d(arb_t y, double x);
 
-void arb_set_fmpz(arb_t x, const fmpz_t y);
+void arb_set_fmpz(arb_t y, const fmpz_t x);
 
 ARB_INLINE void
 arb_set_fmpz_2exp(arb_t x, const fmpz_t y, const fmpz_t exp)
@@ -178,7 +178,7 @@ arb_set_fmpz_2exp(arb_t x, const fmpz_t y, const fmpz_t exp)
     mag_zero(arb_radref(x));
 }
 
-void arb_set_round_fmpz_2exp(arb_t y, const fmpz_t x, const fmpz_t exp, slong prec);
+void arb_set_round_fmpz_2exp(arb_t y, const fmpz_t x, const fmpz_t e, slong prec);
 
 void arb_set_round_fmpz(arb_t y, const fmpz_t x, slong prec);
 
@@ -200,7 +200,7 @@ void arb_print(const arb_t x);
 void arb_printd(const arb_t x, slong digits);
 void arb_printn(const arb_t x, slong digits, ulong flags);
 
-void _arb_vec_printn(arb_srcptr vec, slong len, slong ndigits, ulong flags);
+void _arb_vec_printn(arb_srcptr vec, slong len, slong digits, ulong flags);
 void _arb_vec_printd(arb_srcptr vec, slong len, slong ndigits);
 
 void arb_mul_2exp_si(arb_t y, const arb_t x, slong e);
@@ -304,11 +304,11 @@ void arb_urandom(arb_t x, flint_rand_t state, slong prec);
 
 void arb_add_error_arf(arb_t x, const arf_t err);
 
-void arb_add_error_2exp_si(arb_t x, slong err);
+void arb_add_error_2exp_si(arb_t x, slong e);
 
-void arb_add_error_2exp_fmpz(arb_t x, const fmpz_t err);
+void arb_add_error_2exp_fmpz(arb_t x, const fmpz_t e);
 
-void arb_add_error(arb_t x, const arb_t error);
+void arb_add_error(arb_t x, const arb_t err);
 
 ARB_INLINE void
 arb_add_error_mag(arb_t x, const mag_t err)
@@ -341,10 +341,10 @@ int arb_get_unique_fmpz(fmpz_t z, const arb_t x);
 
 void arb_get_fmpz_mid_rad_10exp(fmpz_t mid, fmpz_t rad, fmpz_t exp, const arb_t x, slong n);
 
-void arb_floor(arb_t z, const arb_t x, slong prec);
-void arb_ceil(arb_t z, const arb_t x, slong prec);
-void arb_nint(arb_t res, const arb_t x, slong prec);
-void arb_trunc(arb_t res, const arb_t x, slong prec);
+void arb_floor(arb_t y, const arb_t x, slong prec);
+void arb_ceil(arb_t y, const arb_t x, slong prec);
+void arb_nint(arb_t y, const arb_t x, slong prec);
+void arb_trunc(arb_t y, const arb_t x, slong prec);
 
 void arb_set_interval_arf(arb_t x, const arf_t a, const arf_t b, slong prec);
 #ifdef __MPFR_H
@@ -356,8 +356,8 @@ void arb_get_interval_arf(arf_t a, arf_t b, const arb_t x, slong prec);
 void arb_get_interval_mpfr(mpfr_t a, mpfr_t b, const arb_t x);
 #endif
 
-void arb_set_interval_mag(arb_t res, const mag_t a, const mag_t b, slong prec);
-void arb_set_interval_neg_pos_mag(arb_t res, const mag_t a, const mag_t b, slong prec);
+void arb_set_interval_mag(arb_t x, const mag_t a, const mag_t b, slong prec);
+void arb_set_interval_neg_pos_mag(arb_t x, const mag_t a, const mag_t b, slong prec);
 
 void arb_union(arb_t z, const arb_t x, const arb_t y, slong prec);
 int arb_intersection(arb_t z, const arb_t x, const arb_t y, slong prec);
@@ -377,7 +377,7 @@ void arb_add_arf(arb_t z, const arb_t x, const arf_t y, slong prec);
 void arb_add_ui(arb_t z, const arb_t x, ulong y, slong prec);
 void arb_add_si(arb_t z, const arb_t x, slong y, slong prec);
 void arb_add_fmpz(arb_t z, const arb_t x, const fmpz_t y, slong prec);
-void arb_add_fmpz_2exp(arb_t z, const arb_t x, const fmpz_t man, const fmpz_t exp, slong prec);
+void arb_add_fmpz_2exp(arb_t z, const arb_t x, const fmpz_t m, const fmpz_t e, slong prec);
 
 void arb_sub(arb_t z, const arb_t x, const arb_t y, slong prec);
 void arb_sub_arf(arb_t z, const arb_t x, const arf_t y, slong prec);
@@ -464,7 +464,7 @@ void arb_hypot(arb_t z, const arb_t x, const arb_t y, slong prec);
 
 void arb_rsqrt(arb_t z, const arb_t x, slong prec);
 void arb_rsqrt_ui(arb_t z, ulong x, slong prec);
-void arb_sqrt1pm1(arb_t r, const arb_t z, slong prec);
+void arb_sqrt1pm1(arb_t z, const arb_t x, slong prec);
 
 void arb_rsqrt_arf_newton(arb_t res, const arf_t x, slong prec);
 void arb_sqrt_arf_newton(arb_t res, const arf_t x, slong prec);
@@ -485,7 +485,7 @@ void arb_log(arb_t z, const arb_t x, slong prec);
 void arb_log_arf(arb_t z, const arf_t x, slong prec);
 void arb_log_ui(arb_t z, ulong x, slong prec);
 void arb_log_fmpz(arb_t z, const fmpz_t x, slong prec);
-void arb_log1p(arb_t r, const arb_t z, slong prec);
+void arb_log1p(arb_t z, const arb_t x, slong prec);
 void arb_log_base_ui(arb_t res, const arb_t x, ulong b, slong prec);
 void arb_log_hypot(arb_t res, const arb_t x, const arb_t y, slong prec);
 void arb_exp(arb_t z, const arb_t x, slong prec);
@@ -509,8 +509,8 @@ void arb_sin_pi_fmpq(arb_t s, const fmpq_t x, slong prec);
 void arb_cos_pi_fmpq(arb_t c, const fmpq_t x, slong prec);
 void arb_sinc(arb_t z, const arb_t x, slong prec);
 void arb_sinc_pi(arb_t z, const arb_t x, slong prec);
-void arb_sinh(arb_t z, const arb_t x, slong prec);
-void arb_cosh(arb_t z, const arb_t x, slong prec);
+void arb_sinh(arb_t s, const arb_t x, slong prec);
+void arb_cosh(arb_t c, const arb_t x, slong prec);
 void arb_sinh_cosh(arb_t s, arb_t c, const arb_t x, slong prec);
 void arb_tanh(arb_t y, const arb_t x, slong prec);
 void arb_coth(arb_t y, const arb_t x, slong prec);
@@ -545,7 +545,7 @@ void arb_const_catalan(arb_t z, slong prec);
 void arb_const_e(arb_t z, slong prec);
 void arb_const_khinchin(arb_t z, slong prec);
 void arb_const_glaisher(arb_t z, slong prec);
-void arb_const_reciprocal_fibonacci(arb_t res, slong prec);
+void arb_const_reciprocal_fibonacci(arb_t z, slong prec);
 void arb_agm(arb_t z, const arb_t x, const arb_t y, slong prec);
 void arb_lgamma(arb_t z, const arb_t x, slong prec);
 void arb_rgamma(arb_t z, const arb_t x, slong prec);
@@ -557,20 +557,20 @@ void arb_zeta(arb_t z, const arb_t s, slong prec);
 void arb_hurwitz_zeta(arb_t z, const arb_t s, const arb_t a, slong prec);
 
 void arb_rising_ui(arb_t z, const arb_t x, ulong n, slong prec);
-void arb_rising_fmpq_ui(arb_t y, const fmpq_t x, ulong n, slong prec);
+void arb_rising_fmpq_ui(arb_t z, const fmpq_t x, ulong n, slong prec);
 void arb_rising(arb_t z, const arb_t x, const arb_t n, slong prec);
 void arb_rising2_ui(arb_t u, arb_t v, const arb_t x, ulong n, slong prec);
 
-void arb_log_ui_from_prev(arb_t s, ulong k, arb_t log_prev, ulong prev, slong prec);
+void arb_log_ui_from_prev(arb_t log_k1, ulong k1, arb_t log_k0, ulong k0, slong prec);
 
-void arb_const_apery(arb_t s, slong prec);
+void arb_const_apery(arb_t z, slong prec);
 
 void arb_zeta_ui_asymp(arb_t x, ulong s, slong prec);
 void arb_zeta_ui_borwein_bsplit(arb_t x, ulong s, slong prec);
 void arb_zeta_ui_euler_product(arb_t z, ulong s, slong prec);
-void arb_zeta_ui_bernoulli(arb_t x, ulong n, slong prec);
+void arb_zeta_ui_bernoulli(arb_t x, ulong s, slong prec);
 void arb_zeta_ui_vec_borwein(arb_ptr z, ulong start, slong num, ulong step, slong prec);
-void arb_zeta_ui(arb_t x, ulong n, slong prec);
+void arb_zeta_ui(arb_t x, ulong s, slong prec);
 void arb_zeta_ui_vec_even(arb_ptr x, ulong start, slong num, slong prec);
 void arb_zeta_ui_vec_odd(arb_ptr x, ulong start, slong num, slong prec);
 void arb_zeta_ui_vec(arb_ptr x, ulong start, slong num, slong prec);
@@ -959,7 +959,7 @@ void _arb_exp_taylor_naive(mp_ptr y, mp_limb_t * error,
 void _arb_exp_taylor_rs(mp_ptr y, mp_limb_t * error,
     mp_srcptr x, mp_size_t xn, ulong N);
 
-void arb_exp_arf_bb(arb_t z, const arf_t x, slong prec, int minus_one);
+void arb_exp_arf_bb(arb_t z, const arf_t x, slong prec, int m1);
 void arb_exp_arf_rs_generic(arb_t res, const arf_t x, slong prec, int minus_one);
 
 int _arb_get_mpn_fixed_mod_log2(mp_ptr w, fmpz_t q, mp_limb_t * error,
@@ -1014,9 +1014,9 @@ void _arb_sin_cos_taylor_rs(mp_ptr ysin, mp_ptr ycos,
 int _arb_get_mpn_fixed_mod_pi4(mp_ptr w, fmpz_t q, int * octant,
     mp_limb_t * error, const arf_t x, mp_size_t wn);
 
-void arb_sin_cos_arf_bb(arb_t zsin, arb_t zcos, const arf_t x, slong prec);
+void arb_sin_cos_arf_bb(arb_t s, arb_t c, const arf_t x, slong prec);
 void arb_sin_cos_arf_rs_generic(arb_t res_sin, arb_t res_cos, const arf_t x, slong prec);
-void arb_sin_cos_arf_generic(arb_t res_sin, arb_t res_cos, const arf_t x, slong prec);
+void arb_sin_cos_arf_generic(arb_t s, arb_t c, const arf_t x, slong prec);
 
 void _arb_sin_cos_wide(arb_t s, arb_t c, const arf_t x, const mag_t r, slong prec);
 void arb_sin_cos_wide(arb_t s, arb_t c, const arb_t x, slong prec);

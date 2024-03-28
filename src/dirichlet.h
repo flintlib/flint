@@ -87,9 +87,9 @@ dirichlet_char_struct;
 
 typedef dirichlet_char_struct dirichlet_char_t[1];
 
-void dirichlet_char_init(dirichlet_char_t x, const dirichlet_group_t G);
-void dirichlet_char_clear(dirichlet_char_t x);
-void dirichlet_char_print(const dirichlet_group_t G, const dirichlet_char_t x);
+void dirichlet_char_init(dirichlet_char_t chi, const dirichlet_group_t G);
+void dirichlet_char_clear(dirichlet_char_t chi);
+void dirichlet_char_print(const dirichlet_group_t G, const dirichlet_char_t chi);
 
 DIRICHLET_INLINE void
 dirichlet_char_set(dirichlet_char_t x, const dirichlet_group_t G, const dirichlet_char_t y)
@@ -130,16 +130,16 @@ void dirichlet_char_first_primitive(dirichlet_char_t x, const dirichlet_group_t 
 int dirichlet_char_next(dirichlet_char_t x, const dirichlet_group_t G);
 int dirichlet_char_next_primitive(dirichlet_char_t x, const dirichlet_group_t G);
 
-void dirichlet_char_mul(dirichlet_char_t c, const dirichlet_group_t G, const dirichlet_char_t a, const dirichlet_char_t b);
+void dirichlet_char_mul(dirichlet_char_t chi12, const dirichlet_group_t G, const dirichlet_char_t chi1, const dirichlet_char_t chi2);
 void dirichlet_char_pow(dirichlet_char_t c, const dirichlet_group_t G, const dirichlet_char_t a, ulong n);
 
-void dirichlet_char_lower(dirichlet_char_t y, const dirichlet_group_t H, const dirichlet_char_t x, const dirichlet_group_t G);
-void dirichlet_char_lift(dirichlet_char_t y, const dirichlet_group_t G, const dirichlet_char_t x, const dirichlet_group_t H);
+void dirichlet_char_lower(dirichlet_char_t chi_H, const dirichlet_group_t H, const dirichlet_char_t chi_G, const dirichlet_group_t G);
+void dirichlet_char_lift(dirichlet_char_t chi_G, const dirichlet_group_t G, const dirichlet_char_t chi_H, const dirichlet_group_t H);
 
 #define DIRICHLET_CHI_NULL UWORD_MAX
 
 ulong dirichlet_pairing(const dirichlet_group_t G, ulong m, ulong n);
-ulong dirichlet_pairing_char(const dirichlet_group_t G, const dirichlet_char_t a, const dirichlet_char_t b);
+ulong dirichlet_pairing_char(const dirichlet_group_t G, const dirichlet_char_t chi, const dirichlet_char_t psi);
 
 DIRICHLET_INLINE int
 dirichlet_char_is_principal(const dirichlet_group_t G, const dirichlet_char_t chi)

@@ -322,8 +322,8 @@ void fmpz_poly_scalar_tdiv_2exp(fmpz_poly_t poly1, const fmpz_poly_t poly2,
 void fmpz_poly_scalar_mul_2exp(fmpz_poly_t poly1, const fmpz_poly_t poly2,
                            ulong exp);
 
-void fmpz_poly_scalar_mod_fmpz(fmpz_poly_t poly1, const fmpz_poly_t poly2, const fmpz_t x);
-void fmpz_poly_scalar_smod_fmpz(fmpz_poly_t poly1, const fmpz_poly_t poly2, const fmpz_t x);
+void fmpz_poly_scalar_mod_fmpz(fmpz_poly_t poly1, const fmpz_poly_t poly2, const fmpz_t p);
+void fmpz_poly_scalar_smod_fmpz(fmpz_poly_t poly1, const fmpz_poly_t poly2, const fmpz_t p);
 
 slong _fmpz_poly_remove_content_2exp(fmpz * pol, slong len);
 
@@ -545,7 +545,7 @@ flint_bitcnt_t _fmpz_poly_2norm_normalised_bits(const fmpz * poly, slong len);
 
 ulong fmpz_poly_max_limbs(const fmpz_poly_t poly);
 slong fmpz_poly_max_bits(const fmpz_poly_t poly);
-void fmpz_poly_height(fmpz_t res, const fmpz_poly_t poly);
+void fmpz_poly_height(fmpz_t height, const fmpz_poly_t poly);
 slong _fmpz_poly_hamming_weight(const fmpz * a, slong len);
 
 /*  Greatest common divisor  *************************************************/
@@ -1075,11 +1075,11 @@ void fmpz_poly_debug(const fmpz_poly_t poly);
 
 /*  CRT  ********************************************************************/
 
-void fmpz_poly_get_nmod_poly(nmod_poly_t res, const fmpz_poly_t poly);
+void fmpz_poly_get_nmod_poly(nmod_poly_t Amod, const fmpz_poly_t A);
 
-void fmpz_poly_set_nmod_poly(fmpz_poly_t res, const nmod_poly_t poly);
+void fmpz_poly_set_nmod_poly(fmpz_poly_t A, const nmod_poly_t Amod);
 
-void fmpz_poly_set_nmod_poly_unsigned(fmpz_poly_t res, const nmod_poly_t poly);
+void fmpz_poly_set_nmod_poly_unsigned(fmpz_poly_t A, const nmod_poly_t Amod);
 
 void
 _fmpz_poly_CRT_ui_precomp(fmpz * res, const fmpz * poly1, slong len1,
@@ -1185,11 +1185,11 @@ void fmpz_poly_bound_roots(fmpz_t bound, const fmpz_poly_t poly);
 
 void _fmpz_poly_num_real_roots_sturm(slong * n_neg, slong * n_pos, const fmpz * pol, slong len);
 
-slong fmpz_poly_num_real_roots_sturm(const fmpz_poly_t poly);
+slong fmpz_poly_num_real_roots_sturm(const fmpz_poly_t pol);
 
 slong _fmpz_poly_num_real_roots(const fmpz * pol, slong len);
 
-slong fmpz_poly_num_real_roots(const fmpz_poly_t poly);
+slong fmpz_poly_num_real_roots(const fmpz_poly_t pol);
 
 /* CLD bounds */
 
@@ -1207,7 +1207,7 @@ ulong fmpz_poly_is_cyclotomic(const fmpz_poly_t poly);
 
 void _fmpz_poly_cos_minpoly(fmpz * f, ulong n);
 
-void fmpz_poly_cos_minpoly(fmpz_poly_t f, ulong n);
+void fmpz_poly_cos_minpoly(fmpz_poly_t poly, ulong n);
 
 void _fmpz_poly_swinnerton_dyer(fmpz * T, ulong n);
 
@@ -1239,11 +1239,11 @@ void fmpz_poly_fibonacci(fmpz_poly_t poly, ulong n);
 
 void _fmpz_poly_eta_qexp(fmpz * f, slong e, slong n);
 
-void fmpz_poly_eta_qexp(fmpz_poly_t f, slong e, slong n);
+void fmpz_poly_eta_qexp(fmpz_poly_t f, slong r, slong n);
 
 void _fmpz_poly_theta_qexp(fmpz * f, slong e, slong n);
 
-void fmpz_poly_theta_qexp(fmpz_poly_t f, slong e, slong n);
+void fmpz_poly_theta_qexp(fmpz_poly_t f, slong r, slong n);
 
 void fmpz_poly_eulerian_polynomial(fmpz_poly_t poly, ulong n);
 

@@ -260,25 +260,25 @@ mag_equal(const mag_t x, const mag_t y)
 
 /* general versions */
 
-void mag_mul(mag_t z, const mag_t x, const mag_t y);
+void mag_mul(mag_t res, const mag_t x, const mag_t y);
 
-void mag_mul_lower(mag_t z, const mag_t x, const mag_t y);
+void mag_mul_lower(mag_t res, const mag_t x, const mag_t y);
 
 void mag_addmul(mag_t z, const mag_t x, const mag_t y);
 
-void mag_add_2exp_fmpz(mag_t z, const mag_t x, const fmpz_t e);
+void mag_add_2exp_fmpz(mag_t res, const mag_t x, const fmpz_t e);
 
-void mag_add(mag_t z, const mag_t x, const mag_t y);
+void mag_add(mag_t res, const mag_t x, const mag_t y);
 
-void mag_add_lower(mag_t z, const mag_t x, const mag_t y);
+void mag_add_lower(mag_t res, const mag_t x, const mag_t y);
 
-void mag_add_ui(mag_t z, const mag_t x, ulong y);
+void mag_add_ui(mag_t res, const mag_t x, ulong y);
 void mag_add_ui_lower(mag_t res, const mag_t x, ulong y);
 
-void mag_add_ui_2exp_si(mag_t z, const mag_t x, ulong y, slong e);
+void mag_add_ui_2exp_si(mag_t res, const mag_t x, ulong y, slong e);
 
-void mag_div(mag_t z, const mag_t x, const mag_t y);
-void mag_div_lower(mag_t z, const mag_t x, const mag_t y);
+void mag_div(mag_t res, const mag_t x, const mag_t y);
+void mag_div_lower(mag_t res, const mag_t x, const mag_t y);
 
 MAG_INLINE void
 mag_inv(mag_t res, const mag_t x)
@@ -298,13 +298,13 @@ mag_inv_lower(mag_t res, const mag_t x)
     mag_div_lower(res, t, x);
 }
 
-void mag_mul_2exp_si(mag_t z, const mag_t x, slong y);
+void mag_mul_2exp_si(mag_t res, const mag_t x, slong y);
 
-void mag_mul_2exp_fmpz(mag_t z, const mag_t x, const fmpz_t y);
+void mag_mul_2exp_fmpz(mag_t res, const mag_t x, const fmpz_t y);
 
-void mag_sub(mag_t z, const mag_t x, const mag_t y);
+void mag_sub(mag_t res, const mag_t x, const mag_t y);
 
-void mag_sub_lower(mag_t z, const mag_t x, const mag_t y);
+void mag_sub_lower(mag_t res, const mag_t x, const mag_t y);
 
 /* Fast versions (no infs/nans, small exponents). Note that this
    applies to outputs too! */
@@ -470,16 +470,16 @@ mag_fast_add_2exp_si(mag_t z, const mag_t x, slong e)
         (exp) = (xexp) + __cexp - __fix; \
     } while (0);
 
-void mag_set_d(mag_t z, double x);
-void mag_set_d_lower(mag_t z, double x);
-void mag_set_d_2exp_fmpz(mag_t z, double c, const fmpz_t exp);
-void mag_set_d_2exp_fmpz_lower(mag_t z, double c, const fmpz_t exp);
+void mag_set_d(mag_t res, double x);
+void mag_set_d_lower(mag_t res, double x);
+void mag_set_d_2exp_fmpz(mag_t res, double x, const fmpz_t y);
+void mag_set_d_2exp_fmpz_lower(mag_t res, double x, const fmpz_t y);
 
-void mag_set_fmpz_2exp_fmpz(mag_t z, const fmpz_t man, const fmpz_t exp);
+void mag_set_fmpz_2exp_fmpz(mag_t res, const fmpz_t x, const fmpz_t y);
 
-void mag_randtest_special(mag_t x, flint_rand_t state, slong expbits);
+void mag_randtest_special(mag_t res, flint_rand_t state, slong expbits);
 
-void mag_randtest(mag_t x, flint_rand_t state, slong expbits);
+void mag_randtest(mag_t res, flint_rand_t state, slong expbits);
 
 #ifdef FLINT_HAVE_FILE
 void mag_fprint(FILE * file, const mag_t x);
@@ -489,14 +489,14 @@ void mag_fprintd(FILE * file, const mag_t x, slong d);
 void mag_print(const mag_t x);
 void mag_printd(const mag_t x, slong d);
 
-void mag_get_fmpq(fmpq_t y, const mag_t x);
+void mag_get_fmpq(fmpq_t res, const mag_t x);
 
 void mag_get_fmpz(fmpz_t res, const mag_t x);
 void mag_get_fmpz_lower(fmpz_t res, const mag_t x);
 
 int mag_cmp(const mag_t x, const mag_t y);
 
-int mag_cmp_2exp_si(const mag_t x, slong e);
+int mag_cmp_2exp_si(const mag_t x, slong y);
 
 MAG_INLINE void
 mag_min(mag_t z, const mag_t x, const mag_t y)
@@ -537,7 +537,7 @@ _mag_vec_clear(mag_ptr v, slong n)
     flint_free(v);
 }
 
-double mag_get_d(const mag_t z);
+double mag_get_d(const mag_t x);
 
 double mag_get_d_log2_approx(const mag_t x);
 
@@ -545,34 +545,34 @@ double mag_get_d_log2_approx(const mag_t x);
 double mag_d_log_upper_bound(double x);
 double mag_d_log_lower_bound(double x);
 
-void mag_log1p(mag_t z, const mag_t x);
+void mag_log1p(mag_t res, const mag_t x);
 
-void mag_log_ui(mag_t t, ulong n);
+void mag_log_ui(mag_t res, ulong n);
 
-void mag_log(mag_t z, const mag_t x);
-void mag_log_lower(mag_t z, const mag_t x);
-void mag_neg_log(mag_t z, const mag_t x);
-void mag_neg_log_lower(mag_t z, const mag_t x);
+void mag_log(mag_t res, const mag_t x);
+void mag_log_lower(mag_t res, const mag_t x);
+void mag_neg_log(mag_t res, const mag_t x);
+void mag_neg_log_lower(mag_t res, const mag_t x);
 
-void mag_exp(mag_t y, const mag_t x);
-void mag_exp_lower(mag_t y, const mag_t x);
+void mag_exp(mag_t res, const mag_t x);
+void mag_exp_lower(mag_t res, const mag_t x);
 
 void mag_expinv(mag_t res, const mag_t x);
-void mag_expinv_lower(mag_t y, const mag_t x);
+void mag_expinv_lower(mag_t res, const mag_t x);
 
-void mag_expm1(mag_t y, const mag_t x);
-void mag_exp_tail(mag_t z, const mag_t x, ulong N);
+void mag_expm1(mag_t res, const mag_t x);
+void mag_exp_tail(mag_t res, const mag_t x, ulong N);
 
-void mag_sinh(mag_t y, const mag_t x);
-void mag_sinh_lower(mag_t y, const mag_t x);
+void mag_sinh(mag_t res, const mag_t x);
+void mag_sinh_lower(mag_t res, const mag_t x);
 
-void mag_cosh(mag_t y, const mag_t x);
-void mag_cosh_lower(mag_t y, const mag_t x);
+void mag_cosh(mag_t res, const mag_t x);
+void mag_cosh_lower(mag_t res, const mag_t x);
 
-void mag_pow_ui(mag_t z, const mag_t x, ulong e);
-void mag_pow_ui_lower(mag_t z, const mag_t x, ulong e);
-void mag_pow_fmpz(mag_t z, const mag_t x, const fmpz_t e);
-void mag_pow_fmpz_lower(mag_t z, const mag_t x, const fmpz_t e);
+void mag_pow_ui(mag_t res, const mag_t x, ulong e);
+void mag_pow_ui_lower(mag_t res, const mag_t x, ulong e);
+void mag_pow_fmpz(mag_t res, const mag_t x, const fmpz_t e);
+void mag_pow_fmpz_lower(mag_t res, const mag_t x, const fmpz_t e);
 
 void mag_const_pi(mag_t res);
 void mag_const_pi_lower(mag_t res);
@@ -580,38 +580,38 @@ void mag_const_pi_lower(mag_t res);
 void mag_atan(mag_t res, const mag_t x);
 void mag_atan_lower(mag_t res, const mag_t x);
 
-void mag_fac_ui(mag_t z, ulong n);
-void mag_rfac_ui(mag_t z, ulong n);
+void mag_fac_ui(mag_t res, ulong n);
+void mag_rfac_ui(mag_t res, ulong n);
 void mag_bin_uiui(mag_t res, ulong n, ulong k);
 
 /* TODO: test */
-void mag_bernoulli_div_fac_ui(mag_t z, ulong n);
+void mag_bernoulli_div_fac_ui(mag_t res, ulong n);
 
 /* TODO: test */
-void mag_set_fmpz_2exp_fmpz_lower(mag_t z, const fmpz_t man, const fmpz_t exp);
+void mag_set_fmpz_2exp_fmpz_lower(mag_t res, const fmpz_t x, const fmpz_t y);
 
-void mag_sqrt(mag_t y, const mag_t x);
-void mag_sqrt_lower(mag_t y, const mag_t x);
-void mag_rsqrt(mag_t y, const mag_t x);
-void mag_rsqrt_lower(mag_t y, const mag_t x);
+void mag_sqrt(mag_t res, const mag_t x);
+void mag_sqrt_lower(mag_t res, const mag_t x);
+void mag_rsqrt(mag_t res, const mag_t x);
+void mag_rsqrt_lower(mag_t res, const mag_t x);
 
-void mag_root(mag_t y, const mag_t x, ulong n);
+void mag_root(mag_t res, const mag_t x, ulong n);
 
-void mag_hypot(mag_t z, const mag_t x, const mag_t y);
+void mag_hypot(mag_t res, const mag_t x, const mag_t y);
 
-void mag_binpow_uiui(mag_t b, ulong m, ulong n);
+void mag_binpow_uiui(mag_t res, ulong m, ulong n);
 
-void mag_polylog_tail(mag_t u, const mag_t z, slong sigma, ulong d, ulong N);
+void mag_polylog_tail(mag_t res, const mag_t z, slong s, ulong d, ulong N);
 
-void mag_geom_series(mag_t res, const mag_t x, ulong n);
+void mag_geom_series(mag_t res, const mag_t x, ulong N);
 
 void mag_hurwitz_zeta_uiui(mag_t res, ulong s, ulong a);
 
-void mag_set_ui(mag_t z, ulong x);
-void mag_set_ui_lower(mag_t z, ulong x);
+void mag_set_ui(mag_t res, ulong x);
+void mag_set_ui_lower(mag_t res, ulong x);
 
 /* TODO: test functions below */
-void mag_set_ui_2exp_si(mag_t z, ulong v, slong e);
+void mag_set_ui_2exp_si(mag_t res, ulong x, slong y);
 
 MAG_INLINE void
 mag_set_fmpz(mag_t z, const fmpz_t x)

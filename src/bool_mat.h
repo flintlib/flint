@@ -90,13 +90,13 @@ int bool_mat_any(const bool_mat_t mat);
 
 int bool_mat_all(const bool_mat_t mat);
 
-int bool_mat_is_diagonal(const bool_mat_t mat);
+int bool_mat_is_diagonal(const bool_mat_t A);
 
-int bool_mat_is_lower_triangular(const bool_mat_t mat);
+int bool_mat_is_lower_triangular(const bool_mat_t A);
 
 int bool_mat_is_transitive(const bool_mat_t mat);
 
-int bool_mat_is_nilpotent(const bool_mat_t mat);
+int bool_mat_is_nilpotent(const bool_mat_t A);
 
 BOOL_MAT_INLINE int
 bool_mat_is_empty(const bool_mat_t mat)
@@ -116,17 +116,17 @@ void bool_mat_zero(bool_mat_t mat);
 
 void bool_mat_one(bool_mat_t mat);
 
-void bool_mat_directed_path(bool_mat_t mat);
+void bool_mat_directed_path(bool_mat_t A);
 
-void bool_mat_directed_cycle(bool_mat_t mat);
+void bool_mat_directed_cycle(bool_mat_t A);
 
 /* Transpose */
 
-void bool_mat_transpose(bool_mat_t mat1, const bool_mat_t mat2);
+void bool_mat_transpose(bool_mat_t dest, const bool_mat_t src);
 
 /* Arithmetic */
 
-void bool_mat_complement(bool_mat_t mat1, const bool_mat_t mat2);
+void bool_mat_complement(bool_mat_t B, const bool_mat_t A);
 
 void bool_mat_add(bool_mat_t res, const bool_mat_t mat1, const bool_mat_t mat2);
 
@@ -146,9 +146,9 @@ bool_mat_sqr(bool_mat_t B, const bool_mat_t A)
 
 int bool_mat_trace(const bool_mat_t mat);
 
-slong bool_mat_nilpotency_degree(const bool_mat_t mat);
+slong bool_mat_nilpotency_degree(const bool_mat_t A);
 
-void bool_mat_transitive_closure(bool_mat_t dest, const bool_mat_t src);
+void bool_mat_transitive_closure(bool_mat_t B, const bool_mat_t A);
 
 slong bool_mat_get_strongly_connected_components(slong *partition, const bool_mat_t A);
 

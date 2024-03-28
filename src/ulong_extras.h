@@ -43,7 +43,7 @@ ulong n_randtest_prime(flint_rand_t state, int proved);
 
 /* Basic arithmetic **********************************************************/
 
-ulong n_revbin(ulong in, ulong bits);
+ulong n_revbin(ulong n, ulong b);
 
 int n_divides(mp_limb_t * q, mp_limb_t n, mp_limb_t p);
 ulong n_divrem2_precomp(ulong * q, ulong a, ulong n, double npre);
@@ -59,8 +59,8 @@ int n_is_square(ulong x);
 int n_is_squarefree(ulong n);
 
 double n_cbrt_estimate(double a);
-ulong n_cbrt(ulong a);
-ulong n_cbrt_binary_search(ulong x);
+ulong n_cbrt(ulong n);
+ulong n_cbrt_binary_search(ulong n);
 ulong n_cbrt_newton_iteration(ulong n);
 ulong n_cbrt_chebyshev_approx(ulong n);
 ulong n_cbrtrem(ulong* remainder, ulong n);

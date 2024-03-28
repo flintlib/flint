@@ -79,7 +79,7 @@ int fmpz_poly_factor_van_hoeij_check_if_solved(fmpz_mat_t M,
 void fmpz_poly_factor_van_hoeij(fmpz_poly_factor_t final_fac,
         const nmod_poly_factor_t fac, const fmpz_poly_t f, slong exp, ulong p);
 
-void fmpz_poly_factor(fmpz_poly_factor_t fac, const fmpz_poly_t G);
+void fmpz_poly_factor(fmpz_poly_factor_t final_fac, const fmpz_poly_t F);
 
 /* Inlines *******************************************************************/
 

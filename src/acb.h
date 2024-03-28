@@ -326,9 +326,9 @@ acb_add_error_arb(acb_t x, const arb_t err)
     arb_add_error(acb_imagref(x), err);
 }
 
-void acb_get_mag(mag_t z, const acb_t x);
+void acb_get_mag(mag_t u, const acb_t x);
 
-void acb_get_mag_lower(mag_t z, const acb_t x);
+void acb_get_mag_lower(mag_t u, const acb_t x);
 
 void acb_get_abs_ubound_arf(arf_t u, const acb_t z, slong prec);
 void acb_get_abs_lbound_arf(arf_t u, const acb_t z, slong prec);
@@ -343,9 +343,9 @@ acb_union(acb_t res, const acb_t x, const acb_t y, slong prec)
 
 void acb_arg(arb_t r, const acb_t z, slong prec);
 
-void acb_sgn(acb_t res, const acb_t z, slong prec);
+void acb_sgn(acb_t r, const acb_t z, slong prec);
 
-void acb_csgn(arb_t res, const acb_t z);
+void acb_csgn(arb_t r, const acb_t z);
 
 void acb_real_abs(acb_t res, const acb_t z, int analytic, slong prec);
 void acb_real_sgn(acb_t res, const acb_t z, int analytic, slong prec);
@@ -356,10 +356,10 @@ void acb_real_max(acb_t res, const acb_t x, const acb_t y, int analytic, slong p
 void acb_real_min(acb_t res, const acb_t x, const acb_t y, int analytic, slong prec);
 void acb_real_sqrtpos(acb_t res, const acb_t z, int analytic, slong prec);
 
-void acb_sqrt_analytic(acb_t res, const acb_t z, int analytic, slong prec);
-void acb_rsqrt_analytic(acb_t res, const acb_t z, int analytic, slong prec);
-void acb_log_analytic(acb_t res, const acb_t z, int analytic, slong prec);
-void acb_pow_analytic(acb_t res, const acb_t z, const acb_t w, int analytic, slong prec);
+void acb_sqrt_analytic(acb_t r, const acb_t z, int analytic, slong prec);
+void acb_rsqrt_analytic(acb_t r, const acb_t z, int analytic, slong prec);
+void acb_log_analytic(acb_t r, const acb_t z, int analytic, slong prec);
+void acb_pow_analytic(acb_t r, const acb_t x, const acb_t y, int analytic, slong prec);
 
 ACB_INLINE void
 acb_add(acb_t z, const acb_t x, const acb_t y, slong prec)
@@ -655,7 +655,7 @@ acb_div_fmpz(acb_t z, const acb_t x, const fmpz_t c, slong prec)
     arb_div_fmpz(acb_imagref(z), acb_imagref(x), c, prec);
 }
 
-void acb_cube(acb_t y, const acb_t x, slong prec);
+void acb_cube(acb_t z, const acb_t x, slong prec);
 void acb_pow_fmpz(acb_t y, const acb_t b, const fmpz_t e, slong prec);
 void acb_pow_ui(acb_t y, const acb_t b, ulong e, slong prec);
 void acb_pow_si(acb_t y, const acb_t b, slong e, slong prec);
@@ -667,26 +667,26 @@ acb_const_pi(acb_t x, slong prec)
     arb_zero(acb_imagref(x));
 }
 
-void acb_log(acb_t r, const acb_t z, slong prec);
-void acb_log1p(acb_t r, const acb_t z, slong prec);
+void acb_log(acb_t y, const acb_t z, slong prec);
+void acb_log1p(acb_t z, const acb_t x, slong prec);
 
-void acb_exp(acb_t r, const acb_t z, slong prec);
-void acb_exp_pi_i(acb_t r, const acb_t z, slong prec);
-void acb_exp_invexp(acb_t r, acb_t s, const acb_t z, slong prec);
-void acb_expm1(acb_t r, const acb_t z, slong prec);
+void acb_exp(acb_t y, const acb_t z, slong prec);
+void acb_exp_pi_i(acb_t y, const acb_t z, slong prec);
+void acb_exp_invexp(acb_t s, acb_t t, const acb_t z, slong prec);
+void acb_expm1(acb_t res, const acb_t z, slong prec);
 
-void acb_sin(acb_t r, const acb_t z, slong prec);
-void acb_cos(acb_t r, const acb_t z, slong prec);
+void acb_sin(acb_t s, const acb_t z, slong prec);
+void acb_cos(acb_t c, const acb_t z, slong prec);
 void acb_sin_cos(acb_t s, acb_t c, const acb_t z, slong prec);
-void acb_tan(acb_t r, const acb_t z, slong prec);
-void acb_cot(acb_t r, const acb_t z, slong prec);
+void acb_tan(acb_t s, const acb_t z, slong prec);
+void acb_cot(acb_t s, const acb_t z, slong prec);
 
-void acb_asin(acb_t r, const acb_t z, slong prec);
-void acb_acos(acb_t r, const acb_t z, slong prec);
-void acb_atan(acb_t r, const acb_t z, slong prec);
+void acb_asin(acb_t res, const acb_t z, slong prec);
+void acb_acos(acb_t res, const acb_t z, slong prec);
+void acb_atan(acb_t res, const acb_t z, slong prec);
 void acb_asinh(acb_t r, const acb_t z, slong prec);
-void acb_acosh(acb_t r, const acb_t z, slong prec);
-void acb_atanh(acb_t r, const acb_t z, slong prec);
+void acb_acosh(acb_t res, const acb_t z, slong prec);
+void acb_atanh(acb_t res, const acb_t z, slong prec);
 
 ACB_INLINE void
 acb_sinh(acb_t y, const acb_t x, slong prec)
@@ -727,8 +727,8 @@ acb_coth(acb_t y, const acb_t x, slong prec)
     acb_mul_onei(y, y);
 }
 
-void acb_sech(acb_t r, const acb_t z, slong prec);
-void acb_csch(acb_t r, const acb_t z, slong prec);
+void acb_sech(acb_t res, const acb_t z, slong prec);
+void acb_csch(acb_t res, const acb_t z, slong prec);
 
 ACB_INLINE void
 acb_sec(acb_t y, const acb_t x, slong prec)
@@ -745,24 +745,24 @@ acb_csc(acb_t y, const acb_t x, slong prec)
     acb_mul_onei(y, y);
 }
 
-void acb_sin_pi(acb_t r, const acb_t z, slong prec);
-void acb_cos_pi(acb_t r, const acb_t z, slong prec);
+void acb_sin_pi(acb_t s, const acb_t z, slong prec);
+void acb_cos_pi(acb_t s, const acb_t z, slong prec);
 void acb_sin_cos_pi(acb_t s, acb_t c, const acb_t z, slong prec);
-void acb_tan_pi(acb_t r, const acb_t z, slong prec);
-void acb_cot_pi(acb_t r, const acb_t z, slong prec);
-void acb_csc_pi(acb_t y, const acb_t x, slong prec);
+void acb_tan_pi(acb_t s, const acb_t z, slong prec);
+void acb_cot_pi(acb_t s, const acb_t z, slong prec);
+void acb_csc_pi(acb_t res, const acb_t z, slong prec);
 
-void acb_sinc(acb_t res, const acb_t z, slong prec);
-void acb_sinc_pi(acb_t res, const acb_t z, slong prec);
+void acb_sinc(acb_t s, const acb_t z, slong prec);
+void acb_sinc_pi(acb_t s, const acb_t z, slong prec);
 
 void acb_pow_arb(acb_t z, const acb_t x, const arb_t y, slong prec);
-void acb_pow(acb_t r, const acb_t x, const acb_t y, slong prec);
+void acb_pow(acb_t z, const acb_t x, const acb_t y, slong prec);
 
-void acb_sqrt(acb_t y, const acb_t x, slong prec);
-void acb_rsqrt(acb_t y, const acb_t x, slong prec);
+void acb_sqrt(acb_t r, const acb_t z, slong prec);
+void acb_rsqrt(acb_t r, const acb_t z, slong prec);
 void acb_sqrts(acb_t y1, acb_t y2, const acb_t x, slong prec);
 
-void acb_root_ui(acb_t y, const acb_t x, ulong k, slong prec);
+void acb_root_ui(acb_t r, const acb_t z, ulong k, slong prec);
 
 void acb_quadratic_roots_fmpz(acb_t r1, acb_t r2,
     const fmpz_t a, const fmpz_t b, const fmpz_t c, slong prec);
@@ -776,7 +776,7 @@ void acb_rising_ui(acb_t z, const acb_t x, ulong n, slong prec);
 void acb_rising(acb_t z, const acb_t x, const acb_t n, slong prec);
 void acb_rising2_ui(acb_t u, acb_t v, const acb_t x, ulong n, slong prec);
 
-void acb_rising_ui_get_mag(mag_t bound, const acb_t s, ulong n);
+void acb_rising_ui_get_mag(mag_t bound, const acb_t x, ulong n);
 
 void acb_gamma(acb_t y, const acb_t x, slong prec);
 void acb_rgamma(acb_t y, const acb_t x, slong prec);
@@ -797,7 +797,7 @@ void acb_polylog_si(acb_t w, slong s, const acb_t z, slong prec);
 
 void acb_agm1(acb_t m, const acb_t z, slong prec);
 void acb_agm1_cpx(acb_ptr m, const acb_t z, slong len, slong prec);
-void acb_agm(acb_t res, const acb_t a, const acb_t b, slong prec);
+void acb_agm(acb_t m, const acb_t x, const acb_t y, slong prec);
 
 #define ACB_LAMBERTW_LEFT 2
 #define ACB_LAMBERTW_MIDDLE 4
@@ -1012,11 +1012,11 @@ void acb_fprintn(FILE * fp, const acb_t z, slong digits, ulong flags);
 #endif
 
 void acb_print(const acb_t x);
-void acb_printd(const acb_t z, slong digits);
+void acb_printd(const acb_t x, slong digits);
 void acb_printn(const acb_t x, slong digits, ulong flags);
 
-void _acb_vec_printd(acb_srcptr vec, slong len, slong ndigits);
-void _acb_vec_printn(acb_srcptr vec, slong len, slong ndigits, ulong flags);
+void _acb_vec_printd(acb_srcptr vec, slong len, slong digits);
+void _acb_vec_printn(acb_srcptr vec, slong len, slong digits, ulong flags);
 
 void acb_randtest(acb_t z, flint_rand_t state, slong prec, slong mag_bits);
 

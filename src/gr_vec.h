@@ -50,7 +50,7 @@ GR_VEC_INLINE slong gr_vec_length(const gr_vec_t vec, gr_ctx_t ctx)
 void gr_vec_fit_length(gr_vec_t vec, slong len, gr_ctx_t ctx);
 void gr_vec_set_length(gr_vec_t vec, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_vec_set(gr_vec_t res, const gr_vec_t src, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_vec_append(gr_vec_t vec, gr_srcptr f, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_vec_append(gr_vec_t vec, gr_srcptr x, gr_ctx_t ctx);
 
 int _gr_vec_write(gr_stream_t out, gr_srcptr vec, slong len, gr_ctx_t ctx);
 int gr_vec_write(gr_stream_t out, const gr_vec_t vec, gr_ctx_t ctx);

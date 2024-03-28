@@ -72,8 +72,8 @@ ca_poly_swap(ca_poly_t poly1, ca_poly_t poly2, ca_ctx_t ctx)
 
 /* Assignment and simple values */
 
-void ca_poly_set_ca(ca_poly_t poly, const ca_t x, ca_ctx_t ctx);
-void ca_poly_set_si(ca_poly_t poly, slong x, ca_ctx_t ctx);
+void ca_poly_set_ca(ca_poly_t poly, const ca_t c, ca_ctx_t ctx);
+void ca_poly_set_si(ca_poly_t poly, slong c, ca_ctx_t ctx);
 
 CA_POLY_INLINE void
 ca_poly_zero(ca_poly_t poly, ca_ctx_t ctx)
@@ -146,7 +146,7 @@ void ca_poly_add(ca_poly_t res, const ca_poly_t poly1, const ca_poly_t poly2, ca
 void _ca_poly_sub(ca_ptr res, ca_srcptr poly1, slong len1, ca_srcptr poly2, slong len2, ca_ctx_t ctx);
 void ca_poly_sub(ca_poly_t res, const ca_poly_t poly1, const ca_poly_t poly2, ca_ctx_t ctx);
 
-void _ca_poly_mul(ca_ptr C, ca_srcptr A, slong lenA, ca_srcptr B, slong lenB, ca_ctx_t ctx);
+void _ca_poly_mul(ca_ptr res, ca_srcptr poly1, slong len1, ca_srcptr poly2, slong len2, ca_ctx_t ctx);
 void ca_poly_mul(ca_poly_t res, const ca_poly_t poly1, const ca_poly_t poly2, ca_ctx_t ctx);
 
 CA_POLY_INLINE void
@@ -180,7 +180,7 @@ ca_poly_div_fmpz(ca_poly_t res, const ca_poly_t poly, const fmpz_t c, ca_ctx_t c
 
 void _ca_poly_mullow_same_nf(ca_ptr C, ca_srcptr A, slong Alen, ca_srcptr B, slong Blen, slong len, ca_field_t K, ca_ctx_t ctx);
 
-void _ca_poly_mullow(ca_ptr C, ca_srcptr A, slong lenA, ca_srcptr B, slong lenB, slong n, ca_ctx_t ctx);
+void _ca_poly_mullow(ca_ptr C, ca_srcptr poly1, slong len1, ca_srcptr poly2, slong len2, slong n, ca_ctx_t ctx);
 void ca_poly_mullow(ca_poly_t res, const ca_poly_t poly1, const ca_poly_t poly2, slong n, ca_ctx_t ctx);
 
 void _ca_poly_divrem_basecase(ca_ptr Q, ca_ptr R, ca_srcptr A, slong lenA, ca_srcptr B, slong lenB, const ca_t invB, ca_ctx_t ctx);
@@ -220,11 +220,11 @@ void ca_poly_integral(ca_poly_t res, const ca_poly_t poly, ca_ctx_t ctx);
 
 /* Greatest common divisor */
 
-slong _ca_poly_gcd_euclidean(ca_ptr G, ca_srcptr A, slong lenA, ca_srcptr B, slong lenB, ca_ctx_t ctx);
-int ca_poly_gcd_euclidean(ca_poly_t G, const ca_poly_t A, const ca_poly_t B, ca_ctx_t ctx);
+slong _ca_poly_gcd_euclidean(ca_ptr res, ca_srcptr A, slong lenA, ca_srcptr B, slong lenB, ca_ctx_t ctx);
+int ca_poly_gcd_euclidean(ca_poly_t res, const ca_poly_t A, const ca_poly_t B, ca_ctx_t ctx);
 
-slong _ca_poly_gcd(ca_ptr G, ca_srcptr A, slong lenA, ca_srcptr B, slong lenB, ca_ctx_t ctx);
-int ca_poly_gcd(ca_poly_t G, const ca_poly_t A, const ca_poly_t B, ca_ctx_t ctx);
+slong _ca_poly_gcd(ca_ptr res, ca_srcptr A, slong lenA, ca_srcptr B, slong lenB, ca_ctx_t ctx);
+int ca_poly_gcd(ca_poly_t res, const ca_poly_t A, const ca_poly_t g, ca_ctx_t ctx);
 
 /* Power series division */
 
@@ -253,7 +253,7 @@ void ca_poly_vec_set_length(ca_poly_vec_t vec, slong len, ca_ctx_t ctx);
 void _ca_poly_vec_clear(ca_poly_struct * v, slong len, ca_ctx_t ctx);
 void ca_poly_vec_clear(ca_poly_vec_t vec, ca_ctx_t ctx);
 
-void ca_poly_vec_append(ca_poly_vec_t vec, const ca_poly_t f, ca_ctx_t ctx);
+void ca_poly_vec_append(ca_poly_vec_t vec, const ca_poly_t poly, ca_ctx_t ctx);
 
 /* Roots and factorization */
 

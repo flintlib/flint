@@ -219,7 +219,7 @@ void fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A);
 
 void fmpz_mat_sqr(fmpz_mat_t B, const fmpz_mat_t A);
 
-void fmpz_mat_pow(fmpz_mat_t B, const fmpz_mat_t A, ulong exp);
+void fmpz_mat_pow(fmpz_mat_t B, const fmpz_mat_t A, ulong e);
 
 void fmpz_mat_mul_fmpz_vec(fmpz * c, const fmpz_mat_t A,
                                                    const fmpz * b, slong blen);
@@ -239,7 +239,7 @@ void fmpz_mat_kronecker_product(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat
 
 /* Content */
 
-void fmpz_mat_content(fmpz_t ret, const fmpz_mat_t A);
+void fmpz_mat_content(fmpz_t mat_gcd, const fmpz_mat_t A);
 
 /* Permutations */
 
@@ -428,11 +428,11 @@ fmpz_mat_can_solve(fmpz_mat_t X, fmpz_t den,
 
 /* Nullspace *****************************************************************/
 
-slong fmpz_mat_nullspace(fmpz_mat_t res, const fmpz_mat_t mat);
+slong fmpz_mat_nullspace(fmpz_mat_t B, const fmpz_mat_t A);
 
 /* Inverse *******************************************************************/
 
-int fmpz_mat_inv(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A);
+int fmpz_mat_inv(fmpz_mat_t Ainv, fmpz_t den, const fmpz_mat_t A);
 
 /* Modular reduction and reconstruction **************************************/
 
@@ -472,9 +472,9 @@ int fmpz_mat_is_in_snf(const fmpz_mat_t A);
 
 /* Special matrices **********************************************************/
 
-int fmpz_mat_is_hadamard(const fmpz_mat_t A);
+int fmpz_mat_is_hadamard(const fmpz_mat_t H);
 
-int fmpz_mat_hadamard(fmpz_mat_t A);
+int fmpz_mat_hadamard(fmpz_mat_t H);
 
 /* Gram matrix **************************************************************/
 
