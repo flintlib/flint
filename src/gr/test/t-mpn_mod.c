@@ -13,6 +13,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "gr.h"
+#include "gr_mat.h"
 
 TEST_FUNCTION_START(gr_mpn_mod, state)
 {
@@ -75,6 +76,60 @@ TEST_FUNCTION_START(gr_mpn_mod, state)
         if (n_randint(state, 2))
             gr_ctx_mpn_mod_set_primality(ZZn, fmpz_is_probabprime(n) ? T_TRUE : T_FALSE);
 
+        /* test Waksman mul */
+        {
+            gr_mat_t A, B, C, D;
+            slong a, b, c;
+            int status = GR_SUCCESS;
+
+            a = n_randint(state, 8);
+            b = n_randint(state, 8);
+            c = n_randint(state, 8);
+
+            gr_mat_init(A, a, b, ZZn);
+            gr_mat_init(B, b, c, ZZn);
+            gr_mat_init(C, a, c, ZZn);
+            gr_mat_init(D, a, c, ZZn);
+
+            status |= gr_mat_randtest(A, state, ZZn);
+            status |= gr_mat_randtest(B, state, ZZn);
+            status |= gr_mat_randtest(C, state, ZZn);
+            status |= gr_mat_randtest(D, state, ZZn);
+
+            if (b == c && n_randint(state, 2))
+            {
+                status |= gr_mat_set(C, A, ZZn);
+                status |= gr_mat_mul(C, C, B, ZZn);
+            }
+            else if (a == b && n_randint(state, 2))
+            {
+                status |= gr_mat_set(C, B, ZZn);
+                status |= gr_mat_mul(C, A, C, ZZn);
+            }
+            else
+            {
+                status |= gr_mat_mul(C, A, B, ZZn);
+            }
+
+            status |= gr_mat_mul_classical(D, A, B, ZZn);
+
+            if (status != GR_SUCCESS && gr_mat_equal(C, D, ZZn) == T_FALSE)
+            {
+                flint_printf("FAIL:\n");
+                gr_ctx_println(ZZn);
+                flint_printf("A:\n"); gr_mat_print(A, ZZn); flint_printf("\n\n");
+                flint_printf("B:\n"); gr_mat_print(B, ZZn); flint_printf("\n\n");
+                flint_printf("C:\n"); gr_mat_print(C, ZZn); flint_printf("\n\n");
+                flint_printf("D:\n"); gr_mat_print(D, ZZn); flint_printf("\n\n");
+                flint_abort();
+            }
+
+            gr_mat_clear(A, ZZn);
+            gr_mat_clear(B, ZZn);
+            gr_mat_clear(C, ZZn);
+            gr_mat_clear(D, ZZn);
+        }
+
         gr_test_ring(ZZn, 5, flags);
 
         /* test matrices */
@@ -104,7 +159,6 @@ TEST_FUNCTION_START(gr_mpn_mod, state)
 
         gr_ctx_clear(ZZn);
     }
-
 
     fmpz_clear(n);
 

@@ -684,7 +684,12 @@ _gr_fmpz_mod_mat_mul(fmpz_mod_mat_t res, const fmpz_mod_mat_t x, const fmpz_mod_
 int
 _gr_fmpz_mod_mat_lu(slong * rank, slong * P, fmpz_mod_mat_t LU, const fmpz_mod_mat_t A, int rank_check, gr_ctx_t ctx)
 {
-    return gr_mat_lu_recursive(rank, P, (gr_mat_struct *) LU, (const gr_mat_struct *) A, rank_check, 8, ctx);
+    slong cutoff = 8;
+
+    if (A->r < cutoff || A->c < cutoff)
+        return gr_mat_lu_classical(rank, P, (gr_mat_struct *) LU, (const gr_mat_struct *) A, rank_check, ctx);
+    else
+        return gr_mat_lu_recursive(rank, P, (gr_mat_struct *) LU, (const gr_mat_struct *) A, rank_check, ctx);
 }
 
 int

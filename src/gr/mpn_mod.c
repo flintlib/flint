@@ -1720,14 +1720,216 @@ crt_single:
     return GR_SUCCESS;
 }
 
+FLINT_FORCE_INLINE int
+flint_mpn_signed_sub_n(mp_ptr res, mp_srcptr x, mp_srcptr y, mp_size_t n)
+{
+    if (mpn_cmp(x, y, n) >= 0)
+    {
+        mpn_sub_n(res, x, y, n);
+        return 0;
+    }
+    else
+    {
+        mpn_sub_n(res, y, x, n);
+        return 1;
+    }
+}
+
+FLINT_FORCE_INLINE void
+flint_mpn_signed_div2(mp_ptr res, mp_srcptr x, mp_size_t n)
+{
+    mp_limb_t s = x[n - 1] & (UWORD(1) << (FLINT_BITS - 1));
+    mpn_rshift(res, x, n, 1);
+    res[n - 1] |= s;
+}
+
+/* compute c += (a1 + b1) * (a2 + b2) */
+/* val0, val1, val2 are scratch space */
+FLINT_FORCE_INLINE void
+addmul_addadd(mp_ptr val0, mp_ptr val1, mp_ptr val2, mp_ptr c, mp_srcptr a1, mp_srcptr b1, mp_srcptr a2, mp_srcptr b2, mp_size_t nlimbs, int add_can_overflow_nlimbs)
+{
+    if (!add_can_overflow_nlimbs)
+    {
+        mpn_add_n(val1, a1, b1, nlimbs);
+        mpn_add_n(val2, a2, b2, nlimbs);
+        flint_mpn_mul_n(val0, val1, val2, nlimbs);
+        c[2 * nlimbs] += mpn_add_n(c, c, val0, 2 * nlimbs);
+    }
+    else
+    {
+        val1[nlimbs] = mpn_add_n(val1, a1, b1, nlimbs);
+        val2[nlimbs] = mpn_add_n(val2, a2, b2, nlimbs);
+        flint_mpn_mul_n(val0, val1, val2, nlimbs + 1);
+        /* we write 2 * nlimbs + 2 limbs to val0, but the top limb will be zero */
+        FLINT_ASSERT(val0[2 * nlimbs + 1] == 0);
+        mpn_add_n(c, c, val0, 2 * nlimbs + 1);
+    }
+}
+
+/* compute c += (a1 - b1) * (a2 - b2) */
+/* val0, val1, val2 are scratch space */
+FLINT_FORCE_INLINE void
+addmul_subsub(mp_ptr val0, mp_ptr val1, mp_ptr val2, mp_ptr c, mp_srcptr a1, mp_srcptr b1, mp_srcptr a2, mp_srcptr b2, mp_size_t nlimbs)
+{
+    int neg;
+    neg = flint_mpn_signed_sub_n(val1, a1, b1, nlimbs);
+    neg ^= flint_mpn_signed_sub_n(val2, a2, b2, nlimbs);
+
+    flint_mpn_mul_n(val0, val1, val2, nlimbs);
+    if (neg)
+        c[2 * nlimbs] -= mpn_sub_n(c, c, val0, 2 * nlimbs);
+    else
+        c[2 * nlimbs] += mpn_add_n(c, c, val0, 2 * nlimbs);
+}
+
+/** ------------------------------------------------------------ */
+/** Waksman's algorithm for matrix multiplication                */
+/** does n^3/2+O(n^2) products, but many additions               */
+/** good for small matrices with large entries                   */
+/** ------------------------------------------------------------ */
+int _gr_mpn_mod_mat_mul_waksman(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+{
+    slong nlimbs = MPN_MOD_CTX_NLIMBS(ctx);
+    /* Enough to hold any unreduced value, including one sign bit. TODO: tighten. */
+    slong slimbs = 2 * nlimbs + 1;
+    slong m = A->r;
+    slong n = B->r;
+    slong p = B->c;
+    /* Normally the sum of two input entries fits in nlimbs, but we may need
+       an extra limb for a carry bit. */
+    int add_can_overflow_nlimbs = (MPN_MOD_CTX_NORM(ctx) == 0);
+
+    if (m == 0 || n == 0 || p == 0)
+        return gr_mat_zero(C, ctx);
+
+    slong i, l, j, k;
+
+    mp_ptr Ctmp = flint_calloc(slimbs * ((m * p) + (p + m) + 5), sizeof(mp_limb_t));
+                                            /* Ctmp itself has m * p entries */
+    mp_ptr Crow = Ctmp + slimbs * (m * p);  /* Crow has p entries */
+    mp_ptr Ccol = Crow + slimbs * p;        /* Ccol has m entries */
+    mp_ptr val0 = Ccol + slimbs * m;        /* val0 has room for 2 sums */
+    mp_ptr val1 = val0 + 2 * slimbs;        /* val1 has room for 1 sum   */
+    mp_ptr val2 = val1 + slimbs;            /* val2 has room for 1 sum   */
+    mp_ptr crow = val2 + slimbs;            /* crow has room for 1 sum   */
+
+#define A_ENTRY(ii, jj) (((mp_srcptr) A->rows[ii]) + (jj) * nlimbs)
+#define B_ENTRY(ii, jj) (((mp_srcptr) B->rows[ii]) + (jj) * nlimbs)
+
+#define C_ENTRY(ii, jj) (Ctmp + ((ii) * p + (jj)) * slimbs)
+#define Crow_ENTRY(ii) (Crow + (ii) * slimbs)
+#define Ccol_ENTRY(ii) (Ccol + (ii) * slimbs)
+
+    slong np = n >> 1;
+
+    for (j = 1; j <= np; j++)
+    {
+        slong j2 = (j << 1) - 1;
+
+        for (k = 0; k < p; k++)
+        {
+            addmul_addadd(val0, val1, val2, C_ENTRY(0, k), A_ENTRY(0, j2-1), B_ENTRY(j2, k), A_ENTRY(0, j2), B_ENTRY(j2-1, k), nlimbs, add_can_overflow_nlimbs);
+            addmul_subsub(val0, val1, val2, Crow_ENTRY(k), A_ENTRY(0, j2-1), B_ENTRY(j2, k), A_ENTRY(0, j2), B_ENTRY(j2-1, k), nlimbs);
+        }
+
+        for (l = 1; l < m; l++)
+        {
+            addmul_addadd(val0, val1, val2, C_ENTRY(l, 0), A_ENTRY(l, j2-1), B_ENTRY(j2, 0), A_ENTRY(l, j2), B_ENTRY(j2-1, 0), nlimbs, add_can_overflow_nlimbs);
+            addmul_subsub(val0, val1, val2, Ccol_ENTRY(l), A_ENTRY(l, j2-1), B_ENTRY(j2, 0), A_ENTRY(l, j2), B_ENTRY(j2-1, 0), nlimbs);
+        }
+
+        for (k = 1; k < p; k++)
+        {
+            for (l = 1; l < m; l++)
+            {
+                addmul_addadd(val0, val1, val2, C_ENTRY(l, k), A_ENTRY(l, j2-1), B_ENTRY(j2, k), A_ENTRY(l, j2), B_ENTRY(j2-1, k), nlimbs, add_can_overflow_nlimbs);
+            }
+        }
+    }
+
+    for (l = 1; l < m; l++)
+    {
+        mpn_add_n(val1, Ccol_ENTRY(l), C_ENTRY(l, 0), slimbs);
+        flint_mpn_signed_div2(Ccol_ENTRY(l), val1, slimbs);
+        mpn_sub_n(C_ENTRY(l, 0), C_ENTRY(l, 0), Ccol_ENTRY(l), slimbs);
+    }
+
+    mpn_add_n(val1, Crow, C_ENTRY(0, 0), slimbs);
+    flint_mpn_signed_div2(val0, val1, slimbs);
+    mpn_sub_n(C_ENTRY(0, 0), C_ENTRY(0, 0), val0, slimbs);
+
+    for (k = 1; k < p; k++)
+    {
+        mpn_add_n(crow, Crow_ENTRY(k), C_ENTRY(0, k), slimbs);
+        flint_mpn_signed_div2(val1, crow, slimbs);
+        mpn_sub_n(C_ENTRY(0, k), C_ENTRY(0, k), val1, slimbs);
+        mpn_sub_n(crow, val1, val0, slimbs);
+
+        for (l = 1; l < m; l++)
+        {
+            mpn_sub_n(val2, C_ENTRY(l, k), crow, slimbs);
+            mpn_sub_n(C_ENTRY(l, k), val2, Ccol_ENTRY(l), slimbs);
+        }
+    }
+
+    if ((n & 1) == 1)
+    {
+        for (l = 0; l < m; l++)
+        {
+            for (k = 0; k < p; k++)
+            {
+                flint_mpn_mul_n(val0, A_ENTRY(l, n-1), B_ENTRY(n-1, k), nlimbs);
+                C_ENTRY(l, k)[2 * nlimbs] += mpn_add_n(C_ENTRY(l, k), C_ENTRY(l, k), val0, 2 * nlimbs);
+            }
+        }
+    }
+
+    /* Reduce and write output */
+    for (i = 0; i < m; i++)
+    {
+        for (k = 0; k < p; k++)
+        {
+            mp_size_t d;
+            mp_ptr Cptr = ((mp_ptr) C->rows[i]) + k * nlimbs;
+
+            if ((slong) C_ENTRY(i, k)[slimbs - 1] >= 0)
+            {
+                d = slimbs;
+                MPN_NORM(C_ENTRY(i, k), d);
+                _gr_mpn_mod_set_mpn(Cptr, C_ENTRY(i, k), d, ctx);
+            }
+            else
+            {
+                d = slimbs;
+                mpn_neg(C_ENTRY(i, k), C_ENTRY(i, k), d);
+                MPN_NORM(C_ENTRY(i, k), d);
+                _gr_mpn_mod_set_mpn(Cptr, C_ENTRY(i, k), d, ctx);
+                _gr_mpn_mod_neg(Cptr, Cptr, ctx);
+            }
+
+        }
+    }
+
+    flint_free(Ctmp);
+
+    return GR_SUCCESS;
+}
+
 
 /* note: mul_strassen can be very slightly faster than classical and multi_mod,
    but the range is so narrow that we don't bother */
 
 /* todo: retune this when arithmetic is more optimized */
+static const slong mpn_mod_mat_mul_waksman_cutoff[MPN_MOD_MAX_LIMBS + 1] =
+{
+    0, 0, WORD_MAX, 20, 10, 8, 8, 8, 6, 5, 5, 4, 4, 4, 4, 4, 4,
+};
+
+
+/* todo: retune this when arithmetic is more optimized */
 static const int mpn_mod_mat_mul_multi_mod_cutoff[MPN_MOD_MAX_LIMBS + 1] =
 {
-    0, 0, 300, 80, 80, 70, 70, 70, 60, 60, 50, 50, 50, 40, 40, 40, 40,
+    0, 0, 300, 80, 80, 90, 100, 90, 90, 90, 80, 80, 70, 70, 70, 70, 70,
 };
 
 int
@@ -1735,7 +1937,7 @@ _gr_mpn_mod_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx
 {
     slong ar = A->r;
 
-    if (ar < 30)
+    if (ar <= 3)
         return gr_mat_mul_classical(C, A, B, ctx);
 
     slong ac = A->c;
@@ -1743,18 +1945,22 @@ _gr_mpn_mod_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx
     slong cutoff;
     slong n = MPN_MOD_CTX_NLIMBS(ctx);
 
-    cutoff = mpn_mod_mat_mul_multi_mod_cutoff[n];
+    cutoff = mpn_mod_mat_mul_waksman_cutoff[n];
 
     if (ar < cutoff || ac < cutoff || bc < cutoff)
         return gr_mat_mul_classical(C, A, B, ctx);
-    else
-        return _gr_mpn_mod_mat_mul_multi_mod(C, A, B, ctx);
+
+    cutoff = mpn_mod_mat_mul_multi_mod_cutoff[n];
+
+    if (ar < cutoff || ac < cutoff || bc < cutoff)
+        return _gr_mpn_mod_mat_mul_waksman(C, A, B, ctx);
+
+    return _gr_mpn_mod_mat_mul_multi_mod(C, A, B, ctx);
 }
 
-/* roughly 2x the subclassical multiplication cutoff */
 static const int mpn_mod_mat_solve_tri_cutoff[MPN_MOD_MAX_LIMBS + 1] =
 {
-    0, 0, 700, 170, 170, 150, 150, 150, 130, 130, 110, 110, 100, 90, 90, 90, 90,
+    0, 0, 700, 200, 160, 80, 80, 40, 30, 30, 30, 30, 20, 20, 20, 20, 20,
 };
 
 int
@@ -1966,7 +2172,7 @@ static const unsigned int mpn_mod_mat_lu_delayed_cutoff[MPN_MOD_MAX_LIMBS + 1] =
 
 static const unsigned int mpn_mod_mat_lu_recursive_cutoff[MPN_MOD_MAX_LIMBS + 1] =
 {
-    0, 0, 2000, 1500, 1000, 600, 600, 500, 400, 400, 300, 300, 300, 300, 250, 250, 250,
+    0, 0, 200, 180, 100, 50, 40, 40, 30, 20, 20, 20, 20, 20, 20, 20, 20,
 };
 
 int
@@ -1984,7 +2190,7 @@ _gr_mpn_mod_mat_lu(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int r
     if (d < cutoff)
         return _gr_mpn_mod_mat_lu_classical_delayed(rank, P, LU, A, rank_check, ctx);
 
-    return gr_mat_lu_recursive(rank, P, LU, A, rank_check, cutoff / 2, ctx);
+    return gr_mat_lu_recursive(rank, P, LU, A, rank_check, ctx);
 }
 
 
