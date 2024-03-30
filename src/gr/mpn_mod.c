@@ -2193,6 +2193,29 @@ _gr_mpn_mod_mat_lu(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int r
     return gr_mat_lu_recursive(rank, P, LU, A, rank_check, ctx);
 }
 
+int
+_gr_mpn_mod_mat_det(mp_ptr res, const gr_mat_t A, gr_ctx_t ctx)
+{
+    slong n = A->r;
+
+    if (A->r != A->c)
+        return GR_DOMAIN;
+
+    if (n <= 4)
+        return gr_mat_det_cofactor(res, A, ctx);
+
+    if (n == 5)
+        return gr_mat_det_berkowitz(res, A, ctx);
+
+    if (gr_mat_det_lu(res, A, ctx) != GR_SUCCESS)
+    {
+        /* Fall back on division-free algorithm if we encountered an impossible inverse */
+        /* Could try something else here: faddeev_bsgs (O(n^3.5)) or Howell form. */
+        GR_MUST_SUCCEED(gr_mat_det_berkowitz(res, A, ctx));
+    }
+
+    return GR_SUCCESS;
+}
 
 int _mpn_mod_methods_initialized = 0;
 
@@ -2304,10 +2327,7 @@ gr_method_tab_input _mpn_mod_methods_input[] =
     {GR_METHOD_MAT_NONSINGULAR_SOLVE_TRIL,                 (gr_funcptr) _gr_mpn_mod_mat_nonsingular_solve_tril},
     {GR_METHOD_MAT_NONSINGULAR_SOLVE_TRIU,                 (gr_funcptr) _gr_mpn_mod_mat_nonsingular_solve_triu},
     {GR_METHOD_MAT_LU,          (gr_funcptr) _gr_mpn_mod_mat_lu},
-
-/*
     {GR_METHOD_MAT_DET,         (gr_funcptr) _gr_mpn_mod_mat_det},
-*/
     {0,                         (gr_funcptr) NULL},
 };
 
