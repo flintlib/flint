@@ -143,7 +143,7 @@ gr_mat_nonsingular_solve_tril_recursive(gr_mat_t X,
 }
 
 int
-gr_mat_nonsingular_solve_tril(gr_mat_t X, const gr_mat_t L,
+gr_mat_nonsingular_solve_tril_generic(gr_mat_t X, const gr_mat_t L,
                                     const gr_mat_t B, int unit, gr_ctx_t ctx)
 {
     /* todo: tune thresholds */
@@ -151,4 +151,11 @@ gr_mat_nonsingular_solve_tril(gr_mat_t X, const gr_mat_t L,
         return gr_mat_nonsingular_solve_tril_classical(X, L, B, unit, ctx);
     else
         return gr_mat_nonsingular_solve_tril_recursive(X, L, B, unit, ctx);
+}
+
+int
+gr_mat_nonsingular_solve_tril(gr_mat_t X, const gr_mat_t L,
+                                    const gr_mat_t B, int unit, gr_ctx_t ctx)
+{
+    return GR_MAT_BINARY_OP_WITH_FLAG(ctx, MAT_NONSINGULAR_SOLVE_TRIL)(X, L, B, unit, ctx);
 }

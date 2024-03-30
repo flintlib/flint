@@ -120,7 +120,6 @@ TEST_FUNCTION_START(gr_mat_lu_recursive, state)
         slong m, n, r, d, rank;
         slong * P;
         int status;
-        slong cutoff;
 
         if (n_randint(state, 2))
             gr_ctx_init_fmpz(ctx);
@@ -132,8 +131,6 @@ TEST_FUNCTION_START(gr_mat_lu_recursive, state)
 
         for (r = 0; r <= FLINT_MIN(m, n); r++)
         {
-            cutoff = 2 + n_randint(state, 5);
-
             gr_mat_init(A, m, n, ctx);
             gr_mat_init(LU, m, n, ctx);
 
@@ -147,7 +144,7 @@ TEST_FUNCTION_START(gr_mat_lu_recursive, state)
 
             P = flint_malloc(sizeof(slong) * m);
 
-            status = gr_mat_lu_recursive(&rank, P, LU, A, 0, cutoff, ctx);
+            status = gr_mat_lu_recursive(&rank, P, LU, A, 0, ctx);
 
             if (status == GR_SUCCESS)
             {
@@ -180,7 +177,6 @@ TEST_FUNCTION_START(gr_mat_lu_recursive, state)
         slong m, n, r, d, rank;
         slong * P;
         int status;
-        slong cutoff;
 
         gr_ctx_init_random(ctx, state);
 
@@ -189,8 +185,6 @@ TEST_FUNCTION_START(gr_mat_lu_recursive, state)
 
         for (r = 0; r <= FLINT_MIN(m, n); r++)
         {
-            cutoff = 2 + n_randint(state, 5);
-
             gr_mat_init(A, m, n, ctx);
             gr_mat_init(LU, m, n, ctx);
 
@@ -204,7 +198,7 @@ TEST_FUNCTION_START(gr_mat_lu_recursive, state)
 
             P = flint_malloc(sizeof(slong) * m);
 
-            status = gr_mat_lu_recursive(&rank, P, LU, A, 0, cutoff, ctx);
+            status = gr_mat_lu_recursive(&rank, P, LU, A, 0, ctx);
 
             if (status == GR_SUCCESS)
             {
@@ -238,7 +232,6 @@ TEST_FUNCTION_START(gr_mat_lu_recursive, state)
         slong n, r, d, rank;
         slong * P;
         int status;
-        slong cutoff;
 
         if (n_randint(state, 2))
             gr_ctx_init_fmpz(ctx);
@@ -249,8 +242,6 @@ TEST_FUNCTION_START(gr_mat_lu_recursive, state)
 
         for (r = 0; r <= n; r++)
         {
-            cutoff = 2 + n_randint(state, 5);
-
             gr_mat_init(A, n, n, ctx);
             gr_mat_init(LU, n, n, ctx);
 
@@ -264,7 +255,7 @@ TEST_FUNCTION_START(gr_mat_lu_recursive, state)
 
             P = flint_malloc(sizeof(slong) * n);
 
-            status = gr_mat_lu_recursive(&rank, P, LU, A, 1, cutoff, ctx);
+            status = gr_mat_lu_recursive(&rank, P, LU, A, 1, ctx);
 
             if (status == GR_SUCCESS)
             {
