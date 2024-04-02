@@ -28,7 +28,7 @@ _gr_poly_evaluate_horner(gr_ptr res, gr_srcptr f, slong len, const gr_srcptr x, 
     {
         slong sz = ctx->sizeof_elem;
 
-        status |= gr_mul(res, x, GR_ENTRY(f, 1, sz), ctx);
+        status |= gr_mul(res, GR_ENTRY(f, 1, sz), x, ctx);
         status |= gr_add(res, res, f, ctx);
 
         return status;

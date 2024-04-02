@@ -24,15 +24,14 @@ _gr_poly_mullow_generic(gr_ptr res,
     if (n == 1)
         return gr_mul(res, poly1, poly2, ctx);
 
-    /* todo: noncommutative rings */
     if (len1 == 1)
-        return _gr_vec_mul_scalar(res, poly2, n, poly1, ctx);
+        return _gr_scalar_mul_vec(res, poly1, poly2, n, ctx);
 
     if (len2 == 1)
         return _gr_vec_mul_scalar(res, poly1, n, poly2, ctx);
 
     /* Squaring */
-    if (poly1 == poly2 && len1 == len2)
+    if (poly1 == poly2 && len1 == len2 && gr_ctx_is_commutative_ring(ctx) == T_TRUE)
     {
         slong i, start, stop, sz;
         sz = ctx->sizeof_elem;
