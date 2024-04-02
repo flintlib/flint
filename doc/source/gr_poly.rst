@@ -21,6 +21,19 @@ and not supporting aliasing of the input and output arrays),
 and a non-underscore method which performs automatic memory
 management and handles degenerate cases.
 
+Supported coefficient domains
+-------------------------------------------------------------------------------
+
+Some methods in this module implicitly assume that *R* is a commutative
+ring or an approximate (e.g. floating-point) commutative ring.
+When used with a more general *R*, they may output nonsense without
+returning the appropriate ``GR_DOMAIN`` or ``GR_UNABLE`` flags.
+Better support for noncommutative coefficients is planned for the future.
+
+Some methods make stronger implicit assumptions, for example that *R*
+is an integral domain or a field. Such assumptions are documented on
+a case by case basis.
+
 Type compatibility
 -------------------------------------------------------------------------------
 

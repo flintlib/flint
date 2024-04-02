@@ -31,7 +31,9 @@ _gr_poly_mullow_generic(gr_ptr res,
         return _gr_vec_mul_scalar(res, poly1, n, poly2, ctx);
 
     /* Squaring */
-    if (poly1 == poly2 && len1 == len2 && gr_ctx_is_commutative_ring(ctx) == T_TRUE)
+    /* fixme: only valid for commutative rings, but we also want squaring over
+       ringlike structures, e.g. floats */
+    if (poly1 == poly2 && len1 == len2 /* && gr_ctx_is_commutative_ring(ctx) == T_TRUE */)
     {
         slong i, start, stop, sz;
         sz = ctx->sizeof_elem;
