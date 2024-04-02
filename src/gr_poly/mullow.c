@@ -24,6 +24,7 @@ _gr_poly_mullow_generic(gr_ptr res,
     if (n == 1)
         return gr_mul(res, poly1, poly2, ctx);
 
+    /* todo: noncommutative rings */
     if (len1 == 1)
         return _gr_vec_mul_scalar(res, poly2, n, poly1, ctx);
 
