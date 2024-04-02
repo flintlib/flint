@@ -46,6 +46,7 @@
 #include "t-inv_series.c"
 #include "t-log_series.c"
 #include "t-make_monic.c"
+#include "t-mul_karatsuba.c"
 #include "t-nth_derivative.c"
 #include "t-pow_series_fmpq.c"
 #include "t-pow_series_ui.c"
@@ -105,6 +106,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_poly_inv_series),
     TEST_FUNCTION(gr_poly_log_series),
     TEST_FUNCTION(gr_poly_make_monic),
+    TEST_FUNCTION(gr_poly_mul_karatsuba),
     TEST_FUNCTION(gr_poly_nth_derivative),
     TEST_FUNCTION(gr_poly_pow_series_fmpq),
     TEST_FUNCTION(gr_poly_pow_series_ui),

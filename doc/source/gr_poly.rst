@@ -147,6 +147,16 @@ Arithmetic
 
 .. function:: int gr_poly_mul_scalar(gr_poly_t res, const gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx)
 
+.. function:: int _gr_poly_mul_karatsuba(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
+              int gr_poly_mul_karatsuba(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx)
+
+    Karatsuba multiplication.
+    Not optimized for unbalanced operands, and not memory-optimized for recursive calls.
+    The underscore method requires positive lengths and does not support aliasing.
+    This function calls :func:`_gr_poly_mul` recursively rather than itself, so to get a recursive
+    algorithm with `O(n^{1.6})` complexity, the ring must overload :func:`_gr_poly_mul` to dispatch
+    to :func:`_gr_poly_mul_karatsuba` above some cutoff.
+
 Powering
 --------------------------------------------------------------------------------
 
