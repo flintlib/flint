@@ -155,6 +155,7 @@ HEADER_DIRS :=                                                              \
         mpn_extras                                                          \
         mpfr_vec                        mpfr_mat                            \
         nmod            nmod_vec        nmod_mat        nmod_poly           \
+        mpn_mod                                                             \
         fmpz            fmpz_vec        fmpz_mat        fmpz_poly           \
         fmpz_mod        fmpz_mod_vec    fmpz_mod_mat    fmpz_mod_poly       \
         fmpq            fmpq_vec        fmpq_mat        fmpq_poly           \
