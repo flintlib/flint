@@ -774,6 +774,23 @@ Helper functions for reduction
     of `L` to be monotonic increasing.
 
 
+Test functions
+-------------------------------------------------------------------------------
+
+.. function:: void gr_mat_test_mul(gr_method_mat_binary_op mul_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+
+    Tests the given function ``mul_impl`` for correctness as an implementation
+    of matrix multiplication. Runs *iters* test iterations, generating matrices
+    up to size *maxn*. If *ctx* is set to ``NULL``, a random ring is generated
+    on each test iteration.
+
+.. function:: void gr_mat_test_lu(gr_method_mat_lu_op lu_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+
+    Tests the given function ``lu_impl`` for correctness as an implementation
+    of LU factorization. Runs *iters* test iterations, generating matrices
+    up to size *maxn*. If *ctx* is set to ``NULL``, a random ring is generated
+    on each test iteration.
+
 .. raw:: latex
 
     \newpage

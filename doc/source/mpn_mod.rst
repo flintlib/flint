@@ -50,6 +50,10 @@ Context objects
     initialization and returns
     ``GR_UNABLE`` if the modulus is not in bounds.
 
+.. function:: void gr_ctx_init_mpn_mod_randtest(gr_ctx_t ctx, flint_rand_t state)
+
+    Initializes *ctx* to a ring with a random modulus.
+
 .. macro:: MPN_MOD_CTX_NLIMBS(ctx)
 
     Retrives the number of limbs `\ell` of the modulus.
@@ -168,8 +172,8 @@ used by higher-level generic routines.
 
 .. function:: int mpn_mod_mat_mul_waksman(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 
-    Implements Waksman multiplication using `n^3/2 + O(n)` scalar multiplications.
-    The accumulations are done with delayed reduction.
+    Waksman's matrix multiplication algorithm using `n^3/2 + O(n)` scalar multiplications.
+    The operations are done with delayed reduction.
 
 .. function:: int mpn_mod_mat_mul_multi_mod(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 

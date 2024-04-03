@@ -15,7 +15,7 @@
 #include "gr.h"
 #include "gr_mat.h"
 
-TEST_FUNCTION_START(gr_mpn_mod, state)
+TEST_FUNCTION_START(mpn_mod, state)
 {
     gr_ctx_t ZZn, VecZZn, MatZZn, ZZnx;
     fmpz_t n;
