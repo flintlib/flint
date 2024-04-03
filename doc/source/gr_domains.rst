@@ -136,7 +136,6 @@ Base rings and fields
 
 .. function:: void gr_ctx_nmod_set_primality(gr_ctx_t ctx, truth_t is_prime)
               void gr_ctx_fmpz_mod_set_primality(gr_ctx_t ctx, truth_t is_prime)
-              void gr_ctx_mpn_mod_set_primality(gr_ctx_t ctx, truth_t is_prime)
 
     For a ring initialized with :func:`gr_ctx_init_nmod`
     or :func:`gr_ctx_init_fmpz_mod` respectively,
