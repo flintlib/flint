@@ -101,6 +101,8 @@ _gr_mat_randrank(gr_mat_t mat, flint_rand_t state, slong rank, slong bits, gr_ct
     fmpz_mat_clear(A);
 }
 
+FLINT_DLL extern gr_static_method_table _ca_methods;
+
 void gr_mat_test_lu(gr_method_mat_lu_op lu_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
 {
     slong iter;
@@ -123,8 +125,17 @@ void gr_mat_test_lu(gr_method_mat_lu_op lu_impl, flint_rand_t state, slong iters
         else
             ctx = given_ctx;
 
-        m = n_randint(state, maxn + 1);
-        n = n_randint(state, maxn + 1);
+        /* Hack: ca can have too much blowup */
+        if (((gr_ctx_struct *) ctx)->methods == _ca_methods)
+        {
+            m = n_randint(state, FLINT_MIN(maxn, 4) + 1);
+            n = n_randint(state, FLINT_MIN(maxn, 4) + 1);
+        }
+        else
+        {
+            m = n_randint(state, maxn + 1);
+            n = n_randint(state, maxn + 1);
+        }
 
         gr_mat_init(A, m, n, ctx);
         gr_mat_init(LU, m, n, ctx);
