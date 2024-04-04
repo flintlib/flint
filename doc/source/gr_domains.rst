@@ -128,18 +128,14 @@ Base rings and fields
     of integers modulo *n* where
     elements have type :type:`fmpz`. The modulus must be positive.
 
-.. function:: int gr_ctx_init_mpn_mod(gr_ctx_t ctx, const fmpz_t n)
+* :func:`gr_ctx_init_mpn_mod`
 
     Initializes *ctx* to the ring `\mathbb{Z}/n\mathbb{Z}`
     of integers modulo *n* where
-    elements are flat ``mpn`` arrays with the same number of limbs as
-    *n*. We currently require that the number of limbs *s* satisfies
-    `2 \le s \le 16`. This constructor does no initialization and returns
-    ``GR_UNABLE`` if the modulus is not in bounds.
+    elements are flat limb arrays with the same number of limbs as *n*.
 
 .. function:: void gr_ctx_nmod_set_primality(gr_ctx_t ctx, truth_t is_prime)
               void gr_ctx_fmpz_mod_set_primality(gr_ctx_t ctx, truth_t is_prime)
-              void gr_ctx_mpn_mod_set_primality(gr_ctx_t ctx, truth_t is_prime)
 
     For a ring initialized with :func:`gr_ctx_init_nmod`
     or :func:`gr_ctx_init_fmpz_mod` respectively,

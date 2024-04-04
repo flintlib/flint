@@ -901,8 +901,17 @@ gr_test_binary_op_type_variants(gr_ctx_t R,
     {
         uy = n_randtest(state);
         sy = (slong) n_randtest(state);
-        fmpz_randtest(zy, state, 100);
-        fmpq_randtest(qy, state, 100);
+
+        if (n_randint(state, 10) == 0)
+        {
+            fmpz_randtest(zy, state, 10000);
+            fmpq_randtest(qy, state, 200);
+        }
+        else
+        {
+            fmpz_randtest(zy, state, 100);
+            fmpq_randtest(qy, state, 100);
+        }
     }
 
     for (which = 0; which < 4; which++)
