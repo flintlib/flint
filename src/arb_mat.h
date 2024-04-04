@@ -121,7 +121,7 @@ arb_mat_is_square(const arb_mat_t mat)
     return (mat->r == mat->c);
 }
 
-int arb_mat_is_exact(const arb_mat_t A);
+int arb_mat_is_exact(const arb_mat_t mat);
 
 int arb_mat_is_zero(const arb_mat_t mat);
 int arb_mat_is_finite(const arb_mat_t mat);
@@ -174,7 +174,7 @@ void arb_mat_stirling(arb_mat_t mat, int kind, slong prec);
 
 void arb_mat_dct(arb_mat_t mat, int type, slong prec);
 
-void arb_mat_transpose(arb_mat_t mat1, const arb_mat_t mat2);
+void arb_mat_transpose(arb_mat_t dest, const arb_mat_t src);
 
 /* Norms */
 
@@ -182,7 +182,7 @@ void arb_mat_bound_inf_norm(mag_t b, const arb_mat_t A);
 
 void arb_mat_frobenius_norm(arb_t res, const arb_mat_t A, slong prec);
 
-void arb_mat_bound_frobenius_norm(mag_t b, const arb_mat_t A);
+void arb_mat_bound_frobenius_norm(mag_t res, const arb_mat_t A);
 
 /* Arithmetic */
 
@@ -202,12 +202,12 @@ void _arb_mat_addmul_rad_mag_fast(arb_mat_t C, mag_srcptr A, mag_srcptr B, slong
 
 void arb_mat_mul_block(arb_mat_t C, const arb_mat_t A, const arb_mat_t B, slong prec);
 
-void arb_mat_mul_entrywise(arb_mat_t res, const arb_mat_t mat1, const arb_mat_t mat2, slong prec);
+void arb_mat_mul_entrywise(arb_mat_t C, const arb_mat_t A, const arb_mat_t B, slong prec);
 
 void arb_mat_sqr_classical(arb_mat_t B, const arb_mat_t A, slong prec);
-void arb_mat_sqr(arb_mat_t B, const arb_mat_t A, slong prec);
+void arb_mat_sqr(arb_mat_t res, const arb_mat_t mat, slong prec);
 
-void arb_mat_pow_ui(arb_mat_t B, const arb_mat_t A, ulong exp, slong prec);
+void arb_mat_pow_ui(arb_mat_t res, const arb_mat_t mat, ulong exp, slong prec);
 
 /* Scalar arithmetic */
 
@@ -362,7 +362,7 @@ int arb_mat_solve_precond(arb_mat_t X, const arb_mat_t A, const arb_mat_t B, slo
 int arb_mat_solve_preapprox(arb_mat_t X, const arb_mat_t A,
     const arb_mat_t B, const arb_mat_t R, const arb_mat_t T, slong prec);
 
-void arb_mat_approx_mul(arb_mat_t C, const arb_mat_t A, const arb_mat_t B, slong prec);
+void arb_mat_approx_mul(arb_mat_t res, const arb_mat_t mat1, const arb_mat_t mat2, slong prec);
 void arb_mat_approx_solve_triu(arb_mat_t X, const arb_mat_t U, const arb_mat_t B, int unit, slong prec);
 void arb_mat_approx_solve_tril(arb_mat_t X, const arb_mat_t L, const arb_mat_t B, int unit, slong prec);
 int arb_mat_approx_lu(slong * P, arb_mat_t LU, const arb_mat_t A, slong prec);
@@ -393,7 +393,7 @@ int _arb_mat_ldl_inplace(arb_mat_t A, slong prec);
 
 int _arb_mat_ldl_golub_and_van_loan(arb_mat_t A, slong prec);
 
-int arb_mat_ldl(arb_mat_t L, const arb_mat_t A, slong prec);
+int arb_mat_ldl(arb_mat_t res, const arb_mat_t A, slong prec);
 
 void arb_mat_solve_ldl_precomp(arb_mat_t X,
     const arb_mat_t L, const arb_mat_t B, slong prec);
@@ -413,8 +413,8 @@ void arb_mat_companion(arb_mat_t mat, const arb_poly_t poly, slong prec);
 
 void arb_mat_trace(arb_t trace, const arb_mat_t mat, slong prec);
 
-void _arb_mat_diag_prod(arb_t res, const arb_mat_t A, slong a, slong b, slong prec);
-void arb_mat_diag_prod(arb_t res, const arb_mat_t A, slong prec);
+void _arb_mat_diag_prod(arb_t res, const arb_mat_t mat, slong a, slong b, slong prec);
+void arb_mat_diag_prod(arb_t res, const arb_mat_t mat, slong prec);
 
 /* Sparsity structure */
 

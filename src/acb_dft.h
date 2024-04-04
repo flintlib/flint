@@ -20,12 +20,12 @@ extern "C" {
 #endif
 
 void _acb_dft_naive(acb_ptr w, acb_srcptr v, slong dv, acb_srcptr z, slong dz, slong len, slong prec);
-void acb_dft_naive(acb_ptr w, acb_srcptr v, slong len, slong prec);
-void acb_dft_crt(acb_ptr w, acb_srcptr v, slong len, slong prec);
-void acb_dft_cyc(acb_ptr w, acb_srcptr v, slong len, slong prec);
+void acb_dft_naive(acb_ptr w, acb_srcptr v, slong n, slong prec);
+void acb_dft_crt(acb_ptr w, acb_srcptr v, slong n, slong prec);
+void acb_dft_cyc(acb_ptr w, acb_srcptr v, slong n, slong prec);
 void acb_dft_rad2_inplace(acb_ptr v, int e, slong prec);
 void acb_dft_rad2(acb_ptr w, acb_srcptr v, int e, slong prec);
-void acb_dft_bluestein(acb_ptr w, acb_srcptr v, slong len, slong prec);
+void acb_dft_bluestein(acb_ptr w, acb_srcptr v, slong n, slong prec);
 void acb_dft_prod(acb_ptr w, acb_srcptr v, slong * cyc, slong num, slong prec);
 
 void acb_dft_rad2_inplace_threaded(acb_ptr v, int e, slong prec);
@@ -176,12 +176,12 @@ void acb_dft_step(acb_ptr w, acb_srcptr v, acb_dft_step_ptr cyc, slong num, slon
 
 void acb_dft_precomp(acb_ptr w, acb_srcptr v, const acb_dft_pre_t pre, slong prec);
 void acb_dft_inverse_precomp(acb_ptr w, acb_srcptr v, const acb_dft_pre_t pre, slong prec);
-void acb_dft_naive_precomp(acb_ptr w, acb_srcptr v, const acb_dft_naive_t pol, slong prec);
-void acb_dft_cyc_precomp(acb_ptr w, acb_srcptr v, const acb_dft_cyc_t cyc, slong prec);
+void acb_dft_naive_precomp(acb_ptr w, acb_srcptr v, const acb_dft_naive_t t, slong prec);
+void acb_dft_cyc_precomp(acb_ptr w, acb_srcptr v, const acb_dft_cyc_t t, slong prec);
 
 void acb_dft_rad2_precomp_inplace(acb_ptr v, const acb_dft_rad2_t rad2, slong prec);
-void acb_dft_rad2_precomp(acb_ptr w, acb_srcptr v, const acb_dft_rad2_t rad2, slong prec);
-void acb_dft_crt_precomp(acb_ptr w, acb_srcptr v, const acb_dft_crt_t crt, slong prec);
+void acb_dft_rad2_precomp(acb_ptr w, acb_srcptr v, const acb_dft_rad2_t t, slong prec);
+void acb_dft_crt_precomp(acb_ptr w, acb_srcptr v, const acb_dft_crt_t t, slong prec);
 void acb_dft_prod_precomp(acb_ptr w, acb_srcptr v, const acb_dft_prod_t prod, slong prec);
 void acb_dft_bluestein_precomp(acb_ptr w, acb_srcptr v, const acb_dft_bluestein_t t, slong prec);
 
@@ -195,8 +195,8 @@ void _acb_dft_precomp_init(acb_dft_pre_t pre, slong dv, acb_ptr z, slong dz, slo
 void acb_dft_precomp_init(acb_dft_pre_t pre, slong len, slong prec);
 void acb_dft_precomp_clear(acb_dft_pre_t pre);
 
-void acb_dft(acb_ptr w, acb_srcptr v, slong len, slong prec);
-void acb_dft_inverse(acb_ptr w, acb_srcptr v, slong len, slong prec);
+void acb_dft(acb_ptr w, acb_srcptr v, slong n, slong prec);
+void acb_dft_inverse(acb_ptr w, acb_srcptr v, slong n, slong prec);
 
 acb_dft_step_ptr _acb_dft_steps_prod(slong * m, slong num, slong prec);
 
@@ -269,8 +269,8 @@ acb_dft_bluestein_clear(acb_dft_bluestein_t t)
 }
 
 void _acb_dft_crt_init(acb_dft_crt_t crt, slong dv, slong len, slong prec);
-void acb_dft_crt_init(acb_dft_crt_t crt, slong len, slong prec);
-void acb_dft_crt_clear(acb_dft_crt_t crt);
+void acb_dft_crt_init(acb_dft_crt_t t, slong len, slong prec);
+void acb_dft_crt_clear(acb_dft_crt_t t);
 
 /* utils, could be moved elsewhere */
 

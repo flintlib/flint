@@ -52,7 +52,7 @@ void fmpz_mpoly_q_set_si(fmpz_mpoly_q_t res, slong x, const fmpz_mpoly_ctx_t ctx
 
 void fmpz_mpoly_q_canonicalise(fmpz_mpoly_q_t x, const fmpz_mpoly_ctx_t ctx);
 
-int fmpz_mpoly_q_is_canonical(const fmpz_mpoly_q_t res, const fmpz_mpoly_ctx_t ctx);
+int fmpz_mpoly_q_is_canonical(const fmpz_mpoly_q_t x, const fmpz_mpoly_ctx_t ctx);
 
 /* Properties */
 

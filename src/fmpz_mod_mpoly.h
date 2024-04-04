@@ -275,7 +275,7 @@ slong fmpz_mod_mpoly_degree_si(const fmpz_mod_mpoly_t A, slong var, const fmpz_m
 
 int fmpz_mod_mpoly_total_degree_fits_si(const fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_ctx_t ctx);
 
-void fmpz_mod_mpoly_total_degree_fmpz(fmpz_t td, const fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_ctx_t ctx);
+void fmpz_mod_mpoly_total_degree_fmpz(fmpz_t tdeg, const fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_ctx_t ctx);
 slong fmpz_mod_mpoly_total_degree_si(const fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_ctx_t ctx);
 
 void fmpz_mod_mpoly_used_vars(int * used, const fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_ctx_t ctx);
@@ -377,8 +377,8 @@ void fmpz_mod_mpoly_set_term_coeff_ui(fmpz_mod_mpoly_t A, slong i,
 void fmpz_mod_mpoly_set_term_coeff_si(fmpz_mod_mpoly_t A, slong i,
                                       slong c, const fmpz_mod_mpoly_ctx_t ctx);
 
-int fmpz_mod_mpoly_term_exp_fits_ui(const fmpz_mod_mpoly_t A, slong i, const fmpz_mod_mpoly_ctx_t ctx);
-int fmpz_mod_mpoly_term_exp_fits_si(const fmpz_mod_mpoly_t A, slong i, const fmpz_mod_mpoly_ctx_t ctx);
+int fmpz_mod_mpoly_term_exp_fits_ui(const fmpz_mod_mpoly_t poly, slong i, const fmpz_mod_mpoly_ctx_t ctx);
+int fmpz_mod_mpoly_term_exp_fits_si(const fmpz_mod_mpoly_t poly, slong i, const fmpz_mod_mpoly_ctx_t ctx);
 
 void fmpz_mod_mpoly_get_term_exp_fmpz(fmpz ** exp,
             const fmpz_mod_mpoly_t A, slong i, const fmpz_mod_mpoly_ctx_t ctx);

@@ -32,7 +32,7 @@ void ca_field_init_fxy(ca_field_t K, calcium_func_code func, const ca_t x, const
 void ca_field_init_multi(ca_field_t K, slong len, ca_ctx_t ctx);
 void ca_field_clear(ca_field_t K, ca_ctx_t ctx);
 
-void ca_field_set_ext(ca_field_t K, slong i, ca_ext_srcptr x, ca_ctx_t ctx);
+void ca_field_set_ext(ca_field_t K, slong i, ca_ext_srcptr x_index, ca_ctx_t ctx);
 
 void ca_field_print(const ca_field_t K, ca_ctx_t ctx);
 

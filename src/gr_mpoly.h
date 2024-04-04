@@ -210,8 +210,8 @@ WARN_UNUSED_RESULT int gr_mpoly_neg(gr_mpoly_t A, const gr_mpoly_t B, const mpol
 WARN_UNUSED_RESULT int gr_mpoly_add(gr_mpoly_t A, const gr_mpoly_t B, const gr_mpoly_t C, const mpoly_ctx_t mctx, gr_ctx_t cctx);
 WARN_UNUSED_RESULT int gr_mpoly_sub(gr_mpoly_t A, const gr_mpoly_t B, const gr_mpoly_t C, const mpoly_ctx_t mctx, gr_ctx_t cctx);
 
-WARN_UNUSED_RESULT int gr_mpoly_mul(gr_mpoly_t poly1, const gr_mpoly_t poly2, const gr_mpoly_t poly3, const mpoly_ctx_t mctx, gr_ctx_t cctx);
-WARN_UNUSED_RESULT int gr_mpoly_mul_johnson(gr_mpoly_t poly1, const gr_mpoly_t poly2, const gr_mpoly_t poly3, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+WARN_UNUSED_RESULT int gr_mpoly_mul(gr_mpoly_t A, const gr_mpoly_t B, const gr_mpoly_t C, const mpoly_ctx_t mctx, gr_ctx_t cctx);
+WARN_UNUSED_RESULT int gr_mpoly_mul_johnson(gr_mpoly_t A, const gr_mpoly_t B, const gr_mpoly_t C, const mpoly_ctx_t mctx, gr_ctx_t cctx);
 WARN_UNUSED_RESULT int gr_mpoly_mul_monomial(gr_mpoly_t A, const gr_mpoly_t B, const gr_mpoly_t C, const mpoly_ctx_t mctx, gr_ctx_t cctx);
 
 WARN_UNUSED_RESULT int gr_mpoly_mul_scalar(gr_mpoly_t A, const gr_mpoly_t B, gr_srcptr c, const mpoly_ctx_t mctx, gr_ctx_t cctx);
