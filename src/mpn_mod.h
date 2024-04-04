@@ -183,7 +183,7 @@ char * _flint_mpn_get_str(mp_srcptr x, mp_size_t n);
 /* Basic operations and arithmetic */
 
 int gr_ctx_init_mpn_mod(gr_ctx_t ctx, const fmpz_t n);
-int _gr_ctx_init_mpn_mod(gr_ctx_t ctx, mp_srcptr n, mp_size_t nlimbs)
+int _gr_ctx_init_mpn_mod(gr_ctx_t ctx, mp_srcptr n, mp_size_t nlimbs);
 void gr_ctx_init_mpn_mod_randtest(gr_ctx_t ctx, flint_rand_t state);
 void gr_ctx_mpn_mod_set_primality(gr_ctx_t ctx, truth_t is_prime);
 

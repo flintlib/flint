@@ -32,9 +32,16 @@ void gr_mat_test_mul(gr_method_mat_binary_op mul_impl, flint_rand_t state, slong
         else
             ctx = given_ctx;
 
-        a = n_randint(state, maxn);
-        b = n_randint(state, maxn);
-        c = n_randint(state, maxn);
+        if (n_randint(state, 4) == 0)
+        {
+            a = b = c = n_randint(state, maxn);
+        }
+        else
+        {
+            a = n_randint(state, maxn);
+            b = n_randint(state, maxn);
+            c = n_randint(state, maxn);
+        }
 
         gr_mat_init(A, a, b, ctx);
         gr_mat_init(B, b, c, ctx);
@@ -55,6 +62,17 @@ void gr_mat_test_mul(gr_method_mat_binary_op mul_impl, flint_rand_t state, slong
         {
             status |= gr_mat_set(C, B, ctx);
             status |= mul_impl(C, A, C, ctx);
+        }
+        else if (a == b && b == c && n_randint(state, 2))
+        {
+            status |= gr_mat_set(B, A, ctx);
+            status |= mul_impl(C, A, A, ctx);
+        }
+        else if (a == b && b == c && n_randint(state, 2))
+        {
+            status |= gr_mat_set(B, A, ctx);
+            status |= gr_mat_set(C, A, ctx);
+            status |= mul_impl(C, C, C, ctx);
         }
         else
         {
