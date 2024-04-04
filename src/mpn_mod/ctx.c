@@ -126,36 +126,28 @@ gr_method_tab_input _mpn_mod_methods_input[] =
     {0,                         (gr_funcptr) NULL},
 };
 
-/* todo: allow passing modulus as an mpn */
 int
-gr_ctx_init_mpn_mod(gr_ctx_t ctx, const fmpz_t n)
+_gr_ctx_init_mpn_mod(gr_ctx_t ctx, mp_srcptr n, mp_size_t nlimbs)
 {
-    mp_size_t s;
-    mp_srcptr nptr;
     mp_bitcnt_t norm;
-
-    s = fmpz_size(n);
-
-    if (s < MPN_MOD_MIN_LIMBS || s > MPN_MOD_MAX_LIMBS || fmpz_sgn(n) < 0)
-        return GR_DOMAIN;
+    if (nlimbs < MPN_MOD_MIN_LIMBS || nlimbs > MPN_MOD_MAX_LIMBS || n[nlimbs - 1] == 0)
+        return GR_UNABLE;
 
     ctx->which_ring = GR_CTX_MPN_MOD;
-    ctx->sizeof_elem = s * sizeof(mp_limb_t);
+    ctx->sizeof_elem = nlimbs * sizeof(mp_limb_t);
 
     GR_CTX_DATA_AS_PTR(ctx) = flint_malloc(sizeof(_mpn_mod_ctx_struct));
 
-    MPN_MOD_CTX_NLIMBS(ctx) = s;
-
-    nptr = COEFF_TO_PTR(*n)->_mp_d;
-    flint_mpn_copyi(MPN_MOD_CTX_MODULUS(ctx), nptr, s);
-    MPN_MOD_CTX_NORM(ctx) = norm = flint_clz(nptr[s - 1]);
+    MPN_MOD_CTX_NLIMBS(ctx) = nlimbs;
+    flint_mpn_copyi(MPN_MOD_CTX_MODULUS(ctx), n, nlimbs);
+    MPN_MOD_CTX_NORM(ctx) = norm = flint_clz(n[nlimbs - 1]);
 
     if (norm == 0)
-        flint_mpn_copyi(MPN_MOD_CTX_MODULUS_NORMED(ctx), nptr, s);
+        flint_mpn_copyi(MPN_MOD_CTX_MODULUS_NORMED(ctx), n, nlimbs);
     else
-        mpn_lshift(MPN_MOD_CTX_MODULUS_NORMED(ctx), nptr, s, norm);
+        mpn_lshift(MPN_MOD_CTX_MODULUS_NORMED(ctx), n, nlimbs, norm);
 
-    flint_mpn_preinvn(MPN_MOD_CTX_MODULUS_PREINV(ctx), MPN_MOD_CTX_MODULUS_NORMED(ctx), s);
+    flint_mpn_preinvn(MPN_MOD_CTX_MODULUS_PREINV(ctx), MPN_MOD_CTX_MODULUS_NORMED(ctx), nlimbs);
 
     MPN_MOD_CTX_IS_PRIME(ctx) = T_UNKNOWN;
 
@@ -170,6 +162,18 @@ gr_ctx_init_mpn_mod(gr_ctx_t ctx, const fmpz_t n)
     }
 
     return GR_SUCCESS;
+}
+
+int
+gr_ctx_init_mpn_mod(gr_ctx_t ctx, const fmpz_t n)
+{
+    if (fmpz_sgn(n) <= 0)
+        return GR_DOMAIN;
+
+    if (!COEFF_IS_MPZ(*n))
+        return GR_UNABLE;
+
+    return _gr_ctx_init_mpn_mod(ctx, COEFF_TO_PTR(*n)->_mp_d, COEFF_TO_PTR(*n)->_mp_size);
 }
 
 /* todo: have a generic interface for this */

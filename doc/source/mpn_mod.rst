@@ -43,12 +43,13 @@ Context objects
 -------------------------------------------------------------------------------
 
 .. function:: int gr_ctx_init_mpn_mod(gr_ctx_t ctx, const fmpz_t n)
+              int _gr_ctx_init_mpn_mod(gr_ctx_t ctx, mp_srcptr n, mp_size_t nlimbs)
 
     Initializes *ctx* to the ring `\mathbb{Z}/n\mathbb{Z}`
     of integers modulo *n* where elements are ``mp_limb_t`` arrays with
     the same number of limbs as *n*. This constructor does no
-    initialization and returns
-    ``GR_UNABLE`` if the modulus is not in bounds.
+    initialization and returns ``GR_DOMAIN`` if the modulus is nonpositive,
+    or ``GR_UNABLE`` if the modulus is not in bounds.
 
 .. function:: void gr_ctx_init_mpn_mod_randtest(gr_ctx_t ctx, flint_rand_t state)
 
