@@ -55,11 +55,18 @@ set(CMAKE_C_STANDARD_REQUIRED TRUE)
 option(BUILD_SHARED_LIBS "Build shared libs" on)
 option(WITH_NTL "Build tests for NTL interface or not" off)
 
+# No -march on PowerPC, but -mtune works
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "ppc|powerpc")
+    set(OPTFLAG "tune")
+else()
+    set(OPTFLAG "arch")
+endif()
+
 # MSVC has no equivalent to "-march=<arch>"
 if(NOT MSVC)
-    set(ENABLE_ARCH "native" CACHE STRING "Enable and push -march=ARCH option to C compiler")
+    set(ENABLE_ARCH "native" CACHE STRING "Enable and push -m${OPTFLAG}=ARCH option to C compiler")
     if(NOT "${ENABLE_ARCH}" STREQUAL "NO")
-        check_c_compiler_flag("-march=${ENABLE_ARCH}" HAS_FLAG_ARCH)
+        check_c_compiler_flag("-m${OPTFLAG}=${ENABLE_ARCH}" HAS_FLAG_ARCH)
     endif()
 endif()
 
@@ -148,7 +155,7 @@ endif()
 message(STATUS "Checking whether fft_small module is available")
 set(CMAKE_REQUIRED_LIBRARIES gmp::gmp)
 if(HAS_FLAG_ARCH)
-    set(CMAKE_REQUIRED_FLAGS "-march=${ENABLE_ARCH}")
+    set(CMAKE_REQUIRED_FLAGS "-m${OPTFLAG}=${ENABLE_ARCH}")
 endif()
 if(HAS_FLAG_AVX2)
     set(CMAKE_REQUIRED_FLAGS "${avx2_flag}")
@@ -413,7 +420,7 @@ if (HAS_FLAG_UNROLL_LOOPS)
 endif()
 
 if(NOT MSVC AND NOT "${ENABLE_ARCH}" STREQUAL "NO")
-    target_compile_options(flint PUBLIC "-march=${ENABLE_ARCH}")
+    target_compile_options(flint PUBLIC "-m${OPTFLAG}=${ENABLE_ARCH}")
 endif()
 
 if(ENABLE_AVX2)
