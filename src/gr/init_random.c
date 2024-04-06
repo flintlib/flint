@@ -60,12 +60,8 @@ gr_ctx_init_random_ring_composite(gr_ctx_t ctx, flint_rand_t state)
 */
             break;
         case 3:
-            gr_ctx_init_gr_poly(ctx, base_ring);
-/*
-    this currently breaks some tests
-            gr_ctx_init_gr_series_mod(ctx, base_ring, n_randint(state, 6));
+            gr_ctx_init_series_mod_gr_poly(ctx, base_ring, n_randint(state, 6));
             break;
-*/
         case 4:
             gr_ctx_init_vector_space_gr_vec(ctx, base_ring, n_randint(state, 4));
             break;

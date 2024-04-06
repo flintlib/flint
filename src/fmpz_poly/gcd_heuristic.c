@@ -180,7 +180,7 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, slong len1,
       Make space for unpacked gcd. May have one extra coeff due to
       1 0 -x being packed as 0 -1 -x.
    */
-   glen = FLINT_MIN((limbsg*FLINT_BITS)/pack_bits + 1, len2);
+   glen = FLINT_MIN((slong) ((limbsg * FLINT_BITS) / pack_bits) + 1, len2);
    G = _fmpz_vec_init(glen);
 
    /*
@@ -202,9 +202,9 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, slong len1,
 
    /* make space for quotient and remainder of both polys by gcd */
    qlimbs = limbs1 - limbsg + 1;
-   qlen = FLINT_MIN(len1, (qlimbs*FLINT_BITS)/pack_bits + 1);
+   qlen = FLINT_MIN(len1, (slong) ((qlimbs * FLINT_BITS) / pack_bits) + 1);
    qlimbs2 = limbs2 - limbsg + 1;
-   qlen2 = FLINT_MIN(len2, (qlimbs2*FLINT_BITS)/pack_bits + 1);
+   qlen2 = FLINT_MIN(len2, (slong) ((qlimbs2 * FLINT_BITS) / pack_bits) + 1);
    qlimbs = (FLINT_MAX(qlen, qlen2)*pack_bits - 1)/FLINT_BITS + 1;
    q = flint_calloc(qlimbs, sizeof(mp_limb_t));
    temp = flint_malloc(limbsg*sizeof(mp_limb_t));
@@ -228,7 +228,7 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, slong len1,
 	  log_length = FLINT_MIN(log_glen, FLINT_BIT_COUNT(qlen));
 
 	  /* allow one bit for signs */
-	  divides = (bits_G + bits_Q + log_length < pack_bits);
+	  divides = (bits_G + bits_Q + log_length < (ulong) pack_bits);
 
       if (!divides) /* need to multiply out to check exact quotient */
          divides = multiplies_out(A, len1, Q, qlen, G, glen, sign1, t);
@@ -249,7 +249,7 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, slong len1,
 		    log_length = FLINT_MIN(log_glen, FLINT_BIT_COUNT(qlen2));
 
 			/* allow one bit for signs */
-			divides = (bits_G + bits_Q + log_length < pack_bits);
+			divides = (bits_G + bits_Q + log_length < (ulong) pack_bits);
 
             if (!divides) /* we need to multiply out */
                divides = multiplies_out(B, len2, Q, qlen2, G, glen, sign1, t);

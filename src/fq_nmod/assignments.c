@@ -16,7 +16,7 @@
 #include "nmod_poly.h"
 #include "fq_nmod.h"
 
-void fq_nmod_set(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
+void fq_nmod_set(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t FLINT_UNUSED(ctx))
 {
     nmod_poly_set(rop, op);
 }
@@ -38,17 +38,17 @@ void fq_nmod_set_ui(fq_nmod_t rop, const ulong x, const fq_nmod_ctx_t ctx)
     nmod_poly_set_coeff_ui(rop, 0, n_mod2_preinv(x, ctx->mod.n, ctx->mod.ninv));
 }
 
-void fq_nmod_swap(fq_nmod_t op1, fq_nmod_t op2, const fq_nmod_ctx_t ctx)
+void fq_nmod_swap(fq_nmod_t op1, fq_nmod_t op2, const fq_nmod_ctx_t FLINT_UNUSED(ctx))
 {
     nmod_poly_swap(op1, op2);
 }
 
-void fq_nmod_zero(fq_nmod_t rop,  const fq_nmod_ctx_t ctx)
+void fq_nmod_zero(fq_nmod_t rop,  const fq_nmod_ctx_t FLINT_UNUSED(ctx))
 {
     nmod_poly_zero(rop);
 }
 
-void fq_nmod_one(fq_nmod_t rop,  const fq_nmod_ctx_t ctx)
+void fq_nmod_one(fq_nmod_t rop,  const fq_nmod_ctx_t FLINT_UNUSED(ctx))
 {
     nmod_poly_one(rop);
 }

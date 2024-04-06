@@ -143,7 +143,7 @@ static int roots_mod_prime_power(nmod_poly_factor_t x, nmod_poly_t fpk,
         }
 
         nmod_poly_fit_length(x1, p);
-        for (i = 0; i < p; i++)
+        for (i = 0; (ulong) i < p; i++)
             x1->coeffs[i] = i;
         x1->length = p;
     }

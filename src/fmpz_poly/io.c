@@ -13,7 +13,8 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
-#include <gmpcompat.h>
+#include "gmpcompat.h"
+#include "mpn_extras.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"

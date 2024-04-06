@@ -25,7 +25,7 @@ TEMPLATE(T, poly_factor_split_single) (TEMPLATE(T, poly_t) linfactor,
     else
     {
         flint_rand_t state;
-        ulong deflation;
+        slong deflation;
         TEMPLATE(T, poly_t) pol;
 
         flint_randinit(state);

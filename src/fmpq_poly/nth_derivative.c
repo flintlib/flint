@@ -24,7 +24,7 @@ void _fmpq_poly_nth_derivative(fmpz * rpoly, fmpz_t rden,
 void fmpq_poly_nth_derivative(fmpq_poly_t res, const fmpq_poly_t poly, ulong n)
 {
     slong len = poly->length;
-    if (len <= n)
+    if ((ulong) len <= n)
     {
         fmpq_poly_zero(res);
         return;

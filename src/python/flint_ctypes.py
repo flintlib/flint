@@ -178,6 +178,10 @@ class ca_struct(ctypes.Structure):
 class nmod_struct(ctypes.Structure):
     _fields_ = [('val', c_ulong)]
 
+# todo: want different structure for each size
+class mpn_mod_struct(ctypes.Structure):
+    _fields_ = [('val', c_ulong * 16)]
+
 class nmod_poly_struct(ctypes.Structure):
     _fields_ = [('coeffs', ctypes.c_void_p),
                 ('alloc', c_slong),
@@ -438,6 +442,8 @@ class gr_ctx:
             >>> DirichletGroup(3).is_ring()
             False
             >>> PSL2Z.is_ring()
+            False
+            >>> SymmetricGroup(5).is_ring()
             False
             >>> PolynomialRing(RF).is_ring()
             False
@@ -4028,6 +4034,9 @@ class gr_elem:
             32
             >>> RF(0.5).exp10()
             3.162277660168380
+            >>> x = PowerSeriesModRing(QQ, 5).gen(); x.exp()
+            1 + x + (1/2)*x^2 + (1/6)*x^3 + (1/24)*x^4 (mod x^5)
+
         """
         return self._unary_op(self, libgr.gr_exp10, "exp10($x)")
 
@@ -4047,6 +4056,8 @@ class gr_elem:
             x + (-1/2)*x^2 + (1/3)*x^3 + (-1/4)*x^4 + (1/5)*x^5 + O(x^6)
             >>> QQser(1).log()
             0
+            >>> x = PowerSeriesModRing(QQ, 5).gen(); (1+x).log()
+            x + (-1/2)*x^2 + (1/3)*x^3 + (-1/4)*x^4 (mod x^5)
 
         """
         return self._unary_op(self, libgr.gr_log, "log($x)")
@@ -4071,6 +4082,10 @@ class gr_elem:
         return self._unary_op(self, libgr.gr_cos, "cos($x)")
 
     def tan(self):
+        """
+            >>> x = PowerSeriesModRing(QQ, 5).gen(); x.tan()
+            x + (1/3)*x^3 (mod x^5)
+        """
         return self._unary_op(self, libgr.gr_tan, "tan($x)")
 
     def sinh(self):
@@ -4082,8 +4097,52 @@ class gr_elem:
     def tanh(self):
         return self._unary_op(self, libgr.gr_tanh, "tanh($x)")
 
+    def asin(self):
+        """
+            >>> x = PowerSeriesModRing(QQ, 5).gen(); x.asin()
+            x + (1/6)*x^3 (mod x^5)
+        """
+        return self._unary_op(self, libgr.gr_asin, "asin($x)")
+
+    def acos(self):
+        """
+            >>> x = PowerSeriesModRing(QQ, 5).gen(); x.acos()
+            Traceback (most recent call last):
+              ...
+            FlintUnableError: failed to compute acos(x) in {Power series over Rational field (fmpq) mod x^5} for {x = x (mod x^5)}
+            >>> x = PowerSeriesModRing(RR_ca, 5).gen(); x.acos()
+            (1.57080 {(a)/2 where a = 3.14159 [Pi]}) - x + (-0.166667 {-1/6})*x^3 (mod x^5)
+        """
+        return self._unary_op(self, libgr.gr_acos, "acos($x)")
+
     def atan(self):
+        """
+            >>> x = PowerSeriesModRing(QQ, 5).gen(); x.atan()
+            x + (-1/3)*x^3 (mod x^5)
+        """
         return self._unary_op(self, libgr.gr_atan, "atan($x)")
+
+    def asinh(self):
+        """
+            >>> x = PowerSeriesModRing(QQ, 5).gen(); x.asinh()
+            x + (-1/6)*x^3 (mod x^5)
+        """
+        return self._unary_op(self, libgr.gr_asinh, "asinh($x)")
+
+    def acosh(self):
+        """
+            >>> x = PowerSeriesModRing(CC, 3).gen(); x.acosh()
+            [1.570796326794897 +/- 5.54e-16]*I + (-1.000000000000000*I)*x (mod x^3)
+        """
+        return self._unary_op(self, libgr.gr_acosh, "acosh($x)")
+
+    def atanh(self):
+        """
+            >>> x = PowerSeriesModRing(QQ, 5).gen(); x.atanh()
+            x + (1/3)*x^3 (mod x^5)
+        """
+        return self._unary_op(self, libgr.gr_atanh, "atanh($x)")
+
 
     def exp_pi_i(self):
         r"""
@@ -4386,14 +4445,14 @@ class PowerSeriesRing_gr_series(gr_ctx):
     def __del__(self):
         self._coefficient_ring._decrement_refcount()
 
-class PowerSeriesModRing_gr_series(gr_ctx):
-    def __init__(self, coefficient_ring, mod=6, var=None):
+class PowerSeriesModRing_gr_poly(gr_ctx):
+    def __init__(self, coefficient_ring, mod, var=None):
         assert isinstance(coefficient_ring, gr_ctx)
         gr_ctx.__init__(self)
-        libgr.gr_ctx_init_gr_series_mod(self._ref, coefficient_ring._ref, mod)
+        libgr.gr_ctx_init_series_mod_gr_poly(self._ref, coefficient_ring._ref, mod)
         coefficient_ring._refcount += 1
         self._coefficient_ring = coefficient_ring
-        self._elem_type = gr_series
+        self._elem_type = gr_poly
         if var is not None:
             self._set_gen_name(var)
 
@@ -4582,6 +4641,30 @@ class IntegersMod_nmod(gr_ctx):
 class nmod(gr_elem):
     _struct_type = nmod_struct
 
+
+class IntegersMod_mpn_mod(gr_ctx):
+    def __init__(self, n):
+        n = self._as_fmpz(n)
+        # todo: error handling (must handle cleanup when ctx has not been initialized
+        assert n >= (1 << FLINT_BITS) and n < (1 << (8 * FLINT_BITS))
+        gr_ctx.__init__(self)
+        libgr.gr_ctx_init_mpn_mod(self._ref, n._ref)
+        self._elem_type = mpn_mod
+
+class mpn_mod(gr_elem):
+    _struct_type = mpn_mod_struct
+
+
+class IntegersMod_fmpz_mod(gr_ctx):
+    def __init__(self, n):
+        n = self._as_fmpz(n)
+        assert n >= 1
+        gr_ctx.__init__(self)
+        libgr.gr_ctx_init_fmpz_mod(self._ref, n._ref)
+        self._elem_type = fmpz_mod
+
+class fmpz_mod(gr_elem):
+    _struct_type = fmpz_struct
 
 
 """
@@ -5757,9 +5840,9 @@ class gr_mat(gr_elem):
             [([2.00000000000000 +/- 1.86e-15] + [+/- 1.86e-15]*I), ([3.00000000000000 +/- 2.90e-15] + [+/- 1.86e-15]*I)]
             >>> L*A*R
             [[([2.00000000000 +/- 1.10e-12] + [+/- 1.08e-12]*I), ([+/- 1.44e-12] + [+/- 1.42e-12]*I)],
-            [([+/- 9.76e-13] + [+/- 9.63e-13]*I), ([3.00000000000 +/- 1.27e-12] + [+/- 1.25e-12]*I)]]
+            [([+/- 9.77e-13] + [+/- 9.63e-13]*I), ([3.00000000000 +/- 1.27e-12] + [+/- 1.25e-12]*I)]]
             >>> L*R
-            [[([1.00000000000 +/- 3.26e-13] + [+/- 3.20e-13]*I), ([+/- 3.72e-13] + [+/- 3.67e-13]*I)],
+            [[([1.00000000000 +/- 3.26e-13] + [+/- 3.20e-13]*I), ([+/- 3.73e-13] + [+/- 3.67e-13]*I)],
             [([+/- 2.77e-13] + [+/- 2.73e-13]*I), ([1.00000000000 +/- 3.17e-13] + [+/- 3.13e-13]*I)]]
 
             >>> A = Mat(CF)([[1,2],[-1,4]])
@@ -5993,10 +6076,12 @@ class fmpq_poly(gr_elem):
 
 class PolynomialRing_fmpz_poly(gr_ctx):
 
-    def __init__(self):
+    def __init__(self, var=None):
         gr_ctx.__init__(self)
         libgr.gr_ctx_init_fmpz_poly(self._ref)
         self._elem_type = fmpz_poly
+        if var is not None:
+            self._set_gen_name(var)
 
     @property
     def _coefficient_ring(self):
@@ -6005,10 +6090,12 @@ class PolynomialRing_fmpz_poly(gr_ctx):
 
 class PolynomialRing_fmpq_poly(gr_ctx):
 
-    def __init__(self):
+    def __init__(self, var=None):
         gr_ctx.__init__(self)
         libgr.gr_ctx_init_fmpq_poly(self._ref)
         self._elem_type = fmpq_poly
+        if var is not None:
+            self._set_gen_name(var)
 
 ZZx_fmpz_poly = PolynomialRing_fmpz_poly()
 QQx_fmpq_poly = PolynomialRing_fmpq_poly()
@@ -6609,7 +6696,7 @@ libflint.fexpr_get_decimal_str.restype = ctypes.c_void_p
 
 PolynomialRing = PolynomialRing_gr_poly
 PowerSeriesRing = PowerSeriesRing_gr_series
-PowerSeriesModRing = PowerSeriesModRing_gr_series
+PowerSeriesModRing = PowerSeriesModRing_gr_poly
 
 NumberField = NumberField_nf
 
@@ -7885,6 +7972,17 @@ def test_gr_series():
     assert raises(lambda: x**3 / O2, FlintUnableError)
     assert raises(lambda: x**3 / O3, FlintUnableError)
 
+    R3 = PowerSeriesModRing(QQ, 3)
+    assert R3(3 + O4) == R3(3)
+    assert R3(3 + O3) == R3(3)
+    assert raises(lambda: R3(3 + O2), FlintUnableError)
+
+    R2 = PowerSeriesModRing(QQ, 2)
+    R2b = PowerSeriesModRing(QQ, 2)
+    assert R2(R3(5)) == 5
+    assert R2(2) + R2b(3) == 5
+    assert raises(lambda: R3(R2(5)), FlintDomainError)
+
     R = RRser
     x = R.gen()
     a = R(RR("0 +/- 1e-10"))
@@ -7909,20 +8007,6 @@ def test_gr_series():
     assert raises(lambda: (x**3) / (a * x**4), FlintDomainError)
     assert raises(lambda: (a * x + x**3) / (a * x**2), FlintUnableError)
 
-    R = PowerSeriesModRing(QQ, 6)
-    x = R.gen()
-
-    assert x**6 == 0
-    assert x**5 != 0
-    assert x / x == 1
-    assert str(1 / (1 + x)) == "1 - x + x^2 - x^3 + x^4 - x^5 (mod x^6)"
-    assert str(x / (x + x**2)) == "1 - x + x^2 - x^3 + x^4 - x^5 (mod x^6)"
-
-    # note: nonunique quotient, currently permitted
-    assert str(x / (x.exp() - 1)) == "1 + (-1/2)*x + (1/12)*x^2 + (-1/720)*x^4 + (1/720)*x^5 (mod x^6)"
-
-    assert raises(lambda: x / 0, FlintDomainError)
-
     x = PowerSeriesRing(ZZmod(1)).gen()
     assert x + x == 0
     assert x - x == 0
@@ -7930,6 +8014,50 @@ def test_gr_series():
     assert x / x == 0
 
 
+    R = PowerSeriesModRing(QQ, 6)
+    x = R.gen()
+
+    assert x**6 == 0
+    assert x**5 != 0
+    assert str(1 / (1 + x)) == "1 - x + x^2 - x^3 + x^4 - x^5 (mod x^6)"
+
+    # Deflating quotients are nonunique and not supported by / by default
+    assert raises(lambda: x / x, FlintDomainError)
+    # assert x / x == 1
+    # assert str(x / (x + x**2)) == "1 - x + x^2 - x^3 + x^4 - x^5 (mod x^6)"
+    # assert str(x / (x.exp() - 1)) == "1 + (-1/2)*x + (1/12)*x^2 + (-1/720)*x^4 + (1/720)*x^5 (mod x^6)"
+
+    assert raises(lambda: x / 0, FlintDomainError)
+
+def test_integers_mod():
+    R = IntegersMod_mpn_mod(10**20 + 1)
+    c = ZZ(2) ** 4321
+    assert R(3) * c == R(c) * 3
+    assert R(3) + c == R(c) + 3
+    assert R(3) - c == -(R(c) - 3)
+    assert IntegersMod_mpn_mod(10**20)(IntegersMod_mpn_mod(10**20)(17)) == 17
+    assert IntegersMod_mpn_mod(10**20)(IntegersMod_fmpz_mod(10**20)(17)) == 17
+    assert raises(lambda: IntegersMod_mpn_mod(10**20)(IntegersMod_fmpz_mod(10**20 + 1)(17)), NotImplementedError)
+    assert raises(lambda: IntegersMod_mpn_mod(10**20)(IntegersMod_fmpz_mod(10**50)(17)), NotImplementedError)
+    assert raises(lambda: IntegersMod_mpn_mod(10**20)(IntegersMod_mpn_mod(10**20 + 1)(17)), NotImplementedError)
+    assert raises(lambda: IntegersMod_mpn_mod(10**20)(IntegersMod_mpn_mod(10**50)(17)), NotImplementedError)
+
+
+def test_gen_name():
+    for R in [NumberField(ZZx.gen() ** 2 + 1, "b"),
+              PolynomialRing_fmpz_poly("b"),
+              PolynomialRing_fmpq_poly("b"),
+              PolynomialRing_gr_poly(QQbar, "b"),
+              PowerSeriesRing_gr_series(ZZ, var="b"),
+              PowerSeriesModRing_gr_poly(ZZ, 3, "b"),
+              FiniteField_fq(3, 2, "b"),
+              FiniteField_fq_nmod(3, 2, "b"),
+              FiniteField_fq_zech(3, 2, "b")]:
+        assert str(R.gen()) in ["b", "b^1", "b (mod b^3)"]
+        R._set_gen_name("c")
+        assert str(R.gen()) in ["c", "c^1", "c (mod c^3)"]
+        R._set_gen_names(["d"])
+        assert str(R.gen()) in ["d", "d^1", "d (mod d^3)"]
 
 if __name__ == "__main__":
     from time import time

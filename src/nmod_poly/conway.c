@@ -25,8 +25,8 @@ extern uint8_t __nmod_poly_ntcoeffs0[];
 static int
 conway_polynomial_lt_260(mp_ptr op, ulong prime, ulong deg)
 {
-    slong ix, jx, kx;
-    slong numnt, sum;
+    ulong ix, jx, kx;
+    ulong numnt, sum;
     const uint8_t * ntcoeffs;
 
     /* primes in __nmod_poly_cp_primes0 are offset by 2 */
@@ -115,7 +115,7 @@ extern uint16_t __nmod_poly_cp_md_coeffs1[];
 static int
 conway_polynomial_lt_300(mp_ptr op, ulong prime, ulong deg)
 {
-    slong ix = 0;
+    ulong ix = 0;
     const uint8_t * ap;
     const uint16_t * bp;
 
@@ -229,7 +229,7 @@ extern uint16_t __nmod_poly_cp_md_coeffs2[];
 static int
 conway_polynomial_lt_1000(mp_ptr op, ulong prime, ulong deg)
 {
-    slong ix = 0;
+    ulong ix = 0;
     const uint8_t * ap;
     const uint16_t * bp;
 
@@ -319,7 +319,7 @@ extern uint16_t __nmod_poly_cp_md_coeffs3[];
 static int
 conway_polynomial_lt_3371(mp_ptr op, ulong prime, ulong deg)
 {
-    slong ix = 0;
+    ulong ix = 0;
     const uint8_t * ap;
     const uint16_t * bp;
 
@@ -406,7 +406,7 @@ extern uint16_t __nmod_poly_cp_md_coeffs4[];
 static int
 conway_polynomial_lt_11000(mp_ptr op, ulong prime, ulong deg)
 {
-    slong ix = 0;
+    ulong ix = 0;
     const uint8_t * ap;
     const uint16_t * bp;
 
@@ -479,7 +479,7 @@ extern uint16_t __nmod_poly_cp_md_coeffs5[];
 static int
 conway_polynomial_lt_65536(mp_ptr op, ulong prime, ulong deg)
 {
-    slong ix = 0;
+    ulong ix = 0;
     const uint8_t * ap;
     const uint16_t * bp;
 
@@ -541,7 +541,7 @@ extern uint32_t __nmod_poly_cp_lg_coeffs6[];
 static int
 conway_polynomial_lt_109988(mp_ptr op, ulong prime, ulong deg)
 {
-    slong ix = 0;
+    ulong ix = 0;
     const uint8_t * ap;
     const uint32_t * bp;
 

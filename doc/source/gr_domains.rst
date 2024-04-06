@@ -101,6 +101,12 @@ Base rings and fields
     Initializes *ctx* to the ring of Gaussian integers
     `\mathbb{Z}[i]` with elements of type :type:`fmpzi_t`.
 
+.. function:: void gr_ctx_init_nmod(gr_ctx_t ctx, ulong n)
+
+    Initializes *ctx* to the ring `\mathbb{Z}/n\mathbb{Z}`
+    of integers modulo *n* where
+    elements have type :type:`ulong`. We require `n \ne 0`.
+
 .. function:: void gr_ctx_init_nmod8(gr_ctx_t ctx, unsigned char n)
               void gr_ctx_init_nmod32(gr_ctx_t ctx, unsigned int n)
 
@@ -109,17 +115,24 @@ Base rings and fields
     elements have type :type:`uint8` or :type:`uint32`. The modulus must be
     nonzero.
 
-.. function:: void gr_ctx_init_nmod(gr_ctx_t ctx, ulong n)
+    .. note ::
 
-    Initializes *ctx* to the ring `\mathbb{Z}/n\mathbb{Z}`
-    of integers modulo *n* where
-    elements have type :type:`ulong`. We require `n \ne 0`.
+        Presently, many operations for these types are not as optimized
+        as those for full-word ``nmods``. It is currently recommended
+        to use :func:`gr_ctx_init_nmod` for best performance unless
+        one specifically wants to minimize memory usage.
 
 .. function:: void gr_ctx_init_fmpz_mod(gr_ctx_t ctx, const fmpz_t n)
 
     Initializes *ctx* to the ring `\mathbb{Z}/n\mathbb{Z}`
     of integers modulo *n* where
     elements have type :type:`fmpz`. The modulus must be positive.
+
+* :func:`gr_ctx_init_mpn_mod`
+
+    Initializes *ctx* to the ring `\mathbb{Z}/n\mathbb{Z}`
+    of integers modulo *n* where
+    elements are flat limb arrays with the same number of limbs as *n*.
 
 .. function:: void gr_ctx_nmod_set_primality(gr_ctx_t ctx, truth_t is_prime)
               void gr_ctx_fmpz_mod_set_primality(gr_ctx_t ctx, truth_t is_prime)
@@ -292,6 +305,25 @@ Polynomial rings
     polynomials in *nvars* variables over the given *base_ring*,
     with monomial ordering *ord*.
     Elements have type :type:`gr_mpoly_struct`.
+
+Power series
+-------------------------------------------------------------------------------
+
+.. function:: void gr_ctx_init_series_mod_gr_poly(gr_ctx_t ctx, gr_ctx_t base_ring, slong n)
+
+    Initializes *ctx* to a ring of truncated power series `R[[x]] / \langle x^n \rangle`
+    over the given *base_ring*.
+    Elements have type :type:`gr_poly_struct`.
+    It is assumed that all inputs are already truncated to length *n*,
+    and this invariant is enforced for all outputs.
+
+.. function:: void gr_ctx_init_gr_series(gr_ctx_t ctx, gr_ctx_t base_ring, slong prec)
+
+    Initializes *ctx* to a ring of power series `R[[x]]` over the given *base_ring*.
+    Elements are generally inexact, having an error term `O(x^n)`.
+    The parameter *prec* defines the default precision.
+    Elements have type ``gr_series_struct`` (this type is currently internal).
+
 
 Fraction fields
 -------------------------------------------------------------------------------

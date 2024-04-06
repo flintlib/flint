@@ -13,6 +13,7 @@
 */
 
 #include <math.h>
+#include "mpn_extras.h"
 #include "double_extras.h"
 #include "gmpcompat.h"
 #include "fmpz.h"

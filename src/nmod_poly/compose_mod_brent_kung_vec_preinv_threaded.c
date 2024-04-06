@@ -89,16 +89,16 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv_worker(void * arg_ptr)
     }
 }
 
-void
-_nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * res,
-                                             const nmod_poly_struct * polys,
-                                             slong lenpolys, slong l,
-                                             mp_srcptr g, slong glen,
-                                             mp_srcptr poly, slong len,
-                                             mp_srcptr polyinv, slong leninv,
-                                             nmod_t mod,
-                                             thread_pool_handle * threads,
-                                             slong num_threads)
+void _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(
+        nmod_poly_struct * res,
+        const nmod_poly_struct * polys,
+        slong FLINT_UNUSED(lenpolys), slong l,
+        mp_srcptr g, slong glen,
+        mp_srcptr poly, slong len,
+        mp_srcptr polyinv, slong leninv,
+        nmod_t mod,
+        thread_pool_handle * threads,
+        slong num_threads)
 {
     nmod_mat_t A, B, C;
     slong i, j, n, m, k, len2 = l, len1, shared_j = 0;

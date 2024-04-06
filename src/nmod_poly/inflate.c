@@ -13,7 +13,7 @@
 #include "nmod_poly.h"
 
 void
-nmod_poly_inflate(nmod_poly_t result, const nmod_poly_t input, ulong inflation)
+nmod_poly_inflate(nmod_poly_t result, const nmod_poly_t input, slong inflation)
 {
     if (input->length <= 1 || inflation == 1)
     {

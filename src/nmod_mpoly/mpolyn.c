@@ -13,7 +13,7 @@
 #include "mpoly.h"
 #include "nmod_mpoly.h"
 
-void nmod_mpolyn_init(nmod_mpolyn_t A, flint_bitcnt_t bits, const nmod_mpoly_ctx_t ctx)
+void nmod_mpolyn_init(nmod_mpolyn_t A, flint_bitcnt_t bits, const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     A->coeffs = NULL;
     A->exps = NULL;
@@ -22,7 +22,7 @@ void nmod_mpolyn_init(nmod_mpolyn_t A, flint_bitcnt_t bits, const nmod_mpoly_ctx
     A->bits = bits;
 }
 
-void nmod_mpolyn_clear(nmod_mpolyn_t A, const nmod_mpoly_ctx_t ctx)
+void nmod_mpolyn_clear(nmod_mpolyn_t A, const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     slong i;
     for (i = 0; i < A->alloc; i++)
@@ -38,7 +38,7 @@ void nmod_mpolyn_swap(nmod_mpolyn_t A, nmod_mpolyn_t B)
    *B = t;
 }
 
-void nmod_mpolyn_zero(nmod_mpolyn_t A, const nmod_mpoly_ctx_t ctx)
+void nmod_mpolyn_zero(nmod_mpolyn_t A, const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     slong i;
     for (i = 0; i < A->alloc; i++) {
@@ -48,7 +48,7 @@ void nmod_mpolyn_zero(nmod_mpolyn_t A, const nmod_mpoly_ctx_t ctx)
     A->length = 0;
 }
 
-int nmod_mpolyn_is_zero(nmod_mpolyn_t A, const nmod_mpoly_ctx_t ctx)
+int nmod_mpolyn_is_zero(nmod_mpolyn_t A, const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     return A->length == 0;
 }
@@ -81,7 +81,7 @@ void nmod_mpolyn_fit_length(nmod_mpolyn_t A, slong length, const nmod_mpoly_ctx_
     }
 }
 
-void nmod_mpolyn_set_length(nmod_mpolyn_t A, slong newlen, const nmod_mpoly_ctx_t ctx)
+void nmod_mpolyn_set_length(nmod_mpolyn_t A, slong newlen, const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     if (A->length > newlen)
     {

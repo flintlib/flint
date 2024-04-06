@@ -48,7 +48,8 @@ flint_mpn_factor_pollard_brent_single(mp_ptr factor, mp_ptr n, mp_ptr ninv, mp_p
 
     mp_ptr x, q, ys, subval;
     mp_limb_t iter, i, k, minval, m, one_shift_norm, gcdlimbs;
-    int ret, j;
+    mp_limb_t j;
+    int ret;
 
     TMP_INIT;
     TMP_START;

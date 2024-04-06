@@ -79,7 +79,7 @@ mp_limb_t flint_mpn_divrem_preinvn(mp_ptr qp, mp_ptr rp, mp_srcptr ap, mp_size_t
       if (rp != ap)
          mpn_copyi(rp, ap, size);
 
-      flint_mpn_mul(t, dinv, n, rp + n, size);
+      flint_mpn_mul_or_mulhigh_n(t + n - size, dinv + n - size, rp + n, size);
       cy = mpn_add_n(qp, t + n, rp + n, size);
 
       flint_mpn_mul(t, d, n, qp, size);

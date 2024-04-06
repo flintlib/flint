@@ -19,7 +19,7 @@ void _fmpq_vec_randtest_uniq_sorted(fmpq * vec, flint_rand_t state, slong len, f
     int do_again;
 
     /* if 2^bits < len we are too likely to have collision */
-    if (4 * n_sizeinbase(len, 2) > bits)
+    if ((mp_limb_t) (4 * n_sizeinbase(len, 2)) > bits)
         flint_throw(FLINT_ERROR, "bits too small in %s\n", __func__);
 
     _fmpq_vec_randtest(vec, state, len, bits);

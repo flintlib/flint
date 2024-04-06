@@ -53,13 +53,13 @@ gr_poly_entry_srcptr(const gr_poly_t poly, slong i, gr_ctx_t ctx)
     return GR_ENTRY(poly->coeffs, i, ctx->sizeof_elem);
 }
 
-GR_POLY_INLINE slong gr_poly_length(const gr_poly_t poly, gr_ctx_t ctx)
+GR_POLY_INLINE slong gr_poly_length(const gr_poly_t poly, gr_ctx_t FLINT_UNUSED(ctx))
 {
     return poly->length;
 }
 
 GR_POLY_INLINE void
-gr_poly_swap(gr_poly_t poly1, gr_poly_t poly2, gr_ctx_t ctx)
+gr_poly_swap(gr_poly_t poly1, gr_poly_t poly2, gr_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_SWAP(gr_poly_struct, *poly1, *poly2);
 }
@@ -133,6 +133,10 @@ WARN_UNUSED_RESULT int _gr_poly_mullow_generic(gr_ptr res, gr_srcptr poly1, slon
 GR_POLY_INLINE WARN_UNUSED_RESULT int _gr_poly_mullow(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, slong len, gr_ctx_t ctx) { return GR_POLY_BINARY_TRUNC_OP(ctx, POLY_MULLOW)(res, poly1, len1, poly2, len2, len, ctx); }
 WARN_UNUSED_RESULT int gr_poly_mullow(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong n, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_poly_mul_scalar(gr_poly_t res, const gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx);
+
+WARN_UNUSED_RESULT int _gr_poly_mul_karatsuba(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_poly_mul_karatsuba(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx);
+
 
 /* powering */
 

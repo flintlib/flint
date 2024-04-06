@@ -126,7 +126,8 @@ slong _nmod_mpoly_add(mp_limb_t * Acoeffs,       ulong * Aexps,
 void nmod_mpoly_add(nmod_mpoly_t A, const nmod_mpoly_t B,
                               const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx)
 {
-    slong Abits, N;
+    slong N;
+    ulong Abits;
     ulong * Bexps = B->exps, * Cexps = C->exps;
     ulong * cmpmask;
     int freeBexps = 0, freeCexps = 0;

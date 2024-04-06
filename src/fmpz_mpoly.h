@@ -27,7 +27,7 @@ extern "C" {
 
 FMPZ_MPOLY_INLINE
 fmpz * fmpz_mpoly_term_coeff_ref(fmpz_mpoly_t A, slong i,
-                                                    const fmpz_mpoly_ctx_t ctx)
+                                                    const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_ASSERT(i < A->length);
     return A->coeffs + i;
@@ -122,7 +122,7 @@ void fmpz_mpoly_fit_length(fmpz_mpoly_t A, slong len,
 void fmpz_mpoly_fit_length_reset_bits(fmpz_mpoly_t A, slong len,
                               flint_bitcnt_t bits, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_clear(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_clear(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx));
 
 void _fmpz_mpoly_set_length(fmpz_mpoly_t A, slong newlen, const fmpz_mpoly_ctx_t ctx);
 
@@ -173,7 +173,7 @@ int fmpz_mpoly_equal(const fmpz_mpoly_t A, const fmpz_mpoly_t B,
 
 FMPZ_MPOLY_INLINE
 void fmpz_mpoly_swap(fmpz_mpoly_t A,
-                                fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
+                                fmpz_mpoly_t B, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_SWAP(fmpz_mpoly_struct, *A, *B);
 }
@@ -231,7 +231,7 @@ int fmpz_mpoly_equal_si(const fmpz_mpoly_t A,
                                           slong c, const fmpz_mpoly_ctx_t ctx);
 
 FMPZ_MPOLY_INLINE
-int fmpz_mpoly_is_zero(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
+int fmpz_mpoly_is_zero(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
    return A->length == 0;
 }
@@ -344,7 +344,7 @@ int fmpz_mpoly_is_canonical(const fmpz_mpoly_t A,
                                                    const fmpz_mpoly_ctx_t ctx);
 
 FMPZ_MPOLY_INLINE
-slong fmpz_mpoly_length(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
+slong fmpz_mpoly_length(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     return A->length;
 }
@@ -870,7 +870,7 @@ void fmpz_mpoly_univar_assert_canonical(fmpz_mpoly_univar_t A,
                                                    const fmpz_mpoly_ctx_t ctx);
 
 FMPZ_MPOLY_INLINE
-void fmpz_mpoly_univar_zero(fmpz_mpoly_univar_t A, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_univar_zero(fmpz_mpoly_univar_t A, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     A->length = 0;
 }
@@ -889,7 +889,7 @@ void fmpz_mpoly_from_univar(fmpz_mpoly_t A,
 
 FMPZ_MPOLY_INLINE
 void fmpz_mpoly_univar_swap(fmpz_mpoly_univar_t A, fmpz_mpoly_univar_t B,
-                                                    const fmpz_mpoly_ctx_t ctx)
+                                                    const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_SWAP(fmpz_mpoly_univar_struct, *A, *B);
 }
@@ -898,7 +898,7 @@ int fmpz_mpoly_univar_degree_fits_si(const fmpz_mpoly_univar_t A, const fmpz_mpo
 
 FMPZ_MPOLY_INLINE
 slong fmpz_mpoly_univar_length(const fmpz_mpoly_univar_t A,
-                                                    const fmpz_mpoly_ctx_t ctx)
+                                                    const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     return A->length;
 }

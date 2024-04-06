@@ -29,7 +29,7 @@ TEST_FUNCTION_START(gr_series_fmpq, state)
 
     for (i = 0; i < 5; i++)
     {
-        gr_ctx_init_gr_series_mod(QQx, QQ, i);
+        gr_ctx_init_series_mod_gr_poly(QQx, QQ, i);
         gr_test_ring(QQx, 100, flags);
         gr_ctx_clear(QQx);
     }

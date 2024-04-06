@@ -36,7 +36,7 @@ void tuple_next(fmpz * alpha, slong n);
 /*****************************************************************************/
 
 FMPZ_MPOLY_FACTOR_INLINE
-void fmpz_mpoly_factor_init(fmpz_mpoly_factor_t f, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_factor_init(fmpz_mpoly_factor_t f, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     *f->constant = 1;
     *f->constant_den = 1;
@@ -60,7 +60,7 @@ void fmpz_mpoly_factor_clear(fmpz_mpoly_factor_t f,
 
 FMPZ_MPOLY_FACTOR_INLINE
 slong fmpz_mpoly_factor_length(const fmpz_mpoly_factor_t f,
-                                                    const fmpz_mpoly_ctx_t ctx)
+                                                    const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     return f->num;
 }
@@ -106,7 +106,7 @@ int fmpz_mpoly_factor(fmpz_mpoly_factor_t f,
 
 FMPZ_MPOLY_FACTOR_INLINE
 void fmpz_mpoly_factor_swap(fmpz_mpoly_factor_t f, fmpz_mpoly_factor_t g,
-                                                    const fmpz_mpoly_ctx_t ctx)
+                                                    const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
    fmpz_mpoly_factor_struct t = *f;
    *f = *g;
@@ -180,7 +180,7 @@ typedef struct
 typedef fmpz_mpolyv_struct fmpz_mpolyv_t[1];
 
 FMPZ_MPOLY_FACTOR_INLINE
-void fmpz_mpolyv_init(fmpz_mpolyv_t A, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpolyv_init(fmpz_mpolyv_t A, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     A->coeffs = NULL;
     A->alloc = 0;
@@ -189,7 +189,7 @@ void fmpz_mpolyv_init(fmpz_mpolyv_t A, const fmpz_mpoly_ctx_t ctx)
 
 FMPZ_MPOLY_FACTOR_INLINE
 void fmpz_mpolyv_swap(fmpz_mpolyv_t A, fmpz_mpolyv_t B,
-                                                    const fmpz_mpoly_ctx_t ctx)
+                                                    const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
    fmpz_mpolyv_struct t = *A;
    *A = *B;

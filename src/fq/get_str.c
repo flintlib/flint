@@ -13,7 +13,7 @@
 #include "fq.h"
 
 char *
-fq_get_str(const fq_t op, const fq_ctx_t ctx)
+fq_get_str(const fq_t op, const fq_ctx_t FLINT_UNUSED(ctx))
 {
     return fmpz_poly_get_str(op);
 }

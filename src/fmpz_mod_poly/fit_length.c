@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpn_extras.h"
 #include "fmpz_mod_poly.h"
 
 void _fmpz_mod_poly_fit_length(fmpz_mod_poly_t f, slong len)

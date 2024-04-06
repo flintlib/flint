@@ -304,7 +304,7 @@ FLINT_DLL extern const unsigned int flint_primes_small[];
 
 extern FLINT_TLS_PREFIX ulong * _flint_primes[FLINT_BITS];
 extern FLINT_TLS_PREFIX double * _flint_prime_inverses[FLINT_BITS];
-extern FLINT_TLS_PREFIX int _flint_primes_used;
+extern FLINT_TLS_PREFIX slong _flint_primes_used;
 
 void n_primes_init(n_primes_t iter);
 void n_primes_clear(n_primes_t iter);
@@ -343,7 +343,7 @@ void n_nth_prime_bounds(ulong *lo, ulong *hi, ulong n);
 ulong n_prime_pi(ulong n);
 void n_prime_pi_bounds(ulong *lo, ulong *hi, ulong n);
 
-ulong n_nextprime(ulong n, int proved);
+ulong n_nextprime(ulong n, int FLINT_UNUSED(proved));
 
 /* Factorisation *************************************************************/
 
@@ -356,6 +356,8 @@ ulong n_nextprime(ulong n, int proved);
 #define FLINT_FACTOR_ONE_LINE_ITERS 40000
 
 ULONG_EXTRAS_INLINE void n_factor_init(n_factor_t * factors) { factors->num = UWORD(0); }
+
+ulong n_factor_evaluate(const n_factor_t * fac);
 
 void n_factor(n_factor_t * factors, ulong n, int proved);
 

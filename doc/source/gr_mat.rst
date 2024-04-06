@@ -288,7 +288,7 @@ Gaussian elimination
     zero but can be certified zero may be overwritten by exact zeros.
 
 .. function:: int gr_mat_lu_classical(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, gr_ctx_t ctx)
-              int gr_mat_lu_recursive(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, slong cutoff, gr_ctx_t ctx)
+              int gr_mat_lu_recursive(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, gr_ctx_t ctx)
               int gr_mat_lu_generic(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, gr_ctx_t ctx)
               int gr_mat_lu(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, gr_ctx_t ctx)
 
@@ -322,8 +322,6 @@ Gaussian elimination
     The *classical* version uses iterative Gaussian elimination.
     The *recursive* version uses a block recursive algorithm
     to take advantage of fast matrix multiplication.
-    The *cutoff* for switching to the classical algorithm is given
-    as an explicit input.
     The *generic* version calls the recursive algorithm with a
     default cutoff.
 
@@ -338,9 +336,11 @@ Solving
 
 .. function:: int gr_mat_nonsingular_solve_tril_classical(gr_mat_t X, const gr_mat_t L, const gr_mat_t B, int unit, gr_ctx_t ctx)
               int gr_mat_nonsingular_solve_tril_recursive(gr_mat_t X, const gr_mat_t L, const gr_mat_t B, int unit, gr_ctx_t ctx)
+              int gr_mat_nonsingular_solve_tril_generic(gr_mat_t X, const gr_mat_t L, const gr_mat_t B, int unit, gr_ctx_t ctx)
               int gr_mat_nonsingular_solve_tril(gr_mat_t X, const gr_mat_t L, const gr_mat_t B, int unit, gr_ctx_t ctx)
               int gr_mat_nonsingular_solve_triu_classical(gr_mat_t X, const gr_mat_t U, const gr_mat_t B, int unit, gr_ctx_t ctx)
               int gr_mat_nonsingular_solve_triu_recursive(gr_mat_t X, const gr_mat_t U, const gr_mat_t B, int unit, gr_ctx_t ctx)
+              int gr_mat_nonsingular_solve_triu_generic(gr_mat_t X, const gr_mat_t U, const gr_mat_t B, int unit, gr_ctx_t ctx)
               int gr_mat_nonsingular_solve_triu(gr_mat_t X, const gr_mat_t U, const gr_mat_t B, int unit, gr_ctx_t ctx)
 
     Solves the lower triangular system `LX = B` or the upper triangular system
@@ -773,6 +773,23 @@ Helper functions for reduction
     `L` can all be set to the number of columns of `A`. We require the entries
     of `L` to be monotonic increasing.
 
+
+Test functions
+-------------------------------------------------------------------------------
+
+.. function:: void gr_mat_test_mul(gr_method_mat_binary_op mul_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+
+    Tests the given function ``mul_impl`` for correctness as an implementation
+    of matrix multiplication. Runs *iters* test iterations, generating matrices
+    up to size *maxn*. If *ctx* is set to ``NULL``, a random ring is generated
+    on each test iteration.
+
+.. function:: void gr_mat_test_lu(gr_method_mat_lu_op lu_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+
+    Tests the given function ``lu_impl`` for correctness as an implementation
+    of LU factorization. Runs *iters* test iterations, generating matrices
+    up to size *maxn*. If *ctx* is set to ``NULL``, a random ring is generated
+    on each test iteration.
 
 .. raw:: latex
 

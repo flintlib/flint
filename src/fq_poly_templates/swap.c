@@ -17,7 +17,7 @@
 
 void
 TEMPLATE(T, poly_swap) (TEMPLATE(T, poly_t) op1, TEMPLATE(T, poly_t) op2,
-                        const TEMPLATE(T, ctx_t) ctx)
+                        const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx))
 {
      FLINT_SWAP(TEMPLATE(T, poly_struct), *op1, *op2);
 }

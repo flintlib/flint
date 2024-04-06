@@ -138,7 +138,7 @@ void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
 
         if (stabilised)
         {
-            slong bound1, bound2, bound;
+            ulong bound1, bound2, bound;
 
             bound1 = FLINT_BIT_COUNT(len2)
                     + FLINT_ABS(_fmpz_vec_max_bits(poly1, len1))

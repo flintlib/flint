@@ -13,7 +13,7 @@
 #include "nmod_poly.h"
 
 void
-nmod_poly_deflate(nmod_poly_t result, const nmod_poly_t input, ulong deflation)
+nmod_poly_deflate(nmod_poly_t result, const nmod_poly_t input, slong deflation)
 {
     slong res_length, i;
 

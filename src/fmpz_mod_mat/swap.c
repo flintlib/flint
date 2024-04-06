@@ -13,7 +13,7 @@
 #include "fmpz_mod_mat.h"
 
 void
-fmpz_mod_mat_swap(fmpz_mod_mat_t mat1, fmpz_mod_mat_t mat2, const fmpz_mod_ctx_t ctx)
+fmpz_mod_mat_swap(fmpz_mod_mat_t mat1, fmpz_mod_mat_t mat2, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_SWAP(fmpz_mod_mat_struct, *mat1, *mat2);
 }

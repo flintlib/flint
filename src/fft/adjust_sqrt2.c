@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpn_extras.h"
 #include "fft.h"
 
 void fft_adjust_sqrt2(mp_limb_t * r, mp_limb_t * i1,

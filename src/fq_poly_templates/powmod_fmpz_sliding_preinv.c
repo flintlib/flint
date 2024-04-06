@@ -59,7 +59,7 @@ _TEMPLATE(T, poly_powmod_fmpz_sliding_preinv) (
                                                    2 * lenf - 3, f, lenf, finv,
                                                    lenfinv, ctx);
     }
-    for (i = 1; i < twokm1; i++)
+    for (i = 1; (ulong) i < twokm1; i++)
     {
         TEMPLATE(T, poly_init) (precomp + i, ctx);
         TEMPLATE(T, poly_fit_length) (precomp + i, lenf - 1, ctx);
@@ -116,7 +116,7 @@ _TEMPLATE(T, poly_powmod_fmpz_sliding_preinv) (
         }
     }
 
-    for (j = 0; j < twokm1; j++)
+    for (j = 0; (ulong) j < twokm1; j++)
     {
         TEMPLATE(T, poly_clear) (precomp + j, ctx);
     }

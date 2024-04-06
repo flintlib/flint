@@ -21,7 +21,8 @@ TEST_FUNCTION_START(n_factor_power235, state)
     for (ix = 0; ix < 3000 * flint_test_multiplier(); ix++)
     {
         ulong factor, exp, n1, n2, n1pow;
-        int bits, type;
+        int bits;
+        ulong type;
 
         type = n_randint(state, 4);
 

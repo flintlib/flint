@@ -138,15 +138,15 @@ TEMPLATE(T, poly_powmod_x_fmpz_preinv) (TEMPLATE(T, poly_t) res,
         return;
     }
 
-    if (*e <= UWORD(2)) /* NOTE: This check works */
+    if (*e <= WORD(2)) /* NOTE: This check works */
     {
-        if (*e == UWORD(0))
+        if (*e == WORD(0))
         {
             TEMPLATE(T, poly_fit_length) (res, 1, ctx);
             TEMPLATE(T, one) (res->coeffs, ctx);
             _TEMPLATE(T, poly_set_length) (res, 1, ctx);
         }
-        else if (*e == UWORD(1))
+        else if (*e == WORD(1))
         {
             TEMPLATE(T, poly_t) r;
             TEMPLATE(T, poly_init2) (r, 2, ctx);

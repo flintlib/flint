@@ -44,7 +44,7 @@ _fmpq_poly_power_sums_to_poly(fmpz * res, const fmpz * poly, const fmpz_t den,
 
         a = n_gcd(FLINT_ABS(fmpz_fdiv_ui(res + d - k, k)), k);
         fmpz_divexact_ui(res + d - k, res + d - k, a);
-        if (a != k)
+        if (a != (ulong) k)
         {
             a = k / a;
             for (i = d - k + 1; i < d; i++)

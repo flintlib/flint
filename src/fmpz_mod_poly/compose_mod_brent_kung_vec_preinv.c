@@ -23,7 +23,7 @@
 void
 _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res,
                                                 const fmpz_mod_poly_struct *
-                                                polys, slong lenpolys, slong l,
+                                                polys, slong FLINT_UNUSED(lenpolys), slong l,
                                                 const fmpz * g, slong glen,
                                                 const fmpz * poly, slong len,
                                                 const fmpz * polyinv,

@@ -2390,18 +2390,18 @@ Inflation and deflation
 --------------------------------------------------------------------------------
 
 
-.. function:: void nmod_poly_inflate(nmod_poly_t result, const nmod_poly_t input, ulong inflation)
+.. function:: void nmod_poly_inflate(nmod_poly_t result, const nmod_poly_t input, slong inflation)
 
     Sets ``result`` to the inflated polynomial `p(x^n)` where
     `p` is given by ``input`` and `n` is given by ``deflation``.
 
-.. function:: void nmod_poly_deflate(nmod_poly_t result, const nmod_poly_t input, ulong deflation)
+.. function:: void nmod_poly_deflate(nmod_poly_t result, const nmod_poly_t input, slong deflation)
 
     Sets ``result`` to the deflated polynomial `p(x^{1/n})` where
     `p` is given by ``input`` and `n` is given by ``deflation``.
     Requires `n > 0`.
 
-.. function:: ulong nmod_poly_deflation(const nmod_poly_t input)
+.. function:: slong nmod_poly_deflation(const nmod_poly_t input)
 
     Returns the largest integer by which ``input`` can be deflated.
     As special cases, returns 0 if ``input`` is the zero polynomial

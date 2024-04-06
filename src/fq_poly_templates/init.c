@@ -16,7 +16,7 @@
 #include "templates.h"
 
 void
-TEMPLATE(T, poly_init) (TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, poly_init) (TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx))
 {
     poly->coeffs = NULL;
     poly->alloc = 0;

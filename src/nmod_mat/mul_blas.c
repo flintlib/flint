@@ -715,7 +715,9 @@ int nmod_mat_mul_blas(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 
 #else
 
-int nmod_mat_mul_blas(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
+int nmod_mat_mul_blas(nmod_mat_t FLINT_UNUSED(C),
+                const nmod_mat_t FLINT_UNUSED(A),
+                const nmod_mat_t FLINT_UNUSED(B))
 {
     return 0;
 }

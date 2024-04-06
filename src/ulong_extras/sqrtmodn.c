@@ -80,7 +80,7 @@ slong n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac)
         si = xp*n_invmod(xp % x[i], x[i]);
 
         /* a_i*s_i mod m for each sqrt a_i of a mod x_i*/
-        for (j = 0; j < sn[i]; j++)
+        for (j = 0; (ulong) j < sn[i]; j++)
             s[i][j] = n_mulmod2_preinv(si, s[i][j], m, minv);
     }
 
