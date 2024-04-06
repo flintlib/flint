@@ -16,8 +16,6 @@
 void
 _fmpz_poly_hermite_he(fmpz * coeffs, ulong n)
 {
-    long k;
-
     if (n == 0)
     {
         fmpz_one(coeffs);
@@ -31,14 +29,14 @@ _fmpz_poly_hermite_he(fmpz * coeffs, ulong n)
         return;
     }
 
-    for (k = !(n & 1); k < n; k += 2)
+    for (ulong k = !(n & 1); k < n; k += 2)
     {
         fmpz_zero(coeffs + k);
     }
 
     fmpz_one(coeffs + n);
 
-    for (k = n - 2; k >= 0; k -= 2)
+    for (slong k = n - 2; k >= 0; k -= 2)
     {
         fmpz_mul2_uiui(coeffs + k, coeffs + k+2, k+1, k+2);
         fmpz_divexact_ui(coeffs + k, coeffs + k, n - k);

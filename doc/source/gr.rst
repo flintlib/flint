@@ -825,6 +825,8 @@ Infinities and extended values
               int gr_undefined(gr_ptr res, gr_ctx_t ctx)
               int gr_unknown(gr_ptr res, gr_ctx_t ctx)
 
+    Sets *res* to the signed positive infinity `+\infty`, signed negative infinity `-\infty`, unsigned infinity `{\tilde \infty}`, *Undefined*, or *Unknown*, respectively.
+
 Ordering methods
 ........................................................................
 
@@ -832,7 +834,7 @@ Ordering methods
               int gr_cmp_other(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx)
 
     Sets *res* to -1, 0 or 1 according to whether *x* is less than,
-    equal or greater than the absolute value of *y*.
+    equal or greater than *y*.
     This may return ``GR_DOMAIN`` if the ring is not an ordered ring.
 
 .. function:: int gr_cmpabs(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)

@@ -14,13 +14,13 @@
    This file is public domain. Author: Fredrik Johansson.
 */
 
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
-#include "fmpz_mod.h"
-#include "fmpz_mod_poly.h"
-#include "gr.h"
-#include "profiler.h"
+#include <flint/flint.h>
+#include <flint/ulong_extras.h>
+#include <flint/fmpz.h>
+#include <flint/fmpz_mod.h>
+#include <flint/fmpz_mod_poly.h>
+#include <flint/gr.h>
+#include <flint/profiler.h>
 
 /* Check (X+a)^n = X^n+a  (mod X^r-1, n). */
 int AKS_main(const fmpz_t n, ulong a, ulong r)

@@ -87,7 +87,7 @@ static int _nmod_mpoly_divides_monagan_pearce1(
                 *store++ = x->i;
                 *store++ = x->j;
 
-                if (x->i == -WORD(1))
+                if (x->i == -UWORD(1))
                 {
                     add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0,
                                  WORD(0), WORD(0), fctx.n - coeff2[x->j]);
@@ -304,7 +304,7 @@ int _nmod_mpoly_divides_monagan_pearce(
                 *store++ = x->i;
                 *store++ = x->j;
 
-                if (x->i == -WORD(1))
+                if (x->i == -UWORD(1))
                 {
                     add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0,
                                  WORD(0), WORD(0), fctx.n - coeff2[x->j]);
@@ -557,7 +557,7 @@ int nmod_mpoly_divides_monagan_pearce(
     if (Qbits <= FLINT_BITS)
     {
         /* mask with high bit of each exponent vector field set */
-        for (i = 0; i < FLINT_BITS/Qbits; i++)
+        for (i = 0; (ulong) i < FLINT_BITS/Qbits; i++)
             mask = (mask << Qbits) + (UWORD(1) << (Qbits - 1));
 
         if (!mpoly_monomial_divides(expq, exp2, exp3, N, mask))

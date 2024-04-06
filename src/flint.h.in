@@ -105,7 +105,13 @@ typedef struct __FLINT_FILE FLINT_FILE;
 #if defined(__GNUC__)
 # define FLINT_FORCE_INLINE static __attribute__((always_inline)) inline
 # define FLINT_STATIC_NOINLINE static __attribute__((noinline))
-# define FLINT_UNUSED(x) UNUSED_ ## x __attribute__((unused))
+# if !FLINT_WANT_ASSERT
+#  define FLINT_UNUSED(x) UNUSED_ ## x __attribute__((unused))
+# else
+   /* NOTE: This may or may not be required as some function inputs may be used
+    * for assertions. */
+#  define FLINT_UNUSED(x) x
+# endif
 # define FLINT_SET_BUT_UNUSED(x) x __attribute__((unused))
 # define FLINT_CONST __attribute__ ((const))
 # define FLINT_WARN_UNUSED __attribute__((warn_unused_result))
@@ -372,38 +378,6 @@ mp_limb_t FLINT_BIT_COUNT(mp_limb_t x)
 #define FLINT_FLOG2(k)  (FLINT_BIT_COUNT(k) - 1)
 
 #define FLINT_CLOG2(k)  FLINT_BIT_COUNT((k) - 1)
-
-/* mpn macros ****************************************************************/
-
-#define flint_mpn_zero(xxx, nnn) \
-    do \
-    { \
-        slong ixxx; \
-        for (ixxx = 0; ixxx < (nnn); ixxx++) \
-            (xxx)[ixxx] = UWORD(0); \
-    } while (0)
-
-#define flint_mpn_copyi(xxx, yyy, nnn) \
-   do { \
-      slong ixxx; \
-      for (ixxx = 0; ixxx < (nnn); ixxx++) \
-         (xxx)[ixxx] = (yyy)[ixxx]; \
-   } while (0)
-
-#define flint_mpn_copyd(xxx, yyy, nnn) \
-   do { \
-      slong ixxx; \
-      for (ixxx = nnn - 1; ixxx >= 0; ixxx--) \
-         (xxx)[ixxx] = (yyy)[ixxx]; \
-   } while (0)
-
-#define flint_mpn_store(xxx, nnn, yyy) \
-   do \
-   { \
-      slong ixxx; \
-      for (ixxx = 0; ixxx < nnn; ixxx++) \
-         (xxx)[ixxx] = yyy; \
-   } while (0)
 
 /* allocation macros *********************************************************/
 

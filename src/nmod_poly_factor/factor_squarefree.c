@@ -57,7 +57,7 @@ nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
 
         nmod_poly_init_mod(h, f->mod);
 
-        for (i = 0; i <= deg/p; i++) /* this will be an integer since f'=0 */
+        for (i = 0; (ulong) i <= deg / p; i++) /* this will be an integer since f'=0 */
         {
             nmod_poly_set_coeff_ui(h, i, nmod_poly_get_coeff_ui(f, i*p));
         }
@@ -117,7 +117,7 @@ nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
 
             nmod_poly_init_mod(g_p, f->mod);
 
-            for (i = 0; i <= nmod_poly_degree(g)/p; i++)
+            for (i = 0; (ulong) i <= nmod_poly_degree(g)/p; i++)
                 nmod_poly_set_coeff_ui(g_p, i, nmod_poly_get_coeff_ui(g, i*p));
 
             nmod_poly_factor_init(new_res_2);

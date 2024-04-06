@@ -280,7 +280,8 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
         slong * sieve_index = flint_malloc(32768*sizeof(slong));
         mp_ptr diff = flint_malloc(16384*nn*sizeof(mp_limb_t));
         ulong offset[15], num_roots;
-        slong k, index = 0, s;
+        ulong s;
+        slong k, index = 0;
         fmpz * roots, * roots2, * evals;
         fmpz_poly_struct ** tree2;
 
@@ -331,14 +332,14 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
 
         /* construct roots */
         roots = _fmpz_vec_init(num_roots);
-        for (i = 0; i < num_roots; i++)
+        for (i = 0; (ulong) i < num_roots; i++)
         {
             __mpz_struct * m = _fmpz_promote(roots + i);
             mpz_realloc(m, nn);
         }
 
         roots2 = _fmpz_vec_init(num_roots);
-        for (i = 0; i < num_roots; i++)
+        for (i = 0; (ulong) i < num_roots; i++)
         {
             __mpz_struct * m = _fmpz_promote(roots2 + i);
             mpz_realloc(m, nn);
@@ -449,7 +450,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
         if (mpn_sub_1(ptr_1, ptr_1, nn, UWORD(2) << norm))
             mpn_add_n(ptr_1, ptr_1, n, nn);
 
-        for (i = 2; i < num_roots; i++)
+        for (i = 2; (ulong) i < num_roots; i++)
         {
             /* V_{k+n} = V_k V_n - V_{k-n} */
             ptr_2 = COEFF_TO_PTR(roots2[i])->_mp_d;
@@ -466,7 +467,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
         flint_printf("roots2 computed %wu\n", num_roots);
 #endif
 
-        for (i = 0; i < num_roots; i++)
+        for (i = 0; (ulong) i < num_roots; i++)
         {
             mp_size_t sn;
             __mpz_struct * m1 = COEFF_TO_PTR(roots[i]);
@@ -520,7 +521,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
         flint_printf("evaluated at roots\n");
 #endif
 
-        for (i = 0; i < num_roots; i++)
+        for (i = 0; (ulong) i < num_roots; i++)
         {
             fmpz_gcd(fac, n_in, evals + i);
             if (!fmpz_is_zero(fac) && !fmpz_is_one(fac))
@@ -537,7 +538,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
         flint_free(sieve_index);
         flint_free(diff);
 
-        if (i < num_roots)
+        if ((ulong) i < num_roots)
             goto cleanup2;
     }
 

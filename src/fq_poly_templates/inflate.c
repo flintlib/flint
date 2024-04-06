@@ -44,7 +44,7 @@ TEMPLATE(T, poly_inflate) (TEMPLATE(T, poly_t) result,
         {
             TEMPLATE(T, set) (result->coeffs + (i * inflation),
                               input->coeffs + i, ctx);
-            for (j = i * inflation - 1; j > (i - 1) * inflation; j--)
+            for (j = i * inflation - 1; j > (i - 1) * (slong) inflation; j--)
                 TEMPLATE(T, zero) (result->coeffs + j, ctx);
         }
         TEMPLATE(T, set) (result->coeffs, input->coeffs, ctx);

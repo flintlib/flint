@@ -39,7 +39,7 @@ static void nmod_mpoly_evals(
     const int * ignore,
     const nmod_mpoly_t A,
     ulong * Amin_exp,
-    ulong * Amax_exp,
+    ulong * FLINT_UNUSED(Amax_exp),
     ulong * Astride,
     mp_limb_t * alpha,
     const nmod_mpoly_ctx_t ctx)
@@ -110,7 +110,7 @@ static void nmod_mpoly_evals(
 
             n_poly_fit_length(out + j, varexp + 1);
 
-            while (out[j].length <= varexp)
+            while ((ulong) out[j].length <= varexp)
             {
                 out[j].coeffs[out[j].length] = 0;
                 out[j].length++;
@@ -147,7 +147,7 @@ static void nmod_mpoly_evals_medprime(
     const int * ignore,
     const nmod_mpoly_t A,
     ulong * Amin_exp,
-    ulong * Amax_exp,
+    ulong * FLINT_UNUSED(Amax_exp),
     ulong * Astride,
     const nmod_mpoly_ctx_t smctx,
     const fq_zech_struct * alphas,
@@ -199,7 +199,7 @@ static void nmod_mpoly_evals_medprime(
         }
 
         if (hi == 0 && FLINT_SIGN_EXT(lo) == 0 && total_degree >= 0)
-            total_degree = FLINT_MAX(total_degree, lo);
+            total_degree = FLINT_MAX((ulong) total_degree, lo);
         else
             total_degree = -1;
 
@@ -212,7 +212,7 @@ static void nmod_mpoly_evals_medprime(
 
             fq_zech_poly_fit_length(out + j, varexp + 1, medctx);
 
-            while (out[j].length <= varexp)
+            while ((ulong) out[j].length <= varexp)
             {
                 fq_zech_zero(out[j].coeffs + out[j].length, medctx);
                 out[j].length++;
@@ -244,7 +244,7 @@ static void nmod_mpoly_evals_lgprime(
     const int * ignore,
     const nmod_mpoly_t A,
     ulong * Amin_exp,
-    ulong * Amax_exp,
+    ulong * FLINT_UNUSED(Amax_exp),
     ulong * Astride,
     const nmod_mpoly_ctx_t smctx,
     const fq_nmod_struct * alpha,
@@ -302,7 +302,7 @@ static void nmod_mpoly_evals_lgprime(
         }
 
         if (hi == 0 && FLINT_SIGN_EXT(lo) == 0 && total_degree >= 0)
-            total_degree = FLINT_MAX(total_degree, lo);
+            total_degree = FLINT_MAX((ulong) total_degree, lo);
         else
             total_degree = -1;
 
@@ -315,7 +315,7 @@ static void nmod_mpoly_evals_lgprime(
 
             n_poly_fit_length(out + j, d*(varexp + 1));
 
-            while (out[j].length <= varexp)
+            while ((ulong) out[j].length <= varexp)
             {
                 _n_fq_zero(out[j].coeffs + d*out[j].length, d);
                 out[j].length++;
@@ -1872,7 +1872,7 @@ skip_monomial_cofactors:
     _set_estimates(I, A, B, ctx);
 
     j = FLINT_MAX(0, 8 - I->mvars);
-    if (!I->Gdeflate_deg_bounds_are_nice || ctx->mod.n < j)
+    if (!I->Gdeflate_deg_bounds_are_nice || ctx->mod.n < (ulong) j)
         _set_estimates_medprime(I, A, B, ctx);
 
     if (!I->Gdeflate_deg_bounds_are_nice)
@@ -1929,7 +1929,7 @@ skip_monomial_cofactors:
         {
             slong k = I->brown_perm[1];
             slong d = FLINT_MAX(I->Adeflate_deg[k], I->Bdeflate_deg[k]);
-            int deg_is_small = d < ctx->mod.n/2;
+            int deg_is_small = (ulong) d < ctx->mod.n/2;
 
             if (I->Adensity + I->Bdensity > (deg_is_small ? 0.05 : 0.2))
             {
@@ -1990,7 +1990,7 @@ skip_monomial_cofactors:
         {
             k = I->brown_perm[j];
             d = FLINT_MAX(I->Adeflate_deg[k], I->Bdeflate_deg[k]);
-            if (d > ctx->mod.n/2)
+            if ((ulong) d > ctx->mod.n/2)
                 deg_is_small = 0;
         }
 

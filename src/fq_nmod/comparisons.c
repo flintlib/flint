@@ -15,22 +15,22 @@
 #include "nmod_poly.h"
 #include "fq_nmod.h"
 
-int fq_nmod_equal(const fq_nmod_t op1, const fq_nmod_t op2, const fq_nmod_ctx_t ctx)
+int fq_nmod_equal(const fq_nmod_t op1, const fq_nmod_t op2, const fq_nmod_ctx_t FLINT_UNUSED(ctx))
 {
     return nmod_poly_equal(op1, op2);
 }
 
-int fq_nmod_is_zero(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
+int fq_nmod_is_zero(const fq_nmod_t op, const fq_nmod_ctx_t FLINT_UNUSED(ctx))
 {
     return nmod_poly_is_zero(op);
 }
 
-int fq_nmod_is_one(const fq_nmod_t op, const fq_nmod_ctx_t ctx)
+int fq_nmod_is_one(const fq_nmod_t op, const fq_nmod_ctx_t FLINT_UNUSED(ctx))
 {
     return nmod_poly_is_one(op);
 }
 
-int fq_nmod_cmp(const fq_nmod_t a, const fq_nmod_t b, const fq_nmod_ctx_t ctx)
+int fq_nmod_cmp(const fq_nmod_t a, const fq_nmod_t b, const fq_nmod_ctx_t FLINT_UNUSED(ctx))
 {
     slong i;
 

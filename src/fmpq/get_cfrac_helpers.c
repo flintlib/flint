@@ -508,7 +508,7 @@ again:
     if (n < 3)
         goto cleanup;
 
-    if ((flags & CFRAC_NEED_HGCD) && xd_len <= 3 + _fmpz_mat22_bits(M)/FLINT_BITS)
+    if ((flags & CFRAC_NEED_HGCD) && xd_len <= 3 + (slong) (_fmpz_mat22_bits(M) / FLINT_BITS))
     {
         goto cleanup;
     }

@@ -124,6 +124,8 @@ gr_test_set_ui(gr_ctx_t R, flint_rand_t state, int test_flags)
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
         flint_printf("\n");
+        flint_printf("set_ui\n");
+        gr_ctx_println(R);
         flint_printf("a = %wu\n", a);
         flint_printf("b = %wu\n", b);
         flint_printf("c = %wu\n", c);
@@ -180,6 +182,8 @@ gr_test_set_si(gr_ctx_t R, flint_rand_t state, int test_flags)
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
         flint_printf("\n");
+        flint_printf("set_si\n");
+        gr_ctx_println(R);
         flint_printf("a = %wd\n", a);
         flint_printf("b = %wd\n", b);
         flint_printf("c = %wd\n", c);
@@ -238,6 +242,8 @@ gr_test_set_fmpz(gr_ctx_t R, flint_rand_t state, int test_flags)
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
         flint_printf("\n");
+        flint_printf("set_fmpz\n");
+        gr_ctx_println(R);
         flint_printf("a = "); fmpz_print(a); flint_printf("\n");
         flint_printf("b = "); fmpz_print(b); flint_printf("\n");
         flint_printf("c = "); fmpz_print(c); flint_printf("\n");
@@ -300,6 +306,7 @@ gr_test_set_fmpq(gr_ctx_t R, flint_rand_t state, int test_flags)
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
         flint_printf("\n");
+        flint_printf("set_fmpq\n");
         gr_ctx_println(R);
         flint_printf("a = "); fmpq_print(a); flint_printf("\n");
         flint_printf("b = "); fmpq_print(b); flint_printf("\n");
@@ -894,8 +901,17 @@ gr_test_binary_op_type_variants(gr_ctx_t R,
     {
         uy = n_randtest(state);
         sy = (slong) n_randtest(state);
-        fmpz_randtest(zy, state, 100);
-        fmpq_randtest(qy, state, 100);
+
+        if (n_randint(state, 10) == 0)
+        {
+            fmpz_randtest(zy, state, 10000);
+            fmpq_randtest(qy, state, 200);
+        }
+        else
+        {
+            fmpz_randtest(zy, state, 100);
+            fmpq_randtest(qy, state, 100);
+        }
     }
 
     for (which = 0; which < 4; which++)
@@ -1750,6 +1766,8 @@ gr_test_is_invertible(gr_ctx_t R, flint_rand_t state, int test_flags)
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
         flint_printf("\n");
+        gr_ctx_println(R);
+        flint_printf("is_invertible\n");
         flint_printf("x = \n"); gr_println(x, R);
         flint_printf("x ^ -1 = \n"); gr_println(x_inv, R);
         flint_printf("status = %d, invertible = %d\n", status, invertible);
@@ -2668,6 +2686,7 @@ gr_test_sqrt(gr_ctx_t R, flint_rand_t state, int test_flags)
     int status = GR_SUCCESS;
     gr_ptr x, y, y2;
     int perfect;
+    char * fail_str = "";
 
     GR_TMP_INIT3(x, y, y2, R);
 
@@ -2693,16 +2712,19 @@ gr_test_sqrt(gr_ctx_t R, flint_rand_t state, int test_flags)
 
     if (status == GR_SUCCESS && gr_equal(y2, x, R) == T_FALSE)
     {
+        fail_str = "y2 == x is FALSE\n";
         status = GR_TEST_FAIL;
     }
 
     if (status == GR_DOMAIN && perfect)
     {
+        fail_str = "status is GR_DOMAIN but input is a perfect square\n";
         status = GR_TEST_FAIL;
     }
 
     if (status == GR_SUCCESS && perfect && gr_is_square(x, R) == T_FALSE)
     {
+        fail_str = "is_square(x) returns T_FALSE but input is a perfect square\n";
         status = GR_TEST_FAIL;
     }
 
@@ -2712,6 +2734,7 @@ gr_test_sqrt(gr_ctx_t R, flint_rand_t state, int test_flags)
     if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
     {
         flint_printf("FAIL: sqrt\n");
+        flint_printf("%s\n", fail_str);
         flint_printf("R = "); gr_ctx_println(R);
         flint_printf("x = \n"); gr_println(x, R);
         flint_printf("y = \n"); gr_println(y, R);

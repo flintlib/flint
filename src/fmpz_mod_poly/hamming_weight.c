@@ -13,7 +13,7 @@
 #include "fmpz_mod_poly.h"
 
 slong
-fmpz_mod_poly_hamming_weight(const fmpz_mod_poly_t A, const fmpz_mod_ctx_t ctx)
+fmpz_mod_poly_hamming_weight(const fmpz_mod_poly_t A, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
 {
     return _fmpz_poly_hamming_weight(A->coeffs, A->length);
 }

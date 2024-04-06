@@ -97,7 +97,7 @@ _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_worker(void * arg_ptr)
 void
 _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_struct * res,
                                                  const fmpz_mod_poly_struct * polys,
-                                                 slong lenpolys, slong l,
+                                                 slong FLINT_UNUSED(lenpolys), slong l,
                                                  const fmpz * g, slong glen,
                                                  const fmpz * poly, slong len,
                                                  const fmpz * polyinv, slong leninv,

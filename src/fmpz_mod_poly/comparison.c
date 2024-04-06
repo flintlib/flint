@@ -13,20 +13,20 @@
 #include "fmpz_mod_poly.h"
 
 int fmpz_mod_poly_equal(const fmpz_mod_poly_t poly1,
-                        const fmpz_mod_poly_t poly2, const fmpz_mod_ctx_t ctx)
+                        const fmpz_mod_poly_t poly2, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
 {
     return fmpz_poly_equal((fmpz_poly_struct *) poly1,
                            (fmpz_poly_struct *) poly2);
 }
 
 int fmpz_mod_poly_equal_trunc(const fmpz_mod_poly_t poly1,
-                const fmpz_mod_poly_t poly2, slong n, const fmpz_mod_ctx_t ctx)
+                const fmpz_mod_poly_t poly2, slong n, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
 {
     return fmpz_poly_equal_trunc((fmpz_poly_struct *) poly1,
                            (fmpz_poly_struct *) poly2, n);
 }
 
-int fmpz_mod_poly_is_zero(const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
+int fmpz_mod_poly_is_zero(const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
 {
     return poly->length == 0;
 }

@@ -1,8 +1,15 @@
-dnl  X64-64 mpn_mullo_basecase optimised for Intel Broadwell.
-
-dnl  Contributed to the GNU project by Torbjorn Granlund.
-
-dnl  Copyright 2017 Free Software Foundation, Inc.
+dnl
+dnl   Copyright 2017 Free Software Foundation, Inc.
+dnl   Contributed to the GNU project by Torbjorn Granlund.
+dnl   Copyright (C) 2024 Albin Ahlbäck
+dnl
+dnl   This file is part of FLINT.
+dnl
+dnl   FLINT is free software: you can redistribute it and/or modify it under
+dnl   the terms of the GNU Lesser General Public License (LGPL) as published
+dnl   by the Free Software Foundation; either version 3 of the License, or
+dnl   (at your option) any later version.  See <https://www.gnu.org/licenses/>.
+dnl
 
 dnl  This file is part of the GNU MP Library.
 dnl
@@ -29,16 +36,6 @@ dnl
 dnl  You should have received copies of the GNU General Public License and the
 dnl  GNU Lesser General Public License along with the GNU MP Library.  If not,
 dnl  see https://www.gnu.org/licenses/.
-dnl
-dnl   Copyright (C) 2024 Albin Ahlbäck
-dnl
-dnl   This file is part of FLINT.
-dnl
-dnl   FLINT is free software: you can redistribute it and/or modify it under
-dnl   the terms of the GNU Lesser General Public License (LGPL) as published
-dnl   by the Free Software Foundation; either version 3 of the License, or
-dnl   (at your option) any later version.  See <https://www.gnu.org/licenses/>.
-dnl
 
 include(`config.m4')
 
@@ -49,18 +46,17 @@ define(`n',	   `%rcx')
 
 define(`bp',	   `%r8')
 define(`jmpreg',   `%r9')
-define(`nn',	   `%r10')
-define(`m',	   `%r13')
-define(`mm',	   `%r14')
+
+define(`nn',	   `%rbp')
+define(`mm',	   `%rbx')
+define(`m',	   `%r14')
 
 define(`rx',	   `%rax')
 
-define(`r0',	   `%r11')
-define(`r1',	   `%rbx')
-define(`r2',	   `%rbp')
-define(`r3',	   `%r12')
-
-dnl Idea: Do similar to mpn_mullo_basecase for Skylake.
+define(`r0',	   `%r10')
+define(`r1',	   `%r11')
+define(`r2',	   `%r12')
+define(`r3',	   `%r13')
 
 	TEXT
 	ALIGN(32)
@@ -212,10 +208,10 @@ L(end):	adox	0*8(rp), r2
 	lea	-1*8(m), m
 	lea	1*8(bp), bp	C Increase bp
 	lea	2*8(rp,m), rp	C Reset rp
-	mov	0*8(bp), %rdx	C Load bp
 	cmp	R32(m), R32(mm)
 	jge	L(jmp)
 	C If |m| < |mm|: goto jmpreg, but first do high part
+	mov	0*8(bp), %rdx	C Load bp
 	or	R32(nn), R32(n)	C Reset n, CF and OF
 	mulx	-2*8(ap), r1, r1
 	adcx	r1, rx
@@ -223,6 +219,7 @@ L(end):	adox	0*8(rp), r2
 	C If |m| > |mm|: goto fin
 L(jmp):	jg	L(fin)
 	C If |m| = |mm|: goto jmpreg
+	mov	0*8(bp), %rdx	C Load bp
 	or	R32(nn), R32(n)	C Reset n, clear CF and OF
 	jmp	*jmpreg
 

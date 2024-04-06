@@ -9,6 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdlib.h>
+#include <string.h>
 #include "fmpz.h"
 #include "fq_nmod.h"
 #include "fq_zech.h"
@@ -24,6 +26,8 @@
 
 #define FQ_CTX(ring_ctx) ((fq_zech_ctx_struct *)(GR_CTX_DATA_AS_PTR(ring_ctx)))
 
+static const char * default_var = "a";
+
 /* todo: lots of inlining */
 
 void
@@ -38,6 +42,21 @@ _gr_fq_zech_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
     gr_stream_write(out, "Finite field (fq_zech)");
     return GR_SUCCESS;
+}
+
+int _gr_fq_zech_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
+{
+    slong len;
+    len = strlen(s);
+
+    FQ_CTX(ctx)->fq_nmod_ctx->var = flint_realloc(FQ_CTX(ctx)->fq_nmod_ctx->var, len + 1);
+    memcpy(FQ_CTX(ctx)->fq_nmod_ctx->var, s, len + 1);
+    return GR_SUCCESS;
+}
+
+int _gr_fq_zech_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
+{
+    return _gr_fq_zech_ctx_set_gen_name(ctx, s[0]);
 }
 
 void
@@ -509,6 +528,8 @@ gr_method_tab_input _fq_zech_methods_input[] =
 {
     {GR_METHOD_CTX_CLEAR,       (gr_funcptr) _gr_fq_zech_ctx_clear},
     {GR_METHOD_CTX_WRITE,       (gr_funcptr) _gr_fq_zech_ctx_write},
+    {GR_METHOD_CTX_SET_GEN_NAME,    (gr_funcptr) _gr_fq_zech_ctx_set_gen_name},
+    {GR_METHOD_CTX_SET_GEN_NAMES,   (gr_funcptr) _gr_fq_zech_ctx_set_gen_names},
     {GR_METHOD_CTX_IS_RING,     (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) gr_generic_ctx_predicate_true},
@@ -608,7 +629,7 @@ gr_ctx_init_fq_zech(gr_ctx_t ctx, ulong p, slong d, const char * var)
     fq_zech_ctx_struct * fq_zech_ctx;
 
     fq_zech_ctx = flint_malloc(sizeof(fq_zech_ctx_struct));
-    fq_zech_ctx_init_ui(fq_zech_ctx, p, d, var == NULL ? "a" : var);
+    fq_zech_ctx_init_ui(fq_zech_ctx, p, d, var == NULL ? default_var : var);
 
     _gr_ctx_init_fq_zech_from_ref(ctx, fq_zech_ctx);
 }
@@ -622,7 +643,7 @@ gr_ctx_init_fq_zech_modulus_nmod_poly(gr_ctx_t ctx, const nmod_poly_t modulus, c
     fq_nmod_ctx = flint_malloc(sizeof(fq_nmod_ctx_struct));
     fq_zech_ctx = flint_malloc(sizeof(fq_zech_ctx_struct));
 
-    fq_nmod_ctx_init_modulus(fq_nmod_ctx, modulus, var == NULL ? "a" : var);
+    fq_nmod_ctx_init_modulus(fq_nmod_ctx, modulus, var == NULL ? default_var : var);
 
     if (fq_zech_ctx_init_fq_nmod_ctx_check(fq_zech_ctx, fq_nmod_ctx))
     {

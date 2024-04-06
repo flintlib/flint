@@ -21,7 +21,8 @@ fmpz_factor_ecm_stage_II(mp_ptr f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
 
     mp_ptr Qx, Qz, Rx, Rz, Qdx, Qdz, a, b, g;
     mp_limb_t mmin, mmax, maxj, sz, gcdlimbs;
-    int i, j, ret;
+    ulong i, j;
+    int ret;
     mp_ptr arrx, arrz, Q0x2, Q0z2;
 
     TMP_INIT;

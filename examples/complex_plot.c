@@ -3,14 +3,14 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
-#include "acb.h"
-#include "acb_hypgeom.h"
-#include "acb_modular.h"
-#include "acb_elliptic.h"
-#include "acb_mat.h"
-#include "acb_theta.h"
-#include "profiler.h"
-#include "thread_support.h"
+#include <flint/acb.h>
+#include <flint/acb_hypgeom.h>
+#include <flint/acb_modular.h>
+#include <flint/acb_elliptic.h>
+#include <flint/acb_mat.h>
+#include <flint/acb_theta.h>
+#include <flint/profiler.h>
+#include <flint/thread_support.h>
 
 /* some useful color operations */
 #define CLAMP(y) FLINT_MAX(0.0, FLINT_MIN((y), 1.0))

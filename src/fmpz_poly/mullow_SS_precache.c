@@ -10,6 +10,7 @@
 */
 
 #include "flint-mparam.h"
+#include "mpn_extras.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fft.h"

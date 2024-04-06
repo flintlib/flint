@@ -11,6 +11,8 @@
 
 #include "gr.h"
 
+/* todo: make overloadable */
+/* todo: deal correctly with structures having the same kind */
 /* todo: deal correctly with nested structures */
 
 int gr_ctx_cmp_coercion(gr_ctx_t ctx1, gr_ctx_t ctx2)

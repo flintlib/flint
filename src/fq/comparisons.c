@@ -12,17 +12,17 @@
 #include "fmpz_poly.h"
 #include "fq.h"
 
-int fq_equal(const fq_t op1, const fq_t op2, const fq_ctx_t ctx)
+int fq_equal(const fq_t op1, const fq_t op2, const fq_ctx_t FLINT_UNUSED(ctx))
 {
     return fmpz_poly_equal(op1, op2);
 }
 
-int fq_is_zero(const fq_t op, const fq_ctx_t ctx)
+int fq_is_zero(const fq_t op, const fq_ctx_t FLINT_UNUSED(ctx))
 {
     return fmpz_poly_is_zero(op);
 }
 
-int fq_is_one(const fq_t op, const fq_ctx_t ctx)
+int fq_is_one(const fq_t op, const fq_ctx_t FLINT_UNUSED(ctx))
 {
     return fmpz_poly_is_one(op);
 }

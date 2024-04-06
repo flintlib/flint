@@ -29,7 +29,7 @@ void _fmpz_vec_sum_max_bits(slong * sumabs, slong * maxabs,
         slong c = fmpz_get_si(coeffs + j);
         ulong uc = (ulong) FLINT_ABS(c);
         add_ssaaaa(hi, lo, hi, lo, UWORD(0), uc);
-        maxabs[0] = FLINT_MAX(maxabs[0], FLINT_BIT_COUNT(uc));
+        maxabs[0] = FLINT_MAX(maxabs[0], (slong) FLINT_BIT_COUNT(uc));
     }
 
     if (j == length)

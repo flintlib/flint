@@ -2,10 +2,10 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include "arb.h"
-#include "acb.h"
-#include "arb_poly.h"
-#include "profiler.h"
+#include <flint/arb.h>
+#include <flint/acb.h>
+#include <flint/arb_poly.h>
+#include <flint/profiler.h>
 
 void
 keiper_li_series(arb_ptr z, slong len, slong prec)

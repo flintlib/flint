@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpn_extras.h"
 #include "mpoly.h"
 #include "fmpz_vec.h"
 #include "fmpz_mod_mpoly.h"

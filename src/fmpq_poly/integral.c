@@ -62,7 +62,7 @@ void _fmpq_poly_integral(fmpz * rpoly, fmpz_t rden,
         {
             c = _fmpz_gcd_small(poly + k - 1, k);
 
-            if (c == k)
+            if (c == (ulong) k)
             {
                 fmpz_divexact_ui(rpoly + k, poly + k - 1, k);
                 divisors[k] = 1;

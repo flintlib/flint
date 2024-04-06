@@ -54,6 +54,7 @@ GR_MAT_INLINE gr_srcptr gr_mat_entry_srcptr(const gr_mat_t mat, slong i, slong j
 typedef int ((*gr_method_mat_unary_op_get_scalar)(gr_ptr, const gr_mat_t, gr_ctx_ptr));
 typedef int ((*gr_method_mat_unary_op)(gr_mat_t, const gr_mat_t, gr_ctx_ptr));
 typedef int ((*gr_method_mat_binary_op)(gr_mat_t, const gr_mat_t, const gr_mat_t, gr_ctx_ptr));
+typedef int ((*gr_method_mat_binary_op_with_flag)(gr_mat_t, const gr_mat_t, const gr_mat_t, int, gr_ctx_ptr));
 typedef int ((*gr_method_mat_pivot_op)(slong *, gr_mat_t, slong, slong, slong, gr_ctx_ptr));
 typedef int ((*gr_method_mat_diagonalization_op)(gr_vec_t, gr_mat_t, gr_mat_t, const gr_mat_t, int, gr_ctx_ptr));
 typedef int ((*gr_method_mat_lu_op)(slong *, slong *, gr_mat_t, const gr_mat_t, int, gr_ctx_ptr));
@@ -61,6 +62,7 @@ typedef int ((*gr_method_mat_lu_op)(slong *, slong *, gr_mat_t, const gr_mat_t, 
 #define GR_MAT_UNARY_OP_GET_SCALAR(ctx, NAME) (((gr_method_mat_unary_op_get_scalar *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_MAT_UNARY_OP(ctx, NAME) (((gr_method_mat_unary_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_MAT_BINARY_OP(ctx, NAME) (((gr_method_mat_binary_op *) ctx->methods)[GR_METHOD_ ## NAME])
+#define GR_MAT_BINARY_OP_WITH_FLAG(ctx, NAME) (((gr_method_mat_binary_op_with_flag *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_MAT_PIVOT_OP(ctx, NAME) (((gr_method_mat_pivot_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_MAT_DIAGONALIZATION_OP(ctx, NAME) (((gr_method_mat_diagonalization_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_MAT_LU_OP(ctx, NAME) (((gr_method_mat_lu_op *) ctx->methods)[GR_METHOD_ ## NAME])
@@ -70,7 +72,7 @@ WARN_UNUSED_RESULT int gr_mat_init_set(gr_mat_t res, const gr_mat_t mat, gr_ctx_
 void gr_mat_clear(gr_mat_t mat, gr_ctx_t ctx);
 
 GR_MAT_INLINE void
-gr_mat_swap(gr_mat_t mat1, gr_mat_t mat2, gr_ctx_t ctx)
+gr_mat_swap(gr_mat_t mat1, gr_mat_t mat2, gr_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_SWAP(gr_mat_struct, *mat1, *mat2);
 }
@@ -83,7 +85,7 @@ WARN_UNUSED_RESULT int gr_mat_invert_cols(gr_mat_t mat, slong * perm, gr_ctx_t c
 void gr_mat_window_init(gr_mat_t window, const gr_mat_t mat, slong r1, slong c1, slong r2, slong c2, gr_ctx_t ctx);
 
 GR_MAT_INLINE void
-gr_mat_window_clear(gr_mat_t window, gr_ctx_t ctx)
+gr_mat_window_clear(gr_mat_t window, gr_ctx_t FLINT_UNUSED(ctx))
 {
     flint_free(window->rows);
 }
@@ -100,13 +102,13 @@ WARN_UNUSED_RESULT int gr_mat_randpermdiag(int * parity, gr_mat_t mat, flint_ran
 WARN_UNUSED_RESULT int gr_mat_randrank(gr_mat_t mat, flint_rand_t state, slong rank, gr_ctx_t ctx);
 
 GR_MAT_INLINE truth_t
-gr_mat_is_empty(const gr_mat_t mat, gr_ctx_t ctx)
+gr_mat_is_empty(const gr_mat_t mat, gr_ctx_t FLINT_UNUSED(ctx))
 {
     return ((mat->r == 0) || (mat->c == 0)) ? T_TRUE : T_FALSE;
 }
 
 GR_MAT_INLINE truth_t
-gr_mat_is_square(const gr_mat_t mat, gr_ctx_t ctx)
+gr_mat_is_square(const gr_mat_t mat, gr_ctx_t FLINT_UNUSED(ctx))
 {
     return (mat->r == mat->c) ? T_TRUE : T_FALSE;
 }
@@ -160,7 +162,7 @@ WARN_UNUSED_RESULT int gr_mat_find_nonzero_pivot_large_abs(slong * pivot_row, gr
 WARN_UNUSED_RESULT int gr_mat_find_nonzero_pivot_generic(slong * pivot_row, gr_mat_t mat, slong start_row, slong end_row, slong column, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_find_nonzero_pivot(slong * pivot_row, gr_mat_t mat, slong start_row, slong end_row, slong column, gr_ctx_t ctx);
 
-WARN_UNUSED_RESULT int gr_mat_lu_recursive(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, slong cutoff, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_lu_recursive(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_lu_classical(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_lu_generic(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_lu(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, gr_ctx_t ctx);
@@ -218,10 +220,12 @@ WARN_UNUSED_RESULT int gr_mat_transpose(gr_mat_t B, const gr_mat_t A, gr_ctx_t c
 
 WARN_UNUSED_RESULT int gr_mat_nonsingular_solve_tril_classical(gr_mat_t X, const gr_mat_t L, const gr_mat_t B, int unit, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_nonsingular_solve_tril_recursive(gr_mat_t X, const gr_mat_t L, const gr_mat_t B, int unit, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_nonsingular_solve_tril_generic(gr_mat_t X, const gr_mat_t L, const gr_mat_t B, int unit, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_nonsingular_solve_tril(gr_mat_t X, const gr_mat_t L, const gr_mat_t B, int unit, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_mat_nonsingular_solve_triu_classical(gr_mat_t X, const gr_mat_t U, const gr_mat_t B, int unit, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_nonsingular_solve_triu_recursive(gr_mat_t X, const gr_mat_t U, const gr_mat_t B, int unit, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_mat_nonsingular_solve_triu_generic(gr_mat_t X, const gr_mat_t L, const gr_mat_t B, int unit, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_nonsingular_solve_triu(gr_mat_t X, const gr_mat_t U, const gr_mat_t B, int unit, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_mat_trace(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx);
@@ -286,6 +290,10 @@ WARN_UNUSED_RESULT int gr_mat_exp(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_log_jordan(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_log(gr_mat_t res, const gr_mat_t A, gr_ctx_t ctx);
 
+/* Test functions */
+
+void gr_mat_test_mul(gr_method_mat_binary_op mul_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
+void gr_mat_test_lu(gr_method_mat_lu_op lu_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
 
 #ifdef __cplusplus
 }

@@ -97,7 +97,7 @@ _padic_log_bsplit(fmpz_t z, const fmpz_t y, slong v, const fmpz_t p, slong N)
 }
 
 void
-_padic_log_balanced(fmpz_t z, const fmpz_t y, slong v, const fmpz_t p, slong N)
+_padic_log_balanced(fmpz_t z, const fmpz_t y, slong FLINT_UNUSED(v), const fmpz_t p, slong N)
 {
     fmpz_t pv, pN, r, t, u;
     slong w;

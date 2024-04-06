@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "fmpq_poly.h"
+#include <flint/fmpq_poly.h>
 
 int main(int argc, char* argv[])
 {

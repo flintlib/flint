@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpn_extras.h"
 #include "thread_support.h"
 #include "gmpcompat.h"
 #include "fmpz.h"

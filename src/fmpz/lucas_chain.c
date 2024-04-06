@@ -10,7 +10,6 @@
 */
 
 #include <math.h>
-#include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
@@ -197,9 +196,9 @@ void fmpz_lucas_chain_mul(fmpz_t Ukm, fmpz_t Ukm1,
 
 /* Compute U_m, U_{m + 1} from V_m, V_{m + 1} */
 void fmpz_lucas_chain_VtoU(fmpz_t Um, fmpz_t Um1,
-                           const fmpz_t Vm, const fmpz_t Vm1,
-                           const fmpz_t A, const fmpz_t B, const fmpz_t Dinv,
-                           const fmpz_t n)
+        const fmpz_t Vm, const fmpz_t Vm1,
+        const fmpz_t A, const fmpz_t FLINT_UNUSED(B), const fmpz_t Dinv,
+        const fmpz_t n)
 {
    fmpz_t t;
 

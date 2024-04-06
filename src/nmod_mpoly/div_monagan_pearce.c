@@ -93,7 +93,7 @@ static int _nmod_mpoly_div_monagan_pearce1(
                 do {
                     *store++ = x->i;
                     *store++ = x->j;
-                    if (x->i != -WORD(1))
+                    if (x->i != -UWORD(1))
                         hind[x->i] |= WORD(1);
 
                 } while ((x = x->next) != NULL);
@@ -107,7 +107,7 @@ static int _nmod_mpoly_div_monagan_pearce1(
                     *store++ = x->i;
                     *store++ = x->j;
 
-                    if (x->i == -WORD(1))
+                    if (x->i == -UWORD(1))
                     {
                         add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), WORD(0), fctx.n - Acoeffs[x->j]);
                     }
@@ -343,7 +343,7 @@ static int _nmod_mpoly_div_monagan_pearce(
                 {
                     *store++ = x->i;
                     *store++ = x->j;
-                    if (x->i != -WORD(1))
+                    if (x->i != -UWORD(1))
                         hind[x->i] |= WORD(1);
 
                 } while ((x = x->next) != NULL);
@@ -358,7 +358,7 @@ static int _nmod_mpoly_div_monagan_pearce(
                     *store++ = x->i;
                     *store++ = x->j;
 
-                    if (x->i == -WORD(1))
+                    if (x->i == -UWORD(1))
                     {
                         add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0,
                                      WORD(0), WORD(0), fctx.n - Acoeffs[x->j]);

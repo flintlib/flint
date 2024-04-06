@@ -678,6 +678,14 @@ _gr_nmod_vec_mul_scalar(ulong * res, const ulong * vec1, slong len, const ulong 
 }
 
 int
+_gr_nmod_scalar_mul_vec(ulong * res, ulong * c, const ulong * vec1, slong len, gr_ctx_t ctx)
+{
+    nmod_t mod = NMOD_CTX(ctx);
+    _nmod_vec_scalar_mul_nmod_inline(res, vec1, len, c[0], mod);
+    return GR_SUCCESS;
+}
+
+int
 _gr_nmod_vec_mul_scalar_si(ulong * res, const ulong * vec1, slong len, slong c, gr_ctx_t ctx)
 {
     nmod_t mod = NMOD_CTX(ctx);
@@ -1492,6 +1500,7 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_VEC_MUL_SCALAR_UI,   (gr_funcptr) _gr_nmod_vec_mul_scalar_ui},
     {GR_METHOD_VEC_MUL_SCALAR_FMPZ, (gr_funcptr) _gr_nmod_vec_mul_scalar_fmpz},
     {GR_METHOD_VEC_MUL_SCALAR_2EXP_SI,   (gr_funcptr) _gr_nmod_vec_mul_scalar_2exp_si},
+    {GR_METHOD_SCALAR_MUL_VEC,      (gr_funcptr) _gr_nmod_scalar_mul_vec},
     {GR_METHOD_VEC_ADDMUL_SCALAR,        (gr_funcptr) _gr_nmod_vec_addmul_scalar},
     {GR_METHOD_VEC_ADDMUL_SCALAR_SI,     (gr_funcptr) _gr_nmod_vec_addmul_scalar_si},
     {GR_METHOD_VEC_SUBMUL_SCALAR,        (gr_funcptr) _gr_nmod_vec_submul_scalar},

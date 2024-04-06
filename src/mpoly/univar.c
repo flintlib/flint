@@ -46,7 +46,7 @@ void mpoly_void_ring_elem_clear(void * a, mpoly_void_ring_t R)
     flint_free(a);
 }
 
-void mpoly_univar_init(mpoly_univar_t A, mpoly_void_ring_t R)
+void mpoly_univar_init(mpoly_univar_t A, mpoly_void_ring_t FLINT_UNUSED(R))
 {
     A->coeffs = NULL;
     A->exps = NULL;

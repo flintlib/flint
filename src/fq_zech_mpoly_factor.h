@@ -69,7 +69,7 @@ typedef fq_zech_polyun_struct fq_zech_polyun_t[1];
 /*****************************************************************************/
 
 FQ_ZECH_MPOLY_FACTOR_INLINE
-void fq_zech_bpoly_init(fq_zech_bpoly_t A, const fq_zech_ctx_t ctx)
+void fq_zech_bpoly_init(fq_zech_bpoly_t A, const fq_zech_ctx_t FLINT_UNUSED(ctx))
 {
     A->coeffs = NULL;
     A->alloc = 0;
@@ -79,7 +79,7 @@ void fq_zech_bpoly_init(fq_zech_bpoly_t A, const fq_zech_ctx_t ctx)
 void fq_zech_bpoly_clear(fq_zech_bpoly_t A, const fq_zech_ctx_t ctx);
 
 FQ_ZECH_MPOLY_FACTOR_INLINE
-void fq_zech_bpoly_swap(fq_zech_bpoly_t A, fq_zech_bpoly_t B, const fq_zech_ctx_t ctx)
+void fq_zech_bpoly_swap(fq_zech_bpoly_t A, fq_zech_bpoly_t B, const fq_zech_ctx_t FLINT_UNUSED(ctx))
 {
     fq_zech_bpoly_struct t = *A;
     *A = *B;
@@ -98,13 +98,13 @@ void fq_zech_bpoly_fit_length(fq_zech_bpoly_t A, slong len, const fq_zech_ctx_t 
 }
 
 FQ_ZECH_MPOLY_FACTOR_INLINE
-void fq_zech_bpoly_zero(fq_zech_bpoly_t A, const fq_zech_ctx_t ctx)
+void fq_zech_bpoly_zero(fq_zech_bpoly_t A, const fq_zech_ctx_t FLINT_UNUSED(ctx))
 {
     A->length = 0;
 }
 
 FQ_ZECH_MPOLY_FACTOR_INLINE
-int fq_zech_bpoly_is_zero(const fq_zech_bpoly_t A, const fq_zech_ctx_t ctx)
+int fq_zech_bpoly_is_zero(const fq_zech_bpoly_t A, const fq_zech_ctx_t FLINT_UNUSED(ctx))
 {
     return A->length == 0;
 }
@@ -114,7 +114,7 @@ int fq_zech_bpoly_equal(const fq_zech_bpoly_t A, const fq_zech_bpoly_t B, const 
 void fq_zech_bpoly_get_coeff(fq_zech_t c, const fq_zech_bpoly_t A, slong e0, slong e1, const fq_zech_ctx_t ctx);
 
 FQ_ZECH_MPOLY_FACTOR_INLINE
-slong fq_zech_bpoly_degree0(const fq_zech_bpoly_t A, const fq_zech_ctx_t ctx)
+slong fq_zech_bpoly_degree0(const fq_zech_bpoly_t A, const fq_zech_ctx_t FLINT_UNUSED(ctx))
 {
     return A->length - 1;
 }
@@ -259,7 +259,7 @@ int fq_zech_bpoly_factor_lgprime(
 /*****************************************************************************/
 
 FQ_ZECH_MPOLY_FACTOR_INLINE
-void fq_zech_tpoly_init(fq_zech_tpoly_t A, const fq_zech_ctx_t ctx)
+void fq_zech_tpoly_init(fq_zech_tpoly_t A, const fq_zech_ctx_t FLINT_UNUSED(ctx))
 {
     A->coeffs = NULL;
     A->alloc = 0;
@@ -267,7 +267,7 @@ void fq_zech_tpoly_init(fq_zech_tpoly_t A, const fq_zech_ctx_t ctx)
 }
 
 FQ_ZECH_MPOLY_FACTOR_INLINE
-void fq_zech_tpoly_swap(fq_zech_tpoly_t A, fq_zech_tpoly_t B, const fq_zech_ctx_t ctx)
+void fq_zech_tpoly_swap(fq_zech_tpoly_t A, fq_zech_tpoly_t B, const fq_zech_ctx_t FLINT_UNUSED(ctx))
 {
     fq_zech_tpoly_struct t = *A;
     *A = *B;
@@ -282,7 +282,7 @@ void fq_zech_tpoly_clear(fq_zech_tpoly_t A, const fq_zech_ctx_t ctx);
 /*****************************************************************************/
 
 FQ_ZECH_MPOLY_FACTOR_INLINE
-void fq_zech_polyu_init(fq_zech_polyu_t A, const fq_zech_ctx_t ctx)
+void fq_zech_polyu_init(fq_zech_polyu_t A, const fq_zech_ctx_t FLINT_UNUSED(ctx))
 {
     A->coeffs = NULL;
     A->exps = NULL;
@@ -303,7 +303,7 @@ void fq_zech_polyu_fit_length(fq_zech_polyu_t A, slong len, const fq_zech_ctx_t 
 }
 
 FQ_ZECH_MPOLY_FACTOR_INLINE
-void fq_zech_polyu_swap(fq_zech_polyu_t A, fq_zech_polyu_t B, const fq_zech_ctx_t ctx)
+void fq_zech_polyu_swap(fq_zech_polyu_t A, fq_zech_polyu_t B, const fq_zech_ctx_t FLINT_UNUSED(ctx))
 {
     fq_zech_polyu_struct t = *B;
     *B = *A;
@@ -330,7 +330,7 @@ int fq_zech_polyu_is_canonical(
 /*****************************************************************************/
 
 FQ_ZECH_MPOLY_FACTOR_INLINE
-void fq_zech_polyun_init(fq_zech_polyun_t A, const fq_zech_ctx_t ctx)
+void fq_zech_polyun_init(fq_zech_polyun_t A, const fq_zech_ctx_t FLINT_UNUSED(ctx))
 {
     A->coeffs = NULL;
     A->exps = NULL;
@@ -350,7 +350,7 @@ void fq_zech_polyun_fit_length(fq_zech_polyun_t A, slong len, const fq_zech_ctx_
 }
 
 FQ_ZECH_MPOLY_FACTOR_INLINE
-void fq_zech_polyun_swap(fq_zech_polyun_t A, fq_zech_polyun_t B, const fq_zech_ctx_t ctx)
+void fq_zech_polyun_swap(fq_zech_polyun_t A, fq_zech_polyun_t B, const fq_zech_ctx_t FLINT_UNUSED(ctx))
 {
     fq_zech_polyun_struct t = *B;
     *B = *A;
@@ -447,7 +447,7 @@ int fq_zech_mpoly_factor(fq_zech_mpoly_factor_t f,
 
 FQ_ZECH_MPOLY_FACTOR_INLINE
 void fq_zech_mpoly_factor_swap(fq_zech_mpoly_factor_t A,
-                       fq_zech_mpoly_factor_t B, const fq_zech_mpoly_ctx_t ctx)
+                       fq_zech_mpoly_factor_t B, const fq_zech_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
    fq_zech_mpoly_factor_struct t = *A;
    *A = *B;
@@ -495,7 +495,7 @@ typedef struct
 typedef fq_zech_mpolyv_struct fq_zech_mpolyv_t[1];
 
 FQ_ZECH_MPOLY_FACTOR_INLINE
-void fq_zech_mpolyv_init(fq_zech_mpolyv_t A, const fq_zech_mpoly_ctx_t ctx)
+void fq_zech_mpolyv_init(fq_zech_mpolyv_t A, const fq_zech_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     A->coeffs = NULL;
     A->alloc = 0;
@@ -504,7 +504,7 @@ void fq_zech_mpolyv_init(fq_zech_mpolyv_t A, const fq_zech_mpoly_ctx_t ctx)
 
 FQ_ZECH_MPOLY_FACTOR_INLINE
 void fq_zech_mpolyv_swap(fq_zech_mpolyv_t A, fq_zech_mpolyv_t B,
-                                                 const fq_zech_mpoly_ctx_t ctx)
+                                                 const fq_zech_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
    fq_zech_mpolyv_struct t = *A;
    *A = *B;

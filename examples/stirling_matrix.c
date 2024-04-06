@@ -16,10 +16,10 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_mat.h"
-#include "arith.h"
+#include <flint/flint.h>
+#include <flint/fmpz.h>
+#include <flint/fmpz_mat.h>
+#include <flint/arith.h>
 
 int main(int argc, char* argv[])
 {

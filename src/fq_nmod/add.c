@@ -14,7 +14,7 @@
 #include "nmod_poly.h"
 #include "fq_nmod.h"
 
-void fq_nmod_add(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_t op2, const fq_nmod_ctx_t ctx)
+void fq_nmod_add(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_t op2, const fq_nmod_ctx_t FLINT_UNUSED(ctx))
 {
     slong max = FLINT_MAX(op1->length, op2->length);
 

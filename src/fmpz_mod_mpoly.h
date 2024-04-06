@@ -90,7 +90,7 @@ void fmpz_mod_mpoly_ctx_get_modulus(fmpz_t m, const fmpz_mod_mpoly_ctx_t ctx)
 
 
 FMPZ_MOD_MPOLY_INLINE
-void fmpz_mod_mpoly_init(fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_ctx_t ctx)
+void fmpz_mod_mpoly_init(fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     A->coeffs = NULL;
     A->exps = NULL;
@@ -149,7 +149,7 @@ void _fmpz_mod_mpoly_fit_length(
 
 FMPZ_MOD_MPOLY_INLINE
 void _fmpz_mod_mpoly_set_length(fmpz_mod_mpoly_t A, slong newlen,
-                                                const fmpz_mod_mpoly_ctx_t ctx)
+                                                const fmpz_mod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_ASSERT(newlen <= A->coeffs_alloc);
     FLINT_ASSERT(mpoly_words_per_exp(A->bits, ctx->minfo)*newlen <= A->exps_alloc);
@@ -159,7 +159,7 @@ void _fmpz_mod_mpoly_set_length(fmpz_mod_mpoly_t A, slong newlen,
 
 FMPZ_MOD_MPOLY_INLINE
 void fmpz_mod_mpoly_truncate(fmpz_mod_mpoly_t A, slong newlen,
-                                                const fmpz_mod_mpoly_ctx_t ctx)
+                                                const fmpz_mod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     if (A->length > newlen)
     {
@@ -203,7 +203,7 @@ int fmpz_mod_mpoly_equal(const fmpz_mod_mpoly_t A,
 
 FMPZ_MOD_MPOLY_INLINE
 void fmpz_mod_mpoly_swap(fmpz_mod_mpoly_t A, fmpz_mod_mpoly_t B,
-                                                const fmpz_mod_mpoly_ctx_t ctx)
+                                                const fmpz_mod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_SWAP(fmpz_mod_mpoly_struct, *A, *B);
 }
@@ -251,7 +251,7 @@ int fmpz_mod_mpoly_equal_si(const fmpz_mod_mpoly_t A,
 
 FMPZ_MOD_MPOLY_INLINE
 int fmpz_mod_mpoly_is_zero(const fmpz_mod_mpoly_t A,
-                                                const fmpz_mod_mpoly_ctx_t ctx)
+                                                const fmpz_mod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
    return A->length < 1;
 }
@@ -357,7 +357,7 @@ int fmpz_mod_mpoly_is_canonical(const fmpz_mod_mpoly_t A,
 
 FMPZ_MOD_MPOLY_INLINE
 slong fmpz_mod_mpoly_length(const fmpz_mod_mpoly_t A,
-                                                const fmpz_mod_mpoly_ctx_t ctx)
+                                                const fmpz_mod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     return A->length;
 }
@@ -765,7 +765,7 @@ void fmpz_mod_mpoly_univar_assert_canonical(fmpz_mod_mpoly_univar_t A,
 
 FMPZ_MOD_MPOLY_INLINE
 void fmpz_mod_mpoly_univar_zero(fmpz_mod_mpoly_univar_t A,
-                                                const fmpz_mod_mpoly_ctx_t ctx)
+                                                const fmpz_mod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     A->length = 0;
 }
@@ -786,28 +786,28 @@ void fmpz_mod_mpoly_from_univar(fmpz_mod_mpoly_t A,
 
 FMPZ_MOD_MPOLY_INLINE
 void fmpz_mod_mpoly_univar_swap(fmpz_mod_mpoly_univar_t A,
-                     fmpz_mod_mpoly_univar_t B, const fmpz_mod_mpoly_ctx_t ctx)
+                     fmpz_mod_mpoly_univar_t B, const fmpz_mod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_SWAP(fmpz_mod_mpoly_univar_struct, *A, *B);
 }
 
 FMPZ_MOD_MPOLY_INLINE
 int fmpz_mod_mpoly_univar_degree_fits_si(const fmpz_mod_mpoly_univar_t A,
-                                                const fmpz_mod_mpoly_ctx_t ctx)
+                                                const fmpz_mod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     return A->length == 0 || fmpz_fits_si(A->exps + 0);
 }
 
 FMPZ_MOD_MPOLY_INLINE
 slong fmpz_mod_mpoly_univar_length(const fmpz_mod_mpoly_univar_t A,
-                                                const fmpz_mod_mpoly_ctx_t ctx)
+                                                const fmpz_mod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     return A->length;
 }
 
 FMPZ_MOD_MPOLY_INLINE
 slong fmpz_mod_mpoly_univar_get_term_exp_si(fmpz_mod_mpoly_univar_t A, slong i,
-                                                const fmpz_mod_mpoly_ctx_t ctx)
+                                                const fmpz_mod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_ASSERT(i < (ulong)A->length);
     return fmpz_get_si(A->exps + i);

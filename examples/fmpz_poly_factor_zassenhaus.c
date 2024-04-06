@@ -16,11 +16,11 @@
 
 #include <stdio.h>
 
-#include "flint.h"
-#include "fmpz_poly.h"
-#include "fmpz_poly_factor.h"
-#include "nmod_poly.h"
-#include "ulong_extras.h"
+#include <flint/flint.h>
+#include <flint/fmpz_poly.h>
+#include <flint/fmpz_poly_factor.h>
+#include <flint/nmod_poly.h>
+#include <flint/ulong_extras.h>
 
 int main(void)
 {

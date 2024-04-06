@@ -18,8 +18,8 @@ static int
 fmpz_mat_is_spd_arb(const fmpz_mat_t A)
 {
     slong d = fmpz_mat_nrows(A);
-    slong prec;
-    slong maxprec = 32;
+    ulong prec;
+    ulong maxprec = 32;
     arb_mat_t M, L;
     slong j, k;
     int res = 0;

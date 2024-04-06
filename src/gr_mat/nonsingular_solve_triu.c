@@ -144,7 +144,7 @@ gr_mat_nonsingular_solve_triu_recursive(gr_mat_t X,
 }
 
 int
-gr_mat_nonsingular_solve_triu(gr_mat_t X, const gr_mat_t U,
+gr_mat_nonsingular_solve_triu_generic(gr_mat_t X, const gr_mat_t U,
                                     const gr_mat_t B, int unit, gr_ctx_t ctx)
 {
     /* todo: tune thresholds */
@@ -152,4 +152,11 @@ gr_mat_nonsingular_solve_triu(gr_mat_t X, const gr_mat_t U,
         return gr_mat_nonsingular_solve_triu_classical(X, U, B, unit, ctx);
     else
         return gr_mat_nonsingular_solve_triu_recursive(X, U, B, unit, ctx);
+}
+
+int
+gr_mat_nonsingular_solve_triu(gr_mat_t X, const gr_mat_t U,
+                                    const gr_mat_t B, int unit, gr_ctx_t ctx)
+{
+    return GR_MAT_BINARY_OP_WITH_FLAG(ctx, MAT_NONSINGULAR_SOLVE_TRIU)(X, U, B, unit, ctx);
 }

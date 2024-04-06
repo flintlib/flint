@@ -45,7 +45,9 @@ int n_is_prime(mp_limb_t n)
 int
 n_is_prime_pocklington(mp_limb_t n, ulong iterations)
 {
-    int i, j, pass;
+    int pass;
+    slong i;
+    ulong j;
     mp_limb_t n1, cofactor, b, c, ninv, limit, F, Fsq, det, rootn, val, c1, c2, upper_limit;
     n_factor_t factors;
     c = 0;

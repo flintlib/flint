@@ -24,6 +24,7 @@
 #include "t-mul.c"
 #include "t-mul_n.c"
 #include "t-mul_toom22.c"
+#include "t-mullow_n.c"
 #include "t-mulhigh.c"
 #include "t-mulhigh_normalised.c"
 #include "t-mulmod_2expp1.c"
@@ -48,6 +49,7 @@ test_struct tests[] =
     TEST_FUNCTION(flint_mpn_mul),
     TEST_FUNCTION(flint_mpn_mul_n),
     TEST_FUNCTION(flint_mpn_mul_toom22),
+    TEST_FUNCTION(flint_mpn_mullow_n),
     TEST_FUNCTION(flint_mpn_mulhigh),
     TEST_FUNCTION(flint_mpn_mulhigh_normalised),
     TEST_FUNCTION(flint_mpn_mulmod_2expp1),

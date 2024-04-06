@@ -96,7 +96,7 @@ void padic_mat_scalar_mul_fmpz(padic_mat_t B,
 
 void _padic_mat_scalar_mul_padic(padic_mat_t B,
                                  const padic_mat_t A, const padic_t c,
-                                 const padic_ctx_t ctx)
+                                 const padic_ctx_t FLINT_UNUSED(ctx))
 {
     if (padic_mat_is_empty(B))
     {

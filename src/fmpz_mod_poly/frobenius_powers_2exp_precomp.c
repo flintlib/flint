@@ -16,7 +16,7 @@ void fmpz_mod_poly_frobenius_powers_2exp_precomp(
            fmpz_mod_poly_frobenius_powers_2exp_t pow, const fmpz_mod_poly_t f,
                  const fmpz_mod_poly_t finv, ulong m, const fmpz_mod_ctx_t ctx)
 {
-    slong i, l = 0;
+    ulong i, l;
 
     if (m == 0)
     {
@@ -26,7 +26,7 @@ void fmpz_mod_poly_frobenius_powers_2exp_precomp(
     }
 
     l = FLINT_CLOG2(m);
-    if ((WORD(1) << l) == m)
+    if ((UWORD(1) << l) == m)
        l++;
 
     pow->pow = (fmpz_mod_poly_struct *) flint_malloc(l*sizeof(fmpz_mod_poly_struct));
