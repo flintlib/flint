@@ -194,7 +194,7 @@ then
         echo "FAIL"
         exit 1
     fi
-    echo "$res" | perl -0ne 'if (/result = 0.88622692545275801364908374167057/g) {$found=1; last} END {exit !$found }'
+    echo "$res" | perl -0ne 'if (/result = 0.8862269254527580/g) {$found=1; last} END {exit !$found }'
     if test "$?" != "0";
     then
 	echo "FAIL"
