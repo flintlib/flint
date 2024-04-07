@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gr_vec.h"
 #include "gr_poly.h"
 
 /* TODO: a self-recursive variant that can reuse scratch space. */
@@ -77,11 +78,9 @@ _gr_poly_mul_karatsuba(gr_ptr res, gr_srcptr f, slong flen, gr_srcptr g, slong g
     }
 
     /* v -= f0 g0 */
-    status |= _gr_poly_sub(v, v, vlen, res, 2 * m - 1, ctx);
-    vlen = FLINT_MAX(vlen, 2 * m - 1);
+    status |= _gr_vec_sub(v, v, res, 2 * m - 1, ctx);
     /* v -= f1 g1 */
-    status |= _gr_poly_sub(v, v, vlen, GR_ENTRY(res, 2 * m, sz), f1len + g1len - 1, ctx);
-    vlen = FLINT_MAX(vlen, f1len + g1len - 1);
+    status |= _gr_vec_sub(v, v, GR_ENTRY(res, 2 * m, sz), f1len + g1len - 1, ctx);
 
     /* Finally add the middle part. */
     status |= _gr_poly_add(GR_ENTRY(res, m, sz), GR_ENTRY(res, m, sz), vlen, v, vlen, ctx);
