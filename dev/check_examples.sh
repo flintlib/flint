@@ -210,7 +210,6 @@ elif test "$1" = "padic_roots"
 then
     echo -n "padic_roots...."
     res=$($2/padic_roots 11)
-    echo "result = $res"
     if test "$?" != "0";
     then
         echo "FAIL"

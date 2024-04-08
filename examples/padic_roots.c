@@ -56,43 +56,11 @@ fmpz_poly_roots_fq_clear(fmpz_poly_roots_fq_t roots, fq_ctx_t fctx)
 }
 
 
-char *
-fmpz_poly_roots_fq_get_str(fmpz_poly_roots_fq_t roots, fq_ctx_t fctx)
-{
-    char *buffer = NULL;
-    size_t buffer_size = 0;
-    FILE *out = open_memstream(&buffer, &buffer_size);
-
-    _fq_vec_fprint(out, roots->x0, roots->num, fctx);
-    fclose(out);
-
-    return buffer;
-}
-
 int
 fmpz_poly_roots_fq_print(fmpz_poly_roots_fq_t roots, fq_ctx_t fctx)
 {
     _fq_vec_print(roots->x0, roots->num, fctx);
     return 1;
-}
-
-char *
-fmpz_poly_roots_fq_get_str_pretty(fmpz_poly_roots_fq_t roots, fq_ctx_t fctx)
-{
-    char *buffer = NULL;
-    size_t buffer_size = 0;
-    FILE *out = open_memstream(&buffer, &buffer_size);
-    slong j;
-
-    for (j = 0; j < roots->num; j++)
-    {
-        fq_fprint_pretty(out, roots->x0 + j, fctx);
-        flint_fprintf(out, " %wd\n", roots->multiplicity[j]);
-    }
-
-    fclose(out);
-
-    return buffer;
 }
 
 int
