@@ -1,4 +1,8 @@
 headers = [
+  'flint.h',
+  'flint-config.h',
+  'gmpcompat.h',
+  #
   'acb_calc.h',
   'acb_dft.h',
   'acb_dirichlet.h',
