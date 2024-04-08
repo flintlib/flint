@@ -1,6 +1,7 @@
 project('FLINT', 'c',
   version: '3.1.0',
-  license: 'LGPL3+'
+  license: 'LGPL3+',
+  default_options: ['buildtype=release'],
 )
 
 cc = meson.get_compiler('c')
