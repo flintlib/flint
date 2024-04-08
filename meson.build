@@ -28,6 +28,7 @@ install_headers(headers_all, subdir: 'flint')
 libflint = library('flint', c_files_all,
   dependencies: flint_deps,
   include_directories: include_directories('src'),
+  install: true
 )
 
 pkg_mod = import('pkgconfig')
