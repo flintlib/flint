@@ -215,6 +215,12 @@ used by higher-level generic routines.
 Polynomial algorithms
 -------------------------------------------------------------------------------
 
+All multiplication algorithms optimize for squaring.
+
+.. function:: int _mpn_mod_poly_mullow_classical(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
+
+    Polynomial multiplication using the schoolbook algorithm.
+
 .. function:: int _mpn_mod_poly_mullow_KS(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
 
     Polynomial multiplication using Kronecker substitution (bit packing).

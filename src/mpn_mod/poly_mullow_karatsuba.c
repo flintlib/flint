@@ -11,7 +11,7 @@
 
 #include "mpn_mod.h"
 
-void _mpn_dotrev_2x2_3(mp_ptr s, mp_srcptr a, mp_srcptr b, slong len)
+void _mpn_dot_rev_2x2_3(mp_ptr s, mp_srcptr a, mp_srcptr b, slong len)
 {
     mp_limb_t A0, A1, B0, B1;
     mp_limb_t p2, p1, p0;
@@ -50,7 +50,7 @@ void _mpn_dotrev_2x2_3(mp_ptr s, mp_srcptr a, mp_srcptr b, slong len)
     s[2] = s2;
 }
 
-void _mpn_dotrev_2x2_4(mp_ptr s, mp_srcptr a, mp_srcptr b, slong len)
+void _mpn_dot_rev_2x2_4(mp_ptr s, mp_srcptr a, mp_srcptr b, slong len)
 {
     mp_limb_t A0, A1, B0, B1;
     mp_limb_t p3, p2, p1, p0;
@@ -90,7 +90,7 @@ void _mpn_dotrev_2x2_4(mp_ptr s, mp_srcptr a, mp_srcptr b, slong len)
     s[3] = s3;
 }
 
-void _mpn_dotrev_2x2_5(mp_ptr s, mp_srcptr a, mp_srcptr b, slong len)
+void _mpn_dot_rev_2x2_5(mp_ptr s, mp_srcptr a, mp_srcptr b, slong len)
 {
     mp_limb_t A0, A1, B0, B1;
     mp_limb_t p3, p2, p1, p0;
@@ -131,7 +131,7 @@ void _mpn_dotrev_2x2_5(mp_ptr s, mp_srcptr a, mp_srcptr b, slong len)
     s[4] = s4;
 }
 
-void _mpn_dotrev_3x3_5(mp_ptr s, mp_srcptr a, mp_srcptr b, slong len)
+void _mpn_dot_rev_3x3_5(mp_ptr s, mp_srcptr a, mp_srcptr b, slong len)
 {
     mp_limb_t A0, A1, A2, B0, B1, B2;
     mp_limb_t p4, p3, p2, p1, p0;
@@ -184,7 +184,7 @@ void _mpn_dotrev_3x3_5(mp_ptr s, mp_srcptr a, mp_srcptr b, slong len)
 }
 
 void
-_mpn_dotrev_nxn_2n(mp_ptr res, mp_srcptr a, mp_srcptr b, slong len, mp_size_t nlimbs)
+_mpn_dot_rev_nxn_2n(mp_ptr res, mp_srcptr a, mp_srcptr b, slong len, mp_size_t nlimbs)
 {
     mp_limb_t t[2 * MPN_MOD_MAX_LIMBS + 3];
     mp_size_t slimbs = 2 * nlimbs;
@@ -200,7 +200,7 @@ _mpn_dotrev_nxn_2n(mp_ptr res, mp_srcptr a, mp_srcptr b, slong len, mp_size_t nl
 }
 
 void
-_mpn_dotrev_nxn_2nm1(mp_ptr res, mp_srcptr a, mp_srcptr b, slong len, mp_size_t nlimbs)
+_mpn_dot_rev_nxn_2nm1(mp_ptr res, mp_srcptr a, mp_srcptr b, slong len, mp_size_t nlimbs)
 {
     mp_limb_t t[2 * MPN_MOD_MAX_LIMBS + 3];
     mp_size_t slimbs = 2 * nlimbs - 1;
@@ -217,7 +217,7 @@ _mpn_dotrev_nxn_2nm1(mp_ptr res, mp_srcptr a, mp_srcptr b, slong len, mp_size_t 
 }
 
 void
-_mpn_dotrev_nxn_2np1(mp_ptr res, mp_srcptr a, mp_srcptr b, slong len, mp_size_t nlimbs)
+_mpn_dot_rev_nxn_2np1(mp_ptr res, mp_srcptr a, mp_srcptr b, slong len, mp_size_t nlimbs)
 {
     mp_limb_t t[2 * MPN_MOD_MAX_LIMBS + 3];
     mp_size_t slimbs = 2 * nlimbs + 1;
@@ -252,7 +252,7 @@ _mpn_poly_mullow_classical(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr po
             {
                 top1 = FLINT_MIN(len1 - 1, i);
                 top2 = FLINT_MIN(len2 - 1, i);
-                _mpn_dotrev_2x2_3(res + i * slimbs, poly1 + (i - top2) * nlimbs, poly2 + (i - top1) * nlimbs, top1 + top2 - i + 1);
+                _mpn_dot_rev_2x2_3(res + i * slimbs, poly1 + (i - top2) * nlimbs, poly2 + (i - top1) * nlimbs, top1 + top2 - i + 1);
             }
         }
         else if (slimbs == 4)
@@ -261,7 +261,7 @@ _mpn_poly_mullow_classical(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr po
             {
                 top1 = FLINT_MIN(len1 - 1, i);
                 top2 = FLINT_MIN(len2 - 1, i);
-                _mpn_dotrev_2x2_4(res + i * slimbs, poly1 + (i - top2) * nlimbs, poly2 + (i - top1) * nlimbs, top1 + top2 - i + 1);
+                _mpn_dot_rev_2x2_4(res + i * slimbs, poly1 + (i - top2) * nlimbs, poly2 + (i - top1) * nlimbs, top1 + top2 - i + 1);
             }
         }
         else
@@ -270,7 +270,7 @@ _mpn_poly_mullow_classical(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr po
             {
                 top1 = FLINT_MIN(len1 - 1, i);
                 top2 = FLINT_MIN(len2 - 1, i);
-                _mpn_dotrev_2x2_5(res + i * slimbs, poly1 + (i - top2) * nlimbs, poly2 + (i - top1) * nlimbs, top1 + top2 - i + 1);
+                _mpn_dot_rev_2x2_5(res + i * slimbs, poly1 + (i - top2) * nlimbs, poly2 + (i - top1) * nlimbs, top1 + top2 - i + 1);
             }
         }
     }
@@ -280,7 +280,7 @@ _mpn_poly_mullow_classical(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr po
         {
             top1 = FLINT_MIN(len1 - 1, i);
             top2 = FLINT_MIN(len2 - 1, i);
-            _mpn_dotrev_3x3_5(res + i * slimbs, poly1 + (i - top2) * nlimbs, poly2 + (i - top1) * nlimbs, top1 + top2 - i + 1);
+            _mpn_dot_rev_3x3_5(res + i * slimbs, poly1 + (i - top2) * nlimbs, poly2 + (i - top1) * nlimbs, top1 + top2 - i + 1);
         }
     }
     else if (slimbs == 2 * nlimbs - 1)
@@ -289,7 +289,7 @@ _mpn_poly_mullow_classical(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr po
         {
             top1 = FLINT_MIN(len1 - 1, i);
             top2 = FLINT_MIN(len2 - 1, i);
-            _mpn_dotrev_nxn_2nm1(res + i * slimbs, poly1 + (i - top2) * nlimbs, poly2 + (i - top1) * nlimbs, top1 + top2 - i + 1, nlimbs);
+            _mpn_dot_rev_nxn_2nm1(res + i * slimbs, poly1 + (i - top2) * nlimbs, poly2 + (i - top1) * nlimbs, top1 + top2 - i + 1, nlimbs);
         }
     }
     else if (slimbs == 2 * nlimbs)
@@ -298,7 +298,7 @@ _mpn_poly_mullow_classical(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr po
         {
             top1 = FLINT_MIN(len1 - 1, i);
             top2 = FLINT_MIN(len2 - 1, i);
-            _mpn_dotrev_nxn_2n(res + i * slimbs, poly1 + (i - top2) * nlimbs, poly2 + (i - top1) * nlimbs, top1 + top2 - i + 1, nlimbs);
+            _mpn_dot_rev_nxn_2n(res + i * slimbs, poly1 + (i - top2) * nlimbs, poly2 + (i - top1) * nlimbs, top1 + top2 - i + 1, nlimbs);
         }
     }
     else
@@ -307,7 +307,7 @@ _mpn_poly_mullow_classical(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr po
         {
             top1 = FLINT_MIN(len1 - 1, i);
             top2 = FLINT_MIN(len2 - 1, i);
-            _mpn_dotrev_nxn_2np1(res + i * slimbs, poly1 + (i - top2) * nlimbs, poly2 + (i - top1) * nlimbs, top1 + top2 - i + 1, nlimbs);
+            _mpn_dot_rev_nxn_2np1(res + i * slimbs, poly1 + (i - top2) * nlimbs, poly2 + (i - top1) * nlimbs, top1 + top2 - i + 1, nlimbs);
         }
     }
 }
@@ -333,16 +333,16 @@ _mpn_poly_sqrlow_classical(mp_ptr res, mp_srcptr poly1, slong len1, slong len, m
             stop = FLINT_MIN(len1 - 1, (i + 1) / 2 - 1);
 
             if (nlimbs == 2)
-                _mpn_dotrev_2x2_3(rp, poly1 + start * nlimbs, poly1 + (i - stop) * nlimbs, stop - start + 1);
+                _mpn_dot_rev_2x2_3(rp, poly1 + start * nlimbs, poly1 + (i - stop) * nlimbs, stop - start + 1);
             else if (nlimbs == 3)
-                _mpn_dotrev_3x3_5(rp, poly1 + start * nlimbs, poly1 + (i - stop) * nlimbs, stop - start + 1);
+                _mpn_dot_rev_3x3_5(rp, poly1 + start * nlimbs, poly1 + (i - stop) * nlimbs, stop - start + 1);
             else
-                _mpn_dotrev_nxn_2nm1(rp, poly1 + start * nlimbs, poly1 + (i - stop) * nlimbs, stop - start + 1, nlimbs);
+                _mpn_dot_rev_nxn_2nm1(rp, poly1 + start * nlimbs, poly1 + (i - stop) * nlimbs, stop - start + 1, nlimbs);
 
             mpn_lshift(rp, rp, slimbs, 1);
             if (i % 2 == 0 && i / 2 < len1)
             {
-                mpn_sqr(t, poly1 + (i / 2) * nlimbs, nlimbs);
+                flint_mpn_sqr(t, poly1 + (i / 2) * nlimbs, nlimbs);
                 mpn_add_n(rp, rp, t, slimbs);
             }
         }
@@ -364,14 +364,14 @@ _mpn_poly_sqrlow_classical(mp_ptr res, mp_srcptr poly1, slong len1, slong len, m
             stop = FLINT_MIN(len1 - 1, (i + 1) / 2 - 1);
 
             if (nlimbs == 2)
-                _mpn_dotrev_2x2_4(rp, poly1 + start * nlimbs, poly1 + (i - stop) * nlimbs, stop - start + 1);
+                _mpn_dot_rev_2x2_4(rp, poly1 + start * nlimbs, poly1 + (i - stop) * nlimbs, stop - start + 1);
             else
-                _mpn_dotrev_nxn_2n(rp, poly1 + start * nlimbs, poly1 + (i - stop) * nlimbs, stop - start + 1, nlimbs);
+                _mpn_dot_rev_nxn_2n(rp, poly1 + start * nlimbs, poly1 + (i - stop) * nlimbs, stop - start + 1, nlimbs);
 
             mpn_lshift(rp, rp, slimbs, 1);
             if (i % 2 == 0 && i / 2 < len1)
             {
-                mpn_sqr(t, poly1 + (i / 2) * nlimbs, nlimbs);
+                flint_mpn_sqr(t, poly1 + (i / 2) * nlimbs, nlimbs);
                 mpn_add_n(rp, rp, t, slimbs);
             }
         }
@@ -390,13 +390,13 @@ _mpn_poly_sqrlow_classical(mp_ptr res, mp_srcptr poly1, slong len1, slong len, m
             start = FLINT_MAX(0, i - len1 + 1);
             stop = FLINT_MIN(len1 - 1, (i + 1) / 2 - 1);
             if (nlimbs == 2)
-                _mpn_dotrev_2x2_5(rp, poly1 + start * nlimbs, poly1 + (i - stop) * nlimbs, stop - start + 1);
+                _mpn_dot_rev_2x2_5(rp, poly1 + start * nlimbs, poly1 + (i - stop) * nlimbs, stop - start + 1);
             else
-                _mpn_dotrev_nxn_2np1(rp, poly1 + start * nlimbs, poly1 + (i - stop) * nlimbs, stop - start + 1, nlimbs);
+                _mpn_dot_rev_nxn_2np1(rp, poly1 + start * nlimbs, poly1 + (i - stop) * nlimbs, stop - start + 1, nlimbs);
             mpn_lshift(rp, rp, slimbs, 1);
             if (i % 2 == 0 && i / 2 < len1)
             {
-                mpn_sqr(t, poly1 + (i / 2) * nlimbs, nlimbs);
+                flint_mpn_sqr(t, poly1 + (i / 2) * nlimbs, nlimbs);
                 rp[slimbs - 1] += mpn_add_n(rp, rp, t, slimbs - 1);
             }
         }
