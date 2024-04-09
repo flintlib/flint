@@ -56,7 +56,7 @@ _gr_poly_mul_karatsuba(gr_ptr res, gr_srcptr f, slong flen, gr_srcptr g, slong g
     tlen = FLINT_MAX(m, f1len);
     ulen = FLINT_MAX(m, g1len);
     vlen = tlen + ulen - 1;
-    alloc = tlen + (squaring ? 0 : ulen) + FLINT_MAX(FLINT_MAX(vlen, 2 * m - 1), flen + glen - 1);
+    alloc = tlen + (squaring ? 0 : ulen) + vlen;
 
     GR_TMP_INIT_VEC(t, alloc, ctx);
     u = GR_ENTRY(t, tlen, sz);
