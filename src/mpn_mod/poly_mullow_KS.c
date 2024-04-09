@@ -91,8 +91,8 @@ _mpn_mod_poly_mullow_KS(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2
     limbs1 = (bits * len1 - 1) / FLINT_BITS + 1;
     limbs2 = (bits * len2 - 1) / FLINT_BITS + 1;
 
-    FLINT_ASSERT((limbs1 >= (bits * (len1 - 1) / FLINT_BITS + nlimbs + 1)))
-    FLINT_ASSERT((limbs2 >= (bits * (len2 - 1) / FLINT_BITS + nlimbs + 1)))
+    FLINT_ASSERT(limbs1 >= (bits * (len1 - 1) / FLINT_BITS + nlimbs + 1));
+    FLINT_ASSERT(limbs2 >= (bits * (len2 - 1) / FLINT_BITS + nlimbs + 1));
 
     arr1 = flint_calloc(squaring ? limbs1 : limbs1 + limbs2, sizeof(mp_limb_t));
     arr2 = squaring ? arr1 : arr1 + limbs1;
