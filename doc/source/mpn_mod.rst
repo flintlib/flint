@@ -218,3 +218,15 @@ Polynomial algorithms
 .. function:: int _mpn_mod_poly_mullow_KS(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
 
     Polynomial multiplication using Kronecker substitution (bit packing).
+
+.. function:: int _mpn_mod_poly_mullow_karatsuba(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong len, slong cutoff, gr_ctx_t ctx)
+
+    Polynomial multiplication using the Karatsuba algorithm,
+    implemented without intermediate modular reductions.
+    This algorithm calls itself recursively, switching to
+    basecase multiplication (also without intermediate reductions)
+    when either *len1* or *len2* is smaller than *cutoff*.
+
+    Currently a full product is computed internally regardless of *len*;
+    truncation only skips the modular reductions.
+

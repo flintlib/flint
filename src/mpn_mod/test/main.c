@@ -20,6 +20,7 @@
 #include "t-mat_mul_multi_mod.c"
 #include "t-mat_mul_waksman.c"
 #include "t-poly_mullow_KS.c"
+#include "t-poly_mullow_karatsuba.c"
 
 /* Array of test functions ***************************************************/
 
@@ -31,6 +32,7 @@ test_struct tests[] =
     TEST_FUNCTION(mpn_mod_mat_mul_multi_mod),
     TEST_FUNCTION(mpn_mod_mat_mul_waksman),
     TEST_FUNCTION(mpn_mod_poly_mullow_KS),
+    TEST_FUNCTION(mpn_mod_poly_mullow_karatsuba),
 };
 
 /* main function *************************************************************/

@@ -22,7 +22,6 @@ TEST_FUNCTION_START(mpn_mod_poly_mullow_KS, state)
     {
         gr_ctx_init_mpn_mod_randtest(ctx, state);
         gr_poly_test_mullow((gr_method_poly_binary_trunc_op) _mpn_mod_poly_mullow_KS, state, 10, 50, ctx);
-        flint_set_num_threads(1);
         gr_ctx_clear(ctx);
     }
 
