@@ -12,7 +12,7 @@
 #include "mpn_mod.h"
 
 /* assumes res is initially zeroed */
-/* assumes that we can write one limb too much */
+/* assumes that we can write one (zeroed) limb too much */
 /* assumes bits >= FLINT_BITS */
 static void
 _mpn_mod_poly_bit_pack(mp_ptr res, mp_srcptr x, slong len, mp_bitcnt_t bits, mp_size_t nlimbs)
@@ -90,6 +90,9 @@ _mpn_mod_poly_mullow_KS(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2
 
     limbs1 = (bits * len1 - 1) / FLINT_BITS + 1;
     limbs2 = (bits * len2 - 1) / FLINT_BITS + 1;
+
+    FLINT_ASSERT((limbs1 >= (bits * (len1 - 1) / FLINT_BITS + nlimbs + 1)))
+    FLINT_ASSERT((limbs2 >= (bits * (len2 - 1) / FLINT_BITS + nlimbs + 1)))
 
     arr1 = flint_calloc(squaring ? limbs1 : limbs1 + limbs2, sizeof(mp_limb_t));
     arr2 = squaring ? arr1 : arr1 + limbs1;
