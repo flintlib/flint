@@ -6,6 +6,33 @@ History and changes
 FLINT version history
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+2024-03-18 -- FLINT 3.1.2
+-------------------------------------------------------------------------------
+
+Main contributors: Albin Ahlbäck (AA)
+
+* Maintenance
+
+  * Remove the need for ``ldconfig`` completely in FLINT's Autotools build
+    system.
+
+
+2024-03-07 -- FLINT 3.1.1
+-------------------------------------------------------------------------------
+
+Main contributors: Albin Ahlbäck (AA)
+
+* Bug fixes
+
+  * Add ``padic_types.h`` to headers in ``Makefile.in`` (AA).
+
+* Maintenance
+
+  * Add check for ``aligned_alloc`` and ``_aligned_malloc`` for systems that may
+    not provide any of these functions (AA).
+  * Add options for setting ``-march=ARCH`` (AA).
+
+
 2024-02-25 -- FLINT 3.1.0
 -------------------------------------------------------------------------------
 
