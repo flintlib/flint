@@ -1317,6 +1317,13 @@ then
     esac
 
     GMP_FINISH
+else
+    # NOTE: LSYM_PREFIX is needed for longlong_asm_gnu.h
+    GMP_INIT(tmpconf)
+    GMP_ASM_TEXT
+    GMP_ASM_LABEL_SUFFIX
+    GMP_ASM_LSYM_PREFIX
+    rm -f $gmp_tmpconfigm4 $gmp_tmpconfigm4i $gmp_tmpconfigm4p
 fi
 
 if test "$enable_assembly" = "yes";
