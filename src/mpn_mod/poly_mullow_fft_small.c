@@ -329,7 +329,7 @@ int _mpn_mod_poly_mulmid_fft_small_internal(mp_ptr z, ulong zl, ulong zh,
             return GR_SUCCESS;
         }
 
-        _mpn_mod_vec_zero(z + (zn - zl) * nbits, zh - zn, ctx);
+        _mpn_mod_vec_zero(z + (zn - zl) * nlimbs, zh - zn, ctx);
         zh = zn;
     }
 
