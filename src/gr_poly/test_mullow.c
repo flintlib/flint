@@ -12,10 +12,14 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 
-void gr_poly_test_mullow(gr_method_poly_binary_trunc_op mullow_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+void gr_poly_test_mullow(gr_method_poly_binary_trunc_op mullow_impl, gr_method_poly_binary_trunc_op mullow_ref,
+    flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
 {
     slong iter;
     gr_ctx_ptr given_ctx = ctx;
+
+    if (mullow_ref == NULL)
+        mullow_ref = (gr_method_poly_binary_trunc_op) _gr_poly_mullow_generic;
 
     for (iter = 0; iter < iters; iter++)
     {
@@ -61,7 +65,9 @@ void gr_poly_test_mullow(gr_method_poly_binary_trunc_op mullow_impl, flint_rand_
 #endif
 
         status |= mullow_impl(C, A, n1, B, n2, n, ctx);
-        status |= _gr_poly_mullow_generic(D, A, n1, B, n2, n, ctx);
+
+        if (status == GR_SUCCESS)
+            status |= mullow_ref(D, A, n1, B, n2, n, ctx);
 
         if (status == GR_SUCCESS && _gr_vec_equal(C, D, n, ctx) == T_FALSE)
         {

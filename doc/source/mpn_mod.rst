@@ -236,3 +236,8 @@ All multiplication algorithms optimize for squaring.
     Currently a full product is computed internally regardless of *len*;
     truncation only skips the modular reductions.
 
+.. function:: int _mpn_mod_poly_mullow_fft_small(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
+
+    Polynomial multiplication using the small-prime FFT.
+    Returns ``GR_UNABLE`` if the small-prime FFT is not available
+    or if the coefficients are too large to use this implementation.

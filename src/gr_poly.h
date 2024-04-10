@@ -450,7 +450,7 @@ WARN_UNUSED_RESULT int gr_poly_tan_series(gr_poly_t f, const gr_poly_t h, slong 
 
 /* Test functions */
 
-void gr_poly_test_mullow(gr_method_poly_binary_trunc_op mullow_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
+void gr_poly_test_mullow(gr_method_poly_binary_trunc_op mullow_impl, gr_method_poly_binary_trunc_op mullow_ref, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
 
 #ifdef __cplusplus
 }
