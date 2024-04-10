@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2024 Albin Ahlbäck
+    Copyright (C) 2024 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -17,15 +18,15 @@
 #define WANT_STOR 1
 
 #if WANT_STOR
-# define MAX_ALLOC_SIZE (FLINT_MPN_SQRHIGH_SQR_CUTOFF + 50)
+# define MAX_ALLOC_SIZE (FLINT_MPN_MULHIGH_MUL_CUTOFF + 50)
 #else
-# define N_MAX FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH
+# define N_MAX FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH
 # define MAX_ALLOC_SIZE (2 * N_MAX)
 #endif
 
-#define GET_N_FULL_SQR(state) (N_MIN + FLINT_MPN_SQRHIGH_SQR_CUTOFF + n_randint(state, 50 - N_MIN + 1))
-#define GET_N_LARGE(state) (N_MIN + n_randint(state, FLINT_MPN_SQRHIGH_SQR_CUTOFF - N_MIN + 1))
-#define GET_N_SMALL(state) (N_MIN + n_randint(state, 2 * FLINT_MPN_SQRHIGH_MULDERS_CUTOFF - N_MIN + 1))
+#define GET_N_FULL_MUL(state) (N_MIN + FLINT_MPN_MULHIGH_MUL_CUTOFF + n_randint(state, 50 - N_MIN + 1))
+#define GET_N_LARGE(state) (N_MIN + n_randint(state, FLINT_MPN_MULHIGH_MUL_CUTOFF - N_MIN + 1))
+#define GET_N_SMALL(state) (N_MIN + n_randint(state, 2 * FLINT_MPN_MULHIGH_MULDERS_CUTOFF - N_MIN + 1))
 
 #define rpcH (rpc + n - 1)
 
@@ -87,11 +88,11 @@ static ulong lower_bound(ulong n)
 }
 #endif
 
-TEST_FUNCTION_START(flint_mpn_sqrhigh, state)
+TEST_FUNCTION_START(flint_mpn_mulhigh_n, state)
 {
     slong ix;
     int result;
-    mp_ptr rp, rpc, xp;
+    mp_ptr rp, rpc, xp, yp;
 
     rpc = flint_malloc(2 * sizeof(mp_limb_t) * MAX_ALLOC_SIZE);
 
@@ -100,11 +101,10 @@ TEST_FUNCTION_START(flint_mpn_sqrhigh, state)
         mp_limb_t borrow;
         mp_size_t n;
 
-
 #if WANT_STOR
         /* Trigger full multiplication in mulhigh */
         if (n_randint(state, 1000) == 0)
-            n = GET_N_FULL_SQR(state);
+            n = GET_N_FULL_MUL(state);
         else if (n_randint(state, 100) == 0)
             n = GET_N_LARGE(state);
         else
@@ -114,18 +114,20 @@ TEST_FUNCTION_START(flint_mpn_sqrhigh, state)
 #endif
 
         xp = flint_malloc(sizeof(mp_limb_t) * n);
+        yp = flint_malloc(sizeof(mp_limb_t) * n);
 
         mpn_random2(xp, n);
+        mpn_random2(yp, n);
 
-        if (n <= FLINT_MAX(FLINT_MPN_SQRHIGH_MULDERS_CUTOFF, FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH))
+        if (n <= FLINT_MAX(FLINT_MPN_MULHIGH_MULDERS_CUTOFF, FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH))
         {
             /* Check that it is coherent with generic version */
             mp_limb_t ret0, ret1;
 
             rp = flint_malloc(sizeof(mp_limb_t) * n);
 
-            ret0 = generic_mulhigh_basecase(rpc, xp, xp, n);
-            ret1 = flint_mpn_sqrhigh(rp, xp, n);
+            ret0 = generic_mulhigh_basecase(rpc, xp, yp, n);
+            ret1 = flint_mpn_mulhigh_n(rp, xp, yp, n);
 
             result = (mpn_cmp(rp, rpc, n) == 0 && ret0 == ret1);
             if (!result)
@@ -134,19 +136,20 @@ TEST_FUNCTION_START(flint_mpn_sqrhigh, state)
                         "ix = %wd\n"
                         "n = %wd\n"
                         "xp = %{ulong*}\n"
+                        "yp = %{ulong*}\n"
                         "Expected ret: %{ulong}\n"
                         "Got ret:      %{ulong}\n"
                         "Expected limbs: %{ulong*}\n"
                         "Got limbs:      %{ulong*}\n",
-                        ix, n, xp, n, ret0, ret1, rpc, n, rp, n);
+                        ix, n, xp, n, yp, n, ret0, ret1, rpc, n, rp, n);
         }
         else
         {
             /* Check that it is coherent with bounds */
             rp = flint_malloc(sizeof(mp_limb_t) * (n + 1));
 
-            rp[0] = flint_mpn_sqrhigh(rp + 1, xp, n);
-            flint_mpn_sqr(rpc, xp, n);
+            rp[0] = flint_mpn_mulhigh_n(rp + 1, xp, yp, n);
+            flint_mpn_mul_n(rpc, xp, yp, n);
 
             result = (mpn_cmp(rp, rpcH, n + 1) <= 0);
             if (!result)
@@ -155,9 +158,10 @@ TEST_FUNCTION_START(flint_mpn_sqrhigh, state)
                         "ix = %wd\n"
                         "n = %wd\n"
                         "xp = %{ulong*}\n"
+                        "yp = %{ulong*}\n"
                         "Upper bound: %{ulong*}\n"
                         "Got:         %{ulong*}\n",
-                        ix, n, xp, n, rpcH, n + 1, rp, n + 1);
+                        ix, n, xp, n, yp, n, rpcH, n + 1, rp, n + 1);
 
             /* Check lower bound */
             borrow = mpn_sub_1(rpcH, rpcH, n + 1, lower_bound(n));
@@ -171,12 +175,14 @@ TEST_FUNCTION_START(flint_mpn_sqrhigh, state)
                         "ix = %wd\n"
                         "n = %wd\n"
                         "xp = %{ulong*}\n"
+                        "yp = %{ulong*}\n"
                         "Lower bound: %{ulong*}\n"
                         "Got:         %{ulong*}\n",
-                        ix, n, xp, n, rpcH, n + 1, rp, n + 1);
+                        ix, n, xp, n, yp, n, rpcH, n + 1, rp, n + 1);
         }
 
         flint_free(xp);
+        flint_free(yp);
         flint_free(rp);
     }
 
@@ -184,12 +190,13 @@ TEST_FUNCTION_START(flint_mpn_sqrhigh, state)
 
     TEST_FUNCTION_END(state);
 }
+
 #undef N_MIN
 #undef N_MAX
 #undef WANT_STOR
 #undef rpcH
 #undef MAX_ALLOC_SIZE
 
-#undef GET_N_FULL_SQR
+#undef GET_N_FULL_MUL
 #undef GET_N_LARGE
 #undef GET_N_SMALL

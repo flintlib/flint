@@ -50,9 +50,9 @@ TEST_FUNCTION_START(flint_mpn_sqr, state)
             TEST_FUNCTION_FAIL(
                     "n = %wd\n"
                     "xp = %{ulong*}\n"
-                    "rp1 = %{ulong*}\n"
-                    "rp2 = %{ulong*}\n",
-                    n, xp, n, rp1, 2 * n, rp2, 2 * n);
+                    "Expected: %{ulong*}\n"
+                    "Got:      %{ulong*}\n",
+                    n, xp, n, rp2, 2 * n, rp1, 2 * n);
 
         flint_free(xp);
         flint_free(rp1);
@@ -61,3 +61,9 @@ TEST_FUNCTION_START(flint_mpn_sqr, state)
 
     TEST_FUNCTION_END(state);
 }
+
+#undef N_MIN
+#undef N_MAX
+#undef WANT_BIG
+#undef N_MIN_STOR
+#undef N_MAX_STOR

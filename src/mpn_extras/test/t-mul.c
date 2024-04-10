@@ -72,3 +72,6 @@ TEST_FUNCTION_START(flint_mpn_mul, state)
 
 #undef N_MIN
 #undef N_MAX
+#undef WANT_BIG
+#undef N_MIN_STOR
+#undef N_MAX_STOR

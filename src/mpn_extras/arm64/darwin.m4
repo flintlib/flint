@@ -37,14 +37,29 @@ dnl  don't want to disable macro expansions in or after them.
 changecom
 
 
-dnl  LEA_HI(reg,gmp_symbol), LEA_LO(reg,gmp_symbol)
+dnl  LEA_HI(reg,gmp_symbol)
+dnl  LEA_LO(reg,gmp_symbol)
+dnl  LOH_ADRPADD(labelhi,labello)
 dnl
-dnl  Load the address of gmp_symbol into a register. We split this into two
-dnl  parts to allow separation for manual insn scheduling.  TODO: Darwin allows
-dnl  for relaxing these two insns into an adr and a nop, but that requires the
-dnl  .loh pseudo for connecting them.
+dnl  Load the address of gmp_symbol into a register. label(hi|lo) has
+dnl  to be unique labels that LEA_HI and LEA_LO are put on. We split
+dnl  this into three parts to allow separation for manual insn
+dnl  scheduling. LOH_ADRPADD has to be called as well.
 
-define(`LEA_HI',`adrp	$1, $2@GOTPAGE')dnl
-define(`LEA_LO',`ldr	$1, [$1, $2@GOTPAGEOFF]')dnl
+define(`LEA_HI', `adrp	$1, $2@GOTPAGE')dnl
+define(`LEA_LO', `add	$1, $1, $2@GOTPAGEOFF')dnl
+define(`LOH_ADRPADD', `.loh	AdrpAdd $1, $2')dnl
+
+
+dnl  LBL_HI(reg,gmp_symbol)
+dnl  LBL_LO(reg,gmp_symbol)
+dnl
+dnl  Load the label of gmp_symbol into a register. We split this into
+dnl  three parts to allow separation for manual insn scheduling.
+dnl  LOH_ADRPADD has to be called as well with their respective labels
+dnl  (*not* gmp_symbol).
+
+define(`LBL_HI', `adrp	$1, $2@PAGE')dnl
+define(`LBL_LO', `add	$1, $1, $2@PAGEOFF')dnl
 
 divert`'dnl
