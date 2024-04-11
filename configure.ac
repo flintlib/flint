@@ -1030,8 +1030,11 @@ internals."])])
 internals.])])
 
     dnl The following functions may or may not exist
+    AC_SEARCH_LIBS([__gmpn_invert_limb],[gmp],
+        [AC_DEFINE(FLINT_HAVE_NATIVE_mpn_invert_limb,1,Define if GMP has mpn_invert_limb)])
+
     AC_SEARCH_LIBS([__gmpn_modexact_1_odd],[gmp],
-        [AC_DEFINE(FLINT_HAVE_NATIVE_mpn_modexact_1_odd,1,Define if system has mpn_modexact_1_odd)])
+        [AC_DEFINE(FLINT_HAVE_NATIVE_mpn_modexact_1_odd,1,Define if GMP has mpn_modexact_1_odd)])
 
     AC_SEARCH_LIBS([__gmpn_addmul_2],[gmp],
         [AC_DEFINE(FLINT_HAVE_NATIVE_mpn_addmul_2,1,Define if GMP has mpn_addmul_2)])
