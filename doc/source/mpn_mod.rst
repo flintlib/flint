@@ -241,3 +241,7 @@ All multiplication algorithms optimize for squaring.
     Polynomial multiplication using the small-prime FFT.
     Returns ``GR_UNABLE`` if the small-prime FFT is not available
     or if the coefficients are too large to use this implementation.
+
+.. function:: int _mpn_mod_poly_mullow(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
+
+    Polynomial multiplication using a default algorithm.

@@ -599,6 +599,38 @@ _mpn_mod_poly_mullow_karatsuba(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcpt
 
     nlimbs = MPN_MOD_CTX_NLIMBS(ctx);
     sbits = MPN_MOD_CTX_MODULUS_BITS(ctx);
+
+    if (cutoff == -1)
+    {
+        if (poly1 == poly2 && len1 == len2)
+        {
+            if (sbits <= 128)
+                cutoff = 32;
+            else if (sbits <= 154)
+                cutoff = 24;
+            else if (sbits <= 448)
+                cutoff = 12;
+            else if (sbits <= 600)
+                cutoff = 6;
+            else
+                cutoff = 4;
+        }
+        else
+        {
+            if (sbits <= 155)
+                cutoff = 12;
+            else if (sbits <= 320)
+                cutoff = 8;
+            else if (sbits <= 560)
+                cutoff = 6;
+            else
+                cutoff = 4;
+        }
+
+        cutoff = FLINT_MIN(cutoff, len1);
+        cutoff = FLINT_MIN(cutoff, len2);
+    }
+
     /* b = FLINT_BIT_COUNT(FLINT_MIN(len1, len2)) larger than the bound for
        classical multiplication, since we need padding for up to b
        recursions */

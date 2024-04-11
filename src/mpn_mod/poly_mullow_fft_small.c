@@ -32,6 +32,16 @@ nmod_set_mpn_2(mp_srcptr ad, nmod_t mod)
     return r;
 }
 
+static mp_limb_t
+nmod_set_mpn_3(mp_srcptr ad, nmod_t mod)
+{
+    mp_limb_t r = 0;
+    NMOD_RED2(r, r, ad[2], mod);
+    NMOD_RED2(r, r, ad[1], mod);
+    NMOD_RED2(r, r, ad[0], mod);
+    return r;
+}
+
 /* todo: precomputed inverse */
 static mp_limb_t
 nmod_set_mpn(mp_srcptr ad, mp_size_t an, nmod_t mod)
@@ -74,6 +84,17 @@ static void _mod(
                 aa[5] = nmod_set_mpn_2(a + (i + j + 5) * nlimbs, mod);
                 aa[6] = nmod_set_mpn_2(a + (i + j + 6) * nlimbs, mod);
                 aa[7] = nmod_set_mpn_2(a + (i + j + 7) * nlimbs, mod);
+            }
+            else if (nlimbs == 3)
+            {
+                aa[0] = nmod_set_mpn_3(a + (i + j + 0) * nlimbs, mod);
+                aa[1] = nmod_set_mpn_3(a + (i + j + 1) * nlimbs, mod);
+                aa[2] = nmod_set_mpn_3(a + (i + j + 2) * nlimbs, mod);
+                aa[3] = nmod_set_mpn_3(a + (i + j + 3) * nlimbs, mod);
+                aa[4] = nmod_set_mpn_3(a + (i + j + 4) * nlimbs, mod);
+                aa[5] = nmod_set_mpn_3(a + (i + j + 5) * nlimbs, mod);
+                aa[6] = nmod_set_mpn_3(a + (i + j + 6) * nlimbs, mod);
+                aa[7] = nmod_set_mpn_3(a + (i + j + 7) * nlimbs, mod);
             }
             else
             {
@@ -140,6 +161,7 @@ static void CAT(_crt, NP)( \
             ulong r[N]; \
             ulong t[N]; \
             ulong l = 0; \
+            ulong nn; \
  \
             CAT3(_big_mul, N, M)(r, t, _crt_data_co_prime(Rcrts + np - 1, l, n), Xs[l*BLK_SZ + j]); \
             for (l++; l < np; l++) \
@@ -147,12 +169,10 @@ static void CAT(_crt, NP)( \
  \
             CAT(_reduce_big_sum, N)(r, t, crt_data_prod_primes(Rcrts + np - 1)); \
  \
-            if (mpn_cmp(r, Mhalf, N) > 0) \
-            { \
-                flint_abort(); /* coefficients must be unsigned */ \
-            } \
-            else \
-                mpn_mod_set_mpn(z + (i + j - zl) * nlimbs, r, N, ctx); \
+            FLINT_ASSERT(mpn_cmp(r, Mhalf, N) <= 0); /* coefficients must be unsigned */ \
+            nn = N; \
+            MPN_NORM(r, nn); \
+            mpn_mod_set_mpn(z + (i + j - zl) * nlimbs, r, nn, ctx); \
         } \
     } \
 }
