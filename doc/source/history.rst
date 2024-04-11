@@ -14,10 +14,14 @@ Edgar Costa (EC), Fredrik Johansson (FJ), Vincent Neiger (VN).
 
 * Features
 
-  * Add new module ``mpn_mod`` for fixed-size modulo arithmetic (FJ).
+  * Add new module ``mpn_mod`` for fixed-size few-word modulo arithmetic (FJ).
   * Implement computing qqbar roots of qqbar polynomials (FJ).
-  * Add generic C mulhigh (FJ).
+  * Implement generic ``flint_mpn_mulhigh`` and ``flint_mpn_sqrhigh`` for all
+    ranges based on Mulders' algorithm (FJ).
   * Implement ``n_factor_evaluate`` (AA).
+  * Add ``gr_poly_mul_karatsuba`` (FJ).
+  * Wrap some more methods in ``flint_ctypes`` (FJ).
+  * Handle valuations and exact results in ``gr_series_div`` (FJ).
 
 * Examples
 
@@ -30,8 +34,6 @@ Edgar Costa (EC), Fredrik Johansson (FJ), Vincent Neiger (VN).
     the ADX instruction set for adding two `n` limbed integers onto another `n`
     limbed integer inplace, returning the carry (AA).
   * Replace ``flint_mpn_divexact_1`` with ``mpn_divexact_1`` (AA).
-  * Implement generic ``flint_mpn_mulhigh`` and ``flint_mpn_sqrhigh`` for all
-    ranges based on Mulders' algorithm (FJ).
   * Add ``flint_mpn_mul_Xn`` for `X < 16` on Arm v8, outperforming GMP on Apple
     M1 (AA).
   * Add ``flint_mpn_mul_2`` for Arm v8 (AA).
@@ -41,7 +43,7 @@ Edgar Costa (EC), Fredrik Johansson (FJ), Vincent Neiger (VN).
     taken from GMP, and an Arm v8 version was added as well (AA).
   * Use ``flint_mpn_mulhigh`` in ``mpn_*_preinvn`` methods (FJ).
   * Avoid 8x excessive memory allocation in ``fmpz`` preinvn functions (FJ).
-  * Use ``flint_mpn_mulhigh`` for unbalances preinvn divisions (FJ).
+  * Use ``flint_mpn_mulhigh`` for unbalanced preinvn divisions (FJ).
   * Minimize 32-bit instructions in ``x86_64`` assembly.
   * Add ``flint_mpn_mullow_N`` for `N \le 8` on x86_64 architectures supporting
     the ADX instruction set (AA).
@@ -53,6 +55,8 @@ Edgar Costa (EC), Fredrik Johansson (FJ), Vincent Neiger (VN).
   * Add ``flint_mpn_sqrhigh_N`` routines for `N \le 8` for Arm v8 (AA).
   * Add ``_flint_mpn_mulhigh_basecase`` routines Arm v8 optimized for Apple M1
     (AA).
+  * In gr matrix rings, call ``gr_mat_mul`` rather than ``gr_mat_mul_classical`` (FJ).
+  * Change generic truncated power series to use ``gr_poly`` instead of ``gr_series`` as the data type (FJ).
 
 * Bug fixes
 
@@ -64,6 +68,8 @@ Edgar Costa (EC), Fredrik Johansson (FJ), Vincent Neiger (VN).
   * Fix bug in ``gr_series`` (FJ).
   * Fix primitive root prime (VN).
   * Do not include ``crt_helpers.h`` on 32-bit systems (FJ).
+  * Fix ``gr_ctx_is_finite_characteristic`` for ``fmpz_mod`` (FJ).
+  * Fix setting generator names for univariate gr rings (FJ).
 
 * Build system
 
@@ -87,6 +93,8 @@ Edgar Costa (EC), Fredrik Johansson (FJ), Vincent Neiger (VN).
   * Cleanup tests related to assembly routines in ``mpn_extras`` (AA).
   * Add more test code for ``gr_series`` (FJ).
   * Fix warning in test (AA).
+  * Add functions ``gr_mat_test_mul``, ``gr_mat_test_lu`` and
+    ``gr_poly_test_mullow`` for testing generics overrides (FJ).
 
 * Profiling
 
@@ -136,23 +144,10 @@ Edgar Costa (EC), Fredrik Johansson (FJ), Vincent Neiger (VN).
   * Clarify usage of inline assembly addition and subtraction macros such as
     ``add_ssaaaa`` (AA).
   * Fix another typo (BA).
-  * Some explanations for ``mpn_ctx_mpn_mul`` (?) (FJ).
+  * Some explanations for ``mpn_ctx_mpn_mul`` (FJ).
   * Add human-readable text to documentation of ``ordering_t`` (RB).
   * Document Generic Ring setters for infinities and extended values (RB).
   * Fix documentation of ``gr_comp_other`` (Marc Mezzarobba).
-
-* ``flint_ctypes``: wrap ``is_zero_ring`` (?) (FJ).
-* handle valuations and exact results in ``gr_series_div`` (?) (FJ).
-* gr series mods based directly on gr_poly (?) (FJ).
-* fix setting generator names for univariate gr rings (FJ).
-* gr fmpz_mod: is finite characteristic (?) (FJ).
-* fix bug; test matrices (?) (FJ).
-* verbose tests (?) (FJ).
-* fix bug; test some more (?) (FJ).
-
-Note to Fredrik: Please expand more on ``mpn_mod`` stuff, and perhaps more GR
-stuff! I stopped reading your commits past
-32c4d71005a511c1e91301ac576012fa45246eb3
 
 
 2024-03-18 -- FLINT 3.1.2
