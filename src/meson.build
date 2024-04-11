@@ -1947,6 +1947,7 @@ c_files_all_subdir = [
   'fft/mul_truncate_sqrt2.c',
   'fft/negmod_2expp1.c',
   'fft/normmod_2expp1.c',
+  # These are added by detection/meson.build conditionally.
   #'fft_small/default_ctx.c',
   #'fft_small/fmpz_poly_mul.c',
   #'fft_small/mpn_helpers.c',
@@ -5275,7 +5276,7 @@ c_files_all_subdir = [
   'qsieve/poly.c',
   'qsieve/primes_init.c',
   'qsieve/square_root.c',
-  'test/main.c',
+  #'test/main.c',
   'thread_pool/clear.c',
   'thread_pool/distribute_work.c',
   'thread_pool/find_work.c',
