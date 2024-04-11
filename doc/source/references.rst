@@ -129,7 +129,9 @@ References
 
 .. [GowWag2008] \Jason Gower and Sam Wagstaff : "Square form factoring" Math. Comp. 77, 2008, pp 551-588, https://doi.org/10.1090/S0025-5718-07-02010-8
 
-.. [GraMol2010] \Torbjorn Granlund and Niels Moller : Improved Division by Invariant Integers https://gmplib.org/~tege/division-paper.pdf
+.. [GraMol2010] \Torbjörn Granlund and Niels Möller : Improved Division by Invariant Integers, https://gmplib.org/~tege/division-paper.pdf
+
+.. [GraMon1994] \Törbjorn Granlund and Peter L. Montgomery : Division by Invariant Integers using Multiplication https://gmplib.org/~tege/divcnst-pldi94.pdf
 
 .. [HM2017] \J. van der Hoeven and B. Mourrain. "Efficient certification of numeric solutions to eigenproblems", MACIS 2017, 81-94, (2017), https://hal.archives-ouvertes.fr/hal-01579079
 
