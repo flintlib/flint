@@ -23,7 +23,8 @@ add_project_arguments(
   '-DFLINT_NOSTDIO',
   '-DFLINT_NOSTDARG',
   '-Werror=implicit-function-declaration',
-  language: 'c')
+  language: 'c',
+)
 
 subdir('src')
 
@@ -48,8 +49,16 @@ install_headers(headers_all, subdir: 'flint')
 libflint = library('flint', c_files_all,
   dependencies: flint_deps,
   include_directories: include_directories('src'),
-  install: true
+  install: true,
 )
+
+subdir('src/fmpz/test')
+subdir('src/fmpq/test')
+# ulong_extras tests fails with linker error:
+# Undefined symbols for architecture arm64:
+#  "_n_factor_evaluate", referenced from:
+#      _test_n_factor in main.c.o
+#subdir('src/ulong_extras/test')
 
 pkg_mod = import('pkgconfig')
 pkg_mod.generate(

@@ -1,3 +1,5 @@
+src_inc = include_directories('.')
+
 headers = [
   'flint.h',
   'flint-config.h',
