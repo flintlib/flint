@@ -1,4 +1,5 @@
 /*
+    Copyright (C) 2021 Daniel Schultz
     Copyright (C) 2024 Fredrik Johansson
 
     This file is part of FLINT.
