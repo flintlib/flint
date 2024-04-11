@@ -192,8 +192,7 @@ Basic arithmetic with precomputed inverses
         invxl = (B^2 - B*x - 1)/x = (B^2 - 1)/x - B
 
     Note that `x` must be normalised, i.e. with msb set. This inverse
-    makes use of the following theorem of Torbjorn Granlund and Peter
-    Montgomery~[Lemma~8.1][GraMon1994]_:
+    makes use of Lemma 8.1 in [GraMon1994]_:
 
     Let `d` be normalised, `d < B`, i.e. it fits in a word, and suppose
     that `m d < B^2 \leq (m+1) d`. Let `0 \leq n \leq B d - 1`.  Write
