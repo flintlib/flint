@@ -67,7 +67,6 @@ Edgar Costa (EC), Fredrik Johansson (FJ), Vincent Neiger (VN).
   * Fix assertion in ``flint_mpn_mulhigh`` (AA).
   * Fix bug in ``gr_series`` (FJ).
   * Fix primitive root prime (VN).
-  * Do not include ``crt_helpers.h`` on 32-bit systems (FJ).
   * Fix ``gr_ctx_is_finite_characteristic`` for ``fmpz_mod`` (FJ).
   * Fix setting generator names for univariate gr rings (FJ).
 
@@ -147,7 +146,7 @@ Edgar Costa (EC), Fredrik Johansson (FJ), Vincent Neiger (VN).
   * Some explanations for ``mpn_ctx_mpn_mul`` (FJ).
   * Add human-readable text to documentation of ``ordering_t`` (RB).
   * Document Generic Ring setters for infinities and extended values (RB).
-  * Fix documentation of ``gr_comp_other`` (Marc Mezzarobba).
+  * Fix documentation of ``gr_cmp_other`` (Marc Mezzarobba).
 
 
 2024-03-18 -- FLINT 3.1.2
