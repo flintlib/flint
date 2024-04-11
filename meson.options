@@ -1,0 +1,4 @@
+option('fft_small', type : 'feature', value : 'auto',
+        description: 'Build the fft_small module')
+option('assembly', type : 'feature', value : 'auto',
+        description: 'Use assembly code')
