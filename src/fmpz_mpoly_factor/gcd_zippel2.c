@@ -280,7 +280,7 @@ static void n_polyun_mod_zip_eval_cur_inc_coeff(
     nmod_t ctx)
 {
     slong i, Ei;
-    slong e0, e1;
+    ulong e0, e1;
     mp_limb_t c;
     n_poly_struct * Ec;
 
@@ -726,7 +726,7 @@ static int _nmod_mpoly_bma_get_fmpz_mpoly2(
         {
             this_exp = new_exp % Ictx->subdegs[j];
             new_exp = new_exp / Ictx->subdegs[j];
-            if (this_exp > Ictx->degbounds[j])
+            if ((slong) this_exp > Ictx->degbounds[j])
                 return 0;
             (Aexps + N*i)[offsets[j]] |= this_exp << shifts[j];
         }
@@ -828,7 +828,7 @@ static int _fmpz_mod_bma_get_fmpz_mpoly2(
         {
             this_exp = fmpz_fdiv_ui(new_exp, Ictx->subdegs[j]);
             fmpz_fdiv_q_ui(new_exp, new_exp, Ictx->subdegs[j]);
-            if (this_exp > Ictx->degbounds[j])
+            if ((slong) this_exp > Ictx->degbounds[j])
             {
                 success = 0;
                 goto cleanup;
@@ -1239,7 +1239,7 @@ void _fmpz_mpoly_ksub_content(
           -1: better degree bound is in GevaldegXY
 */
 
-int static _random_check_sp(
+static int _random_check_sp(
     ulong * GevaldegXY,
     ulong GdegboundXY,
     int which_check,
@@ -1323,7 +1323,7 @@ int static _random_check_sp(
     return 1; /* Hmm */
 }
 
-int static _random_check_mp(
+static int _random_check_mp(
     ulong * GevaldegXY,
     ulong GdegboundXY,
     int which_check,
@@ -1895,13 +1895,13 @@ pick_bma_prime:
         if (GLambda_sp->pointcount/2 >= Gamma->length &&
             !nmod_bma_mpoly_reduce(GLambda_sp) &&
             nmod_bma_mpoly_get_fmpz_mpoly2(H, Hmarks, ctx, sshift_sp, GLambda_sp, Ictx, ctx_sp) &&
-            Hmarks->coeffs[1] == Gamma->length)
+            Hmarks->coeffs[1] == (ulong) Gamma->length)
         {
             which_check = 0;
             goto check_sp;
         }
 
-        if (AbarLambda_sp->pointcount/2 >= Amarks->coeffs[1] &&
+        if ((ulong) (AbarLambda_sp->pointcount/2) >= Amarks->coeffs[1] &&
             !nmod_bma_mpoly_reduce(AbarLambda_sp) &&
             nmod_bma_mpoly_get_fmpz_mpoly2(H, Hmarks, ctx, sshift_sp, AbarLambda_sp, Ictx, ctx_sp) &&
             Hmarks->coeffs[1] == Amarks->coeffs[1])
@@ -1910,7 +1910,7 @@ pick_bma_prime:
             goto check_sp;
         }
 
-        if (BbarLambda_sp->pointcount/2 >= Bmarks->coeffs[1] &&
+        if ((ulong) (BbarLambda_sp->pointcount/2) >= Bmarks->coeffs[1] &&
             !nmod_bma_mpoly_reduce(BbarLambda_sp) &&
             nmod_bma_mpoly_get_fmpz_mpoly2(H, Hmarks, ctx, sshift_sp, BbarLambda_sp, Ictx, ctx_sp) &&
             Hmarks->coeffs[1] == Bmarks->coeffs[1])
@@ -1919,7 +1919,7 @@ pick_bma_prime:
             goto check_sp;
         }
 
-        if (GLambda_sp->pointcount/2 > ABtotal_length)
+        if ((ulong) (GLambda_sp->pointcount/2) > ABtotal_length)
         {
             success = 0;
             goto cleanup;
@@ -2110,13 +2110,13 @@ pick_bma_prime:
         if (GLambda_mp->pointcount/2 >= Gamma->length &&
             !fmpz_mod_bma_mpoly_reduce(GLambda_mp, ctx_mp) &&
             fmpz_mod_bma_mpoly_get_fmpz_mpoly2(H, Hmarks, ctx, sshift_mp, GLambda_mp, Ictx, ctx_mp) &&
-            Hmarks->coeffs[1] == Gamma->length)
+            Hmarks->coeffs[1] == (ulong) Gamma->length)
         {
             which_check = 0;
             goto check_mp;
         }
 
-        if (AbarLambda_mp->pointcount/2 >= Bmarks->coeffs[1] &&
+        if ((ulong) (AbarLambda_mp->pointcount/2) >= Bmarks->coeffs[1] &&
             !fmpz_mod_bma_mpoly_reduce(AbarLambda_mp, ctx_mp) &&
             fmpz_mod_bma_mpoly_get_fmpz_mpoly2(H, Hmarks, ctx, sshift_mp, AbarLambda_mp, Ictx, ctx_mp) &&
             Hmarks->coeffs[1] == Amarks->coeffs[1])
@@ -2125,7 +2125,7 @@ pick_bma_prime:
             goto check_mp;
         }
 
-        if (BbarLambda_mp->pointcount/2 >= Bmarks->coeffs[1] &&
+        if ((ulong) (BbarLambda_mp->pointcount/2) >= Bmarks->coeffs[1] &&
             !fmpz_mod_bma_mpoly_reduce(BbarLambda_mp, ctx_mp) &&
             fmpz_mod_bma_mpoly_get_fmpz_mpoly2(H, Hmarks, ctx, sshift_mp, BbarLambda_mp, Ictx, ctx_mp) &&
             Hmarks->coeffs[1] == Bmarks->coeffs[1])
@@ -2134,7 +2134,7 @@ pick_bma_prime:
             goto check_mp;
         }
 
-        if (GLambda_mp->pointcount/2 > ABtotal_length)
+        if ((ulong) (GLambda_mp->pointcount/2) > ABtotal_length)
         {
             success = 0;
             goto cleanup;

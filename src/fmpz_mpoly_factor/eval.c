@@ -167,7 +167,7 @@ next:
         stop++;
 
     fmpz_poly_fit_length(E, e + 1);
-    while (E->length <= e)
+    while ((ulong) E->length <= e)
     {
         fmpz_zero(E->coeffs + E->length);
         E->length++;

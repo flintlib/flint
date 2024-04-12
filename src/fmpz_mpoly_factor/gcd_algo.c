@@ -172,7 +172,7 @@ void fmpz_mpoly_evals(
             flint_bitcnt_t bits = FLINT_BIT_COUNT(Amax_exp[j]);
             xpoweval = alpha[j]; /* xpoweval = alpha[j]^(2^i) */
             xinvpoweval = nmod_inv(xpoweval, (out + 0)->mod); /* alpha[j]^(-2^i) */
-            for (i = 0; i < bits; i++)
+            for (i = 0; (ulong) i < bits; i++)
             {
                 LUToffset[LUTlen] = offsets[j];
                 LUTmask[LUTlen] = (UWORD(1) << (shifts[j] + i));
