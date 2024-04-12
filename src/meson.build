@@ -5306,6 +5306,7 @@ c_files_all_subdir = [
   'ulong_extras/euler_phi.c',
   'ulong_extras/factor.c',
   'ulong_extras/factor_ecm.c',
+  'ulong_extras/factor_misc.c',
   'ulong_extras/factorial_fast_mod2_preinv.c',
   'ulong_extras/factorial_mod2_preinv.c',
   'ulong_extras/factor_insert.c',

@@ -19,9 +19,6 @@ mpfr_dep = dependency('mpfr', version: '>= 4.1.0')
 flint_deps = [gmp_dep, mpfr_dep, m_dep]
 
 add_project_arguments(
-  '-DBUILDING_FLINT',
-  '-DFLINT_NOSTDIO',
-  '-DFLINT_NOSTDARG',
   '-Werror=implicit-function-declaration',
   language: 'c',
 )
@@ -50,15 +47,22 @@ libflint = library('flint', c_files_all,
   dependencies: flint_deps,
   include_directories: include_directories('src'),
   install: true,
+  c_args: [
+    '-DBUILDING_FLINT',
+    '-DFLINT_NOSTDIO',
+    '-DFLINT_NOSTDARG',
+  ]
 )
 
-subdir('src/fmpz/test')
-subdir('src/fmpq/test')
-# ulong_extras tests fails with linker error:
-# Undefined symbols for architecture arm64:
-#  "_n_factor_evaluate", referenced from:
-#      _test_n_factor in main.c.o
-#subdir('src/ulong_extras/test')
+tests_opt = get_option('tests')
+if tests_opt.enabled()
+  subdir('src/fmpz/test')
+  subdir('src/fmpq/test')
+  subdir('src/ulong_extras/test')
+else
+  bad_test_exe = executable('bad_test', 'bad_test.c')
+  test('Need to build tests with -Dtests=enabled', bad_test_exe)
+endif
 
 pkg_mod = import('pkgconfig')
 pkg_mod.generate(
