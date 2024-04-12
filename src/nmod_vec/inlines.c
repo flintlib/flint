@@ -11,4 +11,13 @@
 
 #define NMOD_VEC_INLINES_C
 
+#if defined(__GNUC__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 #include "nmod_vec.h"
+
+#if defined(__GNUC__)
+# pragma GCC diagnostic pop
+#endif

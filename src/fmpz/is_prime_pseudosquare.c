@@ -14,7 +14,7 @@
 #include "fmpz.h"
 
 #ifndef FLINT64
-mp_limb_t flint_fmpz_pseudosquares[][3] =
+static const mp_limb_t flint_fmpz_pseudosquares[][3] =
 {
    { 17, 0, 0 },
    { 73, 0, 0 },
@@ -173,7 +173,7 @@ mp_limb_t flint_fmpz_pseudosquares[][2] =
 
 #define FLINT_NUM_FMPZ_PSEUDOSQUARES 74
 
-void fmpz_set_pseudosquare(fmpz_t f, unsigned int i)
+static void fmpz_set_pseudosquare(fmpz_t f, unsigned int i)
 {
 #ifndef FLINT64
    if (i < 25)

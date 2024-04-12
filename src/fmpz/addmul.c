@@ -22,6 +22,11 @@
             _mpz_realloc(z, nlimbs); \
     } while (0)
 
+/* Is used in submul.c as well */
+#if defined(__GNUC__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
 /* Will not get called with x or y small. */
 void
 _flint_mpz_addmul_large(mpz_ptr z, mpz_srcptr x, mpz_srcptr y, int negate)
@@ -163,6 +168,9 @@ _flint_mpz_addmul_large(mpz_ptr z, mpz_srcptr x, mpz_srcptr y, int negate)
 
     TMP_END;
 }
+#if defined(__GNUC__)
+# pragma GCC diagnostic pop
+#endif
 
 void fmpz_addmul(fmpz_t f, const fmpz_t g, const fmpz_t h)
 {

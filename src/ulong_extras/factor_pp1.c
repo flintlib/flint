@@ -66,7 +66,7 @@ void n_pp1_print(mp_limb_t x, mp_limb_t y, ulong norm)
       y = n_submod(y, two, n);                  \
    } while (0)
 
-void n_pp1_pow_ui(mp_limb_t * x, mp_limb_t * y, ulong exp,
+static void n_pp1_pow_ui(mp_limb_t * x, mp_limb_t * y, ulong exp,
                     mp_limb_t n, mp_limb_t ninv, ulong norm)
 {
    const mp_limb_t x0 = *x;
@@ -87,7 +87,7 @@ void n_pp1_pow_ui(mp_limb_t * x, mp_limb_t * y, ulong exp,
    }
 }
 
-mp_limb_t n_pp1_factor(mp_limb_t n, mp_limb_t x, ulong norm)
+static mp_limb_t n_pp1_factor(mp_limb_t n, mp_limb_t x, ulong norm)
 {
    if (norm)
    {
@@ -102,7 +102,7 @@ mp_limb_t n_pp1_factor(mp_limb_t n, mp_limb_t x, ulong norm)
    return n_gcd(n, x);
 }
 
-mp_limb_t n_pp1_find_power(mp_limb_t * x, mp_limb_t * y,
+static mp_limb_t n_pp1_find_power(mp_limb_t * x, mp_limb_t * y,
                   ulong p, mp_limb_t n, mp_limb_t ninv, ulong norm)
 {
    mp_limb_t factor;

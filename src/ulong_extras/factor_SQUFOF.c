@@ -12,7 +12,7 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-mp_limb_t _ll_factor_SQUFOF(mp_limb_t n_hi, mp_limb_t n_lo, ulong max_iters)
+static mp_limb_t _ll_factor_SQUFOF(mp_limb_t n_hi, mp_limb_t n_lo, ulong max_iters)
 {
     mp_limb_t n[2];
     mp_limb_t sqrt[2];

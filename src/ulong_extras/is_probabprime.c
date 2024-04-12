@@ -161,7 +161,7 @@ n_is_probabprime_fermat(mp_limb_t n, mp_limb_t i)
         return n_powmod2_ui_preinv(i, n - 1, n, n_preinvert_limb(n)) == UWORD(1);
 }
 
-n_pair_t
+static n_pair_t
 fchain_precomp(mp_limb_t m, mp_limb_t n, double npre)
 {
     n_pair_t current = {0, 0}, old;
@@ -200,7 +200,7 @@ fchain_precomp(mp_limb_t m, mp_limb_t n, double npre)
     return current;
 }
 
-n_pair_t
+static n_pair_t
 fchain2_preinv(mp_limb_t m, mp_limb_t n, mp_limb_t ninv)
 {
     n_pair_t current = {0, 0}, old;
@@ -273,7 +273,7 @@ n_is_probabprime_fibonacci(mp_limb_t n)
     }
 }
 
-n_pair_t
+static n_pair_t
 lchain_precomp(mp_limb_t m, mp_limb_t a, mp_limb_t n, double npre)
 {
     n_pair_t current = {0, 0}, old;
@@ -310,7 +310,7 @@ lchain_precomp(mp_limb_t m, mp_limb_t a, mp_limb_t n, double npre)
     return current;
 }
 
-n_pair_t
+static n_pair_t
 lchain2_preinv(mp_limb_t m, mp_limb_t a, mp_limb_t n, mp_limb_t ninv)
 {
     n_pair_t current = {0, 0}, old;

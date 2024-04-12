@@ -12,6 +12,11 @@
 
 #include "mpn_extras.h"
 
+#if defined(__GNUC__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 #if FLINT_HAVE_ASSEMBLY_x86_64_adx
 
 mp_limb_t flint_mpn_mul_1_1(mp_ptr, mp_srcptr, mp_srcptr);
@@ -892,4 +897,8 @@ const flint_mpn_mul_func_t flint_mpn_mul_n_func_tab[] = {
     MUL( 7, 7),
 };
 
+#endif
+
+#if defined(__GNUC__)
+# pragma GCC diagnostic pop
 #endif

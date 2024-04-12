@@ -21,7 +21,7 @@
 #endif
 
 /* Only those with odd index */
-const ulong ULONG_PRIMORIALS[] =
+static const ulong ULONG_PRIMORIALS[] =
 {
     UWORD(6),
     UWORD(30),
@@ -55,7 +55,7 @@ const ulong ULONG_PRIMORIALS[] =
 
 #define PROD_LIMBS_DIRECT_CUTOFF 50
 
-mp_size_t mpn_prod_limbs_direct(mp_limb_t * result, const mp_limb_t * factors,
+static mp_size_t mpn_prod_limbs_direct(mp_limb_t * result, const mp_limb_t * factors,
     mp_size_t n)
 {
     mp_size_t k, len;
@@ -79,7 +79,7 @@ mp_size_t mpn_prod_limbs_direct(mp_limb_t * result, const mp_limb_t * factors,
     return len;
 }
 
-mp_size_t mpn_prod_limbs_balanced(mp_limb_t * result, mp_limb_t * scratch,
+static mp_size_t mpn_prod_limbs_balanced(mp_limb_t * result, mp_limb_t * scratch,
                              const mp_limb_t * factors, mp_size_t n, ulong bits)
 {
     mp_size_t an, bn, alen, blen, len;
@@ -112,7 +112,7 @@ mp_size_t mpn_prod_limbs_balanced(mp_limb_t * result, mp_limb_t * scratch,
     bits must be set to some bound on the bit size of the entries
     in factors. If no bound is known, simply use FLINT_BITS.
 */
-mp_size_t mpn_prod_limbs(mp_limb_t * result, const mp_limb_t * factors,
+static mp_size_t mpn_prod_limbs(mp_limb_t * result, const mp_limb_t * factors,
     mp_size_t n, ulong bits)
 {
     mp_size_t len, limbs;

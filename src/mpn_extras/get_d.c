@@ -86,7 +86,7 @@ MA 02110-1301, USA. */
    handling routines, and gets the sign wrong.  We don't use such a limb to
    double cast, neither in the IEEE or generic code.  */
 
-#include "flint.h"
+#include "mpn_extras.h"
 
 /* assumes unsigned int is at least 32 bits */
 #if defined (FLINT_BIG_ENDIAN) && FLINT_BIG_ENDIAN == 1

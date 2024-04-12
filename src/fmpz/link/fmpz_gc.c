@@ -34,7 +34,7 @@ ulong mpz_free_num = 0;
 ulong mpz_free_alloc = 0;
 
 #if FLINT_USES_PTHREAD
-void fmpz_lock_init()
+static void fmpz_lock_init()
 {
    pthread_mutex_init(&fmpz_lock, NULL);
 }

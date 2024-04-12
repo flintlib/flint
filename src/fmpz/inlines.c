@@ -11,8 +11,17 @@
 
 #define FMPZ_INLINES_C
 
+#if defined(__GNUC__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 #include "gmpcompat.h"
 #include "fmpz.h"
+
+#if defined(__GNUC__)
+# pragma GCC diagnostic pop
+#endif
 
 void _fmpz_promote_set_ui(fmpz_t f, ulong v)
 {

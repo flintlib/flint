@@ -67,7 +67,7 @@ typedef struct
     int op;
 } nmod_mat_transpose_arg_t;
 
-void
+static void
 _nmod_mat_addmul_transpose_worker(void * arg_ptr)
 {
     nmod_mat_transpose_arg_t arg = *((nmod_mat_transpose_arg_t *) arg_ptr);
@@ -225,7 +225,7 @@ typedef struct
     int op;
 } nmod_mat_packed_arg_t;
 
-void
+static void
 _nmod_mat_addmul_packed_worker(void * arg_ptr)
 {
     nmod_mat_packed_arg_t arg = *((nmod_mat_packed_arg_t *) arg_ptr);
@@ -445,7 +445,7 @@ _nmod_mat_mul_classical_threaded_pool_op(nmod_mat_t D, const nmod_mat_t C,
     }
 }
 
-void
+static void
 _nmod_mat_mul_classical_threaded_op(nmod_mat_t D, const nmod_mat_t C,
             const nmod_mat_t A, const nmod_mat_t B, int op)
 {

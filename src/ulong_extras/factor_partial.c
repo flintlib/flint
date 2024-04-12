@@ -12,7 +12,7 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-int is_prime2(mp_limb_t n, int proved)
+static int is_prime2(mp_limb_t n, int proved)
 {
    if (proved) return n_is_prime(n);
    else return n_is_probabprime(n);

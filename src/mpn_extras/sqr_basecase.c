@@ -11,6 +11,11 @@
 
 #include "mpn_extras.h"
 
+#if defined(__GNUC__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 #if FLINT_HAVE_ASSEMBLY_x86_64_adx
 
 mp_limb_t flint_mpn_sqr_1(mp_ptr, mp_srcptr);
@@ -131,4 +136,8 @@ const flint_mpn_sqr_func_t flint_mpn_sqr_func_tab[] = {
     NULL,
 };
 
+#endif
+
+#if defined(__GNUC__)
+# pragma GCC diagnostic pop
 #endif

@@ -13,7 +13,7 @@
 #include "nmod.h"
 #include "nmod_poly.h"
 
-void _nmod_poly_rem_q1(mp_ptr R,
+static void _nmod_poly_rem_q1(mp_ptr R,
                        mp_srcptr A, slong lenA, mp_srcptr B, slong lenB,
                        nmod_t mod)
 {

@@ -318,7 +318,7 @@ static void s2worker_func(void* varg)
          X->stride, X->crts + X->offset, X->nlimbs, X->mpn_mod_ctx);
 }
 
-int _mpn_mod_poly_mulmid_fft_small_internal(mp_ptr z, ulong zl, ulong zh,
+static int _mpn_mod_poly_mulmid_fft_small_internal(mp_ptr z, ulong zl, ulong zh,
     mp_srcptr a, ulong an,
     mp_srcptr b, ulong bn,
     mpn_ctx_t R, gr_ctx_t ctx)

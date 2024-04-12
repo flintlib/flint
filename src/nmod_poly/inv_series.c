@@ -16,6 +16,11 @@
 #include "nmod_poly.h"
 #include "gr_poly.h"
 
+#if defined(__GNUC__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+/* Used in gr/nmod.c */
 void
 _nmod_poly_inv_series_basecase_preinv1(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, mp_limb_t q, nmod_t mod)
 {
@@ -47,6 +52,9 @@ _nmod_poly_inv_series_basecase_preinv1(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slo
         }
     }
 }
+#if defined(__GNUC__)
+# pragma GCC diagnostic pop
+#endif
 
 void
 _nmod_poly_inv_series_basecase(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nmod_t mod)

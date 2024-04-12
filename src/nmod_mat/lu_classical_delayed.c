@@ -21,7 +21,7 @@ nmod_set_uiuiui(ulong s2, ulong s1, ulong s0, nmod_t mod)
     return s0;
 }
 
-slong
+static slong
 nmod_mat_lu_classical_delayed_1(slong * P, nmod_mat_t A, int rank_check)
 {
     mp_limb_t d, e, f, **a;
@@ -121,7 +121,7 @@ nmod_mat_lu_classical_delayed_1(slong * P, nmod_mat_t A, int rank_check)
     return rank;
 }
 
-slong
+static slong
 nmod_mat_lu_classical_delayed_2(slong * P, nmod_mat_t A, int rank_check)
 {
     mp_limb_t d, e, f, **a;
@@ -291,7 +291,7 @@ nmod_mat_lu_classical_delayed_2(slong * P, nmod_mat_t A, int rank_check)
     return rank;
 }
 
-slong
+static slong
 nmod_mat_lu_classical_delayed_3(slong * P, nmod_mat_t A, int rank_check)
 {
     mp_limb_t d, e, f, **a;

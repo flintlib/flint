@@ -12,7 +12,7 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-mp_limb_t
+static mp_limb_t
 n_sqr_and_add_a(mp_limb_t y, mp_limb_t a, mp_limb_t n, mp_limb_t ninv,
               mp_limb_t normbits)
 {

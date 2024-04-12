@@ -11,5 +11,13 @@
 
 #define ULONG_EXTRAS_INLINES_C
 
-#include "flint.h"
+#if defined(__GNUC__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 #include "ulong_extras.h"
+
+#if defined(__GNUC__)
+# pragma GCC diagnostic pop
+#endif

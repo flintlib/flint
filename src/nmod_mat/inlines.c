@@ -12,7 +12,16 @@
 
 #define NMOD_MAT_INLINES_C
 
+#if defined(__GNUC__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 #include "nmod_mat.h"
+
+#if defined(__GNUC__)
+# pragma GCC diagnostic pop
+#endif
 
 void nmod_mat_set_entry(nmod_mat_t mat, slong i, slong j, mp_limb_t x)
 {

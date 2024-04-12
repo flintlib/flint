@@ -153,6 +153,11 @@ _fmpz_get_str_recursive(char * s, slong num_digits, const fmpz_t f, const slong 
     }
 }
 
+#if defined(__GNUC__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+/* Used in test/t-get_str.c */
 char *
 fmpz_get_str_bsplit_threaded(char * s, const fmpz_t f)
 {
@@ -232,6 +237,10 @@ fmpz_get_str_bsplit_threaded(char * s, const fmpz_t f)
 
     return s;
 }
+
+#if defined(__GNUC__)
+# pragma GCC diagnostic pop
+#endif
 
 char * fmpz_get_str(char * str, int b, const fmpz_t f)
 {

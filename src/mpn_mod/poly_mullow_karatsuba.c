@@ -11,6 +11,11 @@
 
 #include "mpn_mod.h"
 
+#if defined(__GNUC__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+/* Used in poly_mullow_classical.c */
 void _mpn_dot_rev_2x2_3(mp_ptr s, mp_srcptr a, mp_srcptr b, slong len)
 {
     mp_limb_t A0, A1, B0, B1;
@@ -232,6 +237,9 @@ _mpn_dot_rev_nxn_2np1(mp_ptr res, mp_srcptr a, mp_srcptr b, slong len, mp_size_t
         res[slimbs - 1] += mpn_add_n(res, res, t, 2 * nlimbs);
     }
 }
+#if defined(__GNUC__)
+# pragma GCC diagnostic pop
+#endif
 
 
 /* Sets {res,len*slimbs} viewed as a polynomial with length-slimbs coefficients

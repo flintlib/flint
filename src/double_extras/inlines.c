@@ -11,5 +11,13 @@
 
 #define DOUBLE_EXTRAS_INLINES_C
 
-#include "flint.h"
+#if defined(__GNUC__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 #include "double_extras.h"
+
+#if defined(__GNUC__)
+# pragma GCC diagnostic pop
+#endif
