@@ -40,7 +40,8 @@ int fq_zech_mpoly_equal(const fq_zech_mpoly_t poly1, const fq_zech_mpoly_t poly2
                                                  const fq_zech_mpoly_ctx_t ctx)
 {
     ulong * ptr1 = poly1->exps, * ptr2 = poly2->exps;
-    slong max_bits, N;
+    flint_bitcnt_t max_bits;
+    slong N;
     int r, free1 = 0, free2 = 0;
 
     if (poly1 == poly2)
