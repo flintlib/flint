@@ -188,9 +188,9 @@ DEFINE_IT(8, 7, 6)  /* 400 bits */
 
 /* 50 bits (unused) */
 static void _crt_1(
-    mp_ptr z, ulong zl, ulong zi_start, ulong zi_stop,
-    sd_fft_ctx_struct* Rffts, double* d, ulong dstride,
-    crt_data_struct* Rcrts, mp_size_t nlimbs, gr_ctx_t ctx)
+    mp_ptr FLINT_UNUSED(z), ulong FLINT_UNUSED(zl), ulong FLINT_UNUSED(zi_start), ulong FLINT_UNUSED(zi_stop),
+    sd_fft_ctx_struct* FLINT_UNUSED(Rffts), double* FLINT_UNUSED(d), ulong FLINT_UNUSED(dstride),
+    crt_data_struct* FLINT_UNUSED(Rcrts), mp_size_t FLINT_UNUSED(nlimbs), gr_ctx_t FLINT_UNUSED(ctx))
 {
     flint_abort();
 }
