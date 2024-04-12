@@ -71,7 +71,7 @@ static void n_bpoly_mod_make_monic_mod(n_bpoly_t A, n_poly_t mk, nmod_t mod)
 static void n_bpoly_set_fq_nmod_poly_gen0(
     n_bpoly_t A,
     const fq_nmod_poly_t B,
-    const fq_nmod_ctx_t ectx)
+    const fq_nmod_ctx_t FLINT_UNUSED(ectx))
 {
     slong i;
 
