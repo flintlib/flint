@@ -61,7 +61,7 @@ int fq_nmod_mpolyn_is_canonical(
     return 1;
 }
 
-void fq_nmod_mpolyn_init(fq_nmod_mpolyn_t A, flint_bitcnt_t bits, const fq_nmod_mpoly_ctx_t ctx)
+void fq_nmod_mpolyn_init(fq_nmod_mpolyn_t A, flint_bitcnt_t bits, const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     A->coeffs = NULL;
     A->exps = NULL;
@@ -70,7 +70,7 @@ void fq_nmod_mpolyn_init(fq_nmod_mpolyn_t A, flint_bitcnt_t bits, const fq_nmod_
     A->bits = bits;
 }
 
-void fq_nmod_mpolyn_clear(fq_nmod_mpolyn_t A, const fq_nmod_mpoly_ctx_t ctx)
+void fq_nmod_mpolyn_clear(fq_nmod_mpolyn_t A, const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     slong i;
     for (i = 0; i < A->alloc; i++)
@@ -86,12 +86,12 @@ void fq_nmod_mpolyn_swap(fq_nmod_mpolyn_t A, fq_nmod_mpolyn_t B)
    *B = t;
 }
 
-void fq_nmod_mpolyn_zero(fq_nmod_mpolyn_t A, const fq_nmod_mpoly_ctx_t ctx)
+void fq_nmod_mpolyn_zero(fq_nmod_mpolyn_t A, const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     A->length = 0;
 }
 
-int fq_nmod_mpolyn_is_zero(fq_nmod_mpolyn_t A, const fq_nmod_mpoly_ctx_t ctx)
+int fq_nmod_mpolyn_is_zero(fq_nmod_mpolyn_t A, const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     return A->length == 0;
 }

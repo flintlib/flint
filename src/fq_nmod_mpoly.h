@@ -980,7 +980,7 @@ int fq_nmod_mpolyu_is_canonical(const fq_nmod_mpolyu_t poly,
                                                 const fq_nmod_mpoly_ctx_t ctx);
 
 void fq_nmod_mpolyu_init(fq_nmod_mpolyu_t A, flint_bitcnt_t bits,
-                                                const fq_nmod_mpoly_ctx_t ctx);
+                                                const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx));
 
 void fq_nmod_mpolyu_clear(fq_nmod_mpolyu_t A,
                                                const fq_nmod_mpoly_ctx_t uctx);
@@ -1079,24 +1079,20 @@ FQ_NMOD_MPOLY_INLINE mp_limb_t * fq_nmod_mpolyu_leadcoeff(
 /* mpolyn ********************************************************************/
 
 void fq_nmod_mpolyn_init(fq_nmod_mpolyn_t A, flint_bitcnt_t bits,
-                                                const fq_nmod_mpoly_ctx_t ctx);
+                                                const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx));
 
-void fq_nmod_mpolyn_clear(fq_nmod_mpolyn_t A,
-                                                const fq_nmod_mpoly_ctx_t ctx);
+void fq_nmod_mpolyn_clear(fq_nmod_mpolyn_t A, const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx));
 
 void fq_nmod_mpolyn_swap(fq_nmod_mpolyn_t A, fq_nmod_mpolyn_t B);
 
 int fq_nmod_mpolyn_is_canonical(const fq_nmod_mpolyn_t A,
                                                 const fq_nmod_mpoly_ctx_t ctx);
 
-void fq_nmod_mpolyn_zero(fq_nmod_mpolyn_t A,
-                                                const fq_nmod_mpoly_ctx_t ctx);
+void fq_nmod_mpolyn_zero(fq_nmod_mpolyn_t A, const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx));
 
-void fq_nmod_mpolyn_one(fq_nmod_mpolyn_t A,
-                                                const fq_nmod_mpoly_ctx_t ctx);
+void fq_nmod_mpolyn_one(fq_nmod_mpolyn_t A, const fq_nmod_mpoly_ctx_t ctx);
 
-int fq_nmod_mpolyn_is_zero(fq_nmod_mpolyn_t A,
-                                                const fq_nmod_mpoly_ctx_t ctx);
+int fq_nmod_mpolyn_is_zero(fq_nmod_mpolyn_t A, const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx));
 
 void fq_nmod_mpolyn_print_pretty(const fq_nmod_mpolyn_t A,
                              const char ** x_in, const fq_nmod_mpoly_ctx_t ctx);
@@ -1142,7 +1138,7 @@ void fq_nmod_mpoly_from_mpolyn_perm_inflate(fq_nmod_mpoly_t A,
                 const slong * perm, const ulong * shift, const ulong * stride);
 
 void fq_nmod_mpolyun_init(fq_nmod_mpolyun_t A,
-                           flint_bitcnt_t bits, const fq_nmod_mpoly_ctx_t ctx);
+                           flint_bitcnt_t bits, const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx));
 
 void fq_nmod_mpolyun_clear(fq_nmod_mpolyun_t A,
                                                 const fq_nmod_mpoly_ctx_t ctx);
@@ -1181,16 +1177,16 @@ void fq_nmod_mpolyun_shift_right(fq_nmod_mpolyun_t A, ulong s);
 void fq_nmod_mpolyun_shift_left(fq_nmod_mpolyun_t A, ulong s);
 
 void fq_nmod_mpolyn_mul_poly(fq_nmod_mpolyn_t A,
-                        const fq_nmod_mpolyn_t B, const fq_nmod_poly_t c,
-                              const fq_nmod_mpoly_ctx_t ctx, fq_nmod_poly_t t);
+        const fq_nmod_mpolyn_t B, const fq_nmod_poly_t c,
+        const fq_nmod_mpoly_ctx_t ctx);
 
 void fq_nmod_mpolyun_mul_poly(fq_nmod_mpolyun_t A,
                          const fq_nmod_mpolyun_t B, const fq_nmod_poly_t c,
                                                 const fq_nmod_mpoly_ctx_t ctx);
 
 void fq_nmod_mpolyn_divexact_poly(fq_nmod_mpolyn_t A,
-                      const fq_nmod_mpolyn_t B, const fq_nmod_poly_t c,
-            const fq_nmod_mpoly_ctx_t ctx, fq_nmod_poly_t q, fq_nmod_poly_t r);
+        const fq_nmod_mpolyn_t B, const fq_nmod_poly_t c,
+        const fq_nmod_mpoly_ctx_t ctx);
 
 void fq_nmod_mpolyun_divexact_poly(fq_nmod_mpolyun_t A,
                         const fq_nmod_mpolyun_t B, const fq_nmod_poly_t c,
