@@ -17,7 +17,7 @@ void _fmpz_mod_mpoly_set_nmod_mpoly(
     fmpz_mod_mpoly_t A,
     const fmpz_mod_mpoly_ctx_t ctx,
     const nmod_mpoly_t nA,
-    const nmod_mpoly_ctx_t nctx)
+    const nmod_mpoly_ctx_t FLINT_UNUSED(nctx))
 {
     slong i, N = mpoly_words_per_exp(nA->bits, ctx->minfo);
     fmpz_mod_mpoly_fit_length_reset_bits(A, nA->length, nA->bits, ctx);

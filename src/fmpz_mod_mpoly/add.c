@@ -76,7 +76,8 @@ void fmpz_mod_mpoly_add(
     const fmpz_mod_mpoly_t C,
     const fmpz_mod_mpoly_ctx_t ctx)
 {
-    slong Abits, N;
+    slong N;
+    flint_bitcnt_t Abits;
     ulong * Bexps = B->exps, * Cexps = C->exps;
     ulong * cmpmask;
     int freeBexps = 0, freeCexps = 0;

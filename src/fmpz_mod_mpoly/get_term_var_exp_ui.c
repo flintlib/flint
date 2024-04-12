@@ -17,7 +17,7 @@ ulong fmpz_mod_mpoly_get_term_var_exp_ui(const fmpz_mod_mpoly_t A, slong i,
 {
     slong N = mpoly_words_per_exp(A->bits, ctx->minfo);
 
-    if (i >= (ulong) A->length)
+    if (i >= A->length)
         flint_throw(FLINT_ERROR, "fmpz_mod_mpoly_get_term_var_exp_ui: index out of range");
 
     return mpoly_get_monomial_var_exp_ui(A->exps + N*i, var, A->bits, ctx->minfo);

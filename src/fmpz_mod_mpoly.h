@@ -100,8 +100,7 @@ void fmpz_mod_mpoly_init(fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_ctx_t FLINT_UN
     A->exps_alloc = 0;
 }
 
-void fmpz_mod_mpoly_clear(fmpz_mod_mpoly_t A,
-                                               const fmpz_mod_mpoly_ctx_t ctx);
+void fmpz_mod_mpoly_clear(fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_ctx_t FLINT_UNUSED(ctx));
 
 void fmpz_mod_mpoly_init2(fmpz_mod_mpoly_t A, slong alloc,
                                                const fmpz_mod_mpoly_ctx_t ctx);
@@ -366,7 +365,7 @@ void fmpz_mod_mpoly_resize(fmpz_mod_mpoly_t A, slong new_length,
                                                const fmpz_mod_mpoly_ctx_t ctx);
 
 void fmpz_mod_mpoly_get_term_coeff_fmpz(fmpz_t c,
-            const fmpz_mod_mpoly_t A, slong i, const fmpz_mod_mpoly_ctx_t ctx);
+            const fmpz_mod_mpoly_t A, slong i, const fmpz_mod_mpoly_ctx_t FLINT_UNUSED(ctx));
 
 void fmpz_mod_mpoly_set_term_coeff_fmpz(fmpz_mod_mpoly_t A, slong i,
                                const fmpz_t c, const fmpz_mod_mpoly_ctx_t ctx);
@@ -749,7 +748,7 @@ void fmpz_mod_mpoly_inflate(fmpz_mod_mpoly_t A,
 /* Univariates ***************************************************************/
 
 void fmpz_mod_mpoly_univar_init(fmpz_mod_mpoly_univar_t A,
-                                               const fmpz_mod_mpoly_ctx_t ctx);
+                                               const fmpz_mod_mpoly_ctx_t FLINT_UNUSED(ctx));
 
 void fmpz_mod_mpoly_univar_clear(fmpz_mod_mpoly_univar_t A,
                                                const fmpz_mod_mpoly_ctx_t ctx);
@@ -915,7 +914,7 @@ void _fmpz_mod_mpoly_from_fmpz_mod_poly_inflate(fmpz_mod_mpoly_t A,
 
 void _fmpz_mod_mpoly_set_nmod_mpoly(fmpz_mod_mpoly_t A,
                         const fmpz_mod_mpoly_ctx_t ctx, const nmod_mpoly_t nA,
-                                                  const nmod_mpoly_ctx_t nctx);
+                                                  const nmod_mpoly_ctx_t FLINT_UNUSED(nctx));
 
 void _fmpz_mod_mpoly_get_nmod_mpoly(nmod_mpoly_t nA,
                         const nmod_mpoly_ctx_t nctx, const fmpz_mod_mpoly_t A,

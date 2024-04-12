@@ -12,9 +12,9 @@
 #include "fmpz_mod_mpoly.h"
 
 void fmpz_mod_mpoly_get_term_coeff_fmpz(fmpz_t c, const fmpz_mod_mpoly_t A,
-                                       slong i, const fmpz_mod_mpoly_ctx_t ctx)
+                                       slong i, const fmpz_mod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
-    if (i >= (ulong) A->length)
+    if (i >= A->length)
         flint_throw(FLINT_ERROR,
                      "fmpz_mod_mpoly_get_term_coeff_fmpz: index out of range");
 
