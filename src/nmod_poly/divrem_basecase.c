@@ -103,8 +103,8 @@ void _nmod_poly_divrem_q1_preinv1(mp_ptr Q, mp_ptr R,
             {
                 umul_ppmm(t1, t0, q1, B[i - 1]);
                 umul_ppmm(s1, s0, q0, B[i]);
-                add_sssaaaaaa(t2, t1, t0, 0,  t1, t0, 0, 0, A[i]);
-                add_sssaaaaaa(t2, t1, t0, t2, t1, t0, 0, s1, s0);
+                add_ssaaaa(t1, t0, t1, t0, 0, A[i]);
+                add_sssaaaaaa(t2, t1, t0, 0, t1, t0, 0, s1, s0);
                 if (t2 != 0)
                     sub_ddmmss(t2, t1, t2, t1, 0, mod.n);
                 t1 = FLINT_MIN(t1, t1 - mod.n);
