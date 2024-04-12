@@ -161,8 +161,8 @@ bad_fq_nmod_embed_struct * bad_fq_nmod_mpoly_embed_chooser_init(
 void bad_fq_nmod_mpoly_embed_chooser_clear(
     bad_fq_nmod_mpoly_embed_chooser_t embc,
     fq_nmod_mpoly_ctx_t ectx,
-    const fq_nmod_mpoly_ctx_t ctx,
-    flint_rand_t randstate);
+    const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx),
+    flint_rand_t FLINT_UNUSED(randstate));
 
 bad_fq_nmod_embed_struct * bad_fq_nmod_mpoly_embed_chooser_next(
     bad_fq_nmod_mpoly_embed_chooser_t embc,
@@ -889,7 +889,7 @@ void fq_nmod_mpoly_ctx_change_modulus(fq_nmod_mpoly_ctx_t ctx,
 /* Univariates ***************************************************************/
 
 void fq_nmod_mpoly_univar_init(fq_nmod_mpoly_univar_t A,
-                                                const fq_nmod_mpoly_ctx_t ctx);
+                                                const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx));
 
 void fq_nmod_mpoly_univar_clear(fq_nmod_mpoly_univar_t A,
                                                 const fq_nmod_mpoly_ctx_t ctx);
@@ -929,7 +929,7 @@ void fq_nmod_mpoly_univar_swap(fq_nmod_mpoly_univar_t A,
     FLINT_SWAP(fq_nmod_mpoly_univar_struct, *A, *B);
 }
 
-int fq_nmod_mpoly_univar_degree_fits_si(const fq_nmod_mpoly_univar_t A, const fq_nmod_mpoly_ctx_t ctx);
+int fq_nmod_mpoly_univar_degree_fits_si(const fq_nmod_mpoly_univar_t A, const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx));
 
 FQ_NMOD_MPOLY_INLINE
 slong fq_nmod_mpoly_univar_length(const fq_nmod_mpoly_univar_t A,
@@ -938,7 +938,7 @@ slong fq_nmod_mpoly_univar_length(const fq_nmod_mpoly_univar_t A,
     return A->length;
 }
 
-slong fq_nmod_mpoly_univar_get_term_exp_si(fq_nmod_mpoly_univar_t A, slong i, const fq_nmod_mpoly_ctx_t ctx);
+slong fq_nmod_mpoly_univar_get_term_exp_si(fq_nmod_mpoly_univar_t A, slong i, const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx));
 
 FQ_NMOD_MPOLY_INLINE
 void fq_nmod_mpoly_univar_get_term_coeff(fq_nmod_mpoly_t c,
@@ -1202,11 +1202,9 @@ void fq_nmod_mpolyn_content_poly(fq_nmod_poly_t g,
 void fq_nmod_mpolyun_content_poly(fq_nmod_poly_t g,
                            fq_nmod_mpolyun_t B, const fq_nmod_mpoly_ctx_t ctx);
 
-slong fq_nmod_mpolyn_lastdeg(fq_nmod_mpolyn_t A,
-                                                const fq_nmod_mpoly_ctx_t ctx);
+slong fq_nmod_mpolyn_lastdeg(fq_nmod_mpolyn_t A, const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx));
 
-slong fq_nmod_mpolyun_lastdeg(fq_nmod_mpolyun_t A,
-                                                const fq_nmod_mpoly_ctx_t ctx);
+slong fq_nmod_mpolyun_lastdeg(fq_nmod_mpolyun_t A, const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx));
 
 void fq_nmod_mpolyun_set(
     fq_nmod_mpolyun_t A,

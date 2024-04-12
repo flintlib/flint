@@ -221,7 +221,7 @@ int fq_nmod_mpolyu_gcdm_zippel(
     fq_nmod_mpoly_ctx_t ctx,
     flint_rand_t randstate)
 {
-    slong degbound;
+    ulong degbound;
     slong bound;
     slong Alastdeg, Blastdeg;
     slong lastdeg;
@@ -391,7 +391,7 @@ choose_prime_inner:
         goto choose_prime_inner;
 
     switch (fq_nmod_mpolyu_gcds_zippel(Geval, Aeval, Beval, Gform,
-                           ctx->minfo->nvars - 1, ectx, randstate, &degbound))
+                           ctx->minfo->nvars - 1, ectx, randstate, (slong *) &degbound))
     {
         default:
             FLINT_ASSERT(0);

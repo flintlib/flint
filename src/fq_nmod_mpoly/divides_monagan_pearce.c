@@ -99,7 +99,7 @@ case n:                                                                       \
         do {                                                                  \
             *store++ = x->i;                                                  \
             *store++ = x->j;                                                  \
-            if (x->i == -WORD(1))                                             \
+            if (x->i == -UWORD(1))                                             \
             {                                                                 \
                 _n_fq_sub(Qcoeffs + d*Qlen, Qcoeffs + d*Qlen,                 \
                                             Acoeffs + d*x->j, d, fqctx->mod); \
@@ -124,7 +124,7 @@ case n:                                                                       \
                 do {
                     *store++ = x->i;
                     *store++ = x->j;
-                    if (x->i == -WORD(1))
+                    if (x->i == -UWORD(1))
                     {
                         _n_fq_sub(Qcoeffs + d*Qlen, Qcoeffs + d*Qlen,
                                               Acoeffs + d*x->j, d, fqctx->mod);
@@ -349,7 +349,7 @@ case n:                                                                       \
         do {                                                                  \
             *store++ = x->i;                                                  \
             *store++ = x->j;                                                  \
-            if (x->i == -WORD(1))                                             \
+            if (x->i == -UWORD(1))                                             \
             {                                                                 \
                 n_fq_sub(Qcoeffs + d*Qlen, Qcoeffs + d*Qlen,                  \
                                            Acoeffs + d*x->j, fqctx);          \
@@ -376,7 +376,7 @@ case n:                                                                       \
                     *store++ = x->i;
                     *store++ = x->j;
 
-                    if (x->i == -WORD(1))
+                    if (x->i == -UWORD(1))
                     {
                         n_fq_sub(Qcoeffs + d*Qlen, Qcoeffs + d*Qlen,
                                                    Acoeffs + d*x->j, fqctx);
@@ -618,7 +618,7 @@ int fq_nmod_mpoly_divides_monagan_pearce(
     if (Qbits <= FLINT_BITS)
     {
         /* mask with high bit of each exponent vector field set */
-        for (i = 0; i < FLINT_BITS/Qbits; i++)
+        for (i = 0; i < (slong) (FLINT_BITS / Qbits); i++)
             mask = (mask << Qbits) + (UWORD(1) << (Qbits - 1));
 
         if (!mpoly_monomial_divides(expq, Aexps, Bexps, N, mask))

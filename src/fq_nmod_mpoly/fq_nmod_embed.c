@@ -614,8 +614,8 @@ bad_fq_nmod_mpoly_embed_chooser_init(bad_fq_nmod_mpoly_embed_chooser_t embc,
 
 void
 bad_fq_nmod_mpoly_embed_chooser_clear(bad_fq_nmod_mpoly_embed_chooser_t embc,
-                  fq_nmod_mpoly_ctx_t ectx, const fq_nmod_mpoly_ctx_t ctx,
-                                                        flint_rand_t randstate)
+                  fq_nmod_mpoly_ctx_t ectx, const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx),
+                                                        flint_rand_t FLINT_UNUSED(randstate))
 {
     bad_fq_nmod_embed_array_clear(embc->embed, embc->m);
     fq_nmod_mpoly_ctx_clear(ectx);

@@ -204,7 +204,7 @@ void fq_nmod_mpoly_evals_lgprime(
         }
 
         if (hi == 0 && FLINT_SIGN_EXT(lo) == 0 && total_degree >= 0)
-            total_degree = FLINT_MAX(total_degree, lo);
+            total_degree = FLINT_MAX(total_degree, (slong) lo);
         else
             total_degree = -1;
 

@@ -21,7 +21,7 @@ void fq_nmod_mpoly_get_term_coeff_fq_nmod(
 {
     slong d = fq_nmod_ctx_degree(ctx->fqctx);
 
-    if (i >= (ulong) A->length)
+    if (i >= A->length)
     {
         flint_throw(FLINT_ERROR, "fmpz_mpoly_get_term_coeff_fmpz: index out of range");
     }
