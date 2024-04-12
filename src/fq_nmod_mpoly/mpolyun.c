@@ -18,7 +18,7 @@
 void fq_nmod_mpolyun_init(
     fq_nmod_mpolyun_t A,
     flint_bitcnt_t bits,
-    const fq_nmod_mpoly_ctx_t ctx)
+    const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     A->coeffs = NULL;
     A->exps = NULL;
@@ -99,7 +99,7 @@ void fq_nmod_mpolyun_swap(
 
 void fq_nmod_mpolyun_zero(
     fq_nmod_mpolyun_t A,
-    const fq_nmod_mpoly_ctx_t ctx)
+    const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     A->length = 0;
 }
@@ -253,8 +253,7 @@ void fq_nmod_mpolyn_mul_poly(
     fq_nmod_mpolyn_t A,
     const fq_nmod_mpolyn_t B,
     const fq_nmod_poly_t c,
-    const fq_nmod_mpoly_ctx_t ctx,
-    fq_nmod_poly_t t  /* temp */)
+    const fq_nmod_mpoly_ctx_t ctx)
 {
     slong i;
     n_fq_poly_struct * Acoeff, * Bcoeff;
@@ -312,12 +311,9 @@ void fq_nmod_mpolyun_mul_poly(
     slong i, Blen;
     fq_nmod_mpolyn_struct * Acoeff, * Bcoeff;
     ulong * Aexp, * Bexp;
-    fq_nmod_poly_t t;
 
     FLINT_ASSERT(A->bits == B->bits);
     FLINT_ASSERT(!fq_nmod_poly_is_zero(c, ctx->fqctx));
-
-    fq_nmod_poly_init(t, ctx->fqctx);
 
     Blen = B->length;
     fq_nmod_mpolyun_fit_length(A, Blen, ctx);
@@ -328,12 +324,10 @@ void fq_nmod_mpolyun_mul_poly(
 
     for (i = 0; i < Blen; i++)
     {
-        fq_nmod_mpolyn_mul_poly(Acoeff + i, Bcoeff + i, c, ctx, t);
+        fq_nmod_mpolyn_mul_poly(Acoeff + i, Bcoeff + i, c, ctx);
         Aexp[i] = Bexp[i];
     }
     A->length = Blen;
-
-    fq_nmod_poly_clear(t, ctx->fqctx);
 }
 
 
@@ -341,9 +335,7 @@ void fq_nmod_mpolyn_divexact_poly(
     fq_nmod_mpolyn_t A,
     const fq_nmod_mpolyn_t B,
     const fq_nmod_poly_t c,
-    const fq_nmod_mpoly_ctx_t ctx,
-    fq_nmod_poly_t q, /* temp */
-    fq_nmod_poly_t r  /* temp */)
+    const fq_nmod_mpoly_ctx_t ctx)
 {
     slong i;
     n_fq_poly_struct * Acoeff, * Bcoeff;
@@ -405,13 +397,9 @@ void fq_nmod_mpolyun_divexact_poly(
     slong i, Blen;
     fq_nmod_mpolyn_struct * Acoeff, * Bcoeff;
     ulong * Aexp, * Bexp;
-    fq_nmod_poly_t q, r;
 
     FLINT_ASSERT(A->bits == B->bits);
     FLINT_ASSERT(!fq_nmod_poly_is_zero(c, ctx->fqctx));
-
-    fq_nmod_poly_init(q, ctx->fqctx);
-    fq_nmod_poly_init(r, ctx->fqctx);
 
     Blen = B->length;
     fq_nmod_mpolyun_fit_length(A, Blen, ctx);
@@ -422,13 +410,10 @@ void fq_nmod_mpolyun_divexact_poly(
 
     for (i = 0; i < Blen; i++)
     {
-        fq_nmod_mpolyn_divexact_poly(Acoeff + i, Bcoeff + i, c, ctx, q, r);
+        fq_nmod_mpolyn_divexact_poly(Acoeff + i, Bcoeff + i, c, ctx);
         Aexp[i] = Bexp[i];
     }
     A->length = Blen;
-
-    fq_nmod_poly_clear(q, ctx->fqctx);
-    fq_nmod_poly_clear(r, ctx->fqctx);
 }
 
 
@@ -627,7 +612,7 @@ void fq_nmod_mpoly_from_mpolyn_perm_inflate(
 
 slong fq_nmod_mpolyn_lastdeg(
     fq_nmod_mpolyn_t A,
-    const fq_nmod_mpoly_ctx_t ctx)
+    const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     slong i;
     slong deg = -WORD(1);
@@ -640,7 +625,7 @@ slong fq_nmod_mpolyn_lastdeg(
 
 slong fq_nmod_mpolyun_lastdeg(
     fq_nmod_mpolyun_t A,
-    const fq_nmod_mpoly_ctx_t ctx)
+    const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     slong i, j;
     slong deg = -WORD(1);

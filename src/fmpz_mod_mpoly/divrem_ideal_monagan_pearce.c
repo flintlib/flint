@@ -129,7 +129,7 @@ int _fmpz_mod_mpoly_divrem_ideal_monagan_pearce(
                 *store++ = x->j;
                 *store++ = x->p;
 
-                if (x->i == -WORD(1))
+                if (x->i == -UWORD(1))
                 {
                     fmpz_add(acc, acc, Acoeffs + x->j);
                 }

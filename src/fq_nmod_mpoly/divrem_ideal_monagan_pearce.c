@@ -140,7 +140,7 @@ int _fq_nmod_mpoly_divrem_ideal_monagan_pearce(
                 *store++ = x->j;
                 *store++ = x->p;
 
-                if (x->i == -WORD(1))
+                if (x->i == -UWORD(1))
                 {
                     n_fq_sub(acc, acc, poly2 + d*x->j, ctx->fqctx);
                 }

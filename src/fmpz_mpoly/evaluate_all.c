@@ -33,7 +33,7 @@ int _fmpz_mpoly_evaluate_all_fmpz_sp(fmpz_t ev, const fmpz_mpoly_t A,
 {
     int success = 1;
     flint_bitcnt_t bits = A->bits;
-    slong i, j, k, N, nvars = ctx->minfo->nvars;
+    slong i, k, N, nvars = ctx->minfo->nvars;
     slong entries, k_len, shift, off;
     slong Alen = A->length;
     const fmpz * Acoeff = A->coeffs;
@@ -74,7 +74,9 @@ int _fmpz_mpoly_evaluate_all_fmpz_sp(fmpz_t ev, const fmpz_mpoly_t A,
     k = 0;
     for (i = 0; i < nvars; i++)
     {
-        flint_bitcnt_t varibits = FLINT_BIT_COUNT(degrees[i]);
+        flint_bitcnt_t j, varibits;
+
+        varibits = FLINT_BIT_COUNT(degrees[i]);
 
         mpoly_gen_offset_shift_sp(&off, &shift, i, bits, ctx->minfo);
         for (j = 0; j < varibits; j++)
@@ -122,7 +124,7 @@ int _fmpz_mpoly_evaluate_all_fmpz_mp(fmpz_t ev, const fmpz_mpoly_t A,
 {
     int success = 1;
     flint_bitcnt_t Abits = A->bits;
-    slong i, j, k, N, nvars = ctx->minfo->nvars;
+    slong i, k, N, nvars = ctx->minfo->nvars;
     slong entries, k_len, off;
     slong Alen = A->length;
     const fmpz * Acoeff = A->coeffs;
@@ -163,7 +165,9 @@ int _fmpz_mpoly_evaluate_all_fmpz_mp(fmpz_t ev, const fmpz_mpoly_t A,
     k = 0;
     for (i = 0; i < nvars; i++)
     {
-        flint_bitcnt_t varibits = fmpz_bits(degrees + i);
+        flint_bitcnt_t j, varibits;
+
+        varibits = fmpz_bits(degrees + i);
 
         off = mpoly_gen_offset_mp(i, Abits, ctx->minfo);
         for (j = 0; j < varibits; j++)

@@ -1,4 +1,4 @@
-/*r
+/*
     Copyright (C) 2018, 2021 Daniel Schultz
 
     This file is part of FLINT.
@@ -46,11 +46,11 @@ int fmpz_pow_cache_mulpow_ui(
         return 1;
     }
 
-    if (k >= T->length)
+    if (k >= (ulong) T->length)
     {
-        if (k + 1 >= T->alloc)
+        if (k + 1 >= (ulong) T->alloc)
         {
-            slong new_alloc = FLINT_MAX(k + 1, 2*T->alloc);
+            slong new_alloc = FLINT_MAX(k + 1, (ulong) (2 * T->alloc));
             T->powers = FLINT_ARRAY_REALLOC(T->powers, new_alloc, fmpz);
             for (i = T->alloc; i < new_alloc; i++)
                 fmpz_init(T->powers + i);
@@ -59,10 +59,9 @@ int fmpz_pow_cache_mulpow_ui(
         }
 
         do {
-            fmpz_mul(T->powers + T->length, T->powers + T->length - 1,
-                                                                T->powers + 1);
+            fmpz_mul(T->powers + T->length, T->powers + T->length - 1, T->powers + 1);
             T->length++;
-        } while (k >= T->length);
+        } while (k >= (ulong) T->length);
     }
 
     fmpz_mul(a, b, T->powers + k);

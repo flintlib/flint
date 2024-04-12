@@ -18,7 +18,8 @@
 int fq_zech_mpoly_pow_ui(fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
                                         ulong k, const fq_zech_mpoly_ctx_t ctx)
 {
-    slong i, exp_bits;
+    slong i;
+    ulong exp_bits;
     fmpz * maxBfields;
     TMP_INIT;
 

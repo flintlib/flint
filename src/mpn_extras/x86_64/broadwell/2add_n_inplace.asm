@@ -29,22 +29,24 @@ dnl NOTE: This function could easily not be inplace without pushing registers,
 dnl       but currently I do not know if this function is going to be used on
 dnl       other functions than multiplications.
 
+dnl NOTE: Make this function shorter.
+
 	TEXT
 
 	ALIGN(16)
 PROLOGUE(flint_mpn_2add_n_inplace)
-	mov	R32(n), R32(s1)
+	mov	R32(n), R32(sx)
 	lea	L(tab)(%rip), s0
 	shr	$3, R32(n)
-	and	$7, R32(s1)
-	xor	R32(sx), R32(sx)
+	and	$7, R32(sx)	C Also resets OF and CF
 
 ifdef(`PIC',
-`	movslq	(s0,s1,4), s1
-	lea	(s1,s0), s0
+`	movslq	(s0,sx,4), sx
+	lea	(sx,s0), s0
+	xor	R32(sx), R32(sx)
 	jmp	*s0
 ',`
-	jmp	*(s0,s1,8)
+	jmp	*(s0,sx,8)
 ')
 
 L(p1):	mov	0*8(rp), s3
@@ -186,10 +188,12 @@ L(a4):	mov	6*8(rp), s2	C 23 start
 L(end):	adox	7*8(bp), s3
 	mov	s2, 6*8(rp)
 	mov	s3, 7*8(rp)
-	seto	R8(sx)
-	adc	R32(n), R32(sx)		C n = 0
+	seto	R8(sx)		C sx < 8 prior, so it is contained in 8 bits
+	adc	R32(n), R32(sx)	C n = 0
 
 	ret
+EPILOGUE()
+
 	JUMPTABSECT
 	ALIGN(8)
 L(tab):	JMPENT(	L(p0), L(tab))
@@ -201,4 +205,3 @@ L(tab):	JMPENT(	L(p0), L(tab))
 	JMPENT(	L(p6), L(tab))
 	JMPENT(	L(p7), L(tab))
 	TEXT
-EPILOGUE()

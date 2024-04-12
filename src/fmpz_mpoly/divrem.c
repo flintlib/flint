@@ -135,10 +135,10 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
                 {
                     *store++ = x->i;
                     *store++ = x->j;
-                    if (x->i != -WORD(1))
-                        hind[x->i] |= WORD(1);
+                    if (x->i != -UWORD(1))
+                        hind[x->i] |= UWORD(1);
 
-                    if (x->i == -WORD(1))
+                    if (x->i == -UWORD(1))
                         _fmpz_mpoly_add_uiuiui_fmpz(acc_sm, poly2 + x->j);
                     else
                         _fmpz_mpoly_submul_uiuiui_fmpz(acc_sm, poly3[x->i], q_coeff[x->j]);
@@ -154,10 +154,10 @@ slong _fmpz_mpoly_divrem_monagan_pearce1(slong * lenr,
                 {
                     *store++ = x->i;
                     *store++ = x->j;
-                    if (x->i != -WORD(1))
-                        hind[x->i] |= WORD(1);
+                    if (x->i != -UWORD(1))
+                        hind[x->i] |= UWORD(1);
 
-                    if (x->i == -WORD(1))
+                    if (x->i == -UWORD(1))
                         fmpz_add(acc_lg, acc_lg, poly2 + x->j);
                     else
                         fmpz_submul(acc_lg, poly3 + x->i, q_coeff + x->j);
@@ -487,10 +487,10 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
                 {
                     *store++ = x->i;
                     *store++ = x->j;
-                    if (x->i != -WORD(1))
-                        hind[x->i] |= WORD(1);
+                    if (x->i != -UWORD(1))
+                        hind[x->i] |= UWORD(1);
 
-                    if (x->i == -WORD(1))
+                    if (x->i == -UWORD(1))
                         _fmpz_mpoly_add_uiuiui_fmpz(acc_sm, poly2 + x->j);
                     else
                         _fmpz_mpoly_submul_uiuiui_fmpz(acc_sm, poly3[x->i], q_coeff[x->j]);
@@ -507,10 +507,10 @@ slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
                 {
                     *store++ = x->i;
                     *store++ = x->j;
-                    if (x->i != -WORD(1))
-                        hind[x->i] |= WORD(1);
+                    if (x->i != -UWORD(1))
+                        hind[x->i] |= UWORD(1);
 
-                    if (x->i == -WORD(1))
+                    if (x->i == -UWORD(1))
                         fmpz_add(acc_lg, acc_lg, poly2 + x->j);
                     else
                         fmpz_submul(acc_lg, poly3 + x->i, q_coeff + x->j);
@@ -734,7 +734,8 @@ void fmpz_mpoly_divrem_monagan_pearce(fmpz_mpoly_t q, fmpz_mpoly_t r,
                   const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
-   slong exp_bits, N, lenq = 0, lenr = 0;
+   slong N, lenq = 0, lenr = 0;
+   flint_bitcnt_t exp_bits;
    ulong * exp2 = poly2->exps, * exp3 = poly3->exps;
    ulong * cmpmask;
    int free2 = 0, free3 = 0;

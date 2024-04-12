@@ -1033,10 +1033,10 @@ static slong _fmpz_mpoly_divides_stripe1(
                 {
                     *store++ = x->i;
                     *store++ = x->j;
-                    if (x->i != -WORD(1))
-                        hind[x->i] |= WORD(1);
+                    if (x->i != -UWORD(1))
+                        hind[x->i] |= UWORD(1);
 
-                    if (x->i == -WORD(1))
+                    if (x->i == -UWORD(1))
                     {
                         _fmpz_mpoly_add_uiuiui_fmpz(acc_sm, Acoeff + x->j);
                     }
@@ -1060,10 +1060,10 @@ static slong _fmpz_mpoly_divides_stripe1(
                 {
                     *store++ = x->i;
                     *store++ = x->j;
-                    if (x->i != -WORD(1))
-                        hind[x->i] |= WORD(1);
+                    if (x->i != -UWORD(1))
+                        hind[x->i] |= UWORD(1);
 
-                    if (x->i == -WORD(1))
+                    if (x->i == -UWORD(1))
                     {
                         fmpz_add(acc_lg, acc_lg, Acoeff + x->j);
                     }
@@ -1394,13 +1394,13 @@ static slong _fmpz_mpoly_divides_stripe(
                     *store++ = x->i;
                     *store++ = x->j;
 
-                    if (x->i == -WORD(1))
+                    if (x->i == -UWORD(1))
                     {
                         _fmpz_mpoly_add_uiuiui_fmpz(acc_sm, Acoeff + x->j);
                     }
                     else
                     {
-                        hind[x->i] |= WORD(1);
+                        hind[x->i] |= UWORD(1);
                         FLINT_ASSERT(!COEFF_IS_MPZ(Bcoeff[x->i]));
                         FLINT_ASSERT(!COEFF_IS_MPZ(Qcoeff[x->j]));
                         _fmpz_mpoly_submul_uiuiui_fmpz(acc_sm,
@@ -1419,13 +1419,13 @@ static slong _fmpz_mpoly_divides_stripe(
                     *store++ = x->i;
                     *store++ = x->j;
 
-                    if (x->i == -WORD(1))
+                    if (x->i == -UWORD(1))
                     {
                         fmpz_add(acc_lg, acc_lg, Acoeff + x->j);
                     }
                     else
                     {
-                        hind[x->i] |= WORD(1);
+                        hind[x->i] |= UWORD(1);
                         fmpz_submul(acc_lg, Bcoeff + x->i, Qcoeff + x->j);
                     }
                 } while ((x = x->next) != NULL);
@@ -1791,7 +1791,7 @@ static void chunk_mulsub(worker_arg_t W, divides_heap_chunk_t L, slong q_prev_le
 static void trychunk(worker_arg_t W, divides_heap_chunk_t L)
 {
     divides_heap_base_struct * H = W->H;
-    slong i;
+    flint_bitcnt_t i;
     slong N = H->N;
     fmpz_mpoly_struct * C = L->polyC;
     slong q_prev_length;
@@ -2135,7 +2135,7 @@ int _fmpz_mpoly_divides_heap_threaded_pool(
     mpoly_monomial_add_mp(texps, qexps + N*0, Bexp + N*1, N);
 
     mask = 0;
-    for (i = 0; i < FLINT_BITS/exp_bits; i++)
+    for (i = 0; (flint_bitcnt_t) i < FLINT_BITS/exp_bits; i++)
         mask = (mask << exp_bits) + (UWORD(1) << (exp_bits - 1));
 
     k = 1;

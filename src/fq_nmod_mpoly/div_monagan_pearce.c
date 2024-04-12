@@ -115,7 +115,7 @@ static int _fq_nmod_mpoly_div_monagan_pearce(
                 *store++ = x->i;
                 *store++ = x->j;
 
-                if (x->i == -WORD(1))
+                if (x->i == -UWORD(1))
                 {
                     n_fq_sub(Qcoeffs + d*Qlen, Qcoeffs + d*Qlen, Acoeffs + d*x->j, fqctx);
                 }

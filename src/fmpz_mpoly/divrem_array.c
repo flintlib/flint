@@ -997,7 +997,8 @@ int fmpz_mpoly_divrem_array(fmpz_mpoly_t q, fmpz_mpoly_t r,
                     const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
-   slong i, exp_bits, N, lenq = 0, lenr = 0, array_size;
+   slong i, N, lenq = 0, lenr = 0, array_size;
+   flint_bitcnt_t exp_bits;
    ulong * max_fields, * max_fields2, * max_fields3;
    ulong * exp2 = poly2->exps, * exp3 = poly3->exps;
    int free2 = 0, free3 = 0;

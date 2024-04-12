@@ -18,7 +18,7 @@
 
 void fq_nmod_mpoly_univar_init(
     fq_nmod_mpoly_univar_t A,
-    const fq_nmod_mpoly_ctx_t ctx)
+    const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     A->coeffs = NULL;
     A->exps = NULL;
@@ -128,13 +128,13 @@ void fq_nmod_mpoly_univar_set_coeff_ui(
 }
 
 int fq_nmod_mpoly_univar_degree_fits_si(const fq_nmod_mpoly_univar_t A,
-                                                 const fq_nmod_mpoly_ctx_t ctx)
+                                                 const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     return A->length == 0 || fmpz_fits_si(A->exps + 0);
 }
 
 slong fq_nmod_mpoly_univar_get_term_exp_si(fq_nmod_mpoly_univar_t A, slong i,
-                                                 const fq_nmod_mpoly_ctx_t ctx)
+                                                 const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_ASSERT(i < (ulong)A->length);
     return fmpz_get_si(A->exps + i);
@@ -447,7 +447,7 @@ void _fq_nmod_mpoly_from_univar(
 
             FLINT_ASSERT(x->next == NULL);
 
-            if (x->j + 1 < (B->coeffs + x->i)->length)
+            if (x->j + 1 < (ulong) (B->coeffs + x->i)->length)
             {
                 FLINT_ASSERT(fmpz_fits_si(B->exps + x->i));
                 x->j = x->j + 1;
@@ -484,7 +484,7 @@ void _fq_nmod_mpoly_from_univar(
 
             FLINT_ASSERT(x->next == NULL);
 
-            if (x->j + 1 < (B->coeffs + x->i)->length)
+            if (x->j + 1 < (ulong) (B->coeffs + x->i)->length)
             {
                 x->j = x->j + 1;
                 x->next = NULL;

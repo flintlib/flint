@@ -13,7 +13,7 @@
 #include "mpn_mod.h"
 
 int
-_mpn_mod_vec_clear(mp_ptr res, slong len, gr_ctx_t ctx)
+_mpn_mod_vec_clear(mp_ptr FLINT_UNUSED(res), slong FLINT_UNUSED(len), gr_ctx_t FLINT_UNUSED(ctx))
 {
     return GR_SUCCESS;
 }

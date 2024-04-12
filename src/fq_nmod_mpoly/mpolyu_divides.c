@@ -353,10 +353,10 @@ int fq_nmod_mpolyuu_divides(
             {
                 *store++ = x->i;
                 *store++ = x->j;
-                if (x->i != -WORD(1))
+                if (x->i != -UWORD(1))
                     hind[x->i] |= WORD(1);
 
-                if (x->i == -WORD(1))
+                if (x->i == -UWORD(1))
                 {
                     a = Acoeff + x->j;
                     fq_nmod_mpoly_fit_length(S, T->length + a->length, ctx);

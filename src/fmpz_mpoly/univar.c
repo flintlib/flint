@@ -15,7 +15,7 @@
 #include "mpoly.h"
 #include "fmpz_mpoly.h"
 
-void fmpz_mpoly_univar_init(fmpz_mpoly_univar_t A, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_univar_init(fmpz_mpoly_univar_t A, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     A->coeffs = NULL;
     A->exps = NULL;
@@ -124,12 +124,12 @@ void fmpz_mpoly_univar_set_coeff_ui(
     return;
 }
 
-int fmpz_mpoly_univar_degree_fits_si(const fmpz_mpoly_univar_t A, const fmpz_mpoly_ctx_t ctx)
+int fmpz_mpoly_univar_degree_fits_si(const fmpz_mpoly_univar_t A, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     return A->length == 0 || fmpz_fits_si(A->exps + 0);
 }
 
-slong fmpz_mpoly_univar_get_term_exp_si(fmpz_mpoly_univar_t A, slong i, const fmpz_mpoly_ctx_t ctx)
+slong fmpz_mpoly_univar_get_term_exp_si(fmpz_mpoly_univar_t A, slong i, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_ASSERT((ulong)i < (ulong)A->length);
     return fmpz_get_si(A->exps + i);
@@ -439,7 +439,7 @@ void _fmpz_mpoly_from_univar(fmpz_mpoly_t A, flint_bitcnt_t Abits,
 
             FLINT_ASSERT(x->next == NULL);
 
-            if (x->j + 1 < (B->coeffs + x->i)->length)
+            if (x->j + 1 < (ulong) (B->coeffs + x->i)->length)
             {
                 FLINT_ASSERT(fmpz_fits_si(B->exps + x->i));
                 x->j = x->j + 1;
@@ -477,7 +477,7 @@ void _fmpz_mpoly_from_univar(fmpz_mpoly_t A, flint_bitcnt_t Abits,
 
             FLINT_ASSERT(x->next == NULL);
 
-            if (x->j + 1 < (B->coeffs + x->i)->length)
+            if (x->j + 1 < (ulong) (B->coeffs + x->i)->length)
             {
                 x->j = x->j + 1;
                 x->next = NULL;

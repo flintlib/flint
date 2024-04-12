@@ -231,7 +231,8 @@ int mpn_mod_mat_mul_multi_mod(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr
     slong limit;
     ulong first_prime; /* not prime */
     int squaring = (A == B);
-    slong Abits, Bbits, Cbits, bits, mod_bits, nlimbs;
+    flint_bitcnt_t Abits, Bbits, Cbits, bits, mod_bits;
+    slong nlimbs;
 
     nlimbs = MPN_MOD_CTX_NLIMBS(ctx);
     mod_bits = FLINT_BITS * (nlimbs - 1) + (FLINT_BITS - MPN_MOD_CTX_NORM(ctx));

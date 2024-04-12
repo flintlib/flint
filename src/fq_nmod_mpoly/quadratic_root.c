@@ -203,7 +203,7 @@ static int _fq_nmod_mpoly_quadratic_root_heap(
             j = *--store;
             i = *--store;
 
-            if (i == -UWORD(1))
+            if (i == -WORD(1))
             {
                 if (j + 1 < Blen)
                 {
@@ -219,7 +219,7 @@ static int _fq_nmod_mpoly_quadratic_root_heap(
                     FLINT_ASSERT(exp_next <= Alen + 2);
                 }
             }
-            else if (i == -UWORD(2))
+            else if (i == -WORD(2))
             {
                 if (j + 1 < Qlen)
                 {

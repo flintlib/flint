@@ -113,10 +113,10 @@ static slong _fq_zech_mpoly_divrem_monagan_pearce(slong * lenr,
             do {
                 *store++ = x->i;
                 *store++ = x->j;
-                if (x->i != -WORD(1))
+                if (x->i != -UWORD(1))
                     hind[x->i] |= WORD(1);
 
-                if (x->i == -WORD(1))
+                if (x->i == -UWORD(1))
                 {
                     fq_zech_sub(q_coeff + q_len, q_coeff + q_len, coeff2 + x->j, fqctx);
                 }
@@ -248,7 +248,8 @@ void fq_zech_mpoly_divrem_monagan_pearce(fq_zech_mpoly_t q, fq_zech_mpoly_t r,
                       const fq_zech_mpoly_t poly2, const fq_zech_mpoly_t poly3,
                                                  const fq_zech_mpoly_ctx_t ctx)
 {
-    slong exp_bits, N, lenq = 0, lenr = 0;
+    slong N, lenq = 0, lenr = 0;
+    flint_bitcnt_t exp_bits;
     ulong * exp2 = poly2->exps, * exp3 = poly3->exps;
     ulong * cmpmask;
     int free2 = 0, free3 = 0;

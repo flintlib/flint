@@ -104,7 +104,8 @@ slong _fmpz_mpoly_integral(fmpz_t s, fmpz * coeff1, ulong * exp1,
 void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale,
                const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx)
 {
-    slong i, len1, exp_bits;
+    slong i, len1;
+    flint_bitcnt_t exp_bits;
     ulong * exp2 = poly2->exps;
     fmpz * gen_fields, * max_fields;
     int free2 = 0;
