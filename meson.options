@@ -1,3 +1,5 @@
+option('tests', type : 'feature', value : 'disabled',
+        description: 'Build the tests')
 option('fft_small', type : 'feature', value : 'auto',
         description: 'Build the fft_small module')
 option('assembly', type : 'feature', value : 'auto',

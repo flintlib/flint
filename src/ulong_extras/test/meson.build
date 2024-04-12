@@ -5,4 +5,4 @@ test_exe = executable('main',
   include_directories: src_inc,
   install: false,
 )
-test(file, test_exe)
+test('ulong_extras', test_exe)
