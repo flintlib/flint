@@ -74,14 +74,14 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
     mask = mpoly_overflow_mask_sp(bits);
 
     /* output poly index starts at -1, will be immediately updated to 0 */
-    k = -WORD(1);
+    k = -UWORD(1);
 
     /* s is the number of terms * (latest quotient) we should put into heap */
     s = len3;
 
     /* insert (-1, 0, exp2[0]) into heap */
     x = chain + 0;
-    x->i = -WORD(1);
+    x->i = -UWORD(1);
     x->j = 0;
     x->next = NULL;
     HEAP_ASSIGN(heap[1], exp2[0], x);
@@ -117,10 +117,10 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
                 {
                     *store++ = x->i;
                     *store++ = x->j;
-                    if (x->i != -WORD(1))
-                        hind[x->i] |= WORD(1);
+                    if (x->i != -UWORD(1))
+                        hind[x->i] |= UWORD(1);
 
-                    if (x->i == -WORD(1))
+                    if (x->i == -UWORD(1))
                         _fmpz_mpoly_add_uiuiui_fmpz(acc_sm, poly2 + x->j);
                     else
                         _fmpz_mpoly_submul_uiuiui_fmpz(acc_sm, poly3[x->i], p1[x->j]);
@@ -136,10 +136,10 @@ slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
                 {
                     *store++ = x->i;
                     *store++ = x->j;
-                    if (x->i != -WORD(1))
-                        hind[x->i] |= WORD(1);
+                    if (x->i != -UWORD(1))
+                        hind[x->i] |= UWORD(1);
 
-                    if (x->i == -WORD(1))
+                    if (x->i == -UWORD(1))
                         fmpz_add(acc_lg, acc_lg, poly2 + x->j);
                     else
                         fmpz_submul(acc_lg, poly3 + x->i, p1 + x->j);
@@ -364,14 +364,14 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
     mask = bits <= FLINT_BITS ? mpoly_overflow_mask_sp(bits) : 0;
 
     /* output poly index starts at -1, will be immediately updated to 0 */
-    k = -WORD(1);
+    k = -UWORD(1);
 
     /* s is the number of terms * (latest quotient) we should put into heap */
     s = len3;
 
     /* insert (-1, 0, exp2[0]) into heap */
     x = chain + 0;
-    x->i = -WORD(1);
+    x->i = -UWORD(1);
     x->j = 0;
     x->next = NULL;
     heap[1].next = x;
@@ -420,10 +420,10 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
                 {
                     *store++ = x->i;
                     *store++ = x->j;
-                    if (x->i != -WORD(1))
+                    if (x->i != -UWORD(1))
                         hind[x->i] |= WORD(1);
 
-                    if (x->i == -WORD(1))
+                    if (x->i == -UWORD(1))
                         _fmpz_mpoly_add_uiuiui_fmpz(acc_sm, poly2 + x->j);
                     else
                         _fmpz_mpoly_submul_uiuiui_fmpz(acc_sm, poly3[x->i], p1[x->j]);
@@ -440,10 +440,10 @@ slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1, ulong ** exp1,
                 {
                     *store++ = x->i;
                     *store++ = x->j;
-                    if (x->i != -WORD(1))
+                    if (x->i != -UWORD(1))
                         hind[x->i] |= WORD(1);
 
-                    if (x->i == -WORD(1))
+                    if (x->i == -UWORD(1))
                         fmpz_add(acc_lg, acc_lg, poly2 + x->j);
                     else
                         fmpz_submul(acc_lg, poly3 + x->i, p1 + x->j);
@@ -630,7 +630,7 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
     slong i, N, len = 0;
-    flint_bitcnt_t exp_bits;
+    flint_bitcnt_t j, exp_bits;
     fmpz * max_fields2, * max_fields3;
     ulong * cmpmask;
     ulong * exp2 = poly2->exps, * exp3 = poly3->exps, * expq;
@@ -730,7 +730,7 @@ int fmpz_mpoly_divides_monagan_pearce(fmpz_mpoly_t poly1,
     if (exp_bits <= FLINT_BITS)
     {
         /* mask with high bit of each exponent vector field set */
-        for (i = 0; i < FLINT_BITS/exp_bits; i++)
+        for (j = 0; j < FLINT_BITS/exp_bits; j++)
             mask = (mask << exp_bits) + (UWORD(1) << (exp_bits - 1));
 
         if (!mpoly_monomial_divides(expq, exp2, exp3, N, mask))

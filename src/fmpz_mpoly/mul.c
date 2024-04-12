@@ -82,7 +82,7 @@ static int _try_array_LEX(slong * Bdegs, slong * Cdegs,
 }
 
 
-static int _try_array_DEG(slong Btotaldeg, slong Ctotaldeg,
+static int _try_array_DEG(slong Btotaldeg, slong FLINT_UNUSED(Ctotaldeg),
                                            slong Blen, slong Clen, slong nvars)
 {
     slong i, dense_size, total_degree;

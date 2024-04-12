@@ -152,19 +152,19 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce1(fmpz_mpoly_struct ** polyq,
                 *store++ = x->i;
                 *store++ = x->j;
                 *store++ = x->p;
-                if (x->i != -WORD(1))
-                    hinds[x->p][x->i] |= WORD(1);
+                if (x->i != -UWORD(1))
+                    hinds[x->p][x->i] |= UWORD(1);
 
                 if (small)
                 {
-                    if (x->i == -WORD(1))
+                    if (x->i == -UWORD(1))
                       _fmpz_mpoly_sub_uiuiui_fmpz(c, poly2 + x->j);
                     else
                       _fmpz_mpoly_addmul_uiuiui_fmpz(c,
                              poly3[x->p]->coeffs[x->i], polyq[x->p]->coeffs[x->j]);
                 } else
                 {
-                    if (x->i == -WORD(1))
+                    if (x->i == -UWORD(1))
                         fmpz_sub(qc, qc, poly2 + x->j);
                     else
                         fmpz_addmul(qc, poly3[x->p]->coeffs + x->i,
@@ -183,7 +183,7 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce1(fmpz_mpoly_struct ** polyq,
                 if (j + 1 < len2)
                 {
                     x = chains[0] + 0;
-                    x->i = -WORD(1);
+                    x->i = -UWORD(1);
                     x->j = j + 1;
                     x->p = p;
                     x->next = NULL;
@@ -485,19 +485,19 @@ slong _fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** polyq,
                 *store++ = x->i;
                 *store++ = x->j;
                 *store++ = x->p;
-                if (x->i != -WORD(1))
-                    hinds[x->p][x->i] |= WORD(1);
+                if (x->i != -UWORD(1))
+                    hinds[x->p][x->i] |= UWORD(1);
 
                 if (small)
                 {
-                    if (x->i == -WORD(1))
+                    if (x->i == -UWORD(1))
                         _fmpz_mpoly_sub_uiuiui_fmpz(c, poly2 + x->j);
                     else
                         _fmpz_mpoly_addmul_uiuiui_fmpz(c,
                              poly3[x->p]->coeffs[x->i], polyq[x->p]->coeffs[x->j]);
                 } else
                 {
-                    if (x->i == -WORD(1))
+                    if (x->i == -UWORD(1))
                         fmpz_sub(qc, qc, poly2 + x->j);
                     else
                         fmpz_addmul(qc, poly3[x->p]->coeffs + x->i,
@@ -704,7 +704,8 @@ void fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q, fmpz_mpoly_t
     const fmpz_mpoly_t poly2, fmpz_mpoly_struct * const * poly3, slong len,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
-   slong i, exp_bits, N, lenr = 0;
+   slong i, N, lenr = 0;
+   flint_bitcnt_t exp_bits;
    slong len3 = 0;
    ulong * cmpmask;
    ulong * exp2;
