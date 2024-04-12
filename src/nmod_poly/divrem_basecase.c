@@ -106,7 +106,9 @@ void _nmod_poly_divrem_q1_preinv1(mp_ptr Q, mp_ptr R,
                 add_ssaaaa(t1, t0, t1, t0, 0, A[i]);
                 add_sssaaaaaa(t2, t1, t0, 0, t1, t0, 0, s1, s0);
                 if (t2 != 0)
-                    t1 -= mod.n;
+                    /* Note: should just be t1 -= mod.n, but with GCC
+                       on Zen3 that version runs noticeably slower. */
+                    sub_ddmmss(t2, t1, t2, t1, 0, mod.n);
                 t1 = FLINT_MIN(t1, t1 - mod.n);
                 FLINT_ASSERT(t1 < mod.n);
                 NMOD_RED2(R[i], t1, t0, mod);
