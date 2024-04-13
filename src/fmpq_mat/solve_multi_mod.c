@@ -17,48 +17,41 @@
 #include "fmpz_mat.h"
 #include "fmpq_mat.h"
 
-mp_limb_t fmpz_mat_find_good_prime_and_solve(nmod_mat_t Xmod,
-		                 nmod_mat_t Amod, nmod_mat_t Bmod,
-                const fmpz_mat_t A, const fmpz_mat_t B, const fmpz_t det_bound);
-
-
-static int
-_fmpq_mat_check_solution_fmpz_mat(const fmpq_mat_t X, const fmpz_mat_t A, const fmpz_mat_t B)
+static mp_limb_t fmpz_mat_find_good_prime_and_solve(
+        nmod_mat_t Xmod, nmod_mat_t Amod, nmod_mat_t Bmod,
+        const fmpz_mat_t A, const fmpz_mat_t B, const fmpz_t det_bound)
 {
-    slong i, j;
-    fmpz_mat_t Xclear, AXclear;
-    fmpz_t t;
-    fmpz * Xden;
-    int ok;
+    mp_limb_t p;
+    fmpz_t tested;
 
-    Xden = _fmpz_vec_init(X->c);
-    fmpz_mat_init(Xclear, X->r, X->c);
-    fmpz_mat_init(AXclear, B->r, B->c);
-    fmpz_init(t);
+    p = UWORD(1) << NMOD_MAT_OPTIMAL_MODULUS_BITS;
+    fmpz_init(tested);
+    fmpz_one(tested);
 
-    fmpq_mat_get_fmpz_mat_colwise(Xclear, Xden, X);
-    fmpz_mat_mul(AXclear, A, Xclear);
-
-    ok = 1;
-    for (i = 0; i < B->r && ok; i++)
+    while (1)
     {
-        for (j = 0; j < B->c && ok; j++)
+        p = n_nextprime(p, 0);
+        nmod_mat_set_mod(Xmod, p);
+        nmod_mat_set_mod(Amod, p);
+        nmod_mat_set_mod(Bmod, p);
+        fmpz_mat_get_nmod_mat(Amod, A);
+        fmpz_mat_get_nmod_mat(Bmod, B);
+        if (nmod_mat_solve(Xmod, Amod, Bmod))
+            break;
+        fmpz_mul_ui(tested, tested, p);
+        if (fmpz_cmp(tested, det_bound) > 0)
         {
-            /* AXclear[i,j] / Xden[j] = B[i,j]  */
-            fmpz_mul(t, fmpz_mat_entry(B, i, j), Xden + j);
-
-            if (!fmpz_equal(t, fmpz_mat_entry(AXclear, i, j)))
-                ok = 0;
+            p = 0;
+            break;
         }
     }
 
-    _fmpz_vec_clear(Xden, X->c);
-    fmpz_mat_clear(Xclear);
-    fmpz_mat_clear(AXclear);
-    fmpz_clear(t);
-
-    return ok;
+    fmpz_clear(tested);
+    return p;
 }
+
+int
+_fmpq_mat_check_solution_fmpz_mat(const fmpq_mat_t X, const fmpz_mat_t A, const fmpz_mat_t B);
 
 static void
 _fmpq_mat_solve_multi_mod(fmpq_mat_t X,
