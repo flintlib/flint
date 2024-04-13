@@ -16,7 +16,7 @@
 #include "nmod_poly.h"
 #include "fq_nmod.h"
 
-void _fq_nmod_inv(mp_limb_t *rop, const mp_limb_t *op, slong len,
+static void _fq_nmod_inv(mp_limb_t *rop, const mp_limb_t *op, slong len,
                   const fq_nmod_ctx_t ctx)
 {
     const slong d = fq_nmod_ctx_degree(ctx);

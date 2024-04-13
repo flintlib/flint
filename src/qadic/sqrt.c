@@ -127,7 +127,7 @@ static void _find_nonresidue(fmpz *rop,
     The value of \code{(rop,d)}$ is undefined when the return value
     is zero.
  */
-int
+static int
 _artin_schreier_preimage(fmpz *rop, const fmpz *op, slong len,
                          const fmpz *a, const slong *j, slong lena)
 {
@@ -794,7 +794,7 @@ _qadic_sqrt_2(fmpz *rop, const fmpz *op, slong len,
 
     Assumes that \code{(op, len)} has valuation $0$.
  */
-int _qadic_sqrt(fmpz *rop, const fmpz *op, slong len,
+static int _qadic_sqrt(fmpz *rop, const fmpz *op, slong len,
                 const fmpz *a, const slong *j, slong lena,
                 const fmpz_t p, slong N)
 {

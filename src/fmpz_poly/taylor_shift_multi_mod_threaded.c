@@ -30,7 +30,7 @@ typedef struct
 }
 mod_ui_arg_t;
 
-void
+static void
 _fmpz_vec_multi_mod_ui_worker(void * arg_ptr)
 {
     mod_ui_arg_t arg = *((mod_ui_arg_t *) arg_ptr);
@@ -65,7 +65,7 @@ _fmpz_vec_multi_mod_ui_worker(void * arg_ptr)
     fmpz_comb_temp_clear(comb_temp);
 }
 
-void
+static void
 _fmpz_vec_multi_mod_ui_threaded(mp_ptr * residues, fmpz * vec, slong len,
     mp_srcptr primes, slong num_primes, int crt)
 {
@@ -115,7 +115,7 @@ typedef struct
 }
 taylor_shift_arg_t;
 
-void
+static void
 _fmpz_poly_multi_taylor_shift_worker(void * arg_ptr)
 {
     taylor_shift_arg_t arg = *((taylor_shift_arg_t *) arg_ptr);
@@ -133,7 +133,7 @@ _fmpz_poly_multi_taylor_shift_worker(void * arg_ptr)
     }
 }
 
-void
+static void
 _fmpz_poly_multi_taylor_shift_threaded(mp_ptr * residues, slong len,
         const fmpz_t c, mp_srcptr primes, slong num_primes)
 {

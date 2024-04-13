@@ -11,10 +11,16 @@
 
 #define FMPQ_INLINES_C
 
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
+#if defined(__GNUC__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 #include "fmpq.h"
+
+#if defined(__GNUC__)
+# pragma GCC diagnostic pop
+#endif
 
 void fmpq_numerator(fmpz_t n, const fmpq_t q)
 {

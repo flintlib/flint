@@ -12,4 +12,13 @@
 
 #define FMPZ_MOD_MAT_INLINES_C
 
+#if defined(__GNUC__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 #include "fmpz_mod_mat.h"
+
+#if defined(__GNUC__)
+# pragma GCC diagnostic pop
+#endif

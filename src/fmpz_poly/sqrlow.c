@@ -20,7 +20,7 @@
 # include "fft_small.h"
 #endif
 
-void _fmpz_poly_sqrlow_tiny1(fmpz * res, const fmpz * poly, slong len, slong n)
+static void _fmpz_poly_sqrlow_tiny1(fmpz * res, const fmpz * poly, slong len, slong n)
 {
     slong i, j, c;
 
@@ -43,7 +43,7 @@ void _fmpz_poly_sqrlow_tiny1(fmpz * res, const fmpz * poly, slong len, slong n)
     }
 }
 
-void _fmpz_poly_sqrlow_tiny2(fmpz * res, const fmpz * poly, slong len, slong n)
+static void _fmpz_poly_sqrlow_tiny2(fmpz * res, const fmpz * poly, slong len, slong n)
 {
     slong i, j, k, c, d;
     mp_limb_t hi, lo;

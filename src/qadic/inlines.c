@@ -11,5 +11,13 @@
 
 #define QADIC_INLINES_C
 
-#include "flint.h"
+#if defined(__GNUC__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 #include "qadic.h"
+
+#if defined(__GNUC__)
+# pragma GCC diagnostic pop
+#endif

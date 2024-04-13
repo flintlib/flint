@@ -22,7 +22,7 @@ mp_limb_t fmpz_mat_find_good_prime_and_solve(nmod_mat_t Xmod,
                 const fmpz_mat_t A, const fmpz_mat_t B, const fmpz_t det_bound);
 
 
-int
+static int
 _fmpq_mat_check_solution_fmpz_mat(const fmpq_mat_t X, const fmpz_mat_t A, const fmpz_mat_t B)
 {
     slong i, j;
@@ -60,7 +60,7 @@ _fmpq_mat_check_solution_fmpz_mat(const fmpq_mat_t X, const fmpz_mat_t A, const 
     return ok;
 }
 
-void
+static void
 _fmpq_mat_solve_multi_mod(fmpq_mat_t X,
                         const fmpz_mat_t A, const fmpz_mat_t B,
                      nmod_mat_t Xmod, nmod_mat_t Amod, nmod_mat_t Bmod,

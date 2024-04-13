@@ -13,7 +13,7 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-void _fmpz_mat_resize_van_hoeij(fmpz_mat_t M, slong r, slong c)
+static void _fmpz_mat_resize_van_hoeij(fmpz_mat_t M, slong r, slong c)
 {
    slong i, j;
    fmpz * old_entries = M->entries;

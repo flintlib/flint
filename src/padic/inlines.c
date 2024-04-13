@@ -11,11 +11,16 @@
 
 #define PADIC_INLINES_C
 
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
+#if defined(__GNUC__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 #include "padic.h"
+
+#if defined(__GNUC__)
+# pragma GCC diagnostic pop
+#endif
 
 void padic_get_unit(fmpz_t f, padic_t p)
 {

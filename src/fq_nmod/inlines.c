@@ -12,4 +12,13 @@
 
 #define FQ_NMOD_INLINES_C
 
+#if defined(__GNUC__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 #include "fq_nmod.h"
+
+#if defined(__GNUC__)
+# pragma GCC diagnostic pop
+#endif

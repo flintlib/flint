@@ -11,9 +11,19 @@
 
 #define FMPZ_MOD_POLY_INLINES_C
 
+#if defined(__GNUC__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
+#include "fmpz_mod_poly.h"
+
+#if defined(__GNUC__)
+# pragma GCC diagnostic pop
+#endif
+
 #include "fmpz.h"
 #include "fmpz_mod.h"
-#include "fmpz_mod_poly.h"
 
 /* FIXME: These should be moved to their own files */
 

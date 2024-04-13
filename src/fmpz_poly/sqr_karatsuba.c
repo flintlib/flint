@@ -18,13 +18,13 @@
     For documentation, see fmpz_poly/mul_karatsuba.c
  */
 
-extern void revbin1(fmpz * out, const fmpz * in, slong len, slong bits);
+void revbin1(fmpz * out, const fmpz * in, slong len, slong bits);
 
-extern void revbin2(fmpz * out, const fmpz * in, slong len, slong bits);
+void revbin2(fmpz * out, const fmpz * in, slong len, slong bits);
 
-extern void _fmpz_vec_add_rev(fmpz * in1, fmpz * in2, slong bits);
+void _fmpz_vec_add_rev(fmpz * in1, fmpz * in2, slong bits);
 
-void _fmpz_poly_sqr_kara_recursive(fmpz * out, fmpz * rev,
+static void _fmpz_poly_sqr_kara_recursive(fmpz * out, fmpz * rev,
                                    fmpz * temp, slong bits)
 {
     slong len = (WORD(1) << bits);

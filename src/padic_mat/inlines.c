@@ -11,4 +11,13 @@
 
 #define PADIC_MAT_INLINES_C
 
+#if defined(__GNUC__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 #include "padic_mat.h"
+
+#if defined(__GNUC__)
+# pragma GCC diagnostic pop
+#endif

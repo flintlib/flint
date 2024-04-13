@@ -11,4 +11,13 @@
 
 #define FQ_DEFAULT_INLINES_C
 
+#if defined(__GNUC__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 #include "fq_default.h"
+
+#if defined(__GNUC__)
+# pragma GCC diagnostic pop
+#endif

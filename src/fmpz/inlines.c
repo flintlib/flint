@@ -16,12 +16,13 @@
 # pragma GCC diagnostic ignored "-Wmissing-prototypes"
 #endif
 
-#include "gmpcompat.h"
 #include "fmpz.h"
 
 #if defined(__GNUC__)
 # pragma GCC diagnostic pop
 #endif
+
+#include "gmpcompat.h"
 
 void _fmpz_promote_set_ui(fmpz_t f, ulong v)
 {

@@ -84,7 +84,7 @@ _permpiv_copy(slong * perm, slong * prm, slong * pivots, slong * piv, slong n)
     }
 }
 
-int
+static int
 _fmpq_mat_can_solve_multi_mod(fmpq_mat_t X,
                          const fmpz_mat_t A, const fmpz_mat_t B, const fmpz_t D)
 {

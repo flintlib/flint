@@ -51,6 +51,8 @@ slong padic_get_prec(const padic_t x)
    return x->N;
 }
 
+void padic_get_unit(fmpz_t f, padic_t p);
+
 /* Context *******************************************************************/
 
 void padic_ctx_init(padic_ctx_t ctx, const fmpz_t p, slong min, slong max,

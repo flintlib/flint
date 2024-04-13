@@ -43,6 +43,12 @@
 void _fmpz_poly_mul_kara_recursive(fmpz * out, fmpz * rev1, fmpz * rev2,
                                    fmpz * temp, slong bits);
 
+/* The following functions are used in sqr_karatsuba.c as well */
+#if defined(__GNUC__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 /*
    Switches the coefficients of poly in of length len into a
    poly out of length 2^bits.
@@ -78,6 +84,10 @@ _fmpz_vec_add_rev(fmpz * in1, fmpz * in2, slong bits)
         fmpz_add(in1 + j, in1 + j, in2 + i);
     }
 }
+
+#if defined(__GNUC__)
+# pragma GCC diagnostic pop
+#endif
 
 /*
    Recursive Karatsuba assuming polynomials are in revbin format.

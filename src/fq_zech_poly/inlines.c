@@ -11,5 +11,13 @@
 
 #define FQ_ZECH_POLY_INLINES_C
 
-#include "flint.h"
+#if defined(__GNUC__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 #include "fq_zech_poly.h"
+
+#if defined(__GNUC__)
+# pragma GCC diagnostic pop
+#endif

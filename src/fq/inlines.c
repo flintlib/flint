@@ -11,8 +11,18 @@
 
 #define FQ_INLINES_C
 
-#include "fmpz.h"
+#if defined(__GNUC__)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 #include "fq.h"
+
+#if defined(__GNUC__)
+# pragma GCC diagnostic pop
+#endif
+
+#include "fmpz.h"
 
 /* TODO: Remove this */
 void __fq_ctx_prime(fmpz_t p, fq_ctx_t ctx)
