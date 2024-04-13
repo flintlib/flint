@@ -24,17 +24,6 @@ add_project_arguments(
 )
 
 subdir('src')
-
-headers_all = []
-foreach header : headers
-  headers_all += ['src' / header]
-endforeach
-
-c_files_all = []
-foreach file : c_files_all_subdir
-  c_files_all += ['src' / file]
-endforeach
-
 subdir('detection')
 
 if have_assembly
@@ -56,11 +45,11 @@ libflint = library('flint', c_files_all,
 
 tests_opt = get_option('tests')
 if tests_opt.enabled()
-  subdir('src/fmpz/test')
-  subdir('src/fmpq/test')
-  subdir('src/ulong_extras/test')
+  foreach mod_test : mod_tests
+    subdir('src' / mod_test)
+  endforeach
 else
-  bad_test_exe = executable('bad_test', 'bad_test.c')
+  bad_test_exe = executable('bad_test', '_meson_build/bad_test.c')
   test('Need to build tests with -Dtests=enabled', bad_test_exe)
 endif
 
