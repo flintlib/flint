@@ -24,7 +24,7 @@ static int _try_lift(
     fmpz_mod_mpolyv_t qfac,
     const fmpz_mod_mpoly_t q,
     const fmpz_mod_mpolyv_t pfac,
-    const fmpz_mod_mpoly_t p,
+    const fmpz_mod_mpoly_t FLINT_UNUSED(p),
     slong m,
     const fmpz * alphas,
     slong n,

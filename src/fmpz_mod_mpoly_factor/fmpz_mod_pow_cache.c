@@ -33,7 +33,7 @@ void fmpz_mod_pow_cache_mulpow_ui(
 {
     FLINT_ASSERT(c->length > 1);
 
-    if (e < c->length)
+    if (e < (ulong) c->length)
     {
         fmpz_mod_mul(a, b, c->coeffs + e, ctx);
         return;
@@ -49,7 +49,7 @@ void fmpz_mod_pow_cache_mulpow_ui(
 
     fmpz_mod_poly_fit_length(c, e + 1, ctx);
 
-    while (e >= c->length)
+    while (e >= (ulong) c->length)
     {
         fmpz_mod_mul(c->coeffs + c->length,
                      c->coeffs + c->length - 1, c->coeffs + 1, ctx);

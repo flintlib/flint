@@ -79,10 +79,10 @@ void fmpz_mod_polyu3_degrees(
 
 /***************************************************************************/
 
-void fmpz_mod_mpolyu_init(
+static void fmpz_mod_mpolyu_init(
     fmpz_mod_mpolyu_t A,
     flint_bitcnt_t bits,
-    const fmpz_mod_mpoly_ctx_t ctx)
+    const fmpz_mod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     A->coeffs = NULL;
     A->exps = NULL;
@@ -92,7 +92,7 @@ void fmpz_mod_mpolyu_init(
 }
 
 
-void fmpz_mod_mpolyu_clear(
+static void fmpz_mod_mpolyu_clear(
     fmpz_mod_mpolyu_t A,
     const fmpz_mod_mpoly_ctx_t uctx)
 {
@@ -103,35 +103,7 @@ void fmpz_mod_mpolyu_clear(
     flint_free(A->exps);
 }
 
-
-void fmpz_mod_mpolyu_swap(
-    fmpz_mod_mpolyu_t A,
-    fmpz_mod_mpolyu_t B,
-    const fmpz_mod_mpoly_ctx_t uctx)
-{
-   fmpz_mod_mpolyu_struct t = *A;
-   *A = *B;
-   *B = t;
-}
-
-void fmpz_mod_mpolyu_zero(
-    fmpz_mod_mpolyu_t A,
-    const fmpz_mod_mpoly_ctx_t uctx)
-{
-    A->length = 0;
-}
-
-int fmpz_mod_mpolyu_is_one(
-    fmpz_mod_mpolyu_t A,
-    const fmpz_mod_mpoly_ctx_t uctx)
-{
-    if (A->length != 1 || A->exps[0] != UWORD(0))
-        return 0;
-
-    return fmpz_mod_mpoly_is_one(A->coeffs + 0, uctx);
-}
-
-void fmpz_mod_mpolyu_fit_length(
+static void fmpz_mod_mpolyu_fit_length(
     fmpz_mod_mpolyu_t A,
     slong length,
     const fmpz_mod_mpoly_ctx_t uctx)
@@ -153,33 +125,8 @@ void fmpz_mod_mpolyu_fit_length(
     }
 }
 
-void fmpz_mod_mpolyu_one(fmpz_mod_mpolyu_t A, const fmpz_mod_mpoly_ctx_t uctx)
-{
-    fmpz_mod_mpolyu_fit_length(A, WORD(1), uctx);
-    A->exps[0] = UWORD(0);
-    fmpz_mod_mpoly_one(A->coeffs + 0, uctx);
-    A->length = WORD(1);
-}
-
-void fmpz_mod_mpolyu_repack_bits_inplace(
-    fmpz_mod_mpolyu_t A,
-    flint_bitcnt_t bits,
-    const fmpz_mod_mpoly_ctx_t ctx)
-{
-    slong i;
-
-    if (bits == A->bits)
-        return;
-
-    A->bits = bits;
-
-    for (i = 0; i < A->alloc; i++)
-        fmpz_mod_mpoly_repack_bits_inplace(A->coeffs + i, bits, ctx);
-}
-
-
 /* if the coefficient doesn't exist, a new one is created (and set to zero) */
-fmpz_mod_mpoly_struct * _fmpz_mod_mpolyu_get_coeff(
+static fmpz_mod_mpoly_struct * _fmpz_mod_mpolyu_get_coeff(
     fmpz_mod_mpolyu_t A,
     ulong pow,
     const fmpz_mod_mpoly_ctx_t uctx)

@@ -479,7 +479,7 @@ slong fmpz_mod_polyun_stack_size(const fmpz_mod_polyun_stack_t S)
 
 
 void fmpz_mod_mpolyn_stack_init(fmpz_mod_mpolyn_stack_t S,
-                          flint_bitcnt_t bits, const fmpz_mod_mpoly_ctx_t ctx);
+                          flint_bitcnt_t bits, const fmpz_mod_mpoly_ctx_t FLINT_UNUSED(ctx));
 
 void fmpz_mod_mpolyn_stack_clear(fmpz_mod_mpolyn_stack_t S,
                                                const fmpz_mod_mpoly_ctx_t ctx);
@@ -625,7 +625,7 @@ void fmpz_mod_mpoly_set_polyu1n(fmpz_mod_mpoly_t B,
 /* mpolyn ********************************************************************/
 
 void fmpz_mod_mpolyn_init(fmpz_mod_mpolyn_t A, flint_bitcnt_t bits,
-                                               const fmpz_mod_mpoly_ctx_t ctx);
+                                               const fmpz_mod_mpoly_ctx_t FLINT_UNUSED(ctx));
 
 FMPZ_MOD_MPOLY_INLINE void fmpz_mod_mpolyn_swap(fmpz_mod_mpolyn_t A,
                            fmpz_mod_mpolyn_t B, const fmpz_mod_mpoly_ctx_t FLINT_UNUSED(ctx))
@@ -850,7 +850,7 @@ void fmpz_mod_polyu3_print_pretty(
     const char * var0,
     const char * var1,
     const char * var2,
-    const fmpz_mod_ctx_t ctx);
+    const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
 
 /* mpolyu ********************************************************************/
 
@@ -941,8 +941,7 @@ int fmpz_mod_bpoly_is_one(const fmpz_mod_bpoly_t A, const fmpz_mod_ctx_t ctx)
     return A->length == 1 && fmpz_mod_poly_is_one(A->coeffs + 0, ctx);
 }
 
-slong fmpz_mod_bpoly_degree1(const fmpz_mod_bpoly_t A,
-                                                     const fmpz_mod_ctx_t ctx);
+slong fmpz_mod_bpoly_degree1(const fmpz_mod_bpoly_t A, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
 
 void fmpz_mod_bpoly_print_pretty(const fmpz_mod_bpoly_t A,
                const char * xvar, const char * yvar, const fmpz_mod_ctx_t ctx);
@@ -953,7 +952,7 @@ void fmpz_mod_bpoly_fit_length(fmpz_mod_bpoly_t A, slong len,
 void fmpz_mod_bpoly_set_coeff(fmpz_mod_bpoly_t A, slong xi, slong yi,
                                      const fmpz_t c, const fmpz_mod_ctx_t ctx);
 
-void fmpz_mod_bpoly_zero(fmpz_mod_bpoly_t A, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_bpoly_zero(fmpz_mod_bpoly_t A, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
 
 void fmpz_mod_bpoly_reverse_vars(fmpz_mod_bpoly_t A,
                            const fmpz_mod_bpoly_t B, const fmpz_mod_ctx_t ctx);
@@ -1359,7 +1358,7 @@ void fmpz_mod_mpoly_mock_eval_coeff(
     fmpz_mod_polyun_t mock,
     const fmpz_mod_mpoly_t A,
     const fmpz_mod_polyun_t Aeh_inc,
-    const fmpz_mod_mpoly_ctx_t ctx);
+    const fmpz_mod_mpoly_ctx_t FLINT_UNUSED(ctx));
 
 slong fmpz_mod_polyun_product_roots(
     fmpz_mod_polyun_t M,

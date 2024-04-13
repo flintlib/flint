@@ -161,7 +161,7 @@ void fmpz_mod_polyu3_print_pretty(
     const char * var0,
     const char * var1,
     const char * var2,
-    const fmpz_mod_ctx_t ctx)
+    const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
 {
     slong i;
     int first = 1;

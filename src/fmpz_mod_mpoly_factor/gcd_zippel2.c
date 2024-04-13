@@ -337,7 +337,7 @@ void fmpz_mod_mpoly_mock_eval_coeff(
     fmpz_mod_polyun_t mock,
     const fmpz_mod_mpoly_t A,
     const fmpz_mod_polyun_t Aeh_inc,
-    const fmpz_mod_mpoly_ctx_t ctx)
+    const fmpz_mod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     slong i, k;
 
@@ -452,7 +452,7 @@ void fmpz_mod_polyu2n_zip_eval_cur_inc_coeff(
     const fmpz_mod_ctx_t ctx)
 {
     slong i, Ei;
-    slong e0, e1;
+    ulong e0, e1;
     fmpz_t c;
 
     FLINT_ASSERT(Acur->length > 0);
