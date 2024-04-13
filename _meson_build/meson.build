@@ -1,5 +1,5 @@
 project('FLINT', 'c',
-  version: '3.1.0',
+  version: '3.2.0-dev',
   license: 'LGPL3+',
   default_options: [
     'buildtype=release',
@@ -7,8 +7,13 @@ project('FLINT', 'c',
   ],
 )
 
-cc = meson.get_compiler('c')
 cfg_data = configuration_data()
+cfg_data.set('FLINT_MAJOR', meson.project_version().split('.')[0])
+cfg_data.set('FLINT_MINOR', meson.project_version().split('.')[1])
+cfg_data.set('FLINT_PATCH', meson.project_version().split('.')[2])
+cfg_data.set('FLINT_VERSION_FULL', meson.project_version())
+
+cc = meson.get_compiler('c')
 fs = import('fs')
 
 m_dep = cc.find_library('m', required: false)
@@ -23,10 +28,12 @@ add_project_arguments(
   language: 'c',
 )
 
-subdir('src')
 subdir('detection')
+subdir('src')
 
 if have_assembly
+  s_files = []
+  subdir('src' / assembly_dir)
   c_files_all += s_files
 endif
 

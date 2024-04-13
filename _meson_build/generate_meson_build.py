@@ -6,19 +6,23 @@ from argparse import ArgumentParser
 
 this_dir = dirname(abspath(__file__))
 
-files = [
+files_to_copy = [
     'configure',
     'Makefile',
     'meson.build',
     'meson.options',
 ]
 
-# Directories in src that are not modules to be built as part of libflint
+# Directories in src that are not modules or that need special handling
 exclude_mod_dirs = [
     'test',
     'profile',
     'interfaces',
     'python',
+]
+
+conditional_modules = [
+    'fft_small',
 ]
 
 # Modules that do not have a corresponding header file
@@ -91,6 +95,12 @@ src_meson_build = '''\
 #   python _meson_build/generate_meson_build.py
 #
 
+configure_file(
+  input: 'flint.h.in',
+  output: 'flint.h',
+  configuration: cfg_data,
+)
+
 src_dir_inc = include_directories('.')
 
 modules = [
@@ -126,6 +136,14 @@ foreach mod : modules + headers_no_dir
   endif
 endforeach
 
+# Add conditional modules
+
+if have_fft_small
+  subdir('fft_small')
+  mod_tests += ['fft_small/test']
+  headers_all += ['fft_small.h']
+endif
+
 headers_all = files(headers_all)
 '''
 
@@ -160,7 +178,70 @@ test_exe = executable('main',
 test('%s', test_exe)
 '''
 
+asm_submodule_arm64 = '''\
+
+asm_deps = [
+  '../../../config.m4',
+  '../asm-defs.m4',
+]
+
+if host_machine.system() == 'darwin'
+  asm_deps += ['darwin.m4']
+else
+  asm_deps += ['arm64-defs.m4']
+endif
+
+asm_files = [
+%s
+]
+'''
+
+asm_submodule_x86_broadwell = '''\
+
+asm_deps = [
+    '../../../config.m4',
+    '../asm-defs.m4',
+    'x86-defs.m4',
+]
+
+if host_machine.system() == 'darwin'
+  asm_deps += ['darwin.m4']
+endif
+
+asm_files = [
+%s
+]
+'''
+
+asm_to_s_files = '''\
+
+m4_prog = find_program('m4', native: true)
+
+foreach asm_file: asm_files
+  s_filename = fs.stem(asm_file) + '.s'
+  s_file = custom_target(s_filename,
+    input: [asm_file] + asm_deps,
+    output: s_filename,
+    command: [m4_prog, '-I..', '@INPUT0@'],
+    capture: true,
+  )
+  s_files += [s_file]
+endforeach
+'''
+
+
+asm_modules = [
+    ('mpn_extras/arm64', asm_submodule_arm64),
+    ('mpn_extras/x86_64/broadwell', asm_submodule_x86_broadwell),
+]
+
+
 def get_flint_modules(flint_root):
+    """
+    Scan the src directory and return a list of all modules.
+
+    Also check for possible mismatches between subdirs and headers.
+    """
     src_path = join(flint_root, 'src')
     is_mod = lambda p: isdir(join(src_path, p)) and p not in exclude_mod_dirs
     subdirs = [p for p in listdir(src_path) if is_mod(p)]
@@ -184,76 +265,83 @@ def get_flint_modules(flint_root):
 
     return subdirs
 
-parser = ArgumentParser(description='Generate Meson build files')
 
+parser = ArgumentParser(description='Generate Meson build files')
 parser.add_argument('-q', '--quiet', action='store_true',
                     help='Do not print anything')
 parser.add_argument('--error-if-changed', action='store_true',
                     help='Exit with error code 1 if the files have changed')
 parser.add_argument('output_dir', default='.', help='Output directory')
 
+
 def main(args):
     args = parser.parse_args(args)
 
-    for fname in files:
+    for fname in files_to_copy:
         src_path = join(this_dir, fname)
         dst_path = join(args.output_dir, fname)
-        if not args.quiet:
-            print('Copying {} to {}'.format(src_path, dst_path))
-        if args.error_if_changed:
-            if not same_files(src_path, dst_path):
-                print('File {} has changed'.format(dst))
-                return 1
-        copyfile(src_path, dst_path)
+        copy_file(src_path, dst_path, args)
 
     modules = get_flint_modules(args.output_dir)
 
-    modules_str = '\n'.join(f"  '{m}'," for m in sorted(modules))
-    mod_no_head_str = '\n'.join(f"  '{m}'," for m in sorted(mod_no_header))
-    mod_no_test_str = '\n'.join(f"  '{m}'," for m in sorted(mod_no_tests))
-    head_no_dir_str = '\n'.join(f"  '{m}'," for m in sorted(head_no_dir))
+    # We will generate the meson.build file for conditional modules but the
+    # main meson.build file will decide whether to include them or not.
+    modules_unconditional = set(modules) - set(conditional_modules)
 
+    # src/meson.build
     src_meson_build_text = src_meson_build % (
-        modules_str, mod_no_head_str, mod_no_test_str, head_no_dir_str)
-
+        format_lines(modules_unconditional),
+        format_lines(mod_no_header),
+        format_lines(mod_no_tests),
+        format_lines(head_no_dir),
+    )
     dst_path = join(args.output_dir, 'src', 'meson.build')
+    write_file(dst_path, src_meson_build_text, args)
 
-    if not args.quiet:
-        print('Writing meson.build to {}'.format(src_path))
-    if args.error_if_changed:
-        if not same_content(src_meson_build_text, src_path):
-            print('File {} has changed'.format(src_path))
-            return 1
-    with open(dst_path, 'w') as fout:
-        fout.write(src_meson_build_text)
-
+    # src/mod/meson.build
     for mod in modules + mod_no_header:
         mod_dir = join(args.output_dir, 'src', mod)
         c_files = [f for f in listdir(mod_dir) if f.endswith('.c')]
-        c_files_str = '\n'.join(f"  '{f}'," for f in sorted(c_files))
-        src_mod_meson_build_text = src_mod_meson_build % c_files_str
+        src_mod_meson_build_text = src_mod_meson_build % format_lines(c_files)
         dst_path = join(mod_dir, 'meson.build')
-        if not args.quiet:
-            print('Writing meson.build to {}'.format(dst_path))
-        if args.error_if_changed:
-            if not same_content(src_mod_meson_build_text, dst_path):
-                print('File {} has changed'.format(dst_path))
-                return 1
-        with open(dst_path, 'w') as fout:
-            fout.write(src_mod_meson_build_text)
+        write_file(dst_path, src_mod_meson_build_text, args)
 
+        # src/mod/test/meson.build
         if mod not in mod_no_tests:
             test_dir = join(mod_dir, 'test')
             test_mod_meson_build_text = test_mod_meson_build % mod
             dst_path = join(test_dir, 'meson.build')
-            if not args.quiet:
-                print('Writing meson.build to {}'.format(dst_path))
-            if args.error_if_changed:
-                if not same_content(test_mod_meson_build_text, dst_path):
-                    print('File {} has changed'.format(dst_path))
-                    return 1
-            with open(dst_path, 'w') as fout:
-                fout.write(test_mod_meson_build_text)
+            write_file(dst_path, test_mod_meson_build_text, args)
+
+    # src/mpn_extras/*/meson.build
+    for path, asm_submodule in asm_modules:
+        asm_dir = join(args.output_dir, 'src', path)
+        asm_files = [f for f in listdir(asm_dir) if f.endswith('.asm')]
+        asm_submodule_text = asm_submodule % format_lines(asm_files)
+        asm_submodule_text += asm_to_s_files
+        dst_path = join(asm_dir, 'meson.build')
+        write_file(dst_path, asm_submodule_text, args)
+
+
+def format_lines(lst):
+    return '\n'.join(f"  '{m}'," for m in sorted(lst))
+
+
+def write_file(dst_path, text, args):
+    if not args.quiet:
+        print('Writing %s' % dst_path)
+    if args.error_if_changed:
+        if not same_content(text, dst_path):
+            print('File {} has changed'.format(dst_path))
+            sys.exit(1)
+    with open(dst_path, 'w') as fout:
+        fout.write(text)
+
+
+def copy_file(src_path, dst_path, args):
+    with open(src_path, 'r') as f:
+        src_content = f.read()
+    write_file(dst_path, src_content, args)
 
 
 def same_files(src_path, dst_path):
