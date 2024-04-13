@@ -1,0 +1,158 @@
+#!/usr/bin/env python
+
+from os.path import join, abspath, dirname
+import sys
+import shutil
+from subprocess import check_call
+from argparse import ArgumentParser
+
+
+parser = ArgumentParser(description='Configure FLINT for building with meson')
+
+parser.add_argument('--build-dir', default='build', help='Build directory')
+
+parser.add_argument('--prefix', default=None, help='Installation prefix')
+parser.add_argument('--bindir', default=None, help='Binary directory')
+parser.add_argument('--libdir', default=None, help='Library directory')
+parser.add_argument('--includedir', default=None, help='Include directory')
+
+parser.add_argument('--build', default=None, help='Not supported...')
+parser.add_argument('--host', default=None, help='Not supported...')
+
+parser.add_argument('--disable-shared', default=False, action='store_true', help='Do not build shared libraries')
+parser.add_argument('--enable-static', default=False, action='store_true', help='Build static libraries')
+
+parser.add_argument('--disable-libtool-lock', default=None, help='Not supported...')
+parser.add_argument('--enable-pthread', default=None, help='Not supported...')
+parser.add_argument('--enable-reentrant', default=None, help='Not supported...')
+parser.add_argument('--enable-thread-safe', default=None, help='Not supported...')
+parser.add_argument('--enable-assert', default=None, help='Not supported...')
+parser.add_argument('--enable-coverage', default=None, help='Not supported...')
+parser.add_argument('--enable-debug', default=None, help='Not supported...')
+parser.add_argument('--enable-dependency-tracking', default=None, help='Not supported...')
+parser.add_argument('--enable-pretty-tests', default=None, help='Not supported...')
+
+parser.add_argument('--enable-gmp-internals', default=None, help='Not supported...')
+
+parser.add_argument('--enable-assembly', default=None, choices=['yes', 'no', 'auto'], help='Enable assembly routines (if available)')
+parser.add_argument('--enable-avx2', default=None, choices=['yes', 'no', 'auto'], help='Use AVX2 instructions')
+parser.add_argument('--enable-avx512', default=None, choices=['yes', 'no', 'auto'], help='Use AVX512 instructions')
+
+parser.add_argument('--with-gmp', default=None, help='GMP install directory')
+parser.add_argument('--with-mpfr', default=None, help='MPFR install directory')
+
+parser.add_argument('--with-blas', default=None, help='Not supported...')
+parser.add_argument('--with-gc', default=None, help='Not supported...')
+parser.add_argument('--with-ntl', default=None, help='Not supported...')
+
+
+def run_command(cmd):
+    print('-' * 80)
+    print('$', ' '.join(cmd))
+    print('-' * 80)
+    check_call(cmd)
+
+
+def enabled_disabled(value):
+    if value == 'yes':
+        return 'enabled'
+    elif value == 'no':
+        return 'disabled'
+    elif value == 'auto':
+        return 'auto'
+    else:
+        raise ValueError('Invalid value: ' + value)
+
+
+def get_meson_command_from_configure_args(args):
+    """
+    Translate e.g. 
+        ./configure --prefix=/opt/foo --enable-assembly=no
+    to
+        meson setup build --prefix=/opt/foo -Dassembly=disabled
+    Raise ValueError if modifying an option is not supported.
+    """
+    args = parser.parse_args(args)
+
+    setup_args = []
+
+    if args.bindir is not None:
+        setup_args.append('--bindir=' + args.bindir)
+    if args.libdir is not None:
+        setup_args.append('--libdir=' + args.libdir)
+    if args.includedir is not None:
+        setup_args.append('--includedir=' + args.includedir)
+    if args.prefix is not None:
+        setup_args.append('--prefix=' + args.prefix)
+
+    if args.enable_static and args.disable_shared:
+        setup_args.append('--default-library=static')
+    elif args.enable_static and not args.disable_shared:
+        setup_args.append('--default-library=both')
+    elif not args.enable_static and not args.disable_shared:
+        pass
+    elif not args.enable_static and args.disable_shared:
+        raise ValueError('Cannot use --enable-static and --disable-shared together')
+
+    if args.disable_libtool_lock is not None:
+        raise ValueError('--disable-libtool-lock is not supported')
+    if args.enable_pthread is not None:
+        raise ValueError('--enable-pthread is not supported')
+    if args.enable_reentrant is not None:
+        raise ValueError('--enable-reentrant is not supported')
+    if args.enable_thread_safe is not None:
+        raise ValueError('--enable-thread-safe is not supported')
+    if args.enable_assert is not None:
+        raise ValueError('--enable-assert is not supported')
+    if args.enable_coverage is not None:
+        raise ValueError('--enable-coverage is not supported')
+    if args.enable_debug is not None:
+        raise ValueError('--enable-debug is not supported')
+    if args.enable_dependency_tracking is not None:
+        raise ValueError('--enable-dependency-tracking is not supported')
+    if args.enable_pretty_tests is not None:
+        raise ValueError('--enable-pretty-tests is not supported')
+
+    if args.enable_gmp_internals is not None:
+        raise ValueError('--enable-gmp-internals is not supported')
+
+    if args.enable_assembly is not None:
+        setup_args.append('-Dassembly=' + enabled_disabled(args.enable_assembly))
+
+    if args.enable_avx2 is not None or args.enable_avx512 is not None:
+        if 'enableds' in (args.enable_avx2, args.enable_avx512):
+            fft_small = 'enabled'
+        elif 'disabled' in (args.enable_avx2, args.enable_avx512):
+            fft_small = 'disabled'
+        else:
+            fft_small = 'auto'
+        setup_args.append('-Dfft_small=' + fft_small)
+
+    if args.with_gmp is not None:
+        setup_args.append('--pkg-config-path=' + join(args.with_gmp, 'lib', 'pkgconfig'))
+    if args.with_mpfr is not None:
+        setup_args.append('--pkg-config-path=' + join(args.with_mpfr, 'lib', 'pkgconfig'))
+
+    if args.with_blas is not None:
+        raise ValueError('--with-blas is not supported')
+    if args.with_gc is not None:
+        raise ValueError('--with-gc is not supported')
+    if args.with_ntl is not None:
+        raise ValueError('--with-ntl is not supported')
+
+    cmd = ['meson', 'setup', args.build_dir] + setup_args
+    return cmd, args
+
+
+def main(*args):
+    cmd, args = get_meson_command_from_configure_args(args)
+    # The default behaviour of ./configure is to basically wipe out the build.
+    # Everything is then rebuilt from scratch. We will do the same here to
+    # match the semantics of configure which does not preserve any settings
+    # from one run of configure to the next.
+    shutil.rmtree(args.build_dir, ignore_errors=True)
+    run_command(cmd)
+
+
+if __name__ == '__main__':
+    sys.exit(main(*sys.argv[1:]))
