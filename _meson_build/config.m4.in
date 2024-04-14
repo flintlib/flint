@@ -1,0 +1,21 @@
+dnl config.m4.  Generated automatically by configure.
+changequote(<,>)
+ifdef(<__CONFIG_M4_INCLUDED__>,,<
+define(<TEXT>, <.text>)
+define(<DATA>, <.data>)
+define(<LABEL_SUFFIX>, <:>)
+define(<GLOBL>, <.globl>)
+define(<GLOBL_ATTR>, <>)
+define(<GSYM_PREFIX>, <_>)
+define(<RODATA>, <	.section	__TEXT,__const>)
+define(<TYPE>, <>)
+define(<SIZE>, <>)
+define(<LSYM_PREFIX>, @LSYM_PREFIX@)
+define(<ALIGN_LOGARITHMIC>,<yes>)
+>)
+changequote(`,')
+ifdef(`__CONFIG_M4_INCLUDED__',,`
+include(`../src/mpn_extras/asm-defs.m4')
+include(`../src/mpn_extras/arm64/darwin.m4')
+')
+define(`__CONFIG_M4_INCLUDED__')
