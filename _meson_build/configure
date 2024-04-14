@@ -120,9 +120,9 @@ def get_meson_command_from_configure_args(args):
         setup_args.append('-Dassembly=' + enabled_disabled(args.enable_assembly))
 
     if args.enable_avx2 is not None or args.enable_avx512 is not None:
-        if 'enabled' in (args.enable_avx2, args.enable_avx512):
+        if 'yes' in (args.enable_avx2, args.enable_avx512):
             fft_small = 'enabled'
-        elif 'disabled' in (args.enable_avx2, args.enable_avx512):
+        elif 'no' in (args.enable_avx2, args.enable_avx512):
             fft_small = 'disabled'
         else:
             fft_small = 'auto'
