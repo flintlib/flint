@@ -1,4 +1,12 @@
 # -----------------------------------------------------------------------------
+#   FLINT configuration
+# -----------------------------------------------------------------------------
+
+# Data set on cfg_data is used to generate flint_config.h
+# Data set on cfg_data_internal (below) is used to generate config.h
+cfg_data = configuration_data()
+
+# -----------------------------------------------------------------------------
 #    fft_small
 # -----------------------------------------------------------------------------
 
@@ -20,11 +28,6 @@ fft_small_opt = fft_small_opt.enable_auto_if(fft_small_supported)
 have_fft_small = fft_small_opt.enabled()
 
 message('FFT_SMALL: ', have_fft_small ? 'enabled' : 'disabled')
-
-if have_fft_small
-    cfg_data.set('FLINT_HAVE_FFT_SMALL', 1,
-        description: 'Define to use the fft_small module')
-endif
 
 # -----------------------------------------------------------------------------
 #   assembly
@@ -64,13 +67,138 @@ have_assembly = assembly_opt.enabled()
 message('ASSEMBLY: ', have_assembly ? 'enabled' : 'disabled')
 
 # -----------------------------------------------------------------------------
+#  external configuration for flint_config.h
+# -----------------------------------------------------------------------------
+
+# cfg_data.set('FLINT_BIG_ENDIAN', 1,
+#   description: 'Define if system is big endian.')
+
+if FLINT_HAVE_ASSEMBLY == 'armv8'
+  cfg_data.set('FLINT_HAVE_ASSEMBLY_armv8', 1,
+    description: 'Define if Arm v8 assembly is available')
+elif FLINT_HAVE_ASSEMBLY == 'x86_64_adx'
+  cfg_data.set('FLINT_HAVE_ASSEMBLY_x86_64_adx', 1,
+    description: 'Define if x86_64 ADX assembly is available')
+endif
+
+if have_fft_small
+    cfg_data.set('FLINT_HAVE_FFT_SMALL', 1,
+        description: 'Define to use the fft_small module')
+endif
+
+cfg_data.set('FLINT_HAVE_NATIVE_mpn_add_n_sub_n', 1,
+  description: 'Define if GMP has mpn_add_n_sub_n')
+cfg_data.set('FLINT_HAVE_NATIVE_mpn_add_nc', 1,
+  description: 'Define if GMP has mpn_add_nc')
+cfg_data.set('FLINT_HAVE_NATIVE_mpn_addlsh1_n', 1,
+  description: 'Define if GMP has mpn_addlsh1_n')
+# cfg_data.set('FLINT_HAVE_NATIVE_mpn_addlsh1_n_ip1', 0,
+#   description: 'Define if GMP has mpn_addlsh1_n_ip1')
+# cfg_data.set('FLINT_HAVE_NATIVE_mpn_addmul_2', 0,
+#   description: 'Define if GMP has mpn_addmul_2')
+# cfg_data.set('FLINT_HAVE_NATIVE_mpn_modexact_1_odd', 0,
+#   description: 'Define if system has mpn_modexact_1_odd')
+cfg_data.set('FLINT_HAVE_NATIVE_mpn_rsh1add_n', 1,
+  description: 'Define if GMP has mpn_rsh1add_n')
+cfg_data.set('FLINT_HAVE_NATIVE_mpn_rsh1sub_n', 1,
+  description: 'Define if GMP has mpn_rsh1sub_n')
+cfg_data.set('FLINT_HAVE_NATIVE_mpn_sub_nc', 1,
+  description: 'Define if GMP has mpn_sub_nc')
+# cfg_data.set('FLINT_KNOW_STRONG_ORDER', 1,
+#   description: 'Define if system is strongly ordered')
+# cfg_data.set('FLINT_REENTRANT', 0,
+#   description: 'Define to enable reentrant.')
+cfg_data.set('FLINT_UNROLL_LOOPS', 1,
+  description: 'Define to locally unroll some loops')
+# cfg_data.set('FLINT_USES_BLAS', 0,
+#   description: 'Define to enable BLAS.')
+# cfg_data.set('FLINT_USES_CPUSET', 0,
+#   description: 'Define if system has cpu_set_t')
+# cfg_data.set('FLINT_USES_GC', 0,
+#   description: 'Define to enable the Boehm-Demers-Weise garbage collector.')
+cfg_data.set('FLINT_USES_PTHREAD', 1,
+  description: 'Define to enable the use of pthread.')
+
+cfg_data.set('FLINT_USES_TLS', 1,
+  description: 'Define to enable thread-local storage.')
+# cfg_data.set('FLINT_WANT_WANT_ASSERT', 1,
+#   description: 'Define to enable use of asserts.')
+cfg_data.set('FLINT_WANT_GMP_INTERNALS', 1,
+  description: 'Define to enable use of GMP internals.')
+cfg_data.set('FLINT_WANT_PRETTY_TESTS', 1,
+  description: 'Define to enable pretty printing for tests.')
+
+# -----------------------------------------------------------------------------
 #  internal configuration for config.h
 # -----------------------------------------------------------------------------
 
 cfg_data_internal = cfg_data
 
-cfg_data_internal.set_quoted('LSYM_PREFIX', 'L')
+#cfg_data_internal.set('AC_APPLE_UNIVERSAL_BUILD', 1)
 
-if FLINT_HAVE_ASSEMBLY != ''
-    cfg_data_internal.set('FLINT_HAVE_ASSEMBLY_' + FLINT_HAVE_ASSEMBLY, 1)
+# XXX: Change this when coverage options are added
+#cfg_data_internal.set('FLINT_COVERAGE', 1)
+
+if cc.has_header_symbol('stdlib.h', 'aligned_alloc')
+  cfg_data_internal.set('HAVE_ALIGNED_ALLOC', 1,
+    description: 'Define to 1 if you have the \'aligned_alloc\' function.')
 endif
+
+ac_headers_check = [
+  'alloca.h',
+  'arm_neon.h',
+  'dlfcn.h',
+  'errno.h',
+  'fenv.h',
+  'float.h',
+  'immintrin.h', # XXX: has_header is not equivalent to autotools check...
+  'inttypes.h',
+  'malloc.h',
+  'math.h',
+  'pthread_np.h',
+  'stdarg.h',
+  'stdint.h',
+  'stdio.h',
+  'stdlib.h',
+  'string.h',
+  'strings.h',
+  'sys/param.h',
+  'sys/stat.h',
+  'sys/types.h',
+  'unistd.h',
+  'windows.h',
+]
+
+foreach h : ac_headers_check
+  if cc.has_header(h)
+    cfg_data_internal.set('HAVE_' + h.underscorify().to_upper(), 1,
+      description: f'Define to 1 if you have the <@h@> header file.')
+  endif
+endforeach
+
+# XXX: Do we need to check for _alligned_malloc?
+
+cfg_data_internal.set_quoted('LSYM_PREFIX', 'L',
+  description: 'Assembler local label prefix')
+cfg_data_internal.set_quoted('LT_OBJDIR', '.libs/',
+  description: 'Define to the sub-directory where libtool stores uninstalled libraries.')
+cfg_data_internal.set_quoted('PACKAGE_BUGREPORT',
+  'https://github.com/flintlib/flint/issues/',
+  description: 'Define to the address where bug reports for this package should be sent.')
+cfg_data_internal.set_quoted('PACKAGE_NAME', 'FLINT',
+  description: 'Define to the full name of this package.')
+cfg_data_internal.set_quoted('PACKAGE_STRING', 'FLINT ' + FLINT_VERSION_FULL,
+  description: 'Define to the full name and version of this package.')
+cfg_data_internal.set_quoted('PACKAGE_TARNAME', 'flint',
+  description: 'Define to the one symbol short name of this package.')
+cfg_data_internal.set_quoted('PACKAGE_URL', 'https://flintlib.org/',
+  description: 'Define to the home page for this package.')
+cfg_data_internal.set_quoted('PACKAGE_VERSION', FLINT_VERSION_FULL,
+  description: 'Define to the version of this package.')
+
+cfg_data_internal.set('STDC_HEADERS', 1,
+  description: '''Define to 1 if all of the C89 standard headers exist (not just the ones
+   required in a freestanding environment). This macro is provided for
+   backward compatibility; new code need not use it.''')
+
+# XXX: set WORDS_BIGENDIAN or undef inline here?
