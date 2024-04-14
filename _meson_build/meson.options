@@ -4,3 +4,9 @@ option('fft_small', type : 'feature', value : 'auto',
         description: 'Build the fft_small module')
 option('assembly', type : 'feature', value : 'auto',
         description: 'Use assembly code')
+option('gc', type : 'feature', value : 'disabled',
+        description: 'Use the Boehm garbage collector')
+option('reentrant', type : 'feature', value : 'disabled',
+        description: 'Build the reentrant module')
+option('threadsafe', type : 'feature', value : 'enabled',
+        description: 'Build the threadsafe module')
