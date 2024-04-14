@@ -45,13 +45,14 @@ assembly_opt = assembly_opt.require(host_machine.system() != 'windows',
 if host_machine.cpu_family() == 'aarch64'
   assembly_cpu_supported = true
   assembly_dir = 'mpn_extras/arm64'
-  # FLINT_HAVE_ASSEMBLY_armv8
+  FLINT_HAVE_ASSEMBLY = 'armv8'
 elif host_machine.cpu_family() == 'x86_64'
   assembly_cpu_supported = true
   assembly_dir = 'mpn_extras/x86_64/broadwell'
-  # FLINT_HAVE_ASSEMBLY_x86_64_adx
+  FLINT_HAVE_ASSEMBLY = 'x86_64_adx'
 else
   assembly_cpu_supported = false
+  FLINT_HAVE_ASSEMBLY = ''
 endif
 
 assembly_opt = assembly_opt.require(assembly_cpu_supported,
@@ -61,3 +62,15 @@ assembly_opt = assembly_opt.enable_auto_if(true)
 have_assembly = assembly_opt.enabled()
 
 message('ASSEMBLY: ', have_assembly ? 'enabled' : 'disabled')
+
+# -----------------------------------------------------------------------------
+#  internal configuration for config.h
+# -----------------------------------------------------------------------------
+
+cfg_data_internal = cfg_data
+
+cfg_data_internal.set_quoted('LSYM_PREFIX', 'L')
+
+if FLINT_HAVE_ASSEMBLY != ''
+    cfg_data_internal.set('FLINT_HAVE_ASSEMBLY_' + FLINT_HAVE_ASSEMBLY, 1)
+endif

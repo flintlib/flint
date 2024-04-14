@@ -1,5 +1,5 @@
 import sys
-from os import listdir
+from os import listdir, makedirs
 from os.path import join, dirname, abspath, isdir
 from shutil import copyfile
 from argparse import ArgumentParser
@@ -11,6 +11,8 @@ files_to_copy = [
     'Makefile',
     'meson.build',
     'meson.options',
+    'include/meson.build',
+    'include/flint/meson.build',
 ]
 
 # Directories in src that are not modules or that need special handling
@@ -19,6 +21,7 @@ exclude_mod_dirs = [
     'profile',
     'interfaces',
     'python',
+    'include',
 ]
 
 conditional_modules = [
@@ -37,11 +40,7 @@ head_no_dir = [
     'acf_types',
     'arb_types',
     'arf_types',
-    'config',
     'crt_helpers',
-    'flint',
-    'flint-config',
-    'flint-mparam',
     'fmpq_types',
     'fmpz_mod_types',
     'fmpz_types',
@@ -49,7 +48,6 @@ head_no_dir = [
     'fq_types',
     'fq_zech_types',
     'gettimeofday',
-    'gmpcompat',
     'limb_types',
     'longlong',
     'longlong_asm_clang',
@@ -67,6 +65,14 @@ head_no_dir = [
     'profiler',
     'templates',
     'test_helpers',
+]
+
+headers_skip = [
+    'flint',
+    'config',
+    'flint-config',
+    'flint-mparam',
+    'gmpcompat',
 ]
 
 mod_no_tests = [
@@ -94,14 +100,6 @@ src_meson_build = '''\
 # To regenerate it, run:
 #   python _meson_build/generate_meson_build.py
 #
-
-configure_file(
-  input: 'flint.h.in',
-  output: 'flint.h',
-  configuration: cfg_data,
-)
-
-src_dir_inc = include_directories('.')
 
 modules = [
 %s
@@ -171,7 +169,7 @@ test_exe = executable('main',
   'main.c',
   dependencies: flint_deps,
   link_with: libflint,
-  include_directories: src_dir_inc,
+  include_directories: [headers_built_nodir_inc, '../..'],
   install: false,
 )
 
@@ -194,6 +192,8 @@ endif
 asm_files = [
 %s
 ]
+
+src_dir_inc = include_directories('.')
 '''
 
 asm_submodule_x86_broadwell = '''\
@@ -249,8 +249,8 @@ def get_flint_modules(flint_root):
 
     # Check for mismatches between subdirs and headers apart from the
     # known exceptions (exclude_mod_dirs, mod_no_header, head_no_dir)
-    extra_dirs = set(subdirs) - set(headers) != set(mod_no_header)
-    extra_headers = set(headers) - set(subdirs) != set(head_no_dir)
+    extra_dirs = set(subdirs) - set(headers) - set(mod_no_header)
+    extra_headers = set(headers) - set(subdirs) - set(head_no_dir) - set(headers_skip)
     if extra_dirs or extra_headers:
         print('Mismatch between subdirs and headers in src')
         print('Extra headers:\n', '\n'.join(sorted(extra_headers)))
@@ -334,6 +334,7 @@ def write_file(dst_path, text, args):
         if not same_content(text, dst_path):
             print('File {} has changed'.format(dst_path))
             sys.exit(1)
+    makedirs(dirname(dst_path), exist_ok=True)
     with open(dst_path, 'w') as fout:
         fout.write(text)
 
