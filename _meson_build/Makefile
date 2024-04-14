@@ -1,4 +1,4 @@
-BUILDDIR = build2
+BUILDDIR = build.meson
 
 all: setup
 	meson compile -C $(BUILDDIR)

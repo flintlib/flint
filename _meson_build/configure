@@ -9,7 +9,7 @@ from argparse import ArgumentParser
 
 parser = ArgumentParser(description='Configure FLINT for building with meson')
 
-parser.add_argument('--build-dir', default='build', help='Build directory')
+parser.add_argument('--build-dir', default='build.meson', help='Build directory')
 
 parser.add_argument('--prefix', default=None, help='Installation prefix')
 parser.add_argument('--bindir', default=None, help='Binary directory')
