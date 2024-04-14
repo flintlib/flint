@@ -12,12 +12,6 @@ FLINT_MINOR = meson.project_version().split('.')[1]
 FLINT_PATCH = meson.project_version().split('.')[2]
 FLINT_VERSION_FULL = meson.project_version()
 
-cfg_data = configuration_data()
-cfg_data.set('FLINT_MAJOR', FLINT_MAJOR)
-cfg_data.set('FLINT_MINOR', FLINT_MINOR)
-cfg_data.set('FLINT_PATCH', FLINT_PATCH)
-cfg_data.set('FLINT_VERSION_FULL', FLINT_VERSION_FULL)
-
 cc = meson.get_compiler('c')
 fs = import('fs')
 
