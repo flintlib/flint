@@ -7,11 +7,16 @@ project('FLINT', 'c',
   ],
 )
 
+FLINT_MAJOR = meson.project_version().split('.')[0]
+FLINT_MINOR = meson.project_version().split('.')[1]
+FLINT_PATCH = meson.project_version().split('.')[2]
+FLINT_VERSION_FULL = meson.project_version()
+
 cfg_data = configuration_data()
-cfg_data.set('FLINT_MAJOR', meson.project_version().split('.')[0])
-cfg_data.set('FLINT_MINOR', meson.project_version().split('.')[1])
-cfg_data.set('FLINT_PATCH', meson.project_version().split('.')[2])
-cfg_data.set('FLINT_VERSION_FULL', meson.project_version())
+cfg_data.set('FLINT_MAJOR', FLINT_MAJOR)
+cfg_data.set('FLINT_MINOR', FLINT_MINOR)
+cfg_data.set('FLINT_PATCH', FLINT_PATCH)
+cfg_data.set('FLINT_VERSION_FULL', FLINT_VERSION_FULL)
 
 cc = meson.get_compiler('c')
 fs = import('fs')
@@ -37,11 +42,14 @@ if have_assembly
   c_files_all += s_files
 endif
 
+# Build include directory after list of all source files is complete
+subdir('include')
+
 install_headers(headers_all, subdir: 'flint')
 
 libflint = library('flint', c_files_all,
   dependencies: flint_deps,
-  include_directories: include_directories('src'),
+  include_directories: [headers_built_nodir_inc, 'src'],
   install: true,
   c_args: [
     '-DBUILDING_FLINT',
