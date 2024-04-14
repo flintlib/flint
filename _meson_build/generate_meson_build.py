@@ -13,6 +13,7 @@ files_to_copy = [
     'meson.options',
     'include/meson.build',
     'include/flint/meson.build',
+    'config.m4.in',
 ]
 
 # Directories in src that are not modules or that need special handling
@@ -121,6 +122,9 @@ headers_all = []
 c_files_all = []
 mod_tests = []
 
+# Select the right version of fmpz.c (see configuration)
+c_files_all += files('fmpz/link' / fmpz_c_in)
+
 foreach mod : modules
   subdir(mod)
   if mod not in modules_no_tests
@@ -179,7 +183,6 @@ test('%s', test_exe)
 asm_submodule_arm64 = '''\
 
 asm_deps = [
-  '../../../config.m4',
   '../asm-defs.m4',
 ]
 
@@ -199,7 +202,6 @@ src_dir_inc = include_directories('.')
 asm_submodule_x86_broadwell = '''\
 
 asm_deps = [
-    '../../../config.m4',
     '../asm-defs.m4',
     'x86-defs.m4',
 ]
@@ -220,9 +222,9 @@ m4_prog = find_program('m4', native: true)
 foreach asm_file: asm_files
   s_filename = fs.stem(asm_file) + '.s'
   s_file = custom_target(s_filename,
-    input: [asm_file] + asm_deps,
+    input: [asm_file, config_m4] + asm_deps,
     output: s_filename,
-    command: [m4_prog, '-I..', '@INPUT0@'],
+    command: [m4_prog, '@INPUT0@'],
     capture: true,
   )
   s_files += [s_file]
@@ -302,6 +304,8 @@ def main(args):
     for mod in modules + mod_no_header:
         mod_dir = join(args.output_dir, 'src', mod)
         c_files = [f for f in listdir(mod_dir) if f.endswith('.c')]
+        if mod == 'fmpz':
+            c_files = [f for f in c_files if f != 'fmpz.c']
         src_mod_meson_build_text = src_mod_meson_build % format_lines(c_files)
         dst_path = join(mod_dir, 'meson.build')
         write_file(dst_path, src_mod_meson_build_text, args)

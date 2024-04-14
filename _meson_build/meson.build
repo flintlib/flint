@@ -31,6 +31,13 @@ subdir('detection')
 subdir('src')
 
 if have_assembly
+  # Generate config.m4 with assembly language configuration
+  config_m4 = configure_file(
+    input: 'config.m4.in',
+    output: 'config.m4',
+    configuration: {'LSYM_PREFIX': LSYM_PREFIX},
+  )
+
   s_files = []
   subdir('src' / assembly_dir)
   c_files_all += s_files

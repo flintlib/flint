@@ -2,9 +2,31 @@
 #   FLINT configuration
 # -----------------------------------------------------------------------------
 
-# Data set on cfg_data is used to generate flint_config.h
-# Data set on cfg_data_internal (below) is used to generate config.h
+# Data set on cfg_data is used to generate flint-config.h
+# Data set on cfg_data_internal (below) is also used to generate config.h
 cfg_data = configuration_data()
+
+# -----------------------------------------------------------------------------
+#   fmpz memory management
+# -----------------------------------------------------------------------------
+
+enable_gc = get_option('gc').enabled()
+enable_reentrant = get_option('reentrant').enabled()
+enable_thread_safe = get_option('threadsafe').enabled()
+
+if enable_gc
+  if enable_thread_safe
+    error('Garbage collection is not thread safe')
+  else
+    fmpz_c_in = 'fmpz_gc.c'
+  endif
+else
+  if enable_reentrant
+    fmpz_c_in = 'fmpz_reentrant.c'
+  else
+    fmpz_c_in = 'fmpz_single.c'
+  endif
+endif
 
 # -----------------------------------------------------------------------------
 #   GMP
@@ -99,6 +121,11 @@ assembly_opt = assembly_opt.enable_auto_if(true)
 have_assembly = assembly_opt.enabled()
 
 message('ASSEMBLY: ', have_assembly ? 'enabled' : 'disabled')
+
+# XXX: Need better detection of ASM language support
+if have_assembly
+  LSYM_PREFIX = 'L'
+endif
 
 # -----------------------------------------------------------------------------
 #  external configuration for flint_config.h
