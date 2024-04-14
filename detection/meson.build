@@ -7,6 +7,17 @@
 cfg_data = configuration_data()
 
 # -----------------------------------------------------------------------------
+#   GMP
+# -----------------------------------------------------------------------------
+
+gmp_long_long_limb = cc.compiles('''
+#include <gmp.h>
+#if !defined(_LONG_LONG_LIMB)
+# error mp_limb_t != unsigned long long int
+#endif
+''')
+
+# -----------------------------------------------------------------------------
 #    fft_small
 # -----------------------------------------------------------------------------
 
@@ -28,6 +39,29 @@ fft_small_opt = fft_small_opt.enable_auto_if(fft_small_supported)
 have_fft_small = fft_small_opt.enabled()
 
 message('FFT_SMALL: ', have_fft_small ? 'enabled' : 'disabled')
+
+# -----------------------------------------------------------------------------
+#   mparam
+# -----------------------------------------------------------------------------
+
+flint_mparam = 'generic'
+
+if host_machine.system() != 'windows'
+  if host_machine.cpu_family() == 'aarch64'
+    if host_machine.system() == 'darwin'
+      flint_mparam = 'arm64/applem1'
+    else
+      flint_mparam = 'arm64'
+    endif
+  elif host_machine.cpu_family() == 'x86_64'
+    # XXX: Need better CPU detection
+    if have_assembly
+      flint_mparam = 'x86_64/broadwell'
+    else
+      flint_mparam = 'generic'
+    endif
+  endif
+endif
 
 # -----------------------------------------------------------------------------
 #   assembly
