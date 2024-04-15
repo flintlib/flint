@@ -175,29 +175,6 @@ have_fft_small = fft_small_opt.enabled()
 message('FFT_SMALL: ', have_fft_small ? 'enabled' : 'disabled')
 
 # -----------------------------------------------------------------------------
-#   mparam
-# -----------------------------------------------------------------------------
-
-flint_mparam = 'generic'
-
-if host_machine.system() != 'windows'
-  if host_machine.cpu_family() == 'aarch64'
-    if host_machine.system() == 'darwin'
-      flint_mparam = 'arm64/applem1'
-    else
-      flint_mparam = 'arm64'
-    endif
-  elif host_machine.cpu_family() == 'x86_64'
-    # XXX: Need better CPU detection
-    if have_assembly
-      flint_mparam = 'x86_64/broadwell'
-    else
-      flint_mparam = 'generic'
-    endif
-  endif
-endif
-
-# -----------------------------------------------------------------------------
 #   assembly
 # -----------------------------------------------------------------------------
 
@@ -237,6 +214,29 @@ message('ASSEMBLY: ', have_assembly ? 'enabled' : 'disabled')
 # XXX: Need better detection of ASM language support
 if have_assembly
   LSYM_PREFIX = 'L'
+endif
+
+# -----------------------------------------------------------------------------
+#   mparam
+# -----------------------------------------------------------------------------
+
+flint_mparam = 'generic'
+
+if host_machine.system() != 'windows'
+  if host_machine.cpu_family() == 'aarch64'
+    if host_machine.system() == 'darwin'
+      flint_mparam = 'arm64/applem1'
+    else
+      flint_mparam = 'arm64'
+    endif
+  elif host_machine.cpu_family() == 'x86_64'
+    # XXX: Need better CPU detection
+    if have_assembly
+      flint_mparam = 'x86_64/broadwell'
+    else
+      flint_mparam = 'generic'
+    endif
+  endif
 endif
 
 # -----------------------------------------------------------------------------
