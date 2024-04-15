@@ -746,6 +746,11 @@ Test functions
     A reference implementation to compare against can be provided as
     ``mullow_ref``; if ``NULL``, classical multiplication is used.
 
+.. function:: void gr_poly_test_divrem(gr_method_poly_binary_binary_op divrem_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+
+    Tests the given function ``divrem_impl`` for correctness as an implementation
+    of :func:`_gr_poly_divrem`.
+
 .. raw:: latex
 
     \newpage
