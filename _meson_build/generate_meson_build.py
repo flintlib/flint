@@ -202,8 +202,8 @@ src_dir_inc = include_directories('.')
 asm_submodule_x86_broadwell = '''\
 
 asm_deps = [
-    '../asm-defs.m4',
-    'x86-defs.m4',
+    '../../asm-defs.m4',
+    '../x86_64-defs.m4',
 ]
 
 if host_machine.system() == 'darwin'
@@ -271,8 +271,8 @@ def get_flint_modules(flint_root):
 parser = ArgumentParser(description='Generate Meson build files')
 parser.add_argument('-q', '--quiet', action='store_true',
                     help='Do not print anything')
-parser.add_argument('--error-if-changed', action='store_true',
-                    help='Exit with error code 1 if the files have changed')
+parser.add_argument('-v', '--verbose', action='store_true',
+                    help='Show all steps')
 parser.add_argument('output_dir', default='.', help='Output directory')
 
 
@@ -282,7 +282,9 @@ def main(args):
     for fname in files_to_copy:
         src_path = join(this_dir, fname)
         dst_path = join(args.output_dir, fname)
-        copy_file(src_path, dst_path, args)
+        if not args.quiet:
+            print('Copying %s to %s' % (src_path, dst_path))
+        copy_file(src_path, dst_path)
 
     modules = get_flint_modules(args.output_dir)
 
@@ -298,8 +300,12 @@ def main(args):
         format_lines(head_no_dir),
     )
     dst_path = join(args.output_dir, 'src', 'meson.build')
-    write_file(dst_path, src_meson_build_text, args)
+    if not args.quiet:
+        print('Writing %s' % dst_path)
+    write_file(dst_path, src_meson_build_text)
 
+    if not args.quiet:
+        print('Making meson.build files in all modules')
     # src/mod/meson.build
     for mod in modules + mod_no_header:
         mod_dir = join(args.output_dir, 'src', mod)
@@ -308,14 +314,18 @@ def main(args):
             c_files = [f for f in c_files if f != 'fmpz.c']
         src_mod_meson_build_text = src_mod_meson_build % format_lines(c_files)
         dst_path = join(mod_dir, 'meson.build')
-        write_file(dst_path, src_mod_meson_build_text, args)
+        if args.verbose:
+            print('Writing %s' % dst_path)
+        write_file(dst_path, src_mod_meson_build_text)
 
         # src/mod/test/meson.build
         if mod not in mod_no_tests:
             test_dir = join(mod_dir, 'test')
             test_mod_meson_build_text = test_mod_meson_build % mod
             dst_path = join(test_dir, 'meson.build')
-            write_file(dst_path, test_mod_meson_build_text, args)
+            if args.verbose:
+                print('Writing %s' % dst_path)
+            write_file(dst_path, test_mod_meson_build_text)
 
     # src/mpn_extras/*/meson.build
     for path, asm_submodule in asm_modules:
@@ -324,29 +334,24 @@ def main(args):
         asm_submodule_text = asm_submodule % format_lines(asm_files)
         asm_submodule_text += asm_to_s_files
         dst_path = join(asm_dir, 'meson.build')
-        write_file(dst_path, asm_submodule_text, args)
+        if args.verbose:
+            print('Writing %s' % dst_path)
+        write_file(dst_path, asm_submodule_text)
 
 
 def format_lines(lst):
     return '\n'.join(f"  '{m}'," for m in sorted(lst))
 
 
-def write_file(dst_path, text, args):
-    if not args.quiet:
-        print('Writing %s' % dst_path)
-    if args.error_if_changed:
-        if not same_content(text, dst_path):
-            print('File {} has changed'.format(dst_path))
-            sys.exit(1)
+def write_file(dst_path, text):
     makedirs(dirname(dst_path), exist_ok=True)
     with open(dst_path, 'w') as fout:
         fout.write(text)
 
 
-def copy_file(src_path, dst_path, args):
-    with open(src_path, 'r') as f:
-        src_content = f.read()
-    write_file(dst_path, src_content, args)
+def copy_file(src_path, dst_path):
+    makedirs(dirname(dst_path), exist_ok=True)
+    copyfile(src_path, dst_path)
 
 
 def same_files(src_path, dst_path):

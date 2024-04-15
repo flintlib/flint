@@ -6,9 +6,11 @@ option('assembly', type : 'feature', value : 'auto',
         description: 'Use assembly code')
 option('gc', type : 'feature', value : 'disabled',
         description: 'Use the Boehm garbage collector')
+option('pthread', type : 'feature', value : 'auto',
+        description: 'Use pthread')
 option('reentrant', type : 'feature', value : 'disabled',
         description: 'Build the reentrant module')
-option('threadsafe', type : 'feature', value : 'enabled',
+option('thread_safe', type : 'feature', value : 'enabled',
         description: 'Build the threadsafe module')
 option('gmp_internals', type : 'feature', value : 'auto',
         description: 'Use GMP internals')
