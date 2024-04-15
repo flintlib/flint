@@ -116,8 +116,8 @@ if gmp_internals_opt.allowed()
       'mp_limb_t a[2], b[2]; __gmpn_addlsh1_n(a, b, (mp_size_t) 1, (mp_limb_t) 0);',
     ],
     'mpn_addlsh1_n_ip1': [
-      'mp_limb_t __gmpn_addlsh1_n_ip1(mp_ptr, mp_srcptr, mp_size_t, mp_limb_t);',
-      'mp_limb_t a[2], b[2]; __gmpn_addlsh1_n_ip1(a, b, (mp_size_t) 1, (mp_limb_t) 0);',
+      'mp_limb_t __gmpn_addlsh1_n_ip1(mp_ptr, mp_srcptr, mp_size_t);',
+      'mp_limb_t a[2], b[2]; __gmpn_addlsh1_n_ip1(a, b, (mp_size_t) 1);',
     ],
     'mpn_addmul_2': [
       'void __gmpn_addmul_2(mp_ptr, mp_srcptr, mp_size_t, mp_limb_t);',
@@ -246,10 +246,10 @@ endif
 # cfg_data.set('FLINT_BIG_ENDIAN', 1,
 #   description: 'Define if system is big endian.')
 
-if FLINT_HAVE_ASSEMBLY == 'armv8'
+if have_assembly and FLINT_HAVE_ASSEMBLY == 'armv8'
   cfg_data.set('FLINT_HAVE_ASSEMBLY_armv8', 1,
     description: 'Define if Arm v8 assembly is available')
-elif FLINT_HAVE_ASSEMBLY == 'x86_64_adx'
+elif have_assembly and FLINT_HAVE_ASSEMBLY == 'x86_64_adx'
   cfg_data.set('FLINT_HAVE_ASSEMBLY_x86_64_adx', 1,
     description: 'Define if x86_64 ADX assembly is available')
 endif
