@@ -339,6 +339,9 @@ int _mpn_mod_poly_mullow_KS(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr p
 int _mpn_mod_poly_mullow_fft_small(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong len, gr_ctx_t ctx);
 int _mpn_mod_poly_mullow(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong len, gr_ctx_t ctx);
 
+int _mpn_mod_poly_inv_series(mp_ptr Q, mp_srcptr B, slong lenB, slong len, gr_ctx_t ctx);
+int _mpn_mod_poly_div_series(mp_ptr Q, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, slong len, gr_ctx_t ctx);
+
 #ifdef __cplusplus
 }
 #endif

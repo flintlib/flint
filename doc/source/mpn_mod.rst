@@ -244,4 +244,9 @@ All multiplication algorithms optimize for squaring.
 
 .. function:: int _mpn_mod_poly_mullow(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
 
-    Polynomial multiplication using a default algorithm.
+    Polynomial multiplication with automatic algorithm selection.
+
+.. function:: int _mpn_mod_poly_inv_series(mp_ptr Q, mp_srcptr B, slong lenB, slong len, gr_ctx_t ctx)
+              int _mpn_mod_poly_div_series(mp_ptr Q, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, slong len, gr_ctx_t ctx)
+
+    Power series inversion and divison with automatic algorithm selection.
