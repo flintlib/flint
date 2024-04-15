@@ -145,6 +145,15 @@ void _nmod_poly_mul_mid_default_mpn_ctx(mp_ptr res, slong zl, slong zh, mp_srcpt
 #endif
 
 #if 0
+#define INFO "div"
+#define SETUP random_input(A, state, 2 * len, ctx); \
+              random_input(B, state, len, ctx); \
+              GR_IGNORE(gr_poly_set_coeff_si(B, len - 1, 1, ctx));
+#define CASE_A GR_IGNORE(gr_poly_div_basecase(C, A, B, ctx));
+#define CASE_B GR_IGNORE(gr_poly_div_newton(C, A, B, ctx));
+#endif
+
+#if 0
 #define INFO "divrem (nmod basecase)"
 #define SETUP random_input(A, state, 2 * len, ctx); \
               random_input(B, state, len, ctx); \
@@ -204,6 +213,15 @@ void _nmod_poly_mul_mid_default_mpn_ctx(mp_ptr res, slong zl, slong zh, mp_srcpt
 #endif
 
 #if 1
+#define INFO "divexact (basecase -> bidirectional)"
+#define SETUP random_input(C, state, len, ctx); \
+              random_input(B, state, len, ctx); \
+              GR_IGNORE(gr_poly_mul(A, B, C, ctx));
+#define CASE_A GR_IGNORE(gr_poly_divexact_basecase(C, A, B, ctx));
+#define CASE_B GR_IGNORE(gr_poly_divexact_bidirectional(C, A, B, ctx));
+#endif
+
+#if 0
 #define INFO "gcd"
 #define SETUP random_input(A, state, len, ctx); \
               random_input(B, state, len, ctx);

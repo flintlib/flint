@@ -59,6 +59,23 @@ _mpn_mod_poly_div_series(mp_ptr Q, mp_srcptr A, slong lenA, mp_srcptr B, slong l
         return _gr_poly_div_series_newton(Q, A, lenA, B, lenB, len, cutoff, ctx);
 }
 
+int
+_mpn_mod_poly_div(mp_ptr Q, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, gr_ctx_t ctx)
+{
+    slong tab_i, cutoff, bits;
+
+    bits = MPN_MOD_CTX_MODULUS_BITS(ctx);
+    tab_i = (bits - FLINT_BITS - 1) / 16;
+    cutoff = div_series_cutoff_tab[tab_i];
+
+    if (lenB <= cutoff || lenA - lenB + 1 <= cutoff)
+        return _gr_poly_div_basecase(Q, A, lenA, B, lenB, ctx);
+    else
+        return _gr_poly_div_newton(Q, A, lenA, B, lenB, ctx);
+}
+
+/* note: we don't define _mpn_mod_poly_divexact because the default algorithm is currently fine */
+
 /* todo: check unbalanced tuning */
 int _mpn_mod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, gr_ctx_t ctx)
 {
