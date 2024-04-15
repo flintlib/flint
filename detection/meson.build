@@ -11,6 +11,7 @@ cfg_data = configuration_data()
 # -----------------------------------------------------------------------------
 
 gmp_internals_opt = get_option('gmp_internals')
+pthread_opt = get_option('pthread')
 
 # -----------------------------------------------------------------------------
 #   fmpz memory management
@@ -18,7 +19,7 @@ gmp_internals_opt = get_option('gmp_internals')
 
 enable_gc = get_option('gc').enabled()
 enable_reentrant = get_option('reentrant').enabled()
-enable_thread_safe = get_option('threadsafe').enabled()
+enable_thread_safe = get_option('thread_safe').enabled()
 
 if enable_gc
   if enable_thread_safe
@@ -255,8 +256,8 @@ elif have_assembly and FLINT_HAVE_ASSEMBLY == 'x86_64_adx'
 endif
 
 if have_fft_small
-    cfg_data.set('FLINT_HAVE_FFT_SMALL', 1,
-        description: 'Define to use the fft_small module')
+  cfg_data.set('FLINT_HAVE_FFT_SMALL', 1,
+    description: 'Define to use the fft_small module')
 endif
 
 # cfg_data.set('FLINT_KNOW_STRONG_ORDER', 1,
@@ -271,11 +272,17 @@ cfg_data.set('FLINT_UNROLL_LOOPS', 1,
 #   description: 'Define if system has cpu_set_t')
 # cfg_data.set('FLINT_USES_GC', 0,
 #   description: 'Define to enable the Boehm-Demers-Weise garbage collector.')
-cfg_data.set('FLINT_USES_PTHREAD', 1,
-  description: 'Define to enable the use of pthread.')
 
-cfg_data.set('FLINT_USES_TLS', 1,
-  description: 'Define to enable thread-local storage.')
+if pthread_opt.allowed()
+  cfg_data.set('FLINT_USES_PTHREAD', 1,
+    description: 'Define to enable the use of pthread.')
+endif
+
+if enable_thread_safe
+  cfg_data.set('FLINT_USES_TLS', 1,
+    description: 'Define to enable thread-local storage.')
+endif
+
 # cfg_data.set('FLINT_WANT_WANT_ASSERT', 1,
 #   description: 'Define to enable use of asserts.')
 
