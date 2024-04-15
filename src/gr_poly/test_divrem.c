@@ -41,10 +41,17 @@ void gr_poly_test_divrem(gr_method_poly_binary_binary_op divrem_impl,
 
         status = GR_SUCCESS;
 
-        status |= gr_poly_randtest(A, state, 1 + n_randint(state, 6), ctx);
-        status |= gr_poly_randtest(B, state, 1 + n_randint(state, 6), ctx);
-        status |= gr_poly_randtest(Q, state, 1 + n_randint(state, 6), ctx);
-        status |= gr_poly_randtest(R, state, 1 + n_randint(state, 6), ctx);
+        status |= gr_poly_randtest(A, state, 1 + n_randint(state, maxn), ctx);
+        status |= gr_poly_randtest(B, state, 1 + n_randint(state, maxn), ctx);
+        if (A->length < B->length)
+            gr_poly_swap(A, B, ctx);
+
+        status |= gr_poly_randtest(Q, state, 1 + n_randint(state, maxn), ctx);
+        status |= gr_poly_randtest(R, state, 1 + n_randint(state, maxn), ctx);
+
+        /* randomly generate monic polynomials */
+        if (n_randint(state, 2) && B->length >= 1)
+            status |= gr_poly_set_coeff_si(B, B->length - 1, 1, ctx);
 
         if (n_randint(state, 3) == 0)
         {
@@ -52,16 +59,28 @@ void gr_poly_test_divrem(gr_method_poly_binary_binary_op divrem_impl,
             status |= gr_poly_add(A, A, R, ctx);
         }
 
-        if (A->length >= B->length && B->length >= 1)
+        if (B->length >= 1)
         {
             gr_poly_fit_length(Q, A->length - B->length + 1, ctx);
             gr_poly_fit_length(R, B->length - 1, ctx);
 
-            status |= divrem_impl(Q->coeffs, R->coeffs, A->coeffs, A->length, B->coeffs, B->length, ctx);
+            if (n_randint(state, 2))
+            {
+                status |= divrem_impl(Q->coeffs, R->coeffs, A->coeffs, A->length, B->coeffs, B->length, ctx);
+            }
+            else
+            {
+                /* test aliasing */
+                gr_poly_t A2;
+                gr_poly_init(A2, ctx);
+                status |= gr_poly_set(A2, A, ctx);
+                status |= divrem_impl(Q->coeffs, A2->coeffs, A2->coeffs, A->length, B->coeffs, B->length, ctx);
+                status |= _gr_vec_set(R->coeffs, A2->coeffs, B->length - 1, ctx);
+                gr_poly_clear(A2, ctx);
+            }
 
             _gr_poly_set_length(Q, A->length - B->length + 1, ctx);
             _gr_poly_set_length(R, B->length - 1, ctx);
-
             _gr_poly_normalise(Q, ctx);
             _gr_poly_normalise(R, ctx);
         }
