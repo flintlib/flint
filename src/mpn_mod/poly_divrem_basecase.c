@@ -44,36 +44,29 @@ mpn_mod_set_mpn2(mp_ptr res, mp_srcptr s, mp_size_t l, gr_ctx_t ctx)
 static int _mpn_mod_poly_divrem_q0_preinv1(mp_ptr Q, mp_ptr R,
                           mp_srcptr A, mp_srcptr B, slong lenA, mp_srcptr invL, gr_ctx_t ctx)
 {
+    /* special case for lenA == 1 omitted since this is dealt with
+       in the calling function */
+
+    mp_size_t nlimbs = MPN_MOD_CTX_NLIMBS(ctx);
+
     int monic = mpn_mod_is_one(invL, ctx) == T_TRUE;
 
-    if (lenA == 1)
+    if (monic)
+        mpn_mod_set(Q, A + (lenA - 1) * nlimbs, ctx);
+    else
+        mpn_mod_mul(Q, A + (lenA - 1) * nlimbs, invL, ctx);
+
+    if (R == A)
     {
-        if (monic)
-            _mpn_mod_vec_set(Q, A, lenA, ctx);
-        else
-            _mpn_mod_vec_mul_scalar(Q, A, lenA, invL, ctx);
+        mp_limb_t t[MPN_MOD_MAX_LIMBS];
+
+        mpn_mod_neg(t, Q, ctx);
+        _mpn_mod_vec_addmul_scalar(R, B, lenA - 1, t, ctx);
     }
     else
     {
-        mp_size_t nlimbs = MPN_MOD_CTX_NLIMBS(ctx);
-
-        if (monic)
-            mpn_mod_set(Q, A + (lenA - 1) * nlimbs, ctx);
-        else
-            mpn_mod_mul(Q, A + (lenA - 1) * nlimbs, invL, ctx);
-
-        if (R == A)
-        {
-            mp_limb_t t[MPN_MOD_MAX_LIMBS];
-
-            mpn_mod_neg(t, Q, ctx);
-            _mpn_mod_vec_addmul_scalar(R, B, lenA - 1, t, ctx);
-        }
-        else
-        {
-            _mpn_mod_vec_mul_scalar(R, B, lenA - 1, Q, ctx);
-            _mpn_mod_vec_sub(R, A, R, lenA - 1, ctx);
-        }
+        _mpn_mod_vec_mul_scalar(R, B, lenA - 1, Q, ctx);
+        _mpn_mod_vec_sub(R, A, R, lenA - 1, ctx);
     }
 
     return GR_SUCCESS;
