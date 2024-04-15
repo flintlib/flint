@@ -250,3 +250,9 @@ All multiplication algorithms optimize for squaring.
               int _mpn_mod_poly_div_series(mp_ptr Q, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, slong len, gr_ctx_t ctx)
 
     Power series inversion and divison with automatic algorithm selection.
+
+.. function:: int _mpn_mod_poly_divrem_basecase_preinv1(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, mp_srcptr invL, gr_ctx_t ctx)
+              int _mpn_mod_poly_divrem_basecase(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, gr_ctx_t ctx)
+
+    Polynomial division with remainder implemented using the basecase
+    algorithm with delayed reductions.
