@@ -7,6 +7,12 @@
 cfg_data = configuration_data()
 
 # -----------------------------------------------------------------------------
+#   Project options
+# -----------------------------------------------------------------------------
+
+gmp_internals_opt = get_option('gmp_internals')
+
+# -----------------------------------------------------------------------------
 #   fmpz memory management
 # -----------------------------------------------------------------------------
 
@@ -29,6 +35,14 @@ else
 endif
 
 # -----------------------------------------------------------------------------
+#   libm
+# -----------------------------------------------------------------------------
+
+if not cc.has_function('atan2', dependencies: m_dep)
+  error('libm is required')
+endif
+
+# -----------------------------------------------------------------------------
 #   GMP
 # -----------------------------------------------------------------------------
 
@@ -38,6 +52,104 @@ gmp_long_long_limb = cc.compiles('''
 # error mp_limb_t != unsigned long long int
 #endif
 ''')
+
+# We need to check with cc.links rather than cc.has_function etc because we
+# are checking if we can link symbols not in the headers.
+
+gmp_test_code = '''
+#include <gmp.h>
+
+@0@
+
+int main() {
+  @1@
+  return 0;
+}
+'''
+
+gmp_base_tests = {
+  'mpz_init': ['', 'mpz_t x; __gmpz_init(x);'],
+  'mpn_mul_basecase': [
+    'void __gmpn_mul_basecase(mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t);',
+    'mp_limb_t a[2], b[2], p[4]; __gmpn_mul_basecase(p, a, (mp_size_t) 1, b, (mp_size_t) 1);',
+  ],
+}
+
+foreach name, snippets : gmp_base_tests
+  _code = gmp_test_code.format(snippets[0], snippets[1])
+  if not cc.links(_code, dependencies: gmp_dep, name: name + ' links')
+    message('This code did not link with -lgmp: ', _code)
+    error('GMP does not have ' + name)
+  endif
+endforeach
+
+if gmp_internals_opt.allowed()
+
+  gmp_internals_required = {
+    'mpn_gcd_11': ['', 'mp_limb_t res, a=0, b=0; res = __gmpn_gcd_11(a, b);'],
+    'mpn_div_q': [
+      'void __gmpn_div_q(mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t, mp_ptr);',
+      'mp_limb_t q[2], n[2], d[2], t[2]; __gmpn_div_q(q, t, (mp_size_t) 1, n, (mp_size_t) 1, d);'
+    ],
+  }
+
+  foreach name, snippets : gmp_internals_required
+    _code = gmp_test_code.format(snippets[0], snippets[1])
+    if not cc.links(_code, dependencies: gmp_dep, name: name + ' links')
+      message('This code did not link with -lgmp: ', _code)
+      # Maybe disable gmp_internals rather than error?
+      error('GMP does not have ' + name)
+    endif
+  endforeach
+
+  gmp_internals_optional = {
+    'mpn_add_n_sub_n': [
+      'void __gmpn_add_n_sub_n(mp_ptr, mp_ptr, mp_ptr, mp_size_t);',
+      'mp_limb_t a[2], b[2], c[2], d[2]; __gmpn_add_n_sub_n(a, b, c, (mp_size_t) 1);',
+    ],
+    'mpn_add_nc': [
+      'mp_limb_t __gmpn_add_nc(mp_ptr, mp_srcptr, mp_size_t, mp_limb_t);',
+      'mp_limb_t a[2], b[2]; __gmpn_add_nc(a, b, (mp_size_t) 1, (mp_limb_t) 0);',
+    ],
+    'mpn_addlsh1_n': [
+      'mp_limb_t __gmpn_addlsh1_n(mp_ptr, mp_srcptr, mp_size_t, mp_limb_t);',
+      'mp_limb_t a[2], b[2]; __gmpn_addlsh1_n(a, b, (mp_size_t) 1, (mp_limb_t) 0);',
+    ],
+    'mpn_addlsh1_n_ip1': [
+      'mp_limb_t __gmpn_addlsh1_n_ip1(mp_ptr, mp_srcptr, mp_size_t, mp_limb_t);',
+      'mp_limb_t a[2], b[2]; __gmpn_addlsh1_n_ip1(a, b, (mp_size_t) 1, (mp_limb_t) 0);',
+    ],
+    'mpn_addmul_2': [
+      'void __gmpn_addmul_2(mp_ptr, mp_srcptr, mp_size_t, mp_limb_t);',
+      'mp_limb_t a[2], b[2]; __gmpn_addmul_2(a, b, (mp_size_t) 1, (mp_limb_t) 0);',
+    ],
+    'mpn_modexact_1_odd': [
+      'mp_limb_t __gmpn_modexact_1_odd(mp_srcptr, mp_size_t, mp_limb_t);',
+      'mp_limb_t a[2]; __gmpn_modexact_1_odd(a, (mp_size_t) 1, (mp_limb_t) 0);',
+    ],
+    'mpn_rsh1add_n': [
+      'mp_limb_t __gmpn_rsh1add_n(mp_ptr, mp_srcptr, mp_size_t, mp_limb_t);',
+      'mp_limb_t a[2], b[2]; __gmpn_rsh1add_n(a, b, (mp_size_t) 1, (mp_limb_t) 0);',
+    ],
+    'mpn_rsh1sub_n': [
+      'mp_limb_t __gmpn_rsh1sub_n(mp_ptr, mp_srcptr, mp_size_t, mp_limb_t);',
+      'mp_limb_t a[2], b[2]; __gmpn_rsh1sub_n(a, b, (mp_size_t) 1, (mp_limb_t) 0);',
+    ],
+    'mpn_sub_nc': [
+      'mp_limb_t __gmpn_sub_nc(mp_ptr, mp_srcptr, mp_size_t, mp_limb_t);',
+      'mp_limb_t a[2], b[2]; __gmpn_sub_nc(a, b, (mp_size_t) 1, (mp_limb_t) 0);',
+    ],
+  }
+
+  foreach name, snippets : gmp_internals_optional
+    _code = gmp_test_code.format(snippets[0], snippets[1])
+    if cc.links(_code, dependencies: gmp_dep, name: name + ' links')
+      cfg_data.set('FLINT_HAVE_NATIVE_' + name, 1,
+        description: 'Define if GMP has ' + name)
+    endif
+  endforeach
+
+endif
 
 # -----------------------------------------------------------------------------
 #    fft_small
@@ -147,24 +259,6 @@ if have_fft_small
         description: 'Define to use the fft_small module')
 endif
 
-cfg_data.set('FLINT_HAVE_NATIVE_mpn_add_n_sub_n', 1,
-  description: 'Define if GMP has mpn_add_n_sub_n')
-cfg_data.set('FLINT_HAVE_NATIVE_mpn_add_nc', 1,
-  description: 'Define if GMP has mpn_add_nc')
-cfg_data.set('FLINT_HAVE_NATIVE_mpn_addlsh1_n', 1,
-  description: 'Define if GMP has mpn_addlsh1_n')
-# cfg_data.set('FLINT_HAVE_NATIVE_mpn_addlsh1_n_ip1', 0,
-#   description: 'Define if GMP has mpn_addlsh1_n_ip1')
-# cfg_data.set('FLINT_HAVE_NATIVE_mpn_addmul_2', 0,
-#   description: 'Define if GMP has mpn_addmul_2')
-# cfg_data.set('FLINT_HAVE_NATIVE_mpn_modexact_1_odd', 0,
-#   description: 'Define if system has mpn_modexact_1_odd')
-cfg_data.set('FLINT_HAVE_NATIVE_mpn_rsh1add_n', 1,
-  description: 'Define if GMP has mpn_rsh1add_n')
-cfg_data.set('FLINT_HAVE_NATIVE_mpn_rsh1sub_n', 1,
-  description: 'Define if GMP has mpn_rsh1sub_n')
-cfg_data.set('FLINT_HAVE_NATIVE_mpn_sub_nc', 1,
-  description: 'Define if GMP has mpn_sub_nc')
 # cfg_data.set('FLINT_KNOW_STRONG_ORDER', 1,
 #   description: 'Define if system is strongly ordered')
 # cfg_data.set('FLINT_REENTRANT', 0,
@@ -184,8 +278,12 @@ cfg_data.set('FLINT_USES_TLS', 1,
   description: 'Define to enable thread-local storage.')
 # cfg_data.set('FLINT_WANT_WANT_ASSERT', 1,
 #   description: 'Define to enable use of asserts.')
-cfg_data.set('FLINT_WANT_GMP_INTERNALS', 1,
-  description: 'Define to enable use of GMP internals.')
+
+if gmp_internals_opt.allowed()
+  cfg_data.set('FLINT_WANT_GMP_INTERNALS', 1,
+    description: 'Define to enable use of GMP internals.')
+endif
+
 cfg_data.set('FLINT_WANT_PRETTY_TESTS', 1,
   description: 'Define to enable pretty printing for tests.')
 

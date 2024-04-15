@@ -10,3 +10,5 @@ option('reentrant', type : 'feature', value : 'disabled',
         description: 'Build the reentrant module')
 option('threadsafe', type : 'feature', value : 'enabled',
         description: 'Build the threadsafe module')
+option('gmp_internals', type : 'feature', value : 'auto',
+        description: 'Use GMP internals')
