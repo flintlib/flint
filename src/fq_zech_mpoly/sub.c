@@ -67,7 +67,8 @@ slong _fq_zech_mpoly_sub(fq_zech_struct * coeff1,       ulong * exp1,
 void fq_zech_mpoly_sub(fq_zech_mpoly_t poly1, const fq_zech_mpoly_t poly2,
                           const fq_zech_mpoly_t poly3, const fq_zech_mpoly_ctx_t ctx)
 {
-    slong len1 = 0, max_bits, N;
+    slong len1 = 0, N;
+    ulong max_bits;
     ulong * exp2 = poly2->exps, * exp3 = poly3->exps;
     ulong * cmpmask;
     int free2 = 0, free3 = 0;

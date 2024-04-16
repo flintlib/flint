@@ -1030,8 +1030,11 @@ internals."])])
 internals.])])
 
     dnl The following functions may or may not exist
+    AC_SEARCH_LIBS([__gmpn_invert_limb],[gmp],
+        [AC_DEFINE(FLINT_HAVE_NATIVE_mpn_invert_limb,1,Define if GMP has mpn_invert_limb)])
+
     AC_SEARCH_LIBS([__gmpn_modexact_1_odd],[gmp],
-        [AC_DEFINE(FLINT_HAVE_NATIVE_mpn_modexact_1_odd,1,Define if system has mpn_modexact_1_odd)])
+        [AC_DEFINE(FLINT_HAVE_NATIVE_mpn_modexact_1_odd,1,Define if GMP has mpn_modexact_1_odd)])
 
     AC_SEARCH_LIBS([__gmpn_addmul_2],[gmp],
         [AC_DEFINE(FLINT_HAVE_NATIVE_mpn_addmul_2,1,Define if GMP has mpn_addmul_2)])
@@ -1317,6 +1320,13 @@ then
     esac
 
     GMP_FINISH
+else
+    # NOTE: LSYM_PREFIX is needed for longlong_asm_gnu.h
+    GMP_INIT(tmpconf)
+    GMP_ASM_TEXT
+    GMP_ASM_LABEL_SUFFIX
+    GMP_ASM_LSYM_PREFIX
+    rm -f $gmp_tmpconfigm4 $gmp_tmpconfigm4i $gmp_tmpconfigm4p
 fi
 
 if test "$enable_assembly" = "yes";

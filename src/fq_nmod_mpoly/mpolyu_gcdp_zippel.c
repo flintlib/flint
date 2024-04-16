@@ -548,7 +548,7 @@ pick_evaluation_point:
     {
         slong shift, off;
         mpoly_gen_offset_shift_sp(&off, &shift, i, f->bits, ctx->minfo);
-        for (j = 0; j < f->bits; j++)
+        for (j = 0; (ulong) j < f->bits; j++)
         {
             offs[f->bits*i + j] = off;
             masks[f->bits*i + j] = UWORD(1) << (j + shift);
@@ -604,7 +604,7 @@ pick_evaluation_point:
 
         fq_nmod_poly_gcd(Geval, Aeval, Beval, ctx->fqctx);
 
-        if (f->exps[0] < fq_nmod_poly_degree(Geval, ctx->fqctx))
+        if (f->exps[0] < (ulong) fq_nmod_poly_degree(Geval, ctx->fqctx))
         {
             ++exceededcount;
             if (exceededcount < 2)
@@ -614,7 +614,7 @@ pick_evaluation_point:
             goto finished;
         }
 
-        if (f->exps[0] > fq_nmod_poly_degree(Geval, ctx->fqctx))
+        if (f->exps[0] > (ulong) fq_nmod_poly_degree(Geval, ctx->fqctx))
         {
             success = nmod_gcds_form_main_degree_too_high;
             *degbound = fq_nmod_poly_degree(Geval, ctx->fqctx);
@@ -628,11 +628,11 @@ pick_evaluation_point:
             fq_nmod_poly_get_coeff(ck, Geval, k, ctx->fqctx);
             if (!fq_nmod_is_zero(ck, ctx->fqctx))
             {
-                while (j < f->length && f->exps[j] > k)
+                while (j < f->length && f->exps[j] > (ulong) k)
                 {
                     j++;
                 }
-                if (j >= f->length || f->exps[j] != k)
+                if (j >= f->length || f->exps[j] != (ulong) k)
                 {
                     success = nmod_gcds_form_wrong;
                     goto finished;
@@ -1333,7 +1333,7 @@ int fq_nmod_mpolyu_gcdp_zippel(
 
         success = fq_nmod_mpolyu_gcdp_zippel(Geval, Abareval, Bbareval,
                                         Aeval, Beval, var - 1, ctx, randstate);
-        if (!success || Geval->exps[0] > degbound)
+        if (!success || Geval->exps[0] > (ulong) degbound)
         {
             success = 0;
             goto finished;

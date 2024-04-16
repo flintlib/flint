@@ -57,6 +57,7 @@ _mpn_mod_ctx_struct;
 #define MPN_MOD_CTX_MODULUS_PREINV(ctx) (MPN_MOD_CTX(ctx)->dinv)
 #define MPN_MOD_CTX_NORM(ctx) (MPN_MOD_CTX(ctx)->norm)
 #define MPN_MOD_CTX_IS_PRIME(ctx) (MPN_MOD_CTX(ctx)->is_prime)
+#define MPN_MOD_CTX_MODULUS_BITS(ctx) ((MPN_MOD_CTX_NLIMBS(ctx) - 1) * FLINT_BITS + (FLINT_BITS - MPN_MOD_CTX_NORM(ctx)))
 
 /* Helpers which actually belong in mpn_extras.h */
 
@@ -203,7 +204,7 @@ mpn_mod_init(mp_ptr x, gr_ctx_t ctx)
 }
 
 MPN_MOD_INLINE void
-mpn_mod_clear(mp_ptr x, gr_ctx_t ctx)
+mpn_mod_clear(mp_ptr FLINT_UNUSED(x), gr_ctx_t FLINT_UNUSED(ctx))
 {
 }
 
@@ -305,7 +306,7 @@ int mpn_mod_div(mp_ptr res, mp_srcptr x, mp_srcptr y, gr_ctx_t ctx);
 /* Vector functions */
 
 int _mpn_mod_vec_zero(mp_ptr res, slong len, gr_ctx_t ctx);
-int _mpn_mod_vec_clear(mp_ptr res, slong len, gr_ctx_t ctx);
+int _mpn_mod_vec_clear(mp_ptr FLINT_UNUSED(res), slong FLINT_UNUSED(len), gr_ctx_t FLINT_UNUSED(ctx));
 int _mpn_mod_vec_set(mp_ptr res, mp_srcptr x, slong len, gr_ctx_t ctx);
 void _mpn_mod_vec_swap(mp_ptr vec1, mp_ptr vec2, slong len, gr_ctx_t ctx);
 int _mpn_mod_vec_neg(mp_ptr res, mp_srcptr x, slong len, gr_ctx_t ctx);
@@ -331,7 +332,12 @@ int mpn_mod_mat_lu(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int r
 int mpn_mod_mat_det(mp_ptr res, const gr_mat_t A, gr_ctx_t ctx);
 
 /* Polynomial algorithms */
-/* TODO */
+
+int _mpn_mod_poly_mullow_classical(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong len, gr_ctx_t ctx);
+int _mpn_mod_poly_mullow_karatsuba(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong len, slong cutoff, gr_ctx_t ctx);
+int _mpn_mod_poly_mullow_KS(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong len, gr_ctx_t ctx);
+int _mpn_mod_poly_mullow_fft_small(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong len, gr_ctx_t ctx);
+int _mpn_mod_poly_mullow(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong len, gr_ctx_t ctx);
 
 #ifdef __cplusplus
 }

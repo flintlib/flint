@@ -139,7 +139,7 @@ int fmpz_mod_mpoly_content_vars(
 
     for (i = 0; i < num_vars; i++)
     {
-        if (vars[i] >= (ulong) ctx->minfo->nvars)
+        if (vars[i] >= ctx->minfo->nvars)
             flint_throw(FLINT_ERROR, "fmpz_mod_mpoly_content_vars: variable out of range");
     }
 

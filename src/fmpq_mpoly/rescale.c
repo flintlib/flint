@@ -66,13 +66,14 @@ int _fmpq_mpoly_rescale(fmpq_t Acontent, fmpz * Acoeff, const fmpq_mpoly_t B,
                                const fmpq * scales, const fmpq_mpoly_ctx_t ctx)
 {
     int success = 1;
-    slong i, j, v;
+    slong i, v;
     slong nvars, N;
     slong Blen;
     fmpz * Bcoeff;
     ulong * Bexp;
     fmpz * Buexp;
     flint_bitcnt_t Bbits, tbits;
+    ulong j;
     fmpz * emin;
     fmpz * emax;
     fmpz ** powertable;

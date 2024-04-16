@@ -16,7 +16,7 @@
 #include "fq_zech_mpoly.h"
 
 void fq_zech_mpoly_univar_init(fq_zech_mpoly_univar_t A,
-                                                 const fq_zech_mpoly_ctx_t ctx)
+                                                 const fq_zech_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     A->coeffs = NULL;
     A->exps = NULL;
@@ -74,12 +74,12 @@ void fq_zech_mpoly_univar_fit_length(fq_zech_mpoly_univar_t A,
     }
 }
 
-int fq_zech_mpoly_univar_degree_fits_si(const fq_zech_mpoly_univar_t A, const fq_zech_mpoly_ctx_t ctx)
+int fq_zech_mpoly_univar_degree_fits_si(const fq_zech_mpoly_univar_t A, const fq_zech_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     return A->length == 0 || fmpz_fits_si(A->exps + 0);
 }
 
-slong fq_zech_mpoly_univar_get_term_exp_si(fq_zech_mpoly_univar_t A, slong i, const fq_zech_mpoly_ctx_t ctx)
+slong fq_zech_mpoly_univar_get_term_exp_si(fq_zech_mpoly_univar_t A, slong i, const fq_zech_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_ASSERT((ulong)i < (ulong)A->length);
     return fmpz_get_si(A->exps + i);
@@ -391,7 +391,7 @@ void fq_zech_mpoly_from_univar_bits(fq_zech_mpoly_t A, flint_bitcnt_t Abits,
 
             FLINT_ASSERT(x->next == NULL);
 
-            if (x->j + 1 < (B->coeffs + x->i)->length)
+            if (x->j + 1 < (ulong) (B->coeffs + x->i)->length)
             {
                 FLINT_ASSERT(fmpz_fits_si(B->exps + x->i));
                 x->j = x->j + 1;
@@ -430,7 +430,7 @@ void fq_zech_mpoly_from_univar_bits(fq_zech_mpoly_t A, flint_bitcnt_t Abits,
 
             FLINT_ASSERT(x->next == NULL);
 
-            if (x->j + 1 < (B->coeffs + x->i)->length)
+            if (x->j + 1 < (ulong) (B->coeffs + x->i)->length)
             {
                 x->j = x->j + 1;
                 x->next = NULL;

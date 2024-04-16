@@ -1403,7 +1403,7 @@ Primality testing
     `94` bits) the function fails silently and returns `-1`, otherwise, if
     `n` is proven prime by the pseudosquares method, return `1`.
 
-    Tests if `n` is a prime according to [Theorem 2.7] [LukPatWil1996]_.
+    Tests if `n` is a prime according to Theorem 2.7 in [LukPatWil1996]_.
 
     We first factor `N` using trial division up to some limit `B`.
     In fact, the number of primes used in the trial factoring is at

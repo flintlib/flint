@@ -733,7 +733,17 @@ Power series special functions
               int _gr_poly_tan_series(gr_ptr f, gr_srcptr h, slong hlen, slong n, gr_ctx_t ctx)
               int gr_poly_tan_series(gr_poly_t f, const gr_poly_t h, slong n, gr_ctx_t ctx)
 
+Test functions
+-------------------------------------------------------------------------------
 
+.. function:: void gr_poly_test_mullow(gr_method_poly_binary_trunc_op mullow_impl, gr_method_poly_binary_trunc_op mullow_ref, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+
+    Tests the given function ``mullow_impl`` for correctness as an implementation
+    of :func:`_gr_poly_mullow`. Runs *iters* test iterations, generating
+    polynomials up to length *maxn*. If *ctx* is set to ``NULL``, a random
+    ring is generated on each test iteration.
+    A reference implementation to compare against can be provided as
+    ``mullow_ref``; if ``NULL``, classical multiplication is used.
 
 .. raw:: latex
 

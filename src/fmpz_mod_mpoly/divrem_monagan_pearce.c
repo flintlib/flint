@@ -282,7 +282,7 @@ static int _fmpz_mod_mpoly_divrem_monagan_pearce1(
             j = *--store;
             i = *--store;
 
-            if (i == -UWORD(1))
+            if (i == -WORD(1))
             {
                 /* take next dividend term */
                 if (j + 1 < Alen)
@@ -523,7 +523,7 @@ static int _fmpz_mod_mpoly_divrem_monagan_pearce(
                 *store++ = x->i;
                 *store++ = x->j;
 
-                if (x->i == -WORD(1))
+                if (x->i == -UWORD(1))
                 {
                     fmpz Aj = Acoeffs[x->j];
 

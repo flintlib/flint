@@ -29,7 +29,7 @@ void fmpq_mpoly_make_monic(fmpq_mpoly_t A, const fmpq_mpoly_t B,
 }
 
 /* this version must ignore A->content */
-void _fmpq_mpoly_make_monic_inplace(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
+void _fmpq_mpoly_make_monic_inplace(fmpq_mpoly_t A, const fmpq_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_ASSERT(A->zpoly->length > 0);
     FLINT_ASSERT(fmpz_sgn(A->zpoly->coeffs + 0) > 0);

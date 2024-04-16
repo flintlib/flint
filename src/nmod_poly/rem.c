@@ -18,7 +18,7 @@ void _nmod_poly_rem_q1(mp_ptr R,
                        nmod_t mod)
 {
     slong i;
-    mp_limb_t invL, t, q0, q1, t1, t0, s1, s0;
+    mp_limb_t invL, t, q0, q1, t2, t1, t0, s1, s0;
 
     FLINT_ASSERT(lenA == lenB + 1);
     invL = (B[lenB-1] == 1) ? 1 : n_invmod(B[lenB-1], mod.n);
@@ -61,10 +61,17 @@ void _nmod_poly_rem_q1(mp_ptr R,
     {
         for (i = 1; i < lenB - 1; i++)
         {
-            t = A[i];
-            NMOD_ADDMUL(t, q1, B[i - 1], mod);
-            NMOD_ADDMUL(t, q0, B[i], mod);
-            R[i] = t;
+            umul_ppmm(t1, t0, q1, B[i - 1]);
+            umul_ppmm(s1, s0, q0, B[i]);
+            add_ssaaaa(t1, t0, t1, t0, 0, A[i]);
+            add_sssaaaaaa(t2, t1, t0, 0, t1, t0, 0, s1, s0);
+            if (t2 != 0)
+                /* Note: should just be t1 -= mod.n, but with GCC
+                   on Zen3 that version runs noticeably slower. */
+                sub_ddmmss(t2, t1, t2, t1, 0, mod.n);
+            t1 = FLINT_MIN(t1, t1 - mod.n);
+            FLINT_ASSERT(t1 < mod.n);
+            NMOD_RED2(R[i], t1, t0, mod);
         }
     }
 }

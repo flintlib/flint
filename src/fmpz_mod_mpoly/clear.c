@@ -11,7 +11,7 @@
 
 #include "fmpz_mod_mpoly.h"
 
-void fmpz_mod_mpoly_clear(fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_ctx_t ctx)
+void fmpz_mod_mpoly_clear(fmpz_mod_mpoly_t A, const fmpz_mod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     slong i;
 

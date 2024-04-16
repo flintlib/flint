@@ -48,7 +48,7 @@ static int _fq_nmod_mpoly_pmul(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t X,
 
     p = fmpz_get_ui(pow);
 
-    if (X->length <= WORD(2) || A->length/p < X->length)
+    if (X->length <= WORD(2) || A->length/p < (ulong) X->length)
     {
         if (!fq_nmod_mpoly_pow_ui(T, X, p, ctx))
         {

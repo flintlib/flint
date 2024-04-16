@@ -201,7 +201,7 @@ int nmod_mpolyn_interp_crt_lg_poly(
 
         mpoly_monomial_zero(Texps + N*Ti, N);
 
-        if (Fi < Flen && Aexp >= 0 && ((Fexps + N*Fi)[off]>>shift) == Aexp)
+        if (Fi < Flen && Aexp >= 0 && ((Fexps + N*Fi)[off]>>shift) == (ulong) Aexp)
         {
             /* F term ok, A term ok */
             n_poly_mod_rem(evil_cast_nmod_poly_to_n_poly(u), Fcoeffs + Fi,
@@ -225,7 +225,7 @@ int nmod_mpolyn_interp_crt_lg_poly(
                 Aexp--;
             } while (Aexp >= 0 && fq_nmod_is_zero(Acoeff + Aexp, fqctx));
         }
-        else if (Fi < Flen && (Aexp < 0 || ((Fexps + N*Fi)[off]>>shift) > Aexp))
+        else if (Fi < Flen && (Aexp < 0 || ((Fexps + N*Fi)[off]>>shift) > (ulong) Aexp))
         {
             /* F term ok, A term missing */
             n_poly_mod_rem(evil_cast_nmod_poly_to_n_poly(v), Fcoeffs + Fi,
@@ -245,7 +245,7 @@ int nmod_mpolyn_interp_crt_lg_poly(
             (Texps + N*Ti)[off] = (Fexps + N*Fi)[off];
             Fi++;
         }
-        else if (Aexp >= 0 && (Fi >= Flen || ((Fexps + N*Fi)[off]>>shift) < Aexp))
+        else if (Aexp >= 0 && (Fi >= Flen || ((Fexps + N*Fi)[off]>>shift) < (ulong) Aexp))
         {
             /* F term missing, A term ok */
             changed = 1;
@@ -1461,7 +1461,7 @@ int fq_nmod_mpolyn_interp_crt_sm_poly(
 
         mpoly_monomial_zero(Texps + N*Ti, N);
 
-        if (Fi < Flen && Ai >= 0 && ((Fexps + N*Fi)[off]>>shift) == Ai)
+        if (Fi < Flen && Ai >= 0 && ((Fexps + N*Fi)[off]>>shift) == (ulong) Ai)
         {
             /* F term ok, A term ok */
             n_fq_poly_evaluate_fq_nmod(u, Fcoeffs + Fi, alpha, ctx->fqctx);
@@ -1484,7 +1484,7 @@ int fq_nmod_mpolyn_interp_crt_sm_poly(
                 Ai--;
             } while (Ai >= 0 && fq_nmod_is_zero(Acoeff + Ai, ctx->fqctx));
         }
-        else if (Fi < Flen && (Ai < 0 || ((Fexps + N*Fi)[off]>>shift) > Ai))
+        else if (Fi < Flen && (Ai < 0 || ((Fexps + N*Fi)[off]>>shift) > (ulong) Ai))
         {
             /* F term ok, A term missing */
             n_fq_poly_evaluate_fq_nmod(v, Fcoeffs + Fi, alpha, ctx->fqctx);
@@ -1503,7 +1503,7 @@ int fq_nmod_mpolyn_interp_crt_sm_poly(
             (Texps + N*Ti)[off] = (Fexps + N*Fi)[off];
             Fi++;
         }
-        else if (Ai >= 0 && (Fi >= Flen || ((Fexps + N*Fi)[off]>>shift) < Ai))
+        else if (Ai >= 0 && (Fi >= Flen || ((Fexps + N*Fi)[off]>>shift) < (ulong) Ai))
         {
             /* F term missing, A term ok */
             changed = 1;
@@ -2240,7 +2240,7 @@ int fq_nmod_mpolyn_interp_crt_lg_poly(
 
         mpoly_monomial_zero(Texp + N*Ti, N);
 
-        if (Fi < Flen && Aexp >= 0 && ((Fexp + N*Fi)[off]>>shift) == Aexp)
+        if (Fi < Flen && Aexp >= 0 && ((Fexp + N*Fi)[off]>>shift) == (ulong) Aexp)
         {
             /* F term ok, A term ok */
             bad_fq_nmod_embed_n_fq_sm_to_fq_nmod_lg(u, Fcoeff + Fi, emb);
@@ -2265,7 +2265,7 @@ int fq_nmod_mpolyn_interp_crt_lg_poly(
                 Aexp--;
             } while (Aexp >= 0 && fq_nmod_is_zero(Acoeff + Aexp, ectx->fqctx));
         }
-        else if (Fi < Flen && (Aexp < 0 || ((Fexp + N*Fi)[off]>>shift) > Aexp))
+        else if (Fi < Flen && (Aexp < 0 || ((Fexp + N*Fi)[off]>>shift) > (ulong) Aexp))
         {
             /* F term ok, A term missing */
             bad_fq_nmod_embed_n_fq_sm_to_fq_nmod_lg(v, Fcoeff + Fi, emb);
@@ -2286,7 +2286,7 @@ int fq_nmod_mpolyn_interp_crt_lg_poly(
             (Texp + N*Ti)[off] = (Fexp + N*Fi)[off];
             Fi++;
         }
-        else if (Aexp >= 0 && (Fi >= Flen || ((Fexp + N*Fi)[off]>>shift) < Aexp))
+        else if (Aexp >= 0 && (Fi >= Flen || ((Fexp + N*Fi)[off]>>shift) < (ulong) Aexp))
         {
             /* F term missing, A term ok */
             changed = 1;

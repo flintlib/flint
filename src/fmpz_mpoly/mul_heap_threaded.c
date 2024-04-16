@@ -16,9 +16,9 @@
 #include "mpoly.h"
 #include "fmpz_mpoly.h"
 
-slong _fmpz_mpoly_mul_heap_part1(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc,
+static slong _fmpz_mpoly_mul_heap_part1(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc,
               const fmpz * Bcoeff, const ulong * Bexp, slong Blen,
-              const fmpz * Ccoeff, const ulong * Cexp, slong Clen,
+              const fmpz * Ccoeff, const ulong * Cexp, slong FLINT_UNUSED(Clen),
          slong * start, slong * end, slong * hind, const fmpz_mpoly_stripe_t S)
 {
     const int flint_small = S->flint_small;
@@ -181,9 +181,9 @@ slong _fmpz_mpoly_mul_heap_part1(fmpz ** A_coeff, ulong ** A_exp, slong * A_allo
 }
 
 
-slong _fmpz_mpoly_mul_heap_part(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc,
+static slong _fmpz_mpoly_mul_heap_part(fmpz ** A_coeff, ulong ** A_exp, slong * A_alloc,
                  const fmpz * Bcoeff, const ulong * Bexp, slong Blen,
-                 const fmpz * Ccoeff, const ulong * Cexp, slong Clen,
+                 const fmpz * Ccoeff, const ulong * Cexp, slong FLINT_UNUSED(Clen),
          slong * start, slong * end, slong * hind, const fmpz_mpoly_stripe_t S)
 {
     const int flint_small = S->flint_small;

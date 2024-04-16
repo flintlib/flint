@@ -787,7 +787,8 @@ static slong _fmpz_mpoly_divides_array_chunked(fmpz ** poly1, ulong ** exp1,
                                           slong * mults, slong num, slong bits)
 {
    slong i, j, k, prod, len = 0, l1, l2, l3;
-   slong bits1, bits2, bits3 = 0, tlen, talloc, skip, max_exp;
+   slong bits1, bits2, bits3 = 0, tlen, talloc, skip;
+   ulong max_exp;
    slong shift = bits*(num);
    slong * i1, * i2, * i3, * n1, * n2, * n3;
    slong * b1, * b3, * maxb1, * maxb3, * max_exp1, * max_exp3;
@@ -1301,7 +1302,8 @@ slong _fmpz_mpoly_divides_array(fmpz ** poly1, ulong ** exp1, slong * alloc,
 int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                           const fmpz_mpoly_t poly3, const fmpz_mpoly_ctx_t ctx)
 {
-   slong i, bits, exp_bits, N, len = 0, array_size;
+   slong i, bits, N, len = 0, array_size;
+   flint_bitcnt_t exp_bits;
    ulong max, * max_fields1, * max_fields2, * max_fields3;
    ulong * exp2 = poly2->exps, * exp3 = poly3->exps;
    int free2 = 0, free3 = 0;

@@ -14,7 +14,7 @@
 #include "fmpz_mpoly.h"
 
 void fmpz_mpoly_set_term_coeff_fmpz(fmpz_mpoly_t A,
-                           slong i, const fmpz_t c, const fmpz_mpoly_ctx_t ctx)
+                           slong i, const fmpz_t c, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     if ((ulong) i >= (ulong) A->length)
     {
@@ -25,7 +25,7 @@ void fmpz_mpoly_set_term_coeff_fmpz(fmpz_mpoly_t A,
 }
 
 void fmpz_mpoly_set_term_coeff_ui(fmpz_mpoly_t A,
-                                  slong i, ulong c, const fmpz_mpoly_ctx_t ctx)
+                                  slong i, ulong c, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     if ((ulong) i >= (ulong) A->length)
     {
@@ -36,7 +36,7 @@ void fmpz_mpoly_set_term_coeff_ui(fmpz_mpoly_t A,
 }
 
 void fmpz_mpoly_set_term_coeff_si(fmpz_mpoly_t A,
-                                  slong i, slong c, const fmpz_mpoly_ctx_t ctx)
+                                  slong i, slong c, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     if ((ulong) i >= (ulong) A->length)
     {

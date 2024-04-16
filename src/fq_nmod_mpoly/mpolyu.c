@@ -48,7 +48,7 @@ int fq_nmod_mpolyu_is_canonical(const fq_nmod_mpolyu_t A,
 }
 
 void fq_nmod_mpolyu_init(fq_nmod_mpolyu_t A, flint_bitcnt_t bits,
-                                                 const fq_nmod_mpoly_ctx_t ctx)
+                                                 const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     A->coeffs = NULL;
     A->exps = NULL;

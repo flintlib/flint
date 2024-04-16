@@ -14,7 +14,7 @@
 
 void fq_zech_mpoly_fit_bits(fq_zech_mpoly_t A, slong bits, const fq_zech_mpoly_ctx_t ctx)
 {
-    if (A->bits < bits)
+    if (A->bits < (ulong) bits)
     {
         if (A->alloc != 0)
         {

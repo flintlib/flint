@@ -18,7 +18,7 @@ void fmpz_mod_mpoly_get_term(fmpz_mod_mpoly_t M, const fmpz_mod_mpoly_t A,
     flint_bitcnt_t bits = A->bits;
     slong N = mpoly_words_per_exp(bits, ctx->minfo);
 
-    if (i >= (ulong) A->length)
+    if (i >= A->length)
         flint_throw(FLINT_ERROR, "fmpz_mod_mpoly_get_term: index out of range");
 
     fmpz_mod_mpoly_fit_length_reset_bits(M, 1, bits, ctx);

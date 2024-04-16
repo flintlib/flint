@@ -35,7 +35,7 @@ fmpz_mpoly_fit_length(fmpz_mpoly_t poly, slong len, const fmpz_mpoly_ctx_t ctx)
     }
 }
 
-void _fmpz_mpoly_set_length(fmpz_mpoly_t A, slong newlen, const fmpz_mpoly_ctx_t ctx)
+void _fmpz_mpoly_set_length(fmpz_mpoly_t A, slong newlen, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     slong i;
     for (i = newlen; i < A->length; i++)
@@ -44,7 +44,7 @@ void _fmpz_mpoly_set_length(fmpz_mpoly_t A, slong newlen, const fmpz_mpoly_ctx_t
     A->length = newlen;
 }
 
-void fmpz_mpoly_truncate(fmpz_mpoly_t A, slong newlen, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_truncate(fmpz_mpoly_t A, slong newlen, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     if (A->length > newlen)
     {

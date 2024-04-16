@@ -219,11 +219,11 @@ void _fmpz_mod_mpoly_mul_johnson1(
 }
 
 
-void _fmpz_mod_mpoly_mul_johnson(
+static void _fmpz_mod_mpoly_mul_johnson(
     fmpz_mod_mpoly_t A,
     const fmpz * Bcoeffs, const ulong * Bexps, slong Blen,
     const fmpz * Ccoeffs, const ulong * Cexps, slong Clen,
-    flint_bitcnt_t bits,
+    flint_bitcnt_t FLINT_UNUSED(bits),
     slong N,
     const ulong * cmpmask,
     const fmpz_mod_ctx_t ctx)

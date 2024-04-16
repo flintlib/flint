@@ -59,6 +59,10 @@ Context objects
 
     Retrives the number of limbs `\ell` of the modulus.
 
+.. macro:: MPN_MOD_CTX_MODULUS_BITS
+
+    Retrieves the number of bits of the modulus.
+
 .. macro:: MPN_MOD_CTX_MODULUS(ctx)
 
     Pointer to the limbs of the modulus.
@@ -173,7 +177,7 @@ used by higher-level generic routines.
 
 .. function:: int mpn_mod_mat_mul_waksman(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 
-    Waksman's matrix multiplication algorithm using `n^3/2 + O(n)` scalar multiplications.
+    Waksman's matrix multiplication algorithm using `n^3/2 + O(n^2)` scalar multiplications.
     The operations are done with delayed reduction.
 
 .. function:: int mpn_mod_mat_mul_multi_mod(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
@@ -211,4 +215,33 @@ used by higher-level generic routines.
 Polynomial algorithms
 -------------------------------------------------------------------------------
 
-TODO
+All multiplication algorithms optimize for squaring.
+
+.. function:: int _mpn_mod_poly_mullow_classical(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
+
+    Polynomial multiplication using the schoolbook algorithm.
+
+.. function:: int _mpn_mod_poly_mullow_KS(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
+
+    Polynomial multiplication using Kronecker substitution (bit packing).
+
+.. function:: int _mpn_mod_poly_mullow_karatsuba(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong len, slong cutoff, gr_ctx_t ctx)
+
+    Polynomial multiplication using the Karatsuba algorithm,
+    implemented without intermediate modular reductions.
+    This algorithm calls itself recursively, switching to
+    basecase multiplication (also without intermediate reductions)
+    when either *len1* or *len2* is smaller than *cutoff*.
+
+    Currently a full product is computed internally regardless of *len*;
+    truncation only skips the modular reductions.
+
+.. function:: int _mpn_mod_poly_mullow_fft_small(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
+
+    Polynomial multiplication using the small-prime FFT.
+    Returns ``GR_UNABLE`` if the small-prime FFT is not available
+    or if the coefficients are too large to use this implementation.
+
+.. function:: int _mpn_mod_poly_mullow(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
+
+    Polynomial multiplication using a default algorithm.
