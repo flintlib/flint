@@ -10,25 +10,49 @@ cfg_data = configuration_data()
 #   Project options
 # -----------------------------------------------------------------------------
 
-gmp_internals_opt = get_option('gmp_internals')
+libtool_lock_opt = get_option('libtool_lock')
 pthread_opt = get_option('pthread')
+reentrant_opt = get_option('reentrant')
+thread_safe_opt = get_option('thread_safe')
+assert_opt = get_option('assert')
+pretty_tests_opt = get_option('pretty_tests')
+gmp_internals_opt = get_option('gmp_internals')
+assembly_opt = get_option('assembly')
+avx2_opt = get_option('avx2')
+avx512_opt = get_option('avx512')
+fft_small_opt = get_option('fft_small')
+blas_opt = get_option('blas')
+gc_opt = get_option('gc')
+ntl_opt = get_option('ntl')
+
+# -----------------------------------------------------------------------------
+#   Unsupported options
+# -----------------------------------------------------------------------------
+
+if avx2_opt.enabled()
+  error('AVX2 support is not yet implemented')
+elif avx512_opt.enabled()
+  error('AVX512 support is not yet implemented')
+elif blas_opt.enabled()
+  error('BLAS support is not yet implemented')
+elif gc_opt.enabled()
+  error('Garbage collection is not yet implemented')
+elif ntl_opt.enabled()
+  error('NTL support is not yet implemented')
+endif
 
 # -----------------------------------------------------------------------------
 #   fmpz memory management
 # -----------------------------------------------------------------------------
 
-enable_gc = get_option('gc').enabled()
-enable_reentrant = get_option('reentrant').enabled()
-enable_thread_safe = get_option('thread_safe').enabled()
-
-if enable_gc
-  if enable_thread_safe
+if gc_opt.allowed()
+  if thread_safe_opt.allowed()
     error('Garbage collection is not thread safe')
   else
     fmpz_c_in = 'fmpz_gc.c'
   endif
 else
-  if enable_reentrant
+  if reentrant_opt.enabled()
     fmpz_c_in = 'fmpz_reentrant.c'
   else
     fmpz_c_in = 'fmpz_single.c'
@@ -241,11 +265,30 @@ if host_machine.system() != 'windows'
 endif
 
 # -----------------------------------------------------------------------------
+#   cpu_set_t support
+# -----------------------------------------------------------------------------
+
+have_cpu_set_t = cc.compiles('''
+#define _GNU_SOURCE
+#include <sched.h>
+#include <pthread.h>
+
+int main() {
+  cpu_set_t s;
+  CPU_ZERO(&s);
+  pthread_getaffinity_np(pthread_self(), sizeof(cpu_set_t), &s);
+  return 0;
+}
+''')
+
+# -----------------------------------------------------------------------------
 #  external configuration for flint_config.h
 # -----------------------------------------------------------------------------
 
-# cfg_data.set('FLINT_BIG_ENDIAN', 1,
-#   description: 'Define if system is big endian.')
+if host_machine.endian() == 'big'
+  cfg_data.set('FLINT_BIG_ENDIAN', 1,
+    description: 'Define if system is big endian.')
+endif
 
 if have_assembly and FLINT_HAVE_ASSEMBLY == 'armv8'
   cfg_data.set('FLINT_HAVE_ASSEMBLY_armv8', 1,
@@ -260,39 +303,57 @@ if have_fft_small
     description: 'Define to use the fft_small module')
 endif
 
+# XXX: Need better CPU detection
 # cfg_data.set('FLINT_KNOW_STRONG_ORDER', 1,
 #   description: 'Define if system is strongly ordered')
-# cfg_data.set('FLINT_REENTRANT', 0,
-#   description: 'Define to enable reentrant.')
+
+if reentrant_opt.enabled()
+  cfg_data.set('FLINT_REENTRANT', 1,
+    description: 'Define to enable reentrant.')
+endif
+
 cfg_data.set('FLINT_UNROLL_LOOPS', 1,
   description: 'Define to locally unroll some loops')
-# cfg_data.set('FLINT_USES_BLAS', 0,
-#   description: 'Define to enable BLAS.')
-# cfg_data.set('FLINT_USES_CPUSET', 0,
-#   description: 'Define if system has cpu_set_t')
-# cfg_data.set('FLINT_USES_GC', 0,
-#   description: 'Define to enable the Boehm-Demers-Weise garbage collector.')
 
-if pthread_opt.allowed()
+if blas_opt.enabled()
+  cfg_data.set('FLINT_USES_BLAS', 1,
+    description: 'Define to enable BLAS.')
+endif
+
+if have_cpu_set_t
+  cfg_data.set('FLINT_USES_CPUSET', 1,
+    description: 'Define if system has cpu_set_t')
+endif
+
+if gc_opt.enabled()
+  cfg_data.set('FLINT_USES_GC', 1,
+    description: 'Define to enable the Boehm-Demers-Weise garbage collector.')
+endif
+
+if pthread_opt.enabled()
   cfg_data.set('FLINT_USES_PTHREAD', 1,
     description: 'Define to enable the use of pthread.')
 endif
 
-if enable_thread_safe
+if thread_safe_opt.enabled()
   cfg_data.set('FLINT_USES_TLS', 1,
     description: 'Define to enable thread-local storage.')
 endif
 
-# cfg_data.set('FLINT_WANT_WANT_ASSERT', 1,
-#   description: 'Define to enable use of asserts.')
+if assert_opt.enabled()
+  cfg_data.set('FLINT_WANT_ASSERT', 1,
+    description: 'Define to enable use of asserts.')
+endif
 
 if gmp_internals_opt.allowed()
   cfg_data.set('FLINT_WANT_GMP_INTERNALS', 1,
     description: 'Define to enable use of GMP internals.')
 endif
 
-cfg_data.set('FLINT_WANT_PRETTY_TESTS', 1,
-  description: 'Define to enable pretty printing for tests.')
+if pretty_tests_opt.enabled()
+  cfg_data.set('FLINT_WANT_PRETTY_TESTS', 1,
+    description: 'Define to enable pretty printing for tests.')
+endif
 
 # -----------------------------------------------------------------------------
 #  internal configuration for config.h
@@ -344,8 +405,10 @@ endforeach
 
 # XXX: Do we need to check for _alligned_malloc?
 
+# XXX: Need better checking for LSYM_PREFIX and related assembly options
 cfg_data_internal.set_quoted('LSYM_PREFIX', 'L',
   description: 'Assembler local label prefix')
+
 cfg_data_internal.set_quoted('LT_OBJDIR', '.libs/',
   description: 'Define to the sub-directory where libtool stores uninstalled libraries.')
 cfg_data_internal.set_quoted('PACKAGE_BUGREPORT',
