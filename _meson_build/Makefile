@@ -18,3 +18,11 @@ install: compile
 test: setup
 	meson configure $(BUILDDIR) -Dtests=enabled
 	meson test -C $(BUILDDIR)
+
+coverage: setup
+	# Coverage tool e.g. gcovr needs to be installed *before* meson configure:
+	#    pip install gcovr
+	meson configure $(BUILDDIR) -Dtests=enabled -Db_coverage=true
+	meson test -C $(BUILDDIR)
+	cd $(BUILDDIR) && ninja coverage-html
+	# open $(BUILDDIR)/meson-logs/coveragereport/index.html
