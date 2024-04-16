@@ -737,19 +737,32 @@ Power series special functions
 Test functions
 -------------------------------------------------------------------------------
 
-.. function:: void gr_poly_test_mullow(gr_method_poly_binary_trunc_op mullow_impl, gr_method_poly_binary_trunc_op mullow_ref, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+The following functions run *iters* test iterations, generating
+polynomials up to length *maxn*. If *ctx* is set to ``NULL``, a random
+ring is generated on each test iteration, otherwise the given ring is used.
+
+.. function:: void _gr_poly_test_mullow(gr_method_poly_binary_trunc_op mullow_impl, gr_method_poly_binary_trunc_op mullow_ref, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
 
     Tests the given function ``mullow_impl`` for correctness as an implementation
-    of :func:`_gr_poly_mullow`. Runs *iters* test iterations, generating
-    polynomials up to length *maxn*. If *ctx* is set to ``NULL``, a random
-    ring is generated on each test iteration.
+    of :func:`_gr_poly_mullow`. 
     A reference implementation to compare against can be provided as
     ``mullow_ref``; if ``NULL``, classical multiplication is used.
 
-.. function:: void gr_poly_test_divrem(gr_method_poly_binary_binary_op divrem_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+.. function:: void _gr_poly_test_divrem(gr_method_poly_binary_binary_op divrem_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
 
     Tests the given function ``divrem_impl`` for correctness as an implementation
     of :func:`_gr_poly_divrem`.
+
+.. function:: void _gr_poly_test_inv_series(gr_method_poly_unary_trunc_op inv_series_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+
+    Tests the given function ``inv_series_impl`` for correctness as an implementation
+    of :func:`_gr_poly_inv_series`.
+
+.. function:: void _gr_poly_test_div_series(gr_method_poly_binary_trunc_op div_series_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+
+    Tests the given function ``div_series_impl`` for correctness as an implementation
+    of :func:`_gr_poly_div_series`.
+
 
 .. raw:: latex
 

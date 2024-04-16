@@ -12,7 +12,7 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 
-void gr_poly_test_divrem(gr_method_poly_binary_binary_op divrem_impl,
+void _gr_poly_test_divrem(gr_method_poly_binary_binary_op divrem_impl,
     flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
 {
     slong iter;

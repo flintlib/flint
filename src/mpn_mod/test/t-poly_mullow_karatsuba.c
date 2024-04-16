@@ -34,8 +34,8 @@ TEST_FUNCTION_START(mpn_mod_poly_mullow_karatsuba, state)
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         gr_ctx_init_mpn_mod_randtest(ctx, state);
-        gr_poly_test_mullow((gr_method_poly_binary_trunc_op) _mpn_mod_poly_mullow_karatsuba_deep, NULL, state, 10, 40, ctx);
-        gr_poly_test_mullow((gr_method_poly_binary_trunc_op) _mpn_mod_poly_mullow_karatsuba_shallow, NULL, state, 10, 40, ctx);
+        _gr_poly_test_mullow((gr_method_poly_binary_trunc_op) _mpn_mod_poly_mullow_karatsuba_deep, NULL, state, 10, 40, ctx);
+        _gr_poly_test_mullow((gr_method_poly_binary_trunc_op) _mpn_mod_poly_mullow_karatsuba_shallow, NULL, state, 10, 40, ctx);
         gr_ctx_clear(ctx);
     }
 

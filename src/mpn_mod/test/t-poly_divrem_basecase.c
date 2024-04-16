@@ -21,14 +21,14 @@ TEST_FUNCTION_START(mpn_mod_poly_divrem_basecase, state)
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         gr_ctx_init_mpn_mod_randtest(ctx, state);
-        gr_poly_test_divrem((gr_method_poly_binary_binary_op) _mpn_mod_poly_divrem_basecase, state, 10, 30, ctx);
+        _gr_poly_test_divrem((gr_method_poly_binary_binary_op) _mpn_mod_poly_divrem_basecase, state, 10, 30, ctx);
         gr_ctx_clear(ctx);
     }
 
     for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
         gr_ctx_init_mpn_mod_randtest(ctx, state);
-        gr_poly_test_divrem((gr_method_poly_binary_binary_op) _mpn_mod_poly_divrem, state, 10, 100, ctx);
+        _gr_poly_test_divrem((gr_method_poly_binary_binary_op) _mpn_mod_poly_divrem, state, 10, 100, ctx);
         gr_ctx_clear(ctx);
     }
 
