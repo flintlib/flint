@@ -456,6 +456,7 @@ void _gr_poly_test_divrem(gr_method_poly_binary_binary_op divrem_impl, flint_ran
 void _gr_poly_test_div(gr_method_poly_binary_op div_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
 void _gr_poly_test_inv_series(gr_method_poly_unary_trunc_op inv_series_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
 void _gr_poly_test_div_series(gr_method_poly_binary_trunc_op div_series_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
+void _gr_poly_test_gcd(gr_method_poly_gcd_op gcd_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
 
 #ifdef __cplusplus
 }

@@ -768,6 +768,11 @@ ring is generated on each test iteration, otherwise the given ring is used.
     Tests the given function ``div_series_impl`` for correctness as an implementation
     of :func:`_gr_poly_div_series`.
 
+.. function:: void _gr_poly_test_gcd(gr_method_poly_gcd_op gcd_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+
+    Tests the given function ``gcd_impl`` for correctness as an implementation
+    of :func:`_gr_poly_gcd`.
+
 
 .. raw:: latex
 
