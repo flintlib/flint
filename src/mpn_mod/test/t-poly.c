@@ -23,6 +23,7 @@ TEST_FUNCTION_START(mpn_mod_poly, state)
         gr_ctx_init_mpn_mod_randtest(ctx, state);
         _gr_poly_test_inv_series((gr_method_poly_unary_trunc_op) _mpn_mod_poly_inv_series, state, 10, 200, ctx);
         _gr_poly_test_div_series((gr_method_poly_binary_trunc_op) _mpn_mod_poly_div_series, state, 10, 200, ctx);
+        _gr_poly_test_div((gr_method_poly_binary_op) _mpn_mod_poly_div, state, 10, 200, ctx);
         gr_ctx_clear(ctx);
     }
 

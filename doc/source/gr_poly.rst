@@ -753,6 +753,11 @@ ring is generated on each test iteration, otherwise the given ring is used.
     Tests the given function ``divrem_impl`` for correctness as an implementation
     of :func:`_gr_poly_divrem`.
 
+.. function:: void _gr_poly_test_div(gr_method_poly_binary_op div_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+
+    Tests the given function ``div_impl`` for correctness as an implementation
+    of :func:`_gr_poly_div`.
+
 .. function:: void _gr_poly_test_inv_series(gr_method_poly_unary_trunc_op inv_series_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
 
     Tests the given function ``inv_series_impl`` for correctness as an implementation
