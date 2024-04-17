@@ -100,3 +100,13 @@ int _mpn_mod_poly_gcd(mp_ptr G, slong * lenG, mp_srcptr A, slong lenA, mp_srcptr
     else
         return _gr_poly_gcd_hgcd(G, lenG, A, lenA, B, lenB, cutoff / 3, cutoff, ctx);
 }
+
+int _mpn_mod_poly_xgcd(slong * lenG, mp_ptr G, mp_ptr S, mp_ptr T, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, gr_ctx_t ctx)
+{
+    slong cutoff = 240;
+
+    if (lenA < cutoff || lenB < cutoff)
+        return _gr_poly_xgcd_euclidean(lenG, G, S, T, A, lenA, B, lenB, ctx);
+    else
+        return _gr_poly_xgcd_hgcd(lenG, G, S, T, A, lenA, B, lenB, cutoff / 3, cutoff, ctx);
+}

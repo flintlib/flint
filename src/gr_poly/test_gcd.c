@@ -12,8 +12,6 @@
 #include "gr_vec.h"
 #include "gr_poly.h"
 
-#include "mpn_mod.h"
-
 static int
 gr_poly_gcd_wrapper(gr_method_poly_gcd_op gcd_impl, gr_poly_t G, const gr_poly_t A,
                         const gr_poly_t B, gr_ctx_t ctx)

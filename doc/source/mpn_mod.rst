@@ -281,3 +281,8 @@ GCD
 
     Polynomial GCD with automatic selection between basecase
     and HGCD algorithms.
+
+.. function:: int _mpn_mod_poly_xgcd(slong * lenG, mp_ptr G, mp_ptr S, mp_ptr T, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, gr_ctx_t ctx);
+
+    Polynomial extended GCD with automatic selection between basecase
+    and HGCD algorithms.

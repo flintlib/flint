@@ -67,6 +67,7 @@
 #include "t-taylor_shift_convolution.c"
 #include "t-taylor_shift_divconquer.c"
 #include "t-taylor_shift_horner.c"
+#include "t-xgcd.c"
 #include "t-xgcd_euclidean.c"
 #include "t-xgcd_hgcd.c"
 
@@ -127,6 +128,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_poly_taylor_shift_convolution),
     TEST_FUNCTION(gr_poly_taylor_shift_divconquer),
     TEST_FUNCTION(gr_poly_taylor_shift_horner),
+    TEST_FUNCTION(gr_poly_xgcd),
     TEST_FUNCTION(gr_poly_xgcd_euclidean),
     TEST_FUNCTION(gr_poly_xgcd_hgcd)
 };
