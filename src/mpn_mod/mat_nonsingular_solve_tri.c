@@ -32,7 +32,6 @@ mpn_mod_mat_nonsingular_solve_triu(gr_mat_t X, const gr_mat_t U, const gr_mat_t 
 {
     slong cutoff = mpn_mod_mat_solve_tri_cutoff[MPN_MOD_CTX_NLIMBS(ctx)];
 
-    /* todo: tune thresholds */
     if (B->r < cutoff || B->c < cutoff)
         return gr_mat_nonsingular_solve_triu_classical(X, U, B, unit, ctx);
     else

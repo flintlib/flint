@@ -115,10 +115,13 @@ gr_method_tab_input _mpn_mod_methods_input[] =
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _mpn_mod_vec_dot_rev},
 
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) _mpn_mod_poly_mullow},
-/*
     {GR_METHOD_POLY_INV_SERIES, (gr_funcptr) _mpn_mod_poly_inv_series},
     {GR_METHOD_POLY_DIV_SERIES, (gr_funcptr) _mpn_mod_poly_div_series},
     {GR_METHOD_POLY_DIVREM,     (gr_funcptr) _mpn_mod_poly_divrem},
+    {GR_METHOD_POLY_DIV,        (gr_funcptr) _mpn_mod_poly_div},
+    {GR_METHOD_POLY_GCD,        (gr_funcptr) _mpn_mod_poly_gcd},
+    {GR_METHOD_POLY_XGCD,       (gr_funcptr) _mpn_mod_poly_xgcd},
+/*
     {GR_METHOD_POLY_ROOTS,      (gr_funcptr) mpn_mod_roots_gr_poly},
 */
 

@@ -777,19 +777,31 @@ Helper functions for reduction
 Test functions
 -------------------------------------------------------------------------------
 
+The following functions run *iters* test iterations, generating matrices
+up to size *maxn*. If *ctx* is set to ``NULL``, a random ring is generated
+on each test iteration, otherwise the given ring is tested.
+
 .. function:: void gr_mat_test_mul(gr_method_mat_binary_op mul_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
 
     Tests the given function ``mul_impl`` for correctness as an implementation
-    of matrix multiplication. Runs *iters* test iterations, generating matrices
-    up to size *maxn*. If *ctx* is set to ``NULL``, a random ring is generated
-    on each test iteration.
+    of :func:`gr_mat_mul`.
 
 .. function:: void gr_mat_test_lu(gr_method_mat_lu_op lu_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
 
-    Tests the given function ``lu_impl`` for correctness as an implementation
-    of LU factorization. Runs *iters* test iterations, generating matrices
-    up to size *maxn*. If *ctx* is set to ``NULL``, a random ring is generated
-    on each test iteration.
+    Tests the given function ``mul_impl`` for correctness as an implementation
+    of :func:`gr_mat_lu`.
+
+.. function:: void gr_mat_test_det(gr_method_mat_unary_op_get_scalar det_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+
+    Tests the given function ``det_impl`` for correctness as an implementation
+    of :func:`gr_mat_det`.
+
+.. function:: void gr_mat_test_nonsingular_solve_tril(gr_method_mat_binary_op_with_flag solve_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+              void gr_mat_test_nonsingular_solve_triu(gr_method_mat_binary_op_with_flag solve_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+
+    Tests the given function ``solve_impl`` for correctness as an implementation
+    of :func:`gr_mat_nonsingular_solve_tril` / :func:`gr_mat_nonsingular_solve_triu`.
+
 
 .. raw:: latex
 

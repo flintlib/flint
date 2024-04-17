@@ -157,21 +157,21 @@ int mpn_mod_mat_mul_waksman(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_c
             mp_size_t d;
             mp_ptr Cptr = ((mp_ptr) C->rows[i]) + k * nlimbs;
 
-            if ((slong) C_ENTRY(i, k)[slimbs - 1] >= 0)
-            {
-                d = slimbs;
-                MPN_NORM(C_ENTRY(i, k), d);
-                mpn_mod_set_mpn(Cptr, C_ENTRY(i, k), d, ctx);
-            }
-            else
-            {
+            /* As currently implemented, there is no wraparound arithmetic.
+               Were that the case, we would need something like
+
                 d = slimbs;
                 mpn_neg(C_ENTRY(i, k), C_ENTRY(i, k), d);
                 MPN_NORM(C_ENTRY(i, k), d);
                 mpn_mod_set_mpn(Cptr, C_ENTRY(i, k), d, ctx);
                 mpn_mod_neg(Cptr, Cptr, ctx);
-            }
 
+               when the leading limb indicates a negative value. */
+            FLINT_ASSERT((slong) C_ENTRY(i, k)[slimbs - 1] >= 0);
+
+            d = slimbs;
+            MPN_NORM(C_ENTRY(i, k), d);
+            mpn_mod_set_mpn(Cptr, C_ENTRY(i, k), d, ctx);
         }
     }
 

@@ -15,10 +15,13 @@
 /* Include functions *********************************************************/
 
 #include "t-mpn_mod.c"
+#include "t-mat.c"
 #include "t-mat_lu.c"
 #include "t-mat_lu_classical_delayed.c"
 #include "t-mat_mul_multi_mod.c"
 #include "t-mat_mul_waksman.c"
+#include "t-poly_divrem_basecase.c"
+#include "t-poly.c"
 #include "t-poly_mullow.c"
 #include "t-poly_mullow_KS.c"
 #include "t-poly_mullow_classical.c"
@@ -30,10 +33,13 @@
 test_struct tests[] =
 {
     TEST_FUNCTION(mpn_mod),
+    TEST_FUNCTION(mpn_mod_mat),
     TEST_FUNCTION(mpn_mod_mat_lu),
     TEST_FUNCTION(mpn_mod_mat_lu_classical_delayed),
     TEST_FUNCTION(mpn_mod_mat_mul_multi_mod),
     TEST_FUNCTION(mpn_mod_mat_mul_waksman),
+    TEST_FUNCTION(mpn_mod_poly_divrem_basecase),
+    TEST_FUNCTION(mpn_mod_poly),
     TEST_FUNCTION(mpn_mod_poly_mullow),
     TEST_FUNCTION(mpn_mod_poly_mullow_KS),
     TEST_FUNCTION(mpn_mod_poly_mullow_classical),

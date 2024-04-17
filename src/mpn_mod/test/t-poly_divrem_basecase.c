@@ -13,27 +13,22 @@
 #include "mpn_mod.h"
 #include "gr_poly.h"
 
-TEST_FUNCTION_START(mpn_mod_poly_mullow_fft_small, state)
+TEST_FUNCTION_START(mpn_mod_poly_divrem_basecase, state)
 {
     gr_ctx_t ctx;
     slong iter;
 
-    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         gr_ctx_init_mpn_mod_randtest(ctx, state);
-        flint_set_num_threads(1 + n_randint(state, 4));
-        _gr_poly_test_mullow((gr_method_poly_binary_trunc_op) _mpn_mod_poly_mullow_fft_small, NULL, state, 10, 50, ctx);
-        flint_set_num_threads(1);
+        _gr_poly_test_divrem((gr_method_poly_binary_binary_op) _mpn_mod_poly_divrem_basecase, state, 10, 30, ctx);
         gr_ctx_clear(ctx);
     }
 
     for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
         gr_ctx_init_mpn_mod_randtest(ctx, state);
-        flint_set_num_threads(1 + n_randint(state, 4));
-        _gr_poly_test_mullow((gr_method_poly_binary_trunc_op) _mpn_mod_poly_mullow_fft_small,
-                            (gr_method_poly_binary_trunc_op) _mpn_mod_poly_mullow_KS, state, 10, 5000, ctx);
-        flint_set_num_threads(1);
+        _gr_poly_test_divrem((gr_method_poly_binary_binary_op) _mpn_mod_poly_divrem, state, 10, 100, ctx);
         gr_ctx_clear(ctx);
     }
 
