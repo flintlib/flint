@@ -33,7 +33,7 @@ the main Flint website and the contributors section of this documentation.
 Requirements
 -------------------------------------------------------------------------------
 
-FLINT and following should compile on any machine with GCC and a standard
+FLINT should compile on any machine with GCC and a standard
 GNU toolchain, though GCC 4.8 and following are recommended.
 
 FLINT is specially optimised for x86 (32 and 64 bit) machines. There is also
