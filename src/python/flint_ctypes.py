@@ -4132,7 +4132,7 @@ class gr_elem:
     def acosh(self):
         """
             >>> x = PowerSeriesModRing(CC, 3).gen(); x.acosh()
-            [1.570796326794897 +/- 5.54e-16]*I + (-1.000000000000000*I)*x (mod x^3)
+            ([1.570796326794897 +/- 5.54e-16]*I) + (-1.000000000000000*I)*x (mod x^3)
         """
         return self._unary_op(self, libgr.gr_acosh, "acosh($x)")
 
@@ -4446,6 +4446,18 @@ class PowerSeriesRing_gr_series(gr_ctx):
         self._coefficient_ring._decrement_refcount()
 
 class PowerSeriesModRing_gr_poly(gr_ctx):
+    """
+        >>> x = PowerSeriesModRing(ZZ, 3).gen()
+        >>> (1+x)**1000
+        1 + 1000*x + 499500*x^2 (mod x^3)
+        >>> ((1+x)**2).sqrt() == (1+x)
+        True
+        >>> Rxy = PowerSeriesModRing(PowerSeriesModRing(RR, 2, "x"), 2, "y")
+        >>> x, y = Rxy.gens(recursive=True)
+        >>> (1+x+y).exp().log() - (1+x+y)
+        ([+/- 3.89e-16] + [+/- 3.32e-16]*x (mod x^2)) + ([+/- 3.32e-16] + [+/- 6.63e-16]*x (mod x^2))*y (mod y^2)
+    """
+
     def __init__(self, coefficient_ring, mod, var=None):
         assert isinstance(coefficient_ring, gr_ctx)
         gr_ctx.__init__(self)
