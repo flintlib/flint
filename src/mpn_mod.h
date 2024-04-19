@@ -59,6 +59,13 @@ _mpn_mod_ctx_struct;
 #define MPN_MOD_CTX_IS_PRIME(ctx) (MPN_MOD_CTX(ctx)->is_prime)
 #define MPN_MOD_CTX_MODULUS_BITS(ctx) ((MPN_MOD_CTX_NLIMBS(ctx) - 1) * FLINT_BITS + (FLINT_BITS - MPN_MOD_CTX_NORM(ctx)))
 
+MPN_MOD_INLINE int
+mpn_mod_ctx_set_is_field(gr_ctx_t ctx, truth_t is_field)
+{
+    MPN_MOD_CTX_IS_PRIME(ctx) = is_field;
+    return GR_SUCCESS;
+}
+
 /* Helpers which actually belong in mpn_extras.h */
 
 FLINT_FORCE_INLINE
@@ -186,7 +193,6 @@ char * _flint_mpn_get_str(mp_srcptr x, mp_size_t n);
 int gr_ctx_init_mpn_mod(gr_ctx_t ctx, const fmpz_t n);
 int _gr_ctx_init_mpn_mod(gr_ctx_t ctx, mp_srcptr n, mp_size_t nlimbs);
 void gr_ctx_init_mpn_mod_randtest(gr_ctx_t ctx, flint_rand_t state);
-void gr_ctx_mpn_mod_set_primality(gr_ctx_t ctx, truth_t is_prime);
 
 int mpn_mod_ctx_write(gr_stream_t out, gr_ctx_t ctx);
 void mpn_mod_ctx_clear(gr_ctx_t ctx);

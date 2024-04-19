@@ -29,12 +29,12 @@ void fq_default_ctx_init_type(fq_default_ctx_t ctx,
     {
         gr_ctx_init_nmod(FQ_DEFAULT_GR_CTX(ctx), fmpz_get_ui(p));
         NMOD_CTX_A(FQ_DEFAULT_GR_CTX(ctx))[0] = 0;
-        gr_ctx_nmod_set_primality(FQ_DEFAULT_GR_CTX(ctx), T_TRUE);
+        GR_MUST_SUCCEED(gr_ctx_set_is_field(FQ_DEFAULT_GR_CTX(ctx), T_TRUE));
     }
     else if (type == FQ_DEFAULT_FMPZ_MOD || (type == 0 && d == 1))
     {
         gr_ctx_init_fmpz_mod(FQ_DEFAULT_GR_CTX(ctx), p);
-        gr_ctx_fmpz_mod_set_primality(FQ_DEFAULT_GR_CTX(ctx), T_TRUE);
+        GR_MUST_SUCCEED(gr_ctx_set_is_field(FQ_DEFAULT_GR_CTX(ctx), T_TRUE));
     }
     else
     {
@@ -82,12 +82,12 @@ void fq_default_ctx_init_modulus_type(fq_default_ctx_t ctx,
 
         _gr_ctx_init_nmod(FQ_DEFAULT_GR_CTX(ctx), &mod);
         NMOD_CTX_A(FQ_DEFAULT_GR_CTX(ctx))[0] = a;
-        gr_ctx_nmod_set_primality(FQ_DEFAULT_GR_CTX(ctx), T_TRUE);
+        GR_MUST_SUCCEED(gr_ctx_set_is_field(FQ_DEFAULT_GR_CTX(ctx), T_TRUE));
     }
     else if (type == FQ_DEFAULT_FMPZ_MOD || (type == 0 && d == 1))
     {
         gr_ctx_init_fmpz_mod(FQ_DEFAULT_GR_CTX(ctx), p);
-        gr_ctx_fmpz_mod_set_primality(FQ_DEFAULT_GR_CTX(ctx), T_TRUE);
+        GR_MUST_SUCCEED(gr_ctx_set_is_field(FQ_DEFAULT_GR_CTX(ctx), T_TRUE));
 
         fmpz_mod_divides(FQ_DEFAULT_CTX_FMPZ_MOD_A(ctx), modulus->coeffs + 0,
             modulus->coeffs + 1, FQ_DEFAULT_CTX_FMPZ_MOD(ctx));
@@ -137,7 +137,7 @@ void fq_default_ctx_init_modulus_nmod_type(fq_default_ctx_t ctx,
 
         _gr_ctx_init_nmod(FQ_DEFAULT_GR_CTX(ctx), &mod);
         NMOD_CTX_A(FQ_DEFAULT_GR_CTX(ctx))[0] = a;
-        gr_ctx_nmod_set_primality(FQ_DEFAULT_GR_CTX(ctx), T_TRUE);
+        GR_MUST_SUCCEED(gr_ctx_set_is_field(FQ_DEFAULT_GR_CTX(ctx), T_TRUE));
     }
     else if (type == FQ_DEFAULT_FMPZ_MOD || (type == 0 && d == 1))
     {
@@ -152,7 +152,7 @@ void fq_default_ctx_init_modulus_nmod_type(fq_default_ctx_t ctx,
         fmpz_init_set_ui(pp, p);
         gr_ctx_init_fmpz_mod(FQ_DEFAULT_GR_CTX(ctx), pp);
         fmpz_clear(pp);
-        gr_ctx_fmpz_mod_set_primality(FQ_DEFAULT_GR_CTX(ctx), T_TRUE);
+        GR_MUST_SUCCEED(gr_ctx_set_is_field(FQ_DEFAULT_GR_CTX(ctx), T_TRUE));
         fmpz_set_ui(FMPZ_MOD_CTX_A(FQ_DEFAULT_GR_CTX(ctx)), a);
     }
     else

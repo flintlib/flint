@@ -85,7 +85,7 @@ Context objects
 
     A :type:`truth_t` flag indicating whether `n` is prime.
 
-.. function:: void gr_ctx_mpn_mod_set_primality(gr_ctx_t ctx, truth_t is_prime)
+.. function:: void mpn_mod_ctx_set_is_field(gr_ctx_t ctx, truth_t is_prime)
 
     Set the flag indicating whether `n` is prime. Setting this to ``T_TRUE``
     speeds up some algorithms which can assume that the ring

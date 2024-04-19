@@ -519,6 +519,45 @@ class gr_ctx:
         """
         return self._ctx_predicate(libflint.gr_ctx_is_zero_ring, "is_zero_ring")
 
+    def is_integral_domain(self):
+        """
+        Return whether this structure is an integral domain.
+
+            >>> ZZ.is_integral_domain()
+            True
+            >>> ZZx.is_integral_domain()
+            True
+            >>> PowerSeriesModRing(ZZ, 3).is_integral_domain()
+            False
+
+        """
+        return self._ctx_predicate(libflint.gr_ctx_is_integral_domain, "is_integral_domain")
+
+
+    def is_field(self):
+        """
+        Return whether this structure is a field.
+
+            >>> ZZ.is_field()
+            False
+            >>> QQ.is_field()
+            True
+
+        This check is intended to be fast, and some residue rings may
+        not perform a primality test automatically since this would be
+        expensive. Rather, the user should set a flag manually in the
+        constructor for such rings:
+
+            >>> IntegersMod_fmpz_mod(2**257+1).is_field()
+            Traceback (most recent call last):
+              ...
+            Undecidable: unable to decide is_field for ctx = Integers mod 231584178474632390847141970017375815706539969331281128078915168015826259279873 (fmpz)
+            >>> IntegersMod_fmpz_mod(2**257+1, n_is_prime=True).is_field()
+            True
+
+        """
+        return self._ctx_predicate(libflint.gr_ctx_is_field, "is_field")
+
     def _set_gen_name(self, s):
         status = libflint.gr_ctx_set_gen_name(self._ref, ctypes.c_char_p(str(s).encode('ascii')))
         self._str = None
@@ -4643,37 +4682,43 @@ class acf(gr_elem):
 
 
 class IntegersMod_nmod(gr_ctx):
-    def __init__(self, n):
+    def __init__(self, n, n_is_prime=None):
         n = self._as_ui(n)
         assert n >= 1
         gr_ctx.__init__(self)
         libgr.gr_ctx_init_nmod(self._ref, n)
         self._elem_type = nmod
+        if n_is_prime is not None:
+            libgr.gr_ctx_set_is_field(self, T_TRUE if n_is_prime else T_FALSE)
 
 class nmod(gr_elem):
     _struct_type = nmod_struct
 
 
 class IntegersMod_mpn_mod(gr_ctx):
-    def __init__(self, n):
+    def __init__(self, n, n_is_prime=None):
         n = self._as_fmpz(n)
         # todo: error handling (must handle cleanup when ctx has not been initialized
         assert n >= (1 << FLINT_BITS) and n < (1 << (8 * FLINT_BITS))
         gr_ctx.__init__(self)
         libgr.gr_ctx_init_mpn_mod(self._ref, n._ref)
         self._elem_type = mpn_mod
+        if n_is_prime is not None:
+            libgr.gr_ctx_set_is_field(self, T_TRUE if n_is_prime else T_FALSE)
 
 class mpn_mod(gr_elem):
     _struct_type = mpn_mod_struct
 
 
 class IntegersMod_fmpz_mod(gr_ctx):
-    def __init__(self, n):
+    def __init__(self, n, n_is_prime=None):
         n = self._as_fmpz(n)
         assert n >= 1
         gr_ctx.__init__(self)
         libgr.gr_ctx_init_fmpz_mod(self._ref, n._ref)
         self._elem_type = fmpz_mod
+        if n_is_prime is not None:
+            libgr.gr_ctx_set_is_field(self, T_TRUE if n_is_prime else T_FALSE)
 
 class fmpz_mod(gr_elem):
     _struct_type = fmpz_struct

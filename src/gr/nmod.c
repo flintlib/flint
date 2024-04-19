@@ -53,6 +53,13 @@ _gr_nmod_ctx_is_field(const gr_ctx_t ctx)
     return n_is_prime(NMOD_CTX(ctx).n) ? T_TRUE : T_FALSE;
 }
 
+int
+_gr_nmod_ctx_set_is_field(gr_ctx_t ctx, truth_t is_field)
+{
+    NMOD_IS_PRIME(ctx) = is_field;
+    return GR_SUCCESS;
+}
+
 void
 _gr_nmod_init(ulong * x, const gr_ctx_t ctx)
 {
@@ -1442,6 +1449,7 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_CTX_IS_EXACT,    (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_CANONICAL,
                                 (gr_funcptr) gr_generic_ctx_predicate_true},
+    {GR_METHOD_CTX_SET_IS_FIELD,(gr_funcptr) _gr_nmod_ctx_set_is_field},
     {GR_METHOD_INIT,            (gr_funcptr) _gr_nmod_init},
     {GR_METHOD_CLEAR,           (gr_funcptr) _gr_nmod_clear},
     {GR_METHOD_SWAP,            (gr_funcptr) _gr_nmod_swap},
@@ -1562,10 +1570,4 @@ _gr_ctx_init_nmod(gr_ctx_t ctx, void * nmod_t_ref)
         gr_method_tab_init(__gr_nmod_methods, __gr_nmod_methods_input);
         __gr_nmod_methods_initialized = 1;
     }
-}
-
-void
-gr_ctx_nmod_set_primality(gr_ctx_t ctx, truth_t is_prime)
-{
-    NMOD_IS_PRIME(ctx) = is_prime;
 }
