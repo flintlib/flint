@@ -80,8 +80,8 @@ int main()
         GR_MUST_SUCCEED(gr_ctx_init_mpn_mod(ctx, p));
         gr_ctx_init_fmpz_mod(ctx2, p);
 
-        gr_ctx_mpn_mod_set_primality(ctx, T_TRUE);
-        gr_ctx_fmpz_mod_set_primality(ctx2, T_TRUE);
+        GR_MUST_SUCCEED(gr_ctx_set_is_field(ctx, T_TRUE));
+        GR_MUST_SUCCEED(gr_ctx_set_is_field(ctx2, T_TRUE));
 
         flint_printf("  bits    n   add    mul    solve\n");
 

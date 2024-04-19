@@ -51,6 +51,13 @@ _gr_fmpz_mod_ctx_clear(gr_ctx_t ctx)
     fmpz_clear(FMPZ_MOD_CTX_A(ctx));
 }
 
+int
+_gr_fmpz_mod_ctx_set_is_field(gr_ctx_t ctx, truth_t is_field)
+{
+    FMPZ_MOD_IS_PRIME(ctx) = is_field;
+    return GR_SUCCESS;
+}
+
 truth_t
 _gr_fmpz_mod_ctx_is_field(gr_ctx_t ctx)
 {
@@ -728,6 +735,7 @@ gr_method_tab_input _fmpz_mod_methods_input[] =
     {GR_METHOD_CTX_IS_EXACT,    (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_CANONICAL,
                                 (gr_funcptr) gr_generic_ctx_predicate_true},
+    {GR_METHOD_CTX_SET_IS_FIELD,(gr_funcptr) _gr_fmpz_mod_ctx_set_is_field},
     {GR_METHOD_INIT,            (gr_funcptr) _gr_fmpz_mod_init},
     {GR_METHOD_CLEAR,           (gr_funcptr) _gr_fmpz_mod_clear},
     {GR_METHOD_SWAP,            (gr_funcptr) _gr_fmpz_mod_swap},
@@ -836,10 +844,4 @@ _gr_ctx_init_fmpz_mod_from_ref(gr_ctx_t ctx, const void * fctx)
         gr_method_tab_init(_fmpz_mod_methods, _fmpz_mod_methods_input);
         _fmpz_mod_methods_initialized = 1;
     }
-}
-
-void
-gr_ctx_fmpz_mod_set_primality(gr_ctx_t ctx, truth_t is_prime)
-{
-    FMPZ_MOD_IS_PRIME(ctx) = is_prime;
 }

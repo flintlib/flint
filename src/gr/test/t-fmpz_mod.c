@@ -28,7 +28,7 @@ TEST_FUNCTION_START(gr_fmpz_mod, state)
         fmpz_abs(n, n);
         gr_ctx_init_fmpz_mod(ZZn, n);
         if (n_randint(state, 2))
-            gr_ctx_fmpz_mod_set_primality(ZZn, fmpz_is_probabprime(n) ? T_TRUE : T_FALSE);
+            GR_MUST_SUCCEED(gr_ctx_set_is_field(ZZn, fmpz_is_probabprime(n) ? T_TRUE : T_FALSE));
         gr_test_ring(ZZn, 10, flags);
         gr_ctx_clear(ZZn);
     }
@@ -39,7 +39,7 @@ TEST_FUNCTION_START(gr_fmpz_mod, state)
         fmpz_abs(n, n);
         gr_ctx_init_fmpz_mod(ZZn, n);
         if (n_randint(state, 2))
-            gr_ctx_fmpz_mod_set_primality(ZZn, fmpz_is_probabprime(n) ? T_TRUE : T_FALSE);
+            GR_MUST_SUCCEED(gr_ctx_set_is_field(ZZn, fmpz_is_probabprime(n) ? T_TRUE : T_FALSE));
         gr_test_ring(ZZn, 100, flags);
         gr_ctx_clear(ZZn);
     }

@@ -39,7 +39,7 @@ TEST_FUNCTION_START(mpn_mod, state)
         }
 
         GR_MUST_SUCCEED(gr_ctx_init_mpn_mod(ZZn, n));
-        gr_ctx_mpn_mod_set_primality(ZZn, T_TRUE);
+        GR_MUST_SUCCEED(gr_ctx_set_is_field(ZZn, T_TRUE));
         gr_test_ring(ZZn, 100 * flint_test_multiplier(), flags);
         gr_ctx_clear(ZZn);
     }
@@ -58,7 +58,7 @@ TEST_FUNCTION_START(mpn_mod, state)
         }
 
         GR_MUST_SUCCEED(gr_ctx_init_mpn_mod(ZZn, n));
-        gr_ctx_mpn_mod_set_primality(ZZn, T_TRUE);
+        GR_MUST_SUCCEED(gr_ctx_set_is_field(ZZn, T_TRUE));
         gr_test_ring(ZZn, 100 * flint_test_multiplier(), flags);
         gr_ctx_clear(ZZn);
     }
@@ -74,7 +74,7 @@ TEST_FUNCTION_START(mpn_mod, state)
         }
 
         if (n_randint(state, 2))
-            gr_ctx_mpn_mod_set_primality(ZZn, fmpz_is_probabprime(n) ? T_TRUE : T_FALSE);
+            GR_MUST_SUCCEED(gr_ctx_set_is_field(ZZn, fmpz_is_probabprime(n) ? T_TRUE : T_FALSE));
 
         /* test Waksman mul */
         {

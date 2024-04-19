@@ -37,6 +37,7 @@ gr_method_tab_input _mpn_mod_methods_input[] =
     {GR_METHOD_CTX_IS_EXACT,    (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_CANONICAL,
                                 (gr_funcptr) gr_generic_ctx_predicate_true},
+    {GR_METHOD_CTX_SET_IS_FIELD,(gr_funcptr) mpn_mod_ctx_set_is_field},
     {GR_METHOD_INIT,            (gr_funcptr) mpn_mod_init},
     {GR_METHOD_CLEAR,           (gr_funcptr) mpn_mod_clear},
     {GR_METHOD_SWAP,            (gr_funcptr) mpn_mod_swap},
@@ -186,13 +187,6 @@ gr_ctx_init_mpn_mod(gr_ctx_t ctx, const fmpz_t n)
     return _gr_ctx_init_mpn_mod(ctx, COEFF_TO_PTR(*n)->_mp_d, COEFF_TO_PTR(*n)->_mp_size);
 }
 
-/* todo: have a generic interface for this */
-void
-gr_ctx_mpn_mod_set_primality(gr_ctx_t ctx, truth_t is_prime)
-{
-    MPN_MOD_CTX_IS_PRIME(ctx) = is_prime;
-}
-
 static const int
 randtest_primes[][2] = {
 #if FLINT_BITS == 32
@@ -223,7 +217,7 @@ gr_ctx_init_mpn_mod_randtest(gr_ctx_t ctx, flint_rand_t state)
         fmpz_ui_pow_ui(n, 2, randtest_primes[i][0]);
         fmpz_add_si(n, n, randtest_primes[i][1]);
         GR_MUST_SUCCEED(gr_ctx_init_mpn_mod(ctx, n));
-        gr_ctx_mpn_mod_set_primality(ctx, n_randint(state, 2) ? T_TRUE : T_UNKNOWN);
+        GR_MUST_SUCCEED(gr_ctx_set_is_field(ctx, n_randint(state, 2) ? T_TRUE : T_UNKNOWN));
     }
     else
     {
