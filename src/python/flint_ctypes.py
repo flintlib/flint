@@ -551,7 +551,7 @@ class gr_ctx:
             >>> IntegersMod_fmpz_mod(2**257+1).is_field()
             Traceback (most recent call last):
               ...
-            flint_ctypes.Undecidable: unable to decide is_field for ctx = Integers mod 231584178474632390847141970017375815706539969331281128078915168015826259279873 (fmpz)
+            Undecidable: unable to decide is_field for ctx = Integers mod 231584178474632390847141970017375815706539969331281128078915168015826259279873 (fmpz)
             >>> IntegersMod_fmpz_mod(2**257+1, n_is_prime=True).is_field()
             True
 
