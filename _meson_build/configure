@@ -107,6 +107,8 @@ def get_meson_command_from_configure_args(args):
         setup_args.append('--bindir=' + args.bindir)
     if args.libdir is not None:
         setup_args.append('--libdir=' + args.libdir)
+    else:
+        setup_args.append('--libdir=lib')
     if args.includedir is not None:
         setup_args.append('--includedir=' + args.includedir)
     if args.prefix is not None:
