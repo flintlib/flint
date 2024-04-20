@@ -16,9 +16,9 @@ option('gmp_internals', type : 'feature', value : 'auto',
         description: 'Use GMP internals')
 option('assembly', type : 'feature', value : 'auto',
         description: 'Use assembly code')
-option('avx2', type : 'feature', value : 'auto',
+option('avx2', type : 'feature', value : 'disabled',
         description: 'Use AVX2 instructions')
-option('avx512', type : 'feature', value : 'auto',
+option('avx512', type : 'feature', value : 'disabled',
         description: 'Use AVX512 instructions')
 option('fft_small', type : 'feature', value : 'auto',
         description: 'Build the fft_small module')
