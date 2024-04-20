@@ -200,6 +200,9 @@ def main(*args):
     # better not to do this because the files might not need to be rebuilt.
     shutil.rmtree(args.build_dir, ignore_errors=True)
     run_command(cmd)
+    # The Makefile uses this to check if project is configured
+    with open(join(args.build_dir, '.build-dir-created'), 'w') as f:
+        pass
 
 
 if __name__ == '__main__':

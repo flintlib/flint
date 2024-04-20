@@ -12,7 +12,7 @@ $(BUILDDIR)/.build-dir-created:
 clean:
 	rm -rf $(BUILDDIR)
 
-install: compile
+install: setup
 	meson install -C $(BUILDDIR)
 
 test: setup
