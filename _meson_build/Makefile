@@ -15,6 +15,9 @@ clean:
 install: setup
 	meson install -C $(BUILDDIR)
 
+uninstall:
+	cd $(BUILDDIR) && ninja uninstall
+
 test: setup
 	meson configure $(BUILDDIR) -Dtests=enabled
 	meson test -C $(BUILDDIR)
