@@ -183,12 +183,6 @@ endif
 fft_small_opt = get_option('fft_small')
 
 fft_small_arm_code = '''
-#include <gmp.h>
-#if GMP_LIMB_BITS != 64
-# error
-error
-#endif
-
 #include <arm_neon.h>
 #if !(defined(__GNUC__) && defined(__ARM_NEON))
 # if !(defined(_MSC_VER) && defined(_M_ARM64))
@@ -196,16 +190,10 @@ error
 error
 # endif
 #endif
-void main(){};
+int main(){return 0;}
 '''
 
 fft_small_x86_code = '''
-#include <gmp.h>
-#if GMP_LIMB_BITS != 64
-# error
-error
-#endif
-
 #if defined(__GNUC__)
 # include <x86intrin.h>
 #elif defined(_MSC_VER)
@@ -219,7 +207,7 @@ error
 # error
 error
 #endif
-void main(){};
+int main(){return 0;}
 '''
 
 # XXX: Do we need to check ARM64_PATTERN/X86_64_PATTERN?
