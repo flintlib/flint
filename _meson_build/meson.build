@@ -46,8 +46,6 @@ endif
 # Build include directory after list of all source files is complete
 subdir('include')
 
-install_headers(headers_all, subdir: 'flint')
-
 libflint = library('flint', c_files_all,
   dependencies: flint_deps,
   include_directories: [headers_built_nodir_inc, 'src'],
