@@ -182,12 +182,51 @@ endif
 
 fft_small_opt = get_option('fft_small')
 
-# check for headers used by fft_small
-# XXX: Need to actually compile a test program to check for AVX support
-has_avx = cc.has_header('immintrin.h')
-has_neon = cc.has_header('arm_neon.h')
+fft_small_arm_code = '''
+#include <gmp.h>
+#if GMP_LIMB_BITS != 64
+# error
+error
+#endif
 
-fft_small_supported = has_avx or has_neon
+#include <arm_neon.h>
+#if !(defined(__GNUC__) && defined(__ARM_NEON))
+# if !(defined(_MSC_VER) && defined(_M_ARM64))
+#  error
+error
+# endif
+#endif
+void main(){};
+'''
+
+fft_small_x86_code = '''
+#include <gmp.h>
+#if GMP_LIMB_BITS != 64
+# error
+error
+#endif
+
+#if defined(__GNUC__)
+# include <x86intrin.h>
+#elif defined(_MSC_VER)
+# include <intrin.h>
+#else
+# error
+error
+#endif
+
+#if !defined(__AVX2__)
+# error
+error
+#endif
+void main(){};
+'''
+
+# XXX: Do we need to check ARM64_PATTERN/X86_64_PATTERN?
+fft_small_supported = (
+  cc.compiles(fft_small_arm_code, dependencies: gmp_dep)
+  or cc.compiles(fft_small_x86_code, dependencies: gmp_dep)
+)
 
 # Error if fft_small enabled but not possible, otherwise disable if auto
 fft_small_opt = fft_small_opt.require(fft_small_supported,
