@@ -115,7 +115,7 @@ TEST_FUNCTION_START(flint_mpn_sqrhigh, state)
 
         xp = flint_malloc(sizeof(mp_limb_t) * n);
 
-        mpn_random2(xp, n);
+        flint_mpn_rrandom(xp, state, n);
 
         if (n <= FLINT_MAX(FLINT_MPN_SQRHIGH_MULDERS_CUTOFF, FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH))
         {

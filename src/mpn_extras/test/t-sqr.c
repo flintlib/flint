@@ -38,7 +38,7 @@ TEST_FUNCTION_START(flint_mpn_sqr, state)
         rp1 = flint_malloc(sizeof(mp_limb_t) * 2 * n);
         rp2 = flint_malloc(sizeof(mp_limb_t) * 2 * n);
 
-        mpn_random2(xp, n);
+        flint_mpn_rrandom(xp, state, n);
 
         for (i = 0; i < 2 * n; i++)
             rp1[i] = n_randtest(state);

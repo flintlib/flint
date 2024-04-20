@@ -34,9 +34,9 @@ TEST_FUNCTION_START(flint_mpn_2add_n_inplace, state)
 
         n = N_MIN + n_randint(state, N_MAX - N_MIN + 1);
 
-        mpn_random2(rp, N_MAX);
-        mpn_random2(ap, N_MAX);
-        mpn_random2(bp, N_MAX);
+        flint_mpn_rrandom(rp, state, N_MAX);
+        flint_mpn_rrandom(ap, state, N_MAX);
+        flint_mpn_rrandom(bp, state, N_MAX);
         flint_mpn_copyi(rp1, rp, N_MAX);
         flint_mpn_copyi(rp2, rp, N_MAX);
 

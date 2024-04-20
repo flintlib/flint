@@ -116,8 +116,8 @@ TEST_FUNCTION_START(flint_mpn_mulhigh_n, state)
         xp = flint_malloc(sizeof(mp_limb_t) * n);
         yp = flint_malloc(sizeof(mp_limb_t) * n);
 
-        mpn_random2(xp, n);
-        mpn_random2(yp, n);
+        flint_mpn_rrandom(xp, state, n);
+        flint_mpn_rrandom(yp, state, n);
 
         if (n <= FLINT_MAX(FLINT_MPN_MULHIGH_MULDERS_CUTOFF, FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH))
         {

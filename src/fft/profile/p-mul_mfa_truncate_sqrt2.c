@@ -26,9 +26,6 @@ main(void)
     flint_printf("mul_mfa_truncate_sqrt2....");
     fflush(stdout);
 
-
-    _flint_rand_init_gmp(state);
-
     depth = 13;
     w = 2;
     iters = 1;
@@ -49,8 +46,8 @@ main(void)
        r1 = i2 + int_limbs;
        /* r2 = r1 + 2*int_limbs; */
 
-       flint_mpn_urandomb(i1, state->gmp_state, int_limbs*FLINT_BITS);
-       flint_mpn_urandomb(i2, state->gmp_state, int_limbs*FLINT_BITS);
+       flint_mpn_urandomb(i1, state, int_limbs*FLINT_BITS);
+       flint_mpn_urandomb(i2, state, int_limbs*FLINT_BITS);
 
        for (j = 0; j < iters; j++)
           mul_mfa_truncate_sqrt2(r1, i1, int_limbs, i2, int_limbs, depth, w);

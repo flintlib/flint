@@ -17,8 +17,6 @@ TEST_FUNCTION_START(arb_atan_taylor_rs, state)
 {
     slong iter;
 
-    _flint_rand_init_gmp(state);
-
     for (iter = 0; iter < 100000 * 0.1 * flint_test_multiplier(); iter++)
     {
         mp_ptr x, y1, y2, t;
@@ -36,7 +34,7 @@ TEST_FUNCTION_START(arb_atan_taylor_rs, state)
         y2 = flint_malloc(sizeof(mp_limb_t) * xn);
         t = flint_malloc(sizeof(mp_limb_t) * xn);
 
-        flint_mpn_rrandom(x, state->gmp_state, xn);
+        flint_mpn_rrandom(x, state, xn);
         x[xn - 1] &= (LIMB_ONES >> 4);
 
         _arb_atan_taylor_naive(y1, &err1, x, xn, N, alternating);

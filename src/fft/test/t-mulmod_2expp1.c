@@ -18,8 +18,6 @@ TEST_FUNCTION_START(fft_mulmod_2expp1, state)
     flint_bitcnt_t depth, w, maxdepth;
     int iters;
 
-    _flint_rand_init_gmp(state);
-
     maxdepth = (flint_test_multiplier() > 10) ? 18 : 15;
 
     for (iters = 0; iters < 100; iters++)

@@ -31,8 +31,8 @@ TEST_FUNCTION_START(flint_mpn_mulhigh_normalised, state)
 
         n = 1 + n_randint(state, N_MAX);
 
-        mpn_random2(xp, n);
-        mpn_random2(yp, n);
+        flint_mpn_rrandom(xp, state, n);
+        flint_mpn_rrandom(yp, state, n);
         xp[n - 1] |= (UWORD(1) << (FLINT_BITS - 1));
         yp[n - 1] |= (UWORD(1) << (FLINT_BITS - 1));
 

@@ -34,11 +34,8 @@ TEST_FUNCTION_START(flint_mpn_mullow_n, state)
         xp = flint_malloc(sizeof(mp_limb_t) * n);
         yp = flint_malloc(sizeof(mp_limb_t) * n);
 
-        mpn_random2(xp, n);
-        mpn_random2(yp, n);
-
-        if (ix < 1)
-            continue;
+        flint_mpn_rrandom(xp, state, n);
+        flint_mpn_rrandom(yp, state, n);
 
         ret = flint_mpn_mullow_n(rp, xp, yp, n);
         flint_mpn_mul_n(rpf, xp, yp, n);
