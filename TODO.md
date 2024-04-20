@@ -146,10 +146,6 @@ TODO: Update this TODO
 
 * Add `mulhigh`
 
-* Add asymptotically fast resultants?
-
-* Add `pow_trunc`
-
 * Add `gcdinv`
 
 * Add discriminant
@@ -173,47 +169,9 @@ TODO: Update this TODO
 
 ## `arith`
 
-* Think of a better name for this module and/or move parts of it to other
-  modules.
-
-* Write profiling code.
-
 * Write a faster `arith_divisors` using the merge sort algorithm (see Sage's
   implementation). Alternatively (or as a complement) write a supernaturally
   fast `_fmpz_vec_sort`.
-
-* Improve `arith_divisors` by using `long` and `long long` arithmetic for
-  divisors that fit in 1 or 2 limbs.
-
-* Optimise memory management in `mpq_harmonic`.
-
-* Maybe move the helper functions in `primorial.c` to the `mpn_extras` module.
-
-* Implement computation of generalised harmonic numbers.
-
-* Maybe: move Stirling number matrix functions to the `fmpz_mat` module.
-
-* Implement computation of Bernoulli numbers modulo a prime (e.g. porting the
-  code from flint 1)
-
-* Implement multimodular computation of large Bernoulli numbers (e.g. porting
-  `bernmm`)
-
-* Implement rising factorials and falling factorials $(x)_n$, $(x)^n$ as
-  `fmpz_poly` functions, and add `fmpz` functions for their direct evaluation.
-
-* Implement the binomial coefficient `binomial(x,n)` as an `fmpq_poly`
-  function.
-
-* Implement Fibonacci polynomials and `fmpz` Fibonacci numbers.
-
-* Implement orthogonal polynomials (Jacobi, Hermite, Laguerre, Gegenbauer).
-
-* Implement hypergeometric polynomials and series.
-
-* Change the partition function code to use an `fmpz` (or `mpz`) instead of
-  `ulong` for $n$, to allow $n$ larger than $10^9$ on 32 bits (or $10^19$ on 64
-  bits!)
 
 * Write tests for the `arith_hrr_expsum_factored` functions.
 
@@ -224,19 +182,8 @@ TODO: Update this TODO
 
 * Add element getter and setter methods.
 
-* Implement Strassen multiplication.
-
-* Implement fast multiplication when when results are smaller than
-  $2^(\mathtt{FLINT_BITS}-1)$ by using `fmpz` arithmetic directly. Also use
-  $2^\mathtt{FLINT_BITS}$ as one of the "primes" for multimodular
-  multiplication, along with fast CRT code for this purpose.
-
 * Write multiplication functions optimised for sparse matrices by changing the
   loop order and discarding zero multipliers.
-
-* Implement fast null space computation.
-
-* The Dixon $p$-adic solver should implement output-sensitive termination.
 
 * The Dixon $p$-adic solver currently spends most of the time computing integer
   matrix-vector products. Instead of using a single prime, it is likely to be
@@ -250,10 +197,6 @@ TODO: Update this TODO
   a transposed copy in `nmod_mat_mul`. However, this doesn't help in the
   Strassen range unless there also is a transpose version of
   `nmod_mat_mul_strassen`.
-
-* Use `_fmpz_vec` functions instead of for loops in some more places.
-
-* Add transpose versions of common functions, in-place `addmul` etc.
 
 * Take sparseness into account when selecting between algorithms.
 
@@ -272,13 +215,7 @@ TODO: Update this TODO
 
 ## `nmod_mat`
 
-* Support BLAS and use this for multiplication when entries fit in a double
-  before reduction. Even for large moduli, it might be faster to use repeated
-  BLAS multiplications modulo a few small primes followed by CRT. Linear algebra
-  operations would benefit from BLAS versions of triangular solving as well.
-
-* Improve multiplication with packed entries using SSE. Maybe also write a
-  Strassen for packed entries that does additions faster.
+* Write a Strassen for packed entries that does additions faster.
 
 * Investigate why the constant of solving/rref/inverse compared to
   multiplication appears to be worse than in theory (recent paper by Jeannerod,
@@ -290,17 +227,10 @@ TODO: Update this TODO
   matrices. The row pointer is only useful for Gaussian elimination, but there
   we end up working with a separate permutation array anyway.
 
-* Add element getter and setter methods, more convenience functions for setting
-  the zero matrix, identity matrix, etc.
-
-* Implement `nmod_mat_pow`.
-
 * Add functions for computing $A B^\mathrm{T}$ and $A^\mathrm{T} B$, using
   transpose multiplications directly to avoid creating a temporary copy.
 
 * Maybe: add asserts to check that the modulus is a prime where this is assumed.
-
-* Add transpose versions of common functions, in-place `addmul` etc.
 
 * The current `addmul`/`submul` functions are misnamed since they implement a
   more general operation.
@@ -311,12 +241,6 @@ TODO: Update this TODO
 ## `fmpq`
 
 * Add more functions for generating random numbers.
-
-* Write a subquadratic `fmpq_get_cfrac`
-
-* Implement subquadratic rational reconstruction. Also improve detection of
-  integers, etc. and perhaps add CRT functions to hide the intermediate step
-  going from residues -> integer -> rational.
 
 
 ## `fmpq_mat`
@@ -353,3 +277,4 @@ TODO: Update this TODO
 * `d_mat_is_reduced` doesn't seem to make any guarantees about reducedness, just
   approximately checks the Lovasz conditions in double arithmetic. I think this
   is superseded now and can be removed. It is not used anywhere.
+
