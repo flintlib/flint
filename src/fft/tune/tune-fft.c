@@ -33,9 +33,6 @@ main(void)
     flint_printf("#define FFT_TAB \\\n");
     fflush(stdout);
 
-
-    _flint_rand_init_gmp(state);
-
     flint_printf("   { "); fflush(stdout);
     for (depth = 6; depth <= 10; depth++)
     {
@@ -60,8 +57,8 @@ main(void)
             i2 = i1 + n1;
             r1 = i2 + n2;
 
-            flint_mpn_urandomb(i1, state->gmp_state, b1);
-            flint_mpn_urandomb(i2, state->gmp_state, b2);
+            flint_mpn_urandomb(i1, state, b1);
+            flint_mpn_urandomb(i2, state, b2);
 
             best_off = -1;
 
@@ -119,8 +116,8 @@ main(void)
             r1 = i2 + int_limbs + 1;
             tt = r1 + 2*(int_limbs + 1);
 
-            flint_mpn_urandomb(i1, state->gmp_state, int_limbs*FLINT_BITS);
-            flint_mpn_urandomb(i2, state->gmp_state, int_limbs*FLINT_BITS);
+            flint_mpn_urandomb(i1, state, int_limbs*FLINT_BITS);
+            flint_mpn_urandomb(i2, state, int_limbs*FLINT_BITS);
             i1[int_limbs] = 0;
             i2[int_limbs] = 0;
 

@@ -36,8 +36,6 @@ TEST_FUNCTION_START(mpn_negmod_2expp1, state)
     mp_limb_t * a, * z;
     mpz_t p, z1, z2;
 
-    _flint_rand_init_gmp(state);
-
     mpz_init(z1);
     mpz_init(z2);
     mpz_init(p);

@@ -662,25 +662,8 @@ double flint_mpn_get_d(mp_srcptr ptr, mp_size_t size, mp_size_t sign, long exp);
 
 /* random ********************************************************************/
 
-MPN_EXTRAS_INLINE
-void flint_mpn_rrandom(mp_limb_t *rp, gmp_randstate_t state, mp_size_t n)
-{
-  __mpz_struct str;
-  str._mp_d = rp;
-  str._mp_alloc = n;
-  str._mp_size =n;
-  mpz_rrandomb(&str,state,FLINT_BITS*n);
-}
-
-MPN_EXTRAS_INLINE
-void flint_mpn_urandomb(mp_limb_t *rp, gmp_randstate_t state, flint_bitcnt_t n)
-{
-  __mpz_struct str;
-  str._mp_d = rp;
-  str._mp_alloc = (n + FLINT_BITS - 1)/FLINT_BITS;
-  str._mp_size = (n + FLINT_BITS - 1)/FLINT_BITS;
-  mpz_rrandomb(&str,state,n);
-}
+void flint_mpn_rrandom(mp_ptr rp, flint_rand_t state, mp_size_t n);
+void flint_mpn_urandomb(mp_ptr rp, flint_rand_t state, flint_bitcnt_t n);
 
 /******************************************************************************
     Divisions where the quotient is expected to be small. All function do:

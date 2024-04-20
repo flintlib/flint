@@ -38,8 +38,6 @@ TEST_FUNCTION_START(flint_mpn_add_inplace_c, state)
 {
     slong iter;
 
-    _flint_rand_init_gmp(state);
-
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         mp_limb_t a[10], b[10], c[10];
@@ -49,8 +47,8 @@ TEST_FUNCTION_START(flint_mpn_add_inplace_c, state)
         bn = 1 + n_randint(state, 4);
         an = bn + n_randint(state, 4);
 
-        flint_mpn_rrandom(a, state->gmp_state, an);
-        flint_mpn_rrandom(b, state->gmp_state, bn);
+        flint_mpn_rrandom(a, state, an);
+        flint_mpn_rrandom(b, state, bn);
         flint_mpn_copyi(c, a, an);
         cf = n_randint(state, 2);
 
@@ -70,8 +68,8 @@ TEST_FUNCTION_START(flint_mpn_add_inplace_c, state)
     {
         mp_limb_t a[8], b[8], c[8], d[8];
 
-        flint_mpn_rrandom(a, state->gmp_state, 8);
-        flint_mpn_rrandom(b, state->gmp_state, 8);
+        flint_mpn_rrandom(a, state, 8);
+        flint_mpn_rrandom(b, state, 8);
         flint_mpn_copyi(c, a, 8);
         flint_mpn_copyi(d, a, 8);
 

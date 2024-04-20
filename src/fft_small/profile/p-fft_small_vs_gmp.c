@@ -33,8 +33,8 @@ int main(void)
     r = flint_malloc(2 * sizeof(mp_limb_t) * FLINT_MAX(N_MAX_MUL, N_MAX_SQR));
     s = flint_malloc(2 * sizeof(mp_limb_t) * FLINT_MAX(N_MAX_MUL, N_MAX_SQR));
 
-    mpn_random2(x, FLINT_MAX(N_MAX_MUL, N_MAX_SQR));
-    mpn_random2(y, FLINT_MAX(N_MAX_MUL, N_MAX_SQR));
+    flint_mpn_rrandom(x, state, FLINT_MAX(N_MAX_MUL, N_MAX_SQR));
+    flint_mpn_rrandom(y, state, FLINT_MAX(N_MAX_MUL, N_MAX_SQR));
 
     flint_printf("mpn_mul_n vs fft_small\n\n");
 

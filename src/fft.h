@@ -41,9 +41,9 @@ mp_limb_t flint_mpn_sumdiff_n(mp_ptr s, mp_ptr d, mp_srcptr x, mp_srcptr y, mp_s
          nn[limbs] = 1; \
       } else { \
          if (n_randint(state, 2) == 0) \
-            flint_mpn_rrandom(nn, state->gmp_state, limbs); \
+            flint_mpn_rrandom(nn, state, limbs); \
          else \
-            flint_mpn_urandomb(nn, state->gmp_state, limbs*FLINT_BITS); \
+            flint_mpn_urandomb(nn, state, limbs * FLINT_BITS); \
          nn[limbs] = n_randint(state, 1024); \
       } \
       if (n_randint(state, 2)) \

@@ -17,8 +17,6 @@ TEST_FUNCTION_START(flint_mpn_mul_fft_main, state)
 {
     flint_bitcnt_t depth, w, maxdepth;
 
-    _flint_rand_init_gmp(state);
-
     maxdepth = (flint_test_multiplier() > 10) ? 12 :
                (flint_test_multiplier() > 1)  ? 11 : 10;
 
@@ -65,8 +63,8 @@ TEST_FUNCTION_START(flint_mpn_mul_fft_main, state)
                r1 = i2 + n2;
                r2 = r1 + n1 + n2;
 
-               flint_mpn_urandomb(i1, state->gmp_state, b1);
-               flint_mpn_urandomb(i2, state->gmp_state, b2);
+               flint_mpn_urandomb(i1, state, b1);
+               flint_mpn_urandomb(i2, state, b2);
 
                mpn_mul(r2, i1, n1, i2, n2);
                flint_mpn_mul_fft_main(r1, i1, n1, i2, n2);

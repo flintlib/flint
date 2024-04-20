@@ -17,8 +17,6 @@ TEST_FUNCTION_START(fft_convolution, state)
 {
     flint_bitcnt_t depth, w, maxdepth;
 
-    _flint_rand_init_gmp(state);
-
     maxdepth = (flint_test_multiplier() > 10) ? 13 :
                (flint_test_multiplier() > 1)  ? 12 : 11;
 

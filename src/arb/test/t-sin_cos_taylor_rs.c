@@ -17,8 +17,6 @@ TEST_FUNCTION_START(arb_sin_cos_taylor_rs, state)
 {
     slong iter;
 
-    _flint_rand_init_gmp(state);
-
     for (iter = 0; iter < 100000 * 0.1 * flint_test_multiplier(); iter++)
     {
         mp_ptr x, y1s, y1c, y2s, y2c, t;
@@ -37,11 +35,11 @@ TEST_FUNCTION_START(arb_sin_cos_taylor_rs, state)
         y2c = flint_malloc(sizeof(mp_limb_t) * xn);
         t = flint_malloc(sizeof(mp_limb_t) * xn);
 
-        flint_mpn_rrandom(x, state->gmp_state, xn);
-        flint_mpn_rrandom(y1s, state->gmp_state, xn);
-        flint_mpn_rrandom(y1c, state->gmp_state, xn);
-        flint_mpn_rrandom(y2s, state->gmp_state, xn);
-        flint_mpn_rrandom(y2c, state->gmp_state, xn);
+        flint_mpn_rrandom(x, state, xn);
+        flint_mpn_rrandom(y1s, state, xn);
+        flint_mpn_rrandom(y1c, state, xn);
+        flint_mpn_rrandom(y2s, state, xn);
+        flint_mpn_rrandom(y2c, state, xn);
         x[xn - 1] &= (LIMB_ONES >> 4);
 
         _arb_sin_cos_taylor_naive(y1s, y1c, &err1, x, xn, N);

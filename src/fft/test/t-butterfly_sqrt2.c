@@ -61,8 +61,6 @@ TEST_FUNCTION_START(fft_ifft_butterfly_sqrt2, state)
     mpz_t p, ma, mb, m2a, m2b, mn1, mn2;
     mp_limb_t * nn1, * nn2, * r1, * r2, * temp;
 
-    _flint_rand_init_gmp(state);
-
     mpz_init(p);
     mpz_init(ma);
     mpz_init(mb);
