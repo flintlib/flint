@@ -23,7 +23,7 @@ void fq_default_ctx_init_type(fq_default_ctx_t ctx,
     }
     else if (type == FQ_DEFAULT_FQ_NMOD || (type == 0 && d > 1 && fmpz_abs_fits_ui(p)))
     {
-        gr_ctx_init_fq_nmod(FQ_DEFAULT_GR_CTX(ctx), *p, d, var);
+        gr_ctx_init_fq_nmod(FQ_DEFAULT_GR_CTX(ctx), fmpz_get_ui(p), d, var);
     }
     else if (type == FQ_DEFAULT_NMOD || (type == 0 && d == 1 && fmpz_abs_fits_ui(p)))
     {
