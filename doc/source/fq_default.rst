@@ -1,14 +1,14 @@
-.. _fq_default_default:
+.. _fq_default:
 
-**fq_default_default.h** -- unified finite fields
+**fq_default.h** -- unified finite fields
 ===============================================================================
 
 Types, macros and constants
 -------------------------------------------------------------------------------
 
-.. type:: fq_default_default_ctx_t
+.. type:: fq_default_ctx_t
 
-.. type:: fq_default_default_t
+.. type:: fq_default_t
 
 Context Management
 --------------------------------------------------------------------------------
