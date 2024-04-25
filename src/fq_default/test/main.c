@@ -14,6 +14,7 @@
 
 /* Include functions *********************************************************/
 
+#include "t-ctx_init.c"
 #include "t-ctx_init_modulus.c"
 #include "t-ctx_init_modulus_nmod.c"
 #include "t-ctx_modulus.c"
@@ -27,6 +28,7 @@
 
 test_struct tests[] =
 {
+    TEST_FUNCTION(fq_default_ctx_init),
     TEST_FUNCTION(fq_default_ctx_init_modulus),
     TEST_FUNCTION(fq_default_ctx_init_modulus_nmod),
     TEST_FUNCTION(fq_default_ctx_modulus),
