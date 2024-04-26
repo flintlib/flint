@@ -87,9 +87,9 @@ _flint_mpn_mullow_n_mulders_recursive(mp_ptr rp, mp_srcptr np, mp_srcptr mp, mp_
         return;
     }
 
-    l = n - k;
+    FLINT_ASSERT(k >= (n + 1) / 2);
 
-    FLINT_ASSERT(l >= k);
+    l = n - k;
 
     flint_mpn_mul_n(rp, np, mp, k);
     _flint_mpn_mullow_n_mulders_recursive(rp + n, np, mp + k, l);
