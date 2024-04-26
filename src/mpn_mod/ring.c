@@ -540,7 +540,7 @@ mpn_mod_mul(mp_ptr res, mp_srcptr x, mp_srcptr y, gr_ctx_t ctx)
         if (mpn_cmp(res, d, n) >= 0)
             mpn_sub_n(res, res, d, n);
 
-        FLINT_ASSERT(mpn_cmp(r, d, n) < 0);
+        FLINT_ASSERT(mpn_cmp(res, d, n) < 0);
 
         if (norm)
             mpn_rshift(res, res, n, norm);
