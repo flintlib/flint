@@ -423,6 +423,7 @@ FLINT_DLL extern const flint_mpn_mulhigh_normalised_func_t flint_mpn_mulhigh_nor
 # define FLINT_HAVE_NATIVE_mpn_sqrhigh_basecase 1
 
 #elif FLINT_HAVE_ASSEMBLY_armv8
+# define FLINT_MPN_MULLOW_FUNC_TAB_WIDTH 0
 # define FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH 8
 # define FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH 8
 # define FLINT_MPN_MULHIGH_NORMALISED_FUNC_TAB_WIDTH 0
