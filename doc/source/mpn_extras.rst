@@ -162,15 +162,18 @@ More generally, we can define `n`-limb high products of `m`-limb and
 
 .. function:: void flint_mpn_mul_or_mullow_n(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
 
-    Write the low `n` limbs of the product `uv` to ``res``.
+    Write the low `n + 1` limbs of the product `uv` to ``res``.
     The output is assumed to have space for `2n` limbs so that the high
     limbs can be used as scratch space or to write the whole product
     when this is the fastest method.
 
+    Warning: the one extra limb of output may be removed in the future.
+
 .. function:: void flint_mpn_mul_or_mulhigh_n(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
 
-    Write the high `n` limbs of the product `uv` to ``res + n``.
-    The low `n` limbs of the output may be used as scratch space or
+    Write the high `n + 1` limbs of the product `uv` to ``res + (n - 1)``
+    (with possible error of a few ulps as for :func:`flint_mpn_mulhigh_n`).
+    The low `n - 1` limbs of the output may be used as scratch space or
     to write the whole product when this is the fastest method.
 
 Divisibility

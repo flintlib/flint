@@ -491,7 +491,7 @@ void flint_mpn_mul_or_mullow_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t 
 {
     FLINT_ASSERT(n >= 1);
 
-    if (FLINT_HAVE_MULHIGH_FUNC(n))
+    if (FLINT_HAVE_MULLOW_FUNC(n))
         rp[n] = flint_mpn_mullow_func_tab[n](rp, xp, yp);
     else if (n < FLINT_MPN_MULHIGH_MUL_CUTOFF)
         rp[n] = _flint_mpn_mullow_n(rp, xp, yp, n);
