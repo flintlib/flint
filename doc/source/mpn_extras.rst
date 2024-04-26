@@ -148,6 +148,31 @@ More generally, we can define `n`-limb high products of `m`-limb and
     On x86-64 machines with ADX, the basecase version currently assumes
     that `n \ge 8`.
 
+.. function:: void _flint_mpn_mullow_n_mulders_recursive(mp_ptr rp, mp_srcptr u, mp_srcptr v, mp_size_t n)
+              mp_limb_t flint_mpn_mullow_basecase(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
+              mp_limb_t _flint_mpn_mullow_n_mulders(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
+              mp_limb_t _flint_mpn_mullow_n_mul(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
+              mp_limb_t _flint_mpn_mullow_n(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
+              mp_limb_t flint_mpn_mullow_n(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
+
+    Compute the low `n` limbs of the product.
+
+    The `(n + 1)`-th limb is also computed and returned.
+    Warning: this extra limb of output may be removed in the future.
+
+.. function:: void flint_mpn_mul_or_mullow_n(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
+
+    Write the low `n` limbs of the product `uv` to ``res``.
+    The output is assumed to have space for `2n` limbs so that the high
+    limbs can be used as scratch space or to write the whole product
+    when this is the fastest method.
+
+.. function:: void flint_mpn_mul_or_mulhigh_n(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
+
+    Write the high `n` limbs of the product `uv` to ``res + n``.
+    The low `n` limbs of the output may be used as scratch space or
+    to write the whole product when this is the fastest method.
+
 Divisibility
 --------------------------------------------------------------------------------
 
