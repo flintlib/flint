@@ -104,7 +104,7 @@ mp_limb_t flint_mpn_divrem_preinvn(mp_ptr qp, mp_ptr rp, mp_srcptr ap, mp_size_t
          mpn_add_1(qp, qp, size, 1);
       }
 
-      FLINT_ASSERT(mpn_cmp(r, d, n) < 0);
+      FLINT_ASSERT(mpn_cmp(rp, d, n) < 0);
    }
 
    TMP_END;

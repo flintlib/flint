@@ -86,6 +86,8 @@ void flint_mpn_mod_preinvn(mp_ptr rp, mp_srcptr ap, mp_size_t m,
 
       if (mpn_cmp(rp, d, n) >= 0)
          mpn_sub_n(rp, rp, d, n);
+
+      FLINT_ASSERT(mpn_cmp(rp, d, n) < 0);
    }
 
    TMP_END;
