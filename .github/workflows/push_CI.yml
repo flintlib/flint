@@ -20,7 +20,7 @@ jobs:
   freebsd-gcc:
     name: FreeBSD Clang (x0.5)
 
-    runs-on: macos-latest
+    runs-on: macos-13
     env:
       FLINT_TEST_MULTIPLIER: "0.5"
 
