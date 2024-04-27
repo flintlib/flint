@@ -102,7 +102,9 @@ void flint_mpn_mulmod_preinvn(mp_ptr r,
       flint_mpn_mul_or_mulhigh_n(t + 3*n, t + n, dinv, n);
       mpn_add_n(t + 4*n, t + 4*n, t + n, n);
 
-      flint_mpn_mul_n(t + 2*n, t + 4*n, d, n);
+      /* note: we rely on the fact that mul_or_mullow_n actually
+               writes at least n + 1 limbs */
+      flint_mpn_mul_or_mullow_n(t + 2*n, t + 4*n, d, n);
       cy = t[n] - t[3*n] - mpn_sub_n(r, t, t + 2*n, n);
 
       while (cy > 0)
@@ -110,6 +112,8 @@ void flint_mpn_mulmod_preinvn(mp_ptr r,
 
       if (mpn_cmp(r, d, n) >= 0)
          mpn_sub_n(r, r, d, n);
+
+      FLINT_ASSERT(mpn_cmp(r, d, n) < 0);
 
      TMP_END;
    }

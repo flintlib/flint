@@ -396,38 +396,9 @@ flint_mpn_sqr(mp_ptr r, mp_srcptr x, mp_size_t n)
         flint_mpn_mul((_z), (_y), (_yn), (_x), (_xn)); \
     }
 
-/* low multiplication ********************************************************/
+/* High and low multiplication *******************************************************/
 
 #define FLINT_HAVE_MULLOW_FUNC(n) ((n) <= FLINT_MPN_MULLOW_FUNC_TAB_WIDTH)
-
-FLINT_DLL extern const flint_mpn_mul_func_t flint_mpn_mullow_func_tab[];
-
-mp_limb_t flint_mpn_mullow_basecase(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
-
-#if FLINT_HAVE_ASSEMBLY_x86_64_adx
-# define FLINT_MPN_MULLOW_FUNC_TAB_WIDTH 8
-# define FLINT_HAVE_NATIVE_mpn_mullow_basecase 1
-#else
-# define FLINT_MPN_MULLOW_FUNC_TAB_WIDTH 0
-#endif
-
-/* TODO: Fix higher stuff */
-MPN_EXTRAS_INLINE
-mp_limb_t flint_mpn_mullow_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
-{
-    FLINT_ASSERT(n >= 1);
-
-    if (FLINT_HAVE_MULLOW_FUNC(n))
-    {
-        FLINT_ASSERT(rp != xp);
-        return flint_mpn_mullow_func_tab[n](rp, xp, yp);
-    }
-    else
-        return flint_mpn_mullow_basecase(rp, xp, yp, n);
-}
-
-/* high multiplication *******************************************************/
-
 #define FLINT_HAVE_MULHIGH_FUNC(n) ((n) <= FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH)
 #define FLINT_HAVE_SQRHIGH_FUNC(n) ((n) <= FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH)
 #define FLINT_HAVE_MULHIGH_NORMALISED_FUNC(n) ((n) <= FLINT_MPN_MULHIGH_NORMALISED_FUNC_TAB_WIDTH)
@@ -435,44 +406,70 @@ mp_limb_t flint_mpn_mullow_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
 typedef struct { mp_limb_t m1; mp_limb_t m2; } mp_limb_pair_t;
 typedef mp_limb_pair_t (* flint_mpn_mulhigh_normalised_func_t)(mp_ptr, mp_srcptr, mp_srcptr);
 
+FLINT_DLL extern const flint_mpn_mul_func_t flint_mpn_mullow_func_tab[];
 FLINT_DLL extern const flint_mpn_mul_func_t flint_mpn_mulhigh_func_tab[];
 FLINT_DLL extern const flint_mpn_sqr_func_t flint_mpn_sqrhigh_func_tab[];
 FLINT_DLL extern const flint_mpn_mulhigh_normalised_func_t flint_mpn_mulhigh_normalised_func_tab[];
 
 #if FLINT_HAVE_ASSEMBLY_x86_64_adx
+# define FLINT_MPN_MULLOW_FUNC_TAB_WIDTH 8
 # define FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH 9
 # define FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH 8
 # define FLINT_MPN_MULHIGH_NORMALISED_FUNC_TAB_WIDTH 9
-
+# define FLINT_HAVE_NATIVE_mpn_mullow_basecase 1
 /* NOTE: This function only works for n >= 6 */
 # define FLINT_HAVE_NATIVE_mpn_mulhigh_basecase 1
-
-/* NOTE: The x86_64_adx versions of these functions only works for n >= 6 */
+/* NOTE: This function only works for n >= 6 */
 # define FLINT_HAVE_NATIVE_mpn_sqrhigh_basecase 1
+
 #elif FLINT_HAVE_ASSEMBLY_armv8
+# define FLINT_MPN_MULLOW_FUNC_TAB_WIDTH 0
 # define FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH 8
 # define FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH 8
 # define FLINT_MPN_MULHIGH_NORMALISED_FUNC_TAB_WIDTH 0
-
 /* NOTE: This function only works for n > 8 */
 # define FLINT_HAVE_NATIVE_mpn_mulhigh_basecase 1
+
 #else
+/* TODO: generic hardcoded mullows */
+# define FLINT_MPN_MULLOW_FUNC_TAB_WIDTH 0
 # define FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH 16
 # define FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH 2
 # define FLINT_MPN_MULHIGH_NORMALISED_FUNC_TAB_WIDTH 0
+
 #endif
 
+/* FIXME: this tuning is for x86_64_adx with fft_small */
+/* NOTE: we assume that the same cutoff is optimal for both mulhigh and mullow */
 #define FLINT_MPN_MULHIGH_MULDERS_CUTOFF 50
 #define FLINT_MPN_MULHIGH_MUL_CUTOFF 2000
 #define FLINT_MPN_MULHIGH_K_TAB_SIZE 2048
 
-void _flint_mpn_mulhigh_n_mulders_recursive(mp_ptr rp, mp_srcptr np, mp_srcptr mp, mp_size_t n);
+FLINT_DLL extern const signed short flint_mpn_mulhigh_k_tab[FLINT_MPN_MULHIGH_K_TAB_SIZE];
+
+mp_limb_t flint_mpn_mullow_basecase(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n);
+void _flint_mpn_mullow_n_mulders_recursive(mp_ptr rp, mp_srcptr np, mp_srcptr mp, mp_size_t n);
+mp_limb_t _flint_mpn_mullow_n_mulders(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n);
+mp_limb_t _flint_mpn_mullow_n_mul(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n);
+mp_limb_t _flint_mpn_mullow_n(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n);
 
 mp_limb_t _flint_mpn_mulhigh_basecase(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n);
-
+void _flint_mpn_mulhigh_n_mulders_recursive(mp_ptr rp, mp_srcptr np, mp_srcptr mp, mp_size_t n);
 mp_limb_t _flint_mpn_mulhigh_n_mulders(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n);
 mp_limb_t _flint_mpn_mulhigh_n_mul(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n);
 mp_limb_t _flint_mpn_mulhigh_n(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n);
+
+MPN_EXTRAS_INLINE
+mp_limb_t flint_mpn_mullow_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
+{
+    FLINT_ASSERT(n >= 1);
+    FLINT_ASSERT(rp != xp);
+
+    if (FLINT_HAVE_MULLOW_FUNC(n))
+        return flint_mpn_mullow_func_tab[n](rp, xp, yp);
+    else
+        return _flint_mpn_mullow_n(rp, xp, yp, n);
+}
 
 MPN_EXTRAS_INLINE
 mp_limb_t flint_mpn_mulhigh_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
@@ -485,9 +482,23 @@ mp_limb_t flint_mpn_mulhigh_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n
         return _flint_mpn_mulhigh_n(rp, xp, yp, n);
 }
 
-/* We just want the high n limbs, but rp has low limbs available
+/* We just want the high or low n limbs, but rp has 2n limbs available
    which can be used for scratch space or for doing a full multiply
-   without temporary allocations. */
+   without temporary allocations. TODO: exploit this in the Mulders range
+   by calling Mulders directly. */
+MPN_EXTRAS_INLINE
+void flint_mpn_mul_or_mullow_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
+{
+    FLINT_ASSERT(n >= 1);
+
+    if (FLINT_HAVE_MULLOW_FUNC(n))
+        rp[n] = flint_mpn_mullow_func_tab[n](rp, xp, yp);
+    else if (n < FLINT_MPN_MULHIGH_MUL_CUTOFF)
+        rp[n] = _flint_mpn_mullow_n(rp, xp, yp, n);
+    else
+        flint_mpn_mul_n(rp, xp, yp, n);
+}
+
 MPN_EXTRAS_INLINE
 void flint_mpn_mul_or_mulhigh_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
 {

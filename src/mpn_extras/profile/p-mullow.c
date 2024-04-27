@@ -12,26 +12,9 @@
 #include "mpn_extras.h"
 #include "profiler.h"
 
-#define mpn_mullo_basecase __gmpn_mullo_basecase
-void mpn_mullo_basecase(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
+void __gmpn_mullo_n(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 
-#define N_MIN 1
-#define N_MAX 30
-
-#if N_MAX < 9
-# define P 1
-#elif N_MAX < 99
-# define P 2
-#elif N_MAX < 999
-# define P 3
-#elif N_MAX < 9999
-# define P 4
-#else
-# define P 5
-#endif
-
-#define _STR(x) #x
-#define STR(x) _STR(x)
+#define N_MAX 2100
 
 int
 main(void)
@@ -41,28 +24,38 @@ main(void)
     mp_limb_t yp[N_MAX];
     mp_size_t n;
 
-    flint_printf("%.*s      mullo_basecase / FLINT || mul / mullow\n", P, "                              ");
-    for (n = N_MIN; n <= N_MAX; n++)
+    flint_printf("        speedup\n");
+    flint_printf("   n    vs mpn_mullo_n     vs mul    vs basecase\n");
+    for (n = 1; n < N_MAX; n = FLINT_MAX(n + 1, n * 1.05))
     {
-        double t1, t2, t3, FLINT_SET_BUT_UNUSED(__);
-        flint_printf("n = %" STR(P) "wd:", n);
+        double t1, t2, t3, t4, FLINT_SET_BUT_UNUSED(__);
+        flint_printf("%4wd", n);
 
         mpn_random2(xp, n);
         mpn_random2(yp, n);
 
         TIMEIT_START
-        mpn_mullo_basecase(rp, xp, yp, n);
+        __gmpn_mullo_n(rp, xp, yp, n);
         TIMEIT_STOP_VALUES(__, t1)
 
         TIMEIT_START
         flint_mpn_mul_n(rp, xp, yp, n);
         TIMEIT_STOP_VALUES(__, t2)
 
+        if (n >= 9)
+        {
+            TIMEIT_START
+            flint_mpn_mullow_basecase(rp, xp, yp, n);
+            TIMEIT_STOP_VALUES(__, t3)
+        }
+        else
+            t3 = 0.0;
+
         TIMEIT_START
         flint_mpn_mullow_n(rp, xp, yp, n);
-        TIMEIT_STOP_VALUES(__, t3)
+        TIMEIT_STOP_VALUES(__, t4)
 
-        flint_printf("         %7.2fx       ||  %7.2f\n", t1 / t3, t2 / t3);
+        flint_printf("      %7.2fx       %7.2f       %7.2f\n", t1 / t4, t2 / t4, t3 / t4);
     }
 
     flint_cleanup_master();
@@ -70,5 +63,4 @@ main(void)
     return 0;
 }
 
-#undef N_MIN
 #undef N_MAX

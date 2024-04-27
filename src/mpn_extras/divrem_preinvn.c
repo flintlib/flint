@@ -50,7 +50,9 @@ mp_limb_t flint_mpn_divrem_preinvn(mp_ptr qp, mp_ptr rp, mp_srcptr ap, mp_size_t
       flint_mpn_mul_or_mulhigh_n(t, dinv, r + n, n);
       cy = mpn_add_n(q, t + n, r + n, n);
 
-      flint_mpn_mul_n(t, d, q, n);
+      /* note: we rely on the fact that mul_or_mullow_n actually
+               writes at least n + 1 limbs */
+      flint_mpn_mul_or_mullow_n(t, d, q, n);
       cy = r[n] - t[n] - mpn_sub_n(r, a, t, n);
 
       while (cy > 0)
@@ -64,6 +66,8 @@ mp_limb_t flint_mpn_divrem_preinvn(mp_ptr qp, mp_ptr rp, mp_srcptr ap, mp_size_t
          mpn_sub_n(r, r, d, n);
          mpn_add_1(q, q, n, 1);
       }
+
+      FLINT_ASSERT(mpn_cmp(r, d, n) < 0);
 
       m -= n;
       r -= n;
@@ -99,6 +103,8 @@ mp_limb_t flint_mpn_divrem_preinvn(mp_ptr qp, mp_ptr rp, mp_srcptr ap, mp_size_t
          mpn_sub_n(rp, rp, d, n);
          mpn_add_1(qp, qp, size, 1);
       }
+
+      FLINT_ASSERT(mpn_cmp(rp, d, n) < 0);
    }
 
    TMP_END;
