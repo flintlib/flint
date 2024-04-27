@@ -53,8 +53,8 @@
     while (a_nz_idx >= -1 && b_nz_idx >= -1 && status == GR_SUCCESS)                                       \
     {                                                                                                      \
         if (a_nz_idx == -1 && b_nz_idx == -1) break;                                                       \
-        a_ind = (A_VEC)->inds[a_nz_idx];                                                                   \
-        b_ind = (B_VEC)->inds[b_nz_idx];                                                                   \
+        a_ind = (a_nz_idx >= 0) ? (A_VEC)->inds[a_nz_idx] : -1;                                                                   \
+        b_ind = (b_nz_idx >= 0) ? (B_VEC)->inds[b_nz_idx] : -1;                                                                   \
         if (b_nz_idx == -1 || (a_nz_idx >= 0 && a_ind > b_ind))                                                                              \
         {                                                                                               \
             status |= (FUNC_A);                                                                         \
