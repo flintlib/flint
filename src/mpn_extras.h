@@ -542,6 +542,8 @@ mp_limb_t flint_mpn_sqrhigh(mp_ptr rp, mp_srcptr xp, mp_size_t n)
         return _flint_mpn_sqrhigh(rp, xp, n);
 }
 
+mp_limb_pair_t _flint_mpn_mulhigh_normalised(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n);
+
 MPN_EXTRAS_INLINE
 mp_limb_pair_t flint_mpn_mulhigh_normalised(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
 {
@@ -550,27 +552,7 @@ mp_limb_pair_t flint_mpn_mulhigh_normalised(mp_ptr rp, mp_srcptr xp, mp_srcptr y
     if (FLINT_HAVE_MULHIGH_NORMALISED_FUNC(n))
         return flint_mpn_mulhigh_normalised_func_tab[n](rp, xp, yp);
     else
-    {
-        mp_limb_pair_t ret;
-
-        FLINT_ASSERT(rp != xp && rp != yp);
-
-        ret.m1 = flint_mpn_mulhigh_n(rp, xp, yp, n);
-
-        if (rp[n - 1] >> (FLINT_BITS - 1))
-        {
-            ret.m2 = 0;
-        }
-        else
-        {
-            ret.m2 = 1;
-            mpn_lshift(rp, rp, n, 1);
-            rp[0] |= (ret.m1 >> (FLINT_BITS - 1));
-            ret.m1 <<= 1;
-        }
-
-        return ret;
-    }
+        return _flint_mpn_mulhigh_normalised(rp, xp, yp, n);
 }
 
 /* division ******************************************************************/
