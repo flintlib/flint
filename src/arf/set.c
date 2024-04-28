@@ -11,6 +11,7 @@
 
 #include <mpfr.h>
 #include "double_extras.h"
+#include "mpn_extras.h"
 #include "arf.h"
 
 void

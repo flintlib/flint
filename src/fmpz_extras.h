@@ -12,7 +12,6 @@
 #ifndef FMPZ_EXTRAS_H
 #define FMPZ_EXTRAS_H
 
-#include "mpn_extras.h"
 #include "fmpz.h"
 
 #ifdef __cplusplus
@@ -98,12 +97,15 @@ static inline void
 fmpz_set_mpn_large(fmpz_t z, mp_srcptr src, mp_size_t n, int negative)
 {
     mpz_ptr zz;
+    slong i;
     zz = _fmpz_promote(z);
 
     if (zz->_mp_alloc < n)
         mpz_realloc2(zz, n * FLINT_BITS);
 
-    flint_mpn_copyi(zz->_mp_d, src, n);
+    for (i = 0; i < n; i++)
+        zz->_mp_d[i] = src[i];
+
     zz->_mp_size = negative ? -n : n;
 }
 
