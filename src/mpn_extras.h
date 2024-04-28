@@ -103,18 +103,16 @@ int flint_mpn_zero_p(mp_srcptr x, mp_size_t xsize)
         add_ssaaaa(r2, r1, r2, r1, 0, t1);                  \
     } while (0)
 
-/* todo: use optimal code here */
 #define FLINT_MPN_MUL_2X2(r3, r2, r1, r0, a1, a0, b1, b0)   \
     do {                                                    \
         mp_limb_t t1, t2, t3;                               \
         umul_ppmm(r1, r0, a0, b0);                          \
         umul_ppmm(r2, t1, a1, b0);                          \
         add_ssaaaa(r2, r1, r2, r1, 0, t1);                  \
-        umul_ppmm(t1, t2, a0, b1);                          \
+        umul_ppmm(t2, t1, a0, b1);                          \
         umul_ppmm(r3, t3, a1, b1);                          \
-        add_ssaaaa(r3, t1, r3, t1, 0, t3);                  \
-        add_ssaaaa(r2, r1, r2, r1, t1, t2);                 \
-        r3 += r2 < t1;                                      \
+        add_ssaaaa(r3, t2, r3, t2, 0, t3);                  \
+        add_sssaaaaaa(r3, r2, r1, r3, r2, r1, 0, t2, t1);   \
     } while (0)
 
 /* {s0,s1,s2} = u[0]v[n-1] + u[1]v[n-2] + ... */
