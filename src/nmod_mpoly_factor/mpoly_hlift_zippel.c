@@ -10,6 +10,7 @@
 */
 
 #include "ulong_extras.h"
+#include "mpn_extras.h"
 #include "n_poly.h"
 #include "mpoly.h"
 #include "nmod_mpoly_factor.h"

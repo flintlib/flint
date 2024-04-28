@@ -22,7 +22,6 @@
 #define NMOD_POLY_INLINE static inline
 #endif
 
-#include "mpn_extras.h"
 #include "nmod_types.h"
 
 #ifdef __cplusplus
@@ -162,16 +161,7 @@ mp_ptr nmod_poly_lead(const nmod_poly_t poly)
 
 /* Assignment and basic manipulation  ****************************************/
 
-NMOD_POLY_INLINE
-void nmod_poly_set(nmod_poly_t a, const nmod_poly_t b)
-{
-    if (a != b)
-    {
-        nmod_poly_fit_length(a, b->length);
-        flint_mpn_copyi(a->coeffs, b->coeffs, b->length);
-        a->length = b->length;
-    }
-}
+void nmod_poly_set(nmod_poly_t a, const nmod_poly_t b);
 
 NMOD_POLY_INLINE
 void nmod_poly_swap(nmod_poly_t poly1, nmod_poly_t poly2)
