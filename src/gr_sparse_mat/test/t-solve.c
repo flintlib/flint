@@ -15,6 +15,8 @@
 #include "gr_sparse_mat.h"
 /* #include <sys/time.h> */
 
+#define CHECK_TEST(x, name) { if (GR_SUCCESS != (x)) { flint_printf("FAIL %s\n", (name)); flint_abort(); } }
+
 int test_solve(flint_rand_t state, gr_ctx_t ctx)
 {
     int iter, ret;

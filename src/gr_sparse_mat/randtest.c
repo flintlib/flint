@@ -20,6 +20,12 @@ int gr_coo_mat_randtest(gr_coo_mat_t mat, slong nnz, int replacement, truth_t is
     if (nnz < 0 || nnz > len)
         return GR_DOMAIN;
 
+    if (nnz == 0)
+    {
+        gr_coo_mat_zero(mat, ctx);
+        return GR_SUCCESS;
+    }
+
     // Make space
     gr_coo_mat_fit_nnz(mat, nnz, ctx);
 

@@ -562,7 +562,7 @@ gr_lil_mat_window_clear(gr_lil_mat_t window, gr_ctx_t ctx)
 WARN_UNUSED_RESULT int gr_lil_mat_swap_rows(gr_lil_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx);
 //WARN_UNUSED_RESULT int gr_coo_mat_swap_rows(gr_coo_mat_t mat, slong * perm, slong r, slong s, gr_ctx_t ctx);
 
-//WARN_UNUSED_RESULT int gr_lil_mat_permute_rows(gr_lil_mat_t mat, const slong * perm, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_lil_mat_permute_rows(gr_lil_mat_t mat, const slong * perm, gr_ctx_t ctx);
 //WARN_UNUSED_RESULT int gr_coo_mat_permute_rows(gr_coo_mat_t mat, const slong * perm, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_csr_mat_invert_rows(gr_csr_mat_t mat, slong * perm, gr_ctx_t ctx);
@@ -805,6 +805,14 @@ WARN_UNUSED_RESULT int gr_lil_mat_mul_mat_transpose(gr_mat_t Ct, const gr_lil_ma
 
 WARN_UNUSED_RESULT int gr_csr_mat_mul_mat(gr_mat_t C, const gr_csr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_lil_mat_mul_mat(gr_mat_t C, const gr_lil_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
+
+/**
+ * LU and reduce echelon form representation
+**/
+
+WARN_UNUSED_RESULT int gr_lil_mat_lu(slong *rank, slong *P, slong *Q, gr_lil_mat_t L, gr_lil_mat_t U, const gr_lil_mat_t M, gr_ctx_t ctx);
+
+WARN_UNUSED_RESULT int gr_lil_mat_rref(slong *res_rank, gr_lil_mat_t R, gr_lil_mat_t A, gr_ctx_t ctx);
 
 /**
  * Solving, nullvector, and nullspace computation
