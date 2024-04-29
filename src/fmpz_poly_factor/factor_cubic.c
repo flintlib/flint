@@ -857,7 +857,7 @@ void _fmpz_poly_factor_cubic(fmpz_poly_factor_t fac,
         case 1:
             _raise_linear_factor(p, a, b, r + 0, T);
             fmpz_poly_factor_insert(fac, p, 1*exp);
-            fmpz_poly_divides(p, f, p);
+            fmpz_poly_divexact(p, f, p);
             fmpz_poly_factor_insert(fac, p, 1*exp);
             break;
 
