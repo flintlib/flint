@@ -151,6 +151,16 @@ flint_mpn_addmod_2(mp_ptr res, mp_srcptr x, mp_srcptr y, mp_srcptr m)
         sub_ddmmss(res[1], res[0], res[1], res[0], m1, m0);
 }
 
+/* assumes msb of m is zero */
+FLINT_FORCE_INLINE void
+_flint_mpn_addmod_2(mp_ptr res, mp_srcptr x, mp_srcptr y, mp_srcptr m)
+{
+    mp_limb_t m1 = m[1], m0 = m[0];
+    add_ssaaaa(res[1], res[0], x[1], x[0], y[1], y[0]);
+    if (res[1] > m1 || (res[1] == m1 && res[0] >= m0))
+        sub_ddmmss(res[1], res[0], res[1], res[0], m1, m0);
+}
+
 FLINT_FORCE_INLINE void
 flint_mpn_submod_2(mp_ptr res, mp_srcptr x, mp_srcptr y, mp_srcptr m)
 {
