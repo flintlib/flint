@@ -3,6 +3,10 @@
 **mpfr_mat.h** -- matrices of MPFR floating-point numbers
 ===============================================================================
 
+.. note::
+
+    This module is deprecated, and will probably removed completely in the
+    future.
 
 
 Memory management
