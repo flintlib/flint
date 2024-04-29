@@ -310,12 +310,6 @@ Division
     We require `a` and `b` to be reduced modulo `n` before calling the
     function. 
 
-.. function:: void flint_mpn_mulmod_preinvn_2(mp_ptr r, mp_srcptr a, mp_srcptr b, mp_srcptr d, mp_srcptr dinv, ulong norm)
-
-    Version of :func:`flint_mpn_mulmod_preinv1` specialized for two limbs.
-    The behavior is not exactly the same: `a` and `b` are assumed to
-    be unshifted, and the output is unshifted.
-
 .. function:: void flint_mpn_preinvn(mp_ptr dinv, mp_srcptr d, mp_size_t n)
 
     Compute an `n` limb precomputed inverse ``dinv`` of the `n` limb
@@ -364,7 +358,12 @@ Division
     We require `a` and `b` to be reduced modulo `n` before calling the
     function. 
 
-    Note that this function is not always as fast as ordinary division.
+.. function:: void flint_mpn_mulmod_preinvn_2(mp_ptr r, mp_srcptr a, mp_srcptr b, mp_srcptr d, mp_srcptr dinv, ulong norm)
+
+    Version of :func:`flint_mpn_mulmod_preinv1` specialized for two limbs.
+    The behavior is not exactly the same: `a` and `b` are assumed to
+    be unshifted, and the output is unshifted.
+
 
 
 GCD
