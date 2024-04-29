@@ -104,15 +104,17 @@ int flint_mpn_zero_p(mp_srcptr x, mp_size_t xsize)
     } while (0)
 
 #define FLINT_MPN_MUL_2X2(r3, r2, r1, r0, a1, a0, b1, b0)   \
-    do {                                                    \
-        mp_limb_t t1, t2, t3;                               \
-        umul_ppmm(r1, r0, a0, b0);                          \
-        umul_ppmm(r2, t1, a1, b0);                          \
-        add_ssaaaa(r2, r1, r2, r1, 0, t1);                  \
-        umul_ppmm(t2, t1, a0, b1);                          \
-        umul_ppmm(r3, t3, a1, b1);                          \
-        add_ssaaaa(r3, t2, r3, t2, 0, t3);                  \
-        add_sssaaaaaa(r3, r2, r1, r3, r2, r1, 0, t2, t1);   \
+    do {                                                                  \
+        mp_limb_t __t1, __t2, __u1, __u2;                                 \
+        mp_limb_t __r3, __r2, __r1, __r0;                                 \
+        mp_limb_t __a1 = (a1), __a0 = (a0), __b1 = (b1), __b0 = (b0);     \
+        umul_ppmm(__r1, __r0, __a0, __b0);                                \
+        umul_ppmm(__r3, __r2, __a1, __b1);                                \
+        umul_ppmm(__t2, __t1, __a0, __b1);                                \
+        add_sssaaaaaa(__r3, __r2, __r1, __r3, __r2, __r1, 0, __t2, __t1); \
+        umul_ppmm(__u2, __u1, __a1, __b0);                                \
+        add_sssaaaaaa(__r3, __r2, __r1, __r3, __r2, __r1, 0, __u2, __u1); \
+        (r0) = __r0; (r1) = __r1; (r2) = __r2; (r3) = __r3;               \
     } while (0)
 
 /* {s0,s1,s2} = u[0]v[n-1] + u[1]v[n-2] + ... */
