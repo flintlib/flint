@@ -205,7 +205,7 @@ Factoring of ``fmpz`` integers using ECM
 
     Clears the ``ecm_t`` struct.
 
-.. function:: void fmpz_factor_ecm_addmod(mp_ptr a, mp_ptr b, mp_ptr c, mp_ptr n, mp_limb_t n_size)
+.. function:: void flint_mpn_addmod_n(mp_ptr a, mp_ptr b, mp_ptr c, mp_ptr n, mp_limb_t n_size)
 
     Sets `a` to `(b + c)` ``%`` `n`. This is not a normal add mod function,
     it assumes `n` is normalized (highest bit set) and `b` and `c` are reduced
@@ -213,7 +213,7 @@ Factoring of ``fmpz`` integers using ECM
 
     Used for arithmetic operations in ``fmpz_factor_ecm``.
 
-.. function:: void fmpz_factor_ecm_submod(mp_ptr x, mp_ptr a, mp_ptr b, mp_ptr n, mp_limb_t n_size)
+.. function:: void flint_mpn_submod_n(mp_ptr x, mp_ptr a, mp_ptr b, mp_ptr n, mp_limb_t n_size)
 
     Sets `x` to `(a - b)` ``%`` `n`. This is not a normal subtract mod
     function, it assumes `n` is normalized (highest bit set)
