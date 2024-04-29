@@ -112,10 +112,10 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap1(fmpz_t scale, fmpz_mpoly_struct ** pol
                 *store++ = x->i;
                 *store++ = x->j;
                 *store++ = x->p;
-                if (x->i != -WORD(1))
+                if (x->i != -UWORD(1))
                     hinds[x->p][x->i] |= WORD(1);
 
-                if (x->i == -WORD(1))
+                if (x->i == -UWORD(1))
                 {
                     fmpz_addmul(acc_lg, scale, poly2 + x->j);
                 } else
@@ -415,10 +415,10 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale, fmpz_mpoly_struct ** poly
                 *store++ = x->i;
                 *store++ = x->j;
                 *store++ = x->p;
-                if (x->i != -WORD(1))
+                if (x->i != -UWORD(1))
                     hinds[x->p][x->i] |= WORD(1);
 
-                if (x->i == -WORD(1))
+                if (x->i == -UWORD(1))
                 {
                     fmpz_addmul(acc_lg, scale, poly2 + x->j);
                 } else
@@ -441,7 +441,7 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale, fmpz_mpoly_struct ** poly
                 if (j + 1 < len2)
                 {
                     x = chains[0] + 0;
-                    x->i = -WORD(1);
+                    x->i = -UWORD(1);
                     x->j = j + 1;
                     x->p = p;
                     x->next = NULL;
@@ -623,8 +623,9 @@ void fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale,
                 const fmpz_mpoly_t poly2, fmpz_mpoly_struct * const * poly3,
                                          slong len, const fmpz_mpoly_ctx_t ctx)
 {
-    slong i, exp_bits, N, lenr = 0;
+    slong i, N, lenr = 0;
     slong len3 = 0;
+    flint_bitcnt_t exp_bits;
     ulong * cmpmask;
     ulong * exp2;
     ulong ** exp3;

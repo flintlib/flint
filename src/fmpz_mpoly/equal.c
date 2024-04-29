@@ -44,7 +44,8 @@ int fmpz_mpoly_equal(const fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
    ulong * ptr1 = poly1->exps, * ptr2 = poly2->exps;
-   slong max_bits, N;
+   slong N;
+   flint_bitcnt_t max_bits;
    int r, free1 = 0, free2 = 0;
 
    if (poly1 == poly2)

@@ -77,7 +77,7 @@ _gr_poly_compose_divconquer(gr_ptr res, gr_srcptr poly1, slong len1,
     {
         if (gr_is_zero(GR_ENTRY(poly1, j + 1, sz), ctx) != T_TRUE)
         {
-            status |= _gr_vec_mul_scalar(h[i], poly2, len2, GR_ENTRY(poly1, j + 1, sz), ctx);
+            status |= _gr_scalar_mul_vec(h[i], GR_ENTRY(poly1, j + 1, sz), poly2, len2, ctx);
             status |= gr_add(h[i], h[i], GR_ENTRY(poly1, j, sz), ctx);
             hlen[i] = len2;
         }

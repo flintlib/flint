@@ -43,7 +43,7 @@ int fq_zech_mpolyu_is_canonical(const fq_zech_mpolyu_t A,
 }
 
 void fq_zech_mpolyu_init(fq_zech_mpolyu_t A, flint_bitcnt_t bits,
-                                                 const fq_zech_mpoly_ctx_t ctx)
+                                                 const fq_zech_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     A->coeffs = NULL;
     A->exps = NULL;

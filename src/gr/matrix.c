@@ -365,7 +365,7 @@ matrix_mul(gr_mat_t res, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
         }
     }
 
-    return gr_mat_mul_classical(res, mat1, mat2, MATRIX_CTX(ctx)->base_ring);
+    return gr_mat_mul(res, mat1, mat2, MATRIX_CTX(ctx)->base_ring);
 }
 
 /* todo: fmpz etc */

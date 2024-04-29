@@ -21,6 +21,19 @@ and not supporting aliasing of the input and output arrays),
 and a non-underscore method which performs automatic memory
 management and handles degenerate cases.
 
+Supported coefficient domains
+-------------------------------------------------------------------------------
+
+Some methods in this module implicitly assume that *R* is a commutative
+ring or an approximate (e.g. floating-point) commutative ring.
+When used with a more general *R*, they may output nonsense without
+returning the appropriate ``GR_DOMAIN`` or ``GR_UNABLE`` flags.
+Better support for noncommutative coefficients is planned for the future.
+
+Some methods make stronger implicit assumptions, for example that *R*
+is an integral domain or a field. Such assumptions are documented on
+a case by case basis.
+
 Type compatibility
 -------------------------------------------------------------------------------
 
@@ -146,6 +159,16 @@ Arithmetic
               int gr_poly_mullow(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, slong len, gr_ctx_t ctx)
 
 .. function:: int gr_poly_mul_scalar(gr_poly_t res, const gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx)
+
+.. function:: int _gr_poly_mul_karatsuba(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
+              int gr_poly_mul_karatsuba(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx)
+
+    Karatsuba multiplication.
+    Not optimized for unbalanced operands, and not memory-optimized for recursive calls.
+    The underscore method requires positive lengths and does not support aliasing.
+    This function calls :func:`_gr_poly_mul` recursively rather than itself, so to get a recursive
+    algorithm with `O(n^{1.6})` complexity, the ring must overload :func:`_gr_poly_mul` to dispatch
+    to :func:`_gr_poly_mul_karatsuba` above some cutoff.
 
 Powering
 --------------------------------------------------------------------------------
@@ -535,6 +558,7 @@ GCD
               int gr_poly_gcd_hgcd(gr_poly_t G, const gr_poly_t A, const gr_poly_t B, slong inner_cutoff, slong cutoff, gr_ctx_t ctx)
               int _gr_poly_gcd_euclidean(gr_ptr G, slong * lenG, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
               int gr_poly_gcd_euclidean(gr_poly_t G, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx)
+              int _gr_poly_gcd_generic(gr_ptr G, slong * lenG, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
               int _gr_poly_gcd(gr_ptr G, slong * lenG, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
               int gr_poly_gcd(gr_poly_t G, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx)
 
@@ -553,6 +577,10 @@ GCD
 
 .. function:: int _gr_poly_xgcd_hgcd(slong * Glen, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, slong hgcd_cutoff, slong cutoff, gr_ctx_t ctx)
               int gr_poly_xgcd_hgcd(gr_poly_t G, gr_poly_t S, gr_poly_t T, const gr_poly_t A, const gr_poly_t B, slong hgcd_cutoff, slong cutoff, gr_ctx_t ctx)
+
+.. function:: int _gr_poly_xgcd_generic(slong * lenG, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
+              int _gr_poly_xgcd(slong * lenG, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
+              int gr_poly_xgcd(gr_poly_t G, gr_poly_t S, gr_poly_t T, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx)
 
 Resultant
 -------------------------------------------------------------------------------
@@ -710,6 +738,49 @@ Power series special functions
               int _gr_poly_tan_series(gr_ptr f, gr_srcptr h, slong hlen, slong n, gr_ctx_t ctx)
               int gr_poly_tan_series(gr_poly_t f, const gr_poly_t h, slong n, gr_ctx_t ctx)
 
+Test functions
+-------------------------------------------------------------------------------
+
+The following functions run *iters* test iterations, generating
+polynomials up to length *maxn*. If *ctx* is set to ``NULL``, a random
+ring is generated on each test iteration, otherwise the given ring is used.
+
+.. function:: void _gr_poly_test_mullow(gr_method_poly_binary_trunc_op mullow_impl, gr_method_poly_binary_trunc_op mullow_ref, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+
+    Tests the given function ``mullow_impl`` for correctness as an implementation
+    of :func:`_gr_poly_mullow`. 
+    A reference implementation to compare against can be provided as
+    ``mullow_ref``; if ``NULL``, classical multiplication is used.
+
+.. function:: void _gr_poly_test_divrem(gr_method_poly_binary_binary_op divrem_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+
+    Tests the given function ``divrem_impl`` for correctness as an implementation
+    of :func:`_gr_poly_divrem`.
+
+.. function:: void _gr_poly_test_div(gr_method_poly_binary_op div_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+
+    Tests the given function ``div_impl`` for correctness as an implementation
+    of :func:`_gr_poly_div`.
+
+.. function:: void _gr_poly_test_inv_series(gr_method_poly_unary_trunc_op inv_series_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+
+    Tests the given function ``inv_series_impl`` for correctness as an implementation
+    of :func:`_gr_poly_inv_series`.
+
+.. function:: void _gr_poly_test_div_series(gr_method_poly_binary_trunc_op div_series_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+
+    Tests the given function ``div_series_impl`` for correctness as an implementation
+    of :func:`_gr_poly_div_series`.
+
+.. function:: void _gr_poly_test_gcd(gr_method_poly_gcd_op gcd_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+
+    Tests the given function ``gcd_impl`` for correctness as an implementation
+    of :func:`_gr_poly_gcd`.
+
+.. function:: void _gr_poly_test_xgcd(gr_method_poly_xgcd_op xgcd_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+
+    Tests the given function ``xgcd_impl`` for correctness as an implementation
+    of :func:`_gr_poly_xgcd`.
 
 
 .. raw:: latex

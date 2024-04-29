@@ -69,7 +69,7 @@ static int _fmpz_mpoly_pmul(fmpz_mpoly_t A, const fmpz_mpoly_t X,
 
     p = fmpz_get_ui(pow);
 
-    if (X->length <= WORD(2) || A->length/p < X->length)
+    if (X->length <= WORD(2) || (slong) (A->length/p) < X->length)
     {
         if (!fmpz_mpoly_pow_ui(T, X, p, ctx))
         {

@@ -6,6 +6,176 @@ History and changes
 FLINT version history
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+????-??-?? -- FLINT 3.2.0-dev
+-------------------------------------------------------------------------------
+
+Main contributors: Albin Ahlbäck (AA), Bill Allombert (BA), Ricardo Buring (RB),
+Edgar Costa (EC), Fredrik Johansson (FJ), Vincent Neiger (VN).
+
+* Features
+
+  * Add new module ``mpn_mod`` for fixed-size few-word modulo arithmetic (FJ).
+  * Implement computing qqbar roots of qqbar polynomials (FJ).
+  * Implement generic ``flint_mpn_mulhigh`` and ``flint_mpn_sqrhigh`` for all
+    ranges based on Mulders' algorithm (FJ).
+  * Implement ``n_factor_evaluate`` (AA).
+  * Add ``gr_poly_mul_karatsuba`` (FJ).
+  * Wrap some more methods in ``flint_ctypes`` (FJ).
+  * Handle valuations and exact results in ``gr_series_div`` (FJ).
+
+* Examples
+
+  * Add AKS primality example program (FJ).
+  * Add example on double exponential integration (Hartmut Monien).
+
+* Performance
+
+  * Implement ``flint_mpn_2add_n_inplace`` for x86_64 architectures supporting
+    the ADX instruction set for adding two `n` limbed integers onto another `n`
+    limbed integer inplace, returning the carry (AA).
+  * Replace ``flint_mpn_divexact_1`` with ``mpn_divexact_1`` (AA).
+  * Add ``flint_mpn_mul_Xn`` for `X < 16` on Arm v8, outperforming GMP on Apple
+    M1 (AA).
+  * Add ``flint_mpn_mul_2`` for Arm v8 (AA).
+  * Push some parameters into ``flint-mparam.h``, mainly thresholds for FFT
+    multiplication, currently only for Skylake, Zen 3 and Apple M1 (AA).
+  * Add inline assembly version of ``MPN_IORD_U``, where the x86 version is
+    taken from GMP, and an Arm v8 version was added as well (AA).
+  * Use ``flint_mpn_mulhigh`` in ``mpn_*_preinvn`` methods (FJ).
+  * Avoid 8x excessive memory allocation in ``fmpz`` preinvn functions (FJ).
+  * Use ``flint_mpn_mulhigh`` for unbalanced preinvn divisions (FJ).
+  * Minimize 32-bit instructions in ``x86_64`` assembly.
+  * Add ``flint_mpn_mullow_N`` for `N \le 8` on x86_64 architectures supporting
+    the ADX instruction set (AA).
+  * Add ``flint_mpn_mullow_basecase`` for x86_64 architectures supporting the
+    ADX instruction set (AA).
+  * Micro-optimize ``flint_mpn_mulhigh`` (AA).
+  * Add ``flint_mpn_sqr_N`` routines for `N \le 9` for Arm v8 (AA).
+  * Add ``flint_mpn_mulhigh_N`` routines for `N \le 8` for Arm v8 (AA).
+  * Add ``flint_mpn_sqrhigh_N`` routines for `N \le 8` for Arm v8 (AA).
+  * Add ``_flint_mpn_mulhigh_basecase`` routines Arm v8 optimized for Apple M1
+    (AA).
+  * In gr matrix rings, call ``gr_mat_mul`` rather than ``gr_mat_mul_classical`` (FJ).
+  * Change generic truncated power series to use ``gr_poly`` instead of ``gr_series`` as the data type (FJ).
+
+* Bug fixes
+
+  * Fix segfault in ``examples/fq_poly`` (FJ, reported by Andrea Lesavourey).
+  * Fix uninitialized and uncleared variables (FJ).
+  * Fix wrong stack usage in x86 and Arm assembly routines (AA).
+  * Fix missing break statement in example program (FJ).
+  * Fix assertion in ``flint_mpn_mulhigh`` (AA).
+  * Fix bug in ``gr_series`` (FJ).
+  * Fix primitive root prime (VN).
+  * Fix ``gr_ctx_is_finite_characteristic`` for ``fmpz_mod`` (FJ).
+  * Fix setting generator names for univariate gr rings (FJ).
+
+* Build system
+
+  * Add GMP's ``config.guess`` and utilize it (AA).
+  * Check for more CPUs in ``config.guess``, including Intel Comet Lake and
+    Github's Apple M1 virtual runner (AA).
+  * Valdidate more CPUs in ``config.guess``, including ``x86_64v3`` (AA).
+  * Set compiler architecture dependent flags depending on ``$host`` in
+    Autotools (AA).
+  * Add check for Aarch64/Arm v8 (AA).
+  * Search for more GMP internal functions (AA).
+  * Implement parameter files ``flint-mparam.h`` based on architecture (AA).
+  * Create an include directory to build examples in ``Makefile`` (BA).
+  * Fix missing header (VN).
+  * Use CXX when testing NTL (George Huebner).
+
+* Tests
+
+  * Fix test for ``flint_mpn_mul`` where testing for big inputs was not done
+    correctly (AA).
+  * Cleanup tests related to assembly routines in ``mpn_extras`` (AA).
+  * Add more test code for ``gr_series`` (FJ).
+  * Fix warning in test (AA).
+  * Add functions ``gr_mat_test_mul``, ``gr_mat_test_lu`` and
+    ``gr_poly_test_mullow`` for testing generics overrides (FJ).
+
+* Profiling
+
+  * Add profile program for ``flint_mpn_divrem_preinvn`` (FJ).
+  * Add profiler for ``flint_mpn_mullow`` (AA).
+
+* Maintenance
+
+  * Add notes that CMake is only recommended for Windows users (AA).
+  * Convert TODO from txt-format to Markdown (AA).
+  * Generate and install CMake configuration files (Mehdi Chinoune).
+  * Define GMP internal functions, if they are available, in ``mpn_extras.h``
+    (AA).
+  * Change ``#ifdef FLINT_HAVE_FFT_SMALL`` to ``#if FLINT_HAVE_FFT_SMALL`` (AA).
+  * Enable running specific tests in modules via ``make check MOD=XXX
+    ARGS=YYY`` (AA).
+  * Add Codecov key to CI (AA, FJ).
+  * Force Unix-type newlines through git on Cygwin CI (AA).
+  * Remove debug code from ``qqbar_roots_poly_squarefree`` (FJ).
+  * Remove ``FLINT_HAVE_AVX*`` definitions (AA).
+  * Update ``flint-config.h.in`` (AA).
+  * Fix a macro (?) (FJ).
+  * Simplify definition of ``mp_limb_pair_t`` (FJ).
+  * Use ``#include <flint/xxx.h>`` in examples (BA).
+  * Change ``__mpz_struct *`` to ``mpz_ptr`` (EC).
+  * Move mpn macros from ``flint.h`` to ``mpn_extras.h`` (AA)
+  * Enable compiling with ``-Wextra -Werror`` for a big part of the library
+    (AA).
+  * Disable static build by default (AA).
+  * Do not remove intermediate assembly files for making debugging easier (AA).
+  * Add ``make debug MOD=XXX ARGS=YYY`` shortcut for debugging with GDB (AA).
+  * Add ``gdb_history`` and ``vgcore.*`` to ``.gitignore`` (AA).
+
+* Continuous integration
+
+  * Add nightly build to Github (EC).
+  * Add SHAsum (EC).
+  * Remove Ubuntu CMake runner as we no longer recommend CMake for building
+    FLINT on non-Windows systems (AA).
+  * Add runner that checks against regression when compiling with ``-Wextra
+    -Werror`` (AA).
+  * Publish prepreleases only as drafts (Mahrud Sayrafi).
+
+* Documentation
+
+  * Fix typos (EC).
+  * Clarify usage of inline assembly addition and subtraction macros such as
+    ``add_ssaaaa`` (AA).
+  * Fix another typo (BA).
+  * Some explanations for ``mpn_ctx_mpn_mul`` (FJ).
+  * Add human-readable text to documentation of ``ordering_t`` (RB).
+  * Document Generic Ring setters for infinities and extended values (RB).
+  * Fix documentation of ``gr_cmp_other`` (Marc Mezzarobba).
+
+
+2024-03-18 -- FLINT 3.1.2
+-------------------------------------------------------------------------------
+
+Main contributors: Albin Ahlbäck (AA).
+
+* Maintenance
+
+  * Remove the need for ``ldconfig`` completely in FLINT's Autotools build
+    system (AA).
+
+
+2024-03-07 -- FLINT 3.1.1
+-------------------------------------------------------------------------------
+
+Main contributors: Albin Ahlbäck (AA).
+
+* Bug fixes
+
+  * Add ``padic_types.h`` to headers in ``Makefile.in`` (AA).
+
+* Maintenance
+
+  * Add check for ``aligned_alloc`` and ``_aligned_malloc`` for systems that may
+    not provide any of these functions (AA).
+  * Add options for setting ``-march=ARCH`` (AA).
+
+
 2024-02-25 -- FLINT 3.1.0
 -------------------------------------------------------------------------------
 

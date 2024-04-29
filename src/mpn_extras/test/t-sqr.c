@@ -38,7 +38,7 @@ TEST_FUNCTION_START(flint_mpn_sqr, state)
         rp1 = flint_malloc(sizeof(mp_limb_t) * 2 * n);
         rp2 = flint_malloc(sizeof(mp_limb_t) * 2 * n);
 
-        mpn_random2(xp, n);
+        flint_mpn_rrandom(xp, state, n);
 
         for (i = 0; i < 2 * n; i++)
             rp1[i] = n_randtest(state);
@@ -50,9 +50,9 @@ TEST_FUNCTION_START(flint_mpn_sqr, state)
             TEST_FUNCTION_FAIL(
                     "n = %wd\n"
                     "xp = %{ulong*}\n"
-                    "rp1 = %{ulong*}\n"
-                    "rp2 = %{ulong*}\n",
-                    n, xp, n, rp1, 2 * n, rp2, 2 * n);
+                    "Expected: %{ulong*}\n"
+                    "Got:      %{ulong*}\n",
+                    n, xp, n, rp2, 2 * n, rp1, 2 * n);
 
         flint_free(xp);
         flint_free(rp1);
@@ -61,3 +61,9 @@ TEST_FUNCTION_START(flint_mpn_sqr, state)
 
     TEST_FUNCTION_END(state);
 }
+
+#undef N_MIN
+#undef N_MAX
+#undef WANT_BIG
+#undef N_MIN_STOR
+#undef N_MAX_STOR

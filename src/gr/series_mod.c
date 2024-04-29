@@ -128,7 +128,7 @@ static void _gr_gr_series_mod_init(gr_poly_t res, gr_ctx_t ctx)
 
 static void _gr_gr_series_mod_clear(gr_poly_t res, gr_ctx_t ctx)
 {
-    gr_poly_init(res, SERIES_MOD_ELEM_CTX(ctx));
+    gr_poly_clear(res, SERIES_MOD_ELEM_CTX(ctx));
 }
 
 static void _gr_gr_series_mod_swap(gr_poly_t x, gr_poly_t y, gr_ctx_t ctx)

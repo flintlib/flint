@@ -13,7 +13,7 @@
 #include "mpoly.h"
 #include "fmpq_mpoly.h"
 
-void fmpq_mpoly_univar_init(fmpq_mpoly_univar_t A, const fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_univar_init(fmpq_mpoly_univar_t A, const fmpq_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     A->coeffs = NULL;
     A->exps = NULL;
@@ -247,7 +247,7 @@ void fmpq_mpoly_from_univar_bits(fmpq_mpoly_t A, flint_bitcnt_t Abits,
 
             FLINT_ASSERT(x->next == NULL);
 
-            if (x->j + 1 < (B->coeffs + x->i)->zpoly->length)
+            if (x->j + 1 < (ulong) (B->coeffs + x->i)->zpoly->length)
             {
                 FLINT_ASSERT(fmpz_fits_si(B->exps + x->i));
                 x->j = x->j + 1;
@@ -286,7 +286,7 @@ void fmpq_mpoly_from_univar_bits(fmpq_mpoly_t A, flint_bitcnt_t Abits,
 
             FLINT_ASSERT(x->next == NULL);
 
-            if (x->j + 1 < (B->coeffs + x->i)->zpoly->length)
+            if (x->j + 1 < (ulong) (B->coeffs + x->i)->zpoly->length)
             {
                 x->j = x->j + 1;
                 x->next = NULL;

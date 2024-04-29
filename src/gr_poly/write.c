@@ -22,8 +22,28 @@
 static int
 want_parens(const char * s)
 {
-    if (s[0] == '(' || s[0] == '[' || s[0] == '{')
-        return 0;
+    /* Try to determine if the expression is already enclosed by
+       brackets or parentheses. */
+    if (s[0] == '[' || s[0] == '(' || s[0] == '}')
+    {
+        slong depth = 1;
+
+        char open = s[0];
+        char close = (open == '[') ? ']' : (open == '(' ? ')' : '}');
+
+        s++;
+        while (s[0] != '\0')
+        {
+            if (s[0] == open)
+                depth++;
+            else if (s[0] == close)
+                depth--;
+
+            s++;
+            if (depth == 0)
+                return s[0] != '\0';
+        }
+    }
 
     if (s[0] == '-')
         s++;

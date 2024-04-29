@@ -12,7 +12,7 @@
 #include "fmpz.h"
 #include "fq.h"
 
-int fq_get_fmpz(fmpz_t a, const fq_t b, const fq_ctx_t ctx)
+int fq_get_fmpz(fmpz_t a, const fq_t b, const fq_ctx_t FLINT_UNUSED(ctx))
 {
     if (b->length > 1)
         return 0;

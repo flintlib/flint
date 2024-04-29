@@ -78,7 +78,7 @@ slong _fmpz_mpoly_quasidiv_heap1(fmpz_t scale,
 
     /* insert (-1, 0, exp2[0]) into heap */
     x = chain + 0;
-    x->i = -WORD(1);
+    x->i = -UWORD(1);
     x->j = 0;
     x->next = NULL;
     HEAP_ASSIGN(heap[1], exp2[0], x);
@@ -133,8 +133,8 @@ slong _fmpz_mpoly_quasidiv_heap1(fmpz_t scale,
                 {
                     *store++ = x->i;
                     *store++ = x->j;
-                    if (x->i != -WORD(1))
-                        hind[x->i] |= WORD(1);
+                    if (x->i != -UWORD(1))
+                        hind[x->i] |= UWORD(1);
 
                 } while ((x = x->next) != NULL);
             } while (heap_len > 1 && heap[1].exp == exp);
@@ -153,10 +153,10 @@ slong _fmpz_mpoly_quasidiv_heap1(fmpz_t scale,
                 {
                     *store++ = x->i;
                     *store++ = x->j;
-                    if (x->i != -WORD(1))
-                        hind[x->i] |= WORD(1);
+                    if (x->i != -UWORD(1))
+                        hind[x->i] |= UWORD(1);
 
-                    if (x->i == -WORD(1))
+                    if (x->i == -UWORD(1))
                        _fmpz_mpoly_add_uiuiui_fmpz(acc_sm, poly2 + x->j);
                     else
                        _fmpz_mpoly_submul_uiuiui_fmpz(acc_sm, poly3[x->i], q_coeff[x->j]);
@@ -175,10 +175,10 @@ slong _fmpz_mpoly_quasidiv_heap1(fmpz_t scale,
                 {
                     *store++ = x->i;
                     *store++ = x->j;
-                    if (x->i != -WORD(1))
+                    if (x->i != -UWORD(1))
                         hind[x->i] |= WORD(1);
 
-                    if (x->i == -WORD(1))
+                    if (x->i == -UWORD(1))
                         fmpz_add(acc_lg, acc_lg, poly2 + x->j);
                     else
                         fmpz_submul(acc_lg, poly3 + x->i, q_coeff + x->j);
@@ -197,10 +197,10 @@ slong _fmpz_mpoly_quasidiv_heap1(fmpz_t scale,
                 {
                     *store++ = x->i;
                     *store++ = x->j;
-                    if (x->i != -WORD(1))
+                    if (x->i != -UWORD(1))
                         hind[x->i] |= WORD(1);
 
-                    if (x->i == -WORD(1))
+                    if (x->i == -UWORD(1))
                         fmpz_addmul(acc_lg, scale, poly2 + x->j);
                     else
                     {
@@ -525,8 +525,8 @@ slong _fmpz_mpoly_quasidiv_heap(fmpz_t scale,
                 {
                     *store++ = x->i;
                     *store++ = x->j;
-                    if (x->i != -WORD(1))
-                        hind[x->i] |= WORD(1);
+                    if (x->i != -UWORD(1))
+                        hind[x->i] |= UWORD(1);
 
                 } while ((x = x->next) != NULL);
             } while (heap_len > 1 && mpoly_monomial_equal(heap[1].exp, exp, N));
@@ -546,10 +546,10 @@ slong _fmpz_mpoly_quasidiv_heap(fmpz_t scale,
                 {
                     *store++ = x->i;
                     *store++ = x->j;
-                    if (x->i != -WORD(1))
-                        hind[x->i] |= WORD(1);
+                    if (x->i != -UWORD(1))
+                        hind[x->i] |= UWORD(1);
 
-                    if (x->i == -WORD(1))
+                    if (x->i == -UWORD(1))
                        _fmpz_mpoly_add_uiuiui_fmpz(acc_sm, poly2 + x->j);
                     else
                        _fmpz_mpoly_submul_uiuiui_fmpz(acc_sm, poly3[x->i], q_coeff[x->j]);
@@ -569,10 +569,10 @@ slong _fmpz_mpoly_quasidiv_heap(fmpz_t scale,
                 {
                     *store++ = x->i;
                     *store++ = x->j;
-                    if (x->i != -WORD(1))
+                    if (x->i != -UWORD(1))
                         hind[x->i] |= WORD(1);
 
-                    if (x->i == -WORD(1))
+                    if (x->i == -UWORD(1))
                         fmpz_add(acc_lg, acc_lg, poly2 + x->j);
                     else
                         fmpz_submul(acc_lg, poly3 + x->i, q_coeff + x->j);
@@ -592,10 +592,10 @@ slong _fmpz_mpoly_quasidiv_heap(fmpz_t scale,
                 {
                     *store++ = x->i;
                     *store++ = x->j;
-                    if (x->i != -WORD(1))
+                    if (x->i != -UWORD(1))
                         hind[x->i] |= WORD(1);
 
-                    if (x->i == -WORD(1))
+                    if (x->i == -UWORD(1))
                         fmpz_addmul(acc_lg, scale, poly2 + x->j);
                     else
                     {
@@ -793,7 +793,8 @@ void fmpz_mpoly_quasidiv_heap(fmpz_t scale, fmpz_mpoly_t q,
                   const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
-    slong exp_bits, N, lenq = 0;
+    slong N, lenq = 0;
+    flint_bitcnt_t exp_bits;
     ulong * exp2 = poly2->exps, * exp3 = poly3->exps;
     ulong * cmpmask;
     int free2 = 0, free3 = 0;

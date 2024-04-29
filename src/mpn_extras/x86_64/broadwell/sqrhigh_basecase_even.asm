@@ -223,13 +223,13 @@ L(e6):	lea	-2*8(rp), rp
 L(fnd):	adox	ix, r2
 	adox	ix, r3b
 	adc	ix, r3b
+	cmp	R32(mx), R32(mx_final)
 	mov	r2, 1*8(rp)
 	mov	r3b, 2*8(rp)
-	mov	3*8(ap), %rdx		C Load second factor
-	cmp	R32(mx), R32(mx_final)
-	lea	(ap,mx), ap		C Reset ap
 	lea	3*8(rp,mx), rp		C Reset rp
 	jg	L(msh)
+	mov	3*8(ap), %rdx		C Load second factor
+	lea	(ap,mx), ap		C Reset ap
 	je	L(kmp)
 	mulx	0*8(ap), ix, ix
 L(kmp):	mulx	1*8(ap), r2, r3a
@@ -295,25 +295,25 @@ define(`ld1', `r3b')
 define(`ld2', `mx')
 define(`ld3', `ix_save')
 
+
 	C Left shift rp by one and add diagonal
-L(msh):	neg	mx_final
+L(msh):	sar	$4, mx_final
 	lea	L(etab)(%rip), ld2
-	shr	$4, R32(mx_final)
+	lea	1*8(ap,mx_final,8), ap	C Reset ap
+	neg	R32(mx_final)
 	mov	0*8(rp), ld0
-	inc	R32(mx_final)
 	mov	1*8(rp), ld1
-	lea	3*8(ap,mx_final,8), ap
 	or	R32(mx_final), R32(ix)
 	shr	$2, R32(ix)
 	and	$3, R32(mx_final)	C Also reset flags
 
-	mov	-1*8(ap), %rdx
+	mov	0*8(ap), %rdx
 	mulx	%rdx, r1, r1
 ifdef(`PIC',
 `	movslq	(ld2,mx_final,4), mx_final
 	lea	(mx_final,ld2), ld2
 ',`')
-	mov	0*8(ap), %rdx
+	mov	1*8(ap), %rdx
 	mulx	%rdx, r2, r3
 	adox	rx, rx
 	adox	ld0, ld0
@@ -344,7 +344,7 @@ L(ep1):	lea	1*8(ap), ap
 
 	ALIGN(32)
 L(ep0):	# Do nothing
-L(es0):	mov	1*8(ap), %rdx
+L(es0):	mov	2*8(ap), %rdx
 	mov	2*8(rp), ld2
 	mov	3*8(rp), ld3
 	mulx	%rdx, r2, r3
@@ -355,7 +355,7 @@ L(es0):	mov	1*8(ap), %rdx
 	adcx	r2, ld2
 	adcx	r3, ld3
 	mov	ld2, 2*8(rp)
-L(es3):	mov	2*8(ap), %rdx
+L(es3):	mov	3*8(ap), %rdx
 	mov	4*8(rp), ld0
 	mov	5*8(rp), ld1
 	mov	ld3, 3*8(rp)
@@ -366,7 +366,7 @@ L(es3):	mov	2*8(ap), %rdx
 	adcx	r0, ld0
 	adcx	r1, ld1
 	mov	ld0, 4*8(rp)
-L(es2):	mov	-1*8(ap), %rdx
+L(es2):	mov	0*8(ap), %rdx
 	mov	6*8(rp), ld2
 	mov	7*8(rp), ld3
 	mov	ld1, 5*8(rp)
@@ -377,7 +377,7 @@ L(es2):	mov	-1*8(ap), %rdx
 	adcx	r2, ld2
 	adcx	r3, ld3
 	mov	ld2, -2*8(rp)
-L(es1):	mov	0*8(ap), %rdx
+L(es1):	mov	1*8(ap), %rdx
 	mov	0*8(rp), ld0
 	mov	1*8(rp), ld1
 	mov	ld3, -1*8(rp)
@@ -409,12 +409,10 @@ undefine(`ld3')
 	pop	%rbx
 
 	ret
-
+EPILOGUE()
 	JUMPTABSECT
 	ALIGN(8)
 L(etab):JMPENT(	L(ep0), L(etab))
 	JMPENT(	L(ep1), L(etab))
 	JMPENT(	L(ep2), L(etab))
 	JMPENT(	L(ep3), L(etab))
-	TEXT
-EPILOGUE()

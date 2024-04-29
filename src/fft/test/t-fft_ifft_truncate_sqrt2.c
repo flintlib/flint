@@ -17,8 +17,6 @@ TEST_FUNCTION_START(fft_ifft_truncate_sqrt2, state)
 {
     flint_bitcnt_t depth, w, maxdepth;
 
-    _flint_rand_init_gmp(state);
-
     maxdepth = (flint_test_multiplier() > 10) ? 12 :
                (flint_test_multiplier() > 1)  ? 11 : 10;
 

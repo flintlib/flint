@@ -224,14 +224,14 @@ void _mpz_tdiv_qr_preinvn(mpz_ptr q, mpz_ptr r,
     TMP_START;
     if ((r == d || q == d) && !nm) /* we have alias with d */
     {
-        tp = TMP_ALLOC(usize2*FLINT_BITS);
+        tp = TMP_ALLOC(usize2*sizeof(mp_limb_t));
         mpn_copyi(tp, dp, usize2);
         dp = tp;
     }
 
     if (r == a || q == a) /* we have alias with a */
     {
-        tp = TMP_ALLOC(usize1*FLINT_BITS);
+        tp = TMP_ALLOC(usize1*sizeof(mp_limb_t));
         mpn_copyi(tp, ap, usize1);
         ap = tp;
     }
@@ -245,7 +245,7 @@ void _mpz_tdiv_qr_preinvn(mpz_ptr q, mpz_ptr r,
         mpn_tdiv_qr(qp, rp, 0, ap, usize1, dp, usize2);
     else {
         if (nm) {
-            tp = TMP_ALLOC(usize2*FLINT_BITS);
+            tp = TMP_ALLOC(usize2*sizeof(mp_limb_t));
             mpn_lshift(tp, dp, usize2, inv->norm);
             dp = tp;
 
@@ -282,7 +282,7 @@ void _mpz_fdiv_qr_preinvn(mpz_ptr q, mpz_ptr r,
     TMP_START;
     if (q == d || r == d) /* we need d later, so make sure it doesn't alias */
     {
-        t->_mp_d = TMP_ALLOC(usize2*FLINT_BITS);
+        t->_mp_d = TMP_ALLOC(usize2*sizeof(mp_limb_t));
         t->_mp_size = d->_mp_size;
         t->_mp_alloc = d->_mp_alloc;
         mpn_copyi(t->_mp_d, d->_mp_d, usize2);

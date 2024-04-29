@@ -189,11 +189,11 @@ static void _splitworker_bivar(void * varg)
         if (n_poly_degree(arg->modulus) > 0)
         {
             FLINT_ASSERT(arg->G->length > 0);
-            if (n_poly_degree(Gevalp) > ((arg->G->exps + N*0)[off]>>shift))
+            if ((ulong) n_poly_degree(Gevalp) > ((arg->G->exps + N*0)[off]>>shift))
             {
                 continue;
             }
-            else if (n_poly_degree(Gevalp) < ((arg->G->exps + N*0)[off]>>shift))
+            else if ((ulong) n_poly_degree(Gevalp) < ((arg->G->exps + N*0)[off]>>shift))
             {
                 n_poly_one(arg->modulus);
             }
@@ -821,9 +821,9 @@ int nmod_mpolyn_gcd_brown_smprime_threaded_pool(
     flint_bitcnt_t bits = A->bits;
     slong N = mpoly_words_per_exp_sp(bits, ctx->minfo);
     slong offset, shift;
-    ulong num_threads;
+    slong num_threads;
     int success;
-    ulong bound, best_est;
+    slong bound, best_est;
     slong g_stab_est, abar_stab_est, bbar_stab_est, upper_limit;
     mp_limb_t alpha;
     slong deggamma, ldegA, ldegB;
@@ -957,7 +957,7 @@ compute_split:
 
     splitbase->bound = best_est;
 
-    if (alpha <= num_threads)
+    if (alpha <= (ulong) num_threads)
     {
         success = 0;
         goto cleanup_split;

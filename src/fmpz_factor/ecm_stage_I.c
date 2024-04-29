@@ -21,7 +21,8 @@ fmpz_factor_ecm_stage_I(mp_ptr f, const mp_limb_t *prime_array, mp_limb_t num,
 {
     mp_limb_t times;
     mp_size_t sz, gcdlimbs;
-    int i, j, p;
+    int j, p;
+    ulong i;
 
     for (i = 0; i < num; i++)
     {
@@ -49,7 +50,7 @@ fmpz_factor_ecm_stage_I(mp_ptr f, const mp_limb_t *prime_array, mp_limb_t num,
            if neither is true, factor found */
 
         if (!(gcdlimbs == 1 && f[0] == ecm_inf->one[0]) &&
-            !(gcdlimbs == ecm_inf->n_size && mpn_cmp(f, n, ecm_inf->n_size) == 0))
+            !(gcdlimbs == (mp_size_t) ecm_inf->n_size && mpn_cmp(f, n, ecm_inf->n_size) == 0))
         {
             /* Found factor in stage I */
             return gcdlimbs;

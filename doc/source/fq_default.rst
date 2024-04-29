@@ -1,73 +1,67 @@
-.. _fq_default_default:
+.. _fq_default:
 
-**fq_default_default.h** -- unified finite fields
+**fq_default.h** -- unified finite fields
 ===============================================================================
 
 Types, macros and constants
 -------------------------------------------------------------------------------
 
-.. type:: fq_default_default_ctx_t
+.. type:: fq_default_ctx_t
 
-.. type:: fq_default_default_t
+.. type:: fq_default_t
 
 Context Management
 --------------------------------------------------------------------------------
 
 
-.. function:: void fq_default_ctx_init(fq_default_ctx_t ctx, const fmpz_t p, slong d, const char * var)
-
-    Initialises the context for prime `p` and extension degree `d`,
-    with name ``var`` for the generator.  By default, it will try
-    use a Conway polynomial; if one is not available, a random
-    irreducible polynomial will be used.
-
-    Assumes that `p` is a prime.
-
-    Assumes that the string ``var`` is a null-terminated string
-    of length at least one.
-
 .. function:: void fq_default_ctx_init_type(fq_default_ctx_t ctx, const fmpz_t p, slong d, const char * var, int type)
+              void fq_default_ctx_init(fq_default_ctx_t ctx, const fmpz_t p, slong d, const char * var)
 
-    As per the previous function except that if ``type == 1`` an ``fq_zech``
-    context is created, if ``type == 2`` an ``fq_nmod`` and if ``type == 3``
-    an ``fq``. If ``type == 0`` the functionality is as per the previous
-    function.
+    Initialises the context ``ctx`` for prime `p` and extension degree `d`, with
+    string ``var`` of length at least one for the generator display name.  By
+    default, it will try use a Conway polynomial; if one is not available, a
+    random irreducible polynomial will be used.
 
-.. function:: void fq_default_ctx_init_modulus(fq_default_ctx_t ctx, const fmpz_mod_poly_t modulus, fmpz_mod_ctx_t mod_ctx, const char * var)
+    For ``fq_default_ctx_init``, it will choose the best representation for
+    performance.
 
-    Initialises the context for the finite field defined by the given
-    polynomial ``modulus``. The characteristic will be the modulus of
-    the polynomial and the degree equal to its degree.
-
-    Assumes that the characteristic is prime and the polynomial irreducible.
-
-    Assumes that the string ``var`` is a null-terminated string
-    of length at least one.
-
-.. function:: void fq_default_ctx_init_modulus_type(fq_default_ctx_t ctx, const fmpz_mod_poly_t modulus, fmpz_mod_ctx_t mod_ctx, const char * var, int type)
-
-    As per the previous function except that if ``type == 1`` an ``fq_zech``
-    context is created, if ``type == 2`` an ``fq_nmod`` and if ``type == 3``
-    an ``fq``. If ``type == 0`` the functionality is as per the previous
-    function.
-
-.. function:: void fq_default_ctx_init_modulus_nmod(fq_default_ctx_t ctx, const nmod_poly_t modulus, const char * var)
-
-    Initialises the context for the finite field defined by the given
-    polynomial ``modulus``. The characteristic will be the modulus of
-    the polynomial and the degree equal to its degree.
-
-    Assumes that the characteristic is prime and the polynomial irreducible.
-
-    Assumes that the string ``var`` is a null-terminated string
-    of length at least one.
+    For ``fq_default_ctx_init_type``, a separate argument ``type`` is required
+    which sets which representation to use. These values can be: ``0`` (which
+    then will act just like ``fq_default_ctx_init``), ``FQ_DEFAULT_FQ_ZECH``,
+    ``FQ_DEFAULT_FQ_NMOD``, ``FQ_DEFAULT_FQ``, ``FQ_DEFAULT_NMOD`` and
+    ``FQ_DEFAULT_FMPZ_MOD``.
 
 .. function:: void fq_default_ctx_init_modulus_nmod_type(fq_default_ctx_t ctx, const nmod_poly_t modulus, const char * var, int type)
+              void fq_default_ctx_init_modulus_nmod(fq_default_ctx_t ctx, const nmod_poly_t modulus, const char * var)
+              void fq_default_ctx_init_modulus_type(fq_default_ctx_t ctx, const fmpz_mod_poly_t modulus, fmpz_mod_ctx_t mod_ctx, const char * var, int type)
+              void fq_default_ctx_init_modulus(fq_default_ctx_t ctx, const fmpz_mod_poly_t modulus, fmpz_mod_ctx_t mod_ctx, const char * var)
 
-    As per the previous function except that if ``type == 1`` an ``fq_zech``
-    context is created, if ``type == 2`` an ``fq_nmod`` and if ``type == 3``
-    an ``fq``. If ``type == 0`` the functionality is as per the previous
-    function.
+    Initialises the finite field context ``ctx`` defined by the given polynomial
+    ``modulus``. For the ``fmpz_mod_poly`` type, the context structure
+    ``mod_ctx`` for the polynomial must also be given. Sets the printing of
+    variable of the field to the string ``var``, which is assumed to be length
+    of at least one.
+
+    The context ``ctx`` will after the call represent the finite field in one of
+    the five different formats: ``fq_zech``, ``fq_nmod``, ``nmod``, ``fmpz_mod``
+    and ``fq``.
+
+    The characteristic of the field will be the modulus of the polynomial and
+    its degree will equal to the degree of the polynomial. Furthermore, it
+    assumes that the characteristic is prime and that the polynomial
+    irreducible. Furthermore, in order for the field to be representable as the
+    Zech logarithm we assume that polynomial is primitive; if it is not, another
+    representation will be chosen.
+
+    For ``fq_default_ctx_init_modulus_nmod`` or ``fq_default_ctx_init_modulus``,
+    it chooses the best representation for performance.
+
+    For ``fq_default_ctx_init_modulus_nmod_type`` or
+    ``fq_default_ctx_init_modulus_type``, it expects ``type`` to be one of the
+    following choices: ``FQ_DEFAULT_FQ_ZECH``, ``FQ_DEFAULT_FQ_NMOD``,
+    ``FQ_DEFAULT_FQ``, ``FQ_DEFAULT_NMOD`` or ``FQ_DEFAULT_FMPZ_MOD``. To be
+    clear: if the Zech logarithm is chosen but the polynomial is not primitive,
+    another representation will be chosen.
 
 .. function:: void fq_default_ctx_clear(fq_default_ctx_t ctx)
 

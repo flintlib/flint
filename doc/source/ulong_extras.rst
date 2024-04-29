@@ -192,8 +192,7 @@ Basic arithmetic with precomputed inverses
         invxl = (B^2 - B*x - 1)/x = (B^2 - 1)/x - B
 
     Note that `x` must be normalised, i.e. with msb set. This inverse
-    makes use of the following theorem of Torbjorn Granlund and Peter
-    Montgomery~[Lemma~8.1][GraMon1994]_:
+    makes use of Lemma 8.1 in [GraMon1994]_:
 
     Let `d` be normalised, `d < B`, i.e. it fits in a word, and suppose
     that `m d < B^2 \leq (m+1) d`. Let `0 \leq n \leq B d - 1`.  Write
@@ -1074,6 +1073,12 @@ Factorisation
 .. function:: void n_factor_init(n_factor_t * factors)
 
     Initializes factors.
+
+.. function:: ulong n_factor_evaluate(const n_factor_t * factors)
+
+    Returns the evaluation of ``factors``,
+    i.e. `p_{1}^{e_{1}} \cdots p_{n}^{e_{n}}` assuming that it fits in a limb.
+    In case the evaluation does not fit in a limb, it returns `0`.
 
 .. function:: int n_remove(ulong * n, ulong p)
 

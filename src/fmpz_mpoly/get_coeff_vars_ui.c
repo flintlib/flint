@@ -105,7 +105,7 @@ continue_outer_sp:;
     }
     else
     {
-        ulong wpf = A->bits/FLINT_BITS;
+        slong wpf = A->bits/FLINT_BITS;
         maxoffset = 0;
         minoffset = N;
         for (i = 0; i < length; i++)

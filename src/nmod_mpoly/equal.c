@@ -40,7 +40,8 @@ int nmod_mpoly_equal(const nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
                                                     const nmod_mpoly_ctx_t ctx)
 {
     ulong * ptr1 = poly1->exps, * ptr2 = poly2->exps;
-    slong max_bits, N;
+    ulong max_bits;
+    slong N;
     int r, free1 = 0, free2 = 0;
 
     if (poly1 == poly2)

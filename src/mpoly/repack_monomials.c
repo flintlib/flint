@@ -106,7 +106,7 @@ int mpoly_repack_monomials(ulong * exps1, flint_bitcnt_t bits1,
             for (i = 0; i < len; i++)
             {
                 mpoly_unpack_vec_fmpz(tmp_exps, exps2 + N2*i, bits2, nfields, 1);
-                if (_fmpz_vec_max_bits(tmp_exps, nfields) >= bits1)
+                if (_fmpz_vec_max_bits(tmp_exps, nfields) >= (slong) bits1)
                     goto cleanup1;
                 mpoly_pack_vec_fmpz(exps1 + N1*i, tmp_exps, bits1, nfields, 1);
             }

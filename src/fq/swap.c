@@ -12,7 +12,7 @@
 #include "fmpz_poly.h"
 #include "fq.h"
 
-void fq_swap(fq_t op1, fq_t op2, const fq_ctx_t ctx)
+void fq_swap(fq_t op1, fq_t op2, const fq_ctx_t FLINT_UNUSED(ctx))
 {
     fmpz_poly_swap(op1, op2);
 }

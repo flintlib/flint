@@ -27,7 +27,7 @@ extern "C" {
 
 FMPZ_MPOLY_INLINE
 fmpz * fmpz_mpoly_term_coeff_ref(fmpz_mpoly_t A, slong i,
-                                                    const fmpz_mpoly_ctx_t ctx)
+                                                    const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_ASSERT(i < A->length);
     return A->coeffs + i;
@@ -99,10 +99,9 @@ ordering_t fmpz_mpoly_ctx_ord(const fmpz_mpoly_ctx_t ctx)
 
 /*  Memory management ********************************************************/
 
-void fmpz_mpoly_init(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_init(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx));
 
-void fmpz_mpoly_init2(fmpz_mpoly_t A, slong alloc,
-                                                   const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_init2(fmpz_mpoly_t A, slong alloc, const fmpz_mpoly_ctx_t ctx);
 
 void fmpz_mpoly_init3(fmpz_mpoly_t A, slong alloc, flint_bitcnt_t bits,
                                                    const fmpz_mpoly_ctx_t ctx);
@@ -122,11 +121,11 @@ void fmpz_mpoly_fit_length(fmpz_mpoly_t A, slong len,
 void fmpz_mpoly_fit_length_reset_bits(fmpz_mpoly_t A, slong len,
                               flint_bitcnt_t bits, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_clear(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_clear(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx));
 
-void _fmpz_mpoly_set_length(fmpz_mpoly_t A, slong newlen, const fmpz_mpoly_ctx_t ctx);
+void _fmpz_mpoly_set_length(fmpz_mpoly_t A, slong newlen, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx));
 
-void fmpz_mpoly_truncate(fmpz_mpoly_t A, slong newlen, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_truncate(fmpz_mpoly_t A, slong newlen, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx));
 
 void fmpz_mpoly_fit_bits(fmpz_mpoly_t A,
                                   flint_bitcnt_t bits, const fmpz_mpoly_ctx_t ctx);
@@ -173,7 +172,7 @@ int fmpz_mpoly_equal(const fmpz_mpoly_t A, const fmpz_mpoly_t B,
 
 FMPZ_MPOLY_INLINE
 void fmpz_mpoly_swap(fmpz_mpoly_t A,
-                                fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx)
+                                fmpz_mpoly_t B, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_SWAP(fmpz_mpoly_struct, *A, *B);
 }
@@ -231,7 +230,7 @@ int fmpz_mpoly_equal_si(const fmpz_mpoly_t A,
                                           slong c, const fmpz_mpoly_ctx_t ctx);
 
 FMPZ_MPOLY_INLINE
-int fmpz_mpoly_is_zero(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
+int fmpz_mpoly_is_zero(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
    return A->length == 0;
 }
@@ -344,20 +343,20 @@ int fmpz_mpoly_is_canonical(const fmpz_mpoly_t A,
                                                    const fmpz_mpoly_ctx_t ctx);
 
 FMPZ_MPOLY_INLINE
-slong fmpz_mpoly_length(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
+slong fmpz_mpoly_length(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     return A->length;
 }
 
 void fmpz_mpoly_resize(fmpz_mpoly_t A, slong new_length, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_get_term_coeff_fmpz(fmpz_t c, const fmpz_mpoly_t A, slong i, const fmpz_mpoly_ctx_t ctx);
-ulong fmpz_mpoly_get_term_coeff_ui(const fmpz_mpoly_t A, slong i, const fmpz_mpoly_ctx_t ctx);
-slong fmpz_mpoly_get_term_coeff_si(const fmpz_mpoly_t A, slong i, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_get_term_coeff_fmpz(fmpz_t c, const fmpz_mpoly_t A, slong i, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx));
+ulong fmpz_mpoly_get_term_coeff_ui(const fmpz_mpoly_t A, slong i, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx));
+slong fmpz_mpoly_get_term_coeff_si(const fmpz_mpoly_t A, slong i, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx));
 
-void fmpz_mpoly_set_term_coeff_fmpz(fmpz_mpoly_t A, slong i, const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
-void fmpz_mpoly_set_term_coeff_ui(fmpz_mpoly_t A, slong i, ulong c, const fmpz_mpoly_ctx_t ctx);
-void fmpz_mpoly_set_term_coeff_si(fmpz_mpoly_t A, slong i, slong c, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_set_term_coeff_fmpz(fmpz_mpoly_t A, slong i, const fmpz_t c, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx));
+void fmpz_mpoly_set_term_coeff_ui(fmpz_mpoly_t A, slong i, ulong c, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx));
+void fmpz_mpoly_set_term_coeff_si(fmpz_mpoly_t A, slong i, slong c, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx));
 
 int fmpz_mpoly_term_exp_fits_ui(const fmpz_mpoly_t A, slong i, const fmpz_mpoly_ctx_t ctx);
 int fmpz_mpoly_term_exp_fits_si(const fmpz_mpoly_t A, slong i, const fmpz_mpoly_ctx_t ctx);
@@ -854,11 +853,9 @@ int fmpz_mpoly_gcd_zippel2(fmpz_mpoly_t G,
 
 /* Univariates ***************************************************************/
 
-void fmpz_mpoly_univar_init(fmpz_mpoly_univar_t A,
-                                                   const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_univar_init(fmpz_mpoly_univar_t A, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx));
 
-void fmpz_mpoly_univar_clear(fmpz_mpoly_univar_t A,
-                                                   const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_univar_clear(fmpz_mpoly_univar_t A, const fmpz_mpoly_ctx_t ctx);
 
 void fmpz_mpoly_univar_fit_length(fmpz_mpoly_univar_t A,
                                      slong length, const fmpz_mpoly_ctx_t ctx);
@@ -870,7 +867,7 @@ void fmpz_mpoly_univar_assert_canonical(fmpz_mpoly_univar_t A,
                                                    const fmpz_mpoly_ctx_t ctx);
 
 FMPZ_MPOLY_INLINE
-void fmpz_mpoly_univar_zero(fmpz_mpoly_univar_t A, const fmpz_mpoly_ctx_t ctx)
+void fmpz_mpoly_univar_zero(fmpz_mpoly_univar_t A, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     A->length = 0;
 }
@@ -889,21 +886,21 @@ void fmpz_mpoly_from_univar(fmpz_mpoly_t A,
 
 FMPZ_MPOLY_INLINE
 void fmpz_mpoly_univar_swap(fmpz_mpoly_univar_t A, fmpz_mpoly_univar_t B,
-                                                    const fmpz_mpoly_ctx_t ctx)
+                                                    const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_SWAP(fmpz_mpoly_univar_struct, *A, *B);
 }
 
-int fmpz_mpoly_univar_degree_fits_si(const fmpz_mpoly_univar_t A, const fmpz_mpoly_ctx_t ctx);
+int fmpz_mpoly_univar_degree_fits_si(const fmpz_mpoly_univar_t A, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx));
 
 FMPZ_MPOLY_INLINE
 slong fmpz_mpoly_univar_length(const fmpz_mpoly_univar_t A,
-                                                    const fmpz_mpoly_ctx_t ctx)
+                                                    const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     return A->length;
 }
 
-slong fmpz_mpoly_univar_get_term_exp_si(fmpz_mpoly_univar_t A, slong i, const fmpz_mpoly_ctx_t ctx);
+slong fmpz_mpoly_univar_get_term_exp_si(fmpz_mpoly_univar_t A, slong i, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx));
 
 FMPZ_MPOLY_INLINE
 void fmpz_mpoly_univar_get_term_coeff(fmpz_mpoly_t c,
@@ -959,7 +956,7 @@ typedef fmpz_mpoly_vec_struct fmpz_mpoly_vec_t[1];
 
 void fmpz_mpoly_vec_init(fmpz_mpoly_vec_t vec, slong len, const fmpz_mpoly_ctx_t ctx);
 void fmpz_mpoly_vec_print(const fmpz_mpoly_vec_t F, const fmpz_mpoly_ctx_t ctx);
-void fmpz_mpoly_vec_swap(fmpz_mpoly_vec_t x, fmpz_mpoly_vec_t y, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_vec_swap(fmpz_mpoly_vec_t x, fmpz_mpoly_vec_t y, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx));
 void fmpz_mpoly_vec_fit_length(fmpz_mpoly_vec_t vec, slong len, const fmpz_mpoly_ctx_t ctx);
 void fmpz_mpoly_vec_clear(fmpz_mpoly_vec_t vec, const fmpz_mpoly_ctx_t ctx);
 void fmpz_mpoly_vec_set(fmpz_mpoly_vec_t dest, const fmpz_mpoly_vec_t src, const fmpz_mpoly_ctx_t ctx);

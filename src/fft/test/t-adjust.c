@@ -41,8 +41,6 @@ TEST_FUNCTION_START(fft_adjust, state)
     mpz_t p, m2a, m2b, mn1;
     mp_limb_t * nn1, * r1;
 
-    _flint_rand_init_gmp(state);
-
     mpz_init(p);
     mpz_init(m2a);
     mpz_init(m2b);

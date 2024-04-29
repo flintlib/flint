@@ -53,7 +53,7 @@ void nmod_mat_init_nullspace_tr(nmod_mat_t X, nmod_mat_t tmp);
 /*****************************************************************************/
 
 NMOD_MPOLY_FACTOR_INLINE
-void nmod_mpoly_factor_init(nmod_mpoly_factor_t f, const nmod_mpoly_ctx_t ctx)
+void nmod_mpoly_factor_init(nmod_mpoly_factor_t f, const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
 	f->constant = 1;
     f->poly  = NULL;
@@ -76,14 +76,14 @@ void nmod_mpoly_factor_clear(nmod_mpoly_factor_t f,
 
 NMOD_MPOLY_FACTOR_INLINE
 slong nmod_mpoly_factor_length(const nmod_mpoly_factor_t f,
-                                                    const nmod_mpoly_ctx_t ctx)
+                                                    const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     return f->num;
 }
 
 NMOD_MPOLY_FACTOR_INLINE
 ulong nmod_mpoly_factor_get_constant_ui(const nmod_mpoly_factor_t f,
-                                                    const nmod_mpoly_ctx_t ctx)
+                                                    const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     return f->constant;
 }
@@ -158,7 +158,7 @@ int nmod_mpoly_factor_fix_units(nmod_mpoly_factor_t f,
 
 NMOD_MPOLY_FACTOR_INLINE
 void nmod_mpoly_factor_swap(nmod_mpoly_factor_t f, nmod_mpoly_factor_t g,
-                                                    const nmod_mpoly_ctx_t ctx)
+                                                    const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
    nmod_mpoly_factor_struct t = *f;
    *f = *g;
@@ -166,7 +166,7 @@ void nmod_mpoly_factor_swap(nmod_mpoly_factor_t f, nmod_mpoly_factor_t g,
 }
 
 NMOD_MPOLY_FACTOR_INLINE
-void nmod_mpoly_factor_one(nmod_mpoly_factor_t f, const nmod_mpoly_ctx_t ctx)
+void nmod_mpoly_factor_one(nmod_mpoly_factor_t f, const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
 	f->constant = 1;
 	f->num = 0;
@@ -222,7 +222,7 @@ typedef struct
 typedef nmod_mpolyv_struct nmod_mpolyv_t[1];
 
 NMOD_MPOLY_FACTOR_INLINE
-void nmod_mpolyv_init(nmod_mpolyv_t A, const nmod_mpoly_ctx_t ctx)
+void nmod_mpolyv_init(nmod_mpolyv_t A, const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     A->coeffs = NULL;
     A->alloc = 0;
@@ -231,7 +231,7 @@ void nmod_mpolyv_init(nmod_mpolyv_t A, const nmod_mpoly_ctx_t ctx)
 
 NMOD_MPOLY_FACTOR_INLINE
 void nmod_mpolyv_swap(nmod_mpolyv_t A, nmod_mpolyv_t B,
-                                                    const nmod_mpoly_ctx_t ctx)
+                                                    const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
    nmod_mpolyv_struct t = *A;
    *A = *B;

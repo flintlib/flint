@@ -16,6 +16,7 @@
 #include "fmpz.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
+#include "mpn_mod.h"
 #include "nmod_poly.h"
 #include "fq.h"
 #include "fq_nmod.h"
@@ -53,10 +54,16 @@ void _nmod_poly_mul_mid_default_mpn_ctx(mp_ptr res, slong zl, slong zh, mp_srcpt
 #define STEP_BITS for (bits = 1, j = 0; bits <= 64; bits++, j++)
 #endif
 
-#if 1
-#define INIT_CTX fmpz_t t; fmpz_init(t); fmpz_ui_pow_ui(t, 2, bits - 1); fmpz_add_ui(t, t, 1); /* fmpz_nextprime(t, t, 0); */ gr_ctx_init_fmpz_mod(ctx, t); fmpz_clear(t);
+#if 0
+#define INIT_CTX fmpz_t t; fmpz_init(t); fmpz_ui_pow_ui(t, 2, bits - 1); fmpz_add_ui(t, t, 1); fmpz_nextprime(t, t, 0); gr_ctx_init_fmpz_mod(ctx, t); fmpz_clear(t);
 #define RANDCOEFF(t, ctx) fmpz_mod_rand(t, state, gr_ctx_data_as_ptr(ctx));
 #define STEP_BITS for (bits = 32, j = 0; bits <= 65536; bits = next_powhalf2(bits), j++)
+#endif
+
+#if 1
+#define INIT_CTX fmpz_t t; fmpz_init(t); fmpz_ui_pow_ui(t, 2, bits - 1); fmpz_add_ui(t, t, 1); fmpz_nextprime(t, t, 0); GR_MUST_SUCCEED(gr_ctx_init_mpn_mod(ctx, t)); fmpz_clear(t);
+#define RANDCOEFF(t, ctx) fmpz_mod_rand(t, state, gr_ctx_data_as_ptr(ctx));
+#define STEP_BITS for (bits = 80, j = 0; bits <= 1024; bits = bits + 16, j++)
 #endif
 
 #if 0
@@ -78,7 +85,7 @@ void _nmod_poly_mul_mid_default_mpn_ctx(mp_ptr res, slong zl, slong zh, mp_srcpt
 #endif
 
 
-#if 1
+#if 0
 #define INFO "inv_series"
 #define SETUP random_input(A, state, len, ctx); \
               GR_IGNORE(gr_poly_set_coeff_si(A, 0, 1, ctx));
@@ -138,6 +145,15 @@ void _nmod_poly_mul_mid_default_mpn_ctx(mp_ptr res, slong zl, slong zh, mp_srcpt
 #endif
 
 #if 0
+#define INFO "div"
+#define SETUP random_input(A, state, 2 * len, ctx); \
+              random_input(B, state, len, ctx); \
+              GR_IGNORE(gr_poly_set_coeff_si(B, len - 1, 1, ctx));
+#define CASE_A GR_IGNORE(gr_poly_div_basecase(C, A, B, ctx));
+#define CASE_B GR_IGNORE(gr_poly_div_newton(C, A, B, ctx));
+#endif
+
+#if 0
 #define INFO "divrem (nmod basecase)"
 #define SETUP random_input(A, state, 2 * len, ctx); \
               random_input(B, state, len, ctx); \
@@ -155,6 +171,16 @@ void _nmod_poly_mul_mid_default_mpn_ctx(mp_ptr res, slong zl, slong zh, mp_srcpt
 #define CASE_A GR_IGNORE(gr_poly_set(D, A, ctx)); fmpz_mod_poly_divrem_basecase(C, D, D, B, gr_ctx_data_as_ptr(ctx));
 #define CASE_B GR_IGNORE(gr_poly_set(D, A, ctx)); GR_IGNORE(gr_poly_divrem_newton(C, D, D, B, ctx));
 #endif
+
+#if 0
+#define INFO "divrem (mpn_mod basecase)"
+#define SETUP random_input(A, state, 2 * len, ctx); \
+              random_input(B, state, len, ctx); \
+              GR_IGNORE(gr_poly_set_coeff_si(B, len - 1, 1, ctx));
+#define CASE_A GR_IGNORE(gr_poly_set(D, A, ctx)); mpn_mod_poly_divrem_basecase(C, D, D, B, ctx);
+#define CASE_B GR_IGNORE(gr_poly_set(D, A, ctx)); GR_IGNORE(gr_poly_divrem_newton(C, D, D, B, ctx));
+#endif
+
 
 #if 0
 #define INFO "mul (nmod)"
@@ -186,6 +212,22 @@ void _nmod_poly_mul_mid_default_mpn_ctx(mp_ptr res, slong zl, slong zh, mp_srcpt
                _nmod_poly_mul_mid_default_mpn_ctx(C->coeffs, 0, B->length, A->coeffs, A->length, B->coeffs, B->length, ((nmod_t *) gr_ctx_data_ptr(ctx))[0]);
 #endif
 
+#if 1
+#define INFO "divexact (basecase -> bidirectional)"
+#define SETUP random_input(C, state, len, ctx); \
+              random_input(B, state, len, ctx); \
+              GR_IGNORE(gr_poly_mul(A, B, C, ctx));
+#define CASE_A GR_IGNORE(gr_poly_divexact_basecase(C, A, B, ctx));
+#define CASE_B GR_IGNORE(gr_poly_divexact_bidirectional(C, A, B, ctx));
+#endif
+
+#if 0
+#define INFO "gcd"
+#define SETUP random_input(A, state, len, ctx); \
+              random_input(B, state, len, ctx);
+#define CASE_A GR_MUST_SUCCEED(gr_poly_gcd_euclidean(C, A, B, ctx));
+#define CASE_B GR_MUST_SUCCEED(gr_poly_gcd_hgcd(C, A, B, len / 3, len, ctx));
+#endif
 
 void random_input(gr_poly_t A, flint_rand_t state, slong len, gr_ctx_t ctx)
 {

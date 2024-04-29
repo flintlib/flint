@@ -15,7 +15,8 @@
 void _fmpq_mpoly_get_coeff_fmpq_fmpz(fmpq_t c, const fmpq_mpoly_t qpoly,
                                   const fmpz * exp, const fmpq_mpoly_ctx_t qctx)
 {
-    slong N, index, exp_bits;
+    slong N, index;
+    flint_bitcnt_t exp_bits;
     ulong * cmpmask, * packed_exp;
     int exists;
     const fmpz_mpoly_struct * poly = qpoly->zpoly;

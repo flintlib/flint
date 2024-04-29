@@ -25,7 +25,7 @@ TEST_FUNCTION_START(gr_nmod, state)
         n = n_randtest_not_zero(state);
         gr_ctx_init_nmod(ZZn, n);
         if (n_randint(state, 2))
-            gr_ctx_nmod_set_primality(ZZn, n_is_prime(n) ? T_TRUE : T_FALSE);
+            GR_MUST_SUCCEED(gr_ctx_set_is_field(ZZn, n_is_prime(n) ? T_TRUE : T_FALSE));
         gr_test_ring(ZZn, 100, flags);
         gr_ctx_clear(ZZn);
     }

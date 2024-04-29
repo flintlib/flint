@@ -46,6 +46,7 @@
 #include "t-inv_series.c"
 #include "t-log_series.c"
 #include "t-make_monic.c"
+#include "t-mul_karatsuba.c"
 #include "t-nth_derivative.c"
 #include "t-pow_series_fmpq.c"
 #include "t-pow_series_ui.c"
@@ -66,6 +67,7 @@
 #include "t-taylor_shift_convolution.c"
 #include "t-taylor_shift_divconquer.c"
 #include "t-taylor_shift_horner.c"
+#include "t-xgcd.c"
 #include "t-xgcd_euclidean.c"
 #include "t-xgcd_hgcd.c"
 
@@ -105,6 +107,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_poly_inv_series),
     TEST_FUNCTION(gr_poly_log_series),
     TEST_FUNCTION(gr_poly_make_monic),
+    TEST_FUNCTION(gr_poly_mul_karatsuba),
     TEST_FUNCTION(gr_poly_nth_derivative),
     TEST_FUNCTION(gr_poly_pow_series_fmpq),
     TEST_FUNCTION(gr_poly_pow_series_ui),
@@ -125,6 +128,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_poly_taylor_shift_convolution),
     TEST_FUNCTION(gr_poly_taylor_shift_divconquer),
     TEST_FUNCTION(gr_poly_taylor_shift_horner),
+    TEST_FUNCTION(gr_poly_xgcd),
     TEST_FUNCTION(gr_poly_xgcd_euclidean),
     TEST_FUNCTION(gr_poly_xgcd_hgcd)
 };

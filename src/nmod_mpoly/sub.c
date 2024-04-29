@@ -120,7 +120,8 @@ slong _nmod_mpoly_sub(ulong * coeff1,       ulong * exp1,
 void nmod_mpoly_sub(nmod_mpoly_t poly1, const nmod_mpoly_t poly2,
                           const nmod_mpoly_t poly3, const nmod_mpoly_ctx_t ctx)
 {
-    slong len1 = 0, max_bits, N;
+    slong len1 = 0, N;
+    ulong max_bits;
     ulong * exp2 = poly2->exps, * exp3 = poly3->exps;
     ulong * cmpmask;
     int free2 = 0, free3 = 0;

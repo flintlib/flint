@@ -24,7 +24,7 @@ void fq_nmod_mpoly_get_term(
     flint_bitcnt_t bits = A->bits;
     slong N = mpoly_words_per_exp(bits, ctx->minfo);
 
-    if (i >= (ulong) A->length)
+    if (i >= A->length)
     {
         flint_throw(FLINT_ERROR, "fq_nmod_mpoly_get_term: index out of range");
     }

@@ -18,7 +18,7 @@ static int _fmpz_mpoly_evaluate_all_tree_fmpq_sp(fmpq_t ev, const fmpz_mpoly_t p
 {
     int success = 1;
     flint_bitcnt_t bits = poly->bits;
-    slong i, j, k, N, nvars = ctx->minfo->nvars;
+    slong i, k, N, nvars = ctx->minfo->nvars;
     slong entries, k_len, shift, off;
     slong p_len = poly->length;
     const fmpz * p_coeff = poly->coeffs;
@@ -59,7 +59,9 @@ static int _fmpz_mpoly_evaluate_all_tree_fmpq_sp(fmpq_t ev, const fmpz_mpoly_t p
     k = 0;
     for (i = 0; i < nvars; i++)
     {
-        flint_bitcnt_t varibits = FLINT_BIT_COUNT(degrees[i]);
+        flint_bitcnt_t j, varibits;
+
+        varibits = FLINT_BIT_COUNT(degrees[i]);
 
         mpoly_gen_offset_shift_sp(&off, &shift, i, bits, ctx->minfo);
         for (j = 0; j < varibits; j++)
@@ -108,7 +110,7 @@ static int _fmpz_mpoly_evaluate_all_fmpq_mp(fmpq_t ev, const fmpz_mpoly_t poly,
 {
     int success = 1;
     flint_bitcnt_t bits = poly->bits;
-    slong i, j, k, N,  nvars = ctx->minfo->nvars;
+    slong i, k, N,  nvars = ctx->minfo->nvars;
     slong entries, k_len, off;
     slong p_len = poly->length;
     const fmpz * p_coeff = poly->coeffs;
@@ -149,7 +151,9 @@ static int _fmpz_mpoly_evaluate_all_fmpq_mp(fmpq_t ev, const fmpz_mpoly_t poly,
     k = 0;
     for (i = 0; i < nvars; i++)
     {
-        flint_bitcnt_t varibits = fmpz_bits(degrees + i);
+        flint_bitcnt_t j, varibits;
+
+        varibits = fmpz_bits(degrees + i);
 
         off = mpoly_gen_offset_mp(i, bits, ctx->minfo);
         for (j = 0; j < varibits; j++)

@@ -48,7 +48,7 @@ int fq_ctx_fprint(FILE * file, const fq_ctx_t ctx)
 
 void fq_ctx_print(const fq_ctx_t ctx) { fq_ctx_fprint(stdout, ctx); }
 
-int fq_fprint(FILE * file, const fq_t op, const fq_ctx_t ctx) { return fmpz_poly_fprint(file, op); }
-void fq_print(const fq_t op, const fq_ctx_t ctx) { fmpz_poly_print(op); }
+int fq_fprint(FILE * file, const fq_t op, const fq_ctx_t FLINT_UNUSED(ctx)) { return fmpz_poly_fprint(file, op); }
+void fq_print(const fq_t op, const fq_ctx_t FLINT_UNUSED(ctx)) { fmpz_poly_print(op); }
 int fq_fprint_pretty(FILE * file, const fq_t op, const fq_ctx_t ctx) { return fmpz_poly_fprint_pretty(file, op, ctx->var); }
 int fq_print_pretty(const fq_t op, const fq_ctx_t ctx) { return fmpz_poly_print_pretty(op, ctx->var); }

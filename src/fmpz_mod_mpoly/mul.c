@@ -64,7 +64,7 @@ static int _try_dense(
         goto cleanup;
     }
 
-    ret = dense_size < product_count/32;
+    ret = dense_size < (ulong) (product_count/32);
 
 cleanup:
 

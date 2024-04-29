@@ -41,10 +41,10 @@ TEST_FUNCTION_START(flint_mpn_mul, state)
         rp1 = flint_malloc(sizeof(mp_limb_t) * (m + n));
         rp2 = flint_malloc(sizeof(mp_limb_t) * (m + n));
 
-        mpn_random2(xp, m);
-        mpn_random2(yp, n);
+        flint_mpn_rrandom(xp, state, m);
+        flint_mpn_rrandom(yp, state, n);
 
-        mpn_random(rp2, m + n);
+        flint_mpn_rrandom(rp2, state, m + n);
 
         ret1 = mpn_mul(rp1, xp, m, yp, n);
         ret2 = flint_mpn_mul(rp2, xp, m, yp, n);
@@ -72,3 +72,6 @@ TEST_FUNCTION_START(flint_mpn_mul, state)
 
 #undef N_MIN
 #undef N_MAX
+#undef WANT_BIG
+#undef N_MIN_STOR
+#undef N_MAX_STOR

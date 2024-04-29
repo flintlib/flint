@@ -27,7 +27,7 @@ void mpoly_get_cmpmask(ulong * cmpmask, slong N, flint_bitcnt_t bits,
         }
         else
         {
-            for (i = 0; i < N - bits/FLINT_BITS; i++)
+            for (i = 0; i < N - (slong) bits/FLINT_BITS; i++)
                 cmpmask[i] = -UWORD(1);
             for (; i < N; i++)
                 cmpmask[i] = UWORD(0);

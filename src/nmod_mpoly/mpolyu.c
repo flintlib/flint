@@ -18,7 +18,7 @@
 #include "nmod_mpoly_factor.h"
 
 void nmod_mpolyu_init(nmod_mpolyu_t A, flint_bitcnt_t bits,
-                                                    const nmod_mpoly_ctx_t ctx)
+                                                    const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     A->coeffs = NULL;
     A->exps = NULL;
@@ -560,6 +560,8 @@ void nmod_mpoly_from_mpolyl_perm_inflate(
 
 /** 2 variables *************************************/
 
+/* FIXME: Unused functions? /Albin */
+#if 0
 /*
     Convert B to A using the variable permutation perm.
     The uctx should be the context of the coefficients of A.
@@ -576,7 +578,7 @@ void nmod_mpoly_from_mpolyl_perm_inflate(
     the coefficients of A use variables Aexp[2], ..., Aexp[m + 1]
     maxexps if it exists is supposed to be a degree bound on B
 */
-void nmod_mpoly_to_mpolyuu_perm_deflate_threaded_pool(
+static void nmod_mpoly_to_mpolyuu_perm_deflate_threaded_pool(
     nmod_mpolyu_t A,
     const nmod_mpoly_ctx_t uctx,
     const nmod_mpoly_t B,
@@ -584,9 +586,9 @@ void nmod_mpoly_to_mpolyuu_perm_deflate_threaded_pool(
     const slong * perm,
     const ulong * shift,
     const ulong * stride,
-    const ulong * maxexps, /* nullptr is ok */
-    const thread_pool_handle * handles,
-    slong num_handles)
+    const ulong * FLINT_UNUSED(maxexps), /* nullptr is ok */
+    const thread_pool_handle * FLINT_UNUSED(handles),
+    slong FLINT_UNUSED(num_handles))
 {
     slong i, j, k, l;
     slong n = ctx->minfo->nvars;
@@ -649,7 +651,6 @@ void nmod_mpoly_to_mpolyuu_perm_deflate_threaded_pool(
     }
 }
 
-
 /*
     Convert B to A using the variable permutation vector perm.
     A must be constructed with bits = Abits.
@@ -663,7 +664,7 @@ void nmod_mpoly_to_mpolyuu_perm_deflate_threaded_pool(
             l = perm[k]
             Aexp[l] += scale[l]*Bexp[k]
 */
-void nmod_mpoly_from_mpolyuu_perm_inflate( /* only for 2 main vars */
+static void nmod_mpoly_from_mpolyuu_perm_inflate( /* only for 2 main vars */
     nmod_mpoly_t A,
     flint_bitcnt_t Abits,
     const nmod_mpoly_ctx_t ctx,
@@ -735,7 +736,7 @@ void nmod_mpoly_from_mpolyuu_perm_inflate( /* only for 2 main vars */
     nmod_mpoly_sort_terms(A, ctx);
     TMP_END;
 }
-
+#endif
 
 
 void nmod_mpolyu_shift_right(nmod_mpolyu_t A, ulong s)
@@ -858,7 +859,7 @@ void nmod_mpolyu_cvtfrom_poly_notmain(nmod_mpolyu_t A, nmod_poly_t a,
     convert it to a poly "a".
 */
 void nmod_mpolyu_cvtto_poly(nmod_poly_t a, nmod_mpolyu_t A,
-                                                    const nmod_mpoly_ctx_t ctx)
+                                                    const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     slong i;
     nmod_poly_zero(a);

@@ -17,7 +17,7 @@
 void nmod_mpolyun_init(
     nmod_mpolyun_t A,
     flint_bitcnt_t bits,
-    const nmod_mpoly_ctx_t ctx)
+    const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     A->coeffs = NULL;
     A->exps = NULL;
@@ -169,7 +169,7 @@ void nmod_mpolyun_shift_left(nmod_mpolyun_t A, ulong s)
     }
 }
 
-slong nmod_mpolyun_lastdeg(nmod_mpolyun_t A, const nmod_mpoly_ctx_t ctx)
+slong nmod_mpolyun_lastdeg(nmod_mpolyun_t A, const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     slong i, j;
     slong deg = -WORD(1);
@@ -185,7 +185,7 @@ slong nmod_mpolyun_lastdeg(nmod_mpolyun_t A, const nmod_mpoly_ctx_t ctx)
     return deg;
 }
 
-slong nmod_mpolyn_lastdeg(nmod_mpolyn_t A, const nmod_mpoly_ctx_t ctx)
+slong nmod_mpolyn_lastdeg(nmod_mpolyn_t A, const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     slong i;
     slong deg = -WORD(1);
@@ -255,11 +255,11 @@ void nmod_mpolyun_one(nmod_mpolyun_t A, const nmod_mpoly_ctx_t ctx)
     A->length = 1;
 }
 
-void nmod_mpolyn_set_mod(nmod_mpolyn_t A, const nmod_t mod)
+void nmod_mpolyn_set_mod(nmod_mpolyn_t FLINT_UNUSED(A), const nmod_t FLINT_UNUSED(mod))
 {
 }
 
-void nmod_mpolyun_set_mod(nmod_mpolyun_t A, const nmod_t mod)
+void nmod_mpolyun_set_mod(nmod_mpolyun_t FLINT_UNUSED(A), const nmod_t FLINT_UNUSED(mod))
 {
 }
 
@@ -707,8 +707,8 @@ void nmod_mpoly_to_mpolyn_perm_deflate_threaded_pool(
     const slong * perm,
     const ulong * shift,
     const ulong * stride,
-    const thread_pool_handle * handles,
-    slong num_handles)
+    const thread_pool_handle * FLINT_UNUSED(handles),
+    slong FLINT_UNUSED(num_handles))
 {
     slong j, k, l;
     slong NA = mpoly_words_per_exp_sp(A->bits, nctx->minfo);

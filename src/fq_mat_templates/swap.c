@@ -16,7 +16,7 @@
 
 void
 TEMPLATE(T, mat_swap) (TEMPLATE(T, mat_t) mat1, TEMPLATE(T, mat_t) mat2,
-                       const TEMPLATE(T, ctx_t) ctx)
+                       const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx))
 {
     FLINT_SWAP(TEMPLATE(T, mat_struct), *mat1, *mat2);
 }

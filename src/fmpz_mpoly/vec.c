@@ -46,7 +46,7 @@ fmpz_mpoly_vec_print(const fmpz_mpoly_vec_t F, const fmpz_mpoly_ctx_t ctx)
 }
 
 void
-fmpz_mpoly_vec_swap(fmpz_mpoly_vec_t x, fmpz_mpoly_vec_t y, const fmpz_mpoly_ctx_t ctx)
+fmpz_mpoly_vec_swap(fmpz_mpoly_vec_t x, fmpz_mpoly_vec_t y, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     fmpz_mpoly_vec_t tmp;
     *tmp = *x;

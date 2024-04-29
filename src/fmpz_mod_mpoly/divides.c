@@ -15,9 +15,9 @@
 
 static int _fmpz_mod_mpoly_divides_try_dense(
     const fmpz * maxAfields,
-    const fmpz * maxBfields,
+    const fmpz * FLINT_UNUSED(maxBfields),
     slong Alen,
-    slong Blen,
+    slong FLINT_UNUSED(Blen),
     const mpoly_ctx_t mctx)
 {
     const int max_bit_size = FLINT_MIN(FLINT_BITS/3 + 16, FLINT_BITS - 4);
@@ -50,7 +50,7 @@ static int _fmpz_mod_mpoly_divides_try_dense(
     TMP_END;
 
     return total_dense_size < (UWORD(1) << max_bit_size) &&
-           total_dense_size/16 < Alen;
+           total_dense_size / 16 < (ulong) Alen;
 }
 
 

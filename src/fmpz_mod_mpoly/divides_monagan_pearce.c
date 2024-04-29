@@ -97,7 +97,7 @@ static int _fmpz_mod_mpoly_divides_monagan_pearce1(
                 *store++ = x->i;
                 *store++ = x->j;
 
-                if (x->i == -WORD(1))
+                if (x->i == -UWORD(1))
                 {
                     fmpz Aj = Acoeffs[x->j];
 
@@ -356,7 +356,7 @@ int _fmpz_mod_mpoly_divides_monagan_pearce(
                 *store++ = x->i;
                 *store++ = x->j;
 
-                if (x->i == -WORD(1))
+                if (x->i == -UWORD(1))
                 {
                     fmpz Aj = Acoeffs[x->j];
 

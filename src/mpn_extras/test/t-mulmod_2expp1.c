@@ -16,13 +16,10 @@
 TEST_FUNCTION_START(flint_mpn_mulmod_2expp1, state)
 {
     ulong xn, yn, b, zn, c, dn;
-    gmp_randstate_t rands;
     int k, cc;
     mp_limb_t xp[10000], dp[10000], qp[10000], yp[10000];
     mp_limb_t rp[10000], zp[10000], tp[10000], tb;
     int result = 1;
-
-    gmp_randinit_default(rands);
 
     b = 1;
     tb = 1;
@@ -45,8 +42,8 @@ TEST_FUNCTION_START(flint_mpn_mulmod_2expp1, state)
             dn++; /* dp is 2^b+1 */
 
         for (c = 0; c < 20; c++) {
-            mpn_random2(xp, xn);
-            mpn_random2(yp, xn);
+            flint_mpn_rrandom(xp, state, xn);
+            flint_mpn_rrandom(yp, state, xn);
             xp[xn-1] &= GMP_NUMB_MASK >> k;
             yp[xn-1] &= GMP_NUMB_MASK >> k;
             mpn_mul_n(zp, xp, yp, xn);
@@ -90,7 +87,7 @@ TEST_FUNCTION_START(flint_mpn_mulmod_2expp1, state)
             dn++; /* dp is 2^b+1 */
 
         for (c = 0; c < 20; c++) {
-            mpn_random2(xp, xn);
+            flint_mpn_rrandom(xp, state, xn);
             mpn_zero(yp, xn); /* set yp to 2^b */
             xp[xn-1] &= GMP_NUMB_MASK >> k;
             yp[xn-1] &= GMP_NUMB_MASK >> k;
@@ -143,7 +140,7 @@ TEST_FUNCTION_START(flint_mpn_mulmod_2expp1, state)
             dn++; /* dp is 2^b+1 */
 
         for (c = 0; c < 20; c++) {
-            mpn_random2(xp, xn);
+            flint_mpn_rrandom(xp, state, xn);
             mpn_zero(yp, xn); /* set yp to 2^b */
             xp[xn-1] &= GMP_NUMB_MASK >> k;
             yp[xn-1] &= GMP_NUMB_MASK >> k;
@@ -212,8 +209,6 @@ TEST_FUNCTION_START(flint_mpn_mulmod_2expp1, state)
                 TEST_FUNCTION_FAIL("b = %wd\n", b);
         }
     }
-
-    gmp_randclear(rands);
 
     TEST_FUNCTION_END(state);
 }

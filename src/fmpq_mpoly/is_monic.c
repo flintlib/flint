@@ -11,7 +11,7 @@
 
 #include "fmpq_mpoly.h"
 
-int fmpq_mpoly_is_monic(const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t ctx)
+int fmpq_mpoly_is_monic(const fmpq_mpoly_t A, const fmpq_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     int res;
     fmpz_t t;

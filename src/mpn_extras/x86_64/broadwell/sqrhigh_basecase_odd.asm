@@ -215,13 +215,13 @@ L(end):	adox	r3a, r0
 	adox	ix, r1
 	adc	ix, r0
 	adc	ix, r1
+	cmp	R32(mx), R32(mx_final)
 	mov	r0, 0*8(rp)
 	mov	r1, 1*8(rp)
-	mov	2*8(ap), %rdx		C Load second factor
-	cmp	R32(mx), R32(mx_final)
-	lea	(ap,mx), ap		C Reset ap
 	lea	3*8(rp,mx), rp		C Reset rp
 	jg	L(lsh)
+	mov	2*8(ap), %rdx		C Load second factor
+	lea	(ap,mx), ap		C Reset ap
 	je	L(jmp)
 	mulx	0*8(ap), ix, ix
 L(jmp):	mulx	1*8(ap), r2, r3a
@@ -288,11 +288,10 @@ define(`ld2', `mx')
 define(`ld3', `ix_save')
 
 	C Left shift rp by one and add diagonal
-L(lsh):	neg	mx_final
+L(lsh):	sar	$4, mx_final
 	lea	L(dtab)(%rip), ld2
-	shr	$4, R32(mx_final)
-	inc	R32(mx_final)
-	lea	2*8(ap,mx_final,8), ap
+	lea	1*8(ap,mx_final,8), ap
+	neg	mx_final
 	mov	0*8(rp), ld1
 	or	R32(mx_final), R32(ix)
 	shr	$2, R32(ix)
@@ -397,12 +396,10 @@ undefine(`ld3')
 	pop	%rbx
 
 	ret
-
+EPILOGUE()
 	JUMPTABSECT
 	ALIGN(8)
 L(dtab):JMPENT(	L(dp0), L(dtab))
 	JMPENT(	L(dp1), L(dtab))
 	JMPENT(	L(dp2), L(dtab))
 	JMPENT(	L(dp3), L(dtab))
-	TEXT
-EPILOGUE()

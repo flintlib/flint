@@ -14,7 +14,7 @@
 
 void
 fq_nmod_bit_pack(fmpz_t f, const fq_nmod_t op, flint_bitcnt_t bit_size,
-                 const fq_nmod_ctx_t ctx)
+                 const fq_nmod_ctx_t FLINT_UNUSED(ctx))
 {
     nmod_poly_bit_pack(f, op, bit_size);
 }

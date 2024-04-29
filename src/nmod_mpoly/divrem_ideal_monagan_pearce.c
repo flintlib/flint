@@ -111,10 +111,10 @@ int _nmod_mpoly_divrem_ideal_monagan_pearce1(
                 *store++ = x->j;
                 *store++ = x->p;
 
-                if (x->i != -WORD(1))
+                if (x->i != -UWORD(1))
                     hinds[x->p][x->i] |= WORD(1);
 
-                if (x->i == -WORD(1))
+                if (x->i == -UWORD(1))
                 {
                     add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0,
                            WORD(0), WORD(0), ctx->mod.n - Acoeffs[x->j]);
@@ -360,7 +360,7 @@ int _nmod_mpoly_divrem_ideal_monagan_pearce(
                 *store++ = x->j;
                 *store++ = x->p;
 
-                if (x->i == -WORD(1))
+                if (x->i == -UWORD(1))
                 {
                     add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0,
                          UWORD(0), UWORD(0), ctx->mod.n - Acoeffs[x->j]);

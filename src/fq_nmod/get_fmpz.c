@@ -12,7 +12,7 @@
 #include "fmpz.h"
 #include "fq_nmod.h"
 
-int fq_nmod_get_fmpz(fmpz_t a, const fq_nmod_t b, const fq_nmod_ctx_t ctx)
+int fq_nmod_get_fmpz(fmpz_t a, const fq_nmod_t b, const fq_nmod_ctx_t FLINT_UNUSED(ctx))
 {
     if (b->length > 1)
         return 0;

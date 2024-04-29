@@ -82,7 +82,55 @@ const flint_mpn_sqr_func_t flint_mpn_sqrhigh_func_tab[] =
     flint_mpn_sqrhigh_7,
     flint_mpn_sqrhigh_8
 };
+#elif FLINT_HAVE_ASSEMBLY_armv8
+mp_limb_t flint_mpn_mulhigh_1(mp_ptr, mp_srcptr, mp_srcptr);
+mp_limb_t flint_mpn_mulhigh_2(mp_ptr, mp_srcptr, mp_srcptr);
+mp_limb_t flint_mpn_mulhigh_3(mp_ptr, mp_srcptr, mp_srcptr);
+mp_limb_t flint_mpn_mulhigh_4(mp_ptr, mp_srcptr, mp_srcptr);
+mp_limb_t flint_mpn_mulhigh_5(mp_ptr, mp_srcptr, mp_srcptr);
+mp_limb_t flint_mpn_mulhigh_6(mp_ptr, mp_srcptr, mp_srcptr);
+mp_limb_t flint_mpn_mulhigh_7(mp_ptr, mp_srcptr, mp_srcptr);
+mp_limb_t flint_mpn_mulhigh_8(mp_ptr, mp_srcptr, mp_srcptr);
 
+mp_limb_t flint_mpn_sqrhigh_1(mp_ptr, mp_srcptr);
+mp_limb_t flint_mpn_sqrhigh_2(mp_ptr, mp_srcptr);
+mp_limb_t flint_mpn_sqrhigh_3(mp_ptr, mp_srcptr);
+mp_limb_t flint_mpn_sqrhigh_4(mp_ptr, mp_srcptr);
+mp_limb_t flint_mpn_sqrhigh_5(mp_ptr, mp_srcptr);
+mp_limb_t flint_mpn_sqrhigh_6(mp_ptr, mp_srcptr);
+mp_limb_t flint_mpn_sqrhigh_7(mp_ptr, mp_srcptr);
+mp_limb_t flint_mpn_sqrhigh_8(mp_ptr, mp_srcptr);
+
+const flint_mpn_mul_func_t flint_mpn_mulhigh_func_tab[] =
+{
+    NULL,
+    flint_mpn_mulhigh_1,
+    flint_mpn_mulhigh_2,
+    flint_mpn_mulhigh_3,
+    flint_mpn_mulhigh_4,
+    flint_mpn_mulhigh_5,
+    flint_mpn_mulhigh_6,
+    flint_mpn_mulhigh_7,
+    flint_mpn_mulhigh_8,
+};
+
+const flint_mpn_mulhigh_normalised_func_t flint_mpn_mulhigh_normalised_func_tab[] =
+{
+    NULL,
+};
+
+const flint_mpn_sqr_func_t flint_mpn_sqrhigh_func_tab[] =
+{
+    NULL,
+    flint_mpn_sqrhigh_1,
+    flint_mpn_sqrhigh_2,
+    flint_mpn_sqrhigh_3,
+    flint_mpn_sqrhigh_4,
+    flint_mpn_sqrhigh_5,
+    flint_mpn_sqrhigh_6,
+    flint_mpn_sqrhigh_7,
+    flint_mpn_sqrhigh_8,
+};
 #else
 
 /* todo: add MPFR-like basecase for use in mulders */

@@ -40,7 +40,7 @@ _apply_permutation(slong * AP, gr_mat_t A, slong * P, slong n, slong offset)
 }
 
 int
-gr_mat_lu_recursive(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, slong cutoff, gr_ctx_t ctx)
+gr_mat_lu_recursive(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, gr_ctx_t ctx)
 {
     slong i, j, m, n, r1, r2, n1;
     gr_mat_t A0, A1, A00, A01, A10, A11;
@@ -50,7 +50,7 @@ gr_mat_lu_recursive(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int 
     m = A->r;
     n = A->c;
 
-    if (m < cutoff || n < cutoff)
+    if (m <= 1 || n <= 1)
         return gr_mat_lu_classical(rank, P, LU, A, rank_check, ctx);
 
     if (LU != A)
@@ -67,7 +67,7 @@ gr_mat_lu_recursive(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int 
     gr_mat_window_init(A0, LU, 0, 0, m, n1, ctx);
     gr_mat_window_init(A1, LU, 0, n1, m, n, ctx);
 
-    status |= gr_mat_lu_recursive(&r1, P1, A0, A0, rank_check, cutoff, ctx);
+    status |= gr_mat_lu(&r1, P1, A0, A0, rank_check, ctx);
 
     if (status != GR_SUCCESS)
         goto cleanup1;
@@ -99,7 +99,7 @@ gr_mat_lu_recursive(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int 
         gr_mat_clear(T, ctx);
     }
 
-    status |= gr_mat_lu_recursive(&r2, P1, A11, A11, rank_check, cutoff, ctx);
+    status |= gr_mat_lu(&r2, P1, A11, A11, rank_check, ctx);
 
     if (status != GR_SUCCESS)
         goto cleanup2;

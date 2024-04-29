@@ -140,9 +140,8 @@ fq_zech_ctx_init_modulus(fq_zech_ctx_t ctx, const nmod_poly_t modulus, const cha
 int
 fq_zech_ctx_init_fq_nmod_ctx_check(fq_zech_ctx_t ctx, fq_nmod_ctx_t ctx2)
 {
-    ulong i, n;
+    ulong i, n, q, up;
     fq_nmod_t r, gen;
-    slong up, q;
     ulong result;
     ulong j, nz;
     mp_ptr n_reverse_table;

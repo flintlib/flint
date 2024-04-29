@@ -22,7 +22,7 @@ extern "C" {
 
 typedef struct
 {
-   slong num;
+   int num;
    int exp[FLINT_MAX_FACTORS_IN_LIMB];
    ulong p[FLINT_MAX_FACTORS_IN_LIMB];
 }

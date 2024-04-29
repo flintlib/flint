@@ -60,8 +60,6 @@ TEST_FUNCTION_START(butterfly_rshB, state)
     mpz_t p, ma, mb, m2a, m2b, mn1, mn2;
     mp_limb_t * nn1, * nn2, * r1, * r2;
 
-    _flint_rand_init_gmp(state);
-
     mpz_init(p);
     mpz_init(ma);
     mpz_init(mb);
@@ -93,7 +91,7 @@ TEST_FUNCTION_START(butterfly_rshB, state)
                     nn2 = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
                     r1 = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
                     r2 = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
-                    flint_mpn_rrandom(nn1, state->gmp_state, limbs);
+                    flint_mpn_rrandom(nn1, state, limbs);
                     random_fermat(nn1, state, limbs);
                     random_fermat(nn2, state, limbs);
 

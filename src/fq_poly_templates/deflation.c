@@ -19,7 +19,7 @@ ulong
 TEMPLATE(T, poly_deflation) (const TEMPLATE(T, poly_t) input,
                              const TEMPLATE(T, ctx_t) ctx)
 {
-    ulong deflation;
+    slong deflation;
     slong i, coeff;
 
     if (input->length <= 1)

@@ -230,7 +230,7 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
 
     if (FLINT_BIT_COUNT(poly->mod.n) > ((n_sqrt(v->length - 1) + 1)*3)/4)
     {
-        for (i = 1; i < FLINT_BIT_COUNT(l); i++)
+        for (i = 1; i < (slong) FLINT_BIT_COUNT(l); i++)
             nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(h + 1 +
                                    (1 << (i - 1)), h + 1, 1 << (i - 1),
                                    1 << (i - 1), h + (1 << (i - 1)),

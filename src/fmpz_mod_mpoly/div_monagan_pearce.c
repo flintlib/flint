@@ -125,7 +125,7 @@ static int _fmpz_mod_mpoly_div_monagan_pearce(
                 {
                     *store++ = x->i;
                     *store++ = x->j;
-                    if (x->i != -WORD(1))
+                    if (x->i != -UWORD(1))
                         hind[x->i] |= WORD(1);
 
                 } while ((x = x->next) != NULL);
@@ -140,7 +140,7 @@ static int _fmpz_mod_mpoly_div_monagan_pearce(
                     *store++ = x->i;
                     *store++ = x->j;
 
-                    if (x->i == -WORD(1))
+                    if (x->i == -UWORD(1))
                     {
                         fmpz_add(acc, acc, Acoeffs + x->j);
                     }
