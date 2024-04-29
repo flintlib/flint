@@ -90,7 +90,13 @@ jobs:
           # NOTE: When Ubuntu LTS ships lcov v2.0.0+, change this section to
           # `$MAKE coverage'.
           mkdir build/coverage
-          lcov -j $(expr $(nproc) + 1) --capture --omit-lines "flint_throw" --omit-lines '^}$' --exclude "*test/t-*.c" --exclude "*test/main.c" --exclude "/usr/*" --directory build --output-file build/coverage/coverage.info
+          lcov -j $(expr $(nproc) + 1) --capture \
+            --omit-lines "flint_throw" \
+            --omit-lines '^}$' \
+            --exclude "*test/t-*.c" \
+            --exclude "*test/main.c" \
+            --exclude "/usr/*" \
+            --directory build --output-file build/coverage/coverage.info
 
       - name: "Upload coverage data"
         uses: codecov/codecov-action@v4
