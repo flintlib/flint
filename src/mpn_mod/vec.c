@@ -79,8 +79,12 @@ _mpn_mod_vec_add(mp_ptr res, mp_srcptr x, mp_srcptr y, slong len, gr_ctx_t ctx)
         dd[0] = d[0];
         dd[1] = d[1];
 
-        for (i = 0; i < len; i++)
-            flint_mpn_addmod_2(res + i * n, x + i * n, y + i * n, dd);
+        if (MPN_MOD_CTX_NORM(ctx))
+            for (i = 0; i < len; i++)
+                _flint_mpn_addmod_2(res + i * n, x + i * n, y + i * n, dd);
+        else
+            for (i = 0; i < len; i++)
+                flint_mpn_addmod_2(res + i * n, x + i * n, y + i * n, dd);
     }
     else
         for (i = 0; i < len; i++)

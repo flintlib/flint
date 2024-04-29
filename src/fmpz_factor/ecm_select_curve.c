@@ -55,7 +55,7 @@ fmpz_factor_ecm_select_curve(mp_ptr f, mp_ptr sig, mp_ptr n, ecm_t ecm_inf)
 
     mpn_add_n(temp, temp, ecm_inf->one, ecm_inf->n_size); /* temp = (5 << norm) */
 
-    fmpz_factor_ecm_submod(ecm_inf->u, ecm_inf->w, temp, n, ecm_inf->n_size);
+    flint_mpn_submod_n(ecm_inf->u, ecm_inf->w, temp, n, ecm_inf->n_size);
 
     flint_mpn_mulmod_preinvn(ecm_inf->w, ecm_inf->u, ecm_inf->u, ecm_inf->n_size,
                              n, ecm_inf->ninv, ecm_inf->normbits);
@@ -82,9 +82,9 @@ fmpz_factor_ecm_select_curve(mp_ptr f, mp_ptr sig, mp_ptr n, ecm_t ecm_inf)
     flint_mpn_mulmod_preinvn(ecm_inf->w, ecm_inf->u, temp, ecm_inf->n_size,
                              n, ecm_inf->ninv, ecm_inf->normbits);
 
-    fmpz_factor_ecm_submod(ecm_inf->u, ecm_inf->v, ecm_inf->u, n, ecm_inf->n_size);
+    flint_mpn_submod_n(ecm_inf->u, ecm_inf->v, ecm_inf->u, n, ecm_inf->n_size);
 
-    fmpz_factor_ecm_addmod(ecm_inf->v, ecm_inf->v, ecm_inf->w, n, ecm_inf->n_size);
+    flint_mpn_addmod_n(ecm_inf->v, ecm_inf->v, ecm_inf->w, n, ecm_inf->n_size);
 
     flint_mpn_mulmod_preinvn(ecm_inf->w, ecm_inf->u, ecm_inf->u, ecm_inf->n_size,
                              n, ecm_inf->ninv, ecm_inf->normbits);
@@ -165,7 +165,7 @@ fmpz_factor_ecm_select_curve(mp_ptr f, mp_ptr sig, mp_ptr n, ecm_t ecm_inf)
     if (ecm_inf->normbits)
         mpn_lshift(temp, temp, ecm_inf->n_size, ecm_inf->normbits);
 
-    fmpz_factor_ecm_addmod(ecm_inf->a24, ecm_inf->w, temp, n, ecm_inf->n_size);
+    flint_mpn_addmod_n(ecm_inf->a24, ecm_inf->w, temp, n, ecm_inf->n_size);
     mpn_rshift(ecm_inf->a24, ecm_inf->a24, ecm_inf->n_size, 2);
     if (ecm_inf->normbits)
        ecm_inf->a24[0] &= ~((UWORD(1)<<ecm_inf->normbits) - 1);

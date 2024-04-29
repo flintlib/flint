@@ -24,7 +24,13 @@ fexpr_contains(const fexpr_t expr, const fexpr_t x)
         return 0;
 
     if (expr_size == x_size)
-        return _mpn_equal(expr->data, x->data, x_size);
+    {
+        for (i = 0; i < x_size; i++)
+            if (expr->data[i] != x->data[i])
+                return 0;
+
+        return 1;
+    }
 
     nargs = fexpr_nargs(expr);
 

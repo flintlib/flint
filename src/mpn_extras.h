@@ -73,6 +73,137 @@ int flint_mpn_zero_p(mp_srcptr x, mp_size_t xsize)
     return 1;
 }
 
+FLINT_FORCE_INLINE
+int flint_mpn_equal_p(mp_srcptr x, mp_srcptr y, mp_size_t xsize)
+{
+    slong i;
+    for (i = 0; i < xsize; i++)
+    {
+        if (x[i] != y[i])
+            return 0;
+    }
+    return 1;
+}
+
+FLINT_FORCE_INLINE void
+flint_mpn_negmod_n(mp_ptr res, mp_srcptr x, mp_srcptr m, mp_size_t n)
+{
+    if (flint_mpn_zero_p(x, n))
+        flint_mpn_zero(res, n);
+    else
+        mpn_sub_n(res, m, x, n);
+}
+
+FLINT_FORCE_INLINE void
+flint_mpn_addmod_n(mp_ptr res, mp_srcptr x, mp_srcptr y, mp_srcptr m, mp_size_t n)
+{
+    mp_limb_t cy;
+    cy = mpn_add_n(res, x, y, n);
+    if (cy || mpn_cmp(res, m, n) >= 0)
+        mpn_sub_n(res, res, m, n);
+}
+
+FLINT_FORCE_INLINE void
+flint_mpn_submod_n(mp_ptr res, mp_srcptr x, mp_srcptr y, mp_srcptr m, mp_size_t n)
+{
+    int cmp = (mpn_cmp(x, y, n) < 0);
+    mpn_sub_n(res, x, y, n);
+    if (cmp)
+        mpn_add_n(res, res, m, n);
+}
+
+/* assumes yn <= n and y < m */
+FLINT_FORCE_INLINE void
+flint_mpn_addmod_n_m(mp_ptr res, mp_srcptr x, mp_srcptr y, mp_size_t yn, mp_srcptr m, mp_size_t n)
+{
+    mp_limb_t cy;
+    cy = mpn_add(res, x, n, y, yn);
+    if (cy || mpn_cmp(res, m, n) >= 0)
+        mpn_sub_n(res, res, m, n);
+}
+
+/* assumes yn <= n and y < m */
+FLINT_FORCE_INLINE void
+flint_mpn_submod_n_m(mp_ptr res, mp_srcptr x, mp_srcptr y, mp_size_t yn, mp_srcptr m, mp_size_t n)
+{
+    int cmp = (flint_mpn_zero_p(x + yn, n - yn) && mpn_cmp(x, y, yn) < 0);
+    mpn_sub(res, x, n, y, yn);
+    if (cmp)
+        mpn_add_n(res, res, m, n);
+}
+
+FLINT_FORCE_INLINE void
+flint_mpn_negmod_2(mp_ptr res, mp_srcptr x, mp_srcptr m)
+{
+    if (x[0] == 0 && x[1] == 0)
+        res[1] = res[0] = 0;
+    else
+        sub_ddmmss(res[1], res[0], m[1], m[0], x[1], x[0]);
+}
+
+FLINT_FORCE_INLINE void
+flint_mpn_addmod_2(mp_ptr res, mp_srcptr x, mp_srcptr y, mp_srcptr m)
+{
+    mp_limb_t cy;
+    mp_limb_t m1 = m[1], m0 = m[0];
+    add_sssaaaaaa(cy, res[1], res[0], 0, x[1], x[0], 0, y[1], y[0]);
+    if (cy || (res[1] > m1 || (res[1] == m1 && res[0] >= m0)))
+        sub_ddmmss(res[1], res[0], res[1], res[0], m1, m0);
+}
+
+/* assumes msb of m is zero */
+FLINT_FORCE_INLINE void
+_flint_mpn_addmod_2(mp_ptr res, mp_srcptr x, mp_srcptr y, mp_srcptr m)
+{
+    mp_limb_t m1 = m[1], m0 = m[0];
+    add_ssaaaa(res[1], res[0], x[1], x[0], y[1], y[0]);
+    if (res[1] > m1 || (res[1] == m1 && res[0] >= m0))
+        sub_ddmmss(res[1], res[0], res[1], res[0], m1, m0);
+}
+
+FLINT_FORCE_INLINE void
+flint_mpn_submod_2(mp_ptr res, mp_srcptr x, mp_srcptr y, mp_srcptr m)
+{
+    int cmp;
+    mp_limb_t m1 = m[1], m0 = m[0];
+    mp_limb_t x1 = x[1], x0 = x[0];
+    mp_limb_t y1 = y[1], y0 = y[0];
+    cmp = (x1 < y1) || (x1 == y1 && x0 < y0);
+    sub_ddmmss(res[1], res[0], x1, x0, y1, y0);
+    if (cmp)
+        add_ssaaaa(res[1], res[0], res[1], res[0], m1, m0);
+}
+
+FLINT_FORCE_INLINE int
+flint_mpn_signed_sub_n(mp_ptr res, mp_srcptr x, mp_srcptr y, mp_size_t n)
+{
+    if (mpn_cmp(x, y, n) >= 0)
+    {
+        mpn_sub_n(res, x, y, n);
+        return 0;
+    }
+    else
+    {
+        mpn_sub_n(res, y, x, n);
+        return 1;
+    }
+}
+
+FLINT_FORCE_INLINE void
+flint_mpn_signed_div2(mp_ptr res, mp_srcptr x, mp_size_t n)
+{
+    mp_limb_t s = x[n - 1] & (UWORD(1) << (FLINT_BITS - 1));
+    mpn_rshift(res, x, n, 1);
+    res[n - 1] |= s;
+}
+
+void flint_mpn_mulmod_preinvn_2(mp_ptr r,
+        mp_srcptr a, mp_srcptr b,
+        mp_srcptr d, mp_srcptr dinv, ulong norm);
+
+char * _flint_mpn_get_str(mp_srcptr x, mp_size_t n);
+
+
 #define MPN_NORM(a, an)                         \
     do {                                        \
         while ((an) != 0 && (a)[(an) - 1] == 0) \
@@ -103,18 +234,33 @@ int flint_mpn_zero_p(mp_srcptr x, mp_size_t xsize)
         add_ssaaaa(r2, r1, r2, r1, 0, t1);                  \
     } while (0)
 
-/* todo: use optimal code here */
 #define FLINT_MPN_MUL_2X2(r3, r2, r1, r0, a1, a0, b1, b0)   \
-    do {                                                    \
-        mp_limb_t t1, t2, t3;                               \
-        umul_ppmm(r1, r0, a0, b0);                          \
-        umul_ppmm(r2, t1, a1, b0);                          \
-        add_ssaaaa(r2, r1, r2, r1, 0, t1);                  \
-        umul_ppmm(t1, t2, a0, b1);                          \
-        umul_ppmm(r3, t3, a1, b1);                          \
-        add_ssaaaa(r3, t1, r3, t1, 0, t3);                  \
-        add_ssaaaa(r2, r1, r2, r1, t1, t2);                 \
-        r3 += r2 < t1;                                      \
+    do {                                                                  \
+        mp_limb_t __t1, __t2, __u1, __u2;                                 \
+        mp_limb_t __r3, __r2, __r1, __r0;                                 \
+        mp_limb_t __a1 = (a1), __a0 = (a0), __b1 = (b1), __b0 = (b0);     \
+        umul_ppmm(__r1, __r0, __a0, __b0);                                \
+        umul_ppmm(__r3, __r2, __a1, __b1);                                \
+        umul_ppmm(__t2, __t1, __a0, __b1);                                \
+        add_sssaaaaaa(__r3, __r2, __r1, __r3, __r2, __r1, 0, __t2, __t1); \
+        umul_ppmm(__u2, __u1, __a1, __b0);                                \
+        add_sssaaaaaa(__r3, __r2, __r1, __r3, __r2, __r1, 0, __u2, __u1); \
+        (r0) = __r0; (r1) = __r1; (r2) = __r2; (r3) = __r3;               \
+    } while (0)
+
+/* Low three words of 2x2 product */
+#define FLINT_MPN_MUL_3P2X2(r2, r1, r0, a1, a0, b1, b0)                \
+    do {                                                               \
+        mp_limb_t __t1, __t2, __u1, __u2;                              \
+        mp_limb_t __r2, __r1, __r0;                                    \
+        mp_limb_t __a1 = (a1), __a0 = (a0), __b1 = (b1), __b0 = (b0);  \
+        umul_ppmm(__r1, __r0, __a0, __b0);                             \
+        __r2 = __a1 * __b1;                                            \
+        umul_ppmm(__t2, __t1, __a0, __b1);                             \
+        add_ssaaaa(__r2, __r1, __r2, __r1, __t2, __t1);                \
+        umul_ppmm(__u2, __u1, __a1, __b0);                             \
+        add_ssaaaa(__r2, __r1, __r2, __r1, __u2, __u1);                \
+        (r0) = __r0; (r1) = __r1; (r2) = __r2;                         \
     } while (0)
 
 /* {s0,s1,s2} = u[0]v[n-1] + u[1]v[n-2] + ... */
@@ -555,6 +701,8 @@ mp_limb_t flint_mpn_sqrhigh(mp_ptr rp, mp_srcptr xp, mp_size_t n)
         return _flint_mpn_sqrhigh(rp, xp, n);
 }
 
+mp_limb_pair_t _flint_mpn_mulhigh_normalised(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n);
+
 MPN_EXTRAS_INLINE
 mp_limb_pair_t flint_mpn_mulhigh_normalised(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
 {
@@ -563,27 +711,7 @@ mp_limb_pair_t flint_mpn_mulhigh_normalised(mp_ptr rp, mp_srcptr xp, mp_srcptr y
     if (FLINT_HAVE_MULHIGH_NORMALISED_FUNC(n))
         return flint_mpn_mulhigh_normalised_func_tab[n](rp, xp, yp);
     else
-    {
-        mp_limb_pair_t ret;
-
-        FLINT_ASSERT(rp != xp && rp != yp);
-
-        ret.m1 = flint_mpn_mulhigh_n(rp, xp, yp, n);
-
-        if (rp[n - 1] >> (FLINT_BITS - 1))
-        {
-            ret.m2 = 0;
-        }
-        else
-        {
-            ret.m2 = 1;
-            mpn_lshift(rp, rp, n, 1);
-            rp[0] |= (ret.m1 >> (FLINT_BITS - 1));
-            ret.m1 <<= 1;
-        }
-
-        return ret;
-    }
+        return _flint_mpn_mulhigh_normalised(rp, xp, yp, n);
 }
 
 /* division ******************************************************************/

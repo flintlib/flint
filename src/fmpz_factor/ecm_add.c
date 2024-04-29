@@ -49,26 +49,26 @@ fmpz_factor_ecm_add(mp_ptr x, mp_ptr z, mp_ptr x1, mp_ptr z1, mp_ptr x2,
     }
 
     /* u = (x2 - z2) */
-    fmpz_factor_ecm_submod(ecm_inf->u, x2, z2, n, ecm_inf->n_size);
+    flint_mpn_submod_n(ecm_inf->u, x2, z2, n, ecm_inf->n_size);
     /* v = (x1 + z1) */
-    fmpz_factor_ecm_addmod(ecm_inf->v, x1, z1, n, ecm_inf->n_size);
+    flint_mpn_addmod_n(ecm_inf->v, x1, z1, n, ecm_inf->n_size);
 
     /* u = (x2 - z2) * (x1 + z1) */
     flint_mpn_mulmod_preinvn(ecm_inf->u, ecm_inf->u, ecm_inf->v, ecm_inf->n_size,
                              n, ecm_inf->ninv, ecm_inf->normbits);
     /* v = (x1 - z1) */
-    fmpz_factor_ecm_submod(ecm_inf->v, x1, z1, n, ecm_inf->n_size);
+    flint_mpn_submod_n(ecm_inf->v, x1, z1, n, ecm_inf->n_size);
 
     /* w = (x2 + z2) */
-    fmpz_factor_ecm_addmod(ecm_inf->w, x2, z2, n, ecm_inf->n_size);
+    flint_mpn_addmod_n(ecm_inf->w, x2, z2, n, ecm_inf->n_size);
     /* v = (x1 - z1) * (x2 + z2) */
     flint_mpn_mulmod_preinvn(ecm_inf->v, ecm_inf->v, ecm_inf->w, ecm_inf->n_size,
                              n, ecm_inf->ninv, ecm_inf->normbits);
 
     /* w = 2 * (x1 * x2 - z1 * z2) */
-    fmpz_factor_ecm_addmod(ecm_inf->w, ecm_inf->u, ecm_inf->v, n, ecm_inf->n_size);
+    flint_mpn_addmod_n(ecm_inf->w, ecm_inf->u, ecm_inf->v, n, ecm_inf->n_size);
     /* v = 2 * (x2 * z1 - x1 * z2) */
-    fmpz_factor_ecm_submod(ecm_inf->v, ecm_inf->v, ecm_inf->u, n, ecm_inf->n_size);
+    flint_mpn_submod_n(ecm_inf->v, ecm_inf->v, ecm_inf->u, n, ecm_inf->n_size);
 
     /* w = 4 * (x1 * x2 - z1 * z2)^2 */
     flint_mpn_mulmod_preinvn(ecm_inf->w, ecm_inf->w, ecm_inf->w, ecm_inf->n_size,

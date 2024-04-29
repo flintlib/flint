@@ -111,7 +111,7 @@ fmpz_factor_ecm_stage_II(mp_ptr f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
                                          ecm_inf->normbits);
 
 
-                fmpz_factor_ecm_submod(a, a, b, n, ecm_inf->n_size);
+                flint_mpn_submod_n(a, a, b, n, ecm_inf->n_size);
 
                 flint_mpn_mulmod_preinvn(g, g, a, ecm_inf->n_size, n, ecm_inf->ninv,
                                          ecm_inf->normbits);

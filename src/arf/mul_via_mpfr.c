@@ -10,6 +10,7 @@
 */
 
 #include <mpfr.h>
+#include "mpn_extras.h"
 #include "arf.h"
 
 int

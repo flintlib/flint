@@ -11,6 +11,7 @@
 
 #include "thread_pool.h"
 #include "thread_support.h"
+#include "mpn_extras.h"
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"

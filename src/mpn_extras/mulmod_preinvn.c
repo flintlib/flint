@@ -25,7 +25,7 @@ void flint_mpn_mulmod_preinvn(mp_ptr r,
         mp_srcptr a, mp_srcptr b, mp_size_t n,
         mp_srcptr d, mp_srcptr dinv, ulong norm)
 {
-   mp_limb_t cy, p1, p2, b0, b1;
+   mp_limb_t cy, b0, b1;
 
    if (n == 2)
    {
@@ -43,31 +43,16 @@ void flint_mpn_mulmod_preinvn(mp_ptr r,
       }
 
       /* mpn_mul_n(t, a, b, n) */
-      umul_ppmm(t[1], t[0], a[0], b0);
-      umul_ppmm(t[3], t[2], a[1], b1);
-      umul_ppmm(p2, p1, a[0], b1);
-      add_sssaaaaaa(t[3], t[2], t[1], t[3], t[2], t[1], 0, p2, p1);
-      umul_ppmm(p2, p1, a[1], b0);
-      add_sssaaaaaa(t[3], t[2], t[1], t[3], t[2], t[1], 0, p2, p1);
+      FLINT_MPN_MUL_2X2(t[3], t[2], t[1], t[0], a[1], a[0], b1, b0);
 
       /* mpn_mul_n(t + 3*n, t + n, dinv, n) */
-      umul_ppmm(t[7], t[6], t[2], dinv[0]);
-      umul_ppmm(t[9], t[8], t[3], dinv[1]);
-      umul_ppmm(p2, p1, t[2], dinv[1]);
-      add_sssaaaaaa(t[9], t[8], t[7], t[9], t[8], t[7], 0, p2, p1);
-      umul_ppmm(p2, p1, t[3], dinv[0]);
-      add_sssaaaaaa(t[9], t[8], t[7], t[9], t[8], t[7], 0, p2, p1);
+      FLINT_MPN_MUL_2X2(t[9], t[8], t[7], t[6], t[3], t[2], dinv[1], dinv[0]);
 
       /* mpn_add_n(t + 4*n, t + 4*n, t + n, n) */
       add_ssaaaa(t[9], t[8], t[9], t[8], t[3], t[2]);
 
       /* mpn_mul_n(t + 2*n, t + 4*n, d, n) */
-      umul_ppmm(t[5], t[4], t[8], d[0]);
-      t[6] = t[9]*d[1];
-      umul_ppmm(p2, p1, t[8], d[1]);
-      add_ssaaaa(t[6], t[5], t[6], t[5], p2, p1);
-      umul_ppmm(p2, p1, t[9], d[0]);
-      add_ssaaaa(t[6], t[5], t[6], t[5], p2, p1);
+      FLINT_MPN_MUL_3P2X2(t[6], t[5], t[4], t[9], t[8], d[1], d[0]);
 
       /* cy = t[n] - t[3*n] - mpn_sub_n(r, t, t + 2*n, n) */
       sub_dddmmmsss(cy, r[1], r[0], t[2], t[1], t[0], t[6], t[5], t[4]);
@@ -117,4 +102,62 @@ void flint_mpn_mulmod_preinvn(mp_ptr r,
 
      TMP_END;
    }
+}
+
+void flint_mpn_mulmod_preinvn_2(mp_ptr r,
+        mp_srcptr a, mp_srcptr b,
+        mp_srcptr d, mp_srcptr dinv, ulong norm)
+{
+    mp_limb_t cy, b0, b1, r0, r1;
+    mp_limb_t t[10];
+
+    if (norm)
+    {
+        /* mpn_lshift(b, b, n, norm) */
+        b0 = (b[0] << norm);
+        b1 = (b[1] << norm) | (b[0] >> (FLINT_BITS - norm));
+    }
+    else
+    {
+        b0 = b[0];
+        b1 = b[1];
+    }
+
+    /* mpn_mul_n(t, a, b, n) */
+    FLINT_MPN_MUL_2X2(t[3], t[2], t[1], t[0], a[1], a[0], b1, b0);
+
+    /* mpn_mul_n(t + 3*n, t + n, dinv, n) */
+    FLINT_MPN_MUL_2X2(t[9], t[8], t[7], t[6], t[3], t[2], dinv[1], dinv[0]);
+
+    /* mpn_add_n(t + 4*n, t + 4*n, t + n, n) */
+    add_ssaaaa(t[9], t[8], t[9], t[8], t[3], t[2]);
+
+    /* mpn_mul_n(t + 2*n, t + 4*n, d, n) */
+    FLINT_MPN_MUL_3P2X2(t[6], t[5], t[4], t[9], t[8], d[1], d[0]);
+
+    /* cy = t[n] - t[3*n] - mpn_sub_n(r, t, t + 2*n, n) */
+    sub_dddmmmsss(cy, r1, r0, t[2], t[1], t[0], t[6], t[5], t[4]);
+
+    while (cy > 0)
+    {
+        /* cy -= mpn_sub_n(r, r, d, n) */
+        sub_dddmmmsss(cy, r1, r0, cy, r1, r0, 0, d[1], d[0]);
+    }
+
+    if ((r1 > d[1]) || (r1 == d[1] && r0 >= d[0]))
+    {
+        /* mpn_sub_n(r, r, d, n) */
+        sub_ddmmss(r1, r0, r1, r0, d[1], d[0]);
+    }
+
+    if (norm)
+    {
+        r[0] = (r0 >> norm) | (r1 << (FLINT_BITS - norm));
+        r[1] = (r1 >> norm);
+    }
+    else
+    {
+        r[0] = r0;
+        r[1] = r1;
+    }
 }

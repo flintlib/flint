@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "mpn_extras.h"
 #include "nmod.h"
 #include "nmod_vec.h"
 

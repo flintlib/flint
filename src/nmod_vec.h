@@ -19,7 +19,7 @@
 #define NMOD_VEC_INLINE static inline
 #endif
 
-#include "mpn_extras.h"
+#include "flint.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -48,7 +48,9 @@ void _nmod_vec_randtest(mp_ptr vec, flint_rand_t state, slong len, nmod_t mod);
 NMOD_VEC_INLINE
 void _nmod_vec_zero(mp_ptr vec, slong len)
 {
-   flint_mpn_zero(vec, len);
+    slong i;
+    for (i = 0; i < len; i++)
+        vec[i] = 0;
 }
 
 flint_bitcnt_t _nmod_vec_max_bits(mp_srcptr vec, slong len);
@@ -56,7 +58,9 @@ flint_bitcnt_t _nmod_vec_max_bits(mp_srcptr vec, slong len);
 NMOD_VEC_INLINE
 void _nmod_vec_set(mp_ptr res, mp_srcptr vec, slong len)
 {
-   flint_mpn_copyi(res, vec, len);
+    slong i;
+    for (i = 0; i < len; i++)
+        res[i] = vec[i];
 }
 
 NMOD_VEC_INLINE

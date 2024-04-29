@@ -178,3 +178,28 @@ _flint_mpn_mulhigh_n(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
     else
         return _flint_mpn_mulhigh_n_mul(res, u, v, n);
 }
+
+mp_limb_pair_t _flint_mpn_mulhigh_normalised(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
+{
+    FLINT_ASSERT(n >= 1);
+
+    mp_limb_pair_t ret;
+
+    FLINT_ASSERT(rp != xp && rp != yp);
+
+    ret.m1 = flint_mpn_mulhigh_n(rp, xp, yp, n);
+
+    if (rp[n - 1] >> (FLINT_BITS - 1))
+    {
+        ret.m2 = 0;
+    }
+    else
+    {
+        ret.m2 = 1;
+        mpn_lshift(rp, rp, n, 1);
+        rp[0] |= (ret.m1 >> (FLINT_BITS - 1));
+        ret.m1 <<= 1;
+    }
+
+    return ret;
+}
