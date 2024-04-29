@@ -19,20 +19,57 @@ Macros
 Utility functions
 --------------------------------------------------------------------------------
 
-
 .. function:: void flint_mpn_debug(mp_srcptr x, mp_size_t xsize)
 
     Prints debug information about ``(x, xsize)`` to ``stdout``. 
     In particular, this will print binary representations of all the limbs.
 
+.. function:: char * _flint_mpn_get_str(mp_srcptr x, mp_size_t n)
+
+    Returns a string containing the decimal representation of 
+    ``(x, n)``.
+
 .. function:: int flint_mpn_zero_p(mp_srcptr x, mp_size_t xsize)
 
     Returns `1` if all limbs of ``(x, xsize)`` are zero, otherwise `0`.
+
+.. function:: int flint_mpn_equal_p(mp_srcptr x, mp_srcptr y, mp_size_t xsize)
+
+    Returns `1` if all limbs of ``(x, xsize)`` and ``(y, xsize)`` are equal, otherwise `0`.
+
+Addition and subtraction
+--------------------------------------------------------------------------------
 
 .. function:: mp_limb_t flint_mpn_sumdiff_n(mp_ptr s, mp_ptr d, mp_srcptr x, mp_srcptr y, mp_size_t n)
 
     Simultaneously computes the sum ``s`` and difference ``d`` of ``(x, n)`` and ``(y, n)``,
     returning carry multiplied by two plus borrow.
+
+.. function:: void flint_mpn_negmod_n(mp_ptr res, mp_srcptr x, mp_srcptr m, mp_size_t n)
+              void flint_mpn_addmod_n(mp_ptr res, mp_srcptr x, mp_srcptr y, mp_srcptr m, mp_size_t n)
+              void flint_mpn_submod_n(mp_ptr res, mp_srcptr x, mp_srcptr y, mp_srcptr m, mp_size_t n)
+              void flint_mpn_addmod_n_m(mp_ptr res, mp_srcptr x, mp_srcptr y, mp_size_t yn, mp_srcptr m, mp_size_t n)
+              void flint_mpn_submod_n_m(mp_ptr res, mp_srcptr x, mp_srcptr y, mp_size_t yn, mp_srcptr m, mp_size_t n)
+
+    Arithmetic modulo ``(m, n)``. These functions assume that
+    ``(x, n)`` and ``(y, n)`` are already reduced modulo ``(m, n)``.
+    The ``n_m`` variants accept ``(y, yn)`` with ``yn <= n``,
+    where ``(y, yn)`` is already reduced modulo ``(m, n)``.
+
+.. function:: void flint_mpn_negmod_2(mp_ptr res, mp_srcptr x, mp_srcptr m)
+              void flint_mpn_addmod_2(mp_ptr res, mp_srcptr x, mp_srcptr y, mp_srcptr m)
+              void _flint_mpn_addmod_2(mp_ptr res, mp_srcptr x, mp_srcptr y, mp_srcptr m)
+              void flint_mpn_submod_2(mp_ptr res, mp_srcptr x, mp_srcptr y, mp_srcptr m)
+
+    Modular arithmetic specialized for two limbs.
+    The ``_flint_mpn_addmod_2`` version assumes that the most significant
+    bit of ``m[1]`` is not set.
+
+.. function:: int flint_mpn_signed_sub_n(mp_ptr res, mp_srcptr x, mp_srcptr y, mp_size_t n)
+
+    Sets ``res`` to `|x - y|`, returning 0 if the result equals `x - y`
+    and returning 1 if the result equals `y - x`.
+
 
 Multiplication
 --------------------------------------------------------------------------------
@@ -201,6 +238,10 @@ Divisibility
 Division
 --------------------------------------------------------------------------------
 
+.. function:: void flint_mpn_signed_div2(mp_ptr res, mp_srcptr x, mp_size_t n)
+
+    Sets ``res`` to ``(x, n)`` divided by two, where ``x`` is viewed
+    as a signed integer in two's complement form.
 
 .. function:: int flint_mpn_divides(mp_ptr q, mp_srcptr array1, mp_size_t limbs1, mp_srcptr arrayg, mp_size_t limbsg, mp_ptr temp)
 
@@ -240,6 +281,12 @@ Division
 
     We require `a` and `b` to be reduced modulo `n` before calling the
     function. 
+
+.. function:: void flint_mpn_mulmod_preinvn_2(mp_ptr r, mp_srcptr a, mp_srcptr b, mp_srcptr d, mp_srcptr dinv, ulong norm)
+
+    Version of :func:`flint_mpn_mulmod_preinv1` specialized for two limbs.
+    The behavior is not exactly the same: `a` and `b` are assumed to
+    be unshifted, and the output is unshifted.
 
 .. function:: void flint_mpn_preinvn(mp_ptr dinv, mp_srcptr d, mp_size_t n)
 
