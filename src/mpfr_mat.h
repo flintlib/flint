@@ -57,18 +57,6 @@ slong mpfr_mat_ncols(const mpfr_mat_t mat)
 
 void mpfr_mat_init(mpfr_mat_t mat, slong rows, slong cols, mpfr_prec_t prec);
 
-void mpfr_mat_swap(mpfr_mat_t mat1, mpfr_mat_t mat2);
-
-MPFR_MAT_INLINE void
-mpfr_mat_swap_entrywise(mpfr_mat_t mat1, mpfr_mat_t mat2)
-{
-    slong i, j;
-
-    for (i = 0; i < mpfr_mat_nrows(mat1); i++)
-        for (j = 0; j < mpfr_mat_ncols(mat1); j++)
-            mpfr_swap(mpfr_mat_entry(mat2, i, j), mpfr_mat_entry(mat1, i, j));
-}
-
 void mpfr_mat_set(mpfr_mat_t mat1, const mpfr_mat_t mat2);
 
 void mpfr_mat_clear(mpfr_mat_t mat);
