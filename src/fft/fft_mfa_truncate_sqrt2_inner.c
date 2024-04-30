@@ -136,7 +136,7 @@ _fft_inner2_worker(void * arg_ptr)
 
 void fft_mfa_truncate_sqrt2_inner(mp_limb_t ** ii, mp_limb_t ** jj, mp_size_t n,
                    flint_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2,
-                  mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc, mp_limb_t ** tt)
+                  mp_limb_t ** FLINT_UNUSED(temp), mp_size_t n1, mp_size_t trunc, mp_limb_t ** tt)
 {
     mp_size_t i, shared_i = 0;
     mp_size_t n2 = (2*n)/n1;
@@ -150,7 +150,7 @@ void fft_mfa_truncate_sqrt2_inner(mp_limb_t ** ii, mp_limb_t ** jj, mp_size_t n,
     thread_pool_handle * threads;
     fft_inner_arg_t * args;
 
-    while ((UWORD(1)<<depth) < n2) depth++;
+    while ((UWORD(1)<<depth) < (ulong) n2) depth++;
 
 #if FLINT_USES_PTHREAD
     pthread_mutex_init(&mutex, NULL);

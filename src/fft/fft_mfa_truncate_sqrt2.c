@@ -118,8 +118,8 @@ void fft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n,
    flint_bitcnt_t depth = 0;
    flint_bitcnt_t depth2 = 0;
 
-   while ((UWORD(1)<<depth) < n2) depth++;
-   while ((UWORD(1)<<depth2) < n1) depth2++;
+   while ((UWORD(1)<<depth) < (ulong) n2) depth++;
+   while ((UWORD(1)<<depth2) < (ulong) n1) depth2++;
 
    /* first half matrix fourier FFT : n2 rows, n1 cols */
 
@@ -383,7 +383,7 @@ void fft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n,
     thread_pool_handle * threads;
     fft_outer_arg_t * args;
 
-    while ((UWORD(1)<<depth) < n2) depth++;
+    while ((UWORD(1)<<depth) < (ulong) n2) depth++;
 
 #if FLINT_USES_PTHREAD
     pthread_mutex_init(&mutex, NULL);
