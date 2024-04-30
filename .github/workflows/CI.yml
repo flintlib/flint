@@ -38,18 +38,32 @@ jobs:
 
       - name: "Setup"
         run: |
-          sudo apt-get install -y libgmp-dev libmpfr-dev autoconf libtool-bin
+          sudo apt-get install -y \
+            libgmp-dev \
+            libmpfr-dev \
+            autoconf \
+            libtool-bin
 
-          # Install lcov 2.0
+          # Install lcov dependencies...
+          sudo apt-get install -y \
+            libcapture-tiny-perl \
+            libdatetime-perl \
+            libdigest-md5-perl \
+            libfile-spec-perl \
+            libjson-xs-perl \
+            libmodule-load-conditional-perl \
+            libtime-hires-perl
+
+          # ... plus these ones missing in apt
+          sudo cpan -T Memory::Process Scalar::Util
+
+          # Install lcov 2.1
           mkdir lcov
           cd lcov
-          wget https://github.com/linux-test-project/lcov/releases/download/v2.0/lcov-2.0.tar.gz
-          tar -xf lcov-2.0.tar.gz
-          cd lcov-2.0/
+          wget https://github.com/linux-test-project/lcov/releases/download/v2.1/lcov-2.1.tar.gz
+          tar -xf lcov-2.1.tar.gz
+          cd lcov-2.1/
           sudo make install
-
-          # Install lcov dependencies
-          sudo cpan -T Capture::Tiny DateTime Digest::MD5 File::Spec JSON::XS Memory::Process Module::Load::Conditional Scalar::Util Time::HiRes
 
           # Check versions
           gcc --version
@@ -87,10 +101,18 @@ jobs:
 
       - name: "Gather coverage data"
         run: |
-          # NOTE: When Ubuntu LTS ships lcov v2.0.0+, change this section to
+          # NOTE: When Ubuntu LTS ships lcov v2.1.0+, change this section to
           # `$MAKE coverage'.
           mkdir build/coverage
-          lcov -j $(expr $(nproc) + 1) --capture --omit-lines "flint_throw" --omit-lines '^}$' --exclude "*test/t-*.c" --exclude "*test/main.c" --exclude "/usr/*" --directory build --output-file build/coverage/coverage.info
+          lcov -j $(expr $(nproc) + 1) \
+            --capture \
+            --omit-lines "flint_throw" \
+            --omit-lines '^}$' \
+            --exclude "*test/t-*.c" \
+            --exclude "*test/main.c" \
+            --exclude "/usr/*" \
+            --directory build \
+            --output-file build/coverage/coverage.info
 
       - name: "Upload coverage data"
         uses: codecov/codecov-action@v4

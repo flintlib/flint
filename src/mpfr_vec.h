@@ -40,14 +40,6 @@ void _mpfr_vec_set(mpfr_ptr vec1, mpfr_srcptr vec2, slong length);
 
 int _mpfr_vec_equal(mpfr_srcptr vec1, mpfr_srcptr vec2, slong len);
 
-void _mpfr_vec_add(mpfr_ptr res, mpfr_srcptr vec1, mpfr_srcptr vec2, slong length);
-
-void _mpfr_vec_scalar_mul_2exp(mpfr_ptr res, mpfr_srcptr vec, slong length, flint_bitcnt_t exp);
-
-void _mpfr_vec_scalar_mul_mpfr(mpfr_ptr res, mpfr_srcptr vec, slong length, mpfr_t c);
-
-void _mpfr_vec_scalar_product(mpfr_t res, mpfr_srcptr vec1, mpfr_srcptr vec2, slong length);
-
 #ifdef __cplusplus
 }
 #endif

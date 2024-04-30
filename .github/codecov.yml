@@ -21,3 +21,5 @@ ignore:
  - "src/test/t-*.c"
  - "src/*/test/t-*.c"
  - "src/generic_files/exception.c"
+ - "src/generic_files/profiler.c"
+ - "src/profiler.h"

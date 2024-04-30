@@ -16,83 +16,81 @@
 void
 fmpz_factor_no_trial(fmpz_factor_t factor, const fmpz_t n)
 {
-   int exp, i;
+    int exp, i;
+    fmpz_t root;
 
-   if (fmpz_is_prime(n))
-      _fmpz_factor_append(factor, n, 1);
-   else
-   {
-      fmpz_t root;
+    if (fmpz_is_prime(n))
+    {
+        _fmpz_factor_append(factor, n, 1);
+        return;
+    }
 
-      fmpz_init(root);
+    fmpz_init(root);
 
-      exp = fmpz_is_perfect_power(root, n);
+    exp = fmpz_is_perfect_power(root, n);
 
-      if (exp != 0)
-      {
-         fmpz_factor_t fac;
+    if (exp != 0)
+    {
+        fmpz_factor_t fac;
 
-         fmpz_factor_init(fac);
+        fmpz_factor_init(fac);
+        fmpz_factor_no_trial(fac, root);
+        _fmpz_factor_concat(factor, fac, exp);
+        fmpz_factor_clear(fac);
+    }
+    else
+    {
+        fmpz_factor_t fac, fac2, fac3;
+        slong bits = fmpz_sizeinbase(n, 2);
+        int done;
 
-         fmpz_factor_no_trial(fac, root);
+        fmpz_factor_init(fac3);
 
-         _fmpz_factor_concat(factor, fac, exp);
+        done = fmpz_factor_smooth(fac3, n, FLINT_MAX(bits/3 - 17, 2), 1);
 
-         fmpz_factor_clear(fac);
-      } else
-      {
-         fmpz_factor_t fac, fac2, fac3;
-	 slong bits = fmpz_sizeinbase(n, 2);
-         int done;
-
-         fmpz_factor_init(fac3);
-
-	 done = fmpz_factor_smooth(fac3, n, FLINT_MAX(bits/3 - 17, 2), 1);
-
-         if (!done)
-	 {
+        if (!done)
+        {
             fmpz_t n2;
-	    slong exp2;
+            slong exp2;
 
-	    fmpz_init(n2);
+            fmpz_init(n2);
 
-	    /* take out cofactor and factor it */
-	    fmpz_set(n2, fac3->p + fac3->num - 1);
-	    exp = fac3->exp[fac3->num - 1];
-	    fac3->exp[fac3->num - 1] = 0;
-	    fac3->num--;
+            /* take out cofactor and factor it */
+            fmpz_set(n2, fac3->p + fac3->num - 1);
+            exp = fac3->exp[fac3->num - 1];
+            fac3->exp[fac3->num - 1] = 0;
+            fac3->num--;
 
-	    fmpz_factor_init(fac);
+            fmpz_factor_init(fac);
 
-	    /* qsieve can't factor perfect powers */
-	    exp2 = fmpz_is_perfect_power(root, n2);
+            /* qsieve can't factor perfect powers */
+            exp2 = fmpz_is_perfect_power(root, n2);
 
-	    if (exp2)
+            if (exp2)
                 _fmpz_factor_append(fac, root, exp2);
-	    else
-	        qsieve_factor(fac, n2);
+            else
+                qsieve_factor(fac, n2);
 
             for (i = 0; i < fac->num; i++)
             {
-	       fmpz_factor_init(fac2);
+                fmpz_factor_init(fac2);
 
-               fmpz_factor_no_trial(fac2, fac->p + i);
+                fmpz_factor_no_trial(fac2, fac->p + i);
 
-               _fmpz_factor_concat(fac3, fac2, exp*fac->exp[i]);
+                _fmpz_factor_concat(fac3, fac2, exp*fac->exp[i]);
 
-               fmpz_factor_clear(fac2);
+                fmpz_factor_clear(fac2);
             }
 
             fmpz_factor_clear(fac);
 
-	    fmpz_clear(n2);
-	 }
+            fmpz_clear(n2);
+        }
 
-	 _fmpz_factor_concat(factor, fac3, 1);
+        _fmpz_factor_concat(factor, fac3, 1);
 
-	 fmpz_factor_clear(fac3);
-      }
+        fmpz_factor_clear(fac3);
+    }
 
-      fmpz_clear(root);
-   }
+    fmpz_clear(root);
 }
