@@ -24,7 +24,7 @@ static int _try_lift(
     fmpz_mpolyv_t qfac,
     const fmpz_mpoly_t q,
     const fmpz_mpolyv_t pfac,
-    const fmpz_mpoly_t p,
+    const fmpz_mpoly_t FLINT_UNUSED(p),
     slong m,
     fmpz * alpha,
     slong n,
@@ -129,7 +129,7 @@ int fmpz_mpoly_factor_irred_zassenhaus(
     fmpz_mpolyv_t fac,
     const fmpz_mpoly_t A,
     const fmpz_mpoly_ctx_t ctx,
-    zassenhaus_prune_t zas)
+    zassenhaus_prune_t FLINT_UNUSED(zas))
 {
     int success;
     const slong n = ctx->minfo->nvars - 1;

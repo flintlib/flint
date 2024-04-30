@@ -21,7 +21,7 @@
 void fmpz_mpoly_height(
     fmpz_t max,
     const fmpz_mpoly_t A,
-    const fmpz_mpoly_ctx_t ctx)
+    const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     slong i;
     fmpz_t t;
@@ -44,7 +44,7 @@ void fmpz_mpoly_heights(
     fmpz_t max,
     fmpz_t sum,
     const fmpz_mpoly_t A,
-    const fmpz_mpoly_ctx_t ctx)
+    const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     slong i;
     fmpz_t t;

@@ -64,9 +64,9 @@ static void nmod_mpoly_get_eval_helper2(
             Ai++;
             if (Ai >= Alen)
                 break;
-            if (((Aexps[N*Ai + off0] >> shift0) & mask) != e0)
+            if (((Aexps[N*Ai + off0] >> shift0) & mask) != (ulong) e0)
                 break;
-            if (((Aexps[N*Ai + off1] >> shift1) & mask) != e1)
+            if (((Aexps[N*Ai + off1] >> shift1) & mask) != (ulong) e1)
                 break;
         }
 
@@ -155,9 +155,9 @@ static slong nmod_mpoly_set_eval_helper_and_zip_form2(
             Bi++;
             if (Bi >= Blen)
                 break;
-            if (((Bexps[N*Bi + off0] >> shift0) & mask) != e0)
+            if (((Bexps[N*Bi + off0] >> shift0) & mask) != (ulong) e0)
                 break;
-            if (((Bexps[N*Bi + off1] >> shift1) & mask) != e1)
+            if (((Bexps[N*Bi + off1] >> shift1) & mask) != (ulong) e1)
                 break;
         }
 
@@ -444,7 +444,7 @@ static int fmpz_mfactor_lift_prime_power_zippel(
     flint_rand_t state,
     const nmod_mpoly_struct * Bp,
     const fmpz_mpoly_t A,
-    const mp_limb_t * alphap,
+    const mp_limb_t * FLINT_UNUSED(alphap),
     const fmpz_mpoly_ctx_t ctx,
     const nmod_mpoly_ctx_t ctxp,
     slong L)

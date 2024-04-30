@@ -423,7 +423,7 @@ int bpoly_info_disolve(bpoly_info_t I)
     }
 
     fmpz_one(pj);
-    for (j = 1; j < I->k; j++)
+    for (j = 1; (ulong) j < I->k; j++)
     {
         fmpz_mul(pj, pj, I->p);
         fmpz_mod_poly_zero(s, I->ctxp);
