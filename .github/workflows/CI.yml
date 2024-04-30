@@ -106,6 +106,8 @@ jobs:
           mkdir build/coverage
           lcov -j $(expr $(nproc) + 1) \
             --capture \
+            --rc geninfo_unexecuted_blocks=1 \
+            --ignore-errors unused \
             --omit-lines "flint_throw" \
             --omit-lines '^}$' \
             --exclude "/usr/*" \
