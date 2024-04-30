@@ -104,7 +104,7 @@ void nmod_mpoly_factor_swap_base(nmod_mpoly_t p, nmod_mpoly_factor_t f,
     nmod_mpoly_swap(p, f->poly + i, ctx);
 }
 
-slong nmod_mpoly_factor_get_exp_si(nmod_mpoly_factor_t f, slong i, const nmod_mpoly_ctx_t ctx);
+slong nmod_mpoly_factor_get_exp_si(nmod_mpoly_factor_t f, slong i, const nmod_mpoly_ctx_t FLINT_UNUSED(ctx));
 
 void nmod_mpoly_factor_append_ui(nmod_mpoly_factor_t f,
                     const nmod_mpoly_t A, ulong e, const nmod_mpoly_ctx_t ctx);

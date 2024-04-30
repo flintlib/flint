@@ -166,7 +166,7 @@ next:
         stop++;
 
     fq_zech_bpoly_fit_length(E, e + 1, ctx->fqctx);
-    while (E->length <= e)
+    while (E->length <= (slong) e)
     {
         fq_zech_poly_zero(E->coeffs + E->length, ctx->fqctx);
         E->length++;

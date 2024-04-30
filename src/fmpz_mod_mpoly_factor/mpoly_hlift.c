@@ -432,7 +432,7 @@ static int _try_dense(
     slong r,
     const fmpz_t alpha,
     const fmpz_mod_mpoly_t A,
-    const slong * degs,
+    const slong * FLINT_UNUSED(degs),
     const fmpz_mod_mpoly_ctx_t ctx)
 {
     int success;

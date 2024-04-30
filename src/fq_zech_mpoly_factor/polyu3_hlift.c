@@ -380,10 +380,6 @@ int fq_zech_polyu3n_interp_crt_sm_bpoly(
     return changed;
 }
 
-int fq_zech_next(
-    fq_zech_t a,
-    const fq_zech_ctx_t ctx);
-
 void fq_zech_poly_shift_left_scalar_submul(
     fq_zech_poly_t modulus,
     slong k,

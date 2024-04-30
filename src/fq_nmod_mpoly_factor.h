@@ -73,7 +73,7 @@ void fq_nmod_mpoly_factor_swap_base(fq_nmod_mpoly_t p,
     fq_nmod_mpoly_swap(p, f->poly + i, ctx);
 }
 
-slong fq_nmod_mpoly_factor_get_exp_si(fq_nmod_mpoly_factor_t f, slong i, const fq_nmod_mpoly_ctx_t ctx);
+slong fq_nmod_mpoly_factor_get_exp_si(fq_nmod_mpoly_factor_t f, slong i, const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx));
 
 void fq_nmod_mpoly_factor_set(fq_nmod_mpoly_factor_t a,
                 const fq_nmod_mpoly_factor_t b, const fq_nmod_mpoly_ctx_t ctx);
@@ -472,7 +472,7 @@ int n_fq_bpoly_hlift(
     const fq_nmod_t alpha,
     slong degree_inner, /* required degree in x */
     const fq_nmod_ctx_t ctx,
-    n_poly_bpoly_stack_t St);
+    n_poly_bpoly_stack_t FLINT_UNUSED(St));
 
 int n_fq_polyu3_hlift(
     slong r,

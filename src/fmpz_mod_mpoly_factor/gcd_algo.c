@@ -33,7 +33,7 @@ static void fmpz_mod_mpoly_evals(
     const int * ignore,
     const fmpz_mod_mpoly_t A,
     ulong * Amin_exp,
-    ulong * Amax_exp,
+    ulong * FLINT_UNUSED(Amax_exp),
     ulong * Astride,
     const fmpz * alphas,
     const fmpz_mod_mpoly_ctx_t ctx)
@@ -98,7 +98,7 @@ static void fmpz_mod_mpoly_evals(
 
             fmpz_mod_poly_fit_length(out + j, varexp + 1, ctx->ffinfo);
 
-            while (out[j].length <= varexp)
+            while ((ulong) out[j].length <= varexp)
             {
                 fmpz_zero(out[j].coeffs + out[j].length);
                 out[j].length++;

@@ -75,7 +75,7 @@ static int fmpz_mod_poly_add_zip_must_match(
 
     for (i = 0; i < Z->length; i++)
     {
-        if (ai >= 0 && Zexps[i] == ai)
+        if (ai >= 0 && Zexps[i] == (ulong) ai)
         {
             /* Z present, A present */
             fmpz_set(Zcoeffs[i].coeffs + cur_length, Acoeffs + ai);
@@ -84,7 +84,7 @@ static int fmpz_mod_poly_add_zip_must_match(
                 ai--;
             } while (ai >= 0 && fmpz_is_zero(Acoeffs + ai));
         }
-        else if (ai < 0 || Zexps[i] > ai)
+        else if (ai < 0 || Zexps[i] > (ulong) ai)
         {
             /* Z present, A missing */
             fmpz_zero(Zcoeffs[i].coeffs + cur_length);
@@ -445,13 +445,13 @@ cleanup:
 
 static int _do_bivar_or_univar(
     fmpz_mod_mpoly_t G,
-    fmpz_mod_mpoly_t Abar,
-    fmpz_mod_mpoly_t Bbar,
+    fmpz_mod_mpoly_t FLINT_UNUSED(Abar),
+    fmpz_mod_mpoly_t FLINT_UNUSED(Bbar),
     fmpz_mod_mpoly_t A,
     fmpz_mod_mpoly_t B,
     slong var,
     const fmpz_mod_mpoly_ctx_t ctx,
-    flint_rand_t state)
+    flint_rand_t FLINT_UNUSED(state))
 {
     if (var == 1)
     {
@@ -734,7 +734,7 @@ outer_loop:
     for (i = 0; i < Gmarks->length; i++)
         perm[i] = i;
 
-#define length(k) Gmarks->coeffs[(k)+1] - Gmarks->coeffs[k]
+#define length(k) (Gmarks->coeffs[(k)+1] - Gmarks->coeffs[k])
 
     for (i = 1; i < Gmarks->length; i++)
         for (j = i; j > 0 && length(perm[j-1]) > length(perm[j]); j--)
@@ -745,7 +745,7 @@ outer_loop:
     for (i = 0; i < Gmarks->length; i++)
     {
         req_zip_images += length(i);
-        j = FLINT_MAX(j, length(i));
+        j = FLINT_MAX(j, (slong) length(i));
     }
 
     if (Gmarks->length > 1)

@@ -1078,10 +1078,10 @@ void fmpz_mpoly_from_mpoly_perm_inflate(
                 const slong * perm, const ulong * shift, const ulong * stride);
 
 void fmpz_mpoly_height(fmpz_t max,
-                             const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx);
+                             const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx));
 
 void fmpz_mpoly_heights(fmpz_t max, fmpz_t sum,
-                             const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx);
+                             const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx));
 
 /* geobuckets ****************************************************************/
 

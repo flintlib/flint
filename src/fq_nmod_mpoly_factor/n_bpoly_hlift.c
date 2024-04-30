@@ -368,7 +368,7 @@ int n_fq_bpoly_hlift(
     const fq_nmod_t alpha,
     slong degree_inner, /* required degree in x */
     const fq_nmod_ctx_t ctx,
-    n_poly_bpoly_stack_t St)
+    n_poly_bpoly_stack_t FLINT_UNUSED(St))
 {
     int success;
     slong i, j, k, tdeg;

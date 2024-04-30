@@ -479,7 +479,7 @@ static void n_fq_bpoly_lift_start(
                                                 r*sizeof(n_fq_bpoly_struct *));
 
     /* linear lifting has large memory requirements wrt r */
-    if (r < 20 + 5*FLINT_BIT_COUNT(degx))
+    if (r < 20 + 5 * (slong) FLINT_BIT_COUNT(degx))
         L->use_linear = 1;
     else
         L->use_linear = 0;
@@ -529,7 +529,7 @@ static void n_fq_bpoly_lift_start(
     FLINT_ASSERT(degx == n_fq_poly_degree(A->coeffs + 0));
 
     /* try evaluation when not too many local factors */
-    if (r < 10 + FLINT_BIT_COUNT(degx))
+    if (r < 10 + (slong) FLINT_BIT_COUNT(degx))
         L->Eok = nmod_eval_interp_set_degree_modulus(L->E, degx, ctx->mod);
     else
         L->Eok = 0;

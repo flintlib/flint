@@ -15,7 +15,7 @@
 void fmpz_mod_mpolyn_init(
     fmpz_mod_mpolyn_t A,
     flint_bitcnt_t bits,
-    const fmpz_mod_mpoly_ctx_t ctx)
+    const fmpz_mod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     A->coeffs = NULL;
     A->exps = NULL;

@@ -164,7 +164,7 @@ next:
         stop++;
 
     n_bpoly_fit_length(E, e + 1);
-    while (E->length <= e)
+    while (E->length <= (slong) e)
     {
         n_poly_zero(E->coeffs + E->length);
         E->length++;

@@ -347,8 +347,9 @@ static void _find_edge(
 /* NOTE: Here `input' has to be an array of size `count'.  It will be
  * overwritten, and its initial element values do not matter.  It will contain
  * dangling pointers after returning, that is, the values `input[ix]' will be
- * invalid after returning.  Hence, we silence warnings about dangling pointers. */
-#if defined(__GNUC__) && !defined(__clang__)
+ * invalid after returning.  Hence, we silence warnings about dangling pointers.
+ * However, this warning is only available in GCC 12 and forwards.*/
+#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 12
 # pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Wdangling-pointer"
 #endif

@@ -12,7 +12,7 @@
 #include "fmpz.h"
 #include "fq_nmod_mpoly_factor.h"
 
-slong fq_nmod_mpoly_factor_get_exp_si(fq_nmod_mpoly_factor_t f, slong i, const fq_nmod_mpoly_ctx_t ctx)
+slong fq_nmod_mpoly_factor_get_exp_si(fq_nmod_mpoly_factor_t f, slong i, const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_ASSERT(i < (ulong) f->num);
     return fmpz_get_si(f->exp + i);

@@ -12,7 +12,7 @@
 #include "fmpq_mpoly_factor.h"
 
 
-void fmpq_mpoly_factor_init(fmpq_mpoly_factor_t f, const fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_factor_init(fmpq_mpoly_factor_t f, const fmpq_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     fmpq_init(f->constant);
 	fmpq_one(f->constant);

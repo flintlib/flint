@@ -13,7 +13,7 @@
 #include "nmod_mpoly_factor.h"
 
 slong nmod_mpoly_factor_get_exp_si(nmod_mpoly_factor_t f,
-                                           slong i, const nmod_mpoly_ctx_t ctx)
+                                           slong i, const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_ASSERT(i < (ulong) f->num);
     return fmpz_get_si(f->exp + i);
