@@ -1291,7 +1291,7 @@ int fq_nmod_mpoly_factor_irred_smprime_zippel(
     FLINT_ASSERT(_n_fq_is_one(A->coeffs + d*0, d));
     FLINT_ASSERT(A->bits <= FLINT_BITS);
 
-    if (ctx->fqctx->modulus->length < n_clog(A->length, ctx->fqctx->modulus->mod.n))
+    if (ctx->fqctx->modulus->length < (slong) n_clog(A->length, ctx->fqctx->modulus->mod.n))
         return 0;
 
     fq_nmod_mpoly_init(Acopy, ctx);
