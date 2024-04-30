@@ -24,7 +24,7 @@ static int _try_lift(
     nmod_mpolyv_t qfac,
     const nmod_mpoly_t q,
     const nmod_mpolyv_t pfac,
-    const nmod_mpoly_t p,
+    const nmod_mpoly_t FLINT_UNUSED(p),
     slong m,
     mp_limb_t * alpha,
     slong n,

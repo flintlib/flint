@@ -517,13 +517,13 @@ static void _n_bpoly_mod_lift_build_steps(n_bpoly_mod_lift_t L, nmod_t ctx)
 /* linear lifting has large memory requirements wrt r */
 static int _use_linear_cutoff(slong r, slong degx)
 {
-    return r < 30 + 5*FLINT_BIT_COUNT(degx);
+    return r < 30 + 5 * (slong) FLINT_BIT_COUNT(degx);
 }
 
 /* evaluation has even large memory requirements wrt r */
 static int _try_eval_cutoff(slong r, slong degx)
 {
-    return r < 20 + 2*FLINT_BIT_COUNT(degx);
+    return r < 20 + 2 * (slong) FLINT_BIT_COUNT(degx);
 }
 
 static void n_bpoly_mod_lift_start(
@@ -674,7 +674,7 @@ void n_bpoly_mod_lift_combine(
     }
     else
     {
-        if (!L->Eok && r < 20 + 2*FLINT_BIT_COUNT(degx))
+        if (!L->Eok && r < 20 + 2 * (slong) FLINT_BIT_COUNT(degx))
             L->Eok = nmod_eval_interp_set_degree_modulus(L->E, degx, ctx);
 
         A = L->tmp->coeffs;
