@@ -25,7 +25,7 @@ static int _try_lift(
     fq_zech_mpolyv_t qfac,
     const fq_zech_mpoly_t q,
     const fq_zech_mpolyv_t pfac,
-    const fq_zech_mpoly_t p,
+    const fq_zech_mpoly_t FLINT_UNUSED(p),
     slong m,
     fq_zech_struct * alpha,
     slong n,

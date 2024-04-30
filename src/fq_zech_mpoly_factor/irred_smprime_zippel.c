@@ -117,7 +117,7 @@ void _fq_zech_mpoly_monomial_evals(
         mpoly_gen_offset_shift_sp(&offset, &shift, j, Abits, ctx->minfo);
 
         fq_zech_set(xpoweval, alpha + j, ctx->fqctx); /* xpoweval = alpha[i]^(2^i) */
-        for (i = 0; i < Abits; i++)
+        for (i = 0; (ulong) i < Abits; i++)
         {
             LUToffset[LUTlen] = offset;
             LUTmask[LUTlen] = (UWORD(1) << (shift + i));
@@ -197,7 +197,7 @@ static void _fq_zech_mpoly_monomial_evals_indirect(
         mpoly_gen_offset_shift_sp(&offset, &shift, j, Abits, ctx->minfo);
 
         fq_zech_set(xpoweval, alpha + j, ctx->fqctx); /* xpoweval = alpha[i]^(2^i) */
-        for (i = 0; i < Abits; i++)
+        for (i = 0; (ulong) i < Abits; i++)
         {
             LUToffset[LUTlen] = offset;
             LUTmask[LUTlen] = (UWORD(1) << (shift + i));
@@ -1101,7 +1101,7 @@ int fq_zech_mpoly_factor_irred_smprime_zippel(
     FLINT_ASSERT(fq_zech_is_one(A->coeffs + 0, ctx->fqctx));
     FLINT_ASSERT(A->bits <= FLINT_BITS);
 
-    if (fq_zech_ctx_degree(ctx->fqctx) <= n_clog(A->length, fq_zech_ctx_mod(ctx->fqctx).n))
+    if (fq_zech_ctx_degree(ctx->fqctx) <= (slong) n_clog(A->length, fq_zech_ctx_mod(ctx->fqctx).n))
         return 0;
 
     fq_zech_mpoly_init(Acopy, ctx);

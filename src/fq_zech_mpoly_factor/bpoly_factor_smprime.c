@@ -19,14 +19,13 @@
 #include "nmod_mpoly_factor.h"
 #include "fq_zech_mpoly_factor.h"
 
-int fq_zech_next(fq_zech_t x, const fq_zech_ctx_t ctx)
+int fq_zech_next(fq_zech_t x, const fq_zech_ctx_t FLINT_UNUSED(ctx))
 {
     if (x->value < 1)
         return 0;
     x->value--;
     return 1;
 }
-
 
 void fq_zech_bpoly_eval_var1(
     fq_zech_poly_t E,
@@ -582,7 +581,7 @@ static void _lattice(
     Then, run zassenhaus on the gprod[i] as factors of A.
 */
 static int _zassenhaus(
-    const zassenhaus_prune_t zas,
+    const zassenhaus_prune_t FLINT_UNUSED(zas),
     slong limit,
     fq_zech_tpoly_t F,
     const fq_zech_t malpha,

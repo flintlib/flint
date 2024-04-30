@@ -13,7 +13,7 @@
 #include "mpoly.h"
 #include "fq_zech_mpoly_factor.h"
 
-void fq_zech_polyu_clear(fq_zech_polyu_t A, const fq_zech_ctx_t ctx)
+void fq_zech_polyu_clear(fq_zech_polyu_t A, const fq_zech_ctx_t FLINT_UNUSED(ctx))
 {
     if (A->alloc > 0)
     {

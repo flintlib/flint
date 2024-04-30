@@ -66,7 +66,7 @@ int fq_zech_mpoly_get_fq_zech_poly(
         {
             k = Bexps[N*i + off + 0];
             check = 0;
-            for (j = 1; j < wpf; j++)
+            for (j = 1; (ulong) j < wpf; j++)
                 check |= Bexps[N*i + off + j];
 
             if (check != 0 || (slong) k < 0)
