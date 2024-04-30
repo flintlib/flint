@@ -199,11 +199,11 @@ choose_prime:
     if (_fmpz_mod_poly_degree(modulus) > 0)
     {
         FLINT_ASSERT(G->length > 0);
-        if (_fmpz_mod_poly_degree(Gevalp) > G->exps[0])
+        if ((ulong) _fmpz_mod_poly_degree(Gevalp) > G->exps[0])
         {
             goto choose_prime;
         }
-        else if (_fmpz_mod_poly_degree(Gevalp) < G->exps[0])
+        else if ((ulong) _fmpz_mod_poly_degree(Gevalp) < G->exps[0])
         {
             fmpz_mod_poly_one(modulus, ctx);
         }

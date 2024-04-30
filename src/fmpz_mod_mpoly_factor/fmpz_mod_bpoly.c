@@ -61,7 +61,7 @@ void fmpz_mod_bpoly_fit_length(
     A->alloc = len;
 }
 
-void fmpz_mod_bpoly_zero(fmpz_mod_bpoly_t A, const fmpz_mod_ctx_t ctx)
+void fmpz_mod_bpoly_zero(fmpz_mod_bpoly_t A, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
 {
     A->length = 0;
 }
@@ -119,7 +119,7 @@ void fmpz_mod_bpoly_one(fmpz_mod_bpoly_t A, const fmpz_mod_ctx_t ctx)
 
 slong fmpz_mod_bpoly_degree1(
     const fmpz_mod_bpoly_t A,
-    const fmpz_mod_ctx_t ctx)
+    const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
 {
     slong i, len = 0;
     for (i = 0; i < A->length; i++)
