@@ -18,7 +18,9 @@ comment: false
 
 ignore:
  - "src/*/inlines.c"
+ - "src/test/main.c"
  - "src/test/t-*.c"
+ - "src/*/test/main.c"
  - "src/*/test/t-*.c"
  - "src/generic_files/exception.c"
  - "src/generic_files/profiler.c"

@@ -57,12 +57,12 @@ jobs:
           # ... plus these ones missing in apt
           sudo cpan -T Memory::Process Scalar::Util
 
-          # Install lcov 2.1
+          # Install lcov 2.0
           mkdir lcov
           cd lcov
-          wget https://github.com/linux-test-project/lcov/releases/download/v2.1/lcov-2.1.tar.gz
-          tar -xf lcov-2.1.tar.gz
-          cd lcov-2.1/
+          wget https://github.com/linux-test-project/lcov/releases/download/v2.0/lcov-2.0.tar.gz
+          tar -xf lcov-2.0.tar.gz
+          cd lcov-2.0/
           sudo make install
 
           # Check versions
@@ -101,16 +101,22 @@ jobs:
 
       - name: "Gather coverage data"
         run: |
-          # NOTE: When Ubuntu LTS ships lcov v2.1.0+, change this section to
+          # NOTE: When Ubuntu LTS ships lcov v2.0.0+, change this section to
           # `$MAKE coverage'.
           mkdir build/coverage
           lcov -j $(expr $(nproc) + 1) \
             --capture \
             --omit-lines "flint_throw" \
             --omit-lines '^}$' \
-            --exclude "*test/t-*.c" \
-            --exclude "*test/main.c" \
             --exclude "/usr/*" \
+            --exclude "src/*/inlines.c" \
+            --exclude "src/test/main.c" \
+            --exclude "src/test/t-*.c" \
+            --exclude "src/*/test/main.c" \
+            --exclude "src/*/test/t-*.c" \
+            --exclude "src/generic_files/exception.c" \
+            --exclude "src/generic_files/profiler.c" \
+            --exclude "src/profiler.h" \
             --directory build \
             --output-file build/coverage/coverage.info
 
