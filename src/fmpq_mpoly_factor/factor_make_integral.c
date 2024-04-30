@@ -13,7 +13,7 @@
 
 
 int fmpq_mpoly_factor_make_integral(fmpq_mpoly_factor_t f,
-                                                    const fmpq_mpoly_ctx_t ctx)
+                                                    const fmpq_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     int success = 1;
     slong i;
