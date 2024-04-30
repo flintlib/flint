@@ -78,9 +78,9 @@
 /* the legal functions must be implemented */
 #define DEFINE_IT(nn, zz, ff) \
 static void CAT4(radix_2_moth_inv_trunc_block, nn, zz, ff)( \
-    const sd_fft_lctx_t Q, \
-    ulong j, \
-    double* X0, double* X1) \
+    const sd_fft_lctx_t FLINT_UNUSED(Q), \
+    ulong FLINT_UNUSED(j), \
+    double* FLINT_UNUSED(X0), double* FLINT_UNUSED(X1)) \
 { \
     int l = 2; \
     flint_printf("function l = %d, n = %d, z = %d, f = %d", l, nn, zz, ff); \
@@ -149,7 +149,7 @@ static void radix_2_moth_inv_trunc_block_1_2_0(
 /* {x0, x1} = {2*x0, x0} */
 static void radix_2_moth_inv_trunc_block_1_1_1(
     const sd_fft_lctx_t Q,
-    ulong j,
+    ulong FLINT_UNUSED(j),
     double* X0, double* X1)
 {
     VECND n    = VECNOP(set_d)(Q->p);
@@ -168,8 +168,8 @@ static void radix_2_moth_inv_trunc_block_1_1_1(
 /* {x0} = {2*x0} */
 static void radix_2_moth_inv_trunc_block_1_1_0(
     const sd_fft_lctx_t Q,
-    ulong j,
-    double* X0, double* X1)
+    ulong FLINT_UNUSED(j),
+    double* X0, double* FLINT_UNUSED(X1))
 {
     VECND n    = VECNOP(set_d)(Q->p);
     VECND ninv = VECNOP(set_d)(Q->pinv);
@@ -208,8 +208,8 @@ static void radix_2_moth_inv_trunc_block_0_2_1(
 /* {x0} = {(x0)/2} */
 static void radix_2_moth_inv_trunc_block_0_1_1(
     const sd_fft_lctx_t Q,
-    ulong j,
-    double* X0, double* X1)
+    ulong FLINT_UNUSED(j),
+    double* X0, double* FLINT_UNUSED(X1))
 {
     VECND n    = VECNOP(set_d)(Q->p);
     VECND ninv = VECNOP(set_d)(Q->pinv);
@@ -395,7 +395,7 @@ DEFINE_IT(1)
 
 /* use with n = m-2 and m >= 6 */
 #define EXTEND_BASECASE(n, m) \
-void CAT3(sd_ifft_basecase, m, 1)(const sd_fft_lctx_t Q, double* X, ulong j_mr, ulong j_bits) \
+void CAT3(sd_ifft_basecase, m, 1)(const sd_fft_lctx_t Q, double* X, ulong FLINT_UNUSED(j_mr), ulong FLINT_UNUSED(j_bits)) \
 { \
     ulong l = n_pow2(m - 2); \
     FLINT_ASSERT(j_bits == 0); \
@@ -668,7 +668,7 @@ k = 2, n = 3, z = 3, f = false
 static void radix_4_moth_inv_trunc_block_3_3_0(
     const sd_fft_lctx_t Q,
     ulong j, ulong j_bits,
-    double* X0, double* X1, double* X2, double* X3)
+    double* X0, double* X1, double* X2, double* FLINT_UNUSED(X3))
 {
     ulong j_mr = n_pow2(j_bits) - 1 - j;
     VECND n    = VECNOP(set_d)(Q->p);
@@ -802,7 +802,7 @@ k = 2, n = 2, z = 2, f = true
 static void radix_4_moth_inv_trunc_block_2_2_1(
     const sd_fft_lctx_t Q,
     ulong j, ulong j_bits,
-    double* X0, double* X1, double* X2, double* X3)
+    double* X0, double* X1, double* X2, double* FLINT_UNUSED(X3))
 {
     ulong j_mr = n_pow2(j_bits) - 1 - j;
     VECND n    = VECNOP(set_d)(Q->p);
@@ -838,7 +838,7 @@ k = 2, n = 2, z = 2, f = 0
 static void radix_4_moth_inv_trunc_block_2_2_0(
     const sd_fft_lctx_t Q,
     ulong j, ulong j_bits,
-    double* X0, double* X1, double* X2, double* X3)
+    double* X0, double* X1, double* FLINT_UNUSED(X2), double* FLINT_UNUSED(X3))
 {
     ulong j_mr = n_pow2(j_bits) - 1 - j;
     VECND n    = VECNOP(set_d)(Q->p);
@@ -943,8 +943,8 @@ k = 2, n = 1, z = 1, f = true
 */
 static void radix_4_moth_inv_trunc_block_1_1_1(
     const sd_fft_lctx_t Q,
-    ulong j, ulong j_bits,
-    double* X0, double* X1, double* X2, double* X3)
+    ulong FLINT_UNUSED(j), ulong FLINT_UNUSED(j_bits),
+    double* X0, double* X1, double* FLINT_UNUSED(X2), double* FLINT_UNUSED(X3))
 {
     VECND n    = VECNOP(set_d)(Q->p);
     VECND ninv = VECNOP(set_d)(Q->pinv);
@@ -965,8 +965,8 @@ k = 2, n = 1, z = 1, f = false
 */
 static void radix_4_moth_inv_trunc_block_1_1_0(
     const sd_fft_lctx_t Q,
-    ulong j, ulong j_bits,
-    double* X0, double* X1, double* X2, double* X3)
+    ulong FLINT_UNUSED(j), ulong FLINT_UNUSED(j_bits),
+    double* X0, double* FLINT_UNUSED(X1), double* FLINT_UNUSED(X2), double* FLINT_UNUSED(X3))
 {
     VECND n    = VECNOP(set_d)(Q->p);
     VECND ninv = VECNOP(set_d)(Q->pinv);

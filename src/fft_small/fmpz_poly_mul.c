@@ -64,14 +64,14 @@ static void _mod(
                     ulong aa[8];
 
                     /* todo: vectorize */
-                    aa[0] = a[i + j + 0] >= 0 ? a[i + j + 0] : a[i + j + 0] + p;
-                    aa[1] = a[i + j + 1] >= 0 ? a[i + j + 1] : a[i + j + 1] + p;
-                    aa[2] = a[i + j + 2] >= 0 ? a[i + j + 2] : a[i + j + 2] + p;
-                    aa[3] = a[i + j + 3] >= 0 ? a[i + j + 3] : a[i + j + 3] + p;
-                    aa[4] = a[i + j + 4] >= 0 ? a[i + j + 4] : a[i + j + 4] + p;
-                    aa[5] = a[i + j + 5] >= 0 ? a[i + j + 5] : a[i + j + 5] + p;
-                    aa[6] = a[i + j + 6] >= 0 ? a[i + j + 6] : a[i + j + 6] + p;
-                    aa[7] = a[i + j + 7] >= 0 ? a[i + j + 7] : a[i + j + 7] + p;
+                    aa[0] = a[i + j + 0] >= 0 ? (ulong) a[i + j + 0] : a[i + j + 0] + p;
+                    aa[1] = a[i + j + 1] >= 0 ? (ulong) a[i + j + 1] : a[i + j + 1] + p;
+                    aa[2] = a[i + j + 2] >= 0 ? (ulong) a[i + j + 2] : a[i + j + 2] + p;
+                    aa[3] = a[i + j + 3] >= 0 ? (ulong) a[i + j + 3] : a[i + j + 3] + p;
+                    aa[4] = a[i + j + 4] >= 0 ? (ulong) a[i + j + 4] : a[i + j + 4] + p;
+                    aa[5] = a[i + j + 5] >= 0 ? (ulong) a[i + j + 5] : a[i + j + 5] + p;
+                    aa[6] = a[i + j + 6] >= 0 ? (ulong) a[i + j + 6] : a[i + j + 6] + p;
+                    aa[7] = a[i + j + 7] >= 0 ? (ulong) a[i + j + 7] : a[i + j + 7] + p;
 
                     vec8n t = vec8n_load_unaligned(aa);
                     FLINT_ASSERT(i+j < atrunc);
@@ -81,7 +81,7 @@ static void _mod(
 
             aI = sd_fft_ctx_blk_index(abuf, i/BLK_SZ);
             for (j = 0; j < an - i; j++)
-                aI[j] = a[i + j] >= 0 ? a[i + j] : a[i + j] + p;
+                aI[j] = a[i + j] >= 0 ? (ulong) a[i + j] : a[i + j] + p;
         }
     }
     else if (FLINT_ABS(abits) <= SMALL_FMPZ_BITCOUNT_MAX)
@@ -278,7 +278,7 @@ DEFINE_IT(8, 7, 6)  /* 400 bits */
 static void _crt_1(
     fmpz * z, ulong zl, ulong zi_start, ulong zi_stop,
     sd_fft_ctx_struct* Rffts, double* d, ulong dstride,
-    crt_data_struct* Rcrts)
+    crt_data_struct* FLINT_UNUSED(Rcrts))
 {
     ulong i, j, jstart, jstop;
     ulong Xs[BLK_SZ*1];

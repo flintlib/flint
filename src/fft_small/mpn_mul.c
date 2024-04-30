@@ -657,7 +657,7 @@ DEFINE_IT(8,192)
 
 
 #define DEFINE_IT(n, n_plus_1) \
-FLINT_FORCE_INLINE void CAT(_add_to_answer_easy, n)(ulong z[], ulong r[], ulong zn, ulong toff, ulong tshift) \
+FLINT_FORCE_INLINE void CAT(_add_to_answer_easy, n)(ulong z[], ulong r[], ulong FLINT_UNUSED(zn), ulong toff, ulong tshift) \
 { \
     FLINT_ASSERT(zn > toff); \
     if (tshift == 0) \
@@ -976,7 +976,7 @@ static void fill_vec_two_pow_tab(
 
 void mpn_ctx_init(mpn_ctx_t R, ulong p)
 {
-    slong i;
+    ulong i;
 
     R->buffer = NULL;
     R->buffer_alloc = 0;
@@ -1704,7 +1704,7 @@ timeit_start(timer);
             thread_pool_wait(global_thread_pool, P.handles[i - 1]);
 
         unsigned char cf = 0;
-        for (ulong i = 1; i <= P.nhandles; i++)
+        for (slong i = 1; i <= P.nhandles; i++)
         {
             ulong start = w[i].start_easy*P.bits/64;
             if (i == P.nhandles)

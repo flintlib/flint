@@ -277,7 +277,7 @@ DEFINE_IT(1)
 
 /* use with n = m-2 and m >= 6 */
 #define EXTEND_BASECASE(n, m) \
-static void CAT3(sd_fft_basecase, m, 1)(const sd_fft_lctx_t Q, double* X, ulong j_r, ulong j_bits) \
+static void CAT3(sd_fft_basecase, m, 1)(const sd_fft_lctx_t Q, double* X, ulong FLINT_UNUSED(j_r), ulong FLINT_UNUSED(j_bits)) \
 { \
     ulong l = n_pow2(m - 2); \
     _RADIX_4_FORWARD_PARAM_J_IS_Z(VECND, Q) \
@@ -344,7 +344,7 @@ static void sd_fft_base_0(const sd_fft_lctx_t Q, ulong I, ulong j)
 #define DEFINE_IT(itrunc, otrunc) \
 static void CAT4(sd_fft_moth_trunc_block, itrunc, otrunc, 1)( \
     const sd_fft_lctx_t Q, \
-    ulong j_r, ulong j_bits, \
+    ulong FLINT_UNUSED(j_r), ulong FLINT_UNUSED(j_bits), \
     double* X0, double* X1, double* X2, double* X3) \
 { \
     _RADIX_4_FORWARD_PARAM_J_IS_Z(VECND, Q); \

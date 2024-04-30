@@ -289,7 +289,7 @@ DEFINE_IT(4, 4, 3)
 static void _crt_1(
     ulong* z, ulong zl, ulong zi_start, ulong zi_stop,
     sd_fft_ctx_struct* Rffts, double* d, ulong dstride,
-    crt_data_struct* Rcrts,
+    crt_data_struct* FLINT_UNUSED(Rcrts),
     nmod_t mod)
 {
     ulong i, j, jstart, jstop;
@@ -616,13 +616,14 @@ got_np_and_offset:
     flint_give_back_threads(handles, nworkers);
 }
 
-void _nmod_poly_mul_mod_xpnm1_naive(
+#if 0
+static void _nmod_poly_mul_mod_xpnm1_naive(
     ulong* z, ulong zn,
     const ulong* a, ulong an,
     const ulong* b, ulong bn,
     ulong lgN,
     nmod_t mod,
-    mpn_ctx_t R)
+    mpn_ctx_t FLINT_UNUSED(R))
 {
     ulong N = n_pow2(lgN);
     FLINT_ASSERT(zn <= N);
@@ -644,7 +645,7 @@ void _nmod_poly_mul_mod_xpnm1_naive(
 
     flint_free(t);
 }
-
+#endif
 
 void _nmod_poly_mul_mod_xpnm1(
     ulong* z, ulong ztrunc,
