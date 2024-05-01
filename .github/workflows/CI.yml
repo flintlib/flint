@@ -57,12 +57,12 @@ jobs:
           # ... plus these ones missing in apt
           sudo cpan -T Memory::Process Scalar::Util
 
-          # Install lcov 2.0
+          # Install lcov 2.1
           mkdir lcov
           cd lcov
-          wget https://github.com/linux-test-project/lcov/releases/download/v2.0/lcov-2.0.tar.gz
-          tar -xf lcov-2.0.tar.gz
-          cd lcov-2.0/
+          wget https://github.com/linux-test-project/lcov/releases/download/v2.1/lcov-2.1.tar.gz
+          tar -xf lcov-2.1.tar.gz
+          cd lcov-2.1/
           sudo make install
 
           # Check versions
@@ -101,7 +101,7 @@ jobs:
 
       - name: "Gather coverage data"
         run: |
-          # NOTE: When Ubuntu LTS ships lcov v2.0.0+, change this section to
+          # NOTE: When Ubuntu LTS ships lcov v2.1.0+, change this section to
           # `$MAKE coverage'.
           mkdir build/coverage
           lcov -j $(expr $(nproc) + 1) \
