@@ -81,10 +81,12 @@ generic_mulhigh_basecase(mp_ptr rp, mp_srcptr up, mp_srcptr vp, mp_size_t n)
 static ulong lower_bound(ulong n)
 {
     /* These are calculated by hand lower bound for the returned limb */
+    /* mulhi(u, v) truncated at B^n has an error of at most 2 n B^n, which is a
+     * strict inequality */
     if (n < 3)
         return 0;
     else
-        return 4 * n - 8;
+        return 2 * n;
 }
 #endif
 
