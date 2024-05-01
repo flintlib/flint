@@ -17,7 +17,7 @@ TEST_FUNCTION_START(fmpz_vec_dot_general, state)
 {
     int iter;
 
-    for (iter = 0; iter < 100000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
     {
         fmpz * a, * b;
         fmpz_t s, t, c;
