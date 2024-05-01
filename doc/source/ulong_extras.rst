@@ -1040,12 +1040,6 @@ Square root and perfect power testing
     `x \leftarrow x - (x\cdot x\cdot x - a)\cdot x/(2\cdot x\cdot x\cdot x + a)` for getting a good estimate,
     as mentioned in the paper by W. Kahan [Kahan1991]_ .
 
-.. function:: ulong n_cbrt_newton_iteration(ulong n)
-
-    This function returns the integer truncation of the cube root of `n`.
-    Makes use of Newton iterations to get a close value, and then adjusts the
-    estimate so as to get the correct value.
-
 .. function:: ulong n_cbrt_binary_search(ulong n)
 
     This function returns the integer truncation of the cube root of `n`.

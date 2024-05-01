@@ -60,7 +60,6 @@ int n_is_squarefree(ulong n);
 double n_cbrt_estimate(double a);
 ulong n_cbrt(ulong a);
 ulong n_cbrt_binary_search(ulong x);
-ulong n_cbrt_newton_iteration(ulong n);
 ulong n_cbrt_chebyshev_approx(ulong n);
 ulong n_cbrtrem(ulong* remainder, ulong n);
 
