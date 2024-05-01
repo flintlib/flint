@@ -176,13 +176,21 @@ static inline int flint_ctz(ulong x)
 # define MPN_DECR_U MPN_DECR_U
 FLINT_FORCE_INLINE void MPN_INCR_U(mp_ptr ptr, mp_size_t size, mp_limb_t incr)
 {
+# if FLINT_WANT_ASSERT
     mp_limb_t cy = mpn_add_1(ptr, ptr, size, incr);
     FLINT_ASSERT(cy == 0);
+# else
+    mpn_add_1(ptr, ptr, size, incr);
+# endif
 }
 FLINT_FORCE_INLINE void MPN_DECR_U(mp_ptr ptr, mp_size_t size, mp_limb_t incr)
 {
+# if FLINT_WANT_ASSERT
     mp_limb_t cy = mpn_sub_1(ptr, ptr, size, incr);
     FLINT_ASSERT(cy == 0);
+# else
+    mpn_sub_1(ptr, ptr, size, incr);
+# endif
 }
 #endif
 
