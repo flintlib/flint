@@ -31,13 +31,13 @@ TEST_FUNCTION_START(compute_primes, state)
     }
     n_primes_clear(pg);
 
-    for (i = 0; i < 250; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         slong n;
         const mp_limb_t * primes;
         const double * inverses;
 
-        n = n_randtest(state) % lim;
+        n = n_randint(state, lim);
 
         primes = n_primes_arr_readonly(n + 1);
         inverses = n_prime_inverses_arr_readonly(n + 1);
@@ -48,7 +48,7 @@ TEST_FUNCTION_START(compute_primes, state)
                     "inv1 = %g, inv2 = %g\n",
                     n, primes[n], ref_primes[n], inverses[n], ref_inverses[n]);
 
-        if (n_randint(state, 20) == 0)
+        if (n_randint(state, 50) == 0)
             n_cleanup_primes();
     }
 

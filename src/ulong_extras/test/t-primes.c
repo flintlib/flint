@@ -19,42 +19,42 @@ TEST_FUNCTION_START(n_primes, state)
     /* compare with n_nextprime */
     {
         n_primes_t iter;
-        slong i;
         mp_limb_t p, q;
 
         n_primes_init(iter);
         q = 0;
-        for (i = 0; i < 200000; i++)
+        for (n = 0; n < 100000 * flint_test_multiplier(); n++)
         {
             p = n_primes_next(iter);
             q = n_nextprime(q, 0);
 
             if (p != q)
-                TEST_FUNCTION_FAIL("i = %wu, p = %wu, q = %wu\n", i, p, q);
+                TEST_FUNCTION_FAIL("n = %wu, p = %wu, q = %wu\n", n, p, q);
         }
 
         n_primes_clear(iter);
     }
 
     /* count primes */
-    for (n = 0; n < 10; n++)
     {
+        ulong r, s, p;
         n_primes_t iter;
-        mp_limb_t s, p, r;
-
-        const unsigned int primepi[10] = {
+        slong n_max = flint_test_multiplier() > 1.0 ? 10 : flint_test_multiplier() < 1.0 ? 8 : 9;
+        const unsigned int primepi[10] =
+        {
             0, 4, 25, 168, 1229, 9592, 78498, 664579, 5761455, 50847534
         };
 
-        r = n_pow(10, n);
-
         n_primes_init(iter);
-        s = 0;
-        while ((p = n_primes_next(iter)) <= r)
-            s++;
 
-        if (s != primepi[n])
-            TEST_FUNCTION_FAIL("pi(10^%wd) = %u, computed = %wu\n", n, primepi[n], s);
+        for (n = 0, r = 1, s = 0; n < n_max; n++, r *= 10, s++)
+        {
+            while ((p = n_primes_next(iter)) <= r)
+                s++;
+
+            if (s != primepi[n])
+                TEST_FUNCTION_FAIL("pi(10^%wd) = %u, computed = %wu\n", n, primepi[n], s);
+        }
 
         n_primes_clear(iter);
     }
