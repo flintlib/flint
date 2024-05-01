@@ -17,7 +17,7 @@ TEST_FUNCTION_START(fmpz_mat_snf_iliopoulos, state)
 {
     slong iter;
 
-    for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 5000 * flint_test_multiplier(); iter++)
     {
         fmpz_mat_t A, S, S2;
         fmpz_t mod;

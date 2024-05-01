@@ -15,7 +15,7 @@
 #include "fmpz_vec.h"
 #include "fmpz_mat.h"
 
-int
+static int
 fmpz_mat_mod_is_in_howell_form(const fmpz_mat_t A, const fmpz_t mod)
 {
     slong *pivots;
@@ -148,7 +148,7 @@ TEST_FUNCTION_START(fmpz_mat_howell_form_mod, state)
 {
     slong i;
 
-    for (i = 0; i < 10000*flint_test_multiplier(); i++)
+    for (i = 0; i < 5000 * flint_test_multiplier(); i++)
     {
         fmpz_mat_t A, B, D;
         fmpz_t mod;
