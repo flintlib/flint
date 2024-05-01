@@ -14,7 +14,7 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void cyclotomic_naive(fmpz_poly_t poly, ulong n)
+static void cyclotomic_naive(fmpz_poly_t poly, ulong n)
 {
     fmpz_poly_t t;
     slong d;
@@ -57,7 +57,7 @@ TEST_FUNCTION_START(fmpz_poly_cyclotomic, state)
     fmpz_poly_t A, B;
     slong n;
 
-    for (n = 0; n <= 1000; n++)
+    for (n = 0; n <= FLINT_MAX(200.0, 100 * flint_test_multiplier()); n++)
     {
         fmpz_poly_init(A);
         fmpz_poly_init(B);
@@ -85,6 +85,7 @@ TEST_FUNCTION_START(fmpz_poly_cyclotomic, state)
        This exercises the slow path at least on a 32 bit system.
        Testing the 64 bit value is a bit too much to do by default
         as it requires ~2 GB of memory and takes a few minutes. */
+    if (flint_test_multiplier() >= 2.0)
     {
         fmpz_t h, ref;
 
