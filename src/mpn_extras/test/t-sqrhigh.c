@@ -83,7 +83,7 @@ static ulong lower_bound(ulong n)
     if (n < 3)
         return 0;
     else
-        return 4 * n - 8;
+        return 2 * n;
 }
 #endif
 
