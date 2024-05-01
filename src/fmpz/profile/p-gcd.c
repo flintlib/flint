@@ -69,7 +69,7 @@ fmpz_gcd_old(fmpz_t f, const fmpz_t g, const fmpz_t h)
         }
         else                    /* g and h are both large */
         {
-            __mpz_struct *z = _fmpz_promote(f);   /* aliasing fine as g, h already large */
+            mpz_ptr z = _fmpz_promote(f);   /* aliasing fine as g, h already large */
 
             mpz_gcd(z, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
             _fmpz_demote_val(f);    /* gcd may be small */

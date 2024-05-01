@@ -46,7 +46,7 @@ slong _fmpz_remove(fmpz_t x, const fmpz_t f, double finv)
     }
     else  /* x is large */
     {
-        __mpz_struct *z = COEFF_TO_PTR(y);
+        mpz_ptr z = COEFF_TO_PTR(y);
 
         if (!COEFF_IS_MPZ(q))  /* f is small */
         {
@@ -80,7 +80,7 @@ slong _fmpz_remove(fmpz_t x, const fmpz_t f, double finv)
         }
         else  /* f is large */
         {
-            __mpz_struct *r = COEFF_TO_PTR(q);
+            mpz_ptr r = COEFF_TO_PTR(q);
 
             if (!mpz_divisible_p(z, r))
             {

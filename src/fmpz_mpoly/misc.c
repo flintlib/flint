@@ -26,7 +26,7 @@ void _fmpz_mpoly_sub_uiuiui_fmpz(ulong * c, const fmpz_t d)
    } else
    {
       slong size = fmpz_size(d);
-      __mpz_struct * m = COEFF_TO_PTR(fc);
+      mpz_ptr m = COEFF_TO_PTR(fc);
       if (fmpz_sgn(d) < 0)
          mpn_add(c, c, 3, m->_mp_d, size);
       else
@@ -47,7 +47,7 @@ void _fmpz_mpoly_add_uiuiui_fmpz(ulong * c, const fmpz_t d)
    } else
    {
       slong size = fmpz_size(d);
-      __mpz_struct * m = COEFF_TO_PTR(fc);
+      mpz_ptr m = COEFF_TO_PTR(fc);
       if (fmpz_sgn(d) < 0)
          mpn_sub(c, c, 3, m->_mp_d, size);
       else

@@ -49,7 +49,7 @@ typedef struct
 /* The number of new mpz's allocated at a time */
 #define MPZ_BLOCK 64
 
-FLINT_TLS_PREFIX __mpz_struct ** mpz_free_arr = NULL;
+FLINT_TLS_PREFIX mpz_ptr * mpz_free_arr = NULL;
 FLINT_TLS_PREFIX ulong mpz_free_num = 0;
 FLINT_TLS_PREFIX ulong mpz_free_alloc = 0;
 
@@ -78,7 +78,7 @@ void * flint_align_ptr(void * ptr, slong size)
     return (void *)((mask & (slong) ptr) + size);
 }
 
-__mpz_struct * _fmpz_new_mpz(void)
+mpz_ptr _fmpz_new_mpz(void)
 {
     if (mpz_free_num == 0) /* allocate more mpz's */
     {
@@ -110,7 +110,7 @@ __mpz_struct * _fmpz_new_mpz(void)
 
         for (i = 0; i < PAGES_PER_BLOCK; i++)
         {
-            __mpz_struct * page_ptr = (__mpz_struct *)((slong) aligned_ptr + i*flint_page_size);
+            mpz_ptr page_ptr = (mpz_ptr) ((slong) aligned_ptr + i*flint_page_size);
 
             /* set pointer in each page to start of entire block */
             ((fmpz_block_header_s *) page_ptr)->address = ptr;
@@ -126,7 +126,7 @@ __mpz_struct * _fmpz_new_mpz(void)
                 if (mpz_free_num >= mpz_free_alloc)
                 {
                     mpz_free_alloc = FLINT_MAX(mpz_free_num + 1, mpz_free_alloc * 2);
-                    mpz_free_arr = flint_realloc(mpz_free_arr, mpz_free_alloc * sizeof(__mpz_struct *));
+                    mpz_free_arr = flint_realloc(mpz_free_arr, mpz_free_alloc * sizeof(mpz_ptr));
                 }
 
                 mpz_free_arr[mpz_free_num++] = page_ptr + j;
@@ -139,7 +139,7 @@ __mpz_struct * _fmpz_new_mpz(void)
 
 void _fmpz_clear_mpz(fmpz f)
 {
-    __mpz_struct * ptr = COEFF_TO_PTR(f);
+    mpz_ptr ptr = COEFF_TO_PTR(f);
 
     /* check free count for block is zero, else this mpz came from a thread */
     fmpz_block_header_s * header_ptr = (fmpz_block_header_s *)((slong) ptr & flint_page_mask);
@@ -173,7 +173,7 @@ void _fmpz_clear_mpz(fmpz f)
         if (mpz_free_num == mpz_free_alloc)
         {
             mpz_free_alloc = FLINT_MAX(64, mpz_free_alloc * 2);
-            mpz_free_arr = flint_realloc(mpz_free_arr, mpz_free_alloc * sizeof(__mpz_struct *));
+            mpz_free_arr = flint_realloc(mpz_free_arr, mpz_free_alloc * sizeof(mpz_ptr));
         }
 
         mpz_free_arr[mpz_free_num++] = ptr;
@@ -215,11 +215,11 @@ void _fmpz_cleanup(void)
     mpz_free_arr = NULL;
 }
 
-__mpz_struct * _fmpz_promote(fmpz_t f)
+mpz_ptr _fmpz_promote(fmpz_t f)
 {
     if (!COEFF_IS_MPZ(*f)) /* f is small so promote it first */
     {
-        __mpz_struct * mf = _fmpz_new_mpz();
+        mpz_ptr mf = _fmpz_new_mpz();
         (*f) = PTR_TO_COEFF(mf);
         return mf;
     }
@@ -227,12 +227,12 @@ __mpz_struct * _fmpz_promote(fmpz_t f)
         return COEFF_TO_PTR(*f);
 }
 
-__mpz_struct * _fmpz_promote_val(fmpz_t f)
+mpz_ptr _fmpz_promote_val(fmpz_t f)
 {
     fmpz c = (*f);
     if (!COEFF_IS_MPZ(c)) /* f is small so promote it */
     {
-        __mpz_struct * mf = _fmpz_new_mpz();
+        mpz_ptr mf = _fmpz_new_mpz();
         (*f) = PTR_TO_COEFF(mf);
         flint_mpz_set_si(mf, c);
         return mf;
@@ -243,7 +243,7 @@ __mpz_struct * _fmpz_promote_val(fmpz_t f)
 
 void _fmpz_demote_val(fmpz_t f)
 {
-    __mpz_struct * mf = COEFF_TO_PTR(*f);
+    mpz_ptr mf = COEFF_TO_PTR(*f);
     int size = mf->_mp_size;
 
     if (size == 1 || size == -1)
@@ -267,7 +267,7 @@ void _fmpz_demote_val(fmpz_t f)
 
 void _fmpz_init_readonly_mpz(fmpz_t f, const mpz_t z)
 {
-   __mpz_struct *ptr;
+   mpz_ptr ptr;
    *f = WORD(0);
    ptr = _fmpz_promote(f);
 

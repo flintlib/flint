@@ -127,7 +127,7 @@ nmod_poly_bit_pack(fmpz_t f, const nmod_poly_t poly,
                    flint_bitcnt_t bit_size)
 {
     slong len, limbs;
-    __mpz_struct * mpz;
+    mpz_ptr mpz;
     slong i;
 
     len = nmod_poly_length(poly);

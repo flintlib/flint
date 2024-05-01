@@ -208,7 +208,7 @@ void arf_printd(const arf_t y, slong d) { arf_fprintd(stdout, y, d); }
 int arf_load_file(arf_t x, FILE * stream)
 {
     fmpz_t mantissa, exponent;
-    __mpz_struct *mpz_mantissa, *mpz_exponent;
+    mpz_ptr mpz_mantissa, mpz_exponent;
     int err;
 
     fmpz_init(mantissa);

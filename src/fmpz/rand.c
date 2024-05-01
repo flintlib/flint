@@ -27,7 +27,7 @@ fmpz_randbits(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
     }
     else
     {
-        __mpz_struct *mf = _fmpz_promote(f);
+        mpz_ptr mf = _fmpz_promote(f);
         _flint_rand_init_gmp(state);
         mpz_urandomb(mf, state->gmp_state, bits);
         mpz_setbit(mf, bits - 1);
@@ -52,7 +52,7 @@ fmpz_randm(fmpz_t f, flint_rand_t state, const fmpz_t m)
     }
     else
     {
-        __mpz_struct * mf = _fmpz_promote(f);
+        mpz_ptr mf = _fmpz_promote(f);
 
         _flint_rand_init_gmp(state);
         mpz_urandomm(mf, state->gmp_state, COEFF_TO_PTR(*m));
@@ -76,7 +76,7 @@ void fmpz_randprime(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits, int prove
          * but it has different semantics from n_randbits,
          * and in particular may return integers with fewer bits.
          */
-        __mpz_struct * mf = _fmpz_promote(f);
+        mpz_ptr mf = _fmpz_promote(f);
         _flint_rand_init_gmp(state);
 
         do
@@ -127,7 +127,7 @@ fmpz_randtest_unsigned(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
     }
     else
     {
-        __mpz_struct * mf = _fmpz_promote(f);
+        mpz_ptr mf = _fmpz_promote(f);
 
         _flint_rand_init_gmp(state);
         mpz_rrandomb(mf, state->gmp_state, bits);

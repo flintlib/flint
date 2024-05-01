@@ -68,7 +68,7 @@ _fmpz_vec_dot_general_naive(fmpz_t res, const fmpz_t initial,
     } \
     else \
     { \
-        __mpz_struct * __z1 = COEFF_TO_PTR(x); \
+        mpz_ptr __z1 = COEFF_TO_PTR(x); \
         (xptr) = __z1->_mp_d; \
         (xn) = FLINT_ABS(__z1->_mp_size); \
         (xneg) = (__z1->_mp_size < 0); \

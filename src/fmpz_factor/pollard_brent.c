@@ -26,7 +26,7 @@ fmpz_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in,
     fmpz_t fa, fy, maxa, maxy;
     mp_ptr a, y, n, ninv, temp;
     mp_limb_t n_size, normbits, ans, val, size, cy;
-    __mpz_struct *fac, *mptr;
+    mpz_ptr fac, mptr;
     int ret;
 
     TMP_INIT;

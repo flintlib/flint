@@ -31,7 +31,7 @@ fmpz_set(fmpz_t f, const fmpz_t g)
     }
     else                        /* g is large */
     {
-        __mpz_struct * mf = _fmpz_promote(f);
+        mpz_ptr mf = _fmpz_promote(f);
         mpz_set(mf, COEFF_TO_PTR(*g));
     }
 }
@@ -55,7 +55,7 @@ fmpz_set_d(fmpz_t f, double c)
     }
     else
     {
-        __mpz_struct * z = _fmpz_promote(f);
+        mpz_ptr z = _fmpz_promote(f);
         mpz_set_d(z, c);
         _fmpz_demote_val(f);
     }
@@ -92,7 +92,7 @@ fmpz_set_mpf(fmpz_t f, const mpf_t x)
     }
     else
     {
-        __mpz_struct *z = _fmpz_promote(f);
+        mpz_ptr z = _fmpz_promote(f);
         mpz_set_f(z, x);
     }
 }
@@ -120,14 +120,14 @@ fmpz_set_mpz(fmpz_t f, const mpz_t x)
         }
         else                    /* x is large but one limb */
         {
-            __mpz_struct * mf = _fmpz_promote(f);
+            mpz_ptr mf = _fmpz_promote(f);
             flint_mpz_set_ui(mf, uval);
             mpz_neg(mf, mf);
         }
     }
     else                        /* x is more than one limb */
     {
-        __mpz_struct * mf = _fmpz_promote(f);
+        mpz_ptr mf = _fmpz_promote(f);
         mpz_set(mf, x);
     }
 }
@@ -159,7 +159,7 @@ void fmpz_set_signed_ui_array(fmpz_t f, const ulong * c, slong n)
     }
     else
     {
-        __mpz_struct * z = _fmpz_promote(f);
+        mpz_ptr z = _fmpz_promote(f);
         mp_limb_t * zd = FLINT_MPZ_REALLOC(z, n);
 
         if (csign == 0)
@@ -206,7 +206,7 @@ fmpz_set_signed_uiuiui(fmpz_t r, ulong hi, ulong mid, ulong lo)
     }
     else
     {
-        __mpz_struct * z = _fmpz_promote(r);
+        mpz_ptr z = _fmpz_promote(r);
         if (z->_mp_alloc < 3)
             mpz_realloc2(z, 3 * FLINT_BITS);
         z->_mp_d[0] = lo;
@@ -236,7 +236,7 @@ void fmpz_set_ui_array(fmpz_t out, const ulong * in, slong in_len)
     }
     else
     {
-        __mpz_struct * mpz = _fmpz_promote(out);
+        mpz_ptr mpz = _fmpz_promote(out);
         if (mpz->_mp_alloc < size)
             mpz_realloc2(mpz, FLINT_BITS * size);
         mpz->_mp_size = size;

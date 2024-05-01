@@ -349,7 +349,7 @@ void mpoly_monomial_madd_fmpz(ulong * exp1, const ulong * exp2,
 {
     if (COEFF_IS_MPZ(*scalar))
     {
-        __mpz_struct * mpz = COEFF_TO_PTR(*scalar);
+        mpz_ptr mpz = COEFF_TO_PTR(*scalar);
         mpoly_monomial_madd_ui_array(exp1, exp2,
                                            mpz->_mp_d, mpz->_mp_size, exp3, N);
     }

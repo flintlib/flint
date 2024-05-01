@@ -39,7 +39,7 @@ fmpz_mul_ui_old(fmpz_t f, const fmpz_t g, ulong x)
         else
         {
             /* Promote without val as if aliased both are large */
-            __mpz_struct *z = _fmpz_promote(f);
+            mpz_ptr z = _fmpz_promote(f);
             mpz_mul_ui(z, COEFF_TO_PTR(c2), x);
         }
     }

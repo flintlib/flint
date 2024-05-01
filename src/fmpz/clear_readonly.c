@@ -16,7 +16,7 @@ void fmpz_clear_readonly(fmpz_t f)
 {
     if (COEFF_IS_MPZ(*f))
     {
-        __mpz_struct *ptr = COEFF_TO_PTR(*f);
+        mpz_ptr ptr = COEFF_TO_PTR(*f);
 
         mpz_init(ptr);
         _fmpz_clear_mpz(*f);

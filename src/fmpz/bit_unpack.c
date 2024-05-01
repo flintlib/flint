@@ -66,7 +66,7 @@ fmpz_bit_unpack(fmpz_t coeff, mp_srcptr arr, flint_bitcnt_t shift,
     }
     else  /* large coefficient */
     {
-        __mpz_struct * mcoeff;
+        mpz_ptr mcoeff;
         mp_limb_t * p;
         ulong l, b;
 
@@ -164,7 +164,7 @@ fmpz_bit_unpack_unsigned(fmpz_t coeff, mp_srcptr arr,
     }
     else  /* large coefficient */
     {
-        __mpz_struct * mcoeff;
+        mpz_ptr mcoeff;
         mp_limb_t * p;
         ulong l, b;
 

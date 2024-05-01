@@ -66,7 +66,7 @@ fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h)
             }
             else
             {
-                __mpz_struct * mf = _fmpz_promote(f);
+                mpz_ptr mf = _fmpz_promote(f);
                 mpz_mod(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
                 _fmpz_demote_val(f);    /* reduction mod h may result in small value */
             }

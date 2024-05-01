@@ -71,7 +71,7 @@ arb_dot_fmpz(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong x
         }
         else
         {
-            __mpz_struct * z = COEFF_TO_PTR(v);
+            mpz_ptr z = COEFF_TO_PTR(v);
 
             ssize = z->_mp_size;
             size = FLINT_ABS(ssize);

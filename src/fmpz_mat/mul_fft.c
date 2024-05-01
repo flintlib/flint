@@ -154,7 +154,7 @@ static void fft_combine_bits_fmpz(
     mp_size_t total_limbs,
     int sign)
 {
-    __mpz_struct * mx = _fmpz_promote(x);
+    mpz_ptr mx = _fmpz_promote(x);
     mp_limb_t * d = FLINT_MPZ_REALLOC(mx, total_limbs);
     if (sign)
     {

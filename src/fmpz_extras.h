@@ -195,7 +195,7 @@ fmpz_min(fmpz_t z, const fmpz_t x, const fmpz_t y)
     } \
     else \
     { \
-        __mpz_struct * ___zz = COEFF_TO_PTR(zv); \
+        mpz_ptr ___zz = COEFF_TO_PTR(zv); \
         (zptr) = ___zz->_mp_d; \
         (zn) = ___zz->_mp_size; \
         (zsign) = (zn) < 0; \

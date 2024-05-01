@@ -20,7 +20,7 @@ void
 fmpz_mul_old(fmpz_t f, const fmpz_t g, const fmpz_t h)
 {
     fmpz c1, c2;
-    __mpz_struct *z;
+    mpz_ptr z;
 
     c1 = *g;
 

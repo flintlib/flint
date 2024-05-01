@@ -171,7 +171,7 @@ fmpz_factor_pollard_brent_single(fmpz_t p_factor, fmpz_t n_in, fmpz_t yi,
     mp_ptr a, y, n, ninv, temp;
     mp_limb_t n_size, normbits, ans, size, cy;
     mp_limb_t al, yl, val, valinv;
-    __mpz_struct *fac, *mptr;
+    mpz_ptr fac, mptr;
     int ret;
 
     TMP_INIT;

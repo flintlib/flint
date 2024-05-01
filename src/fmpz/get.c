@@ -210,7 +210,7 @@ void fmpz_get_signed_ui_array(mp_limb_t * r, slong n, const fmpz_t x)
     }
     else
     {
-        __mpz_struct * p = COEFF_TO_PTR(*x);
+        mpz_ptr p = COEFF_TO_PTR(*x);
         neg = p->_mp_size < 0;
         sz = FLINT_ABS(p->_mp_size);
 
@@ -236,7 +236,7 @@ void fmpz_get_signed_uiui(mp_limb_t * hi, mp_limb_t * lo, const fmpz_t x)
     }
     else
     {
-        __mpz_struct * p = COEFF_TO_PTR(*x);
+        mpz_ptr p = COEFF_TO_PTR(*x);
         s = -(ulong)(p->_mp_size < 0);
         r0 = p->_mp_d[0];
         if (p->_mp_size > 1 || p->_mp_size < -1)
@@ -267,7 +267,7 @@ void fmpz_get_ui_array(ulong * out, slong out_len, const fmpz_t in)
         size++;
     } else
     {
-        __mpz_struct * mpz = COEFF_TO_PTR(*in);
+        mpz_ptr mpz = COEFF_TO_PTR(*in);
         FLINT_ASSERT(mpz->_mp_size <= out_len);
         while (size < mpz->_mp_size)
             *out++ = mpz->_mp_d[size++];

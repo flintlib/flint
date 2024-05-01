@@ -22,7 +22,7 @@ fexpr_set_fmpz(fexpr_t res, const fmpz_t c)
     else
     {
         slong nlimbs;
-        __mpz_struct * z = COEFF_TO_PTR(*c);
+        mpz_ptr z = COEFF_TO_PTR(*c);
 
         nlimbs = FLINT_ABS(z->_mp_size);
         fexpr_fit_size(res, 1 + nlimbs);

@@ -18,7 +18,7 @@ fmpz_mul_2exp(fmpz_t f, const fmpz_t g, ulong exp)
 {
     slong c1 = *g;
     ulong c1abs, c1bits;
-    __mpz_struct * mf;
+    mpz_ptr mf;
 
     if (c1 == 0)
     {
@@ -73,7 +73,7 @@ fmpz_mul_2exp(fmpz_t f, const fmpz_t g, ulong exp)
     }
     else                                /* g is large */
     {
-        __mpz_struct * mg = COEFF_TO_PTR(c1);
+        mpz_ptr mg = COEFF_TO_PTR(c1);
 
         if (!COEFF_IS_MPZ(*f))
         {

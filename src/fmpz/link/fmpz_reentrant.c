@@ -12,9 +12,9 @@
 #include "gmpcompat.h"
 #include "fmpz.h"
 
-__mpz_struct * _fmpz_new_mpz(void)
+mpz_ptr _fmpz_new_mpz(void)
 {
-    __mpz_struct * mf = (__mpz_struct *) flint_malloc(sizeof(__mpz_struct));
+    mpz_ptr mf = flint_malloc(sizeof(__mpz_struct));
     mpz_init2(mf, 2*FLINT_BITS);
     return mf;
 }
@@ -33,11 +33,11 @@ void _fmpz_cleanup(void)
 {
 }
 
-__mpz_struct * _fmpz_promote(fmpz_t f)
+mpz_ptr _fmpz_promote(fmpz_t f)
 {
     if (!COEFF_IS_MPZ(*f))  /* f is small so promote it first */
     {
-        __mpz_struct * mf = _fmpz_new_mpz();
+        mpz_ptr mf = _fmpz_new_mpz();
         *f = PTR_TO_COEFF(mf);
         return mf;
     }
@@ -45,12 +45,12 @@ __mpz_struct * _fmpz_promote(fmpz_t f)
         return COEFF_TO_PTR(*f);
 }
 
-__mpz_struct * _fmpz_promote_val(fmpz_t f)
+mpz_ptr _fmpz_promote_val(fmpz_t f)
 {
     fmpz c = *f;
     if (!COEFF_IS_MPZ(c))  /* f is small so promote it */
     {
-        __mpz_struct * mf = _fmpz_new_mpz();
+        mpz_ptr mf = _fmpz_new_mpz();
         *f = PTR_TO_COEFF(mf);
         flint_mpz_set_si(mf, c);
         return mf;
@@ -61,7 +61,7 @@ __mpz_struct * _fmpz_promote_val(fmpz_t f)
 
 void _fmpz_demote_val(fmpz_t f)
 {
-    __mpz_struct * mf = COEFF_TO_PTR(*f);
+    mpz_ptr mf = COEFF_TO_PTR(*f);
     int size = mf->_mp_size;
 
     if (!(((unsigned int) size + 1U) & ~2U))  /* size +-1 */
@@ -85,7 +85,7 @@ void _fmpz_demote_val(fmpz_t f)
 
 void _fmpz_init_readonly_mpz(fmpz_t f, const mpz_t z)
 {
-   __mpz_struct * mf = (__mpz_struct *) flint_malloc(sizeof(__mpz_struct));
+   mpz_ptr mf = flint_malloc(sizeof(__mpz_struct));
     *f = PTR_TO_COEFF(mf);
     *mf = *z;
 }

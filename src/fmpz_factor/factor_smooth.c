@@ -67,7 +67,7 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
 {
     ulong exp;
     mp_limb_t p;
-    __mpz_struct * xsrc;
+    mpz_ptr xsrc;
     mp_ptr xd;
     mp_size_t xsize;
     slong found;
@@ -179,7 +179,7 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
     else
     {
         fmpz_t n2, f;
-        __mpz_struct * data;
+        mpz_ptr data;
 
         fmpz_init2(n2, xsize);
 

@@ -137,7 +137,7 @@ static mp_limb_t fmpz_fdiv_r_2exp_flint_bits(const fmpz_t a)
 {
     if (COEFF_IS_MPZ(*a))
     {
-        const __mpz_struct * A = COEFF_TO_PTR(*a);
+        const mpz_ptr A = COEFF_TO_PTR(*a);
         return A->_mp_size > 0 ? A->_mp_d[0] : -A->_mp_d[0];
     }
     else

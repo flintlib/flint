@@ -66,7 +66,7 @@ int fmpz_is_perfect_power(fmpz_t root, const fmpz_t f)
    mpz_t u2, q;
    int exact, exp2, sgn = fmpz_sgn(f);
    slong i, uns, usize = fmpz_size(f);
-   __mpz_struct * u, * r;
+   mpz_ptr u, r;
 
    if (usize == 0)
    {

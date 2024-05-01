@@ -324,7 +324,7 @@ void _fmpz_mpoly_to_ulong_array2(ulong * p, const fmpz * coeffs,
       }
       else
       {
-         __mpz_struct * m = COEFF_TO_PTR(c);
+         mpz_ptr m = COEFF_TO_PTR(c);
 
          for (j = 0; j < size; j++)
             ptr[j] = m->_mp_d[j];
@@ -360,7 +360,7 @@ void _fmpz_mpoly_to_ulong_array1(ulong * p, const fmpz * coeffs,
          ptr[0] = c;
       else
       {
-         __mpz_struct * m = COEFF_TO_PTR(c);
+         mpz_ptr m = COEFF_TO_PTR(c);
 
          if (size != 0)
          {
@@ -409,7 +409,7 @@ void _fmpz_mpoly_to_ulong_array(ulong * p, const fmpz * coeffs,
       }
       else
       {
-         __mpz_struct * m = COEFF_TO_PTR(c);
+         mpz_ptr m = COEFF_TO_PTR(c);
 
          for (j = 0; j < size; j++)
             ptr[j] = m->_mp_d[j];

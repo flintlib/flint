@@ -23,7 +23,7 @@ fmpz_one_2exp(fmpz_t x, ulong e)
     }
     else
     {
-        __mpz_struct * z = _fmpz_promote(x);
+        mpz_ptr z = _fmpz_promote(x);
         flint_mpz_set_ui(z, 1);
         mpz_mul_2exp(z, z, e);
     }
