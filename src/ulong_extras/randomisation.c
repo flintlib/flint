@@ -22,12 +22,6 @@ mp_limb_t n_randbits(flint_rand_t state, unsigned int bits)
    else return (UWORD(1) << (bits - 1)) | n_randint(state, l_shift(UWORD(1), bits));
 }
 
-ulong n_randint(flint_rand_t state, ulong limit)
-{
-    if (limit == UWORD(0)) return n_randlimb(state);
-    else return n_randlimb(state) % limit;
-}
-
 mp_limb_t n_urandint(flint_rand_t state, mp_limb_t limit)
 {
     if ((limit & (limit - 1)) == 0)

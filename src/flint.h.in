@@ -332,14 +332,22 @@ void flint_rand_free(flint_rand_s * state)
 }
 
 /* defined in ulong_extras, but used throughout the test code */
-ulong n_randint(flint_rand_t, ulong);
+ulong n_randlimb(flint_rand_t);
 ulong n_randtest(flint_rand_t);
 ulong n_randtest_not_zero(flint_rand_t);
 
+FLINT_INLINE ulong n_randint(flint_rand_t state, ulong limit)
+{
+    if (limit == UWORD(0))
+        return n_randlimb(state);
+    else
+        return n_randlimb(state) % limit;
+}
+
 #if FLINT_USES_GC
-#define FLINT_GC_INIT() GC_init()
+# define FLINT_GC_INIT() GC_init()
 #else
-#define FLINT_GC_INIT()
+# define FLINT_GC_INIT()
 #endif
 
 #define FLINT_TEST_INIT(xxx) \
@@ -367,7 +375,7 @@ ulong n_randtest_not_zero(flint_rand_t);
     ((shift == FLINT_BITS) ? WORD(0) : ((in) << (shift)))
 
 /* Beware when using the unsigned return value in signed arithmetic */
-static inline
+FLINT_FORCE_INLINE
 mp_limb_t FLINT_BIT_COUNT(mp_limb_t x)
 {
    mp_limb_t zeros = FLINT_BITS;

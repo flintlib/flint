@@ -31,7 +31,6 @@ extern "C" {
 /* Randomisation *************************************************************/
 
 ulong n_randlimb(flint_rand_t state);
-ulong n_randint(flint_rand_t state, ulong limit);
 ulong n_urandint(flint_rand_t state, ulong limit);
 ulong n_randbits(flint_rand_t state, unsigned int bits);
 ulong n_randprime(flint_rand_t state, ulong bits, int proved);
