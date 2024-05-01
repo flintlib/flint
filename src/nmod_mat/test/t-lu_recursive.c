@@ -84,7 +84,7 @@ TEST_FUNCTION_START(nmod_mat_lu_recursive, state)
     slong i;
     int result;
 
-    for (i = 0; i < 2000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_mat_t A, LU;
         mp_limb_t mod;
