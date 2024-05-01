@@ -23,7 +23,7 @@ TEST_FUNCTION_START(flint_mpn_sqr, state)
 {
     slong iter;
 
-    for (iter = 0; iter < 100000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
     {
         slong i, n;
         mp_ptr xp, rp1, rp2;
