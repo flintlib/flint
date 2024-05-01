@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2009 William Hart
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -19,9 +20,9 @@ TEST_FUNCTION_START(n_factor_ecm, state)
 
     fails = 0;
 
-    for (i = 10; i < 64; i += 5)
+    for (i = 10; i < FLINT_BITS; i += 5)
     {
-        for (j = i; j < 64 - i; j += 5)
+        for (j = i; j < FLINT_BITS - i; j += 5)
         {
             for (k = 0; k < flint_test_multiplier(); k++)
             {
