@@ -222,19 +222,16 @@ initialised with a call to :func:`flint_randinit`.  When one is
 finished generating random numbers, one should call
 :func:`flint_randclear` to clean up.
 
-.. function:: void fmpz_randbits(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
+.. function:: void fmpz_randbits_unsigned(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
+              void fmpz_randbits(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
 
     Generates a random signed integer whose absolute value has precisely
     the given number of bits.
 
-.. function:: void fmpz_randtest(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
+.. function:: void fmpz_randtest_unsigned(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
+              void fmpz_randtest(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
 
     Generates a random signed integer whose absolute value has a number
-    of bits which is random from `0` up to ``bits`` inclusive.
-
-.. function:: void fmpz_randtest_unsigned(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
-
-    Generates a random unsigned integer whose value has a number
     of bits which is random from `0` up to ``bits`` inclusive.
 
 .. function:: void fmpz_randtest_not_zero(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)

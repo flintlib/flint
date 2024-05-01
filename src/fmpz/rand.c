@@ -3,6 +3,7 @@
     Copyright (C) 2010, 2012 Sebastian Pancratz
     Copyright (C) 2011 Fredrik Johansson
     Authored 2015 by Daniel S. Roche; US Government work in the public domain.
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -16,14 +17,12 @@
 #include "fmpz.h"
 
 void
-fmpz_randbits(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
+fmpz_randbits_unsigned(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
 {
     if (bits <= SMALL_FMPZ_BITCOUNT_MAX)
     {
         _fmpz_demote(f);
         *f = n_randbits(state, bits);
-        if (n_randint(state, 2))
-            *f = -*f;
     }
     else
     {
@@ -31,12 +30,16 @@ fmpz_randbits(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
         _flint_rand_init_gmp(state);
         mpz_urandomb(mf, state->gmp_state, bits);
         mpz_setbit(mf, bits - 1);
-
-        if (n_randint(state, 2))
-            mpz_neg(mf, mf);
-
         _fmpz_demote_val(f);
     }
+}
+
+void
+fmpz_randbits(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
+{
+    fmpz_randbits_unsigned(f, state, bits);
+    if (n_randint(state, 2))
+        fmpz_neg(f, f);
 }
 
 void
@@ -64,26 +67,15 @@ fmpz_randm(fmpz_t f, flint_rand_t state, const fmpz_t m)
 
 void fmpz_randprime(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits, int proved)
 {
-    if (bits <= SMALL_FMPZ_BITCOUNT_MAX)
+    if (bits <= FLINT_BITS)
     {
-        _fmpz_demote(f);
-        *f = n_randprime(state, bits, proved);
+        fmpz_set_ui(f, n_randprime(state, bits, proved));
     }
     else
     {
-        /* Here I would like to just call
-         * fmpz_randbits(f, state, bits);
-         * but it has different semantics from n_randbits,
-         * and in particular may return integers with fewer bits.
-         */
-        mpz_ptr mf = _fmpz_promote(f);
-        _flint_rand_init_gmp(state);
-
         do
         {
-            mpz_urandomb(mf, state->gmp_state, bits - 1);
-            mpz_setbit(mf, bits - 1);
-
+            fmpz_randbits_unsigned(f, state, bits);
             fmpz_nextprime(f, f, proved);
         } while (fmpz_bits(f) != bits);
     }

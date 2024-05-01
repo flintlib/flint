@@ -104,6 +104,7 @@ int _fmpz_is_canonical(const fmpz_t x);
 
 /* Randomisation *************************************************************/
 
+void fmpz_randbits_unsigned(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits);
 void fmpz_randbits(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits);
 void fmpz_randm(fmpz_t f, flint_rand_t state, const fmpz_t m);
 void fmpz_randtest(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits);
