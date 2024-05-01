@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2020 Daniel Schultz
     Copyright (C) 2021 Fredrik Johansson
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -13,47 +14,29 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
+/* Calculating the GCD is a very costly operation.
+  
+   Hence, our attempt is to find a single-limbed integer of which we can start
+   the process with, because calculating the GCD of {u, n} and {v, 1} is much
+   more effective than calculating if of two n-limbed integers.
+*/
+
+/* TODO
+   * Do we want to utilize mpn_gcd_22 coupled with mpn_divrem_2? Both functions
+     should be available in all new versions of GMP. */
+
 void
 _fmpz_vec_content_chained(fmpz_t res, const fmpz * vec, slong len, const fmpz_t in)
 {
-    while (len > 0 && fmpz_is_zero(vec + 0))
+    flint_bitcnt_t exp2;
+    mp_size_t limb2;
+    slong ix;
+
+    if (in != NULL && !COEFF_IS_MPZ(*in))
     {
-        len--;
-        vec++;
+        fmpz_set(res, in);
+        goto gcd1;
     }
 
-    while (len > 1 && fmpz_is_zero(vec + len - 1))
-        len--;
-
-    if (len == 0)
-    {
-        fmpz_abs(res, in);
-        return;
-    }
-
-    if (len == 1)
-    {
-        fmpz_gcd(res, vec + 0, in);
-        return;
-    }
-
-    if (fmpz_is_pm1(in) || fmpz_is_pm1(vec + 0) || fmpz_is_pm1(vec + len - 1))
-    {
-        fmpz_one(res);
-        return;
-    }
-
-    fmpz_gcd3(res, vec + 0, vec + len - 1, in);
-    vec++;
-    len -= 2;
-
-    while (len >= 2 && !fmpz_is_one(res))
-    {
-        fmpz_gcd3(res, vec + 0, vec + len - 1, res);
-        vec++;
-        len -= 2;
-    }
-
-    if (len != 0 && !fmpz_is_one(res))
-        fmpz_gcd(res, res, vec + 0);
+gcd1: /* We will assume that `in` is taken care of in `res`. */
 }
