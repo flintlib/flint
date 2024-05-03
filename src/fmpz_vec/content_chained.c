@@ -6,7 +6,7 @@
 
     This file is part of FLINT.
 
-    Contains code from mpn_gcd_1 in GMP 6.3.0 under label `gcd1_limbs_eq_zero`.
+    Contains code from mpn_gcd_1 in GMP 6.3.0.
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
@@ -14,6 +14,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpn_extras.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
@@ -36,16 +37,6 @@
 
 typedef struct
 {
-    ulong gd;
-    int exp;
-    ulong limbs;
-    slong jx;
-    slong kx;
-}
-hm_t;
-
-typedef struct
-{
     mp_srcptr d;
     ulong sz;
 }
@@ -55,13 +46,14 @@ typedef mpn_struct * mpn_ptr;
 
 FLINT_STATIC_NOINLINE void heavy_machinery(fmpz_t, const fmpz *, slong, const fmpz_t);
 
+/* In this function we only take care of small inputs. If none is found, we go
+ * to heavy_machinery instead. */
 void
 _fmpz_vec_content_chained(fmpz_t rp, const fmpz * vp, slong vn, const fmpz_t ip)
 {
-    slong jx = -1, kx = 0;
+    slong jx = -1, kx;
     ulong gd; /* single limb gcd */
-    int exp = 0;
-    ulong limbs = 0; /* factors of power of two */
+    int exp;
     mpz_srcptr mp;
     slong msz;
     mp_srcptr md;
@@ -70,7 +62,18 @@ _fmpz_vec_content_chained(fmpz_t rp, const fmpz * vp, slong vn, const fmpz_t ip)
     gd = 0;
 #endif
 
-    /* Check if `ip` can be represented as a single limb */
+    /* We will assume that vn >= 2 for everything that will come */
+    if (vn < WORD(2))
+    {
+        if (ip == NULL)
+            fmpz_abs(rp, vp + 0);
+        else
+            fmpz_gcd(rp, vp + 0, ip);
+
+        return;
+    }
+
+    /* Check if `ip` is a single limb */
     if (ip != NULL)
     {
         fmpz tip = *ip; /* Read-only */
@@ -80,7 +83,7 @@ _fmpz_vec_content_chained(fmpz_t rp, const fmpz * vp, slong vn, const fmpz_t ip)
             if (tip == WORD(0))
             {
                 ip = NULL;
-                goto check_vp;
+                goto check_vp_may_be_zero;
             }
 
             gd = FLINT_ABS(tip);
@@ -90,53 +93,34 @@ _fmpz_vec_content_chained(fmpz_t rp, const fmpz * vp, slong vn, const fmpz_t ip)
         {
             mp = COEFF_TO_PTR(tip);
             msz = FLINT_ABS(SIZ(mp));
-            md = PTR(mp);
 
             if (msz == 1)
             {
-                gd = md[0];
+                gd = PTR(mp)[0];
                 goto ip1;
-            }
-            else
-            {
-                limbs = 0;
-
-                while (md[limbs] == UWORD(0))
-                    limbs++;
-
-                if (limbs == msz - 1)
-                {
-                    /* ip = limb * 2^{FLINT_BITS * limbs} */
-                    gd = md[limbs];
-                    exp = flint_ctz(md[limbs]);
-
-                    if (limbs == UWORD(0))
-                        goto gcd1_limbs_eq_zero;
-                    else
-                        goto gcd1_limbs_nonzero;
-                }
-                else if (limbs == msz - 2)
-                {
-                    exp = flint_ctz(md[limbs]);
-
-                    if ((md[msz] >> exp) == UWORD(0))
-                    {
-                        /* ip = limb * 2^{FLINT_BITS * limbs + exp} */
-                        gd = (md[limbs] >> exp) | (md[msz] << (FLINT_BITS - exp));
-
-                        if (limbs == UWORD(0))
-                            goto gcd1_limbs_eq_zero;
-                        else
-                            goto gcd1_limbs_nonzero;
-                    }
-                }
             }
         }
     }
 
-check_vp: /* Check if we can find any single-limbs in vp. Fast checks only. */
+check_vp_may_be_zero: /* Fast checks only. Result can be zero. */
     for (jx = 0; jx < vn; jx++)
-        if (!COEFF_IS_MPZ(vp[jx]) && !fmpz_is_zero(vp + jx))
+    {
+        if (!fmpz_is_zero(vp + jx))
+            goto check_vp_not_zero;
+        else if (!COEFF_IS_MPZ(vp[jx]))
+            goto found_small;
+    }
+
+    if (ip == NULL)
+        fmpz_zero(rp);
+    else
+        fmpz_abs(rp, ip);
+
+    return;
+
+check_vp_not_zero: /* Fast checks only. Result cannot be zero from this point onwards. */
+    for (jx++; jx < vn; jx++)
+        if (!fmpz_is_zero(vp + jx) && !COEFF_IS_MPZ(vp[jx]))
             goto found_small;
 
     /* Alright, bring it on */
@@ -144,7 +128,6 @@ check_vp: /* Check if we can find any single-limbs in vp. Fast checks only. */
     return;
 
 found_small: /* found small inside vp */
-    limbs = 0;
     gd = FLINT_ABS(vp[jx]);
 
 reduce_gd: /* gd is set, but we need to reduce it */
@@ -154,7 +137,7 @@ reduce_gd: /* gd is set, but we need to reduce it */
     if (ip != NULL)
     {
         slong tsz;
-        mp = COEFF_TO_PTR(*ip);
+        mp = COEFF_TO_PTR(*ip); /* ip cannot be small */
         tsz = msz = FLINT_ABS(SIZ(mp));
         md = PTR(mp);
 
@@ -165,86 +148,21 @@ reduce_gd: /* gd is set, but we need to reduce it */
             msz--;
         }
 
-        /* Set limbs and exp */
-        if (tsz - msz > limbs)
-            /* Do nothing */;
-        else if (tsz - msz == limbs)
-        {
-            /* Check for smallest exp while not touching limbs. */
-            exp = FLINT_MIN(exp, flint_ctz(*md));
-        }
-        else /* tsz - msz < limbs */
-        {
-            /* Set limbs and exp according to ip */
-            limbs = tsz - msz;
-            exp = flint_ctz(*md);
-        }
+        if (tsz != msz)
+            /* keep exp */;
+        else
+            exp = FLINT_MIN(exp, flint_ctz(md[0]));
 
         gd = mpn_gcd_1(md, msz, gd);
-    }
-
-gcd1_limbs_nonzero: /* gd is set and ip has been taken care of, limbs != 0 */
-    FLINT_ASSERT(limbs != UWORD(0));
-    FLINT_ASSERT(gd != UWORD(0));
-    FLINT_ASSERT(gd != UWORD(1));
-    for (; kx < vn; kx++)
-    {
-        FLINT_ASSERT(gd & 1 == 1);
 
         if (gd == UWORD(1))
             goto gd_eq_1;
-
-        /* If kx == jx, we have already taken care of this entry */
-        if (fmpz_is_zero(vp + kx) || kx == jx)
-            continue;
-
-        if (!COEFF_IS_MPZ(vp[kx]))
-        {
-            limbs = 0;
-            goto gcd1_limbs_eq_zero;
-        }
-        else
-        {
-            slong tsz;
-            mp = COEFF_TO_PTR(vp[kx]);
-            tsz = msz = FLINT_ABS(SIZ(mp));
-            md = PTR(mp);
-
-            if (*md != UWORD(0))
-            {
-                limbs = 0;
-                goto gcd1_limbs_eq_zero;
-            }
-
-            do
-            {
-                md++;
-                msz--;
-            } while (*md == UWORD(0));
-
-            if (tsz - msz > limbs)
-                /* Do nothing */;
-            else if (tsz - msz == limbs)
-            {
-                /* Check for smallest exp while not touching limbs. */
-                exp = FLINT_MIN(exp, flint_ctz(*md));
-            }
-            else /* tsz - msz < limbs */
-            {
-                /* Set both limbs and exp */
-                limbs = tsz - msz;
-                exp = flint_ctz(*md);
-            }
-
-            gd = mpn_gcd_1(md, msz, gd);
-        }
     }
 
-    goto small_end;
+    goto compute;
 
 ip1: /* We found ip to be small */
-    /* limbs = 0, exp unset and gd unreduced */
-    FLINT_ASSERT(limbs == UWORD(0));
+    /* gd is set but unreduced and exp is not set */
     FLINT_ASSERT(gd != UWORD(0));
     exp = flint_ctz(gd);
     gd >>= exp;
@@ -252,20 +170,19 @@ ip1: /* We found ip to be small */
     if (gd == UWORD(1))
         goto gd_eq_1;
 
-gcd1_limbs_eq_zero: /* gd is set, ip has been taken care of and limbs = 0 */
-    FLINT_ASSERT(limbs == UWORD(0));
+compute: /* gd is set and ip has been taken care of */
     FLINT_ASSERT(gd != UWORD(0));
     FLINT_ASSERT(gd != UWORD(1));
-    for (; kx < vn; kx++)
+    for (kx = 0; kx < vn; kx++)
     {
         FLINT_ASSERT(gd & 1 == 1);
-
-        if (gd == UWORD(1))
-            goto gd_eq_1;
 
         /* If kx == jx, we have already taken care of this entry */
         if (fmpz_is_zero(vp + kx) || kx == jx)
             continue;
+
+        if (gd == UWORD(1))
+            goto gd_eq_1;
 
         if (!COEFF_IS_MPZ(vp[kx]))
         {
@@ -305,143 +222,72 @@ gcd1_limbs_eq_zero: /* gd is set, ip has been taken care of and limbs = 0 */
         }
     }
 
-    goto small_end;
+    goto fin;
 
 gd_eq_1: /* gd == 1, but we may need to check for common factors of 2 */
     FLINT_ASSERT(gd == UWORD(1));
 
-    if (limbs == UWORD(0) && exp == 0)
+    if (exp == 0)
+        goto fin;
+
+    for (; kx < vn; kx++)
     {
-        goto small_end;
-    }
-    else if (limbs == UWORD(0))
-    {
-limbs_is_zero:
-        /* Check for smallest trailing zero count in first limbs */
-        for (; kx < vn; kx++)
+        if (fmpz_is_zero(vp + kx))
+            continue;
+
+        if (!COEFF_IS_MPZ(vp[kx]))
         {
-            if (fmpz_is_zero(vp + kx))
-                continue;
-            else if (!COEFF_IS_MPZ(vp[kx]))
-            {
-                exp = FLINT_MIN(flint_ctz(FLINT_ABS(vp[kx])), exp);
+            exp = FLINT_MIN(flint_ctz(FLINT_ABS(vp[kx])), exp);
 
-                if (exp == 0)
-                    goto small_end;
-            }
-            else
-            {
-                mp = COEFF_TO_PTR(vp[kx]);
-                md = PTR(mp);
-
-                if (*md == UWORD(0))
-                    continue;
-
-                exp = FLINT_MIN(flint_ctz(*md), exp);
-
-                if (exp == 0)
-                    goto small_end;
-            }
+            if (exp == 0)
+                goto fin;
         }
-    }
-    else
-    {
-        /* Check for trailing zero limbs and trailing zero count */
-        /* Go to previous case if we ever hit a zero limb count */
-        for (; kx < vn; kx++)
-        {
-            if (!COEFF_IS_MPZ(vp[kx]))
-            {
-                limbs = 0;
-                goto limbs_is_zero;
-            }
-            else
-            {
-                slong tsz;
-                mp = COEFF_TO_PTR(vp[kx]);
-                md = PTR(mp);
-
-                if (*md != UWORD(0))
-                {
-                    limbs = 0;
-                    goto limbs_is_zero;
-                }
-
-                tsz = msz = FLINT_ABS(SIZ(mp));
-
-                do
-                {
-                    md++;
-                    msz--;
-                } while (*md == UWORD(0));
-
-                /* Set limbs and exp */
-                if (tsz - msz > limbs)
-                    continue; /* Do nothing */
-                else if (tsz - msz == limbs)
-                {
-                    /* Check for smallest exp while not touching limbs. */
-                    exp = FLINT_MIN(exp, flint_ctz(*md));
-                }
-                else /* tsz - msz < limbs */
-                {
-                    /* Set both limbs and exp */
-                    limbs = tsz - msz;
-                    exp = flint_ctz(*md);
-                }
-            }
-        }
-    }
-
-small_end: /* Finished! Set rp = gd * 2^(FLINT_BITS * limbs + exp) */
-    FLINT_ASSERT(gd != UWORD(0));
-
-    if (limbs == UWORD(0) && (exp == 0 || (gd >> (FLINT_BITS - exp)) == UWORD(0)))
-    {
-        fmpz_set_ui(rp, gd << exp);
-    }
-    else
-    {
-        mpz_ptr mrp = _fmpz_promote(rp);
-        mp_ptr mrpd;
-
-        if (FLINT_ABS(SIZ(mrp)) < limbs + 2)
-            mrpd = _mpz_realloc(mrp, limbs + 2);
         else
-            mrpd = PTR(mrp);
+        {
+            mp = COEFF_TO_PTR(vp[kx]);
+            md = PTR(mp);
 
-        for (jx = 0; jx < limbs; jx++)
-            mrpd[jx] = 0;
+            if (*md == UWORD(0))
+                continue;
 
-        mrpd[limbs] = gd << exp;
-        mrpd[limbs + 1] = gd >> (FLINT_BITS - exp);
-        SIZ(mrp) = limbs + 1 + (mrpd[limbs + 1] != UWORD(0));
+            exp = FLINT_MIN(flint_ctz(*md), exp);
+
+            if (exp == 0)
+                goto fin;
+        }
     }
 
+fin:
+    FLINT_ASSERT(gd != UWORD(0));
+    fmpz_set_ui(rp, gd << exp);
     return;
 }
 
-/* Everything is big, but vp may contain single-limbed integers. */
+/* Everything is an mpz */
 FLINT_STATIC_NOINLINE
 void heavy_machinery(fmpz_t rp, const fmpz * vp, slong vn, const fmpz_t ip)
 {
     mpn_ptr mvp;
-    mpz_srcptr mp;
-    mp_srcptr md;
-    ulong tz, sz;
-    slong ix;
     ulong limbs = UWORD_MAX, exp;
     slong idx0, idx1;
     ulong sz0 = UWORD_MAX, sz1 = UWORD_MAX;
-    ulong a0, a1;
-    ulong b0, b1;
-    mp_ptr ad, bd;
-    ulong an, bn;
+
+    ulong a0;
+
+    slong ix;
+
+    if (vn < WORD(2))
+        FLINT_UNREACHABLE;
 
     mvp = flint_malloc(sizeof(mpn_struct) * (vn + (ip != NULL)));
 
+    /* Start by adding entries to mvp */
     if (ip != NULL)
     {
+        mpz_srcptr mp;
+        mp_srcptr md;
+        ulong sz, tz;
+
         mp = COEFF_TO_PTR(*ip);
         tz = sz = FLINT_ABS(SIZ(mp));
         md = PTR(mp);
@@ -456,12 +302,22 @@ void heavy_machinery(fmpz_t rp, const fmpz * vp, slong vn, const fmpz_t ip)
         mvp[0].d = md;
         mvp[0].sz = sz;
         mvp++;
+
+        sz0 = sz;
+        idx0 = -1;
     }
 
-    for (ix = 0, vp += vn - 1; ix < vn; ix++, vp--)
+    for (ix = 0, vp += vn - 1; ix < vn; vp--)
     {
+        mpz_srcptr mp;
+        mp_srcptr md;
+        ulong sz, tz;
+
         if (fmpz_is_zero(vp))
+        {
+            vn--;
             continue;
+        }
 
         mp = COEFF_TO_PTR(*vp);
         tz = sz = FLINT_ABS(SIZ(mp));
@@ -476,6 +332,7 @@ void heavy_machinery(fmpz_t rp, const fmpz * vp, slong vn, const fmpz_t ip)
         limbs = FLINT_MIN(limbs, tz - sz);
         mvp[ix].d = md;
         mvp[ix].sz = sz;
+        ix++;
 
         if (sz < sz0)
         {
@@ -491,37 +348,151 @@ void heavy_machinery(fmpz_t rp, const fmpz * vp, slong vn, const fmpz_t ip)
         }
     }
 
+    /* Check if we can fast-track the initial GCD */
     if (sz1 == UWORD(1))
     {
         /* 1 = sz0 = sz1 */
+        ulong b0;
+        ulong bexp;
+
         a0 = mvp[idx0].d[0];
         b0 = mvp[idx1].d[0];
+
+        exp = flint_ctz(a0);
+        bexp = flint_ctz(b0);
+
+        a0 >>= exp;
+        b0 >>= bexp;
+        exp = FLINT_MIN(exp, bexp);
+
+        if (b0 < a0)
+            FLINT_SWAP(ulong, a0, b0);
+
+        /* Now b0 >= a0 */
+        /* If much bigger, reduce via remainder first */
+        if ((b0 >> 16) > a0)
+        {
+            b0 %= a0;
+            if (b0 == UWORD(0)) /* b0 was a multiple of a0 */
+                goto G1;
+
+            b0 >>= flint_ctz(b0);
+        }
+
+        a0 = mpn_gcd_11(b0, a0);
+
+        if (a0 == UWORD(1))
+            goto a0_eq_1;
+
         goto G1;
     }
     else if (sz0 == UWORD(1))
     {
-        /* 1 = sz1 < sz2 */
+        /* 1 = sz0 < sz1 */
+        ulong bexp;
+        mp_srcptr bd;
+        ulong bn;
+
         a0 = mvp[idx0].d[0];
+        bd = mvp[idx1].d;
+        bn = mvp[idx1].sz;
+
+        exp = flint_ctz(a0);
+        bexp = flint_ctz(bd[0]);
+
+        a0 >>= exp;
+        exp = FLINT_MIN(exp, bexp);
+
+        a0 = mpn_gcd_1(bd, bn, a0);
+
+        if (a0 == UWORD(1))
+            goto a0_eq_1;
+
+        goto G1;
+    }
+    else if (sz1 == UWORD(2))
+    {
+        /* 2 = sz0 = sz1 */
+        ulong a1, b0, b1;
+        ulong bexp;
+        mp_limb_pair_t a;
+
+        a0 = mvp[idx0].d[0];
+        a1 = mvp[idx0].d[1];
+        b0 = mvp[idx1].d[0];
+        b1 = mvp[idx1].d[1];
+
+        exp = flint_ctz(a0);
+        bexp = flint_ctz(b0);
+
+        a0 = (a0 >> exp) | (a1 << (FLINT_BITS - exp));
+        a1 = (a1 >> exp);
+        b0 = (b0 >> bexp) | (b1 << (FLINT_BITS - bexp));
+        b1 = (b1 >> bexp);
+
+        a = mpn_gcd_22(b1, b0, a1, a0);
+        a1 = a.m2;
+        a0 = a.m1;
+
+        if (a1 == UWORD(0))
+        {
+            if (a0 == UWORD(1))
+                goto a0_eq_1;
+            else
+                goto G1;
+        }
+
         goto G2;
     }
-    else if (sz1 == UWORD(2))
+    else if (sz0 == UWORD(2))
     {
-        /* 2 = sz1 = sz2 */
+        /* 2 = sz0 < sz1 */
+        /* Try to reduce `a` to a single limb */
+        ulong a1;
+        a0 = mvp[idx0].d[0];
+        a1 = mvp[idx0].d[1];
+
+        exp = flint_ctz(a0);
+
+        a0 = (a0 >> exp) | (a1 << (FLINT_BITS - exp));
+        a1 = (a1 >> exp);
+
+        if (a1 == UWORD(0))
+        {
+            exp = FLINT_MIN(flint_ctz(mvp[idx1].d[0]), exp);
+            a0 = mpn_gcd_1(mvp[idx1].d, mvp[idx1].sz, a0);
+
+            if (a0 == UWORD(1))
+                goto a0_eq_1;
+            else
+                goto G1;
+        }
+        else
+            goto G2;
     }
-    else if (sz1 == UWORD(2))
-    {
-        /* 2 = sz1 < sz2 */
-    }
-    else
-    {
-        /* 2 < sz1 <= sz2 */
-    }
 
-Gn:
+Gn: /* TODO:
+       0. Allocate temporary space for two integers -- one for the output (say
+          OP) and one for the input (say IP),
+       1. Take the smallest sample we have (given at idx0), and right shift it
+          into OP,
+       2. Take the next smallest sample and right shift it into IP,
+       3. Compute OP <- GCD(IP, OP),
+       4. If we are at the end, exit.
+       5. If OP can fit in a limb, go to G1.
+       6. If OP can fit in two limbs, go to G2.
+       7. Take the next sample (no specific order), right shift it into IP and
+          go to step 3. */
 
-G2:
+G2: /* TODO: Do mpn_divrem_2 and continue with mpn_gcd_22 */
 
-G1:
+G1: for (ix = -1; ix < vn; ix++)
+        ;
 
-    flint_free(mvp);
+a0_eq_1: /* a0 == 1, but we may need to check for common factors of 2 */
+    FLINT_ASSERT(a0 == UWORD(1));
+
+end:
+
+    flint_free(mvp - (ip != NULL));
 }
