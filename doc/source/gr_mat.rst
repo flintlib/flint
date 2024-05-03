@@ -137,6 +137,12 @@ Assignment and special values
     Returns whether *mat* respectively is the zero matrix or
     the scalar matrix with 1 or -1 on the main diagonal.
 
+.. function:: truth_t gr_mat_contains_zero_mat(const gr_mat_t mat, gr_ctx_t ctx)
+
+    Returns whether *mat* contains the zero matrix, in the sense that all its
+    entries contain the zero element of the base ring, as described
+    in :func:`gr_contains_zero`.
+
 .. function:: truth_t gr_mat_is_scalar(const gr_mat_t mat, gr_ctx_t ctx)
 
     Returns whether *mat* is a scalar matrix, being a diagonal matrix

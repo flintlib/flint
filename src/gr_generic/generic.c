@@ -212,6 +212,11 @@ truth_t gr_generic_is_neg_one(gr_srcptr x, gr_ctx_t ctx)
     return eq;
 }
 
+truth_t gr_generic_contains_zero(gr_srcptr x, gr_ctx_t ctx)
+{
+    return gr_generic_is_zero(x, ctx);
+}
+
 int gr_generic_neg_one(gr_ptr res, gr_ctx_t ctx)
 {
     int status;
@@ -2222,6 +2227,28 @@ gr_generic_vec_is_zero(gr_srcptr vec, slong len, gr_ctx_t ctx)
 }
 
 int
+gr_generic_vec_contains_zero_vec(gr_srcptr vec, slong len, gr_ctx_t ctx)
+{
+    gr_method_unary_predicate contains_zero = GR_UNARY_PREDICATE(ctx, CONTAINS_ZERO);
+    truth_t eq, this_eq;
+    slong i, sz;
+
+    sz = ctx->sizeof_elem;
+
+    eq = T_TRUE;
+
+    for (i = 0; i < len; i++)
+    {
+        this_eq = contains_zero(GR_ENTRY(vec, i, sz), ctx);
+
+        if (this_eq == T_FALSE)
+            return T_FALSE;
+    }
+
+    return eq;
+}
+
+int
 gr_generic_vec_dot(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx)
 {
     gr_method_binary_op mul = GR_BINARY_OP(ctx, MUL);
@@ -2561,6 +2588,8 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_IS_ONE,                  (gr_funcptr) gr_generic_is_one},
     {GR_METHOD_IS_NEG_ONE,              (gr_funcptr) gr_generic_is_neg_one},
 
+    {GR_METHOD_CONTAINS_ZERO,           (gr_funcptr) gr_generic_contains_zero},
+
     {GR_METHOD_EQUAL,                   (gr_funcptr) gr_generic_equal},
 
     {GR_METHOD_SET,                     (gr_funcptr) gr_generic_set},
@@ -2847,6 +2876,8 @@ const gr_method_tab_input _gr_generic_methods[] =
 
     {GR_METHOD_VEC_EQUAL,               (gr_funcptr) gr_generic_vec_equal},
     {GR_METHOD_VEC_IS_ZERO,             (gr_funcptr) gr_generic_vec_is_zero},
+
+    {GR_METHOD_VEC_CONTAINS_ZERO_VEC,   (gr_funcptr) gr_generic_vec_contains_zero_vec},
 
     {GR_METHOD_VEC_SUM,                 (gr_funcptr) _gr_vec_sum_generic},
     {GR_METHOD_VEC_PRODUCT,             (gr_funcptr) _gr_vec_product_generic},

@@ -118,6 +118,8 @@ truth_t gr_mat_is_zero(const gr_mat_t mat, gr_ctx_t ctx);
 truth_t gr_mat_is_one(const gr_mat_t mat, gr_ctx_t ctx);
 truth_t gr_mat_is_neg_one(const gr_mat_t mat, gr_ctx_t ctx);
 
+truth_t gr_mat_contains_zero_mat(const gr_mat_t mat, gr_ctx_t ctx);
+
 WARN_UNUSED_RESULT int gr_mat_zero(gr_mat_t res, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_one(gr_mat_t res, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_mat_set(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx);

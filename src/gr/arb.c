@@ -373,6 +373,12 @@ _gr_arb_is_neg_one(const arb_t x, const gr_ctx_t ctx)
 }
 
 truth_t
+_gr_arb_contains_zero(const arb_t x, const gr_ctx_t ctx)
+{
+    return arb_contains_zero(x) ? T_TRUE : T_FALSE;
+}
+
+truth_t
 _gr_arb_equal(const arb_t x, const arb_t y, const gr_ctx_t ctx)
 {
     if (arb_is_exact(x) && arb_equal(x, y))
@@ -1778,6 +1784,7 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_IS_ZERO,         (gr_funcptr) _gr_arb_is_zero},
     {GR_METHOD_IS_ONE,          (gr_funcptr) _gr_arb_is_one},
     {GR_METHOD_IS_NEG_ONE,      (gr_funcptr) _gr_arb_is_neg_one},
+    {GR_METHOD_CONTAINS_ZERO,   (gr_funcptr) _gr_arb_contains_zero},
     {GR_METHOD_EQUAL,           (gr_funcptr) _gr_arb_equal},
     {GR_METHOD_SET,             (gr_funcptr) _gr_arb_set},
     {GR_METHOD_SET_SI,          (gr_funcptr) _gr_arb_set_si},

@@ -156,6 +156,8 @@ GR_VEC_INLINE WARN_UNUSED_RESULT int _gr_vec_submul_scalar_si(gr_ptr vec1, gr_sr
 GR_VEC_INLINE truth_t _gr_vec_equal(gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx) { return GR_VEC_VEC_PREDICATE(ctx, VEC_EQUAL)(vec1, vec2, len, ctx); }
 GR_VEC_INLINE truth_t _gr_vec_is_zero(gr_srcptr vec, slong len, gr_ctx_t ctx) { return GR_VEC_PREDICATE(ctx, VEC_IS_ZERO)(vec, len, ctx); }
 
+GR_VEC_INLINE truth_t _gr_vec_contains_zero_vec(gr_srcptr vec, slong len, gr_ctx_t ctx) { return GR_VEC_PREDICATE(ctx, VEC_CONTAINS_ZERO_VEC)(vec, len, ctx); }
+
 typedef int ((*gr_method_vec_reduce_op)(gr_ptr, gr_srcptr, slong, gr_ctx_ptr));
 
 typedef int ((*gr_method_vec_dot_op)(gr_ptr, gr_srcptr, int, gr_srcptr, gr_srcptr, slong, gr_ctx_ptr));

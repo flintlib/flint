@@ -182,6 +182,8 @@ typedef enum
     GR_METHOD_IS_ONE,
     GR_METHOD_IS_NEG_ONE,
 
+    GR_METHOD_CONTAINS_ZERO,
+
     GR_METHOD_EQUAL,
 
     GR_METHOD_SET,
@@ -631,6 +633,7 @@ typedef enum
     GR_METHOD_VEC_ZERO,
     GR_METHOD_VEC_EQUAL,
     GR_METHOD_VEC_IS_ZERO,
+    GR_METHOD_VEC_CONTAINS_ZERO_VEC,
     GR_METHOD_VEC_NEG,
 
     GR_METHOD_VEC_NORMALISE,
@@ -1051,6 +1054,8 @@ GR_INLINE WARN_UNUSED_RESULT int gr_set_fexpr(gr_ptr res, fexpr_vec_t inputs, gr
 GR_INLINE truth_t gr_is_zero(gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_PREDICATE(ctx, IS_ZERO)(x, ctx); }
 GR_INLINE truth_t gr_is_one(gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_PREDICATE(ctx, IS_ONE)(x, ctx); }
 GR_INLINE truth_t gr_is_neg_one(gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_PREDICATE(ctx, IS_NEG_ONE)(x, ctx); }
+
+GR_INLINE truth_t gr_contains_zero(gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_PREDICATE(ctx, CONTAINS_ZERO)(x, ctx); }
 
 GR_INLINE truth_t gr_equal(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_PREDICATE(ctx, EQUAL)(x, y, ctx); }
 GR_INLINE truth_t gr_not_equal(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return truth_not(GR_BINARY_PREDICATE(ctx, EQUAL)(x, y, ctx)); }

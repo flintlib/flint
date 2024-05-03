@@ -396,6 +396,12 @@ _gr_acb_is_neg_one(const acb_t x, const gr_ctx_t ctx)
 }
 
 truth_t
+_gr_acb_contains_zero(const acb_t x, const gr_ctx_t ctx)
+{
+    return acb_contains_zero(x) ? T_TRUE : T_FALSE;
+}
+
+truth_t
 _gr_acb_equal(const acb_t x, const acb_t y, const gr_ctx_t ctx)
 {
     if (acb_is_exact(x) && acb_equal(x, y))
@@ -2055,6 +2061,7 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_IS_ZERO,         (gr_funcptr) _gr_acb_is_zero},
     {GR_METHOD_IS_ONE,          (gr_funcptr) _gr_acb_is_one},
     {GR_METHOD_IS_NEG_ONE,      (gr_funcptr) _gr_acb_is_neg_one},
+    {GR_METHOD_CONTAINS_ZERO,   (gr_funcptr) _gr_acb_contains_zero},
     {GR_METHOD_EQUAL,           (gr_funcptr) _gr_acb_equal},
     {GR_METHOD_SET,             (gr_funcptr) _gr_acb_set},
     {GR_METHOD_SET_SI,          (gr_funcptr) _gr_acb_set_si},

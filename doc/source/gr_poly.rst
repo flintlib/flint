@@ -126,6 +126,12 @@ Basic manipulation
               truth_t gr_poly_is_gen(const gr_poly_t poly, gr_ctx_t ctx)
               truth_t gr_poly_is_scalar(const gr_poly_t poly, gr_ctx_t ctx)
 
+.. function:: truth_t gr_poly_contains_zero_poly(const gr_poly_t poly, gr_ctx_t ctx)
+
+    Returns whether *poly* contains the zero polynomial, in the sense that all
+    its coefficients contain the zero element of the base ring, as described
+    in :func:`gr_contains_zero`.
+
 .. function:: int gr_poly_set_scalar(gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx)
               int gr_poly_set_si(gr_poly_t poly, slong c, gr_ctx_t ctx)
               int gr_poly_set_ui(gr_poly_t poly, ulong c, gr_ctx_t ctx)

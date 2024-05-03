@@ -504,6 +504,20 @@ Basic properties
 
     Returns whether *x* represents a rational number.
 
+.. function:: truth_t gr_contains_zero(gr_srcptr x, gr_ctx_t ctx)
+
+    Returns whether *x* contains the ring element 0. If the domain is exact,
+    this is equivalent to calling :func:`gr_is_zero`. If *x* is an ``arb``
+    (respectively ``acb``) element, this returns whether zero is contained in
+    the ball (respectively rectangle). If *x* is a polynomial, this returns
+    whether all coefficients contain the zero element of the base ring. If *x*
+    is a matrix, this returns whether all entries contain the zero element of
+    the base ring.
+
+    See also :func:`gr_poly_contains_zero_poly`,
+    :func:`gr_mat_contains_zero_mat`, and
+    :func:`_gr_vec_contains_zero_vec`.
+
 Arithmetic
 ........................................................................
 

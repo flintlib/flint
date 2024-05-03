@@ -361,6 +361,12 @@ polynomial_is_neg_one(const gr_poly_t poly, gr_ctx_t ctx)
 }
 */
 
+truth_t
+polynomial_contains_zero_polynomial(const gr_poly_t poly, gr_ctx_t ctx)
+{
+    return gr_poly_contains_zero_poly(poly, POLYNOMIAL_ELEM_CTX(ctx));
+}
+
 int
 polynomial_neg(gr_poly_t res, const gr_poly_t mat, gr_ctx_t ctx)
 {
@@ -535,6 +541,9 @@ gr_method_tab_input _gr_poly_methods_input[] =
     {GR_METHOD_IS_ONE,      (gr_funcptr) polynomial_is_one},
     {GR_METHOD_IS_NEG_ONE,  (gr_funcptr) polynomial_is_neg_one},
 */
+
+    {GR_METHOD_CONTAINS_ZERO, (gr_funcptr) polynomial_contains_zero_polynomial},
+
     {GR_METHOD_EQUAL,       (gr_funcptr) polynomial_equal},
     {GR_METHOD_SET,         (gr_funcptr) polynomial_set},
     {GR_METHOD_SET_UI,      (gr_funcptr) polynomial_set_ui},

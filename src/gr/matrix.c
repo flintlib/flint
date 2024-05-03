@@ -308,6 +308,12 @@ matrix_is_neg_one(const gr_mat_t mat, gr_ctx_t ctx)
     return gr_mat_is_neg_one(mat, MATRIX_CTX(ctx)->base_ring);
 }
 
+truth_t
+matrix_contains_zero_matrix(const gr_mat_t mat, gr_ctx_t ctx)
+{
+    return gr_mat_contains_zero_mat(mat, MATRIX_CTX(ctx)->base_ring);
+}
+
 int
 matrix_neg(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
 {
@@ -524,6 +530,7 @@ gr_method_tab_input _gr_mat_methods_input[] =
     {GR_METHOD_IS_ZERO,     (gr_funcptr) matrix_is_zero},
     {GR_METHOD_IS_ONE,      (gr_funcptr) matrix_is_one},
     {GR_METHOD_IS_NEG_ONE,  (gr_funcptr) matrix_is_neg_one},
+    {GR_METHOD_CONTAINS_ZERO, (gr_funcptr) matrix_contains_zero_matrix},
     {GR_METHOD_EQUAL,       (gr_funcptr) matrix_equal},
     {GR_METHOD_SET,         (gr_funcptr) matrix_set},
     {GR_METHOD_SET_UI,      (gr_funcptr) matrix_set_ui},

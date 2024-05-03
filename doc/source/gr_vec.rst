@@ -87,6 +87,12 @@ Types and basic operations
 
 .. function:: truth_t _gr_vec_is_zero(gr_srcptr vec, slong len, gr_ctx_t ctx)
 
+.. function:: truth_t _gr_vec_contains_zero_vec(gr_srcptr vec, slong len, gr_ctx_t ctx)
+
+    Returns whether *vec* contains the zero vector, in the sense that all
+    elements contain the zero element of the base ring, as described
+    in :func:`gr_contains_zero`.
+
 .. function:: int _gr_vec_normalise(slong * res, gr_srcptr vec, slong len, gr_ctx_t ctx)
 
 .. function:: slong _gr_vec_normalise_weak(gr_srcptr vec, slong len, gr_ctx_t ctx)

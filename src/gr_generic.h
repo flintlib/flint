@@ -103,6 +103,8 @@ WARN_UNUSED_RESULT truth_t gr_generic_is_zero(gr_srcptr x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT truth_t gr_generic_is_one(gr_srcptr x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT truth_t gr_generic_is_neg_one(gr_srcptr x, gr_ctx_t ctx);
 
+WARN_UNUSED_RESULT truth_t gr_generic_contains_zero(gr_srcptr x, gr_ctx_t ctx);
+
 WARN_UNUSED_RESULT int gr_generic_neg_one(gr_ptr res, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_generic_set_other(gr_ptr res, gr_srcptr x, gr_ctx_t xctx, gr_ctx_t ctx);
@@ -230,6 +232,7 @@ WARN_UNUSED_RESULT int gr_generic_vec_scalar_addmul_si(gr_ptr vec1, gr_srcptr ve
 WARN_UNUSED_RESULT int gr_generic_vec_scalar_submul_si(gr_ptr vec1, gr_srcptr vec2, slong len, slong c, gr_ctx_t ctx);
 WARN_UNUSED_RESULT truth_t gr_generic_vec_equal(gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_vec_is_zero(gr_srcptr vec, slong len, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_vec_contains_zero_vec(gr_srcptr vec, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_vec_dot(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_vec_dot_rev(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_vec_dot_ui(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, const ulong * vec2, slong len, gr_ctx_t ctx);

@@ -34,6 +34,10 @@
               truth_t gr_generic_is_one(gr_srcptr x, gr_ctx_t ctx)
               truth_t gr_generic_is_neg_one(gr_srcptr x, gr_ctx_t ctx)
 
+.. function:: truth_t gr_generic_contains_zero(gr_srcptr x, gr_ctx_t ctx)
+
+    Returns the same result as :func:`gr_generic_is_zero`, as a fallback.
+
 .. function:: int gr_generic_neg_one(gr_ptr res, gr_ctx_t ctx)
 
 .. function:: int gr_generic_set_other(gr_ptr res, gr_srcptr x, gr_ctx_t xctx, gr_ctx_t ctx)
@@ -219,6 +223,12 @@ To do: move to ``gr_vec``
 .. function:: truth_t gr_generic_vec_equal(gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx)
 
 .. function:: int gr_generic_vec_is_zero(gr_srcptr vec, slong len, gr_ctx_t ctx)
+
+.. function:: int gr_generic_vec_contains_zero_vec(gr_srcptr vec, slong len, gr_ctx_t ctx)
+
+    Returns whether *vec* contains the zero vector, in the sense that all
+    elements contain the zero element of the base ring, as described
+    in :func:`gr_contains_zero`.
 
 .. function:: int gr_generic_vec_dot(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx)
 
