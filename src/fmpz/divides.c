@@ -63,7 +63,7 @@ fmpz_divides(fmpz_t q, const fmpz_t g, const fmpz_t h)
     }
     else                        /* g is large */
     {
-        __mpz_struct * mq;
+        mpz_ptr mq;
 
         if (!COEFF_IS_MPZ(c2))  /* h is small */
         {

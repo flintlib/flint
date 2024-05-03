@@ -867,8 +867,8 @@ _gr_fmpz_vec_sum(fmpz_t res, const fmpz * vec, slong len, gr_ctx_t ctx)
         ulong hi, lo;
         slong i;
         fmpz f;
-        __mpz_struct * f_mpz;
-        __mpz_struct * res_mpz = NULL;
+        mpz_ptr f_mpz;
+        mpz_ptr res_mpz = NULL;
 
         hi = lo = 0;
 

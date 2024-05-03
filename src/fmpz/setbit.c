@@ -21,7 +21,7 @@ void fmpz_setbit(fmpz_t f, ulong i)
         }
         else  /* i >= SMALL_FMPZ_BITCOUNT_MAX */
         {
-            __mpz_struct *ptr = _fmpz_promote_val(f);
+            mpz_ptr ptr = _fmpz_promote_val(f);
 
             mpz_setbit(ptr, i);
             _fmpz_demote_val(f);
@@ -29,7 +29,7 @@ void fmpz_setbit(fmpz_t f, ulong i)
     }
     else
     {
-        __mpz_struct *ptr = COEFF_TO_PTR(*f);
+        mpz_ptr ptr = COEFF_TO_PTR(*f);
 
         mpz_setbit(ptr, i);
 

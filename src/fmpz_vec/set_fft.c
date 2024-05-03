@@ -20,7 +20,7 @@ static void _fmpz_vec_set_fft_coeff(fmpz * coeffs_m, slong i,
 {
     slong size;
     mp_limb_t * data;
-    __mpz_struct * mcoeffs_m;
+    mpz_ptr mcoeffs_m;
 
     coeffs_m += i;
 

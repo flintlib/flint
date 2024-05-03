@@ -40,7 +40,7 @@ static void _fmpz_vec_get_fft_coeff(mp_limb_t ** coeffs_f,
     }
     else /* coeff is an mpz_t */
     {
-        __mpz_struct * mc = COEFF_TO_PTR(c);
+        mpz_ptr mc = COEFF_TO_PTR(c);
         size_j = mc->_mp_size;
         if (size_j < 0)
         {

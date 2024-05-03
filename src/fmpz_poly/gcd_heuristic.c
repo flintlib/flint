@@ -28,7 +28,7 @@ mp_size_t flint_mpn_tdiv_q_fmpz_inplace(mp_ptr arrayg, mp_size_t limbsg, fmpz_t 
 	else
    {
       mp_size_t tlimbs;
-      __mpz_struct * mgc = COEFF_TO_PTR(*gc);
+      mpz_ptr mgc = COEFF_TO_PTR(*gc);
 
       mp_ptr temp = flint_malloc(limbsg*sizeof(mp_limb_t));
       flint_mpn_copyi(temp, arrayg, limbsg);

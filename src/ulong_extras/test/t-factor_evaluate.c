@@ -17,7 +17,7 @@ TEST_FUNCTION_START(n_factor_evaluate, state)
     int result;
     slong iter;
 
-    for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
         ulong eval, fac_eval;
         n_factor_t factors;

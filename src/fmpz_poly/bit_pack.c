@@ -44,7 +44,7 @@ fmpz_poly_bit_pack(fmpz_t f, const fmpz_poly_t poly,
                    flint_bitcnt_t bit_size)
 {
     slong len;
-    __mpz_struct * mpz;
+    mpz_ptr mpz;
     slong i, d;
     int negate;
 

@@ -31,7 +31,7 @@ void fmpz_preinvn_init(fmpz_preinvn_t inv, const fmpz_t f)
       inv->n = 1;
    } else /* c is big */
    {
-      __mpz_struct * mc = COEFF_TO_PTR(c);
+      mpz_ptr mc = COEFF_TO_PTR(c);
       slong size = FLINT_ABS(mc->_mp_size);
       inv->dinv = flint_malloc(size*sizeof(mp_limb_t));
       norm = flint_clz(mc->_mp_d[size - 1]);

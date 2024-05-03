@@ -167,7 +167,7 @@ _flint_mpz_addmul_large(mpz_ptr z, mpz_srcptr x, mpz_srcptr y, int negate)
 void fmpz_addmul(fmpz_t f, const fmpz_t g, const fmpz_t h)
 {
     fmpz c1, c2, c3;
-    __mpz_struct * mf;
+    mpz_ptr mf;
 
     c1 = *g;
 	c2 = *h;

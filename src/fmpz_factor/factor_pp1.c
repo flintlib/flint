@@ -334,14 +334,14 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
         roots = _fmpz_vec_init(num_roots);
         for (i = 0; (ulong) i < num_roots; i++)
         {
-            __mpz_struct * m = _fmpz_promote(roots + i);
+            mpz_ptr m = _fmpz_promote(roots + i);
             mpz_realloc(m, nn);
         }
 
         roots2 = _fmpz_vec_init(num_roots);
         for (i = 0; (ulong) i < num_roots; i++)
         {
-            __mpz_struct * m = _fmpz_promote(roots2 + i);
+            mpz_ptr m = _fmpz_promote(roots2 + i);
             mpz_realloc(m, nn);
         }
 
@@ -470,8 +470,8 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
         for (i = 0; (ulong) i < num_roots; i++)
         {
             mp_size_t sn;
-            __mpz_struct * m1 = COEFF_TO_PTR(roots[i]);
-            __mpz_struct * m2 = COEFF_TO_PTR(roots2[i]);
+            mpz_ptr m1 = COEFF_TO_PTR(roots[i]);
+            mpz_ptr m2 = COEFF_TO_PTR(roots2[i]);
 
             ptr_1 = m1->_mp_d;
             ptr_2 = m2->_mp_d;
@@ -550,7 +550,7 @@ cleanup:
 
     if (ret)
     {
-        __mpz_struct * fm = _fmpz_promote(fac);
+        mpz_ptr fm = _fmpz_promote(fac);
         mpz_realloc(fm, r);
         flint_mpn_copyi(fm->_mp_d, factor, r);
         fm->_mp_size = r;

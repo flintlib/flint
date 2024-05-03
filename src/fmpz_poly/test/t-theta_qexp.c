@@ -10,14 +10,13 @@
 */
 
 #include "test_helpers.h"
-#include "fmpz.h"
 #include "fmpz_poly.h"
 
 TEST_FUNCTION_START(fmpz_poly_theta_qexp, state)
 {
     int i;
 
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b;
         slong e, n;

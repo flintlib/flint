@@ -26,7 +26,7 @@ _fmpz_powm(fmpz_t res, const fmpz_t x, const fmpz_t e, const fmpz_t m)
         /* todo: make n_powmod2_fmpz_preinv faster than mpz_powm and use here */
         ulong c1, c2;
         mpz_t zx, zm;
-        __mpz_struct * zres;
+        mpz_ptr zres;
 
         c2 = *m;
         c1 = fmpz_fdiv_ui(x, c2);
@@ -73,7 +73,7 @@ _fmpz_powm(fmpz_t res, const fmpz_t x, const fmpz_t e, const fmpz_t m)
         if (!COEFF_IS_MPZ(*x))  /* x is small */
         {
             mpz_t zx;
-            __mpz_struct * zres;
+            mpz_ptr zres;
             ulong c1;
 
             c1 = FLINT_ABS(*x);
@@ -88,7 +88,7 @@ _fmpz_powm(fmpz_t res, const fmpz_t x, const fmpz_t e, const fmpz_t m)
         }
         else  /* x is large */
         {
-            __mpz_struct * zres = _fmpz_promote(res);
+            mpz_ptr zres = _fmpz_promote(res);
             mpz_powm(zres, COEFF_TO_PTR(*x), COEFF_TO_PTR(*e), COEFF_TO_PTR(*m));
             _fmpz_demote_val(res);
         }
@@ -202,7 +202,7 @@ _fmpz_powm_ui(fmpz_t res, const fmpz_t x, ulong e, const fmpz_t m)
         if (!COEFF_IS_MPZ(*x))  /* x is small */
         {
             mpz_t zx;
-            __mpz_struct * zres;
+            mpz_ptr zres;
             ulong c1;
 
             c1 = FLINT_ABS(*x);
@@ -217,7 +217,7 @@ _fmpz_powm_ui(fmpz_t res, const fmpz_t x, ulong e, const fmpz_t m)
         }
         else  /* x is large */
         {
-            __mpz_struct * zres = _fmpz_promote(res);
+            mpz_ptr zres = _fmpz_promote(res);
             flint_mpz_powm_ui(zres, COEFF_TO_PTR(*x), e, COEFF_TO_PTR(*m));
             _fmpz_demote_val(res);
         }
@@ -269,7 +269,7 @@ void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong e, const fmpz_t m)
             {
                 ulong c3;
                 mpz_t m3;
-                __mpz_struct *ptr = _fmpz_promote(f);
+                mpz_ptr ptr = _fmpz_promote(f);
 
                 c3 = m2;
                 m3->_mp_d = &c3;

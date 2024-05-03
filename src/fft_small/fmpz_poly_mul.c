@@ -199,7 +199,7 @@ void fmpz_neg_ui_array(fmpz_t out, const ulong * in, slong in_len)
     }
     else
     {
-        __mpz_struct * mpz = _fmpz_promote(out);
+        mpz_ptr mpz = _fmpz_promote(out);
         if (mpz->_mp_alloc < size)
             mpz_realloc2(mpz, FLINT_BITS * size);
         mpz->_mp_size = -size;

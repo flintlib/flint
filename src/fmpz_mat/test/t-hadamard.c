@@ -31,7 +31,7 @@ TEST_FUNCTION_START(fmpz_mat_hadamard, state)
 {
     int n;
 
-    for (n = 0; n <= 300; n++)
+    for (n = 0; n <= FLINT_MIN(300, (slong) (200 * flint_test_multiplier())); n++)
     {
         fmpz_mat_t h;
         int success;

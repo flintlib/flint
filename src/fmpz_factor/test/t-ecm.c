@@ -31,8 +31,8 @@ TEST_FUNCTION_START(fmpz_factor_ecm, state)
     {
         for (j = 0; j < flint_test_multiplier(); j++)
         {
-            fmpz_set_ui(prime1, n_randprime(state, i, 1));
-            fmpz_set_ui(prime2, n_randprime(state, i, 1));
+            fmpz_randprime(prime1, state, i, 1);
+            fmpz_randprime(prime2, state, i, 1);
 
             fmpz_mul(primeprod, prime1, prime2);
 
@@ -78,10 +78,10 @@ TEST_FUNCTION_START(fmpz_factor_ecm, state)
     for (i = 0; i < 5; i++)
     {
         fmpz_set_ui(prime1, n_randprime(state, 53, 1));
-	fmpz_set_ui(prime2, n_randprime(state, 53, 1));
-	fmpz_mul(primeprod, prime1, prime2);
-	fmpz_mul(primeprod, primeprod, primeprod);
-	fmpz_factor_ecm(fac, 212, 2000, 50000, state, primeprod);
+        fmpz_set_ui(prime2, n_randprime(state, 53, 1));
+        fmpz_mul(primeprod, prime1, prime2);
+        fmpz_mul(primeprod, primeprod, primeprod);
+        fmpz_factor_ecm(fac, 212, 2000, 50000, state, primeprod);
     }
 
     /* p^2*q*r for p and q of 53 bits */

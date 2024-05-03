@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2009 William Hart
     Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -19,263 +20,91 @@ TEST_FUNCTION_START(fmpz_poly_xgcd_modular, state)
 {
     int i, result;
 
-    /* Check s*f + t*g == r */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    /* Check s * f + t * g == r */
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t d, f, g, s, t;
+        fmpz_poly_t tmp, res;
         fmpz_t r;
+        int type;
 
         fmpz_poly_init(d);
         fmpz_poly_init(f);
         fmpz_poly_init(g);
         fmpz_poly_init(s);
         fmpz_poly_init(t);
+        fmpz_poly_init(tmp);
+        fmpz_poly_init(res);
         fmpz_init(r);
 
-        do {
-            fmpz_poly_randtest(f, state, n_randint(state, 50), 150);
-            fmpz_poly_randtest(g, state, n_randint(state, 50), 150);
-            fmpz_poly_primitive_part(f, f);
-            fmpz_poly_primitive_part(g, g);
-            fmpz_poly_gcd_modular(d, f, g);
-        } while (d->length != 1);
-
-        fmpz_poly_xgcd_modular(r, s, t, f, g);
-        fmpz_poly_mul(s, s, f);
-        fmpz_poly_mul(t, t, g);
-        fmpz_poly_add(s, s, t);
-
-        result = fmpz_poly_equal_fmpz(s, r);
-        if (!result)
+        do
         {
-           flint_printf("FAIL (check s*f + t*g == r):\n");
-           flint_printf("f = "), fmpz_poly_print(f), flint_printf("\n");
-           flint_printf("g = "), fmpz_poly_print(g), flint_printf("\n");
-           flint_printf("s = "), fmpz_poly_print(s); flint_printf("\n");
-           flint_printf("t = "), fmpz_poly_print(t); flint_printf("\n");
-           flint_printf("d = "), fmpz_poly_print(d); flint_printf("\n");
-           flint_printf("r = "), fmpz_print(r); flint_printf("\n");
-           fflush(stdout);
-           flint_abort();
-        }
-
-        fmpz_clear(r);
-        fmpz_poly_clear(d);
-        fmpz_poly_clear(f);
-        fmpz_poly_clear(g);
-        fmpz_poly_clear(s);
-        fmpz_poly_clear(t);
-    }
-
-    /* Check s*f + t*g == r with smaller polynomials */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
-    {
-        fmpz_poly_t d, f, g, s, t;
-        fmpz_t r;
-
-        fmpz_poly_init(d);
-        fmpz_poly_init(f);
-        fmpz_poly_init(g);
-        fmpz_poly_init(s);
-        fmpz_poly_init(t);
-        fmpz_init(r);
-
-        do {
-            fmpz_poly_randtest(f, state, n_randint(state, 30), 50);
-            fmpz_poly_randtest(g, state, n_randint(state, 30), 50);
-            fmpz_poly_primitive_part(f, f);
-            fmpz_poly_primitive_part(g, g);
-            fmpz_poly_gcd_modular(d, f, g);
-        } while (d->length != 1);
-
-        fmpz_poly_xgcd_modular(r, s, t, f, g);
-        fmpz_poly_mul(s, s, f);
-        fmpz_poly_mul(t, t, g);
-        fmpz_poly_add(s, s, t);
-
-        result = fmpz_poly_equal_fmpz(s, r);
-        if (!result)
-        {
-           flint_printf("FAIL (check small s*f + t*g == r):\n");
-           flint_printf("f = "), fmpz_poly_print(f), flint_printf("\n");
-           flint_printf("g = "), fmpz_poly_print(g), flint_printf("\n");
-           flint_printf("s = "), fmpz_poly_print(s); flint_printf("\n");
-           flint_printf("t = "), fmpz_poly_print(t); flint_printf("\n");
-           flint_printf("d = "), fmpz_poly_print(d); flint_printf("\n");
-           flint_printf("r = "), fmpz_print(r); flint_printf("\n");
-           fflush(stdout);
-           flint_abort();
-        }
-
-        fmpz_clear(r);
-        fmpz_poly_clear(d);
-        fmpz_poly_clear(f);
-        fmpz_poly_clear(g);
-        fmpz_poly_clear(s);
-        fmpz_poly_clear(t);
-    }
-
-    /* Check aliasing of s and f */
-    for (i = 0; i < 20 * flint_test_multiplier(); i++)
-    {
-        fmpz_poly_t d, f, g, s, t;
-        fmpz_t r;
-
-        fmpz_poly_init(d);
-        fmpz_poly_init(f);
-        fmpz_poly_init(g);
-        fmpz_poly_init(s);
-        fmpz_poly_init(t);
-        fmpz_init(r);
-
-        do {
             fmpz_poly_randtest(f, state, n_randint(state, 50), 100);
             fmpz_poly_randtest(g, state, n_randint(state, 50), 100);
             fmpz_poly_primitive_part(f, f);
             fmpz_poly_primitive_part(g, g);
-            fmpz_poly_gcd_modular(d, f, g);
-        } while (d->length != 1);
+            fmpz_poly_gcd(d, f, g);
+        } while (fmpz_poly_length(d) != 1);
 
-        fmpz_poly_xgcd_modular(r, s, t, f, g);
-        fmpz_poly_xgcd_modular(r, f, t, f, g);
+        type = n_randint(state, 5);
 
-        result = (fmpz_poly_equal(s, f) || fmpz_is_zero(r));
-        if (!result)
+        switch (type)
         {
-           flint_printf("FAIL (alias s and f):\n");
-           flint_printf("f = "), fmpz_poly_print(f), flint_printf("\n");
-           flint_printf("s = "), fmpz_poly_print(s); flint_printf("\n");
-           fflush(stdout);
-           flint_abort();
+            case 0: /* No aliasing */
+                fmpz_poly_xgcd_modular(r, s, t, f, g);
+                break;
+
+            case 1: /* s aliased with f */
+                fmpz_poly_set(s, f);
+                fmpz_poly_xgcd_modular(r, s, t, s, g);
+                break;
+
+            case 2: /* s aliased with g */
+                fmpz_poly_set(s, g);
+                fmpz_poly_xgcd_modular(r, s, t, f, s);
+                break;
+
+            case 3: /* t aliased with f */
+                fmpz_poly_set(t, f);
+                fmpz_poly_xgcd_modular(r, s, t, t, g);
+                break;
+
+            case 4: /* t aliased with g */
+                fmpz_poly_set(t, g);
+                fmpz_poly_xgcd_modular(r, s, t, f, t);
+                break;
+
+            default: FLINT_UNREACHABLE;
         }
 
-        fmpz_clear(r);
-        fmpz_poly_clear(d);
-        fmpz_poly_clear(f);
-        fmpz_poly_clear(g);
-        fmpz_poly_clear(s);
-        fmpz_poly_clear(t);
-    }
+        fmpz_poly_mul(tmp, s, f);
+        fmpz_poly_mul(res, t, g);
+        fmpz_poly_add(res, res, tmp);
 
-    /* Check aliasing of s and g */
-    for (i = 0; i < 20 * flint_test_multiplier(); i++)
-    {
-        fmpz_poly_t d, f, g, s, t;
-        fmpz_t r;
+        /* Either s * f + t * g == r */
+        result = fmpz_poly_equal_fmpz(res, r);
 
-        fmpz_poly_init(d);
-        fmpz_poly_init(f);
-        fmpz_poly_init(g);
-        fmpz_poly_init(s);
-        fmpz_poly_init(t);
-        fmpz_init(r);
-
-        do {
-            fmpz_poly_randtest(f, state, n_randint(state, 50), 100);
-            fmpz_poly_randtest(g, state, n_randint(state, 50), 100);
-            fmpz_poly_primitive_part(f, f);
-            fmpz_poly_primitive_part(g, g);
-            fmpz_poly_gcd_modular(d, f, g);
-        } while (d->length != 1);
-
-        fmpz_poly_xgcd_modular(r, s, t, f, g);
-        fmpz_poly_xgcd_modular(r, g, t, f, g);
-
-        result = (fmpz_poly_equal(s, g) || fmpz_is_zero(r));
+        /* ... Or r is zero with f or g being zero */
+        result |= (fmpz_is_zero(r) && (fmpz_poly_is_zero(f) || fmpz_poly_is_zero(g)));
         if (!result)
-        {
-           flint_printf("FAIL (alias s and g):\n");
-           flint_printf("g = "), fmpz_poly_print(g), flint_printf("\n");
-           flint_printf("s = "), fmpz_poly_print(s); flint_printf("\n");
-           fflush(stdout);
-           flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "s * f + t * g != r\n"
+                    "type = %d\n"
+                    "\n"
+                    "s * f + t * g = %{fmpz_poly}\n"
+                    "r = %{fmpz}\n"
+                    "\n"
+                    "f = %{fmpz_poly}\n"
+                    "g = %{fmpz_poly}\n"
+                    "s = %{fmpz_poly}\n"
+                    "t = %{fmpz_poly}\n"
+                    "\n"
+                    "d = %{fmpz_poly}\n",
+                    type, res, r, f, g, s, t, d);
 
         fmpz_clear(r);
-        fmpz_poly_clear(d);
-        fmpz_poly_clear(f);
-        fmpz_poly_clear(g);
-        fmpz_poly_clear(s);
-        fmpz_poly_clear(t);
-    }
-
-    /* Check aliasing of t and f */
-    for (i = 0; i < 20 * flint_test_multiplier(); i++)
-    {
-        fmpz_poly_t d, f, g, s, t;
-        fmpz_t r;
-
-        fmpz_poly_init(d);
-        fmpz_poly_init(f);
-        fmpz_poly_init(g);
-        fmpz_poly_init(s);
-        fmpz_poly_init(t);
-        fmpz_init(r);
-
-        do {
-            fmpz_poly_randtest(f, state, n_randint(state, 50), 100);
-            fmpz_poly_randtest(g, state, n_randint(state, 50), 100);
-            fmpz_poly_primitive_part(f, f);
-            fmpz_poly_primitive_part(g, g);
-            fmpz_poly_gcd_modular(d, f, g);
-        } while (d->length != 1);
-
-        fmpz_poly_xgcd_modular(r, s, t, f, g);
-        fmpz_poly_xgcd_modular(r, s, f, f, g);
-
-        result = (fmpz_poly_equal(t, f) || fmpz_is_zero(r));
-        if (!result)
-        {
-           flint_printf("FAIL (alias t and f):\n");
-           flint_printf("f = "), fmpz_poly_print(f), flint_printf("\n");
-           flint_printf("t = "), fmpz_poly_print(t); flint_printf("\n");
-           fflush(stdout);
-           flint_abort();
-        }
-
-        fmpz_clear(r);
-        fmpz_poly_clear(d);
-        fmpz_poly_clear(f);
-        fmpz_poly_clear(g);
-        fmpz_poly_clear(s);
-        fmpz_poly_clear(t);
-    }
-
-    /* Check aliasing of t and g */
-    for (i = 0; i < 20 * flint_test_multiplier(); i++)
-    {
-        fmpz_poly_t d, f, g, s, t;
-        fmpz_t r;
-
-        fmpz_poly_init(d);
-        fmpz_poly_init(f);
-        fmpz_poly_init(g);
-        fmpz_poly_init(s);
-        fmpz_poly_init(t);
-        fmpz_init(r);
-
-        do {
-            fmpz_poly_randtest(f, state, n_randint(state, 50), 100);
-            fmpz_poly_randtest(g, state, n_randint(state, 50), 100);
-            fmpz_poly_primitive_part(f, f);
-            fmpz_poly_primitive_part(g, g);
-            fmpz_poly_gcd_modular(d, f, g);
-        } while (d->length != 1);
-
-        fmpz_poly_xgcd_modular(r, s, t, f, g);
-        fmpz_poly_xgcd_modular(r, s, g, f, g);
-
-        result = (fmpz_poly_equal(t, g) || fmpz_is_zero(r));
-        if (!result)
-        {
-           flint_printf("FAIL (alias t and g):\n");
-           flint_printf("f = "), fmpz_poly_print(g), flint_printf("\n");
-           flint_printf("t = "), fmpz_poly_print(t); flint_printf("\n");
-           fflush(stdout);
-           flint_abort();
-        }
-
-        fmpz_clear(r);
+        fmpz_poly_clear(tmp);
+        fmpz_poly_clear(res);
         fmpz_poly_clear(d);
         fmpz_poly_clear(f);
         fmpz_poly_clear(g);

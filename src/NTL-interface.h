@@ -50,7 +50,7 @@ inline void fmpz_set_ZZ(fmpz_t rop, const ZZ& op)
             fmpz_set_ui(rop, xp[0]);
         else
         {
-            __mpz_struct *mf = _fmpz_promote(rop);
+            mpz_ptr mf = _fmpz_promote(rop);
 
             mpz_import(mf, lw, -1, sizeof(mp_limb_t), 0, 0, xp);
         }
@@ -81,7 +81,7 @@ inline void fmpz_get_ZZ(NTL_NNS ZZ& rop, const fmpz_t op)
 
    if (COEFF_IS_MPZ(c))
    {
-      __mpz_struct * m = COEFF_TO_PTR(c);
+      mpz_ptr m = COEFF_TO_PTR(c);
       mpn_copyi(xp, m->_mp_d, lw);
    } else
    {

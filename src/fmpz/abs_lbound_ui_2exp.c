@@ -27,7 +27,7 @@ fmpz_abs_lbound_ui_2exp(slong * exp, const fmpz_t x, int bits)
     }
     else
     {
-        __mpz_struct * z = COEFF_TO_PTR(c);
+        mpz_ptr z = COEFF_TO_PTR(c);
         size = z->_mp_size;
         size = FLINT_ABS(size);
         e = (size - 1) * FLINT_BITS;

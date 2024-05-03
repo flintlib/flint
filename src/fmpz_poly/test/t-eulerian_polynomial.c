@@ -15,7 +15,7 @@
 
 TEST_FUNCTION_START(fmpz_poly_eulerian_polynomial, state)
 {
-    ulong n, ix, mx;
+    ulong n, mx;
     fmpz_t sum, fac;
     fmpz_poly_t poly;
 
@@ -23,59 +23,57 @@ TEST_FUNCTION_START(fmpz_poly_eulerian_polynomial, state)
     fmpz_init(sum);
     fmpz_init(fac);
 
-    for (ix = 0; ix < 100; ix++)
+    for (n = 0; n < FLINT_MIN(100 * flint_test_multiplier(), 500 + 10 * flint_test_multiplier()); n++)
     {
-        n = n_randint(state, 1000) + 1; /* Don't want n = 0. */
         fmpz_poly_eulerian_polynomial(poly, n);
 
-        if (!fmpz_is_one(poly->coeffs))
-        {
-            flint_printf("The first coefficient is not 1 for n = %u. Received:\n", n);
-            fmpz_poly_print_pretty(poly, "x");
-            flint_printf("\n");
-            fflush(stdout);
-            flint_abort();
-        }
+        if (!fmpz_is_one(poly->coeffs + 0))
+            TEST_FUNCTION_FAIL(
+                    "First coefficient is not 1.\n"
+                    "n = %wu\n"
+                    "Got: %{fmpz}\n",
+                    n, poly->coeffs + 0);
+
+        if (n == UWORD(0))
+            continue;
 
         if (!fmpz_is_one(poly->coeffs + (n - 1)))
-        {
-            flint_printf("The last coefficient is not 1 for n = %u. Received:\n", n);
-            fmpz_poly_print_pretty(poly, "x");
-            flint_printf("\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Last coefficient is not 1.\n"
+                    "n = %wu\n"
+                    "Got: %{fmpz}\n",
+                    n, poly->coeffs + (n - 1));
 
         for (mx = 0; mx <= n / 2; mx++)
         {
             if (!fmpz_equal(poly->coeffs + mx, poly->coeffs + (n - mx - 1)))
-            {
-                flint_printf("A(n, m) is not equal to A(n, n - m - 1)"
-                        "for n = %u and m = %u.\n", n, mx);
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL(
+                        "A(n, m) != A(n, n - m - 1)\n"
+                        "n = %wu\n"
+                        "m = %wu\n"
+                        "A(n, m) = %{fmpz}\n",
+                        "A(n, n - m - 1) = %{fmpz}\n",
+                        n, mx, poly->coeffs + mx, poly->coeffs + (n - mx - 1));
+
             if (fmpz_cmp_si(poly->coeffs + mx, 0) <= 0)
-            {
-                flint_printf("Negative coefficients for A(n, m)"
-                        "where n = %u and m = %u.\n", n, mx);
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL(
+                        "Negative coefficient(s)\n"
+                        "n = %wu\n",
+                        n);
         }
+
         fmpz_zero(sum);
         for (mx = 0; mx < n; mx++)
             fmpz_add(sum, sum, poly->coeffs + mx);
+
         fmpz_fac_ui(fac, n);
         if (!fmpz_equal(sum, fac))
-        {
-            flint_printf("The sum of the coefficients of the %u'th polynomial"
-                    "was not equal to %u!.\n", n, n);
-            flint_printf("Expected: "), fmpz_print(fac), flint_printf("\n");
-            flint_printf("Got:      "), fmpz_print(sum), flint_printf("\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Sum of coefficients is not equal to n-factorial\n"
+                    "n = %wu\n"
+                    "%wu! = %{fmpz}\n"
+                    "sum = %{fmpz}\n",
+                    n, fac, sum);
     }
 
     fmpz_poly_clear(poly);

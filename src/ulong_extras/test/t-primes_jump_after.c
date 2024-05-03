@@ -22,11 +22,11 @@ TEST_FUNCTION_START(n_primes_jump_after, state)
 
         n_primes_init(iter);
 
-        for (k = 0; k < 100; k++)
+        for (k = 0; k < 10 * flint_test_multiplier(); k++)
         {
             mp_limb_t p, q;
 
-            q = n_randtest(state) % UWORD(1000000000);
+            q = n_randint(state, UWORD(1000000000));
 
             n_primes_jump_after(iter, q);
 

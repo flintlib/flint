@@ -52,7 +52,7 @@ bignum:
 
         if (COEFF_IS_MPZ(c))
         {
-            __mpz_struct * z = COEFF_TO_PTR(c);
+            mpz_ptr z = COEFF_TO_PTR(c);
             limbs = z->_mp_size;
 
             if (limbs < 0)

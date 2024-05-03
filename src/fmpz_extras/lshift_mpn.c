@@ -15,7 +15,7 @@
 void
 fmpz_lshift_mpn(fmpz_t z, mp_srcptr d, mp_size_t dn, int sgnbit, flint_bitcnt_t shift)
 {
-    __mpz_struct * zmpz;
+    mpz_ptr zmpz;
     mp_ptr zp;
     mp_size_t zn, shift_limbs;
     flint_bitcnt_t shift_bits;

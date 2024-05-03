@@ -188,7 +188,7 @@ static int
 fmpz_set_str_fallback(fmpz_t res, const char * str, int b, int neg)
 {
     int err;
-    __mpz_struct * z = _fmpz_promote(res);
+    mpz_ptr z = _fmpz_promote(res);
     err = mpz_set_str(z, str, b);
     if (neg)
         mpz_neg(z, z);

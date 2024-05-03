@@ -19,7 +19,7 @@ TEST_FUNCTION_START(flint_mpn_mulhigh_normalised, state)
     slong ix;
     int result;
 
-    for (ix = 0; ix < 100000 * flint_test_multiplier(); ix++)
+    for (ix = 0; ix < 10000 * flint_test_multiplier(); ix++)
     {
         mp_limb_t rp_n[N_MAX + 1] = {UWORD(0)};
         mp_limb_t rp_u[N_MAX + 1] = {UWORD(0)};

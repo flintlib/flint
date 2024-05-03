@@ -215,32 +215,28 @@ Memory management
 Random generation
 --------------------------------------------------------------------------------
 
-For thread-safety, the randomisation methods take as one of their
-parameters an object of type ``flint_rand_t``.  Before calling
-any of the randomisation functions such an object first has to be
-initialised with a call to :func:`flint_randinit`.  When one is
-finished generating random numbers, one should call
-:func:`flint_randclear` to clean up.
+For thread-safety, the randomisation methods take as one of their parameters an
+object of type ``flint_rand_t``.  Before calling any of the randomisation
+functions such an object first has to be initialised with a call to
+:func:`flint_randinit`.  When one is finished generating random numbers, one
+should call :func:`flint_randclear` to clean up.
 
-.. function:: void fmpz_randbits(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
+.. function:: void fmpz_randbits_unsigned(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
+              void fmpz_randbits(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
 
-    Generates a random signed integer whose absolute value has precisely
-    the given number of bits.
-
-.. function:: void fmpz_randtest(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
-
-    Generates a random signed integer whose absolute value has a number
-    of bits which is random from `0` up to ``bits`` inclusive.
+    Generates a random integer whose absolute value has precisely the given
+    number of bits.
 
 .. function:: void fmpz_randtest_unsigned(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
+              void fmpz_randtest(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
 
-    Generates a random unsigned integer whose value has a number
-    of bits which is random from `0` up to ``bits`` inclusive.
+    Generates a random integer whose absolute value has a number of bits which
+    is random from `0` up to ``bits`` inclusive.
 
 .. function:: void fmpz_randtest_not_zero(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
 
-    As per ``fmpz_randtest``, but the result will not be `0`.
-    If ``bits`` is set to `0`, an exception will result.
+    As per ``fmpz_randtest``, but the result will not be `0`. If ``bits`` is set
+    to `0`, an exception will result.
 
 .. function:: void fmpz_randm(fmpz_t f, flint_rand_t state, const fmpz_t m)
 
@@ -248,30 +244,27 @@ finished generating random numbers, one should call
 
 .. function:: void fmpz_randtest_mod(fmpz_t f, flint_rand_t state, const fmpz_t m)
 
-    Generates a random integer in the range `0` to `m - 1` inclusive,
-    with an increased probability of generating values close to
-    the endpoints.
+    Generates a random integer in the range `0` to `m - 1` inclusive, with an
+    increased probability of generating values close to the endpoints.
 
 .. function:: void fmpz_randtest_mod_signed(fmpz_t f, flint_rand_t state, const fmpz_t m)
 
-    Generates a random integer in the range `(-m/2, m/2]`, with an
-    increased probability of generating values close to the
-    endpoints or close to zero.
+    Generates a random integer in the range `(-m/2, m/2]`, with an increased
+    probability of generating values close to the endpoints or close to zero.
 
 .. function:: void fmpz_randprime(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits, int proved)
 
     Generates a random prime number with the given number of bits.
 
-    The generation is performed by choosing a random number and then
-    finding the next largest prime, and therefore does not quite
-    give a uniform distribution over the set of primes with that
-    many bits.
+    The generation is performed by choosing a random number and then finding the
+    next largest prime, and therefore does not quite give a uniform distribution
+    over the set of primes with that many bits.
 
-    Random number generation is performed using the standard Flint
-    random number generator, which is not suitable for cryptographic use.
+    Random number generation is performed using the standard FLINT random number
+    generator, which is not suitable for cryptographic use.
 
-    If ``proved`` is nonzero, then the integer returned is
-    guaranteed to actually be prime.
+    If ``proved`` is nonzero, then the integer returned is guaranteed to
+    actually be prime.
 
 
 

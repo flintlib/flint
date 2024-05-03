@@ -29,7 +29,7 @@ _fmpz_sub_mpn_1(fmpz_t f, const mp_limb_t * glimbs, mp_size_t gsz, mp_limb_t x);
 void
 fmpz_add_ui_old(fmpz_t f, const fmpz_t g, ulong x)
 {
-    __mpz_struct * mf;
+    mpz_ptr mf;
     slong g1 = *g;
     slong f1 = *f;
 
@@ -100,7 +100,7 @@ carry:      if (COEFF_IS_MPZ(f1))
     }
     else
     {
-        __mpz_struct * mg = COEFF_TO_PTR(g1);
+        mpz_ptr mg = COEFF_TO_PTR(g1);
         mp_size_t gsz = mg->_mp_size;
         mp_limb_t * glimbs = mg->_mp_d;
 
@@ -115,7 +115,7 @@ carry:      if (COEFF_IS_MPZ(f1))
 static void
 _fmpz_add_mpn_1(fmpz_t f, const mp_limb_t * glimbs, mp_size_t gsz, mp_limb_t x)
 {
-    __mpz_struct * mf;
+    mpz_ptr mf;
     mp_limb_t * flimbs;
     mp_size_t gabssz = FLINT_ABS(gsz);
 
@@ -156,7 +156,7 @@ _fmpz_add_mpn_1(fmpz_t f, const mp_limb_t * glimbs, mp_size_t gsz, mp_limb_t x)
 static void
 _fmpz_sub_mpn_1(fmpz_t f, const mp_limb_t * glimbs, mp_size_t gsz, mp_limb_t x)
 {
-    __mpz_struct * mf;
+    mpz_ptr mf;
     mp_limb_t * flimbs;
     mp_size_t gabssz = FLINT_ABS(gsz);
 
@@ -261,7 +261,7 @@ L1:         if (x <= COEFF_MAX) /* Fits in small fmpz */
 void
 fmpz_sub_ui_old(fmpz_t f, const fmpz_t g, ulong x)
 {
-    __mpz_struct * mf;
+    mpz_ptr mf;
     slong g1 = *g;
     slong f1 = *f;
 
@@ -331,7 +331,7 @@ carry:      if (COEFF_IS_MPZ(f1))
     }
     else
     {
-        __mpz_struct * mg = COEFF_TO_PTR(g1);
+        mpz_ptr mg = COEFF_TO_PTR(g1);
         mp_size_t gsz = mg->_mp_size;
         mp_limb_t * glimbs = mg->_mp_d;
 
@@ -366,8 +366,8 @@ void fmpz_add_ui_old(fmpz_t f, const fmpz_t g, ulong x)
     }
     else
     {
-        __mpz_struct * mf = _fmpz_promote(f);  /* g is already large */
-        __mpz_struct * mc = COEFF_TO_PTR(c);
+        mpz_ptr mf = _fmpz_promote(f);  /* g is already large */
+        mpz_ptr mc = COEFF_TO_PTR(c);
         flint_mpz_add_ui(mf, mc, x);
         _fmpz_demote_val(f);  /* cancellation may have occurred */
     }
@@ -396,7 +396,7 @@ fmpz_sub_ui_old(fmpz_t f, const fmpz_t g, ulong x)
     }
     else
     {
-        __mpz_struct * mc, * mf;
+        mpz_ptr mc, mf;
         mf = _fmpz_promote(f);    /* g is already large */
         mc = COEFF_TO_PTR(c);
         flint_mpz_sub_ui(mf, mc, x);

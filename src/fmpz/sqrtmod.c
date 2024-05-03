@@ -177,7 +177,7 @@ int fmpz_sqrtmod(fmpz_t b, const fmpz_t a, const fmpz_t p)
     {
         int ans;
         mpz_t t;
-        __mpz_struct *bptr;
+        mpz_ptr bptr;
 
         if (fmpz_is_even(p))
             return 0;

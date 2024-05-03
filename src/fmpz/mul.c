@@ -144,7 +144,7 @@ flint_mpz_mul(mpz_ptr z, mpz_srcptr x, mpz_srcptr y)
 void
 fmpz_mul(fmpz_t f, const fmpz_t g, const fmpz_t h)
 {
-    __mpz_struct * mf;
+    mpz_ptr mf;
     fmpz c1 = *g;
     fmpz c2 = *h;
 
@@ -208,7 +208,7 @@ fmpz_mul_si(fmpz_t f, const fmpz_t g, slong x)
     }
     else                        /* c2 is large */
     {
-        __mpz_struct * mf;
+        mpz_ptr mf;
         if (!COEFF_IS_MPZ(*f))
         {
             if (x == 0)
@@ -255,7 +255,7 @@ fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong x)
     }
     else                        /* c2 is large */
     {
-        __mpz_struct * mf;
+        mpz_ptr mf;
         if (!COEFF_IS_MPZ(*f))
         {
             if (x == 0)

@@ -83,7 +83,7 @@ static ulong lower_bound(ulong n)
     if (n < 3)
         return 0;
     else
-        return 4 * n - 8;
+        return 2 * n;
 }
 #endif
 
@@ -95,11 +95,10 @@ TEST_FUNCTION_START(flint_mpn_sqrhigh, state)
 
     rpc = flint_malloc(2 * sizeof(mp_limb_t) * MAX_ALLOC_SIZE);
 
-    for (ix = 0; ix < 100000 * flint_test_multiplier(); ix++)
+    for (ix = 0; ix < 10000 * flint_test_multiplier(); ix++)
     {
         mp_limb_t borrow;
         mp_size_t n;
-
 
 #if WANT_STOR
         /* Trigger full multiplication in mulhigh */

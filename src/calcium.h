@@ -151,7 +151,7 @@ CALCIUM_INLINE ulong calcium_fmpz_hash(const fmpz_t x)
         return *x;
     else
     {
-        __mpz_struct * z = COEFF_TO_PTR(*x);
+        mpz_ptr z = COEFF_TO_PTR(*x);
         return (z->_mp_size > 0) ? z->_mp_d[0] : -z->_mp_d[0];
     }
 }

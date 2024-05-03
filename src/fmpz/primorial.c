@@ -135,7 +135,7 @@ fmpz_primorial(fmpz_t res, ulong n)
 {
     mp_size_t len, pi;
     ulong bits;
-    __mpz_struct * mres;
+    mpz_ptr mres;
     const mp_limb_t * primes;
 
     if (n <= LARGEST_ULONG_PRIMORIAL)

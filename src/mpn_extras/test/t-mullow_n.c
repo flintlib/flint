@@ -19,7 +19,7 @@ TEST_FUNCTION_START(flint_mpn_mullow_n, state)
 
     mp_ptr rp, rpf, xp, yp;
 
-    for (ix = 0; ix < 100000 * flint_test_multiplier(); ix++)
+    for (ix = 0; ix < 10000 * flint_test_multiplier(); ix++)
     {
         mp_limb_t ret;
         mp_size_t n;

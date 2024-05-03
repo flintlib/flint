@@ -178,7 +178,7 @@ arf_get_fmpz_2exp(fmpz_t man, fmpz_t exp, const arf_t x)
         }
         else
         {
-            __mpz_struct * z = _fmpz_promote(man);
+            mpz_ptr z = _fmpz_promote(man);
 
             if (z->_mp_alloc < xn)
                 mpz_realloc(z, xn);
@@ -201,7 +201,7 @@ arf_get_fmpz(fmpz_t z, const arf_t x, arf_rnd_t rnd)
     int negative, inexact, value, roundup;
     mp_size_t xn, zn;
     mp_srcptr xp;
-    __mpz_struct * zz;
+    mpz_ptr zz;
     mp_ptr zp;
     mp_limb_t v, v2, v3;
 

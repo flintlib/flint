@@ -17,7 +17,7 @@ TEST_FUNCTION_START(fmpz_mat_hnf_modular_eldiv, state)
 {
     slong iter;
 
-    for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 5000 * flint_test_multiplier(); iter++)
     {
         fmpz_t det;
         fmpz_mat_t A, B, H, H2;

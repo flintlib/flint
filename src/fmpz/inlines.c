@@ -16,33 +16,33 @@
 
 void _fmpz_promote_set_ui(fmpz_t f, ulong v)
 {
-    __mpz_struct * z = _fmpz_promote(f);
+    mpz_ptr z = _fmpz_promote(f);
     flint_mpz_set_ui(z, v);
 }
 
 void _fmpz_promote_neg_ui(fmpz_t f, ulong v)
 {
-    __mpz_struct * z = _fmpz_promote(f);
+    mpz_ptr z = _fmpz_promote(f);
     flint_mpz_set_ui(z, v);
     mpz_neg(z, z);
 }
 
 void _fmpz_promote_set_si(fmpz_t f, slong v)
 {
-    __mpz_struct * z = _fmpz_promote(f);
+    mpz_ptr z = _fmpz_promote(f);
     flint_mpz_set_si(z, v);
 }
 
 void _fmpz_init_promote_set_ui(fmpz_t f, ulong v)
 {
-    __mpz_struct * z = _fmpz_new_mpz();
+    mpz_ptr z = _fmpz_new_mpz();
     *f = PTR_TO_COEFF(z);
     flint_mpz_set_ui(z, v);
 }
 
 void _fmpz_init_promote_set_si(fmpz_t f, slong v)
 {
-    __mpz_struct * z = _fmpz_new_mpz();
+    mpz_ptr z = _fmpz_new_mpz();
     *f = PTR_TO_COEFF(z);
     flint_mpz_set_si(z, v);
 }

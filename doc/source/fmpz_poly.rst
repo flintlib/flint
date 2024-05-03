@@ -3397,7 +3397,7 @@ The Eulerian numbers can be expressed explicitly via the formula
 
 Note: Not to be confused with Euler numbers and polynomials.
 
-.. function:: void arith_eulerian_polynomial(fmpz_poly_t res, ulong n)
+.. function:: void fmpz_eulerian_polynomial(fmpz_poly_t res, ulong n)
 
     Sets ``res`` to the Eulerian polynomial `A_n(x)`, where we define
     `A_0(x) = 1`. The polynomial is calculated via a recursive relation.

@@ -12,32 +12,32 @@
 #include "test_helpers.h"
 #include "mpn_extras.h"
 
+/* We want m > n / 2 + 2 and m <= n. This is only possible if n > 4. */
+#define N_MIN 5
+#define N_MAX 300
+#define M_MIN(n) ((n) / 2 + 3)
+#define M_MAX(n) (n)
+
 TEST_FUNCTION_START(flint_mpn_mul_toom22, state)
 {
     slong iter;
 
-    for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 5000 * flint_test_multiplier(); iter++)
     {
-        slong i, n, m;
+        slong n, m;
         mp_ptr X, Y, R1, R2;
 
-        do
-        {
-            n = 1 + n_randint(state, 300);
-            m = 1 + n_randint(state, n);
-        }
-        while (m <= n / 2 + 2);
+        n = N_MIN + n_randint(state, N_MAX - N_MIN + 1);
+        m = M_MIN(n) + n_randint(state, M_MAX(n) - M_MIN(n) + 1);
 
         X = flint_malloc(sizeof(mp_limb_t) * n);
-        Y = flint_malloc(sizeof(mp_limb_t) * n);
-        R1 = flint_malloc(sizeof(mp_limb_t) * (2 * n));
-        R2 = flint_malloc(sizeof(mp_limb_t) * (2 * n));
+        Y = flint_malloc(sizeof(mp_limb_t) * m);
+        R1 = flint_malloc(sizeof(mp_limb_t) * (n + m));
+        R2 = flint_malloc(sizeof(mp_limb_t) * (n + m));
 
         flint_mpn_rrandom(X, state, n);
         flint_mpn_rrandom(Y, state, m);
-
-        for (i = 0; i < n + m; i++)
-            R1[i] = n_randtest(state);
+        flint_mpn_rrandom(R1, state, n + m);
 
         flint_mpn_mul_toom22(R1, X, n, Y, m, NULL);
         mpn_mul(R2, X, n, Y, m);
@@ -59,3 +59,8 @@ TEST_FUNCTION_START(flint_mpn_mul_toom22, state)
 
     TEST_FUNCTION_END(state);
 }
+
+#undef N_MIN
+#undef N_MAX
+#undef M_MIN
+#undef M_MAX

@@ -46,7 +46,7 @@ fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h)
         }
         else                    /* but h is large */
         {
-            __mpz_struct * mpzc2 = COEFF_TO_PTR(c2);
+            mpz_ptr mpzc2 = COEFF_TO_PTR(c2);
             mp_size_t size = mpzc2->_mp_size;
             /* The sign is stored in the size of an mpz, and gcd_1 only takes
              * positive integers. */
@@ -58,7 +58,7 @@ fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h)
         if (!COEFF_IS_MPZ(c2))  /* but h is small */
         {
             ulong u2;
-            __mpz_struct * mpzc1;
+            mpz_ptr mpzc1;
             mp_size_t size;
 
             if (c2 == 0)
@@ -76,7 +76,7 @@ fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h)
         {
             /* TODO: Change to mpn_gcd in order to save some calculations that
              * have already been already made. */
-            __mpz_struct * mf = _fmpz_promote(f);
+            mpz_ptr mf = _fmpz_promote(f);
             mpz_gcd(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
             _fmpz_demote_val(f);
         }
@@ -100,7 +100,7 @@ fmpz_gcd_ui(fmpz_t res, const fmpz_t a, ulong b)
     }
     else
     {
-        __mpz_struct * ma = COEFF_TO_PTR(*a);
+        mpz_ptr ma = COEFF_TO_PTR(*a);
         fmpz_set_ui(res, mpn_gcd_1(ma->_mp_d, FLINT_ABS(ma->_mp_size), b));
     }
 }
@@ -132,14 +132,14 @@ _fmpz_gcd3_small(fmpz_t res, const fmpz_t a, const fmpz_t b, ulong c)
                 }
                 else
                 {
-                    __mpz_struct * mb = COEFF_TO_PTR(*b);
+                    mpz_ptr mb = COEFF_TO_PTR(*b);
                     c = mpn_gcd_1(mb->_mp_d, FLINT_ABS(mb->_mp_size), c);
                 }
             }
         }
         else
         {
-            __mpz_struct * ma = COEFF_TO_PTR(*a);
+            mpz_ptr ma = COEFF_TO_PTR(*a);
 
             if (!COEFF_IS_MPZ(*b))
             {
@@ -185,7 +185,7 @@ fmpz_gcd3(fmpz_t res, const fmpz_t a, const fmpz_t b, const fmpz_t c)
     else
     {
         /* Three-way mpz_gcd. */
-        __mpz_struct *rp, *ap, *bp, *cp, *tp;
+        mpz_ptr rp, ap, bp, cp, tp;
         mp_size_t an, bn, cn, mn;
 
         /* If res is small, it cannot be aliased with a, b, c, so promoting is fine. */

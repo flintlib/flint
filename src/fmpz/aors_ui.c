@@ -37,7 +37,7 @@ fmpz_add_ui(fmpz_t res, const fmpz_t x, ulong y)
             }
             else
             {
-                __mpz_struct * mpz_res = _fmpz_promote(res);
+                mpz_ptr mpz_res = _fmpz_promote(res);
                 flint_mpz_set_si(mpz_res, b);
             }
 #else
@@ -150,7 +150,7 @@ fmpz_sub_ui(fmpz_t res, const fmpz_t x, ulong y)
             }
             else
             {
-                __mpz_struct * mpz_res = _fmpz_promote(res);
+                mpz_ptr mpz_res = _fmpz_promote(res);
                 flint_mpz_set_si(mpz_res, b);
             }
 #else

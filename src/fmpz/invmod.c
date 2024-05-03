@@ -62,7 +62,7 @@ fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h)
         else                    /* h is large and g is small */
         {
             __mpz_struct temp;  /* put g into a temporary mpz_t */
-            __mpz_struct * mf;
+            mpz_ptr mf;
 
             if (c1 < WORD(0))
             {
@@ -107,7 +107,7 @@ fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h)
         }
         else                    /* both are large */
         {
-            __mpz_struct * mf = _fmpz_promote(f);
+            mpz_ptr mf = _fmpz_promote(f);
             val = mpz_invert(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
             _fmpz_demote_val(f);    /* reduction mod h may result in small value */
 

@@ -13,7 +13,7 @@
 
 int _fmpz_is_canonical(const fmpz_t x)
 {
-    __mpz_struct * z;
+    mpz_ptr z;
     mp_size_t n;
 
     if (!COEFF_IS_MPZ(*x))

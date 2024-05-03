@@ -41,7 +41,7 @@ int _fmpz_is_prime(const fmpz_t n, int proved)
    }
    else
    {
-      __mpz_struct * z;
+      mpz_ptr z;
       mp_ptr d;
       slong size, bits, trial_primes;
 

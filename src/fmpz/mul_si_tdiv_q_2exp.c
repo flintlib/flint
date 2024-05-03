@@ -65,7 +65,7 @@ fmpz_mul_si_tdiv_q_2exp(fmpz_t f, const fmpz_t g, slong x, ulong exp)
        }
        else /* result takes two limbs */
        {
-           __mpz_struct * mf = _fmpz_promote(f);
+           mpz_ptr mf = _fmpz_promote(f);
 
            /* two limbs, least significant first, native endian, no
 nails, stored in prod */
@@ -76,7 +76,7 @@ nails, stored in prod */
    }
    else /* c2 is large */
    {
-       __mpz_struct * mf = _fmpz_promote(f); /* ok without val as
+       mpz_ptr mf = _fmpz_promote(f); /* ok without val as
             if aliased both are large */
        flint_mpz_mul_si(mf, COEFF_TO_PTR(c2), x);
        mpz_tdiv_q_2exp(mf, mf, exp);

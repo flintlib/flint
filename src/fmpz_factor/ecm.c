@@ -52,7 +52,7 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
     ulong i, j;
     int ret;
     ecm_t ecm_inf;
-    __mpz_struct *fac, *mptr;
+    mpz_ptr fac, mptr;
     mp_ptr n, mpsig;
 
     TMP_INIT;

@@ -71,7 +71,7 @@ acb_dot_fmpz(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong x
         }
         else
         {
-            __mpz_struct * z = COEFF_TO_PTR(v);
+            mpz_ptr z = COEFF_TO_PTR(v);
 
             ssize = z->_mp_size;
             size = FLINT_ABS(ssize);

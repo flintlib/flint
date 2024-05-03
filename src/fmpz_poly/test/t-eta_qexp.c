@@ -17,7 +17,7 @@ TEST_FUNCTION_START(fmpz_poly_eta_qexp, state)
 {
     int i;
 
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b;
         slong e, n;

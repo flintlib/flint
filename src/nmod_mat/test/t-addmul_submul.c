@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -12,14 +13,15 @@
 #include "test_helpers.h"
 #include "nmod_mat.h"
 
-TEST_FUNCTION_START(nmod_mat_submul, state)
+TEST_FUNCTION_START(nmod_mat_addmul_submul, state)
 {
     slong i;
 
-    for (i = 0; i < 20 * flint_test_multiplier(); i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         nmod_mat_t A, B, C, D, T, E;
         mp_limb_t mod = n_randtest_not_zero(state);
+        int type, operation;
 
         slong m, k, n;
 
@@ -28,12 +30,15 @@ TEST_FUNCTION_START(nmod_mat_submul, state)
         n = n_randint(state, 100);
 
         /* Force Strassen test */
-        if (i < 5)
+        if (n_randint(state, 5) == 0)
         {
             m += 300;
             k += 300;
             n += 300;
         }
+
+        type = n_randint(state, 2);
+        operation = n_randint(state, 2);
 
         nmod_mat_init(A, m, k, mod);
         nmod_mat_init(B, k, n, mod);
@@ -46,33 +51,54 @@ TEST_FUNCTION_START(nmod_mat_submul, state)
         nmod_mat_randtest(B, state);
         nmod_mat_randtest(C, state);
 
-        nmod_mat_submul(D, C, A, B);
-
         nmod_mat_mul(T, A, B);
-        nmod_mat_sub(E, C, T);
+
+        if (operation)
+        {
+            /* addmul */
+            nmod_mat_add(E, C, T);
+
+            if (type)
+            {
+                /* without aliasing */
+                nmod_mat_addmul(D, C, A, B);
+            }
+            else
+            {
+                /* with aliasing */
+                nmod_mat_set(D, C);
+                nmod_mat_addmul(D, D, A, B);
+            }
+        }
+        else
+        {
+            /* submul */
+            nmod_mat_sub(E, C, T);
+            
+            if (type)
+            {
+                /* without aliasing */
+                nmod_mat_submul(D, C, A, B);
+            }
+            else
+            {
+                /* with aliasing */
+                nmod_mat_set(D, C);
+                nmod_mat_submul(D, D, A, B);
+            }
+        }
 
         if (!nmod_mat_equal(D, E))
             TEST_FUNCTION_FAIL(
                     "Results not equal\n"
+                    "type: %d\n"
+                    "operation: %d\n"
                     "A = %{nmod_mat}\n"
                     "B = %{nmod_mat}\n"
                     "C = %{nmod_mat}\n"
                     "D = %{nmod_mat}\n"
                     "E = %{nmod_mat}\n",
-                    A, B, C, D, E);
-
-        /* Check aliasing */
-        nmod_mat_submul(C, C, A, B);
-
-        if (!nmod_mat_equal(C, E))
-            TEST_FUNCTION_FAIL(
-                    "Results not equal (aliasing)\n"
-                    "A = %{nmod_mat}\n"
-                    "B = %{nmod_mat}\n"
-                    "C = %{nmod_mat}\n"
-                    "D = %{nmod_mat}\n"
-                    "E = %{nmod_mat}\n",
-                    A, B, C, D, E);
+                    type, A, B, C, D, E);
 
         nmod_mat_clear(A);
         nmod_mat_clear(B);

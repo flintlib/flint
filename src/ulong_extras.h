@@ -31,7 +31,6 @@ extern "C" {
 /* Randomisation *************************************************************/
 
 ulong n_randlimb(flint_rand_t state);
-ulong n_randint(flint_rand_t state, ulong limit);
 ulong n_urandint(flint_rand_t state, ulong limit);
 ulong n_randbits(flint_rand_t state, unsigned int bits);
 ulong n_randprime(flint_rand_t state, ulong bits, int proved);
@@ -61,7 +60,6 @@ int n_is_squarefree(ulong n);
 double n_cbrt_estimate(double a);
 ulong n_cbrt(ulong a);
 ulong n_cbrt_binary_search(ulong x);
-ulong n_cbrt_newton_iteration(ulong n);
 ulong n_cbrt_chebyshev_approx(ulong n);
 ulong n_cbrtrem(ulong* remainder, ulong n);
 

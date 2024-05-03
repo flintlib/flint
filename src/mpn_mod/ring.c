@@ -337,7 +337,7 @@ mpn_mod_add_fmpz(mp_ptr res, mp_srcptr x, const fmpz_t y, gr_ctx_t ctx)
         mp_srcptr m = MPN_MOD_CTX_MODULUS(ctx);
         mp_size_t n = MPN_MOD_CTX_NLIMBS(ctx);
 
-        __mpz_struct * z = COEFF_TO_PTR(*y);
+        mpz_ptr z = COEFF_TO_PTR(*y);
         mp_size_t ssize = z->_mp_size;
         mp_size_t zn = FLINT_ABS(ssize);
         mp_srcptr zd = z->_mp_d;
@@ -375,7 +375,7 @@ mpn_mod_sub_fmpz(mp_ptr res, mp_srcptr x, const fmpz_t y, gr_ctx_t ctx)
         mp_srcptr m = MPN_MOD_CTX_MODULUS(ctx);
         mp_size_t n = MPN_MOD_CTX_NLIMBS(ctx);
 
-        __mpz_struct * z = COEFF_TO_PTR(*y);
+        mpz_ptr z = COEFF_TO_PTR(*y);
         mp_size_t ssize = z->_mp_size;
         mp_size_t zn = FLINT_ABS(ssize);
         mp_srcptr zd = z->_mp_d;
@@ -509,7 +509,7 @@ mpn_mod_mul_fmpz(mp_ptr res, mp_srcptr x, const fmpz_t y, gr_ctx_t ctx)
         mp_limb_t t[2 * MPN_MOD_MAX_LIMBS], cy;
         mp_size_t tn, n = MPN_MOD_CTX_NLIMBS(ctx);
 
-        __mpz_struct * z = COEFF_TO_PTR(*y);
+        mpz_ptr z = COEFF_TO_PTR(*y);
         mp_size_t ssize = z->_mp_size;
         mp_size_t zn = FLINT_ABS(ssize);
         mp_srcptr zd = z->_mp_d;

@@ -99,7 +99,7 @@ void mpoly_unpack_vec_fmpz(fmpz * exp1, const ulong * exp2, flint_bitcnt_t bits,
             }
             else
             {
-                __mpz_struct * mpz = _fmpz_promote(exp1);
+                mpz_ptr mpz = _fmpz_promote(exp1);
                 if ((ulong) mpz->_mp_alloc < words_per_field)
                     mpz_realloc2(mpz, bits);
                 mpz->_mp_size = size;

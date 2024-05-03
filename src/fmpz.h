@@ -104,6 +104,7 @@ int _fmpz_is_canonical(const fmpz_t x);
 
 /* Randomisation *************************************************************/
 
+void fmpz_randbits_unsigned(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits);
 void fmpz_randbits(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits);
 void fmpz_randm(fmpz_t f, flint_rand_t state, const fmpz_t m);
 void fmpz_randtest(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits);
@@ -186,7 +187,7 @@ fmpz_get_uiui(mp_limb_t * hi, mp_limb_t * low, const fmpz_t f)
     }
     else
     {
-        __mpz_struct * mpz = COEFF_TO_PTR(*f);
+        mpz_ptr mpz = COEFF_TO_PTR(*f);
         *low = mpz->_mp_d[0];
         *hi  = mpz->_mp_size == 2 ? mpz->_mp_d[1] : 0;
     }
@@ -201,7 +202,7 @@ fmpz_set_uiui(fmpz_t f, mp_limb_t hi, mp_limb_t lo)
     }
     else
     {
-        __mpz_struct *z = _fmpz_promote(f);
+        mpz_ptr z = _fmpz_promote(f);
         if (z->_mp_alloc < 2)
             mpz_realloc2(z, 2 * FLINT_BITS);
         z->_mp_d[0] = lo;
@@ -219,7 +220,7 @@ fmpz_neg_uiui(fmpz_t f, mp_limb_t hi, mp_limb_t lo)
     }
     else
     {
-        __mpz_struct *z = _fmpz_promote(f);
+        mpz_ptr z = _fmpz_promote(f);
         if (z->_mp_alloc < 2)
             mpz_realloc2(z, 2 * FLINT_BITS);
         z->_mp_d[0] = lo;

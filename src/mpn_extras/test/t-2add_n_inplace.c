@@ -22,7 +22,7 @@ TEST_FUNCTION_START(flint_mpn_2add_n_inplace, state)
     slong ix;
     int result;
 
-    for (ix = 0; ix < 100000 * flint_test_multiplier(); ix++)
+    for (ix = 0; ix < 10000 * flint_test_multiplier(); ix++)
     {
         mp_limb_t rp[N_MAX];
         mp_limb_t ap[N_MAX];

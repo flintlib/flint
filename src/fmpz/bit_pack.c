@@ -85,7 +85,7 @@ fmpz_bit_pack(mp_ptr arr, flint_bitcnt_t shift, flint_bitcnt_t bits,
         }
         else
         {
-            __mpz_struct * ptr = COEFF_TO_PTR(c);
+            mpz_ptr ptr = COEFF_TO_PTR(c);
             size = FLINT_ABS(ptr->_mp_size);
 
             /* complement coefficient into arr */
@@ -144,7 +144,7 @@ fmpz_bit_pack(mp_ptr arr, flint_bitcnt_t shift, flint_bitcnt_t bits,
         }
         else
         {
-            __mpz_struct *ptr = COEFF_TO_PTR(c);
+            mpz_ptr ptr = COEFF_TO_PTR(c);
             size = FLINT_ABS(ptr->_mp_size);
 
             /* shift into place */
