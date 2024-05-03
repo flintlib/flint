@@ -31,14 +31,6 @@
       representing a polynomial; many polynomials are small at the ends.
 */
 
-/* TODO
-   * Do we want to utilize mpn_gcd_22 coupled with mpn_divrem_2? Both functions
-     should be available in all new versions of GMP.
-   * Do we want to right shift result before pushing it into mpn_gcd_1?
-*/
-
-#define MAX_STACK_ALLOC 1024
-
 #define SIZ(x) ((x)->_mp_size)
 #define PTR(x) ((x)->_mp_d)
 
@@ -439,11 +431,12 @@ void heavy_machinery(fmpz_t rp, const fmpz * vp, slong vn, const fmpz_t ip)
     ulong tz, sz;
     slong ix;
     ulong limbs = UWORD_MAX, exp;
-    slong idx1, idx2;
-    ulong sz1 = UWORD_MAX, sz2 = UWORD_MAX;
-    ulong g0, g1;
-    mp_ptr gd;
-    ulong gn;
+    slong idx0, idx1;
+    ulong sz0 = UWORD_MAX, sz1 = UWORD_MAX;
+    ulong a0, a1;
+    ulong b0, b1;
+    mp_ptr ad, bd;
+    ulong an, bn;
 
     mvp = flint_malloc(sizeof(mpn_struct) * (vn + (ip != NULL)));
 
@@ -484,35 +477,34 @@ void heavy_machinery(fmpz_t rp, const fmpz * vp, slong vn, const fmpz_t ip)
         mvp[ix].d = md;
         mvp[ix].sz = sz;
 
-        if (sz < sz1)
+        if (sz < sz0)
         {
-            sz2 = sz1;
+            sz1 = sz0;
+            sz0 = sz;
+            idx1 = idx0;
+            idx0 = ix;
+        }
+        else if (sz < sz1)
+        {
             sz1 = sz;
-            idx2 = idx1;
             idx1 = ix;
         }
-        else if (sz < sz2)
-        {
-            sz2 = sz;
-            idx2 = ix;
-        }
     }
 
-    mvp -= (ip != NULL);
-
-    if (sz2 == UWORD(1))
+    if (sz1 == UWORD(1))
     {
-        /* 1 = sz1 = sz2 */
-        g0 = mvp[idx1 + 1].d[0];
+        /* 1 = sz0 = sz1 */
+        a0 = mvp[idx0].d[0];
+        b0 = mvp[idx1].d[0];
         goto G1;
     }
-    else if (sz1 == UWORD(1))
+    else if (sz0 == UWORD(1))
     {
         /* 1 = sz1 < sz2 */
-        g0 = mvp[idx1 + 1].d[0];
+        a0 = mvp[idx0].d[0];
         goto G2;
     }
-    else if (sz2 == UWORD(2))
+    else if (sz1 == UWORD(2))
     {
         /* 2 = sz1 = sz2 */
     }
@@ -523,7 +515,6 @@ void heavy_machinery(fmpz_t rp, const fmpz * vp, slong vn, const fmpz_t ip)
     else
     {
         /* 2 < sz1 <= sz2 */
-        
     }
 
 Gn:
