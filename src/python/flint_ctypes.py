@@ -3684,6 +3684,15 @@ class gr_elem:
     def __rmod__(self, other):
         return self._binary_op(self, other, libgr.gr_euclidean_rem, "$x % $y")
 
+    def is_zero(self):
+        return self._unary_predicate(self, libgr.gr_is_zero, "is_zero")
+
+    def is_one(self):
+        return self._unary_predicate(self, libgr.gr_is_one, "is_one")
+
+    def is_neg_one(self):
+        return self._unary_predicate(self, libgr.gr_is_neg_one, "is_neg_one")
+
     def is_invertible(self):
         """
         Return whether self has a multiplicative inverse in its domain.
@@ -5405,6 +5414,29 @@ class gr_mat(gr_elem):
             if status & GR_UNABLE: raise NotImplementedError
             if status & GR_DOMAIN: raise ValueError
         return x
+
+    def nullspace(self):
+        """
+        Right kernel (nullspace) of this matrix.
+
+            >>> M = Mat(QQ)([[0, 1, 2], [3, 4, 5], [6, 7, 8]])
+            >>> X = M.nullspace()
+            >>> X
+            [[1],
+            [-2],
+            [1]]
+            >>> M * X
+            [[0],
+            [0],
+            [0]]
+        """
+        element_ring = self.parent()._element_ring
+        X = self.parent()(0, 0)
+        status = libgr.gr_mat_nullspace(X._ref, self._ref, element_ring._ref)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return X
 
     def det(self, algorithm=None):
         """
@@ -7894,6 +7926,31 @@ def test_qqbar_roots():
     h = g**2 * f
     ((r1, r2, r3), (e1, e2, e3)) = h.roots(domain=QQbar)
     assert (x-r1)**e1 * (x-r2)**e2 * (x-r3)**e3 == h
+
+def test_qqbar_sage_bug_37927():
+    # check that the example in https://github.com/sagemath/sage/issues/37927
+    # works with our implementation of qqbar
+    for R in [QQbar, QQbar_ca]:
+        I = R.i()
+        v1 = -R.i()
+        v2 = -R(2).sqrt()
+        M = Mat(R)([[0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+                           [0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+                           [-4, 2*v1, 1, 64, -32*v1, -16, 8*v1, 4, -2*v1, -1],
+                           [4*v1, 1, 0, -192*v1, -80, 32*v1, 12, -4*v1, -1, 0],
+                           [2, 0, 0, -480, 160*v1, 48, -12*v1, -2, 0, 0],
+                           [-4, 2*I, 1, 64, -32*I, -16, 8*I, 4, -2*I, -1],
+                           [4*I, 1, 0, -192*I, -80, 32*I, 12, -4*I, -1, 0],
+                           [2, 0, 0, -480, 160*I, 48, -12*I, -2, 0, 0],
+                           [0, 0, 0, 8, 4*v2, 4, 2*v2, 2, v2, 1],
+                           [0, 0, 0, 24*v2, 20, 8*v2, 6, 2*v2, 1, 0],
+                           [0, 0, 0, 8, 4*v2, 4, 2*v2, 2, -v2, 1],
+                           [0, 0, 0, 24*v2, 20, 8*v2, 6, 2*v2, 1, 0],
+                           [0, 0, 0, -4096, -1024*I, 256, 64*I, -16, -4*I, 1],
+                           [0, 0, 0, -4096, 1024*I, 256, -64*I, -16, 4*I, 1]])
+        X = M.nullspace()
+        v = Mat(R)(10, 1, [-108, 0, 0, 1, 0, 12, 0, -60, 0, 64])
+        assert (M * v).is_zero()
 
 def test_ca_notebook_examples():
     # algebraic number identity
