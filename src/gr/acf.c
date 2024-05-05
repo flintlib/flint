@@ -345,7 +345,7 @@ _gr_acf_equal(const acf_t x, const acf_t y, const gr_ctx_t ctx)
 {
     if (arf_is_nan(acf_realref(x)) || arf_is_nan(acf_imagref(x)) ||
         arf_is_nan(acf_realref(y)) || arf_is_nan(acf_imagref(y)))
-        return T_FALSE;
+        return T_UNKNOWN;
 
     return acf_equal(x, y) ? T_TRUE : T_FALSE;
 }

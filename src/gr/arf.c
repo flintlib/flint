@@ -312,7 +312,7 @@ truth_t
 _gr_arf_equal(const arf_t x, const arf_t y, const gr_ctx_t ctx)
 {
     if (arf_is_nan(x) || arf_is_nan(y))
-        return T_FALSE;
+        return T_UNKNOWN;
 
     return arf_equal(x, y) ? T_TRUE : T_FALSE;
 }
