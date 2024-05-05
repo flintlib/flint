@@ -20,7 +20,9 @@
 /* Include functions *********************************************************/
 
 #include "t-acb.c"
+#include "t-acf.c"
 #include "t-arb.c"
+#include "t-arf.c"
 #include "t-ca.c"
 #include "t-dirichlet.c"
 #include "t-fmpq.c"
@@ -72,7 +74,9 @@
 test_struct tests[] =
 {
     TEST_FUNCTION(gr_acb),
+    TEST_FUNCTION(gr_acf),
     TEST_FUNCTION(gr_arb),
+    TEST_FUNCTION(gr_arf),
     TEST_FUNCTION(gr_ca),
     TEST_FUNCTION(gr_dirichlet),
     TEST_FUNCTION(gr_fmpq),

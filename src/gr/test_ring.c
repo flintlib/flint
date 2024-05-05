@@ -3810,3 +3810,55 @@ gr_test_multiplicative_group(gr_ctx_t R, slong iters, int test_flags)
         flint_printf("===============================================================================\n\n");
     }
 }
+
+void
+gr_test_floating_point(gr_ctx_t R, slong iters, int test_flags)
+{
+    timeit_t timer;
+    flint_rand_t state;
+
+    /* test_flags |= GR_TEST_VERBOSE; */
+
+    if (test_flags & GR_TEST_VERBOSE)
+    {
+        timeit_start(timer);
+
+        flint_printf("===============================================================================\n");
+        flint_printf("Testing "); gr_ctx_println(R);
+        flint_printf("-------------------------------------------------------------------------------\n");
+    }
+
+    flint_randinit(state);
+
+    /* if (gr_ctx_is_ring(R) != T_TRUE)
+        flint_abort(); */
+
+    gr_test_iter(R, state, "ctx_get_str", gr_test_ctx_get_str, 1, test_flags);
+
+    gr_test_iter(R, state, "init/clear", gr_test_init_clear, iters, test_flags);
+    gr_test_iter(R, state, "equal", gr_test_equal, iters, test_flags);
+    gr_test_iter(R, state, "swap", gr_test_swap, iters, test_flags);
+    gr_test_iter(R, state, "zero_one", gr_test_zero_one, iters, test_flags);
+    gr_test_iter(R, state, "randtest_not_zero", gr_test_randtest_not_zero, iters, test_flags);
+    gr_test_iter(R, state, "neg", gr_test_neg, iters, test_flags);
+
+    gr_test_iter(R, state, "add: commutative", gr_test_add_commutative, iters, test_flags);
+    gr_test_iter(R, state, "add: aliasing", gr_test_add_aliasing, iters, test_flags);
+    gr_test_iter(R, state, "sub: equal neg add", gr_test_sub_equal_neg_add, iters, test_flags);
+    gr_test_iter(R, state, "sub: aliasing", gr_test_sub_aliasing, iters, test_flags);
+    gr_test_iter(R, state, "mul: commutative", gr_test_mul_commutative, iters, test_flags);
+    gr_test_iter(R, state, "mul: aliasing", gr_test_mul_aliasing, iters, test_flags);
+    gr_test_iter(R, state, "div: aliasing", gr_test_div_aliasing, iters, test_flags);
+    gr_test_iter(R, state, "pow: aliasing", gr_test_pow_aliasing, iters, test_flags);
+
+    flint_randclear(state);
+
+    if (test_flags & GR_TEST_VERBOSE)
+    {
+        timeit_stop(timer);
+
+        flint_printf("-------------------------------------------------------------------------------\n");
+        flint_printf("Tests finished in %.3g cpu, %.3g wall\n", timer->cpu*0.001, timer->wall*0.001);
+        flint_printf("===============================================================================\n\n");
+    }
+}

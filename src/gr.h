@@ -1538,6 +1538,7 @@ int gr_ctx_cmp_coercion(gr_ctx_t ctx1, gr_ctx_t ctx2);
 /* todo: just have gr_test_structure() */
 void gr_test_ring(gr_ctx_t R, slong iters, int test_flags);
 void gr_test_multiplicative_group(gr_ctx_t R, slong iters, int test_flags);
+void gr_test_floating_point(gr_ctx_t R, slong iters, int test_flags);
 
 #ifdef __cplusplus
 }
