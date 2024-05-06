@@ -272,10 +272,7 @@ __nfloat_vec_dot(nfloat_ptr res, nfloat_srcptr initial, int subtract, nfloat_src
         for (i = 0, xi = x, yi = y; i < len; i++, xi = (char *) xi + sizeof_xstep, yi = (char *) yi + sizeof_ystep)
         {
             if (NFLOAT_IS_ZERO(xi) || NFLOAT_IS_ZERO(yi))
-            {
-                DUMMY_OP;
                 continue;
-            }
 
             xexp = NFLOAT_EXP(xi) + NFLOAT_EXP(yi);
             xsgnbit = NFLOAT_SGNBIT(xi) ^ NFLOAT_SGNBIT(yi);
@@ -397,12 +394,10 @@ __nfloat_vec_dot(nfloat_ptr res, nfloat_srcptr initial, int subtract, nfloat_src
         mp_limb_t t[NFLOAT_MAX_LIMBS + 1];
         mp_limb_t s[NFLOAT_MAX_LIMBS + 1];
         nfloat_srcptr xi, yi;
-        mp_limb_t s0, s1;
         slong n;
 
         slong nlimbs = NFLOAT_CTX_NLIMBS(ctx);
 
-        s0 = s1 = 0;
         sexp = WORD_MIN;
 
         if (initial != NULL && !NFLOAT_IS_ZERO(initial))
@@ -411,10 +406,7 @@ __nfloat_vec_dot(nfloat_ptr res, nfloat_srcptr initial, int subtract, nfloat_src
         for (i = 0, xi = x, yi = y; i < len; i++, xi = (char *) xi + sizeof_xstep, yi = (char *) yi + sizeof_ystep)
         {
             if (NFLOAT_IS_ZERO(xi) || NFLOAT_IS_ZERO(yi))
-            {
-                DUMMY_OP;
                 continue;
-            }
 
             xexp = NFLOAT_EXP(xi) + NFLOAT_EXP(yi);
             sexp = FLINT_MAX(sexp, xexp);
@@ -466,10 +458,7 @@ __nfloat_vec_dot(nfloat_ptr res, nfloat_srcptr initial, int subtract, nfloat_src
         for (i = 0, xi = x, yi = y; i < len; i++, xi = (char *) xi + sizeof_xstep, yi = (char *) yi + sizeof_ystep)
         {
             if (NFLOAT_IS_ZERO(xi) || NFLOAT_IS_ZERO(yi))
-            {
-                DUMMY_OP;
                 continue;
-            }
 
             xexp = NFLOAT_EXP(xi) + NFLOAT_EXP(yi);
             xsgnbit = NFLOAT_SGNBIT(xi) ^ NFLOAT_SGNBIT(yi);
