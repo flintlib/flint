@@ -189,6 +189,7 @@ Real and complex numbers
    issues.rst
    examples_arb.rst
    mag.rst
+   nfloat.rst
    arf.rst
    acf.rst
    arb.rst
