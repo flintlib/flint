@@ -22,7 +22,7 @@
 #define FLINT_MPN_MUL_2X2H(r3, r2, r1, a1, a0, b1, b0)   \
     do {                                                                  \
         mp_limb_t __t1, __t2, __u1, __u2, __v3, __v2;                     \
-        mp_limb_t __r3, __r2, __r1, __r0;                                 \
+        mp_limb_t __r3, __r2, __r1;                                       \
         mp_limb_t __a1 = (a1), __a0 = (a0), __b1 = (b1), __b0 = (b0);     \
         umul_ppmm(__t2, __t1, __a0, __b1);                                \
         umul_ppmm(__u2, __u1, __a1, __b0);                                \
@@ -107,6 +107,7 @@ __nfloat_vec_dot(nfloat_ptr res, nfloat_srcptr initial, int subtract, nfloat_src
 
                 xexp = NFLOAT_EXP(xi) + NFLOAT_EXP(yi);
                 delta = sexp - xexp;
+                FLINT_ASSERT(delta != 0);
 
                 if (delta < FLINT_BITS)
                 {
@@ -192,6 +193,203 @@ __nfloat_vec_dot(nfloat_ptr res, nfloat_srcptr initial, int subtract, nfloat_src
         return GR_SUCCESS;
     }
 
+    if (NFLOAT_CTX_NLIMBS(ctx) == 2 && !(NFLOAT_CTX_FLAGS(ctx) & (NFLOAT_ALLOW_INF | NFLOAT_ALLOW_NAN)))
+    {
+        slong i, xexp, delta, sexp, norm, pad_bits;
+        int xsgnbit;
+        nfloat_srcptr xi, yi;
+        mp_limb_t s0, s1, s2;
+        mp_limb_t t0, t1, t2, t3;
+
+        s0 = s1 = s2 = 0;
+        sexp = WORD_MIN;
+
+        if (initial != NULL && !NFLOAT_IS_ZERO(initial))
+            sexp = NFLOAT_EXP(initial);
+
+        for (i = 0, xi = x, yi = y; i < len; i++, xi = (char *) xi + sizeof_xstep, yi = (char *) yi + sizeof_ystep)
+        {
+            if (NFLOAT_IS_ZERO(xi) || NFLOAT_IS_ZERO(yi))
+            {
+                DUMMY_OP;
+                continue;
+            }
+
+            xexp = NFLOAT_EXP(xi) + NFLOAT_EXP(yi);
+            sexp = FLINT_MAX(sexp, xexp);
+        }
+
+        if (sexp == WORD_MIN)
+            return nfloat_zero(res, ctx);
+
+        pad_bits = FLINT_BIT_COUNT(len + 1) + 1;
+        sexp += pad_bits;
+
+        if (initial != NULL && !NFLOAT_IS_ZERO(initial))
+        {
+            xexp = NFLOAT_EXP(initial);
+            xsgnbit = NFLOAT_SGNBIT(initial) ^ subtract;
+            delta = sexp - xexp;
+            FLINT_ASSERT(delta != 0);
+
+            if (delta < 3 * FLINT_BITS)
+            {
+                if (delta < FLINT_BITS)
+                {
+                    s0 = 0;
+                    s1 = NFLOAT_D(initial)[0];
+                    s2 = NFLOAT_D(initial)[1];
+                }
+                else if (delta < 2 * FLINT_BITS)
+                {
+                    s0 = NFLOAT_D(initial)[0];
+                    s1 = NFLOAT_D(initial)[1];
+                    s2 = 0;
+
+                    delta -= FLINT_BITS;
+                }
+                else
+                {
+                    s0 = NFLOAT_D(initial)[1];
+                    s1 = 0;
+                    s2 = 0;
+
+                    delta -= 2 * FLINT_BITS;
+                }
+
+                if (delta != 0)
+                {
+                    s0 = (s0 >> delta) | s1 << (FLINT_BITS - delta);
+                    s1 = (s1 >> delta) | (s2 << (FLINT_BITS - delta));
+                    s2 = s2 >> delta;
+                }
+
+                if (xsgnbit)
+                    sub_dddmmmsss(s2, s1, s0, 0, 0, 0, s2, s1, s0);
+            }
+        }
+
+        for (i = 0, xi = x, yi = y; i < len; i++, xi = (char *) xi + sizeof_xstep, yi = (char *) yi + sizeof_ystep)
+        {
+            if (NFLOAT_IS_ZERO(xi) || NFLOAT_IS_ZERO(yi))
+            {
+                DUMMY_OP;
+                continue;
+            }
+
+            xexp = NFLOAT_EXP(xi) + NFLOAT_EXP(yi);
+            xsgnbit = NFLOAT_SGNBIT(xi) ^ NFLOAT_SGNBIT(yi);
+            delta = sexp - xexp;
+            FLINT_ASSERT(delta != 0);
+
+            if (delta < FLINT_BITS)
+            {
+                xsgnbit = NFLOAT_SGNBIT(xi) ^ NFLOAT_SGNBIT(yi);
+
+#if 1
+                FLINT_MPN_MUL_2X2H(t3, t2, t1, NFLOAT_D(xi)[1], NFLOAT_D(xi)[0], NFLOAT_D(yi)[1], NFLOAT_D(yi)[0]);
+                (void) t0;
+#else
+                FLINT_MPN_MUL_2X2(t3, t2, t1, t0, NFLOAT_D(xi)[1], NFLOAT_D(xi)[0], NFLOAT_D(yi)[1], NFLOAT_D(yi)[0]);
+#endif
+
+                if (xsgnbit)
+                    sub_dddmmmsss(s2, s1, s0, s2, s1, s0, t3 >> delta, (t2 >> delta) | (t3 << (FLINT_BITS - delta)), (t1 >> delta) | (t2 << (FLINT_BITS - delta)));
+                else
+                    add_sssaaaaaa(s2, s1, s0, s2, s1, s0, t3 >> delta, (t2 >> delta) | (t3 << (FLINT_BITS - delta)), (t1 >> delta) | (t2 << (FLINT_BITS - delta)));
+            }
+            else if (delta < 3 * FLINT_BITS)
+            {
+                if (delta < 2 * FLINT_BITS)
+                {
+                    FLINT_MPN_MUL_2X2H(t3, t2, t1, NFLOAT_D(xi)[1], NFLOAT_D(xi)[0], NFLOAT_D(yi)[1], NFLOAT_D(yi)[0]);
+
+                    delta -= FLINT_BITS;
+
+                    if (delta != 0)
+                    {
+                        t2 = (t2 >> delta) | (t3 << (FLINT_BITS - delta));
+                        t3 = t3 >> delta;
+                    }
+                }
+                else
+                {
+                    umul_ppmm(t3, t2, NFLOAT_D(xi)[1], NFLOAT_D(yi)[1]);
+
+                    delta -= 2 * FLINT_BITS;
+
+                    if (delta != 0)
+                        t3 = t3 >> delta;
+
+                    t2 = t3;
+                    t3 = 0;
+                }
+
+                if (xsgnbit)
+                    sub_dddmmmsss(s2, s1, s0, s2, s1, s0, 0, t3, t2);
+                else
+                    add_sssaaaaaa(s2, s1, s0, s2, s1, s0, 0, t3, t2);
+            }
+        }
+
+        if (LIMB_MSB_IS_SET(s2))
+        {
+            sub_dddmmmsss(s2, s1, s0, 0, 0, 0, s2, s1, s0);
+            xsgnbit = 1;
+        }
+        else
+        {
+            xsgnbit = 0;
+        }
+
+        NFLOAT_SGNBIT(res) = xsgnbit ^ subtract;
+
+        if (s2 != 0)
+        {
+            norm = flint_clz(s2);
+            if (norm)
+            {
+                NFLOAT_D(res)[0] = (s1 << norm) | (s0 >> (FLINT_BITS - norm));
+                NFLOAT_D(res)[1] = (s2 << norm) | (s1 >> (FLINT_BITS - norm));
+            }
+            else
+            {
+                NFLOAT_D(res)[0] = s1;
+                NFLOAT_D(res)[1] = s2;
+            }
+            NFLOAT_EXP(res) = sexp - norm;
+        }
+        else if (s1 != 0)
+        {
+            norm = flint_clz(s1);
+            if (norm)
+            {
+                NFLOAT_D(res)[0] = (s0 << norm);
+                NFLOAT_D(res)[1] = (s1 << norm) | (s0 >> (FLINT_BITS - norm));
+            }
+            else
+            {
+                NFLOAT_D(res)[0] = s0;
+                NFLOAT_D(res)[1] = s1;
+            }
+            NFLOAT_EXP(res) = sexp - FLINT_BITS - norm;
+        }
+        else if (s0 != 0)
+        {
+            norm = flint_clz(s0);
+            NFLOAT_D(res)[0] = 0;
+            NFLOAT_D(res)[1] = s0 << norm;
+            NFLOAT_EXP(res) = sexp - 2 * FLINT_BITS - norm;
+        }
+        else
+        {
+            return nfloat_zero(res, ctx);
+        }
+
+        NFLOAT_HANDLE_UNDERFLOW_OVERFLOW(res, ctx);
+        return GR_SUCCESS;
+    }
+
     if (!(NFLOAT_CTX_FLAGS(ctx) & (NFLOAT_ALLOW_INF | NFLOAT_ALLOW_NAN)))
     {
         slong i, xexp, delta, sexp, norm, pad_bits;
@@ -238,6 +436,8 @@ __nfloat_vec_dot(nfloat_ptr res, nfloat_srcptr initial, int subtract, nfloat_src
 
             if (delta < FLINT_BITS)
             {
+                FLINT_ASSERT(delta != 0);
+
                 mpn_rshift(s + 1, NFLOAT_D(initial), nlimbs, delta);
                 s[0] = NFLOAT_D(initial)[0] << (FLINT_BITS - delta);
                 if (xsgnbit)

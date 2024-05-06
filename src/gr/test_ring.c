@@ -38,11 +38,11 @@ gr_test_binary_op_aliasing(gr_ctx_t R, int (*gr_op)(gr_ptr, gr_srcptr, gr_srcptr
 
     alias = n_randint(state, 4);
 
-    /* Don' test x * x == x^2 for inexact "rings" (e.g. floats) where
+    /* Don't test x * x == x^2 for inexact "rings" (e.g. floats) where
        the squaring algorithm might not produce exactly the same result. */
-    if (alias == 2 && gr_ctx_is_ring(R) == T_FALSE && gr_ctx_is_exact(R) == T_FALSE)
+    if ((alias == 2 || alias == 3) && gr_ctx_is_ring(R) == T_FALSE && gr_ctx_is_exact(R) == T_FALSE)
     {
-        alias = 3;
+        alias -= 2;
     }
 
     switch (alias)

@@ -17,7 +17,7 @@
 void
 nfloat_test_dot(flint_rand_t state, slong iters, gr_ctx_t ctx)
 {
-    slong iter, i, len, prec;
+    slong iter, i, len, prec, ebits;
     gr_ptr s0, vec1, vec2, res;
     int subtract, initial, reverse;
     arf_ptr avec1, avec2;
@@ -28,6 +28,11 @@ nfloat_test_dot(flint_rand_t state, slong iters, gr_ctx_t ctx)
     for (iter = 0; iter < iters; iter++)
     {
         len = n_randint(state, 30);
+
+        if (n_randint(state, 2))
+            ebits = 1;
+        else
+            ebits = 10;
 
         initial = n_randint(state, 2);
         subtract = n_randint(state, 2);
@@ -49,7 +54,7 @@ nfloat_test_dot(flint_rand_t state, slong iters, gr_ctx_t ctx)
 
         if (initial)
         {
-            arf_randtest(as0, state, prec, 10);
+            arf_randtest(as0, state, prec, ebits);
             GR_MUST_SUCCEED(nfloat_set_arf(s0, as0, ctx));
 
             arf_set(ares, as0);
@@ -66,8 +71,8 @@ nfloat_test_dot(flint_rand_t state, slong iters, gr_ctx_t ctx)
             }
             else
             {
-                arf_randtest(avec1 + i, state, prec, 10);
-                arf_randtest(avec2 + i, state, prec, 10);
+                arf_randtest(avec1 + i, state, prec, ebits);
+                arf_randtest(avec2 + i, state, prec, ebits);
             }
         }
 
