@@ -937,7 +937,7 @@ nfloat_div(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx)
     yf->_mpfr_sign = 1;
     yf->_mpfr_exp = 0;
 
-    mpfr_div(rf, xf, yf, MPFR_RNDD);
+    mpfr_div(rf, xf, yf, MPFR_RNDZ);
 
     NFLOAT_EXP(res) = NFLOAT_EXP(x) - NFLOAT_EXP(y) + rf->_mpfr_exp;
     NFLOAT_SGNBIT(res) = NFLOAT_SGNBIT(x) ^ NFLOAT_SGNBIT(y);
@@ -973,7 +973,7 @@ nfloat_div_ui(nfloat_ptr res, nfloat_srcptr x, ulong y, gr_ctx_t ctx)
     xf->_mpfr_sign = 1;
     xf->_mpfr_exp = 0;
 
-    mpfr_div_ui(rf, xf, y, MPFR_RNDD);
+    mpfr_div_ui(rf, xf, y, MPFR_RNDZ);
 
     NFLOAT_EXP(res) = NFLOAT_EXP(x) + rf->_mpfr_exp;
     NFLOAT_SGNBIT(res) = NFLOAT_SGNBIT(x);
@@ -1006,7 +1006,7 @@ nfloat_div_si(nfloat_ptr res, nfloat_srcptr x, slong y, gr_ctx_t ctx)
     xf->_mpfr_sign = 1;
     xf->_mpfr_exp = 0;
 
-    mpfr_div_si(rf, xf, y, MPFR_RNDD);
+    mpfr_div_si(rf, xf, y, MPFR_RNDZ);
 
     NFLOAT_EXP(res) = NFLOAT_EXP(x) + rf->_mpfr_exp;
     NFLOAT_SGNBIT(res) = NFLOAT_SGNBIT(x) ^ (y < 0);
@@ -1025,7 +1025,7 @@ nfloat_div_ui(nfloat_ptr res, nfloat_srcptr x, ulong y, gr_ctx_t ctx)
 
     arf_init(t);
     nfloat_get_arf(t, x, ctx);
-    arf_div_ui(t, t, y, NFLOAT_CTX_PREC(ctx), NFLOAT_CTX_RND(ctx));
+    arf_div_ui(t, t, y, NFLOAT_CTX_PREC(ctx), ARF_RND_DOWN);
     status = nfloat_set_arf(res, t, ctx);
     arf_clear(t);
 
@@ -1041,7 +1041,7 @@ nfloat_div_si(nfloat_ptr res, nfloat_srcptr x, slong y, gr_ctx_t ctx)
 
     arf_init(t);
     nfloat_get_arf(t, x, ctx);
-    arf_div_si(t, t, y, NFLOAT_CTX_PREC(ctx), NFLOAT_CTX_RND(ctx));
+    arf_div_si(t, t, y, NFLOAT_CTX_PREC(ctx), ARF_RND_DOWN);
     status = nfloat_set_arf(res, t, ctx);
     arf_clear(t);
 
