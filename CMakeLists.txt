@@ -211,6 +211,7 @@ set(_BUILD_DIRS
     long_extras
     perm
     double_extras   d_vec           d_mat
+    nfloat
     mpn_extras
     mpfr_vec                        mpfr_mat
     nmod            nmod_vec        nmod_mat        nmod_poly

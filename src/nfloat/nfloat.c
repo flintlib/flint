@@ -1034,6 +1034,41 @@ nfloat_mul(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx)
 }
 
 int
+nfloat_inv(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx)
+{
+    mpfr_t rf, xf;
+    slong prec = NFLOAT_CTX_PREC(ctx);
+
+    if (NFLOAT_IS_SPECIAL(x))
+    {
+        if (NFLOAT_IS_ZERO(x))
+            return nfloat_nan(res, ctx);
+        else
+            return nfloat_nan(res, ctx); /* todo */
+    }
+
+    /* todo: make sure aliasing is correct */
+
+    rf->_mpfr_d = NFLOAT_D(res);
+    rf->_mpfr_prec = prec;
+    rf->_mpfr_sign = 1;
+    rf->_mpfr_exp = 0;
+
+    xf->_mpfr_d = NFLOAT_D(x);
+    xf->_mpfr_prec = prec;
+    xf->_mpfr_sign = 1;
+    xf->_mpfr_exp = 0;
+
+    mpfr_ui_div(rf, 1, xf, MPFR_RNDZ);
+
+    NFLOAT_EXP(res) = -NFLOAT_EXP(x) + rf->_mpfr_exp;
+    NFLOAT_SGNBIT(res) = NFLOAT_SGNBIT(x);
+
+    NFLOAT_HANDLE_UNDERFLOW_OVERFLOW(res, ctx);
+    return GR_SUCCESS;
+}
+
+int
 nfloat_div(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx)
 {
     mpfr_t rf, xf, yf;
@@ -1047,6 +1082,7 @@ nfloat_div(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx)
             return nfloat_nan(res, ctx); /* todo */
     }
 
+    /* todo: make sure aliasing is correct */
     rf->_mpfr_d = NFLOAT_D(res);
     rf->_mpfr_prec = prec;
     rf->_mpfr_sign = 1;
@@ -1088,6 +1124,7 @@ nfloat_div_ui(nfloat_ptr res, nfloat_srcptr x, ulong y, gr_ctx_t ctx)
             return nfloat_nan(res, ctx); /* todo */
     }
 
+    /* todo: make sure aliasing is correct */
     rf->_mpfr_d = NFLOAT_D(res);
     rf->_mpfr_prec = prec;
     rf->_mpfr_sign = 1;
@@ -1121,6 +1158,7 @@ nfloat_div_si(nfloat_ptr res, nfloat_srcptr x, slong y, gr_ctx_t ctx)
             return nfloat_nan(res, ctx); /* todo */
     }
 
+    /* todo: make sure aliasing is correct */
     rf->_mpfr_d = NFLOAT_D(res);
     rf->_mpfr_prec = prec;
     rf->_mpfr_sign = 1;
