@@ -272,6 +272,11 @@ int nfloat_set_arf(nfloat_ptr res, const arf_t x, gr_ctx_t ctx);
 int nfloat_get_arf(arf_t res, nfloat_srcptr x, gr_ctx_t ctx);
 #endif
 
+int nfloat_set_fmpq(nfloat_ptr res, const fmpq_t v, gr_ctx_t ctx);
+int nfloat_set_d(nfloat_ptr res, double x, gr_ctx_t ctx);
+int nfloat_set_str(nfloat_ptr res, const char * x, gr_ctx_t ctx);
+int nfloat_set_other(nfloat_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx);
+
 int nfloat_write(gr_stream_t out, nfloat_srcptr x, gr_ctx_t ctx);
 int nfloat_randtest(nfloat_ptr res, flint_rand_t state, gr_ctx_t ctx);
 

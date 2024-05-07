@@ -13,7 +13,9 @@
 #include <mpfr.h>
 #include "fmpz.h"
 #include "arf.h"
+#include "arb.h"
 #include "nfloat.h"
+#include "gr_generic.h"
 
 int
 nfloat_write(gr_stream_t out, nfloat_srcptr x, gr_ctx_t ctx)
@@ -241,6 +243,125 @@ nfloat_set_fmpz(nfloat_ptr res, const fmpz_t x, gr_ctx_t ctx)
             return _nfloat_set_mpn_2exp(res, z->_mp_d, zn, zn * FLINT_BITS, 0, ctx);
         else
             return _nfloat_set_mpn_2exp(res, z->_mp_d, -zn, -zn * FLINT_BITS, 1, ctx);
+    }
+}
+
+/* todo: fast code */
+int
+nfloat_set_fmpq(nfloat_ptr res, const fmpq_t v, gr_ctx_t ctx)
+{
+    arf_t t;
+    int status;
+    arf_init(t);
+    arf_set_fmpq(t, v, NFLOAT_CTX_PREC(ctx), ARF_RND_DOWN);
+    status = nfloat_set_arf(res, t, ctx);
+    arf_clear(t);
+    return status;
+}
+
+/* todo: fast code */
+int
+nfloat_set_d(nfloat_ptr res, double x, gr_ctx_t ctx)
+{
+    arf_t t;
+    int status;
+    arf_init(t);
+    arf_set_d(t, x);
+    status = nfloat_set_arf(res, t, ctx);
+    arf_clear(t);
+    return status;
+}
+
+int
+nfloat_set_str(nfloat_ptr res, const char * x, gr_ctx_t ctx)
+{
+    int status;
+
+    arb_t t;
+    arb_init(t);
+
+    if (!arb_set_str(t, x, NFLOAT_CTX_PREC(ctx) + 20))
+    {
+        arf_set_round(arb_midref(t), arb_midref(t), NFLOAT_CTX_PREC(ctx), ARF_RND_NEAR);
+        status = nfloat_set_arf(res, arb_midref(t), ctx);
+    }
+    else
+    {
+        status = gr_generic_set_str_ring_exponents(res, x, ctx);
+    }
+
+    arb_clear(t);
+    return status;
+}
+
+int
+nfloat_set_other(nfloat_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
+{
+    switch (x_ctx->which_ring)
+    {
+        case GR_CTX_NFLOAT:
+            {
+                slong nlimbs, x_nlimbs;
+
+                if (NFLOAT_IS_SPECIAL(x))
+                {
+                    if (NFLOAT_IS_ZERO(x))
+                        return nfloat_zero(res, ctx);
+                    if (NFLOAT_IS_POS_INF(x))
+                        return nfloat_pos_inf(res, ctx);
+                    if (NFLOAT_IS_NEG_INF(x))
+                        return nfloat_neg_inf(res, ctx);
+                    return nfloat_nan(res, ctx);
+                }
+
+                nlimbs = NFLOAT_CTX_NLIMBS(ctx);
+                x_nlimbs = NFLOAT_CTX_NLIMBS(x_ctx);
+
+                NFLOAT_EXP(res) = NFLOAT_EXP(x);
+                NFLOAT_SGNBIT(res) = NFLOAT_SGNBIT(x);
+
+                if (nlimbs <= x_nlimbs)
+                {
+                    flint_mpn_copyi(NFLOAT_D(res), NFLOAT_D(x) + x_nlimbs - nlimbs, nlimbs);
+                }
+                else
+                {
+                    flint_mpn_zero(NFLOAT_D(res), nlimbs - x_nlimbs);
+                    flint_mpn_copyi(NFLOAT_D(res) + nlimbs - x_nlimbs, NFLOAT_D(x), x_nlimbs);
+                }
+
+                return GR_SUCCESS;
+            }
+
+        case GR_CTX_FMPZ:
+            return nfloat_set_fmpz(res, x, ctx);
+
+        case GR_CTX_FMPQ:
+            return nfloat_set_fmpq(res, x, ctx);
+
+        case GR_CTX_REAL_FLOAT_ARF:
+            return nfloat_set_arf(res, x, ctx);
+
+        case GR_CTX_RR_ARB:
+            return nfloat_set_arf(res, arb_midref((arb_srcptr) x), ctx);
+
+        default:
+            {
+                int status;
+                arf_t t;
+
+                gr_ctx_t arf_ctx;
+                arf_init(t);
+
+                gr_ctx_init_real_float_arf(arf_ctx, NFLOAT_CTX_PREC(ctx));
+                status = gr_set_other(t, x, x_ctx, arf_ctx);
+                if (status == GR_SUCCESS)
+                    status = nfloat_set_arf(res, t, ctx);
+
+                arf_clear(t);
+                gr_ctx_clear(arf_ctx);
+                return status;
+            }
     }
 }
 

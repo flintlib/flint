@@ -7,7 +7,8 @@ This module provides binary floating-point numbers in a flat representation
 with precision in small fixed multiples of the word size
 (64, 128, 192, 256, ... bits on a 64-bit machine). The exponent range is
 close to a full word.
-A number with `n`-limb precision is stored using `n+2` limbs as follows:
+A number with `n`-limb precision is stored as `n+2` contiguous
+limbs as follows:
 
     +---------------+
     | exponent limb |
@@ -20,6 +21,13 @@ A number with `n`-limb precision is stored using `n+2` limbs as follows:
     +---------------+
     | mantissa[n-1] |
     +---------------+
+
+For normal (nonzero and finite) values `x`,
+the most significant limb of the mantissa is always normalised
+to have its most significant bit set, and the exponent `e` is the
+unique integer such that `|x| \in [0.5, 1) \cdot 2^e`.
+Special (zero or nonfinite) values are encoded using special
+values of the exponent field, with junk data in the mantissa.
 
 This type has the advantage that floating-point numbers with the
 same precision can be packed together tightly in vectors
@@ -227,6 +235,11 @@ These methods are interchangeable with their ``gr`` counterparts.
 
 .. function:: int nfloat_set_arf(nfloat_ptr res, const arf_t x, gr_ctx_t ctx)
               int nfloat_get_arf(arf_t res, nfloat_srcptr x, gr_ctx_t ctx)
+
+.. function:: int nfloat_set_fmpq(nfloat_ptr res, const fmpq_t v, gr_ctx_t ctx)
+              int nfloat_set_d(nfloat_ptr res, double x, gr_ctx_t ctx)
+              int nfloat_set_str(nfloat_ptr res, const char * x, gr_ctx_t ctx)
+              int nfloat_set_other(nfloat_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 
 .. function:: int nfloat_write(gr_stream_t out, nfloat_srcptr x, gr_ctx_t ctx)
               int nfloat_randtest(nfloat_ptr res, flint_rand_t state, gr_ctx_t ctx)

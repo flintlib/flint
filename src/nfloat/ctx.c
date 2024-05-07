@@ -56,11 +56,11 @@ gr_method_tab_input _nfloat_methods_input[] =
     {GR_METHOD_SET_SI,          (gr_funcptr) nfloat_set_si},
     {GR_METHOD_SET_UI,          (gr_funcptr) nfloat_set_ui},
     {GR_METHOD_SET_FMPZ,        (gr_funcptr) nfloat_set_fmpz},
-/*
     {GR_METHOD_SET_FMPQ,        (gr_funcptr) nfloat_set_fmpq},
     {GR_METHOD_SET_D,           (gr_funcptr) nfloat_set_d},
     {GR_METHOD_SET_STR,         (gr_funcptr) nfloat_set_str},
     {GR_METHOD_SET_OTHER,       (gr_funcptr) nfloat_set_other},
+/*
     {GR_METHOD_GET_FMPZ,        (gr_funcptr) nfloat_get_fmpz},
     {GR_METHOD_GET_FMPQ,        (gr_funcptr) nfloat_get_fmpq},
     {GR_METHOD_GET_UI,          (gr_funcptr) nfloat_get_ui},
