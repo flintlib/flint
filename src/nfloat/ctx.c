@@ -102,9 +102,9 @@ gr_method_tab_input _nfloat_methods_input[] =
     {GR_METHOD_MUL_2EXP_FMPZ,      (gr_funcptr) nfloat_mul_2exp_fmpz},
     {GR_METHOD_SET_FMPZ_2EXP_FMPZ, (gr_funcptr) nfloat_set_fmpz_2exp_fmpz},
     {GR_METHOD_GET_FMPZ_2EXP_FMPZ, (gr_funcptr) nfloat_get_fmpz_2exp_fmpz},
+*/
 
     {GR_METHOD_POW,             (gr_funcptr) nfloat_pow},
-*/
 
 /*
     {GR_METHOD_POW_UI,          (gr_funcptr) nfloat_pow_ui},
@@ -113,7 +113,6 @@ gr_method_tab_input _nfloat_methods_input[] =
     {GR_METHOD_POW_FMPQ,        (gr_funcptr) nfloat_pow_fmpq},
 */
 
-/*
     {GR_METHOD_SQRT,            (gr_funcptr) nfloat_sqrt},
     {GR_METHOD_RSQRT,           (gr_funcptr) nfloat_rsqrt},
 
@@ -127,7 +126,6 @@ gr_method_tab_input _nfloat_methods_input[] =
     {GR_METHOD_CEIL,            (gr_funcptr) nfloat_ceil},
     {GR_METHOD_TRUNC,           (gr_funcptr) nfloat_trunc},
     {GR_METHOD_NINT,            (gr_funcptr) nfloat_nint},
-*/
 
     {GR_METHOD_ABS,             (gr_funcptr) nfloat_abs},
     {GR_METHOD_CONJ,            (gr_funcptr) nfloat_set},
@@ -139,7 +137,7 @@ gr_method_tab_input _nfloat_methods_input[] =
     {GR_METHOD_CMPABS,          (gr_funcptr) nfloat_cmpabs},
 
     {GR_METHOD_I,               (gr_funcptr) gr_not_in_domain},
-/*
+
     {GR_METHOD_PI,              (gr_funcptr) nfloat_pi},
     {GR_METHOD_EXP,             (gr_funcptr) nfloat_exp},
     {GR_METHOD_EXPM1,           (gr_funcptr) nfloat_expm1},
@@ -154,7 +152,6 @@ gr_method_tab_input _nfloat_methods_input[] =
     {GR_METHOD_ATAN,            (gr_funcptr) nfloat_atan},
     {GR_METHOD_GAMMA,            (gr_funcptr) nfloat_gamma},
     {GR_METHOD_ZETA,             (gr_funcptr) nfloat_zeta},
-*/
 
 /*
     {GR_METHOD_VEC_ADD,                 (gr_funcptr) _nfloat_vec_add},

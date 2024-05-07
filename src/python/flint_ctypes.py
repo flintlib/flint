@@ -1,6 +1,7 @@
 import ctypes
 import ctypes.util
 import sys
+import functools
 
 libflint_path = ctypes.util.find_library('flint')
 if libflint_path == None:
@@ -4688,6 +4689,37 @@ class acf(gr_elem):
     @staticmethod
     def _default_context():
         return CF
+
+
+@functools.cache
+def get_nfloat_class(prec):
+    n = (prec + FLINT_BITS - 1) // FLINT_BITS
+    prec = n * FLINT_BITS
+
+    class _nfloat_struct(ctypes.Structure):
+        _fields_ = [('val', c_ulong * (n + 2))]
+
+    _nfloat_struct.__qualname__ = _nfloat_struct.__name__ = ("nfloat" + str(prec) + "_struct")
+
+    class _nfloat_class(gr_elem):
+        _struct_type = _nfloat_struct
+
+        @staticmethod
+        def _default_context():
+            raise NotImplementedError
+
+    _nfloat_class.__qualname__ = _nfloat_class.__name__ = ("nfloat" + str(prec))
+
+    return _nfloat_class
+
+
+class RealFloat_nfloat(gr_ctx):
+    def __init__(self, prec=128):
+        gr_ctx.__init__(self)
+        libflint.nfloat_ctx_init(self._ref, prec, 0)
+        self._elem_type = get_nfloat_class(prec)
+
+
 
 
 class IntegersMod_nmod(gr_ctx):

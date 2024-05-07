@@ -16,6 +16,7 @@
 #include "arb.h"
 #include "nfloat.h"
 #include "gr_generic.h"
+#include "gr_special.h"
 
 int
 nfloat_write(gr_stream_t out, nfloat_srcptr x, gr_ctx_t ctx)
@@ -183,6 +184,9 @@ _nfloat_underflow(nfloat_ptr res, int sgnbit, gr_ctx_t ctx)
 int
 _nfloat_overflow(nfloat_ptr res, int sgnbit, gr_ctx_t ctx)
 {
+    if (!(NFLOAT_CTX_FLAGS(ctx) & NFLOAT_ALLOW_INF))
+        return GR_UNABLE;
+
     return sgnbit ? nfloat_neg_inf(res, ctx) : nfloat_pos_inf(res, ctx);
 }
 
@@ -1171,3 +1175,196 @@ nfloat_div_si(nfloat_ptr res, nfloat_srcptr x, slong y, gr_ctx_t ctx)
 }
 
 #endif
+
+int
+nfloat_sqrt(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx)
+{
+    mpfr_t xf, zf;
+    int odd_exp;
+    slong nlimbs = NFLOAT_CTX_NLIMBS(ctx);
+    slong prec = NFLOAT_CTX_PREC(ctx);
+
+    if (NFLOAT_IS_SPECIAL(x))
+    {
+        if (NFLOAT_IS_NEG_INF(x))
+            return nfloat_nan(res, ctx);
+        else
+            return nfloat_set(res, x, ctx);
+    }
+
+    if (NFLOAT_SGNBIT(x))
+        return nfloat_nan(res, ctx);
+
+    odd_exp = NFLOAT_EXP(x) & 1;
+
+    /* Powers of two */
+    if (odd_exp &&
+        NFLOAT_D(x)[nlimbs - 1] == (UWORD(1) << (FLINT_BITS - 1)) &&
+        flint_mpn_zero_p(NFLOAT_D(x), nlimbs - 1))
+    {
+        nfloat_set(res, x, ctx);
+        NFLOAT_EXP(res) = (NFLOAT_EXP(res) + 1) / 2;
+        return GR_SUCCESS;
+    }
+
+    xf->_mpfr_d = NFLOAT_D(x);
+    xf->_mpfr_prec = prec;
+    xf->_mpfr_sign = 1;
+    xf->_mpfr_exp = odd_exp;
+
+    if (res == x)
+    {
+        mpfr_sqrt(xf, xf, MPFR_RNDZ);
+    }
+    else
+    {
+        zf->_mpfr_d = NFLOAT_D(res);
+        zf->_mpfr_prec = prec;
+        zf->_mpfr_sign = 1;
+        zf->_mpfr_exp = 0;
+
+        mpfr_sqrt(zf, xf, MPFR_RNDZ);
+    }
+
+    /* floor division */
+    NFLOAT_EXP(res) = (NFLOAT_EXP(x) - (NFLOAT_EXP(x) < 0)) / 2 + zf->_mpfr_exp;
+
+    NFLOAT_SGNBIT(res) = 0;
+
+    return GR_SUCCESS;
+}
+
+int
+nfloat_rsqrt(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx)
+{
+    mpfr_t xf, zf;
+    int odd_exp;
+    slong nlimbs = NFLOAT_CTX_NLIMBS(ctx);
+    slong prec = NFLOAT_CTX_PREC(ctx);
+
+    if (NFLOAT_IS_SPECIAL(x))
+    {
+        if (NFLOAT_IS_ZERO(x))
+            return nfloat_pos_inf(res, ctx);
+        else if (NFLOAT_IS_POS_INF(x))
+            return nfloat_zero(res, ctx);
+        else
+            return nfloat_nan(res, ctx);
+    }
+
+    if (NFLOAT_SGNBIT(x))
+        return nfloat_nan(res, ctx);
+
+    odd_exp = NFLOAT_EXP(x) & 1;
+
+    /* Powers of two */
+    if (odd_exp &&
+        NFLOAT_D(x)[nlimbs - 1] == (UWORD(1) << (FLINT_BITS - 1)) &&
+        flint_mpn_zero_p(NFLOAT_D(x), nlimbs - 1))
+    {
+        nfloat_set(res, x, ctx);
+        NFLOAT_EXP(res) = ((-NFLOAT_EXP(res) + 1)) / 2 + 1;
+        return GR_SUCCESS;
+    }
+
+    xf->_mpfr_d = NFLOAT_D(x);
+    xf->_mpfr_prec = prec;
+    xf->_mpfr_sign = 1;
+    xf->_mpfr_exp = odd_exp;
+
+    if (res == x)
+    {
+        mpfr_rec_sqrt(xf, xf, MPFR_RNDZ);
+    }
+    else
+    {
+        zf->_mpfr_d = NFLOAT_D(res);
+        zf->_mpfr_prec = prec;
+        zf->_mpfr_sign = 1;
+        zf->_mpfr_exp = 0;
+
+        mpfr_rec_sqrt(zf, xf, MPFR_RNDZ);
+    }
+
+    /* floor division */
+    NFLOAT_EXP(res) = -((NFLOAT_EXP(x) - (NFLOAT_EXP(x) < 0)) / 2) + zf->_mpfr_exp;
+
+    NFLOAT_SGNBIT(res) = 0;
+
+    return GR_SUCCESS;
+}
+
+static int
+_nfloat_func1_via_arf(gr_method_unary_op func, nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx)
+{
+    gr_ctx_t arf_ctx;
+    arf_t t;
+    int status;
+
+    gr_ctx_init_real_float_arf(arf_ctx, NFLOAT_CTX_PREC(ctx));
+    arf_init(t);
+    nfloat_get_arf(t, x, ctx);
+    status = func(t, t, arf_ctx);
+    if (status == GR_SUCCESS)
+        status = nfloat_set_arf(res, t, ctx);
+    arf_clear(t);
+    gr_ctx_clear(arf_ctx);
+
+    return status;
+}
+
+static int
+_nfloat_func2_via_arf(gr_method_binary_op func, nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx)
+{
+    gr_ctx_t arf_ctx;
+    arf_t t, u;
+    int status;
+
+    gr_ctx_init_real_float_arf(arf_ctx, NFLOAT_CTX_PREC(ctx));
+    arf_init(t);
+    arf_init(u);
+    nfloat_get_arf(t, x, ctx);
+    nfloat_get_arf(u, y, ctx);
+    status = func(t, t, u, arf_ctx);
+    if (status == GR_SUCCESS)
+        status = nfloat_set_arf(res, t, ctx);
+    arf_clear(t);
+    arf_clear(u);
+    gr_ctx_clear(arf_ctx);
+
+    return status;
+}
+
+/* todo: fast code */
+int nfloat_floor(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx) { return _nfloat_func1_via_arf((gr_method_unary_op) gr_floor, res, x, ctx); }
+int nfloat_ceil(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx) { return _nfloat_func1_via_arf((gr_method_unary_op) gr_ceil, res, x, ctx); }
+int nfloat_trunc(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx) { return _nfloat_func1_via_arf((gr_method_unary_op) gr_trunc, res, x, ctx); }
+int nfloat_nint(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx) { return _nfloat_func1_via_arf((gr_method_unary_op) gr_nint, res, x, ctx); }
+
+int nfloat_pi(nfloat_ptr res, gr_ctx_t ctx)
+{
+    slong nlimbs = NFLOAT_CTX_NLIMBS(ctx);
+
+    FLINT_ASSERT(nlimbs <= ARB_PI4_TAB_LIMBS);
+
+    NFLOAT_EXP(res) = 0;
+    NFLOAT_SGNBIT(res) = 0;
+    flint_mpn_copyi(NFLOAT_D(res), arb_pi4_tab + ARB_PI4_TAB_LIMBS - nlimbs, nlimbs);
+
+    return GR_SUCCESS;
+}
+
+int nfloat_pow(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx) { return _nfloat_func2_via_arf((gr_method_binary_op) gr_pow, res, x, y, ctx); }
+int nfloat_exp(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx) { return _nfloat_func1_via_arf((gr_method_unary_op) gr_exp, res, x, ctx); }
+int nfloat_expm1(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx) { return _nfloat_func1_via_arf((gr_method_unary_op) gr_expm1, res, x, ctx); }
+int nfloat_log(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx) { return _nfloat_func1_via_arf((gr_method_unary_op) gr_log, res, x, ctx); }
+int nfloat_log1p(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx) { return _nfloat_func1_via_arf((gr_method_unary_op) gr_log1p, res, x, ctx); }
+int nfloat_sin(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx) { return _nfloat_func1_via_arf((gr_method_unary_op) gr_sin, res, x, ctx); }
+int nfloat_cos(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx) { return _nfloat_func1_via_arf((gr_method_unary_op) gr_cos, res, x, ctx); }
+int nfloat_tan(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx) { return _nfloat_func1_via_arf((gr_method_unary_op) gr_tan, res, x, ctx); }
+int nfloat_sinh(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx) { return _nfloat_func1_via_arf((gr_method_unary_op) gr_sinh, res, x, ctx); }
+int nfloat_cosh(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx) { return _nfloat_func1_via_arf((gr_method_unary_op) gr_cosh, res, x, ctx); }
+int nfloat_tanh(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx) { return _nfloat_func1_via_arf((gr_method_unary_op) gr_tanh, res, x, ctx); }
+int nfloat_atan(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx) { return _nfloat_func1_via_arf((gr_method_unary_op) gr_atan, res, x, ctx); }
+int nfloat_gamma(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx) { return _nfloat_func1_via_arf((gr_method_unary_op) gr_gamma, res, x, ctx); }
+int nfloat_zeta(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx) { return _nfloat_func1_via_arf((gr_method_unary_op) gr_zeta, res, x, ctx); }
