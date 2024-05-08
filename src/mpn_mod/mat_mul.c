@@ -11,6 +11,7 @@
 
 #include "thread_support.h"
 #include "mpn_mod.h"
+#include "gr_mat.h"
 
 /* todo: retune this when arithmetic is more optimized */
 

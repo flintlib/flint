@@ -11,6 +11,7 @@
 
 #include "fmpz.h"
 #include "mpn_mod.h"
+#include "gr.h"
 
 int _mpn_mod_methods_initialized = 0;
 

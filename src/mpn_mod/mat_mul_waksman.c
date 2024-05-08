@@ -12,6 +12,7 @@
 */
 
 #include "mpn_mod.h"
+#include "gr_mat.h"
 
 /* compute c += (a1 + b1) * (a2 + b2) */
 /* val0, val1, val2 are scratch space */
