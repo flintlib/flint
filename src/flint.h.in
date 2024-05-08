@@ -125,6 +125,8 @@ typedef struct __FLINT_FILE FLINT_FILE;
 # define FLINT_OPTIMIZE(x) FLINT_OPTIMIZE_NESTED_1(x)
 # define FLINT_CONSTANT_P __builtin_constant_p
 # define FLINT_UNREACHABLE __builtin_unreachable()
+# define FLINT_RETURNS_NONNULL __attribute__((returns_nonnull))
+# define FLINT_MALLOC __attribute__((malloc))
 #else
 # define __attribute__(x)
 # if defined(_MSC_VER)
@@ -145,6 +147,8 @@ typedef struct __FLINT_FILE FLINT_FILE;
 # define FLINT_POP_OPTIONS
 # define FLINT_OPTIMIZE(x)
 # define FLINT_CONSTANT_P(x) 0
+# define FLINT_RETURNS_NONNULL
+# define FLINT_MALLOC
 #endif
 
 #if defined(__cplusplus)
@@ -204,11 +208,11 @@ typedef struct __FLINT_FILE FLINT_FILE;
 
 /* memory ********************************************************************/
 
-void * flint_malloc(size_t size);
-void * flint_realloc(void * ptr, size_t size);
-void * flint_calloc(size_t num, size_t size);
+FLINT_WARN_UNUSED FLINT_MALLOC FLINT_RETURNS_NONNULL void * flint_malloc(size_t size);
+FLINT_WARN_UNUSED FLINT_RETURNS_NONNULL void * flint_realloc(void * ptr, size_t size);
+FLINT_WARN_UNUSED FLINT_RETURNS_NONNULL void * flint_calloc(size_t num, size_t size);
 void flint_free(void * ptr);
-void * flint_aligned_alloc(size_t alignment, size_t size);
+FLINT_WARN_UNUSED FLINT_MALLOC FLINT_RETURNS_NONNULL void * flint_aligned_alloc(size_t alignment, size_t size);
 void flint_aligned_free(void * ptr);
 
 typedef void (*flint_cleanup_function_t)(void);
