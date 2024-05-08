@@ -18,7 +18,7 @@
 #define GR_VEC_INLINE static inline
 #endif
 
-#include "gr_types.h"
+#include "gr.h"
 
 #ifdef __cplusplus
 extern "C" {
