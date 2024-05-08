@@ -23,11 +23,20 @@ void acb_zeta_si(acb_t z, slong s, slong prec);
 static void
 _acb_dirichlet_zeta(acb_t res, const acb_t s, slong prec)
 {
-    acb_t a;
-    acb_init(a);
-    acb_one(a);
-    _acb_poly_zeta_cpx_series(res, s, a, 0, 1, prec);
-    acb_clear(a);
+    /* todo: better asymptotic code, and also for hurwitz zeta */
+    if (acb_is_int(s) && arf_cmp_si(arb_midref(acb_realref(s)), prec) > 0)
+    {
+        acb_one(res);
+        mag_set_ui_2exp_si(arb_radref(acb_realref(res)), 1, -prec);
+    }
+    else
+    {
+        acb_t a;
+        acb_init(a);
+        acb_one(a);
+        _acb_poly_zeta_cpx_series(res, s, a, 0, 1, prec);
+        acb_clear(a);
+    }
 }
 
 /* todo: use euler product for complex s, and check efficiency
