@@ -74,8 +74,6 @@ void gr_stream_write_fmpz(gr_stream_t out, const fmpz_t x);
 #define GR_UNABLE 2
 #define GR_TEST_FAIL 4
 
-#define FLINT_WARN_UNUSED __attribute__((warn_unused_result))
-
 #define GR_MUST_SUCCEED(expr) do { if ((expr) != GR_SUCCESS) { flint_throw(FLINT_ERROR, "GR_MUST_SUCCEED failure: %s", __FILE__); } } while (0)
 #define GR_IGNORE(expr) do { int ___unused = (expr); (void) ___unused; } while (0)
 
