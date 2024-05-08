@@ -11,8 +11,178 @@
 
 #include "test_helpers.h"
 #include "gr_vec.h"
+#include "gr_special.h"
 #include "arf.h"
 #include "nfloat.h"
+
+int
+gr_test_approx_unary_op(gr_ctx_t R, gr_method_unary_op op, gr_ctx_t R_ref, gr_srcptr rel_tol, flint_rand_t state, int test_flags)
+{
+    int status = GR_SUCCESS;
+    int alias;
+    int cmp;
+    gr_ptr a, b, a_ref, b_ref, rel_err;
+
+    GR_TMP_INIT2(a, b, R);
+    GR_TMP_INIT3(a_ref, b_ref, rel_err, R_ref);
+
+    alias = n_randint(state, 2);
+
+    status |= gr_randtest(a, state, R);
+    status |= gr_randtest(b, state, R);
+
+    status |= gr_set_other(a_ref, a, R, R_ref);
+
+    if (status == GR_SUCCESS)
+    {
+        if (alias == 0)
+        {
+            status |= op(b, a, R);
+            status |= op(b_ref, a_ref, R_ref);
+        }
+        else
+        {
+            status |= gr_set(b, a, R);
+            status |= op(b, b, R);
+            status |= op(b_ref, a_ref, R_ref);
+        }
+
+        if (status == GR_SUCCESS)
+        {
+            status |= gr_set_other(rel_err, b, R, R_ref);
+
+            status |= gr_sub(rel_err, b_ref, rel_err, R_ref);
+            status |= gr_div(rel_err, rel_err, b_ref, R_ref);
+            status |= gr_abs(rel_err, rel_err, R_ref);
+            status |= gr_cmp(&cmp, rel_err, rel_tol, R_ref);
+
+            if (status == GR_SUCCESS && cmp > 0)
+                status = GR_TEST_FAIL;
+
+            if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
+            {
+                flint_printf("\n");
+                gr_ctx_println(R);
+                gr_ctx_println(R_ref);
+                flint_printf("alias: %d\n", alias);
+                flint_printf("Computed:\n");
+                flint_printf("a = "); gr_println(a, R);
+                flint_printf("op(a) = "); gr_println(b, R);
+                flint_printf("Reference:\n");
+                flint_printf("a = "); gr_println(a_ref, R_ref);
+                flint_printf("op(a) = "); gr_println(b_ref, R_ref);
+                flint_printf("\nrel_err = "); gr_println(rel_err, R_ref);
+                flint_printf("\nrel_tol = "); gr_println(rel_tol, R_ref);
+                flint_printf("\n");
+            }
+        }
+    }
+
+    if (status == GR_TEST_FAIL)
+        flint_abort();
+
+    GR_TMP_CLEAR2(a, b, R);
+    GR_TMP_CLEAR3(a_ref, b_ref, rel_err, R_ref);
+
+    return status;
+}
+
+int
+gr_test_approx_binary_op(gr_ctx_t R, gr_method_binary_op op, gr_ctx_t R_ref, gr_srcptr rel_tol, flint_rand_t state, int test_flags)
+{
+    int status = GR_SUCCESS;
+    int alias;
+    int cmp;
+    gr_ptr a, b, c, a_ref, b_ref, c_ref, rel_err;
+
+    GR_TMP_INIT3(a, b, c, R);
+    GR_TMP_INIT4(a_ref, b_ref, c_ref, rel_err, R_ref);
+
+    alias = n_randint(state, 5);
+
+    status |= gr_randtest(a, state, R);
+    status |= gr_randtest(b, state, R);
+    status |= gr_randtest(c, state, R);
+
+    status |= gr_set_other(a_ref, a, R, R_ref);
+    status |= gr_set_other(b_ref, b, R, R_ref);
+
+    if (status == GR_SUCCESS)
+    {
+        if (alias == 0)
+        {
+            status |= op(c, a, b, R);
+            status |= op(c_ref, a_ref, b_ref, R_ref);
+        }
+        else if (alias == 1)
+        {
+            status |= gr_set(c, a, R);
+            status |= op(c, c, b, R);
+            status |= op(c_ref, a_ref, b_ref, R_ref);
+        }
+        else if (alias == 2)
+        {
+            status |= gr_set(c, b, R);
+            status |= op(c, a, c, R);
+            status |= op(c_ref, a_ref, b_ref, R_ref);
+        }
+        else if (alias == 3)
+        {
+            status |= gr_set(b, a, R);
+            status |= gr_set(b_ref, a_ref, R_ref);
+            status |= op(c, a, a, R);
+            status |= op(c_ref, a_ref, a_ref, R_ref);
+        }
+        else
+        {
+            status |= gr_set(b, a, R);
+            status |= gr_set(c, a, R);
+            status |= gr_set(b_ref, a_ref, R_ref);
+            status |= op(c, c, c, R);
+            status |= op(c_ref, a_ref, a_ref, R_ref);
+        }
+
+        if (status == GR_SUCCESS)
+        {
+            status |= gr_set_other(rel_err, c, R, R_ref);
+
+            status |= gr_sub(rel_err, c_ref, rel_err, R_ref);
+            status |= gr_div(rel_err, rel_err, c_ref, R_ref);
+            status |= gr_abs(rel_err, rel_err, R_ref);
+            status |= gr_cmp(&cmp, rel_err, rel_tol, R_ref);
+
+            if (status == GR_SUCCESS && cmp > 0)
+                status = GR_TEST_FAIL;
+
+            if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
+            {
+                flint_printf("\n");
+                gr_ctx_println(R);
+                gr_ctx_println(R_ref);
+                flint_printf("alias: %d\n", alias);
+                flint_printf("Computed:\n");
+                flint_printf("a = "); gr_println(a, R);
+                flint_printf("b = "); gr_println(b, R);
+                flint_printf("a (op) b = "); gr_println(c, R);
+                flint_printf("Reference:\n");
+                flint_printf("a = "); gr_println(a_ref, R_ref);
+                flint_printf("b = "); gr_println(b_ref, R_ref);
+                flint_printf("a (op) b = "); gr_println(c_ref, R_ref);
+                flint_printf("\nrel_err = "); gr_println(rel_err, R_ref);
+                flint_printf("\nrel_tol = "); gr_println(rel_tol, R_ref);
+                flint_printf("\n");
+            }
+        }
+    }
+
+    if (status == GR_TEST_FAIL)
+        flint_abort();
+
+    GR_TMP_CLEAR3(a, b, c, R);
+    GR_TMP_CLEAR4(a_ref, b_ref, c_ref, rel_err, R_ref);
+
+    return status;
+}
 
 void
 nfloat_test_dot(flint_rand_t state, slong iters, gr_ctx_t ctx)
@@ -157,13 +327,77 @@ nfloat_test_dot(flint_rand_t state, slong iters, gr_ctx_t ctx)
 TEST_FUNCTION_START(nfloat, state)
 {
     gr_ctx_t ctx;
+    gr_ctx_t ctx2;
     slong prec;
 
     for (prec = NFLOAT_MIN_LIMBS * FLINT_BITS; prec <= NFLOAT_MAX_LIMBS * FLINT_BITS; prec += FLINT_BITS)
     {
         nfloat_ctx_init(ctx, prec, 0);
+
         gr_test_floating_point(ctx, 100 * flint_test_multiplier(), 0);
+
         nfloat_test_dot(state, (prec <= 128 ? 10000 : 100) * flint_test_multiplier(), ctx);
+
+        {
+            gr_ptr tol;
+            slong i, reps;
+
+            gr_ctx_init_real_arb(ctx2, prec + 32);
+
+            tol = gr_heap_init(ctx2);
+
+            GR_IGNORE(gr_one(tol, ctx2));
+            GR_IGNORE(gr_mul_2exp_si(tol, tol, -prec + 1, ctx2));
+
+            reps = (prec <= 128 ? 1000 : 1) * flint_test_multiplier();
+
+            for (i = 0; i < reps; i++)
+            {
+                gr_test_approx_binary_op(ctx, (gr_method_binary_op) gr_mul, ctx2, tol, state, 0);
+                gr_test_approx_binary_op(ctx, (gr_method_binary_op) gr_div, ctx2, tol, state, 0);
+                gr_test_approx_binary_op(ctx, (gr_method_binary_op) gr_pow, ctx2, tol, state, 0);
+
+                gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_neg, ctx2, tol, state, 0);
+                gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_abs, ctx2, tol, state, 0);
+                gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_sgn, ctx2, tol, state, 0);
+                gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_inv, ctx2, tol, state, 0);
+                gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_sqrt, ctx2, tol, state, 0);
+                gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_rsqrt, ctx2, tol, state, 0);
+                gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_floor, ctx2, tol, state, 0);
+                gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_ceil, ctx2, tol, state, 0);
+                gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_nint, ctx2, tol, state, 0);
+                gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_trunc, ctx2, tol, state, 0);
+            }
+
+            reps = (prec <= 256 ? 10 : 0) * flint_test_multiplier();
+
+            for (i = 0; i < reps; i++)
+            {
+                gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_exp, ctx2, tol, state, 0);
+                gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_expm1, ctx2, tol, state, 0);
+                gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_log, ctx2, tol, state, 0);
+                gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_log1p, ctx2, tol, state, 0);
+                gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_sin, ctx2, tol, state, 0);
+                gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_cos, ctx2, tol, state, 0);
+                gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_tan, ctx2, tol, state, 0);
+                gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_sinh, ctx2, tol, state, 0);
+                gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_cosh, ctx2, tol, state, 0);
+                gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_tanh, ctx2, tol, state, 0);
+                gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_atan, ctx2, tol, state, 0);
+            }
+
+            reps = (prec <= 256 ? 1 : 0) * flint_test_multiplier();
+
+            for (i = 0; i < reps; i++)
+            {
+                gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_gamma, ctx2, tol, state, 0);
+                gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_zeta, ctx2, tol, state, 0);
+            }
+
+            gr_heap_clear(tol, ctx2);
+            gr_ctx_clear(ctx2);
+        }
+
         gr_ctx_clear(ctx);
     }
 

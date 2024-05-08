@@ -11,6 +11,7 @@
 
 #include <limits.h>
 #include <mpfr.h>
+#include "long_extras.h"
 #include "fmpz.h"
 #include "arf.h"
 #include "arb.h"
@@ -1034,10 +1035,32 @@ nfloat_mul(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx)
 }
 
 int
+nfloat_mul_2exp_si(nfloat_ptr res, nfloat_srcptr x, slong y, gr_ctx_t ctx)
+{
+    if (NFLOAT_IS_SPECIAL(x))
+    {
+        return nfloat_set(res, x, ctx);
+    }
+    else
+    {
+        /* todo */
+        if (y < NFLOAT_MIN_EXP || y > NFLOAT_MAX_EXP)
+            return GR_UNABLE;
+
+        nfloat_set(res, x, ctx);
+        NFLOAT_EXP(res) += y;
+        NFLOAT_HANDLE_UNDERFLOW_OVERFLOW(res, ctx);
+        return GR_SUCCESS;
+    }
+}
+
+
+int
 nfloat_inv(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx)
 {
     mpfr_t rf, xf;
     slong prec = NFLOAT_CTX_PREC(ctx);
+    slong nlimbs = NFLOAT_CTX_NLIMBS(ctx);
 
     if (NFLOAT_IS_SPECIAL(x))
     {
@@ -1045,6 +1068,15 @@ nfloat_inv(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx)
             return nfloat_nan(res, ctx);
         else
             return nfloat_nan(res, ctx); /* todo */
+    }
+
+    if (NFLOAT_D(x)[nlimbs - 1] == (UWORD(1) << (FLINT_BITS - 1)) &&
+        flint_mpn_zero_p(NFLOAT_D(x), nlimbs - 1))
+    {
+        nfloat_set(res, x, ctx);
+        NFLOAT_EXP(res) = 2 - NFLOAT_EXP(res);
+        NFLOAT_HANDLE_UNDERFLOW_OVERFLOW(res, ctx);
+        return GR_SUCCESS;
     }
 
     /* todo: make sure aliasing is correct */
@@ -1245,17 +1277,22 @@ nfloat_sqrt(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx)
         return GR_SUCCESS;
     }
 
-    xf->_mpfr_d = NFLOAT_D(x);
-    xf->_mpfr_prec = prec;
-    xf->_mpfr_sign = 1;
-    xf->_mpfr_exp = odd_exp;
-
     if (res == x)
     {
-        mpfr_sqrt(xf, xf, MPFR_RNDZ);
+        zf->_mpfr_d = NFLOAT_D(x);
+        zf->_mpfr_prec = prec;
+        zf->_mpfr_sign = 1;
+        zf->_mpfr_exp = odd_exp;
+
+        mpfr_sqrt(zf, zf, MPFR_RNDZ);
     }
     else
     {
+        xf->_mpfr_d = NFLOAT_D(x);
+        xf->_mpfr_prec = prec;
+        xf->_mpfr_sign = 1;
+        xf->_mpfr_exp = odd_exp;
+
         zf->_mpfr_d = NFLOAT_D(res);
         zf->_mpfr_prec = prec;
         zf->_mpfr_sign = 1;
@@ -1305,17 +1342,22 @@ nfloat_rsqrt(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx)
         return GR_SUCCESS;
     }
 
-    xf->_mpfr_d = NFLOAT_D(x);
-    xf->_mpfr_prec = prec;
-    xf->_mpfr_sign = 1;
-    xf->_mpfr_exp = odd_exp;
-
     if (res == x)
     {
-        mpfr_rec_sqrt(xf, xf, MPFR_RNDZ);
+        zf->_mpfr_d = NFLOAT_D(x);
+        zf->_mpfr_prec = prec;
+        zf->_mpfr_sign = 1;
+        zf->_mpfr_exp = odd_exp;
+
+        mpfr_rec_sqrt(zf, zf, MPFR_RNDZ);
     }
     else
     {
+        xf->_mpfr_d = NFLOAT_D(x);
+        xf->_mpfr_prec = prec;
+        xf->_mpfr_sign = 1;
+        xf->_mpfr_exp = odd_exp;
+
         zf->_mpfr_d = NFLOAT_D(res);
         zf->_mpfr_prec = prec;
         zf->_mpfr_sign = 1;

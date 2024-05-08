@@ -22,6 +22,7 @@
 #include "gr_generic.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
+#include "nfloat.h"
 
 typedef struct
 {
@@ -242,6 +243,27 @@ _gr_arb_set_other(arb_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
             else
             {
                 return GR_DOMAIN;
+            }
+
+        case GR_CTX_NFLOAT:
+            if (NFLOAT_IS_SPECIAL(x))
+            {
+                if (NFLOAT_IS_ZERO(x))
+                {
+                    arb_zero(res);
+                    return GR_SUCCESS;
+                }
+                else
+                {
+                    return GR_UNABLE;
+                }
+            }
+            else
+            {
+                nfloat_get_arf(arb_midref(res), x, x_ctx);
+                mag_zero(arb_radref(res));
+                arb_set_round(res, res, ARB_CTX_PREC(ctx));
+                return GR_SUCCESS;
             }
 
         case GR_CTX_RR_ARB:
