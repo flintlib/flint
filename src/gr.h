@@ -18,21 +18,10 @@
 #define GR_INLINE static inline
 #endif
 
-#include "flint.h"
+#include "gr_types.h"
 
 #ifdef __cplusplus
- extern "C" {
-#endif
-
-#ifndef CALCIUM_H
-
-typedef enum
-{
-    T_TRUE,
-    T_FALSE,
-    T_UNKNOWN
-} truth_t;
-
+extern "C" {
 #endif
 
 GR_INLINE truth_t truth_and(truth_t x, truth_t y)
@@ -69,21 +58,6 @@ GR_INLINE void truth_println(truth_t x)
     if (x == T_UNKNOWN) flint_printf("T_UNKNOWN\n");
 }
 
-typedef int (*gr_funcptr)(void);
-
-/* Copied from Calcium: stream interface allows simple file or string IO. */
-
-typedef struct
-{
-    FLINT_FILE * fp;
-    char * s;
-    slong len;
-    slong alloc;
-}
-gr_stream_struct;
-
-typedef gr_stream_struct gr_stream_t[1];
-
 #ifdef FLINT_HAVE_FILE
 void gr_stream_init_file(gr_stream_t out, FILE * fp);
 #endif
@@ -105,21 +79,7 @@ void gr_stream_write_fmpz(gr_stream_t out, const fmpz_t x);
 #define GR_MUST_SUCCEED(expr) do { if ((expr) != GR_SUCCESS) { flint_throw(FLINT_ERROR, "GR_MUST_SUCCEED failure: %s", __FILE__); } } while (0)
 #define GR_IGNORE(expr) do { int ___unused = (expr); (void) ___unused; } while (0)
 
-typedef void * gr_ptr;
-typedef const void * gr_srcptr;
-typedef void * gr_ctx_ptr;
-
 #define GR_ENTRY(vec, i, size) ((void *) (((char *) (vec)) + ((i) * (size))))
-
-typedef struct
-{
-    gr_ptr entries;
-    slong alloc;
-    slong length;
-}
-gr_vec_struct;
-
-typedef gr_vec_struct gr_vec_t[1];
 
 GR_INLINE int gr_not_implemented(void) { return GR_UNABLE; }
 GR_INLINE int gr_not_in_domain(void) { return GR_DOMAIN; }
@@ -715,48 +675,6 @@ typedef struct
 gr_method_tab_input;
 
 void gr_method_tab_init(gr_funcptr * methods, gr_method_tab_input * tab);
-
-/* Identify specific rings/fields. */
-
-typedef enum
-{
-    GR_CTX_FMPZ, GR_CTX_FMPQ, GR_CTX_FMPZI,
-    GR_CTX_FMPZ_MOD, GR_CTX_NMOD, GR_CTX_NMOD8, GR_CTX_NMOD32, GR_CTX_MPN_MOD,
-    GR_CTX_FQ, GR_CTX_FQ_NMOD, GR_CTX_FQ_ZECH,
-    GR_CTX_NF,
-    GR_CTX_REAL_ALGEBRAIC_QQBAR, GR_CTX_COMPLEX_ALGEBRAIC_QQBAR,
-    GR_CTX_REAL_ALGEBRAIC_CA, GR_CTX_COMPLEX_ALGEBRAIC_CA,
-    GR_CTX_RR_CA, GR_CTX_CC_CA,
-    GR_CTX_COMPLEX_EXTENDED_CA,
-    GR_CTX_RR_ARB, GR_CTX_CC_ACB,
-    GR_CTX_REAL_FLOAT_ARF, GR_CTX_COMPLEX_FLOAT_ACF,
-    GR_CTX_FMPZ_POLY, GR_CTX_FMPQ_POLY, GR_CTX_GR_POLY,
-    GR_CTX_FMPZ_MPOLY, GR_CTX_GR_MPOLY,
-    GR_CTX_FMPZ_MPOLY_Q,
-    GR_CTX_GR_SERIES, GR_CTX_SERIES_MOD_GR_POLY,
-    GR_CTX_GR_MAT,
-    GR_CTX_GR_VEC,
-    GR_CTX_PSL2Z, GR_CTX_DIRICHLET_GROUP, GR_CTX_PERM,
-    GR_CTX_FEXPR,
-    GR_CTX_UNKNOWN_DOMAIN,
-    GR_CTX_WHICH_STRUCTURE_TAB_SIZE
-}
-gr_which_structure;
-
-/* large enough to hold any context data we want to store inline */
-#define GR_CTX_STRUCT_DATA_BYTES (6 * sizeof(ulong))
-
-typedef struct
-{
-    char data[GR_CTX_STRUCT_DATA_BYTES];
-    ulong which_ring;
-    slong sizeof_elem;
-    gr_funcptr * methods;
-    ulong size_limit;
-}
-gr_ctx_struct;
-
-typedef gr_ctx_struct gr_ctx_t[1];
 
 #define GR_CTX_DATA_AS_PTR(ctx) (*(void **) (&(ctx)->data))
 
@@ -1424,14 +1342,6 @@ int gr_ctx_init_dirichlet_group(gr_ctx_t ctx, ulong q);
 
 /* Generic polynomial ring */
 
-typedef struct
-{
-    gr_ctx_struct * base_ring;
-    slong degree_limit;
-    char * var;
-}
-polynomial_ctx_t;
-
 #define POLYNOMIAL_CTX(ring_ctx) ((polynomial_ctx_t *)((ring_ctx)))
 #define POLYNOMIAL_ELEM_CTX(ring_ctx) (POLYNOMIAL_CTX(ring_ctx)->base_ring)
 
@@ -1451,30 +1361,6 @@ void gr_ctx_init_fmpz_mpoly_q(gr_ctx_t ctx, slong nvars, const ordering_t ord);
 /* Generic series */
 /* TODO: move parts of this to its own module */
 
-typedef struct
-{
-    gr_ctx_struct * base_ring;
-    slong n;
-    char * var;
-}
-series_mod_ctx_t;
-
-typedef struct
-{
-    slong prec;     /* default approximate truncation */
-}
-gr_series_ctx_struct;
-
-typedef gr_series_ctx_struct gr_series_ctx_t[1];
-
-typedef struct
-{
-    gr_ctx_struct * base_ring;
-    gr_series_ctx_struct sctx;
-    char * var;
-}
-series_ctx_t;
-
 #define SERIES_CTX(ring_ctx) ((series_ctx_t *)((ring_ctx)))
 #define SERIES_ELEM_CTX(ring_ctx) (SERIES_CTX(ring_ctx)->base_ring)
 #define SERIES_SCTX(ring_ctx) (&(((series_ctx_t *)((ring_ctx)))->sctx))
@@ -1488,29 +1374,12 @@ void gr_ctx_init_series_mod_gr_poly(gr_ctx_t ctx, gr_ctx_t base_ring, slong n);
 
 /* Generic vectors */
 
-typedef struct
-{
-    gr_ctx_struct * base_ring;
-    int all_sizes;
-    slong n;
-}
-vector_ctx_t;
-
 #define VECTOR_CTX(ring_ctx) ((vector_ctx_t *)((ring_ctx)))
 
 void gr_ctx_init_vector_gr_vec(gr_ctx_t ctx, gr_ctx_t base_ring);
 void gr_ctx_init_vector_space_gr_vec(gr_ctx_t ctx, gr_ctx_t base_ring, slong n);
 
 /* Generic matrix ring */
-
-typedef struct
-{
-    gr_ctx_struct * base_ring;
-    int all_sizes;
-    slong nrows;
-    slong ncols;
-}
-matrix_ctx_t;
 
 #define MATRIX_CTX(ring_ctx) ((matrix_ctx_t *)((ring_ctx)))
 
