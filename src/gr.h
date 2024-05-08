@@ -69,9 +69,6 @@ void gr_stream_write_ui(gr_stream_t out, ulong x);
 void gr_stream_write_free(gr_stream_t out, char * s);
 void gr_stream_write_fmpz(gr_stream_t out, const fmpz_t x);
 
-#define GR_MUST_SUCCEED(expr) do { if ((expr) != GR_SUCCESS) { flint_throw(FLINT_ERROR, "GR_MUST_SUCCEED failure: %s", __FILE__); } } while (0)
-#define GR_IGNORE(expr) do { int ___unused = (expr); (void) ___unused; } while (0)
-
 GR_INLINE int gr_not_implemented(void) { return GR_UNABLE; }
 GR_INLINE int gr_not_in_domain(void) { return GR_DOMAIN; }
 

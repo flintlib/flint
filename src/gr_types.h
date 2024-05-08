@@ -213,6 +213,9 @@ typedef gr_mpoly_struct gr_mpoly_t[1];
 
 #define GR_CTX_DATA_AS_PTR(ctx) (*(void **) (&(ctx)->data))
 
+#define GR_MUST_SUCCEED(expr) do { if ((expr) != GR_SUCCESS) { flint_throw(FLINT_ERROR, "GR_MUST_SUCCEED failure: %s", __FILE__); } } while (0)
+#define GR_IGNORE(expr) do { int ___unused = (expr); (void) ___unused; } while (0)
+
 #ifdef __cplusplus
 }
 #endif
