@@ -18,8 +18,9 @@
 #define GR_MAT_INLINE static inline
 #endif
 
-#include "gr.h"
-#include "gr_poly.h"
+#include "fmpz_types.h"
+#include "fmpq_types.h"
+#include "gr_types.h"
 
 #ifdef __cplusplus
 extern "C" {

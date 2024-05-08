@@ -200,6 +200,10 @@ gr_mpoly_struct;
 
 typedef gr_mpoly_struct gr_mpoly_t[1];
 
+/* widely used macros ********************************************************/
+
+#define GR_ENTRY(vec, i, size) ((void *) (((char *) (vec)) + ((i) * (size))))
+
 #ifdef __cplusplus
 }
 #endif
