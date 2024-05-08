@@ -18,25 +18,14 @@
 #define CALCIUM_INLINE static inline
 #endif
 
-#include "fmpz.h"
 #include "acb_types.h"
+#include "ca_types.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Input and output */
-
-typedef struct
-{
-    FLINT_FILE * fp;
-    char * s;
-    slong len;
-    slong alloc;
-}
-calcium_stream_struct;
-
-typedef calcium_stream_struct calcium_stream_t[1];
 
 #ifdef FLINT_HAVE_FILE
 void calcium_stream_init_file(calcium_stream_t out, FILE * fp);
@@ -65,13 +54,6 @@ void calcium_write_free(calcium_stream_t out, char * s)
 }
 
 /* Triple-valued logic */
-
-typedef enum
-{
-    T_TRUE,
-    T_FALSE,
-    T_UNKNOWN
-} truth_t;
 
 CALCIUM_INLINE void truth_print(truth_t t)
 {
