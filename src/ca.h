@@ -18,12 +18,11 @@
 #define CA_INLINE static inline
 #endif
 
-#include "flint.h"
-#include "fmpz_mpoly_q.h"
 #include "nf_elem.h"
 #include "qqbar.h"
 #include "fmpz_mpoly.h"
 #include "fexpr.h"
+#include "ca_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -278,21 +277,8 @@ _ca_make_fmpq(ca_t x, ca_ctx_t ctx)
         _ca_make_field_element(x, ctx->field_qq, ctx);
 }
 
-CA_INLINE void
-_ca_function_fx(ca_t res, calcium_func_code func, const ca_t x, ca_ctx_t ctx)
-{
-    ca_field_srcptr field = _ca_ctx_get_field_fx(ctx, func, x);
-    _ca_make_field_element(res, field, ctx);
-    fmpz_mpoly_q_gen(CA_MPOLY_Q(res), 0, CA_FIELD_MCTX(field, ctx));
-}
-
-CA_INLINE void
-_ca_function_fxy(ca_t res, calcium_func_code func, const ca_t x, const ca_t y, ca_ctx_t ctx)
-{
-    ca_field_srcptr field = _ca_ctx_get_field_fxy(ctx, func, x, y);
-    _ca_make_field_element(res, field, ctx);
-    fmpz_mpoly_q_gen(CA_MPOLY_Q(res), 0, CA_FIELD_MCTX(field, ctx));
-}
+void _ca_function_fx(ca_t res, calcium_func_code func, const ca_t x, ca_ctx_t ctx);
+void _ca_function_fxy(ca_t res, calcium_func_code func, const ca_t x, const ca_t y, ca_ctx_t ctx);
 
 void ca_set(ca_t res, const ca_t x, ca_ctx_t ctx);
 void ca_transfer(ca_t res, ca_ctx_t res_ctx, const ca_t src, ca_ctx_t src_ctx);
