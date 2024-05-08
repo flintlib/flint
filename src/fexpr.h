@@ -22,8 +22,10 @@
 extern "C" {
 #endif
 
+#include "fmpz_types.h"
 #include "mpoly_types.h"
-#include "calcium.h"
+#include "arf_types.h"
+#include "ca_types.h"
 
 #define FEXPR_TYPE_SMALL_INT     UWORD(0)
 #define FEXPR_TYPE_SMALL_SYMBOL  UWORD(1)
