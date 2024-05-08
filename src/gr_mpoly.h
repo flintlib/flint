@@ -20,8 +20,13 @@
 #define GR_MPOLY_INLINE static inline
 #endif
 
-#include "mpoly.h"
 #include "gr_vec.h"
+
+#if FLINT_WANT_ASSERT
+# include "mpoly.h" /* For mpoly_words_per_exp */
+#else
+# include "mpoly_types.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
