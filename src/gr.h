@@ -667,8 +667,6 @@ gr_method_tab_input;
 
 void gr_method_tab_init(gr_funcptr * methods, gr_method_tab_input * tab);
 
-#define GR_CTX_DATA_AS_PTR(ctx) (*(void **) (&(ctx)->data))
-
 GR_INLINE void * gr_ctx_data_ptr(gr_ctx_t ctx) { return (void *) ctx->data; }
 GR_INLINE void * gr_ctx_data_as_ptr(gr_ctx_t ctx) { return (void *) GR_CTX_DATA_AS_PTR(ctx); }
 

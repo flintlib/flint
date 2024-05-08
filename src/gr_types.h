@@ -211,6 +211,8 @@ typedef gr_mpoly_struct gr_mpoly_t[1];
 
 #define GR_ENTRY(vec, i, size) ((void *) (((char *) (vec)) + ((i) * (size))))
 
+#define GR_CTX_DATA_AS_PTR(ctx) (*(void **) (&(ctx)->data))
+
 #ifdef __cplusplus
 }
 #endif
