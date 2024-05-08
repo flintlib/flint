@@ -97,6 +97,16 @@ typedef fmpz_mpoly_struct fmpz_mpoly_t[1];
 
 typedef struct
 {
+    fmpz_mpoly_struct * p;
+    slong alloc;
+    slong length;
+}
+fmpz_mpoly_vec_struct;
+
+typedef fmpz_mpoly_vec_struct fmpz_mpoly_vec_t[1];
+
+typedef struct
+{
     fmpz_t constant;
     fmpz_t constant_den;        /* should be one after normal operations */
     fmpz_mpoly_struct * poly;

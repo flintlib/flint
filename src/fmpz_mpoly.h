@@ -942,16 +942,6 @@ void fmpz_mpoly_symmetric(fmpz_mpoly_t res, ulong k, const fmpz_mpoly_ctx_t ctx)
 
 /* Vectors of multivariate polynomials */
 
-typedef struct
-{
-    fmpz_mpoly_struct * p;
-    slong alloc;
-    slong length;
-}
-fmpz_mpoly_vec_struct;
-
-typedef fmpz_mpoly_vec_struct fmpz_mpoly_vec_t[1];
-
 #define fmpz_mpoly_vec_entry(vec, i) ((vec)->p + (i))
 
 void fmpz_mpoly_vec_init(fmpz_mpoly_vec_t vec, slong len, const fmpz_mpoly_ctx_t ctx);
