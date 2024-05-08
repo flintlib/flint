@@ -21,7 +21,7 @@
 #include "nf_elem.h"
 #include "qqbar.h"
 #include "fmpz_mpoly.h"
-#include "fexpr.h"
+/* #include "fexpr.h" */
 #include "ca_types.h"
 
 #ifdef __cplusplus
