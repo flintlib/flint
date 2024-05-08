@@ -74,7 +74,7 @@ void gr_stream_write_fmpz(gr_stream_t out, const fmpz_t x);
 #define GR_UNABLE 2
 #define GR_TEST_FAIL 4
 
-#define WARN_UNUSED_RESULT __attribute__((warn_unused_result))
+#define FLINT_WARN_UNUSED __attribute__((warn_unused_result))
 
 #define GR_MUST_SUCCEED(expr) do { if ((expr) != GR_SUCCESS) { flint_throw(FLINT_ERROR, "GR_MUST_SUCCEED failure: %s", __FILE__); } } while (0)
 #define GR_IGNORE(expr) do { int ___unused = (expr); (void) ___unused; } while (0)
@@ -912,12 +912,12 @@ GR_INLINE truth_t gr_ctx_is_canonical(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ct
 GR_INLINE truth_t gr_ctx_is_threadsafe(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_IS_THREADSAFE)(ctx); }
 
 GR_INLINE truth_t gr_ctx_has_real_prec(gr_ctx_t ctx) { return GR_CTX_PREDICATE(ctx, CTX_HAS_REAL_PREC)(ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_ctx_set_real_prec(gr_ctx_t ctx, slong prec) { return GR_CTX_SET_SI(ctx, CTX_SET_REAL_PREC)(ctx, prec); }
-GR_INLINE WARN_UNUSED_RESULT int gr_ctx_get_real_prec(slong * prec, gr_ctx_t ctx) { return GR_CTX_GET_SI(ctx, CTX_GET_REAL_PREC)(prec, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_ctx_set_real_prec(gr_ctx_t ctx, slong prec) { return GR_CTX_SET_SI(ctx, CTX_SET_REAL_PREC)(ctx, prec); }
+GR_INLINE FLINT_WARN_UNUSED int gr_ctx_get_real_prec(slong * prec, gr_ctx_t ctx) { return GR_CTX_GET_SI(ctx, CTX_GET_REAL_PREC)(prec, ctx); }
 
-GR_INLINE WARN_UNUSED_RESULT int gr_ctx_set_is_field(gr_ctx_t ctx, truth_t is_field) { return GR_CTX_SET_TRUTH(ctx, CTX_SET_IS_FIELD)(ctx, is_field); }
-GR_INLINE WARN_UNUSED_RESULT int gr_ctx_set_gen_name(gr_ctx_t ctx, const char * s) { return GR_CTX_SET_STR(ctx, CTX_SET_GEN_NAME)(ctx, s); }
-GR_INLINE WARN_UNUSED_RESULT int gr_ctx_set_gen_names(gr_ctx_t ctx, const char ** s) { return GR_CTX_SET_STRS(ctx, CTX_SET_GEN_NAMES)(ctx, s); }
+GR_INLINE FLINT_WARN_UNUSED int gr_ctx_set_is_field(gr_ctx_t ctx, truth_t is_field) { return GR_CTX_SET_TRUTH(ctx, CTX_SET_IS_FIELD)(ctx, is_field); }
+GR_INLINE FLINT_WARN_UNUSED int gr_ctx_set_gen_name(gr_ctx_t ctx, const char * s) { return GR_CTX_SET_STR(ctx, CTX_SET_GEN_NAME)(ctx, s); }
+GR_INLINE FLINT_WARN_UNUSED int gr_ctx_set_gen_names(gr_ctx_t ctx, const char ** s) { return GR_CTX_SET_STRS(ctx, CTX_SET_GEN_NAMES)(ctx, s); }
 
 GR_INLINE slong _gr_ctx_get_real_prec(gr_ctx_t ctx)
 {
@@ -933,37 +933,37 @@ GR_INLINE void gr_set_shallow(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { GR_VOID_U
 
 GR_INLINE void _gr_length(gr_srcptr x, gr_ctx_t ctx) { _GR_GET_SI_OP(ctx, LENGTH)(x, ctx); }
 
-GR_INLINE WARN_UNUSED_RESULT int gr_randtest(gr_ptr x, flint_rand_t state, gr_ctx_t ctx) { return GR_RANDTEST(ctx, RANDTEST)(x, state, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_randtest_not_zero(gr_ptr x, flint_rand_t state, gr_ctx_t ctx) { return GR_RANDTEST(ctx, RANDTEST_NOT_ZERO)(x, state, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_randtest_small(gr_ptr x, flint_rand_t state, gr_ctx_t ctx) { return GR_RANDTEST(ctx, RANDTEST_SMALL)(x, state, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_randtest(gr_ptr x, flint_rand_t state, gr_ctx_t ctx) { return GR_RANDTEST(ctx, RANDTEST)(x, state, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_randtest_not_zero(gr_ptr x, flint_rand_t state, gr_ctx_t ctx) { return GR_RANDTEST(ctx, RANDTEST_NOT_ZERO)(x, state, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_randtest_small(gr_ptr x, flint_rand_t state, gr_ctx_t ctx) { return GR_RANDTEST(ctx, RANDTEST_SMALL)(x, state, ctx); }
 GR_INLINE /* todo: warn? */ int gr_write(gr_stream_t out, gr_srcptr x, gr_ctx_t ctx) { return GR_STREAM_IN(ctx, WRITE)(out, x, ctx); }
 GR_INLINE /* todo: warn? */ int gr_write_n(gr_stream_t out, gr_srcptr x, slong n, gr_ctx_t ctx) { return GR_STREAM_IN_SI(ctx, WRITE_N)(out, x, n, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_zero(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, ZERO)(res, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_one(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, ONE)(res, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_neg_one(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, NEG_ONE)(res, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_zero(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, ZERO)(res, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_one(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, ONE)(res, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_neg_one(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, NEG_ONE)(res, ctx); }
 
-GR_INLINE WARN_UNUSED_RESULT int gr_set(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, SET)(res, x, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_set_si(gr_ptr res, slong x, gr_ctx_t ctx) { return GR_UNARY_OP_SI(ctx, SET_SI)(res, x, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_set_ui(gr_ptr res, ulong x, gr_ctx_t ctx) { return GR_UNARY_OP_SI(ctx, SET_UI)(res, x, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_set_fmpz(gr_ptr res, const fmpz_t x, gr_ctx_t ctx) { return GR_UNARY_OP_FMPZ(ctx, SET_FMPZ)(res, x, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_set_fmpq(gr_ptr res, const fmpq_t x, gr_ctx_t ctx) { return GR_UNARY_OP_FMPQ(ctx, SET_FMPQ)(res, x, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_set_d(gr_ptr res, double x, gr_ctx_t ctx) { return GR_UNARY_OP_D(ctx, SET_D)(res, x, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_set_other(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx) { return GR_UNARY_OP_OTHER(ctx, SET_OTHER)(res, x, x_ctx, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_set_str(gr_ptr res, const char * x, gr_ctx_t ctx) { return GR_UNARY_OP_STR(ctx, SET_STR)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_set(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, SET)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_set_si(gr_ptr res, slong x, gr_ctx_t ctx) { return GR_UNARY_OP_SI(ctx, SET_SI)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_set_ui(gr_ptr res, ulong x, gr_ctx_t ctx) { return GR_UNARY_OP_SI(ctx, SET_UI)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_set_fmpz(gr_ptr res, const fmpz_t x, gr_ctx_t ctx) { return GR_UNARY_OP_FMPZ(ctx, SET_FMPZ)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_set_fmpq(gr_ptr res, const fmpq_t x, gr_ctx_t ctx) { return GR_UNARY_OP_FMPQ(ctx, SET_FMPQ)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_set_d(gr_ptr res, double x, gr_ctx_t ctx) { return GR_UNARY_OP_D(ctx, SET_D)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_set_other(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx) { return GR_UNARY_OP_OTHER(ctx, SET_OTHER)(res, x, x_ctx, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_set_str(gr_ptr res, const char * x, gr_ctx_t ctx) { return GR_UNARY_OP_STR(ctx, SET_STR)(res, x, ctx); }
 
-GR_INLINE WARN_UNUSED_RESULT int gr_get_si(slong * res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP_GET_SI(ctx, GET_SI)(res, x, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_get_ui(ulong * res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP_GET_UI(ctx, GET_UI)(res, x, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_get_fmpz(fmpz_t res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP_GET_FMPZ(ctx, GET_FMPZ)(res, x, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_get_fmpq(fmpq_t res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP_GET_FMPQ(ctx, GET_FMPQ)(res, x, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_get_d(double * res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP_GET_D(ctx, GET_D)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_get_si(slong * res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP_GET_SI(ctx, GET_SI)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_get_ui(ulong * res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP_GET_UI(ctx, GET_UI)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_get_fmpz(fmpz_t res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP_GET_FMPZ(ctx, GET_FMPZ)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_get_fmpq(fmpq_t res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP_GET_FMPQ(ctx, GET_FMPQ)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_get_d(double * res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP_GET_D(ctx, GET_D)(res, x, ctx); }
 
 #define GR_FEXPR_SERIALIZE (UWORD(1) << 31)
 #define GR_FEXPR_COMPACT (UWORD(1) << 30)
 
 #ifdef FEXPR_H
-GR_INLINE WARN_UNUSED_RESULT int gr_get_fexpr(fexpr_t res, gr_srcptr x, gr_ctx_t ctx) { return GR_GET_FEXPR_OP(ctx, GET_FEXPR)(res, x, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_get_fexpr_serialize(fexpr_t res, gr_srcptr x, gr_ctx_t ctx) { return GR_GET_FEXPR_OP(ctx, GET_FEXPR_SERIALIZE)(res, x, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_set_fexpr(gr_ptr res, fexpr_vec_t inputs, gr_vec_t outputs, const fexpr_t x, gr_ctx_t ctx) { return GR_SET_FEXPR_OP(ctx, SET_FEXPR)(res, inputs, outputs, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_get_fexpr(fexpr_t res, gr_srcptr x, gr_ctx_t ctx) { return GR_GET_FEXPR_OP(ctx, GET_FEXPR)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_get_fexpr_serialize(fexpr_t res, gr_srcptr x, gr_ctx_t ctx) { return GR_GET_FEXPR_OP(ctx, GET_FEXPR_SERIALIZE)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_set_fexpr(gr_ptr res, fexpr_vec_t inputs, gr_vec_t outputs, const fexpr_t x, gr_ctx_t ctx) { return GR_SET_FEXPR_OP(ctx, SET_FEXPR)(res, inputs, outputs, x, ctx); }
 #endif
 
 GR_INLINE truth_t gr_is_zero(gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_PREDICATE(ctx, IS_ZERO)(x, ctx); }
@@ -973,141 +973,141 @@ GR_INLINE truth_t gr_is_neg_one(gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_PRE
 GR_INLINE truth_t gr_equal(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_PREDICATE(ctx, EQUAL)(x, y, ctx); }
 GR_INLINE truth_t gr_not_equal(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return truth_not(GR_BINARY_PREDICATE(ctx, EQUAL)(x, y, ctx)); }
 
-GR_INLINE WARN_UNUSED_RESULT int gr_neg(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, NEG)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_neg(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, NEG)(res, x, ctx); }
 
-GR_INLINE WARN_UNUSED_RESULT int gr_add(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, ADD)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_add_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx) { return GR_BINARY_OP_UI(ctx, ADD_UI)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_add_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx) { return GR_BINARY_OP_SI(ctx, ADD_SI)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_add_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ(ctx, ADD_FMPZ)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_add_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPQ(ctx, ADD_FMPQ)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_add_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx) { return GR_BINARY_OP_OTHER(ctx, ADD_OTHER)(res, x, y, y_ctx, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_other_add(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, gr_ctx_t ctx) { return GR_OTHER_BINARY_OP(ctx, OTHER_ADD)(res, x, x_ctx, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_add(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, ADD)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_add_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx) { return GR_BINARY_OP_UI(ctx, ADD_UI)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_add_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx) { return GR_BINARY_OP_SI(ctx, ADD_SI)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_add_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ(ctx, ADD_FMPZ)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_add_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPQ(ctx, ADD_FMPQ)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_add_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx) { return GR_BINARY_OP_OTHER(ctx, ADD_OTHER)(res, x, y, y_ctx, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_other_add(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, gr_ctx_t ctx) { return GR_OTHER_BINARY_OP(ctx, OTHER_ADD)(res, x, x_ctx, y, ctx); }
 
-GR_INLINE WARN_UNUSED_RESULT int gr_sub(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, SUB)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_sub_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx) { return GR_BINARY_OP_UI(ctx, SUB_UI)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_sub_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx) { return GR_BINARY_OP_SI(ctx, SUB_SI)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_sub_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ(ctx, SUB_FMPZ)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_sub_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPQ(ctx, SUB_FMPQ)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_sub_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx) { return GR_BINARY_OP_OTHER(ctx, SUB_OTHER)(res, x, y, y_ctx, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_other_sub(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, gr_ctx_t ctx) { return GR_OTHER_BINARY_OP(ctx, OTHER_SUB)(res, x, x_ctx, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_sub(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, SUB)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_sub_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx) { return GR_BINARY_OP_UI(ctx, SUB_UI)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_sub_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx) { return GR_BINARY_OP_SI(ctx, SUB_SI)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_sub_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ(ctx, SUB_FMPZ)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_sub_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPQ(ctx, SUB_FMPQ)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_sub_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx) { return GR_BINARY_OP_OTHER(ctx, SUB_OTHER)(res, x, y, y_ctx, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_other_sub(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, gr_ctx_t ctx) { return GR_OTHER_BINARY_OP(ctx, OTHER_SUB)(res, x, x_ctx, y, ctx); }
 
-GR_INLINE WARN_UNUSED_RESULT int gr_mul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, MUL)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_mul_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx) { return GR_BINARY_OP_UI(ctx, MUL_UI)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_mul_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx) { return GR_BINARY_OP_SI(ctx, MUL_SI)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_mul_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ(ctx, MUL_FMPZ)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_mul_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPQ(ctx, MUL_FMPQ)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_mul_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx) { return GR_BINARY_OP_OTHER(ctx, MUL_OTHER)(res, x, y, y_ctx, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_other_mul(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, gr_ctx_t ctx) { return GR_OTHER_BINARY_OP(ctx, OTHER_MUL)(res, x, x_ctx, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_mul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, MUL)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_mul_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx) { return GR_BINARY_OP_UI(ctx, MUL_UI)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_mul_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx) { return GR_BINARY_OP_SI(ctx, MUL_SI)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_mul_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ(ctx, MUL_FMPZ)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_mul_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPQ(ctx, MUL_FMPQ)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_mul_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx) { return GR_BINARY_OP_OTHER(ctx, MUL_OTHER)(res, x, y, y_ctx, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_other_mul(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, gr_ctx_t ctx) { return GR_OTHER_BINARY_OP(ctx, OTHER_MUL)(res, x, x_ctx, y, ctx); }
 
-GR_INLINE WARN_UNUSED_RESULT int gr_addmul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, ADDMUL)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_addmul_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx) { return GR_BINARY_OP_UI(ctx, ADDMUL_UI)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_addmul_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx) { return GR_BINARY_OP_SI(ctx, ADDMUL_SI)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_addmul_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ(ctx, ADDMUL_FMPZ)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_addmul_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPQ(ctx, ADDMUL_FMPQ)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_addmul_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx) { return GR_BINARY_OP_OTHER(ctx, ADDMUL_OTHER)(res, x, y, y_ctx, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_addmul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, ADDMUL)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_addmul_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx) { return GR_BINARY_OP_UI(ctx, ADDMUL_UI)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_addmul_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx) { return GR_BINARY_OP_SI(ctx, ADDMUL_SI)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_addmul_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ(ctx, ADDMUL_FMPZ)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_addmul_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPQ(ctx, ADDMUL_FMPQ)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_addmul_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx) { return GR_BINARY_OP_OTHER(ctx, ADDMUL_OTHER)(res, x, y, y_ctx, ctx); }
 
-GR_INLINE WARN_UNUSED_RESULT int gr_submul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, SUBMUL)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_submul_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx) { return GR_BINARY_OP_UI(ctx, SUBMUL_UI)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_submul_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx) { return GR_BINARY_OP_SI(ctx, SUBMUL_SI)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_submul_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ(ctx, SUBMUL_FMPZ)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_submul_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPQ(ctx, SUBMUL_FMPQ)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_submul_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx) { return GR_BINARY_OP_OTHER(ctx, SUBMUL_OTHER)(res, x, y, y_ctx, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_submul(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, SUBMUL)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_submul_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx) { return GR_BINARY_OP_UI(ctx, SUBMUL_UI)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_submul_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx) { return GR_BINARY_OP_SI(ctx, SUBMUL_SI)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_submul_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ(ctx, SUBMUL_FMPZ)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_submul_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPQ(ctx, SUBMUL_FMPQ)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_submul_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx) { return GR_BINARY_OP_OTHER(ctx, SUBMUL_OTHER)(res, x, y, y_ctx, ctx); }
 
-GR_INLINE WARN_UNUSED_RESULT int gr_mul_two(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, MUL_TWO)(res, x, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_sqr(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, SQR)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_mul_two(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, MUL_TWO)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_sqr(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, SQR)(res, x, ctx); }
 
-GR_INLINE WARN_UNUSED_RESULT int gr_mul_2exp_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx) { return GR_BINARY_OP_SI(ctx, MUL_2EXP_SI)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_mul_2exp_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ(ctx, MUL_2EXP_FMPZ)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_set_fmpz_2exp_fmpz(gr_ptr res, const fmpz_t x, const fmpz_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ_FMPZ(ctx, SET_FMPZ_2EXP_FMPZ)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_get_fmpz_2exp_fmpz(fmpz_t res1, fmpz_t res2, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP_GET_FMPZ_FMPZ(ctx, GET_FMPZ_2EXP_FMPZ)(res1, res2, x, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_set_fmpz_10exp_fmpz(gr_ptr res, const fmpz_t x, const fmpz_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ_FMPZ(ctx, SET_FMPZ_10EXP_FMPZ)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_mul_2exp_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx) { return GR_BINARY_OP_SI(ctx, MUL_2EXP_SI)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_mul_2exp_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ(ctx, MUL_2EXP_FMPZ)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_set_fmpz_2exp_fmpz(gr_ptr res, const fmpz_t x, const fmpz_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ_FMPZ(ctx, SET_FMPZ_2EXP_FMPZ)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_get_fmpz_2exp_fmpz(fmpz_t res1, fmpz_t res2, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP_GET_FMPZ_FMPZ(ctx, GET_FMPZ_2EXP_FMPZ)(res1, res2, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_set_fmpz_10exp_fmpz(gr_ptr res, const fmpz_t x, const fmpz_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ_FMPZ(ctx, SET_FMPZ_10EXP_FMPZ)(res, x, y, ctx); }
 
-GR_INLINE WARN_UNUSED_RESULT int gr_inv(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, INV)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_inv(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, INV)(res, x, ctx); }
 GR_INLINE truth_t gr_is_invertible(gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_PREDICATE(ctx, IS_INVERTIBLE)(x, ctx); }
 
-GR_INLINE WARN_UNUSED_RESULT int gr_div(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, DIV)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_div_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx) { return GR_BINARY_OP_UI(ctx, DIV_UI)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_div_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx) { return GR_BINARY_OP_SI(ctx, DIV_SI)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_div_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ(ctx, DIV_FMPZ)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_div_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPQ(ctx, DIV_FMPQ)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_div_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx) { return GR_BINARY_OP_OTHER(ctx, DIV_OTHER)(res, x, y, y_ctx, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_other_div(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, gr_ctx_t ctx) { return GR_OTHER_BINARY_OP(ctx, OTHER_DIV)(res, x, x_ctx, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_div(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, DIV)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_div_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx) { return GR_BINARY_OP_UI(ctx, DIV_UI)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_div_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx) { return GR_BINARY_OP_SI(ctx, DIV_SI)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_div_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ(ctx, DIV_FMPZ)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_div_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPQ(ctx, DIV_FMPQ)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_div_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx) { return GR_BINARY_OP_OTHER(ctx, DIV_OTHER)(res, x, y, y_ctx, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_other_div(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, gr_ctx_t ctx) { return GR_OTHER_BINARY_OP(ctx, OTHER_DIV)(res, x, x_ctx, y, ctx); }
 
-GR_INLINE WARN_UNUSED_RESULT int gr_div_nonunique(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, DIV_NONUNIQUE)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_div_nonunique(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, DIV_NONUNIQUE)(res, x, y, ctx); }
 GR_INLINE truth_t gr_divides(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_PREDICATE(ctx, DIVIDES)(x, y, ctx); }
 
-GR_INLINE WARN_UNUSED_RESULT int gr_divexact(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, DIVEXACT)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_divexact_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx) { return GR_BINARY_OP_UI(ctx, DIVEXACT_UI)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_divexact_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx) { return GR_BINARY_OP_SI(ctx, DIVEXACT_SI)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_divexact_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ(ctx, DIVEXACT_FMPZ)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_divexact_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPQ(ctx, DIVEXACT_FMPQ)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_divexact_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx) { return GR_BINARY_OP_OTHER(ctx, DIVEXACT_OTHER)(res, x, y, y_ctx, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_other_divexact(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, gr_ctx_t ctx) { return GR_OTHER_BINARY_OP(ctx, OTHER_DIVEXACT)(res, x, x_ctx, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_divexact(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, DIVEXACT)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_divexact_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx) { return GR_BINARY_OP_UI(ctx, DIVEXACT_UI)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_divexact_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx) { return GR_BINARY_OP_SI(ctx, DIVEXACT_SI)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_divexact_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ(ctx, DIVEXACT_FMPZ)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_divexact_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPQ(ctx, DIVEXACT_FMPQ)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_divexact_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx) { return GR_BINARY_OP_OTHER(ctx, DIVEXACT_OTHER)(res, x, y, y_ctx, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_other_divexact(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, gr_ctx_t ctx) { return GR_OTHER_BINARY_OP(ctx, OTHER_DIVEXACT)(res, x, x_ctx, y, ctx); }
 
-GR_INLINE WARN_UNUSED_RESULT int gr_euclidean_div(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, EUCLIDEAN_DIV)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_euclidean_rem(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, EUCLIDEAN_REM)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_euclidean_divrem(gr_ptr res1, gr_ptr res2, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_BINARY_OP(ctx, EUCLIDEAN_DIVREM)(res1, res2, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_gcd(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, GCD)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_lcm(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, LCM)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_euclidean_div(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, EUCLIDEAN_DIV)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_euclidean_rem(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, EUCLIDEAN_REM)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_euclidean_divrem(gr_ptr res1, gr_ptr res2, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_BINARY_OP(ctx, EUCLIDEAN_DIVREM)(res1, res2, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_gcd(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, GCD)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_lcm(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, LCM)(res, x, y, ctx); }
 
-GR_INLINE WARN_UNUSED_RESULT int gr_numerator(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, NUMERATOR)(res, x, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_denominator(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, DENOMINATOR)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_numerator(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, NUMERATOR)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_denominator(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, DENOMINATOR)(res, x, ctx); }
 
-GR_INLINE WARN_UNUSED_RESULT int gr_factor(gr_ptr c, gr_vec_t factors, gr_vec_t exponents, gr_srcptr x, int flags, gr_ctx_t ctx) { return GR_FACTOR_OP(ctx, FACTOR)(c, factors, exponents, x, flags, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_factor(gr_ptr c, gr_vec_t factors, gr_vec_t exponents, gr_srcptr x, int flags, gr_ctx_t ctx) { return GR_FACTOR_OP(ctx, FACTOR)(c, factors, exponents, x, flags, ctx); }
 
-GR_INLINE WARN_UNUSED_RESULT int gr_pow(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, POW)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_pow_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx) { return GR_BINARY_OP_UI(ctx, POW_UI)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_pow_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx) { return GR_BINARY_OP_SI(ctx, POW_SI)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_pow_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ(ctx, POW_FMPZ)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_pow_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPQ(ctx, POW_FMPQ)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_pow_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx) { return GR_BINARY_OP_OTHER(ctx, POW_OTHER)(res, x, y, y_ctx, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_other_pow(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, gr_ctx_t ctx) { return GR_OTHER_BINARY_OP(ctx, OTHER_POW)(res, x, x_ctx, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_pow(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, POW)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_pow_ui(gr_ptr res, gr_srcptr x, ulong y, gr_ctx_t ctx) { return GR_BINARY_OP_UI(ctx, POW_UI)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_pow_si(gr_ptr res, gr_srcptr x, slong y, gr_ctx_t ctx) { return GR_BINARY_OP_SI(ctx, POW_SI)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_pow_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPZ(ctx, POW_FMPZ)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_pow_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx) { return GR_BINARY_OP_FMPQ(ctx, POW_FMPQ)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_pow_other(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx) { return GR_BINARY_OP_OTHER(ctx, POW_OTHER)(res, x, y, y_ctx, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_other_pow(gr_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_srcptr y, gr_ctx_t ctx) { return GR_OTHER_BINARY_OP(ctx, OTHER_POW)(res, x, x_ctx, y, ctx); }
 
-GR_INLINE WARN_UNUSED_RESULT int gr_sqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, SQRT)(res, x, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_rsqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, RSQRT)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_sqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, SQRT)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_rsqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, RSQRT)(res, x, ctx); }
 GR_INLINE truth_t gr_is_square(gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_PREDICATE(ctx, IS_SQUARE)(x, ctx); }
 
-GR_INLINE WARN_UNUSED_RESULT int gr_floor(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, FLOOR)(res, x, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_ceil(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, CEIL)(res, x, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_trunc(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, TRUNC)(res, x, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_nint(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, NINT)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_floor(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, FLOOR)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_ceil(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, CEIL)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_trunc(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, TRUNC)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_nint(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, NINT)(res, x, ctx); }
 
-GR_INLINE WARN_UNUSED_RESULT int gr_abs(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, ABS)(res, x, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_i(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, I)(res, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_conj(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, CONJ)(res, x, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_re(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, RE)(res, x, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_im(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, IM)(res, x, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_sgn(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, SGN)(res, x, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_csgn(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, CSGN)(res, x, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_arg(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, ARG)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_abs(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, ABS)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_i(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, I)(res, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_conj(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, CONJ)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_re(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, RE)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_im(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, IM)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_sgn(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, SGN)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_csgn(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, CSGN)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_arg(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, ARG)(res, x, ctx); }
 
-GR_INLINE WARN_UNUSED_RESULT int gr_pos_inf(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, POS_INF)(res, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_neg_inf(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, NEG_INF)(res, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_uinf(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, UINF)(res, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_undefined(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, UNDEFINED)(res, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_unknown(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, UNKNOWN)(res, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_pos_inf(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, POS_INF)(res, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_neg_inf(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, NEG_INF)(res, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_uinf(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, UINF)(res, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_undefined(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, UNDEFINED)(res, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_unknown(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, UNKNOWN)(res, ctx); }
 
-GR_INLINE WARN_UNUSED_RESULT int gr_cmp(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP_GET_INT(ctx, CMP)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_cmpabs(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP_GET_INT(ctx, CMPABS)(res, x, y, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_cmp_other(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx) { return GR_BINARY_OP_OTHER_GET_INT(ctx, CMP_OTHER)(res, x, y, y_ctx, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_cmpabs_other(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx) { return GR_BINARY_OP_OTHER_GET_INT(ctx, CMPABS_OTHER)(res, x, y, y_ctx, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_cmp(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP_GET_INT(ctx, CMP)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_cmpabs(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP_GET_INT(ctx, CMPABS)(res, x, y, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_cmp_other(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx) { return GR_BINARY_OP_OTHER_GET_INT(ctx, CMP_OTHER)(res, x, y, y_ctx, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_cmpabs_other(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx) { return GR_BINARY_OP_OTHER_GET_INT(ctx, CMPABS_OTHER)(res, x, y, y_ctx, ctx); }
 
-GR_INLINE WARN_UNUSED_RESULT int gr_gen(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, GEN)(res, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_gens(gr_vec_t res, gr_ctx_t ctx) { return GR_VEC_CTX_OP(ctx, GENS)(res, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_gens_recursive(gr_vec_t res, gr_ctx_t ctx) { return GR_VEC_CTX_OP(ctx, GENS_RECURSIVE)(res, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_gen(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, GEN)(res, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_gens(gr_vec_t res, gr_ctx_t ctx) { return GR_VEC_CTX_OP(ctx, GENS)(res, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_gens_recursive(gr_vec_t res, gr_ctx_t ctx) { return GR_VEC_CTX_OP(ctx, GENS_RECURSIVE)(res, ctx); }
 
-GR_INLINE WARN_UNUSED_RESULT int gr_ctx_fq_prime(fmpz_t res, gr_ctx_t ctx) { return GR_CONSTANT_OP_GET_FMPZ(ctx, CTX_FQ_PRIME)(res, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_ctx_fq_degree(slong * res, gr_ctx_t ctx) { return GR_CONSTANT_OP_GET_SI(ctx, CTX_FQ_DEGREE)(res, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_ctx_fq_order(fmpz_t res, gr_ctx_t ctx) { return GR_CONSTANT_OP_GET_FMPZ(ctx, CTX_FQ_ORDER)(res, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_ctx_fq_prime(fmpz_t res, gr_ctx_t ctx) { return GR_CONSTANT_OP_GET_FMPZ(ctx, CTX_FQ_PRIME)(res, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_ctx_fq_degree(slong * res, gr_ctx_t ctx) { return GR_CONSTANT_OP_GET_SI(ctx, CTX_FQ_DEGREE)(res, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_ctx_fq_order(fmpz_t res, gr_ctx_t ctx) { return GR_CONSTANT_OP_GET_FMPZ(ctx, CTX_FQ_ORDER)(res, ctx); }
 
-GR_INLINE WARN_UNUSED_RESULT int gr_fq_frobenius(gr_ptr res, gr_srcptr x, slong e, gr_ctx_t ctx) { return GR_BINARY_OP_SI(ctx, FQ_FROBENIUS)(res, x, e, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_fq_multiplicative_order(fmpz_t res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP_GET_FMPZ(ctx, FQ_MULTIPLICATIVE_ORDER)(res, x, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_fq_norm(fmpz_t res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP_GET_FMPZ(ctx, FQ_NORM)(res, x, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_fq_trace(fmpz_t res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP_GET_FMPZ(ctx, FQ_TRACE)(res, x, ctx); }
-GR_INLINE WARN_UNUSED_RESULT truth_t gr_fq_is_primitive(gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_PREDICATE(ctx, FQ_IS_PRIMITIVE)(x, ctx); }
-GR_INLINE WARN_UNUSED_RESULT int gr_fq_pth_root(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, FQ_PTH_ROOT)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_fq_frobenius(gr_ptr res, gr_srcptr x, slong e, gr_ctx_t ctx) { return GR_BINARY_OP_SI(ctx, FQ_FROBENIUS)(res, x, e, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_fq_multiplicative_order(fmpz_t res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP_GET_FMPZ(ctx, FQ_MULTIPLICATIVE_ORDER)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_fq_norm(fmpz_t res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP_GET_FMPZ(ctx, FQ_NORM)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_fq_trace(fmpz_t res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP_GET_FMPZ(ctx, FQ_TRACE)(res, x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED truth_t gr_fq_is_primitive(gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_PREDICATE(ctx, FQ_IS_PRIMITIVE)(x, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_fq_pth_root(gr_ptr res, gr_srcptr x, gr_ctx_t ctx) { return GR_UNARY_OP(ctx, FQ_PTH_ROOT)(res, x, ctx); }
 
-GR_INLINE WARN_UNUSED_RESULT int gr_set_interval_mid_rad(gr_ptr res, gr_srcptr m, gr_srcptr r, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, SET_INTERVAL_MID_RAD)(res, m, r, ctx); }
+GR_INLINE FLINT_WARN_UNUSED int gr_set_interval_mid_rad(gr_ptr res, gr_srcptr m, gr_srcptr r, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, SET_INTERVAL_MID_RAD)(res, m, r, ctx); }
 
 GR_INLINE void _gr_vec_init(gr_ptr vec, slong len, gr_ctx_t ctx) { GR_VEC_INIT_CLEAR_OP(ctx, VEC_INIT)(vec, len, ctx); }
 GR_INLINE void _gr_vec_clear(gr_ptr vec, slong len, gr_ctx_t ctx) { GR_VEC_INIT_CLEAR_OP(ctx, VEC_CLEAR)(vec, len, ctx); }

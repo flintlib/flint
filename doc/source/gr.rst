@@ -168,7 +168,7 @@ When the status code is any other value than ``GR_SUCCESS``, any
 output variables may be set to meaningless values.
 
 C functions that return a status code are marked with the
-``WARN_UNUSED_RESULT`` attribute. This allows compilers to
+``FLINT_WARN_UNUSED`` attribute. This allows compilers to
 emit warnings when the status code is ignored.
 
 Flags can be OR'ed and checked only at the top level of a computation
