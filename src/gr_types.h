@@ -18,6 +18,13 @@
 extern "C" {
 #endif
 
+/* constants *****************************************************************/
+
+#define GR_SUCCESS 0
+#define GR_DOMAIN 1
+#define GR_UNABLE 2
+#define GR_TEST_FAIL 4
+
 /* truth *********************************************************************/
 
 typedef enum
