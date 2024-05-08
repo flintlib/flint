@@ -22,19 +22,8 @@
 #include "gr_poly.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
-
-typedef struct
-{
-    gr_ptr entries;
-    slong r;
-    slong c;
-    gr_ptr * rows;
-}
-gr_mat_struct;
-
-typedef gr_mat_struct gr_mat_t[1];
 
 #define GR_MAT_ENTRY(mat,i,j,sz) GR_ENTRY((mat)->rows[i], j, sz)
 #define gr_mat_nrows(mat, ctx) ((mat)->r)

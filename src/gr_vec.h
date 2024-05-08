@@ -21,7 +21,7 @@
 #include "gr.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 void gr_vec_init(gr_vec_t vec, slong len, gr_ctx_t ctx);

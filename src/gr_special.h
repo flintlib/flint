@@ -21,7 +21,7 @@
 #include "gr.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 #define GR_SPECIAL_DEF GR_SPECIAL_INLINE WARN_UNUSED_RESULT

@@ -24,22 +24,8 @@
 #include "gr_vec.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
-
-typedef struct
-{
-    gr_ptr coeffs;
-    ulong * exps;
-    slong length;
-    flint_bitcnt_t bits;    /* number of bits per exponent */
-    slong coeffs_alloc;     /* abs size in mp_limb_t units */
-    slong exps_alloc;       /* abs size in ulong units */
-}
-gr_mpoly_struct;
-
-typedef gr_mpoly_struct gr_mpoly_t[1];
-
 
 /* Memory management */
 

@@ -116,7 +116,18 @@ typedef struct
 }
 vector_ctx_t;
 
-/* matrix context ************************************************************/
+/* matrices ******************************************************************/
+
+typedef struct
+{
+    gr_ptr entries;
+    slong r;
+    slong c;
+    gr_ptr * rows;
+}
+gr_mat_struct;
+
+typedef gr_mat_struct gr_mat_t[1];
 
 typedef struct
 {
@@ -127,7 +138,18 @@ typedef struct
 }
 matrix_ctx_t;
 
-/* polynomial context ********************************************************/
+/* polynomials ***************************************************************/
+
+/* fixme: compatible with flint polys but not with arb, ... */
+typedef struct
+{
+    gr_ptr coeffs;
+    slong alloc;
+    slong length;
+}
+gr_poly_struct;
+
+typedef gr_poly_struct gr_poly_t[1];
 
 typedef struct
 {
@@ -162,6 +184,21 @@ typedef struct
     char * var;
 }
 series_ctx_t;
+
+/* multivariate polynomials **************************************************/
+
+typedef struct
+{
+    gr_ptr coeffs;
+    ulong * exps;
+    slong length;
+    flint_bitcnt_t bits;    /* number of bits per exponent */
+    slong coeffs_alloc;     /* abs size in mp_limb_t units */
+    slong exps_alloc;       /* abs size in ulong units */
+}
+gr_mpoly_struct;
+
+typedef gr_mpoly_struct gr_mpoly_t[1];
 
 #ifdef __cplusplus
 }

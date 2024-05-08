@@ -22,7 +22,7 @@
 #include "gr.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 #define GR_GENERIC_DEBUG_RINGS 0
