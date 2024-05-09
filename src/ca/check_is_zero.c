@@ -9,6 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "acb.h"
+#include "fmpz_mpoly_q.h"
+#include "nf_elem.h"
+#include "qqbar.h"
+#include "calcium.h"
 #include "ca.h"
 
 truth_t

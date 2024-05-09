@@ -10,6 +10,10 @@
 */
 
 #include "fmpz_factor.h"
+#include "fmpz_poly.h"
+#include "acb.h"
+#include "qqbar.h"
+#include "nf_elem.h"
 #include "ca.h"
 #include "ca_ext.h"
 #include "ca_field.h"

@@ -10,7 +10,6 @@
 */
 
 #include "ca.h"
-#include "ca_field.h"
 
 truth_t
 ca_check_is_pos_i_inf(const ca_t x, ca_ctx_t ctx)

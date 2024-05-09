@@ -10,6 +10,12 @@
 */
 
 #include <stdio.h>
+#include "fmpz_poly.h"
+#include "fmpz_mpoly_q.h"
+#include "acb.h"
+#include "nf_elem.h"
+#include "qqbar.h"
+#include "calcium.h"
 #include "ca.h"
 #include "ca_ext.h"
 #include "ca_field.h"

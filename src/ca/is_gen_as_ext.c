@@ -9,6 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mpoly_q.h"
+#include "nf_elem.h"
 #include "ca.h"
 
 ca_ext_ptr

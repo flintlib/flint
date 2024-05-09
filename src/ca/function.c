@@ -9,8 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "ca.h"
 #include "fmpz_mpoly_q.h"
+#include "ca.h"
 
 void _ca_function_fx(ca_t res, calcium_func_code func, const ca_t x, ca_ctx_t ctx)
 {

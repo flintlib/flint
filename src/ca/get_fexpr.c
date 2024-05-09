@@ -9,12 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nf_elem.h"
+#include "qqbar.h"
 #include "fexpr.h"
 #include "fexpr_builtin.h"
 #include "ca.h"
-#include "ca_ext.h"
-#include "fexpr.h"
-#include "fexpr_builtin.h"
 
 void
 _fexpr_set_fmpz_poly_decreasing(fexpr_t res, const fmpz * coeffs, slong len, const fexpr_t var)

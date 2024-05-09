@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "qqbar.h"
 #include "ca.h"
 #include "ca_ext.h"
 #include "ca_field.h"

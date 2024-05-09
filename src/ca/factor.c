@@ -11,6 +11,7 @@
 
 #include "fmpz_factor.h"
 #include "fmpz_mpoly_factor.h"
+#include "fmpz_mpoly_q.h"
 #include "ca.h"
 
 #define HAVE_MPOLY_FAC 1

@@ -9,8 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mpoly_q.h"
+#include "nf_elem.h"
+#include "qqbar.h"
 #include "ca.h"
-#include "ca_ext.h"
 
 int
 ca_get_qqbar(qqbar_t res, const ca_t x, ca_ctx_t ctx)

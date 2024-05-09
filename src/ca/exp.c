@@ -9,6 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mpoly_q.h"
+#include "qqbar.h"
 #include "ca.h"
 
 int ca_as_fmpq_pi_i(fmpq_t res, const ca_t x, ca_ctx_t ctx)

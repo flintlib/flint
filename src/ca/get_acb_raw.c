@@ -9,7 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mpoly_q.h"
+#include "acb.h"
 #include "arb_fmpz_poly.h"
+#include "nf_elem.h"
 #include "ca.h"
 #include "ca_ext.h"
 

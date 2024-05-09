@@ -9,10 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nf_elem.h"
+#include "fmpz_mpoly_q.h"
 #include "ca.h"
 #include "ca_ext.h"
 #include "ca_field.h"
-#include "fmpz_mpoly.h"
 
 void
 _nf_elem_get_fmpz_poly_den_shallow(fmpz_poly_t pol, fmpz_t den, const nf_elem_t a, const nf_t nf)

@@ -9,6 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
+#include "nf_elem.h"
 #include "ca.h"
 
 slong
