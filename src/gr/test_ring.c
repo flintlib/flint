@@ -37,6 +37,14 @@ gr_test_binary_op_aliasing(gr_ctx_t R, int (*gr_op)(gr_ptr, gr_srcptr, gr_srcptr
     status |= gr_op(xy1, x, y, R);
 
     alias = n_randint(state, 4);
+
+    /* Don't test x * x == x^2 for inexact "rings" (e.g. floats) where
+       the squaring algorithm might not produce exactly the same result. */
+    if ((alias == 2 || alias == 3) && gr_ctx_is_ring(R) == T_FALSE && gr_ctx_is_exact(R) == T_FALSE)
+    {
+        alias -= 2;
+    }
+
     switch (alias)
     {
         case 0:
@@ -1354,7 +1362,7 @@ gr_test_zero_one(gr_ctx_t R, flint_rand_t state, int test_flags)
     equal = gr_is_one(a, R);
     if (status == GR_SUCCESS && equal == T_FALSE)
     {
-        flint_printf("FAILL is_one\n");
+        flint_printf("FAIL is_one\n");
         gr_ctx_println(R);
         gr_println(a, R);
         status = GR_TEST_FAIL;

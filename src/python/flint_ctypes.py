@@ -1,6 +1,7 @@
 import ctypes
 import ctypes.util
 import sys
+import functools
 
 libflint_path = ctypes.util.find_library('flint')
 if libflint_path == None:
@@ -4690,6 +4691,37 @@ class acf(gr_elem):
         return CF
 
 
+@functools.cache
+def get_nfloat_class(prec):
+    n = (prec + FLINT_BITS - 1) // FLINT_BITS
+    prec = n * FLINT_BITS
+
+    class _nfloat_struct(ctypes.Structure):
+        _fields_ = [('val', c_ulong * (n + 2))]
+
+    _nfloat_struct.__qualname__ = _nfloat_struct.__name__ = ("nfloat" + str(prec) + "_struct")
+
+    class _nfloat_class(gr_elem):
+        _struct_type = _nfloat_struct
+
+        @staticmethod
+        def _default_context():
+            raise NotImplementedError
+
+    _nfloat_class.__qualname__ = _nfloat_class.__name__ = ("nfloat" + str(prec))
+
+    return _nfloat_class
+
+
+class RealFloat_nfloat(gr_ctx):
+    def __init__(self, prec=128):
+        gr_ctx.__init__(self)
+        libflint.nfloat_ctx_init(self._ref, prec, 0)
+        self._elem_type = get_nfloat_class(prec)
+
+
+
+
 class IntegersMod_nmod(gr_ctx):
     def __init__(self, n, n_is_prime=None):
         n = self._as_ui(n)
@@ -8156,6 +8188,45 @@ def test_integers_mod():
     assert raises(lambda: IntegersMod_mpn_mod(10**20)(IntegersMod_mpn_mod(10**20 + 1)(17)), NotImplementedError)
     assert raises(lambda: IntegersMod_mpn_mod(10**20)(IntegersMod_mpn_mod(10**50)(17)), NotImplementedError)
 
+def test_nfloat():
+    R = RealFloat_nfloat(128)
+    R2 = RealField_arb(192)
+    R3 = RealFloat_nfloat(256)
+    tol = R(2.0**(-120))
+    tol2 = R2(2.0**(-120))
+    assert R2(R(3)) == 3
+    assert R(R2(3)) == 3
+    assert R2(R(0)) == 0
+    assert R(R2(0)) == 0
+    assert abs(R(R.pi() - R2.pi())) < tol
+    assert abs(R2(R.pi() - R2.pi())) < tol
+    assert abs(R(R.pi() - R2.pi())) < tol2
+    assert abs(R2(R.pi() - R2.pi())) < tol2
+    assert abs(R(QQ(1)/3) - QQ(1)/3) < tol
+    assert R(ZZ(5)) == 5
+    assert R(-ZZ(5)) == -5
+    c = ZZ(5)**100
+    assert abs(R2(R(c)) - c) < tol * c
+    assert abs(R2(R(-c)) - (-c)) < tol * c
+    assert R(R2(5)) == R(5)
+    assert str(R(0)) == '0'
+    assert str(R(1) / 4) == '0.250000000000000000000000000000000000000'
+    assert R("0.25") == 0.25
+    assert R(-0.25) == -0.25
+    assert abs(R(R.pi() - R3.pi())) < tol
+    assert abs(R3(R.pi() - R3.pi())) < tol
+    assert R3(R(0)) == 0
+    assert R3(R(-1)) == -1
+    assert R(R3(0)) == 0
+    assert R(-R3(1)) == -1
+    assert R(3) <= R(3)
+    assert R(-3) <= R(3)
+    assert not (R(3) < R(3))
+    assert not (R(3) <= R(-3))
+    assert R(0) <= R(3)
+    assert R(0) <= R(0)
+    assert not (R(0) < R(0))
+    assert not (R(0) <= R(-3))
 
 def test_gen_name():
     for R in [NumberField(ZZx.gen() ** 2 + 1, "b"),
