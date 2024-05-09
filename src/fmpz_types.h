@@ -51,6 +51,14 @@ typedef fmpz_poly_struct fmpz_poly_t[1];
 
 typedef struct
 {
+   fmpz ** powers;
+   slong len;
+} fmpz_poly_powers_precomp_struct;
+
+typedef fmpz_poly_powers_precomp_struct fmpz_poly_powers_precomp_t[1];
+
+typedef struct
+{
     fmpz c;
     fmpz_poly_struct *p;
     slong *exp;

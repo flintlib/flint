@@ -18,7 +18,7 @@
 #define CA_EXT_INLINE static inline
 #endif
 
-#include "ca.h"
+#include "ca_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -58,17 +58,7 @@ CA_EXT_INLINE slong ca_ext_nargs(const ca_ext_t x, ca_ctx_t ctx)
         return CA_EXT_FUNC_NARGS(x);
 }
 
-CA_EXT_INLINE void ca_ext_get_arg(ca_t res, const ca_ext_t x, slong i, ca_ctx_t ctx)
-{
-    if (CA_EXT_HEAD(x) == CA_QQBar || i < 0 || i >= CA_EXT_FUNC_NARGS(x))
-    {
-        flint_throw(FLINT_ERROR, "ca_ext_get_arg: index out of range\n");
-    }
-    else
-    {
-        ca_set(res, CA_EXT_FUNC_ARGS(x) + i, ctx);
-    }
-}
+void ca_ext_get_arg(ca_t res, const ca_ext_t x, slong i, ca_ctx_t ctx);
 
 CA_EXT_INLINE ulong ca_ext_hash(const ca_ext_t x, ca_ctx_t ctx)
 {

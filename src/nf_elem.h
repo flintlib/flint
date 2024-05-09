@@ -18,39 +18,14 @@
 #define NF_ELEM_INLINE static inline
 #endif
 
-#include "fmpq.h"
-#include "fmpq_types.h"
 #include "fmpz_mod_types.h"
-#include "nf.h"
+#include "fmpq.h"
+#include "fmpq_poly.h"
+#include "nf_types.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
-
-typedef struct /* element of a linear number field */
-{
-   fmpz_t num;
-   fmpz_t den;
-} lnf_elem_struct;
-
-typedef lnf_elem_struct lnf_elem_t[1];
-
-typedef struct /* element of a quadratic number field */
-{
-   fmpz num[3]; /* extra coeff for delayed reduction */
-   fmpz_t den;
-} qnf_elem_struct;
-
-typedef qnf_elem_struct qnf_elem_t[1];
-
-typedef union /* element in a number field (specified by an nf_t) */
-{
-   fmpq_poly_t elem; /* general case */
-   lnf_elem_t lelem; /* linear number field */
-   qnf_elem_t qelem; /* quadratic number field */
-} nf_elem_struct;
-
-typedef nf_elem_struct nf_elem_t[1];
 
 #define NF_ELEM_NUMREF(xxx) fmpq_poly_numref((xxx)->elem)
 #define NF_ELEM_DENREF(xxx) fmpq_poly_denref((xxx)->elem)

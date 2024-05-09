@@ -12,37 +12,13 @@
 #ifndef NF_H
 #define NF_H
 
-#include "fmpz.h"
-#include "fmpz_poly.h"
-#include "fmpq_poly.h"
+#include "nf_types.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct {
-   fmpq_poly_t pol;  /* defining polynomial */
-   union {
-      /* insert any precomputed inverse for zz case here */
-      fmpz_preinvn_t qq; /* precomputed inverse for leading coeff of num(pol), QQ case */
-   } pinv;
-   union { /* powers of the generator mod pol */
-      fmpq_poly_powers_precomp_t qq;
-      fmpz_poly_powers_precomp_t zz;
-   } powers;
-   fmpq_poly_t traces; /* S_k = sum_i \theta_i^k for k = 0, 1, 2, ..., (n-1) */
-   ulong flag;       /* 1 = pol monic over ZZ, 2, = linear, 4 = quadratic field */
-} nf_struct;
-
-typedef nf_struct nf_t[1];
-
 #define NF_POWERS_CUTOFF 30 /* maximum length of pol where we precompute powers */
-
-#define NF_GENERIC 0
-#define NF_MONIC 1
-#define NF_LINEAR 2
-#define NF_QUADRATIC 4
-#define NF_GAUSSIAN 8
 
 /******************************************************************************
 

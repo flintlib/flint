@@ -40,6 +40,14 @@ fmpq_poly_struct;
 
 typedef fmpq_poly_struct fmpq_poly_t[1];
 
+typedef struct
+{
+   fmpq_poly_struct * powers;
+   slong len;
+} fmpq_poly_powers_precomp_struct;
+
+typedef fmpq_poly_powers_precomp_struct fmpq_poly_powers_precomp_t[1];
+
 /*
     A polynomial f is represented as
         content * zpoly,

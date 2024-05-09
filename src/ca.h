@@ -18,7 +18,7 @@
 #define CA_INLINE static inline
 #endif
 
-#include "nf_elem.h"
+#include "fmpq.h"
 #include "mpoly_types.h"
 #include "ca_types.h"
 
@@ -29,78 +29,6 @@ extern "C" {
 #define CA_INFO(ctx, args) do { if (ctx->options[CA_OPT_VERBOSE]) \
     do { flint_printf("%s:%d:  ", __FILE__, __LINE__); flint_printf args; } \
     while (0); } while (0);
-
-/* Number object *************************************************************/
-
-#define CA_FMPQ(x)         (&((x)->elem.q))
-#define CA_MPOLY_Q(x)      (&(((x)->elem.mpoly_q)[0]))
-#define CA_NF_ELEM(x)      (&((x)->elem.nf))
-#define CA_FMPQ_NUMREF(x)  (fmpq_numref(CA_FMPQ(x)))
-#define CA_FMPQ_DENREF(x)  (fmpq_denref(CA_FMPQ(x)))
-
-#define CA_FIELD(x, ctx)     ((ca_field_ptr) ((x)->field))
-#define CA_FIELD_ULONG(x)    ((x)->field)
-
-/* We always allocate QQ and QQ(i) */
-#define CA_IS_QQ(x, ctx) (CA_FIELD(x, ctx) == (ctx)->field_qq)
-#define CA_IS_QQ_I(x, ctx) (CA_FIELD(x, ctx) == (ctx)->field_qq_i)
-
-/* Use the low two bits of the field pointer to encode special values. */
-/* The field pointer with the mask removed is NULL for
-   Unknown/Undefined/Uinf, and a normal field pointer for signed
-   infinity (encoding the sign). */
-#define CA_UNKNOWN        UWORD(1)
-#define CA_UNDEFINED      UWORD(2)
-#define CA_INF            UWORD(3)
-#define CA_SPECIAL        (CA_UNKNOWN | CA_UNDEFINED | CA_INF)
-
-#define CA_IS_SPECIAL(x)       (CA_FIELD_ULONG(x) & CA_SPECIAL)
-#define CA_IS_UNKNOWN(x)       (CA_FIELD_ULONG(x) == CA_UNKNOWN)
-#define CA_IS_UNDEFINED(x)     (CA_FIELD_ULONG(x) == CA_UNDEFINED)
-#define CA_IS_INF(x)           ((CA_FIELD_ULONG(x) & CA_SPECIAL) == CA_INF)
-#define CA_IS_UNSIGNED_INF(x)  (CA_FIELD_ULONG(x) == CA_INF)
-#define CA_IS_SIGNED_INF(x)    (CA_IS_INF(x) && !CA_IS_UNSIGNED_INF(x))
-
-#define CA_FIELD_UNSPECIAL(x, ctx) ((ca_field_ptr) (CA_FIELD_ULONG(x) & ~CA_SPECIAL))
-
-/* Extension object **********************************************************/
-
-#define CA_EXT_HEAD(x) ((x)->head)
-#define CA_EXT_HASH(x) ((x)->hash)
-#define CA_EXT_DEPTH(x) ((x)->depth)
-
-#define CA_EXT_IS_QQBAR(x) ((x)->head == CA_QQBar)
-
-#define CA_EXT_QQBAR(_x) (&((_x)->data.qqbar.x))
-#define CA_EXT_QQBAR_NF(_x) ((_x)->data.qqbar.nf)
-
-#define CA_EXT_FUNC_ARGS(x) ((x)->data.func_data.args)
-#define CA_EXT_FUNC_NARGS(x) ((x)->data.func_data.nargs)
-#define CA_EXT_FUNC_ENCLOSURE(x) (&((x)->data.func_data.enclosure))
-#define CA_EXT_FUNC_PREC(x) ((x)->data.func_data.prec)
-
-/* Field object **************************************************************/
-
-#define CA_FIELD_LENGTH(K) ((K)->length)
-#define CA_FIELD_EXT(K) ((K)->ext)
-#define CA_FIELD_EXT_ELEM(K, i) ((K)->ext[i])
-#define CA_FIELD_HASH(K) ((K)->hash)
-
-#define CA_FIELD_IS_QQ(K) ((K)->length == 0)
-#define CA_FIELD_IS_NF(K) ((K)->ideal.length == -1)
-#define CA_FIELD_IS_GENERIC(K) (!CA_FIELD_IS_QQ(K) && !CA_FIELD_IS_NF(K))
-
-#define CA_FIELD_NF(K) (((K)->ext[0]->data.qqbar.nf))
-#define CA_FIELD_NF_QQBAR(K) (&((K)->ext[0]->data.qqbar.x))
-
-#define CA_FIELD_IDEAL(K) (&((K)->ideal))
-#define CA_FIELD_IDEAL_ELEM(K, i) fmpz_mpoly_vec_entry(CA_FIELD_IDEAL(K), i)
-#define CA_FIELD_IDEAL_LENGTH(K) ((K)->ideal.length)
-#define CA_FIELD_IDEAL_ALLOC(K) ((K)->ideal.alloc)
-#define CA_FIELD_IDEAL_P(K) ((K)->ideal.p)
-
-#define CA_MCTX_1(ctx) ((ctx)->mctx[0])
-#define CA_FIELD_MCTX(K, ctx) ((ctx)->mctx[CA_FIELD_LENGTH(K) - 1])
 
 /* Context object ************************************************************/
 

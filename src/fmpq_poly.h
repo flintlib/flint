@@ -29,14 +29,6 @@ extern "C" {
 
 /*  Type definitions  ********************************************************/
 
-typedef struct
-{
-   fmpq_poly_struct * powers;
-   slong len;
-} fmpq_poly_powers_precomp_struct;
-
-typedef fmpq_poly_powers_precomp_struct fmpq_poly_powers_precomp_t[1];
-
 #define WEAK_CANONICALISE_CUTOFF 25600
 
 /*  Memory management  *******************************************************/
