@@ -25,9 +25,6 @@
 extern "C" {
 #endif
 
-#define arb_midref(x) (&(x)->mid)
-#define arb_radref(x) (&(x)->rad)
-
 #define ARB_IS_LAGOM(x) (ARF_IS_LAGOM(arb_midref(x)) && MAG_IS_LAGOM(arb_radref(x)))
 
 #define ARB_RND ARF_RND_DOWN

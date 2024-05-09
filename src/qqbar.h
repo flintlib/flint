@@ -22,21 +22,10 @@
 extern "C" {
 #endif
 
-#include "fmpz_types.h"
 #include "fmpq_types.h"
 #include "mpoly_types.h"
-#include "acb.h"
-
-typedef struct
-{
-    fmpz_poly_struct poly;
-    acb_struct enclosure;
-}
-qqbar_struct;
-
-typedef qqbar_struct qqbar_t[1];
-typedef qqbar_struct * qqbar_ptr;
-typedef const qqbar_struct * qqbar_srcptr;
+#include "arf.h"
+#include "ca_types.h"
 
 #define QQBAR_POLY(x) (&((x)->poly))
 #define QQBAR_COEFFS(x) ((&((x)->poly))->coeffs)

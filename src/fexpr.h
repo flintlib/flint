@@ -55,29 +55,6 @@ extern "C" {
 
 #define FEXPR_BUILTIN_ID(head) ((head) >> 16)
 
-typedef struct
-{
-    ulong * data;
-    slong alloc;
-}
-fexpr_struct;
-
-typedef fexpr_struct fexpr_t[1];
-typedef fexpr_struct * fexpr_ptr;
-typedef const fexpr_struct * fexpr_srcptr;
-
-typedef struct
-{
-    fexpr_struct * entries;
-    slong alloc;
-    slong length;
-}
-fexpr_vec_struct;
-
-typedef fexpr_vec_struct fexpr_vec_t[1];
-
-#define fexpr_vec_entry(vec, i) ((vec)->entries + (i))
-
 FEXPR_INLINE void
 fexpr_init(fexpr_t expr)
 {

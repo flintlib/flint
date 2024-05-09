@@ -29,6 +29,9 @@ typedef acb_struct acb_t[1];
 typedef acb_struct * acb_ptr;
 typedef const acb_struct * acb_srcptr;
 
+#define acb_realref(x) (&(x)->real)
+#define acb_imagref(x) (&(x)->imag)
+
 typedef struct
 {
     acb_ptr entries;

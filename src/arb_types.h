@@ -40,6 +40,9 @@ typedef arb_struct arb_t[1];
 typedef arb_struct * arb_ptr;
 typedef const arb_struct * arb_srcptr;
 
+#define arb_midref(x) (&(x)->mid)
+#define arb_radref(x) (&(x)->rad)
+
 typedef struct
 {
     arb_ptr entries;

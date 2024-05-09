@@ -25,9 +25,6 @@
 extern "C" {
 #endif
 
-#define acb_realref(x) (&(x)->real)
-#define acb_imagref(x) (&(x)->imag)
-
 ACB_INLINE void
 acb_init(acb_t x)
 {
