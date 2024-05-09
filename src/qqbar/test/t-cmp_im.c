@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "arb.h"
 #include "qqbar.h"
 
 TEST_FUNCTION_START(qqbar_cmp_im, state)

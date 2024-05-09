@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "qqbar.h"
 #include "ca_poly.h"
 
 /* Defined in t-div_series.c, t-exp_series.c, t-inv_series.c, t-mul.c */

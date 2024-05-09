@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2013 William Hart
-                  2020 Julian Rüth
+    Copyright (C) 2020 Julian Rüth
 
     This file is part of FLINT.
 
@@ -11,6 +11,7 @@
 */
 
 #include "test_helpers.h"
+#include "nf.h"
 #include "nf_elem.h"
 
 TEST_FUNCTION_START(nf_elem_add_sub, state)

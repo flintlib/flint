@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2013 William Hart
-                  2019 Vincent Delecroix
+    Copyright (C) 2019 Vincent Delecroix
 
     This file is part of FLINT.
 
@@ -11,6 +11,8 @@
 */
 
 #include "test_helpers.h"
+#include "fmpz.h"
+#include "fmpq_poly.h"
 #include "nf.h"
 
 TEST_FUNCTION_START(nf_init_clear, state)

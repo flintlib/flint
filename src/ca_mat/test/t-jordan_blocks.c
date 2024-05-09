@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "ca_vec.h"
 #include "ca_mat.h"
 
 int

@@ -10,8 +10,8 @@
 */
 
 #include "test_helpers.h"
+#include "qqbar.h"
 #include "ca.h"
-#include "ca_ext.h"
 #include "ca_field.h"
 
 TEST_FUNCTION_START(ca_field_init_clear, state)

@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "qqbar.h"
 #include "ca.h"
 #include "ca_ext.h"
 

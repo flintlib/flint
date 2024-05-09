@@ -10,11 +10,12 @@
 */
 
 #include "test_helpers.h"
+#include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
 #include "fmpq_poly.h"
+#include "arith.h"
 #include "acb.h"
 #include "arb_poly.h"
-#include "arith.h"
 #include "arb_fmpz_poly.h"
 
 void

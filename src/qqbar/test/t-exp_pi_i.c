@@ -11,6 +11,7 @@
 
 #include "test_helpers.h"
 #include "fmpq.h"
+#include "acb.h"
 #include "qqbar.h"
 
 TEST_FUNCTION_START(qqbar_exp_pi_i, state)

@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "fmpz_mpoly.h"
 #include "ca.h"
 #include "ca_vec.h"
 

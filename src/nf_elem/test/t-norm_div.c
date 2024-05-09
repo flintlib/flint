@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "fmpz_poly.h"
 #include "nf.h"
 #include "nf_elem.h"
 

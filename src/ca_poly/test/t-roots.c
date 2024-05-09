@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "calcium.h"
 #include "ca_poly.h"
 
 TEST_FUNCTION_START(ca_poly_roots, state)

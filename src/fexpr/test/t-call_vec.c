@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "fmpz.h"
 #include "calcium.h"
 #include "fexpr.h"
 
