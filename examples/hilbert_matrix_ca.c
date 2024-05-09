@@ -4,6 +4,7 @@
 #include <string.h>
 #include <flint/profiler.h>
 #include <flint/fmpq_mat.h>
+#include <flint/calcium.h>
 #include <flint/ca.h>
 #include <flint/ca_vec.h>
 #include <flint/ca_mat.h>

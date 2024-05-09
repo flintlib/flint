@@ -75,7 +75,7 @@ quad(arb_t result,
 {
 
     arb_t x, y, h, x0, pi, w, t;
-    slong order = 0, max_iter = 16, n_eval = 0, flag, j, k;
+    slong order = 0, max_iter = 16, n_eval = 0, FLINT_SET_BUT_UNUSED(flag), j, k;
 
     arb_ptr r = _arb_vec_init(max_iter);
     arb_ptr d = _arb_vec_init(max_iter);
@@ -419,7 +419,7 @@ main(int argc, char *argv[])
     slong num_threads = 1;
     slong prec = 1024;
 
-    int index, c, verbose = 0;
+    int c, verbose = 0;
 
     opterr = 0;
 
