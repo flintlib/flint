@@ -24,36 +24,12 @@
 extern "C" {
 #endif
 
-/* Polynomial object */
-
-typedef struct
-{
-    ca_struct * coeffs;
-    slong alloc;
-    slong length;
-}
-ca_poly_struct;
-
-typedef ca_poly_struct ca_poly_t[1];
-
 /* todo: return NULL when out of bounds? */
 CA_POLY_INLINE ca_ptr
 ca_poly_coeff_ptr(ca_poly_t poly, slong i)
 {
     return poly->coeffs + i;
 }
-
-/* Vectors of polynomials */
-
-typedef struct
-{
-    ca_poly_struct * entries;
-    slong length;
-    slong alloc;
-}
-ca_poly_vec_struct;
-
-typedef ca_poly_vec_struct ca_poly_vec_t[1];
 
 /* Memory management */
 

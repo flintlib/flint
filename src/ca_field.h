@@ -12,7 +12,7 @@
 #ifndef CA_FIELD_H
 #define CA_FIELD_H
 
-#include "ca.h"
+#include "ca_types.h"
 
 #ifdef __cplusplus
 extern "C" {

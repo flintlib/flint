@@ -309,6 +309,53 @@ ca_ctx_struct;
 
 typedef ca_ctx_struct ca_ctx_t[1];
 
+/* vectors *******************************************************************/
+
+typedef struct
+{
+    ca_ptr entries;
+    slong alloc;
+    slong length;
+}
+ca_vec_struct;
+
+typedef ca_vec_struct ca_vec_t[1];
+
+/* matrices ******************************************************************/
+
+typedef struct
+{
+    ca_ptr entries;
+    slong r;
+    slong c;
+    ca_ptr * rows;
+}
+ca_mat_struct;
+
+typedef ca_mat_struct ca_mat_t[1];
+
+/* polynomials ***************************************************************/
+
+typedef struct
+{
+    ca_struct * coeffs;
+    slong alloc;
+    slong length;
+}
+ca_poly_struct;
+
+typedef ca_poly_struct ca_poly_t[1];
+
+typedef struct
+{
+    ca_poly_struct * entries;
+    slong length;
+    slong alloc;
+}
+ca_poly_vec_struct;
+
+typedef ca_poly_vec_struct ca_poly_vec_t[1];
+
 #ifdef __cplusplus
 }
 #endif
