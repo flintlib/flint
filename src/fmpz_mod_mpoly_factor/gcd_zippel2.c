@@ -655,7 +655,7 @@ int fmpz_mod_mpolyl_gcd_zippel2_smprime(
 
     betas = _fmpz_vec_init(nvars);
     alphas = _fmpz_vec_init(nvars);
-    flint_randinit(state);
+    flint_rand_init(state);
 
     beta_caches = FLINT_ARRAY_ALLOC(nvars, fmpz_mod_poly_struct);
     alpha_caches = FLINT_ARRAY_ALLOC(nvars, fmpz_mod_poly_struct);
@@ -1242,7 +1242,7 @@ cleanup:
     _fmpz_vec_clear(betas, nvars);
     _fmpz_vec_clear(alphas, nvars);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     for (i = 0; i < nvars; i++)
     {

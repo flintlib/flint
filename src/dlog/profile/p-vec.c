@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
     p = flint_malloc(np * sizeof(nmod_t));
     a = flint_malloc(np * sizeof(ulong));
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     if (argc < 2)
         out = LOG;
@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
 
     flint_free(p);
     flint_free(a);
-    flint_randclear(state);
+    flint_rand_clear(state);
     flint_cleanup();
     flint_printf("PASS\n");
     return 0;

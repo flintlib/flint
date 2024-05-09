@@ -245,7 +245,7 @@ main(void)
         }
     }
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     return 0;
 }

@@ -438,7 +438,7 @@ sample_add_new(void * arg, ulong count)
     _fmpz_vec_clear(res, ntests);
     _fmpz_vec_clear(a, ntests);
     flint_free(b);
-    flint_randclear(state);
+    flint_rand_clear(state);
 }
 
 void
@@ -473,7 +473,7 @@ sample_add_old(void * arg, ulong count)
     _fmpz_vec_clear(res, ntests);
     _fmpz_vec_clear(a, ntests);
     flint_free(b);
-    flint_randclear(state);
+    flint_rand_clear(state);
 }
 
 void
@@ -508,7 +508,7 @@ sample_sub_new(void * arg, ulong count)
     _fmpz_vec_clear(res, ntests);
     _fmpz_vec_clear(a, ntests);
     flint_free(b);
-    flint_randclear(state);
+    flint_rand_clear(state);
 }
 
 void
@@ -543,7 +543,7 @@ sample_sub_old(void * arg, ulong count)
     _fmpz_vec_clear(res, ntests);
     _fmpz_vec_clear(a, ntests);
     flint_free(b);
-    flint_randclear(state);
+    flint_rand_clear(state);
 }
 
 

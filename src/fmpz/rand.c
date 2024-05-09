@@ -27,8 +27,11 @@ fmpz_randbits_unsigned(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
     else
     {
         mpz_ptr mf = _fmpz_promote(f);
-        _flint_rand_init_gmp(state);
-        mpz_urandomb(mf, state->gmp_state, bits);
+
+        if (!FLINT_RAND_GMP_STATE_IS_INITIALISED(state))
+            _flint_rand_init_gmp_state(state);
+
+        mpz_urandomb(mf, state->__gmp_state, bits);
         mpz_setbit(mf, bits - 1);
         _fmpz_demote_val(f);
     }
@@ -57,8 +60,10 @@ fmpz_randm(fmpz_t f, flint_rand_t state, const fmpz_t m)
     {
         mpz_ptr mf = _fmpz_promote(f);
 
-        _flint_rand_init_gmp(state);
-        mpz_urandomm(mf, state->gmp_state, COEFF_TO_PTR(*m));
+        if (!FLINT_RAND_GMP_STATE_IS_INITIALISED(state))
+            _flint_rand_init_gmp_state(state);
+
+        mpz_urandomm(mf, state->__gmp_state, COEFF_TO_PTR(*m));
         if (sgn < 0)
             mpz_neg(mf, mf);
         _fmpz_demote_val(f);
@@ -121,8 +126,10 @@ fmpz_randtest_unsigned(fmpz_t f, flint_rand_t state, flint_bitcnt_t bits)
     {
         mpz_ptr mf = _fmpz_promote(f);
 
-        _flint_rand_init_gmp(state);
-        mpz_rrandomb(mf, state->gmp_state, bits);
+        if (!FLINT_RAND_GMP_STATE_IS_INITIALISED(state))
+            _flint_rand_init_gmp_state(state);
+
+        mpz_rrandomb(mf, state->__gmp_state, bits);
         _fmpz_demote_val(f);
     }
 }

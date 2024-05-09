@@ -593,7 +593,7 @@ int nmod_mpolyl_gcd_zippel_smprime(
 
     betas = FLINT_ARRAY_ALLOC(nvars, mp_limb_t);
     alphas = FLINT_ARRAY_ALLOC(nvars, mp_limb_t);
-    flint_randinit(state);
+    flint_rand_init(state);
 
     Aevals = FLINT_ARRAY_ALLOC(nvars + 1, nmod_mpoly_struct);
     Bevals = FLINT_ARRAY_ALLOC(nvars + 1, nmod_mpoly_struct);
@@ -1155,7 +1155,7 @@ cleanup:
 
     flint_free(betas);
     flint_free(alphas);
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     for (i = 0; i < nvars; i++)
     {
@@ -1262,7 +1262,7 @@ int nmod_mpolyl_gcd_zippel_lgprime(
     FLINT_ASSERT(gammadegs[0] == 0);
     FLINT_ASSERT(gammadegs[1] == 0);
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     lgd = WORD(20)/(FLINT_BIT_COUNT(smctx->mod.n));
     lgd = FLINT_MAX(WORD(2), lgd);
@@ -2172,7 +2172,7 @@ cleanup:
         fq_nmod_clear(betas + i, lgctx->fqctx);
     }
     flint_free(alphas);
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     for (i = 0; i < nvars; i++)
     {

@@ -174,7 +174,7 @@ void nmod_poly_roots(nmod_poly_factor_t r, const nmod_poly_t f,
         return;
     }
 
-    flint_randinit(randstate);
+    flint_rand_init(randstate);
 
     for (i = 0; i < FLINT_BITS + 3; i++)
         nmod_poly_init_mod(t + i, f->mod);
@@ -197,7 +197,7 @@ void nmod_poly_roots(nmod_poly_factor_t r, const nmod_poly_t f,
         _nmod_poly_push_roots(r, t + 0, 1, t + 1, t + 2, t + 3, randstate);
     }
 
-    flint_randclear(randstate);
+    flint_rand_clear(randstate);
 
     for (i = 0; i < FLINT_BITS + 3; i++)
         nmod_poly_clear(t + i);

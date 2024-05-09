@@ -65,7 +65,7 @@ void sample(void * arg, ulong count)
    nmod_poly_clear(a);
    nmod_poly_clear(b);
    nmod_poly_clear(c);
-   flint_randclear(state);
+   flint_rand_clear(state);
 }
 
 int main(void)

@@ -47,7 +47,7 @@ void sample(void * arg, ulong count)
    }
    prof_stop();
 
-   flint_randclear(state);
+   flint_rand_clear(state);
    _nmod_vec_clear(vec);
    _nmod_vec_clear(vec2);
 }

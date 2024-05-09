@@ -23,7 +23,7 @@ int main(void)
     slong i, n;
     double t1, t2, FLINT_SET_BUT_UNUSED(__);
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     {
         for (i = 0; i < MAXN; i++)
@@ -56,7 +56,7 @@ int main(void)
         }
     }
 
-    flint_randclear(state);
+    flint_rand_clear(state);
     flint_cleanup_master();
     return 0;
 }

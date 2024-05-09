@@ -74,7 +74,7 @@ int compute_gcd(
     FLINT_ASSERT(!fmpz_mod_mpoly_is_zero(B, ctx));
     FLINT_ASSERT(ctx->minfo->nvars >= 3);
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     wbits = FLINT_MAX(A->bits, B->bits);
 
@@ -141,7 +141,7 @@ cleanup:
 
     fmpz_mod_mpoly_ctx_clear(lctx);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     flint_free(perm);
     flint_free(shift);

@@ -323,6 +323,14 @@ check_c_source_compiles([[#include <gmp.h>
   #endif
   void main(){};]] LONG_LONG_LIMB)
 
+if(LONG_LONG_LIMB)
+    set(ULONG "unsigned long long int")
+    set(SLONG "long long int")
+else()
+    set(ULONG "unsigned long int")
+    set(SLONG "long int")
+endif()
+
 # Populate headers
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/CMake/cmake_config.h.in

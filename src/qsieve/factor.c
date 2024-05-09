@@ -329,7 +329,7 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
                     flint_printf("\nBlock Lanczos\n");
 #endif
 
-                    flint_randinit(state); /* initialise the random generator */
+                    flint_rand_init(state); /* initialise the random generator */
 
                     do /* repeat block lanczos until it succeeds */
                     {
@@ -345,7 +345,7 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
                             count++;
                     }
 
-                    flint_randclear(state); /* clean up random state */
+                    flint_rand_clear(state); /* clean up random state */
 
     /**************************************************************************
         SQUARE ROOT:

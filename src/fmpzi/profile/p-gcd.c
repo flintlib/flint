@@ -59,7 +59,7 @@ int main(void)
     ulong a_bits, b_bits, g_bits;
     flint_rand_t state;
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     for (a_bits = 100000; a_bits < 10000000; a_bits += 1 + a_bits/2)
     for (b_bits = a_bits; b_bits < 10000000; b_bits += 1 + b_bits/2)
@@ -74,7 +74,7 @@ int main(void)
         flint_printf("\n");
     }
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     return 0;
 }

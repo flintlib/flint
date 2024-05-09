@@ -61,7 +61,7 @@ void sample(void * arg, ulong count)
       if (sum == 0) flint_printf("\r");
    }
 
-   flint_randclear(state);
+   flint_rand_clear(state);
    flint_free(array);
 }
 

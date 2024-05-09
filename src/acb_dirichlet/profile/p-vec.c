@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
 
     nr = 20;
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     rand = flint_malloc(nr * sizeof(ulong));
 
@@ -207,7 +207,7 @@ int main(int argc, char *argv[])
     }
 
     flint_free(rand);
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     flint_cleanup();
     return 0;

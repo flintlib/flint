@@ -3704,7 +3704,7 @@ gr_test_ring(gr_ctx_t R, slong iters, int test_flags)
         flint_printf("-------------------------------------------------------------------------------\n");
     }
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     /* if (gr_ctx_is_ring(R) != T_TRUE)
         flint_abort(); */
@@ -3828,7 +3828,7 @@ gr_test_ring(gr_ctx_t R, slong iters, int test_flags)
 
     gr_test_iter(R, state, "mat_mul_classical: associative", gr_test_mat_mul_classical_associative, iters, test_flags);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     if (test_flags & GR_TEST_VERBOSE)
     {
@@ -3857,7 +3857,7 @@ gr_test_multiplicative_group(gr_ctx_t R, slong iters, int test_flags)
         flint_printf("-------------------------------------------------------------------------------\n");
     }
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     /* if (gr_ctx_is_multiplicative_group(R) != T_TRUE)
         flint_abort(); */
@@ -3891,7 +3891,7 @@ gr_test_multiplicative_group(gr_ctx_t R, slong iters, int test_flags)
 
     gr_test_iter(R, state, "get_set_fexpr", gr_test_get_set_fexpr, iters, test_flags);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     if (test_flags & GR_TEST_VERBOSE)
     {
@@ -3921,7 +3921,7 @@ gr_test_floating_point(gr_ctx_t R, slong iters, int test_flags)
         flint_printf("-------------------------------------------------------------------------------\n");
     }
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     /* if (gr_ctx_is_ring(R) != T_TRUE)
         flint_abort(); */
@@ -3949,7 +3949,7 @@ gr_test_floating_point(gr_ctx_t R, slong iters, int test_flags)
     gr_test_iter(R, state, "vec_mul", gr_test_vec_mul, vec_iters, test_flags);
     gr_test_iter(R, state, "vec_mul_scalar", gr_test_vec_mul_scalar, vec_iters, test_flags);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     if (test_flags & GR_TEST_VERBOSE)
     {

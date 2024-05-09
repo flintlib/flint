@@ -359,7 +359,7 @@ static void _set_estimates(
     slong ignore_limit;
     int * ignore;
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     ignore = FLINT_ARRAY_ALLOC(nvars, int);
     alpha  = FLINT_ARRAY_ALLOC(nvars, mp_limb_t);
@@ -452,7 +452,7 @@ cleanup:
     flint_free(Aevals);
     flint_free(Bevals);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     return;
 }
@@ -480,7 +480,7 @@ static void _set_estimates_medprime(
     if (max_degree < 2)
         return;
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     fq_zech_ctx_init_ui(medctx, smctx->mod.n, 1, "#");
 
@@ -576,7 +576,7 @@ cleanup:
 
     fq_zech_ctx_clear(medctx);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     return;
 }
@@ -600,7 +600,7 @@ static void _set_estimates_lgprime(
     fq_nmod_mpoly_ctx_t lgctx;
     slong d;
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     d = WORD(20)/(FLINT_BIT_COUNT(smctx->mod.n));
     d = FLINT_MAX(WORD(2), d);
@@ -693,7 +693,7 @@ cleanup:
 
     fq_nmod_mpoly_ctx_clear(lgctx);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     return;
 }
@@ -1131,7 +1131,7 @@ static int _try_zippel(
     FLINT_ASSERT(A->length > 0);
     FLINT_ASSERT(B->length > 0);
 
-    flint_randinit(randstate);
+    flint_rand_init(randstate);
 
     /* uctx is context for Z[y_1,...,y_{m-1}]*/
     nmod_mpoly_ctx_init(uctx, m - 1, ORD_LEX, ctx->mod.n);
@@ -1221,7 +1221,7 @@ cleanup:
 
     nmod_mpoly_ctx_clear(uctx);
 
-    flint_randclear(randstate);
+    flint_rand_clear(randstate);
 
     return success;
 }

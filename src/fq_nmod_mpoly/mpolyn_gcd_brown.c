@@ -599,7 +599,7 @@ int fq_nmod_mpolyn_gcd_brown_lgprime_bivar(
 
     fq_nmod_poly_one(modulus, ctx->fqctx);
 
-    flint_randinit(randstate);
+    flint_rand_init(randstate);
     cur_emb = bad_fq_nmod_mpoly_embed_chooser_init(embc, ectx, ctx, randstate);
 
     /*
@@ -777,7 +777,7 @@ cleanup:
 
     bad_fq_nmod_mpoly_embed_chooser_clear(embc, ectx, ctx, randstate);
 
-    flint_randclear(randstate);
+    flint_rand_clear(randstate);
 
     return success;
 }
@@ -868,7 +868,7 @@ int fq_nmod_mpolyn_gcd_brown_lgprime(
 
     fq_nmod_poly_one(modulus, ctx->fqctx);
 
-    flint_randinit(randstate);
+    flint_rand_init(randstate);
     cur_emb = bad_fq_nmod_mpoly_embed_chooser_init(embc, ectx, ctx, randstate);
 
     /*
@@ -1054,7 +1054,7 @@ cleanup:
 
     bad_fq_nmod_mpoly_embed_chooser_clear(embc, ectx, ctx, randstate);
 
-    flint_randclear(randstate);
+    flint_rand_clear(randstate);
 
     return success;
 }

@@ -257,7 +257,7 @@ void mpoly_gcd_info_set_estimates_fq_nmod_mpoly(
     slong ignore_limit;
     int * ignore;
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     ignore = FLINT_ARRAY_ALLOC(nvars, int);
     alpha  = FLINT_ARRAY_ALLOC(nvars, fq_nmod_struct);
@@ -354,7 +354,7 @@ cleanup:
     flint_free(alpha);
     flint_free(Aevals);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     return;
 }
@@ -379,7 +379,7 @@ void mpoly_gcd_info_set_estimates_fq_nmod_mpoly_lgprime(
     bad_fq_nmod_mpoly_embed_chooser_t embc;
     bad_fq_nmod_embed_struct * cur_emb;
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     cur_emb = bad_fq_nmod_mpoly_embed_chooser_init(embc, lgctx, smctx, state);
 
@@ -483,7 +483,7 @@ cleanup:
 
     bad_fq_nmod_mpoly_embed_chooser_clear(embc, lgctx, smctx, state);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     return;
 }
@@ -935,7 +935,7 @@ static int _try_zippel(
     FLINT_ASSERT(A->length > 0);
     FLINT_ASSERT(B->length > 0);
 
-    flint_randinit(randstate);
+    flint_rand_init(randstate);
 
     /* uctx is context for Fq[y_1,...,y_{m-1}]*/
     fq_nmod_mpoly_ctx_init(uctx, m - 1, ORD_LEX, ctx->fqctx);
@@ -1026,7 +1026,7 @@ cleanup:
 
     fq_nmod_mpoly_ctx_clear(uctx);
 
-    flint_randclear(randstate);
+    flint_rand_clear(randstate);
 
     return success;
 }

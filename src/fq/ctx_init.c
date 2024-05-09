@@ -121,7 +121,7 @@ fq_ctx_init(fq_ctx_t ctx, const fmpz_t p, slong d, const char * var)
 
     ctx->is_conway = 0;
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     fmpz_mod_ctx_init(ctxp, p);
     fmpz_mod_poly_init2(poly, d + 1, ctxp);
@@ -131,7 +131,7 @@ fq_ctx_init(fq_ctx_t ctx, const fmpz_t p, slong d, const char * var)
 
     fmpz_mod_poly_clear(poly, ctxp);
     fmpz_mod_ctx_clear(ctxp);
-    flint_randclear(state);
+    flint_rand_clear(state);
 }
 
 /* FIXME: Test super big primes? */

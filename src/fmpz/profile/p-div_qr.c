@@ -51,7 +51,7 @@ void sample_ndiv_qr(void * arg, ulong count)
     fmpz_clear(b);
     fmpz_clear(nmax);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 }
 
 void sample_fdiv_qr(void * arg, ulong count)
@@ -91,7 +91,7 @@ void sample_fdiv_qr(void * arg, ulong count)
     fmpz_clear(b);
     fmpz_clear(nmax);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 }
 
 void sample_cdiv_qr(void * arg, ulong count)
@@ -131,7 +131,7 @@ void sample_cdiv_qr(void * arg, ulong count)
     fmpz_clear(b);
     fmpz_clear(nmax);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 }
 
 void sample_tdiv_qr(void * arg, ulong count)
@@ -171,7 +171,7 @@ void sample_tdiv_qr(void * arg, ulong count)
     fmpz_clear(b);
     fmpz_clear(nmax);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 }
 
 int main(void)
@@ -214,7 +214,7 @@ int main(void)
         flint_rand_t state;
         timeit_t timer;
 
-        flint_randinit(state);
+        flint_rand_init(state);
 
         as = _fmpz_vec_init(len);
         bs = _fmpz_vec_init(len);
@@ -250,7 +250,7 @@ int main(void)
         _fmpz_vec_clear(as, len);
         _fmpz_vec_clear(bs, len);
 
-        flint_randclear(state);
+        flint_rand_clear(state);
     }
 
     return 0;

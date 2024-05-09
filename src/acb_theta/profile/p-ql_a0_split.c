@@ -36,7 +36,7 @@ int main(int argc, char * argv[])
     cstep = atol(argv[3]);
     cmax = atol(argv[4]);
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     /* Profile with different splittings on reduced input */
     for (c = cstep; c <= cmax; c += cstep)
@@ -143,7 +143,7 @@ int main(int argc, char * argv[])
         arb_clear(test);
     }
 
-    flint_randclear(state);
+    flint_rand_clear(state);
     flint_cleanup();
     return 0;
 }

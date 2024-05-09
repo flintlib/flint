@@ -9,16 +9,19 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "mpn_extras.h"
 
 void flint_mpn_rrandom(mp_ptr rp, flint_rand_t state, mp_size_t n)
 {
     __mpz_struct str;
+
     str._mp_d = rp;
     str._mp_alloc = n;
     str._mp_size = n;
-    _flint_rand_init_gmp(state);
+
+    if (!FLINT_RAND_GMP_STATE_IS_INITIALISED(state))
+        _flint_rand_init_gmp_state(state);
+
     FLINT_ASSERT(n >= 1);
     /* Randomly generate numbers where the top limb has the highest bit
        set or not. TODO: do we want this function to generate
@@ -26,17 +29,21 @@ void flint_mpn_rrandom(mp_ptr rp, flint_rand_t state, mp_size_t n)
        that be a separate function? The documentation does not specify
        precisely what this function does. */
     if (n_randint(state, 2))
-        mpz_rrandomb(&str, state->gmp_state, FLINT_BITS * n);
+        mpz_rrandomb(&str, state->__gmp_state, FLINT_BITS * n);
     else
-        mpz_rrandomb(&str, state->gmp_state, FLINT_BITS * n - n_randint(state, FLINT_BITS));
+        mpz_rrandomb(&str, state->__gmp_state, FLINT_BITS * n - n_randint(state, FLINT_BITS));
 }
 
 void flint_mpn_urandomb(mp_ptr rp, flint_rand_t state, flint_bitcnt_t n)
 {
     __mpz_struct str;
+
     str._mp_d = rp;
     str._mp_alloc = (n + FLINT_BITS - 1)/FLINT_BITS;
     str._mp_size = (n + FLINT_BITS - 1)/FLINT_BITS;
-    _flint_rand_init_gmp(state);
-    mpz_urandomb(&str, state->gmp_state, n);
+
+    if (!FLINT_RAND_GMP_STATE_IS_INITIALISED(state))
+        _flint_rand_init_gmp_state(state);
+
+    mpz_urandomb(&str, state->__gmp_state, n);
 }

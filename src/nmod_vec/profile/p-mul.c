@@ -67,7 +67,7 @@ void sample(void * arg, ulong count)
       break;
    }
 
-   flint_randclear(state);
+   flint_rand_clear(state);
    _nmod_vec_clear(vec1);
    _nmod_vec_clear(vec2);
 }

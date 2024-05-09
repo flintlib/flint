@@ -106,7 +106,7 @@ int main()
     flint_rand_t state;
     slong bits, m1, m2, m3;
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     for (bits = 65; bits <= 1024; bits++)
     {
@@ -124,5 +124,5 @@ int main()
     }
 
     fmpz_clear(p);
-    flint_randclear(state);
+    flint_rand_clear(state);
 }

@@ -122,7 +122,7 @@ int main(void)
     flint_free(b);
     fmpz_mod_ctx_clear(ctx);
 
-    flint_randclear(state);
+    FLINT_TEST_CLEANUP(state);
 
     return 0;
 }

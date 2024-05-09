@@ -44,7 +44,7 @@ int fmpz_mod_mpolyl_gcd_hensel_smprime(
     FLINT_ASSERT(B->bits == bits);
     FLINT_ASSERT(ctx->minfo->ord == ORD_LEX);
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     Hdegs  = FLINT_ARRAY_ALLOC(n + 1, slong);
 
@@ -374,7 +374,7 @@ got_alpha:
 
 cleanup:
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     flint_free(Hdegs);
 

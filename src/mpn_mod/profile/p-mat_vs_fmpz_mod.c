@@ -65,7 +65,7 @@ int main()
     slong i;
     slong bits_tab[] = { 80, 128, 180, 256, 512, 1024, };
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     gr_mat_t A, B, C;
     gr_mat_t A2, B2, C2;
@@ -170,6 +170,6 @@ int main()
     }
 
     fmpz_clear(p);
-    flint_randclear(state);
+    flint_rand_clear(state);
     return 0;
 }

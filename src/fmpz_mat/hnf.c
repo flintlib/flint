@@ -46,10 +46,10 @@ fmpz_mat_hnf(fmpz_mat_t H, const fmpz_mat_t A)
     else {
         flint_rand_t state;
 
-        flint_randinit(state);
+        flint_rand_init(state);
 
         fmpz_mat_hnf_pernet_stein(H, A, state);
 
-        flint_randclear(state);
+        flint_rand_clear(state);
     }
 }

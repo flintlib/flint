@@ -67,7 +67,7 @@ void sample(void * arg, ulong count)
    nf_elem_t a;
    fmpq_t norm;
 
-   flint_randinit(state);
+   flint_rand_init(state);
 
    scale = 100;
    if (length >= 50) scale = 10;
@@ -109,7 +109,7 @@ void sample(void * arg, ulong count)
 
    fmpq_poly_clear(pol);
 
-   flint_randclear(state);
+   flint_rand_clear(state);
 }
 
 int main(void)

@@ -103,7 +103,7 @@ void sample_small(void * arg, ulong count)
     fmpz_clear(c);
     fmpz_clear(d);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 }
 
 void sample_small_old(void * arg, ulong count)
@@ -136,7 +136,7 @@ void sample_small_old(void * arg, ulong count)
     fmpz_clear(c);
     fmpz_clear(d);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 }
 
 void sample_small_zeros(void * arg, ulong count)
@@ -170,7 +170,7 @@ void sample_small_zeros(void * arg, ulong count)
     fmpz_clear(c);
     fmpz_clear(d);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 }
 
 void sample_small_zeros_old(void * arg, ulong count)
@@ -204,7 +204,7 @@ void sample_small_zeros_old(void * arg, ulong count)
     fmpz_clear(c);
     fmpz_clear(d);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 }
 
 void sample_big_zeros(void * arg, ulong count)
@@ -238,7 +238,7 @@ void sample_big_zeros(void * arg, ulong count)
     fmpz_clear(c);
     fmpz_clear(d);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 }
 
 void sample_big_zeros_old(void * arg, ulong count)
@@ -272,7 +272,7 @@ void sample_big_zeros_old(void * arg, ulong count)
     fmpz_clear(c);
     fmpz_clear(d);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 }
 
 int main(void)

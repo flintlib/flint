@@ -90,7 +90,7 @@ int nmod_poly_find_distinct_nonzero_roots(
     if (P->coeffs[0] == 0)
         return 0;
 
-    flint_randinit(randstate);
+    flint_rand_init(randstate);
     nmod_poly_init_mod(t, P->mod);
     nmod_poly_init_mod(t2, P->mod);
     nmod_poly_init_mod(f, P->mod);
@@ -155,7 +155,7 @@ int nmod_poly_find_distinct_nonzero_roots(
 
 cleanup:
 
-    flint_randclear(randstate);
+    flint_rand_clear(randstate);
     nmod_poly_clear(t);
     nmod_poly_clear(t2);
     nmod_poly_clear(f);

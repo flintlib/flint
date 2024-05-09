@@ -90,7 +90,7 @@ void sample(void * arg, ulong count)
    nmod_poly_clear(c);
    nmod_poly_clear(d);
    nmod_poly_clear(dinv);
-   flint_randclear(state);
+   flint_rand_clear(state);
 }
 
 int main(void)

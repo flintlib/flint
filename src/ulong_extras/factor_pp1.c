@@ -221,7 +221,7 @@ mp_limb_t n_factor_pp1_wrapper(mp_limb_t n)
    B1 = n_factor_pp1_table[bits - 31][0];
    count = n_factor_pp1_table[bits - 31][1];
 
-   flint_randinit(state);
+   flint_rand_init(state);
 
    for (i = 0; i < count; i++)
    {
@@ -229,11 +229,11 @@ mp_limb_t n_factor_pp1_wrapper(mp_limb_t n)
        factor = n_factor_pp1(n, B1, n_randint(state, n - 3) + 3);
        if (factor != 0)
        {
-           flint_randclear(state);
+           flint_rand_clear(state);
            return factor;
        }
    }
 
-   flint_randclear(state);
+   flint_rand_clear(state);
    return 0;
 }

@@ -170,7 +170,7 @@ main(void)
 
     flint_printf("#define FFT_MULMOD_2EXPP1_CUTOFF %wd\n\n", ((mp_limb_t) 1 << best_d)*best_w/(2*FLINT_BITS));
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     flint_printf("#endif\n");
     return 0;

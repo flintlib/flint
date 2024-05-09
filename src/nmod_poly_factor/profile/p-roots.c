@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
         timeit_t timer;
         ulong p = n_nextprime(UWORD(1) << (SMALL_FMPZ_BITCOUNT_MAX), 1);
 
-        flint_randinit(state);
+        flint_rand_init(state);
 
         nmod_poly_init(f, p);
         nmod_poly_init(g, p);
@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
         nmod_poly_clear(g);
         nmod_poly_clear(f);
 
-        flint_randclear(state);
+        flint_rand_clear(state);
     }
 
     flint_cleanup_master();

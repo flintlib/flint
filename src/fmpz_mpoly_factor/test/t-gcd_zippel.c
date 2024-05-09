@@ -86,7 +86,7 @@ int compute_gcd(
         stride[i] = 1;
     }
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     wbits = FLINT_MAX(A->bits, B->bits);
 
@@ -151,7 +151,7 @@ cleanup:
 
     fmpz_mpoly_ctx_clear(lctx);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     flint_free(perm);
     flint_free(shift);

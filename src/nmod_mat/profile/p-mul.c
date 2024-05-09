@@ -38,7 +38,7 @@ void sample(void * arg, ulong count)
     ulong i;
     flint_rand_t state;
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     nmod_mat_init(A, params->dim_m, params->dim_k, params->modulus);
     nmod_mat_init(B, params->dim_k, params->dim_n, params->modulus);
@@ -71,7 +71,7 @@ void sample(void * arg, ulong count)
     nmod_mat_clear(B);
     nmod_mat_clear(C);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 }
 
 int main(void)
