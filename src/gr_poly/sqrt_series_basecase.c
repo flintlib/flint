@@ -83,15 +83,8 @@ _gr_poly_sqrt_series_basecase(gr_ptr res, gr_srcptr f, slong flen, slong len, gr
 
             if (!is_one)
             {
-#if defined(__GNUC__) && !defined(__clang__)
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif
                 if (have_inv)
                 {
-#if defined(__GNUC__) && !defined(__clang__)
-# pragma GCC diagnostic pop
-#endif
                     status |= gr_mul(GR_ENTRY(res, i, sz), GR_ENTRY(res, i, sz), rinv, ctx);
                 }
                 else

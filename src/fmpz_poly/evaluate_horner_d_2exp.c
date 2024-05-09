@@ -164,15 +164,7 @@ double _fmpz_poly_evaluate_horner_d_2exp2(slong * exp, const fmpz * poly, slong 
         p[i] = fmpz_get_d_2exp(&p_exp[i], poly + i);
     }
 
-    /* GCC really wants to complain about this one */
-#if defined(__GNUC__) && !defined(__clang__)
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif
     v = _fmpz_poly_evaluate_horner_d_2exp2_precomp(exp, p, p_exp, n, d, dexp);
-#if defined(__GNUC__) && !defined(__clang__)
-# pragma GCC diagnostic pop
-#endif
 
     TMP_END;
 
