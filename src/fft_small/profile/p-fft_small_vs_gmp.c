@@ -27,6 +27,9 @@ int main(void)
 {
     mp_ptr x, y, r, s;
     slong n;
+    flint_rand_t state;
+
+    flint_randinit(state);
 
     x = flint_malloc(sizeof(mp_limb_t) * FLINT_MAX(N_MAX_MUL, N_MAX_SQR));
     y = flint_malloc(sizeof(mp_limb_t) * FLINT_MAX(N_MAX_MUL, N_MAX_SQR));
@@ -78,6 +81,8 @@ int main(void)
     flint_free(y);
     flint_free(r);
     flint_free(s);
+
+    flint_randclear(state);
 
     flint_cleanup_master();
 
