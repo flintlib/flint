@@ -10,6 +10,7 @@
 */
 
 #include "ca_mat.h"
+#include "ca_poly.h"
 
 void
 ca_mat_adjugate_charpoly(ca_mat_t adj, ca_t det, const ca_mat_t A, ca_ctx_t ctx)

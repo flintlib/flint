@@ -10,15 +10,16 @@
 */
 
 #include <stdio.h>
-#include "ca.h"
-#include "ca_ext.h"
-#include "ca_field.h"
-
+#include "fmpz_vec.h"
+#include "fmpz_poly.h"
+#include "fmpz_mpoly_q.h"
+#include "acb.h"
 #include "fmpz_mat.h"
 #include "fmpz_lll.h"
 #include "qqbar.h"
-#include "fmpz_mpoly.h"
-
+#include "ca.h"
+#include "ca_ext.h"
+#include "ca_field.h"
 #include "gr.h"
 
 slong

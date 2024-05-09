@@ -11,7 +11,6 @@
 
 #include "ca_poly.h"
 
-
 void
 _ca_poly_log_series(ca_ptr res, ca_srcptr f, slong flen, slong len, ca_ctx_t ctx)
 {

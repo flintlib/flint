@@ -9,7 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "acb.h"
 #include "acb_hypgeom.h"
+#include "qqbar.h"
+#include "ca.h"
 #include "ca_ext.h"
 
 #define ARB_CONST(f) \

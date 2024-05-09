@@ -9,6 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "qqbar.h"
+#include "calcium.h"
+#include "ca.h"
 #include "ca_ext.h"
 
 void

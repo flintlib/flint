@@ -9,6 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "acb.h"
+#include "nf.h"
+#include "qqbar.h"
 #include "ca_ext.h"
 #include "ca_vec.h"
 

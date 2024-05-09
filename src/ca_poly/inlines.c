@@ -10,4 +10,5 @@
 */
 
 #define CA_POLY_INLINES_C
+
 #include "ca_poly.h"

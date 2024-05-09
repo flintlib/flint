@@ -9,7 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
+#include "fmpz_poly.h"
 #include "fmpz_poly_mat.h"
+#include "nf_elem.h"
 #include "ca_mat.h"
 
 static const fmpz * _nf_denref(const nf_elem_t a, const nf_t nf)

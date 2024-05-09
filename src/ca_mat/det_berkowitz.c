@@ -10,6 +10,7 @@
 */
 
 #include "ca_mat.h"
+#include "ca_vec.h"
 
 void
 ca_mat_det_berkowitz(ca_t res, const ca_mat_t A, ca_ctx_t ctx)
