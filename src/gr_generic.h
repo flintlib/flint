@@ -65,7 +65,7 @@ void gr_generic_mul(void) { flint_throw(FLINT_ERROR, "ctx must implement mul()\n
 
 
 /* some useful generic functions, currently not overloadable */
-#ifdef FMPZ_POLY_H
+#if defined(FMPZ_TYPES_H)
 FLINT_WARN_UNUSED int _gr_fmpz_poly_evaluate_horner(gr_ptr res, const fmpz * f, slong len, gr_srcptr x, gr_ctx_t ctx);
 FLINT_WARN_UNUSED int gr_fmpz_poly_evaluate_horner(gr_ptr res, const fmpz_poly_t f, gr_srcptr x, gr_ctx_t ctx);
 FLINT_WARN_UNUSED int _gr_fmpz_poly_evaluate_rectangular(gr_ptr res, const fmpz * f, slong len, gr_srcptr x, gr_ctx_t ctx);
@@ -74,7 +74,7 @@ FLINT_WARN_UNUSED int _gr_fmpz_poly_evaluate(gr_ptr res, const fmpz * f, slong l
 FLINT_WARN_UNUSED int gr_fmpz_poly_evaluate(gr_ptr res, const fmpz_poly_t f, gr_srcptr x, gr_ctx_t ctx);
 #endif
 
-#ifdef FMPZ_MPOLY_H
+#if defined(FMPZ_TYPES_H) && defined(MPOLY_TYPES_H)
 FLINT_WARN_UNUSED int gr_fmpz_mpoly_evaluate_iter(gr_ptr res, const fmpz_mpoly_t pol, gr_srcptr x, const fmpz_mpoly_ctx_t mctx, gr_ctx_t ctx);
 FLINT_WARN_UNUSED int gr_fmpz_mpoly_evaluate_horner(gr_ptr res, const fmpz_mpoly_t pol, gr_srcptr x, const fmpz_mpoly_ctx_t mctx, gr_ctx_t ctx);
 FLINT_WARN_UNUSED int gr_fmpz_mpoly_evaluate(gr_ptr res, const fmpz_mpoly_t f, gr_srcptr x, const fmpz_mpoly_ctx_t mctx, gr_ctx_t ctx);
@@ -115,7 +115,7 @@ FLINT_WARN_UNUSED int gr_generic_set_str(gr_ptr res, const char * s, gr_ctx_t ct
 FLINT_WARN_UNUSED int gr_generic_set_str_balance_additions(gr_ptr res, const char * s, gr_ctx_t ctx);
 FLINT_WARN_UNUSED int gr_generic_set_str_ring_exponents(gr_ptr res, const char * s, gr_ctx_t ctx);
 
-#ifdef FEXPR_H
+#if defined(CA_TYPES_H)
 FLINT_WARN_UNUSED int gr_generic_set_fexpr(gr_ptr res, fexpr_vec_t inputs, gr_vec_t outputs, const fexpr_t expr, gr_ctx_t ctx);
 #endif
 

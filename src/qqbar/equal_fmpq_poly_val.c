@@ -9,8 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_poly.h"
 #include "fmpq_poly.h"
 #include "arb_fmpz_poly.h"
+#include "acb.h"
 #include "qqbar.h"
 
 /* Algorithm based on Cohen section 4.5.1 */

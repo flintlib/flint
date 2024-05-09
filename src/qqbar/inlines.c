@@ -10,4 +10,5 @@
 */
 
 #define QQBAR_INLINES_C
+
 #include "qqbar.h"

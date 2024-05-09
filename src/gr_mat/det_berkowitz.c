@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gr_vec.h"
 #include "gr_mat.h"
 
 int

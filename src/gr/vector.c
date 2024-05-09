@@ -11,12 +11,10 @@
 
 /* Vectors over generic rings */
 
-#include "ulong_extras.h"
 #include "fmpz.h"
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
-#include "gr_special.h"
 
 #define ENTRY_CTX(ctx) (VECTOR_CTX(ctx)->base_ring)
 

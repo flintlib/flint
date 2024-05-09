@@ -12,6 +12,7 @@
 #include "fmpz_vec.h"
 #include "fmpz_mat.h"
 #include "fmpz_lll.h"
+#include "acb.h"
 #include "qqbar.h"
 
 int

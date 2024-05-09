@@ -9,11 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
-#include "ulong_extras.h"
-#include "long_extras.h"
 #include "mpoly.h"
 #include "gr.h"
 

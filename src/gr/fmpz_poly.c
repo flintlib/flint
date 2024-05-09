@@ -9,19 +9,17 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
 #include <string.h>
 #include "fmpz.h"
 #include "fmpz_poly.h"
-#include "fmpz_mat.h"
+#include "fmpz_poly_factor.h"
 #include "fmpq.h"
 #include "fmpq_poly.h"
+#include "fmpz_mpoly.h"
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
 #include "gr_generic.h"
-#include "fmpz_poly_factor.h"
-#include "fmpz_mpoly.h"
 
 #define FMPZ_POLY_CTX(ctx) POLYNOMIAL_CTX(ctx)
 #define FMPZ_POLY_CTX_VAR(ctx) (FMPZ_POLY_CTX(ctx)->var)

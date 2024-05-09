@@ -9,15 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <math.h>
+#include "fmpz_poly.h"
 #include "arb_poly.h"
 #include "arb_fmpz_poly.h"
 #include "acb_dirichlet.h"
-
-#ifdef __GNUC__
-# define log __builtin_log
-#else
-# include <math.h>
-#endif
 
 void
 arb_fmpz_poly_gauss_period_minpoly(fmpz_poly_t res, ulong q, ulong n)

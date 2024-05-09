@@ -413,12 +413,12 @@ int qqbar_express_in_field(fmpq_poly_t res, const qqbar_t alpha, const qqbar_t x
 
 void qqbar_get_quadratic(fmpz_t res_a, fmpz_t res_b, fmpz_t res_c, fmpz_t res_q, const qqbar_t x, int factoring);
 
-#ifdef FEXPR_H
-
 void qqbar_get_fexpr_repr(fexpr_t res, const qqbar_t x);
 void qqbar_get_fexpr_root_nearest(fexpr_t res, const qqbar_t x);
 void qqbar_get_fexpr_root_indexed(fexpr_t res, const qqbar_t x);
 int qqbar_get_fexpr_formula(fexpr_t res, const qqbar_t x, ulong flags);
+
+int qqbar_set_fexpr(qqbar_t res, const fexpr_t expr);
 
 #define QQBAR_FORMULA_GAUSSIANS    1
 #define QQBAR_FORMULA_QUADRATICS   2
@@ -436,11 +436,6 @@ int qqbar_get_fexpr_formula(fexpr_t res, const qqbar_t x, ulong flags);
 #define QQBAR_FORMULA_AUTO_FORM       0
 
 #define QQBAR_FORMULA_ALL ((2 * QQBAR_FORMULA_SEPARATION - 1) | QQBAR_FORMULA_AUTO_FORM)
-
-
-int qqbar_set_fexpr(qqbar_t res, const fexpr_t expr);
-
-#endif
 
 /* Internal functions */
 

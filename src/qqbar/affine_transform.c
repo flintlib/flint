@@ -10,9 +10,10 @@
 */
 
 #include "fmpz_vec.h"
+#include "fmpz_poly.h"
 #include "fmpq.h"
 #include "fmpq_poly.h"
-#include "arb_fmpz_poly.h"
+#include "acb.h"
 #include "qqbar.h"
 
 static void

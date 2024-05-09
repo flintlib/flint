@@ -9,18 +9,17 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
 #include <string.h>
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
-#include "gr.h"
 #include "fq.h"
-#include "fq_poly.h"
 #include "fq_mat.h"
+#include "fq_poly.h"
 #include "fq_poly_factor.h"
+#include "gr.h"
 #include "gr_vec.h"
 #include "gr_generic.h"
 

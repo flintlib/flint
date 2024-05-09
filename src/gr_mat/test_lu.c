@@ -9,8 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "gr_mat.h"
 #include "fmpz_mat.h"
+#include "gr.h"
+#include "gr_mat.h"
 
 static void perm(gr_mat_t A, slong * P)
 {

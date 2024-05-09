@@ -10,6 +10,7 @@
 */
 
 #include "ulong_extras.h"
+#include "arb.h"
 #include "qqbar.h"
 
 int

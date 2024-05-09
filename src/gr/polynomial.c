@@ -11,20 +11,12 @@
 
 /* Polynomials over generic rings */
 
-#include <stdlib.h>
 #include <string.h>
 #include "fmpz.h"
-#include "ulong_extras.h"
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
 #include "gr_generic.h"
-
-#ifdef __GNUC__
-# define strcmp __builtin_strcmp
-#else
-# include <string.h>
-#endif
 
 static const char * default_var = "x";
 

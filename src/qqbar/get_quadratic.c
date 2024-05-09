@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_factor.h"
+#include "arb.h"
 #include "qqbar.h"
 
 /* Write |n| = A * B^2

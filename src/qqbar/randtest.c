@@ -11,6 +11,8 @@
 */
 
 #include "fmpq.h"
+#include "fmpz_poly.h"
+#include "acb.h"
 #include "arb_fmpz_poly.h"
 #include "qqbar.h"
 

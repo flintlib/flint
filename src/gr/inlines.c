@@ -10,6 +10,8 @@
 */
 
 #define GR_INLINES_C
-#include "fexpr.h"
+
+#include "ca_types.h"
 #include "gr.h"
+
 #undef GR_INLINES_C

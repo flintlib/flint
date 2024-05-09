@@ -18,8 +18,6 @@
 extern "C" {
 #endif
 
-#define NF_POWERS_CUTOFF 30 /* maximum length of pol where we precompute powers */
-
 /******************************************************************************
 
     Initialisation

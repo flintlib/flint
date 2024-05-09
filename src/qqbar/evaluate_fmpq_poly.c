@@ -9,13 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
 #include "fmpz_vec.h"
+#include "fmpz_poly.h"
 #include "fmpq_mat.h"
+#include "fmpq.h"
 #include "fmpq_poly.h"
 #include "nf.h"
 #include "nf_elem.h"
 #include "arb_fmpz_poly.h"
+#include "acb.h"
 #include "qqbar.h"
 
 void

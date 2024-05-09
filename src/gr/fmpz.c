@@ -10,19 +10,20 @@
 */
 
 #include <math.h>
-#include "fexpr.h"
-#include "qqbar.h"
+#include "gmpcompat.h"
+#include "fmpz.h"
 #include "fmpz_factor.h"
-#include "fmpz_poly.h"
-#include "fmpz_poly_factor.h"
 #include "fmpz_vec.h"
 #include "fmpz_mat.h"
+#include "fmpz_poly.h"
+#include "fmpz_poly_factor.h"
 #include "fmpq.h"
+#include "fexpr.h"
+#include "qqbar.h"
 #include "gr.h"
 #include "gr_generic.h"
 #include "gr_vec.h"
 #include "gr_special.h"
-#include "gmpcompat.h"
 
 int
 _gr_fmpz_ctx_write(gr_stream_t out, gr_ctx_t ctx)

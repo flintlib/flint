@@ -12,6 +12,7 @@
 #include <string.h>
 #include "fmpz.h"
 #include "fmpz_mpoly_factor.h"
+#include "fmpz_mpoly.h"
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_generic.h"

@@ -9,17 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
 #include <string.h>
-#include "fexpr.h"
-#include "fmpz.h"
+#include "fmpq_poly.h"
 #include "nf.h"
 #include "nf_elem.h"
+#include "fexpr.h"
 #include "gr.h"
 #include "gr_generic.h"
 #include "gr_vec.h"
-#include "gr_poly.h"
-#include "gr_generic.h"
 
 typedef struct
 {

@@ -12,9 +12,9 @@
 
 #include <stdio.h>
 #include <ctype.h>
-#include <stdio.h>
 #include "fmpz.h"
 #include "fmpz_vec.h"
+#include "mpoly.h"
 #include "gr_mpoly.h"
 
 static char * _gr_mpoly_default_vars[8] = {

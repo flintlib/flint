@@ -250,15 +250,13 @@ GR_SPECIAL_DEF int gr_zeta_nzeros(gr_ptr res, gr_srcptr t, gr_ctx_t ctx) { retur
 
 /* todo: backlund_s, etc */
 
-#ifdef DIRICHLET_H
-
+#if defined(DIRICHLET_H)
 FLINT_WARN_UNUSED int gr_dirichlet_chi_fmpz(gr_ptr res, const dirichlet_group_t G, const dirichlet_char_t chi, const fmpz_t n, gr_ctx_t ctx);
 FLINT_WARN_UNUSED int gr_dirichlet_chi_vec(gr_ptr res, const dirichlet_group_t G, const dirichlet_char_t chi, slong len, gr_ctx_t ctx);  /* todo: wrap, test */
 FLINT_WARN_UNUSED int gr_dirichlet_l(gr_ptr res, const dirichlet_group_t G, const dirichlet_char_t chi, gr_srcptr s, gr_ctx_t ctx);
 FLINT_WARN_UNUSED int gr_dirichlet_l_all(gr_vec_t res, const dirichlet_group_t G, gr_srcptr s, gr_ctx_t ctx);  /* todo: wrap, test */
 FLINT_WARN_UNUSED int gr_dirichlet_hardy_theta(gr_ptr res, const dirichlet_group_t G, const dirichlet_char_t chi, gr_srcptr t, gr_ctx_t ctx);
 FLINT_WARN_UNUSED int gr_dirichlet_hardy_z(gr_ptr res, const dirichlet_group_t G, const dirichlet_char_t chi, gr_srcptr t, gr_ctx_t ctx);
-
 #endif
 
 GR_SPECIAL_DEF int gr_jacobi_theta(gr_ptr res1, gr_ptr res2, gr_ptr res3, gr_ptr res4, gr_srcptr z, gr_srcptr tau, gr_ctx_t ctx) { return GR_QUATERNARY_BINARY_OP(ctx, JACOBI_THETA)(res1, res2, res3, res4, z, tau, ctx); }

@@ -10,6 +10,8 @@
 */
 
 #include "fmpz.h"
+#include "fmpz_poly.h"
+#include "fmpq_poly.h"
 #include "nf.h"
 
 void nf_init_randtest(nf_t nf, flint_rand_t state,

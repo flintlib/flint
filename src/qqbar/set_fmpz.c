@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_poly.h"
+#include "acb.h"
 #include "qqbar.h"
 
 void

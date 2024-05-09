@@ -10,6 +10,7 @@
 */
 
 #include "ulong_extras.h"
+#include "arb.h"
 #include "qqbar.h"
 
 void best_rational_fast(slong * p, ulong * q, double x, slong N);

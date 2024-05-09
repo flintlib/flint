@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "arb.h"
 #include "qqbar.h"
 
 /* todo: might be worth it to detect p/q * root of unity */

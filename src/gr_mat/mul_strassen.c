@@ -13,8 +13,6 @@
 
 #include "gr_mat.h"
 
-#include "fmpz_mat.h"
-
 /* todo: optimize for small matrices */
 /* todo: bodrato squaring */
 /* todo: use fused add-mul operations when supported by

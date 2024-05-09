@@ -771,7 +771,7 @@ typedef int ((*gr_method_poly_xgcd_op)(slong *, gr_ptr, gr_ptr, gr_ptr, gr_srcpt
 typedef int ((*gr_method_vec_ctx_op)(gr_vec_t, gr_ctx_ptr));
 typedef slong ((*_gr_method_get_si_op)(gr_srcptr, gr_ctx_ptr));
 
-#ifdef FEXPR_H
+#if defined(CA_TYPES_H)
 typedef int ((*gr_method_get_fexpr_op)(fexpr_t, gr_srcptr, gr_ctx_ptr));
 typedef int ((*gr_method_set_fexpr_op)(gr_ptr, fexpr_vec_t, gr_vec_t, const fexpr_t, gr_ctx_ptr));
 #endif
@@ -868,7 +868,7 @@ typedef int ((*gr_method_set_fexpr_op)(gr_ptr, fexpr_vec_t, gr_vec_t, const fexp
 #define GR_POLY_XGCD_OP(ctx, NAME) (((gr_method_poly_xgcd_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_VEC_CTX_OP(ctx, NAME) (((gr_method_vec_ctx_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define _GR_GET_SI_OP(ctx, NAME) (((_gr_method_get_si_op *) ctx->methods)[_GR_METHOD_ ## NAME])
-#ifdef FEXPR_H
+#if defined(CA_TYPES_H)
 #define GR_GET_FEXPR_OP(ctx, NAME) (((gr_method_get_fexpr_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #define GR_SET_FEXPR_OP(ctx, NAME) (((gr_method_set_fexpr_op *) ctx->methods)[GR_METHOD_ ## NAME])
 #endif
@@ -946,7 +946,7 @@ GR_INLINE FLINT_WARN_UNUSED int gr_get_d(double * res, gr_srcptr x, gr_ctx_t ctx
 #define GR_FEXPR_SERIALIZE (UWORD(1) << 31)
 #define GR_FEXPR_COMPACT (UWORD(1) << 30)
 
-#ifdef FEXPR_H
+#if defined(CA_TYPES_H)
 GR_INLINE FLINT_WARN_UNUSED int gr_get_fexpr(fexpr_t res, gr_srcptr x, gr_ctx_t ctx) { return GR_GET_FEXPR_OP(ctx, GET_FEXPR)(res, x, ctx); }
 GR_INLINE FLINT_WARN_UNUSED int gr_get_fexpr_serialize(fexpr_t res, gr_srcptr x, gr_ctx_t ctx) { return GR_GET_FEXPR_OP(ctx, GET_FEXPR_SERIALIZE)(res, x, ctx); }
 GR_INLINE FLINT_WARN_UNUSED int gr_set_fexpr(gr_ptr res, fexpr_vec_t inputs, gr_vec_t outputs, const fexpr_t x, gr_ctx_t ctx) { return GR_SET_FEXPR_OP(ctx, SET_FEXPR)(res, inputs, outputs, x, ctx); }
@@ -1314,11 +1314,15 @@ void _gr_ctx_init_fq_zech_from_ref(gr_ctx_t ctx, const void * fq_zech_ctx);
 void gr_ctx_init_fmpz_poly(gr_ctx_t ctx);
 void gr_ctx_init_fmpq_poly(gr_ctx_t ctx);
 
-#ifdef FMPQ_POLY_H
+#if defined(FMPQ_TYPES_H)
 void gr_ctx_init_nf(gr_ctx_t ctx, const fmpq_poly_t poly);
-void gr_ctx_init_nf_fmpz_poly(gr_ctx_t ctx, const fmpz_poly_t poly);
-void _gr_ctx_init_nf_from_ref(gr_ctx_t ctx, const void * nfctx);
 #endif
+
+#if defined(FMPZ_TYPES_H)
+void gr_ctx_init_nf_fmpz_poly(gr_ctx_t ctx, const fmpz_poly_t poly);
+#endif
+
+void _gr_ctx_init_nf_from_ref(gr_ctx_t ctx, const void * nfctx);
 
 /* Groups */
 
@@ -1335,12 +1339,9 @@ void gr_ctx_init_gr_poly(gr_ctx_t ctx, gr_ctx_t base_ring);
 
 /* Multivariate */
 
-#ifdef MPOLY_H
+#if defined(MPOLY_TYPES_H)
 void gr_ctx_init_fmpz_mpoly(gr_ctx_t ctx, slong nvars, const ordering_t ord);
 void gr_ctx_init_gr_mpoly(gr_ctx_t ctx, gr_ctx_t base_ring, slong nvars, const ordering_t ord);
-#endif
-
-#ifdef FMPZ_MPOLY_Q_H
 void gr_ctx_init_fmpz_mpoly_q(gr_ctx_t ctx, slong nvars, const ordering_t ord);
 #endif
 

@@ -10,6 +10,7 @@
 */
 
 #include <stdio.h>
+#include "gr.h"
 #include "gr_mat.h"
 
 /* printing *******************************************************************/

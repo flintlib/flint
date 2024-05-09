@@ -10,6 +10,7 @@
 */
 
 #include "calcium.h"
+#include "acb.h"
 #include "qqbar.h"
 
 /* Todo: document, unify and generalize. This is currently only

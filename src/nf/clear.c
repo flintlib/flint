@@ -11,6 +11,8 @@
 */
 
 #include "fmpz.h"
+#include "fmpz_poly.h"
+#include "fmpq_poly.h"
 #include "nf.h"
 
 void nf_clear(nf_t nf)

@@ -10,6 +10,8 @@
 */
 
 #include <stdio.h>
+#include "fmpz.h"
+#include "calcium.h"
 #include "fexpr.h"
 #include "fexpr_builtin.h"
 

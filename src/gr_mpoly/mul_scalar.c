@@ -10,6 +10,7 @@
 */
 
 #include "fmpq.h"
+#include "mpoly.h"
 #include "gr_mpoly.h"
 
 /* c is assumed to be reduced mod n */

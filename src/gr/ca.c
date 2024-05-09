@@ -9,15 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "acb.h"
 #include "fmpzi.h"
 #include "ca.h"
 #include "ca_mat.h"
 #include "ca_poly.h"
-#include "fexpr.h"
+#include "qqbar.h"
 #include "gr.h"
 #include "gr_generic.h"
 #include "gr_vec.h"
-#include "gr_poly.h"
 #include "gr_special.h"
 
 #define GR_CA_CTX(ring_ctx) ((ca_ctx_struct *)(GR_CTX_DATA_AS_PTR(ring_ctx)))

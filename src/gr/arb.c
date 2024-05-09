@@ -9,9 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
 #include "fmpq.h"
 #include "arb_poly.h"
+#include "acb.h"
 #include "acb_poly.h"
 #include "arb_mat.h"
 #include "arb_fmpz_poly.h"
@@ -21,7 +23,6 @@
 #include "gr.h"
 #include "gr_generic.h"
 #include "gr_vec.h"
-#include "gr_poly.h"
 
 typedef struct
 {

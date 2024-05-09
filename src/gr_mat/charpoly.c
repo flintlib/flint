@@ -10,6 +10,7 @@
 */
 
 #include "gr_mat.h"
+#include "gr_poly.h"
 
 /* todo: algorithm selection */
 int

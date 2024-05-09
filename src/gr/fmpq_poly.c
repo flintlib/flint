@@ -9,15 +9,12 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
 #include <string.h>
-#include "fmpz.h"
 #include "fmpq.h"
 #include "fmpq_vec.h"
 #include "fmpq_poly.h"
 #include "gr.h"
 #include "gr_poly.h"
-#include "gr_vec.h"
 #include "gr_generic.h"
 
 #define FMPQ_POLY_CTX(ctx) POLYNOMIAL_CTX(ctx)

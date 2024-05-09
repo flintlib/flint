@@ -26,6 +26,8 @@ extern "C" {
 #define NF_QUADRATIC 4
 #define NF_GAUSSIAN 8
 
+#define NF_POWERS_CUTOFF 30 /* maximum length of pol where we precompute powers */
+
 /* number field **************************************************************/
 
 typedef struct
