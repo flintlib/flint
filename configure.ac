@@ -168,7 +168,7 @@ AC_CONFIG_HEADERS(src/config.h src/flint-config.h)
 ################################################################################
 
 gcc_cflags="-O3 -pedantic -std=c11"
-gcc_warnings="-Werror=implicit-function-declaration -Wall -Wno-stringop-overread -Wno-stringop-overflow"
+gcc_warnings="-Werror=implicit-function-declaration -Wall -Wno-stringop-overread -Wno-stringop-overflow -Wno-maybe-uninitialized"
 
 dnl We only try to provide specifics for those systems that currently supports
 dnl our assembly routines. If more combinations are wished for than what is

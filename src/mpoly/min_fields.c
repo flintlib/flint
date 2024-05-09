@@ -39,15 +39,7 @@ void mpoly_min_fields_ui_sp(ulong * min_fields, const ulong * poly_exps,
             mpoly_monomial_min(pmin, pmin, poly_exps + N*i, bits, N, mask);
     }
 
-    /* GCC really wants to complain about this one */
-#if defined(__GNUC__) && !defined(__clang__)
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif
     mpoly_unpack_vec_ui(min_fields, pmin, bits, mctx->nfields, 1);
-#if defined(__GNUC__) && !defined(__clang__)
-# pragma GCC diagnostic pop
-#endif
 
     TMP_END;
 }
@@ -84,15 +76,7 @@ void mpoly_min_fields_fmpz(fmpz * min_fields, const ulong * poly_exps,
         }
     }
 
-    /* GCC really wants to complain about this one */
-#if defined(__GNUC__) && !defined(__clang__)
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif
     mpoly_unpack_vec_fmpz(min_fields, pmin, bits, mctx->nfields, 1);
-#if defined(__GNUC__) && !defined(__clang__)
-# pragma GCC diagnostic pop
-#endif
 
     TMP_END;
 }
