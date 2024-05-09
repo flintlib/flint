@@ -1427,7 +1427,7 @@ int nfloat_pi(nfloat_ptr res, gr_ctx_t ctx)
 
     FLINT_ASSERT(nlimbs <= ARB_PI4_TAB_LIMBS);
 
-    NFLOAT_EXP(res) = 0;
+    NFLOAT_EXP(res) = 2;
     NFLOAT_SGNBIT(res) = 0;
     flint_mpn_copyi(NFLOAT_D(res), arb_pi4_tab + ARB_PI4_TAB_LIMBS - nlimbs, nlimbs);
 

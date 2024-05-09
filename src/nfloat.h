@@ -231,7 +231,7 @@ _nfloat_set_mpn_2exp(nfloat_ptr res, mp_srcptr x, mp_size_t xn, slong exp, int x
 
         if (xn > nlimbs)
         {
-            mpn_lshift(NFLOAT_D(res), x + xn - nlimbs, xn, norm);
+            mpn_lshift(NFLOAT_D(res), x + xn - nlimbs, nlimbs, norm);
             NFLOAT_D(res)[0] |= (x[xn - nlimbs - 1] >> (FLINT_BITS - norm));
         }
         else

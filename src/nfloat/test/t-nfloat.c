@@ -339,6 +339,60 @@ TEST_FUNCTION_START(nfloat, state)
         nfloat_test_dot(state, (prec <= 128 ? 10000 : 100) * flint_test_multiplier(), ctx);
 
         {
+            gr_ptr x, x2;
+            slong i;
+
+            gr_ctx_init_real_arb(ctx2, 2 + n_randint(state, 500));
+            x = gr_heap_init(ctx);
+            x2 = gr_heap_init(ctx2);
+            for (i = 0; i < 10; i++)
+            {
+                GR_MUST_SUCCEED(gr_randtest(x, state, ctx));
+                GR_MUST_SUCCEED(gr_set_other(x2, x, ctx, ctx2));
+                GR_MUST_SUCCEED(gr_set_other(x, x2, ctx2, ctx));
+            }
+            gr_heap_clear(x, ctx);
+            gr_heap_clear(x2, ctx2);
+            gr_ctx_clear(ctx2);
+
+            gr_ctx_init_fmpz(ctx2);
+            x = gr_heap_init(ctx);
+            x2 = gr_heap_init(ctx2);
+            for (i = 0; i < 10; i++)
+            {
+                GR_MUST_SUCCEED(gr_randtest(x2, state, ctx2));
+                GR_MUST_SUCCEED(gr_set_other(x, x2, ctx2, ctx));
+            }
+            gr_heap_clear(x, ctx);
+            gr_heap_clear(x2, ctx2);
+            gr_ctx_clear(ctx2);
+
+            gr_ctx_init_fmpq(ctx2);
+            x = gr_heap_init(ctx);
+            x2 = gr_heap_init(ctx2);
+            for (i = 0; i < 10; i++)
+            {
+                GR_MUST_SUCCEED(gr_randtest(x2, state, ctx2));
+                GR_MUST_SUCCEED(gr_set_other(x, x2, ctx2, ctx));
+            }
+            gr_heap_clear(x, ctx);
+            gr_heap_clear(x2, ctx2);
+            gr_ctx_clear(ctx2);
+
+            gr_ctx_init_real_qqbar(ctx2);
+            x = gr_heap_init(ctx);
+            x2 = gr_heap_init(ctx2);
+            for (i = 0; i < 3; i++)
+            {
+                GR_MUST_SUCCEED(gr_randtest(x2, state, ctx2));
+                GR_MUST_SUCCEED(gr_set_other(x, x2, ctx2, ctx));
+            }
+            gr_heap_clear(x, ctx);
+            gr_heap_clear(x2, ctx2);
+            gr_ctx_clear(ctx2);
+        }
+
+        {
             gr_ptr tol;
             slong i, reps;
 
