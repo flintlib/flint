@@ -71,10 +71,19 @@ int main()
                     gr_ptr v1 = GR_ENTRY(vec1, i, ctx->sizeof_elem);
                     gr_ptr v2 = GR_ENTRY(vec2, i, ctx->sizeof_elem);
 
-                    GR_MUST_SUCCEED(gr_set_si(v1, -5 + (slong) n_randint(state, 11), ctx));
-                    GR_MUST_SUCCEED(gr_div_ui(v1, v1, 1 + n_randint(state, 100), ctx));
-                    GR_MUST_SUCCEED(gr_set_si(v2, -5 + (slong) n_randint(state, 11), ctx));
-                    GR_MUST_SUCCEED(gr_div_ui(v2, v2, 1 + n_randint(state, 100), ctx));
+                    GR_MUST_SUCCEED(gr_set_si(v1, 1 + n_randint(state, 1000), ctx));
+                    GR_MUST_SUCCEED(gr_div_ui(v1, v1, 1 + n_randint(state, 1000), ctx));
+                    if (n_randint(state, 2))
+                        GR_MUST_SUCCEED(gr_neg(v1, v1, ctx));
+
+                    GR_MUST_SUCCEED(gr_set_si(v2, 1 + n_randint(state, 1000), ctx));
+                    GR_MUST_SUCCEED(gr_div_ui(v2, v2, 1 + n_randint(state, 1000), ctx));
+                    if (n_randint(state, 2))
+                        GR_MUST_SUCCEED(gr_neg(v2, v2, ctx));
+/*
+                    if (n_randint(state, 10) == 0)
+                        GR_MUST_SUCCEED(gr_zero(v2, ctx));
+*/
                 }
 
                 TIMEIT_START
