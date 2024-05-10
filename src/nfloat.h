@@ -166,13 +166,13 @@ int _nfloat_overflow(nfloat_ptr res, int sgnbit, gr_ctx_t ctx);
 
 #define NFLOAT_HANDLE_UNDERFLOW(res, ctx) \
     do { \
-        if (NFLOAT_EXP(res) < NFLOAT_MIN_EXP) \
+        if (FLINT_UNLIKELY(NFLOAT_EXP(res) < NFLOAT_MIN_EXP)) \
             return _nfloat_underflow(res, NFLOAT_SGNBIT(res), ctx); \
     } while (0)
 
 #define NFLOAT_HANDLE_OVERFLOW(res, ctx) \
     do { \
-        if (NFLOAT_EXP(res) < NFLOAT_MIN_EXP) \
+        if (FLINT_UNLIKELY(NFLOAT_EXP(res) < NFLOAT_MIN_EXP)) \
             return _nfloat_underflow(res, NFLOAT_SGNBIT(res), ctx); \
     } while (0)
 

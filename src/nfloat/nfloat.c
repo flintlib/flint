@@ -708,6 +708,53 @@ _nfloat_add_1(nfloat_ptr res, mp_limb_t x0, slong xexp, int xsgnbit, mp_limb_t y
 }
 
 int
+_nfloat_add_2(nfloat_ptr res, mp_srcptr x, slong xexp, int xsgnbit, mp_srcptr y, slong delta, gr_ctx_t ctx)
+{
+    mp_limb_t x1, x0, y1, y0, s2, s1, s0;
+
+    NFLOAT_SGNBIT(res) = xsgnbit;
+
+    x0 = x[0];
+    x1 = x[1];
+
+    if (delta < 2 * FLINT_BITS)
+    {
+        y0 = y[0];
+        y1 = y[1];
+
+        if (delta == 0)
+            add_sssaaaaaa(s2, s1, s0, 0, x1, x0, 0, y1, y0);
+        else if (delta < FLINT_BITS)
+            add_sssaaaaaa(s2, s1, s0, 0, x1, x0, 0, y1 >> delta, (y0 >> delta) | (y1 << (FLINT_BITS - delta)));
+        else
+            add_sssaaaaaa(s2, s1, s0, 0, x1, x0, 0, 0, y1 >> (delta - FLINT_BITS));
+
+        if (s2 == 0)
+        {
+            NFLOAT_D(res)[0] = s0;
+            NFLOAT_D(res)[1] = s1;
+            NFLOAT_EXP(res) = xexp;
+        }
+        else
+        {
+            NFLOAT_D(res)[0] = (s0 >> 1) | (s1 << (FLINT_BITS - 1));
+            NFLOAT_D(res)[1] = (s1 >> 1) | (UWORD(1) << (FLINT_BITS - 1));
+            NFLOAT_EXP(res) = xexp + 1;
+            NFLOAT_HANDLE_OVERFLOW(res, ctx);
+        }
+    }
+    else
+    {
+        NFLOAT_D(res)[0] = x0;
+        NFLOAT_D(res)[1] = x1;
+        NFLOAT_EXP(res) = xexp;
+        NFLOAT_SGNBIT(res) = xsgnbit;
+    }
+
+    return GR_SUCCESS;
+}
+
+int
 _nfloat_sub_1(nfloat_ptr res, mp_limb_t x0, slong xexp, int xsgnbit, mp_limb_t y0, slong delta, gr_ctx_t ctx)
 {
     mp_limb_t u;
@@ -735,6 +782,85 @@ _nfloat_sub_1(nfloat_ptr res, mp_limb_t x0, slong xexp, int xsgnbit, mp_limb_t y
 
     norm = flint_clz(u);
     NFLOAT_D(res)[0] = u << norm;
+    NFLOAT_EXP(res) = xexp - norm;
+    NFLOAT_HANDLE_UNDERFLOW(res, ctx);
+    return GR_SUCCESS;
+}
+
+int
+_nfloat_sub_2(nfloat_ptr res, mp_srcptr x, slong xexp, int xsgnbit, mp_srcptr y, slong delta, gr_ctx_t ctx)
+{
+    mp_limb_t x1, x0, y1, y0, s1, s0;
+    slong norm;
+
+    NFLOAT_SGNBIT(res) = xsgnbit;
+
+    x0 = x[0];
+    x1 = x[1];
+
+    if (delta < 2 * FLINT_BITS)
+    {
+        y0 = y[0];
+        y1 = y[1];
+
+        if (delta == 0)
+        {
+            if (x1 > y1 || (x1 == y1 && x0 >= y0))
+            {
+                sub_ddmmss(s1, s0, x1, x0, y1, y0);
+
+                if (s1 == 0 && s0 == 0)
+                    return nfloat_zero(res, ctx);
+
+                NFLOAT_SGNBIT(res) = xsgnbit;
+            }
+            else
+            {
+                sub_ddmmss(s1, s0, y1, y0, x1, x0);
+
+                NFLOAT_SGNBIT(res) = !xsgnbit;
+            }
+        }
+        else if (delta < FLINT_BITS)
+        {
+            sub_ddmmss(s1, s0, x1, x0, y1 >> delta, (y0 >> delta) | (y1 << (FLINT_BITS - delta)));
+            NFLOAT_SGNBIT(res) = xsgnbit;
+        }
+        else
+        {
+            sub_ddmmss(s1, s0, x1, x0, 0, y1 >> delta);
+            NFLOAT_SGNBIT(res) = xsgnbit;
+        }
+    }
+    else
+    {
+        NFLOAT_D(res)[0] = x0;
+        NFLOAT_D(res)[1] = x1;
+        NFLOAT_EXP(res) = xexp;
+        NFLOAT_SGNBIT(res) = xsgnbit;
+        return GR_SUCCESS;
+    }
+
+    if (s1 == 0)
+    {
+        s1 = s0;
+        s0 = 0;
+        xexp -= FLINT_BITS;
+    }
+
+    norm = flint_clz(s1);
+
+    if (norm == 0)
+    {
+        NFLOAT_D(res)[0] = s0;
+        NFLOAT_D(res)[1] = s1;
+    }
+    else
+    {
+        NFLOAT_D(res)[0] = (s0 << norm) | (s1 >> (FLINT_BITS - norm));
+        NFLOAT_D(res)[1] = s1 << norm;
+    }
+
     NFLOAT_EXP(res) = xexp - norm;
     NFLOAT_HANDLE_UNDERFLOW(res, ctx);
     return GR_SUCCESS;
@@ -898,6 +1024,8 @@ nfloat_add(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx)
     {
         if (nlimbs == 1)
             return _nfloat_add_1(res, NFLOAT_D(x)[0], xexp, xsgnbit, NFLOAT_D(y)[0], delta, ctx);
+        else if (nlimbs == 2)
+            return _nfloat_add_2(res, NFLOAT_D(x), xexp, xsgnbit, NFLOAT_D(y), delta, ctx);
         else
             return _nfloat_add_n(res, NFLOAT_D(x), xexp, xsgnbit, NFLOAT_D(y), delta, nlimbs, ctx);
     }
@@ -905,6 +1033,8 @@ nfloat_add(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx)
     {
         if (nlimbs == 1)
             return _nfloat_sub_1(res, NFLOAT_D(x)[0], xexp, xsgnbit, NFLOAT_D(y)[0], delta, ctx);
+        else if (nlimbs == 2)
+            return _nfloat_sub_2(res, NFLOAT_D(x), xexp, xsgnbit, NFLOAT_D(y), delta, ctx);
         else
             return _nfloat_sub_n(res, NFLOAT_D(x), xexp, xsgnbit, NFLOAT_D(y), delta, nlimbs, ctx);
     }
@@ -950,6 +1080,8 @@ nfloat_sub(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx)
     {
         if (nlimbs == 1)
             return _nfloat_add_1(res, NFLOAT_D(x)[0], xexp, xsgnbit, NFLOAT_D(y)[0], delta, ctx);
+        else if (nlimbs == 2)
+            return _nfloat_add_2(res, NFLOAT_D(x), xexp, xsgnbit, NFLOAT_D(y), delta, ctx);
         else
             return _nfloat_add_n(res, NFLOAT_D(x), xexp, xsgnbit, NFLOAT_D(y), delta, nlimbs, ctx);
     }
@@ -957,6 +1089,8 @@ nfloat_sub(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx)
     {
         if (nlimbs == 1)
             return _nfloat_sub_1(res, NFLOAT_D(x)[0], xexp, xsgnbit, NFLOAT_D(y)[0], delta, ctx);
+        else if (nlimbs == 2)
+            return _nfloat_sub_2(res, NFLOAT_D(x), xexp, xsgnbit, NFLOAT_D(y), delta, ctx);
         else
             return _nfloat_sub_n(res, NFLOAT_D(x), xexp, xsgnbit, NFLOAT_D(y), delta, nlimbs, ctx);
     }
