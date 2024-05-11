@@ -3247,6 +3247,13 @@ gr_test_vec_binary_op(gr_ctx_t R, const char * opname, int (*gr_op)(gr_ptr, gr_s
 
     aliasing = n_randint(state, 4);
 
+    /* Don't test x * x == x^2 for inexact "rings" (e.g. floats) where
+       the squaring algorithm might not produce exactly the same result. */
+    if ((aliasing == 2 || aliasing == 3) && gr_ctx_is_ring(R) == T_FALSE && gr_ctx_is_exact(R) == T_FALSE)
+    {
+        aliasing = 4;
+    }
+
     switch (aliasing)
     {
         case 0:
@@ -3258,6 +3265,10 @@ gr_test_vec_binary_op(gr_ctx_t R, const char * opname, int (*gr_op)(gr_ptr, gr_s
             status |= _gr_vec_op(xy1, x, xy1, len, R);
             break;
         case 2:
+            status |= _gr_vec_set(y, x, len, R);
+            status |= _gr_vec_op(xy1, x, x, len, R);
+            break;
+        case 3:
             status |= _gr_vec_set(y, x, len, R);
             status |= _gr_vec_set(xy1, x, len, R);
             status |= _gr_vec_op(xy1, xy1, xy1, len, R);
