@@ -166,13 +166,13 @@ int _nfloat_overflow(nfloat_ptr res, int sgnbit, gr_ctx_t ctx);
 
 #define NFLOAT_HANDLE_UNDERFLOW(res, ctx) \
     do { \
-        if (NFLOAT_EXP(res) < NFLOAT_MIN_EXP) \
+        if (FLINT_UNLIKELY(NFLOAT_EXP(res) < NFLOAT_MIN_EXP)) \
             return _nfloat_underflow(res, NFLOAT_SGNBIT(res), ctx); \
     } while (0)
 
 #define NFLOAT_HANDLE_OVERFLOW(res, ctx) \
     do { \
-        if (NFLOAT_EXP(res) < NFLOAT_MIN_EXP) \
+        if (FLINT_UNLIKELY(NFLOAT_EXP(res) < NFLOAT_MIN_EXP)) \
             return _nfloat_underflow(res, NFLOAT_SGNBIT(res), ctx); \
     } while (0)
 
@@ -328,6 +328,16 @@ int nfloat_tanh(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
 int nfloat_atan(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
 int nfloat_gamma(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
 int nfloat_zeta(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
+
+void _nfloat_vec_init(nfloat_ptr res, slong len, gr_ctx_t ctx);
+void _nfloat_vec_clear(nfloat_ptr res, slong len, gr_ctx_t ctx);
+int _nfloat_vec_set(nfloat_ptr res, nfloat_srcptr x, slong len, gr_ctx_t ctx);
+int _nfloat_vec_zero(nfloat_ptr res, slong len, gr_ctx_t ctx);
+
+int _nfloat_vec_add(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, slong len, gr_ctx_t ctx);
+int _nfloat_vec_sub(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, slong len, gr_ctx_t ctx);
+int _nfloat_vec_mul(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, slong len, gr_ctx_t ctx);
+int _nfloat_vec_mul_scalar(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_srcptr y, gr_ctx_t ctx);
 
 int _nfloat_vec_dot(nfloat_ptr res, nfloat_srcptr initial, int subtract, nfloat_srcptr x, nfloat_srcptr y, slong len, gr_ctx_t ctx);
 int _nfloat_vec_dot_rev(nfloat_ptr res, nfloat_srcptr initial, int subtract, nfloat_srcptr x, nfloat_srcptr y, slong len, gr_ctx_t ctx);

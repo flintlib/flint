@@ -155,10 +155,14 @@ gr_method_tab_input _nfloat_methods_input[] =
     {GR_METHOD_GAMMA,            (gr_funcptr) nfloat_gamma},
     {GR_METHOD_ZETA,             (gr_funcptr) nfloat_zeta},
 
-/*
+    {GR_METHOD_VEC_INIT,        (gr_funcptr) _nfloat_vec_init},
+    {GR_METHOD_VEC_CLEAR,       (gr_funcptr) _nfloat_vec_clear},
+    {GR_METHOD_VEC_SET,         (gr_funcptr) _nfloat_vec_set},
+    {GR_METHOD_VEC_ZERO,        (gr_funcptr) _nfloat_vec_zero},
     {GR_METHOD_VEC_ADD,                 (gr_funcptr) _nfloat_vec_add},
     {GR_METHOD_VEC_SUB,                 (gr_funcptr) _nfloat_vec_sub},
-*/
+    {GR_METHOD_VEC_MUL,                 (gr_funcptr) _nfloat_vec_mul},
+    {GR_METHOD_VEC_MUL_SCALAR,          (gr_funcptr) _nfloat_vec_mul_scalar},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _nfloat_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _nfloat_vec_dot_rev},
 /*

@@ -3247,6 +3247,13 @@ gr_test_vec_binary_op(gr_ctx_t R, const char * opname, int (*gr_op)(gr_ptr, gr_s
 
     aliasing = n_randint(state, 4);
 
+    /* Don't test x * x == x^2 for inexact "rings" (e.g. floats) where
+       the squaring algorithm might not produce exactly the same result. */
+    if ((aliasing == 2 || aliasing == 3) && gr_ctx_is_ring(R) == T_FALSE && gr_ctx_is_exact(R) == T_FALSE)
+    {
+        aliasing = 4;
+    }
+
     switch (aliasing)
     {
         case 0:
@@ -3258,6 +3265,10 @@ gr_test_vec_binary_op(gr_ctx_t R, const char * opname, int (*gr_op)(gr_ptr, gr_s
             status |= _gr_vec_op(xy1, x, xy1, len, R);
             break;
         case 2:
+            status |= _gr_vec_set(y, x, len, R);
+            status |= _gr_vec_op(xy1, x, x, len, R);
+            break;
+        case 3:
             status |= _gr_vec_set(y, x, len, R);
             status |= _gr_vec_set(xy1, x, len, R);
             status |= _gr_vec_op(xy1, xy1, xy1, len, R);
@@ -3284,6 +3295,8 @@ gr_test_vec_binary_op(gr_ctx_t R, const char * opname, int (*gr_op)(gr_ptr, gr_s
         flint_printf("%s\n", opname);
         gr_ctx_println(R);
         flint_printf("aliasing: %d\n", aliasing);
+        _gr_vec_print(x, len, R); flint_printf("\n");
+        _gr_vec_print(y, len, R); flint_printf("\n");
         _gr_vec_print(xy1, len, R); flint_printf("\n");
         _gr_vec_print(xy2, len, R); flint_printf("\n");
     }
@@ -3302,6 +3315,75 @@ int gr_test_vec_mul(gr_ctx_t R, flint_rand_t state, int test_flags) { return gr_
 int gr_test_vec_div(gr_ctx_t R, flint_rand_t state, int test_flags) { return gr_test_vec_binary_op(R, "vec_div", gr_div, _gr_vec_div, state, test_flags); }
 int gr_test_vec_divexact(gr_ctx_t R, flint_rand_t state, int test_flags) { return gr_test_vec_binary_op(R, "vec_divexact", gr_divexact, _gr_vec_divexact, state, test_flags); }
 int gr_test_vec_pow(gr_ctx_t R, flint_rand_t state, int test_flags) { return gr_test_vec_binary_op(R, "vec_pow", gr_pow, _gr_vec_pow, state, test_flags); }
+
+int
+gr_test_vec_binary_op_scalar(gr_ctx_t R, const char * opname, int (*gr_op)(gr_ptr, gr_srcptr, gr_srcptr, gr_ctx_t),
+    int (*_gr_vec_op)(gr_ptr, gr_srcptr, slong, gr_srcptr, gr_ctx_t), flint_rand_t state, int test_flags)
+{
+    int status, aliasing;
+    slong i, len;
+    gr_ptr x, y, xy1, xy2;
+
+    len = n_randint(state, 5);
+
+    GR_TMP_INIT_VEC(x, len, R);
+    GR_TMP_INIT_VEC(y, 1, R);
+    GR_TMP_INIT_VEC(xy1, len, R);
+    GR_TMP_INIT_VEC(xy2, len, R);
+
+    GR_MUST_SUCCEED(_gr_vec_randtest(x, state, len, R));
+
+    GR_MUST_SUCCEED(_gr_vec_randtest(y, state, 1, R));
+    GR_MUST_SUCCEED(_gr_vec_randtest(xy1, state, len, R));
+    GR_MUST_SUCCEED(_gr_vec_randtest(xy2, state, len, R));
+
+    status = GR_SUCCESS;
+
+    aliasing = n_randint(state, 2);
+
+    if (aliasing)
+    {
+        status |= _gr_vec_set(xy1, x, len, R);
+        status |= _gr_vec_op(xy1, xy1, len, y, R);
+    }
+    else
+    {
+        status |= _gr_vec_op(xy1, x, len, y, R);
+    }
+
+    for (i = 0; i < len; i++)
+        status |= gr_op(GR_ENTRY(xy2, i, R->sizeof_elem),
+                         GR_ENTRY(x, i, R->sizeof_elem),
+                         y, R);
+
+    if (status == GR_SUCCESS && _gr_vec_equal(xy1, xy2, len, R) == T_FALSE)
+    {
+        status = GR_TEST_FAIL;
+    }
+
+    if ((test_flags & GR_TEST_ALWAYS_ABLE) && (status & GR_UNABLE))
+        status = GR_TEST_FAIL;
+
+    if ((test_flags & GR_TEST_VERBOSE) || status == GR_TEST_FAIL)
+    {
+        flint_printf("%s\n", opname);
+        gr_ctx_println(R);
+        flint_printf("aliasing: %d\n", aliasing);
+        _gr_vec_print(x, len, R); flint_printf("\n");
+        _gr_vec_print(y, 1, R); flint_printf("\n");
+        _gr_vec_print(xy1, len, R); flint_printf("\n");
+        _gr_vec_print(xy2, len, R); flint_printf("\n");
+    }
+
+    GR_TMP_CLEAR_VEC(x, len, R);
+    GR_TMP_CLEAR_VEC(y, 1, R);
+    GR_TMP_CLEAR_VEC(xy1, len, R);
+    GR_TMP_CLEAR_VEC(xy2, len, R);
+
+    return status;
+}
+
+int gr_test_vec_mul_scalar(gr_ctx_t R, flint_rand_t state, int test_flags) { return gr_test_vec_binary_op_scalar(R, "vec_mul_scalar", gr_mul, _gr_vec_mul_scalar, state, test_flags); }
 
 int gr_generic_vec_dot(gr_ptr res, gr_srcptr initial, int subtract, gr_srcptr vec1, gr_srcptr vec2, slong len, gr_ctx_t ctx);
 
@@ -3740,6 +3822,8 @@ gr_test_ring(gr_ctx_t R, slong iters, int test_flags)
     gr_test_iter(R, state, "vec_divexact", gr_test_vec_divexact, vec_iters, test_flags);
     /* gr_test_iter(R, state, "vec_pow", gr_test_vec_pow, vec_iters, test_flags & (~GR_TEST_ALWAYS_ABLE)); large elements */
 
+    gr_test_iter(R, state, "vec_mul_scalar", gr_test_vec_mul_scalar, vec_iters, test_flags);
+
     gr_test_iter(R, state, "vec_dot", gr_test_vec_dot, iters, test_flags);
 
     gr_test_iter(R, state, "mat_mul_classical: associative", gr_test_mat_mul_classical_associative, iters, test_flags);
@@ -3824,6 +3908,7 @@ gr_test_floating_point(gr_ctx_t R, slong iters, int test_flags)
 {
     timeit_t timer;
     flint_rand_t state;
+    slong vec_iters = iters / 10 + 1;
 
     /* test_flags |= GR_TEST_VERBOSE; */
 
@@ -3858,6 +3943,11 @@ gr_test_floating_point(gr_ctx_t R, slong iters, int test_flags)
     gr_test_iter(R, state, "mul: aliasing", gr_test_mul_aliasing, iters, test_flags);
     gr_test_iter(R, state, "div: aliasing", gr_test_div_aliasing, iters, test_flags);
     gr_test_iter(R, state, "pow: aliasing", gr_test_pow_aliasing, iters, test_flags);
+
+    gr_test_iter(R, state, "vec_add", gr_test_vec_add, vec_iters, test_flags);
+    gr_test_iter(R, state, "vec_sub", gr_test_vec_sub, vec_iters, test_flags);
+    gr_test_iter(R, state, "vec_mul", gr_test_vec_mul, vec_iters, test_flags);
+    gr_test_iter(R, state, "vec_mul_scalar", gr_test_vec_mul_scalar, vec_iters, test_flags);
 
     flint_randclear(state);
 
