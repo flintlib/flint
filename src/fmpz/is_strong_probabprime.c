@@ -51,13 +51,15 @@ int fmpz_is_strong_probabprime(const fmpz_t n, const fmpz_t base)
          res = 1;
       else
       {
-         for (s--; s > 0 && !fmpz_equal(y, nm1); s--)
+         res = fmpz_equal(y, nm1);
+         
+         for (s--; s > 0 && !res; s--)
          {
             fmpz_mul(t, y, y);
             fmpz_mod(y, t, n);
+            
+            res = fmpz_equal(y, nm1);
          }
-
-         res = fmpz_equal(y, nm1);
       }
 
       fmpz_clear(y);
