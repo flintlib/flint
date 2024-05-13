@@ -20,10 +20,6 @@
 # include <stdarg.h>
 #endif
 
-#if defined(__CYGWIN__)
-# include <sys/param.h>
-#endif
-
 #include <gmp.h>
 #include <limits.h>
 #ifdef BUILDING_FLINT
