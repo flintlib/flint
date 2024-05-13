@@ -62,27 +62,6 @@ typedef struct
 }
 nmod_poly_compose_mod_precomp_preinv_arg_t;
 
-/* zn_poly helper functions  ************************************************
-
-Copyright (C) 2007, 2008 David Harvey
-
-*/
-
-NMOD_POLY_INLINE
-int signed_mpn_sub_n(nn_ptr res, nn_srcptr op1, nn_srcptr op2, slong n)
-{
-   if (mpn_cmp(op1, op2, n) >= 0)
-   {
-      mpn_sub_n(res, op1, op2, n);
-      return 0;
-   }
-   else
-   {
-      mpn_sub_n(res, op2, op1, n);
-      return 1;
-   }
-}
-
 /* Memory management  ********************************************************/
 
 void nmod_poly_init(nmod_poly_t poly, ulong n);

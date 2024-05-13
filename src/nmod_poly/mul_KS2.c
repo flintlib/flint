@@ -126,8 +126,8 @@ _nmod_poly_mul_KS2(nn_ptr res, nn_srcptr op1, slong n1,
          compute |f1(-B)| = |f1e(B^2) - B * f1o(B^2)|
              and |f2(-B)| = |f2e(B^2) - B * f2o(B^2)|
       */
-      v3m_neg  = signed_mpn_sub_n(v1m, v1e, v1o, k1);
-      v3m_neg ^= signed_mpn_sub_n(v2m, v2e, v2o, k2);
+      v3m_neg  = flint_mpn_signed_sub_n(v1m, v1e, v1o, k1);
+      v3m_neg ^= flint_mpn_signed_sub_n(v2m, v2e, v2o, k2);
 
       /*
          compute  h(B)   =  f1(B)   *  f2(B)
@@ -149,7 +149,7 @@ _nmod_poly_mul_KS2(nn_ptr res, nn_srcptr op1, slong n1,
       mpn_add_n(v1p, v1e, v1o, k1);
 
       /* compute |f1(-B)| = |f1e(B^2) - B * f1o(B^2)| */
-      signed_mpn_sub_n(v1m, v1e, v1o, k1);
+      flint_mpn_signed_sub_n(v1m, v1e, v1o, k1);
 
       /*
          compute h(B)  = f1(B)^2

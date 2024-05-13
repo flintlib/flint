@@ -150,7 +150,7 @@ _nmod_poly_mul_KS4(nn_ptr res, nn_srcptr op1, slong n1,
             and |f1(-B)| = |f1e(B^2) - B * f1o(B^2)|
       */
       mpn_add_n (v1pn, v1en, v1on, k1);
-      v3m_neg = signed_mpn_sub_n(v1mn, v1en, v1on, k1);
+      v3m_neg = flint_mpn_signed_sub_n(v1mn, v1en, v1on, k1);
 
       /* evaluate f2e(B^2) and B * f2o(B^2) */
       _nmod_poly_KS2_pack(v2en, op2, n2e, 2, 2 * b, 0, k2);
@@ -161,7 +161,7 @@ _nmod_poly_mul_KS4(nn_ptr res, nn_srcptr op1, slong n1,
             and |f2(-B)| = |f2e(B^2) - B * f2o(B^2)|
       */
       mpn_add_n(v2pn, v2en, v2on, k2);
-      v3m_neg ^= signed_mpn_sub_n(v2mn, v2en, v2on, k2);
+      v3m_neg ^= flint_mpn_signed_sub_n(v2mn, v2en, v2on, k2);
 
       /*
          compute  h(B)  =  f1(B)   *  f2(B)
@@ -184,7 +184,7 @@ _nmod_poly_mul_KS4(nn_ptr res, nn_srcptr op1, slong n1,
             and |f1(-B)| = |f1e(B^2) - B * f1o(B^2)|
       */
       mpn_add_n (v1pn, v1en, v1on, k1);
-      signed_mpn_sub_n(v1mn, v1en, v1on, k1);
+      flint_mpn_signed_sub_n(v1mn, v1en, v1on, k1);
 
       /*
          compute h(B) =  f1(B)^2
@@ -246,7 +246,7 @@ _nmod_poly_mul_KS4(nn_ptr res, nn_srcptr op1, slong n1,
                      |B^(n1-1) * f1e(1/B^2) - B^(n1-2) * f1o(1/B^2)|
       */
       mpn_add_n(v1pr, v1er, v1or, k1);
-      v3m_neg = signed_mpn_sub_n(v1mr, v1er, v1or, k1);
+      v3m_neg = flint_mpn_signed_sub_n(v1mr, v1er, v1or, k1);
 
       /* evaluate B^(n2-1) * f2e(1/B^2) and B^(n2-2) * f2o(1/B^2) */
       _nmod_poly_KS2_pack(v2er, op2 + 2*(n2e - 1), n2e, -2, 2 * b, a2, k2);
@@ -259,7 +259,7 @@ _nmod_poly_mul_KS4(nn_ptr res, nn_srcptr op1, slong n1,
                      |B^(n2-1) * f2e(1/B^2) - B^(n2-2) * f2o(1/B^2)|
       */
       mpn_add_n (v2pr, v2er, v2or, k2);
-      v3m_neg ^= signed_mpn_sub_n(v2mr, v2er, v2or, k2);
+      v3m_neg ^= flint_mpn_signed_sub_n(v2mr, v2er, v2or, k2);
 
       /*
          compute B^(n3-1) * h(1/B) =
@@ -286,7 +286,7 @@ _nmod_poly_mul_KS4(nn_ptr res, nn_srcptr op1, slong n1,
                      |B^(n1-1) * f1e(1/B^2) - B^(n1-2) * f1o(1/B^2)|
       */
       mpn_add_n(v1pr, v1er, v1or, k1);
-      signed_mpn_sub_n(v1mr, v1er, v1or, k1);
+      flint_mpn_signed_sub_n(v1mr, v1er, v1or, k1);
 
       /*
          compute B^(n3-1) * h(1/B)  = (B^(n1-1) * f1(1/B))^2

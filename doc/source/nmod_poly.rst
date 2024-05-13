@@ -79,19 +79,9 @@ Types, macros and constants
 
 .. type:: nmod_poly_t
 
-Helper functions
---------------------------------------------------------------------------------
-
-
-.. function:: int signed_mpn_sub_n(nn_ptr res, nn_srcptr op1, nn_srcptr op2, slong n)
-
-    If ``op1 >= op2`` return 0 and set ``res`` to ``op1 - op2``
-    else return 1 and set ``res`` to ``op2 - op1``.
-
 
 Memory management
 --------------------------------------------------------------------------------
-
 
 .. function:: void nmod_poly_init(nmod_poly_t poly, ulong n)
 
