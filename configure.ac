@@ -951,6 +951,8 @@ FLINT_CHECK_MPFR_H(4,1,0)
 
 FLINT_ABI
 
+AC_DEFINE_UNQUOTED(FLINT_BITS,$flint_cv_abi,[Define according to the ABI FLINT was compiled with])
+
 ################################################################################
 # check headers
 ################################################################################

@@ -12,6 +12,9 @@
 /* Define if system is big endian. */
 #undef FLINT_BIG_ENDIAN
 
+/* Define according to the ABI FLINT was compiled with */
+#undef FLINT_BITS
+
 /* Define if Arm v8 assembly is available */
 #undef FLINT_HAVE_ASSEMBLY_armv8
 

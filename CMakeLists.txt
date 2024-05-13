@@ -331,6 +331,18 @@ else()
     set(SLONG "long int")
 endif()
 
+check_c_source_compiles([[#include <gmp.h>
+  #if GMP_LIMB_BITS == 32
+  # error
+  #endif
+  void main(){};]] FLINT64)
+
+if(FLINT64)
+    set(FLINT_BITS "64")
+else()
+    set(FLINT_BITS "32")
+endif()
+
 # Populate headers
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/CMake/cmake_config.h.in
