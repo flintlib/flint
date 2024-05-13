@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2009, 2015 William Hart
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,9 +10,23 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "ulong_extras.h"
 
+#if defined(__GNUC__) && FLINT64 && defined(__aarch64__)
+# include <arm_acle.h>
+ulong
+n_revbin(ulong n, ulong b)
+{
+    FLINT_ASSERT(b <= FLINT_BITS);
+
+    n = __rbitll(n);
+
+    if (b == 0)
+        return 0;
+    else
+        return n >> (FLINT_BITS - b);
+}
+#else
 static const unsigned char flint_revtab[] = {
     0x00, 0x80, 0x40, 0xC0, 0x20, 0xA0, 0x60, 0xE0, 0x10, 0x90, 0x50, 0xD0,
     0x30, 0xB0, 0x70, 0xF0,
@@ -47,9 +62,42 @@ static const unsigned char flint_revtab[] = {
     0x3F, 0xBF, 0x7F, 0xFF
 };
 
-/*
-   Computes the reverse binary representation of a number of b bits.
-*/
+#if defined(__GNUC__)
+# if FLINT64
+#  define byte_swap __builtin_bswap64
+# else
+#  define byte_swap __builtin_bswap32
+# endif
+#elif defined(_MSC_VER)
+# include <stdlib.h>
+# if FLINT64
+#  define byte_swap _byteswap_uint64
+# else
+#  define byte_swap _byteswap_ulong
+# endif
+#else
+# if FLINT64
+FLINT_FORCE_INLINE byte_swap(ulong n)
+{
+    /* swap adjacent bytes */
+    n = ((n & 0xff00ff00ff00ff00) >> 8) | ((n & 0x00ff00ff00ff00ff) << 8);
+    /* swap adjacent words */
+    n = ((n & 0xffff0000ffff0000) >> 16) | ((n & 0x0000ffff0000ffff) << 16);
+    /* swap adjacent double words */
+    n = (n >> 32) | (n << 32);
+    return n;
+}
+# else
+FLINT_FORCE_INLINE byte_swap(ulong n)
+{
+    /* swap adjacent bytes */
+    n = ((n & 0xff00ff00) >> 8) | ((n & 0x00ff00ff) << 8);
+    /* swap adjacent words */
+    n = (n >> 16) | (n << 16);
+    return n;
+}
+# endif
+#endif
 
 ulong
 n_revbin(ulong n, ulong b)
@@ -83,8 +131,7 @@ n_revbin(ulong n, ulong b)
         n = (((n & 0xf0f0f0f0) >> 4) | ((n & 0x0f0f0f0f) << 4));
 #endif
 
-        byte_swap(n);
-
-        return n >> (FLINT_BITS - b);
+        return byte_swap(n) >> (FLINT_BITS - b);
     }
 }
+#endif

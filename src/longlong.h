@@ -34,11 +34,6 @@ extern "C" {
 #  define flint_ctz __builtin_ctzl
 # endif
 
-/* Byte swap */
-# define _FLINT_CAT_(X,Y) X##Y
-# define _FLINT_CAT(X,Y) _FLINT_CAT_(X,Y)
-# define byte_swap(x) do { (x) = _FLINT_CAT(__builtin_bswap, FLINT_BITS)(x); } while (0)
-
 /* Addition, subtraction and multiplication */
 # if defined(__clang__)
 #  include "longlong_asm_clang.h"
@@ -95,29 +90,6 @@ static inline int flint_ctz(ulong x)
 {
     return FLINT_BITS - 1 - flint_clz(x & -x);
 }
-#endif
-
-/* Byte swap */
-#if !defined(byte_swap)
-# if FLINT_BITS == 32
-#  define byte_swap(n) \
-  do { \
-      /* swap adjacent bytes */ \
-      (n) = ((((n) & 0xff00ff00) >> 8) | (((n) & 0x00ff00ff) << 8)); \
-      /* swap adjacent words */ \
-      (n) = (((n) >> 16) | ((n) << 16)); \
-  } while (0)
-# else
-#  define byte_swap(n) \
-  do { \
-      /* swap adjacent bytes */ \
-      (n) = ((((n) & 0xff00ff00ff00ff00) >> 8) | (((n) & 0x00ff00ff00ff00ff) << 8)); \
-      /* swap adjacent words */ \
-      (n) = ((((n) & 0xffff0000ffff0000) >> 16) | (((n) & 0x0000ffff0000ffff) << 16)); \
-      /* swap adjacent double words */ \
-      (n) = (((n) >> 32) | ((n) << 32)); \
-  } while (0)
-# endif
 #endif
 
 /* Addition and subtraction */

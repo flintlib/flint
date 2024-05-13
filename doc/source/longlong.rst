@@ -79,11 +79,3 @@ Division
 
     Works like ``udiv_qrnnd``, but takes a precomputed inverse ``di`` as 
     computed by ::func::`n_preinvert_limb`.
-
-Miscellaneous
--------------------------------------------------------------------------------
-
-.. macro:: byte_swap(x)
-
-    Swap the order of the bytes in the word `x`, i.e. most significant byte
-    becomes least significant byte, etc.

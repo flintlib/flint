@@ -22,9 +22,6 @@
 # define flint_clz _lzcnt_u32
 # define flint_ctz _tzcnt_u32
 
-/* Byte swap */
-# define byte_swap(x) do { (x) = _byteswap_ulong(x); } while (0)
-
 /* Addition and subtraction */
 # define _FLINT_ADC _addcarry_u32
 # define _FLINT_SBB _subborrow_u32
@@ -55,9 +52,6 @@ do \
 /* Trailing and leading zeros */
 # define flint_clz _lzcnt_u64
 # define flint_ctz _tzcnt_u64
-
-/* Byte swap */
-# define byte_swap(x) do { (x) = _byteswap_uint64(x); } while (0)
 
 /* Addition and subtraction */
 # define _FLINT_ADC _addcarry_u64
