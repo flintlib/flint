@@ -54,6 +54,9 @@
 /* Define if system is strongly ordered */
 #undef FLINT_KNOW_STRONG_ORDER
 
+/* Define to use long long limbs */
+#undef FLINT_LONG_LONG
+
 /* Define to enable reentrant. */
 #undef FLINT_REENTRANT
 

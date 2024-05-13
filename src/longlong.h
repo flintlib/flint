@@ -36,12 +36,12 @@ extern "C" {
 #if defined(__GNUC__)
 
 /* Trailing and leading zeros */
-# ifndef _LONG_LONG_LIMB
-#  define flint_clz __builtin_clzl
-#  define flint_ctz __builtin_ctzl
-# else
+# if FLINT_LONG_LONG
 #  define flint_clz __builtin_clzll
 #  define flint_ctz __builtin_ctzll
+# else
+#  define flint_clz __builtin_clzl
+#  define flint_ctz __builtin_ctzl
 # endif
 
 /* Byte swap */

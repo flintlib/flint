@@ -321,15 +321,7 @@ check_c_source_compiles([[#include <gmp.h>
   #ifndef _LONG_LONG_LIMB
   # error mp_limb_t != unsigned long long limb
   #endif
-  void main(){};]] LONG_LONG_LIMB)
-
-if(LONG_LONG_LIMB)
-    set(ULONG "unsigned long long int")
-    set(SLONG "long long int")
-else()
-    set(ULONG "unsigned long int")
-    set(SLONG "long int")
-endif()
+  void main(){};]] FLINT_LONG_LONG)
 
 check_c_source_compiles([[#include <gmp.h>
   #if GMP_LIMB_BITS == 32
@@ -338,9 +330,9 @@ check_c_source_compiles([[#include <gmp.h>
   void main(){};]] FLINT64)
 
 if(FLINT64)
-    set(FLINT_BITS "64")
+    set(FLINT_BITS 64)
 else()
-    set(FLINT_BITS "32")
+    set(FLINT_BITS 32)
 endif()
 
 # Populate headers
@@ -357,7 +349,7 @@ configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/src/fmpz/fmpz.c
     COPYONLY
 )
-if(LONG_LONG_LIMB)
+if(FLINT_LONG_LONG)
     configure_file(
         ${CMAKE_CURRENT_SOURCE_DIR}/src/gmpcompat-longlong.h.in
         ${CMAKE_CURRENT_SOURCE_DIR}/src/gmpcompat.h

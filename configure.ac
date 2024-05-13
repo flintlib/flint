@@ -936,6 +936,11 @@ FLINT_GMP_LONG_LONG_LIMB([SLONG="long long int"
 AC_SUBST(SLONG)
 AC_SUBST(ULONG)
 
+if test "$flint_cv_gmp_long_long_limb" = "yes";
+then
+    AC_DEFINE(FLINT_LONG_LONG,1,[Define to use long long limbs])
+fi
+
 AC_CONFIG_LINKS([src/gmpcompat.h:src/$gmpcompat_h_in],[],[gmpcompat_h_in="$gmpcompat_h_in"])
 AC_SUBST(GMPCOMPAT_H_IN, $gmpcompat_h_in)
 

@@ -87,10 +87,15 @@ FLINT_DLL extern char flint_version[];
 struct __FLINT_FILE;
 typedef struct __FLINT_FILE FLINT_FILE;
 
-typedef @ULONG@ ulong;
-typedef @SLONG@ slong;
-typedef @ULONG@ flint_bitcnt_t;
+#if FLINT_LONG_LONG
+typedef unsigned long long int ulong;
+typedef long long int slong;
+#else
+typedef unsigned long int ulong;
+typedef long int slong;
+#endif
 
+typedef ulong flint_bitcnt_t;
 typedef ulong * nn_ptr;
 typedef const ulong * nn_srcptr;
 
@@ -169,7 +174,7 @@ typedef const ulong * nn_srcptr;
 # define FLINT_TLS_PREFIX
 #endif
 
-#if defined(_LONG_LONG_LIMB)
+#if FLINT_LONG_LONG
 # define _WORD_FMT "ll"
 # define WORD_FMT "%ll"
 # define WORD_WIDTH_FMT "%*ll"

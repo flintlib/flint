@@ -648,7 +648,7 @@ FLINT_FORCE_INLINE int
 n_zerobits(ulong e)
 {
 #if defined(__GNUC__)
-# if defined(_LONG_LONG_LIMB)
+# if FLINT_LONG_LONG
     return FLINT_BIT_COUNT(e) - __builtin_popcountll(e);
 # else
     return FLINT_BIT_COUNT(e) - __builtin_popcountl(e);
