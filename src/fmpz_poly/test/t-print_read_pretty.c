@@ -14,6 +14,12 @@
 # undef __STRICT_ANSI__
 #endif
 
+#if defined(__CYGWIN__)
+# define ulong ulongxx
+# include <sys/param.h>
+# undef ulong
+#endif
+
 #if (!defined (__WIN32) || defined(__CYGWIN__)) && !defined(_MSC_VER)
 # include <stdlib.h>
 # include <sys/wait.h>

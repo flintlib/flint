@@ -10,8 +10,14 @@
 */
 
 /* Try to get fdopen declared for fmpz_mat_[print/read] */
-#if defined __STRICT_ANSI__
+#if defined(__STRICT_ANSI__)
 # undef __STRICT_ANSI__
+#endif
+
+#if defined(__CYGWIN__)
+# define ulong ulongxx
+# include <sys/param.h>
+# undef ulong
 #endif
 
 #include <string.h>
