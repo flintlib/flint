@@ -72,7 +72,7 @@ static int _factor_irred_compressed(
 
     Abits = A->bits;
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     if (nvars < 2)
     {
@@ -220,7 +220,7 @@ static int _factor_irred_compressed(
         fmpz_mod_mpoly_factor_clear(lcAf, ctx);
     }
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 
 #if FLINT_WANT_ASSERT
     if (success)

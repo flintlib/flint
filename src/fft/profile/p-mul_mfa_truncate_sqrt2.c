@@ -56,7 +56,7 @@ main(void)
        flint_free(i1);
     }
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     flint_printf("done\n");
     return 0;

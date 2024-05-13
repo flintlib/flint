@@ -250,7 +250,7 @@ void _set_estimates(
     slong ignore_limit;
     int * ignore;
 
-    flint_randinit(randstate);
+    flint_rand_init(randstate);
 
     ignore = (int *) flint_malloc(ctx->minfo->nvars*sizeof(int));
     alpha = (mp_limb_t *) flint_malloc(ctx->minfo->nvars*sizeof(mp_limb_t));
@@ -351,7 +351,7 @@ cleanup:
     flint_free(Aevals);
     flint_free(Bevals);
 
-    flint_randclear(randstate);
+    flint_rand_clear(randstate);
 
     return;
 }
@@ -991,7 +991,7 @@ static int _try_zippel(
     FLINT_ASSERT(A->length > 0);
     FLINT_ASSERT(B->length > 0);
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     fmpz_mpoly_ctx_init(lctx, m, ORD_LEX);
 
@@ -1082,7 +1082,7 @@ cleanup:
 
     fmpz_mpoly_ctx_clear(lctx);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     return success;
 }

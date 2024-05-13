@@ -163,7 +163,7 @@ int fmpz_mod_poly_find_distinct_nonzero_roots(
         goto cleanup1;
     }
 
-    flint_randinit(randstate);
+    flint_rand_init(randstate);
     fmpz_mod_poly_init(t, ctx);
     fmpz_mod_poly_init(t2, ctx);
     fmpz_mod_poly_init(f, ctx);
@@ -231,7 +231,7 @@ int fmpz_mod_poly_find_distinct_nonzero_roots(
 
 cleanup:
 
-    flint_randclear(randstate);
+    flint_rand_clear(randstate);
     fmpz_mod_poly_clear(t, ctx);
     fmpz_mod_poly_clear(t2, ctx);
     fmpz_mod_poly_clear(f, ctx);

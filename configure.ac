@@ -926,8 +926,15 @@ fi
 ################################################################################
 
 FLINT_CHECK_GMP_H(6,2,1)
-FLINT_GMP_LONG_LONG_LIMB([gmpcompat_h_in="gmpcompat-longlong.h.in"],
-                         [gmpcompat_h_in="gmpcompat.h.in"])
+FLINT_GMP_LONG_LONG_LIMB([SLONG="long long int"
+                          ULONG="unsigned long long int"
+                          gmpcompat_h_in="gmpcompat-longlong.h.in"],
+                         [SLONG="long int"
+                          ULONG="unsigned long int"
+                          gmpcompat_h_in="gmpcompat.h.in"])
+
+AC_SUBST(SLONG)
+AC_SUBST(ULONG)
 
 AC_CONFIG_LINKS([src/gmpcompat.h:src/$gmpcompat_h_in],[],[gmpcompat_h_in="$gmpcompat_h_in"])
 AC_SUBST(GMPCOMPAT_H_IN, $gmpcompat_h_in)

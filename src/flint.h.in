@@ -24,8 +24,8 @@
 # include <sys/param.h>
 #endif
 
-#include <limits.h>
 #include <gmp.h>
+#include <limits.h>
 #ifdef BUILDING_FLINT
 # include "config.h"
 #else
@@ -92,9 +92,9 @@ FLINT_DLL extern char flint_version[];
 struct __FLINT_FILE;
 typedef struct __FLINT_FILE FLINT_FILE;
 
-#define ulong mp_limb_t
-#define slong mp_limb_signed_t
-#define flint_bitcnt_t ulong
+typedef @ULONG@ ulong;
+typedef @SLONG@ slong;
+typedef @ULONG@ flint_bitcnt_t;
 
 #if FLINT_WANT_ASSERT
 # define FLINT_ASSERT(param) assert(param)
@@ -127,6 +127,7 @@ typedef struct __FLINT_FILE FLINT_FILE;
 # define FLINT_UNREACHABLE __builtin_unreachable()
 # define FLINT_RETURNS_NONNULL __attribute__((returns_nonnull))
 # define FLINT_MALLOC __attribute__((malloc))
+# define FLINT_DEPRECATED __attribute__((deprecated))
 #else
 # define __attribute__(x)
 # if defined(_MSC_VER)
@@ -149,6 +150,7 @@ typedef struct __FLINT_FILE FLINT_FILE;
 # define FLINT_CONSTANT_P(x) 0
 # define FLINT_RETURNS_NONNULL
 # define FLINT_MALLOC
+# define FLINT_DEPRECATED
 #endif
 
 #if defined(__cplusplus)
@@ -270,18 +272,21 @@ FLINT_CONST double flint_test_multiplier(void);
 
 typedef struct
 {
-    gmp_randstate_t gmp_state;
-    int gmp_init;
-    mp_limb_t __randval;
-    mp_limb_t __randval2;
-} flint_rand_s;
+    void * __gmp_state;
+    ulong __randval;
+    ulong __randval2;
+}
+flint_rand_struct;
 
-typedef flint_rand_s flint_rand_t[1];
+typedef flint_rand_struct flint_rand_t[1];
+
+/* Assumes that flint_rand_init has been called for state */
+#define FLINT_RAND_GMP_STATE_IS_INITIALISED(state) ((state)->__gmp_state != NULL)
 
 FLINT_INLINE
-void flint_randinit(flint_rand_t state)
+void flint_rand_init(flint_rand_t state)
 {
-   state->gmp_init = 0;
+    state->__gmp_state = NULL;
 #if FLINT64
     state->__randval = UWORD(13845646450878251009);
     state->__randval2 = UWORD(13142370077570254774);
@@ -292,48 +297,36 @@ void flint_randinit(flint_rand_t state)
 }
 
 FLINT_INLINE
-void flint_randseed(flint_rand_t state, ulong seed1, ulong seed2)
+void flint_rand_set_seed(flint_rand_t state, ulong seed1, ulong seed2)
 {
-   state->__randval = seed1;
-   state->__randval2 = seed2;
+    state->__randval = seed1;
+    state->__randval2 = seed2;
 }
 
 FLINT_INLINE
-void flint_get_randseed(ulong * seed1, ulong * seed2, flint_rand_t state)
+void flint_rand_get_seed(ulong * seed1, ulong * seed2, flint_rand_t state)
 {
-   *seed1 = state->__randval;
-   *seed2 = state->__randval2;
+    *seed1 = state->__randval;
+    *seed2 = state->__randval2;
 }
 
-
-FLINT_INLINE
-void _flint_rand_init_gmp(flint_rand_t state)
-{
-    if (!state->gmp_init)
-    {
-        gmp_randinit_default(state->gmp_state);
-        state->gmp_init = 1;
-    }
-}
+void _flint_rand_init_gmp_state(flint_rand_t);
+void _flint_rand_clear_gmp_state(flint_rand_t);
 
 FLINT_INLINE
-void flint_randclear(flint_rand_t state)
+void flint_rand_clear(flint_rand_t state)
 {
-    if (state->gmp_init)
-        gmp_randclear(state->gmp_state);
+    if (FLINT_RAND_GMP_STATE_IS_INITIALISED(state))
+        _flint_rand_clear_gmp_state(state);
 }
 
-FLINT_INLINE
-flint_rand_s * flint_rand_alloc(void)
-{
-    return (flint_rand_s *) flint_malloc(sizeof(flint_rand_s));
-}
-
-FLINT_INLINE
-void flint_rand_free(flint_rand_s * state)
-{
-    flint_free(state);
-}
+FLINT_DEPRECATED void flint_randinit(flint_rand_t);
+FLINT_DEPRECATED void flint_randclear(flint_rand_t);
+FLINT_DEPRECATED void flint_randseed(flint_rand_t, ulong, ulong);
+FLINT_DEPRECATED void flint_get_randseed(ulong *, ulong *, flint_rand_t);
+FLINT_DEPRECATED void _flint_rand_init_gmp(flint_rand_t);
+FLINT_DEPRECATED flint_rand_struct * flint_rand_alloc(void);
+FLINT_DEPRECATED void flint_rand_free(flint_rand_struct * state);
 
 /* defined in ulong_extras, but used throughout the test code */
 ulong n_randlimb(flint_rand_t);
@@ -357,10 +350,10 @@ FLINT_INLINE ulong n_randint(flint_rand_t state, ulong limit)
 #define FLINT_TEST_INIT(xxx) \
    flint_rand_t xxx; \
    FLINT_GC_INIT(); \
-   flint_randinit(xxx)
+   flint_rand_init(xxx)
 
 #define FLINT_TEST_CLEANUP(xxx) \
-   flint_randclear(xxx); \
+   flint_rand_clear(xxx); \
    flint_cleanup_master();
 
 /* comparison macros *********************************************************/
@@ -380,9 +373,9 @@ FLINT_INLINE ulong n_randint(flint_rand_t state, ulong limit)
 
 /* Beware when using the unsigned return value in signed arithmetic */
 FLINT_FORCE_INLINE
-mp_limb_t FLINT_BIT_COUNT(mp_limb_t x)
+flint_bitcnt_t FLINT_BIT_COUNT(ulong x)
 {
-   mp_limb_t zeros = FLINT_BITS;
+   flint_bitcnt_t zeros = FLINT_BITS;
    if (x) zeros = flint_clz(x);
    return FLINT_BITS - zeros;
 }
@@ -487,8 +480,8 @@ FLINT_INLINE slong flint_mul_sizes(slong x, slong y)
 
 typedef struct
 {
-   mp_limb_t n;
-   mp_limb_t ninv;
+   ulong n;
+   ulong ninv;
    flint_bitcnt_t norm;
 }
 nmod_t;

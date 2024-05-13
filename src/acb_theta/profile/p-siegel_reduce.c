@@ -42,7 +42,7 @@ int main(int argc, char * argv[])
     dstep = atol(argv[4]);
     dmax = atol(argv[5]);
 
-    flint_randinit(state);
+    flint_rand_init(state);
     acb_mat_init(tau, g, g);
     acb_mat_init(w, g, g);
     arb_init(r);
@@ -76,7 +76,7 @@ int main(int argc, char * argv[])
         }
     }
 
-    flint_randclear(state);
+    flint_rand_clear(state);
     acb_mat_clear(tau);
     acb_mat_clear(w);
     arb_clear(r);

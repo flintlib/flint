@@ -1570,7 +1570,7 @@ int fmpz_mpolyl_gcd_zippel2(
                                          B->exps, B->length, bits, ctx->minfo);
 
 
-    flint_randinit(randstate);
+    flint_rand_init(randstate);
     fmpz_init(p);
     fmpz_init(pm1); /* p - 1 */
     fmpz_init(subprod);
@@ -2430,7 +2430,7 @@ cleanup:
     fmpz_clear(subprod);
     fmpz_clear(pm1);
     fmpz_clear(p);
-    flint_randclear(randstate);
+    flint_rand_clear(randstate);
 
     FLINT_ASSERT(G->bits == bits);
     FLINT_ASSERT(Abar->bits == bits);

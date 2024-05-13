@@ -272,7 +272,7 @@ void TEMPLATE(T, poly_roots)(
     else
         fmpz_zero(q2);
 
-    flint_randinit(randstate);
+    flint_rand_init(randstate);
 
     for (i = 0; i < FLINT_BITS + 3; i++)
         TEMPLATE(T, poly_init)(t + i, ctx);
@@ -298,7 +298,7 @@ void TEMPLATE(T, poly_roots)(
 
     fmpz_clear(q2);
 
-    flint_randclear(randstate);
+    flint_rand_clear(randstate);
 
     for (i = 0; i < FLINT_BITS + 3; i++)
         TEMPLATE(T, poly_clear)(t + i, ctx);

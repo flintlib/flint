@@ -68,7 +68,7 @@ int fq_nmod_mpolyl_gcd_hensel_smprime(
     FLINT_ASSERT(B->bits == bits);
     FLINT_ASSERT(ctx->minfo->ord == ORD_LEX);
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     tmp = FLINT_ARRAY_ALLOC(d*(N_FQ_MUL_INV_ITCH + 1), mp_limb_t);
     q = tmp + d*N_FQ_MUL_INV_ITCH;
@@ -390,7 +390,7 @@ got_alpha:
 
 cleanup:
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     flint_free(tmp);
 

@@ -37,7 +37,7 @@ int main(int argc, char * argv[])
     pstep = atol(argv[2]);
     pmax = atol(argv[3]);
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     /* Profile with different number of steps on reduced input */
     for (prec = pstep; prec <= pmax; prec += pstep)
@@ -114,7 +114,7 @@ int main(int argc, char * argv[])
         arb_clear(test);
     }
 
-    flint_randclear(state);
+    flint_rand_clear(state);
     flint_cleanup();
     return 0;
 }

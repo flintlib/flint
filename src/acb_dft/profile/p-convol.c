@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
     if (out == CSV)
         flint_printf("# %-12s, %7s, %7s, %7s\n","name", "prec", "len", "factor", "time");
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     for (j = 0; j < nj; j++)
     {

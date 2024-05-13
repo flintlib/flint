@@ -337,7 +337,7 @@ void mpoly_compression_set(
     if (one_total != M->nvars)
         M->is_perm = 0;
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     sum_deg = 1;
     overflowed = 0;
@@ -357,5 +357,5 @@ void mpoly_compression_set(
     M->is_irred = _mpoly_test_irreducible(M->exps, nvars, Alen,
                                                    M->mvars, state, tries);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 }

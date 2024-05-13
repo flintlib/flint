@@ -139,7 +139,7 @@ int main()
     flint_rand_t state;
     slong bits;
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     /* flint_set_num_threads(8); */
 
@@ -153,5 +153,5 @@ int main()
     }
 
     fmpz_clear(p);
-    flint_randclear(state);
+    flint_rand_clear(state);
 }

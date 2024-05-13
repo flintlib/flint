@@ -64,7 +64,7 @@ fmpz_mat_hnf_transform(fmpz_mat_t H, fmpz_mat_t U, const fmpz_mat_t A)
         _fmpz_mat_hnf_transform_naive(H, U, A);
     else
     {
-        flint_randinit(state);
+        flint_rand_init(state);
         p = n_randprime(state, NMOD_MAT_OPTIMAL_MODULUS_BITS, 1);
         nmod_mat_init(Amod, m, n, p);
 
@@ -73,7 +73,7 @@ fmpz_mat_hnf_transform(fmpz_mat_t H, fmpz_mat_t U, const fmpz_mat_t A)
 
         nmod_mat_clear(Amod);
 
-        flint_randclear(state);
+        flint_rand_clear(state);
 
         if (r == n) /* Full column rank */
             fmpz_mat_hnf_minors_transform(H, U, A);

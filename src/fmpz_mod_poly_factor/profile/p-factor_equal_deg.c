@@ -25,7 +25,7 @@ int main(void)
     fmpz_mod_poly_factor_t f;
     timeit_t timer;
 
-    flint_randinit(state);
+    flint_rand_init(state);
     fmpz_init_set_ui(p, 1);
     fmpz_init(t);
     fmpz_mod_ctx_init(ctx, p);
@@ -102,7 +102,7 @@ int main(void)
     fmpz_mod_ctx_clear(ctx);
     fmpz_clear(p);
     fmpz_clear(t);
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     return 0;
 }

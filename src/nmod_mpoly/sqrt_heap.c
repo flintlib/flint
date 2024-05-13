@@ -175,7 +175,7 @@ static int _nmod_mpoly_sqrt_heap1(
     FLINT_ASSERT(mpoly_words_per_exp(bits, mctx) == 1);
     mpoly_get_cmpmask(&maskhi, 1, bits, mctx);
 
-    flint_randinit(heuristic_state);
+    flint_rand_init(heuristic_state);
 
     /* alloc array of heap nodes which can be chained together */
     next_loc = 2*n_sqrt(Alen) + 4;   /* something bigger than heap can ever be */
@@ -345,7 +345,7 @@ static int _nmod_mpoly_sqrt_heap1(
 
 cleanup:
 
-    flint_randclear(heuristic_state);
+    flint_rand_clear(heuristic_state);
 
     Q->coeffs = Qcoeffs;
     Q->exps = Qexps;
@@ -406,7 +406,7 @@ static int _nmod_mpoly_sqrt_heap(
     cmpmask = (ulong *) TMP_ALLOC(N*sizeof(ulong));
     mpoly_get_cmpmask(cmpmask, N, bits, mctx);
 
-    flint_randinit(heuristic_state);
+    flint_rand_init(heuristic_state);
 
     /* alloc array of heap nodes which can be chained together */
     next_loc = 2*sqrt(Alen) + 4;   /* something bigger than heap can ever be */
@@ -629,7 +629,7 @@ static int _nmod_mpoly_sqrt_heap(
 
 cleanup:
 
-    flint_randclear(heuristic_state);
+    flint_rand_clear(heuristic_state);
 
     Q->coeffs = Qcoeffs;
     Q->exps = Qexps;

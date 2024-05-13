@@ -69,7 +69,7 @@ sample_new(void * arg, ulong count)
         prof_stop();
     }
 
-    flint_randclear(state);
+    flint_rand_clear(state);
     fmpz_clear(res);
     fmpz_clear(a);
 }
@@ -98,7 +98,7 @@ sample_old(void * arg, ulong count)
         prof_stop();
     }
 
-    flint_randclear(state);
+    flint_rand_clear(state);
     fmpz_clear(res);
     fmpz_clear(a);
 }

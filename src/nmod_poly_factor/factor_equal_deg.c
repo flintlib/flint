@@ -30,12 +30,12 @@ nmod_poly_factor_equal_deg(nmod_poly_factor_t factors,
 
         nmod_poly_init_mod(f, pol->mod);
 
-        flint_randinit(state);
+        flint_rand_init(state);
 
         while (!nmod_poly_factor_equal_deg_prob(f, state, pol, d))
            ;
 
-        flint_randclear(state);
+        flint_rand_clear(state);
 
         nmod_poly_init_mod(g, pol->mod);
         nmod_poly_divexact(g, pol, f);

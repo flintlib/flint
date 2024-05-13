@@ -96,7 +96,7 @@ fq_zech_ctx_init_random_ui(fq_zech_ctx_t ctx, ulong p, slong d, const char * var
 
     fq_nmod_ctx = flint_malloc(sizeof(fq_nmod_ctx_struct));
 
-    flint_randinit(state);
+    flint_rand_init(state);
     nmod_poly_init(poly, p);
 
     poly->coeffs = tmp_coeffs;

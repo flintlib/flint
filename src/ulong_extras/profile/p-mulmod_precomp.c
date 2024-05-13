@@ -43,7 +43,7 @@ void sample(void * arg, ulong count)
       prof_stop();
    }
 
-   flint_randclear(state);
+   flint_rand_clear(state);
    flint_free(array);
 }
 

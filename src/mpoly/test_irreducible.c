@@ -979,7 +979,7 @@ int mpoly_test_irreducible(
     if (Abits > FLINT_BITS || Alen < 2)
         return 0;
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     uexps = FLINT_ARRAY_ALLOC(n*Alen, slong);
     max_exps = FLINT_ARRAY_ALLOC(n, slong);
@@ -1013,7 +1013,7 @@ int mpoly_test_irreducible(
 
     result = _mpoly_test_irreducible(uexps, n, Alen, n, state, tries);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
     flint_free(max_exps);
     flint_free(uexps);
 

@@ -74,7 +74,7 @@ int main(void)
 						i, i, max/(double)ITERS);
 	}
 
-   flint_randclear(state);
+   flint_rand_clear(state);
    flint_free(params.rnums1);
    flint_free(params.rnums2);
    return 0;

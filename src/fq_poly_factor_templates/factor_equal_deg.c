@@ -36,14 +36,14 @@ TEMPLATE(T, poly_factor_equal_deg) (TEMPLATE(T, poly_factor_t) factors,
 
         TEMPLATE(T, poly_init) (f, ctx);
 
-        flint_randinit(state);
+        flint_rand_init(state);
 
         while (!TEMPLATE(T, poly_factor_equal_deg_prob)
                (f, state, pol, d, ctx))
         {
         };
 
-        flint_randclear(state);
+        flint_rand_clear(state);
 
         TEMPLATE(T, poly_init) (g, ctx);
         TEMPLATE(T, poly_init) (r, ctx);

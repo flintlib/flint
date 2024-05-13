@@ -25,7 +25,7 @@ main(int argc, char * argv[])
     double incbits, inclen;
     flint_rand_t state;
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     fmpz_poly_init(f);
     fmpz_poly_init(g);
@@ -136,7 +136,7 @@ main(int argc, char * argv[])
     fmpz_clear(c);
     fmpz_clear(d);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
     flint_cleanup();
     return 0;
 }

@@ -36,10 +36,10 @@ TEST_FUNCTION_START(fmpq_poly_gegenbauer_c, state)
     fmpq_set_si(rats, 0, 1);
     for (d = 1; d < 16; d++)
         fmpq_set_si(rats + d, 1, d);
-    flint_randinit(rand_state);
+    flint_rand_init(rand_state);
     for (d = 16; d < NRATS; d++)
         fmpq_randtest_not_zero(rats + d, rand_state, 32);
-    flint_randclear(rand_state);
+    flint_rand_clear(rand_state);
 
     for (d = 0; d < NRATS; d++)
     {

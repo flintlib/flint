@@ -269,12 +269,12 @@ fmpz_mod_poly_factor_berlekamp(fmpz_mod_poly_factor_t factors,
     fmpz_mod_poly_factor_squarefree(sq_free, v, ctx);
 
     /* run Berlekamp algorithm for all squarefree factors */
-    flint_randinit(r);
+    flint_rand_init(r);
     for (i = 0; i < sq_free->num; i++)
     {
         __fmpz_mod_poly_factor_berlekamp(factors, r, sq_free->poly + i, ctx);
     }
-    flint_randclear(r);
+    flint_rand_clear(r);
 
     /* compute multiplicities of factors in f */
     for (i = 0; i < factors->num; i++)

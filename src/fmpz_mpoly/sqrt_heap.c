@@ -175,7 +175,7 @@ slong _fmpz_mpoly_sqrt_heap1(
     FLINT_ASSERT(mpoly_words_per_exp(bits, mctx) == 1);
     mpoly_get_cmpmask(&maskhi, 1, bits, mctx);
 
-    flint_randinit(heuristic_state);
+    flint_rand_init(heuristic_state);
 
     mpz_init(r);
     mpz_init(acc);
@@ -555,7 +555,7 @@ slong _fmpz_mpoly_sqrt_heap1(
 
 cleanup:
 
-    flint_randclear(heuristic_state);
+    flint_rand_clear(heuristic_state);
 
     mpz_clear(r);
     mpz_clear(acc);
@@ -630,7 +630,7 @@ slong _fmpz_mpoly_sqrt_heap(
     cmpmask = (ulong *) TMP_ALLOC(N*sizeof(ulong));
     mpoly_get_cmpmask(cmpmask, N, bits, mctx);
 
-    flint_randinit(heuristic_state);
+    flint_rand_init(heuristic_state);
 
     mpz_init(r);
     mpz_init(acc);
@@ -1065,7 +1065,7 @@ slong _fmpz_mpoly_sqrt_heap(
 
 cleanup:
 
-    flint_randclear(heuristic_state);
+    flint_rand_clear(heuristic_state);
 
     mpz_clear(r);
     mpz_clear(acc);

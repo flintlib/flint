@@ -101,14 +101,14 @@ void qadic_ctx_init(qadic_ctx_t ctx, const fmpz_t p, slong d,
         if (_qadic_ctx_init_conway_ui(ctx, *p, d, min, max, var, mode))
             return;
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     fmpz_mod_ctx_init(ctxp, p);
     fmpz_mod_poly_init2(poly, d + 1, ctxp);
 
     fmpz_mod_poly_randtest_sparse_irreducible(poly, state, d + 1, ctxp);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     /* Find number of non-zero coefficients */
     ctx->len = 1;

@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
         flint_rand_t randstate;
         timeit_t timer;
 
-        flint_randinit(randstate);
+        flint_rand_init(randstate);
 
         p = UWORD(1) << (SMALL_FMPZ_BITCOUNT_MAX);
         p = n_nextprime(p, 1);
@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
         fq_nmod_poly_clear(f, ctx);
         fq_nmod_ctx_clear(ctx);
 
-        flint_randclear(randstate);
+        flint_rand_clear(randstate);
     }
 
     flint_cleanup_master();

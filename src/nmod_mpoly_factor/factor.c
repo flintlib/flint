@@ -275,7 +275,7 @@ static int _factor_irred_compressed(
 
     Abits = A->bits;
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     strides = FLINT_ARRAY_ALLOC(2*nvars, ulong);
     texps = strides + nvars;
@@ -550,7 +550,7 @@ static int _factor_irred_compressed(
 
 cleanup:
 
-    flint_randclear(state);
+    flint_rand_clear(state);
     flint_free(strides);
     flint_free(perm);
 

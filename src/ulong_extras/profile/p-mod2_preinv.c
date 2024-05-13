@@ -107,7 +107,7 @@ void sample(void * arg, ulong count)
 
    if (r == UWORD(9879875897)) flint_abort();
 
-   flint_randclear(state);
+   flint_rand_clear(state);
    flint_free(arr);
 }
 

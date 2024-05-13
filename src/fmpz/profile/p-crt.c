@@ -124,7 +124,7 @@ benchmark(slong num_primes, slong prime_bits)
     fmpz_t res;
     slong k;
 
-    flint_randinit(state);
+    flint_rand_init(state);
     primes = flint_malloc(num_primes * sizeof(mp_limb_t));
     residues = flint_malloc(num_primes * sizeof(mp_limb_t));
     fmpz_init(res);

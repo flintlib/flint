@@ -69,7 +69,7 @@ int nmod_mpolyl_gcd_hensel_smprime(
     FLINT_ASSERT(B->bits == bits);
     FLINT_ASSERT(ctx->minfo->ord == ORD_LEX);
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     Hdegs  = FLINT_ARRAY_ALLOC(n + 1, slong);
 
@@ -394,7 +394,7 @@ got_alpha:
 
 cleanup:
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     flint_free(Hdegs);
 
@@ -491,7 +491,7 @@ int nmod_mpolyl_gcd_hensel_medprime(
     fq_zech_mpoly_init(A, ctx);
     fq_zech_mpoly_init(B, ctx);
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     Hdegs  = FLINT_ARRAY_ALLOC(n + 1, slong);
 
@@ -844,7 +844,7 @@ cleanup:
     fq_zech_mpoly_clear(A, ctx);
     fq_zech_mpoly_clear(B, ctx);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     flint_free(Hdegs);
 

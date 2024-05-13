@@ -46,7 +46,7 @@ void _TEMPLATE(T, embed_gens_naive)(TEMPLATE(T, t) gen_sub,
 				    TEMPLATE(T, ctx_modulus)(sub_ctx),
 				    sup_ctx);
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     /* Get one linear factor of sub_ctx->modulus in sup_ctx */
     while (TEMPLATE(T, poly_degree)(modulus, sup_ctx) != 1)
@@ -57,6 +57,8 @@ void _TEMPLATE(T, embed_gens_naive)(TEMPLATE(T, t) gen_sub,
         };
         TEMPLATE(T, poly_set)(modulus, fact, sup_ctx);
     }
+
+    flint_rand_clear(state);
 
     TEMPLATE(T, gen)(gen_sub, sub_ctx);
     TEMPLATE(T, set)(gen_sup, modulus->coeffs, sup_ctx);

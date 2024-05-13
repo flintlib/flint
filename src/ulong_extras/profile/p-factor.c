@@ -83,7 +83,7 @@ int main(void)
 		  i, max/(double)ITERS);
    }
 
-   flint_randclear(state);
+   flint_rand_clear(state);
    flint_free(params.composites);
    return 0;
 }

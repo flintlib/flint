@@ -231,9 +231,9 @@ nmod_poly_factor_berlekamp(nmod_poly_factor_t factors, const nmod_poly_t f)
 {
     flint_rand_t r;
 
-    flint_randinit(r);
+    flint_rand_init(r);
 
     __nmod_poly_factor_berlekamp(factors, r, f);
 
-    flint_randclear(r);
+    flint_rand_clear(r);
 }

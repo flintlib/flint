@@ -676,7 +676,7 @@ int fq_nmod_mpolyl_gcd_zippel_smprime(
         fq_nmod_init(alphas + i, ctx->fqctx);
     }
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     Aevals = FLINT_ARRAY_ALLOC(nvars + 1, fq_nmod_mpoly_struct);
     Bevals = FLINT_ARRAY_ALLOC(nvars + 1, fq_nmod_mpoly_struct);
@@ -1308,7 +1308,7 @@ cleanup:
     }
     flint_free(betas);
     flint_free(alphas);
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     for (i = 0; i < nvars; i++)
     {
@@ -1523,7 +1523,7 @@ int fq_nmod_mpolyl_gcd_zippel_lgprime(
         fq_nmod_init(alphas + i, smctx->fqctx);
     }
 
-    flint_randinit(state);
+    flint_rand_init(state);
     cur_emb = bad_fq_nmod_mpoly_embed_chooser_init(embc, lgctx, smctx, state);
     lgd = fq_nmod_ctx_degree(lgctx->fqctx);
     n_poly_init2(tmp, lgd);
@@ -2372,7 +2372,7 @@ cleanup:
     n_fq_poly_clear(alphapow);
     fq_nmod_clear(start_alpha, smctx->fqctx);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     for (i = 0; i < nvars; i++)
     {

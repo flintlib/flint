@@ -118,7 +118,7 @@ main(void)
     flint_printf("\n");
     fflush(stdout);
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
 printf("---- balanced ----\n");
 
@@ -184,7 +184,7 @@ printf("---- imbalanced ----\n");
     profile_it(state,   4, 40000,20000,60000,1);
 
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     flint_cleanup_master();
     return 0;

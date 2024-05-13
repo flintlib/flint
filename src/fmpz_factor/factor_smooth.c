@@ -219,7 +219,7 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
                 flint_rand_t state;
 
                 fmpz_init(f);
-                flint_randinit(state);
+                flint_rand_init(state);
 
                 /* currently only tuning values up to factors of 100 bits */
                 bits = FLINT_MIN(bits, 100);
@@ -268,7 +268,7 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
                     }
                 }
 
-                flint_randclear(state);
+                flint_rand_clear(state);
                 fmpz_clear(f);
             }
         }

@@ -43,7 +43,7 @@ void _fq_embed_gens_naive(fq_t gen_sub,
     fq_poly_init(fact, sup_ctx);
     fq_poly_set_fmpz_mod_poly(modulus, fq_ctx_modulus(sub_ctx), sup_ctx);
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     /* Get one linear factor of sub_ctx->modulus in sup_ctx */
     while (fq_poly_degree(modulus, sup_ctx) != 1)
@@ -53,6 +53,8 @@ void _fq_embed_gens_naive(fq_t gen_sub,
         };
         fq_poly_set(modulus, fact, sup_ctx);
     }
+
+    flint_rand_clear(state);
 
     fq_gen(gen_sub, sub_ctx);
     fq_set(gen_sup, modulus->coeffs, sup_ctx);

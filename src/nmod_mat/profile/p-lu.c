@@ -34,7 +34,7 @@ void sample(void * arg, ulong count)
     ulong i;
     flint_rand_t state;
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     nmod_mat_init(A, params->n, params->n, params->modulus);
     nmod_mat_init(LU, params->n, params->n, params->modulus);
@@ -74,7 +74,7 @@ void sample(void * arg, ulong count)
     nmod_mat_clear(LU);
     _perm_clear(P);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 }
 
 slong bits_tab[] = { 5, 14, 15, 25, 30, 31, 32, 33, 60, 61, 62, 63, 64, 0 };

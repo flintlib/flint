@@ -97,7 +97,7 @@ void sample(void * arg, ulong count)
    fmpz_poly_clear(q);
    fmpz_poly_clear(r);
 
-   flint_randclear(state);
+   flint_rand_clear(state);
 }
 
 int main(void)

@@ -56,7 +56,7 @@ acb_theta_transform_sqrtdet(acb_t res, const acb_mat_t tau, slong prec)
     slong k, j, nb_neg, nb_pos;
     int success = 0;
 
-    flint_randinit(state);
+    flint_rand_init(state);
     acb_mat_init(A, g, g);
     acb_mat_init(B, g, g);
     acb_mat_init(C, g, g);
@@ -169,7 +169,7 @@ acb_theta_transform_sqrtdet(acb_t res, const acb_mat_t tau, slong prec)
         acb_union(res, res, z, prec);
     }
 
-    flint_randclear(state);
+    flint_rand_clear(state);
     acb_mat_clear(A);
     acb_mat_clear(B);
     acb_mat_clear(C);

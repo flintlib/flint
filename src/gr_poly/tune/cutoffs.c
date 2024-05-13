@@ -262,7 +262,7 @@ get_profile(gr_ctx_t ctx, slong len)
     gr_poly_init(C, ctx);
     gr_poly_init(D, ctx);
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     SETUP
 
@@ -280,7 +280,7 @@ get_profile(gr_ctx_t ctx, slong len)
 
     printf("len %ld : %f\n", len, tbase / tnew);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     gr_poly_clear(A, ctx);
     gr_poly_clear(B, ctx);

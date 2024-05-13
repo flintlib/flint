@@ -107,11 +107,12 @@ def _handle_error(ctx, status, rstr, *args):
 
 
 class flint_rand_struct(ctypes.Structure):
-    # todo: use the real size
-    _fields_ = [('data', c_slong * 16)]
+    _fields_ = [('__gmp_state', ctypes.c_void_p),
+                ('__randval', c_ulong),
+                ('__randval2', c_ulong)]
 
 _flint_rand = flint_rand_struct()
-libflint.flint_randinit(ctypes.byref(_flint_rand))
+libflint.flint_rand_init(ctypes.byref(_flint_rand))
 
 class fmpz_struct(ctypes.Structure):
     _fields_ = [('val', c_slong)]
