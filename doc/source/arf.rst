@@ -731,7 +731,7 @@ Complex arithmetic
 Low-level methods
 -------------------------------------------------------------------------------
 
-.. function:: int _arf_get_integer_mpn(mp_ptr y, mp_srcptr xp, mp_size_t xn, slong exp)
+.. function:: int _arf_get_integer_mpn(nn_ptr y, nn_srcptr xp, slong xn, slong exp)
 
     Given a floating-point number *x* represented by *xn* limbs at *xp*
     and an exponent *exp*, writes the integer part of *x* to
@@ -741,7 +741,7 @@ Low-level methods
     Assumes that ``xp[0]`` is nonzero and that the
     top bit of ``xp[xn-1]`` is set.
 
-.. function:: int _arf_set_mpn_fixed(arf_t z, mp_srcptr xp, mp_size_t xn, mp_size_t fixn, int negative, slong prec, arf_rnd_t rnd)
+.. function:: int _arf_set_mpn_fixed(arf_t z, nn_srcptr xp, slong xn, slong fixn, int negative, slong prec, arf_rnd_t rnd)
 
     Sets *z* to the fixed-point number having *xn* total limbs and *fixn*
     fractional limbs, negated if *negative* is set, rounding *z* to *prec*
@@ -755,7 +755,7 @@ Low-level methods
     Sets *z* to the integer *x*, negated if *sgnbit* is 1, rounded to *prec*
     bits in the direction specified by *rnd*. There are no assumptions on *x*.
 
-.. function:: int _arf_set_round_uiui(arf_t z, slong * fix, mp_limb_t hi, mp_limb_t lo, int sgnbit, slong prec, arf_rnd_t rnd)
+.. function:: int _arf_set_round_uiui(arf_t z, slong * fix, ulong hi, ulong lo, int sgnbit, slong prec, arf_rnd_t rnd)
 
     Sets the mantissa of *z* to the two-limb mantissa given by *hi* and *lo*,
     negated if *sgnbit* is 1, rounded to *prec* bits in the direction specified
@@ -763,7 +763,7 @@ Low-level methods
     Writes the exponent shift to *fix* without writing the exponent of *z*
     directly.
 
-.. function:: int _arf_set_round_mpn(arf_t z, slong * exp_shift, mp_srcptr x, mp_size_t xn, int sgnbit, slong prec, arf_rnd_t rnd)
+.. function:: int _arf_set_round_mpn(arf_t z, slong * exp_shift, nn_srcptr x, slong xn, int sgnbit, slong prec, arf_rnd_t rnd)
 
     Sets the mantissa of *z* to the mantissa given by the *xn* limbs in *x*,
     negated if *sgnbit* is 1, rounded to *prec* bits in the direction

@@ -13,11 +13,11 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-/* Computes the W' = [w * b / p] (b = mp_limb_t power) */
-mp_limb_t
-n_mulmod_precomp_shoup(mp_limb_t w, mp_limb_t p)
+/* Computes the W' = [w * b / p] (b = ulong power) */
+ulong
+n_mulmod_precomp_shoup(ulong w, ulong p)
 {
-   mp_limb_t q, r;
+   ulong q, r;
    udiv_qrnnd(q, r, w, UWORD(0), p);
    return q;
 }

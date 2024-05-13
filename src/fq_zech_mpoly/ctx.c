@@ -14,7 +14,7 @@
 #include "fq_zech_mpoly.h"
 
 void fq_zech_mpoly_ctx_init_deg(fq_zech_mpoly_ctx_t ctx, slong nvars,
-                                  const ordering_t ord, mp_limb_t p, slong deg)
+                                  const ordering_t ord, ulong p, slong deg)
 {
     mpoly_ctx_init(ctx->minfo, nvars, ord);
     fq_zech_ctx_init_ui(ctx->fqctx, p, deg, "#");

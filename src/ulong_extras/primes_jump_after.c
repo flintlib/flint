@@ -12,7 +12,7 @@
 #include "ulong_extras.h"
 
 void
-n_primes_jump_after(n_primes_t iter, mp_limb_t n)
+n_primes_jump_after(n_primes_t iter, ulong n)
 {
     if (n < iter->small_primes[iter->small_num - 1])
     {

@@ -307,24 +307,24 @@ cleanup:
     s should have at least 2*FLINT_BITS entries allocated
 */
 static slong _uiui_hgcd(
-    mp_limb_t * s,
-    mp_limb_t A1, mp_limb_t A0,
-    mp_limb_t B1, mp_limb_t B0,
+    ulong * s,
+    ulong A1, ulong A0,
+    ulong B1, ulong B0,
     _ui_mat22_t M)
 {
     slong written = 0;
-    mp_limb_t d0, d1;
-    mp_limb_t t0, t1, t2, r0, r1;
+    ulong d0, d1;
+    ulong t0, t1, t2, r0, r1;
     int det = 1;
-    mp_limb_t m11 = 1;
-    mp_limb_t m12 = 0;
-    mp_limb_t m21 = 0;
-    mp_limb_t m22 = 1;
-    mp_limb_t a1 = A1;
-    mp_limb_t a0 = A0;
-    mp_limb_t b1 = B1;
-    mp_limb_t b0 = B0;
-    mp_limb_t q;
+    ulong m11 = 1;
+    ulong m12 = 0;
+    ulong m21 = 0;
+    ulong m22 = 1;
+    ulong a1 = A1;
+    ulong a0 = A0;
+    ulong b1 = B1;
+    ulong b0 = B0;
+    ulong q;
 
     FLINT_ASSERT(a1 != 0);
     FLINT_ASSERT(b1 < a1 || (b1 == a1 && b0 <= a0));
@@ -460,15 +460,15 @@ fix:
 static void _lehmer_exact(_fmpq_cfrac_list_t s, _fmpz_mat22_t M, int flags,
                                     fmpz_t xa, fmpz_t xb, fmpz_t ya, fmpz_t yb)
 {
-    mp_limb_t s_temp[2*FLINT_BITS];
+    ulong s_temp[2*FLINT_BITS];
     slong written;
     unsigned int x_lzcnt;
     mpz_ptr xn, xd, yn, yd;
-    mp_size_t xn_len, xd_len, yn_len, yd_len;
-    mp_ptr xn_ptr, xd_ptr, yn_ptr, yd_ptr;
+    slong xn_len, xd_len, yn_len, yd_len;
+    nn_ptr xn_ptr, xd_ptr, yn_ptr, yd_ptr;
     _ui_mat22_t m;
-    mp_limb_t A0, A1, B0, B1;
-    mp_size_t n;
+    ulong A0, A1, B0, B1;
+    slong n;
 
     if (!COEFF_IS_MPZ(*xa) || !COEFF_IS_MPZ(*xb))
         return;
@@ -553,13 +553,13 @@ again:
     if (flags & CFRAC_NEED_HGCD)
     {
         /* over-strict but fast _hcgd_ok(M, yn, yd) */
-        mp_size_t j;
+        slong j;
         FLINT_ASSERT(yn_len >= yd_len);
         _fmpz_mat22_rmul_ui(M, m);
         for (j = 2 + _fmpz_mat22_bits(M)/FLINT_BITS; j < yn_len; j++)
         {
-            mp_limb_t aa = yn_ptr[j];
-            mp_limb_t bb = j < yd_len ? yd_ptr[j] : 0;
+            ulong aa = yn_ptr[j];
+            ulong bb = j < yd_len ? yd_ptr[j] : 0;
             if (aa > bb && aa - bb > 1)
                 goto its_ok;
         }
@@ -605,18 +605,18 @@ cleanup:
 static void _lehmer_inexact(_fmpq_cfrac_list_t s, _fmpz_mat22_t M, int needM,
                                                 _fmpq_ball_t x, _fmpq_ball_t y)
 {
-    mp_limb_t s_temp[2*FLINT_BITS];
+    ulong s_temp[2*FLINT_BITS];
     slong written;
     unsigned int x_lzcnt;
     mpz_ptr xln, xld, xrn, xrd;
     mpz_ptr yln, yld, yrn, yrd;
-    mp_size_t xln_len, xld_len, xrn_len, xrd_len;
-    mp_size_t yln_len, yld_len, yrn_len, yrd_len;
-    mp_ptr xln_ptr, xld_ptr, xrn_ptr, xrd_ptr;
-    mp_ptr yln_ptr, yld_ptr, yrn_ptr, yrd_ptr;
+    slong xln_len, xld_len, xrn_len, xrd_len;
+    slong yln_len, yld_len, yrn_len, yrd_len;
+    nn_ptr xln_ptr, xld_ptr, xrn_ptr, xrd_ptr;
+    nn_ptr yln_ptr, yld_ptr, yrn_ptr, yrd_ptr;
     _ui_mat22_t m;
-    mp_limb_t A0, A1, B0, B1;
-    mp_size_t n, nl, nr;
+    ulong A0, A1, B0, B1;
+    slong n, nl, nr;
 
     if (!COEFF_IS_MPZ(*x->left_num) || !COEFF_IS_MPZ(*x->left_den)
         || !COEFF_IS_MPZ(*x->right_num) || !COEFF_IS_MPZ(*x->right_den))

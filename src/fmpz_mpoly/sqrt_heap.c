@@ -69,7 +69,7 @@ static mpz_srcptr _fmpz_mpoly_get_mpz_signed_uiuiui(ulong * sm, fmpz x, mpz_ptr 
 /* try to prove that A is not a square */
 static int _is_proved_not_square(
     int count,
-    mp_limb_t * p,
+    ulong * p,
     flint_rand_t state,
     const fmpz * Acoeffs,
     const ulong * Aexps,
@@ -79,7 +79,7 @@ static int _is_proved_not_square(
 {
     int success = 0;
     slong i, N = mpoly_words_per_exp(Abits, mctx);
-    mp_limb_t eval, * alphas;
+    ulong eval, * alphas;
     nmod_t mod;
     ulong * t;
     TMP_INIT;
@@ -99,7 +99,7 @@ static int _is_proved_not_square(
     /* try at most 3*count evaluations */
     count *= 3;
 
-    alphas = (mp_limb_t *) TMP_ALLOC(mctx->nvars*sizeof(mp_limb_t));
+    alphas = (ulong *) TMP_ALLOC(mctx->nvars*sizeof(ulong));
 
 next_p:
 
@@ -164,7 +164,7 @@ slong _fmpz_mpoly_sqrt_heap1(
     ulong acc_sm[3], acc_sm2[3], pp[3];
     int lt_divides, q_rest_small;
     flint_rand_t heuristic_state;
-    mp_limb_t heuristic_p = UWORD(1) << (SMALL_FMPZ_BITCOUNT_MAX);
+    ulong heuristic_p = UWORD(1) << (SMALL_FMPZ_BITCOUNT_MAX);
     int heuristic_count = 0;
     ulong lc_abs = 0; /* 2*sqrt(lc) if it fits in ulong, otherwise 0 */
     ulong lc_norm = 0;
@@ -612,7 +612,7 @@ slong _fmpz_mpoly_sqrt_heap(
     ulong acc_sm[3], acc_sm2[3], pp[3];
     int halves, use_heap, lt_divides, q_rest_small;
     flint_rand_t heuristic_state;
-    mp_limb_t heuristic_p = UWORD(1) << (SMALL_FMPZ_BITCOUNT_MAX);
+    ulong heuristic_p = UWORD(1) << (SMALL_FMPZ_BITCOUNT_MAX);
     int heuristic_count = 0;
     ulong lc_abs = 0; /* 2*sqrt(lc) if it fits in ulong, otherwise 0 */
     ulong lc_norm = 0;

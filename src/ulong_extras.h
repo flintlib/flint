@@ -44,7 +44,7 @@ ulong n_randtest_prime(flint_rand_t state, int proved);
 
 ulong n_revbin(ulong in, ulong bits);
 
-int n_divides(mp_limb_t * q, mp_limb_t n, mp_limb_t p);
+int n_divides(ulong * q, ulong n, ulong p);
 ulong n_divrem2_precomp(ulong * q, ulong a, ulong n, double npre);
 ulong n_divrem2_preinv(ulong * q, ulong a, ulong n, ulong ninv);
 ulong n_div2_preinv(ulong a, ulong n, ulong ninv);
@@ -77,6 +77,15 @@ ulong n_flog(ulong n, ulong b);
 ulong n_clog(ulong n, ulong b);
 ulong n_clog_2exp(ulong n, ulong b);
 
+#ifdef _MSC_VER
+# define DECLSPEC_IMPORT __declspec(dllimport)
+#else
+# define DECLSPEC_IMPORT
+#endif
+DECLSPEC_IMPORT ulong __gmpn_gcd_11(ulong, ulong);
+DECLSPEC_IMPORT ulong __gmpn_gcd_1(nn_srcptr, long int, ulong);
+#undef DECLSPEC_IMPORT
+
 ULONG_EXTRAS_INLINE
 ulong n_gcd(ulong x, ulong y)
 {
@@ -88,11 +97,11 @@ ulong n_gcd(ulong x, ulong y)
         my = flint_ctz(y);
         x >>= mx;
         y >>= my;
-        res = (x != 1 && y != 1) ? mpn_gcd_11(x, y) : 1;
+        res = (x != 1 && y != 1) ? __gmpn_gcd_11(x, y) : 1;
         res <<= FLINT_MIN(mx, my);
         return res;
 #else
-        return mpn_gcd_1(&x, 1, y);
+        return __gmpn_gcd_1(&x, 1, y);
 #endif
     }
     else
@@ -147,12 +156,12 @@ ulong n_lll_mod_preinv(ulong a_hi, ulong a_mi, ulong a_lo, ulong n, ulong ninv);
 ulong n_mulmod_precomp(ulong a, ulong b, ulong n, double ninv);
 ulong n_mulmod_preinv(ulong a, ulong b, ulong n, ulong ninv, ulong norm);
 
-mp_limb_t n_mulmod_precomp_shoup(mp_limb_t w, mp_limb_t p);
+ulong n_mulmod_precomp_shoup(ulong w, ulong p);
 
 ULONG_EXTRAS_INLINE
-mp_limb_t n_mulmod_shoup(mp_limb_t w, mp_limb_t t, mp_limb_t w_precomp, mp_limb_t p)
+ulong n_mulmod_shoup(ulong w, ulong t, ulong w_precomp, ulong p)
 {
-    mp_limb_t q, r, p_hi, p_lo;
+    ulong q, r, p_hi, p_lo;
 
     umul_ppmm(p_hi, p_lo, w_precomp, t);
     q = p_hi;

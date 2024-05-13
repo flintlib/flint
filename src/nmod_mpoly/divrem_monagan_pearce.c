@@ -16,20 +16,20 @@
 static int _nmod_mpoly_divrem_monagan_pearce1_binomial(
     nmod_mpoly_t Q,
     nmod_mpoly_t R,
-    const mp_limb_t * Acoeffs, const ulong * Aexps, slong Alen,
-    const mp_limb_t * Bcoeffs, const ulong * Bexps,
+    const ulong * Acoeffs, const ulong * Aexps, slong Alen,
+    const ulong * Bcoeffs, const ulong * Bexps,
     flint_bitcnt_t bits,
     ulong maskhi,
     nmod_t mod)
 {
-    mp_limb_t * Qcoeffs = Q->coeffs;
-    mp_limb_t * Rcoeffs = R->coeffs;
+    ulong * Qcoeffs = Q->coeffs;
+    ulong * Rcoeffs = R->coeffs;
     ulong * Qexps = Q->exps;
     ulong * Rexps = R->exps;
     ulong lexp, mask = mpoly_overflow_mask_sp(bits);
-    mp_limb_t lcoeff;
-    mp_limb_t lc_inv = nmod_inv(Bcoeffs[0], mod);
-    mp_limb_t mBcoeff1 = mod.n - Bcoeffs[1];
+    ulong lcoeff;
+    ulong lc_inv = nmod_inv(Bcoeffs[0], mod);
+    ulong mBcoeff1 = mod.n - Bcoeffs[1];
     slong Qlen = 0;
     slong Rlen = 0;
     slong Aidx = 0;
@@ -139,8 +139,8 @@ exp_overflow:
 static int _nmod_mpoly_divrem_monagan_pearce1(
     nmod_mpoly_t Q,
     nmod_mpoly_t R,
-    const mp_limb_t * Acoeffs, const ulong * Aexps, slong Alen,
-    const mp_limb_t * Bcoeffs, const ulong * Bexps, slong Blen,
+    const ulong * Acoeffs, const ulong * Aexps, slong Alen,
+    const ulong * Bcoeffs, const ulong * Bexps, slong Blen,
     flint_bitcnt_t bits,
     ulong maskhi,
     nmod_t fctx)
@@ -151,14 +151,14 @@ static int _nmod_mpoly_divrem_monagan_pearce1(
     mpoly_heap_t * chain;
     slong * store, * store_base;
     mpoly_heap_t * x;
-    mp_limb_t * Qcoeffs = Q->coeffs;
-    mp_limb_t * Rcoeffs = R->coeffs;
+    ulong * Qcoeffs = Q->coeffs;
+    ulong * Rcoeffs = R->coeffs;
     ulong * Qexps = Q->exps;
     ulong * Rexps = R->exps;
     slong * hind;
     ulong mask, exp;
     int lt_divides;
-    mp_limb_t lc_minus_inv, acc0, acc1, acc2, pp1, pp0;
+    ulong lc_minus_inv, acc0, acc1, acc2, pp1, pp0;
     TMP_INIT;
 
     TMP_START;
@@ -346,8 +346,8 @@ exp_overflow:
 static int _nmod_mpoly_divrem_monagan_pearce(
     nmod_mpoly_t Q,
     nmod_mpoly_t R,
-    const mp_limb_t * Acoeffs, const ulong * Aexps, slong Alen,
-    const mp_limb_t * Bcoeffs, const ulong * Bexps, slong Blen,
+    const ulong * Acoeffs, const ulong * Aexps, slong Alen,
+    const ulong * Bcoeffs, const ulong * Bexps, slong Blen,
     slong bits,
     slong N,
     const ulong * cmpmask,
@@ -360,8 +360,8 @@ static int _nmod_mpoly_divrem_monagan_pearce(
     mpoly_heap_t * chain;
     slong * store, * store_base;
     mpoly_heap_t * x;
-    mp_limb_t * Qcoeffs = Q->coeffs;
-    mp_limb_t * Rcoeffs = R->coeffs;
+    ulong * Qcoeffs = Q->coeffs;
+    ulong * Rcoeffs = R->coeffs;
     ulong * Qexps = Q->exps;
     ulong * Rexps = R->exps;
     ulong * exp, * exps;
@@ -370,7 +370,7 @@ static int _nmod_mpoly_divrem_monagan_pearce(
     ulong mask;
     slong * hind;
     int lt_divides;
-    mp_limb_t lc_minus_inv, acc0, acc1, acc2, pp1, pp0;
+    ulong lc_minus_inv, acc0, acc1, acc2, pp1, pp0;
     TMP_INIT;
 
     if (N == 1)

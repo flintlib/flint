@@ -18,7 +18,7 @@ TEST_FUNCTION_START(smul_ppmm, state)
 
     for (i = 0; i < 100000 * flint_test_multiplier(); i++)
     {
-        mp_limb_t ph1, pl1, ph2, pl2, pl2old, n1, n2, m1, m2, bit;
+        ulong ph1, pl1, ph2, pl2, pl2old, n1, n2, m1, m2, bit;
         int j, sign;
 
         n1 = n_randtest(state);
@@ -30,13 +30,13 @@ TEST_FUNCTION_START(smul_ppmm, state)
         m2 = n2;
 
         sign = 1;
-        if ((mp_limb_signed_t) m1 < WORD(0))
+        if ((slong) m1 < WORD(0))
         {
             sign = -1;
             m1 = -m1;
         }
 
-        if ((mp_limb_signed_t) m2 < WORD(0))
+        if ((slong) m2 < WORD(0))
         {
             sign = -sign;
             m2 = -m2;

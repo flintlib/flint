@@ -20,7 +20,7 @@
     raised to the e-th power, assuming that neither op nor e are zero.
  */
 
-void _fq_nmod_frobenius(mp_limb_t *rop, const mp_limb_t *op, slong len, slong e,
+void _fq_nmod_frobenius(ulong *rop, const ulong *op, slong len, slong e,
                         const fq_nmod_ctx_t ctx)
 {
     const slong d = ctx->j[ctx->len - 1];
@@ -59,7 +59,7 @@ void fq_nmod_frobenius(fq_nmod_t rop, const fq_nmod_t op, slong e, const fq_nmod
     }
     else
     {
-        mp_limb_t *t;
+        ulong *t;
 
         if (rop == op)
         {

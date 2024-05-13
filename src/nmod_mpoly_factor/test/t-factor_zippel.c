@@ -121,7 +121,7 @@ TEST_FUNCTION_START(nmod_mpoly_factor_zippel, state)
         nmod_mpoly_t a, t;
         slong n, nfacs, len;
         ulong expbound, powbound, pow;
-        mp_limb_t p;
+        ulong p;
 
         p = n_randint(state, (i % 2 == 0) ? 4 : FLINT_BITS - 1) + 1;
         p = n_randbits(state, p);

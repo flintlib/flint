@@ -29,8 +29,8 @@ static const short fft_mullow_tab[] = {1115, 1115, 597, 569, 407, 321, 306, 279,
 #endif
 
 
-void _nmod_poly_mullow(mp_ptr res, mp_srcptr poly1, slong len1,
-                             mp_srcptr poly2, slong len2, slong n, nmod_t mod)
+void _nmod_poly_mullow(nn_ptr res, nn_srcptr poly1, slong len1,
+                             nn_srcptr poly2, slong len2, slong n, nmod_t mod)
 {
     slong bits;
 

@@ -33,7 +33,7 @@ void fmpz_gcdinv(fmpz_t d, fmpz_t a, const fmpz_t f, const fmpz_t g)
         _fmpz_demote(d);
         _fmpz_demote(a);
 
-        *d = n_gcdinv((mp_limb_t *) a, ff, gg);
+        *d = n_gcdinv((ulong *) a, ff, gg);
     }
     else  /* g is large */
     {
@@ -51,7 +51,7 @@ void fmpz_gcdinv(fmpz_t d, fmpz_t a, const fmpz_t f, const fmpz_t g)
 
             fptr->_mp_alloc = 1;
             fptr->_mp_size  = 1;
-            fptr->_mp_d     = (mp_limb_t *) f;
+            fptr->_mp_d     = (ulong *) f;
 
             mpz_gcdext(dtemp, atemp, NULL,
                        fptr, COEFF_TO_PTR(*g));

@@ -138,14 +138,14 @@ gr_method_tab_input _mpn_mod_methods_input[] =
 #endif
 
 int
-_gr_ctx_init_mpn_mod(gr_ctx_t ctx, mp_srcptr n, mp_size_t nlimbs)
+_gr_ctx_init_mpn_mod(gr_ctx_t ctx, nn_srcptr n, slong nlimbs)
 {
-    mp_bitcnt_t norm;
+    flint_bitcnt_t norm;
     if (nlimbs < MPN_MOD_MIN_LIMBS || nlimbs > MPN_MOD_MAX_LIMBS || n[nlimbs - 1] == 0)
         return GR_UNABLE;
 
     ctx->which_ring = GR_CTX_MPN_MOD;
-    ctx->sizeof_elem = nlimbs * sizeof(mp_limb_t);
+    ctx->sizeof_elem = nlimbs * sizeof(ulong);
 
     GR_CTX_DATA_AS_PTR(ctx) = flint_malloc(sizeof(_mpn_mod_ctx_struct));
 

@@ -75,10 +75,10 @@ void nf_elem_clear(nf_elem_t a, const nf_t nf);
 void nf_elem_swap(nf_elem_t a, nf_elem_t b, const nf_t nf);
 
 void nf_elem_randtest(nf_elem_t a, flint_rand_t state,
-                                              mp_bitcnt_t bits, const nf_t nf);
+                                              flint_bitcnt_t bits, const nf_t nf);
 
 void nf_elem_randtest_not_zero(nf_elem_t a, flint_rand_t state,
-                                              mp_bitcnt_t bits, const nf_t nf);
+                                              flint_bitcnt_t bits, const nf_t nf);
 
 NF_ELEM_INLINE
 void nf_elem_canonicalise(nf_elem_t a, const nf_t nf)

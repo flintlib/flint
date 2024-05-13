@@ -17,12 +17,12 @@
 
 /* Assumes poly1 and poly2 are not length 0. */
 void
-_nmod_poly_mul_classical(mp_ptr res, mp_srcptr poly1,
-                         slong len1, mp_srcptr poly2, slong len2, nmod_t mod)
+_nmod_poly_mul_classical(nn_ptr res, nn_srcptr poly1,
+                         slong len1, nn_srcptr poly2, slong len2, nmod_t mod)
 {
     slong i, j, bits, log_len, nlimbs, n1, n2;
     int squaring;
-    mp_limb_t c;
+    ulong c;
 
     if (len1 == 1)
     {
@@ -63,7 +63,7 @@ _nmod_poly_mul_classical(mp_ptr res, mp_srcptr poly1,
         {
             for (i = 0; i < len1; i++)
             {
-                mp_limb_t c = poly1[i];
+                ulong c = poly1[i];
 
                 for (j = 0; j < len2; j++)
                     res[i + j] += c * poly2[j];

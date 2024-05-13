@@ -18,7 +18,7 @@ TEST_FUNCTION_START(add_ssssaaaaaaaa, state)
 
     for (i = 0; i < 100000 * flint_test_multiplier(); i++)
     {
-        mp_limb_t s[4], t[4], a[4], b[4];
+        ulong s[4], t[4], a[4], b[4];
         int aliasing;
 
         for (j = 0; j < 4; j++)

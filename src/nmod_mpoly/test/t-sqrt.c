@@ -24,7 +24,7 @@ TEST_FUNCTION_START(nmod_mpoly_sqrt, state)
         slong len, len1;
         flint_bitcnt_t exp_bits, exp_bits1;
         int sqr;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, (i % 4 == 0) ? 4 : FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -85,7 +85,7 @@ TEST_FUNCTION_START(nmod_mpoly_sqrt, state)
         slong len, len1;
         flint_bitcnt_t exp_bits, exp_bits1;
         int sqr;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, (i % 4 == 0) ? 4 : FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -143,7 +143,7 @@ TEST_FUNCTION_START(nmod_mpoly_sqrt, state)
         slong len, len1;
         flint_bitcnt_t exp_bits, exp_bits1;
         int sqr1, sqr2;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, (i % 4 == 0) ? 4 : FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);

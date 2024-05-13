@@ -15,8 +15,8 @@ int
 arf_cmp(const arf_t x, const arf_t y)
 {
     int xs, ys, ec, mc;
-    mp_size_t xn, yn;
-    mp_srcptr xp, yp;
+    slong xn, yn;
+    nn_srcptr xp, yp;
 
     if (arf_is_special(x) || arf_is_special(y))
     {
@@ -85,8 +85,8 @@ int
 arf_cmpabs(const arf_t x, const arf_t y)
 {
     int ec, mc;
-    mp_size_t xn, yn;
-    mp_srcptr xp, yp;
+    slong xn, yn;
+    nn_srcptr xp, yp;
 
     if (arf_is_special(x) || arf_is_special(y))
     {

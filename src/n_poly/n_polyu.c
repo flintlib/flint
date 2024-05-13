@@ -40,14 +40,14 @@ void n_polyu_realloc(n_polyu_t A, slong len)
     if (old_alloc > 0)
     {
         A->exps = (ulong *) flint_realloc(A->exps, new_alloc*sizeof(ulong));
-        A->coeffs = (mp_limb_t *) flint_realloc(A->coeffs, new_alloc*sizeof(mp_limb_t));
+        A->coeffs = (ulong *) flint_realloc(A->coeffs, new_alloc*sizeof(ulong));
     }
     else
     {
         FLINT_ASSERT(A->exps == NULL);
         FLINT_ASSERT(A->coeffs == NULL);
         A->exps = (ulong *) flint_malloc(new_alloc*sizeof(ulong));
-        A->coeffs = (mp_limb_t *) flint_malloc(new_alloc*sizeof(mp_limb_t));
+        A->coeffs = (ulong *) flint_malloc(new_alloc*sizeof(ulong));
     }
 
     A->alloc = new_alloc;

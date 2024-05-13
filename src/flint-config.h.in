@@ -12,6 +12,9 @@
 /* Define if system is big endian. */
 #undef FLINT_BIG_ENDIAN
 
+/* Define according to the ABI FLINT was compiled with */
+#undef FLINT_BITS
+
 /* Define if Arm v8 assembly is available */
 #undef FLINT_HAVE_ASSEMBLY_armv8
 
@@ -50,6 +53,9 @@
 
 /* Define if system is strongly ordered */
 #undef FLINT_KNOW_STRONG_ORDER
+
+/* Define to use long long limbs */
+#undef FLINT_LONG_LONG
 
 /* Define to enable reentrant. */
 #undef FLINT_REENTRANT

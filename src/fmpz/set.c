@@ -160,7 +160,7 @@ void fmpz_set_signed_ui_array(fmpz_t f, const ulong * c, slong n)
     else
     {
         mpz_ptr z = _fmpz_promote(f);
-        mp_limb_t * zd = FLINT_MPZ_REALLOC(z, n);
+        ulong * zd = FLINT_MPZ_REALLOC(z, n);
 
         if (csign == 0)
         {

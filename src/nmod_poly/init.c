@@ -14,7 +14,7 @@
 #include "nmod_poly.h"
 
 void
-nmod_poly_init_preinv(nmod_poly_t poly, mp_limb_t n, mp_limb_t ninv)
+nmod_poly_init_preinv(nmod_poly_t poly, ulong n, ulong ninv)
 {
     poly->coeffs = NULL;
 
@@ -27,17 +27,17 @@ nmod_poly_init_preinv(nmod_poly_t poly, mp_limb_t n, mp_limb_t ninv)
 }
 
 void
-nmod_poly_init(nmod_poly_t poly, mp_limb_t n)
+nmod_poly_init(nmod_poly_t poly, ulong n)
 {
     nmod_poly_init_preinv(poly, n, n_preinvert_limb(n));
 }
 
 void
 nmod_poly_init2_preinv(nmod_poly_t poly,
-                       mp_limb_t n, mp_limb_t ninv, slong alloc)
+                       ulong n, ulong ninv, slong alloc)
 {
     if (alloc)
-        poly->coeffs = (mp_ptr) flint_malloc(alloc * sizeof(mp_limb_t));
+        poly->coeffs = (nn_ptr) flint_malloc(alloc * sizeof(ulong));
     else
         poly->coeffs = NULL;
 
@@ -51,7 +51,7 @@ nmod_poly_init2_preinv(nmod_poly_t poly,
 }
 
 void
-nmod_poly_init2(nmod_poly_t poly, mp_limb_t n, slong alloc)
+nmod_poly_init2(nmod_poly_t poly, ulong n, slong alloc)
 {
     nmod_poly_init2_preinv(poly, n, n_preinvert_limb(n), alloc);
 }

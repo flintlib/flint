@@ -50,8 +50,8 @@ void fq_nmod_mpoly_evals(
     ulong varexp;
     slong total_degree, lo, hi;
     n_poly_struct * caches = FLINT_ARRAY_ALLOC(3*nvars, n_poly_struct);
-    mp_limb_t * t = FLINT_ARRAY_ALLOC(2*d, mp_limb_t);
-    mp_limb_t * meval = t + d;
+    ulong * t = FLINT_ARRAY_ALLOC(2*d, ulong);
+    ulong * meval = t + d;
 
     for (j = 0; j < nvars; j++)
     {
@@ -77,7 +77,7 @@ void fq_nmod_mpoly_evals(
     total_degree = 0;
     for (i = 0; i < A->length; i++)
     {
-        mp_limb_t * s = A->coeffs + d*i; /* source */
+        ulong * s = A->coeffs + d*i; /* source */
 
         lo = hi = 0;
         for (j = 0; j < nvars; j++)
@@ -158,8 +158,8 @@ void fq_nmod_mpoly_evals_lgprime(
     ulong varexp, lo, hi;
     slong total_degree;
     n_poly_struct * caches = FLINT_ARRAY_ALLOC(3*nvars, n_poly_struct);
-    mp_limb_t * t = FLINT_ARRAY_ALLOC(2*lgd, mp_limb_t);
-    mp_limb_t * meval = t + lgd;
+    ulong * t = FLINT_ARRAY_ALLOC(2*lgd, ulong);
+    ulong * meval = t + lgd;
 
     for (j = 0; j < nvars; j++)
     {
@@ -635,7 +635,7 @@ static int _try_monomial_cofactors(
     slong NA, NG;
     slong nvars = ctx->minfo->nvars;
     fmpz * Abarexps, * Bbarexps, * Texps;
-    mp_limb_t * tmp, * t1, * t2, * a0, * b0;
+    ulong * tmp, * t1, * t2, * a0, * b0;
     fq_nmod_mpoly_t T;
     flint_bitcnt_t Gbits = FLINT_MIN(A->bits, B->bits);
     flint_bitcnt_t Abarbits = A->bits;
@@ -650,8 +650,8 @@ static int _try_monomial_cofactors(
 
     TMP_START;
 
-    tmp = (mp_limb_t *) TMP_ALLOC(d*(4 + FLINT_MAX(N_FQ_MUL_ITCH,
-                                            N_FQ_INV_ITCH))*sizeof(mp_limb_t));
+    tmp = (ulong *) TMP_ALLOC(d*(4 + FLINT_MAX(N_FQ_MUL_ITCH,
+                                            N_FQ_INV_ITCH))*sizeof(ulong));
     t1 = tmp + d*FLINT_MAX(N_FQ_MUL_ITCH, N_FQ_INV_ITCH);
     t2 = t1 + d;
     a0 = t2 + d;

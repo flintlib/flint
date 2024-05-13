@@ -15,13 +15,13 @@
 /* See verify_taylor.py for code to generate tables and
    proof of correctness */
 
-#define TMP_ALLOC_LIMBS(size) TMP_ALLOC((size) * sizeof(mp_limb_t))
+#define TMP_ALLOC_LIMBS(size) TMP_ALLOC((size) * sizeof(ulong))
 
 #define FACTORIAL_TAB_SIZE 288
 
 #if FLINT_BITS == 64
 
-const mp_limb_t factorial_tab_numer[FACTORIAL_TAB_SIZE] = {
+const ulong factorial_tab_numer[FACTORIAL_TAB_SIZE] = {
     UWORD(2432902008176640000),
     UWORD(2432902008176640000),
     UWORD(1216451004088320000),
@@ -312,7 +312,7 @@ const mp_limb_t factorial_tab_numer[FACTORIAL_TAB_SIZE] = {
     UWORD(1),
 };
 
-const mp_limb_t factorial_tab_denom[FACTORIAL_TAB_SIZE] = {
+const ulong factorial_tab_denom[FACTORIAL_TAB_SIZE] = {
     UWORD(2432902008176640000),
     UWORD(2432902008176640000),
     UWORD(2432902008176640000),
@@ -605,7 +605,7 @@ const mp_limb_t factorial_tab_denom[FACTORIAL_TAB_SIZE] = {
 
 #else
 
-const mp_limb_t factorial_tab_numer[FACTORIAL_TAB_SIZE] = {
+const ulong factorial_tab_numer[FACTORIAL_TAB_SIZE] = {
     UWORD(479001600),
     UWORD(479001600),
     UWORD(239500800),
@@ -896,7 +896,7 @@ const mp_limb_t factorial_tab_numer[FACTORIAL_TAB_SIZE] = {
     UWORD(288),
 };
 
-const mp_limb_t factorial_tab_denom[FACTORIAL_TAB_SIZE] = {
+const ulong factorial_tab_denom[FACTORIAL_TAB_SIZE] = {
     UWORD(479001600),
     UWORD(479001600),
     UWORD(479001600),
@@ -1189,11 +1189,11 @@ const mp_limb_t factorial_tab_denom[FACTORIAL_TAB_SIZE] = {
 
 #endif
 
-void _arb_exp_taylor_rs(mp_ptr y, mp_limb_t * error,
-    mp_srcptr x, mp_size_t xn, ulong N)
+void _arb_exp_taylor_rs(nn_ptr y, ulong * error,
+    nn_srcptr x, slong xn, ulong N)
 {
-    mp_ptr s, t, xpow;
-    mp_limb_t new_denom, old_denom, c;
+    nn_ptr s, t, xpow;
+    ulong new_denom, old_denom, c;
     slong power, k, m;
 
     TMP_INIT;

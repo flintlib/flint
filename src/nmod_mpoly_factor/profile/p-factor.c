@@ -1184,7 +1184,7 @@ int main(int argc, char *argv[])
 
     for (k = 0; k <= 4; k++)
     {
-        mp_limb_t ps[] = {2, 3, 11, 257, 43051};
+        ulong ps[] = {2, 3, 11, 257, 43051};
 
         flint_printf("\n------ 4 variables, characteristic %wu ------\n", ps[k]);
         total_time = 0;

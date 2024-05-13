@@ -21,7 +21,7 @@ int nmod_mpoly_compose_nmod_mpoly_geobucket(nmod_mpoly_t A,
     int success = 1;
     slong i, j;
     slong Blen = B->length;
-    const mp_limb_t * Bcoeff = B->coeffs;
+    const ulong * Bcoeff = B->coeffs;
     const ulong * Bexp = B->exps;
     flint_bitcnt_t Bbits = B->bits;
     slong BN = mpoly_words_per_exp(Bbits, ctxB->minfo);

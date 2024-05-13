@@ -9,43 +9,38 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 
 static
 ulong n_ecm_primorial[] =
 {
-#ifdef FLINT64
-
     UWORD(2), UWORD(6), UWORD(30), UWORD(210), UWORD(2310), UWORD(30030),
-    UWORD(510510), UWORD(9699690), UWORD(223092870), UWORD(6469693230),
-    UWORD(200560490130), UWORD(7420738134810), UWORD(304250263527210),
-    UWORD(13082761331670030), UWORD(614889782588491410)
-
-#else
-
-    UWORD(2), UWORD(6), UWORD(30), UWORD(210), UWORD(2310), UWORD(30030),
-    UWORD(510510), UWORD(9699690)
-
+    UWORD(510510), UWORD(9699690),
+#if FLINT64
+    UWORD(223092870), UWORD(6469693230), UWORD(200560490130),
+    UWORD(7420738134810), UWORD(304250263527210), UWORD(13082761331670030),
+    UWORD(614889782588491410)
 #endif
 };
 
-#ifdef FLINT64
+#if FLINT64
 #define num_n_ecm_primorials 15
 #else
 #define num_n_ecm_primorials 9
 #endif
 
 int
-n_factor_ecm(mp_limb_t *f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
-             flint_rand_t state, mp_limb_t n)
+n_factor_ecm(ulong *f, ulong curves, ulong B1, ulong B2,
+             flint_rand_t state, ulong n)
 {
-    mp_limb_t P, num, maxD, mmin, mmax, mdiff, prod, maxj, sig;
+    ulong P, num, maxD, mmin, mmax, mdiff, prod, maxj, sig;
     ulong i, j;
     int ret;
     n_ecm_t n_ecm_inf;
 
-    const mp_limb_t *prime_array;
+    const ulong *prime_array;
 
     n_ecm_inf->normbits = flint_clz(n);
     n <<= n_ecm_inf->normbits;
@@ -185,11 +180,11 @@ n_factor_ecm(mp_limb_t *f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
 */
 
 void
-n_factor_ecm_add(mp_limb_t *x, mp_limb_t *z, mp_limb_t x1, mp_limb_t z1,
-                 mp_limb_t x2, mp_limb_t z2, mp_limb_t x0, mp_limb_t z0,
-                 mp_limb_t n, n_ecm_t n_ecm_inf)
+n_factor_ecm_add(ulong *x, ulong *z, ulong x1, ulong z1,
+                 ulong x2, ulong z2, ulong x0, ulong z0,
+                 ulong n, n_ecm_t n_ecm_inf)
 {
-    mp_limb_t u, v, w;
+    ulong u, v, w;
 
     if (z1 == 0)
     {
@@ -251,10 +246,10 @@ n_factor_ecm_add(mp_limb_t *x, mp_limb_t *z, mp_limb_t x1, mp_limb_t z1,
 /* a24 = (a + 2) / 4 mod n */
 
 void
-n_factor_ecm_double(mp_limb_t *x, mp_limb_t *z, mp_limb_t x0, mp_limb_t z0,
-                    mp_limb_t n, n_ecm_t n_ecm_inf)
+n_factor_ecm_double(ulong *x, ulong *z, ulong x0, ulong z0,
+                    ulong n, n_ecm_t n_ecm_inf)
 {
-    mp_limb_t u, v, w;
+    ulong u, v, w;
 
     if (z0 == 0)
     {
@@ -277,10 +272,10 @@ n_factor_ecm_double(mp_limb_t *x, mp_limb_t *z, mp_limb_t x0, mp_limb_t z0,
 /* P (x0 : z0) <- kP using Montgomery ladder algorithm */
 
 void
-n_factor_ecm_mul_montgomery_ladder(mp_limb_t *x, mp_limb_t *z, mp_limb_t x0, mp_limb_t z0,
-                                   mp_limb_t k, mp_limb_t n, n_ecm_t n_ecm_inf)
+n_factor_ecm_mul_montgomery_ladder(ulong *x, ulong *z, ulong x0, ulong z0,
+                                   ulong k, ulong n, n_ecm_t n_ecm_inf)
 {
-    mp_limb_t x1, z1, x2, z2, len;      /* Q (x1 : z1), P (x2 : z2) */
+    ulong x1, z1, x2, z2, len;      /* Q (x1 : z1), P (x2 : z2) */
 
     if (k == 0)
     {
@@ -334,15 +329,15 @@ n_factor_ecm_mul_montgomery_ladder(mp_limb_t *x, mp_limb_t *z, mp_limb_t x0, mp_
 }
 
 int
-n_factor_ecm_select_curve(mp_limb_t *f, mp_limb_t sig, mp_limb_t n, n_ecm_t n_ecm_inf)
+n_factor_ecm_select_curve(ulong *f, ulong sig, ulong n, n_ecm_t n_ecm_inf)
 {
-    mp_limb_t u, v, w, t, hi, lo;
-    mp_ptr a;
+    ulong u, v, w, t, hi, lo;
+    nn_ptr a;
     int ret = 0;
     TMP_INIT;
 
     TMP_START;
-    a = TMP_ALLOC(2 * sizeof(mp_limb_t));
+    a = TMP_ALLOC(2 * sizeof(ulong));
 
     u = sig;
 
@@ -419,10 +414,10 @@ cleanup:
 }
 
 int
-n_factor_ecm_stage_I(mp_limb_t *f, const mp_limb_t *prime_array, mp_limb_t num,
-                     mp_limb_t B1, mp_limb_t n, n_ecm_t n_ecm_inf)
+n_factor_ecm_stage_I(ulong *f, const ulong *prime_array, ulong num,
+                     ulong B1, ulong n, n_ecm_t n_ecm_inf)
 {
-    mp_limb_t times;
+    ulong times;
     ulong i, j, p;
 
     for (i = 0; i < num; i++)
@@ -450,15 +445,15 @@ n_factor_ecm_stage_I(mp_limb_t *f, const mp_limb_t *prime_array, mp_limb_t num,
 }
 
 int
-n_factor_ecm_stage_II(mp_limb_t *f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P,
-                      mp_limb_t n, n_ecm_t n_ecm_inf)
+n_factor_ecm_stage_II(ulong *f, ulong B1, ulong B2, ulong P,
+                      ulong n, n_ecm_t n_ecm_inf)
 {
 
-    mp_limb_t g, Qx, Qz, Rx, Rz, Qdx, Qdz, a, b;
-    mp_limb_t mmin, mmax, maxj, Q0x2, Q0z2;
+    ulong g, Qx, Qz, Rx, Rz, Qdx, Qdz, a, b;
+    ulong mmin, mmax, maxj, Q0x2, Q0z2;
     ulong i, j;
     int ret;
-    mp_ptr arrx, arrz;
+    nn_ptr arrx, arrz;
 
     mmin = (B1 + (P/2)) / P;
     mmax = ((B2 - P/2) + P - 1)/P;      /* ceil */

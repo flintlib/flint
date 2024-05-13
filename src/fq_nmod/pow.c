@@ -16,7 +16,7 @@
 #include "fmpz.h"
 #include "fq_nmod.h"
 
-void _fq_nmod_pow(mp_limb_t *rop, const mp_limb_t *op, slong len, const fmpz_t e,
+void _fq_nmod_pow(ulong *rop, const ulong *op, slong len, const fmpz_t e,
                   const fq_nmod_ctx_t ctx)
 {
     const slong d = fq_nmod_ctx_degree(ctx);
@@ -34,8 +34,8 @@ void _fq_nmod_pow(mp_limb_t *rop, const mp_limb_t *op, slong len, const fmpz_t e
     else
     {
         ulong bit;
-        mp_limb_t *v = _nmod_vec_init(2 * d - 1);
-        mp_limb_t *R, *S, *T;
+        ulong *v = _nmod_vec_init(2 * d - 1);
+        ulong *R, *S, *T;
 
         _nmod_vec_zero(v, 2 * d - 1);
         _nmod_vec_zero(rop, 2 * d - 1);
@@ -133,7 +133,7 @@ void fq_nmod_pow(fq_nmod_t rop, const fq_nmod_t op, const fmpz_t e, const fq_nmo
     else
     {
         const slong d = fq_nmod_ctx_degree(ctx);
-        mp_limb_t *t;
+        ulong *t;
 
         if (rop == op)
         {

@@ -23,8 +23,8 @@ TEST_FUNCTION_START(nmod_poly_integral, state)
     {
         nmod_poly_t a, b, c;
         ulong len;
-        mp_limb_t c0;
-        mp_limb_t n = n_randtest_prime(state, 0);
+        ulong c0;
+        ulong n = n_randtest_prime(state, 0);
 
         len = n_randint(state, 100);
         len = FLINT_MIN(len, n - 1);
@@ -61,7 +61,7 @@ TEST_FUNCTION_START(nmod_poly_integral, state)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b;
-        mp_limb_t n = n_randtest_prime(state, 0);
+        ulong n = n_randtest_prime(state, 0);
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);

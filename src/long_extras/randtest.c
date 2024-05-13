@@ -16,10 +16,10 @@
 #include "ulong_extras.h"
 #include "long_extras.h"
 
-mp_limb_signed_t z_randtest(flint_rand_t state)
+slong z_randtest(flint_rand_t state)
 {
-    mp_limb_t m;
-    mp_limb_signed_t z;
+    ulong m;
+    slong z;
 
     m = n_randlimb(state);
 
@@ -47,9 +47,9 @@ mp_limb_signed_t z_randtest(flint_rand_t state)
     return z;
 }
 
-mp_limb_signed_t z_randtest_not_zero(flint_rand_t state)
+slong z_randtest_not_zero(flint_rand_t state)
 {
-    mp_limb_signed_t z;
+    slong z;
 
     while ((z = z_randtest(state)) == 0) ;
     return z;

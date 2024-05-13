@@ -187,7 +187,7 @@ nfloat_ctx_init(gr_ctx_t ctx, slong prec, int flags)
     nlimbs = (prec + FLINT_BITS - 1) / FLINT_BITS;
 
     ctx->which_ring = GR_CTX_NFLOAT;
-    ctx->sizeof_elem = sizeof(mp_limb_t) * (nlimbs + NFLOAT_HEADER_LIMBS);
+    ctx->sizeof_elem = sizeof(ulong) * (nlimbs + NFLOAT_HEADER_LIMBS);
     ctx->size_limit = WORD_MAX;
 
     NFLOAT_CTX_NLIMBS(ctx) = nlimbs;

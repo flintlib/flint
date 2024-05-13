@@ -20,8 +20,7 @@
 # include <stdarg.h>
 #endif
 
-#include <gmp.h>
-#include <limits.h>
+#include <stddef.h>
 #ifdef BUILDING_FLINT
 # include "config.h"
 #else
@@ -88,9 +87,17 @@ FLINT_DLL extern char flint_version[];
 struct __FLINT_FILE;
 typedef struct __FLINT_FILE FLINT_FILE;
 
-typedef @ULONG@ ulong;
-typedef @SLONG@ slong;
-typedef @ULONG@ flint_bitcnt_t;
+#if FLINT_LONG_LONG
+typedef unsigned long long int ulong;
+typedef long long int slong;
+#else
+typedef unsigned long int ulong;
+typedef long int slong;
+#endif
+
+typedef ulong flint_bitcnt_t;
+typedef ulong * nn_ptr;
+typedef const ulong * nn_srcptr;
 
 #if FLINT_WANT_ASSERT
 # define FLINT_ASSERT(param) assert(param)
@@ -167,39 +174,37 @@ typedef @ULONG@ flint_bitcnt_t;
 # define FLINT_TLS_PREFIX
 #endif
 
-#if defined(_LONG_LONG_LIMB)
+#if FLINT_LONG_LONG
 # define _WORD_FMT "ll"
 # define WORD_FMT "%ll"
 # define WORD_WIDTH_FMT "%*ll"
 # define WORD(xx) (xx##LL)
 # define UWORD(xx) (xx##ULL)
-# ifndef FLINT_NO_WORDMAC
-#  define UWORD_MAX ULLONG_MAX
-#  define UWORD_MIN ULLONG_MIN
-#  define WORD_MAX LLONG_MAX
-#  define WORD_MIN LLONG_MIN
-# endif
 #else
 # define _WORD_FMT "l"
 # define WORD_FMT "%l"
 # define WORD_WIDTH_FMT "%*l"
 # define WORD(xx) (xx##L)
 # define UWORD(xx) (xx##UL)
-# ifndef FLINT_NO_WORDMAC
-#  define UWORD_MAX ULONG_MAX
-#  define UWORD_MIN ULONG_MIN
-#  define WORD_MAX LONG_MAX
-#  define WORD_MIN LONG_MIN
-# endif
 #endif
 
-#if GMP_LIMB_BITS == 64
-# define FLINT_BITS 64
+#if FLINT_BITS == 64
 # define FLINT_D_BITS 53
 # define FLINT64 1
+# ifndef FLINT_NO_WORDMAC
+#  define UWORD_MAX UWORD(18446744073709551615)
+#  define UWORD_MIN UWORD(0)
+#  define WORD_MAX WORD(9223372036854775807)
+#  define WORD_MIN (-WORD_MAX - WORD(1))
+# endif
 #else
-# define FLINT_BITS 32
 # define FLINT_D_BITS 31
+# ifndef FLINT_NO_WORDMAC
+#  define UWORD_MAX UWORD(4294967295)
+#  define UWORD_MIN UWORD(0)
+#  define WORD_MAX WORD(2147483647)
+#  define WORD_MIN (-WORD_MAX - WORD(1))
+# endif
 #endif
 
 #include "longlong.h"

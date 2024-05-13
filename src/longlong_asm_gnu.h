@@ -65,7 +65,7 @@ see https://www.gnu.org/licenses/.  */
 #if !FLINT_WANT_ASSERT && defined(__amd64__)
 # define MPN_IORD_U(ptr, incr, aors) \
   do { \
-    mp_ptr  __ptr_dummy; \
+    nn_ptr  __ptr_dummy; \
     if (__builtin_constant_p(incr) && (incr) == 0) \
     { \
     } \
@@ -77,7 +77,7 @@ see https://www.gnu.org/licenses/.  */
          "\tlea\t%c2(%0), %0\n" \
          "\tjc\t" ASM_L(top) \
          : "=r" (__ptr_dummy) \
-         : "0"  (ptr), "n" (sizeof(mp_limb_t)) \
+         : "0"  (ptr), "n" (sizeof(ulong)) \
          : "memory"); \
     } \
     else \
@@ -92,23 +92,23 @@ see https://www.gnu.org/licenses/.  */
          ASM_L(done) ":\n" \
          : "=r" (__ptr_dummy) \
          : "0"  (ptr), \
-           "re" ((mp_limb_t) (incr)), "n" (sizeof(mp_limb_t)) \
+           "re" ((ulong) (incr)), "n" (sizeof(ulong)) \
          : "memory"); \
     } \
   } while (0)
 
-# if GMP_LIMB_BITS == 32
+# if FLINT_BITS == 32
 #  define MPN_INCR_U(ptr, size, incr)  MPN_IORD_U(ptr, incr, "addl")
 #  define MPN_DECR_U(ptr, size, incr)  MPN_IORD_U(ptr, incr, "subl")
 # else
 #  define MPN_INCR_U(ptr, size, incr)  MPN_IORD_U(ptr, incr, "addq")
 #  define MPN_DECR_U(ptr, size, incr)  MPN_IORD_U(ptr, incr, "subq")
 # endif
-#elif !FLINT_WANT_ASSERT && (GMP_LIMB_BITS == 64 && defined(__aarch64__))
+#elif !FLINT_WANT_ASSERT && (FLINT_BITS == 64 && defined(__aarch64__))
 # define MPN_IORD_U(ptr, incr, aors, cond, anticond) \
   do { \
-    mp_ptr  __ptr_dummy; \
-    mp_limb_t  __reg_dummy; \
+    nn_ptr  __ptr_dummy; \
+    ulong  __reg_dummy; \
     if (__builtin_constant_p (incr) && (incr) == 0) \
     { \
     } \
@@ -138,7 +138,7 @@ see https://www.gnu.org/licenses/.  */
          "\tb." cond "\t" ASM_L(top) "\n" \
          ASM_L(done) ":\n" \
          : "=r" (__ptr_dummy), "=&r" (__reg_dummy) \
-         : "0"  (ptr), "rI" ((mp_limb_t) (incr)) \
+         : "0"  (ptr), "rI" ((ulong) (incr)) \
          : "memory"); \
     } \
   } while (0)

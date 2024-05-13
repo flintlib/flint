@@ -20,10 +20,10 @@
 static void
 flint_mpz_mul(mpz_ptr z, mpz_srcptr x, mpz_srcptr y)
 {
-    mp_size_t xn, yn, zn, sgn;
-    mp_srcptr xd, yd;
-    mp_ptr zd;
-    mp_limb_t top;
+    slong xn, yn, zn, sgn;
+    nn_srcptr xd, yd;
+    nn_ptr zd;
+    ulong top;
     TMP_INIT;
 
     xn = x->_mp_size;
@@ -36,7 +36,7 @@ flint_mpz_mul(mpz_ptr z, mpz_srcptr x, mpz_srcptr y)
     if (xn < yn)
     {
         mpz_srcptr t;
-        mp_size_t tn;
+        slong tn;
 
         t = x;
         x = y;
@@ -60,7 +60,7 @@ flint_mpz_mul(mpz_ptr z, mpz_srcptr x, mpz_srcptr y)
     {
         if (xn == 2)
         {
-            mp_limb_t r3, r2, r1, r0;
+            ulong r3, r2, r1, r0;
             FLINT_MPN_MUL_2X2(r3, r2, r1, r0, xd[1], xd[0], yd[1], yd[0]);
             zd[0] = r0;
             zd[1] = r1;
@@ -73,7 +73,7 @@ flint_mpz_mul(mpz_ptr z, mpz_srcptr x, mpz_srcptr y)
 
         if (xn == 1)
         {
-            mp_limb_t hi, lo;
+            ulong hi, lo;
             umul_ppmm(hi, lo,  xd[0], yd[0]);
             zd[0] = lo;
             zd[1] = hi;
@@ -92,7 +92,7 @@ flint_mpz_mul(mpz_ptr z, mpz_srcptr x, mpz_srcptr y)
     {
         if (xn == 2)
         {
-            mp_limb_t r2, r1, r0;
+            ulong r2, r1, r0;
             FLINT_MPN_MUL_2X1(r2, r1, r0, xd[1], xd[0], yd[0]);
             zd[0] = r0;
             zd[1] = r1;
@@ -114,13 +114,13 @@ flint_mpz_mul(mpz_ptr z, mpz_srcptr x, mpz_srcptr y)
        we do not overwrite it during the multiplication. */
     if (zd == xd)
     {
-        mp_ptr tmp = TMP_ALLOC(xn * sizeof(mp_limb_t));
+        nn_ptr tmp = TMP_ALLOC(xn * sizeof(ulong));
         flint_mpn_copyi(tmp, xd, xn);
         xd = tmp;
     }
     else if (zd == yd)
     {
-        mp_ptr tmp = TMP_ALLOC(yn * sizeof(mp_limb_t));
+        nn_ptr tmp = TMP_ALLOC(yn * sizeof(ulong));
         flint_mpn_copyi(tmp, yd, yn);
         yd = tmp;
     }
@@ -200,7 +200,7 @@ fmpz_mul_si(fmpz_t f, const fmpz_t g, slong x)
 
     if (!COEFF_IS_MPZ(c2)) /* c2 is small */
     {
-        mp_limb_t th, tl;
+        ulong th, tl;
 
         /* limb by limb multiply (assembly for most CPU's) */
         smul_ppmm(th, tl, c2, x);
@@ -243,8 +243,8 @@ fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong x)
 
     if (!COEFF_IS_MPZ(c2)) /* c2 is small */
     {
-        mp_limb_t th, tl;
-        mp_limb_t uc2 = FLINT_ABS(c2);
+        ulong th, tl;
+        ulong uc2 = FLINT_ABS(c2);
 
         /* unsigned limb by limb multiply (assembly for most CPU's) */
         umul_ppmm(th, tl, uc2, x);

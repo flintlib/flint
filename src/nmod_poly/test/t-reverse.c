@@ -21,7 +21,7 @@ TEST_FUNCTION_START(nmod_poly_reverse, state)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b;
-        mp_limb_t n = n_randtest_not_zero(state);
+        ulong n = n_randtest_not_zero(state);
         slong len;
 
         nmod_poly_init(a, n);
@@ -52,7 +52,7 @@ TEST_FUNCTION_START(nmod_poly_reverse, state)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b;
-        mp_limb_t n = n_randtest_not_zero(state);
+        ulong n = n_randtest_not_zero(state);
         slong m = n_randint(state, 100) + 1;
         slong len = n_randint(state, m);
 

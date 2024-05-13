@@ -17,7 +17,7 @@
 #define ALLOC_PER_VAR ((FLINT_BITS+4)/3)
 
 static char *
-_nmod_mpoly_get_str_pretty(const mp_limb_t * coeff, const ulong * exp, slong len,
+_nmod_mpoly_get_str_pretty(const ulong * coeff, const ulong * exp, slong len,
            const char ** x_in, slong bits, const mpoly_ctx_t mctx, nmod_t fctx)
 {
     char * str, ** x = (char **) x_in, *xtmp;

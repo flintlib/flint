@@ -36,18 +36,18 @@ extern "C" {
 #if defined(__GNUC__)
 
 /* Trailing and leading zeros */
-# ifndef _LONG_LONG_LIMB
-#  define flint_clz __builtin_clzl
-#  define flint_ctz __builtin_ctzl
-# else
+# if FLINT_LONG_LONG
 #  define flint_clz __builtin_clzll
 #  define flint_ctz __builtin_ctzll
+# else
+#  define flint_clz __builtin_clzl
+#  define flint_ctz __builtin_ctzl
 # endif
 
 /* Byte swap */
 # define _FLINT_CAT_(X,Y) X##Y
 # define _FLINT_CAT(X,Y) _FLINT_CAT_(X,Y)
-# define byte_swap(x) do { (x) = _FLINT_CAT(__builtin_bswap, GMP_LIMB_BITS)(x); } while (0)
+# define byte_swap(x) do { (x) = _FLINT_CAT(__builtin_bswap, FLINT_BITS)(x); } while (0)
 
 /* Addition, subtraction and multiplication */
 # if defined(__clang__)
@@ -84,7 +84,7 @@ FLINT_DLL extern const unsigned char __flint_clz_tab[128];
 # define flint_clz flint_clz
 static inline int flint_clz(ulong x)
 {
-    mp_limb_t a, xr = x;
+    ulong a, xr = x;
     const unsigned int bits4 = FLINT_BITS / 4;
     if (FLINT_BITS == 32)
         a = xr < ((ulong) 1 << 2 * bits4)
@@ -141,18 +141,18 @@ static inline int flint_ctz(ulong x)
 
 # define add_sssaaaaaa(s2, s1, s0, a2, a1, a0, b2, b1, b0) \
   do { \
-    mp_limb_t __t1, __t2; \
-    add_ssaaaa(__t1, s0, (mp_limb_t) 0, a0, (mp_limb_t) 0, b0); \
-    add_ssaaaa(__t2, s1, (mp_limb_t) 0, a1, (mp_limb_t) 0, b1); \
+    ulong __t1, __t2; \
+    add_ssaaaa(__t1, s0, (ulong) 0, a0, (ulong) 0, b0); \
+    add_ssaaaa(__t2, s1, (ulong) 0, a1, (ulong) 0, b1); \
     add_ssaaaa(s2, s1, (a2) + (b2), s1, __t2, __t1); \
   } while (0)
 
 # define add_ssssaaaaaaaa(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0) \
   do { \
-    mp_limb_t __u2; \
-    add_sssaaaaaa(__u2, s1, s0, (mp_limb_t) 0, a1, a0, (mp_limb_t) 0, b1, b0); \
+    ulong __u2; \
+    add_sssaaaaaa(__u2, s1, s0, (ulong) 0, a1, a0, (ulong) 0, b1, b0); \
     add_ssaaaa(s3, s2, a3, a2, b3, b2); \
-    add_ssaaaa(s3, s2, s3, s2, (mp_limb_t) 0, __u2); \
+    add_ssaaaa(s3, s2, s3, s2, (ulong) 0, __u2); \
   } while (0)
 
 # define sub_ddmmss(s1, s0, a1, a0, b1, b0) \
@@ -164,34 +164,29 @@ static inline int flint_ctz(ulong x)
 
 # define sub_dddmmmsss(d2, d1, d0, m2, m1, m0, s2, s1, s0) \
   do { \
-    mp_limb_t __t1, __t2; \
-    sub_ddmmss(__t1, d0, (mp_limb_t) 0, m0, (mp_limb_t) 0, s0); \
-    sub_ddmmss(__t2, d1, (mp_limb_t) 0, m1, (mp_limb_t) 0, s1); \
+    ulong __t1, __t2; \
+    sub_ddmmss(__t1, d0, (ulong) 0, m0, (ulong) 0, s0); \
+    sub_ddmmss(__t2, d1, (ulong) 0, m1, (ulong) 0, s1); \
     sub_ddmmss(d2, d1, (m2) - (s2), d1, -__t2, -__t1); \
   } while (0)
 #endif
 
 #if !defined(MPN_INCR_U)
-# define MPN_INCR_U MPN_INCR_U
-# define MPN_DECR_U MPN_DECR_U
-FLINT_FORCE_INLINE void MPN_INCR_U(mp_ptr ptr, mp_size_t size, mp_limb_t incr)
-{
 # if FLINT_WANT_ASSERT
-    mp_limb_t cy = mpn_add_1(ptr, ptr, size, incr);
-    FLINT_ASSERT(cy == 0);
+#  define MPN_INCR_U(ptr, size, incr) \
+  do { \
+    ulong __cy = mpn_add_1(ptr, ptr, size, incr); \
+    FLINT_ASSERT(__cy == 0); \
+  } while (0)
+#  define MPN_DECR_U(ptr, size, incr) \
+  do { \
+    ulong __cy = mpn_sub_1(ptr, ptr, size, incr); \
+    FLINT_ASSERT(__cy == 0); \
+  } while (0)
 # else
-    mpn_add_1(ptr, ptr, size, incr);
+#  define MPN_INCR_U(ptr, size, incr) mpn_add_1(ptr, ptr, size, incr)
+#  define MPN_DECR_U(ptr, size, incr) mpn_sub_1(ptr, ptr, size, incr)
 # endif
-}
-FLINT_FORCE_INLINE void MPN_DECR_U(mp_ptr ptr, mp_size_t size, mp_limb_t incr)
-{
-# if FLINT_WANT_ASSERT
-    mp_limb_t cy = mpn_sub_1(ptr, ptr, size, incr);
-    FLINT_ASSERT(cy == 0);
-# else
-    mpn_sub_1(ptr, ptr, size, incr);
-# endif
-}
 #endif
 
 /* Multiplication */
@@ -267,7 +262,7 @@ FLINT_FORCE_INLINE void MPN_DECR_U(mp_ptr ptr, mp_size_t size, mp_limb_t incr)
     if (__norm) \
     { \
       udiv_qrnnd_int((q), (r), ((n1) << __norm) + ((n0) >> (FLINT_BITS - __norm)), (n0) << __norm, (d) << __norm); \
-      (r) = ((mp_limb_t) (r) >> __norm); \
+      (r) = ((ulong) (r) >> __norm); \
     } \
     else \
        udiv_qrnnd_int((q), (r), (n1), (n0), (d)); \
@@ -277,8 +272,8 @@ FLINT_FORCE_INLINE void MPN_DECR_U(mp_ptr ptr, mp_size_t size, mp_limb_t incr)
 
 # define sdiv_qrnnd(q, r, n1, n0, d) \
   do { \
-    mp_limb_t __n1, __n0, __d; \
-    mp_limb_t __q, __r; \
+    ulong __n1, __n0, __d; \
+    ulong __q, __r; \
     unsigned int __sgn_n = 0, __sgn_d = 0; \
     if ((n1) & __highbit) \
     { \

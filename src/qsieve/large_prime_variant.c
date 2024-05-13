@@ -102,15 +102,15 @@ int qsieve_is_relation(qs_t qs_inf, relation_t a)
 
     The layout is as follows:
     total write size of relation (including this write size)
-    large prime             (1 * mp_limb_t)
+    large prime             (1 * ulong)
     number of small primes  (1 * slong)
     small primes            (number of small primes * slong)
     number of factors       (1 * slong)
     (factor, exponent)      (number of factors * fac_t)
     Y->_mp_size             (1 * slong)
-    Y->_mp_d                (Y->_mp_size * mp_limb_t)
+    Y->_mp_d                (Y->_mp_size * ulong)
  */
-void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime, const fmpz_t Y, const qs_poly_t poly)
+void qsieve_write_to_file(qs_t qs_inf, ulong prime, const fmpz_t Y, const qs_poly_t poly)
 {
     slong num_factors = poly->num_factors;
     slong * small = poly->small;
@@ -124,17 +124,17 @@ void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime, const fmpz_t Y, const qs
     /* Write size of relation */
     write_size =
         sizeof(slong)                           /* total write size */
-        + sizeof(mp_limb_t)                     /* large prime */
+        + sizeof(ulong)                     /* large prime */
         + sizeof(slong)                         /* number of small primes */
         + sizeof(slong) * qs_inf->small_primes  /* small primes */
         + sizeof(slong)                         /* number of factors */
         + sizeof(fac_t) * num_factors           /* factors */
         + sizeof(slong)                         /* Y->_mp_size */
-        + sizeof(mp_limb_t) * (Ysz != 0 ? FLINT_ABS(Ysz) : 1); /* Y->_mp_d */
+        + sizeof(ulong) * (Ysz != 0 ? FLINT_ABS(Ysz) : 1); /* Y->_mp_d */
     fwrite(&write_size, sizeof(slong), 1, (FILE *) qs_inf->siqs);
 
     /* Write large prime */
-    fwrite(&prime, sizeof(mp_limb_t), 1, (FILE *) qs_inf->siqs);
+    fwrite(&prime, sizeof(ulong), 1, (FILE *) qs_inf->siqs);
 
     /* NOTE: We do not have to write small primes. */
     /* Write number of small primes */
@@ -158,14 +158,14 @@ void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime, const fmpz_t Y, const qs
         slong abslimb = FLINT_ABS(*Y);
 
         /* Write mock Y->_mp_d */
-        fwrite(&abslimb, sizeof(mp_limb_t), 1, (FILE *) qs_inf->siqs);
+        fwrite(&abslimb, sizeof(ulong), 1, (FILE *) qs_inf->siqs);
     }
     else
     {
-        mp_srcptr Yd = COEFF_TO_PTR(*Y)->_mp_d;
+        nn_srcptr Yd = COEFF_TO_PTR(*Y)->_mp_d;
 
         /* Write Y->_mp_d */
-        fwrite(Yd, sizeof(mp_limb_t), FLINT_ABS(Ysz), (FILE *) qs_inf->siqs);
+        fwrite(Yd, sizeof(ulong), FLINT_ABS(Ysz), (FILE *) qs_inf->siqs);
     }
 }
 
@@ -185,11 +185,11 @@ void qsieve_write_to_file(qs_t qs_inf, mp_limb_t prime, const fmpz_t Y, const qs
    return a pointer to location of 'prime' in table if it exists else
    create an entry for it and return pointer to that
 */
-hash_t * qsieve_get_table_entry(qs_t qs_inf, mp_limb_t prime)
+hash_t * qsieve_get_table_entry(qs_t qs_inf, ulong prime)
 {
-    mp_limb_t offset, first_offset;
+    ulong offset, first_offset;
     hash_t * entry;
-    mp_limb_t * hash_table =  qs_inf->hash_table;
+    ulong * hash_table =  qs_inf->hash_table;
     hash_t * table = qs_inf->table;
     slong table_size = qs_inf->table_size;
 
@@ -233,7 +233,7 @@ hash_t * qsieve_get_table_entry(qs_t qs_inf, mp_limb_t prime)
    add prime to hashtable, increase size of table if necessary
    and increment count for the added prime
 */
-void qsieve_add_to_hashtable(qs_t qs_inf, mp_limb_t prime)
+void qsieve_add_to_hashtable(qs_t qs_inf, ulong prime)
 {
     hash_t * entry;
 
@@ -285,9 +285,9 @@ relation_t qsieve_parse_relation(qs_t qs_inf)
     fmpz_init(rel.Y);
     if (FLINT_ABS(Ysz) <= 1)
     {
-        mp_limb_t abslimb = 0;
+        ulong abslimb = 0;
 
-        fread(&abslimb, sizeof(mp_limb_t), 1, (FILE *) qs_inf->siqs);
+        fread(&abslimb, sizeof(ulong), 1, (FILE *) qs_inf->siqs);
 
 #if COEFF_MAX != -COEFF_MIN
 # error
@@ -305,7 +305,7 @@ relation_t qsieve_parse_relation(qs_t qs_inf)
         if (mY->_mp_alloc < FLINT_ABS(Ysz))
             _mpz_realloc(mY, FLINT_ABS(Ysz));
 
-        fread(mY->_mp_d, sizeof(mp_limb_t), FLINT_ABS(Ysz), (FILE *) qs_inf->siqs);
+        fread(mY->_mp_d, sizeof(ulong), FLINT_ABS(Ysz), (FILE *) qs_inf->siqs);
         *rel.Y = PTR_TO_COEFF(mY);
     }
 
@@ -545,9 +545,9 @@ int qsieve_process_relation(qs_t qs_inf)
     slong i, num_relations = 0, num_relations2;
     slong rel_list_length;
     slong rlist_length;
-    mp_limb_t prime;
+    ulong prime;
     hash_t * entry;
-    mp_limb_t * hash_table = qs_inf->hash_table;
+    ulong * hash_table = qs_inf->hash_table;
     slong rel_size = 50000;
     relation_t * rel_list = (relation_t *) flint_malloc(rel_size * sizeof(relation_t));
     relation_t * rlist;
@@ -573,7 +573,7 @@ int qsieve_process_relation(qs_t qs_inf)
         if (siqs_eof)
             break;
 
-        fread(&prime, sizeof(mp_limb_t), 1, (FILE *) qs_inf->siqs);
+        fread(&prime, sizeof(ulong), 1, (FILE *) qs_inf->siqs);
         entry = qsieve_get_table_entry(qs_inf, prime);
 
         if (num_relations == rel_size)
@@ -591,8 +591,8 @@ int qsieve_process_relation(qs_t qs_inf)
         else
         {
             /* We have to get to the next relation in the file. We have already
-             * read write_size (is a slong) and large prime (is an mp_limb_t).*/
-            fseek((FILE *) qs_inf->siqs, write_size - sizeof(slong) - sizeof(mp_limb_t), SEEK_CUR);
+             * read write_size (is a slong) and large prime (is an ulong).*/
+            fseek((FILE *) qs_inf->siqs, write_size - sizeof(slong) - sizeof(ulong), SEEK_CUR);
         }
     }
 
@@ -612,7 +612,7 @@ int qsieve_process_relation(qs_t qs_inf)
 #endif
 
     rlist = flint_malloc(num_relations * sizeof(relation_t));
-    memset(hash_table, 0, (1 << 20) * sizeof(mp_limb_t));
+    memset(hash_table, 0, (1 << 20) * sizeof(ulong));
     qs_inf->vertices = 0;
 
     rlist_length = 0;

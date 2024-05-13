@@ -17,7 +17,7 @@ _fmpz_crt_combine(fmpz_t r1r2, fmpz_t m1m2, const fmpz_t r1, const fmpz_t m1, co
 void
 _fmpz_crt_combine_uiui(fmpz_t r1r2, fmpz_t m1m2, ulong r1, ulong m1, ulong r2, ulong m2)
 {
-    mp_limb_t M[2];
+    ulong M[2];
 
     /*
         M = m1 * m2
@@ -31,7 +31,7 @@ _fmpz_crt_combine_uiui(fmpz_t r1r2, fmpz_t m1m2, ulong r1, ulong m1, ulong r2, u
 
     if (M[1] == 0)
     {
-        mp_limb_t c, v;
+        ulong c, v;
 
         c = n_invmod(m1, m2) * m1;
 
@@ -47,7 +47,7 @@ _fmpz_crt_combine_uiui(fmpz_t r1r2, fmpz_t m1m2, ulong r1, ulong m1, ulong r2, u
     }
     else
     {
-        mp_limb_t c[2], t[4], q[3], r[3];
+        ulong c[2], t[4], q[3], r[3];
 
         umul_ppmm(c[1], c[0], n_invmod(m1, m2), m1);
 
@@ -72,7 +72,7 @@ _fmpz_crt_combine_uiui(fmpz_t r1r2, fmpz_t m1m2, ulong r1, ulong m1, ulong r2, u
 }
 
 void
-tree_crt(fmpz_t r, fmpz_t m, mp_srcptr residues, mp_srcptr primes, slong len)
+tree_crt(fmpz_t r, fmpz_t m, nn_srcptr residues, nn_srcptr primes, slong len)
 {
     if (len == 0)
     {
@@ -120,13 +120,13 @@ benchmark(slong num_primes, slong prime_bits)
     flint_rand_t state;
     fmpz_comb_temp_t temp;
     fmpz_comb_t comb;
-    mp_ptr primes, residues;
+    nn_ptr primes, residues;
     fmpz_t res;
     slong k;
 
     flint_rand_init(state);
-    primes = flint_malloc(num_primes * sizeof(mp_limb_t));
-    residues = flint_malloc(num_primes * sizeof(mp_limb_t));
+    primes = flint_malloc(num_primes * sizeof(ulong));
+    residues = flint_malloc(num_primes * sizeof(ulong));
     fmpz_init(res);
 
     primes[0] = n_nextprime(UWORD(1) << (prime_bits - 1), 0);

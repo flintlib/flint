@@ -21,10 +21,10 @@
 
 /* Sets y to (y^2 + a) % n */
 void
-flint_mpn_sqr_and_add_a(mp_ptr y, mp_ptr a, mp_ptr n, mp_limb_t n_size, mp_ptr ninv,
-              mp_limb_t normbits)
+flint_mpn_sqr_and_add_a(nn_ptr y, nn_ptr a, nn_ptr n, ulong n_size, nn_ptr ninv,
+              ulong normbits)
 {
-    mp_limb_t cy;
+    ulong cy;
 
     flint_mpn_mulmod_preinvn(y, y, y, n_size, n, ninv, normbits);   /* y^2 mod n */
     cy = mpn_add_n(y, y, a, n_size);
@@ -40,24 +40,24 @@ flint_mpn_sqr_and_add_a(mp_ptr y, mp_ptr a, mp_ptr n, mp_limb_t n_size, mp_ptr n
 }
 
 int
-flint_mpn_factor_pollard_brent_single(mp_ptr factor, mp_ptr n, mp_ptr ninv, mp_ptr a, mp_ptr y,
-                     mp_limb_t n_size, mp_limb_t normbits, mp_limb_t max_iters)
+flint_mpn_factor_pollard_brent_single(nn_ptr factor, nn_ptr n, nn_ptr ninv, nn_ptr a, nn_ptr y,
+                     ulong n_size, ulong normbits, ulong max_iters)
 {
     /* n_size >= 2, one limb fmpz_t's are passed on to
        n_factor_pollard_brent in outer function      */
 
-    mp_ptr x, q, ys, subval;
-    mp_limb_t iter, i, k, minval, m, one_shift_norm, gcdlimbs;
-    mp_limb_t j;
+    nn_ptr x, q, ys, subval;
+    ulong iter, i, k, minval, m, one_shift_norm, gcdlimbs;
+    ulong j;
     int ret;
 
     TMP_INIT;
     TMP_START;
 
-    x      = TMP_ALLOC(n_size * sizeof(mp_limb_t));  /* initial value to evaluate f(x) */
-    q      = TMP_ALLOC(n_size * sizeof(mp_limb_t));  /* product of gcd's */
-    ys     = TMP_ALLOC(n_size * sizeof(mp_limb_t));
-    subval = TMP_ALLOC(n_size * sizeof(mp_limb_t));
+    x      = TMP_ALLOC(n_size * sizeof(ulong));  /* initial value to evaluate f(x) */
+    q      = TMP_ALLOC(n_size * sizeof(ulong));  /* product of gcd's */
+    ys     = TMP_ALLOC(n_size * sizeof(ulong));
+    subval = TMP_ALLOC(n_size * sizeof(ulong));
 
     /* one shifted by normbits, used for comparisons */
     one_shift_norm = UWORD(1) << normbits;
@@ -166,11 +166,11 @@ flint_mpn_factor_pollard_brent_single(mp_ptr factor, mp_ptr n, mp_ptr ninv, mp_p
 
 int
 fmpz_factor_pollard_brent_single(fmpz_t p_factor, fmpz_t n_in, fmpz_t yi,
-                                 fmpz_t ai, mp_limb_t max_iters)
+                                 fmpz_t ai, ulong max_iters)
 {
-    mp_ptr a, y, n, ninv, temp;
-    mp_limb_t n_size, normbits, ans, size, cy;
-    mp_limb_t al, yl, val, valinv;
+    nn_ptr a, y, n, ninv, temp;
+    ulong n_size, normbits, ans, size, cy;
+    ulong al, yl, val, valinv;
     mpz_ptr fac, mptr;
     int ret;
 
@@ -207,10 +207,10 @@ fmpz_factor_pollard_brent_single(fmpz_t p_factor, fmpz_t n_in, fmpz_t yi,
     normbits = flint_clz(temp[n_size - 1]);
 
     TMP_START;
-    a    = TMP_ALLOC(n_size * sizeof(mp_limb_t));
-    y    = TMP_ALLOC(n_size * sizeof(mp_limb_t));
-    n    = TMP_ALLOC(n_size * sizeof(mp_limb_t));
-    ninv = TMP_ALLOC(n_size * sizeof(mp_limb_t));
+    a    = TMP_ALLOC(n_size * sizeof(ulong));
+    y    = TMP_ALLOC(n_size * sizeof(ulong));
+    n    = TMP_ALLOC(n_size * sizeof(ulong));
+    ninv = TMP_ALLOC(n_size * sizeof(ulong));
 
     /* copying n_in onto n, and normalizing */
 

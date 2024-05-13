@@ -21,7 +21,7 @@ TEST_FUNCTION_START(nmod_poly_taylor_shift, state)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t f, g;
-        mp_limb_t c, mod;
+        ulong c, mod;
 
         mod = n_randtest_prime(state, 0);
 
@@ -51,7 +51,7 @@ TEST_FUNCTION_START(nmod_poly_taylor_shift, state)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t f, g, h1, h2;
-        mp_limb_t mod, c;
+        ulong mod, c;
 
         mod = n_randtest_prime(state, 0);
 
@@ -90,7 +90,7 @@ TEST_FUNCTION_START(nmod_poly_taylor_shift, state)
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         nmod_poly_t f, g, h1, h2;
-        mp_limb_t mod, c;
+        ulong mod, c;
 
         mod = n_randtest_prime(state, 0);
 

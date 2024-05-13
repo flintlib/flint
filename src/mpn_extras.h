@@ -21,6 +21,7 @@
 #define MPN_EXTRAS_INLINE static inline
 #endif
 
+#include <gmp.h>
 #include "flint.h"
 
 #ifdef __cplusplus

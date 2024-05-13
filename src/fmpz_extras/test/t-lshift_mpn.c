@@ -20,9 +20,9 @@ TEST_FUNCTION_START(fmpz_lshift_mpn, state)
     {
         fmpz_t a, b, c;
         ulong e;
-        mp_limb_t atmp;
-        mp_ptr aptr;
-        mp_size_t an;
+        ulong atmp;
+        nn_ptr aptr;
+        slong an;
         int asgnbit;
 
         fmpz_init(a);

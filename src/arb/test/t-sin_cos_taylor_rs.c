@@ -19,21 +19,21 @@ TEST_FUNCTION_START(arb_sin_cos_taylor_rs, state)
 
     for (iter = 0; iter < 100000 * 0.1 * flint_test_multiplier(); iter++)
     {
-        mp_ptr x, y1s, y1c, y2s, y2c, t;
-        mp_limb_t err1, err2;
+        nn_ptr x, y1s, y1c, y2s, y2c, t;
+        ulong err1, err2;
         ulong N;
-        mp_size_t xn;
+        slong xn;
         int cmp, result;
 
         N = n_randint(state, 144 - 1);
         xn = 1 + n_randint(state, 20);
 
-        x = flint_malloc(sizeof(mp_limb_t) * xn);
-        y1s = flint_malloc(sizeof(mp_limb_t) * xn);
-        y1c = flint_malloc(sizeof(mp_limb_t) * xn);
-        y2s = flint_malloc(sizeof(mp_limb_t) * xn);
-        y2c = flint_malloc(sizeof(mp_limb_t) * xn);
-        t = flint_malloc(sizeof(mp_limb_t) * xn);
+        x = flint_malloc(sizeof(ulong) * xn);
+        y1s = flint_malloc(sizeof(ulong) * xn);
+        y1c = flint_malloc(sizeof(ulong) * xn);
+        y2s = flint_malloc(sizeof(ulong) * xn);
+        y2c = flint_malloc(sizeof(ulong) * xn);
+        t = flint_malloc(sizeof(ulong) * xn);
 
         flint_mpn_rrandom(x, state, xn);
         flint_mpn_rrandom(y1s, state, xn);

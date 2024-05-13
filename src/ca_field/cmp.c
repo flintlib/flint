@@ -70,7 +70,7 @@ static int
 _fmpz_mpoly_cmp2(const fmpz_mpoly_t x, const fmpz_mpoly_t y, fmpz_mpoly_ctx_t ctx)
 {
     slong lenx, leny, nvars;
-    mp_limb_t expx, expy;
+    ulong expx, expy;
     slong i, j;
     int c;
 

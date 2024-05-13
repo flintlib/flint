@@ -36,7 +36,7 @@ typedef struct
     _splitbase_struct * base;
     nmod_mpolyn_t G, Abar, Bbar;
     n_poly_t modulus;
-    mp_limb_t alpha;
+    ulong alpha;
     slong required_images;
 }
 _splitworker_arg_struct;
@@ -50,8 +50,8 @@ static void _splitworker_bivar(void * varg)
     n_poly_t Aevalp, Bevalp, Gevalp, Abarevalp, Bbarevalp;
     n_poly_t Aevalm, Bevalm, Gevalm, Abarevalm, Bbarevalm;
     nmod_mpolyn_t T;
-    mp_limb_t gammaevalp, alpha, temp;
-    mp_limb_t gammaevalm;
+    ulong gammaevalp, alpha, temp;
+    ulong gammaevalm;
     int gstab, astab, bstab, use_stab;
     slong ldeg;
     slong N, off, shift;
@@ -267,8 +267,8 @@ static void _splitworker(void * varg)
     nmod_mpolyn_t Aevalp, Bevalp, Gevalp, Abarevalp, Bbarevalp;
     nmod_mpolyn_t Aevalm, Bevalm, Gevalm, Abarevalm, Bbarevalm;
     nmod_mpolyn_t T;
-    mp_limb_t gammaevalp, alpha, temp;
-    mp_limb_t gammaevalm;
+    ulong gammaevalp, alpha, temp;
+    ulong gammaevalm;
     slong ldeg;
     int success;
     nmod_poly_stack_t Sp;
@@ -825,7 +825,7 @@ int nmod_mpolyn_gcd_brown_smprime_threaded_pool(
     int success;
     slong bound, best_est;
     slong g_stab_est, abar_stab_est, bbar_stab_est, upper_limit;
-    mp_limb_t alpha;
+    ulong alpha;
     slong deggamma, ldegA, ldegB;
     slong ldegGs_Abars_Bbars[3];
     n_poly_t cA, cB, cG, cAbar, cBbar, gamma;

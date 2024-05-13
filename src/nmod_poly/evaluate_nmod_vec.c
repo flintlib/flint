@@ -14,8 +14,8 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_evaluate_nmod_vec(mp_ptr ys, mp_srcptr coeffs, slong len,
-    mp_srcptr xs, slong n, nmod_t mod)
+_nmod_poly_evaluate_nmod_vec(nn_ptr ys, nn_srcptr coeffs, slong len,
+    nn_srcptr xs, slong n, nmod_t mod)
 {
     if (len < 32)
         _nmod_poly_evaluate_nmod_vec_iter(ys, coeffs, len, xs, n, mod);
@@ -24,16 +24,16 @@ _nmod_poly_evaluate_nmod_vec(mp_ptr ys, mp_srcptr coeffs, slong len,
 }
 
 void
-nmod_poly_evaluate_nmod_vec(mp_ptr ys,
-        const nmod_poly_t poly, mp_srcptr xs, slong n)
+nmod_poly_evaluate_nmod_vec(nn_ptr ys,
+        const nmod_poly_t poly, nn_srcptr xs, slong n)
 {
     _nmod_poly_evaluate_nmod_vec(ys, poly->coeffs,
                                         poly->length, xs, n, poly->mod);
 }
 
 /* This gives some speedup for small lengths. */
-static inline void _nmod_poly_rem_2(mp_ptr r, mp_srcptr a, slong al,
-    mp_srcptr b, slong bl, nmod_t mod)
+static inline void _nmod_poly_rem_2(nn_ptr r, nn_srcptr a, slong al,
+    nn_srcptr b, slong bl, nmod_t mod)
 {
     if (al == 2)
         r[0] = nmod_sub(a[0], nmod_mul(a[1], b[0], mod), mod);
@@ -42,13 +42,13 @@ static inline void _nmod_poly_rem_2(mp_ptr r, mp_srcptr a, slong al,
 }
 
 void
-_nmod_poly_evaluate_nmod_vec_fast_precomp(mp_ptr vs, mp_srcptr poly,
-    slong plen, const mp_ptr * tree, slong len, nmod_t mod)
+_nmod_poly_evaluate_nmod_vec_fast_precomp(nn_ptr vs, nn_srcptr poly,
+    slong plen, const nn_ptr * tree, slong len, nmod_t mod)
 {
     slong height, i, j, pow, left;
     slong tree_height;
     slong tlen;
-    mp_ptr t, u, swap, pa, pb, pc;
+    nn_ptr t, u, swap, pa, pb, pc;
 
     /* avoid worrying about some degenerate cases */
     if (len < 2 || plen < 2)
@@ -120,10 +120,10 @@ _nmod_poly_evaluate_nmod_vec_fast_precomp(mp_ptr vs, mp_srcptr poly,
     _nmod_vec_clear(u);
 }
 
-void _nmod_poly_evaluate_nmod_vec_fast(mp_ptr ys, mp_srcptr poly, slong plen,
-    mp_srcptr xs, slong n, nmod_t mod)
+void _nmod_poly_evaluate_nmod_vec_fast(nn_ptr ys, nn_srcptr poly, slong plen,
+    nn_srcptr xs, slong n, nmod_t mod)
 {
-    mp_ptr * tree;
+    nn_ptr * tree;
 
     tree = _nmod_poly_tree_alloc(n);
     _nmod_poly_tree_build(tree, xs, n, mod);
@@ -132,16 +132,16 @@ void _nmod_poly_evaluate_nmod_vec_fast(mp_ptr ys, mp_srcptr poly, slong plen,
 }
 
 void
-nmod_poly_evaluate_nmod_vec_fast(mp_ptr ys,
-        const nmod_poly_t poly, mp_srcptr xs, slong n)
+nmod_poly_evaluate_nmod_vec_fast(nn_ptr ys,
+        const nmod_poly_t poly, nn_srcptr xs, slong n)
 {
     _nmod_poly_evaluate_nmod_vec_fast(ys, poly->coeffs,
                                         poly->length, xs, n, poly->mod);
 }
 
 void
-_nmod_poly_evaluate_nmod_vec_iter(mp_ptr ys, mp_srcptr coeffs, slong len,
-    mp_srcptr xs, slong n, nmod_t mod)
+_nmod_poly_evaluate_nmod_vec_iter(nn_ptr ys, nn_srcptr coeffs, slong len,
+    nn_srcptr xs, slong n, nmod_t mod)
 {
     slong i;
     for (i = 0; i < n; i++)
@@ -149,8 +149,8 @@ _nmod_poly_evaluate_nmod_vec_iter(mp_ptr ys, mp_srcptr coeffs, slong len,
 }
 
 void
-nmod_poly_evaluate_nmod_vec_iter(mp_ptr ys,
-        const nmod_poly_t poly, mp_srcptr xs, slong n)
+nmod_poly_evaluate_nmod_vec_iter(nn_ptr ys,
+        const nmod_poly_t poly, nn_srcptr xs, slong n)
 {
     _nmod_poly_evaluate_nmod_vec_iter(ys, poly->coeffs,
                                         poly->length, xs, n, poly->mod);

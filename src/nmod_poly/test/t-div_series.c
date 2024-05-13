@@ -23,7 +23,7 @@ TEST_FUNCTION_START(nmod_poly_div_series, state)
         nmod_poly_t q, a, b, prod;
         slong m;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest_not_zero(state);
         while (!n_is_probabprime(n));
 
@@ -67,7 +67,7 @@ TEST_FUNCTION_START(nmod_poly_div_series, state)
         nmod_poly_t q, a, b;
         slong m;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest(state);
         while (!n_is_probabprime(n));
 
@@ -107,7 +107,7 @@ TEST_FUNCTION_START(nmod_poly_div_series, state)
         nmod_poly_t q, a, b;
         slong m;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest(state);
         while (!n_is_probabprime(n));
 

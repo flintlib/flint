@@ -67,7 +67,7 @@ arb_set_interval_mag(arb_t res, const mag_t a, const mag_t b, slong prec)
     if (MAG_IS_LAGOM(a) && MAG_IS_LAGOM(b))
     {
         slong aexp, bexp;
-        mp_limb_t aman, bman, mman, rman, tmp;
+        ulong aman, bman, mman, rman, tmp;
 
         aman = MAG_MAN(a);
         bman = MAG_MAN(b);
@@ -170,7 +170,7 @@ arb_set_interval_neg_pos_mag(arb_t res, const mag_t a, const mag_t b, slong prec
     if (MAG_IS_LAGOM(a) && MAG_IS_LAGOM(b))
     {
         slong aexp, bexp, mexp, shift;
-        mp_limb_t aman, bman, mman, rman, tmp;
+        ulong aman, bman, mman, rman, tmp;
         int negative;
 
         aman = MAG_MAN(a);

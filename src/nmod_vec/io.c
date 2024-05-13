@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 
-int _nmod_vec_fprint_pretty(FILE * file, mp_srcptr vec, slong len, nmod_t mod)
+int _nmod_vec_fprint_pretty(FILE * file, nn_srcptr vec, slong len, nmod_t mod)
 {
     slong j;
     int z, width;
@@ -55,17 +55,17 @@ int _nmod_vec_fprint_pretty(FILE * file, mp_srcptr vec, slong len, nmod_t mod)
     return z;
 }
 
-void _nmod_vec_print_pretty(mp_srcptr vec, slong len, nmod_t mod)
+void _nmod_vec_print_pretty(nn_srcptr vec, slong len, nmod_t mod)
 {
     _nmod_vec_fprint_pretty(stdout, vec, len, mod);
 }
 
-int _nmod_vec_print(mp_srcptr vec, slong len, nmod_t mod)
+int _nmod_vec_print(nn_srcptr vec, slong len, nmod_t mod)
 {
     return _nmod_vec_fprint_pretty(stdout, vec, len, mod);
 }
 
-int _nmod_vec_fprint(FILE * f, mp_srcptr vec, slong len, nmod_t mod)
+int _nmod_vec_fprint(FILE * f, nn_srcptr vec, slong len, nmod_t mod)
 {
     return _nmod_vec_fprint_pretty(f, vec, len, mod);
 }

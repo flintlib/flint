@@ -20,7 +20,7 @@ void _fmpz_mat_resize_van_hoeij(fmpz_mat_t M, slong r, slong c)
 
    M->entries = (fmpz *) flint_realloc(M->entries, r*c*sizeof(fmpz));
 
-   mpn_zero((mp_ptr) M->entries + M->r*M->c, r*c - M->r*M->c);
+   mpn_zero((nn_ptr) M->entries + M->r*M->c, r*c - M->r*M->c);
 
    if (r != M->r) /* we will have an extra row and column */
    {

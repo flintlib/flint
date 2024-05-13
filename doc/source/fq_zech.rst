@@ -7,7 +7,7 @@ We represent an element of the finite field as a power of a generator for the
 multiplicative group of the finite field. In particular, we use a root of
 `f(x)`, where `f(X) \in \mathbf{F}_p[X]` is a monic, irreducible polynomial of
 degree `n`, as a polynomial in `\mathbf{F}_p[X]` of degree less than `n`. The
-underlying data structure is just an ``mp_limb_t``.
+underlying data structure is just an ``ulong``.
 
 The default choice for `f(X)` is the Conway polynomial for the pair `(p,n)`,
 enabled by Frank Lübeck's data base of Conway polynomials using the
@@ -15,7 +15,7 @@ enabled by Frank Lübeck's data base of Conway polynomials using the
 then a random irreducible polynomial will be chosen for `f(X)`. Additionally,
 the user is able to supply their own `f(X)`.
 
-We required that the order of the field fits inside of an ``mp_limb_t``;
+We required that the order of the field fits inside of an ``ulong``;
 however, it is recommended that `p^n < 2^{20}` due to the time and memory needed
 to compute the Zech logarithm table.
 
@@ -147,7 +147,7 @@ Context Management
 
      Sets `f` to be the size of the finite field.
 
-.. function:: mp_limb_t fq_zech_ctx_order_ui(const fq_zech_ctx_t ctx)
+.. function:: ulong fq_zech_ctx_order_ui(const fq_zech_ctx_t ctx)
 
      Returns the size of the finite field.
 
@@ -178,17 +178,17 @@ Memory management
 
     Clears the element ``rop``.
 
-.. function:: void _fq_zech_sparse_reduce(mp_ptr R, slong lenR, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_sparse_reduce(nn_ptr R, slong lenR, const fq_zech_ctx_t ctx)
 
     Reduces ``(R, lenR)`` modulo the polynomial `f` given by the
     modulus of ``ctx``.
 
-.. function:: void _fq_zech_dense_reduce(mp_ptr R, slong lenR, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_dense_reduce(nn_ptr R, slong lenR, const fq_zech_ctx_t ctx)
 
     Reduces ``(R, lenR)`` modulo the polynomial `f` given by the
     modulus of ``ctx`` using Newton division.
 
-.. function:: void _fq_zech_reduce(mp_ptr r, slong lenR, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_reduce(nn_ptr r, slong lenR, const fq_zech_ctx_t ctx)
 
     Reduces ``(R, lenR)`` modulo the polynomial `f` given by the
     modulus of ``ctx``.  Does either sparse or dense reduction
@@ -250,7 +250,7 @@ Basic arithmetic
     Sets ``rop`` to the quotient of ``op1`` and ``op2``,
     reducing the output in the given context.
 
-.. function:: void _fq_zech_inv(mp_ptr * rop, mp_srcptr * op, slong len, const fq_zech_ctx_t ctx)
+.. function:: void _fq_zech_inv(nn_ptr * rop, nn_srcptr * op, slong len, const fq_zech_ctx_t ctx)
 
     Sets ``(rop, d)`` to the inverse of the non-zero element
     ``(op, len)``.

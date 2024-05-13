@@ -21,8 +21,8 @@ int fq_nmod_mpoly_cmp(
     slong d = fq_nmod_ctx_degree(ctx->fqctx);
     slong i;
     slong length = A->length;
-    const mp_limb_t * Acoeffs = A->coeffs;
-    const mp_limb_t * Bcoeffs = B->coeffs;
+    const ulong * Acoeffs = A->coeffs;
+    const ulong * Bcoeffs = B->coeffs;
     int cmp;
 
     if (A->length != B->length)

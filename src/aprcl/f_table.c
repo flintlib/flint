@@ -20,12 +20,12 @@
 
     f_table[x - 1] = f(x).
 */
-mp_ptr
+nn_ptr
 aprcl_f_table(const ulong q)
 {
     int i;
     ulong g, g_pow, qinv;
-    mp_ptr g_table, f_table;
+    nn_ptr g_table, f_table;
 
     g = n_primitive_root_prime(q);
     g_table = _nmod_vec_init(q);

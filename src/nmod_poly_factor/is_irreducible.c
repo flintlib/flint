@@ -173,7 +173,7 @@ nmod_poly_is_irreducible_rabin(const nmod_poly_t f)
 {
     if (nmod_poly_length(f) > 2)
     {
-        const mp_limb_t p = nmod_poly_modulus(f);
+        const ulong p = nmod_poly_modulus(f);
         const slong n     = nmod_poly_degree(f);
         nmod_poly_t a, x, x_p;
 

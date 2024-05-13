@@ -19,8 +19,8 @@ TEST_FUNCTION_START(nmod_poly_scalar_addmul_nmod, state)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c, d;
-        mp_limb_t n = n_randtest_not_zero(state);
-        mp_limb_t x = n_randint(state, n);
+        ulong n = n_randtest_not_zero(state);
+        ulong x = n_randint(state, n);
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);

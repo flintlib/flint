@@ -17,11 +17,11 @@ int
 main(int argc, char** argv)
 {
     double tbest = 1.0e300;
-    mp_limb_t nums[1000];
+    ulong nums[1000];
 
     slong i;
     slong bits, B1, count;
-    mp_limb_t n, cofactor;
+    ulong n, cofactor;
     n_factor_t fac;
 
     FLINT_TEST_INIT(state);

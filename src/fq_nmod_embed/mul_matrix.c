@@ -20,7 +20,7 @@ void fq_nmod_embed_mul_matrix(nmod_mat_t matrix,
     slong i, j, len = fq_nmod_ctx_degree(ctx);
     const nmod_poly_struct *modulus = ctx->modulus;
     const nmod_t mod = modulus->mod;
-    mp_limb_t lead;
+    ulong lead;
 
     /* This is usually 1, unless the context is non-monic */
     lead = nmod_inv(modulus->coeffs[len], mod);

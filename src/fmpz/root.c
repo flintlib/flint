@@ -32,7 +32,7 @@ fmpz_root(fmpz_t r, const fmpz_t f, slong n)
 
     if (!COEFF_IS_MPZ(c)) /* f is small */
     {
-        mp_limb_t rem, root;
+        ulong rem, root;
         int sgn = c < 0;
 
         if (n == 2)

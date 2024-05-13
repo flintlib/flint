@@ -13,12 +13,12 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-mp_limb_t
-_nmod_poly_discriminant(mp_srcptr poly, slong len, nmod_t mod)
+ulong
+_nmod_poly_discriminant(nn_srcptr poly, slong len, nmod_t mod)
 {
-   mp_ptr der = _nmod_vec_init(len - 1);
+   nn_ptr der = _nmod_vec_init(len - 1);
    slong dlen = len - 1;
-   mp_limb_t res, pow;
+   ulong res, pow;
 
    _nmod_poly_derivative(der, poly, len, mod);
    NMOD_VEC_NORM(der, dlen);
@@ -41,7 +41,7 @@ _nmod_poly_discriminant(mp_srcptr poly, slong len, nmod_t mod)
    return res;
 }
 
-mp_limb_t
+ulong
 nmod_poly_discriminant(const nmod_poly_t f)
 {
     const slong len = f->length;

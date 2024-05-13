@@ -20,7 +20,7 @@ extern "C" {
 
 typedef struct
 {
-    mp_limb_t value;
+    ulong value;
 }
 fq_zech_struct;
 

@@ -18,7 +18,7 @@ TEST_FUNCTION_START(nmod_mat_solve_vec, state)
     nmod_mat_t A, x, b, Ax;
     slong i, m, r;
     int solved;
-    mp_limb_t mod;
+    ulong mod;
 
     for (i = 0; i < 2000 * flint_test_multiplier(); i++)
     {

@@ -312,7 +312,7 @@ typedef struct {
 typedef _fmpz_mat22_struct _fmpz_mat22_t[1];
 
 typedef struct {
-    mp_limb_t _11, _12, _21, _22;
+    ulong _11, _12, _21, _22;
     int det;    /* ditto */
 } _ui_mat22_struct;
 

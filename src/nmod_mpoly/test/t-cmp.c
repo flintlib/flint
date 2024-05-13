@@ -25,7 +25,7 @@ TEST_FUNCTION_START(nmod_mpoly_cmp, state)
         nmod_mpoly_t f, g, mf, mg;
         slong len;
         flint_bitcnt_t exp_bits;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = UWORD(1) + n_randint(state, -UWORD(1));
         nmod_mpoly_ctx_init_rand(ctx, state, 20, modulus);
@@ -78,7 +78,7 @@ TEST_FUNCTION_START(nmod_mpoly_cmp, state)
         int b_a, b_b, b_c, b_aa, b_bb, b_cc;
         int c_a, c_b, c_c, c_aa, c_bb, c_cc;
         flint_bitcnt_t newbits;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = UWORD(1) + n_randint(state, -UWORD(1));
         nmod_mpoly_ctx_init_rand(ctx, state, 20, modulus);

@@ -17,7 +17,7 @@ arb_hypgeom_legendre_p_ui_rec(arb_t res, arb_t res_prime, ulong n, const arb_t x
 {
     slong wp;
     ulong k, den;
-    mp_limb_t denlo, denhi;
+    ulong denlo, denhi;
     mpz_t p0, p1, xx, tt;
     fmpz_t fxx;
     int error;

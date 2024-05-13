@@ -89,12 +89,12 @@ TEST_FUNCTION_START(nmod_mpoly_compose_nmod_poly, state)
         nmod_mpoly_t f;
         nmod_poly_t g;
         nmod_poly_struct ** vals1;
-        mp_limb_t fe, ge;
-        mp_limb_t vals2, * vals3;
+        ulong fe, ge;
+        ulong vals2, * vals3;
         slong nvars1;
         slong len1, len2;
         slong exp_bound1;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -122,7 +122,7 @@ TEST_FUNCTION_START(nmod_mpoly_compose_nmod_poly, state)
 
         vals2 = n_randint(state, modulus);
 
-        vals3 = (mp_limb_t *) flint_malloc(nvars1*sizeof(mp_limb_t));
+        vals3 = (ulong *) flint_malloc(nvars1*sizeof(ulong));
         for (v = 0; v < nvars1; v++)
         {
             vals3[v] = nmod_poly_evaluate_nmod(vals1[v], vals2);

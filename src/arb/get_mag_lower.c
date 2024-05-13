@@ -42,7 +42,7 @@ _arb_get_mag_lower(mag_t z, const arf_t mid, const mag_t rad)
         }
         else
         {
-            mp_limb_t m, xm, rm;
+            ulong m, xm, rm;
 
             ARF_GET_TOP_LIMB(xm, mid);
             xm = xm >> (FLINT_BITS - MAG_BITS);

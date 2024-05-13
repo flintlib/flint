@@ -15,7 +15,7 @@
 
 #define ARF_MAX_CACHE_LIMBS 64
 
-FLINT_TLS_PREFIX mp_ptr * arf_free_arr = NULL;
+FLINT_TLS_PREFIX nn_ptr * arf_free_arr = NULL;
 FLINT_TLS_PREFIX ulong arf_free_num = 0;
 FLINT_TLS_PREFIX ulong arf_free_alloc = 0;
 FLINT_TLS_PREFIX int arf_have_registered_cleanup = 0;
@@ -34,12 +34,12 @@ void _arf_cleanup(void)
 }
 
 void
-_arf_promote(arf_t x, mp_size_t n)
+_arf_promote(arf_t x, slong n)
 {
     if (ARF_USE_CACHE && n <= ARF_MAX_CACHE_LIMBS && arf_free_num != 0)
     {
-        mp_ptr ptr;
-        mp_size_t alloc;
+        nn_ptr ptr;
+        slong alloc;
 
         ptr = arf_free_arr[--arf_free_num];
         alloc = ptr[0];
@@ -51,7 +51,7 @@ _arf_promote(arf_t x, mp_size_t n)
         }
         else
         {
-            ptr = flint_realloc(ptr, n * sizeof(mp_limb_t));
+            ptr = flint_realloc(ptr, n * sizeof(ulong));
             ARF_PTR_ALLOC(x) = n;
             ARF_PTR_D(x) = ptr;
         }
@@ -59,15 +59,15 @@ _arf_promote(arf_t x, mp_size_t n)
     else
     {
         ARF_PTR_ALLOC(x) = n;
-        ARF_PTR_D(x) = flint_malloc(n * sizeof(mp_limb_t));
+        ARF_PTR_D(x) = flint_malloc(n * sizeof(ulong));
     }
 }
 
 void
 _arf_demote(arf_t x)
 {
-    mp_ptr ptr;
-    mp_size_t alloc;
+    nn_ptr ptr;
+    slong alloc;
 
     alloc = ARF_PTR_ALLOC(x);
     ptr = ARF_PTR_D(x);
@@ -84,7 +84,7 @@ _arf_demote(arf_t x)
 
             arf_free_alloc = FLINT_MAX(64, arf_free_alloc * 2);
             arf_free_arr = flint_realloc(arf_free_arr,
-                arf_free_alloc * sizeof(mp_ptr));
+                arf_free_alloc * sizeof(nn_ptr));
         }
 
         ptr[0] = alloc;

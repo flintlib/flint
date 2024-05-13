@@ -18,7 +18,7 @@ void test_with_dimensions1(ulong rdim, ulong cdim, flint_rand_t state)
     int result;
 
     nmod_poly_mat_t a, b;
-    mp_limb_t n = n_randtest_not_zero(state);
+    ulong n = n_randtest_not_zero(state);
     slong shift = n_randint(state, 100);
 
     nmod_poly_mat_init(a, rdim, cdim, n);
@@ -50,7 +50,7 @@ void test_with_dimensions2(ulong rdim, ulong cdim, flint_rand_t state)
     int result;
 
     nmod_poly_mat_t a, b, c;
-    mp_limb_t n = n_randtest_not_zero(state);
+    ulong n = n_randtest_not_zero(state);
     slong shift = n_randint(state, 100);
 
     nmod_poly_mat_init(a, rdim, cdim, n);

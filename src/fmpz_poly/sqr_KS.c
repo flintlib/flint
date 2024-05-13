@@ -21,7 +21,7 @@ _fmpz_poly_sqr_KS(fmpz *rop, const fmpz *op, slong len)
     const slong in_len = len;
     int neg;
     slong bits, limbs, loglen;
-    mp_limb_t *arr, *arr3;
+    ulong *arr, *arr3;
     slong sign = 0;
 
     FMPZ_VEC_NORM(op, len);
@@ -46,11 +46,11 @@ _fmpz_poly_sqr_KS(fmpz *rop, const fmpz *op, slong len)
     bits   = 2 * bits + loglen + sign;
     limbs  = (bits * len - 1) / FLINT_BITS + 1;
 
-    arr = (mp_limb_t *) flint_calloc(limbs, sizeof(mp_limb_t));
+    arr = (ulong *) flint_calloc(limbs, sizeof(ulong));
 
     _fmpz_poly_bit_pack(arr, op, len, bits, neg);
 
-    arr3 = (mp_limb_t *) flint_malloc((2 * limbs) * sizeof(mp_limb_t));
+    arr3 = (ulong *) flint_malloc((2 * limbs) * sizeof(ulong));
 
     flint_mpn_sqr(arr3, arr, limbs);
 

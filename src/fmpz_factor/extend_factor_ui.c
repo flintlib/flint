@@ -15,7 +15,7 @@
 #include "fmpz_factor.h"
 
 void
-_fmpz_factor_extend_factor_ui(fmpz_factor_t factor, mp_limb_t n)
+_fmpz_factor_extend_factor_ui(fmpz_factor_t factor, ulong n)
 {
     slong i, len;
     n_factor_t nfac;

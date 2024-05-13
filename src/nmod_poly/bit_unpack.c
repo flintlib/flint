@@ -17,18 +17,18 @@
 
 /* Assumes len > 0, bits > 0. */
 void
-_nmod_poly_bit_unpack(mp_ptr res, slong len, mp_srcptr mpn, flint_bitcnt_t bits,
+_nmod_poly_bit_unpack(nn_ptr res, slong len, nn_srcptr mpn, flint_bitcnt_t bits,
                       nmod_t mod)
 {
     slong i;
     ulong current_bit = 0, current_limb = 0;
-    mp_limb_t temp_lower, temp_upper, temp_upper2;
+    ulong temp_lower, temp_upper, temp_upper2;
 
     if (bits < FLINT_BITS)
     {
         ulong boundary_limit_bit = FLINT_BITS - bits;
 
-        mp_limb_t mask = (WORD(1) << bits) - WORD(1);
+        ulong mask = (WORD(1) << bits) - WORD(1);
 
         for (i = 0; i < len; i++)
         {
@@ -78,7 +78,7 @@ _nmod_poly_bit_unpack(mp_ptr res, slong len, mp_srcptr mpn, flint_bitcnt_t bits,
     {
         ulong double_boundary_limit_bit = 2 * FLINT_BITS - bits;
 
-        mp_limb_t mask = (WORD(1) << (bits - FLINT_BITS)) - WORD(1);
+        ulong mask = (WORD(1) << (bits - FLINT_BITS)) - WORD(1);
 
         for (i = 0; i < len; i++)
         {
@@ -134,7 +134,7 @@ _nmod_poly_bit_unpack(mp_ptr res, slong len, mp_srcptr mpn, flint_bitcnt_t bits,
     {
         ulong double_boundary_limit_bit = 3 * FLINT_BITS - bits;
 
-        mp_limb_t mask = (WORD(1) << (bits - 2 * FLINT_BITS)) - WORD(1);
+        ulong mask = (WORD(1) << (bits - 2 * FLINT_BITS)) - WORD(1);
 
         for (i = 0; i < len; i++)
         {

@@ -21,7 +21,7 @@ void
 nmod_mat_permute_rows(nmod_mat_t mat, const slong * perm_act, slong * perm_store)
 {
     slong i;
-    mp_limb_t ** mat_tmp = (mp_limb_t **) flint_malloc(mat->r * sizeof(mp_limb_t *));
+    ulong ** mat_tmp = (ulong **) flint_malloc(mat->r * sizeof(ulong *));
 
     /* perm_store[i] <- perm_store[perm_act[i]] */
     if (perm_store)

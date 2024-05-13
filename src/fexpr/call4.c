@@ -16,7 +16,7 @@ void
 fexpr_call4(fexpr_t res, const fexpr_t f, const fexpr_t x1, const fexpr_t x2, const fexpr_t x3, const fexpr_t x4)
 {
     slong res_size, f_size, x1_size, x2_size, x3_size, x4_size;
-    mp_ptr out;
+    nn_ptr out;
 
     f_size = fexpr_size(f);
     x1_size = fexpr_size(x1);

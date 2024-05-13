@@ -156,7 +156,7 @@ arb_hypgeom_gamma_coeff_t arb_hypgeom_gamma_coeffs[ARB_HYPGEOM_GAMMA_TAB_NUM] = 
  {-2904, 16095, 1, 1}, {-2911, 16096, 1, 0}, {-2919, 16097, 1, 1}, {-2927, 16098, 1, 1},
 };
 
-const mp_limb_t arb_hypgeom_gamma_tab_limbs[] = {
+const ulong arb_hypgeom_gamma_tab_limbs[] = {
  Z8(00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000)
  Z8(00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000)
  Z8(00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000)
@@ -4189,8 +4189,8 @@ _arb_hypgeom_gamma_coeff_shallow(arf_t c, mag_t err, slong i, slong prec)
 {
     slong term_limbs;
     slong exp, pos;
-    mp_size_t xn;
-    mp_ptr xp;
+    slong xn;
+    nn_ptr xp;
     int negative;
 
     term_limbs = (prec + FLINT_BITS - 1) / FLINT_BITS;
@@ -4211,7 +4211,7 @@ _arb_hypgeom_gamma_coeff_shallow(arf_t c, mag_t err, slong i, slong prec)
     if (term_limbs > xn)
         return 0;
 
-    xp = (mp_ptr) arb_hypgeom_gamma_tab_limbs + pos;
+    xp = (nn_ptr) arb_hypgeom_gamma_tab_limbs + pos;
 
     ARF_EXP(c) = exp;
     ARF_XSIZE(c) = ARF_MAKE_XSIZE(term_limbs, negative);

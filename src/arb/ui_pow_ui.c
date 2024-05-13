@@ -72,9 +72,9 @@ arb_ui_pow_ui(arb_t res, ulong a, ulong exp, slong prec)
     slong wp, aexp, awidth, trailing, wp_limbs;
     slong exp_fix, alloc, leading;
     int inexact, i, ebits;
-    mp_ptr yman, tmp;
-    mp_size_t yn;
-    mp_limb_t yexp_hi, yexp_lo, aman, aodd, hi, lo;
+    nn_ptr yman, tmp;
+    slong yn;
+    ulong yexp_hi, yexp_lo, aman, aodd, hi, lo;
     ARF_MUL_TMP_DECL
 
     if (exp <= 2)
@@ -89,7 +89,7 @@ arb_ui_pow_ui(arb_t res, ulong a, ulong exp, slong prec)
         }
         else
         {
-            mp_limb_t hi, lo;
+            ulong hi, lo;
             umul_ppmm(hi, lo, a, a);
             arb_set_round_uiui(res, hi, lo, prec);
         }
@@ -184,7 +184,7 @@ arb_ui_pow_ui(arb_t res, ulong a, ulong exp, slong prec)
                     }
                     else
                     {
-                        mp_limb_t y0, y1;
+                        ulong y0, y1;
                         y0 = yman[0];
                         y1 = yman[1];
                         FLINT_MPN_MUL_2X1(yman[2], yman[1], yman[0], y1, y0, aodd);
@@ -241,7 +241,7 @@ arb_ui_pow_ui(arb_t res, ulong a, ulong exp, slong prec)
         /* note: we must have yn == 1 here if wp_limbs == 1 */
         if (wp_limbs == 1)
         {
-            mp_limb_t hi, lo;
+            ulong hi, lo;
 
             /* y = y^2: mantissa */
             umul_ppmm(hi, lo, yman[0], yman[0]);

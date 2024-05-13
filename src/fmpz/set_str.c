@@ -55,16 +55,16 @@ worker(void * arg)
 static void
 _fmpz_set_str_basecase(fmpz_t res, const char * s, slong slen)
 {
-    mp_ptr tmp;
+    nn_ptr tmp;
     unsigned char * stmp;
-    mp_size_t n;
+    slong n;
     slong i;
     TMP_INIT;
 
     TMP_START;
 
     stmp = TMP_ALLOC(sizeof(char) * slen);
-    tmp = TMP_ALLOC(sizeof(mp_limb_t) * (slen / DIGITS_PER_LIMB + 2));
+    tmp = TMP_ALLOC(sizeof(ulong) * (slen / DIGITS_PER_LIMB + 2));
 
     for (i = 0; i < slen; i++)
         stmp[i] = s[i] - '0';

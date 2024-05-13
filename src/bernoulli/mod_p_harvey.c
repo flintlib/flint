@@ -56,14 +56,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ===============================================================================
 */
 
+#include <string.h>
+#include <gmp.h>
 #include "ulong_extras.h"
 #include "bernoulli.h"
-
-#ifdef __GNUC__
-# define memset __builtin_memset
-#else
-# include <string.h>
-#endif
 
 #define DEBUG 0
 #define TIMING 1
@@ -147,7 +143,7 @@ bernoulli_sum_powg(ulong p, ulong pinv, ulong k, ulong g)
     The constructor takes p and max_words as input. Must have 1 <= max_words <=
     MAX_INV. It computes an approximation to 1/p.
 
-    The function expand(mp_ptr res, long s, long n) computes n limbs of s/p.
+    The function expand(nn_ptr res, long s, long n) computes n limbs of s/p.
     Must have 0 < s < p and 1 <= n <= max_words. The output is written to res.
     The first word of output is junk. The next n words are the digits of s/p,
     from least to most significant. The buffer must be at least n+2 words long
@@ -159,8 +155,8 @@ bernoulli_sum_powg(ulong p, ulong pinv, ulong k, ulong g)
 typedef struct
 {
    /* Approximation to 1/p. We store (max_words + 1) limbs. */
-   mp_limb_t pinv[MAX_INV + 2];
-   mp_limb_t p;
+   ulong pinv[MAX_INV + 2];
+   ulong p;
    int max_words;
 }
 expander_t;
@@ -168,7 +164,7 @@ expander_t;
 static void
 expander_init(expander_t * this, ulong p, int max_words)
 {
-    mp_limb_t one;
+    ulong one;
 
     FLINT_ASSERT(max_words >= 1);
     FLINT_ASSERT(max_words <= MAX_INV);
@@ -180,7 +176,7 @@ expander_init(expander_t * this, ulong p, int max_words)
 }
 
 static void
-expander_expand(mp_ptr res, expander_t * this, ulong s, ulong n)
+expander_expand(nn_ptr res, expander_t * this, ulong s, ulong n)
 {
     slong i;
 
@@ -196,15 +192,15 @@ expander_expand(mp_ptr res, expander_t * this, ulong s, ulong n)
     }
     else
     {
-        mpn_mul_1(res, this->pinv + this->max_words - n, n + 1, (mp_limb_t) s);
+        mpn_mul_1(res, this->pinv + this->max_words - n, n + 1, (ulong) s);
 
         /* If the first output limb is really close to 0xFFFF..., then there's
            a possibility of overflow, so fall back on doing division directly.
            This should happen extremely rarely --- essentially never on a
            64-bit system, and very occasionally on a 32-bit system. */
-        if (res[0] > -((mp_limb_t) s))
+        if (res[0] > -((ulong) s))
         {
-            mp_limb_t ss = s;
+            ulong ss = s;
             mpn_divrem_1(res, n + 1, &ss, 1, this->p);
         }
     }
@@ -312,9 +308,9 @@ ulong bernsum_pow2(ulong p, ulong pinv, ulong k, ulong g, ulong n)
         /* memory locality. */
         for (nn = n; nn > 0; nn -= MAX_INV * FLINT_BITS)
         {
-            mp_limb_t s_over_p[MAX_INV + 2];
+            ulong s_over_p[MAX_INV + 2];
             slong bits, words;
-            mp_ptr next;
+            nn_ptr next;
 
             if (nn >= MAX_INV * FLINT_BITS)
             {
@@ -337,11 +333,11 @@ ulong bernsum_pow2(ulong p, ulong pinv, ulong k, ulong g, ulong n)
             /* loop over whole words */
             for (; bits >= FLINT_BITS; bits -= FLINT_BITS, next--)
             {
-                mp_limb_t y;
+                ulong y;
 #if NUM_TABLES != 8 && NUM_TABLES != 4
-                mp_ptr target;
+                nn_ptr target;
 #else
-                mp_ptr target0, target1, target2, target3, target4, target5, target6, target7;
+                nn_ptr target0, target1, target2, target3, target4, target5, target6, target7;
 #endif
 
                 y = *next;
@@ -588,7 +584,7 @@ ulong bernsum_pow2_redc(ulong p, ulong pinv, ulong k, ulong g, ulong n)
     {
         ulong s, x, y;
         slong nn, bits, words;
-        mp_ptr next;
+        nn_ptr next;
 
         s = g_to_i;           /* always in [0, p) */
         if (s >= p)

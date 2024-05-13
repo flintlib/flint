@@ -24,7 +24,7 @@ TEST_FUNCTION_START(nmod_mpoly_mul_johnson, state)
         nmod_mpoly_t f, g, h, k1, k2, t1, t2;
         slong len, len1, len2;
         flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -95,7 +95,7 @@ TEST_FUNCTION_START(nmod_mpoly_mul_johnson, state)
         nmod_mpoly_t f, g, h;
         slong len, len1, len2;
         flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -149,7 +149,7 @@ TEST_FUNCTION_START(nmod_mpoly_mul_johnson, state)
         nmod_mpoly_t f, g, h;
         slong len, len1, len2;
         flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);

@@ -13,12 +13,12 @@
 #include "nmod.h"
 #include "nmod_poly.h"
 
-void _nmod_poly_rem_q1(mp_ptr R,
-                       mp_srcptr A, slong lenA, mp_srcptr B, slong lenB,
+void _nmod_poly_rem_q1(nn_ptr R,
+                       nn_srcptr A, slong lenA, nn_srcptr B, slong lenB,
                        nmod_t mod)
 {
     slong i;
-    mp_limb_t invL, t, q0, q1, t2, t1, t0, s1, s0;
+    ulong invL, t, q0, q1, t2, t1, t0, s1, s0;
 
     FLINT_ASSERT(lenA == lenB + 1);
     invL = (B[lenB-1] == 1) ? 1 : n_invmod(B[lenB-1], mod.n);
@@ -76,8 +76,8 @@ void _nmod_poly_rem_q1(mp_ptr R,
     }
 }
 
-void _nmod_poly_rem(mp_ptr R, mp_srcptr A, slong lenA,
-                              mp_srcptr B, slong lenB, nmod_t mod)
+void _nmod_poly_rem(nn_ptr R, nn_srcptr A, slong lenA,
+                              nn_srcptr B, slong lenB, nmod_t mod)
 {
     if (lenA - lenB == 1)
     {
@@ -85,11 +85,11 @@ void _nmod_poly_rem(mp_ptr R, mp_srcptr A, slong lenA,
     }
     else if (lenB >= 2)
     {
-        mp_ptr Q;
+        nn_ptr Q;
         TMP_INIT;
 
         TMP_START;
-        Q = TMP_ALLOC((lenA - lenB + 1) * sizeof(mp_limb_t));
+        Q = TMP_ALLOC((lenA - lenB + 1) * sizeof(ulong));
         _nmod_poly_divrem(Q, R, A, lenA, B, lenB, mod);
         TMP_END;
     }
@@ -99,7 +99,7 @@ void nmod_poly_rem(nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B)
 {
     const slong lenA = A->length, lenB = B->length;
     nmod_poly_t tR;
-    mp_ptr r;
+    nn_ptr r;
 
     if (lenB == 0)
     {

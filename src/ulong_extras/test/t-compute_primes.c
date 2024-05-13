@@ -17,10 +17,10 @@ TEST_FUNCTION_START(compute_primes, state)
 {
     slong i, lim = 1000000;
     n_primes_t pg;
-    mp_limb_t * ref_primes;
+    ulong * ref_primes;
     double * ref_inverses;
 
-    ref_primes = flint_malloc(sizeof(mp_limb_t) * lim);
+    ref_primes = flint_malloc(sizeof(ulong) * lim);
     ref_inverses = flint_malloc(sizeof(double) * lim);
 
     n_primes_init(pg);
@@ -34,7 +34,7 @@ TEST_FUNCTION_START(compute_primes, state)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         slong n;
-        const mp_limb_t * primes;
+        const ulong * primes;
         const double * inverses;
 
         n = n_randint(state, lim);

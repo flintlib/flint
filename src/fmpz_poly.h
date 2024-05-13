@@ -44,7 +44,7 @@ typedef fmpz_poly_powers_precomp_struct fmpz_poly_powers_precomp_t[1];
 
 typedef struct
 {
-   mp_limb_t ** jj; /* used by fft_convolution_precache */
+   ulong ** jj; /* used by fft_convolution_precache */
    slong n;
    slong len2;
    slong loglen;
@@ -176,9 +176,9 @@ void fmpz_poly_randtest_not_zero(fmpz_poly_t f, flint_rand_t state,
 void fmpz_poly_randtest_no_real_root(fmpz_poly_t p, flint_rand_t state,
                                                 slong len, flint_bitcnt_t bits);
 
-void fmpz_poly_randtest_irreducible1(fmpz_poly_t pol, flint_rand_t state, slong len, mp_bitcnt_t bits);
-void fmpz_poly_randtest_irreducible2(fmpz_poly_t pol, flint_rand_t state, slong len, mp_bitcnt_t bits);
-void fmpz_poly_randtest_irreducible(fmpz_poly_t pol, flint_rand_t state, slong len, mp_bitcnt_t bits);
+void fmpz_poly_randtest_irreducible1(fmpz_poly_t pol, flint_rand_t state, slong len, flint_bitcnt_t bits);
+void fmpz_poly_randtest_irreducible2(fmpz_poly_t pol, flint_rand_t state, slong len, flint_bitcnt_t bits);
+void fmpz_poly_randtest_irreducible(fmpz_poly_t pol, flint_rand_t state, slong len, flint_bitcnt_t bits);
 
 /*  Getting and setting coefficients  ****************************************/
 
@@ -331,14 +331,14 @@ void _fmpz_poly_scale_2exp(fmpz * pol, slong len, slong k);
 
 /*  Bit packing  *************************************************************/
 
-void _fmpz_poly_bit_pack(mp_ptr arr, const fmpz * poly,
+void _fmpz_poly_bit_pack(nn_ptr arr, const fmpz * poly,
                                 slong len, flint_bitcnt_t bit_size, int negate);
 
 int _fmpz_poly_bit_unpack(fmpz * poly, slong len,
-                           mp_srcptr arr, flint_bitcnt_t bit_size, int negate);
+                           nn_srcptr arr, flint_bitcnt_t bit_size, int negate);
 
 void _fmpz_poly_bit_unpack_unsigned(fmpz * poly, slong len,
-                                       mp_srcptr arr, flint_bitcnt_t bit_size);
+                                       nn_srcptr arr, flint_bitcnt_t bit_size);
 
 void fmpz_poly_bit_pack(fmpz_t f, const fmpz_poly_t poly,
         flint_bitcnt_t bit_size);
@@ -901,11 +901,11 @@ void _fmpz_poly_evaluate_fmpq(fmpz_t rnum, fmpz_t rden,
 void fmpz_poly_evaluate_fmpq(fmpq_t res,
                                           const fmpz_poly_t f, const fmpq_t a);
 
-mp_limb_t _fmpz_poly_evaluate_mod(const fmpz * poly, slong len,
-                                     mp_limb_t a, mp_limb_t n, mp_limb_t ninv);
+ulong _fmpz_poly_evaluate_mod(const fmpz * poly, slong len,
+                                     ulong a, ulong n, ulong ninv);
 
-mp_limb_t fmpz_poly_evaluate_mod(const fmpz_poly_t poly, mp_limb_t a,
-                                 mp_limb_t n);
+ulong fmpz_poly_evaluate_mod(const fmpz_poly_t poly, ulong a,
+                                 ulong n);
 
 double _fmpz_poly_evaluate_horner_d(const fmpz * poly, slong n,
                                                                      double d);
@@ -1083,12 +1083,12 @@ void fmpz_poly_set_nmod_poly_unsigned(fmpz_poly_t res, const nmod_poly_t poly);
 
 void
 _fmpz_poly_CRT_ui_precomp(fmpz * res, const fmpz * poly1, slong len1,
-               const fmpz_t m1, mp_srcptr poly2, slong len2, mp_limb_t m2,
-                mp_limb_t m2inv, fmpz_t m1m2, mp_limb_t c, int sign);
+               const fmpz_t m1, nn_srcptr poly2, slong len2, ulong m2,
+                ulong m2inv, fmpz_t m1m2, ulong c, int sign);
 
 void _fmpz_poly_CRT_ui(fmpz * res, const fmpz * poly1, slong len1,
-               const fmpz_t m1, mp_srcptr poly2, slong len2, mp_limb_t m2,
-                                                    mp_limb_t m2inv, int sign);
+               const fmpz_t m1, nn_srcptr poly2, slong len2, ulong m2,
+                                                    ulong m2inv, int sign);
 
 void fmpz_poly_CRT_ui(fmpz_poly_t res, const fmpz_poly_t poly1,
                                      const fmpz_t m1, const nmod_poly_t poly2,
@@ -1197,7 +1197,7 @@ void fmpz_poly_CLD_bound(fmpz_t res, const fmpz_poly_t f, slong n);
 
 /* Special polynomials */
 
-void _fmpz_poly_cyclotomic(fmpz * a, ulong n, mp_ptr factors,
+void _fmpz_poly_cyclotomic(fmpz * a, ulong n, nn_ptr factors,
                                         slong num_factors, ulong phi);
 void fmpz_poly_cyclotomic(fmpz_poly_t poly, ulong n);
 

@@ -25,7 +25,7 @@ slong _fmpz_remove(fmpz_t x, const fmpz_t f, double finv)
         {
             if (y > 0)
             {
-                return n_remove2_precomp((mp_limb_t *) x, q, finv);
+                return n_remove2_precomp((ulong *) x, q, finv);
             }
             else
             {

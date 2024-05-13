@@ -19,7 +19,7 @@ TEST_FUNCTION_START(n_sqrtrem, state)
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
-        mp_limb_t a, r1, r2, s1, s2;
+        ulong a, r1, r2, s1, s2;
         mpz_t a_m, r2_m, s2_m;
 
         mpz_init(a_m);
@@ -46,7 +46,7 @@ TEST_FUNCTION_START(n_sqrtrem, state)
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
-        mp_limb_t a, r1, r2, s1, s2, bits;
+        ulong a, r1, r2, s1, s2, bits;
         mpz_t a_m, r2_m, s2_m;
 
         mpz_init(a_m);

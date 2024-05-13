@@ -240,7 +240,7 @@ char * fmpz_get_str(char * str, int b, const fmpz_t f)
     if (!COEFF_IS_MPZ(*f))
     {
         fmpz c;
-        mp_limb_t d;
+        ulong d;
         c = *f;
 
         d = FLINT_ABS(c);

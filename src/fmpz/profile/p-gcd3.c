@@ -84,7 +84,7 @@ fmpz_gcd3_old(fmpz_t res, const fmpz_t a, const fmpz_t b, const fmpz_t c)
     {
         /* Three-way mpz_gcd. */
         mpz_ptr rp, ap, bp, cp, tp;
-        mp_size_t an, bn, cn, mn;
+        slong an, bn, cn, mn;
 
         /* If res is small, it cannot be aliased with a, b, c, so promoting is fine. */
         rp = _fmpz_promote(res);
@@ -126,7 +126,7 @@ fmpz_gcd3_old(fmpz_t res, const fmpz_t a, const fmpz_t b, const fmpz_t c)
             /* It would be more efficient to allocate temporary space for
                gcd(a, b), but we can't be sure that mpz_gcd never attempts
                to reallocate the output. */
-            t->_mp_d = TMP_ALLOC(sizeof(mp_limb_t) * cn);
+            t->_mp_d = TMP_ALLOC(sizeof(ulong) * cn);
             t->_mp_size = t->_mp_alloc = cn;
             flint_mpn_copyi(t->_mp_d, cp->_mp_d, cn);
 

@@ -36,9 +36,9 @@ int pow_incr(int * pows, int * exp, int n)
 slong qfb_reduced_forms_large(qfb ** forms, slong d)
 {
     slong a, j, k, p, alim, alloc, num, roots, sqrt, i, prod, prime_i;
-    mp_srcptr primes;
+    nn_srcptr primes;
     const double * prime_inverses;
-    mp_limb_t a2;
+    ulong a2;
     n_factor_t * fac;
 
     if (d >= 0)
@@ -106,13 +106,13 @@ slong qfb_reduced_forms_large(qfb ** forms, slong d)
 
     for (a = 1; a <= alim; a++) /* loop through possible a's */
     {
-        mp_limb_t * s;
+        ulong * s;
 
         roots = n_sqrtmodn(&s, n_negmod((-d)%(4*a), 4*a), fac + a);
 
         for (j = 0; j < roots; j++) /* loop through all square roots of d mod 4a */
         {
-           mp_limb_signed_t b = s[j];
+           slong b = s[j];
 
            if (b > 2*a) b -= 4*a;
 
@@ -123,11 +123,11 @@ slong qfb_reduced_forms_large(qfb ** forms, slong d)
                   -sqrt(2^(B-1)/3) < b < sqrt(2^(B-1)/3)
                   0 < -d < 2^(B-1)
                */
-               mp_limb_t c = ((mp_limb_t) (b*b) + (mp_limb_t) (-d))/(4*(mp_limb_t) a);
+               ulong c = ((ulong) (b*b) + (ulong) (-d))/(4*(ulong) a);
 
-               if (c >= (mp_limb_t) a && (b >= 0 || a != c)) /* we have a form */
+               if (c >= (ulong) a && (b >= 0 || a != c)) /* we have a form */
                {
-                   mp_limb_t g;
+                   ulong g;
 
                    if (b)
                    {
@@ -165,11 +165,11 @@ slong qfb_reduced_forms_large(qfb ** forms, slong d)
 slong qfb_reduced_forms(qfb ** forms, slong d)
 {
     slong a, b, k, c, p, blim, alloc, num, sqrt, i, prod, prime_i;
-    mp_srcptr primes;
+    nn_srcptr primes;
     const double * prime_inverses;
-    mp_limb_t b2, exp, primes_cutoff = 0;
+    ulong b2, exp, primes_cutoff = 0;
     n_factor_t * fac;
-    mp_limb_t * s;
+    ulong * s;
 
     if (d >= 0)
         flint_throw(FLINT_ERROR, "%s not implemented for positive discriminant\n", __func__);
@@ -199,10 +199,10 @@ slong qfb_reduced_forms(qfb ** forms, slong d)
 
         for (i = 0; i < num; i++) /* sieve with each sqrt mod p */
         {
-            mp_limb_t off = s[i];
+            ulong off = s[i];
             while (off <= blim)
             {
-                b2 = (off*off - (mp_limb_t) d)/4;
+                b2 = (off*off - (ulong) d)/4;
 
                 fac[off].p[fac[off].num] = p;
                 fac[off].exp[fac[off].num] = n_remove2_precomp(&b2, p, prime_inverses[prime_i]);
@@ -219,7 +219,7 @@ slong qfb_reduced_forms(qfb ** forms, slong d)
 
     for (b = (d & 1); b <= blim; b += 2) /* write any remaining factors, including 2^exp */
     {
-        b2 = ((mp_limb_t)(b*b - d))/4;
+        b2 = ((ulong)(b*b - d))/4;
 
         exp = flint_ctz(b2); /* powers of 2 */
         if (exp)
@@ -249,7 +249,7 @@ slong qfb_reduced_forms(qfb ** forms, slong d)
          int pows[FLINT_MAX_FACTORS_IN_LIMB];
          int n = fac[b].num;
 
-         b2 = ((mp_limb_t)(b*b - d))/4;
+         b2 = ((ulong)(b*b - d))/4;
 
          for (i = 0; i < n; i++)
              pows[i] = 0;
@@ -265,7 +265,7 @@ slong qfb_reduced_forms(qfb ** forms, slong d)
 
              if (a <= c && b <= a) /* we have a form */
              {
-                 mp_limb_t g;
+                 ulong g;
 
                  if (b)
                  {

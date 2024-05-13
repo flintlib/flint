@@ -118,7 +118,7 @@ int nmod_poly_print_pretty(const nmod_poly_t a, const char * x) { return nmod_po
 int nmod_poly_fread(FILE * f, nmod_poly_t poly)
 {
     slong i, length;
-    mp_limb_t n;
+    ulong n;
 
     if (flint_fscanf(f, "%wd %wu", &length, &n) != 2)
         return 0;

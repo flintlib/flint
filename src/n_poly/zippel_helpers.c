@@ -24,7 +24,7 @@ void fq_nmod_poly_product_roots(
 
 void n_fq_poly_product_roots_n_fq(
     n_poly_t master,
-    const mp_limb_t * monomials,
+    const ulong * monomials,
     slong mlength,
     const fq_nmod_ctx_t ctx,
     n_poly_stack_t St)
@@ -100,10 +100,10 @@ slong n_fq_polyun_product_roots(
     and multiply cur pointwise by inc
 */
 
-mp_limb_t _nmod_zip_eval_step(
-    mp_limb_t * cur,            /* in Fp */
-    const mp_limb_t * inc,      /* in Fp */
-    const mp_limb_t * coeffs,   /* in Fp */
+ulong _nmod_zip_eval_step(
+    ulong * cur,            /* in Fp */
+    const ulong * inc,      /* in Fp */
+    const ulong * coeffs,   /* in Fp */
     slong length,
     nmod_t ctx)
 {
@@ -122,16 +122,16 @@ mp_limb_t _nmod_zip_eval_step(
 
 
 void _n_fq_zip_eval_step(
-    mp_limb_t * res,            /* in Fq: size d */
-    mp_limb_t * cur,            /* in Fq: size d*length */
-    const mp_limb_t * inc,      /* in Fq: size d*length */
-    const mp_limb_t * coeffs,   /* in Fq: size d*length */
+    ulong * res,            /* in Fq: size d */
+    ulong * cur,            /* in Fq: size d*length */
+    const ulong * inc,      /* in Fq: size d*length */
+    const ulong * coeffs,   /* in Fq: size d*length */
     slong length,
     const fq_nmod_ctx_t ctx)
 {
     slong d = fq_nmod_ctx_degree(ctx);
     slong i;
-    mp_limb_t * tmp, * sum;
+    ulong * tmp, * sum;
     TMP_INIT;
 
     if (length < 1)
@@ -141,7 +141,7 @@ void _n_fq_zip_eval_step(
     }
 
     TMP_START;
-    tmp = (mp_limb_t *) TMP_ALLOC(8*d*sizeof(mp_limb_t));
+    tmp = (ulong *) TMP_ALLOC(8*d*sizeof(ulong));
     sum = tmp + 4*d;
 
     i = 0;
@@ -159,17 +159,17 @@ void _n_fq_zip_eval_step(
 
 
 void _n_fqp_zip_eval_step(
-    mp_limb_t * res,            /* in Fq: size d */
-    mp_limb_t * cur,            /* in Fp: size length */
-    const mp_limb_t * inc,      /* in Fp: size length */
-    const mp_limb_t * coeffs,   /* in Fq: size d*length */
+    ulong * res,            /* in Fq: size d */
+    ulong * cur,            /* in Fp: size length */
+    const ulong * inc,      /* in Fp: size length */
+    const ulong * coeffs,   /* in Fq: size d*length */
     slong length,
     slong d,
     nmod_t mod)
 {
     slong i, j;
-    mp_limb_t p0, p1;
-    mp_limb_t * tmp;
+    ulong p0, p1;
+    ulong * tmp;
     TMP_INIT;
 
     if (length < 1)
@@ -179,7 +179,7 @@ void _n_fqp_zip_eval_step(
     }
 
     TMP_START;
-    tmp = (mp_limb_t *) TMP_ALLOC(3*d*sizeof(mp_limb_t));
+    tmp = (ulong *) TMP_ALLOC(3*d*sizeof(ulong));
 
     i = 0;
 
@@ -217,17 +217,17 @@ void _n_fqp_zip_eval_step(
         1:  success
 */
 int _nmod_zip_vand_solve(
-    mp_limb_t * coeffs,             /* in Fp: size mlength */
-    const mp_limb_t * monomials,    /* in Fp: size mlength */
+    ulong * coeffs,             /* in Fp: size mlength */
+    const ulong * monomials,    /* in Fp: size mlength */
     slong mlength,
-    const mp_limb_t * evals,        /* in Fp: size elength */
+    const ulong * evals,        /* in Fp: size elength */
     slong elength,
-    const mp_limb_t * master,       /* in Fp: size mlength + 1 */
-    mp_limb_t * scratch,            /* in Fp: size mlength */
+    const ulong * master,       /* in Fp: size mlength + 1 */
+    ulong * scratch,            /* in Fp: size mlength */
     nmod_t ctx)
 {
     slong i, j;
-    mp_limb_t V, V0, V1, V2, T, S, r, p0, p1;
+    ulong V, V0, V1, V2, T, S, r, p0, p1;
 
     FLINT_ASSERT(elength >= mlength);
 
@@ -274,26 +274,26 @@ int _nmod_zip_vand_solve(
 }
 
 int _n_fq_zip_vand_solve(
-    mp_limb_t * coeffs,             /* in Fq: size d*mlength */
-    const mp_limb_t * monomials,    /* in Fq: size d*mlength */
+    ulong * coeffs,             /* in Fq: size d*mlength */
+    const ulong * monomials,    /* in Fq: size d*mlength */
     slong mlength,
-    const mp_limb_t * evals,        /* in Fq: size d*elength */
+    const ulong * evals,        /* in Fq: size d*elength */
     slong elength,
-    const mp_limb_t * master,       /* in Fq: size d*(mlength + 1) */
-    mp_limb_t * scratch,            /* in Fq: size d*mlength */
+    const ulong * master,       /* in Fq: size d*(mlength + 1) */
+    ulong * scratch,            /* in Fq: size d*mlength */
     const fq_nmod_ctx_t ctx)
 {
     slong d = fq_nmod_ctx_degree(ctx);
     nmod_t mod = fq_nmod_ctx_mod(ctx);
     int success;
     slong i, j;
-    mp_limb_t * tmp = FLINT_ARRAY_ALLOC(12*d, mp_limb_t);
-    mp_limb_t * V = tmp + 6*d;
-    mp_limb_t * V0 = V + d;
-    mp_limb_t * T = V0 + d;
-    mp_limb_t * S = T + d;
-    mp_limb_t * r = S + d;
-    mp_limb_t * p0 = r + d;
+    ulong * tmp = FLINT_ARRAY_ALLOC(12*d, ulong);
+    ulong * V = tmp + 6*d;
+    ulong * V0 = V + d;
+    ulong * T = V0 + d;
+    ulong * S = T + d;
+    ulong * r = S + d;
+    ulong * p0 = r + d;
 
     FLINT_ASSERT(elength >= mlength);
 
@@ -373,28 +373,28 @@ cleanup:
 
 
 int _n_fqp_zip_vand_solve(
-    mp_limb_t * coeffs,             /* in Fq: size d*mlength */
-    const mp_limb_t * monomials,    /* in Fp: size mlength */
+    ulong * coeffs,             /* in Fq: size d*mlength */
+    const ulong * monomials,    /* in Fp: size mlength */
     slong mlength,
-    const mp_limb_t * evals,        /* in Fq: size d*elength */
+    const ulong * evals,        /* in Fq: size d*elength */
     slong elength,
-    const mp_limb_t * master,       /* in Fp: size (mlength + 1) */
-    mp_limb_t * scratch,            /* in Fp: size mlength */
+    const ulong * master,       /* in Fp: size (mlength + 1) */
+    ulong * scratch,            /* in Fp: size mlength */
     const fq_nmod_ctx_t ctx)
 {
     slong d = fq_nmod_ctx_degree(ctx);
     nmod_t mod = fq_nmod_ctx_mod(ctx);
     int success;
     slong i, j, k;
-    mp_limb_t * tmp = FLINT_ARRAY_ALLOC(d*20, mp_limb_t);
-    mp_limb_t * V = tmp + 6*d;
-    mp_limb_t * V0 = V + d;
-    mp_limb_t * T = V0 + d;
-    mp_limb_t * S = T + d;
-    mp_limb_t * r = S + d;
-    mp_limb_t * p0 = r + d;
-    mp_limb_t * V_p = p0 + d;
-    mp_limb_t r_p, T_p, S_p;
+    ulong * tmp = FLINT_ARRAY_ALLOC(d*20, ulong);
+    ulong * V = tmp + 6*d;
+    ulong * V0 = V + d;
+    ulong * T = V0 + d;
+    ulong * S = T + d;
+    ulong * r = S + d;
+    ulong * p0 = r + d;
+    ulong * V_p = p0 + d;
+    ulong r_p, T_p, S_p;
 
     FLINT_ASSERT(elength >= mlength);
 
@@ -415,7 +415,7 @@ int _n_fqp_zip_vand_solve(
             S_p = nmod_add(nmod_mul(r_p, S_p, mod), T_p, mod);
             for (k = 0; k < d; k++)
             {
-                mp_limb_t hi, lo;
+                ulong hi, lo;
                 umul_ppmm(hi, lo, T_p, (evals + d*(j - 1))[k]);
                 add_sssaaaaaa(V_p[3*k+2], V_p[3*k+1], V_p[3*k+0],
                               V_p[3*k+2], V_p[3*k+1], V_p[3*k+0], 0, hi, lo);
@@ -434,7 +434,7 @@ int _n_fqp_zip_vand_solve(
 
         for (k = 0; k < d; k++)
         {
-            mp_limb_t vk;
+            ulong vk;
             NMOD_RED3(vk, V_p[3*k+2], V_p[3*k+1], V_p[3*k+0], mod);
             (coeffs + d*i)[k] = nmod_mul(vk, S_p, mod);
         }
@@ -453,7 +453,7 @@ int _n_fqp_zip_vand_solve(
             scratch[j] = nmod_mul(scratch[j], monomials[j], mod);
             for (k = 0; k < d; k++)
             {
-                mp_limb_t hi, lo;
+                ulong hi, lo;
                 umul_ppmm(hi, lo, scratch[j], (coeffs + d*j)[k]);
                 add_sssaaaaaa(V_p[3*k+2], V_p[3*k+1], V_p[3*k+0],
                               V_p[3*k+2], V_p[3*k+1], V_p[3*k+0], 0, hi, lo);
@@ -462,7 +462,7 @@ int _n_fqp_zip_vand_solve(
 
         for (k = 0; k < d; k++)
         {
-            mp_limb_t vk;
+            ulong vk;
             NMOD_RED3(vk, V_p[3*k+2], V_p[3*k+1], V_p[3*k+0], mod);
             if (vk != (evals + d*i)[k])
             {

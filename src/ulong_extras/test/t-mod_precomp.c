@@ -18,7 +18,7 @@ TEST_FUNCTION_START(n_mod_precomp, state)
 
     for (i = 0; i < 100000 * flint_test_multiplier(); i++)
     {
-        mp_limb_t bits, d, n, r1, r2;
+        ulong bits, d, n, r1, r2;
         double dpre;
 
         bits = n_randint(state, FLINT_D_BITS) + 1;

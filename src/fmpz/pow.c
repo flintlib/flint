@@ -99,7 +99,7 @@ fmpz_ui_pow_ui(fmpz_t x, ulong b, ulong e)
     }
     else if (e == 2)
     {
-        mp_limb_t t[2];
+        ulong t[2];
         umul_ppmm(t[1], t[0], b, b);
         fmpz_set_uiui(x, t[1], t[0]);
     }

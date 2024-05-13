@@ -33,7 +33,7 @@ void _fmpq_poly_integral(fmpz * rpoly, fmpz_t rden,
 {
     slong k;
     ulong v, c, d;
-    mp_ptr divisors;
+    nn_ptr divisors;
     fmpz_t t, u;
     TMP_INIT;
 

@@ -1649,9 +1649,9 @@ Other special functions
 Internals for computing elementary functions
 -------------------------------------------------------------------------------
 
-.. function:: void _arb_atan_taylor_naive(mp_ptr y, mp_limb_t * error, mp_srcptr x, mp_size_t xn, ulong N, int alternating)
+.. function:: void _arb_atan_taylor_naive(nn_ptr y, ulong * error, nn_srcptr x, slong xn, ulong N, int alternating)
 
-.. function:: void _arb_atan_taylor_rs(mp_ptr y, mp_limb_t * error, mp_srcptr x, mp_size_t xn, ulong N, int alternating)
+.. function:: void _arb_atan_taylor_rs(nn_ptr y, ulong * error, nn_srcptr x, slong xn, ulong N, int alternating)
 
     Computes an approximation of `y = \sum_{k=0}^{N-1} x^{2k+1} / (2k+1)`
     (if *alternating* is 0) or `y = \sum_{k=0}^{N-1} (-1)^k x^{2k+1} / (2k+1)`
@@ -1663,9 +1663,9 @@ Internals for computing elementary functions
     The input *x* and output *y* are fixed-point numbers with *xn* fractional
     limbs. A bound for the ulp error is written to *error*.
 
-.. function:: void _arb_exp_taylor_naive(mp_ptr y, mp_limb_t * error, mp_srcptr x, mp_size_t xn, ulong N)
+.. function:: void _arb_exp_taylor_naive(nn_ptr y, ulong * error, nn_srcptr x, slong xn, ulong N)
 
-.. function:: void _arb_exp_taylor_rs(mp_ptr y, mp_limb_t * error, mp_srcptr x, mp_size_t xn, ulong N)
+.. function:: void _arb_exp_taylor_rs(nn_ptr y, ulong * error, nn_srcptr x, slong xn, ulong N)
 
     Computes an approximation of `y = \sum_{k=0}^{N-1} x^k / k!`. Used internally
     for computing exponentials. The *naive* version uses the forward recurrence,
@@ -1678,9 +1678,9 @@ Internals for computing elementary functions
 
     A bound for the ulp error is written to *error*.
 
-.. function:: void _arb_sin_cos_taylor_naive(mp_ptr ysin, mp_ptr ycos, mp_limb_t * error, mp_srcptr x, mp_size_t xn, ulong N)
+.. function:: void _arb_sin_cos_taylor_naive(nn_ptr ysin, nn_ptr ycos, ulong * error, nn_srcptr x, slong xn, ulong N)
 
-.. function:: void _arb_sin_cos_taylor_rs(mp_ptr ysin, mp_ptr ycos, mp_limb_t * error, mp_srcptr x, mp_size_t xn, ulong N, int sinonly, int alternating)
+.. function:: void _arb_sin_cos_taylor_rs(nn_ptr ysin, nn_ptr ycos, ulong * error, nn_srcptr x, slong xn, ulong N, int sinonly, int alternating)
 
     Computes approximations of `y_s = \sum_{k=0}^{N-1} (-1)^k x^{2k+1} / (2k+1)!`
     and `y_c = \sum_{k=0}^{N-1} (-1)^k x^{2k} / (2k)!`.
@@ -1698,13 +1698,13 @@ Internals for computing elementary functions
     the hyperbolic sine is computed (this is currently only intended to
     be used together with *sinonly*).
 
-.. function:: int _arb_get_mpn_fixed_mod_log2(mp_ptr w, fmpz_t q, mp_limb_t * error, const arf_t x, mp_size_t wn)
+.. function:: int _arb_get_mpn_fixed_mod_log2(nn_ptr w, fmpz_t q, ulong * error, const arf_t x, slong wn)
 
     Attempts to write `w = x - q \log(2)` with `0 \le w < \log(2)`, where *w*
     is a fixed-point number with *wn* limbs and ulp error *error*.
     Returns success.
 
-.. function:: int _arb_get_mpn_fixed_mod_pi4(mp_ptr w, fmpz_t q, int * octant, mp_limb_t * error, const arf_t x, mp_size_t wn)
+.. function:: int _arb_get_mpn_fixed_mod_pi4(nn_ptr w, fmpz_t q, int * octant, ulong * error, const arf_t x, slong wn)
 
     Attempts to write `w = |x| - q \pi/4` with `0 \le w < \pi/4`, where *w*
     is a fixed-point number with *wn* limbs and ulp error *error*.

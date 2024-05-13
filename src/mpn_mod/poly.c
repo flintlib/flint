@@ -19,7 +19,7 @@ static const short div_series_cutoff_tab[] = {231, 306, 321, 370, 166, 182, 220,
 static const short divrem_cutoff_tab[] = {166, 139, 139, 139, 69, 75, 89, 139, 127, 111, 111, 127, 116, 111, 106, 101, 97, 93, 106, 106, 85, 81, 78, 101, 54, 75, 85, 81, 63, 60, 58, 75, 52, 58, 58, 66, 52, 58, 52, 56, 54, 54, 46, 54, 52, 50, 46, 50, 39, 46, 48, 46, 46, 38, 44, 44, 40, 40, 42, 44, };
 
 int
-_mpn_mod_poly_inv_series(mp_ptr Q, mp_srcptr B, slong lenB, slong len, gr_ctx_t ctx)
+_mpn_mod_poly_inv_series(nn_ptr Q, nn_srcptr B, slong lenB, slong len, gr_ctx_t ctx)
 {
     slong tab_i, cutoff, bits;
 
@@ -39,7 +39,7 @@ _mpn_mod_poly_inv_series(mp_ptr Q, mp_srcptr B, slong lenB, slong len, gr_ctx_t 
 }
 
 int
-_mpn_mod_poly_div_series(mp_ptr Q, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, slong len, gr_ctx_t ctx)
+_mpn_mod_poly_div_series(nn_ptr Q, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, slong len, gr_ctx_t ctx)
 {
     slong tab_i, cutoff, bits;
 
@@ -60,7 +60,7 @@ _mpn_mod_poly_div_series(mp_ptr Q, mp_srcptr A, slong lenA, mp_srcptr B, slong l
 }
 
 int
-_mpn_mod_poly_div(mp_ptr Q, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, gr_ctx_t ctx)
+_mpn_mod_poly_div(nn_ptr Q, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, gr_ctx_t ctx)
 {
     slong tab_i, cutoff, bits;
 
@@ -77,7 +77,7 @@ _mpn_mod_poly_div(mp_ptr Q, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, gr
 /* note: we don't define _mpn_mod_poly_divexact because the default algorithm is currently fine */
 
 /* todo: check unbalanced tuning */
-int _mpn_mod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, gr_ctx_t ctx)
+int _mpn_mod_poly_divrem(nn_ptr Q, nn_ptr R, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, gr_ctx_t ctx)
 {
     slong tab_i, cutoff, bits;
 
@@ -91,7 +91,7 @@ int _mpn_mod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA, mp_srcptr 
         return _gr_poly_divrem_newton(Q, R, A, lenA, B, lenB, ctx);
 }
 
-int _mpn_mod_poly_gcd(mp_ptr G, slong * lenG, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, gr_ctx_t ctx)
+int _mpn_mod_poly_gcd(nn_ptr G, slong * lenG, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, gr_ctx_t ctx)
 {
     slong cutoff = 240;
 
@@ -101,7 +101,7 @@ int _mpn_mod_poly_gcd(mp_ptr G, slong * lenG, mp_srcptr A, slong lenA, mp_srcptr
         return _gr_poly_gcd_hgcd(G, lenG, A, lenA, B, lenB, cutoff / 3, cutoff, ctx);
 }
 
-int _mpn_mod_poly_xgcd(slong * lenG, mp_ptr G, mp_ptr S, mp_ptr T, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, gr_ctx_t ctx)
+int _mpn_mod_poly_xgcd(slong * lenG, nn_ptr G, nn_ptr S, nn_ptr T, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, gr_ctx_t ctx)
 {
     slong cutoff = 240;
 

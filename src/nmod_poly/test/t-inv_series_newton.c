@@ -23,7 +23,7 @@ TEST_FUNCTION_START(nmod_poly_inv_series_newton, state)
         nmod_poly_t q, qinv, prod;
         slong m;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest_not_zero(state);
         while (!n_is_probabprime(n));
 
@@ -64,7 +64,7 @@ TEST_FUNCTION_START(nmod_poly_inv_series_newton, state)
         nmod_poly_t q, qinv;
         slong m;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest(state);
         while (!n_is_probabprime(n));
 

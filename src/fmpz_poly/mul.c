@@ -44,13 +44,13 @@ _fmpz_poly_mul_tiny2(fmpz * res, const fmpz * poly1,
                          slong len1, const fmpz * poly2, slong len2)
 {
     slong i, j, k, c, d;
-    mp_limb_t hi, lo;
-    mp_ptr tmp;
+    ulong hi, lo;
+    nn_ptr tmp;
     TMP_INIT;
 
     TMP_START;
 
-    tmp = TMP_ALLOC(2 * (len1 + len2 - 1) * sizeof(mp_limb_t));
+    tmp = TMP_ALLOC(2 * (len1 + len2 - 1) * sizeof(ulong));
 
     flint_mpn_zero(tmp, 2 * (len1 + len2 - 1));
 
@@ -81,7 +81,7 @@ _fmpz_poly_mul_tiny2(fmpz * res, const fmpz * poly1,
         lo = tmp[2 * i];
         hi = tmp[2 * i + 1];
 
-        if (((mp_limb_signed_t) hi) >= 0)
+        if (((slong) hi) >= 0)
         {
             fmpz_set_uiui(res + i, hi, lo);
         }
@@ -166,7 +166,7 @@ _fmpz_poly_mul(fmpz * res, const fmpz * poly1,
     }
     else
     {
-        mp_size_t limbs1, limbs2;
+        slong limbs1, limbs2;
 
         limbs1 = (bits1 + FLINT_BITS - 1) / FLINT_BITS;
         limbs2 = (bits2 + FLINT_BITS - 1) / FLINT_BITS;

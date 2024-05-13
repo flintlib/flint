@@ -79,10 +79,10 @@ int arf_complex_mul(arf_t e, arf_t f, const arf_t a, const arf_t b,
                                       const arf_t c, const arf_t d,
                                       slong prec, arf_rnd_t rnd)
 {
-    mp_srcptr ap, bp, cp, dp;
+    nn_srcptr ap, bp, cp, dp;
     int asgn, bsgn, csgn, dsgn, inex1, inex2;
-    mp_ptr tmp, acp, bdp, adp, bcp;
-    mp_size_t an, bn, cn, dn, acn, bdn, adn, bcn, alloc;
+    nn_ptr tmp, acp, bdp, adp, bcp;
+    slong an, bn, cn, dn, acn, bdn, adn, bcn, alloc;
     slong shift;
     slong aexp, bexp, cexp, dexp;
     fmpz texp, uexp;
@@ -238,10 +238,10 @@ int arf_complex_sqr(arf_t e, arf_t f,
     }
     else
     {
-        mp_srcptr ap, bp;
+        nn_srcptr ap, bp;
         int inex1, inex2;
-        mp_ptr tmp, aap, bbp;
-        mp_size_t an, bn, aan, bbn, alloc;
+        nn_ptr tmp, aap, bbp;
+        slong an, bn, aan, bbn, alloc;
         slong shift;
         slong aexp, bexp;
         fmpz texp, uexp;
@@ -291,7 +291,7 @@ int arf_complex_sqr(arf_t e, arf_t f,
 
             TMP_START;
 
-            tmp = TMP_ALLOC(alloc * sizeof(mp_limb_t));
+            tmp = TMP_ALLOC(alloc * sizeof(ulong));
             aap = tmp;
             bbp = tmp + aan;
 

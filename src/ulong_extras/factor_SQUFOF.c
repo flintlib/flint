@@ -9,21 +9,21 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include <gmp.h>
 #include "ulong_extras.h"
 
-mp_limb_t _ll_factor_SQUFOF(mp_limb_t n_hi, mp_limb_t n_lo, ulong max_iters)
+ulong _ll_factor_SQUFOF(ulong n_hi, ulong n_lo, ulong max_iters)
 {
-    mp_limb_t n[2];
-    mp_limb_t sqrt[2];
-    mp_limb_t rem[2];
+    ulong n[2];
+    ulong sqrt[2];
+    ulong rem[2];
     slong num, sqroot;
 
     ulong p, q;
 
-    mp_limb_t l, l2, iq, pnext;
-    mp_limb_t qarr[50];
-    mp_limb_t qupto, qlast, t, r = 0;
+    ulong l, l2, iq, pnext;
+    ulong qarr[50];
+    ulong qupto, qlast, t, r = 0;
     ulong i, j;
 
     n[0] = n_lo;
@@ -117,16 +117,16 @@ cont: ;
     return q;
 }
 
-mp_limb_t n_factor_SQUFOF(mp_limb_t n, ulong iters)
+ulong n_factor_SQUFOF(ulong n, ulong iters)
 {
-    mp_limb_t factor = _ll_factor_SQUFOF(UWORD(0), n, iters);
-    mp_limb_t multiplier;
-    mp_limb_t quot, rem;
+    ulong factor = _ll_factor_SQUFOF(UWORD(0), n, iters);
+    ulong multiplier;
+    ulong quot, rem;
     ulong i;
 
     for (i = 1; (i < FLINT_NUM_PRIMES_SMALL) && !factor; i++)
     {
-        mp_limb_t multn[2];
+        ulong multn[2];
         multiplier = flint_primes_small[i];
         umul_ppmm(multn[1], multn[0], multiplier, n);
         factor = _ll_factor_SQUFOF(multn[1], multn[0], iters);

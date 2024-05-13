@@ -81,7 +81,7 @@ partitions_term_bound(double n, double k)
 }
 
 /* Bound number of prime factors in k */
-static mp_limb_t primorial_tab[] = {
+static ulong primorial_tab[] = {
     1, 2, 6, 30, 210, 2310, 30030, 510510, 9699690, 223092870,
 #if FLINT64
     UWORD(6469693230), UWORD(200560490130), UWORD(7420738134810),
@@ -94,7 +94,7 @@ bound_primes(ulong k)
 {
     int i;
 
-    for (i = 0; i < sizeof(primorial_tab) / sizeof(mp_limb_t); i++)
+    for (i = 0; i < sizeof(primorial_tab) / sizeof(ulong); i++)
         if (k <= primorial_tab[i])
             return i;
 
@@ -125,7 +125,7 @@ static void
 eval_trig_prod(arb_t sum, trig_prod_t prod, slong prec)
 {
     int i;
-    mp_limb_t v;
+    ulong v;
     arb_t t;
 
     if (prod->prefactor == 0)

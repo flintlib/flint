@@ -11,13 +11,13 @@
 
 #include "mpn_mod.h"
 
-void _mpn_dot_rev_2x2_3(mp_ptr s, mp_srcptr a, mp_srcptr b, slong len)
+void _mpn_dot_rev_2x2_3(nn_ptr s, nn_srcptr a, nn_srcptr b, slong len)
 {
-    mp_limb_t A0, A1, B0, B1;
-    mp_limb_t p2, p1, p0;
-    mp_limb_t s2, s1, s0;
-    mp_limb_t u2, u1;
-    mp_limb_t v2;
+    ulong A0, A1, B0, B1;
+    ulong p2, p1, p0;
+    ulong s2, s1, s0;
+    ulong u2, u1;
+    ulong v2;
     slong k;
 
     s2 = s1 = s0 = 0;
@@ -50,13 +50,13 @@ void _mpn_dot_rev_2x2_3(mp_ptr s, mp_srcptr a, mp_srcptr b, slong len)
     s[2] = s2;
 }
 
-void _mpn_dot_rev_2x2_4(mp_ptr s, mp_srcptr a, mp_srcptr b, slong len)
+void _mpn_dot_rev_2x2_4(nn_ptr s, nn_srcptr a, nn_srcptr b, slong len)
 {
-    mp_limb_t A0, A1, B0, B1;
-    mp_limb_t p3, p2, p1, p0;
-    mp_limb_t s3, s2, s1, s0;
-    mp_limb_t u3, u2, u1;
-    mp_limb_t v3, v2;
+    ulong A0, A1, B0, B1;
+    ulong p3, p2, p1, p0;
+    ulong s3, s2, s1, s0;
+    ulong u3, u2, u1;
+    ulong v3, v2;
     slong k;
 
     s3 = s2 = s1 = s0 = 0;
@@ -90,13 +90,13 @@ void _mpn_dot_rev_2x2_4(mp_ptr s, mp_srcptr a, mp_srcptr b, slong len)
     s[3] = s3;
 }
 
-void _mpn_dot_rev_2x2_5(mp_ptr s, mp_srcptr a, mp_srcptr b, slong len)
+void _mpn_dot_rev_2x2_5(nn_ptr s, nn_srcptr a, nn_srcptr b, slong len)
 {
-    mp_limb_t A0, A1, B0, B1;
-    mp_limb_t p3, p2, p1, p0;
-    mp_limb_t s4, s3, s2, s1, s0;
-    mp_limb_t u2, u1;
-    mp_limb_t v3, v2;
+    ulong A0, A1, B0, B1;
+    ulong p3, p2, p1, p0;
+    ulong s4, s3, s2, s1, s0;
+    ulong u2, u1;
+    ulong v3, v2;
     slong k;
 
     s4 = s3 = s2 = s1 = s0 = 0;
@@ -131,13 +131,13 @@ void _mpn_dot_rev_2x2_5(mp_ptr s, mp_srcptr a, mp_srcptr b, slong len)
     s[4] = s4;
 }
 
-void _mpn_dot_rev_3x3_5(mp_ptr s, mp_srcptr a, mp_srcptr b, slong len)
+void _mpn_dot_rev_3x3_5(nn_ptr s, nn_srcptr a, nn_srcptr b, slong len)
 {
-    mp_limb_t A0, A1, A2, B0, B1, B2;
-    mp_limb_t p4, p3, p2, p1, p0;
-    mp_limb_t s4, s3, s2, s1, s0;
-    mp_limb_t u2, u1;
-    mp_limb_t v3, v2;
+    ulong A0, A1, A2, B0, B1, B2;
+    ulong p4, p3, p2, p1, p0;
+    ulong s4, s3, s2, s1, s0;
+    ulong u2, u1;
+    ulong v3, v2;
     slong k;
 
     s4 = s3 = s2 = s1 = s0 = 0;
@@ -184,10 +184,10 @@ void _mpn_dot_rev_3x3_5(mp_ptr s, mp_srcptr a, mp_srcptr b, slong len)
 }
 
 void
-_mpn_dot_rev_nxn_2n(mp_ptr res, mp_srcptr a, mp_srcptr b, slong len, mp_size_t nlimbs)
+_mpn_dot_rev_nxn_2n(nn_ptr res, nn_srcptr a, nn_srcptr b, slong len, slong nlimbs)
 {
-    mp_limb_t t[2 * MPN_MOD_MAX_LIMBS + 3];
-    mp_size_t slimbs = 2 * nlimbs;
+    ulong t[2 * MPN_MOD_MAX_LIMBS + 3];
+    slong slimbs = 2 * nlimbs;
     slong j;
 
     flint_mpn_mul_n(res, a, b + (len - 1) * nlimbs, nlimbs);
@@ -200,10 +200,10 @@ _mpn_dot_rev_nxn_2n(mp_ptr res, mp_srcptr a, mp_srcptr b, slong len, mp_size_t n
 }
 
 void
-_mpn_dot_rev_nxn_2nm1(mp_ptr res, mp_srcptr a, mp_srcptr b, slong len, mp_size_t nlimbs)
+_mpn_dot_rev_nxn_2nm1(nn_ptr res, nn_srcptr a, nn_srcptr b, slong len, slong nlimbs)
 {
-    mp_limb_t t[2 * MPN_MOD_MAX_LIMBS + 3];
-    mp_size_t slimbs = 2 * nlimbs - 1;
+    ulong t[2 * MPN_MOD_MAX_LIMBS + 3];
+    slong slimbs = 2 * nlimbs - 1;
     slong j;
 
     flint_mpn_mul_n(t, a, b + (len - 1) * nlimbs, nlimbs);
@@ -217,10 +217,10 @@ _mpn_dot_rev_nxn_2nm1(mp_ptr res, mp_srcptr a, mp_srcptr b, slong len, mp_size_t
 }
 
 void
-_mpn_dot_rev_nxn_2np1(mp_ptr res, mp_srcptr a, mp_srcptr b, slong len, mp_size_t nlimbs)
+_mpn_dot_rev_nxn_2np1(nn_ptr res, nn_srcptr a, nn_srcptr b, slong len, slong nlimbs)
 {
-    mp_limb_t t[2 * MPN_MOD_MAX_LIMBS + 3];
-    mp_size_t slimbs = 2 * nlimbs + 1;
+    ulong t[2 * MPN_MOD_MAX_LIMBS + 3];
+    slong slimbs = 2 * nlimbs + 1;
     slong j;
 
     flint_mpn_mul_n(res, a, b + (len - 1) * nlimbs, nlimbs);
@@ -238,7 +238,7 @@ _mpn_dot_rev_nxn_2np1(mp_ptr res, mp_srcptr a, mp_srcptr b, slong len, mp_size_t
    to the product of {poly1,len1*nlimbs} and {poly2,len2*nlimbs} viewed as
    polynomials with length-nlimbs coefficients. */
 static void
-_mpn_poly_mullow_classical(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong len, mp_size_t nlimbs, mp_size_t slimbs)
+_mpn_poly_mullow_classical(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, slong nlimbs, slong slimbs)
 {
     slong i, top1, top2;
 
@@ -313,11 +313,11 @@ _mpn_poly_mullow_classical(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr po
 }
 
 static void
-_mpn_poly_sqrlow_classical(mp_ptr res, mp_srcptr poly1, slong len1, slong len, mp_size_t nlimbs, mp_size_t slimbs)
+_mpn_poly_sqrlow_classical(nn_ptr res, nn_srcptr poly1, slong len1, slong len, slong nlimbs, slong slimbs)
 {
     slong i, start, stop;
-    mp_limb_t t[2 * MPN_MOD_MAX_LIMBS + 3];
-    mp_ptr rp;
+    ulong t[2 * MPN_MOD_MAX_LIMBS + 3];
+    nn_ptr rp;
 
     FLINT_ASSERT((slimbs == 2 * nlimbs) || (slimbs == 2 * nlimbs + 1) || (slimbs == 2 * nlimbs - 1));
 
@@ -410,7 +410,7 @@ _mpn_poly_sqrlow_classical(mp_ptr res, mp_srcptr poly1, slong len1, slong len, m
 }
 
 FLINT_FORCE_INLINE void
-_mpn_poly_add_n(mp_ptr res, mp_srcptr f, slong flen, mp_srcptr g, slong glen, mp_size_t nlimbs)
+_mpn_poly_add_n(nn_ptr res, nn_srcptr f, slong flen, nn_srcptr g, slong glen, slong nlimbs)
 {
     slong m = FLINT_MIN(flen, glen);
 
@@ -424,11 +424,11 @@ _mpn_poly_add_n(mp_ptr res, mp_srcptr f, slong flen, mp_srcptr g, slong glen, mp
 
 /* inputs have nlimbs, output has nlimbs+1 */
 FLINT_FORCE_INLINE void
-_mpn_poly_add_n_carry(mp_ptr res, mp_srcptr f, slong flen, mp_srcptr g, slong glen, mp_size_t nlimbs)
+_mpn_poly_add_n_carry(nn_ptr res, nn_srcptr f, slong flen, nn_srcptr g, slong glen, slong nlimbs)
 {
     slong m = FLINT_MIN(flen, glen);
     slong i;
-    mp_size_t nlimbs2 = nlimbs + 1;
+    slong nlimbs2 = nlimbs + 1;
 
     if (nlimbs == 2)
     {
@@ -485,11 +485,11 @@ _mpn_poly_add_n_carry(mp_ptr res, mp_srcptr f, slong flen, mp_srcptr g, slong gl
    of incrementing nlimbs.
 */
 static void
-_mpn_poly_mul_karatsuba(mp_ptr res, mp_srcptr f, slong flen, mp_srcptr g, slong glen, mp_size_t nlimbs, mp_size_t slimbs, slong cutoff, int norm)
+_mpn_poly_mul_karatsuba(nn_ptr res, nn_srcptr f, slong flen, nn_srcptr g, slong glen, slong nlimbs, slong slimbs, slong cutoff, int norm)
 {
     slong m, f1len, g1len, tlen, ulen, vlen, alloc;
-    mp_ptr t, u, v;
-    mp_srcptr f0, f1, g0, g1;
+    nn_ptr t, u, v;
+    nn_srcptr f0, f1, g0, g1;
     int squaring = (f == g) && (flen == glen);
     TMP_INIT;
 
@@ -530,7 +530,7 @@ _mpn_poly_mul_karatsuba(mp_ptr res, mp_srcptr f, slong flen, mp_srcptr g, slong 
     alloc = tlen * (nlimbs + 1) + ulen * (nlimbs + 1) + vlen * slimbs;
 
     TMP_START;
-    t = TMP_ALLOC(alloc * sizeof(mp_limb_t));
+    t = TMP_ALLOC(alloc * sizeof(ulong));
     u = t + tlen * (nlimbs + 1);
     v = u + ulen * (nlimbs + 1);
 
@@ -582,12 +582,12 @@ _mpn_poly_mul_karatsuba(mp_ptr res, mp_srcptr f, slong flen, mp_srcptr g, slong 
 }
 
 int
-_mpn_mod_poly_mullow_karatsuba(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong len, slong cutoff, gr_ctx_t ctx)
+_mpn_mod_poly_mullow_karatsuba(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, slong cutoff, gr_ctx_t ctx)
 {
-    mp_ptr t;
+    nn_ptr t;
     slong i, l;
-    mp_size_t nlimbs, slimbs;
-    mp_bitcnt_t sbits;
+    slong nlimbs, slimbs;
+    flint_bitcnt_t sbits;
     int norm;
     TMP_INIT;
     TMP_START;
@@ -637,7 +637,7 @@ _mpn_mod_poly_mullow_karatsuba(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcpt
     sbits = 2 * sbits + 2 * FLINT_BIT_COUNT(FLINT_MIN(len1, len2));
     slimbs = (sbits + FLINT_BITS - 1) / FLINT_BITS;
 
-    t = TMP_ALLOC(sizeof(mp_limb_t) * slimbs * (len1 + len2 - 1));
+    t = TMP_ALLOC(sizeof(ulong) * slimbs * (len1 + len2 - 1));
 
     _mpn_poly_mul_karatsuba(t, poly1, len1, poly2, len2, nlimbs, slimbs, cutoff, norm);
 

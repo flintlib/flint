@@ -18,7 +18,7 @@ TEST_FUNCTION_START(sub_ddmmss, state)
 
    for (i = 0; i < 100000 * flint_test_multiplier(); i++)
    {
-      mp_limb_t dh1, dl1, dh2, dl2, mh, ml, sh, sl;
+      ulong dh1, dl1, dh2, dl2, mh, ml, sh, sl;
 
       mh = n_randtest(state);
       ml = n_randtest(state);

@@ -12,7 +12,7 @@
 #include "mpn_mod.h"
 
 int
-mpn_mod_mat_det(mp_ptr res, const gr_mat_t A, gr_ctx_t ctx)
+mpn_mod_mat_det(nn_ptr res, const gr_mat_t A, gr_ctx_t ctx)
 {
     slong n = A->r;
 

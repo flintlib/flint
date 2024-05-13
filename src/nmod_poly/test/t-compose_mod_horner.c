@@ -20,7 +20,7 @@ TEST_FUNCTION_START(nmod_poly_compose_mod_horner, state)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c, d, e;
-        mp_limb_t m = n_randtest_prime(state, 0);
+        ulong m = n_randtest_prime(state, 0);
 
         nmod_poly_init(a, m);
         nmod_poly_init(b, m);
@@ -59,7 +59,7 @@ TEST_FUNCTION_START(nmod_poly_compose_mod_horner, state)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c, d;
-        mp_limb_t m = n_randtest_prime(state, 0);
+        ulong m = n_randtest_prime(state, 0);
 
         nmod_poly_init(a, m);
         nmod_poly_init(b, m);
@@ -94,7 +94,7 @@ TEST_FUNCTION_START(nmod_poly_compose_mod_horner, state)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c, d;
-        mp_limb_t m = n_randtest_prime(state, 0);
+        ulong m = n_randtest_prime(state, 0);
 
         nmod_poly_init(a, m);
         nmod_poly_init(b, m);
@@ -129,7 +129,7 @@ TEST_FUNCTION_START(nmod_poly_compose_mod_horner, state)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c, d;
-        mp_limb_t m = n_randtest_prime(state, 0);
+        ulong m = n_randtest_prime(state, 0);
 
         nmod_poly_init(a, m);
         nmod_poly_init(b, m);

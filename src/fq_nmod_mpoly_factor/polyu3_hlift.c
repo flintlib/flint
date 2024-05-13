@@ -142,7 +142,7 @@ void n_fq_poly_fill_power(
     n_fq_poly_t alphapow,
     slong e,
     const fq_nmod_ctx_t ctx,
-    mp_limb_t * tmp)
+    ulong * tmp)
 {
     if (e + 1 > alphapow->length)
     {
@@ -170,12 +170,12 @@ void fq_nmod_polyu3_interp_reduce_bpoly(
     slong d = fq_nmod_ctx_degree(ctx);
     slong i;
     slong cur0, cur1, e0, e1, e2;
-    mp_limb_t * tmp, * t;
+    ulong * tmp, * t;
     TMP_INIT;
 
     TMP_START;
 
-    tmp = (mp_limb_t *) TMP_ALLOC(d*(1 + N_FQ_MUL_ITCH)*sizeof(mp_limb_t));
+    tmp = (ulong *) TMP_ALLOC(d*(1 + N_FQ_MUL_ITCH)*sizeof(ulong));
     t = tmp + d*N_FQ_MUL_ITCH;
 
     n_bpoly_zero(Ap);
@@ -293,7 +293,7 @@ int fq_nmod_polyu3n_interp_crt_sm_bpoly(
     slong Fi;
     const n_poly_struct * Acoeffs = A->coeffs;
     slong Ai, ai;
-    mp_limb_t * v = FLINT_ARRAY_ALLOC(d, mp_limb_t);
+    ulong * v = FLINT_ARRAY_ALLOC(d, ulong);
 
     FLINT_ASSERT(n_fq_bpoly_is_canonical(A, ctx));
     FLINT_ASSERT(n_polyun_fq_is_canonical(F, ctx));
@@ -436,7 +436,7 @@ int n_fq_polyu3_hlift(
     slong * BBdegZ;
     slong AdegY, AdegX, AdegZ;
     slong bad_primes_left;
-    mp_limb_t * c = FLINT_ARRAY_ALLOC(d, mp_limb_t);
+    ulong * c = FLINT_ARRAY_ALLOC(d, ulong);
     nmod_eval_interp_t E;
 
     fq_nmod_init(alpha, ctx);

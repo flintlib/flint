@@ -16,7 +16,7 @@
 TEST_FUNCTION_START(n_is_probabprime_BPSW, state)
 {
     int i, result;
-    mp_limb_t d;
+    ulong d;
     mpz_t d_m;
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that primes pass the test */

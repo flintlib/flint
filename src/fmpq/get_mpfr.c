@@ -17,7 +17,7 @@ fmpq_get_mpfr(mpfr_t r, const fmpq_t x, mpfr_rnd_t rnd)
 {
     __mpq_struct mpq;
     fmpz p, q;
-    mp_limb_t pp, qq;
+    ulong pp, qq;
 
     p = *fmpq_numref(x);
     q = *fmpq_denref(x);

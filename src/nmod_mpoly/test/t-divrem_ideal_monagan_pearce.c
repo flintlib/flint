@@ -23,7 +23,7 @@ TEST_FUNCTION_START(nmod_mpoly_divrem_ideal_monagan_pearce, state)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k, r;
         ordering_t ord;
-        mp_limb_t modulus;
+        ulong modulus;
         slong maxbits;
         slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2;
         slong exp_bits, exp_bits1, exp_bits2;
@@ -100,7 +100,7 @@ TEST_FUNCTION_START(nmod_mpoly_divrem_ideal_monagan_pearce, state)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, r, k1, k2;
         nmod_mpoly_struct * g, * q;
-        mp_limb_t modulus;
+        ulong modulus;
         slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2, num;
         nmod_mpoly_struct * qarr[5], * darr[5];
 
@@ -197,7 +197,7 @@ TEST_FUNCTION_START(nmod_mpoly_divrem_ideal_monagan_pearce, state)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, r, k1, k2;
         nmod_mpoly_struct * g, * q;
-        mp_limb_t modulus;
+        ulong modulus;
         slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2, num;
         nmod_mpoly_struct * qarr[5], * darr[5];
 

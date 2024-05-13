@@ -12,19 +12,19 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-int is_prime2(mp_limb_t n, int proved)
+int is_prime2(ulong n, int proved)
 {
    if (proved) return n_is_prime(n);
    else return n_is_probabprime(n);
 }
 
-mp_limb_t n_factor_partial(n_factor_t * factors, mp_limb_t n, mp_limb_t limit, int proved)
+ulong n_factor_partial(n_factor_t * factors, ulong n, ulong limit, int proved)
 {
    ulong factor_arr[FLINT_MAX_FACTORS_IN_LIMB];
    ulong exp_arr[FLINT_MAX_FACTORS_IN_LIMB];
    ulong factors_left;
    ulong exp;
-   mp_limb_t cofactor, factor, cutoff, prod;
+   ulong cofactor, factor, cutoff, prod;
 
    cofactor = n_factor_trial_partial(factors, n, &prod, FLINT_FACTOR_TRIAL_PRIMES, limit);
    if (prod > limit) return cofactor;

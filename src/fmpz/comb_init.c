@@ -42,7 +42,7 @@ void fmpz_comb_temp_init(fmpz_comb_temp_t CT, const fmpz_comb_t C)
 }
 
 
-void fmpz_comb_init(fmpz_comb_t C, mp_srcptr m, slong len)
+void fmpz_comb_init(fmpz_comb_t C, nn_srcptr m, slong len)
 {
     int success;
     slong l, i, j, k, s;
@@ -240,7 +240,7 @@ void fmpz_comb_init(fmpz_comb_t C, mp_srcptr m, slong len)
         }
     }
 
-    C->packed_multipliers = FLINT_ARRAY_ALLOC(l, mp_limb_t);
+    C->packed_multipliers = FLINT_ARRAY_ALLOC(l, ulong);
 
     l = 0;
     for (k = 0, i = 0; k < C->crt_klen; k++)

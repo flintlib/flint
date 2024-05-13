@@ -13,45 +13,45 @@
 #include "mpn_mod.h"
 
 int
-_mpn_mod_vec_clear(mp_ptr FLINT_UNUSED(res), slong FLINT_UNUSED(len), gr_ctx_t FLINT_UNUSED(ctx))
+_mpn_mod_vec_clear(nn_ptr FLINT_UNUSED(res), slong FLINT_UNUSED(len), gr_ctx_t FLINT_UNUSED(ctx))
 {
     return GR_SUCCESS;
 }
 
 int
-_mpn_mod_vec_zero(mp_ptr res, slong len, gr_ctx_t ctx)
+_mpn_mod_vec_zero(nn_ptr res, slong len, gr_ctx_t ctx)
 {
     flint_mpn_zero(res, len * MPN_MOD_CTX_NLIMBS(ctx));
     return GR_SUCCESS;
 }
 
 int
-_mpn_mod_vec_set(mp_ptr res, mp_srcptr x, slong len, gr_ctx_t ctx)
+_mpn_mod_vec_set(nn_ptr res, nn_srcptr x, slong len, gr_ctx_t ctx)
 {
     flint_mpn_copyi(res, x, len * MPN_MOD_CTX_NLIMBS(ctx));
     return GR_SUCCESS;
 }
 
 void
-_mpn_mod_vec_swap(mp_ptr vec1, mp_ptr vec2, slong len, gr_ctx_t ctx)
+_mpn_mod_vec_swap(nn_ptr vec1, nn_ptr vec2, slong len, gr_ctx_t ctx)
 {
     slong i;
-    mp_size_t n = MPN_MOD_CTX_NLIMBS(ctx);
+    slong n = MPN_MOD_CTX_NLIMBS(ctx);
     for (i = 0; i < len * n; i++)
-        FLINT_SWAP(mp_limb_t, vec1[i], vec2[i]);
+        FLINT_SWAP(ulong, vec1[i], vec2[i]);
 }
 
 int
-_mpn_mod_vec_neg(mp_ptr res, mp_srcptr x, slong len, gr_ctx_t ctx)
+_mpn_mod_vec_neg(nn_ptr res, nn_srcptr x, slong len, gr_ctx_t ctx)
 {
-    mp_size_t n = MPN_MOD_CTX_NLIMBS(ctx);
-    mp_srcptr d = MPN_MOD_CTX_MODULUS(ctx);
+    slong n = MPN_MOD_CTX_NLIMBS(ctx);
+    nn_srcptr d = MPN_MOD_CTX_MODULUS(ctx);
     slong i;
 
     if (n == 2)
     {
         /* Only read to registers once */
-        mp_limb_t dd[2];
+        ulong dd[2];
         dd[0] = d[0];
         dd[1] = d[1];
 
@@ -66,16 +66,16 @@ _mpn_mod_vec_neg(mp_ptr res, mp_srcptr x, slong len, gr_ctx_t ctx)
 }
 
 int
-_mpn_mod_vec_add(mp_ptr res, mp_srcptr x, mp_srcptr y, slong len, gr_ctx_t ctx)
+_mpn_mod_vec_add(nn_ptr res, nn_srcptr x, nn_srcptr y, slong len, gr_ctx_t ctx)
 {
-    mp_size_t n = MPN_MOD_CTX_NLIMBS(ctx);
-    mp_srcptr d = MPN_MOD_CTX_MODULUS(ctx);
+    slong n = MPN_MOD_CTX_NLIMBS(ctx);
+    nn_srcptr d = MPN_MOD_CTX_MODULUS(ctx);
     slong i;
 
     if (n == 2)
     {
         /* Only read to registers once */
-        mp_limb_t dd[2];
+        ulong dd[2];
         dd[0] = d[0];
         dd[1] = d[1];
 
@@ -94,16 +94,16 @@ _mpn_mod_vec_add(mp_ptr res, mp_srcptr x, mp_srcptr y, slong len, gr_ctx_t ctx)
 }
 
 int
-_mpn_mod_vec_sub(mp_ptr res, mp_srcptr x, mp_srcptr y, slong len, gr_ctx_t ctx)
+_mpn_mod_vec_sub(nn_ptr res, nn_srcptr x, nn_srcptr y, slong len, gr_ctx_t ctx)
 {
-    mp_size_t n = MPN_MOD_CTX_NLIMBS(ctx);
-    mp_srcptr d = MPN_MOD_CTX_MODULUS(ctx);
+    slong n = MPN_MOD_CTX_NLIMBS(ctx);
+    nn_srcptr d = MPN_MOD_CTX_MODULUS(ctx);
     slong i;
 
     if (n == 2)
     {
         /* Only read to registers once */
-        mp_limb_t dd[2];
+        ulong dd[2];
         dd[0] = d[0];
         dd[1] = d[1];
 
@@ -118,16 +118,16 @@ _mpn_mod_vec_sub(mp_ptr res, mp_srcptr x, mp_srcptr y, slong len, gr_ctx_t ctx)
 }
 
 int
-_mpn_mod_vec_mul(mp_ptr res, mp_srcptr x, mp_srcptr y, slong len, gr_ctx_t ctx)
+_mpn_mod_vec_mul(nn_ptr res, nn_srcptr x, nn_srcptr y, slong len, gr_ctx_t ctx)
 {
-    mp_size_t n = MPN_MOD_CTX_NLIMBS(ctx);
+    slong n = MPN_MOD_CTX_NLIMBS(ctx);
     slong i;
 
     if (n == 2)
     {
-        mp_bitcnt_t norm = MPN_MOD_CTX_NORM(ctx);
-        mp_srcptr dnormed = MPN_MOD_CTX_MODULUS_NORMED(ctx);
-        mp_srcptr dinv = MPN_MOD_CTX_MODULUS_PREINV(ctx);
+        flint_bitcnt_t norm = MPN_MOD_CTX_NORM(ctx);
+        nn_srcptr dnormed = MPN_MOD_CTX_MODULUS_NORMED(ctx);
+        nn_srcptr dinv = MPN_MOD_CTX_MODULUS_PREINV(ctx);
 
         for (i = 0; i < len; i++)
             flint_mpn_mulmod_preinvn_2(res + i * n, x + i * n, y + i * n, dnormed, dinv, norm);
@@ -142,16 +142,16 @@ _mpn_mod_vec_mul(mp_ptr res, mp_srcptr x, mp_srcptr y, slong len, gr_ctx_t ctx)
 /* todo: worth it to check for special cases (0, 1)? */
 /* todo: shoup multiplication */
 int
-_mpn_mod_vec_mul_scalar(mp_ptr res, mp_srcptr x, slong len, mp_srcptr y, gr_ctx_t ctx)
+_mpn_mod_vec_mul_scalar(nn_ptr res, nn_srcptr x, slong len, nn_srcptr y, gr_ctx_t ctx)
 {
-    mp_size_t n = MPN_MOD_CTX_NLIMBS(ctx);
+    slong n = MPN_MOD_CTX_NLIMBS(ctx);
     slong i;
 
     if (n == 2)
     {
-        mp_bitcnt_t norm = MPN_MOD_CTX_NORM(ctx);
-        mp_srcptr dnormed = MPN_MOD_CTX_MODULUS_NORMED(ctx);
-        mp_srcptr dinv = MPN_MOD_CTX_MODULUS_PREINV(ctx);
+        flint_bitcnt_t norm = MPN_MOD_CTX_NORM(ctx);
+        nn_srcptr dnormed = MPN_MOD_CTX_MODULUS_NORMED(ctx);
+        nn_srcptr dinv = MPN_MOD_CTX_MODULUS_PREINV(ctx);
 
         for (i = 0; i < len; i++)
             flint_mpn_mulmod_preinvn_2(res + i * n, x + i * n, y, dnormed, dinv, norm);
@@ -164,7 +164,7 @@ _mpn_mod_vec_mul_scalar(mp_ptr res, mp_srcptr x, slong len, mp_srcptr y, gr_ctx_
 }
 
 int
-_mpn_mod_scalar_mul_vec(mp_ptr res, mp_srcptr y, mp_srcptr x, slong len, gr_ctx_t ctx)
+_mpn_mod_scalar_mul_vec(nn_ptr res, nn_srcptr y, nn_srcptr x, slong len, gr_ctx_t ctx)
 {
     return _mpn_mod_vec_mul_scalar(res, x, len, y, ctx);
 }
@@ -172,18 +172,18 @@ _mpn_mod_scalar_mul_vec(mp_ptr res, mp_srcptr y, mp_srcptr x, slong len, gr_ctx_
 /* todo: worth it to check for special cases (0, 1)? */
 /* todo: shoup multiplication */
 int
-_mpn_mod_vec_addmul_scalar(mp_ptr res, mp_srcptr x, slong len, mp_srcptr y, gr_ctx_t ctx)
+_mpn_mod_vec_addmul_scalar(nn_ptr res, nn_srcptr x, slong len, nn_srcptr y, gr_ctx_t ctx)
 {
-    mp_size_t n = MPN_MOD_CTX_NLIMBS(ctx);
+    slong n = MPN_MOD_CTX_NLIMBS(ctx);
     slong i;
 
     if (n == 2)
     {
-        mp_limb_t t[2];
-        mp_bitcnt_t norm = MPN_MOD_CTX_NORM(ctx);
-        mp_srcptr dnormed = MPN_MOD_CTX_MODULUS_NORMED(ctx);
-        mp_srcptr dinv = MPN_MOD_CTX_MODULUS_PREINV(ctx);
-        mp_srcptr d = MPN_MOD_CTX_MODULUS(ctx);
+        ulong t[2];
+        flint_bitcnt_t norm = MPN_MOD_CTX_NORM(ctx);
+        nn_srcptr dnormed = MPN_MOD_CTX_MODULUS_NORMED(ctx);
+        nn_srcptr dinv = MPN_MOD_CTX_MODULUS_PREINV(ctx);
+        nn_srcptr d = MPN_MOD_CTX_MODULUS(ctx);
 
         for (i = 0; i < len; i++)
         {
@@ -193,7 +193,7 @@ _mpn_mod_vec_addmul_scalar(mp_ptr res, mp_srcptr x, slong len, mp_srcptr y, gr_c
     }
     else
     {
-        mp_limb_t t[MPN_MOD_MAX_LIMBS];
+        ulong t[MPN_MOD_MAX_LIMBS];
 
         for (i = 0; i < len; i++)
         {
@@ -208,12 +208,12 @@ _mpn_mod_vec_addmul_scalar(mp_ptr res, mp_srcptr x, slong len, mp_srcptr y, gr_c
 /* todo: optimize for length 1, 2 */
 /* todo: optimize for when 2n rather than 2n+1 limbs suffice */
 int
-_mpn_mod_vec_dot(mp_ptr res, mp_srcptr initial, int subtract, mp_srcptr vec1, mp_srcptr vec2, slong len, gr_ctx_t ctx)
+_mpn_mod_vec_dot(nn_ptr res, nn_srcptr initial, int subtract, nn_srcptr vec1, nn_srcptr vec2, slong len, gr_ctx_t ctx)
 {
-    mp_limb_t s[2 * MPN_MOD_MAX_LIMBS + 1];
-    mp_limb_t t[2 * MPN_MOD_MAX_LIMBS];
-    mp_size_t n = MPN_MOD_CTX_NLIMBS(ctx);
-    mp_size_t sn;
+    ulong s[2 * MPN_MOD_MAX_LIMBS + 1];
+    ulong t[2 * MPN_MOD_MAX_LIMBS];
+    slong n = MPN_MOD_CTX_NLIMBS(ctx);
+    slong sn;
     slong i;
 
     if (len <= 0)
@@ -227,11 +227,11 @@ _mpn_mod_vec_dot(mp_ptr res, mp_srcptr initial, int subtract, mp_srcptr vec1, mp
 
     if (n == 2)
     {
-        mp_limb_t A0, A1, B0, B1;
-        mp_limb_t p3, p2, p1, p0;
-        mp_limb_t s4, s3, s2, s1, s0;
-        mp_limb_t u2, u1;
-        mp_limb_t v3, v2;
+        ulong A0, A1, B0, B1;
+        ulong p3, p2, p1, p0;
+        ulong s4, s3, s2, s1, s0;
+        ulong u2, u1;
+        ulong v3, v2;
 
         s4 = s3 = s2 = s1 = s0 = 0;
         u2 = u1 = 0;
@@ -306,12 +306,12 @@ _mpn_mod_vec_dot(mp_ptr res, mp_srcptr initial, int subtract, mp_srcptr vec1, mp
 /* todo: optimize for length 1, 2 */
 /* todo: optimize for when 2n rather than 2n+1 limbs suffice */
 int
-_mpn_mod_vec_dot_rev(mp_ptr res, mp_srcptr initial, int subtract, mp_srcptr vec1, mp_srcptr vec2, slong len, gr_ctx_t ctx)
+_mpn_mod_vec_dot_rev(nn_ptr res, nn_srcptr initial, int subtract, nn_srcptr vec1, nn_srcptr vec2, slong len, gr_ctx_t ctx)
 {
-    mp_limb_t s[2 * MPN_MOD_MAX_LIMBS + 1];
-    mp_limb_t t[2 * MPN_MOD_MAX_LIMBS];
-    mp_size_t n = MPN_MOD_CTX_NLIMBS(ctx);
-    mp_size_t sn;
+    ulong s[2 * MPN_MOD_MAX_LIMBS + 1];
+    ulong t[2 * MPN_MOD_MAX_LIMBS];
+    slong n = MPN_MOD_CTX_NLIMBS(ctx);
+    slong sn;
     slong i;
 
     if (len <= 0)
@@ -325,11 +325,11 @@ _mpn_mod_vec_dot_rev(mp_ptr res, mp_srcptr initial, int subtract, mp_srcptr vec1
 
     if (n == 2)
     {
-        mp_limb_t A0, A1, B0, B1;
-        mp_limb_t p3, p2, p1, p0;
-        mp_limb_t s4, s3, s2, s1, s0;
-        mp_limb_t u2, u1;
-        mp_limb_t v3, v2;
+        ulong A0, A1, B0, B1;
+        ulong p3, p2, p1, p0;
+        ulong s4, s3, s2, s1, s0;
+        ulong u2, u1;
+        ulong v3, v2;
 
         s4 = s3 = s2 = s1 = s0 = 0;
         u2 = u1 = 0;

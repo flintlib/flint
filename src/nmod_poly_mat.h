@@ -44,7 +44,7 @@ nmod_poly_mat_ncols(const nmod_poly_mat_t mat)
 
 /* Memory management *********************************************************/
 
-void nmod_poly_mat_init(nmod_poly_mat_t mat, slong rows, slong cols, mp_limb_t n);
+void nmod_poly_mat_init(nmod_poly_mat_t mat, slong rows, slong cols, ulong n);
 
 void nmod_poly_mat_init_set(nmod_poly_mat_t mat, const nmod_poly_mat_t src);
 
@@ -92,7 +92,7 @@ void nmod_poly_mat_shift_right(nmod_poly_mat_t res,
 
 /* Basic properties **********************************************************/
 
-NMOD_POLY_MAT_INLINE mp_limb_t
+NMOD_POLY_MAT_INLINE ulong
 nmod_poly_mat_modulus(const nmod_poly_mat_t mat)
 {
     return mat->modulus;
@@ -179,7 +179,7 @@ void nmod_poly_mat_scalar_mul_nmod_poly(nmod_poly_mat_t B,
                     const nmod_poly_mat_t A, const nmod_poly_t c);
 
 void nmod_poly_mat_scalar_mul_nmod(nmod_poly_mat_t B,
-                    const nmod_poly_mat_t A, mp_limb_t c);
+                    const nmod_poly_mat_t A, ulong c);
 
 /* Matrix arithmetic *********************************************************/
 
@@ -215,7 +215,7 @@ void nmod_poly_mat_pow(nmod_poly_mat_t B, const nmod_poly_mat_t A, ulong exp);
 
 /* Evaluation ****************************************************************/
 
-void nmod_poly_mat_evaluate_nmod(nmod_mat_t B, const nmod_poly_mat_t A, mp_limb_t x);
+void nmod_poly_mat_evaluate_nmod(nmod_mat_t B, const nmod_poly_mat_t A, ulong x);
 
 /* Row reduction *************************************************************/
 

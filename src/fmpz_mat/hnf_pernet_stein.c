@@ -262,7 +262,7 @@ double_det(fmpz_t d1, fmpz_t d2, const fmpz_mat_t B, const fmpz_mat_t c,
 {
     slong i, j, n;
     slong *P;
-    mp_limb_t p, u1mod, u2mod, v1mod, v2mod;
+    ulong p, u1mod, u2mod, v1mod, v2mod;
     fmpz_t bound, prod, s1, s2, t, u1, u2, v1, v2;
     fmpz_mat_t dt, Bt;
     fmpq_t tmpq;

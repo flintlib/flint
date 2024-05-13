@@ -22,13 +22,13 @@ TEST_FUNCTION_START(nmod_vec_scalar_addmul_nmod, state)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         slong len = n_randint(state, 100) + 1;
-        mp_limb_t n = n_randtest_not_zero(state);
-        mp_limb_t c = n_randint(state, n);
+        ulong n = n_randtest_not_zero(state);
+        ulong c = n_randint(state, n);
         nmod_t mod;
 
-        mp_ptr vec = _nmod_vec_init(len);
-        mp_ptr vec2 = _nmod_vec_init(len);
-        mp_ptr vec3 = _nmod_vec_init(len);
+        nn_ptr vec = _nmod_vec_init(len);
+        nn_ptr vec2 = _nmod_vec_init(len);
+        nn_ptr vec3 = _nmod_vec_init(len);
 
         nmod_init(&mod, n);
 

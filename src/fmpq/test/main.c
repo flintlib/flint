@@ -9,9 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
-#include <stdlib.h>
-
 /* For t-get_mpfr.c */
 #include <stdio.h>
 #include <mpfr.h>

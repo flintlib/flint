@@ -23,19 +23,19 @@
 #include "crt_helpers.h"
 #include "fft_small.h"
 
-static mp_limb_t
-nmod_set_mpn_2(mp_srcptr ad, nmod_t mod)
+static ulong
+nmod_set_mpn_2(nn_srcptr ad, nmod_t mod)
 {
-    mp_limb_t r = 0;
+    ulong r = 0;
     NMOD_RED2(r, r, ad[1], mod);
     NMOD_RED2(r, r, ad[0], mod);
     return r;
 }
 
-static mp_limb_t
-nmod_set_mpn_3(mp_srcptr ad, nmod_t mod)
+static ulong
+nmod_set_mpn_3(nn_srcptr ad, nmod_t mod)
 {
-    mp_limb_t r = 0;
+    ulong r = 0;
     NMOD_RED2(r, r, ad[2], mod);
     NMOD_RED2(r, r, ad[1], mod);
     NMOD_RED2(r, r, ad[0], mod);
@@ -43,16 +43,16 @@ nmod_set_mpn_3(mp_srcptr ad, nmod_t mod)
 }
 
 /* todo: precomputed inverse */
-static mp_limb_t
-nmod_set_mpn(mp_srcptr ad, mp_size_t an, nmod_t mod)
+static ulong
+nmod_set_mpn(nn_srcptr ad, slong an, nmod_t mod)
 {
     return mpn_mod_1(ad, an, mod.n);
 }
 
 static void _mod(
     double* abuf, ulong atrunc,
-    mp_srcptr a, ulong an,
-    mp_size_t nlimbs,
+    nn_srcptr a, ulong an,
+    slong nlimbs,
     const sd_fft_ctx_struct* fft)
 {
     double* aI;
@@ -123,9 +123,9 @@ static void _mod(
 
 #define DEFINE_IT(NP, N, M) \
 static void CAT(_crt, NP)( \
-    mp_ptr z, ulong zl, ulong zi_start, ulong zi_stop, \
+    nn_ptr z, ulong zl, ulong zi_start, ulong zi_stop, \
     sd_fft_ctx_struct* Rffts, double* d, ulong dstride, \
-    crt_data_struct* Rcrts, mp_size_t nlimbs, gr_ctx_t ctx) \
+    crt_data_struct* Rcrts, slong nlimbs, gr_ctx_t ctx) \
 { \
     ulong np = NP; \
     ulong n = N; \
@@ -188,9 +188,9 @@ DEFINE_IT(8, 7, 6)  /* 400 bits */
 
 /* 50 bits (unused) */
 static void _crt_1(
-    mp_ptr FLINT_UNUSED(z), ulong FLINT_UNUSED(zl), ulong FLINT_UNUSED(zi_start), ulong FLINT_UNUSED(zi_stop),
+    nn_ptr FLINT_UNUSED(z), ulong FLINT_UNUSED(zl), ulong FLINT_UNUSED(zi_start), ulong FLINT_UNUSED(zi_stop),
     sd_fft_ctx_struct* FLINT_UNUSED(Rffts), double* FLINT_UNUSED(d), ulong FLINT_UNUSED(dstride),
-    crt_data_struct* FLINT_UNUSED(Rcrts), mp_size_t FLINT_UNUSED(nlimbs), gr_ctx_t FLINT_UNUSED(ctx))
+    crt_data_struct* FLINT_UNUSED(Rcrts), slong FLINT_UNUSED(nlimbs), gr_ctx_t FLINT_UNUSED(ctx))
 {
     flint_abort();
 }
@@ -207,11 +207,11 @@ typedef struct {
     ulong atrunc;
     ulong btrunc;
     ulong ztrunc;
-    mp_srcptr a;
+    nn_srcptr a;
     ulong an;
-    mp_srcptr b;
+    nn_srcptr b;
     ulong bn;
-    mp_size_t nlimbs;
+    slong nlimbs;
     gr_ctx_struct * mpn_mod_ctx;
     sd_fft_ctx_struct* ffts;
     crt_data_struct* crts;
@@ -292,7 +292,7 @@ static void s1worker_func(void* varg)
 }
 
 typedef struct {
-    mp_ptr z;
+    nn_ptr z;
     ulong zl;
     ulong start_zi;
     ulong stop_zi;
@@ -302,12 +302,12 @@ typedef struct {
     sd_fft_ctx_struct* ffts;
     crt_data_struct* crts;
     nmod_t mod;
-    mp_size_t nlimbs;
+    slong nlimbs;
     gr_ctx_struct * mpn_mod_ctx;
     void (*f)(
-        mp_ptr z, ulong zl, ulong zi_start, ulong zi_stop,
+        nn_ptr z, ulong zl, ulong zi_start, ulong zi_stop,
         sd_fft_ctx_struct* Rffts, double* d, ulong dstride,
-        crt_data_struct* Rcrts, mp_size_t nlimbs, gr_ctx_t ctx);
+        crt_data_struct* Rcrts, slong nlimbs, gr_ctx_t ctx);
 } s2worker_struct;
 
 static void s2worker_func(void* varg)
@@ -318,9 +318,9 @@ static void s2worker_func(void* varg)
          X->stride, X->crts + X->offset, X->nlimbs, X->mpn_mod_ctx);
 }
 
-int _mpn_mod_poly_mulmid_fft_small_internal(mp_ptr z, ulong zl, ulong zh,
-    mp_srcptr a, ulong an,
-    mp_srcptr b, ulong bn,
+int _mpn_mod_poly_mulmid_fft_small_internal(nn_ptr z, ulong zl, ulong zh,
+    nn_srcptr a, ulong an,
+    nn_srcptr b, ulong bn,
     mpn_ctx_t R, gr_ctx_t ctx)
 {
     ulong modbits;
@@ -332,8 +332,8 @@ int _mpn_mod_poly_mulmid_fft_small_internal(mp_ptr z, ulong zl, ulong zh,
     int squaring;
     slong bits1, bits2;
     int sign = 0;
-    mp_size_t nlimbs = MPN_MOD_CTX_NLIMBS(ctx);
-    mp_bitcnt_t nbits = MPN_MOD_CTX_MODULUS_BITS(ctx);
+    slong nlimbs = MPN_MOD_CTX_NLIMBS(ctx);
+    flint_bitcnt_t nbits = MPN_MOD_CTX_MODULUS_BITS(ctx);
 
     FLINT_ASSERT(an > 0);
     FLINT_ASSERT(bn > 0);
@@ -500,7 +500,7 @@ int _mpn_mod_poly_mulmid_fft_small_internal(mp_ptr z, ulong zl, ulong zh,
 }
 
 int
-_mpn_mod_poly_mullow_fft_small(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
+_mpn_mod_poly_mullow_fft_small(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
 {
     if (len1 >= len2)
         return _mpn_mod_poly_mulmid_fft_small_internal(res, 0, len, poly1, len1, poly2, len2, get_default_mpn_ctx(), ctx);
@@ -511,7 +511,7 @@ _mpn_mod_poly_mullow_fft_small(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcpt
 #else /* FLINT_HAVE_FFT_SMALL */
 
 int
-_mpn_mod_poly_mullow_fft_small(mp_ptr res,  mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
+_mpn_mod_poly_mullow_fft_small(nn_ptr res,  nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
 {
     return GR_UNABLE;
 }

@@ -20,6 +20,9 @@
 
 #cmakedefine01 FLINT_KNOW_STRONG_ORDER
 
+#cmakedefine FLINT_BITS @FLINT_BITS@
+#cmakedefine01 FLINT_LONG_LONG
+
 /* NOTE: Here we assume this is how it works. */
 #if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
 # define HAVE__ALIGNED_MALLOC 1

@@ -274,7 +274,7 @@ int fmpz_poly_fread_pretty(FILE *file, fmpz_poly_t poly, char **x)
 
     fmpz_poly_zero(poly);
     if (poly->alloc)
-        flint_mpn_zero((mp_ptr) poly->coeffs, poly->alloc);
+        flint_mpn_zero((nn_ptr) poly->coeffs, poly->alloc);
 
     i = 0;
     N = 80;

@@ -14,7 +14,7 @@
 #include "gr_poly.h"
 
 void
-_nmod_poly_invsqrt_series(mp_ptr g, mp_srcptr h, slong hlen, slong n, nmod_t mod)
+_nmod_poly_invsqrt_series(nn_ptr g, nn_srcptr h, slong hlen, slong n, nmod_t mod)
 {
     gr_ctx_t ctx;
     _gr_ctx_init_nmod(ctx, &mod);

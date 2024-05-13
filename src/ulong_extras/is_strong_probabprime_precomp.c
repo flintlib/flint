@@ -15,11 +15,11 @@
 #include "ulong_extras.h"
 
 int
-n_is_strong_probabprime_precomp(mp_limb_t n, double npre, mp_limb_t a,
-                                mp_limb_t d)
+n_is_strong_probabprime_precomp(ulong n, double npre, ulong a,
+                                ulong d)
 {
-    mp_limb_t t = d;
-    mp_limb_t y;
+    ulong t = d;
+    ulong y;
 
     /* Map large base to range 2 ... n - 1 */
     if (a >= n)

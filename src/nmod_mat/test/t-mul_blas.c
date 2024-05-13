@@ -36,7 +36,7 @@ TEST_FUNCTION_START(nmod_mat_mul_blas, state)
     for (i = 0; i < 1 * flint_test_multiplier(); i++)
     {
         nmod_mat_t A, B, C, D;
-        mp_limb_t modulus;
+        ulong modulus;
         slong m, k, n;
 
         m = n_randint(state, 150) + 2;

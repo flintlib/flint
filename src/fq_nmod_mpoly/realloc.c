@@ -32,5 +32,5 @@ void fq_nmod_mpoly_realloc(
     A->exps = (ulong *) flint_realloc(A->exps, A->exps_alloc*sizeof(ulong));
 
     A->coeffs_alloc = d*alloc;
-    A->coeffs = (mp_limb_t *) flint_realloc(A->coeffs, A->coeffs_alloc*sizeof(ulong));
+    A->coeffs = (ulong *) flint_realloc(A->coeffs, A->coeffs_alloc*sizeof(ulong));
 }

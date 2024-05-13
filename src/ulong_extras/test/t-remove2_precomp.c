@@ -16,7 +16,7 @@
 TEST_FUNCTION_START(n_remove2_precomp, state)
 {
     int i, result;
-    const mp_limb_t * primes;
+    const ulong * primes;
     const double * inverses;
 
     primes = n_primes_arr_readonly(10000);
@@ -24,7 +24,7 @@ TEST_FUNCTION_START(n_remove2_precomp, state)
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test random numbers */
     {
-        mp_limb_t n1, n2, orig_n;
+        ulong n1, n2, orig_n;
         mpz_t d_n2, d_n1, d_p;
         int exp1, exp2;
         ulong j;
@@ -56,7 +56,7 @@ TEST_FUNCTION_START(n_remove2_precomp, state)
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test perfect powers */
     {
-        mp_limb_t n1, n2, orig_n, base;
+        ulong n1, n2, orig_n, base;
         mpz_t d_n2, d_n1, d_p;
         int exp1, exp2, exp;
         ulong j;

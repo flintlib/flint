@@ -17,7 +17,7 @@ TEST_FUNCTION_START(n_is_probabprime_fibonacci, state)
 {
     int i, result;
     ulong count = UWORD(0);
-    mp_limb_t d;
+    ulong d;
     mpz_t d_m;
     slong test_multiplier;
 

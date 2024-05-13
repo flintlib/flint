@@ -18,7 +18,7 @@
 double
 d_randtest(flint_rand_t state)
 {
-    mp_limb_t m1, m2;
+    ulong m1, m2;
     double t;
 
     if (FLINT_BITS == 64)

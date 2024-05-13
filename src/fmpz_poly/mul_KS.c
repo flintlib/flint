@@ -23,7 +23,7 @@ _fmpz_poly_mul_KS(fmpz * res, const fmpz * poly1, slong len1,
     int neg1, neg2;
     slong limbs1, limbs2, loglen;
     slong bits1, bits2, bits;
-    mp_limb_t *arr1, *arr2, *arr3;
+    ulong *arr1, *arr2, *arr3;
     slong sign = 0;
 
     FMPZ_VEC_NORM(poly1, len1);
@@ -66,19 +66,19 @@ _fmpz_poly_mul_KS(fmpz * res, const fmpz * poly1, slong len1,
 
     if (poly1 == poly2)
     {
-        arr1 = (mp_limb_t *) flint_calloc(limbs1, sizeof(mp_limb_t));
+        arr1 = (ulong *) flint_calloc(limbs1, sizeof(ulong));
         arr2 = arr1;
         _fmpz_poly_bit_pack(arr1, poly1, len1, bits, neg1);
     }
     else
     {
-        arr1 = (mp_limb_t *) flint_calloc(limbs1 + limbs2, sizeof(mp_limb_t));
+        arr1 = (ulong *) flint_calloc(limbs1 + limbs2, sizeof(ulong));
         arr2 = arr1 + limbs1;
         _fmpz_poly_bit_pack(arr1, poly1, len1, bits, neg1);
         _fmpz_poly_bit_pack(arr2, poly2, len2, bits, neg2);
     }
 
-    arr3 = (mp_limb_t *) flint_malloc((limbs1 + limbs2) * sizeof(mp_limb_t));
+    arr3 = (ulong *) flint_malloc((limbs1 + limbs2) * sizeof(ulong));
 
     if (arr1 == arr2 && limbs1 == limbs2)
         flint_mpn_sqr(arr3, arr1, limbs1);

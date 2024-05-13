@@ -16,7 +16,7 @@
 
 void fq_nmod_mpoly_set_n_fq(
     fq_nmod_mpoly_t A,
-    const mp_limb_t * c,
+    const ulong * c,
     const fq_nmod_mpoly_ctx_t ctx)
 {
     slong d = fq_nmod_ctx_degree(ctx->fqctx);

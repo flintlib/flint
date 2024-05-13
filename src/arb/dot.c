@@ -12,12 +12,12 @@
 #include "arb.h"
 #include "mpn_extras.h"
 
-/* We need uint64_t instead of mp_limb_t on 32-bit systems for
+/* We need uint64_t instead of ulong on 32-bit systems for
    safe summation of 30-bit error bounds. */
 #include <stdint.h>
 
-void mpfr_mulhigh_n(mp_ptr rp, mp_srcptr np, mp_srcptr mp, mp_size_t n);
-void mpfr_sqrhigh_n(mp_ptr rp, mp_srcptr np, mp_size_t n);
+void mpfr_mulhigh_n(nn_ptr rp, nn_srcptr np, nn_srcptr mp, slong n);
+void mpfr_sqrhigh_n(nn_ptr rp, nn_srcptr np, slong n);
 
 /* Add ((a * b) / 2^MAG_BITS) * 2^exp into srad*2^srad_exp.
    Assumes that srad_exp >= exp and that overflow cannot occur.  */
@@ -49,7 +49,7 @@ mag_set_ui_2exp_small(mag_t z, ulong x, slong e)
     else
     {
         slong bits;
-        mp_limb_t overflow;
+        ulong overflow;
 
         bits = flint_clz(x);
         bits = FLINT_BITS - bits;
@@ -139,9 +139,9 @@ add_errors(mag_t rad, uint64_t Aerr, slong Aexp, uint64_t Berr, slong Bexp, uint
 }
 
 static void
-mulhigh(mp_ptr res, mp_srcptr xptr, mp_size_t xn, mp_srcptr yptr, mp_size_t yn, mp_size_t nn)
+mulhigh(nn_ptr res, nn_srcptr xptr, slong xn, nn_srcptr yptr, slong yn, slong nn)
 {
-    mp_ptr tmp, xxx, yyy;
+    nn_ptr tmp, xxx, yyy;
     slong k;
     ARF_MUL_TMP_DECL;
 
@@ -166,14 +166,14 @@ mulhigh(mp_ptr res, mp_srcptr xptr, mp_size_t xn, mp_srcptr yptr, mp_size_t yn, 
 }
 
 void
-_arb_dot_addmul_generic(mp_ptr sum, mp_ptr serr, mp_ptr tmp, mp_size_t sn,
-    mp_srcptr xptr, mp_size_t xn, mp_srcptr yptr, mp_size_t yn,
+_arb_dot_addmul_generic(nn_ptr sum, nn_ptr serr, nn_ptr tmp, slong sn,
+    nn_srcptr xptr, slong xn, nn_srcptr yptr, slong yn,
     int negative, flint_bitcnt_t shift)
 {
     slong shift_bits, shift_limbs, term_prec;
-    mp_limb_t cy;
-    mp_ptr sstart, tstart;
-    mp_size_t tn, nn;
+    ulong cy;
+    nn_ptr sstart, tstart;
+    slong tn, nn;
 
     shift_bits = shift % FLINT_BITS;
     shift_limbs = shift / FLINT_BITS;
@@ -291,14 +291,14 @@ _arb_dot_addmul_generic(mp_ptr sum, mp_ptr serr, mp_ptr tmp, mp_size_t sn,
 }
 
 void
-_arb_dot_add_generic(mp_ptr sum, mp_ptr serr, mp_ptr tmp, mp_size_t sn,
-    mp_srcptr xptr, mp_size_t xn,
+_arb_dot_add_generic(nn_ptr sum, nn_ptr serr, nn_ptr tmp, slong sn,
+    nn_srcptr xptr, slong xn,
     int negative, flint_bitcnt_t shift)
 {
     slong shift_bits, shift_limbs, term_prec;
-    mp_limb_t cy, err;
-    mp_ptr sstart, tstart;
-    mp_size_t tn, nn;
+    ulong cy, err;
+    nn_ptr sstart, tstart;
+    slong tn, nn;
 
     shift_bits = shift % FLINT_BITS;
     shift_limbs = shift / FLINT_BITS;
@@ -384,16 +384,16 @@ arb_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong xstep,
     slong xexp, yexp, exp, max_exp, min_exp, sum_exp;
     slong xrexp, yrexp, srad_exp, max_rad_exp;
     int xnegative, ynegative, inexact;
-    mp_size_t xn, yn, sn, alloc;
+    slong xn, yn, sn, alloc;
     flint_bitcnt_t shift;
     arb_srcptr xi, yi;
     arf_srcptr xm, ym;
     mag_srcptr xr, yr;
-    mp_limb_t xtop, ytop;
-    mp_limb_t xrad, yrad;
-    mp_limb_t serr;   /* Sum over arithmetic errors */
+    ulong xtop, ytop;
+    ulong xrad, yrad;
+    ulong serr;   /* Sum over arithmetic errors */
     uint64_t srad;    /* Sum over propagated errors */
-    mp_ptr tmp, sum;  /* Workspace */
+    nn_ptr tmp, sum;  /* Workspace */
     ARF_ADD_TMP_DECL;
 
     /* todo: fast fma and fmma (len=2) code */
@@ -614,7 +614,7 @@ arb_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong xstep,
 
         if (!arf_is_special(xm))
         {
-            mp_srcptr xptr;
+            nn_srcptr xptr;
 
             xexp = ARF_EXP(xm);
             xn = ARF_SIZE(xm);
@@ -679,7 +679,7 @@ arb_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong xstep,
 #if 0
             else if (xn == 1 && yn == 1 && sn == 2 && shift < FLINT_BITS)  /* Fastest path. */
             {
-                mp_limb_t hi, lo, out;
+                ulong hi, lo, out;
 
                 xtop = ARF_NOPTR_D(xm)[0];
                 ytop = ARF_NOPTR_D(ym)[0];
@@ -698,8 +698,8 @@ arb_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong xstep,
             }
             else if (xn == 2 && yn == 2 && shift < FLINT_BITS && sn <= 3)
             {
-                mp_limb_t x1, x0, y1, y0;
-                mp_limb_t u3, u2, u1, u0;
+                ulong x1, x0, y1, y0;
+                ulong u3, u2, u1, u0;
 
                 x0 = ARF_NOPTR_D(xm)[0];
                 x1 = ARF_NOPTR_D(xm)[1];
@@ -736,8 +736,8 @@ arb_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong xstep,
 #endif
             else if (xn <= 2 && yn <= 2 && sn <= 3)
             {
-                mp_limb_t x1, x0, y1, y0;
-                mp_limb_t u3, u2, u1, u0;
+                ulong x1, x0, y1, y0;
+                ulong u3, u2, u1, u0;
 
                 if (xn == 1 && yn == 1)
                 {
@@ -849,7 +849,7 @@ arb_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong xstep,
             }
             else
             {
-                mp_srcptr xptr, yptr;
+                nn_srcptr xptr, yptr;
 
                 xptr = (xn <= ARF_NOPTR_LIMBS) ? ARF_NOPTR_D(xm) : ARF_PTR_D(xm);
                 yptr = (yn <= ARF_NOPTR_LIMBS) ? ARF_NOPTR_D(ym) : ARF_PTR_D(ym);
@@ -924,7 +924,7 @@ arb_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong xstep,
     if (sum[sn - 1] == 0)
     {
         slong sum_exp2;
-        mp_size_t sn2;
+        slong sn2;
 
         sn2 = sn;
         sum_exp2 = sum_exp;

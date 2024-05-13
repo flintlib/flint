@@ -446,14 +446,14 @@ done:
 
 #define MAC(h, l, a, b)                 \
 do {                                    \
-    mp_limb_t p1, p0;                   \
+    ulong p1, p0;                   \
     umul_ppmm(p1, p0, a, b);            \
     add_ssaaaa(h, l, h, l, p1, p0);     \
 } while (0)
 
 void fmpz_multi_CRT_ui(
     fmpz_t b,
-    mp_srcptr in,
+    nn_srcptr in,
     const fmpz_comb_t C,
     fmpz_comb_temp_t CT,
     int sign)
@@ -465,10 +465,10 @@ void fmpz_multi_CRT_ui(
     fmpz * T = CT->T;
     fmpz * A = CT->A;
     slong * offsets = C->crt_offsets;
-    const mp_limb_t * md = C->packed_multipliers;
+    const ulong * md = C->packed_multipliers;
     mpz_ptr az;
-    mp_limb_t * ad;
-    mp_limb_t hi, lo, t;
+    ulong * ad;
+    ulong hi, lo, t;
 
     for (k = 0, i = 0, l = 0; k < klen; k++)
     {

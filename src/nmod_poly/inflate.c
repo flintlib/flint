@@ -21,7 +21,7 @@ nmod_poly_inflate(nmod_poly_t result, const nmod_poly_t input, slong inflation)
     }
     else if (inflation == 0)
     {
-        mp_limb_t v = nmod_poly_evaluate_nmod(input, 1);
+        ulong v = nmod_poly_evaluate_nmod(input, 1);
         nmod_poly_zero(result);
         nmod_poly_set_coeff_ui(result, 0, v);
     }

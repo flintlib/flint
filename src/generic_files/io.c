@@ -324,9 +324,9 @@ int flint_vfprintf(FILE * fs, const char * ip, va_list vlist)
     iplen = strlen(ip);
     TMP_START;
 
-#if defined(_LONG_LONG_LIMB)
+#if FLINT_LONG_LONG
     /*
-       If mp_limb_t is long long, then
+       If ulong is long long, then
 
          `%(format args...)w' -> `%(format args...)ll'.
 
@@ -381,7 +381,7 @@ continue_while:
             memcpy(opcur, ip, sizeof(char) * cpsz);
             ip = ipcur;
 
-#if defined(_LONG_LONG_LIMB)
+#if FLINT_LONG_LONG
             opcur += cpsz + 1;
             opcur[-1] = opcur[-2];
             opcur[-2] = 'l';

@@ -11,7 +11,7 @@
 
 #include "ulong_extras.h"
 
-void n_factor_insert(n_factor_t * factors, mp_limb_t p, ulong exp)
+void n_factor_insert(n_factor_t * factors, ulong p, ulong exp)
 {
    slong i;
 

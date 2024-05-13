@@ -34,7 +34,7 @@ TEST_FUNCTION_START(arb_log_tab, state)
 
         for (i = 0; i < num; i++)
         {
-            tt->_mp_d = (mp_ptr) arb_log_tab11[i];
+            tt->_mp_d = (nn_ptr) arb_log_tab11[i];
             tt->_mp_size = prec / FLINT_BITS;
             tt->_mp_alloc = tt->_mp_size;
 
@@ -86,7 +86,7 @@ TEST_FUNCTION_START(arb_log_tab, state)
 
         for (i = 0; i < num; i++)
         {
-            tt->_mp_d = (mp_ptr) arb_log_tab12[i];
+            tt->_mp_d = (nn_ptr) arb_log_tab12[i];
             tt->_mp_size = prec / FLINT_BITS;
             tt->_mp_alloc = tt->_mp_size;
 
@@ -138,7 +138,7 @@ TEST_FUNCTION_START(arb_log_tab, state)
 
         for (i = 0; i < num; i++)
         {
-            tt->_mp_d = (mp_ptr) arb_log_tab21[i];
+            tt->_mp_d = (nn_ptr) arb_log_tab21[i];
             tt->_mp_size = prec / FLINT_BITS;
             tt->_mp_alloc = tt->_mp_size;
 
@@ -190,7 +190,7 @@ TEST_FUNCTION_START(arb_log_tab, state)
 
         for (i = 0; i < num; i++)
         {
-            tt->_mp_d = (mp_ptr) arb_log_tab22[i];
+            tt->_mp_d = (nn_ptr) arb_log_tab22[i];
             tt->_mp_size = prec / FLINT_BITS;
             tt->_mp_alloc = tt->_mp_size;
 

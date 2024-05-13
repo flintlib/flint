@@ -31,7 +31,7 @@ slong next_powhalf2(slong n)
         return WORD(1) << FLINT_BIT_COUNT(n);
 }
 
-void _nmod_poly_mul_mid_default_mpn_ctx(mp_ptr res, slong zl, slong zh, mp_srcptr a, slong an, mp_srcptr b, slong bn, nmod_t mod);
+void _nmod_poly_mul_mid_default_mpn_ctx(nn_ptr res, slong zl, slong zh, nn_srcptr a, slong an, nn_srcptr b, slong bn, nmod_t mod);
 
 #define TIMEIT_END_REPEAT3(__timer, __reps, __min_time) \
             } \

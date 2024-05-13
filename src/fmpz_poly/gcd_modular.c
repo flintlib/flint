@@ -22,8 +22,8 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, slong len1,
     flint_bitcnt_t bits1, bits2, nb1, nb2, bits_small, pbits, curr_bits = 0, new_bits;
     fmpz_t ac, bc, hc, d, g, l, eval_A, eval_B, eval_GCD, modulus;
     fmpz * A, * B, * Q, * lead_A, * lead_B;
-    mp_ptr a, b, h;
-    mp_limb_t p, h_inv, g_mod;
+    nn_ptr a, b, h;
+    ulong p, h_inv, g_mod;
     nmod_t mod;
     slong i, n, n0, unlucky, hlen, bound;
     int g_pm1;

@@ -116,8 +116,8 @@ void timeit_stop_us(timeit_t t)
 
 ******************************************************************************/
 
-#if (defined( _MSC_VER ) || (GMP_LIMB_BITS == 64 && defined (__amd64__)) || \
-     (GMP_LIMB_BITS == 32 && (defined (__i386__) || \
+#if (defined( _MSC_VER ) || (FLINT_BITS == 64 && defined (__amd64__)) || \
+     (FLINT_BITS == 32 && (defined (__i386__) || \
 			      defined (__i486__) || defined(__amd64__))))
 
 #define FLINT_NUM_CLOCKS 20

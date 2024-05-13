@@ -21,7 +21,7 @@ TEST_FUNCTION_START(arf_set_round_ui, state)
         arf_t x, y;
         slong prec, fix1;
         int ret1, ret2;
-        mp_limb_t t;
+        ulong t;
         arf_rnd_t rnd;
 
         prec = 2 + n_randint(state, 1000);

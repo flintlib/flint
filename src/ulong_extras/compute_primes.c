@@ -36,7 +36,7 @@ const unsigned int flint_primes_small[] =
 
 
 /* _flint_primes[i] holds an array of 2^i primes */
-FLINT_TLS_PREFIX mp_limb_t * _flint_primes[FLINT_BITS];
+FLINT_TLS_PREFIX ulong * _flint_primes[FLINT_BITS];
 FLINT_TLS_PREFIX double * _flint_prime_inverses[FLINT_BITS];
 FLINT_TLS_PREFIX slong _flint_primes_used = 0;
 
@@ -68,7 +68,7 @@ n_compute_primes(ulong num_primes)
         n_primes_t iter;
 
         num_computed = UWORD(1) << m;
-        _flint_primes[m] = flint_malloc(sizeof(mp_limb_t) * num_computed);
+        _flint_primes[m] = flint_malloc(sizeof(ulong) * num_computed);
         _flint_prime_inverses[m] = flint_malloc(sizeof(double) * num_computed);
 
         n_primes_init(iter);

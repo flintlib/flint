@@ -23,7 +23,7 @@ int n_bpoly_mod_pfrac2(
     int success;
     slong A_deg1, B1_deg1, B2_deg1, C1_deg1, C2_deg1;
     slong bad_prime_count, bound;
-    mp_limb_t alpha, c;
+    ulong alpha, c;
     n_poly_t Aevalp, B1evalp, B2evalp, C1evalp, C2evalp;
     n_poly_t Aevalm, B1evalm, B2evalm, C1evalm, C2evalm;
     n_poly_t modulus, alphapow, t1, t2;
@@ -224,7 +224,7 @@ int n_bpoly_mod_pfrac(
 {
     int success;
     slong i, j, bad_prime_count, bound;
-    mp_limb_t alpha, c;
+    ulong alpha, c;
     n_poly_struct Aevalp[1], * Bevalp, * Cevalp;
     n_poly_struct Aevalm[1], * Bevalm, * Cevalm;
     n_poly_t modulus, alphapow, t1, t2;

@@ -12,7 +12,7 @@
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 
-void _nmod_vec_randtest(mp_ptr vec, flint_rand_t state, slong len, nmod_t mod)
+void _nmod_vec_randtest(nn_ptr vec, flint_rand_t state, slong len, nmod_t mod)
 {
     slong i, sparseness;
 

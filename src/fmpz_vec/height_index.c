@@ -23,7 +23,7 @@ _fmpz_vec_height_index(const fmpz * vec, slong len)
     else
     {
         fmpz c;
-        mp_srcptr max_d;
+        nn_srcptr max_d;
         slong max_mpz_limbs, i, max_i, max_coeff, mpz_limbs;
 
         max_coeff = 0;

@@ -12,9 +12,9 @@
 """
 Generic version of mul_n:
 
-void flint_mpn_mul_n_basecase(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n)
+void flint_mpn_mul_n_basecase(nn_ptr res, nn_srcptr u, nn_srcptr v, slong n)
 {
-    mp_limb_t b, a;
+    ulong b, a;
     slong i;
 
     NN_MUL_1X1(a, res[0], u[0], v[0]);
@@ -40,9 +40,9 @@ Schema for a general n x m multiply (here n = 7, m = 4):
 """
 
 def mul1v(n):
-    print("mp_limb_t flint_mpn_mul_%i_1v(mp_ptr res, mp_srcptr u, mp_limb_t v0)" % n)
+    print("ulong flint_mpn_mul_%i_1v(nn_ptr res, nn_srcptr u, ulong v0)" % n)
     print("{")
-    print("    mp_limb_t a;")
+    print("    ulong a;")
     print("    NN_MUL_1X1(a, res[0], u[0], v0);")
     for i in range(1, n-1):
         print("    NN_ADDMUL_S2_A2_1X1(a, res[%i], 0, a, u[%i], v0);" % (i, i))
@@ -52,9 +52,9 @@ def mul1v(n):
 
 def mulnm(n, m):
     if m == 1:
-        print("mp_limb_t flint_mpn_mul_%i_1(mp_ptr res, mp_srcptr u, mp_srcptr v)" % n)
+        print("ulong flint_mpn_mul_%i_1(nn_ptr res, nn_srcptr u, nn_srcptr v)" % n)
         print("{")
-        print("    mp_limb_t a, v0 = v[0];")
+        print("    ulong a, v0 = v[0];")
         print("    NN_MUL_1X1(a, res[0], u[0], v0);")
         for i in range(1, n-1):
             print("    NN_ADDMUL_S2_A2_1X1(a, res[%i], 0, a, u[%i], v0);" % (i, i))
@@ -62,10 +62,10 @@ def mulnm(n, m):
         print("    return res[%i];" % n)
         print("}")
     elif m == 2:
-        print("mp_limb_t flint_mpn_mul_%i_%i(mp_ptr res, mp_srcptr u, mp_srcptr v)" % (n, m))
+        print("ulong flint_mpn_mul_%i_%i(nn_ptr res, nn_srcptr u, nn_srcptr v)" % (n, m))
         print("{")
-        print("    mp_limb_t b, a;")
-        print("    mp_limb_t w[2];")
+        print("    ulong b, a;")
+        print("    ulong w[2];")
         print("    w[0] = v[0];")
         print("    w[1] = v[1];")
         print("    NN_MUL_1X1(a, res[0], u[0], w[0]);")
@@ -80,9 +80,9 @@ def mulnm(n, m):
         print("    return res[%i];" % (n + m - 1))
         print("}")
     else:
-        print("mp_limb_t flint_mpn_mul_%i_%i(mp_ptr res, mp_srcptr u, mp_srcptr v)" % (n, m))
+        print("ulong flint_mpn_mul_%i_%i(nn_ptr res, nn_srcptr u, nn_srcptr v)" % (n, m))
         print("{")
-        print("    mp_limb_t b, a;")
+        print("    ulong b, a;")
         print("    NN_MUL_1X1(a, res[0], u[0], v[0]);")
         print("    NN_DOTREV_S3_A3_1X1(b, a, res[1], 0, 0, a, u, v, 2);")
         for i in range(2, m):
@@ -98,7 +98,7 @@ def mulnm(n, m):
 for n in range(2, 8):
     for m in range(1, n+1):
         if n >= 8 and m >= 5:
-            print("void flint_mpn_mul_%i_%i(mp_ptr res, mp_srcptr u, mp_srcptr v)" % (n, m))
+            print("void flint_mpn_mul_%i_%i(nn_ptr res, nn_srcptr u, nn_srcptr v)" % (n, m))
             print("{")
             print("    __gmpn_mul_basecase(res, u, %i, v, %i);" % (n, m))
             print("}")
@@ -114,9 +114,9 @@ for n in range(8, 17):
     #print()
 
 def mulhigh_n(n):
-    print("mp_limb_t flint_mpn_mulhigh_%i_generic(mp_ptr res, mp_srcptr u, mp_srcptr v)" % n)
+    print("ulong flint_mpn_mulhigh_%i_generic(nn_ptr res, nn_srcptr u, nn_srcptr v)" % n)
     print("{")
-    print("    mp_limb_t b, a, low;")
+    print("    ulong b, a, low;")
     print("    NN_DOTREV_S3_1X1_HIGH(b, a, u, v, %i);" % (n - 1))
     print("    NN_DOTREV_S3_A3_1X1(b, a, low, 0, b, a, u, v, %i);" % n)
     for i in range(n - 2):

@@ -20,7 +20,7 @@
 # define _STOR_SLONG long long int
 #endif
 
-#if defined(_LONG_LONG_LIMB)
+#if FLINT_LONG_LONG
 # define _FLINT_ADC __builtin_addcll
 # define _FLINT_SBB __builtin_subcll
 #else

@@ -17,7 +17,7 @@ TEST_FUNCTION_START(n_is_perfect_power, state)
 {
     int i, result;
     ulong bits, root, hi, n;
-    mp_limb_t d;
+    ulong d;
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test that squares pass the test */
     {

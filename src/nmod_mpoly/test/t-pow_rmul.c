@@ -73,7 +73,7 @@ TEST_FUNCTION_START(nmod_mpoly_pow_rmul, state)
         ulong pow_bound;
         slong len, len1, len2;
         flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randbits(state, n_randint(state, FLINT_BITS));
         modulus = FLINT_MAX(UWORD(2), modulus);

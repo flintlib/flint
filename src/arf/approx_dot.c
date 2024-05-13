@@ -13,13 +13,13 @@
 #include "mpn_extras.h"
 
 void
-_arb_dot_addmul_generic(mp_ptr sum, mp_ptr serr, mp_ptr tmp, mp_size_t sn,
-    mp_srcptr xptr, mp_size_t xn, mp_srcptr yptr, mp_size_t yn,
+_arb_dot_addmul_generic(nn_ptr sum, nn_ptr serr, nn_ptr tmp, slong sn,
+    nn_srcptr xptr, slong xn, nn_srcptr yptr, slong yn,
     int negative, flint_bitcnt_t shift);
 
 void
-_arb_dot_add_generic(mp_ptr sum, mp_ptr serr, mp_ptr tmp, mp_size_t sn,
-    mp_srcptr xptr, mp_size_t xn,
+_arb_dot_add_generic(nn_ptr sum, nn_ptr serr, nn_ptr tmp, slong sn,
+    nn_srcptr xptr, slong xn,
     int negative, flint_bitcnt_t shift);
 
 void
@@ -63,12 +63,12 @@ arf_approx_dot(arf_t res, const arf_t initial, int subtract, arf_srcptr x, slong
     slong i, j, nonzero, padding, extend;
     slong xexp, yexp, exp, max_exp, min_exp, sum_exp;
     int xnegative, ynegative;
-    mp_size_t xn, yn, sn, alloc;
+    slong xn, yn, sn, alloc;
     flint_bitcnt_t shift;
     arf_srcptr xi, yi;
     arf_srcptr xm, ym;
-    mp_limb_t serr;   /* Sum over arithmetic errors  - not used, but need dummy for calls */
-    mp_ptr tmp, sum;  /* Workspace */
+    ulong serr;   /* Sum over arithmetic errors  - not used, but need dummy for calls */
+    nn_ptr tmp, sum;  /* Workspace */
     ARF_ADD_TMP_DECL;
 
     /* todo: fast fma and fmma (len=2) code */
@@ -211,7 +211,7 @@ arf_approx_dot(arf_t res, const arf_t initial, int subtract, arf_srcptr x, slong
 
         if (!arf_is_special(xm))
         {
-            mp_srcptr xptr;
+            nn_srcptr xptr;
 
             xexp = ARF_EXP(xm);
             xn = ARF_SIZE(xm);
@@ -255,7 +255,7 @@ arf_approx_dot(arf_t res, const arf_t initial, int subtract, arf_srcptr x, slong
 #if 0
             else if (xn == 1 && yn == 1 && sn == 2 && shift < FLINT_BITS)  /* Fastest path. */
             {
-                mp_limb_t hi, lo, x0, y0;
+                ulong hi, lo, x0, y0;
 
                 x0 = ARF_NOPTR_D(xm)[0];
                 y0 = ARF_NOPTR_D(ym)[0];
@@ -272,8 +272,8 @@ arf_approx_dot(arf_t res, const arf_t initial, int subtract, arf_srcptr x, slong
             }
             else if (xn == 2 && yn == 2 && shift < FLINT_BITS && sn <= 3)
             {
-                mp_limb_t x1, x0, y1, y0;
-                mp_limb_t u3, u2, u1, u0;
+                ulong x1, x0, y1, y0;
+                ulong u3, u2, u1, u0;
 
                 x0 = ARF_NOPTR_D(xm)[0];
                 x1 = ARF_NOPTR_D(xm)[1];
@@ -304,8 +304,8 @@ arf_approx_dot(arf_t res, const arf_t initial, int subtract, arf_srcptr x, slong
 #endif
             else if (xn <= 2 && yn <= 2 && sn <= 3)
             {
-                mp_limb_t x1, x0, y1, y0;
-                mp_limb_t u3, u2, u1, u0;
+                ulong x1, x0, y1, y0;
+                ulong u3, u2, u1, u0;
 
                 if (xn == 1 && yn == 1)
                 {
@@ -403,7 +403,7 @@ arf_approx_dot(arf_t res, const arf_t initial, int subtract, arf_srcptr x, slong
             }
             else
             {
-                mp_srcptr xptr, yptr;
+                nn_srcptr xptr, yptr;
 
                 xptr = (xn <= ARF_NOPTR_LIMBS) ? ARF_NOPTR_D(xm) : ARF_PTR_D(xm);
                 yptr = (yn <= ARF_NOPTR_LIMBS) ? ARF_NOPTR_D(ym) : ARF_PTR_D(ym);
@@ -423,7 +423,7 @@ arf_approx_dot(arf_t res, const arf_t initial, int subtract, arf_srcptr x, slong
     if (sum[sn - 1] == 0)
     {
         slong sum_exp2;
-        mp_size_t sn2;
+        slong sn2;
 
         sn2 = sn;
         sum_exp2 = sum_exp;

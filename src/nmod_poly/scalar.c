@@ -32,7 +32,7 @@ void nmod_poly_scalar_addmul_nmod(nmod_poly_t A, const nmod_poly_t B, ulong x)
 }
 
 void
-nmod_poly_scalar_mul_nmod(nmod_poly_t res, const nmod_poly_t poly1, mp_limb_t c)
+nmod_poly_scalar_mul_nmod(nmod_poly_t res, const nmod_poly_t poly1, ulong c)
 {
     if ((poly1->length == 0) || (c == 0))
     {

@@ -99,7 +99,7 @@ void padic_poly_inv_series(padic_poly_t Qinv, const padic_poly_t Q, slong n,
         Qcopy = (fmpz *) flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < Q->length; i++)
             Qcopy[i] = Q->coeffs[i];
-        mpn_zero((mp_ptr) Qcopy + i, n - i);
+        mpn_zero((nn_ptr) Qcopy + i, n - i);
         Qalloc = 1;
     }
 

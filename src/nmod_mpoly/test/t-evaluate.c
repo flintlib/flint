@@ -23,12 +23,12 @@ TEST_FUNCTION_START(nmod_mpoly_evaluate, state)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g;
-        mp_limb_t fe;
-        mp_limb_t * vals;
+        ulong fe;
+        ulong * vals;
         slong * perm;
         slong nvars, len;
         flint_bitcnt_t exp_bits;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -42,7 +42,7 @@ TEST_FUNCTION_START(nmod_mpoly_evaluate, state)
         exp_bits = n_randint(state, 200) + 1;
 
         perm = (slong *) flint_malloc(nvars*sizeof(slong));
-        vals = (mp_limb_t *) flint_malloc(nvars*sizeof(mp_limb_t));
+        vals = (ulong *) flint_malloc(nvars*sizeof(ulong));
         for (v = 0; v < nvars; v++)
         {
             vals[v] = n_randlimb(state);
@@ -101,11 +101,11 @@ TEST_FUNCTION_START(nmod_mpoly_evaluate, state)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, fg;
-        mp_limb_t fe, ge, fge;
-        mp_limb_t * vals;
+        ulong fe, ge, fge;
+        ulong * vals;
         slong nvars, len1, len2;
         flint_bitcnt_t exp_bits1, exp_bits2;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -121,7 +121,7 @@ TEST_FUNCTION_START(nmod_mpoly_evaluate, state)
         exp_bits1 = n_randint(state, 200) + 1;
         exp_bits2 = n_randint(state, 200) + 1;
 
-        vals = (mp_limb_t *) flint_malloc(nvars*sizeof(mp_limb_t));
+        vals = (ulong *) flint_malloc(nvars*sizeof(ulong));
         for (v = 0; v < nvars; v++)
         {
             vals[v] = n_randlimb(state);
@@ -159,11 +159,11 @@ TEST_FUNCTION_START(nmod_mpoly_evaluate, state)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, fg;
-        mp_limb_t fe, ge, fge;
-        mp_limb_t * vals;
+        ulong fe, ge, fge;
+        ulong * vals;
         slong nvars, len1, len2;
         flint_bitcnt_t exp_bits1, exp_bits2;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -179,7 +179,7 @@ TEST_FUNCTION_START(nmod_mpoly_evaluate, state)
         exp_bits1 = n_randint(state, 200) + 1;
         exp_bits2 = n_randint(state, 200) + 1;
 
-        vals = (mp_limb_t *) flint_malloc(nvars*sizeof(mp_limb_t));
+        vals = (ulong *) flint_malloc(nvars*sizeof(ulong));
         for (v = 0; v < nvars; v++)
         {
             vals[v] = n_randlimb(state);

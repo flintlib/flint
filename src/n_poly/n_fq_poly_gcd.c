@@ -14,18 +14,18 @@
 #include "n_poly.h"
 
 slong _n_fq_poly_gcd_euclidean_inplace_(
-    mp_limb_t * A, slong Alen,
-    mp_limb_t * B, slong Blen,
+    ulong * A, slong Alen,
+    ulong * B, slong Blen,
     const fq_nmod_ctx_t ctx,
-    mp_limb_t * tmp)
+    ulong * tmp)
 {
     slong d = fq_nmod_ctx_degree(ctx);
     nmod_t mod = fq_nmod_ctx_mod(ctx);
     slong i;
-    mp_limb_t * u = tmp;
-    mp_limb_t * q0 = u + d;
-    mp_limb_t * q1 = q0 + d;
-    mp_limb_t * t = q1 + d;
+    ulong * u = tmp;
+    ulong * q0 = u + d;
+    ulong * q1 = q0 + d;
+    ulong * t = q1 + d;
 
 again:
 
@@ -151,7 +151,7 @@ void n_fq_poly_gcd_(
 {
     slong d = fq_nmod_ctx_degree(ctx);
     slong n;
-    mp_limb_t * a, * b, * t;
+    ulong * a, * b, * t;
 #if FLINT_WANT_ASSERT
     fq_nmod_poly_t GG, AA, BB;
     fq_nmod_poly_init(GG, ctx);

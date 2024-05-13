@@ -25,13 +25,16 @@
 
 int main(void)
 {
-    mp_ptr x, y, r, s;
+    nn_ptr x, y, r, s;
     slong n;
+    flint_rand_t state;
 
-    x = flint_malloc(sizeof(mp_limb_t) * FLINT_MAX(N_MAX_MUL, N_MAX_SQR));
-    y = flint_malloc(sizeof(mp_limb_t) * FLINT_MAX(N_MAX_MUL, N_MAX_SQR));
-    r = flint_malloc(2 * sizeof(mp_limb_t) * FLINT_MAX(N_MAX_MUL, N_MAX_SQR));
-    s = flint_malloc(2 * sizeof(mp_limb_t) * FLINT_MAX(N_MAX_MUL, N_MAX_SQR));
+    flint_rand_init(state);
+
+    x = flint_malloc(sizeof(ulong) * FLINT_MAX(N_MAX_MUL, N_MAX_SQR));
+    y = flint_malloc(sizeof(ulong) * FLINT_MAX(N_MAX_MUL, N_MAX_SQR));
+    r = flint_malloc(2 * sizeof(ulong) * FLINT_MAX(N_MAX_MUL, N_MAX_SQR));
+    s = flint_malloc(2 * sizeof(ulong) * FLINT_MAX(N_MAX_MUL, N_MAX_SQR));
 
     flint_mpn_rrandom(x, state, FLINT_MAX(N_MAX_MUL, N_MAX_SQR));
     flint_mpn_rrandom(y, state, FLINT_MAX(N_MAX_MUL, N_MAX_SQR));
@@ -78,6 +81,8 @@ int main(void)
     flint_free(y);
     flint_free(r);
     flint_free(s);
+
+    flint_rand_clear(state);
 
     flint_cleanup_master();
 

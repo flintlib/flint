@@ -27,7 +27,7 @@ flint_bitcnt_t fmpz_val2(const fmpz_t x)
     }
     else
     {
-        mp_limb_t *d = (COEFF_TO_PTR(c))->_mp_d;
+        ulong *d = (COEFF_TO_PTR(c))->_mp_d;
         flint_bitcnt_t u;
 
         t = 0;

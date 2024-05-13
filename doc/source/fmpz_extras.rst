@@ -63,7 +63,7 @@ so these methods should not be used gratuitously.
 
     Sets *z* to the sum of *x*, *y*, and *c*.
 
-.. function:: mp_size_t _fmpz_size(const fmpz_t x)
+.. function:: slong _fmpz_size(const fmpz_t x)
 
     Returns the number of limbs required to represent *x*.
 
@@ -82,7 +82,7 @@ so these methods should not be used gratuitously.
 Low-level conversions
 -------------------------------------------------------------------------------
 
-.. function:: void fmpz_set_mpn_large(fmpz_t z, mp_srcptr src, mp_size_t n, int negative)
+.. function:: void fmpz_set_mpn_large(fmpz_t z, nn_srcptr src, slong n, int negative)
 
     Sets *z* to the integer represented by the *n* limbs in the array *src*,
     or minus this value if *negative* is 1.
@@ -93,13 +93,13 @@ Low-level conversions
 
     Given an *fmpz_t* *zv*, this macro sets *zptr* to a pointer to the limbs of *zv*,
     *zn* to the number of limbs, and *zsign* to a sign bit (0 if nonnegative,
-    1 if negative). The variable *ztmp* must be a single *mp_limb_t*, which is
+    1 if negative). The variable *ztmp* must be a single *ulong*, which is
     used as a buffer. If *zv* is a small value, *zv* itself contains no limb
     array that *zptr* could point to, so the single limb is copied to *ztmp*
     and *zptr* is set to point to *ztmp*. The case where *zv*
     is zero is not handled specially, and *zn* is set to 1.
 
-.. function:: void fmpz_lshift_mpn(fmpz_t z, mp_srcptr src, mp_size_t n, int negative, flint_bitcnt_t shift)
+.. function:: void fmpz_lshift_mpn(fmpz_t z, nn_srcptr src, slong n, int negative, flint_bitcnt_t shift)
 
     Sets *z* to the integer represented by the *n* limbs in the array *src*,
     or minus this value if *negative* is 1, shifted left by *shift* bits.

@@ -104,7 +104,7 @@ slong _fmpz_mpoly_quasidiv_heap1(fmpz_t scale,
             len = FLINT_MAX(q_len + 1, 2*qs_alloc);
             qs = (fmpz *) flint_realloc(qs, len*sizeof(fmpz));
             if (len > qs_alloc)
-                flint_mpn_zero((mp_ptr) (qs + qs_alloc), len - qs_alloc);
+                flint_mpn_zero((nn_ptr) (qs + qs_alloc), len - qs_alloc);
             qs_alloc = len;
         }
 
@@ -485,7 +485,7 @@ slong _fmpz_mpoly_quasidiv_heap(fmpz_t scale,
             len = FLINT_MAX(q_len + 1, 2*qs_alloc);
             qs = (fmpz *) flint_realloc(qs, len*sizeof(fmpz));
             if (len > qs_alloc)
-                flint_mpn_zero((mp_ptr) (qs + qs_alloc), len - qs_alloc);
+                flint_mpn_zero((nn_ptr) (qs + qs_alloc), len - qs_alloc);
             qs_alloc = len;
         }
 

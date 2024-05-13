@@ -41,11 +41,11 @@ TEST_FUNCTION_START(nmod_poly_hgcd, state)
     {
         nmod_poly_t a, b, c, d, c1, d1, s, t;
 
-        mp_ptr M[4];
+        nn_ptr M[4];
         slong lenM[4];
         slong sgnM;
 
-        mp_limb_t n = n_randprime(state, FLINT_BITS, 0);
+        ulong n = n_randprime(state, FLINT_BITS, 0);
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
@@ -132,7 +132,7 @@ TEST_FUNCTION_START(nmod_poly_hgcd, state)
 
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
-        mp_limb_t p;
+        ulong p;
         slong sgnM, sgnMr;
         nmod_poly_t m11, m12, m21, m22, A, B, a, b;
         nmod_poly_t m11r, m12r, m21r, m22r, Ar, Br;

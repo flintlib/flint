@@ -20,7 +20,7 @@
 #define FLINT_NUM_TINY_FACTORIALS 13
 #endif
 
-const mp_limb_t flint_tiny_factorials[] =
+const ulong flint_tiny_factorials[] =
 {
   UWORD(1), UWORD(1), UWORD(2), UWORD(6), UWORD(24), UWORD(120), UWORD(720), UWORD(5040), UWORD(40320), UWORD(362880),
   UWORD(3628800), UWORD(39916800), UWORD(479001600),

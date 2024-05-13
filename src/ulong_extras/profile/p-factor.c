@@ -25,7 +25,7 @@ void sample(void * arg, ulong count)
 {
    fac_one_line_t * params = (fac_one_line_t *) arg;
    ulong i, j;
-   mp_limb_t n2;
+   ulong n2;
 
    for (i = 0; i < count; i++)
    {

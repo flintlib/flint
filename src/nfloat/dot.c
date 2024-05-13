@@ -21,9 +21,9 @@
 /* Experimental: use fast but inaccurate product? */
 #define FLINT_MPN_MUL_2X2H(r3, r2, r1, a1, a0, b1, b0)   \
     do {                                                                  \
-        mp_limb_t __t1, __t2, __u1, __u2, __v3, __v2;                     \
-        mp_limb_t __r3, __r2, __r1;                                       \
-        mp_limb_t __a1 = (a1), __a0 = (a0), __b1 = (b1), __b0 = (b0);     \
+        ulong __t1, __t2, __u1, __u2, __v3, __v2;                     \
+        ulong __r3, __r2, __r1;                                       \
+        ulong __a1 = (a1), __a0 = (a0), __b1 = (b1), __b0 = (b0);     \
         umul_ppmm(__t2, __t1, __a0, __b1);                                \
         umul_ppmm(__u2, __u1, __a1, __b0);                                \
         add_sssaaaaaa(__r3, __r2, __r1, 0, __t2, __t1, 0, __u2, __u1);    \
@@ -39,7 +39,7 @@ __nfloat_vec_dot(nfloat_ptr res, nfloat_srcptr initial, int subtract, nfloat_src
     {
         slong i, xexp, delta, sexp, norm, pad_bits;
         int xsgnbit;
-        mp_limb_t t1, t0, s1, s0;
+        ulong t1, t0, s1, s0;
         nfloat_srcptr xi, yi;
         int have_zeros = 0;
 
@@ -198,8 +198,8 @@ __nfloat_vec_dot(nfloat_ptr res, nfloat_srcptr initial, int subtract, nfloat_src
         slong i, xexp, delta, sexp, norm, pad_bits;
         int xsgnbit;
         nfloat_srcptr xi, yi;
-        mp_limb_t s0, s1, s2;
-        mp_limb_t t0, t1, t2, t3;
+        ulong s0, s1, s2;
+        ulong t0, t1, t2, t3;
 
         s0 = s1 = s2 = 0;
         sexp = WORD_MIN;
@@ -391,8 +391,8 @@ __nfloat_vec_dot(nfloat_ptr res, nfloat_srcptr initial, int subtract, nfloat_src
     {
         slong i, xexp, delta, sexp, norm, pad_bits;
         int xsgnbit;
-        mp_limb_t t[NFLOAT_MAX_LIMBS + 1];
-        mp_limb_t s[NFLOAT_MAX_LIMBS + 1];
+        ulong t[NFLOAT_MAX_LIMBS + 1];
+        ulong s[NFLOAT_MAX_LIMBS + 1];
         nfloat_srcptr xi, yi;
         slong n;
 

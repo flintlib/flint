@@ -13,12 +13,12 @@
 #include "mpn_extras.h"
 
 void
-_arb_exp_taylor_naive(mp_ptr y, mp_limb_t * error,
-    mp_srcptr x, mp_size_t xn, ulong N)
+_arb_exp_taylor_naive(nn_ptr y, ulong * error,
+    nn_srcptr x, slong xn, ulong N)
 {
     ulong k;
-    mp_ptr s, t, u, v;
-    mp_size_t nn = xn + 1;
+    nn_ptr s, t, u, v;
+    slong nn = xn + 1;
 
     if (N == 0)
     {
@@ -27,10 +27,10 @@ _arb_exp_taylor_naive(mp_ptr y, mp_limb_t * error,
         return;
     }
 
-    s = flint_malloc(sizeof(mp_limb_t) * (nn + 1));
-    t = flint_malloc(sizeof(mp_limb_t) * nn);
-    v = flint_malloc(sizeof(mp_limb_t) * nn);
-    u = flint_malloc(sizeof(mp_limb_t) * 2 * nn);
+    s = flint_malloc(sizeof(ulong) * (nn + 1));
+    t = flint_malloc(sizeof(ulong) * nn);
+    v = flint_malloc(sizeof(ulong) * nn);
+    u = flint_malloc(sizeof(ulong) * 2 * nn);
 
     /* s = 1 */
     flint_mpn_zero(s, nn);

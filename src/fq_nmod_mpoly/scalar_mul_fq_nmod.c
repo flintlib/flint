@@ -17,12 +17,12 @@
 void fq_nmod_mpoly_scalar_mul_n_fq(
     fq_nmod_mpoly_t A,
     const fq_nmod_mpoly_t B,
-    const mp_limb_t * c,
+    const ulong * c,
     const fq_nmod_mpoly_ctx_t ctx)
 {
     slong d = fq_nmod_ctx_degree(ctx->fqctx);
     slong i;
-    mp_limb_t * t;
+    ulong * t;
     TMP_INIT;
 
     if (_n_fq_is_zero(c, d))
@@ -53,7 +53,7 @@ void fq_nmod_mpoly_scalar_mul_n_fq(
 
     TMP_START;
 
-    t = (mp_limb_t *) TMP_ALLOC(d*N_FQ_MUL_ITCH*sizeof(mp_limb_t));
+    t = (ulong *) TMP_ALLOC(d*N_FQ_MUL_ITCH*sizeof(ulong));
 
     for (i = 0; i < B->length; i++)
         _n_fq_mul(A->coeffs + d*i, B->coeffs + d*i, c, ctx->fqctx, t);
@@ -70,7 +70,7 @@ void fq_nmod_mpoly_scalar_mul_fq_nmod(
 {
     slong d = fq_nmod_ctx_degree(ctx->fqctx);
     slong i;
-    mp_limb_t * t;
+    ulong * t;
     TMP_INIT;
 
     if (fq_nmod_is_zero(c, ctx->fqctx))
@@ -102,7 +102,7 @@ void fq_nmod_mpoly_scalar_mul_fq_nmod(
 
     TMP_START;
 
-    t = (mp_limb_t *) TMP_ALLOC(d*(1 + N_FQ_MUL_ITCH)*sizeof(mp_limb_t));
+    t = (ulong *) TMP_ALLOC(d*(1 + N_FQ_MUL_ITCH)*sizeof(ulong));
     n_fq_set_fq_nmod(t, c, ctx->fqctx);
 
     for (i = 0; i < B->length; i++)

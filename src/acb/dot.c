@@ -12,7 +12,7 @@
 #include "acb.h"
 #include "mpn_extras.h"
 
-/* We need uint64_t instead of mp_limb_t on 32-bit systems for
+/* We need uint64_t instead of ulong on 32-bit systems for
    safe summation of 30-bit error bounds. */
 #include <stdint.h>
 
@@ -99,17 +99,17 @@ add_errors(mag_t rad, uint64_t Aerr, slong Aexp, uint64_t Berr, slong Bexp, uint
 }
 
 void
-_arb_dot_addmul_generic(mp_ptr sum, mp_ptr serr, mp_ptr tmp, mp_size_t sn,
-    mp_srcptr xptr, mp_size_t xn, mp_srcptr yptr, mp_size_t yn,
+_arb_dot_addmul_generic(nn_ptr sum, nn_ptr serr, nn_ptr tmp, slong sn,
+    nn_srcptr xptr, slong xn, nn_srcptr yptr, slong yn,
     int negative, flint_bitcnt_t shift);
 
 void
-_arb_dot_add_generic(mp_ptr sum, mp_ptr serr, mp_ptr tmp, mp_size_t sn,
-    mp_srcptr xptr, mp_size_t xn,
+_arb_dot_add_generic(nn_ptr sum, nn_ptr serr, nn_ptr tmp, slong sn,
+    nn_srcptr xptr, slong xn,
     int negative, flint_bitcnt_t shift);
 
 static void
-_arb_dot_output(arb_t res, mp_ptr sum, mp_size_t sn, int negative,
+_arb_dot_output(arb_t res, nn_ptr sum, slong sn, int negative,
     uint64_t serr, slong sum_exp, uint64_t srad, slong srad_exp, slong prec)
 {
     slong exp_fix;
@@ -126,7 +126,7 @@ _arb_dot_output(arb_t res, mp_ptr sum, mp_size_t sn, int negative,
     if (sum[sn - 1] == 0)
     {
         slong sum_exp2;
-        mp_size_t sn2;
+        slong sn2;
 
         sn2 = sn;
         sum_exp2 = sum_exp;
@@ -171,7 +171,7 @@ _arb_dot_output(arb_t res, mp_ptr sum, mp_size_t sn, int negative,
 #define ARB_DOT_ADD(s_sum, s_serr, s_sn, s_sum_exp, s_subtract, xm) \
     if (!arf_is_special(xm)) \
     { \
-        mp_srcptr xptr; \
+        nn_srcptr xptr; \
         xexp = ARF_EXP(xm); \
         xn = ARF_SIZE(xm); \
         xnegative = ARF_SGNBIT(xm); \
@@ -204,9 +204,9 @@ static void
 _arf_complex_mul_gauss(arf_t e, arf_t f, const arf_t a, const arf_t b,
                                          const arf_t c, const arf_t d)
 {
-    mp_srcptr ap, bp, cp, dp;
+    nn_srcptr ap, bp, cp, dp;
     int asgn, bsgn, csgn, dsgn;
-    mp_size_t an, bn, cn, dn;
+    slong an, bn, cn, dn;
     slong aexp, bexp, cexp, dexp;
     fmpz texp, uexp;
 
@@ -294,16 +294,16 @@ acb_dot(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong xstep,
     slong re_prec, im_prec;
     slong xrexp, yrexp;
     int xnegative, ynegative;
-    mp_size_t xn, yn, re_sn, im_sn, alloc;
+    slong xn, yn, re_sn, im_sn, alloc;
     flint_bitcnt_t shift;
     arb_srcptr xi, yi;
     arf_srcptr xm, ym;
     mag_srcptr xr, yr;
-    mp_limb_t xtop, ytop;
-    mp_limb_t xrad, yrad;
-    mp_limb_t re_serr, im_serr;   /* Sum over arithmetic errors */
+    ulong xtop, ytop;
+    ulong xrad, yrad;
+    ulong re_serr, im_serr;   /* Sum over arithmetic errors */
     uint64_t re_srad, im_srad;    /* Sum over propagated errors */
-    mp_ptr tmp, re_sum, im_sum;   /* Workspace */
+    nn_ptr tmp, re_sum, im_sum;   /* Workspace */
     slong xoff, yoff;
     char * use_gauss;
     ARF_ADD_TMP_DECL;
@@ -629,7 +629,7 @@ acb_dot(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong xstep,
         for (i = 0; i < len; i++)
         {
             arb_srcptr ai, bi, ci, di;
-            mp_size_t an, bn, cn, dn;
+            slong an, bn, cn, dn;
             slong aexp, bexp, cexp, dexp;
 
             ai = ((arb_srcptr) x) + 2 * i * xstep;
@@ -683,9 +683,9 @@ acb_dot(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong xstep,
         for (yoff = 0; yoff < 2; yoff++)
         {
             slong sum_exp, srad_exp;
-            mp_ptr sum;
-            mp_size_t sn;
-            mp_limb_t serr;
+            nn_ptr sum;
+            slong sn;
+            ulong serr;
             uint64_t srad;
             int flipsign;
 
@@ -745,8 +745,8 @@ acb_dot(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong xstep,
                     }
                     else if (xn <= 2 && yn <= 2 && sn <= 3)
                     {
-                        mp_limb_t x1, x0, y1, y0;
-                        mp_limb_t u3, u2, u1, u0;
+                        ulong x1, x0, y1, y0;
+                        ulong u3, u2, u1, u0;
 
                         if (xn == 1 && yn == 1)
                         {
@@ -858,7 +858,7 @@ acb_dot(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong xstep,
                     }
                     else
                     {
-                        mp_srcptr xptr, yptr;
+                        nn_srcptr xptr, yptr;
 
                         xptr = (xn <= ARF_NOPTR_LIMBS) ? ARF_NOPTR_D(xm) : ARF_PTR_D(xm);
                         yptr = (yn <= ARF_NOPTR_LIMBS) ? ARF_NOPTR_D(ym) : ARF_PTR_D(ym);

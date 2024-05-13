@@ -16,7 +16,7 @@
 /* compute c += (a1 + b1) * (a2 + b2) */
 /* val0, val1, val2 are scratch space */
 FLINT_FORCE_INLINE void
-addmul_addadd(mp_ptr val0, mp_ptr val1, mp_ptr val2, mp_ptr c, mp_srcptr a1, mp_srcptr b1, mp_srcptr a2, mp_srcptr b2, mp_size_t nlimbs, int add_can_overflow_nlimbs)
+addmul_addadd(nn_ptr val0, nn_ptr val1, nn_ptr val2, nn_ptr c, nn_srcptr a1, nn_srcptr b1, nn_srcptr a2, nn_srcptr b2, slong nlimbs, int add_can_overflow_nlimbs)
 {
     if (!add_can_overflow_nlimbs)
     {
@@ -39,7 +39,7 @@ addmul_addadd(mp_ptr val0, mp_ptr val1, mp_ptr val2, mp_ptr c, mp_srcptr a1, mp_
 /* compute c += (a1 - b1) * (a2 - b2) */
 /* val0, val1, val2 are scratch space */
 FLINT_FORCE_INLINE void
-addmul_subsub(mp_ptr val0, mp_ptr val1, mp_ptr val2, mp_ptr c, mp_srcptr a1, mp_srcptr b1, mp_srcptr a2, mp_srcptr b2, mp_size_t nlimbs)
+addmul_subsub(nn_ptr val0, nn_ptr val1, nn_ptr val2, nn_ptr c, nn_srcptr a1, nn_srcptr b1, nn_srcptr a2, nn_srcptr b2, slong nlimbs)
 {
     int neg;
     neg = flint_mpn_signed_sub_n(val1, a1, b1, nlimbs);
@@ -69,17 +69,17 @@ int mpn_mod_mat_mul_waksman(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_c
 
     slong i, l, j, k;
 
-    mp_ptr Ctmp = flint_calloc(slimbs * ((m * p) + (p + m) + 5), sizeof(mp_limb_t));
+    nn_ptr Ctmp = flint_calloc(slimbs * ((m * p) + (p + m) + 5), sizeof(ulong));
                                             /* Ctmp itself has m * p entries */
-    mp_ptr Crow = Ctmp + slimbs * (m * p);  /* Crow has p entries */
-    mp_ptr Ccol = Crow + slimbs * p;        /* Ccol has m entries */
-    mp_ptr val0 = Ccol + slimbs * m;        /* val0 has room for 2 sums */
-    mp_ptr val1 = val0 + 2 * slimbs;        /* val1 has room for 1 sum   */
-    mp_ptr val2 = val1 + slimbs;            /* val2 has room for 1 sum   */
-    mp_ptr crow = val2 + slimbs;            /* crow has room for 1 sum   */
+    nn_ptr Crow = Ctmp + slimbs * (m * p);  /* Crow has p entries */
+    nn_ptr Ccol = Crow + slimbs * p;        /* Ccol has m entries */
+    nn_ptr val0 = Ccol + slimbs * m;        /* val0 has room for 2 sums */
+    nn_ptr val1 = val0 + 2 * slimbs;        /* val1 has room for 1 sum   */
+    nn_ptr val2 = val1 + slimbs;            /* val2 has room for 1 sum   */
+    nn_ptr crow = val2 + slimbs;            /* crow has room for 1 sum   */
 
-#define A_ENTRY(ii, jj) (((mp_srcptr) A->rows[ii]) + (jj) * nlimbs)
-#define B_ENTRY(ii, jj) (((mp_srcptr) B->rows[ii]) + (jj) * nlimbs)
+#define A_ENTRY(ii, jj) (((nn_srcptr) A->rows[ii]) + (jj) * nlimbs)
+#define B_ENTRY(ii, jj) (((nn_srcptr) B->rows[ii]) + (jj) * nlimbs)
 
 #define C_ENTRY(ii, jj) (Ctmp + ((ii) * p + (jj)) * slimbs)
 #define Crow_ENTRY(ii) (Crow + (ii) * slimbs)
@@ -154,8 +154,8 @@ int mpn_mod_mat_mul_waksman(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_c
     {
         for (k = 0; k < p; k++)
         {
-            mp_size_t d;
-            mp_ptr Cptr = ((mp_ptr) C->rows[i]) + k * nlimbs;
+            slong d;
+            nn_ptr Cptr = ((nn_ptr) C->rows[i]) + k * nlimbs;
 
             /* As currently implemented, there is no wraparound arithmetic.
                Were that the case, we would need something like

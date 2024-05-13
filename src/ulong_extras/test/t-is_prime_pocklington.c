@@ -17,7 +17,7 @@ TEST_FUNCTION_START(n_is_prime_pocklington, state)
 {
     int i, result;
     ulong count = 0;
-    mp_limb_t d;
+    ulong d;
     mpz_t d_m;
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test that primes pass the test */

@@ -17,11 +17,11 @@
    (i.e. writes one word per coefficient)
 */
 void
-_nmod_poly_KS2_unpack1(mp_ptr res, mp_srcptr op, slong n, ulong b,
+_nmod_poly_KS2_unpack1(nn_ptr res, nn_srcptr op, slong n, ulong b,
                   ulong k)
 {
    /* limb we're currently extracting bits from */
-   mp_limb_t buf = 0;
+   ulong buf = 0;
    /* number of bits currently in buf; always in [0, FLINT_BITS) */
    ulong buf_b = 0;
 
@@ -92,11 +92,11 @@ _nmod_poly_KS2_unpack1(mp_ptr res, mp_srcptr op, slong n, ulong b,
    (i.e. writes two words per coefficient)
 */
 void
-_nmod_poly_KS2_unpack2(mp_ptr res, mp_srcptr op, slong n, ulong b,
+_nmod_poly_KS2_unpack2(nn_ptr res, nn_srcptr op, slong n, ulong b,
                   ulong k)
 {
    /* limb we're currently extracting bits from */
-   mp_limb_t buf = 0;
+   ulong buf = 0;
    /* number of bits currently in buf; always in [0, FLINT_BITS) */
    ulong buf_b = 0;
 
@@ -183,11 +183,11 @@ _nmod_poly_KS2_unpack2(mp_ptr res, mp_srcptr op, slong n, ulong b,
    (i.e. writes three words per coefficient)
 */
 void
-_nmod_poly_KS2_unpack3(mp_ptr res, mp_srcptr op, slong n, ulong b,
+_nmod_poly_KS2_unpack3(nn_ptr res, nn_srcptr op, slong n, ulong b,
                   ulong k)
 {
    /* limb we're currently extracting bits from */
-   mp_limb_t buf = 0;
+   ulong buf = 0;
    /* number of bits currently in buf; always in [0, FLINT_BITS) */
    ulong buf_b = 0, mask;
 
@@ -251,7 +251,7 @@ _nmod_poly_KS2_unpack3(mp_ptr res, mp_srcptr op, slong n, ulong b,
 
 
 void
-_nmod_poly_KS2_unpack(mp_ptr res, mp_srcptr op, slong n, ulong b,
+_nmod_poly_KS2_unpack(nn_ptr res, nn_srcptr op, slong n, ulong b,
                  ulong k)
 {
    if (b <= FLINT_BITS)

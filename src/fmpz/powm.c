@@ -248,7 +248,7 @@ void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong e, const fmpz_t m)
         {
             if (!COEFF_IS_MPZ(g2))  /* g is small */
             {
-                mp_limb_t minv = n_preinvert_limb(m2);
+                ulong minv = n_preinvert_limb(m2);
 
                 _fmpz_demote(f);
 

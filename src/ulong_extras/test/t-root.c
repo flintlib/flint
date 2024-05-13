@@ -16,7 +16,7 @@
 TEST_FUNCTION_START(n_root, state)
 {
    int i, result;
-   mp_limb_t upper_limit;
+   ulong upper_limit;
 
 #if FLINT64
    upper_limit = 2642245;
@@ -28,7 +28,7 @@ TEST_FUNCTION_START(n_root, state)
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
-        mp_limb_t a, c, d, val;
+        ulong a, c, d, val;
         mpz_t e, f, g;
 
         mpz_init(e);
@@ -64,7 +64,7 @@ TEST_FUNCTION_START(n_root, state)
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
-        mp_limb_t a, c, d, max_pow, base;
+        ulong a, c, d, max_pow, base;
 
         base = n_randint(state, upper_limit - 2) + 2;     /* base form 2 to 2642245*/
         max_pow = n_flog(UWORD_MAX, base);
@@ -88,7 +88,7 @@ TEST_FUNCTION_START(n_root, state)
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
-        mp_limb_t a, c, d, max_pow, base;
+        ulong a, c, d, max_pow, base;
 
         base = n_randint(state, upper_limit - 2) + 2;     /* base between 2 to 2642245*/
         max_pow = n_flog(UWORD_MAX, base);
@@ -112,7 +112,7 @@ TEST_FUNCTION_START(n_root, state)
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
-        mp_limb_t a, c, d, max_pow, base, val;
+        ulong a, c, d, max_pow, base, val;
         mpz_t e, g, h;
 
         mpz_init(e);

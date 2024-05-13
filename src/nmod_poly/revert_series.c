@@ -17,7 +17,7 @@
 #include "gr_poly.h"
 
 void
-_nmod_poly_revert_series(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nmod_t mod)
+_nmod_poly_revert_series(nn_ptr Qinv, nn_srcptr Q, slong Qlen, slong n, nmod_t mod)
 {
     gr_ctx_t ctx;
     _gr_ctx_init_nmod(ctx, &mod);

@@ -16,9 +16,9 @@
 
 /* A = D - B*C, coefficients of D are clobbered */
 static void _fq_nmod_mpoly_mulsub(fq_nmod_mpoly_t A,
-                   mp_limb_t * Dcoeff, const ulong * Dexp, slong Dlen,
-             const mp_limb_t * Bcoeffs, const ulong * Bexp, slong Blen,
-             const mp_limb_t * Ccoeffs, const ulong * Cexp, slong Clen,
+                   ulong * Dcoeff, const ulong * Dexp, slong Dlen,
+             const ulong * Bcoeffs, const ulong * Bexp, slong Blen,
+             const ulong * Ccoeffs, const ulong * Cexp, slong Clen,
                          flint_bitcnt_t bits, slong N, const ulong * cmpmask,
                                                      const fq_nmod_ctx_t fqctx)
 {
@@ -32,13 +32,13 @@ static void _fq_nmod_mpoly_mulsub(fq_nmod_mpoly_t A,
     mpoly_heap_t * x;
     slong Di;
     slong Alen;
-    mp_limb_t * Acoeffs = A->coeffs;
+    ulong * Acoeffs = A->coeffs;
     ulong * Aexps = A->exps;
     ulong * exp, * exps;
     ulong ** exp_list;
     slong exp_next;
     slong * hind;
-    mp_limb_t * t;
+    ulong * t;
     int lazy_size = _n_fq_dot_lazy_size(Blen, fqctx);
     TMP_INIT;
 
@@ -61,7 +61,7 @@ static void _fq_nmod_mpoly_mulsub(fq_nmod_mpoly_t A,
     for (i = 0; i < Blen; i++)
         hind[i] = 1;
 
-    t = (mp_limb_t *) TMP_ALLOC(6*d*sizeof(mp_limb_t));
+    t = (ulong *) TMP_ALLOC(6*d*sizeof(ulong));
 
     /* start with no heap nodes and no exponent vectors in use */
     exp_next = 0;

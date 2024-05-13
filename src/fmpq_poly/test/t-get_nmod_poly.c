@@ -23,7 +23,7 @@ TEST_FUNCTION_START(fmpq_poly_get_nmod_poly, state)
         fmpq_poly_t A;
         nmod_poly_t M, M2;
         slong length;
-        mp_limb_t mod;
+        ulong mod;
 
         length = n_randint(state, 50);
 
@@ -58,7 +58,7 @@ TEST_FUNCTION_START(fmpq_poly_get_nmod_poly, state)
         fmpq_poly_t A;
         nmod_poly_t M, M2;
         slong length;
-        mp_limb_t mod;
+        ulong mod;
         ulong lead;
 
         length = n_randint(state, 50);

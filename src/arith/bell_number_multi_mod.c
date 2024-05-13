@@ -13,11 +13,11 @@
 #include "fmpz.h"
 #include "arith.h"
 
-static mp_limb_t
-arith_bell_number_nmod2(unsigned int * divtab, mp_ptr facs, mp_ptr pows, ulong n, nmod_t mod)
+static ulong
+arith_bell_number_nmod2(unsigned int * divtab, nn_ptr facs, nn_ptr pows, ulong n, nmod_t mod)
 {
-    mp_limb_t s, t, u, v, s2, s1, s0, t1, t0;
-    mp_limb_t qq[3];
+    ulong s, t, u, v, s2, s1, s0, t1, t0;
+    ulong qq[3];
     slong i;
 
     /* Compute inverse factorials */
@@ -94,7 +94,7 @@ arith_bell_number_multi_mod(fmpz_t res, ulong n)
     fmpz_comb_temp_t temp;
     fmpz_comb_t comb;
     nmod_t mod;
-    mp_ptr primes, residues, t, u;
+    nn_ptr primes, residues, t, u;
     slong k, num_primes;
     flint_bitcnt_t size, prime_bits;
     unsigned int * divtab;
@@ -109,11 +109,11 @@ arith_bell_number_multi_mod(fmpz_t res, ulong n)
     prime_bits = FLINT_BITS - 1;
     num_primes = (size + prime_bits - 1) / prime_bits;
 
-    primes = flint_malloc(num_primes * sizeof(mp_limb_t));
-    residues = flint_malloc(num_primes * sizeof(mp_limb_t));
+    primes = flint_malloc(num_primes * sizeof(ulong));
+    residues = flint_malloc(num_primes * sizeof(ulong));
     divtab = flint_malloc(2 * sizeof(unsigned int) * (n + 1));
-    t = flint_malloc((n + 1) * sizeof(mp_limb_t));
-    u = flint_malloc((n + 1) * sizeof(mp_limb_t));
+    t = flint_malloc((n + 1) * sizeof(ulong));
+    u = flint_malloc((n + 1) * sizeof(ulong));
 
     divisor_table(divtab, n + 1);
 

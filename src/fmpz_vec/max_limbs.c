@@ -13,11 +13,11 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-mp_size_t
+slong
 _fmpz_vec_max_limbs(const fmpz * vec, slong len)
 {
     slong i;
-    mp_size_t limbs, max_limbs = 0;
+    slong limbs, max_limbs = 0;
 
     for (i = 0; i < len; i++)
     {

@@ -14,9 +14,9 @@
 #include "nmod_poly.h"
 #include "arith.h"
 
-mp_limb_t nmod_inv_check(mp_limb_t x, nmod_t mod)
+ulong nmod_inv_check(ulong x, nmod_t mod)
 {
-    mp_limb_t r, g;
+    ulong r, g;
 
     g = n_gcdinv(&r, x, mod.n);
     if (g != 1)
@@ -26,10 +26,10 @@ mp_limb_t nmod_inv_check(mp_limb_t x, nmod_t mod)
 }
 
 int
-arith_bell_number_nmod_vec_series(mp_ptr res, slong n, nmod_t mod)
+arith_bell_number_nmod_vec_series(nn_ptr res, slong n, nmod_t mod)
 {
-    mp_limb_t c;
-    mp_ptr tmp;
+    ulong c;
+    nn_ptr tmp;
     slong k;
     int success;
 
@@ -39,7 +39,7 @@ arith_bell_number_nmod_vec_series(mp_ptr res, slong n, nmod_t mod)
     if (mod.n == 1)
         return 0;
 
-    tmp = flint_malloc(sizeof(mp_limb_t) * n);
+    tmp = flint_malloc(sizeof(ulong) * n);
 
     /* Compute inverse factorials */
     c = 1;

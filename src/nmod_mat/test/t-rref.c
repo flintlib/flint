@@ -57,11 +57,11 @@ TEST_FUNCTION_START(nmod_mat_rref, state)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_mat_t A, B, C, D;
-        mp_limb_t mod;
+        ulong mod;
         slong j, k, m, n, rank1, rank2;
         slong *perm;
         int equal;
-        mp_limb_t c;
+        ulong c;
 
         mod = n_randtest_prime(state, 0);
 

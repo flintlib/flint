@@ -97,7 +97,7 @@ void n_bpoly_print_pretty(
 }
 
 char * n_fq_get_str_pretty(
-    const mp_limb_t * a,
+    const ulong * a,
     const fq_nmod_ctx_t ctx)
 {
     char * s;
@@ -111,7 +111,7 @@ char * n_fq_get_str_pretty(
 
 int n_fq_fprint_pretty(
     FILE * file,
-    const mp_limb_t * a,
+    const ulong * a,
     const fq_nmod_ctx_t ctx)
 {
     slong d = fq_nmod_ctx_degree(ctx);
@@ -144,7 +144,7 @@ int n_fq_fprint_pretty(
     return 1;
 }
 
-void n_fq_print_pretty(const mp_limb_t * a, const fq_nmod_ctx_t ctx) { n_fq_fprint_pretty(stdout, a, ctx); }
+void n_fq_print_pretty(const ulong * a, const fq_nmod_ctx_t ctx) { n_fq_fprint_pretty(stdout, a, ctx); }
 
 void n_poly_print_pretty(const n_poly_t A, const char * x)
 {

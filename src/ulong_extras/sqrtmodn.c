@@ -12,24 +12,24 @@
 #include "ulong_extras.h"
 
 /* compute square roots of a modulo m given factorisation of m */
-slong n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac)
+slong n_sqrtmodn(ulong ** sqrt, ulong a, n_factor_t * fac)
 {
-    mp_limb_t m = 1, minv = 1;
+    ulong m = 1, minv = 1;
     slong i, j, num;
-    mp_limb_t * x, * sn, * ind, ** s;
+    ulong * x, * sn, * ind, ** s;
 
     /* Check if modulus is one, that is, it has a trivial representation */
     if (fac->num == 0)
     {
-        *sqrt = flint_malloc(sizeof(mp_limb_t));
+        *sqrt = flint_malloc(sizeof(ulong));
         (*sqrt)[0] = 0;
         return 1;
     }
 
-    x = flint_malloc(sizeof(mp_limb_t)*fac->num);
-    sn = flint_malloc(sizeof(mp_limb_t)*fac->num);
-    ind = flint_malloc(sizeof(mp_limb_t)*fac->num);
-    s = flint_malloc(sizeof(mp_limb_t *)*fac->num);
+    x = flint_malloc(sizeof(ulong)*fac->num);
+    sn = flint_malloc(sizeof(ulong)*fac->num);
+    ind = flint_malloc(sizeof(ulong)*fac->num);
+    s = flint_malloc(sizeof(ulong *)*fac->num);
 
     /* compute prime powers and square roots of a mod x_i = p_i^r_i*/
     num = 1;
@@ -53,7 +53,7 @@ slong n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac)
         }
     }
 
-    *sqrt = flint_malloc(num*sizeof(mp_limb_t));
+    *sqrt = flint_malloc(num*sizeof(ulong));
 
     /*
        compute values s_i = 1 mod x_i and s_i = 0 mod x_j for j != i
@@ -61,7 +61,7 @@ slong n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac)
      */
     for (i = 0; i < fac->num; i++)
     {
-        mp_limb_t xp = 1, si;
+        ulong xp = 1, si;
 
         /* compute product of x_j for j != i */
         for (j = 0; j < i; j++)

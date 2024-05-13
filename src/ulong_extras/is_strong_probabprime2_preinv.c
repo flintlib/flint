@@ -14,11 +14,11 @@
 #include "ulong_extras.h"
 
 int
-n_is_strong_probabprime2_preinv(mp_limb_t n, mp_limb_t ninv, mp_limb_t a,
-                                mp_limb_t d)
+n_is_strong_probabprime2_preinv(ulong n, ulong ninv, ulong a,
+                                ulong d)
 {
-    mp_limb_t t = d;
-    mp_limb_t y;
+    ulong t = d;
+    ulong y;
 
     FLINT_ASSERT(a < n);
 

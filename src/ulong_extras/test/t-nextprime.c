@@ -17,8 +17,8 @@
 
 TEST_FUNCTION_START(n_nextprime, state)
 {
-    mp_limb_t n;
-    mp_limb_t res1, res2;
+    ulong n;
+    ulong res1, res2;
     slong rep;
     mpz_t mpz_n;
 

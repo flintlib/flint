@@ -1,3 +1,4 @@
+#include <gmp.h>
 #include "ulong_extras.h"
 #include "fft_small.h"
 #include "profiler.h"

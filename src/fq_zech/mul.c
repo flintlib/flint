@@ -29,7 +29,7 @@ void
 fq_zech_mul_fmpz(fq_zech_t rop, const fq_zech_t op, const fmpz_t x,
                  const fq_zech_ctx_t ctx)
 {
-    mp_limb_t ux;
+    ulong ux;
     fmpz_t y;
 
     fmpz_init(y);
@@ -46,7 +46,7 @@ void
 fq_zech_mul_si(fq_zech_t rop, const fq_zech_t op, slong x,
                const fq_zech_ctx_t ctx)
 {
-    mp_limb_t y;
+    ulong y;
     if (x == 0 || fq_zech_is_zero(op, ctx))
     {
         fq_zech_zero(rop, ctx);
@@ -66,10 +66,10 @@ fq_zech_mul_si(fq_zech_t rop, const fq_zech_t op, slong x,
 }
 
 void
-fq_zech_mul_ui(fq_zech_t rop, const fq_zech_t op, mp_limb_t x,
+fq_zech_mul_ui(fq_zech_t rop, const fq_zech_t op, ulong x,
                const fq_zech_ctx_t ctx)
 {
-    mp_limb_t b;
+    ulong b;
 
     if (x == 0 || fq_zech_is_zero(op, ctx))
     {

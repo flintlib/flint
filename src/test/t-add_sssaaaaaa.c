@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
 #include "ulong_extras.h"
 #include "test_helpers.h"
 
@@ -19,7 +20,7 @@ TEST_FUNCTION_START(add_sssaaaaaa, state)
 
     for (i = 0; i < 100000 * flint_test_multiplier(); i++)
     {
-        mp_limb_t s[3], t[3], a[3], b[3];
+        ulong s[3], t[3], a[3], b[3];
 
         for (j = 0; j < 3; j++)
         {

@@ -16,7 +16,7 @@
 
 TEST_FUNCTION_START(arith_bell_number_nmod_vec, state)
 {
-    mp_ptr b1, b2, b3;
+    nn_ptr b1, b2, b3;
     slong n;
 
     const slong maxn = 3000;
@@ -29,7 +29,7 @@ TEST_FUNCTION_START(arith_bell_number_nmod_vec, state)
     for (n = 0; n < maxn; n += (n < 50) ? + 1 : n/4)
     {
         nmod_t mod;
-        mp_limb_t p;
+        ulong p;
 
         p = n_randtest_not_zero(state);
         nmod_init(&mod, p);

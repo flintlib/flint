@@ -40,8 +40,8 @@ TEST_FUNCTION_START(flint_mpn_add_inplace_c, state)
 
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
-        mp_limb_t a[10], b[10], c[10];
-        mp_size_t an, bn;
+        ulong a[10], b[10], c[10];
+        slong an, bn;
         unsigned char cf, c1, c2;
 
         bn = 1 + n_randint(state, 4);
@@ -66,7 +66,7 @@ TEST_FUNCTION_START(flint_mpn_add_inplace_c, state)
 
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
-        mp_limb_t a[8], b[8], c[8], d[8];
+        ulong a[8], b[8], c[8], d[8];
 
         flint_mpn_rrandom(a, state, 8);
         flint_mpn_rrandom(b, state, 8);

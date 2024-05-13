@@ -65,7 +65,7 @@ static void n_polyu1n_mod_zip_eval_cur_inc_coeff(
     const nmod_t ctx)
 {
     slong i;
-    mp_limb_t c;
+    ulong c;
 
     FLINT_ASSERT(Acur->length > 0);
     FLINT_ASSERT(Acur->length == Ainc->length);
@@ -93,7 +93,7 @@ static int n_poly_add_zip_must_match(
     slong Alen = A->length;
     ulong * Zexps = Z->exps;
     n_poly_struct * Zcoeffs = Z->coeffs;
-    mp_limb_t * Acoeffs = A->coeffs;
+    ulong * Acoeffs = A->coeffs;
 
     ai = Alen - 1;
 
@@ -125,12 +125,12 @@ static int n_poly_add_zip_must_match(
 }
 
 
-static mp_limb_t * nmod_mat_row_ref(nmod_mat_t M, slong i)
+static ulong * nmod_mat_row_ref(nmod_mat_t M, slong i)
 {
     return M->rows[i];
 }
 
-static void _nmod_vec_mul(mp_limb_t * a, mp_limb_t * b, mp_limb_t * c,
+static void _nmod_vec_mul(ulong * a, ulong * b, ulong * c,
                                                            slong n, nmod_t ctx)
 {
     for (n--; n >= 0; n--)
@@ -176,7 +176,7 @@ int nmod_mpolyl_gcds_zippel(
     n_polyun_t Aeh_inc, Aeh_cur, Aeh_coeff_mock;
     n_polyun_t Beh_inc, Beh_cur, Beh_coeff_mock;
     n_polyun_t HG, MG, ZG;
-    mp_limb_t * betas;
+    ulong * betas;
     n_poly_struct * beta_caches;
     nmod_mat_struct * ML;
     nmod_mat_t MF, Msol, MFtemp, Mwindow;
@@ -201,7 +201,7 @@ int nmod_mpolyl_gcds_zippel(
         return Gmarks[1] - Gmarks[0] == 1;
     }
 
-    betas = FLINT_ARRAY_ALLOC(var, mp_limb_t);
+    betas = FLINT_ARRAY_ALLOC(var, ulong);
     beta_caches = FLINT_ARRAY_ALLOC(3*var, n_poly_struct);
     for (i = 0; i < var; i++)
     {
@@ -325,7 +325,7 @@ next_betas:
     if (Gmarks[s + 1] - Gmarks[s] == 1)
     {
         /* monic case */
-        mp_limb_t temp = 1;
+        ulong temp = 1;
 
         for (i = 0; i < l; i++)
         {
@@ -592,7 +592,7 @@ int nmod_mpolyl_gcdp_zippel_smprime(
     slong Adeg, Bdeg, Alastdeg, Blastdeg, Gdeg;
     slong bound, Gdegbound, lastdeg, req_zip_images;
     int success, changed, have_enough;
-    mp_limb_t alpha, start_alpha, gammaeval, temp;
+    ulong alpha, start_alpha, gammaeval, temp;
     n_poly_t a, b, c, gamma, modulus, alphapow;
     nmod_mpoly_t Ac, Bc, Aeval, Beval, Geval, Abareval, Bbareval;
     nmod_mpolyn_t H, T;

@@ -17,19 +17,19 @@
 static int _fq_nmod_mpoly_divrem_monagan_pearce1_binomial(
     fq_nmod_mpoly_t Q,
     fq_nmod_mpoly_t R,
-    const mp_limb_t * Acoeffs, const ulong * Aexps, slong Alen,
-    const mp_limb_t * Bcoeffs, const ulong * Bexps,
+    const ulong * Acoeffs, const ulong * Aexps, slong Alen,
+    const ulong * Bcoeffs, const ulong * Bexps,
     flint_bitcnt_t bits,
     ulong maskhi,
     const fq_nmod_ctx_t fqctx)
 {
     slong d = fq_nmod_ctx_degree(fqctx);
-    mp_limb_t * Qcoeffs = Q->coeffs;
-    mp_limb_t * Rcoeffs = R->coeffs;
+    ulong * Qcoeffs = Q->coeffs;
+    ulong * Rcoeffs = R->coeffs;
     ulong * Qexps = Q->exps;
     ulong * Rexps = R->exps;
     ulong lexp, mask = mpoly_overflow_mask_sp(bits);
-    mp_limb_t * tmp, * lc_inv, * mBcoeff1;
+    ulong * tmp, * lc_inv, * mBcoeff1;
     int lc_inv_is_one;
     slong Qlen = 0;
     slong Rlen = 0;
@@ -39,8 +39,8 @@ static int _fq_nmod_mpoly_divrem_monagan_pearce1_binomial(
 
     TMP_START;
 
-    tmp = (mp_limb_t *) TMP_ALLOC(d*(2 + FLINT_MAX(N_FQ_MUL_ITCH,
-                                            N_FQ_INV_ITCH))*sizeof(mp_limb_t));
+    tmp = (ulong *) TMP_ALLOC(d*(2 + FLINT_MAX(N_FQ_MUL_ITCH,
+                                            N_FQ_INV_ITCH))*sizeof(ulong));
     lc_inv = tmp + d*FLINT_MAX(N_FQ_MUL_ITCH, N_FQ_INV_ITCH);
     mBcoeff1 = lc_inv + d;
 
@@ -155,8 +155,8 @@ exp_overflow:
 static int _fq_nmod_mpoly_divrem_monagan_pearce1(
     fq_nmod_mpoly_t Q,
     fq_nmod_mpoly_t R,
-    const mp_limb_t * Acoeffs, const ulong * Aexps, slong Alen,
-    const mp_limb_t * Bcoeffs, const ulong * Bexps, slong Blen,
+    const ulong * Acoeffs, const ulong * Aexps, slong Alen,
+    const ulong * Bcoeffs, const ulong * Bexps, slong Blen,
     flint_bitcnt_t bits,
     ulong maskhi,
     const fq_nmod_ctx_t ctx)
@@ -168,21 +168,21 @@ static int _fq_nmod_mpoly_divrem_monagan_pearce1(
     mpoly_heap_t * chain;
     slong * store, * store_base;
     mpoly_heap_t * x;
-    mp_limb_t * Qcoeffs = Q->coeffs;
-    mp_limb_t * Rcoeffs = R->coeffs;
+    ulong * Qcoeffs = Q->coeffs;
+    ulong * Rcoeffs = R->coeffs;
     ulong * Qexps = Q->exps;
     ulong * Rexps = R->exps;
     slong * hind;
     ulong mask, exp;
     int lt_divides;
-    mp_limb_t * lc_minus_inv, * t;
+    ulong * lc_minus_inv, * t;
     int lazy_size = _n_fq_dot_lazy_size(Blen, ctx);
     TMP_INIT;
 
     TMP_START;
 
-    t = (mp_limb_t *) TMP_ALLOC(6*d*sizeof(mp_limb_t));
-    lc_minus_inv = (mp_limb_t *) TMP_ALLOC(d*sizeof(mp_limb_t));
+    t = (ulong *) TMP_ALLOC(6*d*sizeof(ulong));
+    lc_minus_inv = (ulong *) TMP_ALLOC(d*sizeof(ulong));
 
     /* alloc array of heap nodes which can be chained together */
     next_loc = Blen + 4;   /* something bigger than heap can ever be */
@@ -442,8 +442,8 @@ exp_overflow:
 static int _fq_nmod_mpoly_divrem_monagan_pearce(
     fq_nmod_mpoly_t Q,
     fq_nmod_mpoly_t R,
-    const mp_limb_t * Acoeffs, const ulong * Aexps, slong Alen,
-    const mp_limb_t * Bcoeffs, const ulong * Bexps, slong Blen,
+    const ulong * Acoeffs, const ulong * Aexps, slong Alen,
+    const ulong * Bcoeffs, const ulong * Bexps, slong Blen,
     flint_bitcnt_t bits,
     slong N,
     const ulong * cmpmask,
@@ -457,8 +457,8 @@ static int _fq_nmod_mpoly_divrem_monagan_pearce(
     mpoly_heap_t * chain;
     slong * store, * store_base;
     mpoly_heap_t * x;
-    mp_limb_t * Qcoeffs = Q->coeffs;
-    mp_limb_t * Rcoeffs = R->coeffs;
+    ulong * Qcoeffs = Q->coeffs;
+    ulong * Rcoeffs = R->coeffs;
     ulong * Qexps = Q->exps;
     ulong * Rexps = R->exps;
     slong Qlen;
@@ -469,7 +469,7 @@ static int _fq_nmod_mpoly_divrem_monagan_pearce(
     ulong mask;
     slong * hind;
     int lt_divides;
-    mp_limb_t * lc_minus_inv, * pp;
+    ulong * lc_minus_inv, * pp;
     TMP_INIT;
 
     if (N == 1)
@@ -484,8 +484,8 @@ static int _fq_nmod_mpoly_divrem_monagan_pearce(
 
     TMP_START;
 
-    pp = (mp_limb_t *) TMP_ALLOC(d*sizeof(mp_limb_t));
-    lc_minus_inv = (mp_limb_t *) TMP_ALLOC(d*sizeof(mp_limb_t));
+    pp = (ulong *) TMP_ALLOC(d*sizeof(ulong));
+    lc_minus_inv = (ulong *) TMP_ALLOC(d*sizeof(ulong));
 
     /* alloc array of heap nodes which can be chained together */
     next_loc = Blen + 4;   /* something bigger than heap can ever be */

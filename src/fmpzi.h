@@ -92,7 +92,7 @@ fmpzi_set_si_si(fmpzi_t res, slong a, slong b)
 }
 
 FMPZI_INLINE void
-fmpzi_randtest(fmpzi_t res, flint_rand_t state, mp_bitcnt_t bits)
+fmpzi_randtest(fmpzi_t res, flint_rand_t state, flint_bitcnt_t bits)
 {
     fmpz_randtest(fmpzi_realref(res), state, bits);
     fmpz_randtest(fmpzi_imagref(res), state, bits);

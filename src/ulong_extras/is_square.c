@@ -25,15 +25,15 @@ int mod63[63] = {1,1,0,0,1,0,0,1,0,1,0,0,0,0,1,0,1,0,1,0,0,
                  0,1,0,0,1,0,0,1,0,0,0,0,0,0,1,1,1,0,0,0,0,
                  0,1,0,0,1,0,0,1,0,0,0,0,0,0,1,0,1,0,0,0,0};
 
-int n_is_square(mp_limb_t x)
+int n_is_square(ulong x)
 {
-    mp_limb_t sq;
+    ulong sq;
 
     if (!mod64[x % UWORD(64)]) return 0;
     if (!mod63[x % UWORD(63)]) return 0;
     if (!mod65[x % UWORD(65)]) return 0;
 
-    sq = (mp_limb_t) (sqrt((double) x) + 0.5);
+    sq = (ulong) (sqrt((double) x) + 0.5);
 
     return (x == sq*sq);
 }

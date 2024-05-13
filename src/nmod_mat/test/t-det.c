@@ -22,7 +22,7 @@ TEST_FUNCTION_START(nmod_mat_det, state)
     {
         nmod_mat_t A;
         fmpz_mat_t B;
-        mp_limb_t Adet;
+        ulong Adet;
         fmpz_t Bdet;
         ulong t;
 

@@ -22,7 +22,7 @@ TEST_FUNCTION_START(nmod_vec_nmod_pow_fmpz, state)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_t mod;
-        mp_limb_t b, c1, c2;
+        ulong b, c1, c2;
         ulong exp1;
         fmpz_t exp2;
 
@@ -48,7 +48,7 @@ TEST_FUNCTION_START(nmod_vec_nmod_pow_fmpz, state)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_t mod;
-        mp_limb_t b, c1, c2, c3;
+        ulong b, c1, c2, c3;
         fmpz_t exp1, exp2, exp3;
 
         nmod_init(&mod, n_randtest_not_zero(state));

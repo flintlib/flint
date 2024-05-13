@@ -230,8 +230,8 @@ These methods are interchangeable with their ``gr`` counterparts.
               int nfloat_set_si(nfloat_ptr res, slong x, gr_ctx_t ctx)
               int nfloat_set_fmpz(nfloat_ptr res, const fmpz_t x, gr_ctx_t ctx)
 
-.. function:: int _nfloat_set_mpn_2exp(nfloat_ptr res, mp_srcptr x, mp_size_t xn, slong exp, int xsgnbit, gr_ctx_t ctx)
-              int nfloat_set_mpn_2exp(nfloat_ptr res, mp_srcptr x, mp_size_t xn, slong exp, int xsgnbit, gr_ctx_t ctx)
+.. function:: int _nfloat_set_mpn_2exp(nfloat_ptr res, nn_srcptr x, slong xn, slong exp, int xsgnbit, gr_ctx_t ctx)
+              int nfloat_set_mpn_2exp(nfloat_ptr res, nn_srcptr x, slong xn, slong exp, int xsgnbit, gr_ctx_t ctx)
 
 .. function:: int nfloat_set_arf(nfloat_ptr res, const arf_t x, gr_ctx_t ctx)
               int nfloat_get_arf(arf_t res, nfloat_srcptr x, gr_ctx_t ctx)
@@ -315,7 +315,7 @@ Internal functions
 
 .. function:: int _nfloat_cmp(nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx)
               int _nfloat_cmpabs(nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx)
-              int _nfloat_add_1(nfloat_ptr res, mp_limb_t x0, slong xexp, int xsgnbit, mp_limb_t y0, slong delta, gr_ctx_t ctx)
-              int _nfloat_sub_1(nfloat_ptr res, mp_limb_t x0, slong xexp, int xsgnbit, mp_limb_t y0, slong delta, gr_ctx_t ctx)
-              int _nfloat_add_n(nfloat_ptr res, mp_srcptr xd, slong xexp, int xsgnbit, mp_srcptr yd, slong delta, slong nlimbs, gr_ctx_t ctx)
-              int _nfloat_sub_n(nfloat_ptr res, mp_srcptr xd, slong xexp, int xsgnbit, mp_srcptr yd, slong delta, slong nlimbs, gr_ctx_t ctx)
+              int _nfloat_add_1(nfloat_ptr res, ulong x0, slong xexp, int xsgnbit, ulong y0, slong delta, gr_ctx_t ctx)
+              int _nfloat_sub_1(nfloat_ptr res, ulong x0, slong xexp, int xsgnbit, ulong y0, slong delta, gr_ctx_t ctx)
+              int _nfloat_add_n(nfloat_ptr res, nn_srcptr xd, slong xexp, int xsgnbit, nn_srcptr yd, slong delta, slong nlimbs, gr_ctx_t ctx)
+              int _nfloat_sub_n(nfloat_ptr res, nn_srcptr xd, slong xexp, int xsgnbit, nn_srcptr yd, slong delta, slong nlimbs, gr_ctx_t ctx)

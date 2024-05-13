@@ -15,13 +15,13 @@
 #include "fmpz.h"
 #include "fq_nmod.h"
 
-void _fq_nmod_trace(fmpz_t rop2, const mp_limb_t *op, slong len,
+void _fq_nmod_trace(fmpz_t rop2, const ulong *op, slong len,
                     const fq_nmod_ctx_t ctx)
 {
     const slong d = fq_nmod_ctx_degree(ctx);
 
     slong i, l;
-    mp_limb_t *t, rop;
+    ulong *t, rop;
 
     t = _nmod_vec_init(d);
     _nmod_vec_zero(t, d);

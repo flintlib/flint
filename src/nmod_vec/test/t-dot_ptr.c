@@ -21,9 +21,9 @@ TEST_FUNCTION_START(nmod_vec_dot_ptr, state)
     {
         slong len;
         nmod_t mod;
-        mp_limb_t m, res, res2;
-        mp_ptr x, y;
-        mp_ptr * z;
+        ulong m, res, res2;
+        nn_ptr x, y;
+        nn_ptr * z;
         int limbs1;
         slong j, offset;
 
@@ -35,7 +35,7 @@ TEST_FUNCTION_START(nmod_vec_dot_ptr, state)
 
         x = _nmod_vec_init(len);
         y = _nmod_vec_init(len);
-        z = flint_malloc(sizeof(mp_ptr) * len);
+        z = flint_malloc(sizeof(nn_ptr) * len);
 
         _nmod_vec_randtest(x, state, len, mod);
         _nmod_vec_randtest(y, state, len, mod);

@@ -15,8 +15,8 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1, slong len1,
-                                      mp_srcptr poly2, slong len2, nmod_t mod)
+_nmod_poly_compose_horner(nn_ptr res, nn_srcptr poly1, slong len1,
+                                      nn_srcptr poly2, slong len2, nmod_t mod)
 {
     if (len1 == 1)
     {
@@ -35,11 +35,11 @@ _nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1, slong len1,
     {
         const slong alloc = (len1 - 1) * (len2 - 1) + 1;
         slong i = len1 - 1, lenr = len2;
-        mp_ptr t, t1, t2;
+        nn_ptr t, t1, t2;
         TMP_INIT;
 
         TMP_START;
-        t = TMP_ALLOC(alloc * sizeof(mp_limb_t));
+        t = TMP_ALLOC(alloc * sizeof(ulong));
 
         if (len1 % 2 == 0)
         {
@@ -63,7 +63,7 @@ _nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1, slong len1,
         {
             _nmod_poly_mul(t2, t1, lenr, poly2, len2, mod);
             lenr += len2 - 1;
-            FLINT_SWAP(mp_ptr, t1, t2);
+            FLINT_SWAP(nn_ptr, t1, t2);
             t1[0] = n_addmod(t1[0], poly1[i], mod.n);
         }
 

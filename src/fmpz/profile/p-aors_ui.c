@@ -21,10 +21,10 @@
 #if OLD_ALBIN
 
 static void
-_fmpz_add_mpn_1(fmpz_t f, const mp_limb_t * glimbs, mp_size_t gsz, mp_limb_t x);
+_fmpz_add_mpn_1(fmpz_t f, const ulong * glimbs, slong gsz, ulong x);
 
 static void
-_fmpz_sub_mpn_1(fmpz_t f, const mp_limb_t * glimbs, mp_size_t gsz, mp_limb_t x);
+_fmpz_sub_mpn_1(fmpz_t f, const ulong * glimbs, slong gsz, ulong x);
 
 void
 fmpz_add_ui_old(fmpz_t f, const fmpz_t g, ulong x)
@@ -35,7 +35,7 @@ fmpz_add_ui_old(fmpz_t f, const fmpz_t g, ulong x)
 
     if (!COEFF_IS_MPZ(g1))  /* g is small */
     {
-        mp_size_t sz = 2;
+        slong sz = 2;
         if (g1 >= 0)
         {
             {   /* add with jump if carry */
@@ -101,8 +101,8 @@ carry:      if (COEFF_IS_MPZ(f1))
     else
     {
         mpz_ptr mg = COEFF_TO_PTR(g1);
-        mp_size_t gsz = mg->_mp_size;
-        mp_limb_t * glimbs = mg->_mp_d;
+        slong gsz = mg->_mp_size;
+        ulong * glimbs = mg->_mp_d;
 
         if (gsz > 0)
             _fmpz_add_mpn_1(f, glimbs, gsz, x);
@@ -113,11 +113,11 @@ carry:      if (COEFF_IS_MPZ(f1))
 
 /* "Add" two number with same sign. Decide sign from g. */
 static void
-_fmpz_add_mpn_1(fmpz_t f, const mp_limb_t * glimbs, mp_size_t gsz, mp_limb_t x)
+_fmpz_add_mpn_1(fmpz_t f, const ulong * glimbs, slong gsz, ulong x)
 {
     mpz_ptr mf;
-    mp_limb_t * flimbs;
-    mp_size_t gabssz = FLINT_ABS(gsz);
+    ulong * flimbs;
+    slong gabssz = FLINT_ABS(gsz);
 
     /* Promote f as it is guaranteed to be large */
     if (COEFF_IS_MPZ(*f))
@@ -131,7 +131,7 @@ _fmpz_add_mpn_1(fmpz_t f, const mp_limb_t * glimbs, mp_size_t gsz, mp_limb_t x)
 
     if (mf->_mp_alloc < (gabssz + 1)) /* Ensure result fits */
     {
-        mp_limb_t * tmp = flimbs;
+        ulong * tmp = flimbs;
         flimbs = _mpz_realloc(mf, gabssz + 1);
 
         /* If f and g are aliased, then we need to change glimbs as well. */
@@ -154,11 +154,11 @@ _fmpz_add_mpn_1(fmpz_t f, const mp_limb_t * glimbs, mp_size_t gsz, mp_limb_t x)
 
 /* Subtract two limbs (they have different sign) and decide the sign via g. */
 static void
-_fmpz_sub_mpn_1(fmpz_t f, const mp_limb_t * glimbs, mp_size_t gsz, mp_limb_t x)
+_fmpz_sub_mpn_1(fmpz_t f, const ulong * glimbs, slong gsz, ulong x)
 {
     mpz_ptr mf;
-    mp_limb_t * flimbs;
-    mp_size_t gabssz = FLINT_ABS(gsz);
+    ulong * flimbs;
+    slong gabssz = FLINT_ABS(gsz);
 
     /* If size of g is 1, we have a higher probability of the result being
      * small. */
@@ -267,7 +267,7 @@ fmpz_sub_ui_old(fmpz_t f, const fmpz_t g, ulong x)
 
     if (!COEFF_IS_MPZ(g1))  /* g is small */
     {
-        mp_size_t sz = -2;
+        slong sz = -2;
         if (g1 <= 0)
         {
             /* "add" with jump if carry */
@@ -332,8 +332,8 @@ carry:      if (COEFF_IS_MPZ(f1))
     else
     {
         mpz_ptr mg = COEFF_TO_PTR(g1);
-        mp_size_t gsz = mg->_mp_size;
-        mp_limb_t * glimbs = mg->_mp_d;
+        slong gsz = mg->_mp_size;
+        ulong * glimbs = mg->_mp_d;
 
         if (gsz > 0)
             _fmpz_sub_mpn_1(f, glimbs, gsz, x);
@@ -350,7 +350,7 @@ void fmpz_add_ui_old(fmpz_t f, const fmpz_t g, ulong x)
 
     if (!COEFF_IS_MPZ(c))  /* g is small */
     {
-        mp_limb_t sum[2];
+        ulong sum[2];
         if (c >= WORD(0))  /* both operands non-negative */
         {
             add_ssaaaa(sum[1], sum[0], 0, c, 0, x);
@@ -380,7 +380,7 @@ fmpz_sub_ui_old(fmpz_t f, const fmpz_t g, ulong x)
 
     if (!COEFF_IS_MPZ(c))       /* coeff is small */
     {
-        mp_limb_t sum[2];
+        ulong sum[2];
         if (c < WORD(0))             /* g negative, x positive, so difference is negative */
         {
             add_ssaaaa(sum[1], sum[0], 0, -c, 0, x);
@@ -418,7 +418,7 @@ sample_add_new(void * arg, ulong count)
 
     res = _fmpz_vec_init(ntests);
     a = _fmpz_vec_init(ntests);
-    b = flint_malloc(sizeof(mp_limb_t) * ntests);
+    b = flint_malloc(sizeof(ulong) * ntests);
 
     for (ix = 0; ix < 10 * count; ix++)
     {
@@ -453,7 +453,7 @@ sample_add_old(void * arg, ulong count)
 
     res = _fmpz_vec_init(ntests);
     a = _fmpz_vec_init(ntests);
-    b = flint_malloc(sizeof(mp_limb_t) * ntests);
+    b = flint_malloc(sizeof(ulong) * ntests);
 
     for (ix = 0; ix < 10 * count; ix++)
     {
@@ -488,7 +488,7 @@ sample_sub_new(void * arg, ulong count)
 
     res = _fmpz_vec_init(ntests);
     a = _fmpz_vec_init(ntests);
-    b = flint_malloc(sizeof(mp_limb_t) * ntests);
+    b = flint_malloc(sizeof(ulong) * ntests);
 
     for (ix = 0; ix < 10 * count; ix++)
     {
@@ -523,7 +523,7 @@ sample_sub_old(void * arg, ulong count)
 
     res = _fmpz_vec_init(ntests);
     a = _fmpz_vec_init(ntests);
-    b = flint_malloc(sizeof(mp_limb_t) * ntests);
+    b = flint_malloc(sizeof(ulong) * ntests);
 
     for (ix = 0; ix < 10 * count; ix++)
     {

@@ -166,7 +166,7 @@ int fmpz_sqrtmod(fmpz_t b, const fmpz_t a, const fmpz_t p)
 
     if (!COEFF_IS_MPZ(*p))  /* p, and b are small */
     {
-        mp_limb_t ans;
+        ulong ans;
 
         ans = n_sqrtmod(*b, *p);
         if (ans)

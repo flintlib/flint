@@ -16,7 +16,7 @@ void
 bool_mat_randtest(bool_mat_t mat, flint_rand_t state)
 {
     slong i, j;
-    mp_limb_t density;
+    ulong density;
 
     density = n_randint(state, 101);
     for (i = 0; i < bool_mat_nrows(mat); i++)

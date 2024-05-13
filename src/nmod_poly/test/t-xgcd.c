@@ -25,7 +25,7 @@ TEST_FUNCTION_START(nmod_poly_xgcd, state)
     {
         nmod_poly_t a, b, c, g1, g2, s, t, sum, temp;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest_not_zero(state);
         while (!n_is_probabprime(n));
 
@@ -87,7 +87,7 @@ TEST_FUNCTION_START(nmod_poly_xgcd, state)
     {
         nmod_poly_t a, b, g, s, t;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest(state);
         while (!n_is_probabprime(n));
 
@@ -126,7 +126,7 @@ TEST_FUNCTION_START(nmod_poly_xgcd, state)
     {
         nmod_poly_t a, b, g, s, t;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest(state);
         while (!n_is_probabprime(n));
 
@@ -165,7 +165,7 @@ TEST_FUNCTION_START(nmod_poly_xgcd, state)
     {
         nmod_poly_t a, b, g, s, t;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest(state);
         while (!n_is_probabprime(n));
 
@@ -203,7 +203,7 @@ TEST_FUNCTION_START(nmod_poly_xgcd, state)
     {
         nmod_poly_t a, b, g, s, t;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest(state);
         while (!n_is_probabprime(n));
 
@@ -241,7 +241,7 @@ TEST_FUNCTION_START(nmod_poly_xgcd, state)
     {
         nmod_poly_t a, b, g, s, t;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest(state);
         while (!n_is_probabprime(n));
 
@@ -279,7 +279,7 @@ TEST_FUNCTION_START(nmod_poly_xgcd, state)
     {
         nmod_poly_t a, b, g, s, t;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest(state);
         while (!n_is_probabprime(n));
 

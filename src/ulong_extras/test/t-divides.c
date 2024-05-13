@@ -18,7 +18,7 @@ TEST_FUNCTION_START(n_divides, state)
 
     for (i = 0; i < 2000 * flint_test_multiplier(); i++)
     {
-        mp_limb_t n, p, q;
+        ulong n, p, q;
         int nbits, pbits;
         int flag, type;
 

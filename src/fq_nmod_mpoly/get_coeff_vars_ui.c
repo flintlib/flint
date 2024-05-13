@@ -31,7 +31,7 @@ void fq_nmod_mpoly_get_coeff_vars_ui(
     ulong * uexp;
     ulong * tmask, * texp;
     slong nvars = ctx->minfo->nvars;
-    mp_limb_t * Ccoeffs;
+    ulong * Ccoeffs;
     ulong * Cexps;
     slong Clen;
     TMP_INIT;

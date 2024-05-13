@@ -53,7 +53,7 @@ mag_sub_lower(mag_t z, const mag_t x, const mag_t y)
         {
             if (shift <= MAG_BITS)
             {
-                mp_limb_t c = MAG_MAN(x) - (MAG_MAN(y) >> shift) - 1;
+                ulong c = MAG_MAN(x) - (MAG_MAN(y) >> shift) - 1;
 
                 /* too much cancellation -- compute precisely */
                 if (c < (UWORD(1) << (MAG_BITS - 4)))

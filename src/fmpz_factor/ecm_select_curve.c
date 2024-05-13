@@ -20,21 +20,22 @@
 /* Also selects initial point Q0 [x0 :: z0]  (z0 = 1) */
 
 int
-fmpz_factor_ecm_select_curve(mp_ptr f, mp_ptr sig, mp_ptr n, ecm_t ecm_inf)
+fmpz_factor_ecm_select_curve(nn_ptr f, nn_ptr sig, nn_ptr n, ecm_t ecm_inf)
 {
-    mp_size_t sz, cy;
-    mp_size_t invlimbs, gcdlimbs;
-    mp_ptr temp, tempv, tempn, tempi, tempf;
+    slong sz, cy;
+    mp_size_t invlimbs;
+    slong gcdlimbs;
+    nn_ptr temp, tempv, tempn, tempi, tempf;
     int ret;
 
     TMP_INIT;
 
     TMP_START;
-    temp = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
-    tempv = TMP_ALLOC((ecm_inf->n_size) * sizeof(mp_limb_t));
-    tempn = TMP_ALLOC((ecm_inf->n_size) * sizeof(mp_limb_t));
-    tempi = TMP_ALLOC((ecm_inf->n_size + 1) * sizeof(mp_limb_t));
-    tempf = TMP_ALLOC((ecm_inf->n_size + 1) * sizeof(mp_limb_t));
+    temp = TMP_ALLOC(ecm_inf->n_size * sizeof(ulong));
+    tempv = TMP_ALLOC((ecm_inf->n_size) * sizeof(ulong));
+    tempn = TMP_ALLOC((ecm_inf->n_size) * sizeof(ulong));
+    tempi = TMP_ALLOC((ecm_inf->n_size + 1) * sizeof(ulong));
+    tempf = TMP_ALLOC((ecm_inf->n_size + 1) * sizeof(ulong));
 
     mpn_zero(tempn, ecm_inf->n_size);
     mpn_zero(tempv, ecm_inf->n_size);
@@ -110,10 +111,12 @@ fmpz_factor_ecm_select_curve(mp_ptr f, mp_ptr sig, mp_ptr n, ecm_t ecm_inf)
     flint_mpn_copyi(tempv, ecm_inf->v, sz);
     flint_mpn_copyi(tempn, n, ecm_inf->n_size);
 
+    /* NOTE: invlimbs must be mp_size_t since it is strictly different from
+     * slong on Windows systems. */
     gcdlimbs = mpn_gcdext(tempf, tempi, &invlimbs, tempv, sz, tempn, ecm_inf->n_size);
 
     if (!(gcdlimbs == 1 && tempf[0] == ecm_inf->one[0]) &&
-        !(gcdlimbs == (mp_size_t) ecm_inf->n_size && mpn_cmp(tempf, n, ecm_inf->n_size) == 0))
+        !(gcdlimbs == (slong) ecm_inf->n_size && mpn_cmp(tempf, n, ecm_inf->n_size) == 0))
     {
         /* Found factor */
         flint_mpn_copyi(f, tempf, gcdlimbs);

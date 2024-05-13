@@ -139,7 +139,7 @@ typedef fq_zech_mpoly_geobucket_struct fq_zech_mpoly_geobucket_t[1];
 /* Context object ************************************************************/
 
 void fq_zech_mpoly_ctx_init_deg(fq_zech_mpoly_ctx_t ctx, slong nvars,
-                                 const ordering_t ord, mp_limb_t p, slong deg);
+                                 const ordering_t ord, ulong p, slong deg);
 
 void fq_zech_mpoly_ctx_clear(fq_zech_mpoly_ctx_t ctx);
 

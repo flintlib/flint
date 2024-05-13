@@ -19,7 +19,7 @@ TEST_FUNCTION_START(n_factor_SQUFOF, state)
 
     for (i = 0; i < 300 * flint_test_multiplier(); i++) /* Test random numbers */
     {
-        mp_limb_t n1, n2;
+        ulong n1, n2;
 
         do
         {

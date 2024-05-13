@@ -25,23 +25,23 @@
 
     The behaviour of this function does NOT depend on the initial value of z.
 */
-static mp_limb_t fft_combine_bits_signed(
-    mp_limb_t * z,
-    mp_limb_t ** a, mp_size_t alen,
+static ulong fft_combine_bits_signed(
+    ulong * z,
+    ulong ** a, slong alen,
     flint_bitcnt_t bits,
-    mp_size_t limbs,
-    mp_size_t zn)
+    slong limbs,
+    slong zn)
 {
-    mp_size_t i, zout;
-    mp_limb_t * t;
-    mp_limb_t f;
+    slong i, zout;
+    ulong * t;
+    ulong f;
     TMP_INIT;
 
     FLINT_ASSERT(bits > 1);
 
     TMP_START;
 
-    t = TMP_ARRAY_ALLOC((limbs + 1), mp_limb_t);
+    t = TMP_ARRAY_ALLOC((limbs + 1), ulong);
 
     f = 0;
     zout = 0;
@@ -51,8 +51,8 @@ static mp_limb_t fft_combine_bits_signed(
         /* add the i^th coeffs a[i] */
         slong q = (bits*i)/FLINT_BITS;
         slong r = (bits*i)%FLINT_BITS;
-        mp_limb_t s;
-        mp_limb_t halflimb = UWORD(1) << (FLINT_BITS - 1);
+        ulong s;
+        ulong halflimb = UWORD(1) << (FLINT_BITS - 1);
 
         if (a[i][limbs] | (a[i][limbs - 1] > halflimb))
         {
@@ -108,25 +108,25 @@ static mp_limb_t fft_combine_bits_signed(
     Split into coefficients from |x| evaluated at 2^bits,
     and do a negmod on each coefficient for x < 0.
 */
-static mp_size_t fft_split_bits_fmpz(
-    mp_limb_t ** poly,
+static slong fft_split_bits_fmpz(
+    ulong ** poly,
     const fmpz_t x,
     flint_bitcnt_t bits,
-    mp_size_t limbs)
+    slong limbs)
 {
-    mp_size_t len;
+    slong len;
     int x_is_neg = 0;
 
     if (COEFF_IS_MPZ(*x))
     {
-        mp_size_t s = COEFF_TO_PTR(*x)->_mp_size;
+        slong s = COEFF_TO_PTR(*x)->_mp_size;
         x_is_neg = s < 0;
         len = fft_split_bits(poly, COEFF_TO_PTR(*x)->_mp_d,
                              x_is_neg ? -s : s, bits, limbs);
     }
     else if (!fmpz_is_zero(x))
     {
-        mp_limb_t ux;
+        ulong ux;
         x_is_neg = *x < 0;
         ux = x_is_neg ? -*x : *x;
         len = fft_split_bits(poly, &ux, 1, bits, limbs);
@@ -138,7 +138,7 @@ static mp_size_t fft_split_bits_fmpz(
 
     if (x_is_neg)
     {
-        mp_size_t i;
+        slong i;
         for (i = 0; i < len; i++)
             mpn_negmod_2expp1(poly[i], poly[i], limbs);
     }
@@ -148,14 +148,14 @@ static mp_size_t fft_split_bits_fmpz(
 
 static void fft_combine_bits_fmpz(
     fmpz_t x,
-    mp_limb_t ** poly, slong length,
+    ulong ** poly, slong length,
     flint_bitcnt_t bits,
-    mp_size_t limbs,
-    mp_size_t total_limbs,
+    slong limbs,
+    slong total_limbs,
     int sign)
 {
     mpz_ptr mx = _fmpz_promote(x);
-    mp_limb_t * d = FLINT_MPZ_REALLOC(mx, total_limbs);
+    ulong * d = FLINT_MPZ_REALLOC(mx, total_limbs);
     if (sign)
     {
         if (fft_combine_bits_signed(d, poly, length, bits, limbs, total_limbs))
@@ -302,7 +302,7 @@ void _fmpz_mat_mul_truncate_sqrt2(
         K*N*4*n arrays of length size for B's fft rep
             4*n arrays of length size for C's fft rep
     */
-    temp = FLINT_ARRAY_ALLOC((6 + 4*n*(M*K + K*N + 1))*size, mp_limb_t);
+    temp = FLINT_ARRAY_ALLOC((6 + 4*n*(M*K + K*N + 1))*size, ulong);
     t = temp + 2*size;
     t1 = t + size;
     t2 = t1 + size;
@@ -316,7 +316,7 @@ void _fmpz_mat_mul_truncate_sqrt2(
         K*N arrays of pointers of length 4*n for B's coeffs
           1 array  of pointers of length 4*n for C's coeffs
     */
-    coeffs = FLINT_ARRAY_ALLOC(4*n*(M*K + K*N + 1), mp_limb_t*);
+    coeffs = FLINT_ARRAY_ALLOC(4*n*(M*K + K*N + 1), ulong*);
     Acoeffs = coeffs;
     Bcoeffs = Acoeffs + 4*n*M*K;
     Ccoeffs = Bcoeffs + 4*n*K*N;

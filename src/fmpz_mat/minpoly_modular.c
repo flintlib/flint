@@ -134,7 +134,7 @@ slong _fmpz_mat_minpoly_modular(fmpz * rop, const fmpz_mat_t op)
         double b1, b2, b3, bb;
 
         slong pbits  = FLINT_BITS - 1, i, j;
-        mp_limb_t p = (UWORD(1) << pbits);
+        ulong p = (UWORD(1) << pbits);
         ulong * P, * Q;
 
         fmpz_mat_t v1, v2, v3;

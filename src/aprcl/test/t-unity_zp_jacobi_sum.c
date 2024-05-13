@@ -28,7 +28,7 @@ TEST_FUNCTION_START(aprcl_unity_zp_jacobi_sum, state)
         fmpz_t n;
         unity_zp f, g;
         n_factor_t q_factors;
-        mp_ptr table;
+        nn_ptr table;
 
         n_factor_init(&q_factors);
 
@@ -82,7 +82,7 @@ TEST_FUNCTION_START(aprcl_unity_zp_jacobi_sum, state)
         fmpz_t n;
         unity_zp f, g;
         n_factor_t q_factors;
-        mp_ptr table;
+        nn_ptr table;
 
         n_factor_init(&q_factors);
 
@@ -135,7 +135,7 @@ TEST_FUNCTION_START(aprcl_unity_zp_jacobi_sum, state)
         fmpz_t n;
         unity_zp f, g;
         n_factor_t q_factors;
-        mp_ptr table;
+        nn_ptr table;
 
         n_factor_init(&q_factors);
 

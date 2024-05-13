@@ -21,7 +21,7 @@ extern "C" {
 /* arrays of ulong */
 typedef struct
 {
-    mp_limb_t * coeffs;
+    ulong * coeffs;
     slong alloc;
     slong length;
 } n_poly_struct;
@@ -58,7 +58,7 @@ typedef n_tpoly_t n_fq_tpoly_t;
 typedef struct
 {
     ulong * exps;
-    mp_limb_t * coeffs;
+    ulong * coeffs;
     slong length;
     slong alloc;
 } n_polyu_struct;
@@ -113,14 +113,14 @@ typedef struct {
 typedef n_poly_bpoly_stack_struct n_poly_bpoly_stack_t[1];
 
 typedef struct {
-    mp_limb_t * M;
-    mp_limb_t * T;
-    mp_limb_t * Q;
-    mp_limb_t * array;
+    ulong * M;
+    ulong * T;
+    ulong * Q;
+    ulong * array;
     slong alloc;
     slong d;
     slong radix;
-    mp_limb_t w;
+    ulong w;
 } nmod_eval_interp_struct;
 
 typedef nmod_eval_interp_struct nmod_eval_interp_t[1];

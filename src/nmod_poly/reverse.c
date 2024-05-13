@@ -11,10 +11,10 @@
 
 #include "nmod_poly.h"
 
-void _nmod_poly_reverse(mp_ptr output, mp_srcptr input, slong len, slong m)
+void _nmod_poly_reverse(nn_ptr output, nn_srcptr input, slong len, slong m)
 {
     slong i, min;
-    mp_limb_t temp;
+    ulong temp;
 
     if (input != output)
     {

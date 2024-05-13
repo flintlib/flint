@@ -635,7 +635,7 @@ static int convex_hull_is_indecomposable(
 static void z_rand_vec_primitive(
     slong * v, slong len,
     flint_rand_t state,
-    mp_limb_t bound)
+    ulong bound)
 {
     slong i, g;
 

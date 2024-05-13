@@ -14,7 +14,7 @@
 #include "gr_poly.h"
 
 void
-_nmod_poly_exp_series(mp_ptr f, mp_srcptr h, slong hlen, slong n, nmod_t mod)
+_nmod_poly_exp_series(nn_ptr f, nn_srcptr h, slong hlen, slong n, nmod_t mod)
 {
     gr_ctx_t ctx;
     _gr_ctx_init_nmod(ctx, &mod);
@@ -23,7 +23,7 @@ _nmod_poly_exp_series(mp_ptr f, mp_srcptr h, slong hlen, slong n, nmod_t mod)
 
 /* todo: gr version */
 void
-_nmod_poly_exp_expinv_series(mp_ptr f, mp_ptr g, mp_srcptr h, slong hlen, slong n, nmod_t mod)
+_nmod_poly_exp_expinv_series(nn_ptr f, nn_ptr g, nn_srcptr h, slong hlen, slong n, nmod_t mod)
 {
     _nmod_poly_exp_series(f, h, hlen, n, mod);
     _nmod_poly_inv_series(g, f, n, n, mod);

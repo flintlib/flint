@@ -27,7 +27,7 @@ TEST_FUNCTION_START(nmod_mpoly_mul_array_threaded, state)
         nmod_mpoly_t f, g, h, k;
         slong len, len1, len2, exp_bound, exp_bound1, exp_bound2;
         slong n, max_bound;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, SMALL_FMPZ_BITCOUNT_MAX) + 2;
         modulus = n_randbits(state, modulus);
@@ -90,7 +90,7 @@ TEST_FUNCTION_START(nmod_mpoly_mul_array_threaded, state)
         nmod_mpoly_t f, g, h;
         slong len, len1, len2, exp_bound, exp_bound1, exp_bound2;
         slong n, max_bound;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, SMALL_FMPZ_BITCOUNT_MAX) + 2;
         modulus = n_randbits(state, modulus);
@@ -148,7 +148,7 @@ TEST_FUNCTION_START(nmod_mpoly_mul_array_threaded, state)
         nmod_mpoly_t f, g, h;
         slong len, len1, len2, exp_bound, exp_bound1, exp_bound2;
         slong n, max_bound;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, SMALL_FMPZ_BITCOUNT_MAX) + 2;
         modulus = n_randbits(state, modulus);

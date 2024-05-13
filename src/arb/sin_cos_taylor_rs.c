@@ -15,19 +15,19 @@
 /* See verify_taylor.py for code to generate tables and
    proof of correctness */
 
-#define TMP_ALLOC_LIMBS(size) TMP_ALLOC((size) * sizeof(mp_limb_t))
+#define TMP_ALLOC_LIMBS(size) TMP_ALLOC((size) * sizeof(ulong))
 
 #define FACTORIAL_TAB_SIZE 288
 
-FLINT_DLL extern const mp_limb_t factorial_tab_numer[FACTORIAL_TAB_SIZE];
-FLINT_DLL extern const mp_limb_t factorial_tab_denom[FACTORIAL_TAB_SIZE];
+FLINT_DLL extern const ulong factorial_tab_numer[FACTORIAL_TAB_SIZE];
+FLINT_DLL extern const ulong factorial_tab_denom[FACTORIAL_TAB_SIZE];
 
-void _arb_sin_cos_taylor_rs(mp_ptr ysin, mp_ptr ycos,
-    mp_limb_t * error, mp_srcptr x, mp_size_t xn, ulong N,
+void _arb_sin_cos_taylor_rs(nn_ptr ysin, nn_ptr ycos,
+    ulong * error, nn_srcptr x, slong xn, ulong N,
     int sinonly, int alternating)
 {
-    mp_ptr s, t, xpow;
-    mp_limb_t new_denom, old_denom, c;
+    nn_ptr s, t, xpow;
+    ulong new_denom, old_denom, c;
     slong power, k, m;
     int cosorsin;
 

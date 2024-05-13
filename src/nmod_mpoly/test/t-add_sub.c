@@ -22,7 +22,7 @@ TEST_FUNCTION_START(nmod_mpoly_add_sub, state)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k;
-        mp_limb_t modulus;
+        ulong modulus;
         slong len, len1, len2;
         slong exp_bits, exp_bits1, exp_bits2;
 
@@ -76,7 +76,7 @@ TEST_FUNCTION_START(nmod_mpoly_add_sub, state)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k;
-        mp_limb_t modulus;
+        ulong modulus;
         slong len, len1, len2;
         slong exp_bits, exp_bits1, exp_bits2;
 
@@ -130,7 +130,7 @@ TEST_FUNCTION_START(nmod_mpoly_add_sub, state)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k;
-        mp_limb_t modulus;
+        ulong modulus;
         slong len, len1, len2;
         slong exp_bits, exp_bits1, exp_bits2;
 
@@ -185,7 +185,7 @@ TEST_FUNCTION_START(nmod_mpoly_add_sub, state)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k1, k2;
-        mp_limb_t modulus;
+        ulong modulus;
         slong len, len1, len2;
         slong exp_bits, exp_bits1, exp_bits2;
 
@@ -244,7 +244,7 @@ TEST_FUNCTION_START(nmod_mpoly_add_sub, state)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k1, k2;
-        mp_limb_t modulus;
+        ulong modulus;
         slong len, len1, len2;
         slong exp_bits, exp_bits1, exp_bits2;
 
@@ -303,7 +303,7 @@ TEST_FUNCTION_START(nmod_mpoly_add_sub, state)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h;
-        mp_limb_t modulus;
+        ulong modulus;
         slong len, len1, len2;
         slong exp_bits, exp_bits1, exp_bits2;
 
@@ -357,7 +357,7 @@ TEST_FUNCTION_START(nmod_mpoly_add_sub, state)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h;
-        mp_limb_t modulus;
+        ulong modulus;
         slong len, len1, len2;
         slong exp_bits, exp_bits1, exp_bits2;
 

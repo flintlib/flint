@@ -20,7 +20,7 @@ typedef struct
 
 #define invert_limb_naive(ninv, n)                    \
    do {                                               \
-      mp_limb_t dummy;                                \
+      ulong dummy;                                \
       udiv_qrnnd (ninv, dummy, ~(n), ~(WORD(0)), n);  \
    } while (0)
 

@@ -14,10 +14,10 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-void _nmod_poly_make_monic(mp_ptr output,
-                            mp_srcptr input, slong len, nmod_t mod)
+void _nmod_poly_make_monic(nn_ptr output,
+                            nn_srcptr input, slong len, nmod_t mod)
 {
-    mp_limb_t inv;
+    ulong inv;
 
     inv = n_invmod(input[len - 1], mod.n);
     _nmod_vec_scalar_mul_nmod(output, input, len, inv, mod);

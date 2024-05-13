@@ -12,11 +12,11 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-mp_limb_t
-_nmod_poly_evaluate_nmod(mp_srcptr poly, slong len, mp_limb_t c, nmod_t mod)
+ulong
+_nmod_poly_evaluate_nmod(nn_srcptr poly, slong len, ulong c, nmod_t mod)
 {
     slong m;
-    mp_limb_t val;
+    ulong val;
 
     if (len == 0)
         return 0;
@@ -38,8 +38,8 @@ _nmod_poly_evaluate_nmod(mp_srcptr poly, slong len, mp_limb_t c, nmod_t mod)
     return val;
 }
 
-mp_limb_t
-nmod_poly_evaluate_nmod(const nmod_poly_t poly, mp_limb_t c)
+ulong
+nmod_poly_evaluate_nmod(const nmod_poly_t poly, ulong c)
 {
     return _nmod_poly_evaluate_nmod(poly->coeffs, poly->length, c, poly->mod);
 }

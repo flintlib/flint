@@ -17,9 +17,9 @@ int
 arf_mul_via_mpfr(arf_t z, const arf_t x, const arf_t y,
         slong prec, arf_rnd_t rnd)
 {
-    mp_size_t xn, yn, zn, val;
-    mp_srcptr xptr, yptr;
-    mp_ptr tmp, zptr;
+    slong xn, yn, zn, val;
+    nn_srcptr xptr, yptr;
+    nn_ptr tmp, zptr;
     mpfr_t xf, yf, zf;
     int ret;
     ARF_MUL_TMP_DECL
@@ -43,7 +43,7 @@ arf_mul_via_mpfr(arf_t z, const arf_t x, const arf_t y,
     zf->_mpfr_sign = 1;
     zf->_mpfr_exp = 0;
 
-    xf->_mpfr_d = (mp_ptr) xptr;
+    xf->_mpfr_d = (nn_ptr) xptr;
     xf->_mpfr_prec = xn * FLINT_BITS;
     xf->_mpfr_sign = ARF_SGNBIT(x) ? -1 : 1;
     xf->_mpfr_exp = 0;
@@ -54,7 +54,7 @@ arf_mul_via_mpfr(arf_t z, const arf_t x, const arf_t y,
     }
     else
     {
-        yf->_mpfr_d = (mp_ptr) yptr;
+        yf->_mpfr_d = (nn_ptr) yptr;
         yf->_mpfr_prec = yn * FLINT_BITS;
         yf->_mpfr_sign = ARF_SGNBIT(y) ? -1 : 1;
         yf->_mpfr_exp = 0;

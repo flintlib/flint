@@ -27,7 +27,7 @@ TEST_FUNCTION_START(nmod_poly_factor_cantor_zassenhaus, state)
         nmod_poly_t pol1, poly, quot, rem;
         nmod_poly_t product;
         nmod_poly_factor_t res;
-        mp_limb_t modulus, lead;
+        ulong modulus, lead;
         slong i, j, length, num;
         slong exp[5];
 

@@ -19,7 +19,7 @@ void fq_nmod_mpoly_make_monic(
     const fq_nmod_mpoly_ctx_t ctx)
 {
     slong d = fq_nmod_ctx_degree(ctx->fqctx);
-    mp_limb_t * c;
+    ulong * c;
     TMP_INIT;
 
     if (B->length < 1)
@@ -28,7 +28,7 @@ void fq_nmod_mpoly_make_monic(
     }
 
     TMP_START;
-    c = (mp_limb_t *) TMP_ALLOC((1 + N_FQ_INV_ITCH)*d*sizeof(mp_limb_t));
+    c = (ulong *) TMP_ALLOC((1 + N_FQ_INV_ITCH)*d*sizeof(ulong));
 
     _n_fq_inv(c, B->coeffs + d*0, ctx->fqctx, c + d);
     fq_nmod_mpoly_scalar_mul_n_fq(A, B, c, ctx);

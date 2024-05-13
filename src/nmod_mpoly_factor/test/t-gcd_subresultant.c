@@ -204,7 +204,7 @@ TEST_FUNCTION_START(nmod_mpoly_factor_gcd_subresultant, state)
         nmod_mpoly_t a, b, g, t;
         slong len, len1, len2;
         slong degbound;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);

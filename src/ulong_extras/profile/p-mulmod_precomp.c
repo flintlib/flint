@@ -16,16 +16,16 @@
 void sample(void * arg, ulong count)
 {
    ulong i;
-   mp_limb_t a, d;
+   ulong a, d;
    double dpre;
-   mp_ptr array = (mp_ptr) flint_malloc(1000*sizeof(mp_limb_t));
+   nn_ptr array = (nn_ptr) flint_malloc(1000*sizeof(ulong));
    FLINT_TEST_INIT(state);
 
 
    for (i = 0; i < count; i++)
    {
       int j;
-      mp_limb_t bits = n_randint(state, 53) + 1;
+      ulong bits = n_randint(state, 53) + 1;
       d = n_randbits(state, bits);
       a = n_randint(state, d);
       dpre = n_precompute_inverse(d);

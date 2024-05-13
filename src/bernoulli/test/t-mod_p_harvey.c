@@ -51,7 +51,7 @@ TEST_FUNCTION_START(bernoulli_mod_p_harvey, state)
     for (iter = 0; iter < 100000 * 0.1 * flint_test_multiplier(); iter++)
     {
         ulong a, b, n, q1, r1, r2;
-        mp_limb_t q2[2];
+        ulong q2[2];
         double bnpre;
 
         a = n_randtest_bits(state, FLINT_D_BITS);

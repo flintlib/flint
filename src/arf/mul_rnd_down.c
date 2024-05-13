@@ -15,11 +15,11 @@
 int
 arf_mul_rnd_down(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec)
 {
-    mp_size_t xn, yn, zn;
-    mp_limb_t hi, lo;
+    slong xn, yn, zn;
+    ulong hi, lo;
     slong expfix;
     int sgnbit, ret, fix;
-    mp_ptr zptr;
+    nn_ptr zptr;
 
     xn = ARF_XSIZE(x);
     yn = ARF_XSIZE(y);
@@ -30,7 +30,7 @@ arf_mul_rnd_down(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec)
     if (yn > xn)
     {
         FLINT_SWAP(arf_srcptr, x, y);
-        FLINT_SWAP(mp_size_t, xn, yn);
+        FLINT_SWAP(slong, xn, yn);
     }
 
     /* Either operand is a special value. */
@@ -107,8 +107,8 @@ arf_mul_rnd_down(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec)
     }
     else if (xn == 2)
     {
-        mp_limb_t zz[4];
-        mp_limb_t x1, x0, y1, y0;
+        ulong zz[4];
+        ulong x1, x0, y1, y0;
 
         x0 = ARF_NOPTR_D(x)[0];
         x1 = ARF_NOPTR_D(x)[1];
@@ -183,9 +183,9 @@ arf_mul_rnd_down(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec)
     }
     else
     {
-        mp_size_t zn, alloc;
-        mp_srcptr xptr, yptr;
-        mp_ptr tmp;
+        slong zn, alloc;
+        nn_srcptr xptr, yptr;
+        nn_ptr tmp;
         ARF_MUL_TMP_DECL
 
         ARF_GET_MPN_READONLY(xptr, xn, x);
@@ -207,7 +207,7 @@ arf_mul_rnd_down(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec)
 int
 arf_mul_mpz(arf_ptr z, arf_srcptr x, const mpz_t y, slong prec, arf_rnd_t rnd)
 {
-    mp_size_t xn, yn;
+    slong xn, yn;
     slong fix, shift;
     int sgnbit, inexact;
 
@@ -234,9 +234,9 @@ arf_mul_mpz(arf_ptr z, arf_srcptr x, const mpz_t y, slong prec, arf_rnd_t rnd)
     }
     else
     {
-        mp_size_t zn, alloc;
-        mp_srcptr xptr, yptr;
-        mp_ptr tmp;
+        slong zn, alloc;
+        nn_srcptr xptr, yptr;
+        nn_ptr tmp;
         ARF_MUL_TMP_DECL
 
         ARF_GET_MPN_READONLY(xptr, xn, x);

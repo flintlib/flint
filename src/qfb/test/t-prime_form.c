@@ -47,7 +47,7 @@ TEST_FUNCTION_START(qfb_prime_form, state)
            n = n_randprime(state, n_randint(state, FLINT_BITS - 1) + 2, 0);
            fmpz_set_ui(p, n);
            Dmodp = fmpz_fdiv_ui(D, n);
-        } while ((mp_limb_signed_t) Dmodp < 0 /* Jacobi can't handle this */
+        } while ((slong) Dmodp < 0 /* Jacobi can't handle this */
          || (n == 2 && ((q = fmpz_fdiv_ui(D, 8)) == 2 || q == 3 || q == 5))
          || (n != 2 && Dmodp != 0 && n_jacobi(Dmodp, n) < 0));
 

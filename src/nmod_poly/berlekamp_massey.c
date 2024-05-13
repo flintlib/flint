@@ -57,7 +57,7 @@ typedef nmod_berlekamp_massey_struct nmod_berlekamp_massey_t[1];
 */
 void nmod_berlekamp_massey_init(
     nmod_berlekamp_massey_t B,
-    mp_limb_t p)
+    ulong p)
 {
     nmod_t fpctx;
     nmod_init(&fpctx, p);
@@ -101,7 +101,7 @@ void nmod_berlekamp_massey_clear(
 /* setting the prime also starts over */
 void nmod_berlekamp_massey_set_prime(
     nmod_berlekamp_massey_t B,
-    mp_limb_t p)
+    ulong p)
 {
     nmod_t fpctx;
     nmod_init(&fpctx, p);
@@ -129,7 +129,7 @@ void nmod_berlekamp_massey_print(
 
 void nmod_berlekamp_massey_add_points(
     nmod_berlekamp_massey_t B,
-    const mp_limb_t * a,
+    const ulong * a,
     slong count)
 {
     slong i;
@@ -158,7 +158,7 @@ void nmod_berlekamp_massey_add_zeros(
 
 void nmod_berlekamp_massey_add_point(
     nmod_berlekamp_massey_t B,
-    mp_limb_t a)
+    ulong a)
 {
     slong old_length = B->points->length;
     nmod_poly_fit_length(B->points, old_length + 1);

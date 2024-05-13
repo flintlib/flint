@@ -21,7 +21,7 @@ TEST_FUNCTION_START(nmod_poly_mat_pow, state)
     {
         nmod_poly_mat_t A, B, C;
         slong m, j, exp, deg;
-        mp_limb_t mod;
+        ulong mod;
 
         mod = n_randtest_prime(state, 0);
         m = n_randint(state, 6);
@@ -65,7 +65,7 @@ TEST_FUNCTION_START(nmod_poly_mat_pow, state)
     {
         nmod_poly_mat_t A, B;
         slong m, exp, deg;
-        mp_limb_t mod;
+        ulong mod;
 
         mod = n_randtest_prime(state, 0);
         m = n_randint(state, 6);

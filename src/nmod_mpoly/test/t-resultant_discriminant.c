@@ -55,9 +55,9 @@ TEST_FUNCTION_START(nmod_mpoly_resultant_discriminant, state)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t a, b, r;
         nmod_poly_t au, bu;
-        mp_limb_t ru;
+        ulong ru;
         slong len1, len2, exp_bound1, exp_bound2;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -105,7 +105,7 @@ TEST_FUNCTION_START(nmod_mpoly_resultant_discriminant, state)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t a, b, c, ab, ra, rb, rab, p;
         slong len1, len2, len3, exp_bound1, exp_bound2, exp_bound3;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -175,7 +175,7 @@ TEST_FUNCTION_START(nmod_mpoly_resultant_discriminant, state)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t a, b, ab, r, da, db, dab, p;
         slong len1, len2, exp_bound1, exp_bound2;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);

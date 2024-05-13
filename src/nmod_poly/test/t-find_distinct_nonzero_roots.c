@@ -21,7 +21,7 @@ TEST_FUNCTION_START(nmod_poly_find_distinct_nonzero_roots, state)
     {
         int highdegreefactor;
         nmod_poly_t a, b, r;
-        mp_limb_t p;
+        ulong p;
 
         p = n_randtest_prime(state, 1);
 

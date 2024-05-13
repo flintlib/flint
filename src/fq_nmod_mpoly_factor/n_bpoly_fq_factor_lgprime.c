@@ -191,11 +191,11 @@ static void _lattice(
     n_bpoly_struct * ld;
     nmod_mat_t M, T1, T2;
     int nlimbs;
-    mp_limb_t * trow;
+    ulong * trow;
     slong lift_order = lift_alpha_pow->length - 1;
 
     nlimbs = _nmod_vec_dot_bound_limbs(r, ctx->mod);
-    trow = (mp_limb_t *) flint_malloc(r*sizeof(mp_limb_t));
+    trow = (ulong *) flint_malloc(r*sizeof(ulong));
     n_bpoly_init(Q);
     n_bpoly_init(R);
     n_bpoly_init(dg);

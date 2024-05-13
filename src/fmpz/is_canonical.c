@@ -14,7 +14,7 @@
 int _fmpz_is_canonical(const fmpz_t x)
 {
     mpz_ptr z;
-    mp_size_t n;
+    slong n;
 
     if (!COEFF_IS_MPZ(*x))
         return 1;
@@ -26,7 +26,7 @@ int _fmpz_is_canonical(const fmpz_t x)
         return 0;
 
     if (n == 1)
-        return z->_mp_d[0] > (mp_limb_t) COEFF_MAX;
+        return z->_mp_d[0] > (ulong) COEFF_MAX;
 
     return z->_mp_d[n - 1] != 0;
 }

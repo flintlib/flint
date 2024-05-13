@@ -13,15 +13,15 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-mp_ptr * _nmod_poly_tree_alloc(slong len)
+nn_ptr * _nmod_poly_tree_alloc(slong len)
 {
-    mp_ptr * tree = NULL;
+    nn_ptr * tree = NULL;
 
     if (len)
     {
         slong i, height = FLINT_CLOG2(len);
 
-        tree = flint_malloc(sizeof(mp_ptr) * (height + 1));
+        tree = flint_malloc(sizeof(nn_ptr) * (height + 1));
         for (i = 0; i <= height; i++)
             tree[i] = _nmod_vec_init(len + (len >> i) + 1);
     }
@@ -29,7 +29,7 @@ mp_ptr * _nmod_poly_tree_alloc(slong len)
     return tree;
 }
 
-void _nmod_poly_tree_free(mp_ptr * tree, slong len)
+void _nmod_poly_tree_free(nn_ptr * tree, slong len)
 {
     if (len)
     {
@@ -43,10 +43,10 @@ void _nmod_poly_tree_free(mp_ptr * tree, slong len)
 }
 
 void
-_nmod_poly_tree_build(mp_ptr * tree, mp_srcptr roots, slong len, nmod_t mod)
+_nmod_poly_tree_build(nn_ptr * tree, nn_srcptr roots, slong len, nmod_t mod)
 {
     slong height, pow, left, i;
-    mp_ptr pa, pb;
+    nn_ptr pa, pb;
 
     if (len == 0)
         return;
@@ -67,7 +67,7 @@ _nmod_poly_tree_build(mp_ptr * tree, mp_srcptr roots, slong len, nmod_t mod)
 
         for (i = 0; i < len / 2; i++)
         {
-            mp_limb_t a, b;
+            ulong a, b;
 
             a = roots[2 * i];
             b = roots[2 * i + 1];

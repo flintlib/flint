@@ -21,11 +21,11 @@
 
 int
 fmpz_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in,
-                          mp_limb_t max_tries, mp_limb_t max_iters)
+                          ulong max_tries, ulong max_iters)
 {
     fmpz_t fa, fy, maxa, maxy;
-    mp_ptr a, y, n, ninv, temp;
-    mp_limb_t n_size, normbits, ans, val, size, cy;
+    nn_ptr a, y, n, ninv, temp;
+    ulong n_size, normbits, ans, val, size, cy;
     mpz_ptr fac, mptr;
     int ret;
 
@@ -55,10 +55,10 @@ fmpz_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in,
     fmpz_sub_ui(maxy, n_in, 1);     /* 1 <= y <= n - 1 */
 
     TMP_START;
-    a    = TMP_ALLOC(n_size * sizeof(mp_limb_t));
-    y    = TMP_ALLOC(n_size * sizeof(mp_limb_t));
-    n    = TMP_ALLOC(n_size * sizeof(mp_limb_t));
-    ninv = TMP_ALLOC(n_size * sizeof(mp_limb_t));
+    a    = TMP_ALLOC(n_size * sizeof(ulong));
+    y    = TMP_ALLOC(n_size * sizeof(ulong));
+    n    = TMP_ALLOC(n_size * sizeof(ulong));
+    ninv = TMP_ALLOC(n_size * sizeof(ulong));
 
     /* copying n_in onto n, and normalizing */
 

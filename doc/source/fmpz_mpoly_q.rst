@@ -143,7 +143,7 @@ The variable strings in *x* start with the variable of most significance at inde
 Random generation
 -------------------------------------------------------------------------------
 
-.. function:: void fmpz_mpoly_q_randtest(fmpz_mpoly_q_t res, flint_rand_t state, slong length, mp_limb_t coeff_bits, slong exp_bound, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_q_randtest(fmpz_mpoly_q_t res, flint_rand_t state, slong length, ulong coeff_bits, slong exp_bound, const fmpz_mpoly_ctx_t ctx)
 
     Sets *res* to a random rational function where both numerator and denominator
     have up to *length* terms, coefficients up to size *coeff_bits*, and

@@ -18,7 +18,7 @@
 #if FLINT64
 #define __u32 unsigned int
 #else
-#define __u32 mp_limb_t
+#define __u32 ulong
 #endif
 
 static const __u32 __bernoulli_denom_small[] =
@@ -39,8 +39,8 @@ static const __u32 __bernoulli_denom_small[] =
 void arith_bernoulli_number_denom(fmpz_t den, ulong n)
 {
     slong i;
-    mp_limb_t p;
-    const mp_limb_t * primes;
+    ulong p;
+    const ulong * primes;
 
     if (n % 2 == 1)
     {

@@ -39,14 +39,14 @@ sliding_select_k(ulong bits)
 /* todo: avoid swaps (or perform pointer swaps) */
 /* note: supports aliasing */
 static int
-_gr_pow_mpn_sliding(gr_ptr f, gr_srcptr g, mp_srcptr exp, mp_size_t en, gr_ctx_t ctx)
+_gr_pow_mpn_sliding(gr_ptr f, gr_srcptr g, nn_srcptr exp, slong en, gr_ctx_t ctx)
 {
     slong h, k, value;
     slong i, j, alloc;
     gr_ptr temp;
     fmpz * g_powers;
     slong sz = ctx->sizeof_elem;
-    mp_bitcnt_t ebits;
+    flint_bitcnt_t ebits;
     int status = GR_SUCCESS;
 
     ebits = (en - 1) * FLINT_BITS + FLINT_BIT_COUNT(exp[en - 1]);

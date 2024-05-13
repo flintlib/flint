@@ -603,7 +603,7 @@ int fmpz_mod_bpoly_divides(
         {
             for (j = order - 1; j >= 0; j--)
             {
-                mp_limb_t qc = n_poly_get_coeff(q, order*i + j);
+                ulong qc = n_poly_get_coeff(q, order*i + j);
                 if (qc == 0)
                     continue;
 

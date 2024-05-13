@@ -173,14 +173,14 @@ void fq_nmod_mpolyn_scalar_mul_fq_nmod(
     const fq_nmod_mpoly_ctx_t ctx)
 {
     slong i;
-    mp_limb_t * cc;
+    ulong * cc;
 
     FLINT_ASSERT(!fq_nmod_is_zero(c, ctx->fqctx));
 
     if (fq_nmod_is_one(c, ctx->fqctx))
         return;
 
-    cc = FLINT_ARRAY_ALLOC(fq_nmod_ctx_degree(ctx->fqctx), mp_limb_t);
+    cc = FLINT_ARRAY_ALLOC(fq_nmod_ctx_degree(ctx->fqctx), ulong);
 
     n_fq_set_fq_nmod(cc, c, ctx->fqctx);
 
@@ -199,13 +199,13 @@ void fq_nmod_mpolyun_scalar_mul_fq_nmod(
     const fq_nmod_mpoly_ctx_t ctx)
 {
     slong i, j;
-    mp_limb_t * cc;
+    ulong * cc;
     FLINT_ASSERT(!fq_nmod_is_zero(c, ctx->fqctx));
 
     if (fq_nmod_is_one(c, ctx->fqctx))
         return;
 
-    cc = FLINT_ARRAY_ALLOC(fq_nmod_ctx_degree(ctx->fqctx), mp_limb_t);
+    cc = FLINT_ARRAY_ALLOC(fq_nmod_ctx_degree(ctx->fqctx), ulong);
 
     n_fq_set_fq_nmod(cc, c, ctx->fqctx);
 
@@ -542,7 +542,7 @@ void fq_nmod_mpoly_from_mpolyn_perm_inflate(
     slong i, h, k, l;
     slong NA, NB;
     slong Alen;
-    mp_limb_t * Acoeff;
+    ulong * Acoeff;
     ulong * Aexp;
     ulong * Bexps;
     ulong * Aexps, * tAexp, * tAgexp;

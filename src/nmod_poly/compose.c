@@ -15,8 +15,8 @@
 #include "gr_poly.h"
 
 void
-_nmod_poly_compose(mp_ptr res, mp_srcptr poly1, slong len1,
-                               mp_srcptr poly2, slong len2, nmod_t mod)
+_nmod_poly_compose(nn_ptr res, nn_srcptr poly1, slong len1,
+                               nn_srcptr poly2, slong len2, nmod_t mod)
 {
     if (len1 == 1)
         res[0] = poly1[0];

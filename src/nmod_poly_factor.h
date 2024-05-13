@@ -36,7 +36,7 @@ typedef struct
     nmod_poly_struct * H;
     nmod_poly_struct * v;
     nmod_poly_struct * vinv;
-    mp_ptr tmp;
+    nn_ptr tmp;
     slong m;
 }
 nmod_poly_interval_poly_arg_t;
@@ -94,7 +94,7 @@ int nmod_poly_is_irreducible_rabin(const nmod_poly_t f);
 
 int nmod_poly_is_irreducible_ddf(const nmod_poly_t f);
 
-int _nmod_poly_is_squarefree(mp_srcptr f, slong len, nmod_t mod);
+int _nmod_poly_is_squarefree(nn_srcptr f, slong len, nmod_t mod);
 
 int nmod_poly_is_squarefree(const nmod_poly_t f);
 
@@ -109,16 +109,16 @@ void nmod_poly_factor_kaltofen_shoup(nmod_poly_factor_t res,
 
 void nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f);
 
-mp_limb_t nmod_poly_factor_with_berlekamp(nmod_poly_factor_t result,
+ulong nmod_poly_factor_with_berlekamp(nmod_poly_factor_t result,
     const nmod_poly_t input);
 
-mp_limb_t nmod_poly_factor_with_cantor_zassenhaus(nmod_poly_factor_t result,
+ulong nmod_poly_factor_with_cantor_zassenhaus(nmod_poly_factor_t result,
     const nmod_poly_t input);
 
-mp_limb_t nmod_poly_factor_with_kaltofen_shoup(nmod_poly_factor_t result,
+ulong nmod_poly_factor_with_kaltofen_shoup(nmod_poly_factor_t result,
     const nmod_poly_t input);
 
-mp_limb_t nmod_poly_factor(nmod_poly_factor_t result,
+ulong nmod_poly_factor(nmod_poly_factor_t result,
     const nmod_poly_t input);
 
 void _nmod_poly_interval_poly_worker(void* arg_ptr);

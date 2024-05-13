@@ -20,7 +20,7 @@ TEST_FUNCTION_START(nmod_poly_factor_is_squarefree, state)
     for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
     {
         nmod_poly_t poly, Q, R, t;
-        mp_limb_t modulus;
+        ulong modulus;
         slong i, num_factors, exp, max_exp;
         int v, result;
 

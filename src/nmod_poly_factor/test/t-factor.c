@@ -27,7 +27,7 @@ TEST_FUNCTION_START(nmod_poly_factor, state)
         int result = 1;
         nmod_poly_t pol1, poly, quot, rem, product;
         nmod_poly_factor_t res;
-        mp_limb_t modulus, lead = 1;
+        ulong modulus, lead = 1;
         slong length, num, i, j;
         ulong exp[5];
 
@@ -131,7 +131,7 @@ TEST_FUNCTION_START(nmod_poly_factor, state)
     {
         nmod_poly_t pol1, poly, quot, rem;
         nmod_poly_factor_t res, res2;
-        mp_limb_t modulus;
+        ulong modulus;
         slong length, num, i, j;
         slong exp[5];
         ulong inflation;

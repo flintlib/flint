@@ -15,7 +15,7 @@
 
 void _nmod_mpoly_pow_rmul(
     nmod_mpoly_t A,
-    const mp_limb_t * Bcoeffs, const ulong * Bexps, slong Blen,
+    const ulong * Bcoeffs, const ulong * Bexps, slong Blen,
     ulong k,
     slong N,
     const ulong * cmpmask,

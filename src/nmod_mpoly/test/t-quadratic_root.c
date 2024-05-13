@@ -80,7 +80,7 @@ TEST_FUNCTION_START(nmod_mpoly_quadratic_root, state)
         nmod_mpoly_t f, a, b, x;
         slong len, len1;
         flint_bitcnt_t exp_bits, exp_bits1;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, FLINT_BITS) + 1;
         modulus = n_randbits(state, modulus);

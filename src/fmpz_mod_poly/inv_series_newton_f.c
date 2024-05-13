@@ -34,7 +34,7 @@ void fmpz_mod_poly_inv_series_f(fmpz_t f, fmpz_mod_poly_t Qinv,
         Qcopy = (fmpz *) flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < Q->length; i++)
             Qcopy[i] = Q->coeffs[i];
-        flint_mpn_zero((mp_ptr) Qcopy + i, n - i);
+        flint_mpn_zero((nn_ptr) Qcopy + i, n - i);
         Qalloc = 1;
     }
 

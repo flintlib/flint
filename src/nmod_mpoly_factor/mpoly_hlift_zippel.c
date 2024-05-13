@@ -53,7 +53,7 @@ static int nmod_mpoly_from_zip(
     slong zvar = 1;
     ulong x, y, z;
     flint_bitcnt_t bits = B->bits;
-    mp_limb_t * Bcoeffs;
+    ulong * Bcoeffs;
     ulong * Bexps;
     slong N = mpoly_words_per_exp_sp(bits, ctx->minfo);
     ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
@@ -172,11 +172,11 @@ static void nmod_mpoly_set_eval_helper3(
     ulong y, x, z;
     slong yoff, xoff, zoff, * off;
     slong yshift, xshift, zshift, * shift;
-    mp_limb_t * p;
+    ulong * p;
     flint_bitcnt_t bits = A->bits;
     slong Alen = A->length;
     const ulong * Aexps = A->exps;
-    const mp_limb_t * Acoeffs = A->coeffs;
+    const ulong * Acoeffs = A->coeffs;
     slong N = mpoly_words_per_exp(bits, ctx->minfo);
     ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
     ulong * ind;
@@ -245,7 +245,7 @@ static void nmod_mpoly_set_eval_helper3(
         for (j = 0; j < n; j++)
         {
             slong Ai = ind[j];
-            mp_limb_t meval = 1;
+            ulong meval = 1;
 
             for (k = 2; k < yvar; k++)
             {
@@ -289,13 +289,13 @@ static slong nmod_mpoly_set_eval_helper_and_zip_form3(
     slong i, j, k, n;
     slong * off, * shift;
     ulong y, x, z;
-    mp_limb_t * p;
+    ulong * p;
     nmod_mpoly_struct * Hc;
     slong old_len, zip_length = 0;
     flint_bitcnt_t bits = B->bits;
     slong Blen = B->length;
     const ulong * Bexps = B->exps;
-    const mp_limb_t * Bcoeffs = B->coeffs;
+    const ulong * Bcoeffs = B->coeffs;
     slong N = mpoly_words_per_exp(bits, ctx->minfo);
     ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
     ulong * ind;
@@ -383,7 +383,7 @@ static slong nmod_mpoly_set_eval_helper_and_zip_form3(
         for (j = 0; j < n; j++)
         {
             slong Bi = ind[j];
-            mp_limb_t meval = 1;
+            ulong meval = 1;
 
             for (k = 2; k < yvar; k++)
             {
@@ -436,7 +436,7 @@ static slong nmod_mpoly_set_eval_helper_and_zip_form3(
 static void n_polyu_mod_eval_step(n_polyu_t E, n_polyun_t A, nmod_t ctx)
 {
     slong Ai, Ei, n;
-    mp_limb_t * p;
+    ulong * p;
 
     n_polyu_fit_length(E, A->length);
 
@@ -587,7 +587,7 @@ int nmod_mpoly_hlift_zippel(
     slong m,
     nmod_mpoly_struct * B,
     slong r,
-    const mp_limb_t * alpha,
+    const ulong * alpha,
     const nmod_mpoly_t A,
     const slong * degs,
     const nmod_mpoly_ctx_t ctx,
@@ -599,7 +599,7 @@ int nmod_mpoly_hlift_zippel(
     nmod_mpolyu_struct * H;
     n_polyun_struct M[1], Aeh[1], * Beh, * BBeval, * Z;
     n_polyu_struct Aeval[1], * Beval;
-    mp_limb_t * beta;
+    ulong * beta;
     n_poly_struct * caches;
     nmod_mpoly_t T1, T2;
     ulong * Bdegs;
@@ -638,7 +638,7 @@ int nmod_mpoly_hlift_zippel(
     }
 #endif
 
-    beta = FLINT_ARRAY_ALLOC(ctx->minfo->nvars,mp_limb_t);
+    beta = FLINT_ARRAY_ALLOC(ctx->minfo->nvars,ulong);
 
     /* caches for powers of the betas */
     caches = FLINT_ARRAY_ALLOC(3*ctx->minfo->nvars, n_poly_struct);

@@ -14,7 +14,7 @@
 #include "nmod_poly_mat.h"
 
 void
-nmod_poly_mat_init(nmod_poly_mat_t A, slong rows, slong cols, mp_limb_t n)
+nmod_poly_mat_init(nmod_poly_mat_t A, slong rows, slong cols, ulong n)
 {
     slong i;
 

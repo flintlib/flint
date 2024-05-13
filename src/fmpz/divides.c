@@ -32,7 +32,7 @@ fmpz_divides(fmpz_t q, const fmpz_t g, const fmpz_t h)
     {
         if (!COEFF_IS_MPZ(c2))  /* h is also small */
         {
-            mp_limb_t qz;
+            ulong qz;
 
             if (c1 < 0)
             {
@@ -67,7 +67,7 @@ fmpz_divides(fmpz_t q, const fmpz_t g, const fmpz_t h)
 
         if (!COEFF_IS_MPZ(c2))  /* h is small */
         {
-            mp_limb_t r;
+            ulong r;
 
             mq = _fmpz_promote(q);
 

@@ -42,12 +42,12 @@ fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h)
             }
 
             u2 = FLINT_ABS(c2);
-            fmpz_set_ui(f, mpn_gcd_1((mp_srcptr) &u2, (mp_size_t) 1, u1));
+            fmpz_set_ui(f, mpn_gcd_1((nn_srcptr) &u2, (slong) 1, u1));
         }
         else                    /* but h is large */
         {
             mpz_ptr mpzc2 = COEFF_TO_PTR(c2);
-            mp_size_t size = mpzc2->_mp_size;
+            slong size = mpzc2->_mp_size;
             /* The sign is stored in the size of an mpz, and gcd_1 only takes
              * positive integers. */
             fmpz_set_ui(f, mpn_gcd_1(mpzc2->_mp_d, FLINT_ABS(size), u1));
@@ -59,7 +59,7 @@ fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h)
         {
             ulong u2;
             mpz_ptr mpzc1;
-            mp_size_t size;
+            slong size;
 
             if (c2 == 0)
             {
@@ -186,7 +186,7 @@ fmpz_gcd3(fmpz_t res, const fmpz_t a, const fmpz_t b, const fmpz_t c)
     {
         /* Three-way mpz_gcd. */
         mpz_ptr rp, ap, bp, cp, tp;
-        mp_size_t an, bn, cn, mn;
+        slong an, bn, cn, mn;
 
         /* If res is small, it cannot be aliased with a, b, c, so promoting is fine. */
         rp = _fmpz_promote(res);
@@ -228,7 +228,7 @@ fmpz_gcd3(fmpz_t res, const fmpz_t a, const fmpz_t b, const fmpz_t c)
             /* It would be more efficient to allocate temporary space for
                gcd(a, b), but we can't be sure that mpz_gcd never attempts
                to reallocate the output. */
-            t->_mp_d = TMP_ALLOC(sizeof(mp_limb_t) * cn);
+            t->_mp_d = TMP_ALLOC(sizeof(ulong) * cn);
             t->_mp_size = t->_mp_alloc = cn;
             flint_mpn_copyi(t->_mp_d, cp->_mp_d, cn);
 

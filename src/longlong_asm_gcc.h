@@ -43,9 +43,9 @@ see https://www.gnu.org/licenses/.  */
 #define LONGLONG_ASM_H
 
 /* Machine specific operations */
-#if defined (__amd64__) || (GMP_LIMB_BITS == 32 && (defined (__i386__) || defined (__i486__)))
+#if defined (__amd64__) || (FLINT_BITS == 32 && (defined (__i386__) || defined (__i486__)))
 
-# if GMP_LIMB_BITS == 64 && defined (__amd64__)
+# if FLINT_BITS == 64 && defined (__amd64__)
 #  define _ASM_ADD "addq"
 #  define _ASM_ADC "adcq"
 #  define _ASM_SUB "subq"
@@ -125,7 +125,7 @@ see https://www.gnu.org/licenses/.  */
     : "=a" (w0), "=d" (w1) \
     : "%0" ((ulong)(u)), "rm" ((ulong)(v)))
 
-#elif (GMP_LIMB_BITS == 64 && defined(__aarch64__)) || (GMP_LIMB_BITS == 32 && defined(__arm__))
+#elif (FLINT_BITS == 64 && defined(__aarch64__)) || (FLINT_BITS == 32 && defined(__arm__))
 
 # define add_ssaaaa(s1, s0, a1, a0, b1, b0) \
   __asm__("adds %1,%3,%5\n" \

@@ -55,7 +55,7 @@ Bit sizes and norms
     the elements of ``vec``. Sets ``maxabs`` to the bit count of the
     maximum of the absolute values of the elements of ``vec``.
 
-.. function:: mp_size_t _fmpz_vec_max_limbs(const fmpz * vec, slong len)
+.. function:: slong _fmpz_vec_max_limbs(const fmpz * vec, slong len)
 
     Returns the maximum number of limbs needed to store the absolute value
     of any entry in ``(vec, len)``.  If all entries are zero, returns
@@ -130,25 +130,25 @@ Conversions
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fmpz_vec_get_nmod_vec(mp_ptr res, const fmpz * poly, slong len, nmod_t mod)
+.. function:: void _fmpz_vec_get_nmod_vec(nn_ptr res, const fmpz * poly, slong len, nmod_t mod)
 
     Reduce the coefficients of ``(poly, len)`` modulo the given
     modulus and set ``(res, len)`` to the result.
 
-.. function:: void _fmpz_vec_set_nmod_vec(fmpz * res, mp_srcptr poly, slong len, nmod_t mod)
+.. function:: void _fmpz_vec_set_nmod_vec(fmpz * res, nn_srcptr poly, slong len, nmod_t mod)
 
     Set the coefficients of ``(res, len)`` to the symmetric modulus
     of the coefficients of ``(poly, len)``, i.e. convert the given
     coefficients modulo the given modulus `n` to their signed integer
     representatives in the range `[-n/2, n/2)`.
 
-.. function:: void _fmpz_vec_get_fft(mp_limb_t ** coeffs_f, const fmpz * coeffs_m, slong l, slong length)
+.. function:: void _fmpz_vec_get_fft(ulong ** coeffs_f, const fmpz * coeffs_m, slong l, slong length)
 
     Convert the vector of coeffs ``coeffs_m`` to an fft vector
     ``coeffs_f`` of the given ``length`` with ``l`` limbs per
     coefficient with an additional limb for overflow.
 
-.. function:: void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length, const mp_ptr * coeffs_f, slong limbs, slong sign)
+.. function:: void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length, const nn_ptr * coeffs_f, slong limbs, slong sign)
 
     Convert an fft vector ``coeffs_f`` of fully reduced Fermat numbers of the
     given ``length`` to a vector of ``fmpz``'s. Each is assumed to be the given

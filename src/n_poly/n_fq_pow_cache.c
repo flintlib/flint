@@ -15,7 +15,7 @@
 
 /* hold positive and negative powers of b */
 void n_fq_pow_cache_start_n_fq(
-    const mp_limb_t * b,
+    const ulong * b,
     n_poly_t pos,       /* b^0, b^1, b^2, ..., b^50 */
     n_poly_t bin,       /* b^1, b^2, b^3,  b^4, b^8, b^12, ... */
     n_poly_t neg,       /* b^-0, b^-1, b^-2, ..., b^-50 */
@@ -48,18 +48,18 @@ void n_fq_pow_cache_start_fq_nmod(
 
 /* r = a*b^e */
 static void n_fq_pow_cache_mulpow_ui_array_bin(
-    mp_limb_t * r,
-    const mp_limb_t * a,
-    mp_limb_t * elimbs, slong elen,
+    ulong * r,
+    const ulong * a,
+    ulong * elimbs, slong elen,
     n_poly_t bin,
-    const mp_limb_t * b,
+    const ulong * b,
     const fq_nmod_ctx_t ctx,
-    mp_limb_t * tmp)    /* size d*N_FQ_MUL_ITCH */
+    ulong * tmp)    /* size d*N_FQ_MUL_ITCH */
 {
     slong d = fq_nmod_ctx_degree(ctx);
-    const mp_limb_t * s = a; /* source */
+    const ulong * s = a; /* source */
     slong ei = 0, i = 0;
-    mp_limb_t e = (ei < elen) ? elimbs[ei] : 0;
+    ulong e = (ei < elen) ? elimbs[ei] : 0;
     int bits_left = FLINT_BITS;
 
     /* complicated code needed if an odd number of bits per limb */
@@ -130,8 +130,8 @@ static void n_fq_pow_cache_mulpow_ui_array_bin(
 
 /* r =  a*b^e */
 void n_fq_pow_cache_mulpow_ui(
-    mp_limb_t * r,
-    const mp_limb_t * a,
+    ulong * r,
+    const ulong * a,
     ulong e,
     n_poly_t pos,
     n_poly_t bin,
@@ -182,8 +182,8 @@ void n_fq_pow_cache_mulpow_ui(
 
 /* r =  a*b^-e */
 void n_fq_pow_cache_mulpow_neg_ui(
-    mp_limb_t * r,
-    const mp_limb_t * a,
+    ulong * r,
+    const ulong * a,
     ulong e,
     n_poly_t pos,
     n_poly_t bin,
@@ -191,7 +191,7 @@ void n_fq_pow_cache_mulpow_neg_ui(
     const fq_nmod_ctx_t ctx)
 {
     slong i, d = fq_nmod_ctx_degree(ctx);
-    mp_limb_t * tmp;
+    ulong * tmp;
     fmpz_t f;
 
     FLINT_ASSERT(pos->length >= 2);
@@ -242,8 +242,8 @@ void n_fq_pow_cache_mulpow_neg_ui(
 
 /* r = a*b^-e */
 void n_fq_pow_cache_mulpow_fmpz(
-    mp_limb_t * r,
-    const mp_limb_t * a,
+    ulong * r,
+    const ulong * a,
     const fmpz_t e,
     n_poly_t pos,
     n_poly_t bin,

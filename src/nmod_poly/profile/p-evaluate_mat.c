@@ -29,7 +29,7 @@ main(void)
     int result;
     nmod_mat_t A, B, C;
     nmod_poly_t poly;
-    mp_limb_t n;
+    ulong n;
     clock_t horner_begin, paterson_begin;
     double horner_time, paterson_time;
     FLINT_TEST_INIT(state);

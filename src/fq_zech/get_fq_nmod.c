@@ -18,7 +18,7 @@ void
 fq_zech_get_fq_nmod(fq_nmod_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx)
 {
     slong i;
-    mp_limb_t q, r;
+    ulong q, r;
 
     nmod_poly_fit_length(rop, fq_zech_ctx_degree(ctx));
     nmod_poly_zero(rop);

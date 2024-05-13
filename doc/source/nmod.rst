@@ -6,7 +6,7 @@
 Modular reduction and arithmetic
 --------------------------------------------------------------------------------
 
-.. function:: void nmod_init(nmod_t * mod, mp_limb_t n)
+.. function:: void nmod_init(nmod_t * mod, ulong n)
 
     Initialises the given ``nmod_t`` structure for reduction modulo `n`
     with a precomputed inverse.
@@ -67,68 +67,68 @@ Modular reduction and arithmetic
     ``mod`` parameter must be a valid ``nmod_t`` structure. It is 
     assumed that `r`, `a`, `b` are already reduced modulo ``mod.n``.
 
-.. function:: mp_limb_t _nmod_add(mp_limb_t a, mp_limb_t b, nmod_t mod)
+.. function:: ulong _nmod_add(ulong a, ulong b, nmod_t mod)
 
     Returns `a + b` modulo ``mod.n``. It is assumed that ``mod`` is 
     no more than ``FLINT_BITS - 1`` bits. It is assumed that `a` and `b` 
     are already reduced modulo ``mod.n``.
 
-.. function:: mp_limb_t nmod_add(mp_limb_t a, mp_limb_t b, nmod_t mod)
+.. function:: ulong nmod_add(ulong a, ulong b, nmod_t mod)
 
     Returns `a + b` modulo ``mod.n``. No assumptions are made about 
     ``mod.n``. It is assumed that `a` and `b` are already reduced 
     modulo ``mod.n``.
 
-.. function:: mp_limb_t _nmod_sub(mp_limb_t a, mp_limb_t b, nmod_t mod)
+.. function:: ulong _nmod_sub(ulong a, ulong b, nmod_t mod)
 
     Returns `a - b` modulo ``mod.n``. It is assumed that ``mod`` 
     is no more than ``FLINT_BITS - 1`` bits. It is assumed that 
     `a` and `b` are already reduced modulo ``mod.n``.
 
-.. function:: mp_limb_t nmod_sub(mp_limb_t a, mp_limb_t b, nmod_t mod)
+.. function:: ulong nmod_sub(ulong a, ulong b, nmod_t mod)
 
     Returns `a - b` modulo ``mod.n``. No assumptions are made about 
     ``mod.n``. It is assumed that `a` and `b` are already reduced 
     modulo ``mod.n``.
 
-.. function:: mp_limb_t nmod_neg(mp_limb_t a, nmod_t mod)
+.. function:: ulong nmod_neg(ulong a, nmod_t mod)
 
     Returns `-a` modulo ``mod.n``. It is assumed that `a` is already 
     reduced modulo ``mod.n``, but no assumptions are made about the 
     latter.
 
-.. function:: mp_limb_t nmod_mul(mp_limb_t a, mp_limb_t b, nmod_t mod)
+.. function:: ulong nmod_mul(ulong a, ulong b, nmod_t mod)
 
     Returns `ab` modulo ``mod.n``. No assumptions are made about 
     ``mod.n``. It is assumed that `a` and `b` are already reduced 
     modulo ``mod.n``.
 
-.. function:: mp_limb_t _nmod_mul_fullword(mp_limb_t a, mp_limb_t b, nmod_t mod)
+.. function:: ulong _nmod_mul_fullword(ulong a, ulong b, nmod_t mod)
 
     Returns `ab` modulo ``mod.n``. Requires that ``mod.n`` is exactly
     ``FLINT_BITS`` large. It is assumed that `a` and `b` are already
     reduced modulo ``mod.n``.
 
-.. function:: mp_limb_t nmod_inv(mp_limb_t a, nmod_t mod)
+.. function:: ulong nmod_inv(ulong a, nmod_t mod)
 
     Returns `a^{-1}` modulo ``mod.n``. The inverse is assumed to exist.
 
-.. function:: mp_limb_t nmod_div(mp_limb_t a, mp_limb_t b, nmod_t mod)
+.. function:: ulong nmod_div(ulong a, ulong b, nmod_t mod)
 
     Returns `ab^{-1}` modulo ``mod.n``. The inverse of `b` is assumed to
     exist. It is assumed that `a` is already reduced modulo ``mod.n``.
 
-.. function:: int nmod_divides(mp_limb_t * a, mp_limb_t b, mp_limb_t c, nmod_t mod)
+.. function:: int nmod_divides(ulong * a, ulong b, ulong c, nmod_t mod)
 
     If `a\cdot c = b \mod n` has a solution for `a` return `1` and set `a` to such a solution. Otherwise return `0` and leave `a` undefined.
 
-.. function:: mp_limb_t nmod_pow_ui(mp_limb_t a, ulong e, nmod_t mod)
+.. function:: ulong nmod_pow_ui(ulong a, ulong e, nmod_t mod)
 
     Returns `a^e` modulo ``mod.n``. No assumptions are made about 
     ``mod.n``. It is assumed that `a` is already reduced
     modulo ``mod.n``.
 
-.. function:: mp_limb_t nmod_pow_fmpz(mp_limb_t a, const fmpz_t e, nmod_t mod)
+.. function:: ulong nmod_pow_fmpz(ulong a, const fmpz_t e, nmod_t mod)
 
     Returns `a^e` modulo ``mod.n``. No assumptions are made about 
     ``mod.n``. It is assumed that `a` is already reduced
@@ -146,16 +146,16 @@ Discrete Logarithms via Pohlig-Hellman
 
     Free any space used by ``L``.
 
-.. function:: double nmod_discrete_log_pohlig_hellman_precompute_prime(nmod_discrete_log_pohlig_hellman_t L, mp_limb_t p)
+.. function:: double nmod_discrete_log_pohlig_hellman_precompute_prime(nmod_discrete_log_pohlig_hellman_t L, ulong p)
 
     Configure ``L`` for discrete logarithms modulo ``p`` to an internally chosen base. It is assumed that ``p`` is prime.
     The return is an estimate on the number of multiplications needed for one run.
 
-.. function:: mp_limb_t nmod_discrete_log_pohlig_hellman_primitive_root(const nmod_discrete_log_pohlig_hellman_t L)
+.. function:: ulong nmod_discrete_log_pohlig_hellman_primitive_root(const nmod_discrete_log_pohlig_hellman_t L)
 
     Return the internally stored base.
 
-.. function:: ulong nmod_discrete_log_pohlig_hellman_run(const nmod_discrete_log_pohlig_hellman_t L, mp_limb_t y)
+.. function:: ulong nmod_discrete_log_pohlig_hellman_run(const nmod_discrete_log_pohlig_hellman_t L, ulong y)
 
     Return the logarithm of ``y`` with respect to the internally stored base. ``y`` is expected to be reduced modulo the ``p``.
     The function is undefined if the logarithm does not exist.

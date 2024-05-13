@@ -497,10 +497,10 @@ static void _lattice(
     fq_zech_bpoly_struct * ld;
     nmod_mat_t M, T1, T2;
     int nlimbs;
-    mp_limb_t * trow;
+    ulong * trow;
 
     nlimbs = _nmod_vec_dot_bound_limbs(r, fq_zech_ctx_mod(ctx));
-    trow = (mp_limb_t *) flint_malloc(r*sizeof(mp_limb_t));
+    trow = (ulong *) flint_malloc(r*sizeof(ulong));
     fq_zech_bpoly_init(Q, ctx);
     fq_zech_bpoly_init(R, ctx);
     fq_zech_bpoly_init(dg, ctx);

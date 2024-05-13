@@ -14,9 +14,9 @@
 #include "ulong_extras.h"
 
 /* return (x|y)*(-1)^tstbit(r,1) */
-int _n_jacobi_unsigned(mp_limb_t x, mp_limb_t y, unsigned int r)
+int _n_jacobi_unsigned(ulong x, ulong y, unsigned int r)
 {
-    mp_limb_t t, st;
+    ulong t, st;
     int e;
 
     FLINT_ASSERT(y & 1);
@@ -43,12 +43,12 @@ int _n_jacobi_unsigned(mp_limb_t x, mp_limb_t y, unsigned int r)
     return (int)(r & 2) - 1;
 }
 
-int n_jacobi_unsigned(mp_limb_t x, mp_limb_t y)
+int n_jacobi_unsigned(ulong x, ulong y)
 {
     return _n_jacobi_unsigned(x, y, 0);
 }
 
-int n_jacobi(mp_limb_signed_t x, mp_limb_t y)
+int n_jacobi(slong x, ulong y)
 {
     return _n_jacobi_unsigned(FLINT_ABS(x), y, FLINT_SIGN_EXT(x) & y);
 }

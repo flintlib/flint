@@ -25,7 +25,7 @@ TEST_FUNCTION_START(nmod_poly_factor_squarefree, state)
         int result = 1;
         nmod_poly_t pol1, poly, quot, rem;
         nmod_poly_factor_t res;
-        mp_limb_t modulus;
+        ulong modulus;
         slong exp[5], prod1;
         slong length, i, j, num;
 

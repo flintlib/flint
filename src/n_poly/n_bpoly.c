@@ -94,7 +94,7 @@ void _n_bpoly_set(n_bpoly_t A, const n_bpoly_t B)
         n_poly_set(A->coeffs + i, B->coeffs + i);
 }
 
-void n_bpoly_set_coeff_nonzero(n_bpoly_t A, slong xi, slong yi, mp_limb_t c)
+void n_bpoly_set_coeff_nonzero(n_bpoly_t A, slong xi, slong yi, ulong c)
 {
     slong i;
 
@@ -112,7 +112,7 @@ void n_bpoly_set_coeff_nonzero(n_bpoly_t A, slong xi, slong yi, mp_limb_t c)
     FLINT_ASSERT(!n_poly_is_zero(A->coeffs + A->length - 1));
 }
 
-void n_bpoly_set_coeff(n_bpoly_t A, slong xi, slong yi, mp_limb_t c)
+void n_bpoly_set_coeff(n_bpoly_t A, slong xi, slong yi, ulong c)
 {
     slong i;
 

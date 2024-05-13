@@ -9,14 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
 /* Assumes poly1 and poly2 are not length 0. */
 void
-_nmod_poly_mulhigh_classical(mp_ptr res, mp_srcptr poly1,
-                             slong len1, mp_srcptr poly2, slong len2, slong start,
+_nmod_poly_mulhigh_classical(nn_ptr res, nn_srcptr poly1,
+                             slong len1, nn_srcptr poly2, slong len2, slong start,
                              nmod_t mod)
 {
     slong m, n;

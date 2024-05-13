@@ -11,12 +11,12 @@
 
 #include "ulong_extras.h"
 
-mp_limb_t n_mulmod_precomp(mp_limb_t a, mp_limb_t b, mp_limb_t n, double npre)
+ulong n_mulmod_precomp(ulong a, ulong b, ulong n, double npre)
 {
-    mp_limb_t quot;
+    ulong quot;
     slong rem;
 
-    quot = (mp_limb_t) ((double) a * (double) b * npre);
+    quot = (ulong) ((double) a * (double) b * npre);
     rem  = a * b - quot * n;
     if (rem < 0)
     {

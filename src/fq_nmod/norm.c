@@ -20,12 +20,12 @@
     This computes the norm on $\mathbf{F}_q$.
  */
 
-void _fq_nmod_norm(fmpz_t rop2, const mp_limb_t *op, slong len,
+void _fq_nmod_norm(fmpz_t rop2, const ulong *op, slong len,
                         const fq_nmod_ctx_t ctx)
 {
     const slong d = fq_nmod_ctx_degree(ctx);
 
-    mp_limb_t rop;
+    ulong rop;
 
     if (d == 1)
     {
@@ -49,7 +49,7 @@ void _fq_nmod_norm(fmpz_t rop2, const mp_limb_t *op, slong len,
          */
         if (ctx->modulus->coeffs[d] != WORD(1))
         {
-            mp_limb_t f;
+            ulong f;
             f = n_powmod2_ui_preinv(ctx->modulus->coeffs[d], len - 1, ctx->mod.n, ctx->mod.ninv);
             f = n_invmod(f, ctx->mod.n);
             rop = n_mulmod2_preinv(f, rop, ctx->mod.n, ctx->mod.ninv);

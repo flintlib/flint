@@ -17,7 +17,7 @@
 # define FMPQ_HARMONIC_UI_TAB_SIZE 25
 #endif
 
-static const mp_limb_t fmpq_harmonic_ui_tab_num[] =
+static const ulong fmpq_harmonic_ui_tab_num[] =
 {
     0, 1, 3, 11, 25, 137, 49, 363, 761, 7129, 7381, 83711, 86021, 1145993,
     1171733, 1195757, 2436559, 42142223, 14274301, 275295799, 55835135,
@@ -34,7 +34,7 @@ static const mp_limb_t fmpq_harmonic_ui_tab_num[] =
 #endif
 };
 
-const mp_limb_t fmpq_harmonic_ui_tab_den[] =
+const ulong fmpq_harmonic_ui_tab_den[] =
 {
     1, 1, 2, 6, 12, 60, 20, 140, 280, 2520, 2520, 27720, 27720, 360360,
     360360, 360360, 720720, 12252240, 4084080, 77597520, 15519504, 5173168,
@@ -105,7 +105,7 @@ def harmonic(n):
 static void
 harmonic_odd_direct(fmpz_t P, fmpz_t Q, ulong a, ulong b, ulong n, int d)
 {
-    mp_limb_t p, q, r, s, t, u, v, w = 0;
+    ulong p, q, r, s, t, u, v, w = 0;
     slong k;
 
     fmpz_zero(P);
@@ -122,7 +122,7 @@ harmonic_odd_direct(fmpz_t P, fmpz_t Q, ulong a, ulong b, ulong n, int d)
                 d++;
 
             r = (UWORD(1) << d) - UWORD(1);
-            s = ((mp_limb_t) k) << (d-1);
+            s = ((ulong) k) << (d-1);
 
             umul_ppmm(t, u, p, s);
             umul_ppmm(v, w, q, r);

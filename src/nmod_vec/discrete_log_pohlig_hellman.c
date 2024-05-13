@@ -63,7 +63,7 @@ static slong _pow_ui_cost(ulong pow)
     Assume that p is prime, don't check. Return an estimate on the number of
     multiplications need for one run.
 */
-double nmod_discrete_log_pohlig_hellman_precompute_prime(nmod_discrete_log_pohlig_hellman_t L, mp_limb_t p)
+double nmod_discrete_log_pohlig_hellman_precompute_prime(nmod_discrete_log_pohlig_hellman_t L, ulong p)
 {
     slong i;
     ulong c;
@@ -198,12 +198,12 @@ try_alpha:
 }
 
 /* return x such that y = alpha^x mod p, alpha is the p.r. L->alpha*/
-ulong nmod_discrete_log_pohlig_hellman_run(const nmod_discrete_log_pohlig_hellman_t L, mp_limb_t y)
+ulong nmod_discrete_log_pohlig_hellman_run(const nmod_discrete_log_pohlig_hellman_t L, ulong y)
 {
     slong i, j;
     ulong x, q, r, e, x0 = 0, x1 = 0, x2 = 0, pp0, pp1, acc, g, pipow;
     ulong lo, mid, hi, d;
-    mp_limb_t beta, z, w;
+    ulong beta, z, w;
     nmod_discrete_log_pohlig_hellman_entry_struct * Li;
 
     FLINT_ASSERT(y != 0);

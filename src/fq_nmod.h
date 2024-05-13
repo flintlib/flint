@@ -74,9 +74,9 @@ void fq_nmod_init2(fq_nmod_t rop, const fq_nmod_ctx_t ctx);
 
 void fq_nmod_clear(fq_nmod_t rop, const fq_nmod_ctx_t FLINT_UNUSED(ctx));
 
-void _fq_nmod_sparse_reduce(mp_limb_t *R, slong lenR, const fq_nmod_ctx_t ctx);
-void _fq_nmod_dense_reduce(mp_limb_t* R, slong lenR, const fq_nmod_ctx_t ctx);
-void _fq_nmod_reduce(mp_limb_t* R, slong lenR, const fq_nmod_ctx_t ctx);
+void _fq_nmod_sparse_reduce(ulong *R, slong lenR, const fq_nmod_ctx_t ctx);
+void _fq_nmod_dense_reduce(ulong* R, slong lenR, const fq_nmod_ctx_t ctx);
+void _fq_nmod_reduce(ulong* R, slong lenR, const fq_nmod_ctx_t ctx);
 void fq_nmod_reduce(fq_nmod_t rop, const fq_nmod_ctx_t ctx);
 
 /* Basic arithmetic **********************************************************/
@@ -107,7 +107,7 @@ void fq_nmod_sqr(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 
 void fq_nmod_inv(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t ctx);
 
-void _fq_nmod_pow(mp_limb_t *rop, const mp_limb_t *op,
+void _fq_nmod_pow(ulong *rop, const ulong *op,
                            slong len, const fmpz_t e, const fq_nmod_ctx_t ctx);
 
 void fq_nmod_pow(fq_nmod_t rop, const fq_nmod_t op1,
@@ -177,17 +177,17 @@ char * fq_nmod_get_str_pretty(const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 
 /* Special functions *********************************************************/
 
-void _fq_nmod_trace(fmpz_t rop, const mp_limb_t *op, slong len,
+void _fq_nmod_trace(fmpz_t rop, const ulong *op, slong len,
                     const fq_nmod_ctx_t ctx);
 
 void fq_nmod_trace(fmpz_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 
-void _fq_nmod_frobenius(mp_limb_t *rop, const mp_limb_t *op, slong len, slong e,
+void _fq_nmod_frobenius(ulong *rop, const ulong *op, slong len, slong e,
                         const fq_nmod_ctx_t ctx);
 
 void fq_nmod_frobenius(fq_nmod_t rop, const fq_nmod_t op, slong e, const fq_nmod_ctx_t ctx);
 
-void _fq_nmod_norm(fmpz_t rop, const mp_limb_t *op, slong len,
+void _fq_nmod_norm(fmpz_t rop, const ulong *op, slong len,
                    const fq_nmod_ctx_t ctx);
 
 void fq_nmod_norm(fmpz_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx);

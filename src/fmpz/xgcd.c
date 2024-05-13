@@ -150,7 +150,7 @@ fmpz_xgcd_canonical_bezout(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const f
         mpz_t mf;
         ulong tf = FLINT_ABS(*f);
 
-        mf->_mp_d = (mp_limb_t *) &tf;
+        mf->_mp_d = (ulong *) &tf;
         mf->_mp_size  = fmpz_sgn(f);
 
         _fmpz_promote(d);
@@ -165,7 +165,7 @@ fmpz_xgcd_canonical_bezout(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const f
         mpz_t mg;
         ulong tg = FLINT_ABS(*g);
 
-        mg->_mp_d = (mp_limb_t *) &tg;
+        mg->_mp_d = (ulong *) &tg;
         mg->_mp_size  = fmpz_sgn(g);
 
         _fmpz_promote(d);

@@ -205,7 +205,7 @@ void fmpz_combit(fmpz_t f, ulong i)
 
 flint_bitcnt_t fmpz_popcnt(const fmpz_t c)
 {
-    mp_limb_t d;
+    ulong d;
     fmpz c1 = *c;
 
     if (!COEFF_IS_MPZ(c1))

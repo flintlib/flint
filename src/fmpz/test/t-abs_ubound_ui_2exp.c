@@ -23,7 +23,7 @@ TEST_FUNCTION_START(fmpz_abs_ubound_ui_2exp, state)
         fmpz_t x, y;
         slong bits, yexp;
         slong exp;
-        mp_limb_t man;
+        ulong man;
 
         fmpz_init(x);
         fmpz_init(y);

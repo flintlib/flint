@@ -28,7 +28,7 @@ slong _n_poly_vec_max_degree(const n_poly_struct * A, slong Alen)
 void _n_poly_vec_mul_nmod_intertible(
     n_poly_struct * A,
     slong Alen,
-    mp_limb_t c,
+    ulong c,
     nmod_t ctx)
 {
     slong i;

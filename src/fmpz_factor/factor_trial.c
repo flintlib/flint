@@ -19,15 +19,15 @@ int
 fmpz_factor_trial(fmpz_factor_t factor, const fmpz_t n, slong num_primes)
 {
     ulong exp;
-    mp_limb_t p;
+    ulong p;
     mpz_t x;
-    mp_ptr xd;
-    mp_size_t xsize;
+    nn_ptr xd;
+    slong xsize;
     slong found;
     int ret = 1;
     slong * idx;
     slong bits, i;
-    const mp_limb_t * primes;
+    const ulong * primes;
 
     if (num_primes > 3512 || num_primes < 0)
     {

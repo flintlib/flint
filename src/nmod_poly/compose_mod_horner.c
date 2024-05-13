@@ -15,11 +15,11 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_compose_mod_horner(mp_ptr res,
-    mp_srcptr f, slong lenf, mp_srcptr g, mp_srcptr h, slong lenh, nmod_t mod)
+_nmod_poly_compose_mod_horner(nn_ptr res,
+    nn_srcptr f, slong lenf, nn_srcptr g, nn_srcptr h, slong lenh, nmod_t mod)
 {
     slong i, len;
-    mp_ptr t;
+    nn_ptr t;
 
     if (lenh == 1)
         return;
@@ -65,7 +65,7 @@ nmod_poly_compose_mod_horner(nmod_poly_t res,
     slong len3 = poly3->length;
     slong len = len3 - 1;
 
-    mp_ptr ptr2;
+    nn_ptr ptr2;
 
     if (len3 == 0)
     {

@@ -19,20 +19,20 @@ TEST_FUNCTION_START(arb_atan_taylor_rs, state)
 
     for (iter = 0; iter < 100000 * 0.1 * flint_test_multiplier(); iter++)
     {
-        mp_ptr x, y1, y2, t;
-        mp_limb_t err1, err2;
+        nn_ptr x, y1, y2, t;
+        ulong err1, err2;
         ulong N;
-        mp_size_t xn;
+        slong xn;
         int alternating, cmp, result;
 
         N = n_randint(state, 256);
         alternating = n_randint(state, 2);
         xn = 1 + n_randint(state, 20);
 
-        x = flint_malloc(sizeof(mp_limb_t) * xn);
-        y1 = flint_malloc(sizeof(mp_limb_t) * xn);
-        y2 = flint_malloc(sizeof(mp_limb_t) * xn);
-        t = flint_malloc(sizeof(mp_limb_t) * xn);
+        x = flint_malloc(sizeof(ulong) * xn);
+        y1 = flint_malloc(sizeof(ulong) * xn);
+        y2 = flint_malloc(sizeof(ulong) * xn);
+        t = flint_malloc(sizeof(ulong) * xn);
 
         flint_mpn_rrandom(x, state, xn);
         x[xn - 1] &= (LIMB_ONES >> 4);

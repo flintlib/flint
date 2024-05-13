@@ -33,9 +33,9 @@ arf_set(arf_t y, const arf_t x)
         }
         else
         {
-            mp_ptr yptr;
-            mp_srcptr xptr;
-            mp_size_t n;
+            nn_ptr yptr;
+            nn_srcptr xptr;
+            slong n;
 
             ARF_GET_MPN_READONLY(xptr, n, x);
             ARF_GET_MPN_WRITE(yptr, n, y);
@@ -51,9 +51,9 @@ void
 arf_set_d(arf_t x, double v)
 {
 #if FLINT_BITS == 64
-    mp_limb_t h, sign, exp, frac;
+    ulong h, sign, exp, frac;
     slong real_exp, real_man;
-    union { double uf; mp_limb_t ul; } u;
+    union { double uf; ulong ul; } u;
 
     u.uf = v;
     h = u.ul;
@@ -103,7 +103,7 @@ arf_set_d(arf_t x, double v)
     arf_set_si_2exp_si(x, real_man, real_exp);
 #else
     mpfr_t t;
-    mp_limb_t tmp[2];
+    ulong tmp[2];
 
     t->_mpfr_prec = 53;
     t->_mpfr_sign = 1;
@@ -132,19 +132,19 @@ arf_set_mpfr(arf_t x, const mpfr_t y)
     }
     else
     {
-        mp_size_t n = (y->_mpfr_prec + FLINT_BITS - 1) / FLINT_BITS;
+        slong n = (y->_mpfr_prec + FLINT_BITS - 1) / FLINT_BITS;
         arf_set_mpn(x, y->_mpfr_d, n, y->_mpfr_sign < 0);
         fmpz_set_si(ARF_EXPREF(x), y->_mpfr_exp);
     }
 }
 
 void
-arf_set_mpn(arf_t y, mp_srcptr x, mp_size_t xn, int sgnbit)
+arf_set_mpn(arf_t y, nn_srcptr x, slong xn, int sgnbit)
 {
     unsigned int leading;
-    mp_size_t yn, xn1;
-    mp_ptr yptr;
-    mp_limb_t bot;
+    slong yn, xn1;
+    nn_ptr yptr;
+    ulong bot;
 
     xn1 = xn;
 
@@ -182,8 +182,8 @@ arf_set_mpn(arf_t y, mp_srcptr x, mp_size_t xn, int sgnbit)
 }
 
 int
-_arf_set_mpn_fixed(arf_t z, mp_srcptr xp, mp_size_t xn,
-        mp_size_t fixn, int negative, slong prec, arf_rnd_t rnd)
+_arf_set_mpn_fixed(arf_t z, nn_srcptr xp, slong xn,
+        slong fixn, int negative, slong prec, arf_rnd_t rnd)
 {
     slong exp, exp_shift;
     int inexact;

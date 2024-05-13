@@ -108,7 +108,7 @@ slong _fmpz_mpoly_quasidivrem_heap1(fmpz_t scale, slong * lenr,
             len = FLINT_MAX(q_len + 1, 2*qs_alloc);
             qs = (fmpz *) flint_realloc(qs, len*sizeof(fmpz));
             if (len > qs_alloc)
-                flint_mpn_zero((mp_ptr) (qs + qs_alloc), len - qs_alloc);
+                flint_mpn_zero((nn_ptr) (qs + qs_alloc), len - qs_alloc);
             qs_alloc = len;
         }
         /* make sure remainder array has space for r_len + 1 entries */
@@ -119,7 +119,7 @@ slong _fmpz_mpoly_quasidivrem_heap1(fmpz_t scale, slong * lenr,
             len = FLINT_MAX(r_len + 1, 2*rs_alloc);
             rs = (fmpz *) flint_realloc(rs, len*sizeof(fmpz));
             if (len > rs_alloc)
-                flint_mpn_zero((mp_ptr) (rs + rs_alloc), len - rs_alloc);
+                flint_mpn_zero((nn_ptr) (rs + rs_alloc), len - rs_alloc);
             rs_alloc = len;
         }
 
@@ -470,7 +470,7 @@ slong _fmpz_mpoly_quasidivrem_heap(fmpz_t scale, slong * lenr,
             len = FLINT_MAX(q_len + 1, 2*qs_alloc);
             qs = (fmpz *) flint_realloc(qs, len*sizeof(fmpz));
             if (len > qs_alloc)
-                flint_mpn_zero((mp_ptr) (qs + qs_alloc), len - qs_alloc);
+                flint_mpn_zero((nn_ptr) (qs + qs_alloc), len - qs_alloc);
             qs_alloc = len;
         }
         /* make sure remainder array has space for r_len + 1 entries */
@@ -481,7 +481,7 @@ slong _fmpz_mpoly_quasidivrem_heap(fmpz_t scale, slong * lenr,
             len = FLINT_MAX(r_len + 1, 2*rs_alloc);
             rs = (fmpz *) flint_realloc(rs, len*sizeof(fmpz));
             if (len > rs_alloc)
-                flint_mpn_zero((mp_ptr) (rs + rs_alloc), len - rs_alloc);
+                flint_mpn_zero((nn_ptr) (rs + rs_alloc), len - rs_alloc);
             rs_alloc = len;
         }
 

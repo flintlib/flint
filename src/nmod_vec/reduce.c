@@ -12,7 +12,7 @@
 #include "nmod.h"
 #include "nmod_vec.h"
 
-void _nmod_vec_reduce(mp_ptr res, mp_srcptr vec, slong len, nmod_t mod)
+void _nmod_vec_reduce(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod)
 {
     slong i;
     for (i = 0 ; i < len; i++)

@@ -16,12 +16,12 @@
 #include "gr_poly.h"
 
 void
-_nmod_poly_div_series_basecase_preinv1(mp_ptr Qinv, mp_srcptr P, slong Plen,
-                                mp_srcptr Q, slong Qlen, slong n, mp_limb_t q, nmod_t mod)
+_nmod_poly_div_series_basecase_preinv1(nn_ptr Qinv, nn_srcptr P, slong Plen,
+                                nn_srcptr Q, slong Qlen, slong n, ulong q, nmod_t mod)
 {
     slong i, j, l;
     int nlimbs;
-    mp_limb_t s;
+    ulong s;
 
     Plen = FLINT_MIN(Plen, n);
     Qlen = FLINT_MIN(Qlen, n);
@@ -57,10 +57,10 @@ _nmod_poly_div_series_basecase_preinv1(mp_ptr Qinv, mp_srcptr P, slong Plen,
 }
 
 void
-_nmod_poly_div_series_basecase(mp_ptr Qinv, mp_srcptr P, slong Plen,
-                                mp_srcptr Q, slong Qlen, slong n, nmod_t mod)
+_nmod_poly_div_series_basecase(nn_ptr Qinv, nn_srcptr P, slong Plen,
+                                nn_srcptr Q, slong Qlen, slong n, nmod_t mod)
 {
-    mp_limb_t q;
+    ulong q;
 
     q = Q[0];
     if (q != 1)
@@ -109,8 +109,8 @@ nmod_poly_div_series_basecase(nmod_poly_t Q, const nmod_poly_t A,
 }
 
 void
-_nmod_poly_div_series(mp_ptr Q, mp_srcptr A, slong Alen,
-                                mp_srcptr B, slong Blen, slong n, nmod_t mod)
+_nmod_poly_div_series(nn_ptr Q, nn_srcptr A, slong Alen,
+                                nn_srcptr B, slong Blen, slong n, nmod_t mod)
 {
     Blen = FLINT_MIN(Blen, n);
 

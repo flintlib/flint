@@ -16,9 +16,9 @@
 #include "ulong_extras.h"
 #include "long_extras.h"
 
-mp_limb_signed_t z_randint(flint_rand_t state, mp_limb_t limit)
+slong z_randint(flint_rand_t state, ulong limit)
 {
-    mp_limb_signed_t z;
+    slong z;
 
     if ((limit == UWORD(0)) || (limit > WORD_MAX))
         limit = WORD_MAX;

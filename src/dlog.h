@@ -30,7 +30,7 @@ enum
 };
 
 typedef struct dlog_precomp_struct dlog_precomp_struct;
-typedef struct dlog_precomp_struct * dlog_precomp_ptr;
+typedef struct dlog_precomp_struct * dlog_preconn_ptr;
 
 /* log in (1+pZ/p^eZ), e small: use recursion formulas
  * could use padic log instead but exponent is small
@@ -107,7 +107,7 @@ typedef struct
     ulong num;
     ulong * expo;
     ulong * crt_coeffs;
-    dlog_precomp_ptr pre;
+    dlog_preconn_ptr pre;
 }
 dlog_crt_struct;
 

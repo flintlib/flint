@@ -23,7 +23,7 @@
 int main(int argc, char* argv[])
 {
     slong bit_bound;
-    mp_limb_t prime, res;
+    ulong prime, res;
     fmpz_t x, y, prod;
 
     if (argc != 2)

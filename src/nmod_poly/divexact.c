@@ -17,7 +17,7 @@
 #include "gr_poly.h"
 
 void
-_nmod_poly_divexact(mp_ptr Q, mp_srcptr A, slong lenA,  mp_srcptr B, slong lenB, nmod_t mod)
+_nmod_poly_divexact(nn_ptr Q, nn_srcptr A, slong lenA,  nn_srcptr B, slong lenB, nmod_t mod)
 {
     if (lenA == lenB)
     {
@@ -40,7 +40,7 @@ nmod_poly_divexact(nmod_poly_t Q,
                  const nmod_poly_t A, const nmod_poly_t B)
 {
     nmod_poly_t tQ;
-    mp_ptr q;
+    nn_ptr q;
     slong A_len, B_len;
 
     B_len = B->length;

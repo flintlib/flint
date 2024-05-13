@@ -20,7 +20,7 @@ TEST_FUNCTION_START(nmod_poly_inflate, state)
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         nmod_poly_t poly1, poly2, poly3, xp;
-        mp_limb_t modulus;
+        ulong modulus;
         ulong inflation;
 
         modulus = n_randtest_prime(state, 0);

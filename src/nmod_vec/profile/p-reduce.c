@@ -22,13 +22,13 @@ typedef struct
 
 void sample(void * arg, ulong count)
 {
-   mp_limb_t n;
+   ulong n;
    nmod_t mod;
    info_t * info = (info_t *) arg;
    flint_bitcnt_t bits = info->bits;
-   mp_ptr vec = _nmod_vec_init(1000);
-   mp_ptr vec2 = _nmod_vec_init(1000);
-   mp_size_t j;
+   nn_ptr vec = _nmod_vec_init(1000);
+   nn_ptr vec2 = _nmod_vec_init(1000);
+   slong j;
    slong i;
    FLINT_TEST_INIT(state);
 

@@ -33,7 +33,7 @@ int main(void)
 {
     nmod_poly_t f, g;
     nmod_poly_factor_t res;
-    mp_limb_t modulus;
+    ulong modulus;
     int i, j, k, n, num;
     double t, T1, T2, T3, T4;
 

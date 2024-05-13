@@ -383,18 +383,18 @@ int fmpz_mat_solve_fflu(fmpz_mat_t X, fmpz_t den,
 int fmpz_mat_solve_fflu_precomp(fmpz_mat_t X, const slong * perm,
                                     const fmpz_mat_t FFLU, const fmpz_mat_t B);
 
-mp_limb_t
+ulong
 fmpz_mat_find_good_prime_and_invert(nmod_mat_t Ainv,
 		                   const fmpz_mat_t A, const fmpz_t det_bound);
 
-mp_limb_t *
+ulong *
 fmpz_mat_dixon_get_crt_primes(slong * num_primes,
-		                              const fmpz_mat_t A, mp_limb_t p);
+		                              const fmpz_mat_t A, ulong p);
 
 void
 _fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
 		  const fmpz_mat_t A, const fmpz_mat_t B,
- 			       const nmod_mat_t Ainv, mp_limb_t p,
+ 			       const nmod_mat_t Ainv, ulong p,
                                                const fmpz_t N, const fmpz_t D);
 
 int fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
@@ -403,7 +403,7 @@ int fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
 void
 _fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
                      const fmpz_mat_t A, const fmpz_mat_t B,
-                                 const nmod_mat_t Ainv, mp_limb_t p,
+                                 const nmod_mat_t Ainv, ulong p,
                                                const fmpz_t N, const fmpz_t D);
 
 int

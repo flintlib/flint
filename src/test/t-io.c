@@ -468,7 +468,7 @@ TEST_FUNCTION_START(flint_fprintf, state)
         mpq_t xmpq1, xmpq2;
 
         slong xslong_vec[SLONG_VEC_LEN];
-        mp_ptr xnmod_vec;
+        nn_ptr xnmod_vec;
         fmpz * xfmpz_vec;
         fmpq * xfmpq_vec;
         arb_ptr xarb_vec;
@@ -595,7 +595,7 @@ TEST_FUNCTION_START(flint_fprintf, state)
         str1 = flint_calloc(STR_SIZE, sizeof(char));
         str2 = flint_calloc(STR_SIZE, sizeof(char));
 
-#if defined(_LONG_LONG_LIMB)
+#if FLINT_LONG_LONG
 # define ULONG_SLONG_STR \
                 "Here we print a ulong: %020llu\n" \
                 "Here we print a slong: %20lld\n"

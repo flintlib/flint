@@ -17,8 +17,8 @@
 #include "nmod_poly.h"
 #include "gr_poly.h"
 
-slong _nmod_poly_gcd(mp_ptr G, mp_srcptr A, slong lenA,
-                              mp_srcptr B, slong lenB, nmod_t mod)
+slong _nmod_poly_gcd(nn_ptr G, nn_srcptr A, slong lenA,
+                              nn_srcptr B, slong lenB, nmod_t mod)
 {
     slong cutoff = NMOD_BITS(mod) <= 8 ? NMOD_POLY_SMALL_GCD_CUTOFF : NMOD_POLY_GCD_CUTOFF;
 
@@ -39,7 +39,7 @@ void nmod_poly_gcd(nmod_poly_t G,
     {
         slong lenA = A->length, lenB = B->length, lenG;
         nmod_poly_t tG;
-        mp_ptr g;
+        nn_ptr g;
 
         if (lenA == 0) /* lenA = lenB = 0 */
         {
@@ -80,13 +80,13 @@ void nmod_poly_gcd(nmod_poly_t G,
     }
 }
 
-slong _nmod_poly_gcd_euclidean(mp_ptr G, mp_srcptr A, slong lenA,
-                                        mp_srcptr B, slong lenB, nmod_t mod)
+slong _nmod_poly_gcd_euclidean(nn_ptr G, nn_srcptr A, slong lenA,
+                                        nn_srcptr B, slong lenB, nmod_t mod)
 {
     slong steps;
     slong lenR1, lenR2 = 0, lenG = 0;
 
-    mp_ptr F, R1, R2, R3 = G, T;
+    nn_ptr F, R1, R2, R3 = G, T;
 
     if (lenB == 1)
     {
@@ -160,7 +160,7 @@ void nmod_poly_gcd_euclidean(nmod_poly_t G,
     {
         slong lenA = A->length, lenB = B->length, lenG;
         nmod_poly_t tG;
-        mp_ptr g;
+        nn_ptr g;
 
         if (lenA == 0) /* lenA = lenB = 0 */
         {
@@ -201,8 +201,8 @@ void nmod_poly_gcd_euclidean(nmod_poly_t G,
     }
 }
 
-slong _nmod_poly_gcd_hgcd(mp_ptr G, mp_srcptr A, slong lenA,
-                                   mp_srcptr B, slong lenB, nmod_t mod)
+slong _nmod_poly_gcd_hgcd(nn_ptr G, nn_srcptr A, slong lenA,
+                                   nn_srcptr B, slong lenB, nmod_t mod)
 {
     slong cutoff = NMOD_BITS(mod) <= 8 ? NMOD_POLY_SMALL_GCD_CUTOFF : NMOD_POLY_GCD_CUTOFF;
     slong lenG = 0;
@@ -223,7 +223,7 @@ void nmod_poly_gcd_hgcd(nmod_poly_t G,
     {
         slong lenA = A->length, lenB = B->length, lenG;
         nmod_poly_t tG;
-        mp_ptr g;
+        nn_ptr g;
 
         if (lenA == 0) /* lenA = lenB = 0 */
         {

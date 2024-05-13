@@ -16,9 +16,9 @@ void
 _fmpz_poly_mulhigh(fmpz * res, const fmpz * poly1, slong len1,
                                    const fmpz * poly2, slong len2, slong start)
 {
-    mp_size_t limbs1 = _fmpz_vec_max_limbs(poly1, len1);
-    mp_size_t limbs2 = _fmpz_vec_max_limbs(poly2, len2);
-    mp_size_t limbsx = FLINT_MAX(limbs1, limbs2);
+    slong limbs1 = _fmpz_vec_max_limbs(poly1, len1);
+    slong limbs2 = _fmpz_vec_max_limbs(poly2, len2);
+    slong limbsx = FLINT_MAX(limbs1, limbs2);
 
     if (start < 5)
     {

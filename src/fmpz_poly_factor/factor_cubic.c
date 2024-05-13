@@ -133,7 +133,7 @@ static slong binary_sqrt(fmpz_t z, fmpz_t x, slong p)
 }
 
 
-static mp_limb_t fmpz_fdiv_r_2exp_flint_bits(const fmpz_t a)
+static ulong fmpz_fdiv_r_2exp_flint_bits(const fmpz_t a)
 {
     if (COEFF_IS_MPZ(*a))
     {
@@ -223,7 +223,7 @@ static slong binary_cubic_lift(
 {
     slong n;
     fmpz_t r2, c, d, t;
-    mp_limb_t A, B, C, D, INV, R, R2, S, E;
+    ulong A, B, C, D, INV, R, R2, S, E;
 
     /* start with a factorization mod 2^n */
     n = 1;
@@ -238,7 +238,7 @@ static slong binary_cubic_lift(
 
     while (n <= FLINT_BITS/2)
     {
-        mp_limb_t mask = (UWORD(1) << n);
+        ulong mask = (UWORD(1) << n);
         C = (A - (S - R2*E)) >> n;
         D = (B - (R*S)) >> n;
         R += (((D - C*R)*INV) % mask) << n;
@@ -353,11 +353,11 @@ static slong binary_cubic_lift_continue(
 
 
 /* return f(0)*...*f(largest_prime - 1) mod prime_product */
-static mp_limb_t eval_product_mod_n(
+static ulong eval_product_mod_n(
     const fmpz_t a,
     const fmpz_t b,
-    mp_limb_t prime_product,
-    mp_limb_t largest_prime)
+    ulong prime_product,
+    ulong largest_prime)
 {
     nmod_t ctx;
     ulong A, B, F, G, H, P, i;

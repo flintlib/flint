@@ -22,7 +22,7 @@ TEST_FUNCTION_START(nmod_poly_sqrt, state)
     {
         nmod_poly_t a, b;
         int square1, square2;
-        mp_limb_t mod;
+        ulong mod;
         mod = n_randtest_prime(state, 0);
 
         nmod_poly_init(a, mod);
@@ -55,7 +55,7 @@ TEST_FUNCTION_START(nmod_poly_sqrt, state)
     {
         nmod_poly_t a, b, c;
         int square;
-        mp_limb_t mod;
+        ulong mod;
         mod = n_randtest_prime(state, 0);
 
         nmod_poly_init(a, mod);
@@ -98,7 +98,7 @@ TEST_FUNCTION_START(nmod_poly_sqrt, state)
         nmod_poly_t a, b, c;
         slong j;
         int square;
-        mp_limb_t mod;
+        ulong mod;
         mod = n_randtest_prime(state, 0);
 
         nmod_poly_init(a, mod);

@@ -21,8 +21,8 @@ void fmpz_poly_mul_SS_precache_init(fmpz_poly_mul_precache_t pre,
     slong i, len_out, loglen2;
     slong output_bits, size;
     ulong size1, size2;
-    mp_limb_t * ptr;
-    mp_limb_t ** t1, ** t2, ** s1;
+    ulong * ptr;
+    ulong ** t1, ** t2, ** s1;
     int N;
 
     pre->len2 = poly2->length;
@@ -51,13 +51,13 @@ void fmpz_poly_mul_SS_precache_init(fmpz_poly_mul_precache_t pre,
 
     /* allocate space for ffts */
     N = flint_get_num_threads();
-    pre->jj = (mp_limb_t **)
-        flint_malloc((4*(pre->n + pre->n*size) + 3*size*N + 3*N)*sizeof(mp_limb_t));
-    for (i = 0, ptr = (mp_limb_t *) pre->jj + 4*pre->n; i < 4*pre->n; i++, ptr += size)
+    pre->jj = (ulong **)
+        flint_malloc((4*(pre->n + pre->n*size) + 3*size*N + 3*N)*sizeof(ulong));
+    for (i = 0, ptr = (ulong *) pre->jj + 4*pre->n; i < 4*pre->n; i++, ptr += size)
         pre->jj[i] = ptr;
-    t1 = (mp_limb_t **) ptr;
-    t2 = (mp_limb_t **) t1 + N;
-    s1 = (mp_limb_t **) t2 + N;
+    t1 = (ulong **) ptr;
+    t2 = (ulong **) t1 + N;
+    s1 = (ulong **) t2 + N;
     ptr += 3*N;
 
     t1[0] = ptr;
@@ -102,8 +102,8 @@ void _fmpz_poly_mullow_SS_precache(fmpz * output, const fmpz * input1,
 {
     slong len_out;
     slong size, i;
-    mp_limb_t ** ii, ** t1, ** t2, ** s1, ** tt;
-    mp_limb_t * ptr;
+    ulong ** ii, ** t1, ** t2, ** s1, ** tt;
+    ulong * ptr;
     int N;
 
     len_out = FLINT_MAX(len1 + pre->len2 - 1, 2*pre->n + 1);
@@ -112,14 +112,14 @@ void _fmpz_poly_mullow_SS_precache(fmpz * output, const fmpz * input1,
 
     /* allocate space for ffts */
     N = flint_get_num_threads();
-    ii = (mp_limb_t **)
-        flint_malloc((4*(pre->n + pre->n*size) + 5*size*N + 4*N)*sizeof(mp_limb_t));
-    for (i = 0, ptr = (mp_limb_t *) ii + 4*pre->n; i < 4*pre->n; i++, ptr += size)
+    ii = (ulong **)
+        flint_malloc((4*(pre->n + pre->n*size) + 5*size*N + 4*N)*sizeof(ulong));
+    for (i = 0, ptr = (ulong *) ii + 4*pre->n; i < 4*pre->n; i++, ptr += size)
         ii[i] = ptr;
-    t1 = (mp_limb_t **) ptr;
-    t2 = (mp_limb_t **) t1 + N;
-    s1 = (mp_limb_t **) t2 + N;
-    tt = (mp_limb_t **) s1 + N;
+    t1 = (ulong **) ptr;
+    t2 = (ulong **) t1 + N;
+    s1 = (ulong **) t2 + N;
+    tt = (ulong **) s1 + N;
     ptr += 4*N;
 
     t1[0] = ptr;

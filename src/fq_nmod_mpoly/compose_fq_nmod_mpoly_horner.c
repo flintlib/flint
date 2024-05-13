@@ -91,7 +91,7 @@ int fq_nmod_mpoly_compose_fq_nmod_mpoly_horner(fq_nmod_mpoly_t A,
     ulong * counts;
     slong Blen = B->length;
     slong * Blist;
-    const mp_limb_t * Bcoeffs = B->coeffs;
+    const ulong * Bcoeffs = B->coeffs;
     ulong * Bexp = B->exps;
     flint_bitcnt_t Bbits = B->bits;
     slong BN = mpoly_words_per_exp(Bbits, ctxB->minfo);

@@ -40,7 +40,7 @@ mpn_mod_ctx_clear(gr_ctx_t ctx)
 }
 
 int
-mpn_mod_set_ui(mp_ptr res, ulong x, gr_ctx_t ctx)
+mpn_mod_set_ui(nn_ptr res, ulong x, gr_ctx_t ctx)
 {
     FLINT_ASSERT(MPN_MOD_CTX_NLIMBS(ctx) >= 2);
 
@@ -50,9 +50,9 @@ mpn_mod_set_ui(mp_ptr res, ulong x, gr_ctx_t ctx)
 }
 
 int
-mpn_mod_set_si(mp_ptr res, slong x, gr_ctx_t ctx)
+mpn_mod_set_si(nn_ptr res, slong x, gr_ctx_t ctx)
 {
-    mp_size_t n = MPN_MOD_CTX_NLIMBS(ctx);
+    slong n = MPN_MOD_CTX_NLIMBS(ctx);
     FLINT_ASSERT(n >= 2);
 
     if (x >= 0)
@@ -69,7 +69,7 @@ mpn_mod_set_si(mp_ptr res, slong x, gr_ctx_t ctx)
 }
 
 int
-mpn_mod_neg_one(mp_ptr res, gr_ctx_t ctx)
+mpn_mod_neg_one(nn_ptr res, gr_ctx_t ctx)
 {
     return mpn_mod_set_si(res, -1, ctx);
 }
@@ -77,11 +77,11 @@ mpn_mod_neg_one(mp_ptr res, gr_ctx_t ctx)
 /* fixme: flint_mpn_mod_preinvn is misdocumented */
 
 int
-mpn_mod_set_mpn(mp_ptr res, mp_srcptr x, mp_size_t xn, gr_ctx_t ctx)
+mpn_mod_set_mpn(nn_ptr res, nn_srcptr x, slong xn, gr_ctx_t ctx)
 {
-    mp_size_t n = MPN_MOD_CTX_NLIMBS(ctx);
-    mp_bitcnt_t norm = MPN_MOD_CTX_NORM(ctx);
-    mp_size_t rn;
+    slong n = MPN_MOD_CTX_NLIMBS(ctx);
+    flint_bitcnt_t norm = MPN_MOD_CTX_NORM(ctx);
+    slong rn;
 
     if (xn < n || (xn == n && mpn_cmp(x, MPN_MOD_CTX_MODULUS(ctx), n) < 0))
     {
@@ -90,11 +90,11 @@ mpn_mod_set_mpn(mp_ptr res, mp_srcptr x, mp_size_t xn, gr_ctx_t ctx)
     }
     else
     {
-        mp_ptr r;
+        nn_ptr r;
         TMP_INIT;
 
         TMP_START;
-        r = TMP_ALLOC((xn + 1) * sizeof(mp_limb_t));
+        r = TMP_ALLOC((xn + 1) * sizeof(ulong));
 
         if (norm == 0)
         {
@@ -144,13 +144,13 @@ mpn_mod_set_mpn(mp_ptr res, mp_srcptr x, mp_size_t xn, gr_ctx_t ctx)
 }
 
 int
-mpn_mod_set_fmpz(mp_ptr res, const fmpz_t x, gr_ctx_t ctx)
+mpn_mod_set_fmpz(nn_ptr res, const fmpz_t x, gr_ctx_t ctx)
 {
     if (!COEFF_IS_MPZ(*x))
         mpn_mod_set_si(res, *x, ctx);
     else
     {
-        mp_size_t nd = FLINT_ABS(COEFF_TO_PTR(*x)->_mp_size);
+        slong nd = FLINT_ABS(COEFF_TO_PTR(*x)->_mp_size);
         int neg = COEFF_TO_PTR(*x)->_mp_size < 0;
 
         mpn_mod_set_mpn(res, COEFF_TO_PTR(*x)->_mp_d, nd, ctx);
@@ -172,14 +172,14 @@ _gr_fmpz_mod_ctx_struct;
 #define FMPZ_MOD_CTX(ring_ctx) ((((_gr_fmpz_mod_ctx_struct *)(ring_ctx))->ctx))
 
 int
-mpn_mod_set_other(mp_ptr res, gr_ptr v, gr_ctx_t v_ctx, gr_ctx_t ctx)
+mpn_mod_set_other(nn_ptr res, gr_ptr v, gr_ctx_t v_ctx, gr_ctx_t ctx)
 {
     if (v_ctx == ctx)
         return mpn_mod_set(res, v, ctx);
 
     if (v_ctx->which_ring == GR_CTX_MPN_MOD)
     {
-        mp_size_t n = MPN_MOD_CTX_NLIMBS(ctx);
+        slong n = MPN_MOD_CTX_NLIMBS(ctx);
 
         if (MPN_MOD_CTX_NLIMBS(v_ctx) == n &&
             flint_mpn_equal_p(MPN_MOD_CTX_MODULUS(v_ctx), MPN_MOD_CTX_MODULUS(ctx), n))
@@ -191,11 +191,11 @@ mpn_mod_set_other(mp_ptr res, gr_ptr v, gr_ctx_t v_ctx, gr_ctx_t ctx)
 
     if (v_ctx->which_ring == GR_CTX_FMPZ_MOD)
     {
-        mp_size_t n = MPN_MOD_CTX_NLIMBS(ctx);
+        slong n = MPN_MOD_CTX_NLIMBS(ctx);
 
         if (fmpz_size(FMPZ_MOD_CTX(v_ctx)->n) == n)
         {
-            mp_srcptr vd = COEFF_TO_PTR(*(FMPZ_MOD_CTX(v_ctx)->n))->_mp_d;
+            nn_srcptr vd = COEFF_TO_PTR(*(FMPZ_MOD_CTX(v_ctx)->n))->_mp_d;
 
             if (flint_mpn_equal_p(vd, MPN_MOD_CTX_MODULUS(ctx), n))
                 return mpn_mod_set_fmpz(res, v, ctx);
@@ -206,7 +206,7 @@ mpn_mod_set_other(mp_ptr res, gr_ptr v, gr_ctx_t v_ctx, gr_ctx_t ctx)
 }
 
 int
-mpn_mod_randtest(mp_ptr res, flint_rand_t state, gr_ctx_t ctx)
+mpn_mod_randtest(nn_ptr res, flint_rand_t state, gr_ctx_t ctx)
 {
     fmpz_t t;
     fmpz_init(t);
@@ -218,14 +218,14 @@ mpn_mod_randtest(mp_ptr res, flint_rand_t state, gr_ctx_t ctx)
 }
 
 int
-mpn_mod_write(gr_stream_t out, mp_srcptr x, gr_ctx_t ctx)
+mpn_mod_write(gr_stream_t out, nn_srcptr x, gr_ctx_t ctx)
 {
     gr_stream_write_free(out, _flint_mpn_get_str(x, MPN_MOD_CTX_NLIMBS(ctx)));
     return GR_SUCCESS;
 }
 
 int
-mpn_mod_get_fmpz(fmpz_t res, mp_srcptr x, gr_ctx_t ctx)
+mpn_mod_get_fmpz(fmpz_t res, nn_srcptr x, gr_ctx_t ctx)
 {
     fmpz_set_ui_array(res, x, MPN_MOD_CTX_NLIMBS(ctx));
     return GR_SUCCESS;
@@ -235,13 +235,13 @@ mpn_mod_get_fmpz(fmpz_t res, mp_srcptr x, gr_ctx_t ctx)
 truth_t
 mpn_mod_is_neg_one(gr_srcptr x, gr_ctx_t ctx)
 {
-    mp_limb_t t[MPN_MOD_MAX_LIMBS];
+    ulong t[MPN_MOD_MAX_LIMBS];
     mpn_mod_neg_one(t, ctx);
     return flint_mpn_equal_p(x, t, MPN_MOD_CTX_NLIMBS(ctx)) ? T_TRUE : T_FALSE;
 }
 
 int
-mpn_mod_neg(mp_ptr res, mp_srcptr x, gr_ctx_t ctx)
+mpn_mod_neg(nn_ptr res, nn_srcptr x, gr_ctx_t ctx)
 {
     if (MPN_MOD_CTX_NLIMBS(ctx) == 2)
         flint_mpn_negmod_2(res, x, MPN_MOD_CTX_MODULUS(ctx));
@@ -251,7 +251,7 @@ mpn_mod_neg(mp_ptr res, mp_srcptr x, gr_ctx_t ctx)
 }
 
 int
-mpn_mod_add(mp_ptr res, mp_srcptr x, mp_srcptr y, gr_ctx_t ctx)
+mpn_mod_add(nn_ptr res, nn_srcptr x, nn_srcptr y, gr_ctx_t ctx)
 {
     if (MPN_MOD_CTX_NLIMBS(ctx) == 2)
         flint_mpn_addmod_2(res, x, y, MPN_MOD_CTX_MODULUS(ctx));
@@ -261,7 +261,7 @@ mpn_mod_add(mp_ptr res, mp_srcptr x, mp_srcptr y, gr_ctx_t ctx)
 }
 
 int
-mpn_mod_sub(mp_ptr res, mp_srcptr x, mp_srcptr y, gr_ctx_t ctx)
+mpn_mod_sub(nn_ptr res, nn_srcptr x, nn_srcptr y, gr_ctx_t ctx)
 {
     if (MPN_MOD_CTX_NLIMBS(ctx) == 2)
         flint_mpn_submod_2(res, x, y, MPN_MOD_CTX_MODULUS(ctx));
@@ -271,11 +271,11 @@ mpn_mod_sub(mp_ptr res, mp_srcptr x, mp_srcptr y, gr_ctx_t ctx)
 }
 
 int
-mpn_mod_add_ui(mp_ptr res, mp_srcptr x, ulong y, gr_ctx_t ctx)
+mpn_mod_add_ui(nn_ptr res, nn_srcptr x, ulong y, gr_ctx_t ctx)
 {
     if (MPN_MOD_CTX_NLIMBS(ctx) == 2)
     {
-        mp_limb_t t[2];
+        ulong t[2];
         t[0] = y;
         t[1] = 0;
         flint_mpn_addmod_2(res, x, t, MPN_MOD_CTX_MODULUS(ctx));
@@ -288,11 +288,11 @@ mpn_mod_add_ui(mp_ptr res, mp_srcptr x, ulong y, gr_ctx_t ctx)
 }
 
 int
-mpn_mod_sub_ui(mp_ptr res, mp_srcptr x, ulong y, gr_ctx_t ctx)
+mpn_mod_sub_ui(nn_ptr res, nn_srcptr x, ulong y, gr_ctx_t ctx)
 {
     if (MPN_MOD_CTX_NLIMBS(ctx) == 2)
     {
-        mp_limb_t t[2];
+        ulong t[2];
         t[0] = y;
         t[1] = 0;
         flint_mpn_submod_2(res, x, t, MPN_MOD_CTX_MODULUS(ctx));
@@ -305,7 +305,7 @@ mpn_mod_sub_ui(mp_ptr res, mp_srcptr x, ulong y, gr_ctx_t ctx)
 }
 
 int
-mpn_mod_add_si(mp_ptr res, mp_srcptr x, slong y, gr_ctx_t ctx)
+mpn_mod_add_si(nn_ptr res, nn_srcptr x, slong y, gr_ctx_t ctx)
 {
     if (y >= 0)
         mpn_mod_add_ui(res, x, (ulong) y, ctx);
@@ -315,7 +315,7 @@ mpn_mod_add_si(mp_ptr res, mp_srcptr x, slong y, gr_ctx_t ctx)
 }
 
 int
-mpn_mod_sub_si(mp_ptr res, mp_srcptr x, slong y, gr_ctx_t ctx)
+mpn_mod_sub_si(nn_ptr res, nn_srcptr x, slong y, gr_ctx_t ctx)
 {
     if (y >= 0)
         mpn_mod_sub_ui(res, x, (ulong) y, ctx);
@@ -325,7 +325,7 @@ mpn_mod_sub_si(mp_ptr res, mp_srcptr x, slong y, gr_ctx_t ctx)
 }
 
 int
-mpn_mod_add_fmpz(mp_ptr res, mp_srcptr x, const fmpz_t y, gr_ctx_t ctx)
+mpn_mod_add_fmpz(nn_ptr res, nn_srcptr x, const fmpz_t y, gr_ctx_t ctx)
 {
     if (!COEFF_IS_MPZ(*y))
     {
@@ -333,14 +333,14 @@ mpn_mod_add_fmpz(mp_ptr res, mp_srcptr x, const fmpz_t y, gr_ctx_t ctx)
     }
     else
     {
-        mp_limb_t t[MPN_MOD_MAX_LIMBS];
-        mp_srcptr m = MPN_MOD_CTX_MODULUS(ctx);
-        mp_size_t n = MPN_MOD_CTX_NLIMBS(ctx);
+        ulong t[MPN_MOD_MAX_LIMBS];
+        nn_srcptr m = MPN_MOD_CTX_MODULUS(ctx);
+        slong n = MPN_MOD_CTX_NLIMBS(ctx);
 
         mpz_ptr z = COEFF_TO_PTR(*y);
-        mp_size_t ssize = z->_mp_size;
-        mp_size_t zn = FLINT_ABS(ssize);
-        mp_srcptr zd = z->_mp_d;
+        slong ssize = z->_mp_size;
+        slong zn = FLINT_ABS(ssize);
+        nn_srcptr zd = z->_mp_d;
 
         if (zn < n || (zn == n && mpn_cmp(zd, m, n) < 0))
         {
@@ -363,7 +363,7 @@ mpn_mod_add_fmpz(mp_ptr res, mp_srcptr x, const fmpz_t y, gr_ctx_t ctx)
 }
 
 int
-mpn_mod_sub_fmpz(mp_ptr res, mp_srcptr x, const fmpz_t y, gr_ctx_t ctx)
+mpn_mod_sub_fmpz(nn_ptr res, nn_srcptr x, const fmpz_t y, gr_ctx_t ctx)
 {
     if (!COEFF_IS_MPZ(*y))
     {
@@ -371,14 +371,14 @@ mpn_mod_sub_fmpz(mp_ptr res, mp_srcptr x, const fmpz_t y, gr_ctx_t ctx)
     }
     else
     {
-        mp_limb_t t[MPN_MOD_MAX_LIMBS];
-        mp_srcptr m = MPN_MOD_CTX_MODULUS(ctx);
-        mp_size_t n = MPN_MOD_CTX_NLIMBS(ctx);
+        ulong t[MPN_MOD_MAX_LIMBS];
+        nn_srcptr m = MPN_MOD_CTX_MODULUS(ctx);
+        slong n = MPN_MOD_CTX_NLIMBS(ctx);
 
         mpz_ptr z = COEFF_TO_PTR(*y);
-        mp_size_t ssize = z->_mp_size;
-        mp_size_t zn = FLINT_ABS(ssize);
-        mp_srcptr zd = z->_mp_d;
+        slong ssize = z->_mp_size;
+        slong zn = FLINT_ABS(ssize);
+        nn_srcptr zd = z->_mp_d;
 
         if (zn < n || (zn == n && mpn_cmp(zd, m, n) < 0))
         {
@@ -403,9 +403,9 @@ mpn_mod_sub_fmpz(mp_ptr res, mp_srcptr x, const fmpz_t y, gr_ctx_t ctx)
 
 /* should mirror flint_mpn_mulmod_preinvn (backport any improvements) */
 int
-mpn_mod_mul(mp_ptr res, mp_srcptr x, mp_srcptr y, gr_ctx_t ctx)
+mpn_mod_mul(nn_ptr res, nn_srcptr x, nn_srcptr y, gr_ctx_t ctx)
 {
-    mp_size_t n = MPN_MOD_CTX_NLIMBS(ctx);
+    slong n = MPN_MOD_CTX_NLIMBS(ctx);
 
     if (n == 2)
     {
@@ -413,11 +413,11 @@ mpn_mod_mul(mp_ptr res, mp_srcptr x, mp_srcptr y, gr_ctx_t ctx)
     }
     else
     {
-        mp_limb_t t[5 * MPN_MOD_MAX_LIMBS];
-        mp_bitcnt_t norm = MPN_MOD_CTX_NORM(ctx);
-        mp_ptr d = MPN_MOD_CTX_MODULUS_NORMED(ctx);
-        mp_ptr dinv = MPN_MOD_CTX_MODULUS_PREINV(ctx);
-        mp_limb_t cy;
+        ulong t[5 * MPN_MOD_MAX_LIMBS];
+        flint_bitcnt_t norm = MPN_MOD_CTX_NORM(ctx);
+        nn_ptr d = MPN_MOD_CTX_MODULUS_NORMED(ctx);
+        nn_ptr dinv = MPN_MOD_CTX_MODULUS_PREINV(ctx);
+        ulong cy;
 
         if (norm)
         {
@@ -465,11 +465,11 @@ mpn_mod_mul(mp_ptr res, mp_srcptr x, mp_srcptr y, gr_ctx_t ctx)
 
 /* todo: check for 0? */
 int
-mpn_mod_mul_ui(mp_ptr res, mp_srcptr x, ulong y, gr_ctx_t ctx)
+mpn_mod_mul_ui(nn_ptr res, nn_srcptr x, ulong y, gr_ctx_t ctx)
 {
-    mp_limb_t t[MPN_MOD_MAX_LIMBS + 1];
-    mp_size_t n = MPN_MOD_CTX_NLIMBS(ctx);
-    mp_size_t tn;
+    ulong t[MPN_MOD_MAX_LIMBS + 1];
+    slong n = MPN_MOD_CTX_NLIMBS(ctx);
+    slong tn;
 
     t[n] = mpn_mul_1(t, x, n, y);
     tn = n + (t[n] != 0);
@@ -481,11 +481,11 @@ mpn_mod_mul_ui(mp_ptr res, mp_srcptr x, ulong y, gr_ctx_t ctx)
 #define UI_ABS_SI(x) (((slong)(x) < 0) ? (-(ulong)(x)) : ((ulong)(x)))
 
 int
-mpn_mod_mul_si(mp_ptr res, mp_srcptr x, slong y, gr_ctx_t ctx)
+mpn_mod_mul_si(nn_ptr res, nn_srcptr x, slong y, gr_ctx_t ctx)
 {
-    mp_limb_t t[MPN_MOD_MAX_LIMBS + 1];
-    mp_size_t n = MPN_MOD_CTX_NLIMBS(ctx);
-    mp_size_t tn;
+    ulong t[MPN_MOD_MAX_LIMBS + 1];
+    slong n = MPN_MOD_CTX_NLIMBS(ctx);
+    slong tn;
 
     t[n] = mpn_mul_1(t, x, n, UI_ABS_SI(y));
     tn = n + (t[n] != 0);
@@ -498,7 +498,7 @@ mpn_mod_mul_si(mp_ptr res, mp_srcptr x, slong y, gr_ctx_t ctx)
 
 /* todo: check for 0? */
 int
-mpn_mod_mul_fmpz(mp_ptr res, mp_srcptr x, const fmpz_t y, gr_ctx_t ctx)
+mpn_mod_mul_fmpz(nn_ptr res, nn_srcptr x, const fmpz_t y, gr_ctx_t ctx)
 {
     if (!COEFF_IS_MPZ(*y))
     {
@@ -506,13 +506,13 @@ mpn_mod_mul_fmpz(mp_ptr res, mp_srcptr x, const fmpz_t y, gr_ctx_t ctx)
     }
     else
     {
-        mp_limb_t t[2 * MPN_MOD_MAX_LIMBS], cy;
-        mp_size_t tn, n = MPN_MOD_CTX_NLIMBS(ctx);
+        ulong t[2 * MPN_MOD_MAX_LIMBS], cy;
+        slong tn, n = MPN_MOD_CTX_NLIMBS(ctx);
 
         mpz_ptr z = COEFF_TO_PTR(*y);
-        mp_size_t ssize = z->_mp_size;
-        mp_size_t zn = FLINT_ABS(ssize);
-        mp_srcptr zd = z->_mp_d;
+        slong ssize = z->_mp_size;
+        slong zn = FLINT_ABS(ssize);
+        nn_srcptr zd = z->_mp_d;
 
         if (zn <= n)
         {
@@ -535,86 +535,86 @@ mpn_mod_mul_fmpz(mp_ptr res, mp_srcptr x, const fmpz_t y, gr_ctx_t ctx)
 }
 
 int
-mpn_mod_addmul(mp_ptr res, mp_srcptr x, mp_srcptr y, gr_ctx_t ctx)
+mpn_mod_addmul(nn_ptr res, nn_srcptr x, nn_srcptr y, gr_ctx_t ctx)
 {
-    mp_limb_t t[MPN_MOD_MAX_LIMBS];
+    ulong t[MPN_MOD_MAX_LIMBS];
     mpn_mod_mul(t, x, y, ctx);
     mpn_mod_add(res, res, t, ctx);
     return GR_SUCCESS;
 }
 
 int
-mpn_mod_addmul_ui(mp_ptr res, mp_srcptr x, ulong y, gr_ctx_t ctx)
+mpn_mod_addmul_ui(nn_ptr res, nn_srcptr x, ulong y, gr_ctx_t ctx)
 {
-    mp_limb_t t[MPN_MOD_MAX_LIMBS];
+    ulong t[MPN_MOD_MAX_LIMBS];
     mpn_mod_mul_ui(t, x, y, ctx);
     mpn_mod_add(res, res, t, ctx);
     return GR_SUCCESS;
 }
 
 int
-mpn_mod_addmul_si(mp_ptr res, mp_srcptr x, slong y, gr_ctx_t ctx)
+mpn_mod_addmul_si(nn_ptr res, nn_srcptr x, slong y, gr_ctx_t ctx)
 {
-    mp_limb_t t[MPN_MOD_MAX_LIMBS];
+    ulong t[MPN_MOD_MAX_LIMBS];
     mpn_mod_mul_si(t, x, y, ctx);
     mpn_mod_add(res, res, t, ctx);
     return GR_SUCCESS;
 }
 
 int
-mpn_mod_addmul_fmpz(mp_ptr res, mp_srcptr x, const fmpz_t y, gr_ctx_t ctx)
+mpn_mod_addmul_fmpz(nn_ptr res, nn_srcptr x, const fmpz_t y, gr_ctx_t ctx)
 {
-    mp_limb_t t[MPN_MOD_MAX_LIMBS];
+    ulong t[MPN_MOD_MAX_LIMBS];
     mpn_mod_mul_fmpz(t, x, y, ctx);
     mpn_mod_add(res, res, t, ctx);
     return GR_SUCCESS;
 }
 
 int
-mpn_mod_submul(mp_ptr res, mp_srcptr x, mp_srcptr y, gr_ctx_t ctx)
+mpn_mod_submul(nn_ptr res, nn_srcptr x, nn_srcptr y, gr_ctx_t ctx)
 {
-    mp_limb_t t[MPN_MOD_MAX_LIMBS];
+    ulong t[MPN_MOD_MAX_LIMBS];
     mpn_mod_mul(t, x, y, ctx);
     mpn_mod_sub(res, res, t, ctx);
     return GR_SUCCESS;
 }
 
 int
-mpn_mod_submul_ui(mp_ptr res, mp_srcptr x, ulong y, gr_ctx_t ctx)
+mpn_mod_submul_ui(nn_ptr res, nn_srcptr x, ulong y, gr_ctx_t ctx)
 {
-    mp_limb_t t[MPN_MOD_MAX_LIMBS];
+    ulong t[MPN_MOD_MAX_LIMBS];
     mpn_mod_mul_ui(t, x, y, ctx);
     mpn_mod_sub(res, res, t, ctx);
     return GR_SUCCESS;
 }
 
 int
-mpn_mod_submul_si(mp_ptr res, mp_srcptr x, slong y, gr_ctx_t ctx)
+mpn_mod_submul_si(nn_ptr res, nn_srcptr x, slong y, gr_ctx_t ctx)
 {
-    mp_limb_t t[MPN_MOD_MAX_LIMBS];
+    ulong t[MPN_MOD_MAX_LIMBS];
     mpn_mod_mul_si(t, x, y, ctx);
     mpn_mod_sub(res, res, t, ctx);
     return GR_SUCCESS;
 }
 
 int
-mpn_mod_submul_fmpz(mp_ptr res, mp_srcptr x, const fmpz_t y, gr_ctx_t ctx)
+mpn_mod_submul_fmpz(nn_ptr res, nn_srcptr x, const fmpz_t y, gr_ctx_t ctx)
 {
-    mp_limb_t t[MPN_MOD_MAX_LIMBS];
+    ulong t[MPN_MOD_MAX_LIMBS];
     mpn_mod_mul_fmpz(t, x, y, ctx);
     mpn_mod_sub(res, res, t, ctx);
     return GR_SUCCESS;
 }
 
 int
-mpn_mod_inv(mp_ptr res, mp_srcptr x, gr_ctx_t ctx)
+mpn_mod_inv(nn_ptr res, nn_srcptr x, gr_ctx_t ctx)
 {
-    mp_size_t n = MPN_MOD_CTX_NLIMBS(ctx);
-    mp_srcptr d = MPN_MOD_CTX_MODULUS(ctx);
-    mp_limb_t g[MPN_MOD_MAX_LIMBS];
-    mp_limb_t s[MPN_MOD_MAX_LIMBS];
-    mp_limb_t t[MPN_MOD_MAX_LIMBS];
-    mp_limb_t u[MPN_MOD_MAX_LIMBS];
+    slong n = MPN_MOD_CTX_NLIMBS(ctx);
+    nn_srcptr d = MPN_MOD_CTX_MODULUS(ctx);
+    ulong g[MPN_MOD_MAX_LIMBS];
+    ulong s[MPN_MOD_MAX_LIMBS];
+    ulong t[MPN_MOD_MAX_LIMBS];
+    ulong u[MPN_MOD_MAX_LIMBS];
     mp_size_t gsize, ssize;
 
     if (mpn_mod_is_one(x, ctx) == T_TRUE || mpn_mod_is_neg_one(x, ctx) == T_TRUE)
@@ -623,6 +623,8 @@ mpn_mod_inv(mp_ptr res, mp_srcptr x, gr_ctx_t ctx)
     flint_mpn_copyi(t, x, n);
     flint_mpn_copyi(u, d, n);
     /* todo: does mpn_gcdext allow aliasing? */
+    /* NOTE: ssize must be mp_size_t since it is strictly different from slong
+     * on Windows systems. */
     gsize = mpn_gcdext(g, s, &ssize, t, n, u, n);
 
     if (gsize != 1 || g[0] != 1)
@@ -639,10 +641,10 @@ mpn_mod_inv(mp_ptr res, mp_srcptr x, gr_ctx_t ctx)
 }
 
 int
-mpn_mod_div(mp_ptr res, mp_srcptr x, mp_srcptr y, gr_ctx_t ctx)
+mpn_mod_div(nn_ptr res, nn_srcptr x, nn_srcptr y, gr_ctx_t ctx)
 {
     int status;
-    mp_limb_t t[MPN_MOD_MAX_LIMBS];
+    ulong t[MPN_MOD_MAX_LIMBS];
 
     status = mpn_mod_inv(t, y, ctx);
     if (status == GR_SUCCESS)

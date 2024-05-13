@@ -54,7 +54,7 @@ int compare_facs(const void * a, const void * b)
 void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
 {
     qs_t qs_inf;
-    mp_limb_t small_factor, delta;
+    ulong small_factor, delta;
     ulong expt = 0;
     unsigned char * sieve;
     slong ncols, nrows, i, j = 0, count, num_primes;

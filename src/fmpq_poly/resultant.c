@@ -53,7 +53,7 @@ void _fmpq_poly_resultant(fmpz_t rnum, fmpz_t rden,
         slong lenG = len2;
 	ulong p;
         nmod_t mod;
-	mp_ptr pp1, pp2, gp;
+	nn_ptr pp1, pp2, gp;
 
         fmpz_init(c1);
         fmpz_init(c2);

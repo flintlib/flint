@@ -132,7 +132,7 @@ TEST_FUNCTION_START(nmod_mpoly_mpolyuu_divides, state)
         nmod_mpoly_t a, b;
         slong len1, len2;
         flint_bitcnt_t exp_bits;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, (i % 10 == 0) ? 4: FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -168,7 +168,7 @@ TEST_FUNCTION_START(nmod_mpoly_mpolyuu_divides, state)
         nmod_mpoly_t a, b, c;
         slong len1, len2, len3;
         flint_bitcnt_t exp_bits;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, (i % 10 == 0) ? 4: FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);

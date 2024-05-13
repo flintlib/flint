@@ -59,7 +59,7 @@ TEST_FUNCTION_START(fmpz_poly_cos_minpoly, state)
 
     for (n = 0; testdata[n] != -1; n++)
     {
-        mp_limb_t y;
+        ulong y;
 
         fmpz_poly_randtest(p, state, 20, 1 + n_randint(state, 100));
 

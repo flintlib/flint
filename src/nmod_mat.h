@@ -29,13 +29,13 @@ extern "C" {
 #define nmod_mat_entry(mat,i,j) ((mat)->rows[(i)][(j)])
 
 NMOD_MAT_INLINE
-mp_limb_t nmod_mat_get_entry(const nmod_mat_t mat, slong i, slong j)
+ulong nmod_mat_get_entry(const nmod_mat_t mat, slong i, slong j)
 {
    return mat->rows[i][j];
 }
 
 NMOD_MAT_INLINE
-mp_limb_t * nmod_mat_entry_ptr(const nmod_mat_t mat, slong i, slong j)
+ulong * nmod_mat_entry_ptr(const nmod_mat_t mat, slong i, slong j)
 {
    return mat->rows[i] + j;
 }
@@ -55,10 +55,10 @@ slong nmod_mat_ncols(const nmod_mat_t mat)
 }
 
 /* TODO: Document */
-void nmod_mat_set_mod(nmod_mat_t mat, mp_limb_t n);
+void nmod_mat_set_mod(nmod_mat_t mat, ulong n);
 
 /* Memory management */
-void nmod_mat_init(nmod_mat_t mat, slong rows, slong cols, mp_limb_t n);
+void nmod_mat_init(nmod_mat_t mat, slong rows, slong cols, ulong n);
 void nmod_mat_init_set(nmod_mat_t mat, const nmod_mat_t src);
 void nmod_mat_clear(nmod_mat_t mat);
 void nmod_mat_one(nmod_mat_t mat);
@@ -71,10 +71,10 @@ nmod_mat_swap_entrywise(nmod_mat_t mat1, nmod_mat_t mat2)
     slong i, j;
     for (i = 0; i < nmod_mat_nrows(mat1); i++)
     {
-       mp_limb_t * row1 = mat1->rows[i];
-       mp_limb_t * row2 = mat2->rows[i];
+       ulong * row1 = mat1->rows[i];
+       ulong * row2 = mat2->rows[i];
        for (j = 0; j < nmod_mat_ncols(mat1); j++)
-          FLINT_SWAP(mp_limb_t, row1[j], row2[j]);
+          FLINT_SWAP(ulong, row1[j], row2[j]);
     }
 }
 
@@ -92,7 +92,7 @@ void nmod_mat_concat_vertical(nmod_mat_t res,
 void nmod_mat_randtest(nmod_mat_t mat, flint_rand_t state);
 void nmod_mat_randfull(nmod_mat_t mat, flint_rand_t state);
 int nmod_mat_randpermdiag(nmod_mat_t mat, flint_rand_t state,
-                 mp_srcptr diag, slong n);
+                 nn_srcptr diag, slong n);
 void nmod_mat_randrank(nmod_mat_t, flint_rand_t state, slong rank);
 void nmod_mat_randops(nmod_mat_t mat, flint_rand_t state, slong count);
 void nmod_mat_randtril(nmod_mat_t mat, flint_rand_t state, int unit);
@@ -138,9 +138,9 @@ void nmod_mat_neg(nmod_mat_t B, const nmod_mat_t A);
 
 /* Matrix-scalar arithmetic */
 
-void nmod_mat_scalar_mul(nmod_mat_t B, const nmod_mat_t A, mp_limb_t c);
+void nmod_mat_scalar_mul(nmod_mat_t B, const nmod_mat_t A, ulong c);
 void nmod_mat_scalar_addmul_ui(nmod_mat_t dest,
-                       const nmod_mat_t X, const nmod_mat_t Y, const mp_limb_t b);
+                       const nmod_mat_t X, const nmod_mat_t Y, const ulong b);
 
 
 void nmod_mat_scalar_mul_fmpz(nmod_mat_t res, const nmod_mat_t M, const fmpz_t c);
@@ -171,17 +171,17 @@ void nmod_mat_addmul(nmod_mat_t D, const nmod_mat_t C,
 void nmod_mat_submul(nmod_mat_t D, const nmod_mat_t C,
                                 const nmod_mat_t A, const nmod_mat_t B);
 
-void nmod_mat_mul_nmod_vec(mp_limb_t * c, const nmod_mat_t A,
-                                              const mp_limb_t * b, slong blen);
+void nmod_mat_mul_nmod_vec(ulong * c, const nmod_mat_t A,
+                                              const ulong * b, slong blen);
 
-void nmod_mat_mul_nmod_vec_ptr(mp_limb_t * const * c,
-                  const nmod_mat_t A, const mp_limb_t * const * b, slong blen);
+void nmod_mat_mul_nmod_vec_ptr(ulong * const * c,
+                  const nmod_mat_t A, const ulong * const * b, slong blen);
 
-void nmod_mat_nmod_vec_mul(mp_limb_t * c, const mp_limb_t * a,
+void nmod_mat_nmod_vec_mul(ulong * c, const ulong * a,
                                                slong alen, const nmod_mat_t B);
 
-void nmod_mat_nmod_vec_mul_ptr(mp_limb_t * const * c,
-                  const mp_limb_t * const * a, slong alen, const nmod_mat_t B);
+void nmod_mat_nmod_vec_mul_ptr(ulong * const * c,
+                  const ulong * const * a, slong alen, const nmod_mat_t B);
 
 /* Exponent */
 
@@ -190,15 +190,15 @@ void nmod_mat_pow(nmod_mat_t dest, const nmod_mat_t mat, ulong pow);
 
 /* Trace */
 
-mp_limb_t nmod_mat_trace(const nmod_mat_t mat);
+ulong nmod_mat_trace(const nmod_mat_t mat);
 
 /* Determinant */
 
-mp_limb_t _nmod_mat_det(nmod_mat_t A);
-mp_limb_t nmod_mat_det(const nmod_mat_t A);
+ulong _nmod_mat_det(nmod_mat_t A);
+ulong nmod_mat_det(const nmod_mat_t A);
 
-mp_limb_t _nmod_mat_det_howell(nmod_mat_t A);
-mp_limb_t nmod_mat_det_howell(const nmod_mat_t A);
+ulong _nmod_mat_det_howell(nmod_mat_t A);
+ulong nmod_mat_det_howell(const nmod_mat_t A);
 
 /* Rank */
 
@@ -218,7 +218,7 @@ void nmod_mat_swap_rows(nmod_mat_t mat, slong * perm, slong r, slong s)
         if (perm)
             FLINT_SWAP(slong, perm[r], perm[s]);
 
-        FLINT_SWAP(mp_ptr, mat->rows[r], mat->rows[s]);
+        FLINT_SWAP(nn_ptr, mat->rows[r], mat->rows[s]);
     }
 }
 
@@ -242,7 +242,7 @@ void nmod_mat_swap_cols(nmod_mat_t mat, slong * perm, slong r, slong s)
             FLINT_SWAP(slong, perm[r], perm[s]);
 
         for (i = 0; i < mat->r; i++)
-            FLINT_SWAP(mp_limb_t, mat->rows[i][r], mat->rows[i][s]);
+            FLINT_SWAP(ulong, mat->rows[i][r], mat->rows[i][s]);
     }
 }
 
@@ -261,7 +261,7 @@ void nmod_mat_invert_cols(nmod_mat_t mat, slong * perm)
 
         for (t = 0; t < mat->r; t++)
             for (i = 0; i < k; i++)
-                FLINT_SWAP(mp_limb_t, mat->rows[t][i], mat->rows[t][c - i - 1]);
+                FLINT_SWAP(ulong, mat->rows[t][i], mat->rows[t][c - i - 1]);
     }
 }
 
@@ -287,7 +287,7 @@ slong nmod_mat_lu_recursive(slong * P, nmod_mat_t A, int rank_check);
 /* Nonsingular solving */
 
 int nmod_mat_solve(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B);
-int nmod_mat_solve_vec(mp_ptr x, const nmod_mat_t A, mp_srcptr b);
+int nmod_mat_solve_vec(nn_ptr x, const nmod_mat_t A, nn_srcptr b);
 
 /* Solving */
 
@@ -351,7 +351,7 @@ void nmod_mat_similarity(nmod_mat_t M, slong r, ulong d);
 
 /* Inlines *******************************************************************/
 
-void nmod_mat_set_entry(nmod_mat_t mat, slong i, slong j, mp_limb_t x);
+void nmod_mat_set_entry(nmod_mat_t mat, slong i, slong j, ulong x);
 
 #ifdef __cplusplus
 }

@@ -22,7 +22,7 @@
 #define NUM_SMALL_FIB2 92
 #endif
 
-static const mp_limb_t small_fib[NUM_SMALL_FIB] =
+static const ulong small_fib[NUM_SMALL_FIB] =
 {
     0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987,
     1597, 2584, 4181, 6765, 10946, 17711, 28657, 46368, 75025, 121393,
@@ -55,7 +55,7 @@ void fmpz_fib_ui(fmpz_t f, ulong n)
     }
     else if (n < NUM_SMALL_FIB2)
     {
-        mp_limb_t hi, lo, a, b;
+        ulong hi, lo, a, b;
         a = small_fib[n / 2];
         b = small_fib[n / 2 - 1];
         if (n & 1)

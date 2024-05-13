@@ -16,13 +16,13 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-mp_limb_t n_randbits(flint_rand_t state, unsigned int bits)
+ulong n_randbits(flint_rand_t state, unsigned int bits)
 {
    if (bits == 0) return UWORD(0);
    else return (UWORD(1) << (bits - 1)) | n_randint(state, l_shift(UWORD(1), bits));
 }
 
-mp_limb_t n_urandint(flint_rand_t state, mp_limb_t limit)
+ulong n_urandint(flint_rand_t state, ulong limit)
 {
     if ((limit & (limit - 1)) == 0)
     {
@@ -30,8 +30,8 @@ mp_limb_t n_urandint(flint_rand_t state, mp_limb_t limit)
     }
     else
     {
-        const mp_limb_t rand_max = UWORD_MAX;
-        mp_limb_t bucket_size, num_of_buckets, rand_within_range;
+        const ulong rand_max = UWORD_MAX;
+        ulong bucket_size, num_of_buckets, rand_within_range;
 
         bucket_size = 1 + (rand_max - limit + 1)/limit;
         num_of_buckets = bucket_size*limit;
@@ -46,7 +46,7 @@ mp_limb_t n_urandint(flint_rand_t state, mp_limb_t limit)
 }
 
 #if FLINT64
-mp_limb_t n_randlimb(flint_rand_t state)
+ulong n_randlimb(flint_rand_t state)
 {
     state->__randval = (state->__randval*UWORD(13282407956253574709) + UWORD(286824421));
     state->__randval2 = (state->__randval2*UWORD(7557322358563246341) + UWORD(286824421));
@@ -54,7 +54,7 @@ mp_limb_t n_randlimb(flint_rand_t state)
     return (state->__randval>>32) + ((state->__randval2>>32) << 32);
 }
 #else
-mp_limb_t n_randlimb(flint_rand_t state)
+ulong n_randlimb(flint_rand_t state)
 {
     state->__randval = (state->__randval*UWORD(1543932465) +  UWORD(1626832771));
     state->__randval2 = (state->__randval2*UWORD(2495927737) +  UWORD(1626832771));
@@ -63,10 +63,10 @@ mp_limb_t n_randlimb(flint_rand_t state)
 }
 #endif
 
-mp_limb_t n_randtest_bits(flint_rand_t state, int bits)
+ulong n_randtest_bits(flint_rand_t state, int bits)
 {
-    mp_limb_t m;
-    mp_limb_t n;
+    ulong m;
+    ulong n;
 
     m = n_randlimb(state);
 
@@ -107,22 +107,22 @@ mp_limb_t n_randtest_bits(flint_rand_t state, int bits)
     return n;
 }
 
-mp_limb_t n_randtest(flint_rand_t state)
+ulong n_randtest(flint_rand_t state)
 {
     return n_randtest_bits(state, n_randint(state, FLINT_BITS + 1));
 }
 
-mp_limb_t n_randtest_not_zero(flint_rand_t state)
+ulong n_randtest_not_zero(flint_rand_t state)
 {
-    mp_limb_t n;
+    ulong n;
 
     while ((n = n_randtest(state)) == 0) ;
     return n;
 }
 
-mp_limb_t n_randprime(flint_rand_t state, ulong bits, int proved)
+ulong n_randprime(flint_rand_t state, ulong bits, int proved)
 {
-    mp_limb_t rand;
+    ulong rand;
 
     if (bits < 2)
     {
@@ -153,7 +153,7 @@ mp_limb_t n_randprime(flint_rand_t state, ulong bits, int proved)
     return rand;
 }
 
-mp_limb_t n_randtest_prime(flint_rand_t state, int proved)
+ulong n_randtest_prime(flint_rand_t state, int proved)
 {
     return n_randprime(state, 2 + n_randint(state, FLINT_BITS - 1), proved);
 }

@@ -71,7 +71,7 @@ void fq_default_ctx_init_modulus_type(fq_default_ctx_t ctx,
     }
     else if (type == FQ_DEFAULT_NMOD || (type == 0 && d == 1 && fmpz_abs_fits_ui(p)))
     {
-        mp_limb_t c0, c1, a;
+        ulong c0, c1, a;
         nmod_t mod;
 
         nmod_init(&mod, fmpz_get_ui(p));
@@ -126,7 +126,7 @@ void fq_default_ctx_init_modulus_nmod_type(fq_default_ctx_t ctx,
     }
     else if (type == FQ_DEFAULT_NMOD || (type == 0 && d == 1))
     {
-        mp_limb_t c0, c1, a;
+        ulong c0, c1, a;
         nmod_t mod;
 
         nmod_init(&mod, p);
@@ -142,7 +142,7 @@ void fq_default_ctx_init_modulus_nmod_type(fq_default_ctx_t ctx,
     else if (type == FQ_DEFAULT_FMPZ_MOD || (type == 0 && d == 1))
     {
         fmpz_t pp;
-        mp_limb_t c0, c1, a;
+        ulong c0, c1, a;
 
         c0 = modulus->coeffs[0];
         c1 = modulus->coeffs[1];

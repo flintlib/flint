@@ -422,7 +422,7 @@ TEST_FUNCTION_START(nmod_mpoly_factor_gcd_zippel, state)
         nmod_mpoly_t a, b, g, t;
         slong len, len1, len2;
         slong degbound;
-        mp_limb_t p;
+        ulong p;
 
         p = n_randint(state, (i % 2 == 0) ? 10 : FLINT_BITS - 1) + 1;
         p = n_randbits(state, p);
