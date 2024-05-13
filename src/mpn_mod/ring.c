@@ -615,7 +615,7 @@ mpn_mod_inv(nn_ptr res, nn_srcptr x, gr_ctx_t ctx)
     ulong s[MPN_MOD_MAX_LIMBS];
     ulong t[MPN_MOD_MAX_LIMBS];
     ulong u[MPN_MOD_MAX_LIMBS];
-    slong gsize, ssize;
+    mp_size_t gsize, ssize;
 
     if (mpn_mod_is_one(x, ctx) == T_TRUE || mpn_mod_is_neg_one(x, ctx) == T_TRUE)
         return mpn_mod_set(res, x, ctx);
@@ -623,6 +623,8 @@ mpn_mod_inv(nn_ptr res, nn_srcptr x, gr_ctx_t ctx)
     flint_mpn_copyi(t, x, n);
     flint_mpn_copyi(u, d, n);
     /* todo: does mpn_gcdext allow aliasing? */
+    /* NOTE: ssize must be mp_size_t since it is strictly different from slong
+     * on Windows systems. */
     gsize = mpn_gcdext(g, s, &ssize, t, n, u, n);
 
     if (gsize != 1 || g[0] != 1)

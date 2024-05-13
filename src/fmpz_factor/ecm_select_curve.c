@@ -23,7 +23,8 @@ int
 fmpz_factor_ecm_select_curve(nn_ptr f, nn_ptr sig, nn_ptr n, ecm_t ecm_inf)
 {
     slong sz, cy;
-    slong invlimbs, gcdlimbs;
+    mp_size_t invlimbs;
+    slong gcdlimbs;
     nn_ptr temp, tempv, tempn, tempi, tempf;
     int ret;
 
@@ -110,6 +111,8 @@ fmpz_factor_ecm_select_curve(nn_ptr f, nn_ptr sig, nn_ptr n, ecm_t ecm_inf)
     flint_mpn_copyi(tempv, ecm_inf->v, sz);
     flint_mpn_copyi(tempn, n, ecm_inf->n_size);
 
+    /* NOTE: invlimbs must be mp_size_t since it is strictly different from
+     * slong on Windows systems. */
     gcdlimbs = mpn_gcdext(tempf, tempi, &invlimbs, tempv, sz, tempn, ecm_inf->n_size);
 
     if (!(gcdlimbs == 1 && tempf[0] == ecm_inf->one[0]) &&
