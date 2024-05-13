@@ -1,29 +1,19 @@
 /*
-   Copyright 1991, 1992, 1993, 1994, 1996, 1997, 1999, 2000, 2001, 2002, 2003,
-   2004, 2005 Free Software Foundation, Inc.
+    Copyright 1991, 1992, 1993, 1994, 1996, 1997, 1999, 2000, 2001, 2002, 2003,
+    2004, 2005 Free Software Foundation, Inc.
 
-   Copyright 2009, 2015, 2016 William Hart
-   Copyright 2011 Fredrik Johansson
-   Copyright 2023 Albin Ahlbäck
+    Copyright (C) 2009, 2015, 2016 William Hart
+    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2023 Albin Ahlbäck
 
-   This file is free software; you can redistribute it and/or modify
-   it under the terms of the GNU Lesser General Public License as published by
-   the Free Software Foundation; either version 2.1 of the License, or (at your
-   option) any later version.
+    This file is part of FLINT.
 
-   This file is distributed in the hope that it will be useful, but
-   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-   or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
-   License for more details.
+    Contains code from GNU MP Library.
 
-   You should have received a copy of the GNU Lesser General Public License
-   along with this file; see the file COPYING.LIB.  If not, write to
-   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-   MA 02110-1301, USA.
-*/
-
-/*
-   N.B: This file has been adapted from code found in GMP 4.2.1.
+    FLINT is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Lesser General Public License (LGPL) as published
+    by the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #ifndef FLINT_LONGLONG_H
