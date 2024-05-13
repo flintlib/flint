@@ -14,8 +14,8 @@
 void
 arf_debug(const arf_t x)
 {
-    mp_srcptr d;
-    mp_size_t n;
+    nn_srcptr d;
+    slong n;
     slong i;
 
     flint_printf("{exp=");

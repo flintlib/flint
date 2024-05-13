@@ -16,7 +16,7 @@
 
 /* Defined in t-landau_function_vec.c and t-sum_of_squares.c */
 #define known known_landau_function_vec
-static const mp_limb_t known[] = {
+static const ulong known[] = {
     1, 1, 2, 3, 4, 6, 6, 12, 15, 20, 30, 30, 60, 60, 84, 105, 140, 210,
     210, 420, 420, 420, 420, 840, 840, 1260, 1260, 1540, 2310, 2520,
     4620, 4620, 5460, 5460, 9240, 9240, 13860, 13860, 16380, 16380,

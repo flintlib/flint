@@ -59,11 +59,11 @@ int z_mat22_det_is_negative(slong m11, slong m12, slong m21, slong m22)
 
 /* Randomisation  ************************************************************/
 
-mp_limb_signed_t z_randtest(flint_rand_t state);
+slong z_randtest(flint_rand_t state);
 
-mp_limb_signed_t z_randtest_not_zero(flint_rand_t state);
+slong z_randtest_not_zero(flint_rand_t state);
 
-mp_limb_signed_t z_randint(flint_rand_t state, mp_limb_t limit);
+slong z_randint(flint_rand_t state, ulong limit);
 
 /*****************************************************************************/
 

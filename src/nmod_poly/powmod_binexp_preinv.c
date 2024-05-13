@@ -19,10 +19,10 @@
 #include "fmpz.h"
 
 void
-_nmod_poly_powmod_fmpz_binexp_preinv (mp_ptr res, mp_srcptr poly, fmpz_t e,
-            mp_srcptr f, slong lenf, mp_srcptr finv, slong lenfinv, nmod_t mod)
+_nmod_poly_powmod_fmpz_binexp_preinv (nn_ptr res, nn_srcptr poly, fmpz_t e,
+            nn_srcptr f, slong lenf, nn_srcptr finv, slong lenfinv, nmod_t mod)
 {
-    mp_ptr T, Q;
+    nn_ptr T, Q;
     slong lenT, lenQ;
     slong i, bits;
 
@@ -83,7 +83,7 @@ void
 nmod_poly_powmod_fmpz_binexp_preinv(nmod_poly_t res, const nmod_poly_t poly,
                          fmpz_t e, const nmod_poly_t f, const nmod_poly_t finv)
 {
-    mp_ptr p;
+    nn_ptr p;
     slong len = poly->length;
     slong lenf = f->length;
     slong trunc = lenf - 1;
@@ -178,10 +178,10 @@ nmod_poly_powmod_fmpz_binexp_preinv(nmod_poly_t res, const nmod_poly_t poly,
 }
 
 void
-_nmod_poly_powmod_ui_binexp_preinv(mp_ptr res, mp_srcptr poly, ulong e,
-                    mp_srcptr f, slong lenf, mp_srcptr finv, slong lenfinv, nmod_t mod)
+_nmod_poly_powmod_ui_binexp_preinv(nn_ptr res, nn_srcptr poly, ulong e,
+                    nn_srcptr f, slong lenf, nn_srcptr finv, slong lenfinv, nmod_t mod)
 {
-    mp_ptr T, Q;
+    nn_ptr T, Q;
     slong lenT, lenQ, i;
 
     if (lenf == 2)
@@ -219,7 +219,7 @@ void
 nmod_poly_powmod_ui_binexp_preinv(nmod_poly_t res, const nmod_poly_t poly,
                           ulong e, const nmod_poly_t f, const nmod_poly_t finv)
 {
-    mp_ptr p;
+    nn_ptr p;
     slong len = poly->length;
     slong lenf = f->length;
     slong trunc = lenf - 1;

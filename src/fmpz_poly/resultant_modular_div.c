@@ -27,8 +27,8 @@ void _fmpz_poly_resultant_modular_div(fmpz_t res,
     fmpz_comb_temp_t comb_temp;
     fmpz_t ac, bc, l, modulus, div, la, lb;
     fmpz * A, * B, * lead_A, * lead_B;
-    mp_ptr a, b, rarr, parr;
-    mp_limb_t p, d;
+    nn_ptr a, b, rarr, parr;
+    ulong p, d;
     nmod_t mod;
 
     if (fmpz_is_zero(divisor))

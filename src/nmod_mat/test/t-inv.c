@@ -17,7 +17,7 @@ TEST_FUNCTION_START(nmod_mat_inv, state)
 {
     nmod_mat_t A, B, C, I;
     slong i, j, m, r;
-    mp_limb_t mod;
+    ulong mod;
     int result;
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)

@@ -12,7 +12,7 @@
 #include "mpn_extras.h"
 #include "arb.h"
 
-#define TMP_ALLOC_LIMBS(__n) TMP_ALLOC((__n) * sizeof(mp_limb_t))
+#define TMP_ALLOC_LIMBS(__n) TMP_ALLOC((__n) * sizeof(ulong))
 
 /*
 Compute wn-limb fixed-point number w, a number of ulps error, and
@@ -65,11 +65,11 @@ for a total of 3 ulp.
 
 
 int
-_arb_get_mpn_fixed_mod_log2(mp_ptr w, fmpz_t q, mp_limb_t * error,
-                                                const arf_t x, mp_size_t wn)
+_arb_get_mpn_fixed_mod_log2(nn_ptr w, fmpz_t q, ulong * error,
+                                                const arf_t x, slong wn)
 {
-    mp_srcptr xp;
-    mp_size_t xn;
+    nn_srcptr xp;
+    slong xn;
     int negative;
     slong exp;
 
@@ -102,9 +102,9 @@ _arb_get_mpn_fixed_mod_log2(mp_ptr w, fmpz_t q, mp_limb_t * error,
     }
     else
     {
-        mp_ptr qp, rp, np;
-        mp_srcptr dp;
-        mp_size_t qn, rn, nn, dn, tn, alloc;
+        nn_ptr qp, rp, np;
+        nn_srcptr dp;
+        slong qn, rn, nn, dn, tn, alloc;
         TMP_INIT;
 
         tn = ((exp + 2) + FLINT_BITS - 1) / FLINT_BITS;

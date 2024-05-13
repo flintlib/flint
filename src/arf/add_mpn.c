@@ -12,7 +12,7 @@
 #include "mpn_extras.h"
 #include "arf.h"
 
-FLINT_TLS_PREFIX mp_ptr __arf_add_tmp = NULL;
+FLINT_TLS_PREFIX nn_ptr __arf_add_tmp = NULL;
 FLINT_TLS_PREFIX slong __arf_add_alloc = 0;
 
 void _arf_add_tmp_cleanup(void)
@@ -24,23 +24,23 @@ void _arf_add_tmp_cleanup(void)
 
 /* Assumptions: top limbs of x and y nonzero. */
 int
-_arf_add_mpn(arf_t z, mp_srcptr xp, mp_size_t xn, int xsgnbit, const fmpz_t xexp,
-                      mp_srcptr yp, mp_size_t yn, int ysgnbit, flint_bitcnt_t shift,
+_arf_add_mpn(arf_t z, nn_srcptr xp, slong xn, int xsgnbit, const fmpz_t xexp,
+                      nn_srcptr yp, slong yn, int ysgnbit, flint_bitcnt_t shift,
                       slong prec, arf_rnd_t rnd)
 {
-    mp_size_t wn, zn, zn_original, alloc, xbase, wbase;
-    mp_size_t shift_limbs;
+    slong wn, zn, zn_original, alloc, xbase, wbase;
+    slong shift_limbs;
     flint_bitcnt_t shift_bits;
     int inexact;
     slong fix;
-    mp_limb_t cy;
-    mp_ptr tmp;
+    ulong cy;
+    nn_ptr tmp;
     ARF_ADD_TMP_DECL
 
     /* very fast case */
     if (xn == 1 && yn == 1 && shift < FLINT_BITS - 1)
     {
-        mp_limb_t hi, lo, xhi, xlo, yhi, ylo;
+        ulong hi, lo, xhi, xlo, yhi, ylo;
 
         xhi = xp[0];
         yhi = yp[0];
@@ -93,7 +93,7 @@ _arf_add_mpn(arf_t z, mp_srcptr xp, mp_size_t xn, int xsgnbit, const fmpz_t xexp
     /* somewhat fast case */
     if (xn <= 2 && yn <= 2 && shift <= 2 * FLINT_BITS)
     {
-        mp_limb_t t[5], xtmp[4], ytmp[4], yhi, ylo;
+        ulong t[5], xtmp[4], ytmp[4], yhi, ylo;
         slong fix2;
 
         xtmp[0] = 0;

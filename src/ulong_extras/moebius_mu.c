@@ -15,7 +15,7 @@
 #define FLINT_MU_LOOKUP_CUTOFF 1024
 
 #if FLINT64
-const mp_limb_t FLINT_MOEBIUS_ODD[] =
+const ulong FLINT_MOEBIUS_ODD[] =
 {
     UWORD(0x4289108a05208102), UWORD(0x19988004a8a12422), UWORD(0x1a8245028906a062),
     UWORD(0x229428012aa26a00), UWORD(0x8422a98980440a18), 0x224925084068929aUL,
@@ -25,7 +25,7 @@ const mp_limb_t FLINT_MOEBIUS_ODD[] =
     UWORD(0x0108884a22186025)
 };
 #else
-const mp_limb_t FLINT_MOEBIUS_ODD[] =
+const ulong FLINT_MOEBIUS_ODD[] =
 {
     UWORD(0x05208102), 0x4289108aUL, UWORD(0xa8a12422), UWORD(0x19988004), UWORD(0x8906a062),
     UWORD(0x1a824502), UWORD(0x2aa26a00), UWORD(0x22942801), UWORD(0x80440a18), UWORD(0x8422a989),
@@ -41,8 +41,8 @@ void n_moebius_mu_vec(int * mu, ulong len)
 {
     ulong k;
     ulong pi;
-    const mp_limb_t * primes;
-    mp_limb_t p, q;
+    const ulong * primes;
+    ulong p, q;
 
     pi = n_prime_pi(len);
     primes = n_primes_arr_readonly(pi);
@@ -62,7 +62,7 @@ void n_moebius_mu_vec(int * mu, ulong len)
     }
 }
 
-int n_moebius_mu(mp_limb_t n)
+int n_moebius_mu(ulong n)
 {
     int i;
     n_factor_t fac;
@@ -76,7 +76,7 @@ int n_moebius_mu(mp_limb_t n)
 
     if (n < FLINT_MU_LOOKUP_CUTOFF)
     {
-        mp_limb_t m;
+        ulong m;
         n -= 1;
         m = FLINT_MOEBIUS_ODD[n / FLINT_BITS];
         m &= (UWORD(3) << (n % FLINT_BITS));

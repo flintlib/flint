@@ -34,7 +34,7 @@ TEST_FUNCTION_START(arb_atan_tab, state)
 
         for (i = 0; i < num; i++)
         {
-            tt->_mp_d = (mp_ptr) arb_atan_tab1[i];
+            tt->_mp_d = (nn_ptr) arb_atan_tab1[i];
             tt->_mp_size = prec / FLINT_BITS;
             tt->_mp_alloc = tt->_mp_size;
 
@@ -85,7 +85,7 @@ TEST_FUNCTION_START(arb_atan_tab, state)
 
         for (i = 0; i < num; i++)
         {
-            tt->_mp_d = (mp_ptr) arb_atan_tab21[i];
+            tt->_mp_d = (nn_ptr) arb_atan_tab21[i];
             tt->_mp_size = prec / FLINT_BITS;
             tt->_mp_alloc = tt->_mp_size;
 
@@ -136,7 +136,7 @@ TEST_FUNCTION_START(arb_atan_tab, state)
 
         for (i = 0; i < num; i++)
         {
-            tt->_mp_d = (mp_ptr) arb_atan_tab22[i];
+            tt->_mp_d = (nn_ptr) arb_atan_tab22[i];
             tt->_mp_size = prec / FLINT_BITS;
             tt->_mp_alloc = tt->_mp_size;
 

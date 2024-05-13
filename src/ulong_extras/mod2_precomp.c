@@ -12,15 +12,15 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-mp_limb_t
-n_mod2_precomp(mp_limb_t a, mp_limb_t n, double npre)
+ulong
+n_mod2_precomp(ulong a, ulong n, double npre)
 {
-    mp_limb_t quot;
+    ulong quot;
     slong rem;
 
     if (a < n)
         return a;
-    if ((mp_limb_signed_t) n < WORD(0))
+    if ((slong) n < WORD(0))
         return a - n;
 
     if (n == 1)
@@ -29,14 +29,14 @@ n_mod2_precomp(mp_limb_t a, mp_limb_t n, double npre)
         rem = 0;
     } else
     {
-        quot = (mp_limb_t) ((double) a * npre);
+        quot = (ulong) ((double) a * npre);
         rem  = a - quot * n;
     }
 
-    if (rem < (mp_limb_signed_t) (-n))
-        quot -= (mp_limb_t) ((double) (-rem) * npre);
+    if (rem < (slong) (-n))
+        quot -= (ulong) ((double) (-rem) * npre);
     else if (rem >= (slong) n)
-        quot += (mp_limb_t) ((double) rem * npre);
+        quot += (ulong) ((double) rem * npre);
     else if (rem < WORD(0))
         return rem + n;
     else

@@ -14,8 +14,8 @@
 int
 arf_is_int(const arf_t x)
 {
-    mp_size_t xn;
-    mp_srcptr xp;
+    slong xn;
+    nn_srcptr xp;
     slong exp, c;
 
     exp = ARF_EXP(x);

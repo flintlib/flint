@@ -15,7 +15,7 @@
 #include "fmpz.h"
 #include "fmpz_factor.h"
 
-void _fmpz_np1_trial_factors(const fmpz_t n, mp_ptr pp1, slong * num_pp1, ulong limit)
+void _fmpz_np1_trial_factors(const fmpz_t n, nn_ptr pp1, slong * num_pp1, ulong limit)
 {
    slong i, num;
    ulong ppi, p;
@@ -61,10 +61,10 @@ void _fmpz_np1_trial_factors(const fmpz_t n, mp_ptr pp1, slong * num_pp1, ulong 
    }
 }
 
-int fmpz_is_prime_morrison(fmpz_t F, fmpz_t R, const fmpz_t n, mp_ptr pp1, slong num_pp1)
+int fmpz_is_prime_morrison(fmpz_t F, fmpz_t R, const fmpz_t n, nn_ptr pp1, slong num_pp1)
 {
    slong i, d, bits;
-   mp_limb_t a, b;
+   ulong a, b;
    fmpz_t g, q, r, ex, c, D, Dinv, A, B, Ukm, Ukm1, Um, Um1, Vm, Vm1, p;
    fmpz_factor_t fac;
    int res = 0, fac_found;

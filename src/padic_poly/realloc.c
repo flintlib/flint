@@ -29,7 +29,7 @@ void padic_poly_realloc(padic_poly_t poly, slong alloc, const fmpz_t p)
 
         poly->coeffs = (fmpz *) flint_realloc(poly->coeffs, alloc * sizeof(fmpz));
         if (alloc > poly->alloc)
-            mpn_zero((mp_ptr) (poly->coeffs + poly->alloc),
+            mpn_zero((nn_ptr) (poly->coeffs + poly->alloc),
                      alloc - poly->alloc);
     }
     else                        /* Nothing allocated already so do it now */

@@ -14,7 +14,7 @@
 int
 arf_equal(const arf_t x, const arf_t y)
 {
-    mp_size_t n;
+    slong n;
 
     if (x == y)
         return 1;

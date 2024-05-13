@@ -18,10 +18,10 @@ TEST_FUNCTION_START(n_sqrtmodn, state)
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random squares mod n */
     {
-        mp_limb_t a, b, n, ninv;
+        ulong a, b, n, ninv;
         slong num, i;
         flint_bitcnt_t bits;
-        mp_limb_t * sqrt;
+        ulong * sqrt;
         int btest;
         n_factor_t fac;
 
@@ -62,9 +62,9 @@ TEST_FUNCTION_START(n_sqrtmodn, state)
 
     for (i = 0; i < 500 * flint_test_multiplier(); i++) /* test random nonsquares */
     {
-        mp_limb_t a, b, n, ninv;
+        ulong a, b, n, ninv;
         flint_bitcnt_t bits;
-        mp_limb_t * sqrt;
+        ulong * sqrt;
         n_factor_t fac;
 
         bits = n_randint(state, 18) + 2;

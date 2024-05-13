@@ -16,17 +16,17 @@
 #include "fmpz_vec.h"
 
 static void _fmpz_vec_set_fft_coeff(fmpz * coeffs_m, slong i,
-                          const mp_ptr * coeffs_f, slong limbs, slong sign)
+                          const nn_ptr * coeffs_f, slong limbs, slong sign)
 {
     slong size;
-    mp_limb_t * data;
+    ulong * data;
     mpz_ptr mcoeffs_m;
 
     coeffs_m += i;
 
     if (sign)
     {
-        mp_limb_t halflimb = UWORD(1) << (FLINT_BITS - 1);
+        ulong halflimb = UWORD(1) << (FLINT_BITS - 1);
 
         {
             mcoeffs_m = _fmpz_promote(coeffs_m);
@@ -68,7 +68,7 @@ static void _fmpz_vec_set_fft_coeff(fmpz * coeffs_m, slong i,
 typedef struct
 {
     fmpz * coeffs_m;
-    const mp_ptr * coeffs_f;
+    const nn_ptr * coeffs_f;
     slong limbs;
     int sign;
 }
@@ -81,7 +81,7 @@ worker(slong i, work_t * work)
 }
 
 void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length,
-                          const mp_ptr * coeffs_f, slong limbs, slong sign)
+                          const nn_ptr * coeffs_f, slong limbs, slong sign)
 {
     work_t work;
     slong max_threads;

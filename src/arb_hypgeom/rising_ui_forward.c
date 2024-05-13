@@ -16,9 +16,9 @@ _arf_increment_fast(arf_t x, slong prec)
 {
     if (arf_sgn(x) > 0)
     {
-        mp_limb_t hi, v, cy;
-        mp_ptr xptr;
-        mp_size_t xn;
+        ulong hi, v, cy;
+        nn_ptr xptr;
+        slong xn;
         slong xexp;
 
         xexp = ARF_EXP(x);

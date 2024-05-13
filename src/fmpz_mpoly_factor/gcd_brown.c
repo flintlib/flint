@@ -78,7 +78,7 @@ int fmpz_mpolyl_gcd_brown(
     int success;
     fmpz_t bound;
     slong offset, shift;
-    mp_limb_t p, gammared;
+    ulong p, gammared;
     fmpz_t gamma, modulus;
     fmpz_t gnm, gns, anm, ans, bnm, bns;
     fmpz_t cA, cB, cG, cAbar, cBbar;

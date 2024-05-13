@@ -17,8 +17,8 @@
 
 slong _nmod_mpoly_mul_johnson1(
     nmod_mpoly_t A,
-    const mp_limb_t * coeff2, const ulong * exp2, slong len2,
-    const mp_limb_t * coeff3, const ulong * exp3, slong len3,
+    const ulong * coeff2, const ulong * exp2, slong len2,
+    const ulong * coeff3, const ulong * exp3, slong len3,
     ulong maskhi,
     nmod_t fctx)
 {
@@ -30,7 +30,7 @@ slong _nmod_mpoly_mul_johnson1(
     slong * Q;
     mpoly_heap_t * x;
     slong len1;
-    mp_limb_t * p1 = A->coeffs;
+    ulong * p1 = A->coeffs;
     ulong * e1 = A->exps;
     slong * hind;
     ulong exp;
@@ -144,8 +144,8 @@ slong _nmod_mpoly_mul_johnson1(
 
 slong _nmod_mpoly_mul_johnson(
     nmod_mpoly_t A,
-    const mp_limb_t * coeff2, const ulong * exp2, slong len2,
-    const mp_limb_t * coeff3, const ulong * exp3, slong len3,
+    const ulong * coeff2, const ulong * exp2, slong len2,
+    const ulong * coeff3, const ulong * exp3, slong len3,
     flint_bitcnt_t bits,
     slong N,
     const ulong * cmpmask,
@@ -159,7 +159,7 @@ slong _nmod_mpoly_mul_johnson(
     slong * Q;
     mpoly_heap_t * x;
     slong len1;
-    mp_limb_t * p1 = A->coeffs;
+    ulong * p1 = A->coeffs;
     ulong * e1 = A->exps;
     ulong * exp, * exps;
     ulong ** exp_list;

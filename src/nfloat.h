@@ -42,10 +42,10 @@ extern "C" {
 /* Number of header limbs used to encode sign + exponent. We use a
    whole limb for the sign bit to avoid the overhead of bit fiddling. */
 #define NFLOAT_HEADER_LIMBS 2
-#define NFLOAT_EXP(x) (((mp_limb_signed_t *) x)[0])
-#define NFLOAT_SGNBIT(x) (((mp_ptr) x)[1])
-#define NFLOAT_D(x) (((mp_ptr) x) + NFLOAT_HEADER_LIMBS)
-#define NFLOAT_DATA(x) (((mp_ptr) x))
+#define NFLOAT_EXP(x) (((slong *) x)[0])
+#define NFLOAT_SGNBIT(x) (((nn_ptr) x)[1])
+#define NFLOAT_D(x) (((nn_ptr) x) + NFLOAT_HEADER_LIMBS)
+#define NFLOAT_DATA(x) (((nn_ptr) x))
 
 /* Limbs needed to hold a temporary element of any precision. */
 #define NFLOAT_MAX_ALLOC (NFLOAT_HEADER_LIMBS + NFLOAT_MAX_LIMBS)
@@ -96,14 +96,14 @@ typedef const void * nfloat_srcptr;
 #define NFLOAT_CTX_DATA_NLIMBS(ctx) (NFLOAT_CTX_NLIMBS(ctx) + NFLOAT_HEADER_LIMBS)
 #define NFLOAT_CTX_HAS_INF_NAN(ctx) ((NFLOAT_CTX_FLAGS(ctx) & (NFLOAT_ALLOW_INF | NFLOAT_ALLOW_NAN)) != 0)
 
-typedef struct { mp_limb_t head[NFLOAT_HEADER_LIMBS]; mp_limb_t d[64 / FLINT_BITS]; } nfloat64_struct;
-typedef struct { mp_limb_t head[NFLOAT_HEADER_LIMBS]; mp_limb_t d[128 / FLINT_BITS]; } nfloat128_struct;
-typedef struct { mp_limb_t head[NFLOAT_HEADER_LIMBS]; mp_limb_t d[192 / FLINT_BITS]; } nfloat192_struct;
-typedef struct { mp_limb_t head[NFLOAT_HEADER_LIMBS]; mp_limb_t d[256 / FLINT_BITS]; } nfloat256_struct;
-typedef struct { mp_limb_t head[NFLOAT_HEADER_LIMBS]; mp_limb_t d[384 / FLINT_BITS]; } nfloat384_struct;
-typedef struct { mp_limb_t head[NFLOAT_HEADER_LIMBS]; mp_limb_t d[512 / FLINT_BITS]; } nfloat512_struct;
-typedef struct { mp_limb_t head[NFLOAT_HEADER_LIMBS]; mp_limb_t d[1024 / FLINT_BITS]; } nfloat1024_struct;
-typedef struct { mp_limb_t head[NFLOAT_HEADER_LIMBS]; mp_limb_t d[2048 / FLINT_BITS]; } nfloat2048_struct;
+typedef struct { ulong head[NFLOAT_HEADER_LIMBS]; ulong d[64 / FLINT_BITS]; } nfloat64_struct;
+typedef struct { ulong head[NFLOAT_HEADER_LIMBS]; ulong d[128 / FLINT_BITS]; } nfloat128_struct;
+typedef struct { ulong head[NFLOAT_HEADER_LIMBS]; ulong d[192 / FLINT_BITS]; } nfloat192_struct;
+typedef struct { ulong head[NFLOAT_HEADER_LIMBS]; ulong d[256 / FLINT_BITS]; } nfloat256_struct;
+typedef struct { ulong head[NFLOAT_HEADER_LIMBS]; ulong d[384 / FLINT_BITS]; } nfloat384_struct;
+typedef struct { ulong head[NFLOAT_HEADER_LIMBS]; ulong d[512 / FLINT_BITS]; } nfloat512_struct;
+typedef struct { ulong head[NFLOAT_HEADER_LIMBS]; ulong d[1024 / FLINT_BITS]; } nfloat1024_struct;
+typedef struct { ulong head[NFLOAT_HEADER_LIMBS]; ulong d[2048 / FLINT_BITS]; } nfloat2048_struct;
 
 typedef nfloat64_struct nfloat64_t[1];
 typedef nfloat128_struct nfloat128_t[1];
@@ -114,7 +114,7 @@ typedef nfloat512_struct nfloat512_t[1];
 typedef nfloat1024_struct nfloat1024_t[1];
 typedef nfloat2048_struct nfloat2048_t[1];
 
-#define LIMB_MSB_IS_SET(n) ((mp_limb_signed_t) (n) < 0)
+#define LIMB_MSB_IS_SET(n) ((slong) (n) < 0)
 
 int nfloat_ctx_init(gr_ctx_t ctx, slong prec, int flags);
 int nfloat_ctx_write(gr_stream_t out, gr_ctx_t ctx);
@@ -202,9 +202,9 @@ int nfloat_set_si(nfloat_ptr res, slong x, gr_ctx_t ctx);
 
 /* Here exp is understood such that {x, xn} is a fraction in [0, 1). */
 NFLOAT_INLINE int
-_nfloat_set_mpn_2exp(nfloat_ptr res, mp_srcptr x, mp_size_t xn, slong exp, int xsgnbit, gr_ctx_t ctx)
+_nfloat_set_mpn_2exp(nfloat_ptr res, nn_srcptr x, slong xn, slong exp, int xsgnbit, gr_ctx_t ctx)
 {
-    mp_limb_t top;
+    ulong top;
     slong norm;
     slong nlimbs = NFLOAT_CTX_NLIMBS(ctx);
 
@@ -251,7 +251,7 @@ _nfloat_set_mpn_2exp(nfloat_ptr res, mp_srcptr x, mp_size_t xn, slong exp, int x
 }
 
 NFLOAT_INLINE int
-nfloat_set_mpn_2exp(nfloat_ptr res, mp_srcptr x, mp_size_t xn, slong exp, int xsgnbit, gr_ctx_t ctx)
+nfloat_set_mpn_2exp(nfloat_ptr res, nn_srcptr x, slong xn, slong exp, int xsgnbit, gr_ctx_t ctx)
 {
     while (xn != 0 && x[xn - 1] == 0)
     {
@@ -289,10 +289,10 @@ int nfloat_cmpabs(int * res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx);
 int nfloat_sgn(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
 int nfloat_im(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
 
-int _nfloat_add_1(nfloat_ptr res, mp_limb_t x0, slong xexp, int xsgnbit, mp_limb_t y0, slong delta, gr_ctx_t ctx);
-int _nfloat_sub_1(nfloat_ptr res, mp_limb_t x0, slong xexp, int xsgnbit, mp_limb_t y0, slong delta, gr_ctx_t ctx);
-int _nfloat_add_n(nfloat_ptr res, mp_srcptr xd, slong xexp, int xsgnbit, mp_srcptr yd, slong delta, slong nlimbs, gr_ctx_t ctx);
-int _nfloat_sub_n(nfloat_ptr res, mp_srcptr xd, slong xexp, int xsgnbit, mp_srcptr yd, slong delta, slong nlimbs, gr_ctx_t ctx);
+int _nfloat_add_1(nfloat_ptr res, ulong x0, slong xexp, int xsgnbit, ulong y0, slong delta, gr_ctx_t ctx);
+int _nfloat_sub_1(nfloat_ptr res, ulong x0, slong xexp, int xsgnbit, ulong y0, slong delta, gr_ctx_t ctx);
+int _nfloat_add_n(nfloat_ptr res, nn_srcptr xd, slong xexp, int xsgnbit, nn_srcptr yd, slong delta, slong nlimbs, gr_ctx_t ctx);
+int _nfloat_sub_n(nfloat_ptr res, nn_srcptr xd, slong xexp, int xsgnbit, nn_srcptr yd, slong delta, slong nlimbs, gr_ctx_t ctx);
 
 int nfloat_add(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx);
 int nfloat_sub(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx);

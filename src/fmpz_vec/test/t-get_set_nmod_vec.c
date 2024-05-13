@@ -24,13 +24,13 @@ TEST_FUNCTION_START(fmpz_vec_get_set_nmod_vec, state)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz *a, *b;
-        mp_ptr c;
+        nn_ptr c;
         nmod_t mod;
         slong i;
-        mp_limb_t t;
+        ulong t;
 
         slong len = n_randint(state, 100);
-        mp_limb_t n = n_randtest_not_zero(state);
+        ulong n = n_randtest_not_zero(state);
 
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);

@@ -670,10 +670,10 @@ n_zerobits(ulong e)
 FLINT_FORCE_INLINE slong
 poly_pow_length(slong poly_len, ulong exp, slong trunc)
 {
-    mp_limb_t hi, lo;
+    ulong hi, lo;
     umul_ppmm(hi, lo, poly_len - 1, exp);
     add_ssaaaa(hi, lo, hi, lo, 0, 1);
-    if (hi != 0 || lo > (mp_limb_t) WORD_MAX)
+    if (hi != 0 || lo > (ulong) WORD_MAX)
         return trunc;
     return FLINT_MIN((slong) lo, trunc);
 }

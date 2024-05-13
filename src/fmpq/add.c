@@ -17,7 +17,7 @@ void
 _fmpq_add_small(fmpz_t rnum, fmpz_t rden, slong p1, ulong q1, slong p2, ulong q2)
 {
     ulong pp, qq, rr, ss;
-    mp_limb_t hi, lo;
+    ulong hi, lo;
     int s1, s2;
 
     if (q1 == q2)

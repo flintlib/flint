@@ -14,7 +14,7 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_cyclotomic(fmpz * a, ulong n, mp_ptr factors,
+_fmpz_poly_cyclotomic(fmpz * a, ulong n, nn_ptr factors,
                                         slong num_factors, ulong phi)
 {
     ulong i;

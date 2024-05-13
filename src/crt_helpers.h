@@ -89,232 +89,232 @@ FLINT_FORCE_INLINE unsigned char _subborrow_ulong(unsigned char cf, ulong x, ulo
 #define add_sssssaaaaaaaaaa(s4,s3,s2,s1,s0, a4,a3,a2,a1,a0, b4,b3,b2,b1,b0)  \
   __asm__ ("addq %14,%q4\n\tadcq %12,%q3\n\tadcq %10,%q2\n\tadcq %8,%q1\n\tadcq %6,%q0"    \
        : "=r" (s4), "=&r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                    \
-       : "0"  ((mp_limb_t)(a4)), "rme" ((mp_limb_t)(b4)),                 \
-         "1"  ((mp_limb_t)(a3)), "rme" ((mp_limb_t)(b3)),                 \
-         "2"  ((mp_limb_t)(a2)), "rme" ((mp_limb_t)(b2)),                 \
-         "3"  ((mp_limb_t)(a1)), "rme" ((mp_limb_t)(b1)),                 \
-         "4"  ((mp_limb_t)(a0)), "rme" ((mp_limb_t)(b0)))
+       : "0"  ((ulong)(a4)), "rme" ((ulong)(b4)),                 \
+         "1"  ((ulong)(a3)), "rme" ((ulong)(b3)),                 \
+         "2"  ((ulong)(a2)), "rme" ((ulong)(b2)),                 \
+         "3"  ((ulong)(a1)), "rme" ((ulong)(b1)),                 \
+         "4"  ((ulong)(a0)), "rme" ((ulong)(b0)))
 
 #define add_ssssssaaaaaaaaaaaa(s5,s4,s3,s2,s1,s0, a5,a4,a3,a2,a1,a0, b5,b4,b3,b2,b1,b0)  \
   __asm__ ("addq %17,%q5\nadcq %15,%q4\n\tadcq %13,%q3\n\tadcq %11,%q2\n\tadcq %9,%q1\n\tadcq %7,%q0"    \
        : "=r" (s5), "=&r" (s4), "=&r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                    \
-       : "0"  ((mp_limb_t)(a5)), "rme" ((mp_limb_t)(b5)),                 \
-         "1"  ((mp_limb_t)(a4)), "rme" ((mp_limb_t)(b4)),                 \
-         "2"  ((mp_limb_t)(a3)), "rme" ((mp_limb_t)(b3)),                 \
-         "3"  ((mp_limb_t)(a2)), "rme" ((mp_limb_t)(b2)),                 \
-         "4"  ((mp_limb_t)(a1)), "rme" ((mp_limb_t)(b1)),                 \
-         "5"  ((mp_limb_t)(a0)), "rme" ((mp_limb_t)(b0)))
+       : "0"  ((ulong)(a5)), "rme" ((ulong)(b5)),                 \
+         "1"  ((ulong)(a4)), "rme" ((ulong)(b4)),                 \
+         "2"  ((ulong)(a3)), "rme" ((ulong)(b3)),                 \
+         "3"  ((ulong)(a2)), "rme" ((ulong)(b2)),                 \
+         "4"  ((ulong)(a1)), "rme" ((ulong)(b1)),                 \
+         "5"  ((ulong)(a0)), "rme" ((ulong)(b0)))
 
 #define add_sssssssaaaaaaaaaaaaaa(s6,s5,s4,s3,s2,s1,s0, a6,a5,a4,a3,a2,a1,a0, b6,b5,b4,b3,b2,b1,b0)  \
   __asm__ ("addq %20,%q6\nadcq %18,%q5\nadcq %16,%q4\n\tadcq %14,%q3\n\tadcq %12,%q2\n\tadcq %10,%q1\n\tadcq %8,%q0"    \
        : "=r" (s6), "=&r" (s5), "=&r" (s4), "=&r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                    \
-       : "0"  ((mp_limb_t)(a6)), "rme" ((mp_limb_t)(b6)),                 \
-         "1"  ((mp_limb_t)(a5)), "rme" ((mp_limb_t)(b5)),                 \
-         "2"  ((mp_limb_t)(a4)), "rme" ((mp_limb_t)(b4)),                 \
-         "3"  ((mp_limb_t)(a3)), "rme" ((mp_limb_t)(b3)),                 \
-         "4"  ((mp_limb_t)(a2)), "rme" ((mp_limb_t)(b2)),                 \
-         "5"  ((mp_limb_t)(a1)), "rme" ((mp_limb_t)(b1)),                 \
-         "6"  ((mp_limb_t)(a0)), "rme" ((mp_limb_t)(b0)))
+       : "0"  ((ulong)(a6)), "rme" ((ulong)(b6)),                 \
+         "1"  ((ulong)(a5)), "rme" ((ulong)(b5)),                 \
+         "2"  ((ulong)(a4)), "rme" ((ulong)(b4)),                 \
+         "3"  ((ulong)(a3)), "rme" ((ulong)(b3)),                 \
+         "4"  ((ulong)(a2)), "rme" ((ulong)(b2)),                 \
+         "5"  ((ulong)(a1)), "rme" ((ulong)(b1)),                 \
+         "6"  ((ulong)(a0)), "rme" ((ulong)(b0)))
 
 #define add_ssssssssaaaaaaaaaaaaaaaa(s7,s6,s5,s4,s3,s2,s1,s0, a7,a6,a5,a4,a3,a2,a1,a0, b7,b6,b5,b4,b3,b2,b1,b0)  \
   __asm__ ("addq %23,%q7\nadcq %21,%q6\nadcq %19,%q5\n\tadcq %17,%q4\n\tadcq %15,%q3\n\tadcq %13,%q2\n\tadcq %11,%q1\n\tadcq %9,%q0"    \
        : "=r" (s7), "=&r" (s6), "=&r" (s5), "=&r" (s4), "=&r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                    \
-       : "0"  ((mp_limb_t)(a7)), "rme" ((mp_limb_t)(b7)),                 \
-         "1"  ((mp_limb_t)(a6)), "rme" ((mp_limb_t)(b6)),                 \
-         "2"  ((mp_limb_t)(a5)), "rme" ((mp_limb_t)(b5)),                 \
-         "3"  ((mp_limb_t)(a4)), "rme" ((mp_limb_t)(b4)),                 \
-         "4"  ((mp_limb_t)(a3)), "rme" ((mp_limb_t)(b3)),                 \
-         "5"  ((mp_limb_t)(a2)), "rme" ((mp_limb_t)(b2)),                 \
-         "6"  ((mp_limb_t)(a1)), "rme" ((mp_limb_t)(b1)),                 \
-         "7"  ((mp_limb_t)(a0)), "rme" ((mp_limb_t)(b0)))
+       : "0"  ((ulong)(a7)), "rme" ((ulong)(b7)),                 \
+         "1"  ((ulong)(a6)), "rme" ((ulong)(b6)),                 \
+         "2"  ((ulong)(a5)), "rme" ((ulong)(b5)),                 \
+         "3"  ((ulong)(a4)), "rme" ((ulong)(b4)),                 \
+         "4"  ((ulong)(a3)), "rme" ((ulong)(b3)),                 \
+         "5"  ((ulong)(a2)), "rme" ((ulong)(b2)),                 \
+         "6"  ((ulong)(a1)), "rme" ((ulong)(b1)),                 \
+         "7"  ((ulong)(a0)), "rme" ((ulong)(b0)))
 
 
 #define sub_ddddmmmmssss(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0)  \
   __asm__ ("subq %11,%q3\n\tsbbq %9,%q2\n\tsbbq %7,%q1\n\tsbbq %5,%q0"    \
        : "=r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                    \
-       : "0"  ((mp_limb_t)(a3)), "rme" ((mp_limb_t)(b3)),                 \
-         "1"  ((mp_limb_t)(a2)), "rme" ((mp_limb_t)(b2)),                 \
-         "2"  ((mp_limb_t)(a1)), "rme" ((mp_limb_t)(b1)),                 \
-         "3"  ((mp_limb_t)(a0)), "rme" ((mp_limb_t)(b0)))
+       : "0"  ((ulong)(a3)), "rme" ((ulong)(b3)),                 \
+         "1"  ((ulong)(a2)), "rme" ((ulong)(b2)),                 \
+         "2"  ((ulong)(a1)), "rme" ((ulong)(b1)),                 \
+         "3"  ((ulong)(a0)), "rme" ((ulong)(b0)))
 
 #define sub_dddddmmmmmsssss(s4,s3,s2,s1,s0, a4,a3,a2,a1,a0, b4,b3,b2,b1,b0)  \
   __asm__ ("subq %14,%q4\n\tsbbq %12,%q3\n\tsbbq %10,%q2\n\tsbbq %8,%q1\n\tsbbq %6,%q0"    \
        : "=r" (s4), "=&r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                    \
-       : "0"  ((mp_limb_t)(a4)), "rme" ((mp_limb_t)(b4)),                 \
-         "1"  ((mp_limb_t)(a3)), "rme" ((mp_limb_t)(b3)),                 \
-         "2"  ((mp_limb_t)(a2)), "rme" ((mp_limb_t)(b2)),                 \
-         "3"  ((mp_limb_t)(a1)), "rme" ((mp_limb_t)(b1)),                 \
-         "4"  ((mp_limb_t)(a0)), "rme" ((mp_limb_t)(b0)))
+       : "0"  ((ulong)(a4)), "rme" ((ulong)(b4)),                 \
+         "1"  ((ulong)(a3)), "rme" ((ulong)(b3)),                 \
+         "2"  ((ulong)(a2)), "rme" ((ulong)(b2)),                 \
+         "3"  ((ulong)(a1)), "rme" ((ulong)(b1)),                 \
+         "4"  ((ulong)(a0)), "rme" ((ulong)(b0)))
 
 #define sub_ddddddmmmmmmssssss(s5,s4,s3,s2,s1,s0, a5,a4,a3,a2,a1,a0, b5,b4,b3,b2,b1,b0)  \
   __asm__ ("subq %17,%q5\nsbbq %15,%q4\n\tsbbq %13,%q3\n\tsbbq %11,%q2\n\tsbbq %9,%q1\n\tsbbq %7,%q0"    \
        : "=r" (s5), "=&r" (s4), "=&r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                    \
-       : "0"  ((mp_limb_t)(a5)), "rme" ((mp_limb_t)(b5)),                 \
-         "1"  ((mp_limb_t)(a4)), "rme" ((mp_limb_t)(b4)),                 \
-         "2"  ((mp_limb_t)(a3)), "rme" ((mp_limb_t)(b3)),                 \
-         "3"  ((mp_limb_t)(a2)), "rme" ((mp_limb_t)(b2)),                 \
-         "4"  ((mp_limb_t)(a1)), "rme" ((mp_limb_t)(b1)),                 \
-         "5"  ((mp_limb_t)(a0)), "rme" ((mp_limb_t)(b0)))
+       : "0"  ((ulong)(a5)), "rme" ((ulong)(b5)),                 \
+         "1"  ((ulong)(a4)), "rme" ((ulong)(b4)),                 \
+         "2"  ((ulong)(a3)), "rme" ((ulong)(b3)),                 \
+         "3"  ((ulong)(a2)), "rme" ((ulong)(b2)),                 \
+         "4"  ((ulong)(a1)), "rme" ((ulong)(b1)),                 \
+         "5"  ((ulong)(a0)), "rme" ((ulong)(b0)))
 
 #define sub_dddddddmmmmmmmsssssss(s6,s5,s4,s3,s2,s1,s0, a6,a5,a4,a3,a2,a1,a0, b6,b5,b4,b3,b2,b1,b0)  \
   __asm__ ("subq %20,%q6\nsbbq %18,%q5\nsbbq %16,%q4\n\tsbbq %14,%q3\n\tsbbq %12,%q2\n\tsbbq %10,%q1\n\tsbbq %8,%q0"    \
        : "=r" (s6), "=&r" (s5), "=&r" (s4), "=&r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                    \
-       : "0"  ((mp_limb_t)(a6)), "rme" ((mp_limb_t)(b6)),                 \
-         "1"  ((mp_limb_t)(a5)), "rme" ((mp_limb_t)(b5)),                 \
-         "2"  ((mp_limb_t)(a4)), "rme" ((mp_limb_t)(b4)),                 \
-         "3"  ((mp_limb_t)(a3)), "rme" ((mp_limb_t)(b3)),                 \
-         "4"  ((mp_limb_t)(a2)), "rme" ((mp_limb_t)(b2)),                 \
-         "5"  ((mp_limb_t)(a1)), "rme" ((mp_limb_t)(b1)),                 \
-         "6"  ((mp_limb_t)(a0)), "rme" ((mp_limb_t)(b0)))
+       : "0"  ((ulong)(a6)), "rme" ((ulong)(b6)),                 \
+         "1"  ((ulong)(a5)), "rme" ((ulong)(b5)),                 \
+         "2"  ((ulong)(a4)), "rme" ((ulong)(b4)),                 \
+         "3"  ((ulong)(a3)), "rme" ((ulong)(b3)),                 \
+         "4"  ((ulong)(a2)), "rme" ((ulong)(b2)),                 \
+         "5"  ((ulong)(a1)), "rme" ((ulong)(b1)),                 \
+         "6"  ((ulong)(a0)), "rme" ((ulong)(b0)))
 
 #define sub_ddddddddmmmmmmmmssssssss(s7,s6,s5,s4,s3,s2,s1,s0, a7,a6,a5,a4,a3,a2,a1,a0, b7,b6,b5,b4,b3,b2,b1,b0)  \
   __asm__ ("subq %23,%q7\nsbbq %21,%q6\nsbbq %19,%q5\n\tsbbq %17,%q4\n\tsbbq %15,%q3\n\tsbbq %13,%q2\n\tsbbq %11,%q1\n\tsbbq %9,%q0"    \
        : "=r" (s7), "=&r" (s6), "=&r" (s5), "=&r" (s4), "=&r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                    \
-       : "0"  ((mp_limb_t)(a7)), "rme" ((mp_limb_t)(b7)),                 \
-         "1"  ((mp_limb_t)(a6)), "rme" ((mp_limb_t)(b6)),                 \
-         "2"  ((mp_limb_t)(a5)), "rme" ((mp_limb_t)(b5)),                 \
-         "3"  ((mp_limb_t)(a4)), "rme" ((mp_limb_t)(b4)),                 \
-         "4"  ((mp_limb_t)(a3)), "rme" ((mp_limb_t)(b3)),                 \
-         "5"  ((mp_limb_t)(a2)), "rme" ((mp_limb_t)(b2)),                 \
-         "6"  ((mp_limb_t)(a1)), "rme" ((mp_limb_t)(b1)),                 \
-         "7"  ((mp_limb_t)(a0)), "rme" ((mp_limb_t)(b0)))
+       : "0"  ((ulong)(a7)), "rme" ((ulong)(b7)),                 \
+         "1"  ((ulong)(a6)), "rme" ((ulong)(b6)),                 \
+         "2"  ((ulong)(a5)), "rme" ((ulong)(b5)),                 \
+         "3"  ((ulong)(a4)), "rme" ((ulong)(b4)),                 \
+         "4"  ((ulong)(a3)), "rme" ((ulong)(b3)),                 \
+         "5"  ((ulong)(a2)), "rme" ((ulong)(b2)),                 \
+         "6"  ((ulong)(a1)), "rme" ((ulong)(b1)),                 \
+         "7"  ((ulong)(a0)), "rme" ((ulong)(b0)))
 
 #elif defined(__GNUC__) && defined(__ARM_NEON)
 
 #define add_sssssaaaaaaaaaa(s4, s3, s2, s1, s0, a4, a3, a2, a1, a0, b4, b3, b2, b1, b0)      \
   __asm__ ("adds %4,%9,%14\n\tadcs %3,%8,%13\n\tadcs %2,%7,%12\n\tadcs %1,%6,%11\n\tadc %0,%5,%10"\
        : "=r" (s4), "=&r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                        \
-       : "r" ((mp_limb_t)(a4)), "r" ((mp_limb_t)(a3)), "r" ((mp_limb_t)(a2)), "r" ((mp_limb_t)(a1)), "r" ((mp_limb_t)(a0)), \
-         "r" ((mp_limb_t)(b4)), "r" ((mp_limb_t)(b3)), "r" ((mp_limb_t)(b2)), "r" ((mp_limb_t)(b1)), "rI" ((mp_limb_t)(b0))                        \
+       : "r" ((ulong)(a4)), "r" ((ulong)(a3)), "r" ((ulong)(a2)), "r" ((ulong)(a1)), "r" ((ulong)(a0)), \
+         "r" ((ulong)(b4)), "r" ((ulong)(b3)), "r" ((ulong)(b2)), "r" ((ulong)(b1)), "rI" ((ulong)(b0))                        \
        : "cc")
 
 #define add_ssssssaaaaaaaaaaaa(s5, s4, s3, s2, s1, s0, a5, a4, a3, a2, a1, a0, b5, b4, b3, b2, b1, b0)      \
   __asm__ ("adds %5,%11,%17\n\tadcs %4,%10,%16\n\tadcs %3,%9,%15\n\tadcs %2,%8,%14\n\tadcs %1,%7,%13\n\tadc %0,%6,%12"\
        : "=r" (s5), "=&r" (s4), "=&r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                        \
-       : "r" ((mp_limb_t)(a5)), "r" ((mp_limb_t)(a4)), "r" ((mp_limb_t)(a3)), "r" ((mp_limb_t)(a2)), "r" ((mp_limb_t)(a1)), "r" ((mp_limb_t)(a0)), \
-         "r" ((mp_limb_t)(b5)), "r" ((mp_limb_t)(b4)), "r" ((mp_limb_t)(b3)), "r" ((mp_limb_t)(b2)), "r" ((mp_limb_t)(b1)), "rI" ((mp_limb_t)(b0)) \
+       : "r" ((ulong)(a5)), "r" ((ulong)(a4)), "r" ((ulong)(a3)), "r" ((ulong)(a2)), "r" ((ulong)(a1)), "r" ((ulong)(a0)), \
+         "r" ((ulong)(b5)), "r" ((ulong)(b4)), "r" ((ulong)(b3)), "r" ((ulong)(b2)), "r" ((ulong)(b1)), "rI" ((ulong)(b0)) \
        : "cc")
 
 #define add_sssssssaaaaaaaaaaaaaa(s6, s5, s4, s3, s2, s1, s0, a6, a5, a4, a3, a2, a1, a0, b6, b5, b4, b3, b2, b1, b0)      \
   __asm__ ("adds %6,%13,%20\n\tadcs %5,%12,%19\n\tadcs %4,%11,%18\n\tadcs %3,%10,%17\n\tadcs %2,%9,%16\n\tadcs %1,%8,%15\n\tadc %0,%7,%14"\
        : "=r" (s6), "=&r" (s5), "=&r" (s4), "=&r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                        \
-       : "r" ((mp_limb_t)(a6)), "r" ((mp_limb_t)(a5)), "r" ((mp_limb_t)(a4)), "r" ((mp_limb_t)(a3)), "r" ((mp_limb_t)(a2)), "r" ((mp_limb_t)(a1)), "r" ((mp_limb_t)(a0)), \
-         "r" ((mp_limb_t)(b6)), "r" ((mp_limb_t)(b5)), "r" ((mp_limb_t)(b4)), "r" ((mp_limb_t)(b3)), "r" ((mp_limb_t)(b2)), "r" ((mp_limb_t)(b1)), "rI" ((mp_limb_t)(b0)) \
+       : "r" ((ulong)(a6)), "r" ((ulong)(a5)), "r" ((ulong)(a4)), "r" ((ulong)(a3)), "r" ((ulong)(a2)), "r" ((ulong)(a1)), "r" ((ulong)(a0)), \
+         "r" ((ulong)(b6)), "r" ((ulong)(b5)), "r" ((ulong)(b4)), "r" ((ulong)(b3)), "r" ((ulong)(b2)), "r" ((ulong)(b1)), "rI" ((ulong)(b0)) \
        : "cc")
 
 #define add_ssssssssaaaaaaaaaaaaaaaa(s7, s6, s5, s4, s3, s2, s1, s0, a7, a6, a5, a4, a3, a2, a1, a0, b7, b6, b5, b4, b3, b2, b1, b0)      \
   __asm__ ("adds %7,%15,%23\n\tadcs %6,%14,%22\n\tadcs %5,%13,%21\n\tadcs %4,%12,%20\n\tadcs %3,%11,%19\n\tadcs %2,%10,%18\n\tadcs %1,%9,%17\n\tadc %0,%8,%16"\
        : "=r" (s7), "=&r" (s6), "=&r" (s5), "=&r" (s4), "=&r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                        \
-       : "r" ((mp_limb_t)(a7)), "r" ((mp_limb_t)(a6)), "r" ((mp_limb_t)(a5)), "r" ((mp_limb_t)(a4)), "r" ((mp_limb_t)(a3)), "r" ((mp_limb_t)(a2)), "r" ((mp_limb_t)(a1)), "r" ((mp_limb_t)(a0)), \
-         "r" ((mp_limb_t)(b7)), "r" ((mp_limb_t)(b6)), "r" ((mp_limb_t)(b5)), "r" ((mp_limb_t)(b4)), "r" ((mp_limb_t)(b3)), "r" ((mp_limb_t)(b2)), "r" ((mp_limb_t)(b1)), "rI" ((mp_limb_t)(b0)) \
+       : "r" ((ulong)(a7)), "r" ((ulong)(a6)), "r" ((ulong)(a5)), "r" ((ulong)(a4)), "r" ((ulong)(a3)), "r" ((ulong)(a2)), "r" ((ulong)(a1)), "r" ((ulong)(a0)), \
+         "r" ((ulong)(b7)), "r" ((ulong)(b6)), "r" ((ulong)(b5)), "r" ((ulong)(b4)), "r" ((ulong)(b3)), "r" ((ulong)(b2)), "r" ((ulong)(b1)), "rI" ((ulong)(b0)) \
        : "cc")
 
 
 #define sub_ddddmmmmssss(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0)      \
   __asm__ ("subs %3,%7,%11\n\tsbcs %2,%6,%10\n\tsbcs %1,%5,%9\n\tsbc %0,%4,%8"\
        : "=r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                        \
-       : "r" ((mp_limb_t)(a3)), "r" ((mp_limb_t)(a2)), "r" ((mp_limb_t)(a1)), "r" ((mp_limb_t)(a0)), \
-         "r" ((mp_limb_t)(b3)), "r" ((mp_limb_t)(b2)), "r" ((mp_limb_t)(b1)), "rI" ((mp_limb_t)(b0))                        \
+       : "r" ((ulong)(a3)), "r" ((ulong)(a2)), "r" ((ulong)(a1)), "r" ((ulong)(a0)), \
+         "r" ((ulong)(b3)), "r" ((ulong)(b2)), "r" ((ulong)(b1)), "rI" ((ulong)(b0))                        \
        : "cc")
 
 #define sub_dddddmmmmmsssss(s4, s3, s2, s1, s0, a4, a3, a2, a1, a0, b4, b3, b2, b1, b0)      \
   __asm__ ("subs %4,%9,%14\n\tsbcs %3,%8,%13\n\tsbcs %2,%7,%12\n\tsbcs %1,%6,%11\n\tsbc %0,%5,%10"\
        : "=r" (s4), "=&r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                        \
-       : "r" ((mp_limb_t)(a4)), "r" ((mp_limb_t)(a3)), "r" ((mp_limb_t)(a2)), "r" ((mp_limb_t)(a1)), "r" ((mp_limb_t)(a0)), \
-         "r" ((mp_limb_t)(b4)), "r" ((mp_limb_t)(b3)), "r" ((mp_limb_t)(b2)), "r" ((mp_limb_t)(b1)), "rI" ((mp_limb_t)(b0))                        \
+       : "r" ((ulong)(a4)), "r" ((ulong)(a3)), "r" ((ulong)(a2)), "r" ((ulong)(a1)), "r" ((ulong)(a0)), \
+         "r" ((ulong)(b4)), "r" ((ulong)(b3)), "r" ((ulong)(b2)), "r" ((ulong)(b1)), "rI" ((ulong)(b0))                        \
        : "cc")
 
 #define sub_ddddddmmmmmmssssss(s5, s4, s3, s2, s1, s0, a5, a4, a3, a2, a1, a0, b5, b4, b3, b2, b1, b0)      \
   __asm__ ("subs %5,%11,%17\n\tsbcs %4,%10,%16\n\tsbcs %3,%9,%15\n\tsbcs %2,%8,%14\n\tsbcs %1,%7,%13\n\tsbc %0,%6,%12"\
        : "=r" (s5), "=&r" (s4), "=&r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                        \
-       : "r" ((mp_limb_t)(a5)), "r" ((mp_limb_t)(a4)), "r" ((mp_limb_t)(a3)), "r" ((mp_limb_t)(a2)), "r" ((mp_limb_t)(a1)), "r" ((mp_limb_t)(a0)), \
-         "r" ((mp_limb_t)(b5)), "r" ((mp_limb_t)(b4)), "r" ((mp_limb_t)(b3)), "r" ((mp_limb_t)(b2)), "r" ((mp_limb_t)(b1)), "rI" ((mp_limb_t)(b0))                        \
+       : "r" ((ulong)(a5)), "r" ((ulong)(a4)), "r" ((ulong)(a3)), "r" ((ulong)(a2)), "r" ((ulong)(a1)), "r" ((ulong)(a0)), \
+         "r" ((ulong)(b5)), "r" ((ulong)(b4)), "r" ((ulong)(b3)), "r" ((ulong)(b2)), "r" ((ulong)(b1)), "rI" ((ulong)(b0))                        \
        : "cc")
 
 #define sub_dddddddmmmmmmmsssssss(s6, s5, s4, s3, s2, s1, s0, a6, a5, a4, a3, a2, a1, a0, b6, b5, b4, b3, b2, b1, b0)      \
   __asm__ ("subs %6,%13,%20\n\tsbcs %5,%12,%19\n\tsbcs %4,%11,%18\n\tsbcs %3,%10,%17\n\tsbcs %2,%9,%16\n\tsbcs %1,%8,%15\n\tsbc %0,%7,%14"\
        : "=r" (s6), "=&r" (s5), "=&r" (s4), "=&r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                        \
-       : "r" ((mp_limb_t)(a6)), "r" ((mp_limb_t)(a5)), "r" ((mp_limb_t)(a4)), "r" ((mp_limb_t)(a3)), "r" ((mp_limb_t)(a2)), "r" ((mp_limb_t)(a1)), "r" ((mp_limb_t)(a0)), \
-         "r" ((mp_limb_t)(b6)), "r" ((mp_limb_t)(b5)), "r" ((mp_limb_t)(b4)), "r" ((mp_limb_t)(b3)), "r" ((mp_limb_t)(b2)), "r" ((mp_limb_t)(b1)), "rI" ((mp_limb_t)(b0))                        \
+       : "r" ((ulong)(a6)), "r" ((ulong)(a5)), "r" ((ulong)(a4)), "r" ((ulong)(a3)), "r" ((ulong)(a2)), "r" ((ulong)(a1)), "r" ((ulong)(a0)), \
+         "r" ((ulong)(b6)), "r" ((ulong)(b5)), "r" ((ulong)(b4)), "r" ((ulong)(b3)), "r" ((ulong)(b2)), "r" ((ulong)(b1)), "rI" ((ulong)(b0))                        \
        : "cc")
 
 #define sub_ddddddddmmmmmmmmssssssss(s7, s6, s5, s4, s3, s2, s1, s0, a7, a6, a5, a4, a3, a2, a1, a0, b7, b6, b5, b4, b3, b2, b1, b0)      \
   __asm__ ("subs %7,%15,%23\n\tsbcs %6,%14,%22\n\tsbcs %5,%13,%21\n\tsbcs %4,%12,%20\n\tsbcs %3,%11,%19\n\tsbcs %2,%10,%18\n\tsbcs %1,%9,%17\n\tsbc %0,%8,%16"\
        : "=r" (s7), "=&r" (s6), "=&r" (s5), "=&r" (s4), "=&r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                        \
-       : "r" ((mp_limb_t)(a7)), "r" ((mp_limb_t)(a6)), "r" ((mp_limb_t)(a5)), "r" ((mp_limb_t)(a4)), "r" ((mp_limb_t)(a3)), "r" ((mp_limb_t)(a2)), "r" ((mp_limb_t)(a1)), "r" ((mp_limb_t)(a0)), \
-         "r" ((mp_limb_t)(b7)), "r" ((mp_limb_t)(b6)), "r" ((mp_limb_t)(b5)), "r" ((mp_limb_t)(b4)), "r" ((mp_limb_t)(b3)), "r" ((mp_limb_t)(b2)), "r" ((mp_limb_t)(b1)), "rI" ((mp_limb_t)(b0))                        \
+       : "r" ((ulong)(a7)), "r" ((ulong)(a6)), "r" ((ulong)(a5)), "r" ((ulong)(a4)), "r" ((ulong)(a3)), "r" ((ulong)(a2)), "r" ((ulong)(a1)), "r" ((ulong)(a0)), \
+         "r" ((ulong)(b7)), "r" ((ulong)(b6)), "r" ((ulong)(b5)), "r" ((ulong)(b4)), "r" ((ulong)(b3)), "r" ((ulong)(b2)), "r" ((ulong)(b1)), "rI" ((ulong)(b0))                        \
        : "cc")
 
 #elif defined(_MSC_VER) && (defined(__AVX2__) || defined(_M_ARM64))
 #define add_sssssaaaaaaaaaa(s4, s3, s2, s1, s0, a4, a3, a2, a1, a0, b4, b3, b2, b1, b0)         \
   do {                                                                                          \
-    mp_limb_t __t0 = 0;                                                                         \
-    add_ssssaaaaaaaa(__t0, s2, s1, s0, (mp_limb_t) 0, a2, a1, a0, (mp_limb_t) 0, b2, b1, b0);   \
+    ulong __t0 = 0;                                                                         \
+    add_ssssaaaaaaaa(__t0, s2, s1, s0, (ulong) 0, a2, a1, a0, (ulong) 0, b2, b1, b0);   \
     add_ssaaaa(s4, s3, a4, a3, b4, b3);                                                         \
-    add_ssaaaa(s4, s3, s4, s3, (mp_limb_t) 0, __t0);                                            \
+    add_ssaaaa(s4, s3, s4, s3, (ulong) 0, __t0);                                            \
   } while (0)
 
 #define add_ssssssaaaaaaaaaaaa(s5, s4, s3, s2, s1, s0, a5, a4, a3, a2, a1, a0, b5, b4, b3, b2, b1, b0)      \
   do {                                                                                                      \
-    mp_limb_t __t1 = 0;                                                                                     \
-    add_sssssaaaaaaaaaa(__t1, s3, s2, s1, s0, (mp_limb_t) 0, a3, a2, a1, a0, (mp_limb_t) 0, b3, b2, b1, b0);\
+    ulong __t1 = 0;                                                                                     \
+    add_sssssaaaaaaaaaa(__t1, s3, s2, s1, s0, (ulong) 0, a3, a2, a1, a0, (ulong) 0, b3, b2, b1, b0);\
     add_ssaaaa(s5, s4, a5, a4, b5, b4);                                                                     \
-    add_ssaaaa(s5, s4, s5, s4, (mp_limb_t) 0, __t1);                                                        \
+    add_ssaaaa(s5, s4, s5, s4, (ulong) 0, __t1);                                                        \
   } while (0)
 
 #define add_sssssssaaaaaaaaaaaaaa(s6, s5, s4, s3, s2, s1, s0, a6, a5, a4, a3, a2, a1, a0, b6, b5, b4, b3, b2, b1, b0)       \
   do {                                                                                                                      \
-    mp_limb_t __t2 = 0;                                                                                                     \
-    add_ssssssaaaaaaaaaaaa(__t2, s4, s3, s2, s1, s0, (mp_limb_t) 0, a4, a3, a2, a1, a0, (mp_limb_t) 0, b4, b3, b2, b1, b0); \
+    ulong __t2 = 0;                                                                                                     \
+    add_ssssssaaaaaaaaaaaa(__t2, s4, s3, s2, s1, s0, (ulong) 0, a4, a3, a2, a1, a0, (ulong) 0, b4, b3, b2, b1, b0); \
     add_ssaaaa(s6, s5, a6, a5, b6, b5);                                                                                     \
-    add_ssaaaa(s6, s5, s6, s5, (mp_limb_t) 0, __t2);                                                                        \
+    add_ssaaaa(s6, s5, s6, s5, (ulong) 0, __t2);                                                                        \
   } while (0)
 
 #define add_ssssssssaaaaaaaaaaaaaaaa(s7, s6, s5, s4, s3, s2, s1, s0, a7, a6, a5, a4, a3, a2, a1, a0, b7, b6, b5, b4, b3, b2, b1, b0)        \
   do {                                                                                                                                      \
-    mp_limb_t __t3 = 0;                                                                                                                     \
-    add_sssssssaaaaaaaaaaaaaa(__t3, s5, s4, s3, s2, s1, s0, (mp_limb_t) 0, a5, a4, a3, a2, a1, a0, (mp_limb_t) 0, b5, b4, b3, b2, b1, b0);  \
+    ulong __t3 = 0;                                                                                                                     \
+    add_sssssssaaaaaaaaaaaaaa(__t3, s5, s4, s3, s2, s1, s0, (ulong) 0, a5, a4, a3, a2, a1, a0, (ulong) 0, b5, b4, b3, b2, b1, b0);  \
     add_ssaaaa(s7, s6, a7, a6, b7, b6);                                                                                                     \
-    add_ssaaaa(s7, s6, s7, s6, (mp_limb_t) 0, __t3);                                                                                        \
+    add_ssaaaa(s7, s6, s7, s6, (ulong) 0, __t3);                                                                                        \
   } while (0)
 
 #define sub_ddddmmmmssss(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0)        \
   do {                                                                          \
-    mp_limb_t __t1, __u1;                                                       \
-    sub_dddmmmsss(__t1, s1, s0, (mp_limb_t) 0, a1, a0, (mp_limb_t) 0, b1, b0);  \
-    sub_ddmmss(__u1, s2, (mp_limb_t) 0, a2, (mp_limb_t) 0, b2);                 \
+    ulong __t1, __u1;                                                       \
+    sub_dddmmmsss(__t1, s1, s0, (ulong) 0, a1, a0, (ulong) 0, b1, b0);  \
+    sub_ddmmss(__u1, s2, (ulong) 0, a2, (ulong) 0, b2);                 \
     sub_ddmmss(s3, s2, (a3) - (b3), s2, -__u1, -__t1);                          \
   } while (0)
 
 #define sub_dddddmmmmmsssss(s4, s3, s2, s1, s0, a4, a3, a2, a1, a0, b4, b3, b2, b1, b0)         \
   do {                                                                                          \
-    mp_limb_t __t2, __u2;                                                                       \
-    sub_ddddmmmmssss(__t2, s2, s1, s0, (mp_limb_t) 0, a2, a1, a0, (mp_limb_t) 0, b2, b1, b0);   \
-    sub_ddmmss(__u2, s3, (mp_limb_t) 0, a3, (mp_limb_t) 0, b3);                                 \
+    ulong __t2, __u2;                                                                       \
+    sub_ddddmmmmssss(__t2, s2, s1, s0, (ulong) 0, a2, a1, a0, (ulong) 0, b2, b1, b0);   \
+    sub_ddmmss(__u2, s3, (ulong) 0, a3, (ulong) 0, b3);                                 \
     sub_ddmmss(s4, s3, (a4) - (b4), s3, -__u2, -__t2);                                          \
   } while (0)
 
 #define sub_ddddddmmmmmmssssss(s5, s4, s3, s2, s1, s0, a5, a4, a3, a2, a1, a0, b5, b4, b3, b2, b1, b0)      \
   do {                                                                                                      \
-    mp_limb_t __t3, __u3;                                                                                   \
-    sub_dddddmmmmmsssss(__t3, s3, s2, s1, s0, (mp_limb_t) 0, a3, a2, a1, a0, (mp_limb_t) 0, b3, b2, b1, b0);\
-    sub_ddmmss(__u3, s4, (mp_limb_t) 0, a4, (mp_limb_t) 0, b4);                                             \
+    ulong __t3, __u3;                                                                                   \
+    sub_dddddmmmmmsssss(__t3, s3, s2, s1, s0, (ulong) 0, a3, a2, a1, a0, (ulong) 0, b3, b2, b1, b0);\
+    sub_ddmmss(__u3, s4, (ulong) 0, a4, (ulong) 0, b4);                                             \
     sub_ddmmss(s5, s4, (a5) - (b5), s4, -__u3, -__t3);                                                      \
   } while (0)
 
 #define sub_dddddddmmmmmmmsssssss(s6, s5, s4, s3, s2, s1, s0, a6, a5, a4, a3, a2, a1, a0, b6, b5, b4, b3, b2, b1, b0)       \
   do {                                                                                                                      \
-    mp_limb_t __t4, __u4;                                                                                                   \
-    sub_ddddddmmmmmmssssss(__t4, s4, s3, s2, s1, s0, (mp_limb_t) 0, a4, a3, a2, a1, a0, (mp_limb_t) 0, b4, b3, b2, b1, b0); \
-    sub_ddmmss(__u4, s5, (mp_limb_t) 0, a5, (mp_limb_t) 0, b5);                                                             \
+    ulong __t4, __u4;                                                                                                   \
+    sub_ddddddmmmmmmssssss(__t4, s4, s3, s2, s1, s0, (ulong) 0, a4, a3, a2, a1, a0, (ulong) 0, b4, b3, b2, b1, b0); \
+    sub_ddmmss(__u4, s5, (ulong) 0, a5, (ulong) 0, b5);                                                             \
     sub_ddmmss(s6, s5, (a6) - (b6), s5, -__u4, -__t4);                                                                      \
   } while (0)
 
 #define sub_ddddddddmmmmmmmmssssssss(s7, s6, s5, s4, s3, s2, s1, s0, a7, a6, a5, a4, a3, a2, a1, a0, b7, b6, b5, b4, b3, b2, b1, b0)        \
   do {                                                                                                                                      \
-    mp_limb_t __t5, __u5;                                                                                                                   \
-    sub_dddddddmmmmmmmsssssss(__t5, s5, s4, s3, s2, s1, s0, (mp_limb_t) 0, a5, a4, a3, a2, a1, a0, (mp_limb_t) 0, b5, b4, b3, b2, b1, b0);  \
-    sub_ddmmss(__u5, s6, (mp_limb_t) 0, a6, (mp_limb_t) 0, b6);                                                                             \
+    ulong __t5, __u5;                                                                                                                   \
+    sub_dddddddmmmmmmmsssssss(__t5, s5, s4, s3, s2, s1, s0, (ulong) 0, a5, a4, a3, a2, a1, a0, (ulong) 0, b5, b4, b3, b2, b1, b0);  \
+    sub_ddmmss(__u5, s6, (ulong) 0, a6, (ulong) 0, b6);                                                                             \
     sub_ddmmss(s7, s6, (a7) - (b7), s6, -__u5, -__t5);                                                                                      \
   } while (0)
 

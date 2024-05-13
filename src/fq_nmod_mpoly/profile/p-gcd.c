@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
 {
     slong i;
     const char * vars[] = {"x", "y", "z", "t" ,"u", "v", "w", "s", "p"};
-    mp_limb_t p = UWORD(4611686018427388073);
+    ulong p = UWORD(4611686018427388073);
 
     print_banner();
     for (i = 50; i < 100; i += 4)

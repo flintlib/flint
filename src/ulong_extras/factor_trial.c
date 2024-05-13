@@ -11,18 +11,18 @@
 
 #include "ulong_extras.h"
 
-mp_limb_t n_factor_trial(n_factor_t * factors, mp_limb_t n, ulong num_primes)
+ulong n_factor_trial(n_factor_t * factors, ulong n, ulong num_primes)
 {
     return n_factor_trial_range(factors, n, UWORD(0), num_primes);
 }
 
-mp_limb_t n_factor_trial_partial(n_factor_t * factors, mp_limb_t n, mp_limb_t * prod, ulong num_primes, mp_limb_t limit)
+ulong n_factor_trial_partial(n_factor_t * factors, ulong n, ulong * prod, ulong num_primes, ulong limit)
 {
    unsigned int exp;
-   mp_limb_t p;
+   ulong p;
    double ppre;
    ulong i;
-   const mp_limb_t * primes;
+   const ulong * primes;
    const double * inverses;
 
    (*prod) = 1;
@@ -46,13 +46,13 @@ mp_limb_t n_factor_trial_partial(n_factor_t * factors, mp_limb_t n, mp_limb_t * 
    return n;
 }
 
-mp_limb_t n_factor_trial_range(n_factor_t * factors, mp_limb_t n, ulong start, ulong num_primes)
+ulong n_factor_trial_range(n_factor_t * factors, ulong n, ulong start, ulong num_primes)
 {
    unsigned int exp;
-   mp_limb_t p;
+   ulong p;
    double ppre;
    ulong i;
-   const mp_limb_t * primes;
+   const ulong * primes;
    const double * inverses;
 
    primes = n_primes_arr_readonly(num_primes);

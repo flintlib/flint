@@ -27,7 +27,7 @@ TEST_FUNCTION_START(fq_zech_mul_ui, state)
 
         for (jx = 0; jx < 10; jx++)
         {
-            mp_limb_t x;
+            ulong x;
             fq_nmod_t aa, bb;
             fq_zech_t a, b, c;
 
@@ -74,7 +74,7 @@ TEST_FUNCTION_START(fq_zech_mul_ui, state)
 
         for (jx = 0; jx < 10; jx++)
         {
-            mp_limb_t x;
+            ulong x;
             fq_nmod_t aa, bb;
             fq_zech_t a, b;
 

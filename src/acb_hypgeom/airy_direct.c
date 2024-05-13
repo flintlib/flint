@@ -70,7 +70,7 @@ static void
 acb_hypgeom_airy_0f1_sum_inner(acb_t s, acb_srcptr t, slong m, slong n, slong alpha, int real, slong prec)
 {
     slong j, k;
-    mp_limb_t c, chi, clo;
+    ulong c, chi, clo;
 
     acb_zero(s);
 

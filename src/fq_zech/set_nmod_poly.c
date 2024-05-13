@@ -14,8 +14,8 @@
 void fq_zech_set_nmod_poly(fq_zech_t a, const nmod_poly_t b, const fq_zech_ctx_t ctx)
 {
     ulong blen = b->length;
-    const mp_limb_t * bcoeffs = b->coeffs;
-    mp_limb_t qm1 = ctx->qm1;
+    const ulong * bcoeffs = b->coeffs;
+    ulong qm1 = ctx->qm1;
     ulong i;
     fq_zech_t t;
     fq_zech_zero(a, ctx);

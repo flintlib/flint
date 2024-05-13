@@ -19,10 +19,10 @@ TEST_FUNCTION_START(nmod_mat_nmod_vec_mul, state)
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        mp_limb_t p;
+        ulong p;
         nmod_mat_t A, B, C;
-        mp_limb_t * a, * c;
-        mp_limb_t ** aa, ** cc;
+        ulong * a, * c;
+        ulong ** aa, ** cc;
         slong j, m, n, alen;
 
         p = n_randtest_not_zero(state);
@@ -40,22 +40,22 @@ TEST_FUNCTION_START(nmod_mat_nmod_vec_mul, state)
         _nmod_vec_randtest(c, state, n, B->mod);
         _nmod_vec_randtest(a, state, alen, B->mod);
 
-        cc = FLINT_ARRAY_ALLOC(n, mp_limb_t*);
+        cc = FLINT_ARRAY_ALLOC(n, ulong*);
         for (j = 0; j < n; j++)
         {
-            cc[j] = FLINT_ARRAY_ALLOC(1, mp_limb_t);
+            cc[j] = FLINT_ARRAY_ALLOC(1, ulong);
             cc[j][0] = c[j];
         }
 
-        aa = FLINT_ARRAY_ALLOC(alen, mp_limb_t*);
+        aa = FLINT_ARRAY_ALLOC(alen, ulong*);
         for (j = 0; j < alen; j++)
         {
-            aa[j] = FLINT_ARRAY_ALLOC(1, mp_limb_t);
+            aa[j] = FLINT_ARRAY_ALLOC(1, ulong);
             aa[j][0] = a[j];
         }
 
         nmod_mat_nmod_vec_mul(c, a, alen, B);
-        nmod_mat_nmod_vec_mul_ptr(cc, (const mp_limb_t * const *)aa, alen, B);
+        nmod_mat_nmod_vec_mul_ptr(cc, (const ulong * const *)aa, alen, B);
 
         /* supposed to match mul of the chopped or zero-extended a */
         for (j = 0; j < m && j < alen; j++)

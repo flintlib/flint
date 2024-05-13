@@ -16,7 +16,7 @@
 void
 fq_zech_trace(fmpz_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx)
 {
-    mp_limb_t p_i, trace;
+    ulong p_i, trace;
     fq_zech_t t, op_p_i;
     double qm1inv;
     if (fq_zech_is_zero(op, ctx))

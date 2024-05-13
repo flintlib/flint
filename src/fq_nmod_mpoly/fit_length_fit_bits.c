@@ -25,7 +25,7 @@ void fq_nmod_mpoly_fit_length_fit_bits(
     if (d*len > A->coeffs_alloc)
     {
         A->coeffs_alloc = FLINT_MAX(d*len, 2*A->coeffs_alloc);
-        A->coeffs = flint_realloc(A->coeffs, A->coeffs_alloc*sizeof(mp_limb_t));
+        A->coeffs = flint_realloc(A->coeffs, A->coeffs_alloc*sizeof(ulong));
     }
 
     if (bits > A->bits)

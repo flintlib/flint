@@ -23,7 +23,7 @@ TEST_FUNCTION_START(nmod_poly_mat_concat_vertical, state)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         slong r1, r2, c1;
-        mp_limb_t mod;
+        ulong mod;
 
         r1 = n_randint(state, 10);
         r2 = n_randint(state, 10);

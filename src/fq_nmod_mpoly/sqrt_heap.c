@@ -25,7 +25,7 @@
 static int _is_proved_not_square(
     int count,
     flint_rand_t state,
-    const mp_limb_t * Acoeffs,
+    const ulong * Acoeffs,
     const ulong * Aexps,
     slong Alen,
     flint_bitcnt_t Abits,
@@ -86,7 +86,7 @@ cleanup:
     return success;
 }
 
-static int n_fq_sqrt(mp_limb_t * q, const mp_limb_t * a, const fq_nmod_ctx_t ctx)
+static int n_fq_sqrt(ulong * q, const ulong * a, const fq_nmod_ctx_t ctx)
 {
     int res;
     fq_nmod_t t;
@@ -101,7 +101,7 @@ static int n_fq_sqrt(mp_limb_t * q, const mp_limb_t * a, const fq_nmod_ctx_t ctx
 
 static int _fq_nmod_mpoly_sqrt_heap(
     fq_nmod_mpoly_t Q,
-    const mp_limb_t * Acoeffs,
+    const ulong * Acoeffs,
     const ulong * Aexps,
     slong Alen,
     flint_bitcnt_t bits,
@@ -120,14 +120,14 @@ static int _fq_nmod_mpoly_sqrt_heap(
     mpoly_heap_t ** chain;
     slong * store, * store_base;
     mpoly_heap_t * x;
-    mp_limb_t * Qcoeffs = Q->coeffs;
+    ulong * Qcoeffs = Q->coeffs;
     ulong * Qexps = Q->exps;
     ulong * exp, * exp3;
     ulong * exps[64];
     ulong ** exp_list;
     slong exp_next;
     ulong mask;
-    mp_limb_t * t, * t2, * lc_inv;
+    ulong * t, * t2, * lc_inv;
     int lt_divides, halves;
     flint_rand_t heuristic_state;
     int heuristic_count = 0;
@@ -135,7 +135,7 @@ static int _fq_nmod_mpoly_sqrt_heap(
 
     TMP_START;
 
-    t = (mp_limb_t *) TMP_ALLOC(13*d*sizeof(mp_limb_t));
+    t = (ulong *) TMP_ALLOC(13*d*sizeof(ulong));
     t2 = t + 6*d;
     lc_inv = t2 + 6*d;
 
@@ -259,7 +259,7 @@ static int _fq_nmod_mpoly_sqrt_heap(
                 exp_list[--exp_next] = heap[1].exp;
                 x = _mpoly_heap_pop(heap, &heap_len, N, cmpmask);
                 do {
-                    mp_limb_t * dest;
+                    ulong * dest;
                     *store++ = x->i;
                     *store++ = x->j;
                     dest = (x->i != x->j) ? t2 : t;
@@ -398,11 +398,11 @@ int fq_nmod_mpoly_sqrt_heap(fq_nmod_mpoly_t Q, const fq_nmod_mpoly_t A,
     {
         slong d = fq_nmod_ctx_degree(ctx->fqctx);
         flint_bitcnt_t bits = A->bits;
-        mp_limb_t * Aexps = A->exps;
+        ulong * Aexps = A->exps;
         slong Alen = A->length;
         slong i, j, N = mpoly_words_per_exp(bits, ctx->minfo);
         ulong mask = (bits <= FLINT_BITS) ? mpoly_overflow_mask_sp(bits) : 0;
-        mp_limb_t * t;
+        ulong * t;
 
         if (Q != A)
             fq_nmod_mpoly_fit_length_reset_bits(Q, Alen, bits, ctx);
@@ -418,7 +418,7 @@ int fq_nmod_mpoly_sqrt_heap(fq_nmod_mpoly_t Q, const fq_nmod_mpoly_t A,
             }
         }
 
-        t = FLINT_ARRAY_ALLOC(N_FQ_MUL_ITCH*d, mp_limb_t);
+        t = FLINT_ARRAY_ALLOC(N_FQ_MUL_ITCH*d, ulong);
 
         for (i = 0; i < Alen; i++)
         {

@@ -56,10 +56,10 @@ fmpz_add_ui(fmpz_t res, const fmpz_t x, ulong y)
     {
         mpz_ptr rp;
         mpz_srcptr xp;
-        mp_ptr rd;
-        mp_srcptr xd;
-        mp_size_t xn_signed, xn;
-        mp_limb_t cy;
+        nn_ptr rd;
+        nn_srcptr xd;
+        slong xn_signed, xn;
+        ulong cy;
 
         xp = COEFF_TO_PTR(*x);
         xn_signed = xp->_mp_size;
@@ -169,10 +169,10 @@ fmpz_sub_ui(fmpz_t res, const fmpz_t x, ulong y)
     {
         mpz_ptr rp;
         mpz_srcptr xp;
-        mp_ptr rd;
-        mp_srcptr xd;
-        mp_size_t xn_signed, xn;
-        mp_limb_t cy;
+        nn_ptr rd;
+        nn_srcptr xd;
+        slong xn_signed, xn;
+        ulong cy;
 
         xp = COEFF_TO_PTR(*x);
         xn_signed = xp->_mp_size;

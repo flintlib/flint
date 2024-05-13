@@ -29,9 +29,9 @@ _arf_set_inline(arf_t y, const arf_t x)
     }
     else
     {
-        mp_ptr yptr;
-        mp_srcptr xptr;
-        mp_size_t n;
+        nn_ptr yptr;
+        nn_srcptr xptr;
+        slong n;
 
         ARF_GET_MPN_READONLY(xptr, n, x);
         ARF_GET_MPN_WRITE(yptr, n, y);

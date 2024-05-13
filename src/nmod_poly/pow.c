@@ -14,7 +14,7 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_pow(mp_ptr res, mp_srcptr poly, slong len, ulong e, nmod_t mod)
+_nmod_poly_pow(nn_ptr res, nn_srcptr poly, slong len, ulong e, nmod_t mod)
 {
     _nmod_poly_pow_binexp(res, poly, len, e, mod);
 }

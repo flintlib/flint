@@ -116,9 +116,9 @@ int __fmpz_mod_inv_degree(fmpz_t invd, slong d, const fmpz_t p)
 }
 
 static inline
-int __nmod_inv_degree(fmpz_t invd, slong d, mp_limb_t p)
+int __nmod_inv_degree(fmpz_t invd, slong d, ulong p)
 {
-    mp_limb_t ud = d % p;
+    ulong ud = d % p;
     if (!ud)
         return 0;
     ud = n_invmod(ud, p);

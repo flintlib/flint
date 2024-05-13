@@ -12,7 +12,7 @@
 #include "ulong_extras.h"
 #include "nmod_mat.h"
 
-void nmod_mat_set_mod(nmod_mat_t mat, mp_limb_t n)
+void nmod_mat_set_mod(nmod_mat_t mat, ulong n)
 {
     mat->mod.n = n;
     mat->mod.norm = flint_clz(n);

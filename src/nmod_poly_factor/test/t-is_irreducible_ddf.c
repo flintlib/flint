@@ -21,7 +21,7 @@ TEST_FUNCTION_START(nmod_poly_factor_is_irreducible_ddf, state)
     for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
     {
         nmod_poly_t poly, poly2, poly3;
-        mp_limb_t modulus;
+        ulong modulus;
         slong length, length2;
         int result = 1;
 

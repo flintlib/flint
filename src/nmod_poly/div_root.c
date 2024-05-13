@@ -12,10 +12,10 @@
 #include "nmod.h"
 #include "nmod_poly.h"
 
-mp_limb_t
-_nmod_poly_div_root(mp_ptr Q, mp_srcptr A, slong len, mp_limb_t c, nmod_t mod)
+ulong
+_nmod_poly_div_root(nn_ptr Q, nn_srcptr A, slong len, ulong c, nmod_t mod)
 {
-    mp_limb_t r, t;
+    ulong r, t;
     slong i;
 
     if (len < 2)
@@ -35,11 +35,11 @@ _nmod_poly_div_root(mp_ptr Q, mp_srcptr A, slong len, mp_limb_t c, nmod_t mod)
     return r;
 }
 
-mp_limb_t
+ulong
 nmod_poly_div_root(nmod_poly_t Q,
-                 const nmod_poly_t A, mp_limb_t c)
+                 const nmod_poly_t A, ulong c)
 {
-    mp_limb_t rem;
+    ulong rem;
 
     slong len = A->length;
 

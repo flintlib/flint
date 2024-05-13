@@ -36,7 +36,7 @@ TEST_FUNCTION_START(arb_sin_cos_tab, state)
         {
             for (i = 0; i < num; i++)
             {
-                tt->_mp_d = (mp_ptr) arb_sin_cos_tab1[2 * i + which];
+                tt->_mp_d = (nn_ptr) arb_sin_cos_tab1[2 * i + which];
                 tt->_mp_size = prec / FLINT_BITS;
                 tt->_mp_alloc = tt->_mp_size;
 
@@ -101,7 +101,7 @@ TEST_FUNCTION_START(arb_sin_cos_tab, state)
         {
             for (i = 0; i < num; i++)
             {
-                tt->_mp_d = (mp_ptr) arb_sin_cos_tab21[2 * i + which];
+                tt->_mp_d = (nn_ptr) arb_sin_cos_tab21[2 * i + which];
                 tt->_mp_size = prec / FLINT_BITS;
                 tt->_mp_alloc = tt->_mp_size;
 
@@ -166,7 +166,7 @@ TEST_FUNCTION_START(arb_sin_cos_tab, state)
         {
             for (i = 0; i < num; i++)
             {
-                tt->_mp_d = (mp_ptr) arb_sin_cos_tab22[2 * i + which];
+                tt->_mp_d = (nn_ptr) arb_sin_cos_tab22[2 * i + which];
                 tt->_mp_size = prec / FLINT_BITS;
                 tt->_mp_alloc = tt->_mp_size;
 

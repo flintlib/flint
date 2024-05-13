@@ -21,7 +21,7 @@ static void n_polyu1n_mod_interp_reduce_2sm_poly(
     nmod_t ctx)
 {
     slong i;
-    mp_limb_t u, v;
+    ulong u, v;
 
     n_poly_zero(E);
     n_poly_zero(F);
@@ -38,17 +38,17 @@ static void n_polyu1n_mod_interp_lift_2sm_poly(
     n_polyun_t F,
     const n_poly_t A,
     const n_poly_t B,
-    mp_limb_t alpha,
+    ulong alpha,
     nmod_t ctx)
 {
     slong lastlen = 0;
     slong Fi, Aexp, Bexp;
-    const mp_limb_t * Acoeffs = A->coeffs;
-    const mp_limb_t * Bcoeffs = B->coeffs;
+    const ulong * Acoeffs = A->coeffs;
+    const ulong * Bcoeffs = B->coeffs;
     slong e;
-    mp_limb_t d0 = (1 + ctx.n)/2;
-    mp_limb_t d1 = nmod_inv(nmod_add(alpha, alpha, ctx), ctx);
-    mp_limb_t Avalue, Bvalue, u, v;
+    ulong d0 = (1 + ctx.n)/2;
+    ulong d1 = nmod_inv(nmod_add(alpha, alpha, ctx), ctx);
+    ulong Avalue, Bvalue, u, v;
 
     Aexp = n_poly_degree(A);
     Bexp = n_poly_degree(B);
@@ -126,10 +126,10 @@ static int n_polyu1n_mod_interp_crt_2sm_poly(
     int changed = 0, Finc;
     slong lastlen = 0;
     n_poly_struct * Fvalue;
-    mp_limb_t u, v, FvalueA, FvalueB;
+    ulong u, v, FvalueA, FvalueB;
     slong Fi, Ti, Aexp, Bexp, e, fexp;
-    const mp_limb_t * Acoeff = A->coeffs;
-    const mp_limb_t * Bcoeff = B->coeffs;
+    const ulong * Acoeff = A->coeffs;
+    const ulong * Bcoeff = B->coeffs;
     slong Flen = F->length;
     n_poly_t zero;
 
@@ -250,7 +250,7 @@ int n_polyu1n_mod_gcd_brown_smprime(
 {
     int success;
     slong bound;
-    mp_limb_t alpha, temp, gammaevalp, gammaevalm;
+    ulong alpha, temp, gammaevalp, gammaevalm;
     n_poly_struct * Aevalp, * Bevalp, * Gevalp, * Abarevalp, * Bbarevalp;
     n_poly_struct * Aevalm, * Bevalm, * Gevalm, * Abarevalm, * Bbarevalm;
     n_polyun_struct * T;

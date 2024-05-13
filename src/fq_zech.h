@@ -99,7 +99,7 @@ fq_zech_clear(fq_zech_t FLINT_UNUSED(rop), const fq_zech_ctx_t FLINT_UNUSED(ctx)
 FQ_ZECH_INLINE void
 fq_zech_reduce(fq_zech_t rop, const fq_zech_ctx_t ctx)
 {
-    mp_limb_t order = fq_zech_ctx_order_ui(ctx);
+    ulong order = fq_zech_ctx_order_ui(ctx);
     if (rop->value >= order)
     {
         rop->value -= order;

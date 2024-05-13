@@ -23,7 +23,7 @@
 typedef struct
 {
     volatile int gcd_is_one;
-    volatile mp_limb_t p;
+    volatile ulong p;
 #if FLINT_USES_PTHREAD
     pthread_mutex_t mutex;
 #endif
@@ -99,7 +99,7 @@ static void _splitworker(void * varg)
     slong N = mpoly_words_per_exp_sp(bits, ctx->minfo);
     slong offset, shift;
     int success;
-    mp_limb_t p, gammared;
+    ulong p, gammared;
     nmod_poly_stack_t Sp;
 
     mpoly_gen_offset_shift_sp(&offset, &shift,

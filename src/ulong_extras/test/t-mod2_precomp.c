@@ -18,7 +18,7 @@ TEST_FUNCTION_START(n_mod2_precomp, state)
 
     for (i = 0; i < 100000 * flint_test_multiplier(); i++)
     {
-        mp_limb_t d, n, r1, r2;
+        ulong d, n, r1, r2;
         double dpre;
 
         d = n_randtest_not_zero(state);

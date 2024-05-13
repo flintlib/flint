@@ -20,23 +20,23 @@
     hgcd for two-limb input, individual quotients not written
 */
 static slong _hgcd_uiui_no_write(
-    mp_limb_t A1, mp_limb_t A0,
-    mp_limb_t B1, mp_limb_t B0,
+    ulong A1, ulong A0,
+    ulong B1, ulong B0,
     _ui_mat22_t M)
 {
     slong written = 0; /* number of quotients generated */
-    mp_limb_t last_written = 0;
-    mp_limb_t d0, d1, t0, t1, t2, r0, r1;
+    ulong last_written = 0;
+    ulong d0, d1, t0, t1, t2, r0, r1;
     int det = 1;
-    mp_limb_t m11 = 1;
-    mp_limb_t m12 = 0;
-    mp_limb_t m21 = 0;
-    mp_limb_t m22 = 1;
-    mp_limb_t a1 = A1;
-    mp_limb_t a0 = A0;
-    mp_limb_t b1 = B1;
-    mp_limb_t b0 = B0;
-    mp_limb_t q;
+    ulong m11 = 1;
+    ulong m12 = 0;
+    ulong m21 = 0;
+    ulong m22 = 1;
+    ulong a1 = A1;
+    ulong a0 = A0;
+    ulong b1 = B1;
+    ulong b0 = B0;
+    ulong q;
 
     FLINT_ASSERT(a1 != 0);
     FLINT_ASSERT(b1 < a1 || (b1 == a1 && b0 <= a0));
@@ -171,7 +171,7 @@ fix:
 
 
 /* u is odd */
-static int coprime_ui(mp_limb_t u, mp_limb_t v)
+static int coprime_ui(ulong u, ulong v)
 {
     FLINT_ASSERT(u > 0);
     FLINT_ASSERT(v > 0);
@@ -206,7 +206,7 @@ again:
 }
 
 /* u is odd */
-static int coprime_uiui(mp_limb_t u1, mp_limb_t u0, mp_limb_t v1, mp_limb_t v0)
+static int coprime_uiui(ulong u1, ulong u0, ulong v1, ulong v0)
 {
     FLINT_ASSERT(u1 > 0 || u0 > 0);
     FLINT_ASSERT(v1 > 0 || v0 > 0);
@@ -258,8 +258,8 @@ again:
 int _fmpq_reconstruct_fmpz_2_ui(fmpz_t n, fmpz_t d,
               const fmpz_t a, const fmpz_t m, const fmpz_t NN, const fmpz_t DD)
 {
-    mp_limb_t Q, R, A, B, N;
-    mp_limb_t m11 = 1, m12 = 0, t;
+    ulong Q, R, A, B, N;
+    ulong m11 = 1, m12 = 0, t;
     int mdet = 1;
 
     FLINT_ASSERT(fmpz_size(m) == 1);
@@ -310,9 +310,9 @@ gauss:
 int _fmpq_reconstruct_fmpz_2_uiui(fmpz_t n, fmpz_t d,
               const fmpz_t a, const fmpz_t m, const fmpz_t NN, const fmpz_t DD)
 {
-    mp_limb_t extra;
-    mp_limb_t Q1, Q0, R1, R0, A1, A0, B1, B0, N1, N0, D1, D0;
-    mp_limb_t m11[2] = {1, 0}, m12[2] = {0, 0}, t[2];
+    ulong extra;
+    ulong Q1, Q0, R1, R0, A1, A0, B1, B0, N1, N0, D1, D0;
+    ulong m11[2] = {1, 0}, m12[2] = {0, 0}, t[2];
     int mdet = 1;
 
     FLINT_ASSERT(fmpz_size(m) == 2);
@@ -382,18 +382,18 @@ gauss:
 int _fmpq_reconstruct_fmpz_2_ui_array(fmpz_t n, fmpz_t d,
               const fmpz_t a, const fmpz_t m, const fmpz_t N, const fmpz_t D)
 {
-    mp_limb_t ex0, ex1, ex2, ex3, A1, A0, B1, B0;
+    ulong ex0, ex1, ex2, ex3, A1, A0, B1, B0;
     unsigned int n_lzcnt, a_lzcnt;
     _ui_mat22_t h;
     slong written;
-    const mp_limb_t * n_ptr, * d_ptr;
+    const ulong * n_ptr, * d_ptr;
     slong n_len, d_len;
-    mp_limb_t A[FMPQ_RECONSTRUCT_ARRAY_LIMIT + 1];
-    mp_limb_t B[FMPQ_RECONSTRUCT_ARRAY_LIMIT + 1];
-    mp_limb_t Q[FMPQ_RECONSTRUCT_ARRAY_LIMIT + 1];
-    mp_limb_t R[FMPQ_RECONSTRUCT_ARRAY_LIMIT + 1];
-    mp_limb_t m11[FMPQ_RECONSTRUCT_ARRAY_LIMIT + 2];
-    mp_limb_t m12[FMPQ_RECONSTRUCT_ARRAY_LIMIT + 2];
+    ulong A[FMPQ_RECONSTRUCT_ARRAY_LIMIT + 1];
+    ulong B[FMPQ_RECONSTRUCT_ARRAY_LIMIT + 1];
+    ulong Q[FMPQ_RECONSTRUCT_ARRAY_LIMIT + 1];
+    ulong R[FMPQ_RECONSTRUCT_ARRAY_LIMIT + 1];
+    ulong m11[FMPQ_RECONSTRUCT_ARRAY_LIMIT + 2];
+    ulong m12[FMPQ_RECONSTRUCT_ARRAY_LIMIT + 2];
     slong Alen, Blen, Qlen, Rlen, m_len;
     int mdet = 1;
 
@@ -414,7 +414,7 @@ int _fmpq_reconstruct_fmpz_2_ui_array(fmpz_t n, fmpz_t d,
     }
     else
     {
-        n_ptr = (mp_srcptr) N; /* haha, dirty but works */
+        n_ptr = (nn_srcptr) N; /* haha, dirty but works */
         n_len = 1;
     }
 
@@ -425,7 +425,7 @@ int _fmpq_reconstruct_fmpz_2_ui_array(fmpz_t n, fmpz_t d,
     }
     else
     {
-        d_ptr = (mp_srcptr) D; /* haha, dirty but works */
+        d_ptr = (nn_srcptr) D; /* haha, dirty but works */
         d_len = 1;
     }
 
@@ -627,12 +627,12 @@ static int _lehmer(_fmpz_mat22_t M, fmpz_t A, fmpz_t B, const fmpz_t N,
 {
     int ret;
     slong written;
-    mp_srcptr n_ptr;
+    nn_srcptr n_ptr;
     mpz_ptr a, b, s, t;
-    mp_ptr a_ptr, b_ptr, s_ptr, t_ptr;
-    mp_size_t a_len, b_len, n_len, s_len, t_len;
+    nn_ptr a_ptr, b_ptr, s_ptr, t_ptr;
+    slong a_len, b_len, n_len, s_len, t_len;
     _ui_mat22_t h;
-    mp_limb_t A0, A1, B0, B1;
+    ulong A0, A1, B0, B1;
     unsigned int n_lzcnt, a_lzcnt;
 
     if (!COEFF_IS_MPZ(*A) || !COEFF_IS_MPZ(*B))
@@ -651,7 +651,7 @@ static int _lehmer(_fmpz_mat22_t M, fmpz_t A, fmpz_t B, const fmpz_t N,
     }
     else
     {
-        n_ptr = (mp_srcptr) N; /* haha, dirty but works */
+        n_ptr = (nn_srcptr) N; /* haha, dirty but works */
         n_len = 1;
     }
 
@@ -923,7 +923,7 @@ int _fmpq_reconstruct_fmpz_2(fmpz_t n, fmpz_t d,
                 const fmpz_t a, const fmpz_t m, const fmpz_t N, const fmpz_t D)
 {
     int ret, success;
-    mp_size_t Asize, Nsize;
+    slong Asize, Nsize;
     fmpz_t Q, R, A, B;
     _fmpz_mat22_t M; /* only need first row of matrix M */
 #if FLINT_WANT_ASSERT

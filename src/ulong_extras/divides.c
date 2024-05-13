@@ -12,9 +12,9 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-int n_divides(mp_limb_t * q, mp_limb_t n, mp_limb_t p)
+int n_divides(ulong * q, ulong n, ulong p)
 {
-   mp_limb_t quo, rem;
+   ulong quo, rem;
 
    if (p == 0)
    {

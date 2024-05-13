@@ -201,9 +201,9 @@ void unity_zp_aut(unity_zp f, const unity_zp g, ulong x);
 void unity_zp_aut_inv(unity_zp f, const unity_zp g, ulong x);
 
 /* Jacobi sum computation. */
-mp_ptr aprcl_f_table(const ulong q);
+nn_ptr aprcl_f_table(const ulong q);
 
-void _unity_zp_jacobi_sum_pq_general(unity_zp f, const mp_ptr table, ulong p, ulong q, ulong k, ulong a, ulong b);
+void _unity_zp_jacobi_sum_pq_general(unity_zp f, const nn_ptr table, ulong p, ulong q, ulong k, ulong a, ulong b);
 void unity_zp_jacobi_sum_pq(unity_zp f, ulong q, ulong p);
 
 void unity_zp_jacobi_sum_2q_one(unity_zp f, ulong q);

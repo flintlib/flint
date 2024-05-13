@@ -90,7 +90,7 @@ fq_nmod_ctx_init_randtest(fq_nmod_ctx_t ctx, flint_rand_t state, int type)
     if (n_randint(state, 2))
     {
         nmod_poly_t modulus;
-        mp_limb_t x;
+        ulong x;
 
         nmod_poly_init(modulus, ctx->mod.n);
         nmod_poly_set(modulus, ctx->modulus);

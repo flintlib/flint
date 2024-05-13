@@ -190,7 +190,7 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap1(fmpz_t scale, fmpz_mpoly_struct ** pol
                 {
                     slong len = FLINT_MAX(q_len[w] + 1, 2*qs_alloc[w]);
                     qs[w] = (fmpz *) flint_realloc(qs[w], len*sizeof(fmpz));
-                    flint_mpn_zero((mp_ptr) (qs[w] + qs_alloc[w]), len - qs_alloc[w]);
+                    flint_mpn_zero((nn_ptr) (qs[w] + qs_alloc[w]), len - qs_alloc[w]);
                     qs_alloc[w] = len;
                 }
 
@@ -232,7 +232,7 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap1(fmpz_t scale, fmpz_mpoly_struct ** pol
         {
             slong len = FLINT_MAX(r_len + 1, 2*rs_alloc);
             rs = (fmpz *) flint_realloc(rs, len*sizeof(fmpz));
-            flint_mpn_zero((mp_ptr) (rs + rs_alloc), len - rs_alloc);
+            flint_mpn_zero((nn_ptr) (rs + rs_alloc), len - rs_alloc);
             rs_alloc = len;
         }
         fmpz_set(r_coeff + r_len, acc_lg);
@@ -509,7 +509,7 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale, fmpz_mpoly_struct ** poly
                 {
                     slong len = FLINT_MAX(q_len[w] + 1, 2*qs_alloc[w]);
                     qs[w] = (fmpz *) flint_realloc(qs[w], len*sizeof(fmpz));
-                    flint_mpn_zero((mp_ptr) (qs[w] + qs_alloc[w]), len - qs_alloc[w]);
+                    flint_mpn_zero((nn_ptr) (qs[w] + qs_alloc[w]), len - qs_alloc[w]);
                     qs_alloc[w] = len;
                 }
 
@@ -553,7 +553,7 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale, fmpz_mpoly_struct ** poly
         {
             slong len = FLINT_MAX(r_len + 1, 2*rs_alloc);
             rs = (fmpz *) flint_realloc(rs, len*sizeof(fmpz));
-            flint_mpn_zero((mp_ptr) (rs + rs_alloc), len - rs_alloc);
+            flint_mpn_zero((nn_ptr) (rs + rs_alloc), len - rs_alloc);
             rs_alloc = len;
         }
         fmpz_set(r_coeff + r_len, acc_lg);

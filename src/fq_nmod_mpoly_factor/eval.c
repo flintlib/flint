@@ -24,7 +24,7 @@ int _fq_nmod_mpoly_eval_rest_n_fq_poly(
     slong * ends,
     slong * stops,
     ulong * es,
-    const mp_limb_t * Acoeffs,
+    const ulong * Acoeffs,
     const ulong * Aexps,
     slong Alen,
     slong var,

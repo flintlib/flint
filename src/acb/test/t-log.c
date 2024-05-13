@@ -16,7 +16,7 @@
 static int
 close_to_one(const acb_t z)
 {
-    mp_limb_t top;
+    ulong top;
 
     if (arf_abs_bound_lt_2exp_si(arb_midref(acb_imagref(z))) > -3)
         return 0;

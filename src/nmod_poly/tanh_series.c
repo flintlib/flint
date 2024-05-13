@@ -14,9 +14,9 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_tanh_series(mp_ptr f, mp_srcptr h, slong n, nmod_t mod)
+_nmod_poly_tanh_series(nn_ptr f, nn_srcptr h, slong n, nmod_t mod)
 {
-    mp_ptr t, u;
+    nn_ptr t, u;
 
     t = _nmod_vec_init(n);
     u = _nmod_vec_init(n);
@@ -35,7 +35,7 @@ _nmod_poly_tanh_series(mp_ptr f, mp_srcptr h, slong n, nmod_t mod)
 void
 nmod_poly_tanh_series(nmod_poly_t g, const nmod_poly_t h, slong n)
 {
-    mp_ptr h_coeffs;
+    nn_ptr h_coeffs;
     slong h_len = h->length;
 
     if (h_len > 0 && h->coeffs[0] != UWORD(0))

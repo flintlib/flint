@@ -13,25 +13,25 @@
 #include "fmpz.h"
 
 int
-fmpz_bit_unpack(fmpz_t coeff, mp_srcptr arr, flint_bitcnt_t shift,
+fmpz_bit_unpack(fmpz_t coeff, nn_srcptr arr, flint_bitcnt_t shift,
                 flint_bitcnt_t bits, int negate, int borrow)
 {
-    mp_limb_t mask, sign;
+    ulong mask, sign;
     ulong limbs = (shift + bits) / FLINT_BITS;
     ulong rem_bits = (shift + bits) % FLINT_BITS;
 
     /* determine if field is positive or negative */
     if (rem_bits)
-        sign = ((((mp_limb_t) 1) << (rem_bits - 1)) & arr[limbs]);
+        sign = ((((ulong) 1) << (rem_bits - 1)) & arr[limbs]);
     else
-        sign = ((((mp_limb_t) 1) << (FLINT_BITS - 1)) & arr[limbs - 1]);
+        sign = ((((ulong) 1) << (FLINT_BITS - 1)) & arr[limbs - 1]);
 
     if (bits <= SMALL_FMPZ_BITCOUNT_MAX)  /* fits into a small coeff */
     {
         _fmpz_demote(coeff);
 
         /* mask for the given number of bits */
-        mask = (((mp_limb_t) 1) << bits) - (mp_limb_t) 1;
+        mask = (((ulong) 1) << bits) - (ulong) 1;
 
         if (limbs + (rem_bits != 0) > 1)  /* field crosses a limb boundary */
             (*coeff) =
@@ -41,10 +41,10 @@ fmpz_bit_unpack(fmpz_t coeff, mp_srcptr arr, flint_bitcnt_t shift,
 
         /* sign extend */
         if (sign)
-            (*coeff) += ((~(mp_limb_t) 0) << bits);
+            (*coeff) += ((~(ulong) 0) << bits);
 
         /* determine whether we need to return a borrow */
-        sign = (*coeff < (mp_limb_signed_t) 0 ? (mp_limb_t) 1 : (mp_limb_t) 0);
+        sign = (*coeff < (slong) 0 ? (ulong) 1 : (ulong) 0);
 
         /* deal with borrow */
         if (borrow)
@@ -62,12 +62,12 @@ fmpz_bit_unpack(fmpz_t coeff, mp_srcptr arr, flint_bitcnt_t shift,
         if (negate)
             fmpz_neg(coeff, coeff);
 
-        return (sign != (mp_limb_t) 0);
+        return (sign != (ulong) 0);
     }
     else  /* large coefficient */
     {
         mpz_ptr mcoeff;
-        mp_limb_t * p;
+        ulong * p;
         ulong l, b;
 
         mcoeff = _fmpz_promote(coeff);
@@ -93,15 +93,15 @@ fmpz_bit_unpack(fmpz_t coeff, mp_srcptr arr, flint_bitcnt_t shift,
         /* mask off the last limb, if not full */
         if (b)
         {
-            mask = (((mp_limb_t) 1) << b) - (mp_limb_t) 1;
+            mask = (((ulong) 1) << b) - (ulong) 1;
             p[l - 1] &= mask;
         }
 
-        if (sign != (mp_limb_t) 0)
+        if (sign != (ulong) 0)
         {
             /* sign extend */
             if (b)
-                p[l - 1] += ((~(mp_limb_t) 0) << b);
+                p[l - 1] += ((~(ulong) 0) << b);
 
             /* negate */
             mpn_com(p, p, l);
@@ -109,7 +109,7 @@ fmpz_bit_unpack(fmpz_t coeff, mp_srcptr arr, flint_bitcnt_t shift,
                 mpn_add_1(p, p, l, 1);
 
             /* normalise */
-            while (l && (p[l - 1] == (mp_limb_t) 0))
+            while (l && (p[l - 1] == (ulong) 0))
                 l--;
 
             mcoeff->_mp_size = -l;
@@ -123,7 +123,7 @@ fmpz_bit_unpack(fmpz_t coeff, mp_srcptr arr, flint_bitcnt_t shift,
                 mpn_add_1(p, p, l, 1);
 
             /* normalise */
-            while (l && (p[l - 1] == (mp_limb_t) 0))
+            while (l && (p[l - 1] == (ulong) 0))
                 l--;
 
             mcoeff->_mp_size = l;
@@ -142,19 +142,19 @@ fmpz_bit_unpack(fmpz_t coeff, mp_srcptr arr, flint_bitcnt_t shift,
 }
 
 void
-fmpz_bit_unpack_unsigned(fmpz_t coeff, mp_srcptr arr,
+fmpz_bit_unpack_unsigned(fmpz_t coeff, nn_srcptr arr,
                          flint_bitcnt_t shift, flint_bitcnt_t bits)
 {
     ulong limbs = (shift + bits) / FLINT_BITS;
     ulong rem_bits = (shift + bits) % FLINT_BITS;
-    mp_limb_t mask;
+    ulong mask;
 
     if (bits <= SMALL_FMPZ_BITCOUNT_MAX)  /* fits into a small coeff */
     {
         _fmpz_demote(coeff);
 
         /* mask for the given number of bits */
-        mask = (((mp_limb_t) 1) << bits) - (mp_limb_t) 1;
+        mask = (((ulong) 1) << bits) - (ulong) 1;
 
         if (limbs + (rem_bits != 0) > 1)  /* field crosses a limb boundary */
             (*coeff) =
@@ -165,7 +165,7 @@ fmpz_bit_unpack_unsigned(fmpz_t coeff, mp_srcptr arr,
     else  /* large coefficient */
     {
         mpz_ptr mcoeff;
-        mp_limb_t * p;
+        ulong * p;
         ulong l, b;
 
         mcoeff = _fmpz_promote(coeff);
@@ -191,12 +191,12 @@ fmpz_bit_unpack_unsigned(fmpz_t coeff, mp_srcptr arr,
         /* mask off the last limb, if not full */
         if (b)
         {
-            mask = (((mp_limb_t) 1) << b) - (mp_limb_t) 1;
+            mask = (((ulong) 1) << b) - (ulong) 1;
             p[l - 1] &= mask;
         }
 
         /* normalise */
-        while (l && (p[l - 1] == (mp_limb_t) 0))
+        while (l && (p[l - 1] == (ulong) 0))
             l--;
 
         mcoeff->_mp_size = l;

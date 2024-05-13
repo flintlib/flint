@@ -463,7 +463,7 @@ arb_const_euler_eval(arb_t res, slong prec)
 
 ARB_DEF_CACHED_CONSTANT(arb_const_euler_brent_mcmillan, arb_const_euler_eval)
 
-FLINT_DLL extern const mp_limb_t arb_hypgeom_gamma_tab_limbs[];
+FLINT_DLL extern const ulong arb_hypgeom_gamma_tab_limbs[];
 
 void
 arb_const_euler(arb_t res, slong prec)
@@ -471,7 +471,7 @@ arb_const_euler(arb_t res, slong prec)
     if (prec < ARB_HYPGEOM_GAMMA_TAB_PREC - 16)
     {
         slong exp;
-        mp_size_t n;
+        slong n;
 
         n = ARB_HYPGEOM_GAMMA_TAB_PREC / FLINT_BITS;
 

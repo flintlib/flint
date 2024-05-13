@@ -24,7 +24,7 @@ TEST_FUNCTION_START(nmod_poly_mat_get_set_coeff_mat, state)
         nmod_poly_mat_t pmat2;
         nmod_mat_t cmat1;
         nmod_mat_t cmat2;
-        mp_limb_t mod;
+        ulong mod;
         slong m, n, deg;
         int jx;
 

@@ -15,9 +15,9 @@
 #include "fq_nmod_mpoly.h"
 
 slong _fq_nmod_mpoly_add(
-    mp_limb_t * Acoeffs, ulong * Aexps,
-    mp_limb_t * Bcoeffs, const ulong * Bexps, slong Blen,
-    mp_limb_t * Ccoeffs, const ulong * Cexps, slong Clen,
+    ulong * Acoeffs, ulong * Aexps,
+    ulong * Bcoeffs, const ulong * Bexps, slong Blen,
+    ulong * Ccoeffs, const ulong * Cexps, slong Clen,
     slong N, const ulong * cmpmask, const fq_nmod_ctx_t fqctx)
 {
     slong d = fq_nmod_ctx_degree(fqctx);

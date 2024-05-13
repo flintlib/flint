@@ -55,11 +55,11 @@ const ulong ULONG_PRIMORIALS[] =
 
 #define PROD_LIMBS_DIRECT_CUTOFF 50
 
-mp_size_t mpn_prod_limbs_direct(mp_limb_t * result, const mp_limb_t * factors,
-    mp_size_t n)
+slong mpn_prod_limbs_direct(ulong * result, const ulong * factors,
+    slong n)
 {
-    mp_size_t k, len;
-    mp_limb_t top;
+    slong k, len;
+    ulong top;
     if (n < 1)
     {
         result[0] = UWORD(1);
@@ -79,11 +79,11 @@ mp_size_t mpn_prod_limbs_direct(mp_limb_t * result, const mp_limb_t * factors,
     return len;
 }
 
-mp_size_t mpn_prod_limbs_balanced(mp_limb_t * result, mp_limb_t * scratch,
-                             const mp_limb_t * factors, mp_size_t n, ulong bits)
+slong mpn_prod_limbs_balanced(ulong * result, ulong * scratch,
+                             const ulong * factors, slong n, ulong bits)
 {
-    mp_size_t an, bn, alen, blen, len;
-    mp_limb_t top;
+    slong an, bn, alen, blen, len;
+    ulong top;
 
     if (n < PROD_LIMBS_DIRECT_CUTOFF)
         return mpn_prod_limbs_direct(result, factors, n);
@@ -112,18 +112,18 @@ mp_size_t mpn_prod_limbs_balanced(mp_limb_t * result, mp_limb_t * scratch,
     bits must be set to some bound on the bit size of the entries
     in factors. If no bound is known, simply use FLINT_BITS.
 */
-mp_size_t mpn_prod_limbs(mp_limb_t * result, const mp_limb_t * factors,
-    mp_size_t n, ulong bits)
+slong mpn_prod_limbs(ulong * result, const ulong * factors,
+    slong n, ulong bits)
 {
-    mp_size_t len, limbs;
-    mp_limb_t * scratch;
+    slong len, limbs;
+    ulong * scratch;
 
     if (n < PROD_LIMBS_DIRECT_CUTOFF)
         return mpn_prod_limbs_direct(result, factors, n);
 
     limbs = (n * bits - 1)/FLINT_BITS + 2;
 
-    scratch = flint_malloc(sizeof(mp_limb_t) * limbs);
+    scratch = flint_malloc(sizeof(ulong) * limbs);
     len = mpn_prod_limbs_balanced(result, scratch, factors, n, bits);
     flint_free(scratch);
 
@@ -133,10 +133,10 @@ mp_size_t mpn_prod_limbs(mp_limb_t * result, const mp_limb_t * factors,
 void
 fmpz_primorial(fmpz_t res, ulong n)
 {
-    mp_size_t len, pi;
+    slong len, pi;
     ulong bits;
     mpz_ptr mres;
-    const mp_limb_t * primes;
+    const ulong * primes;
 
     if (n <= LARGEST_ULONG_PRIMORIAL)
     {

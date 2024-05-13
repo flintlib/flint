@@ -326,7 +326,7 @@ int flint_vfprintf(FILE * fs, const char * ip, va_list vlist)
 
 #if defined(_LONG_LONG_LIMB)
     /*
-       If mp_limb_t is long long, then
+       If ulong is long long, then
 
          `%(format args...)w' -> `%(format args...)ll'.
 

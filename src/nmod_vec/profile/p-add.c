@@ -15,11 +15,11 @@
 #include "nmod.h"
 #include "nmod_vec.h"
 
-void _nmod_vec_add_fast(mp_ptr res, mp_srcptr vec1, mp_srcptr vec2, slong len, nmod_t mod);
+void _nmod_vec_add_fast(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod);
 
 #define NUMTYPES 1
 
-void (* funcs[])(mp_ptr, mp_srcptr, mp_srcptr, slong, nmod_t) = {_nmod_vec_add /*, _nmod_vec_add_fast */};
+void (* funcs[])(nn_ptr, nn_srcptr, nn_srcptr, slong, nmod_t) = {_nmod_vec_add /*, _nmod_vec_add_fast */};
 
 char * str[] = {"_nmod_vec_add" /*, "_nmod_vec_add_fast" */};
 
@@ -35,14 +35,14 @@ info_t;
 
 void sample(void * arg, ulong unused)
 {
-    mp_limb_t n;
+    ulong n;
     nmod_t mod;
     info_t * info = (info_t *) arg;
     flint_bitcnt_t mod_bits = info->mod_bits;
     flint_bitcnt_t len = info->len;
     slong type;
     slong ix;
-    mp_ptr vec1, vec2, res;
+    nn_ptr vec1, vec2, res;
     double * timers = info->timers;
     double start;
     FLINT_TEST_INIT(state);

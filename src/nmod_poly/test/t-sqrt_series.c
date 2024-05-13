@@ -24,7 +24,7 @@ TEST_FUNCTION_START(nmod_poly_sqrt_series, state)
         nmod_poly_t h, g, r;
         slong m;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest_prime(state, 0);
         while (n == UWORD(2));
 
@@ -65,7 +65,7 @@ TEST_FUNCTION_START(nmod_poly_sqrt_series, state)
         nmod_poly_t g, h;
         slong m;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest_prime(state, 0);
         while (n == UWORD(2));
 

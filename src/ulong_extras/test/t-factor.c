@@ -19,7 +19,7 @@ TEST_FUNCTION_START(n_factor, state)
 
     for (ix = 0; ix < 1000 * flint_test_multiplier(); ix++)
     {
-        mp_limb_t n1, n2;
+        ulong n1, n2;
         n_factor_t factors;
         int type;
 

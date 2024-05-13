@@ -26,7 +26,7 @@ slong _fq_zech_mpoly_derivative(fq_zech_struct * Acoeff,       ulong * Aexp,
     Alen = 0;
     for (i = 0; i < Blen; i++)
     {
-        mp_limb_t cr;
+        ulong cr;
         ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
         ulong c = (Bexp[N*i + offset] >> shift) & mask;
         if (c == 0)
@@ -56,7 +56,7 @@ slong _fq_zech_mpoly_derivative_mp(fq_zech_struct * Acoeff,       ulong * Aexp,
     Alen = 0;
     for (i = 0; i < Blen; i++)
     {
-        mp_limb_t cr;
+        ulong cr;
         fmpz_set_ui_array(c, Bexp + N*i + offset, bits/FLINT_BITS);
         if (fmpz_is_zero(c))
             continue;

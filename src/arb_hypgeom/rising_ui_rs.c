@@ -48,7 +48,7 @@ _arb_hypgeom_rising_coeffs_2(ulong * c, ulong k, slong l)
 {
     slong i, j;
     ulong d;
-    mp_limb_t hi, lo;
+    ulong hi, lo;
 
     if (l < 2)
         flint_throw(FLINT_ERROR, "(%s): l < 2\n", __func__);
@@ -112,7 +112,7 @@ arb_hypgeom_rising_ui_rs(arb_t res, const arb_t x, ulong n, ulong m, slong prec)
     slong i, k, l, m0, climbs, climbs_max, wp;
     arb_ptr xpow;
     arb_t t, u;
-    mp_ptr c;
+    nn_ptr c;
     TMP_INIT;
 
     if (n <= 1)
@@ -146,7 +146,7 @@ arb_hypgeom_rising_ui_rs(arb_t res, const arb_t x, ulong n, ulong m, slong prec)
     wp = ARF_PREC_ADD(prec, FLINT_BIT_COUNT(n));
 
     climbs_max = FLINT_BIT_COUNT(n - 1) * m;
-    c = TMP_ALLOC(sizeof(mp_limb_t) * climbs_max * m);
+    c = TMP_ALLOC(sizeof(ulong) * climbs_max * m);
 
     xpow = _arb_vec_init(m + 1);
     _arb_vec_set_powers(xpow, x, m + 1, wp);

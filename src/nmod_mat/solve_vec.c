@@ -12,7 +12,7 @@
 #include "nmod_mat.h"
 
 int
-nmod_mat_solve_vec(mp_ptr x, const nmod_mat_t A, mp_srcptr b)
+nmod_mat_solve_vec(nn_ptr x, const nmod_mat_t A, nn_srcptr b)
 {
     nmod_mat_t X, B;
     int result;
@@ -29,7 +29,7 @@ nmod_mat_solve_vec(mp_ptr x, const nmod_mat_t A, mp_srcptr b)
     nmod_mat_window_init(B, A, 0, 0, m, 1);
 
     for (i = 0; i < m; i++) X->rows[i] = x + i;
-    for (i = 0; i < m; i++) B->rows[i] = (mp_ptr) (b + i);
+    for (i = 0; i < m; i++) B->rows[i] = (nn_ptr) (b + i);
 
     result = nmod_mat_solve(X, A, B);
 

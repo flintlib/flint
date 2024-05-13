@@ -966,7 +966,7 @@ Euclidean division
     be invertible modulo the modulus of ``Q``. An exception is
     raised if this is not the case or if ``n = 0``.
 
-.. function:: void _fq_nmod_poly_div_series(fq_nmod_struct * Q, const fq_nmod_struct * A, mp_limb_signed_t Alen, const fq_nmod_struct * B, mp_limb_signed_t Blen, mp_limb_signed_t n, const fq_nmod_ctx_t ctx)
+.. function:: void _fq_nmod_poly_div_series(fq_nmod_struct * Q, const fq_nmod_struct * A, slong Alen, const fq_nmod_struct * B, slong Blen, slong n, const fq_nmod_ctx_t ctx)
 
     Set ``(Q, n)`` to the quotient of the series ``(A, Alen``) and
     ``(B, Blen)`` assuming ``Alen, Blen <= n``. We assume the bottom

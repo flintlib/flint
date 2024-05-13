@@ -66,8 +66,8 @@ fmpq_dedekind_sum_naive(fmpq_t s, const fmpz_t h, const fmpz_t k)
 
 #define _UI_MAT22_RMUL_ELEM(m11, m12, m21, m22, q) \
   do {                                             \
-    mp_limb_t __t1 = m12 + q*m11;                  \
-    mp_limb_t __t2 = m22 + q*m21;                  \
+    ulong __t1 = m12 + q*m11;                  \
+    ulong __t2 = m22 + q*m21;                  \
     m12 = m11;                                     \
     m22 = m21;                                     \
     m11 = __t1;                                    \

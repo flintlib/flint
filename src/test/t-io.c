@@ -468,7 +468,7 @@ TEST_FUNCTION_START(flint_fprintf, state)
         mpq_t xmpq1, xmpq2;
 
         slong xslong_vec[SLONG_VEC_LEN];
-        mp_ptr xnmod_vec;
+        nn_ptr xnmod_vec;
         fmpz * xfmpz_vec;
         fmpq * xfmpq_vec;
         arb_ptr xarb_vec;

@@ -15,7 +15,7 @@
 /* assumes that we can write one (zeroed) limb too much */
 /* assumes bits >= FLINT_BITS */
 static void
-_mpn_mod_poly_bit_pack(mp_ptr res, mp_srcptr x, slong len, mp_bitcnt_t bits, mp_size_t nlimbs)
+_mpn_mod_poly_bit_pack(nn_ptr res, nn_srcptr x, slong len, flint_bitcnt_t bits, slong nlimbs)
 {
     slong i, l, shift;
 
@@ -32,12 +32,12 @@ _mpn_mod_poly_bit_pack(mp_ptr res, mp_srcptr x, slong len, mp_bitcnt_t bits, mp_
 }
 
 static void
-_mpn_mod_poly_bit_unpack(mp_ptr res, mp_srcptr x, slong len, mp_bitcnt_t bits, mp_size_t nlimbs, gr_ctx_t ctx)
+_mpn_mod_poly_bit_unpack(nn_ptr res, nn_srcptr x, slong len, flint_bitcnt_t bits, slong nlimbs, gr_ctx_t ctx)
 {
     slong i, i1, i2, l1, shift, l2;
-    mp_limb_t t[2 * MPN_MOD_MAX_LIMBS + 3];
-    mp_limb_t mask;
-    mp_size_t blimbs, tn;
+    ulong t[2 * MPN_MOD_MAX_LIMBS + 3];
+    ulong mask;
+    slong blimbs, tn;
 
     blimbs = (bits + FLINT_BITS - 1) / FLINT_BITS;
 
@@ -72,10 +72,10 @@ _mpn_mod_poly_bit_unpack(mp_ptr res, mp_srcptr x, slong len, mp_bitcnt_t bits, m
 }
 
 int
-_mpn_mod_poly_mullow_KS(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
+_mpn_mod_poly_mullow_KS(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
 {
     slong bits, nbits, nlimbs, limbs1, limbs2;
-    mp_ptr arr1, arr2, arr;
+    nn_ptr arr1, arr2, arr;
     int squaring;
 
     len1 = FLINT_MIN(len1, len);
@@ -94,14 +94,14 @@ _mpn_mod_poly_mullow_KS(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2
     FLINT_ASSERT(limbs1 >= (bits * (len1 - 1) / FLINT_BITS + nlimbs + 1));
     FLINT_ASSERT(limbs2 >= (bits * (len2 - 1) / FLINT_BITS + nlimbs + 1));
 
-    arr1 = flint_calloc(squaring ? limbs1 : limbs1 + limbs2, sizeof(mp_limb_t));
+    arr1 = flint_calloc(squaring ? limbs1 : limbs1 + limbs2, sizeof(ulong));
     arr2 = squaring ? arr1 : arr1 + limbs1;
 
     _mpn_mod_poly_bit_pack(arr1, poly1, len1, bits, nlimbs);
     if (!squaring)
         _mpn_mod_poly_bit_pack(arr2, poly2, len2, bits, nlimbs);
 
-    arr = flint_malloc((limbs1 + limbs2) * sizeof(mp_limb_t));
+    arr = flint_malloc((limbs1 + limbs2) * sizeof(ulong));
 
     if (squaring)
         flint_mpn_sqr(arr, arr1, limbs1);

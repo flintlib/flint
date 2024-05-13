@@ -23,7 +23,7 @@ TEST_FUNCTION_START(nmod_poly_compose_mod_brent_kung_precomp_preinv, state)
     {
         nmod_poly_t a, b, c, cinv, d, e;
         nmod_mat_t B;
-        mp_limb_t m = n_randtest_prime(state, 0);
+        ulong m = n_randtest_prime(state, 0);
 
         nmod_poly_init(a, m);
         nmod_poly_init(b, m);
@@ -72,7 +72,7 @@ TEST_FUNCTION_START(nmod_poly_compose_mod_brent_kung_precomp_preinv, state)
     {
         nmod_poly_t a, b, c, cinv, d;
         nmod_mat_t B;
-        mp_limb_t m = n_randtest_prime(state, 0);
+        ulong m = n_randtest_prime(state, 0);
 
         nmod_poly_init(a, m);
         nmod_poly_init(b, m);
@@ -117,7 +117,7 @@ TEST_FUNCTION_START(nmod_poly_compose_mod_brent_kung_precomp_preinv, state)
     {
         nmod_poly_t a, b, c, cinv, d;
         nmod_mat_t B;
-        mp_limb_t m = n_randtest_prime(state, 0);
+        ulong m = n_randtest_prime(state, 0);
 
         nmod_poly_init(a, m);
         nmod_poly_init(b, m);
@@ -162,7 +162,7 @@ TEST_FUNCTION_START(nmod_poly_compose_mod_brent_kung_precomp_preinv, state)
     {
         nmod_poly_t a, b, c, cinv, d;
         nmod_mat_t B;
-        mp_limb_t m = n_randtest_prime(state, 0);
+        ulong m = n_randtest_prime(state, 0);
 
         nmod_poly_init(a, m);
         nmod_poly_init(b, m);

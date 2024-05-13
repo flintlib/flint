@@ -12,12 +12,12 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-void _nmod_poly_integral(mp_ptr res, mp_srcptr poly, slong len, nmod_t mod)
+void _nmod_poly_integral(nn_ptr res, nn_srcptr poly, slong len, nmod_t mod)
 {
     if (len > 2)
     {
         slong k;
-        mp_limb_t t, u;
+        ulong t, u;
 
         res[len - 1] = poly[len - 2];
         t = len - 1;

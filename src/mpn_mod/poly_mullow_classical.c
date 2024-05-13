@@ -12,28 +12,28 @@
 #include "mpn_mod.h"
 
 /* currently defined in poly_mullow_karatsuba.c */
-void _mpn_dot_rev_2x2_3(mp_ptr s, mp_srcptr a, mp_srcptr b, slong len);
-void _mpn_dot_rev_2x2_4(mp_ptr s, mp_srcptr a, mp_srcptr b, slong len);
-void _mpn_dot_rev_2x2_5(mp_ptr s, mp_srcptr a, mp_srcptr b, slong len);
-void _mpn_dot_rev_3x3_5(mp_ptr s, mp_srcptr a, mp_srcptr b, slong len);
-void _mpn_dot_rev_nxn_2n(mp_ptr res, mp_srcptr a, mp_srcptr b, slong len, mp_size_t nlimbs);
-void _mpn_dot_rev_nxn_2nm1(mp_ptr res, mp_srcptr a, mp_srcptr b, slong len, mp_size_t nlimbs);
-void _mpn_dot_rev_nxn_2np1(mp_ptr res, mp_srcptr a, mp_srcptr b, slong len, mp_size_t nlimbs);
+void _mpn_dot_rev_2x2_3(nn_ptr s, nn_srcptr a, nn_srcptr b, slong len);
+void _mpn_dot_rev_2x2_4(nn_ptr s, nn_srcptr a, nn_srcptr b, slong len);
+void _mpn_dot_rev_2x2_5(nn_ptr s, nn_srcptr a, nn_srcptr b, slong len);
+void _mpn_dot_rev_3x3_5(nn_ptr s, nn_srcptr a, nn_srcptr b, slong len);
+void _mpn_dot_rev_nxn_2n(nn_ptr res, nn_srcptr a, nn_srcptr b, slong len, slong nlimbs);
+void _mpn_dot_rev_nxn_2nm1(nn_ptr res, nn_srcptr a, nn_srcptr b, slong len, slong nlimbs);
+void _mpn_dot_rev_nxn_2np1(nn_ptr res, nn_srcptr a, nn_srcptr b, slong len, slong nlimbs);
 
 static void
-mpn_mod_set_mpn2(mp_ptr res, mp_srcptr s, mp_size_t l, gr_ctx_t ctx)
+mpn_mod_set_mpn2(nn_ptr res, nn_srcptr s, slong l, gr_ctx_t ctx)
 {
     MPN_NORM(s, l);
     mpn_mod_set_mpn(res, s, l, ctx);
 }
 
 int
-_mpn_mod_poly_mullow_classical(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
+_mpn_mod_poly_mullow_classical(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
 {
     slong i, top1, top2;
-    mp_size_t nlimbs, slimbs;
-    mp_bitcnt_t sbits;
-    mp_limb_t s[2 * MPN_MOD_MAX_LIMBS + 1];
+    slong nlimbs, slimbs;
+    flint_bitcnt_t sbits;
+    ulong s[2 * MPN_MOD_MAX_LIMBS + 1];
     int squaring;
 
     if (len == 1)
@@ -70,7 +70,7 @@ _mpn_mod_poly_mullow_classical(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcpt
 
     if (squaring)
     {
-        mp_limb_t t[2 * MPN_MOD_MAX_LIMBS];
+        ulong t[2 * MPN_MOD_MAX_LIMBS];
         slong start, stop;
 
         if (slimbs == 2 * nlimbs - 1)

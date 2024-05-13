@@ -16,8 +16,8 @@
 
 static int _fq_nmod_mpoly_div_monagan_pearce(
     fq_nmod_mpoly_t Q,
-    const mp_limb_t * Acoeffs, const ulong * Aexps, slong Alen,
-    const mp_limb_t * Bcoeffs, const ulong * Bexps, slong Blen,
+    const ulong * Acoeffs, const ulong * Aexps, slong Alen,
+    const ulong * Bcoeffs, const ulong * Bexps, slong Blen,
     flint_bitcnt_t bits,
     slong N,
     const ulong * cmpmask,
@@ -31,7 +31,7 @@ static int _fq_nmod_mpoly_div_monagan_pearce(
     mpoly_heap_t * chain;
     slong * store, * store_base;
     mpoly_heap_t * x;
-    mp_limb_t * Qcoeffs = Q->coeffs;
+    ulong * Qcoeffs = Q->coeffs;
     ulong * Qexps = Q->exps;
     slong Qlen;
     ulong * exp, * exps;
@@ -40,13 +40,13 @@ static int _fq_nmod_mpoly_div_monagan_pearce(
     ulong mask;
     slong * hind;
     int lt_divides;
-    mp_limb_t * lc_minus_inv, * pp;
+    ulong * lc_minus_inv, * pp;
     TMP_INIT;
 
     TMP_START;
 
-    pp = (mp_limb_t *) TMP_ALLOC(d*sizeof(mp_limb_t));
-    lc_minus_inv = (mp_limb_t *) TMP_ALLOC(d*sizeof(mp_limb_t));
+    pp = (ulong *) TMP_ALLOC(d*sizeof(ulong));
+    lc_minus_inv = (ulong *) TMP_ALLOC(d*sizeof(ulong));
 
     /* alloc array of heap nodes which can be chained together */
     next_loc = Blen + 4;   /* something bigger than heap can ever be */

@@ -14,8 +14,8 @@
 #include "nmod_mpoly.h"
 
 static slong _nmod_mpoly_derivative(
-    mp_limb_t * coeff1, ulong * exp1,
-    const mp_limb_t * coeff2, const ulong * exp2, slong len2,
+    ulong * coeff1, ulong * exp1,
+    const ulong * coeff2, const ulong * exp2, slong len2,
     flint_bitcnt_t bits,
     slong N,
     slong offset,
@@ -30,7 +30,7 @@ static slong _nmod_mpoly_derivative(
     len1 = 0;
     for (i = 0; i < len2; i++)
     {
-        mp_limb_t cr;
+        ulong cr;
         ulong c = (exp2[N*i + offset] >> shift) & mask;
         if (c == 0)
             continue;
@@ -47,8 +47,8 @@ static slong _nmod_mpoly_derivative(
 
 
 static slong _nmod_mpoly_derivative_mp(
-    mp_limb_t * coeff1, ulong * exp1,
-    const mp_limb_t * coeff2, const ulong * exp2, slong len2,
+    ulong * coeff1, ulong * exp1,
+    const ulong * coeff2, const ulong * exp2, slong len2,
     flint_bitcnt_t bits,
     slong N,
     slong offset,
@@ -57,17 +57,17 @@ static slong _nmod_mpoly_derivative_mp(
 {
     slong i, len1;
     slong esize = bits/FLINT_BITS;
-    mp_limb_t * t;
+    ulong * t;
     TMP_INIT;
 
     TMP_START;
-    t = (mp_limb_t *) TMP_ALLOC(esize*sizeof(mp_limb_t));
+    t = (ulong *) TMP_ALLOC(esize*sizeof(ulong));
 
     /* x^c -> c*x^(c-1) */
     len1 = 0;
     for (i = 0; i < len2; i++)
     {
-        mp_limb_t cr = mpn_divrem_1(t, 0, exp2 + N*i + offset, esize, fctx.n);
+        ulong cr = mpn_divrem_1(t, 0, exp2 + N*i + offset, esize, fctx.n);
         coeff1[len1] = nmod_mul(coeff2[i], cr, fctx);
         if (coeff1[len1] == 0)
             continue;

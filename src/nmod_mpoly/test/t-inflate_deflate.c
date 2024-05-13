@@ -26,7 +26,7 @@ TEST_FUNCTION_START(nmod_mpoly_inflate_deflate, state)
         slong len1, len2, len3;
         flint_bitcnt_t exp_bits1, exp_bits2, exp_bits3;
         flint_bitcnt_t stride_bits, shift_bits;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = FLINT_MAX(UWORD(2), n_randlimb(state));
 
@@ -121,7 +121,7 @@ TEST_FUNCTION_START(nmod_mpoly_inflate_deflate, state)
         slong len1, len2, len3;
         flint_bitcnt_t exp_bits1, exp_bits2, exp_bits3;
         flint_bitcnt_t stride_bits, shift_bits;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = FLINT_MAX(UWORD(2), n_randlimb(state));
 

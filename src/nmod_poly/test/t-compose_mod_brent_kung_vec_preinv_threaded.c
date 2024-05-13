@@ -25,7 +25,7 @@ TEST_FUNCTION_START(nmod_poly_compose_mod_brent_kung_vec_preinv_threaded, state)
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, ainv, b, c;
-        mp_limb_t m = n_randtest_prime(state, 0);
+        ulong m = n_randtest_prime(state, 0);
         slong j, k, l;
         nmod_poly_struct * pow, * res;
 

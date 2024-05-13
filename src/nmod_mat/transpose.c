@@ -14,7 +14,7 @@
 void
 nmod_mat_transpose(nmod_mat_t B, const nmod_mat_t A)
 {
-    mp_limb_t tmp;
+    ulong tmp;
 
     slong i, j;
 

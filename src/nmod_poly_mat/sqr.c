@@ -32,7 +32,7 @@ nmod_poly_mat_sqr(nmod_poly_mat_t C, const nmod_poly_mat_t A)
     else
     {
         ulong Alen;
-        mp_limb_t mod = nmod_poly_mat_modulus(A);
+        ulong mod = nmod_poly_mat_modulus(A);
 
         Alen = nmod_poly_mat_max_length(A);
 
@@ -105,10 +105,10 @@ nmod_poly_mat_sqr_interpolate(nmod_poly_mat_t C, const nmod_poly_mat_t A)
 
     nmod_mat_t *C_mod, *A_mod;
 
-    mp_ptr xs;
-    mp_ptr tt, uu;
-    mp_ptr * tree;
-    mp_ptr weights;
+    nn_ptr xs;
+    nn_ptr tt, uu;
+    nn_ptr * tree;
+    nn_ptr weights;
     nmod_t mod;
 
     if (A->c == 0)

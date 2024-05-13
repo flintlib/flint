@@ -16,9 +16,9 @@
 int
 arf_root(arf_ptr z, arf_srcptr x, ulong k, slong prec, arf_rnd_t rnd)
 {
-    mp_size_t xn, zn, val;
-    mp_srcptr xptr;
-    mp_ptr tmp, zptr;
+    slong xn, zn, val;
+    nn_srcptr xptr;
+    nn_ptr tmp, zptr;
     mpfr_t xf, zf;
     fmpz_t q, r;
     int inexact;
@@ -62,12 +62,12 @@ arf_root(arf_ptr z, arf_srcptr x, ulong k, slong prec, arf_rnd_t rnd)
     ARF_GET_MPN_READONLY(xptr, xn, x);
     zn = (prec + FLINT_BITS - 1) / FLINT_BITS;
 
-    zf->_mpfr_d = tmp = flint_malloc(zn * sizeof(mp_limb_t));
+    zf->_mpfr_d = tmp = flint_malloc(zn * sizeof(ulong));
     zf->_mpfr_prec = prec;
     zf->_mpfr_sign = 1;
     zf->_mpfr_exp = 0;
 
-    xf->_mpfr_d = (mp_ptr) xptr;
+    xf->_mpfr_d = (nn_ptr) xptr;
     xf->_mpfr_prec = xn * FLINT_BITS;
     xf->_mpfr_sign = 1;
     xf->_mpfr_exp = fmpz_get_ui(r);

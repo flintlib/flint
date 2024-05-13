@@ -18,7 +18,7 @@ TEST_FUNCTION_START(flint_ctz, state)
 
    for (i = 0; i < 100000 * flint_test_multiplier(); i++)
    {
-      mp_limb_t n;
+      ulong n;
       unsigned int count = 0;
 
       n = n_randtest(state);

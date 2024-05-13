@@ -22,7 +22,7 @@ TEST_FUNCTION_START(nmod_poly_mat_set_nmod_mat, state)
     {
         nmod_poly_mat_t pmat;
         nmod_mat_t cmat;
-        mp_limb_t mod;
+        ulong mod;
         slong m, n, deg;
 
         mod = n_randtest_prime(state, 0);

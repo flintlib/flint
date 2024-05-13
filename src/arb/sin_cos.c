@@ -12,7 +12,7 @@
 #include "mpn_extras.h"
 #include "arb.h"
 
-#define TMP_ALLOC_LIMBS(__n) TMP_ALLOC((__n) * sizeof(mp_limb_t))
+#define TMP_ALLOC_LIMBS(__n) TMP_ALLOC((__n) * sizeof(ulong))
 #define MAGLIM(prec) FLINT_MAX(65536, (4*prec))
 
 static void
@@ -78,9 +78,9 @@ _arb_sin_cos(arb_t zsin, arb_t zcos, const arf_t x, const mag_t xrad, slong prec
 {
     int want_sin, want_cos;
     slong radexp, exp, wp, wn, N, r, wprounded, maglim, orig_prec;
-    mp_ptr tmp, w, sina, cosa, sinb, cosb, ta, tb;
-    mp_ptr sinptr, cosptr;
-    mp_limb_t p1, q1bits, p2, q2bits, error, error2, p1_tab1, radman;
+    nn_ptr tmp, w, sina, cosa, sinb, cosb, ta, tb;
+    nn_ptr sinptr, cosptr;
+    ulong p1, q1bits, p2, q2bits, error, error2, p1_tab1, radman;
     int negative, inexact, octant;
     int sinnegative, cosnegative, swapsincos;
     TMP_INIT;
@@ -300,7 +300,7 @@ _arb_sin_cos(arb_t zsin, arb_t zcos, const arf_t x, const mag_t xrad, slong prec
     }
     else if (p1 == 0 || p2 == 0)    /* only one table lookup */
     {
-        mp_srcptr sinc, cosc;
+        nn_srcptr sinc, cosc;
 
         if (wp <= ARB_SIN_COS_TAB1_PREC)  /* must be in table 1 */
         {
@@ -339,7 +339,7 @@ _arb_sin_cos(arb_t zsin, arb_t zcos, const arf_t x, const mag_t xrad, slong prec
     }
     else        /* two table lookups, must be in table 2 */
     {
-        mp_srcptr sinc, cosc, sind, cosd;
+        nn_srcptr sinc, cosc, sind, cosd;
 
         sinc = arb_sin_cos_tab21[2 * p1] + ARB_SIN_COS_TAB2_LIMBS - wn;
         cosc = arb_sin_cos_tab21[2 * p1 + 1] + ARB_SIN_COS_TAB2_LIMBS - wn;
@@ -380,7 +380,7 @@ _arb_sin_cos(arb_t zsin, arb_t zcos, const arf_t x, const mag_t xrad, slong prec
 
     if (swapsincos)
     {
-        mp_ptr tmptr = sinptr;
+        nn_ptr tmptr = sinptr;
         sinptr = cosptr;
         cosptr = tmptr;
     }
@@ -414,7 +414,7 @@ _arb_sin_cos(arb_t zsin, arb_t zcos, const arf_t x, const mag_t xrad, slong prec
     else
     {
         mag_t sin_err, cos_err, quadratic, comp_err, xrad_copy;
-        mp_limb_t A_sin, A_cos, A_exp;
+        ulong A_sin, A_cos, A_exp;
 
         /* Copy xrad to support aliasing (note: the exponent has
            also been clamped earlier). */
@@ -451,7 +451,7 @@ _arb_sin_cos(arb_t zsin, arb_t zcos, const arf_t x, const mag_t xrad, slong prec
         A_exp = -ARB_SIN_COS_TAB1_BITS;
         if (swapsincos)
         {
-            mp_limb_t tt = A_sin;
+            ulong tt = A_sin;
             A_sin = A_cos;
             A_cos = tt;
         }

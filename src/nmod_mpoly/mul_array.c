@@ -248,7 +248,7 @@ void _nmod_mpoly_mul_array_chunked_LEX(
         {
             /* compute bound on coeffs of output chunk */
             slong len = 0;
-            mp_limb_t t2, t1, t0, u1, u0;
+            ulong t2, t1, t0, u1, u0;
 
             for (i = 0, j = Pi; i < Al && j >= 0; i++, j--)
             {
@@ -720,7 +720,7 @@ void _nmod_mpoly_mul_array_chunked_DEG(
         {
             /* compute bound on coeffs of output chunk */
             slong len = 0;
-            mp_limb_t t2, t1, t0, u1, u0;
+            ulong t2, t1, t0, u1, u0;
 
             for (i = 0, j = Pi; i < Al && j >= 0; i++, j--)
             {

@@ -15,7 +15,7 @@
 #include "fmpz.h"
 #include "fmpz_factor.h"
 
-void _fmpz_nm1_trial_factors(const fmpz_t n, mp_ptr pm1, slong * num_pm1, ulong limit)
+void _fmpz_nm1_trial_factors(const fmpz_t n, nn_ptr pm1, slong * num_pm1, ulong limit)
 {
    slong i, num;
    ulong ppi, p;
@@ -61,7 +61,7 @@ void _fmpz_nm1_trial_factors(const fmpz_t n, mp_ptr pm1, slong * num_pm1, ulong 
    }
 }
 
-int fmpz_is_prime_pocklington(fmpz_t F, fmpz_t R, const fmpz_t n, mp_ptr pm1, slong num_pm1)
+int fmpz_is_prime_pocklington(fmpz_t F, fmpz_t R, const fmpz_t n, nn_ptr pm1, slong num_pm1)
 {
    slong i, d, bits;
    ulong a;

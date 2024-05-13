@@ -325,7 +325,7 @@ void fq_nmod_mpoly_from_mpolyu_perm_inflate(
     slong i, j, k, l;
     slong NA, NB;
     slong Alen;
-    mp_limb_t * Acoeff;
+    ulong * Acoeff;
     ulong * Aexp;
     ulong * uexps;
     ulong * Aexps;
@@ -496,7 +496,7 @@ void fq_nmod_mpoly_from_mpolyuu_perm_inflate( /* only for 2 main vars */
     slong i, j, k, l;
     slong NA, NB;
     slong Alen;
-    mp_limb_t * Acoeff;
+    ulong * Acoeff;
     ulong * Aexp;
     ulong * uexps;
     ulong * Aexps;
@@ -764,14 +764,14 @@ void fq_nmod_mpolyu_divexact_mpoly_inplace(
     if (fq_nmod_mpoly_is_fq_nmod(c, ctx))
     {
         slong d = fq_nmod_ctx_degree(ctx->fqctx);
-        mp_limb_t * inv;
+        ulong * inv;
 
         if (_n_fq_is_one(c->coeffs + d*0, d))
             return;
 
         TMP_START;
 
-        inv = (mp_limb_t *) TMP_ALLOC(d*sizeof(mp_limb_t));
+        inv = (ulong *) TMP_ALLOC(d*sizeof(ulong));
 
         n_fq_inv(inv, c->coeffs + d*0, ctx->fqctx);
 

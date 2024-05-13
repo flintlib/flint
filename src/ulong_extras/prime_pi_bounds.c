@@ -15,7 +15,7 @@
 
 FLINT_DLL extern const unsigned char FLINT_PRIME_PI_ODD_LOOKUP[];
 
-void n_prime_pi_bounds(ulong *lo, ulong *hi, mp_limb_t n)
+void n_prime_pi_bounds(ulong *lo, ulong *hi, ulong n)
 {
     if (n < FLINT_PRIME_PI_ODD_LOOKUP_CUTOFF)
     {

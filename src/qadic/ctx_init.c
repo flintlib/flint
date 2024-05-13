@@ -27,7 +27,7 @@ int _qadic_ctx_init_conway_ui(qadic_ctx_t ctx, ulong p, slong d,
     ulong tmp[410]; /* Largest degree is 409 */
     slong num_nzcoeffs;
     slong * idx_nzcoeffs;
-    mp_ptr nzcoeffs;
+    nn_ptr nzcoeffs;
     slong ix, jx;
 
     result = _nmod_poly_conway(tmp, p, d);

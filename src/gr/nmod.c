@@ -647,8 +647,8 @@ _gr_nmod_vec_sub(ulong * res, const ulong * vec1, const ulong * vec2, slong len,
 }
 
 
-static inline void _nmod_vec_scalar_mul_nmod_fullword_inline(mp_ptr res, mp_srcptr vec,
-                               slong len, mp_limb_t c, nmod_t mod)
+static inline void _nmod_vec_scalar_mul_nmod_fullword_inline(nn_ptr res, nn_srcptr vec,
+                               slong len, ulong c, nmod_t mod)
 {
     slong i;
 
@@ -656,8 +656,8 @@ static inline void _nmod_vec_scalar_mul_nmod_fullword_inline(mp_ptr res, mp_srcp
         NMOD_MUL_FULLWORD(res[i], vec[i], c, mod);
 }
 
-static inline void _nmod_vec_scalar_mul_nmod_generic_inline(mp_ptr res, mp_srcptr vec,
-                               slong len, mp_limb_t c, nmod_t mod)
+static inline void _nmod_vec_scalar_mul_nmod_generic_inline(nn_ptr res, nn_srcptr vec,
+                               slong len, ulong c, nmod_t mod)
 {
     slong i;
 
@@ -665,8 +665,8 @@ static inline void _nmod_vec_scalar_mul_nmod_generic_inline(mp_ptr res, mp_srcpt
         NMOD_MUL_PRENORM(res[i], vec[i], c << mod.norm, mod);
 }
 
-static inline void _nmod_vec_scalar_mul_nmod_inline(mp_ptr res, mp_srcptr vec,
-                               slong len, mp_limb_t c, nmod_t mod)
+static inline void _nmod_vec_scalar_mul_nmod_inline(nn_ptr res, nn_srcptr vec,
+                               slong len, ulong c, nmod_t mod)
 {
     if (NMOD_BITS(mod) == FLINT_BITS)
         _nmod_vec_scalar_mul_nmod_fullword_inline(res, vec, len, c, mod);
@@ -1040,14 +1040,14 @@ _gr_nmod_poly_mullow(ulong * res,
 
 /* fixme: duplicates _nmod_poly_divrem for error handling */
 int
-_gr_nmod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA,
-                                  mp_srcptr B, slong lenB, gr_ctx_t ctx)
+_gr_nmod_poly_divrem(nn_ptr Q, nn_ptr R, nn_srcptr A, slong lenA,
+                                  nn_srcptr B, slong lenB, gr_ctx_t ctx)
 {
     if (lenA <= 20 || lenB <= 8 || lenA - lenB <= 6 ||
             (NMOD_BITS(NMOD_CTX(ctx)) <= 61 && lenA <= 40) ||
             (NMOD_BITS(NMOD_CTX(ctx)) <= 29 && lenA <= 70))
     {
-        mp_limb_t invB;
+        ulong invB;
         int status;
 
         status = _gr_nmod_inv(&invB, &B[lenB - 1], ctx);
@@ -1072,7 +1072,7 @@ _gr_nmod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA,
 }
 
 int
-_gr_nmod_poly_divexact(mp_ptr Q, mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, gr_ctx_t ctx)
+_gr_nmod_poly_divexact(nn_ptr Q, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, gr_ctx_t ctx)
 {
     slong lenQ = lenA - lenB + 1;
 
@@ -1106,13 +1106,13 @@ static const short inv_series_cutoff_tab[64] = {38, 36, 38, 36, 41, 48, 49, 54, 
 
 #endif
 
-void _nmod_poly_inv_series_basecase_preinv1(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, mp_limb_t q, nmod_t mod);
+void _nmod_poly_inv_series_basecase_preinv1(nn_ptr Qinv, nn_srcptr Q, slong Qlen, slong n, ulong q, nmod_t mod);
 
 int
 _gr_nmod_poly_inv_series_basecase(ulong * res,
     const ulong * f, slong flen, slong n, gr_ctx_t ctx)
 {
-    mp_limb_t q;
+    ulong q;
 
     q = f[0];
     if (q != 1)
@@ -1142,13 +1142,13 @@ _gr_nmod_poly_inv_series(ulong * res,
 }
 
 
-void _nmod_poly_div_series_basecase_preinv1(mp_ptr Qinv, mp_srcptr P, slong Plen, mp_srcptr Q, slong Qlen, slong n, mp_limb_t q, nmod_t mod);
+void _nmod_poly_div_series_basecase_preinv1(nn_ptr Qinv, nn_srcptr P, slong Plen, nn_srcptr Q, slong Qlen, slong n, ulong q, nmod_t mod);
 
 int
 _gr_nmod_poly_div_series_basecase(ulong * res,
     const ulong * f, slong flen, const ulong * g, slong glen, slong n, gr_ctx_t ctx)
 {
-    mp_limb_t q;
+    ulong q;
 
     q = g[0];
     if (q != 1)
@@ -1389,7 +1389,7 @@ _gr_nmod_mat_mul(gr_mat_t res, const gr_mat_t x, const gr_mat_t y, gr_ctx_t ctx)
     nmod_mat_struct *XX, *YY;
 
     R->entries = res->entries;
-    R->rows = (mp_ptr *) res->rows;
+    R->rows = (nn_ptr *) res->rows;
     R->r = res->r;
     R->c = res->c;
     R->mod = NMOD_CTX(ctx);
@@ -1401,7 +1401,7 @@ _gr_nmod_mat_mul(gr_mat_t res, const gr_mat_t x, const gr_mat_t y, gr_ctx_t ctx)
     else
     {
         X->entries = x->entries;
-        X->rows = (mp_ptr *) x->rows;
+        X->rows = (nn_ptr *) x->rows;
         X->r = x->r;
         X->c = x->c;
         X->mod = NMOD_CTX(ctx);
@@ -1419,7 +1419,7 @@ _gr_nmod_mat_mul(gr_mat_t res, const gr_mat_t x, const gr_mat_t y, gr_ctx_t ctx)
     else
     {
         Y->entries = y->entries;
-        Y->rows = (mp_ptr *) y->rows;
+        Y->rows = (nn_ptr *) y->rows;
         Y->r = y->r;
         Y->c = y->c;
         Y->mod = NMOD_CTX(ctx);

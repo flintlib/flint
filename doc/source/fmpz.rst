@@ -282,13 +282,13 @@ Conversion
     Returns `f` as an ``ulong``.  The result is undefined
     if `f` does not fit into an ``ulong`` or is negative.
 
-.. function:: void fmpz_get_uiui(mp_limb_t * hi, mp_limb_t * low, const fmpz_t f)
+.. function:: void fmpz_get_uiui(ulong * hi, ulong * low, const fmpz_t f)
 
     If `f` consists of two limbs, then ``*hi`` and ``*low`` are set to the high
     and low limbs, otherwise ``*low`` is set to the low limb and ``*hi`` is set
     to `0`.
 
-.. function:: mp_limb_t fmpz_get_nmod(const fmpz_t f, nmod_t mod)
+.. function:: ulong fmpz_get_nmod(const fmpz_t f, nmod_t mod)
 
     Returns `f \mod n`.
 
@@ -325,9 +325,9 @@ Conversion
 
     Sets the ``mpz_t`` `x` to the same value as `f`.
 
-.. function:: int fmpz_get_mpn(mp_ptr * n, fmpz_t n_in)
+.. function:: int fmpz_get_mpn(nn_ptr * n, fmpz_t n_in)
 
-    Sets the ``mp_ptr`` `n` to the same value as `n_{in}`. Returned
+    Sets the ``nn_ptr`` `n` to the same value as `n_{in}`. Returned
     integer is number of limbs allocated to `n`, minimum number of limbs
     required to hold the value stored in `n_{in}`.
 
@@ -362,12 +362,12 @@ Conversion
 
     Sets `f` to the given ``ulong`` value, and then negates `f`.
 
-.. function:: void fmpz_set_uiui(fmpz_t f, mp_limb_t hi, mp_limb_t lo)
+.. function:: void fmpz_set_uiui(fmpz_t f, ulong hi, ulong lo)
 
     Sets `f` to ``lo``, plus ``hi`` shifted to the left by
     ``FLINT_BITS``.
 
-.. function:: void fmpz_neg_uiui(fmpz_t f, mp_limb_t hi, mp_limb_t lo)
+.. function:: void fmpz_neg_uiui(fmpz_t f, ulong hi, ulong lo)
 
     Sets `f` to ``lo``, plus ``hi`` shifted to the left by
     ``FLINT_BITS``, and then negates `f`.
@@ -427,7 +427,7 @@ Conversion
     in base `b`. The base `b` can vary between `2` and `62`, inclusive.
     Returns `0` if the string contains a valid input and `-1` otherwise.
 
-.. function:: void fmpz_set_ui_smod(fmpz_t f, mp_limb_t x, mp_limb_t m)
+.. function:: void fmpz_set_ui_smod(fmpz_t f, ulong x, ulong m)
 
     Sets `f` to the signed remainder `y \equiv x \bmod m` satisfying
     `-m/2 < y \leq m/2`, given `x` which is assumed to satisfy
@@ -585,7 +585,7 @@ Basic properties and manipulation
     Returns the number of bits required to store the absolute
     value of `f`.  If `f` is `0` then `0` is returned.
 
-.. function:: mp_size_t fmpz_size(const fmpz_t f)
+.. function:: slong fmpz_size(const fmpz_t f)
 
     Returns the number of limbs required to store the absolute
     value of `f`.  If `f` is zero then `0` is returned.
@@ -634,14 +634,14 @@ Basic properties and manipulation
 
     Test bit index `i` of `f` and return `0` or `1`, accordingly.
 
-.. function:: mp_limb_t fmpz_abs_lbound_ui_2exp(slong * exp, const fmpz_t x, int bits)
+.. function:: ulong fmpz_abs_lbound_ui_2exp(slong * exp, const fmpz_t x, int bits)
 
     For nonzero `x`, returns a mantissa `m` with exactly ``bits`` bits and
     sets ``exp`` to an exponent `e`, such that `|x| \ge m 2^e`. The number
     of bits must be between 1 and ``FLINT_BITS`` inclusive.
     The mantissa is guaranteed to be correctly rounded.
 
-.. function:: mp_limb_t fmpz_abs_ubound_ui_2exp(slong * exp, const fmpz_t x, int bits)
+.. function:: ulong fmpz_abs_ubound_ui_2exp(slong * exp, const fmpz_t x, int bits)
 
     For nonzero `x`, returns a mantissa `m` with exactly ``bits`` bits
     and sets ``exp`` to an exponent `e`, such that `|x| \le m 2^e`.
@@ -1160,7 +1160,7 @@ Bit packing and unpacking
 --------------------------------------------------------------------------------
 
 
-.. function:: int fmpz_bit_pack(mp_limb_t * arr, flint_bitcnt_t shift, flint_bitcnt_t bits, const fmpz_t coeff, int negate, int borrow)
+.. function:: int fmpz_bit_pack(ulong * arr, flint_bitcnt_t shift, flint_bitcnt_t bits, const fmpz_t coeff, int negate, int borrow)
 
     Shifts the given coefficient to the left by ``shift`` bits and adds
     it to the integer in ``arr`` in a field of the given number of bits::
@@ -1180,7 +1180,7 @@ Bit packing and unpacking
     The value of ``coeff`` may also be optionally (and notionally) negated
     before it is used, by setting the ``negate`` parameter to `-1`.
 
-.. function:: int fmpz_bit_unpack(fmpz_t coeff, mp_limb_t * arr, flint_bitcnt_t shift, flint_bitcnt_t bits, int negate, int borrow)
+.. function:: int fmpz_bit_unpack(fmpz_t coeff, ulong * arr, flint_bitcnt_t shift, flint_bitcnt_t bits, int negate, int borrow)
 
     A bit field of the given number of bits is extracted from ``arr``,
     starting after ``shift`` bits, and placed into ``coeff``.  An
@@ -1190,7 +1190,7 @@ Bit packing and unpacking
 
     The value of ``shift`` is expected to be less than ``FLINT_BITS``.
 
-.. function:: void fmpz_bit_unpack_unsigned(fmpz_t coeff, const mp_limb_t * arr, flint_bitcnt_t shift, flint_bitcnt_t bits)
+.. function:: void fmpz_bit_unpack_unsigned(fmpz_t coeff, const ulong * arr, flint_bitcnt_t shift, flint_bitcnt_t bits)
 
     A bit field of the given number of bits is extracted from ``arr``,
     starting after ``shift`` bits, and placed into ``coeff``.
@@ -1278,7 +1278,7 @@ The ``fmpz_multi_CRT`` class is similar to ``fmpz_multi_CRT_ui`` except that it 
     If sign = 0, it is assumed that `0 \le r_1 < m_1` and `0 \le r_2 < m_2`.
     Otherwise, it is assumed that `-m_1 \le r_1 < m_1` and `0 \le r_2 < m_2`.
 
-.. function:: void fmpz_multi_mod_ui(mp_limb_t * out, const fmpz_t in, const fmpz_comb_t comb, fmpz_comb_temp_t temp)
+.. function:: void fmpz_multi_mod_ui(ulong * out, const fmpz_t in, const fmpz_comb_t comb, fmpz_comb_temp_t temp)
 
     Reduces the multiprecision integer ``in`` modulo each of the primes
     stored in the ``comb`` structure. The array ``out`` will be filled
@@ -1286,7 +1286,7 @@ The ``fmpz_multi_CRT`` class is similar to ``fmpz_multi_CRT_ui`` except that it 
     temporary space which must be provided by :func:`fmpz_comb_temp_init` and
     cleared by :func:`fmpz_comb_temp_clear`.
 
-.. function:: void fmpz_multi_CRT_ui(fmpz_t output, mp_srcptr residues, const fmpz_comb_t comb, fmpz_comb_temp_t ctemp, int sign)
+.. function:: void fmpz_multi_CRT_ui(fmpz_t output, nn_srcptr residues, const fmpz_comb_t comb, fmpz_comb_temp_t ctemp, int sign)
 
     This function takes a set of residues modulo the list of primes
     contained in the ``comb`` structure and reconstructs a multiprecision
@@ -1299,7 +1299,7 @@ The ``fmpz_multi_CRT`` class is similar to ``fmpz_multi_CRT_ui`` except that it 
     space which must be provided by :func:`fmpz_comb_temp_init` and
     cleared by :func:`fmpz_comb_temp_clear`.
 
-.. function:: void fmpz_comb_init(fmpz_comb_t comb, mp_srcptr primes, slong num_primes)
+.. function:: void fmpz_comb_init(fmpz_comb_t comb, nn_srcptr primes, slong num_primes)
 
     Initialises a ``comb`` structure for multimodular reduction and
     recombination.  The array ``primes`` is assumed to contain
@@ -1427,7 +1427,7 @@ Primality testing
     composite prime. However in that case an error is printed, as
     that would be of independent interest.
 
-.. function:: int fmpz_is_prime_pocklington(fmpz_t F, fmpz_t R, const fmpz_t n, mp_ptr pm1, slong num_pm1)
+.. function:: int fmpz_is_prime_pocklington(fmpz_t F, fmpz_t R, const fmpz_t n, nn_ptr pm1, slong num_pm1)
 
     Applies the Pocklington primality test. The test computes a product
     `F` of prime powers which divide `n - 1`.
@@ -1454,7 +1454,7 @@ Primality testing
 
     Requires `n` to be odd.
 
-.. function:: void _fmpz_nm1_trial_factors(const fmpz_t n, mp_ptr pm1, slong * num_pm1, ulong limit)
+.. function:: void _fmpz_nm1_trial_factors(const fmpz_t n, nn_ptr pm1, slong * num_pm1, ulong limit)
 
     Trial factors `n - 1` up to the given limit (approximately) and stores
     the factors in an array ``pm1`` whose length is written out to
@@ -1464,7 +1464,7 @@ Primality testing
     be produced (and hence on the length of the array that needs to be
     supplied).
 
-.. function:: int fmpz_is_prime_morrison(fmpz_t F, fmpz_t R, const fmpz_t n, mp_ptr pp1, slong num_pp1)
+.. function:: int fmpz_is_prime_morrison(fmpz_t F, fmpz_t R, const fmpz_t n, nn_ptr pp1, slong num_pp1)
 
     Applies the Morrison `p + 1` primality test. The test computes a
     product `F` of primes which divide `n + 1`.
@@ -1492,7 +1492,7 @@ Primality testing
 
     Requires `n` to be odd and non-square.
 
-.. function:: void _fmpz_np1_trial_factors(const fmpz_t n, mp_ptr pp1, slong * num_pp1, ulong limit)
+.. function:: void _fmpz_np1_trial_factors(const fmpz_t n, nn_ptr pp1, slong * num_pp1, ulong limit)
 
     Trial factors `n + 1` up to the given limit (approximately) and stores
     the factors in an array ``pp1`` whose length is written out to

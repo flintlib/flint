@@ -16,7 +16,7 @@
 #include "nmod_poly.h"
 
 void
-_fmpz_vec_get_nmod_vec(mp_ptr res, const fmpz * poly, slong len, nmod_t mod)
+_fmpz_vec_get_nmod_vec(nn_ptr res, const fmpz * poly, slong len, nmod_t mod)
 {
     slong i;
 

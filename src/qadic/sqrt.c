@@ -159,7 +159,7 @@ _artin_schreier_preimage(fmpz *rop, const fmpz *op, slong len,
 
         for (k = 0; k < d; k++)
         {
-            nmod_mat_entry(A, k, i) = (mp_limb_t) f[k];
+            nmod_mat_entry(A, k, i) = (ulong) f[k];
         }
         fmpz_zero(e + i);
     }

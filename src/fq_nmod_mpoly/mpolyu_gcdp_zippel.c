@@ -216,13 +216,13 @@ static int fq_nmod_mpolyu_evalfromsk(
     slong d = fq_nmod_ctx_degree(ctx->fqctx);
     slong i, j;
     int ret = 0;
-    mp_limb_t * pp, * acc;
+    ulong * pp, * acc;
     fq_nmod_t acct;
 
     FLINT_ASSERT(A->length == SK->length);
 
-    pp = FLINT_ARRAY_ALLOC(d, mp_limb_t);
-    acc = FLINT_ARRAY_ALLOC(d, mp_limb_t);
+    pp = FLINT_ARRAY_ALLOC(d, ulong);
+    acc = FLINT_ARRAY_ALLOC(d, ulong);
     fq_nmod_init(acct, ctx->fqctx);
 
     fq_nmod_poly_zero(e, ctx->fqctx);
@@ -281,7 +281,7 @@ void fq_nmod_poly_product_roots(fq_nmod_poly_t P, fq_nmod_struct * r,
 
     for x
 */
-int fq_nmod_vandsolve(mp_limb_t * X, mp_limb_t * A, fq_nmod_struct * b,
+int fq_nmod_vandsolve(ulong * X, ulong * A, fq_nmod_struct * b,
                                             slong n, const fq_nmod_ctx_t fqctx)
 {
     slong d = fq_nmod_ctx_degree(fqctx);

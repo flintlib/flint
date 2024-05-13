@@ -42,7 +42,7 @@ static void n_polyu_sort_terms(n_polyu_t A)
     for (i = 1; i < A->length; i++)
     for (j = i; j > 0 && A->exps[j - 1] < A->exps[j]; j--)
     {
-        FLINT_SWAP(mp_limb_t, A->coeffs[j - 1], A->coeffs[j]);
+        FLINT_SWAP(ulong, A->coeffs[j - 1], A->coeffs[j]);
         FLINT_SWAP(ulong, A->exps[j - 1], A->exps[j]);
     }
     return;
@@ -173,7 +173,7 @@ void n_polyu3_mod_interp_reduce_2sm_bpoly(
     slong i;
     slong cur0, cur1, e0, e1, e2;
     ulong tp0, tp1, tp2, tm0, tm1, tm2, p1, p0;
-    const mp_limb_t * Acoeffs = A->coeffs;
+    const ulong * Acoeffs = A->coeffs;
     const ulong * Aexps = A->exps;
 
     n_bpoly_zero(Ap);
@@ -252,7 +252,7 @@ void n_polyu3n_mod_interp_lift_2sm_bpoly(
     n_polyun_t T,
     const n_bpoly_t A,
     const n_bpoly_t B,
-    mp_limb_t alpha,
+    ulong alpha,
     nmod_t mod)
 {
     slong lastlength = 0;
@@ -263,8 +263,8 @@ void n_polyu3n_mod_interp_lift_2sm_bpoly(
     slong Ai, ai;
     n_poly_struct * Bcoeffs = B->coeffs;
     slong Bi, bi;
-    mp_limb_t u, v, Avalue, Bvalue;
-    mp_limb_t d0, d1;
+    ulong u, v, Avalue, Bvalue;
+    ulong d0, d1;
 
     FLINT_ASSERT(2*alpha < mod.n);
 
@@ -401,9 +401,9 @@ int n_polyu3n_mod_interp_crt_2sm_bpoly(
     n_poly_struct * Bcoeffs = B->coeffs;
     slong Bi, bi;
     n_poly_struct * Fvalue;
-    mp_limb_t u, v, Avalue, Bvalue, FvalueA, FvalueB;
+    ulong u, v, Avalue, Bvalue, FvalueA, FvalueB;
     int texp_set, cmp;
-    mp_limb_t alpha = alphapow->coeffs[1];
+    ulong alpha = alphapow->coeffs[1];
 
 #if FLINT_WANT_ASSERT
     u = n_poly_mod_evaluate_nmod(modulus, alpha, mod);
@@ -580,7 +580,7 @@ int n_polyu3_mod_hlift2(
     n_polyu_t A,
     n_polyu_t B0,
     n_polyu_t B1,
-    mp_limb_t beta,
+    ulong beta,
     slong degree_inner, /* required degree in x */
     nmod_t ctx)
 {
@@ -588,7 +588,7 @@ int n_polyu3_mod_hlift2(
     n_polyun_t T;
     n_bpoly_t Ap, Am, B0p, B0m, B1p, B1m;
     n_poly_t modulus, alphapow, t1, t2;
-    mp_limb_t alpha, c;
+    ulong alpha, c;
     slong ldegBB0, ldegBB1;
     slong Adegy, Adegz, Adegx;
     slong bad_primes_left;
@@ -753,7 +753,7 @@ int n_polyu3_mod_hlift(
     n_polyun_struct * BB,
     n_polyu_t A,
     n_polyu_struct * B,
-    mp_limb_t beta,
+    ulong beta,
     slong degree_inner, /* required degree in x */
     nmod_t ctx)
 {
@@ -763,7 +763,7 @@ int n_polyu3_mod_hlift(
     n_bpoly_struct * Bp, * Bm;
     n_bpoly_t Ap, Am;
     n_poly_t modulus, alphapow, t1, t2;
-    mp_limb_t alpha, c;
+    ulong alpha, c;
     slong * BBdegZ;
     slong AdegY, AdegX, AdegZ;
     slong bad_primes_left;

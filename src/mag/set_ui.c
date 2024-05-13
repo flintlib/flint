@@ -24,7 +24,7 @@ mag_set_ui(mag_t z, ulong x)
     else
     {
         slong bits;
-        mp_limb_t overflow;
+        ulong overflow;
 
         bits = flint_clz(x);
         bits = FLINT_BITS - bits;

@@ -23,7 +23,7 @@ void test_resultant(
     nmod_mpoly_univar_t F, G;
     nmod_poly_t f, g;
     nmod_mpoly_t R;
-    mp_limb_t r;
+    ulong r;
 
     nmod_mpoly_univar_init(F, ctx);
     nmod_mpoly_univar_init(G, ctx);
@@ -136,7 +136,7 @@ TEST_FUNCTION_START(nmod_mpoly_univar_resultant, state)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, t;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);

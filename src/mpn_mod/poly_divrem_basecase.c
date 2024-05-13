@@ -22,7 +22,7 @@
 #endif
 
 static void
-mpn_mod_set_mpn2(mp_ptr res, mp_srcptr s, mp_size_t l, gr_ctx_t ctx)
+mpn_mod_set_mpn2(nn_ptr res, nn_srcptr s, slong l, gr_ctx_t ctx)
 {
     MPN_NORM(s, l);
     mpn_mod_set_mpn(res, s, l, ctx);
@@ -31,7 +31,7 @@ mpn_mod_set_mpn2(mp_ptr res, mp_srcptr s, mp_size_t l, gr_ctx_t ctx)
 #define FLINT_MPN_MUL_3_2X2(R2, R1, R0, a1, a0, b1, b0) \
     do \
     { \
-        mp_limb_t __tmp2, __tmp1; \
+        ulong __tmp2, __tmp1; \
         umul_ppmm(R1, R0, a0, b0); \
         (R2) = (a1) * (b1); \
         umul_ppmm(__tmp2, __tmp1, a0, b1); \
@@ -41,13 +41,13 @@ mpn_mod_set_mpn2(mp_ptr res, mp_srcptr s, mp_size_t l, gr_ctx_t ctx)
     } \
     while (0) \
 
-static int _mpn_mod_poly_divrem_q0_preinv1(mp_ptr Q, mp_ptr R,
-                          mp_srcptr A, mp_srcptr B, slong lenA, mp_srcptr invL, gr_ctx_t ctx)
+static int _mpn_mod_poly_divrem_q0_preinv1(nn_ptr Q, nn_ptr R,
+                          nn_srcptr A, nn_srcptr B, slong lenA, nn_srcptr invL, gr_ctx_t ctx)
 {
     /* special case for lenA == 1 omitted since this is dealt with
        in the calling function */
 
-    mp_size_t nlimbs = MPN_MOD_CTX_NLIMBS(ctx);
+    slong nlimbs = MPN_MOD_CTX_NLIMBS(ctx);
 
     int monic = mpn_mod_is_one(invL, ctx) == T_TRUE;
 
@@ -58,7 +58,7 @@ static int _mpn_mod_poly_divrem_q0_preinv1(mp_ptr Q, mp_ptr R,
 
     if (R == A)
     {
-        mp_limb_t t[MPN_MOD_MAX_LIMBS];
+        ulong t[MPN_MOD_MAX_LIMBS];
 
         mpn_mod_neg(t, Q, ctx);
         _mpn_mod_vec_addmul_scalar(R, B, lenA - 1, t, ctx);
@@ -72,16 +72,16 @@ static int _mpn_mod_poly_divrem_q0_preinv1(mp_ptr Q, mp_ptr R,
     return GR_SUCCESS;
 }
 
-static int _mpn_mod_poly_divrem_q1_preinv1(mp_ptr Q, mp_ptr R,
-                          mp_srcptr A, slong lenA, mp_srcptr B, slong lenB,
-                          mp_srcptr invL, gr_ctx_t ctx)
+static int _mpn_mod_poly_divrem_q1_preinv1(nn_ptr Q, nn_ptr R,
+                          nn_srcptr A, slong lenA, nn_srcptr B, slong lenB,
+                          nn_srcptr invL, gr_ctx_t ctx)
 {
-    mp_limb_t q0[MPN_MOD_MAX_LIMBS];
-    mp_limb_t q1[MPN_MOD_MAX_LIMBS];
-    mp_limb_t t[2 * MPN_MOD_MAX_LIMBS + 1];
-    mp_limb_t u[2 * MPN_MOD_MAX_LIMBS];
+    ulong q0[MPN_MOD_MAX_LIMBS];
+    ulong q1[MPN_MOD_MAX_LIMBS];
+    ulong t[2 * MPN_MOD_MAX_LIMBS + 1];
+    ulong u[2 * MPN_MOD_MAX_LIMBS];
     slong i;
-    mp_size_t nlimbs = MPN_MOD_CTX_NLIMBS(ctx);
+    slong nlimbs = MPN_MOD_CTX_NLIMBS(ctx);
     int monic = mpn_mod_is_one(invL, ctx) == T_TRUE;
 
     /* special case for lenB == 1 omitted since this is dealt with
@@ -117,9 +117,9 @@ static int _mpn_mod_poly_divrem_q1_preinv1(mp_ptr Q, mp_ptr R,
         {
             for (i = 1; i < lenB - 1; i++)
             {
-                mp_srcptr B1ptr = B + (i - 1) * nlimbs;
-                mp_srcptr Bptr = B + i * nlimbs;
-                mp_srcptr Aptr = A + i * nlimbs;
+                nn_srcptr B1ptr = B + (i - 1) * nlimbs;
+                nn_srcptr Bptr = B + i * nlimbs;
+                nn_srcptr Aptr = A + i * nlimbs;
 
                 FLINT_MPN_MUL_3_2X2(t[2], t[1], t[0], q1[1], q1[0], B1ptr[1], B1ptr[0]);
                 add_sssaaaaaa(t[2], t[1], t[0], t[2], t[1], t[0], 0, Aptr[1], Aptr[0]);
@@ -132,9 +132,9 @@ static int _mpn_mod_poly_divrem_q1_preinv1(mp_ptr Q, mp_ptr R,
         {
             for (i = 1; i < lenB - 1; i++)
             {
-                mp_srcptr B1ptr = B + (i - 1) * nlimbs;
-                mp_srcptr Bptr = B + i * nlimbs;
-                mp_srcptr Aptr = A + i * nlimbs;
+                nn_srcptr B1ptr = B + (i - 1) * nlimbs;
+                nn_srcptr Bptr = B + i * nlimbs;
+                nn_srcptr Aptr = A + i * nlimbs;
 
                 FLINT_MPN_MUL_2X2(t[3], t[2], t[1], t[0], q1[1], q1[0], B1ptr[1], B1ptr[0]);
                 add_ssssaaaaaaaa(t[3], t[2], t[1], t[0], t[3], t[2], t[1], t[0], 0, 0, Aptr[1], Aptr[0]);
@@ -152,7 +152,7 @@ static int _mpn_mod_poly_divrem_q1_preinv1(mp_ptr Q, mp_ptr R,
             flint_mpn_mul_n(t, q1, B + (i - 1) * nlimbs, nlimbs);
             flint_mpn_mul_n(u, q0, B + i * nlimbs, nlimbs);
             t[2 * nlimbs] = mpn_add_n(t, t, u, 2 * nlimbs);
-            mp_limb_t cy = mpn_add_n(t, t, A + i * nlimbs, nlimbs);
+            ulong cy = mpn_add_n(t, t, A + i * nlimbs, nlimbs);
             mpn_add_1(t + nlimbs, t + nlimbs, nlimbs + 1, cy);
             mpn_mod_set_mpn2(R + i * nlimbs, t, 2 * nlimbs + 1, ctx);
         }
@@ -162,18 +162,18 @@ static int _mpn_mod_poly_divrem_q1_preinv1(mp_ptr Q, mp_ptr R,
 }
 
 int
-_mpn_mod_poly_divrem_basecase_preinv1(mp_ptr Q, mp_ptr R,
-                                     mp_srcptr A, slong lenA, mp_srcptr B, slong lenB,
-                                     mp_srcptr invL,
+_mpn_mod_poly_divrem_basecase_preinv1(nn_ptr Q, nn_ptr R,
+                                     nn_srcptr A, slong lenA, nn_srcptr B, slong lenB,
+                                     nn_srcptr invL,
                                      gr_ctx_t ctx)
 {
     slong iR, i, j;
     slong bits;
-    mp_limb_t r[MPN_MOD_MAX_LIMBS];
-    mp_limb_t c[MPN_MOD_MAX_LIMBS];
-    mp_limb_t t[2 * MPN_MOD_MAX_LIMBS];
-    mp_size_t slimbs, nlimbs;
-    mp_ptr W;
+    ulong r[MPN_MOD_MAX_LIMBS];
+    ulong c[MPN_MOD_MAX_LIMBS];
+    ulong t[2 * MPN_MOD_MAX_LIMBS];
+    slong slimbs, nlimbs;
+    nn_ptr W;
     int monic;
     TMP_INIT;
 
@@ -205,10 +205,10 @@ _mpn_mod_poly_divrem_basecase_preinv1(mp_ptr Q, mp_ptr R,
     FLINT_ASSERT((slimbs == 2 * nlimbs) || (slimbs == 2 * nlimbs + 1) || (slimbs == 2 * nlimbs - 1));
 
     TMP_START;
-    W = TMP_ALLOC(lenA * slimbs * sizeof(mp_limb_t));
+    W = TMP_ALLOC(lenA * slimbs * sizeof(ulong));
 
-    mp_ptr R3 = W;
-    mp_ptr ptrQ = Q - nlimbs * (lenB - 1);
+    nn_ptr R3 = W;
+    nn_ptr ptrQ = Q - nlimbs * (lenB - 1);
 
     for (i = 0; i < lenA; i++)
     {
@@ -247,14 +247,14 @@ _mpn_mod_poly_divrem_basecase_preinv1(mp_ptr Q, mp_ptr R,
 #if defined(add_sssssaaaaaaaaaa)
                 if (nlimbs == 2)
                 {
-                    mp_limb_t t[4];
+                    ulong t[4];
 
                     if (slimbs == 5)
                     {
                         for (j = 0; j < lenB - 1; j++)
                         {
-                            mp_ptr a = R3 + slimbs * (iR - lenB + 1 + j);
-                            mp_srcptr b = B + j * nlimbs;
+                            nn_ptr a = R3 + slimbs * (iR - lenB + 1 + j);
+                            nn_srcptr b = B + j * nlimbs;
                             FLINT_MPN_MUL_2X2(t[3], t[2], t[1], t[0], b[1], b[0], c[1], c[0]);
                             add_sssssaaaaaaaaaa(a[4], a[3], a[2], a[1], a[0], a[4], a[3], a[2], a[1], a[0], 0, t[3], t[2], t[1], t[0]);
                         }
@@ -263,8 +263,8 @@ _mpn_mod_poly_divrem_basecase_preinv1(mp_ptr Q, mp_ptr R,
                     {
                         for (j = 0; j < lenB - 1; j++)
                         {
-                            mp_ptr a = R3 + slimbs * (iR - lenB + 1 + j);
-                            mp_srcptr b = B + j * nlimbs;
+                            nn_ptr a = R3 + slimbs * (iR - lenB + 1 + j);
+                            nn_srcptr b = B + j * nlimbs;
                             FLINT_MPN_MUL_2X2(t[3], t[2], t[1], t[0], b[1], b[0], c[1], c[0]);
                             add_ssssaaaaaaaa(a[3], a[2], a[1], a[0], a[3], a[2], a[1], a[0], t[3], t[2], t[1], t[0]);
                         }
@@ -273,8 +273,8 @@ _mpn_mod_poly_divrem_basecase_preinv1(mp_ptr Q, mp_ptr R,
                     {
                         for (j = 0; j < lenB - 1; j++)
                         {
-                            mp_ptr a = R3 + slimbs * (iR - lenB + 1 + j);
-                            mp_srcptr b = B + j * nlimbs;
+                            nn_ptr a = R3 + slimbs * (iR - lenB + 1 + j);
+                            nn_srcptr b = B + j * nlimbs;
                             FLINT_MPN_MUL_3_2X2(t[2], t[1], t[0], b[1], b[0], c[1], c[0]);
                             add_sssaaaaaa(a[2], a[1], a[0], a[2], a[1], a[0], t[2], t[1], t[0]);
                         }
@@ -315,10 +315,10 @@ _mpn_mod_poly_divrem_basecase_preinv1(mp_ptr Q, mp_ptr R,
 }
 
 int
-_mpn_mod_poly_divrem_basecase(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA,
-                                  mp_srcptr B, slong lenB, gr_ctx_t ctx)
+_mpn_mod_poly_divrem_basecase(nn_ptr Q, nn_ptr R, nn_srcptr A, slong lenA,
+                                  nn_srcptr B, slong lenB, gr_ctx_t ctx)
 {
-    mp_limb_t invB[MPN_MOD_MAX_LIMBS];
+    ulong invB[MPN_MOD_MAX_LIMBS];
     int status;
 
     status = mpn_mod_inv(invB, B + (lenB - 1) * MPN_MOD_CTX_NLIMBS(ctx), ctx);

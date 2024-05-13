@@ -60,7 +60,7 @@ static void n_bpoly_mod_make_monic_series(
 
 static void _n_bpoly_set_poly_gen0(
     n_bpoly_t A,
-    const mp_limb_t * Bcoeffs, slong Blength)
+    const ulong * Bcoeffs, slong Blength)
 {
     slong i;
     n_bpoly_fit_length(A, Blength);
@@ -73,7 +73,7 @@ static void _n_bpoly_set_poly_gen0(
 static void n_bpoly_mod_eval(
     nmod_poly_t E,
     const n_bpoly_t A,
-    mp_limb_t alpha,
+    ulong alpha,
     nmod_t ctx)
 {
     slong i;
@@ -1091,10 +1091,10 @@ static void _lattice(
     n_bpoly_struct * ld;
     nmod_mat_t M, T1, T2;
     int nlimbs;
-    mp_limb_t * trow;
+    ulong * trow;
 
     nlimbs = _nmod_vec_dot_bound_limbs(r, ctx);
-    trow = FLINT_ARRAY_ALLOC(r, mp_limb_t);
+    trow = FLINT_ARRAY_ALLOC(r, ulong);
     n_bpoly_init(Q);
     n_bpoly_init(R);
     n_bpoly_init(dg);
@@ -1171,7 +1171,7 @@ static int _zassenhaus(
     const zassenhaus_prune_t zas,
     slong limit,
     n_tpoly_t F,
-    mp_limb_t malpha,
+    ulong malpha,
     const nmod_mat_t N,
     n_bpoly_struct * const * g,
     slong r,
@@ -1348,7 +1348,7 @@ int n_bpoly_mod_factor_smprime(
     slong final_order, lift_order, lattice_order;
     slong * CLD;
     nmod_poly_t Aeval;
-    mp_limb_t alpha_best, alpha_tmp;
+    ulong alpha_best, alpha_tmp;
     nmod_poly_factor_t local_fac_best, local_fac_tmp;
     int local_fac_tries = 0;
     n_bpoly_t monicA;

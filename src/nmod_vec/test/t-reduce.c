@@ -20,10 +20,10 @@ TEST_FUNCTION_START(nmod_vec_reduce, state)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         slong j, len = n_randint(state, 100) + 1;
-        mp_ptr vec = _nmod_vec_init(len);
-        mp_ptr vec2 = _nmod_vec_init(len);
+        nn_ptr vec = _nmod_vec_init(len);
+        nn_ptr vec2 = _nmod_vec_init(len);
 
-        mp_limb_t n = n_randtest_not_zero(state);
+        ulong n = n_randtest_not_zero(state);
         nmod_t mod;
         nmod_init(&mod, n);
 

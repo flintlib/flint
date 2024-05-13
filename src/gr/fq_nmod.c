@@ -373,7 +373,7 @@ int
 __gr_fq_nmod_vec_dot(fq_nmod_struct * res, const fq_nmod_struct * initial, int subtract, const fq_nmod_struct * vec1, const fq_nmod_struct * vec2, slong len, gr_ctx_t ctx)
 {
     slong i;
-    mp_ptr s, t;
+    nn_ptr s, t;
     slong slen, tlen, len1, len2;
     slong plen;
     nmod_t mod;
@@ -389,7 +389,7 @@ __gr_fq_nmod_vec_dot(fq_nmod_struct * res, const fq_nmod_struct * initial, int s
 
     plen = FQ_CTX(ctx)->modulus->length;
 
-    t = GR_TMP_ALLOC((4 * plen) * sizeof(mp_limb_t));
+    t = GR_TMP_ALLOC((4 * plen) * sizeof(ulong));
     s = t + 2 * plen;
 
     mod = FQ_CTX(ctx)->mod;
@@ -458,7 +458,7 @@ __gr_fq_nmod_vec_dot(fq_nmod_struct * res, const fq_nmod_struct * initial, int s
     _nmod_vec_set(res->coeffs, s, slen);
     _nmod_poly_set_length(res, slen);
 
-    GR_TMP_FREE(t, (4 * plen) * sizeof(mp_limb_t));
+    GR_TMP_FREE(t, (4 * plen) * sizeof(ulong));
 
     return GR_SUCCESS;
 }
@@ -468,7 +468,7 @@ int
 __gr_fq_nmod_vec_dot_rev(fq_nmod_struct * res, const fq_nmod_struct * initial, int subtract, const fq_nmod_struct * vec1, const fq_nmod_struct * vec2, slong len, gr_ctx_t ctx)
 {
     slong i;
-    mp_ptr s, t;
+    nn_ptr s, t;
     slong slen, tlen, len1, len2;
     slong plen;
     nmod_t mod;
@@ -484,7 +484,7 @@ __gr_fq_nmod_vec_dot_rev(fq_nmod_struct * res, const fq_nmod_struct * initial, i
 
     plen = FQ_CTX(ctx)->modulus->length;
 
-    t = GR_TMP_ALLOC((4 * plen) * sizeof(mp_limb_t));
+    t = GR_TMP_ALLOC((4 * plen) * sizeof(ulong));
     s = t + 2 * plen;
 
     mod = FQ_CTX(ctx)->mod;
@@ -553,7 +553,7 @@ __gr_fq_nmod_vec_dot_rev(fq_nmod_struct * res, const fq_nmod_struct * initial, i
     _nmod_vec_set(res->coeffs, s, slen);
     _nmod_poly_set_length(res, slen);
 
-    GR_TMP_FREE(t, (4 * plen) * sizeof(mp_limb_t));
+    GR_TMP_FREE(t, (4 * plen) * sizeof(ulong));
 
     return GR_SUCCESS;
 }

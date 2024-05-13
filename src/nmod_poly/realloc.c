@@ -25,7 +25,7 @@ nmod_poly_realloc(nmod_poly_t poly, slong alloc)
         return;
     }
 
-    poly->coeffs = (mp_ptr) flint_realloc(poly->coeffs, alloc * sizeof(mp_limb_t));
+    poly->coeffs = (nn_ptr) flint_realloc(poly->coeffs, alloc * sizeof(ulong));
 
     poly->alloc = alloc;
 

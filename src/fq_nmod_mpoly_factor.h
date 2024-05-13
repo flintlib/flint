@@ -373,7 +373,7 @@ int fq_nmod_mpoly_factor_irred_lgprime_zippel(
 /*****************************************************************************/
 
 void fq_nmod_mpoly_compression_do(fq_nmod_mpoly_t L,
-               const fq_nmod_mpoly_ctx_t Lctx, mp_limb_t * Acoeffs, slong Alen,
+               const fq_nmod_mpoly_ctx_t Lctx, ulong * Acoeffs, slong Alen,
                                                         mpoly_compression_t M);
 
 void fq_nmod_mpoly_compression_undo(fq_nmod_mpoly_t A,
@@ -498,7 +498,7 @@ int fq_nmod_mpoly_factor_zippel(fq_nmod_mpoly_factor_t f,
 
 int _fq_nmod_mpoly_eval_rest_n_fq_poly(n_poly_struct * E,
     slong * starts, slong * ends, slong * stops, ulong * es,
-    const mp_limb_t * Acoeffs, const ulong * Aexps, slong Alen, slong var,
+    const ulong * Acoeffs, const ulong * Aexps, slong Alen, slong var,
     const n_fq_poly_struct * alphas, const slong * offsets, const slong * shifts,
                     slong N, ulong mask, slong nvars, const fq_nmod_ctx_t ctx);
 

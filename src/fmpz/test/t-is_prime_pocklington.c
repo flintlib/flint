@@ -22,7 +22,7 @@ TEST_FUNCTION_START(fmpz_is_prime_pocklington, state)
     for (i = 0; i < 30 * flint_test_multiplier(); i++)
     {
         fmpz_t p, F, R;
-        mp_ptr pm1;
+        nn_ptr pm1;
         slong num_pm1;
         ulong limit;
         double logd;

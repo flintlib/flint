@@ -21,7 +21,7 @@ TEST_FUNCTION_START(nmod_poly_div_root, state)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t P, Q, D, DQ, DR;
-        mp_limb_t mod, r, rem;
+        ulong mod, r, rem;
         slong n;
 
         mod = n_randtest_prime(state, 0);
@@ -69,7 +69,7 @@ TEST_FUNCTION_START(nmod_poly_div_root, state)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t P, Q1, Q2;
-        mp_limb_t mod, r, rem1, rem2;
+        ulong mod, r, rem1, rem2;
         slong n;
 
         mod = n_randtest_prime(state, 0);

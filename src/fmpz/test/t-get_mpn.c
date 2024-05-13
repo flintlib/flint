@@ -19,7 +19,7 @@ TEST_FUNCTION_START(fmpz_get_mpn, state)
 
     fmpz_t a, b, mmin;
     int i, j, k;
-    mp_ptr mpna;
+    nn_ptr mpna;
 
     fmpz_init(a);
     fmpz_init(b);

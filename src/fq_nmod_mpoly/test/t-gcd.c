@@ -230,7 +230,7 @@ TEST_FUNCTION_START(fq_nmod_mpoly_gcd, state)
         fq_nmod_mpoly_ctx_t ctx;
         fq_nmod_mpoly_t a, b, g, t1, t2;
         slong len, len1, len2;
-        mp_limb_t exp_bound, exp_bound1, exp_bound2;
+        ulong exp_bound, exp_bound1, exp_bound2;
 
         fq_nmod_mpoly_ctx_init_rand(ctx, state, 10, FLINT_BITS, 5);
         fq_nmod_init(c, ctx->fqctx);
@@ -323,7 +323,7 @@ TEST_FUNCTION_START(fq_nmod_mpoly_gcd, state)
     {
         fq_nmod_mpoly_ctx_t ctx;
         fq_nmod_mpoly_t a, b, g, t;
-        mp_limb_t rlimb;
+        ulong rlimb;
         flint_bitcnt_t newbits;
         slong len, len1, len2;
         slong degbound;
@@ -520,7 +520,7 @@ TEST_FUNCTION_START(fq_nmod_mpoly_gcd, state)
     {
         fq_nmod_mpoly_ctx_t ctx;
         fq_nmod_mpoly_t a, b, g, t;
-        mp_limb_t rlimb;
+        ulong rlimb;
         flint_bitcnt_t newbits;
         slong len1, len2, len3, len4;
         ulong degbounds1[4];

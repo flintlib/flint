@@ -33,13 +33,13 @@ void n_poly_realloc(n_poly_t A, slong len)
     if (old_alloc > 0)
     {
         FLINT_ASSERT(A->coeffs != NULL);
-        A->coeffs = (mp_limb_t *) flint_realloc(A->coeffs,
-                                                  new_alloc*sizeof(mp_limb_t));
+        A->coeffs = (ulong *) flint_realloc(A->coeffs,
+                                                  new_alloc*sizeof(ulong));
     }
     else
     {
         FLINT_ASSERT(A->coeffs == NULL);
-        A->coeffs = (mp_limb_t *) flint_malloc(new_alloc*sizeof(mp_limb_t));
+        A->coeffs = (ulong *) flint_malloc(new_alloc*sizeof(ulong));
     }
     A->alloc = new_alloc;
 }

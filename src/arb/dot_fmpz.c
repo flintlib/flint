@@ -16,7 +16,7 @@ arb_dot_fmpz(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong x
 {
     arb_ptr t;
     slong i, ssize, size, tmp_size;
-    mp_ptr ztmp;
+    nn_ptr ztmp;
     fmpz v;
     ulong av, al;
     unsigned int bc;
@@ -119,7 +119,7 @@ arb_dot_fmpz(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong x
 
     if (tmp_size != 0)
     {
-        ztmp = TMP_ALLOC(sizeof(mp_limb_t) * tmp_size);
+        ztmp = TMP_ALLOC(sizeof(ulong) * tmp_size);
 
         for (i = 0; i < len; i++)
         {

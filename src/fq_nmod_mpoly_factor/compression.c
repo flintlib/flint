@@ -17,7 +17,7 @@
 void fq_nmod_mpoly_compression_do(
     fq_nmod_mpoly_t L,
     const fq_nmod_mpoly_ctx_t Lctx,
-    mp_limb_t * Acoeffs,
+    ulong * Acoeffs,
     slong Alen,
     mpoly_compression_t M)
 {

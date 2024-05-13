@@ -25,7 +25,7 @@ TEST_FUNCTION_START(nmod_poly_mat_inv, state)
         slong n, deg;
         float density;
         int ns1, ns2, result;
-        mp_limb_t mod;
+        ulong mod;
 
         mod = n_randtest_prime(state, 0);
         n = n_randint(state, 8);
@@ -73,7 +73,7 @@ TEST_FUNCTION_START(nmod_poly_mat_inv, state)
         slong n, deg;
         float density;
         int nonsingular;
-        mp_limb_t mod;
+        ulong mod;
 
         mod = n_randtest_prime(state, 0);
         n = n_randint(state, 10);

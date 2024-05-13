@@ -32,31 +32,31 @@ do {                                            \
 } while (0)
 
 NMOD_VEC_INLINE
-mp_ptr _nmod_vec_init(slong len)
+nn_ptr _nmod_vec_init(slong len)
 {
-   return (mp_ptr) flint_malloc(len * sizeof(mp_limb_t));
+   return (nn_ptr) flint_malloc(len * sizeof(ulong));
 }
 
 NMOD_VEC_INLINE
-void _nmod_vec_clear(mp_ptr vec)
+void _nmod_vec_clear(nn_ptr vec)
 {
    flint_free(vec);
 }
 
-void _nmod_vec_randtest(mp_ptr vec, flint_rand_t state, slong len, nmod_t mod);
+void _nmod_vec_randtest(nn_ptr vec, flint_rand_t state, slong len, nmod_t mod);
 
 NMOD_VEC_INLINE
-void _nmod_vec_zero(mp_ptr vec, slong len)
+void _nmod_vec_zero(nn_ptr vec, slong len)
 {
     slong i;
     for (i = 0; i < len; i++)
         vec[i] = 0;
 }
 
-flint_bitcnt_t _nmod_vec_max_bits(mp_srcptr vec, slong len);
+flint_bitcnt_t _nmod_vec_max_bits(nn_srcptr vec, slong len);
 
 NMOD_VEC_INLINE
-void _nmod_vec_set(mp_ptr res, mp_srcptr vec, slong len)
+void _nmod_vec_set(nn_ptr res, nn_srcptr vec, slong len)
 {
     slong i;
     for (i = 0; i < len; i++)
@@ -64,19 +64,19 @@ void _nmod_vec_set(mp_ptr res, mp_srcptr vec, slong len)
 }
 
 NMOD_VEC_INLINE
-void _nmod_vec_swap(mp_ptr a, mp_ptr b, slong length)
+void _nmod_vec_swap(nn_ptr a, nn_ptr b, slong length)
 {
     slong i;
     for (i = 0; i < length; i++)
     {
-        mp_limb_t t = a[i];
+        ulong t = a[i];
         a[i] = b[i];
         b[i] = t;
     }
 }
 
 NMOD_VEC_INLINE
-int _nmod_vec_equal(mp_srcptr vec, mp_srcptr vec2, slong len)
+int _nmod_vec_equal(nn_srcptr vec, nn_srcptr vec2, slong len)
 {
    slong i;
 
@@ -87,7 +87,7 @@ int _nmod_vec_equal(mp_srcptr vec, mp_srcptr vec2, slong len)
 }
 
 NMOD_VEC_INLINE
-int _nmod_vec_is_zero(mp_srcptr vec, slong len)
+int _nmod_vec_is_zero(nn_srcptr vec, slong len)
 {
    slong i;
 
@@ -97,26 +97,26 @@ int _nmod_vec_is_zero(mp_srcptr vec, slong len)
    return 1;
 }
 
-void _nmod_vec_reduce(mp_ptr res, mp_srcptr vec,
+void _nmod_vec_reduce(nn_ptr res, nn_srcptr vec,
                                         slong len, nmod_t mod);
 
-void _nmod_vec_add(mp_ptr res, mp_srcptr vec1,
-                        mp_srcptr vec2, slong len, nmod_t mod);
+void _nmod_vec_add(nn_ptr res, nn_srcptr vec1,
+                        nn_srcptr vec2, slong len, nmod_t mod);
 
-void _nmod_vec_sub(mp_ptr res, mp_srcptr vec1,
-                        mp_srcptr vec2, slong len, nmod_t mod);
+void _nmod_vec_sub(nn_ptr res, nn_srcptr vec1,
+                        nn_srcptr vec2, slong len, nmod_t mod);
 
-void _nmod_vec_neg(mp_ptr res, mp_srcptr vec,
+void _nmod_vec_neg(nn_ptr res, nn_srcptr vec,
                                             slong len, nmod_t mod);
 
-void _nmod_vec_scalar_mul_nmod(mp_ptr res, mp_srcptr vec,
-                            slong len, mp_limb_t c, nmod_t mod);
+void _nmod_vec_scalar_mul_nmod(nn_ptr res, nn_srcptr vec,
+                            slong len, ulong c, nmod_t mod);
 
-void _nmod_vec_scalar_mul_nmod_shoup(mp_ptr res, mp_srcptr vec,
-                            slong len, mp_limb_t c, nmod_t mod);
+void _nmod_vec_scalar_mul_nmod_shoup(nn_ptr res, nn_srcptr vec,
+                            slong len, ulong c, nmod_t mod);
 
-void _nmod_vec_scalar_addmul_nmod(mp_ptr res, mp_srcptr vec,
-                            slong len, mp_limb_t c, nmod_t mod);
+void _nmod_vec_scalar_addmul_nmod(nn_ptr res, nn_srcptr vec,
+                            slong len, ulong c, nmod_t mod);
 
 int _nmod_vec_dot_bound_limbs(slong len, nmod_t mod);
 
@@ -124,7 +124,7 @@ int _nmod_vec_dot_bound_limbs(slong len, nmod_t mod);
 #define NMOD_VEC_DOT(res, i, len, expr1, expr2, mod, nlimbs)                \
     do                                                                      \
     {                                                                       \
-        mp_limb_t s0, s1, s2, t0, t1;                                       \
+        ulong s0, s1, s2, t0, t1;                                       \
         s0 = s1 = s2 = UWORD(0);                                            \
         switch (nlimbs)                                                     \
         {                                                                   \
@@ -154,7 +154,7 @@ int _nmod_vec_dot_bound_limbs(slong len, nmod_t mod);
                 }                                                           \
                 else                                                        \
                 {                                                           \
-                    mp_limb_t v0, v1, u0, u1;                               \
+                    ulong v0, v1, u0, u1;                               \
                     i = 0;                                                  \
                     if ((len) & 1)                                          \
                         umul_ppmm(v1, v0, (expr1), (expr2));                \
@@ -185,23 +185,23 @@ int _nmod_vec_dot_bound_limbs(slong len, nmod_t mod);
         res = s0;                                                           \
     } while (0);
 
-mp_limb_t _nmod_vec_dot(mp_srcptr vec1, mp_srcptr vec2,
+ulong _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2,
     slong len, nmod_t mod, int nlimbs);
 
-mp_limb_t _nmod_vec_dot_rev(mp_srcptr vec1, mp_srcptr vec2,
+ulong _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2,
     slong len, nmod_t mod, int nlimbs);
 
-mp_limb_t _nmod_vec_dot_ptr(mp_srcptr vec1, const mp_ptr * vec2, slong offset,
+ulong _nmod_vec_dot_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset,
     slong len, nmod_t mod, int nlimbs);
 
 /* some IO functions */
 #ifdef FLINT_HAVE_FILE
-int _nmod_vec_fprint_pretty(FILE * file, mp_srcptr vec, slong len, nmod_t mod);
-int _nmod_vec_fprint(FILE * f, mp_srcptr vec, slong len, nmod_t mod);
+int _nmod_vec_fprint_pretty(FILE * file, nn_srcptr vec, slong len, nmod_t mod);
+int _nmod_vec_fprint(FILE * f, nn_srcptr vec, slong len, nmod_t mod);
 #endif
 
-void _nmod_vec_print_pretty(mp_srcptr vec, slong len, nmod_t mod);
-int _nmod_vec_print(mp_srcptr vec, slong len, nmod_t mod);
+void _nmod_vec_print_pretty(nn_srcptr vec, slong len, nmod_t mod);
+int _nmod_vec_print(nn_srcptr vec, slong len, nmod_t mod);
 
 
 

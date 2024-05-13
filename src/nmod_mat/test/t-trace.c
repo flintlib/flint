@@ -21,7 +21,7 @@ TEST_FUNCTION_START(nmod_mat_trace, state)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_mat_t A, B, AB, BA;
-        mp_limb_t mod, trab, trba;
+        ulong mod, trab, trba;
         slong m, n;
 
         mod = n_randtest_prime(state, 0);

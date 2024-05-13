@@ -23,7 +23,7 @@ TEST_FUNCTION_START(nmod_mpoly_divides, state)
         nmod_mpoly_t f, g, h, k, hsave, gsave;
         slong len, len1, len2;
         flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, (i % 4 == 0) ? 4: FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -101,8 +101,8 @@ TEST_FUNCTION_START(nmod_mpoly_divides, state)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k;
         slong len, len1, len2;
-        mp_limb_t max_bound, * exp_bound, * exp_bound1, * exp_bound2;
-        mp_limb_t modulus;
+        ulong max_bound, * exp_bound, * exp_bound1, * exp_bound2;
+        ulong modulus;
         slong n;
 
         modulus = n_randint(state, (i % 4 == 0) ? 4: FLINT_BITS - 1) + 1;
@@ -122,9 +122,9 @@ TEST_FUNCTION_START(nmod_mpoly_divides, state)
 
         n = FLINT_MAX(WORD(1), ctx->minfo->nvars);
         max_bound = 1 + 150/n/n;
-        exp_bound = (mp_limb_t *) flint_malloc(ctx->minfo->nvars*sizeof(mp_limb_t));
-        exp_bound1 = (mp_limb_t *) flint_malloc(ctx->minfo->nvars*sizeof(mp_limb_t));
-        exp_bound2 = (mp_limb_t *) flint_malloc(ctx->minfo->nvars*sizeof(mp_limb_t));
+        exp_bound = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
+        exp_bound1 = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
+        exp_bound2 = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
         for (j = 0; j < ctx->minfo->nvars; j++)
         {
             exp_bound[j] = UWORD(1) << (FLINT_BITS - 1);
@@ -176,8 +176,8 @@ TEST_FUNCTION_START(nmod_mpoly_divides, state)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k;
         slong len, len1, len2;
-        mp_limb_t max_bound, * exp_bound, * exp_bound1, * exp_bound2;
-        mp_limb_t modulus;
+        ulong max_bound, * exp_bound, * exp_bound1, * exp_bound2;
+        ulong modulus;
         fmpz * shifts, * strides;
 
         modulus = n_randint(state, (i % 4 == 0) ? 4: FLINT_BITS - 1) + 1;
@@ -196,9 +196,9 @@ TEST_FUNCTION_START(nmod_mpoly_divides, state)
         len2 = n_randint(state, 50);
 
         max_bound = 1 + 20/FLINT_MAX(WORD(1), ctx->minfo->nvars);
-        exp_bound = (mp_limb_t *) flint_malloc(ctx->minfo->nvars*sizeof(mp_limb_t));
-        exp_bound1 = (mp_limb_t *) flint_malloc(ctx->minfo->nvars*sizeof(mp_limb_t));
-        exp_bound2 = (mp_limb_t *) flint_malloc(ctx->minfo->nvars*sizeof(mp_limb_t));
+        exp_bound = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
+        exp_bound1 = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
+        exp_bound2 = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
         shifts = (fmpz *) flint_malloc(ctx->minfo->nvars*sizeof(fmpz));
         strides = (fmpz *) flint_malloc(ctx->minfo->nvars*sizeof(fmpz));
         for (j = 0; j < ctx->minfo->nvars; j++)
@@ -268,8 +268,8 @@ TEST_FUNCTION_START(nmod_mpoly_divides, state)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k;
         slong len, len1, len2;
-        mp_limb_t max_bound, * exp_bound, * exp_bound1, * exp_bound2;
-        mp_limb_t modulus;
+        ulong max_bound, * exp_bound, * exp_bound1, * exp_bound2;
+        ulong modulus;
         slong n;
 
         modulus = n_randint(state, (i % 4 == 0) ? 4: FLINT_BITS - 1) + 1;
@@ -289,9 +289,9 @@ TEST_FUNCTION_START(nmod_mpoly_divides, state)
 
         n = FLINT_MAX(WORD(1), ctx->minfo->nvars);
         max_bound = 1 + 100/n/n;
-        exp_bound = (mp_limb_t *) flint_malloc(ctx->minfo->nvars*sizeof(mp_limb_t));
-        exp_bound1 = (mp_limb_t *) flint_malloc(ctx->minfo->nvars*sizeof(mp_limb_t));
-        exp_bound2 = (mp_limb_t *) flint_malloc(ctx->minfo->nvars*sizeof(mp_limb_t));
+        exp_bound = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
+        exp_bound1 = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
+        exp_bound2 = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
         for (j = 0; j < ctx->minfo->nvars; j++)
         {
             exp_bound[j] = UWORD(1) << (FLINT_BITS - 1);
@@ -345,8 +345,8 @@ TEST_FUNCTION_START(nmod_mpoly_divides, state)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k;
         slong len, len1, len2;
-        mp_limb_t max_bound, * exp_bound, * exp_bound1, * exp_bound2;
-        mp_limb_t modulus;
+        ulong max_bound, * exp_bound, * exp_bound1, * exp_bound2;
+        ulong modulus;
         slong n;
 
         modulus = n_randint(state, (i % 4 == 0) ? 4: FLINT_BITS - 1) + 1;
@@ -366,9 +366,9 @@ TEST_FUNCTION_START(nmod_mpoly_divides, state)
 
         n = FLINT_MAX(WORD(1), ctx->minfo->nvars);
         max_bound = 1 + 100/n/n;
-        exp_bound = (mp_limb_t *) flint_malloc(ctx->minfo->nvars*sizeof(mp_limb_t));
-        exp_bound1 = (mp_limb_t *) flint_malloc(ctx->minfo->nvars*sizeof(mp_limb_t));
-        exp_bound2 = (mp_limb_t *) flint_malloc(ctx->minfo->nvars*sizeof(mp_limb_t));
+        exp_bound = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
+        exp_bound1 = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
+        exp_bound2 = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
         for (j = 0; j < ctx->minfo->nvars; j++)
         {
             exp_bound[j] = UWORD(1) << (FLINT_BITS - 1);

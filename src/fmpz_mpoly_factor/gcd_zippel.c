@@ -67,7 +67,7 @@ int fmpz_mpolyl_gcd_zippel(
     flint_bitcnt_t bits = G->bits;
     int success, changed;
     slong i, j, Gdegbound, Gdeg, req_zip_images;
-    mp_limb_t p, t, gammap;
+    ulong p, t, gammap;
     fmpz_t c, gamma, modulus;
     nmod_mpoly_t Ap, Bp, Gp, Abarp, Bbarp;
     nmod_mpoly_ctx_t ctxp;

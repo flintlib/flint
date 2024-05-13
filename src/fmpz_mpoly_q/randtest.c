@@ -13,7 +13,7 @@
 
 void
 fmpz_mpoly_q_randtest(fmpz_mpoly_q_t res, flint_rand_t state,
-    slong length, mp_limb_t coeff_bits, slong exp_bound, const fmpz_mpoly_ctx_t ctx)
+    slong length, ulong coeff_bits, slong exp_bound, const fmpz_mpoly_ctx_t ctx)
 {
     length = n_randint(state, length + 1);
 

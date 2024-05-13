@@ -20,21 +20,21 @@
     FLINT_MAX(FLINT_MAX(4, N_FQ_MUL_ITCH), 2 + (N_FQ_REDUCE_ITCH))
 
 void _n_fq_poly_rem_basecase_(
-    mp_limb_t * Q,
-    mp_limb_t * A,
-    const mp_limb_t * AA, slong Alen,
-    const mp_limb_t * B, slong Blen,
-    const mp_limb_t * invB,
+    ulong * Q,
+    ulong * A,
+    const ulong * AA, slong Alen,
+    const ulong * B, slong Blen,
+    const ulong * invB,
     const fq_nmod_ctx_t ctx,
     n_poly_stack_t St)
 {
     slong i;
     slong d = fq_nmod_ctx_degree(ctx);
     nmod_t mod = fq_nmod_ctx_mod(ctx);
-    mp_limb_t * tmp = n_poly_stack_vec_init(St, d*(3 + N_FQ_POLY_DIVREM_BASECASE_ITCH));
-    mp_limb_t * u = tmp + d*N_FQ_POLY_DIVREM_BASECASE_ITCH;
-    mp_limb_t * q0 = u + d;
-    mp_limb_t * q1 = q0 + d;
+    ulong * tmp = n_poly_stack_vec_init(St, d*(3 + N_FQ_POLY_DIVREM_BASECASE_ITCH));
+    ulong * u = tmp + d*N_FQ_POLY_DIVREM_BASECASE_ITCH;
+    ulong * q0 = u + d;
+    ulong * q1 = q0 + d;
 
     if (A != AA)
         _nmod_vec_set(A, AA, d*Alen);
@@ -81,27 +81,27 @@ void _n_fq_poly_rem_basecase_(
 
 
 void _n_fq_poly_divrem_basecase_(
-    mp_limb_t * Q,
-    mp_limb_t * A,
-    const mp_limb_t * AA, slong Alen,
-    const mp_limb_t * B, slong Blen,
-    const mp_limb_t * invB,
+    ulong * Q,
+    ulong * A,
+    const ulong * AA, slong Alen,
+    const ulong * B, slong Blen,
+    const ulong * invB,
     const fq_nmod_ctx_t ctx,
     n_poly_stack_t St)
 {
     slong i;
     slong d = fq_nmod_ctx_degree(ctx);
     nmod_t mod = fq_nmod_ctx_mod(ctx);
-    mp_limb_t * tmp = n_poly_stack_vec_init(St, d*(1 + N_FQ_POLY_DIVREM_BASECASE_ITCH));
-    mp_limb_t * u = tmp + d*N_FQ_POLY_DIVREM_BASECASE_ITCH;
+    ulong * tmp = n_poly_stack_vec_init(St, d*(1 + N_FQ_POLY_DIVREM_BASECASE_ITCH));
+    ulong * u = tmp + d*N_FQ_POLY_DIVREM_BASECASE_ITCH;
 
     if (A != AA)
         _nmod_vec_set(A, AA, d*Alen);
 
     while (Alen - Blen > 3 && Blen > 1)
     {
-        mp_limb_t * q1 = Q + d*(Alen - Blen);
-        mp_limb_t * q0 = Q + d*(Alen - Blen - 1);
+        ulong * q1 = Q + d*(Alen - Blen);
+        ulong * q0 = Q + d*(Alen - Blen - 1);
 
         _n_fq_mul(q1, A + d*(Alen - 1), invB, ctx, tmp);
         _n_fq_mul(q0, q1, B + d*(Blen - 2), ctx, tmp);
@@ -128,7 +128,7 @@ void _n_fq_poly_divrem_basecase_(
 
     while (Alen - Blen >= 0)
     {
-        mp_limb_t * q0 = Q + d*(Alen - Blen);
+        ulong * q0 = Q + d*(Alen - Blen);
 
         _n_fq_mul(q0, A + d*(Alen - 1), invB, ctx, tmp);
 
@@ -146,12 +146,12 @@ void _n_fq_poly_divrem_basecase_(
 }
 
 void _n_fq_poly_divrem_divconquer_recursive_(
-    mp_limb_t * Q,
-    mp_limb_t * BQ,
-    mp_limb_t * W,
-    const mp_limb_t * A,
-    const mp_limb_t * B, slong lenB,
-    const mp_limb_t * invB,
+    ulong * Q,
+    ulong * BQ,
+    ulong * W,
+    const ulong * A,
+    const ulong * B, slong lenB,
+    const ulong * invB,
     const fq_nmod_ctx_t ctx,
     n_poly_stack_t St)
 {
@@ -171,19 +171,19 @@ void _n_fq_poly_divrem_divconquer_recursive_(
     {
         const slong n2 = lenB / 2;
         const slong n1 = lenB - n2;
-        mp_limb_t * W1 = W;
-        mp_limb_t * W2 = W + d*lenB;
-        const mp_limb_t * p1 = A + d*2*n2;
-        const mp_limb_t * p2;
-        const mp_limb_t * d1 = B + d*n2;
-        const mp_limb_t * d2 = B;
-        const mp_limb_t * d3 = B + d*n1;
-        const mp_limb_t * d4 = B;
-        mp_limb_t * q1 = Q + d*n2;
-        mp_limb_t * q2 = Q;
-        mp_limb_t * dq1 = BQ + d*n2;
-        mp_limb_t * d1q1 = BQ + d*2*n2;
-        mp_limb_t * d2q1, * d3q2, * d4q2, * t;
+        ulong * W1 = W;
+        ulong * W2 = W + d*lenB;
+        const ulong * p1 = A + d*2*n2;
+        const ulong * p2;
+        const ulong * d1 = B + d*n2;
+        const ulong * d2 = B;
+        const ulong * d3 = B + d*n1;
+        const ulong * d4 = B;
+        ulong * q1 = Q + d*n2;
+        ulong * q2 = Q;
+        ulong * dq1 = BQ + d*n2;
+        ulong * d1q1 = BQ + d*2*n2;
+        ulong * d2q1, * d3q2, * d4q2, * t;
 
         _n_fq_poly_divrem_divconquer_recursive_(q1, d1q1, W1, p1, d1, n1, invB, ctx, St);
 
@@ -210,11 +210,11 @@ void _n_fq_poly_divrem_divconquer_recursive_(
 }
 
 static void __n_fq_poly_divrem_divconquer_(
-    mp_limb_t * Q,
-    mp_limb_t * R,
-    mp_limb_t * A, slong lenA,
-    mp_limb_t * B, slong lenB,
-    mp_limb_t * invB,
+    ulong * Q,
+    ulong * R,
+    ulong * A, slong lenA,
+    ulong * B, slong lenB,
+    ulong * invB,
     const fq_nmod_ctx_t ctx,
     n_poly_stack_t St)
 {
@@ -229,12 +229,12 @@ static void __n_fq_poly_divrem_divconquer_(
     {
         const slong n1 = lenA - lenB + 1;
         const slong n2 = lenB - n1;
-        const mp_limb_t * p1 = A + d*n2;
-        const mp_limb_t * d1 = B + d*n2;
-        const mp_limb_t * d2 = B;
-        mp_limb_t * W = n_poly_stack_vec_init(St, d*((2*n1 - 1) + lenB - 1));
-        mp_limb_t * d1q1 = R + d*n2;
-        mp_limb_t * d2q1 = W + d*(2*n1 - 1);
+        const ulong * p1 = A + d*n2;
+        const ulong * d1 = B + d*n2;
+        const ulong * d2 = B;
+        ulong * W = n_poly_stack_vec_init(St, d*((2*n1 - 1) + lenB - 1));
+        ulong * d1q1 = R + d*n2;
+        ulong * d2q1 = W + d*(2*n1 - 1);
 
         _n_fq_poly_divrem_divconquer_recursive_(Q, d1q1, W, p1, d1, n1, invB, ctx, St);
 
@@ -248,7 +248,7 @@ static void __n_fq_poly_divrem_divconquer_(
     }
     else
     {
-        mp_limb_t * W = n_poly_stack_vec_init(St, d*lenA);
+        ulong * W = n_poly_stack_vec_init(St, d*lenA);
 
         _n_fq_poly_divrem_divconquer_recursive_(Q, R, W, A, B, lenB, invB, ctx, St);
 
@@ -260,11 +260,11 @@ static void __n_fq_poly_divrem_divconquer_(
 
 
 void _n_fq_poly_divrem_divconquer_(
-    mp_limb_t * Q,
-    mp_limb_t * R,
-    mp_limb_t * A, slong lenA,
-    mp_limb_t * B, slong lenB,
-    mp_limb_t * invB,
+    ulong * Q,
+    ulong * R,
+    ulong * A, slong lenA,
+    ulong * B, slong lenB,
+    ulong * invB,
     const fq_nmod_ctx_t ctx,
     n_poly_stack_t St)
 {
@@ -277,7 +277,7 @@ void _n_fq_poly_divrem_divconquer_(
     else
     {
         slong shift, n = 2*lenB - 1;
-        mp_limb_t * QB, * W;
+        ulong * QB, * W;
 
         _nmod_vec_set(R, A, d*lenA);
         W = n_poly_stack_vec_init(St, d*2*n);
@@ -314,9 +314,9 @@ void n_fq_poly_divrem_divconquer_(
     const slong lenA = A->length;
     const slong lenB = B->length;
     const slong lenQ = lenA - lenB + 1;
-    mp_limb_t * tmp, * invB;
+    ulong * tmp, * invB;
     n_poly_t Qt, Rt;
-    mp_limb_t * q, * r;
+    ulong * q, * r;
 #if FLINT_WANT_ASSERT
     fq_nmod_poly_t QQ, RR, AA, BB;
 #endif

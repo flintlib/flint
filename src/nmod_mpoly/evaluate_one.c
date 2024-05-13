@@ -27,11 +27,11 @@ void _nmod_mpoly_evaluate_one_ui_sp(
     slong i, N, off, shift;
     ulong * cmpmask, * one;
     slong Blen = B->length;
-    const mp_limb_t * Bcoeffs = B->coeffs;
+    const ulong * Bcoeffs = B->coeffs;
     const ulong * Bexps = B->exps;
     flint_bitcnt_t bits = B->bits;
     slong Alen;
-    mp_limb_t * Acoeffs;
+    ulong * Acoeffs;
     ulong * Aexps;
     ulong mask, k;
     int need_sort = 0, cmp;
@@ -112,11 +112,11 @@ static void _nmod_mpoly_evaluate_one_ui_mp(
     slong i, N, off;
     ulong * cmpmask, * one, * tmp;
     slong Blen = B->length;
-    const mp_limb_t * Bcoeffs = B->coeffs;
+    const ulong * Bcoeffs = B->coeffs;
     const ulong * Bexps = B->exps;
     flint_bitcnt_t bits = B->bits;
     slong Alen;
-    mp_limb_t * Acoeffs;
+    ulong * Acoeffs;
     ulong * Aexps;
     fmpz_t k;
     int need_sort = 0, cmp;

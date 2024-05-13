@@ -18,7 +18,7 @@ TEST_FUNCTION_START(n_is_square, state)
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that non-squares pass */
     {
-        mp_limb_t a, s, bits;
+        ulong a, s, bits;
 
         bits = n_randint(state, FLINT_BITS/2) + 1;
         a = n_randtest_bits(state, bits);
@@ -31,7 +31,7 @@ TEST_FUNCTION_START(n_is_square, state)
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that squares pass */
     {
-        mp_limb_t a, s, bits;
+        ulong a, s, bits;
 
         bits = n_randint(state, FLINT_BITS/2);
         a = n_randtest_bits(state, bits);

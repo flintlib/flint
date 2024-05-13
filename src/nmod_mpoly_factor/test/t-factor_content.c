@@ -98,7 +98,7 @@ TEST_FUNCTION_START(nmod_mpoly_factor_content, state)
         nmod_mpoly_t a, t;
         slong n, nfacs, len;
         ulong * expbounds;
-        mp_limb_t p;
+        ulong p;
 
         p = n_randint(state, (i % 2 == 0) ? 4 : FLINT_BITS - 1) + 1;
         p = n_randbits(state, p);

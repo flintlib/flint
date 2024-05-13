@@ -18,7 +18,7 @@ TEST_FUNCTION_START(n_factor_trial_range, state)
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random numbers */
     {
-        mp_limb_t n1, n2;
+        ulong n1, n2;
         n_factor_t factors;
 
         n_factor_init(&factors);

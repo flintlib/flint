@@ -44,7 +44,7 @@ arb_exp_taylor_sum_rs_generic(arb_t res, const arb_t x, slong N, slong prec)
     {
         arb_ptr tpow;
         slong j, k, m, M, tp, xmag;
-        mp_limb_t c, d, chi, clo;
+        ulong c, d, chi, clo;
 
         xmag = arf_abs_bound_lt_2exp_si(arb_midref(x));
 

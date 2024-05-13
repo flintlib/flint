@@ -14,7 +14,7 @@
 #include "nmod_mat.h"
 
 void
-nmod_mat_one_addmul(nmod_mat_t dest, const nmod_mat_t mat, mp_limb_t c)
+nmod_mat_one_addmul(nmod_mat_t dest, const nmod_mat_t mat, ulong c)
 {
     slong i, j;
 
@@ -40,7 +40,7 @@ nmod_mat_one_addmul(nmod_mat_t dest, const nmod_mat_t mat, mp_limb_t c)
 }
 
 void
-_nmod_poly_evaluate_mat_horner(nmod_mat_t dest, mp_srcptr poly, slong len, const nmod_mat_t c)
+_nmod_poly_evaluate_mat_horner(nmod_mat_t dest, nn_srcptr poly, slong len, const nmod_mat_t c)
 {
     slong m = len-1;
     nmod_mat_t temp;

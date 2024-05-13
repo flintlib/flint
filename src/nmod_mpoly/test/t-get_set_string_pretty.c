@@ -19,7 +19,7 @@ TEST_FUNCTION_START(nmod_mpoly_get_set_string_pretty, state)
     {
         slong len1;
         flint_bitcnt_t exp_bits1;
-        mp_limb_t modulus;
+        ulong modulus;
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, f1;
         char * str;

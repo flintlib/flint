@@ -15,8 +15,8 @@
 
 void
 _fmpz_poly_CRT_ui_precomp(fmpz * res, const fmpz * poly1, slong len1,
-               const fmpz_t m1, mp_srcptr poly2, slong len2, mp_limb_t m2,
-                mp_limb_t m2inv, fmpz_t m1m2, mp_limb_t c, int sign)
+               const fmpz_t m1, nn_srcptr poly2, slong len2, ulong m2,
+                ulong m2inv, fmpz_t m1m2, ulong c, int sign)
 {
     slong i;
 
@@ -47,10 +47,10 @@ _fmpz_poly_CRT_ui_precomp(fmpz * res, const fmpz * poly1, slong len1,
 
 void
 _fmpz_poly_CRT_ui(fmpz * res, const fmpz * poly1, slong len1,
-               const fmpz_t m1, mp_srcptr poly2, slong len2, mp_limb_t m2,
-                mp_limb_t m2inv, int sign)
+               const fmpz_t m1, nn_srcptr poly2, slong len2, ulong m2,
+                ulong m2inv, int sign)
 {
-    mp_limb_t c;
+    ulong c;
     fmpz_t m1m2;
 
     c = fmpz_fdiv_ui(m1, m2);

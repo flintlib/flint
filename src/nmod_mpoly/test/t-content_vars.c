@@ -49,7 +49,7 @@ TEST_FUNCTION_START(nmod_mpoly_content_vars, state)
         slong nvars, num_vars, len;
         ulong * exp_bounds;
         slong * vars;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, (i % 10 == 0) ? 4: FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);

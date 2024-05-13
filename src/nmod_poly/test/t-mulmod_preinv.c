@@ -24,7 +24,7 @@ TEST_FUNCTION_START(nmod_poly_mulmod_preinv, state)
     {
         nmod_poly_t a, b, res, t, f, finv;
 
-        mp_limb_t n = n_randtest_prime(state, 0);
+        ulong n = n_randtest_prime(state, 0);
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
@@ -74,7 +74,7 @@ TEST_FUNCTION_START(nmod_poly_mulmod_preinv, state)
     {
         nmod_poly_t a, b, res, t, f, finv;
 
-        mp_limb_t n = n_randtest_prime(state, 0);
+        ulong n = n_randtest_prime(state, 0);
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
@@ -124,7 +124,7 @@ TEST_FUNCTION_START(nmod_poly_mulmod_preinv, state)
     {
         nmod_poly_t a, b, res, t, f, finv;
 
-        mp_limb_t n = n_randtest_prime(state, 0);
+        ulong n = n_randtest_prime(state, 0);
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
@@ -174,7 +174,7 @@ TEST_FUNCTION_START(nmod_poly_mulmod_preinv, state)
     {
         nmod_poly_t a, b, res, t, f, finv;
 
-        mp_limb_t n = n_randtest_prime(state, 0);
+        ulong n = n_randtest_prime(state, 0);
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
@@ -225,7 +225,7 @@ TEST_FUNCTION_START(nmod_poly_mulmod_preinv, state)
     {
         nmod_poly_t a, b, res1, res2, t, f, finv;
 
-        mp_limb_t n = n_randtest_prime(state, 0);
+        ulong n = n_randtest_prime(state, 0);
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);

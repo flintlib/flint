@@ -18,10 +18,10 @@ static int
 basecase(arb_t res, n_primes_t primes, ulong a, ulong b, ulong nmax, slong prec)
 {
     ulong n, p, pp;
-    mp_limb_t prod[NUM_BASECASE];
-    mp_limb_t top;
-    mp_size_t nlimbs;
-    mp_limb_t hi, lo;
+    ulong prod[NUM_BASECASE];
+    ulong top;
+    slong nlimbs;
+    ulong hi, lo;
     int inexact, more;
     slong shift;
 

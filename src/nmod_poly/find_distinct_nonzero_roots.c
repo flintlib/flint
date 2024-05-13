@@ -57,10 +57,10 @@ try_again:
     The modulus of P is assumed to be prime.
 */
 int nmod_poly_find_distinct_nonzero_roots(
-    mp_limb_t * roots,
+    ulong * roots,
     const nmod_poly_t P)
 {
-    mp_limb_t a0, a1;
+    ulong a0, a1;
     int success;
     slong i, roots_idx, sp;
     nmod_poly_struct * a , * b;

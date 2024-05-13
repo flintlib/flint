@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 
 
-static const mp_limb_t small_factorials[] =
+static const ulong small_factorials[] =
 {
     UWORD(1), UWORD(1), UWORD(2), UWORD(6), UWORD(24), UWORD(120), UWORD(720), UWORD(5040), UWORD(40320), UWORD(362880),
     UWORD(3628800), UWORD(39916800), UWORD(479001600),
@@ -31,9 +31,9 @@ static const mp_limb_t small_factorials[] =
 #endif
 
 
-mp_limb_t n_factorial_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv)
+ulong n_factorial_mod2_preinv(ulong n, ulong p, ulong pinv)
 {
-    mp_limb_t prod, hi, lo;
+    ulong prod, hi, lo;
 
     if (n <= MAX_SMALL_FACTORIAL)
         return n_mod2_preinv(small_factorials[n], p, pinv);

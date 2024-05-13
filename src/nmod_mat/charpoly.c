@@ -16,7 +16,7 @@
 #include "nmod_poly.h"
 
 void
-_nmod_mat_charpoly_berkowitz(mp_ptr cp, const nmod_mat_t mat, nmod_t mod)
+_nmod_mat_charpoly_berkowitz(nn_ptr cp, const nmod_mat_t mat, nmod_t mod)
 {
     const slong n = mat->r;
 
@@ -44,12 +44,12 @@ _nmod_mat_charpoly_berkowitz(mp_ptr cp, const nmod_mat_t mat, nmod_t mod)
     else
     {
         slong i, k, t;
-        mp_ptr a, A, s;
+        nn_ptr a, A, s;
         int nlimbs;
         TMP_INIT;
 
         TMP_START;
-        a = TMP_ALLOC(sizeof(mp_limb_t) * (n * n));
+        a = TMP_ALLOC(sizeof(ulong) * (n * n));
         A = a + (n - 1) * n;
 
         nlimbs = _nmod_vec_dot_bound_limbs(n, mod);

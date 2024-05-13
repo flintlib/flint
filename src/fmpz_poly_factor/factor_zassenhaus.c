@@ -118,7 +118,7 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
     {
         slong i, j;
         slong r = lenF;
-        mp_limb_t p = 2;
+        ulong p = 2;
         nmod_poly_t d, g, t;
         nmod_poly_factor_t fac;
         zassenhaus_prune_t Z;

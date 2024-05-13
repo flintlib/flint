@@ -16,7 +16,7 @@
 TEST_FUNCTION_START(n_factor_ecm, state)
 {
     int i, j, k, result, fails;
-    mp_limb_t prime1, prime2, prod, f, mod;
+    ulong prime1, prime2, prod, f, mod;
 
     fails = 0;
 

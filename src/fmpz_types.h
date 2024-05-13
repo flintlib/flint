@@ -32,7 +32,7 @@ typedef fmpz_factor_struct fmpz_factor_t[1];
 
 typedef struct
 {
-   mp_ptr dinv;
+   nn_ptr dinv;
    slong n;
    flint_bitcnt_t norm;
 } fmpz_preinvn_struct;

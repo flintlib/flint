@@ -16,10 +16,10 @@
 #include "nmod_mpoly.h"
 
 slong _nmod_mpoly_scalar_addmul_ui1(
-    mp_limb_t * Acoeffs, ulong * Aexps,
-    const mp_limb_t * Bcoeffs, const ulong * Bexps, slong Blen,
-    const mp_limb_t * Ccoeffs, const ulong * Cexps, slong Clen,
-    mp_limb_t d,
+    ulong * Acoeffs, ulong * Aexps,
+    const ulong * Bcoeffs, const ulong * Bexps, slong Blen,
+    const ulong * Ccoeffs, const ulong * Cexps, slong Clen,
+    ulong d,
     ulong maskhi,
     nmod_t fctx)
 {
@@ -71,10 +71,10 @@ slong _nmod_mpoly_scalar_addmul_ui1(
 }
 
 static slong _nmod_mpoly_scalar_addmul_ui(
-    mp_limb_t * Acoeffs, ulong * Aexps,
-    const mp_limb_t * Bcoeffs, const ulong * Bexps, slong Blen,
-    const mp_limb_t * Ccoeffs, const ulong * Cexps, slong Clen,
-    mp_limb_t d,
+    ulong * Acoeffs, ulong * Aexps,
+    const ulong * Bcoeffs, const ulong * Bexps, slong Blen,
+    const ulong * Ccoeffs, const ulong * Cexps, slong Clen,
+    ulong d,
     slong N,
     const ulong * cmpmask,
     nmod_t fctx)
@@ -139,7 +139,7 @@ void nmod_mpoly_scalar_addmul_ui(
     nmod_mpoly_t A,
     const nmod_mpoly_t B,
     const nmod_mpoly_t C,
-    mp_limb_t d,
+    ulong d,
     const nmod_mpoly_ctx_t ctx)
 {
     ulong Abits;
@@ -220,7 +220,7 @@ void nmod_mpoly_scalar_addmul_ui(
 void nmod_mpoly_scalar_mul_nmod_invertible(
     nmod_mpoly_t A,
     const nmod_mpoly_t B,
-    mp_limb_t c,
+    ulong c,
     const nmod_mpoly_ctx_t ctx)
 {
     FLINT_ASSERT(c != 0);
@@ -258,13 +258,13 @@ void nmod_mpoly_scalar_mul_nmod_invertible(
 void nmod_mpoly_scalar_mul_nmod_general(
     nmod_mpoly_t A,
     const nmod_mpoly_t B,
-    mp_limb_t c,
+    ulong c,
     const nmod_mpoly_ctx_t ctx)
 {
     slong i, N;
     slong Alen, Blen;
     ulong * Aexp, * Bexp;
-    mp_limb_t * Acoeff, * Bcoeff;
+    ulong * Acoeff, * Bcoeff;
 
     FLINT_ASSERT(c < ctx->mod.n);
 

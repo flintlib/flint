@@ -14,7 +14,7 @@
 
 void nf_init_randtest(nf_t nf, flint_rand_t state,
         slong len,
-        mp_bitcnt_t bits_in)
+        flint_bitcnt_t bits_in)
 {
     fmpq_poly_t pol;
     fmpz_poly_t q;

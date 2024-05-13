@@ -32,7 +32,7 @@ fmpz_mod_ctx_get_modulus_mpz_read_only(mpz_t m, const fmpz_mod_ctx_t ctx)
     {
         m->_mp_size = 1;
         m->_mp_alloc = 1;
-        m->_mp_d = (mp_ptr) p;
+        m->_mp_d = (nn_ptr) p;
     }
 }
 
@@ -57,8 +57,8 @@ void _fmpz_mod_mpoly_mul_johnson1(
     ulong * Aexps = A->exps;
     slong Alen;
     mpz_t t, acc, modulus;
-    mp_limb_t * Bcoeffs_packed = NULL;
-    mp_limb_t * Ccoeffs_packed = NULL;
+    ulong * Bcoeffs_packed = NULL;
+    ulong * Ccoeffs_packed = NULL;
     TMP_INIT;
 
     TMP_START;
@@ -78,7 +78,7 @@ void _fmpz_mod_mpoly_mul_johnson1(
 
     if (Blen > 8*n)
     {
-        Bcoeffs_packed = FLINT_ARRAY_ALLOC(n*(Blen + Clen), mp_limb_t);
+        Bcoeffs_packed = FLINT_ARRAY_ALLOC(n*(Blen + Clen), ulong);
         Ccoeffs_packed = Bcoeffs_packed + n*Blen;
         for (i = 0; i < Blen; i++)
             fmpz_get_ui_array(Bcoeffs_packed + n*i, n, Bcoeffs + i);
@@ -106,7 +106,7 @@ void _fmpz_mod_mpoly_mul_johnson1(
 
         if (Bcoeffs_packed)
         {
-            mp_limb_t * acc_d, * t_d;
+            ulong * acc_d, * t_d;
             slong acc_len;
 
             FLINT_MPZ_REALLOC(acc, 2*n+1);
@@ -244,8 +244,8 @@ static void _fmpz_mod_mpoly_mul_johnson(
     ulong * Aexps = A->exps;
     slong Alen;
     mpz_t t, acc, modulus;
-    mp_limb_t * Bcoeffs_packed = NULL;
-    mp_limb_t * Ccoeffs_packed = NULL;
+    ulong * Bcoeffs_packed = NULL;
+    ulong * Ccoeffs_packed = NULL;
     TMP_INIT;
 
     FLINT_ASSERT(Blen > 0);
@@ -281,7 +281,7 @@ static void _fmpz_mod_mpoly_mul_johnson(
 
     if (Blen > 8*n)
     {
-        Bcoeffs_packed = FLINT_ARRAY_ALLOC(n*(Blen + Clen), mp_limb_t);
+        Bcoeffs_packed = FLINT_ARRAY_ALLOC(n*(Blen + Clen), ulong);
         Ccoeffs_packed = Bcoeffs_packed + n*Blen;
         for (i = 0; i < Blen; i++)
             fmpz_get_ui_array(Bcoeffs_packed + n*i, n, Bcoeffs + i);
@@ -315,7 +315,7 @@ static void _fmpz_mod_mpoly_mul_johnson(
 
         if (Bcoeffs_packed)
         {
-            mp_limb_t * acc_d, * t_d;
+            ulong * acc_d, * t_d;
             slong acc_len;
 
             FLINT_MPZ_REALLOC(acc, 2*n+1);

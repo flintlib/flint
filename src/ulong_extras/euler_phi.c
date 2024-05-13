@@ -12,10 +12,10 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-mp_limb_t n_euler_phi(mp_limb_t n)
+ulong n_euler_phi(ulong n)
 {
     int i;
-    mp_limb_t phi;
+    ulong phi;
     n_factor_t fac;
 
     if (n < 2)

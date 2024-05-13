@@ -17,7 +17,7 @@
 #include "fmpz_mat.h"
 #include "fmpq_mat.h"
 
-mp_limb_t fmpz_mat_find_good_prime_and_solve(nmod_mat_t Xmod,
+ulong fmpz_mat_find_good_prime_and_solve(nmod_mat_t Xmod,
 		                 nmod_mat_t Amod, nmod_mat_t Bmod,
                 const fmpz_mat_t A, const fmpz_mat_t B, const fmpz_t det_bound);
 
@@ -64,7 +64,7 @@ void
 _fmpq_mat_solve_multi_mod(fmpq_mat_t X,
                         const fmpz_mat_t A, const fmpz_mat_t B,
                      nmod_mat_t Xmod, nmod_mat_t Amod, nmod_mat_t Bmod,
-		                   mp_limb_t p, const fmpz_t N, const fmpz_t D)
+		                   ulong p, const fmpz_t N, const fmpz_t D)
 {
     fmpz_t bound, pprod;
     fmpz_mat_t x;
@@ -151,7 +151,7 @@ fmpq_mat_solve_fmpz_mat_multi_mod(fmpq_mat_t X,
 {
     nmod_mat_t Xmod, Amod, Bmod;
     fmpz_t N, D;
-    mp_limb_t p;
+    ulong p;
 
     if (!fmpz_mat_is_square(A))
     {

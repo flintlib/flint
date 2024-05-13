@@ -23,7 +23,7 @@ TEST_FUNCTION_START(nmod_poly_divrem_newton_n_preinv, state)
     {
         nmod_poly_t a, b, binv, q, r, test;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest_not_zero(state);
         while (!n_is_probabprime(n));
 
@@ -74,7 +74,7 @@ TEST_FUNCTION_START(nmod_poly_divrem_newton_n_preinv, state)
     {
         nmod_poly_t a, b, binv, q, r;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest(state);
         while (!n_is_probabprime(n));
 
@@ -121,7 +121,7 @@ TEST_FUNCTION_START(nmod_poly_divrem_newton_n_preinv, state)
     {
         nmod_poly_t a, b, binv, q, r;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest(state);
         while (!n_is_probabprime(n));
 
@@ -168,7 +168,7 @@ TEST_FUNCTION_START(nmod_poly_divrem_newton_n_preinv, state)
     {
         nmod_poly_t a, b, binv, q, r;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest(state);
         while (!n_is_probabprime(n));
 
@@ -216,7 +216,7 @@ TEST_FUNCTION_START(nmod_poly_divrem_newton_n_preinv, state)
     {
         nmod_poly_t a, b, binv, q, r;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest(state);
         while (!n_is_probabprime(n));
 
@@ -263,7 +263,7 @@ TEST_FUNCTION_START(nmod_poly_divrem_newton_n_preinv, state)
     {
         nmod_poly_t a, b, binv, q, r;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest(state);
         while (!n_is_probabprime(n));
 
@@ -310,7 +310,7 @@ TEST_FUNCTION_START(nmod_poly_divrem_newton_n_preinv, state)
     {
         nmod_poly_t a, b, binv, q, r;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest(state);
         while (!n_is_probabprime(n));
 

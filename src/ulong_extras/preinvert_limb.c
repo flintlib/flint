@@ -55,7 +55,7 @@ static const unsigned short rec_word_tab[512] = {
 
 #define _invert_limb(dinv, d)                                      \
    do {                                                           \
-      mp_limb_t _v0, _v1, _v2, _d21, _e, _m0;                     \
+      ulong _v0, _v1, _v2, _d21, _e, _m0;                     \
       FLINT_ASSERT(((d) & (UWORD(1)<<(FLINT_BITS - 1))) != 0); \
       _v0 = rec_word_tab[((d) >> 22) & 0x1FF];                    \
       _d21 = ((d) >> 11) + 1;                                     \
@@ -63,12 +63,12 @@ static const unsigned short rec_word_tab[512] = {
       umul_ppmm(_v1, _e, _m0, _d21);                              \
       _v1 = (_v0 << 4) - _v1 - 1;                                 \
       _e = -_v1*((d) >> 1);                                       \
-      _m0 = -((d) & (mp_limb_t) 1);                               \
+      _m0 = -((d) & (ulong) 1);                               \
       _e -= ((_v1 - (_v1 >> 1)) & _m0);                           \
       umul_ppmm(_v2, _m0, _v1, _e);                               \
       _v2 = (_v1 << 15) + (_v2 >> 1);                             \
       umul_ppmm(_v0, _d21, _v2, (d));                             \
-      add_ssaaaa(_v0, _d21, _v0, _d21, (mp_limb_t) 0, (d));       \
+      add_ssaaaa(_v0, _d21, _v0, _d21, (ulong) 0, (d));       \
       (dinv) = _v2 - (_v0 + (d));                                 \
    } while(0)
 
@@ -96,20 +96,20 @@ static const unsigned short rec_word_tab[256] = {
 
 #define _invert_limb(dinv, d)                                      \
    do {                                                           \
-      mp_limb_t _v0, _v2, _d40, _e, _m0;                          \
+      ulong _v0, _v2, _d40, _e, _m0;                          \
       FLINT_ASSERT(((d) & (UWORD(1)<<(FLINT_BITS - 1))) != 0); \
       _d40 = ((d) >> 24) + 1;                                     \
       _v0 = rec_word_tab[((d) >> 55) & 0xFF];                     \
       _v0 = (_v0 << 11) - ((_v0*_v0*_d40) >> 40) - 1;             \
-      _v2 = ((_v0*((((mp_limb_t) 1) << 60) - _v0*_d40)) >> 47);   \
+      _v2 = ((_v0*((((ulong) 1) << 60) - _v0*_d40)) >> 47);   \
       _v2 += (_v0 << 13);                                         \
       _e = -_v2*((d) >> 1);                                       \
-      _m0 = -((d) & (mp_limb_t) 1);                               \
+      _m0 = -((d) & (ulong) 1);                               \
       _e -= ((_v2 - (_v2 >> 1)) & _m0);                           \
       umul_ppmm(_v0, _d40, _v2, _e);                              \
       _v2 = (_v2 << 31) + (_v0 >> 1);                             \
       umul_ppmm(_v0, _d40, _v2, (d));                             \
-      add_ssaaaa(_v0, _d40, _v0, _d40, (mp_limb_t) 0, (d));       \
+      add_ssaaaa(_v0, _d40, _v0, _d40, (ulong) 0, (d));       \
       (dinv) = _v2 - (_v0 + (d));                                 \
    } while (0)
 

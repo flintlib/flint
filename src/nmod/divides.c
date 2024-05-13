@@ -13,7 +13,7 @@
 #include "nmod.h"
 #include "ulong_extras.h"
 
-int nmod_divides(mp_limb_t * a, mp_limb_t b, mp_limb_t c, nmod_t mod)
+int nmod_divides(ulong * a, ulong b, ulong c, nmod_t mod)
 {
     int success;
     ulong g, x, y, q;

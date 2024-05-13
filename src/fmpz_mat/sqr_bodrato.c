@@ -17,10 +17,10 @@
 #define E fmpz_mat_entry
 
 static void
-local_fmma(fmpz_t f, mp_limb_t a, fmpz b,
+local_fmma(fmpz_t f, ulong a, fmpz b,
            fmpz c, fmpz d)
 {
-    mp_limb_t sh, sl, th, tl;
+    ulong sh, sl, th, tl;
 
     smul_ppmm(sh, sl, a, b);
     smul_ppmm(th, tl, c, d);
@@ -52,7 +52,7 @@ fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A)
         if (!COEFF_IS_MPZ(a) && !COEFF_IS_MPZ(b) &&
             !COEFF_IS_MPZ(c) && !COEFF_IS_MPZ(d))
         {
-            mp_limb_t s, t, u, v;
+            ulong s, t, u, v;
 
             smul_ppmm(s, t, a, a);
             smul_ppmm(u, v, b, c);
@@ -95,7 +95,7 @@ fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A)
           !COEFF_IS_MPZ(*E(A, 2, 0)) && !COEFF_IS_MPZ(*E(A, 2, 1)) &&
           !COEFF_IS_MPZ(*E(A, 2, 2)))
           {
-            mp_limb_t s, t, u, v, j, k;
+            ulong s, t, u, v, j, k;
 
             smul_ppmm(s, t, *E(A, 0, 2), *E(A, 2, 0));
             smul_ppmm(u, v, *E(A, 0, 1), *E(A, 1, 0));

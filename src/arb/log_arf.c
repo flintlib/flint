@@ -14,7 +14,7 @@
 
 int _arb_log_ui_smooth(arb_t res, ulong n, slong prec);
 
-#define TMP_ALLOC_LIMBS(size) TMP_ALLOC((size) * sizeof(mp_limb_t))
+#define TMP_ALLOC_LIMBS(size) TMP_ALLOC((size) * sizeof(ulong))
 
 #if 0
 /* requires x != 1 */
@@ -22,18 +22,18 @@ static void
 arf_log_via_mpfr(arf_t z, const arf_t x, slong prec, arf_rnd_t rnd)
 {
     mpfr_t xf, zf;
-    mp_ptr zptr, tmp;
-    mp_srcptr xptr;
-    mp_size_t xn, zn, val;
+    nn_ptr zptr, tmp;
+    nn_srcptr xptr;
+    slong xn, zn, val;
     TMP_INIT;
     TMP_START;
 
     zn = (prec + FLINT_BITS - 1) / FLINT_BITS;
-    tmp = TMP_ALLOC(zn * sizeof(mp_limb_t));
+    tmp = TMP_ALLOC(zn * sizeof(ulong));
 
     ARF_GET_MPN_READONLY(xptr, xn, x);
 
-    xf->_mpfr_d = (mp_ptr) xptr;
+    xf->_mpfr_d = (nn_ptr) xptr;
     xf->_mpfr_prec = xn * FLINT_BITS;
     xf->_mpfr_sign = ARF_SGNBIT(x) ? -1 : 1;
     xf->_mpfr_exp = ARF_EXP(x);
@@ -127,10 +127,10 @@ arb_log_arf(arb_t z, const arf_t x, slong prec)
     else
     {
         slong exp, wp, wn, N, r, closeness_to_one;
-        mp_srcptr xp;
-        mp_size_t xn, tn;
-        mp_ptr tmp, w, t, u;
-        mp_limb_t p1, q1bits, p2, q2bits, error, error2, cy;
+        nn_srcptr xp;
+        slong xn, tn;
+        nn_ptr tmp, w, t, u;
+        ulong p1, q1bits, p2, q2bits, error, error2, cy;
         int negative, inexact, used_taylor_series;
         TMP_INIT;
 

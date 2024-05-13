@@ -22,7 +22,7 @@ TEST_FUNCTION_START(n_factor_one_line, state)
 
     for (i = 0; i < num_iter; i++) /* Test random numbers */
     {
-        mp_limb_t n1, n2, bits;
+        ulong n1, n2, bits;
 
         do
         {

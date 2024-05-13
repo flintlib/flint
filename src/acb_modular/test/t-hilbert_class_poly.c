@@ -119,7 +119,7 @@ TEST_FUNCTION_START(acb_modular_hilbert_class_poly, state)
 {
     {
         slong i;
-        mp_limb_t c;
+        ulong c;
         fmpz_poly_t hd;
         nmod_poly_t hdp;
 

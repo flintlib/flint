@@ -22,7 +22,7 @@ TEST_FUNCTION_START(n_cbrt, state)
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
-        mp_limb_t n, val, ans;
+        ulong n, val, ans;
         mpz_t mpz_n, mpz_val;
 
         mpz_init(mpz_n);
@@ -47,7 +47,7 @@ TEST_FUNCTION_START(n_cbrt, state)
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
-        mp_limb_t n, val, ans, bits;
+        ulong n, val, ans, bits;
         mpz_t mpz_n, mpz_val;
 
         mpz_init(mpz_n);
@@ -75,7 +75,7 @@ TEST_FUNCTION_START(n_cbrt, state)
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
-        mp_limb_t n, val, ans, bits;
+        ulong n, val, ans, bits;
         mpz_t mpz_n, mpz_val;
 
         mpz_init(mpz_n);
@@ -103,7 +103,7 @@ TEST_FUNCTION_START(n_cbrt, state)
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
-        mp_limb_t n, val, ans, bits;
+        ulong n, val, ans, bits;
         mpz_t mpz_n, mpz_val;
 
         mpz_init(mpz_n);

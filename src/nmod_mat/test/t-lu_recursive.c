@@ -19,12 +19,12 @@
 void perm(nmod_mat_t A, slong * P)
 {
     slong i;
-    mp_ptr * tmp;
+    nn_ptr * tmp;
 
     if (A->c == 0 || A->r == 0)
         return;
 
-    tmp = flint_malloc(sizeof(mp_ptr) * A->r);
+    tmp = flint_malloc(sizeof(nn_ptr) * A->r);
 
     for (i = 0; i < A->r; i++) tmp[P[i]] = A->rows[i];
     for (i = 0; i < A->r; i++) A->rows[i] = tmp[i];
@@ -87,7 +87,7 @@ TEST_FUNCTION_START(nmod_mat_lu_recursive, state)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_mat_t A, LU;
-        mp_limb_t mod;
+        ulong mod;
         slong m, n, r, d, rank;
         slong * P;
 

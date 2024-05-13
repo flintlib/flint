@@ -12,9 +12,9 @@
 #ifndef LONGLONG_DIV_H
 #define LONGLONG_DIV_H
 
-#if defined (__amd64__) || (GMP_LIMB_BITS == 32 && (defined (__i386__) || defined (__i486__)))
+#if defined (__amd64__) || (FLINT_BITS == 32 && (defined (__i386__) || defined (__i486__)))
 
-# if GMP_LIMB_BITS == 64 && defined (__amd64__)
+# if FLINT_BITS == 64 && defined (__amd64__)
 #  define _FLINT_ASM_DIV "divq"
 #  define _FLINT_ASM_IDIV "idivq"
 # else

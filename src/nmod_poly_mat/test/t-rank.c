@@ -22,7 +22,7 @@ TEST_FUNCTION_START(nmod_poly_mat_rank, state)
     {
         nmod_poly_mat_t A;
         nmod_mat_t Ax;
-        mp_limb_t mod, x;
+        ulong mod, x;
         slong j, m, n, deg, rank, zrank;
         float density;
 

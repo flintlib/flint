@@ -27,9 +27,9 @@ fmpz_mul_si_tdiv_q_2exp(fmpz_t f, const fmpz_t g, slong x, ulong exp)
    }
    else if (!COEFF_IS_MPZ(c2)) /* c2 is small */
    {
-       mp_limb_t prod[2];
-       mp_limb_t uc2;
-       mp_limb_t ux;
+       ulong prod[2];
+       ulong uc2;
+       ulong ux;
 
        if (exp >= 2 * FLINT_BITS)
        {
@@ -69,7 +69,7 @@ fmpz_mul_si_tdiv_q_2exp(fmpz_t f, const fmpz_t g, slong x, ulong exp)
 
            /* two limbs, least significant first, native endian, no
 nails, stored in prod */
-           mpz_import(mf, 2, -1, sizeof(mp_limb_t), 0, 0, prod);
+           mpz_import(mf, 2, -1, sizeof(ulong), 0, 0, prod);
            if ((c2 ^ x) < WORD(0))
                mpz_neg(mf, mf);
        }

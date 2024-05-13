@@ -30,7 +30,7 @@ int nmod_mpoly_factor_irred_smprime_zippel(
     int alphas_tries_remaining, alphabetas_tries_remaining, alphabetas_length;
     const slong n = ctx->minfo->nvars - 1;
     slong i, j, k, r;
-    mp_limb_t * alpha;
+    ulong * alpha;
     n_poly_struct * alphabetas;
     nmod_mpoly_struct * Aevals;
     slong * degs, * degeval;
@@ -64,7 +64,7 @@ int nmod_mpoly_factor_irred_smprime_zippel(
 
     degs    = (slong *) flint_malloc((n + 1)*sizeof(slong));
     degeval = (slong *) flint_malloc((n + 1)*sizeof(slong));
-    alpha   = (mp_limb_t *) flint_malloc(n*sizeof(mp_limb_t));
+    alpha   = (ulong *) flint_malloc(n*sizeof(ulong));
     alphabetas = (n_poly_struct *) flint_malloc(n*sizeof(n_poly_struct));
     Aevals  = (nmod_mpoly_struct *) flint_malloc(n*sizeof(nmod_mpoly_struct));
     for (i = 0; i < n; i++)
@@ -245,7 +245,7 @@ next_alphabetas:
     fac->length = r;
     for (i = 0; i < r; i++)
     {
-        mp_limb_t q;
+        ulong q;
         FLINT_ASSERT(nmod_mpoly_is_ui(new_lcs->coeffs + 0*r + i, ctx));
         FLINT_ASSERT(nmod_mpoly_length(new_lcs->coeffs + 0*r + i, ctx) == 1);
         _nmod_mpoly_set_n_bpoly_var1_zero(fac->coeffs + i, newA->bits,

@@ -22,8 +22,8 @@ nmod_mat_mul_check(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 {
     slong i, j, k;
 
-    mp_limb_t s0, s1, s2;
-    mp_limb_t t0, t1;
+    ulong s0, s1, s2;
+    ulong t0, t1;
 
     for (i = 0; i < A->r; i++)
     {
@@ -52,7 +52,7 @@ TEST_FUNCTION_START(nmod_mat_mul, state)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_mat_t A, B, C, D;
-        mp_limb_t mod;
+        ulong mod;
 
         slong m, k, n;
 

@@ -24,7 +24,7 @@ TEST_FUNCTION_START(nmod_mpoly_univar, state)
         nmod_mpoly_univar_t fx, gx;
         slong len1, len2, n;
         flint_bitcnt_t exp_bits1, exp_bits2, bits;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, SMALL_FMPZ_BITCOUNT_MAX) + 2;
         modulus = n_randbits(state, modulus);

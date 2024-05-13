@@ -16,7 +16,7 @@
 
 TEST_FUNCTION_START(n_sizeinbase, state)
 {
-    mp_limb_t n;
+    ulong n;
     int base, size1, size2;
     slong rep;
     mpz_t t;

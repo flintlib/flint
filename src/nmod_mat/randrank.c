@@ -16,7 +16,7 @@ void
 nmod_mat_randrank(nmod_mat_t mat, flint_rand_t state, slong rank)
 {
     slong i;
-    mp_limb_t * diag;
+    ulong * diag;
 
     if (rank < 0 || rank > mat->r || rank > mat->c)
     {

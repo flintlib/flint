@@ -27,15 +27,15 @@ n_pair_t;
     Currently it acts as such all the way up to 2^64.
 */
 
-int n_is_probabprime(mp_limb_t n)
+int n_is_probabprime(ulong n)
 {
-    mp_limb_t d;
+    ulong d;
     unsigned int norm;
     int isprime;
 #if FLINT64
     double npre;
 #else
-    mp_limb_t ninv;
+    ulong ninv;
 #endif
 
     if (n <= UWORD(1)) return 0;
@@ -108,7 +108,7 @@ int n_is_probabprime(mp_limb_t n)
 }
 
 int
-n_is_probabprime_BPSW(mp_limb_t n)
+n_is_probabprime_BPSW(ulong n)
 {
     if (n <= UWORD(1))
         return 0;
@@ -129,7 +129,7 @@ n_is_probabprime_BPSW(mp_limb_t n)
     }
     else
     {
-        mp_limb_t d;
+        ulong d;
 
         d = n - UWORD(1);
         while ((d & UWORD(1)) == UWORD(0))
@@ -143,7 +143,7 @@ n_is_probabprime_BPSW(mp_limb_t n)
         }
         else
         {
-            mp_limb_t ninv = n_preinvert_limb(n);
+            ulong ninv = n_preinvert_limb(n);
             if (n_is_strong_probabprime2_preinv(n, ninv, WORD(2), d) == 0)
                 return 0;
         }
@@ -153,7 +153,7 @@ n_is_probabprime_BPSW(mp_limb_t n)
 }
 
 int
-n_is_probabprime_fermat(mp_limb_t n, mp_limb_t i)
+n_is_probabprime_fermat(ulong n, ulong i)
 {
     if (FLINT_BIT_COUNT(n) <= FLINT_D_BITS)
         return (n_powmod(i, n - 1, n) == UWORD(1));
@@ -162,11 +162,11 @@ n_is_probabprime_fermat(mp_limb_t n, mp_limb_t i)
 }
 
 n_pair_t
-fchain_precomp(mp_limb_t m, mp_limb_t n, double npre)
+fchain_precomp(ulong m, ulong n, double npre)
 {
     n_pair_t current = {0, 0}, old;
     int length;
-    mp_limb_t power, xy;
+    ulong power, xy;
 
     old.x = UWORD(2);
     old.y = n - UWORD(3);
@@ -201,11 +201,11 @@ fchain_precomp(mp_limb_t m, mp_limb_t n, double npre)
 }
 
 n_pair_t
-fchain2_preinv(mp_limb_t m, mp_limb_t n, mp_limb_t ninv)
+fchain2_preinv(ulong m, ulong n, ulong ninv)
 {
     n_pair_t current = {0, 0}, old;
     int length;
-    mp_limb_t power, xy;
+    ulong power, xy;
 
     old.x = UWORD(2);
     old.y = n - UWORD(3);
@@ -240,9 +240,9 @@ fchain2_preinv(mp_limb_t m, mp_limb_t n, mp_limb_t ninv)
 }
 
 int
-n_is_probabprime_fibonacci(mp_limb_t n)
+n_is_probabprime_fibonacci(ulong n)
 {
-    mp_limb_t m;
+    ulong m;
     n_pair_t V;
 
     if ((ulong) FLINT_ABS((slong) n) <= UWORD(3))
@@ -265,7 +265,7 @@ n_is_probabprime_fibonacci(mp_limb_t n)
     }
     else
     {
-        mp_limb_t ninv = n_preinvert_limb(n);
+        ulong ninv = n_preinvert_limb(n);
 
         V = fchain2_preinv(m, n, ninv);
         return (n_mulmod2_preinv(n - UWORD(3), V.x, n, ninv) ==
@@ -274,11 +274,11 @@ n_is_probabprime_fibonacci(mp_limb_t n)
 }
 
 n_pair_t
-lchain_precomp(mp_limb_t m, mp_limb_t a, mp_limb_t n, double npre)
+lchain_precomp(ulong m, ulong a, ulong n, double npre)
 {
     n_pair_t current = {0, 0}, old;
     int length, i;
-    mp_limb_t power, xy, xx, yy;
+    ulong power, xy, xx, yy;
 
     old.x = UWORD(2);
     old.y = a;
@@ -311,11 +311,11 @@ lchain_precomp(mp_limb_t m, mp_limb_t a, mp_limb_t n, double npre)
 }
 
 n_pair_t
-lchain2_preinv(mp_limb_t m, mp_limb_t a, mp_limb_t n, mp_limb_t ninv)
+lchain2_preinv(ulong m, ulong a, ulong n, ulong ninv)
 {
     n_pair_t current = {0, 0}, old;
     int length, i;
-    mp_limb_t power, xy, xx, yy;
+    ulong power, xy, xx, yy;
 
     old.x = UWORD(2);
     old.y = a;
@@ -348,18 +348,18 @@ lchain2_preinv(mp_limb_t m, mp_limb_t a, mp_limb_t n, mp_limb_t ninv)
 }
 
 int
-n_is_probabprime_lucas(mp_limb_t n)
+n_is_probabprime_lucas(ulong n)
 {
     int i;
     slong D, Q;
-    mp_limb_t A;
-    mp_limb_t left, right;
+    ulong A;
+    ulong left, right;
     n_pair_t V;
 
     D = 0;
     Q = 0;
 
-    if (((n % 2) == 0) || (FLINT_ABS((mp_limb_signed_t) n) <= 2))
+    if (((n % 2) == 0) || (FLINT_ABS((slong) n) <= 2))
     {
         return (n == UWORD(2));
     }
@@ -419,7 +419,7 @@ n_is_probabprime_lucas(mp_limb_t n)
     }
     else
     {
-        mp_limb_t ninv = n_preinvert_limb(n);
+        ulong ninv = n_preinvert_limb(n);
         V = lchain2_preinv(n + 1, A, n, ninv);
 
         left = n_mulmod_precomp(A, V.x, n, ninv);

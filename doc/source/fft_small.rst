@@ -31,7 +31,7 @@ Integer multiplication
     frees the cache.
 
 .. function:: void mpn_ctx_mpn_mul(mpn_ctx_t R, ulong * r1, const ulong * i1, ulong n1, const ulong * i2, ulong n2)
-              void mpn_mul_default_mpn_ctx(mp_ptr r1, mp_srcptr i1, mp_size_t n1, mp_srcptr i2, mp_size_t n2)
+              void mpn_mul_default_mpn_ctx(nn_ptr r1, nn_srcptr i1, slong n1, nn_srcptr i2, slong n2)
 
     Writes to ``r1`` the product of the integers ``(i1, n1)`` and ``(i2, n2)``.
     Assumes that `n_1 \ge n_2 \ge 1`, respectively using a given context
@@ -41,7 +41,7 @@ Polynomial arithmetic
 ---------------------------------------------------------------------------------
 
 .. function:: void _nmod_poly_mul_mid_mpn_ctx(ulong * z, ulong zl, ulong zh, const ulong * a, ulong an, const ulong * b, ulong bn, nmod_t mod, mpn_ctx_t R)
-              void _nmod_poly_mul_mid_default_mpn_ctx(mp_ptr res, slong zl, slong zh, mp_srcptr a, slong an, mp_srcptr b, slong bn, nmod_t mod)
+              void _nmod_poly_mul_mid_default_mpn_ctx(nn_ptr res, slong zl, slong zh, nn_srcptr a, slong an, nn_srcptr b, slong bn, nmod_t mod)
 
     Writes to ``z`` the middle product containing coefficients in the
     range `[zl, zh)` of the product of the polynomials  ``(a, an)`` and ``(b, bn)``,

@@ -26,7 +26,7 @@ static int _try_lift(
     const nmod_mpolyv_t pfac,
     const nmod_mpoly_t FLINT_UNUSED(p),
     slong m,
-    mp_limb_t * alpha,
+    ulong * alpha,
     slong n,
     const nmod_mpoly_ctx_t ctx)
 {
@@ -135,7 +135,7 @@ int nmod_mpoly_factor_irred_smprime_zassenhaus(
     const slong n = ctx->minfo->nvars - 1;
     slong i, j, k, m, len;
     slong * subset;
-    mp_limb_t * alpha;
+    ulong * alpha;
     nmod_mpoly_struct * Aevals;
     slong * deg, * degeval;
     nmod_mpolyv_t qfac, pfac, tfac, dfac;
@@ -150,7 +150,7 @@ int nmod_mpoly_factor_irred_smprime_zassenhaus(
     FLINT_ASSERT(A->bits <= FLINT_BITS);
 
     subset = (slong*) flint_malloc(4*sizeof(slong));
-    alpha = (mp_limb_t *) flint_malloc(n*sizeof(mp_limb_t));
+    alpha = (ulong *) flint_malloc(n*sizeof(ulong));
     Aevals    = (nmod_mpoly_struct *) flint_malloc(n*sizeof(nmod_mpoly_struct));
     deg     = (slong *) flint_malloc((n + 1)*sizeof(slong));
     degeval = (slong *) flint_malloc((n + 1)*sizeof(slong));

@@ -20,7 +20,7 @@ fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat,
     const fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign)
 {
     slong i, j, k;
-    mp_ptr r;
+    nn_ptr r;
 
     r = _nmod_vec_init(nres);
 
@@ -43,7 +43,7 @@ fmpz_mat_multi_CRT_ui(fmpz_mat_t mat, nmod_mat_t * const residues,
 {
     fmpz_comb_t comb;
     fmpz_comb_temp_t temp;
-    mp_ptr primes;
+    nn_ptr primes;
     slong i;
 
     primes = _nmod_vec_init(nres);

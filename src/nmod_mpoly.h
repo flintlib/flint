@@ -31,7 +31,7 @@ extern "C" {
 #endif
 
 FLINT_FORCE_INLINE
-mp_limb_t * nmod_mpoly_term_coeff_ref(nmod_mpoly_t A, slong i,
+ulong * nmod_mpoly_term_coeff_ref(nmod_mpoly_t A, slong i,
                                                     const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_ASSERT(i < A->length);
@@ -96,7 +96,7 @@ typedef struct
     slong degb_alloc;
     slong * deg_bounds;
     slong coeff_alloc;
-    mp_limb_t * coeffs;
+    ulong * coeffs;
 } nmod_mpolyd_struct;
 
 typedef nmod_mpolyd_struct nmod_mpolyd_t[1];
@@ -241,14 +241,14 @@ slong nmod_poly_stack_size_mpolyn(const nmod_poly_stack_t S)
 /* Context object ************************************************************/
 
 void nmod_mpoly_ctx_init(nmod_mpoly_ctx_t ctx,
-                         slong nvars, const ordering_t ord, mp_limb_t modulus);
+                         slong nvars, const ordering_t ord, ulong modulus);
 
 void nmod_mpoly_ctx_init_rand(nmod_mpoly_ctx_t ctx, flint_rand_t state,
-                                           slong max_nvars, mp_limb_t modulus);
+                                           slong max_nvars, ulong modulus);
 
 void nmod_mpoly_ctx_clear(nmod_mpoly_ctx_t ctx);
 
-void nmod_mpoly_ctx_set_modulus(nmod_mpoly_ctx_t ctx, mp_limb_t modulus);
+void nmod_mpoly_ctx_set_modulus(nmod_mpoly_ctx_t ctx, ulong modulus);
 
 NMOD_MPOLY_INLINE
 slong nmod_mpoly_ctx_nvars(const nmod_mpoly_ctx_t ctx)
@@ -263,7 +263,7 @@ ordering_t nmod_mpoly_ctx_ord(const nmod_mpoly_ctx_t ctx)
 }
 
 NMOD_MPOLY_INLINE
-mp_limb_t nmod_mpoly_ctx_modulus(const nmod_mpoly_ctx_t ctx)
+ulong nmod_mpoly_ctx_modulus(const nmod_mpoly_ctx_t ctx)
 {
     return ctx->mod.n;
 }
@@ -312,7 +312,7 @@ void nmod_mpoly_fit_length_reset_bits(nmod_mpoly_t A,
 
 NMOD_MPOLY_INLINE
 void _nmod_mpoly_fit_length(
-    mp_limb_t ** coeffs,
+    ulong ** coeffs,
     slong * coeffs_alloc,
     ulong ** exps,
     slong * exps_alloc,
@@ -322,14 +322,14 @@ void _nmod_mpoly_fit_length(
     if (length > *coeffs_alloc)
     {
         *coeffs_alloc = FLINT_MAX(length, *coeffs_alloc*2);
-        *coeffs = (mp_limb_t *) flint_realloc(*coeffs,
-                                              *coeffs_alloc*sizeof(mp_limb_t));
+        *coeffs = (ulong *) flint_realloc(*coeffs,
+                                              *coeffs_alloc*sizeof(ulong));
     }
 
     if (N*length > *exps_alloc)
     {
         *exps_alloc = FLINT_MAX(N*length, *exps_alloc*2);
-        *exps = (mp_limb_t *) flint_realloc(*exps, *exps_alloc*sizeof(ulong));
+        *exps = (ulong *) flint_realloc(*exps, *exps_alloc*sizeof(ulong));
     }
 }
 
@@ -472,7 +472,7 @@ void nmod_mpoly_get_coeff_vars_ui(nmod_mpoly_t C,
                  const nmod_mpoly_t A, const slong * vars, const ulong * exps,
                                      slong length, const nmod_mpoly_ctx_t ctx);
 
-NMOD_MPOLY_INLINE mp_limb_t nmod_mpoly_leadcoeff(
+NMOD_MPOLY_INLINE ulong nmod_mpoly_leadcoeff(
                                     nmod_mpoly_t A, const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_ASSERT(A->length > 0);
@@ -491,7 +491,7 @@ int nmod_mpoly_get_nmod_poly(nmod_poly_t A, const nmod_mpoly_t B,
                                         slong var, const nmod_mpoly_ctx_t ctx);
 
 void _nmod_mpoly_set_nmod_poly(nmod_mpoly_t A, flint_bitcnt_t Abits,
-                                        const mp_limb_t * Bcoeffs, slong Blen,
+                                        const ulong * Bcoeffs, slong Blen,
                                         slong var, const nmod_mpoly_ctx_t ctx);
 
 void nmod_mpoly_set_n_poly_mod(nmod_mpoly_t A, const n_poly_t B,
@@ -650,9 +650,9 @@ void nmod_mpoly_add(nmod_mpoly_t A, const nmod_mpoly_t B,
 void nmod_mpoly_sub(nmod_mpoly_t A, const nmod_mpoly_t B,
                              const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx);
 
-slong _nmod_mpoly_add(mp_limb_t * coeff1,       ulong * exp1,
-                const mp_limb_t * coeff2, const ulong * exp2, slong len2,
-                const mp_limb_t * coeff3, const ulong * exp3, slong len3,
+slong _nmod_mpoly_add(ulong * coeff1,       ulong * exp1,
+                const ulong * coeff2, const ulong * exp2, slong len2,
+                const ulong * coeff3, const ulong * exp3, slong len3,
                                   slong N, const ulong * cmpmask, nmod_t fctx);
 
 slong _nmod_mpoly_sub(ulong * coeff1,       ulong * exp1,
@@ -673,7 +673,7 @@ void nmod_mpoly_make_monic(nmod_mpoly_t A, const nmod_mpoly_t B,
                                                     const nmod_mpoly_ctx_t ctx);
 
 void nmod_mpoly_scalar_mul_nmod_invertible(nmod_mpoly_t A,
-                const nmod_mpoly_t B, mp_limb_t c, const nmod_mpoly_ctx_t ctx);
+                const nmod_mpoly_t B, ulong c, const nmod_mpoly_ctx_t ctx);
 
 void nmod_mpoly_scalar_addmul_ui(nmod_mpoly_t A,
                         const nmod_mpoly_t B, const nmod_mpoly_t C, ulong d,
@@ -691,9 +691,9 @@ int _ff_poly_pow_fmpz_is_not_feasible(slong length, const fmpz_t e);
 
 int _ff_poly_pow_ui_is_not_feasible(slong length, ulong e);
 
-mp_limb_t _nmod_mpoly_eval_all_ui(const mp_limb_t * Acoeffs,
+ulong _nmod_mpoly_eval_all_ui(const ulong * Acoeffs,
                  const ulong * Aexps, slong Alen, flint_bitcnt_t Abits,
-                 const mp_limb_t * alphas, const mpoly_ctx_t mctx, nmod_t mod);
+                 const ulong * alphas, const mpoly_ctx_t mctx, nmod_t mod);
 
 ulong nmod_mpoly_evaluate_all_ui(const nmod_mpoly_t A,
                                const ulong * vals, const nmod_mpoly_ctx_t ctx);
@@ -747,8 +747,8 @@ int nmod_mpoly_mul_dense(nmod_mpoly_t A,
        const nmod_mpoly_t B, const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx);
 
 slong _nmod_mpoly_mul_johnson(nmod_mpoly_t A,
-                 const mp_limb_t * coeff2, const ulong * exp2, slong len2,
-                 const mp_limb_t * coeff3, const ulong * exp3, slong len3,
+                 const ulong * coeff2, const ulong * exp2, slong len2,
+                 const ulong * coeff3, const ulong * exp3, slong len3,
              flint_bitcnt_t bits, slong N, const ulong * cmpmask, nmod_t fctx);
 
 void _nmod_mpoly_mul_johnson_maxfields(nmod_mpoly_t A,
@@ -788,7 +788,7 @@ int _nmod_mpoly_mul_dense(nmod_mpoly_t P,
 
 /* Powering ******************************************************************/
 
-void _nmod_mpoly_pow_rmul(nmod_mpoly_t A, const mp_limb_t * Bcoeffs,
+void _nmod_mpoly_pow_rmul(nmod_mpoly_t A, const ulong * Bcoeffs,
                             const ulong * Bexps, slong Blen, ulong k, slong N,
                             const ulong * cmpmask, nmod_t mod, nmod_mpoly_t T);
 
@@ -849,8 +849,8 @@ void nmod_mpoly_divexact(nmod_mpoly_t Q, const nmod_mpoly_t A,
 }
 
 int _nmod_mpoly_divides_monagan_pearce(nmod_mpoly_t Q,
-                    const mp_limb_t * coeff2, const ulong * exp2, slong len2,
-                    const mp_limb_t * coeff3, const ulong * exp3, slong len3,
+                    const ulong * coeff2, const ulong * exp2, slong len2,
+                    const ulong * coeff3, const ulong * exp3, slong len3,
                     flint_bitcnt_t bits, slong N, const ulong * cmpmask,
                                                                   nmod_t fctx);
 
@@ -991,7 +991,7 @@ typedef struct _nmod_mpoly_stripe_struct
     slong N;
     flint_bitcnt_t bits;
     nmod_t mod;
-    mp_limb_t lc_minus_inv;
+    ulong lc_minus_inv;
     const ulong * cmpmask;
     slong * startidx;
     slong * endidx;
@@ -1241,7 +1241,7 @@ void nmod_mpolyu_shift_left(nmod_mpolyu_t A, ulong s);
 int nmod_mpolyu_content_mpoly(nmod_mpoly_t g,
                            const nmod_mpolyu_t A, const nmod_mpoly_ctx_t ctx);
 
-void nmod_mpolyu_scalar_mul_nmod(nmod_mpolyu_t A, mp_limb_t c,
+void nmod_mpolyu_scalar_mul_nmod(nmod_mpolyu_t A, ulong c,
                                                   const nmod_mpoly_ctx_t ctx);
 
 void nmod_mpolyu_set(nmod_mpolyu_t A, const nmod_mpolyu_t B,
@@ -1286,7 +1286,7 @@ int nmod_mpolyu_gcdm_zippel(nmod_mpolyu_t G, nmod_mpolyu_t Abar,
                        nmod_mpolyu_t Bbar, nmod_mpolyu_t A, nmod_mpolyu_t B,
                                  nmod_mpoly_ctx_t ctx, flint_rand_t randstate);
 
-NMOD_MPOLY_INLINE mp_limb_t nmod_mpolyu_leadcoeff(
+NMOD_MPOLY_INLINE ulong nmod_mpolyu_leadcoeff(
                                    nmod_mpolyu_t A, const nmod_mpoly_ctx_t ctx)
 {
     FLINT_ASSERT(A->length > 0);
@@ -1336,7 +1336,7 @@ void nmod_mpolyn_mul_poly(nmod_mpolyn_t A, const nmod_mpolyn_t B,
 void nmod_mpoly_cvtto_mpolyn(nmod_mpolyn_t A, const nmod_mpoly_t B,
                                         slong var, const nmod_mpoly_ctx_t ctx);
 
-NMOD_MPOLY_INLINE mp_limb_t nmod_mpolyn_leadcoeff(nmod_mpolyn_t A,
+NMOD_MPOLY_INLINE ulong nmod_mpolyn_leadcoeff(nmod_mpolyn_t A,
                                                     const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     n_poly_struct * leadpoly;
@@ -1393,7 +1393,7 @@ void nmod_mpolyn_one(nmod_mpolyn_t A, const nmod_mpoly_ctx_t ctx);
 
 void nmod_mpolyun_one(nmod_mpolyun_t A, const nmod_mpoly_ctx_t ctx);
 
-mp_limb_t nmod_mpolyun_leadcoeff_last(nmod_mpolyun_t A,
+ulong nmod_mpolyun_leadcoeff_last(nmod_mpolyun_t A,
                                                    const nmod_mpoly_ctx_t ctx);
 
 void nmod_mpolyn_set_mod(nmod_mpolyn_t FLINT_UNUSED(A), const nmod_t FLINT_UNUSED(mod));
@@ -1406,10 +1406,10 @@ int nmod_mpolyun_is_nonzero_nmod(const nmod_mpolyun_t A, const nmod_mpoly_ctx_t 
 
 void nmod_mpolyn_scalar_mul_nmod(
     nmod_mpolyn_t A,
-    mp_limb_t c,
+    ulong c,
     const nmod_mpoly_ctx_t ctx);
 
-void nmod_mpolyun_scalar_mul_nmod(nmod_mpolyun_t A, mp_limb_t c,
+void nmod_mpolyun_scalar_mul_nmod(nmod_mpolyun_t A, ulong c,
                                                    const nmod_mpoly_ctx_t ctx);
 
 void nmod_mpolyn_mul_last(nmod_mpolyn_t A, n_poly_t b,
@@ -1481,7 +1481,7 @@ void nmod_mpoly_from_mpolyn_perm_inflate(nmod_mpoly_t A,
                         const nmod_mpolyn_t B, const nmod_mpoly_ctx_t nctx,
                 const slong * perm, const ulong * shift, const ulong * stride);
 
-NMOD_MPOLY_INLINE mp_limb_t nmod_mpolyun_leadcoeff(
+NMOD_MPOLY_INLINE ulong nmod_mpolyun_leadcoeff(
                                   nmod_mpolyun_t A, const nmod_mpoly_ctx_t ctx)
 {
     FLINT_ASSERT(A->length > 0);
@@ -1594,16 +1594,16 @@ int nmod_mpolyl_gcd_hensel_medprime(
 
 void _nmod_mpoly_monomial_evals_cache(n_poly_t E,
                     const ulong * Aexps, flint_bitcnt_t Abits, slong Alen,
-                    const mp_limb_t * betas, slong start, slong stop,
+                    const ulong * betas, slong start, slong stop,
                                           const mpoly_ctx_t mctx, nmod_t mod);
 
 void _nmod_mpoly_monomial_evals2_cache(n_polyun_t E,
           const ulong * Aexps, flint_bitcnt_t Abits, slong Alen,
-          const mp_limb_t * betas, slong m, const mpoly_ctx_t ctx, nmod_t mod);
+          const ulong * betas, slong m, const mpoly_ctx_t ctx, nmod_t mod);
 
 /* interp ********************************************************************/
 
-void _nmod_poly_eval2_pow(mp_limb_t * vp, mp_limb_t * vm,
+void _nmod_poly_eval2_pow(ulong * vp, ulong * vm,
                                    n_poly_t P, n_poly_t alphapow, nmod_t fctx);
 
 void nmod_mpolyn_interp_reduce_2sm_poly(n_poly_t E,
@@ -1612,7 +1612,7 @@ void nmod_mpolyn_interp_reduce_2sm_poly(n_poly_t E,
 
 void nmod_mpolyn_interp_lift_2sm_poly(slong * lastdeg_,
                        nmod_mpolyn_t F, const n_poly_t A, const n_poly_t B,
-                                  mp_limb_t alpha, const nmod_mpoly_ctx_t ctx);
+                                  ulong alpha, const nmod_mpoly_ctx_t ctx);
 
 int nmod_mpolyn_interp_crt_2sm_poly(slong * lastdeg_,
                      nmod_mpolyn_t F, nmod_mpolyn_t T, const n_poly_t A,
@@ -1632,7 +1632,7 @@ void nmod_mpolyn_interp_reduce_2sm_mpolyn(nmod_mpolyn_t E,
 
 void nmod_mpolyn_interp_lift_2sm_mpolyn(slong * lastdeg,
                       nmod_mpolyn_t T, nmod_mpolyn_t A, nmod_mpolyn_t B,
-                       slong var, mp_limb_t alpha, const nmod_mpoly_ctx_t ctx);
+                       slong var, ulong alpha, const nmod_mpoly_ctx_t ctx);
 
 int nmod_mpolyn_interp_crt_2sm_mpolyn(slong * lastdeg,
                         nmod_mpolyn_t F, nmod_mpolyn_t T, nmod_mpolyn_t A,
@@ -1640,7 +1640,7 @@ int nmod_mpolyn_interp_crt_2sm_mpolyn(slong * lastdeg,
                                n_poly_t alphapow, const nmod_mpoly_ctx_t ctx);
 
 void nmod_mpolyun_interp_reduce_sm_mpolyu(nmod_mpolyu_t B,
-               nmod_mpolyun_t A, mp_limb_t alpha, const nmod_mpoly_ctx_t ctx);
+               nmod_mpolyun_t A, ulong alpha, const nmod_mpoly_ctx_t ctx);
 
 void nmod_mpolyn_interp_lift_sm_mpoly(nmod_mpolyn_t A,
                             const nmod_mpoly_t B, const nmod_mpoly_ctx_t ctx);
@@ -1650,11 +1650,11 @@ void nmod_mpolyun_interp_lift_sm_mpolyu(nmod_mpolyun_t A,
 
 int nmod_mpolyn_interp_crt_sm_mpoly(slong * lastdeg, nmod_mpolyn_t F,
                             nmod_mpolyn_t T, nmod_mpoly_t A, n_poly_t modulus,
-                                  mp_limb_t alpha, const nmod_mpoly_ctx_t ctx);
+                                  ulong alpha, const nmod_mpoly_ctx_t ctx);
 
 int nmod_mpolyun_interp_crt_sm_mpolyu(slong * lastdeg,
              nmod_mpolyun_t F, nmod_mpolyun_t T, nmod_mpolyu_t A,
-                n_poly_t modulus, mp_limb_t alpha, const nmod_mpoly_ctx_t ctx);
+                n_poly_t modulus, ulong alpha, const nmod_mpoly_ctx_t ctx);
 
 int nmod_mpolyn_interp_mcrt_sm_mpoly(slong * lastdeg_,
                 nmod_mpolyn_t F, const nmod_mpoly_t A, const n_poly_t modulus,

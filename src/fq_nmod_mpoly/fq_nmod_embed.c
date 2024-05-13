@@ -107,7 +107,7 @@ static void _set_matrices(bad_fq_nmod_embed_t cur)
     slong n = fq_nmod_ctx_degree(cur->lgctx);
     slong i;
     n_fq_poly_t phi_as_n_fq_poly, phi_pow, q;
-    mp_limb_t ** Mrows = cur->lg_to_sm_mat->rows;
+    ulong ** Mrows = cur->lg_to_sm_mat->rows;
 
     n_fq_poly_init(phi_as_n_fq_poly);
     n_fq_poly_init(phi_pow);
@@ -159,8 +159,8 @@ void bad_fq_nmod_embed_array_init(bad_fq_nmod_embed_struct * emb,
     nmod_mat_t M, Msol;
     fq_nmod_t biggen;
     fmpz_t P;
-    mp_limb_t lc_inv;
-    mp_limb_t p = smallctx->modulus->mod.n;
+    ulong lc_inv;
+    ulong p = smallctx->modulus->mod.n;
     slong n, m = nmod_poly_degree(smallctx->modulus);
 
     /* n is the degree of the extension */
@@ -346,7 +346,7 @@ void bad_fq_nmod_embed_array_init(bad_fq_nmod_embed_struct * emb,
 /* just matrix-vector multiplication */
 void bad_n_fq_embed_lg_to_sm(
     n_fq_poly_t out,        /* poly over smctx */
-    const mp_limb_t * in,   /* element of lgctx */
+    const ulong * in,   /* element of lgctx */
     const bad_fq_nmod_embed_t emb)
 {
     slong smd = fq_nmod_ctx_degree(emb->smctx);
@@ -431,7 +431,7 @@ void bad_fq_nmod_embed_fq_nmod_lg_to_n_fq_sm(
 
 /* just matrix-vector multiplication */
 void bad_n_fq_embed_sm_to_lg(
-    mp_limb_t * out,        /* element of lgctx */
+    ulong * out,        /* element of lgctx */
     const n_fq_poly_t in,   /* poly over smctx */
     const bad_fq_nmod_embed_t emb)
 {
@@ -537,8 +537,8 @@ void bad_fq_nmod_embed_n_fq_sm_to_fq_nmod_lg(
 /**************** convert Fp[theta]/f(theta) to Fp[phi]/g(phi) ***************/
 
 void bad_n_fq_embed_sm_elem_to_lg(
-    mp_limb_t * out,
-    const mp_limb_t * in,
+    ulong * out,
+    const ulong * in,
     const bad_fq_nmod_embed_t emb)
 {
     slong smd = fq_nmod_ctx_degree(emb->smctx);
@@ -584,7 +584,7 @@ bad_fq_nmod_mpoly_embed_chooser_init(bad_fq_nmod_mpoly_embed_chooser_t embc,
 {
     nmod_poly_t ext_modulus;
     fq_nmod_ctx_t ext_fqctx;
-    mp_limb_t p = ctx->fqctx->modulus->mod.n;
+    ulong p = ctx->fqctx->modulus->mod.n;
     slong m = nmod_poly_degree(ctx->fqctx->modulus);
     slong n;
 
@@ -630,7 +630,7 @@ bad_fq_nmod_mpoly_embed_chooser_next(bad_fq_nmod_mpoly_embed_chooser_t embc,
 {
     nmod_poly_t ext_modulus;
     fq_nmod_ctx_t ext_fqctx;
-    mp_limb_t p = embc->p;
+    ulong p = embc->p;
     slong m = embc->m;
     slong n = embc->n;
 

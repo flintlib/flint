@@ -22,7 +22,7 @@ TEST_FUNCTION_START(nmod_poly_invmod, state)
     /* Aliasing c and a */
     for (i = 0; i < 500; i++)
     {
-        mp_limb_t p;
+        ulong p;
         nmod_poly_t a, b, c;
         int ans1, ans2;
 
@@ -61,7 +61,7 @@ TEST_FUNCTION_START(nmod_poly_invmod, state)
     /* Aliasing c and b */
     for (i = 0; i < 500; i++)
     {
-        mp_limb_t p;
+        ulong p;
         nmod_poly_t a, b, c;
         int ans1, ans2;
 
@@ -100,7 +100,7 @@ TEST_FUNCTION_START(nmod_poly_invmod, state)
     /* Compare with result from XGCD */
     for (i = 0; i < 1000; i++)
     {
-        mp_limb_t p;
+        ulong p;
         nmod_poly_t a, b, g, s, t, u;
         int ans;
 
@@ -152,7 +152,7 @@ TEST_FUNCTION_START(nmod_poly_invmod, state)
     /* Check correctness */
     for (i = 0; i < 1000; i++)
     {
-        mp_limb_t p;
+        ulong p;
         nmod_poly_t a, b, f, u;
         int ans;
 

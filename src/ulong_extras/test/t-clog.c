@@ -18,7 +18,7 @@ TEST_FUNCTION_START(n_clog, state)
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
-        mp_limb_t a = 0, b = 0, k, x;
+        ulong a = 0, b = 0, k, x;
 
         while (a < 1)
             a = n_randtest(state);

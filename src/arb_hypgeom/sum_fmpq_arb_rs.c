@@ -69,8 +69,8 @@ arf_get_d_log2_abs_approx_clamped(const arf_t x)
     }
     else
     {
-        mp_srcptr tp;
-        mp_size_t tn;
+        nn_srcptr tp;
+        slong tn;
         double v;
         slong e = ARF_EXP(x);
 

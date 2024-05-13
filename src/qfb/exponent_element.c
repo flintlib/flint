@@ -131,7 +131,7 @@ int qfb_exponent_element(fmpz_t exponent, qfb_t f, fmpz_t n, ulong B1, ulong B2_
    n_primes_t iter;
    ulong hi, lo;
    double quot;
-   mp_bitcnt_t bits0;
+   flint_bitcnt_t bits0;
 
    n_primes_init(iter);
 

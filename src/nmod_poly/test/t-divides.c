@@ -22,7 +22,7 @@ TEST_FUNCTION_START(nmod_poly_divides, state)
     {
         nmod_poly_t a, b, q, prod;
         int divides;
-        mp_limb_t n;
+        ulong n;
 
         do n = n_randtest_not_zero(state);
         while (!n_is_probabprime(n));
@@ -64,7 +64,7 @@ TEST_FUNCTION_START(nmod_poly_divides, state)
     {
         nmod_poly_t a, b, q, prod;
         int divides;
-        mp_limb_t n;
+        ulong n;
 
         do n = n_randtest_not_zero(state);
         while (!n_is_probabprime(n));
@@ -106,7 +106,7 @@ TEST_FUNCTION_START(nmod_poly_divides, state)
     {
         nmod_poly_t a, b, q;
         int divides1, divides2;
-        mp_limb_t n;
+        ulong n;
 
         do n = n_randtest_not_zero(state);
         while (!n_is_probabprime(n));
@@ -144,7 +144,7 @@ TEST_FUNCTION_START(nmod_poly_divides, state)
     {
         nmod_poly_t a, b, q;
         int divides1, divides2;
-        mp_limb_t n;
+        ulong n;
 
         do n = n_randtest_not_zero(state);
         while (!n_is_probabprime(n));

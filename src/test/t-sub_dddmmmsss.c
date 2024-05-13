@@ -19,7 +19,7 @@ TEST_FUNCTION_START(sub_dddmmmsss, state)
 
     for (i = 0; i < 100000 * flint_test_multiplier(); i++)
     {
-        mp_limb_t s[3], t[3], a[3], b[3];
+        ulong s[3], t[3], a[3], b[3];
 
         for (j = 0; j < 3; j++)
         {

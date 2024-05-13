@@ -37,7 +37,7 @@ static int _nmod_mpoly_quadratic_root_heap(
     mpoly_heap_t * chain;
     slong * store, * store_base;
     mpoly_heap_t * x;
-    mp_limb_t * Qcoeffs = Q->coeffs;
+    ulong * Qcoeffs = Q->coeffs;
     ulong * Qexps = Q->exps;
     ulong * exp, * exps;
     ulong ** exp_list;
@@ -345,7 +345,7 @@ int nmod_mpoly_quadratic_root(
 
     if (ctx->mod.n != 2)
     {
-        mp_limb_t c = (ctx->mod.n - 1)/2;
+        ulong c = (ctx->mod.n - 1)/2;
         nmod_mpoly_t t1, t2;
 
         nmod_mpoly_init(t1, ctx);

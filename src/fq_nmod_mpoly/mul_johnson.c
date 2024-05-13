@@ -18,8 +18,8 @@
 
 void _fq_nmod_mpoly_mul_johnson1(
     fq_nmod_mpoly_t A,
-    const mp_limb_t * Bcoeffs, const ulong * Bexps, slong Blen,
-    const mp_limb_t * Ccoeffs, const ulong * Cexps, slong Clen,
+    const ulong * Bcoeffs, const ulong * Bexps, slong Blen,
+    const ulong * Ccoeffs, const ulong * Cexps, slong Clen,
     ulong maskhi,
     const fq_nmod_ctx_t ctx)
 {
@@ -33,9 +33,9 @@ void _fq_nmod_mpoly_mul_johnson1(
     mpoly_heap_t * x;
     slong * hind;
     ulong exp;
-    mp_limb_t * t;
+    ulong * t;
     int lazy_size = _n_fq_dot_lazy_size(Blen, ctx);
-    mp_limb_t * Acoeffs = A->coeffs;
+    ulong * Acoeffs = A->coeffs;
     ulong * Aexps = A->exps;
     slong Acoeffs_alloc = A->coeffs_alloc;
     slong Aexps_alloc = A->exps_alloc;
@@ -49,7 +49,7 @@ void _fq_nmod_mpoly_mul_johnson1(
     chain = (mpoly_heap_t *) TMP_ALLOC(Blen*sizeof(mpoly_heap_t));
     store = store_base = (slong *) TMP_ALLOC(2*Blen*sizeof(slong));
     hind = (slong *) TMP_ALLOC(Blen*sizeof(slong));
-    t = (mp_limb_t *) TMP_ALLOC(6*d*sizeof(mp_limb_t));
+    t = (ulong *) TMP_ALLOC(6*d*sizeof(ulong));
 
     for (i = 0; i < Blen; i++)
         hind[i] = 1;
@@ -183,8 +183,8 @@ void _fq_nmod_mpoly_mul_johnson1(
 
 void _fq_nmod_mpoly_mul_johnson(
     fq_nmod_mpoly_t A,
-    const mp_limb_t * Bcoeffs, const ulong * Bexps, slong Blen,
-    const mp_limb_t * Ccoeffs, const ulong * Cexps, slong Clen,
+    const ulong * Bcoeffs, const ulong * Bexps, slong Blen,
+    const ulong * Ccoeffs, const ulong * Cexps, slong Clen,
     flint_bitcnt_t bits,
     slong N,
     const ulong * cmpmask,
@@ -202,9 +202,9 @@ void _fq_nmod_mpoly_mul_johnson(
     ulong ** exp_list;
     slong exp_next;
     slong * hind;
-    mp_limb_t * t;
+    ulong * t;
     int lazy_size = _n_fq_dot_lazy_size(Blen, ctx);
-    mp_limb_t * Acoeffs = A->coeffs;
+    ulong * Acoeffs = A->coeffs;
     ulong * Aexps = A->exps;
     slong Alen;
     TMP_INIT;
@@ -229,7 +229,7 @@ void _fq_nmod_mpoly_mul_johnson(
     exps = (ulong *) TMP_ALLOC(Blen*N*sizeof(ulong));
     exp_list = (ulong **) TMP_ALLOC(Blen*sizeof(ulong *));
     hind = (slong *) TMP_ALLOC(Blen*sizeof(slong));
-    t = (mp_limb_t *) TMP_ALLOC(6*d*sizeof(mp_limb_t));
+    t = (ulong *) TMP_ALLOC(6*d*sizeof(ulong));
 
     for (i = 0; i < Blen; i++)
     {

@@ -23,7 +23,7 @@ extern uint8_t __nmod_poly_ntcoeffs0[];
 #define num_nontrivialcoeffs __nmod_poly_numntcoeffs0
 #define nontrivialcoeffs __nmod_poly_ntcoeffs0
 static int
-conway_polynomial_lt_260(mp_ptr op, ulong prime, ulong deg)
+conway_polynomial_lt_260(nn_ptr op, ulong prime, ulong deg)
 {
     ulong ix, jx, kx;
     ulong numnt, sum;
@@ -113,7 +113,7 @@ extern uint16_t __nmod_poly_cp_md_coeffs1[];
 #define small_coeffs __nmod_poly_cp_sm_coeffs1
 #define big_coeffs __nmod_poly_cp_md_coeffs1
 static int
-conway_polynomial_lt_300(mp_ptr op, ulong prime, ulong deg)
+conway_polynomial_lt_300(nn_ptr op, ulong prime, ulong deg)
 {
     ulong ix = 0;
     const uint8_t * ap;
@@ -227,7 +227,7 @@ extern uint16_t __nmod_poly_cp_md_coeffs2[];
 #define small_coeffs __nmod_poly_cp_sm_coeffs2
 #define big_coeffs __nmod_poly_cp_md_coeffs2
 static int
-conway_polynomial_lt_1000(mp_ptr op, ulong prime, ulong deg)
+conway_polynomial_lt_1000(nn_ptr op, ulong prime, ulong deg)
 {
     ulong ix = 0;
     const uint8_t * ap;
@@ -317,7 +317,7 @@ extern uint16_t __nmod_poly_cp_md_coeffs3[];
 #define small_coeffs __nmod_poly_cp_sm_coeffs3
 #define big_coeffs __nmod_poly_cp_md_coeffs3
 static int
-conway_polynomial_lt_3371(mp_ptr op, ulong prime, ulong deg)
+conway_polynomial_lt_3371(nn_ptr op, ulong prime, ulong deg)
 {
     ulong ix = 0;
     const uint8_t * ap;
@@ -404,7 +404,7 @@ extern uint16_t __nmod_poly_cp_md_coeffs4[];
 #define small_coeffs __nmod_poly_cp_sm_coeffs4
 #define big_coeffs __nmod_poly_cp_md_coeffs4
 static int
-conway_polynomial_lt_11000(mp_ptr op, ulong prime, ulong deg)
+conway_polynomial_lt_11000(nn_ptr op, ulong prime, ulong deg)
 {
     ulong ix = 0;
     const uint8_t * ap;
@@ -477,7 +477,7 @@ extern uint16_t __nmod_poly_cp_md_coeffs5[];
 #define small_coeffs __nmod_poly_cp_sm_coeffs5
 #define big_coeffs __nmod_poly_cp_md_coeffs5
 static int
-conway_polynomial_lt_65536(mp_ptr op, ulong prime, ulong deg)
+conway_polynomial_lt_65536(nn_ptr op, ulong prime, ulong deg)
 {
     ulong ix = 0;
     const uint8_t * ap;
@@ -539,7 +539,7 @@ extern uint32_t __nmod_poly_cp_lg_coeffs6[];
 #define small_coeffs __nmod_poly_cp_sm_coeffs6
 #define big_coeffs __nmod_poly_cp_lg_coeffs6
 static int
-conway_polynomial_lt_109988(mp_ptr op, ulong prime, ulong deg)
+conway_polynomial_lt_109988(nn_ptr op, ulong prime, ulong deg)
 {
     ulong ix = 0;
     const uint8_t * ap;
@@ -577,7 +577,7 @@ conway_polynomial_lt_109988(mp_ptr op, ulong prime, ulong deg)
 #undef big_coeffs
 
 int
-_nmod_poly_conway(mp_ptr op, ulong prime, slong deg)
+_nmod_poly_conway(nn_ptr op, ulong prime, slong deg)
 {
     if (deg <= 0)
         return 0;

@@ -17,7 +17,7 @@
 #include "gr_poly.h"
 
 void
-_nmod_poly_inv_series_basecase_preinv1(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, mp_limb_t q, nmod_t mod)
+_nmod_poly_inv_series_basecase_preinv1(nn_ptr Qinv, nn_srcptr Q, slong Qlen, slong n, ulong q, nmod_t mod)
 {
     Qlen = FLINT_MIN(Qlen, n);
 
@@ -31,7 +31,7 @@ _nmod_poly_inv_series_basecase_preinv1(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slo
     {
         slong i, j, l;
         int nlimbs;
-        mp_limb_t s;
+        ulong s;
 
         nlimbs = _nmod_vec_dot_bound_limbs(FLINT_MIN(n, Qlen), mod);
 
@@ -49,9 +49,9 @@ _nmod_poly_inv_series_basecase_preinv1(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slo
 }
 
 void
-_nmod_poly_inv_series_basecase(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nmod_t mod)
+_nmod_poly_inv_series_basecase(nn_ptr Qinv, nn_srcptr Q, slong Qlen, slong n, nmod_t mod)
 {
-    mp_limb_t q;
+    ulong q;
 
     q = Q[0];
     if (q != 1)
@@ -61,7 +61,7 @@ _nmod_poly_inv_series_basecase(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nm
 }
 
 void
-_nmod_poly_inv_series(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nmod_t mod)
+_nmod_poly_inv_series(nn_ptr Qinv, nn_srcptr Q, slong Qlen, slong n, nmod_t mod)
 {
     Qlen = FLINT_MIN(Qlen, n);
 
@@ -138,7 +138,7 @@ nmod_poly_inv_series_basecase(nmod_poly_t Qinv, const nmod_poly_t Q, slong n)
 }
 
 void
-_nmod_poly_inv_series_newton(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nmod_t mod)
+_nmod_poly_inv_series_newton(nn_ptr Qinv, nn_srcptr Q, slong Qlen, slong n, nmod_t mod)
 {
     _nmod_poly_inv_series(Qinv, Q, Qlen, n, mod);
 }

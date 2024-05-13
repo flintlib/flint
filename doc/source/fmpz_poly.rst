@@ -308,9 +308,9 @@ Randomisation
     length is up to ``len`` and where each coefficient has up to the
     given number of bits.
 
-.. function:: void fmpz_poly_randtest_irreducible1(fmpz_poly_t pol, flint_rand_t state, slong len, mp_bitcnt_t bits)
-              void fmpz_poly_randtest_irreducible2(fmpz_poly_t pol, flint_rand_t state, slong len, mp_bitcnt_t bits)
-              void fmpz_poly_randtest_irreducible(fmpz_poly_t pol, flint_rand_t state, slong len, mp_bitcnt_t bits)
+.. function:: void fmpz_poly_randtest_irreducible1(fmpz_poly_t pol, flint_rand_t state, slong len, flint_bitcnt_t bits)
+              void fmpz_poly_randtest_irreducible2(fmpz_poly_t pol, flint_rand_t state, slong len, flint_bitcnt_t bits)
+              void fmpz_poly_randtest_irreducible(fmpz_poly_t pol, flint_rand_t state, slong len, flint_bitcnt_t bits)
 
     Sets ``p`` to a random irreducible polynomial, whose
     length is up to ``len`` and where each coefficient has up to the
@@ -586,13 +586,13 @@ Bit packing
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fmpz_poly_bit_pack(mp_ptr arr, const fmpz * poly, slong len, flint_bitcnt_t bit_size, int negate)
+.. function:: void _fmpz_poly_bit_pack(nn_ptr arr, const fmpz * poly, slong len, flint_bitcnt_t bit_size, int negate)
 
     Packs the coefficients of ``poly`` into bitfields of the given
     ``bit_size``, negating the coefficients before packing
     if ``negate`` is set to `-1`.
 
-.. function:: int _fmpz_poly_bit_unpack(fmpz * poly, slong len, mp_srcptr arr, flint_bitcnt_t bit_size, int negate)
+.. function:: int _fmpz_poly_bit_unpack(fmpz * poly, slong len, nn_srcptr arr, flint_bitcnt_t bit_size, int negate)
 
     Unpacks the polynomial of given length from the array as packed into
     fields of the given ``bit_size``, finally negating the coefficients
@@ -600,7 +600,7 @@ Bit packing
     leading term with coefficient `\pm1` should be added at
     position ``len`` of ``poly``.
 
-.. function:: void _fmpz_poly_bit_unpack_unsigned(fmpz * poly, slong len, mp_srcptr arr, flint_bitcnt_t bit_size)
+.. function:: void _fmpz_poly_bit_unpack_unsigned(fmpz * poly, slong len, nn_srcptr arr, flint_bitcnt_t bit_size)
 
     Unpacks the polynomial of given length from the array as packed into
     fields of the given ``bit_size``.  The coefficients are assumed to
@@ -1181,7 +1181,7 @@ Bit sizes and norms
     integer square root of the sum of the squares of the coefficients of
     ``poly``.
 
-.. function:: mp_limb_t _fmpz_poly_2norm_normalised_bits(const fmpz * poly, slong len)
+.. function:: ulong _fmpz_poly_2norm_normalised_bits(const fmpz * poly, slong len)
 
     Returns an upper bound on the number of bits of the normalised
     Euclidean norm of ``(poly, len)``, i.e. the number of bits of
@@ -2283,14 +2283,14 @@ Evaluation
     Evaluates the polynomial `f` at the rational `a`, and
     sets ``res`` to the result.
 
-.. function:: mp_limb_t _fmpz_poly_evaluate_mod(const fmpz * poly, slong len, mp_limb_t a, mp_limb_t n, mp_limb_t ninv)
+.. function:: ulong _fmpz_poly_evaluate_mod(const fmpz * poly, slong len, ulong a, ulong n, ulong ninv)
 
     Evaluates ``(poly, len)`` at the value `a` modulo `n` and
     returns the result.  The last argument ``ninv`` must be set
     to the precomputed inverse of `n`, which can be obtained using
     the function :func:`n_preinvert_limb`.
 
-.. function:: mp_limb_t fmpz_poly_evaluate_mod(const fmpz_poly_t poly, mp_limb_t a, mp_limb_t n)
+.. function:: ulong fmpz_poly_evaluate_mod(const fmpz_poly_t poly, ulong a, ulong n)
 
     Evaluates ``poly`` at the value `a` modulo `n` and returns the result.
 
@@ -3087,7 +3087,7 @@ Modular reduction and reconstruction
     Sets the coefficients of ``A`` to the residues in ``Amod``,
     normalised to the interval `0 \le r < m` where `m` is the modulus.
 
-.. function:: void _fmpz_poly_CRT_ui_precomp(fmpz * res, const fmpz * poly1, slong len1, const fmpz_t m1, mp_srcptr poly2, slong len2, mp_limb_t m2, mp_limb_t m2inv, fmpz_t m1m2, mp_limb_t c, int sign)
+.. function:: void _fmpz_poly_CRT_ui_precomp(fmpz * res, const fmpz * poly1, slong len1, const fmpz_t m1, nn_srcptr poly2, slong len2, ulong m2, ulong m2inv, fmpz_t m1m2, ulong c, int sign)
 
     Sets the coefficients in ``res`` to the CRT reconstruction modulo
     `m_1m_2` of the residues ``(poly1, len1)`` and ``(poly2, len2)``
@@ -3103,7 +3103,7 @@ Modular reduction and reconstruction
     Coefficients of ``res`` are written up to the maximum of
     ``len1`` and ``len2``.
 
-.. function:: void _fmpz_poly_CRT_ui(fmpz * res, const fmpz * poly1, slong len1, const fmpz_t m1, mp_srcptr poly2, slong len2, mp_limb_t m2, mp_limb_t m2inv, int sign)
+.. function:: void _fmpz_poly_CRT_ui(fmpz * res, const fmpz * poly1, slong len1, const fmpz_t m1, nn_srcptr poly2, slong len2, ulong m2, ulong m2inv, int sign)
 
     This function is identical to ``_fmpz_poly_CRT_ui_precomp``,
     apart from automatically computing `m_1m_2` and `c`. It also
@@ -3206,7 +3206,7 @@ Minimal polynomials
 --------------------------------------------------------------------------------
 
 
-.. function:: void _fmpz_poly_cyclotomic(fmpz * a, ulong n, mp_ptr factors, slong num_factors, ulong phi)
+.. function:: void _fmpz_poly_cyclotomic(fmpz * a, ulong n, nn_ptr factors, slong num_factors, ulong phi)
 
     Sets ``a`` to the lower half of the cyclotomic polynomial `\Phi_n(x)`,
     given `n \ge 3` which must be squarefree.

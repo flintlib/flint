@@ -20,7 +20,7 @@ TEST_FUNCTION_START(nmod_mat_nullspace, state)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_mat_t A, B, ker;
-        mp_limb_t mod;
+        ulong mod;
         slong m, n, d, r, nullity, nulrank;
 
         m = n_randint(state, 30);

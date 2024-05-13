@@ -118,7 +118,7 @@ int fmpz_mpoly_q_set_str_pretty(fmpz_mpoly_q_t res, const char * s, const char *
 
 /* Random generation */
 
-void fmpz_mpoly_q_randtest(fmpz_mpoly_q_t res, flint_rand_t state, slong length, mp_limb_t coeff_bits, slong exp_bound, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_q_randtest(fmpz_mpoly_q_t res, flint_rand_t state, slong length, ulong coeff_bits, slong exp_bound, const fmpz_mpoly_ctx_t ctx);
 
 /* Comparisons */
 

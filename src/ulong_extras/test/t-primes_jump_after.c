@@ -24,7 +24,7 @@ TEST_FUNCTION_START(n_primes_jump_after, state)
 
         for (k = 0; k < 10 * flint_test_multiplier(); k++)
         {
-            mp_limb_t p, q;
+            ulong p, q;
 
             q = n_randint(state, UWORD(1000000000));
 

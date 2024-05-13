@@ -60,11 +60,11 @@ acb_hypgeom_rising_ui_jet_powsum(acb_ptr res, const acb_t x, ulong n, slong len,
 
     if (n <= 12 || (FLINT_BITS == 64 && n <= 20))
     {
-        mp_ptr c;
+        nn_ptr c;
         TMP_START;
 
         wp = ARF_PREC_ADD(prec, FLINT_BIT_COUNT(n));
-        c = TMP_ALLOC(sizeof(mp_limb_t) * (n + 1) * len);
+        c = TMP_ALLOC(sizeof(ulong) * (n + 1) * len);
 
         _nmod_vec_zero(c, (n + 1) * len);
 

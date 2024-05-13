@@ -18,7 +18,7 @@
    Divide (arrayg, limbsg) by the positive value gc in-place and
    return the number of limbs written
 */
-mp_size_t flint_mpn_tdiv_q_fmpz_inplace(mp_ptr arrayg, mp_size_t limbsg, fmpz_t gc)
+slong flint_mpn_tdiv_q_fmpz_inplace(nn_ptr arrayg, slong limbsg, fmpz_t gc)
 {
    if (fmpz_size(gc) == 1)
    {
@@ -27,10 +27,10 @@ mp_size_t flint_mpn_tdiv_q_fmpz_inplace(mp_ptr arrayg, mp_size_t limbsg, fmpz_t 
    }
 	else
    {
-      mp_size_t tlimbs;
+      slong tlimbs;
       mpz_ptr mgc = COEFF_TO_PTR(*gc);
 
-      mp_ptr temp = flint_malloc(limbsg*sizeof(mp_limb_t));
+      nn_ptr temp = flint_malloc(limbsg*sizeof(ulong));
       flint_mpn_copyi(temp, arrayg, limbsg);
 
       mpn_tdiv_q(arrayg, temp, limbsg, mgc->_mp_d, mgc->_mp_size);
@@ -75,7 +75,7 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, slong len1,
    slong sign1, sign2, glen, qlen, qlen2;
 	fmpz_t ac, bc, d, gc;
    fmpz * A, * B, * G, * Q, * t;
-   mp_ptr array1, array2, arrayg, q, temp;
+   nn_ptr array1, array2, arrayg, q, temp;
    int divides;
 
    fmpz_init(ac);
@@ -159,9 +159,9 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, slong len1,
    /* allocate space to pack into */
    limbs1 = (pack_bits*len1 - 1)/FLINT_BITS + 1;
    limbs2 = (pack_bits*len2 - 1)/FLINT_BITS + 1;
-	array1 = flint_calloc(limbs1, sizeof(mp_limb_t));
-   array2 = flint_calloc(limbs2, sizeof(mp_limb_t));
-   arrayg = flint_calloc(limbs2, sizeof(mp_limb_t));
+	array1 = flint_calloc(limbs1, sizeof(ulong));
+   array2 = flint_calloc(limbs2, sizeof(ulong));
+   arrayg = flint_calloc(limbs2, sizeof(ulong));
 
    /* pack first poly and normalise */
    sign1 = (slong) fmpz_sgn(A + len1 - 1);
@@ -206,8 +206,8 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, slong len1,
    qlimbs2 = limbs2 - limbsg + 1;
    qlen2 = FLINT_MIN(len2, (slong) ((qlimbs2 * FLINT_BITS) / pack_bits) + 1);
    qlimbs = (FLINT_MAX(qlen, qlen2)*pack_bits - 1)/FLINT_BITS + 1;
-   q = flint_calloc(qlimbs, sizeof(mp_limb_t));
-   temp = flint_malloc(limbsg*sizeof(mp_limb_t));
+   q = flint_calloc(qlimbs, sizeof(ulong));
+   temp = flint_malloc(limbsg*sizeof(ulong));
 	divides = 0;
 
    if (flint_mpn_divides(q, array1, limbs1, arrayg, limbsg, temp))

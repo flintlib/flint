@@ -42,9 +42,9 @@ fmpz_get_d_2exp(slong * exp, const fmpz_t f)
         *exp = FLINT_BIT_COUNT(d_abs);
 
         if (d < WORD(0))
-            return flint_mpn_get_d((mp_limb_t *) &d_abs, WORD(1), WORD(-1), -*exp);
+            return flint_mpn_get_d((ulong *) &d_abs, WORD(1), WORD(-1), -*exp);
         else
-            return flint_mpn_get_d((mp_limb_t *) &d, WORD(1), WORD(1), -*exp);
+            return flint_mpn_get_d((ulong *) &d, WORD(1), WORD(1), -*exp);
     }
     else
     {
@@ -74,7 +74,7 @@ fmpz_get_d(const fmpz_t f)
     }
     else if (!COEFF_IS_MPZ(c))
     {
-        mp_limb_t d;
+        ulong d;
 
         if (c > 0)
         {
@@ -114,13 +114,13 @@ fmpz_get_mpfr(mpfr_t x, const fmpz_t f, mpfr_rnd_t rnd)
 }
 
 int
-fmpz_get_mpn(mp_ptr *n, fmpz_t n_in)
+fmpz_get_mpn(nn_ptr *n, fmpz_t n_in)
 {
-    mp_limb_t n_size;
-    mp_ptr temp;
+    ulong n_size;
+    nn_ptr temp;
 
     n_size = fmpz_size(n_in);
-    *n = flint_malloc(n_size * sizeof(mp_limb_t));
+    *n = flint_malloc(n_size * sizeof(ulong));
 
     if (n_size <= 1)
     {
@@ -144,10 +144,10 @@ fmpz_get_mpz(mpz_t x, const fmpz_t f)
         mpz_set(x, COEFF_TO_PTR(*f));   /* set x to large value */
 }
 
-mp_limb_t fmpz_get_nmod(const fmpz_t aa, nmod_t mod)
+ulong fmpz_get_nmod(const fmpz_t aa, nmod_t mod)
 {
     fmpz A = *aa;
-    mp_limb_t r, SA, UA;
+    ulong r, SA, UA;
 
     if (!COEFF_IS_MPZ(A))
     {
@@ -158,7 +158,7 @@ mp_limb_t fmpz_get_nmod(const fmpz_t aa, nmod_t mod)
     else
     {
         mpz_srcptr a = COEFF_TO_PTR(A);
-        mp_srcptr ad = a->_mp_d;
+        nn_srcptr ad = a->_mp_d;
         slong an = a->_mp_size;
 
         if (an < 0)
@@ -195,7 +195,7 @@ fmpz_get_si(const fmpz_t f)
     return (!COEFF_IS_MPZ(*f) ? *f : flint_mpz_get_si(COEFF_TO_PTR(*f)));
 }
 
-void fmpz_get_signed_ui_array(mp_limb_t * r, slong n, const fmpz_t x)
+void fmpz_get_signed_ui_array(ulong * r, slong n, const fmpz_t x)
 {
     int neg;
     slong i, sz;
@@ -225,7 +225,7 @@ void fmpz_get_signed_ui_array(mp_limb_t * r, slong n, const fmpz_t x)
         mpn_neg(r, r, n);
 }
 
-void fmpz_get_signed_uiui(mp_limb_t * hi, mp_limb_t * lo, const fmpz_t x)
+void fmpz_get_signed_uiui(ulong * hi, ulong * lo, const fmpz_t x)
 {
     ulong r0, r1, s;
 

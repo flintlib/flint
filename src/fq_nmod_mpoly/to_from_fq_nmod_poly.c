@@ -31,7 +31,7 @@ void _fq_nmod_mpoly_to_fq_nmod_poly_deflate(
     ulong mask;
     slong i, shift, off, N;
     slong len = B->length;
-    mp_limb_t * coeff = B->coeffs;
+    ulong * coeff = B->coeffs;
     ulong * exp = B->exps;
     ulong var_shift, var_stride;
     flint_bitcnt_t bits = B->bits;

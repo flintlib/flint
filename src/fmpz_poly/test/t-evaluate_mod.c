@@ -24,7 +24,7 @@ TEST_FUNCTION_START(fmpz_poly_evaluate_mod, state)
     {
         fmpz_t b, s;
         fmpz_poly_t f;
-        mp_limb_t a, n, r;
+        ulong a, n, r;
 
         fmpz_poly_init(f);
         fmpz_poly_randtest(f, state, n_randint(state, 10), 20);

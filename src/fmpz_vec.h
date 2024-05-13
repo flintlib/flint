@@ -90,7 +90,7 @@ slong _fmpz_vec_max_bits_ref(const fmpz * vec, slong len);
 void _fmpz_vec_sum_max_bits(slong * sumabs, slong * maxabs,
                                             const fmpz * coeffs, slong length);
 
-mp_size_t _fmpz_vec_max_limbs(const fmpz * vec, slong len);
+slong _fmpz_vec_max_limbs(const fmpz * vec, slong len);
 
 void _fmpz_vec_height(fmpz_t height, const fmpz * vec, slong len);
 
@@ -111,16 +111,16 @@ int _fmpz_vec_read(fmpz ** vec, slong * len);
 /*  Conversions  *************************************************************/
 
 void _fmpz_vec_set_nmod_vec(fmpz * res,
-                                       mp_srcptr poly, slong len, nmod_t mod);
+                                       nn_srcptr poly, slong len, nmod_t mod);
 
-void _fmpz_vec_get_nmod_vec(mp_ptr res,
+void _fmpz_vec_get_nmod_vec(nn_ptr res,
                                     const fmpz * poly, slong len, nmod_t mod);
 
-void _fmpz_vec_get_fft(mp_limb_t ** coeffs_f,
+void _fmpz_vec_get_fft(ulong ** coeffs_f,
                                  const fmpz * coeffs_m, slong l, slong length);
 
 void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length,
-                               const mp_ptr * coeffs_f, slong limbs, slong sign);
+                               const nn_ptr * coeffs_f, slong limbs, slong sign);
 
 slong _fmpz_vec_get_d_vec_2exp(double * appv, const fmpz * vec, slong len);
 

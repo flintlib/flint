@@ -14,7 +14,7 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-int n_is_perfect_power235(mp_limb_t n)
+int n_is_perfect_power235(ulong n)
 {
     static unsigned char mod63[63] = {7,7,4,0,5,4,0,5,6,5,4,4,0,4,4,0,5,4,5,4,
                               4,0,5,4,0,5,4,6,7,4,0,4,4,0,4,6,7,5,4,0,4,4,0,5,
@@ -43,21 +43,21 @@ int n_is_perfect_power235(mp_limb_t n)
     if (t & 1)
     {
         double x = sqrt((double) n);
-        mp_limb_t y = (mp_limb_t) (x + 0.5);
+        ulong y = (ulong) (x + 0.5);
         if (n == n_pow(y, 2)) return 1;
     }
 
     if (t & 2)
     {
         double x = pow((double) n, 1.0 / 3.0);
-        mp_limb_t y = (mp_limb_t) (x + 0.5);
+        ulong y = (ulong) (x + 0.5);
         if (n == n_pow(y, 3)) return 1;
     }
 
     if (t & 4)
     {
         double x = pow((double) n, 1.0 / 5.0);
-        mp_limb_t y = (mp_limb_t) (x + 0.5);
+        ulong y = (ulong) (x + 0.5);
         if (n == n_pow(y, 5)) return 1;
     }
 

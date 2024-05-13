@@ -16,7 +16,7 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_pow_trunc(mp_ptr res, mp_srcptr poly,
+_nmod_poly_pow_trunc(nn_ptr res, nn_srcptr poly,
                                        ulong e, slong trunc, nmod_t mod)
 {
     _nmod_poly_pow_trunc_binexp(res, poly, e, trunc, mod);
@@ -27,7 +27,7 @@ nmod_poly_pow_trunc(nmod_poly_t res,
                            const nmod_poly_t poly, ulong e, slong trunc)
 {
     const slong len = poly->length;
-    mp_ptr p;
+    nn_ptr p;
     int pcopy = 0;
 
     if (len < 2 || e < UWORD(3) || trunc == 0)
@@ -90,12 +90,12 @@ nmod_poly_pow_trunc(nmod_poly_t res,
 }
 
 void
-_nmod_poly_pow_trunc_binexp(mp_ptr res, mp_srcptr poly,
+_nmod_poly_pow_trunc_binexp(nn_ptr res, nn_srcptr poly,
                                 ulong e, slong trunc, nmod_t mod)
 {
     ulong bit = ~((~UWORD(0)) >> 1);
-    mp_ptr v = _nmod_vec_init(trunc);
-    mp_ptr R, S, T;
+    nn_ptr v = _nmod_vec_init(trunc);
+    nn_ptr R, S, T;
 
     /*
        Set bits to the bitmask with a 1 one place lower than the msb of e
@@ -169,7 +169,7 @@ nmod_poly_pow_trunc_binexp(nmod_poly_t res,
                            const nmod_poly_t poly, ulong e, slong trunc)
 {
     const slong len = poly->length;
-    mp_ptr p;
+    nn_ptr p;
     int pcopy = 0;
 
     if (len < 2 || e < UWORD(3) || trunc == 0)

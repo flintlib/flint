@@ -17,22 +17,22 @@
 
 /* solve z^2+z=c */
 static int _quadratic_root_const(
-    mp_limb_t * z,
-    const mp_limb_t * c,
+    ulong * z,
+    const ulong * c,
     const fq_nmod_ctx_t fqctx)
 {
     slong i, d = fq_nmod_ctx_degree(fqctx);
-    mp_limb_t * t, * p, * u, * cp, * ut, * up, * ct;
+    ulong * t, * p, * u, * cp, * ut, * up, * ct;
     int success;
     TMP_INIT;
 #if FLINT_WANT_ASSERT
-    mp_limb_t * c_org = FLINT_ARRAY_ALLOC(d, mp_limb_t);
+    ulong * c_org = FLINT_ARRAY_ALLOC(d, ulong);
     _n_fq_set(c_org, c, d);
 #endif
 
     TMP_START;
     i = FLINT_MAX(N_FQ_REDUCE_ITCH, N_FQ_MUL_INV_ITCH);
-    t = (mp_limb_t *) TMP_ALLOC((i + 7)*d*sizeof(mp_limb_t));
+    t = (ulong *) TMP_ALLOC((i + 7)*d*sizeof(ulong));
     p = t + d*i;
     u = p + d*2;
     ut = u + d;
@@ -94,8 +94,8 @@ static int _quadratic_root_const(
 */
 static int _fq_nmod_mpoly_quadratic_root_heap(
     fq_nmod_mpoly_t Q,
-    const mp_limb_t * Acoeffs, const ulong * Aexps, slong Alen,
-    const mp_limb_t * Bcoeffs, const ulong * Bexps, slong Blen,
+    const ulong * Acoeffs, const ulong * Aexps, slong Alen,
+    const ulong * Bcoeffs, const ulong * Bexps, slong Blen,
     slong bits,
     slong N,
     const ulong * cmpmask,
@@ -109,13 +109,13 @@ static int _fq_nmod_mpoly_quadratic_root_heap(
     mpoly_heap_t * chain;
     slong * store, * store_base;
     mpoly_heap_t * x;
-    mp_limb_t * Qcoeffs = Q->coeffs;
+    ulong * Qcoeffs = Q->coeffs;
     ulong * Qexps = Q->exps;
     ulong * exp, * exps;
     ulong ** exp_list;
     slong exp_next;
     ulong mask;
-    mp_limb_t * t, * c, * lcAinv;
+    ulong * t, * c, * lcAinv;
     int mcmp;
     TMP_INIT;
 
@@ -124,7 +124,7 @@ static int _fq_nmod_mpoly_quadratic_root_heap(
 
     TMP_START;
 
-    t = (mp_limb_t *) TMP_ALLOC(8*d*sizeof(mp_limb_t));
+    t = (ulong *) TMP_ALLOC(8*d*sizeof(ulong));
     c = t + 6*d;
     lcAinv = c + d;
     _n_fq_inv(lcAinv, Acoeffs + d*0, fqctx, t);
@@ -187,7 +187,7 @@ static int _fq_nmod_mpoly_quadratic_root_heap(
                 }
                 else
                 {
-                    const mp_limb_t * s = (x->i == -UWORD(2)) ?
+                    const ulong * s = (x->i == -UWORD(2)) ?
                                            Qcoeffs + d*x->j : Acoeffs + d*x->i;
                     FLINT_ASSERT(x->j < Qlen);
                     FLINT_ASSERT(x->i == -UWORD(2) || x->i < Alen);
@@ -456,7 +456,7 @@ int fq_nmod_mpoly_quadratic_root(
 
     if (ctx->fqctx->mod.n != 2)
     {
-        mp_limb_t mhalf = (ctx->fqctx->mod.n - 1)/2;
+        ulong mhalf = (ctx->fqctx->mod.n - 1)/2;
         fq_nmod_mpoly_t t1, t2;
         fq_nmod_t c;
 

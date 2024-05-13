@@ -33,7 +33,7 @@ void _fq_nmod_mpoly_compose_mat(
     flint_bitcnt_t Bbits = B->bits;
     slong BN = mpoly_words_per_exp(Bbits, ctxB->minfo);
     const ulong * Bexp = B->exps;
-    const mp_limb_t * Bcoeffs = B->coeffs;
+    const ulong * Bcoeffs = B->coeffs;
     slong AN;
 
     FLINT_ASSERT(A != B);

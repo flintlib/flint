@@ -73,10 +73,10 @@ partitions_fmpz_fmpz_hrr(fmpz_t p, const fmpz_t n, int use_doubles)
 
 /* To compute p(n) mod 2^64. */
 static void
-partitions_vec(mp_ptr v, slong len)
+partitions_vec(nn_ptr v, slong len)
 {
     slong i, j, n;
-    mp_limb_t p;
+    ulong p;
 
     for (n = 0; n < FLINT_MIN(len, NUMBER_OF_SMALL_PARTITIONS); n++)
         v[n] = partitions_lookup[n];
@@ -108,7 +108,7 @@ _partitions_fmpz_ui(fmpz_t res, ulong n, int use_doubles)
     }
     else if (FLINT_BITS == 64 && (n < 500 || (!use_doubles && n < 1200)))
     {
-        mp_ptr tmp = flint_malloc((n + 1) * sizeof(mp_limb_t));
+        nn_ptr tmp = flint_malloc((n + 1) * sizeof(ulong));
 
         if (n < 417)  /* p(n) < 2^64 */
         {

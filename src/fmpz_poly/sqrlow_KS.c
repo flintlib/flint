@@ -19,7 +19,7 @@ void _fmpz_poly_sqrlow_KS(fmpz * res, const fmpz * poly, slong len, slong n)
 {
     int neg;
     slong bits, limbs, loglen, sign = 0;
-    mp_limb_t *arr_in, *arr_out;
+    ulong *arr_in, *arr_out;
 
     len = FLINT_MIN(len, n);
 
@@ -50,8 +50,8 @@ void _fmpz_poly_sqrlow_KS(fmpz * res, const fmpz * poly, slong len, slong n)
     bits   = 2 * bits + loglen + sign;
     limbs  = (bits * len - 1) / FLINT_BITS + 1;
 
-    arr_in  = flint_calloc(limbs, sizeof(mp_limb_t));
-    arr_out = flint_malloc((2 * limbs) * sizeof(mp_limb_t));
+    arr_in  = flint_calloc(limbs, sizeof(ulong));
+    arr_out = flint_malloc((2 * limbs) * sizeof(ulong));
 
     _fmpz_poly_bit_pack(arr_in, poly, len, bits, neg);
 

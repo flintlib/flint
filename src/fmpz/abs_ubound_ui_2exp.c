@@ -13,10 +13,10 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-mp_limb_t
+ulong
 fmpz_abs_ubound_ui_2exp(slong * exp, const fmpz_t x, int bits)
 {
-    mp_limb_t m;
+    ulong m;
     slong shift, e, size;
     fmpz c = *x;
 
@@ -54,7 +54,7 @@ fmpz_abs_ubound_ui_2exp(slong * exp, const fmpz_t x, int bits)
             else
             {
                 /* read a second limb to get an accurate value */
-                mp_limb_t m2 = z->_mp_d[size - 2];
+                ulong m2 = z->_mp_d[size - 2];
                 m = (m << (-shift)) | (m2 >> (FLINT_BITS + shift));
                 /* round up */
                 m++;

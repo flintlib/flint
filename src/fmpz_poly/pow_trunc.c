@@ -147,7 +147,7 @@ fmpz_poly_pow_trunc(fmpz_poly_t res, const fmpz_poly_t poly, ulong e, slong n)
         copy = (fmpz *) flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < poly->length; i++)
             copy[i] = poly->coeffs[i];
-        flint_mpn_zero((mp_ptr) copy + poly->length, n - poly->length);
+        flint_mpn_zero((nn_ptr) copy + poly->length, n - poly->length);
         clear = 1;
     }
 

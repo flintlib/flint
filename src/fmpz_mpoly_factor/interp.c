@@ -128,7 +128,7 @@ void fmpz_mpoly_interp_reduce_p_mpolyn(
     slong N = mpoly_words_per_exp_sp(A->bits, ctx->minfo);
     slong offset, shift, k;
     ulong mask;
-    mp_limb_t v;
+    ulong v;
     fmpz * Acoeff = A->coeffs;
     ulong * Aexp = A->exps;
     slong Alen = A->length;

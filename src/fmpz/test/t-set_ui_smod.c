@@ -20,7 +20,7 @@ TEST_FUNCTION_START(fmpz_set_ui_smod, state)
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b, mz;
-        mp_limb_t m, r;
+        ulong m, r;
 
         fmpz_init(a);
         fmpz_init(b);

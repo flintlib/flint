@@ -13,7 +13,7 @@
 #include "thread_support.h"
 #include "mpn_extras.h"
 
-#define TMP_ALLOC_LIMBS(__n) TMP_ALLOC((__n) * sizeof(mp_limb_t))
+#define TMP_ALLOC_LIMBS(__n) TMP_ALLOC((__n) * sizeof(ulong))
 
 void
 arb_exp_arf_huge(arb_t z, const arf_t x, slong mag, slong prec, int minus_one)
@@ -180,8 +180,8 @@ arb_exp_arf(arb_t z, const arf_t x, slong prec, int minus_one, slong maglim)
     {
         slong exp, wp, wn, N, r, wprounded, finaln;
         fmpz_t n;
-        mp_ptr tmp, w, t, u, finalvalue;
-        mp_limb_t p1, q1bits, p2, q2bits, error, error2;
+        nn_ptr tmp, w, t, u, finalvalue;
+        ulong p1, q1bits, p2, q2bits, error, error2;
         int negative, inexact;
         TMP_INIT;
 

@@ -25,8 +25,8 @@ void _fmpz_poly_resultant_modular(fmpz_t res, const fmpz * poly1, slong len1,
     fmpz_comb_temp_t comb_temp;
     fmpz_t ac, bc, l, modulus;
     fmpz * A, * B, * lead_A, * lead_B;
-    mp_ptr a, b, rarr, parr;
-    mp_limb_t p;
+    nn_ptr a, b, rarr, parr;
+    ulong p;
     nmod_t mod;
 
     /* special case, one of the polys is a constant */

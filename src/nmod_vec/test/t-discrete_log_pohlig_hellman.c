@@ -25,7 +25,7 @@ TEST_FUNCTION_START(nmod_vec_discrete_log_pohlig_hellman, state)
         {
             double score;
             nmod_t fpctx;
-            mp_limb_t p;
+            ulong p;
 
             p = n_randtest_prime(state, 1);
             nmod_init(&fpctx, p);
@@ -38,7 +38,7 @@ TEST_FUNCTION_START(nmod_vec_discrete_log_pohlig_hellman, state)
             for (k = 0; k < 10; k++)
             {
                 ulong x;
-                mp_limb_t y, alpha = nmod_discrete_log_pohlig_hellman_primitive_root(L);
+                ulong y, alpha = nmod_discrete_log_pohlig_hellman_primitive_root(L);
 
                 x = n_urandint(state, p - 1);
                 y = nmod_pow_ui(alpha, x, fpctx);

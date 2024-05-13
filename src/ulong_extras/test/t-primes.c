@@ -19,7 +19,7 @@ TEST_FUNCTION_START(n_primes, state)
     /* compare with n_nextprime */
     {
         n_primes_t iter;
-        mp_limb_t p, q;
+        ulong p, q;
 
         n_primes_init(iter);
         q = 0;

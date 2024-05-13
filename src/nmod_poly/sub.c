@@ -15,7 +15,7 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_sub(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2,
+_nmod_poly_sub(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2,
                slong len2, nmod_t mod)
 {
     slong i, min = FLINT_MIN(len1, len2);

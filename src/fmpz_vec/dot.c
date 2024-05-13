@@ -79,18 +79,18 @@ _fmpz_vec_dot_general_naive(fmpz_t res, const fmpz_t initial,
     do { \
         if ((an) == 0) \
         { \
-            FLINT_SWAP(mp_ptr, s, b); \
+            FLINT_SWAP(nn_ptr, s, b); \
             (sn) = (bn); \
         } \
         else if ((an) >= (bn)) \
         { \
-            mp_limb_t __cy; \
+            ulong __cy; \
             (s)[(an)] = __cy = mpn_add((s), (a), (an), (b), (bn)); \
             (sn) = (an) + (__cy != 0); \
         } \
         else \
         { \
-            mp_limb_t __cy; \
+            ulong __cy; \
             (s)[(bn)] = __cy = mpn_add((s), (b), (bn), (a), (an)); \
             (sn) = (bn) + (__cy != 0); \
         } \
@@ -99,7 +99,7 @@ _fmpz_vec_dot_general_naive(fmpz_t res, const fmpz_t initial,
 /* (s,sn) = (s,sn) + (a,an) * b. Allows sn == 0 but not an == 0. */
 #define MPN_ADDMUL_1(s, sn, a, an, b) \
     do { \
-        mp_limb_t __cy; \
+        ulong __cy; \
         if ((sn) >= (an)) \
         { \
             FLINT_ASSERT((an) != 0); \
@@ -123,7 +123,7 @@ _fmpz_vec_dot_general_naive(fmpz_t res, const fmpz_t initial,
 
 
 FLINT_STATIC_NOINLINE
-void _fmpz_set_mpn(fmpz_t res, mp_srcptr x, mp_size_t xn, int neg)
+void _fmpz_set_mpn(fmpz_t res, nn_srcptr x, slong xn, int neg)
 {
     if (xn <= 1 && x[0] <= COEFF_MAX)
     {
@@ -140,27 +140,27 @@ void
 _fmpz_vec_dot_general(fmpz_t res, const fmpz_t initial, int subtract,
             const fmpz * a, const fmpz * b, int reverse, slong len)
 {
-    mp_limb_t tmp1[INITIAL_ALLOC + 2];
-    mp_limb_t tmp2[INITIAL_ALLOC + 2];
-    mp_limb_t tmp3[INITIAL_ALLOC + 2];
-    mp_size_t alloc = INITIAL_ALLOC;
-    mp_size_t new_alloc;
+    ulong tmp1[INITIAL_ALLOC + 2];
+    ulong tmp2[INITIAL_ALLOC + 2];
+    ulong tmp3[INITIAL_ALLOC + 2];
+    slong alloc = INITIAL_ALLOC;
+    slong new_alloc;
 
     /* We maintain separate sums for small terms, large positive terms,
        and large negative terms, the idea being to have fewer
        adjustments in the main loop in exchange for some added
        complexity combining things in the end. Should profile
        alternative strategies. */
-    mp_limb_t s0 = 0, s1 = 0, s2 = 0;
-    mp_ptr neg = tmp1;
-    mp_ptr pos = tmp2;
-    mp_size_t posn = 0, negn = 0;
+    ulong s0 = 0, s1 = 0, s2 = 0;
+    nn_ptr neg = tmp1;
+    nn_ptr pos = tmp2;
+    slong posn = 0, negn = 0;
 
     /* Temporary space for products. */
-    mp_ptr t = tmp3;
-    mp_size_t tn;
+    nn_ptr t = tmp3;
+    slong tn;
 
-    mp_ptr tmp_heap = NULL;
+    nn_ptr tmp_heap = NULL;
 
     slong i;
 
@@ -199,9 +199,9 @@ _fmpz_vec_dot_general(fmpz_t res, const fmpz_t initial, int subtract,
     if (initial != NULL)
     {
         fmpz ca;
-        mp_limb_t atmp;
-        mp_srcptr ap;
-        mp_size_t an;
+        ulong atmp;
+        nn_srcptr ap;
+        slong an;
         int aneg;
 
         ca = *initial;
@@ -222,7 +222,7 @@ _fmpz_vec_dot_general(fmpz_t res, const fmpz_t initial, int subtract,
             {
                 new_alloc = an + 4;
 
-                tmp_heap = flint_malloc(3 * (new_alloc + 2) * sizeof(mp_limb_t));
+                tmp_heap = flint_malloc(3 * (new_alloc + 2) * sizeof(ulong));
 
                 t = tmp_heap;
                 pos = t + (new_alloc + 2);
@@ -247,10 +247,10 @@ _fmpz_vec_dot_general(fmpz_t res, const fmpz_t initial, int subtract,
     for (i = 0; i < len; i++)
     {
         fmpz ca, cb;
-        mp_limb_t atmp, btmp;
-        mp_srcptr ap, bp;
-        mp_size_t an, bn;
-        mp_limb_t cy;
+        ulong atmp, btmp;
+        nn_srcptr ap, bp;
+        slong an, bn;
+        ulong cy;
         int aneg, bneg;
 
         ca = a[i];
@@ -263,7 +263,7 @@ _fmpz_vec_dot_general(fmpz_t res, const fmpz_t initial, int subtract,
 
         if (!COEFF_IS_MPZ(ca) && !COEFF_IS_MPZ(cb))
         {
-            mp_limb_t hi, lo;
+            ulong hi, lo;
             smul_ppmm(hi, lo, ca, cb);
             add_sssaaaaaa(s2, s1, s0, s2, s1, s0, FLINT_SIGN_EXT(hi), hi, lo);
             continue;
@@ -275,11 +275,11 @@ _fmpz_vec_dot_general(fmpz_t res, const fmpz_t initial, int subtract,
 
         if (tn > alloc)
         {
-            mp_ptr p1, p2, p3;
+            nn_ptr p1, p2, p3;
 
             new_alloc = FLINT_MAX(3 * alloc / 2, tn + 4);
 
-            p1 = flint_malloc(3 * (new_alloc + 2) * sizeof(mp_limb_t));
+            p1 = flint_malloc(3 * (new_alloc + 2) * sizeof(ulong));
             p2 = p1 + (new_alloc + 2);
             p3 = p2 + (new_alloc + 2);
 
@@ -289,7 +289,7 @@ _fmpz_vec_dot_general(fmpz_t res, const fmpz_t initial, int subtract,
             pos = p2;
             neg = p3;
 
-            FLINT_SWAP(mp_ptr, tmp_heap, p1);
+            FLINT_SWAP(nn_ptr, tmp_heap, p1);
 
             if (p1 != NULL)
                 flint_free(p1);
@@ -299,13 +299,13 @@ _fmpz_vec_dot_general(fmpz_t res, const fmpz_t initial, int subtract,
 
         if (an < bn)
         {
-            FLINT_SWAP(mp_srcptr, ap, bp);
-            FLINT_SWAP(mp_size_t, an, bn);
+            FLINT_SWAP(nn_srcptr, ap, bp);
+            FLINT_SWAP(slong, an, bn);
         }
 
         if (bn == 1)
         {
-            mp_limb_t b0 = bp[0];
+            ulong b0 = bp[0];
 
             if (aneg ^ bneg)
                 MPN_ADDMUL_1(neg, negn, ap, an, b0);

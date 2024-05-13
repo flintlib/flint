@@ -21,7 +21,7 @@ int main(void)
     timeit_t timer;
     slong iters, j, n;
     nmod_mpoly_ctx_t ctx;
-    mp_limb_t p = n_nextprime(UWORD(1) << (SMALL_FMPZ_BITCOUNT_MAX), 1);
+    ulong p = n_nextprime(UWORD(1) << (SMALL_FMPZ_BITCOUNT_MAX), 1);
     const char * vars[] = {"x", "y", "z", "t", "u"};
 
     nmod_mpoly_ctx_init(ctx, 5, ORD_LEX, p);

@@ -49,7 +49,7 @@ static const double inv_table[] = {
    max_base[n] = UWORD_MAX^(1/n) for n in range [1, FLINT_BITS]
    max_base[0] is set to 0, although it will never be called */
 
-static const mp_limb_t max_base[] = {
+static const ulong max_base[] = {
 #ifdef FLINT64
                         UWORD(0), UWORD_MAX, UWORD(4294967296), UWORD(2642245), UWORD(65536),
                         UWORD(7131), UWORD(1625), UWORD(565), UWORD(256), UWORD(138), UWORD(84),
@@ -73,10 +73,10 @@ static const mp_limb_t max_base[] = {
                         /* this table consists of 65 values in case of FLINT64,
                            otherwise 33 */
 
-mp_limb_t
-n_root(mp_limb_t n, mp_limb_t root)
+ulong
+n_root(ulong n, ulong root)
 {
-    mp_limb_t x, currval, base, upper_limit;
+    ulong x, currval, base, upper_limit;
     double dx;
 
     if (!n || !root)

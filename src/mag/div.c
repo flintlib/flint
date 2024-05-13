@@ -23,13 +23,13 @@ mag_div(mag_t z, const mag_t x, const mag_t y)
     }
     else
     {
-        mp_limb_t q;
+        ulong q;
         slong fix;
 
 #if FLINT_BITS == 64
         q = (MAG_MAN(x) << MAG_BITS) / MAG_MAN(y) + 1;
 #else
-        mp_limb_t hi, lo, r;
+        ulong hi, lo, r;
         lo = MAG_MAN(x) << MAG_BITS;
         hi = MAG_MAN(x) >> (FLINT_BITS - MAG_BITS);
         udiv_qrnnd(q, r, hi, lo, MAG_MAN(y));

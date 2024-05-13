@@ -25,13 +25,13 @@ _fmpq_mat_check_solution_fmpz_mat(const fmpq_mat_t X, const fmpz_mat_t A, const 
 void
 _fmpq_mat_solve_dixon(fmpq_mat_t X,
                     const fmpz_mat_t A, const fmpz_mat_t B,
-                    const nmod_mat_t Ainv, mp_limb_t p,
+                    const nmod_mat_t Ainv, ulong p,
                     const fmpz_t N, const fmpz_t D)
 {
     fmpz_t bound, ppow;
     fmpz_mat_t x, y, d, Ay;
     fmpz_t prod;
-    mp_limb_t * crt_primes;
+    ulong * crt_primes;
     nmod_mat_t * A_mod;
     nmod_mat_t Ay_mod, d_mod, y_mod;
     slong i, j, n, nexti, cols, num_primes;
@@ -166,7 +166,7 @@ fmpq_mat_solve_fmpz_mat_dixon(fmpq_mat_t X,
 {
     nmod_mat_t Ainv;
     fmpz_t N, D;
-    mp_limb_t p;
+    ulong p;
 
     if (!fmpz_mat_is_square(A))
     {

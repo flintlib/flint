@@ -15,13 +15,13 @@
 /* See verify_taylor.py for code to generate tables and
    proof of correctness */
 
-#define TMP_ALLOC_LIMBS(size) TMP_ALLOC((size) * sizeof(mp_limb_t))
+#define TMP_ALLOC_LIMBS(size) TMP_ALLOC((size) * sizeof(ulong))
 
 #define ODD_RECIPROCAL_TAB_SIZE 256
 
 #if FLINT_BITS == 64
 
-const mp_limb_t odd_reciprocal_tab_numer[ODD_RECIPROCAL_TAB_SIZE] = {
+const ulong odd_reciprocal_tab_numer[ODD_RECIPROCAL_TAB_SIZE] = {
     UWORD(13835020108241056725), UWORD(4611673369413685575),
     UWORD(2767004021648211345), UWORD(1976431444034436675),
     UWORD(1537224456471228525), UWORD(1257729100749186975),
@@ -152,7 +152,7 @@ const mp_limb_t odd_reciprocal_tab_numer[ODD_RECIPROCAL_TAB_SIZE] = {
     UWORD(6291002587483845), UWORD(6266380268159055),
 };
 
-const mp_limb_t odd_reciprocal_tab_denom[ODD_RECIPROCAL_TAB_SIZE] = {
+const ulong odd_reciprocal_tab_denom[ODD_RECIPROCAL_TAB_SIZE] = {
     UWORD(13835020108241056725), UWORD(13835020108241056725),
     UWORD(13835020108241056725), UWORD(13835020108241056725),
     UWORD(13835020108241056725), UWORD(13835020108241056725),
@@ -285,7 +285,7 @@ const mp_limb_t odd_reciprocal_tab_denom[ODD_RECIPROCAL_TAB_SIZE] = {
 
 #else
 
-const mp_limb_t odd_reciprocal_tab_numer[ODD_RECIPROCAL_TAB_SIZE] = {
+const ulong odd_reciprocal_tab_numer[ODD_RECIPROCAL_TAB_SIZE] = {
     UWORD(1673196525), UWORD(557732175),
     UWORD(334639305), UWORD(239028075),
     UWORD(185910725), UWORD(152108775),
@@ -416,7 +416,7 @@ const mp_limb_t odd_reciprocal_tab_numer[ODD_RECIPROCAL_TAB_SIZE] = {
     UWORD(262143), UWORD(261117),
 };
 
-const mp_limb_t odd_reciprocal_tab_denom[ODD_RECIPROCAL_TAB_SIZE] = {
+const ulong odd_reciprocal_tab_denom[ODD_RECIPROCAL_TAB_SIZE] = {
     UWORD(1673196525), UWORD(1673196525),
     UWORD(1673196525), UWORD(1673196525),
     UWORD(1673196525), UWORD(1673196525),
@@ -549,11 +549,11 @@ const mp_limb_t odd_reciprocal_tab_denom[ODD_RECIPROCAL_TAB_SIZE] = {
 
 #endif
 
-void _arb_atan_taylor_rs(mp_ptr y, mp_limb_t * error,
-    mp_srcptr x, mp_size_t xn, ulong N, int alternating)
+void _arb_atan_taylor_rs(nn_ptr y, ulong * error,
+    nn_srcptr x, slong xn, ulong N, int alternating)
 {
-    mp_ptr s, t, xpow;
-    mp_limb_t new_denom, old_denom, c;
+    nn_ptr s, t, xpow;
+    ulong new_denom, old_denom, c;
     slong power, k, m;
 
     TMP_INIT;

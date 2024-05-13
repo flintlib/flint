@@ -43,10 +43,10 @@ _arb_hypgeom_gamma_upper_sum_rs_1(arb_t res, ulong p, ulong q, const arb_t z, sl
 {
     slong m, i, j, k, jlen, jbot, jtop, wp;
     double dz, logdz;
-    mp_limb_t c, chi, clo;
+    ulong c, chi, clo;
     arb_t s, t;
     arb_ptr zpow;
-    mp_ptr cs;
+    nn_ptr cs;
 
     m = n_sqrt(N);
     m = FLINT_MAX(m, 2);
@@ -77,7 +77,7 @@ _arb_hypgeom_gamma_upper_sum_rs_1(arb_t res, ulong p, ulong q, const arb_t z, sl
     arb_init(s);
     arb_init(t);
     zpow = _arb_vec_init(m + 1);
-    cs = flint_malloc(sizeof(mp_limb_t) * (m + 1));
+    cs = flint_malloc(sizeof(ulong) * (m + 1));
     arb_mul_ui(zpow + m, z, q, prec);
     arb_inv(zpow + m, zpow + m, prec);
     _arb_vec_set_powers(zpow, zpow + m, m + 1, prec);

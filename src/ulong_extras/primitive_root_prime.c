@@ -19,7 +19,7 @@ ulong n_primitive_root_prime_prefactor(ulong p, n_factor_t * factors)
         return 1;
 
     // compute the divisions "(p-1) / factors" once for all
-    mp_limb_signed_t exps[FLINT_MAX_FACTORS_IN_LIMB];
+    slong exps[FLINT_MAX_FACTORS_IN_LIMB];
     for (slong i = 0; i < factors->num; i++)
         exps[i] = (p-1) / factors->p[i];
 

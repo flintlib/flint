@@ -54,7 +54,7 @@ nfloat_swap(nfloat_ptr x, nfloat_ptr y, gr_ctx_t ctx)
     slong i, n = NFLOAT_CTX_DATA_NLIMBS(ctx);
 
     for (i = 0; i < n; i++)
-        FLINT_SWAP(mp_limb_t, NFLOAT_DATA(x)[i], NFLOAT_DATA(y)[i]);
+        FLINT_SWAP(ulong, NFLOAT_DATA(x)[i], NFLOAT_DATA(y)[i]);
 }
 
 int
@@ -74,7 +74,7 @@ _nfloat_vec_init(nfloat_ptr res, slong len, gr_ctx_t ctx)
     slong i, n = NFLOAT_CTX_DATA_NLIMBS(ctx);
 
     for (i = 0; i < len; i++)
-        nfloat_init((mp_ptr) res + i * n, ctx);
+        nfloat_init((nn_ptr) res + i * n, ctx);
 }
 
 void
@@ -95,7 +95,7 @@ _nfloat_vec_zero(nfloat_ptr res, slong len, gr_ctx_t ctx)
     slong i, n = NFLOAT_CTX_DATA_NLIMBS(ctx);
 
     for (i = 0; i < len; i++)
-        nfloat_zero((mp_ptr) res + i * n, ctx);
+        nfloat_zero((nn_ptr) res + i * n, ctx);
 
     return GR_SUCCESS;
 }
@@ -419,7 +419,7 @@ nfloat_set_arf(nfloat_ptr res, const arf_t x, gr_ctx_t ctx)
     else
     {
         slong exp, xn;
-        mp_srcptr xp;
+        nn_srcptr xp;
         int sgnbit;
 
         ARF_GET_MPN_READONLY(xp, xn, x);
@@ -641,7 +641,7 @@ nfloat_im(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx)
 }
 
 static mp_limb_pair_t
-_flint_mpn_mulhigh_normalised2(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
+_flint_mpn_mulhigh_normalised2(nn_ptr rp, nn_srcptr xp, nn_srcptr yp, slong n)
 {
     mp_limb_pair_t ret;
 
@@ -649,10 +649,10 @@ _flint_mpn_mulhigh_normalised2(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t 
 
     if (rp == xp || rp == yp)
     {
-        mp_ptr t;
+        nn_ptr t;
         TMP_INIT;
         TMP_START;
-        t = TMP_ALLOC(sizeof(mp_limb_t) * n);
+        t = TMP_ALLOC(sizeof(ulong) * n);
         ret = _flint_mpn_mulhigh_normalised2(t, xp, yp, n);
         flint_mpn_copyi(rp, t, n);
         TMP_END;
@@ -681,7 +681,7 @@ _flint_mpn_mulhigh_normalised2(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t 
 
 /* handles aliasing */
 FLINT_FORCE_INLINE
-mp_limb_pair_t flint_mpn_mulhigh_normalised2(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t n)
+mp_limb_pair_t flint_mpn_mulhigh_normalised2(nn_ptr rp, nn_srcptr xp, nn_srcptr yp, slong n)
 {
     FLINT_ASSERT(n >= 1);
 
@@ -707,9 +707,9 @@ n_signed_sub(ulong * r, ulong x, ulong y)
 }
 
 int
-_nfloat_add_1(nfloat_ptr res, mp_limb_t x0, slong xexp, int xsgnbit, mp_limb_t y0, slong delta, gr_ctx_t ctx)
+_nfloat_add_1(nfloat_ptr res, ulong x0, slong xexp, int xsgnbit, ulong y0, slong delta, gr_ctx_t ctx)
 {
-    mp_limb_t hi, lo;
+    ulong hi, lo;
 
     NFLOAT_SGNBIT(res) = xsgnbit;
 
@@ -740,9 +740,9 @@ _nfloat_add_1(nfloat_ptr res, mp_limb_t x0, slong xexp, int xsgnbit, mp_limb_t y
 }
 
 int
-_nfloat_add_2(nfloat_ptr res, mp_srcptr x, slong xexp, int xsgnbit, mp_srcptr y, slong delta, gr_ctx_t ctx)
+_nfloat_add_2(nfloat_ptr res, nn_srcptr x, slong xexp, int xsgnbit, nn_srcptr y, slong delta, gr_ctx_t ctx)
 {
-    mp_limb_t x1, x0, y1, y0, s2, s1, s0;
+    ulong x1, x0, y1, y0, s2, s1, s0;
 
     NFLOAT_SGNBIT(res) = xsgnbit;
 
@@ -787,9 +787,9 @@ _nfloat_add_2(nfloat_ptr res, mp_srcptr x, slong xexp, int xsgnbit, mp_srcptr y,
 }
 
 int
-_nfloat_sub_1(nfloat_ptr res, mp_limb_t x0, slong xexp, int xsgnbit, mp_limb_t y0, slong delta, gr_ctx_t ctx)
+_nfloat_sub_1(nfloat_ptr res, ulong x0, slong xexp, int xsgnbit, ulong y0, slong delta, gr_ctx_t ctx)
 {
-    mp_limb_t u;
+    ulong u;
     slong norm;
 
     if (delta == 0)
@@ -820,9 +820,9 @@ _nfloat_sub_1(nfloat_ptr res, mp_limb_t x0, slong xexp, int xsgnbit, mp_limb_t y
 }
 
 int
-_nfloat_sub_2(nfloat_ptr res, mp_srcptr x, slong xexp, int xsgnbit, mp_srcptr y, slong delta, gr_ctx_t ctx)
+_nfloat_sub_2(nfloat_ptr res, nn_srcptr x, slong xexp, int xsgnbit, nn_srcptr y, slong delta, gr_ctx_t ctx)
 {
-    mp_limb_t x1, x0, y1, y0, s1, s0;
+    ulong x1, x0, y1, y0, s1, s0;
     slong norm;
 
     NFLOAT_SGNBIT(res) = xsgnbit;
@@ -899,11 +899,11 @@ _nfloat_sub_2(nfloat_ptr res, mp_srcptr x, slong xexp, int xsgnbit, mp_srcptr y,
 }
 
 int
-_nfloat_add_n(nfloat_ptr res, mp_srcptr xd, slong xexp, int xsgnbit, mp_srcptr yd, slong delta, slong nlimbs, gr_ctx_t ctx)
+_nfloat_add_n(nfloat_ptr res, nn_srcptr xd, slong xexp, int xsgnbit, nn_srcptr yd, slong delta, slong nlimbs, gr_ctx_t ctx)
 {
     slong shift_limbs, shift_bits;
-    mp_limb_t cy;
-    mp_limb_t t[NFLOAT_MAX_LIMBS];
+    ulong cy;
+    ulong t[NFLOAT_MAX_LIMBS];
 
     NFLOAT_SGNBIT(res) = xsgnbit;
 
@@ -948,10 +948,10 @@ _nfloat_add_n(nfloat_ptr res, mp_srcptr xd, slong xexp, int xsgnbit, mp_srcptr y
 }
 
 int
-_nfloat_sub_n(nfloat_ptr res, mp_srcptr xd, slong xexp, int xsgnbit, mp_srcptr yd, slong delta, slong nlimbs, gr_ctx_t ctx)
+_nfloat_sub_n(nfloat_ptr res, nn_srcptr xd, slong xexp, int xsgnbit, nn_srcptr yd, slong delta, slong nlimbs, gr_ctx_t ctx)
 {
     slong shift_limbs, shift_bits, n, norm;
-    mp_limb_t t[NFLOAT_MAX_LIMBS];
+    ulong t[NFLOAT_MAX_LIMBS];
 
     if (delta == 0)
     {
@@ -1142,9 +1142,9 @@ _nfloat_vec_aors_1(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, int subtrac
 
     for (i = 0; i < len; i++)
     {
-        xi = (mp_srcptr) x + i * stride;
-        yi = (mp_srcptr) y + i * stride;
-        ri = (mp_ptr) res + i * stride;
+        xi = (nn_srcptr) x + i * stride;
+        yi = (nn_srcptr) y + i * stride;
+        ri = (nn_ptr) res + i * stride;
 
         xexp = NFLOAT_EXP(xi);
         yexp = NFLOAT_EXP(yi);
@@ -1201,9 +1201,9 @@ _nfloat_vec_aors_2(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, int subtrac
 
     for (i = 0; i < len; i++)
     {
-        xi = (mp_srcptr) x + i * stride;
-        yi = (mp_srcptr) y + i * stride;
-        ri = (mp_ptr) res + i * stride;
+        xi = (nn_srcptr) x + i * stride;
+        yi = (nn_srcptr) y + i * stride;
+        ri = (nn_ptr) res + i * stride;
 
         xexp = NFLOAT_EXP(xi);
         yexp = NFLOAT_EXP(yi);
@@ -1268,9 +1268,9 @@ _nfloat_vec_add(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, slong len, gr_
 
     for (i = 0; i < len; i++)
     {
-        xi = (mp_srcptr) x + i * stride;
-        yi = (mp_srcptr) y + i * stride;
-        ri = (mp_ptr) res + i * stride;
+        xi = (nn_srcptr) x + i * stride;
+        yi = (nn_srcptr) y + i * stride;
+        ri = (nn_ptr) res + i * stride;
 
         status |= nfloat_add(ri, xi, yi, ctx);
     }
@@ -1300,9 +1300,9 @@ _nfloat_vec_sub(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, slong len, gr_
 
     for (i = 0; i < len; i++)
     {
-        xi = (mp_srcptr) x + i * stride;
-        yi = (mp_srcptr) y + i * stride;
-        ri = (mp_ptr) res + i * stride;
+        xi = (nn_srcptr) x + i * stride;
+        yi = (nn_srcptr) y + i * stride;
+        ri = (nn_ptr) res + i * stride;
 
         status |= nfloat_sub(ri, xi, yi, ctx);
     }
@@ -1336,7 +1336,7 @@ nfloat_mul(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx)
 
     if (nlimbs == 1)
     {
-        mp_limb_t hi, lo;
+        ulong hi, lo;
 
         umul_ppmm(hi, lo, NFLOAT_D(x)[0], NFLOAT_D(y)[0]);
 
@@ -1353,7 +1353,7 @@ nfloat_mul(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx)
     }
     else if (nlimbs == 2)
     {
-        mp_limb_t r3, r2, r1, FLINT_SET_BUT_UNUSED(r0);
+        ulong r3, r2, r1, FLINT_SET_BUT_UNUSED(r0);
 
         FLINT_MPN_MUL_2X2(r3, r2, r1, r0, NFLOAT_D(x)[1], NFLOAT_D(x)[0], NFLOAT_D(y)[1], NFLOAT_D(y)[0]);
 
@@ -1389,7 +1389,7 @@ _nfloat_vec_mul_1(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, slong len, g
     slong xexp, yexp;
     nfloat_srcptr xi, yi;
     nfloat_ptr ri;
-    mp_limb_t hi, lo;
+    ulong hi, lo;
     int xsgnbit, ysgnbit;
     int status = GR_SUCCESS;
 
@@ -1397,9 +1397,9 @@ _nfloat_vec_mul_1(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, slong len, g
 
     for (i = 0; i < len; i++)
     {
-        xi = (mp_srcptr) x + i * stride;
-        yi = (mp_srcptr) y + i * stride;
-        ri = (mp_ptr) res + i * stride;
+        xi = (nn_srcptr) x + i * stride;
+        yi = (nn_srcptr) y + i * stride;
+        ri = (nn_ptr) res + i * stride;
 
         xexp = NFLOAT_EXP(xi);
         yexp = NFLOAT_EXP(yi);
@@ -1445,7 +1445,7 @@ _nfloat_vec_mul_2(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, slong len, g
     slong xexp, yexp;
     nfloat_srcptr xi, yi;
     nfloat_ptr ri;
-    mp_limb_t r3, r2, r1, FLINT_SET_BUT_UNUSED(r0);
+    ulong r3, r2, r1, FLINT_SET_BUT_UNUSED(r0);
     int xsgnbit, ysgnbit;
     int status = GR_SUCCESS;
 
@@ -1453,9 +1453,9 @@ _nfloat_vec_mul_2(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, slong len, g
 
     for (i = 0; i < len; i++)
     {
-        xi = (mp_srcptr) x + i * stride;
-        yi = (mp_srcptr) y + i * stride;
-        ri = (mp_ptr) res + i * stride;
+        xi = (nn_srcptr) x + i * stride;
+        yi = (nn_srcptr) y + i * stride;
+        ri = (nn_ptr) res + i * stride;
 
         xexp = NFLOAT_EXP(xi);
         yexp = NFLOAT_EXP(yi);
@@ -1518,9 +1518,9 @@ _nfloat_vec_mul(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, slong len, gr_
 
     for (i = 0; i < len; i++)
     {
-        xi = (mp_srcptr) x + i * stride;
-        yi = (mp_srcptr) y + i * stride;
-        ri = (mp_ptr) res + i * stride;
+        xi = (nn_srcptr) x + i * stride;
+        yi = (nn_srcptr) y + i * stride;
+        ri = (nn_ptr) res + i * stride;
 
         status |= nfloat_mul(ri, xi, yi, ctx);
     }
@@ -1535,7 +1535,7 @@ _nfloat_vec_mul_scalar_1(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_srcp
     slong xexp, yexp;
     nfloat_srcptr xi;
     nfloat_ptr ri;
-    mp_limb_t y0, hi, lo;
+    ulong y0, hi, lo;
     int xsgnbit, ysgnbit;
     int status = GR_SUCCESS;
 
@@ -1550,8 +1550,8 @@ _nfloat_vec_mul_scalar_1(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_srcp
 
     for (i = 0; i < len; i++)
     {
-        xi = (mp_srcptr) x + i * stride;
-        ri = (mp_ptr) res + i * stride;
+        xi = (nn_srcptr) x + i * stride;
+        ri = (nn_ptr) res + i * stride;
 
         xexp = NFLOAT_EXP(xi);
 
@@ -1595,8 +1595,8 @@ _nfloat_vec_mul_scalar_2(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_srcp
     slong xexp, yexp;
     nfloat_srcptr xi;
     nfloat_ptr ri;
-    mp_limb_t y0, y1;
-    mp_limb_t r3, r2, r1, FLINT_SET_BUT_UNUSED(r0);
+    ulong y0, y1;
+    ulong r3, r2, r1, FLINT_SET_BUT_UNUSED(r0);
     int xsgnbit, ysgnbit;
     int status = GR_SUCCESS;
 
@@ -1612,8 +1612,8 @@ _nfloat_vec_mul_scalar_2(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_srcp
 
     for (i = 0; i < len; i++)
     {
-        xi = (mp_srcptr) x + i * stride;
-        ri = (mp_ptr) res + i * stride;
+        xi = (nn_srcptr) x + i * stride;
+        ri = (nn_ptr) res + i * stride;
 
         xexp = NFLOAT_EXP(xi);
 
@@ -1674,8 +1674,8 @@ _nfloat_vec_mul_scalar(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_srcptr
 
     for (i = 0; i < len; i++)
     {
-        xi = (mp_srcptr) x + i * stride;
-        ri = (mp_ptr) res + i * stride;
+        xi = (nn_srcptr) x + i * stride;
+        ri = (nn_ptr) res + i * stride;
 
         status |= nfloat_mul(ri, xi, y, ctx);
     }

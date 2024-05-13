@@ -13,10 +13,10 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-mp_limb_t n_factor_lehman(mp_limb_t n)
+ulong n_factor_lehman(ulong n)
 {
     double limit;
-    mp_limb_t cuberoot, k;
+    ulong cuberoot, k;
     n_factor_t factors;
     slong bound;
 
@@ -27,7 +27,7 @@ mp_limb_t n_factor_lehman(mp_limb_t n)
     if ((n & 1) == 0) return 2;
 
     limit = pow(n, 1.0/3.0);
-    cuberoot = (mp_limb_t) ceil(limit);
+    cuberoot = (ulong) ceil(limit);
     bound = n_prime_pi(cuberoot);
 
     n_factor_init(&factors);
@@ -41,13 +41,13 @@ mp_limb_t n_factor_lehman(mp_limb_t n)
     for (k = 1; k <= cuberoot + 1; k++)
     {
         double low = 2.0*sqrt((double) k)*sqrt((double) n);
-        mp_limb_t x = (mp_limb_t) ceil(low - 0.0001);
-        mp_limb_t end = (mp_limb_t) floor(0.0001 + low + pow(n, 1.0/6.0)/((double) 4.0*sqrt((double) k)));
-        mp_limb_t sub = k*n*4;
+        ulong x = (ulong) ceil(low - 0.0001);
+        ulong end = (ulong) floor(0.0001 + low + pow(n, 1.0/6.0)/((double) 4.0*sqrt((double) k)));
+        ulong sub = k*n*4;
 
         for ( ; x <= end; x++)
         {
-            mp_limb_t p, sq = x*x - sub;
+            ulong p, sq = x*x - sub;
             if (n_is_square(sq))
             {
                 sq = sqrt((double) sq);

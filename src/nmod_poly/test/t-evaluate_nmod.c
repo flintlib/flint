@@ -21,8 +21,8 @@ TEST_FUNCTION_START(nmod_poly_evaluate_nmod, state)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a;
-        mp_limb_t n = n_randtest_not_zero(state);
-        mp_limb_t sum, eval;
+        ulong n = n_randtest_not_zero(state);
+        ulong sum, eval;
 
         nmod_poly_init(a, n);
         nmod_poly_randtest(a, state, n_randint(state, 100));
@@ -51,8 +51,8 @@ TEST_FUNCTION_START(nmod_poly_evaluate_nmod, state)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b;
-        mp_limb_t n = n_randtest_not_zero(state);
-        mp_limb_t eval1, eval2, c;
+        ulong n = n_randtest_not_zero(state);
+        ulong eval1, eval2, c;
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);

@@ -83,7 +83,7 @@ void nmod_mat_init_nullspace_tr(nmod_mat_t X, nmod_mat_t tmp)
         {
             for (j = 0; j < rank; j++)
             {
-                mp_limb_t c = nmod_mat_entry(tmp, j, nonpivots[i]);
+                ulong c = nmod_mat_entry(tmp, j, nonpivots[i]);
                 nmod_mat_entry(X, i, pivots[j]) = nmod_neg(c, tmp->mod);
             }
 

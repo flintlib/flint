@@ -49,7 +49,7 @@ stirling_1u_ogf_bsplit(fmpz * res, ulong a, ulong b, slong len, int which, int f
 
     if (n == 1 || (len <= MAX_BASECASE && n * cbc <= FLINT_BITS))
     {
-        mp_limb_t v[MAX_BASECASE];
+        ulong v[MAX_BASECASE];
         slong i, j;
 
         if (which == 1)

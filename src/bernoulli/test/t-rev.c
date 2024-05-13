@@ -18,7 +18,7 @@
 TEST_FUNCTION_START(bernoulli_rev, state)
 {
     slong nmax, n, bound, count;
-    mp_limb_t p, pinv, m1, m2;
+    ulong p, pinv, m1, m2;
     nmod_poly_t A;
 
     bound = 100000 * FLINT_MIN(1.0, 0.1 * flint_test_multiplier());

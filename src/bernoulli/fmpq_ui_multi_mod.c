@@ -26,8 +26,8 @@ crt_res_t;
 
 typedef struct
 {
-    mp_srcptr residues;
-    mp_srcptr primes;
+    nn_srcptr residues;
+    nn_srcptr primes;
 }
 crt_args_t;
 
@@ -95,7 +95,7 @@ crt_basecase(crt_res_t * res, slong a, slong b, crt_args_t * args)
 
 /* todo: optimize basecase and move to flint */
 void
-_arb_tree_crt(fmpz_t r, fmpz_t m, mp_srcptr residues, mp_srcptr primes, slong len)
+_arb_tree_crt(fmpz_t r, fmpz_t m, nn_srcptr residues, nn_srcptr primes, slong len)
 {
     crt_res_t res;
     crt_args_t args;
@@ -123,8 +123,8 @@ _arb_tree_crt(fmpz_t r, fmpz_t m, mp_srcptr residues, mp_srcptr primes, slong le
 typedef struct
 {
     ulong n;
-    mp_ptr primes;
-    mp_ptr residues;
+    nn_ptr primes;
+    nn_ptr residues;
 }
 mod_p_param_t;
 
@@ -142,7 +142,7 @@ _bernoulli_fmpq_ui_multi_mod(fmpz_t num, fmpz_t den, ulong n, double alpha)
     n_primes_t prime_iter;
     slong i, bits, mod_bits, zeta_bits, num_primes;
     ulong p;
-    mp_ptr primes, residues;
+    nn_ptr primes, residues;
     mag_t primes_product;
     fmpz_t M;
 #if TIMING
@@ -197,8 +197,8 @@ _bernoulli_fmpq_ui_multi_mod(fmpz_t num, fmpz_t den, ulong n, double alpha)
     flint_printf("\nn = %lu, bits = %lu, num_primes = %ld\n", n, bits, num_primes);
 #endif
 
-    primes = flint_malloc(sizeof(mp_limb_t) * num_primes);
-    residues = flint_malloc(sizeof(mp_limb_t) * num_primes);
+    primes = flint_malloc(sizeof(ulong) * num_primes);
+    residues = flint_malloc(sizeof(ulong) * num_primes);
 
     p = 5;
     n_primes_jump_after(prime_iter, 5);

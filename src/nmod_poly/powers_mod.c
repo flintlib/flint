@@ -23,9 +23,9 @@ typedef struct
    slong n;
    slong glen;
    slong ginvlen;
-   mp_srcptr g;
-   mp_srcptr ginv;
-   mp_ptr * res;
+   nn_srcptr g;
+   nn_srcptr ginv;
+   nn_ptr * res;
    nmod_t mod;
 #if FLINT_USES_PTHREAD
    pthread_mutex_t * mutex;
@@ -38,8 +38,8 @@ _nmod_poly_powers_mod_preinv_worker(void * arg_ptr)
     powers_preinv_arg_t arg = *((powers_preinv_arg_t *) arg_ptr);
     slong i, j, k = arg.k, n = arg.n;
     slong glen = arg.glen, ginvlen = arg.ginvlen;
-    mp_ptr * res = arg.res;
-    mp_srcptr g = arg.g, ginv = arg.ginv;
+    nn_ptr * res = arg.res;
+    nn_srcptr g = arg.g, ginv = arg.ginv;
     const nmod_t mod = arg.mod;
 
     while (1)
@@ -78,9 +78,9 @@ _nmod_poly_powers_mod_preinv_worker(void * arg_ptr)
     {ginv, ginvlen} must be set to the power series inverse of the reverse of g
 */
 void
-_nmod_poly_powers_mod_preinv_threaded_pool(mp_ptr * res, mp_srcptr f,
-		 slong flen, slong n, mp_srcptr g, slong glen,
-           mp_srcptr ginv, slong ginvlen, const nmod_t mod,
+_nmod_poly_powers_mod_preinv_threaded_pool(nn_ptr * res, nn_srcptr f,
+		 slong flen, slong n, nn_srcptr g, slong glen,
+           nn_srcptr ginv, slong ginvlen, const nmod_t mod,
 	                       thread_pool_handle * threads, slong num_threads)
 {
     slong i, k, shared_j = 0;
@@ -165,9 +165,9 @@ _nmod_poly_powers_mod_preinv_threaded_pool(mp_ptr * res, mp_srcptr f,
 }
 
 void
-_nmod_poly_powers_mod_preinv_threaded(mp_ptr * res, mp_srcptr f,
-                 slong flen, slong n, mp_srcptr g, slong glen,
-            mp_srcptr ginv, slong ginvlen, const nmod_t mod)
+_nmod_poly_powers_mod_preinv_threaded(nn_ptr * res, nn_srcptr f,
+                 slong flen, slong n, nn_srcptr g, slong glen,
+            nn_srcptr ginv, slong ginvlen, const nmod_t mod)
 {
     thread_pool_handle * threads;
     slong num_threads = flint_request_threads(&threads, flint_get_num_threads());
@@ -185,7 +185,7 @@ nmod_poly_powers_mod_bsgs(nmod_poly_struct * res,
     slong i;
 
     nmod_poly_t ginv;
-    mp_ptr * res_arr;
+    nn_ptr * res_arr;
 
     if (nmod_poly_length(g) == 0)
     {
@@ -219,7 +219,7 @@ nmod_poly_powers_mod_bsgs(nmod_poly_struct * res,
         return;
     }
 
-    res_arr = (mp_ptr *) flint_malloc(n*sizeof(mp_ptr));
+    res_arr = (nn_ptr *) flint_malloc(n*sizeof(nn_ptr));
     nmod_poly_init_mod(ginv, g->mod);
 
     for (i = 0; i < n; i++)
@@ -250,8 +250,8 @@ nmod_poly_powers_mod_bsgs(nmod_poly_struct * res,
     {ginv, ginvlen} must be set to the power series inverse of the reverse of g
 */
 void
-_nmod_poly_powers_mod_preinv_naive(mp_ptr * res, mp_srcptr f, slong flen, slong n,
-         mp_srcptr g, slong glen, mp_srcptr ginv, slong ginvlen, const nmod_t mod)
+_nmod_poly_powers_mod_preinv_naive(nn_ptr * res, nn_srcptr f, slong flen, slong n,
+         nn_srcptr g, slong glen, nn_srcptr ginv, slong ginvlen, const nmod_t mod)
 {
     slong i;
 
@@ -296,7 +296,7 @@ nmod_poly_powers_mod_naive(nmod_poly_struct * res, const nmod_poly_t f,
     slong i;
 
     nmod_poly_t ginv;
-    mp_ptr * res_arr;
+    nn_ptr * res_arr;
 
     if (nmod_poly_length(g) == 0)
     {
@@ -330,7 +330,7 @@ nmod_poly_powers_mod_naive(nmod_poly_struct * res, const nmod_poly_t f,
         return;
     }
 
-    res_arr = (mp_ptr *) flint_malloc(n*sizeof(mp_ptr));
+    res_arr = (nn_ptr *) flint_malloc(n*sizeof(nn_ptr));
     nmod_poly_init_mod(ginv, g->mod);
 
     for (i = 0; i < n; i++)

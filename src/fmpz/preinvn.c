@@ -16,28 +16,28 @@ void fmpz_preinvn_init(fmpz_preinvn_t inv, const fmpz_t f)
 {
    fmpz c = *f;
    flint_bitcnt_t norm;
-   mp_ptr t;
+   nn_ptr t;
 
    if (c == 0)
    {
       flint_throw(FLINT_ERROR, "Exception (fmpz_preinvn_init). Division by zero.\n");
    } else if (!COEFF_IS_MPZ(c)) /* c is small */
    {
-      inv->dinv = flint_malloc(sizeof(mp_limb_t));
+      inv->dinv = flint_malloc(sizeof(ulong));
       if (c < 0) c = -c;
       norm = flint_clz(c);
       if (norm) c <<= norm;
-      flint_mpn_preinvn(inv->dinv, (mp_ptr) &c, 1);
+      flint_mpn_preinvn(inv->dinv, (nn_ptr) &c, 1);
       inv->n = 1;
    } else /* c is big */
    {
       mpz_ptr mc = COEFF_TO_PTR(c);
       slong size = FLINT_ABS(mc->_mp_size);
-      inv->dinv = flint_malloc(size*sizeof(mp_limb_t));
+      inv->dinv = flint_malloc(size*sizeof(ulong));
       norm = flint_clz(mc->_mp_d[size - 1]);
       if (norm)
       {
-         t = flint_malloc(size*sizeof(mp_limb_t));
+         t = flint_malloc(size*sizeof(ulong));
          mpn_lshift(t, mc->_mp_d, size, norm);
       } else
          t = mc->_mp_d;

@@ -21,7 +21,7 @@
 typedef struct
 {
     slong n;
-    mp_limb_t modulus;
+    ulong modulus;
     int algorithm;
 } mat_lu_t;
 

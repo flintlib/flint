@@ -60,7 +60,7 @@ arb_sin_cos_taylor_sum_rs(arb_t s, const arb_t x, slong N, int cosine, slong pre
     {
         arb_ptr tpow;
         slong j, k, m, M, tp, xmag;
-        mp_limb_t c, d, chi, clo;
+        ulong c, d, chi, clo;
 
         xmag = arf_abs_bound_lt_2exp_si(arb_midref(x));
 

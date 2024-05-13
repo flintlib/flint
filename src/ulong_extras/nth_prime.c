@@ -11,7 +11,7 @@
 
 #include "ulong_extras.h"
 
-mp_limb_t n_nth_prime(ulong n)
+ulong n_nth_prime(ulong n)
 {
     if (n == 0)
     {
@@ -21,7 +21,7 @@ mp_limb_t n_nth_prime(ulong n)
     return n_primes_arr_readonly(n)[n-1];
 }
 
-void n_nth_prime_bounds(mp_limb_t *lo, mp_limb_t *hi, ulong n)
+void n_nth_prime_bounds(ulong *lo, ulong *hi, ulong n)
 {
     int bits, ll;
     double llo, lhi;
@@ -37,6 +37,6 @@ void n_nth_prime_bounds(mp_limb_t *lo, mp_limb_t *hi, ulong n)
     else if (n < 528491312) ll = 2;
     else                    ll = 3;
 
-    *lo = (mp_limb_t) (n * (llo + ll - 1));
-    *hi = (mp_limb_t) (n * (lhi + (ll+1) - (n >= 15985 ? 0.9427 : 0.0)));
+    *lo = (ulong) (n * (llo + ll - 1));
+    *hi = (ulong) (n * (lhi + (ll+1) - (n >= 15985 ? 0.9427 : 0.0)));
 }

@@ -22,7 +22,7 @@ TEST_FUNCTION_START(nmod_poly_powers_mod_naive, state)
     {
         nmod_poly_t f, g, pow;
         nmod_poly_struct * res;
-        mp_limb_t n;
+        ulong n;
         ulong exp;
         slong j;
 

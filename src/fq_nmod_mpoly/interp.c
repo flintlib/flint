@@ -29,12 +29,12 @@
 static void _n_poly_mul_n_fq(
     n_poly_t a,
     const n_poly_t b,
-    const mp_limb_t * c,
+    const ulong * c,
     const fq_nmod_ctx_t ctx)
 {
     slong d = fq_nmod_ctx_degree(ctx);
     n_poly_t C;
-    C->coeffs = (mp_limb_t *) c;
+    C->coeffs = (ulong *) c;
     C->length = d;
     C->alloc = d;
     _n_poly_normalise(C);
@@ -344,9 +344,9 @@ int nmod_mpolyn_interp_crt_lg_bpoly(
     n_poly_struct * Fcoeffs = F->coeffs;
     ulong * Texps = T->exps;
     n_poly_struct * Tcoeffs = T->coeffs;
-    mp_limb_t * u = FLINT_ARRAY_ALLOC(3*lgd, mp_limb_t);
-    mp_limb_t * v = u + lgd;
-    mp_limb_t * inv_m_eval = v + lgd;
+    ulong * u = FLINT_ARRAY_ALLOC(3*lgd, ulong);
+    ulong * v = u + lgd;
+    ulong * inv_m_eval = v + lgd;
     ulong Fexpi, mask;
 
     mask = (-UWORD(1)) >> (FLINT_BITS - F->bits);
@@ -950,7 +950,7 @@ static int nmod_mpolyn_interp_crt_lg_mpoly(
     slong Flen = F->length, Alen = A->length;
     ulong * Fexp = F->exps, * Aexp = A->exps;
     ulong * Texp;
-    mp_limb_t * Acoeff = A->coeffs;
+    ulong * Acoeff = A->coeffs;
     n_poly_struct * Fcoeff = F->coeffs;
     n_poly_struct * Tcoeff;
     fq_nmod_t at;
@@ -1175,7 +1175,7 @@ int nmod_mpolyn_interp_mcrt_lg_mpoly(
     nmod_mpolyn_t H,
     const nmod_mpoly_ctx_t smctx,
     const n_poly_t m,
-    const mp_limb_t * inv_m_eval,
+    const ulong * inv_m_eval,
     fq_nmod_mpoly_t A,
     const fq_nmod_mpoly_ctx_t lgctx)
 {
@@ -1185,7 +1185,7 @@ int nmod_mpolyn_interp_mcrt_lg_mpoly(
     slong N = mpoly_words_per_exp(A->bits, smctx->minfo);
 #endif
     int changed = 0;
-    mp_limb_t * u = FLINT_ARRAY_ALLOC(lgd, mp_limb_t);
+    ulong * u = FLINT_ARRAY_ALLOC(lgd, ulong);
     n_poly_t w;
 
     n_poly_init(w);
@@ -1597,7 +1597,7 @@ int fq_nmod_mpolyn_interp_crt_sm_bpoly(
     n_fq_poly_struct * Fcoeffs = F->coeffs;
     ulong * Texps = T->exps;
     n_fq_poly_struct * Tcoeffs = T->coeffs;
-    mp_limb_t * v = FLINT_ARRAY_ALLOC(d, mp_limb_t);
+    ulong * v = FLINT_ARRAY_ALLOC(d, ulong);
     ulong Fexpi, mask;
 
     FLINT_ASSERT(fq_nmod_mpolyn_is_canonical(F, ctx));
@@ -1866,9 +1866,9 @@ int fq_nmod_mpolyn_interp_mcrt_sm_mpoly(
 #endif
     slong lastdeg = *lastdeg_;
     int changed = 0;
-    mp_limb_t * v = FLINT_ARRAY_ALLOC(d, mp_limb_t);
+    ulong * v = FLINT_ARRAY_ALLOC(d, ulong);
     slong i, Alen = A->length;
-    mp_limb_t * Acoeffs = A->coeffs;
+    ulong * Acoeffs = A->coeffs;
     n_fq_poly_struct * Fcoeffs = F->coeffs;
 
     FLINT_ASSERT(F->bits == A->bits);
@@ -2392,9 +2392,9 @@ int fq_nmod_mpolyn_interp_crt_lg_bpoly(
     n_fq_poly_struct * Fcoeffs = F->coeffs;
     ulong * Texps = T->exps;
     n_fq_poly_struct * Tcoeffs = T->coeffs;
-    mp_limb_t * u = FLINT_ARRAY_ALLOC(3*lgd, mp_limb_t);
-    mp_limb_t * v = u + lgd;
-    mp_limb_t * inv_m_eval = v + lgd;
+    ulong * u = FLINT_ARRAY_ALLOC(3*lgd, ulong);
+    ulong * v = u + lgd;
+    ulong * inv_m_eval = v + lgd;
     n_fq_poly_t u_sm;
     ulong Fexpi, mask;
 
@@ -2923,7 +2923,7 @@ void fq_nmod_mpolyn_interp_lift_sm_mpoly(
     slong i;
     slong N;
     n_fq_poly_struct * Acoeff;
-    mp_limb_t * Bcoeff;
+    ulong * Bcoeff;
     ulong * Aexp, * Bexp;
     slong Blen;
 
@@ -2987,7 +2987,7 @@ int fq_nmod_mpolyn_interp_crt_sm_mpoly(
     slong Flen = F->length, Alen = A->length;
     ulong * Fexp = F->exps, * Aexp = A->exps;
     ulong * Texp;
-    mp_limb_t * Acoeff = A->coeffs;
+    ulong * Acoeff = A->coeffs;
     n_fq_poly_struct * Fcoeff = F->coeffs;
     n_fq_poly_struct * Tcoeff;
     fq_nmod_poly_t tp;
@@ -3333,7 +3333,7 @@ int fq_nmod_mpolyn_interp_crt_lg_mpoly(
     slong Flen = F->length, Alen = A->length;
     ulong * Fexp = F->exps, * Aexp = A->exps;
     ulong * Texp;
-    mp_limb_t * Acoeff = A->coeffs;
+    ulong * Acoeff = A->coeffs;
     n_fq_poly_struct * Fcoeff = F->coeffs;
     n_fq_poly_struct * Tcoeff;
     fq_nmod_t at;

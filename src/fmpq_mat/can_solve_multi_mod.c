@@ -96,7 +96,7 @@ _fmpq_mat_can_solve_multi_mod(fmpq_mat_t X,
     slong * prm, * perm, * piv, * pivots;
     int stabilised; /* has CRT stabilised */
     int res = 1, pcmp, firstp = 1;
-    mp_limb_t p = UWORD(1) << NMOD_MAT_OPTIMAL_MODULUS_BITS;
+    ulong p = UWORD(1) << NMOD_MAT_OPTIMAL_MODULUS_BITS;
 
     n = A->r;
 

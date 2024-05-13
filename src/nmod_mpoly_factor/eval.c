@@ -23,7 +23,7 @@ int _nmod_mpoly_evaluate_rest_n_poly(
     slong * ends,
     slong * stops,
     ulong * es,
-    const mp_limb_t * Acoeffs,
+    const ulong * Acoeffs,
     const ulong * Aexps,
     slong Alen,
     slong var,
@@ -229,7 +229,7 @@ void _nmod_mpoly_set_n_bpoly_var1_zero(
     Alen = 0;
     for (i = Blen - 1; i >= 0; i--)
     {
-        mp_limb_t c = n_poly_get_coeff(B->coeffs + i, 0);
+        ulong c = n_poly_get_coeff(B->coeffs + i, 0);
         if (c == 0)
             continue;
 

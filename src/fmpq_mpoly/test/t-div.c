@@ -113,7 +113,7 @@ TEST_FUNCTION_START(fmpq_mpoly_div, state)
         fmpq_mpoly_ctx_t ctx;
         fmpq_mpoly_t f, g, h, k, r;
         slong len, len1, len2;
-        mp_limb_t max_bound, * exp_bound, * exp_bound1, * exp_bound2;
+        ulong max_bound, * exp_bound, * exp_bound1, * exp_bound2;
         flint_bitcnt_t coeff_bits;
         fmpz * shifts, * strides;
         slong nvars;
@@ -134,9 +134,9 @@ TEST_FUNCTION_START(fmpq_mpoly_div, state)
         coeff_bits = n_randint(state, 70);
 
         max_bound = 1 + 400/FLINT_MAX(WORD(1), nvars)/FLINT_MAX(WORD(1), nvars);
-        exp_bound = (mp_limb_t *) flint_malloc(nvars*sizeof(mp_limb_t));
-        exp_bound1 = (mp_limb_t *) flint_malloc(nvars*sizeof(mp_limb_t));
-        exp_bound2 = (mp_limb_t *) flint_malloc(nvars*sizeof(mp_limb_t));
+        exp_bound = (ulong *) flint_malloc(nvars*sizeof(ulong));
+        exp_bound1 = (ulong *) flint_malloc(nvars*sizeof(ulong));
+        exp_bound2 = (ulong *) flint_malloc(nvars*sizeof(ulong));
         shifts = (fmpz *) flint_malloc(nvars*sizeof(fmpz));
         strides = (fmpz *) flint_malloc(nvars*sizeof(fmpz));
         for (j = 0; j < nvars; j++)
@@ -205,7 +205,7 @@ TEST_FUNCTION_START(fmpq_mpoly_div, state)
         fmpq_mpoly_ctx_t ctx;
         fmpq_mpoly_t f, g, h, r;
         slong len, len1, len2;
-        mp_limb_t max_bound, * exp_bound, * exp_bound1, * exp_bound2;
+        ulong max_bound, * exp_bound, * exp_bound1, * exp_bound2;
         flint_bitcnt_t coeff_bits;
         fmpz * shifts, * strides;
         slong nvars;
@@ -225,9 +225,9 @@ TEST_FUNCTION_START(fmpq_mpoly_div, state)
         coeff_bits = n_randint(state, 70);
 
         max_bound = 1 + 400/FLINT_MAX(WORD(1), nvars)/FLINT_MAX(WORD(1), nvars);
-        exp_bound = (mp_limb_t *) flint_malloc(nvars*sizeof(mp_limb_t));
-        exp_bound1 = (mp_limb_t *) flint_malloc(nvars*sizeof(mp_limb_t));
-        exp_bound2 = (mp_limb_t *) flint_malloc(nvars*sizeof(mp_limb_t));
+        exp_bound = (ulong *) flint_malloc(nvars*sizeof(ulong));
+        exp_bound1 = (ulong *) flint_malloc(nvars*sizeof(ulong));
+        exp_bound2 = (ulong *) flint_malloc(nvars*sizeof(ulong));
         shifts = (fmpz *) flint_malloc(nvars*sizeof(fmpz));
         strides = (fmpz *) flint_malloc(nvars*sizeof(fmpz));
         for (j = 0; j < nvars; j++)
@@ -294,7 +294,7 @@ TEST_FUNCTION_START(fmpq_mpoly_div, state)
         fmpq_mpoly_ctx_t ctx;
         fmpq_mpoly_t f, g, h, r;
         slong len, len1, len2;
-        mp_limb_t max_bound, * exp_bound, * exp_bound1, * exp_bound2;
+        ulong max_bound, * exp_bound, * exp_bound1, * exp_bound2;
         flint_bitcnt_t coeff_bits;
         fmpz * shifts, * strides;
         slong nvars;
@@ -314,9 +314,9 @@ TEST_FUNCTION_START(fmpq_mpoly_div, state)
         coeff_bits = n_randint(state, 70);
 
         max_bound = 1 + 400/FLINT_MAX(WORD(1), nvars)/FLINT_MAX(WORD(1), nvars);
-        exp_bound = (mp_limb_t *) flint_malloc(nvars*sizeof(mp_limb_t));
-        exp_bound1 = (mp_limb_t *) flint_malloc(nvars*sizeof(mp_limb_t));
-        exp_bound2 = (mp_limb_t *) flint_malloc(nvars*sizeof(mp_limb_t));
+        exp_bound = (ulong *) flint_malloc(nvars*sizeof(ulong));
+        exp_bound1 = (ulong *) flint_malloc(nvars*sizeof(ulong));
+        exp_bound2 = (ulong *) flint_malloc(nvars*sizeof(ulong));
         shifts = (fmpz *) flint_malloc(nvars*sizeof(fmpz));
         strides = (fmpz *) flint_malloc(nvars*sizeof(fmpz));
         for (j = 0; j < nvars; j++)

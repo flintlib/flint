@@ -19,7 +19,7 @@ TEST_FUNCTION_START(n_factor_trial_partial, state)
 
     for (ix = 0; ix < 1000 * flint_test_multiplier(); ix++) /* Test random numbers */
     {
-        mp_limb_t n1, n2, prod, limit;
+        ulong n1, n2, prod, limit;
         n_factor_t factors;
 
         n_factor_init(&factors);

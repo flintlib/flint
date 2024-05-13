@@ -11,7 +11,7 @@
 
 #include "ulong_extras.h"
 
-const mp_limb_t * n_primes_arr_readonly(ulong num_primes)
+const ulong * n_primes_arr_readonly(ulong num_primes)
 {
     slong m;
 

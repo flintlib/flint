@@ -16,7 +16,7 @@ int
 arf_mul_rnd_any(arf_ptr z, arf_srcptr x, arf_srcptr y,
         slong prec, arf_rnd_t rnd)
 {
-    mp_size_t xn, yn;
+    slong xn, yn;
     slong fix;
     int sgnbit, inexact;
 
@@ -29,7 +29,7 @@ arf_mul_rnd_any(arf_ptr z, arf_srcptr x, arf_srcptr y,
     if (yn > xn)
     {
         FLINT_SWAP(arf_srcptr, x, y);
-        FLINT_SWAP(mp_size_t, xn, yn);
+        FLINT_SWAP(slong, xn, yn);
     }
 
     /* Either operand is a special value. */
@@ -40,9 +40,9 @@ arf_mul_rnd_any(arf_ptr z, arf_srcptr x, arf_srcptr y,
     }
     else
     {
-        mp_size_t zn, alloc;
-        mp_srcptr xptr, yptr;
-        mp_ptr tmp;
+        slong zn, alloc;
+        nn_srcptr xptr, yptr;
+        nn_ptr tmp;
         ARF_MUL_TMP_DECL
 
         ARF_GET_MPN_READONLY(xptr, xn, x);

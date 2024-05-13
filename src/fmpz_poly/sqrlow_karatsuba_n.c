@@ -92,7 +92,7 @@ void _fmpz_poly_sqrlow_karatsuba(fmpz * res, const fmpz * poly, slong len, slong
         copy = flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < len; i++)
             copy[i] = poly[i];
-        flint_mpn_zero((mp_ptr) copy + len, n - len);
+        flint_mpn_zero((nn_ptr) copy + len, n - len);
         clear = 1;
     }
 

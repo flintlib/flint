@@ -22,7 +22,7 @@ TEST_FUNCTION_START(fmpz_is_prime_morrison, state)
     for (i = 0; i < 30 * flint_test_multiplier(); i++)
     {
         fmpz_t p, F, R;
-        mp_ptr pp1;
+        nn_ptr pp1;
         slong num_pp1;
         double logd;
         ulong limit;

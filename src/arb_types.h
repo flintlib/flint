@@ -21,7 +21,7 @@ extern "C" {
 typedef struct
 {
     fmpz exp;
-    mp_limb_t man;
+    ulong man;
 }
 mag_struct;
 

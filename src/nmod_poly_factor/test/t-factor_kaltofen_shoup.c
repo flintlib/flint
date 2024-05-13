@@ -25,7 +25,7 @@ TEST_FUNCTION_START(nmod_poly_factor_kaltofen_shoup, state)
     {
         nmod_poly_t poly1, poly, q, r, product;
         nmod_poly_factor_t res;
-        mp_limb_t modulus, lead;
+        ulong modulus, lead;
         slong i, j, length, num;
         slong exp[5];
 

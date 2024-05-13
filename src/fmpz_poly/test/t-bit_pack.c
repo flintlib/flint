@@ -24,8 +24,8 @@ TEST_FUNCTION_START(fmpz_poly_bit_pack, state)
 
         slong length = n_randint(state, 100) + 1;
         flint_bitcnt_t bits = n_randint(state, 300) + 2;
-        mp_ptr arr = (mp_ptr) flint_calloc((length * bits - 1) / FLINT_BITS + 1,
-                                     sizeof(mp_limb_t));
+        nn_ptr arr = (nn_ptr) flint_calloc((length * bits - 1) / FLINT_BITS + 1,
+                                     sizeof(ulong));
         int negate;
 
         fmpz_poly_init(a);
@@ -64,8 +64,8 @@ TEST_FUNCTION_START(fmpz_poly_bit_pack, state)
 
         slong length = n_randint(state, 100) + 1;
         flint_bitcnt_t bits = n_randint(state, 300) + 1;
-        mp_ptr arr = (mp_ptr) flint_calloc((length * bits - 1) / FLINT_BITS + 1,
-                                     sizeof(mp_limb_t));
+        nn_ptr arr = (nn_ptr) flint_calloc((length * bits - 1) / FLINT_BITS + 1,
+                                     sizeof(ulong));
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);

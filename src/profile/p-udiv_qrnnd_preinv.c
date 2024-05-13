@@ -15,8 +15,8 @@
 
 void sample(void * arg, ulong count)
 {
-   mp_limb_t d, q, r, dinv, norm;
-   mp_ptr array = (mp_ptr) flint_malloc(200 * sizeof(mp_limb_t));
+   ulong d, q, r, dinv, norm;
+   nn_ptr array = (nn_ptr) flint_malloc(200 * sizeof(ulong));
    ulong i;
    int j;
 

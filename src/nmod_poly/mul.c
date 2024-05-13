@@ -33,8 +33,8 @@ static const short fft_sqr_tab[] = {1420, 1420, 1353, 964, 689, 569, 407, 353, 3
 
 #endif
 
-void _nmod_poly_mul(mp_ptr res, mp_srcptr poly1, slong len1,
-                             mp_srcptr poly2, slong len2, nmod_t mod)
+void _nmod_poly_mul(nn_ptr res, nn_srcptr poly1, slong len1,
+                             nn_srcptr poly2, slong len2, nmod_t mod)
 {
     slong bits, cutoff_len;
 

@@ -27,11 +27,11 @@ the following primitive datatype should be used:
 |                                        |                                |
 |:--------------------------------------:|:------------------------------:|
 | bit counts up to a single limb         | `ulong`                        |
-| bit counts, multiprecision             | `mp_bitcnt_t`                  |
+| bit counts, multiprecision             | `flint_bitcnt_t`                  |
 | byte counts (strings)                  | `size_t`                       |
-| limb counts in multiprecision integers | `mp_size_t`                    |
-| limbs (unsigned/signed)                | `mp_limb_t`/`mp_limb_signed_t` |
-| `mp_limb_t` arrays                     | `mp_ptr`/`mp_srcptr`           |
+| limb counts in multiprecision integers | `slong`                    |
+| limbs (unsigned/signed)                | `ulong`/`slong` |
+| `ulong` arrays                     | `nn_ptr`/`nn_srcptr`           |
 | ui/si function constants               | `ulong`/`slong`                |
 | exponents (unsigned/signed)            | `ulong`/`slong`                |
 | polynomial lengths                     | `slong`                        |
@@ -43,11 +43,11 @@ The typical definitions of these in terms of primitive types are:
 
 |               |                                         |
 |:-------------:|:---------------------------------------:|
-| `mp_bitcnt_t` | `unsigned long` or `unsigned long long` |
-| `mp_size_t`   | `long` or `long long`                   |
-| `mp_limb_t`   | `unsigned long` or `unsigned long long` |
-| `mp_ptr`      | `mp_limb_t *`                           |
-| `mp_srcptr`   | `const mp_limb_t *`                     |
+| `flint_bitcnt_t` | `unsigned long` or `unsigned long long` |
+| `slong`   | `long` or `long long`                   |
+| `ulong`   | `unsigned long` or `unsigned long long` |
+| `nn_ptr`      | `ulong *`                           |
+| `nn_srcptr`   | `const ulong *`                     |
 | `slong`       | `long` or `long long`                   |
 | `ulong`       | `unsigned long` or `unsigned long long` |
 

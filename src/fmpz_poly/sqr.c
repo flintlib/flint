@@ -44,13 +44,13 @@ void _fmpz_poly_sqr_tiny1(fmpz * res, const fmpz * poly, slong len)
 void _fmpz_poly_sqr_tiny2(fmpz * res, const fmpz * poly, slong len)
 {
     slong i, j, k, c, d;
-    mp_limb_t hi, lo;
-    mp_ptr tmp;
+    ulong hi, lo;
+    nn_ptr tmp;
     TMP_INIT;
 
     TMP_START;
 
-    tmp = TMP_ALLOC(2 * (2 * len - 1) * sizeof(mp_limb_t));
+    tmp = TMP_ALLOC(2 * (2 * len - 1) * sizeof(ulong));
 
     flint_mpn_zero(tmp, 2 * (2 * len - 1));
 
@@ -87,7 +87,7 @@ void _fmpz_poly_sqr_tiny2(fmpz * res, const fmpz * poly, slong len)
         lo = tmp[2 * i];
         hi = tmp[2 * i + 1];
 
-        if (((mp_limb_signed_t) hi) >= 0)
+        if (((slong) hi) >= 0)
         {
             fmpz_set_uiui(res + i, hi, lo);
         }
@@ -159,7 +159,7 @@ void _fmpz_poly_sqr(fmpz * res, const fmpz * poly, slong len)
     }
     else
     {
-        mp_size_t limbs;
+        slong limbs;
 
         limbs = (bits + FLINT_BITS - 1) / FLINT_BITS;
 

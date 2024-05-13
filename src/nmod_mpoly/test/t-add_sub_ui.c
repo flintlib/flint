@@ -21,7 +21,7 @@ TEST_FUNCTION_START(nmod_mpoly_add_sub_ui, state)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h;
-        mp_limb_t modulus;
+        ulong modulus;
         ulong c;
         slong len, len1, len2;
         slong exp_bits, exp_bits1, exp_bits2;
@@ -77,7 +77,7 @@ TEST_FUNCTION_START(nmod_mpoly_add_sub_ui, state)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g;
-        mp_limb_t modulus;
+        ulong modulus;
         ulong c;
         slong len1, len2;
         slong exp_bits1, exp_bits2;

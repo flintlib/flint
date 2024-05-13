@@ -41,8 +41,8 @@ inline void fmpz_set_ZZ(fmpz_t rop, const ZZ& op)
         fmpz_zero(rop);
     else
     {
-        const mp_size_t lw = op.size();
-        const mp_limb_t *xp = ((mp_limb_t *) (((slong *) (x)) + 2));
+        const slong lw = op.size();
+        const ulong *xp = ((ulong *) (((slong *) (x)) + 2));
 
         if (lw == 0)
             fmpz_zero(rop);
@@ -52,7 +52,7 @@ inline void fmpz_set_ZZ(fmpz_t rop, const ZZ& op)
         {
             mpz_ptr mf = _fmpz_promote(rop);
 
-            mpz_import(mf, lw, -1, sizeof(mp_limb_t), 0, 0, xp);
+            mpz_import(mf, lw, -1, sizeof(ulong), 0, 0, xp);
         }
 
         if (op < WORD(0))
@@ -65,7 +65,7 @@ inline void fmpz_set_ZZ(fmpz_t rop, const ZZ& op)
  */
 inline void fmpz_get_ZZ(NTL_NNS ZZ& rop, const fmpz_t op)
 {
-   mp_limb_t *xp;
+   ulong *xp;
    _ntl_gbigint *x = &rop.rep;
    slong lw = fmpz_size(op);
    fmpz c = *op;
@@ -77,7 +77,7 @@ inline void fmpz_get_ZZ(NTL_NNS ZZ& rop, const fmpz_t op)
    }
 
    _ntl_gsetlength(x, lw);
-   xp = ((mp_limb_t *) (((slong *) (*x)) + 2));  // data
+   xp = ((ulong *) (((slong *) (*x)) + 2));  // data
 
    if (COEFF_IS_MPZ(c))
    {

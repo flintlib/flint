@@ -341,7 +341,7 @@ done:
 }
 
 void fmpz_multi_mod_ui(
-    mp_limb_t * out,
+    ulong * out,
     const fmpz_t input,
     const fmpz_comb_t C,
     fmpz_comb_temp_t CT)
@@ -375,7 +375,7 @@ void fmpz_multi_mod_ui(
         for ( ; i < j; i++)
         {
             /* mid level split: depends on FMPZ_MOD_UI_CUTOFF */
-            mp_limb_t t = fmpz_get_nmod(A + k, lu[i].mod);
+            ulong t = fmpz_get_nmod(A + k, lu[i].mod);
 
             /* low level split: 1, 2, or 3 small primes */
             if (lu[i].mod2.n != 0)

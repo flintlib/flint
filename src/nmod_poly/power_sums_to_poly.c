@@ -14,7 +14,7 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_power_sums_to_poly(mp_ptr res, mp_srcptr poly, slong len,
+_nmod_poly_power_sums_to_poly(nn_ptr res, nn_srcptr poly, slong len,
                               nmod_t mod)
 {
     if (mod.n <= 12 || poly[0] <= 10)
@@ -58,7 +58,7 @@ nmod_poly_power_sums_to_poly(nmod_poly_t res, const nmod_poly_t Q)
 
 /* todo: should use dot products */
 void
-_nmod_poly_power_sums_to_poly_naive(mp_ptr res, mp_srcptr poly, slong len,
+_nmod_poly_power_sums_to_poly_naive(nn_ptr res, nn_srcptr poly, slong len,
                                     nmod_t mod)
 {
     slong i, k;
@@ -121,16 +121,16 @@ nmod_poly_power_sums_to_poly_naive(nmod_poly_t res, const nmod_poly_t Q)
 }
 
 void
-_nmod_poly_power_sums_to_poly_schoenhage(mp_ptr res, mp_srcptr poly, slong len,
+_nmod_poly_power_sums_to_poly_schoenhage(nn_ptr res, nn_srcptr poly, slong len,
                                          nmod_t mod)
 {
-    mp_ptr t;
+    nn_ptr t;
     slong d = poly[0];
 
     if (len >= d + 1)
         len = d + 1;
 
-    t = flint_malloc(len * sizeof(mp_limb_t));
+    t = flint_malloc(len * sizeof(ulong));
 
     _nmod_vec_neg(t, poly + 1, len - 1, mod);
     _nmod_poly_integral(t, t, len, mod);

@@ -389,7 +389,7 @@ TEST_FUNCTION_START(nmod_mpoly_gcd_cofactors, state)
         nmod_mpoly_t a, b, g, abar, bbar, t;
         slong len, len1, len2;
         flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, (i % 10 == 0) ? 4: FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -448,7 +448,7 @@ TEST_FUNCTION_START(nmod_mpoly_gcd_cofactors, state)
         nmod_mpoly_t a, b, g, abar, bbar, t1, t2;
         slong len, len1;
         flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, (i % 10 == 0) ? 4: FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -504,12 +504,12 @@ TEST_FUNCTION_START(nmod_mpoly_gcd_cofactors, state)
     /* one input divides the other */
     for (i = 0; i < tmul * flint_test_multiplier(); i++)
     {
-        mp_limb_t c;
+        ulong c;
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t a, b, g, abar, bbar, t1, t2;
         slong len, len1, len2;
-        mp_limb_t exp_bound, exp_bound1, exp_bound2;
-        mp_limb_t modulus;
+        ulong exp_bound, exp_bound1, exp_bound2;
+        ulong modulus;
 
         modulus = n_randint(state, (i % 10 == 0) ? 4: FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -570,7 +570,7 @@ TEST_FUNCTION_START(nmod_mpoly_gcd_cofactors, state)
         nmod_mpoly_t a, b, g, abar, bbar, t;
         slong len, len1, len2;
         slong degbound;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, (i % 10 == 0) ? 4: FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -621,11 +621,11 @@ TEST_FUNCTION_START(nmod_mpoly_gcd_cofactors, state)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t a, b, g, abar, bbar, t;
-        mp_limb_t rlimb;
+        ulong rlimb;
         flint_bitcnt_t newbits;
         slong len, len1, len2;
         slong degbound;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, (i % 10 == 0) ? 4: FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -696,7 +696,7 @@ TEST_FUNCTION_START(nmod_mpoly_gcd_cofactors, state)
         flint_bitcnt_t stride_bits, shift_bits;
         slong len, len1, len2;
         slong degbound;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, (i % 10 == 0) ? 4: FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -791,7 +791,7 @@ TEST_FUNCTION_START(nmod_mpoly_gcd_cofactors, state)
         ulong degbounds2[4];
         ulong degbounds3[4];
         flint_bitcnt_t bits4;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, (i % 10 == 0) ? 4: FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -850,14 +850,14 @@ TEST_FUNCTION_START(nmod_mpoly_gcd_cofactors, state)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t a, b, g, abar, bbar, t;
-        mp_limb_t rlimb;
+        ulong rlimb;
         flint_bitcnt_t newbits;
         slong len1, len2, len3, len4;
         ulong degbounds1[4];
         ulong degbounds2[4];
         ulong degbounds3[4];
         flint_bitcnt_t bits4;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, (i % 10 == 0) ? 4: FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -939,7 +939,7 @@ TEST_FUNCTION_START(nmod_mpoly_gcd_cofactors, state)
         ulong degbounds2[4];
         ulong degbounds3[4];
         flint_bitcnt_t bits4;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, (i % 10 == 0) ? 4: FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);

@@ -26,15 +26,15 @@
 /* 2x2 -> 4 signed addmul */
 static void _do_row_22_4_signed_branchy(
     fmpz * CR,
-    const mp_limb_t * AR,
-    const mp_limb_t * B,
+    const ulong * AR,
+    const ulong * B,
     slong br,
     slong bc)
 {
     slong j, k, l;
-    mp_limb_t s[4], t3, t2, t1, t0, w3, w2, w1, w0;
-    mp_limb_t A0, A1, B0, B1;
-    mp_limb_t u2, u1, u0;
+    ulong s[4], t3, t2, t1, t0, w3, w2, w1, w0;
+    ulong A0, A1, B0, B1;
+    ulong u2, u1, u0;
 
     for (j = 0, l = 0; j < bc; j++)
     {
@@ -83,15 +83,15 @@ static void _do_row_22_4_signed_branchy(
 /* 2x2 -> 4 signed addmul */
 static void _do_row_22_4_signed(
     fmpz * CR,
-    const mp_limb_t * AR,
-    const mp_limb_t * B,
+    const ulong * AR,
+    const ulong * B,
     slong br,
     slong bc)
 {
     slong j, k, l;
-    mp_limb_t s[4], t3, t2, t1, t0, w3, w2, w1, w0;
-    mp_limb_t A0, A1, B0, B1;
-    mp_limb_t v3, v2, u2, u1, u0;
+    ulong s[4], t3, t2, t1, t0, w3, w2, w1, w0;
+    ulong A0, A1, B0, B1;
+    ulong v3, v2, u2, u1, u0;
 
     for (j = 0, l = 0; j < bc; j++)
     {
@@ -140,18 +140,18 @@ static void _do_row_22_4_signed(
 /* 2x2 -> 5 signed addmul */
 static void _do_row_22_5_signed(
     fmpz * CR,
-    const mp_limb_t * AR,
-    const mp_limb_t * B,
+    const ulong * AR,
+    const ulong * B,
     slong br,
     slong bc)
 {
     slong j, k, l;
-    mp_limb_t s[5];
-    mp_limb_t A0, A1, B0, B1;
-    mp_limb_t s4, s3, s2, s1, s0;
-    mp_limb_t p3, p2, p1, p0;
-    mp_limb_t u3, u2;
-    mp_limb_t v2;
+    ulong s[5];
+    ulong A0, A1, B0, B1;
+    ulong s4, s3, s2, s1, s0;
+    ulong p3, p2, p1, p0;
+    ulong u3, u2;
+    ulong v2;
 
     for (j = 0, l = 0; j < bc; j++)
     {
@@ -199,18 +199,18 @@ static void _do_row_22_5_signed(
 /* 2x2 -> 4 unsigned addmul */
 static void _do_row_22_4_unsigned(
     fmpz * CR,
-    const mp_limb_t * AR,
-    const mp_limb_t * B,
+    const ulong * AR,
+    const ulong * B,
     slong br,
     slong bc)
 {
     slong j, k, l;
-    mp_limb_t s[4];
-    mp_limb_t A0, A1, B0, B1;
-    mp_limb_t p3, p2, p1, p0;
-    mp_limb_t s3, s2, s1, s0;
-    mp_limb_t u3, u2, u1;
-    mp_limb_t v3, v2;
+    ulong s[4];
+    ulong A0, A1, B0, B1;
+    ulong p3, p2, p1, p0;
+    ulong s3, s2, s1, s0;
+    ulong u3, u2, u1;
+    ulong v3, v2;
 
     for (j = 0, l = 0; j < bc; j++)
     {
@@ -251,18 +251,18 @@ static void _do_row_22_4_unsigned(
 /* 2x2 -> 5 unsigned addmul */
 static void _do_row_22_5_unsigned(
     fmpz * CR,
-    const mp_limb_t * AR,
-    const mp_limb_t * B,
+    const ulong * AR,
+    const ulong * B,
     slong br,
     slong bc)
 {
     slong j, k, l;
-    mp_limb_t s[5];
-    mp_limb_t A0, A1, B0, B1;
-    mp_limb_t p3, p2, p1, p0;
-    mp_limb_t s4, s3, s2, s1, s0;
-    mp_limb_t u2, u1;
-    mp_limb_t v3, v2;
+    ulong s[5];
+    ulong A0, A1, B0, B1;
+    ulong p3, p2, p1, p0;
+    ulong s4, s3, s2, s1, s0;
+    ulong u2, u1;
+    ulong v3, v2;
 
     for (j = 0, l = 0; j < bc; j++)
     {
@@ -316,7 +316,7 @@ typedef struct {
     fmpz ** Crows;
     fmpz ** Arows;
     fmpz ** Brows;
-    mp_limb_t * BL;
+    ulong * BL;
     int sign;
     int words;
 } _worker_arg;
@@ -328,7 +328,7 @@ static void _red_worker(void * varg)
     slong Bstopcol = arg->Bstopcol;
     slong br = arg->br;
     fmpz ** Brows = arg->Brows;
-    mp_limb_t * BL = arg->BL;
+    ulong * BL = arg->BL;
     int sign = arg->sign;
     slong i, j;
 
@@ -358,10 +358,10 @@ static void _mul_worker(void * varg)
     slong bc = arg->bc;
     fmpz ** Crows = arg->Crows;
     fmpz ** Arows = arg->Arows;
-    mp_limb_t * BL = arg->BL;
+    ulong * BL = arg->BL;
     int sign = arg->sign;
     int words = arg->words;
-    mp_limb_t * AL;
+    ulong * AL;
     slong i, j;
     TMP_INIT;
 
@@ -370,7 +370,7 @@ static void _mul_worker(void * varg)
 
     TMP_START;
 
-    AL = TMP_ARRAY_ALLOC(2*ac, mp_limb_t);
+    AL = TMP_ARRAY_ALLOC(2*ac, ulong);
 
     if (sign)
     {
@@ -453,7 +453,7 @@ void _fmpz_mat_mul_double_word_internal(
     mainarg.Crows = C->rows;
     mainarg.Arows = A->rows;
     mainarg.Brows = B->rows;
-    mainarg.BL = TMP_ARRAY_ALLOC(br*bc*2, mp_limb_t);
+    mainarg.BL = TMP_ARRAY_ALLOC(br*bc*2, ulong);
     mainarg.sign = sign;
 
     if (bits + sign <= 4*FLINT_BITS)

@@ -19,7 +19,7 @@ void _fmpz_mod_poly_fit_length(fmpz_mod_poly_t f, slong len)
     {
         slong alloc = FLINT_MAX(2*f->alloc, len);
         f->coeffs = FLINT_ARRAY_REALLOC(f->coeffs, alloc, fmpz);
-        flint_mpn_zero((mp_ptr) (f->coeffs + f->alloc), alloc - f->alloc);
+        flint_mpn_zero((nn_ptr) (f->coeffs + f->alloc), alloc - f->alloc);
         f->alloc = alloc;
     }
 }

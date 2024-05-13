@@ -31,7 +31,7 @@ void _nmod_mpoly_monomial_evals_cache(
     const ulong * Aexps,
     flint_bitcnt_t Abits,
     slong Alen,
-    const mp_limb_t * betas,
+    const ulong * betas,
     slong start,
     slong stop,
     const mpoly_ctx_t mctx,
@@ -42,7 +42,7 @@ void _nmod_mpoly_monomial_evals_cache(
     slong N = mpoly_words_per_exp_sp(Abits, mctx);
     slong * off, * shift;
     n_poly_struct * caches;
-    mp_limb_t * c;
+    ulong * c;
     slong num = stop - start;
 
     FLINT_ASSERT(Abits <= FLINT_BITS);
@@ -104,7 +104,7 @@ void _nmod_mpoly_monomial_evals2_cache(
     const ulong * Aexps,
     flint_bitcnt_t Abits,
     slong Alen,
-    const mp_limb_t * betas,
+    const ulong * betas,
     slong m,
     const mpoly_ctx_t mctx,
     nmod_t mod)
@@ -115,7 +115,7 @@ void _nmod_mpoly_monomial_evals2_cache(
     slong N = mpoly_words_per_exp_sp(Abits, mctx);
     slong * off, * shift;
     n_poly_struct * caches;
-    mp_limb_t * c;
+    ulong * c;
 
     FLINT_ASSERT(Abits <= FLINT_BITS);
     FLINT_ASSERT(Alen > 0);
@@ -351,7 +351,7 @@ int nmod_mpoly_gcd_get_use_new(
     return use;
 }
 
-mp_limb_t n_poly_mod_eval_step_sep(
+ulong n_poly_mod_eval_step_sep(
     n_poly_t cur,
     const n_poly_t inc,
     const nmod_mpoly_t A,
@@ -363,7 +363,7 @@ mp_limb_t n_poly_mod_eval_step_sep(
 }
 
 static void n_fq_poly_eval_step_sep(
-    mp_limb_t * res,
+    ulong * res,
     n_fq_poly_t cur,
     const n_fq_poly_t inc,
     const fq_nmod_mpoly_t A,
@@ -383,7 +383,7 @@ static void n_bpoly_mod_eval_step_sep(
 {
     slong i, Ai;
     slong e0, e1;
-    mp_limb_t c;
+    ulong c;
 
     n_bpoly_zero(E);
 
@@ -412,7 +412,7 @@ static void n_bpoly_mod_eval_step_sep(
 static void nmod_mpoly_monomial_evals(
     n_poly_t E,
     const nmod_mpoly_t A,
-    const mp_limb_t * betas,
+    const ulong * betas,
     slong start,
     slong stop,
     const nmod_mpoly_ctx_t ctx)
@@ -436,7 +436,7 @@ static void fq_nmod_mpoly_monomial_evals(
 static void nmod_mpoly_monomial_evals2(
     n_polyun_t E,
     const nmod_mpoly_t A,
-    const mp_limb_t * betas,
+    const ulong * betas,
     slong m,
     const nmod_mpoly_ctx_t ctx)
 {
@@ -499,13 +499,13 @@ int nmod_mpolyl_gcd_zippel_smprime(
     slong i, m;
     slong nvars = ctx->minfo->nvars;
     flint_bitcnt_t bits = A->bits;
-    mp_limb_t * alphas, * betas;
+    ulong * alphas, * betas;
     flint_rand_t state;
     nmod_mpoly_t cont;
     nmod_mpoly_t T, G, Abar, Bbar;
     n_polyun_t HG, HAbar, HBbar, MG, MAbar, MBbar, ZG, ZAbar, ZBbar;
     n_bpoly_t Aev, Bev, Gev, Abarev, Bbarev;
-    mp_limb_t gammaev;
+    ulong gammaev;
     nmod_mpolyn_t Tn, Gn, Abarn, Bbarn;
     slong lastdeg;
     slong cur_zip_image, req_zip_images, this_length;
@@ -515,7 +515,7 @@ int nmod_mpolyl_gcd_zippel_smprime(
     nmod_mpoly_struct * Aevals, * Bevals;
     nmod_mpoly_struct * gammaevals;
     n_poly_bpoly_stack_t St;
-    mp_limb_t c, start_alpha;
+    ulong c, start_alpha;
     ulong GdegboundXY, newdegXY, Abideg, Bbideg;
     slong degxAB, degyAB;
 
@@ -591,8 +591,8 @@ int nmod_mpolyl_gcd_zippel_smprime(
     n_poly_stack_init(St->poly_stack);
     n_bpoly_stack_init(St->bpoly_stack);
 
-    betas = FLINT_ARRAY_ALLOC(nvars, mp_limb_t);
-    alphas = FLINT_ARRAY_ALLOC(nvars, mp_limb_t);
+    betas = FLINT_ARRAY_ALLOC(nvars, ulong);
+    alphas = FLINT_ARRAY_ALLOC(nvars, ulong);
     flint_rand_init(state);
 
     Aevals = FLINT_ARRAY_ALLOC(nvars + 1, nmod_mpoly_struct);
@@ -1209,7 +1209,7 @@ int nmod_mpolyl_gcd_zippel_lgprime(
     fq_nmod_mpolyn_t qTn, qGn, qAbarn, qBbarn;
     n_fq_polyun_t HG, HAbar, HBbar, MG, MAbar, MBbar, ZG, ZAbar, ZBbar;
     n_fq_bpoly_t Aev, Bev, Gev, Abarev, Bbarev;
-    const mp_limb_t * gammaev;
+    const ulong * gammaev;
     slong lastdeg;
     slong cur_zip_image, req_zip_images, this_length;
     n_polyun_t Aeh_cur, Aeh_inc, Beh_cur, Beh_inc;

@@ -22,7 +22,7 @@ TEST_FUNCTION_START(nmod_poly_gcdinv, state)
     /* Compare with result from XGCD */
     for (i = 0; i < 1000; i++)
     {
-        mp_limb_t p;
+        ulong p;
         nmod_poly_t a, b, d, g, s, t, u;
 
         p = n_randtest_prime(state, 0);
@@ -73,7 +73,7 @@ TEST_FUNCTION_START(nmod_poly_gcdinv, state)
     /* Compare with result from XGCD */
     for (i = 0; i < 1000; i++)
     {
-        mp_limb_t p;
+        ulong p;
         nmod_poly_t a, b, d, f, g, s, t, u;
 
         p = n_randtest_prime(state, 0);

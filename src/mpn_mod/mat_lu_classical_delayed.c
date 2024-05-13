@@ -21,15 +21,15 @@
 int
 mpn_mod_mat_lu_classical_delayed(slong * res_rank, slong * P, gr_mat_t A, const gr_mat_t A_in, int rank_check, gr_ctx_t ctx)
 {
-    mp_limb_t d[MPN_MOD_MAX_LIMBS];
-    mp_limb_t e[MPN_MOD_MAX_LIMBS];
-    mp_limb_t f[MPN_MOD_MAX_LIMBS];
-    mp_ptr * a;
-    mp_ptr tmprow;
+    ulong d[MPN_MOD_MAX_LIMBS];
+    ulong e[MPN_MOD_MAX_LIMBS];
+    ulong f[MPN_MOD_MAX_LIMBS];
+    nn_ptr * a;
+    nn_ptr tmprow;
     slong n = MPN_MOD_CTX_NLIMBS(ctx);
     slong i, j, nrows, ncols, rank, row, col, pivot_row, tmp_index;
     int status = GR_SUCCESS;
-    mp_ptr tmp_ptr, b;
+    nn_ptr tnn_ptr, b;
     TMP_INIT;
 
     nrows = A->r;
@@ -41,7 +41,7 @@ mpn_mod_mat_lu_classical_delayed(slong * res_rank, slong * P, gr_mat_t A, const 
         return GR_SUCCESS;
     }
 
-    a = (mp_ptr *) A->rows;
+    a = (nn_ptr *) A->rows;
 
     if (A != A_in)
     {
@@ -55,7 +55,7 @@ mpn_mod_mat_lu_classical_delayed(slong * res_rank, slong * P, gr_mat_t A, const 
         P[i] = i;
 
     TMP_START;
-    b = TMP_ALLOC((2 * n + 1) * sizeof(mp_limb_t) * (nrows + 1) * ncols);
+    b = TMP_ALLOC((2 * n + 1) * sizeof(ulong) * (nrows + 1) * ncols);
     tmprow = b + (2 * n + 1) * (nrows * ncols);
 
 #define UNREDUCED(ii, jj) (b + (2 * n + 1) * ((ii) * ncols + (jj)))
@@ -107,9 +107,9 @@ mpn_mod_mat_lu_classical_delayed(slong * res_rank, slong * P, gr_mat_t A, const 
         /* swap rows */
         if (pivot_row != row)
         {
-            tmp_ptr = a[pivot_row];
+            tnn_ptr = a[pivot_row];
             a[pivot_row] = a[row];
-            a[row] = tmp_ptr;
+            a[row] = tnn_ptr;
 
             tmp_index = P[pivot_row];
             P[pivot_row] = P[row];
@@ -148,7 +148,7 @@ mpn_mod_mat_lu_classical_delayed(slong * res_rank, slong * P, gr_mat_t A, const 
             {
                 for (j = col + 1; j < ncols; j++)
                 {
-                    mp_limb_t t[4];
+                    ulong t[4];
                     FLINT_MPN_MUL_2X2(t[3], t[2], t[1], t[0], REDUCED(row, j)[1], REDUCED(row, j)[0], f[1], f[0]);
                     add_sssssaaaaaaaaaa(UNREDUCED(i, j)[4], UNREDUCED(i, j)[3], UNREDUCED(i, j)[2], UNREDUCED(i, j)[1], UNREDUCED(i, j)[0],
                                         UNREDUCED(i, j)[4], UNREDUCED(i, j)[3], UNREDUCED(i, j)[2], UNREDUCED(i, j)[1], UNREDUCED(i, j)[0],

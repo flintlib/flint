@@ -134,7 +134,7 @@ void _fmpz_mat_charpoly_modular(fmpz * rop, const fmpz_mat_t op)
         slong bound;
 
         slong pbits  = FLINT_BITS - 1;
-        mp_limb_t p = (UWORD(1) << pbits);
+        ulong p = (UWORD(1) << pbits);
 
         fmpz_t m;
 

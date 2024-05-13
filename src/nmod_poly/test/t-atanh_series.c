@@ -23,7 +23,7 @@ TEST_FUNCTION_START(nmod_poly_atanh_series, state)
     {
         nmod_poly_t A, B, atanhA, atanhB;
         slong n;
-        mp_limb_t mod;
+        ulong mod;
 
         mod = n_randtest_prime(state, 0);
         n = 1 + n_randtest(state) % 100;
@@ -71,7 +71,7 @@ TEST_FUNCTION_START(nmod_poly_atanh_series, state)
     {
         nmod_poly_t A, B;
         slong n;
-        mp_limb_t mod;
+        ulong mod;
         mod = n_randtest_prime(state, 0);
         n = n_randtest(state) % 50;
         n = FLINT_MIN(n, mod);

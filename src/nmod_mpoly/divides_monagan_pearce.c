@@ -17,8 +17,8 @@
 
 static int _nmod_mpoly_divides_monagan_pearce1(
     nmod_mpoly_t Q,
-    const mp_limb_t * coeff2, const ulong * exp2, slong len2,
-    const mp_limb_t * coeff3, const ulong * exp3, slong len3,
+    const ulong * coeff2, const ulong * exp2, slong len2,
+    const ulong * coeff3, const ulong * exp3, slong len3,
     slong bits,
     ulong maskhi,
     nmod_t fctx)
@@ -30,11 +30,11 @@ static int _nmod_mpoly_divides_monagan_pearce1(
     mpoly_heap_t * chain;
     slong * store, * store_base;
     mpoly_heap_t * x;
-    mp_limb_t * q_coeff = Q->coeffs;
+    ulong * q_coeff = Q->coeffs;
     ulong * q_exp = Q->exps;
     slong * hind;
     ulong mask, exp, maxexp = exp2[len2 - 1];
-    mp_limb_t lc_minus_inv, acc0, acc1, acc2, pp1, pp0;
+    ulong lc_minus_inv, acc0, acc1, acc2, pp1, pp0;
     TMP_INIT;
 
     TMP_START;
@@ -204,8 +204,8 @@ not_exact_division:
 
 int _nmod_mpoly_divides_monagan_pearce(
     nmod_mpoly_t Q,
-    const mp_limb_t * coeff2, const ulong * exp2, slong len2,
-    const mp_limb_t * coeff3, const ulong * exp3, slong len3,
+    const ulong * coeff2, const ulong * exp2, slong len2,
+    const ulong * coeff3, const ulong * exp3, slong len3,
     flint_bitcnt_t bits,
     slong N,
     const ulong * cmpmask,
@@ -218,12 +218,12 @@ int _nmod_mpoly_divides_monagan_pearce(
     mpoly_heap_t * chain;
     slong * store, * store_base;
     mpoly_heap_t * x;
-    mp_limb_t * q_coeff = Q->coeffs;
+    ulong * q_coeff = Q->coeffs;
     ulong * q_exp = Q->exps;
     ulong * exp, * exps;
     ulong ** exp_list;
     slong exp_next;
-    mp_limb_t lc_minus_inv, acc0, acc1, acc2, pp1, pp0;
+    ulong lc_minus_inv, acc0, acc1, acc2, pp1, pp0;
     ulong mask;
     slong * hind;
     TMP_INIT;

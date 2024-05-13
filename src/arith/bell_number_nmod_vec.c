@@ -13,7 +13,7 @@
 #include "arith.h"
 
 void
-arith_bell_number_nmod_vec(mp_ptr b, slong len, nmod_t mod)
+arith_bell_number_nmod_vec(nn_ptr b, slong len, nmod_t mod)
 {
     if (len < 300)
     {

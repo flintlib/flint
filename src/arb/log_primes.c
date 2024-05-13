@@ -508,7 +508,7 @@ void _arb_log_p_ensure_cached(slong prec)
             for (i = 0; i < ARB_LOG_PRIME_CACHE_NUM; i++)
             {
                 slong exp, exp_fix;
-                mp_size_t n;
+                slong n;
                 arb_ptr res = _arb_log_p_cache + i;
 
                 n = ARB_LOG_TAB2_PREC / FLINT_BITS;
@@ -729,7 +729,7 @@ void _arb_atan_gauss_p_ensure_cached(slong prec)
             for (i = 0; i < ARB_ATAN_GAUSS_PRIME_CACHE_NUM; i++)
             {
                 slong exp, exp_fix;
-                mp_size_t n;
+                slong n;
                 static const char exponents[24] = {0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1};
                 arb_ptr res = _arb_atan_gauss_p_cache + i;
 

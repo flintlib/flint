@@ -14,7 +14,7 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_product_roots_nmod_vec(mp_ptr poly, mp_srcptr xs, slong n, nmod_t mod)
+_nmod_poly_product_roots_nmod_vec(nn_ptr poly, nn_srcptr xs, slong n, nmod_t mod)
 {
     if (n == 0)
     {
@@ -45,7 +45,7 @@ _nmod_poly_product_roots_nmod_vec(mp_ptr poly, mp_srcptr xs, slong n, nmod_t mod
     else
     {
         const slong m = (n + 1) / 2;
-        mp_ptr tmp;
+        nn_ptr tmp;
 
         tmp = _nmod_vec_init(n + 2);
 
@@ -58,7 +58,7 @@ _nmod_poly_product_roots_nmod_vec(mp_ptr poly, mp_srcptr xs, slong n, nmod_t mod
 }
 
 void
-nmod_poly_product_roots_nmod_vec(nmod_poly_t poly, mp_srcptr xs, slong n)
+nmod_poly_product_roots_nmod_vec(nmod_poly_t poly, nn_srcptr xs, slong n)
 {
     nmod_poly_fit_length(poly, n + 1);
     _nmod_poly_product_roots_nmod_vec(poly->coeffs, xs, n, poly->mod);

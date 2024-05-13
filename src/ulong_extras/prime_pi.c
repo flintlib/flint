@@ -23,10 +23,10 @@ const unsigned char FLINT_PRIME_PI_ODD_LOOKUP[] =
 };
 
 
-ulong n_prime_pi(mp_limb_t n)
+ulong n_prime_pi(ulong n)
 {
     ulong low, mid, high;
-    const mp_limb_t * primes;
+    const ulong * primes;
 
     if (n < FLINT_PRIME_PI_ODD_LOOKUP_CUTOFF)
     {

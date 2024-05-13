@@ -13,18 +13,18 @@
 #include "nmod_mpoly.h"
 #include "fmpz_mpoly.h"
 
-mp_limb_t fmpz_mpoly_evaluate_all_nmod(
+ulong fmpz_mpoly_evaluate_all_nmod(
     const fmpz_mpoly_t A,
-    const mp_limb_t * alphas,
+    const ulong * alphas,
     const fmpz_mpoly_ctx_t ctx,
     nmod_t fpctx)
 {
-    mp_limb_t eval, * t;
+    ulong eval, * t;
     TMP_INIT;
 
     TMP_START;
 
-    t = TMP_ARRAY_ALLOC(A->length, mp_limb_t);
+    t = TMP_ARRAY_ALLOC(A->length, ulong);
     _fmpz_vec_get_nmod_vec(t, A->coeffs, A->length, fpctx);
     eval = _nmod_mpoly_eval_all_ui(t, A->exps, A->length, A->bits,
                                                     alphas, ctx->minfo, fpctx);

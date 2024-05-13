@@ -20,7 +20,7 @@ void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, slong len1,
 {
     slong len_out, loglen, loglen2, n;
     slong output_bits, limbs, size, i;
-    mp_limb_t * ptr, ** t1, ** t2, ** tt, ** s1, ** ii, ** jj;
+    ulong * ptr, ** t1, ** t2, ** tt, ** s1, ** ii, ** jj;
     slong bits1, bits2;
     ulong size1, size2;
     int sign = 0;
@@ -61,13 +61,13 @@ void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, slong len1,
     /* allocate space for ffts */
 
     N = flint_get_num_threads();
-    ii = flint_malloc((4*(n + n*size) + 5*size*N)*sizeof(mp_limb_t));
-    for (i = 0, ptr = (mp_limb_t *) ii + 4*n; i < 4*n; i++, ptr += size)
+    ii = flint_malloc((4*(n + n*size) + 5*size*N)*sizeof(ulong));
+    for (i = 0, ptr = (ulong *) ii + 4*n; i < 4*n; i++, ptr += size)
         ii[i] = ptr;
-   t1 = TMP_ALLOC(N*sizeof(mp_limb_t *));
-   t2 = TMP_ALLOC(N*sizeof(mp_limb_t *));
-   s1 = TMP_ALLOC(N*sizeof(mp_limb_t *));
-   tt = TMP_ALLOC(N*sizeof(mp_limb_t *));
+   t1 = TMP_ALLOC(N*sizeof(ulong *));
+   t2 = TMP_ALLOC(N*sizeof(ulong *));
+   s1 = TMP_ALLOC(N*sizeof(ulong *));
+   tt = TMP_ALLOC(N*sizeof(ulong *));
 
    t1[0] = ptr;
    t2[0] = t1[0] + size*N;
@@ -84,8 +84,8 @@ void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, slong len1,
 
     if (input1 != input2)
     {
-        jj = flint_malloc(4*(n + n*size)*sizeof(mp_limb_t));
-        for (i = 0, ptr = (mp_limb_t *) jj + 4*n; i < 4*n; i++, ptr += size)
+        jj = flint_malloc(4*(n + n*size)*sizeof(ulong));
+        for (i = 0, ptr = (ulong *) jj + 4*n; i < 4*n; i++, ptr += size)
             jj[i] = ptr;
     } else jj = ii;
 

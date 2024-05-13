@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-mp_size_t
+slong
 fmpz_size(const fmpz_t f)
 {
     fmpz d = *f;

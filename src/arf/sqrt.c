@@ -16,9 +16,9 @@
 int
 arf_sqrt(arf_ptr z, arf_srcptr x, slong prec, arf_rnd_t rnd)
 {
-    mp_size_t xn, zn, val;
-    mp_srcptr xptr;
-    mp_ptr tmp, zptr;
+    slong xn, zn, val;
+    nn_srcptr xptr;
+    nn_ptr tmp, zptr;
     mpfr_t xf, zf;
     int inexact, odd_exp;
     ARF_MUL_TMP_DECL
@@ -57,7 +57,7 @@ arf_sqrt(arf_ptr z, arf_srcptr x, slong prec, arf_rnd_t rnd)
     zf->_mpfr_sign = 1;
     zf->_mpfr_exp = 0;
 
-    xf->_mpfr_d = (mp_ptr) xptr;
+    xf->_mpfr_d = (nn_ptr) xptr;
     xf->_mpfr_prec = xn * FLINT_BITS;
     xf->_mpfr_sign = 1;
     xf->_mpfr_exp = odd_exp;

@@ -41,7 +41,7 @@ one can write ``FLINT_SWAP(fmpz_poly_struct, *x, *y)`` to swap the content of
     Returns the sign of `x` where `x` is interpreted as a :type:`slong`, that
     is, returns `-1` if `x < 0`, `0` if `x = 0` and `1` if `x > 0`.
 
-.. function:: mp_limb_t FLINT_BIT_COUNT(mp_limb_t x)
+.. function:: ulong FLINT_BIT_COUNT(ulong x)
 
     Returns the number of binary bits required to represent an ``ulong x``.  If
     `x` is zero, returns `0`.
@@ -73,7 +73,7 @@ by the C standard, but it is true on mainstream platforms.
 Since the C types *long* and *unsigned long* do not have a standardized size
 in practice, FLINT defines *slong* and *ulong* types which are guaranteed
 to be 32 bits on a 32-bit system and 64 bits on a 64-bit system.
-They are also guaranteed to have the same size as GMP's :type:`mp_limb_t`.
+They are also guaranteed to have the same size as GMP's :type:`ulong`.
 GMP builds with a different limb size configuration are not supported at all.
 For convenience, the macro *FLINT_BITS* specifies the word length (32 or 64)
 of the system.
@@ -103,19 +103,19 @@ of the system.
 The following GMP-defined types are used in methods that manipulate the
 internal representation of numbers (using limb arrays).
 
-.. type:: mp_limb_t
+.. type:: ulong
 
     A single limb.
 
-.. type:: mp_ptr
+.. type:: nn_ptr
 
     Pointer to a writable array of limbs.
 
-.. type:: mp_srcptr
+.. type:: nn_srcptr
 
     Pointer to a read-only array of limbs.
 
-.. type:: mp_size_t
+.. type:: slong
 
     A limb count (always nonnegative).
 
@@ -237,7 +237,7 @@ Input/Output
     ``printf``, ``fprintf``, ``vprintf``, and ``vfprintf``.
 
     The first extension is the addition of the length modifier ``w``, used for
-    printing the types :type:`ulong`, :type:`slong` and :type:`mp_limb_t`. As
+    printing the types :type:`ulong`, :type:`slong` and :type:`ulong`. As
     these types are either defined as signed and unsigned ``long int`` or
     ``long long int``, this comes in handy. Just like ``long int`` and ``long
     long int``, the conversion format specifier are allowed to be ``d``, ``i``,
@@ -309,7 +309,7 @@ Input/Output
 .. code-block:: c
 
     slong * vslong; slong vslong_len;
-    mp_ptr vnmod; slong vnmod_len; /* The base type for nmod is ulong */
+    nn_ptr vnmod; slong vnmod_len; /* The base type for nmod is ulong */
     fmpz * vfmpz; slong vfmpz_len;
     /* fmpz_mod vectors are given by the type `fmpz *' */
     fmpq * vfmpq; slong vfmpq_len;
@@ -414,7 +414,7 @@ Input/Output
 
      These are equivalent to the standard library functions ``scanf``,
      ``fscanf``, and ``sscanf`` with an additional length modifier "w" for
-     reading an :type:`mp_limb_t` type.
+     reading an :type:`ulong` type.
 
 Exceptions
 -----------------

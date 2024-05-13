@@ -123,20 +123,20 @@ void bad_fq_nmod_embed_sm_to_lg(fq_nmod_t out,
 void bad_fq_nmod_embed_lg_to_sm(fq_nmod_poly_t out,
                             const fq_nmod_t in, const bad_fq_nmod_embed_t emb);
 
-void bad_n_fq_embed_sm_to_lg(mp_limb_t * out_, const n_poly_t in_,
+void bad_n_fq_embed_sm_to_lg(ulong * out_, const n_poly_t in_,
                                                 const bad_fq_nmod_embed_t emb);
 
 void bad_fq_nmod_embed_n_fq_sm_to_fq_nmod_lg(fq_nmod_t out,
                             const n_poly_t in_, const bad_fq_nmod_embed_t emb);
 
-void bad_n_fq_embed_lg_to_sm(n_poly_t out_, const mp_limb_t * in_,
+void bad_n_fq_embed_lg_to_sm(n_poly_t out_, const ulong * in_,
                                                 const bad_fq_nmod_embed_t emb);
 
 void bad_fq_nmod_embed_fq_nmod_lg_to_n_fq_sm(n_poly_t out_,
                             const fq_nmod_t in, const bad_fq_nmod_embed_t emb);
 
-void bad_n_fq_embed_sm_elem_to_lg(mp_limb_t * out,
-                          const mp_limb_t * in, const bad_fq_nmod_embed_t emb);
+void bad_n_fq_embed_sm_elem_to_lg(ulong * out,
+                          const ulong * in, const bad_fq_nmod_embed_t emb);
 
 void bad_fq_nmod_embed_sm_elem_to_lg(fq_nmod_t out,
                             const fq_nmod_t in, const bad_fq_nmod_embed_t emb);
@@ -147,7 +147,7 @@ typedef struct bad_fq_nmod_mpoly_embed_chooser
     slong m; /* degree of the extension F_q / F_p */
     slong n; /* degree of the extension F_q^n / F_q */
     slong k; /* index of current in embed */
-    mp_limb_t p;
+    ulong p;
 } bad_fq_nmod_mpoly_embed_chooser_struct;
 
 typedef bad_fq_nmod_mpoly_embed_chooser_struct bad_fq_nmod_mpoly_embed_chooser_t[1];
@@ -174,7 +174,7 @@ bad_fq_nmod_embed_struct * bad_fq_nmod_mpoly_embed_chooser_next(
 /* Context object ************************************************************/
 
 void fq_nmod_mpoly_ctx_init_deg(fq_nmod_mpoly_ctx_t ctx, slong nvars,
-                                 const ordering_t ord, mp_limb_t p, slong deg);
+                                 const ordering_t ord, ulong p, slong deg);
 
 void fq_nmod_mpoly_ctx_init(fq_nmod_mpoly_ctx_t ctx, slong nvars,
                               const ordering_t ord, const fq_nmod_ctx_t fqctx);
@@ -241,7 +241,7 @@ void fq_nmod_mpoly_fit_length_reset_bits(fq_nmod_mpoly_t A,
 
 FQ_NMOD_MPOLY_INLINE
 void _fq_nmod_mpoly_fit_length(
-    mp_limb_t ** coeffs,
+    ulong ** coeffs,
     slong * coeffs_alloc,
     slong d,
     ulong ** exps,
@@ -252,14 +252,14 @@ void _fq_nmod_mpoly_fit_length(
     if (d*length > *coeffs_alloc)
     {
         *coeffs_alloc = FLINT_MAX(d*length, *coeffs_alloc*2);
-        *coeffs = (mp_limb_t *) flint_realloc(*coeffs,
-                                              *coeffs_alloc*sizeof(mp_limb_t));
+        *coeffs = (ulong *) flint_realloc(*coeffs,
+                                              *coeffs_alloc*sizeof(ulong));
     }
 
     if (N*length > *exps_alloc)
     {
         *exps_alloc = FLINT_MAX(N*length, *exps_alloc*2);
-        *exps = (mp_limb_t *) flint_realloc(*exps, *exps_alloc*sizeof(ulong));
+        *exps = (ulong *) flint_realloc(*exps, *exps_alloc*sizeof(ulong));
     }
 }
 
@@ -322,7 +322,7 @@ void fq_nmod_mpoly_swap(fq_nmod_mpoly_t A, fq_nmod_mpoly_t B,
 /* Constants *****************************************************************/
 
 FQ_NMOD_MPOLY_INLINE
-mp_limb_t * fq_nmod_mpoly_get_nonzero_n_fq(const fq_nmod_mpoly_t A,
+ulong * fq_nmod_mpoly_get_nonzero_n_fq(const fq_nmod_mpoly_t A,
                                                  const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_ASSERT(A->length == 1);
@@ -341,7 +341,7 @@ void fq_nmod_mpoly_set_fq_nmod(fq_nmod_mpoly_t A,
                              const fq_nmod_t c, const fq_nmod_mpoly_ctx_t ctx);
 
 void fq_nmod_mpoly_set_n_fq(fq_nmod_mpoly_t A,
-                           const mp_limb_t * c, const fq_nmod_mpoly_ctx_t ctx);
+                           const ulong * c, const fq_nmod_mpoly_ctx_t ctx);
 
 void fq_nmod_mpoly_set_ui(fq_nmod_mpoly_t A, ulong c,
                                                 const fq_nmod_mpoly_ctx_t ctx);
@@ -425,7 +425,7 @@ void fq_nmod_mpoly_get_coeff_vars_ui(fq_nmod_mpoly_t C,
               const fq_nmod_mpoly_t A, const slong * vars, const ulong * exps,
                                   slong length, const fq_nmod_mpoly_ctx_t ctx);
 
-FQ_NMOD_MPOLY_INLINE mp_limb_t * _fq_nmod_mpoly_leadcoeff(
+FQ_NMOD_MPOLY_INLINE ulong * _fq_nmod_mpoly_leadcoeff(
                         const fq_nmod_mpoly_t A, const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_ASSERT(A->length > 0);
@@ -557,9 +557,9 @@ void fq_nmod_mpoly_randtest_bits(fq_nmod_mpoly_t A, flint_rand_t state,
 /* Addition/Subtraction ******************************************************/
 
 slong _fq_nmod_mpoly_add(
-                         mp_limb_t * coeff1,       ulong * exp1,
-                         mp_limb_t * coeff2, const ulong * exp2, slong len2,
-                         mp_limb_t * coeff3, const ulong * exp3, slong len3,
+                         ulong * coeff1,       ulong * exp1,
+                         ulong * coeff2, const ulong * exp2, slong len2,
+                         ulong * coeff3, const ulong * exp3, slong len3,
                    slong N, const ulong * cmpmask, const fq_nmod_ctx_t fqctx);
 
 void fq_nmod_mpoly_add_fq_nmod(fq_nmod_mpoly_t A,
@@ -567,7 +567,7 @@ void fq_nmod_mpoly_add_fq_nmod(fq_nmod_mpoly_t A,
                                                 const fq_nmod_mpoly_ctx_t ctx);
 
 void fq_nmod_mpoly_add_n_fq(fq_nmod_mpoly_t A,
-                            const fq_nmod_mpoly_t B, const mp_limb_t * c,
+                            const fq_nmod_mpoly_t B, const ulong * c,
                                                 const fq_nmod_mpoly_ctx_t ctx);
 
 void fq_nmod_mpoly_sub_fq_nmod(fq_nmod_mpoly_t A,
@@ -592,7 +592,7 @@ void fq_nmod_mpoly_scalar_mul_fq_nmod(fq_nmod_mpoly_t A,
     const fq_nmod_mpoly_t B, const fq_nmod_t c, const fq_nmod_mpoly_ctx_t ctx);
 
 void fq_nmod_mpoly_scalar_mul_n_fq(fq_nmod_mpoly_t A,
-  const fq_nmod_mpoly_t B, const mp_limb_t * c, const fq_nmod_mpoly_ctx_t ctx);
+  const fq_nmod_mpoly_t B, const ulong * c, const fq_nmod_mpoly_ctx_t ctx);
 
 void fq_nmod_mpoly_make_monic(fq_nmod_mpoly_t A,
                        const fq_nmod_mpoly_t B, const fq_nmod_mpoly_ctx_t ctx);
@@ -614,7 +614,7 @@ void fq_nmod_mpoly_evaluate_one_fq_nmod(fq_nmod_mpoly_t A,
                                                 const fq_nmod_mpoly_ctx_t ctx);
 
 void _fq_nmod_mpoly_eval_all_fq_nmod(fq_nmod_t ev,
-                  const mp_limb_t * Acoeffs, const ulong * Aexps, slong Alen,
+                  const ulong * Acoeffs, const ulong * Aexps, slong Alen,
                        flint_bitcnt_t Abits, fq_nmod_struct * const * alphas,
                             const mpoly_ctx_t mctx, const fq_nmod_ctx_t fqctx);
 
@@ -657,10 +657,10 @@ void fq_nmod_mpoly_mul_johnson(fq_nmod_mpoly_t poly1,
 
 void _fq_nmod_mpoly_mul_johnson(
     fq_nmod_mpoly_t A,
-    const mp_limb_t * Bcoeffs,
+    const ulong * Bcoeffs,
     const ulong * Bexps,
     slong Blen,
-    const mp_limb_t * Ccoeffs,
+    const ulong * Ccoeffs,
     const ulong * Cexps,
     slong Clen,
     flint_bitcnt_t bits,
@@ -726,8 +726,8 @@ void fq_nmod_mpoly_divrem_ideal_monagan_pearce(
                                       slong len, const fq_nmod_mpoly_ctx_t ctx);
 
 int _fq_nmod_mpoly_divides_monagan_pearce(fq_nmod_mpoly_t A,
-             const mp_limb_t * coeff2, const ulong * exp2, slong len2,
-             const mp_limb_t * coeff3, const ulong * exp3, slong len3,
+             const ulong * coeff2, const ulong * exp2, slong len2,
+             const ulong * coeff3, const ulong * exp3, slong len3,
   flint_bitcnt_t bits, slong N, const ulong * cmpmask, const fq_nmod_ctx_t fqctx);
 
 
@@ -1069,7 +1069,7 @@ int fq_nmod_mpolyu_gcdm_zippel(fq_nmod_mpolyu_t G,
              fq_nmod_mpolyu_t Abar, fq_nmod_mpolyu_t Bbar,  fq_nmod_mpolyu_t A,
           fq_nmod_mpolyu_t B, fq_nmod_mpoly_ctx_t ctx, flint_rand_t randstate);
 
-FQ_NMOD_MPOLY_INLINE mp_limb_t * fq_nmod_mpolyu_leadcoeff(
+FQ_NMOD_MPOLY_INLINE ulong * fq_nmod_mpolyu_leadcoeff(
                        const fq_nmod_mpolyu_t A, const fq_nmod_mpoly_ctx_t ctx)
 {
     FLINT_ASSERT(A->length > 0);
@@ -1106,7 +1106,7 @@ void fq_nmod_mpolyn_fit_bits(fq_nmod_mpolyn_t A, slong bits,
 void fq_nmod_mpolyn_set(fq_nmod_mpolyn_t A, const fq_nmod_mpolyn_t B,
                                                 const fq_nmod_mpoly_ctx_t ctx);
 
-FQ_NMOD_MPOLY_INLINE mp_limb_t * fq_nmod_mpolyn_leadcoeff(
+FQ_NMOD_MPOLY_INLINE ulong * fq_nmod_mpolyn_leadcoeff(
                              fq_nmod_mpolyn_t A, const fq_nmod_mpoly_ctx_t ctx)
 {
     /* slong d = fq_nmod_ctx_degree(ctx->fqctx); */
@@ -1350,7 +1350,7 @@ int nmod_mpolyun_interp_crt_lg_mpolyu(slong * lastdeg,
 
 int nmod_mpolyn_interp_mcrt_lg_mpoly(slong * lastdeg_,
             nmod_mpolyn_t H, const nmod_mpoly_ctx_t smctx, const n_poly_t m,
-                              const mp_limb_t * inv_m_eval,fq_nmod_mpoly_t A,
+                              const ulong * inv_m_eval,fq_nmod_mpoly_t A,
                                               const fq_nmod_mpoly_ctx_t lgctx);
 
 int nmod_mpolyun_interp_mcrt_lg_mpolyu(slong * lastdeg,

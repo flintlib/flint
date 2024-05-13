@@ -31,7 +31,7 @@ int n_bpoly_mod_is_canonical(const n_bpoly_t A, nmod_t mod)
 }
 
 
-void n_bpoly_scalar_mul_nmod(n_bpoly_t A, mp_limb_t c, nmod_t ctx)
+void n_bpoly_scalar_mul_nmod(n_bpoly_t A, ulong c, nmod_t ctx)
 {
     slong i;
 

@@ -389,7 +389,7 @@ TEST_FUNCTION_START(fmpz_mpoly_gcd, state)
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t a, b, g, t1, t2;
         slong len, len1, len2;
-        mp_limb_t exp_bound, exp_bound1, exp_bound2;
+        ulong exp_bound, exp_bound1, exp_bound2;
         flint_bitcnt_t coeff_bits;
 
         fmpz_mpoly_ctx_init_rand(ctx, state, 10);
@@ -492,7 +492,7 @@ TEST_FUNCTION_START(fmpz_mpoly_gcd, state)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t a, b, g, t;
-        mp_limb_t rlimb;
+        ulong rlimb;
         flint_bitcnt_t coeff_bits, newbits;
         slong len, len1, len2;
         slong degbound;
@@ -704,7 +704,7 @@ TEST_FUNCTION_START(fmpz_mpoly_gcd, state)
     {
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t a, b, g, t;
-        mp_limb_t rlimb;
+        ulong rlimb;
         flint_bitcnt_t newbits;
         flint_bitcnt_t coeff_bits1, coeff_bits2, coeff_bits3, coeff_bits4;
         slong len1, len2, len3, len4;

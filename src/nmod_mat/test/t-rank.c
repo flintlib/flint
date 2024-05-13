@@ -17,7 +17,7 @@ TEST_FUNCTION_START(nmod_mat_rank, state)
 {
     nmod_mat_t A;
     slong i, m, n, d, r;
-    mp_limb_t mod;
+    ulong mod;
 
     /* Maximally sparse matrices of given rank */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)

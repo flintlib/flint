@@ -25,7 +25,7 @@ void fq_nmod_mpoly_init3(
     if (alloc > 0)
     {
         A->coeffs_alloc = d*alloc;
-        A->coeffs = FLINT_ARRAY_ALLOC(A->coeffs_alloc, mp_limb_t);
+        A->coeffs = FLINT_ARRAY_ALLOC(A->coeffs_alloc, ulong);
         A->exps_alloc = N*alloc;
         A->exps = FLINT_ARRAY_ALLOC(A->exps_alloc, ulong);
     }

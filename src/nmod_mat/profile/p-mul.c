@@ -26,7 +26,7 @@ typedef struct
     slong dim_m;
     slong dim_n;
     slong dim_k;
-    mp_limb_t modulus;
+    ulong modulus;
     int algorithm;
 } mat_mul_t;
 

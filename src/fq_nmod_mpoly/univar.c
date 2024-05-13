@@ -236,7 +236,7 @@ void fq_nmod_mpoly_to_univar(fq_nmod_mpoly_univar_t A, const fq_nmod_mpoly_t B,
     slong N = mpoly_words_per_exp(bits, ctx->minfo);
     slong shift, off;
     slong Blen = B->length;
-    const mp_limb_t * Bcoeff = B->coeffs;
+    const ulong * Bcoeff = B->coeffs;
     const ulong * Bexp = B->exps;
     slong i;
     int its_new;

@@ -44,20 +44,20 @@ ulong n_ecm_primorial[] =
 #endif
 
 int
-fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
+fmpz_factor_ecm(fmpz_t f, ulong curves, ulong B1, ulong B2,
                 flint_rand_t state, const fmpz_t n_in)
 {
     fmpz_t sig, nm8;
-    mp_limb_t P, num, maxP, mmin, mmax, mdiff, prod, maxj, n_size, cy;
+    ulong P, num, maxP, mmin, mmax, mdiff, prod, maxj, n_size, cy;
     ulong i, j;
     int ret;
     ecm_t ecm_inf;
     mpz_ptr fac, mptr;
-    mp_ptr n, mpsig;
+    nn_ptr n, mpsig;
 
     TMP_INIT;
 
-    const mp_limb_t *prime_array;
+    const ulong *prime_array;
     n_size = fmpz_size(n_in);
 
     if (n_size == 1)
@@ -71,8 +71,8 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
 
     TMP_START;
 
-    n      = TMP_ALLOC(n_size * sizeof(mp_limb_t));
-    mpsig  = TMP_ALLOC(n_size * sizeof(mp_limb_t));
+    n      = TMP_ALLOC(n_size * sizeof(ulong));
+    mpsig  = TMP_ALLOC(n_size * sizeof(ulong));
 
     if ((!COEFF_IS_MPZ(* n_in)))
     {

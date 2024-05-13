@@ -59,7 +59,7 @@ flint_printf("---------------------------\n");
 int main(int argc, char *argv[])
 {
     slong i, time, total_time = 0;
-    mp_limb_t p = UWORD(4611686018427388073);
+    ulong p = UWORD(4611686018427388073);
 
     flint_printf("starting dense\n");
     {

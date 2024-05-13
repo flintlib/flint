@@ -14,8 +14,8 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_interpolate_nmod_vec(mp_ptr poly,
-                            mp_srcptr xs, mp_srcptr ys, slong n, nmod_t mod)
+_nmod_poly_interpolate_nmod_vec(nn_ptr poly,
+                            nn_srcptr xs, nn_srcptr ys, slong n, nmod_t mod)
 {
     if (n < 6)
         _nmod_poly_interpolate_nmod_vec_newton(poly, xs, ys, n, mod);
@@ -27,7 +27,7 @@ _nmod_poly_interpolate_nmod_vec(mp_ptr poly,
 
 void
 nmod_poly_interpolate_nmod_vec(nmod_poly_t poly,
-                                    mp_srcptr xs, mp_srcptr ys, slong n)
+                                    nn_srcptr xs, nn_srcptr ys, slong n)
 {
     if (n == 0)
     {
@@ -44,10 +44,10 @@ nmod_poly_interpolate_nmod_vec(nmod_poly_t poly,
 }
 
 void
-_nmod_poly_interpolate_nmod_vec_barycentric(mp_ptr poly,
-                            mp_srcptr xs, mp_srcptr ys, slong n, nmod_t mod)
+_nmod_poly_interpolate_nmod_vec_barycentric(nn_ptr poly,
+                            nn_srcptr xs, nn_srcptr ys, slong n, nmod_t mod)
 {
-    mp_ptr P, Q, w;
+    nn_ptr P, Q, w;
     slong i, j;
 
     if (n == 1)
@@ -89,7 +89,7 @@ _nmod_poly_interpolate_nmod_vec_barycentric(mp_ptr poly,
 
 void
 nmod_poly_interpolate_nmod_vec_barycentric(nmod_poly_t poly,
-                                    mp_srcptr xs, mp_srcptr ys, slong n)
+                                    nn_srcptr xs, nn_srcptr ys, slong n)
 {
     if (n == 0)
     {
@@ -106,9 +106,9 @@ nmod_poly_interpolate_nmod_vec_barycentric(nmod_poly_t poly,
 }
 
 void
-_nmod_poly_interpolation_weights(mp_ptr w, const mp_ptr * tree, slong len, nmod_t mod)
+_nmod_poly_interpolation_weights(nn_ptr w, const nn_ptr * tree, slong len, nmod_t mod)
 {
-    mp_ptr tmp;
+    nn_ptr tmp;
     slong i, n, height;
 
     if (len == 0)
@@ -137,10 +137,10 @@ _nmod_poly_interpolation_weights(mp_ptr w, const mp_ptr * tree, slong len, nmod_
 }
 
 void
-_nmod_poly_interpolate_nmod_vec_fast_precomp(mp_ptr poly, mp_srcptr ys,
-    const mp_ptr * tree, mp_srcptr weights, slong len, nmod_t mod)
+_nmod_poly_interpolate_nmod_vec_fast_precomp(nn_ptr poly, nn_srcptr ys,
+    const nn_ptr * tree, nn_srcptr weights, slong len, nmod_t mod)
 {
-    mp_ptr t, u, pa, pb;
+    nn_ptr t, u, pa, pb;
     slong i, pow, left;
 
     if (len == 0)
@@ -184,11 +184,11 @@ _nmod_poly_interpolate_nmod_vec_fast_precomp(mp_ptr poly, mp_srcptr ys,
 
 
 void
-_nmod_poly_interpolate_nmod_vec_fast(mp_ptr poly,
-                            mp_srcptr xs, mp_srcptr ys, slong len, nmod_t mod)
+_nmod_poly_interpolate_nmod_vec_fast(nn_ptr poly,
+                            nn_srcptr xs, nn_srcptr ys, slong len, nmod_t mod)
 {
-    mp_ptr * tree;
-    mp_ptr w;
+    nn_ptr * tree;
+    nn_ptr w;
 
     tree = _nmod_poly_tree_alloc(len);
     _nmod_poly_tree_build(tree, xs, len, mod);
@@ -204,7 +204,7 @@ _nmod_poly_interpolate_nmod_vec_fast(mp_ptr poly,
 
 void
 nmod_poly_interpolate_nmod_vec_fast(nmod_poly_t poly,
-                                    mp_srcptr xs, mp_srcptr ys, slong n)
+                                    nn_srcptr xs, nn_srcptr ys, slong n)
 {
     if (n == 0)
     {
@@ -221,9 +221,9 @@ nmod_poly_interpolate_nmod_vec_fast(nmod_poly_t poly,
 }
 
 static void
-_interpolate_newton(mp_ptr ys, mp_srcptr xs, slong n, nmod_t mod)
+_interpolate_newton(nn_ptr ys, nn_srcptr xs, slong n, nmod_t mod)
 {
-    mp_limb_t p, q, t;
+    ulong p, q, t;
     slong i, j;
 
     for (i = 1; i < n; i++)
@@ -242,9 +242,9 @@ _interpolate_newton(mp_ptr ys, mp_srcptr xs, slong n, nmod_t mod)
 }
 
 static void
-_newton_to_monomial(mp_ptr ys, mp_srcptr xs, slong n, nmod_t mod)
+_newton_to_monomial(nn_ptr ys, nn_srcptr xs, slong n, nmod_t mod)
 {
-    mp_limb_t t;
+    ulong t;
     slong i, j;
 
     for (i = n - 2; i >= 0; i--)
@@ -266,8 +266,8 @@ _newton_to_monomial(mp_ptr ys, mp_srcptr xs, slong n, nmod_t mod)
 }
 
 void
-_nmod_poly_interpolate_nmod_vec_newton(mp_ptr poly, mp_srcptr xs,
-    mp_srcptr ys, slong n, nmod_t mod)
+_nmod_poly_interpolate_nmod_vec_newton(nn_ptr poly, nn_srcptr xs,
+    nn_srcptr ys, slong n, nmod_t mod)
 {
     if (n == 1)
     {
@@ -284,7 +284,7 @@ _nmod_poly_interpolate_nmod_vec_newton(mp_ptr poly, mp_srcptr xs,
 
 void
 nmod_poly_interpolate_nmod_vec_newton(nmod_poly_t poly,
-                                    mp_srcptr xs, mp_srcptr ys, slong n)
+                                    nn_srcptr xs, nn_srcptr ys, slong n)
 {
     if (n == 0)
     {

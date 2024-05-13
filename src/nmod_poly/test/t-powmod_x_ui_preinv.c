@@ -23,7 +23,7 @@ TEST_FUNCTION_START(nmod_poly_powmod_x_ui_preinv, state)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, res1, res2, t, f, finv;
-        mp_limb_t n;
+        ulong n;
         ulong exp;
 
         n = n_randtest_prime(state, 0);
@@ -73,7 +73,7 @@ TEST_FUNCTION_START(nmod_poly_powmod_x_ui_preinv, state)
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         nmod_poly_t res1, t, f, finv;
-        mp_limb_t n;
+        ulong n;
         ulong exp;
 
         n = n_randtest_prime(state, 0);
@@ -115,7 +115,7 @@ TEST_FUNCTION_START(nmod_poly_powmod_x_ui_preinv, state)
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         nmod_poly_t res1, t, f, finv;
-        mp_limb_t n;
+        ulong n;
         ulong exp;
 
         n = n_randtest_prime(state, 0);

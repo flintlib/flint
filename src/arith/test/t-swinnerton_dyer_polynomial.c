@@ -13,7 +13,7 @@
 #include "fmpz_poly.h"
 #include "arith.h"
 
-static const mp_limb_t known_values[] =
+static const ulong known_values[] =
 {
     UWORD(2147483629),
     UWORD(1073742093),
@@ -31,7 +31,7 @@ static const mp_limb_t known_values[] =
 TEST_FUNCTION_START(arith_swinnerton_dyer_polynomial, state)
 {
     fmpz_poly_t S;
-    mp_limb_t r;
+    ulong r;
     slong n;
 
 

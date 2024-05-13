@@ -67,14 +67,14 @@ fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h)
             if (c1 < WORD(0))
             {
                 c1 = -c1;
-                temp._mp_d = (mp_limb_t *) & c1;
+                temp._mp_d = (ulong *) & c1;
                 temp._mp_size = -1;
             }
             else if (c1 == WORD(0))
                 temp._mp_size = 0;
             else
             {
-                temp._mp_d = (mp_limb_t *) & c1;
+                temp._mp_d = (ulong *) & c1;
                 temp._mp_size = 1;
             }
 

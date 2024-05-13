@@ -36,7 +36,7 @@ slong n_factor_pp1_table[][2] = {
 
 #if 0
 /* For debugging */
-void n_pp1_print(mp_limb_t x, mp_limb_t y, ulong norm)
+void n_pp1_print(ulong x, ulong y, ulong norm)
 {
    if (norm)
    {
@@ -50,7 +50,7 @@ void n_pp1_print(mp_limb_t x, mp_limb_t y, ulong norm)
 
 #define n_pp1_2k(x, y, n, ninv, x0, norm)       \
    do {                                         \
-      const mp_limb_t two = (UWORD(2) << norm);      \
+      const ulong two = (UWORD(2) << norm);      \
       y = n_mulmod_preinv(y, x, n, ninv, norm); \
       y = n_submod(y, x0, n);                   \
       x = n_mulmod_preinv(x, x, n, ninv, norm); \
@@ -59,18 +59,18 @@ void n_pp1_print(mp_limb_t x, mp_limb_t y, ulong norm)
 
 #define n_pp1_2kp1(x, y, n, ninv, x0, norm)     \
    do {                                         \
-      const mp_limb_t two = (UWORD(2) << norm);      \
+      const ulong two = (UWORD(2) << norm);      \
       x = n_mulmod_preinv(x, y, n, ninv, norm); \
       x = n_submod(x, x0, n);                   \
       y = n_mulmod_preinv(y, y, n, ninv, norm); \
       y = n_submod(y, two, n);                  \
    } while (0)
 
-void n_pp1_pow_ui(mp_limb_t * x, mp_limb_t * y, ulong exp,
-                    mp_limb_t n, mp_limb_t ninv, ulong norm)
+void n_pp1_pow_ui(ulong * x, ulong * y, ulong exp,
+                    ulong n, ulong ninv, ulong norm)
 {
-   const mp_limb_t x0 = *x;
-   const mp_limb_t two = (UWORD(2) << norm);
+   const ulong x0 = *x;
+   const ulong two = (UWORD(2) << norm);
    ulong bit = ((UWORD(1) << FLINT_BIT_COUNT(exp)) >> 2);
 
    (*y) = n_mulmod_preinv(*x, *x, n, ninv, norm);
@@ -87,7 +87,7 @@ void n_pp1_pow_ui(mp_limb_t * x, mp_limb_t * y, ulong exp,
    }
 }
 
-mp_limb_t n_pp1_factor(mp_limb_t n, mp_limb_t x, ulong norm)
+ulong n_pp1_factor(ulong n, ulong x, ulong norm)
 {
    if (norm)
    {
@@ -102,10 +102,10 @@ mp_limb_t n_pp1_factor(mp_limb_t n, mp_limb_t x, ulong norm)
    return n_gcd(n, x);
 }
 
-mp_limb_t n_pp1_find_power(mp_limb_t * x, mp_limb_t * y,
-                  ulong p, mp_limb_t n, mp_limb_t ninv, ulong norm)
+ulong n_pp1_find_power(ulong * x, ulong * y,
+                  ulong p, ulong n, ulong ninv, ulong norm)
 {
-   mp_limb_t factor;
+   ulong factor;
 
    do
    {
@@ -116,11 +116,11 @@ mp_limb_t n_pp1_find_power(mp_limb_t * x, mp_limb_t * y,
    return factor;
 }
 
-mp_limb_t n_factor_pp1(mp_limb_t n, ulong B1, ulong c)
+ulong n_factor_pp1(ulong n, ulong B1, ulong c)
 {
    slong i, j;
-   mp_limb_t factor = 0;
-   mp_limb_t x, y = 0, oldx, oldy, ninv;
+   ulong factor = 0;
+   ulong x, y = 0, oldx, oldy, ninv;
    ulong pr, oldpr, sqrt, bits0, norm;
    n_primes_t iter;
 
@@ -207,7 +207,7 @@ cleanup:
    return factor;
 }
 
-mp_limb_t n_factor_pp1_wrapper(mp_limb_t n)
+ulong n_factor_pp1_wrapper(ulong n)
 {
    slong bits = FLINT_BIT_COUNT(n);
    ulong B1;

@@ -25,7 +25,7 @@ int
 fmpq_mat_can_solve_fmpz_mat_dixon(fmpq_mat_t X,
                         const fmpz_mat_t A, const fmpz_mat_t B)
 {
-    mp_limb_t p;
+    ulong p;
     fmpz_t tested;
     nmod_mat_t Ap, LU;
     int result = 0, success = 0;

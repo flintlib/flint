@@ -32,7 +32,7 @@ arb_log_abs(arb_t res, const arb_t a, slong prec)
 static int
 arf_close_to_one(const arf_t z)
 {
-    mp_limb_t top;
+    ulong top;
 
     if (ARF_EXP(z) == 0)
     {

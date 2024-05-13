@@ -39,7 +39,7 @@ void _nf_elem_set_coeff_num_fmpz(nf_elem_t a, slong i, const fmpz_t b, const nf_
         {
             fmpq_poly_fit_length(NF_ELEM(a), i + 1);
             _fmpq_poly_set_length(NF_ELEM(a), i + 1);
-            flint_mpn_zero((mp_ptr) NF_ELEM(a)->coeffs + len, (i + 1) - len);
+            flint_mpn_zero((nn_ptr) NF_ELEM(a)->coeffs + len, (i + 1) - len);
         }
 
         if (*NF_ELEM(a)->den == WORD(1))

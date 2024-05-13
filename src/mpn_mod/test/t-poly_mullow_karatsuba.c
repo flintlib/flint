@@ -14,13 +14,13 @@
 #include "gr_poly.h"
 
 static int
-_mpn_mod_poly_mullow_karatsuba_deep(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
+_mpn_mod_poly_mullow_karatsuba_deep(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
 {
     return _mpn_mod_poly_mullow_karatsuba(res, poly1, len1, poly2, len2, len, 2, ctx);
 }
 
 static int
-_mpn_mod_poly_mullow_karatsuba_shallow(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
+_mpn_mod_poly_mullow_karatsuba_shallow(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
 {
     return _mpn_mod_poly_mullow_karatsuba(res, poly1, len1, poly2, len2, len, FLINT_MIN(len1, len2), ctx);
 }

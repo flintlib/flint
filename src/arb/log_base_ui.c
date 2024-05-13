@@ -23,8 +23,8 @@
 static double
 _arf_get_mantissa_d(const arf_t x)
 {
-    mp_srcptr xp;
-    mp_size_t xn;
+    nn_srcptr xp;
+    slong xn;
     ARF_GET_MPN_READONLY(xp, xn, x);
 
     if (xn == 1)

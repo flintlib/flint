@@ -23,7 +23,7 @@
 #define FAC_TAB_SIZE 13
 #endif
 
-static const mp_limb_t fac_tab[] =
+static const ulong fac_tab[] =
 {
   UWORD(1), UWORD(1), UWORD(2), UWORD(6), UWORD(24), UWORD(120), UWORD(720), UWORD(5040), UWORD(40320), UWORD(362880),
   UWORD(3628800), UWORD(39916800), UWORD(479001600),

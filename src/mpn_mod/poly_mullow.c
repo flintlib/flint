@@ -335,7 +335,7 @@ static const uint8_t sqrlow_cutoffs[][2] = {
 };
 
 int
-_mpn_mod_poly_mullow(mp_ptr res, mp_srcptr poly1, slong len1, mp_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
+_mpn_mod_poly_mullow(nn_ptr res, nn_srcptr poly1, slong len1, nn_srcptr poly2, slong len2, slong len, gr_ctx_t ctx)
 {
     slong n;
     slong bits, cutoff_karatsuba, cutoff_fft_KS, tab_i;

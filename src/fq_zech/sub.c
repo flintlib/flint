@@ -16,7 +16,7 @@ void
 fq_zech_sub(fq_zech_t rop, const fq_zech_t op1, const fq_zech_t op2,
             const fq_zech_ctx_t ctx)
 {
-    mp_limb_t index, c;
+    ulong index, c;
     if (op2->value == ctx->qm1)
     {
         rop->value = op1->value;

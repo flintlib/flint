@@ -60,7 +60,7 @@ void _nmod_mpoly_radix_sort1(nmod_mpoly_t A, slong left, slong right,
         if (((A->exps + 1*cur)[0] & mask) != cmp)
         {
             {
-                mp_limb_t t;
+                ulong t;
                 t = A->coeffs[mid];
                 A->coeffs[mid] = A->coeffs[cur];
                 A->coeffs[cur] = t;
@@ -118,7 +118,7 @@ void _nmod_mpoly_radix_sort(nmod_mpoly_t A, slong left, slong right,
         if (((A->exps + N*check)[off] & mask) != cmp)
         {
             {
-                mp_limb_t t;
+                ulong t;
                 t = A->coeffs[mid];
                 A->coeffs[mid] = A->coeffs[check];
                 A->coeffs[check] = t;

@@ -26,7 +26,7 @@ void sample(void * arg, ulong count)
    slong scale;
 
    nmod_poly_t a, b, c;
-   mp_limb_t m;
+   ulong m;
 
    FLINT_TEST_INIT(state);
 
