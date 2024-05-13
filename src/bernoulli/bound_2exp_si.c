@@ -55,7 +55,7 @@ bernoulli_bound_2exp_si(ulong n)
         if (n == 1)
             return -WORD(1);
         else
-            return LONG_MIN;
+            return WORD_MIN;
     }
     else if (n < 512)
     {

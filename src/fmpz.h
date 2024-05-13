@@ -18,6 +18,7 @@
 #define FMPZ_INLINE static inline
 #endif
 
+#include <gmp.h>
 #include "fmpz_types.h"
 
 #ifdef __cplusplus

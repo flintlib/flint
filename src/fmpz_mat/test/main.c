@@ -20,9 +20,6 @@
 # undef ulong
 #endif
 
-#include <string.h>
-#include <stdlib.h>
-
 /* Include functions *********************************************************/
 
 #include "t-add_sub.c"

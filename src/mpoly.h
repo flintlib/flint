@@ -20,6 +20,7 @@
 #endif
 
 #include <string.h>
+#include <gmp.h>
 #include "mpoly_types.h"
 
 #ifdef __cplusplus

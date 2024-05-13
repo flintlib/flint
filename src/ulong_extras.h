@@ -77,6 +77,9 @@ ulong n_flog(ulong n, ulong b);
 ulong n_clog(ulong n, ulong b);
 ulong n_clog_2exp(ulong n, ulong b);
 
+ulong __gmpn_gcd_11(ulong, ulong);
+ulong __gmpn_gcd_1(nn_srcptr, long int, ulong);
+
 ULONG_EXTRAS_INLINE
 ulong n_gcd(ulong x, ulong y)
 {
@@ -88,11 +91,11 @@ ulong n_gcd(ulong x, ulong y)
         my = flint_ctz(y);
         x >>= mx;
         y >>= my;
-        res = (x != 1 && y != 1) ? mpn_gcd_11(x, y) : 1;
+        res = (x != 1 && y != 1) ? __gmpn_gcd_11(x, y) : 1;
         res <<= FLINT_MIN(mx, my);
         return res;
 #else
-        return mpn_gcd_1(&x, 1, y);
+        return __gmpn_gcd_1(&x, 1, y);
 #endif
     }
     else

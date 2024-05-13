@@ -9,9 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
-#include <stdlib.h>
-
 #include "fmpz_poly.h"
 #include "fmpz_mpoly.h"
 #include "gr_generic.h"

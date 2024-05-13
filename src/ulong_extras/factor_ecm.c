@@ -9,28 +9,23 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 
 static
 ulong n_ecm_primorial[] =
 {
-#ifdef FLINT64
-
     UWORD(2), UWORD(6), UWORD(30), UWORD(210), UWORD(2310), UWORD(30030),
-    UWORD(510510), UWORD(9699690), UWORD(223092870), UWORD(6469693230),
-    UWORD(200560490130), UWORD(7420738134810), UWORD(304250263527210),
-    UWORD(13082761331670030), UWORD(614889782588491410)
-
-#else
-
-    UWORD(2), UWORD(6), UWORD(30), UWORD(210), UWORD(2310), UWORD(30030),
-    UWORD(510510), UWORD(9699690)
-
+    UWORD(510510), UWORD(9699690),
+#if FLINT64
+    UWORD(223092870), UWORD(6469693230), UWORD(200560490130),
+    UWORD(7420738134810), UWORD(304250263527210), UWORD(13082761331670030),
+    UWORD(614889782588491410)
 #endif
 };
 
-#ifdef FLINT64
+#if FLINT64
 #define num_n_ecm_primorials 15
 #else
 #define num_n_ecm_primorials 9

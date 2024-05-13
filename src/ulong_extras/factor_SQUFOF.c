@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include <gmp.h>
 #include "ulong_extras.h"
 
 ulong _ll_factor_SQUFOF(ulong n_hi, ulong n_lo, ulong max_iters)

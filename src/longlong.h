@@ -172,26 +172,21 @@ static inline int flint_ctz(ulong x)
 #endif
 
 #if !defined(MPN_INCR_U)
-# define MPN_INCR_U MPN_INCR_U
-# define MPN_DECR_U MPN_DECR_U
-FLINT_FORCE_INLINE void MPN_INCR_U(nn_ptr ptr, slong size, ulong incr)
-{
 # if FLINT_WANT_ASSERT
-    ulong cy = mpn_add_1(ptr, ptr, size, incr);
-    FLINT_ASSERT(cy == 0);
+#  define MPN_INCR_U(ptr, size, incr) \
+  do { \
+    ulong __cy = mpn_add_1(ptr, ptr, size, incr); \
+    FLINT_ASSERT(__cy == 0); \
+  } while (0)
+#  define MPN_DECR_U(ptr, size, incr) \
+  do { \
+    ulong __cy = mpn_sub_1(ptr, ptr, size, incr); \
+    FLINT_ASSERT(__cy == 0); \
+  } while (0)
 # else
-    mpn_add_1(ptr, ptr, size, incr);
+#  define MPN_INCR_U(ptr, size, incr) mpn_add_1(ptr, ptr, size, incr)
+#  define MPN_DECR_U(ptr, size, incr) mpn_sub_1(ptr, ptr, size, incr)
 # endif
-}
-FLINT_FORCE_INLINE void MPN_DECR_U(nn_ptr ptr, slong size, ulong incr)
-{
-# if FLINT_WANT_ASSERT
-    ulong cy = mpn_sub_1(ptr, ptr, size, incr);
-    FLINT_ASSERT(cy == 0);
-# else
-    mpn_sub_1(ptr, ptr, size, incr);
-# endif
-}
 #endif
 
 /* Multiplication */

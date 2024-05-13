@@ -18,10 +18,11 @@
 #define FFT_INLINE static inline
 #endif
 
+#include <gmp.h>
 #include "flint.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* defined in mpn_extras.h */

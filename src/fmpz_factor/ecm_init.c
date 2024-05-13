@@ -14,29 +14,17 @@
 void
 fmpz_factor_ecm_init(ecm_t ecm_inf, ulong sz)
 {
-    ecm_inf->t = flint_malloc(sz * sizeof(ulong));
-    ecm_inf->u = flint_malloc(sz * sizeof(ulong));
-    ecm_inf->v = flint_malloc(sz * sizeof(ulong));
-    ecm_inf->w = flint_malloc(sz * sizeof(ulong));
+    ecm_inf->t = flint_calloc(sz, sizeof(ulong));
+    ecm_inf->u = flint_calloc(sz, sizeof(ulong));
+    ecm_inf->v = flint_calloc(sz, sizeof(ulong));
+    ecm_inf->w = flint_calloc(sz, sizeof(ulong));
 
-    ecm_inf->x = flint_malloc(sz * sizeof(ulong));
-    ecm_inf->z = flint_malloc(sz * sizeof(ulong));
+    ecm_inf->x = flint_calloc(sz, sizeof(ulong));
+    ecm_inf->z = flint_calloc(sz, sizeof(ulong));
 
-    ecm_inf->a24 = flint_malloc(sz * sizeof(ulong));
-    ecm_inf->ninv = flint_malloc(sz * sizeof(ulong));
-    ecm_inf->one = flint_malloc(sz * sizeof(ulong));
-
-    mpn_zero(ecm_inf->t, sz);
-    mpn_zero(ecm_inf->u, sz);
-    mpn_zero(ecm_inf->v, sz);
-    mpn_zero(ecm_inf->w, sz);
-
-    mpn_zero(ecm_inf->x, sz);
-    mpn_zero(ecm_inf->z, sz);
-
-    mpn_zero(ecm_inf->a24, sz);
-    mpn_zero(ecm_inf->ninv, sz);
-    mpn_zero(ecm_inf->one, sz);
+    ecm_inf->a24 = flint_calloc(sz, sizeof(ulong));
+    ecm_inf->ninv = flint_calloc(sz, sizeof(ulong));
+    ecm_inf->one = flint_calloc(sz, sizeof(ulong));
 
     ecm_inf->n_size = sz;
 }

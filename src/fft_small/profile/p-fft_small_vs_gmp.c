@@ -27,6 +27,9 @@ int main(void)
 {
     nn_ptr x, y, r, s;
     slong n;
+    flint_rand_t state;
+
+    flint_rand_init(state);
 
     x = flint_malloc(sizeof(ulong) * FLINT_MAX(N_MAX_MUL, N_MAX_SQR));
     y = flint_malloc(sizeof(ulong) * FLINT_MAX(N_MAX_MUL, N_MAX_SQR));
@@ -78,6 +81,8 @@ int main(void)
     flint_free(y);
     flint_free(r);
     flint_free(s);
+
+    flint_rand_clear(state);
 
     flint_cleanup_master();
 
