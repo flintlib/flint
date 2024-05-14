@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "long_extras.h"
 #include "d_mat.h"
 
 void
@@ -18,13 +19,24 @@ d_mat_init(d_mat_t mat, slong rows, slong cols)
     slong i;
 
     if (rows != 0)
-        mat->rows = (double **) flint_malloc(rows * sizeof(double *));
+        mat->rows = flint_malloc(rows * sizeof(double *));
     else
         mat->rows = NULL;
 
-    if (rows != 0 && cols != 0)       /* Allocate space for r*c small entries */
+    mat->r = rows;
+    mat->c = cols;
+
+    if (rows != 0 && cols != 0)
     {
-        mat->entries = (double *) flint_calloc(flint_mul_sizes(rows, cols), sizeof(double));
+        slong num;
+        int of;
+
+        of = z_mul_checked(&num, rows, cols);
+
+        if (of)
+            flint_throw(FLINT_ERROR, "Overflow creating a %wd x %wd object\n", rows, cols);
+
+        mat->entries = flint_calloc(num, sizeof(double));
 
         for (i = 0; i < rows; i++)
             mat->rows[i] = mat->entries + i * cols;
@@ -35,7 +47,4 @@ d_mat_init(d_mat_t mat, slong rows, slong cols)
         for (i = 0; i < rows; i++)
             mat->rows[i] = NULL;
     }
-
-    mat->r = rows;
-    mat->c = cols;
 }

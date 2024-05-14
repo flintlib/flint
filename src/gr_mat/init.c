@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "long_extras.h"
 #include "gr_mat.h"
 
 void
@@ -18,6 +19,9 @@ gr_mat_init(gr_mat_t mat, slong rows, slong cols, gr_ctx_t ctx)
 
     sz = ctx->sizeof_elem;
 
+    mat->r = rows;
+    mat->c = cols;
+
     if (rows != 0)
         mat->rows = flint_malloc(rows * sizeof(gr_ptr));
     else
@@ -25,7 +29,15 @@ gr_mat_init(gr_mat_t mat, slong rows, slong cols, gr_ctx_t ctx)
 
     if (rows != 0 && cols != 0)
     {
-        mat->entries = (gr_ptr) flint_malloc(flint_mul_sizes(rows, cols) * sz);
+        slong num;
+        int of;
+
+        of = z_mul_checked(&num, rows, cols);
+
+        if (of)
+            flint_throw(FLINT_ERROR, "Overflow creating a %wd x %wd object\n", rows, cols);
+
+        mat->entries = flint_malloc(num * sz);
 
         _gr_vec_init(mat->entries, rows * cols, ctx);
 
@@ -38,7 +50,4 @@ gr_mat_init(gr_mat_t mat, slong rows, slong cols, gr_ctx_t ctx)
         for (i = 0; i < rows; i++)
             mat->rows[i] = NULL;
     }
-
-    mat->r = rows;
-    mat->c = cols;
 }

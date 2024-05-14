@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "long_extras.h"
 #include "mpn_extras.h"
 #include "nmod_mat.h"
 
@@ -19,13 +20,24 @@ nmod_mat_init(nmod_mat_t mat, slong rows, slong cols, ulong n)
     slong i;
 
     if (rows != 0)
-        mat->rows = (ulong **) flint_malloc(rows * sizeof(ulong *));
+        mat->rows = flint_malloc(rows * sizeof(ulong *));
     else
         mat->rows = NULL;
 
+    mat->r = rows;
+    mat->c = cols;
+
     if (rows != 0 && cols != 0)
     {
-        mat->entries = (ulong *) flint_calloc(flint_mul_sizes(rows, cols), sizeof(ulong));
+        slong num;
+        int of;
+
+        of = z_mul_checked(&num, rows, cols);
+
+        if (of)
+            flint_throw(FLINT_ERROR, "Overflow creating a %wd x %wd object\n", rows, cols);
+
+        mat->entries = flint_calloc(num, sizeof(ulong));
 
         for (i = 0; i < rows; i++)
             mat->rows[i] = mat->entries + i * cols;
@@ -33,15 +45,12 @@ nmod_mat_init(nmod_mat_t mat, slong rows, slong cols, ulong n)
     else
     {
         mat->entries = NULL;
-	if (rows != 0)
+        if (rows != 0)
         {
             for (i = 0; i < rows; i++)
                 mat->rows[i] = NULL;
         }
     }
-
-    mat->r = rows;
-    mat->c = cols;
 
     nmod_mat_set_mod(mat, n);
 }
@@ -58,9 +67,22 @@ nmod_mat_init_set(nmod_mat_t mat, const nmod_mat_t src)
     else
         mat->rows = NULL;
 
-    if ((rows) && (cols))
+    mat->r = rows;
+    mat->c = cols;
+
+    mat->mod = src->mod;
+
+    if (rows != 0 && cols != 0)
     {
-        mat->entries = flint_malloc(flint_mul_sizes(rows, cols) * sizeof(ulong));
+        slong num;
+        int of;
+
+        of = z_mul_checked(&num, rows, cols);
+
+        if (of)
+            flint_throw(FLINT_ERROR, "Overflow creating a %wd x %wd object\n", rows, cols);
+
+        mat->entries = flint_malloc(num * sizeof(ulong));
 
         for (i = 0; i < rows; i++)
         {
@@ -71,15 +93,10 @@ nmod_mat_init_set(nmod_mat_t mat, const nmod_mat_t src)
     else
     {
         mat->entries = NULL;
-	if (rows != 0)
+        if (rows != 0)
         {
             for (i = 0; i < rows; i++)
                 mat->rows[i] = NULL;
-	}
+        }
     }
-
-    mat->r = rows;
-    mat->c = cols;
-
-    mat->mod = src->mod;
 }

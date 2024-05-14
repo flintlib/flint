@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "long_extras.h"
 #include "fmpz_mat.h"
 
 void
@@ -18,13 +19,24 @@ fmpz_mat_init(fmpz_mat_t mat, slong rows, slong cols)
     slong i;
 
     if (rows != 0)
-        mat->rows = (fmpz **) flint_malloc(rows * sizeof(fmpz *));
+        mat->rows = flint_malloc(rows * sizeof(fmpz *));
     else
         mat->rows = NULL;
 
-    if (rows != 0 && cols != 0)       /* Allocate space for r*c small entries */
+    mat->r = rows;
+    mat->c = cols;
+
+    if (rows != 0 && cols != 0)
     {
-        mat->entries = (fmpz *) flint_calloc(flint_mul_sizes(rows, cols), sizeof(fmpz));
+        slong num;
+        int of;
+
+        of = z_mul_checked(&num, rows, cols);
+
+        if (of)
+            flint_throw(FLINT_ERROR, "Overflow creating a %wd x %wd object\n", rows, cols);
+
+        mat->entries = flint_calloc(num, sizeof(fmpz));
 
         for (i = 0; i < rows; i++)
             mat->rows[i] = mat->entries + i * cols;
@@ -35,9 +47,6 @@ fmpz_mat_init(fmpz_mat_t mat, slong rows, slong cols)
         for (i = 0; i < rows; i++)
             mat->rows[i] = NULL;
     }
-
-    mat->r = rows;
-    mat->c = cols;
 }
 
 void
