@@ -26,9 +26,6 @@ static inline int flint_ctz(ulong x)
     return index;
 }
 
-/* Byte swap */
-# define byte_swap(x) do { (x) = _byteswap_uint64(x); } while (0)
-
 /* Multiplication */
 #define umul_ppmm(r1, r0, u, v) \
 do \
