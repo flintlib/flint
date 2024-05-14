@@ -207,8 +207,6 @@ typedef const ulong * nn_srcptr;
 # endif
 #endif
 
-#include "longlong.h"
-
 /* memory ********************************************************************/
 
 FLINT_WARN_UNUSED FLINT_MALLOC FLINT_RETURNS_NONNULL void * flint_malloc(size_t size);
@@ -365,18 +363,6 @@ FLINT_INLINE ulong n_randint(flint_rand_t state, ulong limit)
 #define FLINT_SIGN_EXT(x) (-(ulong)((slong)(x) < 0))
 #define FLINT_SGN(x) ((0 < (slong)(x)) - ((slong)(x) < 0))
 #define FLINT_SWAP(T, x, y) do { T _swap_t = (x); (x) = (y); (y) = _swap_t; } while(0)
-
-/* Beware when using the unsigned return value in signed arithmetic */
-FLINT_FORCE_INLINE
-flint_bitcnt_t FLINT_BIT_COUNT(ulong x)
-{
-   flint_bitcnt_t zeros = FLINT_BITS;
-   if (x) zeros = flint_clz(x);
-   return FLINT_BITS - zeros;
-}
-
-#define FLINT_FLOG2(k) (FLINT_BIT_COUNT(k) - 1)
-#define FLINT_CLOG2(k) FLINT_BIT_COUNT((k) - 1)
 
 /* allocation macros *********************************************************/
 

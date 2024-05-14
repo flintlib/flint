@@ -19,6 +19,8 @@
 #ifndef FLINT_LONGLONG_H
 #define FLINT_LONGLONG_H
 
+#include "flint.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -91,6 +93,18 @@ static inline int flint_ctz(ulong x)
     return FLINT_BITS - 1 - flint_clz(x & -x);
 }
 #endif
+
+/* Beware when using the unsigned return value in signed arithmetic */
+FLINT_FORCE_INLINE
+flint_bitcnt_t FLINT_BIT_COUNT(ulong x)
+{
+    flint_bitcnt_t zeros = FLINT_BITS;
+    if (x) zeros = flint_clz(x);
+    return FLINT_BITS - zeros;
+}
+
+#define FLINT_FLOG2(k) (FLINT_BIT_COUNT(k) - 1)
+#define FLINT_CLOG2(k) FLINT_BIT_COUNT((k) - 1)
 
 /* Addition and subtraction */
 #if !defined(add_ssaaaa)

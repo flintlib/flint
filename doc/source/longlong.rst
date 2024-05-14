@@ -3,7 +3,7 @@
 **longlong.h** -- support functions for multi-word arithmetic
 ===============================================================================
 
-Leading and trailing zeroes
+Bit manipulation
 -------------------------------------------------------------------------------
 
 .. macro:: flint_clz(x)
@@ -17,6 +17,17 @@ Leading and trailing zeroes
 
     As for ``flint_clz()``, but counts from the least significant end. If `x` is
     zero then the return value is undefined.
+
+.. function:: flint_bitcnt_t FLINT_BIT_COUNT(ulong x)
+
+    Returns the number of binary bits required to represent *x*. If *x* is zero
+    it returns *0*. This is an inline-function only.
+
+.. macro:: FLINT_FLOG2(x)
+           FLINT_CLOG2(x)
+
+    For `x \ge 1`, it returns `\lfloor \log_2 x \rfloor`
+    and `\lceil \log_2 x \rceil`, respectively.
 
 Addition and subtraction
 -------------------------------------------------------------------------------
