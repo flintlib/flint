@@ -15,6 +15,8 @@
 
 #define E(j,k) fmpz_mat_entry(B,j,k)
 
+#define r_shift(in, c) (((c) == FLINT_BITS) ? WORD(0) : ((in) >> (c)))
+
 slong
 fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, slong * perm,
                             const fmpz_mat_t A, int rank_check)

@@ -27,74 +27,75 @@ extern "C" {
 #endif
 
 #define NMOD_RED2(r, a_hi, a_lo, mod) \
-   do { \
-      ulong q0xx, q1xx, r1xx; \
-      const ulong u1xx = ((a_hi)<<(mod).norm) + r_shift((a_lo), FLINT_BITS - (mod).norm);	\
-      const ulong u0xx = ((a_lo)<<(mod).norm); \
-      const ulong nxx = ((mod).n<<(mod).norm); \
-      umul_ppmm(q1xx, q0xx, (mod).ninv, u1xx); \
-      add_ssaaaa(q1xx, q0xx, q1xx, q0xx, u1xx, u0xx); \
-      r1xx = (u0xx - (q1xx + 1)*nxx); \
-      if (r1xx > q0xx) r1xx += nxx; \
-      if (r1xx < nxx) r = (r1xx>>(mod).norm); \
-      else r = ((r1xx - nxx)>>(mod).norm); \
-   } while (0)
+  do { \
+    ulong q0xx, q1xx, r1xx; \
+    const ulong u1xx = ((a_hi)<<(mod).norm) \
+     + (((mod).norm == 0) ? WORD(0) : (a_lo)>>(FLINT_BITS - (mod).norm)); \
+    const ulong u0xx = (a_lo)<<(mod).norm; \
+    const ulong nxx = (mod).n<<(mod).norm; \
+    umul_ppmm(q1xx, q0xx, (mod).ninv, u1xx); \
+    add_ssaaaa(q1xx, q0xx, q1xx, q0xx, u1xx, u0xx); \
+    r1xx = (u0xx - (q1xx + 1)*nxx); \
+    if (r1xx > q0xx) r1xx += nxx; \
+    if (r1xx < nxx) r = (r1xx>>(mod).norm); \
+    else r = ((r1xx - nxx)>>(mod).norm); \
+  } while (0)
 
 #define NMOD_RED(r, a, mod) \
-   do { \
-      NMOD_RED2(r, 0, a, mod); \
-   } while (0)
+  do { \
+    NMOD_RED2(r, 0, a, mod); \
+  } while (0)
 
 #define NMOD2_RED2(r, a_hi, a_lo, mod) \
-    do { \
-       ulong v_hi;	\
-       NMOD_RED(v_hi, a_hi, mod); \
-       NMOD_RED2(r, v_hi, a_lo, mod); \
-    } while (0)
+  do { \
+    ulong v_hi;	\
+    NMOD_RED(v_hi, a_hi, mod); \
+    NMOD_RED2(r, v_hi, a_lo, mod); \
+  } while (0)
 
 #define NMOD_RED3(r, a_hi, a_me, a_lo, mod) \
-    do { \
-       ulong v_hi;	\
-       NMOD_RED2(v_hi, a_hi, a_me, mod); \
-       NMOD_RED2(r, v_hi, a_lo, mod); \
-    } while (0)
+  do { \
+    ulong v_hi;	\
+    NMOD_RED2(v_hi, a_hi, a_me, mod); \
+    NMOD_RED2(r, v_hi, a_lo, mod); \
+  } while (0)
 
 #define NMOD_BITS(mod) (FLINT_BITS - ((mod).norm))
 #define NMOD_CAN_USE_SHOUP(mod) ((mod).norm > 0)
 
 #define NMOD_MUL_PRENORM(res, a, b, mod) \
-    do { \
-        ulong q0xx, q1xx, rxx, p_hixx, p_loxx; \
-        ulong nxx, ninvxx; \
-        unsigned int normxx; \
-        ninvxx = (mod).ninv; \
-        normxx = (mod).norm; \
-        nxx = (mod).n << normxx; \
-        umul_ppmm(p_hixx, p_loxx, (a), (b)); \
-        umul_ppmm(q1xx, q0xx, ninvxx, p_hixx); \
-        add_ssaaaa(q1xx, q0xx, q1xx, q0xx, p_hixx, p_loxx); \
-        rxx = (p_loxx - (q1xx + 1) * nxx); \
-        if (rxx > q0xx) \
-            rxx += nxx; \
-        rxx = (rxx < nxx ? rxx : rxx - nxx) >> normxx; \
-        (res) = rxx; \
-    } while (0)
+  do { \
+    ulong q0xx, q1xx, rxx, p_hixx, p_loxx; \
+    ulong nxx, ninvxx; \
+    unsigned int normxx; \
+    ninvxx = (mod).ninv; \
+    normxx = (mod).norm; \
+    nxx = (mod).n << normxx; \
+    umul_ppmm(p_hixx, p_loxx, (a), (b)); \
+    umul_ppmm(q1xx, q0xx, ninvxx, p_hixx); \
+    add_ssaaaa(q1xx, q0xx, q1xx, q0xx, p_hixx, p_loxx); \
+    rxx = (p_loxx - (q1xx + 1) * nxx); \
+    if (rxx > q0xx) \
+      rxx += nxx; \
+    rxx = (rxx < nxx ? rxx : rxx - nxx) >> normxx; \
+    (res) = rxx; \
+  } while (0)
 
 #define NMOD_MUL_FULLWORD(res, a, b, mod) \
-    do { \
-        ulong q0xx, q1xx, rxx, p_hixx, p_loxx; \
-        ulong nxx, ninvxx; \
-        ninvxx = (mod).ninv; \
-        nxx = (mod).n; \
-        umul_ppmm(p_hixx, p_loxx, (a), (b)); \
-        umul_ppmm(q1xx, q0xx, ninvxx, p_hixx); \
-        add_ssaaaa(q1xx, q0xx, q1xx, q0xx, p_hixx, p_loxx); \
-        rxx = (p_loxx - (q1xx + 1) * nxx); \
-        if (rxx > q0xx) \
-            rxx += nxx; \
-        rxx = (rxx < nxx ? rxx : rxx - nxx); \
-        (res) = rxx; \
-    } while (0)
+  do { \
+    ulong q0xx, q1xx, rxx, p_hixx, p_loxx; \
+    ulong nxx, ninvxx; \
+    ninvxx = (mod).ninv; \
+    nxx = (mod).n; \
+    umul_ppmm(p_hixx, p_loxx, (a), (b)); \
+    umul_ppmm(q1xx, q0xx, ninvxx, p_hixx); \
+    add_ssaaaa(q1xx, q0xx, q1xx, q0xx, p_hixx, p_loxx); \
+    rxx = (p_loxx - (q1xx + 1) * nxx); \
+    if (rxx > q0xx) \
+      rxx += nxx; \
+    rxx = (rxx < nxx ? rxx : rxx - nxx); \
+    (res) = rxx; \
+  } while (0)
 
 NMOD_INLINE ulong nmod_set_ui(ulong x, nmod_t mod)
 {
