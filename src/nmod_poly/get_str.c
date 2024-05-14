@@ -13,6 +13,7 @@
 #include <string.h>
 #include <math.h>
 #include "nmod_poly.h"
+#include "longlong.h"
 
 char * nmod_poly_get_str(const nmod_poly_t poly)
 {

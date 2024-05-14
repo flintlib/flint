@@ -12,6 +12,7 @@
 #ifndef FFT_SMALL_H
 #define FFT_SMALL_H
 
+#include "longlong.h"
 #include "machine_vectors.h"
 
 #define LG_BLK_SZ 8

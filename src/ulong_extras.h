@@ -23,6 +23,7 @@
 #endif
 
 #include "limb_types.h"
+#include "longlong.h"
 
 #ifdef __cplusplus
 extern "C" {

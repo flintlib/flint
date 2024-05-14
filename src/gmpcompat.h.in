@@ -13,7 +13,7 @@
 #define GMP_COMPAT_H
 
 #include <gmp.h>
-#include "flint.h"
+#include "longlong.h"
 
 #define FLINT_MPZ_REALLOC(z, len)       \
     ((len) > ((z)->_mp_alloc)           \

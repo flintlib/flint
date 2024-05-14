@@ -18,7 +18,7 @@
 # include <intrin.h>
 #endif
 
-#include "flint.h"
+#include "longlong.h"
 #include "templates.h"
 
 #ifdef __cplusplus

@@ -15,6 +15,7 @@
 #include "thread_support.h"
 
 #if FLINT_USES_BLAS
+# include "longlong.h"
 # include "cblas.h"
 #endif
 
