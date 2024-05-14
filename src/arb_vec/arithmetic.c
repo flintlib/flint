@@ -10,12 +10,25 @@
 */
 
 #include "arb.h"
+#include "arb_vec.h"
 
-void
-_arb_vec_clear(arb_ptr v, slong n)
+void _arb_vec_add(arb_ptr C, arb_srcptr A, arb_srcptr B, slong n, slong prec)
 {
     slong i;
     for (i = 0; i < n; i++)
-        arb_clear(v + i);
-    flint_free(v);
+        arb_add(C + i, A + i, B + i, prec);
+}
+
+void _arb_vec_sub(arb_ptr C, arb_srcptr A, arb_srcptr B, slong n, slong prec)
+{
+    slong i;
+    for (i = 0; i < n; i++)
+        arb_sub(C + i, A + i, B + i, prec);
+}
+
+void _arb_vec_neg(arb_ptr B, arb_srcptr A, slong n)
+{
+    slong i;
+    for (i = 0; i < n; i++)
+        arb_neg(B + i, A + i);
 }

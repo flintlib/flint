@@ -253,6 +253,7 @@ set(_BUILD_DIRS
     bool_mat        partitions
     mag
     arf             acf             arb             acb
+    arb_vec
     arb_mat         arb_poly        arb_calc        arb_hypgeom
     acb_mat         acb_poly        acb_calc        acb_hypgeom
     arb_fmpz_poly   arb_fpwrap

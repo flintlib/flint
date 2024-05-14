@@ -10,9 +10,9 @@
 */
 
 #include "arb.h"
+#include "arb_vec.h"
 
-void
-_arb_vec_get_mag(mag_t bound, arb_srcptr vec, slong len)
+void _arb_vec_get_mag(mag_t bound, arb_srcptr vec, slong len)
 {
     if (len < 1)
     {
@@ -31,4 +31,25 @@ _arb_vec_get_mag(mag_t bound, arb_srcptr vec, slong len)
         }
         mag_clear(t);
     }
+}
+
+void _arb_vec_add_error_arf_vec(arb_ptr res, arf_srcptr err, slong len)
+{
+    slong i;
+    for (i = 0; i < len; i++)
+        arb_add_error_arf(res + i, err + i);
+}
+
+void _arb_vec_add_error_mag_vec(arb_ptr res, mag_srcptr err, slong len)
+{
+    slong i;
+    for (i = 0; i < len; i++)
+        mag_add(arb_radref(res + i), arb_radref(res + i), err + i);
+}
+
+void _arb_vec_indeterminate(arb_ptr vec, slong len)
+{
+    slong i;
+    for (i = 0; i < len; i++)
+        arb_indeterminate(vec + i);
 }

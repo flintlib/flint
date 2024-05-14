@@ -194,6 +194,7 @@ Real and complex numbers
    acf.rst
    arb.rst
    acb.rst
+   arb_vec.rst
    arb_poly.rst
    acb_poly.rst
    arb_fmpz_poly.rst
