@@ -20,7 +20,7 @@
 #include "gr_special.h"
 
 /* todo: define in longlong.h */
-#if defined(__GNUC__) && defined(__AVX2__)
+#if FLINT_BITS == 64 && defined(__GNUC__) && defined(__AVX2__)
 
 #define add_sssssaaaaaaaaaa(s4,s3,s2,s1,s0, a4,a3,a2,a1,a0, b4,b3,b2,b1,b0)  \
   __asm__ ("addq %14,%q4\n\tadcq %12,%q3\n\tadcq %10,%q2\n\tadcq %8,%q1\n\tadcq %6,%q0"    \
@@ -870,14 +870,13 @@ _nfloat_add_3(nfloat_ptr res, nn_srcptr x, slong xexp, int xsgnbit, nn_srcptr y,
     }
     else if (delta < 2 * FLINT_BITS)
     {
+        delta -= FLINT_BITS;
         y0 = y[1];
         y1 = y[2];
         y2 = 0;
 
-        if (delta != FLINT_BITS)
+        if (delta != 0)
         {
-            delta -= FLINT_BITS;
-
             y0 = (y0 >> delta) | (y1 << (FLINT_BITS - delta));
             y1 = (y1 >> delta);
         }
@@ -885,7 +884,6 @@ _nfloat_add_3(nfloat_ptr res, nn_srcptr x, slong xexp, int xsgnbit, nn_srcptr y,
     else if (delta < 3 * FLINT_BITS)
     {
         delta -= 2 * FLINT_BITS;
-
         y0 = y[2] >> delta;
         y1 = 0;
         y2 = 0;
@@ -948,7 +946,6 @@ _nfloat_add_4(nfloat_ptr res, nn_srcptr x, slong xexp, int xsgnbit, nn_srcptr y,
     else if (delta < 2 * FLINT_BITS)
     {
         delta -= FLINT_BITS;
-
         y0 = y[1];
         y1 = y[2];
         y2 = y[3];
@@ -964,7 +961,6 @@ _nfloat_add_4(nfloat_ptr res, nn_srcptr x, slong xexp, int xsgnbit, nn_srcptr y,
     else if (delta < 3 * FLINT_BITS)
     {
         delta -= 2 * FLINT_BITS;
-
         y0 = y[2];
         y1 = y[3];
         y2 = 0;
@@ -978,6 +974,7 @@ _nfloat_add_4(nfloat_ptr res, nn_srcptr x, slong xexp, int xsgnbit, nn_srcptr y,
     }
     else if (delta < 4 * FLINT_BITS)
     {
+        delta -= 3 * FLINT_BITS;
         y0 = y[3] >> delta;
         y1 = 0;
         y2 = 0;
@@ -1148,6 +1145,7 @@ _nfloat_sub_2(nfloat_ptr res, nn_srcptr x, slong xexp, int xsgnbit, nn_srcptr y,
         }
         else if (delta < 2 * FLINT_BITS)
         {
+            delta -= FLINT_BITS;
             sub_ddmmss(s1, s0, x1, x0, 0, y1 >> delta);
         }
         else
@@ -1271,13 +1269,13 @@ _nfloat_sub_3(nfloat_ptr res, nn_srcptr x, slong xexp, int xsgnbit, nn_srcptr y,
         }
         else if (delta < 2 * FLINT_BITS)
         {
+            delta -= FLINT_BITS;
             y0 = y[1];
             y1 = y[2];
             y2 = 0;
 
-            if (delta != FLINT_BITS)
+            if (delta != 0)
             {
-                delta -= FLINT_BITS;
                 y0 = (y0 >> delta) | (y1 << (FLINT_BITS - delta));
                 y1 = (y1 >> delta);
             }
@@ -1285,7 +1283,6 @@ _nfloat_sub_3(nfloat_ptr res, nn_srcptr x, slong xexp, int xsgnbit, nn_srcptr y,
         else if (delta < 3 * FLINT_BITS)
         {
             delta -= 2 * FLINT_BITS;
-
             y0 = y[2] >> delta;
             y1 = 0;
             y2 = 0;
@@ -1438,7 +1435,6 @@ _nfloat_sub_4(nfloat_ptr res, nn_srcptr x, slong xexp, int xsgnbit, nn_srcptr y,
         else if (delta < 2 * FLINT_BITS)
         {
             delta -= FLINT_BITS;
-
             y0 = y[1];
             y1 = y[2];
             y2 = y[3];
@@ -1454,7 +1450,6 @@ _nfloat_sub_4(nfloat_ptr res, nn_srcptr x, slong xexp, int xsgnbit, nn_srcptr y,
         else if (delta < 3 * FLINT_BITS)
         {
             delta -= 2 * FLINT_BITS;
-
             y0 = y[2];
             y1 = y[3];
             y2 = 0;
@@ -1469,7 +1464,6 @@ _nfloat_sub_4(nfloat_ptr res, nn_srcptr x, slong xexp, int xsgnbit, nn_srcptr y,
         else if (delta < 4 * FLINT_BITS)
         {
             delta -= 3 * FLINT_BITS;
-
             y0 = y[3] >> delta;
             y1 = 0;
             y2 = 0;
