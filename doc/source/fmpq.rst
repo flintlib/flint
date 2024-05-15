@@ -183,6 +183,9 @@ Conversion
     Sets ``a``, ``b`` to the numerator and denominator of ``c``
     respectively.
 
+    **Note:** Requires that ``gmp.h`` has been included before any FLINT
+    header is included.
+
 .. function:: void fmpq_set_si(fmpq_t res, slong p, ulong q)
 
     Sets ``res`` to the canonical form of the fraction ``p / q``.
@@ -206,6 +209,9 @@ Conversion
     Sets the value of ``dest`` to that of the ``mpq_t`` variable
     ``src``.
 
+    **Note:** Requires that ``gmp.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int fmpq_set_str(fmpq_t dest, const char * s, int base)
 
     Sets the value of ``dest`` to the value represented in the string
@@ -221,6 +227,9 @@ Conversion
 .. function:: void fmpq_get_mpq(mpq_t dest, const fmpq_t src)
 
     Sets the value of ``dest``
+
+    **Note:** Requires that ``gmp.h`` has been included before any FLINT
+    header is included.
 
 .. function:: int fmpq_get_mpfr(mpfr_t dest, const fmpq_t src, mpfr_rnd_t rnd)
 
@@ -268,9 +277,15 @@ Conversion
     This provides a convenient function for user code, only
     requiring to work with the types ``fmpq_t`` and ``mpq_t``.
 
+    **Note:** Requires that ``gmp.h`` has been included before any FLINT
+    header is included.
+
 .. function:: void flint_mpq_clear_readonly(mpq_t z)
 
     Clears the readonly ``mpq_t`` `z`.
+
+    **Note:** Requires that ``gmp.h`` has been included before any FLINT
+    header is included.
 
 .. function:: void fmpq_init_set_readonly(fmpq_t f, const mpq_t z)
 

@@ -11,6 +11,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
 #include "ulong_extras.h"
 #include "fmpq.h"
 
@@ -109,4 +110,10 @@ fmpq_set_fmpz_frac(fmpq_t res, const fmpz_t p, const fmpz_t q)
 
         fmpz_clear(t);
     }
+}
+
+void fmpq_set_mpq(fmpq_t dest, const mpq_t src)
+{
+    fmpz_set_mpz(fmpq_numref(dest), mpq_numref(src));
+    fmpz_set_mpz(fmpq_denref(dest), mpq_denref(src));
 }

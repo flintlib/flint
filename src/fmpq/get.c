@@ -30,6 +30,12 @@ void fmpq_get_mpz_frac(mpz_t a, mpz_t b, fmpq_t c)
    fmpz_get_mpz(b, fmpq_denref(c));
 }
 
+void fmpq_get_mpq(mpq_t dest, const fmpq_t src)
+{
+    fmpz_get_mpz(mpq_numref(dest), fmpq_numref(src));
+    fmpz_get_mpz(mpq_denref(dest), fmpq_denref(src));
+}
+
 int
 fmpq_get_mpfr(mpfr_t r, const fmpq_t x, mpfr_rnd_t rnd)
 {
