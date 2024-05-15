@@ -430,6 +430,13 @@ Conversion
     words of the result in ``out[0], ..., out[n-1]``. This will give a signed
     two's complement representation of `in` (assuming `in` doesn't overflow the array).
 
+.. function:: void fmpz_set_mpn_large(fmpz_t z, nn_srcptr src, slong n, int negative)
+
+    Sets *z* to the integer represented by the *n* limbs in the array *src*,
+    or minus this value if *negative* is 1.
+    Requires `n \ge 2` and that the top limb of *src* is nonzero.
+    Note that *fmpz_set_ui*, *fmpz_neg_ui* can be used for single-limb integers.
+
 .. function:: void fmpz_get_signed_uiui(ulong * hi, ulong * lo, const fmpz_t in)
 
     Retrieves the value of `in` modulo `2^{2 * FLINT\_BITS}` and puts the high

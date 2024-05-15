@@ -94,22 +94,6 @@ fmpz_add2_fmpz_si_inline(fmpz_t z, const fmpz_t x, const fmpz_t y, slong c)
 }
 
 static inline void
-fmpz_set_mpn_large(fmpz_t z, nn_srcptr src, slong n, int negative)
-{
-    mpz_ptr zz;
-    slong i;
-    zz = _fmpz_promote(z);
-
-    if (zz->_mp_alloc < n)
-        mpz_realloc2(zz, n * FLINT_BITS);
-
-    for (i = 0; i < n; i++)
-        zz->_mp_d[i] = src[i];
-
-    zz->_mp_size = negative ? -n : n;
-}
-
-static inline void
 fmpz_adiv_q_2exp(fmpz_t z, const fmpz_t x, flint_bitcnt_t exp)
 {
     int sign = fmpz_sgn(x);
@@ -150,7 +134,7 @@ _fmpz_size(const fmpz_t f)
     if (!COEFF_IS_MPZ(d))
         return 1;
     else
-        return mpz_size(COEFF_TO_PTR(d));
+        return FLINT_ABS(FMPZ_TO_ZZ(d)->size);
 }
 
 static inline void
@@ -208,7 +192,7 @@ static inline slong
 fmpz_allocated_bytes(const fmpz_t x)
 {
     if (COEFF_IS_MPZ(*x))
-        return sizeof(__mpz_struct) + COEFF_TO_PTR(*x)->_mp_alloc * sizeof(ulong);
+        return sizeof(zz_struct) + FMPZ_TO_ZZ(*x)->alloc * sizeof(ulong);
     else
         return 0;
 }

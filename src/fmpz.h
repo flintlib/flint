@@ -209,6 +209,8 @@ void fmpz_set_ui_array(fmpz_t out, const ulong * in, slong n);
 void fmpz_get_signed_ui_array(ulong * out, slong n, const fmpz_t in);
 void fmpz_set_signed_ui_array(fmpz_t out, const ulong * in, slong n);
 
+void fmpz_set_mpn_large(fmpz_t z, nn_srcptr src, slong n, int negative);
+
 ulong fmpz_get_nmod(const fmpz_t f, nmod_t mod);
 
 double fmpz_get_d(const fmpz_t f);

@@ -82,13 +82,6 @@ so these methods should not be used gratuitously.
 Low-level conversions
 -------------------------------------------------------------------------------
 
-.. function:: void fmpz_set_mpn_large(fmpz_t z, nn_srcptr src, slong n, int negative)
-
-    Sets *z* to the integer represented by the *n* limbs in the array *src*,
-    or minus this value if *negative* is 1.
-    Requires `n \ge 2` and that the top limb of *src* is nonzero.
-    Note that *fmpz_set_ui*, *fmpz_neg_ui* can be used for single-limb integers.
-
 .. macro:: FMPZ_GET_MPN_READONLY(zsign, zn, zptr, ztmp, zv)
 
     Given an *fmpz_t* *zv*, this macro sets *zptr* to a pointer to the limbs of *zv*,

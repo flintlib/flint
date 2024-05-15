@@ -243,3 +243,18 @@ void fmpz_set_ui_array(fmpz_t out, const ulong * in, slong in_len)
         flint_mpn_copyi(mpz->_mp_d, in, size);
     }
 }
+
+void fmpz_set_mpn_large(fmpz_t z, nn_srcptr src, slong n, int negative)
+{
+    mpz_ptr zz;
+    slong i;
+    zz = _fmpz_promote(z);
+
+    if (zz->_mp_alloc < n)
+        mpz_realloc(zz, n);
+
+    for (i = 0; i < n; i++)
+        zz->_mp_d[i] = src[i];
+
+    zz->_mp_size = negative ? -n : n;
+}
