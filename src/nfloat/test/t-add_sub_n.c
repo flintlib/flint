@@ -41,6 +41,10 @@ TEST_FUNCTION_START(add_sub_n, state)
             if (n_randint(state, 2))
                 NFLOAT_EXP(b) = NFLOAT_EXP(a) - 1;
 
+            /* trigger special cases with increased probability */
+            if (n_randint(state, 100) == 0)
+                flint_mpn_store(NFLOAT_D(b), prec / FLINT_BITS, ~UWORD(0));
+
             GR_MUST_SUCCEED(_nfloat_add_n(r1, NFLOAT_D(a), NFLOAT_EXP(a), NFLOAT_SGNBIT(a), NFLOAT_D(b), NFLOAT_EXP(a) - NFLOAT_EXP(b), prec / FLINT_BITS, ctx));
 
             if (prec == FLINT_BITS)
