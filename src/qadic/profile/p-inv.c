@@ -22,7 +22,6 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "flint.h"
 #include "fmpz.h"
 #include "qadic.h"
 

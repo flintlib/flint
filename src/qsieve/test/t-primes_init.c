@@ -10,7 +10,6 @@
 */
 
 #include "test_helpers.h"
-#include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "qsieve.h"

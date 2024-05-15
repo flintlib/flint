@@ -11,7 +11,6 @@
 
 #define FMPQ_INLINES_C
 
-#include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpq.h"

@@ -15,7 +15,6 @@
 
 #include "templates.h"
 
-#include "flint.h"
 #include "ulong_extras.h"
 
 void

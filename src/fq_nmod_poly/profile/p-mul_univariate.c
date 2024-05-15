@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include "flint.h"
 #include "fmpz.h"
 #include "fq_nmod.h"
 #include "fq_nmod_poly.h"

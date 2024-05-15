@@ -11,7 +11,6 @@
 
 #define FQ_DEFAULT_MAT_INLINES_C
 
-#include "flint.h"
 #include "ulong_extras.h"
 #include "fq_default.h"
 #include "fq_default_mat.h"
