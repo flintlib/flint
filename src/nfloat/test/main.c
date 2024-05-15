@@ -11,12 +11,14 @@
 
 /* Include functions *********************************************************/
 
+#include "t-add_sub_n.c"
 #include "t-nfloat.c"
 
 /* Array of test functions ***************************************************/
 
 test_struct tests[] =
 {
+    TEST_FUNCTION(add_sub_n),
     TEST_FUNCTION(nfloat),
 };
 
