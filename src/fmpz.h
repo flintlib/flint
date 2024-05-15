@@ -765,25 +765,6 @@ int fmpz_moebius_mu(const fmpz_t n);
 
 void fmpz_divisor_sigma(fmpz_t res, ulong k, const fmpz_t n);
 
-/* Declare dead functions ****************************************************/
-
-#define __new_fmpz _Pragma("GCC error \"'__new_fmpz' is deprecated.\"")
-#define __free_fmpz _Pragma("GCC error \"'__free_fmpz' is deprecated.\"")
-#define __fmpz_lt _Pragma("GCC error \"'__fmpz_lt' is deprecated.\"")
-#define __fmpz_gt _Pragma("GCC error \"'__fmpz_gt' is deprecated.\"")
-#define __fmpz_lte _Pragma("GCC error \"'__fmpz_lte' is deprecated.\"")
-#define __fmpz_gte _Pragma("GCC error \"'__fmpz_gte' is deprecated.\"")
-#define __fmpz_neq _Pragma("GCC error \"'__fmpz_neq' is deprecated.\"")
-
-#define __fmpz_init _Pragma("GCC error \"'__fmpz_init' is deprecated. Use 'fmpz_init' instead.\"")
-#define __fmpz_init_set _Pragma("GCC error \"'__fmpz_init_set' is deprecated. Use 'fmpz_init_set' instead.\"")
-#define __fmpz_init_set_ui _Pragma("GCC error \"'__fmpz_init_set_ui' is deprecated. Use 'fmpz_init_set_ui' instead.\"")
-#define __fmpz_clear _Pragma("GCC error \"'__fmpz_clear' is deprecated. Use 'fmpz_clear' instead.\"")
-#define __fmpz_set_si _Pragma("GCC error \"'__fmpz_set_si' is deprecated. Use 'fmpz_set_si' instead.\"")
-#define __fmpz_set_ui _Pragma("GCC error \"'__fmpz_set_ui' is deprecated. Use 'fmpz_set_ui' instead.\"")
-#define __fmpz_eq _Pragma("GCC error \"'__fmpz_eq' is deprecated. Use 'fmpz_equal' instead.\"")
-#define __fmpz_neg _Pragma("GCC error \"'__fmpz_neg' is deprecated. Use 'fmpz_neg' instead.\"")
-
 #ifdef __cplusplus
 }
 #endif
