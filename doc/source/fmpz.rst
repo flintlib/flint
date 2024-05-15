@@ -135,6 +135,9 @@ Types, macros and constants
    Initialises a new ``mpz_t`` and returns a pointer to it. This is only used
    internally.
 
+   **Note:** Requires that ``gmp.h`` has been included before any FLINT
+   header is included.
+
 .. function:: void _fmpz_clear_mpz(fmpz f)
 
    Clears the ``mpz_t`` "pointed to" by the ``fmpz`` `f`. This is only used
@@ -153,6 +156,9 @@ Types, macros and constants
    If `f` doesn't represent an ``mpz_t``, initialise one and associate it to
    `f`.
 
+   **Note:** Requires that ``gmp.h`` has been included before any FLINT
+   header is included.
+
 .. function:: mpz_ptr _fmpz_promote_val(fmpz_t f)
 
    If `f` doesn't represent an ``mpz_t``, initialise one and associate it to
@@ -162,6 +168,9 @@ Types, macros and constants
    an ``mpz_t`` that can be passed to GMP, but the ``fmpz`` will be in an
    inconsistent state with respect to the other Flint ``fmpz`` functions such as
    ``fmpz_is_zero``, etc.
+
+   **Note:** Requires that ``gmp.h`` has been included before any FLINT
+   header is included.
 
 .. function:: void _fmpz_demote(fmpz_t f)
 
@@ -303,9 +312,15 @@ Conversion
     Sets `f` to the ``mpf_t`` `x`, rounding down towards zero if
     the value of `x` is fractional.
 
+    **Note:** Requires that ``gmp.h`` has been included before any FLINT
+    header is included.
+
 .. function:: void fmpz_get_mpf(mpf_t x, const fmpz_t f)
 
     Sets the value of the ``mpf_t`` `x` to the value of `f`.
+
+    **Note:** Requires that ``gmp.h`` has been included before any FLINT
+    header is included.
 
 .. function:: void fmpz_get_mpfr(mpfr_t x, const fmpz_t f, mpfr_rnd_t rnd)
 
@@ -324,6 +339,9 @@ Conversion
 .. function:: void fmpz_get_mpz(mpz_t x, const fmpz_t f)
 
     Sets the ``mpz_t`` `x` to the same value as `f`.
+
+    **Note:** Requires that ``gmp.h`` has been included before any FLINT
+    header is included.
 
 .. function:: int fmpz_get_mpn(nn_ptr * n, fmpz_t n_in)
 
@@ -421,6 +439,9 @@ Conversion
 
     Sets `f` to the given ``mpz_t`` value.
 
+    **Note:** Requires that ``gmp.h`` has been included before any FLINT
+    header is included.
+
 .. function:: int fmpz_set_str(fmpz_t f, const char * str, int b)
 
     Sets `f` to the value given in the null-terminated string ``str``,
@@ -471,9 +492,15 @@ Conversion
             _fmpz_demote_val(f);
         }
 
+    **Note:** Requires that ``gmp.h`` has been included before any FLINT
+    header is included.
+
 .. function:: void flint_mpz_clear_readonly(mpz_t z)
 
     Clears the readonly ``mpz_t`` `z`.
+
+    **Note:** Requires that ``gmp.h`` has been included before any FLINT
+    header is included.
 
 .. function:: void fmpz_init_set_readonly(fmpz_t f, const mpz_t z)
 
@@ -497,6 +524,9 @@ Conversion
             foo(..., f);
             fmpz_clear_readonly(f);
         }
+
+    **Note:** Requires that ``gmp.h`` has been included before any FLINT
+    header is included.
 
 .. function:: void fmpz_clear_readonly(fmpz_t f)
 
