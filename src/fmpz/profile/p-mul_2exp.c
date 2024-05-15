@@ -10,8 +10,8 @@
 */
 
 #include "profiler.h"
-#include "fmpz.h"
 #include "gmpcompat.h"
+#include "fmpz.h"
 
 #define ntests 1000
 

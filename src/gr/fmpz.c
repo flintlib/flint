@@ -10,6 +10,7 @@
 */
 
 #include <math.h>
+#include <gmp.h>
 #include "fexpr.h"
 #include "qqbar.h"
 #include "fmpz_factor.h"

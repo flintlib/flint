@@ -97,7 +97,7 @@ TEST_FUNCTION_START(fmpz_poly_q_scalar_div_fmpq, state)
             flint_printf("b = "), fmpz_poly_q_print(b), flint_printf("\n\n");
             flint_printf("c = "), fmpz_poly_q_print(c), flint_printf("\n\n");
             flint_printf("d = "), fmpz_poly_q_print(d), flint_printf("\n\n");
-            gmp_printf("y = %Qd\n\n", y);
+            flint_printf("y = %{fmpq}\n\n", y);
             fflush(stdout);
             flint_abort();
         }

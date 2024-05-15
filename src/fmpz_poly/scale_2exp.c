@@ -23,7 +23,7 @@ void _fmpz_poly_scale_2exp(fmpz * pol, slong len, slong k)
     else if (k > 0)
     {
         if (fmpz_is_zero(pol))
-            z = ULONG_MAX;
+            z = UWORD_MAX;
         else
             z = fmpz_val2(pol);
 
@@ -40,7 +40,7 @@ void _fmpz_poly_scale_2exp(fmpz * pol, slong len, slong k)
     else
     {
         if (fmpz_is_zero(pol + len - 1))
-            z = ULONG_MAX;
+            z = UWORD_MAX;
         else
             z = fmpz_val2(pol + len - 1);
 

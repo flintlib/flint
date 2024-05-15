@@ -11,6 +11,7 @@
 
 #include <stdlib.h>
 #include <time.h>
+#include <gmp.h>
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
