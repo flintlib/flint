@@ -117,7 +117,7 @@ mpz_ptr _fmpz_new_mpz(void)
 
             for (j = skip; j < num; j++)
             {
-                mpz_init2(page_ptr + j, 2*FLINT_BITS);
+                mpz_init2(page_ptr + j, 2 * FLINT_BITS);
 
                 /*
                    Cannot be lifted from loop due to possibility of
@@ -168,7 +168,7 @@ void _fmpz_clear_mpz(fmpz f)
     } else
     {
         if (ptr->_mp_alloc > FLINT_MPZ_MAX_CACHE_LIMBS)
-            mpz_realloc2(ptr, 2*FLINT_BITS);
+            mpz_realloc(ptr, 2);
 
         if (mpz_free_num == mpz_free_alloc)
         {

@@ -62,7 +62,7 @@ mpz_ptr _fmpz_new_mpz(void)
         }
         mpz_arr[mpz_num++] = z;
 
-        mpz_init(z);
+        mpz_init2(z, 2 * FLINT_BITS);
     }
 
 #if FLINT_USES_PTHREAD
@@ -77,7 +77,7 @@ void _fmpz_clear_mpz(fmpz f)
     mpz_ptr ptr = COEFF_TO_PTR(f);
 
     if (ptr->_mp_alloc > FLINT_MPZ_MAX_CACHE_LIMBS)
-        mpz_realloc2(ptr, 1);
+        mpz_realloc(ptr, 2);
 
 #if FLINT_USES_PTHREAD
     pthread_mutex_lock(&fmpz_lock);

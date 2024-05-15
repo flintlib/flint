@@ -18,7 +18,8 @@ void fmpz_clear_readonly(fmpz_t f)
     {
         mpz_ptr ptr = COEFF_TO_PTR(*f);
 
-        mpz_init(ptr);
+        /* NOTE: Do not feed the collector anything less than two limbs! */
+        mpz_init2(ptr, 2 * FLINT_BITS);
         _fmpz_clear_mpz(*f);
         *f = WORD(0);
     }
