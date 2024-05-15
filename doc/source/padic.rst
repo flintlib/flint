@@ -204,9 +204,15 @@ reduced to the precision of ``rop``.
 
     Sets the `p`-adic number ``rop`` to the GMP integer ``op``.
 
+    **Note:** Requires that ``gmp.h`` has been included before any FLINT
+    header is included.
+
 .. function:: void padic_set_mpq(padic_t rop, const mpq_t op, const padic_ctx_t ctx)
 
     Sets ``rop`` to the GMP rational ``op``.
+
+    **Note:** Requires that ``gmp.h`` has been included before any FLINT
+    header is included.
 
 .. function:: void padic_get_fmpz(fmpz_t rop, const padic_t op, const padic_ctx_t ctx)
 
@@ -224,9 +230,15 @@ reduced to the precision of ``rop``.
 
     If ``op`` is not a `p`-adic integer, raises an ``abort`` signal.
 
+    **Note:** Requires that ``gmp.h`` has been included before any FLINT
+    header is included.
+
 .. function:: void padic_get_mpq(mpq_t rop, const padic_t op, const padic_ctx_t ctx)
 
     Sets the GMP rational ``rop`` to the value of ``op``.
+
+    **Note:** Requires that ``gmp.h`` has been included before any FLINT
+    header is included.
 
 .. function:: void padic_swap(padic_t op1, padic_t op2)
 
