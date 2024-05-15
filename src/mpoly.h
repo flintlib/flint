@@ -21,6 +21,7 @@
 
 #include <string.h>
 #include <gmp.h>
+#include "longlong.h"
 #include "mpoly_types.h"
 
 #ifdef __cplusplus

@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_mat.h"
+#include "longlong.h"
 
 /* todo: squaring optimizations */
 

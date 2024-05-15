@@ -13,6 +13,9 @@
 #include "ulong_extras.h"
 #include "mpoly.h"
 
+#define l_shift(in, shift) \
+    ((shift == FLINT_BITS) ? WORD(0) : ((in) << (shift)))
+
 TEST_FUNCTION_START(mpoly_pack_unpack, state)
 {
     slong k, i, length, nfields, bits1, bits2;

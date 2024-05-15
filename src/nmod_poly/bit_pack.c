@@ -14,6 +14,8 @@
 #include "nmod_poly.h"
 #include "fmpz.h"
 
+#define r_shift(in, c) (((c) == FLINT_BITS) ? WORD(0) : ((in) >> (c)))
+
 /* Assumes length > 0, bits > 0. */
 void
 _nmod_poly_bit_pack(nn_ptr res, nn_srcptr poly, slong len, flint_bitcnt_t bits)

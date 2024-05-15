@@ -23,6 +23,7 @@
 #endif
 
 #include "limb_types.h"
+#include "longlong.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -116,24 +117,36 @@ ulong n_CRT(ulong r1, ulong m1, ulong r2, ulong m2);
 
 ULONG_EXTRAS_INLINE int n_mul_checked(ulong * a, ulong b, ulong c)
 {
+#if defined(__GNUC__)
+    return __builtin_mul_overflow(b, c, a);
+#else
 	ulong ahi, alo;
 	umul_ppmm(ahi, alo, b, c);
 	*a = alo;
 	return 0 != ahi;
+#endif
 }
 
 ULONG_EXTRAS_INLINE int n_add_checked(ulong * a, ulong b, ulong c)
 {
+#if defined(__GNUC__)
+    return __builtin_add_overflow(b, c, a);
+#else
     int of = b + c < b;
     *a = b + c;
     return of;
+#endif
 }
 
 ULONG_EXTRAS_INLINE int n_sub_checked(ulong * a, ulong b, ulong c)
 {
+#if defined(__GNUC__)
+    return __builtin_sub_overflow(b, c, a);
+#else
     int of = b < c;
     *a = b - c;
     return of;
+#endif
 }
 
 /* Modular arithmetic ********************************************************/

@@ -11,6 +11,7 @@
 
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
+#include "longlong.h"
 
 void fmpz_mod_poly_frobenius_powers_2exp_precomp(
            fmpz_mod_poly_frobenius_powers_2exp_t pow, const fmpz_mod_poly_t f,

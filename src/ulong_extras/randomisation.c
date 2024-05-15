@@ -16,10 +16,15 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
+#define l_shift(in, shift) \
+    ((shift == FLINT_BITS) ? WORD(0) : ((in) << (shift)))
+
 ulong n_randbits(flint_rand_t state, unsigned int bits)
 {
-   if (bits == 0) return UWORD(0);
-   else return (UWORD(1) << (bits - 1)) | n_randint(state, l_shift(UWORD(1), bits));
+   if (bits == 0)
+       return UWORD(0);
+   else
+       return (UWORD(1) << (bits - 1)) | n_randint(state, l_shift(UWORD(1), bits));
 }
 
 ulong n_urandint(flint_rand_t state, ulong limit)

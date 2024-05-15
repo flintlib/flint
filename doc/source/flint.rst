@@ -59,17 +59,6 @@ The file ``flint.h`` contains various useful macros.
     Returns the sign of `x` where `x` is interpreted as a :type:`slong`, that
     is, returns `-1` if `x < 0`, `0` if `x = 0` and `1` if `x > 0`.
 
-.. function:: flint_bitcnt_t FLINT_BIT_COUNT(ulong x)
-
-    Returns the number of binary bits required to represent *x*. If *x* is zero
-    it returns *0*. This is an inline-function only.
-
-.. macro:: FLINT_FLOG2(x)
-           FLINT_CLOG2(x)
-
-    For `x \ge 1`, it returns `\lfloor \log_2 x \rfloor`
-    and `\lceil \log_2 x \rceil`, respectively.
-
 Integer types
 -----------------------------------------------
 

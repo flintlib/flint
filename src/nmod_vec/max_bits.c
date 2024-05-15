@@ -11,6 +11,7 @@
 */
 
 #include "nmod_vec.h"
+#include "longlong.h"
 
 flint_bitcnt_t _nmod_vec_max_bits(nn_srcptr vec, slong len)
 {

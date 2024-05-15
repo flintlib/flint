@@ -13,6 +13,10 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
+#if FLINT_USES_BLAS
+# include "longlong.h"
+#endif
+
 void _fmpz_mat_mul_small_1(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 {
     slong ar, br, bc;
