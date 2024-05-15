@@ -45,16 +45,16 @@ int main()
 
     flint_printf("                   _gr_vec_add          _gr_vec_mul          _gr_vec_mul_scalar   _gr_vec_sum          _gr_vec_product      _gr_vec_dot\n");
 
-    for (prec = 64; prec <= 2048; prec *= 2)
+    for (prec = 64; prec <= 2048; prec = prec < 256 ? prec + 64 : prec * 2)
     {
         flint_printf("prec = %wd\n", prec);
 
-        for (n = 3; n <= 100; n = (n == 3) ? 10 : n * 10)
+        for (n = 10; n <= 100; n *= 10)
         {
             for (which = 0; which < 2; which++)
             {
                 flint_rand_t state;
-                flint_randinit(state);
+                flint_rand_init(state);
 
                 if (which == 0)
                     gr_ctx_init_real_float_arf(ctx, prec);
@@ -127,7 +127,7 @@ int main()
                 gr_heap_clear_vec(vec2, n, ctx);
                 gr_heap_clear_vec(vec3, n, ctx);
 
-                flint_randclear(state);
+                flint_rand_clear(state);
             }
 
             flint_printf("n = %4wd   ", n);

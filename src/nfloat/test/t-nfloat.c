@@ -10,10 +10,10 @@
 */
 
 #include "test_helpers.h"
+#include "fmpq.h"
+#include "arf.h"
 #include "gr_vec.h"
 #include "gr_special.h"
-#include "arf.h"
-#include "fmpq.h"
 #include "nfloat.h"
 
 int
@@ -607,9 +607,17 @@ TEST_FUNCTION_START(nfloat, state)
             tol = gr_heap_init(ctx2);
 
             GR_IGNORE(gr_one(tol, ctx2));
-            GR_IGNORE(gr_mul_2exp_si(tol, tol, -prec + 1, ctx2));
+            GR_IGNORE(gr_mul_2exp_si(tol, tol, -prec + 2, ctx2));
 
-            reps = (prec <= 128 ? 1000 : 1) * flint_test_multiplier();
+            reps = (prec <= 256 ? 10000 : 1) * flint_test_multiplier();
+
+            for (i = 0; i < reps; i++)
+            {
+                gr_test_approx_binary_op(ctx, (gr_method_binary_op) gr_add, ctx2, tol, state, 0);
+                gr_test_approx_binary_op(ctx, (gr_method_binary_op) gr_sub, ctx2, tol, state, 0);
+            }
+
+            reps = (prec <= 256 ? 1000 : 1) * flint_test_multiplier();
 
             for (i = 0; i < reps; i++)
             {
