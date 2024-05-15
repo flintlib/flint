@@ -65,6 +65,8 @@ void fmpz_init2(fmpz_t f, ulong limbs);
 void _fmpz_promote_set_ui(fmpz_t f, ulong v);
 void _fmpz_promote_set_si(fmpz_t f, slong v);
 void _fmpz_promote_neg_ui(fmpz_t f, ulong v);
+void _fmpz_promote_set_uiui(fmpz_t f, ulong hi, ulong lo);
+void _fmpz_promote_neg_uiui(fmpz_t f, ulong hi, ulong lo);
 void _fmpz_init_promote_set_ui(fmpz_t f, ulong v);
 void _fmpz_init_promote_set_si(fmpz_t f, slong v);
 
@@ -180,9 +182,36 @@ fmpz_neg_ui(fmpz_t f, ulong val)
         _fmpz_promote_neg_ui(f, val);
 }
 
-void fmpz_get_uiui(ulong * hi, ulong * low, const fmpz_t f);
-void fmpz_set_uiui(fmpz_t f, ulong hi, ulong lo);
-void fmpz_neg_uiui(fmpz_t f, ulong hi, ulong lo);
+FMPZ_INLINE void fmpz_get_uiui(ulong * hi, ulong * low, const fmpz_t f)
+{
+    if (!COEFF_IS_MPZ(*f))
+    {
+        *low = *f;
+        *hi  = 0;
+    }
+    else
+    {
+        zz_srcptr zf = FMPZ_TO_ZZ(*f);
+        *low = zf->ptr[0];
+        *hi  = zf->size == 2 ? zf->ptr[1] : 0;
+    }
+}
+
+FMPZ_INLINE void fmpz_set_uiui(fmpz_t f, ulong hi, ulong lo)
+{
+    if (hi == 0)
+        fmpz_set_ui(f, lo);
+    else
+        _fmpz_promote_set_uiui(f, hi, lo);
+}
+
+FMPZ_INLINE void fmpz_neg_uiui(fmpz_t f, ulong hi, ulong lo)
+{
+    if (hi == 0)
+        fmpz_neg_ui(f, lo);
+    else
+        _fmpz_promote_neg_uiui(f, hi, lo);
+}
 
 void fmpz_get_signed_uiui(ulong * hi, ulong * lo, const fmpz_t x);
 

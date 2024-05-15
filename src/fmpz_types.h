@@ -26,6 +26,7 @@ typedef struct
 } zz_struct;
 
 typedef zz_struct * zz_ptr;
+typedef const zz_struct * zz_srcptr;
 #define FMPZ_TO_ZZ(x) ((zz_ptr) ((ulong) (x) << 2))
 
 typedef struct
