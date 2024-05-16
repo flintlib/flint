@@ -188,7 +188,7 @@ fmpz_set_signed_uiuiui(fmpz_t r, ulong hi, ulong mid, ulong lo)
     {
         mpz_ptr z = _fmpz_promote(r);
         if (z->_mp_alloc < 3)
-            mpz_realloc2(z, 3 * FLINT_BITS);
+            mpz_realloc(z, 3);
         z->_mp_d[0] = lo;
         z->_mp_d[1] = mid;
         z->_mp_d[2] = hi;
@@ -218,7 +218,7 @@ void fmpz_set_ui_array(fmpz_t out, const ulong * in, slong in_len)
     {
         mpz_ptr mpz = _fmpz_promote(out);
         if (mpz->_mp_alloc < size)
-            mpz_realloc2(mpz, FLINT_BITS * size);
+            mpz_realloc(mpz, size);
         mpz->_mp_size = size;
         flint_mpn_copyi(mpz->_mp_d, in, size);
     }

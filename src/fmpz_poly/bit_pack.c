@@ -57,8 +57,9 @@ fmpz_poly_bit_pack(fmpz_t f, const fmpz_poly_t poly,
     }
 
     mpz = _fmpz_promote(f);
-    mpz_realloc2(mpz, len * bit_size);
-    d = mpz->_mp_alloc;
+    d = (len * bit_size - 1) / FLINT_BITS + 1;
+    if (mpz->_mp_alloc < d)
+        mpz_realloc(mpz, d);
 
     flint_mpn_zero(mpz->_mp_d, d);
 

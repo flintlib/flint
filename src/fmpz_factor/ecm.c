@@ -99,7 +99,11 @@ fmpz_factor_ecm(fmpz_t f, ulong curves, ulong B1, ulong B2,
 
     ret = 0;
     fac = _fmpz_promote(f);
-    mpz_realloc(fac, fmpz_size(n_in));
+    {
+        int alloc = fmpz_size(n_in);
+        if (fac->_mp_alloc < alloc)
+            mpz_realloc(fac, alloc);
+    }
 
     /************************ STAGE I PRECOMPUTATIONS ************************/
 

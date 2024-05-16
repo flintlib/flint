@@ -322,7 +322,7 @@ arf_get_fmpz(fmpz_t z, const arf_t x, arf_rnd_t rnd)
 
     zz = _fmpz_promote(z);
     if (zz->_mp_alloc < zn)
-        mpz_realloc2(zz, zn * FLINT_BITS);
+        mpz_realloc(zz, zn);
 
     zp = zz->_mp_d;
 

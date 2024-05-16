@@ -153,7 +153,8 @@ fmpz_primorial(fmpz_t res, ulong n)
     bits = FLINT_BIT_COUNT(primes[pi - 1]);
 
     mres = _fmpz_promote(res);
-    mpz_realloc2(mres, pi*bits);
+    if (mres->_mp_alloc < (int) ((pi * bits) / FLINT_BITS) + 1)
+        mpz_realloc(mres, (pi * bits) / FLINT_BITS + 1);
 
     len = mpn_prod_limbs(mres->_mp_d, primes, pi, bits);
     mres->_mp_size = len;

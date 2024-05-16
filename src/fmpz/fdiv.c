@@ -203,7 +203,7 @@ void _mpz_tdiv_qr_preinvn(mpz_ptr q, mpz_ptr r,
     nn_ptr qp, rp, ap, dp, tp, sp;
 
     if ((ulong) r->_mp_alloc < usize1 + nm)
-        mpz_realloc2(r, (usize1 + nm)*FLINT_BITS);
+        mpz_realloc(r, usize1 + nm);
 
     if (usize1 < usize2) /* special case preinv code can't deal with */
     {
@@ -214,7 +214,7 @@ void _mpz_tdiv_qr_preinvn(mpz_ptr q, mpz_ptr r,
     }
 
     if ((ulong) q->_mp_alloc < qsize + nm)
-        mpz_realloc2(q, (qsize + nm)*FLINT_BITS);
+        mpz_realloc(q, qsize + nm);
 
     dp = d->_mp_d;
     ap = a->_mp_d;

@@ -141,9 +141,9 @@ nmod_poly_bit_pack(fmpz_t f, const nmod_poly_t poly,
     }
 
     mpz = _fmpz_promote(f);
-    mpz_realloc2(mpz, len * bit_size);
-
     limbs = (len * bit_size - 1) / FLINT_BITS + 1;
+    if (mpz->_mp_alloc < limbs)
+        mpz_realloc(mpz, limbs);
 
     _nmod_poly_bit_pack(mpz->_mp_d, poly->coeffs, len, bit_size);
 
