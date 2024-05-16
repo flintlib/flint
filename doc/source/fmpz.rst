@@ -130,18 +130,34 @@ Types, macros and constants
    A macro which returns `1` if `f` represents an ``mpz_t``, otherwise `0` is
    returned.
 
+.. macro:: MPZ_MIN_ALLOC
+
+   A constant determining the minimum number of limbs the *fmpz* memory manager
+   will allocate for each *mpz*. This constant is currently 2.
+
 .. function:: mpz_ptr _fmpz_new_mpz(void)
 
-   Initialises a new ``mpz_t`` and returns a pointer to it. This is only used
-   internally.
+   Returns a pointer to an initialised *mpz* with at least
+   :macro:`MPZ_MIN_ALLOC` limbs allocated. This is only used internally.
 
    **Note:** Requires that ``gmp.h`` has been included before any FLINT
    header is included.
 
 .. function:: void _fmpz_clear_mpz(fmpz f)
 
-   Clears the ``mpz_t`` "pointed to" by the ``fmpz`` `f`. This is only used
+   Clears the *mpz* "pointed to" by the *fmpz* *f*. This is only used
    internally.
+
+.. note::
+
+   As of FLINT 3.2.0, it is required that the *mpz* pointed to by *f* has at
+   least :macro:`MPZ_MIN_ALLOC` limbs allocated when :func:`_fmpz_clear_mpz` is
+   called. Note that GMP functions never reduce the number of allocated limbs,
+   apart from a bug in ``mpz_remove`` which as of GMP 6.3.0 may reduce the
+   number of allocated limbs in the output *mpz*. Hence, as long as
+   ``mpz_realloc`` never is called with a second argument less than
+   :macro:`MPZ_MIN_ALLOC` on an *mpz* received from :func:`_fmpz_new_mpz`, any
+   other usage should be fine.
 
 .. function:: void _fmpz_cleanup_mpz_content()
 
