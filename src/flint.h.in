@@ -484,6 +484,7 @@ typedef fmpq fmpq_t[1];
 
 /* The minimum number of limbs that the fmpz collector should spit out */
 #define MPZ_MIN_ALLOC 2
+#define MPZ_REALLOC(ptr, sz) ((int) (sz) > ((ptr)->_mp_alloc) ? (mp_ptr) mpz_realloc(ptr, sz) : ((ptr)->_mp_d))
 
 #ifdef __cplusplus
 }
