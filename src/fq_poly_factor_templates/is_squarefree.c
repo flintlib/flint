@@ -15,7 +15,6 @@
 
 #include "templates.h"
 
-#include "ulong_extras.h"
 int
 _TEMPLATE(T, poly_is_squarefree) (const TEMPLATE(T, struct) * f, slong len,
                                   const TEMPLATE(T, ctx_t) ctx)

@@ -14,7 +14,6 @@
 
 #include "templates.h"
 
-#include "ulong_extras.h"
 
 static inline int
 TEMPLATE(T, mat_pivot) (TEMPLATE(T, mat_t) A, slong * P, slong start_row,

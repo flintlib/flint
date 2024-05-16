@@ -11,7 +11,6 @@
 
 /* Vectors over generic rings */
 
-#include "ulong_extras.h"
 #include "fmpz.h"
 #include "gr.h"
 #include "gr_vec.h"

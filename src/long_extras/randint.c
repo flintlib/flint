@@ -12,7 +12,6 @@
 
 #include <limits.h>
 
-#include "ulong_extras.h"
 #include "long_extras.h"
 
 slong z_randint(flint_rand_t state, ulong limit)

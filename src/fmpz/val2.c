@@ -10,7 +10,6 @@
 */
 
 #include <gmp.h>
-#include "ulong_extras.h"
 #include "fmpz.h"
 
 flint_bitcnt_t fmpz_val2(const fmpz_t x)

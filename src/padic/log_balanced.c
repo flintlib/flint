@@ -11,7 +11,6 @@
 */
 
 #include "padic.h"
-#include "ulong_extras.h"
 
 static void
 _padic_log_bsplit_series(fmpz_t P, fmpz_t B, fmpz_t T,

@@ -13,7 +13,6 @@
 
 #include "gmpcompat.h"
 #include "mpn_extras.h"
-#include "ulong_extras.h"
 #include "fmpz.h"
 
 /* Will not get called with x or y small. */

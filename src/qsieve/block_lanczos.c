@@ -21,7 +21,6 @@ benefit from your work.
 --------------------------------------------------------------------*/
 
 
-#include "ulong_extras.h"
 #include "qsieve.h"
 
 #ifdef __GNUC__

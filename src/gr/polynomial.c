@@ -14,7 +14,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "fmpz.h"
-#include "ulong_extras.h"
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_poly.h"

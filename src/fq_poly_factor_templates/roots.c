@@ -13,7 +13,6 @@
 
 #include "templates.h"
 
-#include "ulong_extras.h"
 
 /* split f assuming that f has degree(f) distinct nonzero roots in Fq */
 void _TEMPLATE(T, poly_split_rabin)(

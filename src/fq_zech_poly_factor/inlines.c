@@ -11,7 +11,6 @@
 
 #define FQ_ZECH_POLY_FACTOR_INLINES_C
 
-#include "ulong_extras.h"
 #include "fq_zech.h"
 #include "fq_zech_poly.h"
 
