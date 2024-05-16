@@ -17,11 +17,12 @@
 #if FLINT_USES_BLAS && FLINT_BITS == 64
 
 #include <stdint.h>
+#include <limits.h>
+#include <cblas.h>
 #include "nmod.h"
 #include "fmpz.h"
 #include "thread_pool.h"
 #include "thread_support.h"
-#include "cblas.h"
 
 typedef struct {
     slong m;
