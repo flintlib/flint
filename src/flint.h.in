@@ -482,6 +482,9 @@ typedef fmpq fmpq_t[1];
 
 #define COEFF_IS_MPZ(x) (((x) >> SMALL_FMPZ_BITCOUNT_MAX) == WORD(1))
 
+/* The minimum number of limbs that the fmpz collector should spit out */
+#define MPZ_MIN_ALLOC 2
+
 #ifdef __cplusplus
 }
 #endif
