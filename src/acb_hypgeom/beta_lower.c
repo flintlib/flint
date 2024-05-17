@@ -36,7 +36,8 @@ acb_beta(acb_t res, const acb_t a, const acb_t b, slong prec)
 void acb_hypgeom_beta_lower(acb_t res,
     const acb_t a, const acb_t b, const acb_t z, int regularized, slong prec)
 {
-    acb_t t, u;
+    acb_t t, u, v;
+    int formula = 0;
 
     if (acb_is_zero(z) && arb_is_positive(acb_realref(a)))
     {
@@ -55,14 +56,32 @@ void acb_hypgeom_beta_lower(acb_t res,
 
     acb_init(t);
     acb_init(u);
+    acb_init(v);
 
-    acb_sub_ui(t, b, 1, prec);
-    acb_neg(t, t);
-    acb_add_ui(u, a, 1, prec);
+    /* todo: recognize different combinations of integer parameters */
+    if (acb_is_int(b) && arf_sgn(arb_midref(acb_realref(b))) > 0 &&
+                         arf_cmp_si(arb_midref(acb_realref(b)), prec / 10) < 0)
+        formula = 0;
+    else
+        formula = 1;
+
+    if (formula == 0)
+    {
+        acb_sub_ui(t, b, 1, prec);
+        acb_neg(t, t);
+        acb_add_ui(u, a, 1, prec);
+        acb_set(v, a);
+    }
+    else
+    {
+        acb_add(t, a, b, prec);
+        acb_add_ui(u, a, 1, prec);
+        acb_one(v);
+    }
 
     if (regularized)
     {
-        acb_hypgeom_2f1(t, a, t, u, z, 1, prec);
+        acb_hypgeom_2f1(t, v, t, u, z, 1, prec);
 
         acb_add(u, a, b, prec);
         acb_gamma(u, u, prec);
@@ -72,15 +91,24 @@ void acb_hypgeom_beta_lower(acb_t res,
     }
     else
     {
-        acb_hypgeom_2f1(t, a, t, u, z, 0, prec);
+        acb_hypgeom_2f1(t, v, t, u, z, 0, prec);
         acb_div(t, t, a, prec);
     }
 
     acb_pow(u, z, a, prec);
     acb_mul(t, t, u, prec);
 
+    if (formula == 1)
+    {
+        acb_sub_ui(u, z, 1, prec);
+        acb_neg(u, u);
+        acb_pow(u, u, b, prec);
+        acb_mul(t, t, u, prec);
+    }
+
     acb_set(res, t);
 
     acb_clear(t);
     acb_clear(u);
+    acb_clear(v);
 }
