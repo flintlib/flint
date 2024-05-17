@@ -116,3 +116,41 @@ void fmpz_divexact_ui(fmpz_t f, const fmpz_t g, ulong h)
         _fmpz_demote_val(f);  /* division by h may result in small value */
     }
 }
+
+#if defined(__GNUC__)
+void fmpz_divexact2_uiui(fmpz_t f, const fmpz_t g, ulong h1, ulong h2)
+{
+    ulong hx;
+    int of;
+
+    /* builtin for better handling of overflow */
+    of = __builtin_mul_overflow(h1, h2, &hx);
+
+    if (!of)
+    {
+        fmpz_divexact_ui(f, g, hx);
+    }
+    else
+    {
+        fmpz_divexact_ui(f, g, h1);
+        fmpz_divexact_ui(f, f, h2);
+    }
+}
+#else
+void fmpz_divexact2_uiui(fmpz_t f, const fmpz_t g, ulong h1, ulong h2)
+{
+    ulong hi, lo;
+
+    umul_ppmm(hi, lo, h1, h2);
+
+    if (!hi)
+    {
+        fmpz_divexact_ui(f, g, lo);
+    }
+    else
+    {
+        fmpz_divexact_ui(f, g, h1);
+        fmpz_divexact_ui(f, f, h2);
+    }
+}
+#endif
