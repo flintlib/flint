@@ -171,7 +171,26 @@ TEST_FUNCTION_START(acb_hypgeom_beta_lower, state)
 
         if (!acb_overlaps(res, res2) || acb_rel_accuracy_bits(res) < acb_rel_accuracy_bits(res2) - 10)
         {
-            flint_printf("FAIL: test case (3\n\n");
+            flint_printf("FAIL: test case (3)\n\n");
+            flint_printf("res = "); acb_printd(res, 100); flint_printf("\n\n");
+            flint_printf("res2 = "); acb_printd(res2, 100); flint_printf("\n\n");
+            flint_abort();
+        }
+
+        /* see issue #1979 */
+        prec = 200;
+
+        acb_zero(a);
+        acb_zero(b);
+        arb_set_str(acb_realref(a), "17.24094565", prec);
+        arb_set_str(acb_realref(b), "294.4532014", prec);
+        acb_set_d(z, 0.5);
+        acb_hypgeom_beta_lower(res, a, b, z, 1, prec);
+        arb_set_str(acb_realref(res2), "0.9999999999999999999999999999999999999999999999999999999999999999998474866919 +/- 2.07e-77", prec);
+
+        if (!acb_overlaps(res, res2) || acb_rel_accuracy_bits(res) < acb_rel_accuracy_bits(res2) - 20)
+        {
+            flint_printf("FAIL: test case (4)\n\n");
             flint_printf("res = "); acb_printd(res, 100); flint_printf("\n\n");
             flint_printf("res2 = "); acb_printd(res2, 100); flint_printf("\n\n");
             flint_abort();
