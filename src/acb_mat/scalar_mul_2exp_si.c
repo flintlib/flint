@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2018 Fredrik Johansson
+    Copyright (C) 2012 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -12,12 +12,11 @@
 #include "acb.h"
 #include "acb_mat.h"
 
-void
-acb_mat_indeterminate(acb_mat_t A)
+void acb_mat_scalar_mul_2exp_si(acb_mat_t B, const acb_mat_t A, slong c)
 {
     slong i, j;
 
     for (i = 0; i < acb_mat_nrows(A); i++)
         for (j = 0; j < acb_mat_ncols(A); j++)
-            acb_indeterminate(acb_mat_entry(A, i, j));
+            acb_mul_2exp_si(acb_mat_entry(B, i, j), acb_mat_entry(A, i, j), c);
 }
