@@ -87,8 +87,10 @@ gr_method_tab_input _nfloat_methods_input[] =
     {GR_METHOD_MUL_SI,          (gr_funcptr) nfloat_mul_si},
     {GR_METHOD_MUL_FMPZ,        (gr_funcptr) nfloat_mul_fmpz},
     {GR_METHOD_MUL_TWO,         (gr_funcptr) nfloat_mul_two},
+*/
     {GR_METHOD_ADDMUL,          (gr_funcptr) nfloat_addmul},
     {GR_METHOD_SUBMUL,          (gr_funcptr) nfloat_submul},
+/*
     {GR_METHOD_SQR,             (gr_funcptr) nfloat_sqr},
 */
     {GR_METHOD_DIV,             (gr_funcptr) nfloat_div},
@@ -163,6 +165,8 @@ gr_method_tab_input _nfloat_methods_input[] =
     {GR_METHOD_VEC_SUB,                 (gr_funcptr) _nfloat_vec_sub},
     {GR_METHOD_VEC_MUL,                 (gr_funcptr) _nfloat_vec_mul},
     {GR_METHOD_VEC_MUL_SCALAR,          (gr_funcptr) _nfloat_vec_mul_scalar},
+    {GR_METHOD_VEC_ADDMUL_SCALAR,          (gr_funcptr) _nfloat_vec_addmul_scalar},
+    {GR_METHOD_VEC_SUBMUL_SCALAR,          (gr_funcptr) _nfloat_vec_submul_scalar},
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _nfloat_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _nfloat_vec_dot_rev},
 /*

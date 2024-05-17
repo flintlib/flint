@@ -92,6 +92,5 @@ TEST_FUNCTION_START(add_sub_n, state)
         gr_ctx_clear(ctx);
     }
 
-
     TEST_FUNCTION_END(state);
 }
