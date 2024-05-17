@@ -11,6 +11,10 @@
 
 #include "mag.h"
 
+#if !FLINT64
+# include "longlong.h"
+#endif
+
 void
 mag_div_lower(mag_t z, const mag_t x, const mag_t y)
 {

@@ -12,7 +12,7 @@
 
 #include <stdio.h>
 #include <ctype.h>
-#include <stdio.h>
+#include <string.h>
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "gr_mpoly.h"

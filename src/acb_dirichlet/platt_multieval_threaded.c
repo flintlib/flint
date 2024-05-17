@@ -14,6 +14,7 @@
 #include "thread_pool.h"
 #include "thread_support.h"
 #include "fmpz_vec.h"
+#include "acb.h"
 #include "acb_dirichlet.h"
 
 slong platt_get_smk_index(slong B, const fmpz_t j, slong prec);

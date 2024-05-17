@@ -10,7 +10,6 @@
 */
 
 #include <gmp.h>
-#include "ulong_extras.h"
 #include "fmpz.h"
 
 /* The underlying approximate division is implemented in arb/div.c.

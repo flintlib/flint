@@ -10,7 +10,6 @@
 */
 
 #include "gmpcompat.h"
-#include "ulong_extras.h"
 #include "fmpz.h"
 
 void fmpz_add(fmpz_t f, const fmpz_t g, const fmpz_t h)

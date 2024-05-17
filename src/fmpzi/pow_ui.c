@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "longlong.h"
 #include "fmpzi.h"
 
 /* todo: maybe handle (+-1 +- i)^n as a special case */

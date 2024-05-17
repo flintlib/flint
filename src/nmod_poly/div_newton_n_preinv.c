@@ -13,7 +13,6 @@
 
 #include "nmod_vec.h"
 #include "nmod_poly.h"
-#include "ulong_extras.h"
 
 void _nmod_poly_div_newton_n_preinv(nn_ptr Q, nn_srcptr A, slong lenA,
         nn_srcptr FLINT_UNUSED(B), slong lenB, nn_srcptr Binv,

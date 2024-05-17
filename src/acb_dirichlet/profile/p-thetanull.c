@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include "acb.h"
 #include "acb_dirichlet.h"
 
 static int usage(char *argv[])

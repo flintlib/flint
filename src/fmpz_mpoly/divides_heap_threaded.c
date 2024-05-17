@@ -13,9 +13,9 @@
 
 #if FLINT_KNOW_STRONG_ORDER
 
+#include "ulong_extras.h"
 #include "thread_pool.h"
 #include "thread_support.h"
-#include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "mpoly.h"

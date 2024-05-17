@@ -97,7 +97,7 @@ _acb_dft_bluestein_init(acb_dft_bluestein_t t, slong dv, slong n, slong prec)
     if (n == 0)
         return;
 
-    e = n_clog(2 * n - 1, 2);
+    e = FLINT_CLOG2(2 * n - 1);
 
     if (DFT_VERB)
         flint_printf("dft_bluestein: init z[2^%i]\n", e);

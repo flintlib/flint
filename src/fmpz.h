@@ -19,7 +19,6 @@
 #endif
 
 #include "fmpz_types.h"
-#include "longlong.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -359,22 +358,7 @@ void fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong x);
 void fmpz_mul_si(fmpz_t f, const fmpz_t g, slong x);
 void fmpz_mul(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
-FMPZ_INLINE void
-fmpz_mul2_uiui(fmpz_t f, const fmpz_t g, ulong h1, ulong h2)
-{
-    ulong hi, lo;
-
-    umul_ppmm(hi, lo, h1, h2);
-    if (!hi)
-    {
-        fmpz_mul_ui(f, g, lo);
-    }
-    else
-    {
-        fmpz_mul_ui(f, g, h1);
-        fmpz_mul_ui(f, f, h2);
-    }
-}
+void fmpz_mul2_uiui(fmpz_t f, const fmpz_t g, ulong h1, ulong h2);
 
 void fmpz_mul_2exp(fmpz_t f, const fmpz_t g, ulong exp);
 void fmpz_one_2exp(fmpz_t f, ulong exp);
@@ -408,22 +392,7 @@ void fmpz_divexact(fmpz_t f, const fmpz_t g, const fmpz_t h);
 void fmpz_divexact_ui(fmpz_t f, const fmpz_t g, ulong h);
 void fmpz_divexact_si(fmpz_t f, const fmpz_t g, slong h);
 
-FMPZ_INLINE void
-fmpz_divexact2_uiui(fmpz_t f, const fmpz_t g, ulong h1, ulong h2)
-{
-    ulong hi, lo;
-
-    umul_ppmm(hi, lo, h1, h2);
-    if (!hi)
-    {
-        fmpz_divexact_ui(f, g, lo);
-    }
-    else
-    {
-        fmpz_divexact_ui(f, g, h1);
-        fmpz_divexact_ui(f, f, h2);
-    }
-}
+void fmpz_divexact2_uiui(fmpz_t f, const fmpz_t g, ulong h1, ulong h2);
 
 void fmpz_cdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h);
 void fmpz_fdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h);

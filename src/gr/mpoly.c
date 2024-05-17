@@ -11,6 +11,7 @@
 
 /* Multivariate polynomials over generic rings */
 
+#include <string.h>
 #include "gr.h"
 #include "gr_mpoly.h"
 #include "gr_generic.h"

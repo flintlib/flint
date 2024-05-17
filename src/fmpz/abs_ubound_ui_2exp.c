@@ -10,7 +10,7 @@
 */
 
 #include <gmp.h>
-#include "ulong_extras.h"
+#include "longlong.h"
 #include "fmpz.h"
 
 ulong

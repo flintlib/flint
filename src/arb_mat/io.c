@@ -11,6 +11,7 @@
 */
 
 #include <stdio.h>
+#include "arb.h"
 #include "arb_mat.h"
 
 /* printing *******************************************************************/

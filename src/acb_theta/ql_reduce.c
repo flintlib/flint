@@ -10,6 +10,7 @@
 */
 
 #include "arb_mat.h"
+#include "acb.h"
 #include "acb_mat.h"
 #include "acb_theta.h"
 

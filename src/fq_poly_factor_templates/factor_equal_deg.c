@@ -18,7 +18,6 @@
 
 #include "templates.h"
 
-#include "ulong_extras.h"
 
 void
 TEMPLATE(T, poly_factor_equal_deg) (TEMPLATE(T, poly_factor_t) factors,

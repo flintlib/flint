@@ -19,13 +19,12 @@
 #define MPOLY_INLINE static inline
 #endif
 
-#include <string.h>
 #include <gmp.h>
 #include "longlong.h"
 #include "mpoly_types.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* choose m so that (m + 1)/(n - m) ~= la/lb, i.e. m = (n*la - lb)/(la + lb) */
@@ -662,12 +661,10 @@ void mpoly_monomial_set_extra(ulong * exp2, const ulong * exp3,
     }
 }
 
-FLINT_FORCE_INLINE
-void mpoly_copy_monomials(ulong * exp1, const ulong * exp2, slong len, slong N)
-{
-    if (len > 0)
-        memcpy(exp1, exp2, N*len*sizeof(ulong));
-}
+void mpoly_copy_monomials(ulong * exp1, const ulong * exp2, slong len, slong N);
+#if defined(__GNUC__)
+# define mpoly_copy_monomials(exp1, exp2, len, N) __builtin_memcpy(exp1, exp2, (N) * (len) * sizeof(ulong))
+#endif
 
 FLINT_FORCE_INLINE
 void mpoly_monomial_swap(ulong * exp2, ulong * exp3, slong N)

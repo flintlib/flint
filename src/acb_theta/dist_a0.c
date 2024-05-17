@@ -9,6 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "arb.h"
+#include "arb_mat.h"
+#include "acb.h"
 #include "acb_mat.h"
 #include "acb_theta.h"
 

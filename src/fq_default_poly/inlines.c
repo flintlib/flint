@@ -11,6 +11,5 @@
 
 #define FQ_DEFAULT_POLY_INLINES_C
 
-#include "ulong_extras.h"
 #include "fq_default.h"
 #include "fq_default_poly.h"

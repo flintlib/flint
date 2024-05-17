@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "arb_mat.h"
 #include "acb_mat.h"
 
 TEST_FUNCTION_START(acb_mat_set_real_imag, state)

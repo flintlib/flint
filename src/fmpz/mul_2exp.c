@@ -12,6 +12,7 @@
 
 #include <string.h>
 #include <gmp.h>
+#include "longlong.h"
 #include "fmpz.h"
 
 void

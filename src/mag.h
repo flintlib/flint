@@ -118,18 +118,10 @@ _fmpz_sub2_fast(fmpz_t z, const fmpz_t x, const fmpz_t y, slong c)
 
 #define MAG_ONE_HALF (UWORD(1) << (MAG_BITS - 1))
 
-static inline ulong
-__mag_fixmul32(ulong x, ulong y)
-{
-    ulong u, v;
-    umul_ppmm(u, v, x, y);
-    return (u << (32 - MAG_BITS)) | (v >> MAG_BITS);
-}
-
 #if FLINT_BITS == 64
-#define MAG_FIXMUL(x, y) (((x) * (y)) >> MAG_BITS)
+# define MAG_FIXMUL(x, y) (((x) * (y)) >> MAG_BITS)
 #else
-#define MAG_FIXMUL(x, y) __mag_fixmul32((x), (y))
+# define MAG_FIXMUL(x, y) ((ulong) (((unsigned long long int) (x) * (unsigned long long int) (y)) >> MAG_BITS))
 #endif
 
 #define MAG_CHECK_BITS(rr) \

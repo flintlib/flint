@@ -10,7 +10,6 @@
 */
 
 #include "arb_mat.h"
-#include "gr.h"
 #include "gr_mat.h"
 
 void

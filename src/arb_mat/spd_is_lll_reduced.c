@@ -11,6 +11,7 @@
 
 #include "fmpz_mat.h"
 #include "fmpz_lll.h"
+#include "arb.h"
 #include "arb_mat.h"
 
 /* Adapted from fmpz_mat_is_reduced_gram */

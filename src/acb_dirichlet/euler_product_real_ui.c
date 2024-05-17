@@ -11,6 +11,7 @@
 
 #include "thread_pool.h"
 #include "thread_support.h"
+#include "arb.h"
 #include "acb_dirichlet.h"
 
 #ifdef __GNUC__

@@ -11,7 +11,6 @@
 */
 
 #include "double_extras.h"
-#include "ulong_extras.h"
 
 double
 d_randtest_signed(flint_rand_t state, slong minexp, slong maxexp)

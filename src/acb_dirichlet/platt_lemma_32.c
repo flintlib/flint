@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "arb.h"
 #include "acb_dirichlet.h"
 
 /* out = 2*pi^(5/4)*exp(1/(8*h^2) - (t0^2)/(2*h^2) - pi*x) */

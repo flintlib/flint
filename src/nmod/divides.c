@@ -11,7 +11,6 @@
 */
 
 #include "nmod.h"
-#include "ulong_extras.h"
 
 int nmod_divides(ulong * a, ulong b, ulong c, nmod_t mod)
 {

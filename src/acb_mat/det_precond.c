@@ -10,6 +10,7 @@
 */
 
 #include "perm.h"
+#include "acb.h"
 #include "acb_mat.h"
 
 static void

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "longlong.h"
 #include "fmpz_vec.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_mpoly_factor.h"

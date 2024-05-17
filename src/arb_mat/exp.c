@@ -12,6 +12,7 @@
 #include "double_extras.h"
 #include "fmpz_mat.h"
 #include "bool_mat.h"
+#include "arb.h"
 #include "arb_mat.h"
 
 #define LOG2_OVER_E 0.25499459743395350926

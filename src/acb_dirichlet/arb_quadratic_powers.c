@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "arb.h"
 #include "acb_dirichlet.h"
 
 /* TODO: BSGS can reduce to nv mul */
