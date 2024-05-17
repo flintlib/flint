@@ -306,18 +306,6 @@ _acb_vec_kronecker_mul_step(acb_ptr z, acb_srcptr x, acb_srcptr y, slong step, s
     }
 }
 
-FLINT_FORCE_INLINE void
-acb_vec_printd_index(acb_srcptr vec, slong len, slong digits)
-{
-    slong i;
-    for (i = 0; i < len; i++)
-    {
-        flint_printf("[%wd] ", i);
-        acb_printd(vec + i, digits);
-        flint_printf("\n");
-    }
-}
-
 #ifdef __cplusplus
 }
 #endif

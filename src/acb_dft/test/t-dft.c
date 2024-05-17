@@ -12,6 +12,21 @@
 #include "test_helpers.h"
 #include "acb_dft.h"
 
+/* Defined in t-convol.c and t-dft.c. */
+#ifndef acb_vec_printd_index
+# define acb_vec_printd_index acb_vec_printd_index
+static void acb_vec_printd_index(acb_srcptr vec, slong len, slong digits)
+{
+    slong i;
+    for (i = 0; i < len; i++)
+    {
+        flint_printf("[%wd] ", i);
+        acb_printd(vec + i, digits);
+        flint_printf("\n");
+    }
+}
+#endif
+
 /* Both of these are defined in t-convol.c and t-dft.c. However, do_f is not the
  * same. */
 #define do_f rajtantajtan
