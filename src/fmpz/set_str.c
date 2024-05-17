@@ -12,11 +12,11 @@
 
 #include <string.h>
 #include <ctype.h>
+#include <gmp.h>
+#include "thread_pool.h"
+#include "thread_support.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
-#include "thread_support.h"
-#include "thread_pool.h"
-#include "profiler.h"
 
 #define BASECASE_CUTOFF 24000
 

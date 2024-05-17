@@ -18,24 +18,32 @@
 #define FMPZ_INLINE static inline
 #endif
 
-#include <gmp.h>
 #include "fmpz_types.h"
 #include "longlong.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Memory management *********************************************************/
 
+#if defined(__GMP_H__)
 mpz_ptr _fmpz_new_mpz(void);
+
+mpz_ptr _fmpz_promote(fmpz_t f);
+mpz_ptr _fmpz_promote_val(fmpz_t f);
+
+void _fmpz_init_readonly_mpz(fmpz_t f, const mpz_t z);
+void flint_mpz_init_set_readonly(mpz_t z, const fmpz_t f);
+void fmpz_init_set_readonly(fmpz_t f, const mpz_t z);
+
+void flint_mpz_clear_readonly(mpz_t z);
+void _fmpz_clear_readonly_mpz(mpz_t);
+#endif
 
 void _fmpz_clear_mpz(fmpz f);
 void _fmpz_cleanup_mpz_content(void);
 void _fmpz_cleanup(void);
-
-mpz_ptr _fmpz_promote(fmpz_t f);
-mpz_ptr _fmpz_promote_val(fmpz_t f);
 
 FMPZ_INLINE
 void _fmpz_demote(fmpz_t f)
@@ -57,8 +65,12 @@ void fmpz_init2(fmpz_t f, ulong limbs);
 void _fmpz_promote_set_ui(fmpz_t f, ulong v);
 void _fmpz_promote_set_si(fmpz_t f, slong v);
 void _fmpz_promote_neg_ui(fmpz_t f, ulong v);
+void _fmpz_promote_set_uiui(fmpz_t f, ulong hi, ulong lo);
+void _fmpz_promote_neg_uiui(fmpz_t f, ulong hi, ulong lo);
 void _fmpz_init_promote_set_ui(fmpz_t f, ulong v);
 void _fmpz_init_promote_set_si(fmpz_t f, slong v);
+
+void fmpz_set(fmpz_t f, const fmpz_t g);
 
 FMPZ_INLINE
 void fmpz_init_set(fmpz_t f, const fmpz_t g)
@@ -69,10 +81,8 @@ void fmpz_init_set(fmpz_t f, const fmpz_t g)
     }
     else
     {
-        mpz_ptr ptr;
-        ptr = _fmpz_new_mpz();
-        *f = PTR_TO_COEFF(ptr);
-        mpz_set(ptr, COEFF_TO_PTR(*g));
+        *f = 0;
+        fmpz_set(f, g);
     }
 }
 
@@ -94,12 +104,6 @@ void fmpz_init_set_si(fmpz_t f, slong g)
         _fmpz_init_promote_set_si(f, g);
 }
 
-void _fmpz_init_readonly_mpz(fmpz_t f, const mpz_t z);
-void flint_mpz_init_set_readonly(mpz_t z, const fmpz_t f);
-void fmpz_init_set_readonly(fmpz_t f, const mpz_t z);
-
-void flint_mpz_clear_readonly(mpz_t z);
-void _fmpz_clear_readonly_mpz(mpz_t);
 void fmpz_clear_readonly(fmpz_t f);
 
 int _fmpz_is_canonical(const fmpz_t x);
@@ -134,7 +138,6 @@ void fmpz_one(fmpz_t f)
     *f = WORD(1);
 }
 
-void fmpz_set(fmpz_t f, const fmpz_t g);
 FMPZ_INLINE void fmpz_swap(fmpz_t f, fmpz_t g) { FLINT_SWAP(fmpz, *f, *g); }
 
 slong fmpz_get_si(const fmpz_t f);
@@ -179,8 +182,7 @@ fmpz_neg_ui(fmpz_t f, ulong val)
         _fmpz_promote_neg_ui(f, val);
 }
 
-FMPZ_INLINE void
-fmpz_get_uiui(ulong * hi, ulong * low, const fmpz_t f)
+FMPZ_INLINE void fmpz_get_uiui(ulong * hi, ulong * low, const fmpz_t f)
 {
     if (!COEFF_IS_MPZ(*f))
     {
@@ -189,46 +191,26 @@ fmpz_get_uiui(ulong * hi, ulong * low, const fmpz_t f)
     }
     else
     {
-        mpz_ptr mpz = COEFF_TO_PTR(*f);
-        *low = mpz->_mp_d[0];
-        *hi  = mpz->_mp_size == 2 ? mpz->_mp_d[1] : 0;
+        zz_srcptr zf = FMPZ_TO_ZZ(*f);
+        *low = zf->ptr[0];
+        *hi  = zf->size == 2 ? zf->ptr[1] : 0;
     }
 }
 
-FMPZ_INLINE void
-fmpz_set_uiui(fmpz_t f, ulong hi, ulong lo)
+FMPZ_INLINE void fmpz_set_uiui(fmpz_t f, ulong hi, ulong lo)
 {
     if (hi == 0)
-    {
         fmpz_set_ui(f, lo);
-    }
     else
-    {
-        mpz_ptr z = _fmpz_promote(f);
-        if (z->_mp_alloc < 2)
-            mpz_realloc2(z, 2 * FLINT_BITS);
-        z->_mp_d[0] = lo;
-        z->_mp_d[1] = hi;
-        z->_mp_size = 2;
-    }
+        _fmpz_promote_set_uiui(f, hi, lo);
 }
 
-FMPZ_INLINE void
-fmpz_neg_uiui(fmpz_t f, ulong hi, ulong lo)
+FMPZ_INLINE void fmpz_neg_uiui(fmpz_t f, ulong hi, ulong lo)
 {
     if (hi == 0)
-    {
         fmpz_neg_ui(f, lo);
-    }
     else
-    {
-        mpz_ptr z = _fmpz_promote(f);
-        if (z->_mp_alloc < 2)
-            mpz_realloc2(z, 2 * FLINT_BITS);
-        z->_mp_d[0] = lo;
-        z->_mp_d[1] = hi;
-        z->_mp_size = -2;
-    }
+        _fmpz_promote_neg_uiui(f, hi, lo);
 }
 
 void fmpz_get_signed_uiui(ulong * hi, ulong * lo, const fmpz_t x);
@@ -256,16 +238,20 @@ void fmpz_set_ui_array(fmpz_t out, const ulong * in, slong n);
 void fmpz_get_signed_ui_array(ulong * out, slong n, const fmpz_t in);
 void fmpz_set_signed_ui_array(fmpz_t out, const ulong * in, slong n);
 
-void fmpz_get_mpz(mpz_t x, const fmpz_t f);
-void fmpz_set_mpz(fmpz_t f, const mpz_t x);
+void fmpz_set_mpn_large(fmpz_t z, nn_srcptr src, slong n, int negative);
 
 ulong fmpz_get_nmod(const fmpz_t f, nmod_t mod);
 
 double fmpz_get_d(const fmpz_t f);
 void fmpz_set_d(fmpz_t f, double c);
 
+#if defined(__GMP_H__)
+void fmpz_get_mpz(mpz_t x, const fmpz_t f);
+void fmpz_set_mpz(fmpz_t f, const mpz_t x);
+
 void fmpz_get_mpf(mpf_t x, const fmpz_t f);
 void fmpz_set_mpf(fmpz_t f, const mpf_t x);
+#endif
 
 #ifdef __MPFR_H
 void fmpz_get_mpfr(mpfr_t x, const fmpz_t f, mpfr_rnd_t rnd);
@@ -298,7 +284,7 @@ int fmpz_is_even(const fmpz_t f)
     if (!COEFF_IS_MPZ(*f))
         return !((*f) & WORD(1));
     else
-        return mpz_even_p(COEFF_TO_PTR(*f));
+        return !(FMPZ_TO_ZZ(*f)->ptr[0] & 1);
 }
 
 FMPZ_INLINE
@@ -307,7 +293,7 @@ int fmpz_is_odd(const fmpz_t f)
     if (!COEFF_IS_MPZ(*f))
         return ((*f) & WORD(1));
     else
-        return mpz_odd_p(COEFF_TO_PTR(*f));
+        return (FMPZ_TO_ZZ(*f)->ptr[0] & 1);
 }
 
 int fmpz_sgn(const fmpz_t f);
@@ -764,25 +750,6 @@ void fmpz_euler_phi(fmpz_t res, const fmpz_t n);
 int fmpz_moebius_mu(const fmpz_t n);
 
 void fmpz_divisor_sigma(fmpz_t res, ulong k, const fmpz_t n);
-
-/* Declare dead functions ****************************************************/
-
-#define __new_fmpz _Pragma("GCC error \"'__new_fmpz' is deprecated.\"")
-#define __free_fmpz _Pragma("GCC error \"'__free_fmpz' is deprecated.\"")
-#define __fmpz_lt _Pragma("GCC error \"'__fmpz_lt' is deprecated.\"")
-#define __fmpz_gt _Pragma("GCC error \"'__fmpz_gt' is deprecated.\"")
-#define __fmpz_lte _Pragma("GCC error \"'__fmpz_lte' is deprecated.\"")
-#define __fmpz_gte _Pragma("GCC error \"'__fmpz_gte' is deprecated.\"")
-#define __fmpz_neq _Pragma("GCC error \"'__fmpz_neq' is deprecated.\"")
-
-#define __fmpz_init _Pragma("GCC error \"'__fmpz_init' is deprecated. Use 'fmpz_init' instead.\"")
-#define __fmpz_init_set _Pragma("GCC error \"'__fmpz_init_set' is deprecated. Use 'fmpz_init_set' instead.\"")
-#define __fmpz_init_set_ui _Pragma("GCC error \"'__fmpz_init_set_ui' is deprecated. Use 'fmpz_init_set_ui' instead.\"")
-#define __fmpz_clear _Pragma("GCC error \"'__fmpz_clear' is deprecated. Use 'fmpz_clear' instead.\"")
-#define __fmpz_set_si _Pragma("GCC error \"'__fmpz_set_si' is deprecated. Use 'fmpz_set_si' instead.\"")
-#define __fmpz_set_ui _Pragma("GCC error \"'__fmpz_set_ui' is deprecated. Use 'fmpz_set_ui' instead.\"")
-#define __fmpz_eq _Pragma("GCC error \"'__fmpz_eq' is deprecated. Use 'fmpz_equal' instead.\"")
-#define __fmpz_neg _Pragma("GCC error \"'__fmpz_neg' is deprecated. Use 'fmpz_neg' instead.\"")
 
 #ifdef __cplusplus
 }

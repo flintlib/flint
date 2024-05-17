@@ -179,14 +179,12 @@ arf_get_fmpz_2exp(fmpz_t man, fmpz_t exp, const arf_t x)
         else
         {
             mpz_ptr z = _fmpz_promote(man);
-
-            if (z->_mp_alloc < xn)
-                mpz_realloc(z, xn);
+            mp_ptr zptr = FLINT_MPZ_REALLOC(z, xn);
 
             if (shift == 0)
-                flint_mpn_copyi(z->_mp_d, xptr, xn);
+                flint_mpn_copyi(zptr, xptr, xn);
             else
-                mpn_rshift(z->_mp_d, xptr, xn, shift);
+                mpn_rshift(zptr, xptr, xn, shift);
 
             /* top limb cannot be zero */
             z->_mp_size = ARF_SGNBIT(x) ? -xn : xn;
@@ -321,10 +319,7 @@ arf_get_fmpz(fmpz_t z, const arf_t x, arf_rnd_t rnd)
     zn = (exp + (rnd != ARF_RND_DOWN) + FLINT_BITS - 1) / FLINT_BITS;
 
     zz = _fmpz_promote(z);
-    if (zz->_mp_alloc < zn)
-        mpz_realloc2(zz, zn * FLINT_BITS);
-
-    zp = zz->_mp_d;
+    zp = FLINT_MPZ_REALLOC(zz, zn);
 
     if (rnd == ARF_RND_DOWN)
     {

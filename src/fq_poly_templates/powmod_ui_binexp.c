@@ -14,7 +14,6 @@
 
 #include "templates.h"
 
-#include "flint.h"
 #include "ulong_extras.h"
 void
 _TEMPLATE(T, poly_powmod_ui_binexp) (TEMPLATE(T, struct) * res,

@@ -11,7 +11,6 @@
 
 #include <stdlib.h>
 #include "profiler.h"
-#include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "qfb.h"

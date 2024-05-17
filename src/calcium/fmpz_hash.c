@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2019 Daniel Schultz
+    Copyright (C) 2020 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -9,14 +9,18 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpq.h"
+#include <gmp.h>
+#include "calcium.h"
 
-double fmpq_get_d(const fmpq_t a)
+/* slower alternative: fmpz_fdiv_ui(x 1000000007) */
+
+ulong calcium_fmpz_hash(const fmpz_t x)
 {
-    double d;
-    mpq_t z;
-    flint_mpq_init_set_readonly(z, a);
-    d = mpq_get_d(z);
-    flint_mpq_clear_readonly(z);
-    return d;
+    if (!COEFF_IS_MPZ(*x))
+        return *x;
+    else
+    {
+        mpz_ptr z = COEFF_TO_PTR(*x);
+        return (z->_mp_size > 0) ? z->_mp_d[0] : -z->_mp_d[0];
+    }
 }

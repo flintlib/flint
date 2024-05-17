@@ -13,7 +13,6 @@
 
 #include <math.h>
 #include <float.h>
-#include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "double_extras.h"

@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "mpoly.h"
 
 void mpoly_pack_monomials_tight(ulong * exp1, const ulong * exp2,

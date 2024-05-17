@@ -14,22 +14,23 @@
 
 void fermat_to_mpz(mpz_t m, mp_limb_t * i, mp_size_t limbs)
 {
-   mp_limb_signed_t hi;
+    mp_limb_signed_t hi;
+    mp_ptr mptr = FLINT_MPZ_REALLOC(m, limbs + 1);
 
-   mpz_realloc(m, limbs + 1);
-   flint_mpn_copyi(m->_mp_d, i, limbs + 1);
-   hi = i[limbs];
-   if (hi < WORD(0))
-   {
-      mpn_neg(m->_mp_d, m->_mp_d, limbs + 1);
-      m->_mp_size = limbs + 1;
-      while ((m->_mp_size) && (!m->_mp_d[m->_mp_size - 1]))
-         m->_mp_size--;
-      m->_mp_size = -m->_mp_size;
-   } else
-   {
-      m->_mp_size = limbs + 1;
-      while ((m->_mp_size) && (!m->_mp_d[m->_mp_size - 1]))
-         m->_mp_size--;
-   }
+    flint_mpn_copyi(mptr, i, limbs + 1);
+    hi = i[limbs];
+    if (hi < WORD(0))
+    {
+        mpn_neg(mptr, mptr, limbs + 1);
+        m->_mp_size = limbs + 1;
+        while ((m->_mp_size) && (!mptr[m->_mp_size - 1]))
+            m->_mp_size--;
+        m->_mp_size = -m->_mp_size;
+    }
+    else
+    {
+        m->_mp_size = limbs + 1;
+        while ((m->_mp_size) && (!mptr[m->_mp_size - 1]))
+            m->_mp_size--;
+    }
 }

@@ -478,9 +478,16 @@ typedef fmpq fmpq_t[1];
 
 /* Conversions between mpz_ptr and fmpz_t */
 #define PTR_TO_COEFF(x) (((ulong) (x) >> 2) | (WORD(1) << (FLINT_BITS - 2)))
-#define COEFF_TO_PTR(x) ((mpz_ptr) (((ulong)x) << 2))
+#define COEFF_TO_PTR(x) ((mpz_ptr) ((ulong) (x) << 2))
 
 #define COEFF_IS_MPZ(x) (((x) >> SMALL_FMPZ_BITCOUNT_MAX) == WORD(1))
+
+/* The minimum number of limbs that the fmpz collector should spit out */
+#define MPZ_MIN_ALLOC 2
+
+/* NOTE: Never allocate less than MPZ_MIN_ALLOC */
+#define FLINT_MPZ_REALLOC(ptr, sz) ((int) (sz) > ((ptr)->_mp_alloc) ? (mp_ptr) mpz_realloc(ptr, sz) : (ptr)->_mp_d)
+#define FLINT_MPZ_REALLOC_TIGHT(ptr, sz) ((mp_ptr) mpz_realloc(ptr, FLINT_MAX(sz, MPZ_MIN_ALLOC)))
 
 #ifdef __cplusplus
 }

@@ -12,7 +12,6 @@
 */
 
 #include <math.h>
-#include "flint.h"
 #include "ulong_extras.h"
 
 /* A table of precomputed inverses of values from 1 to 64

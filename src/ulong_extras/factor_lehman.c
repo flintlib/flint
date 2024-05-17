@@ -10,7 +10,6 @@
 */
 
 #include <math.h>
-#include "flint.h"
 #include "ulong_extras.h"
 
 ulong n_factor_lehman(ulong n)

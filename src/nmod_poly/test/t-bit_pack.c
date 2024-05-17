@@ -27,17 +27,15 @@ TEST_FUNCTION_START(nmod_poly_bit_pack, state)
         nn_ptr mpn;
 
         do
-        {
             n = n_randtest_not_zero(state);
-        } while (n == 1);
+        while (n == 1);
         bits = 2 * FLINT_BIT_COUNT(n) + n_randint(state, FLINT_BITS);
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         do
-        {
             nmod_poly_randtest(a, state, n_randint(state, 100));
-        } while (a->length == 0);
+        while (a->length == 0);
 
         mpn =
             flint_malloc(sizeof(ulong) *
@@ -50,13 +48,10 @@ TEST_FUNCTION_START(nmod_poly_bit_pack, state)
 
         result = (nmod_poly_equal(a, b));
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            nmod_poly_print(a), flint_printf("\n\n");
-            nmod_poly_print(b), flint_printf("\n\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "a = %{nmod_poly}\n"
+                    "b = %{nmod_poly}\n",
+                    a, b);
 
         nmod_poly_clear(a);
         nmod_poly_clear(b);
@@ -71,9 +66,8 @@ TEST_FUNCTION_START(nmod_poly_bit_pack, state)
         ulong n;
 
         do
-        {
             n = n_randtest_not_zero(state);
-        } while (n == 1);
+        while (n == 1);
 
         fmpz_init(f);
         nmod_poly_init(A, n);
@@ -87,22 +81,11 @@ TEST_FUNCTION_START(nmod_poly_bit_pack, state)
         nmod_poly_bit_unpack(B, f, b);
 
         if (!nmod_poly_equal(A, B))
-        {
-            mpz_t zz;
-            flint_printf("FAIL:\n");
-            flint_printf("INPUT: ");
-            nmod_poly_print(A);
-            flint_printf("\n");
-            mpz_init(zz); fmpz_get_mpz(zz, f);
-            flint_printf("PACKED: ");
-            mpz_out_str(stdout, 2, zz);
-            flint_printf("\n");
-            flint_printf("OUTPUT: ");
-            nmod_poly_print(B);
-            flint_printf("\n\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Input polynomial: %{nmod_poly}\n"
+                    "Bit-packed integer: %{fmpz}\n"
+                    "Output polynomial: %{nmod_poly}\n",
+                    A, f, B);
 
         fmpz_clear(f);
         nmod_poly_clear(A);

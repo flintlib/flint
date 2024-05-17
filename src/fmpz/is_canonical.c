@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
 #include "fmpz.h"
 
 int _fmpz_is_canonical(const fmpz_t x)

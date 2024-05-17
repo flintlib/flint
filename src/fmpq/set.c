@@ -1,5 +1,7 @@
 /*
+    Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2020 William Hart
 
     This file is part of FLINT.
 
@@ -9,7 +11,58 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
+#include "ulong_extras.h"
 #include "fmpq.h"
+
+void _fmpq_set_si(fmpz_t rnum, fmpz_t rden, slong p, ulong q)
+{
+    if (q == 1 || p == 0)
+    {
+        fmpz_set_si(rnum, p);
+        fmpz_one(rden);
+    }
+    else
+    {
+        ulong r = n_gcd(p < 0 ? (-(ulong) p) : (ulong) p, q);
+
+        if (p < 0)
+        {
+            fmpz_set_ui(rnum, (-(ulong) p) / r);
+            fmpz_neg(rnum, rnum);
+        }
+        else
+            fmpz_set_si(rnum, p / r);
+
+        fmpz_set_ui(rden, q / r);
+    }
+}
+
+void fmpq_set_si(fmpq_t res, slong p, ulong q)
+{
+    _fmpq_set_si(fmpq_numref(res), fmpq_denref(res), p, q);
+}
+
+void _fmpq_set_ui(fmpz_t rnum, fmpz_t rden, ulong p, ulong q)
+{
+    if (q == 1 || p == 0)
+    {
+        fmpz_set_ui(rnum, p);
+        fmpz_one(rden);
+    }
+    else
+    {
+        ulong r = n_gcd(p, q);
+
+        fmpz_set_ui(rnum, p / r);
+        fmpz_set_ui(rden, q / r);
+    }
+}
+
+void fmpq_set_ui(fmpq_t res, ulong p, ulong q)
+{
+    _fmpq_set_ui(fmpq_numref(res), fmpq_denref(res), p, q);
+}
 
 void
 fmpq_set_fmpz_frac(fmpq_t res, const fmpz_t p, const fmpz_t q)
@@ -57,4 +110,10 @@ fmpq_set_fmpz_frac(fmpq_t res, const fmpz_t p, const fmpz_t q)
 
         fmpz_clear(t);
     }
+}
+
+void fmpq_set_mpq(fmpq_t dest, const mpq_t src)
+{
+    fmpz_set_mpz(fmpq_numref(dest), mpq_numref(src));
+    fmpz_set_mpz(fmpq_denref(dest), mpq_denref(src));
 }

@@ -10,7 +10,6 @@
 */
 
 #include <mpfr.h>
-#include "flint.h"
 #include "mpfr_mat.h"
 
 void

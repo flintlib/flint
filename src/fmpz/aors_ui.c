@@ -11,7 +11,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "gmpcompat.h"
 #include "fmpz.h"
 
@@ -70,10 +69,7 @@ fmpz_add_ui(fmpz_t res, const fmpz_t x, ulong y)
         else
             rp = _fmpz_promote_val(res);
 
-        if (rp->_mp_alloc < xn + 1)
-            _mpz_realloc(rp, xn + 1);
-
-        rd = rp->_mp_d;
+        rd = FLINT_MPZ_REALLOC(rp, xn + 1);
         xd = xp->_mp_d;
 
         if (xn_signed >= 0) /* positive + nonnegative */
@@ -183,10 +179,7 @@ fmpz_sub_ui(fmpz_t res, const fmpz_t x, ulong y)
         else
             rp = _fmpz_promote_val(res);
 
-        if (rp->_mp_alloc < xn + 1)
-            _mpz_realloc(rp, xn + 1);
-
-        rd = rp->_mp_d;
+        rd = FLINT_MPZ_REALLOC(rp, xn + 1);
         xd = xp->_mp_d;
 
         if (xn_signed <= 0) /* positive + nonnegative */

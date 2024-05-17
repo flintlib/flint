@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
 #include "test_helpers.h"
 #include "long_extras.h"
 #include "fmpz.h"
@@ -77,12 +78,11 @@ TEST_FUNCTION_START(fmpz_init_set_readonly, state)
             fmpz_set_mpz(h, z);
 
             if (!fmpz_equal(g, h) || !_fmpz_is_canonical(h))
-            {
-                flint_printf("FAIL:\n\n");
-                flint_printf("g = "), fmpz_print(g), flint_printf("\n");
-                flint_printf("h = "), fmpz_print(h), flint_printf("\n");
-                gmp_printf("z = %Zd\n", z);
-            }
+                TEST_FUNCTION_FAIL(
+                        "g = %{fmpz}\n"
+                        "h = %{fmpz}\n"
+                        "z = %{mpz}\n",
+                        g, h, z);
 
             fmpz_clear_readonly(g);
             fmpz_clear(h);

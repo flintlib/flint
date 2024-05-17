@@ -18,6 +18,7 @@
 #define ARF_INLINE static inline
 #endif
 
+#include <gmp.h>
 #include "mag.h"
 #include "arf_types.h"
 

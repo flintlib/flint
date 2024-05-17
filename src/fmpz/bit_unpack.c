@@ -77,8 +77,7 @@ fmpz_bit_unpack(fmpz_t coeff, nn_srcptr arr, flint_bitcnt_t shift,
         b = bits % FLINT_BITS;
 
         /* allocate space for l limbs only */
-        mpz_realloc(mcoeff, l);
-        p = mcoeff->_mp_d;
+        p = FLINT_MPZ_REALLOC_TIGHT(mcoeff, l);
 
         /* shift in l limbs */
         if (shift)
@@ -175,8 +174,7 @@ fmpz_bit_unpack_unsigned(fmpz_t coeff, nn_srcptr arr,
         b = bits % FLINT_BITS;
 
         /* allocate space for l limbs only */
-        mpz_realloc(mcoeff, l);
-        p = mcoeff->_mp_d;
+        p = FLINT_MPZ_REALLOC_TIGHT(mcoeff, l);
 
         /* shift in l limbs */
         if (shift)

@@ -14,6 +14,7 @@
 #ifndef FLINT_NTL_INT_H
 #define FLINT_NTL_INT_H
 
+#include <gmp.h>
 #include <NTL/ZZX.h>
 #include <NTL/ZZ_pXFactoring.h>
 #include <NTL/ZZ_pEX.h>

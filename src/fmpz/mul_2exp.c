@@ -10,15 +10,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
 #include <string.h>
+#include <gmp.h>
+#include "fmpz.h"
 
 void
 fmpz_mul_2exp(fmpz_t f, const fmpz_t g, ulong exp)
 {
     slong c1 = *g;
     ulong c1abs, c1bits;
-    mpz_ptr mf;
 
     if (c1 == 0)
     {
@@ -41,23 +41,10 @@ fmpz_mul_2exp(fmpz_t f, const fmpz_t g, ulong exp)
         ulong expred = exp % FLINT_BITS;
         int alloc = 1 + exp / FLINT_BITS + ((c1bits + expred) > FLINT_BITS);
         ulong * limbs;
+        mpz_ptr mf;
 
-        /* Ensure enough limbs are allocated for f */
-        if (!COEFF_IS_MPZ(*f))
-        {
-            /* TODO: Initialize the new mpz with alloc limbs instead of
-             * reallocating them. */
-            mf = _fmpz_new_mpz();
-            *f = PTR_TO_COEFF(mf);
-            _mpz_realloc(mf, alloc);
-        }
-        else
-        {
-            mf = COEFF_TO_PTR(*f);
-            if (mf->_mp_alloc < alloc)
-                _mpz_realloc(mf, alloc);
-        }
-        limbs = mf->_mp_d;
+        mf = _fmpz_promote(f);
+        limbs = FLINT_MPZ_REALLOC(mf, alloc);
         mf->_mp_size = (c1 > 0) ? alloc : -alloc;
         memset(limbs, 0, sizeof(ulong) * alloc);
 
@@ -75,17 +62,6 @@ fmpz_mul_2exp(fmpz_t f, const fmpz_t g, ulong exp)
     {
         mpz_ptr mg = COEFF_TO_PTR(c1);
 
-        if (!COEFF_IS_MPZ(*f))
-        {
-            /* TODO: Initialize the new mpz with alloc limbs instead of
-             * reallocating them. */
-            mf = _fmpz_new_mpz();
-            *f = PTR_TO_COEFF(mf);
-            _mpz_realloc(mf, FLINT_ABS(mg->_mp_size) + exp / FLINT_BITS + 1);
-        }
-        else
-            mf = COEFF_TO_PTR(*f);
-
-        mpz_mul_2exp(mf, mg, exp);
+        mpz_mul_2exp(_fmpz_promote(f), mg, exp);
     }
 }

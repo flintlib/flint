@@ -12,13 +12,12 @@
 */
 
 #include "profiler.h"
-#include "flint.h"
 #include "nmod_mat.h"
 #include "ulong_extras.h"
 #include "thread_support.h"
 
-#if FLINT_HAVE_BLAS
-#include "cblas.h"
+#if FLINT_USES_BLAS
+# include <cblas.h>
 #endif
 
 typedef struct

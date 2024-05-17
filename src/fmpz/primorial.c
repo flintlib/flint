@@ -10,9 +10,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
-#include "mpn_extras.h"
 #include "ulong_extras.h"
+#include "mpn_extras.h"
+#include "fmpz.h"
 
 #if FLINT64
 #define LARGEST_ULONG_PRIMORIAL 52
@@ -136,6 +136,7 @@ fmpz_primorial(fmpz_t res, ulong n)
     slong len, pi;
     ulong bits;
     mpz_ptr mres;
+    mp_ptr rp;
     const ulong * primes;
 
     if (n <= LARGEST_ULONG_PRIMORIAL)
@@ -153,8 +154,8 @@ fmpz_primorial(fmpz_t res, ulong n)
     bits = FLINT_BIT_COUNT(primes[pi - 1]);
 
     mres = _fmpz_promote(res);
-    mpz_realloc2(mres, pi*bits);
+    rp = FLINT_MPZ_REALLOC(mres, (pi * bits) / FLINT_BITS + 1);
 
-    len = mpn_prod_limbs(mres->_mp_d, primes, pi, bits);
+    len = mpn_prod_limbs(rp, primes, pi, bits);
     mres->_mp_size = len;
 }

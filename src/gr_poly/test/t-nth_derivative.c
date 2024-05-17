@@ -10,7 +10,6 @@
 */
 
 #include "test_helpers.h"
-#include "flint.h"
 #include "gr_poly.h"
 #include "ulong_extras.h"
 

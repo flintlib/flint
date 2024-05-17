@@ -11,5 +11,4 @@
 
 #define D_VEC_INLINES_C
 
-#include "flint.h"
 #include "d_vec.h"

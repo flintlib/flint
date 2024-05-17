@@ -47,6 +47,7 @@ fmpz_poly_bit_pack(fmpz_t f, const fmpz_poly_t poly,
     mpz_ptr mpz;
     slong i, d;
     int negate;
+    mp_ptr ptr;
 
     len = fmpz_poly_length(poly);
 
@@ -57,21 +58,21 @@ fmpz_poly_bit_pack(fmpz_t f, const fmpz_poly_t poly,
     }
 
     mpz = _fmpz_promote(f);
-    mpz_realloc2(mpz, len * bit_size);
-    d = mpz->_mp_alloc;
+    d = (len * bit_size - 1) / FLINT_BITS + 1;
+    ptr = FLINT_MPZ_REALLOC(mpz, d);
 
-    flint_mpn_zero(mpz->_mp_d, d);
+    flint_mpn_zero(ptr, d);
 
     if (fmpz_sgn(fmpz_poly_lead(poly)) < 0)
         negate = -1;
     else
         negate = 0;
 
-    _fmpz_poly_bit_pack(mpz->_mp_d, poly->coeffs, len, bit_size, negate);
+    _fmpz_poly_bit_pack(ptr, poly->coeffs, len, bit_size, negate);
 
     for (i = d - 1; i >= 0; i--)
     {
-        if (mpz->_mp_d[i] != 0)
+        if (ptr[i] != 0)
             break;
     }
     d = i + 1;

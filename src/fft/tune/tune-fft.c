@@ -10,7 +10,6 @@
 */
 
 #include <time.h>
-#include "flint.h"
 #include "ulong_extras.h"
 #include "fft.h"
 #include "mpn_extras.h"

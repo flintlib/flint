@@ -10,7 +10,7 @@
 */
 
 #include <math.h>
-#include "flint.h"
+#include "arith.h"
 
 double
 arith_bell_number_size(ulong n)

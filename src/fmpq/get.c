@@ -1,5 +1,7 @@
 /*
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2015 William Hart
+    Copyright (C) 2019 Daniel Schultz
 
     This file is part of FLINT.
 
@@ -9,8 +11,30 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpfr.h"
+#include <mpfr.h>
 #include "fmpq.h"
+
+double fmpq_get_d(const fmpq_t a)
+{
+    double d;
+    mpq_t z;
+    flint_mpq_init_set_readonly(z, a);
+    d = mpq_get_d(z);
+    flint_mpq_clear_readonly(z);
+    return d;
+}
+
+void fmpq_get_mpz_frac(mpz_t a, mpz_t b, fmpq_t c)
+{
+   fmpz_get_mpz(a, fmpq_numref(c));
+   fmpz_get_mpz(b, fmpq_denref(c));
+}
+
+void fmpq_get_mpq(mpq_t dest, const fmpq_t src)
+{
+    fmpz_get_mpz(mpq_numref(dest), fmpq_numref(src));
+    fmpz_get_mpz(mpq_denref(dest), fmpq_denref(src));
+}
 
 int
 fmpq_get_mpfr(mpfr_t r, const fmpq_t x, mpfr_rnd_t rnd)

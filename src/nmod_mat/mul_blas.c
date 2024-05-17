@@ -9,15 +9,17 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mat.h"
+#include "nmod_types.h"
 
 #if FLINT_USES_BLAS && FLINT_BITS == 64
 
+#include <limits.h>
+#include <cblas.h>
 #include "thread_pool.h"
 #include "thread_support.h"
 #include "nmod.h"
+#include "nmod_mat.h"
 #include "fmpz.h"
-#include "cblas.h"
 
 /*
     This code is on the edge of disaster. Blas is used for dot products

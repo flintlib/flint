@@ -10,7 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include <gmp.h>
 #include "fmpz.h"
 #include "padic_poly.h"
 

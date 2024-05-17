@@ -11,7 +11,6 @@
 
 #include <stdlib.h>
 #include <float.h>
-#include "flint.h"
 #include "fmpz.h"
 #include "ulong_extras.h"
 #include "profiler.h"

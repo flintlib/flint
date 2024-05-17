@@ -22,6 +22,10 @@ pthread_mutex_t fmpz_lock;
 /* Always free larger mpz's to avoid wasting too much heap space */
 #define FLINT_MPZ_MAX_CACHE_LIMBS 64
 
+#if FLINT_MPZ_MAX_CACHE_LIMBS < MPZ_MIN_ALLOC
+# error
+#endif
+
 /* The number of new mpz's allocated at a time */
 #define MPZ_BLOCK 64
 
@@ -57,12 +61,12 @@ mpz_ptr _fmpz_new_mpz(void)
 
         if (mpz_num == mpz_alloc) /* store pointer to prevent gc cleanup */
         {
-            mpz_alloc = FLINT_MAX(64, mpz_alloc * 2);
+            mpz_alloc = FLINT_MAX(MPZ_BLOCK, 2 * mpz_alloc);
             mpz_arr = flint_realloc(mpz_arr, mpz_alloc * sizeof(mpz_ptr));
         }
         mpz_arr[mpz_num++] = z;
 
-        mpz_init(z);
+        mpz_init2(z, MPZ_MIN_ALLOC * FLINT_BITS);
     }
 
 #if FLINT_USES_PTHREAD
@@ -76,8 +80,10 @@ void _fmpz_clear_mpz(fmpz f)
 {
     mpz_ptr ptr = COEFF_TO_PTR(f);
 
+    FLINT_ASSERT(ptr->_mp_alloc >= MPZ_MIN_ALLOC);
+
     if (ptr->_mp_alloc > FLINT_MPZ_MAX_CACHE_LIMBS)
-        mpz_realloc2(ptr, 1);
+        mpz_realloc(ptr, MPZ_MIN_ALLOC);
 
 #if FLINT_USES_PTHREAD
     pthread_mutex_lock(&fmpz_lock);
@@ -85,7 +91,7 @@ void _fmpz_clear_mpz(fmpz f)
 
     if (mpz_free_num == mpz_free_alloc)
     {
-        mpz_free_alloc = FLINT_MAX(64, mpz_free_alloc * 2);
+        mpz_free_alloc = FLINT_MAX(MPZ_BLOCK, 2 * mpz_free_alloc);
         mpz_free_arr = flint_realloc(mpz_free_arr, mpz_free_alloc * sizeof(mpz_ptr));
     }
 
@@ -177,19 +183,18 @@ void _fmpz_demote_val(fmpz_t f)
 
 void _fmpz_init_readonly_mpz(fmpz_t f, const mpz_t z)
 {
-   mpz_ptr ptr;
-   *f = WORD(0);
-   ptr = _fmpz_promote(f);
+    mpz_ptr ptr;
+    *f = WORD(0);
+    ptr = _fmpz_promote(f);
 
-   mpz_clear(ptr);
-   *ptr = *z;
+    mpz_clear(ptr);
+    *ptr = *z;
 }
 
 void _fmpz_clear_readonly_mpz(mpz_t z)
 {
-    if (((z->_mp_size == 1 || z->_mp_size == -1) && (z->_mp_d[0] <= COEFF_MAX))
-        || (z->_mp_size == 0))
-    {
+    int size = z->_mp_size;
+
+    if (size == 0 || ((size == 1 || size == -1) && (z->_mp_d[0] <= COEFF_MAX)))
         mpz_clear(z);
-    }
 }

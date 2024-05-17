@@ -15,14 +15,18 @@
 mpz_ptr _fmpz_new_mpz(void)
 {
     mpz_ptr mf = flint_malloc(sizeof(__mpz_struct));
-    mpz_init2(mf, 2*FLINT_BITS);
+    mpz_init2(mf, MPZ_MIN_ALLOC * FLINT_BITS);
     return mf;
 }
 
 void _fmpz_clear_mpz(fmpz f)
 {
-    mpz_clear(COEFF_TO_PTR(f));
-    flint_free(COEFF_TO_PTR(f));
+    mpz_ptr ptr = COEFF_TO_PTR(f);
+
+    FLINT_ASSERT(ptr->_mp_alloc >= MPZ_MIN_ALLOC);
+
+    mpz_clear(ptr);
+    flint_free(ptr);
 }
 
 void _fmpz_cleanup_mpz_content(void)
@@ -85,16 +89,15 @@ void _fmpz_demote_val(fmpz_t f)
 
 void _fmpz_init_readonly_mpz(fmpz_t f, const mpz_t z)
 {
-   mpz_ptr mf = flint_malloc(sizeof(__mpz_struct));
+    mpz_ptr mf = flint_malloc(sizeof(__mpz_struct));
     *f = PTR_TO_COEFF(mf);
     *mf = *z;
 }
 
 void _fmpz_clear_readonly_mpz(mpz_t z)
 {
-    if (((z->_mp_size == 1 || z->_mp_size == -1) && (z->_mp_d[0] <= COEFF_MAX))
-        || (z->_mp_size == 0))
-    {
+    int size = z->_mp_size;
+
+    if (size == 0 || ((size == 1 || size == -1) && (z->_mp_d[0] <= COEFF_MAX)))
         mpz_clear(z);
-    }
 }

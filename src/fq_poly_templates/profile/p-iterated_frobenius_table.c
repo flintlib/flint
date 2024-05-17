@@ -11,7 +11,6 @@
 
 #ifdef T
 
-#include "flint.h"
 #include "templates.h"
 
 #include <sys/stat.h>

@@ -11,7 +11,6 @@
 */
 
 #include <math.h>
-#include "flint.h"
 #include "ulong_extras.h"
 
 ulong n_factor_power235(ulong * exp, ulong n)

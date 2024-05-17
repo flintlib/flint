@@ -11,7 +11,6 @@
 
 #include <limits.h>
 
-#include "flint.h"
 #include "fmpz.h"
 #include "ulong_extras.h"
 #include "long_extras.h"

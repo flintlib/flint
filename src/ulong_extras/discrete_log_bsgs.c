@@ -13,7 +13,6 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "flint.h"
 #include "ulong_extras.h"
 
 typedef struct apow {

@@ -11,7 +11,6 @@
 */
 
 #include <math.h>
-#include "flint.h"
 #include "ulong_extras.h"
 
 int n_is_perfect_power235(ulong n)

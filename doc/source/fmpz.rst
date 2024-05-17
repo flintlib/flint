@@ -130,15 +130,34 @@ Types, macros and constants
    A macro which returns `1` if `f` represents an ``mpz_t``, otherwise `0` is
    returned.
 
+.. macro:: MPZ_MIN_ALLOC
+
+   A constant determining the minimum number of limbs the *fmpz* memory manager
+   will allocate for each *mpz*. This constant is currently 2.
+
 .. function:: mpz_ptr _fmpz_new_mpz(void)
 
-   Initialises a new ``mpz_t`` and returns a pointer to it. This is only used
-   internally.
+   Returns a pointer to an initialised *mpz* with at least
+   :macro:`MPZ_MIN_ALLOC` limbs allocated. This is only used internally.
+
+   **Note:** Requires that ``gmp.h`` has been included before any FLINT
+   header is included.
 
 .. function:: void _fmpz_clear_mpz(fmpz f)
 
-   Clears the ``mpz_t`` "pointed to" by the ``fmpz`` `f`. This is only used
+   Clears the *mpz* "pointed to" by the *fmpz* *f*. This is only used
    internally.
+
+.. note::
+
+   As of FLINT 3.2.0, it is required that the *mpz* pointed to by *f* has at
+   least :macro:`MPZ_MIN_ALLOC` limbs allocated when :func:`_fmpz_clear_mpz` is
+   called. Note that GMP functions never reduce the number of allocated limbs,
+   apart from a bug in ``mpz_remove`` which as of GMP 6.3.0 may reduce the
+   number of allocated limbs in the output *mpz*. Hence, as long as
+   ``mpz_realloc`` never is called with a second argument less than
+   :macro:`MPZ_MIN_ALLOC` on an *mpz* received from :func:`_fmpz_new_mpz`, any
+   other usage should be fine.
 
 .. function:: void _fmpz_cleanup_mpz_content()
 
@@ -153,6 +172,9 @@ Types, macros and constants
    If `f` doesn't represent an ``mpz_t``, initialise one and associate it to
    `f`.
 
+   **Note:** Requires that ``gmp.h`` has been included before any FLINT
+   header is included.
+
 .. function:: mpz_ptr _fmpz_promote_val(fmpz_t f)
 
    If `f` doesn't represent an ``mpz_t``, initialise one and associate it to
@@ -162,6 +184,9 @@ Types, macros and constants
    an ``mpz_t`` that can be passed to GMP, but the ``fmpz`` will be in an
    inconsistent state with respect to the other Flint ``fmpz`` functions such as
    ``fmpz_is_zero``, etc.
+
+   **Note:** Requires that ``gmp.h`` has been included before any FLINT
+   header is included.
 
 .. function:: void _fmpz_demote(fmpz_t f)
 
@@ -303,9 +328,15 @@ Conversion
     Sets `f` to the ``mpf_t`` `x`, rounding down towards zero if
     the value of `x` is fractional.
 
+    **Note:** Requires that ``gmp.h`` has been included before any FLINT
+    header is included.
+
 .. function:: void fmpz_get_mpf(mpf_t x, const fmpz_t f)
 
     Sets the value of the ``mpf_t`` `x` to the value of `f`.
+
+    **Note:** Requires that ``gmp.h`` has been included before any FLINT
+    header is included.
 
 .. function:: void fmpz_get_mpfr(mpfr_t x, const fmpz_t f, mpfr_rnd_t rnd)
 
@@ -324,6 +355,9 @@ Conversion
 .. function:: void fmpz_get_mpz(mpz_t x, const fmpz_t f)
 
     Sets the ``mpz_t`` `x` to the same value as `f`.
+
+    **Note:** Requires that ``gmp.h`` has been included before any FLINT
+    header is included.
 
 .. function:: int fmpz_get_mpn(nn_ptr * n, fmpz_t n_in)
 
@@ -412,6 +446,13 @@ Conversion
     words of the result in ``out[0], ..., out[n-1]``. This will give a signed
     two's complement representation of `in` (assuming `in` doesn't overflow the array).
 
+.. function:: void fmpz_set_mpn_large(fmpz_t z, nn_srcptr src, slong n, int negative)
+
+    Sets *z* to the integer represented by the *n* limbs in the array *src*,
+    or minus this value if *negative* is 1.
+    Requires `n \ge 2` and that the top limb of *src* is nonzero.
+    Note that *fmpz_set_ui*, *fmpz_neg_ui* can be used for single-limb integers.
+
 .. function:: void fmpz_get_signed_uiui(ulong * hi, ulong * lo, const fmpz_t in)
 
     Retrieves the value of `in` modulo `2^{2 * FLINT\_BITS}` and puts the high
@@ -420,6 +461,9 @@ Conversion
 .. function:: void fmpz_set_mpz(fmpz_t f, const mpz_t x)
 
     Sets `f` to the given ``mpz_t`` value.
+
+    **Note:** Requires that ``gmp.h`` has been included before any FLINT
+    header is included.
 
 .. function:: int fmpz_set_str(fmpz_t f, const char * str, int b)
 
@@ -471,9 +515,15 @@ Conversion
             _fmpz_demote_val(f);
         }
 
+    **Note:** Requires that ``gmp.h`` has been included before any FLINT
+    header is included.
+
 .. function:: void flint_mpz_clear_readonly(mpz_t z)
 
     Clears the readonly ``mpz_t`` `z`.
+
+    **Note:** Requires that ``gmp.h`` has been included before any FLINT
+    header is included.
 
 .. function:: void fmpz_init_set_readonly(fmpz_t f, const mpz_t z)
 
@@ -497,6 +547,9 @@ Conversion
             foo(..., f);
             fmpz_clear_readonly(f);
         }
+
+    **Note:** Requires that ``gmp.h`` has been included before any FLINT
+    header is included.
 
 .. function:: void fmpz_clear_readonly(fmpz_t f)
 

@@ -11,38 +11,61 @@
 
 #define FMPZ_INLINES_C
 
-#include "gmpcompat.h"
+#include <gmp.h>
 #include "fmpz.h"
 
+/* NOTE: Herein we rely on that the fmpz collector never assigns an mpz with
+   less than two limbs. */
 void _fmpz_promote_set_ui(fmpz_t f, ulong v)
 {
-    mpz_ptr z = _fmpz_promote(f);
-    flint_mpz_set_ui(z, v);
+    mpz_ptr zf = _fmpz_promote(f);
+    zf->_mp_d[0] = v;
+    zf->_mp_size = 1;
 }
 
 void _fmpz_promote_neg_ui(fmpz_t f, ulong v)
 {
-    mpz_ptr z = _fmpz_promote(f);
-    flint_mpz_set_ui(z, v);
-    mpz_neg(z, z);
+    mpz_ptr zf = _fmpz_promote(f);
+    zf->_mp_d[0] = v;
+    zf->_mp_size = -1;
 }
 
 void _fmpz_promote_set_si(fmpz_t f, slong v)
 {
-    mpz_ptr z = _fmpz_promote(f);
-    flint_mpz_set_si(z, v);
+    mpz_ptr zf = _fmpz_promote(f);
+    zf->_mp_d[0] = FLINT_ABS(v);
+    zf->_mp_size = (v < 0) ? -1 : 1;
 }
 
 void _fmpz_init_promote_set_ui(fmpz_t f, ulong v)
 {
-    mpz_ptr z = _fmpz_new_mpz();
-    *f = PTR_TO_COEFF(z);
-    flint_mpz_set_ui(z, v);
+    mpz_ptr zf = _fmpz_new_mpz();
+    *f = PTR_TO_COEFF(zf);
+    zf->_mp_d[0] = v;
+    zf->_mp_size = 1;
 }
 
 void _fmpz_init_promote_set_si(fmpz_t f, slong v)
 {
-    mpz_ptr z = _fmpz_new_mpz();
-    *f = PTR_TO_COEFF(z);
-    flint_mpz_set_si(z, v);
+    mpz_ptr zf = _fmpz_new_mpz();
+    *f = PTR_TO_COEFF(zf);
+    zf->_mp_d[0] = FLINT_ABS(v);
+    zf->_mp_size = (v < 0) ? -1 : 1;
+}
+
+/* NOTE: We assume that hi != 0 for the following two functions. */
+void _fmpz_promote_set_uiui(fmpz_t f, ulong hi, ulong lo)
+{
+    mpz_ptr zf = _fmpz_promote(f);
+    zf->_mp_d[0] = lo;
+    zf->_mp_d[1] = hi;
+    zf->_mp_size = 2;
+}
+
+void _fmpz_promote_neg_uiui(fmpz_t f, ulong hi, ulong lo)
+{
+    mpz_ptr zf = _fmpz_promote(f);
+    zf->_mp_d[0] = lo;
+    zf->_mp_d[1] = hi;
+    zf->_mp_size = -2;
 }

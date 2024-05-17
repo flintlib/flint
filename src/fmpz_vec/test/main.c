@@ -9,6 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
+
 /* Include functions *********************************************************/
 
 #include "t-add.c"

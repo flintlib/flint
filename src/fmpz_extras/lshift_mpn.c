@@ -26,10 +26,7 @@ fmpz_lshift_mpn(fmpz_t z, nn_srcptr d, slong dn, int sgnbit, flint_bitcnt_t shif
     shift_bits = shift % FLINT_BITS;
     zn = dn + shift_limbs + (shift_bits != 0);
 
-    if (zmpz->_mp_alloc < zn)
-        mpz_realloc2(zmpz, zn * FLINT_BITS);
-
-    zp = zmpz->_mp_d;
+    zp = FLINT_MPZ_REALLOC(zmpz, zn);
     flint_mpn_zero(zp, shift_limbs);
 
     if (shift_bits == 0)

@@ -16,12 +16,6 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-#define MPZ_FIT_SIZE(z, nlimbs) \
-    do { \
-        if (z->_mp_alloc < nlimbs) \
-            _mpz_realloc(z, nlimbs); \
-    } while (0)
-
 /* Will not get called with x or y small. */
 void
 _flint_mpz_addmul_large(mpz_ptr z, mpz_srcptr x, mpz_srcptr y, int negate)
@@ -122,8 +116,7 @@ _flint_mpz_addmul_large(mpz_ptr z, mpz_srcptr x, mpz_srcptr y, int negate)
 
     tn -= (top == 0);
     alloc = FLINT_MAX(tn, zn) + 1;
-    MPZ_FIT_SIZE(z, alloc);
-    zd = z->_mp_d;
+    zd = FLINT_MPZ_REALLOC(z, alloc);
 
     if (sgn >= 0)
     {

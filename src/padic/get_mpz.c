@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
 #include "padic.h"
 
 void padic_get_mpz(mpz_t rop, const padic_t op, const padic_ctx_t ctx)

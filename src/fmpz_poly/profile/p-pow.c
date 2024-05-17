@@ -11,7 +11,6 @@
 
 #include <string.h>
 #include <float.h>
-#include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "ulong_extras.h"

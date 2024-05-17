@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include <gmp.h>
 #include "ulong_extras.h"
 #include "fmpz.h"
 
@@ -20,7 +20,7 @@ fmpz_init2(fmpz_t f, ulong limbs)
     {
         mpz_ptr mf = _fmpz_new_mpz();
         *f = PTR_TO_COEFF(mf);
-        _mpz_realloc(mf, limbs);
+        FLINT_MPZ_REALLOC(mf, limbs);
     }
     else
     {

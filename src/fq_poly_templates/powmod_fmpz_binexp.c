@@ -14,7 +14,6 @@
 
 #include "templates.h"
 
-#include "flint.h"
 void
 _TEMPLATE(T, poly_powmod_fmpz_binexp) (
     TEMPLATE(T, struct) * res,

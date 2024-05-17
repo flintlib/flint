@@ -72,7 +72,7 @@ fmpz_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in,
     flint_mpn_preinvn(ninv, n, n_size);
 
     fac = _fmpz_promote(p_factor);
-    mpz_realloc2(fac, n_size * FLINT_BITS);
+    FLINT_MPZ_REALLOC(fac, n_size);
     fac->_mp_size = n_size;
 
     while (max_tries--)

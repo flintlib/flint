@@ -15,11 +15,6 @@
 #include <gmp.h>
 #include "longlong.h"
 
-#define FLINT_MPZ_REALLOC(z, len)       \
-    ((len) > ((z)->_mp_alloc)           \
-        ? (mp_ptr) _mpz_realloc(z, len) \
-        : ((z)->_mp_d))
-
 static inline
 void flint_mpz_add_uiui(mpz_ptr a, mpz_srcptr b, ulong c1, ulong c0)
 {
@@ -110,7 +105,7 @@ void flint_mpz_set_si(mpz_ptr r, slong s)
       (in older GMP versions, this code is simply never triggered) */
    if (r->_mp_alloc == 0)
    {
-      r->_mp_d = (mp_ptr) flint_malloc(sizeof(mp_limb_t));
+      r->_mp_d = (mp_ptr) flint_malloc(2 * sizeof(mp_limb_t));
       r->_mp_alloc = 1;
    }
 
@@ -130,7 +125,7 @@ void flint_mpz_set_ui(mpz_ptr r, ulong u)
       (in older GMP versions, this code is simply never triggered) */
    if (r->_mp_alloc == 0)
    {
-      r->_mp_d = (mp_ptr) flint_malloc(sizeof(mp_limb_t));
+      r->_mp_d = (mp_ptr) flint_malloc(2 * sizeof(mp_limb_t));
       r->_mp_alloc = 1;
    }
 
@@ -141,7 +136,7 @@ void flint_mpz_set_ui(mpz_ptr r, ulong u)
 static inline
 void flint_mpz_init_set_si(mpz_ptr r, slong s)
 {
-   r->_mp_d = (mp_ptr) flint_malloc(sizeof(mp_limb_t));
+   r->_mp_d = (mp_ptr) flint_malloc(2 * sizeof(mp_limb_t));
    r->_mp_alloc = 1;
 
    if (s < 0) {
@@ -156,7 +151,7 @@ void flint_mpz_init_set_si(mpz_ptr r, slong s)
 static inline
 void flint_mpz_init_set_ui(mpz_ptr r, ulong u)
 {
-   r->_mp_d = (mp_ptr) flint_malloc(sizeof(mp_limb_t));
+   r->_mp_d = (mp_ptr) flint_malloc(2 * sizeof(mp_limb_t));
    r->_mp_alloc = 1;
 
    r->_mp_d[0] = u;

@@ -144,17 +144,7 @@ const char * calcium_func_name(calcium_func_code func);
 
 /* Flint extras */
 
-/* slower alternative: fmpz_fdiv_ui(x 1000000007) */
-CALCIUM_INLINE ulong calcium_fmpz_hash(const fmpz_t x)
-{
-    if (!COEFF_IS_MPZ(*x))
-        return *x;
-    else
-    {
-        mpz_ptr z = COEFF_TO_PTR(*x);
-        return (z->_mp_size > 0) ? z->_mp_d[0] : -z->_mp_d[0];
-    }
-}
+ulong calcium_fmpz_hash(const fmpz_t x);
 
 #ifdef __cplusplus
 }

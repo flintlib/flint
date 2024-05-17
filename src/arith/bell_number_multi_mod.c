@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
 #include "nmod.h"
 #include "fmpz.h"
 #include "arith.h"
