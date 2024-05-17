@@ -21,7 +21,6 @@
 
 #include "fmpz_types.h"
 #include "nmod_types.h"
-#include "d_mat.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -484,13 +483,16 @@ int fmpz_mat_is_spd(const fmpz_mat_t A);
 
 /* Conversions **************************************************************/
 
+#if defined(D_MAT_H)
 int fmpz_mat_get_d_mat(d_mat_t B, const fmpz_mat_t A);
-
 int fmpz_mat_get_d_mat_transpose(d_mat_t B, const fmpz_mat_t A);
+#endif
 
 /* Cholesky Decomposition ****************************************************/
 
+#if defined(D_MAT_H)
 void fmpz_mat_chol_d(d_mat_t R, const fmpz_mat_t A);
+#endif
 
 /* LLL ***********************************************************************/
 
