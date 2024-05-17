@@ -10,6 +10,7 @@
 */
 
 #include "double_extras.h"
+#include "arb.h"
 #include "arb_hypgeom.h"
 
 #define LOG2 0.69314718055994531

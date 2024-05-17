@@ -9,9 +9,10 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "profiler.h"
+#include "fmpz_poly.h"
 #include "acb_poly.h"
 #include "arb_fmpz_poly.h"
-#include "profiler.h"
 
 static int check_accuracy(acb_ptr vec, slong len, slong prec)
 {

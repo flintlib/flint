@@ -9,10 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
+#include "arb_fmpz_poly.h"
 #include "acf.h"
 #include "acb.h"
-#include "arb_fmpz_poly.h"
 #include "gr.h"
 #include "gr_generic.h"
 #include "gr_vec.h"

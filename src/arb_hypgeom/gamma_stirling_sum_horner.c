@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "arb.h"
 #include "arb_hypgeom.h"
 
 void arb_gamma_stirling_coeff(arb_t b, ulong k, int digamma, slong prec);

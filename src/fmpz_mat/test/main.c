@@ -19,6 +19,7 @@
 # include <sys/param.h>
 # undef ulong
 #endif
+#include "d_mat.h"
 
 /* Include functions *********************************************************/
 

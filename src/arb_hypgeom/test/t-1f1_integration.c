@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "arb.h"
 #include "arb_hypgeom.h"
 
 TEST_FUNCTION_START(arb_hypgeom_1f1_integration, state)
