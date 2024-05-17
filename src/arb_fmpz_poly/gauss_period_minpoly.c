@@ -11,6 +11,7 @@
 
 #include "arb_poly.h"
 #include "arb_fmpz_poly.h"
+#include "acb.h"
 #include "acb_dirichlet.h"
 
 #ifdef __GNUC__

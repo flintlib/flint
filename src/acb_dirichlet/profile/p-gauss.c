@@ -10,8 +10,9 @@
 */
 
 #include <string.h>
-#include "acb_dirichlet.h"
 #include "profiler.h"
+#include "acb.h"
+#include "acb_dirichlet.h"
 
 #define LOG 0
 #define CSV 1

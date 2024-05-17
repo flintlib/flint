@@ -11,6 +11,7 @@
 */
 
 #include "thread_support.h"
+#include "acb.h"
 #include "acb_dirichlet.h"
 #include "arb_calc.h"
 

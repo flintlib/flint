@@ -9,8 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
 #include "profiler.h"
+#include "longlong.h"
+#include "fmpz.h"
 
 void
 fmpz_fmma_old(fmpz_t f, const fmpz_t a, const fmpz_t b,

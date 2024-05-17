@@ -12,6 +12,7 @@
 #include "fmpq.h"
 #include "arb_mat.h"
 #include "arb_hypgeom.h"
+#include "acb.h"
 #include "acb_dirichlet.h"
 
 #ifdef __GNUC__

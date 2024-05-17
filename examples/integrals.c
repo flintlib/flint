@@ -12,6 +12,7 @@
 #include <math.h>
 #include <flint/profiler.h>
 #include <flint/arb_hypgeom.h>
+#include <flint/acb.h>
 #include <flint/acb_hypgeom.h>
 #include <flint/acb_dirichlet.h>
 #include <flint/acb_modular.h>

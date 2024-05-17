@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "arb.h"
 #include "acb_dirichlet.h"
 
 TEST_FUNCTION_START(acb_dirichlet_backlund_s_bound, state)

@@ -13,6 +13,10 @@
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 
+#if FLINT_WANT_ASSERT
+# include "longlong.h"
+#endif
+
 /* split f assuming that f has degree(f) distinct nonzero roots in Fp */
 void _fmpz_mod_poly_split_rabin(
     fmpz_mod_poly_t a,

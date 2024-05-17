@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <flint/arb_mat.h>
+#include <flint/acb.h>
 #include <flint/acb_mat.h>
 #include <flint/profiler.h>
 

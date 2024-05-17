@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <flint/profiler.h>
+#include <flint/acb.h>
 #include <flint/acb_dirichlet.h>
 
 static int usage(char *argv[])
