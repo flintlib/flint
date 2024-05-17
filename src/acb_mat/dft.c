@@ -20,8 +20,8 @@ acb_mat_dft(acb_mat_t res, int kind, slong prec)
     acb_t v;
     slong n, r, c, i, j;
 
-    r = arb_mat_nrows(res);
-    c = arb_mat_ncols(res);
+    r = acb_mat_nrows(res);
+    c = acb_mat_ncols(res);
     n = FLINT_MIN(r, c);
 
     if (n == 0)

@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_mat.h"
+#include "arb.h"
 #include "arb_mat.h"
 
 int arb_mat_is_lagom(const arb_mat_t A)

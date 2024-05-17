@@ -30,20 +30,20 @@ void func_name(acb_mat_t B, const acb_mat_t A, scalar_type c, slong prec) \
             scalar_op(acb_mat_entry(B, i, j), acb_mat_entry(A, i, j), c, prec); \
 }
 
-MAT_SCALAR_OP(acb_mat_scalar_addmul_si, slong, acb_addmul_si);
-MAT_SCALAR_OP(   acb_mat_scalar_mul_si, slong,    acb_mul_si);
-MAT_SCALAR_OP(   acb_mat_scalar_div_si, slong,    acb_div_si);
+MAT_SCALAR_OP(acb_mat_scalar_addmul_si, slong, acb_addmul_si)
+MAT_SCALAR_OP(   acb_mat_scalar_mul_si, slong,    acb_mul_si)
+MAT_SCALAR_OP(   acb_mat_scalar_div_si, slong,    acb_div_si)
 
-MAT_SCALAR_OP(acb_mat_scalar_addmul_fmpz, const fmpz_t, acb_addmul_fmpz);
-MAT_SCALAR_OP(   acb_mat_scalar_mul_fmpz, const fmpz_t,    acb_mul_fmpz);
-MAT_SCALAR_OP(   acb_mat_scalar_div_fmpz, const fmpz_t,    acb_div_fmpz);
+MAT_SCALAR_OP(acb_mat_scalar_addmul_fmpz, const fmpz_t, acb_addmul_fmpz)
+MAT_SCALAR_OP(   acb_mat_scalar_mul_fmpz, const fmpz_t,    acb_mul_fmpz)
+MAT_SCALAR_OP(   acb_mat_scalar_div_fmpz, const fmpz_t,    acb_div_fmpz)
 
-MAT_SCALAR_OP(acb_mat_scalar_addmul_arb, const arb_t, acb_addmul_arb);
-MAT_SCALAR_OP(   acb_mat_scalar_mul_arb, const arb_t,    acb_mul_arb);
-MAT_SCALAR_OP(   acb_mat_scalar_div_arb, const arb_t,    acb_div_arb);
+MAT_SCALAR_OP(acb_mat_scalar_addmul_arb, const arb_t, acb_addmul_arb)
+MAT_SCALAR_OP(   acb_mat_scalar_mul_arb, const arb_t,    acb_mul_arb)
+MAT_SCALAR_OP(   acb_mat_scalar_div_arb, const arb_t,    acb_div_arb)
 
-MAT_SCALAR_OP(acb_mat_scalar_addmul_acb, const acb_t, acb_addmul);
-MAT_SCALAR_OP(   acb_mat_scalar_mul_acb, const acb_t,    acb_mul);
-MAT_SCALAR_OP(   acb_mat_scalar_div_acb, const acb_t,    acb_div);
+MAT_SCALAR_OP(acb_mat_scalar_addmul_acb, const acb_t, acb_addmul)
+MAT_SCALAR_OP(   acb_mat_scalar_mul_acb, const acb_t,    acb_mul)
+MAT_SCALAR_OP(   acb_mat_scalar_div_acb, const acb_t,    acb_div)
 
 #undef MAT_SCALAR_OP

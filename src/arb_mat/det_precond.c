@@ -10,6 +10,7 @@
 */
 
 #include "perm.h"
+#include "arb.h"
 #include "arb_mat.h"
 
 static void

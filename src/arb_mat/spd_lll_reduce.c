@@ -13,7 +13,6 @@
 #include "fmpz_lll.h"
 #include "arb_mat.h"
 
-
 void
 arb_mat_spd_lll_reduce(fmpz_mat_t U, const arb_mat_t A, slong prec)
 {

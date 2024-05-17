@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "acb.h"
 #include "acb_mat.h"
 
 int
@@ -18,7 +19,7 @@ acb_mat_eig_multiple(acb_ptr E, const acb_mat_t A, acb_srcptr E_approx, const ac
     acb_ptr F;
     int success;
 
-    n = arb_mat_nrows(A);
+    n = acb_mat_nrows(A);
     F = _acb_vec_init(n);
 
     success = acb_mat_eig_simple_vdhoeven_mourrain(F, NULL, NULL, A, E_approx, R_approx, prec);

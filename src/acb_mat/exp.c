@@ -11,8 +11,10 @@
 
 #include "double_extras.h"
 #include "fmpz_mat.h"
-#include "acb_mat.h"
 #include "bool_mat.h"
+#include "arb_mat.h"
+#include "acb.h"
+#include "acb_mat.h"
 
 slong _arb_mat_exp_choose_N(const mag_t norm, slong prec);
 

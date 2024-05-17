@@ -10,6 +10,7 @@
 */
 
 #include "fmpz_mat.h"
+#include "acb.h"
 #include "acb_mat.h"
 
 void
