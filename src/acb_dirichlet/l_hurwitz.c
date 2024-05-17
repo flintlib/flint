@@ -45,7 +45,7 @@ acb_dirichlet_l_hurwitz(acb_t res, const acb_t s,
     dirichlet_char_one(cn, G);
     acb_zero(t);
 
-    prec += n_clog(G->phi_q, 2);
+    prec += FLINT_CLOG2(G->phi_q);
 
     order = dirichlet_order_char(G, chi);
     mult = G->expo / order;

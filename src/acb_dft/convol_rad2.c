@@ -78,9 +78,9 @@ acb_dft_convol_rad2(acb_ptr w, acb_srcptr f, acb_srcptr g, slong len, slong prec
     if (len <= 0)
         return;
     else if ((len & (len - 1)) == 0)
-        e = n_clog(len, 2);
+        e = FLINT_CLOG2(len);
     else
-        e = n_clog(2 * len - 1, 2);
+        e = FLINT_CLOG2(2 * len - 1);
     acb_dft_rad2_init(dft, e, prec);
     acb_dft_convol_rad2_precomp(w, f, g, len, dft, prec);
     acb_dft_rad2_clear(dft);

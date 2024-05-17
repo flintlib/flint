@@ -29,7 +29,7 @@ acb_dirichlet_l_vec_hurwitz(acb_ptr res, const acb_t s,
     acb_init(qs);
     acb_init(a);
 
-    prec += n_clog(G->phi_q, 2);
+    prec += FLINT_CLOG2(G->phi_q);
 
     acb_set_ui(qs, G->q);
     acb_neg(a, s);

@@ -10,24 +10,24 @@
 */
 
 #include <math.h>
-#include "ulong_extras.h"
+#include "acb.h"
 #include "acb_mat.h"
 #include "acb_theta.h"
 
 static slong
 acb_theta_naive_fullprec(const acb_theta_eld_t E, slong prec)
 {
-    return prec + FLINT_MAX(prec + ceil(n_flog(1 + acb_theta_eld_nb_pts(E), 2)),
+    return prec + FLINT_MAX(prec + FLINT_FLOG2(1 + acb_theta_eld_nb_pts(E)),
         ACB_THETA_LOW_PREC);
 }
 
 
-ACB_INLINE slong
+FLINT_FORCE_INLINE slong
 acb_theta_naive_newprec(slong prec, slong coord, slong dist, slong max_dist, slong ord)
 {
     double r = ((double) FLINT_MAX(0, dist - 1)) / (max_dist + 2);
     double neg = r * r * prec;
-    double pos = ord * n_clog(1 + FLINT_ABS(coord), 2);
+    double pos = ord * FLINT_CLOG2(1 + FLINT_ABS(coord));
 
     return FLINT_MAX(ACB_THETA_LOW_PREC, ceil((double) prec - neg + pos));
 }
