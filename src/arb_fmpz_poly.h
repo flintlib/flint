@@ -12,7 +12,7 @@
 #ifndef ARB_FMPZ_POLY_H
 #define ARB_FMPZ_POLY_H
 
-#include "fmpz_poly.h"
+#include "fmpz_types.h"
 #include "acb_types.h"
 
 #ifdef __cplusplus
