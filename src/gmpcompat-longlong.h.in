@@ -15,11 +15,6 @@
 #include <gmp.h>
 #include "longlong.h"
 
-#define FLINT_MPZ_REALLOC(z, len)       \
-    ((len) > ((z)->_mp_alloc)           \
-        ? (mp_ptr) _mpz_realloc(z, len) \
-        : ((z)->_mp_d))
-
 static inline
 void flint_mpz_add_uiui(mpz_ptr a, mpz_srcptr b, ulong c1, ulong c0)
 {

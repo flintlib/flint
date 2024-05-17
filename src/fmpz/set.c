@@ -187,11 +187,10 @@ fmpz_set_signed_uiuiui(fmpz_t r, ulong hi, ulong mid, ulong lo)
     else
     {
         mpz_ptr z = _fmpz_promote(r);
-        if (z->_mp_alloc < 3)
-            mpz_realloc(z, 3);
-        z->_mp_d[0] = lo;
-        z->_mp_d[1] = mid;
-        z->_mp_d[2] = hi;
+        mp_ptr zp = FLINT_MPZ_REALLOC(z, 3);
+        zp[0] = lo;
+        zp[1] = mid;
+        zp[2] = hi;
         z->_mp_size = negate ? -3 : 3;
     }
 }
@@ -217,24 +216,23 @@ void fmpz_set_ui_array(fmpz_t out, const ulong * in, slong in_len)
     else
     {
         mpz_ptr mpz = _fmpz_promote(out);
-        if (mpz->_mp_alloc < size)
-            mpz_realloc(mpz, size);
+        mp_ptr mp = FLINT_MPZ_REALLOC(mpz, size);
         mpz->_mp_size = size;
-        flint_mpn_copyi(mpz->_mp_d, in, size);
+        flint_mpn_copyi(mp, in, size);
     }
 }
 
 void fmpz_set_mpn_large(fmpz_t z, nn_srcptr src, slong n, int negative)
 {
     mpz_ptr zz;
+    mp_ptr zp;
     slong i;
-    zz = _fmpz_promote(z);
 
-    if (zz->_mp_alloc < n)
-        mpz_realloc(zz, n);
+    zz = _fmpz_promote(z);
+    zp = FLINT_MPZ_REALLOC(zz, n);
 
     for (i = 0; i < n; i++)
-        zz->_mp_d[i] = src[i];
+        zp[i] = src[i];
 
     zz->_mp_size = negative ? -n : n;
 }

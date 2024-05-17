@@ -130,6 +130,7 @@ nmod_poly_bit_pack(fmpz_t f, const nmod_poly_t poly,
 {
     slong len, limbs;
     mpz_ptr mpz;
+    mp_ptr mp;
     slong i;
 
     len = nmod_poly_length(poly);
@@ -142,14 +143,13 @@ nmod_poly_bit_pack(fmpz_t f, const nmod_poly_t poly,
 
     mpz = _fmpz_promote(f);
     limbs = (len * bit_size - 1) / FLINT_BITS + 1;
-    if (mpz->_mp_alloc < limbs)
-        mpz_realloc(mpz, limbs);
+    mp = FLINT_MPZ_REALLOC(mpz, limbs);
 
-    _nmod_poly_bit_pack(mpz->_mp_d, poly->coeffs, len, bit_size);
+    _nmod_poly_bit_pack(mp, poly->coeffs, len, bit_size);
 
     for (i = limbs - 1; i >= 0; i--)
     {
-        if (mpz->_mp_d[i] != 0)
+        if (mp[i] != 0)
             break;
     }
 

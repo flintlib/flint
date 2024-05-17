@@ -295,13 +295,12 @@ relation_t qsieve_parse_relation(qs_t qs_inf)
     else
     {
         mpz_ptr mY = _fmpz_new_mpz();
+        mp_ptr ptr;
 
         mY->_mp_size = Ysz;
+        ptr = FLINT_MPZ_REALLOC(mY, FLINT_ABS(Ysz));
 
-        if (mY->_mp_alloc < FLINT_ABS(Ysz))
-            _mpz_realloc(mY, FLINT_ABS(Ysz));
-
-        fread(mY->_mp_d, sizeof(ulong), FLINT_ABS(Ysz), (FILE *) qs_inf->siqs);
+        fread(ptr, sizeof(ulong), FLINT_ABS(Ysz), (FILE *) qs_inf->siqs);
         *rel.Y = PTR_TO_COEFF(mY);
     }
 

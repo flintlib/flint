@@ -98,11 +98,11 @@ fmpz_factor_ecm(fmpz_t f, ulong curves, ulong B1, ulong B2,
     fmpz_sub_ui(nm8, n_in, 8);
 
     ret = 0;
+    /* FIXME: Wait to promote f until after stage 2 precomputations? */
     fac = _fmpz_promote(f);
     {
         int alloc = fmpz_size(n_in);
-        if (fac->_mp_alloc < alloc)
-            mpz_realloc(fac, alloc);
+        FLINT_MPZ_REALLOC(fac, alloc);
     }
 
     /************************ STAGE I PRECOMPUTATIONS ************************/

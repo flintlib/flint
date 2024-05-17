@@ -224,8 +224,7 @@ fmpz_factor_pollard_brent_single(fmpz_t p_factor, fmpz_t n_in, fmpz_t yi,
     flint_mpn_preinvn(ninv, n, n_size);
 
     fac = _fmpz_promote(p_factor);
-    if (fac->_mp_alloc < (int) n_size)
-        mpz_realloc(fac, n_size);
+    FLINT_MPZ_REALLOC(fac, n_size);
     fac->_mp_size = n_size;
 
     mpn_zero(a, n_size);

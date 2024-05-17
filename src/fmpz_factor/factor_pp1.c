@@ -335,16 +335,14 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong
         for (i = 0; (ulong) i < num_roots; i++)
         {
             mpz_ptr m = _fmpz_promote(roots + i);
-            if (m->_mp_alloc < nn)
-                mpz_realloc(m, nn);
+            FLINT_MPZ_REALLOC(m, nn);
         }
 
         roots2 = _fmpz_vec_init(num_roots);
         for (i = 0; (ulong) i < num_roots; i++)
         {
             mpz_ptr m = _fmpz_promote(roots2 + i);
-            if (m->_mp_alloc < nn)
-                mpz_realloc(m, nn);
+            FLINT_MPZ_REALLOC(m, nn);
         }
 
         evals = _fmpz_vec_init(num_roots);
@@ -553,9 +551,8 @@ cleanup:
     if (ret)
     {
         mpz_ptr fm = _fmpz_promote(fac);
-        if (fm->_mp_alloc < r)
-            mpz_realloc(fm, r);
-        flint_mpn_copyi(fm->_mp_d, factor, r);
+        mp_ptr fp = FLINT_MPZ_REALLOC(fm, r);
+        flint_mpn_copyi(fp, factor, r);
         fm->_mp_size = r;
         _fmpz_demote_val(fac);
     }

@@ -20,8 +20,7 @@ fmpz_init2(fmpz_t f, ulong limbs)
     {
         mpz_ptr mf = _fmpz_new_mpz();
         *f = PTR_TO_COEFF(mf);
-        if ((int) limbs > mf->_mp_alloc)
-            mpz_realloc(mf, limbs);
+        FLINT_MPZ_REALLOC(mf, limbs);
     }
     else
     {

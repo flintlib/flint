@@ -43,23 +43,8 @@ fmpz_mul_2exp(fmpz_t f, const fmpz_t g, ulong exp)
         ulong * limbs;
         mpz_ptr mf;
 
-        /* Ensure enough limbs are allocated for f */
-        if (!COEFF_IS_MPZ(*f))
-        {
-            /* TODO: Initialize the new mpz with alloc limbs instead of
-             * reallocating them. */
-            mf = _fmpz_new_mpz();
-            *f = PTR_TO_COEFF(mf);
-            if (mf->_mp_alloc < alloc)
-                mpz_realloc(mf, alloc);
-        }
-        else
-        {
-            mf = COEFF_TO_PTR(*f);
-            if (mf->_mp_alloc < alloc)
-                mpz_realloc(mf, alloc);
-        }
-        limbs = mf->_mp_d;
+        mf = _fmpz_promote(f);
+        limbs = FLINT_MPZ_REALLOC(mf, alloc);
         mf->_mp_size = (c1 > 0) ? alloc : -alloc;
         memset(limbs, 0, sizeof(ulong) * alloc);
 

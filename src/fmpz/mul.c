@@ -48,9 +48,7 @@ flint_mpz_mul(mpz_ptr z, mpz_srcptr x, mpz_srcptr y)
     }
 
     zn = xn + yn;
-    if (z->_mp_alloc < zn)
-        _mpz_realloc(z, zn);
-    zd = z->_mp_d;
+    zd = FLINT_MPZ_REALLOC(z, zn);
     /* Important: read after possibly resizing z, so that the
        pointers are valid in case of aliasing. */
     xd = x->_mp_d;
