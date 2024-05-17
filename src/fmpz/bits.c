@@ -10,6 +10,7 @@
 */
 
 #include <gmp.h>
+#include "longlong.h"
 #include "fmpz.h"
 
 flint_bitcnt_t fmpz_bits(const fmpz_t f)

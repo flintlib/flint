@@ -10,6 +10,7 @@
 */
 
 #include <gmp.h>
+#include "longlong.h"
 #include "fmpzi.h"
 
 slong fmpzi_bits(const fmpzi_t x)

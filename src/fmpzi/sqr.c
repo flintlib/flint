@@ -10,6 +10,7 @@
 */
 
 #include <gmp.h>
+#include "longlong.h"
 #include "fmpzi.h"
 
 void

@@ -11,6 +11,7 @@
 */
 
 #include <gmp.h>
+#include "longlong.h"
 #include "fmpz.h"
 #include "gr.h"
 #include "gr_generic.h"

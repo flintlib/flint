@@ -11,6 +11,7 @@
 */
 
 #include <gmp.h>
+#include "longlong.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
