@@ -19,8 +19,7 @@
 #endif
 
 #include "fmpq_types.h"
-#include "arb_mat.h"
-#include "acb.h"
+#include "acb_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -48,21 +47,13 @@ acb_mat_swap(acb_mat_t mat1, acb_mat_t mat2)
     FLINT_SWAP(acb_mat_struct, *mat1, *mat2);
 }
 
-ACB_MAT_INLINE void
-acb_mat_swap_entrywise(acb_mat_t mat1, acb_mat_t mat2)
-{
-    slong i, j;
-
-    for (i = 0; i < acb_mat_nrows(mat1); i++)
-        for (j = 0; j < acb_mat_ncols(mat1); j++)
-            acb_swap(acb_mat_entry(mat2, i, j), acb_mat_entry(mat1, i, j));
-}
+void acb_mat_swap_entrywise(acb_mat_t mat1, acb_mat_t mat2);
 
 /* Window matrices */
 
 void acb_mat_window_init(acb_mat_t window, const acb_mat_t mat, slong r1, slong c1, slong r2, slong c2);
 
-ARB_MAT_INLINE void
+ACB_MAT_INLINE void
 acb_mat_window_clear(acb_mat_t window)
 {
     flint_free(window->rows);
@@ -147,30 +138,9 @@ acb_mat_is_diag(const acb_mat_t mat)
 
 /* Radius and interval operations */
 
-ACB_MAT_INLINE void
-acb_mat_get_mid(acb_mat_t B, const acb_mat_t A)
-{
-    slong i, j;
+void acb_mat_get_mid(acb_mat_t B, const acb_mat_t A);
 
-    for (i = 0; i < acb_mat_nrows(A); i++)
-    {
-        for (j = 0; j < acb_mat_ncols(A); j++)
-        {
-            arb_get_mid_arb(acb_realref(acb_mat_entry(B, i, j)), acb_realref(acb_mat_entry(A, i, j)));
-            arb_get_mid_arb(acb_imagref(acb_mat_entry(B, i, j)), acb_imagref(acb_mat_entry(A, i, j)));
-        }
-    }
-}
-
-ACB_MAT_INLINE void
-acb_mat_add_error_mag(acb_mat_t mat, const mag_t err)
-{
-    slong i, j;
-
-    for (i = 0; i < acb_mat_nrows(mat); i++)
-        for (j = 0; j < acb_mat_ncols(mat); j++)
-            acb_add_error_mag(acb_mat_entry(mat, i, j), err);
-}
+void acb_mat_add_error_mag(acb_mat_t mat, const mag_t err);
 
 /* Special matrices */
 
@@ -227,135 +197,22 @@ void acb_mat_pow_ui(acb_mat_t B, const acb_mat_t A, ulong exp, slong prec);
 
 /* Scalar arithmetic */
 
-ACB_MAT_INLINE void
-acb_mat_scalar_mul_2exp_si(acb_mat_t B, const acb_mat_t A, slong c)
-{
-    slong i, j;
+void acb_mat_scalar_mul_2exp_si(acb_mat_t B, const acb_mat_t A, slong c);
 
-    for (i = 0; i < acb_mat_nrows(A); i++)
-        for (j = 0; j < acb_mat_ncols(A); j++)
-            acb_mul_2exp_si(acb_mat_entry(B, i, j), acb_mat_entry(A, i, j), c);
-}
+void acb_mat_scalar_mul_si(acb_mat_t B, const acb_mat_t A, slong c, slong prec);
+void acb_mat_scalar_mul_fmpz(acb_mat_t B, const acb_mat_t A, const fmpz_t c, slong prec);
+void acb_mat_scalar_mul_arb(acb_mat_t B, const acb_mat_t A, const arb_t c, slong prec);
+void acb_mat_scalar_mul_acb(acb_mat_t B, const acb_mat_t A, const acb_t c, slong prec);
 
-ACB_MAT_INLINE void
-acb_mat_scalar_addmul_si(acb_mat_t B, const acb_mat_t A, slong c, slong prec)
-{
-    slong i, j;
+void acb_mat_scalar_addmul_si(acb_mat_t B, const acb_mat_t A, slong c, slong prec);
+void acb_mat_scalar_addmul_fmpz(acb_mat_t B, const acb_mat_t A, const fmpz_t c, slong prec);
+void acb_mat_scalar_addmul_arb(acb_mat_t B, const acb_mat_t A, const arb_t c, slong prec);
+void acb_mat_scalar_addmul_acb(acb_mat_t B, const acb_mat_t A, const acb_t c, slong prec);
 
-    for (i = 0; i < acb_mat_nrows(A); i++)
-        for (j = 0; j < acb_mat_ncols(A); j++)
-            acb_addmul_si(acb_mat_entry(B, i, j), acb_mat_entry(A, i, j), c, prec);
-}
-
-ACB_MAT_INLINE void
-acb_mat_scalar_mul_si(acb_mat_t B, const acb_mat_t A, slong c, slong prec)
-{
-    slong i, j;
-
-    for (i = 0; i < acb_mat_nrows(A); i++)
-        for (j = 0; j < acb_mat_ncols(A); j++)
-            acb_mul_si(acb_mat_entry(B, i, j), acb_mat_entry(A, i, j), c, prec);
-}
-
-ACB_MAT_INLINE void
-acb_mat_scalar_div_si(acb_mat_t B, const acb_mat_t A, slong c, slong prec)
-{
-    slong i, j;
-
-    for (i = 0; i < acb_mat_nrows(A); i++)
-        for (j = 0; j < acb_mat_ncols(A); j++)
-            acb_div_si(acb_mat_entry(B, i, j), acb_mat_entry(A, i, j), c, prec);
-}
-
-ACB_MAT_INLINE void
-acb_mat_scalar_addmul_fmpz(acb_mat_t B, const acb_mat_t A, const fmpz_t c, slong prec)
-{
-    slong i, j;
-
-    for (i = 0; i < acb_mat_nrows(A); i++)
-        for (j = 0; j < acb_mat_ncols(A); j++)
-            acb_addmul_fmpz(acb_mat_entry(B, i, j), acb_mat_entry(A, i, j), c, prec);
-}
-
-ACB_MAT_INLINE void
-acb_mat_scalar_mul_fmpz(acb_mat_t B, const acb_mat_t A, const fmpz_t c, slong prec)
-{
-    slong i, j;
-
-    for (i = 0; i < acb_mat_nrows(A); i++)
-        for (j = 0; j < acb_mat_ncols(A); j++)
-            acb_mul_fmpz(acb_mat_entry(B, i, j), acb_mat_entry(A, i, j), c, prec);
-}
-
-ACB_MAT_INLINE void
-acb_mat_scalar_div_fmpz(acb_mat_t B, const acb_mat_t A, const fmpz_t c, slong prec)
-{
-    slong i, j;
-
-    for (i = 0; i < acb_mat_nrows(A); i++)
-        for (j = 0; j < acb_mat_ncols(A); j++)
-            acb_div_fmpz(acb_mat_entry(B, i, j), acb_mat_entry(A, i, j), c, prec);
-}
-
-ACB_MAT_INLINE void
-acb_mat_scalar_addmul_acb(acb_mat_t B, const acb_mat_t A, const acb_t c, slong prec)
-{
-    slong i, j;
-
-    for (i = 0; i < acb_mat_nrows(A); i++)
-        for (j = 0; j < acb_mat_ncols(A); j++)
-            acb_addmul(acb_mat_entry(B, i, j), acb_mat_entry(A, i, j), c, prec);
-}
-
-ACB_MAT_INLINE void
-acb_mat_scalar_mul_acb(acb_mat_t B, const acb_mat_t A, const acb_t c, slong prec)
-{
-    slong i, j;
-
-    for (i = 0; i < acb_mat_nrows(A); i++)
-        for (j = 0; j < acb_mat_ncols(A); j++)
-            acb_mul(acb_mat_entry(B, i, j), acb_mat_entry(A, i, j), c, prec);
-}
-
-ACB_MAT_INLINE void
-acb_mat_scalar_div_acb(acb_mat_t B, const acb_mat_t A, const acb_t c, slong prec)
-{
-    slong i, j;
-
-    for (i = 0; i < acb_mat_nrows(A); i++)
-        for (j = 0; j < acb_mat_ncols(A); j++)
-            acb_div(acb_mat_entry(B, i, j), acb_mat_entry(A, i, j), c, prec);
-}
-
-ACB_MAT_INLINE void
-acb_mat_scalar_addmul_arb(acb_mat_t B, const acb_mat_t A, const arb_t c, slong prec)
-{
-    slong i, j;
-
-    for (i = 0; i < acb_mat_nrows(A); i++)
-        for (j = 0; j < acb_mat_ncols(A); j++)
-            acb_addmul_arb(acb_mat_entry(B, i, j), acb_mat_entry(A, i, j), c, prec);
-}
-
-ACB_MAT_INLINE void
-acb_mat_scalar_mul_arb(acb_mat_t B, const acb_mat_t A, const arb_t c, slong prec)
-{
-    slong i, j;
-
-    for (i = 0; i < acb_mat_nrows(A); i++)
-        for (j = 0; j < acb_mat_ncols(A); j++)
-            acb_mul_arb(acb_mat_entry(B, i, j), acb_mat_entry(A, i, j), c, prec);
-}
-
-ACB_MAT_INLINE void
-acb_mat_scalar_div_arb(acb_mat_t B, const acb_mat_t A, const arb_t c, slong prec)
-{
-    slong i, j;
-
-    for (i = 0; i < acb_mat_nrows(A); i++)
-        for (j = 0; j < acb_mat_ncols(A); j++)
-            acb_div_arb(acb_mat_entry(B, i, j), acb_mat_entry(A, i, j), c, prec);
-}
+void acb_mat_scalar_div_si(acb_mat_t B, const acb_mat_t A, slong c, slong prec);
+void acb_mat_scalar_div_fmpz(acb_mat_t B, const acb_mat_t A, const fmpz_t c, slong prec);
+void acb_mat_scalar_div_arb(acb_mat_t B, const acb_mat_t A, const arb_t c, slong prec);
+void acb_mat_scalar_div_acb(acb_mat_t B, const acb_mat_t A, const acb_t c, slong prec);
 
 /* Vector arithmetic */
 
@@ -454,11 +311,7 @@ void acb_mat_trace(acb_t trace, const acb_mat_t mat, slong prec);
 void _acb_mat_diag_prod(acb_t res, const acb_mat_t A, slong a, slong b, slong prec);
 void acb_mat_diag_prod(acb_t res, const acb_mat_t A, slong prec);
 
-ACB_MAT_INLINE slong
-acb_mat_allocated_bytes(const acb_mat_t x)
-{
-    return _acb_vec_allocated_bytes(x->entries, x->r * x->c) + x->r * sizeof(acb_ptr);
-}
+slong acb_mat_allocated_bytes(const acb_mat_t x);
 
 #ifdef __cplusplus
 }
