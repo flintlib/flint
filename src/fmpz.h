@@ -19,7 +19,6 @@
 #endif
 
 #include "fmpz_types.h"
-#include "longlong.h"
 
 #ifdef __cplusplus
 extern "C" {
