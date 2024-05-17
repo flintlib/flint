@@ -12,7 +12,7 @@
 #ifndef ACB_DFT_H
 #define ACB_DFT_H
 
-#include "ulong_extras.h"
+#include "limb_types.h"
 #include "acb.h"
 
 #ifdef __cplusplus
