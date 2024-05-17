@@ -12,7 +12,7 @@
 #ifndef ARB_HYPGEOM_H
 #define ARB_HYPGEOM_H
 
-#include "arb.h"
+#include "arb_types.h"
 
 #ifdef __cplusplus
 extern "C" {
