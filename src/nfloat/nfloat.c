@@ -1012,7 +1012,7 @@ _nfloat_add_4(nfloat_ptr res, nn_srcptr x, slong xexp, int xsgnbit, nn_srcptr y,
 }
 
 int
-_nfloat_sub_1(nfloat_ptr res, mp_limb_t x0, slong xexp, int xsgnbit, mp_limb_t y0, slong delta, gr_ctx_t ctx)
+_nfloat_sub_1(nfloat_ptr res, ulong x0, slong xexp, int xsgnbit, ulong y0, slong delta, gr_ctx_t ctx)
 {
     ulong u, u0;
     slong norm = 0;
@@ -2465,7 +2465,6 @@ _nfloat_vec_mul_scalar(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_srcptr
 
     return status;
 }
-
 int
 nfloat_mul_2exp_si(nfloat_ptr res, nfloat_srcptr x, slong y, gr_ctx_t ctx)
 {
@@ -2486,6 +2485,385 @@ nfloat_mul_2exp_si(nfloat_ptr res, nfloat_srcptr x, slong y, gr_ctx_t ctx)
     }
 }
 
+int
+nfloat_addmul(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx)
+{
+    ulong t[NFLOAT_MAX_ALLOC];
+    int status;
+
+    status = nfloat_mul(t, x, y, ctx);
+    status |= nfloat_add(res, res, t, ctx);
+    return status;
+}
+
+int
+nfloat_submul(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx)
+{
+    ulong t[NFLOAT_MAX_ALLOC];
+    int status;
+
+    status = nfloat_mul(t, x, y, ctx);
+    status |= nfloat_sub(res, res, t, ctx);
+    return status;
+}
+
+/* No infs or nans allowed by context; y != 0 */
+int
+_nfloat_vec_aorsmul_scalar_1(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_srcptr y, int subtract, gr_ctx_t ctx)
+{
+    slong yexp, rexp, texp;
+    slong i, stride;
+    nfloat_srcptr xi;
+    nfloat_ptr ri;
+    ulong t[NFLOAT_HEADER_LIMBS + 1];
+    ulong y0, hi, lo;
+    int rsgnbit, tsgnbit, ysgnbit;
+    int status = GR_SUCCESS;
+
+    yexp = NFLOAT_EXP(y);
+    ysgnbit = NFLOAT_SGNBIT(y) ^ subtract;
+    y0 = NFLOAT_D(y)[0];
+
+    stride = NFLOAT_HEADER_LIMBS + 1;
+
+    for (i = 0; i < len; i++)
+    {
+        xi = (nn_srcptr) x + i * stride;
+        ri = (nn_ptr) res + i * stride;
+
+        if (NFLOAT_IS_ZERO(xi))
+            continue;
+
+        /* status |= nfloat_mul(t, xi, y, ctx); */
+        umul_ppmm(hi, lo, NFLOAT_D(xi)[0], y0);
+
+        if (LIMB_MSB_IS_SET(hi))
+        {
+            NFLOAT_D(t)[0] = hi;
+            NFLOAT_EXP(t) = NFLOAT_EXP(xi) + yexp;
+        }
+        else
+        {
+            NFLOAT_D(t)[0] = (hi << 1) | (lo >> (FLINT_BITS - 1));
+            NFLOAT_EXP(t) = NFLOAT_EXP(xi) + yexp - 1;
+        }
+
+        NFLOAT_SGNBIT(t) = NFLOAT_SGNBIT(xi) ^ ysgnbit;
+        texp = NFLOAT_EXP(t);
+
+        /* The product could have underflowed or overflowed. By assumption that
+           we have no infs or nans, quit. */
+        if (FLINT_UNLIKELY(texp < NFLOAT_MIN_EXP || texp > NFLOAT_MAX_EXP))
+            return GR_UNABLE;
+
+        if (NFLOAT_IS_ZERO(ri))
+        {
+            flint_mpn_copyi(ri, t, NFLOAT_HEADER_LIMBS + 1);
+            continue;
+        }
+
+        rexp = NFLOAT_EXP(ri);
+        tsgnbit = NFLOAT_SGNBIT(t);
+        rsgnbit = NFLOAT_SGNBIT(ri);
+
+        if (rexp >= texp)
+            status |= (NFLOAT_SGNBIT(t) == NFLOAT_SGNBIT(ri) ? _nfloat_add_1 : _nfloat_sub_1)(ri, NFLOAT_D(ri)[0], rexp, rsgnbit, NFLOAT_D(t)[0], rexp - texp, ctx);
+        else
+            status |= (NFLOAT_SGNBIT(t) == NFLOAT_SGNBIT(ri) ? _nfloat_add_1 : _nfloat_sub_1)(ri, NFLOAT_D(t)[0], texp, tsgnbit, NFLOAT_D(ri)[0], texp - rexp, ctx);
+    }
+
+    return status;
+}
+
+/* No infs or nans allowed by context; y != 0 */
+int
+_nfloat_vec_aorsmul_scalar_2(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_srcptr y, int subtract, gr_ctx_t ctx)
+{
+    slong yexp, rexp, texp;
+    slong i, stride;
+    nfloat_srcptr xi;
+    nfloat_ptr ri;
+    ulong t[NFLOAT_HEADER_LIMBS + 2];
+    ulong y0, y1, r3, r2, r1, FLINT_SET_BUT_UNUSED(r0);
+    int rsgnbit, tsgnbit, ysgnbit;
+    int status = GR_SUCCESS;
+
+    yexp = NFLOAT_EXP(y);
+    ysgnbit = NFLOAT_SGNBIT(y) ^ subtract;
+    y0 = NFLOAT_D(y)[0];
+    y1 = NFLOAT_D(y)[1];
+
+    stride = NFLOAT_HEADER_LIMBS + 2;
+
+    for (i = 0; i < len; i++)
+    {
+        xi = (nn_srcptr) x + i * stride;
+        ri = (nn_ptr) res + i * stride;
+
+        if (NFLOAT_IS_ZERO(xi))
+            continue;
+
+        /* status |= nfloat_mul(t, xi, y, ctx); */
+
+        FLINT_MPN_MUL_2X2(r3, r2, r1, r0, NFLOAT_D(xi)[1], NFLOAT_D(xi)[0], y1, y0);
+
+        if (LIMB_MSB_IS_SET(r3))
+        {
+            NFLOAT_D(t)[0] = r2;
+            NFLOAT_D(t)[1] = r3;
+            NFLOAT_EXP(t) = NFLOAT_EXP(xi) + yexp;
+        }
+        else
+        {
+            NFLOAT_D(t)[0] = (r2 << 1) | (r1 >> (FLINT_BITS - 1));
+            NFLOAT_D(t)[1] = (r3 << 1) | (r2 >> (FLINT_BITS - 1));
+            NFLOAT_EXP(t) = NFLOAT_EXP(xi) + yexp - 1;
+        }
+
+        NFLOAT_SGNBIT(t) = NFLOAT_SGNBIT(xi) ^ ysgnbit;
+        texp = NFLOAT_EXP(t);
+
+        /* The product could have underflowed or overflowed. By assumption that
+           we have no infs or nans, quit. */
+        if (FLINT_UNLIKELY(texp < NFLOAT_MIN_EXP || texp > NFLOAT_MAX_EXP))
+            return GR_UNABLE;
+
+        if (NFLOAT_IS_ZERO(ri))
+        {
+            flint_mpn_copyi(ri, t, NFLOAT_HEADER_LIMBS + 2);
+            continue;
+        }
+
+        rexp = NFLOAT_EXP(ri);
+        tsgnbit = NFLOAT_SGNBIT(t);
+        rsgnbit = NFLOAT_SGNBIT(ri);
+
+        if (rexp >= texp)
+            status |= (NFLOAT_SGNBIT(t) == NFLOAT_SGNBIT(ri) ? _nfloat_add_2 : _nfloat_sub_2)(ri, NFLOAT_D(ri), rexp, rsgnbit, NFLOAT_D(t), rexp - texp, ctx);
+        else
+            status |= (NFLOAT_SGNBIT(t) == NFLOAT_SGNBIT(ri) ? _nfloat_add_2 : _nfloat_sub_2)(ri, NFLOAT_D(t), texp, tsgnbit, NFLOAT_D(ri), texp - rexp, ctx);
+    }
+
+    return status;
+}
+
+/* No infs or nans allowed by context; y != 0 */
+int
+_nfloat_vec_aorsmul_scalar_3(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_srcptr y, int subtract, gr_ctx_t ctx)
+{
+    slong yexp, rexp, texp;
+    slong i, stride;
+    nfloat_srcptr xi;
+    nfloat_ptr ri;
+    ulong t[NFLOAT_HEADER_LIMBS + 3];
+    int rsgnbit, tsgnbit, ysgnbit;
+    int status = GR_SUCCESS;
+    mp_limb_pair_t mul_res;
+
+    yexp = NFLOAT_EXP(y);
+    ysgnbit = NFLOAT_SGNBIT(y) ^ subtract;
+
+    stride = NFLOAT_HEADER_LIMBS + 3;
+
+    for (i = 0; i < len; i++)
+    {
+        xi = (nn_srcptr) x + i * stride;
+        ri = (nn_ptr) res + i * stride;
+
+        if (NFLOAT_IS_ZERO(xi))
+            continue;
+
+        /* status |= nfloat_mul(t, xi, y, ctx); */
+        mul_res = flint_mpn_mulhigh_normalised2(NFLOAT_D(t), NFLOAT_D(xi), NFLOAT_D(y), 3);
+        NFLOAT_EXP(t) = NFLOAT_EXP(xi) + yexp - mul_res.m2;
+        NFLOAT_SGNBIT(t) = NFLOAT_SGNBIT(xi) ^ ysgnbit;
+        texp = NFLOAT_EXP(t);
+
+        /* The product could have underflowed or overflowed. By assumption that
+           we have no infs or nans, quit. */
+        if (FLINT_UNLIKELY(texp < NFLOAT_MIN_EXP || texp > NFLOAT_MAX_EXP))
+            return GR_UNABLE;
+
+        if (NFLOAT_IS_ZERO(ri))
+        {
+            flint_mpn_copyi(ri, t, NFLOAT_HEADER_LIMBS + 3);
+            continue;
+        }
+
+        rexp = NFLOAT_EXP(ri);
+        tsgnbit = NFLOAT_SGNBIT(t);
+        rsgnbit = NFLOAT_SGNBIT(ri);
+
+        if (rexp >= texp)
+            status |= (NFLOAT_SGNBIT(t) == NFLOAT_SGNBIT(ri) ? _nfloat_add_3 : _nfloat_sub_3)(ri, NFLOAT_D(ri), rexp, rsgnbit, NFLOAT_D(t), rexp - texp, ctx);
+        else
+            status |= (NFLOAT_SGNBIT(t) == NFLOAT_SGNBIT(ri) ? _nfloat_add_3 : _nfloat_sub_3)(ri, NFLOAT_D(t), texp, tsgnbit, NFLOAT_D(ri), texp - rexp, ctx);
+    }
+
+    return status;
+}
+
+int
+_nfloat_vec_aorsmul_scalar_4(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_srcptr y, int subtract, gr_ctx_t ctx)
+{
+    slong yexp, rexp, texp;
+    slong i, stride;
+    nfloat_srcptr xi;
+    nfloat_ptr ri;
+    ulong t[NFLOAT_HEADER_LIMBS + 4];
+    int rsgnbit, tsgnbit, ysgnbit;
+    int status = GR_SUCCESS;
+    mp_limb_pair_t mul_res;
+
+    yexp = NFLOAT_EXP(y);
+    ysgnbit = NFLOAT_SGNBIT(y) ^ subtract;
+
+    stride = NFLOAT_HEADER_LIMBS + 4;
+
+    for (i = 0; i < len; i++)
+    {
+        xi = (nn_srcptr) x + i * stride;
+        ri = (nn_ptr) res + i * stride;
+
+        if (NFLOAT_IS_ZERO(xi))
+            continue;
+
+        /* status |= nfloat_mul(t, xi, y, ctx); */
+        mul_res = flint_mpn_mulhigh_normalised2(NFLOAT_D(t), NFLOAT_D(xi), NFLOAT_D(y), 4);
+        NFLOAT_EXP(t) = NFLOAT_EXP(xi) + yexp - mul_res.m2;
+        NFLOAT_SGNBIT(t) = NFLOAT_SGNBIT(xi) ^ ysgnbit;
+        texp = NFLOAT_EXP(t);
+
+        /* The product could have underflowed or overflowed. By assumption that
+           we have no infs or nans, quit. */
+        if (FLINT_UNLIKELY(texp < NFLOAT_MIN_EXP || texp > NFLOAT_MAX_EXP))
+            return GR_UNABLE;
+
+        if (NFLOAT_IS_ZERO(ri))
+        {
+            flint_mpn_copyi(ri, t, NFLOAT_HEADER_LIMBS + 4);
+            continue;
+        }
+
+        rexp = NFLOAT_EXP(ri);
+        tsgnbit = NFLOAT_SGNBIT(t);
+        rsgnbit = NFLOAT_SGNBIT(ri);
+
+        if (rexp >= texp)
+            status |= (NFLOAT_SGNBIT(t) == NFLOAT_SGNBIT(ri) ? _nfloat_add_4 : _nfloat_sub_4)(ri, NFLOAT_D(ri), rexp, rsgnbit, NFLOAT_D(t), rexp - texp, ctx);
+        else
+            status |= (NFLOAT_SGNBIT(t) == NFLOAT_SGNBIT(ri) ? _nfloat_add_4 : _nfloat_sub_4)(ri, NFLOAT_D(t), texp, tsgnbit, NFLOAT_D(ri), texp - rexp, ctx);
+    }
+
+    return status;
+}
+
+int
+_nfloat_vec_aorsmul_scalar_n(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_srcptr y, int subtract, slong nlimbs, gr_ctx_t ctx)
+{
+    slong yexp, rexp, texp;
+    slong i, stride;
+    nfloat_srcptr xi;
+    nfloat_ptr ri;
+    ulong t[NFLOAT_MAX_ALLOC];
+    int rsgnbit, tsgnbit, ysgnbit;
+    int status = GR_SUCCESS;
+    mp_limb_pair_t mul_res;
+
+    yexp = NFLOAT_EXP(y);
+    ysgnbit = NFLOAT_SGNBIT(y) ^ subtract;
+
+    stride = NFLOAT_HEADER_LIMBS + nlimbs;
+
+    for (i = 0; i < len; i++)
+    {
+        xi = (nn_srcptr) x + i * stride;
+        ri = (nn_ptr) res + i * stride;
+
+        if (NFLOAT_IS_ZERO(xi))
+            continue;
+
+        /* status |= nfloat_mul(t, xi, y, ctx); */
+        mul_res = flint_mpn_mulhigh_normalised2(NFLOAT_D(t), NFLOAT_D(xi), NFLOAT_D(y), nlimbs);
+        NFLOAT_EXP(t) = NFLOAT_EXP(xi) + yexp - mul_res.m2;
+        NFLOAT_SGNBIT(t) = NFLOAT_SGNBIT(xi) ^ ysgnbit;
+        texp = NFLOAT_EXP(t);
+
+        /* The product could have underflowed or overflowed. By assumption that
+           we have no infs or nans, quit. */
+        if (FLINT_UNLIKELY(texp < NFLOAT_MIN_EXP || texp > NFLOAT_MAX_EXP))
+            return GR_UNABLE;
+
+        if (NFLOAT_IS_ZERO(ri))
+        {
+            flint_mpn_copyi(ri, t, NFLOAT_HEADER_LIMBS + nlimbs);
+            continue;
+        }
+
+        rexp = NFLOAT_EXP(ri);
+        tsgnbit = NFLOAT_SGNBIT(t);
+        rsgnbit = NFLOAT_SGNBIT(ri);
+
+        if (rexp >= texp)
+            status |= (NFLOAT_SGNBIT(t) == NFLOAT_SGNBIT(ri) ? _nfloat_add_n : _nfloat_sub_n)(ri, NFLOAT_D(ri), rexp, rsgnbit, NFLOAT_D(t), rexp - texp, nlimbs, ctx);
+        else
+            status |= (NFLOAT_SGNBIT(t) == NFLOAT_SGNBIT(ri) ? _nfloat_add_n : _nfloat_sub_n)(ri, NFLOAT_D(t), texp, tsgnbit, NFLOAT_D(ri), texp - rexp, nlimbs, ctx);
+    }
+
+    return status;
+}
+
+int
+_nfloat_vec_addmul_scalar(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_srcptr y, gr_ctx_t ctx)
+{
+    if (!NFLOAT_CTX_HAS_INF_NAN(ctx))
+    {
+        slong nlimbs = NFLOAT_CTX_NLIMBS(ctx);
+
+        if (NFLOAT_IS_ZERO(y))
+            return GR_SUCCESS;
+
+        if (nlimbs == 1)
+            return _nfloat_vec_aorsmul_scalar_1(res, x, len, y, 0, ctx);
+        if (nlimbs == 2)
+            return _nfloat_vec_aorsmul_scalar_2(res, x, len, y, 0, ctx);
+        if (nlimbs == 3)
+            return _nfloat_vec_aorsmul_scalar_3(res, x, len, y, 0, ctx);
+        if (nlimbs == 4)
+            return _nfloat_vec_aorsmul_scalar_4(res, x, len, y, 0, ctx);
+        return _nfloat_vec_aorsmul_scalar_n(res, x, len, y, 0, nlimbs, ctx);
+    }
+    else
+    {
+        return gr_generic_vec_scalar_addmul(res, x, len, y, ctx);
+    }
+}
+
+int
+_nfloat_vec_submul_scalar(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat_srcptr y, gr_ctx_t ctx)
+{
+    if (!NFLOAT_CTX_HAS_INF_NAN(ctx))
+    {
+        slong nlimbs = NFLOAT_CTX_NLIMBS(ctx);
+
+        if (NFLOAT_IS_ZERO(y))
+            return GR_SUCCESS;
+
+        if (nlimbs == 1)
+            return _nfloat_vec_aorsmul_scalar_1(res, x, len, y, 1, ctx);
+        if (nlimbs == 2)
+            return _nfloat_vec_aorsmul_scalar_2(res, x, len, y, 1, ctx);
+        if (nlimbs == 3)
+            return _nfloat_vec_aorsmul_scalar_3(res, x, len, y, 1, ctx);
+        if (nlimbs == 4)
+            return _nfloat_vec_aorsmul_scalar_4(res, x, len, y, 1, ctx);
+        return _nfloat_vec_aorsmul_scalar_n(res, x, len, y, 1, nlimbs, ctx);
+    }
+    else
+    {
+        return gr_generic_vec_scalar_submul(res, x, len, y, ctx);
+    }
+}
 
 int
 nfloat_inv(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx)
