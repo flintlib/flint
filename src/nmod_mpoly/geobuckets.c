@@ -9,9 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpoly.h"
+#include "longlong.h"
 #include "nmod_mpoly.h"
 
+FLINT_FORCE_INLINE
+slong clog4(slong x)
+{
+    return (x <= 4) ? 0 : (slong) ((FLINT_BIT_COUNT(x - 1) - UWORD(1)) / UWORD(2));
+}
 
 void nmod_mpoly_geobucket_init(nmod_mpoly_geobucket_t B,
                                                     const nmod_mpoly_ctx_t ctx)
@@ -77,7 +82,7 @@ void nmod_mpoly_geobucket_fit_length(nmod_mpoly_geobucket_t B, slong len,
 void nmod_mpoly_geobucket_set(nmod_mpoly_geobucket_t B, nmod_mpoly_t p,
                                                     const nmod_mpoly_ctx_t ctx)
 {
-    slong i = mpoly_geobucket_clog4(p->length);
+    slong i = clog4(p->length);
     B->length = 0;
     nmod_mpoly_geobucket_fit_length(B, i + 1, ctx);
     nmod_mpoly_swap(B->polys + i, p, ctx);
@@ -88,7 +93,7 @@ void nmod_mpoly_geobucket_set(nmod_mpoly_geobucket_t B, nmod_mpoly_t p,
 void _nmod_mpoly_geobucket_fix(nmod_mpoly_geobucket_t B, slong i,
                                                     const nmod_mpoly_ctx_t ctx)
 {
-    while (mpoly_geobucket_clog4((B->polys + i)->length) > i)
+    while (clog4((B->polys + i)->length) > i)
     {
         FLINT_ASSERT(i + 1 <= B->length);
         if (i + 1 == B->length)
@@ -115,7 +120,7 @@ void nmod_mpoly_geobucket_add(nmod_mpoly_geobucket_t B, nmod_mpoly_t p,
     if (nmod_mpoly_is_zero(p, ctx))
         return;
 
-    i = mpoly_geobucket_clog4(p->length);
+    i = clog4(p->length);
     nmod_mpoly_geobucket_fit_length(B, i + 1, ctx);
     nmod_mpoly_add(B->temps + i, B->polys + i, p, ctx);
     nmod_mpoly_swap(B->polys + i, B->temps + i, ctx);
@@ -131,7 +136,7 @@ void nmod_mpoly_geobucket_sub(nmod_mpoly_geobucket_t B, nmod_mpoly_t p,
     if (nmod_mpoly_is_zero(p, ctx))
         return;
 
-    i = mpoly_geobucket_clog4(p->length);
+    i = clog4(p->length);
     nmod_mpoly_geobucket_fit_length(B, i + 1, ctx);
     nmod_mpoly_sub(B->temps + i, B->polys + i, p, ctx);
     nmod_mpoly_swap(B->polys + i, B->temps + i, ctx);

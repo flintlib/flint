@@ -10,6 +10,7 @@
 */
 
 #include <string.h>
+#include <gmp.h>
 #include "mpoly.h"
 #include "fmpq_mpoly.h"
 
