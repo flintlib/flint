@@ -1385,24 +1385,32 @@ Special matrices
 Conversions
 --------------------------------------------------------------------------------
 
-
 .. function:: int fmpz_mat_get_d_mat(d_mat_t B, const fmpz_mat_t A)
+              int fmpz_mat_get_d_mat_transpose(d_mat_t B, const fmpz_mat_t A)
 
-    Sets the entries of ``B`` as doubles corresponding to the entries of
-    ``A``, rounding down towards zero if the latter cannot be represented
-    exactly. The return value is -1 if any entry of ``A`` is too large to
-    fit in the normal range of a double, and 0 otherwise.
+    Sets the entries of *B* as doubles corresponding to the entries of *A* and
+    the transpose of *A*, respectively, rounding down towards zero if the latter
+    cannot be represented exactly. The return value is -1 if any entry of ``A``
+    is too large to fit in the normal range of a double, and 0 otherwise.
 
-.. function:: int fmpz_mat_get_d_mat_transpose(d_mat_t B, const fmpz_mat_t A)
+.. note::
 
-    Sets the entries of ``B`` as doubles corresponding to the entries of
-    the transpose of ``A``, rounding down towards zero if the latter cannot
-    be represented exactly. The return value is -1 if any entry of ``A`` is
-    too large to fit in the normal range of a double, and 0 otherwise.
-
+    Requires ``d_mat.h`` to be included before ``fmpz_mat.h`` in order to
+    declare these functions.
 
 Cholesky Decomposition
 --------------------------------------------------------------------------------
+
+.. function:: void fmpz_mat_chol_d(d_mat_t R, const fmpz_mat_t A)
+
+    Computes ``R``, the Cholesky factor of a symmetric, positive definite
+    matrix ``A`` using the Cholesky decomposition process. (Sets ``R``
+    such that `A = RR^{T}` where ``R`` is a lower triangular matrix.)
+
+.. note::
+
+    Requires ``d_mat.h`` to be included before ``fmpz_mat.h`` in order to
+    declare this function.
 
 .. function:: void fmpz_mat_is_spd(const fmpz_mat_t A)
 
@@ -1413,13 +1421,6 @@ Cholesky Decomposition
     :func:`arb_mat_ldl`. If we cannot guarantee that `A` is positive definite,
     we use an exact method instead, computing the characteristic polynomial of
     `A` and applying Descartes' rule of signs.
-
-.. function:: void fmpz_mat_chol_d(d_mat_t R, const fmpz_mat_t A)
-
-    Computes ``R``, the Cholesky factor of a symmetric, positive definite
-    matrix ``A`` using the Cholesky decomposition process. (Sets ``R``
-    such that `A = RR^{T}` where ``R`` is a lower triangular matrix.)
-
 
 LLL
 --------------------------------------------------------------------------------

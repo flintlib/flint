@@ -9,8 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "acb_dirichlet.h"
+#include "arb.h"
 #include "arb_hypgeom.h"
+#include "acb_dirichlet.h"
 
 /* c1 = 4*zeta(sigma)/(2*sigma-1) * pi^((-3-2*sigma)/4) * exp(...) */
 static void

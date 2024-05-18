@@ -21,7 +21,6 @@
 
 #include "fmpz_types.h"
 #include "nmod_types.h"
-#include "d_mat.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -65,8 +64,6 @@ int fmpz_mat_is_one(const fmpz_mat_t mat);
 
 int fmpz_mat_is_zero_row(const fmpz_mat_t mat, slong i);
 
-#define fmpz_mat_col_equal(M, m, n) _Pragma("GCC warning \"'fmpz_mat_col_equal' is deprecated in favor for 'fmpz_mat_equal_col'\"") fmpz_mat_equal_col(M, m, n)
-#define fmpz_mat_row_equal(M, m, n) _Pragma("GCC warning \"'fmpz_mat_row_equal' is deprecated in favor for 'fmpz_mat_equal_row'\"") fmpz_mat_equal_row(M, m, n)
 int fmpz_mat_equal_col(fmpz_mat_t M, slong m, slong n);
 int fmpz_mat_equal_row(fmpz_mat_t M, slong m, slong n);
 
@@ -172,48 +169,28 @@ void fmpz_mat_mul_classical(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B
 void fmpz_mat_mul_waksman(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
 void fmpz_mat_mul_strassen(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
 
-#define fmpz_mat_mul_classical_inline _Pragma("GCC error \"'fmpz_mat_mul_classical_inline' is deprecated. Use 'fmpz_mat_mul_classical' instead.\"")
-
-void _fmpz_mat_mul_fft(fmpz_mat_t C,
-                                    const fmpz_mat_t A, slong abits,
-                                    const fmpz_mat_t B, slong bbits, int sign);
-
+void _fmpz_mat_mul_fft(fmpz_mat_t C, const fmpz_mat_t A, slong abits, const fmpz_mat_t B, slong bbits, int sign);
 void fmpz_mat_mul_fft(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
 
-void _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A,
-                           const fmpz_mat_t B, int sign, flint_bitcnt_t Cbits);
+void _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B, int sign, flint_bitcnt_t Cbits);
+void fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
 
-void fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A,
-                                                           const fmpz_mat_t B);
+int _fmpz_mat_mul_blas(
+        fmpz_mat_t C,
+        const fmpz_mat_t A, flint_bitcnt_t Abits,
+        const fmpz_mat_t B, flint_bitcnt_t Bbits,
+        int sign, flint_bitcnt_t Cbits);
+int fmpz_mat_mul_blas(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
 
-int _fmpz_mat_mul_blas(fmpz_mat_t C,
-                                    const fmpz_mat_t A, flint_bitcnt_t Abits,
-                                    const fmpz_mat_t B, flint_bitcnt_t Bbits,
-                                               int sign, flint_bitcnt_t Cbits);
+void _fmpz_mat_mul_small_1(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
+void _fmpz_mat_mul_small_2a(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
+void _fmpz_mat_mul_small_2b(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
 
-int fmpz_mat_mul_blas(fmpz_mat_t C, const fmpz_mat_t A,
-                                                           const fmpz_mat_t B);
+void _fmpz_mat_mul_small_internal(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B, flint_bitcnt_t Cbits);
+void _fmpz_mat_mul_double_word_internal(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B, int sign, flint_bitcnt_t bits);
 
-void _fmpz_mat_mul_small_1(fmpz_mat_t C, const fmpz_mat_t A,
-                                                           const fmpz_mat_t B);
-
-void _fmpz_mat_mul_small_2a(fmpz_mat_t C, const fmpz_mat_t A,
-                                                           const fmpz_mat_t B);
-
-void _fmpz_mat_mul_small_2b(fmpz_mat_t C, const fmpz_mat_t A,
-                                                           const fmpz_mat_t B);
-
-void _fmpz_mat_mul_small_internal(fmpz_mat_t C, const fmpz_mat_t A,
-                                     const fmpz_mat_t B, flint_bitcnt_t Cbits);
-
-void _fmpz_mat_mul_small(fmpz_mat_t C, const fmpz_mat_t A,
-                                                           const fmpz_mat_t B);
-
-void _fmpz_mat_mul_double_word(fmpz_mat_t C, const fmpz_mat_t A,
-                                                           const fmpz_mat_t B);
-
-void _fmpz_mat_mul_double_word_internal(fmpz_mat_t C,
-        const fmpz_mat_t A, const fmpz_mat_t B, int sign, flint_bitcnt_t bits);
+void _fmpz_mat_mul_small(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
+void _fmpz_mat_mul_double_word(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
 
 void fmpz_mat_sqr_bodrato(fmpz_mat_t B, const fmpz_mat_t A);
 
@@ -221,17 +198,11 @@ void fmpz_mat_sqr(fmpz_mat_t B, const fmpz_mat_t A);
 
 void fmpz_mat_pow(fmpz_mat_t B, const fmpz_mat_t A, ulong exp);
 
-void fmpz_mat_mul_fmpz_vec(fmpz * c, const fmpz_mat_t A,
-                                                   const fmpz * b, slong blen);
+void fmpz_mat_mul_fmpz_vec(fmpz * c, const fmpz_mat_t A, const fmpz * b, slong blen);
+void fmpz_mat_mul_fmpz_vec_ptr(fmpz * const * c, const fmpz_mat_t A, const fmpz * const * b, slong blen);
 
-void fmpz_mat_mul_fmpz_vec_ptr(fmpz * const * c, const fmpz_mat_t A,
-                                           const fmpz * const * b, slong blen);
-
-void fmpz_mat_fmpz_vec_mul(fmpz * c, const fmpz * a, slong alen,
-                                                           const fmpz_mat_t B);
-
-void fmpz_mat_fmpz_vec_mul_ptr(fmpz * const * c,
-                       const fmpz * const * a, slong alen, const fmpz_mat_t B);
+void fmpz_mat_fmpz_vec_mul(fmpz * c, const fmpz * a, slong alen, const fmpz_mat_t B);
+void fmpz_mat_fmpz_vec_mul_ptr(fmpz * const * c, const fmpz * const * a, slong alen, const fmpz_mat_t B);
 
 /* Kronecker product */
 
@@ -260,21 +231,19 @@ void fmpz_mat_invert_cols(fmpz_mat_t mat, slong * perm);
 
 /* Gaussian elimination *****************************************************/
 
-slong fmpz_mat_find_pivot_any(const fmpz_mat_t mat,
-                                      slong start_row, slong end_row, slong c);
+slong fmpz_mat_find_pivot_any(const fmpz_mat_t mat, slong start_row, slong end_row, slong c);
 
-slong fmpz_mat_find_pivot_smallest(const fmpz_mat_t mat,
-                                      slong start_row, slong end_row, slong c);
+slong fmpz_mat_find_pivot_smallest(const fmpz_mat_t mat, slong start_row, slong end_row, slong c);
 
-slong fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, slong * perm,
-                            const fmpz_mat_t A, int rank_check);
+slong fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, slong * perm, const fmpz_mat_t A, int rank_check);
 
 slong fmpz_mat_rank_small_inplace(fmpz_mat_t B);
+
 slong fmpz_mat_rref(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A);
 slong fmpz_mat_rref_fflu(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A);
 slong fmpz_mat_rref_mul(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A);
-int fmpz_mat_is_in_rref_with_rank(const fmpz_mat_t A, const fmpz_t den,
-        slong rank);
+
+int fmpz_mat_is_in_rref_with_rank(const fmpz_mat_t A, const fmpz_t den, slong rank);
 
 /* Modular Howell and strong echelon form ***********************************/
 
@@ -288,19 +257,12 @@ void fmpz_mat_trace(fmpz_t trace, const fmpz_mat_t mat);
 
 /* Determinant **************************************************************/
 
-void fmpz_mat_det(fmpz_t det, const fmpz_mat_t A);
-
-void fmpz_mat_det_cofactor(fmpz_t det, const fmpz_mat_t A);
-
 void fmpz_mat_det_bareiss(fmpz_t det, const fmpz_mat_t A);
-
+void fmpz_mat_det_cofactor(fmpz_t det, const fmpz_mat_t A);
 void fmpz_mat_det_modular(fmpz_t det, const fmpz_mat_t A, int proved);
-
-void fmpz_mat_det_modular_accelerated(fmpz_t det,
-    const fmpz_mat_t A, int proved);
-
-void fmpz_mat_det_modular_given_divisor(fmpz_t det, const fmpz_mat_t A,
-        const fmpz_t d, int proved);
+void fmpz_mat_det_modular_accelerated(fmpz_t det, const fmpz_mat_t A, int proved);
+void fmpz_mat_det_modular_given_divisor(fmpz_t det, const fmpz_mat_t A, const fmpz_t d, int proved);
+void fmpz_mat_det(fmpz_t det, const fmpz_mat_t A);
 
 void fmpz_mat_det_bound(fmpz_t bound, const fmpz_mat_t A);
 void fmpz_mat_det_bound_nonzero(fmpz_t bound, const fmpz_mat_t A);
@@ -314,12 +276,9 @@ void fmpz_mat_similarity(fmpz_mat_t A, slong r, fmpz_t d);
 /* Characteristic polynomial ************************************************/
 
 void _fmpz_mat_charpoly_berkowitz(fmpz * rop, const fmpz_mat_t op);
-
-void fmpz_mat_charpoly_berkowitz(fmpz_poly_t cp,
-                                                          const fmpz_mat_t mat);
+void fmpz_mat_charpoly_berkowitz(fmpz_poly_t cp, const fmpz_mat_t mat);
 
 void _fmpz_mat_charpoly_modular(fmpz * rop, const fmpz_mat_t op);
-
 void fmpz_mat_charpoly_modular(fmpz_poly_t cp, const fmpz_mat_t mat);
 
 FMPZ_MAT_INLINE
@@ -342,7 +301,6 @@ void fmpz_mat_charpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
 /* Characteristic polynomial ************************************************/
 
 slong _fmpz_mat_minpoly_modular(fmpz * rop, const fmpz_mat_t op);
-
 void fmpz_mat_minpoly_modular(fmpz_poly_t cp, const fmpz_mat_t mat);
 
 FMPZ_MAT_INLINE
@@ -368,63 +326,37 @@ slong fmpz_mat_rank(const fmpz_mat_t A);
 
 /* Nonsingular solving *******************************************************/
 
-void fmpz_mat_solve_bound(fmpz_t N, fmpz_t D,
-                                       const fmpz_mat_t A, const fmpz_mat_t B);
+void fmpz_mat_solve_bound(fmpz_t N, fmpz_t D, const fmpz_mat_t A, const fmpz_mat_t B);
 
-int fmpz_mat_solve(fmpz_mat_t X, fmpz_t den,
-                                       const fmpz_mat_t A, const fmpz_mat_t B);
-
-int fmpz_mat_solve_cramer(fmpz_mat_t X, fmpz_t den,
-                                       const fmpz_mat_t A, const fmpz_mat_t B);
-
-int fmpz_mat_solve_fflu(fmpz_mat_t X, fmpz_t den,
-                                       const fmpz_mat_t A, const fmpz_mat_t B);
-
-int fmpz_mat_solve_fflu_precomp(fmpz_mat_t X, const slong * perm,
-                                    const fmpz_mat_t FFLU, const fmpz_mat_t B);
+int fmpz_mat_solve_cramer(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B);
+int fmpz_mat_solve_fflu_precomp(fmpz_mat_t X, const slong * perm, const fmpz_mat_t FFLU, const fmpz_mat_t B);
+int fmpz_mat_solve_fflu(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B);
+int fmpz_mat_solve(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B);
 
 ulong
 fmpz_mat_find_good_prime_and_invert(nmod_mat_t Ainv,
 		                   const fmpz_mat_t A, const fmpz_t det_bound);
 
-ulong *
-fmpz_mat_dixon_get_crt_primes(slong * num_primes,
-		                              const fmpz_mat_t A, ulong p);
+ulong * fmpz_mat_dixon_get_crt_primes(slong * num_primes, const fmpz_mat_t A, ulong p);
 
-void
-_fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
-		  const fmpz_mat_t A, const fmpz_mat_t B,
- 			       const nmod_mat_t Ainv, ulong p,
-                                               const fmpz_t N, const fmpz_t D);
+void _fmpz_mat_solve_dixon(
+        fmpz_mat_t X, fmpz_t mod,
+        const fmpz_mat_t A, const fmpz_mat_t B, const nmod_mat_t Ainv,
+        ulong p, const fmpz_t N, const fmpz_t D);
 
-int fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
-        const fmpz_mat_t A, const fmpz_mat_t B);
+void _fmpz_mat_solve_dixon_den(
+        fmpz_mat_t X, fmpz_t den,
+        const fmpz_mat_t A, const fmpz_mat_t B, const nmod_mat_t Ainv,
+        ulong p, const fmpz_t N, const fmpz_t D);
 
-void
-_fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
-                     const fmpz_mat_t A, const fmpz_mat_t B,
-                                 const nmod_mat_t Ainv, ulong p,
-                                               const fmpz_t N, const fmpz_t D);
+int fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod, const fmpz_mat_t A, const fmpz_mat_t B);
 
-int
-fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den,
-		                       const fmpz_mat_t A, const fmpz_mat_t B);
+int fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B);
+int fmpz_mat_solve_multi_mod_den(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B);
 
-int
-fmpz_mat_solve_multi_mod_den(fmpz_mat_t X, fmpz_t den,
-	                               const fmpz_mat_t A, const fmpz_mat_t B);
-
-int
-fmpz_mat_can_solve_multi_mod_den(fmpz_mat_t X, fmpz_t den,
-                                       const fmpz_mat_t A, const fmpz_mat_t B);
-
-int
-fmpz_mat_can_solve_fflu(fmpz_mat_t X, fmpz_t den,
- 		                       const fmpz_mat_t A, const fmpz_mat_t B);
-
-int
-fmpz_mat_can_solve(fmpz_mat_t X, fmpz_t den,
-                                       const fmpz_mat_t A, const fmpz_mat_t B);
+int fmpz_mat_can_solve_multi_mod_den(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B);
+int fmpz_mat_can_solve_fflu(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B);
+int fmpz_mat_can_solve(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B);
 
 /* Nullspace *****************************************************************/
 
@@ -461,13 +393,14 @@ void fmpz_mat_hnf_minors_transform(fmpz_mat_t H, fmpz_mat_t U, const fmpz_mat_t 
 void fmpz_mat_hnf_modular(fmpz_mat_t H, const fmpz_mat_t A, const fmpz_t D);
 void fmpz_mat_hnf_modular_eldiv(fmpz_mat_t A, const fmpz_t D);
 void fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A, flint_rand_t state);
+
 int fmpz_mat_is_in_hnf(const fmpz_mat_t A);
 
 void fmpz_mat_snf(fmpz_mat_t S, const fmpz_mat_t A);
 void fmpz_mat_snf_diagonal(fmpz_mat_t S, const fmpz_mat_t A);
 void fmpz_mat_snf_kannan_bachem(fmpz_mat_t S, const fmpz_mat_t A);
-void fmpz_mat_snf_iliopoulos(fmpz_mat_t S, const fmpz_mat_t A,
-        const fmpz_t mod);
+void fmpz_mat_snf_iliopoulos(fmpz_mat_t S, const fmpz_mat_t A, const fmpz_t mod);
+
 int fmpz_mat_is_in_snf(const fmpz_mat_t A);
 
 /* Special matrices **********************************************************/
@@ -484,21 +417,22 @@ int fmpz_mat_is_spd(const fmpz_mat_t A);
 
 /* Conversions **************************************************************/
 
+#if defined(D_MAT_H)
 int fmpz_mat_get_d_mat(d_mat_t B, const fmpz_mat_t A);
-
 int fmpz_mat_get_d_mat_transpose(d_mat_t B, const fmpz_mat_t A);
+#endif
 
 /* Cholesky Decomposition ****************************************************/
 
+#if defined(D_MAT_H)
 void fmpz_mat_chol_d(d_mat_t R, const fmpz_mat_t A);
+#endif
 
 /* LLL ***********************************************************************/
 
-int fmpz_mat_is_reduced(const fmpz_mat_t A,
-                                                     double delta, double eta);
+int fmpz_mat_is_reduced(const fmpz_mat_t A, double delta, double eta);
 
-int fmpz_mat_is_reduced_gram(const fmpz_mat_t A,
-                                                     double delta, double eta);
+int fmpz_mat_is_reduced_gram(const fmpz_mat_t A, double delta, double eta);
 
 int fmpz_mat_is_reduced_with_removal(const fmpz_mat_t A,
                         double delta, double eta, const fmpz_t gs_B, int newd);
@@ -508,23 +442,19 @@ int fmpz_mat_is_reduced_gram_with_removal(const fmpz_mat_t A,
 
 /* Classical LLL *************************************************************/
 
-void fmpz_mat_lll_original(fmpz_mat_t A,
-                                         const fmpq_t delta, const fmpq_t eta);
+void fmpz_mat_lll_original(fmpz_mat_t A, const fmpq_t delta, const fmpq_t eta);
 
 /* Modified LLL **************************************************************/
 
-void fmpz_mat_lll_storjohann(fmpz_mat_t A,
-                                         const fmpq_t delta, const fmpq_t eta);
+void fmpz_mat_lll_storjohann(fmpz_mat_t A, const fmpq_t delta, const fmpq_t eta);
 
 /* Column partitioning *******************************************************/
 
-int fmpz_mat_col_partition(slong * part,
-                                              fmpz_mat_t M, int short_circuit);
+int fmpz_mat_col_partition(slong * part, fmpz_mat_t M, int short_circuit);
 
 /* Van Hoeij helper function *************************************************/
 
-int fmpz_mat_next_col_van_hoeij(fmpz_mat_t M, fmpz_t P,
-                                       fmpz_mat_t col, slong exp, slong U_exp);
+int fmpz_mat_next_col_van_hoeij(fmpz_mat_t M, fmpz_t P, fmpz_mat_t col, slong exp, slong U_exp);
 
 #ifdef __cplusplus
 }

@@ -12,7 +12,7 @@
 #ifndef ACB_DFT_H
 #define ACB_DFT_H
 
-#include "ulong_extras.h"
+#include "limb_types.h"
 #include "acb.h"
 
 #ifdef __cplusplus
@@ -303,18 +303,6 @@ _acb_vec_kronecker_mul_step(acb_ptr z, acb_srcptr x, acb_srcptr y, slong step, s
     for (k = 0; k < len; k++)
     {
         acb_mul(z + k, x + k, y + k * step, prec);
-    }
-}
-
-FLINT_FORCE_INLINE void
-acb_vec_printd_index(acb_srcptr vec, slong len, slong digits)
-{
-    slong i;
-    for (i = 0; i < len; i++)
-    {
-        flint_printf("[%wd] ", i);
-        acb_printd(vec + i, digits);
-        flint_printf("\n");
     }
 }
 

@@ -10,10 +10,11 @@
 */
 
 #include <stdlib.h>
-#include "qqbar.h"
-#include "acb_poly.h"
-#include "arb_fmpz_poly.h"
+#include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
+#include "arb_fmpz_poly.h"
+#include "acb_poly.h"
+#include "qqbar.h"
 
 /*
 We convert an annihilating polynomial over QQbar to an annihilating polynomial

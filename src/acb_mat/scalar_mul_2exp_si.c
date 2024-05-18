@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014 Fredrik Johansson
+    Copyright (C) 2012 Fredrik Johansson
 
     This file is part of FLINT.
 
@@ -9,11 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "acb_modular.h"
-#include "acb_elliptic.h"
+#include "acb.h"
+#include "acb_mat.h"
 
-void
-acb_modular_elliptic_k(acb_t k, const acb_t m, slong prec)
+void acb_mat_scalar_mul_2exp_si(acb_mat_t B, const acb_mat_t A, slong c)
 {
-    acb_elliptic_k(k, m, prec);
+    slong i, j;
+
+    for (i = 0; i < acb_mat_nrows(A); i++)
+        for (j = 0; j < acb_mat_ncols(A); j++)
+            acb_mul_2exp_si(acb_mat_entry(B, i, j), acb_mat_entry(A, i, j), c);
 }

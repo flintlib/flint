@@ -9,18 +9,14 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "acb.h"
-#include "acb_mat.h"
+#include "arb.h"
+#include "arb_mat.h"
 
-void
-acb_mat_add(acb_mat_t res,
-        const acb_mat_t mat1, const acb_mat_t mat2, slong prec)
+void arb_mat_scalar_mul_2exp_si(arb_mat_t B, const arb_mat_t A, slong c)
 {
     slong i, j;
 
-    for (i = 0; i < acb_mat_nrows(mat1); i++)
-        for (j = 0; j < acb_mat_ncols(mat1); j++)
-            acb_add(acb_mat_entry(res, i, j),
-                acb_mat_entry(mat1, i, j),
-                acb_mat_entry(mat2, i, j), prec);
+    for (i = 0; i < arb_mat_nrows(A); i++)
+        for (j = 0; j < arb_mat_ncols(A); j++)
+            arb_mul_2exp_si(arb_mat_entry(B, i, j), arb_mat_entry(A, i, j), c);
 }

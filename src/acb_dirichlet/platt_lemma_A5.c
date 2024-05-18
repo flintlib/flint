@@ -9,8 +9,9 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "acb_dirichlet.h"
+#include "arb.h"
 #include "arb_hypgeom.h"
+#include "acb_dirichlet.h"
 
 /* Lemma A5 requires B > h*sqrt(k) */
 static int

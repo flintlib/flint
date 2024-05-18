@@ -10,6 +10,7 @@
 */
 
 #include "ulong_extras.h"
+#include "arb.h"
 #include "arb_hypgeom.h"
 
 #ifdef __GNUC__

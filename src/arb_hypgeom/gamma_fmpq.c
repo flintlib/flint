@@ -12,6 +12,7 @@
 #include "double_extras.h"
 #include "fmpz_poly.h"
 #include "fmpq.h"
+#include "arb.h"
 #include "arb_hypgeom.h"
 #include "hypgeom.h"
 
