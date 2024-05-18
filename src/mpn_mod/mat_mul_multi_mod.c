@@ -18,6 +18,7 @@
 #include "nmod.h"
 #include "nmod_mat.h"
 #include "mpn_mod.h"
+#include "gr_mat.h"
 
 typedef struct {
     slong m;

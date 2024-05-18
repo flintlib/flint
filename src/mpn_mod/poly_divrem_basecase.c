@@ -11,10 +11,6 @@
 
 #include "mpn_mod.h"
 
-#include "gr_poly.h"
-
-#include "mpn_mod.h"
-
 /* for wide add_ssss.... macros. todo; these ought to be provided
    everywhere */
 #if FLINT_BITS == 64 && defined(__AVX2__)

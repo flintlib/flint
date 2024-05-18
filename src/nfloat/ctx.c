@@ -10,6 +10,8 @@
 */
 
 #include "nfloat.h"
+#include "gr.h"
+#include "gr_mat.h"
 
 int _nfloat_methods_initialized = 0;
 

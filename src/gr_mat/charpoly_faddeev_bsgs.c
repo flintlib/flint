@@ -12,6 +12,7 @@
 #include "ulong_extras.h"
 #include "gr_vec.h"
 #include "gr_mat.h"
+#include "gr_poly.h"
 
 static int
 gr_mat_trace_prod(gr_ptr res, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)

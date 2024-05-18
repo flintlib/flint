@@ -9,6 +9,8 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "longlong.h"
+#include "mpoly.h"
 #include "gr_mpoly.h"
 
 /*

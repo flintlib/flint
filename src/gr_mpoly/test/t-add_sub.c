@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "mpoly.h"
 #include "gr_mpoly.h"
 
 TEST_FUNCTION_START(gr_mpoly_add_sub, state)

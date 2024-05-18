@@ -10,6 +10,7 @@
 */
 
 #include <stdio.h>
+#include "calcium.h"
 #include "ca.h"
 #include "ca_ext.h"
 #include "ca_field.h"

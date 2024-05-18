@@ -10,6 +10,7 @@
 */
 
 #include "fmpz.h"
+#include "mpoly.h"
 #include "gr_mpoly.h"
 
 /* todo: should have an

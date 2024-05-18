@@ -11,6 +11,7 @@
 
 #include "test_helpers.h"
 #include "ca_mat.h"
+#include "ca_poly.h"
 
 TEST_FUNCTION_START(ca_mat_ca_poly_evaluate, state)
 {

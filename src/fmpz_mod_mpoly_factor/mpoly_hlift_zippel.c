@@ -15,6 +15,10 @@
 #include "mpoly.h"
 #include "fmpz_mod_mpoly_factor.h"
 
+#if FLINT_WANT_ASSERT
+# include "longlong.h"
+#endif
+
 void fmpz_mod_polyu_init(fmpz_mod_polyu_t A)
 {
     A->length = 0;

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gr.h"
 #include "gr_mat.h"
 
 static void _gr_mat_test_nonsingular_solve_tri(gr_method_mat_binary_op_with_flag solve_impl, int upper, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)

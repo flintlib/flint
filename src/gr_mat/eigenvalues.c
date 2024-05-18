@@ -10,6 +10,7 @@
 */
 
 #include "gr_mat.h"
+#include "gr_poly.h"
 
 int
 gr_mat_eigenvalues(gr_vec_t lambda, gr_vec_t mult, const gr_mat_t mat, int flags, gr_ctx_t ctx)

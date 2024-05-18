@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gr.h"
 #include "gr_mat.h"
 
 truth_t gr_mat_is_diagonal(const gr_mat_t mat, gr_ctx_t ctx)

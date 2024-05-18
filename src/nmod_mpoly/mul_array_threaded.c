@@ -10,6 +10,7 @@
 */
 
 #include <string.h>
+#include "longlong.h"
 #include "thread_pool.h"
 #include "thread_support.h"
 #include "fmpz.h"

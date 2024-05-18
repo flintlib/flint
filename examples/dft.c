@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <flint/profiler.h>
+#include <flint/calcium.h>
 #include <flint/ca.h>
 #include <flint/ca_vec.h>
 

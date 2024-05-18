@@ -17,6 +17,10 @@
 #include "fq_nmod_mpoly.h"
 #include "fq_nmod_mpoly_factor.h"
 
+#if FLINT_WANT_ASSERT
+# include "longlong.h"
+#endif
+
 int fq_nmod_mpolyu_is_canonical(const fq_nmod_mpolyu_t A,
                                                  const fq_nmod_mpoly_ctx_t ctx)
 {

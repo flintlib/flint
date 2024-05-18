@@ -10,6 +10,7 @@
 */
 
 #include "mpn_mod.h"
+#include "gr_mat.h"
 
 static const int mpn_mod_mat_solve_tri_cutoff[MPN_MOD_MAX_LIMBS + 1] =
 {
