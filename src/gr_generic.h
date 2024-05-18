@@ -18,11 +18,10 @@
 #define GR_GENERIC_INLINE static inline
 #endif
 
-#include "flint.h"
-#include "gr.h"
+#include "gr_types.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 #define GR_GENERIC_DEBUG_RINGS 0

@@ -20,7 +20,7 @@
 #define GR_MPOLY_INLINE static inline
 #endif
 
-#include "mpoly.h"
+#include "mpoly_types.h"
 #include "gr_vec.h"
 
 #ifdef __cplusplus
