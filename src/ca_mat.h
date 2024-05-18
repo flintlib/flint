@@ -18,24 +18,13 @@
 #define CA_MAT_INLINE static inline
 #endif
 
-#include "ca_poly.h"
+#include "ca.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Matrix object */
-
-typedef struct
-{
-    ca_ptr entries;
-    slong r;
-    slong c;
-    ca_ptr * rows;
-}
-ca_mat_struct;
-
-typedef ca_mat_struct ca_mat_t[1];
 
 #define ca_mat_entry(mat,i,j) ((mat)->rows[i] + (j))
 #define ca_mat_nrows(mat) ((mat)->r)

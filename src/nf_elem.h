@@ -19,12 +19,11 @@
 #endif
 
 #include "fmpq.h"
-#include "fmpq_types.h"
 #include "fmpz_mod_types.h"
 #include "nf.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 typedef struct /* element of a linear number field */

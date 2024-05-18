@@ -23,7 +23,16 @@ extern "C" {
 #endif
 
 #include "mpoly_types.h"
-#include "calcium.h"
+#include "arf_types.h"
+#include "gr_types.h"
+
+/* FIXME: We need calcium_stream in ca_types.h, but this header includes qqbar.h
+   which conditionally defines functions using fexpr_t if and only if FEXPR_H is
+   defined. And at this point FEXPR_H is defined, but not fexpr_t... */
+#ifndef calcium_stream_struct
+# define calcium_stream_struct gr_stream_struct
+# define calcium_stream_t gr_stream_t
+#endif
 
 #define FEXPR_TYPE_SMALL_INT     UWORD(0)
 #define FEXPR_TYPE_SMALL_SYMBOL  UWORD(1)
