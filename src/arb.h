@@ -638,241 +638,45 @@ arb_sqr(arb_t res, const arb_t val, slong prec)
 
 /* vector functions */
 
-ARB_INLINE arb_ptr
-_arb_vec_entry_ptr(arb_ptr vec, slong i)
-{
-    return vec + i;
-}
+arb_ptr _arb_vec_entry_ptr(arb_ptr vec, slong i);
 
-ARB_INLINE void
-_arb_vec_zero(arb_ptr A, slong n)
-{
-    slong i;
-    for (i = 0; i < n; i++)
-        arb_zero(A + i);
-}
+void _arb_vec_zero(arb_ptr A, slong n);
+void _arb_vec_indeterminate(arb_ptr vec, slong len);
 
-ARB_INLINE int
-_arb_vec_is_zero(arb_srcptr vec, slong len)
-{
-    slong i;
-    for (i = 0; i < len; i++)
-        if (!arb_is_zero(vec + i))
-            return 0;
-    return 1;
-}
+int _arb_vec_is_zero(arb_srcptr vec, slong len);
+int _arb_vec_is_finite(arb_srcptr x, slong len);
 
-ARB_INLINE int
-_arb_vec_is_finite(arb_srcptr x, slong len)
-{
-    slong i;
+int _arb_vec_equal(arb_srcptr vec1, arb_srcptr vec2, slong len);
+int _arb_vec_overlaps(arb_srcptr vec1, arb_srcptr vec2, slong len);
+int _arb_vec_contains(arb_srcptr vec1, arb_srcptr vec2, slong len);
 
-    for (i = 0; i < len; i++)
-        if (!arb_is_finite(x + i))
-            return 0;
+void _arb_vec_set(arb_ptr res, arb_srcptr vec, slong len);
+void _arb_vec_swap(arb_ptr res, arb_ptr vec, slong len);
+void _arb_vec_neg(arb_ptr B, arb_srcptr A, slong n);
 
-    return 1;
-}
+void _arb_vec_set_round(arb_ptr res, arb_srcptr vec, slong len, slong prec);
 
-ARB_INLINE int
-_arb_vec_equal(arb_srcptr vec1, arb_srcptr vec2, slong len)
-{
-    slong i;
+void _arb_vec_sub(arb_ptr C, arb_srcptr A, arb_srcptr B, slong n, slong prec);
+void _arb_vec_add(arb_ptr C, arb_srcptr A, arb_srcptr B, slong n, slong prec);
 
-    for (i = 0; i < len; i++)
-    {
-        if (!arb_equal(vec1 + i, vec2 + i))
-            return 0;
-    }
-    return 1;
-}
-
-ARB_INLINE int
-_arb_vec_overlaps(arb_srcptr vec1, arb_srcptr vec2, slong len)
-{
-    slong i;
-
-    for (i = 0; i < len; i++)
-    {
-        if (!arb_overlaps(vec1 + i, vec2 + i))
-            return 0;
-    }
-
-    return 1;
-}
-
-ARB_INLINE int
-_arb_vec_contains(arb_srcptr vec1, arb_srcptr vec2, slong len)
-{
-    slong i;
-
-    for (i = 0; i < len; i++)
-    {
-        if (!arb_contains(vec1 + i, vec2 + i))
-            return 0;
-    }
-
-    return 1;
-}
-
-ARB_INLINE void
-_arb_vec_set(arb_ptr res, arb_srcptr vec, slong len)
-{
-    slong i;
-    for (i = 0; i < len; i++)
-        arb_set(res + i, vec + i);
-}
-
-ARB_INLINE void
-_arb_vec_set_round(arb_ptr res, arb_srcptr vec, slong len, slong prec)
-{
-    slong i;
-    for (i = 0; i < len; i++)
-        arb_set_round(res + i, vec + i, prec);
-}
-
-ARB_INLINE void
-_arb_vec_swap(arb_ptr res, arb_ptr vec, slong len)
-{
-    slong i;
-    for (i = 0; i < len; i++)
-        arb_swap(res + i, vec + i);
-}
-
-ARB_INLINE void
-_arb_vec_neg(arb_ptr B, arb_srcptr A, slong n)
-{
-    slong i;
-    for (i = 0; i < n; i++)
-        arb_neg(B + i, A + i);
-}
-
-ARB_INLINE void
-_arb_vec_sub(arb_ptr C, arb_srcptr A,
-    arb_srcptr B, slong n, slong prec)
-{
-    slong i;
-    for (i = 0; i < n; i++)
-        arb_sub(C + i, A + i, B + i, prec);
-}
-
-ARB_INLINE void
-_arb_vec_add(arb_ptr C, arb_srcptr A,
-    arb_srcptr B, slong n, slong prec)
-{
-    slong i;
-    for (i = 0; i < n; i++)
-        arb_add(C + i, A + i, B + i, prec);
-}
-
-ARB_INLINE void
-_arb_vec_scalar_mul(arb_ptr res, arb_srcptr vec,
-    slong len, const arb_t c, slong prec)
-{
-    slong i;
-    for (i = 0; i < len; i++)
-        arb_mul(res + i, vec + i, c, prec);
-}
-
-ARB_INLINE void
-_arb_vec_scalar_div(arb_ptr res, arb_srcptr vec,
-    slong len, const arb_t c, slong prec)
-{
-    slong i;
-    for (i = 0; i < len; i++)
-        arb_div(res + i, vec + i, c, prec);
-}
-
-ARB_INLINE void
-_arb_vec_scalar_mul_fmpz(arb_ptr res, arb_srcptr vec,
-    slong len, const fmpz_t c, slong prec)
-{
-    slong i;
-    arf_t t;
-    arf_init(t);
-    arf_set_fmpz(t, c);
-    for (i = 0; i < len; i++)
-        arb_mul_arf(res + i, vec + i, t, prec);
-    arf_clear(t);
-}
-
-ARB_INLINE void
-_arb_vec_scalar_mul_2exp_si(arb_ptr res, arb_srcptr src, slong len, slong c)
-{
-    slong i;
-    for (i = 0; i < len; i++)
-        arb_mul_2exp_si(res + i, src + i, c);
-}
-
-ARB_INLINE void
-_arb_vec_scalar_addmul(arb_ptr res, arb_srcptr vec,
-    slong len, const arb_t c, slong prec)
-{
-    slong i;
-    for (i = 0; i < len; i++)
-        arb_addmul(res + i, vec + i, c, prec);
-}
+void _arb_vec_scalar_mul(arb_ptr res, arb_srcptr vec, slong len, const arb_t c, slong prec);
+void _arb_vec_scalar_mul_fmpz(arb_ptr res, arb_srcptr vec, slong len, const fmpz_t c, slong prec);
+void _arb_vec_scalar_mul_2exp_si(arb_ptr res, arb_srcptr src, slong len, slong c);
+void _arb_vec_scalar_div(arb_ptr res, arb_srcptr vec, slong len, const arb_t c, slong prec);
+void _arb_vec_scalar_addmul(arb_ptr res, arb_srcptr vec, slong len, const arb_t c, slong prec);
 
 void _arb_vec_get_mag(mag_t bound, arb_srcptr vec, slong len);
 
-ARB_INLINE slong
-_arb_vec_bits(arb_srcptr x, slong len)
-{
-    slong i, b, c;
-
-    b = 0;
-    for (i = 0; i < len; i++)
-    {
-        c = arb_bits(x + i);
-        b = FLINT_MAX(b, c);
-    }
-
-    return b;
-}
+slong _arb_vec_bits(arb_srcptr x, slong len);
 
 void _arb_vec_set_powers(arb_ptr xs, const arb_t x, slong len, slong prec);
 
-ARB_INLINE void
-_arb_vec_add_error_arf_vec(arb_ptr res, arf_srcptr err, slong len)
-{
-    slong i;
-    for (i = 0; i < len; i++)
-        arb_add_error_arf(res + i, err + i);
-}
+void _arb_vec_add_error_arf_vec(arb_ptr res, arf_srcptr err, slong len);
+void _arb_vec_add_error_mag_vec(arb_ptr res, mag_srcptr err, slong len);
 
-ARB_INLINE void
-_arb_vec_add_error_mag_vec(arb_ptr res, mag_srcptr err, slong len)
-{
-    slong i;
-    for (i = 0; i < len; i++)
-        mag_add(arb_radref(res + i), arb_radref(res + i), err + i);
-}
+void _arb_vec_trim(arb_ptr res, arb_srcptr vec, slong len);
 
-ARB_INLINE void
-_arb_vec_indeterminate(arb_ptr vec, slong len)
-{
-    slong i;
-    for (i = 0; i < len; i++)
-        arb_indeterminate(vec + i);
-}
-
-ARB_INLINE void
-_arb_vec_trim(arb_ptr res, arb_srcptr vec, slong len)
-{
-    slong i;
-    for (i = 0; i < len; i++)
-        arb_trim(res + i, vec + i);
-}
-
-ARB_INLINE int
-_arb_vec_get_unique_fmpz_vec(fmpz * res,  arb_srcptr vec, slong len)
-{
-    slong i;
-    for (i = 0; i < len; i++)
-        if (!arb_get_unique_fmpz(res + i, vec + i))
-            return 0;
-    return 1;
-}
+int _arb_vec_get_unique_fmpz_vec(fmpz * res,  arb_srcptr vec, slong len);
 
 /* arctangent implementation */
 
@@ -1081,31 +885,9 @@ arb_allocated_bytes(const arb_t x)
     return arf_allocated_bytes(arb_midref(x)) + mag_allocated_bytes(arb_radref(x));
 }
 
-ARB_INLINE slong
-_arb_vec_allocated_bytes(arb_srcptr vec, slong len)
-{
-    slong i, size;
+slong _arb_vec_allocated_bytes(arb_srcptr vec, slong len);
 
-    size = len * sizeof(arb_struct);
-
-    for (i = 0; i < len; i++)
-        size += arb_allocated_bytes(vec + i);
-
-    return size;
-}
-
-ARB_INLINE double
-_arb_vec_estimate_allocated_bytes(slong len, slong prec)
-{
-    double size;
-
-    size = len * (double) sizeof(arb_struct);
-
-    if (prec > ARF_NOPTR_LIMBS * FLINT_BITS)
-        size += len * (double) ((prec + FLINT_BITS - 1) / FLINT_BITS) * sizeof(ulong);
-
-    return size;
-}
+double _arb_vec_estimate_allocated_bytes(slong len, slong prec);
 
 int arb_load_str(arb_t res, const char * data);
 char * arb_dump_str(const arb_t x);
