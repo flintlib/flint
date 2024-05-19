@@ -21,7 +21,7 @@ jobs:
   ubuntu-codecoverage:
     name: Ubuntu GCC, Code Coverage (x10)
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     env:
       CC: "gcc"
@@ -42,28 +42,8 @@ jobs:
             libgmp-dev \
             libmpfr-dev \
             autoconf \
-            libtool-bin
-
-          # Install lcov dependencies...
-          sudo apt-get install -y \
-            libcapture-tiny-perl \
-            libdatetime-perl \
-            libdigest-md5-perl \
-            libfile-spec-perl \
-            libjson-xs-perl \
-            libmodule-load-conditional-perl \
-            libtime-hires-perl
-
-          # ... plus these ones missing in apt
-          sudo cpan -T Memory::Process Scalar::Util
-
-          # Install lcov 2.0
-          mkdir lcov
-          cd lcov
-          wget https://github.com/linux-test-project/lcov/releases/download/v2.0/lcov-2.0.tar.gz
-          tar -xf lcov-2.0.tar.gz
-          cd lcov-2.0/
-          sudo make install
+            libtool-bin \
+            lcov
 
           # Check versions
           gcc --version
@@ -101,26 +81,7 @@ jobs:
 
       - name: "Gather coverage data"
         run: |
-          # NOTE: When Ubuntu LTS ships lcov v2.0.0+, change this section to
-          # `$MAKE coverage'.
-          mkdir build/coverage
-          lcov -j $(expr $(nproc) + 1) \
-            --capture \
-            --rc geninfo_unexecuted_blocks=1 \
-            --ignore-errors unused \
-            --omit-lines "flint_throw" \
-            --omit-lines '^}$' \
-            --exclude "/usr/*" \
-            --exclude "src/*/inlines.c" \
-            --exclude "src/test/main.c" \
-            --exclude "src/test/t-*.c" \
-            --exclude "src/*/test/main.c" \
-            --exclude "src/*/test/t-*.c" \
-            --exclude "src/generic_files/exception.c" \
-            --exclude "src/generic_files/profiler.c" \
-            --exclude "src/profiler.h" \
-            --directory build \
-            --output-file build/coverage/coverage.info
+          $MAKE coverage
 
       - name: "Upload coverage data"
         uses: codecov/codecov-action@v4
@@ -137,7 +98,7 @@ jobs:
   gcc-build-regression-check:
     name: GCC build regression check (no tests)
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     env:
       CC: "gcc"
@@ -177,7 +138,7 @@ jobs:
   ubuntu-gcc-assert:
     name: Ubuntu GCC with NTL (assert, x2)
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     env:
       CC: "gcc"
@@ -606,7 +567,7 @@ jobs:
   nemo:
     name: Nemo.jl (temporary branch)
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     env:
       LOCAL: ${{ github.workspace }}/local
