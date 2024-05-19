@@ -18,24 +18,12 @@
 #define GR_POLY_INLINE static inline
 #endif
 
-#include "fmpz_types.h"
 #include "fmpq_types.h"
 #include "gr.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
-
-/* fixme: compatible with flint polys but not with arb, ... */
-typedef struct
-{
-    gr_ptr coeffs;
-    slong alloc;
-    slong length;
-}
-gr_poly_struct;
-
-typedef gr_poly_struct gr_poly_t[1];
 
 void gr_poly_init(gr_poly_t poly, gr_ctx_t ctx);
 void gr_poly_init2(gr_poly_t poly, slong len, gr_ctx_t ctx);

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ca_vec.h"
 #include "ca_mat.h"
 
 truth_t

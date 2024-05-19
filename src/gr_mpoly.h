@@ -20,11 +20,15 @@
 #define GR_MPOLY_INLINE static inline
 #endif
 
-#include "mpoly.h"
+#include "mpoly_types.h"
 #include "gr_vec.h"
 
+#if FLINT_WANT_ASSERT
+# include "mpoly.h"
+#endif
+
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 typedef struct

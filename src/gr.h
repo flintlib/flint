@@ -18,21 +18,10 @@
 #define GR_INLINE static inline
 #endif
 
-#include "flint.h"
+#include "gr_types.h"
 
 #ifdef __cplusplus
- extern "C" {
-#endif
-
-#ifndef CALCIUM_H
-
-typedef enum
-{
-    T_TRUE,
-    T_FALSE,
-    T_UNKNOWN
-} truth_t;
-
+extern "C" {
 #endif
 
 GR_INLINE truth_t truth_and(truth_t x, truth_t y)
@@ -69,21 +58,6 @@ GR_INLINE void truth_println(truth_t x)
     if (x == T_UNKNOWN) flint_printf("T_UNKNOWN\n");
 }
 
-typedef int (*gr_funcptr)(void);
-
-/* Copied from Calcium: stream interface allows simple file or string IO. */
-
-typedef struct
-{
-    FLINT_FILE * fp;
-    char * s;
-    slong len;
-    slong alloc;
-}
-gr_stream_struct;
-
-typedef gr_stream_struct gr_stream_t[1];
-
 #ifdef FLINT_HAVE_FILE
 void gr_stream_init_file(gr_stream_t out, FILE * fp);
 #endif
@@ -95,31 +69,8 @@ void gr_stream_write_ui(gr_stream_t out, ulong x);
 void gr_stream_write_free(gr_stream_t out, char * s);
 void gr_stream_write_fmpz(gr_stream_t out, const fmpz_t x);
 
-#define GR_SUCCESS 0
-#define GR_DOMAIN 1
-#define GR_UNABLE 2
-#define GR_TEST_FAIL 4
-
-#define WARN_UNUSED_RESULT __attribute__((warn_unused_result))
-
 #define GR_MUST_SUCCEED(expr) do { if ((expr) != GR_SUCCESS) { flint_throw(FLINT_ERROR, "GR_MUST_SUCCEED failure: %s", __FILE__); } } while (0)
 #define GR_IGNORE(expr) do { int ___unused = (expr); (void) ___unused; } while (0)
-
-typedef void * gr_ptr;
-typedef const void * gr_srcptr;
-typedef void * gr_ctx_ptr;
-
-#define GR_ENTRY(vec, i, size) ((void *) (((char *) (vec)) + ((i) * (size))))
-
-typedef struct
-{
-    gr_ptr entries;
-    slong alloc;
-    slong length;
-}
-gr_vec_struct;
-
-typedef gr_vec_struct gr_vec_t[1];
 
 GR_INLINE int gr_not_implemented(void) { return GR_UNABLE; }
 GR_INLINE int gr_not_in_domain(void) { return GR_DOMAIN; }
@@ -743,23 +694,6 @@ typedef enum
     GR_CTX_WHICH_STRUCTURE_TAB_SIZE
 }
 gr_which_structure;
-
-/* large enough to hold any context data we want to store inline */
-#define GR_CTX_STRUCT_DATA_BYTES (6 * sizeof(ulong))
-
-typedef struct
-{
-    char data[GR_CTX_STRUCT_DATA_BYTES];
-    ulong which_ring;
-    slong sizeof_elem;
-    gr_funcptr * methods;
-    ulong size_limit;
-}
-gr_ctx_struct;
-
-typedef gr_ctx_struct gr_ctx_t[1];
-
-#define GR_CTX_DATA_AS_PTR(ctx) (*(void **) (&(ctx)->data))
 
 GR_INLINE void * gr_ctx_data_ptr(gr_ctx_t ctx) { return (void *) ctx->data; }
 GR_INLINE void * gr_ctx_data_as_ptr(gr_ctx_t ctx) { return (void *) GR_CTX_DATA_AS_PTR(ctx); }

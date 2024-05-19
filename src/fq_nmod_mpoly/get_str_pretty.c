@@ -10,6 +10,7 @@
 */
 
 #include <string.h>
+#include <gmp.h>
 #include "fmpz.h"
 #include "fq_nmod.h"
 #include "n_poly.h"

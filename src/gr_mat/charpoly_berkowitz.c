@@ -11,6 +11,7 @@
 
 #include "gr_vec.h"
 #include "gr_mat.h"
+#include "gr_poly.h"
 
 int
 _gr_mat_charpoly_berkowitz(gr_ptr cp, const gr_mat_t mat, gr_ctx_t ctx)

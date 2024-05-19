@@ -9,7 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
+#include "mpoly.h"
 #include "gr_mpoly.h"
 
 int gr_mpoly_neg(

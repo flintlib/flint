@@ -1,6 +1,7 @@
 /* This file is public domain. Author: Fredrik Johansson. */
 
 #include <flint/profiler.h>
+#include <flint/calcium.h>
 #include <flint/ca.h>
 #include <flint/ca_ext.h>
 #include <flint/ca_field.h>

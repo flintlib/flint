@@ -10,6 +10,7 @@
 */
 
 #include "ca_mat.h"
+#include "ca_poly.h"
 
 void
 _ca_mat_charpoly(ca_ptr cp, const ca_mat_t mat, ca_ctx_t ctx)

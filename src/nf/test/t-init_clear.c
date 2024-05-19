@@ -11,6 +11,7 @@
 */
 
 #include "test_helpers.h"
+#include "fmpz.h"
 #include "nf.h"
 
 TEST_FUNCTION_START(nf_init_clear, state)

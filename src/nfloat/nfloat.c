@@ -9,9 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <limits.h>
 #include <mpfr.h>
-#include "long_extras.h"
 #include "fmpz.h"
 #include "arf.h"
 #include "arb.h"

@@ -13,6 +13,10 @@
 #include "mpoly.h"
 #include "nmod_mpoly.h"
 
+#if FLINT_WANT_ASSERT
+# include "longlong.h"
+#endif
+
 /*
     set A(x_var^Bstride[var]) to B/xbar^Bshifts
     it is asserted that the conversion is correct

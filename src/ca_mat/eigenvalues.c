@@ -10,6 +10,7 @@
 */
 
 #include "ca_mat.h"
+#include "ca_poly.h"
 
 int
 ca_mat_eigenvalues(ca_vec_t lambda, ulong * exp, const ca_mat_t mat, ca_ctx_t ctx)

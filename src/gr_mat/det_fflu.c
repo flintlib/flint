@@ -10,6 +10,7 @@
 */
 
 #include "perm.h"
+#include "gr.h"
 #include "gr_mat.h"
 
 int

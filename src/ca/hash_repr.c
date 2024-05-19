@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "calcium.h"
 #include "ca.h"
 
 ulong ca_hash_repr(const ca_t x, ca_ctx_t ctx)

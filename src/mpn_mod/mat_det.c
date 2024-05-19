@@ -10,6 +10,8 @@
 */
 
 #include "mpn_mod.h"
+#include "gr.h"
+#include "gr_mat.h"
 
 int
 mpn_mod_mat_det(nn_ptr res, const gr_mat_t A, gr_ctx_t ctx)

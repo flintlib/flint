@@ -18,12 +18,9 @@
 #define CA_INLINE static inline
 #endif
 
-#include "flint.h"
 #include "fmpz_mpoly_q.h"
-#include "nf_elem.h"
-#include "qqbar.h"
-#include "fmpz_mpoly.h"
 #include "fexpr.h"
+#include "ca_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,26 +31,6 @@ extern "C" {
     while (0); } while (0);
 
 /* Number object *************************************************************/
-
-typedef union
-{
-    fmpq q;                           /* rational number */
-    nf_elem_struct nf;                /* algebraic number field element */
-    fmpz_mpoly_q_struct * mpoly_q;    /* generic field element */
-}
-ca_elem_struct;
-
-typedef struct
-{
-    ulong field;
-    ca_elem_struct elem;
-}
-ca_struct;
-
-
-typedef ca_struct ca_t[1];
-typedef ca_struct * ca_ptr;
-typedef const ca_struct * ca_srcptr;
 
 #define CA_FMPQ(x)         (&((x)->elem.q))
 #define CA_MPOLY_Q(x)      (&(((x)->elem.mpoly_q)[0]))
@@ -86,41 +63,7 @@ typedef const ca_struct * ca_srcptr;
 
 #define CA_FIELD_UNSPECIAL(x, ctx) ((ca_field_ptr) (CA_FIELD_ULONG(x) & ~CA_SPECIAL))
 
-
-
 /* Extension object **********************************************************/
-
-typedef struct
-{
-    qqbar_struct x;        /* qqbar_t element */
-    nf_struct * nf;        /* antic number field for fast arithmetic */
-}
-ca_ext_qqbar;
-
-typedef struct
-{
-    ca_struct * args;       /* Function arguments x1, ..., xn. */
-    slong nargs;            /* Number of function arguments n. */
-    acb_struct enclosure;   /* Cached numerical enclosure of f(x1,...,xn) */
-    slong prec;             /* Working precision of cached enclosure */
-    qqbar_struct * qqbar;   /* Cached qqbar */
-}
-ca_ext_func_data;
-
-typedef struct
-{
-    calcium_func_code head;   /* f = F_Pi, F_Exp, ... */
-    ulong hash;
-    slong depth;
-    union {
-        ca_ext_qqbar qqbar;
-        ca_ext_func_data func_data;
-    } data;
-} ca_ext_struct;
-
-typedef ca_ext_struct ca_ext_t[1];
-typedef ca_ext_struct * ca_ext_ptr;
-typedef const ca_ext_struct * ca_ext_srcptr;
 
 #define CA_EXT_HEAD(x) ((x)->head)
 #define CA_EXT_HASH(x) ((x)->hash)
@@ -136,33 +79,7 @@ typedef const ca_ext_struct * ca_ext_srcptr;
 #define CA_EXT_FUNC_ENCLOSURE(x) (&((x)->data.func_data.enclosure))
 #define CA_EXT_FUNC_PREC(x) ((x)->data.func_data.prec)
 
-typedef struct
-{
-    ca_ext_struct ** items;
-    slong length;
-    slong alloc;
-
-    slong hash_size;
-    slong * hash_table;
-}
-ca_ext_cache_struct;
-
-typedef ca_ext_cache_struct ca_ext_cache_t[1];
-
 /* Field object **************************************************************/
-
-typedef struct
-{
-    slong length;                /* Number of generators              */
-    ca_ext_struct ** ext;        /* Generators                        */
-    fmpz_mpoly_vec_struct ideal; /* Algebraic relations for reduction */
-    ulong hash;
-}
-ca_field_struct;
-
-typedef ca_field_struct ca_field_t[1];
-typedef ca_field_struct * ca_field_ptr;
-typedef const ca_field_struct * ca_field_srcptr;
 
 #define CA_FIELD_LENGTH(K) ((K)->length)
 #define CA_FIELD_EXT(K) ((K)->ext)
@@ -184,19 +101,6 @@ typedef const ca_field_struct * ca_field_srcptr;
 
 #define CA_MCTX_1(ctx) ((ctx)->mctx[0])
 #define CA_FIELD_MCTX(K, ctx) ((ctx)->mctx[CA_FIELD_LENGTH(K) - 1])
-
-typedef struct
-{
-    ca_field_struct ** items;
-    slong length;
-    slong alloc;
-
-    slong hash_size;
-    slong * hash_table;
-}
-ca_field_cache_struct;
-
-typedef ca_field_cache_struct ca_field_cache_t[1];
 
 /* Context object ************************************************************/
 
@@ -224,20 +128,6 @@ enum
 #define CA_TRIG_EXPONENTIAL  1
 #define CA_TRIG_SINE_COSINE  2
 #define CA_TRIG_TANGENT      3
-
-typedef struct
-{
-    ca_ext_cache_struct ext_cache;              /* Cached extension objects */
-    ca_field_cache_struct field_cache;          /* Cached extension fields  */
-    ca_field_struct * field_qq;                 /* Quick access to QQ      */
-    ca_field_struct * field_qq_i;               /* Quick access to QQ(i)   */
-    fmpz_mpoly_ctx_struct ** mctx;              /* Cached contexts for multivariate polys */
-    slong mctx_len;
-    slong * options;
-}
-ca_ctx_struct;
-
-typedef ca_ctx_struct ca_ctx_t[1];
 
 #define CA_CTX_EXT_CACHE(ctx) (&((ctx)->ext_cache))
 #define CA_CTX_FIELD_CACHE(ctx) (&((ctx)->field_cache))
@@ -607,17 +497,6 @@ char * ca_get_decimal_str(const ca_t x, slong digits, ulong flags, ca_ctx_t ctx)
 #define CA_FACTOR_POLY_CONTENT   64
 #define CA_FACTOR_POLY_SQF       128
 #define CA_FACTOR_POLY_FULL      256
-
-typedef struct
-{
-    ca_ptr base;
-    ca_ptr exp;
-    slong length;
-    slong alloc;
-}
-ca_factor_struct;
-
-typedef ca_factor_struct ca_factor_t[1];
 
 void ca_factor_init(ca_factor_t fac, ca_ctx_t ctx);
 void ca_factor_clear(ca_factor_t fac, ca_ctx_t ctx);

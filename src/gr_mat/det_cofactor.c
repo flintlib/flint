@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gr.h"
 #include "gr_mat.h"
 
 #define E(i,j) GR_MAT_ENTRY(A, i, j, sz)

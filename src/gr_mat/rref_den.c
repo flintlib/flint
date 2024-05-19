@@ -9,7 +9,6 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "perm.h"
 #include "gr_mat.h"
 
 int

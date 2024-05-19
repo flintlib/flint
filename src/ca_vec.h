@@ -26,16 +26,6 @@ extern "C" {
 
 /* Vector object */
 
-typedef struct
-{
-    ca_ptr entries;
-    slong alloc;
-    slong length;
-}
-ca_vec_struct;
-
-typedef ca_vec_struct ca_vec_t[1];
-
 #define ca_vec_entry(vec, i) ((vec)->entries + (i))
 
 CA_VEC_INLINE ca_ptr

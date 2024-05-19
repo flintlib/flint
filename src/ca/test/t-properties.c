@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "calcium.h"
 #include "ca.h"
 
 TEST_FUNCTION_START(ca_properties, state)

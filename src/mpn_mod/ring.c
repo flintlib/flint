@@ -10,14 +10,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "mpn_extras.h"
 #include "fmpz.h"
 #include "fmpz_mod.h"
+#include "mpn_mod.h"
 #include "gr.h"
 #include "gr_generic.h"
-#include "gr_vec.h"
-#include "gr_mat.h"
-#include "mpn_mod.h"
 
 /* todo: separate method tables, more fixed-width optimizations */
 /* todo: fast polynomial multiplication */

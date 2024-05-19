@@ -11,6 +11,7 @@
 */
 
 #include <string.h>
+#include <gmp.h>
 #include "fmpz.h"
 #include "mpoly.h"
 #include "fmpz_mpoly.h"

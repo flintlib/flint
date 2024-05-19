@@ -13,6 +13,7 @@
 #include "acb_hypgeom.h"
 #include "acb_modular.h"
 #include "acb_dirichlet.h"
+#include "calcium.h"
 #include "fexpr.h"
 #include "fexpr_builtin.h"
 
