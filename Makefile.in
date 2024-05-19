@@ -854,11 +854,9 @@ endif
 ################################################################################
 
 ifneq ($(COVERAGE), 0)
+# NOTE: Requires lcov v2.0
 coverage: | $(BUILD_DIR)/coverage
-	lcov --capture  --exclude "*test/t-*.c" --exclude "*test/main.c" --exclude "/usr/*" --directory $(BUILD_DIR) --output-file $(BUILD_DIR)/coverage/coverage.info
-
-# TODO: Add -j $(NJOBS) and --omit-lines "flint_throw" --omit-lines '^}$$' to
-# lcov flags when next Ubuntu LTS ships lcov v2.0.0+.
+	lcov -j $(NJOBS) --capture --rc geninfo_unexecuted_blocks=1 --ignore-errors unused --omit-lines "flint_throw" --omit-lines '^}$$' --exclude "/usr/*" --exclude "src/*/inlines.c" --exclude "src/test/main.c" --exclude "src/test/t-*.c" --exclude "src/*/test/main.c" --exclude "src/*/test/t-*.c" --exclude "src/generic_files/exception.c" --exclude "src/generic_files/profiler.c" --exclude "src/profiler.h" --directory build --output-file build/coverage/coverage.info
 
 coverage_html: coverage
 	genhtml $(NJOBS) $(BUILD_DIR)/coverage/coverage.info --output-directory $(BUILD_DIR)/coverage
