@@ -153,27 +153,18 @@ int fmpz_mpoly_print_pretty(const fmpz_mpoly_t A, const char ** x, const fmpz_mp
 
 /*  Basic manipulation *******************************************************/
 
-void fmpz_mpoly_gen(fmpz_mpoly_t poly, slong i,
-                                                   const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_gen(fmpz_mpoly_t poly, slong i, const fmpz_mpoly_ctx_t ctx);
 
-int fmpz_mpoly_is_gen(const fmpz_mpoly_t poly,
-                                          slong k, const fmpz_mpoly_ctx_t ctx);
+int fmpz_mpoly_is_gen(const fmpz_mpoly_t poly, slong k, const fmpz_mpoly_ctx_t ctx);
 
-void _fmpz_mpoly_set(fmpz * poly1, ulong * exps1,
-                    const fmpz * poly2, const ulong * exps2, slong n, slong N);
+void _fmpz_mpoly_set(fmpz * poly1, ulong * exps1, const fmpz * poly2, const ulong * exps2, slong n, slong N);
+void fmpz_mpoly_set(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_set(fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                                                   const fmpz_mpoly_ctx_t ctx);
-
-int _fmpz_mpoly_equal(fmpz * poly1, ulong * exps1,
-                    const fmpz * poly2, const ulong * exps2, slong n, slong N);
-
-int fmpz_mpoly_equal(const fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                                                   const fmpz_mpoly_ctx_t ctx);
+int _fmpz_mpoly_equal(fmpz * poly1, ulong * exps1, const fmpz * poly2, const ulong * exps2, slong n, slong N);
+int fmpz_mpoly_equal(const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
 
 FMPZ_MPOLY_INLINE
-void fmpz_mpoly_swap(fmpz_mpoly_t A,
-                                fmpz_mpoly_t B, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
+void fmpz_mpoly_swap(fmpz_mpoly_t A, fmpz_mpoly_t B, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_SWAP(fmpz_mpoly_struct, *A, *B);
 }
@@ -194,20 +185,13 @@ slong fmpz_mpoly_max_bits(const fmpz_mpoly_t A);
 
 /* Constants *****************************************************************/
 
-int fmpz_mpoly_is_fmpz(const fmpz_mpoly_t A,
-                                                   const fmpz_mpoly_ctx_t ctx);
+int fmpz_mpoly_is_fmpz(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_get_fmpz(fmpz_t c, const fmpz_mpoly_t A,
-                                                   const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_get_fmpz(fmpz_t c, const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_set_fmpz(fmpz_mpoly_t A,
-                                   const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
-
-void fmpz_mpoly_set_ui(fmpz_mpoly_t A,
-                                          ulong c, const fmpz_mpoly_ctx_t ctx);
-
-void fmpz_mpoly_set_si(fmpz_mpoly_t A,
-                                          slong c, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_set_si(fmpz_mpoly_t A, slong c, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_set_ui(fmpz_mpoly_t A, ulong c, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_set_fmpz(fmpz_mpoly_t A, const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
 
 FMPZ_MPOLY_INLINE
 void fmpz_mpoly_zero(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
@@ -221,14 +205,9 @@ void fmpz_mpoly_one(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx)
     fmpz_mpoly_set_ui(A, UWORD(1), ctx);
 }
 
-int fmpz_mpoly_equal_fmpz(const fmpz_mpoly_t A,
-                                   const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
-
-int fmpz_mpoly_equal_ui(const fmpz_mpoly_t A,
-                                          ulong c, const fmpz_mpoly_ctx_t ctx);
-
-int fmpz_mpoly_equal_si(const fmpz_mpoly_t A,
-                                          slong c, const fmpz_mpoly_ctx_t ctx);
+int fmpz_mpoly_equal_si(const fmpz_mpoly_t A, slong c, const fmpz_mpoly_ctx_t ctx);
+int fmpz_mpoly_equal_ui(const fmpz_mpoly_t A, ulong c, const fmpz_mpoly_ctx_t ctx);
+int fmpz_mpoly_equal_fmpz(const fmpz_mpoly_t A, const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
 
 FMPZ_MPOLY_INLINE
 int fmpz_mpoly_is_zero(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
@@ -262,86 +241,49 @@ void fmpz_mpoly_used_vars(int * used, const fmpz_mpoly_t A, const fmpz_mpoly_ctx
 
 /* Coefficients **************************************************************/
 
-void fmpz_mpoly_get_coeff_fmpz_monomial(fmpz_t c,
-                          const fmpz_mpoly_t A, const fmpz_mpoly_t M,
-                                                   const fmpz_mpoly_ctx_t ctx);
+slong fmpz_mpoly_get_coeff_si_fmpz(const fmpz_mpoly_t A, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx);
+ulong fmpz_mpoly_get_coeff_ui_fmpz(const fmpz_mpoly_t A, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_get_coeff_fmpz_fmpz(fmpz_t c, const fmpz_mpoly_t A, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_set_coeff_fmpz_monomial(fmpz_mpoly_t A,
-                                  const fmpz_t c, const fmpz_mpoly_t M,
-                                                   const fmpz_mpoly_ctx_t ctx);
+slong fmpz_mpoly_get_coeff_si_ui(const fmpz_mpoly_t A, const ulong * exp, const fmpz_mpoly_ctx_t ctx);
+ulong fmpz_mpoly_get_coeff_ui_ui(const fmpz_mpoly_t A, const ulong * exp, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_get_coeff_fmpz_ui(fmpz_t c, const fmpz_mpoly_t A, const ulong * exp, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_get_coeff_fmpz_fmpz(fmpz_t c, const fmpz_mpoly_t A,
-                               fmpz * const * exp, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_get_coeff_fmpz_monomial(fmpz_t c, const fmpz_mpoly_t A, const fmpz_mpoly_t M, const fmpz_mpoly_ctx_t ctx);
 
-ulong fmpz_mpoly_get_coeff_ui_fmpz(           const fmpz_mpoly_t A,
-                               fmpz * const * exp, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_set_coeff_si_ui(fmpz_mpoly_t A, const slong c, const ulong * exp, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_set_coeff_ui_ui(fmpz_mpoly_t A, const ulong c, const ulong * exp, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_set_coeff_fmpz_ui(fmpz_mpoly_t A, const fmpz_t c, const ulong * exp, const fmpz_mpoly_ctx_t ctx);
 
-slong fmpz_mpoly_get_coeff_si_fmpz(           const fmpz_mpoly_t A,
-                               fmpz * const * exp, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_set_coeff_si_fmpz(fmpz_mpoly_t A, const slong c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_set_coeff_ui_fmpz(fmpz_mpoly_t A, const ulong c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx);
+void _fmpz_mpoly_set_coeff_fmpz_fmpz(fmpz_mpoly_t A, const fmpz_t c, const fmpz * exp, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_set_coeff_fmpz_fmpz(fmpz_mpoly_t A, const fmpz_t c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_get_coeff_fmpz_ui(fmpz_t c, const fmpz_mpoly_t A,
-                                const ulong * exp, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_set_coeff_fmpz_monomial(fmpz_mpoly_t A, const fmpz_t c, const fmpz_mpoly_t M, const fmpz_mpoly_ctx_t ctx);
 
-ulong fmpz_mpoly_get_coeff_ui_ui(           const fmpz_mpoly_t A,
-                                const ulong * exp, const fmpz_mpoly_ctx_t ctx);
-
-slong fmpz_mpoly_get_coeff_si_ui(           const fmpz_mpoly_t A,
-                                const ulong * exp, const fmpz_mpoly_ctx_t ctx);
-
-void _fmpz_mpoly_set_coeff_fmpz_fmpz(fmpz_mpoly_t A,
-                 const fmpz_t c, const fmpz * exp, const fmpz_mpoly_ctx_t ctx);
-
-void fmpz_mpoly_set_coeff_fmpz_fmpz(fmpz_mpoly_t A,
-               const fmpz_t c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx);
-
-void fmpz_mpoly_set_coeff_ui_fmpz(fmpz_mpoly_t A,
-                const ulong c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx);
-
-void fmpz_mpoly_set_coeff_si_fmpz(fmpz_mpoly_t A,
-                const slong c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx);
-
-void fmpz_mpoly_set_coeff_fmpz_ui(fmpz_mpoly_t A,
-                const fmpz_t c, const ulong * exp, const fmpz_mpoly_ctx_t ctx);
-
-void fmpz_mpoly_set_coeff_ui_ui(fmpz_mpoly_t A,
-                 const ulong c, const ulong * exp, const fmpz_mpoly_ctx_t ctx);
-
-void fmpz_mpoly_set_coeff_si_ui(fmpz_mpoly_t A,
-                 const slong c, const ulong * exp, const fmpz_mpoly_ctx_t ctx);
-
-void fmpz_mpoly_get_coeff_vars_ui(fmpz_mpoly_t C,
-             const fmpz_mpoly_t A, const slong * vars, const ulong * exps,
-                                     slong length, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_get_coeff_vars_ui(fmpz_mpoly_t C, const fmpz_mpoly_t A, const slong * vars, const ulong * exps, slong length, const fmpz_mpoly_ctx_t ctx);
 
 /* conversion ****************************************************************/
 
-int fmpz_mpoly_is_fmpz_poly(const fmpz_mpoly_t A, slong var,
-                                                   const fmpz_mpoly_ctx_t ctx);
+int fmpz_mpoly_is_fmpz_poly(const fmpz_mpoly_t A, slong var, const fmpz_mpoly_ctx_t ctx);
 
-int fmpz_mpoly_get_fmpz_poly(fmpz_poly_t A, const fmpz_mpoly_t B,
-                                        slong var, const fmpz_mpoly_ctx_t ctx);
+int fmpz_mpoly_get_fmpz_poly(fmpz_poly_t A, const fmpz_mpoly_t B, slong var, const fmpz_mpoly_ctx_t ctx);
 
-void _fmpz_mpoly_set_fmpz_poly(fmpz_mpoly_t A, flint_bitcnt_t Abits,
-      const fmpz * Bcoeffs, slong Blen, slong var, const fmpz_mpoly_ctx_t ctx);
+void _fmpz_mpoly_set_fmpz_poly(fmpz_mpoly_t A, flint_bitcnt_t Abits, const fmpz * Bcoeffs, slong Blen, slong var, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_set_fmpz_poly(fmpz_mpoly_t A, const fmpz_poly_t B, slong v, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_set_fmpz_poly(fmpz_mpoly_t A, const fmpz_poly_t B,
-                                          slong v, const fmpz_mpoly_ctx_t ctx);
-
-void _fmpz_mpoly_set_fmpz_poly_one_var(fmpz_mpoly_t A,
-                        flint_bitcnt_t Aminbits, fmpz * Acoeffs, slong Adeg,
-                                                   const fmpz_mpoly_ctx_t ctx);
+void _fmpz_mpoly_set_fmpz_poly_one_var(fmpz_mpoly_t A, flint_bitcnt_t Aminbits, fmpz * Acoeffs, slong Adeg, const fmpz_mpoly_ctx_t ctx);
 
 void fmpz_mpoly_set_gen_fmpz_poly(fmpz_mpoly_t res, slong var, const fmpz_poly_t pol, const fmpz_mpoly_ctx_t ctx);
 
 /* comparison ****************************************************************/
 
-int fmpz_mpoly_cmp(const fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                                                   const fmpz_mpoly_ctx_t ctx);
+int fmpz_mpoly_cmp(const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
 
 /* container operations ******************************************************/
 
-int fmpz_mpoly_is_canonical(const fmpz_mpoly_t A,
-                                                   const fmpz_mpoly_ctx_t ctx);
+int fmpz_mpoly_is_canonical(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx);
 
 FMPZ_MPOLY_INLINE
 slong fmpz_mpoly_length(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
@@ -362,300 +304,145 @@ void fmpz_mpoly_set_term_coeff_si(fmpz_mpoly_t A, slong i, slong c, const fmpz_m
 int fmpz_mpoly_term_exp_fits_ui(const fmpz_mpoly_t A, slong i, const fmpz_mpoly_ctx_t ctx);
 int fmpz_mpoly_term_exp_fits_si(const fmpz_mpoly_t A, slong i, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_get_term_exp_fmpz(fmpz ** exp, const fmpz_mpoly_t A,
-                                          slong i, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_get_term_exp_si(slong * exp, const fmpz_mpoly_t A, slong i, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_get_term_exp_ui(ulong * exp, const fmpz_mpoly_t A, slong i, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_get_term_exp_fmpz(fmpz ** exp, const fmpz_mpoly_t A, slong i, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_get_term_exp_ui(ulong * exp, const fmpz_mpoly_t A,
-                                          slong i, const fmpz_mpoly_ctx_t ctx);
+slong fmpz_mpoly_get_term_var_exp_si(const fmpz_mpoly_t A, slong i, slong var, const fmpz_mpoly_ctx_t ctx);
+ulong fmpz_mpoly_get_term_var_exp_ui(const fmpz_mpoly_t A, slong i, slong var, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_get_term_exp_si(slong * exp, const fmpz_mpoly_t A,
-                                          slong i, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_get_term(fmpz_mpoly_t M, const fmpz_mpoly_t A, slong i, const fmpz_mpoly_ctx_t ctx);
 
-ulong fmpz_mpoly_get_term_var_exp_ui(const fmpz_mpoly_t A, slong i,
-                                        slong var, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_get_term_monomial(fmpz_mpoly_t M, const fmpz_mpoly_t A, slong i, const fmpz_mpoly_ctx_t ctx);
 
-slong fmpz_mpoly_get_term_var_exp_si(const fmpz_mpoly_t A, slong i,
-                                        slong var, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_set_term_exp_ui(fmpz_mpoly_t A, slong i, const ulong * exp, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_set_term_exp_fmpz(fmpz_mpoly_t A, slong i, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_set_term_exp_fmpz(fmpz_mpoly_t A,
-                      slong i, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_push_term_si_ui(fmpz_mpoly_t A, slong c, const ulong * exp, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_push_term_si_fmpz(fmpz_mpoly_t A, slong c, fmpz *const *exp, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_push_term_si_ffmpz(fmpz_mpoly_t A, slong c, const fmpz *exp, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_set_term_exp_ui(fmpz_mpoly_t A,
-                       slong i, const ulong * exp, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_push_term_ui_ui(fmpz_mpoly_t A, ulong c, const ulong * exp, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_push_term_ui_fmpz(fmpz_mpoly_t A, ulong c, fmpz *const *exp, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_push_term_ui_ffmpz(fmpz_mpoly_t A, ulong c, const fmpz *exp, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_get_term(fmpz_mpoly_t M, const fmpz_mpoly_t A,
-                                          slong i, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_push_term_fmpz_ui(fmpz_mpoly_t A, const fmpz_t c, const ulong * exp, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_push_term_fmpz_fmpz(fmpz_mpoly_t A, const fmpz_t c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_push_term_fmpz_ffmpz(fmpz_mpoly_t A, const fmpz_t c, const fmpz *exp, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_get_term_monomial(fmpz_mpoly_t M, const fmpz_mpoly_t A,
-                                          slong i, const fmpz_mpoly_ctx_t ctx);
+void _fmpz_mpoly_push_exp_ui(fmpz_mpoly_t A, const ulong * exp, const fmpz_mpoly_ctx_t ctx);
+void _fmpz_mpoly_push_exp_ffmpz(fmpz_mpoly_t A, const fmpz * exp, const fmpz_mpoly_ctx_t ctx);
+void _fmpz_mpoly_push_exp_pfmpz(fmpz_mpoly_t A, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_push_term_fmpz_fmpz(fmpz_mpoly_t A,
-               const fmpz_t c, fmpz * const * exp, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_combine_like_terms(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_push_term_fmpz_ffmpz(fmpz_mpoly_t A, const fmpz_t c,
-                                    const fmpz *exp, const fmpz_mpoly_ctx_t ctx);
-
-void fmpz_mpoly_push_term_ui_fmpz(fmpz_mpoly_t A, ulong c, fmpz *const *exp,
-                                  const fmpz_mpoly_ctx_t ctx);
-
-void fmpz_mpoly_push_term_ui_ffmpz(fmpz_mpoly_t A, ulong c,
-                                    const fmpz *exp, const fmpz_mpoly_ctx_t ctx);
-
-void fmpz_mpoly_push_term_si_fmpz(fmpz_mpoly_t A, slong c, fmpz *const *exp,
-                                  const fmpz_mpoly_ctx_t ctx);
-
-void fmpz_mpoly_push_term_si_ffmpz(fmpz_mpoly_t A, slong c,
-                                    const fmpz *exp, const fmpz_mpoly_ctx_t ctx);
-
-void fmpz_mpoly_push_term_fmpz_ui(fmpz_mpoly_t A,
-                const fmpz_t c, const ulong * exp, const fmpz_mpoly_ctx_t ctx);
-
-void fmpz_mpoly_push_term_ui_ui(fmpz_mpoly_t A,
-                       ulong c, const ulong * exp, const fmpz_mpoly_ctx_t ctx);
-
-void fmpz_mpoly_push_term_si_ui(fmpz_mpoly_t A,
-                       slong c, const ulong * exp, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_reverse(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
 
 void fmpz_mpoly_sort_terms(fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_combine_like_terms(fmpz_mpoly_t A,
-                                                   const fmpz_mpoly_ctx_t ctx);
+void _fmpz_mpoly_radix_sort1(fmpz_mpoly_t A, slong left, slong right, flint_bitcnt_t pos, ulong cmpmask, ulong totalmask);
+void _fmpz_mpoly_radix_sort(fmpz_mpoly_t A, slong left, slong right, flint_bitcnt_t pos, slong N, ulong * cmpmask);
 
-void fmpz_mpoly_reverse(fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                                                   const fmpz_mpoly_ctx_t ctx);
-
-void fmpz_mpoly_assert_canonical(const fmpz_mpoly_t A,
-                                                   const fmpz_mpoly_ctx_t ctx);
-
-void _fmpz_mpoly_radix_sort1(fmpz_mpoly_t A, slong left, slong right,
-                              flint_bitcnt_t pos, ulong cmpmask, ulong totalmask);
-
-void _fmpz_mpoly_radix_sort(fmpz_mpoly_t A, slong left, slong right,
-                                    flint_bitcnt_t pos, slong N, ulong * cmpmask);
-
-void _fmpz_mpoly_push_exp_ffmpz(fmpz_mpoly_t A,
-                                 const fmpz * exp, const fmpz_mpoly_ctx_t ctx);
-
-void _fmpz_mpoly_push_exp_pfmpz(fmpz_mpoly_t A,
-                               fmpz * const * exp, const fmpz_mpoly_ctx_t ctx);
-
-void _fmpz_mpoly_push_exp_ui(fmpz_mpoly_t A,
-                                const ulong * exp, const fmpz_mpoly_ctx_t ctx);
-
+void fmpz_mpoly_assert_canonical(const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx);
 
 /* Random generation *********************************************************/
 
-void fmpz_mpoly_randtest_bound(fmpz_mpoly_t A, flint_rand_t state,
-                        slong length, flint_bitcnt_t coeff_bits, ulong exp_bound,
-                                                   const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_randtest_bound(fmpz_mpoly_t A, flint_rand_t state, slong length, flint_bitcnt_t coeff_bits, ulong exp_bound, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_randtest_bounds(fmpz_mpoly_t A, flint_rand_t state, slong length, flint_bitcnt_t coeff_bits, ulong * exp_bounds, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_randtest_bounds(fmpz_mpoly_t A, flint_rand_t state,
-                     slong length, flint_bitcnt_t coeff_bits, ulong * exp_bounds,
-                                                   const fmpz_mpoly_ctx_t ctx);
-
-void fmpz_mpoly_randtest_bits(fmpz_mpoly_t A, flint_rand_t state,
-                   slong length, flint_bitcnt_t coeff_bits, flint_bitcnt_t exp_bits,
-                                                   const fmpz_mpoly_ctx_t ctx);
-
+void fmpz_mpoly_randtest_bits(fmpz_mpoly_t A, flint_rand_t state, slong length, flint_bitcnt_t coeff_bits, flint_bitcnt_t exp_bits, const fmpz_mpoly_ctx_t ctx);
 
 /* Addition/Subtraction ******************************************************/
 
-void fmpz_mpoly_add_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                                   const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_add_si(fmpz_mpoly_t A, const fmpz_mpoly_t B, slong c, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_add_ui(fmpz_mpoly_t A, const fmpz_mpoly_t B, ulong c, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_add_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
+slong _fmpz_mpoly_add(fmpz * poly1, ulong * exps1, const fmpz * poly2, const ulong * exps2, slong len2, const fmpz * poly3, const ulong * exps3, slong len3, slong N, const ulong * cmpmask);
+void fmpz_mpoly_add(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_add_ui(fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                                          ulong c, const fmpz_mpoly_ctx_t ctx);
-
-void fmpz_mpoly_add_si(fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                                          slong c, const fmpz_mpoly_ctx_t ctx);
-
-void fmpz_mpoly_sub_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                                   const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
-
-void fmpz_mpoly_sub_ui(fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                                          ulong c, const fmpz_mpoly_ctx_t ctx);
-
-void fmpz_mpoly_sub_si(fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                                          slong c, const fmpz_mpoly_ctx_t ctx);
-
-void fmpz_mpoly_add(fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                             const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx);
-
-slong _fmpz_mpoly_add(fmpz * poly1, ulong * exps1,
-                 const fmpz * poly2, const ulong * exps2, slong len2,
-                 const fmpz * poly3, const ulong * exps3, slong len3, slong N,
-                                                        const ulong * cmpmask);
-
-void fmpz_mpoly_sub(fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                             const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx);
-
-slong _fmpz_mpoly_sub(fmpz * poly1, ulong * exps1,
-                 const fmpz * poly2, const ulong * exps2, slong len2,
-                 const fmpz * poly3, const ulong * exps3, slong len3, slong N,
-                                                        const ulong * cmpmask);
-
+void fmpz_mpoly_sub_si(fmpz_mpoly_t A, const fmpz_mpoly_t B, slong c, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_sub_ui(fmpz_mpoly_t A, const fmpz_mpoly_t B, ulong c, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_sub_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
+slong _fmpz_mpoly_sub(fmpz * poly1, ulong * exps1, const fmpz * poly2, const ulong * exps2, slong len2, const fmpz * poly3, const ulong * exps3, slong len3, slong N, const ulong * cmpmask);
+void fmpz_mpoly_sub(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx);
 
 /* Scalar operations *********************************************************/
 
-void fmpz_mpoly_neg(fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                                                   const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_neg(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_scalar_mul_fmpz(fmpz_mpoly_t A,
-             const fmpz_mpoly_t B, const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_scalar_mul_si(fmpz_mpoly_t A, const fmpz_mpoly_t B, slong c, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_scalar_mul_ui(fmpz_mpoly_t A, const fmpz_mpoly_t B, ulong c, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_scalar_mul_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_scalar_mul_si(fmpz_mpoly_t A,
-                    const fmpz_mpoly_t B, slong c, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_scalar_fmma(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_t c, const fmpz_mpoly_t D, const fmpz_t e, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_scalar_mul_ui(fmpz_mpoly_t A,
-                    const fmpz_mpoly_t B, ulong c, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_scalar_divexact_si(fmpz_mpoly_t A, const fmpz_mpoly_t B, slong c, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_scalar_divexact_ui(fmpz_mpoly_t A, const fmpz_mpoly_t B, ulong c, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_scalar_divexact_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_scalar_fmma(fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                         const fmpz_t c, const fmpz_mpoly_t D, const fmpz_t e,
-                                                   const fmpz_mpoly_ctx_t ctx);
-
-void fmpz_mpoly_scalar_divexact_fmpz(fmpz_mpoly_t A,
-             const fmpz_mpoly_t B, const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
-
-void fmpz_mpoly_scalar_divexact_si(fmpz_mpoly_t A,
-                    const fmpz_mpoly_t B, slong c, const fmpz_mpoly_ctx_t ctx);
-
-void fmpz_mpoly_scalar_divexact_ui(fmpz_mpoly_t A,
-                    const fmpz_mpoly_t B, ulong c, const fmpz_mpoly_ctx_t ctx);
-
-int fmpz_mpoly_scalar_divides_fmpz(fmpz_mpoly_t A,
-             const fmpz_mpoly_t B, const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
-
-int fmpz_mpoly_scalar_divides_si(fmpz_mpoly_t A,
-                    const fmpz_mpoly_t B, slong c, const fmpz_mpoly_ctx_t ctx);
-
-int fmpz_mpoly_scalar_divides_ui(fmpz_mpoly_t A,
-                    const fmpz_mpoly_t B, ulong c, const fmpz_mpoly_ctx_t ctx);
-
+int fmpz_mpoly_scalar_divides_si(fmpz_mpoly_t A, const fmpz_mpoly_t B, slong c, const fmpz_mpoly_ctx_t ctx);
+int fmpz_mpoly_scalar_divides_ui(fmpz_mpoly_t A, const fmpz_mpoly_t B, ulong c, const fmpz_mpoly_ctx_t ctx);
+int fmpz_mpoly_scalar_divides_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_t c, const fmpz_mpoly_ctx_t ctx);
 
 /* Differentiation/Integration ***********************************************/
 
-void fmpz_mpoly_derivative(fmpz_mpoly_t A,
-                  const fmpz_mpoly_t B, slong var, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_derivative(fmpz_mpoly_t A, const fmpz_mpoly_t B, slong var, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_integral(fmpz_mpoly_t A, fmpz_t scale,
-                  const fmpz_mpoly_t B, slong var, const fmpz_mpoly_ctx_t ctx);
-
+void fmpz_mpoly_integral(fmpz_mpoly_t A, fmpz_t scale, const fmpz_mpoly_t B, slong var, const fmpz_mpoly_ctx_t ctx);
 
 /* Evaluation ****************************************************************/
 
 int _fmpz_pow_ui_is_not_feasible(flint_bitcnt_t bbits, ulong e);
-
 int _fmpz_pow_fmpz_is_not_feasible(flint_bitcnt_t bbits, const fmpz_t e);
 
-int fmpz_mpoly_evaluate_all_fmpz(fmpz_t ev, const fmpz_mpoly_t A,
-                              fmpz * const * vals, const fmpz_mpoly_ctx_t ctx);
+int fmpz_mpoly_evaluate_all_fmpz(fmpz_t ev, const fmpz_mpoly_t A, fmpz * const * vals, const fmpz_mpoly_ctx_t ctx);
+ulong fmpz_mpoly_evaluate_all_nmod(const fmpz_mpoly_t A, const ulong * alphas, const fmpz_mpoly_ctx_t ctx, nmod_t fpctx);
+void fmpz_mpoly_evaluate_all_fmpz_mod(fmpz_t ev, const fmpz_mpoly_t A, const fmpz * alphas, const fmpz_mpoly_ctx_t ctx, const fmpz_mod_ctx_t fpctx);
 
-ulong fmpz_mpoly_evaluate_all_nmod(const fmpz_mpoly_t A,
-           const ulong * alphas, const fmpz_mpoly_ctx_t ctx, nmod_t fpctx);
+int fmpz_mpoly_evaluate_one_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B, slong var, const fmpz_t val, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_evaluate_all_fmpz_mod(fmpz_t ev,
-                        const fmpz_mpoly_t A, const fmpz * alphas,
-                       const fmpz_mpoly_ctx_t ctx, const fmpz_mod_ctx_t fpctx);
+int fmpz_mpoly_compose_fmpz_poly(fmpz_poly_t A, const fmpz_mpoly_t B, fmpz_poly_struct * const * C, const fmpz_mpoly_ctx_t ctxB);
 
-int fmpz_mpoly_evaluate_one_fmpz(fmpz_mpoly_t A,
-                           const fmpz_mpoly_t B, slong var, const fmpz_t val,
-                                                   const fmpz_mpoly_ctx_t ctx);
+void _fmpz_mpoly_compose_mat(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mat_t M, const fmpz_mpoly_ctx_t ctxB, const fmpz_mpoly_ctx_t ctxAC);
 
-int fmpz_mpoly_compose_fmpz_poly(fmpz_poly_t A,
-                         const fmpz_mpoly_t B, fmpz_poly_struct * const * C,
-                                                  const fmpz_mpoly_ctx_t ctxB);
+int fmpz_mpoly_compose_fmpz_mpoly_geobucket(fmpz_mpoly_t A, const fmpz_mpoly_t B, fmpz_mpoly_struct * const * C, const fmpz_mpoly_ctx_t ctxB, const fmpz_mpoly_ctx_t ctxAC);
+int fmpz_mpoly_compose_fmpz_mpoly_horner(fmpz_mpoly_t A, const fmpz_mpoly_t B, fmpz_mpoly_struct * const * C, const fmpz_mpoly_ctx_t ctxB, const fmpz_mpoly_ctx_t ctxAC);
+int fmpz_mpoly_compose_fmpz_mpoly(fmpz_mpoly_t A, const fmpz_mpoly_t B, fmpz_mpoly_struct * const * C, const fmpz_mpoly_ctx_t ctxB, const fmpz_mpoly_ctx_t ctxAC);
 
-void _fmpz_mpoly_compose_mat(fmpz_mpoly_t A,
-                            const fmpz_mpoly_t B, const fmpz_mat_t M,
-                    const fmpz_mpoly_ctx_t ctxB, const fmpz_mpoly_ctx_t ctxAC);
-
-int fmpz_mpoly_compose_fmpz_mpoly_geobucket(fmpz_mpoly_t A,
-                   const fmpz_mpoly_t B, fmpz_mpoly_struct * const * C,
-                    const fmpz_mpoly_ctx_t ctxB, const fmpz_mpoly_ctx_t ctxAC);
-
-int fmpz_mpoly_compose_fmpz_mpoly_horner(fmpz_mpoly_t A,
-                   const fmpz_mpoly_t B, fmpz_mpoly_struct * const * C,
-                    const fmpz_mpoly_ctx_t ctxB, const fmpz_mpoly_ctx_t ctxAC);
-
-int fmpz_mpoly_compose_fmpz_mpoly(fmpz_mpoly_t A,
-                   const fmpz_mpoly_t B, fmpz_mpoly_struct * const * C,
-                    const fmpz_mpoly_ctx_t ctxB, const fmpz_mpoly_ctx_t ctxAC);
-
-void fmpz_mpoly_compose_fmpz_mpoly_gen(fmpz_mpoly_t A,
-                             const fmpz_mpoly_t B, const slong * c,
-                    const fmpz_mpoly_ctx_t ctxB, const fmpz_mpoly_ctx_t ctxAC);
-
+void fmpz_mpoly_compose_fmpz_mpoly_gen(fmpz_mpoly_t A, const fmpz_mpoly_t B, const slong * c, const fmpz_mpoly_ctx_t ctxB, const fmpz_mpoly_ctx_t ctxAC);
 
 /* Multiplication ************************************************************/
 
-void fmpz_mpoly_mul(fmpz_mpoly_t A,
-       const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_mul(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_mul_monomial(fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                             const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_mul_monomial(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_mul_johnson(fmpz_mpoly_t A,
-       const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx);
-
-void fmpz_mpoly_mul_heap_threaded(fmpz_mpoly_t A,
-       const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx);
-
-int fmpz_mpoly_mul_array(fmpz_mpoly_t A,
-       const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx);
-
-int fmpz_mpoly_mul_array_threaded(fmpz_mpoly_t A,
-       const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx);
-
-int fmpz_mpoly_mul_dense(fmpz_mpoly_t A,
-       const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx);
-
-slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * alloc,
-                 const fmpz * poly2, const ulong * exp2, slong len2,
-                 const fmpz * poly3, const ulong * exp3, slong len3,
-                             flint_bitcnt_t bits, slong N, const ulong * cmpmask);
-
-void _fmpz_mpoly_mul_johnson_maxfields(fmpz_mpoly_t A,
-                                 const fmpz_mpoly_t B, fmpz * maxBfields,
-                                 const fmpz_mpoly_t C, fmpz * maxCfields,
-                                                   const fmpz_mpoly_ctx_t ctx);
+void _fmpz_mpoly_mul_johnson_maxfields(fmpz_mpoly_t A, const fmpz_mpoly_t B, fmpz * maxBfields, const fmpz_mpoly_t C, fmpz * maxCfields, const fmpz_mpoly_ctx_t ctx);
+slong _fmpz_mpoly_mul_johnson(fmpz ** poly1, ulong ** exp1, slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, slong len3, flint_bitcnt_t bits, slong N, const ulong * cmpmask);
+void fmpz_mpoly_mul_johnson(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx);
 
 void _fmpz_mpoly_mul_heap_threaded_pool_maxfields(fmpz_mpoly_t A,
            const fmpz_mpoly_t B, fmpz * maxBfields,
            const fmpz_mpoly_t C, fmpz * maxCfields, const fmpz_mpoly_ctx_t ctx,
                         const thread_pool_handle * handles, slong num_handles);
+void fmpz_mpoly_mul_heap_threaded(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx);
 
-int _fmpz_mpoly_mul_array_DEG(fmpz_mpoly_t A,
-                                 const fmpz_mpoly_t B, fmpz * maxBfields,
-                                 const fmpz_mpoly_t C, fmpz * maxCfields,
-                                                   const fmpz_mpoly_ctx_t ctx);
+int fmpz_mpoly_mul_array(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx);
+int fmpz_mpoly_mul_array_threaded(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx);
 
-int _fmpz_mpoly_mul_array_LEX(fmpz_mpoly_t A,
-                                 const fmpz_mpoly_t B, fmpz * maxBfields,
-                                 const fmpz_mpoly_t C, fmpz * maxCfields,
-                                                   const fmpz_mpoly_ctx_t ctx);
+int _fmpz_mpoly_mul_dense(fmpz_mpoly_t P, const fmpz_mpoly_t A, fmpz * maxAfields, const fmpz_mpoly_t B, fmpz * maxBfields, const fmpz_mpoly_ctx_t ctx);
+int fmpz_mpoly_mul_dense(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_t C, const fmpz_mpoly_ctx_t ctx);
 
-int _fmpz_mpoly_mul_array_threaded_pool_DEG(fmpz_mpoly_t A,
-           const fmpz_mpoly_t B, fmpz * maxBfields,
-           const fmpz_mpoly_t C, fmpz * maxCfields, const fmpz_mpoly_ctx_t ctx,
-                        const thread_pool_handle * handles, slong num_handles);
+int _fmpz_mpoly_mul_array_DEG(fmpz_mpoly_t A, const fmpz_mpoly_t B, fmpz * maxBfields, const fmpz_mpoly_t C, fmpz * maxCfields, const fmpz_mpoly_ctx_t ctx);
+int _fmpz_mpoly_mul_array_LEX(fmpz_mpoly_t A, const fmpz_mpoly_t B, fmpz * maxBfields, const fmpz_mpoly_t C, fmpz * maxCfields, const fmpz_mpoly_ctx_t ctx);
 
-int _fmpz_mpoly_mul_array_threaded_pool_LEX(fmpz_mpoly_t A,
-           const fmpz_mpoly_t B, fmpz * maxBfields,
-           const fmpz_mpoly_t C, fmpz * maxCfields, const fmpz_mpoly_ctx_t ctx,
-                        const thread_pool_handle * handles, slong num_handles);
-
-int _fmpz_mpoly_mul_dense(fmpz_mpoly_t P,
-                                 const fmpz_mpoly_t A, fmpz * maxAfields,
-                                 const fmpz_mpoly_t B, fmpz * maxBfields,
-                                                   const fmpz_mpoly_ctx_t ctx);
+int _fmpz_mpoly_mul_array_threaded_pool_DEG(fmpz_mpoly_t A, const fmpz_mpoly_t B, fmpz * maxBfields, const fmpz_mpoly_t C, fmpz * maxCfields, const fmpz_mpoly_ctx_t ctx, const thread_pool_handle * handles, slong num_handles);
+int _fmpz_mpoly_mul_array_threaded_pool_LEX(fmpz_mpoly_t A, const fmpz_mpoly_t B, fmpz * maxBfields, const fmpz_mpoly_t C, fmpz * maxCfields, const fmpz_mpoly_ctx_t ctx, const thread_pool_handle * handles, slong num_handles);
 
 /* Powering ******************************************************************/
 
-int fmpz_mpoly_pow_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                                  const fmpz_t k, const fmpz_mpoly_ctx_t ctx);
-
-int fmpz_mpoly_pow_ui(fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                                          ulong k, const fmpz_mpoly_ctx_t ctx);
+int fmpz_mpoly_pow_ui(fmpz_mpoly_t A, const fmpz_mpoly_t B, ulong k, const fmpz_mpoly_ctx_t ctx);
+int fmpz_mpoly_pow_fmpz(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_t k, const fmpz_mpoly_ctx_t ctx);
 
 /* Division ******************************************************************/
 
@@ -677,41 +464,39 @@ int _fmpz_mpoly_divides_heap_threaded_pool(fmpz_mpoly_t Q,
 #endif
 
 slong _fmpz_mpoly_divides_array(fmpz ** poly1, ulong ** exp1,
-         slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2,
-                        const fmpz * poly3, const ulong * exp3, slong len3,
-                                         slong * mults, slong num, slong bits);
+        slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2,
+        const fmpz * poly3, const ulong * exp3, slong len3,
+        slong * mults, slong num, slong bits);
 
 int fmpz_mpoly_divides_array(fmpz_mpoly_t poly1,
-                  const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
-                                                   const fmpz_mpoly_ctx_t ctx);
-
+        const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
+        const fmpz_mpoly_ctx_t ctx);
 
 int mpoly_divides_select_exps(fmpz_mpoly_t S, fmpz_mpoly_ctx_t zctx,
-                                slong nworkers, ulong * Aexp, slong Alen,
-                                   ulong * Bexp, slong Blen, flint_bitcnt_t bits);
+        slong nworkers, ulong * Aexp, slong Alen,
+        ulong * Bexp, slong Blen, flint_bitcnt_t bits);
 
 slong _fmpz_mpoly_divides_monagan_pearce(fmpz ** poly1,
-                      ulong ** exp1, slong * alloc, const fmpz * poly2,
-                    const ulong * exp2, slong len2, const fmpz * poly3,
-                    const ulong * exp3, slong len3, flint_bitcnt_t bits, slong N,
-                                                        const ulong * cmpmask);
+        ulong ** exp1, slong * alloc, const fmpz * poly2,
+        const ulong * exp2, slong len2, const fmpz * poly3,
+        const ulong * exp3, slong len3, flint_bitcnt_t bits, slong N,
+        const ulong * cmpmask);
 
 void fmpz_mpoly_divrem(fmpz_mpoly_t Q, fmpz_mpoly_t R,
        const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
 
 void fmpz_mpoly_quasidivrem(fmpz_t scale, fmpz_mpoly_t Q,
-     fmpz_mpoly_t R, const fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                                                   const fmpz_mpoly_ctx_t ctx);
+        fmpz_mpoly_t R, const fmpz_mpoly_t A, const fmpz_mpoly_t B,
+        const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_div(fmpz_mpoly_t Q, const fmpz_mpoly_t A,
-                             const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_div(fmpz_mpoly_t Q, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
 
 void fmpz_mpoly_quasidiv(fmpz_t scale, fmpz_mpoly_t Q,
        const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
 
 void fmpz_mpoly_divrem_ideal(fmpz_mpoly_struct ** Q,
-     fmpz_mpoly_t R, const fmpz_mpoly_t A, fmpz_mpoly_struct * const * B,
-                                        slong len, const fmpz_mpoly_ctx_t ctx);
+        fmpz_mpoly_t R, const fmpz_mpoly_t A, fmpz_mpoly_struct * const * B,
+        slong len, const fmpz_mpoly_ctx_t ctx);
 
 void fmpz_mpoly_quasidivrem_ideal(fmpz_t scale,
      fmpz_mpoly_struct ** Q, fmpz_mpoly_t R, const fmpz_mpoly_t A,
@@ -733,69 +518,64 @@ slong _fmpz_mpoly_div_monagan_pearce(fmpz ** polyq,
                        slong len3, slong bits, slong N, const ulong * cmpmask);
 
 void fmpz_mpoly_div_monagan_pearce(fmpz_mpoly_t q,
-                     const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
-                                                   const fmpz_mpoly_ctx_t ctx);
+        const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
+        const fmpz_mpoly_ctx_t ctx);
 
 slong _fmpz_mpoly_divrem_monagan_pearce(slong * lenr,
-  fmpz ** polyq, ulong ** expq, slong * allocq, fmpz ** polyr,
-                  ulong ** expr, slong * allocr, const fmpz * poly2,
-   const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3,
-                       slong len3, slong bits, slong N, const ulong * cmpmask);
+        fmpz ** polyq, ulong ** expq, slong * allocq, fmpz ** polyr,
+        ulong ** expr, slong * allocr, const fmpz * poly2,
+        const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3,
+        slong len3, slong bits, slong N, const ulong * cmpmask);
 
 void fmpz_mpoly_divrem_monagan_pearce(fmpz_mpoly_t q, fmpz_mpoly_t r,
-                  const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
-                                                   const fmpz_mpoly_ctx_t ctx);
+        const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
+        const fmpz_mpoly_ctx_t ctx);
 
 slong _fmpz_mpoly_divrem_array(slong * lenr,
-       fmpz ** polyq, ulong ** expq, slong * allocq,
-              fmpz ** polyr, ulong ** expr, slong * allocr,
-                const fmpz * poly2, const ulong * exp2, slong len2,
+        fmpz ** polyq, ulong ** expq, slong * allocq,
+        fmpz ** polyr, ulong ** expr, slong * allocr,
+        const fmpz * poly2, const ulong * exp2, slong len2,
         const fmpz * poly3, const ulong * exp3, slong len3, slong * mults,
-                                                        slong num, slong bits);
+        slong num, slong bits);
 
 int fmpz_mpoly_divrem_array(fmpz_mpoly_t q, fmpz_mpoly_t r,
-                    const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
-                                                   const fmpz_mpoly_ctx_t ctx);
+        const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
+        const fmpz_mpoly_ctx_t ctx);
 
 void fmpz_mpoly_quasidivrem_heap(fmpz_t scale,
-                        fmpz_mpoly_t q, fmpz_mpoly_t r,
-                  const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
-                                                   const fmpz_mpoly_ctx_t ctx);
+        fmpz_mpoly_t q, fmpz_mpoly_t r,
+        const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
+        const fmpz_mpoly_ctx_t ctx);
 
 void fmpz_mpoly_quasidiv_heap(fmpz_t scale, fmpz_mpoly_t q,
-                  const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
-                                                   const fmpz_mpoly_ctx_t ctx);
+        const fmpz_mpoly_t poly2, const fmpz_mpoly_t poly3,
+        const fmpz_mpoly_ctx_t ctx);
 
 slong
 _fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** polyq,
-       fmpz ** polyr, ulong ** expr, slong * allocr, const fmpz * poly2,
-          const ulong * exp2, slong len2, fmpz_mpoly_struct * const * poly3,
-                        ulong * const * exp3, slong len, slong N, slong bits,
-                            const fmpz_mpoly_ctx_t ctx, const ulong * cmpmask);
+        fmpz ** polyr, ulong ** expr, slong * allocr, const fmpz * poly2,
+        const ulong * exp2, slong len2, fmpz_mpoly_struct * const * poly3,
+        ulong * const * exp3, slong len, slong N, slong bits,
+        const fmpz_mpoly_ctx_t ctx, const ulong * cmpmask);
 
 void
 fmpz_mpoly_divrem_ideal_monagan_pearce(fmpz_mpoly_struct ** q, fmpz_mpoly_t r,
-    const fmpz_mpoly_t poly2, fmpz_mpoly_struct * const * poly3, slong len,
-                                                   const fmpz_mpoly_ctx_t ctx);
+        const fmpz_mpoly_t poly2, fmpz_mpoly_struct * const * poly3, slong len,
+        const fmpz_mpoly_ctx_t ctx);
 
 void
 fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale,
-                                 fmpz_mpoly_struct ** q, fmpz_mpoly_t r,
-                const fmpz_mpoly_t poly2, fmpz_mpoly_struct * const * poly3,
-                                        slong len, const fmpz_mpoly_ctx_t ctx);
+        fmpz_mpoly_struct ** q, fmpz_mpoly_t r,
+        const fmpz_mpoly_t poly2, fmpz_mpoly_struct * const * poly3,
+        slong len, const fmpz_mpoly_ctx_t ctx);
 
 /* Square root ***************************************************************/
 
-slong _fmpz_mpoly_sqrt_heap(fmpz ** polyq, ulong ** expq,
-           slong * allocq, const fmpz * poly2, const ulong * exp2, slong len2,
-                       flint_bitcnt_t bits, const mpoly_ctx_t mctx, int check);
-
-int fmpz_mpoly_sqrt_heap(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
-                                        const fmpz_mpoly_ctx_t ctx, int check);
+slong _fmpz_mpoly_sqrt_heap(fmpz ** polyq, ulong ** expq, slong * allocq, const fmpz * poly2, const ulong * exp2, slong len2, flint_bitcnt_t bits, const mpoly_ctx_t mctx, int check);
+int fmpz_mpoly_sqrt_heap(fmpz_mpoly_t q, const fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx, int check);
 
 FMPZ_MPOLY_INLINE
-int fmpz_mpoly_sqrt(fmpz_mpoly_t q, const fmpz_mpoly_t poly2,
-                                                    const fmpz_mpoly_ctx_t ctx)
+int fmpz_mpoly_sqrt(fmpz_mpoly_t q, const fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
 {
     return fmpz_mpoly_sqrt_heap(q, poly2, ctx, 1);
 }
@@ -813,59 +593,36 @@ int fmpz_mpoly_is_square(const fmpz_mpoly_t poly2, const fmpz_mpoly_ctx_t ctx)
 
 /* GCD ***********************************************************************/
 
-void fmpz_mpoly_term_content(fmpz_mpoly_t M, const fmpz_mpoly_t A,
-                                                   const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_term_content(fmpz_mpoly_t M, const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx);
 
 void fmpz_mpoly_primitive_part(fmpz_mpoly_t res, const fmpz_mpoly_t f, const fmpz_mpoly_ctx_t ctx);
 
-int fmpz_mpoly_content_vars(fmpz_mpoly_t g, const fmpz_mpoly_t A,
-                  slong * vars, slong vars_length, const fmpz_mpoly_ctx_t ctx);
+int fmpz_mpoly_content_vars(fmpz_mpoly_t g, const fmpz_mpoly_t A, slong * vars, slong vars_length, const fmpz_mpoly_ctx_t ctx);
 
-int fmpz_mpoly_gcd(fmpz_mpoly_t G,
-       const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_deflation(fmpz * shift, fmpz * stride, const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx);
 
-int fmpz_mpoly_gcd_cofactors(fmpz_mpoly_t G,
-                fmpz_mpoly_t Abar, fmpz_mpoly_t Bbar, const fmpz_mpoly_t A,
-                             const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_deflate(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz * shift, const fmpz * stride, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_inflate(fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz * shift, const fmpz * stride, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_deflation(fmpz * shift, fmpz * stride,
-                             const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t ctx);
+int fmpz_mpoly_gcd_cofactors(fmpz_mpoly_t G, fmpz_mpoly_t Abar, fmpz_mpoly_t Bbar, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_deflate(fmpz_mpoly_t A, const fmpz_mpoly_t B,
-          const fmpz * shift, const fmpz * stride, const fmpz_mpoly_ctx_t ctx);
-
-void fmpz_mpoly_inflate(fmpz_mpoly_t A, const fmpz_mpoly_t B,
-          const fmpz * shift, const fmpz * stride, const fmpz_mpoly_ctx_t ctx);
-
-int fmpz_mpoly_gcd_hensel(fmpz_mpoly_t G,
-       const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
-
-int fmpz_mpoly_gcd_brown(fmpz_mpoly_t G,
-       const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
-
-int fmpz_mpoly_gcd_subresultant(fmpz_mpoly_t G,
-       const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
-
-int fmpz_mpoly_gcd_zippel(fmpz_mpoly_t G,
-       const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
-
-int fmpz_mpoly_gcd_zippel2(fmpz_mpoly_t G,
-       const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
+int fmpz_mpoly_gcd_hensel(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
+int fmpz_mpoly_gcd_brown(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
+int fmpz_mpoly_gcd_subresultant(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
+int fmpz_mpoly_gcd_zippel(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
+int fmpz_mpoly_gcd_zippel2(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
+int fmpz_mpoly_gcd(fmpz_mpoly_t G, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx);
 
 /* Univariates ***************************************************************/
 
 void fmpz_mpoly_univar_init(fmpz_mpoly_univar_t A, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx));
-
 void fmpz_mpoly_univar_clear(fmpz_mpoly_univar_t A, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_univar_fit_length(fmpz_mpoly_univar_t A,
-                                     slong length, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_univar_fit_length(fmpz_mpoly_univar_t A, slong length, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_univar_print_pretty(const fmpz_mpoly_univar_t A,
-                                  const char ** x, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_univar_print_pretty(const fmpz_mpoly_univar_t A, const char ** x, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_univar_assert_canonical(fmpz_mpoly_univar_t A,
-                                                   const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_univar_assert_canonical(fmpz_mpoly_univar_t A, const fmpz_mpoly_ctx_t ctx);
 
 FMPZ_MPOLY_INLINE
 void fmpz_mpoly_univar_zero(fmpz_mpoly_univar_t A, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
@@ -985,31 +742,24 @@ int fmpz_mpoly_vec_is_autoreduced(const fmpz_mpoly_vec_t G, const fmpz_mpoly_ctx
 
 ******************************************************************************/
 
-void mpoly_void_ring_init_fmpz_mpoly_ctx(mpoly_void_ring_t R,
-                                                   const fmpz_mpoly_ctx_t ctx);
+void mpoly_void_ring_init_fmpz_mpoly_ctx(mpoly_void_ring_t R, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_pow_fps(fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                                          ulong k, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_pow_fps(fmpz_mpoly_t A, const fmpz_mpoly_t B, ulong k, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpolyl_lead_coeff(fmpz_mpoly_t c, const fmpz_mpoly_t A,
-                                   slong num_vars, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpolyl_lead_coeff(fmpz_mpoly_t c, const fmpz_mpoly_t A, slong num_vars, const fmpz_mpoly_ctx_t ctx);
 
-int fmpz_mpolyl_content(fmpz_mpoly_t g, const fmpz_mpoly_t A,
-                                   slong num_vars, const fmpz_mpoly_ctx_t ctx);
+int fmpz_mpolyl_content(fmpz_mpoly_t g, const fmpz_mpoly_t A, slong num_vars, const fmpz_mpoly_ctx_t ctx);
 
 void _fmpz_mpoly_to_fmpz_poly_deflate(fmpz_poly_t A,
-                         const fmpz_mpoly_t B, slong var, const ulong * Bshift,
-                            const ulong * Bstride, const fmpz_mpoly_ctx_t ctx);
+        const fmpz_mpoly_t B, slong var, const ulong * Bshift,
+        const ulong * Bstride, const fmpz_mpoly_ctx_t ctx);
 
 void _fmpz_mpoly_from_fmpz_poly_inflate(fmpz_mpoly_t A,
-       flint_bitcnt_t Abits, const fmpz_poly_t B, slong var, const ulong * Ashift,
-                            const ulong * Astride, const fmpz_mpoly_ctx_t ctx);
+        flint_bitcnt_t Abits, const fmpz_poly_t B, slong var, const ulong * Ashift,
+        const ulong * Astride, const fmpz_mpoly_ctx_t ctx);
 
-int fmpz_mpoly_repack_bits(fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                                flint_bitcnt_t Abits, const fmpz_mpoly_ctx_t ctx);
-
-int fmpz_mpoly_repack_bits_inplace(fmpz_mpoly_t A, flint_bitcnt_t Abits,
-                                                   const fmpz_mpoly_ctx_t ctx);
+int fmpz_mpoly_repack_bits(fmpz_mpoly_t A, const fmpz_mpoly_t B, flint_bitcnt_t Abits, const fmpz_mpoly_ctx_t ctx);
+int fmpz_mpoly_repack_bits_inplace(fmpz_mpoly_t A, flint_bitcnt_t Abits, const fmpz_mpoly_ctx_t ctx);
 
 typedef struct _fmpz_mpoly_stripe_struct
 {
@@ -1028,7 +778,6 @@ typedef struct _fmpz_mpoly_stripe_struct
 } fmpz_mpoly_stripe_struct;
 
 typedef fmpz_mpoly_stripe_struct fmpz_mpoly_stripe_t[1];
-
 
 /* mpolyd ********************************************************************/
 
@@ -1059,30 +808,24 @@ void fmpz_pow_cache_init(fmpz_pow_cache_t T, const fmpz_t val);
 
 void fmpz_pow_cache_clear(fmpz_pow_cache_t T);
 
-int fmpz_pow_cache_mulpow_ui(fmpz_t a, const fmpz_t b, ulong k,
-                                                          fmpz_pow_cache_t T);
-
-int fmpz_pow_cache_mulpow_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t k,
-                                                          fmpz_pow_cache_t T);
+int fmpz_pow_cache_mulpow_ui(fmpz_t a, const fmpz_t b, ulong k, fmpz_pow_cache_t T);
+int fmpz_pow_cache_mulpow_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t k, fmpz_pow_cache_t T);
 
 /*****************************************************************************/
 
 void fmpz_mpoly_to_mpoly_perm_deflate_threaded_pool(
-                                fmpz_mpoly_t A, const fmpz_mpoly_ctx_t lctx,
-                            const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx,
-               const slong * perm, const ulong * shift, const ulong * stride,
-                        const thread_pool_handle * handles, slong num_handles);
+        fmpz_mpoly_t A, const fmpz_mpoly_ctx_t lctx,
+        const fmpz_mpoly_t B, const fmpz_mpoly_ctx_t ctx,
+        const slong * perm, const ulong * shift, const ulong * stride,
+        const thread_pool_handle * handles, slong num_handles);
 
 void fmpz_mpoly_from_mpoly_perm_inflate(
-               fmpz_mpoly_t A, flint_bitcnt_t Abits, const fmpz_mpoly_ctx_t ctx,
-                          const fmpz_mpoly_t B,  const fmpz_mpoly_ctx_t lctx,
-                const slong * perm, const ulong * shift, const ulong * stride);
+        fmpz_mpoly_t A, flint_bitcnt_t Abits, const fmpz_mpoly_ctx_t ctx,
+        const fmpz_mpoly_t B,  const fmpz_mpoly_ctx_t lctx,
+        const slong * perm, const ulong * shift, const ulong * stride);
 
-void fmpz_mpoly_height(fmpz_t max,
-                             const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx));
-
-void fmpz_mpoly_heights(fmpz_t max, fmpz_t sum,
-                             const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx));
+void fmpz_mpoly_height(fmpz_t max, const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx));
+void fmpz_mpoly_heights(fmpz_t max, fmpz_t sum, const fmpz_mpoly_t A, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx));
 
 /* geobuckets ****************************************************************/
 
@@ -1095,140 +838,68 @@ typedef struct fmpz_mpoly_geobucket
 
 typedef fmpz_mpoly_geobucket_struct fmpz_mpoly_geobucket_t[1];
 
-void fmpz_mpoly_geobucket_init(fmpz_mpoly_geobucket_t B,
-                                                   const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_geobucket_init(fmpz_mpoly_geobucket_t B, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_geobucket_clear(fmpz_mpoly_geobucket_t B, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_geobucket_clear(fmpz_mpoly_geobucket_t B,
-                                                   const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_geobucket_empty(fmpz_mpoly_t p, fmpz_mpoly_geobucket_t B, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_geobucket_empty(fmpz_mpoly_t p,
-                         fmpz_mpoly_geobucket_t B, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_geobucket_fit_length(fmpz_mpoly_geobucket_t B, slong i, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_geobucket_fit_length(fmpz_mpoly_geobucket_t B,
-                                          slong i, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_geobucket_set(fmpz_mpoly_geobucket_t B, fmpz_mpoly_t p, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_geobucket_set(fmpz_mpoly_geobucket_t B,
-                                   fmpz_mpoly_t p, const fmpz_mpoly_ctx_t ctx);
-
-void fmpz_mpoly_geobucket_add(fmpz_mpoly_geobucket_t B,
-                                   fmpz_mpoly_t p, const fmpz_mpoly_ctx_t ctx);
-
-void fmpz_mpoly_geobucket_sub(fmpz_mpoly_geobucket_t B,
-                                   fmpz_mpoly_t p, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_geobucket_add(fmpz_mpoly_geobucket_t B, fmpz_mpoly_t p, const fmpz_mpoly_ctx_t ctx);
+void fmpz_mpoly_geobucket_sub(fmpz_mpoly_geobucket_t B, fmpz_mpoly_t p, const fmpz_mpoly_ctx_t ctx);
 
 /* Helpers for array methods *************************************************/
 
-void _fmpz_mpoly_mul_array_chunked_DEG(fmpz_mpoly_t P,
-                             const fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                                       ulong degb, const fmpz_mpoly_ctx_t ctx);
+void _fmpz_mpoly_mul_array_chunked_DEG(fmpz_mpoly_t P, const fmpz_mpoly_t A, const fmpz_mpoly_t B, ulong degb, const fmpz_mpoly_ctx_t ctx);
+void _fmpz_mpoly_mul_array_chunked_LEX(fmpz_mpoly_t P, const fmpz_mpoly_t A, const fmpz_mpoly_t B, const ulong * mults, const fmpz_mpoly_ctx_t ctx);
 
-void _fmpz_mpoly_mul_array_chunked_LEX(fmpz_mpoly_t P,
-                             const fmpz_mpoly_t A, const fmpz_mpoly_t B,
-                              const ulong * mults, const fmpz_mpoly_ctx_t ctx);
+void _fmpz_mpoly_addmul_array1_slong1(ulong * poly1, const slong * poly2, const ulong * exp2, slong len2, const slong * poly3, const ulong * exp3, slong len3);
+void _fmpz_mpoly_addmul_array1_slong2(ulong * poly1, const slong * poly2, const ulong * exp2, slong len2, const slong * poly3, const ulong * exp3, slong len3);
+void _fmpz_mpoly_addmul_array1_slong(ulong * poly1, const slong * poly2, const ulong * exp2, slong len2, const slong * poly3, const ulong * exp3, slong len3);
 
-void _fmpz_mpoly_addmul_array1_slong1(ulong * poly1,
-                 const slong * poly2, const ulong * exp2, slong len2,
-                          const slong * poly3, const ulong * exp3, slong len3);
+void _fmpz_mpoly_addmul_array1_fmpz(fmpz * poly1, const fmpz * poly2, const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, slong len3);
 
-void _fmpz_mpoly_addmul_array1_slong(ulong * poly1,
-                 const slong * poly2, const ulong * exp2, slong len2,
-                          const slong * poly3, const ulong * exp3, slong len3);
+void _fmpz_mpoly_submul_array1_slong1(ulong * poly1, const slong * poly2, const ulong * exp2, slong len2, const slong * poly3, const ulong * exp3, slong len3);
+void _fmpz_mpoly_submul_array1_slong2(ulong * poly1, const slong * poly2, const ulong * exp2, slong len2, const slong * poly3, const ulong * exp3, slong len3);
+void _fmpz_mpoly_submul_array1_slong(ulong * poly1, const slong * poly2, const ulong * exp2, slong len2, const slong * poly3, const ulong * exp3, slong len3);
 
-void _fmpz_mpoly_addmul_array1_slong2(ulong * poly1,
-                 const slong * poly2, const ulong * exp2, slong len2,
-                          const slong * poly3, const ulong * exp3, slong len3);
+void _fmpz_mpoly_submul_array1_fmpz(fmpz * poly1, const fmpz * poly2, const ulong * exp2, slong len2, const fmpz * poly3, const ulong * exp3, slong len3);
 
-void _fmpz_mpoly_addmul_array1_fmpz(fmpz * poly1,
-                 const fmpz * poly2, const ulong * exp2, slong len2,
-                           const fmpz * poly3, const ulong * exp3, slong len3);
+void _fmpz_mpoly_submul_array1_slong2_1(ulong * poly1, slong d, const ulong exp2, const slong * poly3, const ulong * exp3, slong len3);
+void _fmpz_mpoly_submul_array1_slong_1(ulong * poly1, slong d, const ulong exp2, const slong * poly3, const ulong * exp3, slong len3);
 
-void _fmpz_mpoly_submul_array1_slong(ulong * poly1,
-                  const slong * poly2, const ulong * exp2, slong len2,
-                          const slong * poly3, const ulong * exp3, slong len3);
+void _fmpz_mpoly_submul_array1_fmpz_1(fmpz * poly1, const fmpz_t d, ulong exp2, const fmpz * poly3, const ulong * exp3, slong len3);
 
-void _fmpz_mpoly_submul_array1_slong2(ulong * poly1,
-                  const slong * poly2, const ulong * exp2, slong len2,
-                          const slong * poly3, const ulong * exp3, slong len3);
+slong fmpz_mpoly_append_array_sm1_LEX(fmpz_mpoly_t P, slong Plen, ulong * coeff_array, const ulong * mults, slong num, slong array_size, slong top);
+slong fmpz_mpoly_append_array_sm2_LEX(fmpz_mpoly_t P, slong Plen, ulong * coeff_array, const ulong * mults, slong num, slong array_size, slong top);
+slong fmpz_mpoly_append_array_sm3_LEX(fmpz_mpoly_t P, slong Plen, ulong * coeff_array, const ulong * mults, slong num, slong array_size, slong top);
 
-void _fmpz_mpoly_submul_array1_slong1(ulong * poly1,
-                 const slong * poly2, const ulong * exp2, slong len2,
-                          const slong * poly3, const ulong * exp3, slong len3);
+slong fmpz_mpoly_append_array_fmpz_LEX(fmpz_mpoly_t P, slong Plen, fmpz * coeff_array, const ulong * mults, slong num, slong array_size, slong top);
 
-void _fmpz_mpoly_submul_array1_fmpz(fmpz * poly1,
-                 const fmpz * poly2, const ulong * exp2, slong len2,
-                           const fmpz * poly3, const ulong * exp3, slong len3);
+slong fmpz_mpoly_append_array_sm1_DEGLEX(fmpz_mpoly_t P, slong Plen, ulong * coeff_array, slong top, slong nvars, slong degb);
+slong fmpz_mpoly_append_array_sm2_DEGLEX(fmpz_mpoly_t P, slong Plen, ulong * coeff_array, slong top, slong nvars, slong degb);
+slong fmpz_mpoly_append_array_sm3_DEGLEX(fmpz_mpoly_t P, slong Plen, ulong * coeff_array, slong top, slong nvars, slong degb);
 
-void _fmpz_mpoly_submul_array1_slong_1(ulong * poly1,
-                          slong d, const ulong exp2,
-                          const slong * poly3, const ulong * exp3, slong len3);
+slong fmpz_mpoly_append_array_fmpz_DEGLEX(fmpz_mpoly_t P, slong Plen, fmpz * coeff_array, slong top, slong nvars, slong degb);
 
-void _fmpz_mpoly_submul_array1_slong2_1(ulong * poly1,
-                           slong d, const ulong exp2,
-                          const slong * poly3, const ulong * exp3, slong len3);
+slong fmpz_mpoly_append_array_sm1_DEGREVLEX(fmpz_mpoly_t P, slong Plen, ulong * coeff_array, slong top, slong nvars, slong degb);
+slong fmpz_mpoly_append_array_sm2_DEGREVLEX(fmpz_mpoly_t P, slong Plen, ulong * coeff_array, slong top, slong nvars, slong degb);
+slong fmpz_mpoly_append_array_sm3_DEGREVLEX(fmpz_mpoly_t P, slong Plen, ulong * coeff_array, slong top, slong nvars, slong degb);
+slong fmpz_mpoly_append_array_fmpz_DEGREVLEX(fmpz_mpoly_t P, slong Plen, fmpz * coeff_array, slong top, slong nvars, slong degb);
 
-void _fmpz_mpoly_submul_array1_fmpz_1(fmpz * poly1,
-                          const fmpz_t d, ulong exp2,
-                           const fmpz * poly3, const ulong * exp3, slong len3);
+slong _fmpz_mpoly_from_ulong_array1(fmpz ** poly1, ulong ** exp1, slong * alloc, ulong * poly2, const slong * mults, slong num, slong bits, slong k);
+slong _fmpz_mpoly_from_ulong_array2(fmpz ** poly1, ulong ** exp1, slong * alloc, ulong * poly2, const slong * mults, slong num, slong bits, slong k);
+slong _fmpz_mpoly_from_ulong_array(fmpz ** poly1, ulong ** exp1, slong * alloc, ulong * poly2, const slong * mults, slong num, slong bits, slong k);
 
-slong fmpz_mpoly_append_array_sm1_LEX(fmpz_mpoly_t P,
-                        slong Plen, ulong * coeff_array,
-                  const ulong * mults, slong num, slong array_size, slong top);
-slong fmpz_mpoly_append_array_sm2_LEX(fmpz_mpoly_t P,
-                        slong Plen, ulong * coeff_array,
-                  const ulong * mults, slong num, slong array_size, slong top);
-slong fmpz_mpoly_append_array_sm3_LEX(fmpz_mpoly_t P,
-                         slong Plen, ulong * coeff_array,
-                  const ulong * mults, slong num, slong array_size, slong top);
-slong fmpz_mpoly_append_array_fmpz_LEX(fmpz_mpoly_t P,
-                        slong Plen, fmpz * coeff_array,
-                  const ulong * mults, slong num, slong array_size, slong top);
+slong _fmpz_mpoly_from_fmpz_array(fmpz ** poly1, ulong ** exp1, slong * alloc, fmpz * poly2, const slong * mults, slong num, slong bits, slong k);
 
-slong fmpz_mpoly_append_array_sm1_DEGLEX(fmpz_mpoly_t P,
-          slong Plen, ulong * coeff_array, slong top, slong nvars, slong degb);
-slong fmpz_mpoly_append_array_sm2_DEGLEX(fmpz_mpoly_t P,
-          slong Plen, ulong * coeff_array, slong top, slong nvars, slong degb);
-slong fmpz_mpoly_append_array_sm3_DEGLEX(fmpz_mpoly_t P,
-          slong Plen, ulong * coeff_array, slong top, slong nvars, slong degb);
-slong fmpz_mpoly_append_array_fmpz_DEGLEX(fmpz_mpoly_t P,
-           slong Plen, fmpz * coeff_array, slong top, slong nvars, slong degb);
+void _fmpz_mpoly_to_ulong_array1(ulong * p, const fmpz * coeffs, const ulong * exps, slong len);
+void _fmpz_mpoly_to_ulong_array2(ulong * p, const fmpz * coeffs, const ulong * exps, slong len);
+void _fmpz_mpoly_to_ulong_array(ulong * p, const fmpz * coeffs, const ulong * exps, slong len);
 
-slong fmpz_mpoly_append_array_sm1_DEGREVLEX(fmpz_mpoly_t P,
-          slong Plen, ulong * coeff_array, slong top, slong nvars, slong degb);
-slong fmpz_mpoly_append_array_sm2_DEGREVLEX(fmpz_mpoly_t P,
-          slong Plen, ulong * coeff_array, slong top, slong nvars, slong degb);
-slong fmpz_mpoly_append_array_sm3_DEGREVLEX(fmpz_mpoly_t P,
-          slong Plen, ulong * coeff_array, slong top, slong nvars, slong degb);
-slong fmpz_mpoly_append_array_fmpz_DEGREVLEX(fmpz_mpoly_t P,
-           slong Plen, fmpz * coeff_array, slong top, slong nvars, slong degb);
-
-slong _fmpz_mpoly_from_ulong_array(fmpz ** poly1,
-                         ulong ** exp1, slong * alloc, ulong * poly2,
-                          const slong * mults, slong num, slong bits, slong k);
-
-slong _fmpz_mpoly_from_ulong_array2(fmpz ** poly1,
-                         ulong ** exp1, slong * alloc, ulong * poly2,
-                          const slong * mults, slong num, slong bits, slong k);
-
-slong _fmpz_mpoly_from_ulong_array1(fmpz ** poly1,
-                         ulong ** exp1, slong * alloc, ulong * poly2,
-                          const slong * mults, slong num, slong bits, slong k);
-
-slong _fmpz_mpoly_from_fmpz_array(fmpz ** poly1,
-                         ulong ** exp1, slong * alloc, fmpz * poly2,
-                          const slong * mults, slong num, slong bits, slong k);
-
-void _fmpz_mpoly_to_ulong_array2(ulong * p, const fmpz * coeffs,
-                                                const ulong * exps, slong len);
-
-void _fmpz_mpoly_to_ulong_array1(ulong * p, const fmpz * coeffs,
-                                                const ulong * exps, slong len);
-
-void _fmpz_mpoly_to_ulong_array(ulong * p, const fmpz * coeffs,
-                                                const ulong * exps, slong len);
-
-void _fmpz_mpoly_to_fmpz_array(fmpz * p, const fmpz * coeffs,
-                                                const ulong * exps, slong len);
-
+void _fmpz_mpoly_to_fmpz_array(fmpz * p, const fmpz * coeffs, const ulong * exps, slong len);
 
 /* Misc arithmetic - has nothing to do with mpoly, should be moved out *******/
 
