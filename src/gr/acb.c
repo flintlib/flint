@@ -31,10 +31,14 @@
 typedef struct
 {
     slong prec;
+    int flags;
 }
 gr_acb_ctx;
 
+#define ACB_CTX_ANALYTIC 1
+
 #define ACB_CTX_PREC(ring_ctx) (((gr_acb_ctx *)((ring_ctx)))->prec)
+#define ACB_CTX_FLAGS(ring_ctx) (((gr_acb_ctx *)((ring_ctx)))->flags)
 
 int _gr_acb_ctx_set_real_prec(gr_ctx_t ctx, slong prec)
 {
@@ -723,7 +727,10 @@ _gr_acb_pow(acb_t res, const acb_t x, const acb_t exp, const gr_ctx_t ctx)
     }
     else if (!acb_contains_zero(x) || arb_is_positive(acb_realref(exp)))
     {
-        acb_pow(res, x, exp, ACB_CTX_PREC(ctx));
+        if (ACB_CTX_FLAGS(ctx) & ACB_CTX_ANALYTIC)
+            acb_pow_analytic(res, x, exp, 1, ACB_CTX_PREC(ctx));
+        else
+            acb_pow(res, x, exp, ACB_CTX_PREC(ctx));
 
         if (!acb_is_finite(res))
             return GR_UNABLE;
@@ -761,7 +768,17 @@ _gr_acb_is_square(const acb_t x, const gr_ctx_t ctx)
 int
 _gr_acb_sqrt(acb_t res, const acb_t x, const gr_ctx_t ctx)
 {
-    acb_sqrt(res, x, ACB_CTX_PREC(ctx));
+    if (ACB_CTX_FLAGS(ctx) & ACB_CTX_ANALYTIC)
+    {
+        acb_sqrt_analytic(res, x, 1, ACB_CTX_PREC(ctx));
+        if (!acb_is_finite(res))
+            return GR_UNABLE;
+    }
+    else
+    {
+        acb_sqrt(res, x, ACB_CTX_PREC(ctx));
+    }
+
     return GR_SUCCESS;
 }
 
@@ -770,7 +787,17 @@ _gr_acb_rsqrt(acb_t res, const acb_t x, const gr_ctx_t ctx)
 {
     if (!acb_contains_zero(x))
     {
-        acb_rsqrt(res, x, ACB_CTX_PREC(ctx));
+        if (ACB_CTX_FLAGS(ctx) & ACB_CTX_ANALYTIC)
+        {
+            acb_rsqrt_analytic(res, x, 1, ACB_CTX_PREC(ctx));
+            if (!acb_is_finite(res))
+                return GR_UNABLE;
+        }
+        else
+        {
+            acb_rsqrt(res, x, ACB_CTX_PREC(ctx));
+        }
+
         return GR_SUCCESS;
     }
     else if (acb_is_zero(x))
@@ -786,16 +813,36 @@ _gr_acb_rsqrt(acb_t res, const acb_t x, const gr_ctx_t ctx)
 int
 _gr_acb_floor(acb_t res, const acb_t x, const gr_ctx_t ctx)
 {
-    arb_floor(acb_realref(res), acb_realref(x), ACB_CTX_PREC(ctx));
-    arb_zero(acb_imagref(res));
+    if (ACB_CTX_FLAGS(ctx) & ACB_CTX_ANALYTIC)
+    {
+        acb_real_floor(res, x, 1, ACB_CTX_PREC(ctx));
+        if (!acb_is_finite(res))
+            return GR_UNABLE;
+    }
+    else
+    {
+        arb_floor(acb_realref(res), acb_realref(x), ACB_CTX_PREC(ctx));
+        arb_zero(acb_imagref(res));
+    }
+
     return GR_SUCCESS;
 }
 
 int
 _gr_acb_ceil(acb_t res, const acb_t x, const gr_ctx_t ctx)
 {
-    arb_ceil(acb_realref(res), acb_realref(x), ACB_CTX_PREC(ctx));
-    arb_zero(acb_imagref(res));
+    if (ACB_CTX_FLAGS(ctx) & ACB_CTX_ANALYTIC)
+    {
+        acb_real_ceil(res, x, 1, ACB_CTX_PREC(ctx));
+        if (!acb_is_finite(res))
+            return GR_UNABLE;
+    }
+    else
+    {
+        arb_ceil(acb_realref(res), acb_realref(x), ACB_CTX_PREC(ctx));
+        arb_zero(acb_imagref(res));
+    }
+
     return GR_SUCCESS;
 }
 
@@ -932,7 +979,15 @@ _gr_acb_log(acb_t res, const acb_t x, const gr_ctx_t ctx)
         return GR_UNABLE;
     }
 
-    acb_log(res, x, ACB_CTX_PREC(ctx));
+    if (ACB_CTX_FLAGS(ctx) & ACB_CTX_ANALYTIC)
+    {
+        acb_log_analytic(res, x, 1, ACB_CTX_PREC(ctx));
+        if (!acb_is_finite(res))
+            return GR_UNABLE;
+    }
+    else
+        acb_log(res, x, ACB_CTX_PREC(ctx));
+
     return GR_SUCCESS;
 }
 
@@ -2285,6 +2340,7 @@ gr_ctx_init_complex_acb(gr_ctx_t ctx, slong prec)
 
     ACB_CTX_PREC(ctx) = FLINT_MAX(2, FLINT_MIN(prec, WORD_MAX / 8));
     ACB_CTX_PREC(ctx) = prec;
+    ACB_CTX_FLAGS(ctx) = 0;
 
     ctx->methods = _acb_methods;
 
