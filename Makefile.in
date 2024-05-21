@@ -12,9 +12,11 @@
 FLINT_DIR:=.
 SRC_DIR:=src
 BUILD_DIR:=build
+TUNE_DIR:=src/tune
 ABS_FLINT_DIR:='$(patsubst %/,%, $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))'
 ABS_SRC_DIR:=$(ABS_FLINT_DIR)/$(SRC_DIR)
 ABS_BUILD_DIR:=$(ABS_FLINT_DIR)/$(SRC_DIR)
+ABS_TUNE_DIR:=$(ABS_FLINT_DIR)/$(TUNE_DIR)
 
 FLINT_VERSION:=@FLINT_VERSION_FULL@
 FLINT_MAJOR_SO:=@FLINT_MAJOR_SO@
@@ -81,6 +83,7 @@ CFLAGS:=@CFLAGS@
 TESTCFLAGS:=@TESTCFLAGS@
 CPPFLAGS:=@CPPFLAGS@ -DBUILDING_FLINT
 CPPFLAGS2:=-L$(FLINT_DIR) $(CPPFLAGS)
+CPPFLAGS3:=-I$(TUNE_DIR) $(CPPFLAGS2)
 LIB_CPPFLAGS:=@LIB_CPPFLAGS@
 CXXFLAGS:=@CXXFLAGS@
 LIBS:=@LIBS@
@@ -156,6 +159,7 @@ HEADER_DIRS :=                                                              \
         mpn_extras                                                          \
         mpfr_vec                        mpfr_mat                            \
         nmod            nmod_vec        nmod_mat        nmod_poly           \
+        n_mod           n_mod_vec                                           \
         mpn_mod                                                             \
         fmpz            fmpz_vec        fmpz_mat        fmpz_poly           \
         fmpz_mod        fmpz_mod_vec    fmpz_mod_mat    fmpz_mod_poly       \
@@ -218,8 +222,14 @@ TEMPLATE_DIRS :=                                                            \
         fq_poly_templates               fq_poly_factor_templates            \
         fq_embed_templates              fq_templates
 
+_TUNE_DIRS :=                                                                \
+        n_mod_vec
+
+TUNE_DIRS := $(patsubst %, $(BUILD_DIR)/tune/%, $(_TUNE_DIRS))
+
 BUILD_DIRS :=                                                               \
         $(BUILD_DIR)                                                        \
+        $(TUNE_DIRS)                                                        \
         $(patsubst %, $(BUILD_DIR)/%, $(DIRS))                              \
         $(patsubst %, $(BUILD_DIR)/%/profile, $(DIRS))                      \
         $(patsubst %, $(BUILD_DIR)/%/test, $(DIRS))                         \
@@ -299,12 +309,12 @@ ifneq ($(WANT_NTL), 0)
 interfaces_TEST_SOURCES := $(SRC_DIR)/interfaces/test/t-NTL-interface.cpp
 endif
 
-define xxx_TUNE_SOURCES
-$(1)_TUNE_SOURCES := $(wildcard $(SRC_DIR)/$(1)/tune/*.c)
+define xxx_OLD_TUNE_SOURCES
+$(1)_OLD_TUNE_SOURCES := $(wildcard $(SRC_DIR)/$(1)/tune/*.c)
 endef
-_TUNE_SOURCES := $(wildcard $(SRC_DIR)/tune/*.c)
-$(foreach dir, $(DIRS), $(eval $(call xxx_TUNE_SOURCES,$(dir))))
-TUNE_SOURCES := $(foreach dir,$(DIRS),$($(dir)_TUNE_SOURCES)) $(_TUNE_SOURCES)
+_OLD_TUNE_SOURCES := $(wildcard $(SRC_DIR)/tune/*.c)
+$(foreach dir, $(DIRS), $(eval $(call xxx_OLD_TUNE_SOURCES,$(dir))))
+OLD_TUNE_SOURCES := $(foreach dir,$(DIRS),$($(dir)_OLD_TUNE_SOURCES)) $(_OLD_TUNE_SOURCES)
 
 EXMP_SOURCES := $(wildcard $(FLINT_DIR)/examples/*.c)
 
@@ -359,12 +369,12 @@ interfaces_TESTS := $(BUILD_DIR)/interfaces/test/t-NTL-interface$(EXEEXT)
 endif
 TESTS := $(_TESTS) $(foreach dir,$(DIRS),$($(dir)_TESTS)) $(interfaces_TESTS)
 
-define xxx_TUNES
-$(1)_TUNES := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%$(EXEEXT),$($(1)_TUNE_SOURCES))
+define xxx_OLD_TUNES
+$(1)_OLD_TUNES := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%$(EXEEXT),$($(1)_OLD_TUNE_SOURCES))
 endef
-_TUNES := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%$(EXEEXT),$(_TUNE_SOURCES))
-$(foreach dir, $(DIRS), $(eval $(call xxx_TUNES,$(dir))))
-TUNES := $(foreach dir,$(DIRS),$($(dir)_TUNES)) $(_TUNES)
+_OLD_TUNES := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%$(EXEEXT),$(_OLD_TUNE_SOURCES))
+$(foreach dir, $(DIRS), $(eval $(call xxx_OLD_TUNES,$(dir))))
+OLD_TUNES := $(foreach dir,$(DIRS),$($(dir)_OLD_TUNES)) $(_OLD_TUNES)
 
 EXMPS := $(patsubst $(FLINT_DIR)/%.c,$(BUILD_DIR)/%$(EXEEXT),$(EXMP_SOURCES))
 
@@ -675,30 +685,20 @@ endif
 endif
 
 ifeq ($(SHARED), 0)
-$(BUILD_DIR)/tune/%$(EXEEXT): $(SRC_DIR)/tune/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/tune
-	@echo "  CC  $(<:$(SRC_DIR)/%=%)"
-	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
-else
-$(BUILD_DIR)/tune/%$(EXEEXT): $(SRC_DIR)/tune/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/tune
-	@echo "  CC  $(<:$(SRC_DIR)/%=%)"
-	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
-endif
-
-ifeq ($(SHARED), 0)
-define xxx_TUNES_rule
+define xxx_OLD_TUNES_rule
 $(BUILD_DIR)/$(1)/tune/%$(EXEEXT): $(SRC_DIR)/$(1)/tune/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/$(1)/tune
 	@echo "  CC  $$(<:$(SRC_DIR)/%=%)"
 	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) $$(DEPFLAGS)
 endef
 else
-define xxx_TUNES_rule
+define xxx_OLD_TUNES_rule
 $(BUILD_DIR)/$(1)/tune/%$(EXEEXT): $(SRC_DIR)/$(1)/tune/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/$(1)/tune
 	@echo "  CC  $$(<:$(SRC_DIR)/%=%)"
 	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) $$(DEPFLAGS)
 endef
 endif
 
-$(foreach dir, $(DIRS), $(eval $(call xxx_TUNES_rule,$(dir))))
+$(foreach dir, $(DIRS), $(eval $(call xxx_OLD_TUNES_rule,$(dir))))
 
 ifeq ($(SHARED), 0)
 $(BUILD_DIR)/examples/%$(EXEEXT): $(FLINT_DIR)/examples/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/examples $(BUILD_DIR)/include
@@ -834,7 +834,35 @@ endif
 # tuning
 ################################################################################
 
-tune: library $(TUNES)
+# Only old tunes, i.e. under src/MOD/tune/
+old_tune: library $(OLD_TUNES)
+
+TUNE_SOURCE:=$(TUNE_DIR)/tune.c
+TUNE_DEPS_SOURCES:=$(wildcard $(TUNE_DIR)/n_mod_vec/*.c)
+
+_TUNE_HEADERS:=tune.h clock.h
+TUNE_HEADERS:=$(patsubst %,$(TUNE_DIR)/%,$(_TUNE_HEADERS))
+
+TUNE_DEPS_OBJS:=$(patsubst $(TUNE_DIR)/%.c,$(BUILD_DIR)/tune/%.o,$(TUNE_DEPS_SOURCES))
+
+TUNE_EXE:=$(BUILD_DIR)/tuneup$(EXEEXT)
+
+# Sloppy to say that all TUNE_DIRS have to be built.
+$(BUILD_DIR)/tune/%.o: $(TUNE_DIR)/%.c $(TUNE_HEADERS) | $(TUNE_DIRS)
+	@echo "  CC  $(<:$(SRC_DIR)/%=%)"
+	@$(CC) $(CFLAGS) $(CPPFLAGS3) $(LIB_CPPFLAGS) -c $< -o $@ $(DEPFLAGS)
+
+ifeq ($(SHARED), 0)
+$(TUNE_EXE): $(TUNE_SOURCE) $(TUNE_DEPS_OBJS) $(TUNE_HEADERS) $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)
+	@echo "  CC  $(<:$(SRC_DIR)/%=%)"
+	@$(CC) $(CFLAGS) $(CPPFLAGS3) $(LIB_CPPFLAGS) $(TUNE_DEPS_OBJS) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
+else
+$(TUNE_EXE): $(TUNE_SOURCE) $(TUNE_DEPS_OBJS) $(TUNE_HEADERS) | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)
+	@echo "  CC  $(<:$(SRC_DIR)/%=%)"
+	@$(CC) $(CFLAGS) $(CPPFLAGS3) $(LIB_CPPFLAGS) $(TUNE_DEPS_OBJS) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
+endif
+
+tune: $(TUNE_EXE)
 
 ################################################################################
 # valgrind
@@ -988,5 +1016,5 @@ dist:
 print-%:
 	@echo "$*=$($*)"
 
-.PHONY: all library shared static examples checkexamples profile tests check tune valgrind clean distclean install uninstall dist %_TEST_RUN %_TEST_RUN_% %_TEST_DGB_RUN_ARGS %_VALGRIND_RUN print-% coverage coverage_html debug
+.PHONY: all library shared static examples checkexamples profile tests check tune old_tune valgrind clean distclean install uninstall dist %_TEST_RUN %_TEST_RUN_% %_TEST_DGB_RUN_ARGS %_VALGRIND_RUN print-% coverage coverage_html debug
 .PRECIOUS: $(mpn_extras_PIC_S_SOURCES) $(mpn_extras_S_SOURCES)

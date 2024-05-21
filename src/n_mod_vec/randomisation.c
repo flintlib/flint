@@ -10,14 +10,12 @@
 */
 
 #include "n_mod.h"
+#include "n_mod_vec.h"
 
-void n_mod_ctx_init_rand(n_mod_ctx_ptr ctx, flint_rand_t state)
+void _n_mod_vec_rand(nn_ptr rp, flint_rand_t state, slong len, n_mod_ctx_srcptr ctx)
 {
-    ulong n = n_randtest_not_zero(state);
-    unsigned int norm = flint_clz(n);
+    slong ix;
 
-    ctx->nu = n;
-    ctx->nn = n << norm;
-    ctx->ninv = n_preinvert_limb_prenorm(ctx->nn);
-    ctx->norm = norm;
+    for (ix = 0; ix < len; ix++)
+        rp[ix] = n_mod_rand(state, ctx);
 }

@@ -33,10 +33,14 @@ N_MOD_VEC_INLINE nn_ptr _n_mod_vec_init(slong len)
 
 N_MOD_VEC_INLINE void _n_mod_vec_clear(nn_ptr up)
 {
-    return flint_free(up);
+    flint_free(up);
 }
 
-void _n_mod_vec_is_canonical(nn_srcptr up, slong len, n_mod_ctx_srcptr ctx);
+void _n_mod_vec_is_canonical(nn_srcptr, slong, n_mod_ctx_srcptr);
+
+/* randomisation *************************************************************/
+
+void _n_mod_vec_rand(nn_ptr, flint_rand_t, slong, n_mod_ctx_srcptr);
 
 /* assignments ***************************************************************/
 
@@ -97,15 +101,8 @@ int _n_mod_vec_is_zero(nn_srcptr up, slong len)
 
 void _n_mod_vec_neg(nn_ptr, nn_srcptr, slong, ulong);
 
-/*
-   0: mod < 2^{FLINT_BITS} / 2
-   1: mod < 2^{FLINT_BITS}
-*/
-/* TODO: Establish tuning suite that can override case 0. */
-void _n_mod_vec_add_0(nn_ptr, nn_srcptr, nn_srcptr, slong, ulong);
-void _n_mod_vec_sub_0(nn_ptr, nn_srcptr, nn_srcptr, slong, ulong);
-void _n_mod_vec_add_1(nn_ptr, nn_srcptr, nn_srcptr, slong, ulong);
-void _n_mod_vec_sub_1(nn_ptr, nn_srcptr, nn_srcptr, slong, ulong);
+void _n_mod_vec_add(nn_ptr, nn_srcptr, nn_srcptr, slong, ulong);
+void _n_mod_vec_sub(nn_ptr, nn_srcptr, nn_srcptr, slong, ulong);
 
 /* dot products **************************************************************/
 
