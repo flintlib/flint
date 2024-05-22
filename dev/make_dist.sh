@@ -25,6 +25,13 @@ echo "Extracting"
 tar -xf ${archive_prefix}.tar.gz
 rm ${archive_prefix}.tar.gz
 
+# update VERSION file
+printf $flint_version > VERSION
+
+echo "Bootstrapping"
+./bootstrap.sh
+
+
 echo "Adding / patching / removing files"
 # copy some files that should be included in the distribution archive
 cp -r config ${archive_prefix}/
@@ -32,15 +39,12 @@ cp configure ${archive_prefix}/
 cp src/config.h.in ${archive_prefix}/src/
 
 # remove some things we don't want to install
-cd ${archive_prefix}
+pushd ${archive_prefix}
 rm -rf .[a-z]*  # no dot files
 rm -rf dev
 
-# update VERSION file
-printf $flint_version > VERSION
-
 # return to top directory
-cd ..
+popd
 
 # create the source archives
 echo "Create .tar.gz"

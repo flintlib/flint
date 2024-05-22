@@ -84,11 +84,6 @@ jobs:
           autoconf --version
           libtool --version
 
-
-      - name: "Bootstrap"
-        run: |
-          ./bootstrap.sh
-
       - name: "Create source archive"
         run: dev/make_dist.sh ${FLINT_VERSION}
 
