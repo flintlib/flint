@@ -57,6 +57,7 @@ gr_method_tab_input _mpn_mod_methods_input[] =
     {GR_METHOD_SET_UI,          (gr_funcptr) mpn_mod_set_ui},
     {GR_METHOD_SET_FMPZ,        (gr_funcptr) mpn_mod_set_fmpz},
     {GR_METHOD_SET_OTHER,       (gr_funcptr) mpn_mod_set_other},
+    {GR_METHOD_GET_FMPZ,        (gr_funcptr) mpn_mod_get_fmpz},
     {GR_METHOD_NEG,             (gr_funcptr) mpn_mod_neg},
     {GR_METHOD_ADD,             (gr_funcptr) mpn_mod_add},
     {GR_METHOD_ADD_UI,          (gr_funcptr) mpn_mod_add_ui},

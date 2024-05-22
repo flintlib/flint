@@ -141,6 +141,14 @@ _gr_fmpz_mod_set_ui(fmpz_t res, ulong v, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+int
+_gr_fmpz_mod_get_fmpz(fmpz_t res, const fmpz_t x, const gr_ctx_t ctx)
+{
+    fmpz_set(res, x);
+    return GR_SUCCESS;
+}
+
+
 /* todo: public interface */
 #define NMOD_CTX_REF(ring_ctx) (((nmod_t *)((ring_ctx))))
 #define NMOD_CTX(ring_ctx) (*NMOD_CTX_REF(ring_ctx))
@@ -249,6 +257,20 @@ _gr_fmpz_mod_sub(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
 }
 
 int
+_gr_fmpz_mod_sub_si(fmpz_t res, const fmpz_t x, slong y, const gr_ctx_t ctx)
+{
+    fmpz_mod_sub_si(res, x, y, FMPZ_MOD_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpz_mod_sub_ui(fmpz_t res, const fmpz_t x, ulong y, const gr_ctx_t ctx)
+{
+    fmpz_mod_sub_ui(res, x, y, FMPZ_MOD_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
 _gr_fmpz_mod_mul(fmpz_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
 #if 1
@@ -264,6 +286,13 @@ int
 _gr_fmpz_mod_mul_si(fmpz_t res, const fmpz_t x, slong y, const gr_ctx_t ctx)
 {
     fmpz_mod_mul_si(res, x, y, FMPZ_MOD_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fmpz_mod_mul_ui(fmpz_t res, const fmpz_t x, ulong y, const gr_ctx_t ctx)
+{
+    fmpz_mod_mul_ui(res, x, y, FMPZ_MOD_CTX(ctx));
     return GR_SUCCESS;
 }
 
@@ -753,13 +782,17 @@ gr_method_tab_input _fmpz_mod_methods_input[] =
     {GR_METHOD_SET_UI,          (gr_funcptr) _gr_fmpz_mod_set_ui},
     {GR_METHOD_SET_FMPZ,        (gr_funcptr) _gr_fmpz_mod_set_fmpz},
     {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_fmpz_mod_set_other},
+    {GR_METHOD_GET_FMPZ,        (gr_funcptr) _gr_fmpz_mod_get_fmpz},
     {GR_METHOD_NEG,             (gr_funcptr) _gr_fmpz_mod_neg},
     {GR_METHOD_ADD,             (gr_funcptr) _gr_fmpz_mod_add},
     {GR_METHOD_ADD_UI,          (gr_funcptr) _gr_fmpz_mod_add_ui},
     {GR_METHOD_ADD_SI,          (gr_funcptr) _gr_fmpz_mod_add_si},
     {GR_METHOD_SUB,             (gr_funcptr) _gr_fmpz_mod_sub},
+    {GR_METHOD_SUB_UI,          (gr_funcptr) _gr_fmpz_mod_sub_ui},
+    {GR_METHOD_SUB_SI,          (gr_funcptr) _gr_fmpz_mod_sub_si},
     {GR_METHOD_MUL,             (gr_funcptr) _gr_fmpz_mod_mul},
     {GR_METHOD_MUL_SI,          (gr_funcptr) _gr_fmpz_mod_mul_si},
+    {GR_METHOD_MUL_UI,          (gr_funcptr) _gr_fmpz_mod_mul_ui},
     {GR_METHOD_ADDMUL,          (gr_funcptr) _gr_fmpz_mod_addmul},
     {GR_METHOD_SUBMUL,          (gr_funcptr) _gr_fmpz_mod_submul},
     {GR_METHOD_MUL_TWO,         (gr_funcptr) _gr_fmpz_mod_mul_two},
