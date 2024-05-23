@@ -67,13 +67,11 @@ void fmpz_mod_ctx_init(fmpz_mod_ctx_t ctx, const fmpz_t n)
             ctx->mul_fxn = _fmpz_mod_mul2;
         }
     }
-#if FLINT_HAVE_FFT_SMALL
-    else if (bits >= 19000)
+    else if (bits > 20 * FLINT_BITS)   /* todo: optimize fmpz_mod_mul so that this always makes sense */
     {
         ctx->ninv_huge = flint_malloc(sizeof(fmpz_preinvn_struct));
         fmpz_preinvn_init(ctx->ninv_huge, n);
     }
-#endif
 }
 
 void fmpz_mod_ctx_init_ui(fmpz_mod_ctx_t ctx, ulong n)

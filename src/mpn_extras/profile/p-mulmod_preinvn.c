@@ -17,21 +17,19 @@
 /* FIXME: Non-x86 systems do not have prof_* definitions! */
 #ifdef FLINT_NUM_CLOCKS
 
-#define mock_mulmod_preinvn(rxx, axx, bxx, nnn, nxx, ninv, norm)    \
-   do {                                                             \
-      mp_ptr __t;                                                   \
-      TMP_INIT;                                                     \
-                                                                    \
-      TMP_START;                                                    \
-      __t = TMP_ALLOC(3*(nnn)*sizeof(mp_limb_t));                   \
-                                                                    \
-      mpn_mul_n(__t, axx, bxx, nnn);                                \
-      if (norm)                                                     \
-         mpn_rshift(__t, __t, 2*(nnn), norm);                       \
-                                                                    \
-      mpn_tdiv_qr(__t + 2*(nnn), rxx, 0, __t, 2*(nnn), nxx, nnn);   \
-      TMP_END;                                                      \
-   } while (0)
+void
+mock_mulmod_preinvn(mp_ptr rxx, mp_ptr axx, mp_srcptr bxx, slong nnn, mp_srcptr nxx, mp_srcptr ninv, slong norm)
+{
+    mp_ptr __t;
+    TMP_INIT;
+    TMP_START;
+    __t = TMP_ALLOC((3*(nnn)+1)*sizeof(mp_limb_t));
+    flint_mpn_mul_n(__t, axx, bxx, nnn);
+    if (norm)
+       mpn_rshift(__t, __t, 2*(nnn), norm);
+    mpn_tdiv_qr(__t + 2*(nnn), rxx, 0, __t, 2*(nnn), nxx, nnn);
+    TMP_END;
+}
 
 typedef struct
 {

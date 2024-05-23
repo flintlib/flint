@@ -232,11 +232,13 @@ void _mpz_tdiv_qr_preinvn(mpz_ptr q, mpz_ptr r,
     }
 
     /*
-       TODO: speedup mpir's mullow and mulhigh and use in
-       flint_mpn_divrem_preinvn so we can remove this first
+       TODO: speedup flint_mpn_divrem_preinvn so we can remove this first
        case here
     */
-    if (usize2 == 2 || (usize2 > 15 && usize2 < 120))
+    slong rn = size2;
+    slong qn = size1 - size2 + 1;
+
+    if (rn <= 3 || (rn >= 15 && qn == 1) || (rn >= 60 && qn <= 40))
         mpn_tdiv_qr(qp, rp, 0, ap, usize1, dp, usize2);
     else {
         if (nm) {

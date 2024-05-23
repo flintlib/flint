@@ -10,43 +10,84 @@
 */
 
 #include <math.h>
+#include <gmp.h>
+#include "longlong.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
+#include "fmpz_extras.h"
+#include "gr.h"
+#include "mpn_mod.h"
+
+int _gr_lucas_chain(gr_ptr Vm, gr_ptr Vm1, gr_srcptr A, const fmpz_t m, gr_ctx_t ctx)
+{
+    gr_ptr t;
+    slong i, B, mn;
+    int status = GR_SUCCESS;
+    nn_srcptr md;
+    ulong mtmp;
+    slong i_limb, i_bit;
+    int FLINT_SET_BUT_UNUSED(msgn);
+
+    FMPZ_GET_MPN_READONLY(msgn, mn, md, mtmp, *m);
+    B = (mn - 1) * FLINT_BITS + FLINT_BIT_COUNT(md[mn - 1]);
+
+    gr_method_binary_op mul = GR_BINARY_OP(ctx, MUL);
+    gr_method_binary_op sub = GR_BINARY_OP(ctx, SUB);
+    gr_method_binary_op_ui sub_ui = GR_BINARY_OP_UI(ctx, SUB_UI);
+
+    GR_TMP_INIT(t, ctx);
+
+    status |= gr_set_ui(Vm, 2, ctx);
+    status |= gr_set(Vm1, A, ctx);
+
+    for (i = B - 1; i >= 0; i--)
+    {
+       i_limb = i / FLINT_BITS;
+       i_bit = i % FLINT_BITS;
+
+       if (md[i_limb] & (UWORD(1) << i_bit)) /* 1 in binary repn */
+       {
+          status |= mul(t, Vm, Vm1, ctx);
+          status |= sub(Vm, t, A, ctx);
+          status |= mul(t, Vm1, Vm1, ctx);
+          status |= sub_ui(Vm1, t, 2, ctx);
+       }
+       else /* 0 in binary repn */
+       {
+          status |= mul(t, Vm, Vm1, ctx);
+          status |= sub(Vm1, t, A, ctx);
+          status |= mul(t, Vm, Vm, ctx);
+          status |= sub_ui(Vm, t, 2, ctx);
+       }
+    }
+
+    GR_TMP_CLEAR(t, ctx);
+    return status;
+}
 
 void fmpz_lucas_chain(fmpz_t Vm, fmpz_t Vm1, const fmpz_t A,
                                          const fmpz_t m, const fmpz_t n)
 {
-    fmpz_t t;
-    slong i, B = fmpz_sizeinbase(m, 2);
+    gr_ctx_t ctx;
+    gr_ptr rVm, rVm1, rA;
+    int status = GR_SUCCESS;
 
-    fmpz_init(t);
-    fmpz_set_ui(Vm, 2);
-    fmpz_set(Vm1, A);
+    if (fmpz_size(n) == 1)
+        gr_ctx_init_nmod(ctx, fmpz_get_ui(n));
+    else if (gr_ctx_init_mpn_mod(ctx, n) != GR_SUCCESS)
+        gr_ctx_init_fmpz_mod(ctx, n);
 
-    for (i = B - 1; i >= 0; i--)
-    {
-       if (fmpz_tstbit(m, i)) /* 1 in binary repn */
-       {
-          fmpz_mul(t, Vm, Vm1);
-          fmpz_sub(t, t, A);
-          fmpz_mod(Vm, t, n);
+    GR_TMP_INIT3(rVm, rVm1, rA, ctx);
 
-          fmpz_mul(t, Vm1, Vm1);
-          fmpz_sub_ui(t, t, 2);
-          fmpz_mod(Vm1, t, n);
-       } else /* 0 in binary repn */
-       {
-          fmpz_mul(t, Vm, Vm1);
-          fmpz_sub(t, t, A);
-          fmpz_mod(Vm1, t, n);
+    status |= gr_set_fmpz(rA, A, ctx);
+    status |= _gr_lucas_chain(rVm, rVm1, rA, m, ctx);
+    status |= gr_get_fmpz(Vm, rVm, ctx);
+    status |= gr_get_fmpz(Vm1, rVm1, ctx);
+    GR_MUST_SUCCEED(status);
 
-          fmpz_mul(t, Vm, Vm);
-          fmpz_sub_ui(t, t, 2);
-          fmpz_mod(Vm, t, n);
-       }
-    }
-
-    fmpz_clear(t);
+    GR_TMP_CLEAR3(rVm, rVm1, rA, ctx);
+    gr_ctx_clear(ctx);
+    return;
 }
 
 void fmpz_lucas_chain_full(fmpz_t Vm, fmpz_t Vm1, const fmpz_t A, const fmpz_t B,

@@ -137,6 +137,14 @@ _gr_nmod_set_fmpz(ulong * res, const fmpz_t v, const gr_ctx_t ctx)
 }
 
 int
+_gr_nmod_get_fmpz(fmpz_t res, const ulong * x, const gr_ctx_t ctx)
+{
+    fmpz_set_ui(res, x[0]);
+    return GR_SUCCESS;
+}
+
+
+int
 _gr_nmod_inv(ulong * res, const ulong * x, const gr_ctx_t ctx)
 {
     ulong r, g;
@@ -1467,6 +1475,7 @@ gr_method_tab_input __gr_nmod_methods_input[] =
     {GR_METHOD_SET_UI,          (gr_funcptr) _gr_nmod_set_ui},
     {GR_METHOD_SET_FMPZ,        (gr_funcptr) _gr_nmod_set_fmpz},
     {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_nmod_set_other},
+    {GR_METHOD_GET_FMPZ,        (gr_funcptr) _gr_nmod_get_fmpz},
     {GR_METHOD_NEG,             (gr_funcptr) _gr_nmod_neg},
     {GR_METHOD_ADD,             (gr_funcptr) _gr_nmod_add},
     {GR_METHOD_ADD_SI,          (gr_funcptr) _gr_nmod_add_si},
