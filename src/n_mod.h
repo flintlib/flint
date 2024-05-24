@@ -53,47 +53,30 @@ N_MOD_INLINE int n_mod_is_canonical(ulong a, n_mod_ctx_srcptr ctx)
 
 /* assignments and conversions ***********************************************/
 
+N_MOD_INLINE ulong n_mod_set_uiui(ulong a1, ulong a0, n_mod_ctx_srcptr ctx)
+{
+    unsigned int norm = ctx->norm;
+    ulong nn = ctx->nn, ninv = ctx->ninv;
+    ulong q0, q1, r1, u0, u1;
+
+    u1 = (a1 << norm) + ((norm == 0) ? UWORD(0) : a0 >> (FLINT_BITS - norm));
+    u0 = a0 << norm;
+
+    umul_ppmm(q1, q0, ninv, u1);
+    add_ssaaaa(q1, q0, q1, q0, u1, u0);
+    r1 = (u0 - (q1 + 1) * nn);
+    if (r1 > q0)
+        r1 += nn;
+
+    return (r1 < nn) ? r1 >> norm : (r1 - nn) >> norm;
+}
+
 N_MOD_INLINE ulong n_mod_set_ui(ulong a, n_mod_ctx_srcptr ctx)
 {
     if (a < ctx->nu)
         return a;
     else
-    {
-        unsigned int norm = ctx->norm;
-        ulong nn = ctx->nn, ninv = ctx->ninv;
-        ulong u0, u1, q0, q1, r1;
-
-        u1 = a >> (FLINT_BITS - norm);
-        u0 = a << norm;
-
-        umul_ppmm(q1, q0, ninv, u1);
-        add_ssaaaa(q1, q0, q1, q0, u1, u0);
-
-        r1 = u0 - (q1 + 1) * nn;
-        if (r1 > q0)
-            r1 += nn;
-
-        return ((r1 < nn) ? r1 : (r1 - nn)) >> norm;
-    }
-}
-
-N_MOD_INLINE ulong n_mod_set_uiui(ulong a1, ulong a0, n_mod_ctx_srcptr ctx)
-{
-    unsigned int norm = ctx->norm;
-    ulong nn = ctx->nn, ninv = ctx->ninv;
-    ulong u0, u1, q0, q1, r1;
-
-    u1 = (a1 << norm) | (a0 >> (FLINT_BITS - norm));
-    u0 = a0 << norm;
-
-    umul_ppmm(q1, q0, ninv, u1);
-    add_ssaaaa(q1, q0, q1, q0, u1, u0);
-
-    r1 = u0 - (q1 + 1) * nn;
-    if (r1 > q0)
-        r1 += nn;
-
-    return ((r1 < nn) ? r1 : (r1 - nn)) >> norm;
+        return n_mod_set_uiui(0, a, ctx);
 }
 
 /* randomisation *************************************************************/

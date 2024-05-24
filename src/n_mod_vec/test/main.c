@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2024 Albin Ahlbäck
+    Copyright (C) 2023 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -11,15 +11,13 @@
 
 /* Include functions *********************************************************/
 
-#include "test_helpers.h"
-
-/* #include "t-divides.c" */
+#include "t-aors.c"
 
 /* Array of test functions ***************************************************/
 
 test_struct tests[] =
 {
-    /* TEST_FUNCTION(nmod_divides), */
+    TEST_FUNCTION(n_mod_vec_aors),
 };
 
 /* main function *************************************************************/
