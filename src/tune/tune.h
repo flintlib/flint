@@ -19,6 +19,24 @@
    Should run a function once and return the time to run the main function. */
 typedef double (* tune_func_t)(void *);
 
+/* ulong_extras **************************************************************/
+
+struct n_param_0
+{
+    nn_ptr ap;
+    nn_ptr bp;
+    nn_ptr xp;
+    nn_ptr yp;
+    slong len;
+};
+
+/* Only sets xp and yp, and orders xp[ix] >= yp[ix] */
+void * n_param_init_generate_0(void);
+void n_param_clear(void *);
+
+double _tune_n_xgcd_0(void *);
+double _tune_n_xgcd_1(void *);
+
 /* n_mod_vec *****************************************************************/
 
 struct n_mod_vec_param_0
@@ -30,6 +48,7 @@ struct n_mod_vec_param_0
     n_mod_ctx_t ctx;
 };
 
+/* Only sets ap and bp */
 void * n_mod_vec_param_init_generate_0(void);
 void n_mod_vec_param_clear(void *);
 

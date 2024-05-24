@@ -223,13 +223,14 @@ TEMPLATE_DIRS :=                                                            \
         fq_embed_templates              fq_templates
 
 _TUNE_DIRS :=                                                                \
-        n_mod_vec
+        ulong_extras    n_mod_vec
 
-TUNE_DIRS := $(patsubst %, $(BUILD_DIR)/tune/%, $(_TUNE_DIRS))
+TUNE_DIRS := $(patsubst %, $(TUNE_DIR)/%, $(_TUNE_DIRS))
+TUNE_BUILD_DIRS := $(patsubst %, $(BUILD_DIR)/tune/%, $(_TUNE_DIRS))
 
 BUILD_DIRS :=                                                               \
         $(BUILD_DIR)                                                        \
-        $(TUNE_DIRS)                                                        \
+        $(TUNE_BUILD_DIRS)                                                  \
         $(patsubst %, $(BUILD_DIR)/%, $(DIRS))                              \
         $(patsubst %, $(BUILD_DIR)/%/profile, $(DIRS))                      \
         $(patsubst %, $(BUILD_DIR)/%/test, $(DIRS))                         \
@@ -838,7 +839,7 @@ endif
 old_tune: library $(OLD_TUNES)
 
 TUNE_SOURCE:=$(TUNE_DIR)/tune.c
-TUNE_DEPS_SOURCES:=$(wildcard $(TUNE_DIR)/n_mod_vec/*.c)
+TUNE_DEPS_SOURCES:=$(foreach dir,$(TUNE_DIRS),$(wildcard $(dir)/*.c))
 
 _TUNE_HEADERS:=tune.h clock.h
 TUNE_HEADERS:=$(patsubst %,$(TUNE_DIR)/%,$(_TUNE_HEADERS))
@@ -847,8 +848,8 @@ TUNE_DEPS_OBJS:=$(patsubst $(TUNE_DIR)/%.c,$(BUILD_DIR)/tune/%.o,$(TUNE_DEPS_SOU
 
 TUNE_EXE:=$(BUILD_DIR)/tuneup$(EXEEXT)
 
-# Sloppy to say that all TUNE_DIRS have to be built.
-$(BUILD_DIR)/tune/%.o: $(TUNE_DIR)/%.c $(TUNE_HEADERS) | $(TUNE_DIRS)
+# Sloppy to say that all TUNE_BUILD_DIRS have to be built.
+$(BUILD_DIR)/tune/%.o: $(TUNE_DIR)/%.c $(TUNE_HEADERS) | $(TUNE_BUILD_DIRS)
 	@echo "  CC  $(<:$(SRC_DIR)/%=%)"
 	@$(CC) $(CFLAGS) $(CPPFLAGS3) $(LIB_CPPFLAGS) -c $< -o $@ $(DEPFLAGS)
 

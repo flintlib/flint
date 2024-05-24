@@ -105,6 +105,34 @@ print_define_with_speedup(const char * str, int val, int other_val, double speed
             str, val, speedup, other_val);
 }
 
+static void tune_n_xgcd(int warmups, int min_runs)
+{
+    void * params = n_param_init_generate_0();
+    double t0, t1;
+    int chosen_method, other_method;
+    double speedup;
+
+    t0 = measure_func(_tune_n_xgcd_0, params, warmups, min_runs);
+    t1 = measure_func(_tune_n_xgcd_1, params, warmups, min_runs);
+
+    if (t0 <= t1)
+    {
+        chosen_method = 0;
+        other_method = 1;
+        speedup = SPEEDUP(t1, t0);
+    }
+    else
+    {
+        chosen_method = 1;
+        other_method = 0;
+        speedup = SPEEDUP(t0, t1);
+    }
+
+    print_define_with_speedup("N_GCDEXT_METHOD", chosen_method, other_method, speedup);
+
+    n_param_clear(params);
+}
+
 static void tune_n_mod_vec_add(int warmups, int min_runs)
 {
     void * params = n_mod_vec_param_init_generate_0();
@@ -169,6 +197,7 @@ struct tune_t
 
 static const struct tune_t tunes[] =
 {
+    {"n_xgcd",         tune_n_xgcd},
     {"_n_mod_vec_add", tune_n_mod_vec_add},
     {"_n_mod_vec_sub", tune_n_mod_vec_sub},
 };

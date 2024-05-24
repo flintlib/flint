@@ -10,16 +10,13 @@
 */
 
 #include "flint-mparam.h"
-#include "n_mod_vec.h"
+#include "ulong_extras.h"
 
-#undef N_MOD_VEC_ADD_METHOD
-#undef N_MOD_VEC_SUB_METHOD
+#undef N_GCDEXT_METHOD
 #define TUNE_PROGRAM 1
 
-#define N_MOD_VEC_ADD_METHOD 1
-#define N_MOD_VEC_SUB_METHOD 1
+#define N_GCDEXT_METHOD 0
 
-#define _n_mod_vec_add _n_mod_vec_add_1
-#define _n_mod_vec_sub _n_mod_vec_sub_1
+#define n_xgcd n_xgcd_0
 
-#include "n_mod_vec/aors.c"
+#include "ulong_extras/xgcd.c"

@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "flint-mparam.h"
 #include "n_mod_vec.h"
 
 #undef N_MOD_VEC_ADD_METHOD

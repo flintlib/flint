@@ -11,37 +11,32 @@
 
 #include "clock.h"
 #include "tune.h"
-#include "n_mod.h"
-#include "n_mod_vec.h"
 
-void _n_mod_vec_add_0(nn_ptr, nn_srcptr, nn_srcptr, slong, ulong);
-void _n_mod_vec_sub_0(nn_ptr, nn_srcptr, nn_srcptr, slong, ulong);
-void _n_mod_vec_add_1(nn_ptr, nn_srcptr, nn_srcptr, slong, ulong);
-void _n_mod_vec_sub_1(nn_ptr, nn_srcptr, nn_srcptr, slong, ulong);
+ulong n_xgcd_0(nn_ptr, nn_ptr, ulong, ulong);
+ulong n_xgcd_1(nn_ptr, nn_ptr, ulong, ulong);
 
 #define DEFINE_IT(name, func)                   \
 double name(void * vparam)                      \
 {                                               \
-    struct n_mod_vec_param_0 * param = vparam;  \
-    nn_ptr rp, ap, bp;                          \
+    struct n_param_0 * param = vparam;          \
+    nn_ptr ap, bp, xp, yp;                      \
     slong len;                                  \
-    ulong nu;                                   \
     flint_time_t t0, t1;                        \
+    slong ix;                                   \
                                                 \
-    rp = param->rp;                             \
     ap = param->ap;                             \
     bp = param->bp;                             \
+    xp = param->xp;                             \
+    yp = param->yp;                             \
     len = param->len;                           \
-    nu = param->ctx->nu;                        \
                                                 \
     flint_time_get(t0);                         \
-    func(rp, ap, bp, len, nu);                  \
+    for (ix = 0; ix < len; ix++)                \
+        func(ap, bp, xp[ix], yp[ix]);           \
     flint_time_get(t1);                         \
                                                 \
     return flint_time_nsec_diff(t1, t0);        \
 }
 
-DEFINE_IT(_tune_n_mod_vec_add_0, _n_mod_vec_add_0)
-DEFINE_IT(_tune_n_mod_vec_add_1, _n_mod_vec_add_1)
-DEFINE_IT(_tune_n_mod_vec_sub_0, _n_mod_vec_sub_0)
-DEFINE_IT(_tune_n_mod_vec_sub_1, _n_mod_vec_sub_1)
+DEFINE_IT(_tune_n_xgcd_0, n_xgcd_0)
+DEFINE_IT(_tune_n_xgcd_1, n_xgcd_0)
