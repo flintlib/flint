@@ -53,6 +53,7 @@ N_MOD_INLINE int n_mod_is_canonical(ulong a, n_mod_ctx_srcptr ctx)
 
 /* assignments and conversions ***********************************************/
 
+/* FIXME */
 N_MOD_INLINE ulong n_mod_set_uiui(ulong a1, ulong a0, n_mod_ctx_srcptr ctx)
 {
     unsigned int norm = ctx->norm;
@@ -77,6 +78,10 @@ N_MOD_INLINE ulong n_mod_set_ui(ulong a, n_mod_ctx_srcptr ctx)
         return a;
     else
         return n_mod_set_uiui(0, a, ctx);
+}
+
+N_MOD_INLINE ulong n_mod_set_uiuiui(ulong a2, ulong a1, ulong a0, n_mod_ctx_srcptr ctx)
+{
 }
 
 /* randomisation *************************************************************/

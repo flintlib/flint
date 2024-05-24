@@ -107,17 +107,15 @@ void _n_mod_vec_sub(nn_ptr, nn_srcptr, nn_srcptr, slong, ulong);
 /* dot products **************************************************************/
 
 /*
-   0: unreduced dot product fits inside a word
-   1: mod < 2^{FLINT_BITS / 2} / 16
-   2: mod < 2^{FLINT_BITS / 2}
-   3: mod < 2^{FLINT_BITS} / 16
-   4: mod < 2^{FLINT_BITS}
+   0: mod <= 2^{FLINT_BITS / 4}
+   1: mod <= 2^{FLINT_BITS / 2}
+   2: mod <= 2^{FLINT_BITS} / 16
+   3: mod <= 2^{FLINT_BITS}
 */
 ulong _n_mod_vec_dot_0(nn_srcptr, nn_srcptr, slong, n_mod_ctx_srcptr);
 ulong _n_mod_vec_dot_1(nn_srcptr, nn_srcptr, slong, n_mod_ctx_srcptr);
 ulong _n_mod_vec_dot_2(nn_srcptr, nn_srcptr, slong, n_mod_ctx_srcptr);
 ulong _n_mod_vec_dot_3(nn_srcptr, nn_srcptr, slong, n_mod_ctx_srcptr);
-ulong _n_mod_vec_dot_4(nn_srcptr, nn_srcptr, slong, n_mod_ctx_srcptr);
 
 #ifdef __cplusplus
 }
