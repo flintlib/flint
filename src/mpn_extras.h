@@ -549,20 +549,25 @@ flint_mpn_sqr(mp_ptr r, mp_srcptr x, mp_size_t n)
 #define FLINT_HAVE_MULHIGH_FUNC(n) ((n) <= FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH)
 #define FLINT_HAVE_SQRHIGH_FUNC(n) ((n) <= FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH)
 #define FLINT_HAVE_MULHIGH_NORMALISED_FUNC(n) ((n) <= FLINT_MPN_MULHIGH_NORMALISED_FUNC_TAB_WIDTH)
+#define FLINT_HAVE_SQRHIGH_NORMALISED_FUNC(n) ((n) <= FLINT_MPN_SQRHIGH_NORMALISED_FUNC_TAB_WIDTH)
 
 typedef struct { mp_limb_t m1; mp_limb_t m2; } mp_limb_pair_t;
+typedef mp_limb_pair_t (* flint_mpn_sqrhigh_normalised_func_t)(mp_ptr, mp_srcptr);
 typedef mp_limb_pair_t (* flint_mpn_mulhigh_normalised_func_t)(mp_ptr, mp_srcptr, mp_srcptr);
 
 FLINT_DLL extern const flint_mpn_mul_func_t flint_mpn_mullow_func_tab[];
 FLINT_DLL extern const flint_mpn_mul_func_t flint_mpn_mulhigh_func_tab[];
 FLINT_DLL extern const flint_mpn_sqr_func_t flint_mpn_sqrhigh_func_tab[];
 FLINT_DLL extern const flint_mpn_mulhigh_normalised_func_t flint_mpn_mulhigh_normalised_func_tab[];
+FLINT_DLL extern const flint_mpn_sqrhigh_normalised_func_t flint_mpn_sqrhigh_normalised_func_tab[];
 
 #if FLINT_HAVE_ASSEMBLY_x86_64_adx
 # define FLINT_MPN_MULLOW_FUNC_TAB_WIDTH 8
 # define FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH 9
 # define FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH 8
 # define FLINT_MPN_MULHIGH_NORMALISED_FUNC_TAB_WIDTH 9
+# define FLINT_MPN_SQRHIGH_NORMALISED_FUNC_TAB_WIDTH 8
+
 # define FLINT_HAVE_NATIVE_mpn_mullow_basecase 1
 /* NOTE: This function only works for n >= 6 */
 # define FLINT_HAVE_NATIVE_mpn_mulhigh_basecase 1
@@ -574,6 +579,8 @@ FLINT_DLL extern const flint_mpn_mulhigh_normalised_func_t flint_mpn_mulhigh_nor
 # define FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH 8
 # define FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH 8
 # define FLINT_MPN_MULHIGH_NORMALISED_FUNC_TAB_WIDTH 0
+# define FLINT_MPN_SQRHIGH_NORMALISED_FUNC_TAB_WIDTH 0
+
 /* NOTE: This function only works for n > 8 */
 # define FLINT_HAVE_NATIVE_mpn_mulhigh_basecase 1
 
@@ -583,6 +590,7 @@ FLINT_DLL extern const flint_mpn_mulhigh_normalised_func_t flint_mpn_mulhigh_nor
 # define FLINT_MPN_MULHIGH_FUNC_TAB_WIDTH 16
 # define FLINT_MPN_SQRHIGH_FUNC_TAB_WIDTH 2
 # define FLINT_MPN_MULHIGH_NORMALISED_FUNC_TAB_WIDTH 0
+# define FLINT_MPN_SQRHIGH_NORMALISED_FUNC_TAB_WIDTH 0
 
 #endif
 
@@ -713,6 +721,19 @@ mp_limb_pair_t flint_mpn_mulhigh_normalised(mp_ptr rp, mp_srcptr xp, mp_srcptr y
         return flint_mpn_mulhigh_normalised_func_tab[n](rp, xp, yp);
     else
         return _flint_mpn_mulhigh_normalised(rp, xp, yp, n);
+}
+
+mp_limb_pair_t _flint_mpn_sqrhigh_normalised(mp_ptr rp, mp_srcptr xp, mp_size_t n);
+
+MPN_EXTRAS_INLINE
+mp_limb_pair_t flint_mpn_sqrhigh_normalised(mp_ptr rp, mp_srcptr xp, mp_size_t n)
+{
+    FLINT_ASSERT(n >= 1);
+
+    if (FLINT_HAVE_SQRHIGH_NORMALISED_FUNC(n))
+        return flint_mpn_sqrhigh_normalised_func_tab[n](rp, xp);
+    else
+        return _flint_mpn_sqrhigh_normalised(rp, xp, n);
 }
 
 /* division ******************************************************************/
