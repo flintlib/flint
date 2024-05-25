@@ -256,6 +256,7 @@ These methods are interchangeable with their ``gr`` counterparts.
               int nfloat_mul(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx)
               int nfloat_submul(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx)
               int nfloat_addmul(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx)
+              int nfloat_sqr(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx)
 
 .. function:: int nfloat_mul_2exp_si(nfloat_ptr res, nfloat_srcptr x, slong y, gr_ctx_t ctx)
 

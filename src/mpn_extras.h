@@ -264,6 +264,20 @@ char * _flint_mpn_get_str(mp_srcptr x, mp_size_t n);
         (r0) = __r0; (r1) = __r1; (r2) = __r2;                         \
     } while (0)
 
+#define FLINT_MPN_SQR_2X2(r3, r2, r1, r0, a1, a0)   \
+    do {                                                                     \
+        mp_limb_t __t1, __t2, __t3;                                          \
+        mp_limb_t __r3, __r2, __r1, __r0;                                    \
+        mp_limb_t __a1 = (a1), __a0 = (a0);                                  \
+        umul_ppmm(__t2, __t1, __a0, __a1);                                   \
+        add_sssaaaaaa(__t3, __t2, __t1, 0, __t2, __t1, 0, __t2, __t1);       \
+        umul_ppmm(__r1, __r0, __a0, __a0);                                   \
+        umul_ppmm(__r3, __r2, __a1, __a1);                                   \
+        add_sssaaaaaa(__r3, __r2, __r1, __r3, __r2, __r1, __t3, __t2, __t1); \
+        (r0) = __r0; (r1) = __r1; (r2) = __r2; (r3) = __r3;                  \
+    } while (0)
+
+
 /* {s0,s1,s2} = u[0]v[n-1] + u[1]v[n-2] + ... */
 /* Assumes n >= 2 */
 #define NN_DOTREV_S3_1X1(s2, s1, s0, u, v, n) \

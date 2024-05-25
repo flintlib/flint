@@ -92,9 +92,7 @@ gr_method_tab_input _nfloat_methods_input[] =
 */
     {GR_METHOD_ADDMUL,          (gr_funcptr) nfloat_addmul},
     {GR_METHOD_SUBMUL,          (gr_funcptr) nfloat_submul},
-/*
     {GR_METHOD_SQR,             (gr_funcptr) nfloat_sqr},
-*/
     {GR_METHOD_DIV,             (gr_funcptr) nfloat_div},
     {GR_METHOD_DIV_UI,          (gr_funcptr) nfloat_div_ui},
     {GR_METHOD_DIV_SI,          (gr_funcptr) nfloat_div_si},
