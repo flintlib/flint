@@ -62,9 +62,9 @@ Types, macros and constants
             NFLOAT_MAX_LIMBS
 
     The number of limbs `n` permitted as precision. The current
-    limits are are `1 \le n \le 33` on a 64-bit machine and
-    `1 \le n \le 66` on a 32-bit machine, permitting precision
-    up to 2112 bits. The upper limit exists so that elements and
+    limits are are `1 \le n \le 66` on a 64-bit machine and
+    `1 \le n \le 132` on a 32-bit machine, permitting precision
+    up to 4224 bits. The upper limit exists so that elements and
     temporary buffers are safe to allocate on the stack and so that
     simple operations like swapping are not too expensive.
 
@@ -84,6 +84,7 @@ Types, macros and constants
           nfloat512_struct
           nfloat1024_struct
           nfloat2048_struct
+          nfloat4096_struct
           nfloat64_t
           nfloat128_t
           nfloat192_t
@@ -92,6 +93,7 @@ Types, macros and constants
           nfloat512_t
           nfloat1024_t
           nfloat2048_t
+          nfloat4096_t
 
     For convenience we define types of the correct structure size for
     some common levels of bit precision. An ``nfloatX_t`` is defined as

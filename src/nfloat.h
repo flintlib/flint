@@ -30,10 +30,10 @@ extern "C" {
    expensive compared to a pointer-and-size representation. */
 #if FLINT_BITS == 64
 #define NFLOAT_MIN_LIMBS 1
-#define NFLOAT_MAX_LIMBS 33
+#define NFLOAT_MAX_LIMBS 66
 #else
 #define NFLOAT_MIN_LIMBS 1
-#define NFLOAT_MAX_LIMBS 66
+#define NFLOAT_MAX_LIMBS 132
 #endif
 
 /* Number of header limbs used to encode sign + exponent. We use a
@@ -101,6 +101,7 @@ typedef struct { ulong head[NFLOAT_HEADER_LIMBS]; ulong d[384 / FLINT_BITS]; } n
 typedef struct { ulong head[NFLOAT_HEADER_LIMBS]; ulong d[512 / FLINT_BITS]; } nfloat512_struct;
 typedef struct { ulong head[NFLOAT_HEADER_LIMBS]; ulong d[1024 / FLINT_BITS]; } nfloat1024_struct;
 typedef struct { ulong head[NFLOAT_HEADER_LIMBS]; ulong d[2048 / FLINT_BITS]; } nfloat2048_struct;
+typedef struct { ulong head[NFLOAT_HEADER_LIMBS]; ulong d[4096 / FLINT_BITS]; } nfloat4096_struct;
 
 typedef nfloat64_struct nfloat64_t[1];
 typedef nfloat128_struct nfloat128_t[1];
