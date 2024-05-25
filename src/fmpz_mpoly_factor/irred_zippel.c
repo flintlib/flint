@@ -909,10 +909,13 @@ next_alpha:
     {
         FLINT_ASSERT(fmpz_mpoly_is_fmpz(Alc->coeffs + 0*r + i, ctx));
         FLINT_ASSERT(fmpz_mpoly_length(Alc->coeffs + 0*r + i, ctx) == 1);
-        FLINT_ASSERT(fmpz_divisible(Alc->coeffs[i].coeffs + 0,
-                                 Aufac->p[i].coeffs + Aufac->p[i].length - 1));
-        fmpz_divexact(q, Alc->coeffs[i].coeffs + 0,
-                                  Aufac->p[i].coeffs + Aufac->p[i].length - 1);
+
+        if (!fmpz_divides(q, Alc->coeffs[i].coeffs + 0,
+                             Aufac->p[i].coeffs + Aufac->p[i].length - 1))
+        {
+            goto next_alpha;
+        }
+
         _fmpz_mpoly_set_fmpz_poly(fac->coeffs + i, newA->bits,
                                Aufac->p[i].coeffs, Aufac->p[i].length, 0, ctx);
         fmpz_mpoly_scalar_mul_fmpz(fac->coeffs + i, fac->coeffs + i, q, ctx);
