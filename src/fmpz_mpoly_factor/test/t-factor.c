@@ -121,6 +121,22 @@ TEST_FUNCTION_START(fmpz_mpoly_factor, state)
         fmpz_mpoly_ctx_t ctx;
         fmpz_mpoly_t f;
 
+        fmpz_mpoly_ctx_init(ctx, 4, ORD_LEX);
+        fmpz_mpoly_init(f, ctx);
+
+        fmpz_mpoly_set_str_pretty(f, "(x1*x2*x3*x4+x1*x2*x3+x1*x3+x1-x3-1)*"
+                                     "(3*x1^2*x2^2*x3^2*x4^2+6*x1^2*x2^2*x3^2*x4+3*x1^2*x2^2*x3^2+x1^2*x2^2*x3*x4^3+4*x1^2*x2^2*x3*x4^2+5*x1^2*x2^2*x3*x4+2*x1^2*x2^2*x3-4*x1^2*x2*x3^2*x4^2-3*x1^2*x2*x3^2*x4+x1^2*x2*x3^2-5*x1^2*x2*x3*x4^2-4*x1^2*x2*x3*x4+x1^2*x2*x3-x1^2*x2*x4^2-x1^2*x2*x4-2*x1^2*x3^2*x4-4*x1^2*x3*x4-2*x1^2*x4-x1*x2^2*x3*x4^3-4*x1*x2^2*x3*x4^2-5*x1*x2^2*x3*x4-2*x1*x2^2*x3+x1*x2*x3^2*x4^2-3*x1*x2*x3^2*x4-4*x1*x2*x3^2+4*x1*x2*x3*x4^2+x1*x2*x3*x4-3*x1*x2*x3+2*x1*x2*x4^2+2*x1*x2*x4+3*x1*x3^2*x4-x1*x3^2+7*x1*x3*x4-x1*x3+4*x1*x4+x2*x3*x4^2+3*x2*x3*x4+2*x2*x3-x2*x4^2-x2*x4-x3^2*x4+x3^2-3*x3*x4+x3-2*x4)",
+                                  NULL, ctx);
+        check_omega(2, 2, f, ctx, fmpz_mpoly_factor);
+
+        fmpz_mpoly_clear(f, ctx);
+        fmpz_mpoly_ctx_clear(ctx);
+    }
+
+    {
+        fmpz_mpoly_ctx_t ctx;
+        fmpz_mpoly_t f;
+
         fmpz_mpoly_ctx_init(ctx, 8, ORD_LEX);
         fmpz_mpoly_init(f, ctx);
 
