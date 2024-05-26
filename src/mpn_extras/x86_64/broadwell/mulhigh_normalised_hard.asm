@@ -12,283 +12,326 @@ dnl
 include(`config.m4')
 
 dnl TODO:
-dnl * Do stuff in between to avoid latency penalties.
-dnl * Convert %rX registers using 32-bit operations to %rax, ..., %rbp
-dnl   registers to save a few bytes.
+dnl  * Redo n = 6, 7, 8, just like n < 6.
+
+define(`rp',	   `%rdi')
+define(`ap',	   `%rsi')
+define(`bp_param', `%rdx')
+
+define(`bp',	   `%r8')
+
+define(`s0',  `%rax')
+define(`s1',  `%rcx')
+define(`s2',  `%r9')
+define(`s3',  `%r10')
+define(`s4',  `%r11')
+define(`s5',  `%rbx')
+define(`s6',  `%rbp')
+define(`s7',  `%r12')
+define(`s8',  `%r13')
+define(`s9',  `%r14')
+define(`s10', `%r15')
 
 	TEXT
-
 	ALIGN(16)
 PROLOGUE(flint_mpn_mulhigh_normalised_1)
-	mov	0*8(%rdx), %rdx
-	mulx	0*8(%rsi), %rax, %rcx
-	mov	$0, %rdx
-	test	%rcx, %rcx
-	setns	%dl
+	C   0
+	C 0 x
+	mov	0*8(bp_param), %rdx
+	mulx	0*8(ap), s0, s1
+	xor	%edx, %edx
+	test	s1, s1
 	js	L(1)
-	add	%rax, %rax
-	adc	%rcx, %rcx
-L(1):
-	mov	%rcx, 0*8(%rdi)
-
+	add	s0, s0
+	adc	s1, s1
+	inc	%edx
+L(1):	mov	s1, 0*8(rp)
 	ret
 EPILOGUE()
 
 	ALIGN(16)
 PROLOGUE(flint_mpn_mulhigh_normalised_2)
-	mov	1*8(%rdx), %r11
-	mov	0*8(%rdx), %rdx
-	xor	%r10d, %r10d
-	mulx	0*8(%rsi), %r9, %rax
-	mulx	1*8(%rsi), %r9, %rcx
-	adcx	%r9, %rax
-	adcx	%r10, %rcx
-	mov	%r11, %rdx
-	mulx	0*8(%rsi), %r9, %r8
-	adcx	%r9, %rax
-	adcx	%r8, %rcx
-	mulx	1*8(%rsi), %r9, %r8
-	adox	%r9, %rcx
-	adox	%r10, %r8
-	adcx	%r10, %r8
-	mov	$0, %rdx
-	test	%r8, %r8
-	setns	%dl
+	C   0 1
+	C 0 h x
+	C 1 x x
+	mov	1*8(bp_param), s2
+	mov	0*8(bp_param), %rdx
+
+	mulx	0*8(ap), s0, s0		C a0 b0
+	xor	R32(s1), R32(s1)
+	mulx	1*8(ap), s3, s4		C a1 b0
+	adox	s3, s0
+	C 0, 4 + o
+
+	mov	s2, %rdx
+	mulx	0*8(ap), bp, s3		C a0 b1
+	adcx	bp, s0
+	adox	s3, s4
+	mulx	1*8(ap), s2, ap		C a1 b1
+	adcx	s2, s4
+	adox	s1, ap
+	C 0, 4, ap + c
+
+	mov	$0, %edx
+	adc	s1, ap
 	js	L(2)
-	add	%rax, %rax
-	adc	%rcx, %rcx
-	adc	%r8, %r8
-L(2):
-	mov	%rcx, 0*8(%rdi)
-	mov	%r8, 1*8(%rdi)
+	add	s0, s0
+	adc	s4, s4
+	inc	%edx
+	adc	ap, ap
+L(2):	mov	s4, 0*8(rp)
+	mov	ap, 1*8(rp)
 
 	ret
 EPILOGUE()
 
 	ALIGN(16)
 PROLOGUE(flint_mpn_mulhigh_normalised_3)
-	push	%rbx
+	C   0 1 2
+	C 0   h x
+	C 1 h x x
+	C 2 x x x
+	mov	bp_param, bp
+	mov	0*8(bp_param), %rdx
 
-	mov	%rdx, %rcx
-	mov	0*8(%rdx), %rdx
-	xor	%r9d, %r9d
+	mulx	1*8(ap), s0, s0		C a1 b0
+	push	s5
+	xor	R32(s1), R32(s1)
+	mulx	2*8(ap), s2, s3		C a2 b0
+	push	s6
+	adcx	s2, s0
+	C 0, 3 + c
 
-	mulx	1*8(%rsi), %r8, %rax
-	mulx	2*8(%rsi), %r8, %r10
-	adcx	%r8, %rax
-	adcx	%r9, %r10
+	mov	1*8(bp), %rdx
+	mulx	1*8(ap), s4, s5		C a1 b1
+	adox	s4, s0
+	adcx	s5, s3
+	mulx	2*8(ap), s6, s2		C a2 b1
+	adox	s6, s3
+	adcx	s1, s2
+	mulx	0*8(ap), s4, s4		C a0 b1
+	adox	s1, s2
+	C (0, 4), 3, 2
 
-	mov	1*8(%rcx), %rdx
-	mulx	0*8(%rsi), %r8, %rbx
-	mulx	1*8(%rsi), %r8, %r11
-	adcx	%rbx, %rax
-	adox	%r8, %rax
-	adcx	%r11, %r10
-	mulx	2*8(%rsi), %r8, %r11
-	adox	%r8, %r10
-	adcx	%r9, %r11
-	adox	%r9, %r11
+	mov	2*8(bp), %rdx
+	mulx	0*8(ap), bp, s5		C a0 b2
+	adox	s4, s0
+	mulx	1*8(ap), s6, s4		C a1 b2
+	adcx	bp, s0
+	adox	s5, s3
+	mulx	2*8(ap), bp, ap		C a2 b2
+	adcx	s6, s3
+	adox	s4, s2
+	pop	s6
+	adcx	bp, s2
+	adox	s1, ap
+	C 0, 3, 2, ap + c
 
-	mov	2*8(%rcx), %rdx
-	mulx	0*8(%rsi), %r8, %rbx
-	adcx	%r8, %rax
-	adcx	%rbx, %r10
-	mulx	1*8(%rsi), %r8, %rbx
-	adox	%r8, %r10
-	adox	%rbx, %r11
-	mulx	2*8(%rsi), %r8, %rbx
-	adcx	%r8, %r11
-	adcx	%r9, %rbx
-	adox	%r9, %rbx
+	mov	$0, %edx
+	pop	s5
+	adc	s1, ap
+	C 0, 3, 2, ap
 
-	mov	$0, %rdx
-	test	%rbx, %rbx
-	setns	%dl
 	js	L(3)
-	add	%rax, %rax
-	adc	%r10, %r10
-	adc	%r11, %r11
-	adc	%rbx, %rbx
-L(3):
-	mov	%r10, 0*8(%rdi)
-	mov	%r11, 1*8(%rdi)
-	mov	%rbx, 2*8(%rdi)
-
-	pop	%rbx
+	add	s0, s0
+	adc	s3, s3
+	inc	%edx
+	adc	s2, s2
+	adc	ap, ap
+L(3):	mov	s3, 0*8(rp)
+	mov	s2, 1*8(rp)
+	mov	ap, 2*8(rp)
 
 	ret
 EPILOGUE()
 
 	ALIGN(16)
 PROLOGUE(flint_mpn_mulhigh_normalised_4)
-	push	%rbx
-	push	%rbp
+	C   0 1 2 3
+	C 0     h x
+	C 1   h x x
+	C 2 h x x x
+	C 3 x x x x
+	mov	bp_param, bp
+	mov	0*8(bp_param), %rdx
 
-	mov	%rdx, %rcx
-	mov	0*8(%rdx), %rdx
-	xor	%r9d, %r9d
+	mulx	2*8(ap), s0, s0		C a2 b0
+	push	s5
+	xor	R32(s1), R32(s1)
+	mulx	3*8(ap), s2, s3		C a3 b0
+	push	s6
+	adcx	s2, s0
+	C 0, 3 + c
 
-	mulx	2*8(%rsi), %r8, %rax
-	mulx	3*8(%rsi), %r8, %r10
-	adcx	%r8, %rax
-	adcx	%r9, %r10
+	mov	1*8(bp), %rdx
+	mulx	2*8(ap), s4, s5		C a2 b1
+	push	s7
+	adox	s4, s0
+	adcx	s5, s3
+	mulx	3*8(ap), s6, s2		C a3 b1
+	adox	s6, s3
+	adcx	s1, s2
+	mulx	1*8(ap), s4, s4		C a1 b1
+	adox	s1, s2
+	C (0, 4), 3, 2
 
-	mov	1*8(%rcx), %rdx
-	mulx	1*8(%rsi), %r8, %rbx
-	mulx	2*8(%rsi), %r8, %r11
-	adcx	%rbx, %rax
-	adox	%r8, %rax
-	adcx	%r11, %r10
-	mulx	3*8(%rsi), %r8, %r11
-	adox	%r8, %r10
-	adcx	%r9, %r11
-	adox	%r9, %r11
+	mov	2*8(bp), %rdx
+	mulx	1*8(ap), s7, s5		C a1 b2
+	adox	s4, s0
+	mulx	2*8(ap), s6, s4		C a2 b2
+	adcx	s7, s0
+	adox	s5, s3
+	mulx	3*8(ap), s7, s5		C a3 b2
+	adcx	s6, s3
+	adox	s4, s2
+	mulx	0*8(ap), s6, s6		C a0 b2
+	adcx	s7, s2
+	adox	s1, s5
+	C (0, 6), 3, 2, 5 + c
 
-	mov	2*8(%rcx), %rdx
-	mulx	0*8(%rsi), %r8, %rbp
-	mulx	1*8(%rsi), %r8, %rbx
-	adcx	%rbp, %rax
-	adox	%r8, %rax
-	adcx	%rbx, %r10
-	mulx	2*8(%rsi), %r8, %rbx
-	adox	%r8, %r10
-	adcx	%rbx, %r11
-	mulx	3*8(%rsi), %r8, %rbx
-	adox	%r8, %r11
-	adcx	%r9, %rbx
-	adox	%r9, %rbx
+	mov	3*8(bp), %rdx
+	mulx	0*8(ap), bp, s4		C a0 b3
+	adcx	s1, s5
+	adox	s6, s0
+	mulx	1*8(ap), s7, s6		C a1 b3
+	adcx	bp, s0
+	adox	s4, s3
+	mulx	2*8(ap), bp, s4		C a2 b3
+	adcx	s7, s3
+	adox	s6, s2
+	mulx	3*8(ap), s7, ap		C a3 b3
+	adcx	bp, s2
+	adox	s5, s4
+	adcx	s7, s4
+	mov	$0, %edx
+	adox	s1, ap
+	pop	s7
+	adc	s1, ap
+	C 0, 3, 2, 4, ap
 
-	mov	3*8(%rcx), %rdx
-	mulx	0*8(%rsi), %r8, %rbp
-	adcx	%r8, %rax
-	adcx	%rbp, %r10
-	mulx	1*8(%rsi), %r8, %rbp
-	adox	%r8, %r10
-	adox	%rbp, %r11
-	mulx	2*8(%rsi), %r8, %rbp
-	adcx	%r8, %r11
-	adcx	%rbp, %rbx
-	mulx	3*8(%rsi), %r8, %rbp
-	adox	%r8, %rbx
-	adcx	%r9, %rbp
-	adox	%r9, %rbp
-
-	mov	$0, %rdx
-	test	%rbp, %rbp
-	setns	%dl
 	js	L(4)
-	add	%rax, %rax
-	adc	%r10, %r10
-	adc	%r11, %r11
-	adc	%rbx, %rbx
-	adc	%rbp, %rbp
-L(4):
-	mov	%r10, 0*8(%rdi)
-	mov	%r11, 1*8(%rdi)
-	mov	%rbx, 2*8(%rdi)
-	mov	%rbp, 3*8(%rdi)
-
-	pop	%rbp
-	pop	%rbx
+	add	s0, s0
+	adc	s3, s3
+	adc	s2, s2
+	inc	%edx
+	adc	s4, s4
+	adc	ap, ap
+L(4):	mov	s3, 0*8(rp)
+	pop	s6
+	mov	s2, 1*8(rp)
+	pop	s5
+	mov	s4, 2*8(rp)
+	mov	ap, 3*8(rp)
 
 	ret
 EPILOGUE()
 
 	ALIGN(16)
 PROLOGUE(flint_mpn_mulhigh_normalised_5)
-	push	%rbx
-	push	%rbp
-	push	%r12
+	C   0 1 2 3 4
+	C 0       h x
+	C 1     h x x
+	C 2   h x x x
+	C 3 h x x x x
+	C 4 x x x x x
 
-	mov	%rdx, %rcx
-	mov	0*8(%rdx), %rdx
-	xor	%r9d, %r9d
+	mov	bp_param, bp
+	mov	0*8(bp_param), %rdx
 
-	mulx	3*8(%rsi), %r8, %rax
-	mulx	4*8(%rsi), %r8, %r10
-	adcx	%r8, %rax
-	adcx	%r9, %r10
+	mulx	3*8(ap), s0, s0		C a3 b0
+	push	s5
+	xor	R32(s1), R32(s1)
+	mulx	4*8(ap), s2, s3		C a4 b0
+	push	s6
+	adox	s2, s0
+	C 0, 3 + o
 
-	mov	1*8(%rcx), %rdx
-	mulx	2*8(%rsi), %r8, %rbx
-	mulx	3*8(%rsi), %r8, %r11
-	adcx	%rbx, %rax
-	adox	%r8, %rax
-	adcx	%r11, %r10
-	mulx	4*8(%rsi), %r8, %r11
-	adox	%r8, %r10
-	adcx	%r9, %r11
-	adox	%r9, %r11
+	mov	1*8(bp), %rdx
+	mulx	3*8(ap), s4, s5		C a3 b1
+	push	s7
+	adcx	s4, s0
+	adox	s5, s3
+	mulx	4*8(ap), s6, s2		C a4 b1
+	push	s8
+	adcx	s6, s3
+	adox	s1, s2
+	mulx	2*8(ap), s4, s4		C a2 b1
+	adcx	s1, s2
+	C (0, 4), 3, 2
 
-	mov	2*8(%rcx), %rdx
-	mulx	1*8(%rsi), %r8, %rbp
-	mulx	2*8(%rsi), %r8, %rbx
-	adcx	%rbp, %rax
-	adox	%r8, %rax
-	adcx	%rbx, %r10
-	mulx	3*8(%rsi), %r8, %rbx
-	adox	%r8, %r10
-	adcx	%rbx, %r11
-	mulx	4*8(%rsi), %r8, %rbx
-	adox	%r8, %r11
-	adcx	%r9, %rbx
-	adox	%r9, %rbx
+	mov	2*8(bp), %rdx
+	mulx	2*8(ap), s7, s8		C a2 b2
+	adox	s4, s0
+	mulx	3*8(ap), s5, s6		C a3 b2
+	adcx	s7, s0
+	adox	s8, s3
+	mulx	4*8(ap), s4, s7		C a4 b2
+	adcx	s5, s3
+	adox	s6, s2
+	mulx	1*8(ap), s8, s8		C a1 b2
+	adcx	s4, s2
+	adox	s1, s7
+	C (0, 8), 3, 2, 7 + c
 
-	mov	3*8(%rcx), %rdx
-	mulx	0*8(%rsi), %r8, %r12
-	mulx	1*8(%rsi), %r8, %rbp
-	adcx	%r12, %rax
-	adox	%r8, %rax
-	adcx	%rbp, %r10
-	mulx	2*8(%rsi), %r8, %rbp
-	adox	%r8, %r10
-	adcx	%rbp, %r11
-	mulx	3*8(%rsi), %r8, %rbp
-	adox	%r8, %r11
-	adcx	%rbp, %rbx
-	mulx	4*8(%rsi), %r8, %rbp
-	adox	%r8, %rbx
-	adcx	%r9, %rbp
-	adox	%r9, %rbp
+	mov	3*8(bp), %rdx
+	mulx	1*8(ap), s5, s6		C a1 b3
+	adcx	s1, s7
+	adox	s8, s0
+	mulx	2*8(ap), s4, s8		C a2 b3
+	adcx	s5, s0
+	adox	s6, s3
+	mulx	3*8(ap), s5, s6		C a3 b3
+	adcx	s4, s3
+	adox	s8, s2
+	mulx	4*8(ap), s4, s8		C a4 b3
+	adcx	s5, s2
+	adox	s6, s7
+	mulx	0*8(ap), s5, s5		C a0 b3
+	adcx	s4, s7
+	adox	s1, s8
+	C (0, 5), 3, 2, 7, 8 + c
 
-	mov	4*8(%rcx), %rdx
-	mulx	0*8(%rsi), %r8, %r12
-	adcx	%r8, %rax
-	adcx	%r12, %r10
-	mulx	1*8(%rsi), %r8, %r12
-	adox	%r8, %r10
-	adox	%r12, %r11
-	mulx	2*8(%rsi), %r8, %r12
-	adcx	%r8, %r11
-	adcx	%r12, %rbx
-	mulx	3*8(%rsi), %r8, %r12
-	adox	%r8, %rbx
-	adox	%r12, %rbp
-	mulx	4*8(%rsi), %r8, %r12
-	adcx	%r8, %rbp
-	adcx	%r9, %r12
-	adox	%r9, %r12
+	mov	4*8(bp), %rdx
+	mulx	0*8(ap), s6, s4		C a0 b4
+	adcx	s1, s8
+	adox	s5, s0
+	mulx	1*8(ap), bp, s5		C a1 b4
+	adcx	s6, s0
+	adox	s4, s3
+	mulx	2*8(ap), s6, s4		C a2 b4
+	adcx	bp, s3
+	adox	s5, s2
+	mulx	3*8(ap), bp, s5		C a3 b4
+	adcx	s6, s2
+	adox	s4, s7
+	mulx	4*8(ap), s6, s4		C a4 b4
+	adcx	s7, bp
+	adox	s5, s8
+	C 0, 3, 2, bp, (8 + c, 6), 4 + o
 
-	mov	$0, %rdx
-	test	%r12, %r12
-	setns	%dl
+	adcx	s8, s6
+	adox	s1, s4
+	mov	$0, %edx
+	pop	s8
+	adc	s1, s4
+	C 0, 3, 2, bp, 6, 4
+
 	js	L(5)
-	add	%rax, %rax
-	adc	%r10, %r10
-	adc	%r11, %r11
-	adc	%rbx, %rbx
-	adc	%rbp, %rbp
-	adc	%r12, %r12
-L(5):
-	mov	%r10, 0*8(%rdi)
-	mov	%r11, 1*8(%rdi)
-	mov	%rbx, 2*8(%rdi)
-	mov	%rbp, 3*8(%rdi)
-	mov	%r12, 4*8(%rdi)
-
-	pop	%r12
-	pop	%rbp
-	pop	%rbx
+	add	s0, s0
+	adc	s3, s3
+	adc	s2, s2
+	inc	%edx
+	adc	bp, bp
+	adc	s6, s6
+	adc	s4, s4
+L(5):	mov	s3, 0*8(rp)
+	pop	s7
+	mov	s2, 1*8(rp)
+	mov	bp, 2*8(rp)
+	mov	s6, 3*8(rp)
+	pop	s6
+	mov	s4, 4*8(rp)
+	pop	s5
 
 	ret
 EPILOGUE()

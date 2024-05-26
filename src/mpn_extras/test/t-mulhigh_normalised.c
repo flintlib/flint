@@ -60,7 +60,7 @@ TEST_FUNCTION_START(flint_mpn_mulhigh_normalised, state)
             result = result && (mpn_cmp(rp_n, rp_u, n + 1) == 0);
             if (!result)
                 TEST_FUNCTION_FAIL(
-                        "rp_n != rp_u << 1 when normalised\n"
+                        "Normalised case failed\n"
                         "ix = %wd\n"
                         "n = %wd\n"
                         "xp = %{ulong*}\n"
@@ -74,7 +74,7 @@ TEST_FUNCTION_START(flint_mpn_mulhigh_normalised, state)
             result = (mpn_cmp(rp_n, rp_u, n + 1) == 0);
             if (!result)
                 TEST_FUNCTION_FAIL(
-                        "rp_n != rp_u when unnormalised\n"
+                        "Unnormalised case failed\n"
                         "ix = %wd\n"
                         "n = %wd\n"
                         "xp = %{ulong*}\n"
