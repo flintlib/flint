@@ -17,7 +17,6 @@
 
 #define LG_BLK_SZ 8
 #define BLK_SZ 256
-#define BLK_SHIFT 10
 
 #ifdef __cplusplus
 extern "C" {
@@ -119,7 +118,7 @@ FLINT_FORCE_INLINE slong z_max(slong a, slong b) {return FLINT_MAX(a, b);}
 int fft_small_mulmod_satisfies_bounds(ulong n);
 
 /*
-    The twiddle factors are split across FLINT_BITS tables:
+    The twiddle factors are split across SD_FFT_CTX_W2TAB_SIZE tables:
 
         [0] = {e(1)}                                original index 0
         [1] = {e(1/4)}                              original index 1
@@ -135,7 +134,7 @@ int fft_small_mulmod_satisfies_bounds(ulong n);
         [j_bits][j_r]  where j_bits = nbits(j), j_r = j - 2^(j_bits-1)
 
     with the special case j_bits = j_r = 0 for j = 0.
-    The first SD_FFT_CTX_INIT_DEPTH tables are stored consecutively to ease the
+    The first SD_FFT_CTX_W2TAB_INIT tables are stored consecutively to ease the
     lookup of small indices, which must currently be at least 4.
 */
 
@@ -170,7 +169,8 @@ do { \
 } while (0)
 
 
-#define SD_FFT_CTX_INIT_DEPTH 12
+#define SD_FFT_CTX_W2TAB_INIT 12
+#define SD_FFT_CTX_W2TAB_SIZE 40
 
 /* This context is the one expected to sit in a global position */
 typedef struct {
@@ -180,7 +180,7 @@ typedef struct {
     ulong primitive_root;
     ulong blk_sz;
     volatile ulong w2tab_depth;
-    double* w2tab[FLINT_BITS];
+    double* w2tab[SD_FFT_CTX_W2TAB_SIZE];
 } sd_fft_ctx_struct;
 
 typedef sd_fft_ctx_struct sd_fft_ctx_t[1];
@@ -190,21 +190,14 @@ typedef struct {
     double* data;
     double p;
     double pinv;
-    const double* w2tab[50];
+    const double* w2tab[SD_FFT_CTX_W2TAB_SIZE];
 } sd_fft_lctx_struct;
 
 typedef sd_fft_lctx_struct sd_fft_lctx_t[1];
 
-/*
-    Points are blocked into blocks of size BLK_SZ. The blocks are mapped into
-    memory with some extra padding for potential cache issues. The 4* keeps
-    things aligned for 4-wide vectors. If this alignment is broken, the load
-    and stores in the fft (unspecified vec4d_load) need to support unaligned
-    addresses.
-*/
 FLINT_FORCE_INLINE ulong sd_fft_ctx_blk_offset(ulong I)
 {
-    return (I << LG_BLK_SZ) + 4*(I >> (BLK_SHIFT+2));
+    return I << LG_BLK_SZ;
 }
 
 FLINT_FORCE_INLINE ulong sd_fft_ctx_data_size(ulong depth)
@@ -261,7 +254,7 @@ void sd_fft_lctx_init(sd_fft_lctx_t L, sd_fft_ctx_t Q, ulong depth)
     L->p = Q->p;
     L->pinv = Q->pinv;
     sd_fft_ctx_fit_depth(Q, depth);
-    for (int i = 0; i < 50; i++)
+    for (int i = 0; i < SD_FFT_CTX_W2TAB_SIZE; i++)
         L->w2tab[i] = Q->w2tab[i];
 }
 

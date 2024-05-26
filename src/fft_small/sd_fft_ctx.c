@@ -17,7 +17,7 @@ void sd_fft_ctx_clear(sd_fft_ctx_t Q)
 {
     ulong k;
     flint_aligned_free(Q->w2tab[0]);
-    for (k = SD_FFT_CTX_INIT_DEPTH; k < FLINT_BITS; k++)
+    for (k = SD_FFT_CTX_W2TAB_INIT; k < SD_FFT_CTX_W2TAB_SIZE; k++)
         flint_aligned_free(Q->w2tab[k]);
 }
 
@@ -40,18 +40,18 @@ void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp)
     ninv = Q->pinv;
 
     /*
-        fill wtab to a depth of SD_FFT_CTX_INIT_DEPTH:
-        2^(SD_FFT_CTX_INIT_DEPTH-1) entries: 1, e(1/4), e(1/8), e(3/8), ...
+        fill wtab to a depth of SD_FFT_CTX_W2TAB_INIT:
+        2^(SD_FFT_CTX_W2TAB_INIT-1) entries: 1, e(1/4), e(1/8), e(3/8), ...
 
         Q->w2tab[j] is itself a table of length 2^(j-1) containing 2^(j+1) st
         roots of unity.
     */
-    N = n_pow2(SD_FFT_CTX_INIT_DEPTH - 1);
+    N = n_pow2(SD_FFT_CTX_W2TAB_INIT - 1);
     t = (double*) flint_aligned_alloc(4096, n_round_up(N*sizeof(double), 4096));
 
     Q->w2tab[0] = t;
     t[0] = 1;
-    for (k = 1, l = 1; k < SD_FFT_CTX_INIT_DEPTH; k++, l *= 2)
+    for (k = 1, l = 1; k < SD_FFT_CTX_W2TAB_INIT; k++, l *= 2)
     {
         ulong ww = nmod_pow_ui(Q->primitive_root, (Q->mod.n - 1)>>(k + 1), Q->mod);
         double w = vec1d_set_d(vec1d_reduce_0n_to_pmhn(ww, n));
@@ -68,7 +68,7 @@ void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp)
     Q->w2tab_depth = k;
 
     /* the rest of the tables are uninitialized */
-    for ( ; k < FLINT_BITS; k++)
+    for ( ; k < SD_FFT_CTX_W2TAB_SIZE; k++)
         Q->w2tab[k] = NULL;
 
 #if FLINT_WANT_ASSERT
@@ -101,8 +101,8 @@ void sd_fft_ctx_fit_depth(sd_fft_ctx_t Q, ulong depth)
 
         /* The first few tables are stored consecutively, so vec16 is ok. */
         off = 0;
-        l = n_pow2(SD_FFT_CTX_INIT_DEPTH - 1);
-        for (j = SD_FFT_CTX_INIT_DEPTH - 1; j < k; j++)
+        l = n_pow2(SD_FFT_CTX_W2TAB_INIT - 1);
+        for (j = SD_FFT_CTX_W2TAB_INIT - 1; j < k; j++)
         {
             i = 0; do {
                 vec8d x0 = vec8d_load_aligned(t + i + 0);
