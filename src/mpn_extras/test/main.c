@@ -31,6 +31,7 @@
 #include "t-remove_power.c"
 #include "t-sqr.c"
 #include "t-sqrhigh.c"
+#include "t-sqrhigh_normalised.c"
 
 /* Array of test functions ***************************************************/
 
@@ -55,7 +56,8 @@ test_struct tests[] =
     TEST_FUNCTION(flint_mpn_remove_2exp),
     TEST_FUNCTION(flint_mpn_remove_power),
     TEST_FUNCTION(flint_mpn_sqr),
-    TEST_FUNCTION(flint_mpn_sqrhigh)
+    TEST_FUNCTION(flint_mpn_sqrhigh),
+    TEST_FUNCTION(flint_mpn_sqrhigh_normalised)
 };
 
 /* main function *************************************************************/
