@@ -4713,6 +4713,12 @@ def get_nfloat_class(prec):
 
     return _nfloat_class
 
+class RealFloat_nfloat(gr_ctx):
+    def __init__(self, prec=128):
+        gr_ctx.__init__(self)
+        libflint.nfloat_ctx_init(self._ref, prec, 0)
+        self._elem_type = get_nfloat_class(prec)
+
 @functools.cache
 def get_nfloat_complex_class(prec):
     n = (prec + FLINT_BITS - 1) // FLINT_BITS
