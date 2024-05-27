@@ -52,7 +52,7 @@ int compare_doubles(const void * ap, const void * bp)
     return (a < b) ? -1 : (a > b) ? 1 : 0;
 }
 
-static double measure_func(tune_func_t fun, void * params, int runs, int warmups)
+double measure_func(tune_func_t fun, void * params, int runs, int warmups)
 {
     double * times = malloc(sizeof(double) * runs);
     int ix;

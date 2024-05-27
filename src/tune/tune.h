@@ -42,6 +42,10 @@ void n_param_clear(void *);
 double _tune_n_xgcd_0(void *);
 double _tune_n_xgcd_1(void *);
 
+/* mpn_extras ****************************************************************/
+
+#define FLINT_MPN_MULHIGH_K_TAB_MAX_SIZE 4096
+
 /* n_mod_vec *****************************************************************/
 #if WANT_N_MOD
 struct n_mod_vec_param_0
