@@ -215,7 +215,7 @@ FLINT_ASSERT(i+j < atrunc);
     }
 
     for (i = an; i < atrunc; i++)
-        sd_fft_ctx_set_index(abuf, i, 0);
+        abuf[i] = 0;
 }
 
 
@@ -353,18 +353,15 @@ typedef struct {
 static void extra_func(void* varg)
 {
     s1worker_struct* X = (s1worker_struct*) varg;
-    sd_fft_lctx_t Q;
+    sd_fft_ctx_struct* Q = X->ffts + X->ioff;
 
-    sd_fft_lctx_init(Q, X->ffts + X->ioff, X->depth);
-    _mod(X->bbuf, X->btrunc, X->b, X->bn, X->ffts + X->ioff, X->mod);
-    sd_fft_lctx_fft_trunc(Q, X->bbuf, X->depth, X->btrunc, X->ztrunc);
-    sd_fft_lctx_clear(Q, X->ffts + X->ioff);
+    _mod(X->bbuf, X->btrunc, X->b, X->bn, Q, X->mod);
+    sd_fft_trunc(Q, X->bbuf, X->depth, X->btrunc, X->ztrunc);
 }
 
 void s1worker_func(void* varg)
 {
     s1worker_struct* X = (s1worker_struct*) varg;
-    sd_fft_lctx_t Q;
     ulong i, m;
     thread_pool_handle* handles = NULL;
     slong nworkers = 0;
@@ -377,8 +374,7 @@ void s1worker_func(void* varg)
         ulong ioff = i + X->offset;
         double* abuf = X->abuf + X->stride*i;
         double* bbuf = X->bbuf;
-
-        sd_fft_lctx_init(Q, X->ffts + ioff, X->depth);
+        sd_fft_ctx_struct* Q = X->ffts + ioff;
 
         if (!X->squaring)
         {
@@ -389,13 +385,13 @@ void s1worker_func(void* varg)
             }
             else
             {
-                _mod(bbuf, X->btrunc, X->b, X->bn, X->ffts + ioff, X->mod);
-                sd_fft_lctx_fft_trunc(Q, bbuf, X->depth, X->btrunc, X->ztrunc);
+                _mod(bbuf, X->btrunc, X->b, X->bn, Q, X->mod);
+                sd_fft_trunc(Q, bbuf, X->depth, X->btrunc, X->ztrunc);
             }
         }
 
-        _mod(abuf, X->atrunc, X->a, X->an, X->ffts + ioff, X->mod);
-        sd_fft_lctx_fft_trunc(Q, abuf, X->depth, X->atrunc, X->ztrunc);
+        _mod(abuf, X->atrunc, X->a, X->an, Q, X->mod);
+        sd_fft_trunc(Q, abuf, X->depth, X->atrunc, X->ztrunc);
 
         if (!X->squaring)
         {
@@ -404,17 +400,15 @@ void s1worker_func(void* varg)
         }
 
         ulong cop = X->np == 1 ? 1 : *crt_data_co_prime_red(X->crts + X->np - 1, ioff);
-        NMOD_RED2(m, cop >> (FLINT_BITS - X->depth), cop << X->depth, X->ffts[ioff].mod);
-        m = nmod_inv(m, X->ffts[ioff].mod);
+        NMOD_RED2(m, cop >> (FLINT_BITS - X->depth), cop << X->depth, Q->mod);
+        m = nmod_inv(m, Q->mod);
 
         if (X->squaring)
-            sd_fft_lctx_point_sqr(Q, abuf, m, X->depth);
+            sd_fft_ctx_point_sqr(Q, abuf, m, X->depth);
         else
-            sd_fft_lctx_point_mul(Q, abuf, bbuf, m, X->depth);
+            sd_fft_ctx_point_mul(Q, abuf, bbuf, m, X->depth);
 
-        sd_fft_lctx_ifft_trunc(Q, abuf, X->depth, X->ztrunc);
-
-        sd_fft_lctx_clear(Q, X->ffts + ioff);
+        sd_ifft_trunc(Q, abuf, X->depth, X->ztrunc);
     }
 
     flint_give_back_threads(handles, nworkers);
@@ -796,27 +790,23 @@ typedef struct {
 void s1pworker_func(void* varg)
 {
     s1pworker_struct* X = (s1pworker_struct*) varg;
-    sd_fft_lctx_t Q;
     ulong i, m;
 
     for (i = X->start_pi; i < X->stop_pi; i++)
     {
         ulong ioff = i + X->offset;
         double* abuf = X->abuf + X->stride*i;
+        sd_fft_ctx_struct* Q = X->ffts + ioff;
 
-        sd_fft_lctx_init(Q, X->ffts + ioff, X->depth);
-
-        _mod(abuf, X->atrunc, X->a, X->an, X->ffts + ioff, X->mod);
-        sd_fft_lctx_fft_trunc(Q, abuf, X->depth, X->atrunc, X->ztrunc);
+        _mod(abuf, X->atrunc, X->a, X->an, Q, X->mod);
+        sd_fft_trunc(Q, abuf, X->depth, X->atrunc, X->ztrunc);
 
         ulong cop = X->np == 1 ? 1 : *crt_data_co_prime_red(X->crts + X->np - 1, ioff);
-        NMOD_RED2(m, cop >> (FLINT_BITS - X->depth), cop << X->depth, X->ffts[ioff].mod);
-        m = nmod_inv(m, X->ffts[ioff].mod);
-        sd_fft_lctx_point_mul(Q, abuf, X->bbuf + X->stride*i, m, X->depth);
+        NMOD_RED2(m, cop >> (FLINT_BITS - X->depth), cop << X->depth, Q->mod);
+        m = nmod_inv(m, Q->mod);
+        sd_fft_ctx_point_mul(Q, abuf, X->bbuf + X->stride*i, m, X->depth);
 
-        sd_fft_lctx_ifft_trunc(Q, abuf, X->depth, X->ztrunc);
-
-        sd_fft_lctx_clear(Q, X->ffts + ioff);
+        sd_ifft_trunc(Q, abuf, X->depth, X->ztrunc);
     }
 }
 
@@ -831,7 +821,6 @@ void _mul_precomp_init(
     ulong modbits = FLINT_BITS - mod.norm;
     ulong offset = 0;
     ulong i, np, stride;
-    sd_fft_lctx_t Q;
 
     btrunc = n_round_up(btrunc, BLK_SZ);
 
@@ -883,13 +872,10 @@ got_np_and_offset:
     {
         ulong ioff = i + offset;
         double* bbuf = M->bbuf + stride*i;
+        sd_fft_ctx_struct* Q = R->ffts + ioff;
 
-        sd_fft_lctx_init(Q, R->ffts + ioff, depth);
-
-        _mod(bbuf, N, b, bn, R->ffts + ioff, mod);
-        sd_fft_lctx_fft_trunc(Q, bbuf, depth, N, N);
-
-        sd_fft_lctx_clear(Q, R->ffts + ioff);
+        _mod(bbuf, N, b, bn, Q, mod);
+        sd_fft_trunc(Q, bbuf, depth, N, N);
     }
 }
 

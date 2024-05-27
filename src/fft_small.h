@@ -178,32 +178,20 @@ typedef struct {
     double pinv;
     nmod_t mod;
     ulong primitive_root;
-    ulong blk_sz;
     volatile ulong w2tab_depth;
     double* w2tab[SD_FFT_CTX_W2TAB_SIZE];
 } sd_fft_ctx_struct;
 
 typedef sd_fft_ctx_struct sd_fft_ctx_t[1];
 
-/* The local context is expected to be copied and passed to the calculations. */
-typedef struct {
-    double* data;
-    double p;
-    double pinv;
-    const double* w2tab[SD_FFT_CTX_W2TAB_SIZE];
-} sd_fft_lctx_struct;
-
-typedef sd_fft_lctx_struct sd_fft_lctx_t[1];
-
 FLINT_FORCE_INLINE ulong sd_fft_ctx_blk_offset(ulong I)
 {
     return I << LG_BLK_SZ;
 }
 
-FLINT_FORCE_INLINE ulong sd_fft_ctx_data_size(ulong depth)
+FLINT_FORCE_INLINE ulong sd_fft_ctx_data_size(ulong L)
 {
-    FLINT_ASSERT(depth >= LG_BLK_SZ);
-    return sd_fft_ctx_blk_offset(n_pow2(depth - LG_BLK_SZ));
+    return n_pow2(L);
 }
 
 FLINT_FORCE_INLINE double* sd_fft_ctx_blk_index(double* d, ulong I)
@@ -211,96 +199,35 @@ FLINT_FORCE_INLINE double* sd_fft_ctx_blk_index(double* d, ulong I)
     return d + sd_fft_ctx_blk_offset(I);
 }
 
-FLINT_FORCE_INLINE double* sd_fft_lctx_blk_index(const sd_fft_lctx_t Q, ulong I)
+/*
+location of the bit-reversed eval:
+    with out_data = fft(in_data) of length 2^L, then
+    eval_poly(in_data, sd_fft_ctx_w(, i)) = out_data[sd_fft_ctx_trunc_index(L, i)]
+*/
+FLINT_FORCE_INLINE ulong sd_fft_ctx_trunc_index(ulong L, ulong i)
 {
-    return Q->data + sd_fft_ctx_blk_offset(I);
-}
-
-FLINT_FORCE_INLINE void sd_fft_ctx_set_index(double* d, ulong i, double x)
-{
-    sd_fft_ctx_blk_index(d, i/BLK_SZ)[i%BLK_SZ] = x;
-}
-
-FLINT_FORCE_INLINE double sd_fft_ctx_get_index(double* d, ulong i)
-{
-    return sd_fft_ctx_blk_index(d, i/BLK_SZ)[i%BLK_SZ];
-}
-
-/* slightly-worse-than-bit-reversed order of sd_{i}fft_basecase_4 */
-FLINT_FORCE_INLINE double sd_fft_ctx_get_fft_index(double* d, ulong i)
-{
-    ulong j = i&(BLK_SZ-16);
-    FLINT_ASSERT(BLK_SZ >= 16);
-    j |= (i&3)<<2;
-    j |= ((i>>2)&3);
-    return sd_fft_ctx_blk_index(d, i/BLK_SZ)[j];
+    /* 4x4 transposed blocks in basecases if depth >= 4 */
+    if (L >= 4)
+        i = (i&(-16)) | ((i>>2)&3) | ((i&3)<<2);
+    return i;
 }
 
 /* sd_fft.c */
-void sd_fft_trunc(const sd_fft_lctx_t Q, ulong I, ulong S, ulong k, ulong j, ulong itrunc, ulong otrunc);
+void sd_fft_trunc(sd_fft_ctx_t Q, double* d, ulong L, ulong itrunc, ulong otrunc);
 
 /* sd_ifft.c */
-void sd_ifft_trunc(const sd_fft_lctx_t Q, ulong I, ulong S, ulong k, ulong j, ulong z, ulong n, int f);
+void sd_ifft_trunc(sd_fft_ctx_t Q, double* d, ulong L, ulong trunc);
 
 /* sd_fft_ctx.c */
 void sd_fft_ctx_clear(sd_fft_ctx_t Q);
 void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp);
 void sd_fft_ctx_fit_depth(sd_fft_ctx_t Q, ulong k);
 
-/* TODO: these should probably increment/decrement a ref count */
-FLINT_FORCE_INLINE
-void sd_fft_lctx_init(sd_fft_lctx_t L, sd_fft_ctx_t Q, ulong depth)
-{
-    L->p = Q->p;
-    L->pinv = Q->pinv;
-    sd_fft_ctx_fit_depth(Q, depth);
-    for (int i = 0; i < SD_FFT_CTX_W2TAB_SIZE; i++)
-        L->w2tab[i] = Q->w2tab[i];
-}
-
-FLINT_FORCE_INLINE
-void sd_fft_lctx_clear(sd_fft_lctx_t FLINT_UNUSED(LQ), sd_fft_ctx_t FLINT_UNUSED(Q))
-{
-}
-
-void sd_fft_lctx_point_mul(const sd_fft_lctx_t Q,
+void sd_fft_ctx_point_mul(const sd_fft_ctx_t Q,
                             double* a, const double* b, ulong m_, ulong depth);
-void sd_fft_lctx_point_sqr(const sd_fft_lctx_t Q,
+void sd_fft_ctx_point_sqr(const sd_fft_ctx_t Q,
                             double* a, ulong m_, ulong depth);
 
-
-FLINT_FORCE_INLINE void sd_fft_lctx_fft_trunc(sd_fft_lctx_t Q, double* d, ulong depth, ulong itrunc, ulong otrunc)
-{
-    FLINT_ASSERT(depth >= LG_BLK_SZ);
-    FLINT_ASSERT(itrunc % BLK_SZ == 0);
-    FLINT_ASSERT(otrunc % BLK_SZ == 0);
-    FLINT_ASSERT(Q->w2tab[depth - 1] != NULL);
-    Q->data = d;
-    sd_fft_trunc(Q, 0, 1, depth - LG_BLK_SZ, 0, itrunc/BLK_SZ, otrunc/BLK_SZ);
-}
-
-FLINT_FORCE_INLINE void sd_fft_lctx_ifft_trunc(sd_fft_lctx_t Q, double* d, ulong depth, ulong trunc)
-{
-    FLINT_ASSERT(depth >= LG_BLK_SZ);
-    FLINT_ASSERT(trunc % BLK_SZ == 0);
-    FLINT_ASSERT(Q->w2tab[depth - 1] != NULL);
-    Q->data = d;
-    sd_ifft_trunc(Q, 0, 1, depth - LG_BLK_SZ, 0, trunc/BLK_SZ, trunc/BLK_SZ, 0);
-}
-
-FLINT_FORCE_INLINE void sd_fft_ctx_fft_trunc(sd_fft_ctx_t Q, double* d, ulong depth, ulong itrunc, ulong otrunc)
-{
-    sd_fft_lctx_t QL;
-    sd_fft_lctx_init(QL, Q, depth);
-    sd_fft_lctx_fft_trunc(QL, d, depth, itrunc, otrunc);
-}
-
-FLINT_FORCE_INLINE void sd_fft_ctx_ifft_trunc(sd_fft_ctx_t Q, double* d, ulong depth, ulong trunc)
-{
-    sd_fft_lctx_t QL;
-    sd_fft_lctx_init(QL, Q, depth);
-    sd_fft_lctx_ifft_trunc(QL, d, depth, trunc);
-}
 
 /*
     The bit reversed table is
@@ -310,7 +237,7 @@ FLINT_FORCE_INLINE void sd_fft_ctx_ifft_trunc(sd_fft_ctx_t Q, double* d, ulong d
 */
 
 /* look up w[2*j] */
-FLINT_FORCE_INLINE double sd_fft_lctx_w2(const sd_fft_lctx_t Q, ulong j)
+FLINT_FORCE_INLINE double sd_fft_ctx_w2(const sd_fft_ctx_t Q, ulong j)
 {
     ulong j_bits, j_r;
     SET_J_BITS_AND_J_R(j_bits, j_r, j);
@@ -318,22 +245,18 @@ FLINT_FORCE_INLINE double sd_fft_lctx_w2(const sd_fft_lctx_t Q, ulong j)
 }
 
 /* look up -w[2*j]^-1 */
-FLINT_FORCE_INLINE double sd_fft_lctx_w2inv(const sd_fft_lctx_t Q, ulong j)
+FLINT_FORCE_INLINE double sd_fft_ctx_w2inv(const sd_fft_ctx_t Q, ulong j)
 {
     ulong j_bits, j_mr;
     SET_J_BITS_AND_J_MR(j_bits, j_mr, j);
-    if (j == 0)
-        return -1.0;
-    else
-        return Q->w2tab[j_bits][j_mr];
+    return (j == 0) ? -1.0 : Q->w2tab[j_bits][j_mr];
 }
 
-/* look up w[jj] */
-FLINT_FORCE_INLINE double sd_fft_ctx_w(const sd_fft_ctx_t Q, ulong jj)
+/* look up w[j] */
+FLINT_FORCE_INLINE double sd_fft_ctx_w(const sd_fft_ctx_t Q, ulong j)
 {
-    ulong j = jj/2, j_bits, j_r;
-    SET_J_BITS_AND_J_R(j_bits, j_r, j);
-    return (jj&1) ? -Q->w2tab[j_bits][j_r] : Q->w2tab[j_bits][j_r];
+    double r = sd_fft_ctx_w2(Q, j/2);
+    return (j&1) ? -r : r;
 }
 
 typedef struct {

@@ -175,7 +175,7 @@
 */
 #define DEFINE_IT(j_is_0) \
 FLINT_FORCE_INLINE void CAT(sd_fft_basecase_4, j_is_0)( \
-    const sd_fft_lctx_t Q, \
+    const sd_fft_ctx_t Q, \
     double* X, \
     ulong j_r, \
     ulong j_bits) \
@@ -186,7 +186,7 @@ FLINT_FORCE_INLINE void CAT(sd_fft_basecase_4, j_is_0)( \
     vec4d x0, x1, x2, x3, y0, y1, y2, y3, u, v; \
  \
     /* will abuse the fact that Q->w2tab[0] points to consecutive entries */ \
-    FLINT_ASSERT(SD_FFT_CTX_INIT_DEPTH >= 4); \
+    FLINT_ASSERT(SD_FFT_CTX_W2TAB_INIT >= 4); \
  \
     x0 = vec4d_load(X+0); \
     x0 = vec4d_reduce_to_pm1n(x0, n, ninv); \
@@ -277,7 +277,7 @@ DEFINE_IT(1)
 
 /* use with n = m-2 and m >= 6 */
 #define EXTEND_BASECASE(n, m) \
-static void CAT3(sd_fft_basecase, m, 1)(const sd_fft_lctx_t Q, double* X, ulong FLINT_UNUSED(j_r), ulong FLINT_UNUSED(j_bits)) \
+static void CAT3(sd_fft_basecase, m, 1)(const sd_fft_ctx_t Q, double* X, ulong FLINT_UNUSED(j_r), ulong FLINT_UNUSED(j_bits)) \
 { \
     ulong l = n_pow2(m - 2); \
     _RADIX_4_FORWARD_PARAM_J_IS_Z(VECND, Q) \
@@ -289,7 +289,7 @@ static void CAT3(sd_fft_basecase, m, 1)(const sd_fft_lctx_t Q, double* X, ulong 
     CAT3(sd_fft_basecase, n, 0)(Q, X+2*l, 0, 2); \
     CAT3(sd_fft_basecase, n, 0)(Q, X+3*l, 1, 2); \
 } \
-static void CAT3(sd_fft_basecase, m, 0)(const sd_fft_lctx_t Q, double* X, ulong j_r, ulong j_bits) \
+static void CAT3(sd_fft_basecase, m, 0)(const sd_fft_ctx_t Q, double* X, ulong j_r, ulong j_bits) \
 { \
     ulong l = n_pow2(m - 2); \
     _RADIX_4_FORWARD_PARAM_J_IS_NZ(VECND, Q, j_r, j_bits) \
@@ -306,10 +306,10 @@ EXTEND_BASECASE(6, 8)
 #undef EXTEND_BASECASE
 
 /* parameter 1: j can be zero */
-static void sd_fft_base_1(const sd_fft_lctx_t Q, ulong I, ulong j)
+static void sd_fft_base_1(const sd_fft_ctx_t Q, double* d, ulong I, ulong j)
 {
     ulong j_bits, j_r;
-    double* x = sd_fft_lctx_blk_index(Q, I);
+    double* x = sd_fft_ctx_blk_index(d, I);
 
     FLINT_ASSERT(8 == LG_BLK_SZ);
     FLINT_ASSERT(256 == BLK_SZ);
@@ -323,10 +323,10 @@ static void sd_fft_base_1(const sd_fft_lctx_t Q, ulong I, ulong j)
 }
 
 /* parameter 0: j cannot be zero */
-static void sd_fft_base_0(const sd_fft_lctx_t Q, ulong I, ulong j)
+static void sd_fft_base_0(const sd_fft_ctx_t Q, double* d, ulong I, ulong j)
 {
     ulong j_bits, j_r;
-    double* x = sd_fft_lctx_blk_index(Q, I);
+    double* x = sd_fft_ctx_blk_index(d, I);
 
     FLINT_ASSERT(j != 0);
     FLINT_ASSERT(8 == LG_BLK_SZ);
@@ -343,7 +343,7 @@ static void sd_fft_base_0(const sd_fft_lctx_t Q, ulong I, ulong j)
 /* third parameter is j == 0 */
 #define DEFINE_IT(itrunc, otrunc) \
 static void CAT4(sd_fft_moth_trunc_block, itrunc, otrunc, 1)( \
-    const sd_fft_lctx_t Q, \
+    const sd_fft_ctx_t Q, \
     ulong FLINT_UNUSED(j_r), ulong FLINT_UNUSED(j_bits), \
     double* X0, double* X1, double* X2, double* X3) \
 { \
@@ -376,7 +376,7 @@ static void CAT4(sd_fft_moth_trunc_block, itrunc, otrunc, 1)( \
     FLINT_ASSERT(i == BLK_SZ); \
 } \
 static void CAT4(sd_fft_moth_trunc_block, itrunc, otrunc, 0)( \
-    const sd_fft_lctx_t Q, \
+    const sd_fft_ctx_t Q, \
     ulong j_r, ulong j_bits, \
     double* X0, double* X1, double* X2, double* X3) \
 { \
@@ -425,8 +425,9 @@ DEFINE_IT(4, 4)
 
 /************************ the recursive stuff ********************************/
 
-void sd_fft_main_block(
-    const sd_fft_lctx_t Q,
+static void sd_fft_main_block(
+    const sd_fft_ctx_t Q,
+    double* d,
     ulong I, /* starting index */
     ulong S, /* stride */
     ulong k, /* BLK_SZ transforms each of length 2^k */
@@ -441,13 +442,13 @@ void sd_fft_main_block(
 
         ulong l2 = n_pow2(k2);
         ulong a = 0; do {
-            sd_fft_main_block(Q, I + a*S, S<<k2, k1, j);
+            sd_fft_main_block(Q, d, I + a*S, S<<k2, k1, j);
         } while (a++, a < l2);
 
         // row ffts
         ulong l1 = n_pow2(k1);
         ulong b = 0; do {
-            sd_fft_main_block(Q, I + (b<<k2)*S, S, k2, (j<<k1) + b);
+            sd_fft_main_block(Q, d, I + (b<<k2)*S, S, k2, (j<<k1) + b);
         } while (b++, b < l1);
 
         return;
@@ -466,10 +467,10 @@ void sd_fft_main_block(
         {
             _RADIX_4_FORWARD_PARAM_J_IS_Z(VECND, Q)
             ulong a = 0; do {
-                double* X0 = sd_fft_lctx_blk_index(Q, I+a*S + (S<<k2)*0);
-                double* X1 = sd_fft_lctx_blk_index(Q, I+a*S + (S<<k2)*1);
-                double* X2 = sd_fft_lctx_blk_index(Q, I+a*S + (S<<k2)*2);
-                double* X3 = sd_fft_lctx_blk_index(Q, I+a*S + (S<<k2)*3);
+                double* X0 = sd_fft_ctx_blk_index(d, I+a*S + (S<<k2)*0);
+                double* X1 = sd_fft_ctx_blk_index(d, I+a*S + (S<<k2)*1);
+                double* X2 = sd_fft_ctx_blk_index(d, I+a*S + (S<<k2)*2);
+                double* X3 = sd_fft_ctx_blk_index(d, I+a*S + (S<<k2)*3);
                 ulong i = 0; do {
                     _RADIX_4_FORWARD_MOTH_J_IS_Z(VECND, X0+i, X1+i, X2+i, X3+i);
                 } while (i += N, i < BLK_SZ);
@@ -479,10 +480,10 @@ void sd_fft_main_block(
         {
             _RADIX_4_FORWARD_PARAM_J_IS_NZ(VECND, Q, j_r, j_bits)
             ulong a = 0; do {
-                double* X0 = sd_fft_lctx_blk_index(Q, I+a*S + (S<<k2)*0);
-                double* X1 = sd_fft_lctx_blk_index(Q, I+a*S + (S<<k2)*1);
-                double* X2 = sd_fft_lctx_blk_index(Q, I+a*S + (S<<k2)*2);
-                double* X3 = sd_fft_lctx_blk_index(Q, I+a*S + (S<<k2)*3);
+                double* X0 = sd_fft_ctx_blk_index(d, I+a*S + (S<<k2)*0);
+                double* X1 = sd_fft_ctx_blk_index(d, I+a*S + (S<<k2)*1);
+                double* X2 = sd_fft_ctx_blk_index(d, I+a*S + (S<<k2)*2);
+                double* X3 = sd_fft_ctx_blk_index(d, I+a*S + (S<<k2)*3);
                 ulong i = 0; do {
                     _RADIX_4_FORWARD_MOTH_J_IS_NZ(VECND, X0+i, X1+i, X2+i, X3+i);
                 } while (i += N, i < BLK_SZ);
@@ -495,13 +496,13 @@ void sd_fft_main_block(
         /* row ffts */
         ulong l1 = n_pow2(k1);
         ulong b = 0; do {
-            sd_fft_main_block(Q, I + (b<<k2)*S, S, k2, (j<<k1) + b);
+            sd_fft_main_block(Q, d, I + (b<<k2)*S, S, k2, (j<<k1) + b);
         } while (b++, b < l1);
     }
     else if (k == 1)
     {
-        double* X0 = sd_fft_lctx_blk_index(Q, I + S*0);
-        double* X1 = sd_fft_lctx_blk_index(Q, I + S*1);
+        double* X0 = sd_fft_ctx_blk_index(d, I + S*0);
+        double* X1 = sd_fft_ctx_blk_index(d, I + S*1);
         if (FLINT_UNLIKELY(j_bits == 0))
         {
             _RADIX_2_FORWARD_PARAM_J_IS_Z(VECND, Q)
@@ -522,7 +523,8 @@ void sd_fft_main_block(
 
 
 void sd_fft_main(
-    const sd_fft_lctx_t Q,
+    const sd_fft_ctx_t Q,
+    double* d,
     ulong I,    /* starting index */
     ulong S,    /* stride */
     ulong k,    /* 1 transform of length BLK_SZ*2^k */
@@ -536,13 +538,13 @@ void sd_fft_main(
         /* column ffts */
         ulong l2 = n_pow2(k2);
         ulong a = 0; do {
-            sd_fft_main_block(Q, I + a*S, S<<k2, k1, j);
+            sd_fft_main_block(Q, d, I + a*S, S<<k2, k1, j);
         } while (a++, a < l2);
 
         /* row ffts */
         ulong l1 = n_pow2(k1);
         ulong b = 0; do {
-            sd_fft_main(Q, I + b*(S<<k2), S, k2, (j<<k1) + b);
+            sd_fft_main(Q, d, I + b*(S<<k2), S, k2, (j<<k1) + b);
         } while (b++, b < l1);
 
         return;
@@ -551,28 +553,29 @@ void sd_fft_main(
     if (k == 2)
     {
         // k1 = 2; k2 = 0
-        sd_fft_main_block(Q, I, S, 2, j);
-        sd_fft_base_1(Q, I + S*0, 4*j + 0);
-        sd_fft_base_0(Q, I + S*1, 4*j + 1);
-        sd_fft_base_0(Q, I + S*2, 4*j + 2);
-        sd_fft_base_0(Q, I + S*3, 4*j + 3);
+        sd_fft_main_block(Q, d, I, S, 2, j);
+        sd_fft_base_1(Q, d, I + S*0, 4*j + 0);
+        sd_fft_base_0(Q, d, I + S*1, 4*j + 1);
+        sd_fft_base_0(Q, d, I + S*2, 4*j + 2);
+        sd_fft_base_0(Q, d, I + S*3, 4*j + 3);
     }
     else if (k == 1)
     {
         // k1 = 1; k2 = 0
-        sd_fft_main_block(Q, I, S, 1, j);
-        sd_fft_base_1(Q, I + S*0, 2*j + 0);
-        sd_fft_base_0(Q, I + S*1, 2*j + 1);
+        sd_fft_main_block(Q, d, I, S, 1, j);
+        sd_fft_base_1(Q, d, I + S*0, 2*j + 0);
+        sd_fft_base_0(Q, d, I + S*1, 2*j + 1);
     }
     else
     {
-        sd_fft_base_1(Q, I, j);
+        sd_fft_base_1(Q, d, I, j);
     }
 }
 
 
-void sd_fft_trunc_block(
-    const sd_fft_lctx_t Q,
+static void sd_fft_trunc_block(
+    const sd_fft_ctx_t Q,
+    double* d,
     ulong I, // starting index
     ulong S, // stride
     ulong k, // transform length 2^k
@@ -594,7 +597,7 @@ void sd_fft_trunc_block(
         {
             for (ulong a = 0; a < otrunc; a++)
             {
-                double* X0 = sd_fft_lctx_blk_index(Q, I + S*a);
+                double* X0 = sd_fft_ctx_blk_index(d, I + S*a);
                 VECND z = VECNOP(zero)();
                 ulong i = 0; do {
                     VECNOP(store)(X0+i, z);
@@ -603,10 +606,10 @@ void sd_fft_trunc_block(
         }
         else
         {
-            double* X0 = sd_fft_lctx_blk_index(Q, I + S*0);
+            double* X0 = sd_fft_ctx_blk_index(d, I + S*0);
             for (ulong a = 1; a < otrunc; a++)
             {
-                double* X1 = sd_fft_lctx_blk_index(Q, I + S*a);
+                double* X1 = sd_fft_ctx_blk_index(d, I + S*a);
                 ulong i = 0; do {
                     VECND u = VECNOP(load)(X0+i);
                     VECNOP(store)(X1+i, u);
@@ -619,7 +622,7 @@ void sd_fft_trunc_block(
 
     if (itrunc == otrunc && otrunc == n_pow2(k))
     {
-        sd_fft_main_block(Q, I, S, k, j);
+        sd_fft_main_block(Q, d, I, S, k, j);
         return;
     }
 
@@ -638,15 +641,15 @@ void sd_fft_trunc_block(
 
         /* columns */
         for (ulong a = 0; a < z2p; a++)
-            sd_fft_trunc_block(Q, I + a*S, S << k2, k1, j, z1 + (a < z2), n1p);
+            sd_fft_trunc_block(Q, d, I + a*S, S << k2, k1, j, z1 + (a < z2), n1p);
 
         /* full rows */
         for (ulong b = 0; b < n1; b++)
-            sd_fft_trunc_block(Q, I + b*(S << k2), S, k2, (j << k1) + b, z2p, l2);
+            sd_fft_trunc_block(Q, d, I + b*(S << k2), S, k2, (j << k1) + b, z2p, l2);
 
         /* last partial row */
         if (n2 > 0)
-            sd_fft_trunc_block(Q, I + n1*(S << k2), S, k2, (j << k1) + n1, z2p, n2);
+            sd_fft_trunc_block(Q, d, I + n1*(S << k2), S, k2, (j << k1) + n1, z2p, n2);
 
         return;
     }
@@ -658,23 +661,23 @@ void sd_fft_trunc_block(
 #define IT(ii, oo) CAT4(sd_fft_moth_trunc_block, ii, oo, 0), \
                    CAT4(sd_fft_moth_trunc_block, ii, oo, 1)
 #define LOOKUP_IT(ii, oo, j_is_zero) tab[(j_is_zero) + 2*((oo)-1 + 4*((ii)-2))]
-        static void (*tab[3*4*2])(const sd_fft_lctx_t, ulong, ulong, double*, double*, double*, double*) =
+        static void (*tab[3*4*2])(const sd_fft_ctx_t, ulong, ulong, double*, double*, double*, double*) =
                         {IT(2,1), IT(2,2), IT(2,3), IT(2,4),
                          IT(3,1), IT(3,2), IT(3,3), IT(3,4),
                          IT(4,1), IT(4,2), IT(4,3), IT(4,4)};
 
         LOOKUP_IT(itrunc, otrunc, j == 0)(Q, j_r, j_bits,
-                                            sd_fft_lctx_blk_index(Q, I + S*0),
-                                            sd_fft_lctx_blk_index(Q, I + S*1),
-                                            sd_fft_lctx_blk_index(Q, I + S*2),
-                                            sd_fft_lctx_blk_index(Q, I + S*3));
+                                            sd_fft_ctx_blk_index(d, I + S*0),
+                                            sd_fft_ctx_blk_index(d, I + S*1),
+                                            sd_fft_ctx_blk_index(d, I + S*2),
+                                            sd_fft_ctx_blk_index(d, I + S*3));
 #undef LOOKUP_IT
 #undef IT
     }
     else if (k == 1)
     {
-        double* X0 = sd_fft_lctx_blk_index(Q, I + S*0);
-        double* X1 = sd_fft_lctx_blk_index(Q, I + S*1);
+        double* X0 = sd_fft_ctx_blk_index(d, I + S*0);
+        double* X1 = sd_fft_ctx_blk_index(d, I + S*1);
         FLINT_ASSERT(itrunc == 2);
         FLINT_ASSERT(otrunc == 1);
         if (FLINT_UNLIKELY(j_bits == 0))
@@ -695,8 +698,9 @@ void sd_fft_trunc_block(
 }
 
 
-void sd_fft_trunc(
-    const sd_fft_lctx_t Q,
+static void sd_fft_trunc_internal(
+    const sd_fft_ctx_t Q,
+    double* d,
     ulong I, /* starting index */
     ulong S, /* stride */
     ulong k, /* transform length BLK_SZ*2^k */
@@ -711,7 +715,7 @@ void sd_fft_trunc(
     {
         for (ulong a = 0; a < otrunc; a++)
         {
-            double* X0 = sd_fft_lctx_blk_index(Q, I + S*a);
+            double* X0 = sd_fft_ctx_blk_index(d, I + S*a);
             VECND z = VECNOP(zero)();
             ulong i = 0; do {
                 VECNOP(store)(X0 + i, z);
@@ -736,36 +740,76 @@ void sd_fft_trunc(
 
         /* columns */
         for (ulong a = 0; a < z2p; a++)
-            sd_fft_trunc_block(Q, I + a*S, S << k2, k1, j, z1 + (a < z2), n1p);
+            sd_fft_trunc_block(Q, d, I + a*S, S << k2, k1, j, z1 + (a < z2), n1p);
 
         /* full rows */
         for (ulong b = 0; b < n1; b++)
-            sd_fft_trunc(Q, I + b*(S << k2), S, k2, (j << k1) + b, z2p, l2);
+            sd_fft_trunc_internal(Q, d, I + b*(S << k2), S, k2, (j << k1) + b, z2p, l2);
 
         /* last partial row */
         if (n2 > 0)
-            sd_fft_trunc(Q, I + n1*(S << k2), S, k2, (j << k1) + n1, z2p, n2);
+            sd_fft_trunc_internal(Q, d, I + n1*(S << k2), S, k2, (j << k1) + n1, z2p, n2);
 
         return;
     }
 
     if (k == 2)
     {
-        sd_fft_trunc_block(Q, I, S, 2, j, itrunc, otrunc);
-                        sd_fft_base_1(Q, I + S*0, 4*j + 0);
-        if (otrunc > 1) sd_fft_base_0(Q, I + S*1, 4*j + 1);
-        if (otrunc > 2) sd_fft_base_0(Q, I + S*2, 4*j + 2);
-        if (otrunc > 3) sd_fft_base_0(Q, I + S*3, 4*j + 3);
+        sd_fft_trunc_block(Q, d, I, S, 2, j, itrunc, otrunc);
+                        sd_fft_base_1(Q, d, I + S*0, 4*j + 0);
+        if (otrunc > 1) sd_fft_base_0(Q, d, I + S*1, 4*j + 1);
+        if (otrunc > 2) sd_fft_base_0(Q, d, I + S*2, 4*j + 2);
+        if (otrunc > 3) sd_fft_base_0(Q, d, I + S*3, 4*j + 3);
     }
     else if (k == 1)
     {
-        sd_fft_trunc_block(Q, I, S, 1, j, itrunc, otrunc);
-                        sd_fft_base_1(Q, I + S*0, 2*j + 0);
-        if (otrunc > 1) sd_fft_base_0(Q, I + S*1, 2*j + 1);
+        sd_fft_trunc_block(Q, d, I, S, 1, j, itrunc, otrunc);
+                        sd_fft_base_1(Q, d, I + S*0, 2*j + 0);
+        if (otrunc > 1) sd_fft_base_0(Q, d, I + S*1, 2*j + 1);
     }
     else
     {
-        sd_fft_base_1(Q, I, j);
+        sd_fft_base_1(Q, d, I, j);
+    }
+}
+
+/********************* interface functions ***********************/
+
+void sd_fft_trunc(
+    sd_fft_ctx_t Q,
+    double* d,
+    ulong L,    /* convolution length 2^L */
+    ulong itrunc, ulong otrunc)
+{
+    FLINT_ASSERT(itrunc <= n_pow2(L));
+    FLINT_ASSERT(otrunc <= n_pow2(L));
+
+    if (L > LG_BLK_SZ)
+    {
+        ulong new_itrunc, new_otrunc;
+
+        sd_fft_ctx_fit_depth(Q, L);
+
+        new_itrunc = n_cdiv(itrunc, BLK_SZ);
+        new_otrunc = n_cdiv(otrunc, BLK_SZ);
+        /* this isn't very clever */
+        for (int i = 0; i < ((-itrunc)&(BLK_SZ-1)); i++)
+            d[itrunc+i] = 0.0;
+
+        sd_fft_trunc_internal(Q, d, 0, 1, L - LG_BLK_SZ, 0, new_itrunc, new_otrunc);
+        return;
+    }
+
+    /* neither is this */
+    for (int i = itrunc; i < n_pow2(L); i++)
+        d[i] = 0;
+
+    /* L=8 reads from w2tab[7] */
+    FLINT_ASSERT(LG_BLK_SZ <= SD_FFT_CTX_W2TAB_INIT);
+
+    switch (L) {
+      case 8: sd_fft_base_1(Q, d, 0, 0); break;
+      default: flint_printf("sd_fft_trunc: L=%wud not supported yet", L); flint_abort();
     }
 }
 

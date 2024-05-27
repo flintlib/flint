@@ -30,7 +30,6 @@ void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp)
     if (!fft_small_mulmod_satisfies_bounds(pp))
         flint_throw(FLINT_ERROR, "FFT prime %wu does not satisfy bounds for arithmetic", pp);
 
-    Q->blk_sz = BLK_SZ;
     Q->p = pp;
     Q->pinv = 1.0/Q->p;
     nmod_init(&Q->mod, pp);
@@ -72,7 +71,7 @@ void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp)
         Q->w2tab[k] = NULL;
 
 #if FLINT_WANT_ASSERT
-    for (k = 1; k < SD_FFT_CTX_INIT_DEPTH; k++)
+    for (k = 1; k < SD_FFT_CTX_W2TAB_INIT; k++)
     {
         ulong ww = nmod_pow_ui(Q->primitive_root, (Q->mod.n - 1)>>(k + 1), Q->mod);
         for (i = 0; i < n_pow2(k-1); i++)
