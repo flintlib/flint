@@ -30,10 +30,10 @@ extern "C" {
    expensive compared to a pointer-and-size representation. */
 #if FLINT_BITS == 64
 #define NFLOAT_MIN_LIMBS 1
-#define NFLOAT_MAX_LIMBS 33
+#define NFLOAT_MAX_LIMBS 66
 #else
 #define NFLOAT_MIN_LIMBS 1
-#define NFLOAT_MAX_LIMBS 66
+#define NFLOAT_MAX_LIMBS 132
 #endif
 
 /* Number of header limbs used to encode sign + exponent. We use a
@@ -101,6 +101,7 @@ typedef struct { ulong head[NFLOAT_HEADER_LIMBS]; ulong d[384 / FLINT_BITS]; } n
 typedef struct { ulong head[NFLOAT_HEADER_LIMBS]; ulong d[512 / FLINT_BITS]; } nfloat512_struct;
 typedef struct { ulong head[NFLOAT_HEADER_LIMBS]; ulong d[1024 / FLINT_BITS]; } nfloat1024_struct;
 typedef struct { ulong head[NFLOAT_HEADER_LIMBS]; ulong d[2048 / FLINT_BITS]; } nfloat2048_struct;
+typedef struct { ulong head[NFLOAT_HEADER_LIMBS]; ulong d[4096 / FLINT_BITS]; } nfloat4096_struct;
 
 typedef nfloat64_struct nfloat64_t[1];
 typedef nfloat128_struct nfloat128_t[1];
@@ -110,6 +111,7 @@ typedef nfloat384_struct nfloat384_t[1];
 typedef nfloat512_struct nfloat512_t[1];
 typedef nfloat1024_struct nfloat1024_t[1];
 typedef nfloat2048_struct nfloat2048_t[1];
+typedef nfloat4096_struct nfloat4096_t[1];
 
 #define LIMB_MSB_IS_SET(n) ((slong) (n) < 0)
 
@@ -126,6 +128,7 @@ nfloat_init(nfloat_ptr res, gr_ctx_t ctx)
 NFLOAT_INLINE void
 nfloat_clear(nfloat_ptr res, gr_ctx_t ctx)
 {
+    FLINT_ASSERT(NFLOAT_IS_SPECIAL(res) || LIMB_MSB_IS_SET(NFLOAT_D(res)[NFLOAT_CTX_NLIMBS(ctx)-1]));
 }
 
 void nfloat_swap(nfloat_ptr x, nfloat_ptr y, gr_ctx_t ctx);
@@ -262,6 +265,106 @@ nfloat_set_mpn_2exp(nfloat_ptr res, nn_srcptr x, slong xn, slong exp, int xsgnbi
     return _nfloat_set_mpn_2exp(res, x, xn, exp, xsgnbit, ctx);
 }
 
+NFLOAT_INLINE int
+nfloat_1_set_2_2exp(nfloat_ptr res, ulong x1, ulong x0, slong exp, int xsgnbit, gr_ctx_t ctx)
+{
+    slong norm;
+
+    if (x1 == 0)
+    {
+        if (x0 == 0)
+            return nfloat_zero(res, ctx);
+
+        norm = flint_clz(x0);
+        NFLOAT_EXP(res) = exp - FLINT_BITS - norm;
+        NFLOAT_SGNBIT(res) = xsgnbit;
+        NFLOAT_D(res)[0] = x0 << norm;
+    }
+    else if (LIMB_MSB_IS_SET(x1))
+    {
+        NFLOAT_EXP(res) = exp;
+        NFLOAT_SGNBIT(res) = xsgnbit;
+        NFLOAT_D(res)[0] = x1;
+    }
+    else
+    {
+        norm = flint_clz(x1);
+        NFLOAT_EXP(res) = exp - norm;
+        NFLOAT_SGNBIT(res) = xsgnbit;
+        NFLOAT_D(res)[0] = (x1 << norm) | (x0 >> (FLINT_BITS - norm));
+    }
+
+    NFLOAT_HANDLE_UNDERFLOW_OVERFLOW(res, ctx);
+    return GR_SUCCESS;
+}
+
+NFLOAT_INLINE int
+nfloat_1_set_3_2exp(nfloat_ptr res, ulong x2, ulong x1, ulong x0, slong exp, int xsgnbit, gr_ctx_t ctx)
+{
+    if (x2 == 0)
+        return nfloat_1_set_2_2exp(res, x1, x0, exp - FLINT_BITS, xsgnbit, ctx);
+    else
+        return nfloat_1_set_2_2exp(res, x2, x1, exp, xsgnbit, ctx);
+}
+
+NFLOAT_INLINE int
+nfloat_2_set_3_2exp(nfloat_ptr res, ulong x2, ulong x1, ulong x0, slong exp, int xsgnbit, gr_ctx_t ctx)
+{
+    slong norm;
+
+    if (x2 == 0)
+    {
+        if (x1 == 0)
+        {
+            if (x0 == 0)
+                return nfloat_zero(res, ctx);
+
+            norm = flint_clz(x0);
+            exp = exp - 2 * FLINT_BITS - norm;
+            x1 = 0;
+            x2 = x0 << norm;
+        }
+        else if (LIMB_MSB_IS_SET(x1))
+        {
+            exp = exp - FLINT_BITS;
+            x2 = x1;
+            x1 = x0;
+        }
+        else
+        {
+            norm = flint_clz(x1);
+            exp = exp - FLINT_BITS - norm;
+            x2 = (x1 << norm) | (x0 >> (FLINT_BITS - norm));
+            x1 = (x0 << norm);
+        }
+    }
+    else if (!LIMB_MSB_IS_SET(x2))
+    {
+        norm = flint_clz(x2);
+        exp = exp - norm;
+        x2 = (x2 << norm) | (x1 >> (FLINT_BITS - norm));
+        x1 = (x1 << norm) | (x0 >> (FLINT_BITS - norm));
+    }
+
+    NFLOAT_EXP(res) = exp;
+    NFLOAT_SGNBIT(res) = xsgnbit;
+    NFLOAT_D(res)[0] = x1;
+    NFLOAT_D(res)[1] = x2;
+    NFLOAT_HANDLE_UNDERFLOW_OVERFLOW(res, ctx);
+    return GR_SUCCESS;
+}
+
+NFLOAT_INLINE int
+nfloat_2_set_4_2exp(nfloat_ptr res, ulong x3, ulong x2, ulong x1, ulong x0, slong exp, int xsgnbit, gr_ctx_t ctx)
+{
+    if (x3 == 0)
+        return nfloat_2_set_3_2exp(res, x2, x1, x0, exp - FLINT_BITS, xsgnbit, ctx);
+    else
+        return nfloat_2_set_3_2exp(res, x3, x2, x1, exp, xsgnbit, ctx);
+}
+
+
+
 int nfloat_set_fmpz(nfloat_ptr res, const fmpz_t x, gr_ctx_t ctx);
 
 #ifdef ARF_H
@@ -302,6 +405,7 @@ int nfloat_sub(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx);
 int nfloat_mul(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx);
 int nfloat_addmul(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx);
 int nfloat_submul(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx);
+int nfloat_sqr(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx);
 
 int nfloat_mul_2exp_si(nfloat_ptr res, nfloat_srcptr x, slong y, gr_ctx_t ctx);
 
@@ -348,6 +452,103 @@ int _nfloat_vec_submul_scalar(nfloat_ptr res, nfloat_srcptr x, slong len, nfloat
 
 int _nfloat_vec_dot(nfloat_ptr res, nfloat_srcptr initial, int subtract, nfloat_srcptr x, nfloat_srcptr y, slong len, gr_ctx_t ctx);
 int _nfloat_vec_dot_rev(nfloat_ptr res, nfloat_srcptr initial, int subtract, nfloat_srcptr x, nfloat_srcptr y, slong len, gr_ctx_t ctx);
+
+/* Complex numbers */
+/* Note: we use the same context data for real and complex rings
+   (only which_ring and sizeof_elem differ). This allows us to call
+   nfloat methods on the real and imaginary parts without creating
+   a temporary nfloat context object, as long as the nfloat methods
+   don't call any generic gr methods internally.
+*/
+
+typedef nfloat_ptr nfloat_complex_ptr;
+typedef nfloat_srcptr nfloat_complex_srcptr;
+
+int nfloat_complex_ctx_init(gr_ctx_t ctx, slong prec, int flags);
+
+#define NFLOAT_COMPLEX_CTX_DATA_NLIMBS(ctx) (2 * NFLOAT_CTX_DATA_NLIMBS(ctx))
+
+#define NFLOAT_COMPLEX_RE(ptr, ctx) (ptr)
+#define NFLOAT_COMPLEX_IM(ptr, ctx) ((nn_ptr) (ptr) + NFLOAT_CTX_DATA_NLIMBS(ctx))
+
+#define NFLOAT_COMPLEX_IS_SPECIAL(x, ctx) (NFLOAT_IS_SPECIAL(NFLOAT_COMPLEX_RE(x, ctx)) || NFLOAT_IS_SPECIAL(NFLOAT_COMPLEX_IM(x, ctx)))
+#define NFLOAT_COMPLEX_IS_ZERO(x, ctx) (NFLOAT_IS_ZERO(NFLOAT_COMPLEX_RE(x, ctx)) && NFLOAT_IS_ZERO(NFLOAT_COMPLEX_IM(x, ctx)))
+
+
+NFLOAT_INLINE void
+nfloat_complex_init(nfloat_complex_ptr res, gr_ctx_t ctx)
+{
+    nfloat_init(NFLOAT_COMPLEX_RE(res, ctx), ctx);
+    nfloat_init(NFLOAT_COMPLEX_IM(res, ctx), ctx);
+}
+
+NFLOAT_INLINE void
+nfloat_complex_clear(nfloat_complex_ptr res, gr_ctx_t ctx)
+{
+    FLINT_ASSERT(NFLOAT_IS_SPECIAL(NFLOAT_COMPLEX_RE(res, ctx)) || LIMB_MSB_IS_SET(NFLOAT_D(NFLOAT_COMPLEX_RE(res, ctx))[NFLOAT_CTX_NLIMBS(ctx)-1]));
+    FLINT_ASSERT(NFLOAT_IS_SPECIAL(NFLOAT_COMPLEX_IM(res, ctx)) || LIMB_MSB_IS_SET(NFLOAT_D(NFLOAT_COMPLEX_IM(res, ctx))[NFLOAT_CTX_NLIMBS(ctx)-1]));
+}
+
+NFLOAT_INLINE int
+nfloat_complex_zero(nfloat_complex_ptr res, gr_ctx_t ctx)
+{
+    nfloat_zero(NFLOAT_COMPLEX_RE(res, ctx), ctx);
+    nfloat_zero(NFLOAT_COMPLEX_IM(res, ctx), ctx);
+    return GR_SUCCESS;
+}
+
+#ifdef ACF_H
+int nfloat_complex_get_acf(acf_t res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_set_acf(nfloat_complex_ptr res, const acf_t x, gr_ctx_t ctx);
+#endif
+
+#ifdef ACB_H
+int nfloat_complex_get_acb(acb_t res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_set_acb(nfloat_complex_ptr res, const acb_t x, gr_ctx_t ctx);
+#endif
+
+int nfloat_complex_write(gr_stream_t out, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_randtest(nfloat_complex_ptr res, flint_rand_t state, gr_ctx_t ctx);
+
+void nfloat_complex_swap(nfloat_complex_ptr x, nfloat_complex_ptr y, gr_ctx_t ctx);
+int nfloat_complex_set(nfloat_complex_ptr res, nfloat_complex_ptr x, gr_ctx_t ctx);
+int nfloat_complex_one(nfloat_complex_ptr res, gr_ctx_t ctx);
+int nfloat_complex_neg_one(nfloat_complex_ptr res, gr_ctx_t ctx);
+truth_t nfloat_complex_is_zero(nfloat_complex_srcptr x, gr_ctx_t ctx);
+truth_t nfloat_complex_is_one(nfloat_complex_srcptr x, gr_ctx_t ctx);
+truth_t nfloat_complex_is_neg_one(nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_i(nfloat_complex_ptr res, gr_ctx_t ctx);
+int nfloat_complex_pi(nfloat_complex_ptr res, gr_ctx_t ctx);
+int nfloat_complex_conj(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_re(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_im(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+truth_t nfloat_complex_equal(nfloat_complex_srcptr x, nfloat_complex_srcptr y, gr_ctx_t ctx);
+int nfloat_complex_set_si(nfloat_complex_ptr res, slong x, gr_ctx_t ctx);
+int nfloat_complex_set_ui(nfloat_complex_ptr res, ulong x, gr_ctx_t ctx);
+int nfloat_complex_set_fmpz(nfloat_complex_ptr res, const fmpz_t x, gr_ctx_t ctx);
+int nfloat_complex_set_fmpq(nfloat_complex_ptr res, const fmpq_t x, gr_ctx_t ctx);
+int nfloat_complex_set_d(nfloat_complex_ptr res, double x, gr_ctx_t ctx);
+int nfloat_complex_neg(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_add(nfloat_complex_ptr res, nfloat_complex_srcptr x, nfloat_complex_srcptr y, gr_ctx_t ctx);
+int nfloat_complex_sub(nfloat_complex_ptr res, nfloat_complex_srcptr x, nfloat_complex_srcptr y, gr_ctx_t ctx);
+int _nfloat_complex_sqr_naive(nfloat_ptr res1, nfloat_ptr res2, nfloat_srcptr a, nfloat_srcptr b, gr_ctx_t ctx);
+int _nfloat_complex_sqr_standard(nfloat_ptr res1, nfloat_ptr res2, nfloat_srcptr a, nfloat_srcptr b, gr_ctx_t ctx);
+int _nfloat_complex_sqr_karatsuba(nfloat_ptr res1, nfloat_ptr res2, nfloat_srcptr a, nfloat_srcptr b, gr_ctx_t ctx);
+int _nfloat_complex_sqr(nfloat_ptr res1, nfloat_ptr res2, nfloat_srcptr a, nfloat_srcptr b, gr_ctx_t ctx);
+int nfloat_complex_sqr(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int _nfloat_complex_mul_naive(nfloat_ptr res1, nfloat_ptr res2, nfloat_srcptr a, nfloat_srcptr b, nfloat_srcptr c, nfloat_srcptr d, gr_ctx_t ctx);
+int _nfloat_complex_mul_standard(nfloat_ptr res1, nfloat_ptr res2, nfloat_srcptr a, nfloat_srcptr b, nfloat_srcptr c, nfloat_srcptr d, gr_ctx_t ctx);
+int _nfloat_complex_mul_karatsuba(nfloat_ptr res1, nfloat_ptr res2, nfloat_srcptr a, nfloat_srcptr b, nfloat_srcptr c, nfloat_srcptr d, gr_ctx_t ctx);
+int nfloat_complex_mul(nfloat_complex_ptr res, nfloat_complex_srcptr x, nfloat_complex_srcptr y, gr_ctx_t ctx);
+int nfloat_complex_inv(nfloat_complex_ptr res, nfloat_complex_srcptr x, gr_ctx_t ctx);
+int nfloat_complex_div(nfloat_complex_ptr res, nfloat_complex_srcptr x, nfloat_complex_srcptr y, gr_ctx_t ctx);
+
+void _nfloat_complex_vec_init(nfloat_complex_ptr res, slong len, gr_ctx_t ctx);
+void _nfloat_complex_vec_clear(nfloat_complex_ptr res, slong len, gr_ctx_t ctx);
+int _nfloat_complex_vec_zero(nfloat_complex_ptr res, slong len, gr_ctx_t ctx);
+int _nfloat_complex_vec_set(nfloat_complex_ptr res, nfloat_complex_srcptr x, slong len, gr_ctx_t ctx);
+int _nfloat_complex_vec_add(nfloat_complex_ptr res, nfloat_complex_srcptr x, nfloat_complex_srcptr y, slong len, gr_ctx_t ctx);
+int _nfloat_complex_vec_sub(nfloat_complex_ptr res, nfloat_complex_srcptr x, nfloat_complex_srcptr y, slong len, gr_ctx_t ctx);
 
 #ifdef __cplusplus
 }

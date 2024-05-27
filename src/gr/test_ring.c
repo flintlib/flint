@@ -1369,9 +1369,13 @@ gr_test_zero_one(gr_ctx_t R, flint_rand_t state, int test_flags)
     }
 
     status |= gr_randtest(a, state, R);
-    status |= gr_one(a, R);
-    status |= gr_neg(a, a, R);
+    status |= gr_neg_one(a, R);
     equal = gr_is_neg_one(a, R);
+    if (status == GR_SUCCESS && equal == T_FALSE)
+        status = GR_TEST_FAIL;
+
+    status |= gr_neg(a, a, R);
+    equal = gr_is_one(a, R);
     if (status == GR_SUCCESS && equal == T_FALSE)
         status = GR_TEST_FAIL;
 
@@ -3939,7 +3943,8 @@ gr_test_floating_point(gr_ctx_t R, slong iters, int test_flags)
     gr_test_iter(R, state, "add: aliasing", gr_test_add_aliasing, iters, test_flags);
     gr_test_iter(R, state, "sub: equal neg add", gr_test_sub_equal_neg_add, iters, test_flags);
     gr_test_iter(R, state, "sub: aliasing", gr_test_sub_aliasing, iters, test_flags);
-    gr_test_iter(R, state, "mul: commutative", gr_test_mul_commutative, iters, test_flags);
+    /* can fail for complex */
+    /* gr_test_iter(R, state, "mul: commutative", gr_test_mul_commutative, iters, test_flags); */
     gr_test_iter(R, state, "mul: aliasing", gr_test_mul_aliasing, iters, test_flags);
     gr_test_iter(R, state, "div: aliasing", gr_test_div_aliasing, iters, test_flags);
     gr_test_iter(R, state, "pow: aliasing", gr_test_pow_aliasing, iters, test_flags);

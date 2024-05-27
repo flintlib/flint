@@ -513,6 +513,12 @@ nfloat_get_arf(arf_t res, nfloat_srcptr x, gr_ctx_t ctx)
     }
     else
     {
+        if (!LIMB_MSB_IS_SET(NFLOAT_D(x)[NFLOAT_CTX_NLIMBS(ctx) - 1]))
+        {
+            flint_printf("bad nfloat!\n");
+            flint_abort();
+        }
+
         arf_set_mpn(res, NFLOAT_D(x), NFLOAT_CTX_NLIMBS(ctx), NFLOAT_SGNBIT(x));
         arf_mul_2exp_si(res, res, NFLOAT_EXP(x) - FLINT_BITS * NFLOAT_CTX_NLIMBS(ctx));
     }
@@ -2164,6 +2170,71 @@ nfloat_mul(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, gr_ctx_t ctx)
 }
 
 int
+nfloat_sqr(nfloat_ptr res, nfloat_srcptr x, gr_ctx_t ctx)
+{
+    mp_limb_pair_t mul_res;
+    slong nlimbs;
+
+    if (NFLOAT_IS_SPECIAL(x))
+    {
+        if (NFLOAT_IS_ZERO(x))
+            return nfloat_zero(res, ctx);
+        else
+            return nfloat_abs(res, x, ctx);
+    }
+
+    nlimbs = NFLOAT_CTX_NLIMBS(ctx);
+
+    if (nlimbs == 1)
+    {
+        ulong hi, lo;
+
+        umul_ppmm(hi, lo, NFLOAT_D(x)[0], NFLOAT_D(x)[0]);
+
+        if (LIMB_MSB_IS_SET(hi))
+        {
+            NFLOAT_D(res)[0] = hi;
+            NFLOAT_EXP(res) = 2 * NFLOAT_EXP(x);
+        }
+        else
+        {
+            NFLOAT_D(res)[0] = (hi << 1) | (lo >> (FLINT_BITS - 1));
+            NFLOAT_EXP(res) = 2 * NFLOAT_EXP(x) - 1;
+        }
+    }
+    else if (nlimbs == 2)
+    {
+        ulong r3, r2, r1, FLINT_SET_BUT_UNUSED(r0);
+
+        FLINT_MPN_SQR_2X2(r3, r2, r1, r0, NFLOAT_D(x)[1], NFLOAT_D(x)[0]);
+
+        if (LIMB_MSB_IS_SET(r3))
+        {
+            NFLOAT_D(res)[0] = r2;
+            NFLOAT_D(res)[1] = r3;
+            NFLOAT_EXP(res) = 2 * NFLOAT_EXP(x);
+        }
+        else
+        {
+            NFLOAT_D(res)[0] = (r2 << 1) | (r1 >> (FLINT_BITS - 1));
+            NFLOAT_D(res)[1] = (r3 << 1) | (r2 >> (FLINT_BITS - 1));
+            NFLOAT_EXP(res) = 2 * NFLOAT_EXP(x) - 1;
+        }
+    }
+    else
+    {
+        /* todo: sqrhigh_normalised */
+        mul_res = flint_mpn_mulhigh_normalised2(NFLOAT_D(res), NFLOAT_D(x), NFLOAT_D(x), NFLOAT_CTX_NLIMBS(ctx));
+        NFLOAT_EXP(res) = 2 * NFLOAT_EXP(x) - mul_res.m2;
+    }
+
+    NFLOAT_SGNBIT(res) = 0;
+    NFLOAT_HANDLE_UNDERFLOW_OVERFLOW(res, ctx);
+    return GR_SUCCESS;
+}
+
+/* todo: squaring */
+int
 _nfloat_vec_mul_1(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, slong len, gr_ctx_t ctx)
 {
     slong i, stride;
@@ -2219,6 +2290,7 @@ _nfloat_vec_mul_1(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, slong len, g
     return status;
 }
 
+/* todo: squaring */
 int
 _nfloat_vec_mul_2(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, slong len, gr_ctx_t ctx)
 {
@@ -2277,6 +2349,7 @@ _nfloat_vec_mul_2(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, slong len, g
     return status;
 }
 
+/* todo: squaring */
 int
 _nfloat_vec_mul(nfloat_ptr res, nfloat_srcptr x, nfloat_srcptr y, slong len, gr_ctx_t ctx)
 {

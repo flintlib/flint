@@ -4713,12 +4713,38 @@ def get_nfloat_class(prec):
 
     return _nfloat_class
 
-
 class RealFloat_nfloat(gr_ctx):
     def __init__(self, prec=128):
         gr_ctx.__init__(self)
         libflint.nfloat_ctx_init(self._ref, prec, 0)
         self._elem_type = get_nfloat_class(prec)
+
+@functools.cache
+def get_nfloat_complex_class(prec):
+    n = (prec + FLINT_BITS - 1) // FLINT_BITS
+    prec = n * FLINT_BITS
+
+    class _nfloat_complex_struct(ctypes.Structure):
+        _fields_ = [('val', c_ulong * (2 * (n + 2)))]
+
+    _nfloat_complex_struct.__qualname__ = _nfloat_complex_struct.__name__ = ("nfloat" + str(prec) + "_complex_struct")
+
+    class _nfloat_complex_class(gr_elem):
+        _struct_type = _nfloat_complex_struct
+
+        @staticmethod
+        def _default_context():
+            raise NotImplementedError
+
+    _nfloat_complex_class.__qualname__ = _nfloat_complex_class.__name__ = ("nfloat" + str(prec) + "_complex")
+
+    return _nfloat_complex_class
+
+class ComplexFloat_nfloat_complex(gr_ctx):
+    def __init__(self, prec=128):
+        gr_ctx.__init__(self)
+        libflint.nfloat_complex_ctx_init(self._ref, prec, 0)
+        self._elem_type = get_nfloat_complex_class(prec)
 
 
 

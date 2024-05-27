@@ -12,6 +12,7 @@
 #include "test_helpers.h"
 #include "fmpq.h"
 #include "arf.h"
+#include "acf.h"
 #include "gr_vec.h"
 #include "gr_special.h"
 #include "nfloat.h"
@@ -94,7 +95,6 @@ gr_test_approx_unary_op(gr_ctx_t R, gr_method_unary_op op, gr_ctx_t R_ref, gr_sr
         if (status == GR_SUCCESS)
         {
             status |= gr_set_other(rel_err, b, R, R_ref);
-
             status |= gr_sub(rel_err, b_ref, rel_err, R_ref);
             status |= gr_div(rel_err, rel_err, b_ref, R_ref);
             status |= gr_abs(rel_err, rel_err, R_ref);
@@ -534,6 +534,46 @@ TEST_FUNCTION_START(nfloat, state)
     gr_ctx_t ctx;
     gr_ctx_t ctx2;
     slong prec;
+    slong iter;
+
+    for (prec = NFLOAT_MIN_LIMBS * FLINT_BITS; prec <= NFLOAT_MAX_LIMBS * FLINT_BITS; prec += FLINT_BITS)
+    {
+        nfloat_complex_ctx_init(ctx, prec, 0);
+
+        gr_test_floating_point(ctx, 100 * flint_test_multiplier(), 0);
+
+        {
+            gr_ptr tol1, tol;
+            slong i, reps;
+
+            gr_ctx_init_complex_acb(ctx2, prec + 32);
+
+            tol1 = gr_heap_init(ctx);
+            tol = gr_heap_init(ctx2);
+
+            GR_IGNORE(gr_one(tol, ctx2));
+            GR_IGNORE(gr_mul_2exp_si(tol, tol, -prec + 3, ctx2));
+
+            reps = (prec <= 256 ? 10000 : 1) * flint_test_multiplier();
+
+            for (i = 0; i < reps; i++)
+            {
+                gr_test_approx_binary_op(ctx, (gr_method_binary_op) gr_add, ctx2, tol, state, 0);
+                gr_test_approx_binary_op(ctx, (gr_method_binary_op) gr_sub, ctx2, tol, state, 0);
+                gr_test_approx_binary_op(ctx, (gr_method_binary_op) gr_mul, ctx2, tol, state, 0);
+                gr_test_approx_binary_op(ctx, (gr_method_binary_op) gr_div, ctx2, tol, state, 0);
+                gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_neg, ctx2, tol, state, 0);
+                gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_sqr, ctx2, tol, state, 0);
+                gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_inv, ctx2, tol, state, 0);
+            }
+
+            gr_heap_clear(tol1, ctx);
+            gr_heap_clear(tol, ctx2);
+            gr_ctx_clear(ctx2);
+        }
+
+        gr_ctx_clear(ctx);
+    }
 
     for (prec = NFLOAT_MIN_LIMBS * FLINT_BITS; prec <= NFLOAT_MAX_LIMBS * FLINT_BITS; prec += FLINT_BITS)
     {
@@ -631,6 +671,7 @@ TEST_FUNCTION_START(nfloat, state)
                 gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_neg, ctx2, tol, state, 0);
                 gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_abs, ctx2, tol, state, 0);
                 gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_sgn, ctx2, tol, state, 0);
+                gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_sqr, ctx2, tol, state, 0);
                 gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_inv, ctx2, tol, state, 0);
                 gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_sqrt, ctx2, tol, state, 0);
                 gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_rsqrt, ctx2, tol, state, 0);
@@ -704,6 +745,71 @@ TEST_FUNCTION_START(nfloat, state)
 
         gr_ctx_clear(ctx);
     }
+
+    nfloat_ctx_init(ctx, FLINT_BITS, 0);
+
+    for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
+    {
+        ulong x[3];
+        ulong r[NFLOAT_MAX_ALLOC];
+        ulong s[NFLOAT_MAX_ALLOC];
+        int s1, s2;
+        slong exp;
+        int sgn;
+
+        x[0] = n_randint(state, 2) ? 0 : n_randtest(state);
+        x[1] = n_randint(state, 2) ? 0 : n_randtest(state);
+        x[2] = n_randint(state, 2) ? 0 : n_randtest(state);
+        exp = (slong) n_randint(state, 100) - 100;
+        sgn = n_randint(state, 2);
+
+        s1 = nfloat_1_set_3_2exp(r, x[2], x[1], x[0], exp, sgn, ctx);
+        s2 = nfloat_set_mpn_2exp(s, x, 3, exp, sgn, ctx);
+
+        if (s1 != s2 || nfloat_equal(r, s, ctx) == T_FALSE)
+        {
+            flint_printf("FAIL: nfloat_1_set_3_2exp\n");
+            flint_mpn_debug(x, 3);
+            gr_println(r, ctx);
+            gr_println(s, ctx);
+            flint_abort();
+        }
+    }
+
+    gr_ctx_clear(ctx);
+
+    nfloat_ctx_init(ctx, 2 * FLINT_BITS, 0);
+
+    for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
+    {
+        ulong x[4];
+        ulong r[NFLOAT_MAX_ALLOC];
+        ulong s[NFLOAT_MAX_ALLOC];
+        int s1, s2;
+        slong exp;
+        int sgn;
+
+        x[0] = n_randint(state, 2) ? 0 : n_randtest(state);
+        x[1] = n_randint(state, 2) ? 0 : n_randtest(state);
+        x[2] = n_randint(state, 2) ? 0 : n_randtest(state);
+        x[3] = n_randint(state, 2) ? 0 : n_randtest(state);
+        exp = (slong) n_randint(state, 100) - 100;
+        sgn = n_randint(state, 2);
+
+        s1 = nfloat_2_set_4_2exp(r, x[3], x[2], x[1], x[0], exp, sgn, ctx);
+        s2 = nfloat_set_mpn_2exp(s, x, 4, exp, sgn, ctx);
+
+        if (s1 != s2 || nfloat_equal(r, s, ctx) == T_FALSE)
+        {
+            flint_printf("FAIL: nfloat_2_set_4_2exp\n");
+            flint_mpn_debug(x, 4);
+            gr_println(r, ctx);
+            gr_println(s, ctx);
+            flint_abort();
+        }
+    }
+
+    gr_ctx_clear(ctx);
 
     TEST_FUNCTION_END(state);
 }

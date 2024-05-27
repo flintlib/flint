@@ -50,6 +50,7 @@ gr_method_tab_input _nfloat_methods_input[] =
     {GR_METHOD_WRITE,           (gr_funcptr) nfloat_write},
     {GR_METHOD_ZERO,            (gr_funcptr) nfloat_zero},
     {GR_METHOD_ONE,             (gr_funcptr) nfloat_one},
+    {GR_METHOD_NEG_ONE,         (gr_funcptr) nfloat_neg_one},
     {GR_METHOD_IS_ZERO,         (gr_funcptr) nfloat_is_zero},
     {GR_METHOD_IS_ONE,          (gr_funcptr) nfloat_is_one},
     {GR_METHOD_IS_NEG_ONE,      (gr_funcptr) nfloat_is_neg_one},
@@ -92,9 +93,7 @@ gr_method_tab_input _nfloat_methods_input[] =
 */
     {GR_METHOD_ADDMUL,          (gr_funcptr) nfloat_addmul},
     {GR_METHOD_SUBMUL,          (gr_funcptr) nfloat_submul},
-/*
     {GR_METHOD_SQR,             (gr_funcptr) nfloat_sqr},
-*/
     {GR_METHOD_DIV,             (gr_funcptr) nfloat_div},
     {GR_METHOD_DIV_UI,          (gr_funcptr) nfloat_div_ui},
     {GR_METHOD_DIV_SI,          (gr_funcptr) nfloat_div_si},
@@ -214,8 +213,18 @@ nfloat_ctx_init(gr_ctx_t ctx, slong prec, int flags)
 int
 nfloat_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
-    gr_stream_write(out, "Floating-point numbers with prec = ");
-    gr_stream_write_si(out, NFLOAT_CTX_PREC(ctx));
-    gr_stream_write(out, " (nfloat)");
-    return GR_SUCCESS;
+    if (ctx->which_ring == GR_CTX_NFLOAT_COMPLEX)
+    {
+        gr_stream_write(out, "Complex floating-point numbers with prec = ");
+        gr_stream_write_si(out, NFLOAT_CTX_PREC(ctx));
+        gr_stream_write(out, " (nfloat_complex)");
+        return GR_SUCCESS;
+    }
+    else
+    {
+        gr_stream_write(out, "Floating-point numbers with prec = ");
+        gr_stream_write_si(out, NFLOAT_CTX_PREC(ctx));
+        gr_stream_write(out, " (nfloat)");
+        return GR_SUCCESS;
+    }
 }
