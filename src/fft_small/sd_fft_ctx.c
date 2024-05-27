@@ -70,6 +70,10 @@ void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp)
     for ( ; k < SD_FFT_CTX_W2TAB_SIZE; k++)
         Q->w2tab[k] = NULL;
 
+#if FLINT_USES_PTHREAD
+    pthread_mutex_init(&Q->mutex, NULL);
+#endif
+
 #if FLINT_WANT_ASSERT
     for (k = 1; k < SD_FFT_CTX_W2TAB_INIT; k++)
     {
@@ -83,8 +87,12 @@ void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp)
 #endif
 }
 
-void sd_fft_ctx_fit_depth(sd_fft_ctx_t Q, ulong depth)
+void sd_fft_ctx_fit_depth_with_lock(sd_fft_ctx_t Q, ulong depth)
 {
+#if FLINT_USES_PTHREAD
+    pthread_mutex_lock(&Q->mutex);
+#endif
+
     ulong k = Q->w2tab_depth;
     while (k < depth)
     {
@@ -133,4 +141,9 @@ void sd_fft_ctx_fit_depth(sd_fft_ctx_t Q, ulong depth)
         k++;
         Q->w2tab_depth = k;
     }
+
+
+#if FLINT_USES_PTHREAD
+    pthread_mutex_unlock(&Q->mutex);
+#endif
 }

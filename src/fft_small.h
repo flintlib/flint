@@ -15,6 +15,10 @@
 #include "longlong.h"
 #include "machine_vectors.h"
 
+#if FLINT_USES_PTHREAD
+#include <pthread.h>
+#endif
+
 #define LG_BLK_SZ 8
 #define BLK_SZ 256
 
@@ -180,6 +184,9 @@ typedef struct {
     ulong primitive_root;
     volatile ulong w2tab_depth;
     double* w2tab[SD_FFT_CTX_W2TAB_SIZE];
+#if FLINT_USES_PTHREAD
+    pthread_mutex_t mutex;
+#endif
 } sd_fft_ctx_struct;
 
 typedef sd_fft_ctx_struct sd_fft_ctx_t[1];
@@ -221,7 +228,13 @@ void sd_ifft_trunc(sd_fft_ctx_t Q, double* d, ulong L, ulong trunc);
 /* sd_fft_ctx.c */
 void sd_fft_ctx_clear(sd_fft_ctx_t Q);
 void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp);
-void sd_fft_ctx_fit_depth(sd_fft_ctx_t Q, ulong k);
+void sd_fft_ctx_fit_depth_with_lock(sd_fft_ctx_t Q, ulong k);
+
+FLINT_FORCE_INLINE void sd_fft_ctx_fit_depth(sd_fft_ctx_t Q, ulong depth)
+{
+    if (FLINT_UNLIKELY(Q->w2tab_depth < depth))
+        sd_fft_ctx_fit_depth_with_lock(Q, depth);
+}
 
 void sd_fft_ctx_point_mul(const sd_fft_ctx_t Q,
                             double* a, const double* b, ulong m_, ulong depth);
