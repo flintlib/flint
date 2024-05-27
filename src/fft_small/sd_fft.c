@@ -1020,7 +1020,7 @@ void sd_fft_trunc(
         new_itrunc = n_cdiv(itrunc, BLK_SZ);
         new_otrunc = n_cdiv(otrunc, BLK_SZ);
         /* this isn't very clever */
-        for (int i = 0; i < ((-itrunc)&(BLK_SZ-1)); i++)
+        for (int i = 0; i < ((-(int)itrunc)&(BLK_SZ-1)); i++)
             d[itrunc+i] = 0.0;
 
         sd_fft_trunc_internal(Q, d, 1, L - LG_BLK_SZ, 0, new_itrunc, new_otrunc);
@@ -1028,7 +1028,7 @@ void sd_fft_trunc(
     }
 
     /* neither is this */
-    for (int i = itrunc; i < n_pow2(L); i++)
+    for (int i = itrunc; i < (1<<L); i++)
         d[i] = 0;
 
     /* L=8 reads from w2tab[7] */
