@@ -139,7 +139,7 @@ int fft_small_mulmod_satisfies_bounds(ulong n);
 
     with the special case j_bits = j_r = 0 for j = 0.
     The first SD_FFT_CTX_W2TAB_INIT tables are stored consecutively to ease the
-    lookup of small indices, which must currently be at least 4.
+    lookup of small indices, which must currently be at least max(4, LG_BLK_SZ).
 */
 
 /* for the fft look up of powers of w */

@@ -296,110 +296,284 @@ static void radix_2_moth_inv_trunc_block_0_1_1(
 #define _RADIX_4_REVERSE_PARAM_J_IS_NZ(...) RADIX_4_REVERSE_PARAM_J_IS_NZ(__VA_ARGS__)
 #define _RADIX_4_REVERSE_MOTH_J_IS_NZ(...)  RADIX_4_REVERSE_MOTH_J_IS_NZ(__VA_ARGS__)
 
-/************ basecase inverse transform of size BLK_SZ **********************/
-/*
-    The basecases below 4 are disabled because the ifft expects input in
-    slightly-worse-than-bit-reversed order as in basecase_4.
-*/
-#define DEFINE_IT(j_is_0) \
-FLINT_FORCE_INLINE void sd_ifft_basecase_4_##j_is_0(\
-    const sd_fft_ctx_t Q, double* X, ulong j_mr, ulong j_bits) \
+
+#define LENGTH2INV_ANY_J(T, x0, x1, n, ninv, w0) \
 { \
-    vec4d n    = vec4d_set_d(Q->p); \
-    vec4d ninv = vec4d_set_d(Q->pinv); \
-    vec4d W, W2, IW, u, v; \
-    vec4d x0, x1, x2, x3, y0, y1, y2, y3; \
- \
-    x0 = vec4d_load(X + 0); \
-    x1 = vec4d_load(X + 4); \
-    x2 = vec4d_load(X + 8); \
-    x3 = vec4d_load(X + 12); \
- \
-    if (j_is_0) \
-    { \
-        W  = vec4d_set_d4(-Q->w2tab[0][0], Q->w2tab[0][3], Q->w2tab[0][7], Q->w2tab[0][5]); \
-        IW = vec4d_set_d4( Q->w2tab[0][1], Q->w2tab[0][2], Q->w2tab[0][6], Q->w2tab[0][4]); \
-        W2 = vec4d_set_d4(-Q->w2tab[0][0], Q->w2tab[0][1], Q->w2tab[0][3], Q->w2tab[0][2]); \
-    } \
-    else \
-    { \
-        W2 = vec4d_load_aligned(Q->w2tab[2+j_bits] + 4*j_mr);   /* a b c d */ \
-        W2 = vec4d_permute_3_2_1_0(W2);                         /* d c b a */ \
-        u = vec4d_load_aligned(Q->w2tab[3+j_bits] + 8*j_mr+0);  /* 0 1 2 3 */ \
-        v = vec4d_load_aligned(Q->w2tab[3+j_bits] + 8*j_mr+4);  /* 4 5 6 7 */ \
-        W  = vec4d_unpackhi_permute_3_1_2_0(u, v);              /* 7 5 3 1 */ \
-        IW = vec4d_unpacklo_permute_3_1_2_0(u, v);              /* 6 4 2 0 */ \
-    } \
- \
-    y0 = vec4d_add(x0, x1); \
-    y1 = vec4d_add(x2, x3); \
-    y2 = vec4d_sub(x0, x1); \
-    y3 = vec4d_sub(x3, x2); \
-    y2 = vec4d_mulmod(y2, W, n, ninv); \
-    y3 = vec4d_mulmod(y3, IW, n, ninv); \
-    x0 = vec4d_add(y0, y1); \
-    x1 = vec4d_sub(y3, y2); \
-    x2 = vec4d_sub(y1, y0); \
-    x3 = vec4d_add(y3, y2); \
-    x0 = vec4d_reduce_to_pm1n(x0, n, ninv); \
-    x2 = vec4d_mulmod(x2, W2, n, ninv); \
-    x3 = vec4d_mulmod(x3, W2, n, ninv); \
- \
-    VEC4D_TRANSPOSE(x0, x1, x2, x3, x0, x1, x2, x3); \
- \
-    if (j_is_0) \
-    { \
-        IW = vec4d_set_d(Q->w2tab[0][1]); \
-        y0 = vec4d_add(x0, x1); \
-        y1 = vec4d_add(x2, x3); \
-        y2 = vec4d_sub(x0, x1); \
-        y3 = vec4d_sub(x2, x3); \
-        y0 = vec4d_reduce_to_pm1n(y0, n, ninv); \
-        y1 = vec4d_reduce_to_pm1n(y1, n, ninv); \
-        y2 = vec4d_reduce_to_pm1n(y2, n, ninv); \
-        y3 = vec4d_mulmod(y3, IW, n, ninv); \
-        vec4d_store(X+0, vec4d_add(y0, y1)); \
-        vec4d_store(X+8, vec4d_sub(y0, y1)); \
-        vec4d_store(X+4, vec4d_sub(y2, y3)); \
-        vec4d_store(X+12, vec4d_add(y2, y3)); \
-    } \
-    else \
-    { \
-        W  = vec4d_set_d(Q->w2tab[1+j_bits][2*j_mr+1]); \
-        IW = vec4d_set_d(Q->w2tab[1+j_bits][2*j_mr+0]); \
-        W2 = vec4d_set_d(Q->w2tab[0+j_bits][j_mr]); \
-        y0 = vec4d_add(x0, x1); \
-        y1 = vec4d_add(x2, x3); \
-        y2 = vec4d_sub(x0, x1); \
-        y3 = vec4d_sub(x3, x2); \
-        y2 = vec4d_mulmod(y2, W, n, ninv); \
-        y3 = vec4d_mulmod(y3, IW, n, ninv); \
-        x0 = vec4d_add(y0, y1); \
-        x1 = vec4d_sub(y3, y2); \
-        x2 = vec4d_sub(y1, y0); \
-        x3 = vec4d_add(y3, y2); \
-        x0 = vec4d_reduce_to_pm1n(x0, n, ninv); \
-        x2 = vec4d_mulmod(x2, W2, n, ninv); \
-        x3 = vec4d_mulmod(x3, W2, n, ninv); \
-        vec4d_store(X+0, x0); \
-        vec4d_store(X+4, x1); \
-        vec4d_store(X+8, x2); \
-        vec4d_store(X+12, x3); \
-    } \
+   T Z0 = x0, Z1 = x1; \
+   x0 = CAT(T, reduce_to_pm1n)(CAT(T, add)(Z0, Z1), n, ninv); \
+   x1 = CAT(T, mulmod)(CAT(T, sub)(Z1, Z0), w0, n, ninv); \
 }
 
-DEFINE_IT(0)
-DEFINE_IT(1)
-#undef DEFINE_IT
+#define LENGTH2INV_ZERO_J(T, x0, x1, n, ninv) \
+{ \
+   T Z0 = x0, Z1 = x1; \
+   x0 = CAT(T, reduce_to_pm1n)(CAT(T, add)(Z0, Z1), n, ninv); \
+   x1 = CAT(T, reduce_to_pm1n)(CAT(T, sub)(Z0, Z1), n, ninv); \
+}
+
+#define LENGTH4INV_ANY_J(T, x0, x1, x2, x3, n, ninv, w0, ww0, ww1) \
+{ \
+    T X0 = x0, X1 = x1, X2 = x2, X3 = x3, Y0, Y1, Y2, Y3, Z0, Z1, Z2, Z3; \
+    Y0 = CAT(T, add)(X0, X1); \
+    Y1 = CAT(T, add)(X2, X3); \
+    Y2 = CAT(T, sub)(X0, X1); \
+    Y3 = CAT(T, sub)(X3, X2); \
+    Y2 = CAT(T, mulmod)(Y2, ww0, n, ninv); \
+    Y3 = CAT(T, mulmod)(Y3, ww1, n, ninv); \
+    Z0 = CAT(T, add)(Y0, Y1); \
+    Z1 = CAT(T, sub)(Y3, Y2); \
+    Z2 = CAT(T, sub)(Y1, Y0); \
+    Z3 = CAT(T, add)(Y3, Y2); \
+    x0 = CAT(T, reduce_to_pm1n)(Z0, n, ninv); \
+    x1 = Z1; \
+    x2 = CAT(T, mulmod)(Z2, w0, n, ninv); \
+    x3 = CAT(T, mulmod)(Z3, w0, n, ninv); \
+}
+
+#define LENGTH4INV_ZERO_J(T, x0, x1, x2, x3, n, ninv, ww1) \
+{ \
+    T X0 = x0, X1 = x1, X2 = x2, X3 = x3, Y0, Y1, Y2, Y3; \
+    Y0 = CAT(T, add)(X0, X1); \
+    Y1 = CAT(T, add)(X2, X3); \
+    Y2 = CAT(T, sub)(X0, X1); \
+    Y3 = CAT(T, sub)(X2, X3); \
+    Y0 = CAT(T, reduce_to_pm1n)(Y0, n, ninv); \
+    Y1 = CAT(T, reduce_to_pm1n)(Y1, n, ninv); \
+    Y2 = CAT(T, reduce_to_pm1n)(Y2, n, ninv); \
+    Y3 = CAT(T, mulmod)(Y3, ww1, n, ninv); \
+    x0 = CAT(T, add)(Y0, Y1); \
+    x2 = CAT(T, sub)(Y0, Y1); \
+    x1 = CAT(T, sub)(Y2, Y3); \
+    x3 = CAT(T, add)(Y2, Y3); \
+}
+
+#define LENGTH8INV_ANY_J(T, x0, x1, x2, x3, x4, x5, x6, x7, n, ninv, w0, ww0, ww1, www0, www1, www2, www3) \
+{ \
+    T A0 = x0, A1 = x1, A2 = x2, A3 = x3, A4 = x4, A5 = x5, A6 = x6, A7 = x7; \
+    LENGTH2INV_ANY_J(T, A0,A1, n,ninv, www0) \
+    LENGTH2INV_ANY_J(T, A2,A3, n,ninv, www1) \
+    LENGTH2INV_ANY_J(T, A4,A5, n,ninv, www2) \
+    LENGTH2INV_ANY_J(T, A6,A7, n,ninv, www3) \
+    LENGTH4INV_ANY_J(T, A0,A2,A4,A6, n,ninv, w0,ww0,ww1) \
+    LENGTH4INV_ANY_J(T, A1,A3,A5,A7, n,ninv, w0,ww0,ww1) \
+    x0 = A0; \
+    x1 = A1; \
+    x2 = A2; \
+    x3 = A3; \
+    x4 = A4; \
+    x5 = A5; \
+    x6 = A6; \
+    x7 = A7; \
+}
+
+#define LENGTH8INV_ZERO_J(T, x0, x1, x2, x3, x4, x5, x6, x7, n, ninv, ww1, www2, www3) \
+{ \
+    T A0 = x0, A1 = x1, A2 = x2, A3 = x3, A4 = x4, A5 = x5, A6 = x6, A7 = x7; \
+    LENGTH2INV_ZERO_J(T, A0,A1, n,ninv) \
+    LENGTH2INV_ANY_J(T, A2,A3, n,ninv, ww1) \
+    LENGTH2INV_ANY_J(T, A4,A5, n,ninv, www2) \
+    LENGTH2INV_ANY_J(T, A6,A7, n,ninv, www3) \
+    LENGTH4INV_ZERO_J(T, A0,A2,A4,A6, n,ninv, ww1) \
+    LENGTH4INV_ZERO_J(T, A1,A3,A5,A7, n,ninv, ww1) \
+    x0 = A0; \
+    x1 = A1; \
+    x2 = A2; \
+    x3 = A3; \
+    x4 = A4; \
+    x5 = A5; \
+    x6 = A6; \
+    x7 = A7; \
+}
+
+/************ basecase inverse transform of size dividing BLK_SZ *****************/
+
+static void sd_ifft_basecase_0_1(const sd_fft_ctx_t FLINT_UNUSED(Q), double* FLINT_UNUSED(X))
+{
+}
+
+
+static void sd_ifft_basecase_1_1(const sd_fft_ctx_t Q, double* X)
+{
+    LENGTH2INV_ZERO_J(vec1d, X[0], X[1], Q->p, Q->pinv);
+}
+
+
+static void sd_ifft_basecase_2_1(const sd_fft_ctx_t Q, double* X)
+{
+    LENGTH4INV_ZERO_J(vec1d, X[0], X[1], X[2], X[3], Q->p, Q->pinv, Q->w2tab[1][0]);
+}
+
+
+static void sd_ifft_basecase_3_1(const sd_fft_ctx_t Q, double* X)
+{
+    LENGTH8INV_ZERO_J(vec1d, X[0], X[1], X[2], X[3], X[4], X[5], X[6], X[7], Q->p, Q->pinv,
+                      Q->w2tab[1][0], Q->w2tab[2][1], Q->w2tab[2][0]);
+}
+
+
+static void sd_ifft_basecase_4_1(const sd_fft_ctx_t Q, double* X)
+{
+    vec4d n    = vec4d_set_d(Q->p);
+    vec4d ninv = vec4d_set_d(Q->pinv);
+    vec4d W, W2, IW;
+
+    vec4d x0 = vec4d_load(X+4*0);
+    vec4d x1 = vec4d_load(X+4*1);
+    vec4d x2 = vec4d_load(X+4*2);
+    vec4d x3 = vec4d_load(X+4*3);
+
+    W  = vec4d_set_d4(-Q->w2tab[0][0], Q->w2tab[0][3], Q->w2tab[0][7], Q->w2tab[0][5]);
+    IW = vec4d_set_d4( Q->w2tab[0][1], Q->w2tab[0][2], Q->w2tab[0][6], Q->w2tab[0][4]);
+    W2 = vec4d_set_d4(-Q->w2tab[0][0], Q->w2tab[0][1], Q->w2tab[0][3], Q->w2tab[0][2]);
+    LENGTH4INV_ANY_J(vec4d, x0,x1,x2,x3, n,ninv, W2, W, IW);
+    VEC4D_TRANSPOSE(x0,x1,x2,x3, x0,x1,x2,x3);
+
+    IW = vec4d_set_d(Q->w2tab[0][1]);
+    LENGTH4INV_ZERO_J(vec4d, x0,x1,x2,x3, n,ninv, IW);
+
+    vec4d_store(X+4*0, x0);
+    vec4d_store(X+4*1, x1);
+    vec4d_store(X+4*2, x2);
+    vec4d_store(X+4*3, x3);
+}
+
+static void sd_ifft_basecase_4_0(const sd_fft_ctx_t Q, double* X, ulong j_mr, ulong j_bits)
+{
+    vec4d n    = vec4d_set_d(Q->p);
+    vec4d ninv = vec4d_set_d(Q->pinv);
+    vec4d W, W2, IW, u, v;
+
+    vec4d x0 = vec4d_load(X+4*0);
+    vec4d x1 = vec4d_load(X+4*1);
+    vec4d x2 = vec4d_load(X+4*2);
+    vec4d x3 = vec4d_load(X+4*3);
+
+    W2 = vec4d_load_aligned(&Q->w2tab[2+j_bits][4*j_mr+0]); /* a b c d */
+    W2 = vec4d_permute_3_2_1_0(W2);                         /* d c b a */
+    u  = vec4d_load_aligned(&Q->w2tab[3+j_bits][8*j_mr+0]); /* 0 1 2 3 */
+    v  = vec4d_load_aligned(&Q->w2tab[3+j_bits][8*j_mr+4]); /* 4 5 6 7 */
+    W  = vec4d_unpackhi_permute_3_1_2_0(u, v);              /* 7 5 3 1 */
+    IW = vec4d_unpacklo_permute_3_1_2_0(u, v);              /* 6 4 2 0 */
+    LENGTH4INV_ANY_J(vec4d, x0,x1,x2,x3, n,ninv, W2, W, IW);
+    VEC4D_TRANSPOSE(x0,x1,x2,x3, x0,x1,x2,x3);
+
+    W  = vec4d_set_d(Q->w2tab[1+j_bits][2*j_mr+1]);
+    IW = vec4d_set_d(Q->w2tab[1+j_bits][2*j_mr+0]);
+    W2 = vec4d_set_d(Q->w2tab[0+j_bits][1*j_mr+0]);
+    LENGTH4INV_ANY_J(vec4d, x0,x1,x2,x3, n,ninv, W2, W, IW);
+
+    vec4d_store(X+4*0, x0);
+    vec4d_store(X+4*1, x1);
+    vec4d_store(X+4*2, x2);
+    vec4d_store(X+4*3, x3);
+}
+
+
+static void sd_ifft_basecase_5_1(const sd_fft_ctx_t Q, double* X)
+{
+    vec4d n    = vec4d_set_d(Q->p);
+    vec4d ninv = vec4d_set_d(Q->pinv);
+    vec4d w0, ww0, ww1, www2, www3;
+
+    vec4d x0 = vec4d_load(X+4*0);
+    vec4d x1 = vec4d_load(X+4*1);
+    vec4d x2 = vec4d_load(X+4*2);
+    vec4d x3 = vec4d_load(X+4*3);
+    vec4d x4 = vec4d_load(X+4*4);
+    vec4d x5 = vec4d_load(X+4*5);
+    vec4d x6 = vec4d_load(X+4*6);
+    vec4d x7 = vec4d_load(X+4*7);
+
+    /* j = 0, 1, 2, 3  then {j,2j+0,2j+1}^-1 in each column */
+    w0  = vec4d_set_d4(-Q->w2tab[0][0], Q->w2tab[1][0], Q->w2tab[2][1], Q->w2tab[2][0]);
+    ww0 = vec4d_set_d4(-Q->w2tab[0][0], Q->w2tab[2][1], Q->w2tab[3][3], Q->w2tab[3][1]);
+    ww1 = vec4d_set_d4( Q->w2tab[1][0], Q->w2tab[2][0], Q->w2tab[3][2], Q->w2tab[3][0]);
+    LENGTH4INV_ANY_J(vec4d, x0,x1,x2,x3, n,ninv, w0, ww0, ww1);
+
+    /* j = 4, 5, 6, 7  then {j,2j+0,2j+1}^-1 in each column */
+    w0  = vec4d_set_d4(Q->w2tab[3][3], Q->w2tab[3][2], Q->w2tab[3][1], Q->w2tab[3][0]);
+    ww0 = vec4d_set_d4(Q->w2tab[4][7], Q->w2tab[4][5], Q->w2tab[4][3], Q->w2tab[4][1]);
+    ww1 = vec4d_set_d4(Q->w2tab[4][6], Q->w2tab[4][4], Q->w2tab[4][2], Q->w2tab[4][0]);
+    LENGTH4INV_ANY_J(vec4d, x4,x5,x6,x7, n,ninv, w0, ww0, ww1);
+
+    VEC4D_TRANSPOSE(x0,x1,x2,x3, x0,x1,x2,x3);
+    VEC4D_TRANSPOSE(x4,x5,x6,x7, x4,x5,x6,x7);
+
+    ww1  = vec4d_set_d(Q->w2tab[1][0]);
+    www2 = vec4d_set_d(Q->w2tab[2][1]);
+    www3 = vec4d_set_d(Q->w2tab[2][0]);
+    LENGTH8INV_ZERO_J(vec4d, x0,x1,x2,x3,x4,x5,x6,x7, n,ninv, ww1, www2,www3);
+
+    vec4d_store(X+4*0, x0);
+    vec4d_store(X+4*1, x1);
+    vec4d_store(X+4*2, x2);
+    vec4d_store(X+4*3, x3);
+    vec4d_store(X+4*4, x4);
+    vec4d_store(X+4*5, x5);
+    vec4d_store(X+4*6, x6);
+    vec4d_store(X+4*7, x7);
+}
+
+static void sd_ifft_basecase_5_0(const sd_fft_ctx_t Q, double* X, ulong j_mr, ulong j_bits)
+{
+    vec4d n    = vec4d_set_d(Q->p);
+    vec4d ninv = vec4d_set_d(Q->pinv);
+    vec4d u, v, w0, ww0, ww1, www0, www1, www2, www3;
+
+    vec4d x0 = vec4d_load(X+4*0);
+    vec4d x1 = vec4d_load(X+4*1);
+    vec4d x2 = vec4d_load(X+4*2);
+    vec4d x3 = vec4d_load(X+4*3);
+    vec4d x4 = vec4d_load(X+4*4);
+    vec4d x5 = vec4d_load(X+4*5);
+    vec4d x6 = vec4d_load(X+4*6);
+    vec4d x7 = vec4d_load(X+4*7);
+
+    w0 = vec4d_load_aligned(&Q->w2tab[3+j_bits][8*j_mr+4]);
+    w0 = vec4d_permute_3_2_1_0(w0);
+    u  = vec4d_load_aligned(&Q->w2tab[4+j_bits][16*j_mr+8]);
+    v  = vec4d_load_aligned(&Q->w2tab[4+j_bits][16*j_mr+12]);
+    ww0 = vec4d_unpackhi_permute_3_1_2_0(u, v);
+    ww1 = vec4d_unpacklo_permute_3_1_2_0(u, v);
+    LENGTH4INV_ANY_J(vec4d, x0,x1,x2,x3, n,ninv, w0,ww0,ww1);
+
+    w0 = vec4d_load_aligned(&Q->w2tab[3+j_bits][8*j_mr+0]);
+    w0 = vec4d_permute_3_2_1_0(w0);
+    u  = vec4d_load_aligned(&Q->w2tab[4+j_bits][16*j_mr+0]);
+    v  = vec4d_load_aligned(&Q->w2tab[4+j_bits][16*j_mr+4]);
+    ww0 = vec4d_unpackhi_permute_3_1_2_0(u, v);
+    ww1 = vec4d_unpacklo_permute_3_1_2_0(u, v);
+    LENGTH4INV_ANY_J(vec4d, x4,x5,x6,x7, n,ninv, w0,ww0,ww1);
+
+    VEC4D_TRANSPOSE(x0,x1,x2,x3, x0,x1,x2,x3);
+    VEC4D_TRANSPOSE(x4,x5,x6,x7, x4,x5,x6,x7);
+
+    w0   = vec4d_set_d(Q->w2tab[0+j_bits][1*j_mr+0]);
+    ww0  = vec4d_set_d(Q->w2tab[1+j_bits][2*j_mr+1]);
+    ww1  = vec4d_set_d(Q->w2tab[1+j_bits][2*j_mr+0]);
+    www0 = vec4d_set_d(Q->w2tab[2+j_bits][4*j_mr+3]);
+    www1 = vec4d_set_d(Q->w2tab[2+j_bits][4*j_mr+2]);
+    www2 = vec4d_set_d(Q->w2tab[2+j_bits][4*j_mr+1]);
+    www3 = vec4d_set_d(Q->w2tab[2+j_bits][4*j_mr+0]);
+    LENGTH8INV_ANY_J(vec4d, x0,x1,x2,x3,x4,x5,x6,x7, n,ninv, w0, ww0,ww1, www0,www1,www2,www3);
+
+    vec4d_store(X+4*0, x0);
+    vec4d_store(X+4*1, x1);
+    vec4d_store(X+4*2, x2);
+    vec4d_store(X+4*3, x3);
+    vec4d_store(X+4*4, x4);
+    vec4d_store(X+4*5, x5);
+    vec4d_store(X+4*6, x6);
+    vec4d_store(X+4*7, x7);
+}
 
 
 /* use with n = m-2 and m >= 6 */
 #define EXTEND_BASECASE(n, m) \
-void CAT3(sd_ifft_basecase, m, 1)(const sd_fft_ctx_t Q, double* X, ulong FLINT_UNUSED(j_mr), ulong FLINT_UNUSED(j_bits)) \
+void CAT3(sd_ifft_basecase, m, 1)(const sd_fft_ctx_t Q, double* X) \
 { \
     ulong l = n_pow2(m - 2); \
-    FLINT_ASSERT(j_bits == 0); \
-    CAT3(sd_ifft_basecase, n, 1)(Q, X+0*l, 0, 0); \
+    CAT3(sd_ifft_basecase, n, 1)(Q, X+0*l); \
     CAT3(sd_ifft_basecase, n, 0)(Q, X+1*l, 0, 1); \
     CAT3(sd_ifft_basecase, n, 0)(Q, X+2*l, 1, 2); \
     CAT3(sd_ifft_basecase, n, 0)(Q, X+3*l, 0, 2); \
@@ -429,24 +603,26 @@ void CAT3(sd_ifft_basecase, m, 0)(const sd_fft_ctx_t Q, double* X, ulong j_mr, u
 }
 
 EXTEND_BASECASE(4, 6)
+EXTEND_BASECASE(5, 7)
 EXTEND_BASECASE(6, 8)
+EXTEND_BASECASE(7, 9)
 #undef EXTEND_BASECASE
 
 /* parameter 1: j can be zero */
-void sd_ifft_base_1(const sd_fft_ctx_t Q, double* x, ulong j)
+void sd_ifft_base_8_1(const sd_fft_ctx_t Q, double* x, ulong j)
 {
     ulong j_bits, j_mr;
 
     SET_J_BITS_AND_J_MR(j_bits, j_mr, j);
 
     if (j == 0)
-        sd_ifft_basecase_8_1(Q, x, j_mr, j_bits);
+        sd_ifft_basecase_8_1(Q, x);
     else
         sd_ifft_basecase_8_0(Q, x, j_mr, j_bits);
 }
 
 /* parameter 0: j cannot be zero */
-void sd_ifft_base_0(const sd_fft_ctx_t Q, double* x, ulong j)
+void sd_ifft_base_8_0(const sd_fft_ctx_t Q, double* x, ulong j)
 {
     ulong j_bits, j_mr;
 
@@ -456,6 +632,19 @@ void sd_ifft_base_0(const sd_fft_ctx_t Q, double* x, ulong j)
 
     sd_ifft_basecase_8_0(Q, x, j_mr, j_bits);
 }
+
+void sd_ifft_base_9_1(const sd_fft_ctx_t Q, double* x, ulong j)
+{
+    ulong j_bits, j_mr;
+
+    SET_J_BITS_AND_J_MR(j_bits, j_mr, j);
+
+    if (j == 0)
+        sd_ifft_basecase_9_1(Q, x);
+    else
+        sd_ifft_basecase_9_0(Q, x, j_mr, j_bits);
+}
+
 
 /***************** inverse butterfy with truncation **************************/
 
@@ -1012,7 +1201,7 @@ static void radix_4_moth_inv_trunc_block_0_4_1(
 
 /************************ the recursive stuff ********************************/
 
-static void sd_ifft_main_block(
+static void sd_ifft_no_trunc_block(
     const sd_fft_ctx_t Q,
     double* x,
     ulong S, /* stride */
@@ -1029,13 +1218,13 @@ static void sd_ifft_main_block(
         /* row ffts */
         ulong l1 = n_pow2(k1);
         ulong b = 0; do {
-            sd_ifft_main_block(Q, x + BLK_SZ*((b<<k2)*S), S, k2, (j<<k1) + b);
+            sd_ifft_no_trunc_block(Q, x + BLK_SZ*((b<<k2)*S), S, k2, (j<<k1) + b);
         } while (b++, b < l1);
 
         /* column ffts */
         ulong l2 = n_pow2(k2);
         ulong a = 0; do {
-            sd_ifft_main_block(Q, x + BLK_SZ*(a*S), S<<k2, k1, j);
+            sd_ifft_no_trunc_block(Q, x + BLK_SZ*(a*S), S<<k2, k1, j);
         } while (a++, a < l2);
 
         return;
@@ -1085,7 +1274,7 @@ static void sd_ifft_main_block(
     }
 }
 
-static void sd_ifft_main(
+static void sd_ifft_no_trunc_internal(
     const sd_fft_ctx_t Q,
     double* x,
     ulong S, /* stride */
@@ -1099,12 +1288,12 @@ static void sd_ifft_main(
 
         ulong l1 = n_pow2(k1);
         ulong b = 0; do {
-            sd_ifft_main(Q, x + BLK_SZ*(b*(S<<k2)), S, k2, (j<<k1) + b);
+            sd_ifft_no_trunc_internal(Q, x + BLK_SZ*(b*(S<<k2)), S, k2, (j<<k1) + b);
         } while (b++, b < l1);
 
         ulong l2 = n_pow2(k2);
         ulong a = 0; do {
-            sd_ifft_main_block(Q, x + BLK_SZ*(a*S), S<<k2, k1, j);
+            sd_ifft_no_trunc_block(Q, x + BLK_SZ*(a*S), S<<k2, k1, j);
         } while (a++, a < l2);
 
         return;
@@ -1113,22 +1302,19 @@ static void sd_ifft_main(
     if (k == 2)
     {
         /* k1 = 2; k2 = 0 */
-        sd_ifft_base_1(Q, x + BLK_SZ*(S*0), 4*j+0);
-        sd_ifft_base_0(Q, x + BLK_SZ*(S*1), 4*j+1);
-        sd_ifft_base_0(Q, x + BLK_SZ*(S*2), 4*j+2);
-        sd_ifft_base_0(Q, x + BLK_SZ*(S*3), 4*j+3);
-        sd_ifft_main_block(Q, x, S, 2, j);
+        sd_ifft_base_8_1(Q, x + BLK_SZ*(S*0), 4*j+0);
+        sd_ifft_base_8_0(Q, x + BLK_SZ*(S*1), 4*j+1);
+        sd_ifft_base_8_0(Q, x + BLK_SZ*(S*2), 4*j+2);
+        sd_ifft_base_8_0(Q, x + BLK_SZ*(S*3), 4*j+3);
+        sd_ifft_no_trunc_block(Q, x, S, 2, j);
     }
     else if (k == 1)
     {
-        /* k1 = 1; k2 = 0 */
-        sd_ifft_base_1(Q, x + BLK_SZ*(S*0), 2*j+0);
-        sd_ifft_base_0(Q, x + BLK_SZ*(S*1), 2*j+1);
-        sd_ifft_main_block(Q, x, S, 1, j);
+        sd_ifft_base_9_1(Q, x, j);
     }
     else
     {
-        sd_ifft_base_1(Q, x, j);
+        sd_ifft_base_8_1(Q, x, j);
     }
 }
 
@@ -1149,7 +1335,7 @@ static void sd_ifft_trunc_block(
 
     if (!f && z == n && n == n_pow2(k))
     {
-        sd_ifft_main_block(Q, x, S, k, j);
+        sd_ifft_no_trunc_block(Q, x, S, k, j);
         return;
     }
 
@@ -1196,7 +1382,7 @@ static void sd_ifft_trunc_block(
 
         /* complete rows */
         for (ulong b = 0; b < n1; b++)
-            sd_ifft_main_block(Q, x + BLK_SZ*(b*(S << k2)), S, k2, (j << k1) + b);
+            sd_ifft_no_trunc_block(Q, x + BLK_SZ*(b*(S << k2)), S, k2, (j << k1) + b);
 
         /* rightmost columns */
         for (ulong a = n2; a < z2p; a++)
@@ -1262,7 +1448,7 @@ static void sd_ifft_trunc_internal(
 
         /* complete rows */
         for (ulong b = 0; b < n1; b++)
-            sd_ifft_main(Q, x + BLK_SZ*(b*(S << k2)), S, k2, (j << k1) + b);
+            sd_ifft_no_trunc_internal(Q, x + BLK_SZ*(b*(S << k2)), S, k2, (j << k1) + b);
 
         /* rightmost columns */
         for (ulong a = n2; a < z2p; a++)
@@ -1281,24 +1467,24 @@ static void sd_ifft_trunc_internal(
 
     if (k == 2)
     {
-                   sd_ifft_base_1(Q, x + BLK_SZ*(S*0), 4*j+0);
-        if (n > 1) sd_ifft_base_0(Q, x + BLK_SZ*(S*1), 4*j+1);
-        if (n > 2) sd_ifft_base_0(Q, x + BLK_SZ*(S*2), 4*j+2);
-        if (n > 3) sd_ifft_base_0(Q, x + BLK_SZ*(S*3), 4*j+3);
+                   sd_ifft_base_8_1(Q, x + BLK_SZ*(S*0), 4*j+0);
+        if (n > 1) sd_ifft_base_8_0(Q, x + BLK_SZ*(S*1), 4*j+1);
+        if (n > 2) sd_ifft_base_8_0(Q, x + BLK_SZ*(S*2), 4*j+2);
+        if (n > 3) sd_ifft_base_8_0(Q, x + BLK_SZ*(S*3), 4*j+3);
         sd_ifft_trunc_block(Q, x, S, 2, j, z, n, f);
         if (f) sd_ifft_trunc_internal(Q, x + BLK_SZ*(S*n), S, 0, 4*j+n, 1, 0, f);
     }
     else if (k == 1)
     {
-                   sd_ifft_base_1(Q, x + BLK_SZ*(S*0), 2*j+0);
-        if (n > 1) sd_ifft_base_0(Q, x + BLK_SZ*(S*1), 2*j+1);
+                   sd_ifft_base_8_1(Q, x + BLK_SZ*(S*0), 2*j+0);
+        if (n > 1) sd_ifft_base_8_0(Q, x + BLK_SZ*(S*1), 2*j+1);
         sd_ifft_trunc_block(Q, x, S, 1, j, z, n, f);
         if (f) sd_ifft_trunc_internal(Q, x + BLK_SZ*(S*n), S, 0, 2*j+n, 1, 0, f);
     }
     else
     {
         FLINT_ASSERT(!f);
-        sd_ifft_base_1(Q, x, j);
+        sd_ifft_base_8_1(Q, x, j);
     }
 }
 
@@ -1324,7 +1510,15 @@ void sd_ifft_trunc(
     }
 
     switch (L) {
-        case 8: sd_ifft_base_1(Q, d, 0); break;
-        default: flint_printf("sd_ifft_trunc: L=%wud not supported yet", L); flint_abort();
+        case 0: sd_ifft_basecase_0_1(Q, d); break;
+        case 1: sd_ifft_basecase_1_1(Q, d); break;
+        case 2: sd_ifft_basecase_2_1(Q, d); break;
+        case 3: sd_ifft_basecase_3_1(Q, d); break;
+        case 4: sd_ifft_basecase_4_1(Q, d); break;
+        case 5: sd_ifft_basecase_5_1(Q, d); break;
+        case 6: sd_ifft_basecase_6_1(Q, d); break;
+        case 7: sd_ifft_basecase_7_1(Q, d); break;
+        case 8: sd_ifft_basecase_8_1(Q, d); break;
+        default: FLINT_ASSERT(0);
     }
 }

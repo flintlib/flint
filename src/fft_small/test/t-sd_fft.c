@@ -26,7 +26,6 @@ vec1d vec1d_eval_poly_mod(const vec1d* a, ulong an, const vec1d b, const vec1d n
 void test_sd_fft_trunc(sd_fft_ctx_t Q, ulong minL, ulong maxL, ulong ireps, flint_rand_t state)
 {
     ulong irepmul = 10;
-    minL = n_max(minL, LG_BLK_SZ); /* TODO */
 
     for (ulong L = minL; L <= maxL; L++)
     {
@@ -34,7 +33,7 @@ void test_sd_fft_trunc(sd_fft_ctx_t Q, ulong minL, ulong maxL, ulong ireps, flin
         ulong Xn = n_pow2(L);
         double* X = FLINT_ARRAY_ALLOC(Xn, double);
         double* data =  (double*) flint_aligned_alloc(32,
-                                      sd_fft_ctx_data_size(L)*sizeof(double));
+                                      FLINT_MAX(32, n_pow2(L)*sizeof(double)));
 
         ulong nreps = ireps + irepmul*L;
         for (ulong rep = 0; rep < nreps; rep++)
@@ -44,15 +43,15 @@ void test_sd_fft_trunc(sd_fft_ctx_t Q, ulong minL, ulong maxL, ulong ireps, flin
                 X[i] = n_randint(state, Q->mod.n);
 
             /* output of fft_trunc is supposed to be eval_poly */
-            ulong itrunc = n_round_up(1 + n_randint(state, Xn), BLK_SZ);    /* TODO */
-            ulong otrunc = n_round_up(1 + n_randint(state, Xn), BLK_SZ);
+            ulong itrunc = 1 + n_randint(state, Xn);
+            ulong otrunc = 1 + n_randint(state, Xn);
 
             for (i = 0; i < itrunc; i++)
                 data[i] = X[i];
 
             sd_fft_trunc(Q, data, L, itrunc, otrunc);
 
-            for (int check_reps = 0; check_reps < 2+50/L; check_reps++)
+            for (int check_reps = 0; check_reps < 2+50/(1+L); check_reps++)
             {
                 i = n_randint(state, otrunc);
                 double point = sd_fft_ctx_w(Q, i);
@@ -60,21 +59,21 @@ void test_sd_fft_trunc(sd_fft_ctx_t Q, ulong minL, ulong maxL, ulong ireps, flin
                 if (!vec1d_same_mod(y, data[sd_fft_ctx_trunc_index(L, i)], Q->p, Q->pinv))
                 {
                     flint_printf("FAIL: fft error at index %wu\nitrunc: %wu\n"
-                                           "otrunc: %wu\n", i, itrunc, otrunc);
+                                           "otrunc: %wu\ndepth: %wu\n", i, itrunc, otrunc, L);
                     fflush(stdout);
                     flint_abort();
                 }
             }
 
             /* output of ifft_trunc is supposed to be 2^L*input */
-            ulong trunc = n_round_up(1 + n_randint(state, Xn), BLK_SZ); /* TODO */
+            ulong trunc = 1 + n_randint(state, Xn);
             for (i = 0; i < trunc; i++)
                 data[i] = X[i];
 
             sd_fft_trunc(Q, data, L, trunc, trunc);
             sd_ifft_trunc(Q, data, L, trunc);
 
-            for (int check_reps = 0; check_reps < 2+50/L; check_reps++)
+            for (int check_reps = 0; check_reps < 2+90/(1+L); check_reps++)
             {
                 i = n_randint(state, trunc);
                 double m = vec1d_reduce_0n_to_pmhn(nmod_pow_ui(2, L, Q->mod), Q->p);
