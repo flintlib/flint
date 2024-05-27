@@ -1441,8 +1441,8 @@ nfloat_complex_div(nfloat_complex_ptr res, nfloat_complex_srcptr x, nfloat_compl
         status = nfloat_sqr(c2, c, ctx);
         status |= nfloat_sqr(d2, d, ctx);
         status |= nfloat_add(t, c2, d2, ctx);
-        status |= nfloat_set(NFLOAT_COMPLEX_RE(u, ctx), a, ctx);
-        status |= nfloat_neg(NFLOAT_COMPLEX_IM(u, ctx), b, ctx);
+        status |= nfloat_set(NFLOAT_COMPLEX_RE(u, ctx), c, ctx);
+        status |= nfloat_neg(NFLOAT_COMPLEX_IM(u, ctx), d, ctx);
         status |= nfloat_complex_mul(res, x, u, ctx);
         status |= nfloat_div(r, r, t, ctx);
         status |= nfloat_div(s, s, t, ctx);

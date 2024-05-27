@@ -551,7 +551,7 @@ TEST_FUNCTION_START(nfloat, state)
             tol = gr_heap_init(ctx2);
 
             GR_IGNORE(gr_one(tol, ctx2));
-            GR_IGNORE(gr_mul_2exp_si(tol, tol, -prec + 2, ctx2));
+            GR_IGNORE(gr_mul_2exp_si(tol, tol, -prec + 3, ctx2));
 
             reps = (prec <= 256 ? 10000 : 1) * flint_test_multiplier();
 
@@ -560,10 +560,10 @@ TEST_FUNCTION_START(nfloat, state)
                 gr_test_approx_binary_op(ctx, (gr_method_binary_op) gr_add, ctx2, tol, state, 0);
                 gr_test_approx_binary_op(ctx, (gr_method_binary_op) gr_sub, ctx2, tol, state, 0);
                 gr_test_approx_binary_op(ctx, (gr_method_binary_op) gr_mul, ctx2, tol, state, 0);
-                /* gr_test_approx_binary_op(ctx, (gr_method_binary_op) gr_div, ctx2, tol, state, 0); */
+                gr_test_approx_binary_op(ctx, (gr_method_binary_op) gr_div, ctx2, tol, state, 0);
                 gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_neg, ctx2, tol, state, 0);
                 gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_sqr, ctx2, tol, state, 0);
-                /* gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_inv, ctx2, tol, state, 0); */
+                gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_inv, ctx2, tol, state, 0);
             }
 
             gr_heap_clear(tol1, ctx);
