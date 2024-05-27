@@ -18,9 +18,12 @@
 
 TEST_FUNCTION_START(nfloat_complex, state)
 {
+/*
     gr_ctx_t ctx;
     gr_ctx_t ctx2;
     slong prec;
+    slong iter;
+*/
 
     TEST_FUNCTION_END(state);
 }

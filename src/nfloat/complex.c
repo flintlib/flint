@@ -521,6 +521,15 @@ _nfloat_complex_sqr_standard(nfloat_ptr res1, nfloat_ptr res2, nfloat_srcptr a, 
             sub_dddmmmsss(a2[2], a2[1], a2[0], b2[2], b2[1], b2[0], a2[2], a2[1], a2[0]);
             ssgnbit = 1;
         }
+
+        status |= nfloat_mul(res2, a, b, ctx);
+        if (NFLOAT_EXP(res2) >= NFLOAT_MIN_EXP && NFLOAT_EXP(res2) < NFLOAT_MAX_EXP)
+            NFLOAT_EXP(res2)++;
+        else
+            status |= nfloat_mul_2exp_si(res2, res2, 1, ctx);
+
+        status |= nfloat_2_set_3_2exp(res1, a2[2], a2[1], a2[0], a2b2exp, ssgnbit, ctx);
+        return status;
     }
     else
     {

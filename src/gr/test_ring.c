@@ -1369,9 +1369,13 @@ gr_test_zero_one(gr_ctx_t R, flint_rand_t state, int test_flags)
     }
 
     status |= gr_randtest(a, state, R);
-    status |= gr_one(a, R);
-    status |= gr_neg(a, a, R);
+    status |= gr_neg_one(a, R);
     equal = gr_is_neg_one(a, R);
+    if (status == GR_SUCCESS && equal == T_FALSE)
+        status = GR_TEST_FAIL;
+
+    status |= gr_neg(a, a, R);
+    equal = gr_is_one(a, R);
     if (status == GR_SUCCESS && equal == T_FALSE)
         status = GR_TEST_FAIL;
 

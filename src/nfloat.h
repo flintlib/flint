@@ -128,6 +128,7 @@ nfloat_init(nfloat_ptr res, gr_ctx_t ctx)
 NFLOAT_INLINE void
 nfloat_clear(nfloat_ptr res, gr_ctx_t ctx)
 {
+    FLINT_ASSERT(NFLOAT_IS_SPECIAL(res) || LIMB_MSB_IS_SET(NFLOAT_D(res)[NFLOAT_CTX_NLIMBS(ctx)-1]));
 }
 
 void nfloat_swap(nfloat_ptr x, nfloat_ptr y, gr_ctx_t ctx);
@@ -484,6 +485,8 @@ nfloat_complex_init(nfloat_complex_ptr res, gr_ctx_t ctx)
 NFLOAT_INLINE void
 nfloat_complex_clear(nfloat_complex_ptr res, gr_ctx_t ctx)
 {
+    FLINT_ASSERT(NFLOAT_IS_SPECIAL(NFLOAT_COMPLEX_RE(res, ctx)) || LIMB_MSB_IS_SET(NFLOAT_D(NFLOAT_COMPLEX_RE(res, ctx))[NFLOAT_CTX_NLIMBS(ctx)-1]));
+    FLINT_ASSERT(NFLOAT_IS_SPECIAL(NFLOAT_COMPLEX_IM(res, ctx)) || LIMB_MSB_IS_SET(NFLOAT_D(NFLOAT_COMPLEX_IM(res, ctx))[NFLOAT_CTX_NLIMBS(ctx)-1]));
 }
 
 NFLOAT_INLINE int

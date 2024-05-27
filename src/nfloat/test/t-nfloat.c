@@ -534,6 +534,7 @@ TEST_FUNCTION_START(nfloat, state)
     gr_ctx_t ctx;
     gr_ctx_t ctx2;
     slong prec;
+    slong iter;
 
     for (prec = NFLOAT_MIN_LIMBS * FLINT_BITS; prec <= NFLOAT_MAX_LIMBS * FLINT_BITS; prec += FLINT_BITS)
     {
@@ -744,6 +745,71 @@ TEST_FUNCTION_START(nfloat, state)
 
         gr_ctx_clear(ctx);
     }
+
+    nfloat_ctx_init(ctx, FLINT_BITS, 0);
+
+    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
+    {
+        ulong x[3];
+        ulong r[NFLOAT_MAX_ALLOC];
+        ulong s[NFLOAT_MAX_ALLOC];
+        int s1, s2;
+        slong exp;
+        int sgn;
+
+        x[0] = n_randtest(state);
+        x[1] = n_randtest(state);
+        x[2] = n_randtest(state);
+        exp = (slong) n_randint(state, 100) - 100;
+        sgn = n_randint(state, 2);
+
+        s1 = nfloat_1_set_3_2exp(r, x[2], x[1], x[0], exp, sgn, ctx);
+        s2 = nfloat_set_mpn_2exp(s, x, 3, exp, sgn, ctx);
+
+        if (s1 != s2 || nfloat_equal(r, s, ctx) == T_FALSE)
+        {
+            flint_printf("FAIL: nfloat_1_set_3_2exp\n");
+            flint_mpn_debug(x, 3);
+            gr_println(r, ctx);
+            gr_println(s, ctx);
+            flint_abort();
+        }
+    }
+
+    gr_ctx_clear(ctx);
+
+    nfloat_ctx_init(ctx, 2 * FLINT_BITS, 0);
+
+    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
+    {
+        ulong x[4];
+        ulong r[NFLOAT_MAX_ALLOC];
+        ulong s[NFLOAT_MAX_ALLOC];
+        int s1, s2;
+        slong exp;
+        int sgn;
+
+        x[0] = n_randtest(state);
+        x[1] = n_randtest(state);
+        x[2] = n_randtest(state);
+        x[3] = n_randtest(state);
+        exp = (slong) n_randint(state, 100) - 100;
+        sgn = n_randint(state, 2);
+
+        s1 = nfloat_2_set_4_2exp(r, x[3], x[2], x[1], x[0], exp, sgn, ctx);
+        s2 = nfloat_set_mpn_2exp(s, x, 4, exp, sgn, ctx);
+
+        if (s1 != s2 || nfloat_equal(r, s, ctx) == T_FALSE)
+        {
+            flint_printf("FAIL: nfloat_2_set_4_2exp\n");
+            flint_mpn_debug(x, 4);
+            gr_println(r, ctx);
+            gr_println(s, ctx);
+            flint_abort();
+        }
+    }
+
+    gr_ctx_clear(ctx);
 
     TEST_FUNCTION_END(state);
 }
