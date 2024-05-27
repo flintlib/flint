@@ -12,6 +12,7 @@
 #include "test_helpers.h"
 #include "fmpq.h"
 #include "arf.h"
+#include "acf.h"
 #include "gr_vec.h"
 #include "gr_special.h"
 #include "nfloat.h"
@@ -94,7 +95,6 @@ gr_test_approx_unary_op(gr_ctx_t R, gr_method_unary_op op, gr_ctx_t R_ref, gr_sr
         if (status == GR_SUCCESS)
         {
             status |= gr_set_other(rel_err, b, R, R_ref);
-
             status |= gr_sub(rel_err, b_ref, rel_err, R_ref);
             status |= gr_div(rel_err, rel_err, b_ref, R_ref);
             status |= gr_abs(rel_err, rel_err, R_ref);
@@ -534,6 +534,45 @@ TEST_FUNCTION_START(nfloat, state)
     gr_ctx_t ctx;
     gr_ctx_t ctx2;
     slong prec;
+
+    for (prec = NFLOAT_MIN_LIMBS * FLINT_BITS; prec <= NFLOAT_MAX_LIMBS * FLINT_BITS; prec += FLINT_BITS)
+    {
+        nfloat_complex_ctx_init(ctx, prec, 0);
+
+        gr_test_floating_point(ctx, 100 * flint_test_multiplier(), 0);
+
+        {
+            gr_ptr tol1, tol;
+            slong i, reps;
+
+            gr_ctx_init_complex_acb(ctx2, prec + 32);
+
+            tol1 = gr_heap_init(ctx);
+            tol = gr_heap_init(ctx2);
+
+            GR_IGNORE(gr_one(tol, ctx2));
+            GR_IGNORE(gr_mul_2exp_si(tol, tol, -prec + 2, ctx2));
+
+            reps = (prec <= 256 ? 10000 : 1) * flint_test_multiplier();
+
+            for (i = 0; i < reps; i++)
+            {
+                gr_test_approx_binary_op(ctx, (gr_method_binary_op) gr_add, ctx2, tol, state, 0);
+                gr_test_approx_binary_op(ctx, (gr_method_binary_op) gr_sub, ctx2, tol, state, 0);
+                gr_test_approx_binary_op(ctx, (gr_method_binary_op) gr_mul, ctx2, tol, state, 0);
+                /* gr_test_approx_binary_op(ctx, (gr_method_binary_op) gr_div, ctx2, tol, state, 0); */
+                gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_neg, ctx2, tol, state, 0);
+                gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_sqr, ctx2, tol, state, 0);
+                /* gr_test_approx_unary_op(ctx, (gr_method_unary_op) gr_inv, ctx2, tol, state, 0); */
+            }
+
+            gr_heap_clear(tol1, ctx);
+            gr_heap_clear(tol, ctx2);
+            gr_ctx_clear(ctx2);
+        }
+
+        gr_ctx_clear(ctx);
+    }
 
     for (prec = NFLOAT_MIN_LIMBS * FLINT_BITS; prec <= NFLOAT_MAX_LIMBS * FLINT_BITS; prec += FLINT_BITS)
     {

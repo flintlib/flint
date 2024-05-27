@@ -27,6 +27,7 @@
 #include "gr_generic.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
+#include "nfloat.h"
 
 typedef struct
 {
@@ -279,6 +280,18 @@ _gr_acb_set_other(acb_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
             else
             {
                 return GR_DOMAIN;
+            }
+
+        case GR_CTX_NFLOAT_COMPLEX:
+            if (NFLOAT_CTX_HAS_INF_NAN(x_ctx)) /* todo */
+            {
+                return GR_UNABLE;
+            }
+            else
+            {
+                nfloat_complex_get_acb(res, x, x_ctx);
+                acb_set_round(res, res, ACB_CTX_PREC(ctx));
+                return GR_SUCCESS;
             }
 
         case GR_CTX_RR_ARB:
@@ -956,6 +969,39 @@ _gr_acb_arg(acb_t res, const acb_t x, const gr_ctx_t ctx)
     acb_arg(acb_realref(res), x, ACB_CTX_PREC(ctx));
     arb_zero(acb_imagref(res));
     return GR_SUCCESS;
+}
+
+int
+_gr_acb_cmp(int * res, const acb_t x, const acb_t y, const gr_ctx_t ctx)
+{
+    if (arb_is_zero(acb_imagref(x)) && arb_is_zero(acb_imagref(y)) &&
+        ((arb_is_exact(acb_realref(x)) && arb_is_exact(acb_realref(y))) || !arb_overlaps(acb_realref(x), acb_realref(y))))
+    {
+        *res = arf_cmp(arb_midref(acb_realref(x)), arb_midref(acb_realref(y)));
+        return GR_SUCCESS;
+    }
+    else
+    {
+        *res = 0;
+        return GR_UNABLE;
+    }
+}
+
+int
+_gr_acb_cmpabs(int * res, const acb_t x, const acb_t y, const gr_ctx_t ctx)
+{
+    acb_t t, u;
+
+    *t = *x;
+    *u = *y;
+
+    if (arf_sgn(arb_midref(acb_realref(t))) < 0)
+        ARF_NEG(arb_midref(acb_realref(t)));
+
+    if (arf_sgn(arb_midref(acb_realref(u))) < 0)
+        ARF_NEG(arb_midref(acb_realref(u)));
+
+    return _gr_acb_cmp(res, t, u, ctx);
 }
 
 int
@@ -2172,6 +2218,8 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_SGN,             (gr_funcptr) _gr_acb_sgn},
     {GR_METHOD_CSGN,            (gr_funcptr) _gr_acb_csgn},
     {GR_METHOD_ARG,             (gr_funcptr) _gr_acb_arg},
+    {GR_METHOD_CMP,             (gr_funcptr) _gr_acb_cmp},
+    {GR_METHOD_CMPABS,          (gr_funcptr) _gr_acb_cmpabs},
     {GR_METHOD_PI,              (gr_funcptr) _gr_acb_pi},
     {GR_METHOD_EXP,             (gr_funcptr) _gr_acb_exp},
     {GR_METHOD_EXPM1,           (gr_funcptr) _gr_acb_expm1},

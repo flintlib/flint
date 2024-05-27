@@ -513,6 +513,12 @@ nfloat_get_arf(arf_t res, nfloat_srcptr x, gr_ctx_t ctx)
     }
     else
     {
+        if (!LIMB_MSB_IS_SET(NFLOAT_D(x)[NFLOAT_CTX_NLIMBS(ctx) - 1]))
+        {
+            flint_printf("bad nfloat!\n");
+            flint_abort();
+        }
+
         arf_set_mpn(res, NFLOAT_D(x), NFLOAT_CTX_NLIMBS(ctx), NFLOAT_SGNBIT(x));
         arf_mul_2exp_si(res, res, NFLOAT_EXP(x) - FLINT_BITS * NFLOAT_CTX_NLIMBS(ctx));
     }

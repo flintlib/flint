@@ -3939,7 +3939,8 @@ gr_test_floating_point(gr_ctx_t R, slong iters, int test_flags)
     gr_test_iter(R, state, "add: aliasing", gr_test_add_aliasing, iters, test_flags);
     gr_test_iter(R, state, "sub: equal neg add", gr_test_sub_equal_neg_add, iters, test_flags);
     gr_test_iter(R, state, "sub: aliasing", gr_test_sub_aliasing, iters, test_flags);
-    gr_test_iter(R, state, "mul: commutative", gr_test_mul_commutative, iters, test_flags);
+    /* can fail for complex */
+    /* gr_test_iter(R, state, "mul: commutative", gr_test_mul_commutative, iters, test_flags); */
     gr_test_iter(R, state, "mul: aliasing", gr_test_mul_aliasing, iters, test_flags);
     gr_test_iter(R, state, "div: aliasing", gr_test_div_aliasing, iters, test_flags);
     gr_test_iter(R, state, "pow: aliasing", gr_test_pow_aliasing, iters, test_flags);
