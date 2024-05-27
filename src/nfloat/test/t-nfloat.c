@@ -748,7 +748,7 @@ TEST_FUNCTION_START(nfloat, state)
 
     nfloat_ctx_init(ctx, FLINT_BITS, 0);
 
-    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
     {
         ulong x[3];
         ulong r[NFLOAT_MAX_ALLOC];
@@ -757,9 +757,9 @@ TEST_FUNCTION_START(nfloat, state)
         slong exp;
         int sgn;
 
-        x[0] = n_randtest(state);
-        x[1] = n_randtest(state);
-        x[2] = n_randtest(state);
+        x[0] = n_randint(state, 2) ? 0 : n_randtest(state);
+        x[1] = n_randint(state, 2) ? 0 : n_randtest(state);
+        x[2] = n_randint(state, 2) ? 0 : n_randtest(state);
         exp = (slong) n_randint(state, 100) - 100;
         sgn = n_randint(state, 2);
 
@@ -780,7 +780,7 @@ TEST_FUNCTION_START(nfloat, state)
 
     nfloat_ctx_init(ctx, 2 * FLINT_BITS, 0);
 
-    for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
     {
         ulong x[4];
         ulong r[NFLOAT_MAX_ALLOC];
@@ -789,10 +789,10 @@ TEST_FUNCTION_START(nfloat, state)
         slong exp;
         int sgn;
 
-        x[0] = n_randtest(state);
-        x[1] = n_randtest(state);
-        x[2] = n_randtest(state);
-        x[3] = n_randtest(state);
+        x[0] = n_randint(state, 2) ? 0 : n_randtest(state);
+        x[1] = n_randint(state, 2) ? 0 : n_randtest(state);
+        x[2] = n_randint(state, 2) ? 0 : n_randtest(state);
+        x[3] = n_randint(state, 2) ? 0 : n_randtest(state);
         exp = (slong) n_randint(state, 100) - 100;
         sgn = n_randint(state, 2);
 
