@@ -329,7 +329,7 @@ nfloat_complex_add(nfloat_complex_ptr res, nfloat_complex_srcptr x, nfloat_compl
     int status = GR_SUCCESS;
     status |= nfloat_add(NFLOAT_COMPLEX_RE(res, ctx), NFLOAT_COMPLEX_RE(x, ctx), NFLOAT_COMPLEX_RE(y, ctx), ctx);
     status |= nfloat_add(NFLOAT_COMPLEX_IM(res, ctx), NFLOAT_COMPLEX_IM(x, ctx), NFLOAT_COMPLEX_IM(y, ctx), ctx);
-    return GR_SUCCESS;
+    return status;
 }
 
 int
@@ -338,7 +338,7 @@ nfloat_complex_sub(nfloat_complex_ptr res, nfloat_complex_srcptr x, nfloat_compl
     int status = GR_SUCCESS;
     status |= nfloat_sub(NFLOAT_COMPLEX_RE(res, ctx), NFLOAT_COMPLEX_RE(x, ctx), NFLOAT_COMPLEX_RE(y, ctx), ctx);
     status |= nfloat_sub(NFLOAT_COMPLEX_IM(res, ctx), NFLOAT_COMPLEX_IM(x, ctx), NFLOAT_COMPLEX_IM(y, ctx), ctx);
-    return GR_SUCCESS;
+    return status;
 }
 
 static inline int
@@ -801,7 +801,10 @@ _nfloat_complex_mul_standard(nfloat_ptr res1, nfloat_ptr res2, nfloat_srcptr a, 
         else
         {
             if (_flint_mpn_cmp_2(u[1], u[0], v[1], v[0]) >= 0)
+            {
                 sub_ddmmss(s[1], s[0], u[1], u[0], v[1], v[0]);
+                ssgnbit = usgnbit;
+            }
             else
             {
                 sub_ddmmss(s[1], s[0], v[1], v[0], u[1], u[0]);
@@ -838,7 +841,10 @@ _nfloat_complex_mul_standard(nfloat_ptr res1, nfloat_ptr res2, nfloat_srcptr a, 
         else
         {
             if (_flint_mpn_cmp_2(u[1], u[0], v[1], v[0]) >= 0)
+            {
                 sub_ddmmss(t[1], t[0], u[1], u[0], v[1], v[0]);
+                tsgnbit = usgnbit;
+            }
             else
             {
                 sub_ddmmss(t[1], t[0], v[1], v[0], u[1], u[0]);
@@ -886,7 +892,10 @@ _nfloat_complex_mul_standard(nfloat_ptr res1, nfloat_ptr res2, nfloat_srcptr a, 
         else
         {
             if (_flint_mpn_cmp_3(u[2], u[1], u[0], v[2], v[1], v[0]) >= 0)
+            {
                 sub_dddmmmsss(s[2], s[1], s[0], u[2], u[1], u[0], v[2], v[1], v[0]);
+                ssgnbit = usgnbit;
+            }
             else
             {
                 sub_dddmmmsss(s[2], s[1], s[0], v[2], v[1], v[0], u[2], u[1], u[0]);
@@ -925,7 +934,10 @@ _nfloat_complex_mul_standard(nfloat_ptr res1, nfloat_ptr res2, nfloat_srcptr a, 
         else
         {
             if (_flint_mpn_cmp_3(u[2], u[1], u[0], v[2], v[1], v[0]) >= 0)
+            {
                 sub_dddmmmsss(t[2], t[1], t[0], u[2], u[1], u[0], v[2], v[1], v[0]);
+                tsgnbit = usgnbit;
+            }
             else
             {
                 sub_dddmmmsss(t[2], t[1], t[0], v[2], v[1], v[0], u[2], u[1], u[0]);
@@ -973,7 +985,10 @@ _nfloat_complex_mul_standard(nfloat_ptr res1, nfloat_ptr res2, nfloat_srcptr a, 
         else
         {
             if (mpn_cmp(u, v, 4) >= 0)
+            {
                 sub_ddddmmmmssss(s[3], s[2], s[1], s[0], u[3], u[2], u[1], u[0], v[3], v[2], v[1], v[0]);
+                ssgnbit = usgnbit;
+            }
             else
             {
                 sub_ddddmmmmssss(s[3], s[2], s[1], s[0], v[3], v[2], v[1], v[0], u[3], u[2], u[1], u[0]);
@@ -1014,7 +1029,10 @@ _nfloat_complex_mul_standard(nfloat_ptr res1, nfloat_ptr res2, nfloat_srcptr a, 
         else
         {
             if (mpn_cmp(u, v, 4) >= 0)
+            {
                 sub_ddddmmmmssss(t[3], t[2], t[1], t[0], u[3], u[2], u[1], u[0], v[3], v[2], v[1], v[0]);
+                tsgnbit = usgnbit;
+            }
             else
             {
                 sub_ddddmmmmssss(t[3], t[2], t[1], t[0], v[3], v[2], v[1], v[0], u[3], u[2], u[1], u[0]);
@@ -1059,7 +1077,10 @@ _nfloat_complex_mul_standard(nfloat_ptr res1, nfloat_ptr res2, nfloat_srcptr a, 
         else
         {
             if (mpn_cmp(u, v, 5) >= 0)
+            {
                 sub_dddddmmmmmsssss(s[4], s[3], s[2], s[1], s[0], u[4], u[3], u[2], u[1], u[0], v[4], v[3], v[2], v[1], v[0]);
+                ssgnbit = usgnbit;
+            }
             else
             {
                 sub_dddddmmmmmsssss(s[4], s[3], s[2], s[1], s[0], v[4], v[3], v[2], v[1], v[0], u[4], u[3], u[2], u[1], u[0]);
@@ -1102,7 +1123,10 @@ _nfloat_complex_mul_standard(nfloat_ptr res1, nfloat_ptr res2, nfloat_srcptr a, 
         else
         {
             if (mpn_cmp(u, v, 5) >= 0)
+            {
                 sub_dddddmmmmmsssss(t[4], t[3], t[2], t[1], t[0], u[4], u[3], u[2], u[1], u[0], v[4], v[3], v[2], v[1], v[0]);
+                tsgnbit = usgnbit;
+            }
             else
             {
                 sub_dddddmmmmmsssss(t[4], t[3], t[2], t[1], t[0], v[4], v[3], v[2], v[1], v[0], u[4], u[3], u[2], u[1], u[0]);
