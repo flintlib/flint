@@ -1475,6 +1475,21 @@ void gr_test_ring(gr_ctx_t R, slong iters, int test_flags);
 void gr_test_multiplicative_group(gr_ctx_t R, slong iters, int test_flags);
 void gr_test_floating_point(gr_ctx_t R, slong iters, int test_flags);
 
+int gr_test_cmp_fun(gr_ctx_t R, gr_method_binary_op_get_int op, gr_ctx_t R_ref, flint_rand_t state, int test_flags);
+int gr_test_approx_unary_op(gr_ctx_t R, gr_method_unary_op op, gr_ctx_t R_ref, gr_srcptr rel_tol, flint_rand_t state, int test_flags);
+int gr_test_approx_binary_op(gr_ctx_t R, gr_method_binary_op op, gr_ctx_t R_ref, gr_srcptr rel_tol, flint_rand_t state, int test_flags);
+int gr_test_approx_binary_op_type_variants(gr_ctx_t R, const char * opname,
+    gr_method_binary_op gr_op,
+    gr_method_binary_op_ui gr_op_ui,
+    gr_method_binary_op_si gr_op_si,
+    gr_method_binary_op_fmpz gr_op_fmpz,
+    gr_method_binary_op_fmpq gr_op_fmpq,
+    int fused,
+    int small_test_values,
+    gr_srcptr rel_tol, flint_rand_t state, int test_flags);
+int gr_test_approx_dot(gr_ctx_t R, gr_ctx_t R_ref, slong maxlen, gr_srcptr rel_tol, flint_rand_t state, int test_flags);
+
+
 #ifdef __cplusplus
 }
 #endif

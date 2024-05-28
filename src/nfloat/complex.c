@@ -1664,9 +1664,9 @@ gr_method_tab_input _nfloat_complex_methods_input[] =
     {GR_METHOD_VEC_MUL_SCALAR,          (gr_funcptr) _nfloat_complex_vec_mul_scalar},
     {GR_METHOD_VEC_ADDMUL_SCALAR,          (gr_funcptr) _nfloat_complex_vec_addmul_scalar},
     {GR_METHOD_VEC_SUBMUL_SCALAR,          (gr_funcptr) _nfloat_complex_vec_submul_scalar},
+*/
     {GR_METHOD_VEC_DOT,         (gr_funcptr) _nfloat_complex_vec_dot},
     {GR_METHOD_VEC_DOT_REV,     (gr_funcptr) _nfloat_complex_vec_dot_rev},
-*/
 /*
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) nfloat_complex_poly_mullow},
     {GR_METHOD_POLY_ROOTS_OTHER,(gr_funcptr) nfloat_complex_poly_roots_other},
