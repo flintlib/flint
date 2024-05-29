@@ -1431,6 +1431,12 @@ static void sd_ifft_trunc_internal(
     FLINT_ASSERT(1 <= BLK_SZ*z && BLK_SZ*z <= n_pow2(k+LG_BLK_SZ));
     FLINT_ASSERT(1 <= BLK_SZ*n+f && BLK_SZ*n+f <= n_pow2(k+LG_BLK_SZ));
 
+    if (!f && z == n && n == n_pow2(k))
+    {
+        sd_ifft_no_trunc_internal(Q, x, S, k, j);
+        return;
+    }
+
     if (k > 2)
     {
         ulong k1 = k/2;

@@ -43,8 +43,8 @@ void test_sd_fft_trunc(sd_fft_ctx_t Q, ulong minL, ulong maxL, ulong ireps, flin
                 X[i] = n_randint(state, Q->mod.n);
 
             /* output of fft_trunc is supposed to be eval_poly */
-            ulong itrunc = 1 + n_randint(state, Xn);
-            ulong otrunc = 1 + n_randint(state, Xn);
+            ulong itrunc = rep == 0 ? Xn : 1 + n_randint(state, Xn);
+            ulong otrunc = rep == 0 ? Xn : 1 + n_randint(state, Xn);
 
             for (i = 0; i < itrunc; i++)
                 data[i] = X[i];
@@ -66,7 +66,7 @@ void test_sd_fft_trunc(sd_fft_ctx_t Q, ulong minL, ulong maxL, ulong ireps, flin
             }
 
             /* output of ifft_trunc is supposed to be 2^L*input */
-            ulong trunc = 1 + n_randint(state, Xn);
+            ulong trunc = rep == 0 ? Xn : 1 + n_randint(state, Xn);
             for (i = 0; i < trunc; i++)
                 data[i] = X[i];
 

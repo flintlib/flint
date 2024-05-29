@@ -797,6 +797,7 @@ void sd_fft_no_trunc_internal(
     }
     else
     {
+        /* currently unreachable because all ffts are called with k > 0 */
         sd_fft_base_8_1(Q, x, j);
     }
 }
@@ -952,6 +953,12 @@ static void sd_fft_trunc_internal(
         return;
     }
 
+    if (itrunc == otrunc && otrunc == n_pow2(k))
+    {
+        sd_fft_no_trunc_internal(Q, x, S, k, j);
+        return;
+    }
+
     if (k > 2)
     {
         ulong k1 = k/2;
@@ -996,6 +1003,7 @@ static void sd_fft_trunc_internal(
     }
     else
     {
+        /* currently unreachable for the same reason */
         sd_fft_base_8_1(Q, x, j);
     }
 }
