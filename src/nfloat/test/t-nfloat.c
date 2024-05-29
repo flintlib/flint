@@ -106,10 +106,8 @@ TEST_FUNCTION_START(nfloat, state)
             }
 
             reps = (prec <= 256 ? 10000 : 100) * flint_test_multiplier();
-
             for (i = 0; i < reps; i++)
                 gr_test_approx_dot(ctx, ctx2, 30, tol, state, 0);
-
 
             reps = (prec <= 256 ? 1000 : 1) * flint_test_multiplier();
 

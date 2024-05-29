@@ -17,7 +17,7 @@
 #include "acb.h"
 #include "nfloat.h"
 
-int
+static int
 _flint_mpn_signed_add_n(nn_ptr res, nn_srcptr x, int xsgnbit, nn_srcptr y, int ysgnbit, mp_size_t n)
 {
     if (xsgnbit == ysgnbit)

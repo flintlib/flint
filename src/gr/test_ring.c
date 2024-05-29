@@ -4025,7 +4025,7 @@ gr_test_approx_dot(gr_ctx_t R, gr_ctx_t R_ref, slong maxlen, gr_srcptr rel_tol, 
     int status = GR_SUCCESS;
     int cmp;
 
-    len = n_randint(state, maxlen);
+    len = n_randint(state, maxlen + 1);
     initial = n_randint(state, 2);
     subtract = n_randint(state, 2);
     reverse = n_randint(state, 2);
