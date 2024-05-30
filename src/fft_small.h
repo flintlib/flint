@@ -240,7 +240,7 @@ FLINT_FORCE_INLINE void sd_fft_ctx_fit_depth(sd_fft_ctx_t Q, ulong depth)
 #if FLINT_USES_PTHREAD
     ulong tdepth = (ulong)atomic_load_explicit(&Q->w2tab_depth, memory_order_relaxed);
 #else
-    ulong tdepth = (ulong)Q->w2tab_depth);
+    ulong tdepth = (ulong)Q->w2tab_depth;
 #endif
     if (FLINT_UNLIKELY(tdepth < depth))
         sd_fft_ctx_fit_depth_with_lock(Q, depth);
