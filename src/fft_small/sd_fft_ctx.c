@@ -19,6 +19,10 @@ void sd_fft_ctx_clear(sd_fft_ctx_t Q)
     flint_aligned_free(Q->w2tab[0]);
     for (k = SD_FFT_CTX_W2TAB_INIT; k < SD_FFT_CTX_W2TAB_SIZE; k++)
         flint_aligned_free(Q->w2tab[k]);
+
+#if FLINT_USES_PTHREAD
+    pthread_mutex_destroy(&Q->mutex);
+#endif
 }
 
 void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp)
@@ -64,7 +68,7 @@ void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp)
         } while (i += 1, i < l);
     }
 
-    Q->w2tab_depth = k;
+    atomic_init(&Q->w2tab_depth, (unsigned int)k);
 
     /* the rest of the tables are uninitialized */
     for ( ; k < SD_FFT_CTX_W2TAB_SIZE; k++)
@@ -93,7 +97,12 @@ void sd_fft_ctx_fit_depth_with_lock(sd_fft_ctx_t Q, ulong depth)
     pthread_mutex_lock(&Q->mutex);
 #endif
 
-    ulong k = Q->w2tab_depth;
+#if FLINT_USES_PTHREAD
+    ulong k = (ulong)atomic_load(&Q->w2tab_depth);
+#else
+    ulong k = (ulong)Q->w2tab_depth;
+#endif
+
     while (k < depth)
     {
         ulong i, j, l, off;
@@ -139,7 +148,11 @@ void sd_fft_ctx_fit_depth_with_lock(sd_fft_ctx_t Q, ulong depth)
 #endif
 
         k++;
-        Q->w2tab_depth = k;
+#if FLINT_USES_PTHREAD
+        atomic_store(&Q->w2tab_depth, (unsigned int)k);
+#else
+        Q->w2tab_depth = (unsigned int)k;
+#endif
     }
 
 
