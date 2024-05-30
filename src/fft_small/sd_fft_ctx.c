@@ -68,7 +68,11 @@ void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp)
         } while (i += 1, i < l);
     }
 
+#if FLINT_USES_PTHREAD
     atomic_init(&Q->w2tab_depth, (unsigned int)k);
+#else
+    Q->w2tab_depth = (unsigned int)k;
+#endif
 
     /* the rest of the tables are uninitialized */
     for ( ; k < SD_FFT_CTX_W2TAB_SIZE; k++)
