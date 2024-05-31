@@ -41,11 +41,10 @@ mp_limb_t flint_mpn_sqrhigh_1(mp_ptr res, mp_srcptr u)
     return low;
 }
 
-/* todo */
 mp_limb_t flint_mpn_sqrhigh_2(mp_ptr res, mp_srcptr u)
 {
     mp_limb_t b, low;
-    FLINT_MPN_MUL_2X2(res[1], res[0], low, b, u[1], u[0], u[1], u[0]);
+    FLINT_MPN_SQR_2X2(res[1], res[0], low, b, u[1], u[0]);
     return low;
 }
 

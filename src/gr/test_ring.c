@@ -3230,7 +3230,7 @@ int
 gr_test_vec_binary_op(gr_ctx_t R, const char * opname, int (*gr_op)(gr_ptr, gr_srcptr, gr_srcptr, gr_ctx_t),
     int (*_gr_vec_op)(gr_ptr, gr_srcptr, gr_srcptr, slong, gr_ctx_t), flint_rand_t state, int test_flags)
 {
-    int status, aliasing;
+    int status, aliasing, ref_aliasing;
     slong i, len;
     gr_ptr x, y, xy1, xy2;
 
@@ -3250,12 +3250,13 @@ gr_test_vec_binary_op(gr_ctx_t R, const char * opname, int (*gr_op)(gr_ptr, gr_s
     status = GR_SUCCESS;
 
     aliasing = n_randint(state, 4);
+    ref_aliasing = 0;
 
     /* Don't test x * x == x^2 for inexact "rings" (e.g. floats) where
        the squaring algorithm might not produce exactly the same result. */
     if ((aliasing == 2 || aliasing == 3) && gr_ctx_is_ring(R) == T_FALSE && gr_ctx_is_exact(R) == T_FALSE)
     {
-        aliasing = 4;
+        ref_aliasing = 1;
     }
 
     switch (aliasing)
@@ -3282,9 +3283,14 @@ gr_test_vec_binary_op(gr_ctx_t R, const char * opname, int (*gr_op)(gr_ptr, gr_s
     }
 
     for (i = 0; i < len; i++)
-        status |= gr_op(GR_ENTRY(xy2, i, R->sizeof_elem),
-                         GR_ENTRY(x, i, R->sizeof_elem),
-                         GR_ENTRY(y, i, R->sizeof_elem), R);
+        if (ref_aliasing)
+            status |= gr_op(GR_ENTRY(xy2, i, R->sizeof_elem),
+                             GR_ENTRY(x, i, R->sizeof_elem),
+                             GR_ENTRY(x, i, R->sizeof_elem), R);
+        else
+            status |= gr_op(GR_ENTRY(xy2, i, R->sizeof_elem),
+                             GR_ENTRY(x, i, R->sizeof_elem),
+                             GR_ENTRY(y, i, R->sizeof_elem), R);
 
     if (status == GR_SUCCESS && _gr_vec_equal(xy1, xy2, len, R) == T_FALSE)
     {
