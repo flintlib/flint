@@ -40,10 +40,10 @@ int main()
     int which;
     slong i, n;
     slong prec;
-    double __, t, arf_tadd = 0.0, arf_tmul = 0.0, arf_tmul_scalar = 0.0, arf_taddmul_scalar = 0.0, arf_tsum = 0.0, arf_tprod = 0.0, arf_tdot = 0.0;
-    double nfloat_tadd = 0.0, nfloat_tmul = 0.0, nfloat_tmul_scalar = 0.0, nfloat_taddmul_scalar = 0.0, nfloat_tsum = 0.0, nfloat_tprod = 0.0, nfloat_tdot = 0.0;
+    double __, t, arf_tadd = 0.0, arf_tmul = 0.0, arf_tsqr = 0.0, arf_tmul_scalar = 0.0, arf_taddmul_scalar = 0.0, arf_tsum = 0.0, arf_tprod = 0.0, arf_tdot = 0.0;
+    double nfloat_tadd = 0.0, nfloat_tmul = 0.0, nfloat_tsqr = 0.0, nfloat_tmul_scalar = 0.0, nfloat_taddmul_scalar = 0.0, nfloat_tsum = 0.0, nfloat_tprod = 0.0, nfloat_tdot = 0.0;
 
-    flint_printf("                   _gr_vec_add          _gr_vec_mul       _gr_vec_mul_scalar  _gr_vec_addmul_scalar  _gr_vec_sum          _gr_vec_product      _gr_vec_dot\n");
+    flint_printf("                   _gr_vec_add          _gr_vec_mul       _gr_vec_sqr       _gr_vec_mul_scalar  _gr_vec_addmul_scalar  _gr_vec_sum          _gr_vec_product      _gr_vec_dot\n");
 
     for (prec = 64; prec <= 4096; prec = prec < 256 ? prec + 64 : prec * 2)
     {
@@ -98,6 +98,13 @@ int main()
                 if (which == 0) arf_tmul = t; else nfloat_tmul = t;
                 (void) __;
 
+                TIMEIT_START
+                GR_MUST_SUCCEED(_gr_vec_mul(vec3, vec1, vec1, n, ctx));
+                TIMEIT_STOP_VALUES(__, t)
+                if (which == 0) arf_tsqr = t; else nfloat_tsqr = t;
+                (void) __;
+
+
                 GR_MUST_SUCCEED(gr_pi(x, ctx));
 
                 TIMEIT_START
@@ -137,9 +144,10 @@ int main()
             }
 
             flint_printf("n = %4wd   ", n);
-            flint_printf("     %.3e (%.3fx)   %.3e (%.3fx)   %.3e (%.3fx)   %.3e (%.3fx)   %.3e (%.3fx)   %.3e (%.3fx)   %.3e (%.3fx)\n",
+            flint_printf("     %.3e (%.3fx)   %.3e (%.3fx)   %.3e (%.3fx)   %.3e (%.3fx)   %.3e (%.3fx)   %.3e (%.3fx)   %.3e (%.3fx)   %.3e (%.3fx)\n",
                 nfloat_tadd, arf_tadd / nfloat_tadd,
                 nfloat_tmul, arf_tmul / nfloat_tmul,
+                nfloat_tsqr, arf_tsqr / nfloat_tsqr,
                 nfloat_tmul_scalar, arf_tmul_scalar / nfloat_tmul_scalar,
                 nfloat_taddmul_scalar, arf_taddmul_scalar / nfloat_taddmul_scalar,
                 nfloat_tsum, arf_tsum / nfloat_tsum,
