@@ -94,7 +94,7 @@ void profile_v2_fft(sd_fft_ctx_t Q, ulong minL, ulong maxL)
     timeit_stop(timer);
     flint_printf("depth %wu setup: %wd ms\n", maxL, timer->wall);
 
-    minL = n_max(minL, n_clog2(Q->blk_sz) + 1);
+    minL = n_max(minL, LG_BLK_SZ + 1);
     for (ulong L = minL+1; L <= maxL; L++)
     {
         double fft_time, ifft_time;
@@ -105,22 +105,22 @@ void profile_v2_fft(sd_fft_ctx_t Q, ulong minL, ulong maxL)
         ulong otrunc = n_pow2(L-1);
         while (otrunc < n_pow2(L))
         {
-            otrunc = n_round_up(1+1+(EXP_FAC+1)*otrunc/EXP_FAC, Q->blk_sz);
+            otrunc = n_round_up(1+1+(EXP_FAC+1)*otrunc/EXP_FAC, BLK_SZ);
             otrunc = n_min(otrunc, n_pow2(L));
-            ulong itrunc = n_round_up(otrunc/2, Q->blk_sz);
+            ulong itrunc = n_round_up(otrunc/2, BLK_SZ);
             for (ulong i = 0; i < n_pow2(L); i++)
-                sd_fft_ctx_set_index(data, i, 0);
+                data[i] = 0;
             ulong nreps = 1 + 300000000/(otrunc*n_clog2(otrunc));
 
             timeit_start(timer);
             for (ulong i = 0; i < nreps; i++)
-                sd_fft_ctx_fft_trunc(Q, data, L, itrunc, otrunc);
+                sd_fft_trunc(Q, data, L, itrunc, otrunc);
             timeit_stop(timer);
             fft_time = timer->wall;
 
             timeit_start(timer);
             for (ulong i = 0; i < nreps; i++)
-                sd_fft_ctx_ifft_trunc(Q, data, L, otrunc);
+                sd_ifft_trunc(Q, data, L, otrunc);
             timeit_stop(timer);
             ifft_time = timer->wall;
 
@@ -138,7 +138,7 @@ int main(void)
     sd_fft_ctx_t Q;
     sd_fft_ctx_init_prime(Q, UWORD(0x0003f00000000001));
     flint_printf("--- v2 fft/ifft gflops ---\n");
-    profile_v2_fft(Q, 10, 20);
+    profile_v2_fft(Q, 9, 20);
     sd_fft_ctx_clear(Q);
 
     return 0;
