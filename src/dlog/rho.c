@@ -76,6 +76,10 @@ dlog_rho(const dlog_rho_t t, ulong b)
 
     flint_rand_init(state);
 
+    /* Fixme: the general algorithm hangs */
+    if (t->mod.n <= 3)
+        return dlog_single(b, t->a, t->mod, t->n.n);
+
     do {
 
         for (k = 0; k < RWALK; k++)
@@ -116,3 +120,4 @@ dlog_rho(const dlog_rho_t t, ulong b)
     else
         return nmod_div(e[0], f[0], t->n);
 }
+

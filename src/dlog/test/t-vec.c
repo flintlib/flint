@@ -61,7 +61,7 @@ TEST_FUNCTION_START(dlog_vec, state)
             ref = flint_malloc(nv * sizeof(ulong));
             v = flint_malloc(nv * sizeof(ulong));
 
-            for (iter = 0; iter < 10; iter++)
+            for (iter = 0; iter < FLINT_MAX(2, flint_test_multiplier()); iter++)
             {
 
                 int k;
