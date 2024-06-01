@@ -23,7 +23,7 @@ TEST_FUNCTION_START(dlog_modpe, state)
 {
     slong iter;
 
-    for (iter = 0; iter < 1000; iter++)
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         ulong p, e, pe, a;
 
