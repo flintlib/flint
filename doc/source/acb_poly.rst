@@ -1132,7 +1132,13 @@ Root-finding
     a default value. Finally, the approximate roots are validated rigorously.
 
     Initial values for the iteration can be provided as the array *initial*.
-    If *initial* is set to *NULL*, default values `(0.4+0.9i)^k` are used.
+    If *initial* is set to *NULL*, default values are chosen using the
+    Newton polygon technique of [Bin1996]_.
+    Suppose that the polynomial is `\sum_k a_k x^k` and
+    let `k_1, \ldots, k_q` denote the index coordinates of the
+    vertices in the convex hull of `(k, \log |a_k|)`.
+    For each `2 \le i \le q`, we pick `m_i = k_i - k_{i-1}` points
+    on the circle with radius `r_i = (|a_{k_{i-1}} / a_{k_i} |)^{1/m_i}`.
 
     The polynomial is assumed to be squarefree. If there are repeated
     roots, the iteration is likely to find them (with low numerical accuracy),
