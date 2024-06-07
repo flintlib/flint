@@ -465,9 +465,6 @@ void _acb_poly_root_inclusion(acb_t r, const acb_t m,
 slong _acb_poly_validate_roots(acb_ptr roots,
         acb_srcptr poly, slong len, slong prec);
 
-void _acb_poly_refine_roots_durand_kerner(acb_ptr roots,
-        acb_srcptr poly, slong len, slong prec);
-
 slong _acb_poly_find_roots(acb_ptr roots,
     acb_srcptr poly,
     acb_srcptr initial, slong len, slong maxiter, slong prec);

@@ -1103,13 +1103,6 @@ Root-finding
     it is possible that not all of the polynomial's roots are contained
     among them.
 
-.. function:: void _acb_poly_refine_roots_durand_kerner(acb_ptr roots, acb_srcptr poly, slong len, slong prec)
-
-    Refines the given roots simultaneously using a single iteration
-    of the Durand-Kerner method. The radius of each root is set to an
-    approximation of the correction, giving a rough estimate of its error (not
-    a rigorous bound).
-
 .. function:: slong _acb_poly_find_roots(acb_ptr roots, acb_srcptr poly, acb_srcptr initial, slong len, slong maxiter, slong prec)
 
 .. function:: slong acb_poly_find_roots(acb_ptr roots, const acb_poly_t poly, acb_srcptr initial, slong maxiter, slong prec)

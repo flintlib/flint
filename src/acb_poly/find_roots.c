@@ -14,6 +14,10 @@
 #include "arf.h"
 #include "fmpq.h"
 #include "acb_poly.h"
+#include "gr.h"
+#include "gr_vec.h"
+#include "gr_poly.h"
+#include "nfloat.h"
 
 slong
 _acb_get_mid_mag(const acb_t z)
@@ -144,13 +148,81 @@ _acb_poly_roots_initial_values(acb_ptr roots, acb_srcptr poly, slong deg, slong 
     arf_clear(ar);
 }
 
+#define USE_ABERTH 0
+
+/* todo: this method often gets called with degree 2 or 3 polynomials;
+   consider doing something direct there */
+int
+_acb_poly_find_roots_iter(gr_ptr w, gr_ptr z, gr_srcptr f, gr_srcptr f_prime, slong deg, slong maxiter, gr_ctx_t fp_ctx, gr_ctx_t acb_ctx, slong prec)
+{
+    slong iter, i;
+    slong rootmag, max_rootmag, correction, max_correction;
+    slong sz = fp_ctx->sizeof_elem;
+    int status = GR_SUCCESS;
+
+    acb_t t;
+    acb_init(t);
+
+    for (iter = 0; iter < maxiter; iter++)
+    {
+        /* todo: support magnitude extraction in the fp_ctx */
+        {
+            max_rootmag = -WORD_MAX;
+            for (i = 0; i < deg; i++)
+            {
+                GR_MUST_SUCCEED(gr_set_other(t, GR_ENTRY(z, i, sz), fp_ctx, acb_ctx));
+                rootmag = _acb_get_mid_mag(t);
+                max_rootmag = FLINT_MAX(rootmag, max_rootmag);
+            }
+        }
+
+#if USE_ABERTH
+            status |= _gr_poly_refine_roots_aberth(w, f, fprime, deg, z, 1, fp_ctx);
+#else
+            status |= _gr_poly_refine_roots_wdk(w, f, deg, z, 1, fp_ctx);
+#endif
+
+        /* read error estimates */
+        max_correction = -ARF_PREC_EXACT;
+        for (i = 0; i < deg; i++)
+        {
+            GR_MUST_SUCCEED(gr_set_other(t, GR_ENTRY(w, i, sz), fp_ctx, acb_ctx));
+            correction = _acb_get_mid_mag(t);
+            max_correction = FLINT_MAX(correction, max_correction);
+        }
+
+        status |= _gr_vec_sub(z, z, w, deg, fp_ctx);
+
+        /* estimate the correction relative to the whole set of roots */
+        max_correction -= max_rootmag;
+        /* flint_printf("ITER %wd MAX CORRECTION: %wd\n", iter, max_correction); */
+
+        if (max_correction < -prec / 2)
+            maxiter = FLINT_MIN(maxiter, iter + 2);
+        else if (max_correction < -prec / 3)
+            maxiter = FLINT_MIN(maxiter, iter + 3);
+        else if (max_correction < -prec / 4)
+            maxiter = FLINT_MIN(maxiter, iter + 4);
+    }
+
+    acb_clear(t);
+
+    return status;
+}
+
+
 slong
 _acb_poly_find_roots(acb_ptr roots,
     acb_srcptr poly,
     acb_srcptr initial, slong len, slong maxiter, slong prec)
 {
-    slong iter, i, deg;
-    slong rootmag, max_rootmag, correction, max_correction;
+    slong i, deg;
+    gr_ptr w, z, f, fprime;
+    gr_ctx_t acb_ctx, fp_ctx;
+    slong sz;
+    acb_t t;
+    int status = GR_SUCCESS;
+    int attempt;
 
     deg = len - 1;
 
@@ -184,40 +256,68 @@ _acb_poly_find_roots(acb_ptr roots,
     if (maxiter == 0)
         maxiter = 2 * deg + n_sqrt(prec);
 
-    for (iter = 0; iter < maxiter; iter++)
+    gr_ctx_init_complex_acb(acb_ctx, prec + 64);
+    acb_init(t);
+
+    for (attempt = 0; attempt <= 1; attempt++)
     {
-        max_rootmag = -ARF_PREC_EXACT;
-        for (i = 0; i < deg; i++)
+        /* First try with nfloat if possible, otherwise fall back to acf */
+        if (attempt == 0)
         {
-            rootmag = _acb_get_mid_mag(roots + i);
-            max_rootmag = FLINT_MAX(rootmag, max_rootmag);
+            if (nfloat_complex_ctx_init(fp_ctx, prec, 0) != GR_SUCCESS)
+                continue;
+        }
+        else
+        {
+#if 0
+            flint_printf("second try: %wd\n", prec);
+#endif
+            gr_ctx_init_complex_float_acf(fp_ctx, prec);
         }
 
-        _acb_poly_refine_roots_durand_kerner(roots, poly, len, prec);
+        status = GR_SUCCESS;
 
-        max_correction = -ARF_PREC_EXACT;
+        sz = fp_ctx->sizeof_elem;
+        z = gr_heap_init_vec(4 * deg + 1, fp_ctx);
+        w = GR_ENTRY(z, deg, sz);
+        fprime = GR_ENTRY(z, 2 * deg, sz);
+        f = GR_ENTRY(z, 3 * deg, sz);
+
+        for (i = 0; i <= deg; i++)
+            status |= gr_set_other(GR_ENTRY(f, i, sz), poly + i, acb_ctx, fp_ctx);
         for (i = 0; i < deg; i++)
+            status |= gr_set_other(GR_ENTRY(z, i, sz), roots + i, acb_ctx, fp_ctx);
+
+#if USE_ABERTH
+        status |= _gr_poly_derivative(fprime, f, deg + 1, fp_ctx);
+#endif
+
+        if (status == GR_SUCCESS)
+            status = _acb_poly_find_roots_iter(w, z, f, fprime, deg, maxiter, fp_ctx, acb_ctx, prec);
+
+        if (status == GR_SUCCESS)
         {
-            correction = _acb_get_rad_mag(roots + i);
-            max_correction = FLINT_MAX(correction, max_correction);
+            /* convert back to acb */
+            for (i = 0; i < deg; i++)
+            {
+                GR_MUST_SUCCEED(gr_set_other(roots + i, GR_ENTRY(z, i, sz), fp_ctx, acb_ctx));
+                mag_zero(arb_radref(acb_realref(roots + i)));
+                mag_zero(arb_radref(acb_imagref(roots + i)));
+            }
         }
 
-        /* estimate the correction relative to the whole set of roots */
-        max_correction -= max_rootmag;
+        gr_heap_clear_vec(z, 4 * deg + 1, fp_ctx);
+        gr_ctx_clear(fp_ctx);
 
-        /* flint_printf("ITER %wd MAX CORRECTION: %wd\n", iter, max_correction); */
-
-        if (max_correction < -prec / 2)
-            maxiter = FLINT_MIN(maxiter, iter + 2);
-        else if (max_correction < -prec / 3)
-            maxiter = FLINT_MIN(maxiter, iter + 3);
-        else if (max_correction < -prec / 4)
-            maxiter = FLINT_MIN(maxiter, iter + 4);
+        if (status == GR_SUCCESS)
+            break;
     }
+
+    acb_clear(t);
+    gr_ctx_clear(acb_ctx);
 
     return _acb_poly_validate_roots(roots, poly, len, prec);
 }
-
 
 slong
 acb_poly_find_roots(acb_ptr roots,
@@ -231,6 +331,5 @@ acb_poly_find_roots(acb_ptr roots,
         flint_throw(FLINT_ERROR, "find_roots: expected a nonzero polynomial");
     }
 
-    return _acb_poly_find_roots(roots, poly->coeffs, initial,
-                len, maxiter, prec);
+    return _acb_poly_find_roots(roots, poly->coeffs, initial, len, maxiter, prec);
 }
