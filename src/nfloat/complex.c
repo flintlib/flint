@@ -196,6 +196,66 @@ nfloat_complex_set(nfloat_complex_ptr res, nfloat_complex_ptr x, gr_ctx_t ctx)
 }
 
 int
+nfloat_complex_set_other(nfloat_complex_ptr res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
+{
+    int status = GR_SUCCESS;
+
+    switch (x_ctx->which_ring)
+    {
+        case GR_CTX_NFLOAT:
+            status = nfloat_set_other(res, x, x_ctx, ctx);
+            nfloat_zero(NFLOAT_COMPLEX_IM(res, ctx), ctx);
+            return status;
+
+        case GR_CTX_FMPZ:
+            status = nfloat_set_fmpz(res, x, ctx);
+            nfloat_zero(NFLOAT_COMPLEX_IM(res, ctx), ctx);
+            return status;
+
+        case GR_CTX_FMPQ:
+            status = nfloat_set_fmpq(res, x, ctx);
+            nfloat_zero(NFLOAT_COMPLEX_IM(res, ctx), ctx);
+            return status;
+
+        case GR_CTX_REAL_FLOAT_ARF:
+            status = nfloat_set_arf(res, x, ctx);
+            nfloat_zero(NFLOAT_COMPLEX_IM(res, ctx), ctx);
+            return status;
+
+        case GR_CTX_RR_ARB:
+            status = nfloat_set_arf(res, arb_midref((arb_srcptr) x), ctx);
+            nfloat_zero(NFLOAT_COMPLEX_IM(res, ctx), ctx);
+            return status;
+
+        case GR_CTX_COMPLEX_FLOAT_ACF:
+            status = nfloat_complex_set_acf(res, x, ctx);
+            return status;
+
+        case GR_CTX_CC_ACB:
+            status = nfloat_complex_set_acb(res, x, ctx);
+            return status;
+
+        default:
+            {
+                int status;
+                acf_t t;
+
+                gr_ctx_t acf_ctx;
+                acf_init(t);
+
+                gr_ctx_init_complex_float_acf(acf_ctx, NFLOAT_CTX_PREC(ctx));
+                status = gr_set_other(t, x, x_ctx, acf_ctx);
+                if (status == GR_SUCCESS)
+                    status = nfloat_complex_set_acf(res, t, ctx);
+
+                acf_clear(t);
+                gr_ctx_clear(acf_ctx);
+                return status;
+            }
+    }
+}
+
+int
 nfloat_complex_one(nfloat_complex_ptr res, gr_ctx_t ctx)
 {
     nfloat_one(NFLOAT_COMPLEX_RE(res, ctx), ctx);
@@ -1611,9 +1671,7 @@ gr_method_tab_input _nfloat_complex_methods_input[] =
     {GR_METHOD_SET_FMPQ,        (gr_funcptr) nfloat_complex_set_fmpq},
     {GR_METHOD_SET_D,           (gr_funcptr) nfloat_complex_set_d},
     {GR_METHOD_SET_STR,         (gr_funcptr) gr_generic_set_str_ring_exponents},
-/*
     {GR_METHOD_SET_OTHER,       (gr_funcptr) nfloat_complex_set_other},
-*/
 /*
     {GR_METHOD_GET_FMPZ,        (gr_funcptr) nfloat_complex_get_fmpz},
     {GR_METHOD_GET_FMPQ,        (gr_funcptr) nfloat_complex_get_fmpq},
