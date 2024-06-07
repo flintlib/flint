@@ -681,6 +681,35 @@ Roots
     We consider roots of the zero polynomial to be ill-defined and return
     ``GR_DOMAIN`` in that case.
 
+.. function:: int _gr_poly_refine_roots_aberth(gr_ptr w, gr_srcptr f, gr_srcptr f_prime, slong deg, gr_srcptr z, int progressive, gr_ctx_t ctx)
+              int _gr_poly_refine_roots_wdk(gr_ptr w, gr_srcptr f, slong deg, gr_srcptr z, int progressive, gr_ctx_t ctx)
+
+    Given a vector of approximate complex roots `z_1, \ldots, z_{deg}`
+    of `f = \sum_{i=0}^{deg} f_i x^i`,
+    computes a vector of corrections `w_1, \ldots, w_{deg}` such that
+    `z_k - w_k` is a closer approximation of the respective root
+    provided that the initial approximations are close enough
+    and that the polynomial evaluation is numerically accurate.
+    The user will typically call these methods in a loop.
+
+    The *wdk* version performs the Weierstrass-Durand-Kerner update
+
+    .. math ::
+
+        w_k = \frac{f(z_k)}{\prod_{j \ne k} (z_k - z_j)}, \quad k = 1, \ldots, deg.
+
+    The *aberth* version performs the Aberth-Ehrlich update
+
+    .. math ::
+
+        w_k = \frac{g(z_k)}{1 - g(z_k) \sum_{j \ne k} (z_k - z_j)^{-1}}, \quad g(z_k) = \frac{f(z_k)}{f'(z_k)} \quad k = 1, \ldots, deg.
+
+    requiring the coefficients of `f'` as an extra input *f_prime*.
+
+    If *progressive* flag is set, corrected roots `z_j - w_j` that
+    have already been computed are used in place of `z_j` in the
+    update loop, which can improve the rate of convergence.
+
 Power series special functions
 --------------------------------------------------------------------------------
 

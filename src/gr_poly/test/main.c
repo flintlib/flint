@@ -49,6 +49,7 @@
 #include "t-pow_series_ui.c"
 #include "t-pow_ui.c"
 #include "t-rem.c"
+#include "t-refine_roots.c"
 #include "t-resultant.c"
 #include "t-resultant_euclidean.c"
 #include "t-resultant_hgcd.c"
@@ -109,6 +110,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_poly_pow_series_fmpq),
     TEST_FUNCTION(gr_poly_pow_series_ui),
     TEST_FUNCTION(gr_poly_pow_ui),
+    TEST_FUNCTION(gr_poly_refine_roots),
     TEST_FUNCTION(gr_poly_rem),
     TEST_FUNCTION(gr_poly_resultant),
     TEST_FUNCTION(gr_poly_resultant_euclidean),
