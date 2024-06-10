@@ -758,7 +758,7 @@ FLINT_FORCE_INLINE vec8n vec8n_set_n(ulong a) {
 }
 
 FLINT_FORCE_INLINE vec4n vec4n_bit_shift_right(vec4n a, ulong b) {
-    return _mm256_srl_epi64(a, _mm_set_epi32(0,0,0,b));
+    return _mm256_srli_epi64(a, b);
 }
 
 FLINT_FORCE_INLINE vec8n vec8n_bit_shift_right(vec8n a, ulong b) {
