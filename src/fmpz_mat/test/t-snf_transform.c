@@ -1,4 +1,5 @@
 /*
+    Copyright (C) 2015 Alex J. Best
     Copyright (C) 2024 Joseph Grantham
 
     This file is part of FLINT.
