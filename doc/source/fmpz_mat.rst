@@ -1316,6 +1316,17 @@ Smith normal form
     Aliasing of ``S`` and ``A`` is allowed. The size of ``S`` must be
     the same as that of ``A``.
 
+.. function:: void fmpz_mat_snf_transform(fmpz_mat_t S, fmpz_mat_t U, fmpz_mat_t V, const fmpz_mat_t A)
+
+    Computes an integer matrix ``S`` such that ``S`` is the unique Smith
+    normal form of ``A`` along with the transformation matrices ``U`` and
+    ``V`` such that `UAV = S`. The algorithm used is due to Kannan and
+    Bachem [KanBac1979]_.
+
+    Aliasing of ``S`` and ``A`` is allowed. The size of ``S`` must be
+    the same as that of ``A``, and ``U`` and ``V`` must be square of \compatible
+    dimension (having the same number of rows and columns as ``A``, respectively).
+
 .. function:: void fmpz_mat_snf_diagonal(fmpz_mat_t S, const fmpz_mat_t A)
 
     Computes an integer matrix ``S`` such that ``S`` is the unique Smith

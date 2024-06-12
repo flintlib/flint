@@ -397,6 +397,7 @@ void fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A, flint_rand_t st
 int fmpz_mat_is_in_hnf(const fmpz_mat_t A);
 
 void fmpz_mat_snf(fmpz_mat_t S, const fmpz_mat_t A);
+void fmpz_mat_snf_transform(fmpz_mat_t S, fmpz_mat_t U, fmpz_mat_t V, const fmpz_mat_t A);
 void fmpz_mat_snf_diagonal(fmpz_mat_t S, const fmpz_mat_t A);
 void fmpz_mat_snf_kannan_bachem(fmpz_mat_t S, const fmpz_mat_t A);
 void fmpz_mat_snf_iliopoulos(fmpz_mat_t S, const fmpz_mat_t A, const fmpz_t mod);
