@@ -39,8 +39,8 @@ _fmpz_mat_snf_transform_diagonal(fmpz_mat_t S, fmpz_mat_t U, fmpz_mat_t V, const
         {
             if (fmpz_equal(fmpz_mat_entry(S, i, i), fmpz_mat_entry(S, i + 1, i + 1)))
                 continue;
-            fmpz_xgcd(d, x, y, fmpz_mat_entry(S, i, i), fmpz_mat_entry(S, i + 1, i + 1));
-            fmpz_divexact(fmpz_mat_entry(S, i + 1, i + 1), fmpz_mat_entry(S, i + 1, i + 1), d);
+            fmpz_xgcd(t, x, y, fmpz_mat_entry(S, i, i), fmpz_mat_entry(S, i + 1, i + 1));
+            fmpz_divexact(fmpz_mat_entry(S, i + 1, i + 1), fmpz_mat_entry(S, i + 1, i + 1), t);
 
             /* record row operations */
             for (k = 0; k < A->r; k++)
@@ -51,7 +51,7 @@ _fmpz_mat_snf_transform_diagonal(fmpz_mat_t S, fmpz_mat_t U, fmpz_mat_t V, const
                 fmpz_neg(fmpz_mat_entry(U, i + 1, k), fmpz_mat_entry(U, i + 1, k));
             }
 
-            fmpz_divexact(y, fmpz_mat_entry(S, i, i), d);
+            fmpz_divexact(y, fmpz_mat_entry(S, i, i), t);
 
             /* record column operations */
             for (k = 0; k < A->c; k++)
@@ -62,7 +62,7 @@ _fmpz_mat_snf_transform_diagonal(fmpz_mat_t S, fmpz_mat_t U, fmpz_mat_t V, const
             }
 
             fmpz_mul(fmpz_mat_entry(S, i + 1, i + 1), fmpz_mat_entry(S, i + 1, i + 1), fmpz_mat_entry(S, i, i));
-            fmpz_set(fmpz_mat_entry(S, i, i), d);
+            fmpz_set(fmpz_mat_entry(S, i, i), t);
         }
     }
     fmpz_clear(t); 
