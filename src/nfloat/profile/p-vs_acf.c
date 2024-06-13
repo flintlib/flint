@@ -117,6 +117,8 @@ int main()
                 (void) __;
 
                 GR_MUST_SUCCEED(gr_pi(x, ctx));
+                GR_MUST_SUCCEED(gr_add(x, x, I, ctx));
+                GR_MUST_SUCCEED(gr_inv(x, x, ctx));
 
                 TIMEIT_START
                 GR_MUST_SUCCEED(_gr_vec_mul_scalar(vec3, vec1, n, x, ctx));
