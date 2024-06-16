@@ -45,14 +45,13 @@ _nmod_mat_charpoly_berkowitz(nn_ptr cp, const nmod_mat_t mat, nmod_t mod)
     {
         slong i, k, t;
         nn_ptr a, A, s;
-        int nlimbs;
         TMP_INIT;
 
         TMP_START;
         a = TMP_ALLOC(sizeof(ulong) * (n * n));
         A = a + (n - 1) * n;
 
-        nlimbs = _nmod_vec_dot_bound_limbs(n, mod);
+        const dot_params_t params = _nmod_vec_dot_params(n, mod);
 
         _nmod_vec_zero(cp, n + 1);
         cp[0] = nmod_neg(nmod_mat_entry(mat, 0, 0), mod);
@@ -71,17 +70,17 @@ _nmod_mat_charpoly_berkowitz(nn_ptr cp, const nmod_mat_t mat, nmod_t mod)
                 for (i = 0; i <= t; i++)
                 {
                     s = a + k * n + i;
-                    s[0] = _nmod_vec_dot(mat->rows[i], a + (k - 1) * n, t + 1, mod, nlimbs);
+                    s[0] = _nmod_vec_dot(mat->rows[i], a + (k - 1) * n, t + 1, mod, params);
                 }
 
                 A[k] = a[k * n + t];
             }
 
-            A[t] = _nmod_vec_dot(mat->rows[t], a + (t - 1) * n, t + 1, mod, nlimbs);
+            A[t] = _nmod_vec_dot(mat->rows[t], a + (t - 1) * n, t + 1, mod, params);
 
             for (k = 0; k <= t; k++)
             {
-                cp[k] = nmod_sub(cp[k], _nmod_vec_dot_rev(A, cp, k, mod, nlimbs), mod);
+                cp[k] = nmod_sub(cp[k], _nmod_vec_dot_rev(A, cp, k, mod, params), mod);
                 cp[k] = nmod_sub(cp[k], A[k], mod);
             }
         }
@@ -117,7 +116,6 @@ void nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M)
    ulong h;
    nmod_poly_t b;
    nmod_mat_t M2;
-   int num_limbs;
    TMP_INIT;
 
    if (M->r != M->c)
@@ -142,7 +140,7 @@ void nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M)
    TMP_START;
 
    i = 1;
-   num_limbs = _nmod_vec_dot_bound_limbs(n, p->mod);
+   const dot_params_t params = _nmod_vec_dot_params(n, p->mod);
    nmod_poly_one(p);
    nmod_poly_init(b, p->mod.n);
    nmod_mat_init_set(M2, M);
@@ -226,7 +224,7 @@ void nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M)
          for (k = 1; k <= n - i; k++)
             T[k - 1] = A[k - 1][j - 1];
 
-         A[n - i - 1][j - 1] = _nmod_vec_dot(T, W, n - i, p->mod, num_limbs);
+         A[n - i - 1][j - 1] = _nmod_vec_dot(T, W, n - i, p->mod, params);
       }
 
       for (j = n - i; j <= n - 1; j++)
@@ -234,13 +232,13 @@ void nmod_mat_charpoly_danilevsky(nmod_poly_t p, const nmod_mat_t M)
          for (k = 1; k <= n - i; k++)
             T[k - 1] = A[k - 1][j - 1];
 
-         A[n - i - 1][j - 1] = n_addmod(_nmod_vec_dot(T, W, n - i, p->mod, num_limbs), W[j], p->mod.n);
+         A[n - i - 1][j - 1] = n_addmod(_nmod_vec_dot(T, W, n - i, p->mod, params), W[j], p->mod.n);
       }
 
       for (k = 1; k <= n - i; k++)
          T[k - 1] = A[k - 1][j - 1];
 
-      A[n - i - 1][n - 1] = _nmod_vec_dot(T, W, n - i, p->mod, num_limbs);
+      A[n - i - 1][n - 1] = _nmod_vec_dot(T, W, n - i, p->mod, params);
 
       i++;
    }

@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2024 Vincent Neiger
 
     This file is part of FLINT.
 
@@ -14,7 +15,7 @@
 #include "nmod.h"
 #include "nmod_vec.h"
 
-TEST_FUNCTION_START(nmod_vec_dot_bound_limbs, state)
+TEST_FUNCTION_START(_nmod_vec_dot_params, state)
 {
     int i;
 
@@ -23,7 +24,8 @@ TEST_FUNCTION_START(nmod_vec_dot_bound_limbs, state)
         slong len;
         nmod_t mod;
         ulong m;
-        int limbs1, limbs2;
+        int nlimbs1, nlimbs2;
+        dot_params_t params;
         mpz_t t;
 
         len = n_randint(state, 10000) + 1;
@@ -31,22 +33,30 @@ TEST_FUNCTION_START(nmod_vec_dot_bound_limbs, state)
 
         nmod_init(&mod, m);
 
-        limbs1 = _nmod_vec_dot_bound_limbs(len, mod);
+        params = _nmod_vec_dot_params(len, mod);
+        if (params.method == _DOT0)
+            nlimbs1 = 0;
+        else if (params.method == _DOT1)
+            nlimbs1 = 1;
+        else if (params.method > _DOT2)
+            nlimbs1 = 3;
+        else
+            nlimbs1 = 2;
 
         mpz_init2(t, 4*FLINT_BITS);
         flint_mpz_set_ui(t, m-1);
         mpz_mul(t, t, t);
         flint_mpz_mul_ui(t, t, len);
-        limbs2 = mpz_size(t);
+        nlimbs2 = mpz_size(t);
 
-        if (limbs1 != limbs2)
+        if (nlimbs1 != nlimbs2)
             TEST_FUNCTION_FAIL(
                     "m = %wu\n"
                     "len = %wd\n"
-                    "limbs1 = %d\n"
-                    "limbs2 = %d\n"
+                    "nlimbs1 = %d\n"
+                    "nlimbs2 = %d\n"
                     "bound: %{mpz}\n",
-                    m, len, limbs1, limbs2, t);
+                    m, len, nlimbs1, nlimbs2, t);
 
         mpz_clear(t);
     }

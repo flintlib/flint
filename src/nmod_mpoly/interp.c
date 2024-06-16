@@ -393,7 +393,7 @@ int nmod_mpolyn_interp_crt_sm_bpoly(
     const nmod_mpoly_ctx_t ctx)
 {
     int changed = 0;
-    int nlimbs = _nmod_vec_dot_bound_limbs(modulus->length, ctx->mod);
+    const dot_params_t params = _nmod_vec_dot_params(modulus->length, ctx->mod);
     slong N = mpoly_words_per_exp(F->bits, ctx->minfo);
     slong off0, shift0, off1, shift1;
     n_poly_struct * Acoeffs = A->coeffs;
@@ -440,7 +440,7 @@ int nmod_mpolyn_interp_crt_sm_bpoly(
             /* F term ok, A term ok */
             mpoly_monomial_set(Texps + N*Ti, Fexps + N*Fi, N);
 
-            v = _n_poly_eval_pow(Fcoeffs + Fi, alphapow, nlimbs, ctx->mod);
+            v = _n_poly_eval_pow(Fcoeffs + Fi, alphapow, params, ctx->mod);
             v = nmod_sub(Acoeffs[Ai].coeffs[ai], v, ctx->mod);
             if (v != 0)
             {
@@ -495,7 +495,7 @@ int nmod_mpolyn_interp_crt_sm_bpoly(
             /* F term ok, Aterm missing */
             mpoly_monomial_set(Texps + N*Ti, Fexps + N*Fi, N);
 
-            v = _n_poly_eval_pow(Fcoeffs + Fi, alphapow, nlimbs, ctx->mod);
+            v = _n_poly_eval_pow(Fcoeffs + Fi, alphapow, params, ctx->mod);
             if (v != 0)
             {
                 changed = 1;

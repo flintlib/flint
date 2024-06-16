@@ -17,7 +17,7 @@ slong
 nmod_mat_lu(slong * P, nmod_mat_t A, int rank_check)
 {
     slong nrows, ncols, n, cutoff;
-    int nlimbs, bits;
+    int bits;
     nrows = A->r;
     ncols = A->c;
 
@@ -46,9 +46,12 @@ nmod_mat_lu(slong * P, nmod_mat_t A, int rank_check)
                 return nmod_mat_lu_recursive(P, A, rank_check);
         }
 
-        nlimbs = _nmod_vec_dot_bound_limbs(n, A->mod);
+        const dot_params_t params = _nmod_vec_dot_params(n, A->mod);
 
-        if (nlimbs <= 1 || (nlimbs == 2 && n >= 12) || (nlimbs == 3 && n >= 20))
+        // TODO thresholds to re-examine after dot product changes
+        if (params.method <= _DOT1                        // <= 0,1 limb
+                || (params.method <= _DOT2 && n >= 12)    // <= 2 limbs (n >= 12 if exactly 2)
+                || (params.method > _DOT2 && n >= 20))    // == 3 limbs && n >= 20
             return nmod_mat_lu_classical_delayed(P, A, rank_check);
         else
             return nmod_mat_lu_classical(P, A, rank_check);

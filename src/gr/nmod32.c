@@ -10,7 +10,7 @@
 */
 
 #include "fmpz.h"
-#include "fmpq.h"
+//#include "fmpq.h"
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "gr.h"
@@ -430,10 +430,8 @@ _nmod32_vec_dot(nmod32_t res, const nmod32_t initial, int subtract, const nmod32
 
     {
         ulong ss;
-        int nlimbs;
-
-        nlimbs = _nmod_vec_dot_bound_limbs(len, NMOD32_CTX(ctx));
-        NMOD_VEC_DOT(ss, i, len, (ulong) vec1[i], (ulong) vec2[i], NMOD32_CTX(ctx), nlimbs);
+        const dot_params_t params = _nmod_vec_dot_params(len, NMOD32_CTX(ctx));
+        NMOD_VEC_DOT(ss, i, len, (ulong) vec1[i], (ulong) vec2[i], NMOD32_CTX(ctx), params);
         s = n_addmod(s, ss, n);
     }
 
@@ -477,10 +475,9 @@ _nmod32_vec_dot_rev(nmod32_t res, const nmod32_t initial, int subtract, const nm
 
     {
         ulong ss;
-        int nlimbs;
 
-        nlimbs = _nmod_vec_dot_bound_limbs(len, NMOD32_CTX(ctx));
-        NMOD_VEC_DOT(ss, i, len, (ulong) vec1[i], (ulong) vec2[len - 1 - i], NMOD32_CTX(ctx), nlimbs);
+        const dot_params_t params = _nmod_vec_dot_params(len, NMOD32_CTX(ctx));
+        NMOD_VEC_DOT(ss, i, len, (ulong) vec1[i], (ulong) vec2[len - 1 - i], NMOD32_CTX(ctx), params);
         s = n_addmod(s, ss, n);
     }
 

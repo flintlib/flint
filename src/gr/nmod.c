@@ -858,7 +858,7 @@ __gr_nmod_vec_dot(ulong * res, const ulong * initial, int subtract, const ulong 
 {
     slong i;
     ulong s;
-    int nlimbs;
+    dot_params_t params;
     nmod_t mod;
 
     if (len <= 1)
@@ -890,18 +890,18 @@ __gr_nmod_vec_dot(ulong * res, const ulong * initial, int subtract, const ulong 
         if (len <= 16)
         {
             if (mod.n <= UWORD(1) << (FLINT_BITS / 2 - 2))
-                nlimbs = 1;
+                params.method = _DOT1;
             if (mod.n <= UWORD(1) << (FLINT_BITS - 2))
-                nlimbs = 2;
+                params.method = _DOT2;
             else
-                nlimbs = 3;
+                params.method = _DOT3;
         }
         else
         {
-            nlimbs = _nmod_vec_dot_bound_limbs(len, mod);
+            params = _nmod_vec_dot_params(len, mod);
         }
 
-        NMOD_VEC_DOT(s, i, len, vec1[i], vec2[i], mod, nlimbs);
+        NMOD_VEC_DOT(s, i, len, vec1[i], vec2[i], mod, params);
     }
 
     if (initial == NULL)
@@ -927,7 +927,7 @@ __gr_nmod_vec_dot_rev(ulong * res, const ulong * initial, int subtract, const ul
 {
     slong i;
     ulong s;
-    int nlimbs;
+    dot_params_t params;
     nmod_t mod;
 
     if (len <= 1)
@@ -959,18 +959,18 @@ __gr_nmod_vec_dot_rev(ulong * res, const ulong * initial, int subtract, const ul
         if (len <= 16)
         {
             if (mod.n <= UWORD(1) << (FLINT_BITS / 2 - 2))
-                nlimbs = 1;
+                params.method = _DOT1;
             if (mod.n <= UWORD(1) << (FLINT_BITS - 2))
-                nlimbs = 2;
+                params.method = _DOT2;
             else
-                nlimbs = 3;
+                params.method = _DOT3;
         }
         else
         {
-            nlimbs = _nmod_vec_dot_bound_limbs(len, mod);
+            params = _nmod_vec_dot_params(len, mod);
         }
 
-        NMOD_VEC_DOT(s, i, len, vec1[i], vec2[len - 1 - i], mod, nlimbs);
+        NMOD_VEC_DOT(s, i, len, vec1[i], vec2[len - 1 - i], mod, params);
     }
 
     if (initial == NULL)

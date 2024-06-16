@@ -21,12 +21,12 @@ void nmod_mat_mul_nmod_vec(
     nmod_t mod = A->mod;
     slong i, j;
     slong len = FLINT_MIN(A->c, blen);
-    int nlimbs = _nmod_vec_dot_bound_limbs(len, mod);
+    const dot_params_t params = _nmod_vec_dot_params(len, mod);
 
     for (i = A->r - 1; i >= 0; i--)
     {
         const ulong * Ai = A->rows[i];
-        NMOD_VEC_DOT(c[i], j, len, Ai[j], b[j], mod, nlimbs);
+        NMOD_VEC_DOT(c[i], j, len, Ai[j], b[j], mod, params);
     }
 }
 

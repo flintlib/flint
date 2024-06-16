@@ -190,11 +190,10 @@ static void _lattice(
     n_bpoly_t Q, R, dg;
     n_bpoly_struct * ld;
     nmod_mat_t M, T1, T2;
-    int nlimbs;
     ulong * trow;
     slong lift_order = lift_alpha_pow->length - 1;
 
-    nlimbs = _nmod_vec_dot_bound_limbs(r, ctx->mod);
+    const dot_params_t params = _nmod_vec_dot_params(r, ctx->mod);
     trow = (ulong *) flint_malloc(r*sizeof(ulong));
     n_bpoly_init(Q);
     n_bpoly_init(R);
@@ -243,7 +242,7 @@ static void _lattice(
 
             for (i = 0; i < d; i++)
                 nmod_mat_entry(M, (j - starts[k])*deg + l, i) =
-                         _nmod_vec_dot(trow, N->rows[i], r, ctx->mod, nlimbs);
+                         _nmod_vec_dot(trow, N->rows[i], r, ctx->mod, params);
         }
 
         nmod_mat_init_nullspace_tr(T1, M);

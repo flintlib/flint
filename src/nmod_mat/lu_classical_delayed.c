@@ -430,15 +430,15 @@ slong
 nmod_mat_lu_classical_delayed(slong * P, nmod_mat_t A, int rank_check)
 {
     slong nrows, ncols;
-    int nlimbs;
 
     nrows = A->r;
     ncols = A->c;
-    nlimbs = _nmod_vec_dot_bound_limbs(FLINT_MIN(nrows, ncols), A->mod);
+    const dot_params_t params = _nmod_vec_dot_params(FLINT_MIN(nrows, ncols), A->mod);
 
-    if (nlimbs <= 1)
+    // TODO cases to re-examine after dot product changes?
+    if (params.method <= _DOT1)
         return nmod_mat_lu_classical_delayed_1(P, A, rank_check);
-    else if (nlimbs <= 2)
+    else if (params.method <= _DOT2)
         return nmod_mat_lu_classical_delayed_2(P, A, rank_check);
     else
         return nmod_mat_lu_classical_delayed_3(P, A, rank_check);

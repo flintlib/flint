@@ -496,10 +496,9 @@ static void _lattice(
     fq_zech_bpoly_t Q, R, dg;
     fq_zech_bpoly_struct * ld;
     nmod_mat_t M, T1, T2;
-    int nlimbs;
     ulong * trow;
 
-    nlimbs = _nmod_vec_dot_bound_limbs(r, fq_zech_ctx_mod(ctx));
+    const dot_params_t params = _nmod_vec_dot_params(r, fq_zech_ctx_mod(ctx));
     trow = (ulong *) flint_malloc(r*sizeof(ulong));
     fq_zech_bpoly_init(Q, ctx);
     fq_zech_bpoly_init(R, ctx);
@@ -549,7 +548,7 @@ static void _lattice(
 
             for (i = 0; i < d; i++)
                 nmod_mat_entry(M, (j - starts[k])*deg + l, i) =
-              _nmod_vec_dot(trow, N->rows[i], r, fq_zech_ctx_mod(ctx), nlimbs);
+              _nmod_vec_dot(trow, N->rows[i], r, fq_zech_ctx_mod(ctx), params);
         }
 
         nmod_mat_init_nullspace_tr(T1, M);

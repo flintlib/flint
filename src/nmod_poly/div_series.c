@@ -20,7 +20,6 @@ _nmod_poly_div_series_basecase_preinv1(nn_ptr Qinv, nn_srcptr P, slong Plen,
                                 nn_srcptr Q, slong Qlen, slong n, ulong q, nmod_t mod)
 {
     slong i, j, l;
-    int nlimbs;
     ulong s;
 
     Plen = FLINT_MIN(Plen, n);
@@ -35,13 +34,13 @@ _nmod_poly_div_series_basecase_preinv1(nn_ptr Qinv, nn_srcptr P, slong Plen,
     {
         Qinv[0] = nmod_mul(q, P[0], mod);
 
-        nlimbs = _nmod_vec_dot_bound_limbs(FLINT_MIN(n, Qlen), mod);
+        const dot_params_t params = _nmod_vec_dot_params(FLINT_MIN(n, Qlen), mod);
 
         for (i = 1; i < n; i++)
         {
             l = FLINT_MIN(i, Qlen - 1);
 
-            NMOD_VEC_DOT(s, j, l, Q[j + 1], Qinv[i - 1 - j], mod, nlimbs);
+            NMOD_VEC_DOT(s, j, l, Q[j + 1], Qinv[i - 1 - j], mod, params);
 
             if (i < Plen)
                 s = nmod_sub(P[i], s, mod);
