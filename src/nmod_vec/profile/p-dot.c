@@ -344,7 +344,6 @@ void time_dot_mat_solve_triu(ulong len, ulong n, flint_rand_t state)
     nmod_mat_clear(mat1);
 }
 
-
 void time_dot_mat_solve_triu_vec(ulong len, ulong n, flint_rand_t state)
 {
     if (len > 10000 || n == (UWORD(1)<<63))
@@ -371,9 +370,9 @@ void time_dot_mat_solve_triu_vec(ulong len, ulong n, flint_rand_t state)
 }
 
 
-
-
-
+/*-------------------------*/
+/*  main                   */
+/*-------------------------*/
 
 int main(int argc, char ** argv)
 {
@@ -407,6 +406,22 @@ int main(int argc, char ** argv)
         time_dot_mat_solve_triu_vec, // 11
     };
 
+    const char * description[] = {
+        "#0  --> vec dot           ",
+        "#1  --> vec dot rev       ",
+        "#2  --> vec dot expr      ",
+        "#3  --> poly_mul          ",
+        "#4  --> poly_inv_series   ",
+        "#5  --> poly_exp_series   ",
+        "#6  --> mat_mul           ",
+        "#7  --> mat_solve_tril    ",
+        "#8  --> mat_solve_triu    ",
+        "#9  --> mat_mul_vec       ",
+        "#10 --> mat_solve_tril_vec",
+        "#11 --> mat_solve_triu_vec"
+    };
+
+
     printf("#warmup... ");
     for (slong i = 0; i < 10; i++)
     {
@@ -421,6 +436,7 @@ int main(int argc, char ** argv)
         {
             const timefun tfun = funs[ifun];
 
+            printf("\n%s\n", description[ifun]);
             printf("#bits\\len");
             for (slong i = 0; i < nlens; i++)
                 printf("%9ld", lens[i]);
@@ -445,6 +461,7 @@ int main(int argc, char ** argv)
     {
         const timefun tfun = funs[atoi(argv[1])];
 
+        printf("\n%s\n", description[atoi(argv[1])]);
         printf("#bits\\len");
         for (slong i = 0; i < nlens; i++)
             printf("%9ld", lens[i]);
@@ -469,6 +486,7 @@ int main(int argc, char ** argv)
         const timefun tfun = funs[atoi(argv[1])];
         const slong b = atoi(argv[2]);
 
+        printf("\n%s\n", description[atoi(argv[1])]);
         printf("#bits\\len");
         for (slong i = 0; i < nlens; i++)
             printf("%9ld", lens[i]);
@@ -489,6 +507,7 @@ int main(int argc, char ** argv)
         const slong b = atoi(argv[2]);
         const slong len = atoi(argv[3]);
 
+        printf("\n%s\n", description[atoi(argv[1])]);
         printf("#bits\\len");
         for (slong i = 0; i < nlens; i++)
             printf("%9ld", lens[i]);
