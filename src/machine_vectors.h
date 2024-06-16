@@ -443,6 +443,113 @@ FLINT_FORCE_INLINE vec4n vec4d_convert_limited_vec4n(vec4d a) {
     return _mm256_castpd_si256(_mm256_xor_pd(_mm256_add_pd(a, t), t));
 }
 
+/* vec4n -- AVX2 ***********************************************************/
+
+FLINT_FORCE_INLINE void vec4n_print(vec4n a)
+{
+    flint_printf("[hi %016llx_%016llx_%016llx_%016llx lo]",
+        _mm256_extract_epi64(a, 3),
+        _mm256_extract_epi64(a, 2),
+        _mm256_extract_epi64(a, 1),
+        _mm256_extract_epi64(a, 0));
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_load_unaligned(const ulong* a) {
+    return _mm256_loadu_si256((__m256i*) a);
+}
+
+FLINT_FORCE_INLINE void vec4n_store_unaligned(ulong* z, vec4n a) {
+    _mm256_storeu_si256((__m256i*) z, a);
+}
+
+/* permute_i0_i1_i2_i3(a): return {a[i0], a[i1], a[i2], a[i3]} */
+#ifndef AVOID_AVX2
+#define DEFINE_IT(i0, i1, i2, i3)                                        \
+FLINT_FORCE_INLINE vec4n CAT6(vec4n, permute, i0, i1, i2, i3)(vec4n a) { \
+    return _mm256_permute4x64_epi64(a, i0 + 4*(i1 + 4*(i2 + 4*i3)));     \
+}
+#else
+#define DEFINE_IT(i0, i1, i2, i3)                                        \
+FLINT_FORCE_INLINE vec4n CAT6(vec4n, permute, i0, i1, i2, i3)(vec4n a) { \
+    return vec4n_set_n4(a[i0], a[i1], a[i2], a[i3]);                     \
+}
+#endif
+DEFINE_IT(3,2,1,0)
+#undef DEFINE_IT
+
+FLINT_FORCE_INLINE vec4n vec4n_zero()
+{
+    return _mm256_setzero_si256();
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_set_n4(ulong a0, ulong a1, ulong a2, ulong a3) {
+    return _mm256_set_epi64x(a3, a2, a1, a0);
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_set_n(ulong a) {
+  return _mm256_set1_epi64x(a);
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_add(vec4n a, vec4n b)
+{
+    return _mm256_add_epi64(a, b);
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_sub(vec4n a, vec4n b)
+{
+    return _mm256_sub_epi64(a, b);
+}
+
+/* for n < 2^63 */
+FLINT_FORCE_INLINE vec4n vec4n_addmod_limited(vec4n a, vec4n b, vec4n n)
+{
+    vec4n s = vec4n_add(a, b);
+    vec4n t = vec4n_sub(s, n);
+    vec4n m = _mm256_srai_epi32(t, 31);
+          m = _mm256_shuffle_epi32(m, 1 + 4*(1 + 4*(3 + 4*(3))));
+    return _mm256_blendv_epi8(t, s, m);
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_addmod(vec4n a, vec4n b, vec4n n)
+{
+    vec4n tt = vec4n_set_n(0x8000000000000000);
+    vec4n s = vec4n_add(a, b);
+#if 0
+    vec4n  m = vec4n_sub(n, tt);
+    vec4n t0 = vec4n_sub(m, a);
+    vec4n t1 = vec4n_sub(b, tt);
+    vec4n t2 = vec4n_sub(t1, t0);
+    return _mm256_blendv_epi8(s, t2, _mm256_cmpgt_epi64(t1, t0));
+#else
+    vec4n t0 = vec4n_sub(s, n);
+    vec4n t1 = vec4n_sub(a, tt);
+    vec4n t2 = vec4n_sub(t0, tt);
+    return _mm256_blendv_epi8(t0, s, _mm256_cmpgt_epi64(t2, t1));
+#endif
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_mul(vec4n u, vec4n v)
+{
+    return _mm256_mul_epu32(u, v);
+}
+
+// compilers accept non-(compile-time-)constant b with srli
+// (still, faster if constant)
+FLINT_FORCE_INLINE vec4n vec4n_bit_shift_right(vec4n a, ulong b) {
+    return _mm256_srli_epi64(a, b);
+}
+
+#define vec4n_bit_shift_right_32(a) vec4n_bit_shift_right((a), 32)
+
+FLINT_FORCE_INLINE vec4n vec4n_bit_and(vec4n a, vec4n b) {
+    return _mm256_and_si256(a, b);
+}
+
+FLINT_FORCE_INLINE vec4d vec4n_convert_limited_vec4d(vec4n a) {
+    __m256d t = _mm256_set1_pd(0x1.0p52);
+    return _mm256_sub_pd(_mm256_or_pd(_mm256_castsi256_pd(a), t), t);
+}
+
 
 /* vec8d -- AVX2 ***********************************************************/
 
@@ -665,113 +772,6 @@ EXTEND_VEC_DEF4(vec4d, vec8d, _nmulmod)
 #undef EXTEND_VEC_DEF0
 
 
-
-/* vec4n -- AVX2 ***********************************************************/
-
-FLINT_FORCE_INLINE void vec4n_print(vec4n a)
-{
-    flint_printf("[hi %016llx_%016llx_%016llx_%016llx lo]",
-        _mm256_extract_epi64(a, 3),
-        _mm256_extract_epi64(a, 2),
-        _mm256_extract_epi64(a, 1),
-        _mm256_extract_epi64(a, 0));
-}
-
-FLINT_FORCE_INLINE vec4n vec4n_load_unaligned(const ulong* a) {
-    return _mm256_loadu_si256((__m256i*) a);
-}
-
-FLINT_FORCE_INLINE void vec4n_store_unaligned(ulong* z, vec4n a) {
-    _mm256_storeu_si256((__m256i*) z, a);
-}
-
-/* permute_i0_i1_i2_i3(a): return {a[i0], a[i1], a[i2], a[i3]} */
-#ifndef AVOID_AVX2
-#define DEFINE_IT(i0, i1, i2, i3)                                        \
-FLINT_FORCE_INLINE vec4n CAT6(vec4n, permute, i0, i1, i2, i3)(vec4n a) { \
-    return _mm256_permute4x64_epi64(a, i0 + 4*(i1 + 4*(i2 + 4*i3)));     \
-}
-#else
-#define DEFINE_IT(i0, i1, i2, i3)                                        \
-FLINT_FORCE_INLINE vec4n CAT6(vec4n, permute, i0, i1, i2, i3)(vec4n a) { \
-    return vec4n_set_n4(a[i0], a[i1], a[i2], a[i3]);                     \
-}
-#endif
-DEFINE_IT(3,2,1,0)
-#undef DEFINE_IT
-
-FLINT_FORCE_INLINE vec4n vec4n_zero()
-{
-    return _mm256_setzero_si256();
-}
-
-FLINT_FORCE_INLINE vec4n vec4n_set_n4(ulong a0, ulong a1, ulong a2, ulong a3) {
-    return _mm256_set_epi64x(a3, a2, a1, a0);
-}
-
-FLINT_FORCE_INLINE vec4n vec4n_set_n(ulong a) {
-  return _mm256_set1_epi64x(a);
-}
-
-FLINT_FORCE_INLINE vec4n vec4n_add(vec4n a, vec4n b)
-{
-    return _mm256_add_epi64(a, b);
-}
-
-FLINT_FORCE_INLINE vec4n vec4n_sub(vec4n a, vec4n b)
-{
-    return _mm256_sub_epi64(a, b);
-}
-
-/* for n < 2^63 */
-FLINT_FORCE_INLINE vec4n vec4n_addmod_limited(vec4n a, vec4n b, vec4n n)
-{
-    vec4n s = vec4n_add(a, b);
-    vec4n t = vec4n_sub(s, n);
-    vec4n m = _mm256_srai_epi32(t, 31);
-          m = _mm256_shuffle_epi32(m, 1 + 4*(1 + 4*(3 + 4*(3))));
-    return _mm256_blendv_epi8(t, s, m);
-}
-
-FLINT_FORCE_INLINE vec4n vec4n_addmod(vec4n a, vec4n b, vec4n n)
-{
-    vec4n tt = vec4n_set_n(0x8000000000000000);
-    vec4n s = vec4n_add(a, b);
-#if 0
-    vec4n  m = vec4n_sub(n, tt);
-    vec4n t0 = vec4n_sub(m, a);
-    vec4n t1 = vec4n_sub(b, tt);
-    vec4n t2 = vec4n_sub(t1, t0);
-    return _mm256_blendv_epi8(s, t2, _mm256_cmpgt_epi64(t1, t0));
-#else
-    vec4n t0 = vec4n_sub(s, n);
-    vec4n t1 = vec4n_sub(a, tt);
-    vec4n t2 = vec4n_sub(t0, tt);
-    return _mm256_blendv_epi8(t0, s, _mm256_cmpgt_epi64(t2, t1));
-#endif
-}
-
-FLINT_FORCE_INLINE vec4n vec4n_mul(vec4n u, vec4n v)
-{
-    return _mm256_mul_epu32(u, v);
-}
-
-// compilers accept non-(compile-time-)constant b with srli
-// (still, faster if constant)
-FLINT_FORCE_INLINE vec4n vec4n_bit_shift_right(vec4n a, ulong b) {
-    return _mm256_srli_epi64(a, b);
-}
-
-#define vec4n_bit_shift_right_32(a) vec4n_bit_shift_right((a), 32)
-
-FLINT_FORCE_INLINE vec4n vec4n_bit_and(vec4n a, vec4n b) {
-    return _mm256_and_si256(a, b);
-}
-
-FLINT_FORCE_INLINE vec4d vec4n_convert_limited_vec4d(vec4n a) {
-    __m256d t = _mm256_set1_pd(0x1.0p52);
-    return _mm256_sub_pd(_mm256_or_pd(_mm256_castsi256_pd(a), t), t);
-}
 
 /* vec8n -- AVX2 ***********************************************************/
 
