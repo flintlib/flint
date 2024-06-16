@@ -133,7 +133,7 @@ void time_dot_poly_mul(ulong len, ulong n, flint_rand_t state)
     _nmod_vec_rand(p1, state, len, mod);
     nn_ptr p2 = _nmod_vec_init(len);
     _nmod_vec_rand(p2, state, len, mod);
-    nn_ptr res = _nmod_vec_init(len);
+    nn_ptr res = _nmod_vec_init(2*len);
 
     double FLINT_SET_BUT_UNUSED(tcpu), twall;
 
