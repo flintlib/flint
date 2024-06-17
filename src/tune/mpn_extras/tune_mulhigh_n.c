@@ -44,10 +44,9 @@ mp_limb_t _flint_mpn_mulhigh_n_mulders(mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 
 double measure_func(tune_func_t, void *, int, int);
 
-#if 0
 void _tune_flint_mpn_mulhigh_n(void * vparam)
 {
-    struct mulhigh__param_0 * param = vparam;
+    struct mulhigh_param_0 * param = vparam;
     nn_ptr ap, bp, xp, yp;
     slong len;
     flint_time_t t0, t1;
@@ -105,4 +104,3 @@ tune_flint_mpn_mulhigh_n(int FLINT_UNUSED(warmups), int FLINT_UNUSED(min_runs))
     flint_free(xp);
     flint_free(yp);
 }
-#endif
