@@ -9,13 +9,15 @@ Building FLINT requires:
   * GNU Make together with GNU Autotools
   * CMake (Only recommended for Windows users)
 
-On a typical Linux or Unix-like system where Autotools is available,
-FLINT can be built and installed as follows:
+One can install GMP, MPFR, GNU Make and GNU Autotools on a Ubuntu system via
 
-.. code-block:: bash
+    apt install libgmp-dev libmpfr-dev make autoconf libtool-bin
+
+On a typical Linux or Unix-like system, FLINT can be built and installed as
+follows:
 
     ./bootstrap.sh
-    ./configure --disable-static
+    ./configure
     make -j
     make install
 
