@@ -205,7 +205,6 @@ void time_dot_poly_exp_series(ulong len, ulong n, flint_rand_t state)
 }
 
 
-
 /*-------------------------*/
 /* indirect: mat           */
 /*-------------------------*/
