@@ -80,8 +80,9 @@ _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_
     ulong res = UWORD(0);   /* covers _DOT0 */
     slong i;
 
-    if (params.method == _DOT1)
 #if defined(__AVX2__)
+    if (params.method == _DOT1
+        || (params.method == _DOT_POW2 && mod.n < (UWORD(1) << (FLINT_BITS / 2))))
     {
         vec4n dp = vec4n_zero();
 
@@ -108,7 +109,10 @@ _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_
 
         NMOD_RED(res, res, mod);
     }
+    else if (params.method == _DOT_POW2)  // cannot use avx 32-bit mul
+        _NMOD_VEC_DOT1(res, i, len, vec1[i], vec2[i], mod)
 #else // if defined(__AVX2__)
+    if (params.method == _DOT1 || params.method == _DOT_POW2)
         _NMOD_VEC_DOT1(res, i, len, vec1[i], vec2[i], mod)
 #endif // if defined(__AVX2__)
 
@@ -162,8 +166,6 @@ _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_
         _NMOD_VEC_DOT3_ACC(res, i, len, vec1[i], vec2[i], mod)
     else if (params.method == _DOT3)
         _NMOD_VEC_DOT3(res, i, len, vec1[i], vec2[i], mod)
-    else if (params.method == _DOT_POW2)   // computing on single limb, but no AVX: modulus may be > 2**32
-        _NMOD_VEC_DOT1(res, i, len, vec1[i], vec2[i], mod)
 
     return res;
 }
@@ -202,8 +204,9 @@ _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_par
     ulong res = UWORD(0);   /* covers _DOT0 */
     slong i;
 
-    if (params.method == _DOT1)
 #if defined(__AVX2__)
+    if (params.method == _DOT1
+        || (params.method == _DOT_POW2 && mod.n < (UWORD(1) << (FLINT_BITS / 2))))
     {
         vec4n dp = vec4n_zero();
 
@@ -231,7 +234,10 @@ _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_par
 
         NMOD_RED(res, res, mod);
     }
+    else if (params.method == _DOT_POW2)  // cannot use avx 32-bit mul
+        _NMOD_VEC_DOT1(res, i, len, vec1[i], vec2[len-1-i], mod)
 #else // if defined(__AVX2__)
+    if (params.method == _DOT1 || params.method == _DOT_POW2)
         _NMOD_VEC_DOT1(res, i, len, vec1[i], vec2[len-1-i], mod)
 #endif // if defined(__AVX2__)
 
@@ -286,8 +292,6 @@ _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_par
         _NMOD_VEC_DOT3_ACC(res, i, len, vec1[i], vec2[len-1-i], mod)
     else if (params.method == _DOT3)
         _NMOD_VEC_DOT3(res, i, len, vec1[i], vec2[len-1-i], mod)
-    else if (params.method == _DOT_POW2)   // computing on single limb, but no AVX: modulus may be > 2**32
-        _NMOD_VEC_DOT1(res, i, len, vec1[i], vec2[len-1-i], mod)
 
     return res;
 }
