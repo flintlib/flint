@@ -42,7 +42,7 @@ void time_dot(ulong len, ulong n, flint_rand_t state)
 {
     nmod_t mod;
     nmod_init(&mod, n);
-    const int n_limbs = _nmod_vec_dot_bound_limbs(len, mod);
+    const dot_params_t params = _nmod_vec_dot_params(len, mod);
 
     nn_ptr v1 = _nmod_vec_init(len);
     _nmod_vec_rand(v1, state, len, mod);
@@ -52,7 +52,7 @@ void time_dot(ulong len, ulong n, flint_rand_t state)
     double FLINT_SET_BUT_UNUSED(tcpu), twall;
 
     TIMEIT_START
-    _nmod_vec_dot(v1, v2, len, mod, n_limbs);
+    _nmod_vec_dot(v1, v2, len, mod, params);
     TIMEIT_STOP_VALUES(tcpu, twall)
 
     printf("%.2e", twall);
@@ -65,7 +65,7 @@ void time_dot_rev(ulong len, ulong n, flint_rand_t state)
 {
     nmod_t mod;
     nmod_init(&mod, n);
-    const int n_limbs = _nmod_vec_dot_bound_limbs(len, mod);
+    const dot_params_t params = _nmod_vec_dot_params(len, mod);
 
     nn_ptr v1 = _nmod_vec_init(len);
     _nmod_vec_rand(v1, state, len, mod);
@@ -75,7 +75,7 @@ void time_dot_rev(ulong len, ulong n, flint_rand_t state)
     double FLINT_SET_BUT_UNUSED(tcpu), twall;
 
     TIMEIT_START
-    _nmod_vec_dot_rev(v1, v2, len, mod, n_limbs);
+    _nmod_vec_dot_rev(v1, v2, len, mod, params);
     TIMEIT_STOP_VALUES(tcpu, twall)
 
     printf("%.2e", twall);
@@ -88,7 +88,7 @@ void time_dot_expr(ulong len, ulong n, flint_rand_t state)
 {
     nmod_t mod;
     nmod_init(&mod, n);
-    const int n_limbs = _nmod_vec_dot_bound_limbs(len, mod);
+    const dot_params_t params = _nmod_vec_dot_params(len, mod);
 
     nn_ptr v1 = _nmod_vec_init(9*len);
     _nmod_vec_rand(v1, state, 9*len, mod);
@@ -102,7 +102,7 @@ void time_dot_expr(ulong len, ulong n, flint_rand_t state)
     ulong i, FLINT_SET_BUT_UNUSED(res);
 
     TIMEIT_START
-    NMOD_VEC_DOT(res, i, len, v1i[9*len - 1 - 9*i], v2i[9*len - 1 - 9*i], mod, n_limbs);
+    NMOD_VEC_DOT(res, i, len, v1i[9*len - 1 - 9*i], v2i[9*len - 1 - 9*i], mod, params);
     TIMEIT_STOP_VALUES(tcpu, twall)
 
     printf("%.2e", twall);
@@ -114,9 +114,6 @@ void time_dot_expr(ulong len, ulong n, flint_rand_t state)
 /*-------------------------*/
 /* indirect: poly          */
 /*-------------------------*/
-
-// void _nmod_poly_inv_series_basecase_preinv1(nn_ptr Qinv, nn_srcptr Q, slong Qlen, slong n, ulong q, nmod_t mod)
-// void _nmod_poly_exp_series(nn_ptr f, nn_srcptr h, slong hlen, slong n, nmod_t mod)
 
 void time_dot_poly_mul(ulong len, ulong n, flint_rand_t state)
 {
@@ -186,7 +183,7 @@ void time_dot_poly_exp_series(ulong len, ulong n, flint_rand_t state)
 
     gr_ctx_t ctx;
     gr_ctx_init_nmod(ctx, n);
-    int status;
+    int FLINT_SET_BUT_UNUSED(status);
 
     gr_poly_t p;
     gr_poly_init(p, ctx);
@@ -199,9 +196,6 @@ void time_dot_poly_exp_series(ulong len, ulong n, flint_rand_t state)
 
     TIMEIT_START
     status |= gr_poly_exp_series_basecase(res, p, len, ctx);
-
-// int gr_poly_exp_series_basecase(gr_poly_t f, const gr_poly_t h, slong n, gr_ctx_t ctx)
-
     TIMEIT_STOP_VALUES(tcpu, twall)
 
     printf("%.2e", twall);
@@ -421,6 +415,21 @@ int main(int argc, char ** argv)
         "#11 --> mat_solve_triu_vec"
     };
 
+    if (argc == 1)  // show usage
+    {
+        printf("Usage: `%s [fun] [nbits] [len]`\n", argv[0]);
+        printf("   Each argument is optional; no argument shows this help.\n");
+        printf("   - fun: id number of the timed function (see below),\n");
+        printf("          exception: fun == -1 times all available functions successively\n");
+        printf("   - nbits: number of bits for the modulus, chosen as nextprime(2**(nbits-1))\n");
+        printf("          exception: nbits == 0 picks modulus 2**63\n");
+        printf("   - len: length for the vector, row and column dimension for the matrices\n");
+        printf("\nAvailable functions:\n");
+        for (slong j = 0; j < nfuns; j++)
+            printf("   %s\n", description[j]);
+
+        return 0;
+    }
 
     printf("#warmup... ");
     for (slong i = 0; i < 10; i++)
@@ -430,7 +439,7 @@ int main(int argc, char ** argv)
     }
     printf("\n");
 
-    if (argc == 1)  // launching full suite
+    if (argc == 2 && atoi(argv[1]) == -1)  // launching full suite
     {
         for (slong ifun = 0; ifun < nfuns; ifun++)
         {
