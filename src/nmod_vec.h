@@ -118,14 +118,16 @@ void _nmod_vec_scalar_addmul_nmod(nn_ptr res, nn_srcptr vec, slong len, ulong c,
 typedef enum
 {
     _DOT0 = 0,           /* len == 0 || mod.n == 1 */
-    _DOT1 = 1,           /* 1 limb */
-    _DOT2_32_SPLIT = 2,  /* 2 limbs, modulus < ~2**30.5 (FLINT_BITS == 64 only) */
-    _DOT2_HALF = 3,      /* 2 limbs, modulus < 2**(FLINT_BITS/2) */
-    _DOT2 = 4,           /* 2 limbs */
-    _DOT3_ACC = 5,       /* 3 limbs, modulus < 2**62.5 allowing accumulation in 2 limbs */
-    _DOT3 = 6            /* 3 limbs, modulus >= 2**62.5 */
+    _DOT_POW2 = 1,       /* modulus is a power of 2, computations performed on 1 limb */
+    _DOT1 = 2,           /* 1 limb */
+    _DOT2_32_SPLIT = 3,  /* 2 limbs, modulus < ~2**30.5 (FLINT_BITS == 64 only) */
+    _DOT2_HALF = 4,      /* 2 limbs, modulus < 2**(FLINT_BITS/2) */
+    _DOT2 = 5,           /* 2 limbs */
+    _DOT3_ACC = 6,       /* 3 limbs, modulus < 2**62.5 allowing accumulation in 2 limbs */
+    _DOT3 = 7,           /* 3 limbs, modulus >= 2**62.5 */
 } dot_method_t;
-// > 1 limb <-> method > _DOT1   |   > 2 limbs <-> method > _DOT2
+// if mod.n is not a power of 2, then
+//      > 1 limb <-> method > _DOT1   |   > 2 limbs <-> method > _DOT2
 
 typedef struct
 {
@@ -134,6 +136,7 @@ typedef struct
 } dot_params_t;
 
 // compute dot parameters
+int _nmod_vec_dot_bound_limbs(slong len, nmod_t mod);
 dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod);
 
 // _DOT1   (1 limb)
@@ -322,7 +325,7 @@ do                                                                    \
 do                                                                    \
 {                                                                     \
     res = UWORD(0);   /* covers _DOT0 */                              \
-    if (params.method == _DOT1)                                       \
+    if (params.method == _DOT1 || params.method == _DOT_POW2)         \
         _NMOD_VEC_DOT1(res, i, len, expr1, expr2, mod)                \
     else if (params.method == _DOT2_32_SPLIT)                         \
         _NMOD_VEC_DOT2_32_SPLIT(res, i, len, expr1, expr2, mod,       \

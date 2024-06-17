@@ -21,51 +21,55 @@ dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
 
     dot_params_t params = {_DOT0, UWORD(0)};
 
-    umul_ppmm(t1, t0, mod.n - 1, mod.n - 1);
-    umul_ppmm(t2, t1, t1, len);
-    umul_ppmm(u1, u0, t0, len);
-    add_ssaaaa(t2, t1, t2, t1, UWORD(0), u1);
-
-    // TODO handle power of 2 case? (do not return DOT1 directly; special flag?)
-
-    if (t2 != 0) // three limbs
+    if ((mod.n & (mod.n - 1)) == 0)
+        params.method = _DOT_POW2;
+    else
     {
-        /* we can accumulate 8 terms if n == mod.n is such that        */
-        /*      8 * (n-1)**2 < 2**(2*FLINT_BITS), this is equivalent to    */
-        /*      n <= ceil(sqrt(2**(2*FLINT_BITS-3)))                     */
-#if (FLINT_BITS == 64)
-        if (mod.n <= UWORD(6521908912666391107))
-#else
-        if (mod.n <= UWORD(1518500250))
-#endif
-            params.method = _DOT3_ACC;
-        else
-            params.method = _DOT3;
-    }
+        umul_ppmm(t1, t0, mod.n - 1, mod.n - 1);
+        umul_ppmm(t2, t1, t1, len);
+        umul_ppmm(u1, u0, t0, len);
+        add_ssaaaa(t2, t1, t2, t1, UWORD(0), u1);
 
-    else if (t1 != 0) // two limbs
-    {
-#if (FLINT_BITS == 64)
-        if (mod.n <= UWORD(1515531528) && len <= WORD(380368697)) // see end of file
+        if (t2 != 0) // three limbs
         {
-            params.method = _DOT2_32_SPLIT;
-            NMOD_RED(params.pow2_precomp, (1L << DOT_SPLIT_BITS), mod);
-        }
-        else
+            /* we can accumulate 8 terms if n == mod.n is such that        */
+            /*      8 * (n-1)**2 < 2**(2*FLINT_BITS), this is equivalent to    */
+            /*      n <= ceil(sqrt(2**(2*FLINT_BITS-3)))                     */
+#if (FLINT_BITS == 64)
+            if (mod.n <= UWORD(6521908912666391107))
+#else
+            if (mod.n <= UWORD(1518500250))
 #endif
-        if (mod.n <= (UWORD(1) << (FLINT_BITS / 2)))
-            params.method = _DOT2_HALF;
-        else
-            params.method = _DOT2;
+                params.method = _DOT3_ACC;
+            else
+                params.method = _DOT3;
+        }
+
+        else if (t1 != 0) // two limbs
+        {
+#if (FLINT_BITS == 64)
+            if (mod.n <= UWORD(1515531528) && len <= WORD(380368697))
+            {
+                // see end of file for these constraints; they imply 2 limbs
+                params.method = _DOT2_32_SPLIT;
+                NMOD_RED(params.pow2_precomp, (1L << DOT_SPLIT_BITS), mod);
+            }
+            else
+#endif
+            if (mod.n <= (UWORD(1) << (FLINT_BITS / 2)))
+                params.method = _DOT2_HALF;
+            else
+                params.method = _DOT2;
+        }
+
+        // single limb
+        else if (u0 != 0)
+            params.method = _DOT1;
+
+        // remaining case: u0 == 0
+        // <=> mod.n == 1 or len == 0
+        // => dot product is zero, _DOT0 already set
     }
-
-    // single limb
-    else if (u0 != 0)
-        params.method = _DOT1;
-
-    // remaining case: u0 == 0
-    // <=> mod.n == 1 or len == 0
-    // => dot product is zero, _DOT0 already set
 
     return params;
 }
@@ -107,6 +111,7 @@ _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_
 #else // if defined(__AVX2__)
         _NMOD_VEC_DOT1(res, i, len, vec1[i], vec2[i], mod)
 #endif // if defined(__AVX2__)
+
     else if (params.method == _DOT2_32_SPLIT)
 #if defined(__AVX2__)
     {
@@ -148,6 +153,7 @@ _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_
 #else // if defined(__AVX2__)
         _NMOD_VEC_DOT2_32_SPLIT(res, i, len, vec1[i], vec2[i], mod, params.pow2_precomp)
 #endif // if defined(__AVX2__)
+
     else if (params.method == _DOT2_HALF)
         _NMOD_VEC_DOT2_HALF(res, i, len, vec1[i], vec2[i], mod)
     else if (params.method == _DOT2)
@@ -156,6 +162,8 @@ _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_
         _NMOD_VEC_DOT3_ACC(res, i, len, vec1[i], vec2[i], mod)
     else if (params.method == _DOT3)
         _NMOD_VEC_DOT3(res, i, len, vec1[i], vec2[i], mod)
+    else if (params.method == _DOT_POW2)   // computing on single limb, but no AVX: modulus may be > 2**32
+        _NMOD_VEC_DOT1(res, i, len, vec1[i], vec2[i], mod)
 
     return res;
 }
@@ -226,6 +234,7 @@ _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_par
 #else // if defined(__AVX2__)
         _NMOD_VEC_DOT1(res, i, len, vec1[i], vec2[len-1-i], mod)
 #endif // if defined(__AVX2__)
+
     else if (params.method == _DOT2_32_SPLIT)
 #if defined(__AVX2__)
     {
@@ -268,6 +277,7 @@ _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_par
 #else // if defined(__AVX2__)
         _NMOD_VEC_DOT2_32_SPLIT(res, i, len, vec1[i], vec2[len-1-i], mod, params.pow2_precomp)
 #endif // if defined(__AVX2__)
+
     else if (params.method == _DOT2_HALF)
         _NMOD_VEC_DOT2_HALF(res, i, len, vec1[i], vec2[len-1-i], mod)
     else if (params.method == _DOT2)
@@ -276,6 +286,8 @@ _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_par
         _NMOD_VEC_DOT3_ACC(res, i, len, vec1[i], vec2[len-1-i], mod)
     else if (params.method == _DOT3)
         _NMOD_VEC_DOT3(res, i, len, vec1[i], vec2[len-1-i], mod)
+    else if (params.method == _DOT_POW2)   // computing on single limb, but no AVX: modulus may be > 2**32
+        _NMOD_VEC_DOT1(res, i, len, vec1[i], vec2[len-1-i], mod)
 
     return res;
 }

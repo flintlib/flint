@@ -77,7 +77,7 @@ _nmod_mat_addmul_transpose_op(nn_ptr * D, const nn_ptr * C, const nn_ptr * A,
     flint_free(tmp);
 }
 
-/* Assumes nlimbs = 1 <-> params.method <= _DOT1 */
+/* Assumes nlimbs = 1 */
 static void
 _nmod_mat_addmul_packed_op(nn_ptr * D, const nn_ptr * C, const nn_ptr * A,
     const nn_ptr * B, slong M, slong N, slong K, int op, nmod_t mod)
@@ -194,17 +194,11 @@ _nmod_mat_mul_classical_op(nmod_mat_t D, const nmod_mat_t C,
         || n < NMOD_MAT_MUL_TRANSPOSE_CUTOFF
         || k < NMOD_MAT_MUL_TRANSPOSE_CUTOFF)
     {
-        if ((mod.n & (mod.n - 1)) == 0)
-            params.method = _DOT1; // TODO
-
         _nmod_mat_addmul_basic_op(D->rows, (op == 0) ? NULL : C->rows,
             A->rows, B->rows, m, k, n, op, D->mod, params);
     }
     else
     {
-        if ((mod.n & (mod.n - 1)) == 0)
-            params.method = _DOT1; // TODO
-
         _nmod_mat_addmul_transpose_op(D->rows, (op == 0) ? NULL : C->rows,
             A->rows, B->rows, m, k, n, op, D->mod, params);
     }

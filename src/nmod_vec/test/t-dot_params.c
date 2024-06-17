@@ -49,7 +49,7 @@ TEST_FUNCTION_START(_nmod_vec_dot_params, state)
         flint_mpz_mul_ui(t, t, len);
         nlimbs2 = mpz_size(t);
 
-        if (nlimbs1 != nlimbs2)
+        if (params.method != _DOT_POW2 && nlimbs1 != nlimbs2)
             TEST_FUNCTION_FAIL(
                     "m = %wu\n"
                     "len = %wd\n"
@@ -57,6 +57,17 @@ TEST_FUNCTION_START(_nmod_vec_dot_params, state)
                     "nlimbs2 = %d\n"
                     "bound: %{mpz}\n",
                     m, len, nlimbs1, nlimbs2, t);
+
+        ulong pow2;
+        NMOD_RED(pow2, UWORD(1)<<DOT_SPLIT_BITS, mod);
+        if (params.method == _DOT2_32_SPLIT && params.pow2_precomp != pow2)
+            TEST_FUNCTION_FAIL(
+                    "m = %wu\n"
+                    "len = %wd\n"
+                    "pow2_precomp = %d\n"
+                    "actual pow2 = %d\n"
+                    "(method _DOT2_32_SPLIT)\n",
+                    m, len, params.pow2_precomp, pow2, t);
 
         mpz_clear(t);
     }
