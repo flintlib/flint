@@ -1150,10 +1150,10 @@ FLINT_FORCE_INLINE vec2d vec2d_reduce_0n_to_pmhn(vec2d a, vec2d n) {
 FLINT_FORCE_INLINE vec2d vec2d_reduce_pm1n_to_pmhn(vec2d a, vec2d n) {
     vec2d halfn = vec2d_half(n);
     vec2d t = vec2d_add(a, n);
-    
+
     vec2n condition_a = vcgtq_f64(a, halfn);
     vec2n condition_t = vcltq_f64(t, halfn);
-    
+
     return vbslq_f64(condition_a, vec2d_sub(a, n), vbslq_f64(condition_t, t, a));
 }
 
@@ -1509,18 +1509,18 @@ FLINT_FORCE_INLINE vec2n vec2n_sub(vec2n a, vec2n b) {
 FLINT_FORCE_INLINE vec2n vec2n_addmod(vec2n a, vec2n b, vec2n n) {
     vec2n nmb = vec2n_sub(n, b);
     vec2n sum = vec2n_sub(a, nmb);
-    
+
     vec2n mask = vcgtq_u64(nmb, a);
-    
+
     return vec2n_add(sum, vandq_u64(n, mask));
 }
 
 // (a + b) % n for n < 2^63
 FLINT_FORCE_INLINE vec2n vec2n_addmod_limited(vec2n a, vec2n b, vec2n n) {
     vec2n s = vec2n_add(a, b);
-    
+
     vec2n mask = vcgeq_u64(s, n);
-    
+
     return vec2n_sub(s, vandq_u64(n, mask));
 }
 
