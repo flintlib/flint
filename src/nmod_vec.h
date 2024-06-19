@@ -155,6 +155,7 @@ do                                                                    \
 } while(0);
 
 // _DOT2_SPLIT   (2 limbs, splitting at 56 bits, 8-unrolling)
+#if (FLINT_BITS == 64)
 #define _NMOD_VEC_DOT2_SPLIT(res, i, len, expr1, expr2, mod, pow2_precomp) \
 do                                                    \
 {                                                     \
@@ -182,6 +183,7 @@ do                                                    \
     res = pow2_precomp * dp_hi + dp_lo;               \
     NMOD_RED(res, res, mod);                          \
 } while(0);
+#endif  // FLINT_BITS == 64
 
 // _DOT2_HALF   (two limbs, modulus < 2**32)
 // mod.n is too close to 2**32 to accumulate in some ulong
@@ -326,6 +328,9 @@ do                                                                    \
     NMOD_RED3(res, t2zz, t1zz, t0zz, mod);                            \
 } while(0);
 
+
+#if (FLINT_BITS == 64)
+
 #define NMOD_VEC_DOT(res, i, len, expr1, expr2, mod, params)          \
 do                                                                    \
 {                                                                     \
@@ -345,6 +350,25 @@ do                                                                    \
         _NMOD_VEC_DOT3(res, i, len, expr1, expr2, mod)                \
 } while(0);
 
+#else  // FLINT_BITS == 64
+
+#define NMOD_VEC_DOT(res, i, len, expr1, expr2, mod, params)          \
+do                                                                    \
+{                                                                     \
+    res = UWORD(0);   /* covers _DOT0 */                              \
+    if (params.method == _DOT1 || params.method == _DOT_POW2)         \
+        _NMOD_VEC_DOT1(res, i, len, expr1, expr2, mod)                \
+    else if (params.method == _DOT2_HALF)                             \
+        _NMOD_VEC_DOT2_HALF(res, i, len, expr1, expr2, mod)           \
+    else if (params.method == _DOT2)                                  \
+        _NMOD_VEC_DOT2(res, i, len, expr1, expr2, mod)                \
+    else if (params.method == _DOT3_ACC)                              \
+        _NMOD_VEC_DOT3_ACC(res, i, len, expr1, expr2, mod)            \
+    else if (params.method == _DOT3)                                  \
+        _NMOD_VEC_DOT3(res, i, len, expr1, expr2, mod)                \
+} while(0);
+
+#endif  // FLINT_BITS == 64
 
 ulong _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_t);
 ulong _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_t);
