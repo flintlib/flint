@@ -14,7 +14,7 @@
 #include "nmod_vec.h"
 
 // currently only vectorized for AVX2
-#if defined(__AVX2__)
+#if (defined(__AVX2__) && FLINT_BITS == 64)
 #   include "machine_vectors.h"
 #endif // if defined(__AVX2__)
 
@@ -84,7 +84,7 @@ _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_
     ulong res = UWORD(0);   /* covers _DOT0 */
     slong i;
 
-#if defined(__AVX2__)
+#if (defined(__AVX2__) && FLINT_BITS == 64)
     if (params.method == _DOT1
         || (params.method == _DOT_POW2 && mod.n < (UWORD(1) << (FLINT_BITS / 2))))
     {
@@ -115,13 +115,13 @@ _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_
     }
     else if (params.method == _DOT_POW2)  // cannot use avx 32-bit mul
         _NMOD_VEC_DOT1(res, i, len, vec1[i], vec2[i], mod)
-#else // if defined(__AVX2__)
+#else // if (defined(__AVX2__) && FLINT_BITS == 64)
     if (params.method == _DOT1 || params.method == _DOT_POW2)
         _NMOD_VEC_DOT1(res, i, len, vec1[i], vec2[i], mod)
-#endif // if defined(__AVX2__)
+#endif // if (defined(__AVX2__) && FLINT_BITS == 64)
 
     else if (params.method == _DOT2_SPLIT)
-#if defined(__AVX2__)
+#if (defined(__AVX2__) && FLINT_BITS == 64)
     {
         const vec4n low_bits = vec4n_set_n(DOT_SPLIT_MASK);
         vec4n dp_lo = vec4n_zero();
@@ -158,9 +158,9 @@ _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_
 
         NMOD_RED(res, params.pow2_precomp * hsum_hi + hsum_lo, mod);
     }
-#else // if defined(__AVX2__)
+#else // if (defined(__AVX2__) && FLINT_BITS == 64)
         _NMOD_VEC_DOT2_SPLIT(res, i, len, vec1[i], vec2[i], mod, params.pow2_precomp)
-#endif // if defined(__AVX2__)
+#endif // if (defined(__AVX2__) && FLINT_BITS == 64)
 
     else if (params.method == _DOT2_HALF)
         _NMOD_VEC_DOT2_HALF(res, i, len, vec1[i], vec2[i], mod)
@@ -208,7 +208,7 @@ _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_par
     ulong res = UWORD(0);   /* covers _DOT0 */
     slong i;
 
-#if defined(__AVX2__)
+#if (defined(__AVX2__) && FLINT_BITS == 64)
     if (params.method == _DOT1
         || (params.method == _DOT_POW2 && mod.n < (UWORD(1) << (FLINT_BITS / 2))))
     {
@@ -240,13 +240,13 @@ _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_par
     }
     else if (params.method == _DOT_POW2)  // cannot use avx 32-bit mul
         _NMOD_VEC_DOT1(res, i, len, vec1[i], vec2[len-1-i], mod)
-#else // if defined(__AVX2__)
+#else // if (defined(__AVX2__) && FLINT_BITS == 64)
     if (params.method == _DOT1 || params.method == _DOT_POW2)
         _NMOD_VEC_DOT1(res, i, len, vec1[i], vec2[len-1-i], mod)
-#endif // if defined(__AVX2__)
+#endif // if (defined(__AVX2__) && FLINT_BITS == 64)
 
     else if (params.method == _DOT2_SPLIT)
-#if defined(__AVX2__)
+#if (defined(__AVX2__) && FLINT_BITS == 64)
     {
         const vec4n low_bits = vec4n_set_n(DOT_SPLIT_MASK);
         vec4n dp_lo = vec4n_zero();
@@ -284,9 +284,9 @@ _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_par
 
         NMOD_RED(res, params.pow2_precomp * hsum_hi + hsum_lo, mod);
     }
-#else // if defined(__AVX2__)
+#else // if (defined(__AVX2__) && FLINT_BITS == 64)
         _NMOD_VEC_DOT2_SPLIT(res, i, len, vec1[i], vec2[len-1-i], mod, params.pow2_precomp)
-#endif // if defined(__AVX2__)
+#endif // if (defined(__AVX2__) && FLINT_BITS == 64)
 
     else if (params.method == _DOT2_HALF)
         _NMOD_VEC_DOT2_HALF(res, i, len, vec1[i], vec2[len-1-i], mod)
