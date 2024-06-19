@@ -12,7 +12,10 @@
 
 #include "nmod.h"
 #include "nmod_vec.h"
-#include "machine_vectors.h"
+
+#if defined(__AVX2__)
+#   include "machine_vectors.h"
+#endif // if defined(__AVX2__)
 
 
 dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
@@ -51,8 +54,8 @@ dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
             if (mod.n <= UWORD(1515531528) && len <= WORD(380368697))
             {
                 // see end of file for these constraints; they imply 2 limbs
-                params.method = _DOT2_32_SPLIT;
-                NMOD_RED(params.pow2_precomp, (1L << DOT_SPLIT_BITS), mod);
+                params.method = _DOT2_SPLIT;
+                NMOD_RED(params.pow2_precomp, (UWORD(1) << DOT_SPLIT_BITS), mod);
             }
             else
 #endif
@@ -116,7 +119,7 @@ _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_
         _NMOD_VEC_DOT1(res, i, len, vec1[i], vec2[i], mod)
 #endif // if defined(__AVX2__)
 
-    else if (params.method == _DOT2_32_SPLIT)
+    else if (params.method == _DOT2_SPLIT)
 #if defined(__AVX2__)
     {
         const vec4n low_bits = vec4n_set_n(DOT_SPLIT_MASK);
@@ -155,7 +158,7 @@ _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_
         NMOD_RED(res, params.pow2_precomp * hsum_hi + hsum_lo, mod);
     }
 #else // if defined(__AVX2__)
-        _NMOD_VEC_DOT2_32_SPLIT(res, i, len, vec1[i], vec2[i], mod, params.pow2_precomp)
+        _NMOD_VEC_DOT2_SPLIT(res, i, len, vec1[i], vec2[i], mod, params.pow2_precomp)
 #endif // if defined(__AVX2__)
 
     else if (params.method == _DOT2_HALF)
@@ -241,7 +244,7 @@ _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_par
         _NMOD_VEC_DOT1(res, i, len, vec1[i], vec2[len-1-i], mod)
 #endif // if defined(__AVX2__)
 
-    else if (params.method == _DOT2_32_SPLIT)
+    else if (params.method == _DOT2_SPLIT)
 #if defined(__AVX2__)
     {
         const vec4n low_bits = vec4n_set_n(DOT_SPLIT_MASK);
@@ -281,7 +284,7 @@ _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_par
         NMOD_RED(res, params.pow2_precomp * hsum_hi + hsum_lo, mod);
     }
 #else // if defined(__AVX2__)
-        _NMOD_VEC_DOT2_32_SPLIT(res, i, len, vec1[i], vec2[len-1-i], mod, params.pow2_precomp)
+        _NMOD_VEC_DOT2_SPLIT(res, i, len, vec1[i], vec2[len-1-i], mod, params.pow2_precomp)
 #endif // if defined(__AVX2__)
 
     else if (params.method == _DOT2_HALF)
@@ -305,7 +308,7 @@ _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_par
 
 // Why no vectorization in the general NMOD_VEC_DOT macro?
 // attempts at vectorized versions (2024-06-16, for methods _DOT1,
-// _DOT2_32_SPLIT) did not show an advantage except in "regular" cases where
+// _DOT2_SPLIT) did not show an advantage except in "regular" cases where
 // memory accesses are fast (typically, expr = v[i] or expr = v[len - 1 -i]).
 // For these, there is dedicated code anyway.
 

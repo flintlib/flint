@@ -112,15 +112,18 @@ void _nmod_vec_scalar_addmul_nmod(nn_ptr res, nn_srcptr vec, slong len, ulong c,
 /* -------------------- dot product ----------------------- */
 /* more comments in nmod_vec/dot.c */
 
-#define DOT_SPLIT_BITS 56
-#define DOT_SPLIT_MASK UWORD(72057594037927935) // (1L << DOT_SPLIT_BITS) - 1
+// for _DOT2_SPLIT (currently restricted to FLINT_BITS == 64)
+#if (FLINT_BITS == 64)
+#   define DOT_SPLIT_BITS 56
+#   define DOT_SPLIT_MASK UWORD(72057594037927935) // (1L << DOT_SPLIT_BITS) - 1
+#endif // FLINT_BITS == 64
 
 typedef enum
 {
     _DOT0 = 0,           /* len == 0 || mod.n == 1 */
     _DOT_POW2 = 1,       /* modulus is a power of 2, computations performed on 1 limb */
     _DOT1 = 2,           /* 1 limb */
-    _DOT2_32_SPLIT = 3,  /* 2 limbs, modulus < ~2**30.5 (FLINT_BITS == 64 only) */
+    _DOT2_SPLIT = 3,  /* 2 limbs, modulus < ~2**30.5 (FLINT_BITS == 64 only) */
     _DOT2_HALF = 4,      /* 2 limbs, modulus < 2**(FLINT_BITS/2) */
     _DOT2 = 5,           /* 2 limbs */
     _DOT3_ACC = 6,       /* 3 limbs, modulus < 2**62.5 allowing accumulation in 2 limbs */
@@ -149,8 +152,8 @@ do                                                                    \
     NMOD_RED(res, res, mod);                                          \
 } while(0);
 
-// _DOT2_32_SPLIT   (2 limbs, splitting at 56 bits, 8-unrolling)
-#define _NMOD_VEC_DOT2_32_SPLIT(res, i, len, expr1, expr2, mod, pow2_precomp) \
+// _DOT2_SPLIT   (2 limbs, splitting at 56 bits, 8-unrolling)
+#define _NMOD_VEC_DOT2_SPLIT(res, i, len, expr1, expr2, mod, pow2_precomp) \
 do                                                    \
 {                                                     \
     ulong dp_lo = 0;                                  \
@@ -327,8 +330,8 @@ do                                                                    \
     res = UWORD(0);   /* covers _DOT0 */                              \
     if (params.method == _DOT1 || params.method == _DOT_POW2)         \
         _NMOD_VEC_DOT1(res, i, len, expr1, expr2, mod)                \
-    else if (params.method == _DOT2_32_SPLIT)                         \
-        _NMOD_VEC_DOT2_32_SPLIT(res, i, len, expr1, expr2, mod,       \
+    else if (params.method == _DOT2_SPLIT)                            \
+        _NMOD_VEC_DOT2_SPLIT(res, i, len, expr1, expr2, mod,          \
                 params.pow2_precomp)                                  \
     else if (params.method == _DOT2_HALF)                             \
         _NMOD_VEC_DOT2_HALF(res, i, len, expr1, expr2, mod)           \

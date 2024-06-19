@@ -60,13 +60,13 @@ TEST_FUNCTION_START(_nmod_vec_dot_params, state)
 
         ulong pow2;
         NMOD_RED(pow2, UWORD(1)<<DOT_SPLIT_BITS, mod);
-        if (params.method == _DOT2_32_SPLIT && params.pow2_precomp != pow2)
+        if (params.method == _DOT2_SPLIT && params.pow2_precomp != pow2)
             TEST_FUNCTION_FAIL(
                     "m = %wu\n"
                     "len = %wd\n"
                     "pow2_precomp = %d\n"
                     "actual pow2 = %d\n"
-                    "(method _DOT2_32_SPLIT)\n",
+                    "(method _DOT2_SPLIT)\n",
                     m, len, params.pow2_precomp, pow2, t);
 
         mpz_clear(t);
