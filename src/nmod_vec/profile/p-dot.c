@@ -9,15 +9,15 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <flint/ulong_extras.h>
+#include <ulong_extras.h>
 #include <stdlib.h>  // for atoi
 
-#include <flint/profiler.h>
-#include <flint/nmod.h>
-#include <flint/nmod_vec.h>
-#include <flint/nmod_mat.h>
-#include <flint/nmod_poly.h>
-#include <flint/gr_poly.h>
+#include "profiler.h"
+#include "nmod.h"
+#include "nmod_vec.h"
+#include "nmod_mat.h"
+#include "nmod_poly.h"
+#include "gr_poly.h"
 
 // utility (nmod vec uniform random)
 static inline

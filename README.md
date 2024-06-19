@@ -32,8 +32,13 @@ For FLINT's online documentation, see https://flintlib.org/doc/.
 
 This example assumes that [GMP](https://gmplib.org/), [MPFR](https://www.mpfr.org/)
 and the [GNU build system](https://www.gnu.org/software/automake/manual/html_node/GNU-Build-System.html)
-are already installed. See FLINT's documentation for further instructions
-on how to build FLINT.
+are already installed. To install them on a Ubuntu system, write
+
+    apt install libgmp-dev libmpfr-dev make autoconf libtool-bin
+
+possibly with super-user privileges.
+
+To download, bootstrap, configure and build everything, write
 
     git clone https://github.com/flintlib/flint.git && cd flint
     ./bootstrap.sh
@@ -43,6 +48,8 @@ on how to build FLINT.
     make install                       # optional
     make examples                      # optional
     cd doc && make html && cd ..       # optional: documentation
+
+See FLINT's documentation for further instructions on how to build FLINT.
 
 ## Authors
 
