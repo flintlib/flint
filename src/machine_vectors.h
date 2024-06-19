@@ -550,6 +550,15 @@ FLINT_FORCE_INLINE vec4d vec4n_convert_limited_vec4d(vec4n a) {
     return _mm256_sub_pd(_mm256_or_pd(_mm256_castsi256_pd(a), t), t);
 }
 
+// horizontal sum
+FLINT_FORCE_INLINE ulong vec4n_horizontal_sum(vec4n a) {
+    vec4n a_hi = _mm256_shuffle_epi32(a, 14);  // 14 == 0b00001110
+    vec4n sum_lo = _mm256_add_epi64(a, a_hi);
+    vec2n sum_hi = _mm256_extracti128_si256(sum_lo, 1);
+    vec2n sum = _mm_add_epi64(_mm256_castsi256_si128(sum_lo), sum_hi);
+    return (ulong) _mm_cvtsi128_si64(sum);
+}
+
 
 /* vec8d -- AVX2 ***********************************************************/
 

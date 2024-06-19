@@ -13,6 +13,7 @@
 #include "nmod.h"
 #include "nmod_vec.h"
 
+// currently only vectorized for AVX2
 #if defined(__AVX2__)
 #   include "machine_vectors.h"
 #endif // if defined(__AVX2__)
@@ -105,7 +106,7 @@ _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_
         for ( ; i + 3 < len; i += 4)
             dp = vec4n_add(dp, vec4n_mul(vec4n_load_unaligned(vec1+i), vec4n_load_unaligned(vec2+i)));
 
-        res = dp[0] + dp[1] + dp[2] + dp[3];
+        res = vec4n_horizontal_sum(dp);
 
         for (; i < len; i++)
             res += vec1[i] * vec2[i];
@@ -148,8 +149,8 @@ _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_
         dp_hi = vec4n_add(dp_hi, vec4n_bit_shift_right(dp_lo, DOT_SPLIT_BITS));
         dp_lo = vec4n_bit_and(dp_lo, low_bits);
 
-        ulong hsum_lo = dp_lo[0] + dp_lo[1] + dp_lo[2] + dp_lo[3];
-        const ulong hsum_hi = dp_hi[0] + dp_hi[1] + dp_hi[2] + dp_hi[3] + (hsum_lo >> DOT_SPLIT_BITS);
+        ulong hsum_lo = vec4n_horizontal_sum(dp_lo);
+        const ulong hsum_hi = vec4n_horizontal_sum(dp_hi) + (hsum_lo >> DOT_SPLIT_BITS);
         hsum_lo &= DOT_SPLIT_MASK;
 
         for (; i < len; i++)
@@ -230,7 +231,7 @@ _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_par
         for ( ; i + 3 < len; i += 4)
             dp = vec4n_add(dp, vec4n_mul(vec4n_load_unaligned(vec1+i), vec4n_permute_3_2_1_0(vec4n_load_unaligned(vec2+len-4-i))));
 
-        res = dp[0] + dp[1] + dp[2] + dp[3];
+        res = vec4n_horizontal_sum(dp);
 
         for (; i < len; i++)
             res += vec1[i] * vec2[len-1-i];
@@ -274,8 +275,8 @@ _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_par
         dp_hi = vec4n_add(dp_hi, vec4n_bit_shift_right(dp_lo, DOT_SPLIT_BITS));
         dp_lo = vec4n_bit_and(dp_lo, low_bits);
 
-        ulong hsum_lo = dp_lo[0] + dp_lo[1] + dp_lo[2] + dp_lo[3];
-        const ulong hsum_hi = dp_hi[0] + dp_hi[1] + dp_hi[2] + dp_hi[3] + (hsum_lo >> DOT_SPLIT_BITS);
+        ulong hsum_lo = vec4n_horizontal_sum(dp_lo);
+        const ulong hsum_hi = vec4n_horizontal_sum(dp_hi) + (hsum_lo >> DOT_SPLIT_BITS);
         hsum_lo &= DOT_SPLIT_MASK;
 
         for (; i < len; i++)
