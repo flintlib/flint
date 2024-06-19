@@ -123,7 +123,9 @@ typedef enum
     _DOT0 = 0,           /* len == 0 || mod.n == 1 */
     _DOT_POW2 = 1,       /* modulus is a power of 2, computations performed on 1 limb */
     _DOT1 = 2,           /* 1 limb */
-    _DOT2_SPLIT = 3,  /* 2 limbs, modulus < ~2**30.5 (FLINT_BITS == 64 only) */
+#if (FLINT_BITS == 64)
+    _DOT2_SPLIT = 3,     /* 2 limbs, modulus < ~2**30.5 (FLINT_BITS == 64 only) */
+#endif  // FLINT_BITS == 64
     _DOT2_HALF = 4,      /* 2 limbs, modulus < 2**(FLINT_BITS/2) */
     _DOT2 = 5,           /* 2 limbs */
     _DOT3_ACC = 6,       /* 3 limbs, modulus < 2**62.5 allowing accumulation in 2 limbs */

@@ -120,8 +120,9 @@ _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_
         _NMOD_VEC_DOT1(res, i, len, vec1[i], vec2[i], mod)
 #endif // if (defined(__AVX2__) && FLINT_BITS == 64)
 
+#if FLINT_BITS == 64
     else if (params.method == _DOT2_SPLIT)
-#if (defined(__AVX2__) && FLINT_BITS == 64)
+#if defined(__AVX2__)
     {
         const vec4n low_bits = vec4n_set_n(DOT_SPLIT_MASK);
         vec4n dp_lo = vec4n_zero();
@@ -158,9 +159,10 @@ _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_
 
         NMOD_RED(res, params.pow2_precomp * hsum_hi + hsum_lo, mod);
     }
-#else // if (defined(__AVX2__) && FLINT_BITS == 64)
+#else // if defined(__AVX2__)
         _NMOD_VEC_DOT2_SPLIT(res, i, len, vec1[i], vec2[i], mod, params.pow2_precomp)
-#endif // if (defined(__AVX2__) && FLINT_BITS == 64)
+#endif // if defined(__AVX2__)
+#endif // FLINT_BITS == 64
 
     else if (params.method == _DOT2_HALF)
         _NMOD_VEC_DOT2_HALF(res, i, len, vec1[i], vec2[i], mod)
@@ -245,8 +247,9 @@ _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_par
         _NMOD_VEC_DOT1(res, i, len, vec1[i], vec2[len-1-i], mod)
 #endif // if (defined(__AVX2__) && FLINT_BITS == 64)
 
+#if FLINT_BITS == 64
     else if (params.method == _DOT2_SPLIT)
-#if (defined(__AVX2__) && FLINT_BITS == 64)
+#if defined(__AVX2__)
     {
         const vec4n low_bits = vec4n_set_n(DOT_SPLIT_MASK);
         vec4n dp_lo = vec4n_zero();
@@ -284,9 +287,10 @@ _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_par
 
         NMOD_RED(res, params.pow2_precomp * hsum_hi + hsum_lo, mod);
     }
-#else // if (defined(__AVX2__) && FLINT_BITS == 64)
+#else // if defined(__AVX2__)
         _NMOD_VEC_DOT2_SPLIT(res, i, len, vec1[i], vec2[len-1-i], mod, params.pow2_precomp)
-#endif // if (defined(__AVX2__) && FLINT_BITS == 64)
+#endif // if defined(__AVX2__)
+#endif // FLINT_BITS == 64
 
     else if (params.method == _DOT2_HALF)
         _NMOD_VEC_DOT2_HALF(res, i, len, vec1[i], vec2[len-1-i], mod)
