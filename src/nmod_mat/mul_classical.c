@@ -171,7 +171,7 @@ _nmod_mat_mul_classical_op(nmod_mat_t D, const nmod_mat_t C,
     k = A->c;
     n = B->c;
 
-    if (k == 0)
+    if (k == 0 || mod.n == 1)  // covers params.method == _DOT0
     {
         if (op == 0)
             nmod_mat_zero(D);
@@ -182,9 +182,7 @@ _nmod_mat_mul_classical_op(nmod_mat_t D, const nmod_mat_t C,
 
     dot_params_t params = _nmod_vec_dot_params(k, mod);
 
-    // TODO cases to re-examine after dot product changes?
-    if (params.method == _DOT0)
-        return;
+    // TODO vec_dot changes --> thresholds to re-examine
     if (params.method == _DOT1 && m > 10 && k > 10 && n > 10)
     {
         _nmod_mat_addmul_packed_op(D->rows, (op == 0) ? NULL : C->rows,

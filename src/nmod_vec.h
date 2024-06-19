@@ -141,7 +141,6 @@ typedef struct
 } dot_params_t;
 
 // compute dot parameters
-int _nmod_vec_dot_bound_limbs(slong len, nmod_t mod);
 dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod);
 
 // _DOT1   (1 limb)
