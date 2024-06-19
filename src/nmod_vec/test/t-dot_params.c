@@ -58,6 +58,8 @@ TEST_FUNCTION_START(_nmod_vec_dot_params, state)
                     "bound: %{mpz}\n",
                     m, len, nlimbs1, nlimbs2, t);
 
+// DOT_SPLIT only defined for 64-bit config
+#if (FLINT_BITS == 64)
         ulong pow2;
         NMOD_RED(pow2, UWORD(1)<<DOT_SPLIT_BITS, mod);
         if (params.method == _DOT2_SPLIT && params.pow2_precomp != pow2)
@@ -68,6 +70,7 @@ TEST_FUNCTION_START(_nmod_vec_dot_params, state)
                     "actual pow2 = %d\n"
                     "(method _DOT2_SPLIT)\n",
                     m, len, params.pow2_precomp, pow2, t);
+#endif  // FLINT_BITS == 64
 
         mpz_clear(t);
     }
