@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -22,8 +22,7 @@ fmpz_mat_can_solve_multi_mod_den(fmpz_mat_t X, fmpz_t den,
 
     if (A->r != B->r || A->c != X->r || X->c != B->c)
     {
-        flint_printf("Exception (fmpz_mat_can_solve_multi_mod_den). Incompatible matrix dimensions.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mat_can_solve_multi_mod_den). Incompatible matrix dimensions.\n");
     }
 
     fmpq_mat_init(Q, fmpz_mat_nrows(X), fmpz_mat_ncols(X));
@@ -35,4 +34,3 @@ fmpz_mat_can_solve_multi_mod_den(fmpz_mat_t X, fmpz_t den,
     fmpq_mat_clear(Q);
     return success;
 }
-

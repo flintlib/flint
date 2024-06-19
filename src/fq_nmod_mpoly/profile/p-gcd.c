@@ -5,13 +5,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_nmod_mpoly.h"
 #include "profiler.h"
-
+#include "mpoly.h"
+#include "fq_nmod_mpoly.h"
 
 slong count = 0;
 slong total_super = 0;
@@ -117,7 +117,7 @@ void profile_gcd(
 }
 
 
-void print_banner()
+void print_banner(void)
 {
     flint_printf("|    brown |   hensel |  zippel2 |   zippel |    super |\n");
     flint_printf("+----------+----------+----------+----------+----------+\n");
@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
 {
     slong i;
     const char * vars[] = {"x", "y", "z", "t" ,"u", "v", "w", "s", "p"};
-    mp_limb_t p = UWORD(4611686018427388073);
+    ulong p = UWORD(4611686018427388073);
 
     print_banner();
     for (i = 50; i < 100; i += 4)
@@ -294,4 +294,3 @@ flint_printf("--------------------\ntotal time: %wd\n", total_super);
     flint_cleanup_master();
     return 0;
 }
-

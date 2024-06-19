@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -16,11 +16,11 @@ void
 fmpz_poly_mulhigh_n(fmpz_poly_t res,
                     const fmpz_poly_t poly1, const fmpz_poly_t poly2, slong n)
 {
-    mp_size_t limbs1 = _fmpz_vec_max_limbs(poly1->coeffs, poly1->length);
-    mp_size_t limbs2 = _fmpz_vec_max_limbs(poly2->coeffs, poly2->length);
-    mp_size_t len1 = poly1->length;
-    mp_size_t len2 = poly2->length;
-    mp_size_t limbsx = FLINT_MAX(limbs1, limbs2);
+    slong limbs1 = _fmpz_vec_max_limbs(poly1->coeffs, poly1->length);
+    slong limbs2 = _fmpz_vec_max_limbs(poly2->coeffs, poly2->length);
+    slong len1 = poly1->length;
+    slong len2 = poly2->length;
+    slong limbsx = FLINT_MAX(limbs1, limbs2);
 
     if (n == 0)
     {

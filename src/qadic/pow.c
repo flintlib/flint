@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -113,8 +113,7 @@ void qadic_pow(qadic_t x, const qadic_t y, const fmpz_t e, const qadic_ctx_t ctx
 
     if (fmpz_sgn(e) < 0)
     {
-        flint_printf("Exception (qadic_pow).  e < 0.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (qadic_pow).  e < 0.\n");
     }
 
     if (fmpz_is_zero(e))
@@ -181,4 +180,3 @@ void qadic_pow(qadic_t x, const qadic_t y, const fmpz_t e, const qadic_ctx_t ctx
         fmpz_clear(val);
     }
 }
-

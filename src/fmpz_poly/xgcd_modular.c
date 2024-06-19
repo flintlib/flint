@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -21,10 +21,10 @@ void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
                              const fmpz * poly1, slong len1,
                              const fmpz * poly2, slong len2)
 {
-    mp_ptr G, S, T, A, B, T1, T2;
+    nn_ptr G, S, T, A, B, T1, T2;
     fmpz_t prod;
     int stabilised = 0, first;
-    mp_limb_t p;
+    ulong p;
     flint_bitcnt_t s_bits = 0, t_bits = 0;
 
     /* Compute resultant of input polys */
@@ -55,7 +55,7 @@ void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
 
     for (;;)
     {
-        mp_limb_t R;
+        ulong R;
         nmod_t mod;
 
         /* Get next prime */
@@ -97,7 +97,7 @@ void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
 
         if (!stabilised) /* Need to keep computing xgcds mod p */
         {
-            mp_limb_t RGinv;
+            ulong RGinv;
 
             /* Compute xgcd mod p */
             _nmod_poly_xgcd(G, S, T, A, len1, B, len2, mod);
@@ -138,7 +138,7 @@ void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
 
         if (stabilised)
         {
-            slong bound1, bound2, bound;
+            ulong bound1, bound2, bound;
 
             bound1 = FLINT_BIT_COUNT(len2)
                     + FLINT_ABS(_fmpz_vec_max_bits(poly1, len1))
@@ -223,4 +223,3 @@ fmpz_poly_xgcd_modular(fmpz_t r, fmpz_poly_t s, fmpz_poly_t t,
         }
     }
 }
-

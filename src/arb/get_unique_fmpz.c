@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -68,8 +68,7 @@ arb_get_unique_fmpz(fmpz_t z, const arb_t x)
 
             if (COEFF_IS_MPZ(*exp))
             {
-                flint_printf("arb_get_unique_fmpz: input too large\n");
-                flint_abort();
+                flint_throw(FLINT_ERROR, "arb_get_unique_fmpz: input too large\n");
             }
 
             if (*exp >= 0)
@@ -100,4 +99,3 @@ arb_get_unique_fmpz(fmpz_t z, const arb_t x)
         return res;
     }
 }
-

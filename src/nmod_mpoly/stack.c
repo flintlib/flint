@@ -5,11 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "nmod_poly.h"
+#include "n_poly.h"
 #include "nmod_mpoly.h"
 
 void nmod_poly_stack_init(nmod_poly_stack_t S, flint_bitcnt_t bits, const nmod_mpoly_ctx_t ctx)
@@ -183,4 +184,3 @@ nmod_mpolyn_struct ** nmod_poly_stack_fit_request_mpolyn(nmod_poly_stack_t S, sl
 
     return S->mpolyn_array + S->mpolyn_top;
 }
-

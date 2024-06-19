@@ -5,11 +5,10 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "fft.h"
 
 void ifft_negacyclic(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w,
@@ -69,4 +68,3 @@ void ifft_negacyclic(mp_limb_t ** ii, mp_size_t n, flint_bitcnt_t w,
        }
    }
 }
-

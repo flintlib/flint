@@ -5,13 +5,16 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
+#include "fq_nmod.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 #include "nmod_mpoly_factor.h"
-#include "fq_nmod_mpoly.h"
 #include "fq_nmod_mpoly_factor.h"
 
 /*
@@ -28,7 +31,7 @@ void _nmod_mpoly_monomial_evals_cache(
     const ulong * Aexps,
     flint_bitcnt_t Abits,
     slong Alen,
-    const mp_limb_t * betas,
+    const ulong * betas,
     slong start,
     slong stop,
     const mpoly_ctx_t mctx,
@@ -39,7 +42,7 @@ void _nmod_mpoly_monomial_evals_cache(
     slong N = mpoly_words_per_exp_sp(Abits, mctx);
     slong * off, * shift;
     n_poly_struct * caches;
-    mp_limb_t * c;
+    ulong * c;
     slong num = stop - start;
 
     FLINT_ASSERT(Abits <= FLINT_BITS);
@@ -101,7 +104,7 @@ void _nmod_mpoly_monomial_evals2_cache(
     const ulong * Aexps,
     flint_bitcnt_t Abits,
     slong Alen,
-    const mp_limb_t * betas,
+    const ulong * betas,
     slong m,
     const mpoly_ctx_t mctx,
     nmod_t mod)
@@ -112,7 +115,7 @@ void _nmod_mpoly_monomial_evals2_cache(
     slong N = mpoly_words_per_exp_sp(Abits, mctx);
     slong * off, * shift;
     n_poly_struct * caches;
-    mp_limb_t * c;
+    ulong * c;
 
     FLINT_ASSERT(Abits <= FLINT_BITS);
     FLINT_ASSERT(Alen > 0);
@@ -199,7 +202,7 @@ void _nmod_mpoly_monomial_evals2_cache(
     flint_free(caches);
     flint_free(off);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     Ai = 0;
     for (i = 0; i < E->length; i++)
         Ai += E->coeffs[i].length;
@@ -348,7 +351,7 @@ int nmod_mpoly_gcd_get_use_new(
     return use;
 }
 
-mp_limb_t n_poly_mod_eval_step_sep(
+ulong n_poly_mod_eval_step_sep(
     n_poly_t cur,
     const n_poly_t inc,
     const nmod_mpoly_t A,
@@ -360,7 +363,7 @@ mp_limb_t n_poly_mod_eval_step_sep(
 }
 
 static void n_fq_poly_eval_step_sep(
-    mp_limb_t * res,
+    ulong * res,
     n_fq_poly_t cur,
     const n_fq_poly_t inc,
     const fq_nmod_mpoly_t A,
@@ -371,7 +374,7 @@ static void n_fq_poly_eval_step_sep(
     _n_fq_zip_eval_step(res, cur->coeffs, inc->coeffs, A->coeffs, A->length, ctx);
 }
 
-void static n_bpoly_mod_eval_step_sep(
+static void n_bpoly_mod_eval_step_sep(
     n_bpoly_t E,
     n_polyun_t cur,
     const n_polyun_t inc,
@@ -380,7 +383,7 @@ void static n_bpoly_mod_eval_step_sep(
 {
     slong i, Ai;
     slong e0, e1;
-    mp_limb_t c;
+    ulong c;
 
     n_bpoly_zero(E);
 
@@ -409,7 +412,7 @@ void static n_bpoly_mod_eval_step_sep(
 static void nmod_mpoly_monomial_evals(
     n_poly_t E,
     const nmod_mpoly_t A,
-    const mp_limb_t * betas,
+    const ulong * betas,
     slong start,
     slong stop,
     const nmod_mpoly_ctx_t ctx)
@@ -433,7 +436,7 @@ static void fq_nmod_mpoly_monomial_evals(
 static void nmod_mpoly_monomial_evals2(
     n_polyun_t E,
     const nmod_mpoly_t A,
-    const mp_limb_t * betas,
+    const ulong * betas,
     slong m,
     const nmod_mpoly_ctx_t ctx)
 {
@@ -496,13 +499,13 @@ int nmod_mpolyl_gcd_zippel_smprime(
     slong i, m;
     slong nvars = ctx->minfo->nvars;
     flint_bitcnt_t bits = A->bits;
-    mp_limb_t * alphas, * betas;
+    ulong * alphas, * betas;
     flint_rand_t state;
     nmod_mpoly_t cont;
     nmod_mpoly_t T, G, Abar, Bbar;
     n_polyun_t HG, HAbar, HBbar, MG, MAbar, MBbar, ZG, ZAbar, ZBbar;
     n_bpoly_t Aev, Bev, Gev, Abarev, Bbarev;
-    mp_limb_t gammaev;
+    ulong gammaev;
     nmod_mpolyn_t Tn, Gn, Abarn, Bbarn;
     slong lastdeg;
     slong cur_zip_image, req_zip_images, this_length;
@@ -512,7 +515,7 @@ int nmod_mpolyl_gcd_zippel_smprime(
     nmod_mpoly_struct * Aevals, * Bevals;
     nmod_mpoly_struct * gammaevals;
     n_poly_bpoly_stack_t St;
-    mp_limb_t c, start_alpha;
+    ulong c, start_alpha;
     ulong GdegboundXY, newdegXY, Abideg, Bbideg;
     slong degxAB, degyAB;
 
@@ -528,7 +531,7 @@ int nmod_mpolyl_gcd_zippel_smprime(
     nmod_mpoly_fit_length_reset_bits(rAbar, 1, bits, ctx);
     nmod_mpoly_fit_length_reset_bits(rBbar, 1, bits, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         slong * tmp_degs = FLINT_ARRAY_ALLOC(nvars, slong);
 
@@ -588,9 +591,9 @@ int nmod_mpolyl_gcd_zippel_smprime(
     n_poly_stack_init(St->poly_stack);
     n_bpoly_stack_init(St->bpoly_stack);
 
-    betas = FLINT_ARRAY_ALLOC(nvars, mp_limb_t);
-    alphas = FLINT_ARRAY_ALLOC(nvars, mp_limb_t);
-    flint_randinit(state);
+    betas = FLINT_ARRAY_ALLOC(nvars, ulong);
+    alphas = FLINT_ARRAY_ALLOC(nvars, ulong);
+    flint_rand_init(state);
 
     Aevals = FLINT_ARRAY_ALLOC(nvars + 1, nmod_mpoly_struct);
     Bevals = FLINT_ARRAY_ALLOC(nvars + 1, nmod_mpoly_struct);
@@ -1152,7 +1155,7 @@ cleanup:
 
     flint_free(betas);
     flint_free(alphas);
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     for (i = 0; i < nvars; i++)
     {
@@ -1206,7 +1209,7 @@ int nmod_mpolyl_gcd_zippel_lgprime(
     fq_nmod_mpolyn_t qTn, qGn, qAbarn, qBbarn;
     n_fq_polyun_t HG, HAbar, HBbar, MG, MAbar, MBbar, ZG, ZAbar, ZBbar;
     n_fq_bpoly_t Aev, Bev, Gev, Abarev, Bbarev;
-    const mp_limb_t * gammaev;
+    const ulong * gammaev;
     slong lastdeg;
     slong cur_zip_image, req_zip_images, this_length;
     n_polyun_t Aeh_cur, Aeh_inc, Beh_cur, Beh_inc;
@@ -1236,7 +1239,7 @@ int nmod_mpolyl_gcd_zippel_lgprime(
     nmod_mpoly_fit_length_reset_bits(rAbar, 1, bits, smctx);
     nmod_mpoly_fit_length_reset_bits(rBbar, 1, bits, smctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         slong * tmp_degs = FLINT_ARRAY_ALLOC(nvars, slong);
 
@@ -1259,7 +1262,7 @@ int nmod_mpolyl_gcd_zippel_lgprime(
     FLINT_ASSERT(gammadegs[0] == 0);
     FLINT_ASSERT(gammadegs[1] == 0);
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     lgd = WORD(20)/(FLINT_BIT_COUNT(smctx->mod.n));
     lgd = FLINT_MAX(WORD(2), lgd);
@@ -2169,7 +2172,7 @@ cleanup:
         fq_nmod_clear(betas + i, lgctx->fqctx);
     }
     flint_free(alphas);
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     for (i = 0; i < nvars; i++)
     {
@@ -2213,4 +2216,3 @@ int nmod_mpoly_gcd_zippel2(
 
     return _nmod_mpoly_gcd_algo(G, NULL, NULL, A, B, ctx, MPOLY_GCD_USE_ZIPPEL2);
 }
-

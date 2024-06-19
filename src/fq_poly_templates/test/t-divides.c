@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -20,21 +20,21 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_divides, state)
     int i, result;
 
     /* Check that b divides a b and that the quotient is a */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, ctx_t) ctx;
 
         TEMPLATE(T, poly_t) a, b, c, q;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
         TEMPLATE(T, poly_init) (c, ctx);
         TEMPLATE(T, poly_init) (q, ctx);
 
-        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 50), ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 30), ctx);
         TEMPLATE(T, poly_randtest_not_zero) (b, state,
-                                             n_randint(state, 50) + 1, ctx);
+                                             n_randint(state, 30) + 1, ctx);
         TEMPLATE(T, poly_mul) (c, a, b, ctx);
 
         result = TEMPLATE(T, poly_divides) (q, c, b, ctx)
@@ -69,14 +69,14 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_divides, state)
 
         TEMPLATE(T, poly_t) a, b, c;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
         TEMPLATE(T, poly_init) (c, ctx);
 
-        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 50), ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 20), ctx);
         TEMPLATE(T, poly_randtest_not_zero) (b, state,
-                                             n_randint(state, 50) + 1, ctx);
+                                             n_randint(state, 20) + 1, ctx);
         TEMPLATE(T, poly_mul) (c, a, b, ctx);
 
         result = TEMPLATE(T, poly_divides) (c, c, b, ctx)
@@ -108,14 +108,14 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_divides, state)
 
         TEMPLATE(T, poly_t) a, b, c;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         TEMPLATE(T, poly_init) (a, ctx);
         TEMPLATE(T, poly_init) (b, ctx);
         TEMPLATE(T, poly_init) (c, ctx);
 
-        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 50), ctx);
+        TEMPLATE(T, poly_randtest) (a, state, n_randint(state, 20), ctx);
         TEMPLATE(T, poly_randtest_not_zero) (b, state,
-                                             n_randint(state, 50) + 1, ctx);
+                                             n_randint(state, 20) + 1, ctx);
         TEMPLATE(T, poly_mul) (c, a, b, ctx);
 
         result = TEMPLATE(T, poly_divides) (b, c, b, ctx)

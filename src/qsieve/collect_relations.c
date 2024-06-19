@@ -7,10 +7,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "thread_pool.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "qsieve.h"
@@ -31,7 +32,7 @@ void qsieve_do_sieving(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly)
    int * soln1 = poly->soln1;
    int * soln2 = poly->soln2;
    prime_t * factor_base = qs_inf->factor_base;
-   mp_limb_t p;
+   ulong p;
 
    unsigned char * end = sieve + qs_inf->sieve_size;
    register unsigned char * pos1;
@@ -91,7 +92,7 @@ void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly)
 {
     slong b, d1, d2, i;
     slong pind, size;
-    mp_limb_t p;
+    ulong p;
     slong num_primes = qs_inf->num_primes;
     int * soln1 = poly->soln1;
     int * soln2 = poly->soln2;
@@ -209,15 +210,15 @@ void qsieve_do_sieving2(qs_t qs_inf, unsigned char * sieve, qs_poly_t poly)
 slong qsieve_evaluate_candidate(qs_t qs_inf, ulong i, unsigned char * sieve, qs_poly_t poly)
 {
    slong bits, exp, extra_bits;
-   mp_limb_t modp, prime;
+   ulong modp, prime;
    slong num_primes = qs_inf->num_primes;
    prime_t * factor_base = qs_inf->factor_base;
    slong * small = poly->small; /* exponents of small primes and mult. */
    fac_t * factor = poly->factor;
    int * soln1 = poly->soln1;
    int * soln2 = poly->soln2;
-   mp_limb_t * A_ind = qs_inf->A_ind;
-   mp_limb_t pinv;
+   ulong * A_ind = qs_inf->A_ind;
+   ulong pinv;
    slong num_factors = 0;
    slong relations = 0;
    slong j, k;

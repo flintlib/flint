@@ -6,10 +6,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpn_extras.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
@@ -45,7 +46,7 @@ __fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R,
             p1 = (fmpz *) flint_malloc((lenA - n1) * sizeof(fmpz));
             {
                 slong i;
-                flint_mpn_zero((mp_ptr) p1, n2 - 1);
+                flint_mpn_zero((nn_ptr) p1, n2 - 1);
                 for (i = n2 - 1; i < lenA - n1; i++)
                     p1[i] = (A + n1)[i];
             }
@@ -121,7 +122,7 @@ __fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R,
             p1 = (fmpz *) flint_malloc((2 * lenB - 1) * sizeof(fmpz));
             {
                 slong i;
-                flint_mpn_zero((mp_ptr) p1, lenB - 1);
+                flint_mpn_zero((nn_ptr) p1, lenB - 1);
                 for (i = lenB - 1; i < 2*lenB - 1; i++)
                     p1[i] = (A + shift)[i];
             }
@@ -190,7 +191,7 @@ __fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R,
             p1 = (fmpz *) flint_malloc((lenA - 2 * n2) * sizeof(fmpz));
             {
                 slong i;
-                flint_mpn_zero((mp_ptr) p1, n1 - 1);
+                flint_mpn_zero((nn_ptr) p1, n1 - 1);
                 for (i = n1 - 1; i < lenA - 2 * n2; i++)
                     p1[i] = (A + 2 * n2)[i];
             }
@@ -288,14 +289,12 @@ fmpz_poly_pseudo_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R,
 
     if (B->length == 0)
     {
-        flint_printf("Exception (fmpz_poly_pseudo_divrem_divconquer). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(fmpz_poly_pseudo_divrem_divconquer): Division by zero.\n");
     }
     if (Q == R)
     {
-        flint_printf("Exception (fmpz_poly_pseudo_divrem_divconquer). \n"
+        flint_throw(FLINT_ERROR, "(fmpz_poly_pseudo_divrem_divconquer): "
                "Output arguments Q and R may not be aliased.\n");
-        flint_abort();
     }
     if (A->length < B->length)
     {
@@ -347,4 +346,3 @@ fmpz_poly_pseudo_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R,
     else
         _fmpz_poly_set_length(R, lenr);
 }
-

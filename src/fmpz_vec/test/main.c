@@ -5,18 +5,18 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
-#include <stdlib.h>
+#include <gmp.h>
 
 /* Include functions *********************************************************/
 
 #include "t-add.c"
 #include "t-content.c"
 #include "t-dot.c"
+#include "t-dot_general.c"
 #include "t-get_d_vec_2exp.c"
 #include "t-get_set_fft.c"
 #include "t-get_set_nmod_vec.c"
@@ -61,6 +61,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_vec_add),
     TEST_FUNCTION(fmpz_vec_content),
     TEST_FUNCTION(fmpz_vec_dot),
+    TEST_FUNCTION(fmpz_vec_dot_general),
     TEST_FUNCTION(fmpz_vec_get_d_vec_2exp),
     TEST_FUNCTION(fmpz_vec_get_set_fft),
     TEST_FUNCTION(fmpz_vec_get_set_nmod_vec),

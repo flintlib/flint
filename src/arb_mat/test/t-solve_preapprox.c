@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -211,6 +211,7 @@ TEST_FUNCTION_START(arb_mat_solve_preapprox, state)
                 flint_printf("B = \n"); arb_mat_printd(B, 15); flint_printf("\n\n");
                 flint_printf("T = \n"); arb_mat_printd(T, 15); flint_printf("\n\n");
                 flint_printf("X = \n"); arb_mat_printd(X, 15); flint_printf("\n\n");
+                flint_abort();
             }
         }
 
@@ -228,6 +229,7 @@ TEST_FUNCTION_START(arb_mat_solve_preapprox, state)
                 flint_printf("FAIL (special values A = R = I, T = B))\n");
                 flint_printf("B = \n"); arb_mat_printd(B, 15); flint_printf("\n\n");
                 flint_printf("X = \n"); arb_mat_printd(X, 15); flint_printf("\n\n");
+                flint_abort();
             }
         }
 

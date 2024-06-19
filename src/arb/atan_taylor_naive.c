@@ -5,19 +5,20 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "arb.h"
+#include "mpn_extras.h"
 
 void
-_arb_atan_taylor_naive(mp_ptr y, mp_limb_t * error,
-    mp_srcptr x, mp_size_t xn, ulong N, int alternating)
+_arb_atan_taylor_naive(nn_ptr y, ulong * error,
+    nn_srcptr x, slong xn, ulong N, int alternating)
 {
     ulong k;
-    mp_ptr s, t, x1, x2, u;
-    mp_size_t nn = xn + 1;
+    nn_ptr s, t, x1, x2, u;
+    slong nn = xn + 1;
 
     if (N == 0)
     {
@@ -32,11 +33,11 @@ _arb_atan_taylor_naive(mp_ptr y, mp_limb_t * error,
         error[0] = 0;
     }
 
-    s = flint_malloc(sizeof(mp_limb_t) * nn);
-    t = flint_malloc(sizeof(mp_limb_t) * nn);
-    u = flint_malloc(sizeof(mp_limb_t) * 2 * nn);
-    x1 = flint_malloc(sizeof(mp_limb_t) * nn);
-    x2 = flint_malloc(sizeof(mp_limb_t) * nn);
+    s = flint_malloc(sizeof(ulong) * nn);
+    t = flint_malloc(sizeof(ulong) * nn);
+    u = flint_malloc(sizeof(ulong) * 2 * nn);
+    x1 = flint_malloc(sizeof(ulong) * nn);
+    x2 = flint_malloc(sizeof(ulong) * nn);
 
     flint_mpn_zero(s, nn);
     flint_mpn_zero(t, nn);
@@ -48,7 +49,7 @@ _arb_atan_taylor_naive(mp_ptr y, mp_limb_t * error,
     flint_mpn_copyi(x1 + 1, x, xn);
 
     /* x2 = x * x */
-    mpn_mul_n(u, x1, x1, nn);
+    flint_mpn_mul_n(u, x1, x1, nn);
     flint_mpn_copyi(x2, u + nn, nn);
 
     /* s = t = x */
@@ -58,7 +59,7 @@ _arb_atan_taylor_naive(mp_ptr y, mp_limb_t * error,
     for (k = 1; k < N; k++)
     {
         /* t = t * x2 */
-        mpn_mul_n(u, t, x2, nn);
+        flint_mpn_mul_n(u, t, x2, nn);
         flint_mpn_copyi(t, u + nn, nn);
 
         /* u = t / (2k+1) */
@@ -79,4 +80,3 @@ _arb_atan_taylor_naive(mp_ptr y, mp_limb_t * error,
     flint_free(x1);
     flint_free(x2);
 }
-

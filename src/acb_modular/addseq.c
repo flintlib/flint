@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -134,8 +134,7 @@ acb_modular_addseq_theta(slong * exponents, slong * aindex, slong * bindex, slon
             if (write_as_2a_b(aindex + i, bindex + i, c, exponents, i))
                 continue;
 
-            flint_printf("i = %wd, c = %wu: bad addition sequence!\n", i, c);
-            flint_abort();
+            flint_throw(FLINT_ERROR, "i = %wd, c = %wu: bad addition sequence!\n", i, c);
         }
     }
 }
@@ -170,9 +169,7 @@ acb_modular_addseq_eta(slong * exponents, slong * aindex, slong * bindex, slong 
             if (write_as_2a_b(aindex + i, bindex + i, c, exponents, i))
                 continue;
 
-            flint_printf("i = %wd, c = %wu: bad addition sequence!\n", i, c);
-            flint_abort();
+            flint_throw(FLINT_ERROR, "i = %wd, c = %wu: bad addition sequence!\n", i, c);
         }
     }
 }
-

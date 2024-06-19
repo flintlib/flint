@@ -5,13 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "nmod_mat.h"
+#include "nmod_poly.h"
 #include "nmod_poly_mat.h"
 
 void
@@ -23,10 +24,10 @@ nmod_poly_mat_mul_interpolate(nmod_poly_mat_t C, const nmod_poly_mat_t A,
 
     nmod_mat_t *C_mod, *A_mod, *B_mod;
 
-    mp_ptr xs;
-    mp_ptr tt, uu;
-    mp_ptr * tree;
-    mp_ptr weights;
+    nn_ptr xs;
+    nn_ptr tt, uu;
+    nn_ptr * tree;
+    nn_ptr weights;
     nmod_t mod;
 
     if (B->r == 0)
@@ -47,11 +48,9 @@ nmod_poly_mat_mul_interpolate(nmod_poly_mat_t C, const nmod_poly_mat_t A,
     len = A_len + B_len - 1;
     nmod_init(&mod, nmod_poly_mat_modulus(A));
 
-    if (mod.n < len)
+    if (mod.n < (ulong) len)
     {
-        flint_printf("Exception (nmod_poly_mat_mul_interpolate). \n"
-               "Characteristic is too small.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(nmod_poly_mat_mul_interpolate): Characteristic is too small.\n");
     }
 
     xs = _nmod_vec_init(len);

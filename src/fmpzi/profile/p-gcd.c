@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -56,11 +56,10 @@ double profile_it(ulong a_bits, ulong b_bits, ulong g_bits, flint_rand_t state)
 
 int main(void)
 {
-    ulong i;
     ulong a_bits, b_bits, g_bits;
     flint_rand_t state;
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     for (a_bits = 100000; a_bits < 10000000; a_bits += 1 + a_bits/2)
     for (b_bits = a_bits; b_bits < 10000000; b_bits += 1 + b_bits/2)
@@ -75,7 +74,7 @@ int main(void)
         flint_printf("\n");
     }
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     return 0;
 }

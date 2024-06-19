@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -16,7 +16,7 @@ void
 bool_mat_randtest(bool_mat_t mat, flint_rand_t state)
 {
     slong i, j;
-    mp_limb_t density;
+    ulong density;
 
     density = n_randint(state, 101);
     for (i = 0; i < bool_mat_nrows(mat); i++)
@@ -46,16 +46,14 @@ bool_mat_randtest_nilpotent(bool_mat_t mat, flint_rand_t state)
 
     if (!bool_mat_is_square(mat))
     {
-        flint_printf("bool_mat_randtest_nilpotent: "
+        flint_throw(FLINT_ERROR, "bool_mat_randtest_nilpotent: "
                      "a square matrix is required!\n");
-        flint_abort();
     }
 
     if (bool_mat_is_empty(mat))
     {
-        flint_printf("bool_mat_randtest_nilpotent: "
+        flint_throw(FLINT_ERROR, "bool_mat_randtest_nilpotent: "
                      "a non-empty matrix is required!\n");
-        flint_abort();
     }
 
     n = bool_mat_nrows(mat);

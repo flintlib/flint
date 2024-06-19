@@ -1,12 +1,13 @@
 /*
     Copyright (C) 2013 Martin Lee
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -108,16 +109,12 @@ TEMPLATE(T, poly_powmod_x_fmpz_preinv) (TEMPLATE(T, poly_t) res,
 
     if (lenf == 0)
     {
-        TEMPLATE_PRINTF("Exception: %s_poly_powmod_x_preinv:", T);
-        flint_printf(" divide by zero\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception: " TEMPLATE_STR(T) "_poly_powmod_x_preinv: divide by zero\n");
     }
 
     if (fmpz_sgn(e) < 0)
     {
-        TEMPLATE_PRINTF("Exception: %s_poly_powmod_x_preinv: ", T);
-        flint_printf(" negative exp not implemented\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception: " TEMPLATE_STR(T) "_poly_powmod_x_preinv: negative exp not implemented\n");
     }
 
     if (lenf == 1)
@@ -141,37 +138,32 @@ TEMPLATE(T, poly_powmod_x_fmpz_preinv) (TEMPLATE(T, poly_t) res,
         return;
     }
 
-    if (fmpz_abs_fits_ui(e))
+    if (*e <= WORD(2)) /* NOTE: This check works */
     {
-        ulong exp = fmpz_get_ui(e);
-
-        if (exp <= 2)
+        if (*e == WORD(0))
         {
-            if (exp == UWORD(0))
-            {
-                TEMPLATE(T, poly_fit_length) (res, 1, ctx);
-                TEMPLATE(T, one) (res->coeffs, ctx);
-                _TEMPLATE(T, poly_set_length) (res, 1, ctx);
-            }
-            else if (exp == UWORD(1))
-            {
-                TEMPLATE(T, poly_t) r;
-                TEMPLATE(T, poly_init2) (r, 2, ctx);
-                TEMPLATE(T, poly_gen) (r, ctx);
-                TEMPLATE(T, poly_init) (tmp, ctx);
-                TEMPLATE(T, poly_divrem) (tmp, res, r, f, ctx);
-                TEMPLATE(T, poly_clear) (tmp, ctx);
-                TEMPLATE(T, poly_clear) (r, ctx);
-            }
-            else
-            {
-                TEMPLATE(T, poly_init2) (tmp, 3, ctx);
-                TEMPLATE(T, poly_gen) (tmp, ctx);
-                TEMPLATE(T, poly_mulmod) (res, tmp, tmp, f, ctx);
-                TEMPLATE(T, poly_clear) (tmp, ctx);
-            }
-            return;
+            TEMPLATE(T, poly_fit_length) (res, 1, ctx);
+            TEMPLATE(T, one) (res->coeffs, ctx);
+            _TEMPLATE(T, poly_set_length) (res, 1, ctx);
         }
+        else if (*e == WORD(1))
+        {
+            TEMPLATE(T, poly_t) r;
+            TEMPLATE(T, poly_init2) (r, 2, ctx);
+            TEMPLATE(T, poly_gen) (r, ctx);
+            TEMPLATE(T, poly_init) (tmp, ctx);
+            TEMPLATE(T, poly_divrem) (tmp, res, r, f, ctx);
+            TEMPLATE(T, poly_clear) (tmp, ctx);
+            TEMPLATE(T, poly_clear) (r, ctx);
+        }
+        else
+        {
+            TEMPLATE(T, poly_init2) (tmp, 3, ctx);
+            TEMPLATE(T, poly_gen) (tmp, ctx);
+            TEMPLATE(T, poly_mulmod) (res, tmp, tmp, f, ctx);
+            TEMPLATE(T, poly_clear) (tmp, ctx);
+        }
+        return;
     }
 
     if ((res == f) || (res == finv))

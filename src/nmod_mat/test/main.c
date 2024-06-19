@@ -5,17 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
-
-#include <string.h>
-#include <stdlib.h>
 
 /* Include functions *********************************************************/
 
 #include "t-add.c"
-#include "t-addmul.c"
+#include "t-addmul_submul.c"
 #include "t-can_solve.c"
 #include "t-charpoly_berkowitz.c"
 #include "t-charpoly.c"
@@ -54,7 +51,6 @@
 #include "t-solve_triu_classical.c"
 #include "t-solve_triu_recursive.c"
 #include "t-solve_vec.c"
-#include "t-submul.c"
 #include "t-trace.c"
 #include "t-transpose.c"
 #include "t-window_init_clear.c"
@@ -64,7 +60,7 @@
 test_struct tests[] =
 {
     TEST_FUNCTION(nmod_mat_add),
-    TEST_FUNCTION(nmod_mat_addmul),
+    TEST_FUNCTION(nmod_mat_addmul_submul),
     TEST_FUNCTION(nmod_mat_can_solve),
     TEST_FUNCTION(nmod_mat_charpoly_berkowitz),
     TEST_FUNCTION(nmod_mat_charpoly),
@@ -103,7 +99,6 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_mat_solve_triu_classical),
     TEST_FUNCTION(nmod_mat_solve_triu_recursive),
     TEST_FUNCTION(nmod_mat_solve_vec),
-    TEST_FUNCTION(nmod_mat_submul),
     TEST_FUNCTION(nmod_mat_trace),
     TEST_FUNCTION(nmod_mat_transpose),
     TEST_FUNCTION(nmod_mat_window_init_clear)

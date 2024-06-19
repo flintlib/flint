@@ -5,13 +5,15 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "arb_mat.h"
+#include "acb.h"
 #include "acb_mat.h"
 
-static void
+FLINT_STATIC_NOINLINE void
 copy_re_shallow(arb_mat_t X, const acb_mat_t A)
 {
     slong M, N, i, j;
@@ -22,7 +24,7 @@ copy_re_shallow(arb_mat_t X, const acb_mat_t A)
             *arb_mat_entry(X, i, j) = *acb_realref(acb_mat_entry(A, i, j));
 }
 
-static void
+FLINT_STATIC_NOINLINE void
 copy_im_shallow(arb_mat_t X, const acb_mat_t A)
 {
     slong M, N, i, j;
@@ -33,7 +35,7 @@ copy_im_shallow(arb_mat_t X, const acb_mat_t A)
             *arb_mat_entry(X, i, j) = *acb_imagref(acb_mat_entry(A, i, j));
 }
 
-static void
+FLINT_STATIC_NOINLINE void
 clear_shallow(arb_mat_t X)
 {
     slong M, N, i, j;
@@ -282,4 +284,3 @@ acb_mat_mul_reorder(acb_mat_t C, const acb_mat_t A, const acb_mat_t B, slong pre
         arb_mat_clear(W);
     }
 }
-

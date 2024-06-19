@@ -8,11 +8,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <math.h>
+#include "longlong.h"
 #include "nmod_poly.h"
 #include "nmod_poly_factor.h"
 
@@ -31,13 +32,13 @@ __nmod_poly_factor1(nmod_poly_factor_t res, const nmod_poly_t f, int algorithm)
         nmod_poly_factor_berlekamp(res, f);
 }
 
-mp_limb_t
+ulong
 __nmod_poly_factor(nmod_poly_factor_t result,
                                     const nmod_poly_t input, int algorithm)
 {
     nmod_poly_t monic_input;
     nmod_poly_factor_t sqfree_factors, factors;
-    mp_limb_t leading_coeff;
+    ulong leading_coeff;
     slong i, len;
 
     len = input->length;
@@ -82,7 +83,7 @@ __nmod_poly_factor(nmod_poly_factor_t result,
     return leading_coeff;
 }
 
-mp_limb_t
+ulong
 __nmod_poly_factor_deflation(nmod_poly_factor_t result,
     const nmod_poly_t input, int algorithm)
 {
@@ -106,7 +107,7 @@ __nmod_poly_factor_deflation(nmod_poly_factor_t result,
     {
         nmod_poly_factor_t def_res;
         nmod_poly_t def;
-        mp_limb_t leading_coeff;
+        ulong leading_coeff;
 
         nmod_poly_init_mod(def, input->mod);
 
@@ -150,31 +151,31 @@ __nmod_poly_factor_deflation(nmod_poly_factor_t result,
     }
 }
 
-mp_limb_t
+ulong
 nmod_poly_factor_with_berlekamp(nmod_poly_factor_t result,
     const nmod_poly_t input)
 {
     return __nmod_poly_factor_deflation(result, input, BERLEKAMP);
 }
 
-mp_limb_t
+ulong
 nmod_poly_factor_with_cantor_zassenhaus(nmod_poly_factor_t result,
     const nmod_poly_t input)
 {
     return __nmod_poly_factor_deflation(result, input, ZASSENHAUS);
 }
 
-mp_limb_t
+ulong
 nmod_poly_factor_with_kaltofen_shoup(nmod_poly_factor_t result,
     const nmod_poly_t input)
 {
     return __nmod_poly_factor_deflation(result, input, KALTOFEN);
 }
 
-mp_limb_t
+ulong
 nmod_poly_factor(nmod_poly_factor_t result, const nmod_poly_t input)
 {
-    mp_limb_t p = input->mod.n;
+    ulong p = input->mod.n;
     unsigned int bits = FLINT_BIT_COUNT (p);
     slong n = nmod_poly_degree(input);
 

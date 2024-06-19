@@ -5,11 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fq_zech.h"
+#include "mpoly.h"
 #include "fq_zech_mpoly.h"
 
 int _fq_zech_mpoly_equal(const fq_zech_struct * coeff1, const ulong * exp1,
@@ -39,7 +40,8 @@ int fq_zech_mpoly_equal(const fq_zech_mpoly_t poly1, const fq_zech_mpoly_t poly2
                                                  const fq_zech_mpoly_ctx_t ctx)
 {
     ulong * ptr1 = poly1->exps, * ptr2 = poly2->exps;
-    slong max_bits, N;
+    flint_bitcnt_t max_bits;
+    slong N;
     int r, free1 = 0, free2 = 0;
 
     if (poly1 == poly2)

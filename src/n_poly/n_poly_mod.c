@@ -5,12 +5,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "n_poly.h"
 #include "mpn_extras.h"
+#include "nmod.h"
+#include "n_poly.h"
 
 int n_poly_mod_is_canonical(const n_poly_t A, nmod_t mod)
 {
@@ -56,10 +57,10 @@ void n_poly_mod_add_ui(n_poly_t res, const n_poly_t poly, ulong c, nmod_t ctx)
    }
 }
 
-mp_limb_t n_poly_mod_div_root(n_poly_t Q,
-                                     const n_poly_t A, mp_limb_t c, nmod_t ctx)
+ulong n_poly_mod_div_root(n_poly_t Q,
+                                     const n_poly_t A, ulong c, nmod_t ctx)
 {
-    mp_limb_t rem;
+    ulong rem;
 
     slong len = A->length;
 
@@ -242,7 +243,7 @@ void n_poly_mod_mulmod(n_poly_t res, const n_poly_t poly1,
                             const n_poly_t poly2, const n_poly_t f, nmod_t ctx)
 {
     slong len1, len2, lenf;
-    mp_ptr fcoeffs;
+    nn_ptr fcoeffs;
 
     lenf = f->length;
     len1 = poly1->length;
@@ -250,8 +251,7 @@ void n_poly_mod_mulmod(n_poly_t res, const n_poly_t poly1,
 
     if (lenf == 0)
     {
-        flint_printf("Exception (nmod_poly_mulmod). Divide by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (nmod_poly_mulmod). Divide by zero.\n");
     }
 
     if (lenf == 1 || len1 == 0 || len2 == 0)
@@ -264,7 +264,7 @@ void n_poly_mod_mulmod(n_poly_t res, const n_poly_t poly1,
     {
         if (f == res)
         {
-            fcoeffs = flint_malloc(sizeof(mp_limb_t) * lenf);
+            fcoeffs = flint_malloc(sizeof(ulong) * lenf);
             _nmod_vec_set(fcoeffs, f->coeffs, lenf);
         }
         else
@@ -291,7 +291,7 @@ void n_poly_mod_mulmod(n_poly_t res, const n_poly_t poly1,
 void n_poly_mod_div(n_poly_t Q, const n_poly_t A, const n_poly_t B, nmod_t ctx)
 {
     n_poly_t tQ;
-    mp_ptr q;
+    nn_ptr q;
     slong A_len, B_len;
 
     B_len = B->length;
@@ -305,8 +305,7 @@ void n_poly_mod_div(n_poly_t Q, const n_poly_t A, const n_poly_t B, nmod_t ctx)
         }
         else
         {
-            flint_printf("Exception (n_poly_mod_div). Division by zero.\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "Exception (n_poly_mod_div). Division by zero.\n");
         }
     }
 
@@ -340,16 +339,66 @@ void n_poly_mod_div(n_poly_t Q, const n_poly_t A, const n_poly_t B, nmod_t ctx)
     Q->length = A_len - B_len + 1;
 }
 
+void n_poly_mod_divexact(n_poly_t Q, const n_poly_t A, const n_poly_t B, nmod_t ctx)
+{
+    n_poly_t tQ;
+    nn_ptr q;
+    slong A_len, B_len;
+
+    B_len = B->length;
+
+    if (B_len == 0)
+    {
+        if (ctx.n == 1)
+        {
+            n_poly_set(Q, A);
+            return;
+        }
+        else
+        {
+            flint_throw(FLINT_ERROR, "Exception (n_poly_mod_divexact). Division by zero.\n");
+        }
+    }
+
+    A_len = A->length;
+
+    if (A_len < B_len)
+    {
+        n_poly_zero(Q);
+        return;
+    }
+
+    if (Q == A || Q == B)
+    {
+        n_poly_init2(tQ, A_len - B_len + 1);
+        q = tQ->coeffs;
+    }
+    else
+    {
+        n_poly_fit_length(Q, A_len - B_len + 1);
+        q = Q->coeffs;
+    }
+
+    _nmod_poly_divexact(q, A->coeffs, A_len, B->coeffs, B_len, ctx);
+
+    if (Q == A || Q == B)
+    {
+        n_poly_swap(tQ, Q);
+        n_poly_clear(tQ);
+    }
+
+    Q->length = A_len - B_len + 1;
+}
+
 void n_poly_mod_rem(n_poly_t R, const n_poly_t A, const n_poly_t B, nmod_t ctx)
 {
     const slong lenA = A->length, lenB = B->length;
     n_poly_t tR;
-    mp_ptr r;
+    nn_ptr r;
 
     if (lenB == 0)
     {
-        flint_printf("Exception (nmod_poly_rem). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (nmod_poly_rem). Division by zero.\n");
     }
     if (lenA < lenB)
     {
@@ -386,7 +435,7 @@ void n_poly_mod_divrem(n_poly_t Q, n_poly_t R,
 {
     const slong lenA = A->length, lenB = B->length;
     n_poly_t tQ, tR;
-    mp_ptr q, r;
+    nn_ptr q, r;
 
     if (lenB == 0)
     {
@@ -398,8 +447,7 @@ void n_poly_mod_divrem(n_poly_t Q, n_poly_t R,
         }
         else
         {
-            flint_printf("Exception (n_poly_mod_divrem). Division by zero.");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "Exception (n_poly_mod_divrem). Division by zero.");
         }
     }
 
@@ -455,7 +503,7 @@ void n_poly_mod_divrem(n_poly_t Q, n_poly_t R,
 int n_poly_mod_invmod(n_poly_t A, const n_poly_t B, const n_poly_t P, nmod_t ctx)
 {
     const slong lenB = B->length, lenP = P->length;
-    mp_limb_t * a;
+    ulong * a;
     n_poly_t tA;
     int ans;
 
@@ -513,7 +561,7 @@ void n_poly_mod_gcd(n_poly_t G, const n_poly_t A, const n_poly_t B, nmod_t ctx)
     {
         slong lenA = A->length, lenB = B->length, lenG;
         n_poly_t tG;
-        mp_ptr g;
+        nn_ptr g;
 
         if (lenA == 0) /* lenA = lenB = 0 */
         {
@@ -568,7 +616,7 @@ void n_poly_mod_xgcd(
     else  /* lenA >= lenB >= 0 */
     {
         const slong lenA = A->length, lenB = B->length;
-        mp_limb_t inv;
+        ulong inv;
 
         if (lenA == 0)  /* lenA = lenB = 0 */
         {
@@ -594,7 +642,7 @@ void n_poly_mod_xgcd(
         }
         else  /* lenA >= lenB >= 2 */
         {
-            mp_ptr g, s, t;
+            nn_ptr g, s, t;
             slong lenG;
 
             if (G == A || G == B)
@@ -687,7 +735,7 @@ void n_poly_mod_mulmod_preinv(
     nmod_t ctx)
 {
     slong len1, len2, lenf;
-    mp_ptr fcoeffs;
+    nn_ptr fcoeffs;
 
     lenf = f->length;
     len1 = poly1->length;
@@ -695,8 +743,7 @@ void n_poly_mod_mulmod_preinv(
 
     if (lenf <= len1 || lenf <= len2)
     {
-        flint_printf("n_poly_mod_mulmod_preinv: Input is larger than modulus.");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "n_poly_mod_mulmod_preinv: Input is larger than modulus.");
     }
 
     if (lenf == 1 || len1 == 0 || len2 == 0)
@@ -709,7 +756,7 @@ void n_poly_mod_mulmod_preinv(
     {
         if (f == res)
         {
-            fcoeffs = flint_malloc(sizeof(mp_limb_t) * lenf);
+            fcoeffs = flint_malloc(sizeof(ulong) * lenf);
             _nmod_vec_set(fcoeffs, f->coeffs, lenf);
         }
         else
@@ -772,8 +819,7 @@ void n_poly_mod_div_series(n_poly_t Q, const n_poly_t A, const n_poly_t B,
 
     if (order < 1 || Blen == 0 || B->coeffs[0] == 0)
     {
-        flint_printf("Exception (n_poly_div_series). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (n_poly_div_series). Division by zero.\n");
     }
 
     if (Alen == 0)
@@ -800,7 +846,7 @@ void n_poly_mod_div_series(n_poly_t Q, const n_poly_t A, const n_poly_t B,
     _n_poly_normalise(Q);
 }
 
-void n_poly_mod_scalar_mul_ui(n_poly_t A, const n_poly_t B, mp_limb_t c, nmod_t ctx)
+void n_poly_mod_scalar_mul_ui(n_poly_t A, const n_poly_t B, ulong c, nmod_t ctx)
 {
     if (c >= ctx.n)
     {
@@ -818,10 +864,10 @@ void n_poly_mod_scalar_mul_ui(n_poly_t A, const n_poly_t B, mp_limb_t c, nmod_t 
 }
 
 /* multiply A by (x^k + c) */
-void n_poly_mod_shift_left_scalar_addmul(n_poly_t A, slong k, mp_limb_t c,
+void n_poly_mod_shift_left_scalar_addmul(n_poly_t A, slong k, ulong c,
                                                                     nmod_t ctx)
 {
-    mp_limb_t * Acoeffs;
+    ulong * Acoeffs;
     slong i;
     slong Alen = A->length;
 
@@ -843,11 +889,11 @@ void n_poly_mod_addmul_linear(
     n_poly_t A,
     const n_poly_t B,
     const n_poly_t C,
-    mp_limb_t d1, mp_limb_t d0,
+    ulong d1, ulong d0,
     nmod_t ctx)
 {
     slong i;
-    mp_limb_t * Acoeffs, * Bcoeffs, * Ccoeffs;
+    ulong * Acoeffs, * Bcoeffs, * Ccoeffs;
     slong Blen = B->length;
     slong Clen = C->length;
     slong Alen = FLINT_MAX(B->length, C->length + 1);
@@ -890,12 +936,12 @@ void n_poly_mod_scalar_addmul_nmod(
     n_poly_t A,
     const n_poly_t B,
     const n_poly_t C,
-    mp_limb_t d0,
+    ulong d0,
     nmod_t ctx)
 {
     slong i;
-    mp_limb_t t0, t1;
-    mp_limb_t * Acoeffs, * Bcoeffs, * Ccoeffs;
+    ulong t0, t1;
+    ulong * Acoeffs, * Bcoeffs, * Ccoeffs;
     slong Blen = B->length;
     slong Clen = C->length;
     slong Alen = FLINT_MAX(B->length, C->length);
@@ -984,12 +1030,12 @@ ulong n_poly_mod_remove(n_poly_t f, const n_poly_t p, nmod_t ctx)
     return i;
 }
 
-mp_limb_t _n_poly_eval_pow(n_poly_t P, n_poly_t alphapow, int nlimbs, nmod_t ctx)
+ulong _n_poly_eval_pow(n_poly_t P, n_poly_t alphapow, int nlimbs, nmod_t ctx)
 {
-    mp_limb_t * Pcoeffs = P->coeffs;
+    ulong * Pcoeffs = P->coeffs;
     slong Plen = P->length;
-    mp_limb_t * alpha_powers = alphapow->coeffs;
-    mp_limb_t res;
+    ulong * alpha_powers = alphapow->coeffs;
+    ulong res;
     slong k;
 
     if (Plen > alphapow->length)
@@ -1008,23 +1054,23 @@ mp_limb_t _n_poly_eval_pow(n_poly_t P, n_poly_t alphapow, int nlimbs, nmod_t ctx
     return res;
 }
 
-mp_limb_t n_poly_mod_eval_pow(n_poly_t P, n_poly_t alphapow, nmod_t ctx)
+ulong n_poly_mod_eval_pow(n_poly_t P, n_poly_t alphapow, nmod_t ctx)
 {
     int nlimbs = _nmod_vec_dot_bound_limbs(P->length, ctx);
     return _n_poly_eval_pow(P, alphapow, nlimbs, ctx);
 }
 
 void n_poly_mod_eval2_pow(
-    mp_limb_t * vp,
-    mp_limb_t * vm,
+    ulong * vp,
+    ulong * vm,
     const n_poly_t P,
     n_poly_t alphapow,
     nmod_t ctx)
 {
-    const mp_limb_t * Pcoeffs = P->coeffs;
+    const ulong * Pcoeffs = P->coeffs;
     slong Plen = P->length;
-    mp_limb_t * alpha_powers = alphapow->coeffs;
-    mp_limb_t p1, p0, a0, a1, a2, q1, q0, b0, b1, b2;
+    ulong * alpha_powers = alphapow->coeffs;
+    ulong p1, p0, a0, a1, a2, q1, q0, b0, b1, b2;
     slong k;
 
     a0 = a1 = a2 = 0;
@@ -1068,14 +1114,14 @@ void n_poly_mod_eval2_pow(
     *vm = nmod_sub(p0, q0, ctx);
 }
 
-mp_limb_t n_poly_mod_eval_step2(
+ulong n_poly_mod_eval_step2(
     n_poly_t Acur,
     const n_poly_t Ainc,
     nmod_t mod)
 {
     slong i, Alen = Acur->length;
-    mp_limb_t * cur = Acur->coeffs;
-    const mp_limb_t * inc = Ainc->coeffs;
+    ulong * cur = Acur->coeffs;
+    const ulong * inc = Ainc->coeffs;
     ulong t0, t1, t2, p0, p1;
 
     FLINT_ASSERT(2*Alen == Ainc->length);
@@ -1090,4 +1136,3 @@ mp_limb_t n_poly_mod_eval_step2(
     NMOD_RED3(t0, t2, t1, t0, mod);
     return t0;
 }
-

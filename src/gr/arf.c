@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
 #include "arb_poly.h"
 #include "acb.h"
@@ -16,6 +17,8 @@
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
+#include "gr_generic.h"
+#include "nfloat.h"
 
 typedef struct
 {
@@ -152,14 +155,25 @@ _gr_arf_set(arf_t res, const arf_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_arf_set_str(arf_t res, const char * x, const gr_ctx_t ctx)
+_gr_arf_set_str(arf_t res, const char * x, gr_ctx_t ctx)
 {
+    int status;
+
     arb_t t;
     arb_init(t);
-    arb_set_str(t, x, ARF_CTX_PREC(ctx) + 20);
-    arf_set_round(res, arb_midref(t), ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
+
+    if (!arb_set_str(t, x, ARF_CTX_PREC(ctx) + 20))
+    {
+        arf_set_round(res, arb_midref(t), ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
+        status = GR_SUCCESS;
+    }
+    else
+    {
+        status = gr_generic_set_str_ring_exponents(res, x, ctx);
+    }
+
     arb_clear(t);
-    return GR_SUCCESS;
+    return status;
 }
 
 
@@ -179,6 +193,11 @@ _gr_arf_set_other(arf_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
 
         case GR_CTX_RR_ARB:
             return _gr_arf_set(res, arb_midref((arb_srcptr) x), ctx);
+
+        case GR_CTX_NFLOAT:
+            nfloat_get_arf(res, x, x_ctx);
+            arf_set_round(res, res, ARF_CTX_PREC(ctx), ARF_CTX_RND(ctx));
+            return GR_SUCCESS;
 
         default:
             {
@@ -300,7 +319,7 @@ truth_t
 _gr_arf_equal(const arf_t x, const arf_t y, const gr_ctx_t ctx)
 {
     if (arf_is_nan(x) || arf_is_nan(y))
-        return T_FALSE;
+        return T_UNKNOWN;
 
     return arf_equal(x, y) ? T_TRUE : T_FALSE;
 }

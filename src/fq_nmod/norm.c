@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -20,12 +20,12 @@
     This computes the norm on $\mathbf{F}_q$.
  */
 
-void _fq_nmod_norm(fmpz_t rop2, const mp_limb_t *op, slong len,
+void _fq_nmod_norm(fmpz_t rop2, const ulong *op, slong len,
                         const fq_nmod_ctx_t ctx)
 {
     const slong d = fq_nmod_ctx_degree(ctx);
 
-    mp_limb_t rop;
+    ulong rop;
 
     if (d == 1)
     {
@@ -49,7 +49,7 @@ void _fq_nmod_norm(fmpz_t rop2, const mp_limb_t *op, slong len,
          */
         if (ctx->modulus->coeffs[d] != WORD(1))
         {
-            mp_limb_t f;
+            ulong f;
             f = n_powmod2_ui_preinv(ctx->modulus->coeffs[d], len - 1, ctx->mod.n, ctx->mod.ninv);
             f = n_invmod(f, ctx->mod.n);
             rop = n_mulmod2_preinv(f, rop, ctx->mod.n, ctx->mod.ninv);
@@ -72,4 +72,3 @@ void fq_nmod_norm(fmpz_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
         _fq_nmod_norm(rop, op->coeffs, op->length, ctx);
     }
 }
-

@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -21,7 +21,7 @@ TEST_FUNCTION_START(fmpz_sqrtmod, state)
     {
         int ans;
         fmpz_t a, b, c, p;
-        mp_limb_t prime;
+        ulong prime;
 
         prime = n_randint(state, UWORD(1) << (FLINT_BITS - 1));
         prime = n_nextprime(prime, 1);
@@ -61,7 +61,7 @@ TEST_FUNCTION_START(fmpz_sqrtmod, state)
     {
         int ans;
         fmpz_t a, b, c, d, p;
-        mp_limb_t prime;
+        ulong prime;
 
         prime = n_randint(state, UWORD(1) << (FLINT_BITS - 1));
         prime = n_nextprime(prime, 1);

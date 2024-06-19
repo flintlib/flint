@@ -8,7 +8,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -20,7 +20,7 @@
 /* assumes lenA >= lenB >= 1, and both A and B have nonzero leading
    coefficient */
 int
-_gr_poly_gcd(gr_ptr G, slong * lenG, gr_srcptr A, slong lenA,
+_gr_poly_gcd_generic(gr_ptr G, slong * lenG, gr_srcptr A, slong lenA,
                                 gr_srcptr B, slong lenB, gr_ctx_t ctx)
 {
     if (_gr_poly_gcd_euclidean(G, lenG, A, lenA, B, lenB, ctx) == GR_SUCCESS)

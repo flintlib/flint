@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -49,8 +49,7 @@ _arf_add_eps(arf_t s, const arf_t x, int sgn, slong prec, arf_rnd_t rnd)
 
     if (bits == 0)
     {
-        flint_printf("_arf_add_eps\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "_arf_add_eps\n");
     }
 
     bits = FLINT_MAX(bits, prec) + 10;
@@ -193,4 +192,3 @@ arf_sum(arf_t s, arf_srcptr terms, slong len, slong prec, arf_rnd_t rnd)
 
     return res;
 }
-

@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "arb.h"
 #include "arb_hypgeom.h"
 
 /* Compute initial isolating interval, following K. Petras. */
@@ -32,7 +33,7 @@ arb_hypgeom_legendre_p_ui_root_initial(arb_t res, ulong n, ulong k, slong prec)
     /* Petras numbering starts from 1 */
     k++;
     if (k > n / 2)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     tol = -prec;
     /* We need slightly higher precision since the Newton iteration
@@ -132,8 +133,7 @@ arb_hypgeom_legendre_p_ui_root(arb_t res, arb_t weight, ulong n, ulong k, slong 
 
     if (k >= n)
     {
-        flint_printf("require n > 0 and a root index 0 <= k < n\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "require n > 0 and a root index 0 <= k < n\n");
     }
 
     sign = 1;
@@ -239,4 +239,3 @@ arb_hypgeom_legendre_p_ui_root(arb_t res, arb_t weight, ulong n, ulong k, slong 
     mag_clear(pb);
     mag_clear(p2b);
 }
-

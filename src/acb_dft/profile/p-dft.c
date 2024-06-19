@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -22,9 +22,7 @@ typedef void (*do_f) (acb_ptr y, acb_srcptr x, slong len, slong prec);
 int main(int argc, char *argv[])
 {
     int out;
-    ulong n, nref, maxq = 5000;
     flint_rand_t state;
-    slong r, nr;
 
     int l, nf = 5;
     do_f func[5] = {
@@ -75,7 +73,7 @@ int main(int argc, char *argv[])
     if (out == CSV)
         flint_printf("# %-12s, %7s, %7s, %7s\n","name", "prec", "len", "factor", "time");
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     for (j = 0; j < nj; j++)
     {

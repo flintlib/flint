@@ -5,13 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
 #include "fmpq.h"
+#include "fmpq_vec.h"
 #include "fmpzi.h"
 #include "fexpr.h"
 #include "qqbar.h"
@@ -32,6 +33,13 @@ gr_qqbar_ctx;
 
 #define QQBAR_CTX(ring_ctx) ((gr_qqbar_ctx *)(ring_ctx))
 
+void
+_gr_ctx_qqbar_set_limits(gr_ctx_t ctx, slong deg_limit, slong bits_limit)
+{
+    QQBAR_CTX(ctx)->deg_limit = (deg_limit >= 0) ? deg_limit : WORD_MAX;
+    QQBAR_CTX(ctx)->bits_limit = (bits_limit >= 0) ? bits_limit : WORD_MAX;
+}
+
 int
 _gr_qqbar_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
@@ -39,6 +47,19 @@ _gr_qqbar_ctx_write(gr_stream_t out, gr_ctx_t ctx)
         gr_stream_write(out, "Real algebraic numbers (qqbar)");
     else
         gr_stream_write(out, "Complex algebraic numbers (qqbar)");
+
+    if (QQBAR_CTX(ctx)->deg_limit != WORD_MAX)
+    {
+        gr_stream_write(out, ", deg_limit = ");
+        gr_stream_write_si(out, QQBAR_CTX(ctx)->deg_limit);
+    }
+
+    if (QQBAR_CTX(ctx)->bits_limit != WORD_MAX)
+    {
+        gr_stream_write(out, ", bits_limit = ");
+        gr_stream_write_si(out, QQBAR_CTX(ctx)->bits_limit);
+    }
+
     return GR_SUCCESS;
 }
 
@@ -452,6 +473,10 @@ _gr_qqbar_neg(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 int
 _gr_qqbar_add(qqbar_t res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
 {
+    if (QQBAR_CTX(ctx)->deg_limit != WORD_MAX || QQBAR_CTX(ctx)->bits_limit != WORD_MAX)
+        if (!qqbar_binop_within_limits(x, y, QQBAR_CTX(ctx)->deg_limit, QQBAR_CTX(ctx)->bits_limit))
+            return GR_UNABLE;
+
     qqbar_add(res, x, y);
     return GR_SUCCESS;
 }
@@ -487,6 +512,10 @@ _gr_qqbar_add_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y, const gr_ctx_t 
 int
 _gr_qqbar_sub(qqbar_t res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
 {
+    if (QQBAR_CTX(ctx)->deg_limit != WORD_MAX || QQBAR_CTX(ctx)->bits_limit != WORD_MAX)
+        if (!qqbar_binop_within_limits(x, y, QQBAR_CTX(ctx)->deg_limit, QQBAR_CTX(ctx)->bits_limit))
+            return GR_UNABLE;
+
     qqbar_sub(res, x, y);
     return GR_SUCCESS;
 }
@@ -522,6 +551,10 @@ _gr_qqbar_sub_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y, const gr_ctx_t 
 int
 _gr_qqbar_mul(qqbar_t res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
 {
+    if (QQBAR_CTX(ctx)->deg_limit != WORD_MAX || QQBAR_CTX(ctx)->bits_limit != WORD_MAX)
+        if (!qqbar_binop_within_limits(x, y, QQBAR_CTX(ctx)->deg_limit, QQBAR_CTX(ctx)->bits_limit))
+            return GR_UNABLE;
+
     qqbar_mul(res, x, y);
     return GR_SUCCESS;
 }
@@ -577,6 +610,10 @@ _gr_qqbar_div(qqbar_t res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
     }
     else
     {
+        if (QQBAR_CTX(ctx)->deg_limit != WORD_MAX || QQBAR_CTX(ctx)->bits_limit != WORD_MAX)
+            if (!qqbar_binop_within_limits(x, y, QQBAR_CTX(ctx)->deg_limit, QQBAR_CTX(ctx)->bits_limit))
+                return GR_UNABLE;
+
         qqbar_div(res, x, y);
         return GR_SUCCESS;
     }
@@ -647,6 +684,32 @@ _gr_qqbar_is_invertible(const qqbar_t x, const gr_ctx_t ctx)
 int
 _gr_qqbar_pow_ui(qqbar_t res, const qqbar_t x, ulong exp, const gr_ctx_t ctx)
 {
+    if (QQBAR_CTX(ctx)->bits_limit != WORD_MAX && !(exp == 0 || exp == 1))
+    {
+        slong ebits = FLINT_BIT_COUNT(exp);
+
+        if (qqbar_is_zero(x) || qqbar_is_one(x))
+        {
+            qqbar_set(res, x);
+            return GR_SUCCESS;
+        }
+
+        if (qqbar_is_neg_one(x))
+        {
+            if (exp % 2 == 0)
+                qqbar_one(res);
+            else
+                qqbar_set(res, x);
+            return GR_SUCCESS;
+        }
+
+        if (ebits > SMALL_FMPZ_BITCOUNT_MAX)
+            return GR_UNABLE;
+
+        if ((double) exp * qqbar_height_bits(x) > QQBAR_CTX(ctx)->bits_limit)
+            return GR_UNABLE;
+    }
+
     qqbar_pow_ui(res, x, exp);
     return GR_SUCCESS;
 }
@@ -660,6 +723,32 @@ _gr_qqbar_pow_si(qqbar_t res, const qqbar_t x, slong exp, const gr_ctx_t ctx)
     }
     else
     {
+        if (QQBAR_CTX(ctx)->bits_limit != WORD_MAX && !(exp == 0 || exp == 1 || exp == -1))
+        {
+            slong ebits = FLINT_BIT_COUNT(FLINT_ABS(exp));
+
+            if (qqbar_is_zero(x) || qqbar_is_one(x))
+            {
+                qqbar_set(res, x);
+                return GR_SUCCESS;
+            }
+
+            if (qqbar_is_neg_one(x))
+            {
+                if (exp % 2 == 0)
+                    qqbar_one(res);
+                else
+                    qqbar_set(res, x);
+                return GR_SUCCESS;
+            }
+
+            if (ebits > SMALL_FMPZ_BITCOUNT_MAX)
+                return GR_UNABLE;
+
+            if ((double) FLINT_ABS(exp) * qqbar_height_bits(x) > QQBAR_CTX(ctx)->bits_limit)
+                return GR_UNABLE;
+        }
+
         qqbar_pow_si(res, x, exp);
         return GR_SUCCESS;
     }
@@ -674,6 +763,32 @@ _gr_qqbar_pow_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t exp, const gr_ctx_
     }
     else
     {
+        if (QQBAR_CTX(ctx)->bits_limit != WORD_MAX && !(fmpz_is_zero(exp) || fmpz_is_pm1(exp)))
+        {
+            slong ebits = fmpz_bits(exp);
+
+            if (qqbar_is_zero(x) || qqbar_is_one(x))
+            {
+                qqbar_set(res, x);
+                return GR_SUCCESS;
+            }
+
+            if (qqbar_is_neg_one(x))
+            {
+                if (fmpz_is_even(exp))
+                    qqbar_one(res);
+                else
+                    qqbar_set(res, x);
+                return GR_SUCCESS;
+            }
+
+            if (ebits > SMALL_FMPZ_BITCOUNT_MAX)
+                return GR_UNABLE;
+
+            if ((double) FLINT_ABS(*exp) * qqbar_height_bits(x) > QQBAR_CTX(ctx)->bits_limit)
+                return GR_UNABLE;
+        }
+
         qqbar_pow_fmpz(res, x, exp);
         return GR_SUCCESS;
     }
@@ -1050,6 +1165,81 @@ TRIG3(acsc_pi)
 
 /* todo: quickly skip nonreal roots over the real algebraic numbers */
 int
+_gr_qqbar_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
+{
+    int status;
+    gr_ctx_t ZZ, Rx;
+    gr_vec_t fac, exp;
+    gr_ptr c;
+    slong i;
+
+    if (poly->length == 0)
+        return GR_DOMAIN;
+
+    /* todo: fast numerical check to avoid an exact squarefree factorization */
+
+    gr_ctx_init_fmpz(ZZ);
+    gr_ctx_init_gr_poly(Rx, ctx);
+
+    gr_vec_set_length(roots, 0, ctx);
+    gr_vec_set_length(mult, 0, ZZ);
+
+    c = gr_heap_init(ctx);
+    gr_vec_init(fac, 0, Rx);
+    gr_vec_init(exp, 0, ZZ);
+
+    status = gr_poly_factor_squarefree(c, fac, exp, poly, ctx);
+
+    if (status == GR_SUCCESS)
+    {
+        slong deg2;
+        qqbar_ptr croots;
+        int success;
+        slong j;
+
+        for (i = 0; i < fac->length; i++)
+        {
+            gr_poly_struct * fac_i = gr_vec_entry_ptr(fac, i, Rx);
+            fmpz * exp_i = gr_vec_entry_ptr(exp, i, ZZ);
+
+            deg2 = fac_i->length - 1;
+
+            croots = _qqbar_vec_init(deg2);
+
+            success = _qqbar_roots_poly_squarefree(croots, fac_i->coeffs, deg2 + 1, QQBAR_CTX(ctx)->deg_limit, QQBAR_CTX(ctx)->bits_limit);
+            if (!success)
+            {
+                status = GR_UNABLE;
+                break;
+            }
+
+            for (j = 0; j < deg2; j++)
+            {
+                if (QQBAR_CTX(ctx)->real_only && !qqbar_is_real(croots + j))
+                    continue;
+
+                GR_MUST_SUCCEED(gr_vec_append(roots, croots + j, ctx));
+                GR_MUST_SUCCEED(gr_vec_append(mult, exp_i, ZZ));
+            }
+
+            _qqbar_vec_clear(croots, deg2);
+        }
+    }
+
+    /* todo: qqbar_cmp_root_order, but must sort exponents as well */
+
+    gr_vec_clear(fac, Rx);
+    gr_vec_clear(exp, ZZ);
+    gr_heap_clear(c, ctx);
+
+    gr_ctx_clear(ZZ);
+    gr_ctx_clear(Rx);
+
+    return status;
+}
+
+/* todo: quickly skip nonreal roots over the real algebraic numbers */
+int
 _gr_qqbar_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, gr_ctx_t other_ctx, int flags, gr_ctx_t ctx)
 {
     if (poly->length == 0)
@@ -1103,6 +1293,50 @@ _gr_qqbar_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, 
 
         gr_ctx_clear(ZZ);
 
+        return status;
+    }
+
+    /* Convert to the integer case */
+    if (other_ctx->which_ring == GR_CTX_FMPQ)
+    {
+        fmpz_poly_t f;
+        fmpz_t den;
+        gr_ctx_t ZZ;
+        int status = GR_SUCCESS;
+
+        gr_ctx_init_fmpz(ZZ);
+        fmpz_init(den);
+        fmpz_poly_init2(f, poly->length);
+        _fmpz_poly_set_length(f, poly->length);
+        _fmpq_vec_get_fmpz_vec_fmpz(f->coeffs, den, poly->coeffs, poly->length);
+
+        status = _gr_qqbar_poly_roots_other(roots, mult, (gr_poly_struct *) f, ZZ, flags, ctx);
+
+        fmpz_poly_clear(f);
+        fmpz_clear(den);
+        gr_ctx_clear(ZZ);
+        return status;
+    }
+
+    if (other_ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_QQBAR || other_ctx->which_ring == GR_CTX_COMPLEX_ALGEBRAIC_QQBAR)
+        return _gr_qqbar_poly_roots(roots, mult, poly, flags, ctx);
+
+    /* Allow anything else that we can plausibly convert to qqbar */
+    /* Todo: prefer computing the squarefree factorization in the original ring; this should
+       generally be more efficient. */
+    if (other_ctx->which_ring == GR_CTX_FMPZI ||
+        other_ctx->which_ring == GR_CTX_REAL_ALGEBRAIC_CA ||
+        other_ctx->which_ring == GR_CTX_COMPLEX_ALGEBRAIC_CA ||
+        other_ctx->which_ring == GR_CTX_RR_CA ||
+        other_ctx->which_ring == GR_CTX_CC_CA)
+    {
+        gr_poly_t f;
+        int status = GR_SUCCESS;
+        gr_poly_init(f, ctx);
+        status = gr_poly_set_gr_poly_other(f, poly, other_ctx, ctx);
+        if (status == GR_SUCCESS)
+            status = _gr_qqbar_poly_roots(roots, mult, f, flags, ctx);
+        gr_poly_clear(f, ctx);
         return status;
     }
 
@@ -1167,6 +1401,7 @@ gr_method_tab_input _qqbar_methods_input[] =
     {GR_METHOD_SET_FMPQ,        (gr_funcptr) _gr_qqbar_set_fmpq},
     {GR_METHOD_SET_D,           (gr_funcptr) _gr_qqbar_set_d},
     {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_qqbar_set_other},
+    {GR_METHOD_SET_STR,         (gr_funcptr) gr_generic_set_str_ring_exponents},
 
     {GR_METHOD_GET_SI,          (gr_funcptr) _gr_qqbar_get_si},
     {GR_METHOD_GET_UI,          (gr_funcptr) _gr_qqbar_get_ui},
@@ -1254,6 +1489,7 @@ gr_method_tab_input _qqbar_methods_input[] =
     {GR_METHOD_ASEC_PI,          (gr_funcptr) _gr_qqbar_asec_pi},
     {GR_METHOD_ACSC_PI,          (gr_funcptr) _gr_qqbar_acsc_pi},
 
+    {GR_METHOD_POLY_ROOTS,       (gr_funcptr) _gr_qqbar_poly_roots},
     {GR_METHOD_POLY_ROOTS_OTHER, (gr_funcptr) _gr_qqbar_poly_roots_other},
 
     {0,                         (gr_funcptr) NULL},

@@ -5,12 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "ulong_extras.h"
+#include <gmp.h>
 #include "fmpz.h"
 
 /* The underlying approximate division is implemented in arb/div.c.
@@ -71,7 +70,7 @@ _fmpz_tdiv_qr_correction(fmpz_t q, fmpz_t r, const fmpz_t a, const fmpz_t b)
 }
 
 static void
-_fmpz_fdiv_qr_correction(fmpz_t q, fmpz_t r, const fmpz_t a, const fmpz_t b)
+_fmpz_fdiv_qr_correction(fmpz_t q, fmpz_t r, const fmpz_t FLINT_UNUSED(a), const fmpz_t b)
 {
     while (fmpz_sgn(r) < 0)
     {
@@ -93,7 +92,7 @@ _fmpz_fdiv_qr_correction(fmpz_t q, fmpz_t r, const fmpz_t a, const fmpz_t b)
 }
 
 static void
-_fmpz_cdiv_qr_correction(fmpz_t q, fmpz_t r, const fmpz_t a, const fmpz_t b)
+_fmpz_cdiv_qr_correction(fmpz_t q, fmpz_t r, const fmpz_t FLINT_UNUSED(a), const fmpz_t b)
 {
     while (fmpz_sgn(r) > 0)
     {

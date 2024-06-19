@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -22,8 +22,8 @@ arith_bell_number_vec_multi_mod(fmpz * res, slong n)
 {
     fmpz_comb_t comb[CRT_MAX_RESOLUTION];
     fmpz_comb_temp_t temp[CRT_MAX_RESOLUTION];
-    mp_ptr primes, residues;
-    mp_ptr * polys;
+    nn_ptr primes, residues;
+    nn_ptr * polys;
     nmod_t mod;
     slong i, j, k, num_primes, num_primes_k, resolution;
     flint_bitcnt_t size, prime_bits;
@@ -37,9 +37,9 @@ arith_bell_number_vec_multi_mod(fmpz * res, slong n)
     prime_bits = FLINT_BITS - 1;
     num_primes = (size + prime_bits - 1) / prime_bits;
 
-    primes = flint_malloc(num_primes * sizeof(mp_limb_t));
-    residues = flint_malloc(num_primes * sizeof(mp_limb_t));
-    polys = flint_malloc(num_primes * sizeof(mp_ptr));
+    primes = flint_malloc(num_primes * sizeof(ulong));
+    residues = flint_malloc(num_primes * sizeof(ulong));
+    polys = flint_malloc(num_primes * sizeof(nn_ptr));
 
     /* Compute Bell numbers mod p */
     primes[0] = n_nextprime(UWORD(1)<<prime_bits, 0);

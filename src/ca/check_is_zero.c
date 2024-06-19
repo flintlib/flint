@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "calcium.h"
 #include "ca.h"
 
 truth_t
@@ -166,7 +167,7 @@ ca_check_is_zero(const ca_t x, ca_ctx_t ctx)
 
         /* the zero test will surely have succeeded over a number field */
         if (!CA_FIELD_IS_GENERIC(CA_FIELD(x, ctx)))
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
         /* extract numerator */
         ca_init(t, ctx);

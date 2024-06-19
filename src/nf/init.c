@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -38,8 +38,7 @@ void nf_init(nf_t nf, const fmpq_poly_t pol)
 
     if (len < 2)
     {
-       flint_printf("Exception (nf_init). Degree must be at least 1.\n");
-       flint_abort();
+       flint_throw(FLINT_ERROR, "Exception (nf_init). Degree must be at least 1.\n");
     } else if (len == 2) /* linear case */
        nf->flag |= NF_LINEAR;
     else if (len == 3) /* quadratic case */
@@ -102,4 +101,3 @@ void nf_init(nf_t nf, const fmpq_poly_t pol)
 
    fmpz_mul_si(fmpq_poly_numref(nf->traces), pow, deg);
 }
-

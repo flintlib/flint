@@ -5,13 +5,25 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "gr_poly.h"
 
 /* todo: characteristic 2, ... */
+
+static truth_t
+_char_two(gr_ctx_t ctx)
+{
+    gr_ptr t;
+    truth_t res;
+    GR_TMP_INIT(t, ctx);
+    GR_MUST_SUCCEED(gr_set_ui(t, 2, ctx));
+    res = gr_is_zero(t, ctx);
+    GR_TMP_CLEAR(t, ctx);
+    return res;
+}
 
 int
 _gr_poly_sqrt_series_generic(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_ctx_t ctx)
@@ -20,7 +32,7 @@ _gr_poly_sqrt_series_generic(gr_ptr res, gr_srcptr f, slong flen, slong len, gr_
 
     status = _gr_poly_sqrt_series_newton(res, f, flen, len, 2, ctx);
 
-    if (status != GR_SUCCESS && gr_ctx_is_field(ctx) == T_FALSE)
+    if (status == GR_DOMAIN && (gr_ctx_is_field(ctx) != T_TRUE || _char_two(ctx) != T_FALSE))
         return GR_UNABLE;
 
     return status;

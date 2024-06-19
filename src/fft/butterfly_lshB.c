@@ -5,11 +5,10 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "fft.h"
 
 void butterfly_lshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1,
@@ -94,4 +93,3 @@ void butterfly_lshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1,
       mpn_addmod_2expp1_1(u + x, limbs - x, cy1);
   }
 }
-

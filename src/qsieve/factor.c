@@ -7,23 +7,24 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #define _STDC_FORMAT_MACROS
 
-#ifdef __GNUC__
-# define strcpy __builtin_strcpy
-#else
-# include <math.h>
-#endif
-
 /* try to get fdopen, mkstemp declared */
-#if defined __STRICT_ANSI__
-#undef __STRICT_ANSI__
+#if defined(__STRICT_ANSI__)
+# undef __STRICT_ANSI__
 #endif
 
+#if defined(__CYGWIN__)
+# define ulong ulongxx
+# include <sys/param.h>
+# undef ulong
+#endif
+
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "thread_support.h"
@@ -34,7 +35,7 @@
 
 /* Use Windows API for temporary files under MSVC and MinGW */
 #if (defined(__WIN32) && !defined(__CYGWIN__)) || defined(_MSC_VER)
-#include <windows.h>
+# include <windows.h>
 #endif
 
 int compare_facs(const void * a, const void * b)
@@ -53,7 +54,7 @@ int compare_facs(const void * a, const void * b)
 void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
 {
     qs_t qs_inf;
-    mp_limb_t small_factor, delta;
+    ulong small_factor, delta;
     ulong expt = 0;
     unsigned char * sieve;
     slong ncols, nrows, i, j = 0, count, num_primes;
@@ -217,14 +218,12 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
 #if (defined(__WIN32) && !defined(__CYGWIN__)) || defined(_MSC_VER)
     if (GetTempPathA(MAX_PATH, temp_path) == 0)
     {
-        flint_printf("Exception (qsieve_factor). GetTempPathA() failed.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (qsieve_factor). GetTempPathA() failed.\n");
     }
     /* uUnique = 0 means the we *do* want a unique filename (obviously!). */
     if (GetTempFileNameA(temp_path, "siq", /*uUnique*/ 0, qs_inf->fname) == 0)
     {
-        flint_printf("Exception (qsieve_factor). GetTempFileNameA() failed.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (qsieve_factor). GetTempFileNameA() failed.\n");
     }
     qs_inf->siqs = (FLINT_FILE *) fopen(qs_inf->fname, "wb");
     if (qs_inf->siqs == NULL)
@@ -331,7 +330,7 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
                     flint_printf("\nBlock Lanczos\n");
 #endif
 
-                    flint_randinit(state); /* initialise the random generator */
+                    flint_rand_init(state); /* initialise the random generator */
 
                     do /* repeat block lanczos until it succeeds */
                     {
@@ -347,7 +346,7 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
                             count++;
                     }
 
-                    flint_randclear(state); /* clean up random state */
+                    flint_rand_clear(state); /* clean up random state */
 
     /**************************************************************************
         SQUARE ROOT:

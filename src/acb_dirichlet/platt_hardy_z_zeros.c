@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "acb_dirichlet.h"
 
 slong
@@ -21,8 +22,7 @@ acb_dirichlet_platt_hardy_z_zeros(
     }
     else if (fmpz_sgn(n) < 1)
     {
-        flint_printf("Nonpositive indices of Hardy Z zeros are not supported.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Nonpositive indices of Hardy Z zeros are not supported.\n");
     }
     else
     {

@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -508,7 +508,7 @@ void _arb_log_p_ensure_cached(slong prec)
             for (i = 0; i < ARB_LOG_PRIME_CACHE_NUM; i++)
             {
                 slong exp, exp_fix;
-                mp_size_t n;
+                slong n;
                 arb_ptr res = _arb_log_p_cache + i;
 
                 n = ARB_LOG_TAB2_PREC / FLINT_BITS;
@@ -593,7 +593,7 @@ arb_atan_gauss_primes_vec_bsplit(arb_ptr res, slong n, slong prec)
 
     /* not implemented */
     if (n > 64)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     wp = prec + 64;
 
@@ -729,14 +729,14 @@ void _arb_atan_gauss_p_ensure_cached(slong prec)
             for (i = 0; i < ARB_ATAN_GAUSS_PRIME_CACHE_NUM; i++)
             {
                 slong exp, exp_fix;
-                mp_size_t n;
+                slong n;
                 static const char exponents[24] = {0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1};
                 arb_ptr res = _arb_atan_gauss_p_cache + i;
 
                 n = ARB_LOG_TAB2_PREC / FLINT_BITS;
 
                 if (i >= 24)
-                    flint_abort();
+                    flint_throw(FLINT_ERROR, "(%s)\n", __func__);
                 /* exponent of 2*atan(x) */
                 exp = exponents[i] + 1;
 

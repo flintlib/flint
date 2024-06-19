@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -21,12 +21,12 @@
 
 int
 fmpz_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in,
-                          mp_limb_t max_tries, mp_limb_t max_iters)
+                          ulong max_tries, ulong max_iters)
 {
     fmpz_t fa, fy, maxa, maxy;
-    mp_ptr a, y, n, ninv, temp;
-    mp_limb_t n_size, normbits, ans, val, size, cy;
-    __mpz_struct *fac, *mptr;
+    nn_ptr a, y, n, ninv, temp;
+    ulong n_size, normbits, ans, val, size, cy;
+    mpz_ptr fac, mptr;
     int ret;
 
     TMP_INIT;
@@ -55,10 +55,10 @@ fmpz_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in,
     fmpz_sub_ui(maxy, n_in, 1);     /* 1 <= y <= n - 1 */
 
     TMP_START;
-    a    = TMP_ALLOC(n_size * sizeof(mp_limb_t));
-    y    = TMP_ALLOC(n_size * sizeof(mp_limb_t));
-    n    = TMP_ALLOC(n_size * sizeof(mp_limb_t));
-    ninv = TMP_ALLOC(n_size * sizeof(mp_limb_t));
+    a    = TMP_ALLOC(n_size * sizeof(ulong));
+    y    = TMP_ALLOC(n_size * sizeof(ulong));
+    n    = TMP_ALLOC(n_size * sizeof(ulong));
+    ninv = TMP_ALLOC(n_size * sizeof(ulong));
 
     /* copying n_in onto n, and normalizing */
 
@@ -72,7 +72,7 @@ fmpz_factor_pollard_brent(fmpz_t p_factor, flint_rand_t state, fmpz_t n_in,
     flint_mpn_preinvn(ninv, n, n_size);
 
     fac = _fmpz_promote(p_factor);
-    mpz_realloc2(fac, n_size * FLINT_BITS);
+    FLINT_MPZ_REALLOC(fac, n_size);
     fac->_mp_size = n_size;
 
     while (max_tries--)

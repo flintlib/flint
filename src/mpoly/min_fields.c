@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -39,14 +39,7 @@ void mpoly_min_fields_ui_sp(ulong * min_fields, const ulong * poly_exps,
             mpoly_monomial_min(pmin, pmin, poly_exps + N*i, bits, N, mask);
     }
 
-    /* GCC really wants to complain about this one */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif
     mpoly_unpack_vec_ui(min_fields, pmin, bits, mctx->nfields, 1);
-#ifdef __GNUC__
-# pragma GCC diagnostic pop
-#endif
 
     TMP_END;
 }
@@ -83,14 +76,7 @@ void mpoly_min_fields_fmpz(fmpz * min_fields, const ulong * poly_exps,
         }
     }
 
-    /* GCC really wants to complain about this one */
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif
     mpoly_unpack_vec_fmpz(min_fields, pmin, bits, mctx->nfields, 1);
-#ifdef __GNUC__
-# pragma GCC diagnostic pop
-#endif
 
     TMP_END;
 }

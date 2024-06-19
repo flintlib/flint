@@ -5,24 +5,24 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "mpn_extras.h"
 #include "fmpz.h"
 
 int
-fmpz_bit_pack(mp_ptr arr, flint_bitcnt_t shift, flint_bitcnt_t bits,
+fmpz_bit_pack(nn_ptr arr, flint_bitcnt_t shift, flint_bitcnt_t bits,
               const fmpz_t coeff, int negate, int borrow)
 {
-    mp_limb_t save = arr[0];
+    ulong save = arr[0];
     fmpz c = *coeff;
     int sign = fmpz_sgn(coeff);
-    mp_limb_t cy;
+    ulong cy;
     ulong limbs = (shift + bits) / FLINT_BITS;
     ulong rem_bits = (shift + bits) % FLINT_BITS;
-    mp_limb_t mask;
+    ulong mask;
     ulong size;
 
     if (sign == 0)  /* special case, deal with zero (store -borrow) */
@@ -30,22 +30,22 @@ fmpz_bit_pack(mp_ptr arr, flint_bitcnt_t shift, flint_bitcnt_t bits,
         if (borrow)
         {
             /* store -1 shifted and add save back in */
-            arr[0] = ((~(mp_limb_t) 0) << shift) + save;
+            arr[0] = ((~(ulong) 0) << shift) + save;
 
             /* com remaining limbs */
             if (limbs > 1)
-                flint_mpn_store(arr + 1, limbs - 1, ~(mp_limb_t) 0);
+                flint_mpn_store(arr + 1, limbs - 1, ~(ulong) 0);
 
             /* com remaining bits */
             if (limbs)
             {
                 if (rem_bits)
-                    arr[limbs] = (((mp_limb_t) 1) << rem_bits) - (mp_limb_t) 1;
+                    arr[limbs] = (((ulong) 1) << rem_bits) - (ulong) 1;
             }
             else
             {
                 /* mask off final limb */
-                mask = (((mp_limb_t) 1) << rem_bits) - (mp_limb_t) 1;
+                mask = (((ulong) 1) << rem_bits) - (ulong) 1;
                 arr[limbs] &= mask;
             }
 
@@ -65,7 +65,7 @@ fmpz_bit_pack(mp_ptr arr, flint_bitcnt_t shift, flint_bitcnt_t bits,
         if (!COEFF_IS_MPZ(c))
         {
             /* compute d = -b - borrow */
-            mp_limb_t d = (c < WORD(0) ? c - borrow : -c - borrow);
+            ulong d = (c < WORD(0) ? c - borrow : -c - borrow);
 
             /* store d << shift and add save back into place */
             arr[0] = (d << shift) + save;
@@ -76,16 +76,16 @@ fmpz_bit_pack(mp_ptr arr, flint_bitcnt_t shift, flint_bitcnt_t bits,
                 if (shift)
                     arr[1] =
                         (d >> (FLINT_BITS - shift)) +
-                        ((~(mp_limb_t) 0) << shift);
+                        ((~(ulong) 0) << shift);
                 else
-                    arr[1] = ~(mp_limb_t) 0;
+                    arr[1] = ~(ulong) 0;
             }
 
             size = 2;
         }
         else
         {
-            __mpz_struct * ptr = COEFF_TO_PTR(c);
+            mpz_ptr ptr = COEFF_TO_PTR(c);
             size = FLINT_ABS(ptr->_mp_size);
 
             /* complement coefficient into arr */
@@ -100,7 +100,7 @@ fmpz_bit_pack(mp_ptr arr, flint_bitcnt_t shift, flint_bitcnt_t bits,
             {
                 cy = mpn_lshift(arr, arr, size, shift);
                 if (limbs + (rem_bits != 0) > size)
-                    arr[size++] = ((~(mp_limb_t) 0) << shift) + cy;
+                    arr[size++] = ((~(ulong) 0) << shift) + cy;
             }
 
             /* add back in saved bits from start of field */
@@ -111,16 +111,16 @@ fmpz_bit_pack(mp_ptr arr, flint_bitcnt_t shift, flint_bitcnt_t bits,
         {
             /* com any additional limbs */
             if (limbs > size)
-                flint_mpn_store(arr + size, limbs - size, ~(mp_limb_t) 0);
+                flint_mpn_store(arr + size, limbs - size, ~(ulong) 0);
 
             /* com remaining bits */
             if (rem_bits)
-                arr[limbs] = (((mp_limb_t) 1) << rem_bits) - (mp_limb_t) 1;
+                arr[limbs] = (((ulong) 1) << rem_bits) - (ulong) 1;
         }
         else
         {
             /* mask off final limb */
-            mask = (((mp_limb_t) 1) << rem_bits) - (mp_limb_t) 1;
+            mask = (((ulong) 1) << rem_bits) - (ulong) 1;
             arr[limbs] &= mask;
         }
         return 1;
@@ -130,7 +130,7 @@ fmpz_bit_pack(mp_ptr arr, flint_bitcnt_t shift, flint_bitcnt_t bits,
         if (!COEFF_IS_MPZ(c))
         {
             /* compute d = b - borrow */
-            mp_limb_t d = (c < WORD(0) ? -c - borrow : c - borrow);
+            ulong d = (c < WORD(0) ? -c - borrow : c - borrow);
 
             /* store d<<shift and add save back into place */
             arr[0] = (d << shift) + save;
@@ -144,7 +144,7 @@ fmpz_bit_pack(mp_ptr arr, flint_bitcnt_t shift, flint_bitcnt_t bits,
         }
         else
         {
-            __mpz_struct *ptr = COEFF_TO_PTR(c);
+            mpz_ptr ptr = COEFF_TO_PTR(c);
             size = FLINT_ABS(ptr->_mp_size);
 
             /* shift into place */
@@ -159,7 +159,7 @@ fmpz_bit_pack(mp_ptr arr, flint_bitcnt_t shift, flint_bitcnt_t bits,
 
             /* deal with - borrow */
             if (borrow)
-                mpn_sub_1(arr, arr, size, ((mp_limb_t) 1) << shift);
+                mpn_sub_1(arr, arr, size, ((ulong) 1) << shift);
 
             /* add back in saved bits from start of field */
             arr[0] += save;

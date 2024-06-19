@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -30,7 +30,7 @@ typedef fmpz_poly_t fmpz_list_t;
     Map b via the projection.
 */
 static void map_down(fmpz_mod_poly_t a, const fmpz_mod_ctx_t ctxa,
-               const fmpz_mod_poly_t b, const fmpz_mod_ctx_t ctxb)
+               const fmpz_mod_poly_t b, const fmpz_mod_ctx_t FLINT_UNUSED(ctxb))
 {
     slong i;
 

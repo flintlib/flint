@@ -5,11 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "test_helpers.h"
+#include "nmod.h"
 #include "nmod_mpoly.h"
 
 TEST_FUNCTION_START(nmod_mpoly_evaluate, state)
@@ -22,12 +23,12 @@ TEST_FUNCTION_START(nmod_mpoly_evaluate, state)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g;
-        mp_limb_t fe;
-        mp_limb_t * vals;
+        ulong fe;
+        ulong * vals;
         slong * perm;
         slong nvars, len;
         flint_bitcnt_t exp_bits;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -41,7 +42,7 @@ TEST_FUNCTION_START(nmod_mpoly_evaluate, state)
         exp_bits = n_randint(state, 200) + 1;
 
         perm = (slong *) flint_malloc(nvars*sizeof(slong));
-        vals = (mp_limb_t *) flint_malloc(nvars*sizeof(mp_limb_t));
+        vals = (ulong *) flint_malloc(nvars*sizeof(ulong));
         for (v = 0; v < nvars; v++)
         {
             vals[v] = n_randlimb(state);
@@ -100,11 +101,11 @@ TEST_FUNCTION_START(nmod_mpoly_evaluate, state)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, fg;
-        mp_limb_t fe, ge, fge;
-        mp_limb_t * vals;
+        ulong fe, ge, fge;
+        ulong * vals;
         slong nvars, len1, len2;
         flint_bitcnt_t exp_bits1, exp_bits2;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -120,7 +121,7 @@ TEST_FUNCTION_START(nmod_mpoly_evaluate, state)
         exp_bits1 = n_randint(state, 200) + 1;
         exp_bits2 = n_randint(state, 200) + 1;
 
-        vals = (mp_limb_t *) flint_malloc(nvars*sizeof(mp_limb_t));
+        vals = (ulong *) flint_malloc(nvars*sizeof(ulong));
         for (v = 0; v < nvars; v++)
         {
             vals[v] = n_randlimb(state);
@@ -158,11 +159,11 @@ TEST_FUNCTION_START(nmod_mpoly_evaluate, state)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, fg;
-        mp_limb_t fe, ge, fge;
-        mp_limb_t * vals;
+        ulong fe, ge, fge;
+        ulong * vals;
         slong nvars, len1, len2;
         flint_bitcnt_t exp_bits1, exp_bits2;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -178,7 +179,7 @@ TEST_FUNCTION_START(nmod_mpoly_evaluate, state)
         exp_bits1 = n_randint(state, 200) + 1;
         exp_bits2 = n_randint(state, 200) + 1;
 
-        vals = (mp_limb_t *) flint_malloc(nvars*sizeof(mp_limb_t));
+        vals = (ulong *) flint_malloc(nvars*sizeof(ulong));
         for (v = 0; v < nvars; v++)
         {
             vals[v] = n_randlimb(state);

@@ -36,7 +36,7 @@ Memory management
 --------------------------------------------------------------------------------
 
 
-.. function:: void nmod_poly_mat_init(nmod_poly_mat_t mat, slong rows, slong cols, mp_limb_t n)
+.. function:: void nmod_poly_mat_init(nmod_poly_mat_t mat, slong rows, slong cols, ulong n)
 
     Initialises a matrix with the given number of rows and columns for use.
     The modulus is set to `n`.
@@ -88,7 +88,7 @@ Basic properties
 
     Returns the number of columns in ``mat``.
 
-.. function:: mp_limb_t nmod_poly_mat_modulus(const nmod_poly_mat_t mat)
+.. function:: ulong nmod_poly_mat_modulus(const nmod_poly_mat_t mat)
 
     Returns the modulus of ``mat``.
 
@@ -237,7 +237,7 @@ Evaluation
 --------------------------------------------------------------------------------
 
 
-.. function:: void nmod_poly_mat_evaluate_nmod(nmod_mat_t B, const nmod_poly_mat_t A, mp_limb_t x)
+.. function:: void nmod_poly_mat_evaluate_nmod(nmod_mat_t B, const nmod_poly_mat_t A, ulong x)
 
     Sets the ``nmod_mat_t`` ``B`` to ``A`` evaluated entrywise
     at the point ``x``.
@@ -252,7 +252,7 @@ Arithmetic
 
     Sets ``B`` to ``A`` multiplied entrywise by the polynomial ``c``.
 
-.. function:: void nmod_poly_mat_scalar_mul_nmod(nmod_poly_mat_t B, const nmod_poly_mat_t A, mp_limb_t c)
+.. function:: void nmod_poly_mat_scalar_mul_nmod(nmod_poly_mat_t B, const nmod_poly_mat_t A, ulong c)
 
     Sets ``B`` to ``A`` multiplied entrywise by the coefficient
     ``c``, which is assumed to be reduced modulo the modulus.

@@ -5,11 +5,10 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "fmpz.h"
 #include "mpn_extras.h"
 
@@ -60,7 +59,7 @@ mp_size_t flint_mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
             break;
         maxi = i + 1;
         square[i + 1] = flint_malloc(sizeof(mp_limb_t) * sqsize);
-        mpn_sqr(square[i + 1], square[i], square_size[i]);
+        flint_mpn_sqr(square[i + 1], square[i], square_size[i]);
         if (square[i + 1][sqsize - 1] == 0)
             sqsize -= 1;
         square_size[i + 1] = sqsize;

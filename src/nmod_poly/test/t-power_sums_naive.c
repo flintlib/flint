@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -16,7 +16,7 @@
 TEST_FUNCTION_START(nmod_poly_power_sums_naive, state)
 {
     int l, result;
-    mp_limb_t i, j, k, tot;
+    ulong i, j, k, tot;
 
     /* Check that it is valid in degree 3 with integer roots, ie */
     /* for polynomials of the form (x-i)(x-j)(x-k)               */
@@ -24,7 +24,7 @@ TEST_FUNCTION_START(nmod_poly_power_sums_naive, state)
         for (j = 0; j < 4; j++)
             for (k = 0; k < 4; k++)
             {
-                mp_limb_t n;
+                ulong n;
                 nmod_t mod;
                 nmod_poly_t a, b, c, d;
 
@@ -103,7 +103,7 @@ TEST_FUNCTION_START(nmod_poly_power_sums_naive, state)
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c, d;
-        mp_limb_t n;
+        ulong n;
 
         do{
             n = n_randtest_prime(state, 1);
@@ -149,7 +149,7 @@ TEST_FUNCTION_START(nmod_poly_power_sums_naive, state)
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c, d;
-        mp_limb_t n;
+        ulong n;
 
         do{
             n = n_randtest_prime(state, 1);

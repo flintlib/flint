@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -21,7 +21,7 @@ arb_bernoulli_ui_zeta(arb_t b, ulong n, slong prec)
     arb_t t, u;
 
     if (n < 10 || n % 2 != 0)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     wp = prec + 8;
     piwp = wp + 2*FLINT_BIT_COUNT(n);
@@ -55,4 +55,3 @@ arb_bernoulli_ui_zeta(arb_t b, ulong n, slong prec)
     arb_clear(t);
     arb_clear(u);
 }
-

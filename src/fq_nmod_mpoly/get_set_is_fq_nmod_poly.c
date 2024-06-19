@@ -5,12 +5,15 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fq_nmod.h"
+#include "fq_nmod_poly.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "fq_nmod_mpoly.h"
-
 
 int fq_nmod_mpoly_is_fq_nmod_poly(
     const fq_nmod_mpoly_t A,
@@ -29,7 +32,7 @@ int fq_nmod_mpoly_get_fq_nmod_poly(
 {
     slong d = fq_nmod_ctx_degree(ctx->fqctx);
     slong Blen = B->length;
-    const mp_limb_t * Bcoeffs = B->coeffs;
+    const ulong * Bcoeffs = B->coeffs;
     const ulong * Bexps = B->exps;
     flint_bitcnt_t Bbits = B->bits;
     slong i, N = mpoly_words_per_exp(Bbits, ctx->minfo);
@@ -66,8 +69,8 @@ int fq_nmod_mpoly_get_fq_nmod_poly(
     }
     else
     {
-        slong j, off;
-        ulong check, wpf = Bbits/FLINT_BITS;
+        slong j, off, wpf = Bbits/FLINT_BITS;
+        ulong check;
 
         off = mpoly_gen_offset_mp(var, Bbits, ctx->minfo);
 

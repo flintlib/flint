@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "longlong.h"
 #include "fmpz_poly.h"
 #include "qadic.h"
 
@@ -138,8 +139,7 @@ void qadic_teichmuller(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 
     if (op->val < 0)
     {
-        flint_printf("Exception (qadic_teichmuller).  val(op) is negative.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (qadic_teichmuller).  val(op) is negative.\n");
     }
 
     if (qadic_is_zero(op) || op->val > 0 || N <= 0)
@@ -159,4 +159,3 @@ void qadic_teichmuller(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
         _padic_poly_normalise(rop);
     }
 }
-

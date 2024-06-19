@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gr.h"
 #include "gr_mat.h"
 
 static void
@@ -50,7 +51,7 @@ gr_mat_lu_recursive(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int 
     m = A->r;
     n = A->c;
 
-    if (m < 4 || n < 4)
+    if (m <= 1 || n <= 1)
         return gr_mat_lu_classical(rank, P, LU, A, rank_check, ctx);
 
     if (LU != A)
@@ -67,7 +68,7 @@ gr_mat_lu_recursive(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int 
     gr_mat_window_init(A0, LU, 0, 0, m, n1, ctx);
     gr_mat_window_init(A1, LU, 0, n1, m, n, ctx);
 
-    status |= gr_mat_lu_recursive(&r1, P1, A0, A0, rank_check, ctx);
+    status |= gr_mat_lu(&r1, P1, A0, A0, rank_check, ctx);
 
     if (status != GR_SUCCESS)
         goto cleanup1;
@@ -99,7 +100,7 @@ gr_mat_lu_recursive(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int 
         gr_mat_clear(T, ctx);
     }
 
-    status |= gr_mat_lu_recursive(&r2, P1, A11, A11, rank_check, ctx);
+    status |= gr_mat_lu(&r2, P1, A11, A11, rank_check, ctx);
 
     if (status != GR_SUCCESS)
         goto cleanup2;

@@ -1,11 +1,12 @@
 /*
     Copyright (C) 2019 William Hart
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -26,7 +27,7 @@ void _fq_nmod_vec_dot(fq_nmod_t res, const fq_nmod_struct * vec1,
       return;
    }
 
-   nmod_poly_init(t, ctx->p);
+   nmod_poly_init(t, fq_nmod_ctx_prime(ctx));
 
    nmod_poly_mul(res, vec1 + 0, vec2 + 0);
 
@@ -41,4 +42,3 @@ void _fq_nmod_vec_dot(fq_nmod_t res, const fq_nmod_struct * vec1,
 
    nmod_poly_clear(t);
 }
-

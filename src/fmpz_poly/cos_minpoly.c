@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -21,7 +21,7 @@
 #define MINPOLY_TAB_NUM 65
 #define MINPOLY_TAB_MAX_LEN 24
 
-static const char
+static const unsigned char
 minpoly_len_tab[MINPOLY_TAB_NUM] = {
     1, 2, 2, 2, 2, 3, 2, 4, 3, 4, 3, 6, 3, 7, 4, 5, 5, 9, 4, 10, 5, 7, 6,
     12, 5, 11, 7, 10, 7, 15, 5, 16, 9, 11, 9, 13, 7, 19, 10, 13, 9, 21, 7,
@@ -246,7 +246,7 @@ _fmpz_poly_cos_minpoly(fmpz * f, ulong n)
         }
     }
 
-    _fmpz_poly_div(f, P, Plen, Q, Qlen, 0);
+    _fmpz_poly_divexact(f, P, Plen, Q, Qlen);
 
     _fmpz_vec_clear(P, Pdeg + 1);
     _fmpz_vec_clear(Q, Pdeg + 1);

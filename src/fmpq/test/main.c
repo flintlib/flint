@@ -5,12 +5,9 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
-
-#include <string.h>
-#include <stdlib.h>
 
 /* For t-get_mpfr.c */
 #include <stdio.h>
@@ -27,13 +24,11 @@
 #include "t-canonicalise.c"
 #include "t-cfrac_bound.c"
 #include "t-cmp.c"
-#include "t-cmp_fmpz.c"
-#include "t-cmp_si.c"
-#include "t-cmp_ui.c"
 #include "t-dedekind_sum.c"
 #include "t-div_2exp.c"
 #include "t-div.c"
 #include "t-div_fmpz.c"
+#include "t-equal_si_ui.c"
 #include "t-farey_neighbors.c"
 #include "t-gcd_cofactors.c"
 #include "t-get_cfrac.c"
@@ -81,13 +76,11 @@ test_struct tests[] =
     TEST_FUNCTION(fmpq_canonicalise),
     TEST_FUNCTION(fmpq_cfrac_bound),
     TEST_FUNCTION(fmpq_cmp),
-    TEST_FUNCTION(fmpq_cmp_fmpz),
-    TEST_FUNCTION(fmpq_cmp_si),
-    TEST_FUNCTION(fmpq_cmp_ui),
     TEST_FUNCTION(fmpq_dedekind_sum),
     TEST_FUNCTION(fmpq_div_2exp),
     TEST_FUNCTION(fmpq_div),
     TEST_FUNCTION(fmpq_div_fmpz),
+    TEST_FUNCTION(fmpq_equal_si_ui),
     TEST_FUNCTION(fmpq_farey_neighbors),
     TEST_FUNCTION(fmpq_gcd_cofactors),
     TEST_FUNCTION(fmpq_get_cfrac),

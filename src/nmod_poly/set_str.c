@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -17,7 +17,7 @@ int nmod_poly_set_str(nmod_poly_t poly, const char * s)
 {
     const char * whitespace = " \t\n\r";
     slong i, length;
-    mp_limb_t n;
+    ulong n;
 
     if (flint_sscanf(s, "%wd %wu", &length, &n) != 2)
         return 0;

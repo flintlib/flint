@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -28,7 +28,7 @@ _gr_poly_evaluate_horner(gr_ptr res, gr_srcptr f, slong len, const gr_srcptr x, 
     {
         slong sz = ctx->sizeof_elem;
 
-        status |= gr_mul(res, x, GR_ENTRY(f, 1, sz), ctx);
+        status |= gr_mul(res, GR_ENTRY(f, 1, sz), x, ctx);
         status |= gr_add(res, res, f, ctx);
 
         return status;

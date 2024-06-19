@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -52,9 +52,7 @@ void fmpz_mod_poly_divrem_newton_n_preinv(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
         }
         else
         {
-            flint_printf("Exception (fmpz_mod_poly_divrem_newton_n_preinv)."
-                         " Division by zero.\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(fmpz_mod_poly_divrem_newton_n_preinv): Division by zero.\n");
         }
     }
 
@@ -67,8 +65,7 @@ void fmpz_mod_poly_divrem_newton_n_preinv(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
 
     if (lenA > 2 * lenB - 2)
     {
-        flint_printf("Exception (fmpz_mod_poly_divrem_newton_n_preinv).\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mod_poly_divrem_newton_n_preinv).\n");
     }
 
     if (Q == A || Q == B || Q == Binv)

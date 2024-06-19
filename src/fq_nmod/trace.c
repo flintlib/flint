@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -15,13 +15,13 @@
 #include "fmpz.h"
 #include "fq_nmod.h"
 
-void _fq_nmod_trace(fmpz_t rop2, const mp_limb_t *op, slong len,
+void _fq_nmod_trace(fmpz_t rop2, const ulong *op, slong len,
                     const fq_nmod_ctx_t ctx)
 {
     const slong d = fq_nmod_ctx_degree(ctx);
 
     slong i, l;
-    mp_limb_t *t, rop;
+    ulong *t, rop;
 
     t = _nmod_vec_init(d);
     _nmod_vec_zero(t, d);
@@ -71,4 +71,3 @@ void fq_nmod_trace(fmpz_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx)
 
     _fq_nmod_trace(rop, op->coeffs, op->length, ctx);
 }
-

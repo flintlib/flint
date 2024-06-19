@@ -6,12 +6,21 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "mpfr_mat.h"
+
+FLINT_FORCE_INLINE void
+mpfr_mat_swap_entrywise(mpfr_mat_t mat1, mpfr_mat_t mat2)
+{
+    slong i, j;
+
+    for (i = 0; i < mpfr_mat_nrows(mat1); i++)
+        for (j = 0; j < mpfr_mat_ncols(mat1); j++)
+            mpfr_swap(mpfr_mat_entry(mat2, i, j), mpfr_mat_entry(mat1, i, j));
+}
 
 void
 mpfr_mat_mul_classical(mpfr_mat_t C, const mpfr_mat_t A, const mpfr_mat_t B,
@@ -37,9 +46,7 @@ mpfr_mat_mul_classical(mpfr_mat_t C, const mpfr_mat_t A, const mpfr_mat_t B,
 
     if (C->r != ar || C->c != bc)
     {
-        flint_printf
-            ("Exception (mpfr_mat_mul_classical). Incompatible dimensions.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(mpfr_mat_mul_classical): Incompatible dimensions.\n");
     }
 
     if (br == 0)

@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -17,24 +17,16 @@
 
 TEST_FUNCTION_START(n_nextprime, state)
 {
-    mp_limb_t n;
-    mp_limb_t res1, res2;
+    ulong n;
+    ulong res1, res2;
     slong rep;
     mpz_t mpz_n;
 
     if (n_nextprime(0, 0) != 2)
-    {
-        flint_printf("FAIL: expected n_nextprime(0) = 2");
-        fflush(stdout);
-        flint_abort();
-    }
+        TEST_FUNCTION_FAIL("FAIL: expected n_nextprime(0) = 2");
 
     if (n_nextprime(UWORD_MAX_PRIME - 1, 0) != UWORD_MAX_PRIME)
-    {
-        flint_printf("FAIL: expected n_nextprime(UWORD_MAX_PRIME-1) = UWORD_MAX_PRIME");
-        fflush(stdout);
-        flint_abort();
-    }
+        TEST_FUNCTION_FAIL("FAIL: expected n_nextprime(UWORD_MAX_PRIME-1) = UWORD_MAX_PRIME");
 
     mpz_init(mpz_n);
 
@@ -52,12 +44,7 @@ TEST_FUNCTION_START(n_nextprime, state)
         res2 = flint_mpz_get_ui(mpz_n);
 
         if (res1 != res2)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("%wu, %wu\n", res1, res2);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("%wu, %wu\n", res1, res2);
     }
 
     for (rep = 0; rep < 10000; rep++)
@@ -72,12 +59,7 @@ TEST_FUNCTION_START(n_nextprime, state)
         res2 = flint_mpz_get_ui(mpz_n);
 
         if (res1 != res2)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("%wu, %wu\n", res1, res2);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("%wu, %wu\n", res1, res2);
     }
 
     mpz_clear(mpz_n);

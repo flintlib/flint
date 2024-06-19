@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -51,13 +51,7 @@ TEST_FUNCTION_START(n_urandint, state)
         }
 
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("limit = %wu, deviation = %wd\n", limit, deviation);
-            flint_free(count);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("limit = %wu, deviation = %wd\n", limit, deviation);
     }
 
     flint_free(count);
@@ -108,13 +102,7 @@ TEST_FUNCTION_START(n_urandint, state)
         }
 
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("limit = %wu, deviation = %wd\n", limit, deviation);
-            flint_free(count_in_subrange);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("limit = %wu, deviation = %wd\n", limit, deviation);
     }
 
     flint_free(count_in_subrange);

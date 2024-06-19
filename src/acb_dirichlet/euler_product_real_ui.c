@@ -5,11 +5,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "thread_pool.h"
 #include "thread_support.h"
+#include "arb.h"
 #include "acb_dirichlet.h"
 
 #ifdef __GNUC__
@@ -26,7 +28,7 @@ typedef struct
     ulong s;
     int mod;
     const signed char * chi;
-    mp_ptr primes;
+    nn_ptr primes;
     double * powmags;
     slong num_primes;
     slong wp;
@@ -87,7 +89,8 @@ void _acb_dirichlet_euler_product_real_ui(arb_t res, ulong s,
         return;
     }
 
-    if (prec < 2) flint_abort(); /* assert */
+    if (prec < 2)
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     /* L(s), 1/L(s) = 1 + ...  For s >= 3, zeta(s,2) < 2^(1-s). */
     if (s > (ulong) prec)
@@ -144,7 +147,7 @@ void _acb_dirichlet_euler_product_real_ui(arb_t res, ulong s,
     {
         n_primes_t iter;
         slong i;
-        mp_ptr primes;
+        nn_ptr primes;
         double * powmags;
         slong num_primes = 0;
         slong alloc = 16;
@@ -157,7 +160,7 @@ void _acb_dirichlet_euler_product_real_ui(arb_t res, ulong s,
         n_primes_init(iter);
         n_primes_jump_after(iter, 3);
 
-        primes = flint_malloc(alloc * sizeof(mp_limb_t));
+        primes = flint_malloc(alloc * sizeof(ulong));
         powmags = flint_malloc(alloc * sizeof(double));
 
         for (p = 3; p < limit; p = n_primes_next(iter))
@@ -180,7 +183,7 @@ void _acb_dirichlet_euler_product_real_ui(arb_t res, ulong s,
                 if (num_primes >= alloc)
                 {
                     alloc *= 2;
-                    primes = flint_realloc(primes, alloc * sizeof(mp_limb_t));
+                    primes = flint_realloc(primes, alloc * sizeof(ulong));
                     powmags = flint_realloc(powmags, alloc * sizeof(double));
                 }
 
@@ -289,4 +292,3 @@ void _acb_dirichlet_euler_product_real_ui(arb_t res, ulong s,
     arb_clear(t);
     arb_clear(u);
 }
-

@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -25,7 +25,7 @@ TEST_FUNCTION_START(nmod_vec_discrete_log_pohlig_hellman, state)
         {
             double score;
             nmod_t fpctx;
-            mp_limb_t p;
+            ulong p;
 
             p = n_randtest_prime(state, 1);
             nmod_init(&fpctx, p);
@@ -38,19 +38,12 @@ TEST_FUNCTION_START(nmod_vec_discrete_log_pohlig_hellman, state)
             for (k = 0; k < 10; k++)
             {
                 ulong x;
-                mp_limb_t y, alpha = nmod_discrete_log_pohlig_hellman_primitive_root(L);
+                ulong y, alpha = nmod_discrete_log_pohlig_hellman_primitive_root(L);
 
                 x = n_urandint(state, p - 1);
                 y = nmod_pow_ui(alpha, x, fpctx);
                 if (x != nmod_discrete_log_pohlig_hellman_run(L, y))
-                {
-
-                    printf("FAIL\n");
-                    flint_printf("modulo %wu log base %wu of %wu"
-                                           " should be %wu\n", p, alpha, y, x);
-                    fflush(stdout);
-                    flint_abort();
-                }
+                    TEST_FUNCTION_FAIL("modulo %wu log base %wu of %wu should be %wu\n", p, alpha, y, x);
             }
         }
         nmod_discrete_log_pohlig_hellman_clear(L);

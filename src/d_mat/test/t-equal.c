@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -36,21 +36,13 @@ TEST_FUNCTION_START(d_mat_equal, state)
         d_mat_init(E, m, n + 1);
 
         if (d_mat_equal(A, D) || d_mat_equal(A, E))
-        {
-            flint_printf("FAIL: different dimensions should not be equal\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("different dimensions should not be equal\n");
 
         d_mat_randtest(A, state, 0, 0);
         d_mat_set(B, A);
 
         if (!d_mat_equal(A, B))
-        {
-            flint_printf("FAIL: copied matrices should be equal\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("copied matrices should be equal\n");
 
         if (m && n)
         {
@@ -58,11 +50,7 @@ TEST_FUNCTION_START(d_mat_equal, state)
             A->entries[j] += 1;
 
             if (d_mat_equal(A, B))
-            {
-                flint_printf("FAIL: modified matrices should not be equal\n");
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL("FAIL: modified matrices should not be equal\n");
         }
 
         d_mat_clear(A);

@@ -5,11 +5,10 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "nmod_poly.h"
 #include "nmod_poly_mat.h"
 #include "perm.h"
@@ -24,15 +23,14 @@ nmod_poly_mat_set_perm(nmod_poly_mat_t X, const slong * perm,
 {
     if (X == B)
     {
-        /* Not implemented */
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s): Not implemented\n");
     }
     else
     {
         slong i, j;
 
         if (perm == NULL)
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s): perm == NULL\n");
 
         for (i = 0; i < nmod_poly_mat_nrows(B); i++)
             for (j = 0; j < nmod_poly_mat_ncols(B); j++)
@@ -66,7 +64,7 @@ nmod_poly_mat_solve_fflu_precomp(nmod_poly_mat_t X,
                 nmod_poly_mul(T, LU(j, i), XX(i, k));
                 nmod_poly_sub(XX(j, k), XX(j, k), T);
                 if (i > 0)
-                    nmod_poly_div(XX(j, k), XX(j, k), LU(i-1, i-1));
+                    nmod_poly_divexact(XX(j, k), XX(j, k), LU(i-1, i-1));
             }
         }
 
@@ -79,7 +77,7 @@ nmod_poly_mat_solve_fflu_precomp(nmod_poly_mat_t X,
                 nmod_poly_mul(T, XX(j, k), LU(i, j));
                 nmod_poly_sub(XX(i, k), XX(i, k), T);
             }
-            nmod_poly_div(XX(i, k), XX(i, k), LU(i, i));
+            nmod_poly_divexact(XX(i, k), XX(i, k), LU(i, i));
         }
     }
 

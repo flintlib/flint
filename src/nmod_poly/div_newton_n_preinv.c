@@ -7,20 +7,19 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "nmod_vec.h"
 #include "nmod_poly.h"
-#include "ulong_extras.h"
 
-void _nmod_poly_div_newton_n_preinv(mp_ptr Q, mp_srcptr A, slong lenA,
-                                     mp_srcptr B, slong lenB, mp_srcptr Binv,
-                                     slong lenBinv, nmod_t mod)
+void _nmod_poly_div_newton_n_preinv(nn_ptr Q, nn_srcptr A, slong lenA,
+        nn_srcptr FLINT_UNUSED(B), slong lenB, nn_srcptr Binv,
+        slong lenBinv, nmod_t mod)
 {
     const slong lenQ = lenA - lenB + 1;
-    mp_ptr Arev;
+    nn_ptr Arev;
 
     Arev = _nmod_vec_init(lenQ);
     _nmod_poly_reverse(Arev, A + (lenA - lenQ), lenQ, lenQ);
@@ -38,7 +37,7 @@ void nmod_poly_div_newton_n_preinv(nmod_poly_t Q, const nmod_poly_t A,
     const slong lenA = A->length, lenB = B->length, lenQ = lenA - lenB + 1,
                lenBinv = Binv->length;
 
-    mp_ptr q;
+    nn_ptr q;
 
     if (lenB == 0)
     {
@@ -48,8 +47,7 @@ void nmod_poly_div_newton_n_preinv(nmod_poly_t Q, const nmod_poly_t A,
             return;
         } else
         {
-            flint_printf("Exception (nmod_poly_div_newton_n_preinv). Division by zero.\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "Exception (nmod_poly_div_newton_n_preinv). Division by zero.\n");
         }
     }
 
@@ -66,7 +64,7 @@ void nmod_poly_div_newton_n_preinv(nmod_poly_t Q, const nmod_poly_t A,
 
     if (Q == A || Q == B || Q == Binv)
     {
-        q = (mp_ptr) flint_malloc(lenQ * sizeof(mp_limb_t));
+        q = (nn_ptr) flint_malloc(lenQ * sizeof(ulong));
     }
     else
     {

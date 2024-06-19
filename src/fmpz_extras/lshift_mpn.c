@@ -5,18 +5,19 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpn_extras.h"
 #include "fmpz_extras.h"
 
 void
-fmpz_lshift_mpn(fmpz_t z, mp_srcptr d, mp_size_t dn, int sgnbit, flint_bitcnt_t shift)
+fmpz_lshift_mpn(fmpz_t z, nn_srcptr d, slong dn, int sgnbit, flint_bitcnt_t shift)
 {
-    __mpz_struct * zmpz;
-    mp_ptr zp;
-    mp_size_t zn, shift_limbs;
+    mpz_ptr zmpz;
+    nn_ptr zp;
+    slong zn, shift_limbs;
     flint_bitcnt_t shift_bits;
 
     zmpz = _fmpz_promote(z);
@@ -25,10 +26,7 @@ fmpz_lshift_mpn(fmpz_t z, mp_srcptr d, mp_size_t dn, int sgnbit, flint_bitcnt_t 
     shift_bits = shift % FLINT_BITS;
     zn = dn + shift_limbs + (shift_bits != 0);
 
-    if (zmpz->_mp_alloc < zn)
-        mpz_realloc2(zmpz, zn * FLINT_BITS);
-
-    zp = zmpz->_mp_d;
+    zp = FLINT_MPZ_REALLOC(zmpz, zn);
     flint_mpn_zero(zp, shift_limbs);
 
     if (shift_bits == 0)
@@ -45,4 +43,3 @@ fmpz_lshift_mpn(fmpz_t z, mp_srcptr d, mp_size_t dn, int sgnbit, flint_bitcnt_t 
     zmpz->_mp_size = sgnbit ? -(slong) zn : zn;
     _fmpz_demote_val(z);
 }
-

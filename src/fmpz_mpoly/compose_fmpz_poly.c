@@ -5,12 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_mat.h"
 #include "fmpz_poly.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
 
 static int _fmpz_poly_pow_fmpz_is_not_feasible(const fmpz_poly_t b, const fmpz_t e)
@@ -102,7 +104,7 @@ int _fmpz_mpoly_compose_fmpz_poly_sp(fmpz_poly_t A, const fmpz_mpoly_t B,
         flint_bitcnt_t varibits = FLINT_BIT_COUNT(degrees[i]);
 
         mpoly_gen_offset_shift_sp(&off, &shift, i, bits, ctx->minfo);
-        for (j = 0; j < varibits; j++)
+        for (j = 0; (flint_bitcnt_t) j < varibits; j++)
         {
             offs[k] = off;
             masks[k] = UWORD(1) << (shift + j);
@@ -269,4 +271,3 @@ int fmpz_mpoly_compose_fmpz_poly(fmpz_poly_t A, const fmpz_mpoly_t B,
         return _fmpz_mpoly_compose_fmpz_poly_mp(A, B, C, ctx);
     }
 }
-

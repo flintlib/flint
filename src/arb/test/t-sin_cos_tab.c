@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -36,7 +36,7 @@ TEST_FUNCTION_START(arb_sin_cos_tab, state)
         {
             for (i = 0; i < num; i++)
             {
-                tt->_mp_d = (mp_ptr) arb_sin_cos_tab1[2 * i + which];
+                tt->_mp_d = (nn_ptr) arb_sin_cos_tab1[2 * i + which];
                 tt->_mp_size = prec / FLINT_BITS;
                 tt->_mp_alloc = tt->_mp_size;
 
@@ -101,7 +101,7 @@ TEST_FUNCTION_START(arb_sin_cos_tab, state)
         {
             for (i = 0; i < num; i++)
             {
-                tt->_mp_d = (mp_ptr) arb_sin_cos_tab21[2 * i + which];
+                tt->_mp_d = (nn_ptr) arb_sin_cos_tab21[2 * i + which];
                 tt->_mp_size = prec / FLINT_BITS;
                 tt->_mp_alloc = tt->_mp_size;
 
@@ -166,7 +166,7 @@ TEST_FUNCTION_START(arb_sin_cos_tab, state)
         {
             for (i = 0; i < num; i++)
             {
-                tt->_mp_d = (mp_ptr) arb_sin_cos_tab22[2 * i + which];
+                tt->_mp_d = (nn_ptr) arb_sin_cos_tab22[2 * i + which];
                 tt->_mp_size = prec / FLINT_BITS;
                 tt->_mp_alloc = tt->_mp_size;
 

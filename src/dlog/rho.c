@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -33,10 +33,7 @@ dlog_single(ulong b, ulong a, const nmod_t mod, ulong n)
             ak = nmod_mul(ak, a, mod);
         }
 
-        flint_printf("FAIL[dlog single]: log(%wu,%wu) mod %wu not found (size %wu)\n",
-                b, a, mod.n, n);
-        flint_abort();
-        return 0; /* dummy return because flint_abort() is not declared noreturn */
+        flint_throw(FLINT_ERROR, "(dlog single): log(%wu,%wu) mod %wu not found (size %wu)\n", b, a, mod.n, n);
     }
     else
     {
@@ -55,9 +52,7 @@ dlog_quotient(const dlog_rho_t t, ulong e, ulong f, ulong g, ulong b)
 
     if (g == n.n)
     {
-        flint_printf("FAIL[dlog quotient]: trivial relation e = %wu, f = %wu mod %wu\n",
-                e, f, n.n);
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(dlog quotient): trivial relation e = %wu, f = %wu mod %wu\n", e, f, n.n);
     }
 
     nmod_init(&n, n.n / g);
@@ -79,7 +74,11 @@ dlog_rho(const dlog_rho_t t, ulong b)
     ulong x[2], e[2], f[2], g;
     flint_rand_t state;
 
-    flint_randinit(state);
+    flint_rand_init(state);
+
+    /* Fixme: the general algorithm hangs */
+    if (t->mod.n <= 3)
+        return dlog_single(b, t->a, t->mod, t->n.n);
 
     do {
 
@@ -110,7 +109,7 @@ dlog_rho(const dlog_rho_t t, ulong b)
 
     } while (e[0] == e[1] && f[0] == f[1]);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     /* e = f * log(b) */
     e[0] = nmod_sub(e[0], e[1], t->n);
@@ -121,3 +120,4 @@ dlog_rho(const dlog_rho_t t, ulong b)
     else
         return nmod_div(e[0], f[0], t->n);
 }
+

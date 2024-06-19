@@ -5,18 +5,19 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
+#include "longlong.h"
 
 void fmpz_mod_poly_frobenius_powers_2exp_precomp(
            fmpz_mod_poly_frobenius_powers_2exp_t pow, const fmpz_mod_poly_t f,
                  const fmpz_mod_poly_t finv, ulong m, const fmpz_mod_ctx_t ctx)
 {
-    slong i, l = 0;
+    ulong i, l;
 
     if (m == 0)
     {
@@ -26,7 +27,7 @@ void fmpz_mod_poly_frobenius_powers_2exp_precomp(
     }
 
     l = FLINT_CLOG2(m);
-    if ((WORD(1) << l) == m)
+    if ((UWORD(1) << l) == m)
        l++;
 
     pow->pow = (fmpz_mod_poly_struct *) flint_malloc(l*sizeof(fmpz_mod_poly_struct));

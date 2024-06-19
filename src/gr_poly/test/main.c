@@ -5,12 +5,9 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
-
-#include <string.h>
-#include <stdlib.h>
 
 /* Include functions *********************************************************/
 
@@ -46,11 +43,13 @@
 #include "t-inv_series.c"
 #include "t-log_series.c"
 #include "t-make_monic.c"
+#include "t-mul_karatsuba.c"
 #include "t-nth_derivative.c"
 #include "t-pow_series_fmpq.c"
 #include "t-pow_series_ui.c"
 #include "t-pow_ui.c"
 #include "t-rem.c"
+#include "t-refine_roots.c"
 #include "t-resultant.c"
 #include "t-resultant_euclidean.c"
 #include "t-resultant_hgcd.c"
@@ -66,6 +65,7 @@
 #include "t-taylor_shift_convolution.c"
 #include "t-taylor_shift_divconquer.c"
 #include "t-taylor_shift_horner.c"
+#include "t-xgcd.c"
 #include "t-xgcd_euclidean.c"
 #include "t-xgcd_hgcd.c"
 
@@ -105,10 +105,12 @@ test_struct tests[] =
     TEST_FUNCTION(gr_poly_inv_series),
     TEST_FUNCTION(gr_poly_log_series),
     TEST_FUNCTION(gr_poly_make_monic),
+    TEST_FUNCTION(gr_poly_mul_karatsuba),
     TEST_FUNCTION(gr_poly_nth_derivative),
     TEST_FUNCTION(gr_poly_pow_series_fmpq),
     TEST_FUNCTION(gr_poly_pow_series_ui),
     TEST_FUNCTION(gr_poly_pow_ui),
+    TEST_FUNCTION(gr_poly_refine_roots),
     TEST_FUNCTION(gr_poly_rem),
     TEST_FUNCTION(gr_poly_resultant),
     TEST_FUNCTION(gr_poly_resultant_euclidean),
@@ -125,6 +127,7 @@ test_struct tests[] =
     TEST_FUNCTION(gr_poly_taylor_shift_convolution),
     TEST_FUNCTION(gr_poly_taylor_shift_divconquer),
     TEST_FUNCTION(gr_poly_taylor_shift_horner),
+    TEST_FUNCTION(gr_poly_xgcd),
     TEST_FUNCTION(gr_poly_xgcd_euclidean),
     TEST_FUNCTION(gr_poly_xgcd_hgcd)
 };

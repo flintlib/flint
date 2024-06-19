@@ -5,10 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
+#include "fq_nmod.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "fq_nmod_mpoly.h"
 
 void _fq_nmod_mpoly_evaluate_one_fq_nmod_sp(
@@ -23,11 +27,11 @@ void _fq_nmod_mpoly_evaluate_one_fq_nmod_sp(
     slong i, N, off, shift;
     ulong * cmpmask, * one;
     slong Blen = B->length;
-    const mp_limb_t * Bcoeffs = B->coeffs;
+    const ulong * Bcoeffs = B->coeffs;
     const ulong * Bexps = B->exps;
     flint_bitcnt_t bits = B->bits;
     slong Alen;
-    mp_limb_t * Acoeffs;
+    ulong * Acoeffs;
     ulong * Aexps;
     ulong mask, k;
     int need_sort = 0, cmp;
@@ -111,11 +115,11 @@ static void _fq_nmod_mpoly_evaluate_one_fq_nmod_mp(
     slong i, N, off;
     ulong * cmpmask, * one, * tmp;
     slong Blen = B->length;
-    const mp_limb_t * Bcoeffs = B->coeffs;
+    const ulong * Bcoeffs = B->coeffs;
     const ulong * Bexps = B->exps;
     flint_bitcnt_t bits = B->bits;
     slong Alen;
-    mp_limb_t * Acoeffs;
+    ulong * Acoeffs;
     ulong * Aexps;
     fmpz_t k;
     int need_sort = 0, cmp;

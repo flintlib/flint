@@ -5,56 +5,65 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #ifndef FFT_SMALL_H
 #define FFT_SMALL_H
 
+#include "longlong.h"
 #include "machine_vectors.h"
+
+#if FLINT_USES_PTHREAD
+# include <pthread.h>
+# include <stdatomic.h>
+#endif
 
 #define LG_BLK_SZ 8
 #define BLK_SZ 256
-#define BLK_SHIFT 10
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-FLINT_INLINE ulong n_pow2(int k)
+/* Check that a modulus n satisfies the assumptions for mulmod
+   documented in machine_vectors.h */
+int fft_small_mulmod_satisfies_bounds(ulong n);
+
+FLINT_FORCE_INLINE ulong n_pow2(int k)
 {
     return UWORD(1) << k;
 }
 
-FLINT_INLINE ulong n_min(ulong a, ulong b)
+FLINT_FORCE_INLINE ulong n_min(ulong a, ulong b)
 {
     return FLINT_MIN(a, b);
 }
 
-FLINT_INLINE ulong n_max(ulong a, ulong b)
+FLINT_FORCE_INLINE ulong n_max(ulong a, ulong b)
 {
     return FLINT_MAX(a, b);
 }
 
-FLINT_INLINE ulong n_cdiv(ulong a, ulong b)
+FLINT_FORCE_INLINE ulong n_cdiv(ulong a, ulong b)
 {
     /* not technically correct because the addition can overflow */
     return (a + b - 1)/b;
 }
 
-FLINT_INLINE ulong n_round_up(ulong a, ulong b)
+FLINT_FORCE_INLINE ulong n_round_up(ulong a, ulong b)
 {
     return n_cdiv(a, b)*b;
 }
 
-FLINT_INLINE ulong n_round_down(ulong a, ulong b)
+FLINT_FORCE_INLINE ulong n_round_down(ulong a, ulong b)
 {
     return a/b*b;
 }
 
 /* 0 -> 0, 1 -> 1, [2,3] -> 3, [4,7] -> 7, [8,15] -> 15, ... */
-FLINT_INLINE ulong n_next_pow2m1(ulong a)
+FLINT_FORCE_INLINE ulong n_next_pow2m1(ulong a)
 {
     a |= a >> 1;
     a |= a >> 2;
@@ -67,11 +76,11 @@ FLINT_INLINE ulong n_next_pow2m1(ulong a)
     return a;
 }
 
-FLINT_INLINE ulong n_leading_zeros(ulong x) {
+FLINT_FORCE_INLINE ulong n_leading_zeros(ulong x) {
     return x == 0 ? FLINT_BITS : flint_clz(x);
 }
 
-FLINT_INLINE ulong n_trailing_zeros(ulong x) {
+FLINT_FORCE_INLINE ulong n_trailing_zeros(ulong x) {
     return x == 0 ? FLINT_BITS : flint_ctz(x);
 }
 
@@ -88,36 +97,33 @@ FLINT_INLINE ulong n_trailing_zeros(ulong x) {
     assuming x != 0:
         on x86 we want BSR + 1
 */
-FLINT_INLINE ulong n_nbits(ulong x) {
+FLINT_FORCE_INLINE ulong n_nbits(ulong x) {
     if (x == 0)
         return 0;
     return FLINT_BITS - flint_clz(x);
 }
 
-FLINT_INLINE ulong n_nbits_nz(ulong x) {
+FLINT_FORCE_INLINE ulong n_nbits_nz(ulong x) {
     FLINT_ASSERT(x != 0);
     return (flint_clz(x)^(FLINT_BITS-1)) + 1;
 }
 
-FLINT_INLINE ulong n_clog2(ulong x) {
+FLINT_FORCE_INLINE ulong n_clog2(ulong x) {
     return (x <= 2) ? (x == 2) : FLINT_BITS - flint_clz(x - 1);
 }
 
-FLINT_INLINE ulong n_flog2(ulong x) {
+FLINT_FORCE_INLINE ulong n_flog2(ulong x) {
     return (x <= 2) ? (x == 2) : FLINT_BITS - flint_clz(x);
 }
 
-FLINT_INLINE slong z_min(slong a, slong b) {return FLINT_MIN(a, b);}
+FLINT_FORCE_INLINE slong z_min(slong a, slong b) {return FLINT_MIN(a, b);}
 
-FLINT_INLINE slong z_max(slong a, slong b) {return FLINT_MAX(a, b);}
+FLINT_FORCE_INLINE slong z_max(slong a, slong b) {return FLINT_MAX(a, b);}
 
-
-void* flint_aligned_alloc(ulong alignment, ulong size);
-
-void flint_aligned_free(void* p);
+int fft_small_mulmod_satisfies_bounds(ulong n);
 
 /*
-    The twiddle factors are split across FLINT_BITS tables:
+    The twiddle factors are split across SD_FFT_CTX_W2TAB_SIZE tables:
 
         [0] = {e(1)}                                original index 0
         [1] = {e(1/4)}                              original index 1
@@ -133,8 +139,8 @@ void flint_aligned_free(void* p);
         [j_bits][j_r]  where j_bits = nbits(j), j_r = j - 2^(j_bits-1)
 
     with the special case j_bits = j_r = 0 for j = 0.
-    The first SD_FFT_CTX_INIT_DEPTH tables are stored consecutively to ease the
-    lookup of small indices, which must currently be at least 4.
+    The first SD_FFT_CTX_W2TAB_INIT tables are stored consecutively to ease the
+    lookup of small indices, which must currently be at least max(4, LG_BLK_SZ).
 */
 
 /* for the fft look up of powers of w */
@@ -168,7 +174,8 @@ do { \
 } while (0)
 
 
-#define SD_FFT_CTX_INIT_DEPTH 12
+#define SD_FFT_CTX_W2TAB_INIT 12
+#define SD_FFT_CTX_W2TAB_SIZE 40
 
 /* This context is the one expected to sit in a global position */
 typedef struct {
@@ -176,134 +183,74 @@ typedef struct {
     double pinv;
     nmod_t mod;
     ulong primitive_root;
-    ulong blk_sz;
-    volatile ulong w2tab_depth;
-    double* w2tab[FLINT_BITS];
+#if FLINT_USES_PTHREAD
+    _Atomic(unsigned int) w2tab_depth;
+#else
+    unsigned int w2tab_depth;
+#endif
+    double* w2tab[SD_FFT_CTX_W2TAB_SIZE];
+#if FLINT_USES_PTHREAD
+    pthread_mutex_t mutex;
+#endif
 } sd_fft_ctx_struct;
 
 typedef sd_fft_ctx_struct sd_fft_ctx_t[1];
 
-/* The local context is expected to be copied and passed to the calculations. */
-typedef struct {
-    double* data;
-    double p;
-    double pinv;
-    const double* w2tab[50];
-} sd_fft_lctx_struct;
-
-typedef sd_fft_lctx_struct sd_fft_lctx_t[1];
-
-/*
-    Points are blocked into blocks of size BLK_SZ. The blocks are mapped into
-    memory with some extra padding for potential cache issues. The 4* keeps
-    things aligned for 4-wide vectors. If this alignment is broken, the load
-    and stores in the fft (unspecified vec4d_load) need to support unaligned
-    addresses.
-*/
-FLINT_INLINE ulong sd_fft_ctx_blk_offset(ulong I)
+FLINT_FORCE_INLINE ulong sd_fft_ctx_blk_offset(ulong I)
 {
-    return (I << LG_BLK_SZ) + 4*(I >> (BLK_SHIFT+2));
+    return I << LG_BLK_SZ;
 }
 
-FLINT_INLINE ulong sd_fft_ctx_data_size(ulong depth)
+FLINT_FORCE_INLINE ulong sd_fft_ctx_data_size(ulong L)
 {
-    FLINT_ASSERT(depth >= LG_BLK_SZ);
-    return sd_fft_ctx_blk_offset(n_pow2(depth - LG_BLK_SZ));
+    return n_pow2(L);
 }
 
-FLINT_INLINE double* sd_fft_ctx_blk_index(double* d, ulong I)
+FLINT_FORCE_INLINE double* sd_fft_ctx_blk_index(double* d, ulong I)
 {
     return d + sd_fft_ctx_blk_offset(I);
 }
 
-FLINT_INLINE double* sd_fft_lctx_blk_index(const sd_fft_lctx_t Q, ulong I)
+/*
+location of the bit-reversed eval:
+    with out_data = fft(in_data) of length 2^L, then
+    eval_poly(in_data, sd_fft_ctx_w(, i)) = out_data[sd_fft_ctx_trunc_index(L, i)]
+*/
+FLINT_FORCE_INLINE ulong sd_fft_ctx_trunc_index(ulong L, ulong i)
 {
-    return Q->data + sd_fft_ctx_blk_offset(I);
-}
-
-FLINT_INLINE void sd_fft_ctx_set_index(double* d, ulong i, double x)
-{
-    sd_fft_ctx_blk_index(d, i/BLK_SZ)[i%BLK_SZ] = x;
-}
-
-FLINT_INLINE double sd_fft_ctx_get_index(double* d, ulong i)
-{
-    return sd_fft_ctx_blk_index(d, i/BLK_SZ)[i%BLK_SZ];
-}
-
-/* slightly-worse-than-bit-reversed order of sd_{i}fft_basecase_4 */
-FLINT_INLINE double sd_fft_ctx_get_fft_index(double* d, ulong i)
-{
-    ulong j = i&(BLK_SZ-16);
-    FLINT_ASSERT(BLK_SZ >= 16);
-    j |= (i&3)<<2;
-    j |= ((i>>2)&3);
-    return sd_fft_ctx_blk_index(d, i/BLK_SZ)[j];
+    /* 4x4 transposed blocks in basecases if depth >= 4 */
+    if (L >= 4)
+        i = (i&(-16)) | ((i>>2)&3) | ((i&3)<<2);
+    return i;
 }
 
 /* sd_fft.c */
-void sd_fft_trunc(const sd_fft_lctx_t Q, ulong Iv, ulong S, ulong k, ulong j, ulong itrunc, ulong otrunc);
+void sd_fft_trunc(sd_fft_ctx_t Q, double* d, ulong L, ulong itrunc, ulong otrunc);
 
 /* sd_ifft.c */
-void sd_ifft_trunc(const sd_fft_lctx_t Q, ulong Iv, ulong S, ulong k, ulong j, ulong z, ulong n, int f);
+void sd_ifft_trunc(sd_fft_ctx_t Q, double* d, ulong L, ulong trunc);
 
 /* sd_fft_ctx.c */
 void sd_fft_ctx_clear(sd_fft_ctx_t Q);
 void sd_fft_ctx_init_prime(sd_fft_ctx_t Q, ulong pp);
-void sd_fft_ctx_fit_depth(sd_fft_ctx_t Q, ulong k);
+void sd_fft_ctx_fit_depth_with_lock(sd_fft_ctx_t Q, ulong k);
 
-/* TODO: these should probably increment/decrement a ref count */
-FLINT_INLINE void sd_fft_lctx_init(sd_fft_lctx_t L, sd_fft_ctx_t Q, ulong depth)
+FLINT_FORCE_INLINE void sd_fft_ctx_fit_depth(sd_fft_ctx_t Q, ulong depth)
 {
-    L->p = Q->p;
-    L->pinv = Q->pinv;
-    sd_fft_ctx_fit_depth(Q, depth);
-    for (int i = 0; i < 50; i++)
-        L->w2tab[i] = Q->w2tab[i];
+#if FLINT_USES_PTHREAD
+    ulong tdepth = (ulong)atomic_load_explicit(&Q->w2tab_depth, memory_order_relaxed);
+#else
+    ulong tdepth = (ulong)Q->w2tab_depth;
+#endif
+    if (FLINT_UNLIKELY(tdepth < depth))
+        sd_fft_ctx_fit_depth_with_lock(Q, depth);
 }
 
-FLINT_INLINE void sd_fft_lctx_clear(sd_fft_lctx_t LQ, sd_fft_ctx_t Q)
-{
-}
-
-void sd_fft_lctx_point_mul(const sd_fft_lctx_t Q,
+void sd_fft_ctx_point_mul(const sd_fft_ctx_t Q,
                             double* a, const double* b, ulong m_, ulong depth);
-void sd_fft_lctx_point_sqr(const sd_fft_lctx_t Q,
+void sd_fft_ctx_point_sqr(const sd_fft_ctx_t Q,
                             double* a, ulong m_, ulong depth);
 
-
-FLINT_INLINE void sd_fft_lctx_fft_trunc(sd_fft_lctx_t Q, double* d, ulong depth, ulong itrunc, ulong otrunc)
-{
-    FLINT_ASSERT(depth >= LG_BLK_SZ);
-    FLINT_ASSERT(itrunc % BLK_SZ == 0);
-    FLINT_ASSERT(otrunc % BLK_SZ == 0);
-    FLINT_ASSERT(Q->w2tab[depth - 1] != NULL);
-    Q->data = d;
-    sd_fft_trunc(Q, 0, 1, depth - LG_BLK_SZ, 0, itrunc/BLK_SZ, otrunc/BLK_SZ);
-}
-
-FLINT_INLINE void sd_fft_lctx_ifft_trunc(sd_fft_lctx_t Q, double* d, ulong depth, ulong trunc)
-{
-    FLINT_ASSERT(depth >= LG_BLK_SZ);
-    FLINT_ASSERT(trunc % BLK_SZ == 0);
-    FLINT_ASSERT(Q->w2tab[depth - 1] != NULL);
-    Q->data = d;
-    sd_ifft_trunc(Q, 0, 1, depth - LG_BLK_SZ, 0, trunc/BLK_SZ, trunc/BLK_SZ, 0);
-}
-
-FLINT_INLINE void sd_fft_ctx_fft_trunc(sd_fft_ctx_t Q, double* d, ulong depth, ulong itrunc, ulong otrunc)
-{
-    sd_fft_lctx_t QL;
-    sd_fft_lctx_init(QL, Q, depth);
-    sd_fft_lctx_fft_trunc(QL, d, depth, itrunc, otrunc);
-}
-
-FLINT_INLINE void sd_fft_ctx_ifft_trunc(sd_fft_ctx_t Q, double* d, ulong depth, ulong trunc)
-{
-    sd_fft_lctx_t QL;
-    sd_fft_lctx_init(QL, Q, depth);
-    sd_fft_lctx_ifft_trunc(QL, d, depth, trunc);
-}
 
 /*
     The bit reversed table is
@@ -313,7 +260,7 @@ FLINT_INLINE void sd_fft_ctx_ifft_trunc(sd_fft_ctx_t Q, double* d, ulong depth, 
 */
 
 /* look up w[2*j] */
-FLINT_INLINE double sd_fft_lctx_w2(const sd_fft_lctx_t Q, ulong j)
+FLINT_FORCE_INLINE double sd_fft_ctx_w2(const sd_fft_ctx_t Q, ulong j)
 {
     ulong j_bits, j_r;
     SET_J_BITS_AND_J_R(j_bits, j_r, j);
@@ -321,22 +268,18 @@ FLINT_INLINE double sd_fft_lctx_w2(const sd_fft_lctx_t Q, ulong j)
 }
 
 /* look up -w[2*j]^-1 */
-FLINT_INLINE double sd_fft_lctx_w2inv(const sd_fft_lctx_t Q, ulong j)
+FLINT_FORCE_INLINE double sd_fft_ctx_w2inv(const sd_fft_ctx_t Q, ulong j)
 {
     ulong j_bits, j_mr;
     SET_J_BITS_AND_J_MR(j_bits, j_mr, j);
-    if (j == 0)
-        return -1.0;
-    else
-        return Q->w2tab[j_bits][j_mr];
+    return (j == 0) ? -1.0 : Q->w2tab[j_bits][j_mr];
 }
 
-/* look up w[jj] */
-FLINT_INLINE double sd_fft_ctx_w(const sd_fft_ctx_t Q, ulong jj)
+/* look up w[j] */
+FLINT_FORCE_INLINE double sd_fft_ctx_w(const sd_fft_ctx_t Q, ulong j)
 {
-    ulong j = jj/2, j_bits, j_r;
-    SET_J_BITS_AND_J_R(j_bits, j_r, j);
-    return (jj&1) ? -Q->w2tab[j_bits][j_r] : Q->w2tab[j_bits][j_r];
+    double r = sd_fft_ctx_w2(Q, j/2);
+    return (j&1) ? -r : r;
 }
 
 typedef struct {
@@ -484,7 +427,7 @@ void _mul_precomp_init(
     nmod_t mod,
     mpn_ctx_t R);
 
-FLINT_INLINE void _mul_precomp_clear(mul_precomp_struct* M)
+FLINT_FORCE_INLINE void _mul_precomp_clear(mul_precomp_struct* M)
 {
     flint_aligned_free(M->bbuf);
 }
@@ -501,7 +444,7 @@ typedef struct {
     mul_precomp_struct rem_maker[1];
 } nmod_poly_divrem_precomp_struct;
 
-FLINT_INLINE void _nmod_poly_divrem_precomp_clear(nmod_poly_divrem_precomp_struct* M)
+FLINT_FORCE_INLINE void _nmod_poly_divrem_precomp_clear(nmod_poly_divrem_precomp_struct* M)
 {
     _mul_precomp_clear(M->quo_maker);
     _mul_precomp_clear(M->rem_maker);
@@ -525,8 +468,8 @@ int _nmod_poly_divrem_precomp(
 
 mpn_ctx_struct * get_default_mpn_ctx(void);
 
-void mpn_mul_default_mpn_ctx(mp_ptr r1, mp_srcptr i1, mp_size_t n1, mp_srcptr i2, mp_size_t n2);
-void _nmod_poly_mul_mid_default_mpn_ctx(mp_ptr res, slong zl, slong zh, mp_srcptr a, slong an, mp_srcptr b, slong bn, nmod_t mod);
+void mpn_mul_default_mpn_ctx(nn_ptr r1, nn_srcptr i1, slong n1, nn_srcptr i2, slong n2);
+void _nmod_poly_mul_mid_default_mpn_ctx(nn_ptr res, slong zl, slong zh, nn_srcptr a, slong an, nn_srcptr b, slong bn, nmod_t mod);
 
 
 int _fmpz_poly_mul_mid_mpn_ctx(

@@ -7,14 +7,15 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fmpz.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_mat.h"
 
-slong fmpz_mod_mat_nullspace(fmpz_mod_mat_t X, const fmpz_mod_mat_t A)
+slong fmpz_mod_mat_nullspace(fmpz_mod_mat_t X, const fmpz_mod_mat_t A, const fmpz_mod_ctx_t ctx)
 {
     slong i, j, k, m, n, rank, nullity;
     slong *p;
@@ -22,16 +23,16 @@ slong fmpz_mod_mat_nullspace(fmpz_mod_mat_t X, const fmpz_mod_mat_t A)
     slong *nonpivots;
     fmpz_mod_mat_t tmp;
 
-    m = A->mat->r;
-    n = A->mat->c;
+    m = A->r;
+    n = A->c;
 
     p = flint_malloc(sizeof(slong) * FLINT_MAX(m, n));
 
-    fmpz_mod_mat_init_set(tmp, A);
-    rank = fmpz_mod_mat_rref(NULL, tmp);
+    fmpz_mod_mat_init_set(tmp, A, ctx);
+    rank = fmpz_mod_mat_rref(tmp, tmp, ctx);
     nullity = n - rank;
 
-    fmpz_mod_mat_zero(X);
+    fmpz_mod_mat_zero(X, ctx);
 
     if (rank == 0)
     {
@@ -65,8 +66,8 @@ slong fmpz_mod_mat_nullspace(fmpz_mod_mat_t X, const fmpz_mod_mat_t A)
         {
             for (j = 0; j < rank; j++)
             {
-                fmpz_negmod(fmpz_mod_mat_entry(X, pivots[j], i),
-                             fmpz_mod_mat_entry(tmp, j, nonpivots[i]), A->mod);
+                fmpz_mod_neg(fmpz_mod_mat_entry(X, pivots[j], i),
+                             fmpz_mod_mat_entry(tmp, j, nonpivots[i]), ctx);
             }
 
             fmpz_one(fmpz_mod_mat_entry(X, nonpivots[i], i));
@@ -74,8 +75,7 @@ slong fmpz_mod_mat_nullspace(fmpz_mod_mat_t X, const fmpz_mod_mat_t A)
     }
 
     flint_free(p);
-    fmpz_mod_mat_clear(tmp);
+    fmpz_mod_mat_clear(tmp, ctx);
 
     return nullity;
 }
-

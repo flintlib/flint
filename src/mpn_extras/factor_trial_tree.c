@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -91,7 +91,7 @@ _factor_trial_tree_init(void)
             /* multiply entries in pairs */
 	        for (i = 0, j = 0; j < k/2; j++, i+=(2*n))
             {
-                mpn_mul_n(_factor_trial_tree[m + 1] + i,
+                flint_mpn_mul_n(_factor_trial_tree[m + 1] + i,
 		        _factor_trial_tree[m] + i,
 		        _factor_trial_tree[m] + i + n, n);
 	        }
@@ -216,4 +216,3 @@ int flint_mpn_factor_trial_tree(slong * factors,
 
     return numfacs;
 }
-

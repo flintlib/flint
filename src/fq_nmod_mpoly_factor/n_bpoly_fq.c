@@ -5,10 +5,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fq_nmod.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "fq_nmod_mpoly_factor.h"
 
 void n_fq_poly_mullow_(
@@ -345,8 +348,8 @@ void n_fq_bpoly_make_primitive(
     {
         slong d = fq_nmod_ctx_degree(ctx);
         n_poly_struct * Alead = A->coeffs + Alen - 1;
-        mp_limb_t * c, * c_ = Alead->coeffs + d*(Alead->length - 1);
-        c = FLINT_ARRAY_ALLOC(d, mp_limb_t);
+        ulong * c, * c_ = Alead->coeffs + d*(Alead->length - 1);
+        c = FLINT_ARRAY_ALLOC(d, ulong);
         if (!_n_fq_is_one(c_, d))
         {
             n_fq_poly_scalar_mul_n_fq(g, g, c_, ctx);
@@ -443,4 +446,3 @@ void fq_nmod_mpoly_set_n_fq_bpoly(
 
     fq_nmod_mpoly_sort_terms(A, ctx);
 }
-

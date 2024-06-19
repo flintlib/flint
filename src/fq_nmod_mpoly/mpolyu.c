@@ -5,14 +5,21 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod_vec.h"
+#include "fq_nmod.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 #include "fq_nmod_mpoly.h"
 #include "fq_nmod_mpoly_factor.h"
 
+#if FLINT_WANT_ASSERT
+# include "longlong.h"
+#endif
 
 int fq_nmod_mpolyu_is_canonical(const fq_nmod_mpolyu_t A,
                                                  const fq_nmod_mpoly_ctx_t ctx)
@@ -45,7 +52,7 @@ int fq_nmod_mpolyu_is_canonical(const fq_nmod_mpolyu_t A,
 }
 
 void fq_nmod_mpolyu_init(fq_nmod_mpolyu_t A, flint_bitcnt_t bits,
-                                                 const fq_nmod_mpoly_ctx_t ctx)
+                                                 const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     A->coeffs = NULL;
     A->exps = NULL;
@@ -322,7 +329,7 @@ void fq_nmod_mpoly_from_mpolyu_perm_inflate(
     slong i, j, k, l;
     slong NA, NB;
     slong Alen;
-    mp_limb_t * Acoeff;
+    ulong * Acoeff;
     ulong * Aexp;
     ulong * uexps;
     ulong * Aexps;
@@ -493,7 +500,7 @@ void fq_nmod_mpoly_from_mpolyuu_perm_inflate( /* only for 2 main vars */
     slong i, j, k, l;
     slong NA, NB;
     slong Alen;
-    mp_limb_t * Acoeff;
+    ulong * Acoeff;
     ulong * Aexp;
     ulong * uexps;
     ulong * Aexps;
@@ -761,14 +768,14 @@ void fq_nmod_mpolyu_divexact_mpoly_inplace(
     if (fq_nmod_mpoly_is_fq_nmod(c, ctx))
     {
         slong d = fq_nmod_ctx_degree(ctx->fqctx);
-        mp_limb_t * inv;
+        ulong * inv;
 
         if (_n_fq_is_one(c->coeffs + d*0, d))
             return;
 
         TMP_START;
 
-        inv = (mp_limb_t *) TMP_ALLOC(d*sizeof(mp_limb_t));
+        inv = (ulong *) TMP_ALLOC(d*sizeof(ulong));
 
         n_fq_inv(inv, c->coeffs + d*0, ctx->fqctx);
 

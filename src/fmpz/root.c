@@ -5,12 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-
-#include "flint.h"
+#include <gmp.h>
 #include "ulong_extras.h"
 #include "fmpz.h"
 
@@ -21,8 +20,7 @@ fmpz_root(fmpz_t r, const fmpz_t f, slong n)
 
     if (n <= 0)
     {
-        flint_printf("Exception (fmpz_root). Unable to take %wd-th root.\n", n);
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_root). Unable to take %wd-th root.\n", n);
     }
 
     if (n == 1)
@@ -33,15 +31,14 @@ fmpz_root(fmpz_t r, const fmpz_t f, slong n)
 
     if (!COEFF_IS_MPZ(c)) /* f is small */
     {
-        mp_limb_t rem, root;
+        ulong rem, root;
         int sgn = c < 0;
 
         if (n == 2)
         {
             if (sgn)
             {
-                flint_printf("Exception (fmpz_root). Unable to take square root of negative value.\n");
-                flint_abort();
+                flint_throw(FLINT_ERROR, "Exception (fmpz_root). Unable to take square root of negative value.\n");
             }
 
             root = n_sqrtrem(&rem, c);
@@ -61,8 +58,7 @@ fmpz_root(fmpz_t r, const fmpz_t f, slong n)
             {
                 if ((n & 1) == 0) /* even root */
                 {
-                    flint_printf("Exception (fmpz_root). Unable to take %wd-th root of negative value.\n", n);
-                    flint_abort();
+                    flint_throw(FLINT_ERROR, "Exception (fmpz_root). Unable to take %wd-th root of negative value.\n", n);
                 } else /* odd */
                     c = -c;
             }
@@ -73,8 +69,8 @@ fmpz_root(fmpz_t r, const fmpz_t f, slong n)
         }
     } else /* f is large */
     {
-        __mpz_struct * mpz2 = COEFF_TO_PTR(c);
-        __mpz_struct * mpz1 = _fmpz_promote(r);
+        mpz_ptr mpz2 = COEFF_TO_PTR(c);
+        mpz_ptr mpz1 = _fmpz_promote(r);
 
         int exact = mpz_root(mpz1, mpz2, n);
         _fmpz_demote_val(r); /* root may be small */

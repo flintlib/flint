@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -18,7 +18,7 @@
    Divide (arrayg, limbsg) by the positive value gc in-place and
    return the number of limbs written
 */
-mp_size_t flint_mpn_tdiv_q_fmpz_inplace(mp_ptr arrayg, mp_size_t limbsg, fmpz_t gc)
+slong flint_mpn_tdiv_q_fmpz_inplace(nn_ptr arrayg, slong limbsg, fmpz_t gc)
 {
    if (fmpz_size(gc) == 1)
    {
@@ -27,10 +27,10 @@ mp_size_t flint_mpn_tdiv_q_fmpz_inplace(mp_ptr arrayg, mp_size_t limbsg, fmpz_t 
    }
 	else
    {
-      mp_size_t tlimbs;
-      __mpz_struct * mgc = COEFF_TO_PTR(*gc);
+      slong tlimbs;
+      mpz_ptr mgc = COEFF_TO_PTR(*gc);
 
-      mp_ptr temp = flint_malloc(limbsg*sizeof(mp_limb_t));
+      nn_ptr temp = flint_malloc(limbsg*sizeof(ulong));
       flint_mpn_copyi(temp, arrayg, limbsg);
 
       mpn_tdiv_q(arrayg, temp, limbsg, mgc->_mp_d, mgc->_mp_size);
@@ -75,7 +75,7 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, slong len1,
    slong sign1, sign2, glen, qlen, qlen2;
 	fmpz_t ac, bc, d, gc;
    fmpz * A, * B, * G, * Q, * t;
-   mp_ptr array1, array2, arrayg, q, temp;
+   nn_ptr array1, array2, arrayg, q, temp;
    int divides;
 
    fmpz_init(ac);
@@ -159,9 +159,9 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, slong len1,
    /* allocate space to pack into */
    limbs1 = (pack_bits*len1 - 1)/FLINT_BITS + 1;
    limbs2 = (pack_bits*len2 - 1)/FLINT_BITS + 1;
-	array1 = flint_calloc(limbs1, sizeof(mp_limb_t));
-   array2 = flint_calloc(limbs2, sizeof(mp_limb_t));
-   arrayg = flint_calloc(limbs2, sizeof(mp_limb_t));
+	array1 = flint_calloc(limbs1, sizeof(ulong));
+   array2 = flint_calloc(limbs2, sizeof(ulong));
+   arrayg = flint_calloc(limbs2, sizeof(ulong));
 
    /* pack first poly and normalise */
    sign1 = (slong) fmpz_sgn(A + len1 - 1);
@@ -180,7 +180,7 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, slong len1,
       Make space for unpacked gcd. May have one extra coeff due to
       1 0 -x being packed as 0 -1 -x.
    */
-   glen = FLINT_MIN((limbsg*FLINT_BITS)/pack_bits + 1, len2);
+   glen = FLINT_MIN((slong) ((limbsg * FLINT_BITS) / pack_bits) + 1, len2);
    G = _fmpz_vec_init(glen);
 
    /*
@@ -202,12 +202,12 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, slong len1,
 
    /* make space for quotient and remainder of both polys by gcd */
    qlimbs = limbs1 - limbsg + 1;
-   qlen = FLINT_MIN(len1, (qlimbs*FLINT_BITS)/pack_bits + 1);
+   qlen = FLINT_MIN(len1, (slong) ((qlimbs * FLINT_BITS) / pack_bits) + 1);
    qlimbs2 = limbs2 - limbsg + 1;
-   qlen2 = FLINT_MIN(len2, (qlimbs2*FLINT_BITS)/pack_bits + 1);
+   qlen2 = FLINT_MIN(len2, (slong) ((qlimbs2 * FLINT_BITS) / pack_bits) + 1);
    qlimbs = (FLINT_MAX(qlen, qlen2)*pack_bits - 1)/FLINT_BITS + 1;
-   q = flint_calloc(qlimbs, sizeof(mp_limb_t));
-   temp = flint_malloc(limbsg*sizeof(mp_limb_t));
+   q = flint_calloc(qlimbs, sizeof(ulong));
+   temp = flint_malloc(limbsg*sizeof(ulong));
 	divides = 0;
 
    if (flint_mpn_divides(q, array1, limbs1, arrayg, limbsg, temp))
@@ -228,7 +228,7 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, slong len1,
 	  log_length = FLINT_MIN(log_glen, FLINT_BIT_COUNT(qlen));
 
 	  /* allow one bit for signs */
-	  divides = (bits_G + bits_Q + log_length < pack_bits);
+	  divides = (bits_G + bits_Q + log_length < (ulong) pack_bits);
 
       if (!divides) /* need to multiply out to check exact quotient */
          divides = multiplies_out(A, len1, Q, qlen, G, glen, sign1, t);
@@ -249,7 +249,7 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, slong len1,
 		    log_length = FLINT_MIN(log_glen, FLINT_BIT_COUNT(qlen2));
 
 			/* allow one bit for signs */
-			divides = (bits_G + bits_Q + log_length < pack_bits);
+			divides = (bits_G + bits_Q + log_length < (ulong) pack_bits);
 
             if (!divides) /* we need to multiply out */
                divides = multiplies_out(B, len2, Q, qlen2, G, glen, sign1, t);

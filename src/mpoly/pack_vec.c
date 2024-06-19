@@ -5,10 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
+#include "fmpz.h"
 #include "mpoly.h"
 
 /* this file DOES NOT need to change with new orderings */
@@ -101,9 +103,9 @@ void mpoly_pack_vec_fmpz(ulong * exp1, const fmpz * exp2, flint_bitcnt_t bits,
                 size++;
             } else
             {
-                __mpz_struct * mpz = COEFF_TO_PTR(*exp2);
+                mpz_ptr mpz = COEFF_TO_PTR(*exp2);
                 FLINT_ASSERT(mpz->_mp_size <= words_per_field);
-                while (size < mpz->_mp_size)
+                while ((int) size < mpz->_mp_size)
                     *exp1++ = mpz->_mp_d[size++];
             }
             while (size++ < words_per_field)

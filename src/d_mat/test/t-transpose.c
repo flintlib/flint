@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -37,15 +37,7 @@ TEST_FUNCTION_START(d_mat_transpose, state)
         d_mat_transpose(C, B);
 
         if (!d_mat_equal(C, A))
-        {
-            flint_printf("FAIL: C != A\n");
-            flint_printf("C:\n");
-            d_mat_print(C);
-            flint_printf("A:\n");
-            d_mat_print(A);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("");
 
         d_mat_clear(A);
         d_mat_clear(B);
@@ -68,15 +60,7 @@ TEST_FUNCTION_START(d_mat_transpose, state)
         d_mat_transpose(B, B);
 
         if (!d_mat_equal(B, A))
-        {
-            flint_printf("FAIL: B != A\n");
-            flint_printf("B:\n");
-            d_mat_print(B);
-            flint_printf("A:\n");
-            d_mat_print(A);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("");
 
         d_mat_clear(A);
         d_mat_clear(B);

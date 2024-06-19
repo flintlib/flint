@@ -6,11 +6,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "padic.h"
 #include "padic_poly.h"
 
 /*  The tests fail if one reduces the coefficients modulo N before
@@ -72,14 +75,11 @@ void padic_poly_inv_series(padic_poly_t Qinv, const padic_poly_t Q, slong n,
 
     if (Q->length == 0 || fmpz_is_zero(Q->coeffs + 0))
     {
-        flint_printf("Exception (padic_poly_inv_series):  Constant term is zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (padic_poly_inv_series):  Constant term is zero.\n");
     }
     if (fmpz_divisible(Q->coeffs + 0, ctx->p))
     {
-        flint_printf("Exception (padic_poly_inv_series):\n");
-        flint_printf("Valuation of constant term is not minimal.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (padic_poly_inv_series):\nValuation of constant term is not minimal.\n");
     }
 
     if (- Q->val >= Qinv->N)
@@ -100,7 +100,7 @@ void padic_poly_inv_series(padic_poly_t Qinv, const padic_poly_t Q, slong n,
         Qcopy = (fmpz *) flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < Q->length; i++)
             Qcopy[i] = Q->coeffs[i];
-        mpn_zero((mp_ptr) Qcopy + i, n - i);
+        mpn_zero((nn_ptr) Qcopy + i, n - i);
         Qalloc = 1;
     }
 
@@ -140,4 +140,3 @@ void padic_poly_inv_series(padic_poly_t Qinv, const padic_poly_t Q, slong n,
     if (Qalloc)
         flint_free(Qcopy);
 }
-

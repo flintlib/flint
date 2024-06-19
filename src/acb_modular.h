@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -59,9 +59,7 @@ psl2z_clear(psl2z_t g)
 ACB_MODULAR_INLINE void
 psl2z_swap(psl2z_t f, psl2z_t g)
 {
-    psl2z_struct h = *f;
-    *f = *g;
-    *g = h;
+    FLINT_SWAP(psl2z_struct, *f, *g);
 }
 
 ACB_MODULAR_INLINE void
@@ -198,4 +196,3 @@ void _acb_modular_mul(acb_t z, acb_t tmp1, acb_t tmp2, const acb_t x, const acb_
 #endif
 
 #endif
-

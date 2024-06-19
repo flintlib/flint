@@ -6,10 +6,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
+#include "thread_pool.h"
 #include "thread_support.h"
 #include "nmod.h"
 #include "nmod_mat.h"
@@ -34,7 +36,7 @@ typedef struct {
     nmod_mat_t * mod_C;
     const fmpz_comb_struct * comb;
     slong num_primes;
-    mp_ptr primes;
+    nn_ptr primes;
     int sign;
 } _worker_arg;
 
@@ -58,26 +60,33 @@ static void _mod_worker(void * varg)
 
     if (comb != NULL)
     {
-        mp_limb_t * residues;
+        ulong * residues;
         fmpz_comb_temp_t comb_temp;
 
-        residues = FLINT_ARRAY_ALLOC(num_primes, mp_limb_t);
+        residues = FLINT_ARRAY_ALLOC(num_primes, ulong);
         fmpz_comb_temp_init(comb_temp, comb);
 
         for (i = Astartrow; i < Astoprow; i++)
-        for (j = 0; j < k; j++)
         {
-            fmpz_multi_mod_ui(residues, &Arows[i][j], comb, comb_temp);
-            for (l = 0; l < num_primes; l++)
-                mod_A[l]->rows[i][j] = residues[l];
+            for (j = 0; j < k; j++)
+            {
+                fmpz_multi_mod_ui(residues, &Arows[i][j], comb, comb_temp);
+                for (l = 0; l < num_primes; l++)
+                    mod_A[l]->rows[i][j] = residues[l];
+            }
         }
 
-        for (i = Bstartrow; i < Bstoprow; i++)
-        for (j = 0; j < n; j++)
+        if (mod_B != NULL)
         {
-            fmpz_multi_mod_ui(residues, &Brows[i][j], comb, comb_temp);
-            for (l = 0; l < num_primes; l++)
-                mod_B[l]->rows[i][j] = residues[l];
+            for (i = Bstartrow; i < Bstoprow; i++)
+            {
+                for (j = 0; j < n; j++)
+                {
+                    fmpz_multi_mod_ui(residues, &Brows[i][j], comb, comb_temp);
+                    for (l = 0; l < num_primes; l++)
+                        mod_B[l]->rows[i][j] = residues[l];
+                }
+            }
         }
 
         flint_free(residues);
@@ -86,19 +95,26 @@ static void _mod_worker(void * varg)
     else
     {
         for (i = Astartrow; i < Astoprow; i++)
-        for (j = 0; j < k; j++)
         {
-            for (l = 0; l < num_primes; l++)
-                nmod_mat_entry(mod_A[l], i, j) = fmpz_get_nmod(&Arows[i][j],
-                                                                mod_A[l]->mod);
+            for (j = 0; j < k; j++)
+            {
+                for (l = 0; l < num_primes; l++)
+                    nmod_mat_entry(mod_A[l], i, j) = fmpz_get_nmod(&Arows[i][j],
+                                                                    mod_A[l]->mod);
+            }
         }
 
-        for (i = Bstartrow; i < Bstoprow; i++)
-        for (j = 0; j < n; j++)
+        if (mod_B != NULL)
         {
-            for (l = 0; l < num_primes; l++)
-                nmod_mat_entry(mod_B[l], i, j) = fmpz_get_nmod(&Brows[i][j],
-                                                                mod_A[l]->mod);
+            for (i = Bstartrow; i < Bstoprow; i++)
+            {
+                for (j = 0; j < n; j++)
+                {
+                    for (l = 0; l < num_primes; l++)
+                        nmod_mat_entry(mod_B[l], i, j) = fmpz_get_nmod(&Brows[i][j],
+                                                                        mod_A[l]->mod);
+                }
+            }
         }
     }
 }
@@ -112,7 +128,7 @@ static void _crt_worker(void * varg)
     slong Cstoprow = arg->Cstoprow;
     fmpz ** Crows = arg->Crows;
     nmod_mat_t * mod_C = arg->mod_C;
-    mp_limb_t * primes = arg->primes;
+    ulong * primes = arg->primes;
     slong num_primes = arg->num_primes;
     const fmpz_comb_struct * comb = arg->comb;
     int sign = arg->sign;
@@ -121,10 +137,10 @@ static void _crt_worker(void * varg)
 
     if (comb != NULL)
     {
-        mp_limb_t * residues;
+        ulong * residues;
         fmpz_comb_temp_t comb_temp;
 
-        residues = FLINT_ARRAY_ALLOC(num_primes, mp_limb_t);
+        residues = FLINT_ARRAY_ALLOC(num_primes, ulong);
         fmpz_comb_temp_init(comb_temp, comb);
 
         for (i = Cstartrow; i < Cstoprow; i++)
@@ -141,7 +157,7 @@ static void _crt_worker(void * varg)
     }
     else if (num_primes == 1)
     {
-        mp_limb_t r, t, p = primes[0];
+        ulong r, t, p = primes[0];
 
         if (sign)
         {
@@ -168,7 +184,7 @@ static void _crt_worker(void * varg)
     }
     else if (num_primes == 2)
     {
-        mp_limb_t r0, r1, i0, i1, m0, m1, M[2], t[2], u[2];
+        ulong r0, r1, i0, i1, m0, m1, M[2], t[2], u[2];
         m0 = primes[0];
         m1 = primes[1];
         i0 = n_invmod(m1 % m0, m0);
@@ -215,11 +231,11 @@ static void _crt_worker(void * varg)
     }
     else
     {
-        mp_ptr M, Ns, T, U;
-        mp_size_t Msize, Nsize;
-        mp_limb_t cy, ri;
+        nn_ptr M, Ns, T, U;
+        slong Msize, Nsize;
+        ulong cy, ri;
 
-        M = FLINT_ARRAY_ALLOC(num_primes + 1, mp_limb_t);
+        M = FLINT_ARRAY_ALLOC(num_primes + 1, ulong);
 
         M[0] = primes[0];
         Msize = 1;
@@ -235,9 +251,9 @@ static void _crt_worker(void * varg)
            do not require an extra limb. */
         Nsize = Msize + 2;
 
-        Ns = FLINT_ARRAY_ALLOC(Nsize*num_primes, mp_limb_t);
-        T = FLINT_ARRAY_ALLOC(Nsize, mp_limb_t);
-        U = FLINT_ARRAY_ALLOC(Nsize, mp_limb_t);
+        Ns = FLINT_ARRAY_ALLOC(Nsize*num_primes, ulong);
+        T = FLINT_ARRAY_ALLOC(Nsize, ulong);
+        U = FLINT_ARRAY_ALLOC(Nsize, ulong);
 
         for (i = 0; i < num_primes; i++)
         {
@@ -301,6 +317,7 @@ void _fmpz_mat_mul_multi_mod(
     thread_pool_handle * handles;
     slong limit;
     ulong first_prime; /* not prime */
+    int squaring = (A == B);
 
     mainarg.m = m = A->r;
     mainarg.k = k = A->c;
@@ -335,7 +352,7 @@ void _fmpz_mat_mul_multi_mod(
 
     /* Initialize */
     mainarg.sign = sign;
-    mainarg.primes = FLINT_ARRAY_ALLOC(mainarg.num_primes, mp_limb_t);
+    mainarg.primes = FLINT_ARRAY_ALLOC(mainarg.num_primes, ulong);
     mainarg.primes[0] = first_prime;
     if (mainarg.num_primes > 1)
     {
@@ -345,12 +362,18 @@ void _fmpz_mat_mul_multi_mod(
     }
 
     mainarg.mod_A = FLINT_ARRAY_ALLOC(mainarg.num_primes, nmod_mat_t);
-    mainarg.mod_B = FLINT_ARRAY_ALLOC(mainarg.num_primes, nmod_mat_t);
+
+    if (squaring)
+        mainarg.mod_B = NULL;
+    else
+        mainarg.mod_B = FLINT_ARRAY_ALLOC(mainarg.num_primes, nmod_mat_t);
+
     mainarg.mod_C = FLINT_ARRAY_ALLOC(mainarg.num_primes, nmod_mat_t);
     for (i = 0; i < mainarg.num_primes; i++)
     {
         nmod_mat_init(mainarg.mod_A[i], A->r, A->c, mainarg.primes[i]);
-        nmod_mat_init(mainarg.mod_B[i], B->r, B->c, mainarg.primes[i]);
+        if (!squaring)
+            nmod_mat_init(mainarg.mod_B[i], B->r, B->c, mainarg.primes[i]);
         nmod_mat_init(mainarg.mod_C[i], C->r, C->c, mainarg.primes[i]);
     }
 
@@ -416,8 +439,7 @@ mod_single:
 
     /* mul */
     for (i = 0; i < mainarg.num_primes; i++)
-        nmod_mat_mul(mainarg.mod_C[i], mainarg.mod_A[i], mainarg.mod_B[i]);
-
+        nmod_mat_mul(mainarg.mod_C[i], mainarg.mod_A[i], squaring ? mainarg.mod_A[i] : mainarg.mod_B[i]);
 
     /* limit on the number of threads */
     limit = ((m + n)/64)*(1 + bits/1024);
@@ -469,12 +491,14 @@ crt_single:
     for (i = 0; i < mainarg.num_primes; i++)
     {
         nmod_mat_clear(mainarg.mod_A[i]);
-        nmod_mat_clear(mainarg.mod_B[i]);
+        if (!squaring)
+            nmod_mat_clear(mainarg.mod_B[i]);
         nmod_mat_clear(mainarg.mod_C[i]);
     }
 
     flint_free(mainarg.mod_A);
-    flint_free(mainarg.mod_B);
+    if (!squaring)
+        flint_free(mainarg.mod_B);
     flint_free(mainarg.mod_C);
     flint_free(mainarg.primes);
 }
@@ -505,4 +529,3 @@ fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 
     _fmpz_mat_mul_multi_mod(C, A, B, sign, Cbits);
 }
-

@@ -5,20 +5,21 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpn_extras.h"
 #include "arb.h"
 
-#define TMP_ALLOC_LIMBS(__n) TMP_ALLOC((__n) * sizeof(mp_limb_t))
+#define TMP_ALLOC_LIMBS(__n) TMP_ALLOC((__n) * sizeof(ulong))
 
 int
-_arb_get_mpn_fixed_mod_pi4(mp_ptr w, fmpz_t q, int * octant,
-    mp_limb_t * error, const arf_t x, mp_size_t wn)
+_arb_get_mpn_fixed_mod_pi4(nn_ptr w, fmpz_t q, int * octant,
+    ulong * error, const arf_t x, slong wn)
 {
-    mp_srcptr xp;
-    mp_size_t xn;
+    nn_srcptr xp;
+    slong xn;
     slong exp;
 
     ARF_GET_MPN_READONLY(xp, xn, x);
@@ -35,7 +36,7 @@ _arb_get_mpn_fixed_mod_pi4(mp_ptr w, fmpz_t q, int * octant,
     }
     else if (exp == 0)
     {
-        mp_srcptr dp;
+        nn_srcptr dp;
 
         if (wn > ARB_PI4_TAB_LIMBS)
             return 0;
@@ -66,9 +67,9 @@ _arb_get_mpn_fixed_mod_pi4(mp_ptr w, fmpz_t q, int * octant,
     }
     else
     {
-        mp_ptr qp, rp, np;
-        mp_srcptr dp;
-        mp_size_t qn, rn, nn, dn, tn, alloc;
+        nn_ptr qp, rp, np;
+        nn_srcptr dp;
+        slong qn, rn, nn, dn, tn, alloc;
         TMP_INIT;
 
         tn = ((exp + 2) + FLINT_BITS - 1) / FLINT_BITS;
@@ -124,4 +125,3 @@ _arb_get_mpn_fixed_mod_pi4(mp_ptr w, fmpz_t q, int * octant,
         return 1;
     }
 }
-

@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpoly.h"
 #include "fmpq_mpoly.h"
 
 void fmpq_mpoly_get_term_exp_si(slong * exp, const fmpq_mpoly_t A,
@@ -26,4 +27,3 @@ void fmpq_mpoly_get_term_exp_si(slong * exp, const fmpq_mpoly_t A,
     mpoly_get_monomial_si(exp, A->zpoly->exps + N*i, A->zpoly->bits,
                                                              ctx->zctx->minfo);
 }
-

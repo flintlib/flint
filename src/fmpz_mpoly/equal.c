@@ -6,12 +6,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "fmpz.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
 
 int _fmpz_mpoly_equal(fmpz * poly1, ulong * exps1,
@@ -44,7 +44,8 @@ int fmpz_mpoly_equal(const fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2,
                                                     const fmpz_mpoly_ctx_t ctx)
 {
    ulong * ptr1 = poly1->exps, * ptr2 = poly2->exps;
-   slong max_bits, N;
+   slong N;
+   flint_bitcnt_t max_bits;
    int r, free1 = 0, free2 = 0;
 
    if (poly1 == poly2)

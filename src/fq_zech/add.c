@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -16,7 +16,7 @@ void
 fq_zech_add(fq_zech_t rop, const fq_zech_t op1, const fq_zech_t op2,
             const fq_zech_ctx_t ctx)
 {
-    mp_limb_t index, c;
+    ulong index, c;
     if (op1->value == ctx->qm1)
     {
         rop->value = op2->value;

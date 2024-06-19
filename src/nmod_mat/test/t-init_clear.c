@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -27,24 +27,12 @@ TEST_FUNCTION_START(nmod_mat_init_clear, state)
         nmod_mat_init(A, m, n, mod);
 
         for (i = 0; i < m; i++)
-        {
             for (j = 0; j < n; j++)
-            {
                 if (A->rows[i][j] != UWORD(0))
-                {
-                    flint_printf("FAIL: entries not zero!\n");
-                    fflush(stdout);
-                    flint_abort();
-                }
-            }
-        }
+                    TEST_FUNCTION_FAIL("entries not zero\n");
 
         if (A->mod.n != mod)
-        {
-            flint_printf("FAIL: bad modulus\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("bad modulus\n");
 
         nmod_mat_clear(A);
     }

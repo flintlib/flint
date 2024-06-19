@@ -9,7 +9,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -36,7 +36,7 @@ typedef struct
     nmod_poly_struct * H;
     nmod_poly_struct * v;
     nmod_poly_struct * vinv;
-    mp_ptr tmp;
+    nn_ptr tmp;
     slong m;
 }
 nmod_poly_interval_poly_arg_t;
@@ -85,8 +85,6 @@ int nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
 void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
                                    const nmod_poly_t poly, slong * const *degs);
 
-ulong nmod_poly_remove(nmod_poly_t f, const nmod_poly_t p);
-
 void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
                                   const nmod_poly_t poly, slong * const *degs);
 
@@ -96,7 +94,7 @@ int nmod_poly_is_irreducible_rabin(const nmod_poly_t f);
 
 int nmod_poly_is_irreducible_ddf(const nmod_poly_t f);
 
-int _nmod_poly_is_squarefree(mp_srcptr f, slong len, nmod_t mod);
+int _nmod_poly_is_squarefree(nn_srcptr f, slong len, nmod_t mod);
 
 int nmod_poly_is_squarefree(const nmod_poly_t f);
 
@@ -111,16 +109,16 @@ void nmod_poly_factor_kaltofen_shoup(nmod_poly_factor_t res,
 
 void nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f);
 
-mp_limb_t nmod_poly_factor_with_berlekamp(nmod_poly_factor_t result,
+ulong nmod_poly_factor_with_berlekamp(nmod_poly_factor_t result,
     const nmod_poly_t input);
 
-mp_limb_t nmod_poly_factor_with_cantor_zassenhaus(nmod_poly_factor_t result,
+ulong nmod_poly_factor_with_cantor_zassenhaus(nmod_poly_factor_t result,
     const nmod_poly_t input);
 
-mp_limb_t nmod_poly_factor_with_kaltofen_shoup(nmod_poly_factor_t result,
+ulong nmod_poly_factor_with_kaltofen_shoup(nmod_poly_factor_t result,
     const nmod_poly_t input);
 
-mp_limb_t nmod_poly_factor(nmod_poly_factor_t result,
+ulong nmod_poly_factor(nmod_poly_factor_t result,
     const nmod_poly_t input);
 
 void _nmod_poly_interval_poly_worker(void* arg_ptr);

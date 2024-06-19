@@ -6,10 +6,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpn_extras.h"
 #include "fmpz_factor.h"
 
 void
@@ -25,8 +26,8 @@ _fmpz_factor_fit_length(fmpz_factor_t factor, slong len)
 
         if (len > factor->alloc)
         {
-            flint_mpn_zero((mp_ptr)(factor->p + factor->alloc), len-factor->alloc);
-            flint_mpn_zero((mp_ptr)(factor->exp + factor->alloc), len-factor->alloc);
+            flint_mpn_zero((nn_ptr)(factor->p + factor->alloc), len-factor->alloc);
+            flint_mpn_zero((nn_ptr)(factor->exp + factor->alloc), len-factor->alloc);
         }
 
         factor->alloc = len;

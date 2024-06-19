@@ -6,14 +6,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "nmod_poly.h"
 
 void
-nmod_poly_inflate(nmod_poly_t result, const nmod_poly_t input, ulong inflation)
+nmod_poly_inflate(nmod_poly_t result, const nmod_poly_t input, slong inflation)
 {
     if (input->length <= 1 || inflation == 1)
     {
@@ -21,7 +21,7 @@ nmod_poly_inflate(nmod_poly_t result, const nmod_poly_t input, ulong inflation)
     }
     else if (inflation == 0)
     {
-        mp_limb_t v = nmod_poly_evaluate_nmod(input, 1);
+        ulong v = nmod_poly_evaluate_nmod(input, 1);
         nmod_poly_zero(result);
         nmod_poly_set_coeff_ui(result, 0, v);
     }

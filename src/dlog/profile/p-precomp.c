@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -90,9 +90,6 @@ flog_gen(ulong p, ulong a, ulong num)
 int main(int argc, char *argv[])
 {
     int out = LOG;
-    slong iter, k, nv, nref, r, nr;
-    ulong minq, maxq;
-    ulong * rand;
     int nbits, nl = 5;
     int l[5] = { 1, 10, 100, 1000 , 5000};
 
@@ -118,7 +115,7 @@ int main(int argc, char *argv[])
         flint_abort();
     }
 
-    flint_randinit(state);
+    flint_rand_init(state);
     for (nbits = 10; nbits <= 40; nbits += 5)
     {
 
@@ -173,7 +170,7 @@ int main(int argc, char *argv[])
             }
         }
     }
-    flint_randclear(state);
+    flint_rand_clear(state);
     flint_cleanup();
     flint_printf("PASS\n");
     return 0;

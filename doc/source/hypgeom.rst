@@ -6,7 +6,7 @@
 This module provides functions for high-precision evaluation of series
 of the form
 
-.. math ::
+.. math::
 
     \sum_{k=0}^{n-1} \frac{A(k)}{B(k)} \prod_{j=1}^k \frac{P(k)}{Q(k)} z^k
 
@@ -28,13 +28,13 @@ Strategy for error bounding
 We wish to evaluate `S(z) = \sum_{k=0}^{\infty} T(k) z^k` where `T(k)`
 satisfies `T(0) = 1` and
 
-.. math ::
+.. math::
 
     T(k) = R(k) T(k-1) = \left( \frac{P(k)}{Q(k)} \right) T(k-1)
 
 for given polynomials
 
-.. math ::
+.. math::
 
     P(k) = a_p k^p + a_{p-1} k^{p-1} + \ldots a_0
 
@@ -46,20 +46,20 @@ integers (if there are positive integer roots, the sum is either finite
 or undefined). With these conditions satisfied, our goal is to find a
 parameter `n \ge 0` such that
 
-.. math ::
+.. math::
 
     \left\lvert \sum_{k=n}^{\infty} T(k) z^k \right\rvert \le 2^{-d}.
 
 We can rewrite the hypergeometric term ratio as
 
-.. math ::
+.. math::
 
     z R(k) = z \frac{P(k)}{Q(k)} =
         z \left( \frac{a_p}{b_q} \right) \frac{1}{k^{q-p}} F(k)
 
 where
 
-.. math ::
+.. math::
 
     F(k) = \frac{
     1 + \tilde a_{1} / k + \tilde a_{2} / k^2 + \ldots + \tilde a_q / k^p
@@ -70,7 +70,7 @@ where
 and where `\tilde a_i = a_{p-i} / a_p`, `\tilde b_i = b_{q-i} / b_q`.
 Next, we define
 
-.. math ::
+.. math::
 
     C = \max_{1 \le i \le p} |\tilde a_i|^{(1/i)},
     \quad D = \max_{1 \le i \le q} |\tilde b_i|^{(1/i)}.
@@ -78,21 +78,21 @@ Next, we define
 Now, if `k > C`, the magnitude of the numerator of `F(k)` is
 bounded from above by
 
-.. math ::
+.. math::
 
     1 + \sum_{i=1}^p \left(\frac{C}{k}\right)^i \le 1 + \frac{C}{k-C}
 
 and if `k > 2D`, the magnitude of the denominator of `F(k)` is bounded
 from below by
 
-.. math ::
+.. math::
 
     1 - \sum_{i=1}^q \left(\frac{D}{k}\right)^i \ge 1 + \frac{D}{D-k}.
 
 Putting the inequalities together gives the following bound,
 valid for `k > K = \max(C, 2D)`:
 
-.. math ::
+.. math::
 
     |F(k)| \le \frac{k (k-D)}{(k-C)(k-2D)} = \left(1 + \frac{C}{k-C} \right)
     \left(1 + \frac{D}{k-2D} \right).
@@ -100,7 +100,7 @@ valid for `k > K = \max(C, 2D)`:
 Let `r = q-p` and `\tilde z = |z a_p / b_q|`. Assuming
 `k > \max(C, 2D, {\tilde z}^{1/r})`, we have
 
-.. math ::
+.. math::
 
     |z R(k)| \le G(k) = \frac{\tilde z F(k)}{k^r}
 
@@ -162,7 +162,7 @@ Error bounding
     and `\tilde z = z (a_p / b_q)`, such that for `k > K`, the hypergeometric
     term ratio is bounded by
 
-    .. math ::
+    .. math::
 
         \frac{\tilde z}{k^r} \frac{k(k-D)}{(k-C)(k-2D)}.
 

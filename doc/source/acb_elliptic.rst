@@ -26,7 +26,7 @@ Complete elliptic integrals
 
     Computes the complete elliptic integral of the first kind
 
-    .. math ::
+    .. math::
 
         K(m) = \int_0^{\pi/2} \frac{dt}{\sqrt{1-m \sin^2 t}}
                   = \int_0^1
@@ -51,7 +51,7 @@ Complete elliptic integrals
 
     Computes the complete elliptic integral of the second kind
 
-     .. math ::
+     .. math::
 
         E(m) = \int_0^{\pi/2} \sqrt{1-m \sin^2 t} \, dt =
                     \int_0^1
@@ -64,7 +64,7 @@ Complete elliptic integrals
 
     Evaluates the complete elliptic integral of the third kind
 
-     .. math ::
+     .. math::
 
         \Pi(n, m) = \int_0^{\pi/2}
             \frac{dt}{(1-n \sin^2 t) \sqrt{1-m \sin^2 t}} =
@@ -83,7 +83,7 @@ Legendre incomplete elliptic integrals
     Evaluates the Legendre incomplete elliptic integral of the first kind,
     given by
 
-     .. math ::
+     .. math::
 
         F(\phi,m) = \int_0^{\phi} \frac{dt}{\sqrt{1-m \sin^2 t}}
                   = \int_0^{\sin \phi}
@@ -92,7 +92,7 @@ Legendre incomplete elliptic integrals
     on the standard strip `-\pi/2 \le \operatorname{Re}(\phi) \le \pi/2`.
     Outside this strip, the function extends quasiperiodically as
 
-    .. math ::
+    .. math::
 
         F(\phi + n \pi, m) = 2 n K(m) + F(\phi,m), n \in \mathbb{Z}.
 
@@ -111,7 +111,7 @@ Legendre incomplete elliptic integrals
     Evaluates the Legendre incomplete elliptic integral of the second kind,
     given by
 
-     .. math ::
+     .. math::
 
         E(\phi,m) = \int_0^{\phi} \sqrt{1-m \sin^2 t} \, dt =
                     \int_0^{\sin \phi}
@@ -120,7 +120,7 @@ Legendre incomplete elliptic integrals
     on the standard strip `-\pi/2 \le \operatorname{Re}(\phi) \le \pi/2`.
     Outside this strip, the function extends quasiperiodically as
 
-    .. math ::
+    .. math::
 
         E(\phi + n \pi, m) = 2 n E(m) + E(\phi,m), n \in \mathbb{Z}.
 
@@ -139,7 +139,7 @@ Legendre incomplete elliptic integrals
     Evaluates the Legendre incomplete elliptic integral of the third kind,
     given by
 
-     .. math ::
+     .. math::
 
         \Pi(n, \phi, m) = \int_0^{\phi}
             \frac{dt}{(1-n \sin^2 t) \sqrt{1-m \sin^2 t}} =
@@ -149,7 +149,7 @@ Legendre incomplete elliptic integrals
     on the standard strip `-\pi/2 \le \operatorname{Re}(\phi) \le \pi/2`.
     Outside this strip, the function extends quasiperiodically as
 
-    .. math ::
+    .. math::
 
         \Pi(n, \phi + k \pi, m) = 2 k \Pi(n,m) + \Pi(n,\phi,m), k \in \mathbb{Z}.
 
@@ -178,7 +178,7 @@ in [Car1995]_ and chapter 19 in [NIST2012]_.
 
     Evaluates the Carlson symmetric elliptic integral of the first kind
 
-    .. math ::
+    .. math::
 
         R_F(x,y,z) = \frac{1}{2}
             \int_0^{\infty} \frac{dt}{\sqrt{(t+x)(t+y)(t+z)}}
@@ -205,7 +205,7 @@ in [Car1995]_ and chapter 19 in [NIST2012]_.
 
     Evaluates the Carlson symmetric elliptic integral of the second kind
 
-    .. math ::
+    .. math::
 
         R_G(x,y,z) = \frac{1}{4} \int_0^{\infty}
             \frac{t}{\sqrt{(t+x)(t+y)(t+z)}}
@@ -224,7 +224,7 @@ in [Car1995]_ and chapter 19 in [NIST2012]_.
 
     Evaluates the Carlson symmetric elliptic integral of the third kind
 
-    .. math ::
+    .. math::
 
         R_J(x,y,z,p) = \frac{3}{2}
             \int_0^{\infty} \frac{dt}{(t+p)\sqrt{(t+x)(t+y)(t+z)}}
@@ -285,7 +285,7 @@ The main reference is chapter 23 in [NIST2012]_.
 
     Computes Weierstrass's elliptic function
 
-    .. math ::
+    .. math::
 
         \wp(z, \tau) = \frac{1}{z^2} + \sum_{n^2+m^2 \ne 0}
             \left[ \frac{1}{(z+m+n\tau)^2} - \frac{1}{(m+n\tau)^2} \right]
@@ -293,7 +293,7 @@ The main reference is chapter 23 in [NIST2012]_.
     which satisfies `\wp(z, \tau) = \wp(z + 1, \tau) = \wp(z + \tau, \tau)`.
     To evaluate the function efficiently, we use the formula
 
-    .. math ::
+    .. math::
 
         \wp(z, \tau) = \pi^2 \theta_2^2(0,\tau) \theta_3^2(0,\tau)
             \frac{\theta_4^2(z,\tau)}{\theta_1^2(z,\tau)} -
@@ -337,7 +337,7 @@ The main reference is chapter 23 in [NIST2012]_.
     satisfies `\wp(\wp^{-1}(z, \tau), \tau) = z`. This function is given
     by the elliptic integral
 
-    .. math ::
+    .. math::
 
         \wp^{-1}(z, \tau) = \frac{1}{2} \int_z^{\infty} \frac{dt}{\sqrt{(t-e_1)(t-e_2)(t-e_3)}}
             = R_F(z-e_1,z-e_2,z-e_3).
@@ -346,7 +346,7 @@ The main reference is chapter 23 in [NIST2012]_.
 
     Computes the Weierstrass zeta function
 
-    .. math ::
+    .. math::
 
         \zeta(z, \tau) = \frac{1}{z} + \sum_{n^2+m^2 \ne 0}
             \left[ \frac{1}{z-m-n\tau} + \frac{1}{m+n\tau} + \frac{z}{(m+n\tau)^2} \right]
@@ -358,7 +358,7 @@ The main reference is chapter 23 in [NIST2012]_.
 
     Computes the Weierstrass sigma function
 
-    .. math ::
+    .. math::
 
         \sigma(z, \tau) = z \prod_{n^2+m^2 \ne 0}
             \left[ \left(1-\frac{z}{m+n\tau}\right)

@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -63,7 +63,7 @@ static slong _pow_ui_cost(ulong pow)
     Assume that p is prime, don't check. Return an estimate on the number of
     multiplications need for one run.
 */
-double nmod_discrete_log_pohlig_hellman_precompute_prime(nmod_discrete_log_pohlig_hellman_t L, mp_limb_t p)
+double nmod_discrete_log_pohlig_hellman_precompute_prime(nmod_discrete_log_pohlig_hellman_t L, ulong p)
 {
     slong i;
     ulong c;
@@ -198,12 +198,12 @@ try_alpha:
 }
 
 /* return x such that y = alpha^x mod p, alpha is the p.r. L->alpha*/
-ulong nmod_discrete_log_pohlig_hellman_run(const nmod_discrete_log_pohlig_hellman_t L, mp_limb_t y)
+ulong nmod_discrete_log_pohlig_hellman_run(const nmod_discrete_log_pohlig_hellman_t L, ulong y)
 {
     slong i, j;
     ulong x, q, r, e, x0 = 0, x1 = 0, x2 = 0, pp0, pp1, acc, g, pipow;
     ulong lo, mid, hi, d;
-    mp_limb_t beta, z, w;
+    ulong beta, z, w;
     nmod_discrete_log_pohlig_hellman_entry_struct * Li;
 
     FLINT_ASSERT(y != 0);

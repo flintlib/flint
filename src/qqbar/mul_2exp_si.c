@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -28,8 +28,7 @@ qqbar_mul_2exp_si(qqbar_t res, const qqbar_t x, slong exp)
 
     if (FLINT_BIT_COUNT(d) + FLINT_BIT_COUNT((ulong) FLINT_ABS(exp)) > FLINT_BITS - 8)
     {
-        flint_printf("qqbar_mul_2exp_si: ludicrously large coefficients\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "qqbar_mul_2exp_si: ludicrously large coefficients\n");
     }
 
     fmpz_poly_set(QQBAR_POLY(res), QQBAR_POLY(x));
@@ -62,4 +61,3 @@ qqbar_mul_2exp_si(qqbar_t res, const qqbar_t x, slong exp)
     if (g != 0)
         fmpz_poly_scalar_tdiv_2exp(QQBAR_POLY(res), QQBAR_POLY(res), g);
 }
-

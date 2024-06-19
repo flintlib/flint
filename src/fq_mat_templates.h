@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -29,15 +29,15 @@ void TEMPLATE(T, mat_init_set)(TEMPLATE(T, mat_t) mat, const TEMPLATE(T, mat_t) 
                           const TEMPLATE(T, ctx_t) ctx);
 
 FQ_MAT_TEMPLATES_INLINE slong
-TEMPLATE(T, mat_nrows)(const TEMPLATE(T, mat_t) mat ,
-                       const TEMPLATE(T, ctx_t) ctx)
+TEMPLATE(T, mat_nrows)(const TEMPLATE(T, mat_t) mat,
+                       const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx))
 {
     return mat->r;
 }
 
 FQ_MAT_TEMPLATES_INLINE slong
 TEMPLATE(T, mat_ncols)(const TEMPLATE(T, mat_t) mat,
-                       const TEMPLATE(T, ctx_t) ctx)
+                       const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx))
 {
     return mat->c;
 }
@@ -53,7 +53,7 @@ void TEMPLATE(T, mat_entry_set)(TEMPLATE(T, mat_t) mat, slong i, slong j,
                            const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, mat_swap)(TEMPLATE(T, mat_t) mat1, TEMPLATE(T, mat_t) mat2,
-                      const TEMPLATE(T, ctx_t) ctx);
+                      const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx));
 
 void TEMPLATE(T, mat_swap_entrywise)(TEMPLATE(T, mat_t) mat1,
 		         TEMPLATE(T, mat_t) mat2, const TEMPLATE(T, ctx_t) ctx);
@@ -75,14 +75,14 @@ int TEMPLATE(T, mat_is_one)(const TEMPLATE(T, mat_t) mat,
 
 FQ_MAT_TEMPLATES_INLINE int
 TEMPLATE(T, mat_is_empty)(const TEMPLATE(T, mat_t) mat,
-                          const TEMPLATE(T, ctx_t) ctx)
+                          const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx))
 {
     return (mat->r == 0) || (mat->c == 0);
 }
 
 FQ_MAT_TEMPLATES_INLINE int
 TEMPLATE(T, mat_is_square)(const TEMPLATE(T, mat_t) mat,
-                           const TEMPLATE(T, ctx_t) ctx)
+                           const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx))
 {
     return (mat->r == mat->c);
 }
@@ -131,10 +131,10 @@ void TEMPLATE(T, mat_set_fmpz_mod_mat) (TEMPLATE(T, mat_t) mat1,
 void TEMPLATE(T, mat_window_init)(TEMPLATE(T, mat_t) window,
                              const TEMPLATE(T, mat_t) mat,
                              slong r1, slong c1, slong r2, slong c2,
-                             const TEMPLATE(T, ctx_t) ctx);
+                             const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx));
 
 void TEMPLATE(T, mat_window_clear)(TEMPLATE(T, mat_t) window,
-                              const TEMPLATE(T, ctx_t) ctx);
+                              const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx));
 
 void TEMPLATE(T, mat_concat_horizontal)(TEMPLATE(T, mat_t) res,
                            const TEMPLATE(T, mat_t) mat1,  const TEMPLATE(T, mat_t) mat2,
@@ -169,8 +169,8 @@ int TEMPLATE(T, mat_randpermdiag)(TEMPLATE(T, mat_t) mat, flint_rand_t state,
                               TEMPLATE(T, struct) * diag, slong n,
                               const TEMPLATE(T, ctx_t) ctx);
 
-void TEMPLATE(T, mat_randops)(TEMPLATE(T, mat_t) mat, slong count,
-                         flint_rand_t state, const TEMPLATE(T, ctx_t) ctx);
+void TEMPLATE(T, mat_randops)(TEMPLATE(T, mat_t) mat,
+                         flint_rand_t state, slong count, const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, mat_randtril)(TEMPLATE(T, mat_t) mat, flint_rand_t state,
                           int unit, const TEMPLATE(T, ctx_t) ctx);
@@ -244,7 +244,7 @@ int TEMPLATE(T, mat_inv)(TEMPLATE(T, mat_t) B, TEMPLATE(T, mat_t) A,
 
 /* Solving *******************************************************************/
 
-slong TEMPLATE(T, mat_rref)(TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx);
+slong TEMPLATE(T, mat_rref)(TEMPLATE(T, mat_t) B, const TEMPLATE(T, mat_t) A, const TEMPLATE(T, ctx_t) ctx);
 
 
 slong TEMPLATE(T, mat_reduce_row)(TEMPLATE(T, mat_t) A, slong * P, slong * L,

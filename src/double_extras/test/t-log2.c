@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -27,14 +27,11 @@ TEST_FUNCTION_START(d_log2, state)
         res1 = d_log2(x) * log(2);
         res2 = log(x);
         if (fabs(res1 - res2) > D_EPS)
-        {
-            flint_printf("FAIL\n");
-            flint_printf("x = %.20g\n", x);
-            flint_printf("res1 = %.20g\n", res1);
-            flint_printf("res2 = %.20g\n", res2);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "x = %.20g\n"
+                    "res1 = %.20g\n"
+                    "res2 = %.20g\n",
+                    x, res1, res2);
     }
 
     TEST_FUNCTION_END(state);

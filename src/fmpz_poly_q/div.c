@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -18,8 +18,7 @@ void fmpz_poly_q_div(fmpz_poly_q_t rop,
 {
     if (fmpz_poly_q_is_zero(op2))
     {
-        flint_printf("Exception (fmpz_poly_q_div). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_poly_q_div). Division by zero.\n");
     }
     if (fmpz_poly_q_is_zero(op1))
     {
@@ -79,9 +78,9 @@ void fmpz_poly_q_div(fmpz_poly_q_t rop,
         }
         else
         {
-            fmpz_poly_div(rop->num, op2->den, rop->den);
+            fmpz_poly_divexact(rop->num, op2->den, rop->den);
             fmpz_poly_mul(rop->num, op1->num, rop->num);
-            fmpz_poly_div(rop->den, op1->den, rop->den);
+            fmpz_poly_divexact(rop->den, op1->den, rop->den);
             fmpz_poly_mul(rop->den, rop->den, op2->num);
         }
     }
@@ -91,9 +90,9 @@ void fmpz_poly_q_div(fmpz_poly_q_t rop,
 
         if (fmpz_poly_is_one(rop->den))
         {
-            fmpz_poly_div(rop->den, op2->num, rop->num);
+            fmpz_poly_divexact(rop->den, op2->num, rop->num);
             fmpz_poly_mul(rop->den, op1->den, rop->den);
-            fmpz_poly_div(rop->num, op1->num, rop->num);
+            fmpz_poly_divexact(rop->num, op1->num, rop->num);
             fmpz_poly_mul(rop->num, rop->num, op2->den);
         }
         else
@@ -102,11 +101,11 @@ void fmpz_poly_q_div(fmpz_poly_q_t rop,
 
             fmpz_poly_init(t);
             fmpz_poly_init(u);
-            fmpz_poly_div(t, op1->num, rop->num);
-            fmpz_poly_div(u, op2->num, rop->num);
-            fmpz_poly_div(rop->num, op2->den, rop->den);
+            fmpz_poly_divexact(t, op1->num, rop->num);
+            fmpz_poly_divexact(u, op2->num, rop->num);
+            fmpz_poly_divexact(rop->num, op2->den, rop->den);
             fmpz_poly_mul(rop->num, t, rop->num);
-            fmpz_poly_div(rop->den, op1->den, rop->den);
+            fmpz_poly_divexact(rop->den, op1->den, rop->den);
             fmpz_poly_mul(rop->den, rop->den, u);
             fmpz_poly_clear(t);
             fmpz_poly_clear(u);
@@ -120,4 +119,3 @@ void fmpz_poly_q_div(fmpz_poly_q_t rop,
         fmpz_poly_neg(rop->den, rop->den);
     }
 }
-

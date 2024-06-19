@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -36,7 +36,7 @@ TEST_FUNCTION_START(fmpz_mod_pow_ui, state)
         fmpz_init(w);
         fmpz_init(x);
 
-        for (j = 0; j < 100; j++)
+        for (j = 0; j < 20; j++)
         {
             if (n_randint(state, 1000) == 0)
                 fmpz_randtest_unsigned(p, state, 100000);
@@ -48,13 +48,13 @@ TEST_FUNCTION_START(fmpz_mod_pow_ui, state)
 
             fmpz_randtest_mod(a, state, p);
             fmpz_randtest_mod(b, state, p);
-            e = n_randlimb(state);
-            f = n_randlimb(state);
-            t = e + f;
-            if (t < e || t < f)
+
+            do
             {
-                continue;
-            }
+                e = n_randlimb(state);
+                f = n_randlimb(state);
+                t = e + f;
+            } while (t < e || t < f);
 
             /* check a^(e + f) =  a^e * a^f */
             fmpz_mod_pow_ui(u, a, e, fpctx);

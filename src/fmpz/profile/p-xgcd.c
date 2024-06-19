@@ -5,11 +5,10 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "fmpz.h"
 #include "profiler.h"
 
@@ -45,7 +44,7 @@ void sample_xgcd_small(void * arg, ulong count)
     fmpz_clear(b);
     fmpz_clear(nmax);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 }
 
 void sample_xgcd_mixed(void * arg, ulong count)
@@ -80,7 +79,7 @@ void sample_xgcd_mixed(void * arg, ulong count)
     fmpz_clear(b);
     fmpz_clear(nmax);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 }
 
 void sample_xgcd_big(void * arg, ulong count)
@@ -115,7 +114,7 @@ void sample_xgcd_big(void * arg, ulong count)
     fmpz_clear(b);
     fmpz_clear(nmax);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 }
 
 void sample_xgcd_canonical_bezout_small(void * arg, ulong count)
@@ -150,7 +149,7 @@ void sample_xgcd_canonical_bezout_small(void * arg, ulong count)
     fmpz_clear(b);
     fmpz_clear(nmax);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 }
 
 void sample_xgcd_canonical_bezout_mixed(void * arg, ulong count)
@@ -185,7 +184,7 @@ void sample_xgcd_canonical_bezout_mixed(void * arg, ulong count)
     fmpz_clear(b);
     fmpz_clear(nmax);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 }
 
 void sample_xgcd_canonical_bezout_big(void * arg, ulong count)
@@ -220,7 +219,7 @@ void sample_xgcd_canonical_bezout_big(void * arg, ulong count)
     fmpz_clear(b);
     fmpz_clear(nmax);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 }
 
 int main(void)

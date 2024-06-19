@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -21,9 +21,9 @@ TEST_FUNCTION_START(nmod_vec_dot_ptr, state)
     {
         slong len;
         nmod_t mod;
-        mp_limb_t m, res, res2;
-        mp_ptr x, y;
-        mp_ptr * z;
+        ulong m, res, res2;
+        nn_ptr x, y;
+        nn_ptr * z;
         int limbs1;
         slong j, offset;
 
@@ -35,7 +35,7 @@ TEST_FUNCTION_START(nmod_vec_dot_ptr, state)
 
         x = _nmod_vec_init(len);
         y = _nmod_vec_init(len);
-        z = flint_malloc(sizeof(mp_ptr) * len);
+        z = flint_malloc(sizeof(nn_ptr) * len);
 
         _nmod_vec_randtest(x, state, len, mod);
         _nmod_vec_randtest(y, state, len, mod);
@@ -49,14 +49,11 @@ TEST_FUNCTION_START(nmod_vec_dot_ptr, state)
         res2 = _nmod_vec_dot(x, y, len, mod, limbs1);
 
         if (res != res2)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("m = %wu\n", m);
-            flint_printf("len = %wd\n", len);
-            flint_printf("limbs1 = %d\n", limbs1);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "m = %wu\n"
+                    "len = %wd\n"
+                    "limbs1 = %d\n",
+                    m, len, limbs1);
 
         _nmod_vec_clear(x);
         _nmod_vec_clear(y);

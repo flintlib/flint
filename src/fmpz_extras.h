@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -94,19 +94,6 @@ fmpz_add2_fmpz_si_inline(fmpz_t z, const fmpz_t x, const fmpz_t y, slong c)
 }
 
 static inline void
-fmpz_set_mpn_large(fmpz_t z, mp_srcptr src, mp_size_t n, int negative)
-{
-    __mpz_struct * zz;
-    zz = _fmpz_promote(z);
-
-    if (zz->_mp_alloc < n)
-        mpz_realloc2(zz, n * FLINT_BITS);
-
-    flint_mpn_copyi(zz->_mp_d, src, n);
-    zz->_mp_size = negative ? -n : n;
-}
-
-static inline void
 fmpz_adiv_q_2exp(fmpz_t z, const fmpz_t x, flint_bitcnt_t exp)
 {
     int sign = fmpz_sgn(x);
@@ -139,7 +126,7 @@ _fmpz_sub_small(const fmpz_t x, const fmpz_t y)
     }
 }
 
-static inline mp_size_t
+static inline slong
 _fmpz_size(const fmpz_t f)
 {
     fmpz d = *f;
@@ -147,7 +134,7 @@ _fmpz_size(const fmpz_t f)
     if (!COEFF_IS_MPZ(d))
         return 1;
     else
-        return mpz_size(COEFF_TO_PTR(d));
+        return FLINT_ABS(FMPZ_TO_ZZ(d)->size);
 }
 
 static inline void
@@ -192,20 +179,20 @@ fmpz_min(fmpz_t z, const fmpz_t x, const fmpz_t y)
     } \
     else \
     { \
-        __mpz_struct * ___zz = COEFF_TO_PTR(zv); \
+        mpz_ptr ___zz = COEFF_TO_PTR(zv); \
         (zptr) = ___zz->_mp_d; \
         (zn) = ___zz->_mp_size; \
         (zsign) = (zn) < 0; \
         (zn) = FLINT_ABS(zn); \
     }
 
-void fmpz_lshift_mpn(fmpz_t z, mp_srcptr d, mp_size_t dn, int sgnbit, flint_bitcnt_t shift);
+void fmpz_lshift_mpn(fmpz_t z, nn_srcptr d, slong dn, int sgnbit, flint_bitcnt_t shift);
 
 static inline slong
 fmpz_allocated_bytes(const fmpz_t x)
 {
     if (COEFF_IS_MPZ(*x))
-        return sizeof(__mpz_struct) + COEFF_TO_PTR(*x)->_mp_alloc * sizeof(mp_limb_t);
+        return sizeof(zz_struct) + FMPZ_TO_ZZ(*x)->alloc * sizeof(ulong);
     else
         return 0;
 }
@@ -215,4 +202,3 @@ fmpz_allocated_bytes(const fmpz_t x)
 #endif
 
 #endif
-

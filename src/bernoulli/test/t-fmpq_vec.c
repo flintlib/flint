@@ -5,11 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "test_helpers.h"
+#include "ulong_extras.h"
 #include "nmod_poly.h"
 #include "fmpq.h"
 #include "fmpq_vec.h"
@@ -19,7 +20,7 @@ TEST_FUNCTION_START(bernoulli_fmpq_vec, state)
 {
     slong iter;
     slong n, bound;
-    mp_limb_t p, pinv, m1, m2;
+    ulong p, pinv, m1, m2;
     nmod_poly_t A;
 
     bound = 1000 * FLINT_MIN(1.0, 0.1 * flint_test_multiplier());

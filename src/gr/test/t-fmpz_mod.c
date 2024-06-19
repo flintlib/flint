@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -22,11 +22,24 @@ TEST_FUNCTION_START(gr_fmpz_mod, state)
 
     fmpz_init(n);
 
+    for (iter = 0; iter < 1000; iter++)
+    {
+        fmpz_randtest_not_zero(n, state, 200);
+        fmpz_abs(n, n);
+        gr_ctx_init_fmpz_mod(ZZn, n);
+        if (n_randint(state, 2))
+            GR_MUST_SUCCEED(gr_ctx_set_is_field(ZZn, fmpz_is_probabprime(n) ? T_TRUE : T_FALSE));
+        gr_test_ring(ZZn, 10, flags);
+        gr_ctx_clear(ZZn);
+    }
+
     for (iter = 0; iter < 100; iter++)
     {
         fmpz_randtest_not_zero(n, state, 200);
         fmpz_abs(n, n);
         gr_ctx_init_fmpz_mod(ZZn, n);
+        if (n_randint(state, 2))
+            GR_MUST_SUCCEED(gr_ctx_set_is_field(ZZn, fmpz_is_probabprime(n) ? T_TRUE : T_FALSE));
         gr_test_ring(ZZn, 100, flags);
         gr_ctx_clear(ZZn);
     }

@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -13,7 +13,6 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "flint.h"
 #include "nmod_poly.h"
 
 /*
@@ -28,7 +27,7 @@
 
 int main(void)
 {
-    mp_limb_t p[] = {17ul, 2147483659ul, 9223372036854775837ul};
+    ulong p[] = {17ul, 2147483659ul, 9223372036854775837ul};
     const slong degs[]      = {   20,   40,  60,  80, 100, 120, 140, 160, 180, 200,
                                 220,  240, 260, 280, 300, 320, 340, 360, 380, 400,
                                 420,  440, 460, 480, 500, 520, 540, 560, 580, 600,
@@ -127,7 +126,6 @@ int main(void)
     }
     flint_printf("]\n");
 
-    flint_randclear(state);
+    flint_rand_clear(state);
     return 0;
 }
-

@@ -5,16 +5,18 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 slong _nmod_mpoly_add1(
-    mp_limb_t * Acoeffs, ulong * Aexps,
-    const mp_limb_t * Bcoeffs, const ulong * Bexps, slong Blen,
-    const mp_limb_t * Ccoeffs, const ulong * Cexps, slong Clen,
+    ulong * Acoeffs, ulong * Aexps,
+    const ulong * Bcoeffs, const ulong * Bexps, slong Blen,
+    const ulong * Ccoeffs, const ulong * Cexps, slong Clen,
     ulong maskhi,
     nmod_t fctx)
 {
@@ -64,9 +66,9 @@ slong _nmod_mpoly_add1(
     return k;
 }
 
-slong _nmod_mpoly_add(mp_limb_t * Acoeffs,       ulong * Aexps,
-                const mp_limb_t * Bcoeffs, const ulong * Bexps, slong Blen,
-                const mp_limb_t * Ccoeffs, const ulong * Cexps, slong Clen,
+slong _nmod_mpoly_add(ulong * Acoeffs,       ulong * Aexps,
+                const ulong * Bcoeffs, const ulong * Bexps, slong Blen,
+                const ulong * Ccoeffs, const ulong * Cexps, slong Clen,
                    slong N, const ulong * cmpmask, nmod_t fctx)
 {
     slong i = 0, j = 0, k = 0;
@@ -124,7 +126,8 @@ slong _nmod_mpoly_add(mp_limb_t * Acoeffs,       ulong * Aexps,
 void nmod_mpoly_add(nmod_mpoly_t A, const nmod_mpoly_t B,
                               const nmod_mpoly_t C, const nmod_mpoly_ctx_t ctx)
 {
-    slong Abits, N;
+    slong N;
+    ulong Abits;
     ulong * Bexps = B->exps, * Cexps = C->exps;
     ulong * cmpmask;
     int freeBexps = 0, freeCexps = 0;

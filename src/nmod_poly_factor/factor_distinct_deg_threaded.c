@@ -7,12 +7,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "thread_pool.h"
 #include "thread_support.h"
 #include "ulong_extras.h"
+#include "mpn_extras.h"
 #include "nmod_vec.h"
 #include "nmod_mat.h"
 #include "nmod_poly.h"
@@ -61,7 +63,7 @@ _nmod_poly_compose_mod_brent_kung_precomp_preinv_worker(void * arg_ptr)
     nmod_poly_compose_mod_precomp_preinv_arg_t arg =
                    *((nmod_poly_compose_mod_precomp_preinv_arg_t*) arg_ptr);
     nmod_mat_t B, C;
-    mp_ptr t, h;
+    nn_ptr t, h;
     slong i, n, m;
     nmod_poly_struct * res = arg.res;
     nmod_poly_struct * poly1 = arg.poly1;
@@ -134,7 +136,7 @@ _nmod_poly_interval_poly_worker(void * arg_ptr)
     nmod_poly_struct * vinv = arg.vinv;
     nmod_poly_struct * baby = arg.baby;
     nmod_t mod = v->mod;
-    mp_ptr tmp = arg.tmp;
+    nn_ptr tmp = arg.tmp;
 
     res->coeffs[0] = 1;
 
@@ -199,18 +201,10 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
 
     num_threads = flint_request_threads(&threads, flint_get_num_threads());
 
-    h = (nmod_poly_struct *) flint_malloc((2*m + l + num_threads + 2)*
-                           sizeof(nmod_poly_struct));
-
-    if (h == NULL)
-    {
-        flint_printf("Exception (nmod_poly_factor_distinct_deg):\n");
-        flint_printf("Not enough memory.\n");
-        flint_abort();
-    }
+    h = flint_malloc((2 * m + l + num_threads + 2) * sizeof(nmod_poly_struct));
 
     for (i = 0; i < 2*m + l + 2 + num_threads; i++)
-       nmod_poly_init_mod(h + i, poly->mod);
+        nmod_poly_init_mod(h + i, poly->mod);
 
     H = h + (l + 1);
     I = H + m;
@@ -237,7 +231,7 @@ void nmod_poly_factor_distinct_deg_threaded(nmod_poly_factor_t res,
 
     if (FLINT_BIT_COUNT(poly->mod.n) > ((n_sqrt(v->length - 1) + 1)*3)/4)
     {
-        for (i = 1; i < FLINT_BIT_COUNT(l); i++)
+        for (i = 1; i < (slong) FLINT_BIT_COUNT(l); i++)
             nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(h + 1 +
                                    (1 << (i - 1)), h + 1, 1 << (i - 1),
                                    1 << (i - 1), h + (1 << (i - 1)),

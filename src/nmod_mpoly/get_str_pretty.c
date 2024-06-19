@@ -5,17 +5,21 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <string.h>
+#include <gmp.h>
+#include "longlong.h"
+#include "fmpz.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 #define ALLOC_PER_VAR ((FLINT_BITS+4)/3)
 
 static char *
-_nmod_mpoly_get_str_pretty(const mp_limb_t * coeff, const ulong * exp, slong len,
+_nmod_mpoly_get_str_pretty(const ulong * coeff, const ulong * exp, slong len,
            const char ** x_in, slong bits, const mpoly_ctx_t mctx, nmod_t fctx)
 {
     char * str, ** x = (char **) x_in, *xtmp;
@@ -70,7 +74,7 @@ _nmod_mpoly_get_str_pretty(const mp_limb_t * coeff, const ulong * exp, slong len
         first = (coeff[i] == 1);
         if (!first)
         {
-            off += flint_sprintf(str + off, "%wd", coeff[i]);
+            off += flint_sprintf(str + off, "%wu", coeff[i]);
         }
 
         mpoly_get_monomial_ffmpz(exponents, exp + N*i, bits, mctx);

@@ -6,12 +6,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "test_helpers.h"
+#include "thread_pool.h"
 #include "thread_support.h"
+#include "ulong_extras.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 #include "nmod_poly_factor.h"
@@ -26,7 +28,7 @@ TEST_FUNCTION_START(nmod_poly_factor_interval_threaded, state)
         nmod_poly_t a, b, c, cinv, d;
 	nmod_poly_struct * tmp;
 	nmod_poly_struct * e;
-        mp_limb_t modulus;
+        ulong modulus;
         slong j, num_threads, l;
         nmod_poly_interval_poly_arg_t * args1;
         thread_pool_handle * threads;

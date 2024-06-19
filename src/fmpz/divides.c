@@ -5,11 +5,10 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "gmpcompat.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
@@ -32,7 +31,7 @@ fmpz_divides(fmpz_t q, const fmpz_t g, const fmpz_t h)
     {
         if (!COEFF_IS_MPZ(c2))  /* h is also small */
         {
-            mp_limb_t qz;
+            ulong qz;
 
             if (c1 < 0)
             {
@@ -63,11 +62,11 @@ fmpz_divides(fmpz_t q, const fmpz_t g, const fmpz_t h)
     }
     else                        /* g is large */
     {
-        __mpz_struct * mq;
+        mpz_ptr mq;
 
         if (!COEFF_IS_MPZ(c2))  /* h is small */
         {
-            mp_limb_t r;
+            ulong r;
 
             mq = _fmpz_promote(q);
 

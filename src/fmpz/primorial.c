@@ -6,13 +6,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz.h"
-#include "mpn_extras.h"
 #include "ulong_extras.h"
+#include "mpn_extras.h"
+#include "fmpz.h"
 
 #if FLINT64
 #define LARGEST_ULONG_PRIMORIAL 52
@@ -55,11 +55,11 @@ const ulong ULONG_PRIMORIALS[] =
 
 #define PROD_LIMBS_DIRECT_CUTOFF 50
 
-mp_size_t mpn_prod_limbs_direct(mp_limb_t * result, const mp_limb_t * factors,
-    mp_size_t n)
+slong mpn_prod_limbs_direct(ulong * result, const ulong * factors,
+    slong n)
 {
-    mp_size_t k, len;
-    mp_limb_t top;
+    slong k, len;
+    ulong top;
     if (n < 1)
     {
         result[0] = UWORD(1);
@@ -79,11 +79,11 @@ mp_size_t mpn_prod_limbs_direct(mp_limb_t * result, const mp_limb_t * factors,
     return len;
 }
 
-mp_size_t mpn_prod_limbs_balanced(mp_limb_t * result, mp_limb_t * scratch,
-                             const mp_limb_t * factors, mp_size_t n, ulong bits)
+slong mpn_prod_limbs_balanced(ulong * result, ulong * scratch,
+                             const ulong * factors, slong n, ulong bits)
 {
-    mp_size_t an, bn, alen, blen, len;
-    mp_limb_t top;
+    slong an, bn, alen, blen, len;
+    ulong top;
 
     if (n < PROD_LIMBS_DIRECT_CUTOFF)
         return mpn_prod_limbs_direct(result, factors, n);
@@ -112,18 +112,18 @@ mp_size_t mpn_prod_limbs_balanced(mp_limb_t * result, mp_limb_t * scratch,
     bits must be set to some bound on the bit size of the entries
     in factors. If no bound is known, simply use FLINT_BITS.
 */
-mp_size_t mpn_prod_limbs(mp_limb_t * result, const mp_limb_t * factors,
-    mp_size_t n, ulong bits)
+slong mpn_prod_limbs(ulong * result, const ulong * factors,
+    slong n, ulong bits)
 {
-    mp_size_t len, limbs;
-    mp_limb_t * scratch;
+    slong len, limbs;
+    ulong * scratch;
 
     if (n < PROD_LIMBS_DIRECT_CUTOFF)
         return mpn_prod_limbs_direct(result, factors, n);
 
     limbs = (n * bits - 1)/FLINT_BITS + 2;
 
-    scratch = flint_malloc(sizeof(mp_limb_t) * limbs);
+    scratch = flint_malloc(sizeof(ulong) * limbs);
     len = mpn_prod_limbs_balanced(result, scratch, factors, n, bits);
     flint_free(scratch);
 
@@ -133,10 +133,11 @@ mp_size_t mpn_prod_limbs(mp_limb_t * result, const mp_limb_t * factors,
 void
 fmpz_primorial(fmpz_t res, ulong n)
 {
-    mp_size_t len, pi;
+    slong len, pi;
     ulong bits;
-    __mpz_struct * mres;
-    const mp_limb_t * primes;
+    mpz_ptr mres;
+    mp_ptr rp;
+    const ulong * primes;
 
     if (n <= LARGEST_ULONG_PRIMORIAL)
     {
@@ -153,8 +154,8 @@ fmpz_primorial(fmpz_t res, ulong n)
     bits = FLINT_BIT_COUNT(primes[pi - 1]);
 
     mres = _fmpz_promote(res);
-    mpz_realloc2(mres, pi*bits);
+    rp = FLINT_MPZ_REALLOC(mres, (pi * bits) / FLINT_BITS + 1);
 
-    len = mpn_prod_limbs(mres->_mp_d, primes, pi, bits);
+    len = mpn_prod_limbs(rp, primes, pi, bits);
     mres->_mp_size = len;
 }

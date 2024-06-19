@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "acb.h"
 #include "acb_dirichlet.h"
 
 #ifdef __GNUC__
@@ -105,4 +106,3 @@ acb_dirichlet_hurwitz_precomp_choose_param(ulong * _A, ulong *_K, ulong *_N,
 
     mag_clear(err);
 }
-

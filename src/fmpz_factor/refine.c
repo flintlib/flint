@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -135,8 +135,7 @@ fr_node_list_pop_front(fr_node_ptr *phead, fr_node_ptr *ptail)
 
     if (phead == ptail)
     {
-        flint_printf("aliasing issue...\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "aliasing issue...\n");
     }
 
     if (*phead)

@@ -5,13 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpn_extras.h"
 #include "arb.h"
 
-#define TMP_ALLOC_LIMBS(__n) TMP_ALLOC((__n) * sizeof(mp_limb_t))
+#define TMP_ALLOC_LIMBS(__n) TMP_ALLOC((__n) * sizeof(ulong))
 
 /*
 Compute wn-limb fixed-point number w, a number of ulps error, and
@@ -64,11 +65,11 @@ for a total of 3 ulp.
 
 
 int
-_arb_get_mpn_fixed_mod_log2(mp_ptr w, fmpz_t q, mp_limb_t * error,
-                                                const arf_t x, mp_size_t wn)
+_arb_get_mpn_fixed_mod_log2(nn_ptr w, fmpz_t q, ulong * error,
+                                                const arf_t x, slong wn)
 {
-    mp_srcptr xp;
-    mp_size_t xn;
+    nn_srcptr xp;
+    slong xn;
     int negative;
     slong exp;
 
@@ -101,9 +102,9 @@ _arb_get_mpn_fixed_mod_log2(mp_ptr w, fmpz_t q, mp_limb_t * error,
     }
     else
     {
-        mp_ptr qp, rp, np;
-        mp_srcptr dp;
-        mp_size_t qn, rn, nn, dn, tn, alloc;
+        nn_ptr qp, rp, np;
+        nn_srcptr dp;
+        slong qn, rn, nn, dn, tn, alloc;
         TMP_INIT;
 
         tn = ((exp + 2) + FLINT_BITS - 1) / FLINT_BITS;
@@ -142,8 +143,7 @@ _arb_get_mpn_fixed_mod_log2(mp_ptr w, fmpz_t q, mp_limb_t * error,
             if (mpn_add_1(qp, qp, qn, 1))
             {
                 /* I believe this cannot happen (should prove it) */
-                flint_printf("mod log(2): unexpected carry\n");
-                flint_abort();
+                flint_throw(FLINT_ERROR, "mod log(2): unexpected carry\n");
             }
 
             mpn_sub_n(w, dp + tn, rp + tn, wn);
@@ -171,4 +171,3 @@ _arb_get_mpn_fixed_mod_log2(mp_ptr w, fmpz_t q, mp_limb_t * error,
         return 1;
     }
 }
-

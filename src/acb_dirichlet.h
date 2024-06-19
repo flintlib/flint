@@ -7,20 +7,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #ifndef ACB_DIRICHLET_H
 #define ACB_DIRICHLET_H
 
-#ifdef ACB_DIRICHLET_INLINES_C
-#define ACB_DIRICHLET_INLINE
-#else
-#define ACB_DIRICHLET_INLINE static inline
-#endif
-
-#include "acb.h"
+#include "acb_types.h"
 #include "dirichlet.h"
 
 #ifdef __cplusplus
@@ -190,13 +184,13 @@ void acb_dirichlet_backlund_s_bound(mag_t res, const arb_t t);
 void acb_dirichlet_zeta_nzeros_gram(fmpz_t res, const fmpz_t n);
 slong acb_dirichlet_backlund_s_gram(const fmpz_t n);
 
-ACB_DIRICHLET_INLINE void
+FLINT_FORCE_INLINE void
 acb_dirichlet_hardy_z_zero(arb_t res, const fmpz_t n, slong prec)
 {
     acb_dirichlet_hardy_z_zeros(res, n, 1, prec);
 }
 
-ACB_DIRICHLET_INLINE void
+FLINT_FORCE_INLINE void
 acb_dirichlet_zeta_zero(acb_t res, const fmpz_t n, slong prec)
 {
     acb_dirichlet_zeta_zeros(res, n, 1, prec);
@@ -315,16 +309,6 @@ slong acb_dirichlet_platt_hardy_z_zeros(
 
 void acb_dirichlet_dft_index(acb_ptr w, acb_srcptr v, const dirichlet_group_t G, slong prec);
 void acb_dirichlet_dft(acb_ptr w, acb_srcptr v, const dirichlet_group_t G, slong prec);
-
-/* utils */
-
-ACB_DIRICHLET_INLINE void
-acb_vec_printd(acb_srcptr vec, slong len, slong digits)
-{
-    slong i;
-    for (i = 0; i < len; i++)
-        acb_printd(vec + i, digits), flint_printf("\n");
-}
 
 #ifdef __cplusplus
 }

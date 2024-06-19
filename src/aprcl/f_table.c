@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
 #include "nmod_vec.h"
 #include "aprcl.h"
 
@@ -19,12 +20,12 @@
 
     f_table[x - 1] = f(x).
 */
-mp_ptr
+nn_ptr
 aprcl_f_table(const ulong q)
 {
     int i;
     ulong g, g_pow, qinv;
-    mp_ptr g_table, f_table;
+    nn_ptr g_table, f_table;
 
     g = n_primitive_root_prime(q);
     g_table = _nmod_vec_init(q);

@@ -5,16 +5,17 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpn_extras.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
 void
-_nmod_poly_compose_mod(mp_ptr res,
-    mp_srcptr f, slong lenf, mp_srcptr g, mp_srcptr h, slong lenh, nmod_t mod)
+_nmod_poly_compose_mod(nn_ptr res,
+    nn_srcptr f, slong lenf, nn_srcptr g, nn_srcptr h, slong lenh, nmod_t mod)
 {
     if (lenh < 8 || lenf >= lenh)
         _nmod_poly_compose_mod_horner(res, f, lenf, g, h, lenh, mod);
@@ -32,12 +33,11 @@ nmod_poly_compose_mod(nmod_poly_t res,
     slong len3 = poly3->length;
     slong len = len3 - 1;
 
-    mp_ptr ptr2;
+    nn_ptr ptr2;
 
     if (len3 == 0)
     {
-        flint_printf("Exception (nmod_poly_compose_mod). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (nmod_poly_compose_mod). Division by zero.\n");
     }
 
     if (len1 == 0 || len3 == 1)

@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -44,7 +44,7 @@ TEMPLATE(T, poly_inflate) (TEMPLATE(T, poly_t) result,
         {
             TEMPLATE(T, set) (result->coeffs + (i * inflation),
                               input->coeffs + i, ctx);
-            for (j = i * inflation - 1; j > (i - 1) * inflation; j--)
+            for (j = i * inflation - 1; j > (i - 1) * (slong) inflation; j--)
                 TEMPLATE(T, zero) (result->coeffs + j, ctx);
         }
         TEMPLATE(T, set) (result->coeffs, input->coeffs, ctx);

@@ -5,13 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "acb_dirichlet.h"
-#include "arb_hypgeom.h"
 #include "arb_poly.h"
+#include "arb_hypgeom.h"
+#include "acb.h"
+#include "acb_dirichlet.h"
 
 static void
 _arb_div_si_si(arb_t res, slong x, slong y, slong prec)
@@ -85,7 +86,7 @@ _platt_lambda(arb_t res, const arb_t t, slong prec)
     acb_mul(z, z, s2, prec);
     if (!arb_contains_zero(acb_imagref(z)))
     {
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
     }
     arb_set(res, acb_realref(z));
 
@@ -122,8 +123,7 @@ acb_dirichlet_platt_scaled_lambda_vec(arb_ptr res,
     slong N = A*B;
     if (A < 1 || B < 1 || N % 2)
     {
-        flint_printf("requires an even number of grid points\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "requires an even number of grid points\n");
     }
     else
     {
@@ -540,8 +540,7 @@ void acb_dirichlet_platt_ws_interpolation_precomp(arb_t res, arf_t deriv,
     slong N = A*B;
     if (A < 1 || B < 1 || N % 2)
     {
-        flint_printf("requires an even number of grid points\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "requires an even number of grid points\n");
     }
     else
     {

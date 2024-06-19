@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -30,7 +30,7 @@ enum
 };
 
 typedef struct dlog_precomp_struct dlog_precomp_struct;
-typedef struct dlog_precomp_struct * dlog_precomp_ptr;
+typedef struct dlog_precomp_struct * dlog_preconn_ptr;
 
 /* log in (1+pZ/p^eZ), e small: use recursion formulas
  * could use padic log instead but exponent is small
@@ -107,7 +107,7 @@ typedef struct
     ulong num;
     ulong * expo;
     ulong * crt_coeffs;
-    dlog_precomp_ptr pre;
+    dlog_preconn_ptr pre;
 }
 dlog_crt_struct;
 

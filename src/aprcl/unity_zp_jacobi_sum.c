@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
 #include "nmod_vec.h"
 #include "aprcl.h"
 
@@ -16,7 +17,7 @@
     Computes sum \zeta_{p^k}^{a * x + b * f(x)} for x = 1, 2, ..., q - 2.
 */
 void
-_unity_zp_jacobi_sum_pq_general(unity_zp f, const mp_ptr table,
+_unity_zp_jacobi_sum_pq_general(unity_zp f, const nn_ptr table,
         ulong p, ulong q, ulong k, ulong a, ulong b)
 {
     int i, j;
@@ -56,7 +57,7 @@ void
 unity_zp_jacobi_sum_pq(unity_zp f, ulong q, ulong p)
 {
     ulong k;
-    mp_ptr table;
+    nn_ptr table;
 
     table = aprcl_f_table(q);
     k = aprcl_p_power_in_q(q - 1, p);
@@ -73,7 +74,7 @@ void
 unity_zp_jacobi_sum_2q_one(unity_zp f, ulong q)
 {
     ulong k;
-    mp_ptr table;
+    nn_ptr table;
 
     table = aprcl_f_table(q);
     k = aprcl_p_power_in_q(q - 1, 2);
@@ -91,7 +92,7 @@ void
 unity_zp_jacobi_sum_2q_two(unity_zp f, ulong q)
 {
     ulong a, b, k;
-    mp_ptr table;
+    nn_ptr table;
 
     table = aprcl_f_table(q);
     k = aprcl_p_power_in_q(q - 1, 2);
@@ -102,4 +103,3 @@ unity_zp_jacobi_sum_2q_two(unity_zp f, ulong q)
 
     _nmod_vec_clear(table);
 }
-

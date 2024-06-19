@@ -6,18 +6,18 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-void _nmod_poly_mulmod_preinv(mp_ptr res, mp_srcptr poly1, slong len1,
-                            mp_srcptr poly2, slong len2, mp_srcptr f,
-                            slong lenf, mp_srcptr finv, slong lenfinv, nmod_t mod)
+void _nmod_poly_mulmod_preinv(nn_ptr res, nn_srcptr poly1, slong len1,
+                            nn_srcptr poly2, slong len2, nn_srcptr f,
+                            slong lenf, nn_srcptr finv, slong lenfinv, nmod_t mod)
 {
-    mp_ptr T, Q;
+    nn_ptr T, Q;
     slong lenT, lenQ;
 
     lenT = len1 + len2 - 1;
@@ -42,7 +42,7 @@ nmod_poly_mulmod_preinv(nmod_poly_t res, const nmod_poly_t poly1,
                         const nmod_poly_t finv)
 {
     slong len1, len2, lenf;
-    mp_ptr fcoeffs;
+    nn_ptr fcoeffs;
 
     lenf = f->length;
     len1 = poly1->length;
@@ -50,14 +50,12 @@ nmod_poly_mulmod_preinv(nmod_poly_t res, const nmod_poly_t poly1,
 
     if (lenf == 0)
     {
-        flint_printf("Exception (nmod_poly_mulmod_preinv). Divide by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (nmod_poly_mulmod_preinv). Divide by zero.\n");
     }
 
     if (lenf <= len1 || lenf <= len2)
     {
-        flint_printf("Exception (nmod_poly_mulmod_preinv). Input larger than modulus.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (nmod_poly_mulmod_preinv). Input larger than modulus.\n");
     }
 
     if (lenf == 1 || len1 == 0 || len2 == 0)
@@ -70,7 +68,7 @@ nmod_poly_mulmod_preinv(nmod_poly_t res, const nmod_poly_t poly1,
     {
         if (f == res)
         {
-            fcoeffs = (mp_ptr) flint_malloc(sizeof(mp_limb_t) * lenf);
+            fcoeffs = (nn_ptr) flint_malloc(sizeof(ulong) * lenf);
             _nmod_vec_set(fcoeffs, f->coeffs, lenf);
         } else
             fcoeffs = f->coeffs;

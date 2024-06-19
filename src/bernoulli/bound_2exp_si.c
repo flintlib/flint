@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "longlong.h"
 #include "bernoulli.h"
 
 const short bernoulli_bound_tab[256] = {
@@ -55,7 +56,7 @@ bernoulli_bound_2exp_si(ulong n)
         if (n == 1)
             return -WORD(1);
         else
-            return LONG_MIN;
+            return WORD_MIN;
     }
     else if (n < 512)
     {
@@ -64,7 +65,7 @@ bernoulli_bound_2exp_si(ulong n)
     else
     {
         /* |B_n| < 4 * n! / (2*pi)^n < 4 * (n+1)^(n+1) e^(-n) / (2*pi)^n */
-        mp_limb_t l, u, hi, lo;
+        ulong l, u, hi, lo;
         int b, shift;
 
         b = FLINT_BIT_COUNT(n + 1);
@@ -78,8 +79,7 @@ bernoulli_bound_2exp_si(ulong n)
 
         if (hi || n > (UWORD(1) << (FLINT_BITS - 6)))
         {
-            flint_printf("bernoulli_bound_2exp_si: n too large\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "bernoulli_bound_2exp_si: n too large\n");
         }
 
         l = (lo >> LOG_PREC) + 1;
@@ -89,4 +89,3 @@ bernoulli_bound_2exp_si(ulong n)
         return l + 2 - (131 * n) / 32;
     }
 }
-

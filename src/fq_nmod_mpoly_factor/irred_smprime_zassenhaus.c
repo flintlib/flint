@@ -5,12 +5,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fq_nmod.h"
+#include "n_poly.h"
 #include "fmpz_poly_factor.h"
-#include "nmod_mpoly_factor.h"
 #include "fq_nmod_mpoly_factor.h"
 
 /*
@@ -23,7 +24,7 @@ static int _try_lift(
     fq_nmod_mpolyv_t qfac,
     const fq_nmod_mpoly_t q,
     const fq_nmod_mpolyv_t pfac,
-    const fq_nmod_mpoly_t p,
+    const fq_nmod_mpoly_t FLINT_UNUSED(p),
     slong m,
     fq_nmod_struct * alpha,
     slong n,
@@ -42,7 +43,7 @@ static int _try_lift(
     fq_nmod_mpoly_init(t, ctx);
     fq_nmod_mpoly_init(newq, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fq_nmod_mpoly_one(t, ctx);
     for (i = 0; i < pfac->length; i++)
         fq_nmod_mpoly_mul(t, t, pfac->coeffs + i, ctx);
@@ -107,7 +108,7 @@ cleanup:
     fq_nmod_mpoly_clear(t, ctx);
     fq_nmod_mpoly_clear(newq, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success > 0)
     {
         fq_nmod_mpoly_init(t, ctx);
@@ -251,7 +252,7 @@ got_alpha:
         fq_nmod_mpoly_set(q, m < n ? Aevals + m : A, ctx);
         fq_nmod_mpoly_set(p, Aevals + m - 1, ctx);
 
-    #ifdef FLINT_WANT_ASSERT
+    #if FLINT_WANT_ASSERT
         fq_nmod_mpoly_one(t, ctx);
         for (i = 0; i < pfac->length; i++)
             fq_nmod_mpoly_mul(t, t, pfac->coeffs + i, ctx);
@@ -299,7 +300,7 @@ got_alpha:
         {
             zassenhaus_subset_first(subset, len, k);
 
-        #ifdef FLINT_WANT_ASSERT
+        #if FLINT_WANT_ASSERT
             fq_nmod_mpoly_one(t, ctx);
             for (i = 0; i < len; i++)
             {
@@ -397,7 +398,7 @@ cleanup:
 
     FLINT_ASSERT(success == 0 || success == 1);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success)
     {
         fq_nmod_mpoly_init(t, ctx);
@@ -411,4 +412,3 @@ cleanup:
 
     return success;
 }
-

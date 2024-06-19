@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -14,11 +14,11 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-mp_limb_t
+ulong
 fmpz_mat_find_good_prime_and_invert(nmod_mat_t Ainv,
                                 const fmpz_mat_t A, const fmpz_t det_bound)
 {
-    mp_limb_t p;
+    ulong p;
     fmpz_t tested;
 
     p = UWORD(1) << NMOD_MAT_OPTIMAL_MODULUS_BITS;
@@ -52,10 +52,10 @@ fmpz_mat_find_good_prime_and_invert(nmod_mat_t Ainv,
 
 #define USE_SLOW_MULTIPLICATION 0
 
-mp_limb_t * fmpz_mat_dixon_get_crt_primes(slong * num_primes, const fmpz_mat_t A, mp_limb_t p)
+ulong * fmpz_mat_dixon_get_crt_primes(slong * num_primes, const fmpz_mat_t A, ulong p)
 {
     fmpz_t bound, prod;
-    mp_limb_t * primes;
+    ulong * primes;
     slong i, j;
 
     fmpz_init(bound);
@@ -70,7 +70,7 @@ mp_limb_t * fmpz_mat_dixon_get_crt_primes(slong * num_primes, const fmpz_mat_t A
     fmpz_mul_ui(bound, bound, A->r);
     fmpz_mul_ui(bound, bound, UWORD(2));  /* signs */
 
-    primes = (mp_limb_t *) flint_malloc(sizeof(mp_limb_t) *
+    primes = (ulong *) flint_malloc(sizeof(ulong) *
 		            (fmpz_bits(bound) / (FLINT_BIT_COUNT(p) - 1) + 2));
     primes[0] = p;
     fmpz_set_ui(prod, p);
@@ -93,13 +93,13 @@ mp_limb_t * fmpz_mat_dixon_get_crt_primes(slong * num_primes, const fmpz_mat_t A
 void
 _fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
                         const fmpz_mat_t A, const fmpz_mat_t B,
-                    const nmod_mat_t Ainv, mp_limb_t p,
+                    const nmod_mat_t Ainv, ulong p,
                     const fmpz_t N, const fmpz_t D)
 {
     fmpz_t bound, ppow;
     fmpz_mat_t x, d, y, Ay;
     fmpz_t prod;
-    mp_limb_t * crt_primes;
+    ulong * crt_primes;
     nmod_mat_t * A_mod;
     nmod_mat_t Ay_mod, d_mod, y_mod;
     slong i, n, cols, num_primes;
@@ -212,12 +212,11 @@ fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
 {
     nmod_mat_t Ainv;
     fmpz_t N, D;
-    mp_limb_t p;
+    ulong p;
 
     if (!fmpz_mat_is_square(A))
     {
-        flint_printf("Exception (fmpz_mat_solve_dixon). Non-square system matrix.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mat_solve_dixon). Non-square system matrix.\n");
     }
 
     if (fmpz_mat_is_empty(A) || fmpz_mat_is_empty(B))

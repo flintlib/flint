@@ -5,11 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "long_extras.h"
 #include "fmpz_poly.h"
 #include "fmpz_poly_mat.h"
 
@@ -19,13 +19,24 @@ fmpz_poly_mat_init(fmpz_poly_mat_t A, slong rows, slong cols)
     slong i;
 
     if (rows != 0)
-        A->rows = (fmpz_poly_struct **) flint_malloc(rows * sizeof(fmpz_poly_struct *));
+        A->rows = flint_malloc(rows * sizeof(fmpz_poly_struct *));
     else
         A->rows = NULL;
 
+    A->r = rows;
+    A->c = cols;
+
     if (rows != 0 && cols != 0)
     {
-        A->entries = (fmpz_poly_struct *) flint_malloc(flint_mul_sizes(rows, cols) * sizeof(fmpz_poly_struct));
+        slong num;
+        int of;
+
+        of = z_mul_checked(&num, rows, cols);
+
+        if (of)
+            flint_throw(FLINT_ERROR, "Overflow creating a %wd x %wd object\n", rows, cols);
+
+        A->entries = flint_malloc(num * sizeof(fmpz_poly_struct));
 
         for (i = 0; i < rows * cols; i++)
             fmpz_poly_init(A->entries + i);
@@ -42,7 +53,11 @@ fmpz_poly_mat_init(fmpz_poly_mat_t A, slong rows, slong cols)
                 A->rows[i] = NULL;
         }
     }
+}
 
-    A->r = rows;
-    A->c = cols;
+void
+fmpz_poly_mat_init_set(fmpz_poly_mat_t A, const fmpz_poly_mat_t B)
+{
+    fmpz_poly_mat_init(A, B->r, B->c);
+    fmpz_poly_mat_set(A, B);
 }

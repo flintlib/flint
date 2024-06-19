@@ -5,12 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "profiler.h"
-#include "flint.h"
 #include "ulong_extras.h"
 
 #define ITERS 1000
@@ -25,7 +24,7 @@ void sample(void * arg, ulong count)
 {
    fac_one_line_t * params = (fac_one_line_t *) arg;
    ulong i, j;
-   mp_limb_t n2;
+   ulong n2;
 
    for (i = 0; i < count; i++)
    {
@@ -83,7 +82,7 @@ int main(void)
 		  i, max/(double)ITERS);
    }
 
-   flint_randclear(state);
+   flint_rand_clear(state);
    flint_free(params.composites);
    return 0;
 }

@@ -8,7 +8,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -19,7 +19,7 @@ void
 nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
 {
     nmod_poly_t f_d, g, g_1;
-    mp_limb_t p;
+    ulong p;
     slong deg, i;
 
     if (f->length <= 1)
@@ -57,7 +57,7 @@ nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
 
         nmod_poly_init_mod(h, f->mod);
 
-        for (i = 0; i <= deg/p; i++) /* this will be an integer since f'=0 */
+        for (i = 0; (ulong) i <= deg / p; i++) /* this will be an integer since f'=0 */
         {
             nmod_poly_set_coeff_ui(h, i, nmod_poly_get_coeff_ui(f, i*p));
         }
@@ -76,7 +76,7 @@ nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
         nmod_poly_t h, z;
 
         nmod_poly_gcd(g, f, f_d);
-        nmod_poly_div(g_1, f, g);
+        nmod_poly_divexact(g_1, f, g);
 
         i = 1;
 
@@ -87,7 +87,7 @@ nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
         while (!nmod_poly_is_one(g_1))
         {
             nmod_poly_gcd(h, g_1, g);
-            nmod_poly_div(z, g_1, h);
+            nmod_poly_divexact(z, g_1, h);
 
             /* out <- out.z */
             if (z->length > 1)
@@ -101,7 +101,7 @@ nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
 
             i++;
             nmod_poly_set(g_1, h);
-            nmod_poly_div(g, g, h);
+            nmod_poly_divexact(g, g, h);
         }
 
         nmod_poly_clear(h);
@@ -117,7 +117,7 @@ nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
 
             nmod_poly_init_mod(g_p, f->mod);
 
-            for (i = 0; i <= nmod_poly_degree(g)/p; i++)
+            for (i = 0; (ulong) i <= nmod_poly_degree(g)/p; i++)
                 nmod_poly_set_coeff_ui(g_p, i, nmod_poly_get_coeff_ui(g, i*p));
 
             nmod_poly_factor_init(new_res_2);

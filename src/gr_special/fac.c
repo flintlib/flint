@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -23,7 +23,7 @@
 #define FAC_TAB_SIZE 13
 #endif
 
-static const mp_limb_t fac_tab[] =
+static const ulong fac_tab[] =
 {
   UWORD(1), UWORD(1), UWORD(2), UWORD(6), UWORD(24), UWORD(120), UWORD(720), UWORD(5040), UWORD(40320), UWORD(362880),
   UWORD(3628800), UWORD(39916800), UWORD(479001600),

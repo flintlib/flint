@@ -5,11 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "test_helpers.h"
+#include "ulong_extras.h"
+#include "fmpz.h"
+#include "mpoly.h"
 #include "nmod_mpoly_factor.h"
 
 /* Defined in t-factor.c, t-factor_wang.c, t-factor_zassenhaus.c and
@@ -146,7 +149,7 @@ TEST_FUNCTION_START(nmod_mpoly_factor, state)
         nmod_mpoly_t a, t;
         slong nfacs, len;
         ulong expbound, powbound, pow, expbounds[2];
-        mp_limb_t p;
+        ulong p;
 
         p = n_randint(state, (i % 2 == 0) ? 4 : FLINT_BITS - 1) + 1;
         p = n_randbits(state, p);
@@ -192,7 +195,7 @@ TEST_FUNCTION_START(nmod_mpoly_factor, state)
         nmod_mpoly_t a, t;
         slong n, nfacs, len;
         ulong expbound, powbound, pow;
-        mp_limb_t p;
+        ulong p;
 
         p = n_randint(state, (i % 2 == 0) ? 4 : FLINT_BITS - 1) + 1;
         p = n_randbits(state, p);

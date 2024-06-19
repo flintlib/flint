@@ -5,11 +5,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_poly.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
 
 int fmpz_mpoly_is_fmpz_poly(
@@ -54,8 +56,8 @@ int fmpz_mpoly_get_fmpz_poly(
     }
     else
     {
-        slong j, off;
-        ulong check, wpf = Bbits/FLINT_BITS;
+        slong j, off, wpf = Bbits/FLINT_BITS;
+        ulong check;
 
         off = mpoly_gen_offset_mp(var, Bbits, ctx->minfo);
 
@@ -150,8 +152,7 @@ fmpz_mpoly_set_gen_fmpz_poly(fmpz_mpoly_t res, slong var, const fmpz_poly_t pol,
 {
     if (ctx->minfo->nvars == 0)
     {
-        flint_printf("fmpz_mpoly_set_gen_fmpz_poly: require nvars >= 1");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "fmpz_mpoly_set_gen_fmpz_poly: require nvars >= 1");
     }
 
     fmpz_mpoly_set_fmpz_poly(res, pol, var, ctx);

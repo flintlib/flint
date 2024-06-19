@@ -5,11 +5,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fq_zech.h"
 #include "fmpz_poly_factor.h"
+#include "fq_zech_poly.h"
 #include "fq_zech_poly_factor.h"
 #include "fq_zech_mpoly_factor.h"
 
@@ -23,7 +25,7 @@ static int _try_lift(
     fq_zech_mpolyv_t qfac,
     const fq_zech_mpoly_t q,
     const fq_zech_mpolyv_t pfac,
-    const fq_zech_mpoly_t p,
+    const fq_zech_mpoly_t FLINT_UNUSED(p),
     slong m,
     fq_zech_struct * alpha,
     slong n,
@@ -44,7 +46,7 @@ static int _try_lift(
     fq_zech_mpoly_init(newq, ctx);
     fq_zech_mpoly_univar_init(u, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fq_zech_mpoly_one(t, ctx);
     for (i = 0; i < pfac->length; i++)
         fq_zech_mpoly_mul(t, t, pfac->coeffs + i, ctx);
@@ -109,7 +111,7 @@ cleanup:
     fq_zech_mpoly_clear(newq, ctx);
     fq_zech_mpoly_univar_clear(u, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success > 0)
     {
         fq_zech_mpoly_init(t, ctx);
@@ -242,7 +244,7 @@ got_alpha:
         fq_zech_mpoly_set(q, m < n ? Aevals + m : A, ctx);
         fq_zech_mpoly_set(p, Aevals + m - 1, ctx);
 
-    #ifdef FLINT_WANT_ASSERT
+    #if FLINT_WANT_ASSERT
         fq_zech_mpoly_one(t, ctx);
         for (i = 0; i < pfac->length; i++)
             fq_zech_mpoly_mul(t, t, pfac->coeffs + i, ctx);
@@ -288,7 +290,7 @@ got_alpha:
         {
             zassenhaus_subset_first(subset, len, k);
 
-        #ifdef FLINT_WANT_ASSERT
+        #if FLINT_WANT_ASSERT
             fq_zech_mpoly_one(t, ctx);
             for (i = 0; i < len; i++)
             {
@@ -387,7 +389,7 @@ cleanup:
 
     FLINT_ASSERT(success == 0 || success == 1);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success)
     {
         fq_zech_mpoly_init(t, ctx);
@@ -401,4 +403,3 @@ cleanup:
 
     return success;
 }
-

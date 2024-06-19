@@ -130,7 +130,7 @@ machin.c
 
 This program checks several variations of Machin's formula
 
-.. math ::
+.. math::
 
     \frac{\pi}{4} = 4 \operatorname{atan}\left(\frac{1}{5}\right) - \operatorname{atan}\left(\frac{1}{239}\right)
 
@@ -170,7 +170,7 @@ swinnerton_dyer_poly.c
 
 This program computes the coefficients of the Swinnerton-Dyer polynomial
 
-.. math ::
+.. math::
 
     S_n = \prod (x \pm \sqrt{2} \pm \sqrt{3} \pm \sqrt{5} \pm \ldots \pm \sqrt{p_n})
 
@@ -276,7 +276,7 @@ eigenvalues `\lambda_1, \ldots, \lambda_n`,
 as exact algebraic numbers, and verifies
 the exact trace and determinant formulas
 
-.. math ::
+.. math::
 
     \lambda_1 + \lambda_2 + \ldots + \lambda_n = \operatorname{tr}(H_n), \quad
     \lambda_1 \lambda_2 \cdots \lambda_n = \operatorname{det}(H_n).
@@ -315,13 +315,13 @@ discrete Fourier transform (DFT) in exact arithmetic.
 For the input vector `\textbf{x} = (x_n)_{n=0}^{N-1}`, it verifies
 the identity
 
-.. math ::
+.. math::
 
     \textbf{x} - \operatorname{DFT}^{-1}(\operatorname{DFT}(\textbf{x})) = 0
 
 where
 
-.. math ::
+.. math::
 
     \operatorname{DFT}(\textbf{x})_n = \sum_{k=0}^{N-1} \omega^{-kn} x_k, \quad
     \operatorname{DFT}^{-1}(\textbf{x})_n = \frac{1}{N} \sum_{k=0}^{N-1} \omega^{kn} x_k,

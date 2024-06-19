@@ -5,12 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
 #include "n_poly.h"
-
 
 int n_bpoly_mod_is_canonical(const n_bpoly_t A, nmod_t mod)
 {
@@ -31,7 +31,7 @@ int n_bpoly_mod_is_canonical(const n_bpoly_t A, nmod_t mod)
 }
 
 
-void n_bpoly_scalar_mul_nmod(n_bpoly_t A, mp_limb_t c, nmod_t ctx)
+void n_bpoly_scalar_mul_nmod(n_bpoly_t A, ulong c, nmod_t ctx)
 {
     slong i;
 
@@ -81,7 +81,7 @@ void n_bpoly_mod_divexact_last(n_bpoly_t A, const n_poly_t b, nmod_t ctx)
         if (A->coeffs[i].length < 1)
             continue;
 
-        n_poly_mod_div(t, A->coeffs + i, b, ctx);
+        n_poly_mod_divexact(t, A->coeffs + i, b, ctx);
         n_poly_swap(A->coeffs + i, t);
     }
 }

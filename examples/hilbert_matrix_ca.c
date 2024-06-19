@@ -1,12 +1,14 @@
 /* This file is public domain. Author: Fredrik Johansson. */
 
 #include <stdlib.h>
-#include "profiler.h"
-#include "fmpq_mat.h"
-#include "ca.h"
-#include "ca_vec.h"
-#include "ca_mat.h"
-#include "qqbar.h"
+#include <string.h>
+#include <flint/profiler.h>
+#include <flint/fmpq_mat.h>
+#include <flint/calcium.h>
+#include <flint/ca.h>
+#include <flint/ca_vec.h>
+#include <flint/ca_mat.h>
+#include <flint/qqbar.h>
 
 int main(int argc, char *argv[])
 {

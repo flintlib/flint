@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -19,10 +19,10 @@ TEST_FUNCTION_START(nmod_mat_mul_nmod_vec, state)
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        mp_limb_t p;
+        ulong p;
         nmod_mat_t A, B, C;
-        mp_limb_t * b, * c;
-        mp_limb_t ** bb, ** cc;
+        ulong * b, * c;
+        ulong ** bb, ** cc;
         slong j, m, n, blen;
 
         p = n_randtest_not_zero(state);
@@ -40,22 +40,22 @@ TEST_FUNCTION_START(nmod_mat_mul_nmod_vec, state)
         _nmod_vec_randtest(c, state, m, A->mod);
         _nmod_vec_randtest(b, state, blen, A->mod);
 
-        cc = FLINT_ARRAY_ALLOC(m, mp_limb_t*);
+        cc = FLINT_ARRAY_ALLOC(m, ulong*);
         for (j = 0; j < m; j++)
         {
-            cc[j] = FLINT_ARRAY_ALLOC(1, mp_limb_t);
+            cc[j] = FLINT_ARRAY_ALLOC(1, ulong);
             cc[j][0] = c[j];
         }
 
-        bb = FLINT_ARRAY_ALLOC(blen, mp_limb_t*);
+        bb = FLINT_ARRAY_ALLOC(blen, ulong*);
         for (j = 0; j < blen; j++)
         {
-            bb[j] = FLINT_ARRAY_ALLOC(1, mp_limb_t);
+            bb[j] = FLINT_ARRAY_ALLOC(1, ulong);
             bb[j][0] = b[j];
         }
 
         nmod_mat_mul_nmod_vec(c, A, b, blen);
-        nmod_mat_mul_nmod_vec_ptr(cc, A, (const mp_limb_t * const *)bb, blen);
+        nmod_mat_mul_nmod_vec_ptr(cc, A, (const ulong * const *)bb, blen);
 
         /* supposed to match mul of the chopped or zero-extended b */
         for (j = 0; j < n && j < blen; j++)
@@ -64,15 +64,8 @@ TEST_FUNCTION_START(nmod_mat_mul_nmod_vec, state)
         nmod_mat_mul(C, A, B);
 
         for (j = 0; j < m; j++)
-        {
-            if (nmod_mat_entry(C, j, 0) != c[j] ||
-                nmod_mat_entry(C, j, 0) != cc[j][0])
-            {
-                flint_printf("FAIL: wrong answer\n");
-                fflush(stdout);
-                flint_abort();
-            }
-        }
+            if (nmod_mat_entry(C, j, 0) != c[j] || nmod_mat_entry(C, j, 0) != cc[j][0])
+                TEST_FUNCTION_FAIL("");
 
         nmod_mat_clear(A);
         nmod_mat_clear(B);

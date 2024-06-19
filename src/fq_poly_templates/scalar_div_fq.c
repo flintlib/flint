@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -35,8 +35,7 @@ TEMPLATE(T, TEMPLATE(poly_scalar_div, T)) (TEMPLATE(T, poly_t) rop,
 {
     if (TEMPLATE(T, is_zero) (x, ctx))
     {
-       flint_printf("Exception (fq_poly_scalar_div) Division by zero");
-       flint_abort();
+       flint_throw(FLINT_ERROR, "Exception (fq_poly_scalar_div) Division by zero");
     }
     if (TEMPLATE(T, poly_is_zero) (op, ctx))
     {

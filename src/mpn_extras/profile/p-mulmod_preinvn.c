@@ -5,31 +5,31 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <math.h>
 #include "profiler.h"
-#include "flint.h"
 #include "mpn_extras.h"
 #include "ulong_extras.h"
 
-#define mock_mulmod_preinvn(rxx, axx, bxx, nnn, nxx, ninv, norm)    \
-   do {                                                             \
-      mp_ptr __t;                                                   \
-      TMP_INIT;                                                     \
-                                                                    \
-      TMP_START;                                                    \
-      __t = TMP_ALLOC(3*(nnn)*sizeof(mp_limb_t));                   \
-                                                                    \
-      mpn_mul_n(__t, axx, bxx, nnn);                                \
-      if (norm)                                                     \
-         mpn_rshift(__t, __t, 2*(nnn), norm);                       \
-                                                                    \
-      mpn_tdiv_qr(__t + 2*(nnn), rxx, 0, __t, 2*(nnn), nxx, nnn);   \
-      TMP_END;                                                      \
-   } while (0)
+/* FIXME: Non-x86 systems do not have prof_* definitions! */
+#ifdef FLINT_NUM_CLOCKS
+
+void
+mock_mulmod_preinvn(mp_ptr rxx, mp_ptr axx, mp_srcptr bxx, slong nnn, mp_srcptr nxx, mp_srcptr ninv, slong norm)
+{
+    mp_ptr __t;
+    TMP_INIT;
+    TMP_START;
+    __t = TMP_ALLOC((3*(nnn)+1)*sizeof(mp_limb_t));
+    flint_mpn_mul_n(__t, axx, bxx, nnn);
+    if (norm)
+       mpn_rshift(__t, __t, 2*(nnn), norm);
+    mpn_tdiv_qr(__t + 2*(nnn), rxx, 0, __t, 2*(nnn), nxx, nnn);
+    TMP_END;
+}
 
 typedef struct
 {
@@ -110,7 +110,7 @@ void sample(void * arg, ulong count)
     /* don't init r2 */
 
     gmp_randclear(st);
-    flint_randclear(state);
+    flint_rand_clear(state);
 }
 
 int main(void)
@@ -150,3 +150,6 @@ int main(void)
 
    return 0;
 }
+#else
+int main(void) { return 0; }
+#endif

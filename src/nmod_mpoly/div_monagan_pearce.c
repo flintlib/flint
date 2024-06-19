@@ -5,16 +5,18 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 static int _nmod_mpoly_div_monagan_pearce1(
     nmod_mpoly_t Q,
-    const mp_limb_t * Acoeffs, const ulong * Aexps, slong Alen,
-    const mp_limb_t * Bcoeffs, const ulong * Bexps, slong Blen,
+    const ulong * Acoeffs, const ulong * Aexps, slong Alen,
+    const ulong * Bcoeffs, const ulong * Bexps, slong Blen,
     flint_bitcnt_t bits,
     ulong maskhi,
     nmod_t fctx)
@@ -25,12 +27,12 @@ static int _nmod_mpoly_div_monagan_pearce1(
     mpoly_heap_t * chain;
     slong * store, * store_base;
     mpoly_heap_t * x;
-    mp_limb_t * Qcoeffs = Q->coeffs;
+    ulong * Qcoeffs = Q->coeffs;
     ulong * Qexps = Q->exps;
     slong * hind;
     ulong mask, exp;
     int lt_divides;
-    mp_limb_t lc_minus_inv, acc0, acc1, acc2, pp1, pp0;
+    ulong lc_minus_inv, acc0, acc1, acc2, pp1, pp0;
     TMP_INIT;
 
     TMP_START;
@@ -91,7 +93,7 @@ static int _nmod_mpoly_div_monagan_pearce1(
                 do {
                     *store++ = x->i;
                     *store++ = x->j;
-                    if (x->i != -WORD(1))
+                    if (x->i != -UWORD(1))
                         hind[x->i] |= WORD(1);
 
                 } while ((x = x->next) != NULL);
@@ -105,7 +107,7 @@ static int _nmod_mpoly_div_monagan_pearce1(
                     *store++ = x->i;
                     *store++ = x->j;
 
-                    if (x->i == -WORD(1))
+                    if (x->i == -UWORD(1))
                     {
                         add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0, WORD(0), WORD(0), fctx.n - Acoeffs[x->j]);
                     }
@@ -225,8 +227,8 @@ exp_overflow:
 
 static int _nmod_mpoly_div_monagan_pearce(
     nmod_mpoly_t Q,
-    const mp_limb_t * Acoeffs, const ulong * Aexps, slong Alen,
-    const mp_limb_t * Bcoeffs, const ulong * Bexps, slong Blen,
+    const ulong * Acoeffs, const ulong * Aexps, slong Alen,
+    const ulong * Bcoeffs, const ulong * Bexps, slong Blen,
     flint_bitcnt_t bits,
     slong N,
     const ulong * cmpmask,
@@ -239,7 +241,7 @@ static int _nmod_mpoly_div_monagan_pearce(
     mpoly_heap_t * chain;
     slong * store, * store_base;
     mpoly_heap_t * x;
-    mp_limb_t * Qcoeffs = Q->coeffs;
+    ulong * Qcoeffs = Q->coeffs;
     ulong * Qexps = Q->exps;
     ulong * exp, * exps;
     ulong ** exp_list;
@@ -247,7 +249,7 @@ static int _nmod_mpoly_div_monagan_pearce(
     ulong mask;
     slong * hind;
     int lt_divides;
-    mp_limb_t lc_minus_inv, acc0, acc1, acc2, pp1, pp0;
+    ulong lc_minus_inv, acc0, acc1, acc2, pp1, pp0;
     TMP_INIT;
 
     if (N == 1)
@@ -341,7 +343,7 @@ static int _nmod_mpoly_div_monagan_pearce(
                 {
                     *store++ = x->i;
                     *store++ = x->j;
-                    if (x->i != -WORD(1))
+                    if (x->i != -UWORD(1))
                         hind[x->i] |= WORD(1);
 
                 } while ((x = x->next) != NULL);
@@ -356,7 +358,7 @@ static int _nmod_mpoly_div_monagan_pearce(
                     *store++ = x->i;
                     *store++ = x->j;
 
-                    if (x->i == -WORD(1))
+                    if (x->i == -UWORD(1))
                     {
                         add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0,
                                      WORD(0), WORD(0), fctx.n - Acoeffs[x->j]);

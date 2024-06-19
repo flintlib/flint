@@ -5,13 +5,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "fmpz.h"
 #include "profiler.h"
+#include "longlong.h"
+#include "fmpz.h"
 
 void
 fmpz_fmma_old(fmpz_t f, const fmpz_t a, const fmpz_t b,
@@ -39,7 +39,7 @@ fmpz_fmma_old(fmpz_t f, const fmpz_t a, const fmpz_t b,
     if (!COEFF_IS_MPZ(s) && !COEFF_IS_MPZ(t) &&
         !COEFF_IS_MPZ(u) && !COEFF_IS_MPZ(v))
     {
-        mp_limb_t sh, sl, th, tl;
+        ulong sh, sl, th, tl;
 
         smul_ppmm(sh, sl, s, t);
         smul_ppmm(th, tl, u, v);
@@ -103,7 +103,7 @@ void sample_small(void * arg, ulong count)
     fmpz_clear(c);
     fmpz_clear(d);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 }
 
 void sample_small_old(void * arg, ulong count)
@@ -136,7 +136,7 @@ void sample_small_old(void * arg, ulong count)
     fmpz_clear(c);
     fmpz_clear(d);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 }
 
 void sample_small_zeros(void * arg, ulong count)
@@ -170,7 +170,7 @@ void sample_small_zeros(void * arg, ulong count)
     fmpz_clear(c);
     fmpz_clear(d);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 }
 
 void sample_small_zeros_old(void * arg, ulong count)
@@ -204,7 +204,7 @@ void sample_small_zeros_old(void * arg, ulong count)
     fmpz_clear(c);
     fmpz_clear(d);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 }
 
 void sample_big_zeros(void * arg, ulong count)
@@ -238,7 +238,7 @@ void sample_big_zeros(void * arg, ulong count)
     fmpz_clear(c);
     fmpz_clear(d);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 }
 
 void sample_big_zeros_old(void * arg, ulong count)
@@ -272,7 +272,7 @@ void sample_big_zeros_old(void * arg, ulong count)
     fmpz_clear(c);
     fmpz_clear(d);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 }
 
 int main(void)

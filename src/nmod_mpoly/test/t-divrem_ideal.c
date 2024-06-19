@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -22,7 +22,7 @@ TEST_FUNCTION_START(nmod_mpoly_divrem_ideal, state)
     {
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, g, h, k, r;
-        mp_limb_t modulus;
+        ulong modulus;
         slong len, len1, len2;
         flint_bitcnt_t exp_bits, exp_bits1, exp_bits2;
         nmod_mpoly_struct * qarr[1], * darr[1];
@@ -91,7 +91,7 @@ TEST_FUNCTION_START(nmod_mpoly_divrem_ideal, state)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, r, k1, k2;
         nmod_mpoly_struct * g, * q;
-        mp_limb_t modulus;
+        ulong modulus;
         slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2, num;
         nmod_mpoly_struct * qarr[5], * darr[5];
         fmpz * shifts, * strides;
@@ -210,7 +210,7 @@ TEST_FUNCTION_START(nmod_mpoly_divrem_ideal, state)
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, r, k1, k2;
         nmod_mpoly_struct * g, * q;
-        mp_limb_t modulus;
+        ulong modulus;
         slong nvars, len, len1, len2, exp_bound, exp_bound1, exp_bound2, num;
         nmod_mpoly_struct * qarr[5], * darr[5];
 

@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpn_extras.h"
 #include "arb.h"
 
 static inline void
@@ -28,9 +29,9 @@ _arf_set_inline(arf_t y, const arf_t x)
     }
     else
     {
-        mp_ptr yptr;
-        mp_srcptr xptr;
-        mp_size_t n;
+        nn_ptr yptr;
+        nn_srcptr xptr;
+        slong n;
 
         ARF_GET_MPN_READONLY(xptr, n, x);
         ARF_GET_MPN_WRITE(yptr, n, y);
@@ -51,3 +52,30 @@ arb_set(arb_t x, const arb_t y)
     }
 }
 
+void
+arb_set_d(arb_t x, double y)
+{
+    arf_set_d(arb_midref(x), y);
+    mag_zero(arb_radref(x));
+}
+
+void
+arb_set_fmpz(arb_t x, const fmpz_t y)
+{
+    arf_set_fmpz(arb_midref(x), y);
+    mag_zero(arb_radref(x));
+}
+
+void
+arb_set_si(arb_t x, slong y)
+{
+    arf_set_si(arb_midref(x), y);
+    mag_zero(arb_radref(x));
+}
+
+void
+arb_set_ui(arb_t x, ulong y)
+{
+    arf_set_ui(arb_midref(x), y);
+    mag_zero(arb_radref(x));
+}

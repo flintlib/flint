@@ -3,12 +3,14 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
-#include "acb.h"
-#include "acb_hypgeom.h"
-#include "acb_modular.h"
-#include "acb_elliptic.h"
-#include "profiler.h"
-#include "thread_support.h"
+#include <flint/acb.h>
+#include <flint/acb_hypgeom.h>
+#include <flint/acb_modular.h>
+#include <flint/acb_elliptic.h>
+#include <flint/acb_mat.h>
+#include <flint/acb_theta.h>
+#include <flint/profiler.h>
+#include <flint/thread_support.h>
 
 /* some useful color operations */
 #define CLAMP(y) FLINT_MAX(0.0, FLINT_MIN((y), 1.0))
@@ -390,6 +392,35 @@ fresnelc(acb_t res, const acb_t z, slong prec)
     acb_hypgeom_fresnel(NULL, res, z, 0, prec);
 }
 
+void
+riemanntheta(acb_t res, const acb_t z, slong prec)
+{
+    acb_mat_t tau;
+    acb_ptr th, t;
+
+    acb_mat_init(tau, 2, 2);
+
+    acb_set_d_d(acb_mat_entry(tau, 0, 0), 1.0, 2.0);
+    acb_set_d_d(acb_mat_entry(tau, 0, 1), -1.0, -1.0);
+    acb_set_d_d(acb_mat_entry(tau, 1, 0), -1.0, -1.0);
+    acb_set_d_d(acb_mat_entry(tau, 1, 1), 1.0, 2.0);
+
+    t = _acb_vec_init(2);
+    th = _acb_vec_init(16);
+
+    acb_set(t, z);
+    acb_div_onei(t + 1, z);
+    acb_mul_2exp_si(t + 1, t + 1, -1);
+    acb_theta_all(th, t, tau, 0, prec);
+    acb_set(res, th + 9);
+    acb_mul_2exp_si(res, res, -2);
+
+    _acb_vec_clear(th, 16);
+    _acb_vec_clear(t, 2);
+
+    acb_mat_clear(tau);
+}
+
 typedef struct
 {
     arf_ptr xa;
@@ -606,6 +637,8 @@ int main(int argc, char *argv[])
             func = fresnels;
         else if (!strcmp(argv[i], "fresnelc"))
             func = fresnelc;
+        else if (!strcmp(argv[i], "riemanntheta"))
+            func = riemanntheta;
         else
         {
             printf("unknown option: %s\n", argv[i]);

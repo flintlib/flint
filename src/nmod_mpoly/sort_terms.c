@@ -5,10 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "longlong.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 /*
@@ -59,7 +61,7 @@ void _nmod_mpoly_radix_sort1(nmod_mpoly_t A, slong left, slong right,
         if (((A->exps + 1*cur)[0] & mask) != cmp)
         {
             {
-                mp_limb_t t;
+                ulong t;
                 t = A->coeffs[mid];
                 A->coeffs[mid] = A->coeffs[cur];
                 A->coeffs[cur] = t;
@@ -117,7 +119,7 @@ void _nmod_mpoly_radix_sort(nmod_mpoly_t A, slong left, slong right,
         if (((A->exps + N*check)[off] & mask) != cmp)
         {
             {
-                mp_limb_t t;
+                ulong t;
                 t = A->coeffs[mid];
                 A->coeffs[mid] = A->coeffs[check];
                 A->coeffs[check] = t;

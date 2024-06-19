@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -373,8 +373,8 @@ int qqbar_evaluate_fmpz_mpoly(qqbar_t res, const fmpz_mpoly_t f, qqbar_srcptr x,
 #define QQBAR_ROOTS_UNSORTED 2
 
 void qqbar_roots_fmpz_poly(qqbar_ptr res, const fmpz_poly_t poly, int flags);
-
 void qqbar_roots_fmpq_poly(qqbar_ptr res, const fmpq_poly_t poly, int flags);
+int _qqbar_roots_poly_squarefree(qqbar_ptr roots, qqbar_srcptr coeffs, slong len, slong deg_limit, slong bits_limit);
 
 void qqbar_eigenvalues_fmpz_mat(qqbar_ptr res, const fmpz_mat_t mat, int flags);
 
@@ -476,4 +476,3 @@ int _qqbar_acb_lindep(fmpz * rel, acb_srcptr vec, slong len, int check, slong pr
 #endif
 
 #endif
-

@@ -5,24 +5,23 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "ulong_extras.h"
 
 /* bits of n, B1, count */
-static slong n_factor_pp1_table[][3] = {
-        {31, 2784, 5}, {32, 1208, 2}, {33, 2924, 3},
-        {34, 286, 5}, {35, 58, 5}, {36, 61, 4}, {37, 815, 2},
-        {38, 944, 2}, {39, 61, 3}, {40, 0, 0}, {41, 0, 0},
-        {42, 0, 0}, {43, 0, 0}, {44, 0, 0}, {45, 0, 0},
-        {46, 0, 0}, {47, 0, 0}, {47, 0, 0}, {49, 0, 0},
-        {50, 606, 1}, {51, 2403, 1}, {52, 2524, 1}, {53, 2924, 1},
-        {54, 3735, 2}, {55, 669, 2}, {56, 6092, 3}, {57, 2179, 3},
-        {58, 3922, 3}, {59, 6717, 4}, {60, 4119, 4}, {61, 2288, 4},
-        {62, 9004, 3}, {63, 9004, 3}, {64, 9004, 3}};
+slong n_factor_pp1_table[][2] = {
+    {2784, 5}, {1208, 2}, {2924, 3},
+    { 286, 5}, {  58, 5}, {  61, 4}, { 815, 2},
+    { 944, 2}, {  61, 3}, {   0, 0}, {   0, 0},
+    {   0, 0}, {   0, 0}, {   0, 0}, {   0, 0},
+    {   0, 0}, {   0, 0}, {   0, 0}, {   0, 0},
+    { 606, 1}, {2403, 1}, {2524, 1}, {2924, 1},
+    {3735, 2}, { 669, 2}, {6092, 3}, {2179, 3},
+    {3922, 3}, {6717, 4}, {4119, 4}, {2288, 4},
+    {9004, 3}, {9004, 3}, {9004, 3}};
 
 #define n_pp1_set(x1, y1, x2, y2) \
    do {                           \
@@ -35,7 +34,9 @@ static slong n_factor_pp1_table[][3] = {
       x = (c << norm);           \
    } while (0)
 
-void n_pp1_print(mp_limb_t x, mp_limb_t y, ulong norm)
+#if 0
+/* For debugging */
+void n_pp1_print(ulong x, ulong y, ulong norm)
 {
    if (norm)
    {
@@ -45,10 +46,11 @@ void n_pp1_print(mp_limb_t x, mp_limb_t y, ulong norm)
 
    flint_printf("[%wu, %wu]", x, y);
 }
+#endif
 
 #define n_pp1_2k(x, y, n, ninv, x0, norm)       \
    do {                                         \
-      const mp_limb_t two = (UWORD(2) << norm);      \
+      const ulong two = (UWORD(2) << norm);      \
       y = n_mulmod_preinv(y, x, n, ninv, norm); \
       y = n_submod(y, x0, n);                   \
       x = n_mulmod_preinv(x, x, n, ninv, norm); \
@@ -57,18 +59,18 @@ void n_pp1_print(mp_limb_t x, mp_limb_t y, ulong norm)
 
 #define n_pp1_2kp1(x, y, n, ninv, x0, norm)     \
    do {                                         \
-      const mp_limb_t two = (UWORD(2) << norm);      \
+      const ulong two = (UWORD(2) << norm);      \
       x = n_mulmod_preinv(x, y, n, ninv, norm); \
       x = n_submod(x, x0, n);                   \
       y = n_mulmod_preinv(y, y, n, ninv, norm); \
       y = n_submod(y, two, n);                  \
    } while (0)
 
-void n_pp1_pow_ui(mp_limb_t * x, mp_limb_t * y, ulong exp,
-                    mp_limb_t n, mp_limb_t ninv, ulong norm)
+void n_pp1_pow_ui(ulong * x, ulong * y, ulong exp,
+                    ulong n, ulong ninv, ulong norm)
 {
-   const mp_limb_t x0 = *x;
-   const mp_limb_t two = (UWORD(2) << norm);
+   const ulong x0 = *x;
+   const ulong two = (UWORD(2) << norm);
    ulong bit = ((UWORD(1) << FLINT_BIT_COUNT(exp)) >> 2);
 
    (*y) = n_mulmod_preinv(*x, *x, n, ninv, norm);
@@ -85,7 +87,7 @@ void n_pp1_pow_ui(mp_limb_t * x, mp_limb_t * y, ulong exp,
    }
 }
 
-mp_limb_t n_pp1_factor(mp_limb_t n, mp_limb_t x, ulong norm)
+ulong n_pp1_factor(ulong n, ulong x, ulong norm)
 {
    if (norm)
    {
@@ -100,10 +102,10 @@ mp_limb_t n_pp1_factor(mp_limb_t n, mp_limb_t x, ulong norm)
    return n_gcd(n, x);
 }
 
-mp_limb_t n_pp1_find_power(mp_limb_t * x, mp_limb_t * y,
-                  ulong p, mp_limb_t n, mp_limb_t ninv, ulong norm)
+ulong n_pp1_find_power(ulong * x, ulong * y,
+                  ulong p, ulong n, ulong ninv, ulong norm)
 {
-   mp_limb_t factor;
+   ulong factor;
 
    do
    {
@@ -114,11 +116,11 @@ mp_limb_t n_pp1_find_power(mp_limb_t * x, mp_limb_t * y,
    return factor;
 }
 
-mp_limb_t n_factor_pp1(mp_limb_t n, ulong B1, ulong c)
+ulong n_factor_pp1(ulong n, ulong B1, ulong c)
 {
    slong i, j;
-   mp_limb_t factor = 0;
-   mp_limb_t x, y = 0, oldx, oldy, ninv;
+   ulong factor = 0;
+   ulong x, y = 0, oldx, oldy, ninv;
    ulong pr, oldpr, sqrt, bits0, norm;
    n_primes_t iter;
 
@@ -205,7 +207,7 @@ cleanup:
    return factor;
 }
 
-mp_limb_t n_factor_pp1_wrapper(mp_limb_t n)
+ulong n_factor_pp1_wrapper(ulong n)
 {
    slong bits = FLINT_BIT_COUNT(n);
    ulong B1;
@@ -216,10 +218,10 @@ mp_limb_t n_factor_pp1_wrapper(mp_limb_t n)
    if (bits < 31)
        return 0;
 
-   B1 = n_factor_pp1_table[bits - 31][1];
-   count = n_factor_pp1_table[bits - 31][2];
+   B1 = n_factor_pp1_table[bits - 31][0];
+   count = n_factor_pp1_table[bits - 31][1];
 
-   flint_randinit(state);
+   flint_rand_init(state);
 
    for (i = 0; i < count; i++)
    {
@@ -227,19 +229,11 @@ mp_limb_t n_factor_pp1_wrapper(mp_limb_t n)
        factor = n_factor_pp1(n, B1, n_randint(state, n - 3) + 3);
        if (factor != 0)
        {
-           flint_randclear(state);
+           flint_rand_clear(state);
            return factor;
        }
    }
 
-   flint_randclear(state);
+   flint_rand_clear(state);
    return 0;
 }
-
-/* exists only for tuning/profiling */
-void n_factor_pp1_table_insert(slong bits, slong B1, slong count)
-{
-    n_factor_pp1_table[bits][1] = B1;
-    n_factor_pp1_table[bits][2] = count;
-}
-

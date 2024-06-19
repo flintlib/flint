@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -33,7 +33,7 @@ __fmpq_poly_set_array_mpq(fmpz * poly, fmpz_t den, const mpq_t * a, slong n)
 
     for (i = 0; i < n; i++)
     {
-        __mpz_struct *ptr = _fmpz_promote(poly + i);
+        mpz_ptr ptr = _fmpz_promote(poly + i);
 
         mpz_divexact(t, d, mpq_denref(a[i]));
         mpz_mul(ptr, mpq_numref(a[i]), t);

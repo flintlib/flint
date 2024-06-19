@@ -1,19 +1,26 @@
 #include <stdlib.h>
-#include "flint.h"
 #include "ulong_extras.h"
 #include "profiler.h"
 
 #define cpumin 2
 
+FLINT_DLL extern slong n_factor_pp1_table[][2];
+
+void n_factor_pp1_table_insert(slong bits, slong B1, slong count)
+{
+    n_factor_pp1_table[bits][0] = B1;
+    n_factor_pp1_table[bits][1] = count;
+}
+
 int
 main(int argc, char** argv)
 {
     double tbest = 1.0e300;
-    mp_limb_t nums[1000];
+    ulong nums[1000];
 
     slong i;
     slong bits, B1, count;
-    mp_limb_t n, cofactor;
+    ulong n, cofactor;
     n_factor_t fac;
 
     FLINT_TEST_INIT(state);

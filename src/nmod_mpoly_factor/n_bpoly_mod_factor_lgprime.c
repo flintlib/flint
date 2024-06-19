@@ -5,14 +5,17 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "nmod_mat.h"
-#include "nmod_mpoly_factor.h"
 #include "fmpz_poly_factor.h"
+#include "fq_nmod.h"
+#include "fq_nmod_poly.h"
 #include "fq_nmod_poly_factor.h"
+#include "n_poly.h"
+#include "nmod_mpoly_factor.h"
 
 static void n_bpoly_eval_fq_nmod_poly(
     fq_nmod_poly_t A,
@@ -68,7 +71,7 @@ static void n_bpoly_mod_make_monic_mod(n_bpoly_t A, n_poly_t mk, nmod_t mod)
 static void n_bpoly_set_fq_nmod_poly_gen0(
     n_bpoly_t A,
     const fq_nmod_poly_t B,
-    const fq_nmod_ctx_t ectx)
+    const fq_nmod_ctx_t FLINT_UNUSED(ectx))
 {
     slong i;
 
@@ -436,7 +439,7 @@ static void _hensel_lift_fac(
     n_poly_init(tq);
     n_poly_init(tr);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     n_bpoly_mod_mul(t1, g, a, ctx);
     n_bpoly_mod_mul(t2, h, b, ctx);
     n_bpoly_mod_add(c, t1, t2, ctx);
@@ -480,7 +483,7 @@ static void _hensel_lift_fac(
     n_bpoly_swap(G, t1);
     n_bpoly_swap(H, t2);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         n_poly_t p01;
         n_poly_init(p01);
@@ -565,7 +568,7 @@ static void _hensel_lift_inv(
     n_bpoly_swap(t1, B);
     n_bpoly_swap(t2, A);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         n_poly_t p01;
         n_poly_init(p01);
@@ -639,11 +642,11 @@ static void _lattice(
     n_bpoly_struct * ld;
     nmod_mat_t M, T1, T2;
     int nlimbs;
-    mp_limb_t * trow;
+    ulong * trow;
     slong lift_order = lift_alpha_pow->length - 1;
 
     nlimbs = _nmod_vec_dot_bound_limbs(r, ctx);
-    trow = (mp_limb_t *) flint_malloc(r*sizeof(mp_limb_t));
+    trow = (ulong *) flint_malloc(r*sizeof(ulong));
     n_bpoly_init(Q);
     n_bpoly_init(R);
     n_bpoly_init(dg);
@@ -730,7 +733,6 @@ void n_bpoly_mod_factor_lgprime(
     slong e[FLINT_BITS];
     slong old_nrows;
     slong zas_limit;
-    fmpz_t P;
     n_poly_t final_alpha_pow, curr_alpha_pow, prev_alpha_pow, next_alpha_pow;
     n_poly_t alpha, p1;
     fq_nmod_ctx_t ectx;
@@ -739,8 +741,7 @@ void n_bpoly_mod_factor_lgprime(
     FLINT_ASSERT(Blenx > 1);
 
     deg = 2;
-    fmpz_init_set_ui(P, ctx.n);
-    fq_nmod_ctx_init(ectx, P, deg, "y");
+    fq_nmod_ctx_init_ui(ectx, ctx.n, deg, "y");
     n_poly_init(final_alpha_pow);
     n_poly_init(curr_alpha_pow);
     n_poly_init(prev_alpha_pow);
@@ -780,7 +781,7 @@ next_alpha:
     deg++;
 
 	fq_nmod_ctx_clear(ectx);
-	fq_nmod_ctx_init(ectx, P, deg, "y");
+	fq_nmod_ctx_init_ui(ectx, ctx.n, deg, "y");
 
     n_poly_mock(alpha, ectx->modulus);
 
@@ -910,7 +911,6 @@ more:
 
 cleanup:
 
-    fmpz_clear(P);
     n_poly_clear(final_alpha_pow);
     n_poly_clear(curr_alpha_pow);
     n_poly_clear(prev_alpha_pow);

@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -21,7 +21,7 @@ TEST_FUNCTION_START(nmod_poly_compose_mod_brent_kung_vec_preinv, state)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, ainv, b, c;
-        mp_limb_t m = n_randtest_prime(state, 0);
+        ulong m = n_randtest_prime(state, 0);
         slong j, k, l;
         nmod_poly_struct * pow, * res;
 

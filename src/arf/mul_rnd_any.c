@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -16,7 +16,7 @@ int
 arf_mul_rnd_any(arf_ptr z, arf_srcptr x, arf_srcptr y,
         slong prec, arf_rnd_t rnd)
 {
-    mp_size_t xn, yn;
+    slong xn, yn;
     slong fix;
     int sgnbit, inexact;
 
@@ -29,7 +29,7 @@ arf_mul_rnd_any(arf_ptr z, arf_srcptr x, arf_srcptr y,
     if (yn > xn)
     {
         FLINT_SWAP(arf_srcptr, x, y);
-        FLINT_SWAP(mp_size_t, xn, yn);
+        FLINT_SWAP(slong, xn, yn);
     }
 
     /* Either operand is a special value. */
@@ -40,9 +40,9 @@ arf_mul_rnd_any(arf_ptr z, arf_srcptr x, arf_srcptr y,
     }
     else
     {
-        mp_size_t zn, alloc;
-        mp_srcptr xptr, yptr;
-        mp_ptr tmp;
+        slong zn, alloc;
+        nn_srcptr xptr, yptr;
+        nn_ptr tmp;
         ARF_MUL_TMP_DECL
 
         ARF_GET_MPN_READONLY(xptr, xn, x);
@@ -51,25 +51,7 @@ arf_mul_rnd_any(arf_ptr z, arf_srcptr x, arf_srcptr y,
         alloc = zn = xn + yn;
         ARF_MUL_TMP_ALLOC(tmp, alloc)
 
-        if (yn == 1)
-        {
-            tmp[zn - 1] = mpn_mul_1(tmp, xptr, xn, yptr[0]);
-        }
-        else if (yn >= FLINT_MPN_MUL_THRESHOLD)
-        {
-            flint_mpn_mul_large(tmp, xptr, xn, yptr, yn);
-        }
-        else if (xn == yn)
-        {
-            if (xptr == yptr)
-                mpn_sqr(tmp, xptr, xn);
-            else
-                mpn_mul_n(tmp, xptr, yptr, yn);
-        }
-        else
-        {
-            mpn_mul(tmp, xptr, xn, yptr, yn);
-        }
+        FLINT_MPN_MUL_WITH_SPECIAL_CASES(tmp, xptr, xn, yptr, yn);
 
         inexact = _arf_set_round_mpn(z, &fix, tmp, zn, sgnbit, prec, rnd);
         _fmpz_add2_fast(ARF_EXPREF(z), ARF_EXPREF(x), ARF_EXPREF(y), fix);
@@ -78,4 +60,3 @@ arf_mul_rnd_any(arf_ptr z, arf_srcptr x, arf_srcptr y,
         return inexact;
     }
 }
-

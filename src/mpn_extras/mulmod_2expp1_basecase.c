@@ -5,11 +5,10 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "mpn_extras.h"
 
 /* ret + (xp,n) = (yp,n)*(zp,n) % 2^b+1
@@ -27,14 +26,10 @@ flint_mpn_mulmod_2expp1_internal(mp_ptr xp, mp_srcptr yp, mp_srcptr zp,
     n = BITS_TO_LIMBS(b);
     k = GMP_NUMB_BITS * n - b;
 
-#if 0
-    flint_mpn_mul_large(tp, yp, n, zp, n);
-#else
     if (yp == zp)
-        mpn_sqr(tp, yp, n);
+        flint_mpn_sqr(tp, yp, n);
     else
-        mpn_mul_n(tp, yp, zp, n);
-#endif
+        flint_mpn_mul_n(tp, yp, zp, n);
 
     if (k == 0)
     {
@@ -104,4 +99,3 @@ flint_mpn_mulmod_2expp1_basecase (mp_ptr xp, mp_srcptr yp, mp_srcptr zp, int c,
 
     return c;
 }
-

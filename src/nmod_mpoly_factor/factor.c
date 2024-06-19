@@ -5,12 +5,16 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
 #include "long_extras.h"
+#include "fmpz.h"
+#include "n_poly.h"
 #include "nmod_poly_factor.h"
+#include "mpoly.h"
 #include "nmod_mpoly_factor.h"
 
 static slong _deflate(
@@ -242,7 +246,7 @@ static int _factor_irred_compressed(
     ulong * strides, * texps;
     flint_bitcnt_t Abits;
     flint_rand_t state;
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     nmod_mpoly_t Aorg;
 
     nmod_mpoly_init(Aorg, ctx);
@@ -271,7 +275,7 @@ static int _factor_irred_compressed(
 
     Abits = A->bits;
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     strides = FLINT_ARRAY_ALLOC(2*nvars, ulong);
     texps = strides + nvars;
@@ -396,7 +400,7 @@ static int _factor_irred_compressed(
 
         tot_deg = _deflate(A, tot_deg, strides, perm, ctx);
 
-        #ifdef FLINT_WANT_ASSERT
+        #if FLINT_WANT_ASSERT
         {
             nmod_mpoly_t g;
             nmod_mpoly_init(g, ctx);
@@ -546,11 +550,11 @@ static int _factor_irred_compressed(
 
 cleanup:
 
-    flint_randclear(state);
+    flint_rand_clear(state);
     flint_free(strides);
     flint_free(perm);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success)
     {
         nmod_mpoly_t prod;
@@ -684,7 +688,7 @@ static int _factor_irred(
     slong i, j;
     flint_bitcnt_t Abits;
     mpoly_compression_t M;
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     nmod_mpoly_t Aorg;
 
     nmod_mpoly_init(Aorg, Actx);
@@ -788,7 +792,7 @@ static int _factor_irred(
 
 cleanup_less:
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success)
     {
         nmod_mpoly_t prod;
@@ -1050,4 +1054,3 @@ int nmod_mpoly_factor_zippel(
 {
     return nmod_mpoly_factor_algo(f, A, ctx, MPOLY_FACTOR_USE_ZIP);
 }
-

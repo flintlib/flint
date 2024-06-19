@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -66,8 +66,7 @@ g2_character_switch(slong * a, slong * b, slong * c, slong * d, int twice)
 
     if (twice)
     {
-        flint_printf("error: went through g2_character_switch twice\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "error: went through g2_character_switch twice\n");
     }
     row[0] = a[0];
     row[1] = a[1];

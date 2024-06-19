@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -17,7 +17,7 @@ static inline int
 nmod_mat_pivot(nmod_mat_t A, slong * P, slong start_row, slong col)
 {
     slong j, t;
-    mp_ptr u;
+    nn_ptr u;
 
     if (nmod_mat_entry(A, start_row, col) != 0)
         return 1;
@@ -44,7 +44,7 @@ nmod_mat_pivot(nmod_mat_t A, slong * P, slong start_row, slong col)
 slong
 nmod_mat_lu_classical(slong * P, nmod_mat_t A, int rank_check)
 {
-    mp_limb_t d, e, **a;
+    ulong d, e, **a;
     nmod_t mod;
     slong i, m, n, rank, length, row, col;
 

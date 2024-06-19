@@ -7,14 +7,15 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_mpoly.h"
 
 void fmpz_mpoly_get_term_coeff_fmpz(fmpz_t c, const fmpz_mpoly_t A,
-                                           slong i, const fmpz_mpoly_ctx_t ctx)
+                                           slong i, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     if ((ulong) i >= (ulong) A->length)
     {
@@ -25,7 +26,7 @@ void fmpz_mpoly_get_term_coeff_fmpz(fmpz_t c, const fmpz_mpoly_t A,
 }
 
 ulong fmpz_mpoly_get_term_coeff_ui(const fmpz_mpoly_t A,
-                                           slong i, const fmpz_mpoly_ctx_t ctx)
+                                           slong i, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     if ((ulong) i >= (ulong) A->length)
     {
@@ -36,7 +37,7 @@ ulong fmpz_mpoly_get_term_coeff_ui(const fmpz_mpoly_t A,
 }
 
 slong fmpz_mpoly_get_term_coeff_si(const fmpz_mpoly_t A,
-                                           slong i, const fmpz_mpoly_ctx_t ctx)
+                                           slong i, const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     if ((ulong) i >= (ulong) A->length)
     {

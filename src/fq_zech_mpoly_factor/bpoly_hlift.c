@@ -5,12 +5,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fq_zech.h"
+#include "fq_zech_poly.h"
 #include "fq_zech_mpoly_factor.h"
-
 
 int fq_zech_bpoly_hlift2(
     fq_zech_bpoly_t A, /* clobbered (shifted by alpha) */
@@ -45,7 +46,7 @@ int fq_zech_bpoly_hlift2(
     fq_zech_bpoly_taylor_shift_var0(B0, alpha, ctx);
     fq_zech_bpoly_taylor_shift_var0(B1, alpha, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         fq_zech_poly_t T;
         fq_zech_poly_init(T, ctx);
@@ -218,7 +219,7 @@ int fq_zech_bpoly_hlift(
         fq_zech_bpoly_taylor_shift_var0(B + i, alpha, ctx);
 
     /* supposed to have A(alpha,x) = B0(alpha,x) * B1(alpha,x) * ... */
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         fq_zech_poly_t T;
         fq_zech_poly_init(T, ctx);
@@ -384,4 +385,3 @@ cleanup:
 
     return success;
 }
-

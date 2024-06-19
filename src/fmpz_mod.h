@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -66,7 +66,7 @@ void fmpz_mod_set_ui(fmpz_t a, ulong b, const fmpz_mod_ctx_t ctx);
 void fmpz_mod_set_si(fmpz_t a, slong b, const fmpz_mod_ctx_t ctx);
 
 void _fmpz_mod_add1(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
-void _fmpz_mod_add2s(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
+void _fmpz_mod_add2s(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
 void _fmpz_mod_add2(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
 void _fmpz_mod_addN(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
 
@@ -81,7 +81,7 @@ void fmpz_mod_add_ui(fmpz_t a, const fmpz_t b, ulong c, const fmpz_mod_ctx_t ctx
 void fmpz_mod_add_si(fmpz_t a, const fmpz_t b, slong c, const fmpz_mod_ctx_t ctx);
 
 void _fmpz_mod_sub1(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
-void _fmpz_mod_sub2s(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
+void _fmpz_mod_sub2s(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
 void _fmpz_mod_sub2(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
 void _fmpz_mod_subN(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
 
@@ -101,7 +101,7 @@ void fmpz_mod_si_sub(fmpz_t a, slong b, const fmpz_t c, const fmpz_mod_ctx_t ctx
 void fmpz_mod_neg(fmpz_t a, const fmpz_t b, const fmpz_mod_ctx_t ctx);
 
 void _fmpz_mod_mul1(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
-void _fmpz_mod_mul2s(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
+void _fmpz_mod_mul2s(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
 void _fmpz_mod_mul2(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
 void _fmpz_mod_mulN(fmpz_t a, const fmpz_t b, const fmpz_t c, const fmpz_mod_ctx_t ctx);
 

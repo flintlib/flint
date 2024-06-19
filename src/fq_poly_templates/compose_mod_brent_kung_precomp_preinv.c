@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -15,7 +15,6 @@
 
 #include "templates.h"
 
-#include "flint.h"
 #include "ulong_extras.h"
 
 void
@@ -78,16 +77,12 @@ TEMPLATE(T, poly_precompute_matrix) (TEMPLATE(T, mat_t) A,
 
     if (len2 == 0)
     {
-        flint_printf
-            ("Exception (nmod_poly_compose_mod_brent_kung). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s): Division by zero.\n", __func__);
     }
 
     if (A->r != m || A->c != len)
     {
-        flint_printf
-            ("Exception (nmod_poly_compose_mod_brent_kung). Wrong dimensions.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s): Wrong dimensions.\n", __func__);
     }
 
     if (len2 == 1)
@@ -202,20 +197,12 @@ TEMPLATE(T, poly_compose_mod_brent_kung_precomp_preinv) (
 
     if (len3 == 0)
     {
-        TEMPLATE_PRINTF
-            ("Exception (%s_poly_compose_mod_brent_kung). Division by zero.\n",
-             T);
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s): Division by zero.\n", __func__);
     }
 
     if (len1 >= len3)
     {
-        TEMPLATE_PRINTF
-            ("Exception (%s_poly_compose_brent_kung). The degree of the \n",
-             T);
-        flint_printf
-            ("first polynomial must be smaller than that of the modulus.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s): The degree of the first polynomial must be smaller than that of the modulus.\n", __func__);
     }
 
     if (len1 == 0 || len3 == 1)

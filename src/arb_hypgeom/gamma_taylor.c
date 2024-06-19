@@ -5,11 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "double_extras.h"
+#include "arb.h"
 #include "arb_hypgeom.h"
 
 #define DEBUG 0
@@ -226,8 +227,7 @@ void arb_set_interval_d_fast(arb_t res, double a, double b, slong prec)
 
     if (a > b)
     {
-        flint_printf("arb_set_interval_d_fast: expected a < b\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "arb_set_interval_d_fast: expected a < b\n");
     }
 
     mid = a + 0.5 * (b - a);
@@ -584,9 +584,9 @@ arb_hypgeom_gamma_taylor(arb_t res, const arb_t x, int reciprocal, slong prec)
 
         if (!_arb_hypgeom_gamma_coeff_shallow(c, NULL, i, term_prec[i]))
         {
-            flint_printf("arb_hypgeom_gamma_taylor: prec = %wd, du = %g, log2u = %d, term_prec[%wd] = %wd",
-                prec, du, log2u, i, term_prec[i]);
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(arb_hypgeom_gamma_taylor):"
+                    "prec = %wd, du = %g, log2u = %d, term_prec[%wd] = %wd",
+                    prec, du, log2u, i, term_prec[i]);
         }
 
         if (term_prec[i] < wp - 128)
@@ -689,4 +689,3 @@ cleanup:
 
     return success;
 }
-

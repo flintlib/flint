@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -13,6 +13,10 @@
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
 #include "fmpz_mod_poly_factor.h"
+
+#if FLINT_WANT_ASSERT
+# include "longlong.h"
+#endif
 
 /*
     Helper function for finding roots. The roots of a monic f are written
@@ -181,7 +185,7 @@ void fmpz_mod_poly_roots(fmpz_mod_poly_factor_t r, const fmpz_mod_poly_t f,
     fmpz_sub_ui(p2, p2, 1);
     fmpz_fdiv_q_2exp(p2, p2, 1);
 
-    flint_randinit(randstate);
+    flint_rand_init(randstate);
 
     for (i = 0; i < FLINT_BITS + 3; i++)
         fmpz_mod_poly_init(t + i, ctx);
@@ -208,9 +212,8 @@ void fmpz_mod_poly_roots(fmpz_mod_poly_factor_t r, const fmpz_mod_poly_t f,
 
     fmpz_clear(p2);
 
-    flint_randclear(randstate);
+    flint_rand_clear(randstate);
 
     for (i = 0; i < FLINT_BITS + 3; i++)
         fmpz_mod_poly_clear(t + i, ctx);
 }
-

@@ -5,14 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "ulong_extras.h"
 
 void
-n_primes_jump_after(n_primes_t iter, mp_limb_t n)
+n_primes_jump_after(n_primes_t iter, ulong n)
 {
     if (n < iter->small_primes[iter->small_num - 1])
     {

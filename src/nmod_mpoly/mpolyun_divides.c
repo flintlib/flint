@@ -5,10 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "n_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 int _nmod_mpolyn_divides(
@@ -103,10 +105,10 @@ int _nmod_mpolyn_divides(
             {
                 *store++ = x->i;
                 *store++ = x->j;
-                if (x->i != -WORD(1))
+                if (x->i != -UWORD(1))
                     hind[x->i] |= WORD(1);
 
-                if (x->i == -WORD(1))
+                if (x->i == -UWORD(1))
                 {
                     n_poly_mod_add(acc, acc, A->coeffs + x->j, ctx->mod);
                 }
@@ -617,10 +619,10 @@ int nmod_mpolyun_divides(
             {
                 *store++ = x->i;
                 *store++ = x->j;
-                if (x->i != -WORD(1))
+                if (x->i != -UWORD(1))
                     hind[x->i] |= WORD(1);
 
-                if (x->i == -WORD(1))
+                if (x->i == -UWORD(1))
                 {
                     _nmod_mpolyn_add(S, T, Acoeff + x->j, N, ctx);
                 }

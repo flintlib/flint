@@ -7,11 +7,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "ulong_extras.h"
+#include "mpn_extras.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 #include "nmod_mat.h"
@@ -20,7 +21,7 @@ void
 _nmod_poly_reduce_matrix_mod_poly(nmod_mat_t A, const nmod_mat_t B,
                                    const nmod_poly_t f)
 {
-    mp_ptr tmp1;
+    nn_ptr tmp1;
     slong n = f->length - 1;
     slong i, m = n_sqrt(n) + 1;
 
@@ -38,8 +39,8 @@ _nmod_poly_reduce_matrix_mod_poly(nmod_mat_t A, const nmod_mat_t B,
 }
 
 void
-_nmod_poly_precompute_matrix(nmod_mat_t A, mp_srcptr poly1, mp_srcptr poly2,
-                     slong len2, mp_srcptr poly2inv, slong len2inv, nmod_t mod)
+_nmod_poly_precompute_matrix(nmod_mat_t A, nn_srcptr poly1, nn_srcptr poly2,
+                     slong len2, nn_srcptr poly2inv, slong len2inv, nmod_t mod)
 {
     /* Set rows of A to powers of poly1 */
     slong n, m;
@@ -61,18 +62,16 @@ nmod_poly_precompute_matrix(nmod_mat_t A, const nmod_poly_t poly1,
     slong len = len2 - 1;
     slong m = n_sqrt(len) + 1;
 
-    mp_ptr ptr1;
+    nn_ptr ptr1;
 
     if (len2 == 0)
     {
-        flint_printf("Exception (nmod_poly_precompute_matrix). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (nmod_poly_precompute_matrix). Division by zero.\n");
     }
 
     if (A->r != m || A->c != len)
     {
-        flint_printf("Exception (nmod_poly_precompute_matrix). Wrong dimensions.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (nmod_poly_precompute_matrix). Wrong dimensions.\n");
     }
 
     if (len2 == 1)
@@ -99,12 +98,12 @@ nmod_poly_precompute_matrix(nmod_mat_t A, const nmod_poly_t poly1,
 }
 
 void
-_nmod_poly_compose_mod_brent_kung_precomp_preinv(mp_ptr res, mp_srcptr poly1,
-                  slong len1, const nmod_mat_t A, mp_srcptr poly3, slong len3,
-                                 mp_srcptr poly3inv, slong len3inv, nmod_t mod)
+_nmod_poly_compose_mod_brent_kung_precomp_preinv(nn_ptr res, nn_srcptr poly1,
+                  slong len1, const nmod_mat_t A, nn_srcptr poly3, slong len3,
+                                 nn_srcptr poly3inv, slong len3inv, nmod_t mod)
 {
     nmod_mat_t B, C;
-    mp_ptr t, h;
+    nn_ptr t, h;
     slong i, n, m;
 
     n = len3 - 1;
@@ -172,15 +171,13 @@ nmod_poly_compose_mod_brent_kung_precomp_preinv(nmod_poly_t res,
 
     if (len3 == 0)
     {
-        flint_printf("Exception (nmod_poly_compose_mod_brent_kung_precomp_preinv). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(nmod_poly_compose_mod_brent_kung_precomp_preinv): Division by zero.\n");
     }
 
     if (len1 >= len3)
     {
-        flint_printf("Exception (nmod_poly_compose_mod_brent_kung_precomp_preinv). The degree of the \n"
-               "first polynomial must be smaller than that of the modulus.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(nmod_poly_compose_mod_brent_kung_precomp_preinv): "
+                "The degree of the first polynomial must be smaller than that of the modulus.\n");
     }
 
     if (len1 == 0 || len3 == 1)

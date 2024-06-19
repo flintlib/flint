@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -18,8 +18,7 @@ void fmpz_poly_q_canonicalise(fmpz_poly_q_t rop)
 
     if (fmpz_poly_is_zero(rop->den))
     {
-        flint_printf("Exception (fmpz_poly_q_canonicalise). Denominator is zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_poly_q_canonicalise). Denominator is zero.\n");
     }
 
     if (fmpz_poly_is_one(rop->den))
@@ -29,8 +28,8 @@ void fmpz_poly_q_canonicalise(fmpz_poly_q_t rop)
     fmpz_poly_gcd(gcd, rop->num, rop->den);
     if (!fmpz_poly_is_unit(gcd))
     {
-        fmpz_poly_div(rop->num, rop->num, gcd);
-        fmpz_poly_div(rop->den, rop->den, gcd);
+        fmpz_poly_divexact(rop->num, rop->num, gcd);
+        fmpz_poly_divexact(rop->den, rop->den, gcd);
     }
     fmpz_poly_clear(gcd);
 
@@ -40,4 +39,3 @@ void fmpz_poly_q_canonicalise(fmpz_poly_q_t rop)
         fmpz_poly_neg(rop->den, rop->den);
     }
 }
-

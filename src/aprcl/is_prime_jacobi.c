@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpz_mod.h"
 #include "aprcl.h"
@@ -829,9 +830,7 @@ aprcl_is_prime_jacobi(const fmpz_t n)
 
     if (result == PROBABPRIME || result == UNKNOWN)
     {
-        flint_printf("aprcl_is_prime_jacobi: failed to prove n prime\n");
-        fmpz_print(n); flint_printf("\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "aprcl_is_prime_jacobi: failed to prove n prime for n = %s\n", fmpz_get_str(NULL, 10, n));
     }
 
     /* if we prove primality, returns 1 */

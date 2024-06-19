@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -22,7 +22,7 @@ TEST_FUNCTION_START(fmpz_bit_pack, state)
         fmpz_t a, b;
         flint_bitcnt_t bits = n_randint(state, 300) + 1;
         ulong space = (300 - 1) / FLINT_BITS + 2;   /* 2 to accommodate shift */
-        mp_ptr arr = (mp_ptr) flint_calloc(space, sizeof(mp_limb_t));
+        nn_ptr arr = (nn_ptr) flint_calloc(space, sizeof(ulong));
         flint_bitcnt_t shift = n_randint(state, FLINT_BITS);
         int negate = (int) -n_randint(state, 2);
 
@@ -57,7 +57,7 @@ TEST_FUNCTION_START(fmpz_bit_pack, state)
         fmpz_t a, b;
         flint_bitcnt_t bits = n_randint(state, 300) + 1;
         ulong space = (300 - 1) / FLINT_BITS + 2;   /* 2 to accommodate shift */
-        mp_ptr arr = (mp_ptr) flint_calloc(space, sizeof(mp_limb_t));
+        nn_ptr arr = (nn_ptr) flint_calloc(space, sizeof(ulong));
         flint_bitcnt_t shift = n_randint(state, FLINT_BITS);
 
         fmpz_init(a);

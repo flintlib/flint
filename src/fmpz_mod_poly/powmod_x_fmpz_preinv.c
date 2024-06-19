@@ -9,7 +9,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -97,16 +97,14 @@ fmpz_mod_poly_powmod_x_fmpz_preinv(fmpz_mod_poly_t res, const fmpz_t e,
 
     if (lenf == 0)
     {
-        flint_printf("Exception (fmpz_mod_poly_powmod_x_fmpz_preinv)."
+        flint_throw(FLINT_ERROR, "(fmpz_mod_poly_powmod_x_fmpz_preinv): "
                      "Divide by zero\n");
-        flint_abort();
     }
 
     if (fmpz_sgn(e) < 0)
     {
-        flint_printf("Exception (fmpz_mod_poly_powmod_x_fmpz_preinv)."
+        flint_throw(FLINT_ERROR, "(fmpz_mod_poly_powmod_x_fmpz_preinv): "
                      "Negative exp not implemented\n");
-        flint_abort();
     }
 
     if (lenf == 1)

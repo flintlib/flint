@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -19,8 +19,7 @@ acb_dft_convol_pad(acb_ptr fp, acb_ptr gp, acb_srcptr f, acb_srcptr g, slong n, 
 
     if (np < 2 * n - 1)
     {
-        flint_printf("dft_convol_pad: overlapping padding %wd < 2*%wd-1\n", np, n);
-        flint_abort();
+        flint_throw(FLINT_ERROR, "dft_convol_pad: overlapping padding %wd < 2*%wd-1\n", np, n);
     }
 
     for (k = 0; k < n; k++)
@@ -79,9 +78,9 @@ acb_dft_convol_rad2(acb_ptr w, acb_srcptr f, acb_srcptr g, slong len, slong prec
     if (len <= 0)
         return;
     else if ((len & (len - 1)) == 0)
-        e = n_clog(len, 2);
+        e = FLINT_CLOG2(len);
     else
-        e = n_clog(2 * len - 1, 2);
+        e = FLINT_CLOG2(2 * len - 1);
     acb_dft_rad2_init(dft, e, prec);
     acb_dft_convol_rad2_precomp(w, f, g, len, dft, prec);
     acb_dft_rad2_clear(dft);

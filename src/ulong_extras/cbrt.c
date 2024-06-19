@@ -7,19 +7,18 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <math.h>
 #include "ulong_extras.h"
 
-mp_limb_t
-n_cbrt(mp_limb_t n)
+ulong
+n_cbrt(ulong n)
 {
     int bits;
     double val, x, xcub, num, den;
-    mp_limb_t ret, upper_limit;
+    ulong ret, upper_limit;
 
     /* Taking care of smaller roots */
 
@@ -31,17 +30,20 @@ n_cbrt(mp_limb_t n)
         return 11 + (n >= 1728) + (n >= 2197) + (n >= 2744) + (n >= 3375) + (n >= 4096);
 
     val = (double)n;
+
+#ifdef FLINT64
     bits = FLINT_BIT_COUNT(n);
 
     if (bits > 46)    /* for larger numbers chebyshev approximation method is faster */
         return n_cbrt_chebyshev_approx(n);
+#endif
 
     /* upper_limit is the max cube root possible for one word */
 
 #ifdef FLINT64
-    upper_limit = 2642245;  /* 2642245 < (2^64)^(1/3) */
+    upper_limit = 2642245;  /* 2642245 = floor((2^64)^(1/3)) */
 #else
-    upper_limit = 1625;     /* 1625 < (2^32)^(1/3) */
+    upper_limit = 1625;     /* 1625 = floor((2^32)^(1/3)) */
 #endif
 
     x = n_cbrt_estimate((double)n);   /* initial estimate */
@@ -58,63 +60,12 @@ n_cbrt(mp_limb_t n)
 
     if (ret >= upper_limit)
     {
+#ifndef FLINT64
+        /* If bits(n) > 46, then Chebyshev is used. Hence, this is only possible
+         * for 32-bit systems. */
         if (n >= upper_limit * upper_limit * upper_limit)
             return upper_limit;
-        ret = upper_limit - 1;
-    }
-    while (ret * ret * ret <= n)
-    {
-        (ret) += 1;
-        if (ret == upper_limit)
-            break;
-    }
-    while (ret * ret * ret > n)
-        (ret) -= 1;
-
-    return ret;
-}
-
-mp_limb_t
-n_cbrt_newton_iteration(mp_limb_t n)
-{
-    int iter, bits;
-    mp_limb_t ret;
-    double val, x, xsq, dx;
-
-    /* upper_limit is the max cube root possible for one word */
-
-#ifdef FLINT64
-    const mp_limb_t upper_limit = 2642245;  /* 2642245 < (2^64)^(1/3) */
-#else
-    const mp_limb_t  upper_limit = 1625;    /* 1625 < (2^32)^(1/3) */
 #endif
-
-    val = (double)n;
-    bits = FLINT_BIT_COUNT(n);
-    if (bits < 46)      /* one iteration seems to be sufficient for n < 2^46 */
-        iter = 1;
-    else
-        iter = 2;       /* 2 gives us a precise enough answer for any mp_limb_t */
-
-    x = n_cbrt_estimate((double)n);         /* initial estimate */
-
-    /* Newton's iterations to get cube root */
-    val = (double)n;
-    while(iter--)
-    {
-        xsq = x * x;
-        dx = val / xsq;
-        dx -= x;
-        dx *= 0.333333333333333;     /* dx = dx * (1/3) */
-        x += dx;
-    }
-    /* In case ret^3 or (ret+1)^3 will cause overflow */
-
-    ret = x;
-    if (ret >= upper_limit)
-    {
-        if (n >= upper_limit * upper_limit * upper_limit)
-            return upper_limit;
         ret = upper_limit - 1;
     }
     while (ret * ret * ret <= n)
@@ -125,6 +76,7 @@ n_cbrt_newton_iteration(mp_limb_t n)
     }
     while (ret * ret * ret > n)
         (ret) -= 1;
+
     return ret;
 }
 
@@ -156,11 +108,11 @@ static const float coeff[16][3] = {{0.445434042, 0.864136635, -0.335205926},    
                                    {0.540672371, 0.586548233, -0.127254189},    /* [0.90625, 0.93750]  */
                                    {0.546715310, 0.573654340, -0.120376066},    /* [0.93750, 0.96875]  */
                                    {0.552627494, 0.561446514, -0.114074068}};   /* [0.96875, 1.00000]  */
-mp_limb_t
-n_cbrt_chebyshev_approx(mp_limb_t n)
+ulong
+n_cbrt_chebyshev_approx(ulong n)
 {
     typedef union {
-        mp_limb_t  uword_val;
+        ulong  uword_val;
 #ifdef FLINT64
         double     double_val;
 #else
@@ -170,27 +122,27 @@ n_cbrt_chebyshev_approx(mp_limb_t n)
 
     int rem, mul;
     double factor, root, dec, dec2;
-    mp_limb_t ret, expo, table_index;
+    ulong ret, expo, table_index;
     uni alias;
 
     /* upper_limit is the max cube root possible for one word */
 
 #ifdef FLINT64
-    const mp_limb_t upper_limit = 2642245;              /* 2642245 < (2^64)^(1/3) */
-    const mp_limb_t expo_mask = 0x7FF0000000000000;     /* exponent bits in double */
-    const mp_limb_t mantissa_mask = 0x000FFFFFFFFFFFFF; /* mantissa bits in float */
-    const mp_limb_t table_mask = 0x000F000000000000;    /* first 4 bits of mantissa */
+    const ulong upper_limit = 2642245;              /* 2642245 < (2^64)^(1/3) */
+    const ulong expo_mask = 0x7FF0000000000000;     /* exponent bits in double */
+    const ulong mantissa_mask = 0x000FFFFFFFFFFFFF; /* mantissa bits in float */
+    const ulong table_mask = 0x000F000000000000;    /* first 4 bits of mantissa */
     const int mantissa_bits = 52;
-    const mp_limb_t bias_hex = 0x3FE0000000000000;
+    const ulong bias_hex = 0x3FE0000000000000;
     const int bias = 1022;
     alias.double_val = (double)n;
 #else
-    const mp_limb_t upper_limit = 1625;         /* 1625 < (2^32)^(1/3) */
-    const mp_limb_t expo_mask = 0x7F800000;     /* exponent bits in float */
-    const mp_limb_t mantissa_mask = 0x007FFFFF; /* mantissa bits in float */
-    const mp_limb_t table_mask = 0x00780000;    /* first 4 bits of mantissa */
+    const ulong upper_limit = 1625;         /* 1625 < (2^32)^(1/3) */
+    const ulong expo_mask = 0x7F800000;     /* exponent bits in float */
+    const ulong mantissa_mask = 0x007FFFFF; /* mantissa bits in float */
+    const ulong table_mask = 0x00780000;    /* first 4 bits of mantissa */
     const int mantissa_bits = 23;
-    const mp_limb_t bias_hex = 0x3F000000;
+    const ulong bias_hex = 0x3F000000;
     const int bias = 126;
     alias.double_val = (float)n;
 #endif
@@ -248,10 +200,10 @@ n_cbrt_chebyshev_approx(mp_limb_t n)
     return ret;
 }
 
-mp_limb_t
-n_cbrt_binary_search(mp_limb_t x)
+ulong
+n_cbrt_binary_search(ulong x)
 {
-    mp_limb_t low, high, mid, p, upper_limit;
+    ulong low, high, mid, p, upper_limit;
 
     /* upper_limit is the max cube root possible for one word */
 
@@ -300,10 +252,10 @@ n_cbrt_estimate(double a)
     ulong n, hi, lo;
 
 #ifdef FLINT64
-    const mp_limb_t mul_factor = UWORD(6148914691236517205);
+    const ulong mul_factor = UWORD(6148914691236517205);
     slong s = UWORD(4607182418800017408);      /* ((1 << 10) - 1) << 52 */
 #else
-    const mp_limb_t mul_factor = UWORD(1431655765);
+    const ulong mul_factor = UWORD(1431655765);
     slong s = UWORD(1065353216);               /* ((1 << 7) - 1 << 23)  */
 #endif
 
@@ -317,10 +269,10 @@ n_cbrt_estimate(double a)
     return alias.double_val;
 }
 
-mp_limb_t
-n_cbrtrem(mp_limb_t* remainder, mp_limb_t n)
+ulong
+n_cbrtrem(ulong* remainder, ulong n)
 {
-    mp_limb_t base;
+    ulong base;
 
     if (!n)
     {

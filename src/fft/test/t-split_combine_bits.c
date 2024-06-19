@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -17,8 +17,6 @@ TEST_FUNCTION_START(fft_split_combine_bits, state)
 {
     int i;
     mp_size_t j;
-
-    _flint_rand_init_gmp(state);
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
@@ -35,7 +33,7 @@ TEST_FUNCTION_START(fft_split_combine_bits, state)
         for (j = 0; j < length; j++)
            poly[j] = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
 
-        flint_mpn_urandomb(in, state->gmp_state, total_limbs*FLINT_BITS);
+        flint_mpn_urandomb(in, state, total_limbs*FLINT_BITS);
 
         fft_split_bits(poly, in, total_limbs, bits, limbs);
         fft_combine_bits(out, poly, length, bits, limbs, total_limbs);

@@ -5,12 +5,11 @@
 
      FLINT is free software: you can redistribute it and/or modify it under
      the terms of the GNU Lesser General Public License (LGPL) as published
-     by the Free Software Foundation; either version 2.1 of the License, or
+     by the Free Software Foundation; either version 3 of the License, or
      (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "test_helpers.h"
-#include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "qsieve.h"
@@ -19,7 +18,7 @@ TEST_FUNCTION_START(qsieve_primes_init, state)
 {
    int i;
    slong j, k;
-   mp_limb_t small_factor, pmod;
+   ulong small_factor, pmod;
    qs_t qs_inf;
    fmpz_t n, x, y;
 

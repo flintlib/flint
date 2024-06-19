@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -22,8 +22,8 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, slong len1,
     flint_bitcnt_t bits1, bits2, nb1, nb2, bits_small, pbits, curr_bits = 0, new_bits;
     fmpz_t ac, bc, hc, d, g, l, eval_A, eval_B, eval_GCD, modulus;
     fmpz * A, * B, * Q, * lead_A, * lead_B;
-    mp_ptr a, b, h;
-    mp_limb_t p, h_inv, g_mod;
+    nn_ptr a, b, h;
+    ulong p, h_inv, g_mod;
     nmod_t mod;
     slong i, n, n0, unlucky, hlen, bound;
     int g_pm1;
@@ -67,15 +67,12 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, slong len1,
 
     if (len1 < 64 && len2 < 64) /* compute the squares of the 2-norms */
     {
-        fmpz_set_ui(l, 0);
-        for (i = 0; i < len1; i++)
-            fmpz_addmul(l, A + i, A + i);
+        _fmpz_vec_dot(l, A, A, len1);
         nb1 = fmpz_bits(l);
-        fmpz_set_ui(l, 0);
-        for (i = 0; i < len2; i++)
-            fmpz_addmul(l, B + i, B + i);
+        _fmpz_vec_dot(l, B, B, len2);
         nb2 = fmpz_bits(l);
-    } else /* approximate to save time */
+    }
+    else /* approximate to save time */
     {
         nb1 = 2*bits1 + FLINT_BIT_COUNT(len1);
         nb2 = 2*bits2 + FLINT_BIT_COUNT(len2);
@@ -198,7 +195,7 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, slong len1,
             }
             else
             {
-                if (pbits + unlucky >= bound) /* if we reach the bound with one prime */
+                if (pbits + unlucky >= (ulong) bound) /* if we reach the bound with one prime */
                 {
                     _fmpz_vec_content(hc, res, hlen);
 
@@ -254,7 +251,7 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, slong len1,
                 _fmpz_vec_scalar_divexact_fmpz(res, res, hlen, hc);
             }
 
-            if (fmpz_bits(modulus) + unlucky >= bound)
+            if (fmpz_bits(modulus) + unlucky >= (ulong) bound)
                 break;
 
             /* are we done? */
@@ -328,4 +325,3 @@ fmpz_poly_gcd_modular(fmpz_poly_t res, const fmpz_poly_t poly1,
         }
     }
 }
-

@@ -5,11 +5,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mod.h"
 #include "fmpz_mod_vec.h"
+#include "mpoly.h"
 #include "fmpz_mod_mpoly_factor.h"
 
 int fmpz_mod_bpoly_is_canonical(const fmpz_mod_bpoly_t A, const fmpz_mod_ctx_t ctx)
@@ -59,7 +61,7 @@ void fmpz_mod_bpoly_fit_length(
     A->alloc = len;
 }
 
-void fmpz_mod_bpoly_zero(fmpz_mod_bpoly_t A, const fmpz_mod_ctx_t ctx)
+void fmpz_mod_bpoly_zero(fmpz_mod_bpoly_t A, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
 {
     A->length = 0;
 }
@@ -117,7 +119,7 @@ void fmpz_mod_bpoly_one(fmpz_mod_bpoly_t A, const fmpz_mod_ctx_t ctx)
 
 slong fmpz_mod_bpoly_degree1(
     const fmpz_mod_bpoly_t A,
-    const fmpz_mod_ctx_t ctx)
+    const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
 {
     slong i, len = 0;
     for (i = 0; i < A->length; i++)
@@ -601,7 +603,7 @@ int fmpz_mod_bpoly_divides(
         {
             for (j = order - 1; j >= 0; j--)
             {
-                mp_limb_t qc = n_poly_get_coeff(q, order*i + j);
+                ulong qc = n_poly_get_coeff(q, order*i + j);
                 if (qc == 0)
                     continue;
 

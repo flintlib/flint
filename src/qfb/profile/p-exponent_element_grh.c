@@ -5,19 +5,17 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <stdlib.h>
-#include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "qfb.h"
 
 int main(int argc, char *argv[])
 {
-    int result;
     slong exp, val, num, B1, B2, i;
 
     if (argc != 6)
@@ -37,7 +35,6 @@ int main(int argc, char *argv[])
     for (i = 0; i < num; i++)
     {
         fmpz_t D, exponent;
-        slong e;
 
         fmpz_init(D);
         fmpz_init(exponent);

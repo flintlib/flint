@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -22,8 +22,8 @@ nmod_mat_mul_check(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 {
     slong i, j, k;
 
-    mp_limb_t s0, s1, s2;
-    mp_limb_t t0, t1;
+    ulong s0, s1, s2;
+    ulong t0, t1;
 
     for (i = 0; i < A->r; i++)
     {
@@ -52,7 +52,7 @@ TEST_FUNCTION_START(nmod_mat_mul, state)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_mat_t A, B, C, D;
-        mp_limb_t mod;
+        ulong mod;
 
         slong m, k, n;
 
@@ -97,26 +97,20 @@ TEST_FUNCTION_START(nmod_mat_mul, state)
         nmod_mat_mul_check(D, A, B);
 
         if (!nmod_mat_equal(C, D))
-        {
-            flint_printf("FAIL: results not equal\n");
-            nmod_mat_print_pretty(A);
-            nmod_mat_print_pretty(B);
-            nmod_mat_print_pretty(C);
-            nmod_mat_print_pretty(D);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Results not equal\n"
+                    "A = %{nmod_mat}\n"
+                    "B = %{nmod_mat}\n"
+                    "C = %{nmod_mat}\n"
+                    "D = %{nmod_mat}\n",
+                    A, B, C, D);
 
         if (n == k)
         {
             nmod_mat_mul(A, A, B);
 
             if (!nmod_mat_equal(A, C))
-            {
-                flint_printf("FAIL: aliasing failed\n");
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL("Aliasing failed\n");
         }
 
         nmod_mat_clear(A);
@@ -142,13 +136,11 @@ TEST_FUNCTION_START(nmod_mat_mul, state)
         nmod_mat_mul(A_window, B, A_window);
 
         if (!nmod_mat_equal(A, B))
-        {
-            flint_printf("FAIL: window aliasing failed\n");
-            nmod_mat_print_pretty(A); flint_printf("\n\n");
-            nmod_mat_print_pretty(B); flint_printf("\n\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Window aliasing failed\n"
+                    "A = %{nmod_mat}\n"
+                    "B = %{nmod_mat}\n",
+                    A, B);
 
         nmod_mat_window_clear(A_window);
         nmod_mat_clear(A);

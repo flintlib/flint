@@ -5,22 +5,23 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "arb.h"
+#include "mpn_extras.h"
 
 /* See verify_taylor.py for code to generate tables and
    proof of correctness */
 
-#define TMP_ALLOC_LIMBS(size) TMP_ALLOC((size) * sizeof(mp_limb_t))
+#define TMP_ALLOC_LIMBS(size) TMP_ALLOC((size) * sizeof(ulong))
 
 #define ODD_RECIPROCAL_TAB_SIZE 256
 
 #if FLINT_BITS == 64
 
-const mp_limb_t odd_reciprocal_tab_numer[ODD_RECIPROCAL_TAB_SIZE] = {
+const ulong odd_reciprocal_tab_numer[ODD_RECIPROCAL_TAB_SIZE] = {
     UWORD(13835020108241056725), UWORD(4611673369413685575),
     UWORD(2767004021648211345), UWORD(1976431444034436675),
     UWORD(1537224456471228525), UWORD(1257729100749186975),
@@ -151,7 +152,7 @@ const mp_limb_t odd_reciprocal_tab_numer[ODD_RECIPROCAL_TAB_SIZE] = {
     UWORD(6291002587483845), UWORD(6266380268159055),
 };
 
-const mp_limb_t odd_reciprocal_tab_denom[ODD_RECIPROCAL_TAB_SIZE] = {
+const ulong odd_reciprocal_tab_denom[ODD_RECIPROCAL_TAB_SIZE] = {
     UWORD(13835020108241056725), UWORD(13835020108241056725),
     UWORD(13835020108241056725), UWORD(13835020108241056725),
     UWORD(13835020108241056725), UWORD(13835020108241056725),
@@ -284,7 +285,7 @@ const mp_limb_t odd_reciprocal_tab_denom[ODD_RECIPROCAL_TAB_SIZE] = {
 
 #else
 
-const mp_limb_t odd_reciprocal_tab_numer[ODD_RECIPROCAL_TAB_SIZE] = {
+const ulong odd_reciprocal_tab_numer[ODD_RECIPROCAL_TAB_SIZE] = {
     UWORD(1673196525), UWORD(557732175),
     UWORD(334639305), UWORD(239028075),
     UWORD(185910725), UWORD(152108775),
@@ -415,7 +416,7 @@ const mp_limb_t odd_reciprocal_tab_numer[ODD_RECIPROCAL_TAB_SIZE] = {
     UWORD(262143), UWORD(261117),
 };
 
-const mp_limb_t odd_reciprocal_tab_denom[ODD_RECIPROCAL_TAB_SIZE] = {
+const ulong odd_reciprocal_tab_denom[ODD_RECIPROCAL_TAB_SIZE] = {
     UWORD(1673196525), UWORD(1673196525),
     UWORD(1673196525), UWORD(1673196525),
     UWORD(1673196525), UWORD(1673196525),
@@ -548,11 +549,11 @@ const mp_limb_t odd_reciprocal_tab_denom[ODD_RECIPROCAL_TAB_SIZE] = {
 
 #endif
 
-void _arb_atan_taylor_rs(mp_ptr y, mp_limb_t * error,
-    mp_srcptr x, mp_size_t xn, ulong N, int alternating)
+void _arb_atan_taylor_rs(nn_ptr y, ulong * error,
+    nn_srcptr x, slong xn, ulong N, int alternating)
 {
-    mp_ptr s, t, xpow;
-    mp_limb_t new_denom, old_denom, c;
+    nn_ptr s, t, xpow;
+    ulong new_denom, old_denom, c;
     slong power, k, m;
 
     TMP_INIT;
@@ -560,8 +561,7 @@ void _arb_atan_taylor_rs(mp_ptr y, mp_limb_t * error,
 
     if (N >= ODD_RECIPROCAL_TAB_SIZE)
     {
-        flint_printf("_arb_atan_taylor_rs: N too large!\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "_arb_atan_taylor_rs: N too large!\n");
     }
 
     if (N <= 2)
@@ -584,10 +584,10 @@ void _arb_atan_taylor_rs(mp_ptr y, mp_limb_t * error,
 
             /* higher index ---> */
             /* t = |          | x^2 (lo) | x^2 (hi) | */
-            mpn_sqr(t + xn, x, xn);
+            flint_mpn_sqr(t + xn, x, xn);
 
             /* t = | x^3 (lo) | x^3 (hi) | x^2 (hi) | */
-            mpn_mul_n(t, t + 2 * xn, x, xn);
+            flint_mpn_mul_n(t, t + 2 * xn, x, xn);
 
             /* y = x - x^3 / 3 */
             mpn_divrem_1(t, 0, t + xn, xn, 3);
@@ -619,13 +619,13 @@ void _arb_atan_taylor_rs(mp_ptr y, mp_limb_t * error,
 #define XPOW_WRITE(__k) (xpow + (m - (__k)) * xn)
 #define XPOW_READ(__k) (xpow + (m - (__k) + 1) * xn)
 
-        mpn_sqr(XPOW_WRITE(1), x, xn);
-        mpn_sqr(XPOW_WRITE(2), XPOW_READ(1), xn);
+        flint_mpn_sqr(XPOW_WRITE(1), x, xn);
+        flint_mpn_sqr(XPOW_WRITE(2), XPOW_READ(1), xn);
 
         for (k = 4; k <= m; k += 2)
         {
-            mpn_mul_n(XPOW_WRITE(k - 1), XPOW_READ(k / 2), XPOW_READ(k / 2 - 1), xn);
-            mpn_sqr(XPOW_WRITE(k), XPOW_READ(k / 2), xn);
+            flint_mpn_mul_n(XPOW_WRITE(k - 1), XPOW_READ(k / 2), XPOW_READ(k / 2 - 1), xn);
+            flint_mpn_sqr(XPOW_WRITE(k), XPOW_READ(k / 2), xn);
         }
 
         flint_mpn_zero(s, xn + 1);
@@ -654,8 +654,7 @@ void _arb_atan_taylor_rs(mp_ptr y, mp_limb_t * error,
 
                 if (s[xn + 1] != 0)
                 {
-                    flint_printf("bad division!\n");
-                    flint_abort();
+                    flint_throw(FLINT_ERROR, "bad division!\n");
                 }
 
                 /* subtract 1 */
@@ -674,7 +673,7 @@ void _arb_atan_taylor_rs(mp_ptr y, mp_limb_t * error,
                 /* Outer polynomial evaluation: multiply by (x^2)^m */
                 if (k != 0)
                 {
-                    mpn_mul(t, s, xn + 1, XPOW_READ(m), xn);
+                    flint_mpn_mul(t, s, xn + 1, XPOW_READ(m), xn);
                     flint_mpn_copyi(s, t + xn, xn + 1);
                 }
 
@@ -693,7 +692,7 @@ void _arb_atan_taylor_rs(mp_ptr y, mp_limb_t * error,
 
         /* finally divide by denominator and multiply by x */
         mpn_divrem_1(s, 0, s, xn + 1, odd_reciprocal_tab_denom[0]);
-        mpn_mul(t, s, xn + 1, x, xn);
+        flint_mpn_mul(t, s, xn + 1, x, xn);
         flint_mpn_copyi(y, t + xn, xn);
 
         /* error bound (ulp) */
@@ -702,4 +701,3 @@ void _arb_atan_taylor_rs(mp_ptr y, mp_limb_t * error,
 
     TMP_END;
 }
-

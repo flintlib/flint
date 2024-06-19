@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpn_extras.h"
 #include "fexpr.h"
 
 void
@@ -28,8 +29,7 @@ fexpr_func(fexpr_t res, const fexpr_t expr)
     }
     else
     {
-        flint_printf("fexpr_func: a non-atomic expression is required\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "fexpr_func: a non-atomic expression is required\n");
     }
 
     size = FEXPR_SIZE(data[0]);
@@ -53,8 +53,7 @@ fexpr_view_func(fexpr_t res, const fexpr_t expr)
     }
     else
     {
-        flint_printf("fexpr_view_func: a non-atomic expression is required\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "fexpr_view_func: a non-atomic expression is required\n");
     }
 
     res->data = (ulong *) data;

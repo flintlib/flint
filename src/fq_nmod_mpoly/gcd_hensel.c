@@ -5,13 +5,15 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fq_nmod.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "fq_nmod_mpoly.h"
 #include "fq_nmod_mpoly_factor.h"
-
 
 /*
     in F[x_1, ..., x_n][X]:
@@ -56,7 +58,7 @@ int fq_nmod_mpolyl_gcd_hensel_smprime(
     slong Adegx, Bdegx, gdegx;
     fq_nmod_mpoly_t t1, t2, g, abar, bbar, hbar;
     flint_rand_t state;
-    mp_limb_t * tmp, * q;
+    ulong * tmp, * q;
 
     FLINT_ASSERT(n > 0);
     FLINT_ASSERT(A->length > 0);
@@ -66,9 +68,9 @@ int fq_nmod_mpolyl_gcd_hensel_smprime(
     FLINT_ASSERT(B->bits == bits);
     FLINT_ASSERT(ctx->minfo->ord == ORD_LEX);
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
-    tmp = FLINT_ARRAY_ALLOC(d*(N_FQ_MUL_INV_ITCH + 1), mp_limb_t);
+    tmp = FLINT_ARRAY_ALLOC(d*(N_FQ_MUL_INV_ITCH + 1), ulong);
     q = tmp + d*N_FQ_MUL_INV_ITCH;
 
     fq_nmod_init(mu1, ctx->fqctx);
@@ -388,7 +390,7 @@ got_alpha:
 
 cleanup:
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     flint_free(tmp);
 
@@ -449,4 +451,3 @@ int fq_nmod_mpoly_gcd_hensel(
 
     return _fq_nmod_mpoly_gcd_algo(G, NULL, NULL, A, B, ctx, MPOLY_GCD_USE_HENSEL);
 }
-

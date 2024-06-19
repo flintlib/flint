@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -16,7 +16,7 @@
 TEST_FUNCTION_START(n_rootrem, state)
 {
    int i, result;
-   mp_limb_t upper_limit;
+   ulong upper_limit;
 
 #if FLINT64
    upper_limit = 2642245;
@@ -28,7 +28,7 @@ TEST_FUNCTION_START(n_rootrem, state)
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
-        mp_limb_t a, b, c, d, val, j;
+        ulong a, b, c, d, val, j;
         mpz_t e, f, g, h;
 
         mpz_init(e);
@@ -52,14 +52,12 @@ TEST_FUNCTION_START(n_rootrem, state)
         result = ((a == val) && (b == j));
 
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("Passed Parameters : n = %wu root = %wu", c, d);
-            flint_printf("Answer generated : base = %wu remainder = %wu", a, b);
-            flint_printf("Expected answer : base = %wu remainder = %wu", val, j);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Passed Parameters : n = %wu root = %wu\n"
+                    "Answer generated : base = %wu remainder = %wu\n"
+                    "Expected answer : base = %wu remainder = %wu\n",
+                    c, d, a, b, val, j);
+
         mpz_clear(e);
         mpz_clear(f);
         mpz_clear(g);
@@ -70,7 +68,7 @@ TEST_FUNCTION_START(n_rootrem, state)
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
-        mp_limb_t a, b, c, d, max_pow, base;
+        ulong a, b, c, d, max_pow, base;
 
         base = n_randint(state, upper_limit - 2) + 2;     /* base form 2 to 2642245*/
         max_pow = n_flog(UWORD_MAX, base);
@@ -83,23 +81,18 @@ TEST_FUNCTION_START(n_rootrem, state)
         result = ((a == base) && (b == 0));
 
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("Passed Parameters : n = %wu root = %wu", c, d);
-            printf("\n");
-            flint_printf("Answer generated : base = %wu remainder = %wu", a, b);
-            printf("\n");
-            flint_printf("Expected answer : base = %wu remainder = 0", base);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Passed Parameters : n = %wu root = %wu\n"
+                    "Answer generated : base = %wu remainder = %wu\n"
+                    "Expected answer : base = %wu remainder = 0\n",
+                    c, d, a, b, base);
     }
 
     /* n of type a^b + 1 */
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
-        mp_limb_t a, b, c, d, max_pow, base;
+        ulong a, b, c, d, max_pow, base;
 
         base = n_randint(state, upper_limit - 2) + 2;     /* base between 2 to 2642245*/
         max_pow = n_flog(UWORD_MAX, base);
@@ -112,23 +105,18 @@ TEST_FUNCTION_START(n_rootrem, state)
         result = ((a == base) && (b == 1));
 
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("Passed Parameters : n = %wu root = %wu", c, d);
-            printf("\n");
-            flint_printf("Answer generated : base = %wu remainder = %wu", a, b);
-            printf("\n");
-            flint_printf("Expected answer : base = %wu remainder = 1", base);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Passed Parameters : n = %wu root = %wu\n"
+                    "Answer generated : base = %wu remainder = %wu\n"
+                    "Expected answer : base = %wu remainder = 1\n",
+                    c, d, a, b, base);
    }
 
     /* n of type a^b - 1 */
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
-        mp_limb_t a, b, c, d, j, val, max_pow, base;
+        ulong a, b, c, d, j, val, max_pow, base;
         mpz_t e, f, g, h;
 
         mpz_init(e);
@@ -154,14 +142,11 @@ TEST_FUNCTION_START(n_rootrem, state)
         result = ((a == val) && (b == j));
 
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("Passed Parameters : n = %wu root = %wu", c, d);
-            flint_printf("Answer generated : base = %wu remainder = %wu", a, b);
-            flint_printf("Expected answer : base = %wu remainder = %wu", val, j);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Passed Parameters : n = %wu root = %wu\n"
+                    "Answer generated : base = %wu remainder = %wu\n"
+                    "Expected answer : base = %wu remainder = %wu\n",
+                    c, d, a, b, val, j);
 
         mpz_clear(e);
         mpz_clear(f);

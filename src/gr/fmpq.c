@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -724,8 +724,8 @@ _gr_fmpq_vec_sum(fmpq_t res, const fmpq * vec, slong len, gr_ctx_t ctx)
         ulong hi, lo;
         slong i;
         fmpz f;
-        __mpz_struct * f_mpz;
-        __mpz_struct * res_mpz = NULL;
+        mpz_ptr f_mpz;
+        mpz_ptr res_mpz = NULL;
 
         hi = lo = 0;
 
@@ -982,7 +982,7 @@ _gr_fmpq_poly_roots_other(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, g
                     fmpz_swap(fmpq_denref(res_entries + j), fac->p[i].coeffs + 1);
 
                     if (fmpz_sgn(fmpq_denref(res_entries + j)) <= 0)
-                        flint_abort();
+                        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
                     fmpz_set_ui(mult_entries + j, fac->exp[i]);
                     j++;

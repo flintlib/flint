@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -15,7 +15,7 @@
 #include "fmpq_poly.h"
 
 fmpq_poly_struct *
-_fmpq_poly_powers_precompute(const fmpz * B, const fmpz_t denB, slong len)
+_fmpq_poly_powers_precompute(const fmpz * B, const fmpz_t FLINT_UNUSED(denB), slong len)
 {
    slong i;
    fmpq_poly_struct * powers = flint_malloc(sizeof(fmpq_poly_struct)*(2*len - 1));
@@ -58,8 +58,7 @@ void fmpq_poly_powers_precompute(fmpq_poly_powers_precomp_t pinv,
 {
     if (poly->length == 0)
     {
-        flint_printf("Exception (fmpz_poly_powers_precompute). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_poly_powers_precompute). Division by zero.\n");
     }
 
     pinv->powers = _fmpq_poly_powers_precompute(fmpq_poly_numref(poly),

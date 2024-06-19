@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -36,9 +36,9 @@ const unsigned int flint_primes_small[] =
 
 
 /* _flint_primes[i] holds an array of 2^i primes */
-FLINT_TLS_PREFIX mp_limb_t * _flint_primes[FLINT_BITS];
+FLINT_TLS_PREFIX ulong * _flint_primes[FLINT_BITS];
 FLINT_TLS_PREFIX double * _flint_prime_inverses[FLINT_BITS];
-FLINT_TLS_PREFIX int _flint_primes_used = 0;
+FLINT_TLS_PREFIX slong _flint_primes_used = 0;
 
 #if FLINT_REENTRANT && !FLINT_USES_TLS && FLINT_USES_PTHREAD
 void n_compute_primes_init()
@@ -50,7 +50,7 @@ void n_compute_primes_init()
 void
 n_compute_primes(ulong num_primes)
 {
-    int i, m;
+    slong i, m;
     ulong num_computed;
 
 #if FLINT_REENTRANT && !FLINT_USES_TLS && FLINT_USES_PTHREAD
@@ -68,11 +68,11 @@ n_compute_primes(ulong num_primes)
         n_primes_t iter;
 
         num_computed = UWORD(1) << m;
-        _flint_primes[m] = flint_malloc(sizeof(mp_limb_t) * num_computed);
+        _flint_primes[m] = flint_malloc(sizeof(ulong) * num_computed);
         _flint_prime_inverses[m] = flint_malloc(sizeof(double) * num_computed);
 
         n_primes_init(iter);
-        for (i = 0; i < num_computed; i++)
+        for (i = 0; (ulong) i < num_computed; i++)
         {
             _flint_primes[m][i] = n_primes_next(iter);
             _flint_prime_inverses[m][i] = n_precompute_inverse(_flint_primes[m][i]);
@@ -92,4 +92,3 @@ n_compute_primes(ulong num_primes)
     pthread_mutex_unlock(&primes_lock);
 #endif
 }
-

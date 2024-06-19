@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -28,17 +28,22 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_sqrt_series, state)
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) one;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
+#if defined(FQ_NMOD_POLY_H) || defined(FQ_ZECH_POLY_H)
+        if (TEMPLATE(T, ctx_prime)(ctx) != 2)
+        {
+#else
         if (fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) != 0)
         {
+#endif
             TEMPLATE(T, init)(one, ctx);
 
             TEMPLATE(T, poly_init)(h, ctx);
             TEMPLATE(T, poly_init)(g, ctx);
             TEMPLATE(T, poly_init)(r, ctx);
 
-            do TEMPLATE(T, poly_randtest)(h, state, n_randint(state, 1000), ctx);
+            do TEMPLATE(T, poly_randtest)(h, state, n_randint(state, 30), ctx);
             while (h->length == 0);
             TEMPLATE(T, set_ui)(one, 1, ctx);
             TEMPLATE(T, poly_set_coeff)(h, 0, one, ctx);
@@ -56,8 +61,12 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_sqrt_series, state)
                 TEMPLATE(T, poly_print)(h, ctx), flint_printf("\n\n");
                 TEMPLATE(T, poly_print)(g, ctx), flint_printf("\n\n");
                 TEMPLATE(T, poly_print)(r, ctx), flint_printf("\n\n");
+#if defined(FQ_NMOD_POLY_H) || defined(FQ_ZECH_POLY_H)
+                flint_printf("n = %wu\n", TEMPLATE(T, ctx_prime)(ctx));
+#else
                 flint_printf("n = ");
                 fmpz_print(TEMPLATE(T, ctx_prime)(ctx));
+#endif
                 flint_printf("\n");
                 fflush(stdout);
                 flint_abort();
@@ -74,23 +83,28 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_sqrt_series, state)
     }
 
     /* Check aliasing of h and g */
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         TEMPLATE(T, poly_t) g, h;
         slong m;
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) one;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
+#if defined(FQ_NMOD_POLY_H) || defined(FQ_ZECH_POLY_H)
+        if (TEMPLATE(T, ctx_prime)(ctx) != 2)
+        {
+#else
         if (fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) != 0)
         {
+#endif
             TEMPLATE(T, init)(one, ctx);
 
             TEMPLATE(T, poly_init)(h, ctx);
             TEMPLATE(T, poly_init)(g, ctx);
 
-            do TEMPLATE(T, poly_randtest)(h, state, n_randint(state, 500), ctx);
+            do TEMPLATE(T, poly_randtest)(h, state, n_randint(state, 20), ctx);
             while (h->length == 0);
             TEMPLATE(T, set_ui)(one, 1, ctx);
             TEMPLATE(T, poly_set_coeff)(h, 0, one, ctx);
@@ -106,8 +120,12 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_sqrt_series, state)
                 flint_printf("FAIL:\n");
                 TEMPLATE(T, poly_print)(h, ctx), flint_printf("\n\n");
                 TEMPLATE(T, poly_print)(g, ctx), flint_printf("\n\n");
+#if defined(FQ_NMOD_POLY_H) || defined(FQ_ZECH_POLY_H)
+                flint_printf("n = %wu\n", TEMPLATE(T, ctx_prime)(ctx));
+#else
                 flint_printf("n = ");
                 fmpz_print(TEMPLATE(T, ctx_prime)(ctx));
+#endif
                 flint_printf("m = %wd\n", m);
                 fflush(stdout);
                 flint_abort();

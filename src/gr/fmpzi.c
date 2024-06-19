@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -15,6 +15,7 @@
 #include "qqbar.h"
 #include "fmpzi.h"
 #include "gr.h"
+#include "gr_generic.h"
 
 int
 _gr_fmpzi_ctx_write(gr_stream_t out, gr_ctx_t ctx)
@@ -941,7 +942,6 @@ gr_method_tab_input _fmpzi_methods_input[] =
     {GR_METHOD_SET_FMPQ,        (gr_funcptr) _gr_fmpzi_set_fmpq},
     {GR_METHOD_SET_D,           (gr_funcptr) _gr_fmpzi_set_d},
     {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_fmpzi_set_other},
-/*    {GR_METHOD_SET_STR,         (gr_funcptr) _gr_fmpzi_set_str}, */
     {GR_METHOD_GET_FMPZ,        (gr_funcptr) _gr_fmpzi_get_fmpz},
     {GR_METHOD_GET_FMPQ,        (gr_funcptr) _gr_fmpzi_get_fmpq},
     {GR_METHOD_GET_UI,          (gr_funcptr) _gr_fmpzi_get_ui},
@@ -998,6 +998,7 @@ gr_method_tab_input _fmpzi_methods_input[] =
 */
 
     {GR_METHOD_GEN,             (gr_funcptr) _gr_fmpzi_i},
+    {GR_METHOD_GENS,            (gr_funcptr) gr_generic_gens_single},
 
     {GR_METHOD_I,               (gr_funcptr) _gr_fmpzi_i},
     {GR_METHOD_PI,              (gr_funcptr) gr_not_in_domain},

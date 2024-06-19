@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -20,7 +20,7 @@ TEST_FUNCTION_START(nmod_poly_multi_crt, state)
     {
         nmod_poly_multi_crt_t P;
         nmod_poly_struct ** moduli, ** inputs, * outputs;
-        mp_limb_t modulus = 1009;
+        ulong modulus = 1009;
         slong moduli_count = 1000;
 
         moduli = (nmod_poly_struct **) flint_malloc(moduli_count*sizeof(nmod_poly_struct *));
@@ -84,7 +84,7 @@ TEST_FUNCTION_START(nmod_poly_multi_crt, state)
         slong total_degree, moduli_length, moduli_count;
         nmod_poly_struct ** moduli, ** inputs;
         nmod_poly_t output;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -208,7 +208,7 @@ TEST_FUNCTION_START(nmod_poly_multi_crt, state)
         slong total_degree, moduli_length, moduli_count;
         nmod_poly_struct * moduli, * inputs;
         nmod_poly_t output;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);
@@ -323,7 +323,7 @@ TEST_FUNCTION_START(nmod_poly_multi_crt, state)
         slong total_degree, moduli_length, moduli_count;
         nmod_poly_struct * moduli, * inputs;
         nmod_poly_t output;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
         modulus = n_randbits(state, modulus);

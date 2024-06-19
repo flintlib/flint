@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -25,7 +25,7 @@ static ulong _fmpz_gcd_ui(const fmpz_t g, ulong h)
 void
 _fmpq_mul_small(fmpz_t rnum, fmpz_t rden, slong op1num, ulong op1den, slong op2num, ulong op2den)
 {
-    mp_limb_t hi, lo, denhi, denlo;
+    ulong hi, lo, denhi, denlo;
     int neg;
 
     if (op1num == 0 || op2num == 0)

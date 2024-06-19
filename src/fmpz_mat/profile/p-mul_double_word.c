@@ -5,11 +5,10 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "fmpz_mat.h"
 #include "profiler.h"
 
@@ -71,7 +70,7 @@ int main(void)
 
             if (dim < 150)
             {
-                fmpz_mat_mul_classical_inline(D, A, B);
+                fmpz_mat_mul_classical(D, A, B);
 
                 if (!fmpz_mat_equal(D, E))
                 {

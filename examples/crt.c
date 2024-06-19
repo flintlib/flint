@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -16,14 +16,14 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "ulong_extras.h"
+#include <flint/flint.h>
+#include <flint/fmpz.h>
+#include <flint/ulong_extras.h>
 
 int main(int argc, char* argv[])
 {
-    slong i, bit_bound;
-    mp_limb_t prime, res;
+    slong bit_bound;
+    ulong prime, res;
     fmpz_t x, y, prod;
 
     if (argc != 2)
@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
     fmpz_one(prod);
 
     prime = 0;
-    for (i = 0; fmpz_bits(prod) < bit_bound; i++)
+    while(fmpz_bits(prod) < bit_bound)
     {
         prime = n_nextprime(prime, 0);
         res = fmpz_fdiv_ui(x, prime);

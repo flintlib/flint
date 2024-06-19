@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -18,7 +18,7 @@ fq_zech_get_nmod_poly(nmod_poly_t rop, const fq_zech_t op,
                                                        const fq_zech_ctx_t ctx)
 {
     slong i;
-    mp_limb_t q, r;
+    ulong q, r;
 
     rop->mod = ctx->fq_nmod_ctx->modulus->mod;
 

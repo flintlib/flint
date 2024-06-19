@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -171,7 +171,7 @@ _gr_perm_set_other(perm_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 int
 _gr_perm_one(perm_t res, gr_ctx_t ctx)
 {
-    _perm_set_one(res->entries, PERM_N(ctx));
+    _perm_one(res->entries, PERM_N(ctx));
     return GR_SUCCESS;
 }
 
@@ -224,6 +224,7 @@ gr_method_tab_input _perm_methods_input[] =
 {
     {GR_METHOD_CTX_IS_FINITE,
                             (gr_funcptr) gr_generic_ctx_predicate_true},
+    {GR_METHOD_CTX_IS_RING, (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_MULTIPLICATIVE_GROUP,
                             (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_WRITE,   (gr_funcptr) _gr_perm_ctx_write},

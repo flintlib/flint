@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -20,7 +20,7 @@ slong
 fmpz_mat_rref_mul(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
 {
     nmod_mat_t Amod;
-    mp_limb_t p;
+    ulong p;
     slong i, j, m, n, rank, * pivs, * P;
     fmpz_mat_t B, C, D, E, E2, F, FD;
 
@@ -75,9 +75,8 @@ fmpz_mat_rref_mul(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
         fmpz_mat_init(E2, rank, n - rank);
         if (!fmpz_mat_solve(E2, den, B, C))
         {
-            flint_printf("Exception (fmpz_mat_rref_mul). "
-                         "Singular input matrix for solve.");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(fmpz_mat_rref_mul): "
+                    "Singular input matrix for solve.\n");
         }
 
         fmpz_mat_clear(B);
@@ -148,4 +147,3 @@ fmpz_mat_rref_mul(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
 
     return rank;
 }
-

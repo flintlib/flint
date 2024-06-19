@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -23,7 +23,16 @@ extern "C" {
 #endif
 
 #include "mpoly_types.h"
-#include "calcium.h"
+#include "arf_types.h"
+#include "gr_types.h"
+
+/* FIXME: We need calcium_stream in ca_types.h, but this header includes qqbar.h
+   which conditionally defines functions using fexpr_t if and only if FEXPR_H is
+   defined. And at this point FEXPR_H is defined, but not fexpr_t... */
+#ifndef calcium_stream_struct
+# define calcium_stream_struct gr_stream_struct
+# define calcium_stream_t gr_stream_t
+#endif
 
 #define FEXPR_TYPE_SMALL_INT     UWORD(0)
 #define FEXPR_TYPE_SMALL_SYMBOL  UWORD(1)
@@ -138,9 +147,11 @@ fexpr_set(fexpr_t res, const fexpr_t expr)
 {
     if (res != expr)
     {
+        slong i;
         slong size = fexpr_size(expr);
         fexpr_fit_size(res, size);
-        flint_mpn_copyi(res->data, expr->data, size);
+        for (i = 0; i < size; i++)
+            res->data[i] = expr->data[i];
     }
 }
 
@@ -151,22 +162,10 @@ fexpr_swap(fexpr_t a, fexpr_t b)
 }
 
 FEXPR_INLINE int
-_mpn_equal(mp_srcptr a, mp_srcptr b, slong len)
-{
-    slong i;
-
-    for (i = 0; i < len; i++)
-        if (a[i] != b[i])
-            return 0;
-
-    return 1;
-}
-
-FEXPR_INLINE int
 fexpr_equal(const fexpr_t a, const fexpr_t b)
 {
     ulong ha, hb;
-    slong sa, sb;
+    slong i, sa, sb;
 
     ha = a->data[0];
     hb = b->data[0];
@@ -180,7 +179,11 @@ fexpr_equal(const fexpr_t a, const fexpr_t b)
     if (sa != sb)
         return 0;
 
-    return _mpn_equal(a->data + 1, b->data + 1, sa - 1);
+    for (i = 1; i < sa; i++)
+        if (a->data[i] != b->data[i])
+            return 0;
+
+    return 1;
 }
 
 /* todo: document, test */
@@ -579,4 +582,3 @@ fexpr_vec_set_length(fexpr_vec_t vec, slong len)
 #endif
 
 #endif
-

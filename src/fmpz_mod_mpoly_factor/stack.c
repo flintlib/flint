@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -164,7 +164,7 @@ fmpz_mod_polyun_struct ** fmpz_mod_polyun_stack_fit_request(
 
 
 void fmpz_mod_mpolyn_stack_init(fmpz_mod_mpolyn_stack_t S,
-                           flint_bitcnt_t bits, const fmpz_mod_mpoly_ctx_t ctx)
+                           flint_bitcnt_t bits, const fmpz_mod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     S->alloc = 0;
     S->array = NULL;

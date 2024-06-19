@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -105,4 +105,3 @@ acb_modular_theta_series(acb_poly_t theta1, acb_poly_t theta2,
     if (theta3 != NULL) _acb_poly_normalise(theta3);
     if (theta4 != NULL) _acb_poly_normalise(theta4);
 }
-

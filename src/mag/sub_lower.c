@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -53,7 +53,7 @@ mag_sub_lower(mag_t z, const mag_t x, const mag_t y)
         {
             if (shift <= MAG_BITS)
             {
-                mp_limb_t c = MAG_MAN(x) - (MAG_MAN(y) >> shift) - 1;
+                ulong c = MAG_MAN(x) - (MAG_MAN(y) >> shift) - 1;
 
                 /* too much cancellation -- compute precisely */
                 if (c < (UWORD(1) << (MAG_BITS - 4)))
@@ -83,4 +83,3 @@ mag_sub_lower(mag_t z, const mag_t x, const mag_t y)
         }
     }
 }
-

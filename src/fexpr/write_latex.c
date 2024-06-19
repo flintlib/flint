@@ -5,11 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <stdio.h>
+#include "calcium.h"
 #include "fexpr.h"
 #include "fexpr_builtin.h"
 
@@ -54,8 +55,7 @@ const char * fexpr_get_symbol_str_pointer(char * tmp, const fexpr_t expr)
     }
     else
     {
-        flint_printf("fexpr_get_symbol_str_pointer: a symbol is required\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "fexpr_get_symbol_str_pointer: a symbol is required\n");
     }
 }
 

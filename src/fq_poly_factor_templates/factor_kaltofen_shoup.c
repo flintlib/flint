@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -26,14 +26,7 @@ TEMPLATE(T, poly_factor_kaltofen_shoup) (TEMPLATE(T, poly_factor_t) res,
     slong i, j, k, l, res_num, dist_deg_num;
     slong *degs;
 
-    if (!
-        (degs =
-         flint_malloc(TEMPLATE(T, poly_degree) (poly, ctx) * sizeof(slong))))
-    {
-        TEMPLATE_PRINTF("Exception (%s_poly_factor_kaltofen_shoup): \n", T);
-        flint_printf("Not enough memory.\n");
-        flint_abort();
-    }
+    degs = flint_malloc(TEMPLATE(T, poly_degree) (poly, ctx) * sizeof(slong));
 
     TEMPLATE(T, poly_init) (v, ctx);
 

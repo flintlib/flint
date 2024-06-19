@@ -1,11 +1,12 @@
 /*
     Copyright (C) 2020 William Hart
+    Copyright (C) 2024 William Hart
 
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -20,7 +21,11 @@ int TEMPLATE(T, sqrt)(TEMPLATE(T, t) rop, const TEMPLATE(T, t) op,
 
     if (TEMPLATE(T, is_zero)(op, ctx) || TEMPLATE(T, is_one)(op, ctx))
         TEMPLATE(T, set)(rop, op, ctx);
+#if defined(FQ_NMOD_H) || defined(FQ_ZECH_H)
+    else if (TEMPLATE(T, ctx_prime)(ctx) == 2)
+#else
     else if (fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) == 0)
+#endif
         TEMPLATE(T, pth_root)(rop, op, ctx);
     else
     {
@@ -45,12 +50,12 @@ int TEMPLATE(T, sqrt)(TEMPLATE(T, t) rop, const TEMPLATE(T, t) op,
         {
             flint_rand_t state;
 
-            flint_randinit(state);
+            flint_rand_init(state);
 
             while (TEMPLATE(T, is_square)(z, ctx))
                 TEMPLATE(T, rand)(z, state, ctx);
 
-            flint_randclear(state);
+            flint_rand_clear(state);
         }
 
         TEMPLATE(T, ctx_order)(ord, ctx);
@@ -73,14 +78,14 @@ int TEMPLATE(T, sqrt)(TEMPLATE(T, t) rop, const TEMPLATE(T, t) op,
                 break;
             }
 
-	    if (TEMPLATE(T, is_one)(t, ctx))
+            if (TEMPLATE(T, is_one)(t, ctx))
                 break;
 
             i = 1;
-	    TEMPLATE(T, sqr)(temp, t, ctx);
+            TEMPLATE(T, sqr)(temp, t, ctx);
 
             while (i < M && !TEMPLATE(T, is_one)(temp, ctx))
-	    {
+            {
                 TEMPLATE(T, sqr)(temp, temp, ctx);
                 i++;
             }
@@ -88,7 +93,7 @@ int TEMPLATE(T, sqrt)(TEMPLATE(T, t) rop, const TEMPLATE(T, t) op,
             if (i == M)
             {
                 res = 0;
-		break;
+                break;
             }
 
             TEMPLATE(T, set)(b, c, ctx);

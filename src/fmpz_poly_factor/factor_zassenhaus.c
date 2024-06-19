@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -118,7 +118,7 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
     {
         slong i, j;
         slong r = lenF;
-        mp_limb_t p = 2;
+        ulong p = 2;
         nmod_poly_t d, g, t;
         nmod_poly_factor_t fac;
         zassenhaus_prune_t Z;
@@ -298,4 +298,3 @@ void fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t fac, const fmpz_poly_t G)
 }
 
 #undef TRACE_ZASSENHAUS
-

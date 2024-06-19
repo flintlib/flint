@@ -5,14 +5,16 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fmpz_vec.h"
-#include "nmod_mpoly.h"
-#include "fmpz_mod_mpoly_factor.h"
+#include "fmpz_mod.h"
 #include "n_poly.h"
+#include "nmod_mpoly.h"
+#include "mpoly.h"
+#include "fmpz_mod_mpoly_factor.h"
 
 void fmpz_mod_mpolyn_interp_lift_sm_polyu1n(
     fmpz_mod_mpolyn_t F,
@@ -335,7 +337,7 @@ void fmpz_mod_mpoly_mock_eval_coeff(
     fmpz_mod_polyun_t mock,
     const fmpz_mod_mpoly_t A,
     const fmpz_mod_polyun_t Aeh_inc,
-    const fmpz_mod_mpoly_ctx_t ctx)
+    const fmpz_mod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     slong i, k;
 
@@ -450,7 +452,7 @@ void fmpz_mod_polyu2n_zip_eval_cur_inc_coeff(
     const fmpz_mod_ctx_t ctx)
 {
     slong i, Ei;
-    slong e0, e1;
+    ulong e0, e1;
     fmpz_t c;
 
     FLINT_ASSERT(Acur->length > 0);
@@ -582,7 +584,7 @@ int fmpz_mod_mpolyl_gcd_zippel2_smprime(
     fmpz_init(c);
     fmpz_init(start_alpha);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         slong * tmp_degs = FLINT_ARRAY_ALLOC(nvars, slong);
 
@@ -653,7 +655,7 @@ int fmpz_mod_mpolyl_gcd_zippel2_smprime(
 
     betas = _fmpz_vec_init(nvars);
     alphas = _fmpz_vec_init(nvars);
-    flint_randinit(state);
+    flint_rand_init(state);
 
     beta_caches = FLINT_ARRAY_ALLOC(nvars, fmpz_mod_poly_struct);
     alpha_caches = FLINT_ARRAY_ALLOC(nvars, fmpz_mod_poly_struct);
@@ -1240,7 +1242,7 @@ cleanup:
     _fmpz_vec_clear(betas, nvars);
     _fmpz_vec_clear(alphas, nvars);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     for (i = 0; i < nvars; i++)
     {
@@ -1274,4 +1276,3 @@ gcd_is_trivial:
 
     goto cleanup;
 }
-

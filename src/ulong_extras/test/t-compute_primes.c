@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -17,10 +17,10 @@ TEST_FUNCTION_START(compute_primes, state)
 {
     slong i, lim = 1000000;
     n_primes_t pg;
-    mp_limb_t * ref_primes;
+    ulong * ref_primes;
     double * ref_inverses;
 
-    ref_primes = flint_malloc(sizeof(mp_limb_t) * lim);
+    ref_primes = flint_malloc(sizeof(ulong) * lim);
     ref_inverses = flint_malloc(sizeof(double) * lim);
 
     n_primes_init(pg);
@@ -31,30 +31,25 @@ TEST_FUNCTION_START(compute_primes, state)
     }
     n_primes_clear(pg);
 
-    for (i = 0; i < 250; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         slong n;
-        const mp_limb_t * primes;
+        const ulong * primes;
         const double * inverses;
 
-        n = n_randtest(state) % lim;
+        n = n_randint(state, lim);
 
         primes = n_primes_arr_readonly(n + 1);
         inverses = n_prime_inverses_arr_readonly(n + 1);
 
         if (primes[n] != ref_primes[n] || inverses[n] != ref_inverses[n])
-        {
-            flint_printf("FAIL!\n");
-            flint_printf("n = %wd, p1 = %wu, p2 = %wu\n", n, primes[n], ref_primes[n]);
-            flint_printf("inv1 = %g, inv2 = %g\n", inverses[n], ref_inverses[n]);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "n = %wd, p1 = %wu, p2 = %wu\n"
+                    "inv1 = %g, inv2 = %g\n",
+                    n, primes[n], ref_primes[n], inverses[n], ref_inverses[n]);
 
-        if (n_randint(state, 20) == 0)
-        {
+        if (n_randint(state, 50) == 0)
             n_cleanup_primes();
-        }
     }
 
     flint_free(ref_primes);

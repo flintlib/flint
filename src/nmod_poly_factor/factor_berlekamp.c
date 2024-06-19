@@ -8,7 +8,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -56,7 +56,7 @@ static void
 __nmod_poly_factor_berlekamp(nmod_poly_factor_t factors,
     flint_rand_t state, const nmod_poly_t f)
 {
-    const mp_limb_t p = nmod_poly_modulus(f);
+    const ulong p = nmod_poly_modulus(f);
     const slong n = nmod_poly_degree(f);
 
     nmod_poly_factor_t fac1, fac2;
@@ -64,7 +64,7 @@ __nmod_poly_factor_berlekamp(nmod_poly_factor_t factors,
     nmod_poly_t x_pi, x_pi2;
     nmod_poly_t Q;
     nmod_mat_t matrix;
-    mp_limb_t coeff;
+    ulong coeff;
     slong i, nullity, col, row, *shift;
     nmod_poly_t *basis;
 
@@ -210,7 +210,7 @@ __nmod_poly_factor_berlekamp(nmod_poly_factor_t factors,
 
         nmod_poly_init_mod(Q, f->mod);
 
-        nmod_poly_div(Q, f, g);
+        nmod_poly_divexact(Q, f, g);
 
         if (!nmod_poly_is_zero(Q))
             nmod_poly_make_monic(Q, Q);
@@ -231,9 +231,9 @@ nmod_poly_factor_berlekamp(nmod_poly_factor_t factors, const nmod_poly_t f)
 {
     flint_rand_t r;
 
-    flint_randinit(r);
+    flint_rand_init(r);
 
     __nmod_poly_factor_berlekamp(factors, r, f);
 
-    flint_randclear(r);
+    flint_rand_clear(r);
 }

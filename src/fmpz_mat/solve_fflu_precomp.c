@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -20,20 +20,22 @@
 #define BB(ii,jj) fmpz_mat_entry(B,(ii),(jj))
 #define LU(ii,jj) fmpz_mat_entry(FFLU,(ii),(jj))
 
+#define r_shift(in, c) (((c) == FLINT_BITS) ? WORD(0) : ((in) >> (c)))
+
 void
 fmpz_mat_set_perm(fmpz_mat_t X, const slong * perm, const fmpz_mat_t B)
 {
     if (X == B)
     {
         /* Not implemented */
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s): Not implemented\n", __func__);
     }
     else
     {
         slong i, j;
 
         if (perm == NULL)
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s): perm == NULL\n", __func__);
 
         for (i = 0; i < fmpz_mat_nrows(B); i++)
             for (j = 0; j < fmpz_mat_ncols(B); j++)

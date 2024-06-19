@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -79,4 +79,3 @@ acb_hypgeom_pfq_series_sum(acb_poly_t s, acb_poly_t t,
     acb_hypgeom_pfq_series_sum_forward(s, t, a, p, b, q, z,
         regularized, n, len, prec);
 }
-

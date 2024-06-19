@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 void nmod_mpoly_init3(
@@ -22,7 +23,7 @@ void nmod_mpoly_init3(
     if (alloc > 0)
     {
         A->coeffs_alloc = alloc;
-        A->coeffs = FLINT_ARRAY_ALLOC(A->coeffs_alloc, mp_limb_t);
+        A->coeffs = FLINT_ARRAY_ALLOC(A->coeffs_alloc, ulong);
         A->exps_alloc = N*alloc;
         A->exps = FLINT_ARRAY_ALLOC(A->exps_alloc, ulong);
     }

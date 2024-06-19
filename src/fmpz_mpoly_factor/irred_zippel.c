@@ -5,14 +5,20 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
+#include "mpn_extras.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "nmod_poly_factor.h"
-#include "fmpz_mpoly_factor.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly_factor.h"
+#include "fmpz_mpoly_factor.h"
 
 static void nmod_mpoly_get_eval_helper2(
     n_polyun_t EH,
@@ -22,7 +28,7 @@ static void nmod_mpoly_get_eval_helper2(
 {
     slong start, Ai, j, k, n;
     slong e0, e1, EHi;
-    mp_limb_t * p;
+    ulong * p;
     flint_bitcnt_t bits = A->bits;
     slong Alen = A->length;
     const ulong * Aexps = A->exps;
@@ -58,9 +64,9 @@ static void nmod_mpoly_get_eval_helper2(
             Ai++;
             if (Ai >= Alen)
                 break;
-            if (((Aexps[N*Ai + off0] >> shift0) & mask) != e0)
+            if (((Aexps[N*Ai + off0] >> shift0) & mask) != (ulong) e0)
                 break;
-            if (((Aexps[N*Ai + off1] >> shift1) & mask) != e1)
+            if (((Aexps[N*Ai + off1] >> shift1) & mask) != (ulong) e1)
                 break;
         }
 
@@ -75,7 +81,7 @@ static void nmod_mpoly_get_eval_helper2(
 
         for (j = 0; j < n; j++)
         {
-            mp_limb_t meval = 1;
+            ulong meval = 1;
 
             for (k = 2; k < nvars; k++)
             {
@@ -108,7 +114,7 @@ static slong nmod_mpoly_set_eval_helper_and_zip_form2(
 {
     slong start, Bi, j, k, n;
     slong e0, e1, Hi, EHi;
-    mp_limb_t * p;
+    ulong * p;
     slong zip_length = 0;
     flint_bitcnt_t bits = B->bits;
     slong Blen = B->length;
@@ -149,9 +155,9 @@ static slong nmod_mpoly_set_eval_helper_and_zip_form2(
             Bi++;
             if (Bi >= Blen)
                 break;
-            if (((Bexps[N*Bi + off0] >> shift0) & mask) != e0)
+            if (((Bexps[N*Bi + off0] >> shift0) & mask) != (ulong) e0)
                 break;
-            if (((Bexps[N*Bi + off1] >> shift1) & mask) != e1)
+            if (((Bexps[N*Bi + off1] >> shift1) & mask) != (ulong) e1)
                 break;
         }
 
@@ -166,7 +172,7 @@ static slong nmod_mpoly_set_eval_helper_and_zip_form2(
 
         for (j = 0; j < n; j++)
         {
-            mp_limb_t meval = 1;
+            ulong meval = 1;
 
             for (k = 2; k < ctx->minfo->nvars; k++)
             {
@@ -223,7 +229,7 @@ static int _fmpz_mpoly_modpk_update_zip(
     slong N = mpoly_words_per_exp_sp(A->bits, ctx->minfo);
     ulong start, mask = (-UWORD(1)) >> (FLINT_BITS - A->bits);
     n_poly_t c, t;
-    mp_limb_t * ccoeffs;
+    ulong * ccoeffs;
 
     mpoly_gen_offset_shift_sp(&off, &shift, 0, A->bits, ctx->minfo);
 
@@ -391,8 +397,8 @@ static void n_bpoly_mod_eval_step(
     nmod_t ctx)
 {
     slong i, n, Ai;
-    mp_limb_t * p;
-    mp_limb_t c;
+    ulong * p;
+    ulong c;
     ulong e0, e1;
     slong EHlen = EH->length;
 
@@ -438,7 +444,7 @@ static int fmpz_mfactor_lift_prime_power_zippel(
     flint_rand_t state,
     const nmod_mpoly_struct * Bp,
     const fmpz_mpoly_t A,
-    const mp_limb_t * alphap,
+    const ulong * FLINT_UNUSED(alphap),
     const fmpz_mpoly_ctx_t ctx,
     const nmod_mpoly_ctx_t ctxp,
     slong L)
@@ -497,7 +503,7 @@ static int fmpz_mfactor_lift_prime_power_zippel(
     /* choose betas */
     for (i = 2; i < n; i++)
     {
-        mp_limb_t bb = n_urandint(state, ctxp->mod.n - 3) + 2;
+        ulong bb = n_urandint(state, ctxp->mod.n - 3) + 2;
         nmod_pow_cache_start(bb, beta_caches + 3*i + 0,
                                  beta_caches + 3*i + 1, beta_caches + 3*i + 2);
     }
@@ -677,12 +683,12 @@ int fmpz_mpoly_factor_irred_zippel(
     fmpz_mpoly_t m, mpow;
     fmpz_mpolyv_t Alc, lc_divs;
     fmpz_t q, facBound;
-    mp_limb_t p;
+    ulong p;
     nmod_mpoly_ctx_t ctxp;
     nmod_mpolyv_t facp, tfacp;
     nmod_mpolyv_t Aevalp, Alcp;
     nmod_poly_t Aup;
-    mp_limb_t * alphap;
+    ulong * alphap;
     slong r, L;
 
     FLINT_ASSERT(n > 1);
@@ -704,7 +710,7 @@ int fmpz_mpoly_factor_irred_zippel(
     fmpz_poly_init(Au);
 
     alpha = _fmpz_vec_init(n);
-    alphap = (mp_limb_t *) flint_malloc(n*sizeof(mp_limb_t));
+    alphap = (ulong *) flint_malloc(n*sizeof(ulong));
 
     degs  = (slong *) flint_malloc(2*(n + 1)*sizeof(slong));
     tdegs = degs + (n + 1);
@@ -755,7 +761,7 @@ next_alpha:
             fmpz_set_ui(alpha + i, 1 + (l & (mask - 1)));
     }
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mpoly_degrees_si(tdegs, A, ctx);
     for (i = 0; i < n + 1; i++)
         FLINT_ASSERT(degs[i] == tdegs[i]);
@@ -903,10 +909,13 @@ next_alpha:
     {
         FLINT_ASSERT(fmpz_mpoly_is_fmpz(Alc->coeffs + 0*r + i, ctx));
         FLINT_ASSERT(fmpz_mpoly_length(Alc->coeffs + 0*r + i, ctx) == 1);
-        FLINT_ASSERT(fmpz_divisible(Alc->coeffs[i].coeffs + 0,
-                                 Aufac->p[i].coeffs + Aufac->p[i].length - 1));
-        fmpz_divexact(q, Alc->coeffs[i].coeffs + 0,
-                                  Aufac->p[i].coeffs + Aufac->p[i].length - 1);
+
+        if (!fmpz_divides(q, Alc->coeffs[i].coeffs + 0,
+                             Aufac->p[i].coeffs + Aufac->p[i].length - 1))
+        {
+            goto next_alpha;
+        }
+
         _fmpz_mpoly_set_fmpz_poly(fac->coeffs + i, newA->bits,
                                Aufac->p[i].coeffs, Aufac->p[i].length, 0, ctx);
         fmpz_mpoly_scalar_mul_fmpz(fac->coeffs + i, fac->coeffs + i, q, ctx);
@@ -1083,4 +1092,3 @@ cleanup:
 
     return success;
 }
-

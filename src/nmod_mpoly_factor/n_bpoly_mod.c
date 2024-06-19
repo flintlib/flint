@@ -5,12 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly_factor.h"
-
 
 void nmod_mpoly_get_bpoly(
     n_bpoly_t A,
@@ -54,7 +56,7 @@ void nmod_mpoly_set_bpoly(
     slong i, j;
     slong NA;
     slong Alen;
-    mp_limb_t * Acoeff;
+    ulong * Acoeff;
     ulong * Aexp;
     ulong * Aexps;
     TMP_INIT;
@@ -101,7 +103,7 @@ void nmod_mpoly_set_bpoly(
 }
 
 void n_bpoly_mod_taylor_shift_gen1(n_bpoly_t A, const n_bpoly_t B,
-                                                      mp_limb_t c, nmod_t ctx)
+                                                      ulong c, nmod_t ctx)
 {
     slong i;
 
@@ -193,7 +195,7 @@ void n_bpoly_mod_add(
 
 void n_bpoly_mod_make_primitive(n_poly_t g, n_bpoly_t A, nmod_t ctx)
 {
-    mp_limb_t c = 1;
+    ulong c = 1;
     slong Alen = A->length;
     slong i;
     n_poly_t q, r;
@@ -527,7 +529,7 @@ int n_bpoly_mod_divides(
         {
             for (j = order - 1; j >= 0; j--)
             {
-                mp_limb_t qc = n_poly_get_coeff(q, order*i + j);
+                ulong qc = n_poly_get_coeff(q, order*i + j);
                 if (qc == 0)
                     continue;
 
@@ -604,12 +606,12 @@ cleanup:
     return divides;
 }
 
-void n_bpoly_mod_taylor_shift_gen0(n_bpoly_t A, mp_limb_t alpha, nmod_t ctx)
+void n_bpoly_mod_taylor_shift_gen0(n_bpoly_t A, ulong alpha, nmod_t ctx)
 {
     slong i, j;
     slong n = A->length;
     n_poly_struct * Acoeffs = A->coeffs;
-    mp_limb_t c;
+    ulong c;
 
     FLINT_ASSERT(alpha < ctx.n);
 
@@ -647,5 +649,3 @@ void n_bpoly_mod_taylor_shift_gen0(n_bpoly_t A, mp_limb_t alpha, nmod_t ctx)
         }
     }
 }
-
-

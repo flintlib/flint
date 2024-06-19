@@ -5,12 +5,18 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod_poly.h"
 #include "nmod_mpoly.h"
+#include "fmpz.h"
+#include "fq_nmod.h"
 #include "fq_nmod_mat.h"
+#include "fq_nmod_poly.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "fq_nmod_mpoly.h"
 
 int fq_nmod_next(fq_nmod_t alpha, const fq_nmod_ctx_t fqctx)
@@ -210,13 +216,13 @@ static int fq_nmod_mpolyu_evalfromsk(
     slong d = fq_nmod_ctx_degree(ctx->fqctx);
     slong i, j;
     int ret = 0;
-    mp_limb_t * pp, * acc;
+    ulong * pp, * acc;
     fq_nmod_t acct;
 
     FLINT_ASSERT(A->length == SK->length);
 
-    pp = FLINT_ARRAY_ALLOC(d, mp_limb_t);
-    acc = FLINT_ARRAY_ALLOC(d, mp_limb_t);
+    pp = FLINT_ARRAY_ALLOC(d, ulong);
+    acc = FLINT_ARRAY_ALLOC(d, ulong);
     fq_nmod_init(acct, ctx->fqctx);
 
     fq_nmod_poly_zero(e, ctx->fqctx);
@@ -275,7 +281,7 @@ void fq_nmod_poly_product_roots(fq_nmod_poly_t P, fq_nmod_struct * r,
 
     for x
 */
-int fq_nmod_vandsolve(mp_limb_t * X, mp_limb_t * A, fq_nmod_struct * b,
+int fq_nmod_vandsolve(ulong * X, ulong * A, fq_nmod_struct * b,
                                             slong n, const fq_nmod_ctx_t fqctx)
 {
     slong d = fq_nmod_ctx_degree(fqctx);
@@ -542,7 +548,7 @@ pick_evaluation_point:
     {
         slong shift, off;
         mpoly_gen_offset_shift_sp(&off, &shift, i, f->bits, ctx->minfo);
-        for (j = 0; j < f->bits; j++)
+        for (j = 0; (ulong) j < f->bits; j++)
         {
             offs[f->bits*i + j] = off;
             masks[f->bits*i + j] = UWORD(1) << (j + shift);
@@ -598,7 +604,7 @@ pick_evaluation_point:
 
         fq_nmod_poly_gcd(Geval, Aeval, Beval, ctx->fqctx);
 
-        if (f->exps[0] < fq_nmod_poly_degree(Geval, ctx->fqctx))
+        if (f->exps[0] < (ulong) fq_nmod_poly_degree(Geval, ctx->fqctx))
         {
             ++exceededcount;
             if (exceededcount < 2)
@@ -608,7 +614,7 @@ pick_evaluation_point:
             goto finished;
         }
 
-        if (f->exps[0] > fq_nmod_poly_degree(Geval, ctx->fqctx))
+        if (f->exps[0] > (ulong) fq_nmod_poly_degree(Geval, ctx->fqctx))
         {
             success = nmod_gcds_form_main_degree_too_high;
             *degbound = fq_nmod_poly_degree(Geval, ctx->fqctx);
@@ -622,11 +628,11 @@ pick_evaluation_point:
             fq_nmod_poly_get_coeff(ck, Geval, k, ctx->fqctx);
             if (!fq_nmod_is_zero(ck, ctx->fqctx))
             {
-                while (j < f->length && f->exps[j] > k)
+                while (j < f->length && f->exps[j] > (ulong) k)
                 {
                     j++;
                 }
-                if (j >= f->length || f->exps[j] != k)
+                if (j >= f->length || f->exps[j] != (ulong) k)
                 {
                     success = nmod_gcds_form_wrong;
                     goto finished;
@@ -681,7 +687,7 @@ pick_evaluation_point:
             }
 
         }
-        fq_nmod_mat_rref(ML + s, ctx->fqctx);
+        fq_nmod_mat_rref(ML + s, ML + s, ctx->fqctx);
 
         for (i = 0; i < (f->coeffs + s)->length; i++)
         {
@@ -710,7 +716,7 @@ pick_evaluation_point:
             fq_nmod_mat_window_clear(Mwindow, ctx->fqctx);
         }
 
-        nullity = l - fq_nmod_mat_rref(MF, ctx->fqctx);
+        nullity = l - fq_nmod_mat_rref(MF, MF, ctx->fqctx);
 
         if (nullity == 0)
         {
@@ -1327,7 +1333,7 @@ int fq_nmod_mpolyu_gcdp_zippel(
 
         success = fq_nmod_mpolyu_gcdp_zippel(Geval, Abareval, Bbareval,
                                         Aeval, Beval, var - 1, ctx, randstate);
-        if (!success || Geval->exps[0] > degbound)
+        if (!success || Geval->exps[0] > (ulong) degbound)
         {
             success = 0;
             goto finished;
@@ -1527,4 +1533,3 @@ finished:
 
     return success;
 }
-

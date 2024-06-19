@@ -5,16 +5,17 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fmpz_vec.h"
+#include "mpoly.h"
 #include "fmpz_mod_mpoly.h"
 
 void fmpz_mod_mpoly_univar_init(
     fmpz_mod_mpoly_univar_t A,
-    const fmpz_mod_mpoly_ctx_t ctx)
+    const fmpz_mod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     A->coeffs = NULL;
     A->exps = NULL;
@@ -430,7 +431,7 @@ void _fmpz_mod_mpoly_from_univar(
 
             FLINT_ASSERT(x->next == NULL);
 
-            if (x->j + 1 < (B->coeffs + x->i)->length)
+            if (x->j + 1 < (ulong) (B->coeffs + x->i)->length)
             {
                 FLINT_ASSERT(fmpz_fits_si(B->exps + x->i));
                 x->j = x->j + 1;
@@ -468,7 +469,7 @@ void _fmpz_mod_mpoly_from_univar(
 
             FLINT_ASSERT(x->next == NULL);
 
-            if (x->j + 1 < (B->coeffs + x->i)->length)
+            if (x->j + 1 < (ulong) (B->coeffs + x->i)->length)
             {
                 x->j = x->j + 1;
                 x->next = NULL;
@@ -677,4 +678,3 @@ int fmpz_mod_mpoly_univar_discriminant(
 
     return success;
 }
-

@@ -33,7 +33,7 @@ The modular group
     Represents an element of the modular group `\text{PSL}(2, \mathbb{Z})`,
     namely an integer matrix
 
-    .. math ::
+    .. math::
 
         \begin{pmatrix} a & b \\ c & d \end{pmatrix}
 
@@ -106,7 +106,7 @@ Modular transformations
     Applies the modular transformation *g* to the complex number *z*,
     evaluating
 
-    .. math ::
+    .. math::
 
         w = g z = \frac{az+b}{cz+d}.
 
@@ -181,22 +181,22 @@ Unfortunately, there are many inconsistent notational variations for
 Jacobi theta functions in the literature. Unless otherwise noted,
 we use the functions
 
-.. math ::
+.. math::
 
     \theta_1(z,\tau) = -i \sum_{n=-\infty}^{\infty} (-1)^n \exp(\pi i [(n + 1/2)^2 \tau + (2n + 1) z])
                      = 2 q_{1/4} \sum_{n=0}^{\infty} (-1)^n q^{n(n+1)} \sin((2n+1) \pi z)
 
-.. math ::
+.. math::
 
     \theta_2(z,\tau) = \sum_{n=-\infty}^{\infty} \exp(\pi i [(n + 1/2)^2 \tau + (2n + 1) z])
                      = 2 q_{1/4} \sum_{n=0}^{\infty} q^{n(n+1)} \cos((2n+1) \pi z)
 
-.. math ::
+.. math::
 
     \theta_3(z,\tau) = \sum_{n=-\infty}^{\infty} \exp(\pi i [n^2 \tau + 2n z])
                      = 1 + 2 \sum_{n=1}^{\infty} q^{n^2} \cos(2n \pi z)
 
-.. math ::
+.. math::
 
     \theta_4(z,\tau) = \sum_{n=-\infty}^{\infty} (-1)^n \exp(\pi i [n^2 \tau + 2n z])
                      = 1 + 2 \sum_{n=1}^{\infty} (-1)^n q^{n^2} \cos(2n \pi z)
@@ -217,13 +217,13 @@ To avoid confusion, we only write `q^k` when `k` is an integer.
     (*R* and *S* should be arrays of length 4)
     and `C \in \{0, 1\}` such that
 
-    .. math ::
+    .. math::
 
         \theta_{1+i}(z,\tau) = \exp(\pi i R_i / 4) \cdot A \cdot B \cdot \theta_{1+S_i}(z',\tau')
 
     where `z' = z, A = B = 1` if `C = 0`, and
 
-    .. math ::
+    .. math::
 
         z' = \frac{-z}{c \tau + d}, \quad
         A = \sqrt{\frac{i}{c \tau + d}}, \quad
@@ -244,27 +244,27 @@ To avoid confusion, we only write `q^k` when `k` is an integer.
     We need the function `\theta_{m,n}(z,\tau)` defined for `m, n \in \mathbb{Z}` by
     (beware of the typos in [Rad1973]_)
 
-    .. math ::
+    .. math::
 
         \theta_{0,0}(z,\tau) = \theta_3(z,\tau), \quad
         \theta_{0,1}(z,\tau) = \theta_4(z,\tau)
 
-    .. math ::
+    .. math::
 
         \theta_{1,0}(z,\tau) = \theta_2(z,\tau), \quad
         \theta_{1,1}(z,\tau) = i \theta_1(z,\tau)
 
-    .. math ::
+    .. math::
 
         \theta_{m+2,n}(z,\tau) = (-1)^n \theta_{m,n}(z,\tau)
 
-    .. math ::
+    .. math::
 
         \theta_{m,n+2}(z,\tau) = \theta_{m,n}(z,\tau).
 
     Then we may write
 
-    .. math ::
+    .. math::
 
         \theta_1(z,\tau) &= \varepsilon_1 A B \theta_1(z', \tau')
 
@@ -280,7 +280,7 @@ To avoid confusion, we only write `q^k` when `k` is an integer.
     function by `\varepsilon(a,b,c,d) = \exp(\pi i R(a,b,c,d) / 12)`
     (see :func:`acb_modular_epsilon_arg`), then:
 
-    .. math ::
+    .. math::
 
         \varepsilon_1(a,b,c,d) &= \exp(\pi i [R(-d,b,c,-a) + 1] / 4)
 
@@ -305,7 +305,7 @@ To avoid confusion, we only write `q^k` when `k` is an integer.
     Simultaneously computes the first *len* coefficients of each of the
     formal power series
 
-    .. math ::
+    .. math::
 
         \theta_1(z+x,\tau) / q_{1/4} \in \mathbb{C}[[x]]
 
@@ -341,7 +341,7 @@ To avoid confusion, we only write `q^k` when `k` is an integer.
     `\pm (k+2) = \pm 2, \pm 3, \pm 4, \ldots` etc. The scheme
     is illustrated by the following table:
 
-    .. math ::
+    .. math::
 
         \begin{array}{llll}
                & \theta_1, \theta_2 & q^0 & (w^1 \pm w^{-1}) \\
@@ -359,7 +359,7 @@ To avoid confusion, we only write `q^k` when `k` is an integer.
     `F = \lfloor (N+1)/2 \rfloor + 1`. The error of the
     zeroth derivative can be bounded as
 
-    .. math ::
+    .. math::
 
         2 Q^E W^{N+2} \left[ 1 + Q^F W + Q^{2F} W^2 + \ldots \right]
         = \frac{2 Q^E W^{N+2}}{1 - Q^F W}
@@ -372,14 +372,14 @@ To avoid confusion, we only write `q^k` when `k` is an integer.
     `\pi^r`, but we omit this until we rescale the coefficients
     at the end of the computation). Thus we have the error bound
 
-    .. math ::
+    .. math::
 
         2 Q^E W^{N+2} (N+2)^r \left[ 1 + Q^F W \frac{(N+3)^r}{(N+2)^r} + Q^{2F} W^2 \frac{(N+4)^r}{(N+2)^r} + \ldots \right]
 
     which by the inequality `(1 + m/(N+2))^r \le \exp(mr/(N+2))`
     can be bounded as
 
-    .. math ::
+    .. math::
 
         \frac{2 Q^E W^{N+2} (N+2)^r}{1 - Q^F W \exp(r/(N+2))},
 
@@ -461,7 +461,7 @@ Dedekind eta function
     Evaluates the Dedekind eta function
     without the leading 24th root, i.e.
 
-    .. math :: \exp(-\pi i \tau/12) \eta(\tau) = \sum_{n=-\infty}^{\infty} (-1)^n q^{(3n^2-n)/2}
+    .. math:: \exp(-\pi i \tau/12) \eta(\tau) = \sum_{n=-\infty}^{\infty} (-1)^n q^{(3n^2-n)/2}
 
     given `q = \exp(2 \pi i \tau)`, by summing the defining series.
 
@@ -480,7 +480,7 @@ Dedekind eta function
     `\varepsilon(a,b,c,d) = \exp(\pi i R / 12)` is the 24th root of unity in
     the transformation formula for the Dedekind eta function,
 
-    .. math ::
+    .. math::
 
         \eta\left(\frac{a\tau+b}{c\tau+d}\right) = \varepsilon (a,b,c,d)
             \sqrt{c\tau+d} \eta(\tau).
@@ -516,7 +516,7 @@ Modular forms
     Computes the modular discriminant `\Delta(\tau) = \eta(\tau)^{24}`,
     which transforms as
 
-    .. math ::
+    .. math::
 
         \Delta\left(\frac{a\tau+b}{c\tau+d}\right) = (c\tau+d)^{12} \Delta(\tau).
 
@@ -529,13 +529,13 @@ Modular forms
     of Eisenstein series `G_4(\tau), G_6(\tau), G_8(\tau), \ldots`,
     defined by
 
-    .. math ::
+    .. math::
 
         G_{2k}(\tau) = \sum_{m^2 + n^2 \ne 0} \frac{1}{(m+n\tau )^{2k}}
 
     and satisfying
 
-    .. math ::
+    .. math::
 
         G_{2k} \left(\frac{a\tau+b}{c\tau+d}\right) = (c\tau+d)^{2k} G_{2k}(\tau).
 
@@ -567,7 +567,7 @@ Class polynomials
     Sets *res* to the Hilbert class polynomial of discriminant *D*,
     defined as
 
-    .. math ::
+    .. math::
 
         H_D(x) = \prod_{(a,b,c)} \left(x - j\left(\frac{-b+\sqrt{D}}{2a}\right)\right)
 

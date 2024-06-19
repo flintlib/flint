@@ -5,12 +5,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
+#include "n_poly.h"
 #include "nmod_mpoly_factor.h"
-
 
 int n_bpoly_mod_pfrac2(
     n_bpoly_t C1, n_bpoly_t C2,
@@ -22,7 +23,7 @@ int n_bpoly_mod_pfrac2(
     int success;
     slong A_deg1, B1_deg1, B2_deg1, C1_deg1, C2_deg1;
     slong bad_prime_count, bound;
-    mp_limb_t alpha, c;
+    ulong alpha, c;
     n_poly_t Aevalp, B1evalp, B2evalp, C1evalp, C2evalp;
     n_poly_t Aevalm, B1evalm, B2evalm, C1evalm, C2evalm;
     n_poly_t modulus, alphapow, t1, t2;
@@ -115,7 +116,7 @@ choose_prime:
     _n_poly_mod_rem(C1evalp, t2, B1evalp, mod);
     _n_poly_mod_mul(t2, B2evalp, C1evalp, mod);
     n_poly_mod_sub(Aevalp, Aevalp, t2, mod);
-    _n_poly_mod_div(C2evalp, Aevalp, B1evalp, mod);
+    _n_poly_mod_divexact(C2evalp, Aevalp, B1evalp, mod);
 
     if (!n_poly_mod_invmod(t1, B2evalm, B1evalm, mod))
         goto bad_prime;
@@ -123,7 +124,7 @@ choose_prime:
     _n_poly_mod_rem(C1evalm, t2, B1evalm, mod);
     _n_poly_mod_mul(t2, B2evalm, C1evalm, mod);
     n_poly_mod_sub(Aevalm, Aevalm, t2, mod);
-    _n_poly_mod_div(C2evalm, Aevalm, B1evalm, mod);
+    _n_poly_mod_divexact(C2evalm, Aevalm, B1evalm, mod);
 
     /* update interpolants */
     if (n_poly_degree(modulus) > 0)
@@ -162,7 +163,7 @@ choose_prime:
 
 cleanup:
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success == 1)
     {
         n_bpoly_t T1, T2, T3;
@@ -223,7 +224,7 @@ int n_bpoly_mod_pfrac(
 {
     int success;
     slong i, j, bad_prime_count, bound;
-    mp_limb_t alpha, c;
+    ulong alpha, c;
     n_poly_struct Aevalp[1], * Bevalp, * Cevalp;
     n_poly_struct Aevalm[1], * Bevalm, * Cevalm;
     n_poly_t modulus, alphapow, t1, t2;
@@ -402,7 +403,7 @@ choose_prime:
 
 cleanup:
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success == 1)
     {
         n_bpoly_t T1, T2, T3;

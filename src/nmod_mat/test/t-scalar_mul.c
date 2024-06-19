@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -20,7 +20,7 @@ TEST_FUNCTION_START(nmod_mat_scalar_mul, state)
     for (rep = 0; rep < 1000 * flint_test_multiplier(); rep++)
     {
         nmod_mat_t A, B, C, D;
-        mp_limb_t c;
+        ulong c;
 
         m = n_randint(state, 20);
         n = n_randint(state, 20);
@@ -43,22 +43,14 @@ TEST_FUNCTION_START(nmod_mat_scalar_mul, state)
         nmod_mat_sub(D, C, D);
 
         if (!nmod_mat_equal(A, D))
-        {
-            flint_printf("FAIL\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("");
 
         /* Aliasing */
         nmod_mat_scalar_mul(C, A, c);
         nmod_mat_scalar_mul(A, A, c);
 
         if (!nmod_mat_equal(A, C))
-        {
-            flint_printf("FAIL\n");
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("");
 
         nmod_mat_clear(A);
         nmod_mat_clear(B);

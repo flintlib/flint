@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -70,8 +70,7 @@ bernoulli_fmpq_vec_no_cache(fmpq * res, ulong a, slong num)
 {
     if (a > (UWORD(1) << 31) || num > 1000000000)
     {
-        flint_printf("bernoulli_fmpq_vec_no_cache: excessive input\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "bernoulli_fmpq_vec_no_cache: excessive input\n");
     }
 
     if (a == 0 && num <= 128)

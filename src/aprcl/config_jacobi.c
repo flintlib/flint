@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -15,6 +15,7 @@
 # include <math.h>
 #endif
 
+#include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpz_factor.h"
 #include "aprcl.h"
@@ -68,8 +69,7 @@ aprcl_R_value(const fmpz_t n)
     /* 2^5 * 3^3 * 5^2 * 7 * 11 * 13 * 17 * 19 */
     return UWORD(6983776800);
 #else
-    flint_printf("APRCL not supported for huge numbers on 32 bits\n");
-    flint_abort();
+    flint_throw(FLINT_ERROR, "APRCL not supported for huge numbers on 32 bits\n");
     return 0;
 #endif
 }

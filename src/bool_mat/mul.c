@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -23,8 +23,7 @@ bool_mat_mul(bool_mat_t C, const bool_mat_t A, const bool_mat_t B)
 
     if (ac != br || ar != bool_mat_nrows(C) || bc != bool_mat_ncols(C))
     {
-        flint_printf("bool_mat_mul: incompatible dimensions\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "bool_mat_mul: incompatible dimensions\n");
     }
 
     if (br == 0)

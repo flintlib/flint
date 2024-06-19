@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -38,19 +38,17 @@ TEST_FUNCTION_START(flint_mpn_add_inplace_c, state)
 {
     slong iter;
 
-    _flint_rand_init_gmp(state);
-
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
-        mp_limb_t a[10], b[10], c[10];
-        mp_size_t an, bn;
+        ulong a[10], b[10], c[10];
+        slong an, bn;
         unsigned char cf, c1, c2;
 
         bn = 1 + n_randint(state, 4);
         an = bn + n_randint(state, 4);
 
-        flint_mpn_rrandom(a, state->gmp_state, an);
-        flint_mpn_rrandom(b, state->gmp_state, bn);
+        flint_mpn_rrandom(a, state, an);
+        flint_mpn_rrandom(b, state, bn);
         flint_mpn_copyi(c, a, an);
         cf = n_randint(state, 2);
 
@@ -68,10 +66,10 @@ TEST_FUNCTION_START(flint_mpn_add_inplace_c, state)
 
     for (iter = 0; iter < 1000 * flint_test_multiplier(); iter++)
     {
-        mp_limb_t a[8], b[8], c[8], d[8];
+        ulong a[8], b[8], c[8], d[8];
 
-        flint_mpn_rrandom(a, state->gmp_state, 8);
-        flint_mpn_rrandom(b, state->gmp_state, 8);
+        flint_mpn_rrandom(a, state, 8);
+        flint_mpn_rrandom(b, state, 8);
         flint_mpn_copyi(c, a, 8);
         flint_mpn_copyi(d, a, 8);
 

@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mod.h"
 #include "fmpz_mod_mpoly_factor.h"
 
 int fmpz_mod_bpoly_hlift2(
@@ -119,7 +120,7 @@ int fmpz_mod_bpoly_hlift2(
 
 cleanup:
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success > 0)
     {
         fmpz_mod_bpoly_t tp1, tp2;
@@ -344,7 +345,7 @@ int fmpz_mod_bpoly_hlift(
 
 cleanup:
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success > 0)
     {
         fmpz_mod_bpoly_t tp1, tp2;

@@ -5,11 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fmpz.h"
+#include "ulong_extras.h"
 #include "fq_nmod.h"
 #include "fq_nmod_poly.h"
 #include "fq_nmod_poly_factor.h"
@@ -21,7 +22,7 @@ int main(int argc, char *argv[])
     slong i;
 
     {
-        fmpz_t p;
+        ulong p;
         fq_nmod_ctx_t ctx;
         fq_nmod_t lc;
         fq_nmod_poly_t f, g;
@@ -29,12 +30,12 @@ int main(int argc, char *argv[])
         flint_rand_t randstate;
         timeit_t timer;
 
-        flint_randinit(randstate);
+        flint_rand_init(randstate);
 
-        fmpz_init_set_ui(p, UWORD(1) << (SMALL_FMPZ_BITCOUNT_MAX));
-        fmpz_nextprime(p, p, 1);
+        p = UWORD(1) << (SMALL_FMPZ_BITCOUNT_MAX);
+        p = n_nextprime(p, 1);
 
-        fq_nmod_ctx_init(ctx, p, 6, "a");
+        fq_nmod_ctx_init_ui(ctx, p, 6, "a");
 
         fq_nmod_poly_init(f, ctx);
         fq_nmod_poly_init(g, ctx);
@@ -73,9 +74,8 @@ int main(int argc, char *argv[])
         fq_nmod_poly_clear(g, ctx);
         fq_nmod_poly_clear(f, ctx);
         fq_nmod_ctx_clear(ctx);
-        fmpz_clear(p);
 
-        flint_randclear(randstate);
+        flint_rand_clear(randstate);
     }
 
     flint_cleanup_master();

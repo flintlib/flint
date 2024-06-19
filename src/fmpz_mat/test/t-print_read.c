@@ -6,13 +6,19 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 /* try to get fdopen declared */
 #if defined __STRICT_ANSI__
 # undef __STRICT_ANSI__
+#endif
+
+#if defined(__CYGWIN__)
+# define ulong ulongxx
+# include <sys/param.h>
+# undef ulong
 #endif
 
 #if (!defined (__WIN32) || defined(__CYGWIN__)) && !defined(_MSC_VER)
@@ -33,6 +39,8 @@ TEST_FUNCTION_START(fmpz_mat_print_read, state)
     FILE *in, *out;
     int fd[2];
     pid_t childpid;
+
+    fflush(stdout); /* Ensure buffer does not flow into child process */
 
     /* Randomise k mats, write to and read from a pipe */
     {

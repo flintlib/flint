@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -70,7 +70,7 @@ static void
 acb_hypgeom_airy_0f1_sum_inner(acb_t s, acb_srcptr t, slong m, slong n, slong alpha, int real, slong prec)
 {
     slong j, k;
-    mp_limb_t c, chi, clo;
+    ulong c, chi, clo;
 
     acb_zero(s);
 
@@ -287,4 +287,3 @@ acb_hypgeom_airy_direct(acb_t ai, acb_t aip, acb_t bi, acb_t bip, const acb_t z,
     arb_clear(bi0);
     arb_clear(bi1);
 }
-

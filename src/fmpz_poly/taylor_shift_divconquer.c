@@ -6,10 +6,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "thread_pool.h"
 #include "thread_support.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
@@ -161,4 +162,3 @@ fmpz_poly_taylor_shift_divconquer(fmpz_poly_t g, const fmpz_poly_t f,
 
     _fmpz_poly_taylor_shift_divconquer(g->coeffs, c, g->length);
 }
-

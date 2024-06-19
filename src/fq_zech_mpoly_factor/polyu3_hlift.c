@@ -5,14 +5,16 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fq_zech.h"
+#include "fq_zech_poly.h"
+#include "mpoly.h"
 #include "fq_zech_mpoly_factor.h"
 
-
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
 static void fq_zech_polyu_set_fq_zech_polyun(
     fq_zech_polyu_t A,
     const fq_zech_polyun_t B,
@@ -378,10 +380,6 @@ int fq_zech_polyu3n_interp_crt_sm_bpoly(
     return changed;
 }
 
-int fq_zech_next(
-    fq_zech_t a,
-    const fq_zech_ctx_t ctx);
-
 void fq_zech_poly_shift_left_scalar_submul(
     fq_zech_poly_t modulus,
     slong k,
@@ -512,7 +510,7 @@ choose_prime:
 
 cleanup:
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success == 1)
     {
         fq_zech_polyu_t T1, T2, T3;

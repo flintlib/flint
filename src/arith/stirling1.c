@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "longlong.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
@@ -16,18 +17,15 @@
 #include "arith.h"
 
 /* compute single coefficient in polynomial product */
-static void
+FLINT_FORCE_INLINE void
 _fmpz_poly_mulmid_single(fmpz_t res, const fmpz * poly1, slong len1, const fmpz * poly2, slong len2, slong i)
 {
-    slong j, top1, top2;
+    slong top1, top2;
 
     top1 = FLINT_MIN(len1 - 1, i);
     top2 = FLINT_MIN(len2 - 1, i);
 
-    fmpz_mul(res, poly1 + i - top2, poly2 + top2);
-
-    for (j = 1; j < top1 + top2 - i + 1; j++)
-        fmpz_addmul(res, poly1 + i - top2 + j, poly2 + top2 - j);
+    _fmpz_vec_dot_general(res, NULL, 0, poly1 + i - top2, poly2 + i - top1, 1, top1 + top2 - i + 1);
 }
 
 #define MAX_BASECASE 16
@@ -52,7 +50,7 @@ stirling_1u_ogf_bsplit(fmpz * res, ulong a, ulong b, slong len, int which, int f
 
     if (n == 1 || (len <= MAX_BASECASE && n * cbc <= FLINT_BITS))
     {
-        mp_limb_t v[MAX_BASECASE];
+        ulong v[MAX_BASECASE];
         slong i, j;
 
         if (which == 1)
@@ -226,4 +224,3 @@ arith_stirling_number_1_vec(fmpz * row, ulong n, slong klen)
     for (k = (n + 1) % 2; k < klen; k += 2)
         fmpz_neg(row + k, row + k);
 }
-

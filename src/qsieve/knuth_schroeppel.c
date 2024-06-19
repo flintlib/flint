@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -21,26 +21,26 @@
 #endif
 
 /* Array of possible Knuth-Schroeppel multipliers */
-static const mp_limb_t multipliers[] = {1, 2, 3, 5, 6, 7, 10, 11, 13, 14, 15,
+static const ulong multipliers[] = {1, 2, 3, 5, 6, 7, 10, 11, 13, 14, 15,
                                       17, 19, 21, 22, 23, 26, 29, 30, 31,
                                       33, 34, 35, 37, 38, 41, 42, 43, 47};
 
 /* Number of possible Knuth-Schroeppel multipliers */
-#define KS_MULTIPLIERS (sizeof(multipliers)/sizeof(mp_limb_t))
+#define KS_MULTIPLIERS (sizeof(multipliers)/sizeof(ulong))
 
 /*
    Try to compute a multiplier k such that there are a lot of small primes
    which are quadratic residues modulo kn. If a small weight of n is found
    during this process it is returned.
 */
-mp_limb_t qsieve_knuth_schroeppel(qs_t qs_inf)
+ulong qsieve_knuth_schroeppel(qs_t qs_inf)
 {
     float weights[KS_MULTIPLIERS]; /* array of Knuth-Schroeppel weights */
     float best_weight = -10.0f; /* best weight so far */
 
     ulong i, num_primes, max;
     float logpdivp;
-    mp_limb_t nmod8, mod8, p, nmod, pinv, mult;
+    ulong nmod8, mod8, p, nmod, pinv, mult;
     int kron, jac;
     n_primes_t iter;
 
@@ -129,4 +129,3 @@ mp_limb_t qsieve_knuth_schroeppel(qs_t qs_inf)
 
     return 0; /* we didn't find any small factors */
 }
-

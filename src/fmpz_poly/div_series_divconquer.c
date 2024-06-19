@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -27,11 +27,9 @@ _fmpz_poly_div_series_divconquer(fmpz * Q, const fmpz * A, slong Alen,
 
     if (!_fmpz_poly_div(Q, Arev, 2*n - 1, Brev, n, 1))
     {
-        _fmpz_vec_clear(Arev, 2*n - 1);
-        _fmpz_vec_clear(Brev, n);
-
-        flint_printf("Not an exact division\n");
-        flint_abort();
+        _fmpz_vec_clear(Arev, 2*n - 1); /* flint_throw */
+        _fmpz_vec_clear(Brev, n); /* flint_throw */
+        flint_throw(FLINT_ERROR, "Not an exact division\n");
     }
 
     _fmpz_poly_reverse(Q, Q, n, n);
@@ -48,8 +46,7 @@ void fmpz_poly_div_series_divconquer(fmpz_poly_t Q, const fmpz_poly_t A,
 
     if (Blen == 0)
     {
-        flint_printf("Exception (fmpz_poly_div_series_divconquer). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_poly_div_series_divconquer). Division by zero.\n");
     }
 
     if (Alen == 0)
@@ -75,4 +72,3 @@ void fmpz_poly_div_series_divconquer(fmpz_poly_t Q, const fmpz_poly_t A,
     _fmpz_poly_set_length(Q, n);
     _fmpz_poly_normalise(Q);
 }
-

@@ -5,16 +5,20 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
+#include "nmod_poly.h"
+#include "fq_nmod.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "fq_nmod_mpoly.h"
-
 
 void _fq_nmod_mpoly_eval_all_fq_nmod(
     fq_nmod_t eval,
-    const mp_limb_t * Acoeffs,
+    const ulong * Acoeffs,
     const ulong * Aexps,
     slong Alen,
     flint_bitcnt_t Abits,
@@ -31,14 +35,14 @@ void _fq_nmod_mpoly_eval_all_fq_nmod(
     fmpz_t varexp_mp;
     slong * offsets, * shifts;
     n_poly_struct * caches;
-    mp_limb_t * t;
+    ulong * t;
     TMP_INIT;
 
     TMP_START;
 
     fmpz_init(varexp_mp);
 
-    t = (mp_limb_t *) TMP_ALLOC(d*sizeof(mp_limb_t));
+    t = (ulong *) TMP_ALLOC(d*sizeof(ulong));
     caches = (n_poly_struct *) TMP_ALLOC(3*nvars*sizeof(n_poly_struct));
     offsets = (slong *) TMP_ALLOC(2*nvars*sizeof(slong));
     shifts = offsets + nvars;
@@ -108,4 +112,3 @@ void fq_nmod_mpoly_evaluate_all_fq_nmod(fq_nmod_t ev, const fq_nmod_mpoly_t A,
     _fq_nmod_mpoly_eval_all_fq_nmod(ev, A->coeffs, A->exps, A->length, A->bits,
                                                  vals, ctx->minfo, ctx->fqctx);
 }
-

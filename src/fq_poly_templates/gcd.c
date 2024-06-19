@@ -1,12 +1,13 @@
 /*
     Copyright (C) 2013 Mike Hansen
     Copyright (C) 2023 Fredrik Johansson
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -25,7 +26,11 @@ _TEMPLATE(T, poly_gcd) (TEMPLATE(T, struct)*G,
     slong cutoff;
     slong lenG;
 
-    if (fmpz_bits(TEMPLATE(T, ctx_prime) (ctx)) <= 8)
+#if defined(FQ_NMOD_POLY_H) || defined(FQ_ZECH_POLY_H)
+    if (FLINT_BIT_COUNT(TEMPLATE(T, ctx_prime)(ctx)) <= 8)
+#else
+    if (fmpz_bits(TEMPLATE(T, ctx_prime)(ctx)) <= 8)
+#endif
         cutoff = TEMPLATE(CAP_T, POLY_SMALL_GCD_CUTOFF);
     else
         cutoff = TEMPLATE(CAP_T, POLY_GCD_CUTOFF);

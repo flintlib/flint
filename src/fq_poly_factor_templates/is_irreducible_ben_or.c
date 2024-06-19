@@ -1,11 +1,12 @@
 /*
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -45,8 +46,11 @@ TEMPLATE(T, poly_is_irreducible_ben_or) (const TEMPLATE(T, poly_t) f,
 
     /* Compute xq = x^q mod f */
     fmpz_init(q);
-    fmpz_pow_ui(q, TEMPLATE(T, ctx_prime) (ctx),
-                TEMPLATE(T, ctx_degree) (ctx));
+#if defined(FQ_NMOD_POLY_FACTOR_H) || defined(FQ_ZECH_POLY_FACTOR_H)
+    fmpz_ui_pow_ui(q, TEMPLATE(T, ctx_prime)(ctx), TEMPLATE(T, ctx_degree)(ctx));
+#else
+    fmpz_pow_ui(q, TEMPLATE(T, ctx_prime)(ctx), TEMPLATE(T, ctx_degree)(ctx));
+#endif
     TEMPLATE(T, poly_gen) (x, ctx);
     TEMPLATE(T, poly_powmod_fmpz_sliding_preinv) (xq, x, q, 0, v, vinv, ctx);
     TEMPLATE(T, poly_set) (xqimx, xq, ctx);

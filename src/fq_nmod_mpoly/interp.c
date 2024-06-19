@@ -5,12 +5,16 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fq_nmod.h"
+#include "n_poly.h"
+#include "fq_nmod_poly.h"
+#include "mpoly.h"
+#include "nmod_mpoly.h"
 #include "fq_nmod_mpoly.h"
-
 
 /*
     interp_reduce: map from Fp[x] to Fp[x]/poly(x)
@@ -25,12 +29,12 @@
 static void _n_poly_mul_n_fq(
     n_poly_t a,
     const n_poly_t b,
-    const mp_limb_t * c,
+    const ulong * c,
     const fq_nmod_ctx_t ctx)
 {
     slong d = fq_nmod_ctx_degree(ctx);
     n_poly_t C;
-    C->coeffs = (mp_limb_t *) c;
+    C->coeffs = (ulong *) c;
     C->length = d;
     C->alloc = d;
     _n_poly_normalise(C);
@@ -197,7 +201,7 @@ int nmod_mpolyn_interp_crt_lg_poly(
 
         mpoly_monomial_zero(Texps + N*Ti, N);
 
-        if (Fi < Flen && Aexp >= 0 && ((Fexps + N*Fi)[off]>>shift) == Aexp)
+        if (Fi < Flen && Aexp >= 0 && ((Fexps + N*Fi)[off]>>shift) == (ulong) Aexp)
         {
             /* F term ok, A term ok */
             n_poly_mod_rem(evil_cast_nmod_poly_to_n_poly(u), Fcoeffs + Fi,
@@ -221,7 +225,7 @@ int nmod_mpolyn_interp_crt_lg_poly(
                 Aexp--;
             } while (Aexp >= 0 && fq_nmod_is_zero(Acoeff + Aexp, fqctx));
         }
-        else if (Fi < Flen && (Aexp < 0 || ((Fexps + N*Fi)[off]>>shift) > Aexp))
+        else if (Fi < Flen && (Aexp < 0 || ((Fexps + N*Fi)[off]>>shift) > (ulong) Aexp))
         {
             /* F term ok, A term missing */
             n_poly_mod_rem(evil_cast_nmod_poly_to_n_poly(v), Fcoeffs + Fi,
@@ -241,7 +245,7 @@ int nmod_mpolyn_interp_crt_lg_poly(
             (Texps + N*Ti)[off] = (Fexps + N*Fi)[off];
             Fi++;
         }
-        else if (Aexp >= 0 && (Fi >= Flen || ((Fexps + N*Fi)[off]>>shift) < Aexp))
+        else if (Aexp >= 0 && (Fi >= Flen || ((Fexps + N*Fi)[off]>>shift) < (ulong) Aexp))
         {
             /* F term missing, A term ok */
             changed = 1;
@@ -340,9 +344,9 @@ int nmod_mpolyn_interp_crt_lg_bpoly(
     n_poly_struct * Fcoeffs = F->coeffs;
     ulong * Texps = T->exps;
     n_poly_struct * Tcoeffs = T->coeffs;
-    mp_limb_t * u = FLINT_ARRAY_ALLOC(3*lgd, mp_limb_t);
-    mp_limb_t * v = u + lgd;
-    mp_limb_t * inv_m_eval = v + lgd;
+    ulong * u = FLINT_ARRAY_ALLOC(3*lgd, ulong);
+    ulong * v = u + lgd;
+    ulong * inv_m_eval = v + lgd;
     ulong Fexpi, mask;
 
     mask = (-UWORD(1)) >> (FLINT_BITS - F->bits);
@@ -946,7 +950,7 @@ static int nmod_mpolyn_interp_crt_lg_mpoly(
     slong Flen = F->length, Alen = A->length;
     ulong * Fexp = F->exps, * Aexp = A->exps;
     ulong * Texp;
-    mp_limb_t * Acoeff = A->coeffs;
+    ulong * Acoeff = A->coeffs;
     n_poly_struct * Fcoeff = F->coeffs;
     n_poly_struct * Tcoeff;
     fq_nmod_t at;
@@ -1171,17 +1175,17 @@ int nmod_mpolyn_interp_mcrt_lg_mpoly(
     nmod_mpolyn_t H,
     const nmod_mpoly_ctx_t smctx,
     const n_poly_t m,
-    const mp_limb_t * inv_m_eval,
+    const ulong * inv_m_eval,
     fq_nmod_mpoly_t A,
     const fq_nmod_mpoly_ctx_t lgctx)
 {
     slong lastdeg = *lastdeg_;
     slong i, lgd = fq_nmod_ctx_degree(lgctx->fqctx);
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     slong N = mpoly_words_per_exp(A->bits, smctx->minfo);
 #endif
     int changed = 0;
-    mp_limb_t * u = FLINT_ARRAY_ALLOC(lgd, mp_limb_t);
+    ulong * u = FLINT_ARRAY_ALLOC(lgd, ulong);
     n_poly_t w;
 
     n_poly_init(w);
@@ -1233,7 +1237,7 @@ int nmod_mpolyn_CRT_fq_nmod_mpoly(
 {
     slong d = fq_nmod_ctx_degree(ctxp->fqctx);
     slong i;
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     slong N;
 #endif
     int changed = 0;
@@ -1247,7 +1251,7 @@ int nmod_mpolyn_CRT_fq_nmod_mpoly(
 
     FLINT_ASSERT(H->length == A->length);
     FLINT_ASSERT(H->bits == A->bits);
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     N = mpoly_words_per_exp(A->bits, ctx->minfo);
 #endif
     for (i = 0; i < A->length; i++)
@@ -1457,7 +1461,7 @@ int fq_nmod_mpolyn_interp_crt_sm_poly(
 
         mpoly_monomial_zero(Texps + N*Ti, N);
 
-        if (Fi < Flen && Ai >= 0 && ((Fexps + N*Fi)[off]>>shift) == Ai)
+        if (Fi < Flen && Ai >= 0 && ((Fexps + N*Fi)[off]>>shift) == (ulong) Ai)
         {
             /* F term ok, A term ok */
             n_fq_poly_evaluate_fq_nmod(u, Fcoeffs + Fi, alpha, ctx->fqctx);
@@ -1480,7 +1484,7 @@ int fq_nmod_mpolyn_interp_crt_sm_poly(
                 Ai--;
             } while (Ai >= 0 && fq_nmod_is_zero(Acoeff + Ai, ctx->fqctx));
         }
-        else if (Fi < Flen && (Ai < 0 || ((Fexps + N*Fi)[off]>>shift) > Ai))
+        else if (Fi < Flen && (Ai < 0 || ((Fexps + N*Fi)[off]>>shift) > (ulong) Ai))
         {
             /* F term ok, A term missing */
             n_fq_poly_evaluate_fq_nmod(v, Fcoeffs + Fi, alpha, ctx->fqctx);
@@ -1499,7 +1503,7 @@ int fq_nmod_mpolyn_interp_crt_sm_poly(
             (Texps + N*Ti)[off] = (Fexps + N*Fi)[off];
             Fi++;
         }
-        else if (Ai >= 0 && (Fi >= Flen || ((Fexps + N*Fi)[off]>>shift) < Ai))
+        else if (Ai >= 0 && (Fi >= Flen || ((Fexps + N*Fi)[off]>>shift) < (ulong) Ai))
         {
             /* F term missing, A term ok */
             changed = 1;
@@ -1593,7 +1597,7 @@ int fq_nmod_mpolyn_interp_crt_sm_bpoly(
     n_fq_poly_struct * Fcoeffs = F->coeffs;
     ulong * Texps = T->exps;
     n_fq_poly_struct * Tcoeffs = T->coeffs;
-    mp_limb_t * v = FLINT_ARRAY_ALLOC(d, mp_limb_t);
+    ulong * v = FLINT_ARRAY_ALLOC(d, ulong);
     ulong Fexpi, mask;
 
     FLINT_ASSERT(fq_nmod_mpolyn_is_canonical(F, ctx));
@@ -1857,14 +1861,14 @@ int fq_nmod_mpolyn_interp_mcrt_sm_mpoly(
     const fq_nmod_mpoly_ctx_t ctx)
 {
     slong d = fq_nmod_ctx_degree(ctx->fqctx);
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     slong N = mpoly_words_per_exp(A->bits, ctx->minfo);
 #endif
     slong lastdeg = *lastdeg_;
     int changed = 0;
-    mp_limb_t * v = FLINT_ARRAY_ALLOC(d, mp_limb_t);
+    ulong * v = FLINT_ARRAY_ALLOC(d, ulong);
     slong i, Alen = A->length;
-    mp_limb_t * Acoeffs = A->coeffs;
+    ulong * Acoeffs = A->coeffs;
     n_fq_poly_struct * Fcoeffs = F->coeffs;
 
     FLINT_ASSERT(F->bits == A->bits);
@@ -2236,7 +2240,7 @@ int fq_nmod_mpolyn_interp_crt_lg_poly(
 
         mpoly_monomial_zero(Texp + N*Ti, N);
 
-        if (Fi < Flen && Aexp >= 0 && ((Fexp + N*Fi)[off]>>shift) == Aexp)
+        if (Fi < Flen && Aexp >= 0 && ((Fexp + N*Fi)[off]>>shift) == (ulong) Aexp)
         {
             /* F term ok, A term ok */
             bad_fq_nmod_embed_n_fq_sm_to_fq_nmod_lg(u, Fcoeff + Fi, emb);
@@ -2261,7 +2265,7 @@ int fq_nmod_mpolyn_interp_crt_lg_poly(
                 Aexp--;
             } while (Aexp >= 0 && fq_nmod_is_zero(Acoeff + Aexp, ectx->fqctx));
         }
-        else if (Fi < Flen && (Aexp < 0 || ((Fexp + N*Fi)[off]>>shift) > Aexp))
+        else if (Fi < Flen && (Aexp < 0 || ((Fexp + N*Fi)[off]>>shift) > (ulong) Aexp))
         {
             /* F term ok, A term missing */
             bad_fq_nmod_embed_n_fq_sm_to_fq_nmod_lg(v, Fcoeff + Fi, emb);
@@ -2282,7 +2286,7 @@ int fq_nmod_mpolyn_interp_crt_lg_poly(
             (Texp + N*Ti)[off] = (Fexp + N*Fi)[off];
             Fi++;
         }
-        else if (Aexp >= 0 && (Fi >= Flen || ((Fexp + N*Fi)[off]>>shift) < Aexp))
+        else if (Aexp >= 0 && (Fi >= Flen || ((Fexp + N*Fi)[off]>>shift) < (ulong) Aexp))
         {
             /* F term missing, A term ok */
             changed = 1;
@@ -2388,9 +2392,9 @@ int fq_nmod_mpolyn_interp_crt_lg_bpoly(
     n_fq_poly_struct * Fcoeffs = F->coeffs;
     ulong * Texps = T->exps;
     n_fq_poly_struct * Tcoeffs = T->coeffs;
-    mp_limb_t * u = FLINT_ARRAY_ALLOC(3*lgd, mp_limb_t);
-    mp_limb_t * v = u + lgd;
-    mp_limb_t * inv_m_eval = v + lgd;
+    ulong * u = FLINT_ARRAY_ALLOC(3*lgd, ulong);
+    ulong * v = u + lgd;
+    ulong * inv_m_eval = v + lgd;
     n_fq_poly_t u_sm;
     ulong Fexpi, mask;
 
@@ -2919,7 +2923,7 @@ void fq_nmod_mpolyn_interp_lift_sm_mpoly(
     slong i;
     slong N;
     n_fq_poly_struct * Acoeff;
-    mp_limb_t * Bcoeff;
+    ulong * Bcoeff;
     ulong * Aexp, * Bexp;
     slong Blen;
 
@@ -2983,7 +2987,7 @@ int fq_nmod_mpolyn_interp_crt_sm_mpoly(
     slong Flen = F->length, Alen = A->length;
     ulong * Fexp = F->exps, * Aexp = A->exps;
     ulong * Texp;
-    mp_limb_t * Acoeff = A->coeffs;
+    ulong * Acoeff = A->coeffs;
     n_fq_poly_struct * Fcoeff = F->coeffs;
     n_fq_poly_struct * Tcoeff;
     fq_nmod_poly_t tp;
@@ -3329,7 +3333,7 @@ int fq_nmod_mpolyn_interp_crt_lg_mpoly(
     slong Flen = F->length, Alen = A->length;
     ulong * Fexp = F->exps, * Aexp = A->exps;
     ulong * Texp;
-    mp_limb_t * Acoeff = A->coeffs;
+    ulong * Acoeff = A->coeffs;
     n_fq_poly_struct * Fcoeff = F->coeffs;
     n_fq_poly_struct * Tcoeff;
     fq_nmod_t at;
@@ -3581,7 +3585,7 @@ int fq_nmod_mpolyn_interp_mcrt_lg_mpoly(
 {
     slong lgd = fq_nmod_ctx_degree(ectx->fqctx);
     slong i;
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     slong N = mpoly_words_per_exp(A->bits, ctx->minfo);
 #endif
     int changed = 0;
@@ -3663,5 +3667,3 @@ int fq_nmod_mpolyun_interp_mcrt_lg_mpolyu(
     fq_nmod_clear(inv_m_eval, ectx->fqctx);
     return changed;
 }
-
-

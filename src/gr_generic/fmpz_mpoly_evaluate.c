@@ -6,10 +6,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
 #include "gr.h"
 #include "gr_generic.h"
@@ -374,7 +377,7 @@ HornerFormReturn:
 
 /* todo: accept fmpz exponents */
 int
-gr_evaluate_fmpz_mpoly_iter(gr_ptr res, const fmpz_mpoly_t pol, gr_srcptr x, const fmpz_mpoly_ctx_t ctx, gr_ctx_t cactx)
+gr_fmpz_mpoly_evaluate_iter(gr_ptr res, const fmpz_mpoly_t pol, gr_srcptr x, const fmpz_mpoly_ctx_t ctx, gr_ctx_t cactx)
 {
     slong i, j, len, nvars;
     gr_ptr s, t, u;
@@ -430,5 +433,8 @@ gr_evaluate_fmpz_mpoly_iter(gr_ptr res, const fmpz_mpoly_t pol, gr_srcptr x, con
 int
 gr_fmpz_mpoly_evaluate(gr_ptr res, const fmpz_mpoly_t f, gr_srcptr x, const fmpz_mpoly_ctx_t ctx, gr_ctx_t cactx)
 {
-    return gr_fmpz_mpoly_evaluate_horner(res, f, x, ctx, cactx);
+    if (f->length <= 1 && f->bits <= FLINT_BITS)
+        return gr_fmpz_mpoly_evaluate_iter(res, f, x, ctx, cactx);
+    else
+        return gr_fmpz_mpoly_evaluate_horner(res, f, x, ctx, cactx);
 }

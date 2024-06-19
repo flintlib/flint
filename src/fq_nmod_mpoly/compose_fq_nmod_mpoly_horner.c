@@ -5,11 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_vec.h"
+#include "fq_nmod.h"
+#include "mpoly.h"
 #include "fq_nmod_mpoly.h"
 
 typedef struct
@@ -45,7 +48,7 @@ static int _fq_nmod_mpoly_pmul(fq_nmod_mpoly_t A, const fq_nmod_mpoly_t X,
 
     p = fmpz_get_ui(pow);
 
-    if (X->length <= WORD(2) || A->length/p < X->length)
+    if (X->length <= WORD(2) || A->length/p < (ulong) X->length)
     {
         if (!fq_nmod_mpoly_pow_ui(T, X, p, ctx))
         {
@@ -88,7 +91,7 @@ int fq_nmod_mpoly_compose_fq_nmod_mpoly_horner(fq_nmod_mpoly_t A,
     ulong * counts;
     slong Blen = B->length;
     slong * Blist;
-    const mp_limb_t * Bcoeffs = B->coeffs;
+    const ulong * Bcoeffs = B->coeffs;
     ulong * Bexp = B->exps;
     flint_bitcnt_t Bbits = B->bits;
     slong BN = mpoly_words_per_exp(Bbits, ctxB->minfo);
@@ -410,4 +413,3 @@ cleanup:
 
     return success;
 }
-

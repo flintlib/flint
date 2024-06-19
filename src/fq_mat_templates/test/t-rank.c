@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -26,7 +26,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_rank, state)
     {
         m = n_randint(state, 20);
         n = n_randint(state, 20);
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         for (r = 0; r <= FLINT_MIN(m, n); r++)
         {
@@ -50,14 +50,14 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_rank, state)
     {
         m = n_randint(state, 20);
         n = n_randint(state, 20);
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         for (r = 0; r <= FLINT_MIN(m, n); r++)
         {
             d = n_randint(state, 2 * m * n + 1);
             TEMPLATE(T, mat_init) (A, m, n, ctx);
             TEMPLATE(T, mat_randrank) (A, state, r, ctx);
-            TEMPLATE(T, mat_randops) (A, d, state, ctx);
+            TEMPLATE(T, mat_randops) (A, state, d, ctx);
             if (r != TEMPLATE(T, mat_rank) (A, ctx))
             {
                 flint_printf("FAIL:\n");

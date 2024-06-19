@@ -5,12 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "profiler.h"
-#include "flint.h"
 #include "ulong_extras.h"
 #include "nmod.h"
 #include "nmod_vec.h"
@@ -22,13 +21,13 @@ typedef struct
 
 void sample(void * arg, ulong count)
 {
-   mp_limb_t n;
+   ulong n;
    nmod_t mod;
    info_t * info = (info_t *) arg;
    flint_bitcnt_t bits = info->bits;
-   mp_ptr vec = _nmod_vec_init(1000);
-   mp_ptr vec2 = _nmod_vec_init(1000);
-   mp_size_t j;
+   nn_ptr vec = _nmod_vec_init(1000);
+   nn_ptr vec2 = _nmod_vec_init(1000);
+   slong j;
    slong i;
    FLINT_TEST_INIT(state);
 
@@ -47,7 +46,7 @@ void sample(void * arg, ulong count)
    }
    prof_stop();
 
-   flint_randclear(state);
+   flint_rand_clear(state);
    _nmod_vec_clear(vec);
    _nmod_vec_clear(vec2);
 }

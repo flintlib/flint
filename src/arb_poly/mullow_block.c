@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -114,7 +114,7 @@ _mag_vec_get_fmpz_2exp_blocks(fmpz * coeffs,
 
     maxheight = ALPHA * MAG_BITS + BETA;
     if (maxheight > DOUBLE_BLOCK_MAX_HEIGHT)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s): maxheight > DOUBLE_BLOCK_MAX_HEIGHT\n", __func__);
 
     for (i = 0; i < len; i++)
     {
@@ -184,7 +184,7 @@ _mag_vec_get_fmpz_2exp_blocks(fmpz * coeffs,
             }
             else
             {
-                mp_limb_t man;
+                ulong man;
                 double c;
 
                 man = MAG_MAN(cur);
@@ -198,14 +198,15 @@ _mag_vec_get_fmpz_2exp_blocks(fmpz * coeffs,
                 fmpz_sub_ui(t, t, MAG_BITS); /* bottom exponent */
                 s = _fmpz_sub_small(t, exps + i);
 
-                if (s < 0) flint_abort(); /* Bug catcher */
+                if (s < 0)
+                    flint_throw(FLINT_ERROR, "(%s): s < 0\n", __func__);
 
                 fmpz_set_ui(coeffs + j, man);
                 fmpz_mul_2exp(coeffs + j, coeffs + j, s);
                 c = man;
                 c = ldexp(c, s - DOUBLE_BLOCK_SHIFT);
                 if (c < 1e-150 || c > 1e150) /* Bug catcher */
-                    flint_abort();
+                    flint_throw(FLINT_ERROR, "(%s): c large or big\n", __func__);
                 dblcoeffs[j] = c;
             }
         }
@@ -315,7 +316,8 @@ _arb_vec_get_fmpz_2exp_blocks(fmpz * coeffs, fmpz * exps,
                 fmpz_mul_ui(t, scale, j);
                 fmpz_sub(t, bot, t);
                 s = _fmpz_sub_small(t, exps + i);
-                if (s < 0) flint_abort(); /* Bug catcher */
+                if (s < 0)
+                    flint_throw(FLINT_ERROR, "(%s): s < 0\n", __func__);
                 fmpz_mul_2exp(coeffs + j, coeffs + j, s);
             }
         }
@@ -670,4 +672,3 @@ arb_poly_mullow_block(arb_poly_t res, const arb_poly_t poly1,
     _arb_poly_set_length(res, zlen);
     _arb_poly_normalise(res);
 }
-

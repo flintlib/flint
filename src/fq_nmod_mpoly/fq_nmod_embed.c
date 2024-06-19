@@ -5,12 +5,17 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
 #include "nmod_mat.h"
+#include "fmpz.h"
+#include "fq_nmod.h"
+#include "fq_nmod_poly.h"
 #include "fq_nmod_poly_factor.h"
+#include "n_poly.h"
 #include "fq_nmod_mpoly.h"
 
 /*
@@ -102,7 +107,7 @@ static void _set_matrices(bad_fq_nmod_embed_t cur)
     slong n = fq_nmod_ctx_degree(cur->lgctx);
     slong i;
     n_fq_poly_t phi_as_n_fq_poly, phi_pow, q;
-    mp_limb_t ** Mrows = cur->lg_to_sm_mat->rows;
+    ulong ** Mrows = cur->lg_to_sm_mat->rows;
 
     n_fq_poly_init(phi_as_n_fq_poly);
     n_fq_poly_init(phi_pow);
@@ -154,8 +159,8 @@ void bad_fq_nmod_embed_array_init(bad_fq_nmod_embed_struct * emb,
     nmod_mat_t M, Msol;
     fq_nmod_t biggen;
     fmpz_t P;
-    mp_limb_t lc_inv;
-    mp_limb_t p = smallctx->modulus->mod.n;
+    ulong lc_inv;
+    ulong p = smallctx->modulus->mod.n;
     slong n, m = nmod_poly_degree(smallctx->modulus);
 
     /* n is the degree of the extension */
@@ -341,7 +346,7 @@ void bad_fq_nmod_embed_array_init(bad_fq_nmod_embed_struct * emb,
 /* just matrix-vector multiplication */
 void bad_n_fq_embed_lg_to_sm(
     n_fq_poly_t out,        /* poly over smctx */
-    const mp_limb_t * in,   /* element of lgctx */
+    const ulong * in,   /* element of lgctx */
     const bad_fq_nmod_embed_t emb)
 {
     slong smd = fq_nmod_ctx_degree(emb->smctx);
@@ -357,7 +362,7 @@ void bad_n_fq_embed_lg_to_sm(
     out->length = emb->h->length - 1;
     _n_fq_poly_normalise(out, smd);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         fq_nmod_t in_;
         fq_nmod_poly_t out_, out_check;
@@ -426,7 +431,7 @@ void bad_fq_nmod_embed_fq_nmod_lg_to_n_fq_sm(
 
 /* just matrix-vector multiplication */
 void bad_n_fq_embed_sm_to_lg(
-    mp_limb_t * out,        /* element of lgctx */
+    ulong * out,        /* element of lgctx */
     const n_fq_poly_t in,   /* poly over smctx */
     const bad_fq_nmod_embed_t emb)
 {
@@ -455,7 +460,7 @@ void bad_n_fq_embed_sm_to_lg(
 
     n_poly_stack_clear(St);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         fq_nmod_t out_, out_check;
         fq_nmod_poly_t in_;
@@ -532,8 +537,8 @@ void bad_fq_nmod_embed_n_fq_sm_to_fq_nmod_lg(
 /**************** convert Fp[theta]/f(theta) to Fp[phi]/g(phi) ***************/
 
 void bad_n_fq_embed_sm_elem_to_lg(
-    mp_limb_t * out,
-    const mp_limb_t * in,
+    ulong * out,
+    const ulong * in,
     const bad_fq_nmod_embed_t emb)
 {
     slong smd = fq_nmod_ctx_degree(emb->smctx);
@@ -579,7 +584,7 @@ bad_fq_nmod_mpoly_embed_chooser_init(bad_fq_nmod_mpoly_embed_chooser_t embc,
 {
     nmod_poly_t ext_modulus;
     fq_nmod_ctx_t ext_fqctx;
-    mp_limb_t p = ctx->fqctx->modulus->mod.n;
+    ulong p = ctx->fqctx->modulus->mod.n;
     slong m = nmod_poly_degree(ctx->fqctx->modulus);
     slong n;
 
@@ -609,8 +614,8 @@ bad_fq_nmod_mpoly_embed_chooser_init(bad_fq_nmod_mpoly_embed_chooser_t embc,
 
 void
 bad_fq_nmod_mpoly_embed_chooser_clear(bad_fq_nmod_mpoly_embed_chooser_t embc,
-                  fq_nmod_mpoly_ctx_t ectx, const fq_nmod_mpoly_ctx_t ctx,
-                                                        flint_rand_t randstate)
+                  fq_nmod_mpoly_ctx_t ectx, const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx),
+                                                        flint_rand_t FLINT_UNUSED(randstate))
 {
     bad_fq_nmod_embed_array_clear(embc->embed, embc->m);
     fq_nmod_mpoly_ctx_clear(ectx);
@@ -625,7 +630,7 @@ bad_fq_nmod_mpoly_embed_chooser_next(bad_fq_nmod_mpoly_embed_chooser_t embc,
 {
     nmod_poly_t ext_modulus;
     fq_nmod_ctx_t ext_fqctx;
-    mp_limb_t p = embc->p;
+    ulong p = embc->p;
     slong m = embc->m;
     slong n = embc->n;
 

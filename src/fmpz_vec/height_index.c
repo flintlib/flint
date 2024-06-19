@@ -5,11 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include <gmp.h>
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
@@ -23,7 +23,7 @@ _fmpz_vec_height_index(const fmpz * vec, slong len)
     else
     {
         fmpz c;
-        mp_srcptr max_d;
+        nn_srcptr max_d;
         slong max_mpz_limbs, i, max_i, max_coeff, mpz_limbs;
 
         max_coeff = 0;
@@ -44,7 +44,7 @@ _fmpz_vec_height_index(const fmpz * vec, slong len)
             }
             else
             {
-                __mpz_struct * mc = COEFF_TO_PTR(c);
+                mpz_ptr mc = COEFF_TO_PTR(c);
                 max_d = mc->_mp_d;
                 max_mpz_limbs = mc->_mp_size;
                 max_mpz_limbs = FLINT_ABS(max_mpz_limbs);
@@ -61,7 +61,7 @@ _fmpz_vec_height_index(const fmpz * vec, slong len)
             /* we have found at least one mpz, so only look for those */
             if (COEFF_IS_MPZ(c))
             {
-                __mpz_struct * mc = COEFF_TO_PTR(c);
+                mpz_ptr mc = COEFF_TO_PTR(c);
                 mpz_limbs = mc->_mp_size;
                 mpz_limbs = FLINT_ABS(mpz_limbs);
                 if (mpz_limbs > max_mpz_limbs ||

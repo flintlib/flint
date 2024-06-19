@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -22,7 +22,7 @@ TEST_FUNCTION_START(n_cbrt_chebyshev_approx, state)
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        mp_limb_t n, val, ans;
+        ulong n, val, ans;
         mpz_t mpz_n, mpz_val;
 
         mpz_init(mpz_n);
@@ -37,12 +37,8 @@ TEST_FUNCTION_START(n_cbrt_chebyshev_approx, state)
 
         result = (val == ans);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("n = %wu, val = %wd, ans = %wu\n", n, val, ans);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("n = %wu, val = %wd, ans = %wu\n", n, val, ans);
+
         mpz_clear(mpz_n);
         mpz_clear(mpz_val);
     }
@@ -50,7 +46,7 @@ TEST_FUNCTION_START(n_cbrt_chebyshev_approx, state)
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        mp_limb_t n, val, ans, bits;
+        ulong n, val, ans, bits;
         mpz_t mpz_n, mpz_val;
 
         mpz_init(mpz_n);
@@ -68,12 +64,8 @@ TEST_FUNCTION_START(n_cbrt_chebyshev_approx, state)
 
         result = (val == ans);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("n = %wu, val = %wd, ans = %wu\n", n, val, ans);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("n = %wu, val = %wd, ans = %wu\n", n, val, ans);
+
         mpz_clear(mpz_n);
         mpz_clear(mpz_val);
     }
@@ -82,7 +74,7 @@ TEST_FUNCTION_START(n_cbrt_chebyshev_approx, state)
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        mp_limb_t n, val, ans, bits;
+        ulong n, val, ans, bits;
         mpz_t mpz_n, mpz_val;
 
         mpz_init(mpz_n);
@@ -100,12 +92,8 @@ TEST_FUNCTION_START(n_cbrt_chebyshev_approx, state)
 
         result = (val == ans);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("n = %wu, val = %wd, ans = %wu\n", n, val, ans);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("n = %wu, val = %wd, ans = %wu\n", n, val, ans);
+
         mpz_clear(mpz_n);
         mpz_clear(mpz_val);
     }
@@ -114,7 +102,7 @@ TEST_FUNCTION_START(n_cbrt_chebyshev_approx, state)
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        mp_limb_t n, val, ans, bits;
+        ulong n, val, ans, bits;
         mpz_t mpz_n, mpz_val;
 
         mpz_init(mpz_n);
@@ -132,12 +120,8 @@ TEST_FUNCTION_START(n_cbrt_chebyshev_approx, state)
 
         result = (val == ans);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("n = %wu, val = %wd, ans = %wu\n", n, val, ans);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("n = %wu, val = %wd, ans = %wu\n", n, val, ans);
+
         mpz_clear(mpz_n);
         mpz_clear(mpz_val);
     }

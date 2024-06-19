@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -61,8 +61,7 @@ _arb_log_precompute_reductions(short * rel, double * eps, arb_srcptr alpha, slon
 
             if (!arb_get_unique_fmpz(fmpz_mat_entry(M, j, n), x))
             {
-                flint_printf("failure\n");
-                flint_abort();
+                flint_throw(FLINT_ERROR, "failure\n");
             }
         }
 

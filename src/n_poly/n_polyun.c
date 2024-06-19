@@ -5,14 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly_factor.h"
-#include "mpn_extras.h"
-#include "nmod_vec.h"
-
+#include "n_poly.h"
 
 int n_polyun_mod_is_canonical(const n_polyun_t A, nmod_t mod)
 {

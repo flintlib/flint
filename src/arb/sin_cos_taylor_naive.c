@@ -5,19 +5,20 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "arb.h"
+#include "mpn_extras.h"
 
 void
-_arb_sin_cos_taylor_naive(mp_ptr ysin, mp_ptr ycos, mp_limb_t * error,
-    mp_srcptr x, mp_size_t xn, ulong N)
+_arb_sin_cos_taylor_naive(nn_ptr ysin, nn_ptr ycos, ulong * error,
+    nn_srcptr x, slong xn, ulong N)
 {
     ulong k;
-    mp_ptr s, s2, t, u, v;
-    mp_size_t nn = xn + 1;
+    nn_ptr s, s2, t, u, v;
+    slong nn = xn + 1;
 
     if (N == 0)
     {
@@ -27,11 +28,11 @@ _arb_sin_cos_taylor_naive(mp_ptr ysin, mp_ptr ycos, mp_limb_t * error,
         return;
     }
 
-    s = flint_malloc(sizeof(mp_limb_t) * (nn + 1));
-    s2 = flint_malloc(sizeof(mp_limb_t) * (nn + 1));
-    t = flint_malloc(sizeof(mp_limb_t) * nn);
-    v = flint_malloc(sizeof(mp_limb_t) * nn);
-    u = flint_malloc(sizeof(mp_limb_t) * 2 * nn);
+    s = flint_malloc(sizeof(ulong) * (nn + 1));
+    s2 = flint_malloc(sizeof(ulong) * (nn + 1));
+    t = flint_malloc(sizeof(ulong) * nn);
+    v = flint_malloc(sizeof(ulong) * nn);
+    u = flint_malloc(sizeof(ulong) * 2 * nn);
 
     /* s = 1 */
     flint_mpn_zero(s, nn);
@@ -56,7 +57,7 @@ _arb_sin_cos_taylor_naive(mp_ptr ysin, mp_ptr ycos, mp_limb_t * error,
             s2[nn] -= mpn_sub_n(s2, s2, t, nn);
 
         /* t = t * x / (k + 1) */
-        mpn_mul_n(u, t, v, nn);
+        flint_mpn_mul_n(u, t, v, nn);
         flint_mpn_copyi(t, u + nn, nn);
         mpn_divrem_1(t, 0, t, nn, k + 1);
     }
@@ -80,4 +81,3 @@ _arb_sin_cos_taylor_naive(mp_ptr ysin, mp_ptr ycos, mp_limb_t * error,
     flint_free(u);
     flint_free(v);
 }
-

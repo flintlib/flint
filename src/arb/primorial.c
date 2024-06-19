@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -18,10 +18,10 @@ static int
 basecase(arb_t res, n_primes_t primes, ulong a, ulong b, ulong nmax, slong prec)
 {
     ulong n, p, pp;
-    mp_limb_t prod[NUM_BASECASE];
-    mp_limb_t top;
-    mp_size_t nlimbs;
-    mp_limb_t hi, lo;
+    ulong prod[NUM_BASECASE];
+    ulong top;
+    slong nlimbs;
+    ulong hi, lo;
     int inexact, more;
     slong shift;
 
@@ -167,4 +167,3 @@ arb_primorial_ui(arb_t res, ulong n, slong prec)
         n_primes_clear(primes);
     }
 }
-

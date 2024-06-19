@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -18,6 +18,8 @@
 #define ARF_INLINE static inline
 #endif
 
+#include <gmp.h>
+#include "longlong.h"
 #include "mag.h"
 #include "arf_types.h"
 
@@ -98,7 +100,7 @@ arf_rnd_to_mpfr(arf_rnd_t rnd)
 #define ARF_XSIZE(x) ((x)->size)
 
 /* Construct size field value from size in limbs and sign bit. */
-#define ARF_MAKE_XSIZE(size, sgnbit) ((((mp_size_t) size) << 1) | (sgnbit))
+#define ARF_MAKE_XSIZE(size, sgnbit) ((((slong) size) << 1) | (sgnbit))
 
 /* The limb size, and the sign bit. */
 #define ARF_SIZE(x) (ARF_XSIZE(x) >> 1)
@@ -127,7 +129,7 @@ arf_rnd_to_mpfr(arf_rnd_t rnd)
     } while (0)
 
 
-void _arf_promote(arf_t x, mp_size_t n);
+void _arf_promote(arf_t x, slong n);
 
 void _arf_demote(arf_t x);
 
@@ -152,8 +154,8 @@ void _arf_demote(arf_t x);
 /* Assumes non-special! */
 #define ARF_GET_TOP_LIMB(lmb, x)                     \
     do {                                             \
-        mp_srcptr __xptr;                            \
-        mp_size_t __xn;                              \
+        nn_srcptr __xptr;                            \
+        slong __xn;                              \
         ARF_GET_MPN_READONLY(__xptr, __xn, (x));     \
         (lmb) = __xptr[__xn - 1];                    \
     } while (0)
@@ -161,7 +163,7 @@ void _arf_demote(arf_t x);
 /* Get mpn pointer xptr for writing *exactly* xn limbs to x. */
 #define ARF_GET_MPN_WRITE(xptr, xn, x)                      \
     do {                                                    \
-        mp_size_t __xn = (xn);                              \
+        slong __xn = (xn);                              \
         if ((__xn) <= ARF_NOPTR_LIMBS)                      \
         {                                                   \
             ARF_DEMOTE(x);                                  \
@@ -175,9 +177,9 @@ void _arf_demote(arf_t x);
             }                                               \
             else if (ARF_PTR_ALLOC(x) < (__xn))             \
             {                                               \
-                ARF_PTR_D(x) = (mp_ptr)                     \
+                ARF_PTR_D(x) = (nn_ptr)                     \
                         flint_realloc(ARF_PTR_D(x),         \
-                        (xn) * sizeof(mp_limb_t));          \
+                        (xn) * sizeof(ulong));          \
                 ARF_PTR_ALLOC(x) = (__xn);                  \
             }                                               \
             xptr = ARF_PTR_D(x);                            \
@@ -420,7 +422,7 @@ arf_init_neg_shallow(arf_t z, const arf_t x)
 ARF_INLINE void
 arf_init_set_mag_shallow(arf_t y, const mag_t x)
 {
-    mp_limb_t t = MAG_MAN(x);
+    ulong t = MAG_MAN(x);
     ARF_XSIZE(y) = ARF_MAKE_XSIZE(t != 0, 0);
     ARF_EXP(y) = MAG_EXP(x);
     ARF_NOPTR_D(y)[0] = t << (FLINT_BITS - MAG_BITS);
@@ -451,7 +453,7 @@ arf_mag_cmpabs(const mag_t x, const arf_t y)
 
 /* Assumes xn > 0, x[xn-1] != 0. */
 /* TBD: 1, 2 limb versions */
-void arf_set_mpn(arf_t y, mp_srcptr x, mp_size_t xn, int sgnbit);
+void arf_set_mpn(arf_t y, nn_srcptr x, slong xn, int sgnbit);
 
 ARF_INLINE void
 arf_set_mpz(arf_t y, const mpz_t x)
@@ -475,10 +477,10 @@ arf_set_fmpz(arf_t y, const fmpz_t x)
 
 int _arf_set_round_ui(arf_t x, ulong v, int sgnbit, slong prec, arf_rnd_t rnd);
 
-int _arf_set_round_uiui(arf_t z, slong * fix, mp_limb_t hi, mp_limb_t lo, int sgnbit, slong prec, arf_rnd_t rnd);
+int _arf_set_round_uiui(arf_t z, slong * fix, ulong hi, ulong lo, int sgnbit, slong prec, arf_rnd_t rnd);
 
 int
-_arf_set_round_mpn(arf_t y, slong * exp_shift, mp_srcptr x, mp_size_t xn,
+_arf_set_round_mpn(arf_t y, slong * exp_shift, nn_srcptr x, slong xn,
     int sgnbit, slong prec, arf_rnd_t rnd);
 
 ARF_INLINE int
@@ -571,8 +573,8 @@ arf_bits(const arf_t x)
         return 0;
     else
     {
-        mp_srcptr xp;
-        mp_size_t xn;
+        nn_srcptr xp;
+        slong xn;
         slong c;
 
         ARF_GET_MPN_READONLY(xp, xn, x);
@@ -672,10 +674,10 @@ void arf_frexp(arf_t man, fmpz_t exp, const arf_t x);
 
 void arf_get_fmpz_2exp(fmpz_t man, fmpz_t exp, const arf_t x);
 
-int _arf_get_integer_mpn(mp_ptr y, mp_srcptr x, mp_size_t xn, slong exp);
+int _arf_get_integer_mpn(nn_ptr y, nn_srcptr x, slong xn, slong exp);
 
-int _arf_set_mpn_fixed(arf_t z, mp_srcptr xp, mp_size_t xn,
-        mp_size_t fixn, int negative, slong prec, arf_rnd_t rnd);
+int _arf_set_mpn_fixed(arf_t z, nn_srcptr xp, slong xn,
+        slong fixn, int negative, slong prec, arf_rnd_t rnd);
 
 int arf_get_fmpz(fmpz_t z, const arf_t x, arf_rnd_t rnd);
 
@@ -719,7 +721,7 @@ void arf_urandom(arf_t x, flint_rand_t state, slong bits, arf_rnd_t rnd);
 
 #define MUL_MPFR_MIN_LIMBS 25
 
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
 #define MUL_MPFR_MAX_LIMBS 800
 #else
 #define MUL_MPFR_MAX_LIMBS 10000
@@ -728,13 +730,13 @@ void arf_urandom(arf_t x, flint_rand_t state, slong bits, arf_rnd_t rnd);
 #define ARF_MUL_STACK_ALLOC 40
 #define ARF_MUL_TLS_ALLOC 1000
 
-extern FLINT_TLS_PREFIX mp_ptr __arf_mul_tmp;
+extern FLINT_TLS_PREFIX nn_ptr __arf_mul_tmp;
 extern FLINT_TLS_PREFIX slong __arf_mul_alloc;
 
 extern void _arf_mul_tmp_cleanup(void);
 
 #define ARF_MUL_TMP_DECL \
-    mp_limb_t tmp_stack[ARF_MUL_STACK_ALLOC]; \
+    ulong tmp_stack[ARF_MUL_STACK_ALLOC]; \
 
 #define ARF_MUL_TMP_ALLOC(tmp, alloc) \
     if (alloc <= ARF_MUL_STACK_ALLOC) \
@@ -749,14 +751,14 @@ extern void _arf_mul_tmp_cleanup(void);
             { \
                 flint_register_cleanup_function(_arf_mul_tmp_cleanup); \
             } \
-            __arf_mul_tmp = flint_realloc(__arf_mul_tmp, sizeof(mp_limb_t) * alloc); \
+            __arf_mul_tmp = flint_realloc(__arf_mul_tmp, sizeof(ulong) * alloc); \
             __arf_mul_alloc = alloc; \
         } \
         tmp = __arf_mul_tmp; \
     } \
     else \
     { \
-        tmp = flint_malloc(sizeof(mp_limb_t) * alloc); \
+        tmp = flint_malloc(sizeof(ulong) * alloc); \
     }
 
 #define ARF_MUL_TMP_FREE(tmp, alloc) \
@@ -824,13 +826,13 @@ arf_mul_fmpz(arf_ptr z, arf_srcptr x, const fmpz_t y, slong prec, arf_rnd_t rnd)
 #define ARF_ADD_STACK_ALLOC 40
 #define ARF_ADD_TLS_ALLOC 1000
 
-extern FLINT_TLS_PREFIX mp_ptr __arf_add_tmp;
+extern FLINT_TLS_PREFIX nn_ptr __arf_add_tmp;
 extern FLINT_TLS_PREFIX slong __arf_add_alloc;
 
 extern void _arf_add_tmp_cleanup(void);
 
 #define ARF_ADD_TMP_DECL \
-    mp_limb_t tmp_stack[ARF_ADD_STACK_ALLOC]; \
+    ulong tmp_stack[ARF_ADD_STACK_ALLOC]; \
 
 #define ARF_ADD_TMP_ALLOC(tmp, alloc) \
     if (alloc <= ARF_ADD_STACK_ALLOC) \
@@ -845,22 +847,22 @@ extern void _arf_add_tmp_cleanup(void);
             { \
                 flint_register_cleanup_function(_arf_add_tmp_cleanup); \
             } \
-            __arf_add_tmp = flint_realloc(__arf_add_tmp, sizeof(mp_limb_t) * alloc); \
+            __arf_add_tmp = flint_realloc(__arf_add_tmp, sizeof(ulong) * alloc); \
             __arf_add_alloc = alloc; \
         } \
         tmp = __arf_add_tmp; \
     } \
     else \
     { \
-        tmp = flint_malloc(sizeof(mp_limb_t) * alloc); \
+        tmp = flint_malloc(sizeof(ulong) * alloc); \
     }
 
 #define ARF_ADD_TMP_FREE(tmp, alloc) \
     if (alloc > ARF_ADD_TLS_ALLOC) \
         flint_free(tmp);
 
-int _arf_add_mpn(arf_t z, mp_srcptr xp, mp_size_t xn, int xsgnbit,
-    const fmpz_t xexp, mp_srcptr yp, mp_size_t yn, int ysgnbit,
+int _arf_add_mpn(arf_t z, nn_srcptr xp, slong xn, int xsgnbit,
+    const fmpz_t xexp, nn_srcptr yp, slong yn, int ysgnbit,
     flint_bitcnt_t shift, slong prec, arf_rnd_t rnd);
 
 int arf_add(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec, arf_rnd_t rnd);
@@ -1062,8 +1064,8 @@ mag_fast_init_set_arf(mag_t y, const arf_t x)
     }
     else
     {
-        mp_srcptr xp;
-        mp_size_t xn;
+        nn_srcptr xp;
+        slong xn;
 
         ARF_GET_MPN_READONLY(xp, xn, x);
 
@@ -1085,8 +1087,7 @@ arf_mag_add_ulp(mag_t z, const mag_t x, const arf_t y, slong prec)
 {
     if (ARF_IS_SPECIAL(y))
     {
-        flint_printf("error: ulp error not defined for special value!\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "error: ulp error not defined for special value!\n");
     }
     else if (MAG_IS_LAGOM(z) && MAG_IS_LAGOM(x) && ARF_IS_LAGOM(y))
     {
@@ -1107,8 +1108,7 @@ arf_mag_set_ulp(mag_t z, const arf_t y, slong prec)
 {
     if (ARF_IS_SPECIAL(y))
     {
-        flint_printf("error: ulp error not defined for special value!\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "error: ulp error not defined for special value!\n");
     }
     else
     {
@@ -1148,7 +1148,7 @@ arf_allocated_bytes(const arf_t x)
     slong size = fmpz_allocated_bytes(ARF_EXPREF(x));
 
     if (ARF_HAS_PTR(x))
-        size += ARF_PTR_ALLOC(x) * sizeof(mp_limb_t);
+        size += ARF_PTR_ALLOC(x) * sizeof(ulong);
 
     return size;
 }
@@ -1169,4 +1169,3 @@ void arf_approx_dot(arf_t res, const arf_t initial, int subtract,
 #endif
 
 #endif
-

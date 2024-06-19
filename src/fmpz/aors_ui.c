@@ -7,11 +7,10 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "gmpcompat.h"
 #include "fmpz.h"
 
@@ -37,7 +36,7 @@ fmpz_add_ui(fmpz_t res, const fmpz_t x, ulong y)
             }
             else
             {
-                __mpz_struct * mpz_res = _fmpz_promote(res);
+                mpz_ptr mpz_res = _fmpz_promote(res);
                 flint_mpz_set_si(mpz_res, b);
             }
 #else
@@ -56,10 +55,10 @@ fmpz_add_ui(fmpz_t res, const fmpz_t x, ulong y)
     {
         mpz_ptr rp;
         mpz_srcptr xp;
-        mp_ptr rd;
-        mp_srcptr xd;
-        mp_size_t xn_signed, xn;
-        mp_limb_t cy;
+        nn_ptr rd;
+        nn_srcptr xd;
+        slong xn_signed, xn;
+        ulong cy;
 
         xp = COEFF_TO_PTR(*x);
         xn_signed = xp->_mp_size;
@@ -70,10 +69,7 @@ fmpz_add_ui(fmpz_t res, const fmpz_t x, ulong y)
         else
             rp = _fmpz_promote_val(res);
 
-        if (rp->_mp_alloc < xn + 1)
-            _mpz_realloc(rp, xn + 1);
-
-        rd = rp->_mp_d;
+        rd = FLINT_MPZ_REALLOC(rp, xn + 1);
         xd = xp->_mp_d;
 
         if (xn_signed >= 0) /* positive + nonnegative */
@@ -150,7 +146,7 @@ fmpz_sub_ui(fmpz_t res, const fmpz_t x, ulong y)
             }
             else
             {
-                __mpz_struct * mpz_res = _fmpz_promote(res);
+                mpz_ptr mpz_res = _fmpz_promote(res);
                 flint_mpz_set_si(mpz_res, b);
             }
 #else
@@ -169,10 +165,10 @@ fmpz_sub_ui(fmpz_t res, const fmpz_t x, ulong y)
     {
         mpz_ptr rp;
         mpz_srcptr xp;
-        mp_ptr rd;
-        mp_srcptr xd;
-        mp_size_t xn_signed, xn;
-        mp_limb_t cy;
+        nn_ptr rd;
+        nn_srcptr xd;
+        slong xn_signed, xn;
+        ulong cy;
 
         xp = COEFF_TO_PTR(*x);
         xn_signed = xp->_mp_size;
@@ -183,10 +179,7 @@ fmpz_sub_ui(fmpz_t res, const fmpz_t x, ulong y)
         else
             rp = _fmpz_promote_val(res);
 
-        if (rp->_mp_alloc < xn + 1)
-            _mpz_realloc(rp, xn + 1);
-
-        rd = rp->_mp_d;
+        rd = FLINT_MPZ_REALLOC(rp, xn + 1);
         xd = xp->_mp_d;
 
         if (xn_signed <= 0) /* positive + nonnegative */

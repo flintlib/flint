@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -224,8 +224,7 @@ _arb_atan_sum_bs_powtab(fmpz_t T, fmpz_t Q, flint_bitcnt_t * Qexp,
         }
         else
         {
-            flint_printf("power table has the wrong structure!\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "power table has the wrong structure!\n");
         }
     }
 
@@ -237,4 +236,3 @@ _arb_atan_sum_bs_powtab(fmpz_t T, fmpz_t Q, flint_bitcnt_t * Qexp,
     _fmpz_vec_clear(xpow, length);
     flint_free(xexp);
 }
-

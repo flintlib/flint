@@ -5,11 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fmpz_mat.h"
+#include "arb.h"
 #include "arb_mat.h"
 
 int arb_mat_is_lagom(const arb_mat_t A)
@@ -142,8 +143,7 @@ arb_mat_mid_addmul_block_prescaled(arb_mat_t C,
 
                     if (inexact)
                     {
-                        flint_printf("matrix multiplication: bad exponent!\n");
-                        flint_abort();
+                        flint_throw(FLINT_ERROR, "matrix multiplication: bad exponent!\n");
                     }
                 }
             }
@@ -160,8 +160,7 @@ arb_mat_mid_addmul_block_prescaled(arb_mat_t C,
 
                     if (inexact)
                     {
-                        flint_printf("matrix multiplication: bad exponent!\n");
-                        flint_abort();
+                        flint_throw(FLINT_ERROR, "matrix multiplication: bad exponent!\n");
                     }
                 }
             }
@@ -224,8 +223,7 @@ arb_mat_mul_block(arb_mat_t C, const arb_mat_t A, const arb_mat_t B, slong prec)
 
     if (N != arb_mat_nrows(B) || M != arb_mat_nrows(C) || P != arb_mat_ncols(C))
     {
-        flint_printf("arb_mat_mul_block: incompatible dimensions\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "arb_mat_mul_block: incompatible dimensions\n");
     }
 
     if (M == 0 || N == 0 || P == 0 || arb_mat_is_zero(A) || arb_mat_is_zero(B))
@@ -547,4 +545,3 @@ arb_mat_mul_block(arb_mat_t C, const arb_mat_t A, const arb_mat_t B, slong prec)
         flint_free(BB);
     }
 }
-

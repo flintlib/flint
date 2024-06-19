@@ -5,13 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 /* Vectors over generic rings */
 
-#include "ulong_extras.h"
 #include "fmpz.h"
 #include "gr.h"
 #include "gr_vec.h"
@@ -61,6 +60,28 @@ int vector_gr_vec_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 
     gr_ctx_write(out, elem_ctx);
     return GR_SUCCESS;
+}
+
+truth_t vector_ctx_is_ring(gr_ctx_t ctx)
+{
+    if (VECTOR_CTX(ctx)->all_sizes)
+        return T_FALSE;
+
+    if (VECTOR_CTX(ctx)->n == 0)
+        return T_TRUE;
+
+    return gr_ctx_is_ring(ENTRY_CTX(ctx));
+}
+
+truth_t vector_ctx_is_commutative_ring(gr_ctx_t ctx)
+{
+    if (VECTOR_CTX(ctx)->all_sizes)
+        return T_FALSE;
+
+    if (VECTOR_CTX(ctx)->n == 0)
+        return T_TRUE;
+
+    return gr_ctx_is_commutative_ring(ENTRY_CTX(ctx));
 }
 
 /* todo: public */
@@ -677,6 +698,8 @@ gr_static_method_table _gr_vec_methods;
 
 gr_method_tab_input _gr_vec_methods_input[] =
 {
+    {GR_METHOD_CTX_IS_RING,     (gr_funcptr) vector_ctx_is_ring},
+    {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) vector_ctx_is_commutative_ring},
     {GR_METHOD_CTX_IS_THREADSAFE,    (gr_funcptr) vector_ctx_is_threadsafe},
 
     {GR_METHOD_CTX_WRITE,   (gr_funcptr) vector_gr_vec_ctx_write},
@@ -782,7 +805,8 @@ _gr_ctx_init_vector(gr_ctx_t ctx, gr_ctx_t base_ring, int all_sizes, slong n)
     ctx->sizeof_elem = sizeof(gr_vec_struct);
     ctx->size_limit = WORD_MAX;
 
-    if (n < 0) flint_abort();
+    if (n < 0)
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     VECTOR_CTX(ctx)->base_ring = (gr_ctx_struct *) base_ring;
     VECTOR_CTX(ctx)->all_sizes = all_sizes;

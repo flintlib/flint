@@ -113,12 +113,6 @@ Special polynomials
 
 Note: see also the methods available in FLINT (e.g. for cyclotomic polynomials).
 
-.. function:: void arb_fmpz_poly_cos_minpoly(fmpz_poly_t res, ulong n)
-
-    Sets *res* to the monic minimal polynomial of `2 \cos(2 \pi / n)`.
-    This is a wrapper of FLINT's *fmpz_poly_cos_minpoly*, provided here
-    for backward compatibility.
-
 .. function:: void arb_fmpz_poly_gauss_period_minpoly(fmpz_poly_t res, ulong q, ulong n)
 
     Sets *res* to the minimal polynomial of the Gaussian periods

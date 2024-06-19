@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -70,7 +70,8 @@ _fmpz_poly_eulerian_polynomial_series(fmpz * res, ulong n)
 void
 _fmpz_poly_eulerian_polynomial_rec(fmpz * res, ulong n)
 {
-    slong ix, jx;
+    slong jx;
+    ulong ix;
 
     fmpz_one(res);
     for (ix = 1; ix <= FLINT_MIN(n / 2, SMALL_BOUND / 2); ix++)
@@ -101,7 +102,7 @@ _fmpz_poly_eulerian_polynomial_rec(fmpz * res, ulong n)
 void
 _fmpz_poly_eulerian_polynomial(fmpz * res, ulong n)
 {
-    slong ix;
+    ulong ix;
 
     if (n < 32)
         _fmpz_poly_eulerian_polynomial_rec(res, n);

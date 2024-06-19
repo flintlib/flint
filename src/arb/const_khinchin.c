@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -23,7 +23,8 @@ arb_const_khinchin_eval_param(arb_t s, ulong N, ulong M, slong prec)
     arb_init(u);
     arb_init(h);
 
-    if (N < 2) flint_abort();
+    if (N < 2)
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
     /* if (M < 0) flint_abort(); */
 
     pows = _arb_vec_init(N - 2);

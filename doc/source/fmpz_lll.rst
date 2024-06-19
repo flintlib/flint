@@ -299,6 +299,10 @@ Modified ULLL
 
     Performs ULLL using :func:`fmpz_mat_lll_storjohann` as the LLL function.
 
+.. note::
+
+    This function is currently not tested. Use at your own risk.
+
 
 Main LLL functions
 --------------------------------------------------------------------------------

@@ -1,17 +1,16 @@
 /*
     Copyright (C) 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "gmpcompat.h"
-#include "ulong_extras.h"
 #include "fmpz.h"
 
 void
@@ -22,8 +21,7 @@ fmpz_divexact(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     if (fmpz_is_zero(h))
     {
-        flint_printf("Exception (fmpz_divexact). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_divexact). Division by zero.\n");
     }
 
     if (!COEFF_IS_MPZ(c1))  /* g is small, h must be also or division isn't exact */
@@ -32,7 +30,7 @@ fmpz_divexact(fmpz_t f, const fmpz_t g, const fmpz_t h)
     }
     else  /* g is large */
     {
-        __mpz_struct * mf;
+        mpz_ptr mf;
 
         if (!COEFF_IS_MPZ(c2))  /* h is small */
         {
@@ -65,3 +63,94 @@ fmpz_divexact(fmpz_t f, const fmpz_t g, const fmpz_t h)
         }
     }
 }
+
+void fmpz_divexact_si(fmpz_t f, const fmpz_t g, slong h)
+{
+    fmpz c1 = *g;
+
+    if (h == 0)
+    {
+        flint_throw(FLINT_ERROR, "Exception (fmpz_divexact_si). Division by zero.\n");
+    }
+
+    if (!COEFF_IS_MPZ(c1))  /* g is small */
+    {
+        fmpz_set_si(f, c1 / h);
+    }
+    else  /* g is large */
+    {
+        mpz_ptr mf = _fmpz_promote(f);
+
+        if (h > 0)
+        {
+            flint_mpz_divexact_ui(mf, COEFF_TO_PTR(c1), h);
+            _fmpz_demote_val(f);  /* division by h may result in small value */
+        }
+        else
+        {
+            flint_mpz_divexact_ui(mf, COEFF_TO_PTR(c1), -h);
+            _fmpz_demote_val(f);  /* division by h may result in small value */
+            fmpz_neg(f, f);
+        }
+    }
+}
+
+void fmpz_divexact_ui(fmpz_t f, const fmpz_t g, ulong h)
+{
+    fmpz c1 = *g;
+
+    if (h == 0)
+    {
+        flint_throw(FLINT_ERROR, "Exception (fmpz_divexact_ui). Division by zero.\n");
+    }
+
+    if (!COEFF_IS_MPZ(c1))  /* g is small */
+    {
+        fmpz_set_si(f, c1 / (slong) h);
+    }
+    else  /* g is large */
+    {
+        mpz_ptr mf = _fmpz_promote(f);
+
+        flint_mpz_divexact_ui(mf, COEFF_TO_PTR(c1), h);
+        _fmpz_demote_val(f);  /* division by h may result in small value */
+    }
+}
+
+#if defined(__GNUC__)
+void fmpz_divexact2_uiui(fmpz_t f, const fmpz_t g, ulong h1, ulong h2)
+{
+    ulong hx;
+    int of;
+
+    /* builtin for better handling of overflow */
+    of = __builtin_mul_overflow(h1, h2, &hx);
+
+    if (!of)
+    {
+        fmpz_divexact_ui(f, g, hx);
+    }
+    else
+    {
+        fmpz_divexact_ui(f, g, h1);
+        fmpz_divexact_ui(f, f, h2);
+    }
+}
+#else
+void fmpz_divexact2_uiui(fmpz_t f, const fmpz_t g, ulong h1, ulong h2)
+{
+    ulong hi, lo;
+
+    umul_ppmm(hi, lo, h1, h2);
+
+    if (!hi)
+    {
+        fmpz_divexact_ui(f, g, lo);
+    }
+    else
+    {
+        fmpz_divexact_ui(f, g, h1);
+        fmpz_divexact_ui(f, f, h2);
+    }
+}
+#endif

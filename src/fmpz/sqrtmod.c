@@ -6,11 +6,10 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "gmpcompat.h"
 #include "fmpz.h"
 #include "ulong_extras.h"
@@ -166,7 +165,7 @@ int fmpz_sqrtmod(fmpz_t b, const fmpz_t a, const fmpz_t p)
 
     if (!COEFF_IS_MPZ(*p))  /* p, and b are small */
     {
-        mp_limb_t ans;
+        ulong ans;
 
         ans = n_sqrtmod(*b, *p);
         if (ans)
@@ -176,8 +175,8 @@ int fmpz_sqrtmod(fmpz_t b, const fmpz_t a, const fmpz_t p)
     else  /* p is large */
     {
         int ans;
-        mpz_t t;
-        __mpz_struct *bptr;
+        mpz_ptr t;
+        mpz_srcptr bptr;
 
         if (fmpz_is_even(p))
             return 0;
@@ -187,14 +186,13 @@ int fmpz_sqrtmod(fmpz_t b, const fmpz_t a, const fmpz_t p)
 
         bptr = _fmpz_promote_val(b);
 
-        mpz_init(t);
+        t = _fmpz_new_mpz();
         ans = _fmpz_sqrtmod(t, bptr, COEFF_TO_PTR(*p));
-        mpz_swap(bptr, t);
-        mpz_clear(t);
+        _fmpz_clear_mpz(PTR_TO_COEFF(bptr));
+        *b = PTR_TO_COEFF(t);
 
         _fmpz_demote_val(b);
 
         return ans;
     }
 }
-

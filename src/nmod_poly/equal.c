@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
@@ -30,4 +31,9 @@ int nmod_poly_equal_nmod(const nmod_poly_t poly, ulong cst)
         return nmod_poly_is_zero(poly);
     else
         return (poly->length == 1 && poly->coeffs[0] == cst);
+}
+
+int nmod_poly_equal_ui(const nmod_poly_t poly, ulong cst)
+{
+    return nmod_poly_equal_nmod(poly, nmod_set_ui(cst, poly->mod));
 }

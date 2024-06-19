@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -44,7 +44,7 @@ arb_exp_taylor_sum_rs_generic(arb_t res, const arb_t x, slong N, slong prec)
     {
         arb_ptr tpow;
         slong j, k, m, M, tp, xmag;
-        mp_limb_t c, d, chi, clo;
+        ulong c, d, chi, clo;
 
         xmag = arf_abs_bound_lt_2exp_si(arb_midref(x));
 
@@ -56,7 +56,7 @@ arb_exp_taylor_sum_rs_generic(arb_t res, const arb_t x, slong N, slong prec)
         /* not intended (and not 32-bit safe...) */
         if (M > 30000)
         {
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
         }
 
         tpow = _arb_vec_init(m + 2);
@@ -193,4 +193,3 @@ arb_exp_arf_rs_generic(arb_t res, const arf_t x, slong prec, int minus_one)
     arb_set_round(res, t, prec);
     arb_clear(t);
 }
-

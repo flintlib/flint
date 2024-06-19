@@ -5,10 +5,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
 
 /* given the exponent and the bit count of the base, can we expect b^e to fail */
@@ -30,7 +33,7 @@ int _fmpz_mpoly_evaluate_all_fmpz_sp(fmpz_t ev, const fmpz_mpoly_t A,
 {
     int success = 1;
     flint_bitcnt_t bits = A->bits;
-    slong i, j, k, N, nvars = ctx->minfo->nvars;
+    slong i, k, N, nvars = ctx->minfo->nvars;
     slong entries, k_len, shift, off;
     slong Alen = A->length;
     const fmpz * Acoeff = A->coeffs;
@@ -71,7 +74,9 @@ int _fmpz_mpoly_evaluate_all_fmpz_sp(fmpz_t ev, const fmpz_mpoly_t A,
     k = 0;
     for (i = 0; i < nvars; i++)
     {
-        flint_bitcnt_t varibits = FLINT_BIT_COUNT(degrees[i]);
+        flint_bitcnt_t j, varibits;
+
+        varibits = FLINT_BIT_COUNT(degrees[i]);
 
         mpoly_gen_offset_shift_sp(&off, &shift, i, bits, ctx->minfo);
         for (j = 0; j < varibits; j++)
@@ -119,7 +124,7 @@ int _fmpz_mpoly_evaluate_all_fmpz_mp(fmpz_t ev, const fmpz_mpoly_t A,
 {
     int success = 1;
     flint_bitcnt_t Abits = A->bits;
-    slong i, j, k, N, nvars = ctx->minfo->nvars;
+    slong i, k, N, nvars = ctx->minfo->nvars;
     slong entries, k_len, off;
     slong Alen = A->length;
     const fmpz * Acoeff = A->coeffs;
@@ -160,7 +165,9 @@ int _fmpz_mpoly_evaluate_all_fmpz_mp(fmpz_t ev, const fmpz_mpoly_t A,
     k = 0;
     for (i = 0; i < nvars; i++)
     {
-        flint_bitcnt_t varibits = fmpz_bits(degrees + i);
+        flint_bitcnt_t j, varibits;
+
+        varibits = fmpz_bits(degrees + i);
 
         off = mpoly_gen_offset_mp(i, Abits, ctx->minfo);
         for (j = 0; j < varibits; j++)

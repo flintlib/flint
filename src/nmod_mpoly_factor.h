@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -53,7 +53,7 @@ void nmod_mat_init_nullspace_tr(nmod_mat_t X, nmod_mat_t tmp);
 /*****************************************************************************/
 
 NMOD_MPOLY_FACTOR_INLINE
-void nmod_mpoly_factor_init(nmod_mpoly_factor_t f, const nmod_mpoly_ctx_t ctx)
+void nmod_mpoly_factor_init(nmod_mpoly_factor_t f, const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
 	f->constant = 1;
     f->poly  = NULL;
@@ -76,14 +76,14 @@ void nmod_mpoly_factor_clear(nmod_mpoly_factor_t f,
 
 NMOD_MPOLY_FACTOR_INLINE
 slong nmod_mpoly_factor_length(const nmod_mpoly_factor_t f,
-                                                    const nmod_mpoly_ctx_t ctx)
+                                                    const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     return f->num;
 }
 
 NMOD_MPOLY_FACTOR_INLINE
 ulong nmod_mpoly_factor_get_constant_ui(const nmod_mpoly_factor_t f,
-                                                    const nmod_mpoly_ctx_t ctx)
+                                                    const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     return f->constant;
 }
@@ -104,14 +104,7 @@ void nmod_mpoly_factor_swap_base(nmod_mpoly_t p, nmod_mpoly_factor_t f,
     nmod_mpoly_swap(p, f->poly + i, ctx);
 }
 
-NMOD_MPOLY_FACTOR_INLINE
-slong nmod_mpoly_factor_get_exp_si(nmod_mpoly_factor_t f,
-                                           slong i, const nmod_mpoly_ctx_t ctx)
-{
-    FLINT_ASSERT(i < (ulong) f->num);
-    return fmpz_get_si(f->exp + i);
-}
-
+slong nmod_mpoly_factor_get_exp_si(nmod_mpoly_factor_t f, slong i, const nmod_mpoly_ctx_t FLINT_UNUSED(ctx));
 
 void nmod_mpoly_factor_append_ui(nmod_mpoly_factor_t f,
                     const nmod_mpoly_t A, ulong e, const nmod_mpoly_ctx_t ctx);
@@ -165,7 +158,7 @@ int nmod_mpoly_factor_fix_units(nmod_mpoly_factor_t f,
 
 NMOD_MPOLY_FACTOR_INLINE
 void nmod_mpoly_factor_swap(nmod_mpoly_factor_t f, nmod_mpoly_factor_t g,
-                                                    const nmod_mpoly_ctx_t ctx)
+                                                    const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
    nmod_mpoly_factor_struct t = *f;
    *f = *g;
@@ -173,7 +166,7 @@ void nmod_mpoly_factor_swap(nmod_mpoly_factor_t f, nmod_mpoly_factor_t g,
 }
 
 NMOD_MPOLY_FACTOR_INLINE
-void nmod_mpoly_factor_one(nmod_mpoly_factor_t f, const nmod_mpoly_ctx_t ctx)
+void nmod_mpoly_factor_one(nmod_mpoly_factor_t f, const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
 	f->constant = 1;
 	f->num = 0;
@@ -195,7 +188,7 @@ void _nmod_mpoly_set_lead0(
 slong _n_poly_vec_max_degree(const n_poly_struct * A, slong Alen);
 
 void _n_poly_vec_mul_nmod_intertible(n_poly_struct * A,
-                                          slong Alen, mp_limb_t c, nmod_t ctx);
+                                          slong Alen, ulong c, nmod_t ctx);
 
 void _n_poly_vec_mod_mul_poly(n_poly_struct * A, slong Alen,
                                            const n_poly_t g, const nmod_t ctx);
@@ -229,7 +222,7 @@ typedef struct
 typedef nmod_mpolyv_struct nmod_mpolyv_t[1];
 
 NMOD_MPOLY_FACTOR_INLINE
-void nmod_mpolyv_init(nmod_mpolyv_t A, const nmod_mpoly_ctx_t ctx)
+void nmod_mpolyv_init(nmod_mpolyv_t A, const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     A->coeffs = NULL;
     A->alloc = 0;
@@ -238,7 +231,7 @@ void nmod_mpolyv_init(nmod_mpolyv_t A, const nmod_mpoly_ctx_t ctx)
 
 NMOD_MPOLY_FACTOR_INLINE
 void nmod_mpolyv_swap(nmod_mpolyv_t A, nmod_mpolyv_t B,
-                                                    const nmod_mpoly_ctx_t ctx)
+                                                    const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
    nmod_mpolyv_struct t = *A;
    *A = *B;
@@ -318,7 +311,7 @@ int nmod_mpoly_factor_irred_lgprime_zippel(nmod_mpolyv_t Af,
 /*****************************************************************************/
 
 void nmod_mpoly_compression_do(nmod_mpoly_t L,
-                 const nmod_mpoly_ctx_t Lctx, mp_limb_t * Acoeffs, slong Alen,
+                 const nmod_mpoly_ctx_t Lctx, ulong * Acoeffs, slong Alen,
                                                         mpoly_compression_t M);
 
 void nmod_mpoly_compression_undo(nmod_mpoly_t A,
@@ -364,7 +357,7 @@ typedef nmod_mpoly_pfrac_struct nmod_mpoly_pfrac_t[1];
 
 int nmod_mpoly_pfrac_init(nmod_mpoly_pfrac_t Iv, flint_bitcnt_t bits,
                          slong l, slong r, const nmod_mpoly_struct * betas,
-                          const mp_limb_t * alpha, const nmod_mpoly_ctx_t ctx);
+                          const ulong * alpha, const nmod_mpoly_ctx_t ctx);
 
 void nmod_mpoly_pfrac_clear(nmod_mpoly_pfrac_t Iv,
                                                    const nmod_mpoly_ctx_t ctx);
@@ -373,33 +366,33 @@ int nmod_mpoly_pfrac(slong r, nmod_mpoly_t t, const slong * deg,
                              nmod_mpoly_pfrac_t Iv, const nmod_mpoly_ctx_t ctx);
 
 int nmod_mpoly_hlift(slong m, nmod_mpoly_struct * f, slong r,
-            const mp_limb_t * alpha, const nmod_mpoly_t A, const slong * degs,
+            const ulong * alpha, const nmod_mpoly_t A, const slong * degs,
                                                    const nmod_mpoly_ctx_t ctx);
 
 int n_bpoly_mod_pfrac(slong r, n_bpoly_struct * C,
             slong * C_deg1_bound, n_bpoly_t A, n_bpoly_struct * B, nmod_t mod);
 
 int n_bpoly_mod_hlift2(n_bpoly_t A, n_bpoly_t B0, n_bpoly_t B1,
-                              mp_limb_t alpha, slong degree_inner, nmod_t mod,
+                              ulong alpha, slong degree_inner, nmod_t mod,
                                                       n_poly_bpoly_stack_t St);
 
 int n_bpoly_mod_hlift2_cubic(n_bpoly_t A, n_bpoly_t B0, n_bpoly_t B1,
-                               mp_limb_t alpha, slong degree_inner, nmod_t ctx,
+                               ulong alpha, slong degree_inner, nmod_t ctx,
                                 nmod_eval_interp_t E, n_poly_bpoly_stack_t St);
 
 int n_bpoly_mod_hlift(slong r, n_bpoly_t A, n_bpoly_struct * B,
-                              mp_limb_t alpha, slong degree_inner, nmod_t mod,
+                              ulong alpha, slong degree_inner, nmod_t mod,
                                                       n_poly_bpoly_stack_t St);
 
 int n_bpoly_mod_hlift_cubic(slong r, n_bpoly_t A, n_bpoly_struct * B,
-                               mp_limb_t alpha, slong degree_inner, nmod_t mod,
+                               ulong alpha, slong degree_inner, nmod_t mod,
                                 nmod_eval_interp_t E, n_poly_bpoly_stack_t St);
 
 int n_polyu3_mod_hlift(slong r, n_polyun_struct * BB,  n_polyu_t A,
-           n_polyu_struct * B, mp_limb_t beta, slong degree_inner, nmod_t ctx);
+           n_polyu_struct * B, ulong beta, slong degree_inner, nmod_t ctx);
 
 int nmod_mpoly_hlift_zippel(slong m, nmod_mpoly_struct * B, slong r,
-            const mp_limb_t * alpha, const nmod_mpoly_t A, const slong * degs,
+            const ulong * alpha, const nmod_mpoly_t A, const slong * degs,
                                const nmod_mpoly_ctx_t ctx, flint_rand_t state);
 
 int nmod_mpoly_factor_algo(nmod_mpoly_factor_t f,
@@ -416,7 +409,7 @@ int nmod_mpoly_factor_zippel(nmod_mpoly_factor_t f,
 
 int _nmod_mpoly_evaluate_rest_n_poly(n_poly_struct * E,
     slong * starts, slong * ends, slong * stops, ulong * es,
-    const mp_limb_t * Acoeffs, const ulong * Aexps, slong Alen, slong var,
+    const ulong * Acoeffs, const ulong * Aexps, slong Alen, slong var,
     const n_poly_struct * alphas, const slong * offsets, const slong * shifts,
                                  slong N, ulong mask, slong nvars, nmod_t ctx);
 
@@ -468,4 +461,3 @@ int n_polyun_zip_solve(nmod_mpoly_t A, n_polyun_t Z, n_polyun_t H,
 #endif
 
 #endif
-

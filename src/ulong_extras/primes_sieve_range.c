@@ -5,17 +5,16 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "ulong_extras.h"
 
 static void
-mark(char * sieve, mp_limb_t a, slong len, mp_limb_t p)
+mark(char * sieve, ulong a, ulong len, ulong p)
 {
-    mp_limb_t t;
+    ulong t;
 
     t = p * p;
     if (t >= a)
@@ -36,12 +35,12 @@ mark(char * sieve, mp_limb_t a, slong len, mp_limb_t p)
     }
 }
 
-void
-n_sieve_odd(char * sieve, ulong n, mp_limb_t a,
-    unsigned int * sieve_primes, mp_limb_t bound)
+static void
+n_sieve_odd(char * sieve, ulong n, ulong a,
+    unsigned int * sieve_primes, ulong bound)
 {
-    slong i;
-    mp_limb_t p;
+    ulong i;
+    ulong p;
 
     for (i = 0; i < n / 2; i++)
         sieve[i] = 1;
@@ -58,9 +57,9 @@ n_sieve_odd(char * sieve, ulong n, mp_limb_t a,
 }
 
 void
-n_primes_sieve_range(n_primes_t iter, mp_limb_t a, mp_limb_t b)
+n_primes_sieve_range(n_primes_t iter, ulong a, ulong b)
 {
-    mp_limb_t bound;
+    ulong bound;
     ulong len, odd_len;
 
     /* a and b must be odd */
@@ -72,8 +71,7 @@ n_primes_sieve_range(n_primes_t iter, mp_limb_t a, mp_limb_t b)
 
     if (a < 3 || b < a || len > FLINT_SIEVE_SIZE)
     {
-        flint_printf("invalid sieve range %wu,%wu!\n", a, b);
-        flint_abort();
+        flint_throw(FLINT_ERROR, "invalid sieve range %wu,%wu!\n", a, b);
     }
 
     bound = n_sqrt(b) + 1;

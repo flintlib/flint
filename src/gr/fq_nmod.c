@@ -5,10 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdlib.h>
+#include <string.h>
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 #include "fmpz.h"
@@ -17,11 +19,15 @@
 #include "fq_nmod_mat.h"
 #include "fq_nmod_poly.h"
 #include "fq_nmod_poly_factor.h"
+#include "fmpz_mod_poly.h"
 #include "gr.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
+#include "gr_generic.h"
 
 #define FQ_CTX(ring_ctx) ((fq_nmod_ctx_struct *)(GR_CTX_DATA_AS_PTR(ring_ctx)))
+
+static const char * default_var = "a";
 
 void
 _gr_fq_nmod_ctx_clear(gr_ctx_t ctx)
@@ -35,6 +41,21 @@ _gr_fq_nmod_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 {
     gr_stream_write(out, "Finite field (fq_nmod)");
     return GR_SUCCESS;
+}
+
+int _gr_fq_nmod_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
+{
+    slong len;
+    len = strlen(s);
+
+    FQ_CTX(ctx)->var = flint_realloc(FQ_CTX(ctx)->var, len + 1);
+    memcpy(FQ_CTX(ctx)->var, s, len + 1);
+    return GR_SUCCESS;
+}
+
+int _gr_fq_nmod_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
+{
+    return _gr_fq_nmod_ctx_set_gen_name(ctx, s[0]);
 }
 
 void
@@ -219,6 +240,33 @@ _gr_fq_nmod_div(fq_nmod_t res, const fq_nmod_t x, const fq_nmod_t y, const gr_ct
     }
 }
 
+int
+_gr_fq_nmod_sqr(fq_nmod_t res, const fq_nmod_t x, const gr_ctx_t ctx)
+{
+    fq_nmod_sqr(res, x, FQ_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fq_nmod_pow_ui(fq_nmod_t res, const fq_nmod_t x, ulong y, const gr_ctx_t ctx)
+{
+    fq_nmod_pow_ui(res, x, y, FQ_CTX(ctx));
+    return GR_SUCCESS;
+}
+
+int
+_gr_fq_nmod_pow_fmpz(fq_nmod_t res, const fq_nmod_t x, const fmpz_t y, gr_ctx_t ctx)
+{
+    if (fmpz_sgn(y) < 0)
+    {
+        return gr_generic_pow_fmpz(res, x, y, ctx);
+    }
+    else
+    {
+        fq_nmod_pow(res, x, y, FQ_CTX(ctx));
+        return GR_SUCCESS;
+    }
+}
 
 truth_t
 _gr_fq_nmod_is_invertible(const fq_nmod_t x, const gr_ctx_t ctx)
@@ -246,9 +294,9 @@ _gr_fq_nmod_sqrt(fq_nmod_t res, const fq_nmod_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_ctx_fq_nmod_prime(fmpz_t p, gr_ctx_t ctx)
+_gr_ctx_fq_nmod_prime(ulong * p, gr_ctx_t ctx)
 {
-    fmpz_set(p, fq_nmod_ctx_prime(FQ_CTX(ctx)));
+    *p = fq_nmod_ctx_prime(FQ_CTX(ctx));
     return GR_SUCCESS;
 }
 
@@ -325,7 +373,7 @@ int
 __gr_fq_nmod_vec_dot(fq_nmod_struct * res, const fq_nmod_struct * initial, int subtract, const fq_nmod_struct * vec1, const fq_nmod_struct * vec2, slong len, gr_ctx_t ctx)
 {
     slong i;
-    mp_ptr s, t;
+    nn_ptr s, t;
     slong slen, tlen, len1, len2;
     slong plen;
     nmod_t mod;
@@ -341,7 +389,7 @@ __gr_fq_nmod_vec_dot(fq_nmod_struct * res, const fq_nmod_struct * initial, int s
 
     plen = FQ_CTX(ctx)->modulus->length;
 
-    t = GR_TMP_ALLOC((4 * plen) * sizeof(mp_limb_t));
+    t = GR_TMP_ALLOC((4 * plen) * sizeof(ulong));
     s = t + 2 * plen;
 
     mod = FQ_CTX(ctx)->mod;
@@ -410,7 +458,7 @@ __gr_fq_nmod_vec_dot(fq_nmod_struct * res, const fq_nmod_struct * initial, int s
     _nmod_vec_set(res->coeffs, s, slen);
     _nmod_poly_set_length(res, slen);
 
-    GR_TMP_FREE(t, (4 * plen) * sizeof(mp_limb_t));
+    GR_TMP_FREE(t, (4 * plen) * sizeof(ulong));
 
     return GR_SUCCESS;
 }
@@ -420,7 +468,7 @@ int
 __gr_fq_nmod_vec_dot_rev(fq_nmod_struct * res, const fq_nmod_struct * initial, int subtract, const fq_nmod_struct * vec1, const fq_nmod_struct * vec2, slong len, gr_ctx_t ctx)
 {
     slong i;
-    mp_ptr s, t;
+    nn_ptr s, t;
     slong slen, tlen, len1, len2;
     slong plen;
     nmod_t mod;
@@ -436,7 +484,7 @@ __gr_fq_nmod_vec_dot_rev(fq_nmod_struct * res, const fq_nmod_struct * initial, i
 
     plen = FQ_CTX(ctx)->modulus->length;
 
-    t = GR_TMP_ALLOC((4 * plen) * sizeof(mp_limb_t));
+    t = GR_TMP_ALLOC((4 * plen) * sizeof(ulong));
     s = t + 2 * plen;
 
     mod = FQ_CTX(ctx)->mod;
@@ -505,7 +553,7 @@ __gr_fq_nmod_vec_dot_rev(fq_nmod_struct * res, const fq_nmod_struct * initial, i
     _nmod_vec_set(res->coeffs, s, slen);
     _nmod_poly_set_length(res, slen);
 
-    GR_TMP_FREE(t, (4 * plen) * sizeof(mp_limb_t));
+    GR_TMP_FREE(t, (4 * plen) * sizeof(ulong));
 
     return GR_SUCCESS;
 }
@@ -592,6 +640,8 @@ gr_method_tab_input _fq_nmod_methods_input[] =
 {
     {GR_METHOD_CTX_CLEAR,       (gr_funcptr) _gr_fq_nmod_ctx_clear},
     {GR_METHOD_CTX_WRITE,       (gr_funcptr) _gr_fq_nmod_ctx_write},
+    {GR_METHOD_CTX_SET_GEN_NAME,    (gr_funcptr) _gr_fq_nmod_ctx_set_gen_name},
+    {GR_METHOD_CTX_SET_GEN_NAMES,   (gr_funcptr) _gr_fq_nmod_ctx_set_gen_names},
     {GR_METHOD_CTX_IS_RING,     (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) gr_generic_ctx_predicate_true},
@@ -618,6 +668,7 @@ gr_method_tab_input _fq_nmod_methods_input[] =
     {GR_METHOD_ZERO,            (gr_funcptr) _gr_fq_nmod_zero},
     {GR_METHOD_ONE,             (gr_funcptr) _gr_fq_nmod_one},
     {GR_METHOD_GEN,             (gr_funcptr) _gr_fq_nmod_gen},
+    {GR_METHOD_GENS,            (gr_funcptr) gr_generic_gens_single},
     {GR_METHOD_IS_ZERO,         (gr_funcptr) _gr_fq_nmod_is_zero},
     {GR_METHOD_IS_ONE,          (gr_funcptr) _gr_fq_nmod_is_one},
     {GR_METHOD_EQUAL,           (gr_funcptr) _gr_fq_nmod_equal},
@@ -635,6 +686,10 @@ gr_method_tab_input _fq_nmod_methods_input[] =
     {GR_METHOD_IS_INVERTIBLE,   (gr_funcptr) _gr_fq_nmod_is_invertible},
     {GR_METHOD_INV,             (gr_funcptr) _gr_fq_nmod_inv},
     {GR_METHOD_DIV,             (gr_funcptr) _gr_fq_nmod_div},
+    {GR_METHOD_SQR,             (gr_funcptr) _gr_fq_nmod_sqr},
+    {GR_METHOD_POW_UI,           (gr_funcptr) _gr_fq_nmod_pow_ui},
+    {GR_METHOD_POW_FMPZ,         (gr_funcptr) _gr_fq_nmod_pow_fmpz},
+
     {GR_METHOD_IS_SQUARE,       (gr_funcptr) _gr_fq_nmod_is_square},
     {GR_METHOD_SQRT,            (gr_funcptr) _gr_fq_nmod_sqrt},
 
@@ -675,17 +730,36 @@ _gr_ctx_init_fq_nmod_from_ref(gr_ctx_t ctx, const void * fq_nmod_ctx)
 }
 
 void
-gr_ctx_init_fq_nmod(gr_ctx_t ctx, const fmpz_t p, slong d, const char * var)
+gr_ctx_init_fq_nmod(gr_ctx_t ctx, ulong p, slong d, const char * var)
 {
     fq_nmod_ctx_struct * fq_nmod_ctx;
 
-    if (fmpz_bits(p) > FLINT_BITS)
-    {
-        flint_printf("gr_ctx_init_fq_nmod: expected a word-size p\n");
-        flint_abort();
-    }
-
     fq_nmod_ctx = flint_malloc(sizeof(fq_nmod_ctx_struct));
-    fq_nmod_ctx_init(fq_nmod_ctx, p, d, var == NULL ? "a" : var);
+    fq_nmod_ctx_init_ui(fq_nmod_ctx, p, d, var == NULL ? default_var : var);
     _gr_ctx_init_fq_nmod_from_ref(ctx, fq_nmod_ctx);
+}
+
+int gr_ctx_init_fq_nmod_modulus_nmod_poly(gr_ctx_t ctx, const nmod_poly_t modulus, const char * var)
+{
+    fq_nmod_ctx_struct * fq_nmod_ctx;
+    fq_nmod_ctx = flint_malloc(sizeof(fq_nmod_ctx_struct));
+    fq_nmod_ctx_init_modulus(fq_nmod_ctx, modulus, var == NULL ? default_var : var);
+    _gr_ctx_init_fq_nmod_from_ref(ctx, fq_nmod_ctx);
+    return GR_SUCCESS;
+}
+
+int
+gr_ctx_init_fq_nmod_modulus_fmpz_mod_poly(gr_ctx_t ctx, const fmpz_mod_poly_t modulus, fmpz_mod_ctx_t mod_ctx, const char * var)
+{
+    nmod_poly_t nmodulus;
+    int status;
+
+    if (!fmpz_abs_fits_ui(mod_ctx->n))
+        return GR_UNABLE;
+
+    nmod_poly_init(nmodulus, fmpz_get_ui(mod_ctx->n));
+    fmpz_mod_poly_get_nmod_poly(nmodulus, modulus);
+    status = gr_ctx_init_fq_nmod_modulus_nmod_poly(ctx, nmodulus, var);
+    nmod_poly_clear(nmodulus);
+    return status;
 }

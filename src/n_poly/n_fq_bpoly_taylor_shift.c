@@ -5,22 +5,22 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fq_nmod.h"
 #include "n_poly.h"
 
-
 static void _n_fq_poly_taylor_shift_horner_n_fq(
-    mp_limb_t * poly,
-    const mp_limb_t * c,
+    ulong * poly,
+    const ulong * c,
     slong n,
     const fq_nmod_ctx_t ctx)
 {
     slong d = fq_nmod_ctx_degree(ctx);
     slong i, j;
-    mp_limb_t * p = FLINT_ARRAY_ALLOC(d, mp_limb_t);
+    ulong * p = FLINT_ARRAY_ALLOC(d, ulong);
 
     for (i = n - 2; i >= 0; i--)
     {
@@ -43,7 +43,7 @@ void n_fq_bpoly_taylor_shift_gen1_fq_nmod(
 {
     slong d = fq_nmod_ctx_degree(ctx);
     slong i;
-    mp_limb_t * c = FLINT_ARRAY_ALLOC(d, mp_limb_t);
+    ulong * c = FLINT_ARRAY_ALLOC(d, ulong);
 
     n_fq_set_fq_nmod(c, c_, ctx);
     n_fq_bpoly_set(A, B, ctx);
@@ -60,13 +60,13 @@ void n_fq_bpoly_taylor_shift_gen0_fq_nmod(
 {
     slong d = fq_nmod_ctx_degree(ctx);
     slong n, i, j;
-    mp_limb_t * c;
+    ulong * c;
     n_poly_t t;
 
     if (fq_nmod_is_zero(alpha, ctx))
         return;
 
-    c = FLINT_ARRAY_ALLOC(d, mp_limb_t);
+    c = FLINT_ARRAY_ALLOC(d, ulong);
     n_fq_set_fq_nmod(c, alpha, ctx);
 
     n_poly_init(t);
@@ -90,12 +90,12 @@ void n_fq_bpoly_taylor_shift_gen0_fq_nmod(
 
 void n_fq_bpoly_taylor_shift_gen0_n_fq(
     n_fq_bpoly_t A,
-    const mp_limb_t * alpha,
+    const ulong * alpha,
     const fq_nmod_ctx_t ctx)
 {
     slong d = fq_nmod_ctx_degree(ctx);
     slong i, j, n = A->length;
-    mp_limb_t * tmp, * c, * alphainv;
+    ulong * tmp, * c, * alphainv;
     TMP_INIT;
 
     if (_n_fq_is_zero(alpha, d))
@@ -103,9 +103,9 @@ void n_fq_bpoly_taylor_shift_gen0_n_fq(
 
     TMP_START;
 
-    tmp = (mp_limb_t *) TMP_ALLOC(d*N_FQ_MUL_INV_ITCH*sizeof(mp_limb_t));
-    c = TMP_ALLOC(d*sizeof(mp_limb_t));
-    alphainv = TMP_ALLOC(d*sizeof(mp_limb_t));
+    tmp = (ulong *) TMP_ALLOC(d*N_FQ_MUL_INV_ITCH*sizeof(ulong));
+    c = TMP_ALLOC(d*sizeof(ulong));
+    alphainv = TMP_ALLOC(d*sizeof(ulong));
 
     _n_fq_one(c, d);
     for (i = 1; i < n; i++)
@@ -113,7 +113,7 @@ void n_fq_bpoly_taylor_shift_gen0_n_fq(
         _n_fq_mul(c, c, alpha, ctx, tmp);
         if (!_n_fq_is_one(c, d))
         {
-            mp_limb_t * Aic = A->coeffs[i].coeffs;
+            ulong * Aic = A->coeffs[i].coeffs;
             for (j = 0; j < A->coeffs[i].length; j++)
                 _n_fq_mul(Aic + d*j, Aic + d*j, c, ctx, tmp);
         }
@@ -134,7 +134,7 @@ void n_fq_bpoly_taylor_shift_gen0_n_fq(
         _n_fq_mul(c, c, alphainv, ctx, tmp);
         if (!_n_fq_is_one(c, d))
         {
-            mp_limb_t * Aic = A->coeffs[i].coeffs;
+            ulong * Aic = A->coeffs[i].coeffs;
             for (j = 0; j < A->coeffs[i].length; j++)
                 _n_fq_mul(Aic + d*j, Aic + d*j, c, ctx, tmp);
         }
@@ -144,4 +144,3 @@ void n_fq_bpoly_taylor_shift_gen0_n_fq(
 
     return;
 }
-

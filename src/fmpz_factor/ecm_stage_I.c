@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -16,12 +16,13 @@
 /* Implementation of the stage I of ECM */
 
 int
-fmpz_factor_ecm_stage_I(mp_ptr f, const mp_limb_t *prime_array, mp_limb_t num,
-                        mp_limb_t B1, mp_ptr n, ecm_t ecm_inf)
+fmpz_factor_ecm_stage_I(nn_ptr f, const ulong *prime_array, ulong num,
+                        ulong B1, nn_ptr n, ecm_t ecm_inf)
 {
-    mp_limb_t times;
-    mp_size_t sz, gcdlimbs;
-    int i, j, p;
+    ulong times;
+    slong sz, gcdlimbs;
+    int j, p;
+    ulong i;
 
     for (i = 0; i < num; i++)
     {
@@ -49,7 +50,7 @@ fmpz_factor_ecm_stage_I(mp_ptr f, const mp_limb_t *prime_array, mp_limb_t num,
            if neither is true, factor found */
 
         if (!(gcdlimbs == 1 && f[0] == ecm_inf->one[0]) &&
-            !(gcdlimbs == ecm_inf->n_size && mpn_cmp(f, n, ecm_inf->n_size) == 0))
+            !(gcdlimbs == (slong) ecm_inf->n_size && mpn_cmp(f, n, ecm_inf->n_size) == 0))
         {
             /* Found factor in stage I */
             return gcdlimbs;

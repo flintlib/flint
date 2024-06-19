@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
 #include "nmod.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
@@ -24,7 +25,7 @@ static slong binary_sqrt(fmpz_t z, fmpz_t x, slong p)
     slong e, new_p, n;
     fmpz_t t, tx, s;
     fmpz two = 2;
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_t x_org;
 #endif
 
@@ -60,7 +61,7 @@ static slong binary_sqrt(fmpz_t z, fmpz_t x, slong p)
         return -WORD(1);
     }
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_init_set(x_org, x);
     fmpz_mul_2exp(x_org, x_org, e);
 #endif
@@ -81,7 +82,7 @@ static slong binary_sqrt(fmpz_t z, fmpz_t x, slong p)
     fmpz_fdiv_r_2exp(z, z, n + 1);
     fmpz_fdiv_q_2exp(z, z, 1);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mul(t, z, z);
     fmpz_mul(t, t, x);
     fmpz_sub_ui(t, t, 1);
@@ -104,7 +105,7 @@ static slong binary_sqrt(fmpz_t z, fmpz_t x, slong p)
         fmpz_fdiv_r_2exp(t, t, n);
         fmpz_swap(z, t);
 
-    #ifdef FLINT_WANT_ASSERT
+    #if FLINT_WANT_ASSERT
         fmpz_mul(t, z, z);
         fmpz_mul(t, t, x);
         fmpz_sub_ui(t, t, 1);
@@ -118,7 +119,7 @@ static slong binary_sqrt(fmpz_t z, fmpz_t x, slong p)
     fmpz_mul_2exp(t, t, e/2);
     fmpz_swap(z, t);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_submul(x_org, z, z);
     fmpz_fdiv_r_2exp(t, x_org, new_p + e/2);
     FLINT_ASSERT(fmpz_is_zero(t));
@@ -133,11 +134,11 @@ static slong binary_sqrt(fmpz_t z, fmpz_t x, slong p)
 }
 
 
-static mp_limb_t fmpz_fdiv_r_2exp_flint_bits(const fmpz_t a)
+static ulong fmpz_fdiv_r_2exp_flint_bits(const fmpz_t a)
 {
     if (COEFF_IS_MPZ(*a))
     {
-        const __mpz_struct * A = COEFF_TO_PTR(*a);
+        const mpz_ptr A = COEFF_TO_PTR(*a);
         return A->_mp_size > 0 ? A->_mp_d[0] : -A->_mp_d[0];
     }
     else
@@ -223,7 +224,7 @@ static slong binary_cubic_lift(
 {
     slong n;
     fmpz_t r2, c, d, t;
-    mp_limb_t A, B, C, D, INV, R, R2, S, E;
+    ulong A, B, C, D, INV, R, R2, S, E;
 
     /* start with a factorization mod 2^n */
     n = 1;
@@ -238,7 +239,7 @@ static slong binary_cubic_lift(
 
     while (n <= FLINT_BITS/2)
     {
-        mp_limb_t mask = (UWORD(1) << n);
+        ulong mask = (UWORD(1) << n);
         C = (A - (S - R2*E)) >> n;
         D = (B - (R*S)) >> n;
         R += (((D - C*R)*INV) % mask) << n;
@@ -269,7 +270,7 @@ static slong binary_cubic_lift(
             binary_cubic_lift_inv(inv, r2, r, s, e, n, t, d);
     }
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mul(r2, r, r);
     fmpz_mul_2exp(c, r2, e);
     fmpz_add(c, c, a);
@@ -329,7 +330,7 @@ static slong binary_cubic_lift_continue(
 
     n *= 2;
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mul(r2, r, r);
     fmpz_mul_2exp(c, r2, e);
     fmpz_add(c, c, a);
@@ -353,11 +354,11 @@ static slong binary_cubic_lift_continue(
 
 
 /* return f(0)*...*f(largest_prime - 1) mod prime_product */
-static mp_limb_t eval_product_mod_n(
+static ulong eval_product_mod_n(
     const fmpz_t a,
     const fmpz_t b,
-    mp_limb_t prime_product,
-    mp_limb_t largest_prime)
+    ulong prime_product,
+    ulong largest_prime)
 {
     nmod_t ctx;
     ulong A, B, F, G, H, P, i;
@@ -397,7 +398,7 @@ static void _fmpz_map_from_ZZ2(fmpz_t x, slong prec)
 {
     FLINT_ASSERT(prec > 0);
     fmpz_fdiv_r_2exp(x, x, prec);
-    if (fmpz_bits(x) >= prec)
+    if ((slong) fmpz_bits(x) >= prec)
     {
         fmpz_neg(x, x);
         fmpz_fdiv_r_2exp(x, x, prec);
@@ -715,7 +716,7 @@ try_again:
             goto cleanup;
         }
 
-        if (sqrt_prec + alpha2 < prec)
+        if (sqrt_prec + (slong) alpha2 < prec)
         {
             cubic_prec = binary_cubic_lift_continue(r, s, inv, ta, tb,
                                                  2*beta - 3*alpha, cubic_prec);
@@ -857,7 +858,7 @@ void _fmpz_poly_factor_cubic(fmpz_poly_factor_t fac,
         case 1:
             _raise_linear_factor(p, a, b, r + 0, T);
             fmpz_poly_factor_insert(fac, p, 1*exp);
-            fmpz_poly_divides(p, f, p);
+            fmpz_poly_divexact(p, f, p);
             fmpz_poly_factor_insert(fac, p, 1*exp);
             break;
 
@@ -876,4 +877,3 @@ void _fmpz_poly_factor_cubic(fmpz_poly_factor_t fac,
 
     fmpz_poly_clear(p);
 }
-

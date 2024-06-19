@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -23,7 +23,7 @@ TEST_FUNCTION_START(nmod_poly_compose_mod_brent_kung_precomp_preinv, state)
     {
         nmod_poly_t a, b, c, cinv, d, e;
         nmod_mat_t B;
-        mp_limb_t m = n_randtest_prime(state, 0);
+        ulong m = n_randtest_prime(state, 0);
 
         nmod_poly_init(a, m);
         nmod_poly_init(b, m);
@@ -72,7 +72,7 @@ TEST_FUNCTION_START(nmod_poly_compose_mod_brent_kung_precomp_preinv, state)
     {
         nmod_poly_t a, b, c, cinv, d;
         nmod_mat_t B;
-        mp_limb_t m = n_randtest_prime(state, 0);
+        ulong m = n_randtest_prime(state, 0);
 
         nmod_poly_init(a, m);
         nmod_poly_init(b, m);
@@ -117,7 +117,7 @@ TEST_FUNCTION_START(nmod_poly_compose_mod_brent_kung_precomp_preinv, state)
     {
         nmod_poly_t a, b, c, cinv, d;
         nmod_mat_t B;
-        mp_limb_t m = n_randtest_prime(state, 0);
+        ulong m = n_randtest_prime(state, 0);
 
         nmod_poly_init(a, m);
         nmod_poly_init(b, m);
@@ -162,7 +162,7 @@ TEST_FUNCTION_START(nmod_poly_compose_mod_brent_kung_precomp_preinv, state)
     {
         nmod_poly_t a, b, c, cinv, d;
         nmod_mat_t B;
-        mp_limb_t m = n_randtest_prime(state, 0);
+        ulong m = n_randtest_prime(state, 0);
 
         nmod_poly_init(a, m);
         nmod_poly_init(b, m);

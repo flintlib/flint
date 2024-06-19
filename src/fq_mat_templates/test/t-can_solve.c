@@ -8,7 +8,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -27,7 +27,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_can_solve, state)
     /* test random systems */
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         m = n_randint(state, 50);
         n = n_randint(state, 50);
@@ -43,7 +43,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_can_solve, state)
 
         /* Dense */
         if (n_randint(state, 2))
-            TEMPLATE(T, mat_randops)(A, 1+n_randint(state, 1+m*m), state, ctx);
+            TEMPLATE(T, mat_randops)(A, state, 1+n_randint(state, 1+m*m), ctx);
 
         solved = TEMPLATE(T, mat_can_solve)(X, A, B, ctx);
 
@@ -77,7 +77,7 @@ TEST_TEMPLATE_FUNCTION_START(T, mat_can_solve, state)
     /* test random solvable systems */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         m = n_randint(state, 20);
         n = n_randint(state, 20);

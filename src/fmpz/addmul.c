@@ -1,35 +1,29 @@
 /*
     Copyright (C) 2009 William Hart
+    Copyright (C) 2021 Daniel Schultz
+    Copyright (C) 2022 Fredrik Johansson
 
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "gmpcompat.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
 #include "mpn_extras.h"
-
-#define MPZ_FIT_SIZE(z, nlimbs) \
-    do { \
-        if (z->_mp_alloc < nlimbs) \
-            _mpz_realloc(z, nlimbs); \
-    } while (0)
+#include "fmpz.h"
 
 /* Will not get called with x or y small. */
 void
 _flint_mpz_addmul_large(mpz_ptr z, mpz_srcptr x, mpz_srcptr y, int negate)
 {
-    mp_size_t xn, yn, tn, zn, zn_signed, zn_new, x_sgn, y_sgn, sgn, alloc;
-    mp_srcptr xd, yd;
-    mp_ptr zd;
-    mp_ptr td;
-    mp_limb_t top;
+    slong xn, yn, tn, zn, zn_signed, zn_new, x_sgn, y_sgn, sgn, alloc;
+    nn_srcptr xd, yd;
+    nn_ptr zd;
+    nn_ptr td;
+    ulong top;
     TMP_INIT;
 
     xn = x->_mp_size;
@@ -42,7 +36,7 @@ _flint_mpz_addmul_large(mpz_ptr z, mpz_srcptr x, mpz_srcptr y, int negate)
     if (xn < yn)
     {
         mpz_srcptr t;
-        mp_size_t tn;
+        slong tn;
 
         t = x; x = y; y = t;
         tn = xn; xn = yn; yn = tn;
@@ -107,7 +101,7 @@ _flint_mpz_addmul_large(mpz_ptr z, mpz_srcptr x, mpz_srcptr y, int negate)
 #endif
 
     TMP_START;
-    td = TMP_ALLOC(tn * sizeof(mp_limb_t));
+    td = TMP_ALLOC(tn * sizeof(ulong));
 
     if (x == y)
     {
@@ -121,8 +115,7 @@ _flint_mpz_addmul_large(mpz_ptr z, mpz_srcptr x, mpz_srcptr y, int negate)
 
     tn -= (top == 0);
     alloc = FLINT_MAX(tn, zn) + 1;
-    MPZ_FIT_SIZE(z, alloc);
-    zd = z->_mp_d;
+    zd = FLINT_MPZ_REALLOC(z, alloc);
 
     if (sgn >= 0)
     {
@@ -166,7 +159,7 @@ _flint_mpz_addmul_large(mpz_ptr z, mpz_srcptr x, mpz_srcptr y, int negate)
 void fmpz_addmul(fmpz_t f, const fmpz_t g, const fmpz_t h)
 {
     fmpz c1, c2, c3;
-    __mpz_struct * mf;
+    mpz_ptr mf;
 
     c1 = *g;
 	c2 = *h;
@@ -218,5 +211,108 @@ void fmpz_addmul(fmpz_t f, const fmpz_t g, const fmpz_t h)
         mf = _fmpz_promote_val(f);
         _flint_mpz_addmul_large(mf, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2), 0);
         _fmpz_demote_val(f);  /* cancellation may have occurred	*/
+    }
+}
+
+void fmpz_addmul_si(fmpz_t f, const fmpz_t g, slong x)
+{
+    fmpz F, G;
+
+    G = *g;
+    if (x == 0 || G == 0)
+        return;
+
+    F = *f;
+    if (F == 0)
+    {
+        fmpz_mul_si(f, g, x);
+        return;
+    }
+
+    if (!COEFF_IS_MPZ(G))
+    {
+        ulong p1, p0;
+        smul_ppmm(p1, p0, G, x);
+
+        if (!COEFF_IS_MPZ(F))
+        {
+            ulong F1 = FLINT_SIGN_EXT(F);
+            add_ssaaaa(p1, p0, p1, p0, F1, F);
+            fmpz_set_signed_uiui(f, p1, p0);
+        }
+        else
+        {
+            mpz_ptr pF = COEFF_TO_PTR(F);
+            flint_mpz_add_signed_uiui(pF, pF, p1, p0);
+            _fmpz_demote_val(f);
+        }
+    }
+    else
+    {
+        mpz_ptr pG = COEFF_TO_PTR(G);
+        mpz_ptr pF = _fmpz_promote_val(f);
+
+        if (x < 0)
+            flint_mpz_submul_ui(pF, pG, -x);
+        else
+            flint_mpz_addmul_ui(pF, pG, x);
+
+        _fmpz_demote_val(f);
+    }
+}
+
+void fmpz_addmul_ui(fmpz_t f, const fmpz_t g, ulong x)
+{
+    fmpz F, G;
+
+    G = *g;
+    if (x == 0 || G == 0)
+        return;
+
+    F = *f;
+    if (F == 0)
+    {
+        fmpz_mul_ui(f, g, x);
+        return;
+    }
+
+    if (!COEFF_IS_MPZ(G))
+    {
+        ulong p1, p0;
+
+        if (x <= WORD_MAX)
+        {
+            smul_ppmm(p1, p0, G, x);
+        }
+        else
+        {
+            umul_ppmm(p1, p0, FLINT_ABS(G), x);
+            if (G < 0)
+            {
+                p1 = -p1 - (p0 != 0);
+                p0 = -p0;
+            }
+        }
+
+        if (!COEFF_IS_MPZ(F))
+        {
+            ulong F1 = FLINT_SIGN_EXT(F);
+            add_ssaaaa(p1, p0, p1, p0, F1, F);
+            fmpz_set_signed_uiui(f, p1, p0);
+        }
+        else
+        {
+            mpz_ptr pF = COEFF_TO_PTR(F);
+            flint_mpz_add_signed_uiui(pF, pF, p1, p0);
+            _fmpz_demote_val(f);
+        }
+    }
+    else
+    {
+        mpz_ptr pG = COEFF_TO_PTR(G);
+        mpz_ptr pF = _fmpz_promote_val(f);
+
+        flint_mpz_addmul_ui(pF, pG, x);
+        _fmpz_demote_val(f);
     }
 }

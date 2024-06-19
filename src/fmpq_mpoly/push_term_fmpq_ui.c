@@ -5,14 +5,15 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "fmpq_mpoly.h"
 
 void _fmpq_mpoly_push_rescale(fmpq_mpoly_t A,
-                                          fmpq_t C, const fmpq_mpoly_ctx_t ctx)
+                                          fmpq_t C, const fmpq_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     fmpz_mpoly_struct * Z = A->zpoly;
 

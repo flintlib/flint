@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -25,9 +25,9 @@
 extern "C" {
 #endif
 
-#define LIMB_ONE ((mp_limb_t) 1)
-#define LIMB_ONES (-(mp_limb_t) 1)
-#define LIMB_TOP (((mp_limb_t) 1) << (FLINT_BITS - 1))
+#define LIMB_ONE ((ulong) 1)
+#define LIMB_ONES (-(ulong) 1)
+#define LIMB_TOP (((ulong) 1) << (FLINT_BITS - 1))
 #define MASK_LIMB(n, c) ((n) & (LIMB_ONES << (c)))
 
 #define MAG_MAX_LAGOM_EXP (COEFF_MAX / 4)
@@ -118,25 +118,16 @@ _fmpz_sub2_fast(fmpz_t z, const fmpz_t x, const fmpz_t y, slong c)
 
 #define MAG_ONE_HALF (UWORD(1) << (MAG_BITS - 1))
 
-static inline mp_limb_t
-__mag_fixmul32(mp_limb_t x, mp_limb_t y)
-{
-    mp_limb_t u, v;
-    umul_ppmm(u, v, x, y);
-    return (u << (32 - MAG_BITS)) | (v >> MAG_BITS);
-}
-
 #if FLINT_BITS == 64
-#define MAG_FIXMUL(x, y) (((x) * (y)) >> MAG_BITS)
+# define MAG_FIXMUL(x, y) (((x) * (y)) >> MAG_BITS)
 #else
-#define MAG_FIXMUL(x, y) __mag_fixmul32((x), (y))
+# define MAG_FIXMUL(x, y) ((ulong) (((unsigned long long int) (x) * (unsigned long long int) (y)) >> MAG_BITS))
 #endif
 
 #define MAG_CHECK_BITS(rr) \
     if (MAG_MAN(rr) != 0 && FLINT_BIT_COUNT(MAG_MAN(rr)) != MAG_BITS) \
     { \
-        flint_printf("FAIL: wrong number of bits in mantissa!\n"); \
-        flint_abort(); \
+        flint_throw(FLINT_ERROR, "FAIL: wrong number of bits in mantissa!\n"); \
     }
 
 /* Note: assumes mantissa either has the right number of bits, or
@@ -146,7 +137,7 @@ __mag_fixmul32(mp_limb_t x, mp_limb_t y)
 
 #define MAG_ADJUST_ONE_TOO_LARGE(x) \
     do { \
-        mp_limb_t __t = MAG_MAN(x) >> MAG_BITS; \
+        ulong __t = MAG_MAN(x) >> MAG_BITS; \
         MAG_MAN(x) = (MAG_MAN(x) >> __t) + (__t & MAG_MAN(x)); \
         if (__t) \
             fmpz_add_ui(MAG_EXPREF(x), MAG_EXPREF(x), __t); \
@@ -154,14 +145,14 @@ __mag_fixmul32(mp_limb_t x, mp_limb_t y)
 
 #define MAG_FAST_ADJUST_ONE_TOO_LARGE(x) \
     do { \
-        mp_limb_t __t = MAG_MAN(x) >> MAG_BITS; \
+        ulong __t = MAG_MAN(x) >> MAG_BITS; \
         MAG_MAN(x) = (MAG_MAN(x) >> __t) + (__t & MAG_MAN(x)); \
         MAG_EXP(x) += __t; \
     } while (0)
 
 #define MAG_ADJUST_ONE_TOO_SMALL(x) \
     do { \
-        mp_limb_t __t = !(MAG_MAN(x) >> (MAG_BITS - 1)); \
+        ulong __t = !(MAG_MAN(x) >> (MAG_BITS - 1)); \
         MAG_MAN(x) = (MAG_MAN(x) << __t); \
         if (__t) \
             fmpz_sub_ui(MAG_EXPREF(x), MAG_EXPREF(x), __t); \
@@ -169,7 +160,7 @@ __mag_fixmul32(mp_limb_t x, mp_limb_t y)
 
 #define MAG_FAST_ADJUST_ONE_TOO_SMALL(x) \
     do { \
-        mp_limb_t __t = !(MAG_MAN(x) >> (MAG_BITS - 1)); \
+        ulong __t = !(MAG_MAN(x) >> (MAG_BITS - 1)); \
         MAG_MAN(x) = (MAG_MAN(x) << __t); \
         MAG_EXP(x) -= __t; \
     } while (0)
@@ -447,9 +438,9 @@ mag_fast_add_2exp_si(mag_t z, const mag_t x, slong e)
         int __cexp; \
         double __x; \
         int __fix; \
-        mp_limb_t __man; \
+        ulong __man; \
         __x = frexp((x), &__cexp); \
-        __man = (mp_limb_t)(__x * (double)(LIMB_ONE << MAG_BITS)) + 1; \
+        __man = (ulong)(__x * (double)(LIMB_ONE << MAG_BITS)) + 1; \
         __fix = __man >> (MAG_BITS); \
         __man = (__man >> __fix) + __fix; \
         (man) = __man; \
@@ -462,9 +453,9 @@ mag_fast_add_2exp_si(mag_t z, const mag_t x, slong e)
         int __cexp; \
         double __x; \
         int __fix; \
-        mp_limb_t __man; \
+        ulong __man; \
         __x = frexp((x), &__cexp); \
-        __man = (mp_limb_t)(__x * (double)(LIMB_ONE << MAG_BITS)) - 1; \
+        __man = (ulong)(__x * (double)(LIMB_ONE << MAG_BITS)) - 1; \
         __fix = __man < MAG_ONE_HALF; \
         __man = (__man << __fix); \
         (man) = __man; \
@@ -705,4 +696,3 @@ int mag_dump_file(FILE * stream, const mag_t x);
 #endif
 
 #endif
-

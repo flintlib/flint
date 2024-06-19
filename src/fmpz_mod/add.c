@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -30,9 +30,9 @@ void _fmpz_mod_add1(fmpz_t a, const fmpz_t b, const fmpz_t c,
 }
 
 void _fmpz_mod_add2s(fmpz_t a, const fmpz_t b, const fmpz_t c,
-                                                     const fmpz_mod_ctx_t ctx)
+                                                     const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
 {
-    mp_limb_t a0, b0, c0;
+    ulong a0, b0, c0;
 
     FLINT_ASSERT(fmpz_mod_is_canonical(b, ctx));
     FLINT_ASSERT(fmpz_mod_is_canonical(c, ctx));
@@ -48,7 +48,7 @@ void _fmpz_mod_add2s(fmpz_t a, const fmpz_t b, const fmpz_t c,
 void _fmpz_mod_add2(fmpz_t a, const fmpz_t b, const fmpz_t c,
                                                      const fmpz_mod_ctx_t ctx)
 {
-    mp_limb_t t2, t1, t0, a2, a1, a0, b1, b0, c1, c0;
+    ulong t2, t1, t0, a2, a1, a0, b1, b0, c1, c0;
 
     FLINT_ASSERT(fmpz_mod_is_canonical(b, ctx));
     FLINT_ASSERT(fmpz_mod_is_canonical(c, ctx));
@@ -78,5 +78,38 @@ void _fmpz_mod_addN(fmpz_t a, const fmpz_t b, const fmpz_t c,
     {
         fmpz_sub(a, a, ctx->n);
     }
+    FLINT_ASSERT(fmpz_mod_is_canonical(a, ctx));
+}
+
+void fmpz_mod_add_fmpz(fmpz_t a, const fmpz_t b, const fmpz_t c,
+                                                      const fmpz_mod_ctx_t ctx)
+{
+    FLINT_ASSERT(fmpz_mod_is_canonical(b, ctx));
+
+    fmpz_add(a, b, c);
+    fmpz_mod(a, a, ctx->n);
+
+    FLINT_ASSERT(fmpz_mod_is_canonical(a, ctx));
+}
+
+void fmpz_mod_add_ui(fmpz_t a, const fmpz_t b, ulong c,
+                                                      const fmpz_mod_ctx_t ctx)
+{
+    FLINT_ASSERT(fmpz_mod_is_canonical(b, ctx));
+
+    fmpz_add_ui(a, b, c);
+    fmpz_mod(a, a, ctx->n);
+
+    FLINT_ASSERT(fmpz_mod_is_canonical(a, ctx));
+}
+
+void fmpz_mod_add_si(fmpz_t a, const fmpz_t b, slong c,
+                                                      const fmpz_mod_ctx_t ctx)
+{
+    FLINT_ASSERT(fmpz_mod_is_canonical(b, ctx));
+
+    fmpz_add_si(a, b, c);
+    fmpz_mod(a, a, ctx->n);
+
     FLINT_ASSERT(fmpz_mod_is_canonical(a, ctx));
 }

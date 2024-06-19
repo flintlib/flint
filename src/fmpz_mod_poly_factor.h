@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -19,7 +19,6 @@
 #define FMPZ_MOD_POLY_FACTOR_INLINE static inline
 #endif
 
-#include "thread_pool.h"
 #include "fmpz_mod_types.h"
 
 #ifdef __cplusplus
@@ -29,7 +28,7 @@ extern "C" {
 /* Factoring  ****************************************************************/
 
 void fmpz_mod_poly_factor_init(fmpz_mod_poly_factor_t fac,
-                                                     const fmpz_mod_ctx_t ctx);
+                                                     const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
 
 typedef struct
 {
@@ -58,7 +57,7 @@ void fmpz_mod_poly_factor_set(fmpz_mod_poly_factor_t res,
 
 FMPZ_MOD_POLY_FACTOR_INLINE
 void fmpz_mod_poly_factor_swap(fmpz_mod_poly_factor_t a,
-                            fmpz_mod_poly_factor_t b, const fmpz_mod_ctx_t ctx)
+                            fmpz_mod_poly_factor_t b, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
 {
     fmpz_mod_poly_factor_struct t = *a;
     *a = *b;
@@ -80,7 +79,7 @@ void fmpz_mod_poly_factor_concat(fmpz_mod_poly_factor_t res,
                    const fmpz_mod_poly_factor_t fac, const fmpz_mod_ctx_t ctx);
 
 void fmpz_mod_poly_factor_pow(fmpz_mod_poly_factor_t fac, slong exp,
-                                                     const fmpz_mod_ctx_t ctx);
+                                                     const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
 
 int fmpz_mod_poly_is_irreducible(const fmpz_mod_poly_t f,
                                                      const fmpz_mod_ctx_t ctx);

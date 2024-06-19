@@ -5,12 +5,18 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "longlong.h"
+#include "fmpz.h"
+#include "fq_nmod.h"
+#include "fq_nmod_poly.h"
+#include "n_poly.h"
+#include "mpoly.h"
+#include "nmod_mpoly.h"
 #include "fq_nmod_mpoly.h"
-
 
 int _fq_nmod_mpoly_compose_fq_nmod_poly_sp(fq_nmod_poly_t A, const fq_nmod_mpoly_t B,
                 fq_nmod_poly_struct * const * C, const fq_nmod_mpoly_ctx_t ctx)
@@ -18,10 +24,10 @@ int _fq_nmod_mpoly_compose_fq_nmod_poly_sp(fq_nmod_poly_t A, const fq_nmod_mpoly
     slong d = fq_nmod_ctx_degree(ctx->fqctx);
     int success = 1;
     flint_bitcnt_t bits = B->bits;
-    slong i, j, k, N, nvars = ctx->minfo->nvars;
+    slong i, k, N, nvars = ctx->minfo->nvars;
     slong entries, k_len, shift, off;
     slong Blen = B->length;
-    const mp_limb_t * Bcoeff = B->coeffs;
+    const ulong * Bcoeff = B->coeffs;
     ulong * Bexp = B->exps;
     slong * degrees;
     slong * offs;
@@ -59,7 +65,9 @@ int _fq_nmod_mpoly_compose_fq_nmod_poly_sp(fq_nmod_poly_t A, const fq_nmod_mpoly
     k = 0;
     for (i = 0; i < nvars; i++)
     {
-        flint_bitcnt_t varibits = FLINT_BIT_COUNT(degrees[i]);
+        flint_bitcnt_t j, varibits;
+
+        varibits = FLINT_BIT_COUNT(degrees[i]);
 
         mpoly_gen_offset_shift_sp(&off, &shift, i, bits, ctx->minfo);
         for (j = 0; j < varibits; j++)
@@ -120,7 +128,7 @@ int _fq_nmod_mpoly_compose_fq_nmod_poly_mp(fq_nmod_poly_t A, const fq_nmod_mpoly
     slong i, k, N, nvars = ctx->minfo->nvars;
     slong entries, k_len, off;
     slong Blen = B->length;
-    const mp_limb_t * Bcoeff = B->coeffs;
+    const ulong * Bcoeff = B->coeffs;
     ulong * Bexp = B->exps;
     fmpz * degrees;
     slong * offs;

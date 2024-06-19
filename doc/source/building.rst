@@ -12,8 +12,8 @@ Building FLINT requires:
 * MPFR, at least version 4.1.0 (https://mpfr.org/)
 * Either of the following build systems:
 
-  * GNU Make together with GNU Autotools
-  * CMake
+  * GNU Make together with GNU Autotools (Recommended)
+  * CMake (Recommended only for Windows users)
 
 On a typical Linux or Unix-like system where Autotools is available (see below
 for instructions using CMake), FLINT can be built and installed as follows:
@@ -21,13 +21,16 @@ for instructions using CMake), FLINT can be built and installed as follows:
 .. code-block:: bash
 
     ./bootstrap.sh
-    ./configure --disable-static
+    ./configure
     make -j N
     make install
 
 where ``N`` is the number of jobs number allowed to run parallel. Typically, the
 fastest way to build is to let ``N`` be the number of threads your CPU plus one,
 which can be obtained in Bash through ``$(expr $(nproc) + 1)``.
+
+By default, FLINT only builds a shared library, but a static library can be
+built by pushing ``--enable-static`` to ``configure``.
 
 We also recommend that you check that the library works as it should through
 ``make check``, or ``make -j N check`` for a parallel check, before installing.
@@ -45,7 +48,6 @@ An example of a custom configuration command would be
     ./configure                                         \
         --enable-assert                                 \
         --enable-avx2                                   \
-        --disable-static                                \
         --with-gmp-include=/home/user1/builds/includes/ \
         --with-gmp-lib=/home/user1/builds/lib/          \
         --with-mpfr=/usr                                \
@@ -137,19 +139,17 @@ FLINT with ``--enable-coverage``. Then run:
 .. code-block:: bash
 
     make -j N check
-    make coverage
+    make coverage_html
 
 This will place a coverage report in ``build/coverage``.
-
 
 Static or dynamic library only
 -------------------------------------------------------------------------------
 
-FLINT builds static and shared libraries by default, except on
-platforms where this is not supported. If you do not require either a shared
-or static library then you may pass ``--disable-static`` or
-``--disable-shared`` to ``configure``. This can substantially speed up the
-build.
+By default FLINT only builds a shared libraries by default. If you need to build
+a static library, you can pass ``--enable-static`` to ``configure``. With this,
+``--disable-shared`` can be passed as well to disable the build of a shared
+library, which will reduce the building time.
 
 AVX2 instructions
 -------------------------------------------------------------------------------
@@ -196,10 +196,15 @@ It is also possible to override the default CC, AR and CFLAGS used by FLINT by
 passing ``CC=full_path_to_compiler``, etc., to FLINT's configure.
 
 
-CMake build
+CMake build for Windows users
 -------------------------------------------------------------------------------
 
-If you wish to install FLINT with CMake, simply type:
+For Windows users, we also provide a way to install FLINT using CMake. Note,
+however, that FLINT's CMake script only exists to provide Windows users a way to
+install FLINT. For UNIX-type systems, please use Autotools along with GNU Make
+instead, as described at the top of this page.
+
+If you wish to install FLINT with CMake on Windows, simply type:
 
 .. code-block:: bash
 

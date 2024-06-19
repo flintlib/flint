@@ -5,29 +5,31 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 static int _nmod_mpoly_divrem_monagan_pearce1_binomial(
     nmod_mpoly_t Q,
     nmod_mpoly_t R,
-    const mp_limb_t * Acoeffs, const ulong * Aexps, slong Alen,
-    const mp_limb_t * Bcoeffs, const ulong * Bexps,
+    const ulong * Acoeffs, const ulong * Aexps, slong Alen,
+    const ulong * Bcoeffs, const ulong * Bexps,
     flint_bitcnt_t bits,
     ulong maskhi,
     nmod_t mod)
 {
-    mp_limb_t * Qcoeffs = Q->coeffs;
-    mp_limb_t * Rcoeffs = R->coeffs;
+    ulong * Qcoeffs = Q->coeffs;
+    ulong * Rcoeffs = R->coeffs;
     ulong * Qexps = Q->exps;
     ulong * Rexps = R->exps;
     ulong lexp, mask = mpoly_overflow_mask_sp(bits);
-    mp_limb_t lcoeff;
-    mp_limb_t lc_inv = nmod_inv(Bcoeffs[0], mod);
-    mp_limb_t mBcoeff1 = mod.n - Bcoeffs[1];
+    ulong lcoeff;
+    ulong lc_inv = nmod_inv(Bcoeffs[0], mod);
+    ulong mBcoeff1 = mod.n - Bcoeffs[1];
     slong Qlen = 0;
     slong Rlen = 0;
     slong Aidx = 0;
@@ -137,8 +139,8 @@ exp_overflow:
 static int _nmod_mpoly_divrem_monagan_pearce1(
     nmod_mpoly_t Q,
     nmod_mpoly_t R,
-    const mp_limb_t * Acoeffs, const ulong * Aexps, slong Alen,
-    const mp_limb_t * Bcoeffs, const ulong * Bexps, slong Blen,
+    const ulong * Acoeffs, const ulong * Aexps, slong Alen,
+    const ulong * Bcoeffs, const ulong * Bexps, slong Blen,
     flint_bitcnt_t bits,
     ulong maskhi,
     nmod_t fctx)
@@ -149,14 +151,14 @@ static int _nmod_mpoly_divrem_monagan_pearce1(
     mpoly_heap_t * chain;
     slong * store, * store_base;
     mpoly_heap_t * x;
-    mp_limb_t * Qcoeffs = Q->coeffs;
-    mp_limb_t * Rcoeffs = R->coeffs;
+    ulong * Qcoeffs = Q->coeffs;
+    ulong * Rcoeffs = R->coeffs;
     ulong * Qexps = Q->exps;
     ulong * Rexps = R->exps;
     slong * hind;
     ulong mask, exp;
     int lt_divides;
-    mp_limb_t lc_minus_inv, acc0, acc1, acc2, pp1, pp0;
+    ulong lc_minus_inv, acc0, acc1, acc2, pp1, pp0;
     TMP_INIT;
 
     TMP_START;
@@ -210,7 +212,7 @@ static int _nmod_mpoly_divrem_monagan_pearce1(
                 *store++ = x->i;
                 *store++ = x->j;
 
-                if (x->i == -WORD(1))
+                if (x->i == -UWORD(1))
                 {
                     add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0,
                                  UWORD(0), UWORD(0), fctx.n - Acoeffs[x->j]);
@@ -344,8 +346,8 @@ exp_overflow:
 static int _nmod_mpoly_divrem_monagan_pearce(
     nmod_mpoly_t Q,
     nmod_mpoly_t R,
-    const mp_limb_t * Acoeffs, const ulong * Aexps, slong Alen,
-    const mp_limb_t * Bcoeffs, const ulong * Bexps, slong Blen,
+    const ulong * Acoeffs, const ulong * Aexps, slong Alen,
+    const ulong * Bcoeffs, const ulong * Bexps, slong Blen,
     slong bits,
     slong N,
     const ulong * cmpmask,
@@ -358,8 +360,8 @@ static int _nmod_mpoly_divrem_monagan_pearce(
     mpoly_heap_t * chain;
     slong * store, * store_base;
     mpoly_heap_t * x;
-    mp_limb_t * Qcoeffs = Q->coeffs;
-    mp_limb_t * Rcoeffs = R->coeffs;
+    ulong * Qcoeffs = Q->coeffs;
+    ulong * Rcoeffs = R->coeffs;
     ulong * Qexps = Q->exps;
     ulong * Rexps = R->exps;
     ulong * exp, * exps;
@@ -368,7 +370,7 @@ static int _nmod_mpoly_divrem_monagan_pearce(
     ulong mask;
     slong * hind;
     int lt_divides;
-    mp_limb_t lc_minus_inv, acc0, acc1, acc2, pp1, pp0;
+    ulong lc_minus_inv, acc0, acc1, acc2, pp1, pp0;
     TMP_INIT;
 
     if (N == 1)
@@ -455,7 +457,7 @@ static int _nmod_mpoly_divrem_monagan_pearce(
                 *store++ = x->i;
                 *store++ = x->j;
 
-                if (x->i == -WORD(1))
+                if (x->i == -UWORD(1))
                 {
                     add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0,
                                    UWORD(0), UWORD(0), fctx.n - Acoeffs[x->j]);

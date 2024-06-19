@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -21,7 +21,7 @@ TEST_FUNCTION_START(nmod_poly_factor_is_irreducible_ddf, state)
     for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
     {
         nmod_poly_t poly, poly2, poly3;
-        mp_limb_t modulus;
+        ulong modulus;
         slong length, length2;
         int result = 1;
 

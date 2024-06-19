@@ -5,11 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <stdio.h>
+#include "calcium.h"
 #include "ca.h"
 #include "ca_ext.h"
 #include "ca_field.h"
@@ -185,8 +186,7 @@ _ca_field_print(calcium_stream_t out, const ca_field_t K, ca_print_info_t * info
 
         if (j == info->ext_len)
         {
-            flint_printf("_ca_field_print: ext not found!\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "_ca_field_print: ext not found!\n");
         }
     }
 
@@ -407,8 +407,7 @@ _ca_print(calcium_stream_t out, const ca_t x, ca_print_info_t * info, ca_ctx_t c
 
                 if (j == info->ext_len)
                 {
-                    flint_printf("_ca_field_print: ext not found!\n");
-                    flint_abort();
+                    flint_throw(FLINT_ERROR, "_ca_field_print: ext not found!\n");
                 }
             }
 

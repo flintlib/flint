@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "arb.h"
 #include "arb_mat.h"
 
 #ifdef __GNUC__
@@ -17,6 +18,8 @@
 #else
 # include <math.h>
 #endif
+
+#include "double_extras.h"
 
 /* Block size for better cache locality. */
 #define BLOCK_SIZE 32
@@ -101,7 +104,7 @@ static inline slong _mag_get_exp(const mag_t x)
 static double
 mag_get_d_fixed_si(const mag_t x, slong e)
 {
-    return ldexp(MAG_MAN(x), MAG_EXP(x) - e - MAG_BITS);
+    return d_mul_2exp(MAG_MAN(x), MAG_EXP(x) - e - MAG_BITS);
 }
 
 void
@@ -283,4 +286,3 @@ _arb_mat_addmul_rad_mag_fast(arb_mat_t C, mag_srcptr A, mag_srcptr B,
     flint_free(BB);
     flint_free(CC);
 }
-

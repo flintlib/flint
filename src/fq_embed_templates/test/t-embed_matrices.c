@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -28,13 +28,17 @@ TEST_TEMPLATE_FUNCTION_START(T, embed_matrices, state)
         TEMPLATE(B, mat_t) embed, project, one;
         slong d;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
         d = TEMPLATE(T, ctx_degree)(ctx);
         modulus = TEMPLATE(T, ctx_modulus)(ctx);
 
         TEMPLATE(T, init)(gen, ctx);
         TEMPLATE(T, gen)(gen, ctx);
+#if defined(FQ_NMOD_EMBED_H) || defined(FQ_ZECH_EMBED_H)
+        TEMPLATE(T, pow_ui)(gen, gen, TEMPLATE(T, ctx_prime)(ctx), ctx);
+#else
         TEMPLATE(T, pow)(gen, gen, TEMPLATE(T, ctx_prime)(ctx), ctx);
+#endif
 
         TEMPLATE(B, mat_init)(embed, d, d, TEMPLATE(B, poly_modulus)(modulus));
         TEMPLATE(B, mat_init)(project, d, d, TEMPLATE(B, poly_modulus)(modulus));
@@ -73,7 +77,7 @@ TEST_TEMPLATE_FUNCTION_START(T, embed_matrices, state)
             TEMPLATE(B, mat_t) embed, project, comp, one;
             slong m, n;
 
-            while (TEMPLATE(T, ctx_randtest)(ctx1, state),
+            while (TEMPLATE(T, ctx_init_randtest)(ctx1, state, 3),
                     m = TEMPLATE(T, ctx_degree)(ctx1),
                     m == 1)
             {

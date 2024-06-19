@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "acb.h"
 #include "acb_mat.h"
 
 void
@@ -18,8 +19,7 @@ acb_mat_trace(acb_t trace, const acb_mat_t mat, slong prec)
 
     if (!acb_mat_is_square(mat))
     {
-        flint_printf("acb_mat_trace: a square matrix is required!\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "acb_mat_trace: a square matrix is required!\n");
     }
 
     if (acb_mat_is_empty(mat))

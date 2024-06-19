@@ -5,16 +5,51 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdlib.h>
+#include <string.h>
 #include "fmpz.h"
 #include "fmpq.h"
 #include "fmpq_vec.h"
 #include "fmpq_poly.h"
 #include "gr.h"
 #include "gr_poly.h"
+#include "gr_vec.h"
+#include "gr_generic.h"
+
+#define FMPQ_POLY_CTX(ctx) POLYNOMIAL_CTX(ctx)
+#define FMPQ_POLY_CTX_VAR(ctx) (FMPQ_POLY_CTX(ctx)->var)
+
+static const char * default_var = "x";
+
+void
+_gr_fmpq_poly_ctx_clear(gr_ctx_t ctx)
+{
+    if (FMPQ_POLY_CTX_VAR(ctx) != default_var)
+        flint_free(FMPQ_POLY_CTX_VAR(ctx));
+}
+
+int _gr_fmpq_poly_ctx_set_gen_name(gr_ctx_t ctx, const char * s)
+{
+    slong len;
+    len = strlen(s);
+
+    if (FMPQ_POLY_CTX_VAR(ctx) == default_var)
+        FMPQ_POLY_CTX_VAR(ctx) = NULL;
+
+    FMPQ_POLY_CTX_VAR(ctx) = flint_realloc(FMPQ_POLY_CTX_VAR(ctx), len + 1);
+    memcpy(FMPQ_POLY_CTX_VAR(ctx), s, len + 1);
+    return GR_SUCCESS;
+}
+
+int _gr_fmpq_poly_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
+{
+    return _gr_fmpq_poly_ctx_set_gen_name(ctx, s[0]);
+}
+
 
 int
 _gr_fmpq_poly_ctx_write(gr_stream_t out, gr_ctx_t ctx)
@@ -65,7 +100,7 @@ _gr_fmpq_poly_randtest(fmpq_poly_t res, flint_rand_t state, const gr_ctx_t ctx)
 int
 _gr_fmpq_poly_write(gr_stream_t out, const fmpq_poly_t x, const gr_ctx_t ctx)
 {
-    gr_stream_write_free(out, fmpq_poly_get_str_pretty(x, "x"));
+    gr_stream_write_free(out, fmpq_poly_get_str_pretty(x, FMPQ_POLY_CTX_VAR(ctx)));
     return GR_SUCCESS;
 }
 
@@ -657,6 +692,7 @@ gr_static_method_table _fmpq_poly_methods;
 
 gr_method_tab_input _fmpq_poly_methods_input[] =
 {
+    {GR_METHOD_CTX_CLEAR,       (gr_funcptr) _gr_fmpq_poly_ctx_clear},
     {GR_METHOD_CTX_WRITE,       (gr_funcptr) _gr_fmpq_poly_ctx_write},
     {GR_METHOD_CTX_IS_RING,     (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate_true},
@@ -675,6 +711,9 @@ gr_method_tab_input _fmpq_poly_methods_input[] =
     {GR_METHOD_CTX_IS_EXACT,    (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_CANONICAL,
                                 (gr_funcptr) gr_generic_ctx_predicate_true},
+
+    {GR_METHOD_CTX_SET_GEN_NAME,  (gr_funcptr) _gr_fmpq_poly_ctx_set_gen_name},
+    {GR_METHOD_CTX_SET_GEN_NAMES, (gr_funcptr) _gr_fmpq_poly_ctx_set_gen_names},
     {GR_METHOD_INIT,            (gr_funcptr) _gr_fmpq_poly_init},
     {GR_METHOD_CLEAR,           (gr_funcptr) _gr_fmpq_poly_clear},
     {GR_METHOD_SWAP,            (gr_funcptr) _gr_fmpq_poly_swap},
@@ -684,6 +723,7 @@ gr_method_tab_input _fmpq_poly_methods_input[] =
     {GR_METHOD_ZERO,            (gr_funcptr) _gr_fmpq_poly_zero},
     {GR_METHOD_ONE,             (gr_funcptr) _gr_fmpq_poly_one},
     {GR_METHOD_GEN,             (gr_funcptr) _gr_fmpq_poly_gen},
+    {GR_METHOD_GENS,            (gr_funcptr) gr_generic_gens_single},
     {GR_METHOD_IS_ZERO,         (gr_funcptr) _gr_fmpq_poly_is_zero},
     {GR_METHOD_IS_ONE,          (gr_funcptr) _gr_fmpq_poly_is_one},
     {GR_METHOD_IS_NEG_ONE,      (gr_funcptr) _gr_fmpq_poly_is_neg_one},
@@ -693,7 +733,7 @@ gr_method_tab_input _fmpq_poly_methods_input[] =
     {GR_METHOD_SET_UI,          (gr_funcptr) _gr_fmpq_poly_set_ui},
     {GR_METHOD_SET_FMPZ,        (gr_funcptr) _gr_fmpq_poly_set_fmpz},
     {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_fmpq_poly_set_other},
-/*    {GR_METHOD_SET_STR,         (gr_funcptr) _gr_fmpq_poly_set_str}, */
+    {GR_METHOD_SET_STR,         (gr_funcptr) gr_generic_set_str_balance_additions},
     {GR_METHOD_GET_UI,          (gr_funcptr) _gr_fmpq_poly_get_ui},
     {GR_METHOD_GET_SI,          (gr_funcptr) _gr_fmpq_poly_get_si},
     {GR_METHOD_GET_FMPZ,        (gr_funcptr) _gr_fmpq_poly_get_fmpz},
@@ -749,6 +789,7 @@ gr_ctx_init_fmpq_poly(gr_ctx_t ctx)
     ctx->size_limit = WORD_MAX;
 
     ctx->methods = _fmpq_poly_methods;
+    POLYNOMIAL_CTX(ctx)->var = (char *) default_var;
 
     if (!_fmpq_poly_methods_initialized)
     {

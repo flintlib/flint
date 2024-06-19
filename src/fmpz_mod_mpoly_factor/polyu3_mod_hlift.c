@@ -5,13 +5,15 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mod.h"
+#include "mpoly.h"
 #include "fmpz_mod_mpoly_factor.h"
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
 
 static void fmpz_mod_polyu_get_fmpz_mod_polyun(
     fmpz_mod_polyu_t A,
@@ -439,7 +441,7 @@ int fmpz_mod_polyu3n_interp_crt_2sm_bpoly(
     fmpz_init(FvalueA);
     fmpz_init(FvalueB);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mod_poly_evaluate_fmpz(u, modulus, alphapow->coeffs + 1, ctx);
     fmpz_mod_mul(u, u, alphapow->coeffs + 1, ctx);
     fmpz_mod_add(u, u, u, ctx);
@@ -775,7 +777,7 @@ choose_prime:
 
 cleanup:
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success == 1)
     {
         fmpz_mod_polyu_t T1, T2, T3;

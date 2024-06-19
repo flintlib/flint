@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -43,39 +43,24 @@ TEST_FUNCTION_START(n_xgcd, state)
 
         result = (s <= b * c || b * c == 0);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("s >= b*c\n");
-            flint_printf
-                ("a = %wu, b = %wu, c = %wu, g = %wu, s = %wu, t = %wu\n", a,
-                 b, c, g, s, t);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "s >= b*c\n"
+                    "a = %wu, b = %wu, c = %wu, g = %wu, s = %wu, t = %wu\n",
+                    a, b, c, g, s, t);
 
         result = (t <= a * c || a * c == 0);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("t >= a*c\n");
-            flint_printf
-                ("a = %wu, b = %wu, c = %wu, g = %wu, s = %wu, t = %wu\n", a,
-                 b, c, g, s, t);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "t >= a*c\n"
+                    "a = %wu, b = %wu, c = %wu, g = %wu, s = %wu, t = %wu\n",
+                    a, b, c, g, s, t);
 
         result = (g == c && ph == UWORD(0) && pl == c);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("g != c or s*ac + t*bc != c\n");
-            flint_printf
-                ("a = %wu, b = %wu, c = %wu, g = %wu, s = %wu, t = %wu\n", a,
-                 b, c, g, s, t);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "g != c or s*ac + t*bc != c\n"
+                    "a = %wu, b = %wu, c = %wu, g = %wu, s = %wu, t = %wu\n",
+                    a, b, c, g, s, t);
     }
 
     /* a = 0, b = 0 */
@@ -86,13 +71,10 @@ TEST_FUNCTION_START(n_xgcd, state)
 
         result = (g == 0 && s == 1 && t == 0);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("Case a = 0, b = 0\n");
-            flint_printf("g = %wu, s = %wu, t = %wu\n", g, s, t);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Case a = 0, b = 0\n"
+                    "g = %wu, s = %wu, t = %wu\n",
+                    g, s, t);
     }
 
     /* b = 0 */
@@ -105,13 +87,10 @@ TEST_FUNCTION_START(n_xgcd, state)
 
         result = (g == a && s == 1 && t == 0);
         if (!result)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("Case a = 0\n");
-            flint_printf("a = %wu, g = %wu, s = %wu, t = %wu\n", a, g, s, t);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Case a = 0\n"
+                    "a = %wu, g = %wu, s = %wu, t = %wu\n",
+                    a, g, s, t);
     }
 
     TEST_FUNCTION_END(state);

@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -50,7 +50,7 @@ _gr_poly_compose_series_divconquer(gr_ptr res, gr_srcptr poly1, slong len1,
         alloc += hlen[i];
 
     GR_TMP_INIT_VEC(v, alloc +  2 * powlen, ctx);
-    h = (gr_ptr *) flint_malloc(((len1 + 1) / 2) * sizeof(mp_ptr));
+    h = (gr_ptr *) flint_malloc(((len1 + 1) / 2) * sizeof(nn_ptr));
     h[0] = v;
     for (i = 0; i < (len1 - 1) / 2; i++)
     {

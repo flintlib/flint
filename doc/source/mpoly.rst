@@ -20,8 +20,19 @@ Orderings
 --------------------------------------------------------------------------------
 .. type:: ordering_t
 
-     An enumeration of supported term orderings.  Currently one of ``ORD_LEX``, 
-     ``ORD_DEGLEX`` or ``ORD_DEGREVLEX``.
+    Represents one of the following supported term orderings:
+
+    .. macro:: ORD_LEX
+
+        The lexicographic ordering.
+
+    .. macro:: ORD_DEGLEX
+
+        The degree lexicographic ordering.
+
+    .. macro:: ORD_DEGREVLEX
+
+        The degree reverse lexicographic ordering.
 
 .. type:: mpoly_ctx_struct
           mpoly_ctx_t
@@ -39,8 +50,7 @@ Orderings
 
 .. function:: ordering_t mpoly_ordering_randtest(flint_rand_t state)
 
-    Return a random ordering. The possibilities are ``ORD_LEX``,
-    ``ORD_DEGLEX`` and ``ORD_DEGREVLEX``.
+    Return a random term ordering.
 
 .. function:: void mpoly_ctx_init_rand(mpoly_ctx_t mctx, flint_rand_t state, slong max_nvars)
 
@@ -64,11 +74,13 @@ Orderings
 Monomial arithmetic
 --------------------------------------------------------------------------------
 
+These functions in this section are **only provided as inline functions** as
+they are somewhat trivial. This is in order to minimize the FLINT binary.
 
 .. function:: void mpoly_monomial_add(ulong * exp_ptr, const ulong * exp2, const ulong * exp3, slong N)
 
     Set ``(exp_ptr, N)`` to the sum of the monomials ``(exp2, N)`` and
-    ``(exp3, N)``, assuming ``bits <= FLINT_BITS``
+    ``(exp3, N)``, assuming ``bits <= FLINT_BITS``.
 
 .. function:: void mpoly_monomial_add_mp(ulong * exp_ptr, const ulong * exp2, const ulong * exp3, slong N)
 
@@ -117,6 +129,8 @@ Monomial arithmetic
 Monomial comparison
 --------------------------------------------------------------------------------
 
+These functions in this section are **only provided as inline functions** as
+they are somewhat trivial. This is in order to minimize the FLINT binary.
 
 .. function:: int mpoly_monomial_is_zero(const ulong * exp, slong N)
 
@@ -150,6 +164,8 @@ Monomial comparison
 Monomial divisibility
 --------------------------------------------------------------------------------
 
+These functions in this section are **only provided as inline functions** as
+they are somewhat trivial. This is in order to minimize the FLINT binary.
 
 .. function:: int mpoly_monomial_divides(ulong * exp_ptr, const ulong * exp2, const ulong * exp3, slong N, ulong mask)
 

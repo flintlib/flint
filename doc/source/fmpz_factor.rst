@@ -28,7 +28,7 @@ A separate ``int`` field holds the sign, which may be `-1`, `0` or `1`.
 
     Clears an ``fmpz_factor_t`` structure.
 
-.. function:: void _fmpz_factor_append_ui(fmpz_factor_t factor, mp_limb_t p, ulong exp)
+.. function:: void _fmpz_factor_append_ui(fmpz_factor_t factor, ulong p, ulong exp)
 
     Append a factor `p` to the given exponent to the
     ``fmpz_factor_t`` structure ``factor``.
@@ -145,7 +145,7 @@ A separate ``int`` field holds the sign, which may be `-1`, `0` or `1`.
     smooth for any prime factors `p` of `n` then the function will
     not ever succeed).
 
-.. function:: int fmpz_factor_pollard_brent_single(fmpz_t p_factor, fmpz_t n_in, fmpz_t yi, fmpz_t ai, mp_limb_t max_iters)
+.. function:: int fmpz_factor_pollard_brent_single(fmpz_t p_factor, fmpz_t n_in, fmpz_t yi, fmpz_t ai, ulong max_iters)
 
     Pollard Rho algorithm for integer factorization. Assumes that the `n` is
     not prime. ``factor`` is set as the factor if found. Takes as input the initial
@@ -158,7 +158,7 @@ A separate ``int`` field holds the sign, which may be `-1`, `0` or `1`.
     If the algorithm fails to find a non trivial factor in one call, it tries again
     (this time with a different set of random values).
 
-.. function:: int fmpz_factor_pollard_brent(fmpz_t factor, flint_rand_t state, fmpz_t n, mp_limb_t max_tries, mp_limb_t max_iters)
+.. function:: int fmpz_factor_pollard_brent(fmpz_t factor, flint_rand_t state, fmpz_t n, ulong max_tries, ulong max_iters)
 
     Pollard Rho algorithm for integer factorization. Assumes that the `n` is
     not prime. ``factor`` is set as the factor if found. It is not assured that the
@@ -176,12 +176,27 @@ A separate ``int`` field holds the sign, which may be `-1`, `0` or `1`.
     https://maths-people.anu.edu.au/~brent/pd/rpb051i.pdf
 
 
+Input and output
+--------------------------------------------------------------------------------
+
+.. function:: int fmpz_factor_fprint(FILE * fs, const fmpz_factor_t factor)
+              int fmpz_factor_print(const fmpz_factor_t factor)
+
+    Prints the factorization ``factor`` into ``fs`` or ``stdout``. If ``factor``
+    is zero, it prints ``0``. Else, it prints the factorization as
+    ``f_{1}^e_{1} * ... * f_{n}^e_{n}``, where ``f_{i}`` and ``e_{i}`` are the
+    `i`-th factor and exponent, where ``^e_{i}`` is omitted if `e_{i} = 1`. In
+    particular, if ``factor`` is `1` or `-1`, it prints ``1`` or ``-1``,
+    respectively.
+
+    Returns the number of characters written to file stream.
+
 Elliptic curve (ECM) method
 --------------------------------------------------------------------------------
 
 Factoring of ``fmpz`` integers using ECM
 
-.. function:: void fmpz_factor_ecm_init(ecm_t ecm_inf, mp_limb_t sz)
+.. function:: void fmpz_factor_ecm_init(ecm_t ecm_inf, ulong sz)
 
     Initializes the ``ecm_t`` struct. This is needed in some functions
     and carries data between subsequent calls.
@@ -190,63 +205,47 @@ Factoring of ``fmpz`` integers using ECM
 
     Clears the ``ecm_t`` struct.
 
-.. function:: void fmpz_factor_ecm_addmod(mp_ptr a, mp_ptr b, mp_ptr c, mp_ptr n, mp_limb_t n_size)
-
-    Sets `a` to `(b + c)` ``%`` `n`. This is not a normal add mod function,
-    it assumes `n` is normalized (highest bit set) and `b` and `c` are reduced
-    modulo `n`.
-
-    Used for arithmetic operations in ``fmpz_factor_ecm``.
-
-.. function:: void fmpz_factor_ecm_submod(mp_ptr x, mp_ptr a, mp_ptr b, mp_ptr n, mp_limb_t n_size)
-
-    Sets `x` to `(a - b)` ``%`` `n`. This is not a normal subtract mod
-    function, it assumes `n` is normalized (highest bit set)
-    and `b` and `c` are reduced modulo `n`.
-
-    Used for arithmetic operations in ``fmpz_factor_ecm``.
-
-.. function:: void fmpz_factor_ecm_double(mp_ptr x, mp_ptr z, mp_ptr x0, mp_ptr z0, mp_ptr n, ecm_t ecm_inf)
+.. function:: void fmpz_factor_ecm_double(nn_ptr x, nn_ptr z, nn_ptr x0, nn_ptr z0, nn_ptr n, ecm_t ecm_inf)
 
     Sets the point `(x : z)` to two times `(x_0 : z_0)` modulo `n` according
     to the formula
 
-    .. math ::
+    .. math::
 
         x = (x_0 + z_0)^2 \cdot (x_0 - z_0)^2 \mod n,
 
-    .. math ::
+    .. math::
 
         z = 4 x_0 z_0 \left((x_0 - z_0)^2 + 4a_{24}x_0z_0\right) \mod n.
 
-    ``ecm_inf`` is used just to use temporary ``mp_ptr``'s in the
+    ``ecm_inf`` is used just to use temporary ``nn_ptr``'s in the
     structure. This group doubling is valid only for points expressed in
     Montgomery projective coordinates.
 
-.. function:: void fmpz_factor_ecm_add(mp_ptr x, mp_ptr z, mp_ptr x1, mp_ptr z1, mp_ptr x2, mp_ptr z2, mp_ptr x0, mp_ptr z0, mp_ptr n, ecm_t ecm_inf)
+.. function:: void fmpz_factor_ecm_add(nn_ptr x, nn_ptr z, nn_ptr x1, nn_ptr z1, nn_ptr x2, nn_ptr z2, nn_ptr x0, nn_ptr z0, nn_ptr n, ecm_t ecm_inf)
 
     Sets the point `(x : z)` to the sum of `(x_1 : z_1)` and `(x_2 : z_2)`
     modulo `n`, given the difference `(x_0 : z_0)` according to the formula
 
-    .. math ::
+    .. math::
 
         x = 4z_0(x_1x_2 - z_1z_2)^2 \mod n, \\ z = 4x_0(x_2z_1 - x_1z_2)^2 \mod n.
 
-    ``ecm_inf`` is used just to use temporary ``mp_ptr``'s in the
+    ``ecm_inf`` is used just to use temporary ``nn_ptr``'s in the
     structure. This group addition is valid only for points expressed in
     Montgomery projective coordinates.
 
-.. function:: void fmpz_factor_ecm_mul_montgomery_ladder(mp_ptr x, mp_ptr z, mp_ptr x0, mp_ptr z0, mp_limb_t k, mp_ptr n, ecm_t ecm_inf)
+.. function:: void fmpz_factor_ecm_mul_montgomery_ladder(nn_ptr x, nn_ptr z, nn_ptr x0, nn_ptr z0, ulong k, nn_ptr n, ecm_t ecm_inf)
 
     Montgomery ladder algorithm for scalar multiplication of elliptic points.
 
     Sets the point `(x : z)` to `k(x_0 : z_0)` modulo `n`.
 
-    ``ecm_inf`` is used just to use temporary ``mp_ptr``'s in the
+    ``ecm_inf`` is used just to use temporary ``nn_ptr``'s in the
     structure. Valid only for points expressed in Montgomery projective
     coordinates.
 
-.. function:: int fmpz_factor_ecm_select_curve(mp_ptr f, mp_ptr sigma, mp_ptr n, ecm_t ecm_inf)
+.. function:: int fmpz_factor_ecm_select_curve(nn_ptr f, nn_ptr sigma, nn_ptr n, ecm_t ecm_inf)
 
     Selects a random elliptic curve given a random integer ``sigma``,
     according to Suyama's parameterization. If the factor is found while
@@ -263,7 +262,7 @@ Factoring of ``fmpz`` integers using ECM
     The curve selected is of Montgomery form, the points selected satisfy the
     curve and are projective coordinates.
 
-.. function:: int fmpz_factor_ecm_stage_I(mp_ptr f, const mp_limb_t * prime_array, mp_limb_t num, mp_limb_t B1, mp_ptr n, ecm_t ecm_inf)
+.. function:: int fmpz_factor_ecm_stage_I(nn_ptr f, const ulong * prime_array, ulong num, ulong B1, nn_ptr n, ecm_t ecm_inf)
 
     Stage I implementation of the ECM algorithm.
 
@@ -274,7 +273,7 @@ Factoring of ``fmpz`` integers using ECM
     If the factor is found, number of words required to store the factor is
     returned, otherwise `0`.
 
-.. function:: int fmpz_factor_ecm_stage_II(mp_ptr f, mp_limb_t B1, mp_limb_t B2, mp_limb_t P, mp_ptr n, ecm_t ecm_inf)
+.. function:: int fmpz_factor_ecm_stage_II(nn_ptr f, ulong B1, ulong B2, ulong P, nn_ptr n, ecm_t ecm_inf)
 
     Stage II implementation of the ECM algorithm.
 
@@ -285,7 +284,7 @@ Factoring of ``fmpz`` integers using ECM
     If the factor is found, number of words required to store the factor is
     returned, otherwise `0`.
 
-.. function:: int fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2, flint_rand_t state, const fmpz_t n_in)
+.. function:: int fmpz_factor_ecm(fmpz_t f, ulong curves, ulong B1, ulong B2, flint_rand_t state, const fmpz_t n_in)
 
     Outer wrapper function for the ECM algorithm. In case ``f`` can fit
     in a single unsigned word, a call to ``n_factor_ecm`` is made.

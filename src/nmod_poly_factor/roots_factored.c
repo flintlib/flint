@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -143,7 +143,7 @@ static int roots_mod_prime_power(nmod_poly_factor_t x, nmod_poly_t fpk,
         }
 
         nmod_poly_fit_length(x1, p);
-        for (i = 0; i < p; i++)
+        for (i = 0; (ulong) i < p; i++)
             x1->coeffs[i] = i;
         x1->length = p;
     }

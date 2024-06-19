@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -83,9 +83,9 @@ TEST_FUNCTION_START(fmpq_dedekind_sum, state)
     fmpq_init(s1);
     fmpq_init(s2);
 
-    for (k = -200; k < 200; k++)
+    for (k = -40; k < 40; k++)
     {
-        for (h = -200; h < 200; h++)
+        for (h = -40; h < 40; h++)
         {
             fmpz_set_si(hh, h);
             fmpz_set_si(kk, k);

@@ -10,7 +10,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -18,7 +18,6 @@
 
 #include "templates.h"
 
-#include "ulong_extras.h"
 
 void
 TEMPLATE(T, poly_factor_equal_deg) (TEMPLATE(T, poly_factor_t) factors,
@@ -36,14 +35,14 @@ TEMPLATE(T, poly_factor_equal_deg) (TEMPLATE(T, poly_factor_t) factors,
 
         TEMPLATE(T, poly_init) (f, ctx);
 
-        flint_randinit(state);
+        flint_rand_init(state);
 
         while (!TEMPLATE(T, poly_factor_equal_deg_prob)
                (f, state, pol, d, ctx))
         {
         };
 
-        flint_randclear(state);
+        flint_rand_clear(state);
 
         TEMPLATE(T, poly_init) (g, ctx);
         TEMPLATE(T, poly_init) (r, ctx);

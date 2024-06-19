@@ -5,21 +5,22 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpn_extras.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
 int
 _fmpz_poly_bit_unpack(fmpz * poly, slong len,
-                      mp_srcptr arr, flint_bitcnt_t bit_size, int negate)
+                      nn_srcptr arr, flint_bitcnt_t bit_size, int negate)
 {
     flint_bitcnt_t bits = 0;
-    mp_size_t limbs = 0;
+    slong limbs = 0;
     flint_bitcnt_t b = bit_size % FLINT_BITS;
-    mp_size_t l = bit_size / FLINT_BITS;
+    slong l = bit_size / FLINT_BITS;
     int borrow = 0;
     slong i;
 
@@ -42,12 +43,12 @@ _fmpz_poly_bit_unpack(fmpz * poly, slong len,
 
 void
 _fmpz_poly_bit_unpack_unsigned(fmpz * poly, slong len,
-                               mp_srcptr arr, flint_bitcnt_t bit_size)
+                               nn_srcptr arr, flint_bitcnt_t bit_size)
 {
     flint_bitcnt_t bits = 0;
-    mp_size_t limbs = 0;
+    slong limbs = 0;
     flint_bitcnt_t b = bit_size % FLINT_BITS;
-    mp_size_t l = bit_size / FLINT_BITS;
+    slong l = bit_size / FLINT_BITS;
     slong i;
 
     for (i = 0; i < len; i++)
@@ -72,8 +73,7 @@ fmpz_poly_bit_unpack_unsigned(fmpz_poly_t poly, const fmpz_t f,
 
     if (fmpz_sgn(f) < 0)
     {
-        flint_printf("Exception (fmpz_poly_bit_unpack_unsigned). Expected an unsigned value.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_poly_bit_unpack_unsigned). Expected an unsigned value.\n");
     }
 
     if (bit_size == 0 || fmpz_is_zero(f))

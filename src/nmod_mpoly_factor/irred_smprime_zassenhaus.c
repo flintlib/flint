@@ -5,13 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
 #include "fmpz_poly_factor.h"
+#include "n_poly.h"
 #include "nmod_mpoly_factor.h"
-#include "fq_nmod_mpoly_factor.h"
 
 /*
     return:
@@ -23,9 +24,9 @@ static int _try_lift(
     nmod_mpolyv_t qfac,
     const nmod_mpoly_t q,
     const nmod_mpolyv_t pfac,
-    const nmod_mpoly_t p,
+    const nmod_mpoly_t FLINT_UNUSED(p),
     slong m,
-    mp_limb_t * alpha,
+    ulong * alpha,
     slong n,
     const nmod_mpoly_ctx_t ctx)
 {
@@ -42,7 +43,7 @@ static int _try_lift(
     nmod_mpoly_init(t, ctx);
     nmod_mpoly_init(newq, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     nmod_mpoly_one(t, ctx);
     for (i = 0; i < pfac->length; i++)
         nmod_mpoly_mul(t, t, pfac->coeffs + i, ctx);
@@ -107,7 +108,7 @@ cleanup:
     nmod_mpoly_clear(t, ctx);
     nmod_mpoly_clear(newq, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success > 0)
     {
         nmod_mpoly_init(t, ctx);
@@ -134,7 +135,7 @@ int nmod_mpoly_factor_irred_smprime_zassenhaus(
     const slong n = ctx->minfo->nvars - 1;
     slong i, j, k, m, len;
     slong * subset;
-    mp_limb_t * alpha;
+    ulong * alpha;
     nmod_mpoly_struct * Aevals;
     slong * deg, * degeval;
     nmod_mpolyv_t qfac, pfac, tfac, dfac;
@@ -149,7 +150,7 @@ int nmod_mpoly_factor_irred_smprime_zassenhaus(
     FLINT_ASSERT(A->bits <= FLINT_BITS);
 
     subset = (slong*) flint_malloc(4*sizeof(slong));
-    alpha = (mp_limb_t *) flint_malloc(n*sizeof(mp_limb_t));
+    alpha = (ulong *) flint_malloc(n*sizeof(ulong));
     Aevals    = (nmod_mpoly_struct *) flint_malloc(n*sizeof(nmod_mpoly_struct));
     deg     = (slong *) flint_malloc((n + 1)*sizeof(slong));
     degeval = (slong *) flint_malloc((n + 1)*sizeof(slong));
@@ -234,7 +235,7 @@ next_alpha:
         nmod_mpoly_set(q, m < n ? Aevals + m : A, ctx);
         nmod_mpoly_set(p, Aevals + m - 1, ctx);
 
-    #ifdef FLINT_WANT_ASSERT
+    #if FLINT_WANT_ASSERT
         nmod_mpoly_one(t, ctx);
         for (i = 0; i < pfac->length; i++)
             nmod_mpoly_mul(t, t, pfac->coeffs + i, ctx);
@@ -283,7 +284,7 @@ next_alpha:
         {
             zassenhaus_subset_first(subset, len, k);
 
-        #ifdef FLINT_WANT_ASSERT
+        #if FLINT_WANT_ASSERT
             nmod_mpoly_one(t, ctx);
             for (i = 0; i < len; i++)
             {
@@ -373,7 +374,7 @@ cleanup:
     n_bpoly_clear(B);
     n_tpoly_clear(F);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success)
     {
         nmod_mpoly_init(t, ctx);

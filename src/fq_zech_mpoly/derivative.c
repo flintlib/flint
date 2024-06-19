@@ -5,11 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
+#include "fmpz.h"
 #include "fq_zech.h"
+#include "mpoly.h"
 #include "fq_zech_mpoly.h"
 
 slong _fq_zech_mpoly_derivative(fq_zech_struct * Acoeff,       ulong * Aexp,
@@ -23,7 +26,7 @@ slong _fq_zech_mpoly_derivative(fq_zech_struct * Acoeff,       ulong * Aexp,
     Alen = 0;
     for (i = 0; i < Blen; i++)
     {
-        mp_limb_t cr;
+        ulong cr;
         ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
         ulong c = (Bexp[N*i + offset] >> shift) & mask;
         if (c == 0)
@@ -53,7 +56,7 @@ slong _fq_zech_mpoly_derivative_mp(fq_zech_struct * Acoeff,       ulong * Aexp,
     Alen = 0;
     for (i = 0; i < Blen; i++)
     {
-        mp_limb_t cr;
+        ulong cr;
         fmpz_set_ui_array(c, Bexp + N*i + offset, bits/FLINT_BITS);
         if (fmpz_is_zero(c))
             continue;

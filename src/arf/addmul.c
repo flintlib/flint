@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -15,9 +15,9 @@
 int
 arf_addmul(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec, arf_rnd_t rnd)
 {
-    mp_size_t xn, yn, zn, tn, alloc;
-    mp_srcptr xptr, yptr, zptr;
-    mp_ptr tptr, tptr2;
+    slong xn, yn, zn, tn, alloc;
+    nn_srcptr xptr, yptr, zptr;
+    nn_ptr tptr, tptr2;
     fmpz_t texp;
     slong shift;
     int tsgnbit, inexact;
@@ -80,9 +80,9 @@ arf_addmul(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec, arf_rnd_t rnd)
 int
 arf_addmul_mpz(arf_ptr z, arf_srcptr x, const mpz_t y, slong prec, arf_rnd_t rnd)
 {
-    mp_size_t xn, yn, zn, tn, alloc;
-    mp_srcptr xptr, yptr, zptr;
-    mp_ptr tptr, tptr2;
+    slong xn, yn, zn, tn, alloc;
+    nn_srcptr xptr, yptr, zptr;
+    nn_ptr tptr, tptr2;
     fmpz_t texp, yexp;
     slong shift;
     int tsgnbit, ysgnbit, inexact;
@@ -148,4 +148,3 @@ arf_addmul_mpz(arf_ptr z, arf_srcptr x, const mpz_t y, slong prec, arf_rnd_t rnd
 
     return inexact;
 }
-

@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -20,7 +20,7 @@
     raised to the e-th power, assuming that neither op nor e are zero.
  */
 
-void _fq_nmod_frobenius(mp_limb_t *rop, const mp_limb_t *op, slong len, slong e,
+void _fq_nmod_frobenius(ulong *rop, const ulong *op, slong len, slong e,
                         const fq_nmod_ctx_t ctx)
 {
     const slong d = ctx->j[ctx->len - 1];
@@ -35,7 +35,7 @@ void _fq_nmod_frobenius(mp_limb_t *rop, const mp_limb_t *op, slong len, slong e,
         fmpz_t t;
 
         fmpz_init(t);
-        fmpz_pow_ui(t, fq_nmod_ctx_prime(ctx), e);
+        fmpz_ui_pow_ui(t, fq_nmod_ctx_prime(ctx), e);
         _fq_nmod_pow(rop, op, len, t, ctx);
         fmpz_clear(t);
     }
@@ -59,7 +59,7 @@ void fq_nmod_frobenius(fq_nmod_t rop, const fq_nmod_t op, slong e, const fq_nmod
     }
     else
     {
-        mp_limb_t *t;
+        ulong *t;
 
         if (rop == op)
         {
@@ -87,4 +87,3 @@ void fq_nmod_frobenius(fq_nmod_t rop, const fq_nmod_t op, slong e, const fq_nmod
         _nmod_poly_normalise(rop);
     }
 }
-

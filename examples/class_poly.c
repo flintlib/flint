@@ -2,10 +2,10 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include "arb.h"
-#include "acb_modular.h"
-#include "fmpz_poly.h"
-#include "profiler.h"
+#include <flint/arb.h>
+#include <flint/acb_modular.h>
+#include <flint/fmpz_poly.h>
+#include <flint/profiler.h>
 
 int main(int argc, char *argv[])
 {

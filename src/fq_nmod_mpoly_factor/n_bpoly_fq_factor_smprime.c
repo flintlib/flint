@@ -5,14 +5,18 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "longlong.h"
+#include "fq_nmod.h"
 #include "nmod_mat.h"
 #include "fmpz_poly_factor.h"
-#include "nmod_mpoly_factor.h"
+#include "fq_nmod_poly.h"
 #include "fq_nmod_poly_factor.h"
+#include "n_poly.h"
+#include "nmod_mpoly_factor.h"
 #include "fq_nmod_mpoly_factor.h"
 
 #define FLINT_TMP_ARRAY_ALLOC(n, T) (T *) TMP_ALLOC(n*sizeof(T))
@@ -213,7 +217,7 @@ static void _hensel_lift_fac(
 
     for (i = 0; i < c->length; i++)
     {
-    #ifdef FLINT_WANT_ASSERT
+    #if FLINT_WANT_ASSERT
         {
             slong j, d = fq_nmod_ctx_degree(ctx);
             for (j = 0; j < FLINT_MIN(p0, c->coeffs[i].length); j++)
@@ -246,7 +250,7 @@ static void _hensel_lift_fac(
     n_bpoly_swap(G, t1);
     n_bpoly_swap(H, t2);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         slong j, d = fq_nmod_ctx_degree(ctx);
         n_fq_bpoly_mul(t1, G, H, ctx);
@@ -317,7 +321,7 @@ static void _hensel_lift_inv(
 
     for (i = 0; i < c->length; i++)
     {
-    #ifdef FLINT_WANT_ASSERT
+    #if FLINT_WANT_ASSERT
         {
             slong j, d = fq_nmod_ctx_degree(ctx);
             for (j = 0; j < p0; j++)
@@ -350,7 +354,7 @@ static void _hensel_lift_inv(
     n_bpoly_swap(t1, B);
     n_bpoly_swap(t2, A);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     n_fq_bpoly_mul(t1, G, A, ctx);
     n_fq_bpoly_mul(t2, H, B, ctx);
     n_fq_bpoly_add(c, t1, t2, ctx);
@@ -476,7 +480,7 @@ static void n_fq_bpoly_lift_start(
                                                 r*sizeof(n_fq_bpoly_struct *));
 
     /* linear lifting has large memory requirements wrt r */
-    if (r < 20 + 5*FLINT_BIT_COUNT(degx))
+    if (r < 20 + 5 * (slong) FLINT_BIT_COUNT(degx))
         L->use_linear = 1;
     else
         L->use_linear = 0;
@@ -526,7 +530,7 @@ static void n_fq_bpoly_lift_start(
     FLINT_ASSERT(degx == n_fq_poly_degree(A->coeffs + 0));
 
     /* try evaluation when not too many local factors */
-    if (r < 10 + FLINT_BIT_COUNT(degx))
+    if (r < 10 + (slong) FLINT_BIT_COUNT(degx))
         L->Eok = nmod_eval_interp_set_degree_modulus(L->E, degx, ctx->mod);
     else
         L->Eok = 0;
@@ -907,7 +911,7 @@ static void n_fq_bpoly_lift_continue(
     for (k = 0; k < r; k++)
         n_fq_bpoly_reverse_gens(Bfinal + k, B + k, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         n_fq_bpoly_t t1, t2;
         n_fq_bpoly_init(t1);
@@ -954,10 +958,10 @@ static void _lattice(
     n_fq_bpoly_struct * ld;
     nmod_mat_t M, T1, T2;
     int nlimbs;
-    mp_limb_t * trow;
+    ulong * trow;
 
     nlimbs = _nmod_vec_dot_bound_limbs(r, ctx->mod);
-    trow = (mp_limb_t *) flint_malloc(r*sizeof(mp_limb_t));
+    trow = (ulong *) flint_malloc(r*sizeof(ulong));
     n_fq_bpoly_init(Q);
     n_fq_bpoly_init(R);
     n_fq_bpoly_init(dg);

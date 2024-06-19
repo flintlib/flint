@@ -5,12 +5,19 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "thread_support.h"
 #include "nmod_mpoly.h"
+
+#if FLINT_KNOW_STRONG_ORDER
+
+#include "mpn_extras.h"
+#include "thread_pool.h"
+#include "thread_support.h"
+#include "nmod.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
 
 #define PROFILE_THIS 0
@@ -77,20 +84,20 @@ static void vec_slong_print(const vec_slong_t v)
 */
 typedef struct _nmod_mpoly_ts_struct
 {
-    mp_limb_t * volatile coeffs; /* this is coeff_array[idx] */
+    ulong * volatile coeffs; /* this is coeff_array[idx] */
     ulong * volatile exps;       /* this is exp_array[idx] */
     volatile slong length;
     slong alloc;
     flint_bitcnt_t bits;
     flint_bitcnt_t idx;
-    mp_limb_t * exp_array[FLINT_BITS];
+    ulong * exp_array[FLINT_BITS];
     ulong * coeff_array[FLINT_BITS];
 } nmod_mpoly_ts_struct;
 
 typedef nmod_mpoly_ts_struct nmod_mpoly_ts_t[1];
 
 static void nmod_mpoly_ts_init(nmod_mpoly_ts_t A,
-                              mp_limb_t * Bcoeff, ulong * Bexp, slong Blen,
+                              ulong * Bcoeff, ulong * Bexp, slong Blen,
                                                     flint_bitcnt_t bits, slong N)
 {
     slong i;
@@ -107,7 +114,7 @@ static void nmod_mpoly_ts_init(nmod_mpoly_ts_t A,
     A->exps = A->exp_array[idx]
             = (ulong *) flint_malloc(N*A->alloc*sizeof(ulong));
     A->coeffs = A->coeff_array[idx]
-              = (mp_limb_t *) flint_malloc(A->alloc*sizeof(mp_limb_t));
+              = (ulong *) flint_malloc(A->alloc*sizeof(ulong));
     A->length = Blen;
     for (i = 0; i < Blen; i++)
     {
@@ -133,7 +140,7 @@ static void nmod_mpoly_ts_clear(nmod_mpoly_ts_t A)
 
 /* put B on the end of A */
 static void nmod_mpoly_ts_append(nmod_mpoly_ts_t A,
-                        mp_limb_t * Bcoeff, ulong * Bexps, slong Blen, slong N)
+                        ulong * Bcoeff, ulong * Bexps, slong Blen, slong N)
 {
 /* TODO: this needs barriers on non-x86 */
 
@@ -156,7 +163,7 @@ static void nmod_mpoly_ts_append(nmod_mpoly_ts_t A,
     {
         slong newalloc;
         ulong * newexps;
-        mp_limb_t * newcoeffs;
+        ulong * newcoeffs;
         flint_bitcnt_t newidx;
         newidx = FLINT_BIT_COUNT(newlength - 1);
         newidx = (newidx > 8) ? newidx - 8 : 0;
@@ -167,7 +174,7 @@ static void nmod_mpoly_ts_append(nmod_mpoly_ts_t A,
         newexps = A->exp_array[newidx]
                 = (ulong *) flint_malloc(N*newalloc*sizeof(ulong));
         newcoeffs = A->coeff_array[newidx]
-                  = (mp_limb_t *) flint_malloc(newalloc*sizeof(mp_limb_t));
+                  = (ulong *) flint_malloc(newalloc*sizeof(ulong));
 
         for (i = 0; i < oldlength; i++)
         {
@@ -235,7 +242,7 @@ typedef struct
     slong length;
     slong N;
     flint_bitcnt_t bits;
-    mp_limb_t lc_inv;
+    ulong lc_inv;
     ulong * cmpmask;
     int failed;
 #if PROFILE_THIS
@@ -360,9 +367,9 @@ static void divides_heap_base_add_chunk(divides_heap_base_t H, divides_heap_chun
 */
 static void _nmod_mpoly_mulsub_stripe1(
     nmod_mpoly_t A,
-    const mp_limb_t * Dcoeff, const ulong * Dexp, slong Dlen,
-    const mp_limb_t * Bcoeff, const ulong * Bexp, slong Blen,
-    const mp_limb_t * Ccoeff, const ulong * Cexp, slong Clen,
+    const ulong * Dcoeff, const ulong * Dexp, slong Dlen,
+    const ulong * Bcoeff, const ulong * Bexp, slong Blen,
+    const ulong * Ccoeff, const ulong * Cexp, slong Clen,
     const nmod_mpoly_stripe_t S)
 {
     int upperclosed;
@@ -380,7 +387,7 @@ static void _nmod_mpoly_mulsub_stripe1(
     mpoly_heap_t * x;
     slong Di;
     slong Alen;
-    mp_limb_t * Acoeff = A->coeffs;
+    ulong * Acoeff = A->coeffs;
     ulong * Aexp = A->exps;
     ulong acc0, acc1, acc2, pp0, pp1;
     ulong exp;
@@ -582,9 +589,9 @@ static void _nmod_mpoly_mulsub_stripe1(
 
 static void _nmod_mpoly_mulsub_stripe(
     nmod_mpoly_t A,
-    const mp_limb_t * Dcoeff, const ulong * Dexp, slong Dlen,
-    const mp_limb_t * Bcoeff, const ulong * Bexp, slong Blen,
-    const mp_limb_t * Ccoeff, const ulong * Cexp, slong Clen,
+    const ulong * Dcoeff, const ulong * Dexp, slong Dlen,
+    const ulong * Bcoeff, const ulong * Bexp, slong Blen,
+    const ulong * Ccoeff, const ulong * Cexp, slong Clen,
     const nmod_mpoly_stripe_t S)
 {
     int upperclosed;
@@ -602,7 +609,7 @@ static void _nmod_mpoly_mulsub_stripe(
     mpoly_heap_t * x;
     slong Di;
     slong Alen;
-    mp_limb_t * Acoeff = A->coeffs;
+    ulong * Acoeff = A->coeffs;
     ulong * Aexp = A->exps;
     ulong acc0, acc1, acc2, pp0, pp1;
     ulong * exp, * exps;
@@ -829,8 +836,8 @@ static void _nmod_mpoly_mulsub_stripe(
 */
 static int _nmod_mpoly_divides_stripe1(
     nmod_mpoly_t Q,
-    const mp_limb_t * Acoeff, const ulong * Aexp, slong Alen,
-    const mp_limb_t * Bcoeff, const ulong * Bexp, slong Blen,
+    const ulong * Acoeff, const ulong * Aexp, slong Alen,
+    const ulong * Bcoeff, const ulong * Bexp, slong Blen,
     const nmod_mpoly_stripe_t S)
 {
     flint_bitcnt_t bits = S->bits;
@@ -845,10 +852,10 @@ static int _nmod_mpoly_divides_stripe1(
     slong * store, * store_base;
     mpoly_heap_t * x;
     slong Qlen;
-    mp_limb_t * Qcoeff = Q->coeffs;
+    ulong * Qcoeff = Q->coeffs;
     ulong * Qexp = Q->exps;
     ulong exp;
-    mp_limb_t acc0, acc1, acc2, pp1, pp0;
+    ulong acc0, acc1, acc2, pp1, pp0;
     ulong mask;
     slong * hind;
 
@@ -913,7 +920,7 @@ static int _nmod_mpoly_divides_stripe1(
                 *store++ = x->i;
                 *store++ = x->j;
 
-                if (x->i == -WORD(1))
+                if (x->i == -UWORD(1))
                 {
                     add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0,
                                     WORD(0), WORD(0), S->mod.n - Acoeff[x->j]);
@@ -1055,8 +1062,8 @@ not_exact_division:
 
 static int _nmod_mpoly_divides_stripe(
     nmod_mpoly_t Q,
-    const mp_limb_t * Acoeff, const ulong * Aexp, slong Alen,
-    const mp_limb_t * Bcoeff, const ulong * Bexp, slong Blen,
+    const ulong * Acoeff, const ulong * Aexp, slong Alen,
+    const ulong * Bcoeff, const ulong * Bexp, slong Blen,
     const nmod_mpoly_stripe_t S)
 {
     flint_bitcnt_t bits = S->bits;
@@ -1069,12 +1076,12 @@ static int _nmod_mpoly_divides_stripe(
     slong * store, * store_base;
     mpoly_heap_t * x;
     slong Qlen;
-    mp_limb_t * Qcoeff = Q->coeffs;
+    ulong * Qcoeff = Q->coeffs;
     ulong * Qexp = Q->exps;
     ulong * exp, * exps;
     ulong ** exp_list;
     slong exp_next;
-    mp_limb_t acc0, acc1, acc2, pp1, pp0;
+    ulong acc0, acc1, acc2, pp1, pp0;
     ulong mask;
     slong * hind;
 
@@ -1157,7 +1164,7 @@ static int _nmod_mpoly_divides_stripe(
                 *store++ = x->i;
                 *store++ = x->j;
 
-                if (x->i == -WORD(1))
+                if (x->i == -UWORD(1))
                 {
                     add_sssaaaaaa(acc2, acc1, acc0, acc2, acc1, acc0,
                                  WORD(0), WORD(0), S->mod.n - Acoeff[x->j]);
@@ -1476,7 +1483,7 @@ static void trychunk(worker_arg_t W, divides_heap_chunk_t L)
     nmod_mpoly_struct * T2 = W->polyT2;
 
     mask = 0;
-    for (i = 0; i < FLINT_BITS/H->bits; i++)
+    for (i = 0; (ulong) i < FLINT_BITS/H->bits; i++)
         mask = (mask << H->bits) + (UWORD(1) << (H->bits - 1));
 
     /* return if this section has already finished processing */
@@ -1506,7 +1513,7 @@ static void trychunk(worker_arg_t W, divides_heap_chunk_t L)
     if (L->producer == 1)
     {
         divides_heap_chunk_struct * next;
-        mp_limb_t * Rcoeff;
+        ulong * Rcoeff;
         ulong * Rexp;
         slong Rlen;
 
@@ -1702,17 +1709,13 @@ int _nmod_mpoly_divides_heap_threaded_pool(
     ulong * Aexp, * Bexp;
     int freeAexp, freeBexp;
     worker_arg_struct * worker_args;
-    mp_limb_t qcoeff;
+    ulong qcoeff;
     ulong * texps, * qexps;
     divides_heap_base_t H;
 #if PROFILE_THIS
     slong idx = 0;
 #endif
     TMP_INIT;
-
-#if !FLINT_KNOW_STRONG_ORDER
-    return nmod_mpoly_divides_monagan_pearce(Q, A, B, ctx);
-#endif
 
     if (B->length < 2 || A->length < 2)
     {
@@ -1829,7 +1832,7 @@ int _nmod_mpoly_divides_heap_threaded_pool(
     mpoly_monomial_add_mp(texps, qexps + N*0, Bexp + N*1, N);
 
     mask = 0;
-    for (i = 0; i < FLINT_BITS/exp_bits; i++)
+    for (i = 0; (ulong) i < FLINT_BITS/exp_bits; i++)
         mask = (mask << exp_bits) + (UWORD(1) << (exp_bits - 1));
 
     k = 1;
@@ -1967,3 +1970,6 @@ int nmod_mpoly_divides_heap_threaded(
 
     return divides;
 }
+#else
+typedef int this_file_is_empty;
+#endif

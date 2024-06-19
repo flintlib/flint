@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -24,7 +24,13 @@ fexpr_contains(const fexpr_t expr, const fexpr_t x)
         return 0;
 
     if (expr_size == x_size)
-        return _mpn_equal(expr->data, x->data, x_size);
+    {
+        for (i = 0; i < x_size; i++)
+            if (expr->data[i] != x->data[i])
+                return 0;
+
+        return 1;
+    }
 
     nargs = fexpr_nargs(expr);
 

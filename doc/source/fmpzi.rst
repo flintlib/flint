@@ -51,7 +51,7 @@ Input and output
 Random number generation
 -------------------------------------------------------------------------------
 
-.. function:: void fmpzi_randtest(fmpzi_t res, flint_rand_t state, mp_bitcnt_t bits)
+.. function:: void fmpzi_randtest(fmpzi_t res, flint_rand_t state, flint_bitcnt_t bits)
 
 Properties
 -------------------------------------------------------------------------------

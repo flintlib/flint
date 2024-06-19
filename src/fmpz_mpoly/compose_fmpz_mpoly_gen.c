@@ -5,11 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fmpz_mat.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
 
 /* evaluate B(x_1,...,x_n) at x_i = y_c[i], y_j are vars of ctxAC */
@@ -45,4 +46,3 @@ void fmpz_mpoly_compose_fmpz_mpoly_gen(fmpz_mpoly_t A,
 
     return;
 }
-

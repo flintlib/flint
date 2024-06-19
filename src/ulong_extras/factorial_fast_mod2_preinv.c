@@ -5,23 +5,22 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "ulong_extras.h"
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-mp_limb_t
-n_factorial_fast_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv)
+ulong
+n_factorial_fast_mod2_preinv(ulong n, ulong p, ulong pinv)
 {
     slong i, m;
     nmod_t mod;
-    mp_ptr t, u, v;
-    mp_limb_t r, s;
+    nn_ptr t, u, v;
+    ulong r, s;
 
     if (p == UWORD(1) || n >= p)
         return UWORD(0);
@@ -61,4 +60,3 @@ n_factorial_fast_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv)
 
     return r;
 }
-

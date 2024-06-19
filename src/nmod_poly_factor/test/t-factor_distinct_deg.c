@@ -9,7 +9,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -28,7 +28,7 @@ TEST_FUNCTION_START(nmod_poly_factor_distinct_deg, state)
     {
         nmod_poly_t poly1, poly, q, r, product;
         nmod_poly_factor_t res;
-        mp_limb_t modulus, lead;
+        ulong modulus, lead;
         slong i, length, num;
         slong *degs;
         slong num_of_deg[MAX_DEG + 1];

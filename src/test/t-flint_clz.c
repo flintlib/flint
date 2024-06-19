@@ -5,36 +5,35 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "ulong_extras.h"
 #include "test_helpers.h"
 
+#define r_shift(in, c) (((c) == FLINT_BITS) ? WORD(0) : ((in) >> (c)))
+
 TEST_FUNCTION_START(flint_clz, state)
 {
-   int i, result;
+    int i, result;
 
-   for (i = 0; i < 100000 * flint_test_multiplier(); i++)
-   {
-      mp_limb_t n;
-      unsigned int count = 0;
+    for (i = 0; i < 100000 * flint_test_multiplier(); i++)
+    {
+        ulong n;
+        unsigned int count;
 
-      n = n_randtest(state);
+        n = n_randtest(state);
 
-      if (n != 0)
-         count = flint_clz(n);
+        if (n == 0)
+            continue;
 
-      result = ((n == UWORD(0)) || (((slong)(n << count) < WORD(0)) && (r_shift(n, FLINT_BITS-count) == UWORD(0))));
-      if (!result)
-      {
-         flint_printf("FAIL:\n");
-         flint_printf("n = %wu, count = %u\n", n, count);
-         fflush(stdout);
-         flint_abort();
-      }
-   }
+        count = flint_clz(n);
 
-   TEST_FUNCTION_END(state);
+        result = ((slong)(n << count) < WORD(0)) && (r_shift(n, FLINT_BITS-count) == UWORD(0));
+        if (!result)
+            TEST_FUNCTION_FAIL("n = %wu, count = %u\n", n, count);
+    }
+
+    TEST_FUNCTION_END(state);
 }

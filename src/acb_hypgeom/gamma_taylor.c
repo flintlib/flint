@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -54,7 +54,7 @@ evaluate_rect(acb_t res, const short * term_prec, slong len, const acb_t x, slon
             else
             {
                 if (!_arb_hypgeom_gamma_coeff_shallow(arb_midref(c + j - n1), arb_radref(c + j - n1), j, term_prec[j]))
-                    flint_abort();
+                    flint_throw(FLINT_ERROR, "(%s)\n", __func__);
             }
         }
 
@@ -300,4 +300,3 @@ cleanup:
 
     return success;
 }
-

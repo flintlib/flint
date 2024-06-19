@@ -5,18 +5,17 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "ulong_extras.h"
 
-mp_limb_t
-n_sqr_and_add_a(mp_limb_t y, mp_limb_t a, mp_limb_t n, mp_limb_t ninv,
-              mp_limb_t normbits)
+ulong
+n_sqr_and_add_a(ulong y, ulong a, ulong n, ulong ninv,
+              ulong normbits)
 {
-    mp_limb_t hi, lo;
+    ulong hi, lo;
 
     y = n_mulmod_preinv(y, y, n, ninv, normbits);
     add_ssaaaa(hi, lo, UWORD(0), y, UWORD(0), a);
@@ -34,11 +33,11 @@ n_sqr_and_add_a(mp_limb_t y, mp_limb_t a, mp_limb_t n, mp_limb_t ninv,
 }
 
 int
-n_factor_pollard_brent_single(mp_limb_t *factor, mp_limb_t n, mp_limb_t ninv,
-                              mp_limb_t ai, mp_limb_t xi, mp_limb_t normbits,
-                              mp_limb_t max_iters)
+n_factor_pollard_brent_single(ulong *factor, ulong n, ulong ninv,
+                              ulong ai, ulong xi, ulong normbits,
+                              ulong max_iters)
 {
-    mp_limb_t iter, i, k, j, minval, m, one_shift_norm, x, y, a, q, ys, subval;
+    ulong iter, i, k, j, minval, m, one_shift_norm, x, y, a, q, ys, subval;
     int ret;
 
     if (n < 4)
@@ -121,10 +120,10 @@ n_factor_pollard_brent_single(mp_limb_t *factor, mp_limb_t n, mp_limb_t ninv,
 }
 
 int
-n_factor_pollard_brent(mp_limb_t *factor, flint_rand_t state, mp_limb_t n_in,
-                        mp_limb_t max_tries, mp_limb_t max_iters)
+n_factor_pollard_brent(ulong *factor, flint_rand_t state, ulong n_in,
+                        ulong max_tries, ulong max_iters)
 {
-    mp_limb_t normbits, a, x, n, ninv, max;
+    ulong normbits, a, x, n, ninv, max;
     int ret;
 
     ret = 0;

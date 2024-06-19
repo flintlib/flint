@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -22,8 +22,28 @@
 static int
 want_parens(const char * s)
 {
-    if (s[0] == '(' || s[0] == '[' || s[0] == '{')
-        return 0;
+    /* Try to determine if the expression is already enclosed by
+       brackets or parentheses. */
+    if (s[0] == '[' || s[0] == '(' || s[0] == '}')
+    {
+        slong depth = 1;
+
+        char open = s[0];
+        char close = (open == '[') ? ']' : (open == '(' ? ')' : '}');
+
+        s++;
+        while (s[0] != '\0')
+        {
+            if (s[0] == open)
+                depth++;
+            else if (s[0] == close)
+                depth--;
+
+            s++;
+            if (depth == 0)
+                return s[0] != '\0';
+        }
+    }
 
     if (s[0] == '-')
         s++;
@@ -67,6 +87,8 @@ gr_poly_write(gr_stream_t out, const gr_poly_t poly, const char * x, gr_ctx_t ct
 
         if (i >= 1 && !strcmp(s, "1"))
         {
+            flint_free(s);
+
             if (printed_previously)
                 gr_stream_write(out, " + ");
 
@@ -80,6 +102,8 @@ gr_poly_write(gr_stream_t out, const gr_poly_t poly, const char * x, gr_ctx_t ct
         }
         else if (i >= 1 && !strcmp(s, "-1"))
         {
+            flint_free(s);
+
             if (printed_previously)
                 gr_stream_write(out, " - ");
             else

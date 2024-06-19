@@ -7,12 +7,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "thread_pool.h"
 #include "thread_support.h"
 #include "fmpz_vec.h"
+#include "acb.h"
 #include "acb_dirichlet.h"
 
 slong platt_get_smk_index(slong B, const fmpz_t j, slong prec);

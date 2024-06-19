@@ -4,12 +4,13 @@
     Copyright (C) 2008 Richard Howell-Peak
     Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -205,12 +206,16 @@ TEMPLATE(T, poly_factor) (TEMPLATE(T, poly_factor_t) result,
                           const TEMPLATE(T, poly_t) input,
                           const TEMPLATE(T, ctx_t) ctx)
 {
-    flint_bitcnt_t bits = fmpz_bits(TEMPLATE(T, ctx_prime) (ctx));
+#if defined(FQ_NMOD_POLY_FACTOR_H) || defined(FQ_ZECH_POLY_FACTOR_H)
+    flint_bitcnt_t bits = FLINT_BIT_COUNT(TEMPLATE(T, ctx_prime)(ctx));
+#else
+    flint_bitcnt_t bits = fmpz_bits(TEMPLATE(T, ctx_prime)(ctx));
+#endif
     slong n = TEMPLATE(T, poly_degree) (input, ctx);
 
     result->num = 0;
 
-    if (n < 10 + 50 / bits)
+    if (n < (slong) (10 + 50 / bits))
         __TEMPLATE(T, poly_factor_deflation) (result, leading_coeff, input,
                                               ZASSENHAUS, ctx);
     else

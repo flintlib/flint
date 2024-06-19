@@ -7,11 +7,10 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 
@@ -74,8 +73,7 @@ void fmpz_CRT(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
     fmpz_mod(c, m1, m2);
     if (!fmpz_invmod(c, c, m2))
     {
-        flint_printf("Exception (fmpz_CRT). m1 not invertible modulo m2.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_CRT). m1 not invertible modulo m2.\n");
     }
 
     fmpz_init(m1m2);
@@ -85,4 +83,60 @@ void fmpz_CRT(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
 
     fmpz_clear(m1m2);
     fmpz_clear(c);
+}
+
+void
+_fmpz_CRT_ui_precomp(fmpz_t out, const fmpz_t r1, const fmpz_t m1, ulong r2,
+    ulong m2, ulong m2inv, const fmpz_t m1m2, ulong c, int sign)
+{
+    ulong r1mod, s;
+    fmpz_t tmp;
+    nmod_t mod;
+
+    fmpz_init(tmp);
+
+    if (fmpz_sgn(r1) < 0)
+        fmpz_add(tmp, r1, m1);
+    else
+        fmpz_set(tmp, r1);
+
+    mod.n = m2;
+    mod.ninv = m2inv;
+    mod.norm = flint_clz(m2);
+    r1mod = fmpz_get_nmod(tmp, mod);
+
+    s = n_submod(r2, r1mod, m2);
+    s = n_mulmod2_preinv(s, c, m2, m2inv);
+    fmpz_addmul_ui(tmp, m1, s);
+
+    if (sign)
+    {
+        fmpz_sub(out, tmp, m1m2);
+        if (fmpz_cmpabs(tmp, out) <= 0)
+            fmpz_swap(out, tmp);
+    }
+    else
+    {
+        fmpz_swap(out, tmp);
+    }
+
+    fmpz_clear(tmp);
+}
+
+void fmpz_CRT_ui(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
+    ulong r2, ulong m2, int sign)
+{
+    ulong c;
+    fmpz_t m1m2;
+
+    c = fmpz_fdiv_ui(m1, m2);
+    c = n_invmod(c, m2);
+
+    fmpz_init(m1m2);
+    fmpz_mul_ui(m1m2, m1, m2);
+
+    _fmpz_CRT_ui_precomp(out, r1, m1, r2, m2, n_preinvert_limb(m2),
+        m1m2, c, sign);
+
+    fmpz_clear(m1m2);
 }

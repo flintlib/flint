@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -19,7 +19,6 @@
 #define FMPZ_MOD_POLY_INLINE static inline
 #endif
 
-#include "thread_pool.h"
 #include "nmod_types.h"
 #include "fmpz_mod_types.h"
 
@@ -32,6 +31,8 @@ extern "C" {
 
 #define FMPZ_MOD_POLY_INV_NEWTON_CUTOFF  64 /* Inv series newton: Basecase -> Newton */
 #define FMPZ_MOD_POLY_DIV_DIVCONQUER_CUTOFF
+
+#define FMPZ_MOD_POLY_EVALUATE_FMPZ_VEC  32 /* Evaluate fmpz_vec: Iter -> Fast  */
 
 /*  Type definitions *********************************************************/
 
@@ -87,7 +88,7 @@ fmpz_mod_poly_compose_mod_precomp_preinv_arg_t;
 /*  Initialisation and memory management *************************************/
 
 FMPZ_MOD_POLY_INLINE
-void fmpz_mod_poly_init(fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
+void fmpz_mod_poly_init(fmpz_mod_poly_t poly, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
 {
     poly->coeffs = NULL;
     poly->alloc  = 0;
@@ -95,10 +96,9 @@ void fmpz_mod_poly_init(fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
 }
 
 void fmpz_mod_poly_init2(fmpz_mod_poly_t poly, slong alloc,
-                                                     const fmpz_mod_ctx_t ctx);
+                                                     const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
 
-void fmpz_mod_poly_clear(fmpz_mod_poly_t poly,
-                                                     const fmpz_mod_ctx_t ctx);
+void fmpz_mod_poly_clear(fmpz_mod_poly_t poly, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
 
 void fmpz_mod_poly_realloc(fmpz_mod_poly_t poly, slong alloc,
                                                      const fmpz_mod_ctx_t ctx);
@@ -107,7 +107,7 @@ void _fmpz_mod_poly_fit_length(fmpz_mod_poly_t poly, slong len);
 
 FMPZ_MOD_POLY_INLINE
 void fmpz_mod_poly_fit_length(fmpz_mod_poly_t poly, slong len,
-                                                      const fmpz_mod_ctx_t ctx)
+                                                      const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
 {
     _fmpz_mod_poly_fit_length(poly, len);
 }
@@ -126,7 +126,7 @@ void _fmpz_mod_poly_normalise(fmpz_mod_poly_t poly)
 
 void _fmpz_mod_poly_set_length(fmpz_mod_poly_t poly, slong len);
 
-void fmpz_mod_poly_truncate(fmpz_mod_poly_t poly, slong len, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_poly_truncate(fmpz_mod_poly_t poly, slong len, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
 
 void fmpz_mod_poly_set_trunc(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, slong n, const fmpz_mod_ctx_t ctx);
 
@@ -170,14 +170,44 @@ void fmpz_mod_poly_randtest_sparse_irreducible(fmpz_mod_poly_t poly,
 
 /*  Attributes ***************************************************************/
 
-slong fmpz_mod_poly_degree(const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx);
-slong fmpz_mod_poly_length(const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx);
+FMPZ_MOD_POLY_INLINE
+slong fmpz_mod_poly_length(const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
+{
+    return poly->length;
+}
+FMPZ_MOD_POLY_INLINE
+slong fmpz_mod_poly_degree(const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
+{
+    return poly->length - 1;
+}
 
-fmpz * fmpz_mod_poly_lead(const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx);
+FMPZ_MOD_POLY_INLINE
+fmpz * fmpz_mod_poly_lead(const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
+{
+    if (poly->length)
+        return poly->coeffs + (poly->length - 1);
+    else
+        return NULL;
+}
 
-int fmpz_mod_poly_is_monic(const fmpz_mod_poly_t f, const fmpz_mod_ctx_t ctx);
-int fmpz_mod_poly_is_one(const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx);
-int fmpz_mod_poly_is_gen(const fmpz_mod_poly_t op, const fmpz_mod_ctx_t ctx);
+FMPZ_MOD_POLY_INLINE
+int fmpz_mod_poly_is_monic(const fmpz_mod_poly_t f, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
+{
+    return f->length > 0 && f->coeffs[f->length - 1] == WORD(1);
+}
+
+FMPZ_MOD_POLY_INLINE
+int fmpz_mod_poly_is_one(const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
+{
+   return poly->length == 1 && poly->coeffs[0] == WORD(1);
+}
+
+FMPZ_MOD_POLY_INLINE
+int fmpz_mod_poly_is_gen(const fmpz_mod_poly_t op, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
+{
+    return op->length == 2 && op->coeffs[1] == WORD(1) && op->coeffs[0] == WORD(0);
+}
+
 int fmpz_mod_poly_is_unit(const fmpz_mod_poly_t op, const fmpz_mod_ctx_t ctx);
 
 /*  Assignment and basic manipulation ****************************************/
@@ -187,7 +217,7 @@ void fmpz_mod_poly_set(fmpz_mod_poly_t poly1,
 
 FMPZ_MOD_POLY_INLINE
 void fmpz_mod_poly_swap(fmpz_mod_poly_t poly1,
-                               fmpz_mod_poly_t poly2, const fmpz_mod_ctx_t ctx)
+                               fmpz_mod_poly_t poly2, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_SWAP(fmpz_mod_poly_struct, *poly1, *poly2);
 }
@@ -198,7 +228,7 @@ void fmpz_mod_poly_reverse(fmpz_mod_poly_t res,
                 const fmpz_mod_poly_t poly, slong n, const fmpz_mod_ctx_t ctx);
 
 FMPZ_MOD_POLY_INLINE
-void fmpz_mod_poly_zero(fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx)
+void fmpz_mod_poly_zero(fmpz_mod_poly_t poly, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
 {
    _fmpz_mod_poly_set_length(poly, 0);
 }
@@ -207,9 +237,9 @@ void fmpz_mod_poly_one(fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx);
 
 void fmpz_mod_poly_gen(fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx);
 
-void fmpz_mod_poly_zero_coeffs(fmpz_mod_poly_t poly, slong i, slong j, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_poly_zero_coeffs(fmpz_mod_poly_t poly, slong i, slong j, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
 
-ulong fmpz_mod_poly_deflation(const fmpz_mod_poly_t input, const fmpz_mod_ctx_t ctx);
+ulong fmpz_mod_poly_deflation(const fmpz_mod_poly_t input, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
 void fmpz_mod_poly_deflate(fmpz_mod_poly_t result, const fmpz_mod_poly_t input, ulong deflation, const fmpz_mod_ctx_t ctx);
 void fmpz_mod_poly_inflate(fmpz_mod_poly_t result, const fmpz_mod_poly_t input, ulong inflation, const fmpz_mod_ctx_t ctx);
 
@@ -221,14 +251,14 @@ void fmpz_mod_poly_set_fmpz(fmpz_mod_poly_t poly, const fmpz_t c, const fmpz_mod
 void fmpz_mod_poly_set_fmpz_poly(fmpz_mod_poly_t f, const fmpz_poly_t g, const fmpz_mod_ctx_t ctx);
 
 void fmpz_mod_poly_get_nmod_poly(nmod_poly_t f, const fmpz_mod_poly_t g);
-void fmpz_mod_poly_get_fmpz_poly(fmpz_poly_t f, const fmpz_mod_poly_t g, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_poly_get_fmpz_poly(fmpz_poly_t f, const fmpz_mod_poly_t g, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
 
 /*  Comparison ***************************************************************/
 
-int fmpz_mod_poly_equal(const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, const fmpz_mod_ctx_t ctx);
-int fmpz_mod_poly_equal_trunc(const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, slong n, const fmpz_mod_ctx_t ctx);
+int fmpz_mod_poly_equal(const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
+int fmpz_mod_poly_equal_trunc(const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, slong n, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
 
-int fmpz_mod_poly_is_zero(const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx);
+int fmpz_mod_poly_is_zero(const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
 
 /*  Getting and setting coefficients *****************************************/
 
@@ -236,8 +266,7 @@ void fmpz_mod_poly_set_coeff_fmpz(fmpz_mod_poly_t poly, slong n, const fmpz_t x,
 void fmpz_mod_poly_set_coeff_ui(fmpz_mod_poly_t poly, slong n, ulong x, const fmpz_mod_ctx_t ctx);
 void fmpz_mod_poly_set_coeff_si(fmpz_mod_poly_t poly, slong n, slong x, const fmpz_mod_ctx_t ctx);
 
-void fmpz_mod_poly_get_coeff_fmpz(fmpz_t x, const fmpz_mod_poly_t poly,
-                                             slong n, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_poly_get_coeff_fmpz(fmpz_t x, const fmpz_mod_poly_t poly, slong n, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
 
 /*  Shifting *****************************************************************/
 
@@ -394,9 +423,9 @@ void fmpz_mod_poly_divrem_basecase(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
                              const fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
                                                      const fmpz_mod_ctx_t ctx);
 
-void _fmpz_mod_poly_div_newton_n_preinv (fmpz* Q, const fmpz* A,
-                      slong lenA, const fmpz* B, slong lenB, const fmpz* Binv,
-                                    slong lenBinv, const fmpz_mod_ctx_t ctx);
+void _fmpz_mod_poly_div_newton_n_preinv (fmpz* Q, const fmpz* A, slong lenA,
+                                   const fmpz* FLINT_UNUSED(B), slong lenB, const fmpz* Binv,
+                                   slong lenBinv, const fmpz_mod_ctx_t ctx);
 
 void fmpz_mod_poly_div_newton_n_preinv(fmpz_mod_poly_t Q,
                          const fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
@@ -533,7 +562,7 @@ void fmpz_mod_poly_xgcd_euclidean_f(fmpz_t f, fmpz_mod_poly_t G,
 
 slong _fmpz_mod_poly_xgcd(fmpz *G, fmpz *S, fmpz *T,
                           const fmpz *A, slong lenA, const fmpz *B, slong lenB,
-                          const fmpz_t invB, const fmpz_mod_ctx_t ctx);
+                          const fmpz_t FLINT_UNUSED(invB), const fmpz_mod_ctx_t ctx);
 
 void fmpz_mod_poly_xgcd(fmpz_mod_poly_t G, fmpz_mod_poly_t S,
           fmpz_mod_poly_t T, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
@@ -556,8 +585,9 @@ fmpz_mod_poly_xgcd_f(fmpz_t f, fmpz_mod_poly_t G, fmpz_mod_poly_t S,
 }
 
 slong _fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz *G, fmpz *S,
-                    const fmpz *A, slong lenA, const fmpz *B, slong lenB,
-                                            const fmpz_t invA, const fmpz_mod_ctx_t ctx);
+                                   const fmpz *A, slong lenA,
+                                   const fmpz *B, slong lenB,
+                                   const fmpz_t FLINT_UNUSED(invA), const fmpz_mod_ctx_t ctx);
 
 void fmpz_mod_poly_gcdinv_euclidean_f(fmpz_t f, fmpz_mod_poly_t G,
           fmpz_mod_poly_t S, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B,
@@ -635,39 +665,8 @@ void fmpz_mod_poly_minpoly(fmpz_mod_poly_t poly, const fmpz* seq, slong len, con
 
 /*  Resultant  ***************************************************************/
 
-void _fmpz_mod_poly_resultant_euclidean(fmpz_t res,
-                                    const fmpz *poly1, slong len1,
-                              const fmpz *poly2, slong len2, const fmpz_mod_ctx_t ctx);
-
-void fmpz_mod_poly_resultant_euclidean(fmpz_t r,
-                            const fmpz_mod_poly_t f, const fmpz_mod_poly_t g,
-                                                     const fmpz_mod_ctx_t ctx);
-
-void _fmpz_mod_poly_resultant_hgcd(fmpz_t res, const fmpz *A, slong lenA,
-                                  const fmpz *B, slong lenB, const fmpz_mod_ctx_t ctx);
-
-void fmpz_mod_poly_resultant_hgcd(fmpz_t res, const fmpz_mod_poly_t A,
-                            const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx);
-
-FMPZ_MOD_POLY_INLINE void
-_fmpz_mod_poly_resultant(fmpz_t res, const fmpz *poly1, slong len1,
-                     const fmpz *poly2, slong len2, const fmpz_mod_ctx_t ctx)
-{
-    if (len1 < FMPZ_MOD_POLY_GCD_CUTOFF)
-        _fmpz_mod_poly_resultant_euclidean(res, poly1, len1, poly2, len2, ctx);
-    else
-        _fmpz_mod_poly_resultant_hgcd(res, poly1, len1, poly2, len2, ctx);
-}
-
-FMPZ_MOD_POLY_INLINE void
-fmpz_mod_poly_resultant(fmpz_t res, const fmpz_mod_poly_t f,
-                             const fmpz_mod_poly_t g, const fmpz_mod_ctx_t ctx)
-{
-    if (FLINT_MAX(f->length, g->length) < FMPZ_MOD_POLY_GCD_CUTOFF)
-       fmpz_mod_poly_resultant_euclidean(res, f, g, ctx);
-    else
-       fmpz_mod_poly_resultant_hgcd(res, f, g, ctx);
-}
+void _fmpz_mod_poly_resultant(fmpz_t res, const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_poly_resultant(fmpz_t res, const fmpz_mod_poly_t A, const fmpz_mod_poly_t B, const fmpz_mod_ctx_t ctx);
 
 /*  Discriminant  ************************************************************/
 
@@ -682,42 +681,22 @@ void fmpz_mod_poly_derivative(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, c
 /*  Evaluation  **************************************************************/
 
 void _fmpz_mod_poly_evaluate_fmpz(fmpz_t res, const fmpz *poly, slong len, const fmpz_t a, const fmpz_mod_ctx_t ctx);
-void fmpz_mod_poly_evaluate_fmpz(fmpz_t res,
-                                 const fmpz_mod_poly_t poly, const fmpz_t a,
-                                                     const fmpz_mod_ctx_t ctx);
+void fmpz_mod_poly_evaluate_fmpz(fmpz_t res, const fmpz_mod_poly_t poly, const fmpz_t a, const fmpz_mod_ctx_t ctx);
 
 fmpz_poly_struct ** _fmpz_mod_poly_tree_alloc(slong len);
-
 void _fmpz_mod_poly_tree_free(fmpz_poly_struct ** tree, slong len);
+void _fmpz_mod_poly_tree_build(fmpz_poly_struct ** tree, const fmpz * roots, slong len, const fmpz_mod_ctx_t ctx);
 
-void _fmpz_mod_poly_tree_build(fmpz_poly_struct ** tree,
-                             const fmpz * roots, slong len, const fmpz_mod_ctx_t ctx);
+void _fmpz_mod_poly_evaluate_fmpz_vec_iter(fmpz * ys, const fmpz * coeffs, slong len, const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_poly_evaluate_fmpz_vec_iter(fmpz * ys, const fmpz_mod_poly_t poly, const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx);
 
-void _fmpz_mod_poly_evaluate_fmpz_vec_iter(fmpz * ys, const fmpz * coeffs,
-                        slong len, const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx);
+void _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(fmpz * vs, const fmpz * poly, slong plen, fmpz_poly_struct * const * tree, slong len, const fmpz_mod_ctx_t ctx);
 
-void fmpz_mod_poly_evaluate_fmpz_vec_iter(fmpz * ys,
-                        const fmpz_mod_poly_t poly, const fmpz * xs, slong n,
-                                                     const fmpz_mod_ctx_t ctx);
+void _fmpz_mod_poly_evaluate_fmpz_vec_fast(fmpz * ys, const fmpz * poly, slong plen, const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_poly_evaluate_fmpz_vec_fast(fmpz * ys, const fmpz_mod_poly_t poly, const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx);
 
-void _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(fmpz * vs,
-              const fmpz * poly, slong plen, fmpz_poly_struct * const * tree,
-                                                 slong len, const fmpz_mod_ctx_t ctx);
-
-void _fmpz_mod_poly_evaluate_fmpz_vec_fast(fmpz * ys,
-    const fmpz * poly, slong plen, const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx);
-
-void fmpz_mod_poly_evaluate_fmpz_vec_fast(fmpz * ys,
-                        const fmpz_mod_poly_t poly, const fmpz * xs, slong n,
-                                                     const fmpz_mod_ctx_t ctx);
-
-void _fmpz_mod_poly_evaluate_fmpz_vec(fmpz * ys, const fmpz * coeffs,
-                        slong len, const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx);
-
-void fmpz_mod_poly_evaluate_fmpz_vec(fmpz * ys,
-                        const fmpz_mod_poly_t poly, const fmpz * xs, slong n,
-                                                     const fmpz_mod_ctx_t ctx);
-
+void _fmpz_mod_poly_evaluate_fmpz_vec(fmpz * ys, const fmpz * coeffs, slong len, const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx);
+void fmpz_mod_poly_evaluate_fmpz_vec(fmpz * ys, const fmpz_mod_poly_t poly, const fmpz * xs, slong n, const fmpz_mod_ctx_t ctx);
 
 /*  Composition  *************************************************************/
 
@@ -785,21 +764,30 @@ void fmpz_mod_poly_compose_mod_horner(fmpz_mod_poly_t res,
                      const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2,
                         const fmpz_mod_poly_t poly3, const fmpz_mod_ctx_t ctx);
 
-void _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res,
-                 const fmpz_mod_poly_struct * polys, slong len1, slong l,
-                 const fmpz * g, slong glen, const fmpz * poly, slong len,
-		 const fmpz * polyinv, slong leninv, const fmpz_mod_ctx_t ctx);
+void
+_fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(fmpz_mod_poly_struct * res,
+                                                const fmpz_mod_poly_struct *
+                                                polys, slong FLINT_UNUSED(lenpolys), slong l,
+                                                const fmpz * g, slong glen,
+                                                const fmpz * poly, slong len,
+                                                const fmpz * polyinv,
+                                                slong leninv, const fmpz_mod_ctx_t ctx);
 
 void fmpz_mod_poly_compose_mod_brent_kung_vec_preinv(
       fmpz_mod_poly_struct * res, const fmpz_mod_poly_struct * polys,
       slong len1,slong n, const fmpz_mod_poly_t g, const fmpz_mod_poly_t poly,
                       const fmpz_mod_poly_t polyinv, const fmpz_mod_ctx_t ctx);
 
-void _fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_struct * res,
-             const fmpz_mod_poly_struct * polys, slong lenpolys, slong l,
-             const fmpz * g, slong glen, const fmpz * poly, slong len,
-             const fmpz * polyinv, slong leninv, const fmpz_mod_ctx_t ctx,
-                              thread_pool_handle * threads, slong num_threads);
+void
+_fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_struct * res,
+                                                 const fmpz_mod_poly_struct * polys,
+                                                 slong FLINT_UNUSED(lenpolys), slong l,
+                                                 const fmpz * g, slong glen,
+                                                 const fmpz * poly, slong len,
+                                                 const fmpz * polyinv, slong leninv,
+                                                 const fmpz_mod_ctx_t ctx,
+                                                 thread_pool_handle * threads,
+                                                 slong num_threads);
 
 void fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(fmpz_mod_poly_struct * res,
             const fmpz_mod_poly_struct * polys, slong len1, slong n,
@@ -815,7 +803,7 @@ fmpz_mod_poly_compose_mod_brent_kung_vec_preinv_threaded(fmpz_mod_poly_struct * 
 
 /* Norms *********************************************************************/
 
-slong fmpz_mod_poly_hamming_weight(const fmpz_mod_poly_t A, const fmpz_mod_ctx_t ctx);
+slong fmpz_mod_poly_hamming_weight(const fmpz_mod_poly_t A, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
 
 /*  Radix conversion *********************************************************/
 
@@ -848,13 +836,13 @@ void fmpz_mod_poly_radix(fmpz_mod_poly_struct **B, const fmpz_mod_poly_t F,
 
 /*  Input and output *********************************************************/
 
-char * fmpz_mod_poly_get_str(const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx);
-char * fmpz_mod_poly_get_str_pretty(const fmpz_mod_poly_t poly, const char * x, const fmpz_mod_ctx_t ctx);
+char * fmpz_mod_poly_get_str(const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
+char * fmpz_mod_poly_get_str_pretty(const fmpz_mod_poly_t poly, const char * x, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
 
 #ifdef FLINT_HAVE_FILE
 int _fmpz_mod_poly_fprint(FILE * file, const fmpz *poly, slong len, const fmpz_t p);
 int fmpz_mod_poly_fprint(FILE * file, const fmpz_mod_poly_t poly, const fmpz_mod_ctx_t ctx);
-int fmpz_mod_poly_fprint_pretty(FILE * file, const fmpz_mod_poly_t poly, const char * x, const fmpz_mod_ctx_t ctx);
+int fmpz_mod_poly_fprint_pretty(FILE * file, const fmpz_mod_poly_t poly, const char * x, const fmpz_mod_ctx_t FLINT_UNUSED(ctx));
 
 int fmpz_mod_poly_fread(FILE * file, fmpz_mod_poly_t poly, fmpz_mod_ctx_t ctx);
 #endif

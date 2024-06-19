@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "longlong.h"
 #include "mag.h"
 
 void
@@ -24,7 +25,7 @@ mag_set_ui(mag_t z, ulong x)
     else
     {
         slong bits;
-        mp_limb_t overflow;
+        ulong overflow;
 
         bits = flint_clz(x);
         bits = FLINT_BITS - bits;
@@ -72,4 +73,3 @@ mag_set_ui_lower(mag_t z, ulong x)
         MAG_MAN(z) = x;
     }
 }
-

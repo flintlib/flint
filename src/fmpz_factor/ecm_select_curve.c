@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -20,21 +20,22 @@
 /* Also selects initial point Q0 [x0 :: z0]  (z0 = 1) */
 
 int
-fmpz_factor_ecm_select_curve(mp_ptr f, mp_ptr sig, mp_ptr n, ecm_t ecm_inf)
+fmpz_factor_ecm_select_curve(nn_ptr f, nn_ptr sig, nn_ptr n, ecm_t ecm_inf)
 {
-    mp_size_t sz, cy;
-    mp_size_t invlimbs, gcdlimbs;
-    mp_ptr temp, tempv, tempn, tempi, tempf;
+    slong sz, cy;
+    mp_size_t invlimbs;
+    slong gcdlimbs;
+    nn_ptr temp, tempv, tempn, tempi, tempf;
     int ret;
 
     TMP_INIT;
 
     TMP_START;
-    temp = TMP_ALLOC(ecm_inf->n_size * sizeof(mp_limb_t));
-    tempv = TMP_ALLOC((ecm_inf->n_size) * sizeof(mp_limb_t));
-    tempn = TMP_ALLOC((ecm_inf->n_size) * sizeof(mp_limb_t));
-    tempi = TMP_ALLOC((ecm_inf->n_size + 1) * sizeof(mp_limb_t));
-    tempf = TMP_ALLOC((ecm_inf->n_size + 1) * sizeof(mp_limb_t));
+    temp = TMP_ALLOC(ecm_inf->n_size * sizeof(ulong));
+    tempv = TMP_ALLOC((ecm_inf->n_size) * sizeof(ulong));
+    tempn = TMP_ALLOC((ecm_inf->n_size) * sizeof(ulong));
+    tempi = TMP_ALLOC((ecm_inf->n_size + 1) * sizeof(ulong));
+    tempf = TMP_ALLOC((ecm_inf->n_size + 1) * sizeof(ulong));
 
     mpn_zero(tempn, ecm_inf->n_size);
     mpn_zero(tempv, ecm_inf->n_size);
@@ -55,7 +56,7 @@ fmpz_factor_ecm_select_curve(mp_ptr f, mp_ptr sig, mp_ptr n, ecm_t ecm_inf)
 
     mpn_add_n(temp, temp, ecm_inf->one, ecm_inf->n_size); /* temp = (5 << norm) */
 
-    fmpz_factor_ecm_submod(ecm_inf->u, ecm_inf->w, temp, n, ecm_inf->n_size);
+    flint_mpn_submod_n(ecm_inf->u, ecm_inf->w, temp, n, ecm_inf->n_size);
 
     flint_mpn_mulmod_preinvn(ecm_inf->w, ecm_inf->u, ecm_inf->u, ecm_inf->n_size,
                              n, ecm_inf->ninv, ecm_inf->normbits);
@@ -82,9 +83,9 @@ fmpz_factor_ecm_select_curve(mp_ptr f, mp_ptr sig, mp_ptr n, ecm_t ecm_inf)
     flint_mpn_mulmod_preinvn(ecm_inf->w, ecm_inf->u, temp, ecm_inf->n_size,
                              n, ecm_inf->ninv, ecm_inf->normbits);
 
-    fmpz_factor_ecm_submod(ecm_inf->u, ecm_inf->v, ecm_inf->u, n, ecm_inf->n_size);
+    flint_mpn_submod_n(ecm_inf->u, ecm_inf->v, ecm_inf->u, n, ecm_inf->n_size);
 
-    fmpz_factor_ecm_addmod(ecm_inf->v, ecm_inf->v, ecm_inf->w, n, ecm_inf->n_size);
+    flint_mpn_addmod_n(ecm_inf->v, ecm_inf->v, ecm_inf->w, n, ecm_inf->n_size);
 
     flint_mpn_mulmod_preinvn(ecm_inf->w, ecm_inf->u, ecm_inf->u, ecm_inf->n_size,
                              n, ecm_inf->ninv, ecm_inf->normbits);
@@ -110,10 +111,12 @@ fmpz_factor_ecm_select_curve(mp_ptr f, mp_ptr sig, mp_ptr n, ecm_t ecm_inf)
     flint_mpn_copyi(tempv, ecm_inf->v, sz);
     flint_mpn_copyi(tempn, n, ecm_inf->n_size);
 
+    /* NOTE: invlimbs must be mp_size_t since it is strictly different from
+     * slong on Windows systems. */
     gcdlimbs = mpn_gcdext(tempf, tempi, &invlimbs, tempv, sz, tempn, ecm_inf->n_size);
 
     if (!(gcdlimbs == 1 && tempf[0] == ecm_inf->one[0]) &&
-        !(gcdlimbs == ecm_inf->n_size && mpn_cmp(tempf, n, ecm_inf->n_size) == 0))
+        !(gcdlimbs == (slong) ecm_inf->n_size && mpn_cmp(tempf, n, ecm_inf->n_size) == 0))
     {
         /* Found factor */
         flint_mpn_copyi(f, tempf, gcdlimbs);
@@ -165,7 +168,7 @@ fmpz_factor_ecm_select_curve(mp_ptr f, mp_ptr sig, mp_ptr n, ecm_t ecm_inf)
     if (ecm_inf->normbits)
         mpn_lshift(temp, temp, ecm_inf->n_size, ecm_inf->normbits);
 
-    fmpz_factor_ecm_addmod(ecm_inf->a24, ecm_inf->w, temp, n, ecm_inf->n_size);
+    flint_mpn_addmod_n(ecm_inf->a24, ecm_inf->w, temp, n, ecm_inf->n_size);
     mpn_rshift(ecm_inf->a24, ecm_inf->a24, ecm_inf->n_size, 2);
     if (ecm_inf->normbits)
        ecm_inf->a24[0] &= ~((UWORD(1)<<ecm_inf->normbits) - 1);

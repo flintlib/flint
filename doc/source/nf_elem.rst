@@ -26,7 +26,7 @@ Initialisation
     Clear resources allocated by the given number field element in the given
     number field.
 
-.. function:: void nf_elem_randtest(nf_elem_t a, flint_rand_t state, mp_bitcnt_t bits, const nf_t nf)
+.. function:: void nf_elem_randtest(nf_elem_t a, flint_rand_t state, flint_bitcnt_t bits, const nf_t nf)
 
     Generate a random number field element `a` in the number field ``nf``
     whose coefficients have up to the given number of bits.

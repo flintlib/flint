@@ -5,13 +5,17 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fmpz.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
+
+#if FLINT_WANT_ASSERT
+# include "longlong.h"
+#endif
 
 /* split f assuming that f has degree(f) distinct nonzero roots in Fp */
 void _fmpz_mod_poly_split_rabin(
@@ -70,7 +74,7 @@ void _fmpz_mod_poly_split_rabin(
         _fmpz_mod_poly_set_length(a, 2);
         _fmpz_mod_poly_set_length(b, 2);
 
-    #ifdef FLINT_WANT_ASSERT
+    #if FLINT_WANT_ASSERT
         fmpz_mod_add(T, a->coeffs + 0, b->coeffs + 0, ctx);
         fmpz_mod_mul(T, T, f->coeffs + 2, ctx);
         FLINT_ASSERT(fmpz_equal(T, f->coeffs + 1));
@@ -163,7 +167,7 @@ int fmpz_mod_poly_find_distinct_nonzero_roots(
         goto cleanup1;
     }
 
-    flint_randinit(randstate);
+    flint_rand_init(randstate);
     fmpz_mod_poly_init(t, ctx);
     fmpz_mod_poly_init(t2, ctx);
     fmpz_mod_poly_init(f, ctx);
@@ -231,7 +235,7 @@ int fmpz_mod_poly_find_distinct_nonzero_roots(
 
 cleanup:
 
-    flint_randclear(randstate);
+    flint_rand_clear(randstate);
     fmpz_mod_poly_clear(t, ctx);
     fmpz_mod_poly_clear(t2, ctx);
     fmpz_mod_poly_clear(f, ctx);

@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -23,14 +23,14 @@ extern "C" {
 
 typedef struct
 {
-    mp_limb_t d[ARF_NOPTR_LIMBS];
+    ulong d[ARF_NOPTR_LIMBS];
 }
 mantissa_noptr_struct;
 
 typedef struct
 {
-    mp_size_t alloc;
-    mp_ptr d;
+    slong alloc;
+    nn_ptr d;
 }
 mantissa_ptr_struct;
 
@@ -44,7 +44,7 @@ mantissa_struct;
 typedef struct
 {
     fmpz exp;
-    mp_size_t size;
+    slong size;
     mantissa_struct d;
 }
 arf_struct;

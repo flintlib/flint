@@ -5,12 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fq_zech.h"
+#include "fq_zech_poly.h"
+#include "mpoly.h"
 #include "fq_zech_mpoly_factor.h"
-
 
 /*
     only E and alphas are shifted by "var"
@@ -164,7 +166,7 @@ next:
         stop++;
 
     fq_zech_bpoly_fit_length(E, e + 1, ctx->fqctx);
-    while (E->length <= e)
+    while (E->length <= (slong) e)
     {
         fq_zech_poly_zero(E->coeffs + E->length, ctx->fqctx);
         E->length++;

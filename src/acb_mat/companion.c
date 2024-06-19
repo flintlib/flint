@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -42,8 +42,7 @@ acb_mat_companion(acb_mat_t A, const acb_poly_t poly, slong prec)
 
     if (n != acb_poly_degree(poly) || n != acb_mat_ncols(A))
     {
-        flint_printf("acb_mat_companion: incompatible dimensions!\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "acb_mat_companion: incompatible dimensions!\n");
     }
 
     _acb_mat_companion(A, poly->coeffs, prec);

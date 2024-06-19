@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -14,8 +14,11 @@
 # undef __STRICT_ANSI__
 #endif
 
-#include <string.h>
-#include <stdlib.h>
+#if defined(__CYGWIN__)
+# define ulong ulongxx
+# include <sys/param.h>
+# undef ulong
+#endif
 
 /* Include functions *********************************************************/
 
@@ -43,7 +46,7 @@
 #include "t-divrem_newton_n_preinv.c"
 #include "t-div_series.c"
 #include "t-evaluate_fmpz.c"
-#include "t-evaluate_fmpz_vec_fast.c"
+#include "t-evaluate_fmpz_vec.c"
 #include "t-find_distinct_nonzero_roots.c"
 #include "t-frobenius_powers_precomp.c"
 #include "t-gcd.c"
@@ -78,8 +81,6 @@
 #include "t-randtest_monic_primitive.c"
 #include "t-rem_basecase.c"
 #include "t-resultant.c"
-#include "t-resultant_euclidean.c"
-#include "t-resultant_hgcd.c"
 #include "t-scalar_div_fmpz.c"
 #include "t-scalar_mul_fmpz.c"
 #include "t-set_equal.c"
@@ -121,7 +122,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mod_poly_divrem_newton_n_preinv),
     TEST_FUNCTION(fmpz_mod_poly_div_series),
     TEST_FUNCTION(fmpz_mod_poly_evaluate_fmpz),
-    TEST_FUNCTION(fmpz_mod_poly_evaluate_fmpz_vec_fast),
+    TEST_FUNCTION(fmpz_mod_poly_evaluate_fmpz_vec),
     TEST_FUNCTION(fmpz_mod_poly_find_distinct_nonzero_roots),
     TEST_FUNCTION(fmpz_mod_poly_frobenius_powers_precomp),
     TEST_FUNCTION(fmpz_mod_poly_gcd),
@@ -156,8 +157,6 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mod_poly_randtest_monic_primitive),
     TEST_FUNCTION(fmpz_mod_poly_rem_basecase),
     TEST_FUNCTION(fmpz_mod_poly_resultant),
-    TEST_FUNCTION(fmpz_mod_poly_resultant_euclidean),
-    TEST_FUNCTION(fmpz_mod_poly_resultant_hgcd),
     TEST_FUNCTION(fmpz_mod_poly_scalar_div_fmpz),
     TEST_FUNCTION(fmpz_mod_poly_scalar_mul_fmpz),
     TEST_FUNCTION(fmpz_mod_poly_set_equal),

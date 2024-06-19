@@ -6,11 +6,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include <gmp.h>
 #include "fmpz.h"
 #include "padic_poly.h"
 
@@ -29,7 +29,7 @@ void padic_poly_realloc(padic_poly_t poly, slong alloc, const fmpz_t p)
 
         poly->coeffs = (fmpz *) flint_realloc(poly->coeffs, alloc * sizeof(fmpz));
         if (alloc > poly->alloc)
-            mpn_zero((mp_ptr) (poly->coeffs + poly->alloc),
+            mpn_zero((nn_ptr) (poly->coeffs + poly->alloc),
                      alloc - poly->alloc);
     }
     else                        /* Nothing allocated already so do it now */

@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -63,9 +63,7 @@ FUNC_HEAD
         {
             if (U->r != d)
             {
-                flint_printf
-                    ("Exception (fmpz_lll_d*). Incompatible dimensions of capturing matrix.\n");
-                flint_abort();
+                flint_throw(FLINT_ERROR, "(fmpz_lll_d*): Incompatible dimensions of capturing matrix.\n");
             }
         }
 
@@ -203,7 +201,7 @@ FUNC_HEAD
             /* ************************************ */
 
             tmp = d_mat_entry(r, kappa - 1, kappa - 1) * ctt;
-            tmp = ldexp(tmp, 2 * (expo[kappa - 1] - expo[kappa]));
+            tmp = d_mul_2exp(tmp, 2 * (expo[kappa - 1] - expo[kappa]));
 
             if (tmp <= s[kappa - 1])
             {
@@ -250,7 +248,7 @@ FUNC_HEAD
                     if (kappa > zeros + 1)
                     {
                         tmp = d_mat_entry(r, kappa - 1, kappa - 1) * ctt;
-                        tmp = ldexp(tmp, 2 * (expo[kappa - 1] - expo[kappa2]));
+                        tmp = d_mul_2exp(tmp, 2 * (expo[kappa - 1] - expo[kappa2]));
                     }
                 } while ((kappa >= zeros + 2) && (s[kappa - 1] <= tmp));
 
@@ -425,9 +423,7 @@ FUNC_HEAD
         {
             if (U->r != d)
             {
-                flint_printf
-                    ("Exception (fmpz_lll_d*). Incompatible dimensions of capturing matrix.\n");
-                flint_abort();
+                flint_throw(FLINT_ERROR, "(fmpz_lll_d*): Incompatible dimensions of capturing matrix.\n");
             }
             else if (U->c == d && n > d && fmpz_mat_is_one(U))
             {
@@ -473,7 +469,7 @@ FUNC_HEAD
         {
             d_mat_entry(r, i, i) =
                 fmpz_get_d_2exp(&exp, fmpz_mat_entry(GM, i, i));
-            d_mat_entry(r, i, i) = ldexp(d_mat_entry(r, i, i), exp - expo[i]);
+            d_mat_entry(r, i, i) = d_mul_2exp(d_mat_entry(r, i, i), exp - expo[i]);
         }
 
         for (i = zeros + 1; i < d; i++)
@@ -540,13 +536,13 @@ FUNC_HEAD
             /* ************************************ */
 
             tmp = d_mat_entry(r, kappa - 1, kappa - 1) * ctt;
-            tmp = ldexp(tmp, (expo[kappa - 1] - expo[kappa]));
+            tmp = d_mul_2exp(tmp, (expo[kappa - 1] - expo[kappa]));
 
             if (tmp <= s[kappa - 1])
             {
                 alpha[kappa] = kappa;
                 tmp =
-                    ldexp(d_mat_entry(mu, kappa, kappa - 1) * d_mat_entry(r,
+                    d_mul_2exp(d_mat_entry(mu, kappa, kappa - 1) * d_mat_entry(r,
                                                                           kappa,
                                                                           kappa
                                                                           - 1),
@@ -568,13 +564,13 @@ FUNC_HEAD
                 {
                     fmpz_init(rii);
                     tmp =
-                        ldexp(2 * d_mat_entry(mu, kappa,
+                        d_mul_2exp(2 * d_mat_entry(mu, kappa,
                                               kappa - 1) * d_mat_entry(r,
                                                                        kappa,
                                                                        kappa -
                                                                        1),
                               (expo[kappa] - expo[kappa - 1]));
-                    fmpz_set_d(rii, ldexp(s[kappa - 1] - tmp, expo[kappa]));    /* using a heuristic lower bound on the final GS norm */
+                    fmpz_set_d(rii, d_mul_2exp(s[kappa - 1] - tmp, expo[kappa]));    /* using a heuristic lower bound on the final GS norm */
                     if (fmpz_cmp(rii, gs_B) > 0)
                     {
                         d--;
@@ -592,7 +588,7 @@ FUNC_HEAD
                     if (kappa > zeros + 1)
                     {
                         tmp = d_mat_entry(r, kappa - 1, kappa - 1) * ctt;
-                        tmp = ldexp(tmp, (expo[kappa - 1] - expo[kappa2]));
+                        tmp = d_mul_2exp(tmp, (expo[kappa - 1] - expo[kappa2]));
                     }
                 } while ((kappa >= zeros + 2) && (s[kappa - 1] <= tmp));
 
@@ -683,7 +679,7 @@ FUNC_HEAD
                         fmpz_get_d_2exp(&exp, fmpz_mat_entry
                                         (GM, kappa, kappa));
                     d_mat_entry(r, kappa, kappa) =
-                        ldexp(d_mat_entry(r, kappa, kappa), exp - expo[kappa]);
+                        d_mul_2exp(d_mat_entry(r, kappa, kappa), exp - expo[kappa]);
                 }
 
                 kappa++;
@@ -713,7 +709,7 @@ FUNC_HEAD
             for (i = d - 1; (i >= 0) && (ok > 0); i--)
             {
                 /* rii is the G-S length of ith vector divided by 2 */
-                fmpz_set_d(rii, ldexp(d_mat_entry(r, i, i), expo[i] - 1));
+                fmpz_set_d(rii, d_mul_2exp(d_mat_entry(r, i, i), expo[i] - 1));
                 if ((ok = fmpz_cmp(rii, gs_B)) > 0)
                 {
                     newd--;

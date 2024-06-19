@@ -5,15 +5,16 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly_factor.h"
+#include "ulong_extras.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "mpoly.h"
 #include "fmpz_mpoly_factor.h"
-#include "fmpz_mod_mpoly.h"
-#include "fmpq_poly.h"
 
 /* A has degree 2 wrt gen(0) */
 static void _apply_quadratic(
@@ -128,7 +129,7 @@ static int _factor_irred_compressed(
 
     Abits = A->bits;
 
-    flint_randinit(state);
+    flint_rand_init(state);
     fmpz_poly_init(u);
     fmpz_poly_factor_init(uf);
     fmpz_mpoly_init(lcA, ctx);
@@ -335,7 +336,7 @@ done_alpha:
 
 cleanup:
 
-    flint_randclear(state);
+    flint_rand_clear(state);
     fmpz_poly_clear(u);
     fmpz_poly_factor_clear(uf);
     fmpz_mpoly_clear(lcA, ctx);
@@ -426,7 +427,7 @@ static int _factor_irred(
     slong i, j;
     flint_bitcnt_t Abits;
     mpoly_compression_t M;
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mpoly_t Aorg;
 
     fmpz_mpoly_init(Aorg, Actx);
@@ -552,7 +553,7 @@ static int _factor_irred(
 
 cleanup_less:
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success)
     {
         fmpz_mpoly_t prod;
@@ -820,4 +821,3 @@ int fmpz_mpoly_factor_zippel(
 {
     return _factor(f, A, ctx, MPOLY_FACTOR_USE_ZIP);
 }
-

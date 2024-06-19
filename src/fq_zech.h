@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -31,40 +31,42 @@
 extern "C" {
 #endif
 
-void fq_zech_ctx_init(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char *var);
+void fq_zech_ctx_init_ui(fq_zech_ctx_t ctx, ulong p, slong d, const char * var);
+int _fq_zech_ctx_init_conway_ui(fq_zech_ctx_t ctx, ulong p, slong d, const char * var);
+void fq_zech_ctx_init_conway_ui(fq_zech_ctx_t ctx, ulong p, slong d, const char * var);
+void fq_zech_ctx_init_random_ui(fq_zech_ctx_t ctx, ulong p, slong d, const char * var);
 
 int fq_zech_ctx_init_fq_nmod_ctx_check(fq_zech_ctx_t ctx, fq_nmod_ctx_t ctxn);
-
 void fq_zech_ctx_init_fq_nmod_ctx(fq_zech_ctx_t ctx, fq_nmod_ctx_t ctxn);
 
-int _fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char *var);
+int fq_zech_ctx_init_modulus_check(fq_zech_ctx_t ctx, const nmod_poly_t modulus, const char * var);
+void fq_zech_ctx_init_modulus(fq_zech_ctx_t ctx, const nmod_poly_t modulus, const char * var);
 
-void fq_zech_ctx_init_conway(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char *var);
-
-void fq_zech_ctx_init_random(fq_zech_ctx_t ctx, const fmpz_t p, slong d, const char *var);
-
-void fq_zech_ctx_init_modulus(fq_zech_ctx_t ctx,
-                              const nmod_poly_t modulus,
-                              const char *var);
-
-int fq_zech_ctx_init_modulus_check(fq_zech_ctx_t ctx,
-                              const nmod_poly_t modulus,
-                              const char *var);
-
-void fq_zech_ctx_randtest(fq_zech_ctx_t ctx, flint_rand_t state);
-
-void fq_zech_ctx_randtest_reducible(fq_zech_ctx_t ctx, flint_rand_t state);
+void fq_zech_ctx_init_randtest(fq_zech_ctx_t ctx, flint_rand_t state, int type);
+void fq_zech_ctx_init_randtest_reducible(fq_zech_ctx_t ctx, flint_rand_t state, int type);
 
 void fq_zech_ctx_clear(fq_zech_ctx_t ctx);
 
-const nmod_poly_struct * fq_zech_ctx_modulus(const fq_zech_ctx_t ctx);
+FQ_ZECH_INLINE
+const nmod_poly_struct * fq_zech_ctx_modulus(const fq_zech_ctx_t ctx)
+{
+    return ctx->fq_nmod_ctx->modulus;
+}
 
-slong fq_zech_ctx_degree(const fq_zech_ctx_t ctx);
+FQ_ZECH_INLINE
+slong fq_zech_ctx_degree(const fq_zech_ctx_t ctx)
+{
+    return ctx->fq_nmod_ctx->modulus->length - 1;
+}
 
-void fq_zech_ctx_order(fmpz_t f, const fq_zech_ctx_t ctx);
+FQ_ZECH_INLINE
+ulong fq_zech_ctx_prime(const fq_zech_ctx_t ctx)
+{
+    return ctx->fq_nmod_ctx->mod.n;
+}
 
-FQ_ZECH_INLINE mp_limb_t
-fq_zech_ctx_order_ui(const fq_zech_ctx_t ctx)
+FQ_ZECH_INLINE
+ulong fq_zech_ctx_order_ui(const fq_zech_ctx_t ctx)
 {
     return ctx->qm1 + 1;
 }
@@ -90,14 +92,14 @@ fq_zech_init2(fq_zech_t rop, const fq_zech_ctx_t ctx)
 }
 
 FQ_ZECH_INLINE void
-fq_zech_clear(fq_zech_t rop, const fq_zech_ctx_t ctx)
+fq_zech_clear(fq_zech_t FLINT_UNUSED(rop), const fq_zech_ctx_t FLINT_UNUSED(ctx))
 {
 }
 
 FQ_ZECH_INLINE void
 fq_zech_reduce(fq_zech_t rop, const fq_zech_ctx_t ctx)
 {
-    mp_limb_t order = fq_zech_ctx_order_ui(ctx);
+    ulong order = fq_zech_ctx_order_ui(ctx);
     if (rop->value >= order)
     {
         rop->value -= order;
@@ -169,7 +171,7 @@ void fq_zech_rand_not_zero(fq_zech_t rop, flint_rand_t state,
 /* Comparison ****************************************************************/
 
 FQ_ZECH_INLINE int
-fq_zech_equal(const fq_zech_t op1, const fq_zech_t op2, const fq_zech_ctx_t ctx)
+fq_zech_equal(const fq_zech_t op1, const fq_zech_t op2, const fq_zech_ctx_t FLINT_UNUSED(ctx))
 {
     return op1->value == op2->value;
 }
@@ -181,7 +183,7 @@ fq_zech_is_zero(const fq_zech_t op, const fq_zech_ctx_t ctx)
 }
 
 FQ_ZECH_INLINE int
-fq_zech_is_one(const fq_zech_t op, const fq_zech_ctx_t ctx)
+fq_zech_is_one(const fq_zech_t op, const fq_zech_ctx_t FLINT_UNUSED(ctx))
 {
     return op->value == 0;
 }
@@ -189,7 +191,7 @@ fq_zech_is_one(const fq_zech_t op, const fq_zech_ctx_t ctx)
 /* Assignments and conversions ***********************************************/
 
 FQ_ZECH_INLINE void
-fq_zech_set(fq_zech_t rop, const fq_zech_t op, const fq_zech_ctx_t ctx)
+fq_zech_set(fq_zech_t rop, const fq_zech_t op, const fq_zech_ctx_t FLINT_UNUSED(ctx))
 {
     rop->value = op->value;
 }
@@ -200,7 +202,7 @@ void fq_zech_set_si(fq_zech_t rop, const slong x, const fq_zech_ctx_t ctx);
 void fq_zech_set_ui(fq_zech_t rop, const ulong x, const fq_zech_ctx_t ctx);
 
 FQ_ZECH_INLINE void
-fq_zech_swap(fq_zech_t op1, fq_zech_t op2, const fq_zech_ctx_t ctx)
+fq_zech_swap(fq_zech_t op1, fq_zech_t op2, const fq_zech_ctx_t FLINT_UNUSED(ctx))
 {
     slong temp;
     temp = op2->value;
@@ -215,13 +217,13 @@ fq_zech_zero(fq_zech_t rop, const fq_zech_ctx_t ctx)
 }
 
 FQ_ZECH_INLINE void
-fq_zech_one(fq_zech_t rop, const fq_zech_ctx_t ctx)
+fq_zech_one(fq_zech_t rop, const fq_zech_ctx_t FLINT_UNUSED(ctx))
 {
     rop->value = 0;
 }
 
 FQ_ZECH_INLINE void
-fq_zech_gen(fq_zech_t rop, const fq_zech_ctx_t ctx)
+fq_zech_gen(fq_zech_t rop, const fq_zech_ctx_t FLINT_UNUSED(ctx))
 {
     rop->value = 1;
 }
@@ -246,14 +248,14 @@ void fq_zech_set_nmod_poly(fq_zech_t a, const nmod_poly_t b,
 /* Output ********************************************************************/
 
 #ifdef FLINT_HAVE_FILE
-int fq_zech_fprint(FILE * file, const fq_zech_t op, const fq_zech_ctx_t ctx);
+int fq_zech_fprint(FILE * file, const fq_zech_t op, const fq_zech_ctx_t FLINT_UNUSED(ctx));
 int fq_zech_fprint_pretty(FILE * file, const fq_zech_t op, const fq_zech_ctx_t ctx);
 #endif
 
 void fq_zech_print(const fq_zech_t op, const fq_zech_ctx_t ctx);
 void fq_zech_print_pretty(const fq_zech_t op, const fq_zech_ctx_t ctx);
 
-char * fq_zech_get_str(const fq_zech_t op, const fq_zech_ctx_t ctx);
+char * fq_zech_get_str(const fq_zech_t op, const fq_zech_ctx_t FLINT_UNUSED(ctx));
 char * fq_zech_get_str_pretty(const fq_zech_t op, const fq_zech_ctx_t ctx);
 
 
@@ -274,9 +276,14 @@ void fq_zech_bit_pack(fmpz_t f, const fq_zech_t op, flint_bitcnt_t bit_size,
 void fq_zech_bit_unpack(fq_zech_t rop, const fmpz_t f, flint_bitcnt_t bit_size,
                    const fq_zech_ctx_t ctx);
 
-/* Inlines *******************************************************************/
+/* Deprecated functions ******************************************************/
 
-void __fq_zech_ctx_prime(fmpz_t p, fq_zech_ctx_t ctx);
+void fq_zech_ctx_init(fq_zech_ctx_t, fmpz_t, slong, const char *);
+int _fq_zech_ctx_init_conway(fq_zech_ctx_t, fmpz_t, slong, const char *);
+void fq_zech_ctx_init_conway(fq_zech_ctx_t, fmpz_t, slong, const char *);
+void fq_zech_ctx_init_random(fq_zech_ctx_t, fmpz_t, slong, const char *);
+
+void fq_zech_ctx_order(fmpz_t, const fq_zech_ctx_t);
 
 #ifdef T
 #undef T

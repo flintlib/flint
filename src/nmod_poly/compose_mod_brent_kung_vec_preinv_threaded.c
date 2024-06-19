@@ -7,12 +7,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "thread_pool.h"
 #include "thread_support.h"
 #include "ulong_extras.h"
+#include "mpn_extras.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 #include "nmod_mat.h"
@@ -21,11 +23,11 @@ typedef struct
 {
     nmod_poly_struct * res;
     nmod_mat_struct * C;
-    mp_srcptr h;
-    mp_srcptr poly;
-    mp_srcptr polyinv;
+    nn_srcptr h;
+    nn_srcptr poly;
+    nn_srcptr polyinv;
     nmod_t p;
-    mp_ptr t;
+    nn_ptr t;
     volatile slong * j;
     slong k;
     slong m;
@@ -43,10 +45,10 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv_worker(void * arg_ptr)
     compose_vec_arg_t arg = *((compose_vec_arg_t *) arg_ptr);
     slong i, j, k = arg.k, n = arg.len - 1;
     slong len = arg.len, leninv = arg.leninv;
-    mp_ptr t = arg.t;
-    mp_srcptr h = arg.h;
-    mp_srcptr poly = arg.poly;
-    mp_srcptr polyinv = arg.polyinv;
+    nn_ptr t = arg.t;
+    nn_srcptr h = arg.h;
+    nn_srcptr poly = arg.poly;
+    nn_srcptr polyinv = arg.polyinv;
     nmod_poly_struct * res = arg.res;
     nmod_mat_struct * C = arg.C;
     nmod_t p = arg.p;
@@ -88,20 +90,20 @@ _nmod_poly_compose_mod_brent_kung_vec_preinv_worker(void * arg_ptr)
     }
 }
 
-void
-_nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * res,
-                                             const nmod_poly_struct * polys,
-                                             slong lenpolys, slong l,
-                                             mp_srcptr g, slong glen,
-                                             mp_srcptr poly, slong len,
-                                             mp_srcptr polyinv, slong leninv,
-                                             nmod_t mod,
-                                             thread_pool_handle * threads,
-                                             slong num_threads)
+void _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(
+        nmod_poly_struct * res,
+        const nmod_poly_struct * polys,
+        slong FLINT_UNUSED(lenpolys), slong l,
+        nn_srcptr g, slong glen,
+        nn_srcptr poly, slong len,
+        nn_srcptr polyinv, slong leninv,
+        nmod_t mod,
+        thread_pool_handle * threads,
+        slong num_threads)
 {
     nmod_mat_t A, B, C;
     slong i, j, n, m, k, len2 = l, len1, shared_j = 0;
-    mp_ptr h;
+    nn_ptr h;
     compose_vec_arg_t * args;
 #if FLINT_USES_PTHREAD
     pthread_mutex_t mutex;
@@ -273,20 +275,15 @@ nmod_poly_compose_mod_brent_kung_vec_preinv_threaded(nmod_poly_struct * res,
     {
         if (polys[i].length >= len2)
         {
-            flint_printf
-                ("Exception (nmod_poly_compose_mod_brent_kung_vec_preinv_threaded)."
-                 "The degree of the first polynomial must be smaller than that of the "
-                 " modulus\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(nmod_poly_compose_mod_brent_kung_vec_preinv_threaded): "
+                 "The degree of the first polynomial must be smaller than that of the modulus\n");
         }
     }
 
     if (n > len1)
     {
-        flint_printf
-            ("Exception (nmod_poly_compose_mod_brent_kung_vec_preinv_threaded)."
-             "n is larger than the length of polys\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(nmod_poly_compose_mod_brent_kung_vec_preinv_threaded): "
+                "n is larger than the length of polys\n");
     }
 
     if (n == 0)

@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -19,7 +19,7 @@
 
 #define Z8(a,b,c,d,e,f,g,h) Z2(a,b), Z2(c,d), Z2(e,f), Z2(g,h),
 
-const mp_limb_t arb_exp_tab1[ARB_EXP_TAB1_NUM][ARB_EXP_TAB1_LIMBS] =
+const ulong arb_exp_tab1[ARB_EXP_TAB1_NUM][ARB_EXP_TAB1_LIMBS] =
 {{
   Z8(00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000)
   Z8(00000000,00000000,00000000,00000000,00000000,00000000,00000000,80000000)
@@ -556,7 +556,7 @@ const mp_limb_t arb_exp_tab1[ARB_EXP_TAB1_NUM][ARB_EXP_TAB1_LIMBS] =
   Z8(408864d5,d5780f49,ebee8587,e45235ee,ce1767a0,47c599e3,152a029f,ff8e0171)
 }};
 
-const mp_limb_t arb_exp_tab21[ARB_EXP_TAB21_NUM][ARB_EXP_TAB2_LIMBS] =
+const ulong arb_exp_tab21[ARB_EXP_TAB21_NUM][ARB_EXP_TAB2_LIMBS] =
 {{
   Z8(00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000)
   Z8(00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000)
@@ -996,7 +996,7 @@ const mp_limb_t arb_exp_tab21[ARB_EXP_TAB21_NUM][ARB_EXP_TAB2_LIMBS] =
   Z8(4749b4fd,d2a0a1dd,ad8263b1,12708a7a,32cb9121,61db6846,17c644e9,fe8ef30c)
 }};
 
-const mp_limb_t arb_exp_tab22[ARB_EXP_TAB22_NUM][ARB_EXP_TAB2_LIMBS] =
+const ulong arb_exp_tab22[ARB_EXP_TAB22_NUM][ARB_EXP_TAB2_LIMBS] =
 {{
   Z8(00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000)
   Z8(00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000)
@@ -1606,4 +1606,3 @@ const mp_limb_t arb_exp_tab22[ARB_EXP_TAB22_NUM][ARB_EXP_TAB2_LIMBS] =
   Z8(3ff6a04e,fac0f617,19c31758,9c3d1729,51d3f338,bc414a7f,2a31b689,90223629)
   Z8(0d371e0d,232759e7,95cc9009,6f7c685d,8bc8b40e,27bc7157,f26fd248,83ef2b15)
 }};
-

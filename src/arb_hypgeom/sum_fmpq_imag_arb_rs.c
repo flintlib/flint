@@ -5,12 +5,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "ulong_extras.h"
 #include "fmpz_vec.h"
+#include "arb.h"
 #include "arb_hypgeom.h"
 
 #ifdef __GNUC__
@@ -185,7 +186,7 @@ arb_hypgeom_sum_fmpq_imag_arb_rs(arb_t res_real, arb_t res_imag, const fmpq * a,
         }
 
         if (jbot != jtop - jlen + 1)
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
         /* Factors between jbot and jtop inclusive */
         if (jbot == 0 || alen == 0)
@@ -381,4 +382,3 @@ arb_hypgeom_sum_fmpq_imag_arb_rs(arb_t res_real, arb_t res_imag, const fmpq * a,
     fmpz_clear(c);
     fmpz_clear(den);
 }
-

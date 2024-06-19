@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -25,8 +25,8 @@ void _fmpz_poly_resultant_modular(fmpz_t res, const fmpz * poly1, slong len1,
     fmpz_comb_temp_t comb_temp;
     fmpz_t ac, bc, l, modulus;
     fmpz * A, * B, * lead_A, * lead_B;
-    mp_ptr a, b, rarr, parr;
-    mp_limb_t p;
+    nn_ptr a, b, rarr, parr;
+    ulong p;
     nmod_t mod;
 
     /* special case, one of the polys is a constant */
@@ -68,10 +68,8 @@ void _fmpz_poly_resultant_modular(fmpz_t res, const fmpz * poly1, slong len1,
         fmpz_init(b1);
         fmpz_init(b2);
 
-        for (i = 0; i < len1; i++)
-            fmpz_addmul(b1, A + i, A + i);
-        for (i = 0; i < len2; i++)
-            fmpz_addmul(b2, B + i, B + i);
+        _fmpz_vec_dot(b1, A, A, len1);
+        _fmpz_vec_dot(b2, B, B, len2);
 
         fmpz_pow_ui(b1, b1, len2 - 1);
         fmpz_pow_ui(b2, b2, len1 - 1);
@@ -174,4 +172,3 @@ fmpz_poly_resultant_modular(fmpz_t res, const fmpz_poly_t poly1,
             fmpz_neg(res, res);
    }
 }
-

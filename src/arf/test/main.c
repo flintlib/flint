@@ -5,12 +5,10 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
-#include <stdlib.h>
 #include <mpfr.h>
 
 /* Include functions *********************************************************/
@@ -62,6 +60,7 @@
 #include "t-set_round_mpz.c"
 #include "t-set_round_ui.c"
 #include "t-set_round_uiui.c"
+#include "t-sgn.c"
 #include "t-sosq.c"
 #include "t-sqrt.c"
 #include "t-sub.c"
@@ -125,6 +124,7 @@ test_struct tests[] =
     TEST_FUNCTION(arf_set_round_mpz),
     TEST_FUNCTION(arf_set_round_ui),
     TEST_FUNCTION(arf_set_round_uiui),
+    TEST_FUNCTION(arf_sgn),
     TEST_FUNCTION(arf_sosq),
     TEST_FUNCTION(arf_sqrt),
     TEST_FUNCTION(arf_sub),

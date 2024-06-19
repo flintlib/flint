@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -53,9 +53,8 @@ add_columns(fmpz_mat_t H, const fmpz_mat_t B, const fmpz_mat_t H1, flint_rand_t 
     /* find kernel basis vector */
     if (fmpz_mat_nullspace(k, B1) != 1)
     {
-        flint_printf("Exception (fmpz_mat_hnf_pernet_stein). "
+        flint_throw(FLINT_ERROR, "(fmpz_mat_hnf_pernet_stein): "
                 "Nullspace was not dimension one.\n");
-        flint_abort();
     }
 
     bits = fmpz_mat_max_bits(B1);
@@ -81,9 +80,8 @@ add_columns(fmpz_mat_t H, const fmpz_mat_t B, const fmpz_mat_t H1, flint_rand_t 
     /* solve Bu*x = cols */
     if (!fmpq_mat_solve_fmpz_mat(x, Bu, cols))
     {
-        flint_printf("Exception (fmpz_mat_hnf_pernet_stein). "
-                "Singular input matrix for solve.");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(fmpz_mat_hnf_pernet_stein): "
+                "Singular input matrix for solve.\n");
     }
 
     /* fix final row */
@@ -264,7 +262,7 @@ double_det(fmpz_t d1, fmpz_t d2, const fmpz_mat_t B, const fmpz_mat_t c,
 {
     slong i, j, n;
     slong *P;
-    mp_limb_t p, u1mod, u2mod, v1mod, v2mod;
+    ulong p, u1mod, u2mod, v1mod, v2mod;
     fmpz_t bound, prod, s1, s2, t, u1, u2, v1, v2;
     fmpz_mat_t dt, Bt;
     fmpq_t tmpq;
@@ -636,4 +634,3 @@ fmpz_mat_hnf_pernet_stein(fmpz_mat_t H, const fmpz_mat_t A, flint_rand_t state)
     _perm_clear(P);
     _perm_clear(pivots);
 }
-

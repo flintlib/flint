@@ -1,12 +1,13 @@
 /*
-    Copyright 2021, 2022 William Hart
     Copyright (C) 2012 Fredrik Johansson
+    Copyright (C) 2021, 2022 William Hart
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -41,7 +42,11 @@ _TEMPLATE(T, poly_sqrt)(TEMPLATE(T, struct) * s, const TEMPLATE(T, struct) * p, 
     if (len % 2 == 0)
         return len == 0;
 
+#if defined(FQ_NMOD_POLY_H) || defined(FQ_ZECH_POLY_H)
+    if (TEMPLATE(T, ctx_prime)(ctx) == 2)
+#else
     if (fmpz_cmp_ui(TEMPLATE(T, ctx_prime)(ctx), 2) == 0)
+#endif
         return _TEMPLATE(T, poly_sqrt_2)(s, p, len, ctx);
 
     /* valuation must be even, and then can be reduced to 0 */
@@ -155,4 +160,3 @@ TEMPLATE(T, poly_sqrt)(TEMPLATE(T, poly_t) b, const TEMPLATE(T, poly_t) a, TEMPL
 }
 
 #endif
-

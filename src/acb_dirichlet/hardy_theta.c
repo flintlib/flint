@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -47,8 +47,7 @@ acb_dirichlet_hardy_theta(acb_ptr res, const acb_t t,
 
         if (q != dirichlet_conductor_char(G, chi))
         {
-            flint_printf("hardy theta: need primitive character\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "hardy theta: need primitive character\n");
         }
     }
 
@@ -123,4 +122,3 @@ acb_dirichlet_hardy_theta(acb_ptr res, const acb_t t,
     acb_clear(y + 1);
     arb_clear(c);
 }
-

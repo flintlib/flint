@@ -8,11 +8,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "test_helpers.h"
+#include "ulong_extras.h"
 #include "nmod_poly.h"
 #include "nmod_poly_factor.h"
 
@@ -26,7 +27,7 @@ TEST_FUNCTION_START(nmod_poly_factor, state)
         int result = 1;
         nmod_poly_t pol1, poly, quot, rem, product;
         nmod_poly_factor_t res;
-        mp_limb_t modulus, lead = 1;
+        ulong modulus, lead = 1;
         slong length, num, i, j;
         ulong exp[5];
 
@@ -130,7 +131,7 @@ TEST_FUNCTION_START(nmod_poly_factor, state)
     {
         nmod_poly_t pol1, poly, quot, rem;
         nmod_poly_factor_t res, res2;
-        mp_limb_t modulus;
+        ulong modulus;
         slong length, num, i, j;
         slong exp[5];
         ulong inflation;

@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -40,8 +40,7 @@ _arb_poly_newton_refine_root(arb_t r, arb_srcptr poly, slong len,
 
         if (iters == FLINT_BITS)
         {
-            flint_printf("newton_refine_root: initial value too imprecise\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "newton_refine_root: initial value too imprecise\n");
         }
     }
 
@@ -60,4 +59,3 @@ _arb_poly_newton_refine_root(arb_t r, arb_srcptr poly, slong len,
 
     }
 }
-

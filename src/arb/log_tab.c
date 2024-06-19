@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -20,7 +20,7 @@
 #define Z8(a,b,c,d,e,f,g,h) Z2(a,b), Z2(c,d), Z2(e,f), Z2(g,h),
 
 /* logarithms of primes */
-const mp_limb_t arb_log_p_tab[ARB_LOG_PRIME_CACHE_NUM][ARB_LOG_TAB2_LIMBS] =
+const ulong arb_log_p_tab[ARB_LOG_PRIME_CACHE_NUM][ARB_LOG_TAB2_LIMBS] =
 {{
   Z8(78b63c9f,897a39ce,1e238438,52ab3316,a6c4c60c,062b1a63,e8f70edd,3ea8449f)
   Z8(26fac51c,6425a415,f95884e0,c5e5767d,8a0e23fa,c0b1b31d,3a49bd0d,85db6ab0)
@@ -270,9 +270,9 @@ const mp_limb_t arb_log_p_tab[ARB_LOG_PRIME_CACHE_NUM][ARB_LOG_TAB2_LIMBS] =
   Z8(c8db7021,b2283a67,7bca0417,a1462505,cf59195f,66ffd699,75626d5d,edab2a2c)
 }};
 
-const mp_srcptr arb_log_log2_tab = arb_log_p_tab[0];
+const nn_srcptr arb_log_log2_tab = arb_log_p_tab[0];
 
-const mp_limb_t arb_log_tab11[1 << ARB_LOG_TAB11_BITS][ARB_LOG_TAB1_LIMBS] =
+const ulong arb_log_tab11[1 << ARB_LOG_TAB11_BITS][ARB_LOG_TAB1_LIMBS] =
 {{
   Z8(00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000)
   Z8(00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000)
@@ -659,7 +659,7 @@ const mp_limb_t arb_log_tab11[1 << ARB_LOG_TAB11_BITS][ARB_LOG_TAB1_LIMBS] =
   Z8(c1549af0,96012a8e,ccaabf0a,17ce375a,76554335,e44ad05a,3c46c653,b07197a2)
 }};
 
-const mp_limb_t arb_log_tab12[1 << ARB_LOG_TAB12_BITS][ARB_LOG_TAB1_LIMBS] =
+const ulong arb_log_tab12[1 << ARB_LOG_TAB12_BITS][ARB_LOG_TAB1_LIMBS] =
 {{
   Z8(00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000)
   Z8(00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000)
@@ -1046,7 +1046,7 @@ const mp_limb_t arb_log_tab12[1 << ARB_LOG_TAB12_BITS][ARB_LOG_TAB1_LIMBS] =
   Z8(fa5d1c6e,62b187fd,6bac0a8b,70ef0e95,ca0d270c,e88d71b2,f0531d8a,01fa0a8e)
 }};
 
-const mp_limb_t arb_log_tab21[1 << ARB_LOG_TAB21_BITS][ARB_LOG_TAB2_LIMBS] =
+const ulong arb_log_tab21[1 << ARB_LOG_TAB21_BITS][ARB_LOG_TAB2_LIMBS] =
 {{
   Z8(00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000)
   Z8(00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000)
@@ -1657,7 +1657,7 @@ const mp_limb_t arb_log_tab21[1 << ARB_LOG_TAB21_BITS][ARB_LOG_TAB2_LIMBS] =
   Z8(5b324a78,7753b3c8,8161ccf7,839e0457,1cd40845,4d552f81,acf967d9,ad6a0261)
 }};
 
-const mp_limb_t arb_log_tab22[1 << ARB_LOG_TAB22_BITS][ARB_LOG_TAB2_LIMBS] =
+const ulong arb_log_tab22[1 << ARB_LOG_TAB22_BITS][ARB_LOG_TAB2_LIMBS] =
 {{
   Z8(00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000)
   Z8(00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000)
@@ -2267,5 +2267,3 @@ const mp_limb_t arb_log_tab22[1 << ARB_LOG_TAB22_BITS][ARB_LOG_TAB2_LIMBS] =
   Z8(630346e3,635144e2,378409fc,87012299,a556dc48,d48fc658,82a4441f,a8c1ebd6)
   Z8(f0a5b553,221ccad4,2d3e91ef,be0fe5f4,167294c9,e10d6380,c3372b02,07a28fb8)
 }};
-
-

@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -32,10 +32,10 @@ arf_sosq(arf_t res, const arf_t a, const arf_t b, slong prec, arf_rnd_t rnd)
     }
     else
     {
-        mp_srcptr ap, bp;
+        nn_srcptr ap, bp;
         int inexact;
-        mp_ptr tmp, aap, bbp;
-        mp_size_t an, bn, aan, bbn, alloc;
+        nn_ptr tmp, aap, bbp;
+        slong an, bn, aan, bbn, alloc;
         slong shift;
         fmpz_t texp, uexp;
         ARF_MUL_TMP_DECL
@@ -80,4 +80,3 @@ arf_sosq(arf_t res, const arf_t a, const arf_t b, slong prec, arf_rnd_t rnd)
         return inexact;
     }
 }
-

@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -203,6 +203,7 @@ gr_static_method_table _dirichlet_methods;
 
 gr_method_tab_input _dirichlet_methods_input[] =
 {
+    {GR_METHOD_CTX_IS_RING,     (gr_funcptr) gr_generic_ctx_predicate_false},
     {GR_METHOD_CTX_IS_FINITE,
                             (gr_funcptr) gr_generic_ctx_predicate_true},
     {GR_METHOD_CTX_IS_MULTIPLICATIVE_GROUP,

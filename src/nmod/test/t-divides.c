@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -19,7 +19,7 @@ TEST_FUNCTION_START(nmod_divides, state)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_t mod;
-        mp_limb_t n, x, y, xy, z;
+        ulong n, x, y, xy, z;
         int div;
 
         n = n_randtest_not_zero(state);
@@ -35,12 +35,7 @@ TEST_FUNCTION_START(nmod_divides, state)
 
         /* Claimed divisible, so check this. */
         if (!div || nmod_mul(z, x, mod) != xy)
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("n = %wu, div = %d, x = %wu, y = %wu, z = %wu\n", n, div, x, y, z);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("n = %wu, div = %d, x = %wu, y = %wu, z = %wu\n", n, div, x, y, z);
 
         div = nmod_divides(&z, x, y, mod);
 
@@ -50,12 +45,7 @@ TEST_FUNCTION_START(nmod_divides, state)
             for (z = 0; z < n; z++)
             {
                 if (nmod_mul(z, y, mod) == x)
-                {
-                    flint_printf("FAIL (2):\n");
-                    flint_printf("n = %wu, div = %d, x = %wu, y = %wu, z = %wu\n", n, div, x, y, z);
-                    fflush(stdout);
-                    flint_abort();
-                }
+                    TEST_FUNCTION_FAIL("n = %wu, div = %d, x = %wu, y = %wu, z = %wu\n", n, div, x, y, z);
             }
         }
     }

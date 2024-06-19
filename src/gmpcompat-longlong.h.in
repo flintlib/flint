@@ -5,19 +5,15 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #ifndef GMP_COMPAT_H
 #define GMP_COMPAT_H
 
-#include "flint.h"
-
-#define FLINT_MPZ_REALLOC(z, len)       \
-    ((len) > ((z)->_mp_alloc)           \
-        ? (mp_ptr) _mpz_realloc(z, len) \
-        : ((z)->_mp_d))
+#include <gmp.h>
+#include "longlong.h"
 
 static inline
 void flint_mpz_add_uiui(mpz_ptr a, mpz_srcptr b, ulong c1, ulong c0)
@@ -109,7 +105,7 @@ void flint_mpz_set_si(mpz_ptr r, slong s)
       (in older GMP versions, this code is simply never triggered) */
    if (r->_mp_alloc == 0)
    {
-      r->_mp_d = (mp_ptr) flint_malloc(sizeof(mp_limb_t));
+      r->_mp_d = (mp_ptr) flint_malloc(2 * sizeof(mp_limb_t));
       r->_mp_alloc = 1;
    }
 
@@ -129,7 +125,7 @@ void flint_mpz_set_ui(mpz_ptr r, ulong u)
       (in older GMP versions, this code is simply never triggered) */
    if (r->_mp_alloc == 0)
    {
-      r->_mp_d = (mp_ptr) flint_malloc(sizeof(mp_limb_t));
+      r->_mp_d = (mp_ptr) flint_malloc(2 * sizeof(mp_limb_t));
       r->_mp_alloc = 1;
    }
 
@@ -140,7 +136,7 @@ void flint_mpz_set_ui(mpz_ptr r, ulong u)
 static inline
 void flint_mpz_init_set_si(mpz_ptr r, slong s)
 {
-   r->_mp_d = (mp_ptr) flint_malloc(sizeof(mp_limb_t));
+   r->_mp_d = (mp_ptr) flint_malloc(2 * sizeof(mp_limb_t));
    r->_mp_alloc = 1;
 
    if (s < 0) {
@@ -155,7 +151,7 @@ void flint_mpz_init_set_si(mpz_ptr r, slong s)
 static inline
 void flint_mpz_init_set_ui(mpz_ptr r, ulong u)
 {
-   r->_mp_d = (mp_ptr) flint_malloc(sizeof(mp_limb_t));
+   r->_mp_d = (mp_ptr) flint_malloc(2 * sizeof(mp_limb_t));
    r->_mp_alloc = 1;
 
    r->_mp_d[0] = u;
@@ -541,8 +537,7 @@ static inline
 void flint_mpz_pow_ui(mpz_ptr r, mpz_srcptr b, ulong exp)
 {
    if (exp >= (UWORD(1) << 32)) {
-      flint_printf("Exception (flint_mpz_pow_ui). Power too large.\n");
-      flint_abort();
+      flint_throw(FLINT_ERROR, "Exception (flint_mpz_pow_ui). Power too large.\n");
    }
 
    mpz_pow_ui(r, b, (unsigned long) exp);
@@ -552,8 +547,7 @@ static inline
 void flint_mpz_fac_ui(mpz_ptr r, ulong n)
 {
    if (n >= (UWORD(1) << 32)) {
-      flint_printf("Exception (flint_mpz_fac_ui). Value n too large.\n");
-      flint_abort();
+      flint_throw(FLINT_ERROR, "Exception (flint_mpz_fac_ui). Value n too large.\n");
    }
 
    mpz_fac_ui(r, (unsigned long) n);
@@ -563,13 +557,11 @@ static inline
 void flint_mpz_bin_uiui(mpz_ptr r, ulong n, ulong k)
 {
    if (n >= (UWORD(1) << 32)) {
-      flint_printf("Exception (flint_mpz_bin_uiui). Value n too large.\n");
-      flint_abort();
+      flint_throw(FLINT_ERROR, "Exception (flint_mpz_bin_uiui). Value n too large.\n");
    }
 
    if (k >= (UWORD(1) << 32)) {
-      flint_printf("Exception (flint_mpz_bin_uiui). Value k too large.\n");
-      flint_abort();
+      flint_throw(FLINT_ERROR, "Exception (flint_mpz_bin_uiui). Value k too large.\n");
    }
 
    mpz_bin_uiui(r, (unsigned long) n, (unsigned long) k);
@@ -579,8 +571,7 @@ static inline
 void flint_mpz_fib_ui(mpz_ptr r, ulong n)
 {
    if (n >= (UWORD(1) << 32)) {
-      flint_printf("Exception (flint_mpz_fib_ui). Value n too large.\n");
-      flint_abort();
+      flint_throw(FLINT_ERROR, "Exception (flint_mpz_fib_ui). Value n too large.\n");
    }
 
    mpz_fib_ui(r, (unsigned long) n);

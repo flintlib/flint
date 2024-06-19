@@ -5,12 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <stdlib.h>
 #include <float.h>
-#include "flint.h"
 #include "fmpz.h"
 #include "ulong_extras.h"
 #include "profiler.h"
@@ -33,7 +33,8 @@ main(int argc, char** argv)
 
     int c, n, len, ext, reps = 0;
     slong j;
-    fmpz_t p, temp;
+    ulong p;
+    fmpz_t temp;
     fq_zech_poly_t f, g;
     fq_nmod_poly_t fn;
     fq_zech_ctx_t ctx;
@@ -41,8 +42,7 @@ main(int argc, char** argv)
 
     FLINT_TEST_INIT(state);
 
-    fmpz_init(p);
-    fmpz_set_str(p, argv[1], 10);
+    p = strtoull(argv[1], NULL, 10);
 
     fmpz_init(temp);
 
@@ -52,7 +52,7 @@ main(int argc, char** argv)
     fmpz_set_str(temp, argv[3], 10);
     len = fmpz_get_si(temp);
 
-    fq_nmod_ctx_init(ctxn, p, ext, "a");
+    fq_nmod_ctx_init_ui(ctxn, p, ext, "a");
     fq_zech_ctx_init_fq_nmod_ctx(ctx, ctxn);
 
     fq_zech_poly_init(f, ctx);
@@ -134,7 +134,6 @@ main(int argc, char** argv)
     fq_nmod_poly_clear(fn, ctxn);
     fq_zech_ctx_clear(ctx);
     fq_nmod_ctx_clear(ctxn);
-    fmpz_clear(p);
     fmpz_clear(temp);
 
     FLINT_TEST_CLEANUP(state);

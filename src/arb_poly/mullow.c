@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -99,8 +99,9 @@ arb_poly_mullow(arb_poly_t res, const arb_poly_t poly1,
         }
         else
         {
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
+#if 0
             if (res == poly1 || res == poly2)
             {
                 arb_t t;
@@ -117,6 +118,7 @@ arb_poly_mullow(arb_poly_t res, const arb_poly_t poly1,
                 arb_mul(res->coeffs + 1, poly1->coeffs, poly2->coeffs + 1, prec);
                 arb_addmul(res->coeffs + 1, poly2->coeffs, poly1->coeffs + 1, prec);
             }
+#endif
         }
 
         _arb_poly_set_length(res, n);
@@ -143,4 +145,3 @@ arb_poly_mullow(arb_poly_t res, const arb_poly_t poly1,
     _arb_poly_set_length(res, n);
     _arb_poly_normalise(res);
 }
-

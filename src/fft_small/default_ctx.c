@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -39,13 +39,13 @@ mpn_ctx_struct * get_default_mpn_ctx(void)
 }
 
 void
-mpn_mul_default_mpn_ctx(mp_ptr r1, mp_srcptr i1, mp_size_t n1, mp_srcptr i2, mp_size_t n2)
+mpn_mul_default_mpn_ctx(nn_ptr r1, nn_srcptr i1, slong n1, nn_srcptr i2, slong n2)
 {
     mpn_ctx_mpn_mul(get_default_mpn_ctx(), r1, i1, n1, i2, n2);
 }
 
 void
-_nmod_poly_mul_mid_default_mpn_ctx(mp_ptr res, slong zl, slong zh, mp_srcptr a, slong an, mp_srcptr b, slong bn, nmod_t mod)
+_nmod_poly_mul_mid_default_mpn_ctx(nn_ptr res, slong zl, slong zh, nn_srcptr a, slong an, nn_srcptr b, slong bn, nmod_t mod)
 {
     _nmod_poly_mul_mid_mpn_ctx(res, zl, zh, a, an, b, bn, mod, get_default_mpn_ctx());
 }
@@ -55,4 +55,3 @@ _fmpz_poly_mul_mid_default_mpn_ctx(fmpz * res, slong zl, slong zh, const fmpz * 
 {
     return _fmpz_poly_mul_mid_mpn_ctx(res, zl, zh, a, an, b, bn, get_default_mpn_ctx());
 }
-

@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -22,7 +22,7 @@ TEST_FUNCTION_START(nmod_poly_rem, state)
     {
         nmod_poly_t a, b, q, r, prod;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest_not_zero(state);
         while (!n_is_probabprime(n));
 
@@ -66,7 +66,7 @@ TEST_FUNCTION_START(nmod_poly_rem, state)
     {
         nmod_poly_t a, b, r;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest(state);
         while (!n_is_probabprime(n));
 
@@ -102,7 +102,7 @@ TEST_FUNCTION_START(nmod_poly_rem, state)
     {
         nmod_poly_t a, b, r;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest(state);
         while (!n_is_probabprime(n));
 
@@ -138,7 +138,7 @@ TEST_FUNCTION_START(nmod_poly_rem, state)
     {
         nmod_poly_t a, b, q0, r0, r;
 
-        mp_limb_t n = n_randprime(state, n_randint(state,FLINT_BITS-1)+2, 0);
+        ulong n = n_randprime(state, n_randint(state,FLINT_BITS-1)+2, 0);
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);

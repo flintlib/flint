@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -16,9 +16,9 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "ulong_extras.h"
+#include <flint/flint.h>
+#include <flint/fmpz.h>
+#include <flint/ulong_extras.h>
 
 int main(int argc, char* argv[])
 {
@@ -29,8 +29,8 @@ int main(int argc, char* argv[])
     fmpz_comb_t comb;
     fmpz_comb_temp_t comb_temp;
 
-    mp_limb_t * primes;
-    mp_limb_t * residues;
+    ulong * primes;
+    ulong * residues;
 
     slong num_primes;
 
@@ -53,8 +53,8 @@ int main(int argc, char* argv[])
 
     fmpz_set_str(x, argv[1], 10);
 
-    primes = flint_malloc(num_primes * sizeof(mp_limb_t));
-    residues = flint_malloc(num_primes * sizeof(mp_limb_t));
+    primes = flint_malloc(num_primes * sizeof(ulong));
+    residues = flint_malloc(num_primes * sizeof(ulong));
 
     primes[0] = 2;
     for (i = 1; i < num_primes; i++)

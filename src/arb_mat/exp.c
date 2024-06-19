@@ -5,13 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "double_extras.h"
 #include "fmpz_mat.h"
 #include "bool_mat.h"
+#include "arb.h"
 #include "arb_mat.h"
 
 #define LOG2_OVER_E 0.25499459743395350926
@@ -66,8 +67,7 @@ arb_mat_exp(arb_mat_t B, const arb_mat_t A, slong prec)
 
     if (!arb_mat_is_square(A))
     {
-        flint_printf("arb_mat_exp: a square matrix is required!\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "arb_mat_exp: a square matrix is required!\n");
     }
 
     if (arb_mat_is_empty(A))
@@ -139,7 +139,8 @@ arb_mat_exp(arb_mat_t B, const arb_mat_t A, slong prec)
         mag_mul_2exp_si(norm, norm, -r);
 
         N = _arb_mat_exp_choose_N(norm, wp);
-        if (N < 1) flint_abort(); /* assert */
+        if (N < 1)
+            flint_throw(FLINT_ERROR, "(%s): N < 1", __func__);
 
         /* if positive, nildegree is an upper bound on nilpotency degree */
         if (nildegree > 0)
@@ -161,7 +162,8 @@ arb_mat_exp(arb_mat_t B, const arb_mat_t A, slong prec)
             fmpz_mat_t W;
             fmpz_mat_init(W, dim, dim);
             w = bool_mat_all_pairs_longest_walk(W, S);
-            if (w + 1 != nildegree) flint_abort(); /* assert */
+            if (w + 1 != nildegree)
+                flint_throw(FLINT_ERROR, "(%s): w + 1 != nildegree", __func__);
             for (i = 0; i < dim; i++)
             {
                 for (j = 0; j < dim; j++)

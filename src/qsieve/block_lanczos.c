@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -21,7 +21,6 @@ benefit from your work.
 --------------------------------------------------------------------*/
 
 
-#include "ulong_extras.h"
 #include "qsieve.h"
 
 #ifdef __GNUC__
@@ -732,27 +731,27 @@ uint64_t * block_lanczos(flint_rand_t state, slong nrows,
 	   two numbers  */
 
 	vsize = FLINT_MAX(nrows, ncols);
-	v[0] = (uint64_t *)flint_malloc(vsize * sizeof(uint64_t));
-	v[1] = (uint64_t *)flint_malloc(vsize * sizeof(uint64_t));
-	v[2] = (uint64_t *)flint_malloc(vsize * sizeof(uint64_t));
-	vnext = (uint64_t *)flint_malloc(vsize * sizeof(uint64_t));
-	x = (uint64_t *)flint_malloc(vsize * sizeof(uint64_t));
-	v0 = (uint64_t *)flint_malloc(vsize * sizeof(uint64_t));
-	scratch = (uint64_t *)flint_malloc(FLINT_MAX(vsize, 256 * 8) * sizeof(uint64_t));
+	v[0] = flint_malloc(vsize * sizeof(uint64_t));
+	v[1] = flint_calloc(vsize, sizeof(uint64_t));
+	v[2] = flint_calloc(vsize, sizeof(uint64_t));
+	vnext = flint_malloc(vsize * sizeof(uint64_t));
+	x = flint_malloc(vsize * sizeof(uint64_t));
+	v0 = flint_malloc(vsize * sizeof(uint64_t));
+	scratch = flint_malloc(FLINT_MAX(vsize, 256 * 8) * sizeof(uint64_t));
 
 	/* allocate all the 64x64 variables */
 
-	winv[0] = (uint64_t *)flint_malloc(64 * sizeof(uint64_t));
-	winv[1] = (uint64_t *)flint_malloc(64 * sizeof(uint64_t));
-	winv[2] = (uint64_t *)flint_malloc(64 * sizeof(uint64_t));
-	vt_a_v[0] = (uint64_t *)flint_malloc(64 * sizeof(uint64_t));
-	vt_a_v[1] = (uint64_t *)flint_malloc(64 * sizeof(uint64_t));
-	vt_a2_v[0] = (uint64_t *)flint_malloc(64 * sizeof(uint64_t));
-	vt_a2_v[1] = (uint64_t *)flint_malloc(64 * sizeof(uint64_t));
-	d = (uint64_t *)flint_malloc(64 * sizeof(uint64_t));
-	e = (uint64_t *)flint_malloc(64 * sizeof(uint64_t));
-	f = (uint64_t *)flint_malloc(64 * sizeof(uint64_t));
-	f2 = (uint64_t *)flint_malloc(64 * sizeof(uint64_t));
+	winv[0] = flint_malloc(64 * sizeof(uint64_t));
+	winv[1] = flint_calloc(64, sizeof(uint64_t));
+	winv[2] = flint_calloc(64, sizeof(uint64_t));
+	vt_a_v[0] = flint_malloc(64 * sizeof(uint64_t));
+	vt_a_v[1] = flint_calloc(64, sizeof(uint64_t));
+	vt_a2_v[0] = flint_malloc(64 * sizeof(uint64_t));
+	vt_a2_v[1] = flint_calloc(64, sizeof(uint64_t));
+	d = flint_malloc(64 * sizeof(uint64_t));
+	e = flint_malloc(64 * sizeof(uint64_t));
+	f = flint_malloc(64 * sizeof(uint64_t));
+	f2 = flint_malloc(64 * sizeof(uint64_t));
 
 	/* The iterations computes v[0], vt_a_v[0],
 	   vt_a2_v[0], s[0] and winv[0]. Subscripts larger
@@ -760,16 +759,9 @@ uint64_t * block_lanczos(flint_rand_t state, slong nrows,
 	   quantities, which start off empty (except for
 	   the past version of s[], which contains all
 	   the column indices */
-
-	memset(v[1], 0, vsize * sizeof(uint64_t));
-	memset(v[2], 0, vsize * sizeof(uint64_t));
-	for (i = 0; i < 64; i++) {
+	for (i = 0; i < 64; i++)
 		s[1][i] = i;
-		vt_a_v[1][i] = 0;
-		vt_a2_v[1][i] = 0;
-		winv[1][i] = 0;
-		winv[2][i] = 0;
-	}
+
 	dim0 = 0;
 	dim1 = 64;
 	mask1 = (uint64_t)(-1);
@@ -961,10 +953,8 @@ uint64_t * block_lanczos(flint_rand_t state, slong nrows,
 		if (v[0][i] != 0)
 			break;
 	}
-	if (i < ncols) {
-		flint_printf("lanczos error: dependencies don't work %wd\n",i);
-		flint_abort();
-	}
+	if (i < ncols)
+        flint_throw(FLINT_ERROR, "lanczos error: dependencies don't work %wd\n", i);
 
 	flint_free(v[0]);
 	flint_free(v[1]);

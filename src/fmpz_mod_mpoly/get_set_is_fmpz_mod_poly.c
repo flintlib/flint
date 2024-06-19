@@ -5,11 +5,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_mpoly_factor.h"
+#include "fmpz_mod_poly.h"
+#include "mpoly.h"
+#include "fmpz_mod_mpoly.h"
 
 int fmpz_mod_mpoly_is_fmpz_mod_poly(
     const fmpz_mod_mpoly_t A,
@@ -53,8 +55,8 @@ int fmpz_mod_mpoly_get_fmpz_mod_poly(
     }
     else
     {
-        slong j, off;
-        ulong check, wpf = Bbits/FLINT_BITS;
+        slong j, off, wpf = Bbits/FLINT_BITS;
+        ulong check;
 
         off = mpoly_gen_offset_mp(var, Bbits, ctx->minfo);
 

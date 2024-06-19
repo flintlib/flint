@@ -5,13 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "double_extras.h"
 #include "fmpz_poly.h"
 #include "fmpq.h"
+#include "arb.h"
 #include "arb_hypgeom.h"
 #include "hypgeom.h"
 
@@ -27,25 +28,21 @@ arb_gamma_const_1_3_eval(arb_t s, slong prec)
 
     hypgeom_init(series);
 
-    fmpz_poly_set_str(series->A, "1  1");
+    fmpz_poly_set_str(series->A, "2  279 9108");
     fmpz_poly_set_str(series->B, "1  1");
-    fmpz_poly_set_str(series->P, "4  5 -46 108 -72");
-    fmpz_poly_set_str(series->Q, "4  0 0 0 512000");
+    fmpz_poly_set_str(series->P, "3  -77 216 -144");
+    fmpz_poly_set_str(series->Q, "3  0 0 1024000");
 
     prec += FLINT_CLOG2(prec);
 
     arb_hypgeom_infsum(s, t, series, wp, wp);
-
+    arb_mul_ui(t, t, 960, wp);
     arb_sqrt_ui(u, 10, wp);
+    arb_sqrt(u, u, wp);
     arb_mul(t, t, u, wp);
-
-    arb_const_pi(u, wp);
-    arb_pow_ui(u, u, 4, wp);
-    arb_mul_ui(u, u, 12, wp);
-    arb_mul(s, s, u, wp);
-
-    arb_div(s, s, t, wp);
-    arb_root_ui(s, s, 2, wp);
+    arb_div(s, t, s, wp);
+    arb_const_pi(t, wp);
+    arb_mul(s, s, t, wp);
     arb_root_ui(s, s, 3, prec);
 
     hypgeom_clear(series);
@@ -220,8 +217,7 @@ arb_hypgeom_gamma_small_frac(arb_t y, unsigned int p, unsigned int q, slong prec
     }
     else
     {
-        flint_printf("small fraction not implemented!\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "small fraction not implemented!\n");
     }
 }
 
@@ -374,8 +370,7 @@ build_bsplit_power_table(arb_ptr xpow, const slong * xexp, slong len, slong prec
         }
         else
         {
-            flint_printf("power table has the wrong structure!\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "power table has the wrong structure!\n");
         }
     }
 }
@@ -522,8 +517,7 @@ arb_hypgeom_gamma_fmpq_outward(arb_t y, const fmpq_t x, slong prec)
 
     if (!fmpz_fits_si(n))
     {
-        flint_printf("gamma: too large fmpq to reduce to 0!\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "gamma: too large fmpq to reduce to 0!\n");
     }
 
     m = fmpz_get_si(n);
@@ -713,4 +707,3 @@ arb_hypgeom_gamma_fmpz(arb_t y, const fmpz_t x, slong prec)
     *fmpq_denref(t) = WORD(1);
     arb_hypgeom_gamma_fmpq(y, t, prec);
 }
-

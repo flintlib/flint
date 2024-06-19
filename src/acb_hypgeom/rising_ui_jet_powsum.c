@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -60,11 +60,11 @@ acb_hypgeom_rising_ui_jet_powsum(acb_ptr res, const acb_t x, ulong n, slong len,
 
     if (n <= 12 || (FLINT_BITS == 64 && n <= 20))
     {
-        mp_ptr c;
+        nn_ptr c;
         TMP_START;
 
         wp = ARF_PREC_ADD(prec, FLINT_BIT_COUNT(n));
-        c = TMP_ALLOC(sizeof(mp_limb_t) * (n + 1) * len);
+        c = TMP_ALLOC(sizeof(ulong) * (n + 1) * len);
 
         _nmod_vec_zero(c, (n + 1) * len);
 
@@ -159,4 +159,3 @@ acb_hypgeom_rising_ui_jet_powsum(acb_ptr res, const acb_t x, ulong n, slong len,
         _fmpz_vec_clear(c, (n + 1) * len);
     }
 }
-

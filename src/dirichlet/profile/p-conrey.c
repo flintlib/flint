@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -90,7 +90,7 @@ do_gcdpluscond(ulong q1, ulong q2)
 static ulong
 do_charpluscond(ulong q1, ulong q2)
 {
-    ulong n, q, k;
+    ulong n, q;
 
     for (n = 0, q = q1; q <= q2; q++)
     {
@@ -117,7 +117,7 @@ do_charpluscond(ulong q1, ulong q2)
 static ulong
 do_charplusorder(ulong q1, ulong q2)
 {
-    ulong n, q, k;
+    ulong n, q;
 
     for (n = 0, q = q1; q <= q2; q++)
     {
@@ -144,7 +144,6 @@ do_charplusorder(ulong q1, ulong q2)
 int main(int argc, char *argv[])
 {
     int out;
-    ulong n, nref, maxq = 5000;
 
     int l, nf = 5;
     do_f func[5] = {
@@ -205,14 +204,6 @@ int main(int argc, char *argv[])
             TIMEIT_ONCE_START
                 (func[l])(qmin[i], qmax[i]);
             TIMEIT_ONCE_STOP
-
-            if (l == 0)
-                nref = n;
-            else if (n != nref)
-            {
-                flint_printf("FAIL: wrong number of elements %wu != %wu\n\n",n, nref);
-                flint_abort();
-            }
 
             if (out == JSON)
                 flint_printf("}\n");

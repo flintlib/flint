@@ -1,8 +1,8 @@
 /* This file is public domain. Author: Fredrik Johansson. */
 
 #include <stdlib.h>
-#include "profiler.h"
-#include "ca.h"
+#include <flint/profiler.h>
+#include <flint/ca.h>
 
 int main(int argc, char *argv[])
 {

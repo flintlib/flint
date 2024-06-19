@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -139,6 +139,29 @@ int gr_generic_randtest_small(gr_ptr x, flint_rand_t state, gr_ctx_t ctx)
         status = gr_set_si(x, -3 + (slong) n_randint(state, 7), ctx);
 
     return status;
+}
+
+slong _gr_generic_length(gr_srcptr x, gr_ctx_t ctx)
+{
+    return 0;
+}
+
+
+int gr_generic_gens(gr_vec_t vec, gr_ctx_t ctx)
+{
+    gr_vec_set_length(vec, 0, ctx);
+    return GR_SUCCESS;
+}
+
+int gr_generic_gens_single(gr_vec_t vec, gr_ctx_t ctx)
+{
+    gr_vec_set_length(vec, 1, ctx);
+    return gr_gen(vec->entries, ctx);
+}
+
+int gr_generic_gens_recursive(gr_vec_t vec, gr_ctx_t ctx)
+{
+    return gr_gens(vec, ctx);
 }
 
 /* Generic arithmetic functions */
@@ -837,6 +860,48 @@ int gr_generic_get_fmpz_2exp_fmpz(fmpz_t res1, fmpz_t res2, gr_ptr x, gr_ctx_t c
     fmpq_clear(v);
 
     return status;
+}
+
+int gr_generic_set_fmpz_10exp_fmpz(gr_ptr res, const fmpz_t x, const fmpz_t y, gr_ctx_t ctx)
+{
+    if (fmpz_is_zero(y))
+    {
+        return gr_set_fmpz(res, x, ctx);
+    }
+    else if (fmpz_is_zero(x))
+    {
+        return gr_zero(res, ctx);
+    }
+    else
+    {
+        gr_ptr t;
+        int status;
+
+        GR_TMP_INIT(t, ctx);
+
+        status = gr_set_ui(t, 10, ctx);
+
+        if (fmpz_sgn(y) > 0)
+        {
+            status |= gr_pow_fmpz(t, t, y, ctx);
+            status |= gr_set_fmpz(res, x, ctx);
+            status |= gr_mul(res, res, t, ctx);
+        }
+        else
+        {
+            fmpz_t e;
+            fmpz_init(e);
+            fmpz_neg(e, y);
+            status |= gr_pow_fmpz(t, t, e, ctx);
+            status |= gr_set_fmpz(res, x, ctx);
+            status |= gr_div(res, res, t, ctx);
+            fmpz_clear(e);
+        }
+
+        GR_TMP_CLEAR(t, ctx);
+
+        return status;
+    }
 }
 
 int gr_generic_get_fexpr_serialize(fexpr_t res, gr_srcptr x, gr_ctx_t ctx)
@@ -2453,7 +2518,7 @@ const gr_method_tab_input _gr_generic_methods[] =
 {
     {GR_METHOD_CTX_CLEAR,               (gr_funcptr) gr_generic_ctx_clear},
 
-    {GR_METHOD_CTX_IS_RING,             (gr_funcptr) gr_generic_ctx_predicate_true},
+    {GR_METHOD_CTX_IS_RING,             (gr_funcptr) gr_generic_ctx_predicate},
     {GR_METHOD_CTX_IS_COMMUTATIVE_RING, (gr_funcptr) gr_generic_ctx_predicate},
     {GR_METHOD_CTX_IS_INTEGRAL_DOMAIN,  (gr_funcptr) gr_generic_ctx_predicate},
     {GR_METHOD_CTX_IS_FIELD,            (gr_funcptr) gr_generic_ctx_predicate},
@@ -2476,12 +2541,17 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_SWAP,                    (gr_funcptr) gr_generic_swap},
     {GR_METHOD_SET_SHALLOW,             (gr_funcptr) gr_generic_set_shallow},
 
+    {_GR_METHOD_LENGTH,                 (gr_funcptr) _gr_generic_length},
+
     {GR_METHOD_WRITE,                   (gr_funcptr) gr_generic_write},
     {GR_METHOD_WRITE_N,                 (gr_funcptr) gr_generic_write_n},
 
     {GR_METHOD_RANDTEST,                (gr_funcptr) gr_generic_randtest},
     {GR_METHOD_RANDTEST_NOT_ZERO,       (gr_funcptr) gr_generic_randtest_not_zero},
     {GR_METHOD_RANDTEST_SMALL,          (gr_funcptr) gr_generic_randtest_small},
+
+    {GR_METHOD_GENS,                    (gr_funcptr) gr_generic_gens},
+    {GR_METHOD_GENS_RECURSIVE,          (gr_funcptr) gr_generic_gens_recursive},
 
     {GR_METHOD_ZERO,                    (gr_funcptr) gr_generic_zero},
     {GR_METHOD_ONE,                     (gr_funcptr) gr_generic_one},
@@ -2500,6 +2570,8 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_SET_FMPQ,                (gr_funcptr) gr_generic_set_fmpq},
 
     {GR_METHOD_SET_OTHER,               (gr_funcptr) gr_generic_set_other},
+
+    {GR_METHOD_SET_STR,                 (gr_funcptr) gr_generic_set_str},
 
     {GR_METHOD_GET_FEXPR_SERIALIZE,     (gr_funcptr) gr_generic_get_fexpr_serialize},
     {GR_METHOD_SET_FEXPR,               (gr_funcptr) gr_generic_set_fexpr},
@@ -2551,6 +2623,7 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_MUL_2EXP_FMPZ,           (gr_funcptr) gr_generic_mul_2exp_fmpz},
     {GR_METHOD_SET_FMPZ_2EXP_FMPZ,      (gr_funcptr) gr_generic_set_fmpz_2exp_fmpz},
     {GR_METHOD_GET_FMPZ_2EXP_FMPZ,      (gr_funcptr) gr_generic_get_fmpz_2exp_fmpz},
+    {GR_METHOD_SET_FMPZ_10EXP_FMPZ,     (gr_funcptr) gr_generic_set_fmpz_10exp_fmpz},
 
     {GR_METHOD_DIV_UI,                  (gr_funcptr) gr_generic_div_ui},
     {GR_METHOD_DIV_SI,                  (gr_funcptr) gr_generic_div_si},
@@ -2791,6 +2864,8 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_POLY_DIV,                (gr_funcptr) _gr_poly_div_generic},
     {GR_METHOD_POLY_DIVREM,             (gr_funcptr) _gr_poly_divrem_generic},
     {GR_METHOD_POLY_DIVEXACT,           (gr_funcptr) _gr_poly_divexact_generic},
+    {GR_METHOD_POLY_GCD,                (gr_funcptr) _gr_poly_gcd_generic},
+    {GR_METHOD_POLY_XGCD,               (gr_funcptr) _gr_poly_xgcd_generic},
     {GR_METHOD_POLY_TAYLOR_SHIFT,       (gr_funcptr) _gr_poly_taylor_shift_generic},
     {GR_METHOD_POLY_INV_SERIES,         (gr_funcptr) _gr_poly_inv_series_generic},
     {GR_METHOD_POLY_INV_SERIES_BASECASE,(gr_funcptr) _gr_poly_inv_series_basecase_generic},
@@ -2801,6 +2876,9 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_POLY_EXP_SERIES,         (gr_funcptr) _gr_poly_exp_series_generic},
 
     {GR_METHOD_MAT_MUL,                 (gr_funcptr) gr_mat_mul_generic},
+    {GR_METHOD_MAT_NONSINGULAR_SOLVE_TRIL,                 (gr_funcptr) gr_mat_nonsingular_solve_tril_generic},
+    {GR_METHOD_MAT_NONSINGULAR_SOLVE_TRIU,                 (gr_funcptr) gr_mat_nonsingular_solve_triu_generic},
+    {GR_METHOD_MAT_LU,                  (gr_funcptr) gr_mat_lu_generic},
     {GR_METHOD_MAT_DET,                 (gr_funcptr) gr_mat_det_generic},
     {GR_METHOD_MAT_EXP,                 (gr_funcptr) gr_mat_exp_jordan},
     {GR_METHOD_MAT_LOG,                 (gr_funcptr) gr_mat_log_jordan},
@@ -2814,9 +2892,13 @@ void
 gr_method_tab_init(gr_funcptr * methods, gr_method_tab_input * tab)
 {
     slong i;
+    /* Write to a temporary table so that gr_not_implemented entries
+       do not overwrite proper entries if there are multiple threads
+       trying to init the same table simultaneously. */
+    gr_static_method_table tmp;
 
     for (i = 0; i < GR_METHOD_TAB_SIZE; i++)
-        methods[i] = (gr_funcptr) gr_not_implemented;
+        tmp[i] = (gr_funcptr) gr_not_implemented;
 
     /* Assign generic methods as fallbacks */
     for (i = 0; ; i++)
@@ -2825,9 +2907,9 @@ gr_method_tab_init(gr_funcptr * methods, gr_method_tab_input * tab)
             break;
 
         if (_gr_generic_methods[i].index >= GR_METHOD_TAB_SIZE)
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
-        methods[_gr_generic_methods[i].index] = _gr_generic_methods[i].function;
+        tmp[_gr_generic_methods[i].index] = _gr_generic_methods[i].function;
     }
 
     for (i = 0; ; i++)
@@ -2836,8 +2918,10 @@ gr_method_tab_init(gr_funcptr * methods, gr_method_tab_input * tab)
             break;
 
         if (tab[i].index >= GR_METHOD_TAB_SIZE)
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
-        methods[tab[i].index] = tab[i].function;
+        tmp[tab[i].index] = tab[i].function;
     }
+
+    memcpy(methods, tmp, sizeof(gr_static_method_table));
 }

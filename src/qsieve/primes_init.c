@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -15,11 +15,11 @@
 #include "qsieve.h"
 
 prime_t *
-compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf, slong num_primes)
+compute_factor_base(ulong * small_factor, qs_t qs_inf, slong num_primes)
 {
-    mp_limb_t p, nmod, nmod2;
-    mp_limb_t pinv;
-    mp_limb_t k = qs_inf->k;
+    ulong p, nmod, nmod2;
+    ulong pinv;
+    ulong k = qs_inf->k;
     slong num = qs_inf->num_primes;
     slong fb_prime = 2;
     prime_t * factor_base = NULL;
@@ -93,12 +93,12 @@ compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf, slong num_primes)
     return factor_base;
 }
 
-mp_limb_t qsieve_primes_init(qs_t qs_inf)
+ulong qsieve_primes_init(qs_t qs_inf)
 {
     slong num_primes;
     slong i;
-    mp_limb_t k = qs_inf->k;
-    mp_limb_t small_factor = 0;
+    ulong k = qs_inf->k;
+    ulong small_factor = 0;
     slong bits;
 
     prime_t * factor_base;
@@ -115,8 +115,7 @@ mp_limb_t qsieve_primes_init(qs_t qs_inf)
 
     if (num_primes < 3)
     {
-       flint_printf("Too few factor base primes\n");
-       flint_abort();
+       flint_throw(FLINT_ERROR, "Too few factor base primes\n");
     }
 
     qs_inf->sieve_size = qsieve_tune[i][4]; /* size of sieve to use */
@@ -135,8 +134,7 @@ mp_limb_t qsieve_primes_init(qs_t qs_inf)
 
     if (qs_inf->small_primes > num_primes)
     {
-       flint_printf("Too few factor base primes\n");
-       flint_abort();
+       flint_throw(FLINT_ERROR, "Too few factor base primes\n");
     }
 
     /* build up FB */
@@ -165,10 +163,10 @@ mp_limb_t qsieve_primes_init(qs_t qs_inf)
 
 /* function to call for incrementing number of factor base prime by 'delta' */
 
-mp_limb_t qsieve_primes_increment(qs_t qs_inf, mp_limb_t delta)
+ulong qsieve_primes_increment(qs_t qs_inf, ulong delta)
 {
     slong num_primes = qs_inf->num_primes + delta;
-    mp_limb_t small_factor = 0;
+    ulong small_factor = 0;
 
     compute_factor_base(&small_factor, qs_inf, num_primes + qs_inf->ks_primes);
 

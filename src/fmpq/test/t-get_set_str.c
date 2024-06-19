@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -41,7 +41,7 @@ TEST_FUNCTION_START(fmpq_get_set_str, state)
     check_invalid("5/x3", 6);
     check_invalid("5/3x", 6);
 
-    for (i = 0; i < 100000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_t a, a2;
         mpq_t b;

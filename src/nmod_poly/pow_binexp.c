@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -15,13 +15,13 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_pow_binexp(mp_ptr res, mp_srcptr poly, slong len, ulong e, nmod_t mod)
+_nmod_poly_pow_binexp(nn_ptr res, nn_srcptr poly, slong len, ulong e, nmod_t mod)
 {
     ulong bit = ~((~UWORD(0)) >> 1);
     slong rlen;
     slong alloc = (slong) e * (len - 1) + 1;
-    mp_ptr v = _nmod_vec_init(alloc);
-    mp_ptr R, S, T;
+    nn_ptr v = _nmod_vec_init(alloc);
+    nn_ptr R, S, T;
 
     /*
        Set bits to the bitmask with a 1 one place lower than the msb of e

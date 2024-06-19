@@ -5,10 +5,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
 
 slong _fmpz_mpoly_integral(fmpz_t s, fmpz * coeff1, ulong * exp1,
@@ -101,7 +104,8 @@ slong _fmpz_mpoly_integral(fmpz_t s, fmpz * coeff1, ulong * exp1,
 void fmpz_mpoly_integral(fmpz_mpoly_t poly1, fmpz_t scale,
                const fmpz_mpoly_t poly2, slong var, const fmpz_mpoly_ctx_t ctx)
 {
-    slong i, len1, exp_bits;
+    slong i, len1;
+    flint_bitcnt_t exp_bits;
     ulong * exp2 = poly2->exps;
     fmpz * gen_fields, * max_fields;
     int free2 = 0;

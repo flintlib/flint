@@ -5,14 +5,15 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
 #include "nmod.h"
 #include "arith.h"
 
-const mp_limb_t bell_number_tab[] =
+const ulong bell_number_tab[] =
 {
     UWORD(1), UWORD(1), UWORD(2), UWORD(5), UWORD(15), UWORD(52), UWORD(203), UWORD(877), UWORD(4140), UWORD(21147), UWORD(115975),
     UWORD(678570), UWORD(4213597), UWORD(27644437), UWORD(190899322), UWORD(1382958545),
@@ -27,19 +28,18 @@ const mp_limb_t bell_number_tab[] =
 static const char bell_mod_2[3] = {1, 1, 0};
 static const char bell_mod_3[13] = {1, 1, 2, 2, 0, 1, 2, 1, 0, 0, 1, 0, 1};
 
-mp_limb_t
+ulong
 arith_bell_number_nmod_fallback(ulong n, nmod_t mod)
 {
-    mp_ptr bvec;
-    mp_limb_t s;
+    nn_ptr bvec;
+    ulong s;
 
     if (n > WORD_MAX / 4)
     {
-        flint_printf("arith_bell_number_nmod: too large n\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "arith_bell_number_nmod: too large n\n");
     }
 
-    bvec = flint_malloc(sizeof(mp_limb_t) * (n + 1));
+    bvec = flint_malloc(sizeof(ulong) * (n + 1));
     arith_bell_number_nmod_vec(bvec, n + 1, mod);
     s = bvec[n];
     flint_free(bvec);
@@ -47,13 +47,13 @@ arith_bell_number_nmod_fallback(ulong n, nmod_t mod)
 }
 
 
-mp_limb_t nmod_inv_check(mp_limb_t x, nmod_t mod);
+ulong nmod_inv_check(ulong x, nmod_t mod);
 
-mp_limb_t
+ulong
 arith_bell_number_nmod(ulong n, nmod_t mod)
 {
-    mp_limb_t s, t, u, inv_fac;
-    mp_ptr facs, pows;
+    ulong s, t, u, inv_fac;
+    nn_ptr facs, pows;
     slong i, j;
     int success;
 
@@ -68,7 +68,7 @@ arith_bell_number_nmod(ulong n, nmod_t mod)
 
     /* Compute inverse factorials */
     /* We actually compute (n! / i!) and divide out (n!)^2 at the end */
-    facs = flint_malloc(sizeof(mp_limb_t) * (n + 1));
+    facs = flint_malloc(sizeof(ulong) * (n + 1));
     facs[n] = 1;
     for (i = n - 1; i >= 0; i--)
         facs[i] = nmod_mul(facs[i + 1], i + 1, mod);
@@ -83,10 +83,10 @@ arith_bell_number_nmod(ulong n, nmod_t mod)
     }
     else
     {
-        mp_limb_t v, s2, s1, s0, t1, t0, qq[3];
+        ulong v, s2, s1, s0, t1, t0, qq[3];
 
         /* Compute powers */
-        pows = flint_calloc(n + 1, sizeof(mp_limb_t));
+        pows = flint_calloc(n + 1, sizeof(ulong));
         pows[0] = nmod_pow_ui(0, n, mod);
         pows[1] = nmod_pow_ui(1, n, mod);
 

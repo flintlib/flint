@@ -5,17 +5,23 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "thread_pool.h"
 #include "thread_support.h"
-#include "nmod_mpoly.h"
-#include "nmod_mpoly_factor.h"
+#include "nmod.h"
+#include "fmpz.h"
 #include "fmpz_vec.h"
-#include "fq_nmod_mpoly.h"
+#include "fq_nmod.h"
+#include "mpoly.h"
 #include "fq_zech.h"
 #include "fq_zech_poly.h"
+#include "n_poly.h"
+#include "nmod_mpoly.h"
+#include "fq_nmod_mpoly.h"
+#include "nmod_mpoly_factor.h"
 
 /*
     For each j, set out[j] to the evaluation of A at x_i = alpha[i] (i != j)
@@ -33,9 +39,9 @@ static void nmod_mpoly_evals(
     const int * ignore,
     const nmod_mpoly_t A,
     ulong * Amin_exp,
-    ulong * Amax_exp,
+    ulong * FLINT_UNUSED(Amax_exp),
     ulong * Astride,
-    mp_limb_t * alpha,
+    ulong * alpha,
     const nmod_mpoly_ctx_t ctx)
 {
     slong i, j;
@@ -46,7 +52,7 @@ static void nmod_mpoly_evals(
     ulong * varexps;
     ulong varexp;
     slong total_degree, lo, hi;
-    mp_limb_t meval, t;
+    ulong meval, t;
     n_poly_struct * caches;
 
     offsets = FLINT_ARRAY_ALLOC(2*nvars, slong);
@@ -104,7 +110,7 @@ static void nmod_mpoly_evals(
 
             n_poly_fit_length(out + j, varexp + 1);
 
-            while (out[j].length <= varexp)
+            while ((ulong) out[j].length <= varexp)
             {
                 out[j].coeffs[out[j].length] = 0;
                 out[j].length++;
@@ -141,7 +147,7 @@ static void nmod_mpoly_evals_medprime(
     const int * ignore,
     const nmod_mpoly_t A,
     ulong * Amin_exp,
-    ulong * Amax_exp,
+    ulong * FLINT_UNUSED(Amax_exp),
     ulong * Astride,
     const nmod_mpoly_ctx_t smctx,
     const fq_zech_struct * alphas,
@@ -193,7 +199,7 @@ static void nmod_mpoly_evals_medprime(
         }
 
         if (hi == 0 && FLINT_SIGN_EXT(lo) == 0 && total_degree >= 0)
-            total_degree = FLINT_MAX(total_degree, lo);
+            total_degree = FLINT_MAX((ulong) total_degree, lo);
         else
             total_degree = -1;
 
@@ -206,7 +212,7 @@ static void nmod_mpoly_evals_medprime(
 
             fq_zech_poly_fit_length(out + j, varexp + 1, medctx);
 
-            while (out[j].length <= varexp)
+            while ((ulong) out[j].length <= varexp)
             {
                 fq_zech_zero(out[j].coeffs + out[j].length, medctx);
                 out[j].length++;
@@ -238,7 +244,7 @@ static void nmod_mpoly_evals_lgprime(
     const int * ignore,
     const nmod_mpoly_t A,
     ulong * Amin_exp,
-    ulong * Amax_exp,
+    ulong * FLINT_UNUSED(Amax_exp),
     ulong * Astride,
     const nmod_mpoly_ctx_t smctx,
     const fq_nmod_struct * alpha,
@@ -254,8 +260,8 @@ static void nmod_mpoly_evals_lgprime(
     ulong varexp, lo, hi;
     slong total_degree;
     n_poly_struct * caches;
-    mp_limb_t * t = FLINT_ARRAY_ALLOC(2*d, mp_limb_t);
-    mp_limb_t * meval = t + d;
+    ulong * t = FLINT_ARRAY_ALLOC(2*d, ulong);
+    ulong * meval = t + d;
 
     offsets = FLINT_ARRAY_ALLOC(2*nvars, slong);
     shifts = offsets + nvars;
@@ -296,7 +302,7 @@ static void nmod_mpoly_evals_lgprime(
         }
 
         if (hi == 0 && FLINT_SIGN_EXT(lo) == 0 && total_degree >= 0)
-            total_degree = FLINT_MAX(total_degree, lo);
+            total_degree = FLINT_MAX((ulong) total_degree, lo);
         else
             total_degree = -1;
 
@@ -309,7 +315,7 @@ static void nmod_mpoly_evals_lgprime(
 
             n_poly_fit_length(out + j, d*(varexp + 1));
 
-            while (out[j].length <= varexp)
+            while ((ulong) out[j].length <= varexp)
             {
                 _n_fq_zero(out[j].coeffs + d*out[j].length, d);
                 out[j].length++;
@@ -348,15 +354,15 @@ static void _set_estimates(
     slong i, j;
     n_poly_t Geval;
     n_poly_struct * Aevals, * Bevals;
-    mp_limb_t * alpha;
+    ulong * alpha;
     flint_rand_t state;
     slong ignore_limit;
     int * ignore;
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     ignore = FLINT_ARRAY_ALLOC(nvars, int);
-    alpha  = FLINT_ARRAY_ALLOC(nvars, mp_limb_t);
+    alpha  = FLINT_ARRAY_ALLOC(nvars, ulong);
     Aevals = FLINT_ARRAY_ALLOC(nvars, n_poly_struct);
     Bevals = FLINT_ARRAY_ALLOC(nvars, n_poly_struct);
 
@@ -446,7 +452,7 @@ cleanup:
     flint_free(Aevals);
     flint_free(Bevals);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     return;
 }
@@ -470,15 +476,13 @@ static void _set_estimates_medprime(
     int * ignore;
     fq_zech_ctx_t medctx;
     slong d, max_degree = n_flog(1000000, smctx->mod.n);
-    fmpz_t P;
 
     if (max_degree < 2)
         return;
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
-    fmpz_init_set_ui(P, smctx->mod.n);
-    fq_zech_ctx_init(medctx, P, 1, "#");
+    fq_zech_ctx_init_ui(medctx, smctx->mod.n, 1, "#");
 
     d = n_clog(500, smctx->mod.n);
     d = FLINT_MAX(d, 1);
@@ -526,8 +530,7 @@ try_again:
         goto cleanup;
     }
 
-    fq_zech_ctx_clear(medctx);
-    fq_zech_ctx_init(medctx, P, d, "#");
+    fq_zech_ctx_init_ui(medctx, smctx->mod.n, d, "#");
 
     for (j = 0; j < nvars; j++)
         fq_zech_rand_not_zero(alpha + j, state, medctx);
@@ -573,9 +576,7 @@ cleanup:
 
     fq_zech_ctx_clear(medctx);
 
-    fmpz_clear(P);
-
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     return;
 }
@@ -599,7 +600,7 @@ static void _set_estimates_lgprime(
     fq_nmod_mpoly_ctx_t lgctx;
     slong d;
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     d = WORD(20)/(FLINT_BIT_COUNT(smctx->mod.n));
     d = FLINT_MAX(WORD(2), d);
@@ -692,7 +693,7 @@ cleanup:
 
     fq_nmod_mpoly_ctx_clear(lgctx);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     return;
 }
@@ -843,7 +844,7 @@ static int _try_monomial_cofactors(
     slong NA, NG;
     slong nvars = ctx->minfo->nvars;
     fmpz * Abarexps, * Bbarexps, * Texps;
-    mp_limb_t a0, b0, a0inv;
+    ulong a0, b0, a0inv;
     nmod_mpoly_t T;
     flint_bitcnt_t Gbits = FLINT_MIN(A->bits, B->bits);
     flint_bitcnt_t Abarbits = A->bits;
@@ -959,14 +960,14 @@ int _do_univar(
                                                  I->Gmin_exp, I->Gstride, ctx);
     if (Abar != NULL)
     {
-        nmod_poly_div(t, a, g);
+        nmod_poly_divexact(t, a, g);
         _nmod_mpoly_from_nmod_poly_inflate(Abar, I->Abarbits, t, v_in_both,
                                               I->Abarmin_exp, I->Gstride, ctx);
     }
 
     if (Bbar != NULL)
     {
-        nmod_poly_div(t, b, g);
+        nmod_poly_divexact(t, b, g);
         _nmod_mpoly_from_nmod_poly_inflate(Bbar, I->Bbarbits, t, v_in_both,
                                               I->Bbarmin_exp, I->Gstride, ctx);
     }
@@ -995,7 +996,7 @@ static int _try_missing_var(
 
     nmod_mpoly_univar_init(Au, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     nmod_mpoly_to_univar(Au, B, var, ctx);
     FLINT_ASSERT(Au->length == 1);
 #endif
@@ -1130,7 +1131,7 @@ static int _try_zippel(
     FLINT_ASSERT(A->length > 0);
     FLINT_ASSERT(B->length > 0);
 
-    flint_randinit(randstate);
+    flint_rand_init(randstate);
 
     /* uctx is context for Z[y_1,...,y_{m-1}]*/
     nmod_mpoly_ctx_init(uctx, m - 1, ORD_LEX, ctx->mod.n);
@@ -1220,7 +1221,7 @@ cleanup:
 
     nmod_mpoly_ctx_clear(uctx);
 
-    flint_randclear(randstate);
+    flint_rand_clear(randstate);
 
     return success;
 }
@@ -1702,7 +1703,7 @@ int _nmod_mpoly_gcd_algo_small(
     slong j;
     slong nvars = ctx->minfo->nvars;
     mpoly_gcd_info_t I;
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     nmod_mpoly_t T, Asave, Bsave;
 #endif
 
@@ -1711,7 +1712,7 @@ int _nmod_mpoly_gcd_algo_small(
     else if (B->length == 1)
         return _do_monomial_gcd(G, Abar, Bbar, A, B, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     nmod_mpoly_init(T, ctx);
     nmod_mpoly_init(Asave, ctx);
     nmod_mpoly_init(Bsave, ctx);
@@ -1871,7 +1872,7 @@ skip_monomial_cofactors:
     _set_estimates(I, A, B, ctx);
 
     j = FLINT_MAX(0, 8 - I->mvars);
-    if (!I->Gdeflate_deg_bounds_are_nice || ctx->mod.n < j)
+    if (!I->Gdeflate_deg_bounds_are_nice || ctx->mod.n < (ulong) j)
         _set_estimates_medprime(I, A, B, ctx);
 
     if (!I->Gdeflate_deg_bounds_are_nice)
@@ -1928,7 +1929,7 @@ skip_monomial_cofactors:
         {
             slong k = I->brown_perm[1];
             slong d = FLINT_MAX(I->Adeflate_deg[k], I->Bdeflate_deg[k]);
-            int deg_is_small = d < ctx->mod.n/2;
+            int deg_is_small = (ulong) d < ctx->mod.n/2;
 
             if (I->Adensity + I->Bdensity > (deg_is_small ? 0.05 : 0.2))
             {
@@ -1989,7 +1990,7 @@ skip_monomial_cofactors:
         {
             k = I->brown_perm[j];
             d = FLINT_MAX(I->Adeflate_deg[k], I->Bdeflate_deg[k]);
-            if (d > ctx->mod.n/2)
+            if ((ulong) d > ctx->mod.n/2)
                 deg_is_small = 0;
         }
 
@@ -2078,7 +2079,7 @@ cleanup:
         FLINT_ASSERT(Bbar == NULL || nmod_mpoly_equal(T, Bbar, ctx));
     }
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     nmod_mpoly_clear(T, ctx);
     nmod_mpoly_clear(Asave, ctx);
     nmod_mpoly_clear(Bsave, ctx);
@@ -2270,4 +2271,3 @@ int nmod_mpoly_gcd(
 
     return _nmod_mpoly_gcd_algo(G, NULL, NULL, A, B, ctx, MPOLY_GCD_USE_ALL);
 }
-

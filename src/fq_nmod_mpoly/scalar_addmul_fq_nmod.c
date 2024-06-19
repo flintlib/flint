@@ -5,29 +5,32 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fq_nmod.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "fq_nmod_mpoly.h"
 
 static slong _fq_nmod_mpoly_scalar_addmul_n_fq(
-    mp_limb_t * Acoeffs, ulong * Aexps,
-    mp_limb_t * Bcoeffs, const ulong * Bexps, slong Blen,
-    mp_limb_t * Ccoeffs, const ulong * Cexps, slong Clen,
-    const mp_limb_t * f,
+    ulong * Acoeffs, ulong * Aexps,
+    ulong * Bcoeffs, const ulong * Bexps, slong Blen,
+    ulong * Ccoeffs, const ulong * Cexps, slong Clen,
+    const ulong * f,
     slong N,
     const ulong * cmpmask,
     const fq_nmod_ctx_t fqctx)
 {
     slong d = fq_nmod_ctx_degree(fqctx);
     slong i = 0, j = 0, k = 0;
-    mp_limb_t * tmp;
+    ulong * tmp;
     TMP_INIT;
 
     TMP_START;
 
-    tmp = (mp_limb_t *) TMP_ALLOC(d*N_FQ_MUL_ITCH*sizeof(mp_limb_t));
+    tmp = (ulong *) TMP_ALLOC(d*N_FQ_MUL_ITCH*sizeof(ulong));
 
     while (i < Blen && j < Clen)
     {
@@ -91,7 +94,7 @@ void fq_nmod_mpoly_scalar_addmul_fq_nmod(
     slong N = mpoly_words_per_exp(Abits, ctx->minfo);
     ulong * cmpmask;
     int freeBexps = 0, freeCexps = 0;
-    mp_limb_t * f;
+    ulong * f;
     TMP_INIT;
 
     if (fq_nmod_mpoly_is_zero(B, ctx))
@@ -108,7 +111,7 @@ void fq_nmod_mpoly_scalar_addmul_fq_nmod(
     TMP_START;
     cmpmask = (ulong*) TMP_ALLOC(N*sizeof(ulong));
     mpoly_get_cmpmask(cmpmask, N, Abits, ctx->minfo);
-    f = (mp_limb_t *) TMP_ALLOC(d*sizeof(mp_limb_t));
+    f = (ulong *) TMP_ALLOC(d*sizeof(ulong));
     n_fq_set_fq_nmod(f, e, ctx->fqctx);
 
     if (Abits != B->bits)

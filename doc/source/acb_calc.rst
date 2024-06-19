@@ -104,7 +104,7 @@ Integration
 
     Computes a rigorous enclosure of the integral
 
-    .. math ::
+    .. math::
 
         I = \int_a^b f(t) dt
 
@@ -282,7 +282,7 @@ Local integration algorithms
     For the interval `[-1,1]`, the error of the *n*-point Gauss-Legendre
     rule is bounded by
 
-    .. math ::
+    .. math::
 
         \left| I - \sum_{k=0}^{n-1} w_k f(x_k) \right| \le \frac{64 M}{15 (\rho-1) \rho^{2n-1}}
 
@@ -312,7 +312,7 @@ Integration (old)
 
     Sets *bound* to a ball containing the value of the integral
 
-    .. math ::
+    .. math::
 
         C(x,r) = \frac{1}{2 \pi r} \oint_{|z-x| = r} |f(z)| dz
                = \int_0^1 |f(x+re^{2\pi i t})| dt
@@ -330,7 +330,7 @@ Integration (old)
 
     Computes the integral
 
-    .. math ::
+    .. math::
 
         I = \int_a^b f(t) dt
 
@@ -342,7 +342,7 @@ Integration (old)
     formula. More precisely, if the Taylor series of *f* centered at the point
     *m* is `f(m+x) = \sum_{n=0}^{\infty} a_n x^n`, then
 
-    .. math ::
+    .. math::
 
         \int f(m+x) = \left( \sum_{n=0}^{N-1} a_n \frac{x^{n+1}}{n+1} \right)
                   + \left( \sum_{n=N}^{\infty} a_n \frac{x^{n+1}}{n+1} \right).
@@ -350,7 +350,7 @@ Integration (old)
     For sufficiently small *x*, the second series converges and its
     absolute value is bounded by
 
-    .. math ::
+    .. math::
 
         \sum_{n=N}^{\infty} \frac{C(m,R)}{R^n} \frac{|x|^{n+1}}{N+1}
             = \frac{C(m,R) R x}{(R-x)(N+1)} \left( \frac{x}{R} \right)^N.

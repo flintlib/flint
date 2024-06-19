@@ -5,13 +5,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "profiler.h"
-#include "fmpz.h"
 #include "gmpcompat.h"
+#include "fmpz.h"
 
 #define ntests 1000
 
@@ -34,14 +34,14 @@ fmpz_mul_2exp_old(fmpz_t f, const fmpz_t g, ulong exp)
         }
         else                    /* result is large */
         {
-            __mpz_struct * mf = _fmpz_promote(f);   /* g is saved */
+            mpz_ptr mf = _fmpz_promote(f);   /* g is saved */
             flint_mpz_set_si(mf, d);
             mpz_mul_2exp(mf, mf, exp);
         }
     }
     else                        /* g is large */
     {
-        __mpz_struct * mf = _fmpz_promote(f);   /* g is already large */
+        mpz_ptr mf = _fmpz_promote(f);   /* g is already large */
         mpz_mul_2exp(mf, COEFF_TO_PTR(d), exp);
     }
 }
@@ -69,7 +69,7 @@ sample_new(void * arg, ulong count)
         prof_stop();
     }
 
-    flint_randclear(state);
+    flint_rand_clear(state);
     fmpz_clear(res);
     fmpz_clear(a);
 }
@@ -97,7 +97,7 @@ sample_old(void * arg, ulong count)
         prof_stop();
     }
 
-    flint_randclear(state);
+    flint_rand_clear(state);
     fmpz_clear(res);
     fmpz_clear(a);
 }

@@ -5,35 +5,30 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
 void
 _fmpz_poly_power_sums_to_poly(fmpz * res, const fmpz * poly, slong len)
 {
-    slong i, k;
+    slong k;
     slong d = fmpz_get_ui(poly);
 
     fmpz_one(res + d);
     for (k = 1; k < FLINT_MIN(d + 1, len); k++)
     {
-        fmpz_set(res + d - k, poly + k);
-        for (i = 1; i < k; i++)
-            fmpz_addmul(res + d - k, res + d - k + i, poly + i);
-        fmpz_divexact_si(res + d - k, res + d - k, k);
-        fmpz_neg(res + d - k, res + d - k);
+        _fmpz_vec_dot_general(res + d - k, poly + k, 0, res + d - k + 1, poly + 1, 0, k - 1);
+        fmpz_divexact_si(res + d - k, res + d - k, -k);
     }
     for (k = len; k <= d; k++)
     {
-        fmpz_zero(res + d - k);
-        for (i = 1; i < len; i++)
-            fmpz_addmul(res + d - k, res + d - k + i, poly + i);
-        fmpz_divexact_si(res + d - k, res + d - k, k);
-        fmpz_neg(res + d - k, res + d - k);
+        _fmpz_vec_dot_general(res + d - k, NULL, 0, res + d - k + 1, poly + 1, 0, len - 1);
+        fmpz_divexact_si(res + d - k, res + d - k, -k);
     }
 }
 

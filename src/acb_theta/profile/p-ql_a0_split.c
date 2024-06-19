@@ -5,12 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <stdlib.h>
 #include "profiler.h"
+#include "arb_mat.h"
+#include "acb.h"
 #include "acb_mat.h"
 #include "acb_theta.h"
 
@@ -36,7 +38,7 @@ int main(int argc, char * argv[])
     cstep = atol(argv[3]);
     cmax = atol(argv[4]);
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     /* Profile with different splittings on reduced input */
     for (c = cstep; c <= cmax; c += cstep)
@@ -143,7 +145,7 @@ int main(int argc, char * argv[])
         arb_clear(test);
     }
 
-    flint_randclear(state);
+    flint_rand_clear(state);
     flint_cleanup();
     return 0;
 }

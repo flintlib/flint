@@ -121,16 +121,29 @@ Special values
 Input and output
 -------------------------------------------------------------------------------
 
+The variable strings in *x* start with the variable of most significance at index `0`. If *x* is ``NULL``, the variables are named ``x1``, ``x2``, etc.
+
 .. function:: void fmpz_mpoly_q_print_pretty(const fmpz_mpoly_q_t f, const char ** x, const fmpz_mpoly_ctx_t ctx)
 
     Prints *res* to standard output. If *x* is not *NULL*, the strings in
     *x* are used as the symbols for the variables.
 
+.. function:: char * fmpz_mpoly_q_get_str_pretty(const fmpz_mpoly_q_t f, const char ** x, const fmpz_mpoly_ctx_t ctx)
+
+    Return a string, which the user is responsible for cleaning up, representing *f*, given an array of variable strings *x*.
+
+.. function:: int fmpz_mpoly_q_set_str_pretty(fmpz_mpoly_q_t res, const char * s, const char ** x, fmpz_mpoly_ctx_t ctx)
+
+    Set *res* to the fraction in the null-terminated string *str* given an array *x* of variable strings.
+    If parsing *str* fails, *res* is set to zero, and `-1` is returned. Otherwise, `0` is returned.
+    The operations ``+``, ``-``, ``*``, and ``/`` are permitted along with integers and the variables in *x*.
+    The character ``^`` must be immediately followed by the (integer) exponent.
+    If division by zero occurs, parsing fails.
 
 Random generation
 -------------------------------------------------------------------------------
 
-.. function:: void fmpz_mpoly_q_randtest(fmpz_mpoly_q_t res, flint_rand_t state, slong length, mp_limb_t coeff_bits, slong exp_bound, const fmpz_mpoly_ctx_t ctx)
+.. function:: void fmpz_mpoly_q_randtest(fmpz_mpoly_q_t res, flint_rand_t state, slong length, ulong coeff_bits, slong exp_bound, const fmpz_mpoly_ctx_t ctx)
 
     Sets *res* to a random rational function where both numerator and denominator
     have up to *length* terms, coefficients up to size *coeff_bits*, and

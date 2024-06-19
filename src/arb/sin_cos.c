@@ -5,14 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "mpn_extras.h"
 #include "arb.h"
 
-#define TMP_ALLOC_LIMBS(__n) TMP_ALLOC((__n) * sizeof(mp_limb_t))
+#define TMP_ALLOC_LIMBS(__n) TMP_ALLOC((__n) * sizeof(ulong))
 #define MAGLIM(prec) FLINT_MAX(65536, (4*prec))
 
 static void
@@ -78,9 +78,9 @@ _arb_sin_cos(arb_t zsin, arb_t zcos, const arf_t x, const mag_t xrad, slong prec
 {
     int want_sin, want_cos;
     slong radexp, exp, wp, wn, N, r, wprounded, maglim, orig_prec;
-    mp_ptr tmp, w, sina, cosa, sinb, cosb, ta, tb;
-    mp_ptr sinptr, cosptr;
-    mp_limb_t p1, q1bits, p2, q2bits, error, error2, p1_tab1, radman;
+    nn_ptr tmp, w, sina, cosa, sinb, cosb, ta, tb;
+    nn_ptr sinptr, cosptr;
+    ulong p1, q1bits, p2, q2bits, error, error2, p1_tab1, radman;
     int negative, inexact, octant;
     int sinnegative, cosnegative, swapsincos;
     TMP_INIT;
@@ -261,7 +261,7 @@ _arb_sin_cos(arb_t zsin, arb_t zcos, const arf_t x, const mag_t xrad, slong prec
         }
         else
         {
-            mpn_sqr(ta, sina, wn);
+            flint_mpn_sqr(ta, sina, wn);
             /* 1 - s^2 (negation guaranteed to have borrow) */
             mpn_neg(ta, ta, 2 * wn);
             /* top limb of ta must be nonzero, so no need to normalize
@@ -300,7 +300,7 @@ _arb_sin_cos(arb_t zsin, arb_t zcos, const arf_t x, const mag_t xrad, slong prec
     }
     else if (p1 == 0 || p2 == 0)    /* only one table lookup */
     {
-        mp_srcptr sinc, cosc;
+        nn_srcptr sinc, cosc;
 
         if (wp <= ARB_SIN_COS_TAB1_PREC)  /* must be in table 1 */
         {
@@ -320,15 +320,15 @@ _arb_sin_cos(arb_t zsin, arb_t zcos, const arf_t x, const mag_t xrad, slong prec
 
         if ((want_sin && !swapsincos) || (want_cos && swapsincos))
         {
-            mpn_mul_n(ta, sina, cosc, wn);
-            mpn_mul_n(tb, cosa, sinc, wn);
+            flint_mpn_mul_n(ta, sina, cosc, wn);
+            flint_mpn_mul_n(tb, cosa, sinc, wn);
             mpn_add_n(w, ta + wn, tb + wn, wn);
         }
 
         if ((want_cos && !swapsincos) || (want_sin && swapsincos))
         {
-            mpn_mul_n(ta, cosa, cosc, wn);
-            mpn_mul_n(tb, sina, sinc, wn);
+            flint_mpn_mul_n(ta, cosa, cosc, wn);
+            flint_mpn_mul_n(tb, sina, sinc, wn);
             mpn_sub_n(ta, ta + wn, tb + wn, wn);
         }
 
@@ -339,34 +339,34 @@ _arb_sin_cos(arb_t zsin, arb_t zcos, const arf_t x, const mag_t xrad, slong prec
     }
     else        /* two table lookups, must be in table 2 */
     {
-        mp_srcptr sinc, cosc, sind, cosd;
+        nn_srcptr sinc, cosc, sind, cosd;
 
         sinc = arb_sin_cos_tab21[2 * p1] + ARB_SIN_COS_TAB2_LIMBS - wn;
         cosc = arb_sin_cos_tab21[2 * p1 + 1] + ARB_SIN_COS_TAB2_LIMBS - wn;
         sind = arb_sin_cos_tab22[2 * p2] + ARB_SIN_COS_TAB2_LIMBS - wn;
         cosd = arb_sin_cos_tab22[2 * p2 + 1] + ARB_SIN_COS_TAB2_LIMBS - wn;
 
-        mpn_mul_n(ta, sinc, cosd, wn);
-        mpn_mul_n(tb, cosc, sind, wn);
+        flint_mpn_mul_n(ta, sinc, cosd, wn);
+        flint_mpn_mul_n(tb, cosc, sind, wn);
         mpn_add_n(sinb, ta + wn, tb + wn, wn);
 
-        mpn_mul_n(ta, cosc, cosd, wn);
-        mpn_mul_n(tb, sinc, sind, wn);
+        flint_mpn_mul_n(ta, cosc, cosd, wn);
+        flint_mpn_mul_n(tb, sinc, sind, wn);
         mpn_sub_n(cosb, ta + wn, tb + wn, wn);
 
         error2 = 2 * 1 + 2 * 1 + 3;
 
         if ((want_sin && !swapsincos) || (want_cos && swapsincos))
         {
-            mpn_mul_n(ta, sina, cosb, wn);
-            mpn_mul_n(tb, cosa, sinb, wn);
+            flint_mpn_mul_n(ta, sina, cosb, wn);
+            flint_mpn_mul_n(tb, cosa, sinb, wn);
             mpn_add_n(w, ta + wn, tb + wn, wn);
         }
 
         if ((want_cos && !swapsincos) || (want_sin && swapsincos))
         {
-            mpn_mul_n(ta, cosa, cosb, wn);
-            mpn_mul_n(tb, sina, sinb, wn);
+            flint_mpn_mul_n(ta, cosa, cosb, wn);
+            flint_mpn_mul_n(tb, sina, sinb, wn);
             mpn_sub_n(ta, ta + wn, tb + wn, wn);
         }
 
@@ -380,7 +380,7 @@ _arb_sin_cos(arb_t zsin, arb_t zcos, const arf_t x, const mag_t xrad, slong prec
 
     if (swapsincos)
     {
-        mp_ptr tmptr = sinptr;
+        nn_ptr tmptr = sinptr;
         sinptr = cosptr;
         cosptr = tmptr;
     }
@@ -414,7 +414,7 @@ _arb_sin_cos(arb_t zsin, arb_t zcos, const arf_t x, const mag_t xrad, slong prec
     else
     {
         mag_t sin_err, cos_err, quadratic, comp_err, xrad_copy;
-        mp_limb_t A_sin, A_cos, A_exp;
+        ulong A_sin, A_cos, A_exp;
 
         /* Copy xrad to support aliasing (note: the exponent has
            also been clamped earlier). */
@@ -451,7 +451,7 @@ _arb_sin_cos(arb_t zsin, arb_t zcos, const arf_t x, const mag_t xrad, slong prec
         A_exp = -ARB_SIN_COS_TAB1_BITS;
         if (swapsincos)
         {
-            mp_limb_t tt = A_sin;
+            ulong tt = A_sin;
             A_sin = A_cos;
             A_cos = tt;
         }

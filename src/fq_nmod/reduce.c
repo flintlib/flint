@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -14,7 +14,7 @@
 #include "nmod_poly.h"
 #include "fq_nmod.h"
 
-void _fq_nmod_sparse_reduce(mp_limb_t *R, slong lenR, const fq_nmod_ctx_t ctx)
+void _fq_nmod_sparse_reduce(ulong *R, slong lenR, const fq_nmod_ctx_t ctx)
 {
     slong i, k;
     const slong d = ctx->j[ctx->len - 1];
@@ -34,9 +34,9 @@ void _fq_nmod_sparse_reduce(mp_limb_t *R, slong lenR, const fq_nmod_ctx_t ctx)
     }
 }
 
-void _fq_nmod_dense_reduce(mp_limb_t* R, slong lenR, const fq_nmod_ctx_t ctx)
+void _fq_nmod_dense_reduce(ulong* R, slong lenR, const fq_nmod_ctx_t ctx)
 {
-    mp_limb_t  *q, *r;
+    ulong  *q, *r;
 
     if (lenR < ctx->modulus->length)
     {
@@ -58,7 +58,7 @@ void _fq_nmod_dense_reduce(mp_limb_t* R, slong lenR, const fq_nmod_ctx_t ctx)
 
 }
 
-void _fq_nmod_reduce(mp_limb_t* R, slong lenR, const fq_nmod_ctx_t ctx)
+void _fq_nmod_reduce(ulong* R, slong lenR, const fq_nmod_ctx_t ctx)
 {
     if (ctx->sparse_modulus)
         _fq_nmod_sparse_reduce(R, lenR, ctx);

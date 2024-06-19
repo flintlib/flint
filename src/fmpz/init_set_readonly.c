@@ -5,11 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include <gmp.h>
 #include "fmpz.h"
 
 void fmpz_init_set_readonly(fmpz_t f, const mpz_t z)
@@ -31,4 +31,3 @@ void fmpz_init_set_readonly(fmpz_t f, const mpz_t z)
         *f = WORD(0);
     }
 }
-

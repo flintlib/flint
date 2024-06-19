@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -19,7 +19,7 @@ ulong
 TEMPLATE(T, poly_deflation) (const TEMPLATE(T, poly_t) input,
                              const TEMPLATE(T, ctx_t) ctx)
 {
-    ulong deflation;
+    slong deflation;
     slong i, coeff;
 
     if (input->length <= 1)

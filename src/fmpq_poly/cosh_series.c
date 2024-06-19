@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -48,8 +48,7 @@ void fmpq_poly_cosh_series(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
 
     if (!fmpz_is_zero(poly->coeffs))
     {
-        flint_printf("Exception (fmpq_poly_cosh_series). Constant term != 0.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpq_poly_cosh_series). Constant term != 0.\n");
     }
 
     fmpq_poly_fit_length(res, n);

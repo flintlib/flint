@@ -5,15 +5,17 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod_vec.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 void _nmod_mpoly_pow_rmul(
     nmod_mpoly_t A,
-    const mp_limb_t * Bcoeffs, const ulong * Bexps, slong Blen,
+    const ulong * Bcoeffs, const ulong * Bexps, slong Blen,
     ulong k,
     slong N,
     const ulong * cmpmask,

@@ -5,31 +5,31 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "ulong_extras.h"
 
 /* compute square roots of a modulo m given factorisation of m */
-slong n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac)
+slong n_sqrtmodn(ulong ** sqrt, ulong a, n_factor_t * fac)
 {
-    mp_limb_t m = 1, minv = 1;
+    ulong m = 1, minv = 1;
     slong i, j, num;
-    mp_limb_t * x, * sn, * ind, ** s;
+    ulong * x, * sn, * ind, ** s;
 
+    /* Check if modulus is one, that is, it has a trivial representation */
     if (fac->num == 0)
     {
-        *sqrt = flint_malloc(sizeof(mp_limb_t));
+        *sqrt = flint_malloc(sizeof(ulong));
         (*sqrt)[0] = 0;
         return 1;
     }
 
-    x = flint_malloc(sizeof(mp_limb_t)*fac->num);
-    sn = flint_malloc(sizeof(mp_limb_t)*fac->num);
-    ind = flint_malloc(sizeof(mp_limb_t)*fac->num);
-    s = flint_malloc(sizeof(mp_limb_t *)*fac->num);
+    x = flint_malloc(sizeof(ulong)*fac->num);
+    sn = flint_malloc(sizeof(ulong)*fac->num);
+    ind = flint_malloc(sizeof(ulong)*fac->num);
+    s = flint_malloc(sizeof(ulong *)*fac->num);
 
     /* compute prime powers and square roots of a mod x_i = p_i^r_i*/
     num = 1;
@@ -53,15 +53,15 @@ slong n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac)
         }
     }
 
-    *sqrt = flint_malloc(num*sizeof(mp_limb_t));
+    *sqrt = flint_malloc(num*sizeof(ulong));
 
     /*
-        compute values s_i = 1 mod x_i and s_i = 0 mod x_j for j != i
-        then replace sqrts a_i with a_i * s_i mod m = x_1*x_2*...*x_n
-    */
+       compute values s_i = 1 mod x_i and s_i = 0 mod x_j for j != i
+       then replace sqrts a_i with a_i * s_i mod m = x_1*x_2*...*x_n
+     */
     for (i = 0; i < fac->num; i++)
     {
-        mp_limb_t xp = 1, si;
+        ulong xp = 1, si;
 
         /* compute product of x_j for j != i */
         for (j = 0; j < i; j++)
@@ -80,7 +80,7 @@ slong n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac)
         si = xp*n_invmod(xp % x[i], x[i]);
 
         /* a_i*s_i mod m for each sqrt a_i of a mod x_i*/
-        for (j = 0; j < sn[i]; j++)
+        for (j = 0; (ulong) j < sn[i]; j++)
             s[i][j] = n_mulmod2_preinv(si, s[i][j], m, minv);
     }
 
@@ -88,8 +88,7 @@ slong n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac)
        compute all the square roots by computing
        sum_{i=0}^{fac->num} s[i][j] for each different permutation
        of j's, all modulo m
-    */
-
+     */
     for (i = 0; i < num; i++) /* loop through every possibility */
     {
         /* compute next root */
@@ -117,4 +116,3 @@ slong n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac)
 
     return num;
 }
-

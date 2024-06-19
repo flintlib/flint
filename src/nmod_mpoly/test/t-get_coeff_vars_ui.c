@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -53,7 +53,7 @@ TEST_FUNCTION_START(nmod_mpoly_get_coeff_vars_ui, state)
         slong vars[1];
         ulong exps[1];
         slong var1;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = UWORD(2) + n_randint(state, -UWORD(2));
         nvars = 1 + n_randint(state, 20);
@@ -116,7 +116,7 @@ TEST_FUNCTION_START(nmod_mpoly_get_coeff_vars_ui, state)
         slong vars[2];
         ulong exps[2];
         slong var1, var2;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = UWORD(2) + n_randint(state, -UWORD(2));
         nvars = 2 + n_randint(state, 20);

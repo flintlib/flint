@@ -6,10 +6,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "acb.h"
 #include "acb_dirichlet.h"
 #include "arb_calc.h"
 
@@ -73,8 +74,7 @@ _refine_hardy_z_zero_illinois(arb_t res, const arf_t ra, const arf_t rb, slong p
 
     if (asign == bsign)
     {
-        flint_printf("isolate a zero before bisecting the interval\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "isolate a zero before bisecting the interval\n");
     }
 
     for (k = 0; k < 40; k++)
@@ -205,8 +205,7 @@ _refine_hardy_z_zero_newton(arb_t res, const arf_t ra, const arf_t rb, slong pre
         else
         {
             /* can this happen? should we fallback to illinois? */
-            flint_printf("no inclusion for interval newton!\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "no inclusion for interval newton!\n");
         }
     }
 
@@ -240,4 +239,3 @@ _acb_dirichlet_refine_hardy_z_zero(arb_t res,
 
     arb_set_round(res, res, prec);
 }
-

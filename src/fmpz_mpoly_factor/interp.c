@@ -5,12 +5,16 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
+#include "fmpz_mpoly_factor.h"
 
 /*
     interp_reduce: map from Z to Z/pZ
@@ -78,13 +82,13 @@ void fmpz_mpoly_interp_lift_p(
 int fmpz_mpoly_interp_mcrt_p(
     flint_bitcnt_t * coeffbits_,
     fmpz_mpoly_t H,
-    const fmpz_mpoly_ctx_t ctx,
+    const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx),
     const fmpz_t m,
     const nmod_mpoly_t A,
     const nmod_mpoly_ctx_t ctxp)
 {
     slong i;
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     slong N = mpoly_words_per_exp(A->bits, ctx->minfo);
 #endif
     int changed = 0;
@@ -124,7 +128,7 @@ void fmpz_mpoly_interp_reduce_p_mpolyn(
     slong N = mpoly_words_per_exp_sp(A->bits, ctx->minfo);
     slong offset, shift, k;
     ulong mask;
-    mp_limb_t v;
+    ulong v;
     fmpz * Acoeff = A->coeffs;
     ulong * Aexp = A->exps;
     slong Alen = A->length;
@@ -361,4 +365,3 @@ int fmpz_mpoly_interp_crt_p_mpolyn(
     fmpz_clear(zero);
     return changed;
 }
-

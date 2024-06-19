@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -15,11 +15,11 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-int _nmod_poly_invmod(mp_limb_t *A,
-                      const mp_limb_t *B, slong lenB,
-                      const mp_limb_t *P, slong lenP, const nmod_t mod)
+int _nmod_poly_invmod(ulong *A,
+                      const ulong *B, slong lenB,
+                      const ulong *P, slong lenP, const nmod_t mod)
 {
-    mp_limb_t *G;
+    ulong *G;
     slong lenG;
 
     NMOD_VEC_NORM(B, lenB);
@@ -30,7 +30,7 @@ int _nmod_poly_invmod(mp_limb_t *A,
 
     if (lenG == 1 && G[0] != WORD(1))
     {
-        mp_limb_t invG;
+        ulong invG;
 
         invG = n_invmod(G[0], mod.n);
         _nmod_vec_scalar_mul_nmod(A, A, lenP - 1, invG, mod);
@@ -45,7 +45,7 @@ int nmod_poly_invmod(nmod_poly_t A,
                      const nmod_poly_t B, const nmod_poly_t P)
 {
     const slong lenB = B->length, lenP = P->length;
-    mp_limb_t *t;
+    ulong *t;
     int ans;
 
     if (lenP < 2)
@@ -89,4 +89,3 @@ int nmod_poly_invmod(nmod_poly_t A,
     _nmod_poly_normalise(A);
     return ans;
 }
-

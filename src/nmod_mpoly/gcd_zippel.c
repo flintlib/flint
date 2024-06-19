@@ -5,21 +5,25 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "longlong.h"
+#include "fq_nmod.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 #include "fq_nmod_mpoly.h"
 
-int nmod_mpolyu_gcdm_zippel_bivar(
+static int nmod_mpolyu_gcdm_zippel_bivar(
     nmod_mpolyu_t G,
     nmod_mpolyu_t Abar,
     nmod_mpolyu_t Bbar,
     nmod_mpolyu_t A,
     nmod_mpolyu_t B,
     nmod_mpoly_ctx_t ctx,
-    flint_rand_t randstate)
+    flint_rand_t FLINT_UNUSED(randstate))
 {
     slong var = 0;
     slong Alastdeg, Blastdeg;
@@ -347,7 +351,7 @@ choose_prime_outer:
 
     success = fq_nmod_mpolyu_gcdp_zippel(Gff, Abarff, Bbarff, Aff, Bff,
                                       ctx->minfo->nvars - 2, ffctx, randstate);
-    if (!success || Gff->exps[0] > degbound)
+    if (!success || Gff->exps[0] > (ulong) degbound)
         goto choose_prime_outer;
     degbound = Gff->exps[0];
 
@@ -511,4 +515,3 @@ int nmod_mpoly_gcd_zippel(
 
     return _nmod_mpoly_gcd_algo(G, NULL, NULL, A, B, ctx, MPOLY_GCD_USE_ZIPPEL);
 }
-

@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -14,7 +14,7 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_product_roots_nmod_vec(mp_ptr poly, mp_srcptr xs, slong n, nmod_t mod)
+_nmod_poly_product_roots_nmod_vec(nn_ptr poly, nn_srcptr xs, slong n, nmod_t mod)
 {
     if (n == 0)
     {
@@ -45,7 +45,7 @@ _nmod_poly_product_roots_nmod_vec(mp_ptr poly, mp_srcptr xs, slong n, nmod_t mod
     else
     {
         const slong m = (n + 1) / 2;
-        mp_ptr tmp;
+        nn_ptr tmp;
 
         tmp = _nmod_vec_init(n + 2);
 
@@ -58,7 +58,7 @@ _nmod_poly_product_roots_nmod_vec(mp_ptr poly, mp_srcptr xs, slong n, nmod_t mod
 }
 
 void
-nmod_poly_product_roots_nmod_vec(nmod_poly_t poly, mp_srcptr xs, slong n)
+nmod_poly_product_roots_nmod_vec(nmod_poly_t poly, nn_srcptr xs, slong n)
 {
     nmod_poly_fit_length(poly, n + 1);
     _nmod_poly_product_roots_nmod_vec(poly->coeffs, xs, n, poly->mod);

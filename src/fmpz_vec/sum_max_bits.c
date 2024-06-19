@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "longlong.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
@@ -29,7 +30,7 @@ void _fmpz_vec_sum_max_bits(slong * sumabs, slong * maxabs,
         slong c = fmpz_get_si(coeffs + j);
         ulong uc = (ulong) FLINT_ABS(c);
         add_ssaaaa(hi, lo, hi, lo, UWORD(0), uc);
-        maxabs[0] = FLINT_MAX(maxabs[0], FLINT_BIT_COUNT(uc));
+        maxabs[0] = FLINT_MAX(maxabs[0], (slong) FLINT_BIT_COUNT(uc));
     }
 
     if (j == length)

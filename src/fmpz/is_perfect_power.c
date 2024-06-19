@@ -41,7 +41,7 @@ MA 02110-1301, USA. */
    arithmetic for computing possible roots.
 */
 
-#include "flint.h"
+#include <gmp.h>
 #include "ulong_extras.h"
 #include "fmpz.h"
 
@@ -66,7 +66,7 @@ int fmpz_is_perfect_power(fmpz_t root, const fmpz_t f)
    mpz_t u2, q;
    int exact, exp2, sgn = fmpz_sgn(f);
    slong i, uns, usize = fmpz_size(f);
-   __mpz_struct * u, * r;
+   mpz_ptr u, r;
 
    if (usize == 0)
    {
@@ -300,4 +300,3 @@ n2prime:
       return 0;
    }
 }
-

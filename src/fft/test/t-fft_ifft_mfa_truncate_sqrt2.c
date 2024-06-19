@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -16,8 +16,6 @@
 TEST_FUNCTION_START(fft_ifft_mfa_truncate_sqrt2, state)
 {
     flint_bitcnt_t depth, w, maxdepth;
-
-    _flint_rand_init_gmp(state);
 
     maxdepth = (flint_test_multiplier() > 10) ? 13 :
                (flint_test_multiplier() > 1)  ? 12 : 11;

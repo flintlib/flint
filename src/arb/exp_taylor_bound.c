@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -66,8 +66,7 @@ _arb_exp_taylor_bound(slong mag, slong prec)
     /* assume x <= 1/4 */
     if (mag > -2)
     {
-        flint_printf("_arb_exp_taylor_bound: too large input %wd\n", mag);
-        flint_abort();
+        flint_throw(FLINT_ERROR, "_arb_exp_taylor_bound: too large input %wd\n", mag);
     }
 
     for (i = 1; ; i++)
@@ -76,4 +75,3 @@ _arb_exp_taylor_bound(slong mag, slong prec)
             return i;
     }
 }
-

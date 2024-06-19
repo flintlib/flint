@@ -5,26 +5,27 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fq_nmod.h"
+#include "fq_nmod_poly.h"
 #include "n_poly.h"
 
-
 slong _n_fq_poly_gcd_euclidean_inplace_(
-    mp_limb_t * A, slong Alen,
-    mp_limb_t * B, slong Blen,
+    ulong * A, slong Alen,
+    ulong * B, slong Blen,
     const fq_nmod_ctx_t ctx,
-    mp_limb_t * tmp)
+    ulong * tmp)
 {
     slong d = fq_nmod_ctx_degree(ctx);
     nmod_t mod = fq_nmod_ctx_mod(ctx);
     slong i;
-    mp_limb_t * u = tmp;
-    mp_limb_t * q0 = u + d;
-    mp_limb_t * q1 = q0 + d;
-    mp_limb_t * t = q1 + d;
+    ulong * u = tmp;
+    ulong * q0 = u + d;
+    ulong * q1 = q0 + d;
+    ulong * t = q1 + d;
 
 again:
 
@@ -150,8 +151,8 @@ void n_fq_poly_gcd_(
 {
     slong d = fq_nmod_ctx_degree(ctx);
     slong n;
-    mp_limb_t * a, * b, * t;
-#ifdef FLINT_WANT_ASSERT
+    ulong * a, * b, * t;
+#if FLINT_WANT_ASSERT
     fq_nmod_poly_t GG, AA, BB;
     fq_nmod_poly_init(GG, ctx);
     fq_nmod_poly_init(AA, ctx);
@@ -192,7 +193,7 @@ void n_fq_poly_gcd_(
     n_poly_stack_vec_clear(St);
     n_poly_stack_vec_clear(St);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     FLINT_ASSERT(n_fq_poly_is_canonical(G, ctx));
     n_fq_poly_get_fq_nmod_poly(AA, G, ctx);
     FLINT_ASSERT(fq_nmod_poly_equal(AA, GG, ctx));
@@ -227,4 +228,3 @@ void n_fq_poly_gcd(
     fq_nmod_poly_clear(b, ctx);
 #endif
 }
-

@@ -5,18 +5,19 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "n_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 #include "fq_nmod_mpoly.h"
-
 
 void nmod_mpolyun_init(
     nmod_mpolyun_t A,
     flint_bitcnt_t bits,
-    const nmod_mpoly_ctx_t ctx)
+    const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     A->coeffs = NULL;
     A->exps = NULL;
@@ -79,13 +80,6 @@ void nmod_mpolyun_print_pretty(
         nmod_mpolyn_print_pretty(poly->coeffs + i,x,ctx);
         flint_printf(")*X^%wd",poly->exps[i]);
     }
-}
-
-void nmod_mpolyun_swap(nmod_mpolyun_t A, nmod_mpolyun_t B)
-{
-   nmod_mpolyun_struct t = *A;
-   *A = *B;
-   *B = t;
 }
 
 void nmod_mpolyun_zero(nmod_mpolyun_t A, const nmod_mpoly_ctx_t ctx)
@@ -175,7 +169,7 @@ void nmod_mpolyun_shift_left(nmod_mpolyun_t A, ulong s)
     }
 }
 
-slong nmod_mpolyun_lastdeg(nmod_mpolyun_t A, const nmod_mpoly_ctx_t ctx)
+slong nmod_mpolyun_lastdeg(nmod_mpolyun_t A, const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     slong i, j;
     slong deg = -WORD(1);
@@ -191,7 +185,7 @@ slong nmod_mpolyun_lastdeg(nmod_mpolyun_t A, const nmod_mpoly_ctx_t ctx)
     return deg;
 }
 
-slong nmod_mpolyn_lastdeg(nmod_mpolyn_t A, const nmod_mpoly_ctx_t ctx)
+slong nmod_mpolyn_lastdeg(nmod_mpolyn_t A, const nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     slong i;
     slong deg = -WORD(1);
@@ -261,17 +255,17 @@ void nmod_mpolyun_one(nmod_mpolyun_t A, const nmod_mpoly_ctx_t ctx)
     A->length = 1;
 }
 
-void nmod_mpolyn_set_mod(nmod_mpolyn_t A, const nmod_t mod)
+void nmod_mpolyn_set_mod(nmod_mpolyn_t FLINT_UNUSED(A), const nmod_t FLINT_UNUSED(mod))
 {
 }
 
-void nmod_mpolyun_set_mod(nmod_mpolyun_t A, const nmod_t mod)
+void nmod_mpolyun_set_mod(nmod_mpolyun_t FLINT_UNUSED(A), const nmod_t FLINT_UNUSED(mod))
 {
 }
 
 void nmod_mpolyn_scalar_mul_nmod(
     nmod_mpolyn_t A,
-    mp_limb_t c,
+    ulong c,
     const nmod_mpoly_ctx_t ctx)
 {
     slong i;
@@ -285,7 +279,7 @@ void nmod_mpolyn_scalar_mul_nmod(
 
 void nmod_mpolyun_scalar_mul_nmod(
     nmod_mpolyun_t A,
-    mp_limb_t c,
+    ulong c,
     const nmod_mpoly_ctx_t ctx)
 {
     slong i;
@@ -713,8 +707,8 @@ void nmod_mpoly_to_mpolyn_perm_deflate_threaded_pool(
     const slong * perm,
     const ulong * shift,
     const ulong * stride,
-    const thread_pool_handle * handles,
-    slong num_handles)
+    const thread_pool_handle * FLINT_UNUSED(handles),
+    slong FLINT_UNUSED(num_handles))
 {
     slong j, k, l;
     slong NA = mpoly_words_per_exp_sp(A->bits, nctx->minfo);
@@ -791,7 +785,7 @@ void nmod_mpoly_from_mpolyun_perm_inflate(
     slong i, j, h, k, l;
     slong NA, NB;
     slong Alen;
-    mp_limb_t * Acoeff;
+    ulong * Acoeff;
     ulong * Aexp;
     ulong * uexps;
     ulong * Aexps, * tAexp, * tAgexp;
@@ -850,7 +844,7 @@ void nmod_mpoly_from_mpolyun_perm_inflate(
                                    &Aexp, &A->exps_alloc, NA, Alen + h);
             for (h--; h >= 0; h--)
             {
-                mp_limb_t c = (Bc->coeffs + j)->coeffs[h];
+                ulong c = (Bc->coeffs + j)->coeffs[h];
                 if (c == 0)
                     continue;
                 mpoly_monomial_madd(Aexp + NA*Alen, tAexp, h, tAgexp, NA);
@@ -882,7 +876,7 @@ void nmod_mpoly_from_mpolyn_perm_inflate(
     slong i, h, k, l;
     slong NA, NB;
     slong Alen;
-    mp_limb_t * Acoeff;
+    ulong * Acoeff;
     ulong * Aexp;
     ulong * Bexps;
     ulong * Aexps, * tAexp, * tAgexp;
@@ -932,7 +926,7 @@ void nmod_mpoly_from_mpolyn_perm_inflate(
                                &Aexp, &A->exps_alloc, NA, Alen + h);
         for (h--; h >= 0; h--)
         {
-            mp_limb_t c = (B->coeffs + i)->coeffs[h];
+            ulong c = (B->coeffs + i)->coeffs[h];
             if (c == 0)
                 continue;
             mpoly_monomial_madd(Aexp + NA*Alen, tAexp, h, tAgexp, NA);
@@ -1054,7 +1048,7 @@ void nmod_mpoly_cvtfrom_mpolyn(
     {
         for (j = B->coeffs[i].length - 1; j >= 0; j--)
         {
-            mp_limb_t c = B->coeffs[i].coeffs[j];
+            ulong c = B->coeffs[i].coeffs[j];
             if (c == 0)
                 continue;
 
@@ -1196,4 +1190,3 @@ void nmod_mpolyn_divexact_last(
 
     n_poly_clear(r);
 }
-

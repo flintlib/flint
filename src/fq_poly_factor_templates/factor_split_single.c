@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -25,10 +25,10 @@ TEMPLATE(T, poly_factor_split_single) (TEMPLATE(T, poly_t) linfactor,
     else
     {
         flint_rand_t state;
-        ulong deflation;
+        slong deflation;
         TEMPLATE(T, poly_t) pol;
 
-        flint_randinit(state);
+        flint_rand_init(state);
         TEMPLATE(T, poly_init) (pol, ctx);
         TEMPLATE(T, poly_set) (linfactor, input, ctx);
         deflation = TEMPLATE(T, poly_deflation) (input, ctx);
@@ -68,7 +68,7 @@ TEMPLATE(T, poly_factor_split_single) (TEMPLATE(T, poly_t) linfactor,
             }
         }
 
-        flint_randclear(state);
+        flint_rand_clear(state);
         TEMPLATE(T, poly_clear) (pol, ctx);
     }
 }

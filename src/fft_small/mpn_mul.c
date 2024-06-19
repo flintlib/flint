@@ -1,21 +1,109 @@
 /*
     Copyright (C) 2022 Daniel Schultz
+    Copyright (C) 2024 Fredrik Johansson
 
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <stdint.h>
 #include <string.h>
+#include "mpn_extras.h"
+#include "thread_pool.h"
 #include "thread_support.h"
-#include "ulong_extras.h"
 #include "nmod.h"
-#include "fft_small.h"
 #include "crt_helpers.h"
+#include "fft_small.h"
+
+/*
+The following profiles are hardcoded.
+
+    np bits  n m
+     4   84  4 3
+     4   88  4 3
+     4   92  4 3
+     5  112  4 4
+     5  116  4 4
+     5  120  4 4
+     6  136  5 4
+     6  140  5 4
+     6  144  5 4
+     7  160  6 5
+     7  164  6 5
+     7  168  6 5
+     8  184  7 6
+     8  188  7 6
+     8  192  7 6
+
+Here np is the number of primes {p[0], p[1], ...p[np-1]}. By default the
+following 50-bit primes are used:
+
+    p[0] = 1108307720798209
+    p[1] = 659706976665601
+    p[2] = 1086317488242689
+    p[3] = 910395627798529
+    p[4] = 699289395265537
+    p[5] = 1022545813831681
+    p[6] = 1013749720809473
+    p[7] = 868614185943041
+
+We suppose that the inputs to multiply are
+
+    {a[0], ..., a[an-1]}  and  {b[0], ..., b[bn-1]}
+
+in base 2^64. They will be converted to
+
+   {a'[0], ..., a'[an'-1]}  and  {b'[0], ..., a'[bn'-1]}.
+
+in base 2^bits, where an' = ceil(64*an/bits) and
+bn' = ceil(64*bn/bits). The code for performing the conversion
+actually processes the inputs as base 2^32 arrays of twice the lengths.
+
+Each dot product in the convolution of a' and b' is bounded by
+
+    bn' * (2^bits-1)^2
+
+and we need this to be smaller than prod_primes = p[0], ..., p[np-1]
+for the CRT reconstruction. A slight relaxation of this inequality is
+
+    ceil(64*bn/bits) * 2^(2*bits) <= prod_primes.
+
+The function crt_data_find_bn_bound determines an upper bound for
+permissible bn such that this holds. Numerical values of the bn bounds
+are as follows:
+
+    np = 4, bits =  84, bn <= 2536637511
+    np = 4, bits =  88, bn <= 10380583
+    np = 4, bits =  92, bn <= 42390
+    np = 5, bits = 112, bn <= 32822700
+    np = 5, bits = 116, bn <= 132790
+    np = 5, bits = 120, bn <= 534
+    np = 6, bits = 136, bn <= 144789875
+    np = 6, bits = 140, bn <= 582218
+    np = 6, bits = 144, bn <= 2337
+    np = 7, bits = 160, bn <= 613493872
+    np = 7, bits = 164, bn <= 2456369
+    np = 7, bits = 168, bn <= 9826
+    np = 8, bits = 184, bn <= 2177184315
+    np = 8, bits = 188, bn <= 8689506
+    np = 8, bits = 192, bn <= 34662
+
+Note that we do not require an >= bn for correctness, but for highly
+unbalanced multiplications calling mpn_ctx_mpn_mul with operands
+in this order gives a better bound.
+
+The profile parameters n and m describe the size of CRT operands.
+Let P = p[0] * ... * p[n-1]. One CRT sum has the form
+
+    s = f[0]*x[0] + ... + f[np-1]*x[np-1]
+
+where x[i] is a single limb, f[i] has m limbs, and the limb count n
+is large enough to hold s <= P * np.
+*/
 
 void crt_data_init(crt_data_t C, ulong prime, ulong coeff_len, ulong nprimes)
 {
@@ -29,8 +117,6 @@ void crt_data_clear(crt_data_t C)
 {
     flint_free(C->data);
 }
-
-
 
 /*
     need  ceil(64*bn/bits) <= prod_primes/2^(2*bits)
@@ -231,7 +317,7 @@ void slow_mpn_to_fft_easy(
 
 #else
 void slow_mpn_to_fft_easy(
-    sd_fft_lctx_t Q,
+    const sd_fft_ctx_t Q,
     double* z,
     const uint32_t* a,
     ulong iq_stop_easy,
@@ -300,7 +386,6 @@ void slow_mpn_to_fft_easy(
             zI[ir+6*BLK_SZ/8] = vec8d_get_index(X, 6);
             zI[ir+7*BLK_SZ/8] = vec8d_get_index(X, 7);
         }
-
     }
 }
 #endif
@@ -309,7 +394,7 @@ void slow_mpn_to_fft_easy(
 
 
 void slow_mpn_to_fft(
-    sd_fft_lctx_t Q,
+    const sd_fft_ctx_t Q,
     double* z, ulong ztrunc,
     const ulong* a_, ulong an_,
     ulong bits,
@@ -427,12 +512,12 @@ FLINT_STATIC_NOINLINE void CAT(mpn_to_ffts_hard, NP)( \
             X[l] = vec4d_reduce_to_pm1n(X[l], P[l], PINV[l]); \
  \
         for (ulong l = 0; l < np; l++) \
-            sd_fft_ctx_set_index(d + l*dstride, i, vec4d_get_index(X[l/VEC_SZ], l%VEC_SZ)); \
+            (d + l*dstride)[i] = vec4d_get_index(X[l/VEC_SZ], l%VEC_SZ); \
     } \
  \
     for (ulong l = 0; l < np; l++) \
         for (ulong i = stop_hard; i < atrunc; i++) \
-            sd_fft_ctx_set_index(d + l*dstride, i, 0.0); \
+            (d + l*dstride)[i] = 0.0; \
 }
 
 DEFINE_IT(4)
@@ -474,7 +559,7 @@ DEFINE_IT(8)
         X[l] = vec4d_reduce_to_pm1n(X[l], P[l], PINV[l]); \
  \
     for (ulong l = 0; l < np; l++) \
-        sd_fft_ctx_set_index(d + l*dstride, i+ir, vec4d_get_index(X[l/VEC_SZ], l%VEC_SZ)); \
+        (d + l*dstride)[i+ir] = vec4d_get_index(X[l/VEC_SZ], l%VEC_SZ); \
 }
 
 #define N_CDIV(a, b) (((a) + (b) - 1) / (b))
@@ -571,7 +656,7 @@ DEFINE_IT(8,192)
 
 
 #define DEFINE_IT(n, n_plus_1) \
-FLINT_FORCE_INLINE void CAT(_add_to_answer_easy, n)(ulong z[], ulong r[], ulong zn, ulong toff, ulong tshift) \
+FLINT_FORCE_INLINE void CAT(_add_to_answer_easy, n)(ulong z[], ulong r[], ulong FLINT_UNUSED(zn), ulong toff, ulong tshift) \
 { \
     FLINT_ASSERT(zn > toff); \
     if (tshift == 0) \
@@ -780,13 +865,13 @@ static void CAT(_mpn_from_ffts, NP)( \
             ulong r[N + 1]; \
             ulong t[N + 1]; \
             ulong l = 0; \
-            double xx = sd_fft_ctx_get_index(d + l*dstride, i); \
+            double xx = (d + l*dstride)[i]; \
             ulong x = vec1d_reduce_to_0n(xx, Rffts[l].p, Rffts[l].pinv); \
  \
             CAT3(_big_mul, N, M)(r, t, crt_data_co_prime(Rcrts + np - 1, l), x); \
             for (l++; l < np; l++) \
             { \
-                xx = sd_fft_ctx_get_index(d + l*dstride, i); \
+                xx = (d + l*dstride)[i]; \
                 x = vec1d_reduce_to_0n(xx, Rffts[l].p, Rffts[l].pinv); \
                 CAT3(_big_addmul, N, M)(r, t, crt_data_co_prime(Rcrts + np - 1, l), x); \
             } \
@@ -818,7 +903,7 @@ ulong next_fft_number(ulong p)
     l = n_trailing_zeros(p - 1);
     q = p - (UWORD(2) << l);
     if (bits < 15)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
     if (n_nbits(q) == bits)
         return q;
     if (l < 5)
@@ -890,7 +975,7 @@ static void fill_vec_two_pow_tab(
 
 void mpn_ctx_init(mpn_ctx_t R, ulong p)
 {
-    slong i;
+    ulong i;
 
     R->buffer = NULL;
     R->buffer_alloc = 0;
@@ -987,7 +1072,7 @@ void mpn_ctx_init(mpn_ctx_t R, ulong p)
     R->profiles[i].bits      = bits_; \
     R->profiles[i].bn_bound  = crt_data_find_bn_bound(R->crts + np_ - 1, bits_); \
     R->profiles[i].to_ffts   = CAT3(mpn_to_ffts, np_, bits_); \
-/*flint_printf("profile np = %wu, bits = %3wu, bn <= 0x%16wx\n", R->profiles[i].np, R->profiles[i].bits, R->profiles[i].bn_bound);*/ \
+/*flint_printf("profile np = %wu, bits = %3wu, bn <= %wu\n", R->profiles[i].np, R->profiles[i].bits, R->profiles[i].bn_bound); */ \
     R->profiles_size = i + 1;
 
     PUSH_PROFILE(4, 84, 4,3);
@@ -1144,8 +1229,8 @@ void* mpn_ctx_fit_buffer(mpn_ctx_t R, ulong n)
 }
 
 /* pointwise mul of a with b and m */
-void sd_fft_lctx_point_mul(
-    const sd_fft_lctx_t Q,
+void sd_fft_ctx_point_mul(
+    const sd_fft_ctx_t Q,
     double* a,
     const double* b,
     ulong m_,
@@ -1175,8 +1260,8 @@ void sd_fft_lctx_point_mul(
     }
 }
 
-void sd_fft_lctx_point_sqr(
-    const sd_fft_lctx_t Q,
+void sd_fft_ctx_point_sqr(
+    const sd_fft_ctx_t Q,
     double* a,
     ulong m_,
     ulong depth)
@@ -1257,26 +1342,24 @@ typedef struct fft_worker_struct {
 void fft_worker_func(void* varg)
 {
     fft_worker_struct* X = (fft_worker_struct*) varg;
-    sd_fft_lctx_t Q;
     ulong m;
 
     do {
-        sd_fft_lctx_init(Q, X->fctx, X->depth);
+        sd_fft_ctx_struct* Q = X->fctx;
 
         if (!X->squaring)
-            sd_fft_lctx_fft_trunc(Q, X->bbuf, X->depth, X->btrunc, X->ztrunc);
+            sd_fft_trunc(Q, X->bbuf, X->depth, X->btrunc, X->ztrunc);
 
-        sd_fft_lctx_fft_trunc(Q, X->abuf, X->depth, X->atrunc, X->ztrunc);
-        NMOD_RED2(m, X->cop >> (64 - X->depth), X->cop << X->depth, X->fctx->mod);
-        m = nmod_inv(m, X->fctx->mod);
+        sd_fft_trunc(Q, X->abuf, X->depth, X->atrunc, X->ztrunc);
+        NMOD_RED2(m, X->cop >> (FLINT_BITS - X->depth), X->cop << X->depth, Q->mod);
+        m = nmod_inv(m, Q->mod);
 
         if (X->squaring)
-            sd_fft_lctx_point_sqr(Q, X->abuf, m, X->depth);
+            sd_fft_ctx_point_sqr(Q, X->abuf, m, X->depth);
         else
-            sd_fft_lctx_point_mul(Q, X->abuf, X->bbuf, m, X->depth);
+            sd_fft_ctx_point_mul(Q, X->abuf, X->bbuf, m, X->depth);
 
-        sd_fft_lctx_ifft_trunc(Q, X->abuf, X->depth, X->ztrunc);
-        sd_fft_lctx_clear(Q, X->fctx);
+        sd_ifft_trunc(Q, X->abuf, X->depth, X->ztrunc);
     } while (X = X->next, X != NULL);
 }
 
@@ -1302,31 +1385,29 @@ typedef struct mod_fft_worker_struct {
 void mod_fft_worker_func(void* varg)
 {
     mod_fft_worker_struct* X = (mod_fft_worker_struct*) varg;
-    sd_fft_lctx_t Q;
     ulong m;
 
     do {
-        sd_fft_lctx_init(Q, X->fctx, X->depth);
+        sd_fft_ctx_struct* Q = X->fctx;
 
         if (!X->squaring)
         {
             slow_mpn_to_fft(Q, X->bbuf, X->btrunc, X->b, X->bn, X->bits, X->two_pow_tab);
-            sd_fft_lctx_fft_trunc(Q, X->bbuf, X->depth, X->btrunc, X->ztrunc);
+            sd_fft_trunc(Q, X->bbuf, X->depth, X->btrunc, X->ztrunc);
         }
 
         slow_mpn_to_fft(Q, X->abuf, X->atrunc, X->a, X->an, X->bits, X->two_pow_tab);
-        sd_fft_lctx_fft_trunc(Q, X->abuf, X->depth, X->atrunc, X->ztrunc);
+        sd_fft_trunc(Q, X->abuf, X->depth, X->atrunc, X->ztrunc);
 
-        NMOD_RED2(m, X->cop >> (64 - X->depth), X->cop << X->depth, X->fctx->mod);
-        m = nmod_inv(m, X->fctx->mod);
+        NMOD_RED2(m, X->cop >> (FLINT_BITS - X->depth), X->cop << X->depth, Q->mod);
+        m = nmod_inv(m, Q->mod);
 
         if (X->squaring)
-            sd_fft_lctx_point_sqr(Q, X->abuf, m, X->depth);
+            sd_fft_ctx_point_sqr(Q, X->abuf, m, X->depth);
         else
-            sd_fft_lctx_point_mul(Q, X->abuf, X->bbuf, m, X->depth);
+            sd_fft_ctx_point_mul(Q, X->abuf, X->bbuf, m, X->depth);
 
-        sd_fft_lctx_ifft_trunc(Q, X->abuf, X->depth, X->ztrunc);
-        sd_fft_lctx_clear(Q, X->fctx);
+        sd_ifft_trunc(Q, X->abuf, X->depth, X->ztrunc);
     } while (X = X->next, X != NULL);
 }
 
@@ -1618,7 +1699,7 @@ timeit_start(timer);
             thread_pool_wait(global_thread_pool, P.handles[i - 1]);
 
         unsigned char cf = 0;
-        for (ulong i = 1; i <= P.nhandles; i++)
+        for (slong i = 1; i <= P.nhandles; i++)
         {
             ulong start = w[i].start_easy*P.bits/64;
             if (i == P.nhandles)
@@ -1660,4 +1741,3 @@ flint_printf("      +: %wd\n", timer_overall->wall);
     flint_free(worker_struct_buffer);
     flint_give_back_threads(P.handles, P.nhandles);
 }
-

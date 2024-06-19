@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "acb.h"
 #include "acb_mat.h"
 
 static void
@@ -59,7 +60,7 @@ acb_mat_approx_solve_triu_classical(acb_mat_t X, const acb_mat_t U,
             acb_approx_dot(s, acb_mat_entry(B, j, i), 1, U->rows[j] + j + 1, 1, tmp + j + 1, 1, n - j - 1, prec);
 
             if (!unit)
-                acb_approx_div(tmp + j, s, arb_mat_entry(U, j, j), t, prec);
+                acb_approx_div(tmp + j, s, acb_mat_entry(U, j, j), t, prec);
             else
                 acb_swap(tmp + j, s);
         }

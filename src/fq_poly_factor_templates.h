@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -53,7 +53,7 @@ void TEMPLATE(T, poly_factor_concat)(TEMPLATE(T, poly_factor_t) res,
                                      const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, poly_factor_pow)(TEMPLATE(T, poly_factor_t) fac, slong exp,
-                                  const TEMPLATE(T, ctx_t) ctx);
+                                  const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx));
 
 int _TEMPLATE(T, poly_is_squarefree)(const TEMPLATE(T, struct) * f, slong len,
                                  const TEMPLATE(T, ctx_t) ctx);

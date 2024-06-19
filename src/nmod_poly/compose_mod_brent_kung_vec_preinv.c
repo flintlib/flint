@@ -7,23 +7,24 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "ulong_extras.h"
+#include "mpn_extras.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 #include "nmod_mat.h"
 
 void
 _nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
-                const nmod_poly_struct * polys, slong lenpolys, slong l,
-                         mp_srcptr g, slong glen, mp_srcptr poly, slong len,
-                                   mp_srcptr polyinv, slong leninv, nmod_t mod)
+        const nmod_poly_struct * polys, slong FLINT_UNUSED(lenpolys), slong l,
+        nn_srcptr g, slong glen, nn_srcptr poly, slong len,
+        nn_srcptr polyinv, slong leninv, nmod_t mod)
 {
     nmod_mat_t A, B, C;
-    mp_ptr t, h;
+    nn_ptr t, h;
     slong i, j, k, n, m, len2 = l, len1;
 
     n = len - 1;
@@ -114,18 +115,15 @@ nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
 
         if (len3 >= len2)
         {
-            flint_printf("Exception (nmod_poly_compose_mod_brent_kung_vec_preinv)."
-                 "The degree of the first polynomial must be smaller than that of the "
-                 " modulus\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(nmod_poly_compose_mod_brent_kung_vec_preinv): "
+                 "The degree of the first polynomial must be smaller than that of the modulus\n");
         }
     }
 
     if (n > len1)
     {
-        flint_printf("Exception (nmod_poly_compose_mod_brent_kung_vec_preinv)."
-                                     "n is larger than the length of polys\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(nmod_poly_compose_mod_brent_kung_vec_preinv): "
+                "n is larger than the length of polys\n");
     }
 
     if (n == 0)

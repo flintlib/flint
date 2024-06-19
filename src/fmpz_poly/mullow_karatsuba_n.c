@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpn_extras.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
@@ -105,7 +106,7 @@ _fmpz_poly_mullow_karatsuba(fmpz * res, const fmpz * poly1, slong len1,
         copy1 = (fmpz *) flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < len1; i++)
             copy1[i] = poly1[i];
-        flint_mpn_zero((mp_ptr) copy1 + len1, n - len1);
+        flint_mpn_zero((nn_ptr) copy1 + len1, n - len1);
         clear |= 1;
     }
 
@@ -116,7 +117,7 @@ _fmpz_poly_mullow_karatsuba(fmpz * res, const fmpz * poly1, slong len1,
         copy2 = (fmpz *) flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < len2; i++)
             copy2[i] = poly2[i];
-        flint_mpn_zero((mp_ptr) copy2 + len2, n - len2);
+        flint_mpn_zero((nn_ptr) copy2 + len2, n - len2);
         clear |= 2;
     }
 

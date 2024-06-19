@@ -6,13 +6,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "gmpcompat.h"
-#include "ulong_extras.h"
 #include "fmpz.h"
 
 void
@@ -27,9 +25,9 @@ fmpz_mul_si_tdiv_q_2exp(fmpz_t f, const fmpz_t g, slong x, ulong exp)
    }
    else if (!COEFF_IS_MPZ(c2)) /* c2 is small */
    {
-       mp_limb_t prod[2];
-       mp_limb_t uc2;
-       mp_limb_t ux;
+       ulong prod[2];
+       ulong uc2;
+       ulong ux;
 
        if (exp >= 2 * FLINT_BITS)
        {
@@ -65,18 +63,18 @@ fmpz_mul_si_tdiv_q_2exp(fmpz_t f, const fmpz_t g, slong x, ulong exp)
        }
        else /* result takes two limbs */
        {
-           __mpz_struct * mf = _fmpz_promote(f);
+           mpz_ptr mf = _fmpz_promote(f);
 
            /* two limbs, least significant first, native endian, no
 nails, stored in prod */
-           mpz_import(mf, 2, -1, sizeof(mp_limb_t), 0, 0, prod);
+           mpz_import(mf, 2, -1, sizeof(ulong), 0, 0, prod);
            if ((c2 ^ x) < WORD(0))
                mpz_neg(mf, mf);
        }
    }
    else /* c2 is large */
    {
-       __mpz_struct * mf = _fmpz_promote(f); /* ok without val as
+       mpz_ptr mf = _fmpz_promote(f); /* ok without val as
             if aliased both are large */
        flint_mpz_mul_si(mf, COEFF_TO_PTR(c2), x);
        mpz_tdiv_q_2exp(mf, mf, exp);

@@ -5,14 +5,15 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
+#include "arb_fmpz_poly.h"
 #include "acf.h"
 #include "acb.h"
-#include "arb_fmpz_poly.h"
 #include "gr.h"
 #include "gr_generic.h"
 #include "gr_vec.h"
@@ -345,7 +346,7 @@ _gr_acf_equal(const acf_t x, const acf_t y, const gr_ctx_t ctx)
 {
     if (arf_is_nan(acf_realref(x)) || arf_is_nan(acf_imagref(x)) ||
         arf_is_nan(acf_realref(y)) || arf_is_nan(acf_imagref(y)))
-        return T_FALSE;
+        return T_UNKNOWN;
 
     return acf_equal(x, y) ? T_TRUE : T_FALSE;
 }
@@ -370,7 +371,7 @@ int
 _gr_acf_add_si(acf_t res, const acf_t x, slong y, const gr_ctx_t ctx)
 {
     arf_add_si(acf_realref(res), acf_realref(x), y, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
-    arf_set_round(acf_realref(res), acf_realref(x), ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
+    arf_set_round(acf_imagref(res), acf_imagref(x), ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
@@ -378,7 +379,7 @@ int
 _gr_acf_add_ui(acf_t res, const acf_t x, ulong y, const gr_ctx_t ctx)
 {
     arf_add_ui(acf_realref(res), acf_realref(x), y, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
-    arf_set_round(acf_realref(res), acf_realref(x), ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
+    arf_set_round(acf_imagref(res), acf_imagref(x), ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
@@ -386,7 +387,7 @@ int
 _gr_acf_add_fmpz(acf_t res, const acf_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     arf_add_fmpz(acf_realref(res), acf_realref(x), y, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
-    arf_set_round(acf_realref(res), acf_realref(x), ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
+    arf_set_round(acf_imagref(res), acf_imagref(x), ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
@@ -401,7 +402,7 @@ int
 _gr_acf_sub_si(acf_t res, const acf_t x, slong y, const gr_ctx_t ctx)
 {
     arf_sub_si(acf_realref(res), acf_realref(x), y, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
-    arf_set_round(acf_realref(res), acf_realref(x), ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
+    arf_set_round(acf_imagref(res), acf_imagref(x), ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
@@ -409,7 +410,7 @@ int
 _gr_acf_sub_ui(acf_t res, const acf_t x, ulong y, const gr_ctx_t ctx)
 {
     arf_sub_ui(acf_realref(res), acf_realref(x), y, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
-    arf_set_round(acf_realref(res), acf_realref(x), ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
+    arf_set_round(acf_imagref(res), acf_imagref(x), ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
@@ -417,7 +418,7 @@ int
 _gr_acf_sub_fmpz(acf_t res, const acf_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     arf_sub_fmpz(acf_realref(res), acf_realref(x), y, ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
-    arf_set_round(acf_realref(res), acf_realref(x), ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
+    arf_set_round(acf_imagref(res), acf_imagref(x), ACF_CTX_PREC(ctx), ACF_CTX_RND(ctx));
     return GR_SUCCESS;
 }
 
@@ -671,7 +672,7 @@ _gr_acf_cmpabs(int * res, const acf_t x, const acf_t y, const gr_ctx_t ctx)
     if (!arf_is_zero(acf_imagref(x)) || !arf_is_zero(acf_imagref(y)))
         return GR_UNABLE;
 
-    *res = arf_cmp(acf_realref(x), acf_realref(y));
+    *res = arf_cmpabs(acf_realref(x), acf_realref(y));
     return GR_SUCCESS;
 }
 
@@ -1182,7 +1183,7 @@ gr_method_tab_input _acf_methods_input[] =
     {GR_METHOD_SET_FMPZ,        (gr_funcptr) _gr_acf_set_fmpz},
     {GR_METHOD_SET_FMPQ,        (gr_funcptr) _gr_acf_set_fmpq},
     {GR_METHOD_SET_D,           (gr_funcptr) _gr_acf_set_d},
-/*    {GR_METHOD_SET_STR,         (gr_funcptr) _gr_acf_set_str}, */
+    {GR_METHOD_SET_STR,         (gr_funcptr) gr_generic_set_str_ring_exponents},
     {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_acf_set_other},
 
     {GR_METHOD_GET_FMPZ,        (gr_funcptr) _gr_acf_get_fmpz},

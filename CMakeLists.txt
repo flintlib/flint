@@ -6,16 +6,20 @@
 #
 # FLINT is free software: you can redistribute it and/or modify it under
 # the terms of the GNU Lesser General Public License (LGPL) as published
-# by the Free Software Foundation; either version 2.1 of the License, or
+# by the Free Software Foundation; either version 3 of the License, or
 # (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 #
 
 cmake_minimum_required(VERSION 3.22)
 
+if(NOT WIN32)
+    message(WARNING "Detected system is not Windows. Please use the Autotools configuration along with the Makefile instead as it is more up-to-date. Read INSTALL.")
+endif()
+
 include(CheckCCompilerFlag)
 include(CheckCSourceRuns)
 include(CheckIPOSupported)
-include(FindPkgConfig)
+include(CMakePackageConfigHelpers)
 
 # Source of truth for project version
 file(STRINGS VERSION FLINT_VERSION_FULL)
@@ -44,22 +48,70 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
-# Try to enable the fft_small module
-if("${CMAKE_C_COMPILER_ID}" MATCHES "Clang" OR "${CMAKE_C_COMPILER_ID}" MATCHES "GNU")
-    check_c_compiler_flag("-march=native" HAS_FLAG_GCC_MARCH_NATIVE)
-elseif("${CMAKE_C_COMPILER_ID}" MATCHES "MSVC")
-    # Check if AVX2 is available
-    check_c_compiler_flag("/arch:AVX2" HAS_FLAG_MSVC_AVX2)
-endif()
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED TRUE)
 
 # Build options
 option(BUILD_SHARED_LIBS "Build shared libs" on)
 option(WITH_NTL "Build tests for NTL interface or not" off)
 
+# MSVC has no equivalent to "-march=<arch>"
+if(NOT MSVC)
+    set(ENABLE_ARCH "native" CACHE STRING "Enable and push -march=ARCH option to C compiler")
+    if(NOT "${ENABLE_ARCH}" STREQUAL "NO")
+        check_c_compiler_flag("-march=${ENABLE_ARCH}" HAS_FLAG_ARCH)
+    endif()
+endif()
+
+if(MSVC)
+    set(avx2_flag "/arch:AVX2")
+else()
+    set(avx2_flag "-mavx2")
+endif()
+check_c_compiler_flag("${avx2_flag}" HAS_FLAG_AVX2)
+
+option(ENABLE_AVX2 "Enable AVX2 instructions" ${HAS_FLAG_AVX2})
+option(ENABLE_AVX512 "Enable AVX512 instructions" OFF)
+
+# Check if AVX2 is available
+
+if(ENABLE_AVX2)
+    if(HAS_FLAG_AVX2)
+        check_c_compiler_flag("-mfma" HAS_FLAG_MFMA)
+    else()
+        message(FATAL_ERROR "${CMAKE_C_COMPILER}} does not support the flag ${avx2_flag} needed for AVX2 instructions")
+    endif()
+endif()
+
+if(ENABLE_AVX512)
+    if(MSVC)
+        set(avx512_flag "/arch:AVX512")
+    else()
+        set(avx512_flag "-mavx512f")
+    endif()
+    check_c_compiler_flag("${avx512_flag}" HAS_FLAG_AVX512)
+    if(NOT HAS_FLAG_AVX512)
+        message(FATAL_ERROR "${CMAKE_C_COMPILER}} does not support the flag ${avx512_flag} needed for AVX512 instructions")
+    endif()
+endif()
+
+# Check if strongly ordered memory
+set(STRONGLY_ORDERED_CPUS x86_64 x86 i386 i586 AMD64)
+if(CMAKE_SYSTEM_PROCESSOR IN_LIST STRONGLY_ORDERED_CPUS)
+    message(STATUS "Checking if system is strongly ordered - yes")
+    set(FLINT_KNOW_STRONG_ORDER ON)
+else()
+    message(STATUS "Checking if system is strongly ordered - unsure")
+    set(FLINT_KNOW_STRONG_ORDER OFF)
+endif()
+
 # Find dependencies
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(GMP REQUIRED IMPORTED_TARGET gmp>=6.2.1)
-pkg_check_modules(MPFR REQUIRED IMPORTED_TARGET mpfr>=4.1.0)
+set(GMP_MIN_VERSION 6.2.1)
+find_package(gmp ${GMP_MIN_VERSION} REQUIRED)
+
+set(MPFR_MIN_VERSION 4.1.0)
+find_package(mpfr ${MPFR_MIN_VERSION} REQUIRED)
+
 if (WITH_NTL)
     find_package(NTL REQUIRED)
 endif()
@@ -92,14 +144,14 @@ else()
     set(FLINT_USES_PTHREAD ON CACHE BOOL "Use POSIX Threads.")
 endif()
 
-
 # Check if fft_small module is available
 message(STATUS "Checking whether fft_small module is available")
-set(CMAKE_REQUIRED_INCLUDES ${GMP_INCLUDE_DIRS})
-if(HAS_FLAG_GCC_MARCH_NATIVE)
-    set(CMAKE_REQUIRED_FLAGS "-march=native")
-elseif(HAS_FLAG_MSVC_AVX2)
-    set(CMAKE_REQUIRED_FLAGS "/arch:AVX2")
+set(CMAKE_REQUIRED_LIBRARIES gmp::gmp)
+if(HAS_FLAG_ARCH)
+    set(CMAKE_REQUIRED_FLAGS "-march=${ENABLE_ARCH}")
+endif()
+if(HAS_FLAG_AVX2)
+    set(CMAKE_REQUIRED_FLAGS "${avx2_flag}")
 endif()
 check_c_source_compiles([[
     #include <gmp.h>
@@ -159,10 +211,11 @@ set(_BUILD_DIRS
     long_extras
     perm
     double_extras   d_vec           d_mat
+    nfloat
     mpn_extras
-    mpf_vec                         mpf_mat
     mpfr_vec                        mpfr_mat
     nmod            nmod_vec        nmod_mat        nmod_poly
+    mpn_mod
     fmpz            fmpz_vec        fmpz_mat        fmpz_poly
     fmpz_mod        fmpz_mod_vec    fmpz_mod_mat    fmpz_mod_poly
     fmpq            fmpq_vec        fmpq_mat        fmpq_poly
@@ -191,7 +244,7 @@ set(_BUILD_DIRS
     fmpz_mod_mpoly_factor           fmpq_mpoly_factor
     fq_nmod_mpoly_factor            fq_zech_mpoly_factor
 
-    fft             ${FFT_SMALL}    fmpz_poly_q    fmpz_lll
+    fft             ${FFT_SMALL}    fmpz_poly_q     fmpz_lll
     n_poly          arith           qsieve          aprcl
 
     nf              nf_elem         qfb
@@ -223,27 +276,14 @@ string(REGEX REPLACE "([A-Za-z0-9_-]+;|[A-Za-z0-9_-]+$)" "src/\\1" BUILD_DIRS "$
 # NOTE: Template directories are not supposed to be used.
 
 set(_HEADERS
-    NTL-interface.h flint.h longlong.h flint-config.h gmpcompat.h fft_tuning.h
-    profiler.h templates.h exception.h
+    NTL-interface.h flint.h longlong.h flint-config.h gmpcompat.h flint-mparam.h
+    profiler.h templates.h mpf-impl.h
 )
 string(REGEX REPLACE "([A-Za-z0-9_-]+\.h;|[A-Za-z0-9_-]+\.h$)" "src/\\1" HEADERS "${_HEADERS}")
 
 # Setup for flint-config.h
 check_c_compiler_flag("-mpopcnt" HAS_FLAG_MPOPCNT)
 check_c_compiler_flag("-funroll-loops" HAS_FLAG_UNROLL_LOOPS)
-
-if(HAS_FLAG_MPOPCNT)
-  set(CMAKE_REQUIRED_FLAGS "-mpopcnt")
-endif()
-# Testing __builtin_popcountl...
-check_c_source_runs([[int main(int argc, char ** argv) {
-  #if defined(_WIN64)
-  return __builtin_popcountll(argc) == 100;
-  #else
-  return __builtin_popcountl(argc) == 100;
-  #endif
-  }]] FLINT_USES_POPCNT)
-unset(CMAKE_REQUIRED_FLAGS)
 
 # fenv configuration
 check_c_source_compiles([[#include <fenv.h>
@@ -277,12 +317,24 @@ else()
 endif()
 
 # gmpcompat.h configuration
-set(CMAKE_REQUIRED_INCLUDES ${GMP_INCLUDE_DIRS})
+set(CMAKE_REQUIRED_LIBRARIES gmp::gmp)
 check_c_source_compiles([[#include <gmp.h>
   #ifndef _LONG_LONG_LIMB
   # error mp_limb_t != unsigned long long limb
   #endif
-  void main(){};]] LONG_LONG_LIMB)
+  void main(){};]] FLINT_LONG_LONG)
+
+check_c_source_compiles([[#include <gmp.h>
+  #if GMP_LIMB_BITS == 32
+  # error
+  #endif
+  void main(){};]] FLINT64)
+
+if(FLINT64)
+    set(FLINT_BITS 64)
+else()
+    set(FLINT_BITS 32)
+endif()
 
 # Populate headers
 configure_file(
@@ -298,7 +350,7 @@ configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/src/fmpz/fmpz.c
     COPYONLY
 )
-if(LONG_LONG_LIMB)
+if(FLINT_LONG_LONG)
     configure_file(
         ${CMAKE_CURRENT_SOURCE_DIR}/src/gmpcompat-longlong.h.in
         ${CMAKE_CURRENT_SOURCE_DIR}/src/gmpcompat.h
@@ -314,16 +366,10 @@ endif()
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     configure_file(
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/fft_tuning64.in
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/fft_tuning.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/mpn_extras/generic/flint-mparam.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/flint-mparam.h
         COPYONLY
     )   
-elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
-    configure_file(
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/fft_tuning32.in
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/fft_tuning.h
-        COPYONLY
-    )
 endif()
 
 
@@ -349,21 +395,22 @@ list(APPEND HEADERS ${TEMP})
 
 add_library(flint ${SOURCES})
 target_link_libraries(flint PUBLIC
-    PkgConfig::GMP PkgConfig::MPFR ${PThreads_LIBRARIES})
+    gmp::gmp
+    mpfr::mpfr
+    ${PThreads_LIBRARIES}
+)
 
 if(FLINT_USES_BLAS)
-    target_link_libraries(flint PUBLIC ${CBLAS_LIBRARIES})
+    target_link_libraries(flint PUBLIC CBLAS::CBLAS)
 endif()
 
 # Include directories
 
-target_include_directories(flint PUBLIC 
-    ${CMAKE_CURRENT_SOURCE_DIR}/src ${GMP_INCLUDE_DIRS} ${MPFR_INCLUDE_DIRS}
-    ${CMAKE_CURRENT_BINARY_DIR} ${PThreads_INCLUDE_DIRS})
-
-if(FLINT_USES_BLAS)
-    target_include_directories(flint PUBLIC ${CBLAS_INCLUDE_DIRS})
-endif()
+target_include_directories(flint PUBLIC
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src;${CMAKE_CURRENT_BINARY_DIR}>"
+    "$<INSTALL_INTERFACE:include/flint>"
+    ${PThreads_INCLUDE_DIRS}
+)
 
 if(BUILD_SHARED_LIBS AND MSVC)
     # Export all functions automatically (except global data)
@@ -379,10 +426,19 @@ if (HAS_FLAG_UNROLL_LOOPS)
     target_compile_options(flint PUBLIC "-funroll-loops")
 endif()
 
-if(HAS_FLAG_GCC_MARCH_NATIVE)
-    target_compile_options(flint PUBLIC "-march=native")
-elseif(HAS_FLAG_MSVC_AVX2)
-    target_compile_options(flint PUBLIC "/arch:AVX2")
+if(NOT MSVC AND NOT "${ENABLE_ARCH}" STREQUAL "NO")
+    target_compile_options(flint PUBLIC "-march=${ENABLE_ARCH}")
+endif()
+
+if(ENABLE_AVX2)
+    target_compile_options(flint PUBLIC "${avx2_flag}")
+    if(HAS_FLAG_MFMA)
+        target_compile_options(flint PUBLIC "-mfma")
+    endif()
+endif()
+
+if(ENABLE_AVX512)
+    target_compile_options(flint PUBLIC "${avx512_flag}")
 endif()
 
 # Versioning
@@ -437,12 +493,39 @@ endif()
 include(GNUInstallDirs)
 
 install(TARGETS flint
-            RUNTIME DESTINATION "${CMAKE_INSTALL_FULL_BINDIR}"
-            ARCHIVE DESTINATION "${CMAKE_INSTALL_FULL_LIBDIR}"
-            LIBRARY DESTINATION "${CMAKE_INSTALL_FULL_LIBDIR}"
+            EXPORT flintTargets
+            RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+            ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+            LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
         )
 
 install(FILES ${HEADERS} DESTINATION include/flint)
+
+write_basic_package_version_file(
+  "${CMAKE_CURRENT_BINARY_DIR}/flintConfigVersion.cmake"
+  VERSION "${PROJECT_VERSION}"
+  COMPATIBILITY AnyNewerVersion
+)
+
+configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/flintConfig.cmake.in
+  "${CMAKE_CURRENT_BINARY_DIR}/flintConfig.cmake"
+  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/flint
+)
+
+install(FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/flintConfig.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/flintConfigVersion.cmake"
+        "CMake/FindCBLAS.cmake"
+        "CMake/Findgmp.cmake"
+        "CMake/Findmpfr.cmake"
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/flint
+)
+
+install(EXPORT flintTargets
+        FILE flintTargets.cmake
+        NAMESPACE flint::
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/flint
+)
 
 set_target_properties(flint
     PROPERTIES
@@ -451,9 +534,21 @@ set_target_properties(flint
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin"
 )
 
+# Install PkgConfig file
+set(prefix ${CMAKE_INSTALL_PREFIX})
+set(exec_prefix "\$\{prefix\}")
+set(includedir "\$\{prefix\}/include")
+set(libdir "\$\{prefix\}/${CMAKE_INSTALL_LIBDIR}")
+set(PACKAGE_NAME ${PROJECT_NAME})
+set(PACKAGE_VERSION ${PROJECT_VERSION})
+configure_file(flint.pc.in flint.pc @ONLY)
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/flint.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+
 if(BUILD_TESTING)
+    set(FLINT_SRC ${CMAKE_CURRENT_SOURCE_DIR}/src) # To get src/test/main
     enable_testing()
-    foreach(dir IN LISTS BUILD_DIRS CMAKE_CURRENT_SOURCE_DIR)
+    foreach(dir IN LISTS BUILD_DIRS FLINT_SRC)
         file(GLOB test_file "${dir}/test/main.c")
         if(test_file)
             file(RELATIVE_PATH test_name ${CMAKE_CURRENT_SOURCE_DIR} ${test_file})

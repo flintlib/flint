@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -19,7 +19,7 @@
 #endif
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 typedef struct
@@ -55,8 +55,6 @@ typedef struct
 
 typedef thread_pool_struct thread_pool_t[1];
 
-typedef int thread_pool_handle;
-
 FLINT_DLL extern thread_pool_t global_thread_pool;
 FLINT_DLL extern int global_thread_pool_initialized;
 
@@ -89,7 +87,7 @@ void thread_pool_clear(thread_pool_t T);
 
 void _thread_pool_distribute_work_2(slong start, slong stop,
                                     slong * Astart, slong * Astop, slong Alen,
-                                    slong * Bstart, slong * Bstop, slong Blen);
+                                    slong * Bstart, slong * Bstop, slong FLINT_UNUSED(Blen));
 
 ulong _thread_pool_find_work_2(ulong a, ulong alpha,
                                       ulong b, ulong beta, ulong yn, ulong yd);

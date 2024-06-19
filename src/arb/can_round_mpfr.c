@@ -5,14 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <mpfr.h>
 #include "arb.h"
 
-int mpfr_round_p(mp_srcptr, mp_size_t, mpfr_exp_t, mpfr_prec_t);
+int mpfr_round_p(nn_srcptr, slong, mpfr_exp_t, mpfr_prec_t);
 
 int
 arb_can_round_arf(const arb_t x, slong prec, arf_rnd_t rnd)
@@ -38,8 +38,8 @@ arb_can_round_mpfr(const arb_t x, slong prec, mpfr_rnd_t rnd)
     else
     {
         slong e, bits;
-        mp_size_t n;
-        mp_srcptr d;
+        slong n;
+        nn_srcptr d;
 
         e = _fmpz_sub_small(ARF_EXPREF(arb_midref(x)), MAG_EXPREF(arb_radref(x)));
 
@@ -56,4 +56,3 @@ arb_can_round_mpfr(const arb_t x, slong prec, mpfr_rnd_t rnd)
         return mpfr_round_p(d, n, e, prec + (rnd == MPFR_RNDN));
     }
 }
-

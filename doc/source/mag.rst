@@ -510,7 +510,7 @@ Special functions
 
     Sets *res* to an upper bound for
 
-    .. math ::
+    .. math::
 
         \sum_{k=N}^{\infty} \frac{z^k \log^d(k)}{k^s}.
 
@@ -524,7 +524,7 @@ Special functions
     Sets *res* to an upper bound for `\zeta(s,a) = \sum_{k=0}^{\infty} (k+a)^{-s}`.
     We use the formula
 
-    .. math ::
+    .. math::
 
         \zeta(s,a) \le \frac{1}{a^s} + \frac{1}{(s-1) a^{s-1}}
 

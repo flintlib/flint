@@ -6,11 +6,10 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "ulong_extras.h"
 #include "nmod_mat.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
@@ -25,13 +24,13 @@ _fmpq_mat_check_solution_fmpz_mat(const fmpq_mat_t X, const fmpz_mat_t A, const 
 void
 _fmpq_mat_solve_dixon(fmpq_mat_t X,
                     const fmpz_mat_t A, const fmpz_mat_t B,
-                    const nmod_mat_t Ainv, mp_limb_t p,
+                    const nmod_mat_t Ainv, ulong p,
                     const fmpz_t N, const fmpz_t D)
 {
     fmpz_t bound, ppow;
     fmpz_mat_t x, y, d, Ay;
     fmpz_t prod;
-    mp_limb_t * crt_primes;
+    ulong * crt_primes;
     nmod_mat_t * A_mod;
     nmod_mat_t Ay_mod, d_mod, y_mod;
     slong i, j, n, nexti, cols, num_primes;
@@ -166,12 +165,11 @@ fmpq_mat_solve_fmpz_mat_dixon(fmpq_mat_t X,
 {
     nmod_mat_t Ainv;
     fmpz_t N, D;
-    mp_limb_t p;
+    ulong p;
 
     if (!fmpz_mat_is_square(A))
     {
-        flint_printf("Exception (fmpz_mat_solve_fmpz_mat_dixon). Non-square system matrix.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mat_solve_fmpz_mat_dixon). Non-square system matrix.\n");
     }
 
     if (fmpz_mat_is_empty(A) || fmpz_mat_is_empty(B))
@@ -211,4 +209,3 @@ fmpq_mat_solve_dixon(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B)
 
     return success;
 }
-

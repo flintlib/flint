@@ -6,16 +6,16 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-void _nmod_poly_divrem_newton_n_preinv(mp_ptr Q, mp_ptr R, mp_srcptr A,
-                                        slong lenA, mp_srcptr B, slong lenB,
-                                       mp_srcptr Binv, slong lenBinv, nmod_t mod)
+void _nmod_poly_divrem_newton_n_preinv(nn_ptr Q, nn_ptr R, nn_srcptr A,
+                                        slong lenA, nn_srcptr B, slong lenB,
+                                       nn_srcptr Binv, slong lenBinv, nmod_t mod)
 {
     const slong lenQ = lenA - lenB + 1;
 
@@ -44,7 +44,7 @@ void nmod_poly_divrem_newton_n_preinv(nmod_poly_t Q, nmod_poly_t R,
                                       const nmod_poly_t Binv)
 {
     const slong lenA = A->length, lenB = B->length, lenBinv = Binv->length;
-    mp_ptr q, r;
+    nn_ptr q, r;
 
     if (lenB == 0)
     {
@@ -55,8 +55,7 @@ void nmod_poly_divrem_newton_n_preinv(nmod_poly_t Q, nmod_poly_t R,
             return;
         } else
         {
-            flint_printf("Exception (nmod_poly_divrem_newton_n_preinv). Division by zero.\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "Exception (nmod_poly_divrem_newton_n_preinv). Division by zero.\n");
         }
     }
 

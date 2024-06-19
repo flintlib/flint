@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -18,7 +18,7 @@ void test_with_dimensions1(ulong rdim, ulong cdim, flint_rand_t state)
     int result;
 
     nmod_poly_mat_t a, b;
-    mp_limb_t n = n_randtest_not_zero(state);
+    ulong n = n_randtest_not_zero(state);
     slong shift = n_randint(state, 100);
 
     nmod_poly_mat_init(a, rdim, cdim, n);
@@ -50,7 +50,7 @@ void test_with_dimensions2(ulong rdim, ulong cdim, flint_rand_t state)
     int result;
 
     nmod_poly_mat_t a, b, c;
-    mp_limb_t n = n_randtest_not_zero(state);
+    ulong n = n_randtest_not_zero(state);
     slong shift = n_randint(state, 100);
 
     nmod_poly_mat_init(a, rdim, cdim, n);

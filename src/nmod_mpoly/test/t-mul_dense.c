@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -23,7 +23,7 @@ TEST_FUNCTION_START(nmod_mpoly_mul_dense, state)
         nmod_mpoly_t f, g, h, k;
         slong len, len1, len2;
         slong max_bound, exp_bound, exp_bound1, exp_bound2;
-        mp_limb_t modulus;
+        ulong modulus;
         slong n;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
@@ -85,7 +85,7 @@ TEST_FUNCTION_START(nmod_mpoly_mul_dense, state)
         nmod_mpoly_t f, g, h;
         slong len, len1, len2;
         slong max_bound, exp_bound, exp_bound1, exp_bound2;
-        mp_limb_t modulus;
+        ulong modulus;
         slong n;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;
@@ -144,7 +144,7 @@ TEST_FUNCTION_START(nmod_mpoly_mul_dense, state)
         nmod_mpoly_t f, g, h;
         slong len, len1, len2;
         slong max_bound, exp_bound, exp_bound1, exp_bound2;
-        mp_limb_t modulus;
+        ulong modulus;
         slong n;
 
         modulus = n_randint(state, FLINT_BITS - 1) + 1;

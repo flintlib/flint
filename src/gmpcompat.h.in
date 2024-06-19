@@ -5,19 +5,15 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #ifndef GMP_COMPAT_H
 #define GMP_COMPAT_H
 
-#include "flint.h"
-
-#define FLINT_MPZ_REALLOC(z, len)       \
-    ((len) > ((z)->_mp_alloc)           \
-        ? (mp_ptr) _mpz_realloc(z, len) \
-        : ((z)->_mp_d))
+#include <gmp.h>
+#include "longlong.h"
 
 static inline
 void flint_mpz_add_uiui(mpz_ptr a, mpz_srcptr b, ulong c1, ulong c0)

@@ -5,16 +5,15 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 
 #ifndef FLINT64
-mp_limb_t flint_fmpz_pseudosquares[][3] =
+ulong flint_fmpz_pseudosquares[][3] =
 {
    { 17, 0, 0 },
    { 73, 0, 0 },
@@ -92,7 +91,7 @@ mp_limb_t flint_fmpz_pseudosquares[][3] =
    { 1411295841u, 761797252u, 229581u }
 };
 #else
-mp_limb_t flint_fmpz_pseudosquares[][2] =
+ulong flint_fmpz_pseudosquares[][2] =
 {
    { 17, 0 },
    { 73, 0 },
@@ -203,20 +202,17 @@ void fmpz_set_pseudosquare(fmpz_t f, unsigned int i)
 #endif
    else
    {
-      flint_printf("Exception (fmpz_set_pseudosquare). Index too large.\n");
-      flint_abort();
+      flint_throw(FLINT_ERROR, "Exception (fmpz_set_pseudosquare). Index too large.\n");
    }
 }
 
 int fmpz_is_prime_pseudosquare(const fmpz_t n)
 {
     unsigned int i, j, m1;
-    mp_limb_t p, B, mod8;
+    ulong p, B, mod8;
     fmpz_t NB, f, exp, mod, nm1;
     int ret;
-    const mp_limb_t * primes;
-
-    ret = -1; /* silence compiler warning (not set when aborting) */
+    const ulong * primes;
 
     if (fmpz_sgn(n) <= 0)
        return 0;
@@ -291,10 +287,7 @@ int fmpz_is_prime_pseudosquare(const fmpz_t n)
            ret = 1;
            goto cleanup;
         }
-        flint_printf("Whoah, ");
-        fmpz_print(n);
-        flint_printf("is a probable prime, but not prime, please report!!\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "%s is a probable prime, but not prime, please report!!\n", fmpz_get_str(NULL, 10, n));
     }
     else
     {
@@ -315,16 +308,10 @@ int fmpz_is_prime_pseudosquare(const fmpz_t n)
             }
             if (!fmpz_is_one(mod))
             {
-                flint_printf("Whoah, ");
-                fmpz_print(n);
-                flint_printf("is a probable prime, but not prime, please report!!\n");
-                flint_abort();
+                flint_throw(FLINT_ERROR, "%s is a probable prime, but not prime, please report!!\n", fmpz_get_str(NULL, 10, n));
             }
         }
-        flint_printf("Whoah, ");
-        fmpz_print(n);
-        flint_printf("is a probable prime, but not prime, please report!!\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "%s is a probable prime, but not prime, please report!!\n", fmpz_get_str(NULL, 10, n));
     }
 
 cleanup:

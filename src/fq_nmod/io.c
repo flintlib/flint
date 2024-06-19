@@ -1,11 +1,11 @@
 /*
-    Copyright (C) 2023 Albin Ahlbäck
+    Copyright (C) 2023, 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -22,11 +22,7 @@ int fq_nmod_ctx_fprint(FILE * file, const fq_nmod_ctx_t ctx)
     int r;
     slong i, k;
 
-    r = flint_fprintf(file, "p = ");
-    if (r <= 0)
-        return r;
-
-    r = fmpz_fprint(file, fq_nmod_ctx_prime(ctx));
+    r = flint_fprintf(file, "p = %wu", fq_nmod_ctx_prime(ctx));
     if (r <= 0)
         return r;
 
@@ -74,7 +70,7 @@ int fq_nmod_ctx_fprint(FILE * file, const fq_nmod_ctx_t ctx)
 
 void fq_nmod_ctx_print(const fq_nmod_ctx_t ctx) { fq_nmod_ctx_fprint(stdout, ctx); }
 
-int fq_nmod_fprint(FILE * file, const fq_nmod_t op, const fq_nmod_ctx_t ctx) { return nmod_poly_fprint(file, op); }
-void fq_nmod_print(const fq_nmod_t op, const fq_nmod_ctx_t ctx) { nmod_poly_print(op); }
+int fq_nmod_fprint(FILE * file, const fq_nmod_t op, const fq_nmod_ctx_t FLINT_UNUSED(ctx)) { return nmod_poly_fprint(file, op); }
+void fq_nmod_print(const fq_nmod_t op, const fq_nmod_ctx_t FLINT_UNUSED(ctx)) { nmod_poly_print(op); }
 int fq_nmod_fprint_pretty(FILE * file, const fq_nmod_t op, const fq_nmod_ctx_t ctx) { return nmod_poly_fprint_pretty(file, op, ctx->var); }
 void fq_nmod_print_pretty(const fq_nmod_t op, const fq_nmod_ctx_t ctx) { nmod_poly_print_pretty(op, ctx->var); }

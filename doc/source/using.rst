@@ -436,7 +436,7 @@ Generically, when evaluating a fixed expression (that is, when the
 sequence of operations does not depend on the precision), the
 absolute or relative error will be bounded by
 
-.. math ::
+.. math::
 
     2^{O(1) - prec}
 
@@ -545,7 +545,7 @@ This is not just a failsafe, but occasionally a useful optimization.
 It is not entirely uncommon to have formulas where one term
 is modest and another term decreases exponentially, such as:
 
-.. math ::
+.. math::
 
     \log(x) + \sin(x) \exp(-x).
 

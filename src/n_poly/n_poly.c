@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -33,13 +33,13 @@ void n_poly_realloc(n_poly_t A, slong len)
     if (old_alloc > 0)
     {
         FLINT_ASSERT(A->coeffs != NULL);
-        A->coeffs = (mp_limb_t *) flint_realloc(A->coeffs,
-                                                  new_alloc*sizeof(mp_limb_t));
+        A->coeffs = (ulong *) flint_realloc(A->coeffs,
+                                                  new_alloc*sizeof(ulong));
     }
     else
     {
         FLINT_ASSERT(A->coeffs == NULL);
-        A->coeffs = (mp_limb_t *) flint_malloc(new_alloc*sizeof(mp_limb_t));
+        A->coeffs = (ulong *) flint_malloc(new_alloc*sizeof(ulong));
     }
     A->alloc = new_alloc;
 }
@@ -71,4 +71,3 @@ void n_poly_set_coeff(n_poly_t poly, slong j, ulong c)
         poly->length = j + 1;
     }
 }
-

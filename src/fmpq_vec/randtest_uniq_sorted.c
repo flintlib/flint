@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -19,7 +19,7 @@ void _fmpq_vec_randtest_uniq_sorted(fmpq * vec, flint_rand_t state, slong len, f
     int do_again;
 
     /* if 2^bits < len we are too likely to have collision */
-    if (4 * n_sizeinbase(len, 2) > bits)
+    if ((ulong) (4 * n_sizeinbase(len, 2)) > bits)
         flint_throw(FLINT_ERROR, "bits too small in %s\n", __func__);
 
     _fmpq_vec_randtest(vec, state, len, bits);

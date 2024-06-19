@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -30,7 +30,7 @@ fmpz_lll_heuristic_dot(const double *vec1, const double *vec2, slong len2,
    double tmp = _d_vec_norm(vec1, len2);
    double tmp2 = _d_vec_norm(vec2, len2);
 
-   tmp = ldexp(tmp*tmp2, -70);
+   tmp = tmp*tmp2 * ldexp(1.0, -70);
    tmp2 = sum*sum;
 
    if (tmp2 <= tmp)

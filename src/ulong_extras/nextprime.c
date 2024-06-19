@@ -8,11 +8,10 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "ulong_extras.h"
 
 static unsigned int nextmod30[] =
@@ -47,7 +46,7 @@ static const unsigned short n_modular_primes_tab[N_MOD_TAB] = {
 };
 
 
-static mp_limb_t bsearch_uint(mp_limb_t n, const unsigned int *t, int tlen)
+static ulong bsearch_uint(ulong n, const unsigned int *t, int tlen)
 {
   int lo = 0;
   int hi = tlen-1;
@@ -59,7 +58,7 @@ static mp_limb_t bsearch_uint(mp_limb_t n, const unsigned int *t, int tlen)
   return t[lo];
 }
 
-mp_limb_t n_nextprime(mp_limb_t n, int proved)
+ulong n_nextprime(ulong n, int FLINT_UNUSED(proved))
 {
     ulong i, index;
 
@@ -76,8 +75,7 @@ mp_limb_t n_nextprime(mp_limb_t n, int proved)
 
     if (n >= UWORD_MAX_PRIME)
     {
-        flint_printf("Exception (n_nextprime). No larger single-limb prime exists.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (n_nextprime). No larger single-limb prime exists.\n");
     }
 
     index = n % 30;

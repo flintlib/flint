@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -62,8 +62,7 @@ int _qadic_fprint_pretty(FILE * file, const fmpz * u, slong len, slong v, const 
 
         if (i < len)
         {
-            flint_printf("ERROR (qadic_fprint_pretty).  u < 0 in SERIES mode.\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "ERROR (qadic_fprint_pretty).  u < 0 in SERIES mode.\n");
         }
 
         x = _fmpz_vec_init(len);
@@ -145,8 +144,7 @@ int _qadic_fprint_pretty(FILE * file, const fmpz * u, slong len, slong v, const 
     }
     else
     {
-        flint_printf("Exception (qadic_fprint_pretty).  Unknown print mode.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (qadic_fprint_pretty).  Unknown print mode.\n");
     }
 
     return 1;

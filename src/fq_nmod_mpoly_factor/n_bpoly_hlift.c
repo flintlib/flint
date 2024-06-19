@@ -5,10 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fq_nmod.h"
+#include "n_poly.h"
 #include "fq_nmod_mpoly_factor.h"
 
 /*
@@ -36,7 +38,7 @@ int n_fq_bpoly_hlift2_cubic(
     slong i, j;
     n_fq_poly_struct * c, * s, * t, * u, * v, * g, * ce;
     n_fq_bpoly_struct * B0e, * B1e;
-    mp_limb_t * alpha;
+    ulong * alpha;
 
     FLINT_ASSERT(n_fq_bpoly_is_canonical(A, ctx));
     FLINT_ASSERT(n_fq_bpoly_is_canonical(B0, ctx));
@@ -58,14 +60,14 @@ int n_fq_bpoly_hlift2_cubic(
     B0e  = n_bpoly_stack_take_top(St->bpoly_stack);
     B1e  = n_bpoly_stack_take_top(St->bpoly_stack);
 
-    alpha = FLINT_ARRAY_ALLOC(d, mp_limb_t);
+    alpha = FLINT_ARRAY_ALLOC(d, ulong);
     n_fq_set_fq_nmod(alpha, alpha_, ctx);
 
     n_fq_bpoly_taylor_shift_gen0_n_fq(A, alpha, ctx);
     n_fq_bpoly_taylor_shift_gen0_n_fq(B0, alpha, ctx);
     n_fq_bpoly_taylor_shift_gen0_n_fq(B1, alpha, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         n_fq_poly_t T;
         n_fq_poly_init(T);
@@ -126,7 +128,7 @@ int n_fq_bpoly_hlift2_cubic(
         nmod_eval_interp_to_coeffs_n_fq_poly(c, ce, E, ctx);
         n_fq_poly_sub(c, A->coeffs + j, c, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
         {
             n_fq_poly_t c_check;
             n_fq_poly_init(c_check);
@@ -189,7 +191,7 @@ int n_fq_bpoly_hlift2_cubic(
 
 cleanup:
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success > 0)
     {
         n_bpoly_t tp1, tp2;
@@ -229,7 +231,7 @@ int n_fq_bpoly_hlift2(
     int success;
     slong i, j;
     n_fq_poly_struct * c, * s, * t, * u, * v, * g;
-    mp_limb_t * alpha;
+    ulong * alpha;
 
     FLINT_ASSERT(n_fq_bpoly_is_canonical(A, ctx));
     FLINT_ASSERT(n_fq_bpoly_is_canonical(B0, ctx));
@@ -246,14 +248,14 @@ int n_fq_bpoly_hlift2(
     v = n_poly_stack_take_top(St->poly_stack);
     g = n_poly_stack_take_top(St->poly_stack);
 
-    alpha = FLINT_ARRAY_ALLOC(d, mp_limb_t);
+    alpha = FLINT_ARRAY_ALLOC(d, ulong);
     n_fq_set_fq_nmod(alpha, alpha_, ctx);
 
     n_fq_bpoly_taylor_shift_gen0_n_fq(A, alpha, ctx);
     n_fq_bpoly_taylor_shift_gen0_n_fq(B0, alpha, ctx);
     n_fq_bpoly_taylor_shift_gen0_n_fq(B1, alpha, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         n_poly_t T;
         n_poly_init(T);
@@ -332,7 +334,7 @@ int n_fq_bpoly_hlift2(
 
 cleanup:
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success > 0)
     {
         n_bpoly_t tp1, tp2;
@@ -366,7 +368,7 @@ int n_fq_bpoly_hlift(
     const fq_nmod_t alpha,
     slong degree_inner, /* required degree in x */
     const fq_nmod_ctx_t ctx,
-    n_poly_bpoly_stack_t St)
+    n_poly_bpoly_stack_t FLINT_UNUSED(St))
 {
     int success;
     slong i, j, k, tdeg;
@@ -421,7 +423,7 @@ int n_fq_bpoly_hlift(
         n_fq_bpoly_taylor_shift_gen0_fq_nmod(B + i, alpha, ctx);
 
     /* supposed to have A(alpha,x) = B0(alpha,x) * B1(alpha,x) * ... */
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         n_poly_t T;
         n_poly_init(T);
@@ -548,7 +550,7 @@ int n_fq_bpoly_hlift(
 
 cleanup:
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success > 0)
     {
         n_fq_bpoly_t tp1, tp2;

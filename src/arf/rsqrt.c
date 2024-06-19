@@ -5,19 +5,20 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <mpfr.h>
+#include "mpn_extras.h"
 #include "arf.h"
 
 int
 arf_rsqrt(arf_ptr z, arf_srcptr x, slong prec, arf_rnd_t rnd)
 {
-    mp_size_t xn, zn, val;
-    mp_srcptr xptr;
-    mp_ptr tmp, zptr;
+    slong xn, zn, val;
+    nn_srcptr xptr;
+    nn_ptr tmp, zptr;
     mpfr_t xf, zf;
     int inexact, odd_exp;
     ARF_MUL_TMP_DECL
@@ -60,7 +61,7 @@ arf_rsqrt(arf_ptr z, arf_srcptr x, slong prec, arf_rnd_t rnd)
     zf->_mpfr_sign = 1;
     zf->_mpfr_exp = 0;
 
-    xf->_mpfr_d = (mp_ptr) xptr;
+    xf->_mpfr_d = (nn_ptr) xptr;
     xf->_mpfr_prec = xn * FLINT_BITS;
     xf->_mpfr_sign = 1;
     xf->_mpfr_exp = odd_exp;
@@ -84,4 +85,3 @@ arf_rsqrt(arf_ptr z, arf_srcptr x, slong prec, arf_rnd_t rnd)
 
     return inexact;
 }
-

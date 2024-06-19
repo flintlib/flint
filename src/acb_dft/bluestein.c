@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -97,7 +97,7 @@ _acb_dft_bluestein_init(acb_dft_bluestein_t t, slong dv, slong n, slong prec)
     if (n == 0)
         return;
 
-    e = n_clog(2 * n - 1, 2);
+    e = FLINT_CLOG2(2 * n - 1);
 
     if (DFT_VERB)
         flint_printf("dft_bluestein: init z[2^%i]\n", e);

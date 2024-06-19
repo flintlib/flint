@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -131,7 +131,7 @@ int qfb_exponent_element(fmpz_t exponent, qfb_t f, fmpz_t n, ulong B1, ulong B2_
    n_primes_t iter;
    ulong hi, lo;
    double quot;
-   mp_bitcnt_t bits0;
+   flint_bitcnt_t bits0;
 
    n_primes_init(iter);
 

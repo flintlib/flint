@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -74,7 +74,7 @@ nmod8_randtest(nmod8_t res, flint_rand_t state, const gr_ctx_t ctx)
 int
 nmod8_write(gr_stream_t out, const nmod8_t x, const gr_ctx_t ctx)
 {
-    gr_stream_write_si(out, x[0]);
+    gr_stream_write_ui(out, x[0]);
     return GR_SUCCESS;
 }
 

@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -46,7 +46,7 @@ _arb_get_mag_lower_nonnegative(mag_t z, const arf_t mid, const mag_t rad)
         }
         else
         {
-            mp_limb_t m, xm, rm;
+            ulong m, xm, rm;
 
             ARF_GET_TOP_LIMB(xm, mid);
             xm = xm >> (FLINT_BITS - MAG_BITS);

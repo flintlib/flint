@@ -5,13 +5,16 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gmpcompat.h"
+#include "nmod.h"
+#include "fmpz_mod.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 #include "fmpz_mod_mpoly.h"
-#include "gmpcompat.h"
 
 #ifdef __GNUC__
 # define sqrt __builtin_sqrt
@@ -118,7 +121,7 @@ static int _fmpz_mod_mpoly_sqrt_heap1(
     FLINT_ASSERT(mpoly_words_per_exp(bits, mctx) == 1);
     mpoly_get_cmpmask(&cmpmask, 1, bits, mctx);
 
-    flint_randinit(heuristic_state);
+    flint_rand_init(heuristic_state);
 
     /* alloc array of heap nodes which can be chained together */
     next_loc = 2*n_sqrt(Alen) + 4;   /* something bigger than heap can ever be */
@@ -307,7 +310,7 @@ static int _fmpz_mod_mpoly_sqrt_heap1(
 
 cleanup:
 
-    flint_randclear(heuristic_state);
+    flint_rand_clear(heuristic_state);
 
     Q->coeffs = Qcoeffs;
     Q->exps = Qexps;
@@ -383,7 +386,7 @@ static int _fmpz_mod_mpoly_sqrt_heap(
     cmpmask = (ulong *) TMP_ALLOC(N*sizeof(ulong));
     mpoly_get_cmpmask(cmpmask, N, bits, mctx);
 
-    flint_randinit(heuristic_state);
+    flint_rand_init(heuristic_state);
 
     /* alloc array of heap nodes which can be chained together */
     next_loc = 2*sqrt(Alen) + 4;   /* something bigger than heap can ever be */
@@ -628,7 +631,7 @@ FLINT_ASSERT(fmpz_mod_is_canonical(Acoeffs + 0, fctx));
 
 cleanup:
 
-    flint_randclear(heuristic_state);
+    flint_rand_clear(heuristic_state);
 
     Q->coeffs = Qcoeffs;
     Q->exps = Qexps;

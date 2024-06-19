@@ -5,18 +5,23 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mpoly_factor.h"
+#include "ulong_extras.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly_factor.h"
+#include "fmpz_mpoly_factor.h"
 
 /* max = max abs coeffs(A) */
 void fmpz_mpoly_height(
     fmpz_t max,
     const fmpz_mpoly_t A,
-    const fmpz_mpoly_ctx_t ctx)
+    const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     slong i;
     fmpz_t t;
@@ -39,7 +44,7 @@ void fmpz_mpoly_heights(
     fmpz_t max,
     fmpz_t sum,
     const fmpz_mpoly_t A,
-    const fmpz_mpoly_ctx_t ctx)
+    const fmpz_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     slong i;
     fmpz_t t;
@@ -73,7 +78,7 @@ int fmpz_mpolyl_gcd_brown(
     int success;
     fmpz_t bound;
     slong offset, shift;
-    mp_limb_t p, gammared;
+    ulong p, gammared;
     fmpz_t gamma, modulus;
     fmpz_t gnm, gns, anm, ans, bnm, bns;
     fmpz_t cA, cB, cG, cAbar, cBbar;
@@ -302,4 +307,3 @@ cleanup:
 
     return success;
 }
-

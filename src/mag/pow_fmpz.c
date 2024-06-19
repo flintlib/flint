@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
 #include "mag.h"
 
 void
@@ -30,7 +31,7 @@ mag_pow_fmpz(mag_t z, const mag_t x, const fmpz_t e)
     else
     {
         mag_t y;
-        mp_srcptr elimbs;
+        nn_srcptr elimbs;
         slong i, bits;
 
         mag_init_set(y, x);
@@ -69,7 +70,7 @@ mag_pow_fmpz_lower(mag_t z, const mag_t x, const fmpz_t e)
     else
     {
         mag_t y;
-        mp_srcptr elimbs;
+        nn_srcptr elimbs;
         slong i, bits;
 
         mag_init_set(y, x);
@@ -88,4 +89,3 @@ mag_pow_fmpz_lower(mag_t z, const mag_t x, const fmpz_t e)
         mag_clear(y);
     }
 }
-

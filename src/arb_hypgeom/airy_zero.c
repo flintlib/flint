@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "arb.h"
 #include "arb_hypgeom.h"
 
 #ifdef __GNUC__
@@ -63,8 +64,7 @@ _arb_hypgeom_airy_zero(arb_t res, const fmpz_t n, int which, slong prec)
     {
         if (fmpz_sgn(n) <= 0)
         {
-            flint_printf("Airy zero only defined for index >= 1\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "Airy zero only defined for index >= 1\n");
         }
 
         /* The asymptotic expansions work well except when n == 1, so

@@ -5,14 +5,15 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
+#include "mpoly.h"
 #include "fmpq_mpoly.h"
 
-
-void fmpq_mpoly_univar_init(fmpq_mpoly_univar_t A, const fmpq_mpoly_ctx_t ctx)
+void fmpq_mpoly_univar_init(fmpq_mpoly_univar_t A, const fmpq_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     A->coeffs = NULL;
     A->exps = NULL;
@@ -246,7 +247,7 @@ void fmpq_mpoly_from_univar_bits(fmpq_mpoly_t A, flint_bitcnt_t Abits,
 
             FLINT_ASSERT(x->next == NULL);
 
-            if (x->j + 1 < (B->coeffs + x->i)->zpoly->length)
+            if (x->j + 1 < (ulong) (B->coeffs + x->i)->zpoly->length)
             {
                 FLINT_ASSERT(fmpz_fits_si(B->exps + x->i));
                 x->j = x->j + 1;
@@ -285,7 +286,7 @@ void fmpq_mpoly_from_univar_bits(fmpq_mpoly_t A, flint_bitcnt_t Abits,
 
             FLINT_ASSERT(x->next == NULL);
 
-            if (x->j + 1 < (B->coeffs + x->i)->zpoly->length)
+            if (x->j + 1 < (ulong) (B->coeffs + x->i)->zpoly->length)
             {
                 x->j = x->j + 1;
                 x->next = NULL;
@@ -361,4 +362,3 @@ void fmpq_mpoly_from_univar(fmpq_mpoly_t A, const fmpq_mpoly_univar_t B,
 
     fmpq_mpoly_from_univar_bits(A, bits, B, var, ctx);
 }
-

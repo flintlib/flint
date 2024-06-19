@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -18,12 +18,12 @@ int
 fmpz_factor_trial_range(fmpz_factor_t factor, const fmpz_t n, ulong start, ulong num_primes)
 {
     ulong exp;
-    mp_limb_t p;
+    ulong p;
     mpz_t x;
-    mp_ptr xd;
-    mp_size_t xsize;
-    slong found;
-    slong trial_start, trial_stop;
+    nn_ptr xd;
+    slong xsize;
+    ulong found;
+    ulong trial_start, trial_stop;
     int ret = 1;
 
     if (!COEFF_IS_MPZ(*n))
@@ -70,21 +70,24 @@ fmpz_factor_trial_range(fmpz_factor_t factor, const fmpz_t n, ulong start, ulong
         {
             p = n_primes_arr_readonly(found+1)[found];
             exp = 1;
-            xsize = flint_mpn_divexact_1(xd, xsize, p);
+            mpn_divexact_1(xd, xd, xsize, p);
+            xsize -= (xd[xsize - 1] == 0);
 
             /* Check if p^2 divides n */
             if (flint_mpn_divisible_1_odd(xd, xsize, p))
             {
                 /* TODO: when searching for squarefree numbers
                    (Moebius function, etc), we can abort here. */
-                xsize = flint_mpn_divexact_1(xd, xsize, p);
+                mpn_divexact_1(xd, xd, xsize, p);
+                xsize -= (xd[xsize - 1] == 0);
                 exp = 2;
             }
 
             /* If we're up to cubes, then maybe there are higher powers */
             if (exp == 2 && flint_mpn_divisible_1_odd(xd, xsize, p))
             {
-                xsize = flint_mpn_divexact_1(xd, xsize, p);
+                mpn_divexact_1(xd, xd, xsize, p);
+                xsize -= (xd[xsize - 1] == 0);
                 xsize = flint_mpn_remove_power_ascending(xd, xsize, &p, 1, &exp);
                 exp += 3;
             }

@@ -5,12 +5,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mod.h"
+#include "mpoly.h"
 #include "fmpz_mod_mpoly_factor.h"
-
 
 /*
     E = A(v = alpha)
@@ -121,7 +122,7 @@ int fmpz_mod_polyu1n_intp_crt_sm_poly(
             FLINT_ASSERT(!fmpz_is_zero(Acoeffs + Ai));
         }
 
-        if (Fi < Flen && Ai >= 0 && Fexps[Fi] == Ai)
+        if (Fi < Flen && Ai >= 0 && Fexps[Fi] == (ulong) Ai)
         {
             /* F term ok, A term ok */
             fmpz_mod_poly_evaluate_fmpz(v, Fcoeffs + Fi, alpha, ctx);
@@ -135,7 +136,7 @@ int fmpz_mod_polyu1n_intp_crt_sm_poly(
                 Ai--;
             } while (Ai >= 0 && fmpz_is_zero(Acoeffs + Ai));
         }
-        else if (Fi < Flen && (Ai < 0 || Fexps[Fi] > Ai))
+        else if (Fi < Flen && (Ai < 0 || Fexps[Fi] > (ulong) Ai))
         {
             /* F term ok, A term missing */
             fmpz_mod_poly_evaluate_fmpz(v, Fcoeffs + Fi, alpha, ctx);
@@ -347,7 +348,7 @@ int fmpz_mod_polyu1n_interp_crt_2sm_poly(
     Texps = T->exps;
     Ti = 0;
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mod_poly_evaluate_fmpz(u, modulus, alphapow->coeffs + 1, ctx);
     fmpz_mod_mul(u, u, alphapow->coeffs + 1, ctx);
     fmpz_mod_add(u, u, u, ctx);
@@ -589,7 +590,7 @@ int fmpz_mod_mpolyn_interp_crt_sm_poly(
 
         mpoly_monomial_zero(Texp + N*Ti, N);
 
-        if (Fi < Flen && Ai >= 0 && ((Fexp + N*Fi)[off]>>shift) == Ai)
+        if (Fi < Flen && Ai >= 0 && ((Fexp + N*Fi)[off]>>shift) == (ulong) Ai)
         {
             /* F term ok, A term ok */
             fmpz_mod_poly_evaluate_fmpz(u, Fcoeff + Fi, alpha, ctx->ffinfo);
@@ -611,7 +612,7 @@ int fmpz_mod_mpolyn_interp_crt_sm_poly(
                 Ai--;
             } while (Ai >= 0 && fmpz_is_zero(Acoeff + Ai));
         }
-        else if (Fi < Flen && (Ai < 0 || ((Fexp + N*Fi)[off]>>shift) > Ai))
+        else if (Fi < Flen && (Ai < 0 || ((Fexp + N*Fi)[off]>>shift) > (ulong) Ai))
         {
             /* F term ok, A term missing */
             fmpz_mod_poly_evaluate_fmpz(v, Fcoeff + Fi, alpha, ctx->ffinfo);
@@ -629,7 +630,7 @@ int fmpz_mod_mpolyn_interp_crt_sm_poly(
             (Texp + N*Ti)[off] = (Fexp + N*Fi)[off];
             Fi++;
         }
-        else if (Ai >= 0 && (Fi >= Flen || ((Fexp + N*Fi)[off]>>shift) < Ai))
+        else if (Ai >= 0 && (Fi >= Flen || ((Fexp + N*Fi)[off]>>shift) < (ulong) Ai))
         {
             /* F term missing, A term ok */
             changed = 1;
@@ -971,7 +972,7 @@ int fmpz_mod_mpolyn_interp_crt_2sm_mpolyn(
     fmpz_init(FvalueA);
     fmpz_init(FvalueB);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mod_poly_evaluate_fmpz(u, modulus, alphapow->coeffs + 1, ctx->ffinfo);
     fmpz_mod_mul(u, u, alphapow->coeffs + 1, ctx->ffinfo);
     fmpz_mod_add(u, u, u, ctx->ffinfo);
@@ -1315,4 +1316,3 @@ int fmpz_mod_mpolyn_interp_mcrt_sm_mpoly(
     *lastdeg = lastlen - 1;
     return changed;
 }
-

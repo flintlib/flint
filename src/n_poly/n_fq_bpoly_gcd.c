@@ -5,13 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
+#include "fq_nmod.h"
 #include "n_poly.h"
 #include "fq_nmod_mpoly_factor.h"
-
 
 /* g is in Fq[gen(1)] */
 static void n_fq_bpoly_content_var0(
@@ -77,17 +78,17 @@ void n_fq_bpoly_mul_last(n_bpoly_t A, const n_poly_t b, const fq_nmod_ctx_t ctx)
 /*****************************************************************************/
 
 void n_fq_poly_eval2p_pow(
-    mp_limb_t * vp,
-    mp_limb_t * vm,
+    ulong * vp,
+    ulong * vm,
     const n_fq_poly_t P,
     n_poly_t alphapow,
     slong d,
     nmod_t ctx)
 {
-    const mp_limb_t * Pcoeffs = P->coeffs;
+    const ulong * Pcoeffs = P->coeffs;
     slong Plen = P->length;
-    mp_limb_t * alpha_powers = alphapow->coeffs;
-    mp_limb_t p1, p0, a0, a1, a2, q1, q0, b0, b1, b2;
+    ulong * alpha_powers = alphapow->coeffs;
+    ulong p1, p0, a0, a1, a2, q1, q0, b0, b1, b2;
     slong i, k;
 
     FLINT_ASSERT(P->alloc >= d*Plen);
@@ -146,7 +147,7 @@ void n_fq_bpoly_interp_reduce_2psm_poly(
     slong d = fq_nmod_ctx_degree(ctx);
     slong i, Alen = A->length;
     const n_poly_struct * Ac = A->coeffs;
-    mp_limb_t * Apc, * Amc;
+    ulong * Apc, * Amc;
 
     n_poly_fit_length(Ap, d*Alen);
     n_poly_fit_length(Am, d*Alen);
@@ -170,24 +171,24 @@ void n_fq_bpoly_interp_lift_2psm_poly(
     n_fq_bpoly_t T,
     const n_fq_poly_t A,
     const n_fq_poly_t B,
-    mp_limb_t alpha,
+    ulong alpha,
     const fq_nmod_ctx_t ctx)
 {
     slong d = fq_nmod_ctx_degree(ctx);
     nmod_t mod = fq_nmod_ctx_mod(ctx);
     slong i, j;
     slong lastlength = 0;
-    const mp_limb_t * Acoeffs = A->coeffs;
-    const mp_limb_t * Bcoeffs = B->coeffs;
+    const ulong * Acoeffs = A->coeffs;
+    const ulong * Bcoeffs = B->coeffs;
     n_fq_poly_struct * Tcoeffs;
     slong Alen = A->length;
     slong Blen = B->length;
     slong Tlen = FLINT_MAX(Alen, Blen);
-    mp_limb_t d0 = (1 + mod.n)/2;
-    mp_limb_t d1 = nmod_inv(nmod_add(alpha, alpha, mod), mod);
-    mp_limb_t * u, u1nonzero, u0nonzero;
+    ulong d0 = (1 + mod.n)/2;
+    ulong d1 = nmod_inv(nmod_add(alpha, alpha, mod), mod);
+    ulong * u, u1nonzero, u0nonzero;
 
-    u = FLINT_ARRAY_ALLOC(2*d, mp_limb_t);
+    u = FLINT_ARRAY_ALLOC(2*d, ulong);
 
     n_bpoly_fit_length(T, Tlen);
 
@@ -268,15 +269,15 @@ void n_fq_bpoly_interp_lift_2psm_poly(
 
 void _n_fq_poly_addmul_plinear(
     n_fq_poly_t A,
-    mp_limb_t * Bcoeffs, slong Blen,
+    ulong * Bcoeffs, slong Blen,
     const n_poly_t C,
-    mp_limb_t * s,
+    ulong * s,
     slong d,
     nmod_t mod)
 {
     slong i, j;
-    mp_limb_t * Acoeffs;
-    mp_limb_t * Ccoeffs = C->coeffs;
+    ulong * Acoeffs;
+    ulong * Ccoeffs = C->coeffs;
     slong Clen = C->length;
     slong Alen = FLINT_MAX(Blen, Clen + 1);
 
@@ -330,9 +331,9 @@ int n_fq_bpoly_interp_crt_2psm_poly(
     slong Flen = F->length;
     slong Tlen = FLINT_MAX(FLINT_MAX(Alen, Blen), Flen);
     n_fq_poly_struct * Tcoeffs, * Fcoeffs;
-    mp_limb_t * Acoeffs, * Bcoeffs;
-    mp_limb_t * u, unonzero;
-    mp_limb_t malpha = mod.n - alphapow->coeffs[1];
+    ulong * Acoeffs, * Bcoeffs;
+    ulong * u, unonzero;
+    ulong malpha = mod.n - alphapow->coeffs[1];
 
     n_bpoly_fit_length(T, Tlen);
     Tcoeffs = T->coeffs;
@@ -340,7 +341,7 @@ int n_fq_bpoly_interp_crt_2psm_poly(
     Bcoeffs = B->coeffs;
     Fcoeffs = F->coeffs;
 
-    u = FLINT_ARRAY_ALLOC(2*d, mp_limb_t);
+    u = FLINT_ARRAY_ALLOC(2*d, ulong);
 
     for (i = 0; i < Tlen; i++)
     {
@@ -358,8 +359,8 @@ int n_fq_bpoly_interp_crt_2psm_poly(
         unonzero = 0;
         for (j = 0; j < d; j++)
         {
-            mp_limb_t t1 = nmod_sub(u[d*1 + j], u[d*0 + j], mod);
-            mp_limb_t t0 = nmod_add(u[d*1 + j], u[d*0 + j], mod);
+            ulong t1 = nmod_sub(u[d*1 + j], u[d*0 + j], mod);
+            ulong t0 = nmod_add(u[d*1 + j], u[d*0 + j], mod);
             u[d*1 + j] = t1;
             unonzero |= u[d*1 + j];
             u[d*0 + j] = nmod_mul(malpha, t0, mod);
@@ -368,7 +369,7 @@ int n_fq_bpoly_interp_crt_2psm_poly(
 
         if (unonzero)
         {
-            mp_limb_t * Ficoeffs = i < Flen ? Fcoeffs[i].coeffs : NULL;
+            ulong * Ficoeffs = i < Flen ? Fcoeffs[i].coeffs : NULL;
             slong Filen = i < Flen ? Fcoeffs[i].length : 0;
             _n_fq_poly_addmul_plinear(Tcoeffs + i, Ficoeffs, Filen, modulus, u, d, mod);
             changed = 1;
@@ -422,7 +423,7 @@ int n_fq_bpoly_gcd_brown_smprime2p(
     nmod_t mod = fq_nmod_ctx_mod(ctx);
     int success;
     slong bound;
-    mp_limb_t alpha, temp, * gammaevalp, * gammaevalm;
+    ulong alpha, temp, * gammaevalp, * gammaevalm;
     n_fq_poly_struct * Aevalp, * Bevalp, * Gevalp, * Abarevalp, * Bbarevalp;
     n_fq_poly_struct * Aevalm, * Bevalm, * Gevalm, * Abarevalm, * Bbarevalm;
     n_bpoly_struct * T;
@@ -441,8 +442,8 @@ int n_fq_bpoly_gcd_brown_smprime2p(
     FLINT_ASSERT(A->length > 0);
     FLINT_ASSERT(B->length > 0);
 
-    gammaevalp = FLINT_ARRAY_ALLOC(d, mp_limb_t);
-    gammaevalm = FLINT_ARRAY_ALLOC(d, mp_limb_t);
+    gammaevalp = FLINT_ARRAY_ALLOC(d, ulong);
+    gammaevalm = FLINT_ARRAY_ALLOC(d, ulong);
 
     n_poly_stack_fit_request(Sp->poly_stack, 12);
     Aevalp      = n_poly_stack_take_top(Sp->poly_stack);
@@ -667,7 +668,7 @@ void n_fq_bpoly_interp_reduce_sm_poly(
     slong d = fq_nmod_ctx_degree(ctx);
     slong i, Alen = A->length;
     const n_fq_poly_struct * Ac = A->coeffs;
-    mp_limb_t * Ec;
+    ulong * Ec;
 
     n_poly_fit_length(E, d*Alen);
     Ec = E->coeffs;
@@ -686,7 +687,7 @@ void n_fq_bpoly_interp_lift_sm_poly(
 {
     slong d = fq_nmod_ctx_degree(ctx);
     slong i;
-    const mp_limb_t * Acoeffs = A->coeffs;
+    const ulong * Acoeffs = A->coeffs;
     n_poly_struct * Tcoeffs;
     slong Alen = A->length;
 
@@ -719,14 +720,14 @@ int n_fq_bpoly_interp_crt_sm_poly(
     slong Alen = A->length;
     slong Flen = F->length;
     n_fq_poly_struct * Tcoeffs, * Fcoeffs;
-    mp_limb_t * Acoeffs;
-    mp_limb_t * u, * v;
+    ulong * Acoeffs;
+    ulong * u, * v;
 
     FLINT_ASSERT(n_fq_bpoly_is_canonical(F, ctx));
     FLINT_ASSERT(n_fq_poly_is_canonical(A, ctx));
 
-    u = FLINT_ARRAY_ALLOC(d, mp_limb_t);
-    v = FLINT_ARRAY_ALLOC(d, mp_limb_t);
+    u = FLINT_ARRAY_ALLOC(d, ulong);
+    v = FLINT_ARRAY_ALLOC(d, ulong);
 
     n_fq_bpoly_fit_length(T, FLINT_MAX(Alen, Flen));
     Tcoeffs = T->coeffs;
@@ -801,14 +802,14 @@ int n_fq_bpoly_gcd_brown_smprime(
     int success;
     slong bound;
     fq_nmod_t alpha;
-    mp_limb_t * temp, * gammaeval;
+    ulong * temp, * gammaeval;
     n_poly_struct * Aeval, * Beval, * Geval, * Abareval, * Bbareval;
     n_bpoly_struct * T;
     slong deggamma, ldegG, ldegAbar, ldegBbar, ldegA, ldegB;
     n_poly_struct * cA, * cB, * cG, * cAbar, * cBbar, * gamma;
     n_poly_struct * modulus, * alphapow, * r;
     int gstab, astab, bstab, use_stab;
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     n_fq_bpoly_t Asave, Bsave;
     const slong Sp_size_poly = n_poly_stack_size(Sp->poly_stack);
     const slong Sp_size_bpoly = n_bpoly_stack_size(Sp->bpoly_stack);
@@ -846,7 +847,7 @@ int n_fq_bpoly_gcd_brown_smprime(
     if (n_fq_bpoly_gcd_brown_smprime2p(G, Abar, Bbar, A, B, ctx, Sp,
                                            cA, cB, cG, cAbar, cBbar, gamma, r))
     {
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
         {
             n_fq_poly_struct * Glead = G->coeffs + G->length - 1;
             n_fq_bpoly_t P;
@@ -872,8 +873,8 @@ int n_fq_bpoly_gcd_brown_smprime(
     FLINT_ASSERT(B->length > 0);
 
     fq_nmod_init(alpha, ctx);
-    temp = FLINT_ARRAY_ALLOC(d, mp_limb_t);
-    gammaeval = FLINT_ARRAY_ALLOC(d, mp_limb_t);
+    temp = FLINT_ARRAY_ALLOC(d, ulong);
+    gammaeval = FLINT_ARRAY_ALLOC(d, ulong);
 
     n_poly_stack_fit_request(Sp->poly_stack, 7);
     Aeval       = n_poly_stack_take_top(Sp->poly_stack);
@@ -1037,7 +1038,7 @@ successful_put_content:
 
 cleanup:
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success)
     {
         n_fq_poly_struct * Glead = G->coeffs + G->length - 1;

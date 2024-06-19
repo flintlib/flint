@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "arb.h"
 #include "arb_mat.h"
 
 int
@@ -20,15 +21,13 @@ arb_mat_spd_inv(arb_mat_t X, const arb_mat_t A, slong prec)
 
     if (!arb_mat_is_square(A))
     {
-        flint_printf("arb_mat_spd_inv: a square matrix is required\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "arb_mat_spd_inv: a square matrix is required\n");
     }
 
     if (arb_mat_nrows(X) != arb_mat_nrows(A) ||
         arb_mat_ncols(X) != arb_mat_ncols(A))
     {
-        flint_printf("arb_mat_spd_inv: incompatible dimensions\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "arb_mat_spd_inv: incompatible dimensions\n");
     }
 
     if (arb_mat_is_empty(A))

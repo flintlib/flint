@@ -5,21 +5,22 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "flint-mparam.h"
+#include "mpn_extras.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fft.h"
-#include "fft_tuning.h"
 
 void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, slong len1,
                const fmpz * input2, slong len2, slong trunc)
 {
     slong len_out, loglen, loglen2, n;
     slong output_bits, limbs, size, i;
-    mp_limb_t * ptr, ** t1, ** t2, ** tt, ** s1, ** ii, ** jj;
+    ulong * ptr, ** t1, ** t2, ** tt, ** s1, ** ii, ** jj;
     slong bits1, bits2;
     ulong size1, size2;
     int sign = 0;
@@ -60,13 +61,13 @@ void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, slong len1,
     /* allocate space for ffts */
 
     N = flint_get_num_threads();
-    ii = flint_malloc((4*(n + n*size) + 5*size*N)*sizeof(mp_limb_t));
-    for (i = 0, ptr = (mp_limb_t *) ii + 4*n; i < 4*n; i++, ptr += size)
+    ii = flint_malloc((4*(n + n*size) + 5*size*N)*sizeof(ulong));
+    for (i = 0, ptr = (ulong *) ii + 4*n; i < 4*n; i++, ptr += size)
         ii[i] = ptr;
-   t1 = TMP_ALLOC(N*sizeof(mp_limb_t *));
-   t2 = TMP_ALLOC(N*sizeof(mp_limb_t *));
-   s1 = TMP_ALLOC(N*sizeof(mp_limb_t *));
-   tt = TMP_ALLOC(N*sizeof(mp_limb_t *));
+   t1 = TMP_ALLOC(N*sizeof(ulong *));
+   t2 = TMP_ALLOC(N*sizeof(ulong *));
+   s1 = TMP_ALLOC(N*sizeof(ulong *));
+   tt = TMP_ALLOC(N*sizeof(ulong *));
 
    t1[0] = ptr;
    t2[0] = t1[0] + size*N;
@@ -83,8 +84,8 @@ void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, slong len1,
 
     if (input1 != input2)
     {
-        jj = flint_malloc(4*(n + n*size)*sizeof(mp_limb_t));
-        for (i = 0, ptr = (mp_limb_t *) jj + 4*n; i < 4*n; i++, ptr += size)
+        jj = flint_malloc(4*(n + n*size)*sizeof(ulong));
+        for (i = 0, ptr = (ulong *) jj + 4*n; i < 4*n; i++, ptr += size)
             jj[i] = ptr;
     } else jj = ii;
 

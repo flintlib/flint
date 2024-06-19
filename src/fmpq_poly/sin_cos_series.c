@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -61,6 +61,7 @@ _fmpq_poly_sin_cos_series_basecase_can(fmpz * S, fmpz_t Sden,
         fmpz_zero(t);
         fmpz_zero(u);
 
+        /* todo: precompute A[j] * j, use dot products */
         for (j = 1; j < FLINT_MIN(Alen, k + 1); j++)
         {
             fmpz_mul_ui(v, A + j, j);
@@ -167,8 +168,7 @@ fmpq_poly_sin_cos_series(fmpq_poly_t res1, fmpq_poly_t res2, const fmpq_poly_t p
 
     if (!fmpz_is_zero(poly->coeffs))
     {
-        flint_printf("Exception (fmpq_poly_sin_cos_series). Constant term != 0.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpq_poly_sin_cos_series). Constant term != 0.\n");
     }
 
     fmpq_poly_fit_length(res1, n);
@@ -180,4 +180,3 @@ fmpq_poly_sin_cos_series(fmpq_poly_t res1, fmpq_poly_t res2, const fmpq_poly_t p
     _fmpq_poly_set_length(res2, n);
     _fmpq_poly_normalise(res2);
 }
-

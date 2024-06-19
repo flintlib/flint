@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -14,9 +14,9 @@
 #include "nmod_poly.h"
 #include "arith.h"
 
-mp_limb_t nmod_inv_check(mp_limb_t x, nmod_t mod)
+ulong nmod_inv_check(ulong x, nmod_t mod)
 {
-    mp_limb_t r, g;
+    ulong r, g;
 
     g = n_gcdinv(&r, x, mod.n);
     if (g != 1)
@@ -26,10 +26,10 @@ mp_limb_t nmod_inv_check(mp_limb_t x, nmod_t mod)
 }
 
 int
-arith_bell_number_nmod_vec_series(mp_ptr res, slong n, nmod_t mod)
+arith_bell_number_nmod_vec_series(nn_ptr res, slong n, nmod_t mod)
 {
-    mp_limb_t c;
-    mp_ptr tmp;
+    ulong c;
+    nn_ptr tmp;
     slong k;
     int success;
 
@@ -39,7 +39,7 @@ arith_bell_number_nmod_vec_series(mp_ptr res, slong n, nmod_t mod)
     if (mod.n == 1)
         return 0;
 
-    tmp = flint_malloc(sizeof(mp_limb_t) * n);
+    tmp = flint_malloc(sizeof(ulong) * n);
 
     /* Compute inverse factorials */
     c = 1;

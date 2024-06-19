@@ -5,12 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_poly.h"
 #include "arb_poly.h"
 #include "arb_fmpz_poly.h"
+#include "acb.h"
 #include "acb_dirichlet.h"
 
 #ifdef __GNUC__
@@ -112,8 +114,7 @@ arb_fmpz_poly_gauss_period_minpoly(fmpz_poly_t res, ulong q, ulong n)
                 if (arb_contains_zero(acb_imagref(u)))
                 {
                     /* todo: could increase precision */
-                    flint_printf("fail! imaginary part should be nonzero\n");
-                    flint_abort();
+                    flint_throw(FLINT_ERROR, "fail! imaginary part should be nonzero\n");
                 }
                 else
                 {
@@ -166,4 +167,3 @@ arb_fmpz_poly_gauss_period_minpoly(fmpz_poly_t res, ulong q, ulong n)
 
     flint_free(es);
 }
-

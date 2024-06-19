@@ -5,12 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "profiler.h"
-#include "flint.h"
 #include "ulong_extras.h"
 
 typedef struct
@@ -21,13 +20,13 @@ typedef struct
 
 void sample(void * arg, ulong count)
 {
-   mp_limb_t d, dinv, r = 0;
+   ulong d, dinv, r = 0;
    double dpre;
    info_t * info = (info_t *) arg;
    flint_bitcnt_t bits = info->bits;
    ulong type = info->type;
    ulong i;
-   mp_ptr arr = (mp_ptr) flint_malloc(1024*sizeof(mp_limb_t));
+   nn_ptr arr = (nn_ptr) flint_malloc(1024*sizeof(ulong));
    FLINT_TEST_INIT(state);
 
 
@@ -50,7 +49,7 @@ void sample(void * arg, ulong count)
 	  /*case 1:
 
          prof_start();
-         for (mp_size_t j = 0; j < UWORD(10000); j++)
+         for (slong j = 0; j < UWORD(10000); j++)
          {
             r += n_empty(arr[j&1023], d, dinv);
          }
@@ -72,7 +71,7 @@ void sample(void * arg, ulong count)
 	  /*case 3:
 
          prof_start();
-         for (mp_size_t j = 0; j < UWORD(10000); j++)
+         for (slong j = 0; j < UWORD(10000); j++)
          {
             r += n_mod3_preinv(arr[j&1023], d, dinv);
          }
@@ -107,7 +106,7 @@ void sample(void * arg, ulong count)
 
    if (r == UWORD(9879875897)) flint_abort();
 
-   flint_randclear(state);
+   flint_rand_clear(state);
    flint_free(arr);
 }
 

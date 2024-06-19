@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -22,13 +22,13 @@ TEST_FUNCTION_START(nmod_mat_det_howell, state)
     {
         nmod_mat_t A;
         fmpz_mat_t B;
-        mp_limb_t Adet;
+        ulong Adet;
         fmpz_t Bdet;
         ulong t;
 
-	m = n_randint(state, 30);
+        m = n_randint(state, 30);
         mod = n_randtest(state);
-	mod += mod == 0;
+        mod += mod == 0;
 
         nmod_mat_init(A, m, m, mod);
         fmpz_mat_init(B, m, m);
@@ -37,13 +37,13 @@ TEST_FUNCTION_START(nmod_mat_det_howell, state)
         {
             case 0:
                 nmod_mat_randrank(A, state, m);
-                nmod_mat_randops(A, n_randint(state, 2*m + 1), state);
+                nmod_mat_randops(A, state, n_randint(state, 2*m + 1));
                 break;
             case 1:
                 t = n_randint(state, m);
                 t = FLINT_MIN(t, m);
                 nmod_mat_randrank(A, state, t);
-                nmod_mat_randops(A, n_randint(state, 2*m + 1), state);
+                nmod_mat_randops(A, state, n_randint(state, 2*m + 1));
                 break;
             default:
                 nmod_mat_randtest(A, state);
@@ -58,12 +58,7 @@ TEST_FUNCTION_START(nmod_mat_det_howell, state)
         fmpz_mod_ui(Bdet, Bdet, mod);
 
         if (Adet != fmpz_get_ui(Bdet))
-        {
-            flint_printf("FAIL\n");
-	    flint_printf("Adet = %wu, Bdet = %wu\n", Adet, fmpz_get_ui(Bdet));
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("Adet = %wu, Bdet = %wu\n", Adet, fmpz_get_ui(Bdet));
 
         nmod_mat_clear(A);
         fmpz_mat_clear(B);

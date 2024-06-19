@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -165,6 +165,8 @@ gr_mat_minpoly_field(gr_poly_t p, const gr_mat_t X, gr_ctx_t ctx)
         }
         _gr_poly_set_length(b, r1 + 1, ctx);
 
+        /* todo: poly_divexact */
+        /* todo: compute as (p * b) / g or (p / g) * b or p * (g / b) ? */
         status |= gr_poly_gcd(g, p, b, ctx);
         status |= gr_poly_mul(p, p, b, ctx);
         status |= gr_poly_divrem(p, r, p, g, ctx);

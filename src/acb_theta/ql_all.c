@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "acb.h"
 #include "acb_mat.h"
 #include "acb_theta.h"
 
@@ -159,7 +160,7 @@ acb_theta_ql_all_red(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
     int hasz = !_acb_vec_is_zero(z, g);
     int res;
 
-    flint_randinit(state);
+    flint_rand_init(state);
     d = _arb_vec_init(n);
     d0 = _arb_vec_init(n);
     acb_mat_init(tau_mid, g, g);
@@ -219,7 +220,7 @@ acb_theta_ql_all_red(acb_ptr th, acb_srcptr z, const acb_mat_t tau, slong prec)
         }
     }
 
-    flint_randclear(state);
+    flint_rand_clear(state);
     _arb_vec_clear(d, n);
     _arb_vec_clear(d0, n);
     acb_mat_clear(tau_mid);
@@ -247,7 +248,7 @@ acb_theta_ql_all_sqr_red(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong p
     slong j, k;
     int res;
 
-    flint_randinit(state);
+    flint_rand_init(state);
     acb_mat_init(w, g, g);
     x = _acb_vec_init(g);
     d = _arb_vec_init(n);
@@ -288,7 +289,7 @@ acb_theta_ql_all_sqr_red(acb_ptr th2, acb_srcptr z, const acb_mat_t tau, slong p
         acb_theta_ql_dupl(th2, th, th, d0, d0, g, prec);
     }
 
-    flint_randclear(state);
+    flint_rand_clear(state);
     acb_mat_clear(w);
     _acb_vec_clear(x, g);
     _arb_vec_clear(d, n);

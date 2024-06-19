@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -66,15 +66,15 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
 		                                        slong bits, int proved)
 {
     ulong exp;
-    mp_limb_t p;
-    __mpz_struct * xsrc;
-    mp_ptr xd;
-    mp_size_t xsize;
+    ulong p;
+    mpz_ptr xsrc;
+    nn_ptr xd;
+    slong xsize;
     slong found;
     slong trial_stop;
     slong * idx;
     slong i, b, bits2, istride;
-    const mp_limb_t * primes;
+    const ulong * primes;
     int ret = 0;
 
     TMP_INIT;
@@ -109,7 +109,7 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
 
     /* Create a temporary copy to be mutated */
     TMP_START;
-    xd = TMP_ALLOC(xsize * sizeof(mp_limb_t));
+    xd = TMP_ALLOC(xsize * sizeof(ulong));
     flint_mpn_copyi(xd, xsrc->_mp_d, xsize);
 
     /* Factor out powers of two */
@@ -119,8 +119,7 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
 
     if (bits <= 0)
     {
-        flint_printf("(fmpz_factor_smooth) Number of bits must be at least 1\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(fmpz_factor_smooth) Number of bits must be at least 1\n");
     }
 
     if (bits <= 15)
@@ -145,19 +144,22 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
                 continue;
 
             exp = 1;
-            xsize = flint_mpn_divexact_1(xd, xsize, p);
+            mpn_divexact_1(xd, xd, xsize, p);
+            xsize -= (xd[xsize - 1] == 0);
 
             /* Check if p^2 divides n */
             if (flint_mpn_divisible_1_odd(xd, xsize, p))
             {
-                xsize = flint_mpn_divexact_1(xd, xsize, p);
+                mpn_divexact_1(xd, xd, xsize, p);
+                xsize -= (xd[xsize - 1] == 0);
                 exp = 2;
             }
 
             /* If we're up to cubes, then maybe there are higher powers */
             if (exp == 2 && flint_mpn_divisible_1_odd(xd, xsize, p))
             {
-                xsize = flint_mpn_divexact_1(xd, xsize, p);
+                mpn_divexact_1(xd, xd, xsize, p);
+                xsize -= (xd[xsize - 1] == 0);
                 xsize = flint_mpn_remove_power_ascending(xd, xsize, &p, 1, &exp);
                 exp += 3;
             }
@@ -177,7 +179,7 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
     else
     {
         fmpz_t n2, f;
-        __mpz_struct * data;
+        mpz_ptr data;
 
         fmpz_init2(n2, xsize);
 
@@ -217,7 +219,7 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
                 flint_rand_t state;
 
                 fmpz_init(f);
-                flint_randinit(state);
+                flint_rand_init(state);
 
                 /* currently only tuning values up to factors of 100 bits */
                 bits = FLINT_MIN(bits, 100);
@@ -244,7 +246,7 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
                         }
 
                         /* if what remains is below the bound, just factor it */
-                        if (fmpz_sizeinbase(n2, 2) < bits)
+                        if (fmpz_sizeinbase(n2, 2) < (ulong) bits)
                         {
                             fmpz_factor_no_trial(factor, n2);
 
@@ -266,7 +268,7 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
                     }
                 }
 
-                flint_randclear(state);
+                flint_rand_clear(state);
                 fmpz_clear(f);
             }
         }
@@ -284,4 +286,3 @@ int fmpz_factor_smooth(fmpz_factor_t factor, const fmpz_t n,
     TMP_END;
     return ret;
 }
-

@@ -6,10 +6,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpn_extras.h"
 #include "fmpz.h"
 #include "fmpz_mod.h"
 #include "fmpz_mod_poly.h"
@@ -23,7 +24,7 @@ void fmpz_mod_poly_set_coeff_si(fmpz_mod_poly_t poly, slong n, slong x,
 
     if (n + 1 > poly->length)
     {
-        flint_mpn_zero((mp_ptr) (poly->coeffs + poly->length), n - poly->length);
+        flint_mpn_zero((nn_ptr) (poly->coeffs + poly->length), n - poly->length);
         poly->length = n + 1;
     }
 
@@ -48,7 +49,7 @@ void fmpz_mod_poly_set_coeff_ui(fmpz_mod_poly_t poly, slong n, ulong x,
 
         if (n + 1 > poly->length)
         {
-            flint_mpn_zero((mp_ptr) (poly->coeffs + poly->length), n - poly->length);
+            flint_mpn_zero((nn_ptr) (poly->coeffs + poly->length), n - poly->length);
             poly->length = n + 1;
         }
 
@@ -76,7 +77,7 @@ void fmpz_mod_poly_set_coeff_fmpz(fmpz_mod_poly_t poly, slong n, const fmpz_t x,
 
         if (n + 1 > poly->length)
         {
-            flint_mpn_zero((mp_ptr) (poly->coeffs + poly->length), n - poly->length);
+            flint_mpn_zero((nn_ptr) (poly->coeffs + poly->length), n - poly->length);
             poly->length = n + 1;
         }
 
@@ -90,7 +91,7 @@ void fmpz_mod_poly_set_coeff_fmpz(fmpz_mod_poly_t poly, slong n, const fmpz_t x,
 /* Getters ********************************************************************/
 
 void fmpz_mod_poly_get_coeff_fmpz(fmpz_t x, const fmpz_mod_poly_t poly,
-                                             slong n, const fmpz_mod_ctx_t ctx)
+                                             slong n, const fmpz_mod_ctx_t FLINT_UNUSED(ctx))
 {
     if (n < poly->length)
         fmpz_set(x, poly->coeffs + n);

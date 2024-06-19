@@ -5,13 +5,18 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
+#include "thread_pool.h"
 #include "thread_support.h"
 #include "long_extras.h"
+#include "nmod.h"
+#include "fmpz.h"
 #include "fmpz_vec.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 /*
@@ -19,10 +24,10 @@
     this functions reallocates A and returns the length of A
     version for N == 1
 */
-void _nmod_mpoly_mul_heap_part1(
+static void _nmod_mpoly_mul_heap_part1(
     nmod_mpoly_t A,
-    const mp_limb_t * Bcoeff, const ulong * Bexp, slong Blen,
-    const mp_limb_t * Ccoeff, const ulong * Cexp, slong Clen,
+    const ulong * Bcoeff, const ulong * Bexp, slong Blen,
+    const ulong * Ccoeff, const ulong * Cexp, slong FLINT_UNUSED(Clen),
     slong * start,
     slong * end,
     slong * hind,
@@ -39,8 +44,8 @@ void _nmod_mpoly_mul_heap_part1(
     slong * store, * store_base;
     slong Alen;
     ulong * Aexp = A->exps;
-    mp_limb_t * Acoeff = A->coeffs;
-    mp_limb_t acc0, acc1, acc2, pp0, pp1;
+    ulong * Acoeff = A->coeffs;
+    ulong acc0, acc1, acc2, pp0, pp1;
 
     FLINT_ASSERT(S->N == 1);
 
@@ -159,10 +164,10 @@ void _nmod_mpoly_mul_heap_part1(
 }
 
 
-void _nmod_mpoly_mul_heap_part(
+static void _nmod_mpoly_mul_heap_part(
     nmod_mpoly_t A,
-    const mp_limb_t * Bcoeff, const ulong * Bexp, slong Blen,
-    const mp_limb_t * Ccoeff, const ulong * Cexp, slong Clen,
+    const ulong * Bcoeff, const ulong * Bexp, slong Blen,
+    const ulong * Ccoeff, const ulong * Cexp, slong FLINT_UNUSED(Clen),
     slong * start,
     slong * end,
     slong * hind,
@@ -183,7 +188,7 @@ void _nmod_mpoly_mul_heap_part(
     slong * store, * store_base;
     slong Alen;
     ulong * Aexp = A->exps;
-    mp_limb_t * Acoeff = A->coeffs;
+    ulong * Acoeff = A->coeffs;
     ulong acc0, acc1, acc2, pp0, pp1;
 
     /* tmp allocs from S->big_mem */
@@ -348,12 +353,12 @@ typedef struct
     slong nthreads;
     slong ndivs;
     const nmod_mpoly_ctx_struct * ctx;
-    mp_limb_t * Acoeff;
+    ulong * Acoeff;
     ulong * Aexp;
-    const mp_limb_t * Bcoeff;
+    const ulong * Bcoeff;
     const ulong * Bexp;
     slong Blen;
-    const mp_limb_t * Ccoeff;
+    const ulong * Ccoeff;
     const ulong * Cexp;
     slong Clen;
     slong N;
@@ -576,7 +581,7 @@ static void _join_worker(void * varg)
         FLINT_ASSERT(divs[i].A->exps != NULL);
 
         memcpy(base->Acoeff + divs[i].Aoffset, divs[i].A->coeffs,
-                                          divs[i].A->length*sizeof(mp_limb_t));
+                                          divs[i].A->length*sizeof(ulong));
 
         memcpy(base->Aexp + N*divs[i].Aoffset, divs[i].A->exps,
                                             N*divs[i].A->length*sizeof(ulong));
@@ -586,10 +591,10 @@ static void _join_worker(void * varg)
     }
 }
 
-void _nmod_mpoly_mul_heap_threaded(
+static void _nmod_mpoly_mul_heap_threaded(
     nmod_mpoly_t A,
-    const mp_limb_t * Bcoeff, const ulong * Bexp, slong Blen,
-    const mp_limb_t * Ccoeff, const ulong * Cexp, slong Clen,
+    const ulong * Bcoeff, const ulong * Bexp, slong Blen,
+    const ulong * Ccoeff, const ulong * Cexp, slong Clen,
     flint_bitcnt_t bits,
     slong N,
     const ulong * cmpmask,

@@ -13,8 +13,8 @@ Welcome to FLINT's documentation! FLINT is a C library for doing number theory.
 * Issue tracker: https://github.com/flintlib/flint/issues
 * Mailing list: https://groups.google.com/group/flint-devel
 
-FLINT is free software distributed under the
-GNU Lesser General Public License (LGPL), version 2.1 or later.
+FLINT is free software distributed under the GNU Lesser General Public License
+(LGPL), version 3 or later.
 
 
 Introduction
@@ -139,6 +139,7 @@ Integers mod n
    nmod_poly_factor.rst
    nmod_mpoly.rst
    nmod_mpoly_factor.rst
+   mpn_mod.rst
    fmpz_mod.rst
    fmpz_mod_vec.rst
    fmpz_mod_mat.rst
@@ -188,6 +189,7 @@ Real and complex numbers
    issues.rst
    examples_arb.rst
    mag.rst
+   nfloat.rst
    arf.rst
    acf.rst
    arb.rst
@@ -304,8 +306,6 @@ Floating-point support code
    double_interval.rst
    d_vec.rst
    d_mat.rst
-   mpf_vec.rst
-   mpf_mat.rst
    mpfr_vec.rst
    mpfr_mat.rst
 

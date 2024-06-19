@@ -5,12 +5,16 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "n_poly.h"
 #include "nmod_mpoly_factor.h"
 
+#if FLINT_WANT_ASSERT
+# include "ulong_extras.h"
+#endif
 
 slong _n_poly_vec_max_degree(const n_poly_struct * A, slong Alen)
 {
@@ -24,7 +28,7 @@ slong _n_poly_vec_max_degree(const n_poly_struct * A, slong Alen)
 void _n_poly_vec_mul_nmod_intertible(
     n_poly_struct * A,
     slong Alen,
-    mp_limb_t c,
+    ulong c,
     nmod_t ctx)
 {
     slong i;
@@ -105,4 +109,3 @@ void _n_poly_vec_mod_remove_content(
     _n_poly_vec_mod_content(g, A, Alen, ctx);
     _n_poly_vec_mod_divexact_poly(A, Alen, g, ctx);
 }
-

@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -110,4 +110,3 @@ arb_poly_div_series(arb_poly_t Q, const arb_poly_t A, const arb_poly_t B, slong 
     _arb_poly_set_length(Q, n);
     _arb_poly_normalise(Q);
 }
-

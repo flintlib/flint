@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -55,7 +55,7 @@ TEST_FUNCTION_START(fmpz_mat_mul, state)
         fmpz_mat_randtest(C, state, n_randint(state, 200) + 1);
 
         fmpz_mat_mul(C, A, B);
-        fmpz_mat_mul_classical_inline(D, A, B);
+        fmpz_mat_mul_classical(D, A, B);
 
         if (!fmpz_mat_equal(C, D))
         {
@@ -169,8 +169,8 @@ TEST_FUNCTION_START(fmpz_mat_mul, state)
         if (!fmpz_mat_equal(A, B))
         {
             flint_printf("FAIL: window aliasing failed\n");
-	    fmpz_mat_print(A); flint_printf("\n\n");
-	    fmpz_mat_print(B); flint_printf("\n\n");
+            fmpz_mat_print(A); flint_printf("\n\n");
+            fmpz_mat_print(B); flint_printf("\n\n");
             fflush(stdout);
             flint_abort();
         }

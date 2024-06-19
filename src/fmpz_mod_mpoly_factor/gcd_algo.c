@@ -5,13 +5,16 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly.h"
+#include "nmod.h"
 #include "fmpz_vec.h"
+#include "fmpz_mod.h"
 #include "fmpz_mod_vec.h"
+#include "nmod_mpoly.h"
+#include "mpoly.h"
 #include "fmpz_mod_mpoly_factor.h"
 
 /*
@@ -30,7 +33,7 @@ static void fmpz_mod_mpoly_evals(
     const int * ignore,
     const fmpz_mod_mpoly_t A,
     ulong * Amin_exp,
-    ulong * Amax_exp,
+    ulong * FLINT_UNUSED(Amax_exp),
     ulong * Astride,
     const fmpz * alphas,
     const fmpz_mod_mpoly_ctx_t ctx)
@@ -95,7 +98,7 @@ static void fmpz_mod_mpoly_evals(
 
             fmpz_mod_poly_fit_length(out + j, varexp + 1, ctx->ffinfo);
 
-            while (out[j].length <= varexp)
+            while ((ulong) out[j].length <= varexp)
             {
                 fmpz_zero(out[j].coeffs + out[j].length);
                 out[j].length++;
@@ -139,7 +142,7 @@ static void _set_estimates(
     slong ignore_limit;
     int * ignore;
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     ignore = FLINT_ARRAY_ALLOC(nvars, int);
     alphas  = _fmpz_vec_init(nvars);
@@ -232,7 +235,7 @@ cleanup:
     flint_free(Aevals);
     flint_free(Bevals);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     return;
 }
@@ -546,7 +549,7 @@ static int _try_missing_var(
 
     fmpz_mod_mpoly_univar_init(Au, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mod_mpoly_to_univar(Au, B, var, ctx);
     FLINT_ASSERT(Au->length == 1);
 #endif
@@ -802,7 +805,7 @@ static int _try_zippel(
 
     FLINT_ASSERT(m >= 2);
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     fmpz_mod_mpoly_ctx_init(lctx, m, ORD_LEX, fmpz_mod_ctx_modulus(ctx->ffinfo));
 
@@ -891,7 +894,7 @@ cleanup:
     fmpz_mod_mpoly_clear(Bbarc, lctx);
 
     fmpz_mod_mpoly_ctx_clear(lctx);
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     return success;
 }
@@ -1328,7 +1331,7 @@ static int _fmpz_mod_mpoly_gcd_algo_small(
     slong j;
     slong nvars = ctx->minfo->nvars;
     mpoly_gcd_info_t I;
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mod_mpoly_t T, Asave, Bsave;
 #endif
 
@@ -1343,7 +1346,7 @@ static int _fmpz_mod_mpoly_gcd_algo_small(
     if (B->length == 1)
         return _do_monomial_gcd(G, Abar, Bbar, A, B, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mod_mpoly_init(T, ctx);
     fmpz_mod_mpoly_init(Asave, ctx);
     fmpz_mod_mpoly_init(Bsave, ctx);
@@ -1703,7 +1706,7 @@ cleanup:
         FLINT_ASSERT(Bbar == NULL || fmpz_mod_mpoly_equal(T, Bbar, ctx));
     }
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mod_mpoly_clear(T, ctx);
     fmpz_mod_mpoly_clear(Asave, ctx);
     fmpz_mod_mpoly_clear(Bsave, ctx);
@@ -1870,4 +1873,3 @@ int _fmpz_mod_mpoly_gcd_algo(
     else
         return _fmpz_mod_mpoly_gcd_algo_large(G, Abar, Bbar, A, B, ctx, algo);
 }
-

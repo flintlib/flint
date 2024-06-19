@@ -5,11 +5,10 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "nmod_poly.h"
 #include "nmod_poly_mat.h"
 
@@ -70,7 +69,7 @@ nmod_poly_mat_rref(nmod_poly_mat_t R, nmod_poly_t den, const nmod_poly_mat_t A)
                     nmod_poly_sub(tmp, tmp, tmp2);
                 }
 
-                nmod_poly_div(nmod_poly_mat_entry(R, i, nonpivots[k]),
+                nmod_poly_divexact(nmod_poly_mat_entry(R, i, nonpivots[k]),
                     tmp, nmod_poly_mat_entry(R, i, pivots[i]));
             }
         }
@@ -94,4 +93,3 @@ nmod_poly_mat_rref(nmod_poly_mat_t R, nmod_poly_t den, const nmod_poly_mat_t A)
 
     return rank;
 }
-

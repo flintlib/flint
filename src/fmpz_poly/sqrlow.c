@@ -7,16 +7,17 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpn_extras.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-#ifdef FLINT_HAVE_FFT_SMALL
-#include "fft_small.h"
+#if FLINT_HAVE_FFT_SMALL
+# include "fft_small.h"
 #endif
 
 void _fmpz_poly_sqrlow_tiny1(fmpz * res, const fmpz * poly, slong len, slong n)
@@ -45,13 +46,13 @@ void _fmpz_poly_sqrlow_tiny1(fmpz * res, const fmpz * poly, slong len, slong n)
 void _fmpz_poly_sqrlow_tiny2(fmpz * res, const fmpz * poly, slong len, slong n)
 {
     slong i, j, k, c, d;
-    mp_limb_t hi, lo;
-    mp_ptr tmp;
+    ulong hi, lo;
+    nn_ptr tmp;
     TMP_INIT;
 
     TMP_START;
 
-    tmp = TMP_ALLOC(2 * n * sizeof(mp_limb_t));
+    tmp = TMP_ALLOC(2 * n * sizeof(ulong));
 
     flint_mpn_zero(tmp, 2 * n);
 
@@ -91,7 +92,7 @@ void _fmpz_poly_sqrlow_tiny2(fmpz * res, const fmpz * poly, slong len, slong n)
         lo = tmp[2 * i];
         hi = tmp[2 * i + 1];
 
-        if (((mp_limb_signed_t) hi) >= 0)
+        if (((slong) hi) >= 0)
         {
             fmpz_set_uiui(res + i, hi, lo);
         }
@@ -121,7 +122,7 @@ void _fmpz_poly_sqrlow(fmpz * res, const fmpz * poly, slong len, slong n)
     bits = _fmpz_vec_max_bits(poly, len);
     bits = FLINT_ABS(bits);
 
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
     if (len >= 100 && (bits + bits <= 40 || bits + bits >= 128 || len >= 240))
         if (_fmpz_poly_mul_mid_default_mpn_ctx(res, 0, n, poly, len, poly, len))
             return;
@@ -144,7 +145,7 @@ void _fmpz_poly_sqrlow(fmpz * res, const fmpz * poly, slong len, slong n)
         }
     }
 
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
 
     /* same as in mul.c */
     if (len <= 6 && bits <= 5000)
@@ -166,7 +167,7 @@ void _fmpz_poly_sqrlow(fmpz * res, const fmpz * poly, slong len, slong n)
     }
     else
     {
-        mp_size_t limbs;
+        slong limbs;
 
         limbs = (bits + FLINT_BITS - 1) / FLINT_BITS;
 

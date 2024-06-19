@@ -5,20 +5,25 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "thread_pool.h"
-#include "nmod_mpoly.h"
-#include "fmpz_mpoly_factor.h"
+#include "ulong_extras.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpq.h"
 #include "fmpq_vec.h"
+#include "n_poly.h"
+#include "mpoly.h"
+#include "nmod_mpoly_factor.h"
+#include "fmpz_mpoly_factor.h"
 
 typedef struct
 {
     volatile int gcd_is_one;
-    volatile mp_limb_t p;
+    volatile ulong p;
 #if FLINT_USES_PTHREAD
     pthread_mutex_t mutex;
 #endif
@@ -94,7 +99,7 @@ static void _splitworker(void * varg)
     slong N = mpoly_words_per_exp_sp(bits, ctx->minfo);
     slong offset, shift;
     int success;
-    mp_limb_t p, gammared;
+    ulong p, gammared;
     nmod_poly_stack_t Sp;
 
     mpoly_gen_offset_shift_sp(&offset, &shift,
@@ -342,8 +347,10 @@ static void _find_edge(
 /* NOTE: Here `input' has to be an array of size `count'.  It will be
  * overwritten, and its initial element values do not matter.  It will contain
  * dangling pointers after returning, that is, the values `input[ix]' will be
- * invalid after returning.  Hence, we silence warnings about dangling pointers. */
-#ifdef __GNUC__
+ * invalid after returning.  Hence, we silence warnings about dangling pointers.
+ * However, this warning is only available in GCC 12 and forwards.*/
+#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 12
+# pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Wdangling-pointer"
 #endif
 static slong _fmpz_mpoly_crt(
@@ -391,7 +398,7 @@ static slong _fmpz_mpoly_crt(
     if (exp_right)
         _find_edge(stop, count, exp_right, B, N);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     for (k = 0; k < count; k++)
     {
         FLINT_ASSERT(0 <= start[k]);
@@ -518,7 +525,7 @@ static slong _fmpz_mpoly_crt(
 
     return lastdegree;
 }
-#ifdef __GNUC__
+#if defined(__GNUC__) && !defined(__clang__)
 # pragma GCC diagnostic pop
 #endif
 
@@ -1205,4 +1212,3 @@ cleanup_split:
 
     return success;
 }
-

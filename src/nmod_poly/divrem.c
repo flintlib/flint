@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -16,10 +16,10 @@
 #include "gr_poly.h"
 
 void
-_nmod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA,
-                                  mp_srcptr B, slong lenB, nmod_t mod)
+_nmod_poly_divrem(nn_ptr Q, nn_ptr R, nn_srcptr A, slong lenA,
+                                  nn_srcptr B, slong lenB, nmod_t mod)
 {
-    mp_limb_t invB;
+    ulong invB;
 
     if (lenA <= 20 || lenB <= 8 || lenA - lenB <= 6 ||
             (NMOD_BITS(mod) <= 61 && lenA <= 40) ||
@@ -34,7 +34,7 @@ _nmod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, slong lenA,
         gr_ctx_t ctx;
         _gr_ctx_init_nmod(ctx, &mod);
 
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
         GR_MUST_SUCCEED(_gr_poly_divrem_newton(Q, R, A, lenA, B, lenB, ctx));
 #else
         if (NMOD_BITS(mod) >= 16 && lenB >= 1024 && lenA <= 16384)
@@ -50,7 +50,7 @@ void nmod_poly_divrem(nmod_poly_t Q, nmod_poly_t R,
 {
     const slong lenA = A->length, lenB = B->length;
     nmod_poly_t tQ, tR;
-    mp_ptr q, r;
+    nn_ptr q, r;
 
     if (lenB == 0)
     {
@@ -61,8 +61,7 @@ void nmod_poly_divrem(nmod_poly_t Q, nmod_poly_t R,
             return;
         } else
         {
-            flint_printf("Exception (nmod_poly_divrem). Division by zero.");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "Exception (nmod_poly_divrem). Division by zero.");
         }
     }
 

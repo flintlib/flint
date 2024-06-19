@@ -207,7 +207,7 @@ Random matrix generation
     The matrix can be transformed into a dense matrix with unchanged
     rank by subsequently calling :func:`fq_default_mat_randops`.
 
-.. function:: void fq_default_mat_randops(fq_default_mat_t mat, slong count, flint_rand_t state, const fq_default_ctx_t ctx)
+.. function:: void fq_default_mat_randops(fq_default_mat_t mat, flint_rand_t state, slong count, const fq_default_ctx_t ctx)
 
     Randomises ``mat`` by performing elementary row or column
     operations. More precisely, at most ``count`` random additions
@@ -338,9 +338,9 @@ Reduced row echelon form
 --------------------------------------------------------------------------------
 
 
-.. function:: slong fq_default_mat_rref(fq_default_mat_t A, const fq_default_ctx_t ctx)
+.. function:: slong fq_default_mat_rref(fq_default_mat_t B, const fq_default_mat_t A, const fq_default_ctx_t ctx)
 
-    Puts `A` in reduced row echelon form and returns the rank of `A`.
+    Puts `B` in reduced row echelon form and returns the rank of `A`.
 
     The rref is computed by first obtaining an unreduced row echelon
     form via LU decomposition and then solving an additional

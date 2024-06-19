@@ -5,13 +5,16 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "nmod_mat.h"
+
+/* gcc11 on x86_64 generates significantly worse code with -O3 */
+#pragma GCC optimize("-O2")
 
 /*
 with op = 0, computes D = A*B
@@ -20,11 +23,11 @@ with op = -1, computes D = C - A*B
 */
 
 static inline void
-_nmod_mat_addmul_basic_op(mp_ptr * D, mp_ptr * const C, mp_ptr * const A,
-    mp_ptr * const B, slong m, slong k, slong n, int op, nmod_t mod, int nlimbs)
+_nmod_mat_addmul_basic_op(nn_ptr * D, nn_ptr * const C, nn_ptr * const A,
+    nn_ptr * const B, slong m, slong k, slong n, int op, nmod_t mod, int nlimbs)
 {
     slong i, j;
-    mp_limb_t c;
+    ulong c;
 
     for (i = 0; i < m; i++)
     {
@@ -43,14 +46,14 @@ _nmod_mat_addmul_basic_op(mp_ptr * D, mp_ptr * const C, mp_ptr * const A,
 }
 
 static inline void
-_nmod_mat_addmul_transpose_op(mp_ptr * D, const mp_ptr * C, const mp_ptr * A,
-    const mp_ptr * B, slong m, slong k, slong n, int op, nmod_t mod, int nlimbs)
+_nmod_mat_addmul_transpose_op(nn_ptr * D, const nn_ptr * C, const nn_ptr * A,
+    const nn_ptr * B, slong m, slong k, slong n, int op, nmod_t mod, int nlimbs)
 {
-    mp_ptr tmp;
-    mp_limb_t c;
+    nn_ptr tmp;
+    ulong c;
     slong i, j;
 
-    tmp = flint_malloc(sizeof(mp_limb_t) * k * n);
+    tmp = flint_malloc(sizeof(ulong) * k * n);
 
     for (i = 0; i < k; i++)
         for (j = 0; j < n; j++)
@@ -74,17 +77,17 @@ _nmod_mat_addmul_transpose_op(mp_ptr * D, const mp_ptr * C, const mp_ptr * A,
     flint_free(tmp);
 }
 
-/* requires nlimbs = 1 */
-void
-_nmod_mat_addmul_packed_op(mp_ptr * D, const mp_ptr * C, const mp_ptr * A,
-    const mp_ptr * B, slong M, slong N, slong K, int op, nmod_t mod, int nlimbs)
+/* Assumes nlimbs = 1 */
+static void
+_nmod_mat_addmul_packed_op(nn_ptr * D, const nn_ptr * C, const nn_ptr * A,
+    const nn_ptr * B, slong M, slong N, slong K, int op, nmod_t mod)
 {
     slong i, j, k;
     slong Kpack;
     int pack, pack_bits;
-    mp_limb_t c, d, mask;
-    mp_ptr tmp;
-    mp_ptr Aptr, Tptr;
+    ulong c, d, mask;
+    nn_ptr tmp;
+    nn_ptr Aptr, Tptr;
 
     /* bound unreduced entry */
     c = N * (mod.n-1) * (mod.n-1);
@@ -183,7 +186,7 @@ _nmod_mat_mul_classical_op(nmod_mat_t D, const nmod_mat_t C,
     if (nlimbs == 1 && m > 10 && k > 10 && n > 10)
     {
         _nmod_mat_addmul_packed_op(D->rows, (op == 0) ? NULL : C->rows,
-            A->rows, B->rows, m, k, n, op, D->mod, nlimbs);
+            A->rows, B->rows, m, k, n, op, D->mod);
     }
     else if (m < NMOD_MAT_MUL_TRANSPOSE_CUTOFF
         || n < NMOD_MAT_MUL_TRANSPOSE_CUTOFF

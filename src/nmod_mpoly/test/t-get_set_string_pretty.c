@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -19,7 +19,7 @@ TEST_FUNCTION_START(nmod_mpoly_get_set_string_pretty, state)
     {
         slong len1;
         flint_bitcnt_t exp_bits1;
-        mp_limb_t modulus;
+        ulong modulus;
         nmod_mpoly_ctx_t ctx;
         nmod_mpoly_t f, f1;
         char * str;

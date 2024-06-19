@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -18,7 +18,7 @@
 TEST_FUNCTION_START(bernoulli_rev, state)
 {
     slong nmax, n, bound, count;
-    mp_limb_t p, pinv, m1, m2;
+    ulong p, pinv, m1, m2;
     nmod_poly_t A;
 
     bound = 100000 * FLINT_MIN(1.0, 0.1 * flint_test_multiplier());

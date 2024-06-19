@@ -5,13 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <stdio.h>
-#include "mpoly.h"
+#include "fq_nmod.h"
 #include "n_poly.h"
+#include "mpoly.h"
 
 void n_polyu3_print_pretty(
     const n_polyu_t A,
@@ -96,7 +97,7 @@ void n_bpoly_print_pretty(
 }
 
 char * n_fq_get_str_pretty(
-    const mp_limb_t * a,
+    const ulong * a,
     const fq_nmod_ctx_t ctx)
 {
     char * s;
@@ -110,7 +111,7 @@ char * n_fq_get_str_pretty(
 
 int n_fq_fprint_pretty(
     FILE * file,
-    const mp_limb_t * a,
+    const ulong * a,
     const fq_nmod_ctx_t ctx)
 {
     slong d = fq_nmod_ctx_degree(ctx);
@@ -143,7 +144,7 @@ int n_fq_fprint_pretty(
     return 1;
 }
 
-void n_fq_print_pretty(const mp_limb_t * a, const fq_nmod_ctx_t ctx) { n_fq_fprint_pretty(stdout, a, ctx); }
+void n_fq_print_pretty(const ulong * a, const fq_nmod_ctx_t ctx) { n_fq_fprint_pretty(stdout, a, ctx); }
 
 void n_poly_print_pretty(const n_poly_t A, const char * x)
 {

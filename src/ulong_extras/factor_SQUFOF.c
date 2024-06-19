@@ -5,27 +5,31 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include <gmp.h>
 #include "ulong_extras.h"
 
-mp_limb_t _ll_factor_SQUFOF(mp_limb_t n_hi, mp_limb_t n_lo, ulong max_iters)
-{
-    mp_limb_t n[2];
-	 mp_limb_t sqrt[2];
-	 mp_limb_t rem[2];
-	 slong num, sqroot, p, q;
+#define r_shift(in, c) (((c) == FLINT_BITS) ? WORD(0) : ((in) >> (c)))
 
-    mp_limb_t l, l2, iq, pnext;
-    mp_limb_t qarr[50];
-    mp_limb_t qupto, qlast, t, r = 0;
+ulong _ll_factor_SQUFOF(ulong n_hi, ulong n_lo, ulong max_iters)
+{
+    ulong n[2];
+    ulong sqrt[2];
+    ulong rem[2];
+    slong num, sqroot;
+
+    ulong p, q;
+
+    ulong l, l2, iq, pnext;
+    ulong qarr[50];
+    ulong qupto, qlast, t, r = 0;
     ulong i, j;
 
-	 n[0] = n_lo;
-	 n[1] = n_hi;
+    n[0] = n_lo;
+    n[1] = n_hi;
 
     if (n_hi) num = mpn_sqrtrem(sqrt, rem, n, 2);
     else num = ((sqrt[0] = n_sqrtrem(rem, n_lo)) != UWORD(0));
@@ -74,19 +78,19 @@ mp_limb_t _ll_factor_SQUFOF(mp_limb_t n_hi, mp_limb_t n_lo, ulong max_iters)
         for (j = 0; j < qupto; j++)
             if (r == qarr[j]) goto cont;
         break;
-      cont: ;
-        if (r == UWORD(1)) return UWORD(0);
-   }
+cont: ;
+      if (r == UWORD(1)) return UWORD(0);
+    }
 
     if (i == max_iters) return UWORD(0);  /* taken too much time, give up */
 
     qlast = r;
     p = p + r*((sqroot - p)/r);
 
-	umul_ppmm(rem[1], rem[0], p, p);
+    umul_ppmm(rem[1], rem[0], p, p);
     sub_ddmmss(sqrt[1], sqrt[0], n[1], n[0], rem[1], rem[0]);
-	if (sqrt[1])
-	{
+    if (sqrt[1])
+    {
         int norm;
         norm = flint_clz(qlast);
         udiv_qrnnd(q, rem[0], (sqrt[1] << norm) + r_shift(sqrt[0], FLINT_BITS - norm), sqrt[0] << norm, qlast << norm);
@@ -115,16 +119,16 @@ mp_limb_t _ll_factor_SQUFOF(mp_limb_t n_hi, mp_limb_t n_lo, ulong max_iters)
     return q;
 }
 
-mp_limb_t n_factor_SQUFOF(mp_limb_t n, ulong iters)
+ulong n_factor_SQUFOF(ulong n, ulong iters)
 {
-    mp_limb_t factor = _ll_factor_SQUFOF(UWORD(0), n, iters);
-    mp_limb_t multiplier;
-    mp_limb_t quot, rem;
+    ulong factor = _ll_factor_SQUFOF(UWORD(0), n, iters);
+    ulong multiplier;
+    ulong quot, rem;
     ulong i;
 
     for (i = 1; (i < FLINT_NUM_PRIMES_SMALL) && !factor; i++)
     {
-        mp_limb_t multn[2];
+        ulong multn[2];
         multiplier = flint_primes_small[i];
         umul_ppmm(multn[1], multn[0], multiplier, n);
         factor = _ll_factor_SQUFOF(multn[1], multn[0], iters);

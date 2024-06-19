@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -82,15 +82,7 @@ fmpzi_swap(fmpzi_t x, fmpzi_t y)
     FLINT_SWAP(fmpzi_struct, *x, *y);
 }
 
-FMPZI_INLINE void
-fmpzi_print(const fmpzi_t x)
-{
-    fmpz_print(fmpzi_realref(x));
-    if (fmpz_sgn(fmpzi_imagref(x)) >= 0)
-        flint_printf("+");
-    fmpz_print(fmpzi_imagref(x));
-    flint_printf("*I");
-}
+void fmpzi_print(const fmpzi_t x);
 
 FMPZI_INLINE void
 fmpzi_set_si_si(fmpzi_t res, slong a, slong b)
@@ -100,7 +92,7 @@ fmpzi_set_si_si(fmpzi_t res, slong a, slong b)
 }
 
 FMPZI_INLINE void
-fmpzi_randtest(fmpzi_t res, flint_rand_t state, mp_bitcnt_t bits)
+fmpzi_randtest(fmpzi_t res, flint_rand_t state, flint_bitcnt_t bits)
 {
     fmpz_randtest(fmpzi_realref(res), state, bits);
     fmpz_randtest(fmpzi_imagref(res), state, bits);

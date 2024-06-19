@@ -5,11 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "test_helpers.h"
+#include "ulong_extras.h"
 #include "nmod_vec.h"
 #include "aprcl.h"
 
@@ -20,7 +21,7 @@ TEST_FUNCTION_START(aprcl_f_table, state)
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         ulong len, q, p, g;
-        mp_ptr table;
+        nn_ptr table;
 
         len = n_randint(state, 16);
         while (len < 2)

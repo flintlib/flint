@@ -5,12 +5,9 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
-
-#include <string.h>
-#include <stdlib.h>
 
 /* Include functions *********************************************************/
 
@@ -33,12 +30,14 @@
 #include "t-compose_mod.c"
 #include "t-compose_mod_horner.c"
 #include "t-compose_series.c"
+#include "t-conway.c"
 #include "t-cosh_series.c"
 #include "t-cos_series.c"
 #include "t-deflate.c"
 #include "t-derivative.c"
 #include "t-discriminant.c"
 #include "t-div.c"
+#include "t-divexact.c"
 #include "t-divides.c"
 #include "t-divides_classical.c"
 #include "t-div_newton_n_preinv.c"
@@ -154,12 +153,15 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_poly_compose_mod),
     TEST_FUNCTION(nmod_poly_compose_mod_horner),
     TEST_FUNCTION(nmod_poly_compose_series),
+    TEST_FUNCTION(_nmod_poly_conway),
+    TEST_FUNCTION(_nmod_poly_conway_rand),
     TEST_FUNCTION(nmod_poly_cosh_series),
     TEST_FUNCTION(nmod_poly_cos_series),
     TEST_FUNCTION(nmod_poly_deflate),
     TEST_FUNCTION(nmod_poly_derivative),
     TEST_FUNCTION(nmod_poly_discriminant),
     TEST_FUNCTION(nmod_poly_div),
+    TEST_FUNCTION(nmod_poly_divexact),
     TEST_FUNCTION(nmod_poly_divides),
     TEST_FUNCTION(nmod_poly_divides_classical),
     TEST_FUNCTION(nmod_poly_div_newton_n_preinv),

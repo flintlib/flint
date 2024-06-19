@@ -10,7 +10,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -107,7 +107,7 @@ static void _compute_trace(
 {
     slong i;
     fmpz_mat_t H;
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mod_poly_t a_check;
 
     fmpz_mod_poly_init(a_check, ctx);
@@ -210,7 +210,7 @@ static void _compute_trace(
     fmpz_mat_clear(H);
 
     FLINT_ASSERT(fmpz_mod_poly_equal(a, a_check, ctx));
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mod_poly_clear(a_check, ctx);
 #endif
 }
@@ -232,8 +232,7 @@ static void _fmpz_mod_poly_factor_equal_deg_via_trace(
     const fmpz * p = fmpz_mod_ctx_modulus(ctx);
     fmpz_t halfp;   /* floor((p-1)/2) */
     slong n = fmpz_mod_poly_degree(ff, ctx);
-    slong r = n/d;
-    flint_bitcnt_t r_cutoff;
+    flint_bitcnt_t r = n/d, r_cutoff;
     fmpz_mod_poly_t t, tq, tr, finv;
     slong Qlen, Qalloc;
     queue_struct * Q;
@@ -247,7 +246,7 @@ static void _fmpz_mod_poly_factor_equal_deg_via_trace(
 
     res->num = 0;
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     fmpz_init(halfp);
     fmpz_sub_ui(halfp, p, 1);
@@ -300,7 +299,7 @@ next_queued:
     fmpz_mod_poly_reverse(finv, S->f, S->f->length, ctx);
     fmpz_mod_poly_inv_series(finv, finv, S->f->length, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mod_poly_powmod_x_fmpz_preinv(tq, p, S->f, finv, ctx);
     FLINT_ASSERT(fmpz_mod_poly_equal(S->xp, tq, ctx));
 #endif
@@ -337,7 +336,7 @@ next_alpha:
     fmpz_mod_berlekamp_massey_start_over(bma, ctx);
     fmpz_mod_poly_one(t, ctx);
     fmpz_mod_berlekamp_massey_add_point_ui(bma, 1, ctx);
-    for (i = 1; i < 2*r; i++)
+    for (i = 1; (ulong) i < 2*r; i++)
     {
         fmpz_mod_poly_mulmod_preinv(tq, t, S->a, S->f, finv, ctx);
         fmpz_mod_poly_swap(t, tq, ctx);
@@ -354,7 +353,7 @@ next_alpha:
     /* S->g should be squarefree and factor into linears */
     FLINT_ASSERT(1 <= fmpz_mod_poly_degree(S->g, ctx));
     FLINT_ASSERT(fmpz_mod_poly_degree(S->g, ctx) <= r);
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mod_poly_gen(t, ctx);
     fmpz_mod_poly_powmod_fmpz_binexp(tq, t, p, S->g, ctx);
     fmpz_mod_poly_sub(tq, tq, t, ctx);
@@ -446,7 +445,7 @@ cleanup:
     fmpz_mod_poly_clear(tr, ctx);
     fmpz_mod_poly_clear(finv, ctx);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
     fmpz_clear(halfp);
 
     return;

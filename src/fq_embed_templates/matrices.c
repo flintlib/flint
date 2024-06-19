@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -116,9 +116,9 @@ int __fmpz_mod_inv_degree(fmpz_t invd, slong d, const fmpz_t p)
 }
 
 static inline
-int __nmod_inv_degree(fmpz_t invd, slong d, mp_limb_t p)
+int __nmod_inv_degree(fmpz_t invd, slong d, ulong p)
 {
-    mp_limb_t ud = d % p;
+    ulong ud = d % p;
     if (!ud)
         return 0;
     ud = n_invmod(ud, p);

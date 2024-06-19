@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -56,8 +56,7 @@ qqbar_floor(fmpz_t res, const qqbar_t x)
 
                 if (!arb_get_unique_fmpz(res, v))
                 {
-                    flint_printf("qqbar_floor: either floor(x) or floor(x+1/2) should evaluate numerically\n");
-                    flint_abort();
+                    flint_throw(FLINT_ERROR, "qqbar_floor: either floor(x) or floor(x+1/2) should evaluate numerically\n");
                 }
 
                 qqbar_set_fmpz(u, res);
@@ -76,4 +75,3 @@ qqbar_floor(fmpz_t res, const qqbar_t x)
         arb_clear(v);
     }
 }
-

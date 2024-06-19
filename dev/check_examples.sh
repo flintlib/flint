@@ -6,10 +6,13 @@
 #
 # FLINT is free software: you can redistribute it and/or modify it under
 # the terms of the GNU Lesser General Public License (LGPL) as published
-# by the Free Software Foundation; either version 2.1 of the License, or
+# by the Free Software Foundation; either version 3 of the License, or
 # (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 
-if test "$1" = "bernoulli";
+if test "$1" = "AKS";
+then
+    echo "AKS....SKIPPED"
+elif test "$1" = "bernoulli";
 then
     echo -n "bernoulli...."
     res=$($2/bernoulli 20 -threads 2)
@@ -182,6 +185,23 @@ then
     fi
     echo "PASS"
     exit 0
+elif test "$1" = "integrals_double_exp";
+then
+    echo -n "integrals using double exponential...."
+    res=$($2/integrals_double_exp)
+    if test "$?" != "0";
+    then
+        echo "FAIL"
+        exit 1
+    fi
+    echo "$res" | perl -0ne 'if (/result = 0.8862269254527580/g) {$found=1; last} END {exit !$found }'
+    if test "$?" != "0";
+    then
+	echo "FAIL"
+        exit 2
+    fi
+    echo "PASS"
+    exit 0     
 elif test "$1" = "keiper_li";
 then
     echo "keiper_li....SKIPPED"

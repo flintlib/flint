@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "d_mat.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
@@ -25,9 +26,7 @@ fmpz_mat_chol_d(d_mat_t R, const fmpz_mat_t A)
 
     if (A->r != A->c || R->r != A->r || R->c != A->c)
     {
-        flint_printf
-            ("Exception (fmpz_mat_chol_d). Incompatible dimensions.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(fmpz_mat_chol_d): Incompatible dimensions.\n");
     }
 
     if (A->r == 0)

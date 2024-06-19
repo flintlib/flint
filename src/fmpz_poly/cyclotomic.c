@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -14,10 +14,11 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_cyclotomic(fmpz * a, ulong n, mp_ptr factors,
+_fmpz_poly_cyclotomic(fmpz * a, ulong n, nn_ptr factors,
                                         slong num_factors, ulong phi)
 {
-    slong i, k;
+    ulong i;
+    slong j, k;
     int small;
     ulong D;
 
@@ -57,11 +58,11 @@ _fmpz_poly_cyclotomic(fmpz * a, ulong n, mp_ptr factors,
 
         mu = (num_factors & 1) ? -1 : 1;
         d = WORD(1);
-        for (i = 0; i < num_factors; i++)
+        for (j = 0; j < num_factors; j++)
         {
-            if ((k >> i) & 1)
+            if ((k >> j) & 1)
             {
-                d *= factors[i];
+                d *= factors[j];
                 mu = -mu;
             }
         }
@@ -88,7 +89,8 @@ void
 fmpz_poly_cyclotomic(fmpz_poly_t poly, ulong n)
 {
     n_factor_t factors;
-    slong i, j;
+    slong i;
+    ulong k;
     ulong s, phi;
 
     if (n <= 2)
@@ -128,8 +130,8 @@ fmpz_poly_cyclotomic(fmpz_poly_t poly, ulong n)
     _fmpz_poly_cyclotomic(poly->coeffs, n / s, factors.p, factors.num, phi);
 
     /* Palindromic extension */
-    for (i = 0; i < (phi + 1) / 2; i++)
-        fmpz_set(poly->coeffs + phi - i, poly->coeffs + i);
+    for (k = 0; k < (phi + 1) / 2; k++)
+        fmpz_set(poly->coeffs + phi - k, poly->coeffs + k);
 
     /* Stretch */
     if (s != 1)
@@ -137,11 +139,10 @@ fmpz_poly_cyclotomic(fmpz_poly_t poly, ulong n)
         for (i = phi; i > 0; i--)
         {
             fmpz_set(poly->coeffs + i*s, poly->coeffs + i);
-            for (j = 1; j < s; j++)
-                fmpz_zero(poly->coeffs + i*s - j);
+            for (k = 1; k < s; k++)
+                fmpz_zero(poly->coeffs + i*s - k);
         }
     }
 
     _fmpz_poly_set_length(poly, phi * s + 1);
 }
-

@@ -575,6 +575,16 @@ Matrix multiplication
     The matrices must have compatible dimensions for matrix multiplication.
     No aliasing is allowed.
 
+.. function:: void fmpz_mat_mul_waksman(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
+
+    Sets ``C`` to the matrix product `C = A B` computed using
+    Waksman multiplication, which does only `n^3/2 + O(n^2)`
+    products, but many additions. This is good for small matrices
+    with large entries.
+
+    The matrices must have compatible dimensions for matrix multiplication.
+    No aliasing is allowed.
+
 .. function:: void fmpz_mat_mul_strassen(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 
     Sets `C = AB`. Dimensions must be compatible for matrix multiplication.
@@ -990,7 +1000,7 @@ allowed between arguments.
     Aliasing between input and output matrices is allowed.
 
 
-.. function:: void _fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B, const nmod_mat_t Ainv, mp_limb_t p, const fmpz_t N, const fmpz_t D)
+.. function:: void _fmpz_mat_solve_dixon_den(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B, const nmod_mat_t Ainv, ulong p, const fmpz_t N, const fmpz_t D)
 
     Solves the equation `AX = B` for nonsingular `A`. More precisely, computes
     (``X``, ``den``) such that `AX = B \times \operatorname{den}` using a
@@ -1135,21 +1145,6 @@ Row reduction
 
     Checks that the matrix `A/den` is in reduced row echelon form of rank
     ``rank``, returns 1 if so and 0 otherwise.
-
-
-Modular gaussian elimination
---------------------------------------------------------------------------------
-
-
-.. function:: slong fmpz_mat_rref_mod(slong * perm, fmpz_mat_t A, const fmpz_t p)
-
-    Uses fraction-free Gauss-Jordan elimination to set ``A``
-    to its reduced row echelon form and returns the rank of ``A``.
-    All computations are done modulo p.
-
-    Pivot elements are chosen with ``fmpz_mat_find_pivot_any``.
-    If ``perm`` is non-``NULL``, the permutation of
-    rows in the matrix will also be applied to ``perm``.
 
 
 Strong echelon form and Howell form
@@ -1390,24 +1385,32 @@ Special matrices
 Conversions
 --------------------------------------------------------------------------------
 
-
 .. function:: int fmpz_mat_get_d_mat(d_mat_t B, const fmpz_mat_t A)
+              int fmpz_mat_get_d_mat_transpose(d_mat_t B, const fmpz_mat_t A)
 
-    Sets the entries of ``B`` as doubles corresponding to the entries of
-    ``A``, rounding down towards zero if the latter cannot be represented
-    exactly. The return value is -1 if any entry of ``A`` is too large to
-    fit in the normal range of a double, and 0 otherwise.
+    Sets the entries of *B* as doubles corresponding to the entries of *A* and
+    the transpose of *A*, respectively, rounding down towards zero if the latter
+    cannot be represented exactly. The return value is -1 if any entry of ``A``
+    is too large to fit in the normal range of a double, and 0 otherwise.
 
-.. function:: int fmpz_mat_get_d_mat_transpose(d_mat_t B, const fmpz_mat_t A)
+.. note::
 
-    Sets the entries of ``B`` as doubles corresponding to the entries of
-    the transpose of ``A``, rounding down towards zero if the latter cannot
-    be represented exactly. The return value is -1 if any entry of ``A`` is
-    too large to fit in the normal range of a double, and 0 otherwise.
-
+    Requires ``d_mat.h`` to be included before ``fmpz_mat.h`` in order to
+    declare these functions.
 
 Cholesky Decomposition
 --------------------------------------------------------------------------------
+
+.. function:: void fmpz_mat_chol_d(d_mat_t R, const fmpz_mat_t A)
+
+    Computes ``R``, the Cholesky factor of a symmetric, positive definite
+    matrix ``A`` using the Cholesky decomposition process. (Sets ``R``
+    such that `A = RR^{T}` where ``R`` is a lower triangular matrix.)
+
+.. note::
+
+    Requires ``d_mat.h`` to be included before ``fmpz_mat.h`` in order to
+    declare this function.
 
 .. function:: void fmpz_mat_is_spd(const fmpz_mat_t A)
 
@@ -1418,13 +1421,6 @@ Cholesky Decomposition
     :func:`arb_mat_ldl`. If we cannot guarantee that `A` is positive definite,
     we use an exact method instead, computing the characteristic polynomial of
     `A` and applying Descartes' rule of signs.
-
-.. function:: void fmpz_mat_chol_d(d_mat_t R, const fmpz_mat_t A)
-
-    Computes ``R``, the Cholesky factor of a symmetric, positive definite
-    matrix ``A`` using the Cholesky decomposition process. (Sets ``R``
-    such that `A = RR^{T}` where ``R`` is a lower triangular matrix.)
-
 
 LLL
 --------------------------------------------------------------------------------

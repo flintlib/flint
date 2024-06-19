@@ -7,18 +7,17 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "profiler.h"
-#include "flint.h"
 #include "nmod_mat.h"
 #include "ulong_extras.h"
 #include "thread_support.h"
 
-#if FLINT_HAVE_BLAS
-#include "cblas.h"
+#if FLINT_USES_BLAS
+# include <cblas.h>
 #endif
 
 typedef struct
@@ -26,7 +25,7 @@ typedef struct
     slong dim_m;
     slong dim_n;
     slong dim_k;
-    mp_limb_t modulus;
+    ulong modulus;
     int algorithm;
 } mat_mul_t;
 
@@ -38,7 +37,7 @@ void sample(void * arg, ulong count)
     ulong i;
     flint_rand_t state;
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     nmod_mat_init(A, params->dim_m, params->dim_k, params->modulus);
     nmod_mat_init(B, params->dim_k, params->dim_n, params->modulus);
@@ -71,7 +70,7 @@ void sample(void * arg, ulong count)
     nmod_mat_clear(B);
     nmod_mat_clear(C);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 }
 
 int main(void)
@@ -114,8 +113,8 @@ int main(void)
             {
                 double min_old, min_new, min_ratio = 100;
 
-#if FLINT_HAVE_BLAS
-                openblas_set_num_threads(blas_num);
+#if FLINT_USES_BLAS
+                //openblas_set_num_threads(blas_num);
 #endif
 
                 flint_printf("[flint %wd, blas %wd]: (", flint_num, blas_num);

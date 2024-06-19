@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -16,7 +16,7 @@ acb_dot_fmpz(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong x
 {
     arb_ptr t;
     slong i, ssize, size, tmp_size;
-    mp_ptr ztmp;
+    nn_ptr ztmp;
     fmpz v;
     ulong av, al;
     unsigned int bc;
@@ -71,7 +71,7 @@ acb_dot_fmpz(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong x
         }
         else
         {
-            __mpz_struct * z = COEFF_TO_PTR(v);
+            mpz_ptr z = COEFF_TO_PTR(v);
 
             ssize = z->_mp_size;
             size = FLINT_ABS(ssize);
@@ -119,7 +119,7 @@ acb_dot_fmpz(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong x
 
     if (tmp_size != 0)
     {
-        ztmp = TMP_ALLOC(sizeof(mp_limb_t) * tmp_size);
+        ztmp = TMP_ALLOC(sizeof(ulong) * tmp_size);
 
         for (i = 0; i < len; i++)
         {
@@ -143,4 +143,3 @@ acb_dot_fmpz(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong x
 
     TMP_END;
 }
-

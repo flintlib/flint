@@ -5,12 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
 #include "n_poly.h"
-
 
 void n_bpoly_mod_interp_reduce_2sm_poly(
     n_poly_t Ap,
@@ -21,7 +21,7 @@ void n_bpoly_mod_interp_reduce_2sm_poly(
 {
     slong i, Alen = A->length;
     const n_poly_struct * Ac = A->coeffs;
-    mp_limb_t * Apc, * Amc;
+    ulong * Apc, * Amc;
 
     n_poly_fit_length(Ap, Alen);
     n_poly_fit_length(Am, Alen);
@@ -43,20 +43,20 @@ void n_bpoly_mod_interp_lift_2sm_poly(
     n_bpoly_t T,
     const n_poly_t A,
     const n_poly_t B,
-    mp_limb_t alpha,
+    ulong alpha,
     nmod_t mod)
 {
     slong i;
     slong lastlength = 0;
-    const mp_limb_t * Acoeffs = A->coeffs;
-    const mp_limb_t * Bcoeffs = B->coeffs;
+    const ulong * Acoeffs = A->coeffs;
+    const ulong * Bcoeffs = B->coeffs;
     n_poly_struct * Tcoeffs;
     slong Alen = A->length;
     slong Blen = B->length;
     slong Tlen = FLINT_MAX(Alen, Blen);
-    mp_limb_t d0 = (1 + mod.n)/2;
-    mp_limb_t d1 = nmod_inv(nmod_add(alpha, alpha, mod), mod);
-    mp_limb_t Avalue, Bvalue, u, v;
+    ulong d0 = (1 + mod.n)/2;
+    ulong d1 = nmod_inv(nmod_add(alpha, alpha, mod), mod);
+    ulong Avalue, Bvalue, u, v;
 
     n_bpoly_fit_length(T, Tlen);
 
@@ -107,11 +107,11 @@ int n_bpoly_mod_interp_crt_2sm_poly(
     slong Flen = F->length;
     slong Tlen = FLINT_MAX(FLINT_MAX(Alen, Blen), Flen);
     n_poly_struct * Tcoeffs, * Fcoeffs;
-    mp_limb_t * Acoeffs, * Bcoeffs;
+    ulong * Acoeffs, * Bcoeffs;
     n_poly_t zero;
-    mp_limb_t Avalue, Bvalue, FvalueA, FvalueB, u, v;
+    ulong Avalue, Bvalue, FvalueA, FvalueB, u, v;
     n_poly_struct * Fvalue;
-    mp_limb_t alpha = alphapow->coeffs[1];
+    ulong alpha = alphapow->coeffs[1];
 
     zero->alloc = 0;
     zero->length = 0;
@@ -170,7 +170,7 @@ int n_bpoly_mod_gcd_brown_smprime(
 {
     int success;
     slong bound;
-    mp_limb_t alpha, temp, gammaevalp, gammaevalm;
+    ulong alpha, temp, gammaevalp, gammaevalm;
     n_poly_struct * Aevalp, * Bevalp, * Gevalp, * Abarevalp, * Bbarevalp;
     n_poly_struct * Aevalm, * Bevalm, * Gevalm, * Abarevalm, * Bbarevalm;
     n_bpoly_struct * T;
@@ -178,7 +178,7 @@ int n_bpoly_mod_gcd_brown_smprime(
     n_poly_struct * cA, * cB, * cG, * cAbar, * cBbar, * gamma;
     n_poly_struct * modulus, * alphapow, * r;
     int gstab, astab, bstab, use_stab;
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     n_poly_t leadA, leadB;
     const slong Sp_size_poly = n_poly_stack_size(Sp->poly_stack);
     const slong Sp_size_bpoly = n_bpoly_stack_size(Sp->bpoly_stack);
@@ -187,7 +187,7 @@ int n_bpoly_mod_gcd_brown_smprime(
     FLINT_ASSERT(A->length > 0);
     FLINT_ASSERT(B->length > 0);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     n_poly_init(leadA);
     n_poly_init(leadB);
     n_poly_set(leadA, A->coeffs + A->length - 1);
@@ -225,8 +225,8 @@ int n_bpoly_mod_gcd_brown_smprime(
 
     n_poly_mod_gcd(cG, cA, cB, ctx);
 
-    n_poly_mod_div(cAbar, cA, cG, ctx);
-    n_poly_mod_div(cBbar, cB, cG, ctx);
+    n_poly_mod_divexact(cAbar, cA, cG, ctx);
+    n_poly_mod_divexact(cBbar, cB, cG, ctx);
 
     n_poly_mod_gcd(gamma, A->coeffs + A->length - 1, B->coeffs + B->length - 1, ctx);
 
@@ -311,11 +311,11 @@ choose_prime: /* primes are v - alpha, v + alpha */
     else
     {
         n_poly_mod_gcd(Gevalp, Aevalp, Bevalp, ctx);
-        n_poly_mod_div(Abarevalp, Aevalp, Gevalp, ctx);
-        n_poly_mod_div(Bbarevalp, Bevalp, Gevalp, ctx);
+        n_poly_mod_divexact(Abarevalp, Aevalp, Gevalp, ctx);
+        n_poly_mod_divexact(Bbarevalp, Bevalp, Gevalp, ctx);
         n_poly_mod_gcd(Gevalm, Aevalm, Bevalm, ctx);
-        n_poly_mod_div(Abarevalm, Aevalm, Gevalm, ctx);
-        n_poly_mod_div(Bbarevalm, Bevalm, Gevalm, ctx);
+        n_poly_mod_divexact(Abarevalm, Aevalm, Gevalm, ctx);
+        n_poly_mod_divexact(Bbarevalm, Bevalm, Gevalm, ctx);
         gstab = astab = bstab = 0;
     }
 
@@ -418,7 +418,7 @@ successful_put_content:
 
 cleanup:
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success)
     {
         n_poly_struct * Glead = G->coeffs + G->length - 1;
@@ -439,4 +439,3 @@ cleanup:
 
     return success;
 }
-

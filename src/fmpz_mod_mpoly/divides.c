@@ -5,18 +5,19 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_mpoly.h"
 #include "ulong_extras.h"
+#include "mpoly.h"
+#include "fmpz_mod_mpoly.h"
 
 static int _fmpz_mod_mpoly_divides_try_dense(
     const fmpz * maxAfields,
-    const fmpz * maxBfields,
+    const fmpz * FLINT_UNUSED(maxBfields),
     slong Alen,
-    slong Blen,
+    slong FLINT_UNUSED(Blen),
     const mpoly_ctx_t mctx)
 {
     const int max_bit_size = FLINT_MIN(FLINT_BITS/3 + 16, FLINT_BITS - 4);
@@ -49,7 +50,7 @@ static int _fmpz_mod_mpoly_divides_try_dense(
     TMP_END;
 
     return total_dense_size < (UWORD(1) << max_bit_size) &&
-           total_dense_size/16 < Alen;
+           total_dense_size / 16 < (ulong) Alen;
 }
 
 

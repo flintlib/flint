@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -14,7 +14,7 @@
 #include "fmpq_poly.h"
 
 void _fmpq_poly_make_monic(fmpz * rpoly, fmpz_t rden,
-                      const fmpz * poly, const fmpz_t den, slong len)
+                      const fmpz * poly, const fmpz_t FLINT_UNUSED(den), slong len)
 {
     _fmpz_poly_primitive_part(rpoly, poly, len);
     fmpz_set(rden, rpoly + (len - 1));
@@ -34,4 +34,3 @@ void fmpq_poly_make_monic(fmpq_poly_t res, const fmpq_poly_t poly)
 
     _fmpq_poly_make_monic(res->coeffs, res->den, poly->coeffs, poly->den, len);
 }
-

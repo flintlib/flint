@@ -5,11 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fmpz_vec.h"
+#include "fmpz_mod.h"
 #include "fmpz_poly_factor.h"
 #include "fmpz_mod_mpoly_factor.h"
 
@@ -23,7 +24,7 @@ static int _try_lift(
     fmpz_mod_mpolyv_t qfac,
     const fmpz_mod_mpoly_t q,
     const fmpz_mod_mpolyv_t pfac,
-    const fmpz_mod_mpoly_t p,
+    const fmpz_mod_mpoly_t FLINT_UNUSED(p),
     slong m,
     const fmpz * alphas,
     slong n,
@@ -42,7 +43,7 @@ static int _try_lift(
     fmpz_mod_mpoly_init(t, ctx);
     fmpz_mod_mpoly_init(newq, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mod_mpoly_one(t, ctx);
     for (i = 0; i < pfac->length; i++)
         fmpz_mod_mpoly_mul(t, t, pfac->coeffs + i, ctx);
@@ -107,7 +108,7 @@ cleanup:
     fmpz_mod_mpoly_clear(t, ctx);
     fmpz_mod_mpoly_clear(newq, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success > 0)
     {
         fmpz_mod_mpoly_init(t, ctx);
@@ -234,7 +235,7 @@ next_alpha:
         fmpz_mod_mpoly_set(q, m < n ? Aevals + m : A, ctx);
         fmpz_mod_mpoly_set(p, Aevals + m - 1, ctx);
 
-    #ifdef FLINT_WANT_ASSERT
+    #if FLINT_WANT_ASSERT
         fmpz_mod_mpoly_one(t, ctx);
         for (i = 0; i < pfac->length; i++)
             fmpz_mod_mpoly_mul(t, t, pfac->coeffs + i, ctx);
@@ -283,7 +284,7 @@ next_alpha:
         {
             zassenhaus_subset_first(subset, len, k);
 
-        #ifdef FLINT_WANT_ASSERT
+        #if FLINT_WANT_ASSERT
             fmpz_mod_mpoly_one(t, ctx);
             for (i = 0; i < len; i++)
             {
@@ -373,7 +374,7 @@ cleanup:
     fmpz_mod_bpoly_clear(B, ctx->ffinfo);
     fmpz_mod_tpoly_clear(F, ctx->ffinfo);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success)
     {
         fmpz_mod_mpoly_init(t, ctx);

@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -116,8 +116,8 @@ void timeit_stop_us(timeit_t t)
 
 ******************************************************************************/
 
-#if (defined( _MSC_VER ) || (GMP_LIMB_BITS == 64 && defined (__amd64__)) || \
-     (GMP_LIMB_BITS == 32 && (defined (__i386__) || \
+#if (defined( _MSC_VER ) || (FLINT_BITS == 64 && defined (__amd64__)) || \
+     (FLINT_BITS == 32 && (defined (__i386__) || \
 			      defined (__i486__) || defined(__amd64__))))
 
 #define FLINT_NUM_CLOCKS 20
@@ -128,7 +128,7 @@ FLINT_DLL extern double clock_last[FLINT_NUM_CLOCKS];
 FLINT_DLL extern double clock_accum[FLINT_NUM_CLOCKS];
 
 static inline
-double get_cycle_counter()
+double get_cycle_counter(void)
 {
 #if defined( _MSC_VER )
     return (double)__rdtsc();
@@ -154,7 +154,7 @@ void init_clock(int n)
 }
 
 static inline
-void init_all_clocks()
+void init_all_clocks(void)
 {
    int i;
    for (i = 0; i < FLINT_NUM_CLOCKS; i++)
@@ -187,13 +187,13 @@ void stop_clock(int n)
 ******************************************************************************/
 
 static inline
-void prof_start()
+void prof_start(void)
 {
    start_clock(0);
 }
 
 static inline
-void prof_stop()
+void prof_stop(void)
 {
    stop_clock(0);
 }
@@ -281,4 +281,3 @@ void prof_repeat(double* min, double* max, profile_target_t target, void* arg);
 #endif
 
 #endif
-

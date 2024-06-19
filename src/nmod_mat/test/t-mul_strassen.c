@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -19,7 +19,7 @@ TEST_FUNCTION_START(nmod_mat_mul_strassen, state)
     for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         nmod_mat_t A, B, C, D;
-        mp_limb_t mod = n_randtest_not_zero(state);
+        ulong mod = n_randtest_not_zero(state);
 
         slong m, k, n;
 
@@ -39,15 +39,13 @@ TEST_FUNCTION_START(nmod_mat_mul_strassen, state)
         nmod_mat_mul_strassen(D, A, B);
 
         if (!nmod_mat_equal(C, D))
-        {
-            flint_printf("FAIL: results not equal\n");
-            nmod_mat_print_pretty(A);
-            nmod_mat_print_pretty(B);
-            nmod_mat_print_pretty(C);
-            nmod_mat_print_pretty(D);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "Results not equal\n"
+                    "A = %{nmod_mat}\n"
+                    "B = %{nmod_mat}\n"
+                    "C = %{nmod_mat}\n"
+                    "D = %{nmod_mat}\n",
+                    A, B, C, D);
 
         nmod_mat_clear(A);
         nmod_mat_clear(B);

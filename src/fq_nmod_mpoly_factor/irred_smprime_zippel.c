@@ -5,13 +5,16 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "nmod_mpoly_factor.h"
+#include "ulong_extras.h"
+#include "mpn_extras.h"
+#include "fq_nmod.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "fq_nmod_mpoly_factor.h"
-
 
 static void _sort_and_delete_duplicates(
     fq_nmod_mpoly_t A,
@@ -81,11 +84,11 @@ static void fq_nmod_mpoly_set_eval_helper3(
     ulong y, x, z;
     slong yoff, xoff, zoff, * off;
     slong yshift, xshift, zshift, * shift;
-    mp_limb_t * p;
+    ulong * p;
     flint_bitcnt_t bits = A->bits;
     slong Alen = A->length;
     const ulong * Aexps = A->exps;
-    const mp_limb_t * Acoeffs = A->coeffs;
+    const ulong * Acoeffs = A->coeffs;
     slong N = mpoly_words_per_exp(bits, ctx->minfo);
     ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
     ulong * ind;
@@ -191,11 +194,11 @@ static void fq_nmod_mpoly_set_evalp_helper3(
     ulong y, x, z;
     slong yoff, xoff, zoff, * off;
     slong yshift, xshift, zshift, * shift;
-    mp_limb_t * p;
+    ulong * p;
     flint_bitcnt_t bits = A->bits;
     slong Alen = A->length;
     const ulong * Aexps = A->exps;
-    const mp_limb_t * Acoeffs = A->coeffs;
+    const ulong * Acoeffs = A->coeffs;
     slong N = mpoly_words_per_exp(bits, ctx->minfo);
     ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
     ulong * ind;
@@ -308,13 +311,13 @@ static slong fq_nmod_mpoly_set_eval_helper_and_zip_form3(
     slong i, j, k, n;
     slong * off, * shift;
     ulong y, x, z;
-    mp_limb_t * p;
+    ulong * p;
     fq_nmod_mpoly_struct * Hc;
     slong old_len, zip_length = 0;
     flint_bitcnt_t bits = B->bits;
     slong Blen = B->length;
     const ulong * Bexps = B->exps;
-    const mp_limb_t * Bcoeffs = B->coeffs;
+    const ulong * Bcoeffs = B->coeffs;
     slong N = mpoly_words_per_exp(bits, ctx->minfo);
     ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
     ulong * ind;
@@ -465,13 +468,13 @@ static slong fq_nmod_mpoly_set_evalp_helper_and_zip_form3(
     slong i, j, k, n;
     slong * off, * shift;
     ulong y, x, z;
-    mp_limb_t * p;
+    ulong * p;
     fq_nmod_mpoly_struct * Hc;
     slong old_len, zip_length = 0;
     flint_bitcnt_t bits = B->bits;
     slong Blen = B->length;
     const ulong * Bexps = B->exps;
-    const mp_limb_t * Bcoeffs = B->coeffs;
+    const ulong * Bcoeffs = B->coeffs;
     slong N = mpoly_words_per_exp(bits, ctx->minfo);
     ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
     ulong * ind;
@@ -615,7 +618,7 @@ static void fq_nmod_polyu_eval_step(
 {
     slong d = fq_nmod_ctx_degree(ctx);
     slong Ai, Ei, n;
-    mp_limb_t * p;
+    ulong * p;
 
     n_polyu_fit_length(E, d*A->length);
 
@@ -643,7 +646,7 @@ static void fq_nmod_polyu_evalp_step(
 {
     slong d = fq_nmod_ctx_degree(ctx);
     slong Ai, Ei, n;
-    mp_limb_t * p;
+    ulong * p;
 
     n_polyu_fit_length(E, d*A->length);
 
@@ -830,7 +833,7 @@ static int fq_nmod_mpoly_from_zip(
     slong zvar = 1;
     ulong x, y, z;
     flint_bitcnt_t bits = B->bits;
-    mp_limb_t * Bcoeffs;
+    ulong * Bcoeffs;
     ulong * Bexps;
     slong N = mpoly_words_per_exp_sp(bits, ctx->minfo);
     ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
@@ -929,7 +932,7 @@ static int fq_nmod_mpoly_from_zipp(
     slong zvar = 1;
     ulong x, y, z;
     flint_bitcnt_t bits = B->bits;
-    mp_limb_t * Bcoeffs;
+    ulong * Bcoeffs;
     ulong * Bexps;
     slong N = mpoly_words_per_exp_sp(bits, ctx->minfo);
     ulong mask = (-UWORD(1)) >> (FLINT_BITS - bits);
@@ -1042,7 +1045,7 @@ int fq_nmod_mpoly_hlift_zippel(
     FLINT_ASSERT(r > 1);
     FLINT_ASSERT(bits <= FLINT_BITS);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         fq_nmod_mpoly_t T;
         slong j, * check_degs = FLINT_ARRAY_ALLOC(ctx->minfo->nvars, slong);
@@ -1288,7 +1291,7 @@ int fq_nmod_mpoly_factor_irred_smprime_zippel(
     FLINT_ASSERT(_n_fq_is_one(A->coeffs + d*0, d));
     FLINT_ASSERT(A->bits <= FLINT_BITS);
 
-    if (ctx->fqctx->modulus->length < n_clog(A->length, ctx->fqctx->modulus->mod.n))
+    if (ctx->fqctx->modulus->length < (slong) n_clog(A->length, ctx->fqctx->modulus->mod.n))
         return 0;
 
     fq_nmod_mpoly_init(Acopy, ctx);
@@ -1569,7 +1572,7 @@ cleanup:
     fq_nmod_mpoly_clear(m, ctx);
     fq_nmod_mpoly_clear(mpow, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success)
     {
         fq_nmod_mpoly_t prod;

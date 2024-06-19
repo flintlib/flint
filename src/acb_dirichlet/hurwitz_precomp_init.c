@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -31,8 +31,7 @@ acb_dirichlet_hurwitz_precomp_init(acb_dirichlet_hurwitz_precomp_t pre,
 
     if (A < 1 || K < 1 || N < 1)
     {
-        flint_printf("hurwitz_precomp_init: require A, K, N >= 1 (unless A == 0)\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "hurwitz_precomp_init: require A, K, N >= 1 (unless A == 0)\n");
     }
 
     pre->coeffs = _acb_vec_init(N * K);
@@ -95,4 +94,3 @@ acb_dirichlet_hurwitz_precomp_init_num(acb_dirichlet_hurwitz_precomp_t pre,
     acb_dirichlet_hurwitz_precomp_choose_param(&A, &K, &N, s, num_eval, prec);
     acb_dirichlet_hurwitz_precomp_init(pre, s, deflate, A, K, N, prec);
 }
-

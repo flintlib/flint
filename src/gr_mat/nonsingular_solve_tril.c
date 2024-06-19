@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -19,13 +19,7 @@ gr_mat_nonsingular_solve_tril_classical(gr_mat_t X,
 {
     slong i, j, n, m;
     gr_ptr tmp;
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif
-    gr_ptr inv;
-#ifdef __GNUC__
-# pragma GCC diagnostic pop
-#endif
+    gr_ptr inv = NULL;  /* silence compiler warning */
     gr_ptr s;
     int use_division = 0;
     int status = GR_SUCCESS;
@@ -87,13 +81,7 @@ gr_mat_nonsingular_solve_tril_classical(gr_mat_t X,
 cleanup:
     if (!unit)
     {
-#ifdef __GNUC__
-# pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif
         GR_TMP_CLEAR_VEC(inv, n, ctx);
-#ifdef __GNUC__
-# pragma GCC diagnostic pop
-#endif
     }
 
     flint_free(tmp);
@@ -155,7 +143,7 @@ gr_mat_nonsingular_solve_tril_recursive(gr_mat_t X,
 }
 
 int
-gr_mat_nonsingular_solve_tril(gr_mat_t X, const gr_mat_t L,
+gr_mat_nonsingular_solve_tril_generic(gr_mat_t X, const gr_mat_t L,
                                     const gr_mat_t B, int unit, gr_ctx_t ctx)
 {
     /* todo: tune thresholds */
@@ -163,4 +151,11 @@ gr_mat_nonsingular_solve_tril(gr_mat_t X, const gr_mat_t L,
         return gr_mat_nonsingular_solve_tril_classical(X, L, B, unit, ctx);
     else
         return gr_mat_nonsingular_solve_tril_recursive(X, L, B, unit, ctx);
+}
+
+int
+gr_mat_nonsingular_solve_tril(gr_mat_t X, const gr_mat_t L,
+                                    const gr_mat_t B, int unit, gr_ctx_t ctx)
+{
+    return GR_MAT_BINARY_OP_WITH_FLAG(ctx, MAT_NONSINGULAR_SOLVE_TRIL)(X, L, B, unit, ctx);
 }

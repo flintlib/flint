@@ -5,10 +5,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
 
 void fmpz_pow_cache_init(fmpz_pow_cache_t T, const fmpz_t val)
@@ -43,11 +46,11 @@ int fmpz_pow_cache_mulpow_ui(
         return 1;
     }
 
-    if (k >= T->length)
+    if (k >= (ulong) T->length)
     {
-        if (k + 1 >= T->alloc)
+        if (k + 1 >= (ulong) T->alloc)
         {
-            slong new_alloc = FLINT_MAX(k + 1, 2*T->alloc);
+            slong new_alloc = FLINT_MAX(k + 1, (ulong) (2 * T->alloc));
             T->powers = FLINT_ARRAY_REALLOC(T->powers, new_alloc, fmpz);
             for (i = T->alloc; i < new_alloc; i++)
                 fmpz_init(T->powers + i);
@@ -56,10 +59,9 @@ int fmpz_pow_cache_mulpow_ui(
         }
 
         do {
-            fmpz_mul(T->powers + T->length, T->powers + T->length - 1,
-                                                                T->powers + 1);
+            fmpz_mul(T->powers + T->length, T->powers + T->length - 1, T->powers + 1);
             T->length++;
-        } while (k >= T->length);
+        } while (k >= (ulong) T->length);
     }
 
     fmpz_mul(a, b, T->powers + k);

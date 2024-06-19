@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -32,7 +32,7 @@ _gr_poly_compose_horner(gr_ptr res,
     else if (len1 == 2)
     {
         slong sz = ctx->sizeof_elem;
-        status |= _gr_vec_mul_scalar(res, poly2, len2, GR_ENTRY(poly1, 1, sz), ctx);
+        status |= _gr_scalar_mul_vec(res, GR_ENTRY(poly1, 1, sz), poly2, len2, ctx);
         status |= gr_add(res, res, poly1, ctx);
         return status;
     }
@@ -58,7 +58,7 @@ _gr_poly_compose_horner(gr_ptr res,
 
         /* Perform the first two steps as one,
             "res = a(m) * poly2 + a(m-1)". */
-        status |= _gr_vec_mul_scalar(t1, poly2, len2, GR_ENTRY(poly1, i, sz), ctx);
+        status |= _gr_scalar_mul_vec(t1, GR_ENTRY(poly1, i, sz), poly2, len2, ctx);
         i--;
         status |= gr_add(t1, t1, GR_ENTRY(poly1, i, sz), ctx);
 

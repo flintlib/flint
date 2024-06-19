@@ -5,16 +5,20 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_vec.h"
+#include "fq_nmod.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "fq_nmod_mpoly.h"
 
 void fq_nmod_mpoly_univar_init(
     fq_nmod_mpoly_univar_t A,
-    const fq_nmod_mpoly_ctx_t ctx)
+    const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     A->coeffs = NULL;
     A->exps = NULL;
@@ -123,6 +127,19 @@ void fq_nmod_mpoly_univar_set_coeff_ui(
     return;
 }
 
+int fq_nmod_mpoly_univar_degree_fits_si(const fq_nmod_mpoly_univar_t A,
+                                                 const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
+{
+    return A->length == 0 || fmpz_fits_si(A->exps + 0);
+}
+
+slong fq_nmod_mpoly_univar_get_term_exp_si(fq_nmod_mpoly_univar_t A, slong i,
+                                                 const fq_nmod_mpoly_ctx_t FLINT_UNUSED(ctx))
+{
+    FLINT_ASSERT(i < (ulong)A->length);
+    return fmpz_get_si(A->exps + i);
+}
+
 void fq_nmod_mpoly_univar_assert_canonical(fq_nmod_mpoly_univar_t A,
                                                  const fq_nmod_mpoly_ctx_t ctx)
 {
@@ -219,7 +236,7 @@ void fq_nmod_mpoly_to_univar(fq_nmod_mpoly_univar_t A, const fq_nmod_mpoly_t B,
     slong N = mpoly_words_per_exp(bits, ctx->minfo);
     slong shift, off;
     slong Blen = B->length;
-    const mp_limb_t * Bcoeff = B->coeffs;
+    const ulong * Bcoeff = B->coeffs;
     const ulong * Bexp = B->exps;
     slong i;
     int its_new;
@@ -430,7 +447,7 @@ void _fq_nmod_mpoly_from_univar(
 
             FLINT_ASSERT(x->next == NULL);
 
-            if (x->j + 1 < (B->coeffs + x->i)->length)
+            if (x->j + 1 < (ulong) (B->coeffs + x->i)->length)
             {
                 FLINT_ASSERT(fmpz_fits_si(B->exps + x->i));
                 x->j = x->j + 1;
@@ -467,7 +484,7 @@ void _fq_nmod_mpoly_from_univar(
 
             FLINT_ASSERT(x->next == NULL);
 
-            if (x->j + 1 < (B->coeffs + x->i)->length)
+            if (x->j + 1 < (ulong) (B->coeffs + x->i)->length)
             {
                 x->j = x->j + 1;
                 x->next = NULL;
@@ -654,4 +671,3 @@ int fq_nmod_mpoly_univar_discriminant(
 
     return success;
 }
-

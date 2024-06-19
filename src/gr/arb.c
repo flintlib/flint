@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
 #include "fmpq.h"
 #include "arb_poly.h"
@@ -22,6 +23,7 @@
 #include "gr_generic.h"
 #include "gr_vec.h"
 #include "gr_poly.h"
+#include "nfloat.h"
 
 typedef struct
 {
@@ -94,6 +96,26 @@ _gr_arb_randtest(arb_t res, flint_rand_t state, const gr_ctx_t ctx)
 int
 _gr_arb_write(gr_stream_t out, const arb_t x, const gr_ctx_t ctx)
 {
+    /* used by polynomial printing */
+    if (arb_is_exact(x))
+    {
+        if (arf_is_zero(arb_midref(x)))
+        {
+            gr_stream_write(out, "0");
+            return GR_SUCCESS;
+        }
+        else if (arf_is_one(arb_midref(x)))
+        {
+            gr_stream_write(out, "1");
+            return GR_SUCCESS;
+        }
+        else if (arf_equal_si(arb_midref(x), -1))
+        {
+            gr_stream_write(out, "-1");
+            return GR_SUCCESS;
+        }
+    }
+
     gr_stream_write_free(out, arb_get_str(x, ARB_CTX_PREC(ctx) * 0.30102999566398 + 1, 0));
     return GR_SUCCESS;
 }
@@ -151,12 +173,12 @@ _gr_arb_set_fmpq(arb_t res, const fmpq_t v, const gr_ctx_t ctx)
 }
 
 int
-_gr_arb_set_str(arb_t res, const char * x, const gr_ctx_t ctx)
+_gr_arb_set_str(arb_t res, const char * x, gr_ctx_t ctx)
 {
-    if (arb_set_str(res, x, ARB_CTX_PREC(ctx)))
-        return GR_DOMAIN;
+    if (!arb_set_str(res, x, ARB_CTX_PREC(ctx)))
+        return GR_SUCCESS;
 
-    return GR_SUCCESS;
+    return gr_generic_set_str_ring_exponents(res, x, ctx);
 }
 
 int
@@ -224,6 +246,27 @@ _gr_arb_set_other(arb_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
                 return GR_DOMAIN;
             }
 
+        case GR_CTX_NFLOAT:
+            if (NFLOAT_IS_SPECIAL(x))
+            {
+                if (NFLOAT_IS_ZERO(x))
+                {
+                    arb_zero(res);
+                    return GR_SUCCESS;
+                }
+                else
+                {
+                    return GR_UNABLE;
+                }
+            }
+            else
+            {
+                nfloat_get_arf(arb_midref(res), x, x_ctx);
+                mag_zero(arb_radref(res));
+                arb_set_round(res, res, ARB_CTX_PREC(ctx));
+                return GR_SUCCESS;
+            }
+
         case GR_CTX_RR_ARB:
             arb_set_round(res, x, ARB_CTX_PREC(ctx));
             return GR_SUCCESS;
@@ -245,6 +288,18 @@ _gr_arb_set_other(arb_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
     }
 
     return gr_generic_set_other(res, x, x_ctx, ctx);
+}
+
+int
+_gr_arb_set_interval_mid_rad(arb_t res, const arb_t m, const arb_t r, const gr_ctx_t ctx)
+{
+    mag_t rad;
+    mag_init(rad);
+    arb_get_mag(rad, r);
+    arb_set(res, m);
+    arb_add_error_mag(res, rad);
+    mag_clear(rad);
+    return GR_SUCCESS;
 }
 
 /* xxx: assumes that ctx are not read */
@@ -1755,6 +1810,7 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_SET_STR,         (gr_funcptr) _gr_arb_set_str},
     {GR_METHOD_SET_D,           (gr_funcptr) _gr_arb_set_d},
     {GR_METHOD_SET_OTHER,       (gr_funcptr) _gr_arb_set_other},
+    {GR_METHOD_SET_INTERVAL_MID_RAD,    (gr_funcptr) _gr_arb_set_interval_mid_rad},
     {GR_METHOD_GET_SI,          (gr_funcptr) _gr_arb_get_si},
     {GR_METHOD_GET_UI,          (gr_funcptr) _gr_arb_get_ui},
     {GR_METHOD_GET_FMPZ,        (gr_funcptr) _gr_arb_get_fmpz},

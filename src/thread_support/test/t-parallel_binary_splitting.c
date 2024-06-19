@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -21,7 +21,7 @@ product_res_t;
 
 typedef struct
 {
-    mp_srcptr factors;
+    nn_srcptr factors;
     int left_inplace;
 }
 product_args_t;
@@ -61,7 +61,7 @@ product_basecase(product_res_t * res, slong a, slong b, product_args_t * args)
 }
 
 static void
-bsplit_product(fmpz_t r, mp_srcptr factors, slong len, slong thread_limit, int flags)
+bsplit_product(fmpz_t r, nn_srcptr factors, slong len, slong thread_limit, int flags)
 {
     product_res_t res;
     product_args_t args;
@@ -89,7 +89,7 @@ TEST_FUNCTION_START(thread_support_parallel_binary_splitting, state)
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         fmpz_t r, s;
-        mp_ptr factors;
+        nn_ptr factors;
         slong i, n;
         int flags;
 
@@ -97,7 +97,7 @@ TEST_FUNCTION_START(thread_support_parallel_binary_splitting, state)
 
         flint_set_num_threads(n_randint(state, 10) + 1);
 
-        factors = flint_malloc(n * sizeof(mp_limb_t));
+        factors = flint_malloc(n * sizeof(ulong));
 
         fmpz_init(r);
         fmpz_init(s);
@@ -116,11 +116,9 @@ TEST_FUNCTION_START(thread_support_parallel_binary_splitting, state)
             fmpz_mul_ui(s, s, factors[i]);
 
         if (!fmpz_equal(r, s))
-        {
-            flint_printf("FAIL\n");
-            flint_printf("num_threads = %wd, i = %wd/%wd\n", flint_get_num_threads(), i, n);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL(
+                    "num_threads = %wd, i = %wd/%wd\n",
+                    flint_get_num_threads(), i, n);
 
         flint_free(factors);
         fmpz_clear(r);

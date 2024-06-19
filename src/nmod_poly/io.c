@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -118,7 +118,7 @@ int nmod_poly_print_pretty(const nmod_poly_t a, const char * x) { return nmod_po
 int nmod_poly_fread(FILE * f, nmod_poly_t poly)
 {
     slong i, length;
-    mp_limb_t n;
+    ulong n;
 
     if (flint_fscanf(f, "%wd %wu", &length, &n) != 2)
         return 0;

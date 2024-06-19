@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "longlong.h"
 #include "qadic.h"
 
 /*
@@ -59,7 +60,7 @@ void _qadic_norm(fmpz_t rop, const fmpz *op, slong len,
 
         if (w >= 2 || (*p != WORD(2) && w >= 1))
         {
-            if (4 * FLINT_FLOG2(N) * FLINT_FLOG2(N) * FLINT_FLOG2(d) < d*d*d)
+            if ((slong) (4 * FLINT_FLOG2(N) * FLINT_FLOG2(N) * FLINT_FLOG2(d)) < d*d*d)
             {
                 _qadic_norm_analytic(rop, y, w, len, a, j, lena, p, N);
             }
@@ -96,4 +97,3 @@ void qadic_norm(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
         padic_val(rop) = d * op->val;
     }
 }
-

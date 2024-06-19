@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -428,8 +428,8 @@ typedef struct
 {
     ulong n;
     const unsigned int * divtab;
-    mp_ptr primes;
-    mp_ptr residues;
+    nn_ptr primes;
+    nn_ptr residues;
 }
 mod_p_param_t;
 
@@ -446,7 +446,7 @@ mod_p_worker(slong i, void * param)
 
 /* todo: optimize basecase and move to flint */
 void
-_arb_tree_crt(fmpz_t r, fmpz_t m, mp_srcptr residues, mp_srcptr primes, slong len);
+_arb_tree_crt(fmpz_t r, fmpz_t m, nn_srcptr residues, nn_srcptr primes, slong len);
 
 void
 arb_fmpz_euler_number_ui_multi_mod(fmpz_t num, ulong n, double alpha)
@@ -454,7 +454,7 @@ arb_fmpz_euler_number_ui_multi_mod(fmpz_t num, ulong n, double alpha)
     n_primes_t prime_iter;
     slong i, bits, mod_bits, zeta_bits, num_primes;
     ulong p;
-    mp_ptr primes, residues;
+    nn_ptr primes, residues;
     mag_t primes_product;
     unsigned int * divtab_odd;
     fmpz_t M;
@@ -519,8 +519,8 @@ arb_fmpz_euler_number_ui_multi_mod(fmpz_t num, ulong n, double alpha)
     printf("\nn = %lu, bits = %lu, num_primes = %ld\n", n, bits, num_primes);
 #endif
 
-    primes = flint_malloc(sizeof(mp_limb_t) * num_primes);
-    residues = flint_malloc(sizeof(mp_limb_t) * num_primes);
+    primes = flint_malloc(sizeof(ulong) * num_primes);
+    residues = flint_malloc(sizeof(ulong) * num_primes);
 
     p = 5;
     n_primes_jump_after(prime_iter, 5);
@@ -658,8 +658,7 @@ arb_fmpz_euler_number_ui(fmpz_t res, ulong n)
         arb_euler_number_ui_beta(x, n, mag + 5);
         if (!arb_get_unique_fmpz(res, x))
         {
-            flint_printf("arb_fmpz_euler_number_ui: unexpected inaccuracy\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "arb_fmpz_euler_number_ui: unexpected inaccuracy\n");
         }
         arb_clear(x);
     }

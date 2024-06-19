@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -72,7 +72,7 @@ int compute_gcd(
     FLINT_ASSERT(!nmod_mpoly_is_zero(B, ctx));
     FLINT_ASSERT(ctx->minfo->nvars >= 2);
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     wbits = FLINT_MAX(A->bits, B->bits);
 
@@ -136,7 +136,7 @@ cleanup:
 
     nmod_mpoly_ctx_clear(lctx);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     flint_free(perm);
     flint_free(shift);
@@ -422,7 +422,7 @@ TEST_FUNCTION_START(nmod_mpoly_factor_gcd_zippel, state)
         nmod_mpoly_t a, b, g, t;
         slong len, len1, len2;
         slong degbound;
-        mp_limb_t p;
+        ulong p;
 
         p = n_randint(state, (i % 2 == 0) ? 10 : FLINT_BITS - 1) + 1;
         p = n_randbits(state, p);

@@ -5,12 +5,9 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
-
-#include <string.h>
-#include <stdlib.h>
 
 /* Include functions *********************************************************/
 
@@ -48,7 +45,7 @@
 #include "t-get_term.c"
 #include "t-get_term_monomial.c"
 #include "t-inflate_deflate.c"
-#include "t-mpolyn_divides_threaded.c"
+#include "t-mpolyn_divides_threaded_pool.c"
 #include "t-mpolyuu_divides.c"
 #include "t-mul_array.c"
 #include "t-mul_array_threaded.c"
@@ -111,7 +108,7 @@ test_struct tests[] =
     TEST_FUNCTION(nmod_mpoly_get_term),
     TEST_FUNCTION(nmod_mpoly_get_term_monomial),
     TEST_FUNCTION(nmod_mpoly_inflate_deflate),
-    TEST_FUNCTION(nmod_mpoly_mpolyn_divides_threaded),
+    TEST_FUNCTION(nmod_mpolyn_divides_threaded_pool),
     TEST_FUNCTION(nmod_mpoly_mpolyuu_divides),
     TEST_FUNCTION(nmod_mpoly_mul_array),
     TEST_FUNCTION(nmod_mpoly_mul_array_threaded),

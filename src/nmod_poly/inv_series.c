@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -17,7 +17,7 @@
 #include "gr_poly.h"
 
 void
-_nmod_poly_inv_series_basecase_preinv1(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, mp_limb_t q, nmod_t mod)
+_nmod_poly_inv_series_basecase_preinv1(nn_ptr Qinv, nn_srcptr Q, slong Qlen, slong n, ulong q, nmod_t mod)
 {
     Qlen = FLINT_MIN(Qlen, n);
 
@@ -31,7 +31,7 @@ _nmod_poly_inv_series_basecase_preinv1(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slo
     {
         slong i, j, l;
         int nlimbs;
-        mp_limb_t s;
+        ulong s;
 
         nlimbs = _nmod_vec_dot_bound_limbs(FLINT_MIN(n, Qlen), mod);
 
@@ -49,9 +49,9 @@ _nmod_poly_inv_series_basecase_preinv1(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slo
 }
 
 void
-_nmod_poly_inv_series_basecase(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nmod_t mod)
+_nmod_poly_inv_series_basecase(nn_ptr Qinv, nn_srcptr Q, slong Qlen, slong n, nmod_t mod)
 {
-    mp_limb_t q;
+    ulong q;
 
     q = Q[0];
     if (q != 1)
@@ -61,7 +61,7 @@ _nmod_poly_inv_series_basecase(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nm
 }
 
 void
-_nmod_poly_inv_series(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nmod_t mod)
+_nmod_poly_inv_series(nn_ptr Qinv, nn_srcptr Q, slong Qlen, slong n, nmod_t mod)
 {
     Qlen = FLINT_MIN(Qlen, n);
 
@@ -86,8 +86,7 @@ nmod_poly_inv_series(nmod_poly_t Qinv, const nmod_poly_t Q, slong n)
 
     if (Qlen == 0)
     {
-        flint_printf("Exception (nmod_poly_inv_series). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (nmod_poly_inv_series). Division by zero.\n");
     }
 
     if (Qinv != Q)
@@ -117,8 +116,7 @@ nmod_poly_inv_series_basecase(nmod_poly_t Qinv, const nmod_poly_t Q, slong n)
 
     if (Qlen == 0)
     {
-        flint_printf("Exception (nmod_poly_inv_series_basecase). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (nmod_poly_inv_series_basecase). Division by zero.\n");
     }
 
     if (Qinv != Q)
@@ -140,7 +138,7 @@ nmod_poly_inv_series_basecase(nmod_poly_t Qinv, const nmod_poly_t Q, slong n)
 }
 
 void
-_nmod_poly_inv_series_newton(mp_ptr Qinv, mp_srcptr Q, slong Qlen, slong n, nmod_t mod)
+_nmod_poly_inv_series_newton(nn_ptr Qinv, nn_srcptr Q, slong Qlen, slong n, nmod_t mod)
 {
     _nmod_poly_inv_series(Qinv, Q, Qlen, n, mod);
 }

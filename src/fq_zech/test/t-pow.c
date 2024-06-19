@@ -1,11 +1,12 @@
 /*
     Copyright (C) 2013 Mike Hansen
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -15,15 +16,16 @@
 
 TEST_FUNCTION_START(fq_zech_pow, state)
 {
-    int j, i, result;
+    slong ix, jx;
+    int result;
     fq_zech_ctx_t ctx;
 
-    for (j = 0; j < 10; j++)
+    for (ix = 0; ix < 100 * flint_test_multiplier(); ix++)
     {
-        fq_zech_ctx_randtest(ctx, state);
+        fq_zech_ctx_init_randtest(ctx, state, 1);
 
         /* Check aliasing: a = a^e */
-        for (i = 0; i < 100; i++)
+        for (jx = 0; jx < 10; jx++)
         {
             fq_zech_t a, b;
             fmpz_t e;
@@ -54,7 +56,7 @@ TEST_FUNCTION_START(fq_zech_pow, state)
         }
 
         /* Compare with multiplication, for integral values */
-        for (i = 0; i < 100; i++)
+        for (jx = 0; jx < 10; jx++)
         {
             fq_zech_t a, b, c;
             fmpz_t e, f;

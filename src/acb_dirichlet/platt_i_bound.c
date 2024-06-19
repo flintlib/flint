@@ -5,12 +5,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "acb_dirichlet.h"
+#include "arb.h"
 #include "arb_hypgeom.h"
+#include "acb_dirichlet.h"
 
 /* c1 = 4*zeta(sigma)/(2*sigma-1) * pi^((-3-2*sigma)/4) * exp(...) */
 static void

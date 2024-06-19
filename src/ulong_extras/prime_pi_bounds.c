@@ -6,16 +6,15 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "ulong_extras.h"
 
 FLINT_DLL extern const unsigned char FLINT_PRIME_PI_ODD_LOOKUP[];
 
-void n_prime_pi_bounds(ulong *lo, ulong *hi, mp_limb_t n)
+void n_prime_pi_bounds(ulong *lo, ulong *hi, ulong n)
 {
     if (n < FLINT_PRIME_PI_ODD_LOOKUP_CUTOFF)
     {
@@ -32,4 +31,3 @@ void n_prime_pi_bounds(ulong *lo, ulong *hi, mp_limb_t n)
         *hi = (n / (10 * FLINT_FLOG2(n)) + 1) * 19;
     }
 }
-

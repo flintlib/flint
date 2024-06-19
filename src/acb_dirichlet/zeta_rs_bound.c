@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "acb.h"
 #include "acb_dirichlet.h"
 
 /* Arias de Reyna, Theorem 4.2 */
@@ -87,4 +88,3 @@ acb_dirichlet_zeta_rs_bound(mag_t err, const acb_t s, slong K)
     mag_clear(c3);
     arb_clear(a);
 }
-

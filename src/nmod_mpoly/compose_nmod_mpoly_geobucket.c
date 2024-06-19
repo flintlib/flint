@@ -5,11 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fmpz_vec.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 
 /* evaluate B(xbar) at xbar = C */
@@ -20,7 +21,7 @@ int nmod_mpoly_compose_nmod_mpoly_geobucket(nmod_mpoly_t A,
     int success = 1;
     slong i, j;
     slong Blen = B->length;
-    const mp_limb_t * Bcoeff = B->coeffs;
+    const ulong * Bcoeff = B->coeffs;
     const ulong * Bexp = B->exps;
     flint_bitcnt_t Bbits = B->bits;
     slong BN = mpoly_words_per_exp(Bbits, ctxB->minfo);
@@ -58,4 +59,3 @@ int nmod_mpoly_compose_nmod_mpoly_geobucket(nmod_mpoly_t A,
 
     return success;
 }
-

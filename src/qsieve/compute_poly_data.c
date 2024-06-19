@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -51,10 +51,10 @@ int qsieve_init_A(qs_t qs_inf)
 {
     slong i, j;
     slong s, low, high, span, m, h;
-    mp_limb_t bits, num_factors, rem, mid;
-    mp_limb_t factor_bound[40];
-    mp_limb_t * A_ind;
-    mp_limb_t * curr_subset, * first_subset;
+    ulong bits, num_factors, rem, mid;
+    ulong factor_bound[40];
+    ulong * A_ind;
+    ulong * curr_subset, * first_subset;
     prime_t * factor_base = qs_inf->factor_base;
     fmpz_t prod, temp, upper_bound, lower_bound;
     int ret = 1, found_j;
@@ -349,9 +349,9 @@ init_A_cleanup:
 void qsieve_reinit_A(qs_t qs_inf)
 {
     slong low, s, j;
-    mp_limb_t * A_ind = qs_inf->A_ind;
-    mp_limb_t * curr_subset = qs_inf->curr_subset;
-    mp_limb_t * first_subset = qs_inf->first_subset;
+    ulong * A_ind = qs_inf->A_ind;
+    ulong * curr_subset = qs_inf->curr_subset;
+    ulong * first_subset = qs_inf->first_subset;
     prime_t * factor_base = qs_inf->factor_base;
 
     low = qs_inf->low;
@@ -399,9 +399,9 @@ int qsieve_next_A(qs_t qs_inf)
     slong span = qs_inf->span;
     slong h = qs_inf->h;
     slong m = qs_inf->m;
-    mp_limb_t ret = 1;
-    mp_limb_t * curr_subset = qs_inf->curr_subset;
-    mp_limb_t * A_ind = qs_inf->A_ind;
+    ulong ret = 1;
+    ulong * curr_subset = qs_inf->curr_subset;
+    ulong * A_ind = qs_inf->A_ind;
     prime_t * factor_base = qs_inf->factor_base;
     fmpz_t prod, temp;
     int found_j, inc_diff;
@@ -538,17 +538,17 @@ void qsieve_init_poly_first(qs_t qs_inf)
 {
     slong i, k;
     slong s = qs_inf->s;
-    mp_limb_t * A_ind = qs_inf->A_ind;
-    mp_limb_t * A_inv = qs_inf->A_inv;
-    mp_limb_t * B0_terms = qs_inf->B0_terms;
-    mp_limb_t ** A_inv2B = qs_inf->A_inv2B;
+    ulong * A_ind = qs_inf->A_ind;
+    ulong * A_inv = qs_inf->A_inv;
+    ulong * B0_terms = qs_inf->B0_terms;
+    ulong ** A_inv2B = qs_inf->A_inv2B;
     fmpz_t * B_terms = qs_inf->B_terms;
     fmpz_t * A_divp = qs_inf->A_divp;
     prime_t * factor_base = qs_inf->factor_base;
     int * sqrts = qs_inf->sqrts;
     int * soln1 = qs_inf->soln1;
     int * soln2 = qs_inf->soln2;
-    mp_limb_t p, pinv, temp, temp2;
+    ulong p, pinv, temp, temp2;
 
 #if QS_DEBUG
     qs_inf->poly_count += 1;
@@ -667,8 +667,8 @@ void qsieve_init_poly_next(qs_t qs_inf, slong i)
     prime_t * factor_base = qs_inf->factor_base;
     int * soln1 = qs_inf->soln1;
     int * soln2 = qs_inf->soln2;
-    mp_limb_t ** A_inv2B = qs_inf->A_inv2B;
-    mp_limb_t sign, p, r1, r2;
+    ulong ** A_inv2B = qs_inf->A_inv2B;
+    ulong sign, p, r1, r2;
     fmpz_t temp;
 
     fmpz_init(temp);
@@ -743,8 +743,7 @@ void qsieve_compute_C(fmpz_t C, qs_t qs_inf, qs_poly_t poly)
     fmpz_mod(r, C, qs_inf->A);
     if (!fmpz_is_zero(r))
     {
-       flint_printf("B^2 - kn not divisible by A\n");
-       flint_abort();
+       flint_throw(FLINT_ERROR, "B^2 - kn not divisible by A\n");
     }
 #endif
 

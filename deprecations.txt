@@ -7,7 +7,7 @@
 
 # Deprecated in Flint 2.7.0 (removed)
 
-  nmod_mat_scalar_mul_add -> nmod_mat_scalar_adduml_ui
+  nmod_mat_scalar_mul_add -> nmod_mat_scalar_addmul_ui
 
 # Deprecated in Flint 2.8.0
 

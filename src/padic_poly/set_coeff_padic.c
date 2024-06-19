@@ -5,10 +5,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
+#include "fmpz_vec.h"
+#include "padic.h"
 #include "padic_poly.h"
 
 void padic_poly_set_coeff_padic(padic_poly_t poly, slong n, const padic_t x,
@@ -28,7 +31,7 @@ void padic_poly_set_coeff_padic(padic_poly_t poly, slong n, const padic_t x,
 
     if (n + 1 > poly->length)
     {
-        mpn_zero((mp_ptr) (poly->coeffs + poly->length), n - poly->length);
+        mpn_zero((nn_ptr) (poly->coeffs + poly->length), n - poly->length);
         poly->length = n + 1;
     }
 
@@ -72,4 +75,3 @@ void padic_poly_set_coeff_padic(padic_poly_t poly, slong n, const padic_t x,
 
     _padic_poly_normalise(poly);
 }
-

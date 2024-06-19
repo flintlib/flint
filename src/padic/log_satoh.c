@@ -5,11 +5,10 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "fmpz.h"
 #include "padic.h"
 #include "ulong_extras.h"
@@ -107,4 +106,3 @@ int padic_log_satoh(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         return ans;
     }
 }
-

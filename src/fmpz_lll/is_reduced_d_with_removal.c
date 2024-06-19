@@ -5,11 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "d_vec.h"
+#include "d_mat.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
 #include "fmpz_lll.h"
@@ -30,15 +31,16 @@ fmpz_lll_is_reduced_d_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
                                    const fmpz_t gs_B, int newd)
 {
 #if HAVE_FENV_H
+    d_mat_t A, R, V, Wu, Wd, bound;
+    double * du, * dd;
+    int rounding_direction = fegetround();
+
     if (fl->rt == Z_BASIS)
     {
         /* NOTE: this algorithm should *not* be changed */
         slong i, j, k, m, n;
-        d_mat_t A, Q, R, V, Wu, Wd, bound, bound2, bound3, boundt, mm, rm, mn,
-            rn, absR;
-        double *du, *dd;
+        d_mat_t Q, bound2, bound3, boundt, mm, rm, mn, rn, absR;
         double s, norm = 0, ti, tj, d_gs_B;
-        int rounding_direction = fegetround();
 
         if (B->r == 0 || B->r == 1)
             return 1;
@@ -55,11 +57,8 @@ fmpz_lll_is_reduced_d_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
 
         if (fmpz_mat_get_d_mat_transpose(A, B) == -1)
         {
-            d_mat_clear(A);
             d_mat_clear(Q);
-            d_mat_clear(R);
-            d_mat_clear(V);
-            return 0;
+            goto fail_clear_A_R_V;
         }
 
         d_gs_B = fmpz_get_d(gs_B);
@@ -145,17 +144,7 @@ fmpz_lll_is_reduced_d_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
             norm = FLINT_MAX(norm, s);
         }
         if (!(norm < 1))
-        {
-            d_mat_clear(A);
-            d_mat_clear(R);
-            d_mat_clear(V);
-            d_mat_clear(Wu);
-            d_mat_clear(Wd);
-            _d_vec_clear(du);
-            _d_vec_clear(dd);
-            fesetround(rounding_direction);
-            return 0;
-        }
+            goto fail_clear_all;
 
         d_mat_init(bound, n, n);
 
@@ -395,12 +384,7 @@ fmpz_lll_is_reduced_d_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
             norm = FLINT_MAX(norm, s);
         }
         if (!(norm < 1))
-        {
-            d_mat_clear(R);
-            d_mat_clear(bound);
-            fesetround(rounding_direction);
-            return 0;
-        }
+            goto fail_clear_R_bound_rounding_direction;
 
         d_mat_init(absR, n, n);
         for (i = 0; i < n; i++)
@@ -428,23 +412,13 @@ fmpz_lll_is_reduced_d_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
             ti = (s =
                   (d_mat_entry(R, i, i) - d_mat_entry(bound, i, i))) * fl->eta;
             if (i >= newd && !(s*s >= d_gs_B))
-            {
-                d_mat_clear(R);
-                d_mat_clear(bound);
-                fesetround(rounding_direction);
-                return 0;
-            }
+                goto fail_clear_R_bound_rounding_direction;
             fesetround(FE_UPWARD);
             for (j = i + 1; j < n; j++)
             {
                 tj = fabs(d_mat_entry(R, i, j)) + d_mat_entry(bound, i, j);
                 if (i < newd && !(tj <= ti))
-                {
-                    d_mat_clear(R);
-                    d_mat_clear(bound);
-                    fesetround(rounding_direction);
-                    return 0;
-                }
+                    goto fail_clear_R_bound_rounding_direction;
             }
             ti = d_mat_entry(R, i, i) + d_mat_entry(bound, i, i);
             fesetround(FE_DOWNWARD);
@@ -461,22 +435,12 @@ fmpz_lll_is_reduced_d_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
             fesetround(FE_UPWARD);
             s = sqrt(s) * ti;
             if (i < newd && !(s <= tj))
-            {
-                d_mat_clear(R);
-                d_mat_clear(bound);
-                fesetround(rounding_direction);
-                return 0;
-            }
+                goto fail_clear_R_bound_rounding_direction;
         }
         fesetround(FE_DOWNWARD);
         s = (d_mat_entry(R, i, i) - d_mat_entry(bound, i, i));
         if (i >= newd && !(s*s >= d_gs_B))
-        {
-            d_mat_clear(R);
-            d_mat_clear(bound);
-            fesetround(rounding_direction);
-            return 0;
-        }
+            goto fail_clear_R_bound_rounding_direction;
 
         d_mat_clear(R);
         d_mat_clear(bound);
@@ -486,11 +450,8 @@ fmpz_lll_is_reduced_d_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
     {
         /* NOTE: this algorithm should *not* be changed */
         slong i, j, k, m, n;
-        d_mat_t A, R, V, Wu, Wd, bound, bound2, bound3, boundt, mm, rm, mn,
-            rn, absR;
-        double *du, *dd;
+        d_mat_t bound2, bound3, boundt, mm, rm, mn, rn, absR;
         double s, norm = 0, ti, tj, d_gs_B;
-        int rounding_direction = fegetround();
 
         if (B->r == 0 || B->r == 1)
             return 1;
@@ -505,12 +466,7 @@ fmpz_lll_is_reduced_d_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
         d_mat_zero(V);
 
         if (fmpz_mat_get_d_mat_transpose(A, B) == -1)
-        {
-            d_mat_clear(A);
-            d_mat_clear(R);
-            d_mat_clear(V);
-            return 0;
-        }
+            goto fail_clear_A_R_V;
 
         for (j = 0; j < n; j++)
         {
@@ -534,10 +490,7 @@ fmpz_lll_is_reduced_d_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
             if (!(d_mat_entry(R, j, j) > 0))
             {
                 /* going to take sqrt and then divide by it */
-                d_mat_clear(A);
-                d_mat_clear(R);
-                d_mat_clear(V);
-                return 0;
+                goto fail_clear_A_R_V;
             }
 
             d_mat_entry(R, j, j) = sqrt(d_mat_entry(R, j, j));
@@ -591,14 +544,16 @@ fmpz_lll_is_reduced_d_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
         }
         if (!(norm < 1))
         {
-            d_mat_clear(A);
-            d_mat_clear(R);
-            d_mat_clear(V);
+fail_clear_all:
             d_mat_clear(Wu);
             d_mat_clear(Wd);
             _d_vec_clear(du);
             _d_vec_clear(dd);
             fesetround(rounding_direction);
+fail_clear_A_R_V:
+            d_mat_clear(A);
+            d_mat_clear(R);
+            d_mat_clear(V);
             return 0;
         }
 
@@ -812,12 +767,7 @@ fmpz_lll_is_reduced_d_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
             norm = FLINT_MAX(norm, s);
         }
         if (!(norm < 1))
-        {
-            d_mat_clear(R);
-            d_mat_clear(bound);
-            fesetround(rounding_direction);
-            return 0;
-        }
+            goto fail_clear_R_bound_rounding_direction;
 
         d_mat_init(absR, n, n);
         for (i = 0; i < n; i++)
@@ -845,23 +795,13 @@ fmpz_lll_is_reduced_d_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
             ti = (s =
                   (d_mat_entry(R, i, i) - d_mat_entry(bound, i, i))) * fl->eta;
             if (i >= newd && !(s*s >= d_gs_B))
-            {
-                d_mat_clear(R);
-                d_mat_clear(bound);
-                fesetround(rounding_direction);
-                return 0;
-            }
+                goto fail_clear_R_bound_rounding_direction;
             fesetround(FE_UPWARD);
             for (j = i + 1; j < n; j++)
             {
                 tj = fabs(d_mat_entry(R, i, j)) + d_mat_entry(bound, i, j);
                 if (i < newd && !(tj <= ti))
-                {
-                    d_mat_clear(R);
-                    d_mat_clear(bound);
-                    fesetround(rounding_direction);
-                    return 0;
-                }
+                    goto fail_clear_R_bound_rounding_direction;
             }
             ti = d_mat_entry(R, i, i) + d_mat_entry(bound, i, i);
             fesetround(FE_DOWNWARD);
@@ -878,17 +818,13 @@ fmpz_lll_is_reduced_d_with_removal(const fmpz_mat_t B, const fmpz_lll_t fl,
             fesetround(FE_UPWARD);
             s = sqrt(s) * ti;
             if (i < newd && !(s <= tj))
-            {
-                d_mat_clear(R);
-                d_mat_clear(bound);
-                fesetround(rounding_direction);
-                return 0;
-            }
+                goto fail_clear_R_bound_rounding_direction;
         }
         fesetround(FE_DOWNWARD);
         s = (d_mat_entry(R, i, i) - d_mat_entry(bound, i, i));
         if (i >= newd && !(s*s >= d_gs_B))
         {
+fail_clear_R_bound_rounding_direction:
             d_mat_clear(R);
             d_mat_clear(bound);
             fesetround(rounding_direction);

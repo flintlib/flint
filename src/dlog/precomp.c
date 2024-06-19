@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -32,8 +32,6 @@ dlog_precomp(const dlog_precomp_t pre, ulong b)
         case DLOG_23:
             return dlog_order23(pre->t.order23, b);
         default:
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(dlog_precomp): Unknown option");
     }
-
-    return 0; /* dummy return because flint_abort() is not declared noreturn */
 }

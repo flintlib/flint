@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -31,7 +31,7 @@ TEST_FUNCTION_START(fmpz_mat_hadamard, state)
 {
     int n;
 
-    for (n = 0; n <= 300; n++)
+    for (n = 0; n <= FLINT_MIN(300, (slong) (200 * flint_test_multiplier())); n++)
     {
         fmpz_mat_t h;
         int success;

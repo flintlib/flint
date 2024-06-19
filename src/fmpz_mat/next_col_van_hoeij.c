@@ -6,10 +6,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
+#include "longlong.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
@@ -20,7 +22,7 @@ void _fmpz_mat_resize_van_hoeij(fmpz_mat_t M, slong r, slong c)
 
    M->entries = (fmpz *) flint_realloc(M->entries, r*c*sizeof(fmpz));
 
-   mpn_zero((mp_ptr) M->entries + M->r*M->c, r*c - M->r*M->c);
+   mpn_zero((nn_ptr) M->entries + M->r*M->c, r*c - M->r*M->c);
 
    if (r != M->r) /* we will have an extra row and column */
    {
@@ -40,7 +42,7 @@ void _fmpz_mat_resize_van_hoeij(fmpz_mat_t M, slong r, slong c)
          slong diff = (slong) (M->rows[i] - old_entries);
 
          if (M->rows[i] >= old_entries + M->c*M->r)
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
          j = diff/M->c;
          M->rows[i + 1] = M->entries + (j + 1)*c;

@@ -5,11 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <math.h>
+#include "double_extras.h"
 #include "fmpzi.h"
 
 double
@@ -27,14 +28,14 @@ fmpzi_norm_approx_d_2exp(slong * exp, const fmpzi_t x)
         if (aexp >= bexp + 64)
             b = 0.0;
         else
-            b = ldexp(b, aexp - bexp);
+            b = d_mul_2exp(b, aexp - bexp);
     }
     else
     {
         if (bexp >= aexp + 64)
             a = 0.0;
         else
-            a = ldexp(a, bexp - aexp);
+            a = d_mul_2exp(a, bexp - aexp);
     }
 
     a = a * a + b * b;

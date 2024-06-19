@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -25,8 +25,7 @@ void nmod_mat_minpoly_with_gens(nmod_poly_t p, const nmod_mat_t X, ulong * P)
 
    if (X->r != X->c)
    {
-       flint_printf("Exception (nmod_mat_charpoly).  Non-square matrix.\n");
-       flint_abort();
+       flint_throw(FLINT_ERROR, "Exception (nmod_mat_charpoly).  Non-square matrix.\n");
    }
 
    if (n == 0)
@@ -165,8 +164,9 @@ void nmod_mat_minpoly_with_gens(nmod_poly_t p, const nmod_mat_t X, ulong * P)
       _nmod_poly_set_length(b, r1 + 1);
 
       nmod_poly_gcd(g, p, b);
+      /* todo: compute as (p * b) / g or (p / g) * b or p * (g / b) ? */
       nmod_poly_mul(p, p, b);
-      nmod_poly_div(p, p, g);
+      nmod_poly_divexact(p, p, g);
 
       if (first_poly && r2 < n)
       {

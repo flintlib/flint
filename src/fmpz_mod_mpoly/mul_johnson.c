@@ -5,13 +5,15 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "gmpcompat.h"
 #include "mpn_extras.h"
 #include "fmpz_vec.h"
+#include "fmpz_mod.h"
+#include "mpoly.h"
 #include "fmpz_mod_mpoly.h"
 
 #ifdef fmpz_mod_ctx_get_modulus_mpz_read_only
@@ -30,7 +32,7 @@ fmpz_mod_ctx_get_modulus_mpz_read_only(mpz_t m, const fmpz_mod_ctx_t ctx)
     {
         m->_mp_size = 1;
         m->_mp_alloc = 1;
-        m->_mp_d = (mp_ptr) p;
+        m->_mp_d = (nn_ptr) p;
     }
 }
 
@@ -55,8 +57,8 @@ void _fmpz_mod_mpoly_mul_johnson1(
     ulong * Aexps = A->exps;
     slong Alen;
     mpz_t t, acc, modulus;
-    mp_limb_t * Bcoeffs_packed = NULL;
-    mp_limb_t * Ccoeffs_packed = NULL;
+    ulong * Bcoeffs_packed = NULL;
+    ulong * Ccoeffs_packed = NULL;
     TMP_INIT;
 
     TMP_START;
@@ -76,7 +78,7 @@ void _fmpz_mod_mpoly_mul_johnson1(
 
     if (Blen > 8*n)
     {
-        Bcoeffs_packed = FLINT_ARRAY_ALLOC(n*(Blen + Clen), mp_limb_t);
+        Bcoeffs_packed = FLINT_ARRAY_ALLOC(n*(Blen + Clen), ulong);
         Ccoeffs_packed = Bcoeffs_packed + n*Blen;
         for (i = 0; i < Blen; i++)
             fmpz_get_ui_array(Bcoeffs_packed + n*i, n, Bcoeffs + i);
@@ -104,7 +106,7 @@ void _fmpz_mod_mpoly_mul_johnson1(
 
         if (Bcoeffs_packed)
         {
-            mp_limb_t * acc_d, * t_d;
+            ulong * acc_d, * t_d;
             slong acc_len;
 
             FLINT_MPZ_REALLOC(acc, 2*n+1);
@@ -119,7 +121,7 @@ void _fmpz_mod_mpoly_mul_johnson1(
                     *store++ = x->i;
                     *store++ = x->j;
                     hind[x->i] |= WORD(1);
-                    mpn_mul_n(t_d, Bcoeffs_packed + n*x->i,
+                    flint_mpn_mul_n(t_d, Bcoeffs_packed + n*x->i,
                                    Ccoeffs_packed + n*x->j, n);
                     acc_d[2*n] += mpn_add_n(acc_d, acc_d, t_d, 2*n);
                 } while ((x = x->next) != NULL);
@@ -217,11 +219,11 @@ void _fmpz_mod_mpoly_mul_johnson1(
 }
 
 
-void _fmpz_mod_mpoly_mul_johnson(
+static void _fmpz_mod_mpoly_mul_johnson(
     fmpz_mod_mpoly_t A,
     const fmpz * Bcoeffs, const ulong * Bexps, slong Blen,
     const fmpz * Ccoeffs, const ulong * Cexps, slong Clen,
-    flint_bitcnt_t bits,
+    flint_bitcnt_t FLINT_UNUSED(bits),
     slong N,
     const ulong * cmpmask,
     const fmpz_mod_ctx_t ctx)
@@ -242,8 +244,8 @@ void _fmpz_mod_mpoly_mul_johnson(
     ulong * Aexps = A->exps;
     slong Alen;
     mpz_t t, acc, modulus;
-    mp_limb_t * Bcoeffs_packed = NULL;
-    mp_limb_t * Ccoeffs_packed = NULL;
+    ulong * Bcoeffs_packed = NULL;
+    ulong * Ccoeffs_packed = NULL;
     TMP_INIT;
 
     FLINT_ASSERT(Blen > 0);
@@ -279,7 +281,7 @@ void _fmpz_mod_mpoly_mul_johnson(
 
     if (Blen > 8*n)
     {
-        Bcoeffs_packed = FLINT_ARRAY_ALLOC(n*(Blen + Clen), mp_limb_t);
+        Bcoeffs_packed = FLINT_ARRAY_ALLOC(n*(Blen + Clen), ulong);
         Ccoeffs_packed = Bcoeffs_packed + n*Blen;
         for (i = 0; i < Blen; i++)
             fmpz_get_ui_array(Bcoeffs_packed + n*i, n, Bcoeffs + i);
@@ -313,7 +315,7 @@ void _fmpz_mod_mpoly_mul_johnson(
 
         if (Bcoeffs_packed)
         {
-            mp_limb_t * acc_d, * t_d;
+            ulong * acc_d, * t_d;
             slong acc_len;
 
             FLINT_MPZ_REALLOC(acc, 2*n+1);
@@ -329,7 +331,7 @@ void _fmpz_mod_mpoly_mul_johnson(
                     *store++ = x->i;
                     *store++ = x->j;
                     hind[x->i] |= WORD(1);
-                    mpn_mul_n(t_d, Bcoeffs_packed + n*x->i,
+                    flint_mpn_mul_n(t_d, Bcoeffs_packed + n*x->i,
                                    Ccoeffs_packed + n*x->j, n);
                     acc_d[2*n] += mpn_add_n(acc_d, acc_d, t_d, 2*n);
                 } while ((x = x->next) != NULL);
@@ -553,4 +555,3 @@ void fmpz_mod_mpoly_mul_johnson(
 
     TMP_END;
 }
-

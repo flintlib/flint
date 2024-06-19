@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
     p = flint_malloc(np * sizeof(nmod_t));
     a = flint_malloc(np * sizeof(ulong));
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     if (argc < 2)
         out = LOG;
@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
 
     flint_free(p);
     flint_free(a);
-    flint_randclear(state);
+    flint_rand_clear(state);
     flint_cleanup();
     flint_printf("PASS\n");
     return 0;

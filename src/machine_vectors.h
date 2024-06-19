@@ -1,11 +1,12 @@
 /*
     Copyright (C) 2022 Daniel Schultz
+    Copyright (C) 2023 Mathieu Gouttenoire
 
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -18,7 +19,7 @@
 
 #if defined(__GNUC__)
 # if defined(__AVX2__)
-#  include <x86intrin.h>
+#  include <immintrin.h>
 # elif defined(__ARM_NEON)
 #  include <arm_neon.h>
 # endif
@@ -55,79 +56,8 @@ typedef __m256d vec4d;
 typedef struct {__m256d e1, e2;} vec8d;
 
 
-FLINT_FORCE_INLINE void vec4d_print(vec4d a)
-{
-#ifdef _MSC_VER
-    double as[4];
-    _mm256_storeu_pd(as, a);
-    flint_printf("{%f, %f, %f, %f}", as[0], as[1], as[2], as[3]);
-#else
-    flint_printf("{%f, %f, %f, %f}", a[0], a[1], a[2], a[3]);
-#endif
-}
 
-FLINT_FORCE_INLINE void vec4n_print(vec4n a)
-{
-    flint_printf("[hi %016llx_%016llx_%016llx_%016llx lo]",
-        _mm256_extract_epi64(a, 3),
-        _mm256_extract_epi64(a, 2),
-        _mm256_extract_epi64(a, 1),
-        _mm256_extract_epi64(a, 0));
-}
-
-FLINT_FORCE_INLINE vec4n vec4d_convert_limited_vec4n(vec4d a) {
-    __m256d t = _mm256_set1_pd(0x1.0p52);
-    return _mm256_castpd_si256(_mm256_xor_pd(_mm256_add_pd(a, t), t));
-}
-
-
-FLINT_FORCE_INLINE void vec4n_store_unaligned(ulong* z, vec4n a) {
-    _mm256_storeu_si256((__m256i*) z, a);
-}
-
-FLINT_FORCE_INLINE vec4n vec4n_load_unaligned(const ulong* a) {
-    return _mm256_loadu_si256((__m256i*) a);
-}
-
-FLINT_FORCE_INLINE vec8n vec8n_load_unaligned(const ulong* a) {
-    vec8n z = {vec4n_load_unaligned(a+0), vec4n_load_unaligned(a+4)};
-    return z;
-}
-
-
-FLINT_FORCE_INLINE vec4d vec4n_convert_limited_vec4d(vec4n a) {
-    __m256d t = _mm256_set1_pd(0x1.0p52);
-    return _mm256_sub_pd(_mm256_or_pd(_mm256_castsi256_pd(a), t), t);
-}
-
-/* !!! the outputs are also permuted !!! */
-FLINT_FORCE_INLINE vec8d _vec8i32_convert_vec8d(__m256i a)
-{
-    __m256i mask = _mm256_set1_epi32(0x43300000);
-    __m256i ak0 = _mm256_unpacklo_epi32(a, mask);
-    __m256i ak1 = _mm256_unpackhi_epi32(a, mask);
-    __m256d t = _mm256_set1_pd(0x1.0p52);
-    vec8d z;
-    z.e1 = _mm256_sub_pd(_mm256_castsi256_pd(ak0), t);
-    z.e2 = _mm256_sub_pd(_mm256_castsi256_pd(ak1), t);
-    return z;
-}
-
-/* this does not work because i must be a compile-time constant
-FLINT_FORCE_INLINE ulong vec4n_get_index(vec4n a, const int i)
-{
-    return _mm256_extract_epi64(a, i);
-}
-*/
-
-FLINT_FORCE_INLINE vec4n vec4n_set_n4(ulong a0, ulong a1, ulong a2, ulong a3) {
-    return _mm256_set_epi64x(a3, a2, a1, a0);
-}
-
-
-
-
-/* vec1 **************************************************/
+/* vec1d -- AVX2 ***********************************************************/
 
 FLINT_FORCE_INLINE vec1d vec1d_load(const double* a) {
     return a[0];
@@ -165,11 +95,11 @@ FLINT_FORCE_INLINE vec1d vec1d_round(vec1d a) {
     return rint(a);
 }
 
-FLINT_FORCE_INLINE vec1d vec1d_zero() {
+FLINT_FORCE_INLINE vec1d vec1d_zero(void) {
     return 0.0;
 }
 
-FLINT_FORCE_INLINE vec1d vec1d_one() {
+FLINT_FORCE_INLINE vec1d vec1d_one(void) {
     return 1.0;
 }
 
@@ -256,7 +186,18 @@ FLINT_FORCE_INLINE vec1d vec1d_reduce_2n_to_n(vec1d a, vec1d n) {
 }
 
 
-/* vec4 *****************************************************/
+/* vec4d -- AVX2 ***********************************************************/
+
+FLINT_FORCE_INLINE void vec4d_print(vec4d a)
+{
+#ifdef _MSC_VER
+    double as[4];
+    _mm256_storeu_pd(as, a);
+    flint_printf("{%f, %f, %f, %f}", as[0], as[1], as[2], as[3]);
+#else
+    flint_printf("{%f, %f, %f, %f}", a[0], a[1], a[2], a[3]);
+#endif
+}
 
 FLINT_FORCE_INLINE double vec4d_get_index(vec4d a, const int i) {
 #ifdef _MSC_VER
@@ -315,11 +256,11 @@ FLINT_FORCE_INLINE vec4d vec4d_round(vec4d a) {
     return _mm256_round_pd(a, 4);
 }
 
-FLINT_FORCE_INLINE vec4d vec4d_zero() {
+FLINT_FORCE_INLINE vec4d vec4d_zero(void) {
     return _mm256_setzero_pd();
 }
 
-FLINT_FORCE_INLINE vec4d vec4d_one() {
+FLINT_FORCE_INLINE vec4d vec4d_one(void) {
     return vec4d_set_d(1);
 }
 
@@ -497,8 +438,120 @@ FLINT_FORCE_INLINE vec4d vec4d_reduce_2n_to_n(vec4d a, vec4d n) {
     return vec4d_blendv(s, a, s);
 }
 
+FLINT_FORCE_INLINE vec4n vec4d_convert_limited_vec4n(vec4d a) {
+    __m256d t = _mm256_set1_pd(0x1.0p52);
+    return _mm256_castpd_si256(_mm256_xor_pd(_mm256_add_pd(a, t), t));
+}
 
-/* vec8 **********************************************************************/
+/* vec4n -- AVX2 ***********************************************************/
+
+FLINT_FORCE_INLINE void vec4n_print(vec4n a)
+{
+    flint_printf("[hi %016llx_%016llx_%016llx_%016llx lo]",
+        _mm256_extract_epi64(a, 3),
+        _mm256_extract_epi64(a, 2),
+        _mm256_extract_epi64(a, 1),
+        _mm256_extract_epi64(a, 0));
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_load_unaligned(const ulong* a) {
+    return _mm256_loadu_si256((__m256i*) a);
+}
+
+FLINT_FORCE_INLINE void vec4n_store_unaligned(ulong* z, vec4n a) {
+    _mm256_storeu_si256((__m256i*) z, a);
+}
+
+/* permute_i0_i1_i2_i3(a): return {a[i0], a[i1], a[i2], a[i3]} */
+#ifndef AVOID_AVX2
+#define DEFINE_IT(i0, i1, i2, i3)                                        \
+FLINT_FORCE_INLINE vec4n CAT6(vec4n, permute, i0, i1, i2, i3)(vec4n a) { \
+    return _mm256_permute4x64_epi64(a, i0 + 4*(i1 + 4*(i2 + 4*i3)));     \
+}
+#else
+#define DEFINE_IT(i0, i1, i2, i3)                                        \
+FLINT_FORCE_INLINE vec4n CAT6(vec4n, permute, i0, i1, i2, i3)(vec4n a) { \
+    return vec4n_set_n4(a[i0], a[i1], a[i2], a[i3]);                     \
+}
+#endif
+DEFINE_IT(3,2,1,0)
+#undef DEFINE_IT
+
+FLINT_FORCE_INLINE vec4n vec4n_zero()
+{
+    return _mm256_setzero_si256();
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_set_n4(ulong a0, ulong a1, ulong a2, ulong a3) {
+    return _mm256_set_epi64x(a3, a2, a1, a0);
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_set_n(ulong a) {
+  return _mm256_set1_epi64x(a);
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_add(vec4n a, vec4n b)
+{
+    return _mm256_add_epi64(a, b);
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_sub(vec4n a, vec4n b)
+{
+    return _mm256_sub_epi64(a, b);
+}
+
+/* for n < 2^63 */
+FLINT_FORCE_INLINE vec4n vec4n_addmod_limited(vec4n a, vec4n b, vec4n n)
+{
+    vec4n s = vec4n_add(a, b);
+    vec4n t = vec4n_sub(s, n);
+    vec4n m = _mm256_srai_epi32(t, 31);
+          m = _mm256_shuffle_epi32(m, 1 + 4*(1 + 4*(3 + 4*(3))));
+    return _mm256_blendv_epi8(t, s, m);
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_addmod(vec4n a, vec4n b, vec4n n)
+{
+    vec4n tt = vec4n_set_n(0x8000000000000000);
+    vec4n s = vec4n_add(a, b);
+#if 0
+    vec4n  m = vec4n_sub(n, tt);
+    vec4n t0 = vec4n_sub(m, a);
+    vec4n t1 = vec4n_sub(b, tt);
+    vec4n t2 = vec4n_sub(t1, t0);
+    return _mm256_blendv_epi8(s, t2, _mm256_cmpgt_epi64(t1, t0));
+#else
+    vec4n t0 = vec4n_sub(s, n);
+    vec4n t1 = vec4n_sub(a, tt);
+    vec4n t2 = vec4n_sub(t0, tt);
+    return _mm256_blendv_epi8(t0, s, _mm256_cmpgt_epi64(t2, t1));
+#endif
+}
+
+FLINT_FORCE_INLINE vec4n vec4n_mul(vec4n u, vec4n v)
+{
+    return _mm256_mul_epu32(u, v);
+}
+
+// compilers accept non-(compile-time-)constant b with srli
+// (still, faster if constant)
+FLINT_FORCE_INLINE vec4n vec4n_bit_shift_right(vec4n a, ulong b) {
+    return _mm256_srli_epi64(a, b);
+}
+
+#define vec4n_bit_shift_right_32(a) vec4n_bit_shift_right((a), 32)
+
+FLINT_FORCE_INLINE vec4n vec4n_bit_and(vec4n a, vec4n b) {
+    return _mm256_and_si256(a, b);
+}
+
+FLINT_FORCE_INLINE vec4d vec4n_convert_limited_vec4d(vec4n a) {
+    __m256d t = _mm256_set1_pd(0x1.0p52);
+    return _mm256_sub_pd(_mm256_or_pd(_mm256_castsi256_pd(a), t), t);
+}
+
+
+/* vec8d -- AVX2 ***********************************************************/
 
 FLINT_FORCE_INLINE double vec8d_get_index(vec8d a, int i) {
     return i < 4 ? vec4d_get_index(a.e1, i) : vec4d_get_index(a.e2, i - 4);
@@ -556,6 +609,19 @@ FLINT_FORCE_INLINE vec8d vec8n_convert_limited_vec8d(vec8n a) {
     return z;
 }
 
+/* !!! the outputs are also permuted !!! */
+FLINT_FORCE_INLINE vec8d _vec8i32_convert_vec8d(__m256i a)
+{
+    __m256i mask = _mm256_set1_epi32(0x43300000);
+    __m256i ak0 = _mm256_unpacklo_epi32(a, mask);
+    __m256i ak1 = _mm256_unpackhi_epi32(a, mask);
+    __m256d t = _mm256_set1_pd(0x1.0p52);
+    vec8d z;
+    z.e1 = _mm256_sub_pd(_mm256_castsi256_pd(ak0), t);
+    z.e2 = _mm256_sub_pd(_mm256_castsi256_pd(ak1), t);
+    return z;
+}
+
 
 /* reduce_pm1no_to_0n(a, n): return a mod n in [0,n) assuming a in (-n,n) */
 #define DEFINE_IT(V) \
@@ -602,7 +668,16 @@ DEFINE_IT(vec1d)
 DEFINE_IT(vec4d)
 #undef DEFINE_IT
 
-/* mulmod(a, b, n, ninv): return a*b mod n in [-n,n] with assumptions */
+/*
+    mulmod(a, b, n, 1.0/n): return a*b mod n
+    assuming fft_small_mulmod_satisfies_bounds(n):
+     Products a*b in the range (-2*n^2, 2*n^2) are reduced to the range (-1*n, 1*n).
+     Products a*b in the range (-4*n^2, 4*n^2) are reduced to the range (-3/2*n, 3/2*n).
+    otherwise the more pessimistic:
+     Products a*b in the range (-2*n^2, 2*n^2) are reduced to the range (-9/8*n, 9/8*n).
+     Products a*b in the range (-4*n^2, 4*n^2) are reduced to the range (-7/4*n, 7/4*n).
+    floating point round mode is always assumed to be set to nearest
+*/
 #define DEFINE_IT(V) \
 FLINT_FORCE_INLINE V V##_mulmod(V a, V b, V n, V ninv) { \
     V h = V##_mul(a, b); \
@@ -626,7 +701,7 @@ DEFINE_IT(vec4d)
 
 
 #define EXTEND_VEC_DEF0(U, V, f) \
-FLINT_FORCE_INLINE V V##f() { \
+FLINT_FORCE_INLINE V V##f(void) { \
     U z1 = U##f(); \
     U z2 = U##f(); \
     V z = {z1, z2}; \
@@ -663,48 +738,6 @@ FLINT_FORCE_INLINE V V##f(V a, V b, V c, V d) { \
     U z2 = U##f(a.e2, b.e2, c.e2, d.e2); \
     V z = {z1, z2}; \
     return z; \
-}
-
-FLINT_FORCE_INLINE vec4n vec4n_set_n(ulong a) {
-  return _mm256_set1_epi64x(a);
-}
-
-FLINT_FORCE_INLINE vec4n vec4n_add(vec4n a, vec4n b)
-{
-    return _mm256_add_epi64(a, b);
-}
-
-FLINT_FORCE_INLINE vec4n vec4n_sub(vec4n a, vec4n b)
-{
-    return _mm256_sub_epi64(a, b);
-}
-
-/* for n < 2^63 */
-FLINT_FORCE_INLINE vec4n vec4n_addmod_limited(vec4n a, vec4n b, vec4n n)
-{
-    vec4n s = vec4n_add(a, b);
-    vec4n t = vec4n_sub(s, n);
-    vec4n m = _mm256_srai_epi32(t, 31);
-          m = _mm256_shuffle_epi32(m, 1 + 4*(1 + 4*(3 + 4*(3))));
-    return _mm256_blendv_epi8(t, s, m);
-}
-
-FLINT_FORCE_INLINE vec4n vec4n_addmod(vec4n a, vec4n b, vec4n n)
-{
-    vec4n tt = vec4n_set_n(0x8000000000000000);
-    vec4n s = vec4n_add(a, b);
-#if 0
-    vec4n  m = vec4n_sub(n, tt);
-    vec4n t0 = vec4n_sub(m, a);
-    vec4n t1 = vec4n_sub(b, tt);
-    vec4n t2 = vec4n_sub(t1, t0);
-    return _mm256_blendv_epi8(s, t2, _mm256_cmpgt_epi64(t1, t0));
-#else
-    vec4n t0 = vec4n_sub(s, n);
-    vec4n t1 = vec4n_sub(a, tt);
-    vec4n t2 = vec4n_sub(t0, tt);
-    return _mm256_blendv_epi8(t0, s, _mm256_cmpgt_epi64(t2, t1));
-#endif
 }
 
 EXTEND_VEC_DEF0(vec4d, vec8d, _zero)
@@ -740,6 +773,12 @@ EXTEND_VEC_DEF4(vec4d, vec8d, _nmulmod)
 
 
 
+/* vec8n -- AVX2 ***********************************************************/
+
+FLINT_FORCE_INLINE vec8n vec8n_load_unaligned(const ulong* a) {
+    vec8n z = {vec4n_load_unaligned(a+0), vec4n_load_unaligned(a+4)};
+    return z;
+}
 
 FLINT_FORCE_INLINE vec8n vec8n_set_n(ulong a) {
     vec4n x = vec4n_set_n(a);
@@ -747,22 +786,12 @@ FLINT_FORCE_INLINE vec8n vec8n_set_n(ulong a) {
     return z;
 }
 
-FLINT_FORCE_INLINE vec4n vec4n_bit_shift_right(vec4n a, ulong b) {
-    return _mm256_srl_epi64(a, _mm_set_epi32(0,0,0,b));
-}
-
 FLINT_FORCE_INLINE vec8n vec8n_bit_shift_right(vec8n a, ulong b) {
     vec8n z = {vec4n_bit_shift_right(a.e1, b), vec4n_bit_shift_right(a.e2, b)};
     return z;
 }
 
-#define vec4n_bit_shift_right_32(a) vec4n_bit_shift_right((a), 32)
 #define vec8n_bit_shift_right_32(a) vec8n_bit_shift_right((a), 32)
-
-
-FLINT_FORCE_INLINE vec4n vec4n_bit_and(vec4n a, vec4n b) {
-    return _mm256_and_si256(a, b);
-}
 
 FLINT_FORCE_INLINE vec8n vec8n_bit_and(vec8n a, vec8n b) {
     vec8n z = {vec4n_bit_and(a.e1, b.e1), vec4n_bit_and(a.e2, b.e2)};
@@ -784,7 +813,7 @@ typedef struct {vec2d e1, e2;} vec4d;
 typedef struct {vec4d e1, e2;} vec8d;
 
 #define EXTEND_VEC_DEF0(U, V, f) \
-FLINT_FORCE_INLINE V V##f() { \
+FLINT_FORCE_INLINE V V##f(void) { \
     U z1 = U##f(); \
     U z2 = U##f(); \
     V z = {z1, z2}; return z; \
@@ -819,7 +848,9 @@ FLINT_FORCE_INLINE V V##f(V a, V b, V c, V d) { \
 }
 
 
-/* vec1 **************************************************/
+/* floating point stuff ******************************************************/
+
+/* vec1d -- NEON/ARM64 *********************************************/
 
 FLINT_FORCE_INLINE vec1d vec1d_load(const double* a) {
     return a[0];
@@ -857,11 +888,11 @@ FLINT_FORCE_INLINE vec1d vec1d_round(vec1d a) {
     return rint(a);
 }
 
-FLINT_FORCE_INLINE vec1d vec1d_zero() {
+FLINT_FORCE_INLINE vec1d vec1d_zero(void) {
     return 0.0;
 }
 
-FLINT_FORCE_INLINE vec1d vec1d_one() {
+FLINT_FORCE_INLINE vec1d vec1d_one(void) {
     return 1.0;
 }
 
@@ -942,7 +973,7 @@ FLINT_FORCE_INLINE vec1d vec1d_reduce_pm1n_to_pmhn(vec1d a, vec1d n) {
         return a;
 }
 
-/* vec2 **********************************************************************/
+/* vec2d -- NEON/ARM64 *********************************************/
 
 FLINT_FORCE_INLINE double vec2d_get_index(vec2d a, int i) {
     return a[i];
@@ -956,7 +987,7 @@ FLINT_FORCE_INLINE vec2d vec2d_set_d2(double a0, double a1)
 
 FLINT_FORCE_INLINE vec2d vec2d_set_d(double a)
 {
-    return vec2d_set_d2(a, a);
+    return vdupq_n_f64(a);
 }
 
 FLINT_FORCE_INLINE vec2d vec2d_load(const double* a)
@@ -989,14 +1020,14 @@ FLINT_FORCE_INLINE void vec2d_store_aligned(double* z, vec2d a)
     vst1q_f64(z, a);
 }
 
-FLINT_FORCE_INLINE vec2d vec2d_zero()
+FLINT_FORCE_INLINE vec2d vec2d_zero(void)
 {
-    return vec2d_set_d(0.0);
+    return vdupq_n_f64(0.0);
 }
 
-FLINT_FORCE_INLINE vec2d vec2d_one()
+FLINT_FORCE_INLINE vec2d vec2d_one(void)
 {
-    return vec2d_set_d(1.0);
+    return vdupq_n_f64(1.0);
 }
 
 FLINT_FORCE_INLINE vec2d vec2d_neg(vec2d a)
@@ -1048,7 +1079,7 @@ FLINT_FORCE_INLINE vec2d vec2d_mul(vec2d a, vec2d b)
 
 FLINT_FORCE_INLINE vec2d vec2d_half(vec2d a)
 {
-    return vec2d_mul(a, vec2d_set_d(0.5));
+    return vmulq_n_f64(a, 0.5);
 }
 
 FLINT_FORCE_INLINE vec2d vec2d_fmadd(vec2d a, vec2d b, vec2d c) {
@@ -1104,13 +1135,17 @@ FLINT_FORCE_INLINE vec2d vec2d_reduce_to_pm1n(vec2d a, vec2d n, vec2d ninv) {
 
 FLINT_FORCE_INLINE vec2d vec2d_reduce_0n_to_pmhn(vec2d a, vec2d n) {
     vec2d halfn = vec2d_half(n);
-    return vec2d_blendv(a, vec2d_sub(a, n), vec2d_cmp_gt(a, halfn));
+    return vbslq_f64(vcgtq_f64(a, halfn), vec2d_sub(a, n), a);
 }
 
 FLINT_FORCE_INLINE vec2d vec2d_reduce_pm1n_to_pmhn(vec2d a, vec2d n) {
     vec2d halfn = vec2d_half(n);
-    vec2d t = vec2d_blendv(n, vec2d_neg(n), vec2d_cmp_lt(a, vec2d_zero()));
-    return vec2d_blendv(a, vec2d_sub(a, t), vec2d_cmp_gt(vec2d_abs(a), halfn));
+    vec2d t = vec2d_add(a, n);
+    
+    vec2n condition_a = vcgtq_f64(a, halfn);
+    vec2n condition_t = vcltq_f64(t, halfn);
+    
+    return vbslq_f64(condition_a, vec2d_sub(a, n), vbslq_f64(condition_t, t, a));
 }
 
 FLINT_FORCE_INLINE vec1d vec1d_reduce_pm1no_to_0n(vec1d a, vec1d n) {
@@ -1118,7 +1153,7 @@ FLINT_FORCE_INLINE vec1d vec1d_reduce_pm1no_to_0n(vec1d a, vec1d n) {
 }
 
 FLINT_FORCE_INLINE vec2d vec2d_reduce_pm1no_to_0n(vec2d a, vec2d n) {
-    return vec2d_blendv(a, vec2d_add(a, n), vec2d_cmp_lt(a, vec2d_zero()));
+    return vbslq_f64(vcgeq_f64(a, vec2d_zero()), a, vaddq_f64(a, n));
 }
 
 FLINT_FORCE_INLINE vec1d vec1d_reduce_to_0n(vec1d a, vec1d n, vec1d ninv) {
@@ -1152,7 +1187,7 @@ DEFINE_IT(vec2d)
 
 
 
-/* vec4 **********************************************************************/
+/* vec4d -- NEON/ARM64 *********************************************/
 
 FLINT_FORCE_INLINE vec4d vec4d_set_vec2d2(vec2d a, vec2d b) {
     vec4d z = {a, b}; return z;
@@ -1170,7 +1205,7 @@ FLINT_FORCE_INLINE vec4d vec4d_set_d4(double a0, double a1, double a2, double a3
 FLINT_FORCE_INLINE vec4d vec4d_set_d(double a)
 {
     vec2d z1 = vec2d_set_d(a);
-    return vec4d_set_vec2d2(z1, z1);
+    vec4d z = {z1, z1}; return z;
 }
 
 FLINT_FORCE_INLINE void vec4d_store(double* z, vec4d a)
@@ -1292,7 +1327,12 @@ EXTEND_VEC_DEF3(vec2d, vec4d, _blendv)
 EXTEND_VEC_DEF4(vec2d, vec4d, _mulmod)
 EXTEND_VEC_DEF4(vec2d, vec4d, _nmulmod)
 
-/* vec8 **********************************************************************/
+
+/* vec8d -- NEON/ARM64 *********************************************/
+
+FLINT_FORCE_INLINE vec8d vec8d_set_vec4d2(vec4d a, vec4d b) {
+    vec8d z = {a, b}; return z;
+}
 
 FLINT_FORCE_INLINE double vec8d_get_index(vec8d a, int i) {
     return i < 4 ? vec4d_get_index(a.e1, i) : vec4d_get_index(a.e2, i - 4);
@@ -1396,25 +1436,96 @@ DEFINE_IT(vec2d)
 
 /* integer stuff *************************************************************/
 
+/* vec1n -- NEON/ARM64 *********************************************/
+
 FLINT_FORCE_INLINE void vec1n_store_unaligned(ulong* z, vec1n a) {
     z[0] = a;
-}
-
-FLINT_FORCE_INLINE void vec2n_store_unaligned(ulong* z, vec2n a) {
-   vst1q_u64(z, a);
-}
-
-FLINT_FORCE_INLINE void vec4n_store_unaligned(ulong* z, vec4n a) {
-    vec2n_store_unaligned(z+0, a.e1);
-    vec2n_store_unaligned(z+2, a.e2);
 }
 
 FLINT_FORCE_INLINE vec1n vec1d_convert_limited_vec1n(vec1d a) {
     return (slong)a;
 }
 
+// (a + b) % n
+FLINT_FORCE_INLINE vec1n vec1n_addmod(vec1n a, vec1n b, vec1n n) {
+    vec1n nmb = n - b;
+    return nmb > a ? a + b : a - nmb;
+}
+
+/* vec2n -- NEON/ARM64 *********************************************/
+
+FLINT_FORCE_INLINE vec2d vec2n_convert_limited_vec2d(vec2n a) {
+    float64x2_t t = vdupq_n_f64(0x1.0p52);
+    return vsubq_f64(vreinterpretq_f64_u64(vorrq_u64(a, vreinterpretq_u64_f64(t))), t);
+}
+
+FLINT_FORCE_INLINE void vec2n_store_unaligned(ulong* z, vec2n a) {
+   vst1q_u64(z, a);
+}
+
 FLINT_FORCE_INLINE vec2n vec2d_convert_limited_vec2n(vec2d a) {
     return vcvtnq_u64_f64(a);
+}
+
+FLINT_FORCE_INLINE vec2n vec2n_set_n(ulong a) {
+    vec2n x = vdupq_n_u64(a);
+    return x;
+}
+
+FLINT_FORCE_INLINE vec2n vec2n_load_unaligned(const ulong* a) {
+    return vld1q_u64(a);
+}
+
+// Right shift 32bits
+FLINT_FORCE_INLINE vec2n vec2n_bit_shift_right_32(vec2n a) {
+    return vshrq_n_u64(a, 32);
+}
+
+// AND operation
+FLINT_FORCE_INLINE vec2n vec2n_bit_and(vec2n a, vec2n b) {
+    return vandq_u64(a, b);
+}
+
+// Addition
+FLINT_FORCE_INLINE vec2n vec2n_add(vec2n a, vec2n b) {
+    return vaddq_u64(a, b);
+}
+
+// Substraction
+FLINT_FORCE_INLINE vec2n vec2n_sub(vec2n a, vec2n b) {
+    return vsubq_u64(a, b);
+}
+
+// (a + b) % n
+FLINT_FORCE_INLINE vec2n vec2n_addmod(vec2n a, vec2n b, vec2n n) {
+    vec2n nmb = vec2n_sub(n, b);
+    vec2n sum = vec2n_sub(a, nmb);
+    
+    vec2n mask = vcgtq_u64(nmb, a);
+    
+    return vec2n_add(sum, vandq_u64(n, mask));
+}
+
+// (a + b) % n for n < 2^63
+FLINT_FORCE_INLINE vec2n vec2n_addmod_limited(vec2n a, vec2n b, vec2n n) {
+    vec2n s = vec2n_add(a, b);
+    
+    vec2n mask = vcgeq_u64(s, n);
+    
+    return vec2n_sub(s, vandq_u64(n, mask));
+}
+
+/* vec4n -- NEON/ARM64 *********************************************/
+
+FLINT_FORCE_INLINE vec4d vec4n_convert_limited_vec4d(vec4n a) {
+    vec2d z1 = vec2n_convert_limited_vec2d(a.e1);
+    vec2d z2 = vec2n_convert_limited_vec2d(a.e2);
+    vec4d z = {z1, z2}; return z;
+}
+
+FLINT_FORCE_INLINE void vec4n_store_unaligned(ulong* z, vec4n a) {
+    vec2n_store_unaligned(z+0, a.e1);
+    vec2n_store_unaligned(z+2, a.e2);
 }
 
 FLINT_FORCE_INLINE vec4n vec4d_convert_limited_vec4n(vec4d a) {
@@ -1423,34 +1534,37 @@ FLINT_FORCE_INLINE vec4n vec4d_convert_limited_vec4n(vec4d a) {
     vec4n z = {z1, z2}; return z;
 }
 
-
-FLINT_FORCE_INLINE vec2n vec2n_set_n(ulong a) {
-    vec2n x = vdupq_n_u64(a);
-    return x;
-}
-
 FLINT_FORCE_INLINE vec4n vec4n_set_n(ulong a) {
     vec2n x = vec2n_set_n(a);
     vec4n z = {x, x};
     return z;
 }
 
+FLINT_FORCE_INLINE vec4n vec4n_load_unaligned(const ulong* a) {
+    vec2n z1 = vec2n_load_unaligned(a+0);
+    vec2n z2 = vec2n_load_unaligned(a+2);
+    vec4n z = {z1, z2}; return z;
+}
+
+EXTEND_VEC_DEF1(vec2n, vec4n, _bit_shift_right_32)
+EXTEND_VEC_DEF2(vec2n, vec4n, _bit_and)
+EXTEND_VEC_DEF2(vec2n, vec4n, _add)
+EXTEND_VEC_DEF2(vec2n, vec4n, _sub)
+EXTEND_VEC_DEF3(vec2n, vec4n, _addmod)
+EXTEND_VEC_DEF3(vec2n, vec4n, _addmod_limited)
+
+/* vec8n -- NEON/ARM64 *********************************************/
+
+FLINT_FORCE_INLINE vec8d vec8n_convert_limited_vec8d(vec8n a) {
+    vec4d z1 = vec4n_convert_limited_vec4d(a.e1);
+    vec4d z2 = vec4n_convert_limited_vec4d(a.e2);
+    vec8d z = {z1, z2}; return z;
+}
+
 FLINT_FORCE_INLINE vec8n vec8n_set_n(ulong a) {
     vec4n x = vec4n_set_n(a);
     vec8n z = {x, x};
     return z;
-}
-
-FLINT_FORCE_INLINE vec2n vec2n_load_unaligned(const ulong* a)
-{
-    return vld1q_u64(a);
-}
-
-FLINT_FORCE_INLINE vec4n vec4n_load_unaligned(const ulong* a)
-{
-    vec2n z1 = vec2n_load_unaligned(a+0);
-    vec2n z2 = vec2n_load_unaligned(a+2);
-    vec4n z = {z1, z2}; return z;
 }
 
 FLINT_FORCE_INLINE vec8n vec8n_load_unaligned(const ulong* a)
@@ -1460,66 +1574,22 @@ FLINT_FORCE_INLINE vec8n vec8n_load_unaligned(const ulong* a)
     vec8n z = {z1, z2}; return z;
 }
 
-/* todo: implement using intrinsics */
 
-FLINT_FORCE_INLINE vec1n vec1n_addmod(vec1n a, vec1n b, vec1n n)
-{
-    return n - b > a ? a + b : a + b - n;
-}
-
-FLINT_FORCE_INLINE vec2n vec2n_addmod(vec2n a, vec2n b, vec2n n)
-{
-    vec2n z = {vec1n_addmod(a[0], b[0], n[0]), vec1n_addmod(a[1], b[1], n[1])};
-    return z;
-}
-
-EXTEND_VEC_DEF3(vec2n, vec4n, _addmod)
-EXTEND_VEC_DEF3(vec4n, vec8n, _addmod)
-
-/* todo: optimized version */
-FLINT_FORCE_INLINE vec8n vec8n_addmod_limited(vec8n a, vec8n b, vec8n n)
-{
-    return vec8n_addmod(a, b, n);
-}
-
-FLINT_FORCE_INLINE vec2d vec2n_convert_limited_vec2d(vec2n a)
-{
-    float64x2_t t = vdupq_n_f64(0x1.0p52);
-    return vsubq_f64(vreinterpretq_f64_u64(vorrq_u64(a, vreinterpretq_u64_f64(t))), t);
-}
-
-FLINT_FORCE_INLINE vec4d vec4n_convert_limited_vec4d(vec4n a)
-{
-    return vec4d_set_vec2d2(vec2n_convert_limited_vec2d(a.e1),
-                            vec2n_convert_limited_vec2d(a.e2));
-}
-
-FLINT_FORCE_INLINE vec8d vec8d_set_vec4d2(vec4d a, vec4d b)
-{
-    vec8d z = {a, b}; return z;
-}
-
-FLINT_FORCE_INLINE vec8d vec8n_convert_limited_vec8d(vec8n a)
-{
-    return vec8d_set_vec4d2(vec4n_convert_limited_vec4d(a.e1),
-                            vec4n_convert_limited_vec4d(a.e2));
-}
-
-FLINT_FORCE_INLINE vec2n vec2n_bit_and(vec2n a, vec2n b)
-{
-    return vandq_u64(a, b);
-}
-
-EXTEND_VEC_DEF2(vec2n, vec4n, _bit_and)
+EXTEND_VEC_DEF1(vec4n, vec8n, _bit_shift_right_32)
 EXTEND_VEC_DEF2(vec4n, vec8n, _bit_and)
+EXTEND_VEC_DEF2(vec4n, vec8n, _add)
+EXTEND_VEC_DEF2(vec4n, vec8n, _sub)
+EXTEND_VEC_DEF3(vec4n, vec8n, _addmod)
+EXTEND_VEC_DEF3(vec4n, vec8n, _addmod_limited)
+
 
 #if 0
 /*
-   vshrq_n_u64(a, n) cannot be used because n must be a compile-time
-   constant, and the compiler doesn't see that n is constant
-   even if the function is forced inline.
-   And vshlq_s64(a, vdupq_n_s64(-(slong) n)) cannot be used to emulate
-   vshrq_n_u64(a, n) as it propagates the sign bit.
+    vshrq_n_u64(a, n) cannot be used because n must be a compile-time
+    constant, and the compiler doesn't see that n is constant
+    even if the function is forced inline.
+    And vshlq_s64(a, vdupq_n_s64(-(slong) n)) cannot be used to emulate
+    vshrq_n_u64(a, n) as it propagates the sign bit.
 */
 FLINT_FORCE_INLINE vec2n vec2n_bit_shift_right(vec2n a, ulong n)
 {
@@ -1538,23 +1608,6 @@ FLINT_FORCE_INLINE vec8n vec8n_bit_shift_right(vec8n a, ulong n)
     return z;
 }
 #endif
-
-FLINT_FORCE_INLINE vec2n vec2n_bit_shift_right_32(vec2n a)
-{
-    return vshrq_n_u64(a, 32);
-}
-
-FLINT_FORCE_INLINE vec4n vec4n_bit_shift_right_32(vec4n a)
-{
-    vec4n z = {vec2n_bit_shift_right_32(a.e1), vec2n_bit_shift_right_32(a.e2)};
-    return z;
-}
-
-FLINT_FORCE_INLINE vec8n vec8n_bit_shift_right_32(vec8n a)
-{
-    vec8n z = {vec4n_bit_shift_right_32(a.e1), vec4n_bit_shift_right_32(a.e2)};
-    return z;
-}
 
 
 #undef EXTEND_VEC_DEF4

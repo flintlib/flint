@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "mpoly.h"
 #include "fmpz_mod_mpoly.h"
 
@@ -45,7 +46,7 @@ void mpoly_void_ring_elem_clear(void * a, mpoly_void_ring_t R)
     flint_free(a);
 }
 
-void mpoly_univar_init(mpoly_univar_t A, mpoly_void_ring_t R)
+void mpoly_univar_init(mpoly_univar_t A, mpoly_void_ring_t FLINT_UNUSED(R))
 {
     A->coeffs = NULL;
     A->exps = NULL;
@@ -922,4 +923,3 @@ int mpoly_univar_discriminant(
 
     return success;
 }
-

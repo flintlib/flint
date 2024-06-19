@@ -397,7 +397,7 @@ Multiplication
     but polynomials in `\mathbf{F}_q[Y]` of large degree `n`, we
     change the representation to
 
-    .. math ::
+    .. math::
 
 
         \begin{split}

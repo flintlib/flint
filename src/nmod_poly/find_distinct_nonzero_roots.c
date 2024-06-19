@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -42,7 +42,7 @@ try_again:
         goto try_again;
     }
 
-    nmod_poly_div(b, f, a);
+    nmod_poly_divexact(b, f, a);
 
     /* deg a >= deg b */
     if (nmod_poly_degree(a) < nmod_poly_degree(b))
@@ -57,10 +57,10 @@ try_again:
     The modulus of P is assumed to be prime.
 */
 int nmod_poly_find_distinct_nonzero_roots(
-    mp_limb_t * roots,
+    ulong * roots,
     const nmod_poly_t P)
 {
-    mp_limb_t a0, a1;
+    ulong a0, a1;
     int success;
     slong i, roots_idx, sp;
     nmod_poly_struct * a , * b;
@@ -90,7 +90,7 @@ int nmod_poly_find_distinct_nonzero_roots(
     if (P->coeffs[0] == 0)
         return 0;
 
-    flint_randinit(randstate);
+    flint_rand_init(randstate);
     nmod_poly_init_mod(t, P->mod);
     nmod_poly_init_mod(t2, P->mod);
     nmod_poly_init_mod(f, P->mod);
@@ -155,7 +155,7 @@ int nmod_poly_find_distinct_nonzero_roots(
 
 cleanup:
 
-    flint_randclear(randstate);
+    flint_rand_clear(randstate);
     nmod_poly_clear(t);
     nmod_poly_clear(t2);
     nmod_poly_clear(f);

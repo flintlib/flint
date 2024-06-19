@@ -5,11 +5,16 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
+#include "nmod_poly.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "mpoly.h"
 #include "fmpz_mpoly_factor.h"
 
 /*
@@ -29,7 +34,7 @@ void fmpz_mpoly_evals(
     ulong * Amin_exp,
     ulong * Amax_exp,
     ulong * Astride,
-    mp_limb_t * alpha,
+    ulong * alpha,
     const fmpz_mpoly_ctx_t ctx)
 {
     slong i, j;
@@ -42,8 +47,8 @@ void fmpz_mpoly_evals(
     slong N = mpoly_words_per_exp_sp(A->bits, ctx->minfo);
     ulong * Aexp = A->exps;
     fmpz * Acoeff = A->coeffs;
-    mp_limb_t meval;
-    mp_limb_t t;
+    ulong meval;
+    ulong t;
 
     FLINT_ASSERT(A->bits <= FLINT_BITS);
 
@@ -77,20 +82,20 @@ void fmpz_mpoly_evals(
     if (use_direct_LUT)
     {
         slong off;
-        mp_limb_t * LUT, ** LUTvalue, ** LUTvalueinv;
+        ulong * LUT, ** LUTvalue, ** LUTvalueinv;
 
         /* value of powers of alpha[j] */
-        LUT = (mp_limb_t *) flint_malloc(2*total_length*sizeof(mp_limb_t));
+        LUT = (ulong *) flint_malloc(2*total_length*sizeof(ulong));
 
         /* pointers into LUT */
-        LUTvalue    = (mp_limb_t **) flint_malloc(nvars*sizeof(mp_limb_t *));
-        LUTvalueinv = (mp_limb_t **) flint_malloc(nvars*sizeof(mp_limb_t *));
+        LUTvalue    = (ulong **) flint_malloc(nvars*sizeof(ulong *));
+        LUTvalueinv = (ulong **) flint_malloc(nvars*sizeof(ulong *));
 
         off = 0;
         for (j = 0; j < nvars; j++)
         {
             ulong k;
-            mp_limb_t alphainvj = nmod_inv(alpha[j], (out + 0)->mod);
+            ulong alphainvj = nmod_inv(alpha[j], (out + 0)->mod);
 
             LUTvalue[j] = LUT + off;
             LUTvalueinv[j] = LUT + total_length + off;
@@ -149,17 +154,17 @@ void fmpz_mpoly_evals(
         slong LUTlen;
         ulong * LUTmask;
         slong * LUToffset, * LUTvar;
-        mp_limb_t * LUTvalue, * LUTvalueinv;
-        mp_limb_t * vieval;
-        mp_limb_t t, xpoweval, xinvpoweval;
+        ulong * LUTvalue, * LUTvalueinv;
+        ulong * vieval;
+        ulong t, xpoweval, xinvpoweval;
 
         LUToffset   = (slong *) flint_malloc(N*FLINT_BITS*sizeof(slong));
         LUTmask     = (ulong *) flint_malloc(N*FLINT_BITS*sizeof(ulong));
-        LUTvalue    = (mp_limb_t *) flint_malloc(N*FLINT_BITS*sizeof(mp_limb_t));
+        LUTvalue    = (ulong *) flint_malloc(N*FLINT_BITS*sizeof(ulong));
         LUTvar      = (slong *) flint_malloc(N*FLINT_BITS*sizeof(slong));
-        LUTvalueinv = (mp_limb_t *) flint_malloc(N*FLINT_BITS*sizeof(mp_limb_t));
+        LUTvalueinv = (ulong *) flint_malloc(N*FLINT_BITS*sizeof(ulong));
 
-        vieval = (mp_limb_t *) flint_malloc(nvars*sizeof(mp_limb_t));
+        vieval = (ulong *) flint_malloc(nvars*sizeof(ulong));
 
         LUTlen = 0;
         for (j = nvars - 1; j >= 0; j--)
@@ -167,7 +172,7 @@ void fmpz_mpoly_evals(
             flint_bitcnt_t bits = FLINT_BIT_COUNT(Amax_exp[j]);
             xpoweval = alpha[j]; /* xpoweval = alpha[j]^(2^i) */
             xinvpoweval = nmod_inv(xpoweval, (out + 0)->mod); /* alpha[j]^(-2^i) */
-            for (i = 0; i < bits; i++)
+            for (i = 0; (flint_bitcnt_t) i < bits; i++)
             {
                 LUToffset[LUTlen] = offsets[j];
                 LUTmask[LUTlen] = (UWORD(1) << (shifts[j] + i));
@@ -239,16 +244,16 @@ void _set_estimates(
     slong i, j;
     nmod_poly_t Geval;
     nmod_poly_struct * Aevals, * Bevals;
-    mp_limb_t p = UWORD(1) << (FLINT_BITS - 1);
-    mp_limb_t * alpha;
+    ulong p = UWORD(1) << (FLINT_BITS - 1);
+    ulong * alpha;
     flint_rand_t randstate;
     slong ignore_limit;
     int * ignore;
 
-    flint_randinit(randstate);
+    flint_rand_init(randstate);
 
     ignore = (int *) flint_malloc(ctx->minfo->nvars*sizeof(int));
-    alpha = (mp_limb_t *) flint_malloc(ctx->minfo->nvars*sizeof(mp_limb_t));
+    alpha = (ulong *) flint_malloc(ctx->minfo->nvars*sizeof(ulong));
     Aevals = (nmod_poly_struct *) flint_malloc(
                                    ctx->minfo->nvars*sizeof(nmod_poly_struct));
     Bevals = (nmod_poly_struct *) flint_malloc(
@@ -346,7 +351,7 @@ cleanup:
     flint_free(Aevals);
     flint_free(Bevals);
 
-    flint_randclear(randstate);
+    flint_rand_clear(randstate);
 
     return;
 }
@@ -730,7 +735,7 @@ static int _try_missing_var(
     fmpz_mpoly_init(tG, ctx);
     fmpz_mpoly_univar_init(Au, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mpoly_to_univar(Au, B, var, ctx);
     FLINT_ASSERT(Au->length == 1);
 #endif
@@ -986,7 +991,7 @@ static int _try_zippel(
     FLINT_ASSERT(A->length > 0);
     FLINT_ASSERT(B->length > 0);
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     fmpz_mpoly_ctx_init(lctx, m, ORD_LEX);
 
@@ -1077,7 +1082,7 @@ cleanup:
 
     fmpz_mpoly_ctx_clear(lctx);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     return success;
 }
@@ -1435,7 +1440,7 @@ static int _fmpz_mpoly_gcd_algo_small(
     slong j;
     slong nvars = ctx->minfo->nvars;
     mpoly_gcd_info_t I;
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mpoly_t T, Asave, Bsave;
 #endif
 
@@ -1450,7 +1455,7 @@ static int _fmpz_mpoly_gcd_algo_small(
     if (B->length == 1)
         return _do_monomial_gcd(G, Abar, Bbar, A, B, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mpoly_init(T, ctx);
     fmpz_mpoly_init(Asave, ctx);
     fmpz_mpoly_init(Bsave, ctx);
@@ -1746,7 +1751,7 @@ cleanup:
         FLINT_ASSERT(Bbar == NULL || fmpz_mpoly_equal(T, Bbar, ctx));
     }
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mpoly_clear(T, ctx);
     fmpz_mpoly_clear(Asave, ctx);
     fmpz_mpoly_clear(Bsave, ctx);
@@ -1907,4 +1912,3 @@ int _fmpz_mpoly_gcd_algo(
     else
         return _fmpz_mpoly_gcd_algo_large(G, Abar, Bbar, A, B, ctx, algo);
 }
-

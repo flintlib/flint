@@ -5,17 +5,16 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "ulong_extras.h"
 
-mp_limb_t
-n_powmod_ui_precomp(mp_limb_t a, mp_limb_t exp, mp_limb_t n, double npre)
+ulong
+n_powmod_ui_precomp(ulong a, ulong exp, ulong n, double npre)
 {
-    mp_limb_t x, y;
+    ulong x, y;
 
     if (n == UWORD(1))
         return WORD(0);
@@ -35,8 +34,8 @@ n_powmod_ui_precomp(mp_limb_t a, mp_limb_t exp, mp_limb_t n, double npre)
     return x;
 }
 
-mp_limb_t
-n_powmod_precomp(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n, double npre)
+ulong
+n_powmod_precomp(ulong a, slong exp, ulong n, double npre)
 {
     if (exp < 0)
     {

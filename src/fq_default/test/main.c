@@ -5,15 +5,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
-#include <stdlib.h>
-
 /* Include functions *********************************************************/
 
+#include "t-ctx_init.c"
 #include "t-ctx_init_modulus.c"
 #include "t-ctx_init_modulus_nmod.c"
 #include "t-ctx_modulus.c"
@@ -27,6 +25,7 @@
 
 test_struct tests[] =
 {
+    TEST_FUNCTION(fq_default_ctx_init),
     TEST_FUNCTION(fq_default_ctx_init_modulus),
     TEST_FUNCTION(fq_default_ctx_init_modulus_nmod),
     TEST_FUNCTION(fq_default_ctx_modulus),

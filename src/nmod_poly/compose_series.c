@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -14,8 +14,8 @@
 #include "gr_poly.h"
 
 void
-_nmod_poly_compose_series(mp_ptr res, mp_srcptr poly1, slong len1,
-                            mp_srcptr poly2, slong len2, slong n, nmod_t mod)
+_nmod_poly_compose_series(nn_ptr res, nn_srcptr poly1, slong len1,
+                            nn_srcptr poly2, slong len2, slong n, nmod_t mod)
 {
     gr_ctx_t ctx;
     _gr_ctx_init_nmod(ctx, &mod);
@@ -32,9 +32,8 @@ nmod_poly_compose_series(nmod_poly_t res,
 
     if (len2 != 0 && poly2->coeffs[0] != 0)
     {
-        flint_printf("Exception (nmod_poly_compose_series). Inner polynomial \n"
-               "must have zero constant term.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(nmod_poly_compose_series): "
+                "Inner polynomial must have zero constant term.\n");
     }
 
     if (len1 == 0 || n == 0)

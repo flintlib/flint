@@ -5,13 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_poly.h"
+#include "mpoly.h"
 #include "fmpz_mpoly_factor.h"
-#include "n_poly.h"
 
 /*
     only E and alphas are shifted by "var"
@@ -166,7 +167,7 @@ next:
         stop++;
 
     fmpz_poly_fit_length(E, e + 1);
-    while (E->length <= e)
+    while (E->length <= (slong) e)
     {
         fmpz_zero(E->coeffs + E->length);
         E->length++;
@@ -198,4 +199,3 @@ next:
     flint_free(offsets);
     flint_free(shifts);
 }
-

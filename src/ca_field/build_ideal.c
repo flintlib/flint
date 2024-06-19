@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -19,8 +19,7 @@
 #include "qqbar.h"
 #include "fmpz_mpoly.h"
 
-int qqbar_mul_checked(qqbar_t res, const qqbar_t x, const qqbar_t y, slong deg_limit, slong bits_limit);
-int qqbar_pow_fmpz_checked(qqbar_t res, const qqbar_t x, const fmpz_t y, slong deg_limit, slong bits_limit);
+#include "gr.h"
 
 slong
 acb_multi_lindep(fmpz_mat_t rel, acb_srcptr vec, slong len, int check, slong prec)
@@ -35,7 +34,7 @@ acb_multi_lindep(fmpz_mat_t rel, acb_srcptr vec, slong len, int check, slong pre
     mag_t max_size, max_rad, tmpmag;
 
     if (fmpz_mat_nrows(rel) != 0 || fmpz_mat_ncols(rel) != 0)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     fmpz_mat_clear(rel);
 
@@ -189,8 +188,7 @@ _ca_field_ideal_insert_clear_mpoly(ca_field_t K, fmpz_mpoly_t poly, fmpz_mpoly_c
 {
     if (poly->length == 0)
     {
-        flint_printf("ERROR: inserting the zero polynomial into ideal\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "ERROR: inserting the zero polynomial into ideal\n");
     }
 
     if (fmpz_sgn(poly->coeffs) < 0)
@@ -574,26 +572,32 @@ ca_field_prove_multiplicative_relation(ca_field_t K, const fmpz * rel,
 
         qqbar_one(a);
 
+        /* qqbar arithmetic with (bogus) limits */
+        gr_ctx_t QQbar;
+        gr_ctx_init_complex_qqbar(QQbar);
+        _gr_ctx_qqbar_set_limits(QQbar, ctx->options[CA_OPT_QQBAR_DEG_LIMIT], ctx->options[CA_OPT_PREC_LIMIT] * 10);
+
         for (i = 0; i < num_powers; i++)
         {
             if (!fmpz_is_zero(rel + i))
             {
                 ca_ext_srcptr ext = CA_FIELD_EXT_ELEM(K, powers[i]);
 
-                /* xxx: bogus limits */
-                if (!qqbar_pow_fmpz_checked(b, CA_EXT_QQBAR(ext), rel + i, ctx->options[CA_OPT_QQBAR_DEG_LIMIT], ctx->options[CA_OPT_PREC_LIMIT] * 10))
+                if (gr_pow_fmpz(b, CA_EXT_QQBAR(ext), rel + i, QQbar) != GR_SUCCESS)
                 {
                     success = 0;
                     goto qqbar_end;
                 }
 
-                if (!qqbar_mul_checked(a, a, b, ctx->options[CA_OPT_QQBAR_DEG_LIMIT], ctx->options[CA_OPT_PREC_LIMIT] * 10))
+                if (gr_mul(a, a, b, QQbar) != GR_SUCCESS)
                 {
                     success = 0;
                     goto qqbar_end;
                 }
             }
         }
+
+        gr_ctx_clear(QQbar);
 
         /* (-1)^ */
         if (fmpz_is_odd(rel + num_powers))
@@ -643,7 +647,7 @@ qqbar_end:
                 }
                 else
                 {
-                    flint_abort();
+                    flint_throw(FLINT_ERROR, "(%s)\n", __func__);
                 }
 
                 ca_mul_fmpz(u, u, rel + i, ctx);
@@ -815,7 +819,7 @@ ca_field_build_ideal_multiplicative(ca_field_t K, ca_ctx_t ctx)
             }
             else
             {
-                flint_abort();
+                flint_throw(FLINT_ERROR, "(%s)\n", __func__);
             }
         }
 
@@ -1009,7 +1013,7 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
                 t = CA_EXT_FUNC_ARGS(x);
 
                 if (CA_IS_SPECIAL(t))
-                    flint_abort();
+                    flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
                 L = CA_FIELD(t, ctx);
                 L_len = CA_FIELD_LENGTH(L);

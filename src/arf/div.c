@@ -5,14 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "mpn_extras.h"
 #include "arf.h"
 
-void __gmpn_div_q(mp_ptr, mp_srcptr, mp_size_t, mp_srcptr, mp_size_t, mp_ptr);
+void __gmpn_div_q(nn_ptr, nn_srcptr, slong, nn_srcptr, slong, nn_ptr);
 
 void
 arf_div_special(arf_t z, const arf_t x, const arf_t y)
@@ -36,10 +36,10 @@ arf_div_special(arf_t z, const arf_t x, const arf_t y)
 int
 arf_div(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec, arf_rnd_t rnd)
 {
-    mp_size_t xn, yn, zn, sn, tn, alloc;
-    mp_srcptr xptr, yptr;
-    mp_ptr tmp;
-    mp_ptr tptr, zptr;
+    slong xn, yn, zn, sn, tn, alloc;
+    nn_srcptr xptr, yptr;
+    nn_ptr tmp;
+    nn_ptr tptr, zptr;
     int inexact;
     slong fix, fix2;
     ARF_MUL_TMP_DECL
@@ -109,9 +109,9 @@ arf_div(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec, arf_rnd_t rnd)
            tptr[sn + xn] is guaranteed to be zero in that case since the
            approximate quotient cannot be larger than the true quotient. */
         if (zn >= yn)
-            mpn_mul(tptr, zptr, zn, yptr, yn);
+            flint_mpn_mul(tptr, zptr, zn, yptr, yn);
         else
-            mpn_mul(tptr, yptr, yn, zptr, zn);
+            flint_mpn_mul(tptr, yptr, yn, zptr, zn);
 
         /* The quotient is not exact. Perturbing the approximate quotient
            and rounding gives the correct the result. */
@@ -129,4 +129,3 @@ arf_div(arf_ptr z, arf_srcptr x, arf_srcptr y, slong prec, arf_rnd_t rnd)
 
     return inexact;
 }
-

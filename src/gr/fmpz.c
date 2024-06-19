@@ -5,16 +5,18 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <math.h>
+#include <gmp.h>
 #include "fexpr.h"
 #include "qqbar.h"
 #include "fmpz_factor.h"
 #include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
+#include "fmpz_vec.h"
 #include "fmpz_mat.h"
 #include "fmpq.h"
 #include "gr.h"
@@ -169,12 +171,12 @@ _gr_fmpz_set_other(fmpz_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 }
 
 int
-_gr_fmpz_set_str(fmpz_t res, const char * x, const gr_ctx_t ctx)
+_gr_fmpz_set_str(fmpz_t res, const char * x, gr_ctx_t ctx)
 {
-    if (fmpz_set_str(res, x, 10))
-        return GR_DOMAIN;
+    if (!fmpz_set_str(res, x, 10))
+        return GR_SUCCESS;
 
-    return GR_SUCCESS;
+    return gr_generic_set_str(res, x, ctx);
 }
 
 int
@@ -866,8 +868,8 @@ _gr_fmpz_vec_sum(fmpz_t res, const fmpz * vec, slong len, gr_ctx_t ctx)
         ulong hi, lo;
         slong i;
         fmpz f;
-        __mpz_struct * f_mpz;
-        __mpz_struct * res_mpz = NULL;
+        mpz_ptr f_mpz;
+        mpz_ptr res_mpz = NULL;
 
         hi = lo = 0;
 
@@ -917,74 +919,14 @@ _gr_fmpz_vec_sum(fmpz_t res, const fmpz * vec, slong len, gr_ctx_t ctx)
 int
 _gr_fmpz_vec_dot(fmpz_t res, const fmpz_t initial, int subtract, const fmpz * vec1, const fmpz * vec2, slong len, gr_ctx_t ctx)
 {
-    slong i;
-
-    if (len <= 0)
-    {
-        if (initial == NULL)
-            fmpz_zero(res);
-        else
-            fmpz_set(res, initial);
-        return GR_SUCCESS;
-    }
-
-    if (initial == NULL)
-    {
-        fmpz_mul(res, vec1, vec2);
-    }
-    else
-    {
-        if (subtract)
-            fmpz_neg(res, initial);
-        else
-            fmpz_set(res, initial);
-
-        fmpz_addmul(res, vec1, vec2);
-    }
-
-    for (i = 1; i < len; i++)
-        fmpz_addmul(res, vec1 + i, vec2 + i);
-
-    if (subtract)
-        fmpz_neg(res, res);
-
+    _fmpz_vec_dot_general(res, initial, subtract, vec1, vec2, 0, len);
     return GR_SUCCESS;
 }
 
 int
 _gr_fmpz_vec_dot_rev(fmpz_t res, const fmpz_t initial, int subtract, const fmpz * vec1, const fmpz * vec2, slong len, gr_ctx_t ctx)
 {
-    slong i;
-
-    if (len <= 0)
-    {
-        if (initial == NULL)
-            fmpz_zero(res);
-        else
-            fmpz_set(res, initial);
-        return GR_SUCCESS;
-    }
-
-    if (initial == NULL)
-    {
-        fmpz_mul(res, vec1, vec2 + len - 1);
-    }
-    else
-    {
-        if (subtract)
-            fmpz_neg(res, initial);
-        else
-            fmpz_set(res, initial);
-
-        fmpz_addmul(res, vec1, vec2 + len - 1);
-    }
-
-    for (i = 1; i < len; i++)
-        fmpz_addmul(res, vec1 + i, vec2 + len - 1 - i);
-
-    if (subtract)
-        fmpz_neg(res, res);
-
+    _fmpz_vec_dot_general(res, initial, subtract, vec1, vec2, 1, len);
     return GR_SUCCESS;
 }
 

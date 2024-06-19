@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "arb.h"
 #include "arb_hypgeom.h"
 
 #ifdef __GNUC__
@@ -218,7 +219,7 @@ arb_hypgeom_legendre_p_ui(arb_t res, arb_t res_prime, ulong n, const arb_t x, sl
 
             K_one = n + 1;
             K_one = FLINT_MIN(K_one, 100000.0 * prec);
-            K_one = FLINT_MIN(K_one, UWORD_MAX * 0.25);
+            K_one = FLINT_MIN(K_one, UWORD_MAX / 4);
 
             size = 0.0;
 
@@ -437,4 +438,3 @@ arb_hypgeom_legendre_p_ui(arb_t res, arb_t res_prime, ulong n, const arb_t x, sl
     arb_clear(xsub1);
     arb_clear(x2sub1);
 }
-

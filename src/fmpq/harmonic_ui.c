@@ -5,19 +5,20 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "longlong.h"
 #include "fmpq.h"
 
 #if FLINT_BITS == 64
-#define FMPQ_HARMONIC_UI_TAB_SIZE 47
+# define FMPQ_HARMONIC_UI_TAB_SIZE 47
 #else
-#define FMPQ_HARMONIC_UI_TAB_SIZE 25
+# define FMPQ_HARMONIC_UI_TAB_SIZE 25
 #endif
 
-static const mp_limb_t fmpq_harmonic_ui_tab_num[] =
+static const ulong fmpq_harmonic_ui_tab_num[] =
 {
     0, 1, 3, 11, 25, 137, 49, 363, 761, 7129, 7381, 83711, 86021, 1145993,
     1171733, 1195757, 2436559, 42142223, 14274301, 275295799, 55835135,
@@ -34,7 +35,7 @@ static const mp_limb_t fmpq_harmonic_ui_tab_num[] =
 #endif
 };
 
-const mp_limb_t fmpq_harmonic_ui_tab_den[] =
+const ulong fmpq_harmonic_ui_tab_den[] =
 {
     1, 1, 2, 6, 12, 60, 20, 140, 280, 2520, 2520, 27720, 27720, 360360,
     360360, 360360, 720720, 12252240, 4084080, 77597520, 15519504, 5173168,
@@ -105,7 +106,7 @@ def harmonic(n):
 static void
 harmonic_odd_direct(fmpz_t P, fmpz_t Q, ulong a, ulong b, ulong n, int d)
 {
-    mp_limb_t p, q, r, s, t, u, v, w = 0;
+    ulong p, q, r, s, t, u, v, w = 0;
     slong k;
 
     fmpz_zero(P);
@@ -118,11 +119,11 @@ harmonic_odd_direct(fmpz_t P, fmpz_t Q, ulong a, ulong b, ulong n, int d)
     {
         for (k = b - 1 - (b % 2); k > 0; k -= 2)
         {
-            while (k <= (n >> d))
+            while ((ulong) k <= (n >> d))
                 d++;
 
             r = (UWORD(1) << d) - UWORD(1);
-            s = ((mp_limb_t) k) << (d-1);
+            s = ((ulong) k) << (d-1);
 
             umul_ppmm(t, u, p, s);
             umul_ppmm(v, w, q, r);
@@ -162,7 +163,7 @@ harmonic_odd_direct(fmpz_t P, fmpz_t Q, ulong a, ulong b, ulong n, int d)
     {
         a += (a % 2 == 0);
 
-        for (k = a; k < b; k += 2)
+        for (k = a; (ulong) k < b; k += 2)
         {
             umul_ppmm(t, u, p, k);
             v = 0;
@@ -243,7 +244,7 @@ _fmpq_harmonic_ui(fmpz_t num, fmpz_t den, ulong n)
     {
         /* overflow */
         if ((slong) n < 0)
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
         harmonic_odd_balanced(num, den, 1, n + 1, n, 1);
         _fmpq_canonicalise(num, den);
@@ -255,4 +256,3 @@ fmpq_harmonic_ui(fmpq_t x, ulong n)
 {
     _fmpq_harmonic_ui(fmpq_numref(x), fmpq_denref(x), n);
 }
-

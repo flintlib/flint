@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -59,9 +59,7 @@ void bool_mat_clear(bool_mat_t mat);
 BOOL_MAT_INLINE void
 bool_mat_swap(bool_mat_t mat1, bool_mat_t mat2)
 {
-    bool_mat_struct t = *mat1;
-    *mat1 = *mat2;
-    *mat2 = t;
+    FLINT_SWAP(bool_mat_struct, *mat1, *mat2);
 }
 
 /* Conversions */

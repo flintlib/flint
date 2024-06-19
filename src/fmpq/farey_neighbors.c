@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -31,23 +31,18 @@ void fmpq_farey_neighbors(fmpq_t left, fmpq_t right,
     fmpz_t Q, t;
     fmpq_t mid;
 
+    /* find left denominator */
+    if (fmpz_sgn(fmpq_denref(mid_)) <= 0
+        || fmpz_cmp(fmpq_denref(mid_), Q_) > 0
+        || !fmpz_invmod(fmpq_denref(left), fmpq_numref(mid_), fmpq_denref(mid_)))
+        flint_throw(FLINT_ERROR, "(%s): bad input\n", __func__);
+
     /* simple handling of aliasing */
     fmpz_init_set(fmpq_numref(mid), fmpq_numref(mid_));
     fmpz_init_set(fmpq_denref(mid), fmpq_denref(mid_));
     fmpz_init_set(Q, Q_);
     fmpz_init(t);
 
-    /* find left denominator */
-    if (fmpz_sgn(fmpq_denref(mid)) <= 0
-        || fmpz_cmp(fmpq_denref(mid), Q) > 0
-        || !fmpz_invmod(fmpq_denref(left), fmpq_numref(mid), fmpq_denref(mid)))
-    {
-        fmpz_clear(fmpq_numref(mid));
-        fmpz_clear(fmpq_denref(mid));
-        fmpz_clear(Q);
-        fmpz_clear(t);
-        flint_throw(FLINT_ERROR, "Exception in fmpq_farey_neighbors: bad input");
-    }
     fmpz_sub(t, Q, fmpq_denref(left));
     fmpz_mod(t, t, fmpq_denref(mid));
     fmpz_sub(fmpq_denref(left), Q, t);

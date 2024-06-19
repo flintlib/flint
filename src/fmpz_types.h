@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -17,6 +17,17 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+typedef struct
+{
+    int alloc;
+    int size;
+    nn_ptr ptr;
+} zz_struct;
+
+typedef zz_struct * zz_ptr;
+typedef const zz_struct * zz_srcptr;
+#define FMPZ_TO_ZZ(x) ((zz_ptr) ((ulong) (x) << 2))
 
 typedef struct
 {
@@ -32,7 +43,7 @@ typedef fmpz_factor_struct fmpz_factor_t[1];
 
 typedef struct
 {
-   mp_ptr dinv;
+   nn_ptr dinv;
    slong n;
    flint_bitcnt_t norm;
 } fmpz_preinvn_struct;

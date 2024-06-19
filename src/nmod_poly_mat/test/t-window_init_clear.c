@@ -7,11 +7,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "test_helpers.h"
+#include "ulong_extras.h"
 #include "nmod_poly_mat.h"
 
 TEST_FUNCTION_START(nmod_poly_mat_window_init_clear, state)
@@ -21,7 +22,7 @@ TEST_FUNCTION_START(nmod_poly_mat_window_init_clear, state)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_mat_t a, w;
-        mp_limb_t mod;
+        ulong mod;
         slong j, k, r1, r2, c1, c2;
         slong rows = n_randint(state, 10);
         slong cols = n_randint(state, 10);

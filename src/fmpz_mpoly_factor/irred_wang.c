@@ -5,10 +5,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fmpz_mpoly_factor.h"
 
@@ -99,7 +102,7 @@ next_alpha:
 
 got_alpha:
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mpoly_degrees_si(tdegs, A, ctx);
     for (i = 0; i < n + 1; i++)
         FLINT_ASSERT(degs[i] == tdegs[i]);
@@ -232,10 +235,13 @@ got_alpha:
     {
         FLINT_ASSERT(fmpz_mpoly_is_fmpz(new_lcs->coeffs + 0*r + i, ctx));
         FLINT_ASSERT(fmpz_mpoly_length(new_lcs->coeffs + 0*r + i, ctx) == 1);
-        FLINT_ASSERT(fmpz_divisible(new_lcs->coeffs[i].coeffs + 0, Aufac->p[i].coeffs + Aufac->p[i].length - 1));
 
-        fmpz_divexact(q, new_lcs->coeffs[i].coeffs + 0,
-                                  Aufac->p[i].coeffs + Aufac->p[i].length - 1);
+        if (!fmpz_divides(q, new_lcs->coeffs[i].coeffs + 0,
+                             Aufac->p[i].coeffs + Aufac->p[i].length - 1))
+        {
+            goto next_alpha;
+        }
+
         _fmpz_mpoly_set_fmpz_poly(fac->coeffs + i, newA->bits,
                                Aufac->p[i].coeffs, Aufac->p[i].length, 0, ctx);
         fmpz_mpoly_scalar_mul_fmpz(fac->coeffs + i, fac->coeffs + i, q, ctx);
@@ -316,7 +322,7 @@ cleanup:
 
     fmpz_poly_clear(Au);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success)
     {
         fmpz_mpoly_t prod;
@@ -331,4 +337,3 @@ cleanup:
 
     return success;
 }
-

@@ -6,10 +6,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "acb.h"
 #include "acb_dirichlet.h"
 
 #ifdef __GNUC__
@@ -29,7 +30,7 @@ acb_dirichlet_l_general(acb_t res, const acb_t s,
     }
     else
     {
-        slong wp = prec + n_clog(G->phi_q, 2);
+        slong wp = prec + FLINT_CLOG2(G->phi_q);
         acb_dirichlet_hurwitz_precomp_t pre;
         acb_dirichlet_hurwitz_precomp_init_num(pre, s, acb_is_one(s), G->phi_q, wp);
         acb_dirichlet_l_hurwitz(res, s, pre, G, chi, prec);
@@ -114,4 +115,3 @@ acb_dirichlet_l(acb_t res, const acb_t s,
         acb_dirichlet_l_general(res, s, G, chi, prec);
     }
 }
-

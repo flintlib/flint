@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -46,7 +46,7 @@ void _TEMPLATE(T, embed_gens_naive)(TEMPLATE(T, t) gen_sub,
 				    TEMPLATE(T, ctx_modulus)(sub_ctx),
 				    sup_ctx);
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     /* Get one linear factor of sub_ctx->modulus in sup_ctx */
     while (TEMPLATE(T, poly_degree)(modulus, sup_ctx) != 1)
@@ -57,6 +57,8 @@ void _TEMPLATE(T, embed_gens_naive)(TEMPLATE(T, t) gen_sub,
         };
         TEMPLATE(T, poly_set)(modulus, fact, sup_ctx);
     }
+
+    flint_rand_clear(state);
 
     TEMPLATE(T, gen)(gen_sub, sub_ctx);
     TEMPLATE(T, set)(gen_sup, modulus->coeffs, sup_ctx);

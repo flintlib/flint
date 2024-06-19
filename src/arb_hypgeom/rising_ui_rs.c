@@ -5,11 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "ulong_extras.h"
+#include "arb.h"
 #include "arb_hypgeom.h"
 
 #ifdef __GNUC__
@@ -24,7 +25,8 @@ _arb_hypgeom_rising_coeffs_1(ulong * c, ulong k, slong l)
     slong i, j;
     ulong d;
 
-    if (l < 2) flint_abort();
+    if (l < 2)
+        flint_throw(FLINT_ERROR, "(%s): l < 2\n", __func__);
 
     c[0] = k * (k + 1);
     c[1] = 2 * k + 1;
@@ -47,9 +49,10 @@ _arb_hypgeom_rising_coeffs_2(ulong * c, ulong k, slong l)
 {
     slong i, j;
     ulong d;
-    mp_limb_t hi, lo;
+    ulong hi, lo;
 
-    if (l < 2) flint_abort();
+    if (l < 2)
+        flint_throw(FLINT_ERROR, "(%s): l < 2\n", __func__);
 
     umul_ppmm(c[1], c[0], k, k + 1);
 
@@ -81,7 +84,8 @@ _arb_hypgeom_rising_coeffs_fmpz(fmpz * c, ulong k, slong l)
     slong i, j;
     ulong d;
 
-    if (l < 2) flint_abort();
+    if (l < 2)
+        flint_throw(FLINT_ERROR, "(%s): l < 2\n", __func__);
 
     fmpz_set_ui(c + 0, k);
     fmpz_mul_ui(c + 0, c + 0, k + 1);
@@ -109,7 +113,7 @@ arb_hypgeom_rising_ui_rs(arb_t res, const arb_t x, ulong n, ulong m, slong prec)
     slong i, k, l, m0, climbs, climbs_max, wp;
     arb_ptr xpow;
     arb_t t, u;
-    mp_ptr c;
+    nn_ptr c;
     TMP_INIT;
 
     if (n <= 1)
@@ -143,7 +147,7 @@ arb_hypgeom_rising_ui_rs(arb_t res, const arb_t x, ulong n, ulong m, slong prec)
     wp = ARF_PREC_ADD(prec, FLINT_BIT_COUNT(n));
 
     climbs_max = FLINT_BIT_COUNT(n - 1) * m;
-    c = TMP_ALLOC(sizeof(mp_limb_t) * climbs_max * m);
+    c = TMP_ALLOC(sizeof(ulong) * climbs_max * m);
 
     xpow = _arb_vec_init(m + 1);
     _arb_vec_set_powers(xpow, x, m + 1, wp);
@@ -202,4 +206,3 @@ arb_hypgeom_rising_ui_rs(arb_t res, const arb_t x, ulong n, ulong m, slong prec)
     _arb_vec_clear(xpow, m + 1);
     TMP_END;
 }
-

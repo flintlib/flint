@@ -5,11 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "test_helpers.h"
+#include "nmod.h"
 #include "nmod_mpoly.h"
 
 TEST_FUNCTION_START(nmod_mpoly_scalar_mul_ui, state)
@@ -24,7 +25,7 @@ TEST_FUNCTION_START(nmod_mpoly_scalar_mul_ui, state)
         ulong a, b, c;
         slong len1, len2, len3, len4;
         flint_bitcnt_t exp_bits1, exp_bits2, exp_bits3, exp_bits4;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randbits(state, 1 + n_randint(state, FLINT_BITS));
         modulus = FLINT_MAX(UWORD(2), modulus);
@@ -107,7 +108,7 @@ TEST_FUNCTION_START(nmod_mpoly_scalar_mul_ui, state)
         ulong a, b;
         slong len1, len2, len3, len4;
         flint_bitcnt_t exp_bits1, exp_bits2, exp_bits3, exp_bits4;
-        mp_limb_t modulus;
+        ulong modulus;
 
         modulus = n_randbits(state, 1 + n_randint(state, FLINT_BITS));
         modulus = FLINT_MAX(UWORD(2), modulus);

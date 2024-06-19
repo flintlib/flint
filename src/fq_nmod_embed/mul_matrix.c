@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -20,7 +20,7 @@ void fq_nmod_embed_mul_matrix(nmod_mat_t matrix,
     slong i, j, len = fq_nmod_ctx_degree(ctx);
     const nmod_poly_struct *modulus = ctx->modulus;
     const nmod_t mod = modulus->mod;
-    mp_limb_t lead;
+    ulong lead;
 
     /* This is usually 1, unless the context is non-monic */
     lead = nmod_inv(modulus->coeffs[len], mod);

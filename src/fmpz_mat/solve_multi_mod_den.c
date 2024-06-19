@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -15,11 +15,11 @@
 #include "fmpz_mat.h"
 #include "fmpq_mat.h"
 
-mp_limb_t fmpz_mat_find_good_prime_and_solve(nmod_mat_t Xmod,
+ulong fmpz_mat_find_good_prime_and_solve(nmod_mat_t Xmod,
 		                 nmod_mat_t Amod, nmod_mat_t Bmod,
                 const fmpz_mat_t A, const fmpz_mat_t B, const fmpz_t det_bound)
 {
-    mp_limb_t p;
+    ulong p;
     fmpz_t tested;
 
     p = UWORD(1) << NMOD_MAT_OPTIMAL_MODULUS_BITS;
@@ -64,4 +64,3 @@ fmpz_mat_solve_multi_mod_den(fmpz_mat_t X, fmpz_t den,
     fmpq_mat_clear(Q);
     return success;
 }
-

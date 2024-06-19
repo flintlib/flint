@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -15,8 +15,7 @@
 
 ulong _fmpz_poly_deflation(const fmpz* a, slong len)
 {
-    ulong deflation;
-    slong i, coeff;
+    ulong i, coeff, deflation;
 
     if (len <= 1)
         return len;
@@ -27,7 +26,7 @@ ulong _fmpz_poly_deflation(const fmpz* a, slong len)
 
     deflation = n_gcd(len - 1, coeff);
 
-    while ((deflation > 1) && (coeff + deflation < len))
+    while ((deflation > 1) && (coeff + deflation < (ulong) len))
     {
         for (i = 0; i < deflation - 1; i++)
         {
@@ -42,4 +41,3 @@ ulong _fmpz_poly_deflation(const fmpz* a, slong len)
 
     return deflation;
 }
-

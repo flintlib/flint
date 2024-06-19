@@ -5,27 +5,28 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpn_extras.h"
 #include "thread_support.h"
 #include "gmpcompat.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
 static void _fmpz_vec_set_fft_coeff(fmpz * coeffs_m, slong i,
-                          const mp_ptr * coeffs_f, slong limbs, slong sign)
+                          const nn_ptr * coeffs_f, slong limbs, slong sign)
 {
     slong size;
-    mp_limb_t * data;
-    __mpz_struct * mcoeffs_m;
+    ulong * data;
+    mpz_ptr mcoeffs_m;
 
     coeffs_m += i;
 
     if (sign)
     {
-        mp_limb_t halflimb = UWORD(1) << (FLINT_BITS - 1);
+        ulong halflimb = UWORD(1) << (FLINT_BITS - 1);
 
         {
             mcoeffs_m = _fmpz_promote(coeffs_m);
@@ -67,7 +68,7 @@ static void _fmpz_vec_set_fft_coeff(fmpz * coeffs_m, slong i,
 typedef struct
 {
     fmpz * coeffs_m;
-    const mp_ptr * coeffs_f;
+    const nn_ptr * coeffs_f;
     slong limbs;
     int sign;
 }
@@ -80,7 +81,7 @@ worker(slong i, work_t * work)
 }
 
 void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length,
-                          const mp_ptr * coeffs_f, slong limbs, slong sign)
+                          const nn_ptr * coeffs_f, slong limbs, slong sign)
 {
     work_t work;
     slong max_threads;

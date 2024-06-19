@@ -6,10 +6,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
@@ -18,7 +19,7 @@
 
 static ulong _fmpz_gcd_big_small(const fmpz_t g, ulong h)
 {
-    __mpz_struct * z = COEFF_TO_PTR(*g);
+    mpz_ptr z = COEFF_TO_PTR(*g);
 
     return n_gcd(mpn_mod_1(z->_mp_d, FLINT_ABS(z->_mp_size), h), h);
 }
@@ -40,7 +41,7 @@ _fmpq_poly_exp_series_basecase_deriv(fmpz * B, fmpz_t Bden,
     const fmpz * Aprime, const fmpz_t Aden, slong Alen, slong n)
 {
     fmpz_t t, u;
-    slong j, k;
+    slong k;
 
     Alen = FLINT_MIN(Alen, n);
 
@@ -55,11 +56,8 @@ _fmpq_poly_exp_series_basecase_deriv(fmpz * B, fmpz_t Bden,
 
     for (k = 1; k < n; k++)
     {
-        fmpz_mul(t, Aprime, B + k - 1);
-
-        for (j = 2; j < FLINT_MIN(Alen, k + 1); j++)
-            fmpz_addmul(t, Aprime + j - 1, B + k - j);
-
+        slong l = FLINT_MIN(Alen - 1, k);
+        _fmpz_vec_dot_general(t, NULL, 0, Aprime, B + k - l, 1, l);
         fmpz_mul_ui(u, Aden, k);
         fmpz_divexact(B + k, t, u);
     }
@@ -106,7 +104,7 @@ void _fmpq_poly_integral_offset(fmpz * rpoly, fmpz_t rden,
 {
     slong k;
     ulong v, c, d;
-    mp_ptr divisors;
+    nn_ptr divisors;
     fmpz_t t, u;
     TMP_INIT;
 
@@ -126,7 +124,7 @@ void _fmpq_poly_integral_offset(fmpz * rpoly, fmpz_t rden,
         {
             c = _fmpz_gcd_small(poly + k, k + m);
 
-            if (c == k + m)
+            if (c == (ulong) (k + m))
             {
                 fmpz_divexact_ui(rpoly + k, poly + k, k + m);
                 divisors[k] = 1;
@@ -197,7 +195,7 @@ static void
 MULLOW(fmpz * z, fmpz_t zden, const fmpz * x, const fmpz_t xden, slong xn, const fmpz * y, const fmpz_t yden, slong yn, slong n)
 {
     if (xn + yn - 1 < n)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     if (xn >= yn)
         _fmpz_poly_mullow(z, x, xn, y, yn, n);
@@ -411,7 +409,7 @@ _fmpq_poly_exp_series(fmpz * B, fmpz_t Bden,
         return;
     }
 
-    if (Alen <= 12 || n <= 10 + 1000 / n_sqrt(fmpz_bits(Aden)))
+    if (Alen <= 12 || n <= 10 + 1000 / (slong) n_sqrt(fmpz_bits(Aden)))
     {
         _fmpq_poly_exp_series_basecase(B, Bden, A, Aden, Alen, n);
     }
@@ -450,7 +448,7 @@ _fmpq_poly_exp_expinv_series(fmpz * B, fmpz_t Bden, fmpz * C, fmpz_t Cden,
     }
 
     /* todo: tweak tuning for this function */
-    if (Alen <= 12 || n <= 10 + 1000 / n_sqrt(fmpz_bits(Aden)))
+    if (Alen <= 12 || n <= 10 + 1000 / (slong) n_sqrt(fmpz_bits(Aden)))
     {
         _fmpq_poly_exp_series_basecase(B, Bden, A, Aden, Alen, n);
         _fmpq_poly_inv_series(C, Cden, B, Bden, n, n);
@@ -489,8 +487,7 @@ void fmpq_poly_exp_series(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
 
     if (!fmpz_is_zero(poly->coeffs))
     {
-        flint_printf("Exception (fmpq_poly_exp_series). Constant term != 0.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpq_poly_exp_series). Constant term != 0.\n");
     }
 
     fmpq_poly_fit_length(res, n);
@@ -518,8 +515,7 @@ void fmpq_poly_exp_expinv_series(fmpq_poly_t res1, fmpq_poly_t res2, const fmpq_
 
     if (!fmpz_is_zero(poly->coeffs))
     {
-        flint_printf("Exception (fmpq_poly_exp_expinv_series). Constant term != 0.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpq_poly_exp_expinv_series). Constant term != 0.\n");
     }
 
     fmpq_poly_fit_length(res1, n);

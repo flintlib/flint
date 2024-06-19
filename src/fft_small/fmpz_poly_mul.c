@@ -6,19 +6,18 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpn_extras.h"
+#include "thread_pool.h"
 #include "thread_support.h"
 #include "nmod.h"
-#include "nmod_vec.h"
-#include "nmod_poly.h"
-#include "fft_small.h"
-#include "crt_helpers.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
-#include "fmpz_poly.h"
+#include "crt_helpers.h"
+#include "fft_small.h"
 
 static void _mod(
     double* abuf, ulong atrunc,
@@ -33,8 +32,7 @@ static void _mod(
 
     if (atrunc < an)
     {
-        flint_printf("fft _mod: atrunc < an not handled\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "fft _mod: atrunc < an not handled\n");
     }
 
     if (FLINT_ABS(abits) < FLINT_BIT_COUNT(p))
@@ -66,14 +64,14 @@ static void _mod(
                     ulong aa[8];
 
                     /* todo: vectorize */
-                    aa[0] = a[i + j + 0] >= 0 ? a[i + j + 0] : a[i + j + 0] + p;
-                    aa[1] = a[i + j + 1] >= 0 ? a[i + j + 1] : a[i + j + 1] + p;
-                    aa[2] = a[i + j + 2] >= 0 ? a[i + j + 2] : a[i + j + 2] + p;
-                    aa[3] = a[i + j + 3] >= 0 ? a[i + j + 3] : a[i + j + 3] + p;
-                    aa[4] = a[i + j + 4] >= 0 ? a[i + j + 4] : a[i + j + 4] + p;
-                    aa[5] = a[i + j + 5] >= 0 ? a[i + j + 5] : a[i + j + 5] + p;
-                    aa[6] = a[i + j + 6] >= 0 ? a[i + j + 6] : a[i + j + 6] + p;
-                    aa[7] = a[i + j + 7] >= 0 ? a[i + j + 7] : a[i + j + 7] + p;
+                    aa[0] = a[i + j + 0] >= 0 ? (ulong) a[i + j + 0] : a[i + j + 0] + p;
+                    aa[1] = a[i + j + 1] >= 0 ? (ulong) a[i + j + 1] : a[i + j + 1] + p;
+                    aa[2] = a[i + j + 2] >= 0 ? (ulong) a[i + j + 2] : a[i + j + 2] + p;
+                    aa[3] = a[i + j + 3] >= 0 ? (ulong) a[i + j + 3] : a[i + j + 3] + p;
+                    aa[4] = a[i + j + 4] >= 0 ? (ulong) a[i + j + 4] : a[i + j + 4] + p;
+                    aa[5] = a[i + j + 5] >= 0 ? (ulong) a[i + j + 5] : a[i + j + 5] + p;
+                    aa[6] = a[i + j + 6] >= 0 ? (ulong) a[i + j + 6] : a[i + j + 6] + p;
+                    aa[7] = a[i + j + 7] >= 0 ? (ulong) a[i + j + 7] : a[i + j + 7] + p;
 
                     vec8n t = vec8n_load_unaligned(aa);
                     FLINT_ASSERT(i+j < atrunc);
@@ -83,7 +81,7 @@ static void _mod(
 
             aI = sd_fft_ctx_blk_index(abuf, i/BLK_SZ);
             for (j = 0; j < an - i; j++)
-                aI[j] = a[i + j] >= 0 ? a[i + j] : a[i + j] + p;
+                aI[j] = a[i + j] >= 0 ? (ulong) a[i + j] : a[i + j] + p;
         }
     }
     else if (FLINT_ABS(abits) <= SMALL_FMPZ_BITCOUNT_MAX)
@@ -181,7 +179,7 @@ static void _mod(
     }
 
     for (i = an; i < atrunc; i++)
-        sd_fft_ctx_set_index(abuf, i, 0);
+        abuf[i] = 0;
 }
 
 
@@ -201,11 +199,10 @@ void fmpz_neg_ui_array(fmpz_t out, const ulong * in, slong in_len)
     }
     else
     {
-        __mpz_struct * mpz = _fmpz_promote(out);
-        if (mpz->_mp_alloc < size)
-            mpz_realloc2(mpz, FLINT_BITS * size);
+        mpz_ptr mpz = _fmpz_promote(out);
+        mp_ptr mp = FLINT_MPZ_REALLOC(mpz, size);
         mpz->_mp_size = -size;
-        flint_mpn_copyi(mpz->_mp_d, in, size);
+        flint_mpn_copyi(mp, in, size);
     }
 }
 
@@ -280,7 +277,7 @@ DEFINE_IT(8, 7, 6)  /* 400 bits */
 static void _crt_1(
     fmpz * z, ulong zl, ulong zi_start, ulong zi_stop,
     sd_fft_ctx_struct* Rffts, double* d, ulong dstride,
-    crt_data_struct* Rcrts)
+    crt_data_struct* FLINT_UNUSED(Rcrts))
 {
     ulong i, j, jstart, jstop;
     ulong Xs[BLK_SZ*1];
@@ -332,18 +329,15 @@ typedef struct {
 static void extra_func(void* varg)
 {
     s1worker_struct* X = (s1worker_struct*) varg;
-    sd_fft_lctx_t Q;
+    sd_fft_ctx_struct* Q = X->ffts + X->ioff;
 
-    sd_fft_lctx_init(Q, X->ffts + X->ioff, X->depth);
-    _mod(X->bbuf, X->btrunc, X->b, X->bn, X->bbits, X->ffts + X->ioff);
-    sd_fft_lctx_fft_trunc(Q, X->bbuf, X->depth, X->btrunc, X->ztrunc);
-    sd_fft_lctx_clear(Q, X->ffts + X->ioff);
+    _mod(X->bbuf, X->btrunc, X->b, X->bn, X->bbits, Q);
+    sd_fft_trunc(Q, X->bbuf, X->depth, X->btrunc, X->ztrunc);
 }
 
 static void s1worker_func(void* varg)
 {
     s1worker_struct* X = (s1worker_struct*) varg;
-    sd_fft_lctx_t Q;
     ulong i, m;
     thread_pool_handle* handles = NULL;
     slong nworkers = 0;
@@ -356,8 +350,7 @@ static void s1worker_func(void* varg)
         ulong ioff = i + X->offset;
         double* abuf = X->abuf + X->stride*i;
         double* bbuf = X->bbuf;
-
-        sd_fft_lctx_init(Q, X->ffts + ioff, X->depth);
+        sd_fft_ctx_struct* Q = X->ffts + ioff;
 
         if (!X->squaring)
         {
@@ -368,13 +361,13 @@ static void s1worker_func(void* varg)
             }
             else
             {
-                _mod(bbuf, X->btrunc, X->b, X->bn, X->bbits, X->ffts + ioff);
-                sd_fft_lctx_fft_trunc(Q, bbuf, X->depth, X->btrunc, X->ztrunc);
+                _mod(bbuf, X->btrunc, X->b, X->bn, X->bbits, Q);
+                sd_fft_trunc(Q, bbuf, X->depth, X->btrunc, X->ztrunc);
             }
         }
 
-        _mod(abuf, X->atrunc, X->a, X->an, X->abits, X->ffts + ioff);
-        sd_fft_lctx_fft_trunc(Q, abuf, X->depth, X->atrunc, X->ztrunc);
+        _mod(abuf, X->atrunc, X->a, X->an, X->abits, Q);
+        sd_fft_trunc(Q, abuf, X->depth, X->atrunc, X->ztrunc);
 
         if (!X->squaring)
         {
@@ -383,17 +376,15 @@ static void s1worker_func(void* varg)
         }
 
         ulong cop = X->np == 1 ? 1 : *crt_data_co_prime_red(X->crts + X->np - 1, ioff);
-        NMOD_RED2(m, cop >> (FLINT_BITS - X->depth), cop << X->depth, X->ffts[ioff].mod);
-        m = nmod_inv(m, X->ffts[ioff].mod);
+        NMOD_RED2(m, cop >> (FLINT_BITS - X->depth), cop << X->depth, Q->mod);
+        m = nmod_inv(m, Q->mod);
 
         if (X->squaring)
-            sd_fft_lctx_point_sqr(Q, abuf, m, X->depth);
+            sd_fft_ctx_point_sqr(Q, abuf, m, X->depth);
         else
-            sd_fft_lctx_point_mul(Q, abuf, bbuf, m, X->depth);
+            sd_fft_ctx_point_mul(Q, abuf, bbuf, m, X->depth);
 
-        sd_fft_lctx_ifft_trunc(Q, abuf, X->depth, X->ztrunc);
-
-        sd_fft_lctx_clear(Q, X->ffts + ioff);
+        sd_ifft_trunc(Q, abuf, X->depth, X->ztrunc);
     }
 
     flint_give_back_threads(handles, nworkers);

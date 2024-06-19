@@ -21,6 +21,19 @@ and not supporting aliasing of the input and output arrays),
 and a non-underscore method which performs automatic memory
 management and handles degenerate cases.
 
+Supported coefficient domains
+-------------------------------------------------------------------------------
+
+Some methods in this module implicitly assume that *R* is a commutative
+ring or an approximate (e.g. floating-point) commutative ring.
+When used with a more general *R*, they may output nonsense without
+returning the appropriate ``GR_DOMAIN`` or ``GR_UNABLE`` flags.
+Better support for noncommutative coefficients is planned for the future.
+
+Some methods make stronger implicit assumptions, for example that *R*
+is an integral domain or a field. Such assumptions are documented on
+a case by case basis.
+
 Type compatibility
 -------------------------------------------------------------------------------
 
@@ -70,6 +83,7 @@ Memory management
 .. function:: void gr_poly_clear(gr_poly_t poly, gr_ctx_t ctx)
 
 .. function:: gr_ptr gr_poly_entry_ptr(gr_poly_t poly, slong i, gr_ctx_t ctx)
+              gr_srcptr gr_poly_entry_srcptr(const gr_poly_t poly, slong i, gr_ctx_t ctx)
 
 .. function:: slong gr_poly_length(const gr_poly_t poly, gr_ctx_t ctx)
 
@@ -146,6 +160,16 @@ Arithmetic
 
 .. function:: int gr_poly_mul_scalar(gr_poly_t res, const gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx)
 
+.. function:: int _gr_poly_mul_karatsuba(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
+              int gr_poly_mul_karatsuba(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx)
+
+    Karatsuba multiplication.
+    Not optimized for unbalanced operands, and not memory-optimized for recursive calls.
+    The underscore method requires positive lengths and does not support aliasing.
+    This function calls :func:`_gr_poly_mul` recursively rather than itself, so to get a recursive
+    algorithm with `O(n^{1.6})` complexity, the ring must overload :func:`_gr_poly_mul` to dispatch
+    to :func:`_gr_poly_mul_karatsuba` above some cutoff.
+
 Powering
 --------------------------------------------------------------------------------
 
@@ -175,6 +199,11 @@ Shifting
 .. function:: int _gr_poly_shift_right(gr_ptr res, gr_srcptr poly, slong len, slong n, gr_ctx_t ctx)
               int gr_poly_shift_right(gr_poly_t res, const gr_poly_t poly, slong n, gr_ctx_t ctx)
 
+
+Scalar division
+--------------------------------------------------------------------------------
+
+.. function:: int gr_poly_div_scalar(gr_poly_t res, const gr_poly_t poly, gr_srcptr c, gr_ctx_t ctx)
 
 Division with remainder
 --------------------------------------------------------------------------------
@@ -509,7 +538,7 @@ GCD
     Computes the HGCD of `a` and `b`, that is, a matrix `M`, a sign `\sigma`
     and two polynomials `A` and `B` such that
 
-    .. math ::
+    .. math::
 
         (A,B)^t = \sigma M^{-1} (a,b)^t.
 
@@ -529,6 +558,7 @@ GCD
               int gr_poly_gcd_hgcd(gr_poly_t G, const gr_poly_t A, const gr_poly_t B, slong inner_cutoff, slong cutoff, gr_ctx_t ctx)
               int _gr_poly_gcd_euclidean(gr_ptr G, slong * lenG, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
               int gr_poly_gcd_euclidean(gr_poly_t G, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx)
+              int _gr_poly_gcd_generic(gr_ptr G, slong * lenG, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
               int _gr_poly_gcd(gr_ptr G, slong * lenG, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
               int gr_poly_gcd(gr_poly_t G, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx)
 
@@ -548,8 +578,23 @@ GCD
 .. function:: int _gr_poly_xgcd_hgcd(slong * Glen, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, slong hgcd_cutoff, slong cutoff, gr_ctx_t ctx)
               int gr_poly_xgcd_hgcd(gr_poly_t G, gr_poly_t S, gr_poly_t T, const gr_poly_t A, const gr_poly_t B, slong hgcd_cutoff, slong cutoff, gr_ctx_t ctx)
 
+.. function:: int _gr_poly_xgcd_generic(slong * lenG, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
+              int _gr_poly_xgcd(slong * lenG, gr_ptr G, gr_ptr S, gr_ptr T, gr_srcptr A, slong lenA, gr_srcptr B, slong lenB, gr_ctx_t ctx)
+              int gr_poly_xgcd(gr_poly_t G, gr_poly_t S, gr_poly_t T, const gr_poly_t A, const gr_poly_t B, gr_ctx_t ctx)
+
 Resultant
 -------------------------------------------------------------------------------
+
+For two non-zero polynomials `f(x) = a_m x^m + \dotsb + a_0` and
+`g(x) = b_n x^n + \dotsb + b_0` of degrees `m` and `n`, the resultant
+is defined to be
+
+.. math::
+
+        a_m^n b_n^m \prod_{(x, y) : f(x) = g(y) = 0} (x - y).
+
+For convenience, we define the resultant to be equal to zero if either
+of the two polynomials is zero.
 
 .. function:: int _gr_poly_resultant_euclidean(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
               int gr_poly_resultant_euclidean(gr_ptr res, const gr_poly_t f, const gr_poly_t g, gr_ctx_t ctx)
@@ -636,6 +681,35 @@ Roots
     We consider roots of the zero polynomial to be ill-defined and return
     ``GR_DOMAIN`` in that case.
 
+.. function:: int _gr_poly_refine_roots_aberth(gr_ptr w, gr_srcptr f, gr_srcptr f_prime, slong deg, gr_srcptr z, int progressive, gr_ctx_t ctx)
+              int _gr_poly_refine_roots_wdk(gr_ptr w, gr_srcptr f, slong deg, gr_srcptr z, int progressive, gr_ctx_t ctx)
+
+    Given a vector of approximate complex roots `z_1, \ldots, z_{deg}`
+    of `f = \sum_{i=0}^{deg} f_i x^i`,
+    computes a vector of corrections `w_1, \ldots, w_{deg}` such that
+    `z_k - w_k` is a closer approximation of the respective root
+    provided that the initial approximations are close enough
+    and that the polynomial evaluation is numerically accurate.
+    The user will typically call these methods in a loop.
+
+    The *wdk* version performs the Weierstrass-Durand-Kerner update
+
+    .. math ::
+
+        w_k = \frac{f(z_k)}{\prod_{j \ne k} (z_k - z_j)}, \quad k = 1, \ldots, deg.
+
+    The *aberth* version performs the Aberth-Ehrlich update
+
+    .. math ::
+
+        w_k = \frac{g(z_k)}{1 - g(z_k) \sum_{j \ne k} (z_k - z_j)^{-1}}, \quad g(z_k) = \frac{f(z_k)}{f'(z_k)} \quad k = 1, \ldots, deg.
+
+    requiring the coefficients of `f'` as an extra input *f_prime*.
+
+    If *progressive* flag is set, corrected roots `z_j - w_j` that
+    have already been computed are used in place of `z_j` in the
+    update loop, which can improve the rate of convergence.
+
 Power series special functions
 --------------------------------------------------------------------------------
 
@@ -693,6 +767,49 @@ Power series special functions
               int _gr_poly_tan_series(gr_ptr f, gr_srcptr h, slong hlen, slong n, gr_ctx_t ctx)
               int gr_poly_tan_series(gr_poly_t f, const gr_poly_t h, slong n, gr_ctx_t ctx)
 
+Test functions
+-------------------------------------------------------------------------------
+
+The following functions run *iters* test iterations, generating
+polynomials up to length *maxn*. If *ctx* is set to ``NULL``, a random
+ring is generated on each test iteration, otherwise the given ring is used.
+
+.. function:: void _gr_poly_test_mullow(gr_method_poly_binary_trunc_op mullow_impl, gr_method_poly_binary_trunc_op mullow_ref, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+
+    Tests the given function ``mullow_impl`` for correctness as an implementation
+    of :func:`_gr_poly_mullow`. 
+    A reference implementation to compare against can be provided as
+    ``mullow_ref``; if ``NULL``, classical multiplication is used.
+
+.. function:: void _gr_poly_test_divrem(gr_method_poly_binary_binary_op divrem_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+
+    Tests the given function ``divrem_impl`` for correctness as an implementation
+    of :func:`_gr_poly_divrem`.
+
+.. function:: void _gr_poly_test_div(gr_method_poly_binary_op div_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+
+    Tests the given function ``div_impl`` for correctness as an implementation
+    of :func:`_gr_poly_div`.
+
+.. function:: void _gr_poly_test_inv_series(gr_method_poly_unary_trunc_op inv_series_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+
+    Tests the given function ``inv_series_impl`` for correctness as an implementation
+    of :func:`_gr_poly_inv_series`.
+
+.. function:: void _gr_poly_test_div_series(gr_method_poly_binary_trunc_op div_series_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+
+    Tests the given function ``div_series_impl`` for correctness as an implementation
+    of :func:`_gr_poly_div_series`.
+
+.. function:: void _gr_poly_test_gcd(gr_method_poly_gcd_op gcd_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+
+    Tests the given function ``gcd_impl`` for correctness as an implementation
+    of :func:`_gr_poly_gcd`.
+
+.. function:: void _gr_poly_test_xgcd(gr_method_poly_xgcd_op xgcd_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+
+    Tests the given function ``xgcd_impl`` for correctness as an implementation
+    of :func:`_gr_poly_xgcd`.
 
 
 .. raw:: latex

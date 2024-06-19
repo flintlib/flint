@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -16,8 +16,7 @@ void fmpq_poly_inv(fmpq_poly_t poly1, const fmpq_poly_t poly2)
 {
     if (poly2->length != 1)
     {
-        flint_printf("Exception (fmpq_poly_inv). poly2 is not invertible.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpq_poly_inv). poly2 is not invertible.\n");
     }
 
     if (poly1 == poly2)
@@ -45,4 +44,3 @@ void fmpq_poly_inv(fmpq_poly_t poly1, const fmpq_poly_t poly2)
         _fmpq_poly_set_length(poly1, 1);
     }
 }
-

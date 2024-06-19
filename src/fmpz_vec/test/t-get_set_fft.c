@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -25,15 +25,15 @@ TEST_FUNCTION_START(fmpz_vec_get_set_fft, state)
         fmpz * a, * b;
         flint_bitcnt_t bits;
         slong len, limbs;
-        mp_limb_t ** ii, * ptr;
+        ulong ** ii, * ptr;
         slong i, bt;
 
         bits = n_randint(state, 300) + 1;
         len = n_randint(state, 300) + 1;
         limbs = 2*((bits - 1)/FLINT_BITS + 1);
 
-        ii = flint_malloc((len + len*(limbs + 1))*sizeof(mp_limb_t));
-        ptr = (mp_limb_t *) ii + len;
+        ii = flint_malloc((len + len*(limbs + 1))*sizeof(ulong));
+        ptr = (ulong *) ii + len;
         for (i = 0; i < len; i++, ptr += (limbs + 1))
            ii[i] = ptr;
 
@@ -71,15 +71,15 @@ TEST_FUNCTION_START(fmpz_vec_get_set_fft, state)
         fmpz * a, * b;
         flint_bitcnt_t bits;
         slong len, limbs;
-        mp_limb_t ** ii, * ptr;
+        ulong ** ii, * ptr;
         slong i, bt;
 
         bits = n_randint(state, 300) + 1;
         len = n_randint(state, 300) + 1;
         limbs = 2*((bits - 1)/FLINT_BITS + 1);
 
-        ii = flint_malloc((len + len*(limbs + 1))*sizeof(mp_limb_t));
-        ptr = (mp_limb_t *) ii + len;
+        ii = flint_malloc((len + len*(limbs + 1))*sizeof(ulong));
+        ptr = (ulong *) ii + len;
         for (i = 0; i < len; i++, ptr += (limbs + 1))
            ii[i] = ptr;
 

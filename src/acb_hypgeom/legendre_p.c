@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -123,8 +123,7 @@ acb_hypgeom_legendre_p(acb_t res, const acb_t n, const acb_t m,
         }
         else if (type != 1)
         {
-            flint_printf("unsupported 'type' %d for legendre p\n", type);
-            flint_abort();
+            flint_throw(FLINT_ERROR, "unsupported 'type' %d for legendre p\n", type);
         }
 
         acb_mul_2exp_si(c, m, -1);
@@ -142,4 +141,3 @@ acb_hypgeom_legendre_p(acb_t res, const acb_t n, const acb_t m,
     acb_clear(c);
     acb_clear(w);
 }
-

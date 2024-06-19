@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -69,8 +69,7 @@ void fmpz_mod_poly_randtest_irreducible(fmpz_mod_poly_t f, flint_rand_t state,
 {
     if (len == 0)
     {
-        flint_printf("Exception (fmpz_mod_poly_randtest_irreducible). len == 0.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mod_poly_randtest_irreducible). len == 0.\n");
     }
 
     do {
@@ -84,8 +83,7 @@ void fmpz_mod_poly_randtest_monic_irreducible(fmpz_mod_poly_t f,
 {
     if (len == 0)
     {
-        flint_printf("Exception (fmpz_mod_poly_randtest_monic_irreducible). len == 0.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mod_poly_randtest_monic_irreducible). len == 0.\n");
     }
 
     do {
@@ -99,8 +97,7 @@ void fmpz_mod_poly_randtest_not_zero(fmpz_mod_poly_t f,
 {
     if (len == 0)
     {
-        flint_printf("Exception (fmpz_mod_poly_randtest_not_zero). len == 0.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mod_poly_randtest_not_zero). len == 0.\n");
     }
 
     do {

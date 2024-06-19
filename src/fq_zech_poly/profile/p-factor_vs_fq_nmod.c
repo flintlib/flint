@@ -5,12 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <stdlib.h>
-#include "flint.h"
 #include "fmpz.h"
 #include "fq_zech.h"
 #include "fq_zech_poly.h"
@@ -27,7 +26,7 @@
 int
 main(int argc, char** argv)
 {
-    fmpz_t p;
+    ulong p;
     int c, n, reps = 0;
     slong d, len, i;
     fq_nmod_ctx_t ctx;
@@ -39,13 +38,12 @@ main(int argc, char** argv)
 
     FLINT_TEST_INIT(state);
 
-    fmpz_init(p);
-    fmpz_set_str(p, argv[1], 10);
+    p = strtoull(argv[1], NULL, 10);
 
     d = atol(argv[2]);
     len = atol(argv[3]);
 
-    fq_nmod_ctx_init(ctx, p, d, "a");
+    fq_nmod_ctx_init_ui(ctx, p, d, "a");
     fq_zech_ctx_init_fq_nmod_ctx(ctx_zech, ctx);
 
     fq_nmod_poly_init(f, ctx);
@@ -129,7 +127,6 @@ main(int argc, char** argv)
 
     fq_nmod_ctx_clear(ctx);
     fq_zech_ctx_clear(ctx_zech);
-    fmpz_clear(p);
 
     FLINT_TEST_CLEANUP(state);
 

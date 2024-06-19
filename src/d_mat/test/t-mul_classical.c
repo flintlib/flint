@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -49,24 +49,14 @@ TEST_FUNCTION_START(d_mat_mul_classical, state)
         d_mat_mul_classical(G, E, C);
 
         if (!d_mat_approx_equal(F, G, D_MAT_MUL_CLASSICAL_EPS))
-        {
-            flint_printf("FAIL: results not equal\n");
-            d_mat_print(F);
-            d_mat_print(G);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("Results not equal\n");
 
         if (n == k)
         {
             d_mat_mul_classical(A, A, B);
 
             if (!d_mat_equal(A, E))
-            {
-                flint_printf("FAIL: aliasing failed\n");
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL("Aliasing failed\n");
         }
 
         d_mat_clear(A);

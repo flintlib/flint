@@ -5,19 +5,24 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fmpz_mat.h"
+#include "longlong.h"
+
+/* todo: squaring optimizations */
 
 #if FLINT_USES_BLAS && FLINT_BITS == 64
 
 #include <stdint.h>
+#include <limits.h>
+#include <cblas.h>
 #include "nmod.h"
 #include "fmpz.h"
+#include "thread_pool.h"
 #include "thread_support.h"
-#include "cblas.h"
 
 typedef struct {
     slong m;
@@ -158,9 +163,9 @@ static void _lift_vec(double * a, const uint32_t * b, slong len, uint32_t n)
         a[i] = (int32_t)(b[i] - (n & (-(uint32_t)((int32_t)(n/2 - b[i]) < 0))));
 }
 
-static uint32_t _reduce_uint32(mp_limb_t a, nmod_t mod)
+static uint32_t _reduce_uint32(ulong a, nmod_t mod)
 {
-    mp_limb_t r;
+    ulong r;
     NMOD_RED(r, a, mod);
     return (uint32_t)r;
 }
@@ -199,7 +204,7 @@ static void fmpz_multi_mod_uint32_stride(
         for ( ; i < j; i++)
         {
             /* mid level split: depends on FMPZ_MOD_UI_CUTOFF */
-            mp_limb_t t = fmpz_get_nmod(A + k, lu[i].mod);
+            ulong t = fmpz_get_nmod(A + k, lu[i].mod);
 
             /* low level split: 1, 2, or 3 small primes */
             if (lu[i].mod2.n != 0)
@@ -232,7 +237,7 @@ static void fmpz_multi_mod_uint32_stride(
 /* workers */
 
 typedef struct {
-    mp_limb_t prime;
+    ulong prime;
     slong l;
     slong num_primes;
     slong m;
@@ -337,9 +342,9 @@ void _fromd_worker(void * arg_ptr)
     {
         for (j = 0; j < n; j++)
         {
-            mp_limb_t r;
+            ulong r;
             slong a = (slong) dC[i*n + j];
-            mp_limb_t b = (a < 0) ? a + shift : a;
+            ulong b = (a < 0) ? a + shift : a;
             NMOD_RED(r, b, mod);
             bigC[n*(num_primes*i + l) + j] = r;
         }
@@ -358,11 +363,11 @@ void _crt_worker(void * arg_ptr)
     fmpz ** Crows = arg->Crows;
     const fmpz_comb_struct * comb = arg->comb;
     fmpz_comb_temp_t comb_temp;
-    mp_limb_t * r;
+    ulong * r;
     int sign = arg->sign;
 
     fmpz_comb_temp_init(comb_temp, comb);
-    r = FLINT_ARRAY_ALLOC(num_primes, mp_limb_t);
+    r = FLINT_ARRAY_ALLOC(num_primes, ulong);
 
     for (i = Cstartrow; i < Cstoprow; i++)
     {
@@ -379,14 +384,14 @@ void _crt_worker(void * arg_ptr)
     fmpz_comb_temp_clear(comb_temp);
 }
 
-static mp_limb_t * _calculate_primes(
+static ulong * _calculate_primes(
     slong * num_primes_,
     flint_bitcnt_t bits,
     slong k)
 {
     slong num_primes, primes_alloc;
-    mp_limb_t * primes;
-    mp_limb_t p;
+    ulong * primes;
+    ulong p;
     fmpz_t prod;
 
     p = 2 + 2*n_sqrt((MAX_BLAS_DP_INT - 1)/(ulong)k);
@@ -397,7 +402,7 @@ static mp_limb_t * _calculate_primes(
     }
 
     primes_alloc = 1 + bits/FLINT_BIT_COUNT(p);
-    primes = FLINT_ARRAY_ALLOC(primes_alloc, mp_limb_t);
+    primes = FLINT_ARRAY_ALLOC(primes_alloc, ulong);
     num_primes = 0;
 
     fmpz_init_set_ui(prod, 1);
@@ -417,7 +422,7 @@ static mp_limb_t * _calculate_primes(
         if (num_primes + 1 > primes_alloc)
         {
             primes_alloc = FLINT_MAX(num_primes + 1, primes_alloc*5/4);
-            primes = FLINT_ARRAY_REALLOC(primes, primes_alloc, mp_limb_t);
+            primes = FLINT_ARRAY_REALLOC(primes, primes_alloc, ulong);
         }
 
         primes[num_primes] = p;
@@ -454,7 +459,7 @@ int _fmpz_mat_mul_blas(
     slong n = B->c;
     uint32_t * bigC, * bigA, * bigB;
     double * dC, * dA, * dB;
-    mp_limb_t * primes;
+    ulong * primes;
     slong num_primes;
     fmpz_comb_t comb;
     thread_pool_handle * handles;
@@ -584,11 +589,11 @@ int _fmpz_mat_mul_blas(
 #else
 
 int _fmpz_mat_mul_blas(
-    fmpz_mat_t C,
-    const fmpz_mat_t A, flint_bitcnt_t Abits,
-    const fmpz_mat_t B, flint_bitcnt_t Bbits,
-    int sign,
-    flint_bitcnt_t Cbits)
+    fmpz_mat_t FLINT_UNUSED(C),
+    const fmpz_mat_t FLINT_UNUSED(A), flint_bitcnt_t FLINT_UNUSED(Abits),
+    const fmpz_mat_t FLINT_UNUSED(B), flint_bitcnt_t FLINT_UNUSED(Bbits),
+    int FLINT_UNUSED(sign),
+    flint_bitcnt_t FLINT_UNUSED(Cbits))
 {
     return 0;
 }
@@ -619,4 +624,3 @@ int fmpz_mat_mul_blas(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 
     return _fmpz_mat_mul_blas(C, A, Abits, B, Bbits, sign, Cbits);
 }
-

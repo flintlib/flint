@@ -5,11 +5,10 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "mpoly.h"
 
 /* this file does not need to change with new orderings */
@@ -28,7 +27,7 @@ ulong mpoly_get_monomial_var_exp_ui_mp(const ulong * poly_exps,
                         slong var, flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     slong offset;
-    slong j;
+    ulong j;
     ulong wpf = bits/FLINT_BITS;
     ulong r, check;
 
@@ -49,7 +48,7 @@ slong mpoly_get_monomial_var_exp_si_mp(const ulong * poly_exps,
                         slong var, flint_bitcnt_t bits, const mpoly_ctx_t mctx)
 {
     slong offset;
-    slong j;
+    ulong j;
     ulong wpf = bits/FLINT_BITS;
     ulong r, check;
 

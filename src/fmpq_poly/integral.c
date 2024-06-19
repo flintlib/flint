@@ -5,17 +5,18 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpq_poly.h"
 
 static ulong _fmpz_gcd_big_small(const fmpz_t g, ulong h)
 {
-    __mpz_struct * z = COEFF_TO_PTR(*g);
+    mpz_ptr z = COEFF_TO_PTR(*g);
 
     return n_gcd(mpn_mod_1(z->_mp_d, FLINT_ABS(z->_mp_size), h), h);
 }
@@ -33,7 +34,7 @@ void _fmpq_poly_integral(fmpz * rpoly, fmpz_t rden,
 {
     slong k;
     ulong v, c, d;
-    mp_ptr divisors;
+    nn_ptr divisors;
     fmpz_t t, u;
     TMP_INIT;
 
@@ -62,7 +63,7 @@ void _fmpq_poly_integral(fmpz * rpoly, fmpz_t rden,
         {
             c = _fmpz_gcd_small(poly + k - 1, k);
 
-            if (c == k)
+            if (c == (ulong) k)
             {
                 fmpz_divexact_ui(rpoly + k, poly + k - 1, k);
                 divisors[k] = 1;

@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -23,7 +23,7 @@ extern "C" {
 
 /*  Memory management ********************************************************/
 
-void TEMPLATE(T, poly_init)(TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ctx_t) ctx);
+void TEMPLATE(T, poly_init)(TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx));
 
 void TEMPLATE(T, poly_init2)(TEMPLATE(T, poly_t) poly, slong alloc,
                         const TEMPLATE(T, ctx_t) ctx);
@@ -56,21 +56,21 @@ void _TEMPLATE(T, poly_set_length)(TEMPLATE(T, poly_t) poly, slong len,
 
 FQ_POLY_TEMPLATES_INLINE slong
 TEMPLATE(T, poly_length)(const TEMPLATE(T, poly_t) poly,
-                         const TEMPLATE(T, ctx_t) ctx)
+                         const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx))
 {
     return poly->length;
 }
 
 FQ_POLY_TEMPLATES_INLINE slong
 TEMPLATE(T, poly_degree)(const TEMPLATE(T, poly_t) poly,
-                         const TEMPLATE(T, ctx_t) ctx)
+                         const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx))
 {
     return poly->length - 1;
 }
 
 FQ_POLY_TEMPLATES_INLINE TEMPLATE(T, struct) *
 TEMPLATE(T, poly_lead)(const TEMPLATE(T, poly_t) poly,
-                       const TEMPLATE(T, ctx_t) ctx)
+                       const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx))
 {
     return poly->length > 0 ? poly->coeffs + (poly->length - 1) : NULL;
 }
@@ -111,7 +111,7 @@ void TEMPLATE(T, poly_set_nmod_poly)(TEMPLATE(T, poly_t) rop,
                                                const TEMPLATE(T, ctx_t) ctx);
 
 void TEMPLATE(T, poly_swap)(TEMPLATE(T, poly_t) op1, TEMPLATE(T, poly_t) op2,
-                       const TEMPLATE(T, ctx_t) ctx);
+                       const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx));
 
 void _TEMPLATE(T, poly_zero)(TEMPLATE(T, struct) *rop, slong len, const TEMPLATE(T, ctx_t) ctx);
 void TEMPLATE(T, poly_zero)(TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ctx_t) ctx);
@@ -173,7 +173,7 @@ int TEMPLATE(T, poly_equal_trunc)(const TEMPLATE(T, poly_t) poly1,
 
 FQ_POLY_TEMPLATES_INLINE int
 TEMPLATE(T, poly_is_zero)(const TEMPLATE(T, poly_t) poly,
-                          const TEMPLATE(T, ctx_t) ctx)
+                          const TEMPLATE(T, ctx_t) FLINT_UNUSED(ctx))
 {
     return (poly->length == 0);
 }
@@ -731,7 +731,7 @@ void TEMPLATE(T, poly_div_series)(TEMPLATE(T, poly_t) Q,
 void _TEMPLATE(T, poly_div_newton_n_preinv) (
     TEMPLATE(T, struct) *Q,
     const TEMPLATE(T, struct) *A, slong lenA,
-    const TEMPLATE(T, struct)* B, slong lenB,
+    const TEMPLATE(T, struct)* FLINT_UNUSED(B), slong lenB,
     const TEMPLATE(T, struct)* Binv, slong lenBinv,
     const TEMPLATE(T, ctx_t) ctx);
 

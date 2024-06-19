@@ -6,10 +6,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include <gmp.h>
+#include "longlong.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
@@ -22,7 +24,7 @@ _fmpz_poly_sqrt_KS(fmpz *rop, const fmpz *op, slong len)
     slong i, len2, m, rlimbs;
     int result = 1;
     slong bits, bits2, limbs, limbs2, loglen;
-    mp_limb_t *arr, *arr2, *arr3;
+    ulong *arr, *arr2, *arr3;
 
     /* the degree must be even */
     if (len % 2 == 0)
@@ -66,14 +68,14 @@ _fmpz_poly_sqrt_KS(fmpz *rop, const fmpz *op, slong len)
 
     limbs  = (bits * len - 1) / FLINT_BITS + 1;
 
-    arr = (mp_limb_t *) flint_calloc(limbs, sizeof(mp_limb_t));
+    arr = (ulong *) flint_calloc(limbs, sizeof(ulong));
 
     _fmpz_poly_bit_pack(arr, op, len, bits, 0);
 
     limbs2  = (bits * len2 - 1) / FLINT_BITS + 1;
-    arr2 = (mp_limb_t *) flint_calloc(limbs2, sizeof(mp_limb_t));
+    arr2 = (ulong *) flint_calloc(limbs2, sizeof(ulong));
 
-    arr3 = (mp_limb_t *) flint_calloc(limbs, sizeof(mp_limb_t));
+    arr3 = (ulong *) flint_calloc(limbs, sizeof(ulong));
 
     while (limbs != 0 && arr[limbs - 1] == 0)
         limbs--;
@@ -132,4 +134,3 @@ fmpz_poly_sqrt_KS(fmpz_poly_t b, const fmpz_poly_t a)
 
     return result;
 }
-

@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -42,9 +42,7 @@ void _acb_poly_normalise(acb_poly_t poly);
 ACB_POLY_INLINE void
 acb_poly_swap(acb_poly_t poly1, acb_poly_t poly2)
 {
-    acb_poly_struct t = *poly1;
-    *poly1 = *poly2;
-    *poly2 = t;
+    FLINT_SWAP(acb_poly_struct, *poly1, *poly2);
 }
 
 ACB_POLY_INLINE slong acb_poly_length(const acb_poly_t poly)
@@ -465,9 +463,6 @@ void _acb_poly_root_inclusion(acb_t r, const acb_t m,
     acb_srcptr polyder, slong len, slong prec);
 
 slong _acb_poly_validate_roots(acb_ptr roots,
-        acb_srcptr poly, slong len, slong prec);
-
-void _acb_poly_refine_roots_durand_kerner(acb_ptr roots,
         acb_srcptr poly, slong len, slong prec);
 
 slong _acb_poly_find_roots(acb_ptr roots,

@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -173,7 +173,7 @@ qqbar_atan_pi(slong * p, ulong * q, const qqbar_t x)
         {
             /* root is ~0.267 or ~3.73 -- accuracy should not be that bad */
             if (arb_contains_si(acb_realref(QQBAR_ENCLOSURE(x)), 1))
-                flint_abort();
+                flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
            *p = (arf_cmpabs_2exp_si(arb_midref(acb_realref(QQBAR_ENCLOSURE(x))), 0) < 0) ? 1 : 5;
             *q = 12;
@@ -183,7 +183,7 @@ qqbar_atan_pi(slong * p, ulong * q, const qqbar_t x)
         if (a == 1 && b == 4 && c == 1)
         {
             if (arb_contains_si(acb_realref(QQBAR_ENCLOSURE(x)), -1))
-                flint_abort();
+                flint_throw(FLINT_ERROR, "(%s)\n", __func__);
             *p = (arf_cmpabs_2exp_si(arb_midref(acb_realref(QQBAR_ENCLOSURE(x))), 0) < 0) ? -1 : -5;
             *q = 12;
             return 1;
@@ -242,4 +242,3 @@ qqbar_atan_pi(slong * p, ulong * q, const qqbar_t x)
         return res;
     }
 }
-

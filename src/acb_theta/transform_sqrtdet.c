@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -56,7 +56,7 @@ acb_theta_transform_sqrtdet(acb_t res, const acb_mat_t tau, slong prec)
     slong k, j, nb_neg, nb_pos;
     int success = 0;
 
-    flint_randinit(state);
+    flint_rand_init(state);
     acb_mat_init(A, g, g);
     acb_mat_init(B, g, g);
     acb_mat_init(C, g, g);
@@ -169,7 +169,7 @@ acb_theta_transform_sqrtdet(acb_t res, const acb_mat_t tau, slong prec)
         acb_union(res, res, z, prec);
     }
 
-    flint_randclear(state);
+    flint_rand_clear(state);
     acb_mat_clear(A);
     acb_mat_clear(B);
     acb_mat_clear(C);

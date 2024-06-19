@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -37,12 +37,7 @@ TEST_FUNCTION_START(z_kronecker, state)
         flint_mpz_set_si(nn, n);
 
         if (mpz_kronecker(aa, nn) != z_kronecker(a, n))
-        {
-            flint_printf("FAIL:\n");
-            flint_printf("a = %wd, n = %wd\n", a, n);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("a = %wd, n = %wd\n", a, n);
     }
 
     mpz_clear(aa);

@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "acb.h"
 #include "acb_dirichlet.h"
 
 /*
@@ -96,8 +97,7 @@ acb_dirichlet_zeta_jet_rs(acb_ptr res, const acb_t s, slong len, slong prec)
 {
     if (len > 2)
     {
-        flint_printf("acb_dirichlet_zeta_jet_rs: len > 2 not implemented\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "acb_dirichlet_zeta_jet_rs: len > 2 not implemented\n");
     }
 
     if (len <= 0)
@@ -178,4 +178,3 @@ acb_dirichlet_zeta_jet_rs(acb_ptr res, const acb_t s, slong len, slong prec)
         mag_clear(M);
     }
 }
-

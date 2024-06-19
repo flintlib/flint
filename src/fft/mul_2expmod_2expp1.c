@@ -5,11 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "mpn_extras.h"
 #include "fft.h"
 
 /* WARNING: relies on GCC's handling of >> as arithmetic shift right */
@@ -32,4 +32,3 @@ void mpn_mul_2expmod_2expp1(mp_limb_t * t, mp_limb_t * i1, mp_size_t limbs, flin
       mpn_addmod_2expp1_1(t + 1, limbs - 1, -hi1);
    }
 }
-

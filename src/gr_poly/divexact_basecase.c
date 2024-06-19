@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -47,6 +47,11 @@ _gr_poly_divexact_basecase(gr_ptr Q,
     int status = GR_SUCCESS;
     slong sz = ctx->sizeof_elem;
     gr_ptr invB;
+
+    /* note: if we wanted to be clever, we could pick a pair of coefficients such
+             that the division is easy */
+    if (Alen == Blen)
+        return gr_divexact(Q, GR_ENTRY(A, Alen - 1, sz), GR_ENTRY(B, Blen - 1, sz), ctx);
 
     GR_TMP_INIT(invB, ctx);
 

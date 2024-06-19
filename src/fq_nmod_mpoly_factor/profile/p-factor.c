@@ -5,13 +5,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fq_nmod_mpoly_factor.h"
 #include "profiler.h"
-
+#include "fmpz.h"
+#include "fq_nmod_mpoly_factor.h"
 
 slong check_omega(slong om, const fq_nmod_mpoly_t p, const fq_nmod_mpoly_ctx_t ctx)
 {
@@ -59,7 +59,7 @@ flint_printf("---------------------------\n");
 int main(int argc, char *argv[])
 {
     slong i, time, total_time = 0;
-    mp_limb_t p = UWORD(4611686018427388073);
+    ulong p = UWORD(4611686018427388073);
 
     flint_printf("starting dense\n");
     {
@@ -117,4 +117,3 @@ int main(int argc, char *argv[])
     flint_cleanup_master();
     return 0;
 }
-

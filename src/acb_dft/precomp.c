@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "ulong_extras.h"
 #include "acb_dft.h"
 
 void
@@ -94,9 +95,7 @@ acb_dft_precomp_clear(acb_dft_pre_t pre)
             acb_dft_bluestein_clear(pre->t.bluestein);
             break;
         default:
-            flint_printf("acb_dft_clear: unknown strategy code %i\n", pre->type);
-            flint_abort();
-            break;
+            flint_throw(FLINT_ERROR, "acb_dft_clear: unknown strategy code %i\n", pre->type);
     }
 }
 
@@ -124,9 +123,7 @@ acb_dft_precomp(acb_ptr w, acb_srcptr v, const acb_dft_pre_t pre, slong prec)
             acb_dft_bluestein_precomp(w, v, pre->t.bluestein, prec);
             break;
         default:
-            flint_printf("acb_dft_precomp: unknown strategy code %i\n", pre->type);
-            flint_abort();
-            break;
+            flint_throw(FLINT_ERROR, "acb_dft_precomp: unknown strategy code %i\n", pre->type);
     }
 }
 

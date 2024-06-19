@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -17,7 +17,7 @@ TEST_FUNCTION_START(nmod_mat_rank, state)
 {
     nmod_mat_t A;
     slong i, m, n, d, r;
-    mp_limb_t mod;
+    ulong mod;
 
     /* Maximally sparse matrices of given rank */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
@@ -33,12 +33,8 @@ TEST_FUNCTION_START(nmod_mat_rank, state)
             /* flint_printf("SPARSE %wd\n", r);
             nmod_mat_print_pretty(A); */
             if (r != nmod_mat_rank(A))
-            {
-                flint_printf("FAIL:\n");
-                flint_printf("wrong rank!\n");
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL("Wrong rank\n");
+
             nmod_mat_clear(A);
         }
     }
@@ -55,17 +51,13 @@ TEST_FUNCTION_START(nmod_mat_rank, state)
             d = n_randint(state, 2*m*n + 1);
             nmod_mat_init(A, m, n, mod);
             nmod_mat_randrank(A, state, r);
-            nmod_mat_randops(A, d, state);
+            nmod_mat_randops(A, state, d);
             /*
             flint_printf("DENSE %wd %wd\n", r, d);
             nmod_mat_print_pretty(A); */
             if (r != nmod_mat_rank(A))
-            {
-                flint_printf("FAIL:\n");
-                flint_printf("wrong rank!\n");
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL("Wrong rank\n");
+
             nmod_mat_clear(A);
         }
     }

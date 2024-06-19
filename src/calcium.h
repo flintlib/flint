@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -18,25 +18,14 @@
 #define CALCIUM_INLINE static inline
 #endif
 
-#include "fmpz.h"
 #include "acb_types.h"
+#include "ca_types.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /* Input and output */
-
-typedef struct
-{
-    FLINT_FILE * fp;
-    char * s;
-    slong len;
-    slong alloc;
-}
-calcium_stream_struct;
-
-typedef calcium_stream_struct calcium_stream_t[1];
 
 #ifdef FLINT_HAVE_FILE
 void calcium_stream_init_file(calcium_stream_t out, FILE * fp);
@@ -66,13 +55,7 @@ void calcium_write_free(calcium_stream_t out, char * s)
 
 /* Triple-valued logic */
 
-typedef enum
-{
-    T_TRUE,
-    T_FALSE,
-    T_UNKNOWN
-} truth_t;
-
+/* TODO: Either remove this one or thruth_println in gr.h */
 CALCIUM_INLINE void truth_print(truth_t t)
 {
     if (t == T_TRUE) flint_printf("T_TRUE");
@@ -80,85 +63,14 @@ CALCIUM_INLINE void truth_print(truth_t t)
     if (t == T_UNKNOWN) flint_printf("T_UNKNOWN");
 }
 
-/* IDs for builtin mathematical functions and constants */
-typedef enum
-{
-    /* Special case for representing qqbar instances */
-    CA_QQBar,
-    /* Arithmetic */
-    CA_Neg,
-    CA_Add,
-    CA_Sub,
-    CA_Mul,
-    CA_Div,
-    /* Roots */
-    CA_Sqrt,
-    CA_Cbrt,
-    CA_Root,
-    /* Complex parts */
-    CA_Floor,
-    CA_Ceil,
-    CA_Abs,
-    CA_Sign,
-    CA_Re,
-    CA_Im,
-    CA_Arg,
-    CA_Conjugate,
-    /* Elementary constants */
-    CA_Pi,
-    /* Elementary functions */
-    CA_Sin,
-    CA_Cos,
-    CA_Exp,
-    CA_Log,
-    CA_Pow,
-    CA_Tan,
-    CA_Cot,
-    CA_Cosh,
-    CA_Sinh,
-    CA_Tanh,
-    CA_Coth,
-    CA_Atan,
-    CA_Acos,
-    CA_Asin,
-    CA_Acot,
-    CA_Atanh,
-    CA_Acosh,
-    CA_Asinh,
-    CA_Acoth,
-    /* Euler's constant */
-    CA_Euler,
-    /* Gamma and related functions */
-    CA_Gamma,
-    CA_LogGamma,
-    CA_Psi,
-    CA_Erf,
-    CA_Erfc,
-    CA_Erfi,
-    CA_RiemannZeta,
-    CA_HurwitzZeta,
-    CA_FUNC_CODE_LENGTH
-} calcium_func_code;
-
 const char * calcium_func_name(calcium_func_code func);
 
 /* Flint extras */
 
-/* slower alternative: fmpz_fdiv_ui(x 1000000007) */
-CALCIUM_INLINE ulong calcium_fmpz_hash(const fmpz_t x)
-{
-    if (!COEFF_IS_MPZ(*x))
-        return *x;
-    else
-    {
-        __mpz_struct * z = COEFF_TO_PTR(*x);
-        return (z->_mp_size > 0) ? z->_mp_d[0] : -z->_mp_d[0];
-    }
-}
+ulong calcium_fmpz_hash(const fmpz_t x);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif
-

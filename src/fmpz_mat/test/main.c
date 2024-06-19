@@ -5,17 +5,21 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 /* Try to get fdopen declared for fmpz_mat_[print/read] */
-#if defined __STRICT_ANSI__
+#if defined(__STRICT_ANSI__)
 # undef __STRICT_ANSI__
 #endif
 
-#include <string.h>
-#include <stdlib.h>
+#if defined(__CYGWIN__)
+# define ulong ulongxx
+# include <sys/param.h>
+# undef ulong
+#endif
+#include "d_mat.h"
 
 /* Include functions *********************************************************/
 
@@ -76,6 +80,7 @@
 #include "t-mul_multi_mod.c"
 #include "t-mul_small.c"
 #include "t-mul_strassen.c"
+#include "t-mul_waksman.c"
 #include "t-multi_CRT_ui.c"
 #include "t-multi_CRT_ui_unsigned.c"
 #include "t-nullspace.c"
@@ -85,7 +90,6 @@
 #include "t-rank.c"
 #include "t-rref.c"
 #include "t-rref_fflu.c"
-#include "t-rref_mod.c"
 #include "t-rref_mul.c"
 #include "t-scalar_addmul_fmpz.c"
 #include "t-scalar_addmul_nmod_mat_fmpz.c"
@@ -175,6 +179,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mat_mul_multi_mod),
     TEST_FUNCTION(fmpz_mat_mul_small),
     TEST_FUNCTION(fmpz_mat_mul_strassen),
+    TEST_FUNCTION(fmpz_mat_mul_waksman),
     TEST_FUNCTION(fmpz_mat_multi_CRT_ui),
     TEST_FUNCTION(fmpz_mat_multi_CRT_ui_unsigned),
     TEST_FUNCTION(fmpz_mat_nullspace),
@@ -184,7 +189,6 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_mat_rank),
     TEST_FUNCTION(fmpz_mat_rref),
     TEST_FUNCTION(fmpz_mat_rref_fflu),
-    TEST_FUNCTION(fmpz_mat_rref_mod),
     TEST_FUNCTION(fmpz_mat_rref_mul),
     TEST_FUNCTION(fmpz_mat_scalar_addmul_fmpz),
     TEST_FUNCTION(fmpz_mat_scalar_addmul_nmod_mat_fmpz),

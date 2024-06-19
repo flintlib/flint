@@ -5,14 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "test_helpers.h"
 #include "fmpz_poly.h"
 
-static const mp_limb_t known_values[] =
+static const ulong known_values[] =
 {
     UWORD(2147483629),
     UWORD(1073742093),
@@ -30,7 +30,7 @@ static const mp_limb_t known_values[] =
 TEST_FUNCTION_START(fmpz_poly_swinnerton_dyer, state)
 {
     fmpz_poly_t S;
-    mp_limb_t r;
+    ulong r;
     slong n;
 
     for (n = 0; n <= 10; n++)

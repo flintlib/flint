@@ -6,11 +6,10 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "mpfr_mat.h"
 
 void
@@ -21,9 +20,10 @@ mpfr_mat_randtest(mpfr_mat_t mat, flint_rand_t state)
     r = mat->r;
     c = mat->c;
 
-    _flint_rand_init_gmp(state);
+    if (!FLINT_RAND_GMP_STATE_IS_INITIALISED(state))
+        _flint_rand_init_gmp_state(state);
 
     for (i = 0; i < r; i++)
         for (j = 0; j < c; j++)
-            mpfr_urandomb(mpfr_mat_entry(mat, i, j), state->gmp_state);
+            mpfr_urandomb(mpfr_mat_entry(mat, i, j), state->__gmp_state);
 }

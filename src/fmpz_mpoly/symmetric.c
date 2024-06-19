@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -16,7 +16,8 @@ fmpz_mpoly_symmetric_gens(fmpz_mpoly_t res, ulong k, slong * vars, slong n, cons
 {
     ulong * exp;
     slong * c;
-    slong nvars, i, j;
+    slong nvars, i;
+    ulong j;
 
     if (k == 0)
     {
@@ -26,7 +27,7 @@ fmpz_mpoly_symmetric_gens(fmpz_mpoly_t res, ulong k, slong * vars, slong n, cons
 
     fmpz_mpoly_zero(res, ctx);
 
-    if (k > n)
+    if (k > (ulong) n)
         return;
 
     nvars = ctx->minfo->nvars;
@@ -49,8 +50,8 @@ fmpz_mpoly_symmetric_gens(fmpz_mpoly_t res, ulong k, slong * vars, slong n, cons
         for (i = 0; i < n; i++)
             exp[vars[i]] = 0;
 
-        for (i = 0; i < k; i++)
-            exp[vars[c[i]]] = 1;
+        for (j = 0; j < k; j++)
+            exp[vars[c[j]]] = 1;
 
         fmpz_mpoly_push_term_ui_ui(res, 1, exp, ctx);
 

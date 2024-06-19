@@ -5,15 +5,15 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-static inline
-slong _fmpz_poly_num_real_roots_quadratic(const fmpz * pol, slong len)
+FLINT_FORCE_INLINE
+slong _fmpz_poly_num_real_roots_quadratic(const fmpz * pol)
 {
     if ((fmpz_sgn(pol) * fmpz_sgn(pol + 2) < 0) ||
         (2*fmpz_bits(pol + 1) > fmpz_bits(pol) + fmpz_bits(pol + 2) + 3))
@@ -114,7 +114,7 @@ slong _fmpz_poly_num_real_roots(const fmpz * pol, slong len)
     if (len == 2)
         return i + 1;
     if (len == 3)
-        return i + _fmpz_poly_num_real_roots_quadratic(pol, len);
+        return i + _fmpz_poly_num_real_roots_quadratic(pol);
     if (len <= 5)
     {
         int s;

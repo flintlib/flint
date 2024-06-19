@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -27,7 +27,7 @@ void mpoly_get_cmpmask(ulong * cmpmask, slong N, flint_bitcnt_t bits,
         }
         else
         {
-            for (i = 0; i < N - bits/FLINT_BITS; i++)
+            for (i = 0; i < N - (slong) bits/FLINT_BITS; i++)
                 cmpmask[i] = -UWORD(1);
             for (; i < N; i++)
                 cmpmask[i] = UWORD(0);

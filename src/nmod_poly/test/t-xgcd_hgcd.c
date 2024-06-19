@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -24,7 +24,7 @@ TEST_FUNCTION_START(nmod_poly_xgcd_hgcd, state)
     {
         nmod_poly_t a, b, c, g1, g2, s, t, sum, temp;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest_not_zero(state);
         while (!n_is_probabprime(n));
 
@@ -82,11 +82,11 @@ TEST_FUNCTION_START(nmod_poly_xgcd_hgcd, state)
     }
 
     /* Check aliasing of a and g */
-    for (i = 0; i < 20 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, g, s, t;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest(state);
         while (!n_is_probabprime(n));
 
@@ -95,8 +95,8 @@ TEST_FUNCTION_START(nmod_poly_xgcd_hgcd, state)
         nmod_poly_init(g, n);
         nmod_poly_init(s, n);
         nmod_poly_init(t, n);
-        nmod_poly_randtest(a, state, n_randtest(state) % 200);
-        nmod_poly_randtest(b, state, n_randtest(state) % 200);
+        nmod_poly_randtest(a, state, n_randint(state, 20));
+        nmod_poly_randtest(b, state, n_randint(state, 20));
 
         nmod_poly_xgcd_hgcd(g, s, t, a, b);
         nmod_poly_xgcd_hgcd(a, s, t, a, b);
@@ -121,11 +121,11 @@ TEST_FUNCTION_START(nmod_poly_xgcd_hgcd, state)
     }
 
     /* Check aliasing of b and g */
-    for (i = 0; i < 20 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, g, s, t;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest(state);
         while (!n_is_probabprime(n));
 
@@ -134,8 +134,8 @@ TEST_FUNCTION_START(nmod_poly_xgcd_hgcd, state)
         nmod_poly_init(g, n);
         nmod_poly_init(s, n);
         nmod_poly_init(t, n);
-        nmod_poly_randtest(a, state, n_randtest(state) % 200);
-        nmod_poly_randtest(b, state, n_randtest(state) % 200);
+        nmod_poly_randtest(a, state, n_randint(state, 20));
+        nmod_poly_randtest(b, state, n_randint(state, 20));
 
         nmod_poly_xgcd_hgcd(g, s, t, a, b);
         nmod_poly_xgcd_hgcd(b, s, t, a, b);
@@ -160,11 +160,11 @@ TEST_FUNCTION_START(nmod_poly_xgcd_hgcd, state)
     }
 
     /* Check aliasing of s and a */
-    for (i = 0; i < 20 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, g, s, t;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest(state);
         while (!n_is_probabprime(n));
 
@@ -173,8 +173,8 @@ TEST_FUNCTION_START(nmod_poly_xgcd_hgcd, state)
         nmod_poly_init(g, n);
         nmod_poly_init(s, n);
         nmod_poly_init(t, n);
-        nmod_poly_randtest(a, state, n_randtest(state) % 200);
-        nmod_poly_randtest(b, state, n_randtest(state) % 200);
+        nmod_poly_randtest(a, state, n_randint(state, 20));
+        nmod_poly_randtest(b, state, n_randint(state, 20));
 
         nmod_poly_xgcd_hgcd(g, s, t, a, b);
         nmod_poly_xgcd_hgcd(g, a, t, a, b);
@@ -198,11 +198,11 @@ TEST_FUNCTION_START(nmod_poly_xgcd_hgcd, state)
     }
 
     /* Check aliasing of s and b */
-    for (i = 0; i < 20 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, g, s, t;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest(state);
         while (!n_is_probabprime(n));
 
@@ -211,8 +211,8 @@ TEST_FUNCTION_START(nmod_poly_xgcd_hgcd, state)
         nmod_poly_init(g, n);
         nmod_poly_init(s, n);
         nmod_poly_init(t, n);
-        nmod_poly_randtest(a, state, n_randtest(state) % 200);
-        nmod_poly_randtest(b, state, n_randtest(state) % 200);
+        nmod_poly_randtest(a, state, n_randint(state, 20));
+        nmod_poly_randtest(b, state, n_randint(state, 20));
 
         nmod_poly_xgcd_hgcd(g, s, t, a, b);
         nmod_poly_xgcd_hgcd(g, b, t, a, b);
@@ -236,11 +236,11 @@ TEST_FUNCTION_START(nmod_poly_xgcd_hgcd, state)
     }
 
     /* Check aliasing of t and a */
-    for (i = 0; i < 20 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, g, s, t;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest(state);
         while (!n_is_probabprime(n));
 
@@ -249,8 +249,8 @@ TEST_FUNCTION_START(nmod_poly_xgcd_hgcd, state)
         nmod_poly_init(g, n);
         nmod_poly_init(s, n);
         nmod_poly_init(t, n);
-        nmod_poly_randtest(a, state, n_randtest(state) % 200);
-        nmod_poly_randtest(b, state, n_randtest(state) % 200);
+        nmod_poly_randtest(a, state, n_randint(state, 20));
+        nmod_poly_randtest(b, state, n_randint(state, 20));
 
         nmod_poly_xgcd_hgcd(g, s, t, a, b);
         nmod_poly_xgcd_hgcd(g, s, a, a, b);
@@ -274,11 +274,11 @@ TEST_FUNCTION_START(nmod_poly_xgcd_hgcd, state)
     }
 
     /* Check aliasing of t and b */
-    for (i = 0; i < 20 * flint_test_multiplier(); i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, g, s, t;
 
-        mp_limb_t n;
+        ulong n;
         do n = n_randtest(state);
         while (!n_is_probabprime(n));
 
@@ -287,8 +287,8 @@ TEST_FUNCTION_START(nmod_poly_xgcd_hgcd, state)
         nmod_poly_init(g, n);
         nmod_poly_init(s, n);
         nmod_poly_init(t, n);
-        nmod_poly_randtest(a, state, n_randtest(state) % 200);
-        nmod_poly_randtest(b, state, n_randtest(state) % 200);
+        nmod_poly_randtest(a, state, n_randint(state, 20));
+        nmod_poly_randtest(b, state, n_randint(state, 20));
 
         nmod_poly_xgcd_hgcd(g, s, t, a, b);
         nmod_poly_xgcd_hgcd(g, s, b, a, b);

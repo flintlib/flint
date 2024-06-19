@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -25,16 +25,6 @@ extern "C" {
 #endif
 
 /* Vector object */
-
-typedef struct
-{
-    ca_ptr entries;
-    slong alloc;
-    slong length;
-}
-ca_vec_struct;
-
-typedef ca_vec_struct ca_vec_t[1];
 
 #define ca_vec_entry(vec, i) ((vec)->entries + (i))
 
@@ -57,9 +47,7 @@ void _ca_vec_swap(ca_ptr vec1, ca_ptr vec2, slong len, ca_ctx_t ctx);
 CA_VEC_INLINE void
 ca_vec_swap(ca_vec_t vec1, ca_vec_t vec2, ca_ctx_t ctx)
 {
-    ca_vec_struct t = *vec1;
-    *vec1 = *vec2;
-    *vec2 = t;
+    FLINT_SWAP(ca_vec_struct, *vec1, *vec2);
 }
 
 /* Length */

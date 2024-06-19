@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -26,8 +26,7 @@ fmpq_mat_can_solve_fraction_free(fmpq_mat_t X, const fmpq_mat_t A,
 
     if (A->r != B->r || A->c != X->r || X->c != B->c)
     {
-        flint_printf("Exception (fmpq_mat_can_solve_fraction_free). Incompatible matrix dimensions.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpq_mat_can_solve_fraction_free). Incompatible matrix dimensions.\n");
     }
 
     if (A->r == 0)

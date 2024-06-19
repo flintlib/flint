@@ -5,11 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fq_zech.h"
+#include "mpoly.h"
 #include "fq_zech_mpoly.h"
 
 void fq_zech_mpoly_get_coeff_vars_ui(fq_zech_mpoly_t C, const fq_zech_mpoly_t A,
@@ -105,7 +106,7 @@ continue_outer_sp:;
     }
     else
     {
-        ulong wpf = A->bits/FLINT_BITS;
+        slong wpf = A->bits/FLINT_BITS;
         maxoffset = 0;
         minoffset = N;
         for (i = 0; i < length; i++)

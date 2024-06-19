@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -19,7 +19,7 @@ void _fmpz_poly_sqrlow_KS(fmpz * res, const fmpz * poly, slong len, slong n)
 {
     int neg;
     slong bits, limbs, loglen, sign = 0;
-    mp_limb_t *arr_in, *arr_out;
+    ulong *arr_in, *arr_out;
 
     len = FLINT_MIN(len, n);
 
@@ -50,8 +50,8 @@ void _fmpz_poly_sqrlow_KS(fmpz * res, const fmpz * poly, slong len, slong n)
     bits   = 2 * bits + loglen + sign;
     limbs  = (bits * len - 1) / FLINT_BITS + 1;
 
-    arr_in  = flint_calloc(limbs, sizeof(mp_limb_t));
-    arr_out = flint_malloc((2 * limbs) * sizeof(mp_limb_t));
+    arr_in  = flint_calloc(limbs, sizeof(ulong));
+    arr_out = flint_malloc((2 * limbs) * sizeof(ulong));
 
     _fmpz_poly_bit_pack(arr_in, poly, len, bits, neg);
 
@@ -92,4 +92,3 @@ void fmpz_poly_sqrlow_KS(fmpz_poly_t res, const fmpz_poly_t poly, slong n)
     _fmpz_poly_set_length(res, n);
     _fmpz_poly_normalise(res);
 }
-

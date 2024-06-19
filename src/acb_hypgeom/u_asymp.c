@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -349,7 +349,7 @@ void acb_hypgeom_u_asymp(acb_t res, const acb_t a, const acb_t b,
                     moreprec = MAG_EXP(err);
 
                 n = acb_hypgeom_pfq_choose_n_max(aa, p, aa + p, q, w,
-                    prec + moreprec, FLINT_MIN(WORD_MAX / 2, 50 + 10.0 * prec));
+                    prec + moreprec, FLINT_MIN(WORD_MAX / 2, 50 + 10 * prec));
             }
 
             acb_hypgeom_pfq_sum_invz(s, t, aa, p, aa + p, q, w, winv, n, prec);
@@ -392,4 +392,3 @@ void acb_hypgeom_u_asymp(acb_t res, const acb_t a, const acb_t b,
     acb_clear(w);
     acb_clear(winv);
 }
-

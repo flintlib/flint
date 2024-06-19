@@ -5,11 +5,10 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
@@ -28,14 +27,13 @@ int
 main(void)
 {
     int len, e;
-    fmpz_poly_t f, g[1];
+    fmpz_poly_t f, g;
 
     FLINT_TEST_INIT(state);
 
 
     fmpz_poly_init2(f, lenhi);
-    fmpz_poly_init2(g[0], ehi * (lenhi - 1) + 1);
-    fmpz_poly_init2(g[1], ehi * (lenhi - 1) + 1);
+    fmpz_poly_init2(g, ehi * (lenhi - 1) + 1);
 
     flint_printf("| len | exp | binomial |\n");
 
@@ -63,7 +61,7 @@ main(void)
 
             timeit_start(t[0]);
             for (l = 0; l < loops; l++)
-                fmpz_poly_pow_binomial(g[0], f, e);
+                fmpz_poly_pow_binomial(g, f, e);
             timeit_stop(t[0]);
 
             if (t[0]->cpu <= cpumin)
@@ -80,9 +78,9 @@ main(void)
     }
 
     fmpz_poly_clear(f);
-    fmpz_poly_clear(g[0]);
+    fmpz_poly_clear(g);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
 
     return 0;
 }

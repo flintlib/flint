@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpn_extras.h"
 #include "nmod_poly.h"
 #include "fq_nmod.h"
 #include "fq_nmod_poly.h"
@@ -30,7 +31,7 @@ _fq_nmod_poly_mullow_univariate (fq_nmod_struct * rop,
     slong i;
     slong len;
 
-    mp_ptr cop1, cop2, crop;
+    nn_ptr cop1, cop2, crop;
 
     if (!len1 || !len2)
     {
@@ -38,7 +39,7 @@ _fq_nmod_poly_mullow_univariate (fq_nmod_struct * rop,
         return;
     }
 
-    cop1 = (mp_limb_t *) flint_malloc(clen1*sizeof(mp_limb_t));
+    cop1 = (ulong *) flint_malloc(clen1*sizeof(ulong));
     for (i = 0; i < len1; i++)
     {
         flint_mpn_copyi(cop1 + pfqlen*i, (op1 + i)->coeffs, (op1 + i)->length);
@@ -47,7 +48,7 @@ _fq_nmod_poly_mullow_univariate (fq_nmod_struct * rop,
 
     if (op2 != op1)
     {
-        cop2 = (mp_limb_t *) flint_malloc(clen2*sizeof(mp_limb_t));
+        cop2 = (ulong *) flint_malloc(clen2*sizeof(ulong));
         for (i = 0; i < len2; i++)
         {
             flint_mpn_copyi(cop2 + pfqlen*i, (op2 + i)->coeffs,(op2 + i)->length);
@@ -59,7 +60,7 @@ _fq_nmod_poly_mullow_univariate (fq_nmod_struct * rop,
         cop2 = cop1;
     }
 
-    crop = (mp_limb_t *) flint_malloc(cmlen*sizeof(mp_limb_t));
+    crop = (ulong *) flint_malloc(cmlen*sizeof(ulong));
     if (clen1 >= clen2)
         _nmod_poly_mullow(crop, cop1, clen1, cop2, clen2, cmlen, mod);
     else
@@ -112,4 +113,3 @@ fq_nmod_poly_mullow_univariate (fq_nmod_poly_t rop,
         _fq_nmod_poly_normalise(rop, ctx);
     }
 }
-

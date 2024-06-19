@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -31,9 +31,8 @@ acb_poly_revert_series(acb_poly_t Qinv,
     if (Qlen < 2 || !acb_is_zero(Q->coeffs)
                  || acb_contains_zero(Q->coeffs + 1))
     {
-        flint_printf("Exception (acb_poly_revert_series). Input must \n"
+        flint_throw(FLINT_ERROR, "(acb_poly_revert_series): Input must \n"
                "have zero constant term and nonzero coefficient of x^1.\n");
-        flint_abort();
     }
 
     if (Qinv != Q)

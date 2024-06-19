@@ -5,13 +5,19 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fmpz_vec.h"
-#include "fmpz_mod_mpoly_factor.h"
+#include "fmpz_mod.h"
 #include "n_poly.h"
+#include "mpoly.h"
+#include "fmpz_mod_mpoly_factor.h"
+
+#if FLINT_WANT_ASSERT
+# include "longlong.h"
+#endif
 
 void fmpz_mod_polyu_init(fmpz_mod_polyu_t A)
 {
@@ -77,10 +83,10 @@ void fmpz_mod_polyu3_degrees(
 
 /***************************************************************************/
 
-void fmpz_mod_mpolyu_init(
+static void fmpz_mod_mpolyu_init(
     fmpz_mod_mpolyu_t A,
     flint_bitcnt_t bits,
-    const fmpz_mod_mpoly_ctx_t ctx)
+    const fmpz_mod_mpoly_ctx_t FLINT_UNUSED(ctx))
 {
     A->coeffs = NULL;
     A->exps = NULL;
@@ -90,7 +96,7 @@ void fmpz_mod_mpolyu_init(
 }
 
 
-void fmpz_mod_mpolyu_clear(
+static void fmpz_mod_mpolyu_clear(
     fmpz_mod_mpolyu_t A,
     const fmpz_mod_mpoly_ctx_t uctx)
 {
@@ -101,25 +107,25 @@ void fmpz_mod_mpolyu_clear(
     flint_free(A->exps);
 }
 
-
-void fmpz_mod_mpolyu_swap(
+#if 0
+static void fmpz_mod_mpolyu_swap(
     fmpz_mod_mpolyu_t A,
     fmpz_mod_mpolyu_t B,
-    const fmpz_mod_mpoly_ctx_t uctx)
+    const fmpz_mod_mpoly_ctx_t FLINT_UNUSED(uctx))
 {
    fmpz_mod_mpolyu_struct t = *A;
    *A = *B;
    *B = t;
 }
 
-void fmpz_mod_mpolyu_zero(
+static void fmpz_mod_mpolyu_zero(
     fmpz_mod_mpolyu_t A,
-    const fmpz_mod_mpoly_ctx_t uctx)
+    const fmpz_mod_mpoly_ctx_t FLINT_UNUSED(uctx))
 {
     A->length = 0;
 }
 
-int fmpz_mod_mpolyu_is_one(
+static int fmpz_mod_mpolyu_is_one(
     fmpz_mod_mpolyu_t A,
     const fmpz_mod_mpoly_ctx_t uctx)
 {
@@ -128,8 +134,9 @@ int fmpz_mod_mpolyu_is_one(
 
     return fmpz_mod_mpoly_is_one(A->coeffs + 0, uctx);
 }
+#endif
 
-void fmpz_mod_mpolyu_fit_length(
+static void fmpz_mod_mpolyu_fit_length(
     fmpz_mod_mpolyu_t A,
     slong length,
     const fmpz_mod_mpoly_ctx_t uctx)
@@ -826,7 +833,7 @@ int fmpz_mod_mpoly_hlift_zippel(
     FLINT_ASSERT(r > 1);
     FLINT_ASSERT(bits <= FLINT_BITS);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         fmpz_mod_mpoly_t T;
         slong j, * check_degs = FLINT_ARRAY_ALLOC(ctx->minfo->nvars, slong);

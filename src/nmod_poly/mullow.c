@@ -6,14 +6,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "nmod.h"
 #include "nmod_poly.h"
 
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
 
 #include "fft_small.h"
 
@@ -29,8 +29,8 @@ static const short fft_mullow_tab[] = {1115, 1115, 597, 569, 407, 321, 306, 279,
 #endif
 
 
-void _nmod_poly_mullow(mp_ptr res, mp_srcptr poly1, slong len1,
-                             mp_srcptr poly2, slong len2, slong n, nmod_t mod)
+void _nmod_poly_mullow(nn_ptr res, nn_srcptr poly1, slong len1,
+                             nn_srcptr poly2, slong len2, slong n, nmod_t mod)
 {
     slong bits;
 
@@ -51,7 +51,7 @@ void _nmod_poly_mullow(mp_ptr res, mp_srcptr poly1, slong len1,
 
     bits = NMOD_BITS(mod);
 
-#ifdef FLINT_HAVE_FFT_SMALL
+#if FLINT_HAVE_FFT_SMALL
 
     if (len2 >= fft_mullow_tab[bits - 1])
     {

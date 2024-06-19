@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -24,7 +24,7 @@ TEST_FUNCTION_START(nmod_poly_exp_series, state)
         nmod_poly_t A, B, AB, expA, expB, expAB, S;
         slong n;
         slong N = 100;
-        mp_limb_t mod;
+        ulong mod;
 
         /* Make sure to workout the Newton code */
         if (n_randint(state, 100) == 1)
@@ -92,7 +92,7 @@ TEST_FUNCTION_START(nmod_poly_exp_series, state)
     {
         nmod_poly_t A, B;
         slong n;
-        mp_limb_t mod;
+        ulong mod;
         mod = n_randtest_prime(state, 0);
 
         if (i < 30)

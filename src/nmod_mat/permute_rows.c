@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -21,7 +21,7 @@ void
 nmod_mat_permute_rows(nmod_mat_t mat, const slong * perm_act, slong * perm_store)
 {
     slong i;
-    mp_limb_t ** mat_tmp = (mp_limb_t **) flint_malloc(mat->r * sizeof(mp_limb_t *));
+    ulong ** mat_tmp = (ulong **) flint_malloc(mat->r * sizeof(ulong *));
 
     /* perm_store[i] <- perm_store[perm_act[i]] */
     if (perm_store)

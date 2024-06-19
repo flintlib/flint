@@ -5,14 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
+#include "flint-mparam.h"
 #include "fft.h"
-#include "ulong_extras.h"
-#include "fft_tuning.h"
 #include "mpn_extras.h"
 
 static mp_size_t mulmod_2expp1_table_n[FFT_N_NUM] = MULMOD_TAB;
@@ -162,7 +160,7 @@ void _fft_mulmod_2expp1(mp_limb_t * r1, mp_limb_t * i1, mp_limb_t * i2,
 void fft_mulmod_2expp1(mp_limb_t * r, mp_limb_t * i1, mp_limb_t * i2,
                            mp_size_t n, mp_size_t w, mp_limb_t * tt)
 {
-   mp_size_t bits = n*w;
+   flint_bitcnt_t bits = n*w;
    mp_size_t limbs = bits/FLINT_BITS;
    flint_bitcnt_t depth1, depth = 1;
 

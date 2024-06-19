@@ -2,10 +2,10 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include "arb.h"
-#include "acb.h"
-#include "arb_poly.h"
-#include "profiler.h"
+#include <flint/arb.h>
+#include <flint/acb.h>
+#include <flint/arb_poly.h>
+#include <flint/profiler.h>
 
 void
 keiper_li_series(arb_ptr z, slong len, slong prec)
@@ -15,6 +15,8 @@ keiper_li_series(arb_ptr z, slong len, slong prec)
     t = _arb_vec_init(len);
     u = _arb_vec_init(len);
     v = _arb_vec_init(len);
+
+    TIMEIT_ONCE_START
 
     /* -zeta(s) */
     flint_printf("zeta: ");
@@ -62,6 +64,9 @@ keiper_li_series(arb_ptr z, slong len, slong prec)
     arb_set(z, t);
     _arb_vec_neg(t + 1, t + 1, len - 1);
     _arb_poly_binomial_transform(z + 1, t + 1, len - 1, len - 1, prec);
+    TIMEIT_ONCE_STOP
+
+    flint_printf("total: ");
     TIMEIT_ONCE_STOP
 
     _arb_vec_clear(t, len);

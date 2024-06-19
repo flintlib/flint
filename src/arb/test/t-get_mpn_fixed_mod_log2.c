@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -20,12 +20,12 @@ TEST_FUNCTION_START(arb_get_mpn_fixed_mod_log2, state)
     {
         arf_t x;
         fmpz_t q;
-        mp_ptr w;
+        nn_ptr w;
         arb_t wb, t;
-        mp_size_t wn;
+        slong wn;
         slong prec, prec2;
         int success;
-        mp_limb_t error;
+        ulong error;
 
         prec = 2 + n_randint(state, 10000);
         wn = 1 + n_randint(state, 200);
@@ -35,7 +35,7 @@ TEST_FUNCTION_START(arb_get_mpn_fixed_mod_log2, state)
         arb_init(wb);
         arb_init(t);
         fmpz_init(q);
-        w = flint_malloc(sizeof(mp_limb_t) * wn);
+        w = flint_malloc(sizeof(ulong) * wn);
 
         arf_randtest(x, state, prec, 14);
 

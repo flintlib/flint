@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -21,7 +21,7 @@ NTL_CLIENT
 TEST_FUNCTION_START(ZZ_to_fmpz, state)
 {
     int i, result;
-    mp_bitcnt_t bits, randbits;
+    flint_bitcnt_t bits, randbits;
     fmpz_t int1, int2;
 
     ZZ z;
@@ -60,7 +60,7 @@ TEST_FUNCTION_START(ZZX_to_fmpz_poly, state)
 {
     fmpz_poly_t f_poly1, f_poly2;
     slong length;
-    mp_bitcnt_t bits;
+    flint_bitcnt_t bits;
     int i, result;
 
     /* Check aliasing of a and c */

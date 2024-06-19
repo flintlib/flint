@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -54,11 +54,9 @@ TEST_FUNCTION_START(thread_support_parallel_do, state)
         for (i = 0; i < n; i++)
         {
             if (resx[i] != resy[i] || resx[i] != i * i)
-            {
-                flint_printf("FAIL\n");
-                flint_printf("num_threads = %wd, i = %wd/%wd\n", flint_get_num_threads(), i, n);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL(
+                        "num_threads = %wd, i = %wd/%wd\n",
+                        flint_get_num_threads(), i, n);
         }
 
         flint_free(resx);

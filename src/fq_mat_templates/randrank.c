@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -23,8 +23,7 @@ TEMPLATE(T, mat_randrank) (TEMPLATE(T, mat_t) mat, flint_rand_t state,
 
     if (rank < 0 || rank > mat->r || rank > mat->c)
     {
-        printf("Exception (nmod_mat_randrank). Impossible rank.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s): Impossible rank.\n", __func__);
     }
 
     diag = _TEMPLATE(T, vec_init) (rank, ctx);

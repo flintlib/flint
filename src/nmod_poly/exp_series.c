@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -14,7 +14,7 @@
 #include "gr_poly.h"
 
 void
-_nmod_poly_exp_series(mp_ptr f, mp_srcptr h, slong hlen, slong n, nmod_t mod)
+_nmod_poly_exp_series(nn_ptr f, nn_srcptr h, slong hlen, slong n, nmod_t mod)
 {
     gr_ctx_t ctx;
     _gr_ctx_init_nmod(ctx, &mod);
@@ -23,7 +23,7 @@ _nmod_poly_exp_series(mp_ptr f, mp_srcptr h, slong hlen, slong n, nmod_t mod)
 
 /* todo: gr version */
 void
-_nmod_poly_exp_expinv_series(mp_ptr f, mp_ptr g, mp_srcptr h, slong hlen, slong n, nmod_t mod)
+_nmod_poly_exp_expinv_series(nn_ptr f, nn_ptr g, nn_srcptr h, slong hlen, slong n, nmod_t mod)
 {
     _nmod_poly_exp_series(f, h, hlen, n, mod);
     _nmod_poly_inv_series(g, f, n, n, mod);
@@ -36,8 +36,7 @@ nmod_poly_exp_series(nmod_poly_t f, const nmod_poly_t h, slong n)
 
     if (hlen > 0 && h->coeffs[0] != UWORD(0))
     {
-        flint_printf("Exception (nmod_poly_exp_series). Constant term != 0.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (nmod_poly_exp_series). Constant term != 0.\n");
     }
 
     if (n <= 1 || hlen <= 1)

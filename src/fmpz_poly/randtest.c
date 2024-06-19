@@ -7,7 +7,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -19,7 +19,7 @@
 #include "fmpz_mod_poly.h"
 
 void
-fmpz_poly_randtest_irreducible1(fmpz_poly_t p, flint_rand_t state, slong len, mp_bitcnt_t bits)
+fmpz_poly_randtest_irreducible1(fmpz_poly_t p, flint_rand_t state, slong len, flint_bitcnt_t bits)
 {
     slong i;
     fmpz_t c;
@@ -57,23 +57,23 @@ fmpz_poly_randtest_irreducible1(fmpz_poly_t p, flint_rand_t state, slong len, mp
 }
 
 void
-fmpz_poly_randtest_irreducible2(fmpz_poly_t pol, flint_rand_t state, slong len, mp_bitcnt_t bits)
+fmpz_poly_randtest_irreducible2(fmpz_poly_t pol, flint_rand_t state, slong len, flint_bitcnt_t bits)
 {
     while (1)
     {
         slong i;
         fmpz_poly_factor_t fac;
 
-        do {
+        do
             fmpz_poly_randtest(pol, state, len, bits);
-        } while (fmpz_poly_degree(pol) < 1);
+        while (fmpz_poly_degree(pol) < 1);
 
         fmpz_poly_factor_init(fac);
         fmpz_poly_factor(fac, pol);
 
         i = n_randint(state, fac->num);
 
-        if (FLINT_ABS(fmpz_poly_max_bits(fac->p + i)) <= bits)
+        if ((ulong) FLINT_ABS(fmpz_poly_max_bits(fac->p + i)) <= bits)
         {
             fmpz_poly_set(pol, fac->p + i);
             fmpz_poly_factor_clear(fac);
@@ -85,7 +85,7 @@ fmpz_poly_randtest_irreducible2(fmpz_poly_t pol, flint_rand_t state, slong len, 
 }
 
 void
-fmpz_poly_randtest_irreducible(fmpz_poly_t pol, flint_rand_t state, slong len, mp_bitcnt_t bits)
+fmpz_poly_randtest_irreducible(fmpz_poly_t pol, flint_rand_t state, slong len, flint_bitcnt_t bits)
 {
     if (n_randint(state, 2))
         fmpz_poly_randtest_irreducible1(pol, state, len, bits);
@@ -119,8 +119,7 @@ fmpz_poly_randtest_not_zero(fmpz_poly_t f, flint_rand_t state,
 {
     if ((bits == 0) || (len == 0))
     {
-        flint_printf("Exception (fmpz_poly_randtest_not_zero). bits or len is zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_poly_randtest_not_zero). bits or len is zero.\n");
     }
 
     fmpz_poly_randtest(f, state, len, bits);

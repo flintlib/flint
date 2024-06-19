@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -44,19 +44,20 @@ ulong n_ecm_primorial[] =
 #endif
 
 int
-fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
+fmpz_factor_ecm(fmpz_t f, ulong curves, ulong B1, ulong B2,
                 flint_rand_t state, const fmpz_t n_in)
 {
     fmpz_t sig, nm8;
-    mp_limb_t P, num, maxP, mmin, mmax, mdiff, prod, maxj, n_size, cy;
-    int i, j, ret;
+    ulong P, num, maxP, mmin, mmax, mdiff, prod, maxj, n_size, cy;
+    ulong i, j;
+    int ret;
     ecm_t ecm_inf;
-    __mpz_struct *fac, *mptr;
-    mp_ptr n, mpsig;
+    mpz_ptr fac, mptr;
+    nn_ptr n, mpsig;
 
     TMP_INIT;
 
-    const mp_limb_t *prime_array;
+    const ulong *prime_array;
     n_size = fmpz_size(n_in);
 
     if (n_size == 1)
@@ -70,8 +71,8 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
 
     TMP_START;
 
-    n      = TMP_ALLOC(n_size * sizeof(mp_limb_t));
-    mpsig  = TMP_ALLOC(n_size * sizeof(mp_limb_t));
+    n      = TMP_ALLOC(n_size * sizeof(ulong));
+    mpsig  = TMP_ALLOC(n_size * sizeof(ulong));
 
     if ((!COEFF_IS_MPZ(* n_in)))
     {
@@ -97,8 +98,12 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
     fmpz_sub_ui(nm8, n_in, 8);
 
     ret = 0;
+    /* FIXME: Wait to promote f until after stage 2 precomputations? */
     fac = _fmpz_promote(f);
-    mpz_realloc(fac, fmpz_size(n_in));
+    {
+        int alloc = fmpz_size(n_in);
+        FLINT_MPZ_REALLOC(fac, alloc);
+    }
 
     /************************ STAGE I PRECOMPUTATIONS ************************/
 
@@ -123,8 +128,7 @@ fmpz_factor_ecm(fmpz_t f, mp_limb_t curves, mp_limb_t B1, mp_limb_t B2,
     mmax = ((B2 - P/2) + P - 1)/P;      /* ceil */
     if (mmax < mmin)
     {
-       flint_printf("Exception (ecm). B1 > B2 encountered.\n");
-       flint_abort();
+       flint_throw(FLINT_ERROR, "Exception (ecm). B1 > B2 encountered.\n");
     }
     maxj = (P + 1)/2;
     mdiff = mmax - mmin + 1;

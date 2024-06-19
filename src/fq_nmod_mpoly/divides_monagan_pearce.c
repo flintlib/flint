@@ -5,17 +5,21 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_vec.h"
+#include "fq_nmod.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "fq_nmod_mpoly.h"
 
 static int _fq_nmod_mpoly_divides_monagan_pearce1(
     fq_nmod_mpoly_t Q,
-    const mp_limb_t * Acoeffs, const ulong * Aexps, slong Alen,
-    const mp_limb_t * Bcoeffs, const ulong * Bexps, slong Blen,
+    const ulong * Acoeffs, const ulong * Aexps, slong Alen,
+    const ulong * Bcoeffs, const ulong * Bexps, slong Blen,
     slong bits,
     ulong cmpmask,
     const fq_nmod_ctx_t fqctx)
@@ -28,18 +32,18 @@ static int _fq_nmod_mpoly_divides_monagan_pearce1(
     mpoly_heap_t * chain;
     slong * store, * store_base;
     mpoly_heap_t * x;
-    mp_limb_t * Qcoeffs = Q->coeffs;
+    ulong * Qcoeffs = Q->coeffs;
     ulong * Qexps = Q->exps;
     slong * hind;
     ulong mask, exp, maxexp = Aexps[Alen - 1];
-    mp_limb_t * lc_minus_inv, * t;
+    ulong * lc_minus_inv, * t;
     int lazy_size = _n_fq_dot_lazy_size(Blen, fqctx);
     TMP_INIT;
 
     TMP_START;
 
-    t = (mp_limb_t *) TMP_ALLOC(6*d*sizeof(mp_limb_t));
-    lc_minus_inv = (mp_limb_t *) TMP_ALLOC(d*sizeof(mp_limb_t));
+    t = (ulong *) TMP_ALLOC(6*d*sizeof(ulong));
+    lc_minus_inv = (ulong *) TMP_ALLOC(d*sizeof(ulong));
 
     /* alloc array of heap nodes which can be chained together */
     next_loc = Blen + 4;   /* something bigger than heap can ever be */
@@ -95,7 +99,7 @@ case n:                                                                       \
         do {                                                                  \
             *store++ = x->i;                                                  \
             *store++ = x->j;                                                  \
-            if (x->i == -WORD(1))                                             \
+            if (x->i == -UWORD(1))                                             \
             {                                                                 \
                 _n_fq_sub(Qcoeffs + d*Qlen, Qcoeffs + d*Qlen,                 \
                                             Acoeffs + d*x->j, d, fqctx->mod); \
@@ -120,7 +124,7 @@ case n:                                                                       \
                 do {
                     *store++ = x->i;
                     *store++ = x->j;
-                    if (x->i == -WORD(1))
+                    if (x->i == -UWORD(1))
                     {
                         _n_fq_sub(Qcoeffs + d*Qlen, Qcoeffs + d*Qlen,
                                               Acoeffs + d*x->j, d, fqctx->mod);
@@ -240,8 +244,8 @@ not_exact_division:
 
 int _fq_nmod_mpoly_divides_monagan_pearce(
     fq_nmod_mpoly_t Q,
-    const mp_limb_t * Acoeffs, const ulong * Aexps, slong Alen,
-    const mp_limb_t * Bcoeffs, const ulong * Bexps, slong Blen,
+    const ulong * Acoeffs, const ulong * Aexps, slong Alen,
+    const ulong * Bcoeffs, const ulong * Bexps, slong Blen,
     flint_bitcnt_t bits,
     slong N,
     const ulong * cmpmask,
@@ -255,13 +259,13 @@ int _fq_nmod_mpoly_divides_monagan_pearce(
     mpoly_heap_t * chain;
     slong * store, * store_base;
     mpoly_heap_t * x;
-    mp_limb_t * Qcoeffs = Q->coeffs;
+    ulong * Qcoeffs = Q->coeffs;
     ulong * Qexps = Q->exps;
     slong Qlen;
     ulong * exp, * exps;
     ulong ** exp_list;
     slong exp_next;
-    mp_limb_t * lc_minus_inv, * t;
+    ulong * lc_minus_inv, * t;
     int lazy_size = _n_fq_dot_lazy_size(Blen, fqctx);
     ulong mask;
     slong * hind;
@@ -273,8 +277,8 @@ int _fq_nmod_mpoly_divides_monagan_pearce(
 
     TMP_START;
 
-    t = (mp_limb_t *) TMP_ALLOC(6*d*sizeof(mp_limb_t));
-    lc_minus_inv = (mp_limb_t *) TMP_ALLOC(d*sizeof(mp_limb_t));
+    t = (ulong *) TMP_ALLOC(6*d*sizeof(ulong));
+    lc_minus_inv = (ulong *) TMP_ALLOC(d*sizeof(ulong));
 
     next_loc = Blen + 4;   /* something bigger than heap can ever be */
     heap = (mpoly_heap_s *) TMP_ALLOC((Blen + 1)*sizeof(mpoly_heap_s));
@@ -345,7 +349,7 @@ case n:                                                                       \
         do {                                                                  \
             *store++ = x->i;                                                  \
             *store++ = x->j;                                                  \
-            if (x->i == -WORD(1))                                             \
+            if (x->i == -UWORD(1))                                             \
             {                                                                 \
                 n_fq_sub(Qcoeffs + d*Qlen, Qcoeffs + d*Qlen,                  \
                                            Acoeffs + d*x->j, fqctx);          \
@@ -372,7 +376,7 @@ case n:                                                                       \
                     *store++ = x->i;
                     *store++ = x->j;
 
-                    if (x->i == -WORD(1))
+                    if (x->i == -UWORD(1))
                     {
                         n_fq_sub(Qcoeffs + d*Qlen, Qcoeffs + d*Qlen,
                                                    Acoeffs + d*x->j, fqctx);
@@ -614,7 +618,7 @@ int fq_nmod_mpoly_divides_monagan_pearce(
     if (Qbits <= FLINT_BITS)
     {
         /* mask with high bit of each exponent vector field set */
-        for (i = 0; i < FLINT_BITS/Qbits; i++)
+        for (i = 0; i < (slong) (FLINT_BITS / Qbits); i++)
             mask = (mask << Qbits) + (UWORD(1) << (Qbits - 1));
 
         if (!mpoly_monomial_divides(expq, Aexps, Bexps, N, mask))

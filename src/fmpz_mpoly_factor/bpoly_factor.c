@@ -5,13 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "fmpz_mod.h"
 #include "fmpz_mpoly_factor.h"
-#include "nmod_mpoly_factor.h"
 #include "fmpz_mod_mpoly_factor.h"
 
 void fmpz_tpoly_print(fmpz_tpoly_t A, const char * xvar, const char * yvar, const char * zvar)
@@ -138,7 +139,7 @@ void fmpz_bpoly_make_primitive(fmpz_poly_t g, fmpz_bpoly_t A)
 
     for (i = 0; i < A->length; i++)
     {
-        fmpz_poly_div(q, A->coeffs + i, g);
+        fmpz_poly_divexact(q, A->coeffs + i, g);
         fmpz_poly_swap(A->coeffs + i, q);
     }
 
@@ -422,7 +423,7 @@ int bpoly_info_disolve(bpoly_info_t I)
     }
 
     fmpz_one(pj);
-    for (j = 1; j < I->k; j++)
+    for (j = 1; (ulong) j < I->k; j++)
     {
         fmpz_mul(pj, pj, I->p);
         fmpz_mod_poly_zero(s, I->ctxp);

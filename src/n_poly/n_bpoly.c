@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -94,7 +94,7 @@ void _n_bpoly_set(n_bpoly_t A, const n_bpoly_t B)
         n_poly_set(A->coeffs + i, B->coeffs + i);
 }
 
-void n_bpoly_set_coeff_nonzero(n_bpoly_t A, slong xi, slong yi, mp_limb_t c)
+void n_bpoly_set_coeff_nonzero(n_bpoly_t A, slong xi, slong yi, ulong c)
 {
     slong i;
 
@@ -112,7 +112,7 @@ void n_bpoly_set_coeff_nonzero(n_bpoly_t A, slong xi, slong yi, mp_limb_t c)
     FLINT_ASSERT(!n_poly_is_zero(A->coeffs + A->length - 1));
 }
 
-void n_bpoly_set_coeff(n_bpoly_t A, slong xi, slong yi, mp_limb_t c)
+void n_bpoly_set_coeff(n_bpoly_t A, slong xi, slong yi, ulong c)
 {
     slong i;
 
@@ -153,4 +153,3 @@ void n_bpoly_one(n_bpoly_t A)
     A->length = 1;
     n_poly_one(A->coeffs + 0);
 }
-

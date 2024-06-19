@@ -9,7 +9,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -24,7 +24,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_factor, state)
     int iter;
 
     /* Default algorithm */
-    for (iter = 0; iter < flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 3 * flint_test_multiplier(); iter++)
     {
         int result = 1;
         TEMPLATE(T, poly_t) pol1, poly, quot, rem, product;
@@ -35,7 +35,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_factor, state)
         slong length, num, i, j;
         ulong exp[5];
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, init) (randlead, ctx);
 
@@ -87,7 +87,11 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_factor, state)
                 TEMPLATE(T, poly_factor_with_berlekamp) (res, lead, pol1, ctx);
                 break;
             case 2:
+#if defined(FQ_NMOD_POLY_FACTOR_H) || defined(FQ_ZECH_POLY_FACTOR_H)
+                if (TEMPLATE(T, ctx_prime)(ctx) % 2 == 0)
+#else
                 if (fmpz_is_even(TEMPLATE(T, ctx_prime) (ctx)))
+#endif
                     TEMPLATE(T, poly_factor) (res, lead, pol1, ctx);
                 else
                     TEMPLATE(T, poly_factor_with_cantor_zassenhaus) (res, lead,
@@ -143,7 +147,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_factor, state)
     }
 
     /* Test deflation trick */
-    for (iter = 0; iter < flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 2 * flint_test_multiplier(); iter++)
     {
         TEMPLATE(T, poly_t) pol1, poly, quot, rem;
         TEMPLATE(T, poly_factor_t) res, res2;
@@ -154,7 +158,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_factor, state)
         ulong inflation;
         int found;
 
-        TEMPLATE(T, ctx_randtest) (ctx, state);
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
 
         TEMPLATE(T, poly_init) (pol1, ctx);
         TEMPLATE(T, poly_init) (poly, ctx);

@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -21,7 +21,7 @@ TEST_FUNCTION_START(arf_set_round_ui, state)
         arf_t x, y;
         slong prec, fix1;
         int ret1, ret2;
-        mp_limb_t t;
+        ulong t;
         arf_rnd_t rnd;
 
         prec = 2 + n_randint(state, 1000);

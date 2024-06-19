@@ -5,11 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "fmpz_poly.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
 #include "fmpz_mpoly_factor.h"
 
@@ -134,7 +135,7 @@ int fmpz_mpoly_content_vars(
 
     for (i = 0; i < num_vars; i++)
     {
-        if (vars[i] >= (ulong) ctx->minfo->nvars)
+        if (vars[i] >= ctx->minfo->nvars)
             flint_throw(FLINT_ERROR, "fmpz_mpoly_content_vars: variable out of range");
     }
 
@@ -204,4 +205,3 @@ do_general:
 
     return success;
 }
-

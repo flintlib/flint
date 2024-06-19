@@ -5,12 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_mpoly_factor.h"
-
 
 static int _hlift_quartic2(
     slong m,
@@ -70,7 +70,7 @@ static int _hlift_quartic2(
         fmpz_mpoly_to_univar(Au, A, m, ctx);
         Aui = Au->length - 1;
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
         fmpz_mpoly_one(t2, ctx);
         for (i = 0; i < r; i++)
             fmpz_mpoly_mul(t2, t2, betas + i, ctx);
@@ -85,7 +85,7 @@ static int _hlift_quartic2(
         fmpz_mpoly_divrem(t2, t, A, xalpha, ctx);
         fmpz_mpoly_swap(Aq, t2, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
         fmpz_mpoly_one(t2, ctx);
         for (i = 0; i < r; i++)
             fmpz_mpoly_mul(t2, t2, betas + i, ctx);
@@ -248,7 +248,7 @@ static int _hlift_quartic(
         fmpz_mpoly_to_univar(Au, A, m, ctx);
         Aui = Au->length - 1;
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
         fmpz_mpoly_one(t2, ctx);
         for (i = 0; i < r; i++)
             fmpz_mpoly_mul(t2, t2, betas + i, ctx);
@@ -263,7 +263,7 @@ static int _hlift_quartic(
         fmpz_mpoly_divrem(t2, t, A, xalpha, ctx);
         fmpz_mpoly_swap(Aq, t2, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
         fmpz_mpoly_one(t2, ctx);
         for (i = 0; i < r; i++)
             fmpz_mpoly_mul(t2, t2, betas + i, ctx);
@@ -519,4 +519,3 @@ int fmpz_mpoly_hlift(
     else
         return _hlift_quintic(m, f, r, alpha, A, degs, ctx);
 }
-

@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -638,241 +638,45 @@ arb_sqr(arb_t res, const arb_t val, slong prec)
 
 /* vector functions */
 
-ARB_INLINE arb_ptr
-_arb_vec_entry_ptr(arb_ptr vec, slong i)
-{
-    return vec + i;
-}
+arb_ptr _arb_vec_entry_ptr(arb_ptr vec, slong i);
 
-ARB_INLINE void
-_arb_vec_zero(arb_ptr A, slong n)
-{
-    slong i;
-    for (i = 0; i < n; i++)
-        arb_zero(A + i);
-}
+void _arb_vec_zero(arb_ptr A, slong n);
+void _arb_vec_indeterminate(arb_ptr vec, slong len);
 
-ARB_INLINE int
-_arb_vec_is_zero(arb_srcptr vec, slong len)
-{
-    slong i;
-    for (i = 0; i < len; i++)
-        if (!arb_is_zero(vec + i))
-            return 0;
-    return 1;
-}
+int _arb_vec_is_zero(arb_srcptr vec, slong len);
+int _arb_vec_is_finite(arb_srcptr x, slong len);
 
-ARB_INLINE int
-_arb_vec_is_finite(arb_srcptr x, slong len)
-{
-    slong i;
+int _arb_vec_equal(arb_srcptr vec1, arb_srcptr vec2, slong len);
+int _arb_vec_overlaps(arb_srcptr vec1, arb_srcptr vec2, slong len);
+int _arb_vec_contains(arb_srcptr vec1, arb_srcptr vec2, slong len);
 
-    for (i = 0; i < len; i++)
-        if (!arb_is_finite(x + i))
-            return 0;
+void _arb_vec_set(arb_ptr res, arb_srcptr vec, slong len);
+void _arb_vec_swap(arb_ptr res, arb_ptr vec, slong len);
+void _arb_vec_neg(arb_ptr B, arb_srcptr A, slong n);
 
-    return 1;
-}
+void _arb_vec_set_round(arb_ptr res, arb_srcptr vec, slong len, slong prec);
 
-ARB_INLINE int
-_arb_vec_equal(arb_srcptr vec1, arb_srcptr vec2, slong len)
-{
-    slong i;
+void _arb_vec_sub(arb_ptr C, arb_srcptr A, arb_srcptr B, slong n, slong prec);
+void _arb_vec_add(arb_ptr C, arb_srcptr A, arb_srcptr B, slong n, slong prec);
 
-    for (i = 0; i < len; i++)
-    {
-        if (!arb_equal(vec1 + i, vec2 + i))
-            return 0;
-    }
-    return 1;
-}
-
-ARB_INLINE int
-_arb_vec_overlaps(arb_srcptr vec1, arb_srcptr vec2, slong len)
-{
-    slong i;
-
-    for (i = 0; i < len; i++)
-    {
-        if (!arb_overlaps(vec1 + i, vec2 + i))
-            return 0;
-    }
-
-    return 1;
-}
-
-ARB_INLINE int
-_arb_vec_contains(arb_srcptr vec1, arb_srcptr vec2, slong len)
-{
-    slong i;
-
-    for (i = 0; i < len; i++)
-    {
-        if (!arb_contains(vec1 + i, vec2 + i))
-            return 0;
-    }
-
-    return 1;
-}
-
-ARB_INLINE void
-_arb_vec_set(arb_ptr res, arb_srcptr vec, slong len)
-{
-    slong i;
-    for (i = 0; i < len; i++)
-        arb_set(res + i, vec + i);
-}
-
-ARB_INLINE void
-_arb_vec_set_round(arb_ptr res, arb_srcptr vec, slong len, slong prec)
-{
-    slong i;
-    for (i = 0; i < len; i++)
-        arb_set_round(res + i, vec + i, prec);
-}
-
-ARB_INLINE void
-_arb_vec_swap(arb_ptr res, arb_ptr vec, slong len)
-{
-    slong i;
-    for (i = 0; i < len; i++)
-        arb_swap(res + i, vec + i);
-}
-
-ARB_INLINE void
-_arb_vec_neg(arb_ptr B, arb_srcptr A, slong n)
-{
-    slong i;
-    for (i = 0; i < n; i++)
-        arb_neg(B + i, A + i);
-}
-
-ARB_INLINE void
-_arb_vec_sub(arb_ptr C, arb_srcptr A,
-    arb_srcptr B, slong n, slong prec)
-{
-    slong i;
-    for (i = 0; i < n; i++)
-        arb_sub(C + i, A + i, B + i, prec);
-}
-
-ARB_INLINE void
-_arb_vec_add(arb_ptr C, arb_srcptr A,
-    arb_srcptr B, slong n, slong prec)
-{
-    slong i;
-    for (i = 0; i < n; i++)
-        arb_add(C + i, A + i, B + i, prec);
-}
-
-ARB_INLINE void
-_arb_vec_scalar_mul(arb_ptr res, arb_srcptr vec,
-    slong len, const arb_t c, slong prec)
-{
-    slong i;
-    for (i = 0; i < len; i++)
-        arb_mul(res + i, vec + i, c, prec);
-}
-
-ARB_INLINE void
-_arb_vec_scalar_div(arb_ptr res, arb_srcptr vec,
-    slong len, const arb_t c, slong prec)
-{
-    slong i;
-    for (i = 0; i < len; i++)
-        arb_div(res + i, vec + i, c, prec);
-}
-
-ARB_INLINE void
-_arb_vec_scalar_mul_fmpz(arb_ptr res, arb_srcptr vec,
-    slong len, const fmpz_t c, slong prec)
-{
-    slong i;
-    arf_t t;
-    arf_init(t);
-    arf_set_fmpz(t, c);
-    for (i = 0; i < len; i++)
-        arb_mul_arf(res + i, vec + i, t, prec);
-    arf_clear(t);
-}
-
-ARB_INLINE void
-_arb_vec_scalar_mul_2exp_si(arb_ptr res, arb_srcptr src, slong len, slong c)
-{
-    slong i;
-    for (i = 0; i < len; i++)
-        arb_mul_2exp_si(res + i, src + i, c);
-}
-
-ARB_INLINE void
-_arb_vec_scalar_addmul(arb_ptr res, arb_srcptr vec,
-    slong len, const arb_t c, slong prec)
-{
-    slong i;
-    for (i = 0; i < len; i++)
-        arb_addmul(res + i, vec + i, c, prec);
-}
+void _arb_vec_scalar_mul(arb_ptr res, arb_srcptr vec, slong len, const arb_t c, slong prec);
+void _arb_vec_scalar_mul_fmpz(arb_ptr res, arb_srcptr vec, slong len, const fmpz_t c, slong prec);
+void _arb_vec_scalar_mul_2exp_si(arb_ptr res, arb_srcptr src, slong len, slong c);
+void _arb_vec_scalar_div(arb_ptr res, arb_srcptr vec, slong len, const arb_t c, slong prec);
+void _arb_vec_scalar_addmul(arb_ptr res, arb_srcptr vec, slong len, const arb_t c, slong prec);
 
 void _arb_vec_get_mag(mag_t bound, arb_srcptr vec, slong len);
 
-ARB_INLINE slong
-_arb_vec_bits(arb_srcptr x, slong len)
-{
-    slong i, b, c;
-
-    b = 0;
-    for (i = 0; i < len; i++)
-    {
-        c = arb_bits(x + i);
-        b = FLINT_MAX(b, c);
-    }
-
-    return b;
-}
+slong _arb_vec_bits(arb_srcptr x, slong len);
 
 void _arb_vec_set_powers(arb_ptr xs, const arb_t x, slong len, slong prec);
 
-ARB_INLINE void
-_arb_vec_add_error_arf_vec(arb_ptr res, arf_srcptr err, slong len)
-{
-    slong i;
-    for (i = 0; i < len; i++)
-        arb_add_error_arf(res + i, err + i);
-}
+void _arb_vec_add_error_arf_vec(arb_ptr res, arf_srcptr err, slong len);
+void _arb_vec_add_error_mag_vec(arb_ptr res, mag_srcptr err, slong len);
 
-ARB_INLINE void
-_arb_vec_add_error_mag_vec(arb_ptr res, mag_srcptr err, slong len)
-{
-    slong i;
-    for (i = 0; i < len; i++)
-        mag_add(arb_radref(res + i), arb_radref(res + i), err + i);
-}
+void _arb_vec_trim(arb_ptr res, arb_srcptr vec, slong len);
 
-ARB_INLINE void
-_arb_vec_indeterminate(arb_ptr vec, slong len)
-{
-    slong i;
-    for (i = 0; i < len; i++)
-        arb_indeterminate(vec + i);
-}
-
-ARB_INLINE void
-_arb_vec_trim(arb_ptr res, arb_srcptr vec, slong len)
-{
-    slong i;
-    for (i = 0; i < len; i++)
-        arb_trim(res + i, vec + i);
-}
-
-ARB_INLINE int
-_arb_vec_get_unique_fmpz_vec(fmpz * res,  arb_srcptr vec, slong len)
-{
-    slong i;
-    for (i = 0; i < len; i++)
-        if (!arb_get_unique_fmpz(res + i, vec + i))
-            return 0;
-    return 1;
-}
+int _arb_vec_get_unique_fmpz_vec(fmpz * res,  arb_srcptr vec, slong len);
 
 /* arctangent implementation */
 
@@ -885,17 +689,17 @@ _arb_vec_get_unique_fmpz_vec(fmpz * res,  arb_srcptr vec, slong len)
 #define ARB_ATAN_TAB2_PREC 4608
 #define ARB_ATAN_TAB2_LIMBS (ARB_ATAN_TAB2_PREC / FLINT_BITS)
 
-FLINT_DLL extern const mp_limb_t arb_atan_tab1[1 << ARB_ATAN_TAB1_BITS][ARB_ATAN_TAB1_LIMBS];
-FLINT_DLL extern const mp_limb_t arb_atan_tab21[1 << ARB_ATAN_TAB21_BITS][ARB_ATAN_TAB2_LIMBS];
-FLINT_DLL extern const mp_limb_t arb_atan_tab22[1 << ARB_ATAN_TAB22_BITS][ARB_ATAN_TAB2_LIMBS];
-FLINT_DLL extern const mp_limb_t arb_atan_pi2_minus_one[ARB_ATAN_TAB2_LIMBS];
+FLINT_DLL extern const ulong arb_atan_tab1[1 << ARB_ATAN_TAB1_BITS][ARB_ATAN_TAB1_LIMBS];
+FLINT_DLL extern const ulong arb_atan_tab21[1 << ARB_ATAN_TAB21_BITS][ARB_ATAN_TAB2_LIMBS];
+FLINT_DLL extern const ulong arb_atan_tab22[1 << ARB_ATAN_TAB22_BITS][ARB_ATAN_TAB2_LIMBS];
+FLINT_DLL extern const ulong arb_atan_pi2_minus_one[ARB_ATAN_TAB2_LIMBS];
 
 void
-_arb_atan_taylor_naive(mp_ptr y, mp_limb_t * error,
-    mp_srcptr x, mp_size_t xn, ulong N, int alternating);
+_arb_atan_taylor_naive(nn_ptr y, ulong * error,
+    nn_srcptr x, slong xn, ulong N, int alternating);
 
-void _arb_atan_taylor_rs(mp_ptr y, mp_limb_t * error,
-    mp_srcptr x, mp_size_t xn, ulong N, int alternating);
+void _arb_atan_taylor_rs(nn_ptr y, ulong * error,
+    nn_srcptr x, slong xn, ulong N, int alternating);
 
 #define ARB_ATAN_NEWTON_PREC 3400
 
@@ -914,11 +718,11 @@ void arb_atan_arf_newton(arb_t res, const arf_t x, slong prec);
 #define ARB_LOG_TAB2_PREC 4608
 #define ARB_LOG_TAB2_LIMBS (ARB_LOG_TAB2_PREC / FLINT_BITS)
 
-FLINT_DLL extern const mp_limb_t arb_log_tab11[1 << ARB_LOG_TAB11_BITS][ARB_LOG_TAB1_LIMBS];
-FLINT_DLL extern const mp_limb_t arb_log_tab12[1 << ARB_LOG_TAB12_BITS][ARB_LOG_TAB1_LIMBS];
-FLINT_DLL extern const mp_limb_t arb_log_tab21[1 << ARB_LOG_TAB21_BITS][ARB_LOG_TAB2_LIMBS];
-FLINT_DLL extern const mp_limb_t arb_log_tab22[1 << ARB_LOG_TAB22_BITS][ARB_LOG_TAB2_LIMBS];
-FLINT_DLL extern const mp_srcptr arb_log_log2_tab;
+FLINT_DLL extern const ulong arb_log_tab11[1 << ARB_LOG_TAB11_BITS][ARB_LOG_TAB1_LIMBS];
+FLINT_DLL extern const ulong arb_log_tab12[1 << ARB_LOG_TAB12_BITS][ARB_LOG_TAB1_LIMBS];
+FLINT_DLL extern const ulong arb_log_tab21[1 << ARB_LOG_TAB21_BITS][ARB_LOG_TAB2_LIMBS];
+FLINT_DLL extern const ulong arb_log_tab22[1 << ARB_LOG_TAB22_BITS][ARB_LOG_TAB2_LIMBS];
+FLINT_DLL extern const nn_srcptr arb_log_log2_tab;
 
 void arb_log_newton(arb_t res, const arb_t x, slong prec);
 void arb_log_arf_newton(arb_t res, const arf_t x, slong prec);
@@ -927,7 +731,7 @@ void arb_log_arf_newton(arb_t res, const arf_t x, slong prec);
 
 #define ARB_LOG_PRIME_CACHE_NUM 13
 
-FLINT_DLL extern const mp_limb_t arb_log_p_tab[ARB_LOG_PRIME_CACHE_NUM][ARB_LOG_TAB2_LIMBS];
+FLINT_DLL extern const ulong arb_log_p_tab[ARB_LOG_PRIME_CACHE_NUM][ARB_LOG_TAB2_LIMBS];
 void arb_log_primes_vec_bsplit(arb_ptr res, slong n, slong prec);
 
 void _arb_log_p_ensure_cached(slong prec);
@@ -949,21 +753,21 @@ arb_srcptr _arb_log_p_cache_vec(void);
 #define ARB_EXP_TAB2_PREC 4608
 #define ARB_EXP_TAB2_LIMBS (ARB_EXP_TAB2_PREC / FLINT_BITS)
 
-FLINT_DLL extern const mp_limb_t arb_exp_tab1[ARB_EXP_TAB1_NUM][ARB_EXP_TAB1_LIMBS];
-FLINT_DLL extern const mp_limb_t arb_exp_tab21[ARB_EXP_TAB21_NUM][ARB_EXP_TAB2_LIMBS];
-FLINT_DLL extern const mp_limb_t arb_exp_tab22[ARB_EXP_TAB22_NUM][ARB_EXP_TAB2_LIMBS];
+FLINT_DLL extern const ulong arb_exp_tab1[ARB_EXP_TAB1_NUM][ARB_EXP_TAB1_LIMBS];
+FLINT_DLL extern const ulong arb_exp_tab21[ARB_EXP_TAB21_NUM][ARB_EXP_TAB2_LIMBS];
+FLINT_DLL extern const ulong arb_exp_tab22[ARB_EXP_TAB22_NUM][ARB_EXP_TAB2_LIMBS];
 
-void _arb_exp_taylor_naive(mp_ptr y, mp_limb_t * error,
-    mp_srcptr x, mp_size_t xn, ulong N);
+void _arb_exp_taylor_naive(nn_ptr y, ulong * error,
+    nn_srcptr x, slong xn, ulong N);
 
-void _arb_exp_taylor_rs(mp_ptr y, mp_limb_t * error,
-    mp_srcptr x, mp_size_t xn, ulong N);
+void _arb_exp_taylor_rs(nn_ptr y, ulong * error,
+    nn_srcptr x, slong xn, ulong N);
 
 void arb_exp_arf_bb(arb_t z, const arf_t x, slong prec, int minus_one);
 void arb_exp_arf_rs_generic(arb_t res, const arf_t x, slong prec, int minus_one);
 
-int _arb_get_mpn_fixed_mod_log2(mp_ptr w, fmpz_t q, mp_limb_t * error,
-                                                const arf_t x, mp_size_t wn);
+int _arb_get_mpn_fixed_mod_log2(nn_ptr w, fmpz_t q, ulong * error,
+                                                const arf_t x, slong wn);
 
 slong _arb_exp_taylor_bound(slong mag, slong prec);
 
@@ -997,22 +801,22 @@ void arb_exp_arf(arb_t z, const arf_t x, slong prec, int minus_one, slong maglim
 #define ARB_SIN_COS_TAB2_PREC 4608
 #define ARB_SIN_COS_TAB2_LIMBS (ARB_SIN_COS_TAB2_PREC / FLINT_BITS)
 
-FLINT_DLL extern const mp_limb_t arb_sin_cos_tab1[2 * ARB_SIN_COS_TAB1_NUM][ARB_SIN_COS_TAB1_LIMBS];
-FLINT_DLL extern const mp_limb_t arb_sin_cos_tab21[2 * ARB_SIN_COS_TAB21_NUM][ARB_SIN_COS_TAB2_LIMBS];
-FLINT_DLL extern const mp_limb_t arb_sin_cos_tab22[2 * ARB_SIN_COS_TAB22_NUM][ARB_SIN_COS_TAB2_LIMBS];
+FLINT_DLL extern const ulong arb_sin_cos_tab1[2 * ARB_SIN_COS_TAB1_NUM][ARB_SIN_COS_TAB1_LIMBS];
+FLINT_DLL extern const ulong arb_sin_cos_tab21[2 * ARB_SIN_COS_TAB21_NUM][ARB_SIN_COS_TAB2_LIMBS];
+FLINT_DLL extern const ulong arb_sin_cos_tab22[2 * ARB_SIN_COS_TAB22_NUM][ARB_SIN_COS_TAB2_LIMBS];
 
 #define ARB_PI4_TAB_LIMBS (4608 / FLINT_BITS)
-FLINT_DLL extern const mp_limb_t arb_pi4_tab[ARB_PI4_TAB_LIMBS];
+FLINT_DLL extern const ulong arb_pi4_tab[ARB_PI4_TAB_LIMBS];
 
-void _arb_sin_cos_taylor_naive(mp_ptr ysin, mp_ptr ycos, mp_limb_t * error,
-    mp_srcptr x, mp_size_t xn, ulong N);
+void _arb_sin_cos_taylor_naive(nn_ptr ysin, nn_ptr ycos, ulong * error,
+    nn_srcptr x, slong xn, ulong N);
 
-void _arb_sin_cos_taylor_rs(mp_ptr ysin, mp_ptr ycos,
-    mp_limb_t * error, mp_srcptr x, mp_size_t xn, ulong N,
+void _arb_sin_cos_taylor_rs(nn_ptr ysin, nn_ptr ycos,
+    ulong * error, nn_srcptr x, slong xn, ulong N,
     int sinonly, int alternating);
 
-int _arb_get_mpn_fixed_mod_pi4(mp_ptr w, fmpz_t q, int * octant,
-    mp_limb_t * error, const arf_t x, mp_size_t wn);
+int _arb_get_mpn_fixed_mod_pi4(nn_ptr w, fmpz_t q, int * octant,
+    ulong * error, const arf_t x, slong wn);
 
 void arb_sin_cos_arf_bb(arb_t zsin, arb_t zcos, const arf_t x, slong prec);
 void arb_sin_cos_arf_rs_generic(arb_t res_sin, arb_t res_cos, const arf_t x, slong prec);
@@ -1031,7 +835,7 @@ void arb_atan_gauss_primes_vec_bsplit(arb_ptr res, slong n, slong prec);
 #define ARB_SIN_COS_ATAN_REDUCTION_DEFAULT_MAX_PREC 4000000
 #define ARB_SIN_COS_ATAN_REDUCTION_PREC 2600
 
-FLINT_DLL extern const mp_limb_t arb_atan_gauss_tab[ARB_ATAN_GAUSS_PRIME_CACHE_NUM][ARB_ATAN_TAB2_LIMBS];
+FLINT_DLL extern const ulong arb_atan_gauss_tab[ARB_ATAN_GAUSS_PRIME_CACHE_NUM][ARB_ATAN_TAB2_LIMBS];
 
 void _arb_atan_gauss_p_ensure_cached(slong prec);
 arb_srcptr _arb_atan_gauss_p_cache_vec(void);
@@ -1040,10 +844,10 @@ void arb_sin_cos_arf_atan_reduction(arb_t res1, arb_t res2, const arf_t x, slong
 
 
 ARB_INLINE flint_bitcnt_t
-_arb_mpn_leading_zeros(mp_srcptr d, mp_size_t n)
+_arb_mpn_leading_zeros(nn_srcptr d, slong n)
 {
-    mp_limb_t t;
-    mp_size_t zero_limbs;
+    ulong t;
+    slong zero_limbs;
     flint_bitcnt_t bits;
 
     zero_limbs = 0;
@@ -1081,31 +885,9 @@ arb_allocated_bytes(const arb_t x)
     return arf_allocated_bytes(arb_midref(x)) + mag_allocated_bytes(arb_radref(x));
 }
 
-ARB_INLINE slong
-_arb_vec_allocated_bytes(arb_srcptr vec, slong len)
-{
-    slong i, size;
+slong _arb_vec_allocated_bytes(arb_srcptr vec, slong len);
 
-    size = len * sizeof(arb_struct);
-
-    for (i = 0; i < len; i++)
-        size += arb_allocated_bytes(vec + i);
-
-    return size;
-}
-
-ARB_INLINE double
-_arb_vec_estimate_allocated_bytes(slong len, slong prec)
-{
-    double size;
-
-    size = len * (double) sizeof(arb_struct);
-
-    if (prec > ARF_NOPTR_LIMBS * FLINT_BITS)
-        size += len * (double) ((prec + FLINT_BITS - 1) / FLINT_BITS) * sizeof(mp_limb_t);
-
-    return size;
-}
+double _arb_vec_estimate_allocated_bytes(slong len, slong prec);
 
 int arb_load_str(arb_t res, const char * data);
 char * arb_dump_str(const arb_t x);

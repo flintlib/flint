@@ -5,17 +5,17 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-void _nmod_poly_derivative(mp_ptr x_prime, mp_srcptr x, slong len, nmod_t mod)
+void _nmod_poly_derivative(nn_ptr x_prime, nn_srcptr x, slong len, nmod_t mod)
 {
 	slong j;
-    mp_limb_t k = 1;
+    ulong k = 1;
 
 	for (j = 1; j < len; j++)
 	{
@@ -44,4 +44,3 @@ void nmod_poly_derivative(nmod_poly_t x_prime, const nmod_poly_t x)
 	x_prime->length = x->length - 1;
 	_nmod_poly_normalise(x_prime);
 }
-

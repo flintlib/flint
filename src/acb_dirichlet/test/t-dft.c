@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -27,9 +27,9 @@ check_vec_eq_prec(acb_srcptr w1, acb_srcptr w2, slong len, slong prec, slong dig
             flint_printf("q = %wu, size = %wd\n", q, len);
             flint_printf("\nDFT differ from index %wd / %wd \n", i, len);
             flint_printf("\n%s =\n", f1);
-            acb_vec_printd(w1, len, digits);
+            _acb_vec_printd(w1, len, digits);
             flint_printf("\n%s =\n", f2);
-            acb_vec_printd(w2, len, digits);
+            _acb_vec_printd(w2, len, digits);
             flint_printf("\n\n");
             flint_abort();
         }

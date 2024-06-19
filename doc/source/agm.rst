@@ -42,14 +42,14 @@ Rather than running the AGM iteration until `a_n` and `b_n` agree to
 they agree to about `p/10` bits and finish with a series expansion.
 With `z = (a-b)/(a+b)`, we have
 
-.. math ::
+.. math::
 
     \operatorname{agm}(a,b) = \frac{(a+b) \pi}{4 K(z^2)},
 
 valid at least when `|z| < 1` and `a, b` have nonnegative real part,
 and
 
-.. math ::
+.. math::
 
     \frac{\pi}{4 K(z^2)} = \tfrac{1}{2} - \tfrac{1}{8} z^2 - \tfrac{5}{128} z^4 - \tfrac{11}{512} z^6 - \tfrac{469}{32768} z^8 + \ldots
 
@@ -68,7 +68,7 @@ By Cauchy's integral formula, `|M^{(k)}(z) / k!| \le C D^k` where
 `C = \max(1, |z| + r)` and `D = 1/r`, for any `0 < r < |z|` (we
 choose *r* to be of the order `|z| / 4`). Taylor expansion now gives
 
-.. math ::
+.. math::
 
     \left|\frac{M(z+h) - M(z)}{h} - M'(z)\right| \le \frac{C D^2 h}{1 - D h}
 
@@ -86,7 +86,7 @@ When *z* is not exact, we evaluate at the midpoint as above
 and bound the propagated error using derivatives.
 Again by Cauchy's integral formula, we have
 
-.. math ::
+.. math::
 
     |M'(z+\varepsilon)| \le \frac{\max(1, |z|+|\varepsilon|+r)}{r}
 
@@ -102,17 +102,17 @@ Higher derivatives
 The function `W(z) = 1 / M(z)` is D-finite. The coefficients of
 `W(z+x) = \sum_{k=0}^{\infty} c_k x^k` satisfy
 
-.. math ::
+.. math::
 
     -2 z (z^2-1) c_2 = (3z^2-1) c_1 + z c_0,
 
-.. math ::
+.. math::
 
     -(k+2)(k+3) z (z^2-1) c_{k+3} = (k+2)^2 (3z^2-1) c_{k+2} + (3k(k+3)+7)z c_{k+1} + (k+1)^2 c_{k}
 
 in general, and
 
-.. math ::
+.. math::
 
     -(k+2)^2 c_{k+2} = (3k(k+3)+7) c_{k+1} + (k+1)^2 c_{k}
 

@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -72,9 +72,9 @@ arb_ui_pow_ui(arb_t res, ulong a, ulong exp, slong prec)
     slong wp, aexp, awidth, trailing, wp_limbs;
     slong exp_fix, alloc, leading;
     int inexact, i, ebits;
-    mp_ptr yman, tmp;
-    mp_size_t yn;
-    mp_limb_t yexp_hi, yexp_lo, aman, aodd, hi, lo;
+    nn_ptr yman, tmp;
+    slong yn;
+    ulong yexp_hi, yexp_lo, aman, aodd, hi, lo;
     ARF_MUL_TMP_DECL
 
     if (exp <= 2)
@@ -89,7 +89,7 @@ arb_ui_pow_ui(arb_t res, ulong a, ulong exp, slong prec)
         }
         else
         {
-            mp_limb_t hi, lo;
+            ulong hi, lo;
             umul_ppmm(hi, lo, a, a);
             arb_set_round_uiui(res, hi, lo, prec);
         }
@@ -184,10 +184,10 @@ arb_ui_pow_ui(arb_t res, ulong a, ulong exp, slong prec)
                     }
                     else
                     {
-                        mp_limb_t y0, y1;
+                        ulong y0, y1;
                         y0 = yman[0];
                         y1 = yman[1];
-                        flint_mpn_mul_2x1(yman[2], yman[1], yman[0], y1, y0, aodd);
+                        FLINT_MPN_MUL_2X1(yman[2], yman[1], yman[0], y1, y0, aodd);
                         yn += (yman[2] != 0);
                     }
                 }
@@ -198,7 +198,7 @@ arb_ui_pow_ui(arb_t res, ulong a, ulong exp, slong prec)
                    wp_limbs, we might want to go to the floating-point
                    code here */
                 yexp_lo *= 2;
-                mpn_sqr(tmp, yman, yn);
+                flint_mpn_sqr(tmp, yman, yn);
                 yn = 2 * yn;
                 yn -= (tmp[yn - 1] == 0);
 
@@ -241,7 +241,7 @@ arb_ui_pow_ui(arb_t res, ulong a, ulong exp, slong prec)
         /* note: we must have yn == 1 here if wp_limbs == 1 */
         if (wp_limbs == 1)
         {
-            mp_limb_t hi, lo;
+            ulong hi, lo;
 
             /* y = y^2: mantissa */
             umul_ppmm(hi, lo, yman[0], yman[0]);
@@ -299,7 +299,7 @@ arb_ui_pow_ui(arb_t res, ulong a, ulong exp, slong prec)
         }
 
         if (yn < wp_limbs)
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
         /* y = y * a */
         if (exp & (UWORD(1) << i))
@@ -322,7 +322,7 @@ arb_ui_pow_ui(arb_t res, ulong a, ulong exp, slong prec)
                and there was no multiplication by a, but in that case
                there are 0 leading zeros anyway */
             if (yn == wp_limbs)
-                flint_abort();
+                flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
             if (tmp[yn - 1] >> (FLINT_BITS - 2))
             {

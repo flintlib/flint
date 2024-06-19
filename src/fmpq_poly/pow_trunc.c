@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "longlong.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fmpq.h"
@@ -16,7 +17,7 @@
 
 /* counts zero bits in the binary representation of e */
 static int
-n_zerobits(mp_limb_t e)
+n_zerobits(ulong e)
 {
     int zeros = 0;
 
@@ -32,10 +33,10 @@ n_zerobits(mp_limb_t e)
 static slong
 poly_pow_length(slong poly_len, ulong exp, slong trunc)
 {
-    mp_limb_t hi, lo;
+    ulong hi, lo;
     umul_ppmm(hi, lo, poly_len - 1, exp);
     add_ssaaaa(hi, lo, hi, lo, 0, 1);
-    if (hi != 0 || lo > (mp_limb_t) WORD_MAX)
+    if (hi != 0 || lo > (ulong) WORD_MAX)
         return trunc;
     return FLINT_MIN((slong) lo, trunc);
 }
@@ -210,4 +211,3 @@ fmpq_poly_pow_trunc(fmpq_poly_t res,
         }
     }
 }
-

@@ -5,12 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpn_extras.h"
+#include "fmpz.h"
+#include "mpoly.h"
 #include "fmpz_mpoly.h"
-
 
 slong _fmpz_mpoly_quasidivrem_ideal_heap1(fmpz_t scale, fmpz_mpoly_struct ** polyq,
   fmpz ** polyr, ulong ** expr, slong * allocr, const fmpz * poly2,
@@ -110,10 +112,10 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap1(fmpz_t scale, fmpz_mpoly_struct ** pol
                 *store++ = x->i;
                 *store++ = x->j;
                 *store++ = x->p;
-                if (x->i != -WORD(1))
+                if (x->i != -UWORD(1))
                     hinds[x->p][x->i] |= WORD(1);
 
-                if (x->i == -WORD(1))
+                if (x->i == -UWORD(1))
                 {
                     fmpz_addmul(acc_lg, scale, poly2 + x->j);
                 } else
@@ -188,7 +190,7 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap1(fmpz_t scale, fmpz_mpoly_struct ** pol
                 {
                     slong len = FLINT_MAX(q_len[w] + 1, 2*qs_alloc[w]);
                     qs[w] = (fmpz *) flint_realloc(qs[w], len*sizeof(fmpz));
-                    flint_mpn_zero((mp_ptr) (qs[w] + qs_alloc[w]), len - qs_alloc[w]);
+                    flint_mpn_zero((nn_ptr) (qs[w] + qs_alloc[w]), len - qs_alloc[w]);
                     qs_alloc[w] = len;
                 }
 
@@ -230,7 +232,7 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap1(fmpz_t scale, fmpz_mpoly_struct ** pol
         {
             slong len = FLINT_MAX(r_len + 1, 2*rs_alloc);
             rs = (fmpz *) flint_realloc(rs, len*sizeof(fmpz));
-            flint_mpn_zero((mp_ptr) (rs + rs_alloc), len - rs_alloc);
+            flint_mpn_zero((nn_ptr) (rs + rs_alloc), len - rs_alloc);
             rs_alloc = len;
         }
         fmpz_set(r_coeff + r_len, acc_lg);
@@ -413,10 +415,10 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale, fmpz_mpoly_struct ** poly
                 *store++ = x->i;
                 *store++ = x->j;
                 *store++ = x->p;
-                if (x->i != -WORD(1))
+                if (x->i != -UWORD(1))
                     hinds[x->p][x->i] |= WORD(1);
 
-                if (x->i == -WORD(1))
+                if (x->i == -UWORD(1))
                 {
                     fmpz_addmul(acc_lg, scale, poly2 + x->j);
                 } else
@@ -439,7 +441,7 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale, fmpz_mpoly_struct ** poly
                 if (j + 1 < len2)
                 {
                     x = chains[0] + 0;
-                    x->i = -WORD(1);
+                    x->i = -UWORD(1);
                     x->j = j + 1;
                     x->p = p;
                     x->next = NULL;
@@ -507,7 +509,7 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale, fmpz_mpoly_struct ** poly
                 {
                     slong len = FLINT_MAX(q_len[w] + 1, 2*qs_alloc[w]);
                     qs[w] = (fmpz *) flint_realloc(qs[w], len*sizeof(fmpz));
-                    flint_mpn_zero((mp_ptr) (qs[w] + qs_alloc[w]), len - qs_alloc[w]);
+                    flint_mpn_zero((nn_ptr) (qs[w] + qs_alloc[w]), len - qs_alloc[w]);
                     qs_alloc[w] = len;
                 }
 
@@ -551,7 +553,7 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale, fmpz_mpoly_struct ** poly
         {
             slong len = FLINT_MAX(r_len + 1, 2*rs_alloc);
             rs = (fmpz *) flint_realloc(rs, len*sizeof(fmpz));
-            flint_mpn_zero((mp_ptr) (rs + rs_alloc), len - rs_alloc);
+            flint_mpn_zero((nn_ptr) (rs + rs_alloc), len - rs_alloc);
             rs_alloc = len;
         }
         fmpz_set(r_coeff + r_len, acc_lg);
@@ -621,8 +623,9 @@ void fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale,
                 const fmpz_mpoly_t poly2, fmpz_mpoly_struct * const * poly3,
                                          slong len, const fmpz_mpoly_ctx_t ctx)
 {
-    slong i, exp_bits, N, lenr = 0;
+    slong i, N, lenr = 0;
     slong len3 = 0;
+    flint_bitcnt_t exp_bits;
     ulong * cmpmask;
     ulong * exp2;
     ulong ** exp3;

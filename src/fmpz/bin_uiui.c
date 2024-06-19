@@ -5,19 +5,17 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "gmpcompat.h"
-#include "ulong_extras.h"
 #include "fmpz.h"
 
 /* TODO: speedup for small n,k */
 void fmpz_bin_uiui(fmpz_t res, ulong n, ulong k)
 {
-    __mpz_struct * t = _fmpz_promote(res);
+    mpz_ptr t = _fmpz_promote(res);
     flint_mpz_bin_uiui(t, n, k);
     _fmpz_demote_val(res);
 }

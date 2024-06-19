@@ -5,10 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "mpn_extras.h"
 #include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
 
@@ -33,7 +34,7 @@ void fmpz_mod_poly_realloc(fmpz_mod_poly_t poly, slong alloc,
 
         poly->coeffs = (fmpz *) flint_realloc(poly->coeffs, alloc * sizeof(fmpz));
         if (alloc > poly->alloc)
-            flint_mpn_zero((mp_ptr) (poly->coeffs + poly->alloc),
+            flint_mpn_zero((nn_ptr) (poly->coeffs + poly->alloc),
                      alloc - poly->alloc);
     }
     else                        /* Nothing allocated already so do it now */

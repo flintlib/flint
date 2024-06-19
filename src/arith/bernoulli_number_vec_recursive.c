@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -60,12 +60,12 @@ __ramanujan_even_common_denom(fmpz * num, fmpz * den, slong start, slong n)
             if      (m < WORD(1444))       prodsize = 6;
             else if (m < WORD(2097148))    prodsize = 3;
             else if (m < WORD(3037000495)) prodsize = 2;  /* not very likely... */
-            else flint_abort();
+            else flint_throw(FLINT_ERROR, "(%s)", __func__);
 #else
             if      (m < WORD(32))    prodsize = 6;
             else if (m < WORD(1286))  prodsize = 3;
             else if (m < WORD(46336)) prodsize = 2;
-            else flint_abort();
+            else flint_throw(FLINT_ERROR, "(%s)", __func__);
 #endif
         }
 

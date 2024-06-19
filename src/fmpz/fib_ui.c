@@ -5,13 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "gmpcompat.h"
-#include "ulong_extras.h"
 #include "fmpz.h"
 
 #if FLINT64
@@ -22,7 +20,7 @@
 #define NUM_SMALL_FIB2 92
 #endif
 
-static const mp_limb_t small_fib[NUM_SMALL_FIB] =
+static const ulong small_fib[NUM_SMALL_FIB] =
 {
     0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987,
     1597, 2584, 4181, 6765, 10946, 17711, 28657, 46368, 75025, 121393,
@@ -55,7 +53,7 @@ void fmpz_fib_ui(fmpz_t f, ulong n)
     }
     else if (n < NUM_SMALL_FIB2)
     {
-        mp_limb_t hi, lo, a, b;
+        ulong hi, lo, a, b;
         a = small_fib[n / 2];
         b = small_fib[n / 2 - 1];
         if (n & 1)

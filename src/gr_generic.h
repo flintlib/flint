@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -18,32 +18,31 @@
 #define GR_GENERIC_INLINE static inline
 #endif
 
-#include "flint.h"
-#include "gr.h"
+#include "gr_types.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 #define GR_GENERIC_DEBUG_RINGS 0
 
 #if GR_GENERIC_DEBUG_RINGS
-void gr_generic_init(void) { flint_printf("ctx must implement init()\n"); flint_abort(); }
-void gr_generic_clear(void) { flint_printf("ctx must implement clear()\n"); flint_abort(); }
-void gr_generic_swap(void) { flint_printf("ctx must implement swap()\n"); flint_abort(); }
-void gr_generic_randtest(void) { flint_printf("ctx must implement randtest()\n"); flint_abort(); }
-void gr_generic_write(void) { flint_printf("ctx must implement write()\n"); flint_abort(); }
-void gr_generic_zero(void) { flint_printf("ctx must implement zero()\n"); flint_abort(); }
-void gr_generic_one(void) { flint_printf("ctx must implement one()\n"); flint_abort(); }
-void gr_generic_equal(void) { flint_printf("ctx must implement equal()\n"); flint_abort(); }
-void gr_generic_set(void) { flint_printf("ctx must implement set()\n"); flint_abort(); }
-void gr_generic_set_si(void) { flint_printf("ctx must implement set_si()\n"); flint_abort(); }
-void gr_generic_set_ui(void) { flint_printf("ctx must implement set_ui()\n"); flint_abort(); }
-void gr_generic_set_fmpz(void) { flint_printf("ctx must implement set_fmpz()\n"); flint_abort(); }
-void gr_generic_neg(void) { flint_printf("ctx must implement neg()\n"); flint_abort(); }
-void gr_generic_add(void) { flint_printf("ctx must implement add()\n"); flint_abort(); }
-void gr_generic_sub(void) { flint_printf("ctx must implement sub()\n"); flint_abort(); }
-void gr_generic_mul(void) { flint_printf("ctx must implement mul()\n"); flint_abort(); }
+void gr_generic_init(void) { flint_throw(FLINT_ERROR, "ctx must implement init()\n"); }
+void gr_generic_clear(void) { flint_throw(FLINT_ERROR, "ctx must implement clear()\n"); }
+void gr_generic_swap(void) { flint_throw(FLINT_ERROR, "ctx must implement swap()\n"); }
+void gr_generic_randtest(void) { flint_throw(FLINT_ERROR, "ctx must implement randtest()\n"); }
+void gr_generic_write(void) { flint_throw(FLINT_ERROR, "ctx must implement write()\n"); }
+void gr_generic_zero(void) { flint_throw(FLINT_ERROR, "ctx must implement zero()\n"); }
+void gr_generic_one(void) { flint_throw(FLINT_ERROR, "ctx must implement one()\n"); }
+void gr_generic_equal(void) { flint_throw(FLINT_ERROR, "ctx must implement equal()\n"); }
+void gr_generic_set(void) { flint_throw(FLINT_ERROR, "ctx must implement set()\n"); }
+void gr_generic_set_si(void) { flint_throw(FLINT_ERROR, "ctx must implement set_si()\n"); }
+void gr_generic_set_ui(void) { flint_throw(FLINT_ERROR, "ctx must implement set_ui()\n"); }
+void gr_generic_set_fmpz(void) { flint_throw(FLINT_ERROR, "ctx must implement set_fmpz()\n"); }
+void gr_generic_neg(void) { flint_throw(FLINT_ERROR, "ctx must implement neg()\n"); }
+void gr_generic_add(void) { flint_throw(FLINT_ERROR, "ctx must implement add()\n"); }
+void gr_generic_sub(void) { flint_throw(FLINT_ERROR, "ctx must implement sub()\n"); }
+void gr_generic_mul(void) { flint_throw(FLINT_ERROR, "ctx must implement mul()\n"); }
 #else
 #define gr_generic_init gr_not_implemented
 #define gr_generic_clear gr_not_implemented
@@ -76,6 +75,8 @@ WARN_UNUSED_RESULT int gr_fmpz_poly_evaluate(gr_ptr res, const fmpz_poly_t f, gr
 #endif
 
 #ifdef FMPZ_MPOLY_H
+WARN_UNUSED_RESULT int gr_fmpz_mpoly_evaluate_iter(gr_ptr res, const fmpz_mpoly_t pol, gr_srcptr x, const fmpz_mpoly_ctx_t mctx, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_fmpz_mpoly_evaluate_horner(gr_ptr res, const fmpz_mpoly_t pol, gr_srcptr x, const fmpz_mpoly_ctx_t mctx, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_fmpz_mpoly_evaluate(gr_ptr res, const fmpz_mpoly_t f, gr_srcptr x, const fmpz_mpoly_ctx_t mctx, gr_ctx_t ctx);
 #endif
 
@@ -93,6 +94,10 @@ WARN_UNUSED_RESULT int gr_generic_randtest_not_zero(gr_ptr x, flint_rand_t state
 
 WARN_UNUSED_RESULT int gr_generic_randtest_small(gr_ptr x, flint_rand_t state, gr_ctx_t ctx);
 
+WARN_UNUSED_RESULT int gr_generic_gens(gr_vec_t vec, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_gens_single(gr_vec_t vec, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_gens_recursive(gr_vec_t vec, gr_ctx_t ctx);
+
 WARN_UNUSED_RESULT truth_t gr_generic_is_zero(gr_srcptr x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT truth_t gr_generic_is_one(gr_srcptr x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT truth_t gr_generic_is_neg_one(gr_srcptr x, gr_ctx_t ctx);
@@ -101,6 +106,14 @@ WARN_UNUSED_RESULT int gr_generic_neg_one(gr_ptr res, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_generic_set_other(gr_ptr res, gr_srcptr x, gr_ctx_t xctx, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_set_fmpq(gr_ptr res, const fmpq_t y, gr_ctx_t ctx);
+
+#define GR_PARSE_BALANCE_ADDITIONS 1
+#define GR_PARSE_RING_EXPONENTS 2
+
+WARN_UNUSED_RESULT int gr_generic_set_str_expr(gr_ptr res, const char * s, int flags, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_set_str(gr_ptr res, const char * s, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_set_str_balance_additions(gr_ptr res, const char * s, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_set_str_ring_exponents(gr_ptr res, const char * s, gr_ctx_t ctx);
 
 #ifdef FEXPR_H
 WARN_UNUSED_RESULT int gr_generic_set_fexpr(gr_ptr res, fexpr_vec_t inputs, gr_vec_t outputs, const fexpr_t expr, gr_ctx_t ctx);
@@ -149,6 +162,7 @@ WARN_UNUSED_RESULT int gr_generic_mul_2exp_si(gr_ptr res, gr_srcptr x, slong y, 
 WARN_UNUSED_RESULT int gr_generic_mul_2exp_fmpz(gr_ptr res, gr_srcptr x, const fmpz_t y, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_set_fmpz_2exp_fmpz(gr_ptr res, const fmpz_t x, const fmpz_t y, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_get_fmpz_2exp_fmpz(fmpz_t res1, fmpz_t res2, gr_ptr x, gr_ctx_t ctx);
+WARN_UNUSED_RESULT int gr_generic_set_fmpz_10exp_fmpz(gr_ptr res, const fmpz_t x, const fmpz_t y, gr_ctx_t ctx);
 
 WARN_UNUSED_RESULT int gr_generic_inv(gr_ptr res, gr_srcptr x, gr_ctx_t ctx);
 WARN_UNUSED_RESULT truth_t gr_generic_is_invertible(gr_srcptr x, gr_ctx_t ctx);

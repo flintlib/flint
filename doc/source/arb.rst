@@ -142,11 +142,21 @@ Assignment and rounding
 
 .. function:: void arb_set_ui(arb_t y, ulong x)
 
-.. function:: void arb_set_d(arb_t y, double x)
-
 .. function:: void arb_set_fmpz(arb_t y, const fmpz_t x)
 
+.. function:: void arb_set_d(arb_t y, double x)
+
     Sets *y* to the value of *x* without rounding.
+
+.. note::
+
+    Be cautious when using :func:`arb_set_d` as it does not impose any error
+    bounds and will only convert a ``double`` to an ``arb_t``. For instance,
+    ``arb_set_d(x, 1.1)`` and ``arb_set_str(x, "1.1", prec)`` work very
+    differently, where the former will first create a ``double`` whose value is
+    the approximation of `1.1` (without any error bounds) which then sets *x* to
+    this approximated value with no error. This differs from ``arb_set_str``
+    which will impose an error bound based on the precision.
 
 .. function:: void arb_set_fmpz_2exp(arb_t y, const fmpz_t x, const fmpz_t e)
 
@@ -874,7 +884,7 @@ Arithmetic
     Sets `z = x / y`, rounded to *prec* bits. If *y* contains zero, *z* is
     set to `0 \pm \infty`. Otherwise, error propagation uses the rule
 
-    .. math ::
+    .. math::
         \left| \frac{x}{y} - \frac{x+\xi_1 a}{y+\xi_2 b} \right| =
         \left|\frac{x \xi_2 b - y \xi_1 a}{y (y+\xi_2 b)}\right| \le
         \frac{|xb|+|ya|}{|y| (|y|-b)}
@@ -989,7 +999,7 @@ Powers and roots
     if input interval is `[m-r, m+r]` with `r \le m`, the error is largest at
     `m-r` where it satisfies
 
-    .. math ::
+    .. math::
 
         m^{1/k} - (m-r)^{1/k} = m^{1/k} [1 - (1-r/m)^{1/k}]
 
@@ -1356,7 +1366,7 @@ Gamma function and factorials
     compared to *prec*, it is more efficient to convert *x* to an approximation
     and use :func:`arb_rising_ui`.
 
-.. function :: void arb_rising2_ui(arb_t u, arb_t v, const arb_t x, ulong n, slong prec)
+.. function:: void arb_rising2_ui(arb_t u, arb_t v, const arb_t x, ulong n, slong prec)
 
     Letting `u(x) = x (x+1) (x+2) \cdots (x+n-1)`, simultaneously compute
     `u(x)` and `v(x) = u'(x)`.
@@ -1530,14 +1540,14 @@ Bernoulli numbers and polynomials
 
     For *n* from 0 to *len* - 1, sets entry *n* in the output vector *res* to
 
-    .. math ::
+    .. math::
 
         S_n(a,b) = \frac{1}{n+1}\left(B_{n+1}(b) - B_{n+1}(a)\right)
 
     where `B_n(x)` is a Bernoulli polynomial. If *a* and *b* are integers
     and `b \ge a`, this is equivalent to
 
-    .. math ::
+    .. math::
 
         S_n(a,b) = \sum_{k=a}^{b-1} k^n.
 
@@ -1639,9 +1649,9 @@ Other special functions
 Internals for computing elementary functions
 -------------------------------------------------------------------------------
 
-.. function:: void _arb_atan_taylor_naive(mp_ptr y, mp_limb_t * error, mp_srcptr x, mp_size_t xn, ulong N, int alternating)
+.. function:: void _arb_atan_taylor_naive(nn_ptr y, ulong * error, nn_srcptr x, slong xn, ulong N, int alternating)
 
-.. function:: void _arb_atan_taylor_rs(mp_ptr y, mp_limb_t * error, mp_srcptr x, mp_size_t xn, ulong N, int alternating)
+.. function:: void _arb_atan_taylor_rs(nn_ptr y, ulong * error, nn_srcptr x, slong xn, ulong N, int alternating)
 
     Computes an approximation of `y = \sum_{k=0}^{N-1} x^{2k+1} / (2k+1)`
     (if *alternating* is 0) or `y = \sum_{k=0}^{N-1} (-1)^k x^{2k+1} / (2k+1)`
@@ -1653,9 +1663,9 @@ Internals for computing elementary functions
     The input *x* and output *y* are fixed-point numbers with *xn* fractional
     limbs. A bound for the ulp error is written to *error*.
 
-.. function:: void _arb_exp_taylor_naive(mp_ptr y, mp_limb_t * error, mp_srcptr x, mp_size_t xn, ulong N)
+.. function:: void _arb_exp_taylor_naive(nn_ptr y, ulong * error, nn_srcptr x, slong xn, ulong N)
 
-.. function:: void _arb_exp_taylor_rs(mp_ptr y, mp_limb_t * error, mp_srcptr x, mp_size_t xn, ulong N)
+.. function:: void _arb_exp_taylor_rs(nn_ptr y, ulong * error, nn_srcptr x, slong xn, ulong N)
 
     Computes an approximation of `y = \sum_{k=0}^{N-1} x^k / k!`. Used internally
     for computing exponentials. The *naive* version uses the forward recurrence,
@@ -1668,9 +1678,9 @@ Internals for computing elementary functions
 
     A bound for the ulp error is written to *error*.
 
-.. function:: void _arb_sin_cos_taylor_naive(mp_ptr ysin, mp_ptr ycos, mp_limb_t * error, mp_srcptr x, mp_size_t xn, ulong N)
+.. function:: void _arb_sin_cos_taylor_naive(nn_ptr ysin, nn_ptr ycos, ulong * error, nn_srcptr x, slong xn, ulong N)
 
-.. function:: void _arb_sin_cos_taylor_rs(mp_ptr ysin, mp_ptr ycos, mp_limb_t * error, mp_srcptr x, mp_size_t xn, ulong N, int sinonly, int alternating)
+.. function:: void _arb_sin_cos_taylor_rs(nn_ptr ysin, nn_ptr ycos, ulong * error, nn_srcptr x, slong xn, ulong N, int sinonly, int alternating)
 
     Computes approximations of `y_s = \sum_{k=0}^{N-1} (-1)^k x^{2k+1} / (2k+1)!`
     and `y_c = \sum_{k=0}^{N-1} (-1)^k x^{2k} / (2k)!`.
@@ -1688,13 +1698,13 @@ Internals for computing elementary functions
     the hyperbolic sine is computed (this is currently only intended to
     be used together with *sinonly*).
 
-.. function:: int _arb_get_mpn_fixed_mod_log2(mp_ptr w, fmpz_t q, mp_limb_t * error, const arf_t x, mp_size_t wn)
+.. function:: int _arb_get_mpn_fixed_mod_log2(nn_ptr w, fmpz_t q, ulong * error, const arf_t x, slong wn)
 
     Attempts to write `w = x - q \log(2)` with `0 \le w < \log(2)`, where *w*
     is a fixed-point number with *wn* limbs and ulp error *error*.
     Returns success.
 
-.. function:: int _arb_get_mpn_fixed_mod_pi4(mp_ptr w, fmpz_t q, int * octant, mp_limb_t * error, const arf_t x, mp_size_t wn)
+.. function:: int _arb_get_mpn_fixed_mod_pi4(nn_ptr w, fmpz_t q, int * octant, ulong * error, const arf_t x, slong wn)
 
     Attempts to write `w = |x| - q \pi/4` with `0 \le w < \pi/4`, where *w*
     is a fixed-point number with *wn* limbs and ulp error *error*.
@@ -1765,7 +1775,7 @@ Internals for computing elementary functions
     Computes the arctangent of *x*.
     Initially, the argument-halving formula
 
-    .. math ::
+    .. math::
 
         \operatorname{atan}(x) = 2 \operatorname{atan}\left(\frac{x}{1+\sqrt{1+x^2}}\right)
 
@@ -1773,7 +1783,7 @@ Internals for computing elementary functions
     Then a version of the bit-burst algorithm is used.
     The functional equation
 
-    .. math ::
+    .. math::
 
         \operatorname{atan}(x) = \operatorname{atan}(p/q) +
             \operatorname{atan}(w),

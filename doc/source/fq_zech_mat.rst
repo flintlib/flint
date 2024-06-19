@@ -181,7 +181,7 @@ Random matrix generation
     The matrix can be transformed into a dense matrix with unchanged
     rank by subsequently calling :func:`fq_zech_mat_randops`.
 
-.. function:: void fq_zech_mat_randops(fq_zech_mat_t mat, slong count, flint_rand_t state, const fq_zech_ctx_t ctx)
+.. function:: void fq_zech_mat_randops(fq_zech_mat_t mat, flint_rand_t state, slong count, const fq_zech_ctx_t ctx)
 
     Randomises ``mat`` by performing elementary row or column
     operations. More precisely, at most ``count`` random additions
@@ -343,9 +343,9 @@ Reduced row echelon form
 --------------------------------------------------------------------------------
 
 
-.. function:: slong fq_zech_mat_rref(fq_zech_mat_t A, const fq_zech_ctx_t ctx)
+.. function:: slong fq_zech_mat_rref(fq_zech_mat_t B, const fq_zech_mat_t A, const fq_zech_ctx_t ctx)
 
-    Puts `A` in reduced row echelon form and returns the rank of `A`.
+    Puts `B` in reduced row echelon form and returns the rank of `A`.
 
     The rref is computed by first obtaining an unreduced row echelon
     form via LU decomposition and then solving an additional
@@ -397,7 +397,7 @@ Triangular solving
 
     Uses the block inversion formula
 
-    .. math ::
+    .. math::
       \begin{pmatrix} A & 0 \\ C & D \end{pmatrix}^{-1}
       \begin{pmatrix} X \\ Y \end{pmatrix} =
       \begin{pmatrix} A^{-1} X \\ D^{-1} ( Y - C A^{-1} X ) \end{pmatrix}
@@ -433,7 +433,7 @@ Triangular solving
 
     Uses the block inversion formula
 
-    .. math ::
+    .. math::
         \begin{pmatrix} A & B \\ 0 & D \end{pmatrix}^{-1}
         \begin{pmatrix} X \\ Y \end{pmatrix} =
         \begin{pmatrix} A^{-1} (X - B D^{-1} Y) \\ D^{-1} Y \end{pmatrix}

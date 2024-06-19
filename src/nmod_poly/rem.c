@@ -6,19 +6,19 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "nmod.h"
 #include "nmod_poly.h"
 
-void _nmod_poly_rem_q1(mp_ptr R,
-                       mp_srcptr A, slong lenA, mp_srcptr B, slong lenB,
+void _nmod_poly_rem_q1(nn_ptr R,
+                       nn_srcptr A, slong lenA, nn_srcptr B, slong lenB,
                        nmod_t mod)
 {
     slong i;
-    mp_limb_t invL, t, q0, q1, t1, t0, s1, s0;
+    ulong invL, t, q0, q1, t2, t1, t0, s1, s0;
 
     FLINT_ASSERT(lenA == lenB + 1);
     invL = (B[lenB-1] == 1) ? 1 : n_invmod(B[lenB-1], mod.n);
@@ -61,16 +61,23 @@ void _nmod_poly_rem_q1(mp_ptr R,
     {
         for (i = 1; i < lenB - 1; i++)
         {
-            t = A[i];
-            NMOD_ADDMUL(t, q1, B[i - 1], mod);
-            NMOD_ADDMUL(t, q0, B[i], mod);
-            R[i] = t;
+            umul_ppmm(t1, t0, q1, B[i - 1]);
+            umul_ppmm(s1, s0, q0, B[i]);
+            add_ssaaaa(t1, t0, t1, t0, 0, A[i]);
+            add_sssaaaaaa(t2, t1, t0, 0, t1, t0, 0, s1, s0);
+            if (t2 != 0)
+                /* Note: should just be t1 -= mod.n, but with GCC
+                   on Zen3 that version runs noticeably slower. */
+                sub_ddmmss(t2, t1, t2, t1, 0, mod.n);
+            t1 = FLINT_MIN(t1, t1 - mod.n);
+            FLINT_ASSERT(t1 < mod.n);
+            NMOD_RED2(R[i], t1, t0, mod);
         }
     }
 }
 
-void _nmod_poly_rem(mp_ptr R, mp_srcptr A, slong lenA,
-                              mp_srcptr B, slong lenB, nmod_t mod)
+void _nmod_poly_rem(nn_ptr R, nn_srcptr A, slong lenA,
+                              nn_srcptr B, slong lenB, nmod_t mod)
 {
     if (lenA - lenB == 1)
     {
@@ -78,11 +85,11 @@ void _nmod_poly_rem(mp_ptr R, mp_srcptr A, slong lenA,
     }
     else if (lenB >= 2)
     {
-        mp_ptr Q;
+        nn_ptr Q;
         TMP_INIT;
 
         TMP_START;
-        Q = TMP_ALLOC((lenA - lenB + 1) * sizeof(mp_limb_t));
+        Q = TMP_ALLOC((lenA - lenB + 1) * sizeof(ulong));
         _nmod_poly_divrem(Q, R, A, lenA, B, lenB, mod);
         TMP_END;
     }
@@ -92,12 +99,11 @@ void nmod_poly_rem(nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B)
 {
     const slong lenA = A->length, lenB = B->length;
     nmod_poly_t tR;
-    mp_ptr r;
+    nn_ptr r;
 
     if (lenB == 0)
     {
-        flint_printf("Exception (nmod_poly_rem). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (nmod_poly_rem). Division by zero.\n");
     }
     if (lenA < lenB)
     {

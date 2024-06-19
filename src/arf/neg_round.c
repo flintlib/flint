@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -23,8 +23,8 @@ arf_neg_round(arf_t y, const arf_t x, slong prec, arf_rnd_t rnd)
     {
         int inexact;
         slong fix;
-        mp_size_t xn;
-        mp_srcptr xptr;
+        slong xn;
+        nn_srcptr xptr;
 
         if (y == x)
         {
@@ -41,4 +41,3 @@ arf_neg_round(arf_t y, const arf_t x, slong prec, arf_rnd_t rnd)
         }
     }
 }
-

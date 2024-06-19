@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -121,7 +121,7 @@ TEST_FUNCTION_START(nmod_mpoly_factor_zassenhaus, state)
         nmod_mpoly_t a, t;
         slong n, nfacs, len;
         ulong expbound, powbound, pow;
-        mp_limb_t p;
+        ulong p;
 
         p = n_randint(state, (i % 2 == 0) ? 4 : FLINT_BITS - 1) + 1;
         p = n_randbits(state, p);

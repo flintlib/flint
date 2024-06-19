@@ -5,21 +5,20 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <limits.h>
 
-#include "flint.h"
 #include "fmpz.h"
 #include "ulong_extras.h"
 #include "long_extras.h"
 
-mp_limb_signed_t z_randtest(flint_rand_t state)
+slong z_randtest(flint_rand_t state)
 {
-    mp_limb_t m;
-    mp_limb_signed_t z;
+    ulong m;
+    slong z;
 
     m = n_randlimb(state);
 
@@ -47,11 +46,10 @@ mp_limb_signed_t z_randtest(flint_rand_t state)
     return z;
 }
 
-mp_limb_signed_t z_randtest_not_zero(flint_rand_t state)
+slong z_randtest_not_zero(flint_rand_t state)
 {
-    mp_limb_signed_t z;
+    slong z;
 
     while ((z = z_randtest(state)) == 0) ;
     return z;
 }
-

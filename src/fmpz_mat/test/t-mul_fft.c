@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -38,7 +38,7 @@ TEST_FUNCTION_START(fmpz_mat_mul_fft, state)
         fmpz_mat_randtest(C, state, n_randint(state, 2000) + 1);
 
         fmpz_mat_mul_fft(C, A, B);
-        fmpz_mat_mul_classical_inline(D, A, B);
+        fmpz_mat_mul_classical(D, A, B);
 
         if (!fmpz_mat_equal(C, D))
         {

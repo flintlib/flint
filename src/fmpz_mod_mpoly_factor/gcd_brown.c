@@ -5,12 +5,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mod.h"
+#include "mpoly.h"
 #include "fmpz_mod_mpoly_factor.h"
-
 
 static void _fmpz_mod_poly_gcd_cofactors(
     fmpz_mod_poly_t G,
@@ -47,7 +48,7 @@ int fmpz_mod_polyu1n_gcd_brown_smprime(
     fmpz_mod_poly_struct * cA, * cB, * cG, * cAbar, * cBbar, * gamma;
     fmpz_mod_poly_struct * modulus, * alphapow, * r;
     int gstab, astab, bstab, use_stab;
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mod_poly_t leadA, leadB;
 #endif
 
@@ -56,7 +57,7 @@ int fmpz_mod_polyu1n_gcd_brown_smprime(
     fmpz_init(gammaevalp);
     fmpz_init(gammaevalm);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mod_poly_init(leadA, ctx);
     fmpz_mod_poly_init(leadB, ctx);
     fmpz_mod_poly_set(leadA, A->coeffs + 0, ctx);
@@ -198,11 +199,11 @@ choose_prime:
     if (_fmpz_mod_poly_degree(modulus) > 0)
     {
         FLINT_ASSERT(G->length > 0);
-        if (_fmpz_mod_poly_degree(Gevalp) > G->exps[0])
+        if ((ulong) _fmpz_mod_poly_degree(Gevalp) > G->exps[0])
         {
             goto choose_prime;
         }
-        else if (_fmpz_mod_poly_degree(Gevalp) < G->exps[0])
+        else if ((ulong) _fmpz_mod_poly_degree(Gevalp) < G->exps[0])
         {
             fmpz_mod_poly_one(modulus, ctx);
         }
@@ -266,7 +267,7 @@ successful_put_content:
 
 cleanup:
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success)
     {
         FLINT_ASSERT(fmpz_is_one(fmpz_mod_poly_lead(G->coeffs + 0, ctx)));
@@ -356,7 +357,7 @@ int fmpz_mod_mpolyn_gcd_brown_smprime(
     fmpz_mod_poly_struct * modulus, * alphapow, * t1;
     flint_bitcnt_t bits = A->bits;
     slong N = mpoly_words_per_exp_sp(bits, ctx->minfo);
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mod_mpolyn_t Aorg, Borg;
     fmpz_mod_poly_t leadA, leadB;
 #endif
@@ -397,7 +398,7 @@ int fmpz_mod_mpolyn_gcd_brown_smprime(
 
     mpoly_gen_offset_shift_sp(&offset, &shift, var - 1, G->bits, ctx->minfo);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     fmpz_mod_poly_init(leadA, ctx->ffinfo);
     fmpz_mod_poly_init(leadB, ctx->ffinfo);
     fmpz_mod_poly_set(leadA, A->coeffs + 0, ctx->ffinfo);
@@ -649,7 +650,7 @@ successful_put_content:
 
 cleanup:
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success)
     {
         FLINT_ASSERT(fmpz_is_one(fmpz_mod_mpolyn_leadcoeff(G)));
@@ -676,4 +677,3 @@ cleanup:
 
     return success;
 }
-

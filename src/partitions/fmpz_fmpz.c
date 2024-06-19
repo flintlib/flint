@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -64,10 +64,7 @@ partitions_fmpz_fmpz_hrr(fmpz_t p, const fmpz_t n, int use_doubles)
 
     if (!arb_get_unique_fmpz(p, x))
     {
-        flint_printf("not unique!\n");
-        arb_printd(x, 50);
-        flint_printf("\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "not unique!\n%s\n", arb_get_str(x, 50, 0));
     }
 
     arb_clear(x);
@@ -76,10 +73,10 @@ partitions_fmpz_fmpz_hrr(fmpz_t p, const fmpz_t n, int use_doubles)
 
 /* To compute p(n) mod 2^64. */
 static void
-partitions_vec(mp_ptr v, slong len)
+partitions_vec(nn_ptr v, slong len)
 {
     slong i, j, n;
-    mp_limb_t p;
+    ulong p;
 
     for (n = 0; n < FLINT_MIN(len, NUMBER_OF_SMALL_PARTITIONS); n++)
         v[n] = partitions_lookup[n];
@@ -111,7 +108,7 @@ _partitions_fmpz_ui(fmpz_t res, ulong n, int use_doubles)
     }
     else if (FLINT_BITS == 64 && (n < 500 || (!use_doubles && n < 1200)))
     {
-        mp_ptr tmp = flint_malloc((n + 1) * sizeof(mp_limb_t));
+        nn_ptr tmp = flint_malloc((n + 1) * sizeof(ulong));
 
         if (n < 417)  /* p(n) < 2^64 */
         {

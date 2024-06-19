@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -28,7 +28,7 @@ void mpoly_monomials_shift_right_ui(ulong * Aexps, flint_bitcnt_t Abits,
 
     if (Abits <= FLINT_BITS)
     {
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
         ulong mask = mpoly_overflow_mask_sp(Abits);
 #endif
         for (i = 0; i < Alength; i++)
@@ -66,7 +66,7 @@ void mpoly_monomials_shift_right_ffmpz(ulong * Aexps, flint_bitcnt_t Abits,
 
     if (Abits <= FLINT_BITS)
     {
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
         ulong mask = mpoly_overflow_mask_sp(Abits);
 #endif
         for (i = 0; i < Alength; i++)
@@ -86,5 +86,3 @@ void mpoly_monomials_shift_right_ffmpz(ulong * Aexps, flint_bitcnt_t Abits,
 
     TMP_END;
 }
-
-

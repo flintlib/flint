@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -228,7 +228,7 @@ euler_bsplit_2_basecase(euler_bsplit_2_t s, slong n1, slong n2, bsplit_args_t * 
         arb_ptr T = s->T;
 
         if (n2 - n1 != 1)
-            flint_abort();
+            flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
         if (n1 == 0)
         {
@@ -345,7 +345,7 @@ arb_log_ui_smooth(arb_t s, ulong n, slong prec)
     while (m % 5 == 0) { m /= 5; k++; }
 
     if (m != 1)
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(%s)\n", __func__);
 
     arb_init(t);
 
@@ -463,7 +463,7 @@ arb_const_euler_eval(arb_t res, slong prec)
 
 ARB_DEF_CACHED_CONSTANT(arb_const_euler_brent_mcmillan, arb_const_euler_eval)
 
-FLINT_DLL extern const mp_limb_t arb_hypgeom_gamma_tab_limbs[];
+FLINT_DLL extern const ulong arb_hypgeom_gamma_tab_limbs[];
 
 void
 arb_const_euler(arb_t res, slong prec)
@@ -471,7 +471,7 @@ arb_const_euler(arb_t res, slong prec)
     if (prec < ARB_HYPGEOM_GAMMA_TAB_PREC - 16)
     {
         slong exp;
-        mp_size_t n;
+        slong n;
 
         n = ARB_HYPGEOM_GAMMA_TAB_PREC / FLINT_BITS;
 
@@ -488,4 +488,3 @@ arb_const_euler(arb_t res, slong prec)
         arb_const_euler_brent_mcmillan(res, prec);
     }
 }
-

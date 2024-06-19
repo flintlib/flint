@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -14,8 +14,8 @@
 void
 arf_debug(const arf_t x)
 {
-    mp_srcptr d;
-    mp_size_t n;
+    nn_srcptr d;
+    slong n;
     slong i;
 
     flint_printf("{exp=");
@@ -29,4 +29,3 @@ arf_debug(const arf_t x)
 
     flint_printf("]}");
 }
-

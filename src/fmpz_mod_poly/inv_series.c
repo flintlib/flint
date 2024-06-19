@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -31,8 +31,7 @@ void fmpz_mod_poly_inv_series(fmpz_mod_poly_t g, const fmpz_mod_poly_t h, slong 
 
     if (n == 0 || h->length == 0 || fmpz_is_zero(h->coeffs + 0))
     {
-        flint_printf("Exception (fmpz_mod_poly_inv). Division by zero.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "Exception (fmpz_mod_poly_inv). Division by zero.\n");
     }
 
     if (hlen == 1)

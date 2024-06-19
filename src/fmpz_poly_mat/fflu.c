@@ -5,11 +5,10 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
 #include "fmpz_poly.h"
 #include "fmpz_poly_mat.h"
 
@@ -84,7 +83,7 @@ fmpz_poly_mat_fflu(fmpz_poly_mat_t B, fmpz_poly_t den, slong * perm,
                 fmpz_poly_mul(t, E(j, pivot_col), E(pivot_row, k));
                 fmpz_poly_sub(E(j, k), E(j, k), t);
                 if (pivot_row > 0)
-                    fmpz_poly_div(E(j, k), E(j, k), den);
+                    fmpz_poly_divexact(E(j, k), E(j, k), den);
             }
         }
 

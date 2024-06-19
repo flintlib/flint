@@ -5,10 +5,15 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly_factor.h"
 #include "fmpz_mpoly_factor.h"
 
@@ -62,7 +67,7 @@ int fmpz_mpolyl_gcd_zippel(
     flint_bitcnt_t bits = G->bits;
     int success, changed;
     slong i, j, Gdegbound, Gdeg, req_zip_images;
-    mp_limb_t p, t, gammap;
+    ulong p, t, gammap;
     fmpz_t c, gamma, modulus;
     nmod_mpoly_t Ap, Bp, Gp, Abarp, Bbarp;
     nmod_mpoly_ctx_t ctxp;
@@ -116,7 +121,7 @@ outer_loop:
     }
     p = n_nextprime(p, 1);
 
-    nmod_mpoly_ctx_change_modulus(ctxp, p);
+    nmod_mpoly_ctx_set_modulus(ctxp, p);
 
     /* make sure mod p reduction does not kill both lc(A) and lc(B) */
     gammap = fmpz_get_nmod(gamma, ctxp->mod);
@@ -164,7 +169,7 @@ outer_loop:
     for (i = 0; i < Gmarks->length; i++)
         perm[i] = i;
 
-#define length(k) Gmarks->coeffs[(k)+1] - Gmarks->coeffs[k]
+#define length(k) (Gmarks->coeffs[(k)+1] - Gmarks->coeffs[k])
 
     for (i = 1; i < Gmarks->length; i++)
         for (j = i; j > 0 && length(perm[j-1]) > length(perm[j]); j--)
@@ -175,7 +180,7 @@ outer_loop:
     for (i = 0; i < Gmarks->length; i++)
     {
         req_zip_images += length(i);
-        j = FLINT_MAX(j, length(i));
+        j = FLINT_MAX(j, (slong) length(i));
     }
 
     if (Gmarks->length > 1)
@@ -194,7 +199,7 @@ inner_loop:
     }
     p = n_nextprime(p, 1);
 
-    nmod_mpoly_ctx_change_modulus(ctxp, p);
+    nmod_mpoly_ctx_set_modulus(ctxp, p);
 
     /* make sure mod p reduction does not kill both lc(A) and lc(B) */
     gammap = fmpz_get_nmod(gamma, ctxp->mod);
@@ -266,4 +271,3 @@ cleanup:
 
     return success;
 }
-

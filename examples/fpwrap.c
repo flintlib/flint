@@ -1,8 +1,8 @@
 /* This file is public domain. Author: Fredrik Johansson. */
 
-#include "arb_fpwrap.h"
+#include <flint/arb_fpwrap.h>
 
-int main()
+int main(void)
 {
     double x, y;
     complex_double cx, cy;

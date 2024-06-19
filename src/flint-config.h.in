@@ -1,40 +1,67 @@
 /*
-    Copyright (C) 2023 Albin Ahlbäck
+    Copyright (C) 2023, 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 /* Define if system is big endian. */
 #undef FLINT_BIG_ENDIAN
 
-/* Define if compiler has CLZ intrinsics */
-#undef FLINT_HAS_CLZ
+/* Define according to the ABI FLINT was compiled with */
+#undef FLINT_BITS
 
-/* Define if compiler has CTZ intrinsics */
-#undef FLINT_HAS_CTZ
+/* Define if Arm v8 assembly is available */
+#undef FLINT_HAVE_ASSEMBLY_armv8
 
-/* Define if compiler has popcount intrinsics */
-#undef FLINT_HAS_POPCNT
-
-/* Define if system has AVX2 */
-#undef FLINT_HAVE_AVX2
-
-/* Define if system has AVX512 */
-#undef FLINT_HAVE_AVX512
-
-/* Define if compiler has __builtin_constant_p */
-#undef FLINT_HAVE_CONSTANT_P
+/* Define if x86_64 ADX assembly is available */
+#undef FLINT_HAVE_ASSEMBLY_x86_64_adx
 
 /* Define to use the fft_small module */
 #undef FLINT_HAVE_FFT_SMALL
 
+/* Define if GMP has mpn_add_n_sub_n */
+#undef FLINT_HAVE_NATIVE_mpn_add_n_sub_n
+
+/* Define if GMP has mpn_add_nc */
+#undef FLINT_HAVE_NATIVE_mpn_add_nc
+
+/* Define if GMP has mpn_addlsh1_n */
+#undef FLINT_HAVE_NATIVE_mpn_addlsh1_n
+
+/* Define if GMP has mpn_addlsh1_n_ip1 */
+#undef FLINT_HAVE_NATIVE_mpn_addlsh1_n_ip1
+
+/* Define if GMP has mpn_addmul_2 */
+#undef FLINT_HAVE_NATIVE_mpn_addmul_2
+
+/* Define if system has mpn_modexact_1_odd */
+#undef FLINT_HAVE_NATIVE_mpn_modexact_1_odd
+
+/* Define if GMP has mpn_rsh1add_n */
+#undef FLINT_HAVE_NATIVE_mpn_rsh1add_n
+
+/* Define if GMP has mpn_rsh1sub_n */
+#undef FLINT_HAVE_NATIVE_mpn_rsh1sub_n
+
+/* Define if GMP has mpn_sub_nc */
+#undef FLINT_HAVE_NATIVE_mpn_sub_nc
+
+/* Define if system is strongly ordered */
+#undef FLINT_KNOW_STRONG_ORDER
+
+/* Define to use long long limbs */
+#undef FLINT_LONG_LONG
+
 /* Define to enable reentrant. */
 #undef FLINT_REENTRANT
+
+/* Define to locally unroll some loops */
+#undef FLINT_UNROLL_LOOPS
 
 /* Define to enable BLAS. */
 #undef FLINT_USES_BLAS
@@ -56,3 +83,6 @@
 
 /* Define to enable use of GMP internals. */
 #undef FLINT_WANT_GMP_INTERNALS
+
+/* Define to enable pretty printing for tests. */
+#undef FLINT_WANT_PRETTY_TESTS

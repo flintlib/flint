@@ -5,12 +5,13 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <stdio.h>
 #include "fmpq.h"
+#include "padic.h"
 #include "padic_mat.h"
 
 /* printing *******************************************************************/
@@ -73,8 +74,7 @@ int padic_mat_fprint(FILE * file, const padic_mat_t A, const padic_ctx_t ctx)
     }
     else if (ctx->mode == PADIC_SERIES)
     {
-        flint_printf("ERROR (_padic_mat_fprint).  Mode PADIC_SERIES not implemented yet.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "ERROR (_padic_mat_fprint).  Mode PADIC_SERIES not implemented yet.\n");
     }
     else if (ctx->mode == PADIC_VAL_UNIT)
     {
@@ -122,8 +122,7 @@ int padic_mat_fprint(FILE * file, const padic_mat_t A, const padic_ctx_t ctx)
     }
     else
     {
-        flint_printf("ERROR (_padic_mat_fprint).  Unknown print mode.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "ERROR (_padic_mat_fprint).  Unknown print mode.\n");
     }
 
     return 1;

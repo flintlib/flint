@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -85,9 +85,8 @@ fmpq_poly_compose_series_horner(fmpq_poly_t res,
 
     if (len2 != 0 && !fmpz_is_zero(poly2->coeffs))
     {
-        flint_printf("Exception (fmpq_poly_compose_series_horner). Inner polynomial \n"
-               "must have zero constant term.\n");
-        flint_abort();
+        flint_throw(FLINT_ERROR, "(fmpq_poly_compose_series_horner): "
+                "Inner polynomial must have zero constant term.\n");
     }
 
     if (len1 == 0 || n == 0)

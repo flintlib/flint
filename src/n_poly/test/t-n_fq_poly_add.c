@@ -5,24 +5,26 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "test_helpers.h"
+#include "fq_nmod.h"
+#include "fq_nmod_poly.h"
 #include "n_poly.h"
 
 TEST_FUNCTION_START(n_fq_poly_add, state)
 {
     slong i, j;
 
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fq_nmod_ctx_t ctx;
         n_poly_t a, b, c, d, e;
         fq_nmod_poly_t A, B, C;
 
-        fq_nmod_ctx_randtest(ctx, state);
+        fq_nmod_ctx_init_randtest(ctx, state, 3);
 
         n_poly_init(a);
         n_poly_init(b);

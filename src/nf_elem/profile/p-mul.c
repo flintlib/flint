@@ -5,13 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <math.h>
 #include "profiler.h"
-#include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
@@ -49,7 +48,6 @@ void random_fmpq_poly(fmpq_poly_t pol, flint_rand_t state, slong length)
 void random_nf_elem(nf_elem_t a, flint_rand_t state, nf_t nf)
 {
    slong len = nf->pol->length - 1;
-   slong i;
 
    random_fmpq_poly(NF_ELEM(a), state, len);
 }
@@ -67,7 +65,7 @@ void sample(void * arg, ulong count)
    nf_t nf;
    nf_elem_t a, b, c;
 
-   flint_randinit(state);
+   flint_rand_init(state);
 
    scale = 100;
    if (length >= 50) scale = 10;
@@ -114,7 +112,7 @@ void sample(void * arg, ulong count)
 
    fmpq_poly_clear(pol);
 
-   flint_randclear(state);
+   flint_rand_clear(state);
 }
 
 int main(void)

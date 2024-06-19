@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -17,11 +17,11 @@ _apply_permutation(slong * AP, nmod_mat_t A, slong * P,
 {
     if (n != 0)
     {
-        mp_ptr * Atmp;
+        nn_ptr * Atmp;
         slong * APtmp;
         slong i;
 
-        Atmp = flint_malloc(sizeof(mp_ptr) * n);
+        Atmp = flint_malloc(sizeof(nn_ptr) * n);
         APtmp = flint_malloc(sizeof(slong) * n);
 
         for (i = 0; i < n; i++) Atmp[i] = A->rows[P[i] + offset];
@@ -101,7 +101,7 @@ nmod_mat_lu_recursive(slong * P, nmod_mat_t A, int rank_check)
         {
             for (i = 0; i < m - r1; i++)
             {
-                mp_ptr row = A->rows[r1 + i];
+                nn_ptr row = A->rows[r1 + i];
                 for (j = 0; j < FLINT_MIN(i, r2); j++)
                 {
                     row[r1 + j] = row[n1 + j];

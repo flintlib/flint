@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -130,11 +130,11 @@ slong _fmpz_mat_minpoly_modular(fmpz * rop, const fmpz_mat_t op)
             See Lemma 3.1 in Dumas, "Bounds on the coefficients of the
             characteristic and minimal polynomials", 2007.
         */
-        slong bound;
+        ulong bound;
         double b1, b2, b3, bb;
 
         slong pbits  = FLINT_BITS - 1, i, j;
-        mp_limb_t p = (UWORD(1) << pbits);
+        ulong p = (UWORD(1) << pbits);
         ulong * P, * Q;
 
         fmpz_mat_t v1, v2, v3;
@@ -165,7 +165,7 @@ slong _fmpz_mat_minpoly_modular(fmpz * rop, const fmpz_mat_t op)
             if (b3 < b2)
                b2 = b3;
 
-            bound = n <= bb ? (slong) ceil(n*b1) : (slong) ceil(n*b2);
+            bound = n <= bb ? (ulong) ceil(n*b1) : (ulong) ceil(n*b2);
             bound = bound + 1;
 
             fmpz_clear(b);

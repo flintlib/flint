@@ -5,10 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "n_poly.h"
+#include "mpoly.h"
 #include "nmod_mpoly_factor.h"
 
 /*
@@ -21,7 +23,7 @@ int _nmod_mpoly_evaluate_rest_n_poly(
     slong * ends,
     slong * stops,
     ulong * es,
-    const mp_limb_t * Acoeffs,
+    const ulong * Acoeffs,
     const ulong * Aexps,
     slong Alen,
     slong var,
@@ -162,7 +164,7 @@ next:
         stop++;
 
     n_bpoly_fit_length(E, e + 1);
-    while (E->length <= e)
+    while (E->length <= (slong) e)
     {
         n_poly_zero(E->coeffs + E->length);
         E->length++;
@@ -227,7 +229,7 @@ void _nmod_mpoly_set_n_bpoly_var1_zero(
     Alen = 0;
     for (i = Blen - 1; i >= 0; i--)
     {
-        mp_limb_t c = n_poly_get_coeff(B->coeffs + i, 0);
+        ulong c = n_poly_get_coeff(B->coeffs + i, 0);
         if (c == 0)
             continue;
 
@@ -243,4 +245,3 @@ void _nmod_mpoly_set_n_bpoly_var1_zero(
 
     TMP_END;
 }
-

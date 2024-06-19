@@ -5,18 +5,18 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "flint.h"
-#include "ulong_extras.h"
+#include <gmp.h>
+#include "longlong.h"
 #include "fmpz.h"
 
-mp_limb_t
+ulong
 fmpz_abs_lbound_ui_2exp(slong * exp, const fmpz_t x, int bits)
 {
-    mp_limb_t m;
+    ulong m;
     slong shift, e, size;
     fmpz c = *x;
 
@@ -27,7 +27,7 @@ fmpz_abs_lbound_ui_2exp(slong * exp, const fmpz_t x, int bits)
     }
     else
     {
-        __mpz_struct * z = COEFF_TO_PTR(c);
+        mpz_ptr z = COEFF_TO_PTR(c);
         size = z->_mp_size;
         size = FLINT_ABS(size);
         e = (size - 1) * FLINT_BITS;
@@ -52,7 +52,7 @@ fmpz_abs_lbound_ui_2exp(slong * exp, const fmpz_t x, int bits)
             else
             {
                 /* read a second limb to get an accurate value */
-                mp_limb_t m2 = z->_mp_d[size - 2];
+                ulong m2 = z->_mp_d[size - 2];
                 m = (m << (-shift)) | (m2 >> (FLINT_BITS + shift));
             }
 

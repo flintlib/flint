@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -98,4 +98,3 @@ acb_poly_evaluate2_rectangular(acb_t r, acb_t s, const acb_poly_t f, const acb_t
 {
     _acb_poly_evaluate2_rectangular(r, s, f->coeffs, f->length, a, prec);
 }
-

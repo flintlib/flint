@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 
-int _nmod_vec_fprint_pretty(FILE * file, mp_srcptr vec, slong len, nmod_t mod)
+int _nmod_vec_fprint_pretty(FILE * file, nn_srcptr vec, slong len, nmod_t mod)
 {
     slong j;
     int z, width;
@@ -55,19 +55,17 @@ int _nmod_vec_fprint_pretty(FILE * file, mp_srcptr vec, slong len, nmod_t mod)
     return z;
 }
 
-void _nmod_vec_print_pretty(mp_srcptr vec, slong len, nmod_t mod)
+void _nmod_vec_print_pretty(nn_srcptr vec, slong len, nmod_t mod)
 {
     _nmod_vec_fprint_pretty(stdout, vec, len, mod);
 }
 
-int _nmod_vec_print(mp_srcptr vec, slong len, nmod_t mod)
+int _nmod_vec_print(nn_srcptr vec, slong len, nmod_t mod)
 {
     return _nmod_vec_fprint_pretty(stdout, vec, len, mod);
 }
 
-int _nmod_vec_fprint(FILE * f, mp_srcptr vec, slong len, nmod_t mod)
+int _nmod_vec_fprint(FILE * f, nn_srcptr vec, slong len, nmod_t mod)
 {
     return _nmod_vec_fprint_pretty(f, vec, len, mod);
 }
-
-

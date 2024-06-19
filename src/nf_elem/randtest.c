@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -14,7 +14,7 @@
 #include "nf_elem.h"
 
 void nf_elem_randtest(nf_elem_t a, flint_rand_t state,
-                                               mp_bitcnt_t bits, const nf_t nf)
+                                               flint_bitcnt_t bits, const nf_t nf)
 {
     if (nf->flag & NF_LINEAR)
     {
@@ -64,7 +64,7 @@ void nf_elem_randtest(nf_elem_t a, flint_rand_t state,
 }
 
 void nf_elem_randtest_not_zero(nf_elem_t a, flint_rand_t state,
-                                               mp_bitcnt_t bits, const nf_t nf)
+                                               flint_bitcnt_t bits, const nf_t nf)
 {
    if (nf->flag & NF_LINEAR)
    {

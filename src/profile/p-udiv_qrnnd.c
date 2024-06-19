@@ -5,18 +5,17 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "profiler.h"
-#include "flint.h"
 #include "ulong_extras.h"
 
 void sample(void * arg, ulong count)
 {
-   mp_limb_t d;
-   mp_ptr array = (mp_ptr) flint_malloc(200 * sizeof(mp_limb_t));
+   ulong d;
+   nn_ptr array = (nn_ptr) flint_malloc(200 * sizeof(ulong));
    ulong i;
    int j;
 
@@ -46,7 +45,7 @@ void sample(void * arg, ulong count)
          if (array[j] == 0) flint_printf("\r");
    }
 
-   flint_randclear(state);
+   flint_rand_clear(state);
    flint_free(array);
 }
 

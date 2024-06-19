@@ -6,7 +6,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -16,14 +16,14 @@
    Same as _nmod_poly_KS2_pack(), but requires b <= FLINT_BITS.
 */
 void
-_nmod_poly_KS2_pack1(mp_ptr res, mp_srcptr op, slong n, slong s,
+_nmod_poly_KS2_pack1(nn_ptr res, nn_srcptr op, slong n, slong s,
                 ulong b, ulong k, slong r)
 {
    /* where to write the next limb */
-   mp_ptr dest = res;
+   nn_ptr dest = res;
 
    /* limb currently being filled */
-   mp_limb_t buf;
+   ulong buf;
 
    /* number of bits used in buf; always in [0, FLINT_BITS) */
    ulong buf_b, buf_b_old;
@@ -69,14 +69,14 @@ _nmod_poly_KS2_pack1(mp_ptr res, mp_srcptr op, slong n, slong s,
 }
 
 void
-_nmod_poly_KS2_pack(mp_ptr res, mp_srcptr op, slong n, slong s,
+_nmod_poly_KS2_pack(nn_ptr res, nn_srcptr op, slong n, slong s,
                ulong b, ulong k, slong r)
 {
    /* where to write the next limb */
-   mp_ptr dest = res;
+   nn_ptr dest = res;
 
    /* limb currently being filled */
-   mp_limb_t buf;
+   ulong buf;
 
    /* number of bits used in buf; always in [0, FLINT_BITS) */
    ulong buf_b, buf_b_old;

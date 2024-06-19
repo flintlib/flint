@@ -5,14 +5,24 @@
 
     FLINT is free software: you grn redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "gr.h"
 #include "gr_mat.h"
+
+int
+gr_mat_lu_generic(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, gr_ctx_t ctx)
+{
+    if (A->r < 5 || A->c < 5)
+        return gr_mat_lu_classical(rank, P, LU, A, rank_check, ctx);
+    else
+        return gr_mat_lu_recursive(rank, P, LU, A, rank_check, ctx);
+}
 
 int
 gr_mat_lu(slong * rank, slong * P, gr_mat_t LU, const gr_mat_t A, int rank_check, gr_ctx_t ctx)
 {
-    return gr_mat_lu_recursive(rank, P, LU, A, rank_check, ctx);
+    return GR_MAT_LU_OP(ctx, MAT_LU)(rank, P, LU, A, rank_check, ctx);
 }

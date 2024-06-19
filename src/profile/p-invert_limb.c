@@ -5,12 +5,11 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include "profiler.h"
-#include "flint.h"
 #include "ulong_extras.h"
 
 typedef struct
@@ -20,7 +19,7 @@ typedef struct
 
 #define invert_limb_naive(ninv, n)                    \
    do {                                               \
-      mp_limb_t dummy;                                \
+      ulong dummy;                                \
       udiv_qrnnd (ninv, dummy, ~(n), ~(WORD(0)), n);  \
    } while (0)
 
@@ -61,7 +60,7 @@ void sample(void * arg, ulong count)
       if (sum == 0) flint_printf("\r");
    }
 
-   flint_randclear(state);
+   flint_rand_clear(state);
    flint_free(array);
 }
 

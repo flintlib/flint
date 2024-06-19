@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -45,7 +45,7 @@ _fq_nmod_unrank(fq_nmod_t x, ulong r, const fq_nmod_ctx_t ctx)
 }
 
 static int
-n_is_prime_power(mp_limb_t * p, mp_limb_t n)
+n_is_prime_power(ulong * p, ulong n)
 {
     n_factor_t fac;
 
@@ -71,7 +71,6 @@ void
 fmpz_mat_jacobsthal(fmpz_mat_t Q)
 {
     int * quadratic;
-    fmpz_t pp;
     ulong r, c, q, p, d;
     fq_nmod_ctx_t ctx;
     fq_nmod_t x, y, x2;
@@ -81,8 +80,7 @@ fmpz_mat_jacobsthal(fmpz_mat_t Q)
     if (!(d = n_is_prime_power(&p, q)) || q % 2 == 0)
         flint_throw(FLINT_ERROR, "Not an odd prime power in %s\n", __func__);
 
-    fmpz_init_set_ui(pp, p);
-    fq_nmod_ctx_init(ctx, pp, d, "x");
+    fq_nmod_ctx_init_ui(ctx, p, d, "x");
     fq_nmod_init(x, ctx);
     fq_nmod_init(y, ctx);
     fq_nmod_init(x2, ctx);
@@ -123,7 +121,6 @@ fmpz_mat_jacobsthal(fmpz_mat_t Q)
     fq_nmod_clear(x2, ctx);
     fq_nmod_ctx_clear(ctx);
     flint_free(quadratic);
-    fmpz_clear(pp);
 }
 
 /* 0 -- not possible */
@@ -131,7 +128,7 @@ fmpz_mat_jacobsthal(fmpz_mat_t Q)
 /* 2 -- n = 2^v * 2*(p^e + 1) */
 /* 3 -- n = 2^v */
 static int
-paley_construction(mp_limb_t * q, mp_limb_t n)
+paley_construction(ulong * q, ulong n)
 {
     int i, v;
 
@@ -172,13 +169,12 @@ fmpz_mat_set2x2(fmpz_mat_t A, slong i, slong j,
 int
 fmpz_mat_hadamard(fmpz_mat_t A)
 {
-    slong n, m, i, j;
-    mp_limb_t q;
+    ulong m, n, q;
     int kind;
 
     n = fmpz_mat_nrows(A);
 
-    if (n != fmpz_mat_ncols(A))
+    if ((slong) n != fmpz_mat_ncols(A))
         return 0;
 
     if (n == 0)
@@ -203,6 +199,8 @@ fmpz_mat_hadamard(fmpz_mat_t A)
 
         if (kind == 1)
         {
+            ulong i, j;
+
             fmpz_zero(fmpz_mat_entry(A, 0, 0));
 
             for (i = 0; i < q; i++)
@@ -224,6 +222,8 @@ fmpz_mat_hadamard(fmpz_mat_t A)
         }
         else
         {
+            ulong i, j;
+
             for (i = 0; i < q + 1; i++)
             {
                 for (j = 0; j < q + 1; j++)
@@ -246,6 +246,7 @@ fmpz_mat_hadamard(fmpz_mat_t A)
 
     for ( ; m < n; m *= 2)
     {
+        ulong i;
         for (i = 0; i < m; i++)
         {
             _fmpz_vec_set(A->rows[i] + m, A->rows[i], m);
@@ -256,4 +257,3 @@ fmpz_mat_hadamard(fmpz_mat_t A)
 
     return 1;
 }
-

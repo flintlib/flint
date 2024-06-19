@@ -5,10 +5,12 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "longlong.h"
+#include "mpoly.h"
 #include "nmod_mpoly.h"
 #include "fq_nmod_mpoly.h"
 
@@ -41,7 +43,7 @@ void nmod_mpolyd_init(nmod_mpolyd_t poly, slong nvars)
         poly->deg_bounds[i] = WORD(1);
     }
     poly->coeff_alloc = WORD(16);
-    poly->coeffs = (mp_limb_t *) flint_malloc(poly->coeff_alloc*sizeof(mp_limb_t));
+    poly->coeffs = (ulong *) flint_malloc(poly->coeff_alloc*sizeof(ulong));
     for (i = 0; i < poly->coeff_alloc; i++)
     {
         poly->coeffs[i] = UWORD(0);
@@ -51,7 +53,7 @@ void nmod_mpolyd_init(nmod_mpolyd_t poly, slong nvars)
 void nmod_mpolyd_fit_length(nmod_mpolyd_t poly, slong len) {
     if (poly->coeff_alloc < len) {
 /*flint_printf("realloc %wd -> %wd\n",poly->coeff_alloc, len);*/
-        poly->coeffs = (mp_limb_t *) flint_realloc(poly->coeffs, len*sizeof(mp_limb_t));
+        poly->coeffs = (ulong *) flint_realloc(poly->coeffs, len*sizeof(ulong));
         poly->coeff_alloc = len;
     }
 }
@@ -382,4 +384,3 @@ slong nmod_mpolyd_length(const nmod_mpolyd_t A)
 
     return i;
 }
-

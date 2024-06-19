@@ -5,14 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "fmpz_mod_mpoly.h"
 #include "ulong_extras.h"
 #include "long_extras.h"
-
+#include "mpoly.h"
+#include "fmpz_mod_mpoly.h"
 
 static int _try_dense(
     const fmpz * maxBfields,
@@ -64,7 +64,7 @@ static int _try_dense(
         goto cleanup;
     }
 
-    ret = dense_size < product_count/32;
+    ret = dense_size < (ulong) (product_count/32);
 
 cleanup:
 
@@ -125,4 +125,3 @@ cleanup:
 
     TMP_END;
 }
-

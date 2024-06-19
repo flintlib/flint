@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -16,14 +16,19 @@
 
 TEST_TEMPLATE_FUNCTION_START(T, is_invertible, state)
 {
-    int i, result;
+    slong ix;
+    int result;
 
-    for (i = 0; i < 10 * flint_test_multiplier(); i++)
+    for (ix = 0; ix < 300 * flint_test_multiplier(); ix++)
     {
         TEMPLATE(T, ctx_t) ctx;
         TEMPLATE(T, t) a;
 
-        TEMPLATE(T, ctx_randtest)(ctx, state);
+#if defined(FQ_ZECH_H)
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 3);
+#else
+        TEMPLATE(T, ctx_init_randtest)(ctx, state, 0);
+#endif
 
         TEMPLATE(T, init)(a, ctx);
         TEMPLATE(T, randtest)(a, state, ctx);
@@ -34,7 +39,6 @@ TEST_TEMPLATE_FUNCTION_START(T, is_invertible, state)
             flint_printf("FAIL:\n\n");
             flint_printf("a = "), TEMPLATE(T, print_pretty)(a, ctx), flint_printf("\n");
             TEMPLATE(T, ctx_print)(ctx);
-            fflush(stdout);
             flint_abort();
         }
 

@@ -5,11 +5,15 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <stdio.h>
+#include "fmpz.h"
+#include "fq_nmod.h"
+#include "n_poly.h"
+#include "mpoly.h"
 #include "fq_nmod_mpoly.h"
 
 /* printing *******************************************************************/
@@ -147,10 +151,12 @@ void fq_nmod_mpoly_remainder_strongtest(const fq_nmod_mpoly_t r, const fq_nmod_m
 
         if (divides)
         {
-            flint_printf("fq_nmod_mpoly_remainder_strongtest FAILED i = %wd\n", i);
-            flint_printf("rem ");fq_nmod_mpoly_print_pretty(r, NULL, ctx); printf("\n\n");
-            flint_printf("den ");fq_nmod_mpoly_print_pretty(g, NULL, ctx); printf("\n\n");
-            flint_abort();
+            flint_throw(FLINT_ERROR, "fq_nmod_mpoly_remainder_strongtest FAILED i = %wd\n"
+                    "rem %s\n\n"
+                    "den %s\n\n",
+                    i,
+                    fq_nmod_mpoly_get_str_pretty(r, NULL, ctx),
+                    fq_nmod_mpoly_get_str_pretty(g, NULL, ctx));
         }
     }
 

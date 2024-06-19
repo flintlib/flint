@@ -5,12 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fq_zech.h"
+#include "mpoly.h"
 #include "fq_zech_mpoly.h"
 
 static slong _fq_zech_mpoly_divides_monagan_pearce(
@@ -110,7 +112,7 @@ static slong _fq_zech_mpoly_divides_monagan_pearce(
                 *store++ = x->i;
                 *store++ = x->j;
 
-                if (x->i == -WORD(1))
+                if (x->i == -UWORD(1))
                 {
                     fq_zech_sub(q_coeff + q_len, q_coeff + q_len, coeff2 + x->j, fqctx);
                 }
@@ -345,7 +347,7 @@ int fq_zech_mpoly_divides_monagan_pearce(fq_zech_mpoly_t poly1,
     if (exp_bits <= FLINT_BITS)
     {
         /* mask with high bit of each exponent vector field set */
-        for (i = 0; i < FLINT_BITS/exp_bits; i++)
+        for (i = 0; i < (slong) (FLINT_BITS / exp_bits); i++)
             mask = (mask << exp_bits) + (UWORD(1) << (exp_bits - 1));
 
         if (!mpoly_monomial_divides(expq, exp2, exp3, N, mask))

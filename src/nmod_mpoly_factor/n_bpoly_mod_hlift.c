@@ -5,17 +5,19 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "nmod.h"
+#include "n_poly.h"
 #include "nmod_mpoly_factor.h"
 
 int n_bpoly_mod_hlift2_cubic(
     n_bpoly_t A, /* clobbered (shifted by alpha) */
     n_bpoly_t B0,
     n_bpoly_t B1,
-    mp_limb_t alpha,
+    ulong alpha,
     slong degree_inner, /* required degree in x */
     nmod_t ctx,
     nmod_eval_interp_t E,
@@ -51,7 +53,7 @@ int n_bpoly_mod_hlift2_cubic(
     n_bpoly_mod_taylor_shift_gen0(B1, alpha, ctx);
 
     /* check that A(alpha,x) = B0(alpha,x) * B1(alpha,x) */
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         n_poly_t T;
         n_poly_init(T);
@@ -111,7 +113,7 @@ int n_bpoly_mod_hlift2_cubic(
         nmod_eval_interp_to_coeffs_poly(c, ce, E, ctx);
         n_poly_mod_sub(c, A->coeffs + j, c, ctx);
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
         {
             n_poly_t c_check;
             n_poly_init(c_check);
@@ -138,7 +140,7 @@ int n_bpoly_mod_hlift2_cubic(
         n_poly_mod_rem(u, t, B0->coeffs + 0, ctx);
         n_poly_mod_mul(t, u, B1->coeffs + 0, ctx);
         n_poly_mod_sub(c, c, t, ctx);
-        n_poly_mod_div(v, c, B0->coeffs + 0, ctx);
+        n_poly_mod_divexact(v, c, B0->coeffs + 0, ctx);
 
         if (!n_poly_is_zero(u))
         {
@@ -172,7 +174,7 @@ int n_bpoly_mod_hlift2_cubic(
 
 cleanup:
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success > 0)
     {
         n_bpoly_t tp1, tp2;
@@ -199,7 +201,7 @@ int n_bpoly_mod_hlift2(
     n_bpoly_t A, /* clobbered (shifted by alpha) */
     n_bpoly_t B0,
     n_bpoly_t B1,
-    mp_limb_t alpha,
+    ulong alpha,
     slong degree_inner, /* required degree in x */
     nmod_t ctx,
     n_poly_bpoly_stack_t St)
@@ -227,7 +229,7 @@ int n_bpoly_mod_hlift2(
     n_bpoly_mod_taylor_shift_gen0(B1, alpha, ctx);
 
     /* check that A(alpha,x) = B0(alpha,x) * B1(alpha,x) */
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         n_poly_t T;
         n_poly_init(T);
@@ -273,7 +275,7 @@ int n_bpoly_mod_hlift2(
         n_poly_mod_rem(u, t, B0->coeffs + 0, ctx);
         n_poly_mod_mul(t, u, B1->coeffs + 0, ctx);
         n_poly_mod_sub(c, c, t, ctx);
-        n_poly_mod_div(v, c, B0->coeffs + 0, ctx);
+        n_poly_mod_divexact(v, c, B0->coeffs + 0, ctx);
 
         if (j < B0->length)
             n_poly_mod_add(B0->coeffs + j, B0->coeffs + j, u, ctx);
@@ -304,7 +306,7 @@ int n_bpoly_mod_hlift2(
 
 cleanup:
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success > 0)
     {
         n_bpoly_t tp1, tp2;
@@ -330,7 +332,7 @@ int n_bpoly_mod_hlift_cubic(
     slong r,
     n_bpoly_t A, /* clobbered (shifted by alpha) */
     n_bpoly_struct * B,
-    mp_limb_t alpha,
+    ulong alpha,
     slong degree_inner, /* required degree in x */
     nmod_t ctx,
     nmod_eval_interp_t E,
@@ -342,7 +344,7 @@ int n_bpoly_mod_hlift_cubic(
     n_poly_struct * p, * c, * t, * ce;
     n_poly_struct ** s, * vk, ** Binv, * vek;
     n_bpoly_struct ** Ue, ** Be;
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     n_bpoly_t Acopy;
     n_bpoly_struct * Bcqt;
     int successcqt;
@@ -364,7 +366,7 @@ int n_bpoly_mod_hlift_cubic(
 
     TMP_START;
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     n_bpoly_init(Acopy);
     n_bpoly_set(Acopy, A);
     Bcqt = FLINT_ARRAY_ALLOC(r, n_bpoly_struct);
@@ -404,7 +406,7 @@ int n_bpoly_mod_hlift_cubic(
         n_bpoly_mod_taylor_shift_gen0(B + i, alpha, ctx);
 
     /* check that A(alpha,x) = B0(alpha,x) * B1(alpha,x) * ... */
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         n_poly_t T;
         n_poly_init(T);
@@ -428,7 +430,7 @@ int n_bpoly_mod_hlift_cubic(
     for (k = 0; k < r; k++)
     {
         /* s[k] = (prod_{i!=k} B[i].coeffs[0])^-1 (mod B[k].coeffs[0]) */
-        n_poly_mod_div(t, A->coeffs + 0, B[k].coeffs + 0, ctx);
+        n_poly_mod_divexact(t, A->coeffs + 0, B[k].coeffs + 0, ctx);
         if (!n_poly_mod_invmod(s[k], t, B[k].coeffs + 0, ctx))
         {
             success = -1;
@@ -537,7 +539,7 @@ int n_bpoly_mod_hlift_cubic(
 
 cleanup:
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     FLINT_ASSERT(success == successcqt);
     if (success > 0)
     {
@@ -573,7 +575,7 @@ int n_bpoly_mod_hlift(
     slong r,
     n_bpoly_t A, /* clobbered (shifted by alpha) */
     n_bpoly_struct * B,
-    mp_limb_t alpha,
+    ulong alpha,
     slong degree_inner, /* required degree in x */
     nmod_t ctx,
     n_poly_bpoly_stack_t St)
@@ -632,7 +634,7 @@ int n_bpoly_mod_hlift(
         n_bpoly_mod_taylor_shift_gen0(B + i, alpha, ctx);
 
     /* check that A(alpha,x) = B0(alpha,x) * B1(alpha,x) * ... */
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     {
         n_poly_t T;
         n_poly_init(T);
@@ -761,7 +763,7 @@ int n_bpoly_mod_hlift(
 
 cleanup:
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     if (success > 0)
     {
         n_bpoly_t tp1, tp2;

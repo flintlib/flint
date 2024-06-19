@@ -5,7 +5,7 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
@@ -25,23 +25,23 @@
 
     The behaviour of this function does NOT depend on the initial value of z.
 */
-static mp_limb_t fft_combine_bits_signed(
-    mp_limb_t * z,
-    mp_limb_t ** a, mp_size_t alen,
+static ulong fft_combine_bits_signed(
+    ulong * z,
+    ulong ** a, slong alen,
     flint_bitcnt_t bits,
-    mp_size_t limbs,
-    mp_size_t zn)
+    slong limbs,
+    slong zn)
 {
-    mp_size_t i, zout;
-    mp_limb_t * t;
-    mp_limb_t f;
+    slong i, zout;
+    ulong * t;
+    ulong f;
     TMP_INIT;
 
     FLINT_ASSERT(bits > 1);
 
     TMP_START;
 
-    t = TMP_ARRAY_ALLOC((limbs + 1), mp_limb_t);
+    t = TMP_ARRAY_ALLOC((limbs + 1), ulong);
 
     f = 0;
     zout = 0;
@@ -49,10 +49,10 @@ static mp_limb_t fft_combine_bits_signed(
     for (i = 0; i < alen; i++)
     {
         /* add the i^th coeffs a[i] */
-        mp_limb_t q = (bits*i)/FLINT_BITS;
-        mp_limb_t r = (bits*i)%FLINT_BITS;
-        mp_limb_t s;
-        mp_limb_t halflimb = UWORD(1) << (FLINT_BITS - 1);
+        slong q = (bits*i)/FLINT_BITS;
+        slong r = (bits*i)%FLINT_BITS;
+        ulong s;
+        ulong halflimb = UWORD(1) << (FLINT_BITS - 1);
 
         if (a[i][limbs] | (a[i][limbs - 1] > halflimb))
         {
@@ -77,7 +77,7 @@ static mp_limb_t fft_combine_bits_signed(
 
         if (q < zn)
         {
-            size_t new_zout = FLINT_MIN(zn, q + limbs + 1);
+            slong new_zout = FLINT_MIN(zn, q + limbs + 1);
             FLINT_ASSERT(new_zout >= zout);
 
             while (zout < new_zout)
@@ -108,25 +108,25 @@ static mp_limb_t fft_combine_bits_signed(
     Split into coefficients from |x| evaluated at 2^bits,
     and do a negmod on each coefficient for x < 0.
 */
-static mp_size_t fft_split_bits_fmpz(
-    mp_limb_t ** poly,
+static slong fft_split_bits_fmpz(
+    ulong ** poly,
     const fmpz_t x,
     flint_bitcnt_t bits,
-    mp_size_t limbs)
+    slong limbs)
 {
-    mp_size_t len;
+    slong len;
     int x_is_neg = 0;
 
     if (COEFF_IS_MPZ(*x))
     {
-        mp_size_t s = COEFF_TO_PTR(*x)->_mp_size;
+        slong s = COEFF_TO_PTR(*x)->_mp_size;
         x_is_neg = s < 0;
         len = fft_split_bits(poly, COEFF_TO_PTR(*x)->_mp_d,
                              x_is_neg ? -s : s, bits, limbs);
     }
     else if (!fmpz_is_zero(x))
     {
-        mp_limb_t ux;
+        ulong ux;
         x_is_neg = *x < 0;
         ux = x_is_neg ? -*x : *x;
         len = fft_split_bits(poly, &ux, 1, bits, limbs);
@@ -138,7 +138,7 @@ static mp_size_t fft_split_bits_fmpz(
 
     if (x_is_neg)
     {
-        mp_size_t i;
+        slong i;
         for (i = 0; i < len; i++)
             mpn_negmod_2expp1(poly[i], poly[i], limbs);
     }
@@ -148,14 +148,14 @@ static mp_size_t fft_split_bits_fmpz(
 
 static void fft_combine_bits_fmpz(
     fmpz_t x,
-    mp_limb_t ** poly, slong length,
+    ulong ** poly, slong length,
     flint_bitcnt_t bits,
-    mp_size_t limbs,
-    mp_size_t total_limbs,
+    slong limbs,
+    slong total_limbs,
     int sign)
 {
-    __mpz_struct * mx = _fmpz_promote(x);
-    mp_limb_t * d = FLINT_MPZ_REALLOC(mx, total_limbs);
+    mpz_ptr mx = _fmpz_promote(x);
+    ulong * d = FLINT_MPZ_REALLOC(mx, total_limbs);
     if (sign)
     {
         if (fft_combine_bits_signed(d, poly, length, bits, limbs, total_limbs))
@@ -193,7 +193,7 @@ static void _either_fft_or_mfa(
     slong limbs,
     int use_mfa)
 {
-    ulong trunc2, rs, s, u;
+    ulong trunc2, rs, s;
     slong l;
 
     if (use_mfa)
@@ -207,6 +207,8 @@ static void _either_fft_or_mfa(
         trunc2 = (trunc - 2*n)/n1;
         for (s = 0; s < trunc2; s++)
         {
+            slong u;
+
             rs = n_revbin(s, depth - depth/2 + 1);
             for (u = 0; u < n1; u++)
             {
@@ -300,7 +302,7 @@ void _fmpz_mat_mul_truncate_sqrt2(
         K*N*4*n arrays of length size for B's fft rep
             4*n arrays of length size for C's fft rep
     */
-    temp = FLINT_ARRAY_ALLOC((6 + 4*n*(M*K + K*N + 1))*size, mp_limb_t);
+    temp = FLINT_ARRAY_ALLOC((6 + 4*n*(M*K + K*N + 1))*size, ulong);
     t = temp + 2*size;
     t1 = t + size;
     t2 = t1 + size;
@@ -314,7 +316,7 @@ void _fmpz_mat_mul_truncate_sqrt2(
         K*N arrays of pointers of length 4*n for B's coeffs
           1 array  of pointers of length 4*n for C's coeffs
     */
-    coeffs = FLINT_ARRAY_ALLOC(4*n*(M*K + K*N + 1), mp_limb_t*);
+    coeffs = FLINT_ARRAY_ALLOC(4*n*(M*K + K*N + 1), ulong*);
     Acoeffs = coeffs;
     Bcoeffs = Acoeffs + 4*n*M*K;
     Ccoeffs = Bcoeffs + 4*n*K*N;
@@ -357,7 +359,7 @@ void _fmpz_mat_mul_truncate_sqrt2(
     FLINT_ASSERT(j1 + j2 - 1 <= 4*n);
 
     trunc = j1 + j2 - 1;
-    trunc = FLINT_MAX(trunc, 2*n + 1);
+    trunc = FLINT_MAX(trunc, (ulong) 2*n + 1);
     if (use_mfa)
     {
         sqrt = UWORD(1) << (depth/2);
@@ -390,11 +392,13 @@ void _fmpz_mat_mul_truncate_sqrt2(
     for (i = 0; i < M; i++)
     for (j = 0; j < N; j++)
     {
+        ulong ux;
+
         if (use_mfa)
         {
             ulong trunc2, rs, s, u;
 
-            for (l = 0; l < 2*n; l++)
+            for (l = 0; l < 2 * n; l++)
             {
                 _dot(Ccoeffs[l], Acoeffs + (i*K + 0)*4*n + l, 4*n,
                                  Bcoeffs + (0*N + j)*4*n + l, N*4*n,
@@ -420,21 +424,21 @@ void _fmpz_mat_mul_truncate_sqrt2(
         }
         else
         {
-            for (l = 0; l < trunc; l++)
+            for (ux = 0; ux < trunc; ux++)
             {
-                _dot(Ccoeffs[l], Acoeffs + (i*K + 0)*4*n + l, 4*n,
-                                 Bcoeffs + (0*N + j)*4*n + l, N*4*n,
-                     K, limbs, t, temp);
+                _dot(Ccoeffs[ux], Acoeffs + (i*K + 0)*4*n + ux, 4*n,
+                        Bcoeffs + (0*N + j)*4*n + ux, N*4*n,
+                        K, limbs, t, temp);
             }
 
             ifft_truncate_sqrt2(Ccoeffs, n, w, &t1, &t2, &t3, trunc);
         }
 
         /* pointwise scalar division by 4*n */
-        for (l = 0; l < trunc; l++)
+        for (ux = 0; ux < trunc; ux++)
         {
-            mpn_div_2expmod_2expp1(Ccoeffs[l], Ccoeffs[l], limbs, depth + 2);
-            mpn_normmod_2expp1(Ccoeffs[l], limbs);
+            mpn_div_2expmod_2expp1(Ccoeffs[ux], Ccoeffs[ux], limbs, depth + 2);
+            mpn_normmod_2expp1(Ccoeffs[ux], limbs);
         }
 
         fft_combine_bits_fmpz(fmpz_mat_entry(C, i, j), Ccoeffs,
@@ -589,4 +593,3 @@ void fmpz_mat_mul_fft(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 
     _fmpz_mat_mul_fft(C, A, abits, B, bbits, sign);
 }
-

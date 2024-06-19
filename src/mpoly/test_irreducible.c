@@ -5,13 +5,14 @@
 
     FLINT is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License (LGPL) as published
-    by the Free Software Foundation; either version 2.1 of the License, or
+    by the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
 #include <stdlib.h>
 #include "ulong_extras.h"
 #include "long_extras.h"
+#include "fmpz.h"
 #include "mpoly.h"
 
 typedef struct {
@@ -56,7 +57,7 @@ typedef struct {
 
 typedef point2d_set_struct point2d_set_t[1];
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
 static int point2d_set_is_canonical(const point2d_set_t A)
 {
     slong i;
@@ -146,7 +147,7 @@ static int _is_in_polygon(
     point2d p)
 {
     slong i, a, b, c;
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     int check;
 
     i = nV - 1;
@@ -370,7 +371,7 @@ static void point2d_set_merge(
 
 
 
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
 static int point2d_set_contains(const point2d_set_t A, slong x, slong y)
 {
     slong lo = 0;
@@ -418,7 +419,7 @@ int point2d_set_disjoint(
     slong Blen = B->length;
     slong lo, mid, hi;
     int cmp;
-#ifdef FLINT_WANT_ASSERT
+#if FLINT_WANT_ASSERT
     int check = 1;
 
     for (lo = 0; lo < Blen; lo++)
@@ -634,7 +635,7 @@ static int convex_hull_is_indecomposable(
 static void z_rand_vec_primitive(
     slong * v, slong len,
     flint_rand_t state,
-    mp_limb_t bound)
+    ulong bound)
 {
     slong i, g;
 
@@ -978,7 +979,7 @@ int mpoly_test_irreducible(
     if (Abits > FLINT_BITS || Alen < 2)
         return 0;
 
-    flint_randinit(state);
+    flint_rand_init(state);
 
     uexps = FLINT_ARRAY_ALLOC(n*Alen, slong);
     max_exps = FLINT_ARRAY_ALLOC(n, slong);
@@ -1012,10 +1013,9 @@ int mpoly_test_irreducible(
 
     result = _mpoly_test_irreducible(uexps, n, Alen, n, state, tries);
 
-    flint_randclear(state);
+    flint_rand_clear(state);
     flint_free(max_exps);
     flint_free(uexps);
 
     return result;
 }
-
