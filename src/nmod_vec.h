@@ -369,7 +369,56 @@ do                                                                    \
 
 #endif  // FLINT_BITS == 64
 
-ulong _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_t);
+/* dot functions: specific algorithms */
+ulong _nmod_vec_dot_pow2(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod);
+ulong _nmod_vec_dot1(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod);
+ulong _nmod_vec_dot2_half(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod);
+ulong _nmod_vec_dot2(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod);
+ulong _nmod_vec_dot3_acc(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod);
+ulong _nmod_vec_dot3(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod);
+
+#if FLINT_BITS == 64
+ulong _nmod_vec_dot2_split(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, ulong pow2_precomp);
+#endif  // FLINT_BITS == 64
+
+/* general dot functions */
+
+NMOD_VEC_INLINE ulong _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_t params)
+{
+    if (params.method == _DOT1)
+        return _nmod_vec_dot1(vec1, vec2, len, mod);
+
+#if FLINT_BITS == 64
+    if (params.method == _DOT2_SPLIT)
+        return _nmod_vec_dot2_split(vec1, vec2, len, mod, params.pow2_precomp);
+#endif // FLINT_BITS == 64
+
+    if (params.method == _DOT2)
+        return _nmod_vec_dot2(vec1, vec2, len, mod);
+
+    if (params.method == _DOT3_ACC)
+        return _nmod_vec_dot3_acc(vec1, vec2, len, mod);
+
+    if (params.method == _DOT3)
+        return _nmod_vec_dot3(vec1, vec2, len, mod);
+
+    if (params.method == _DOT2_HALF)
+        return _nmod_vec_dot2_half(vec1, vec2, len, mod);
+
+    if (params.method == _DOT_POW2)
+    {
+#if defined(__AVX2__)
+        if (mod.n < (UWORD(1) << (FLINT_BITS / 2)))
+            return _nmod_vec_dot1(vec1, vec2, len, mod);
+        else  // make sure not to use avx 32-bit mul
+#endif // defined(__AVX2__)
+            return _nmod_vec_dot_pow2(vec1, vec2, len, mod);
+    }
+
+    else  // params.method == _DOT0
+        return UWORD(0);
+}
+
 ulong _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_t);
 
 ulong _nmod_vec_dot_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod, dot_params_t);
