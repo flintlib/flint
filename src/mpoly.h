@@ -1363,9 +1363,9 @@ typedef struct
 
 typedef mpoly_gcd_info_struct mpoly_gcd_info_t[1];
 
-void mpoly_gcd_info_init(mpoly_gcd_info_t I, slong nvars);
+void mpoly_gcd_info_init(mpoly_gcd_info_t Iv, slong nvars);
 
-void mpoly_gcd_info_clear(mpoly_gcd_info_t I);
+void mpoly_gcd_info_clear(mpoly_gcd_info_t Iv);
 
 void mpoly_gcd_info_limits(ulong * Amax_exp, ulong * Amin_exp,
                        slong * Amax_exp_count, slong * Amin_exp_count,
@@ -1378,25 +1378,25 @@ void mpoly_gcd_info_stride(ulong * strides,
                              const ulong * Bmax_exp, const ulong * Bmin_exp,
                                                        const mpoly_ctx_t mctx);
 
-void mpoly_gcd_info_set_perm(mpoly_gcd_info_t I,
+void mpoly_gcd_info_set_perm(mpoly_gcd_info_t Iv,
                          slong Alength, slong Blength, const mpoly_ctx_t mctx);
 
-slong mpoly_gcd_info_get_brown_upper_limit(const mpoly_gcd_info_t I,
+slong mpoly_gcd_info_get_brown_upper_limit(const mpoly_gcd_info_t Iv,
                                                        slong var, slong bound);
 
-void mpoly_gcd_info_measure_hensel(mpoly_gcd_info_t I,
+void mpoly_gcd_info_measure_hensel(mpoly_gcd_info_t Iv,
                          slong Alength, slong Blength, const mpoly_ctx_t mctx);
 
-void mpoly_gcd_info_measure_brown(mpoly_gcd_info_t I,
+void mpoly_gcd_info_measure_brown(mpoly_gcd_info_t Iv,
                          slong Alength, slong Blength, const mpoly_ctx_t mctx);
 
-void mpoly_gcd_info_measure_bma(mpoly_gcd_info_t I,
+void mpoly_gcd_info_measure_bma(mpoly_gcd_info_t Iv,
                          slong Alength, slong Blength, const mpoly_ctx_t mctx);
 
-void mpoly_gcd_info_measure_zippel(mpoly_gcd_info_t I,
+void mpoly_gcd_info_measure_zippel(mpoly_gcd_info_t Iv,
                          slong Alength, slong Blength, const mpoly_ctx_t mctx);
 
-void mpoly_gcd_info_measure_zippel2(mpoly_gcd_info_t I,
+void mpoly_gcd_info_measure_zippel2(mpoly_gcd_info_t Iv,
                          slong Alength, slong Blength, const mpoly_ctx_t mctx);
 
 int mpoly_monomial_cofactors(fmpz * Abarexps, fmpz * Bbarexps,

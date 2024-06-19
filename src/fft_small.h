@@ -242,10 +242,10 @@ FLINT_INLINE double sd_fft_ctx_get_fft_index(double* d, ulong i)
 }
 
 /* sd_fft.c */
-void sd_fft_trunc(const sd_fft_lctx_t Q, ulong I, ulong S, ulong k, ulong j, ulong itrunc, ulong otrunc);
+void sd_fft_trunc(const sd_fft_lctx_t Q, ulong Iv, ulong S, ulong k, ulong j, ulong itrunc, ulong otrunc);
 
 /* sd_ifft.c */
-void sd_ifft_trunc(const sd_fft_lctx_t Q, ulong I, ulong S, ulong k, ulong j, ulong z, ulong n, int f);
+void sd_ifft_trunc(const sd_fft_lctx_t Q, ulong Iv, ulong S, ulong k, ulong j, ulong z, ulong n, int f);
 
 /* sd_fft_ctx.c */
 void sd_fft_ctx_clear(sd_fft_ctx_t Q);
@@ -428,7 +428,7 @@ typedef struct {
 
 typedef mpn_ctx_struct mpn_ctx_t[1];
 
-void _convert_block(ulong* Xs, sd_fft_ctx_struct* Rffts, double* d, ulong dstride, ulong np, ulong I);
+void _convert_block(ulong* Xs, sd_fft_ctx_struct* Rffts, double* d, ulong dstride, ulong np, ulong Iv);
 ulong flint_mpn_nbits(const ulong* a, ulong an);
 int flint_mpn_cmp_ui_2exp(const ulong* a, ulong an, ulong b, ulong e);
 unsigned char flint_mpn_add_inplace_c(ulong* z, ulong zn, ulong* a, ulong an, unsigned char cf);
