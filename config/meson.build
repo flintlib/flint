@@ -192,7 +192,312 @@ if not meson.is_cross_build() and cc.get_id() in ['gcc', 'clang']
   config_guess_result = run_command('./config.guess', check: true)
   target_triple = config_guess_result.stdout().strip()
   exact_cpu = target_triple.split('-')[0]
-  message('EXACT CPU:', exact_cpu)
+else
+  # This could be 'aarch64' or 'x86_64'
+  # https://mesonbuild.com/Reference-tables.html#cpu-families
+  exact_cpu = host_machine.cpu_family()
+endif
+
+message('EXACT CPU:', exact_cpu)
+
+################################################################################
+# architecture specifics
+################################################################################
+
+gcc_cflags = '-O3 -pedantic -std=c11'
+gcc_warnings = '-Werror=implicit-function-declaration -Wall -Wno-stringop-overread -Wno-stringop-overflow'
+
+# We only try to provide specifics for those systems that currently supports
+# our assembly routines. If more combinations are wished for than what is
+# specified, please open up an issue at
+# <https://github.com/flintlib/flint/issues/> and we will consider it.
+#
+# For these systems we aim to provide:
+#
+#   gcc_cflags     flags for GCC-compatible compilers
+#
+#   asm_path       directory for assembly, relative to src/mpn_extras
+#   param_path     directory for flint-mparam.h, relative to src/mpn_extras
+#
+# For x86_64 systems, we can also set:
+#
+#   have_avx512    system has AVX512F and AVX512DQ (we assume this implies have_avx2)
+#   have_avx2      system has AVX2 and FMA
+
+# x86_64 CPUs that have AVX2:
+X86_64_ADX_CPU_NAMES = [
+  'zen1',
+  'zen2',
+  'zen3',
+  'zen4',
+  'coreibwl',
+  'broadwell',
+  'skylake',
+  'skylake_server',
+  'cannonlake',
+  'kabylake',
+  'icelake',
+  'icelake_server',
+  'rocketlake',
+  'tigerlake',
+  'alderlake',
+  'raptorlake',
+  'knightslanding',
+  'sapphirerapids',
+  'cometlake',
+]
+
+if host_machine.cpu_family() == 'aarch64'
+
+  gcc_cflags  =  gcc_cflags
+  gcc_cflags_optlist = 'arch tune'
+  asm_path = 'arm64'
+  param_path = 'arm64'
+  flint_cv_have_fft_small_arm_i = 'yes'
+
+  # NOTE: Cortex values where taken from
+  # https://developer.arm.com/Processors/Cortex-XXX
+
+  if exact_cpu in ['armcortexa35', 'armcortexa35neon']
+    gcc_cflags_arch = '-march=armv8-a'
+    gcc_cflags_tune = '-mtune=cortex-a35'
+
+  elif exact_cpu in ['armcortexa53', 'armcortexa53neon']
+    gcc_cflags_arch = '-march=armv8-a'
+    gcc_cflags_tune = '-mtune=cortex-a53'
+
+  elif exact_cpu in ['armcortexa55', 'armcortexa55neon']
+    gcc_cflags_arch = '-march=armv8.2-a'
+    gcc_cflags_tune = '-mtune=cortex-a55'
+
+  elif exact_cpu in ['armcortexa57', 'armcortexa57neon']
+    gcc_cflags_arch = '-march=armv8-a'
+    gcc_cflags_tune = '-mtune=cortex-a57'
+
+  elif exact_cpu in ['armcortexa72', 'armcortexa72neon']
+    gcc_cflags_arch = '-march=armv8-a'
+    gcc_cflags_tune = '-mtune=cortex-a72'
+
+  elif exact_cpu in ['armcortexa73', 'armcortexa73neon']
+    gcc_cflags_arch = '-march=armv8-a'
+    gcc_cflags_tune = '-mtune=cortex-a73'
+
+  elif exact_cpu in ['armcortexa75', 'armcortexa75neon']
+    gcc_cflags_arch = '-march=armv8.2-a'
+    gcc_cflags_tune = '-mtune=cortex-a75'
+
+  elif exact_cpu in ['armcortexa76', 'armcortexa76neon']
+    gcc_cflags_arch = '-march=armv8.2-a'
+    gcc_cflags_tune = '-mtune=cortex-a76'
+
+  elif exact_cpu in ['armcortexa77', 'armcortexa77neon']
+    gcc_cflags_arch = '-march=armv8.2-a'
+    gcc_cflags_tune = '-mtune=cortex-a77'
+
+  elif exact_cpu in ['armcortexa65', 'armcortexa65neon']
+    gcc_cflags_arch = '-march=armv8.2-a'
+    gcc_cflags_tune = '-mtune=cortex-a65'
+
+  elif exact_cpu in ['armcortexa34', 'armcortexa34neon']
+    gcc_cflags_arch = '-march=armv8-a'
+    gcc_cflags_tune = '-mtune=cortex-a34'
+
+  elif exact_cpu in ['armcortexa78', 'armcortexa78neon']
+    gcc_cflags_arch = '-march=armv8.2-a'
+    gcc_cflags_tune = '-mtune=cortex-a78'
+
+  elif exact_cpu in ['armexynosm1']
+    gcc_cflags_arch = '-march=armv8-a'
+    gcc_cflags_tune = '-mtune=exynos-m1'
+
+  elif exact_cpu in ['armthunderx']
+    gcc_cflags_arch = '-march=armv8-a'
+    gcc_cflags_tune = '-mtune=thunderx'
+
+  elif exact_cpu in ['armxgene1']
+    gcc_cflags_arch = '-march=armv8-a'
+    gcc_cflags_tune = '-mtune=xgene1'
+
+  elif exact_cpu.startswith('applem1')
+    gcc_cflags_arch = '-march=armv8.5-a'
+    gcc_cflags_tune = ''
+
+  elif exact_cpu.startswith('applem2')
+    gcc_cflags_arch = '-march=armv8.6-a'
+    gcc_cflags_tune = ''
+
+  elif exact_cpu.startswith('applem3')
+    gcc_cflags_arch = '-march=armv8.6-a'
+    gcc_cflags_tune = ''
+
+  elif exact_cpu.startswith('aarch64') or exact_cpu.startswith('armv8')
+    gcc_cflags_arch = '-march=armv8-a'
+    gcc_cflags_tune = ''
+
+  else
+    error_msg = '''
+    Error in deciding flags for @0@.
+    Please report at <https://github.com/flintlib/flint/issues/>
+    '''
+    error(error_msg.format(exact_cpu))
+
+  endif
+
+elif host_machine.cpu_family() == 'x86_64' and exact_cpu in X86_64_ADX_CPU_NAMES
+
+  gcc_cflags = gcc_cflags
+  gcc_cflags_optlist = 'arch'
+  asm_path = 'x86_64/broadwell'
+  param_path = 'x86_64/broadwell'
+
+  have_avx512 = 'no'
+  have_avx2 = 'yes'
+  flint_cv_have_fft_small_x86_i = 'yes'
+
+  if exact_cpu == 'zen'
+    gcc_cflags_arch = '-march=znver1'
+    param_path = 'x86_64/zen3'
+
+  elif exact_cpu == 'zen2'
+    gcc_cflags_arch = '-march=znver2'
+    param_path = 'x86_64/zen3'
+
+  elif exact_cpu == 'zen3'
+    gcc_cflags_arch = '-march=znver3'
+    param_path = 'x86_64/zen3'
+
+  elif exact_cpu == 'zen4'
+    gcc_cflags_arch = '-march=znver4'
+    param_path = 'x86_64/zen3'
+    have_avx512 = 'yes'
+
+  elif exact_cpu in ['coreibwl', 'broadwell']
+    gcc_cflags_arch = '-march=broadwell'
+    param_path = 'x86_64/skylake'
+
+  elif exact_cpu == 'skylake'
+    gcc_cflags_arch = '-march=skylake'
+    param_path = 'x86_64/skylake'
+
+  elif exact_cpu == 'skylake_server'
+    gcc_cflags_arch = '-march=skylake-avx512'
+    param_path = 'x86_64/skylake'
+    have_avx512 = 'yes'
+
+  elif exact_cpu == 'cannonlake'
+    gcc_cflags_arch = '-march=cannonlake'
+    param_path = 'x86_64/skylake'
+    have_avx512 = 'yes'
+
+  elif exact_cpu == 'kabylake'
+    gcc_cflags_arch = '-march=skylake'
+    param_path = 'x86_64/skylake'
+
+  elif exact_cpu == 'icelake'
+    gcc_cflags_arch = '-march=icelake-client'
+    param_path = 'x86_64/skylake'
+    have_avx512 = 'yes'
+
+  elif exact_cpu == 'icelake_server'
+    gcc_cflags_arch = '-march=icelake-server'
+    param_path = 'x86_64/skylake'
+    have_avx512 = 'yes'
+
+  elif exact_cpu == 'rocketlake'
+    gcc_cflags_arch = '-march=rocketlake'
+    param_path = 'x86_64/skylake'
+    have_avx512 = 'yes'
+
+  elif exact_cpu == 'tigerlake'
+    gcc_cflags_arch = '-march=tigerlake'
+    param_path = 'x86_64/skylake'
+    have_avx512 = 'yes'
+
+  elif exact_cpu == 'alderlake'
+    gcc_cflags_arch = '-march=alderlake'
+    param_path = 'x86_64/skylake'
+
+  elif exact_cpu == 'raptorlake'
+    gcc_cflags_arch = '-march=alderlake'
+    param_path = 'x86_64/skylake'
+
+  elif exact_cpu == 'knightslanding'
+    gcc_cflags_arch = '-march=knl'
+    param_path = 'x86_64/skylake'
+
+  elif exact_cpu == 'sapphirerapids'
+    gcc_cflags_arch = '-march=sapphirerapids'
+    param_path = 'x86_64/skylake'
+    have_avx512 = 'yes'
+
+  elif exact_cpu == 'cometlake'
+    gcc_cflags_arch = '-march=kabylake'
+    param_path = 'x86_64/skylake'
+
+  else
+    error_msg = '''
+    Error in deciding flags for @0@.
+    Please report at <https://github.com/flintlib/flint/issues/>
+    '''
+    error(error_msg.format(exact_cpu))
+
+  endif
+
+  # Disable assembly on Windows
+  if host_machine.system() == 'windows'
+    flint_nonstd_abi = 'yes'
+    asm_path = ''
+    param_path = 'x86_64'
+  endif
+
+elif host_machine.cpu_family() == 'x86_64'
+
+  # NOTE: We do not care if the user specifies noavx!
+  gcc_cflags = '$gcc_cflags'
+  gcc_cflags_optlist = 'arch'
+  asm_path = ''
+  param_path = 'x86_64'
+
+  if exact_cpu in ['coreiibr', 'ivybridge']
+    gcc_cflags_arch = '-march=ivybridge'
+
+  elif exact_cpu in ['coreihwl', 'haswell']
+    gcc_cflags_arch = '-march=haswell'
+
+  elif exact_cpu in ['piledriver', 'bd2']
+    gcc_cflags_arch = '-march=bdver2'
+
+  elif exact_cpu in ['steamroller', 'bd3']
+    gcc_cflags_arch = '-march=bdver3'
+
+  elif exact_cpu in ['excavator', 'bd4']
+    gcc_cflags_arch = '-march=bdver4'
+    have_avx2 = 'yes'
+
+  elif exact_cpu in ['x86_64v3']
+    gcc_cflags_arch = '-march=x86-64-v3'
+    have_avx2 = 'yes'
+
+  elif exact_cpu in ['x86_64v4']
+    gcc_cflags_arch = '-march=x86-64-v4'
+    have_avx512 = 'yes'
+
+  endif
+
+  if have_avx512 == 'yes'
+    have_avx2 = 'yes'
+  endif
+
+  if have_avx2 == 'yes'
+    flint_cv_have_fft_small_x86_i = 'yes'
+  endif
+
+else
+  # Generic case for unrecognised CPU
+  asm_path = ''
+  param_path = 'generic'
+  gcc_cflags = gcc_cflags
+
 endif
 
 # -----------------------------------------------------------------------------
