@@ -633,7 +633,7 @@ typedef fq_zech_mpoly_pfrac_struct fq_zech_mpoly_pfrac_t[1];
 
 
 int fq_zech_mpoly_pfrac_init(
-    fq_zech_mpoly_pfrac_t I,
+    fq_zech_mpoly_pfrac_t Iv,
     flint_bitcnt_t bits,
     slong l, slong r,
     const fq_zech_mpoly_struct * betas,
@@ -641,14 +641,14 @@ int fq_zech_mpoly_pfrac_init(
     const fq_zech_mpoly_ctx_t ctx);
 
 void fq_zech_mpoly_pfrac_clear(
-    fq_zech_mpoly_pfrac_t I,
+    fq_zech_mpoly_pfrac_t Iv,
     const fq_zech_mpoly_ctx_t ctx);
 
 int fq_zech_mpoly_pfrac(
     slong r,
     fq_zech_mpoly_t t,
     const slong * deg,
-    fq_zech_mpoly_pfrac_t I,
+    fq_zech_mpoly_pfrac_t Iv,
     const fq_zech_mpoly_ctx_t ctx);
 
 int fq_zech_mpoly_hlift(

@@ -409,7 +409,7 @@ typedef fq_nmod_mpoly_pfrac_struct fq_nmod_mpoly_pfrac_t[1];
 
 
 int fq_nmod_mpoly_pfrac_init(
-    fq_nmod_mpoly_pfrac_t I,
+    fq_nmod_mpoly_pfrac_t Iv,
     flint_bitcnt_t bits,
     slong l, slong r,
     const fq_nmod_mpoly_struct * betas,
@@ -417,14 +417,14 @@ int fq_nmod_mpoly_pfrac_init(
     const fq_nmod_mpoly_ctx_t ctx);
 
 void fq_nmod_mpoly_pfrac_clear(
-    fq_nmod_mpoly_pfrac_t I,
+    fq_nmod_mpoly_pfrac_t Iv,
     const fq_nmod_mpoly_ctx_t ctx);
 
 int fq_nmod_mpoly_pfrac(
     slong r,
     fq_nmod_mpoly_t t,
     const slong * deg,
-    fq_nmod_mpoly_pfrac_t I,
+    fq_nmod_mpoly_pfrac_t Iv,
     const fq_nmod_mpoly_ctx_t ctx);
 
 int fq_nmod_mpoly_hlift(

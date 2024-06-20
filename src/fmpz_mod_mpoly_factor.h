@@ -1201,15 +1201,15 @@ typedef struct {
 typedef fmpz_mod_mpoly_pfrac_struct fmpz_mod_mpoly_pfrac_t[1];
 
 
-int fmpz_mod_mpoly_pfrac_init(fmpz_mod_mpoly_pfrac_t I,
+int fmpz_mod_mpoly_pfrac_init(fmpz_mod_mpoly_pfrac_t Iv,
     flint_bitcnt_t bits, slong l, slong r, const fmpz_mod_mpoly_struct * betas,
                           const fmpz * alpha, const fmpz_mod_mpoly_ctx_t ctx);
 
-void fmpz_mod_mpoly_pfrac_clear(fmpz_mod_mpoly_pfrac_t I,
+void fmpz_mod_mpoly_pfrac_clear(fmpz_mod_mpoly_pfrac_t Iv,
                                               const fmpz_mod_mpoly_ctx_t ctx);
 
 int fmpz_mod_mpoly_pfrac(slong r, fmpz_mod_mpoly_t t, const slong * deg,
-                     fmpz_mod_mpoly_pfrac_t I, const fmpz_mod_mpoly_ctx_t ctx);
+                     fmpz_mod_mpoly_pfrac_t Iv, const fmpz_mod_mpoly_ctx_t ctx);
 
 int fmpz_mod_mpoly_hlift(slong m, fmpz_mod_mpoly_struct * f, slong r,
             const fmpz * alpha, const fmpz_mod_mpoly_t A, const slong * degs,
@@ -1288,7 +1288,7 @@ int fmpz_mod_mpolyn_gcd_brown_smprime(
     fmpz_mod_mpolyn_t B,
     slong var,
     const fmpz_mod_mpoly_ctx_t ctx,
-    const mpoly_gcd_info_t I,
+    const mpoly_gcd_info_t Iv,
     fmpz_mod_poly_polyun_mpolyn_stack_t St);
 
 int fmpz_mod_mpolyl_gcdp_zippel(

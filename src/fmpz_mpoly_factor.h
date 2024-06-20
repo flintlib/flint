@@ -242,11 +242,11 @@ void fmpz_mpoly_from_mpolyl_perm_inflate(fmpz_mpoly_t A,
 
 int fmpz_mpolyl_gcd_brown(fmpz_mpoly_t G,
         fmpz_mpoly_t Abar, fmpz_mpoly_t Bbar, fmpz_mpoly_t A, fmpz_mpoly_t B,
-                         const fmpz_mpoly_ctx_t ctx, const mpoly_gcd_info_t I);
+                         const fmpz_mpoly_ctx_t ctx, const mpoly_gcd_info_t Iv);
 
 int fmpz_mpolyl_gcd_brown_threaded_pool(fmpz_mpoly_t G,
         fmpz_mpoly_t Abar, fmpz_mpoly_t Bbar, fmpz_mpoly_t A, fmpz_mpoly_t B,
-                         const fmpz_mpoly_ctx_t ctx, const mpoly_gcd_info_t I,
+                         const fmpz_mpoly_ctx_t ctx, const mpoly_gcd_info_t Iv,
                         const thread_pool_handle * handles, slong num_handles);
 
 int fmpz_mpolyl_gcd_zippel(fmpz_mpoly_t G, fmpz_mpoly_t Abar,
@@ -284,15 +284,15 @@ typedef struct {
 
 typedef fmpz_poly_pfrac_struct fmpz_poly_pfrac_t[1];
 
-void fmpz_poly_pfrac_init(fmpz_poly_pfrac_t I);
+void fmpz_poly_pfrac_init(fmpz_poly_pfrac_t Iv);
 
-void fmpz_poly_pfrac_clear(fmpz_poly_pfrac_t I);
+void fmpz_poly_pfrac_clear(fmpz_poly_pfrac_t Iv);
 
-int fmpz_poly_pfrac_precompute(fmpz_poly_pfrac_t I,
+int fmpz_poly_pfrac_precompute(fmpz_poly_pfrac_t Iv,
                                           const fmpz_poly_struct * b, slong r);
 
 int fmpz_poly_pfrac_precomp(fmpz_poly_struct * c,
-                                     const fmpz_poly_t A, fmpz_poly_pfrac_t I);
+                                     const fmpz_poly_t A, fmpz_poly_pfrac_t Iv);
 
 typedef struct {
     flint_bitcnt_t bits;
@@ -316,15 +316,15 @@ typedef struct {
 
 typedef fmpz_mpoly_pfrac_struct fmpz_mpoly_pfrac_t[1];
 
-int fmpz_mpoly_pfrac_init(fmpz_mpoly_pfrac_t I, flint_bitcnt_t bits,
+int fmpz_mpoly_pfrac_init(fmpz_mpoly_pfrac_t Iv, flint_bitcnt_t bits,
                             slong r, slong w, const fmpz_mpoly_struct * betas,
                                const fmpz * alpha, const fmpz_mpoly_ctx_t ctx);
 
-void fmpz_mpoly_pfrac_clear(fmpz_mpoly_pfrac_t I,
+void fmpz_mpoly_pfrac_clear(fmpz_mpoly_pfrac_t Iv,
                                                    const fmpz_mpoly_ctx_t ctx);
 
 int fmpz_mpoly_pfrac(slong l, fmpz_mpoly_t t, const slong * degs,
-                             fmpz_mpoly_pfrac_t I, const fmpz_mpoly_ctx_t ctx);
+                             fmpz_mpoly_pfrac_t Iv, const fmpz_mpoly_ctx_t ctx);
 
 int fmpz_mpoly_hlift(slong m, fmpz_mpoly_struct * f, slong r,
                 const fmpz * alpha, const fmpz_mpoly_t A, const slong * degs,

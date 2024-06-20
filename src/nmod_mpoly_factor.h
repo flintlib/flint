@@ -355,15 +355,15 @@ typedef struct {
 typedef nmod_mpoly_pfrac_struct nmod_mpoly_pfrac_t[1];
 
 
-int nmod_mpoly_pfrac_init(nmod_mpoly_pfrac_t I, flint_bitcnt_t bits,
+int nmod_mpoly_pfrac_init(nmod_mpoly_pfrac_t Iv, flint_bitcnt_t bits,
                          slong l, slong r, const nmod_mpoly_struct * betas,
                           const ulong * alpha, const nmod_mpoly_ctx_t ctx);
 
-void nmod_mpoly_pfrac_clear(nmod_mpoly_pfrac_t I,
+void nmod_mpoly_pfrac_clear(nmod_mpoly_pfrac_t Iv,
                                                    const nmod_mpoly_ctx_t ctx);
 
 int nmod_mpoly_pfrac(slong r, nmod_mpoly_t t, const slong * deg,
-                             nmod_mpoly_pfrac_t I, const nmod_mpoly_ctx_t ctx);
+                             nmod_mpoly_pfrac_t Iv, const nmod_mpoly_ctx_t ctx);
 
 int nmod_mpoly_hlift(slong m, nmod_mpoly_struct * f, slong r,
             const ulong * alpha, const nmod_mpoly_t A, const slong * degs,

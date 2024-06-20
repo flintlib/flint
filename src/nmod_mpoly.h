@@ -1288,13 +1288,13 @@ int nmod_mpolyn_gcd_brown_smprime_bivar(
 int nmod_mpolyn_gcd_brown_smprime(nmod_mpolyn_t G,
         nmod_mpolyn_t Abar, nmod_mpolyn_t Bbar,
         nmod_mpolyn_t A, nmod_mpolyn_t B, slong var,
-        const nmod_mpoly_ctx_t ctx, const mpoly_gcd_info_t I,
+        const nmod_mpoly_ctx_t ctx, const mpoly_gcd_info_t Iv,
         nmod_poly_stack_t Sp);
 
 int nmod_mpolyn_gcd_brown_smprime_threaded_pool(nmod_mpolyn_t G,
         nmod_mpolyn_t Abar, nmod_mpolyn_t Bbar,
         nmod_mpolyn_t A, nmod_mpolyn_t B, slong var,
-        const nmod_mpoly_ctx_t ctx, const mpoly_gcd_info_t I,
+        const nmod_mpoly_ctx_t ctx, const mpoly_gcd_info_t Iv,
         const thread_pool_handle * handles, slong num_workers);
 
 int nmod_mpolyn_gcd_brown_lgprime(nmod_mpolyn_t G,
