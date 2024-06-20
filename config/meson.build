@@ -189,7 +189,7 @@ endif
 # project build option.
 
 if not meson.is_cross_build() and cc.get_id() in ['gcc', 'clang']
-  config_guess_result = run_command('../config/config.guess', check: true)
+  config_guess_result = run_command('./config.guess', check: true)
   target_triple = config_guess_result.stdout().strip()
   exact_cpu = target_triple.split('-')[0]
   message('EXACT CPU:', exact_cpu)
