@@ -27,7 +27,7 @@ add_project_arguments(
   language: 'c',
 )
 
-subdir('detection')
+subdir('config')
 subdir('src')
 
 if have_assembly
