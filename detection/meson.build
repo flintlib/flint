@@ -177,6 +177,25 @@ if gmp_internals_opt.allowed()
 endif
 
 # -----------------------------------------------------------------------------
+#    CPU detection
+# -----------------------------------------------------------------------------
+
+# We check here for gcc or clang because the config.guess script probably does
+# not work for other compilers. This check will also allow MinGW and cygwin on
+# Windows but not MSVC.
+
+# The config.guess script inspects the current CPU so should not be used for a
+# cross build. Maybe there should be a way to configure the exact CPU as a
+# project build option.
+
+if not meson.is_cross_build() and cc.get_id() in ['gcc', 'clang']
+  config_guess_result = run_command('../config/config.guess', check: true)
+  target_triple = config_guess_result.stdout().strip()
+  exact_cpu = target_triple.split('-')[0]
+  message('EXACT CPU:', exact_cpu)
+endif
+
+# -----------------------------------------------------------------------------
 #    fft_small
 # -----------------------------------------------------------------------------
 
