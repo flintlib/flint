@@ -38,12 +38,9 @@ _nmod_poly_mul_classical(nn_ptr res, nn_srcptr poly1,
 
     squaring = (poly1 == poly2 && len1 == len2);
 
-    // TODO could what is below make more direct use of nmod_vec_dot?
-    log_len = FLINT_BIT_COUNT(len2);
-    bits = FLINT_BITS - (slong) mod.norm;
-    bits = 2 * bits + log_len;
+    const dot_params_t params = _nmod_vec_dot_params(FLINT_MIN(len1, len2), mod);
 
-    if (bits <= FLINT_BITS)
+    if (params.method <= _DOT1)
     {
         flint_mpn_zero(res, len1 + len2 - 1);
 
@@ -82,12 +79,6 @@ _nmod_poly_mul_classical(nn_ptr res, nn_srcptr poly1,
         res[len1 + len2 - 2] = nmod_mul(poly1[len1 - 1], poly2[len2 - 1], mod);
         return;
     }
-
-    dot_params_t params = {_DOT2, 0};
-    if (bits <= 2 * FLINT_BITS)
-        params.method = _DOT2;
-    else
-        params.method = _DOT3;
 
     if (squaring)
     {

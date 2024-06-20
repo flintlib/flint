@@ -172,7 +172,6 @@ void time_dot_poly_inv_series(ulong len, ulong n, flint_rand_t state)
     _nmod_vec_clear(res);
 }
 
-
 void time_dot_poly_exp_series(ulong len, ulong n, flint_rand_t state)
 {
     if (len > 10000 || n == (UWORD(1) << 63))
@@ -203,7 +202,6 @@ void time_dot_poly_exp_series(ulong len, ulong n, flint_rand_t state)
     gr_poly_clear(p, ctx);
     gr_poly_clear(res, ctx);
 }
-
 
 /*-------------------------*/
 /* indirect: mat           */

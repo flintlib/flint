@@ -185,6 +185,15 @@ ulong nmod_addmul(ulong a, ulong b, ulong c, nmod_t mod)
        (r) = nmod_addmul((r), (a), (b), (mod)); \
     } while (0)
 
+// TODO doc  a*b + c*d
+NMOD_INLINE
+ulong nmod_fmma(ulong a, ulong b, ulong c, ulong d, nmod_t mod)
+{
+    a = nmod_mul(a, b, mod);
+    NMOD_ADDMUL(a, c, d, mod);
+    return a;
+}
+
 NMOD_INLINE
 ulong nmod_inv(ulong a, nmod_t mod)
 {
