@@ -395,6 +395,7 @@ ulong _nmod_vec_dot2_split_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t
 
 NMOD_VEC_INLINE ulong _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_t params)
 {
+    // FIXME handle short products
     if (len <= 2 && params.method > _DOT1)
     {
         if (len == 2)

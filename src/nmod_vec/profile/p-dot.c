@@ -376,8 +376,8 @@ int main(int argc, char ** argv)
     const ulong bits[] = {0, 12, 28, 30, 31, 32, 40, 50, 60, 61, 62, 63, 64};
 
     // vector lengths
-    const slong nlens = 14;
-    const ulong lens[] = {1, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 100000, 1000000};
+    const slong nlens = 20;
+    const ulong lens[] = {1, 2, 3, 4, 5, 7, 10, 15, 25, 35, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 100000, 1000000};
 
     // bench functions
     const slong nfuns = 12;

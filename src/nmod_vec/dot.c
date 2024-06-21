@@ -21,14 +21,33 @@
 
 dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
 {
-    ulong t2, t1, t0, u1, u0;
+    // TODO
+    //if (len <= 2)
+    //{
+    //    if (len == 2)
+    //    if (len == 1)
 
-    dot_params_t params = {_DOT0, UWORD(0)};
+    //    // len == 0
+    //    return (dot_params_t){_DOT0, UWORD(0)};
+    //}
 
     if ((mod.n & (mod.n - 1)) == 0)
-        params.method = _DOT_POW2;
+        return (dot_params_t) {_DOT_POW2, UWORD(0)};
+
+    // TODO refine
+    if (len <= 16)
+    {
+        if (mod.n <= UWORD(1) << (FLINT_BITS / 2 - 2))
+            return (dot_params_t) {_DOT1, UWORD(0)};
+        if (mod.n <= UWORD(1) << (FLINT_BITS - 2))
+            return (dot_params_t) {_DOT2, UWORD(0)};
+        else
+            return (dot_params_t) {_DOT3, UWORD(0)};
+    }
+
     else
     {
+        ulong t2, t1, t0, u1, u0;
         umul_ppmm(t1, t0, mod.n - 1, mod.n - 1);
         umul_ppmm(t2, t1, t1, len);
         umul_ppmm(u1, u0, t0, len);
@@ -44,9 +63,9 @@ dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
 #else
             if (mod.n <= UWORD(1518500250))
 #endif
-                params.method = _DOT3_ACC;
+                return (dot_params_t) {_DOT3_ACC, UWORD(0)};
             else
-                params.method = _DOT3;
+                return (dot_params_t) {_DOT3, UWORD(0)};
         }
 
         else if (t1 != 0) // two limbs
@@ -55,27 +74,26 @@ dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
             if (mod.n <= UWORD(1515531528) && len <= WORD(380368697))
             {
                 // see end of file for these constraints; they imply 2 limbs
-                params.method = _DOT2_SPLIT;
-                NMOD_RED(params.pow2_precomp, (UWORD(1) << DOT_SPLIT_BITS), mod);
+                ulong pow2_precomp;
+                NMOD_RED(pow2_precomp, (UWORD(1) << DOT_SPLIT_BITS), mod);
+                return (dot_params_t) {_DOT2_SPLIT, pow2_precomp};
             }
             else
 #endif
             if (mod.n <= (UWORD(1) << (FLINT_BITS / 2)))
-                params.method = _DOT2_HALF;
+                return (dot_params_t) {_DOT2_HALF, UWORD(0)};
             else
-                params.method = _DOT2;
+                return (dot_params_t) {_DOT2, UWORD(0)};
         }
 
         // single limb
         else if (u0 != 0)
-            params.method = _DOT1;
+            return (dot_params_t) {_DOT1, UWORD(0)};
 
-        // remaining case: u0 == 0
-        // <=> mod.n == 1 or len == 0
-        // => dot product is zero, _DOT0 already set
+        // remaining case: u0 == 0 <=> mod.n == 1 or len == 0
+        else
+            return (dot_params_t) {_DOT0, UWORD(0)};
     }
-
-    return params;
 }
 
 
