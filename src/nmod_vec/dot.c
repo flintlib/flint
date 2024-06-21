@@ -21,79 +21,82 @@
 
 dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
 {
-    // TODO
-    //if (len <= 2)
-    //{
-    //    if (len == 2)
-    //    if (len == 1)
+    if (len == 0 || mod.n == 1)
+        return (dot_params_t){_DOT0, UWORD(0)};
+    // from here on len >= 1
 
-    //    // len == 0
-    //    return (dot_params_t){_DOT0, UWORD(0)};
-    //}
+//    // quick choice for short dot products
+//    if (len <= 16)
+//    {
+//        if (mod.n <= UWORD(1) << (FLINT_BITS / 2))
+//        {
+//            if ((mod.n & (mod.n - 1)) == 0
+//                    || mod.n <= UWORD(1) << (FLINT_BITS / 2 - 2))
+//                return (dot_params_t) {_DOT1, UWORD(0)};
+//
+//#if (FLINT_BITS == 64)
+//            if (mod.n <= UWORD(1515531528))  // _SPLIT, see below
+//            {
+//                ulong pow2_precomp;
+//                NMOD_RED(pow2_precomp, (UWORD(1) << DOT_SPLIT_BITS), mod);
+//                return (dot_params_t) {_DOT2_SPLIT, pow2_precomp};
+//            }
+//#endif  // FLINT_BITS == 64
+//
+//            return (dot_params_t) {_DOT2_HALF, UWORD(0)};
+//        }
+//
+//        if (mod.n <= UWORD(1) << (FLINT_BITS - 2))
+//            return (dot_params_t) {_DOT2, UWORD(0)};
+//
+//        return (dot_params_t) {_DOT3, UWORD(0)};
+//    }
+//    // from here on len > 16
 
-    if ((mod.n & (mod.n - 1)) == 0)
+    if (mod.n <= UWORD(1) << (FLINT_BITS / 2)) // implies <= 2 limbs
+    {
+        const ulong t0 = (mod.n - 1) * (mod.n - 1);
+        ulong u1, u0;
+        umul_ppmm(u1, u0, t0, len);
+        if (u1 == 0 || (mod.n & (mod.n - 1)) == 0)  // 1 limb || power of 2
+            return (dot_params_t) {_DOT1, UWORD(0)};
+
+        // u1 != 0 <=> 2 limbs
+#if (FLINT_BITS == 64) // _SPLIT: see end of file for these constraints
+        if (mod.n <= UWORD(1515531528) && len <= WORD(380368697))
+        {
+            ulong pow2_precomp;
+            NMOD_RED(pow2_precomp, (UWORD(1) << DOT_SPLIT_BITS), mod);
+            return (dot_params_t) {_DOT2_SPLIT, pow2_precomp};
+        }
+#endif
+
+        return (dot_params_t) {_DOT2_HALF, UWORD(0)};
+    }
+    // from here on, mod.n > 2**(FLINT_BITS / 2)
+    // --> unreduced dot cannot fit in 1 limb
+
+    if ((mod.n & (mod.n - 1)) == 0) // power of 2
         return (dot_params_t) {_DOT_POW2, UWORD(0)};
 
-    // TODO refine
-    if (len <= 16)
-    {
-        if (mod.n <= UWORD(1) << (FLINT_BITS / 2 - 2))
-            return (dot_params_t) {_DOT1, UWORD(0)};
-        if (mod.n <= UWORD(1) << (FLINT_BITS - 2))
-            return (dot_params_t) {_DOT2, UWORD(0)};
-        else
-            return (dot_params_t) {_DOT3, UWORD(0)};
-    }
+    ulong t2, t1, t0, u1, u0;
+    umul_ppmm(t1, t0, mod.n - 1, mod.n - 1);
+    umul_ppmm(t2, t1, t1, len);
+    umul_ppmm(u1, u0, t0, len);
+    add_ssaaaa(t2, t1, t2, t1, UWORD(0), u1);
 
-    else
-    {
-        ulong t2, t1, t0, u1, u0;
-        umul_ppmm(t1, t0, mod.n - 1, mod.n - 1);
-        umul_ppmm(t2, t1, t1, len);
-        umul_ppmm(u1, u0, t0, len);
-        add_ssaaaa(t2, t1, t2, t1, UWORD(0), u1);
+    if (t2 == 0) // 2 limbs
+        return (dot_params_t) {_DOT2, UWORD(0)};
 
-        if (t2 != 0) // three limbs
-        {
-            /* we can accumulate 8 terms if n == mod.n is such that        */
-            /*      8 * (n-1)**2 < 2**(2*FLINT_BITS), this is equivalent to    */
-            /*      n <= ceil(sqrt(2**(2*FLINT_BITS-3)))                     */
+    // 3 limbs:
 #if (FLINT_BITS == 64)
-            if (mod.n <= UWORD(6521908912666391107))
+    if (mod.n <= UWORD(6521908912666391107))  // room for accumulating 8 terms
 #else
-            if (mod.n <= UWORD(1518500250))
+    if (mod.n <= UWORD(1518500250))           // room for accumulating 8 terms
 #endif
-                return (dot_params_t) {_DOT3_ACC, UWORD(0)};
-            else
-                return (dot_params_t) {_DOT3, UWORD(0)};
-        }
+        return (dot_params_t) {_DOT3_ACC, UWORD(0)};
 
-        else if (t1 != 0) // two limbs
-        {
-#if (FLINT_BITS == 64)
-            if (mod.n <= UWORD(1515531528) && len <= WORD(380368697))
-            {
-                // see end of file for these constraints; they imply 2 limbs
-                ulong pow2_precomp;
-                NMOD_RED(pow2_precomp, (UWORD(1) << DOT_SPLIT_BITS), mod);
-                return (dot_params_t) {_DOT2_SPLIT, pow2_precomp};
-            }
-            else
-#endif
-            if (mod.n <= (UWORD(1) << (FLINT_BITS / 2)))
-                return (dot_params_t) {_DOT2_HALF, UWORD(0)};
-            else
-                return (dot_params_t) {_DOT2, UWORD(0)};
-        }
-
-        // single limb
-        else if (u0 != 0)
-            return (dot_params_t) {_DOT1, UWORD(0)};
-
-        // remaining case: u0 == 0 <=> mod.n == 1 or len == 0
-        else
-            return (dot_params_t) {_DOT0, UWORD(0)};
-    }
+    return (dot_params_t) {_DOT3, UWORD(0)};
 }
 
 
@@ -608,6 +611,11 @@ _nmod_vec_dot_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset,
 
 // 2024-06-16 _DOT2_HALF is slightly faster than _DOT2
 // 2024-06-16 _DOT3_ACC is slightly faster than _DOT3
+
+// 3 limbs, conditions mod.n <= UWORD(6521908912666391107):
+// we can accumulate 8 terms if n == mod.n is such that
+//      8 * (n-1)**2 < 2**(2*FLINT_BITS), this is equivalent to
+//      n <= ceil(sqrt(2**(2*FLINT_BITS-3)))
 
 /*---------------------------------------------*/
 /* dot product for small modulus via splitting */

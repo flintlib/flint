@@ -99,7 +99,8 @@ void time_dot_expr(ulong len, ulong n, flint_rand_t state)
 
     nn_srcptr v1i = v1;
     nn_srcptr v2i = v2;
-    ulong i, FLINT_SET_BUT_UNUSED(res);
+    ulong i;
+    volatile ulong res = 0;  // volatile -> avoid compiler optimizations
 
     TIMEIT_START
     NMOD_VEC_DOT(res, i, len, v1i[9*len - 1 - 9*i], v2i[9*len - 1 - 9*i], mod, params);
@@ -147,7 +148,7 @@ void time_dot_poly_mul(ulong len, ulong n, flint_rand_t state)
 
 void time_dot_poly_inv_series(ulong len, ulong n, flint_rand_t state)
 {
-    if (len > 10000 || n == (UWORD(1) << 63))
+    if (len > 10000 || n % 2 == 0)
     {
         printf("        ");
         return;
@@ -174,7 +175,7 @@ void time_dot_poly_inv_series(ulong len, ulong n, flint_rand_t state)
 
 void time_dot_poly_exp_series(ulong len, ulong n, flint_rand_t state)
 {
-    if (len > 10000 || n == (UWORD(1) << 63))
+    if (len > 10000 || n % 2 == 0)
     {
         printf("        ");
         return;
@@ -262,7 +263,7 @@ void time_dot_mat_mul_vec(ulong len, ulong n, flint_rand_t state)
 
 void time_dot_mat_solve_tril(ulong len, ulong n, flint_rand_t state)
 {
-    if (len > 4000 || n == (UWORD(1) << 63))
+    if (len > 4000 || n % 2 == 0)
     {
         printf("        ");
         return;
@@ -287,7 +288,7 @@ void time_dot_mat_solve_tril(ulong len, ulong n, flint_rand_t state)
 
 void time_dot_mat_solve_tril_vec(ulong len, ulong n, flint_rand_t state)
 {
-    if (len > 10000 || n == (UWORD(1) << 63))
+    if (len > 10000 || n % 2 == 0)
     {
         printf("        ");
         return;
@@ -312,7 +313,7 @@ void time_dot_mat_solve_tril_vec(ulong len, ulong n, flint_rand_t state)
 
 void time_dot_mat_solve_triu(ulong len, ulong n, flint_rand_t state)
 {
-    if (len > 4000 || n == (UWORD(1) << 63))
+    if (len > 4000 || n % 2 == 0)
     {
         printf("        ");
         return;
@@ -337,7 +338,7 @@ void time_dot_mat_solve_triu(ulong len, ulong n, flint_rand_t state)
 
 void time_dot_mat_solve_triu_vec(ulong len, ulong n, flint_rand_t state)
 {
-    if (len > 10000 || n == (UWORD(1)<<63))
+    if (len > 10000 || n % 2 == 0)
     {
         printf("        ");
         return;
@@ -372,8 +373,8 @@ int main(int argc, char ** argv)
     flint_rand_set_seed(state, time(NULL), time(NULL)+129384125L);
 
     // modulus bitsize
-    const slong nbits = 12;
-    const ulong bits[] = {0, 12, 28, 30, 31, 32, 40, 50, 60, 61, 62, 63, 64};
+    const slong nbits = 14;
+    const ulong bits[] = {12, 28, 30, 31, 32, 40, 50, 60, 61, 62, 63, 64, 232, 263};
 
     // vector lengths
     const slong nlens = 20;
@@ -419,7 +420,7 @@ int main(int argc, char ** argv)
         printf("   - fun: id number of the timed function (see below),\n");
         printf("          exception: fun == -1 times all available functions successively\n");
         printf("   - nbits: number of bits for the modulus, chosen as nextprime(2**(nbits-1))\n");
-        printf("          exception: nbits == 0 picks modulus 2**63\n");
+        printf("          exception: nbits == 232 and 263 (moduli 2**32, 2**63)\n");
         printf("   - len: length for the vector, row and column dimension for the matrices\n");
         printf("\nAvailable functions:\n");
         for (slong j = 0; j < nfuns; j++)
@@ -453,7 +454,13 @@ int main(int argc, char ** argv)
                 const slong b = bits[j];
 
                 printf("%-10ld", b);
-                const ulong n = (b==0) ? (UWORD(1) << 63) : n_nextprime(UWORD(1) << (b-1), 0);
+                ulong n;
+                if (b == 232) 
+                    n = UWORD(1) << 32;
+                else if (b == 263)
+                    n = UWORD(1) << 63;
+                else
+                    n = n_nextprime(UWORD(1) << (b-1), 0);
                 for (slong i = 0; i < nlens; i++)
                 {
                     tfun(lens[i], n, state);
@@ -478,7 +485,13 @@ int main(int argc, char ** argv)
             const slong b = bits[j];
 
             printf("%-10ld", b);
-            const ulong n = (b==0) ? (UWORD(1) << 63) : n_nextprime(UWORD(1) << (b-1), 0);
+            ulong n;
+            if (b == 232) 
+                n = UWORD(1) << 32;
+            else if (b == 263)
+                n = UWORD(1) << 63;
+            else
+                n = n_nextprime(UWORD(1) << (b-1), 0);
             for (slong i = 0; i < nlens; i++)
             {
                 tfun(lens[i], n, state);
@@ -499,7 +512,13 @@ int main(int argc, char ** argv)
         printf("\n");
 
         printf("%-10ld", b);
-        const ulong n = (b==0) ? (UWORD(1) << 63) : n_nextprime(UWORD(1) << (b-1), 0);
+        ulong n;
+        if (b == 232) 
+            n = UWORD(1) << 32;
+        else if (b == 263)
+            n = UWORD(1) << 63;
+        else
+            n = n_nextprime(UWORD(1) << (b-1), 0);
         for (slong i = 0; i < nlens; i++)
         {
             tfun(lens[i], n, state);
@@ -520,7 +539,13 @@ int main(int argc, char ** argv)
         printf("\n");
 
         printf("%-10ld", b);
-        const ulong n = (b==0) ? (UWORD(1) << 63) : n_nextprime(UWORD(1) << (b-1), 0);
+        ulong n;
+        if (b == 232) 
+            n = UWORD(1) << 32;
+        else if (b == 263)
+            n = UWORD(1) << 63;
+        else
+            n = n_nextprime(UWORD(1) << (b-1), 0);
 
         tfun(len, n, state);
         printf("\n");

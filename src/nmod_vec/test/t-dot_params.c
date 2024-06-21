@@ -49,7 +49,9 @@ TEST_FUNCTION_START(_nmod_vec_dot_params, state)
         flint_mpz_mul_ui(t, t, len);
         nlimbs2 = mpz_size(t);
 
-        if (params.method != _DOT_POW2 && nlimbs1 != nlimbs2)
+        const int power_of_two = (mod.n & (mod.n - 1)) == 0;
+
+        if (!power_of_two && nlimbs1 != nlimbs2)
             TEST_FUNCTION_FAIL(
                     "m = %wu\n"
                     "len = %wd\n"

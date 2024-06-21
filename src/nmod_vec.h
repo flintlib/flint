@@ -123,18 +123,19 @@ void _nmod_vec_scalar_addmul_nmod(nn_ptr res, nn_srcptr vec, slong len, ulong c,
 typedef enum
 {
     _DOT0 = 0,           /* len == 0 || mod.n == 1 */
-    _DOT_POW2 = 1,       /* modulus is a power of 2, computations performed on 1 limb */
-    _DOT1 = 2,           /* 1 limb */
+    _DOT1 = 1,           /* 1 limb */
 #if (FLINT_BITS == 64)
-    _DOT2_SPLIT = 3,     /* 2 limbs, modulus < ~2**30.5 (FLINT_BITS == 64 only) */
+    _DOT2_SPLIT = 2,     /* 2 limbs, modulus < ~2**30.5 (FLINT_BITS == 64 only) */
 #endif  // FLINT_BITS == 64
-    _DOT2_HALF = 4,      /* 2 limbs, modulus < 2**(FLINT_BITS/2) */
-    _DOT2 = 5,           /* 2 limbs */
-    _DOT3_ACC = 6,       /* 3 limbs, modulus < 2**62.5 allowing accumulation in 2 limbs */
-    _DOT3 = 7,           /* 3 limbs, modulus >= 2**62.5 */
+    _DOT2_HALF = 3,      /* 2 limbs, modulus < 2**(FLINT_BITS/2) */
+    _DOT2 = 4,           /* 2 limbs */
+    _DOT3_ACC = 5,       /* 3 limbs, modulus allowing some accumulation in 2 limbs */
+    _DOT3 = 6,           /* 3 limbs, modulus close to FLINT_BITS bits */
+    _DOT_POW2 = 7,       /* mod.n is a power of 2 at least 2**(1 + FLINT_BITS/2) */
 } dot_method_t;
-// if mod.n is not a power of 2, then
-//      > 1 limb <-> method > _DOT1   |   > 2 limbs <-> method > _DOT2
+// if mod.n is not a power of 2, then unreduced dot product fits in
+//      > 1 limb <=> method > _DOT1   |   > 2 limbs <=> method > _DOT2
+// no relevant information on this if mod.n is a power of 2
 
 typedef struct
 {
@@ -395,7 +396,7 @@ ulong _nmod_vec_dot2_split_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t
 
 NMOD_VEC_INLINE ulong _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_t params)
 {
-    // FIXME handle short products
+    // handle short products
     if (len <= 2 && params.method > _DOT1)
     {
         if (len == 2)
@@ -426,17 +427,10 @@ NMOD_VEC_INLINE ulong _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len, n
         return _nmod_vec_dot2_half(vec1, vec2, len, mod);
 
     if (params.method == _DOT_POW2)
-    {
-#if defined(__AVX2__) && FLINT_BITS == 64
-        if (mod.n < (UWORD(1) << (FLINT_BITS / 2)))
-            return _nmod_vec_dot1(vec1, vec2, len, mod);
-        else  // make sure not to use avx 32-bit mul
-#endif // defined(__AVX2__) && FLINT_BITS == 64
-            return _nmod_vec_dot_pow2(vec1, vec2, len, mod);
-    }
+        return _nmod_vec_dot_pow2(vec1, vec2, len, mod);
 
-    else  // params.method == _DOT0
-        return UWORD(0);
+    // params.method == _DOT0
+    return UWORD(0);
 }
 
 NMOD_VEC_INLINE ulong _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_t params)
@@ -471,14 +465,7 @@ NMOD_VEC_INLINE ulong _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong le
         return _nmod_vec_dot2_half_rev(vec1, vec2, len, mod);
 
     if (params.method == _DOT_POW2)
-    {
-#if defined(__AVX2__) && FLINT_BITS == 64
-        if (mod.n < (UWORD(1) << (FLINT_BITS / 2)))
-            return _nmod_vec_dot1_rev(vec1, vec2, len, mod);
-        else  // make sure not to use avx 32-bit mul
-#endif // defined(__AVX2__) && FLINT_BITS == 64
-            return _nmod_vec_dot_pow2_rev(vec1, vec2, len, mod);
-    }
+        return _nmod_vec_dot_pow2_rev(vec1, vec2, len, mod);
 
     else  // params.method == _DOT0
         return UWORD(0);
