@@ -18,16 +18,11 @@ void nmod_mat_mul_nmod_vec(
     const nmod_mat_t A,
     const ulong * b, slong blen)
 {
-    nmod_t mod = A->mod;
-    slong i, j;
-    slong len = FLINT_MIN(A->c, blen);
-    const dot_params_t params = _nmod_vec_dot_params(len, mod);
+    const slong len = FLINT_MIN(A->c, blen);
+    const dot_params_t params = _nmod_vec_dot_params(len, A->mod);
 
-    for (i = A->r - 1; i >= 0; i--)
-    {
-        const ulong * Ai = A->rows[i];
-        NMOD_VEC_DOT(c[i], j, len, Ai[j], b[j], mod, params);
-    }
+    for (slong i = 0; i < A->r; i++)
+        c[i] = _nmod_vec_dot(A->rows[i], b, len, A->mod, params);
 }
 
 void nmod_mat_mul_nmod_vec_ptr(

@@ -20,7 +20,7 @@ void
 _nmod_poly_mul_classical(nn_ptr res, nn_srcptr poly1,
                          slong len1, nn_srcptr poly2, slong len2, nmod_t mod)
 {
-    slong i, j, bits, log_len, n1, n2;
+    slong i, j, n1, n2;
     int squaring;
     ulong c;
 
