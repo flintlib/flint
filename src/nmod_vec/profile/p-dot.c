@@ -49,10 +49,14 @@ void time_dot(ulong len, ulong n, flint_rand_t state)
     nn_ptr v2 = _nmod_vec_init(len);
     _nmod_vec_rand(v2, state, len, mod);
 
+    // store results in volatile variable to avoid that they
+    // are "optimized away" (especially for len <= 4, inlined part)
+    volatile ulong FLINT_SET_BUT_UNUSED(res);
+
     double FLINT_SET_BUT_UNUSED(tcpu), twall;
 
     TIMEIT_START
-    _nmod_vec_dot(v1, v2, len, mod, params);
+    res = _nmod_vec_dot(v1, v2, len, mod, params);
     TIMEIT_STOP_VALUES(tcpu, twall)
 
     printf("%.2e", twall);
@@ -72,10 +76,14 @@ void time_dot_rev(ulong len, ulong n, flint_rand_t state)
     nn_ptr v2 = _nmod_vec_init(len);
     _nmod_vec_rand(v2, state, len, mod);
 
+    // store results in volatile variable to avoid that they
+    // are "optimized away" (especially for len <= 4, inlined part)
+    volatile ulong FLINT_SET_BUT_UNUSED(res);
+
     double FLINT_SET_BUT_UNUSED(tcpu), twall;
 
     TIMEIT_START
-    _nmod_vec_dot_rev(v1, v2, len, mod, params);
+    res = _nmod_vec_dot_rev(v1, v2, len, mod, params);
     TIMEIT_STOP_VALUES(tcpu, twall)
 
     printf("%.2e", twall);
@@ -100,11 +108,14 @@ void time_dot_ptr(ulong len, ulong n, flint_rand_t state)
     for (ulong i = 0; i < len; i++)
         v2[i] = &v2tmp[i] + offset;
 
+    // store results in volatile variable to avoid that they
+    // are "optimized away" (especially for len <= 4, inlined part)
+    volatile ulong FLINT_SET_BUT_UNUSED(res);
 
     double FLINT_SET_BUT_UNUSED(tcpu), twall;
 
     TIMEIT_START
-    _nmod_vec_dot_ptr(v1, v2, offset, len, mod, params);
+    res = _nmod_vec_dot_ptr(v1, v2, offset, len, mod, params);
     TIMEIT_STOP_VALUES(tcpu, twall)
 
     printf("%.2e", twall);
@@ -205,6 +216,7 @@ void time_dot_poly_exp_series(ulong len, ulong n, flint_rand_t state)
     gr_poly_clear(p, ctx);
     gr_poly_clear(res, ctx);
 }
+
 
 /*-------------------------*/
 /* indirect: mat           */

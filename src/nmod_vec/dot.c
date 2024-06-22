@@ -522,7 +522,70 @@ ulong _nmod_vec_dot_pow2_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, 
 }
 
 ulong _nmod_vec_dot1_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod)
-#if 0 // defined(__AVX2__) && FLINT_BITS == 64
+#if defined(__AVX2__) && FLINT_BITS == 64
+{
+    vec4n dp = vec4n_zero();
+
+    slong i = 0;
+    for ( ; i+31 < len; i += 32)
+    {
+        dp = vec4n_add(dp, vec4n_mul(vec4n_load_unaligned(vec1+i+ 0), vec4n_set_n4(
+                                                                        vec2[i+ 0][offset],
+                                                                        vec2[i+ 1][offset],
+                                                                        vec2[i+ 2][offset],
+                                                                        vec2[i+ 3][offset])));
+        dp = vec4n_add(dp, vec4n_mul(vec4n_load_unaligned(vec1+i+ 4), vec4n_set_n4(
+                                                                        vec2[i+ 4][offset],
+                                                                        vec2[i+ 5][offset],
+                                                                        vec2[i+ 6][offset],
+                                                                        vec2[i+ 7][offset])));
+        dp = vec4n_add(dp, vec4n_mul(vec4n_load_unaligned(vec1+i+ 8), vec4n_set_n4(
+                                                                        vec2[i+ 8][offset],
+                                                                        vec2[i+ 9][offset],
+                                                                        vec2[i+10][offset],
+                                                                        vec2[i+11][offset])));
+        dp = vec4n_add(dp, vec4n_mul(vec4n_load_unaligned(vec1+i+12), vec4n_set_n4(
+                                                                        vec2[i+12][offset],
+                                                                        vec2[i+13][offset],
+                                                                        vec2[i+14][offset],
+                                                                        vec2[i+15][offset])));
+        dp = vec4n_add(dp, vec4n_mul(vec4n_load_unaligned(vec1+i+16), vec4n_set_n4(
+                                                                        vec2[i+16][offset],
+                                                                        vec2[i+17][offset],
+                                                                        vec2[i+18][offset],
+                                                                        vec2[i+19][offset])));
+        dp = vec4n_add(dp, vec4n_mul(vec4n_load_unaligned(vec1+i+20), vec4n_set_n4(
+                                                                        vec2[i+20][offset],
+                                                                        vec2[i+21][offset],
+                                                                        vec2[i+22][offset],
+                                                                        vec2[i+23][offset])));
+        dp = vec4n_add(dp, vec4n_mul(vec4n_load_unaligned(vec1+i+24), vec4n_set_n4(
+                                                                        vec2[i+24][offset],
+                                                                        vec2[i+25][offset],
+                                                                        vec2[i+26][offset],
+                                                                        vec2[i+27][offset])));
+        dp = vec4n_add(dp, vec4n_mul(vec4n_load_unaligned(vec1+i+28), vec4n_set_n4(
+                                                                        vec2[i+28][offset],
+                                                                        vec2[i+29][offset],
+                                                                        vec2[i+30][offset],
+                                                                        vec2[i+31][offset])));
+    }
+
+    for ( ; i + 3 < len; i += 4)
+        dp = vec4n_add(dp, vec4n_mul(vec4n_load_unaligned(vec1+i), vec4n_set_n4(
+                                                                     vec2[i+0][offset],
+                                                                     vec2[i+1][offset],
+                                                                     vec2[i+2][offset],
+                                                                     vec2[i+3][offset])));
+
+    ulong res = vec4n_horizontal_sum(dp);
+
+    for (; i < len; i++)
+        res += vec1[i] * vec2[i][offset];
+
+    NMOD_RED(res, res, mod);
+    return res;
+}
 #else  // if defined(__AVX2__) && FLINT_BITS == 64
 {
     ulong res = UWORD(0);
@@ -656,7 +719,7 @@ ulong _nmod_vec_dot3_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slon
 
 #if FLINT_BITS == 64
 ulong _nmod_vec_dot2_split_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod, ulong pow2_precomp)
-#if 0  // defined(__AVX2__)
+#if defined(__AVX2__)
 {
     const vec4n low_bits = vec4n_set_n(DOT_SPLIT_MASK);
     vec4n dp_lo = vec4n_zero();
@@ -665,21 +728,57 @@ ulong _nmod_vec_dot2_split_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset
     slong i = 0;
     for ( ; i+31 < len; i += 32)
     {
-        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+ 0), vec4n_load_unaligned(vec2+i+ 0)));
-        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+ 4), vec4n_load_unaligned(vec2+i+ 4)));
-        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+ 8), vec4n_load_unaligned(vec2+i+ 8)));
-        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+12), vec4n_load_unaligned(vec2+i+12)));
-        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+16), vec4n_load_unaligned(vec2+i+16)));
-        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+20), vec4n_load_unaligned(vec2+i+20)));
-        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+24), vec4n_load_unaligned(vec2+i+24)));
-        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+28), vec4n_load_unaligned(vec2+i+28)));
+        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+ 0), vec4n_set_n4(
+                                                                        vec2[i+ 0][offset],
+                                                                        vec2[i+ 1][offset],
+                                                                        vec2[i+ 2][offset],
+                                                                        vec2[i+ 3][offset])));
+        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+ 4), vec4n_set_n4(
+                                                                        vec2[i+ 4][offset],
+                                                                        vec2[i+ 5][offset],
+                                                                        vec2[i+ 6][offset],
+                                                                        vec2[i+ 7][offset])));
+        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+ 8), vec4n_set_n4(
+                                                                        vec2[i+ 8][offset],
+                                                                        vec2[i+ 9][offset],
+                                                                        vec2[i+10][offset],
+                                                                        vec2[i+11][offset])));
+        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+12), vec4n_set_n4(
+                                                                        vec2[i+12][offset],
+                                                                        vec2[i+13][offset],
+                                                                        vec2[i+14][offset],
+                                                                        vec2[i+15][offset])));
+        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+16), vec4n_set_n4(
+                                                                        vec2[i+16][offset],
+                                                                        vec2[i+17][offset],
+                                                                        vec2[i+18][offset],
+                                                                        vec2[i+19][offset])));
+        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+20), vec4n_set_n4(
+                                                                        vec2[i+20][offset],
+                                                                        vec2[i+21][offset],
+                                                                        vec2[i+22][offset],
+                                                                        vec2[i+23][offset])));
+        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+24), vec4n_set_n4(
+                                                                        vec2[i+24][offset],
+                                                                        vec2[i+25][offset],
+                                                                        vec2[i+26][offset],
+                                                                        vec2[i+27][offset])));
+        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+28), vec4n_set_n4(
+                                                                        vec2[i+28][offset],
+                                                                        vec2[i+29][offset],
+                                                                        vec2[i+30][offset],
+                                                                        vec2[i+31][offset])));
 
         dp_hi = vec4n_add(dp_hi, vec4n_bit_shift_right(dp_lo, DOT_SPLIT_BITS));
         dp_lo = vec4n_bit_and(dp_lo, low_bits);
     }
 
     for ( ; i + 3 < len; i += 4)
-        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i), vec4n_load_unaligned(vec2+i)));
+        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i), vec4n_set_n4(
+                                                                           vec2[i+0][offset],
+                                                                           vec2[i+1][offset],
+                                                                           vec2[i+2][offset],
+                                                                           vec2[i+3][offset])));
 
     dp_hi = vec4n_add(dp_hi, vec4n_bit_shift_right(dp_lo, DOT_SPLIT_BITS));
     dp_lo = vec4n_bit_and(dp_lo, low_bits);
@@ -689,7 +788,7 @@ ulong _nmod_vec_dot2_split_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset
     hsum_lo &= DOT_SPLIT_MASK;
 
     for (; i < len; i++)
-        hsum_lo += vec1[i] * vec2[i];
+        hsum_lo += vec1[i] * vec2[i][offset];
 
     ulong res;
     NMOD_RED(res, pow2_precomp * hsum_hi + hsum_lo, mod);
