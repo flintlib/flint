@@ -84,32 +84,34 @@ void time_dot_rev(ulong len, ulong n, flint_rand_t state)
     _nmod_vec_clear(v2);
 }
 
-void time_dot_expr(ulong len, ulong n, flint_rand_t state)
+void time_dot_ptr(ulong len, ulong n, flint_rand_t state)
 {
     nmod_t mod;
     nmod_init(&mod, n);
     const dot_params_t params = _nmod_vec_dot_params(len, mod);
 
-    nn_ptr v1 = _nmod_vec_init(9*len);
-    _nmod_vec_rand(v1, state, 9*len, mod);
-    nn_ptr v2 = _nmod_vec_init(9*len);
-    _nmod_vec_rand(v2, state, 9*len, mod);
+    const ulong offset = UWORD(7);
+
+    nn_ptr v1 = _nmod_vec_init(len);
+    _nmod_vec_rand(v1, state, len, mod);
+    nn_ptr v2tmp = _nmod_vec_init(len);
+    _nmod_vec_rand(v2tmp, state, len, mod);
+    nn_ptr * v2 = flint_malloc(sizeof(nn_ptr) * len);
+    for (ulong i = 0; i < len; i++)
+        v2[i] = &v2tmp[i] + offset;
+
 
     double FLINT_SET_BUT_UNUSED(tcpu), twall;
 
-    nn_srcptr v1i = v1;
-    nn_srcptr v2i = v2;
-    ulong i;
-    volatile ulong res = 0;  // volatile -> avoid compiler optimizations
-
     TIMEIT_START
-    NMOD_VEC_DOT(res, i, len, v1i[9*len - 1 - 9*i], v2i[9*len - 1 - 9*i], mod, params);
+    _nmod_vec_dot_ptr(v1, v2, offset, len, mod, params);
     TIMEIT_STOP_VALUES(tcpu, twall)
 
     printf("%.2e", twall);
 
     _nmod_vec_clear(v1);
-    _nmod_vec_clear(v2);
+    _nmod_vec_clear(v2tmp);
+    flint_free(v2);
 }
 
 /*-------------------------*/
@@ -386,7 +388,7 @@ int main(int argc, char ** argv)
     const timefun funs[] = {
         time_dot,                    // 0
         time_dot_rev,                // 1
-        time_dot_expr,               // 2
+        time_dot_ptr,                // 2
         time_dot_poly_mul,           // 3
         time_dot_poly_inv_series,    // 4
         time_dot_poly_exp_series,    // 5
@@ -401,7 +403,7 @@ int main(int argc, char ** argv)
     const char * description[] = {
         "#0  --> vec dot           ",
         "#1  --> vec dot rev       ",
-        "#2  --> vec dot expr      ",
+        "#2  --> vec dot ptr       ",
         "#3  --> poly_mul          ",
         "#4  --> poly_inv_series   ",
         "#5  --> poly_exp_series   ",
