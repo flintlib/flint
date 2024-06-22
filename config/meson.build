@@ -458,6 +458,9 @@ elif host_machine.cpu_family() == 'x86_64'
   asm_path = ''
   param_path = 'x86_64'
 
+  have_avx512 = 'no'
+  have_avx2 = 'no'
+
   if exact_cpu in ['coreiibr', 'ivybridge']
     gcc_cflags_arch = '-march=ivybridge'
 
@@ -490,6 +493,8 @@ elif host_machine.cpu_family() == 'x86_64'
 
   if have_avx2 == 'yes'
     flint_cv_have_fft_small_x86_i = 'yes'
+  else
+    flint_cv_have_fft_small_x86_i = 'no'
   endif
 
 else
@@ -498,7 +503,16 @@ else
   param_path = 'generic'
   gcc_cflags = gcc_cflags
 
+  have_avx512 = 'no'
+  have_avx2 = 'no'
+
 endif
+
+# -----------------------------------------------------------------------------
+#   mparam
+# -----------------------------------------------------------------------------
+
+flint_mparam = param_path
 
 # -----------------------------------------------------------------------------
 #    fft_small
@@ -534,11 +548,17 @@ error
 int main(){return 0;}
 '''
 
-# XXX: Do we need to check ARM64_PATTERN/X86_64_PATTERN?
-fft_small_supported = (
-  cc.compiles(fft_small_arm_code, dependencies: gmp_dep)
-  or cc.compiles(fft_small_x86_code, dependencies: gmp_dep)
-)
+if host_machine.cpu_family() == 'aarch64'
+  fft_small_supported = (
+    flint_cv_have_fft_small_arm_i == 'yes'
+    and cc.compiles(fft_small_arm_code, dependencies: gmp_dep)
+  )
+else
+  fft_small_supported = (
+    flint_cv_have_fft_small_x86_i == 'yes'
+    and cc.compiles(fft_small_x86_code, dependencies: gmp_dep)
+  )
+endif
 
 # Error if fft_small enabled but not possible, otherwise disable if auto
 fft_small_opt = fft_small_opt.require(fft_small_supported,
@@ -551,33 +571,26 @@ have_fft_small = fft_small_opt.enabled()
 message('FFT_SMALL: ', have_fft_small ? 'enabled' : 'disabled')
 
 # -----------------------------------------------------------------------------
-#   assembly
+#   Assembly
 # -----------------------------------------------------------------------------
 
-assembly_opt = get_option('assembly')
-
-# Might be better to check for known good operating systems rather than
-# exclude known bad ones.
-assembly_opt = assembly_opt.require(host_machine.system() != 'windows',
-    error_message: 'No assembly support for Windows')
-
-# Checking for assembly support needs to be more complicated than this. ARM
-# needs to be v8 and not sure exactly what to check for x86_64. For now
-# the checks below would attempt to build assembly on some systems that do not
-# support it. The feature can be disabled with -Dassembly=disabled to build on
-# those systems.
-if host_machine.cpu_family() == 'aarch64'
+if asm_path != ''
   assembly_cpu_supported = true
-  assembly_dir = 'mpn_extras/arm64'
-  FLINT_HAVE_ASSEMBLY = 'armv8'
-elif host_machine.cpu_family() == 'x86_64'
-  assembly_cpu_supported = true
-  assembly_dir = 'mpn_extras/x86_64/broadwell'
-  FLINT_HAVE_ASSEMBLY = 'x86_64_adx'
+  assembly_dir = 'mpn_extras/' + asm_path
+  if host_machine.cpu_family() == 'aarch64'
+    FLINT_HAVE_ASSEMBLY = 'armv8'
+  elif host_machine.cpu_family() == 'x86_64'
+    FLINT_HAVE_ASSEMBLY = 'x86_64_adx'
+  else
+    error('Assembly only supported for x86_64 or aarch64')
+  endif
 else
   assembly_cpu_supported = false
   FLINT_HAVE_ASSEMBLY = ''
 endif
+
+assembly_opt = assembly_opt.require(host_machine.system() != 'windows',
+    error_message: 'No assembly support for Windows')
 
 assembly_opt = assembly_opt.require(assembly_cpu_supported,
     error_message: 'No assembly support for host CPU')
@@ -590,29 +603,6 @@ message('ASSEMBLY: ', have_assembly ? 'enabled' : 'disabled')
 # XXX: Need better detection of ASM language support
 if have_assembly
   LSYM_PREFIX = 'L'
-endif
-
-# -----------------------------------------------------------------------------
-#   mparam
-# -----------------------------------------------------------------------------
-
-flint_mparam = 'generic'
-
-if host_machine.system() != 'windows'
-  if host_machine.cpu_family() == 'aarch64'
-    if host_machine.system() == 'darwin'
-      flint_mparam = 'arm64/applem1'
-    else
-      flint_mparam = 'arm64'
-    endif
-  elif host_machine.cpu_family() == 'x86_64'
-    # XXX: Need better CPU detection
-    if have_assembly
-      flint_mparam = 'x86_64/broadwell'
-    else
-      flint_mparam = 'generic'
-    endif
-  endif
 endif
 
 # -----------------------------------------------------------------------------
