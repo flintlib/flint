@@ -53,6 +53,11 @@ def add_feature_option(parser, feature):
         choices=['yes', 'no', 'auto'], nargs='?', const='yes', action='store')
 
 
+def add_with_option(parser, libname, default):
+    parser.add_argument('--with-' + libname, help=f'Link to {libname}',
+        default=default, const=True, nargs='?')
+
+
 parser = ArgumentParser(description='Configure FLINT for building with meson')
 
 parser.add_argument('--build-dir', default='build.meson', help='Build directory')
@@ -83,12 +88,12 @@ add_feature_option(parser, 'assembly')
 add_feature_option(parser, 'avx2')
 add_feature_option(parser, 'avx512')
 
-parser.add_argument('--with-gmp', default=None, help='GMP install directory')
-parser.add_argument('--with-mpfr', default=None, help='MPFR install directory')
+add_with_option(parser, 'gmp', default=True)
+add_with_option(parser, 'mpfr', default=True)
+add_with_option(parser, 'ntl', default=False)
 
 parser.add_argument('--with-blas', default=None, help='Not supported...')
 parser.add_argument('--with-gc', default=None, help='Not supported...')
-parser.add_argument('--with-ntl', default=None, help='Not supported...')
 
 
 def get_meson_command_from_configure_args(args):
@@ -177,17 +182,18 @@ def get_meson_command_from_configure_args(args):
     elif do_avx2 is True or do_avx512 is True:
         setup_args.append('-Dfft_small=' + 'enabled')
 
-    if args.with_gmp is not None:
-        setup_args.append('--pkg-config-path=' + join(args.with_gmp, 'lib', 'pkgconfig'))
-    if args.with_mpfr is not None:
-        setup_args.append('--pkg-config-path=' + join(args.with_mpfr, 'lib', 'pkgconfig'))
+    for lib in ['gmp', 'mpfr', 'gc', 'ntl', 'blas']:
+        val = getattr(args, 'with_' + lib)
+        if isinstance(val, str):
+            setup_args.append('--pkg-config-path=' + join(val, 'lib', 'pkgconfig'))
+
+    if args.with_ntl:
+        setup_args.append('-Dntl=enabled')
 
     if args.with_blas is not None:
         raise ValueError('--with-blas is not supported')
     if args.with_gc is not None:
         raise ValueError('--with-gc is not supported')
-    if args.with_ntl is not None:
-        raise ValueError('--with-ntl is not supported')
 
     cmd = ['meson', 'setup', args.build_dir] + setup_args
     return cmd, args

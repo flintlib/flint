@@ -146,6 +146,10 @@ if have_fft_small
   headers_all += ['fft_small.h']
 endif
 
+if ntl_opt.enabled()
+  mod_tests += ['interfaces/test']
+endif
+
 headers_all = files(headers_all)
 '''
 
@@ -172,6 +176,29 @@ test_mod_meson_build = '''\
 test_exe = executable('main',
   'main.c',
   dependencies: flint_deps,
+  link_with: libflint,
+  include_directories: [headers_built_nodir_inc, '../..'],
+  install: false,
+)
+
+test('%s', test_exe)
+'''
+
+
+test_mod_NTL_meson_build = '''\
+# This file is generated automatically.
+#
+# To regenerate it, run:
+#   python _meson_build/generate_meson_build.py
+#
+
+# NTL no found by pkgconfig
+cpp = meson.get_compiler('cpp')
+ntl_dep = cpp.find_library('ntl')
+
+test_exe = executable('main',
+  't-NTL-interface.cpp',
+  dependencies: flint_deps + [ntl_dep],
   link_with: libflint,
   include_directories: [headers_built_nodir_inc, '../..'],
   install: false,
@@ -326,6 +353,13 @@ def main(args):
             if args.verbose:
                 print('Writing %s' % dst_path)
             write_file(dst_path, test_mod_meson_build_text)
+
+    # Build for the NTL tests
+    dst_path = join(args.output_dir, 'src', 'interfaces', 'test', 'meson.build')
+    test_mod_meson_build_text = test_mod_NTL_meson_build % 'NTL-interface'
+    if args.verbose:
+        print('Writing %s' % dst_path)
+    write_file(dst_path, test_mod_meson_build_text)
 
     # src/mpn_extras/*/meson.build
     for path, asm_submodule in asm_modules:

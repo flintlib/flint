@@ -1,9 +1,10 @@
-project('FLINT', 'c',
+project('FLINT', 'c', 'cpp',
   version: '3.2.0-dev',
   license: 'LGPL3+',
   default_options: [
     'buildtype=release',
     'c_std=c11',
+    'cpp_std=c++11',
   ],
 )
 
