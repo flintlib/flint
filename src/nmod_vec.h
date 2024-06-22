@@ -144,7 +144,88 @@ typedef struct
 } dot_params_t;
 
 // compute dot parameters
-dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod);
+FLINT_FORCE_INLINE dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
+{
+    if (len == 0 || mod.n == 1)
+        return (dot_params_t){_DOT0, UWORD(0)};
+    // from here on len >= 1
+
+    // this does not really seem to help,
+    // and is suboptimal in some cases (we are pretending there are 16 terms)
+//    // quick choice for short dot products
+//    if (len <= 16)
+//    {
+//        if (mod.n <= UWORD(1) << (FLINT_BITS / 2))
+//        {
+//            if ((mod.n & (mod.n - 1)) == 0
+//                    || mod.n <= UWORD(1) << (FLINT_BITS / 2 - 2))
+//                return (dot_params_t) {_DOT1, UWORD(0)};
+//
+//#if (FLINT_BITS == 64)
+//            if (mod.n <= UWORD(1515531528))  // _SPLIT, see below
+//            {
+//                ulong pow2_precomp;
+//                NMOD_RED(pow2_precomp, (UWORD(1) << DOT_SPLIT_BITS), mod);
+//                return (dot_params_t) {_DOT2_SPLIT, pow2_precomp};
+//            }
+//#endif  // FLINT_BITS == 64
+//
+//            return (dot_params_t) {_DOT2_HALF, UWORD(0)};
+//        }
+//
+//        if (mod.n <= UWORD(1) << (FLINT_BITS - 2))
+//            return (dot_params_t) {_DOT2, UWORD(0)};
+//
+//        return (dot_params_t) {_DOT3, UWORD(0)};
+//    }
+//    // from here on len > 16
+
+    if (mod.n <= UWORD(1) << (FLINT_BITS / 2)) // implies <= 2 limbs
+    {
+        const ulong t0 = (mod.n - 1) * (mod.n - 1);
+        ulong u1, u0;
+        umul_ppmm(u1, u0, t0, len);
+        if (u1 == 0 || (mod.n & (mod.n - 1)) == 0)  // 1 limb || power of 2
+            return (dot_params_t) {_DOT1, UWORD(0)};
+
+        // u1 != 0 <=> 2 limbs
+#if (FLINT_BITS == 64) // _SPLIT: see end of file for these constraints
+        if (mod.n <= UWORD(1515531528) && len <= WORD(380368697))
+        {
+            ulong pow2_precomp;
+            NMOD_RED(pow2_precomp, (UWORD(1) << DOT_SPLIT_BITS), mod);
+            return (dot_params_t) {_DOT2_SPLIT, pow2_precomp};
+        }
+#endif
+
+        return (dot_params_t) {_DOT2_HALF, UWORD(0)};
+    }
+    // from here on, mod.n > 2**(FLINT_BITS / 2)
+    // --> unreduced dot cannot fit in 1 limb
+
+    if ((mod.n & (mod.n - 1)) == 0) // power of 2
+        return (dot_params_t) {_DOT_POW2, UWORD(0)};
+
+    ulong t2, t1, t0, u1, u0;
+    umul_ppmm(t1, t0, mod.n - 1, mod.n - 1);
+    umul_ppmm(t2, t1, t1, len);
+    umul_ppmm(u1, u0, t0, len);
+    add_ssaaaa(t2, t1, t2, t1, UWORD(0), u1);
+
+    if (t2 == 0) // 2 limbs
+        return (dot_params_t) {_DOT2, UWORD(0)};
+
+    // 3 limbs:
+#if (FLINT_BITS == 64)
+    if (mod.n <= UWORD(6521908912666391107))  // room for accumulating 8 terms
+#else
+    if (mod.n <= UWORD(1518500250))           // room for accumulating 8 terms
+#endif
+        return (dot_params_t) {_DOT3_ACC, UWORD(0)};
+
+    return (dot_params_t) {_DOT3, UWORD(0)};
+}
+
 
 // _DOT1   (1 limb)
 #define _NMOD_VEC_DOT1(res, i, len, expr1, expr2, mod)                \
@@ -387,23 +468,124 @@ ulong _nmod_vec_dot2_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod);
 ulong _nmod_vec_dot3_acc_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod);
 ulong _nmod_vec_dot3_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod);
 
+ulong _nmod_vec_dot_pow2_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod);
+ulong _nmod_vec_dot1_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod);
+ulong _nmod_vec_dot2_half_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod);
+ulong _nmod_vec_dot2_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod);
+ulong _nmod_vec_dot3_acc_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod);
+ulong _nmod_vec_dot3_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod);
+
 #if FLINT_BITS == 64
 ulong _nmod_vec_dot2_split(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, ulong pow2_precomp);
 ulong _nmod_vec_dot2_split_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, ulong pow2_precomp);
+ulong _nmod_vec_dot2_split_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod, ulong pow2_precomp);
 #endif  // FLINT_BITS == 64
 
 /* general dot functions */
 
+
 NMOD_VEC_INLINE ulong _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_t params)
 {
     // handle short products
-    if (len <= 2 && params.method > _DOT1)
+    if (len <= 4)
     {
-        if (len == 2)
-            return nmod_fmma(vec1[0], vec2[0], vec1[1], vec2[1], mod);
-        if (len == 1)
-            return nmod_mul(vec1[0], vec2[0], mod);
-        return 0;
+        if (params.method <= _DOT1 || params.method == _DOT_POW2)
+        {
+            if (len == 4)
+            {
+                ulong res =   vec1[0] * vec2[0]
+                            + vec1[1] * vec2[1]
+                            + vec1[2] * vec2[2]
+                            + vec1[3] * vec2[3];
+                NMOD_RED(res, res, mod);
+                return res;
+            }
+            if (len == 3)
+            {
+                ulong res =   vec1[0] * vec2[0]
+                            + vec1[1] * vec2[1]
+                            + vec1[2] * vec2[2];
+                NMOD_RED(res, res, mod);
+                return res;
+            }
+            if (len == 2)
+            {
+                ulong res = vec1[0] * vec2[0] + vec1[1] * vec2[1];
+                NMOD_RED(res, res, mod);
+                return res;
+            }
+            if (len == 1)
+            {
+                ulong res = vec1[0] * vec2[0];
+                NMOD_RED(res, res, mod);
+                return res;
+            }
+            return 0;
+        }
+
+        else if (params.method <= _DOT2)
+        {
+            if (len == 4)
+            {
+                ulong s0, s1, u0, u1;
+                umul_ppmm(u1, u0, vec1[0], vec2[0]);
+                umul_ppmm(s1, s0, vec1[1], vec2[1]);
+                add_ssaaaa(u1, u0, u1, u0, s1, s0);
+                umul_ppmm(s1, s0, vec1[2], vec2[2]);
+                add_ssaaaa(u1, u0, u1, u0, s1, s0);
+                umul_ppmm(s1, s0, vec1[3], vec2[3]);
+                add_ssaaaa(u1, u0, u1, u0, s1, s0);
+                NMOD2_RED2(s0, u1, u0, mod);
+                return s0;
+            }
+            if (len == 3)
+            {
+                ulong s0, s1, u0, u1;
+                umul_ppmm(u1, u0, vec1[0], vec2[0]);
+                umul_ppmm(s1, s0, vec1[1], vec2[1]);
+                add_ssaaaa(u1, u0, u1, u0, s1, s0);
+                umul_ppmm(s1, s0, vec1[2], vec2[2]);
+                add_ssaaaa(u1, u0, u1, u0, s1, s0);
+                NMOD2_RED2(s0, u1, u0, mod);
+                return s0;
+            }
+            if (len == 2)
+            {
+                ulong s0, s1, u0, u1;
+                umul_ppmm(u1, u0, vec1[0], vec2[0]);
+                umul_ppmm(s1, s0, vec1[1], vec2[1]);
+                add_ssaaaa(u1, u0, u1, u0, s1, s0);
+                NMOD2_RED2(s0, u1, u0, mod);
+                return s0;
+            }
+            if (len == 1)
+                return nmod_mul(vec1[0], vec2[0], mod);
+            return 0;
+        }
+
+        else  // if (params.method > _DOT2)
+        {
+            if (len == 4)
+            {
+                ulong res = nmod_mul(vec1[0], vec2[0], mod);
+                res = nmod_addmul(res, vec1[1], vec2[1], mod);
+                res = nmod_addmul(res, vec1[2], vec2[2], mod);
+                res = nmod_addmul(res, vec1[3], vec2[3], mod);
+                return res;
+            }
+            if (len == 3)
+            {
+                ulong res = nmod_mul(vec1[0], vec2[0], mod);
+                res = nmod_addmul(res, vec1[1], vec2[1], mod);
+                res = nmod_addmul(res, vec1[2], vec2[2], mod);
+                return res;
+            }
+            if (len == 2)
+                return nmod_fmma(vec1[0], vec2[0], vec1[1], vec2[1], mod);
+            if (len == 1)
+                return nmod_mul(vec1[0], vec2[0], mod);
+            return 0;
+        }
     }
 
     if (params.method == _DOT1)
@@ -435,13 +617,105 @@ NMOD_VEC_INLINE ulong _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len, n
 
 NMOD_VEC_INLINE ulong _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_t params)
 {
-    if (len <= 2 && params.method > _DOT1)
+    if (len <= 4)
     {
-        if (len == 2)
-            return nmod_fmma(vec1[0], vec2[1], vec1[1], vec2[0], mod);
-        if (len == 1)
-            return nmod_mul(vec1[0], vec2[0], mod);
-        return 0;
+        if (params.method <= _DOT1 || params.method == _DOT_POW2)
+        {
+            if (len == 4)
+            {
+                ulong res =   vec1[0] * vec2[3]
+                            + vec1[1] * vec2[2]
+                            + vec1[2] * vec2[1]
+                            + vec1[3] * vec2[0];
+                NMOD_RED(res, res, mod);
+                return res;
+            }
+            if (len == 3)
+            {
+                ulong res =   vec1[0] * vec2[2]
+                            + vec1[1] * vec2[1]
+                            + vec1[2] * vec2[0];
+                NMOD_RED(res, res, mod);
+                return res;
+            }
+            if (len == 2)
+            {
+                ulong res = vec1[0] * vec2[1] + vec1[1] * vec2[0];
+                NMOD_RED(res, res, mod);
+                return res;
+            }
+            if (len == 1)
+            {
+                ulong res = vec1[0] * vec2[0];
+                NMOD_RED(res, res, mod);
+                return res;
+            }
+            return 0;
+        }
+
+        else if (params.method <= _DOT2)
+        {
+            if (len == 4)
+            {
+                ulong s0, s1, u0, u1;
+                umul_ppmm(u1, u0, vec1[0], vec2[3]);
+                umul_ppmm(s1, s0, vec1[1], vec2[2]);
+                add_ssaaaa(u1, u0, u1, u0, s1, s0);
+                umul_ppmm(s1, s0, vec1[2], vec2[1]);
+                add_ssaaaa(u1, u0, u1, u0, s1, s0);
+                umul_ppmm(s1, s0, vec1[3], vec2[0]);
+                add_ssaaaa(u1, u0, u1, u0, s1, s0);
+                NMOD2_RED2(s0, u1, u0, mod);
+                return s0;
+            }
+            if (len == 3)
+            {
+                ulong s0, s1, u0, u1;
+                umul_ppmm(u1, u0, vec1[0], vec2[2]);
+                umul_ppmm(s1, s0, vec1[1], vec2[1]);
+                add_ssaaaa(u1, u0, u1, u0, s1, s0);
+                umul_ppmm(s1, s0, vec1[2], vec2[0]);
+                add_ssaaaa(u1, u0, u1, u0, s1, s0);
+                NMOD2_RED2(s0, u1, u0, mod);
+                return s0;
+            }
+            if (len == 2)
+            {
+                ulong s0, s1, u0, u1;
+                umul_ppmm(u1, u0, vec1[0], vec2[1]);
+                umul_ppmm(s1, s0, vec1[1], vec2[0]);
+                add_ssaaaa(u1, u0, u1, u0, s1, s0);
+                NMOD2_RED2(s0, u1, u0, mod);
+                return s0;
+            }
+            if (len == 1)
+                return nmod_mul(vec1[0], vec2[0], mod);
+            return 0;
+        }
+
+        else // if (params.method > _DOT2)
+        {
+            if (len == 4)
+            {
+                ulong res = nmod_mul(vec1[0], vec2[3], mod);
+                res = nmod_addmul(res, vec1[1], vec2[2], mod);
+                res = nmod_addmul(res, vec1[2], vec2[1], mod);
+                res = nmod_addmul(res, vec1[3], vec2[0], mod);
+                return res;
+            }
+            if (len == 3)
+            {
+                ulong res = nmod_mul(vec1[0], vec2[2], mod);
+                res = nmod_addmul(res, vec1[1], vec2[1], mod);
+                res = nmod_addmul(res, vec1[2], vec2[0], mod);
+                return res;
+            }
+            if (len == 2)
+                return nmod_fmma(vec1[0], vec2[1], vec1[1], vec2[0], mod);
+            if (len == 1)
+                return nmod_mul(vec1[0], vec2[0], mod);
+            return 0;
+        }
     }
 
     if (params.method == _DOT1)
@@ -471,7 +745,135 @@ NMOD_VEC_INLINE ulong _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong le
         return UWORD(0);
 }
 
-ulong _nmod_vec_dot_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod, dot_params_t);
+NMOD_VEC_INLINE ulong _nmod_vec_dot_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod, dot_params_t params)
+{
+    if (len <= 4)
+    {
+        if (params.method <= _DOT1 || params.method == _DOT_POW2)
+        {
+            if (len == 4)
+            {
+                ulong res =   vec1[0] * vec2[0][offset]
+                            + vec1[1] * vec2[1][offset]
+                            + vec1[2] * vec2[2][offset]
+                            + vec1[3] * vec2[3][offset];
+                NMOD_RED(res, res, mod);
+                return res;
+            }
+            if (len == 3)
+            {
+                ulong res =   vec1[0] * vec2[0][offset]
+                            + vec1[1] * vec2[1][offset]
+                            + vec1[2] * vec2[2][offset];
+                NMOD_RED(res, res, mod);
+                return res;
+            }
+            if (len == 2)
+            {
+                ulong res = vec1[0] * vec2[0][offset] + vec1[1] * vec2[1][offset];
+                NMOD_RED(res, res, mod);
+                return res;
+            }
+            if (len == 1)
+            {
+                ulong res = vec1[0] * vec2[0][offset];
+                NMOD_RED(res, res, mod);
+                return res;
+            }
+            return 0;
+        }
+
+        else if (params.method <= _DOT2)
+        {
+            if (len == 4)
+            {
+                ulong s0, s1, u0, u1;
+                umul_ppmm(u1, u0, vec1[0], vec2[0][offset]);
+                umul_ppmm(s1, s0, vec1[1], vec2[1][offset]);
+                add_ssaaaa(u1, u0, u1, u0, s1, s0);
+                umul_ppmm(s1, s0, vec1[2], vec2[2][offset]);
+                add_ssaaaa(u1, u0, u1, u0, s1, s0);
+                umul_ppmm(s1, s0, vec1[3], vec2[3][offset]);
+                add_ssaaaa(u1, u0, u1, u0, s1, s0);
+                NMOD2_RED2(s0, u1, u0, mod);
+                return s0;
+            }
+            if (len == 3)
+            {
+                ulong s0, s1, u0, u1;
+                umul_ppmm(u1, u0, vec1[0], vec2[0][offset]);
+                umul_ppmm(s1, s0, vec1[1], vec2[1][offset]);
+                add_ssaaaa(u1, u0, u1, u0, s1, s0);
+                umul_ppmm(s1, s0, vec1[2], vec2[2][offset]);
+                add_ssaaaa(u1, u0, u1, u0, s1, s0);
+                NMOD2_RED2(s0, u1, u0, mod);
+                return s0;
+            }
+            if (len == 2)
+            {
+                ulong s0, s1, u0, u1;
+                umul_ppmm(u1, u0, vec1[0], vec2[0][offset]);
+                umul_ppmm(s1, s0, vec1[1], vec2[1][offset]);
+                add_ssaaaa(u1, u0, u1, u0, s1, s0);
+                NMOD2_RED2(s0, u1, u0, mod);
+                return s0;
+            }
+            if (len == 1)
+                return nmod_mul(vec1[0], vec2[0][offset], mod);
+            return 0;
+        }
+
+        else // if (params.method > _DOT2)
+        {
+            if (len == 4)
+            {
+                ulong res = nmod_mul(vec1[0], vec2[0][offset], mod);
+                res = nmod_addmul(res, vec1[1], vec2[1][offset], mod);
+                res = nmod_addmul(res, vec1[2], vec2[2][offset], mod);
+                res = nmod_addmul(res, vec1[3], vec2[3][offset], mod);
+                return res;
+            }
+            if (len == 3)
+            {
+                ulong res = nmod_mul(vec1[0], vec2[0][offset], mod);
+                res = nmod_addmul(res, vec1[1], vec2[1][offset], mod);
+                res = nmod_addmul(res, vec1[2], vec2[2][offset], mod);
+                return res;
+            }
+            if (len == 2)
+                return nmod_fmma(vec1[0], vec2[0][offset], vec1[1], vec2[1][offset], mod);
+            if (len == 1)
+                return nmod_mul(vec1[0], vec2[0][offset], mod);
+            return 0;
+        }
+    }
+
+    if (params.method == _DOT1)
+        return _nmod_vec_dot1_ptr(vec1, vec2, offset, len, mod);
+
+#if FLINT_BITS == 64
+    if (params.method == _DOT2_SPLIT)
+        return _nmod_vec_dot2_split_ptr(vec1, vec2, offset, len, mod, params.pow2_precomp);
+#endif // FLINT_BITS == 64
+
+    if (params.method == _DOT2)
+        return _nmod_vec_dot2_ptr(vec1, vec2, offset, len, mod);
+
+    if (params.method == _DOT3_ACC)
+        return _nmod_vec_dot3_acc_ptr(vec1, vec2, offset, len, mod);
+
+    if (params.method == _DOT3)
+        return _nmod_vec_dot3_ptr(vec1, vec2, offset, len, mod);
+
+    if (params.method == _DOT2_HALF)
+        return _nmod_vec_dot2_half_ptr(vec1, vec2, offset, len, mod);
+
+    if (params.method == _DOT_POW2)
+        return _nmod_vec_dot_pow2_ptr(vec1, vec2, offset, len, mod);
+
+    else  // params.method == _DOT0
+        return UWORD(0);
+}
 
 /* some IO functions */
 #ifdef FLINT_HAVE_FILE

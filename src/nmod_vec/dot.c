@@ -19,87 +19,6 @@
 #endif // if defined(__AVX2__)
 
 
-dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
-{
-    if (len == 0 || mod.n == 1)
-        return (dot_params_t){_DOT0, UWORD(0)};
-    // from here on len >= 1
-
-//    // quick choice for short dot products
-//    if (len <= 16)
-//    {
-//        if (mod.n <= UWORD(1) << (FLINT_BITS / 2))
-//        {
-//            if ((mod.n & (mod.n - 1)) == 0
-//                    || mod.n <= UWORD(1) << (FLINT_BITS / 2 - 2))
-//                return (dot_params_t) {_DOT1, UWORD(0)};
-//
-//#if (FLINT_BITS == 64)
-//            if (mod.n <= UWORD(1515531528))  // _SPLIT, see below
-//            {
-//                ulong pow2_precomp;
-//                NMOD_RED(pow2_precomp, (UWORD(1) << DOT_SPLIT_BITS), mod);
-//                return (dot_params_t) {_DOT2_SPLIT, pow2_precomp};
-//            }
-//#endif  // FLINT_BITS == 64
-//
-//            return (dot_params_t) {_DOT2_HALF, UWORD(0)};
-//        }
-//
-//        if (mod.n <= UWORD(1) << (FLINT_BITS - 2))
-//            return (dot_params_t) {_DOT2, UWORD(0)};
-//
-//        return (dot_params_t) {_DOT3, UWORD(0)};
-//    }
-//    // from here on len > 16
-
-    if (mod.n <= UWORD(1) << (FLINT_BITS / 2)) // implies <= 2 limbs
-    {
-        const ulong t0 = (mod.n - 1) * (mod.n - 1);
-        ulong u1, u0;
-        umul_ppmm(u1, u0, t0, len);
-        if (u1 == 0 || (mod.n & (mod.n - 1)) == 0)  // 1 limb || power of 2
-            return (dot_params_t) {_DOT1, UWORD(0)};
-
-        // u1 != 0 <=> 2 limbs
-#if (FLINT_BITS == 64) // _SPLIT: see end of file for these constraints
-        if (mod.n <= UWORD(1515531528) && len <= WORD(380368697))
-        {
-            ulong pow2_precomp;
-            NMOD_RED(pow2_precomp, (UWORD(1) << DOT_SPLIT_BITS), mod);
-            return (dot_params_t) {_DOT2_SPLIT, pow2_precomp};
-        }
-#endif
-
-        return (dot_params_t) {_DOT2_HALF, UWORD(0)};
-    }
-    // from here on, mod.n > 2**(FLINT_BITS / 2)
-    // --> unreduced dot cannot fit in 1 limb
-
-    if ((mod.n & (mod.n - 1)) == 0) // power of 2
-        return (dot_params_t) {_DOT_POW2, UWORD(0)};
-
-    ulong t2, t1, t0, u1, u0;
-    umul_ppmm(t1, t0, mod.n - 1, mod.n - 1);
-    umul_ppmm(t2, t1, t1, len);
-    umul_ppmm(u1, u0, t0, len);
-    add_ssaaaa(t2, t1, t2, t1, UWORD(0), u1);
-
-    if (t2 == 0) // 2 limbs
-        return (dot_params_t) {_DOT2, UWORD(0)};
-
-    // 3 limbs:
-#if (FLINT_BITS == 64)
-    if (mod.n <= UWORD(6521908912666391107))  // room for accumulating 8 terms
-#else
-    if (mod.n <= UWORD(1518500250))           // room for accumulating 8 terms
-#endif
-        return (dot_params_t) {_DOT3_ACC, UWORD(0)};
-
-    return (dot_params_t) {_DOT3, UWORD(0)};
-}
-
-
 /*-------------------------------------------*/
 /*     dot product: vec1[i] * vec2[i]        */
 /*-------------------------------------------*/
@@ -199,7 +118,7 @@ ulong _nmod_vec_dot2_split(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod
     ulong dp_hi = 0;
 
     slong i = 0;
-    for ( ; i+7 < (len); i += 8)
+    for ( ; i+7 < len; i += 8)
     {
         dp_lo += vec1[i+0] * vec2[i+0]
                + vec1[i+1] * vec2[i+1]
@@ -228,7 +147,7 @@ ulong _nmod_vec_dot2_half(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
 {
     ulong s0 = UWORD(0);
     ulong s1 = UWORD(0);
-    for (slong i = 0; i < (len); i++)
+    for (slong i = 0; i < len; i++)
     {
         const ulong prod = vec1[i] * vec2[i];
         add_ssaaaa(s1, s0, s1, s0, 0, prod);
@@ -342,6 +261,7 @@ ulong _nmod_vec_dot3_acc(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
     return res;
 }
 
+
 /*-----------------------------------------------*/
 /*   dot product rev: vec1[i] * vec2[len-1-i]    */
 /*-----------------------------------------------*/
@@ -443,7 +363,7 @@ ulong _nmod_vec_dot2_split_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t
     ulong dp_hi = 0;
 
     slong i = 0;
-    for ( ; i+7 < (len); i += 8)
+    for ( ; i+7 < len; i += 8)
     {
         dp_lo += vec1[i+0] * vec2[len-1-i]
                + vec1[i+1] * vec2[len-2-i]
@@ -472,7 +392,7 @@ ulong _nmod_vec_dot2_half_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t 
 {
     ulong s0 = UWORD(0);
     ulong s1 = UWORD(0);
-    for (slong i = 0; i < (len); i++)
+    for (slong i = 0; i < len; i++)
     {
         const ulong prod = vec1[i] * vec2[len-1-i];
         add_ssaaaa(s1, s0, s1, s0, 0, prod);
@@ -588,15 +508,222 @@ ulong _nmod_vec_dot3_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
 
 
 
-ulong
-_nmod_vec_dot_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset,
-                            slong len, nmod_t mod, dot_params_t params)
+/*-----------------------------------------------*/
+/*   dot product ptr: vec1[i] * vec2[i][offset]  */
+/*-----------------------------------------------*/
+
+ulong _nmod_vec_dot_pow2_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod)
 {
-    ulong res;
-    slong i;
-    NMOD_VEC_DOT(res, i, len, vec1[i], vec2[i][offset], mod, params);
+    ulong res = UWORD(0);
+    for (slong i = 0; i < len; i++)
+        res += vec1[i] * vec2[i][offset];
+    NMOD_RED(res, res, mod);
     return res;
 }
+
+ulong _nmod_vec_dot1_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod)
+#if 0 // defined(__AVX2__) && FLINT_BITS == 64
+#else  // if defined(__AVX2__) && FLINT_BITS == 64
+{
+    ulong res = UWORD(0);
+    for (slong i = 0; i < len; i++)
+        res += vec1[i] * vec2[i][offset];
+    NMOD_RED(res, res, mod);
+    return res;
+}
+#endif  // if defined(__AVX2__) && FLINT_BITS == 64
+
+ulong _nmod_vec_dot2_half_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod)
+{
+    ulong s0 = UWORD(0);
+    ulong s1 = UWORD(0);
+    for (slong i = 0; i < len; i++)
+    {
+        const ulong prod = vec1[i] * vec2[i][offset];
+        add_ssaaaa(s1, s0, s1, s0, 0, prod);
+    }
+    ulong res;
+    NMOD2_RED2(res, s1, s0, mod);
+    return res;
+}
+
+ulong _nmod_vec_dot2_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod)
+{
+    ulong u0 = UWORD(0);
+    ulong u1 = UWORD(0);
+
+    slong i = 0;
+    for ( ; i+7 < len; i += 8)
+    {
+        ulong s0, s1;
+        umul_ppmm(s1, s0, vec1[i+0], vec2[i+0][offset]);
+        add_ssaaaa(u1, u0, u1, u0, s1, s0);
+        umul_ppmm(s1, s0, vec1[i+1], vec2[i+1][offset]);
+        add_ssaaaa(u1, u0, u1, u0, s1, s0);
+        umul_ppmm(s1, s0, vec1[i+2], vec2[i+2][offset]);
+        add_ssaaaa(u1, u0, u1, u0, s1, s0);
+        umul_ppmm(s1, s0, vec1[i+3], vec2[i+3][offset]);
+        add_ssaaaa(u1, u0, u1, u0, s1, s0);
+        umul_ppmm(s1, s0, vec1[i+4], vec2[i+4][offset]);
+        add_ssaaaa(u1, u0, u1, u0, s1, s0);
+        umul_ppmm(s1, s0, vec1[i+5], vec2[i+5][offset]);
+        add_ssaaaa(u1, u0, u1, u0, s1, s0);
+        umul_ppmm(s1, s0, vec1[i+6], vec2[i+6][offset]);
+        add_ssaaaa(u1, u0, u1, u0, s1, s0);
+        umul_ppmm(s1, s0, vec1[i+7], vec2[i+7][offset]);
+        add_ssaaaa(u1, u0, u1, u0, s1, s0);
+    }
+    for ( ; i < len; i++)
+    {
+        ulong s0, s1;
+        umul_ppmm(s1, s0, vec1[i], vec2[i][offset]);
+        add_ssaaaa(u1, u0, u1, u0, s1, s0);
+    }
+
+    ulong res;
+    NMOD2_RED2(res, u1, u0, mod);
+    return res;
+}
+
+
+ulong _nmod_vec_dot3_acc_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod)
+{
+    ulong t2 = UWORD(0);
+    ulong t1 = UWORD(0);
+    ulong t0 = UWORD(0);
+
+    slong i = 0;
+    for ( ; i+7 < len; i += 8)
+    {
+        ulong s0, s1;
+        ulong u0 = UWORD(0);
+        ulong u1 = UWORD(0);
+        umul_ppmm(s1, s0, vec1[i+0], vec2[i+0][offset]);
+        add_ssaaaa(u1, u0, u1, u0, s1, s0);
+        umul_ppmm(s1, s0, vec1[i+1], vec2[i+1][offset]);
+        add_ssaaaa(u1, u0, u1, u0, s1, s0);
+        umul_ppmm(s1, s0, vec1[i+2], vec2[i+2][offset]);
+        add_ssaaaa(u1, u0, u1, u0, s1, s0);
+        umul_ppmm(s1, s0, vec1[i+3], vec2[i+3][offset]);
+        add_ssaaaa(u1, u0, u1, u0, s1, s0);
+        umul_ppmm(s1, s0, vec1[i+4], vec2[i+4][offset]);
+        add_ssaaaa(u1, u0, u1, u0, s1, s0);
+        umul_ppmm(s1, s0, vec1[i+5], vec2[i+5][offset]);
+        add_ssaaaa(u1, u0, u1, u0, s1, s0);
+        umul_ppmm(s1, s0, vec1[i+6], vec2[i+6][offset]);
+        add_ssaaaa(u1, u0, u1, u0, s1, s0);
+        umul_ppmm(s1, s0, vec1[i+7], vec2[i+7][offset]);
+        add_sssaaaaaa(t2, t1, t0, t2, t1, t0, UWORD(0), u1, u0);
+    }
+
+    ulong s0, s1;
+    ulong u0 = UWORD(0);
+    ulong u1 = UWORD(0);
+    for ( ; i < len; i++)
+    {
+        umul_ppmm(s1, s0, vec1[i], vec2[i][offset]);
+        add_ssaaaa(u1, u0, u1, u0, s1, s0);
+    }
+
+    add_sssaaaaaa(t2, t1, t0, t2, t1, t0, UWORD(0), u1, u0);
+
+    NMOD_RED(t2, t2, mod);
+    ulong res;
+    NMOD_RED3(res, t2, t1, t0, mod);
+    return res;
+}
+
+ulong _nmod_vec_dot3_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod)
+{
+    ulong t2 = UWORD(0);
+    ulong t1 = UWORD(0);
+    ulong t0 = UWORD(0);
+    for (slong i = 0; i < len; i++)
+    {
+        ulong s0, s1;
+        umul_ppmm(s1, s0, vec1[i], vec2[i][offset]);
+        add_sssaaaaaa(t2, t1, t0, t2, t1, t0, UWORD(0), s1, s0);
+    }
+
+    NMOD_RED(t2, t2, mod);
+    ulong res;
+    NMOD_RED3(res, t2, t1, t0, mod);
+    return res;
+}
+
+
+
+#if FLINT_BITS == 64
+ulong _nmod_vec_dot2_split_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod, ulong pow2_precomp)
+#if 0  // defined(__AVX2__)
+{
+    const vec4n low_bits = vec4n_set_n(DOT_SPLIT_MASK);
+    vec4n dp_lo = vec4n_zero();
+    vec4n dp_hi = vec4n_zero();
+
+    slong i = 0;
+    for ( ; i+31 < len; i += 32)
+    {
+        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+ 0), vec4n_load_unaligned(vec2+i+ 0)));
+        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+ 4), vec4n_load_unaligned(vec2+i+ 4)));
+        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+ 8), vec4n_load_unaligned(vec2+i+ 8)));
+        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+12), vec4n_load_unaligned(vec2+i+12)));
+        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+16), vec4n_load_unaligned(vec2+i+16)));
+        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+20), vec4n_load_unaligned(vec2+i+20)));
+        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+24), vec4n_load_unaligned(vec2+i+24)));
+        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+28), vec4n_load_unaligned(vec2+i+28)));
+
+        dp_hi = vec4n_add(dp_hi, vec4n_bit_shift_right(dp_lo, DOT_SPLIT_BITS));
+        dp_lo = vec4n_bit_and(dp_lo, low_bits);
+    }
+
+    for ( ; i + 3 < len; i += 4)
+        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i), vec4n_load_unaligned(vec2+i)));
+
+    dp_hi = vec4n_add(dp_hi, vec4n_bit_shift_right(dp_lo, DOT_SPLIT_BITS));
+    dp_lo = vec4n_bit_and(dp_lo, low_bits);
+
+    ulong hsum_lo = vec4n_horizontal_sum(dp_lo);
+    const ulong hsum_hi = vec4n_horizontal_sum(dp_hi) + (hsum_lo >> DOT_SPLIT_BITS);
+    hsum_lo &= DOT_SPLIT_MASK;
+
+    for (; i < len; i++)
+        hsum_lo += vec1[i] * vec2[i];
+
+    ulong res;
+    NMOD_RED(res, pow2_precomp * hsum_hi + hsum_lo, mod);
+    return res;
+}
+#else  // defined(__AVX2__)
+{
+    ulong dp_lo = 0;
+    ulong dp_hi = 0;
+
+    slong i = 0;
+    for ( ; i+7 < len; i += 8)
+    {
+        dp_lo += vec1[i+0] * vec2[i+0][offset]
+               + vec1[i+1] * vec2[i+1][offset]
+               + vec1[i+2] * vec2[i+2][offset]
+               + vec1[i+3] * vec2[i+3][offset]
+               + vec1[i+4] * vec2[i+4][offset]
+               + vec1[i+5] * vec2[i+5][offset]
+               + vec1[i+6] * vec2[i+6][offset]
+               + vec1[i+7] * vec2[i+7][offset];
+
+        dp_hi += dp_lo >> DOT_SPLIT_BITS;
+        dp_lo &= DOT_SPLIT_MASK;
+    }
+
+    for ( ; i < len; i++)
+        dp_lo += vec1[i] * vec2[i][offset];
+
+    ulong res;
+    NMOD_RED(res, pow2_precomp * dp_hi + dp_lo, mod);
+    return res;
+}
+#endif  // defined(__AVX2__)
+#endif  // FLINT_BITS == 64
 
 
 /*----------------------------------------*/

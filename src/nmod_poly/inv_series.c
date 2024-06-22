@@ -31,7 +31,7 @@ _nmod_poly_inv_series_basecase_preinv1(nn_ptr Qinv, nn_srcptr Q, slong Qlen, slo
     {
         slong i, l;
         ulong s;
-        const dot_params_t params = _nmod_vec_dot_params(FLINT_MIN(n, Qlen), mod);
+        const dot_params_t params = _nmod_vec_dot_params(FLINT_MIN(n, Qlen) - 1, mod);
 
         for (i = 1; i < n; i++)
         {
