@@ -254,6 +254,7 @@ if host_machine.cpu_family() == 'aarch64'
   asm_path = 'arm64'
   param_path = 'arm64'
   flint_cv_have_fft_small_arm_i = 'yes'
+  flint_know_strong_order = 'no'
 
   # NOTE: Cortex values where taken from
   # https://developer.arm.com/Processors/Cortex-XXX
@@ -353,6 +354,7 @@ elif host_machine.cpu_family() == 'x86_64' and exact_cpu in X86_64_ADX_CPU_NAMES
   have_avx512 = 'no'
   have_avx2 = 'yes'
   flint_cv_have_fft_small_x86_i = 'yes'
+  flint_know_strong_order = 'yes'
 
   if exact_cpu == 'zen'
     gcc_cflags_arch = '-march=znver1'
@@ -460,6 +462,7 @@ elif host_machine.cpu_family() == 'x86_64'
 
   have_avx512 = 'no'
   have_avx2 = 'no'
+  flint_know_strong_order = 'yes'
 
   if exact_cpu in ['coreiibr', 'ivybridge']
     gcc_cflags_arch = '-march=ivybridge'
@@ -485,6 +488,9 @@ elif host_machine.cpu_family() == 'x86_64'
     gcc_cflags_arch = '-march=x86-64-v4'
     have_avx512 = 'yes'
 
+  else
+    flint_know_strong_order = 'no'
+
   endif
 
   if have_avx512 == 'yes'
@@ -505,6 +511,8 @@ else
 
   have_avx512 = 'no'
   have_avx2 = 'no'
+  flint_cv_have_fft_small_x86_i = 'no'
+  flint_know_strong_order = 'no'
 
 endif
 
@@ -644,9 +652,10 @@ if have_fft_small
     description: 'Define to use the fft_small module')
 endif
 
-# XXX: Need better CPU detection
-# cfg_data.set('FLINT_KNOW_STRONG_ORDER', 1,
-#   description: 'Define if system is strongly ordered')
+if flint_know_strong_order == 'yes'
+  cfg_data.set('FLINT_KNOW_STRONG_ORDER', 1,
+    description: 'Define if system is strongly ordered')
+endif
 
 if reentrant_opt.enabled()
   cfg_data.set('FLINT_REENTRANT', 1,
