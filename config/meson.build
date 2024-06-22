@@ -38,8 +38,6 @@ elif blas_opt.enabled()
   error('BLAS support is not yet implemented')
 elif gc_opt.enabled()
   error('Garbage collection is not yet implemented')
-elif ntl_opt.enabled()
-  error('NTL support is not yet implemented')
 endif
 
 # -----------------------------------------------------------------------------
