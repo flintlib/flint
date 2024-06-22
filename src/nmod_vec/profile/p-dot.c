@@ -42,7 +42,6 @@ void time_dot(ulong len, ulong n, flint_rand_t state)
 {
     nmod_t mod;
     nmod_init(&mod, n);
-    const dot_params_t params = _nmod_vec_dot_params(len, mod);
 
     nn_ptr v1 = _nmod_vec_init(len);
     _nmod_vec_rand(v1, state, len, mod);
@@ -56,6 +55,7 @@ void time_dot(ulong len, ulong n, flint_rand_t state)
     double FLINT_SET_BUT_UNUSED(tcpu), twall;
 
     TIMEIT_START
+    const dot_params_t params = _nmod_vec_dot_params(len, mod);
     res = _nmod_vec_dot(v1, v2, len, mod, params);
     TIMEIT_STOP_VALUES(tcpu, twall)
 
@@ -69,7 +69,6 @@ void time_dot_rev(ulong len, ulong n, flint_rand_t state)
 {
     nmod_t mod;
     nmod_init(&mod, n);
-    const dot_params_t params = _nmod_vec_dot_params(len, mod);
 
     nn_ptr v1 = _nmod_vec_init(len);
     _nmod_vec_rand(v1, state, len, mod);
@@ -83,6 +82,7 @@ void time_dot_rev(ulong len, ulong n, flint_rand_t state)
     double FLINT_SET_BUT_UNUSED(tcpu), twall;
 
     TIMEIT_START
+    const dot_params_t params = _nmod_vec_dot_params(len, mod);
     res = _nmod_vec_dot_rev(v1, v2, len, mod, params);
     TIMEIT_STOP_VALUES(tcpu, twall)
 
@@ -96,7 +96,6 @@ void time_dot_ptr(ulong len, ulong n, flint_rand_t state)
 {
     nmod_t mod;
     nmod_init(&mod, n);
-    const dot_params_t params = _nmod_vec_dot_params(len, mod);
 
     const ulong offset = UWORD(7);
 
@@ -115,6 +114,7 @@ void time_dot_ptr(ulong len, ulong n, flint_rand_t state)
     double FLINT_SET_BUT_UNUSED(tcpu), twall;
 
     TIMEIT_START
+    const dot_params_t params = _nmod_vec_dot_params(len, mod);
     res = _nmod_vec_dot_ptr(v1, v2, offset, len, mod, params);
     TIMEIT_STOP_VALUES(tcpu, twall)
 
@@ -216,7 +216,6 @@ void time_dot_poly_exp_series(ulong len, ulong n, flint_rand_t state)
     gr_poly_clear(p, ctx);
     gr_poly_clear(res, ctx);
 }
-
 
 /*-------------------------*/
 /* indirect: mat           */

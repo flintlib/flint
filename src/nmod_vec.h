@@ -147,38 +147,68 @@ typedef struct
 FLINT_FORCE_INLINE dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
 {
     if (len == 0 || mod.n == 1)
-        return (dot_params_t){_DOT0, UWORD(0)};
+        return (dot_params_t) {_DOT0, UWORD(0)};
     // from here on len >= 1
 
-    // this does not really seem to help,
-    // and is suboptimal in some cases (we are pretending there are 16 terms)
-//    // quick choice for short dot products
-//    if (len <= 16)
-//    {
-//        if (mod.n <= UWORD(1) << (FLINT_BITS / 2))
-//        {
-//            if (mod.n <= UWORD(1) << (FLINT_BITS / 2 - 2)
-//                    || (mod.n & (mod.n - 1)) == 0)
-//                return (dot_params_t) {_DOT1, UWORD(0)};
-//
-//#if (FLINT_BITS == 64)
-//            if (mod.n <= UWORD(1515531528))  // _SPLIT, see below
-//            {
-//                ulong pow2_precomp;
-//                NMOD_RED(pow2_precomp, (UWORD(1) << DOT_SPLIT_BITS), mod);
-//                return (dot_params_t) {_DOT2_SPLIT, pow2_precomp};
-//            }
-//#endif  // FLINT_BITS == 64
-//
-//            return (dot_params_t) {_DOT2_HALF, UWORD(0)};
-//        }
-//
-//        if (mod.n <= UWORD(1) << (FLINT_BITS - 2))
-//            return (dot_params_t) {_DOT2, UWORD(0)};
-//
-//        return (dot_params_t) {_DOT3, UWORD(0)};
-//    }
-//    // from here on len > 16
+#define _FIXED_LEN_MOD_BOUNDS(fixedlen, onelimb_bnd, twolimb_bnd) \
+        if (len == fixedlen)                                      \
+        {                                                         \
+            if (mod.n <= UWORD(onelimb_bnd))                      \
+                return (dot_params_t) {_DOT1, UWORD(0)};          \
+            if (mod.n <= UWORD(twolimb_bnd))                      \
+                return (dot_params_t) {_DOT2, UWORD(0)};          \
+            return (dot_params_t) {_DOT3, UWORD(0)};              \
+        }
+    // short dot products: k limbs  <=>  n <= ceil(2**(32*k) / sqrt(len))
+    // we use only _DOT1, _DOT2, _DOT3 in that case
+    if (len <= 10)
+    { // TODO 32 bits
+        if ((mod.n & (mod.n - 1)) == 0)  // power of 2
+            return (dot_params_t) {_DOT1, UWORD(0)};
+#if FLINT_BITS == 64
+        _FIXED_LEN_MOD_BOUNDS(10, 1358187914,  5833372668713515885);
+        _FIXED_LEN_MOD_BOUNDS( 9, 1431655766,  6148914691236517206);
+        _FIXED_LEN_MOD_BOUNDS( 8, 1518500250,  6521908912666391107);
+        _FIXED_LEN_MOD_BOUNDS( 7, 1623345051,  6972213902555716131);
+        _FIXED_LEN_MOD_BOUNDS( 6, 1753413057,  7530851732716320753);
+        _FIXED_LEN_MOD_BOUNDS( 5, 1920767767,  8249634742471189718);
+        _FIXED_LEN_MOD_BOUNDS( 4, 2147483648,  9223372036854775808);
+        _FIXED_LEN_MOD_BOUNDS( 3, 2479700525, 10650232656628343402);
+        _FIXED_LEN_MOD_BOUNDS( 2, 3037000500, 13043817825332782213);
+#else  // FLINT_BITS == 64
+        _FIXED_LEN_MOD_BOUNDS(10, 20725, 1358187914);
+        _FIXED_LEN_MOD_BOUNDS( 9, 21846, 1431655766);
+        _FIXED_LEN_MOD_BOUNDS( 8, 23171, 1518500250);
+        _FIXED_LEN_MOD_BOUNDS( 7, 24771, 1623345051);
+        _FIXED_LEN_MOD_BOUNDS( 6, 26755, 1753413057);
+        _FIXED_LEN_MOD_BOUNDS( 5, 29309, 1920767767);
+        _FIXED_LEN_MOD_BOUNDS( 4, 32768, 2147483648);
+        _FIXED_LEN_MOD_BOUNDS( 3, 37838, 2479700525);
+        _FIXED_LEN_MOD_BOUNDS( 2, 46341, 3037000500);
+#endif  // FLINT_BITS == 64
+        // remains len == 1
+        if (mod.n <= (UWORD(1) << FLINT_BITS / 2))
+            return (dot_params_t) {_DOT1, UWORD(0)};
+        return (dot_params_t) {_DOT2, UWORD(0)};
+    }
+#undef _FIXED_LEN_MOD_BOUNDS
+
+// sage: for ell in range(1,11):
+// ....:     n0 = ceil(2**16 / sqrt(ell))
+// ....:     n1 = ceil(2**32 / sqrt(ell))
+// ....:     n2 = ceil(2**64 / sqrt(ell))
+// ....:     print(f"{ell:2d}: {n0}  ||  {n1}  ||  {n2}")
+// ....:
+//  1: 65536  ||  4294967296  ||  18446744073709551616
+//  2: 46341  ||  3037000500  ||  13043817825332782213
+//  3: 37838  ||  2479700525  ||  10650232656628343402
+//  4: 32768  ||  2147483648  ||  9223372036854775808
+//  5: 29309  ||  1920767767  ||  8249634742471189718
+//  6: 26755  ||  1753413057  ||  7530851732716320753
+//  7: 24771  ||  1623345051  ||  6972213902555716131
+//  8: 23171  ||  1518500250  ||  6521908912666391107
+//  9: 21846  ||  1431655766  ||  6148914691236517206
+// 10: 20725  ||  1358187914  ||  5833372668713515885
 
     if (mod.n <= UWORD(1) << (FLINT_BITS / 2)) // implies <= 2 limbs
     {
@@ -454,117 +484,6 @@ do                                                                    \
 #endif  // FLINT_BITS == 64
 
 
-// warning: interface different from other _NMOD_VEC_DOT macros
-// * only supports len <= 4
-// * i must be already initialized at the first wanted value
-// * returns the result
-#define _NMOD_VEC_DOT_SHORT(i, expr1, expr2, len, mod, method)          \
-{                                                                       \
-    if (method <= _DOT1 || method == _DOT_POW2)                         \
-    {                                                                   \
-        if (len == 4)                                                   \
-        {                                                               \
-            ulong res = (expr1) * (expr2); i++;                         \
-            res += (expr1) * (expr2); i++;                              \
-            res += (expr1) * (expr2); i++;                              \
-            res += (expr1) * (expr2);                                   \
-            NMOD_RED(res, res, mod);                                    \
-            return res;                                                 \
-        }                                                               \
-        if (len == 3)                                                   \
-        {                                                               \
-            ulong res = (expr1) * (expr2); i++;                         \
-            res += (expr1) * (expr2); i++;                              \
-            res += (expr1) * (expr2);                                   \
-            NMOD_RED(res, res, mod);                                    \
-            return res;                                                 \
-        }                                                               \
-        if (len == 2)                                                   \
-        {                                                               \
-            ulong res = (expr1) * (expr2); i++;                         \
-            res += (expr1) * (expr2);                                   \
-            NMOD_RED(res, res, mod);                                    \
-            return res;                                                 \
-        }                                                               \
-        if (len == 1)                                                   \
-        {                                                               \
-            ulong res = (expr1) * (expr2);                              \
-            NMOD_RED(res, res, mod);                                    \
-            return res;                                                 \
-        }                                                               \
-        return 0;                                                       \
-    }                                                                   \
-                                                                        \
-    else if (method <= _DOT2)                                           \
-    {                                                                   \
-        if (len == 4)                                                   \
-        {                                                               \
-            ulong s0, s1, u0, u1;                                       \
-            umul_ppmm(u1, u0, (expr1), (expr2)); i++;                   \
-            umul_ppmm(s1, s0, (expr1), (expr2)); i++;                   \
-            add_ssaaaa(u1, u0, u1, u0, s1, s0);                         \
-            umul_ppmm(s1, s0, (expr1), (expr2)); i++;                   \
-            add_ssaaaa(u1, u0, u1, u0, s1, s0);                         \
-            umul_ppmm(s1, s0, (expr1), (expr2));                        \
-            add_ssaaaa(u1, u0, u1, u0, s1, s0);                         \
-            NMOD2_RED2(s0, u1, u0, mod);                                \
-            return s0;                                                  \
-        }                                                               \
-        if (len == 3)                                                   \
-        {                                                               \
-            ulong s0, s1, u0, u1;                                       \
-            umul_ppmm(u1, u0, (expr1), (expr2)); i++;                   \
-            umul_ppmm(s1, s0, (expr1), (expr2)); i++;                   \
-            add_ssaaaa(u1, u0, u1, u0, s1, s0);                         \
-            umul_ppmm(s1, s0, (expr1), (expr2));                        \
-            add_ssaaaa(u1, u0, u1, u0, s1, s0);                         \
-            NMOD2_RED2(s0, u1, u0, mod);                                \
-            return s0;                                                  \
-        }                                                               \
-        if (len == 2)                                                   \
-        {                                                               \
-            ulong s0, s1, u0, u1;                                       \
-            umul_ppmm(u1, u0, (expr1), (expr2)); i++;                   \
-            umul_ppmm(s1, s0, (expr1), (expr2));                        \
-            add_ssaaaa(u1, u0, u1, u0, s1, s0);                         \
-            NMOD2_RED2(s0, u1, u0, mod);                                \
-            return s0;                                                  \
-        }                                                               \
-        if (len == 1)                                                   \
-            return nmod_mul((expr1), (expr2), mod);                     \
-        return 0;                                                       \
-    }                                                                   \
-                                                                        \
-    else  /* if (method > _DOT2) */                                     \
-    {                                                                   \
-        if (len == 4)                                                   \
-        {                                                               \
-            ulong res = nmod_mul((expr1), (expr2), mod); i++;           \
-            res = nmod_addmul(res, (expr1), (expr2), mod); i++;         \
-            res = nmod_addmul(res, (expr1), (expr2), mod); i++;         \
-            res = nmod_addmul(res, (expr1), (expr2), mod);              \
-            return res;                                                 \
-        }                                                               \
-        if (len == 3)                                                   \
-        {                                                               \
-            ulong res = nmod_mul((expr1), (expr2), mod); i++;           \
-            res = nmod_addmul(res, (expr1), (expr2), mod); i++;         \
-            res = nmod_addmul(res, (expr1), (expr2), mod);              \
-            return res;                                                 \
-        }                                                               \
-        if (len == 2)                                                   \
-        {                                                               \
-            ulong res = nmod_mul((expr1), (expr2), mod); i++;           \
-            res = nmod_addmul(res, (expr1), (expr2), mod);              \
-            return res;                                                 \
-        }                                                               \
-        if (len == 1)                                                   \
-            return nmod_mul((expr1), (expr2), mod);                     \
-        return 0;                                                       \
-    }                                                                   \
-}  while(0);                                                            \
-
-
 /* dot functions: specific algorithms */
 ulong _nmod_vec_dot_pow2(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod);
 ulong _nmod_vec_dot1(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod);
@@ -596,10 +515,98 @@ ulong _nmod_vec_dot2_split_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset
 /* general dot functions */
 
 
-NMOD_VEC_INLINE ulong _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_t params)
+// auxiliary for short dot products
+#define _NMOD_VEC_DOT_SHORT1(fixedlen,expr1,expr2)       \
+        if (len == fixedlen)                             \
+        {                                                \
+            ulong res = (expr1) * (expr2); i++;          \
+            for (slong j = 0; j < fixedlen-1; j++, i++)  \
+                res += (expr1) * (expr2);                \
+            NMOD_RED(res, res, mod);                     \
+            return res;                                  \
+        }                                                \
+
+#define _NMOD_VEC_DOT_SHORT2(fixedlen,expr1,expr2)          \
+        if (len == fixedlen)                                \
+        {                                                   \
+            ulong s0, s1, u0, u1;                           \
+            umul_ppmm(u1, u0, (expr1), (expr2)); i++;       \
+            for (slong j = 0; j < fixedlen-1; j++, i++)     \
+            {                                               \
+                umul_ppmm(s1, s0, (expr1), (expr2));        \
+                add_ssaaaa(u1, u0, u1, u0, s1, s0);         \
+            }                                               \
+            NMOD2_RED2(s0, u1, u0, mod);                    \
+            return s0;                                      \
+        }                                                   \
+
+#define _NMOD_VEC_DOT_SHORT3(fixedlen,expr1,expr2)               \
+        if (len == fixedlen)                                     \
+        {                                                        \
+            ulong res = nmod_mul((expr1), (expr2), mod); i++;    \
+            for (slong j = 0; j < fixedlen-1; j++, i++)          \
+                res = nmod_addmul(res, (expr1), (expr2), mod);   \
+            return res;                                          \
+        }                                                        \
+
+// warning: interface different from other _NMOD_VEC_DOT macros
+// * only supports len <= 4, requires method==DOT0|DOT1|DOT2|DOT3
+// * i must be already initialized at the first wanted value
+// * returns the result
+#define _NMOD_VEC_DOT_SHORT(i, expr1, expr2, len, mod, method)          \
+{                                                                       \
+    if (method <= _DOT1)                                                \
+    {                                                                   \
+        _NMOD_VEC_DOT_SHORT1(1, expr1, expr2)                           \
+        _NMOD_VEC_DOT_SHORT1(2, expr1, expr2)                           \
+        _NMOD_VEC_DOT_SHORT1(3, expr1, expr2)                           \
+        _NMOD_VEC_DOT_SHORT1(4, expr1, expr2)                           \
+        _NMOD_VEC_DOT_SHORT1(5, expr1, expr2)                           \
+        _NMOD_VEC_DOT_SHORT1(6, expr1, expr2)                           \
+        _NMOD_VEC_DOT_SHORT1(7, expr1, expr2)                           \
+        _NMOD_VEC_DOT_SHORT1(8, expr1, expr2)                           \
+        _NMOD_VEC_DOT_SHORT1(9, expr1, expr2)                           \
+        _NMOD_VEC_DOT_SHORT1(10, expr1, expr2)                          \
+        return 0;                                                       \
+    }                                                                   \
+                                                                        \
+    else if (method == _DOT2)                                           \
+    {                                                                   \
+        if (len == 1)                                                   \
+            return nmod_mul((expr1), (expr2), mod);                     \
+        _NMOD_VEC_DOT_SHORT2(2, expr1, expr2)                           \
+        _NMOD_VEC_DOT_SHORT2(3, expr1, expr2)                           \
+        _NMOD_VEC_DOT_SHORT2(4, expr1, expr2)                           \
+        _NMOD_VEC_DOT_SHORT2(5, expr1, expr2)                           \
+        _NMOD_VEC_DOT_SHORT2(6, expr1, expr2)                           \
+        _NMOD_VEC_DOT_SHORT2(7, expr1, expr2)                           \
+        _NMOD_VEC_DOT_SHORT2(8, expr1, expr2)                           \
+        _NMOD_VEC_DOT_SHORT2(9, expr1, expr2)                           \
+        _NMOD_VEC_DOT_SHORT2(10, expr1, expr2)                          \
+        return 0;                                                       \
+    }                                                                   \
+                                                                        \
+    else if (method == _DOT3)                                           \
+    {                                                                   \
+        if (len == 1)                                                   \
+            return nmod_mul((expr1), (expr2), mod);                     \
+        _NMOD_VEC_DOT_SHORT3(2, expr1, expr2)                           \
+        _NMOD_VEC_DOT_SHORT3(3, expr1, expr2)                           \
+        _NMOD_VEC_DOT_SHORT3(4, expr1, expr2)                           \
+        _NMOD_VEC_DOT_SHORT3(5, expr1, expr2)                           \
+        _NMOD_VEC_DOT_SHORT3(6, expr1, expr2)                           \
+        _NMOD_VEC_DOT_SHORT3(7, expr1, expr2)                           \
+        _NMOD_VEC_DOT_SHORT3(8, expr1, expr2)                           \
+        _NMOD_VEC_DOT_SHORT3(9, expr1, expr2)                           \
+        _NMOD_VEC_DOT_SHORT3(10, expr1, expr2)                          \
+        return 0;                                                       \
+    }                                                                   \
+}  while(0);                                                            \
+
+FLINT_FORCE_INLINE ulong _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_t params)
 {
     // handle short products
-    if (len <= 4)
+    if (len <= 10)
     {
         slong i = 0;
         _NMOD_VEC_DOT_SHORT(i, vec1[i], vec2[i], len, mod, params.method);
@@ -632,9 +639,9 @@ NMOD_VEC_INLINE ulong _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len, n
     return UWORD(0);
 }
 
-NMOD_VEC_INLINE ulong _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_t params)
+FLINT_FORCE_INLINE ulong _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_t params)
 {
-    if (len <= 4)
+    if (len <= 10)
     {
         slong i = 0;
         _NMOD_VEC_DOT_SHORT(i, vec1[i], vec2[len-1-i], len, mod, params.method);
@@ -667,9 +674,9 @@ NMOD_VEC_INLINE ulong _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong le
         return UWORD(0);
 }
 
-NMOD_VEC_INLINE ulong _nmod_vec_dot_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod, dot_params_t params)
+FLINT_FORCE_INLINE ulong _nmod_vec_dot_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod, dot_params_t params)
 {
-    if (len <= 4)
+    if (len <= 10)
     {
         slong i = 0;
         _NMOD_VEC_DOT_SHORT(i, vec1[i], vec2[i][offset], len, mod, params.method);
@@ -701,6 +708,11 @@ NMOD_VEC_INLINE ulong _nmod_vec_dot_ptr(nn_srcptr vec1, const nn_ptr * vec2, slo
     else  // params.method == _DOT0
         return UWORD(0);
 }
+
+#undef _NMOD_VEC_DOT_SHORT1
+#undef _NMOD_VEC_DOT_SHORT2
+#undef _NMOD_VEC_DOT_SHORT3
+
 
 /* some IO functions */
 #ifdef FLINT_HAVE_FILE
