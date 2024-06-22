@@ -24,6 +24,7 @@ fft_small_opt = get_option('fft_small')
 blas_opt = get_option('blas')
 gc_opt = get_option('gc')
 ntl_opt = get_option('ntl')
+coverage_opt = get_option('b_coverage')
 
 # -----------------------------------------------------------------------------
 #   Unsupported options
@@ -713,8 +714,9 @@ cfg_data_internal = cfg_data
 
 #cfg_data_internal.set('AC_APPLE_UNIVERSAL_BUILD', 1)
 
-# XXX: Change this when coverage options are added
-#cfg_data_internal.set('FLINT_COVERAGE', 1)
+if coverage_opt
+  cfg_data_internal.set('FLINT_COVERAGE', 1)
+endif
 
 if cc.has_header_symbol('stdlib.h', 'aligned_alloc')
   cfg_data_internal.set('HAVE_ALIGNED_ALLOC', 1,

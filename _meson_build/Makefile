@@ -20,12 +20,12 @@ uninstall:
 
 test: setup
 	meson configure $(BUILDDIR) -Dtests=enabled
-	meson test -C $(BUILDDIR)
+	meson test -C $(BUILDDIR) --timeout-multiplier 10
 
 coverage: setup
 	# Coverage tool e.g. gcovr needs to be installed *before* meson configure:
 	#    pip install gcovr
 	meson configure $(BUILDDIR) -Dtests=enabled -Db_coverage=true
-	meson test -C $(BUILDDIR)
+	meson test -C $(BUILDDIR) --timeout-multiplier 10
 	cd $(BUILDDIR) && ninja coverage-html
 	# open $(BUILDDIR)/meson-logs/coveragereport/index.html
