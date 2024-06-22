@@ -180,7 +180,7 @@ _nmod_mat_mul_classical_op(nmod_mat_t D, const nmod_mat_t C,
         return;
     }
 
-    dot_params_t params = _nmod_vec_dot_params(k, mod);
+    const dot_params_t params = _nmod_vec_dot_params(k, mod);
 
     // TODO vec_dot changes --> thresholds to re-examine
     if (params.method == _DOT1 && m > 10 && k > 10 && n > 10)

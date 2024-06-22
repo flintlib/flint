@@ -157,8 +157,8 @@ FLINT_FORCE_INLINE dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
 //    {
 //        if (mod.n <= UWORD(1) << (FLINT_BITS / 2))
 //        {
-//            if ((mod.n & (mod.n - 1)) == 0
-//                    || mod.n <= UWORD(1) << (FLINT_BITS / 2 - 2))
+//            if (mod.n <= UWORD(1) << (FLINT_BITS / 2 - 2)
+//                    || (mod.n & (mod.n - 1)) == 0)
 //                return (dot_params_t) {_DOT1, UWORD(0)};
 //
 //#if (FLINT_BITS == 64)

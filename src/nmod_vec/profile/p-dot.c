@@ -455,7 +455,7 @@ int main(int argc, char ** argv)
 
                 printf("%-10ld", b);
                 ulong n;
-                if (b == 232) 
+                if (b == 232)
                     n = UWORD(1) << 32;
                 else if (b == 263)
                     n = UWORD(1) << 63;
@@ -486,7 +486,7 @@ int main(int argc, char ** argv)
 
             printf("%-10ld", b);
             ulong n;
-            if (b == 232) 
+            if (b == 232)
                 n = UWORD(1) << 32;
             else if (b == 263)
                 n = UWORD(1) << 63;
@@ -513,7 +513,7 @@ int main(int argc, char ** argv)
 
         printf("%-10ld", b);
         ulong n;
-        if (b == 232) 
+        if (b == 232)
             n = UWORD(1) << 32;
         else if (b == 263)
             n = UWORD(1) << 63;
@@ -540,7 +540,7 @@ int main(int argc, char ** argv)
 
         printf("%-10ld", b);
         ulong n;
-        if (b == 232) 
+        if (b == 232)
             n = UWORD(1) << 32;
         else if (b == 263)
             n = UWORD(1) << 63;

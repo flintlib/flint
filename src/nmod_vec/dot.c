@@ -613,6 +613,7 @@ ulong _nmod_vec_dot3_acc_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, 
         umul_ppmm(s1, s0, vec1[i+6], vec2[i+6][offset]);
         add_ssaaaa(u1, u0, u1, u0, s1, s0);
         umul_ppmm(s1, s0, vec1[i+7], vec2[i+7][offset]);
+        add_ssaaaa(u1, u0, u1, u0, s1, s0);
         add_sssaaaaaa(t2, t1, t0, t2, t1, t0, UWORD(0), u1, u0);
     }
 
