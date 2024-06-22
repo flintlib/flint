@@ -411,11 +411,54 @@ do                                                                    \
     NMOD_RED3(res, t2zz, t1zz, t0zz, mod);                            \
 } while(0);
 
+
+#if (FLINT_BITS == 64)
+
+#define NMOD_VEC_DOT(res, i, len, expr1, expr2, mod, params)          \
+do                                                                    \
+{                                                                     \
+    res = UWORD(0);   /* covers _DOT0 */                              \
+    if (params.method == _DOT1 || params.method == _DOT_POW2)         \
+        _NMOD_VEC_DOT1(res, i, len, expr1, expr2, mod)                \
+    else if (params.method == _DOT2_SPLIT)                            \
+        _NMOD_VEC_DOT2_SPLIT(res, i, len, expr1, expr2, mod,          \
+                params.pow2_precomp)                                  \
+    else if (params.method == _DOT2_HALF)                             \
+        _NMOD_VEC_DOT2_HALF(res, i, len, expr1, expr2, mod)           \
+    else if (params.method == _DOT2)                                  \
+        _NMOD_VEC_DOT2(res, i, len, expr1, expr2, mod)                \
+    else if (params.method == _DOT3_ACC)                              \
+        _NMOD_VEC_DOT3_ACC(res, i, len, expr1, expr2, mod)            \
+    else if (params.method == _DOT3)                                  \
+        _NMOD_VEC_DOT3(res, i, len, expr1, expr2, mod)                \
+} while(0);
+
+#else  // FLINT_BITS == 64
+
+#define NMOD_VEC_DOT(res, i, len, expr1, expr2, mod, params)          \
+do                                                                    \
+{                                                                     \
+    res = UWORD(0);   /* covers _DOT0 */                              \
+    if (params.method == _DOT1 || params.method == _DOT_POW2)         \
+        _NMOD_VEC_DOT1(res, i, len, expr1, expr2, mod)                \
+    else if (params.method == _DOT2_HALF)                             \
+        _NMOD_VEC_DOT2_HALF(res, i, len, expr1, expr2, mod)           \
+    else if (params.method == _DOT2)                                  \
+        _NMOD_VEC_DOT2(res, i, len, expr1, expr2, mod)                \
+    else if (params.method == _DOT3_ACC)                              \
+        _NMOD_VEC_DOT3_ACC(res, i, len, expr1, expr2, mod)            \
+    else if (params.method == _DOT3)                                  \
+        _NMOD_VEC_DOT3(res, i, len, expr1, expr2, mod)                \
+} while(0);
+
+#endif  // FLINT_BITS == 64
+
+
 // warning: interface different from other _NMOD_VEC_DOT macros
 // * only supports len <= 4
 // * i must be already initialized at the first wanted value
 // * returns the result
-#define NMOD_VEC_DOT_SHORT(i, expr1, expr2, len, mod, method)           \
+#define _NMOD_VEC_DOT_SHORT(i, expr1, expr2, len, mod, method)          \
 {                                                                       \
     if (method <= _DOT1 || method == _DOT_POW2)                         \
     {                                                                   \
@@ -519,50 +562,8 @@ do                                                                    \
             return nmod_mul((expr1), (expr2), mod);                     \
         return 0;                                                       \
     }                                                                   \
-}                                                                       \
+}  while(0);                                                            \
 
-
-
-#if (FLINT_BITS == 64)
-
-#define NMOD_VEC_DOT(res, i, len, expr1, expr2, mod, params)          \
-do                                                                    \
-{                                                                     \
-    res = UWORD(0);   /* covers _DOT0 */                              \
-    if (params.method == _DOT1 || params.method == _DOT_POW2)         \
-        _NMOD_VEC_DOT1(res, i, len, expr1, expr2, mod)                \
-    else if (params.method == _DOT2_SPLIT)                            \
-        _NMOD_VEC_DOT2_SPLIT(res, i, len, expr1, expr2, mod,          \
-                params.pow2_precomp)                                  \
-    else if (params.method == _DOT2_HALF)                             \
-        _NMOD_VEC_DOT2_HALF(res, i, len, expr1, expr2, mod)           \
-    else if (params.method == _DOT2)                                  \
-        _NMOD_VEC_DOT2(res, i, len, expr1, expr2, mod)                \
-    else if (params.method == _DOT3_ACC)                              \
-        _NMOD_VEC_DOT3_ACC(res, i, len, expr1, expr2, mod)            \
-    else if (params.method == _DOT3)                                  \
-        _NMOD_VEC_DOT3(res, i, len, expr1, expr2, mod)                \
-} while(0);
-
-#else  // FLINT_BITS == 64
-
-#define NMOD_VEC_DOT(res, i, len, expr1, expr2, mod, params)          \
-do                                                                    \
-{                                                                     \
-    res = UWORD(0);   /* covers _DOT0 */                              \
-    if (params.method == _DOT1 || params.method == _DOT_POW2)         \
-        _NMOD_VEC_DOT1(res, i, len, expr1, expr2, mod)                \
-    else if (params.method == _DOT2_HALF)                             \
-        _NMOD_VEC_DOT2_HALF(res, i, len, expr1, expr2, mod)           \
-    else if (params.method == _DOT2)                                  \
-        _NMOD_VEC_DOT2(res, i, len, expr1, expr2, mod)                \
-    else if (params.method == _DOT3_ACC)                              \
-        _NMOD_VEC_DOT3_ACC(res, i, len, expr1, expr2, mod)            \
-    else if (params.method == _DOT3)                                  \
-        _NMOD_VEC_DOT3(res, i, len, expr1, expr2, mod)                \
-} while(0);
-
-#endif  // FLINT_BITS == 64
 
 /* dot functions: specific algorithms */
 ulong _nmod_vec_dot_pow2(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod);
@@ -601,7 +602,7 @@ NMOD_VEC_INLINE ulong _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len, n
     if (len <= 4)
     {
         slong i = 0;
-        NMOD_VEC_DOT_SHORT(i, vec1[i], vec2[i], len, mod, params.method);
+        _NMOD_VEC_DOT_SHORT(i, vec1[i], vec2[i], len, mod, params.method);
     }
 
     if (params.method == _DOT1)
@@ -636,7 +637,7 @@ NMOD_VEC_INLINE ulong _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong le
     if (len <= 4)
     {
         slong i = 0;
-        NMOD_VEC_DOT_SHORT(i, vec1[i], vec2[len-1-i], len, mod, params.method);
+        _NMOD_VEC_DOT_SHORT(i, vec1[i], vec2[len-1-i], len, mod, params.method);
     }
 
     if (params.method == _DOT1)
@@ -671,7 +672,7 @@ NMOD_VEC_INLINE ulong _nmod_vec_dot_ptr(nn_srcptr vec1, const nn_ptr * vec2, slo
     if (len <= 4)
     {
         slong i = 0;
-        NMOD_VEC_DOT_SHORT(i, vec1[i], vec2[i][offset], len, mod, params.method);
+        _NMOD_VEC_DOT_SHORT(i, vec1[i], vec2[i][offset], len, mod, params.method);
     }
 
     if (params.method == _DOT1)
