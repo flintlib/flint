@@ -38,7 +38,96 @@ void nmod_mat_rand(nmod_mat_t mat, flint_rand_t state)
 /* direct: dot / dot_rev / dot expr   */
 /*------------------------------------*/
 
+// timings excluding dot_params
 void time_dot(ulong len, ulong n, flint_rand_t state)
+{
+    nmod_t mod;
+    nmod_init(&mod, n);
+    const dot_params_t params = _nmod_vec_dot_params(len, mod);
+
+    nn_ptr v1 = _nmod_vec_init(len);
+    _nmod_vec_rand(v1, state, len, mod);
+    nn_ptr v2 = _nmod_vec_init(len);
+    _nmod_vec_rand(v2, state, len, mod);
+
+    // store results in volatile variable to avoid that they
+    // are "optimized away" (especially for inlined part)
+    volatile ulong FLINT_SET_BUT_UNUSED(res);
+
+    double FLINT_SET_BUT_UNUSED(tcpu), twall;
+
+    TIMEIT_START
+    res = _nmod_vec_dot(v1, v2, len, mod, params);
+    TIMEIT_STOP_VALUES(tcpu, twall)
+
+    printf("%.2e", twall);
+
+    _nmod_vec_clear(v1);
+    _nmod_vec_clear(v2);
+}
+
+void time_dot_rev(ulong len, ulong n, flint_rand_t state)
+{
+    nmod_t mod;
+    nmod_init(&mod, n);
+    const dot_params_t params = _nmod_vec_dot_params(len, mod);
+
+    nn_ptr v1 = _nmod_vec_init(len);
+    _nmod_vec_rand(v1, state, len, mod);
+    nn_ptr v2 = _nmod_vec_init(len);
+    _nmod_vec_rand(v2, state, len, mod);
+
+    // store results in volatile variable to avoid that they
+    // are "optimized away" (especially for inlined part)
+    volatile ulong FLINT_SET_BUT_UNUSED(res);
+
+    double FLINT_SET_BUT_UNUSED(tcpu), twall;
+
+    TIMEIT_START
+    res = _nmod_vec_dot_rev(v1, v2, len, mod, params);
+    TIMEIT_STOP_VALUES(tcpu, twall)
+
+    printf("%.2e", twall);
+
+    _nmod_vec_clear(v1);
+    _nmod_vec_clear(v2);
+}
+
+void time_dot_ptr(ulong len, ulong n, flint_rand_t state)
+{
+    nmod_t mod;
+    nmod_init(&mod, n);
+    const dot_params_t params = _nmod_vec_dot_params(len, mod);
+
+    const ulong offset = UWORD(7);
+
+    nn_ptr v1 = _nmod_vec_init(len);
+    _nmod_vec_rand(v1, state, len, mod);
+    nn_ptr v2tmp = _nmod_vec_init(len);
+    _nmod_vec_rand(v2tmp, state, len, mod);
+    nn_ptr * v2 = flint_malloc(sizeof(nn_ptr) * len);
+    for (ulong i = 0; i < len; i++)
+        v2[i] = &v2tmp[i] + offset;
+
+    // store results in volatile variable to avoid that they
+    // are "optimized away" (especially for inlined part)
+    volatile ulong FLINT_SET_BUT_UNUSED(res);
+
+    double FLINT_SET_BUT_UNUSED(tcpu), twall;
+
+    TIMEIT_START
+    res = _nmod_vec_dot_ptr(v1, v2, offset, len, mod, params);
+    TIMEIT_STOP_VALUES(tcpu, twall)
+
+    printf("%.2e", twall);
+
+    _nmod_vec_clear(v1);
+    _nmod_vec_clear(v2tmp);
+    flint_free(v2);
+}
+
+// timings including dot_params
+void time_dot_incparams(ulong len, ulong n, flint_rand_t state)
 {
     nmod_t mod;
     nmod_init(&mod, n);
@@ -49,7 +138,7 @@ void time_dot(ulong len, ulong n, flint_rand_t state)
     _nmod_vec_rand(v2, state, len, mod);
 
     // store results in volatile variable to avoid that they
-    // are "optimized away" (especially for len <= 4, inlined part)
+    // are "optimized away" (especially for inlined part)
     volatile ulong FLINT_SET_BUT_UNUSED(res);
 
     double FLINT_SET_BUT_UNUSED(tcpu), twall;
@@ -65,7 +154,7 @@ void time_dot(ulong len, ulong n, flint_rand_t state)
     _nmod_vec_clear(v2);
 }
 
-void time_dot_rev(ulong len, ulong n, flint_rand_t state)
+void time_dot_rev_incparams(ulong len, ulong n, flint_rand_t state)
 {
     nmod_t mod;
     nmod_init(&mod, n);
@@ -76,7 +165,7 @@ void time_dot_rev(ulong len, ulong n, flint_rand_t state)
     _nmod_vec_rand(v2, state, len, mod);
 
     // store results in volatile variable to avoid that they
-    // are "optimized away" (especially for len <= 4, inlined part)
+    // are "optimized away" (especially for inlined part)
     volatile ulong FLINT_SET_BUT_UNUSED(res);
 
     double FLINT_SET_BUT_UNUSED(tcpu), twall;
@@ -92,7 +181,7 @@ void time_dot_rev(ulong len, ulong n, flint_rand_t state)
     _nmod_vec_clear(v2);
 }
 
-void time_dot_ptr(ulong len, ulong n, flint_rand_t state)
+void time_dot_ptr_incparams(ulong len, ulong n, flint_rand_t state)
 {
     nmod_t mod;
     nmod_init(&mod, n);
@@ -108,7 +197,7 @@ void time_dot_ptr(ulong len, ulong n, flint_rand_t state)
         v2[i] = &v2tmp[i] + offset;
 
     // store results in volatile variable to avoid that they
-    // are "optimized away" (especially for len <= 4, inlined part)
+    // are "optimized away" (especially for inlined part)
     volatile ulong FLINT_SET_BUT_UNUSED(res);
 
     double FLINT_SET_BUT_UNUSED(tcpu), twall;
@@ -394,36 +483,42 @@ int main(int argc, char ** argv)
     const ulong lens[] = {1, 2, 3, 4, 5, 7, 10, 15, 25, 35, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 100000, 1000000};
 
     // bench functions
-    const slong nfuns = 12;
+    const slong nfuns = 15;
     typedef void (*timefun) (ulong, ulong, flint_rand_t);
     const timefun funs[] = {
         time_dot,                    // 0
-        time_dot_rev,                // 1
-        time_dot_ptr,                // 2
-        time_dot_poly_mul,           // 3
-        time_dot_poly_inv_series,    // 4
-        time_dot_poly_exp_series,    // 5
-        time_dot_mat_mul,            // 6
-        time_dot_mat_solve_tril,     // 7
-        time_dot_mat_solve_triu,     // 8
-        time_dot_mat_mul_vec,        // 9
-        time_dot_mat_solve_tril_vec, // 10
-        time_dot_mat_solve_triu_vec, // 11
+        time_dot_incparams,          // 1
+        time_dot_rev,                // 2
+        time_dot_rev_incparams,      // 3
+        time_dot_ptr,                // 4
+        time_dot_ptr_incparams,      // 5
+        time_dot_poly_mul,           // 6
+        time_dot_poly_inv_series,    // 7
+        time_dot_poly_exp_series,    // 8
+        time_dot_mat_mul,            // 9
+        time_dot_mat_solve_tril,     // 10
+        time_dot_mat_solve_triu,     // 11
+        time_dot_mat_mul_vec,        // 12
+        time_dot_mat_solve_tril_vec, // 13
+        time_dot_mat_solve_triu_vec, // 14
     };
 
     const char * description[] = {
-        "#0  --> vec dot           ",
-        "#1  --> vec dot rev       ",
-        "#2  --> vec dot ptr       ",
-        "#3  --> poly_mul          ",
-        "#4  --> poly_inv_series   ",
-        "#5  --> poly_exp_series   ",
-        "#6  --> mat_mul           ",
-        "#7  --> mat_solve_tril    ",
-        "#8  --> mat_solve_triu    ",
-        "#9  --> mat_mul_vec       ",
-        "#10 --> mat_solve_tril_vec",
-        "#11 --> mat_solve_triu_vec"
+        "#0  --> vec dot               ",
+        "#1  --> vec dot inc params    ",
+        "#2  --> vec dot rev           ",
+        "#3  --> vec dot rev inc params",
+        "#4  --> vec dot ptr           ",
+        "#5  --> vec dot ptr inc params",
+        "#6  --> poly_mul              ",
+        "#7  --> poly_inv_series       ",
+        "#8  --> poly_exp_series       ",
+        "#9  --> mat_mul               ",
+        "#10 --> mat_solve_tril        ",
+        "#11 --> mat_solve_triu        ",
+        "#12 --> mat_mul_vec           ",
+        "#13 --> mat_solve_tril_vec    ",
+        "#14 --> mat_solve_triu_vec    "
     };
 
     if (argc == 1)  // show usage

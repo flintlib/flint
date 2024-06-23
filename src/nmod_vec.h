@@ -161,11 +161,12 @@ FLINT_FORCE_INLINE dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
         }
     // short dot products: k limbs  <=>  n <= ceil(2**(32*k) / sqrt(len))
     // we use only _DOT1, _DOT2, _DOT3 in that case
-    if (len <= 10)
-    { // TODO 32 bits
+    if (len <= 11)
+    {
         if ((mod.n & (mod.n - 1)) == 0)  // power of 2
             return (dot_params_t) {_DOT1, UWORD(0)};
 #if FLINT_BITS == 64
+        _FIXED_LEN_MOD_BOUNDS(11, 1294981365,  5561902608746059656);
         _FIXED_LEN_MOD_BOUNDS(10, 1358187914,  5833372668713515885);
         _FIXED_LEN_MOD_BOUNDS( 9, 1431655766,  6148914691236517206);
         _FIXED_LEN_MOD_BOUNDS( 8, 1518500250,  6521908912666391107);
@@ -176,6 +177,7 @@ FLINT_FORCE_INLINE dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
         _FIXED_LEN_MOD_BOUNDS( 3, 2479700525, 10650232656628343402);
         _FIXED_LEN_MOD_BOUNDS( 2, 3037000500, 13043817825332782213);
 #else  // FLINT_BITS == 64
+        _FIXED_LEN_MOD_BOUNDS(11, 19760, 1294981365);
         _FIXED_LEN_MOD_BOUNDS(10, 20725, 1358187914);
         _FIXED_LEN_MOD_BOUNDS( 9, 21846, 1431655766);
         _FIXED_LEN_MOD_BOUNDS( 8, 23171, 1518500250);
@@ -193,7 +195,7 @@ FLINT_FORCE_INLINE dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
     }
 #undef _FIXED_LEN_MOD_BOUNDS
 
-// sage: for ell in range(1,11):
+// sage: for ell in range(1,12):
 // ....:     n0 = ceil(2**16 / sqrt(ell))
 // ....:     n1 = ceil(2**32 / sqrt(ell))
 // ....:     n2 = ceil(2**64 / sqrt(ell))
@@ -209,6 +211,8 @@ FLINT_FORCE_INLINE dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
 //  8: 23171  ||  1518500250  ||  6521908912666391107
 //  9: 21846  ||  1431655766  ||  6148914691236517206
 // 10: 20725  ||  1358187914  ||  5833372668713515885
+// 11: 19760  ||  1294981365  ||  5561902608746059656
+
 
     if (mod.n <= UWORD(1) << (FLINT_BITS / 2)) // implies <= 2 limbs
     {
@@ -567,6 +571,7 @@ ulong _nmod_vec_dot2_split_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset
         _NMOD_VEC_DOT_SHORT1(8, expr1, expr2)                           \
         _NMOD_VEC_DOT_SHORT1(9, expr1, expr2)                           \
         _NMOD_VEC_DOT_SHORT1(10, expr1, expr2)                          \
+        _NMOD_VEC_DOT_SHORT1(11, expr1, expr2)                          \
         return 0;                                                       \
     }                                                                   \
                                                                         \
@@ -583,6 +588,7 @@ ulong _nmod_vec_dot2_split_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset
         _NMOD_VEC_DOT_SHORT2(8, expr1, expr2)                           \
         _NMOD_VEC_DOT_SHORT2(9, expr1, expr2)                           \
         _NMOD_VEC_DOT_SHORT2(10, expr1, expr2)                          \
+        _NMOD_VEC_DOT_SHORT2(11, expr1, expr2)                          \
         return 0;                                                       \
     }                                                                   \
                                                                         \
@@ -599,14 +605,17 @@ ulong _nmod_vec_dot2_split_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset
         _NMOD_VEC_DOT_SHORT3(8, expr1, expr2)                           \
         _NMOD_VEC_DOT_SHORT3(9, expr1, expr2)                           \
         _NMOD_VEC_DOT_SHORT3(10, expr1, expr2)                          \
+        _NMOD_VEC_DOT_SHORT3(11, expr1, expr2)                          \
         return 0;                                                       \
     }                                                                   \
 }  while(0);                                                            \
 
 FLINT_FORCE_INLINE ulong _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_t params)
 {
+    if (params.method == _DOT0)
+        return UWORD(0);
     // handle short products
-    if (len <= 10)
+    if (len <= 11)
     {
         slong i = 0;
         _NMOD_VEC_DOT_SHORT(i, vec1[i], vec2[i], len, mod, params.method);
@@ -641,7 +650,7 @@ FLINT_FORCE_INLINE ulong _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len
 
 FLINT_FORCE_INLINE ulong _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_t params)
 {
-    if (len <= 10)
+    if (len <= 11)
     {
         slong i = 0;
         _NMOD_VEC_DOT_SHORT(i, vec1[i], vec2[len-1-i], len, mod, params.method);
@@ -676,7 +685,7 @@ FLINT_FORCE_INLINE ulong _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong
 
 FLINT_FORCE_INLINE ulong _nmod_vec_dot_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod, dot_params_t params)
 {
-    if (len <= 10)
+    if (len <= 11)
     {
         slong i = 0;
         _NMOD_VEC_DOT_SHORT(i, vec1[i], vec2[i][offset], len, mod, params.method);
