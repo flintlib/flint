@@ -25,10 +25,8 @@
 
 ulong _nmod_vec_dot_pow2(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
 {
-    ulong res = UWORD(0);
-    for (slong i = 0; i < len; i++)
-        res += vec1[i] * vec2[i];
-    NMOD_RED(res, res, mod);
+    ulong res; slong i;
+    _NMOD_VEC_DOT1(res, i, len, vec1[i], vec2[i], mod)
     return res;
 }
 
@@ -63,10 +61,8 @@ ulong _nmod_vec_dot1(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
 }
 #else  // if defined(__AVX2__) && FLINT_BITS == 64
 {
-    ulong res = UWORD(0);
-    for (slong i = 0; i < len; i++)
-        res += vec1[i] * vec2[i];
-    NMOD_RED(res, res, mod);
+    ulong res; slong i;
+    _NMOD_VEC_DOT1(res, i, len, vec1[i], vec2[i], mod)
     return res;
 }
 #endif  // if defined(__AVX2__) && FLINT_BITS == 64
@@ -114,30 +110,8 @@ ulong _nmod_vec_dot2_split(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod
 }
 #else  // defined(__AVX2__)
 {
-    ulong dp_lo = 0;
-    ulong dp_hi = 0;
-
-    slong i = 0;
-    for ( ; i+7 < len; i += 8)
-    {
-        dp_lo += vec1[i+0] * vec2[i+0]
-               + vec1[i+1] * vec2[i+1]
-               + vec1[i+2] * vec2[i+2]
-               + vec1[i+3] * vec2[i+3]
-               + vec1[i+4] * vec2[i+4]
-               + vec1[i+5] * vec2[i+5]
-               + vec1[i+6] * vec2[i+6]
-               + vec1[i+7] * vec2[i+7];
-
-        dp_hi += dp_lo >> DOT_SPLIT_BITS;
-        dp_lo &= DOT_SPLIT_MASK;
-    }
-
-    for ( ; i < len; i++)
-        dp_lo += vec1[i] * vec2[i];
-
-    ulong res;
-    NMOD_RED(res, pow2_precomp * dp_hi + dp_lo, mod);
+    ulong res; slong i;
+    _NMOD_VEC_DOT2_SPLIT(res, i, len, vec1[i], vec2[i], mod, pow2_precomp)
     return res;
 }
 #endif  // defined(__AVX2__)
@@ -145,119 +119,29 @@ ulong _nmod_vec_dot2_split(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod
 
 ulong _nmod_vec_dot2_half(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
 {
-    ulong s0 = UWORD(0);
-    ulong s1 = UWORD(0);
-    for (slong i = 0; i < len; i++)
-    {
-        const ulong prod = vec1[i] * vec2[i];
-        add_ssaaaa(s1, s0, s1, s0, 0, prod);
-    }
-    ulong res;
-    NMOD2_RED2(res, s1, s0, mod);
+    ulong res; slong i;
+    _NMOD_VEC_DOT2_HALF(res, i, len, vec1[i], vec2[i], mod)
     return res;
 }
 
 ulong _nmod_vec_dot2(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
 {
-    ulong u0 = UWORD(0);
-    ulong u1 = UWORD(0);
-
-    slong i = 0;
-    for ( ; i+7 < len; i += 8)
-    {
-        ulong s0, s1;
-        umul_ppmm(s1, s0, vec1[i+0], vec2[i+0]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+1], vec2[i+1]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+2], vec2[i+2]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+3], vec2[i+3]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+4], vec2[i+4]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+5], vec2[i+5]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+6], vec2[i+6]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+7], vec2[i+7]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-    }
-    for ( ; i < len; i++)
-    {
-        ulong s0, s1;
-        umul_ppmm(s1, s0, vec1[i], vec2[i]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-    }
-
-    ulong res;
-    NMOD2_RED2(res, u1, u0, mod);
+    ulong res; slong i;
+    _NMOD_VEC_DOT2(res, i, len, vec1[i], vec2[i], mod)
     return res;
 }
 
 ulong _nmod_vec_dot3(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
 {
-    ulong t2 = UWORD(0);
-    ulong t1 = UWORD(0);
-    ulong t0 = UWORD(0);
-    for (slong i = 0; i < len; i++)
-    {
-        ulong s0, s1;
-        umul_ppmm(s1, s0, vec1[i], vec2[i]);
-        add_sssaaaaaa(t2, t1, t0, t2, t1, t0, UWORD(0), s1, s0);
-    }
-
-    NMOD_RED(t2, t2, mod);
-    ulong res;
-    NMOD_RED3(res, t2, t1, t0, mod);
+    ulong res; slong i;
+    _NMOD_VEC_DOT3(res, i, len, vec1[i], vec2[i], mod)
     return res;
 }
 
 ulong _nmod_vec_dot3_acc(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
 {
-    ulong t2 = UWORD(0);
-    ulong t1 = UWORD(0);
-    ulong t0 = UWORD(0);
-
-    slong i = 0;
-    for ( ; i+7 < len; i += 8)
-    {
-        ulong s0, s1;
-        ulong u0 = UWORD(0);
-        ulong u1 = UWORD(0);
-        umul_ppmm(s1, s0, vec1[i+0], vec2[i+0]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+1], vec2[i+1]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+2], vec2[i+2]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+3], vec2[i+3]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+4], vec2[i+4]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+5], vec2[i+5]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+6], vec2[i+6]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+7], vec2[i+7]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        add_sssaaaaaa(t2, t1, t0, t2, t1, t0, UWORD(0), u1, u0);
-    }
-
-    ulong s0, s1;
-    ulong u0 = UWORD(0);
-    ulong u1 = UWORD(0);
-    for ( ; i < len; i++)
-    {
-        umul_ppmm(s1, s0, vec1[i], vec2[i]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-    }
-
-    add_sssaaaaaa(t2, t1, t0, t2, t1, t0, UWORD(0), u1, u0);
-
-    NMOD_RED(t2, t2, mod);
-    ulong res;
-    NMOD_RED3(res, t2, t1, t0, mod);
+    ulong res; slong i;
+    _NMOD_VEC_DOT3_ACC(res, i, len, vec1[i], vec2[i], mod)
     return res;
 }
 
@@ -268,10 +152,8 @@ ulong _nmod_vec_dot3_acc(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
 
 ulong _nmod_vec_dot_pow2_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
 {
-    ulong res = UWORD(0);
-    for (slong i = 0; i < len; i++)
-        res += vec1[i] * vec2[len-1-i];
-    NMOD_RED(res, res, mod);
+    ulong res; slong i;
+    _NMOD_VEC_DOT1(res, i, len, vec1[i], vec2[len-1-i], mod)
     return res;
 }
 
@@ -307,10 +189,8 @@ ulong _nmod_vec_dot1_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
 }
 #else  // if defined(__AVX2__) && FLINT_BITS == 64
 {
-    ulong res = UWORD(0);
-    for (slong i = 0; i < len; i++)
-        res += vec1[i] * vec2[len-1-i];
-    NMOD_RED(res, res, mod);
+    ulong res; slong i;
+    _NMOD_VEC_DOT1(res, i, len, vec1[i], vec2[len-1-i], mod)
     return res;
 }
 #endif  // if defined(__AVX2__) && FLINT_BITS == 64
@@ -359,30 +239,8 @@ ulong _nmod_vec_dot2_split_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t
 }
 #else  // defined(__AVX2__)
 {
-    ulong dp_lo = 0;
-    ulong dp_hi = 0;
-
-    slong i = 0;
-    for ( ; i+7 < len; i += 8)
-    {
-        dp_lo += vec1[i+0] * vec2[len-1-i]
-               + vec1[i+1] * vec2[len-2-i]
-               + vec1[i+2] * vec2[len-3-i]
-               + vec1[i+3] * vec2[len-4-i]
-               + vec1[i+4] * vec2[len-5-i]
-               + vec1[i+5] * vec2[len-6-i]
-               + vec1[i+6] * vec2[len-7-i]
-               + vec1[i+7] * vec2[len-8-i];
-
-        dp_hi += dp_lo >> DOT_SPLIT_BITS;
-        dp_lo &= DOT_SPLIT_MASK;
-    }
-
-    for ( ; i < len; i++)
-        dp_lo += vec1[i] * vec2[len-1-i];
-
-    ulong res;
-    NMOD_RED(res, pow2_precomp * dp_hi + dp_lo, mod);
+    ulong res; slong i;
+    _NMOD_VEC_DOT2_SPLIT(res, i, len, vec1[i], vec2[len-1-i], mod, pow2_precomp)
     return res;
 }
 #endif  // defined(__AVX2__)
@@ -390,123 +248,31 @@ ulong _nmod_vec_dot2_split_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t
 
 ulong _nmod_vec_dot2_half_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
 {
-    ulong s0 = UWORD(0);
-    ulong s1 = UWORD(0);
-    for (slong i = 0; i < len; i++)
-    {
-        const ulong prod = vec1[i] * vec2[len-1-i];
-        add_ssaaaa(s1, s0, s1, s0, 0, prod);
-    }
-    ulong res;
-    NMOD2_RED2(res, s1, s0, mod);
+    ulong res; slong i;
+    _NMOD_VEC_DOT2_HALF(res, i, len, vec1[i], vec2[len-1-i], mod)
     return res;
 }
 
 ulong _nmod_vec_dot2_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
 {
-    ulong u0 = UWORD(0);
-    ulong u1 = UWORD(0);
-
-    slong i = 0;
-    for ( ; i+7 < len; i += 8)
-    {
-        ulong s0, s1;
-        umul_ppmm(s1, s0, vec1[i+0], vec2[len-1-i]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+1], vec2[len-2-i]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+2], vec2[len-3-i]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+3], vec2[len-4-i]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+4], vec2[len-5-i]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+5], vec2[len-6-i]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+6], vec2[len-7-i]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+7], vec2[len-8-i]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-    }
-    for ( ; i < len; i++)
-    {
-        ulong s0, s1;
-        umul_ppmm(s1, s0, vec1[i], vec2[len-1-i]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-    }
-
-    ulong res;
-    NMOD2_RED2(res, u1, u0, mod);
+    ulong res; slong i;
+    _NMOD_VEC_DOT2(res, i, len, vec1[i], vec2[len-1-i], mod)
     return res;
 }
 
 ulong _nmod_vec_dot3_acc_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
 {
-    ulong t2 = UWORD(0);
-    ulong t1 = UWORD(0);
-    ulong t0 = UWORD(0);
-
-    slong i = 0;
-    for ( ; i+7 < len; i += 8)
-    {
-        ulong s0, s1;
-        ulong u0 = UWORD(0);
-        ulong u1 = UWORD(0);
-        umul_ppmm(s1, s0, vec1[i+0], vec2[len-1-i]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+1], vec2[len-2-i]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+2], vec2[len-3-i]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+3], vec2[len-4-i]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+4], vec2[len-5-i]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+5], vec2[len-6-i]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+6], vec2[len-7-i]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+7], vec2[len-8-i]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        add_sssaaaaaa(t2, t1, t0, t2, t1, t0, UWORD(0), u1, u0);
-    }
-
-    ulong s0, s1;
-    ulong u0 = UWORD(0);
-    ulong u1 = UWORD(0);
-    for ( ; i < len; i++)
-    {
-        umul_ppmm(s1, s0, vec1[i], vec2[len-1-i]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-    }
-
-    add_sssaaaaaa(t2, t1, t0, t2, t1, t0, UWORD(0), u1, u0);
-
-    NMOD_RED(t2, t2, mod);
-    ulong res;
-    NMOD_RED3(res, t2, t1, t0, mod);
+    ulong res; slong i;
+    _NMOD_VEC_DOT3_ACC(res, i, len, vec1[i], vec2[len-1-i], mod)
     return res;
 }
 
 ulong _nmod_vec_dot3_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
 {
-    ulong t2 = UWORD(0);
-    ulong t1 = UWORD(0);
-    ulong t0 = UWORD(0);
-    for (slong i = 0; i < len; i++)
-    {
-        ulong s0, s1;
-        umul_ppmm(s1, s0, vec1[i], vec2[len-1-i]);
-        add_sssaaaaaa(t2, t1, t0, t2, t1, t0, UWORD(0), s1, s0);
-    }
-
-    NMOD_RED(t2, t2, mod);
-    ulong res;
-    NMOD_RED3(res, t2, t1, t0, mod);
+    ulong res; slong i;
+    _NMOD_VEC_DOT3(res, i, len, vec1[i], vec2[len-1-i], mod)
     return res;
 }
-
-
 
 /*-----------------------------------------------*/
 /*   dot product ptr: vec1[i] * vec2[i][offset]  */
@@ -514,10 +280,8 @@ ulong _nmod_vec_dot3_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
 
 ulong _nmod_vec_dot_pow2_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod)
 {
-    ulong res = UWORD(0);
-    for (slong i = 0; i < len; i++)
-        res += vec1[i] * vec2[i][offset];
-    NMOD_RED(res, res, mod);
+    ulong res; slong i;
+    _NMOD_VEC_DOT1(res, i, len, vec1[i], vec2[i][offset], mod)
     return res;
 }
 
@@ -529,54 +293,30 @@ ulong _nmod_vec_dot1_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slon
     slong i = 0;
     for ( ; i+31 < len; i += 32)
     {
-        dp = vec4n_add(dp, vec4n_mul(vec4n_load_unaligned(vec1+i+ 0), vec4n_set_n4(
-                                                                        vec2[i+ 0][offset],
-                                                                        vec2[i+ 1][offset],
-                                                                        vec2[i+ 2][offset],
-                                                                        vec2[i+ 3][offset])));
-        dp = vec4n_add(dp, vec4n_mul(vec4n_load_unaligned(vec1+i+ 4), vec4n_set_n4(
-                                                                        vec2[i+ 4][offset],
-                                                                        vec2[i+ 5][offset],
-                                                                        vec2[i+ 6][offset],
-                                                                        vec2[i+ 7][offset])));
-        dp = vec4n_add(dp, vec4n_mul(vec4n_load_unaligned(vec1+i+ 8), vec4n_set_n4(
-                                                                        vec2[i+ 8][offset],
-                                                                        vec2[i+ 9][offset],
-                                                                        vec2[i+10][offset],
-                                                                        vec2[i+11][offset])));
-        dp = vec4n_add(dp, vec4n_mul(vec4n_load_unaligned(vec1+i+12), vec4n_set_n4(
-                                                                        vec2[i+12][offset],
-                                                                        vec2[i+13][offset],
-                                                                        vec2[i+14][offset],
-                                                                        vec2[i+15][offset])));
-        dp = vec4n_add(dp, vec4n_mul(vec4n_load_unaligned(vec1+i+16), vec4n_set_n4(
-                                                                        vec2[i+16][offset],
-                                                                        vec2[i+17][offset],
-                                                                        vec2[i+18][offset],
-                                                                        vec2[i+19][offset])));
-        dp = vec4n_add(dp, vec4n_mul(vec4n_load_unaligned(vec1+i+20), vec4n_set_n4(
-                                                                        vec2[i+20][offset],
-                                                                        vec2[i+21][offset],
-                                                                        vec2[i+22][offset],
-                                                                        vec2[i+23][offset])));
-        dp = vec4n_add(dp, vec4n_mul(vec4n_load_unaligned(vec1+i+24), vec4n_set_n4(
-                                                                        vec2[i+24][offset],
-                                                                        vec2[i+25][offset],
-                                                                        vec2[i+26][offset],
-                                                                        vec2[i+27][offset])));
-        dp = vec4n_add(dp, vec4n_mul(vec4n_load_unaligned(vec1+i+28), vec4n_set_n4(
-                                                                        vec2[i+28][offset],
-                                                                        vec2[i+29][offset],
-                                                                        vec2[i+30][offset],
-                                                                        vec2[i+31][offset])));
+        vec4n vec2_4n;
+        vec2_4n = vec4n_set_n4(vec2[i+ 0][offset], vec2[i+ 1][offset], vec2[i+ 2][offset], vec2[i+ 3][offset]);
+        dp = vec4n_add(dp, vec4n_mul(vec4n_load_unaligned(vec1+i+ 0), vec2_4n));
+        vec2_4n = vec4n_set_n4(vec2[i+ 4][offset], vec2[i+ 5][offset], vec2[i+ 6][offset], vec2[i+ 7][offset]);
+        dp = vec4n_add(dp, vec4n_mul(vec4n_load_unaligned(vec1+i+ 4), vec2_4n));
+        vec2_4n = vec4n_set_n4(vec2[i+ 8][offset], vec2[i+ 9][offset], vec2[i+10][offset], vec2[i+11][offset]);
+        dp = vec4n_add(dp, vec4n_mul(vec4n_load_unaligned(vec1+i+ 8), vec2_4n));
+        vec2_4n = vec4n_set_n4(vec2[i+12][offset], vec2[i+13][offset], vec2[i+14][offset], vec2[i+15][offset]);
+        dp = vec4n_add(dp, vec4n_mul(vec4n_load_unaligned(vec1+i+12), vec2_4n));
+        vec2_4n = vec4n_set_n4(vec2[i+16][offset], vec2[i+17][offset], vec2[i+18][offset], vec2[i+19][offset]);
+        dp = vec4n_add(dp, vec4n_mul(vec4n_load_unaligned(vec1+i+16), vec2_4n));
+        vec2_4n = vec4n_set_n4(vec2[i+20][offset], vec2[i+21][offset], vec2[i+22][offset], vec2[i+23][offset]);
+        dp = vec4n_add(dp, vec4n_mul(vec4n_load_unaligned(vec1+i+20), vec2_4n));
+        vec2_4n = vec4n_set_n4(vec2[i+24][offset], vec2[i+25][offset], vec2[i+26][offset], vec2[i+27][offset]);
+        dp = vec4n_add(dp, vec4n_mul(vec4n_load_unaligned(vec1+i+24), vec2_4n));
+        vec2_4n = vec4n_set_n4(vec2[i+28][offset], vec2[i+29][offset], vec2[i+30][offset], vec2[i+31][offset]);
+        dp = vec4n_add(dp, vec4n_mul(vec4n_load_unaligned(vec1+i+28), vec2_4n));
     }
 
     for ( ; i + 3 < len; i += 4)
-        dp = vec4n_add(dp, vec4n_mul(vec4n_load_unaligned(vec1+i), vec4n_set_n4(
-                                                                     vec2[i+0][offset],
-                                                                     vec2[i+1][offset],
-                                                                     vec2[i+2][offset],
-                                                                     vec2[i+3][offset])));
+    {
+        vec4n vec2_4n = vec4n_set_n4(vec2[i+0][offset], vec2[i+1][offset], vec2[i+2][offset], vec2[i+3][offset]);
+        dp = vec4n_add(dp, vec4n_mul(vec4n_load_unaligned(vec1+i), vec2_4n));
+    }
 
     ulong res = vec4n_horizontal_sum(dp);
 
@@ -588,134 +328,11 @@ ulong _nmod_vec_dot1_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slon
 }
 #else  // if defined(__AVX2__) && FLINT_BITS == 64
 {
-    ulong res = UWORD(0);
-    for (slong i = 0; i < len; i++)
-        res += vec1[i] * vec2[i][offset];
-    NMOD_RED(res, res, mod);
+    ulong res; slong i;
+    _NMOD_VEC_DOT1(res, i, len, vec1[i], vec2[i][offset], mod)
     return res;
 }
 #endif  // if defined(__AVX2__) && FLINT_BITS == 64
-
-ulong _nmod_vec_dot2_half_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod)
-{
-    ulong s0 = UWORD(0);
-    ulong s1 = UWORD(0);
-    for (slong i = 0; i < len; i++)
-    {
-        const ulong prod = vec1[i] * vec2[i][offset];
-        add_ssaaaa(s1, s0, s1, s0, 0, prod);
-    }
-    ulong res;
-    NMOD2_RED2(res, s1, s0, mod);
-    return res;
-}
-
-ulong _nmod_vec_dot2_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod)
-{
-    ulong u0 = UWORD(0);
-    ulong u1 = UWORD(0);
-
-    slong i = 0;
-    for ( ; i+7 < len; i += 8)
-    {
-        ulong s0, s1;
-        umul_ppmm(s1, s0, vec1[i+0], vec2[i+0][offset]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+1], vec2[i+1][offset]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+2], vec2[i+2][offset]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+3], vec2[i+3][offset]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+4], vec2[i+4][offset]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+5], vec2[i+5][offset]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+6], vec2[i+6][offset]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+7], vec2[i+7][offset]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-    }
-    for ( ; i < len; i++)
-    {
-        ulong s0, s1;
-        umul_ppmm(s1, s0, vec1[i], vec2[i][offset]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-    }
-
-    ulong res;
-    NMOD2_RED2(res, u1, u0, mod);
-    return res;
-}
-
-
-ulong _nmod_vec_dot3_acc_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod)
-{
-    ulong t2 = UWORD(0);
-    ulong t1 = UWORD(0);
-    ulong t0 = UWORD(0);
-
-    slong i = 0;
-    for ( ; i+7 < len; i += 8)
-    {
-        ulong s0, s1;
-        ulong u0 = UWORD(0);
-        ulong u1 = UWORD(0);
-        umul_ppmm(s1, s0, vec1[i+0], vec2[i+0][offset]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+1], vec2[i+1][offset]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+2], vec2[i+2][offset]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+3], vec2[i+3][offset]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+4], vec2[i+4][offset]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+5], vec2[i+5][offset]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+6], vec2[i+6][offset]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        umul_ppmm(s1, s0, vec1[i+7], vec2[i+7][offset]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-        add_sssaaaaaa(t2, t1, t0, t2, t1, t0, UWORD(0), u1, u0);
-    }
-
-    ulong s0, s1;
-    ulong u0 = UWORD(0);
-    ulong u1 = UWORD(0);
-    for ( ; i < len; i++)
-    {
-        umul_ppmm(s1, s0, vec1[i], vec2[i][offset]);
-        add_ssaaaa(u1, u0, u1, u0, s1, s0);
-    }
-
-    add_sssaaaaaa(t2, t1, t0, t2, t1, t0, UWORD(0), u1, u0);
-
-    NMOD_RED(t2, t2, mod);
-    ulong res;
-    NMOD_RED3(res, t2, t1, t0, mod);
-    return res;
-}
-
-ulong _nmod_vec_dot3_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod)
-{
-    ulong t2 = UWORD(0);
-    ulong t1 = UWORD(0);
-    ulong t0 = UWORD(0);
-    for (slong i = 0; i < len; i++)
-    {
-        ulong s0, s1;
-        umul_ppmm(s1, s0, vec1[i], vec2[i][offset]);
-        add_sssaaaaaa(t2, t1, t0, t2, t1, t0, UWORD(0), s1, s0);
-    }
-
-    NMOD_RED(t2, t2, mod);
-    ulong res;
-    NMOD_RED3(res, t2, t1, t0, mod);
-    return res;
-}
-
-
 
 #if FLINT_BITS == 64
 ulong _nmod_vec_dot2_split_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod, ulong pow2_precomp)
@@ -728,57 +345,33 @@ ulong _nmod_vec_dot2_split_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset
     slong i = 0;
     for ( ; i+31 < len; i += 32)
     {
-        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+ 0), vec4n_set_n4(
-                                                                        vec2[i+ 0][offset],
-                                                                        vec2[i+ 1][offset],
-                                                                        vec2[i+ 2][offset],
-                                                                        vec2[i+ 3][offset])));
-        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+ 4), vec4n_set_n4(
-                                                                        vec2[i+ 4][offset],
-                                                                        vec2[i+ 5][offset],
-                                                                        vec2[i+ 6][offset],
-                                                                        vec2[i+ 7][offset])));
-        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+ 8), vec4n_set_n4(
-                                                                        vec2[i+ 8][offset],
-                                                                        vec2[i+ 9][offset],
-                                                                        vec2[i+10][offset],
-                                                                        vec2[i+11][offset])));
-        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+12), vec4n_set_n4(
-                                                                        vec2[i+12][offset],
-                                                                        vec2[i+13][offset],
-                                                                        vec2[i+14][offset],
-                                                                        vec2[i+15][offset])));
-        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+16), vec4n_set_n4(
-                                                                        vec2[i+16][offset],
-                                                                        vec2[i+17][offset],
-                                                                        vec2[i+18][offset],
-                                                                        vec2[i+19][offset])));
-        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+20), vec4n_set_n4(
-                                                                        vec2[i+20][offset],
-                                                                        vec2[i+21][offset],
-                                                                        vec2[i+22][offset],
-                                                                        vec2[i+23][offset])));
-        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+24), vec4n_set_n4(
-                                                                        vec2[i+24][offset],
-                                                                        vec2[i+25][offset],
-                                                                        vec2[i+26][offset],
-                                                                        vec2[i+27][offset])));
-        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+28), vec4n_set_n4(
-                                                                        vec2[i+28][offset],
-                                                                        vec2[i+29][offset],
-                                                                        vec2[i+30][offset],
-                                                                        vec2[i+31][offset])));
+        vec4n vec2_4n;
+        vec2_4n = vec4n_set_n4(vec2[i+ 0][offset], vec2[i+ 1][offset], vec2[i+ 2][offset], vec2[i+ 3][offset]);
+        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+ 0), vec2_4n));
+        vec2_4n = vec4n_set_n4(vec2[i+ 4][offset], vec2[i+ 5][offset], vec2[i+ 6][offset], vec2[i+ 7][offset]);
+        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+ 4), vec2_4n));
+        vec2_4n = vec4n_set_n4(vec2[i+ 8][offset], vec2[i+ 9][offset], vec2[i+10][offset], vec2[i+11][offset]);
+        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+ 8), vec2_4n));
+        vec2_4n = vec4n_set_n4(vec2[i+12][offset], vec2[i+13][offset], vec2[i+14][offset], vec2[i+15][offset]);
+        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+12), vec2_4n));
+        vec2_4n = vec4n_set_n4(vec2[i+16][offset], vec2[i+17][offset], vec2[i+18][offset], vec2[i+19][offset]);
+        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+16), vec2_4n));
+        vec2_4n = vec4n_set_n4(vec2[i+20][offset], vec2[i+21][offset], vec2[i+22][offset], vec2[i+23][offset]);
+        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+20), vec2_4n));
+        vec2_4n = vec4n_set_n4(vec2[i+24][offset], vec2[i+25][offset], vec2[i+26][offset], vec2[i+27][offset]);
+        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+24), vec2_4n));
+        vec2_4n = vec4n_set_n4(vec2[i+28][offset], vec2[i+29][offset], vec2[i+30][offset], vec2[i+31][offset]);
+        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i+28), vec2_4n));
 
         dp_hi = vec4n_add(dp_hi, vec4n_bit_shift_right(dp_lo, DOT_SPLIT_BITS));
         dp_lo = vec4n_bit_and(dp_lo, low_bits);
     }
 
     for ( ; i + 3 < len; i += 4)
-        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i), vec4n_set_n4(
-                                                                           vec2[i+0][offset],
-                                                                           vec2[i+1][offset],
-                                                                           vec2[i+2][offset],
-                                                                           vec2[i+3][offset])));
+    {
+        vec4n vec2_4n = vec4n_set_n4(vec2[i+0][offset], vec2[i+1][offset], vec2[i+2][offset], vec2[i+3][offset]);
+        dp_lo = vec4n_add(dp_lo, vec4n_mul(vec4n_load_unaligned(vec1+i), vec2_4n));
+    }
 
     dp_hi = vec4n_add(dp_hi, vec4n_bit_shift_right(dp_lo, DOT_SPLIT_BITS));
     dp_lo = vec4n_bit_and(dp_lo, low_bits);
@@ -796,35 +389,40 @@ ulong _nmod_vec_dot2_split_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset
 }
 #else  // defined(__AVX2__)
 {
-    ulong dp_lo = 0;
-    ulong dp_hi = 0;
-
-    slong i = 0;
-    for ( ; i+7 < len; i += 8)
-    {
-        dp_lo += vec1[i+0] * vec2[i+0][offset]
-               + vec1[i+1] * vec2[i+1][offset]
-               + vec1[i+2] * vec2[i+2][offset]
-               + vec1[i+3] * vec2[i+3][offset]
-               + vec1[i+4] * vec2[i+4][offset]
-               + vec1[i+5] * vec2[i+5][offset]
-               + vec1[i+6] * vec2[i+6][offset]
-               + vec1[i+7] * vec2[i+7][offset];
-
-        dp_hi += dp_lo >> DOT_SPLIT_BITS;
-        dp_lo &= DOT_SPLIT_MASK;
-    }
-
-    for ( ; i < len; i++)
-        dp_lo += vec1[i] * vec2[i][offset];
-
-    ulong res;
-    NMOD_RED(res, pow2_precomp * dp_hi + dp_lo, mod);
+    ulong res; slong i;
+    _NMOD_VEC_DOT2_SPLIT(res, i, len, vec1[i], vec2[i][offset], mod, pow2_precomp)
     return res;
 }
 #endif  // defined(__AVX2__)
 #endif  // FLINT_BITS == 64
 
+ulong _nmod_vec_dot2_half_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod)
+{
+    ulong res; slong i;
+    _NMOD_VEC_DOT2_HALF(res, i, len, vec1[i], vec2[i][offset], mod)
+    return res;
+}
+
+ulong _nmod_vec_dot2_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod)
+{
+    ulong res; slong i;
+    _NMOD_VEC_DOT2(res, i, len, vec1[i], vec2[i][offset], mod)
+    return res;
+}
+
+ulong _nmod_vec_dot3_acc_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod)
+{
+    ulong res; slong i;
+    _NMOD_VEC_DOT3_ACC(res, i, len, vec1[i], vec2[i][offset], mod)
+    return res;
+}
+
+ulong _nmod_vec_dot3_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod)
+{
+    ulong res; slong i;
+    _NMOD_VEC_DOT3(res, i, len, vec1[i], vec2[i][offset], mod)
+    return res;
+}
 
 /*----------------------------------------*/
 /* notes concerning the different methods */
