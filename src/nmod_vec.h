@@ -527,9 +527,21 @@ ulong _nmod_vec_dot2_split_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset
 
 #define _NMOD_VEC_DOT_SHORT3(fixedlen,expr1,expr2)               \
         {                                                        \
-            ulong res = nmod_mul((expr1), (expr2), mod); i++;    \
-            for (slong j = 0; j < fixedlen-1; j++, i++)          \
-                res = nmod_addmul(res, (expr1), (expr2), mod);   \
+            ulong t2zz = UWORD(0);                               \
+            ulong t1zz, t0zz;                                    \
+            umul_ppmm(t1zz, t0zz, (expr1), (expr2)); i++;        \
+            for (slong j = 0; j < fixedlen - 1; j++, i++)        \
+            {                                                    \
+                ulong s0zz, s1zz;                                \
+                umul_ppmm(s1zz, s0zz, (expr1), (expr2));         \
+                add_sssaaaaaa(t2zz, t1zz, t0zz,                  \
+                                t2zz, t1zz, t0zz,                \
+                                UWORD(0), s1zz, s0zz);           \
+            }                                                    \
+                                                                 \
+            NMOD_RED(t2zz, t2zz, mod);                           \
+            ulong res;                                           \
+            NMOD_RED3(res, t2zz, t1zz, t0zz, mod);               \
             return res;                                          \
         }                                                        \
 
