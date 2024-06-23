@@ -133,9 +133,11 @@ typedef enum
     _DOT3 = 6,           /* 3 limbs, modulus close to FLINT_BITS bits */
     _DOT_POW2 = 7,       /* mod.n is a power of 2 at least 2**(1 + FLINT_BITS/2) */
 } dot_method_t;
-// if mod.n is not a power of 2, then unreduced dot product fits in
-//      > 1 limb <=> method > _DOT1   |   > 2 limbs <=> method > _DOT2
-// no relevant information on this if mod.n is a power of 2
+// if mod.n is a power of 2, we use _DOT_POW2 in all cases
+// otherwise, number of limbs of unreduced dot product can be deduced:
+// 1 limb  <=>  method <= _DOT1
+// 2 limbs <=>  _DOT1 < method <= _DOT2
+// 3 limbs <=>  _DOT2 < method
 
 typedef struct
 {
@@ -144,11 +146,16 @@ typedef struct
 } dot_params_t;
 
 // compute dot parameters
+// note: if params has been computed for some given len and mod, algorithms
+// ensure it can be used safely for smaller lengths and same mod
+// (in particular algorithms handle len == 0 even when the method is e.g. _DOT1)
 FLINT_FORCE_INLINE dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
 {
     if (len == 0 || mod.n == 1)
         return (dot_params_t) {_DOT0, UWORD(0)};
-    // from here on len >= 1
+    if ((mod.n & (mod.n - 1)) == 0)
+        return (dot_params_t) {_DOT_POW2, UWORD(0)};
+    // from here on len >= 1, n > 1 not power of 2
 
 #define _FIXED_LEN_MOD_BOUNDS(fixedlen, onelimb_bnd, twolimb_bnd) \
         if (len == fixedlen)                                      \
@@ -159,13 +166,11 @@ FLINT_FORCE_INLINE dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
                 return (dot_params_t) {_DOT2, UWORD(0)};          \
             return (dot_params_t) {_DOT3, UWORD(0)};              \
         }
-    // short dot products: k limbs  <=>  n <= ceil(2**(32*k) / sqrt(len))
-    // we use only _DOT1, _DOT2, _DOT3 in that case
+    // short dot products: we use only _DOT1, _DOT2, _DOT3 in that case
     if (len <= 11)
     {
-        if ((mod.n & (mod.n - 1)) == 0)  // power of 2
-            return (dot_params_t) {_DOT1, UWORD(0)};
 #if FLINT_BITS == 64
+        // 64 bits:  k limbs  <=>  n <= ceil(2**(32*k) / sqrt(len))
         _FIXED_LEN_MOD_BOUNDS(11, 1294981365,  5561902608746059656);
         _FIXED_LEN_MOD_BOUNDS(10, 1358187914,  5833372668713515885);
         _FIXED_LEN_MOD_BOUNDS( 9, 1431655766,  6148914691236517206);
@@ -177,6 +182,7 @@ FLINT_FORCE_INLINE dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
         _FIXED_LEN_MOD_BOUNDS( 3, 2479700525, 10650232656628343402);
         _FIXED_LEN_MOD_BOUNDS( 2, 3037000500, 13043817825332782213);
 #else  // FLINT_BITS == 64
+        // 32 bits: k limbs  <=>  n <= ceil(2**(16*k) / sqrt(len))
         _FIXED_LEN_MOD_BOUNDS(11, 19760, 1294981365);
         _FIXED_LEN_MOD_BOUNDS(10, 20725, 1358187914);
         _FIXED_LEN_MOD_BOUNDS( 9, 21846, 1431655766);
@@ -195,31 +201,12 @@ FLINT_FORCE_INLINE dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
     }
 #undef _FIXED_LEN_MOD_BOUNDS
 
-// sage: for ell in range(1,12):
-// ....:     n0 = ceil(2**16 / sqrt(ell))
-// ....:     n1 = ceil(2**32 / sqrt(ell))
-// ....:     n2 = ceil(2**64 / sqrt(ell))
-// ....:     print(f"{ell:2d}: {n0}  ||  {n1}  ||  {n2}")
-// ....:
-//  1: 65536  ||  4294967296  ||  18446744073709551616
-//  2: 46341  ||  3037000500  ||  13043817825332782213
-//  3: 37838  ||  2479700525  ||  10650232656628343402
-//  4: 32768  ||  2147483648  ||  9223372036854775808
-//  5: 29309  ||  1920767767  ||  8249634742471189718
-//  6: 26755  ||  1753413057  ||  7530851732716320753
-//  7: 24771  ||  1623345051  ||  6972213902555716131
-//  8: 23171  ||  1518500250  ||  6521908912666391107
-//  9: 21846  ||  1431655766  ||  6148914691236517206
-// 10: 20725  ||  1358187914  ||  5833372668713515885
-// 11: 19760  ||  1294981365  ||  5561902608746059656
-
-
     if (mod.n <= UWORD(1) << (FLINT_BITS / 2)) // implies <= 2 limbs
     {
         const ulong t0 = (mod.n - 1) * (mod.n - 1);
         ulong u1, u0;
         umul_ppmm(u1, u0, t0, len);
-        if (u1 == 0 || (mod.n & (mod.n - 1)) == 0)  // 1 limb || power of 2
+        if (u1 == 0)  // 1 limb
             return (dot_params_t) {_DOT1, UWORD(0)};
 
         // u1 != 0 <=> 2 limbs
@@ -231,14 +218,10 @@ FLINT_FORCE_INLINE dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
             return (dot_params_t) {_DOT2_SPLIT, pow2_precomp};
         }
 #endif
-
         return (dot_params_t) {_DOT2_HALF, UWORD(0)};
     }
     // from here on, mod.n > 2**(FLINT_BITS / 2)
     // --> unreduced dot cannot fit in 1 limb
-
-    if ((mod.n & (mod.n - 1)) == 0) // power of 2
-        return (dot_params_t) {_DOT_POW2, UWORD(0)};
 
     ulong t2, t1, t0, u1, u0;
     umul_ppmm(t1, t0, mod.n - 1, mod.n - 1);
@@ -521,7 +504,6 @@ ulong _nmod_vec_dot2_split_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset
 
 // auxiliary for short dot products
 #define _NMOD_VEC_DOT_SHORT1(fixedlen,expr1,expr2)       \
-        if (len == fixedlen)                             \
         {                                                \
             ulong res = (expr1) * (expr2); i++;          \
             for (slong j = 0; j < fixedlen-1; j++, i++)  \
@@ -531,7 +513,6 @@ ulong _nmod_vec_dot2_split_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset
         }                                                \
 
 #define _NMOD_VEC_DOT_SHORT2(fixedlen,expr1,expr2)          \
-        if (len == fixedlen)                                \
         {                                                   \
             ulong s0, s1, u0, u1;                           \
             umul_ppmm(u1, u0, (expr1), (expr2)); i++;       \
@@ -545,7 +526,6 @@ ulong _nmod_vec_dot2_split_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset
         }                                                   \
 
 #define _NMOD_VEC_DOT_SHORT3(fixedlen,expr1,expr2)               \
-        if (len == fixedlen)                                     \
         {                                                        \
             ulong res = nmod_mul((expr1), (expr2), mod); i++;    \
             for (slong j = 0; j < fixedlen-1; j++, i++)          \
@@ -553,70 +533,62 @@ ulong _nmod_vec_dot2_split_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset
             return res;                                          \
         }                                                        \
 
-// warning: interface different from other _NMOD_VEC_DOT macros
-// * only supports len <= 4, requires method==DOT0|DOT1|DOT2|DOT3
+// * supports 1 <= len <= 11, requires method==DOT0|DOT1|DOT2|DOT3|DOT_POW2
 // * i must be already initialized at the first wanted value
-// * returns the result
 #define _NMOD_VEC_DOT_SHORT(i, expr1, expr2, len, mod, method)          \
 {                                                                       \
-    if (method <= _DOT1)                                                \
+    if (method == _DOT1 || method == _DOT_POW2)                         \
     {                                                                   \
-        _NMOD_VEC_DOT_SHORT1(1, expr1, expr2)                           \
-        _NMOD_VEC_DOT_SHORT1(2, expr1, expr2)                           \
-        _NMOD_VEC_DOT_SHORT1(3, expr1, expr2)                           \
-        _NMOD_VEC_DOT_SHORT1(4, expr1, expr2)                           \
-        _NMOD_VEC_DOT_SHORT1(5, expr1, expr2)                           \
-        _NMOD_VEC_DOT_SHORT1(6, expr1, expr2)                           \
-        _NMOD_VEC_DOT_SHORT1(7, expr1, expr2)                           \
-        _NMOD_VEC_DOT_SHORT1(8, expr1, expr2)                           \
-        _NMOD_VEC_DOT_SHORT1(9, expr1, expr2)                           \
-        _NMOD_VEC_DOT_SHORT1(10, expr1, expr2)                          \
+        if (len ==  1) _NMOD_VEC_DOT_SHORT1( 1, expr1, expr2)           \
+        if (len ==  2) _NMOD_VEC_DOT_SHORT1( 2, expr1, expr2)           \
+        if (len ==  3) _NMOD_VEC_DOT_SHORT1( 3, expr1, expr2)           \
+        if (len ==  4) _NMOD_VEC_DOT_SHORT1( 4, expr1, expr2)           \
+        if (len ==  5) _NMOD_VEC_DOT_SHORT1( 5, expr1, expr2)           \
+        if (len ==  6) _NMOD_VEC_DOT_SHORT1( 6, expr1, expr2)           \
+        if (len ==  7) _NMOD_VEC_DOT_SHORT1( 7, expr1, expr2)           \
+        if (len ==  8) _NMOD_VEC_DOT_SHORT1( 8, expr1, expr2)           \
+        if (len ==  9) _NMOD_VEC_DOT_SHORT1( 9, expr1, expr2)           \
+        if (len == 10) _NMOD_VEC_DOT_SHORT1(10, expr1, expr2)           \
         _NMOD_VEC_DOT_SHORT1(11, expr1, expr2)                          \
-        return 0;                                                       \
     }                                                                   \
                                                                         \
     else if (method == _DOT2)                                           \
     {                                                                   \
-        if (len == 1)                                                   \
-            return nmod_mul((expr1), (expr2), mod);                     \
-        _NMOD_VEC_DOT_SHORT2(2, expr1, expr2)                           \
-        _NMOD_VEC_DOT_SHORT2(3, expr1, expr2)                           \
-        _NMOD_VEC_DOT_SHORT2(4, expr1, expr2)                           \
-        _NMOD_VEC_DOT_SHORT2(5, expr1, expr2)                           \
-        _NMOD_VEC_DOT_SHORT2(6, expr1, expr2)                           \
-        _NMOD_VEC_DOT_SHORT2(7, expr1, expr2)                           \
-        _NMOD_VEC_DOT_SHORT2(8, expr1, expr2)                           \
-        _NMOD_VEC_DOT_SHORT2(9, expr1, expr2)                           \
-        _NMOD_VEC_DOT_SHORT2(10, expr1, expr2)                          \
+        if (len == 1)  return nmod_mul((expr1), (expr2), mod);          \
+        if (len ==  2) _NMOD_VEC_DOT_SHORT2(2, expr1, expr2)            \
+        if (len ==  3) _NMOD_VEC_DOT_SHORT2(3, expr1, expr2)            \
+        if (len ==  4) _NMOD_VEC_DOT_SHORT2(4, expr1, expr2)            \
+        if (len ==  5) _NMOD_VEC_DOT_SHORT2(5, expr1, expr2)            \
+        if (len ==  6) _NMOD_VEC_DOT_SHORT2(6, expr1, expr2)            \
+        if (len ==  7) _NMOD_VEC_DOT_SHORT2(7, expr1, expr2)            \
+        if (len ==  8) _NMOD_VEC_DOT_SHORT2(8, expr1, expr2)            \
+        if (len ==  9) _NMOD_VEC_DOT_SHORT2(9, expr1, expr2)            \
+        if (len == 10) _NMOD_VEC_DOT_SHORT2(10, expr1, expr2)           \
         _NMOD_VEC_DOT_SHORT2(11, expr1, expr2)                          \
-        return 0;                                                       \
     }                                                                   \
                                                                         \
     else if (method == _DOT3)                                           \
     {                                                                   \
-        if (len == 1)                                                   \
-            return nmod_mul((expr1), (expr2), mod);                     \
-        _NMOD_VEC_DOT_SHORT3(2, expr1, expr2)                           \
-        _NMOD_VEC_DOT_SHORT3(3, expr1, expr2)                           \
-        _NMOD_VEC_DOT_SHORT3(4, expr1, expr2)                           \
-        _NMOD_VEC_DOT_SHORT3(5, expr1, expr2)                           \
-        _NMOD_VEC_DOT_SHORT3(6, expr1, expr2)                           \
-        _NMOD_VEC_DOT_SHORT3(7, expr1, expr2)                           \
-        _NMOD_VEC_DOT_SHORT3(8, expr1, expr2)                           \
-        _NMOD_VEC_DOT_SHORT3(9, expr1, expr2)                           \
-        _NMOD_VEC_DOT_SHORT3(10, expr1, expr2)                          \
+        if (len == 1)  return nmod_mul((expr1), (expr2), mod);          \
+        if (len ==  2) _NMOD_VEC_DOT_SHORT3(2, expr1, expr2)            \
+        if (len ==  3) _NMOD_VEC_DOT_SHORT3(3, expr1, expr2)            \
+        if (len ==  4) _NMOD_VEC_DOT_SHORT3(4, expr1, expr2)            \
+        if (len ==  5) _NMOD_VEC_DOT_SHORT3(5, expr1, expr2)            \
+        if (len ==  6) _NMOD_VEC_DOT_SHORT3(6, expr1, expr2)            \
+        if (len ==  7) _NMOD_VEC_DOT_SHORT3(7, expr1, expr2)            \
+        if (len ==  8) _NMOD_VEC_DOT_SHORT3(8, expr1, expr2)            \
+        if (len ==  9) _NMOD_VEC_DOT_SHORT3(9, expr1, expr2)            \
+        if (len == 10) _NMOD_VEC_DOT_SHORT3(10, expr1, expr2)           \
         _NMOD_VEC_DOT_SHORT3(11, expr1, expr2)                          \
-        return 0;                                                       \
     }                                                                   \
 }  while(0);                                                            \
 
 FLINT_FORCE_INLINE ulong _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_t params)
 {
-    if (params.method == _DOT0)
-        return UWORD(0);
     // handle short products
     if (len <= 11)
     {
+        if (len == 0) return UWORD(0);
         slong i = 0;
         _NMOD_VEC_DOT_SHORT(i, vec1[i], vec2[i], len, mod, params.method);
     }
@@ -642,9 +614,14 @@ FLINT_FORCE_INLINE ulong _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len
         return _nmod_vec_dot2_half(vec1, vec2, len, mod);
 
     if (params.method == _DOT_POW2)
-        return _nmod_vec_dot_pow2(vec1, vec2, len, mod);
+    {
+        if (mod.n <= UWORD(1) << (FLINT_BITS / 2))
+            return _nmod_vec_dot1(vec1, vec2, len, mod);
+        else
+            return _nmod_vec_dot_pow2(vec1, vec2, len, mod);
+    }
 
-    // params.method == _DOT0
+    // covers _DOT0 for len > 11 (i.e. mod.n == 1...)
     return UWORD(0);
 }
 
@@ -652,6 +629,7 @@ FLINT_FORCE_INLINE ulong _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong
 {
     if (len <= 11)
     {
+        if (len == 0) return UWORD(0);
         slong i = 0;
         _NMOD_VEC_DOT_SHORT(i, vec1[i], vec2[len-1-i], len, mod, params.method);
     }
@@ -677,16 +655,22 @@ FLINT_FORCE_INLINE ulong _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong
         return _nmod_vec_dot2_half_rev(vec1, vec2, len, mod);
 
     if (params.method == _DOT_POW2)
-        return _nmod_vec_dot_pow2_rev(vec1, vec2, len, mod);
+    {
+        if (mod.n <= UWORD(1) << (FLINT_BITS / 2))
+            return _nmod_vec_dot1_rev(vec1, vec2, len, mod);
+        else
+            return _nmod_vec_dot_pow2_rev(vec1, vec2, len, mod);
+    }
 
-    else  // params.method == _DOT0
-        return UWORD(0);
+    // covers _DOT0 for len > 11 (i.e. mod.n == 1...)
+    return UWORD(0);
 }
 
 FLINT_FORCE_INLINE ulong _nmod_vec_dot_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod, dot_params_t params)
 {
     if (len <= 11)
     {
+        if (len == 0) return UWORD(0);
         slong i = 0;
         _NMOD_VEC_DOT_SHORT(i, vec1[i], vec2[i][offset], len, mod, params.method);
     }
@@ -712,10 +696,15 @@ FLINT_FORCE_INLINE ulong _nmod_vec_dot_ptr(nn_srcptr vec1, const nn_ptr * vec2, 
         return _nmod_vec_dot2_half_ptr(vec1, vec2, offset, len, mod);
 
     if (params.method == _DOT_POW2)
-        return _nmod_vec_dot_pow2_ptr(vec1, vec2, offset, len, mod);
+    {
+        if (mod.n <= UWORD(1) << (FLINT_BITS / 2))
+            return _nmod_vec_dot1_ptr(vec1, vec2, offset, len, mod);
+        else
+            return _nmod_vec_dot_pow2_ptr(vec1, vec2, offset, len, mod);
+    }
 
-    else  // params.method == _DOT0
-        return UWORD(0);
+    // covers _DOT0 for len > 11 (i.e. mod.n == 1...)
+    return UWORD(0);
 }
 
 #undef _NMOD_VEC_DOT_SHORT1
