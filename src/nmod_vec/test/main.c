@@ -13,7 +13,7 @@
 
 #include "t-add_sub_neg.c"
 #include "t-discrete_log_pohlig_hellman.c"
-#include "t-dot_params.c"
+#include "t-dot_nlimbs.c"
 #include "t-dot.c"
 #include "t-dot_ptr.c"
 #include "t-nmod.c"

@@ -343,7 +343,7 @@ ulong _nmod_vec_dot2_split_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset
             return res;                                      \
         }                                                    \
 
-// * supports 1 <= len <= 11, requires method==DOT0|DOT1|DOT2|DOT3|DOT_POW2
+// * supports 1 <= len <= 11, requires method==DOT1|DOT2|DOT3|DOT_POW2
 // * i must be already initialized at the first wanted value
 #define _NMOD_VEC_DOT_SHORT(i, expr1, expr2, len, mod, method)          \
 {                                                                       \
