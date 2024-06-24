@@ -861,48 +861,9 @@ __gr_nmod_vec_dot(ulong * res, const ulong * initial, int subtract, const ulong 
     dot_params_t params;
     nmod_t mod;
 
-    if (len <= 1)
-    {
-        if (len == 2)   /* todo: fmma */
-        {
-            mod = NMOD_CTX(ctx);
-            s = nmod_mul(vec1[0], vec2[0], mod);
-            s = nmod_addmul(s, vec1[1], vec2[1], mod);
-        }
-        else if (len == 1)
-        {
-            mod = NMOD_CTX(ctx);
-            s = nmod_mul(vec1[0], vec2[0], mod);
-        }
-        else
-        {
-            if (initial == NULL)
-                _gr_nmod_zero(res, ctx);
-            else
-                _gr_nmod_set(res, initial, ctx);
-            return GR_SUCCESS;
-        }
-    }
-    else
-    {
-        mod = NMOD_CTX(ctx);
-
-        if (len <= 16)
-        {
-            if (mod.n <= UWORD(1) << (FLINT_BITS / 2 - 2))
-                params.method = _DOT1;
-            if (mod.n <= UWORD(1) << (FLINT_BITS - 2))
-                params.method = _DOT2;
-            else
-                params.method = _DOT3;
-        }
-        else
-        {
-            params = _nmod_vec_dot_params(len, mod);
-        }
-
-        NMOD_VEC_DOT(s, i, len, vec1[i], vec2[i], mod, params);
-    }
+    mod = NMOD_CTX(ctx);
+    params = _nmod_vec_dot_params(len, mod);
+    NMOD_VEC_DOT(s, i, len, vec1[i], vec2[i], mod, params);
 
     if (initial == NULL)
     {
@@ -930,48 +891,9 @@ __gr_nmod_vec_dot_rev(ulong * res, const ulong * initial, int subtract, const ul
     dot_params_t params;
     nmod_t mod;
 
-    if (len <= 1)
-    {
-        if (len == 2)   /* todo: fmma */
-        {
-            mod = NMOD_CTX(ctx);
-            s = nmod_mul(vec1[0], vec2[1], mod);
-            s = nmod_addmul(s, vec1[1], vec2[0], mod);
-        }
-        else if (len == 1)
-        {
-            mod = NMOD_CTX(ctx);
-            s = nmod_mul(vec1[0], vec2[0], mod);
-        }
-        else
-        {
-            if (initial == NULL)
-                _gr_nmod_zero(res, ctx);
-            else
-                _gr_nmod_set(res, initial, ctx);
-            return GR_SUCCESS;
-        }
-    }
-    else
-    {
-        mod = NMOD_CTX(ctx);
-
-        if (len <= 16)
-        {
-            if (mod.n <= UWORD(1) << (FLINT_BITS / 2 - 2))
-                params.method = _DOT1;
-            if (mod.n <= UWORD(1) << (FLINT_BITS - 2))
-                params.method = _DOT2;
-            else
-                params.method = _DOT3;
-        }
-        else
-        {
-            params = _nmod_vec_dot_params(len, mod);
-        }
-
-        NMOD_VEC_DOT(s, i, len, vec1[i], vec2[len - 1 - i], mod, params);
-    }
+    mod = NMOD_CTX(ctx);
+    params = _nmod_vec_dot_params(len, mod);
+    NMOD_VEC_DOT(s, i, len, vec1[i], vec2[len - 1 - i], mod, params);
 
     if (initial == NULL)
     {
