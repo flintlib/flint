@@ -24,7 +24,7 @@ TEST_FUNCTION_START(_nmod_vec_dot_params, state)
         slong len;
         nmod_t mod;
         ulong m;
-        int nlimbs1, nlimbs2;
+        int nlimbs1, nlimbs2, nlimbs3;
         dot_params_t params;
         mpz_t t;
 
@@ -34,45 +34,32 @@ TEST_FUNCTION_START(_nmod_vec_dot_params, state)
         nmod_init(&mod, m);
 
         params = _nmod_vec_dot_params(len, mod);
-        if (params.method == _DOT0)
-            nlimbs1 = 0;
-        else if (params.method == _DOT1)
-            nlimbs1 = 1;
-        else if (params.method > _DOT2)
-            nlimbs1 = 3;
-        else
-            nlimbs1 = 2;
+        nlimbs1 = _nmod_vec_dot_bound_limbs_from_params(len, mod, params);
+        nlimbs2 = _nmod_vec_dot_bound_limbs(len, mod);
 
         mpz_init2(t, 4*FLINT_BITS);
         flint_mpz_set_ui(t, m-1);
         mpz_mul(t, t, t);
         flint_mpz_mul_ui(t, t, len);
-        nlimbs2 = mpz_size(t);
+        nlimbs3 = mpz_size(t);
 
-        const int power_of_two = (mod.n & (mod.n - 1)) == 0;
-
-        if (!power_of_two && nlimbs1 != nlimbs2)
+        if (nlimbs1 != nlimbs3)
             TEST_FUNCTION_FAIL(
                     "m = %wu\n"
                     "len = %wd\n"
-                    "nlimbs1 = %d\n"
-                    "nlimbs2 = %d\n"
+                    "nlimbs1(from params) = %d\n"
+                    "nlimbs3(mpz) = %d\n"
                     "bound: %{mpz}\n",
-                    m, len, nlimbs1, nlimbs2, t);
+                    m, len, nlimbs1, nlimbs3, t);
 
-// DOT_SPLIT only defined for 64-bit config
-#if (FLINT_BITS == 64)
-        ulong pow2;
-        NMOD_RED(pow2, UWORD(1)<<DOT_SPLIT_BITS, mod);
-        if (params.method == _DOT2_SPLIT && params.pow2_precomp != pow2)
+        if (nlimbs2 != nlimbs3)
             TEST_FUNCTION_FAIL(
                     "m = %wu\n"
                     "len = %wd\n"
-                    "pow2_precomp = %d\n"
-                    "actual pow2 = %d\n"
-                    "(method _DOT2_SPLIT)\n",
-                    m, len, params.pow2_precomp, pow2, t);
-#endif  // FLINT_BITS == 64
+                    "nlimbs2(from len+mod) = %d\n"
+                    "nlimbs3(mpz) = %d\n"
+                    "bound: %{mpz}\n",
+                    m, len, nlimbs2, nlimbs3, t);
 
         mpz_clear(t);
     }
