@@ -125,16 +125,37 @@ Dot products
 --------------------------------------------------------------------------------
 
 
-.. function:: int _nmod_vec_dot_bound_limbs(slong len, nmod_t mod)
+.. function:: dot_method_t _nmod_vec_dot_params(slong len, nmod_t mod)
 
-    Returns the number of limbs (0, 1, 2 or 3) needed to represent the
-    unreduced dot product of two vectors of length ``len`` having entries
-    modulo ``mod.n``, assuming that ``len`` is nonnegative and that
-    ``mod.n`` is nonzero. The computed bound is tight. In other words,
-    this function returns the precise limb size of ``len`` times
-    ``(mod.n - 1) ^ 2``.
+    Returns a ``dot_method_t`` element. This element can be used as input for
+    the dot product macros and functions that require it, for any dot product
+    of vector with entries reduced modulo ``mod.n`` and whose length is less
+    than or equal to ``len``.
 
-.. macro:: NMOD_VEC_DOT(res, i, len, expr1, expr2, mod, nlimbs)
+    Internals, subject to change: its field ``method`` indicates the method that
+    will be used to compute a dot product of this length ``len`` when working
+    with the given ``mod``. Its field ``pow2_precomp`` is set to ``2**DOT_SPLIT_BITS
+    % mod.n`` if ``method == _DOT2_SPLIT``, and to `0` otherwise.
+
+.. function:: ulong _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_t params)
+
+    Returns the dot product of (``vec1``, ``len``) and (``vec2``, ``len``). The
+    input ``params`` has type ``dot_params_t`` and must have been computed via
+    ``_nmod_vec_dot_params`` with the specified ``mod`` and with a length
+    greater than or equal to ``len``.
+
+.. function:: ulong _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, dot_params_t params)
+
+    The same as ``_nmod_vec_dot``, but reverses ``vec2``.
+
+.. function:: ulong _nmod_vec_dot_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod, dot_params_t params)
+
+    Returns the dot product of (``vec1``, ``len``) and the values at
+    ``vec2[i][offset]``. The input ``params`` has type ``dot_params_t`` and
+    must have been computed via ``_nmod_vec_dot_params`` with the specified
+    ``mod`` and with a length greater than or equal to ``len``.
+
+.. macro:: NMOD_VEC_DOT(res, i, len, expr1, expr2, mod, params)
 
     Effectively performs the computation::
 
@@ -142,27 +163,26 @@ Dot products
         for (i = 0; i < len; i++)
             res += (expr1) * (expr2);
 
-    but with the arithmetic performed modulo ``mod``. The ``nlimbs`` parameter
-    should be 0, 1, 2 or 3, specifying the number of limbs needed to represent
-    the unreduced result.
+    but with the arithmetic performed modulo ``mod``. The input ``params`` has
+    type ``dot_params_t`` and must have been computed via
+    ``_nmod_vec_dot_params`` with the specified ``mod`` and with a length
+    greater than or equal to ``len``.
 
     ``nmod.h`` has to be included in order for this macro to work (order of
     inclusions does not matter).
 
-.. function:: ulong _nmod_vec_dot(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, int nlimbs)
+.. function:: int _nmod_vec_dot_bound_limbs(slong len, nmod_t mod)
 
-    Returns the dot product of (``vec1``, ``len``) and
-    (``vec2``, ``len``). The ``nlimbs`` parameter should be
-    0, 1, 2 or 3, specifying the number of limbs needed to represent the
-    unreduced result.
+    Returns the number of limbs (0, 1, 2 or 3) needed to represent the
+    unreduced dot product of two vectors of length ``len`` having entries
+    modulo ``mod.n``, assuming that ``len`` is nonnegative and that
+    ``mod.n`` is nonzero. The computed bound is tight. In other words,
+    this function returns the precise limb size of ``len`` times
+    ``(mod.n - 1)**2``.
 
-.. function:: ulong _nmod_vec_dot_rev(nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod, int nlimbs)
+.. function:: int _nmod_vec_dot_bound_limbs_from_params(slong len, nmod_t mod, dot_params_t params)
 
-    The same as ``_nmod_vec_dot``, but reverses ``vec2``.
+    Same specification as ``_nmod_vec_dot_bound_limbs``, but uses the additional
+    input ``params`` to reduce the amount of computations; for correctness
+    ``params`` must have been computed for the specified ``len`` and ``mod``.
 
-.. function:: ulong _nmod_vec_dot_ptr(nn_srcptr vec1, const nn_ptr * vec2, slong offset, slong len, nmod_t mod, int nlimbs)
-
-    Returns the dot product of (``vec1``, ``len``) and the values at
-    ``vec2[i][offset]``. The ``nlimbs`` parameter should be
-    0, 1, 2 or 3, specifying the number of limbs needed to represent the
-    unreduced result.

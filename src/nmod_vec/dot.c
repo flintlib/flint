@@ -18,6 +18,43 @@
 #   include "machine_vectors.h"
 #endif // if defined(__AVX2__)
 
+int _nmod_vec_dot_bound_limbs(slong len, nmod_t mod)
+{
+    if (mod.n <= UWORD(1) << (FLINT_BITS / 2)) // implies <= 2 limbs
+    {
+        const ulong t0 = (mod.n - 1) * (mod.n - 1);
+        ulong u1, u0;
+        umul_ppmm(u1, u0, t0, len);
+        if (u1 != 0)
+            return 2;
+        return (u0 != 0);
+    }
+
+    ulong t2, t1, t0, u1, u0;
+    umul_ppmm(t1, t0, mod.n - 1, mod.n - 1);
+    umul_ppmm(t2, t1, t1, len);
+    umul_ppmm(u1, u0, t0, len);
+    add_sssaaaaaa(t2, t1, t0,  t2, t1, UWORD(0),  UWORD(0), u1, u0);
+
+    if (t2 != 0)
+        return 3;
+    if (t1 != 0)
+        return 2;
+    return (t0 != 0);
+}
+
+int _nmod_vec_dot_bound_limbs_from_params(slong len, nmod_t mod, dot_params_t params)
+{
+    if (params.method == _DOT_POW2)
+        return _nmod_vec_dot_bound_limbs(len, mod);
+    if (params.method == _DOT0)
+        return 0;
+    if (params.method <= _DOT1)
+        return 1;
+    if (params.method <= _DOT2)
+        return 2;
+    return 3;
+}
 
 /*-------------------------------------------*/
 /*     dot product: vec1[i] * vec2[i]        */

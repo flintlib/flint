@@ -254,6 +254,9 @@ FLINT_FORCE_INLINE dot_params_t _nmod_vec_dot_params(ulong len, nmod_t mod)
 
 #undef _FIXED_LEN_MOD_BOUNDS
 
+int _nmod_vec_dot_bound_limbs(slong len, nmod_t mod);
+int _nmod_vec_dot_bound_limbs_from_params(slong len, nmod_t mod, dot_params_t params);
+
 
 /* ------ dot product, specific algorithms ------ */
 
