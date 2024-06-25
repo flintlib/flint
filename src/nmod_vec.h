@@ -142,10 +142,6 @@ typedef enum
 // 2 limbs <=>  _DOT1 < method <= _DOT2
 // 3 limbs <=>  _DOT2 < method
 
-// TODO note (for documentation): if params has been computed for some given len and mod, algorithms
-// ensure it can be used safely for smaller lengths and same mod
-// (e.g. in particular algorithms handle len == 0 even when the method is e.g. _DOT1)
-
 typedef struct
 {
     dot_method_t method;
