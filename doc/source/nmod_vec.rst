@@ -23,7 +23,7 @@ Random functions
 
 .. function:: void _nmod_vec_randtest(nn_ptr vec, flint_rand_t state, slong len, nmod_t mod)
 
-    Sets ``vec`` to a random vector of the given length with entries 
+    Sets ``vec`` to a random vector of the given length with entries
     reduced modulo ``mod.n``.
 
 
@@ -46,7 +46,7 @@ Basic manipulation and comparison
 
 .. function:: void _nmod_vec_reduce(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod)
 
-    Reduces the entries of ``(vec, len)`` modulo ``mod.n`` and set 
+    Reduces the entries of ``(vec, len)`` modulo ``mod.n`` and set
     ``res`` to the result.
 
 .. function:: flint_bitcnt_t _nmod_vec_max_bits(nn_srcptr vec, slong len)
@@ -55,8 +55,8 @@ Basic manipulation and comparison
 
 .. function:: int _nmod_vec_equal(nn_srcptr vec, nn_srcptr vec2, slong len)
 
-    Returns~`1` if ``(vec, len)`` is equal to ``(vec2, len)``, 
-    otherwise returns~`0`.
+    Returns `1` if ``(vec, len)`` is equal to ``(vec2, len)``,
+    otherwise returns `0`.
 
 
 Printing
@@ -92,12 +92,12 @@ Arithmetic operations
 
 .. function:: void _nmod_vec_add(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
 
-    Sets ``(res, len)`` to the sum of ``(vec1, len)`` 
+    Sets ``(res, len)`` to the sum of ``(vec1, len)``
     and ``(vec2, len)``.
 
 .. function:: void _nmod_vec_sub(nn_ptr res, nn_srcptr vec1, nn_srcptr vec2, slong len, nmod_t mod)
 
-    Sets ``(res, len)`` to the difference of ``(vec1, len)`` 
+    Sets ``(res, len)`` to the difference of ``(vec1, len)``
     and ``(vec2, len)``.
 
 .. function:: void _nmod_vec_neg(nn_ptr res, nn_srcptr vec, slong len, nmod_t mod)
@@ -107,27 +107,65 @@ Arithmetic operations
 .. function:: void _nmod_vec_scalar_mul_nmod(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)
 
     Sets ``(res, len)`` to ``(vec, len)`` multiplied by `c`. The element
-    `c` and all elements of `vec` are assumed to be less than `mod.n`.
+    `c` and all elements of ``vec`` are assumed to be less than ``mod.n``.
 
 .. function:: void _nmod_vec_scalar_mul_nmod_shoup(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)
 
     Sets ``(res, len)`` to ``(vec, len)`` multiplied by `c` using
-    :func:`n_mulmod_shoup`. `mod.n` should be less than `2^{\mathtt{FLINT\_BITS} - 1}`. `c` 
-    and all elements of `vec` should be less than `mod.n`.
+    :func:`n_mulmod_shoup`. `mod.n` should be less than `2^{\mathtt{FLINT\_BITS} - 1}`. `c`
+    and all elements of ``vec`` should be less than ``mod.n``.
 
 .. function:: void _nmod_vec_scalar_addmul_nmod(nn_ptr res, nn_srcptr vec, slong len, ulong c, nmod_t mod)
 
     Adds ``(vec, len)`` times `c` to the vector ``(res, len)``. The element
-    `c` and all elements of `vec` are assumed to be less than `mod.n`.
+    `c` and all elements of ``vec`` are assumed to be less than ``mod.n``.
 
 
 Dot products
 --------------------------------------------------------------------------------
 
+Dot products functions and macros rely on several implementations, depending on
+the length of this dot product and on the underlying modulus. What
+implementations will be called is determined via ``_nmod_vec_dot_params``,
+which returns a ``dot_params_t`` element which can then be used as input to the
+dot product routines.
 
-.. function:: dot_method_t _nmod_vec_dot_params(slong len, nmod_t mod)
+The efficiency of the different approaches range roughly as follows, from
+faster to slower, on 64 bit machines. In all cases, modular reduction is only
+performed at the very end of the computation.
 
-    Returns a ``dot_method_t`` element. This element can be used as input for
+- moduli up to `1515531528` (about `2^{30.5}`): implemented via single limb
+  integer multiplication, using explicit vectorization if supported (current
+  support is for AVX2);
+
+- moduli that are a power of `2` up to `2^{32}`: same efficiency as the above
+  case;
+
+- moduli that are a power of `2` between `2^{33}` and `2^{63}`: efficiency
+  between that of the above case and that of the below one (depending on the
+  machine and on automatic vectorization);
+
+- other moduli up to `2^{32}`: implemented via single limb integer
+  multiplication combined with accumulation in two limbs;
+
+- moduli more than `2^{32}`, unreduced dot product fits in two limbs:
+  implemented via two limbs integer multiplication, with a final modular
+  reduction;
+
+- unreduced dot product fits in three limbs, moduli up to about `2^{62.5}`:
+  implemented via two limbs integer multiplication, with intermediate
+  accumulation of sub-products in two limbs, and overall accumulation in three
+  limbs;
+
+- unreduced dot product fits in three limbs, other moduli: implemented via two
+  limbs integer multiplication, with accumulation in three limbs.
+
+
+.. type:: dot_params_t
+
+.. function:: dot_params_t _nmod_vec_dot_params(slong len, nmod_t mod)
+
+    Returns a ``dot_params_t`` element. This element can be used as input for
     the dot product macros and functions that require it, for any dot product
     of vector with entries reduced modulo ``mod.n`` and whose length is less
     than or equal to ``len``.
