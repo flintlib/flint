@@ -16,7 +16,6 @@
 void
 nmod_mat_solve_tril_classical(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t B, int unit)
 {
-    int nlimbs;
     slong i, j, n, m;
     nmod_t mod;
     nn_ptr inv, tmp;
@@ -34,7 +33,7 @@ nmod_mat_solve_tril_classical(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t
     else
         inv = NULL;
 
-    nlimbs = _nmod_vec_dot_bound_limbs(n, mod);
+    const dot_params_t params = _nmod_vec_dot_params(n, mod);
     tmp = _nmod_vec_init(n);
 
     for (i = 0; i < m; i++)
@@ -45,7 +44,7 @@ nmod_mat_solve_tril_classical(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t
         for (j = 0; j < n; j++)
         {
             ulong s;
-            s = _nmod_vec_dot(L->rows[j], tmp, j, mod, nlimbs);
+            s = _nmod_vec_dot(L->rows[j], tmp, j, mod, params);
             s = nmod_sub(nmod_mat_entry(B, j, i), s, mod);
             if (!unit)
                 s = n_mulmod2_preinv(s, inv[j], mod.n, mod.ninv);

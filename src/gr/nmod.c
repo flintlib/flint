@@ -856,53 +856,22 @@ _gr_nmod_vec_product(ulong * res, const ulong * vec, slong len, gr_ctx_t ctx)
 int
 __gr_nmod_vec_dot(ulong * res, const ulong * initial, int subtract, const ulong * vec1, const ulong * vec2, slong len, gr_ctx_t ctx)
 {
-    slong i;
     ulong s;
-    int nlimbs;
+    dot_params_t params;
     nmod_t mod;
 
-    if (len <= 1)
+    if (len == 0)
     {
-        if (len == 2)   /* todo: fmma */
-        {
-            mod = NMOD_CTX(ctx);
-            s = nmod_mul(vec1[0], vec2[0], mod);
-            s = nmod_addmul(s, vec1[1], vec2[1], mod);
-        }
-        else if (len == 1)
-        {
-            mod = NMOD_CTX(ctx);
-            s = nmod_mul(vec1[0], vec2[0], mod);
-        }
+        if (initial == NULL)
+            _gr_nmod_zero(res, ctx);
         else
-        {
-            if (initial == NULL)
-                _gr_nmod_zero(res, ctx);
-            else
-                _gr_nmod_set(res, initial, ctx);
-            return GR_SUCCESS;
-        }
+            _gr_nmod_set(res, initial, ctx);
+        return GR_SUCCESS;
     }
-    else
-    {
-        mod = NMOD_CTX(ctx);
 
-        if (len <= 16)
-        {
-            if (mod.n <= UWORD(1) << (FLINT_BITS / 2 - 2))
-                nlimbs = 1;
-            if (mod.n <= UWORD(1) << (FLINT_BITS - 2))
-                nlimbs = 2;
-            else
-                nlimbs = 3;
-        }
-        else
-        {
-            nlimbs = _nmod_vec_dot_bound_limbs(len, mod);
-        }
-
-        NMOD_VEC_DOT(s, i, len, vec1[i], vec2[i], mod, nlimbs);
-    }
+    mod = NMOD_CTX(ctx);
+    params = _nmod_vec_dot_params(len, mod);
+    s = _nmod_vec_dot(vec1, vec2, len, mod, params);
 
     if (initial == NULL)
     {
@@ -925,53 +894,22 @@ __gr_nmod_vec_dot(ulong * res, const ulong * initial, int subtract, const ulong 
 int
 __gr_nmod_vec_dot_rev(ulong * res, const ulong * initial, int subtract, const ulong * vec1, const ulong * vec2, slong len, gr_ctx_t ctx)
 {
-    slong i;
     ulong s;
-    int nlimbs;
+    dot_params_t params;
     nmod_t mod;
 
-    if (len <= 1)
+    if (len == 0)
     {
-        if (len == 2)   /* todo: fmma */
-        {
-            mod = NMOD_CTX(ctx);
-            s = nmod_mul(vec1[0], vec2[1], mod);
-            s = nmod_addmul(s, vec1[1], vec2[0], mod);
-        }
-        else if (len == 1)
-        {
-            mod = NMOD_CTX(ctx);
-            s = nmod_mul(vec1[0], vec2[0], mod);
-        }
+        if (initial == NULL)
+            _gr_nmod_zero(res, ctx);
         else
-        {
-            if (initial == NULL)
-                _gr_nmod_zero(res, ctx);
-            else
-                _gr_nmod_set(res, initial, ctx);
-            return GR_SUCCESS;
-        }
+            _gr_nmod_set(res, initial, ctx);
+        return GR_SUCCESS;
     }
-    else
-    {
-        mod = NMOD_CTX(ctx);
 
-        if (len <= 16)
-        {
-            if (mod.n <= UWORD(1) << (FLINT_BITS / 2 - 2))
-                nlimbs = 1;
-            if (mod.n <= UWORD(1) << (FLINT_BITS - 2))
-                nlimbs = 2;
-            else
-                nlimbs = 3;
-        }
-        else
-        {
-            nlimbs = _nmod_vec_dot_bound_limbs(len, mod);
-        }
-
-        NMOD_VEC_DOT(s, i, len, vec1[i], vec2[len - 1 - i], mod, nlimbs);
-    }
+    mod = NMOD_CTX(ctx);
+    params = _nmod_vec_dot_params(len, mod);
+    s = _nmod_vec_dot_rev(vec1, vec2, len, mod, params);
 
     if (initial == NULL)
     {

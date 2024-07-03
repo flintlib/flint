@@ -24,7 +24,6 @@ TEST_FUNCTION_START(nmod_vec_dot_ptr, state)
         ulong m, res, res2;
         nn_ptr x, y;
         nn_ptr * z;
-        int limbs1;
         slong j, offset;
 
         len = n_randint(state, 1000) + 1;
@@ -43,17 +42,17 @@ TEST_FUNCTION_START(nmod_vec_dot_ptr, state)
         for (j = 0; j < len; j++)
             z[j] = &y[j] + offset;
 
-        limbs1 = _nmod_vec_dot_bound_limbs(len, mod);
+        const dot_params_t params = _nmod_vec_dot_params(len, mod);
 
-        res = _nmod_vec_dot_ptr(x, z, -offset, len, mod, limbs1);
-        res2 = _nmod_vec_dot(x, y, len, mod, limbs1);
+        res = _nmod_vec_dot_ptr(x, z, -offset, len, mod, params);
+        res2 = _nmod_vec_dot(x, y, len, mod, params);
 
         if (res != res2)
             TEST_FUNCTION_FAIL(
                     "m = %wu\n"
                     "len = %wd\n"
-                    "limbs1 = %d\n",
-                    m, len, limbs1);
+                    "method = %d\n",
+                    m, len, params.method);
 
         _nmod_vec_clear(x);
         _nmod_vec_clear(y);

@@ -24,7 +24,6 @@ TEST_FUNCTION_START(nmod_vec_dot, state)
         nmod_t mod;
         ulong m, res;
         nn_ptr x, y;
-        int limbs1;
         mpz_t s, t;
         slong j;
 
@@ -39,9 +38,9 @@ TEST_FUNCTION_START(nmod_vec_dot, state)
         _nmod_vec_randtest(x, state, len, mod);
         _nmod_vec_randtest(y, state, len, mod);
 
-        limbs1 = _nmod_vec_dot_bound_limbs(len, mod);
+        const dot_params_t params = _nmod_vec_dot_params(len, mod);
 
-        res = _nmod_vec_dot(x, y, len, mod, limbs1);
+        res = _nmod_vec_dot(x, y, len, mod, params);
 
         mpz_init(s);
         mpz_init(t);
@@ -59,7 +58,7 @@ TEST_FUNCTION_START(nmod_vec_dot, state)
                     "m = %wu\n"
                     "len = %wd\n"
                     "limbs1 = %d\n",
-                    m, len, limbs1);
+                    m, len, params);
 
         mpz_clear(s);
         mpz_clear(t);

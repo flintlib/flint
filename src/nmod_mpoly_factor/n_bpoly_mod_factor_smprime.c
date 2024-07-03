@@ -1090,10 +1090,9 @@ static void _lattice(
     n_bpoly_t Q, R, dg;
     n_bpoly_struct * ld;
     nmod_mat_t M, T1, T2;
-    int nlimbs;
     ulong * trow;
 
-    nlimbs = _nmod_vec_dot_bound_limbs(r, ctx);
+    const dot_params_t params = _nmod_vec_dot_params(r, ctx);
     trow = FLINT_ARRAY_ALLOC(r, ulong);
     n_bpoly_init(Q);
     n_bpoly_init(R);
@@ -1134,7 +1133,7 @@ static void _lattice(
 
             for (i = 0; i < nrows; i++)
                 nmod_mat_entry(M, j - lower, i) =
-                             _nmod_vec_dot(trow, N->rows[i], r, ctx, nlimbs);
+                             _nmod_vec_dot(trow, N->rows[i], r, ctx, params);
         }
 
         nmod_mat_init_nullspace_tr(T1, M);

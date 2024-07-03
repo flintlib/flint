@@ -20,7 +20,7 @@ void
 _nmod_poly_mullow_classical(nn_ptr res, nn_srcptr poly1, slong len1,
                             nn_srcptr poly2, slong len2, slong n, nmod_t mod)
 {
-    slong i, j, bits, log_len, nlimbs, n1, n2;
+    slong i, j, bits, log_len, n1, n2;
     int squaring;
     ulong c;
 
@@ -41,6 +41,7 @@ _nmod_poly_mullow_classical(nn_ptr res, nn_srcptr poly1, slong len1,
 
     squaring = (poly1 == poly2 && len1 == len2);
 
+    // TODO could what is below make more direct use of nmod_vec_dot?
     log_len = FLINT_BIT_COUNT(len2);
     bits = FLINT_BITS - (slong) mod.norm;
     bits = 2 * bits + log_len;
@@ -88,10 +89,11 @@ _nmod_poly_mullow_classical(nn_ptr res, nn_srcptr poly1, slong len1,
         return;
     }
 
+    dot_params_t params = {_DOT2, 0};
     if (bits <= 2 * FLINT_BITS)
-        nlimbs = 2;
+        params.method = _DOT2;
     else
-        nlimbs = 3;
+        params.method = _DOT3;
 
     if (squaring)
     {
@@ -100,7 +102,7 @@ _nmod_poly_mullow_classical(nn_ptr res, nn_srcptr poly1, slong len1,
             n1 = FLINT_MAX(0, i - len1 + 1);
             n2 = FLINT_MIN(len1 - 1, (i + 1) / 2 - 1);
 
-            c = _nmod_vec_dot_rev(poly1 + n1, poly1 + i - n2, n2 - n1 + 1, mod, nlimbs);
+            c = _nmod_vec_dot_rev(poly1 + n1, poly1 + i - n2, n2 - n1 + 1, mod, params);
             c = nmod_add(c, c, mod);
 
             if (i % 2 == 0 && i / 2 < len1)
@@ -118,7 +120,7 @@ _nmod_poly_mullow_classical(nn_ptr res, nn_srcptr poly1, slong len1,
 
             res[i] = _nmod_vec_dot_rev(poly1 + i - n2,
                                        poly2 + i - n1,
-                                       n1 + n2 - i + 1, mod, nlimbs);
+                                       n1 + n2 - i + 1, mod, params);
         }
     }
 }

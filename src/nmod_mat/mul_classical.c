@@ -24,7 +24,7 @@ with op = -1, computes D = C - A*B
 
 static inline void
 _nmod_mat_addmul_basic_op(nn_ptr * D, nn_ptr * const C, nn_ptr * const A,
-    nn_ptr * const B, slong m, slong k, slong n, int op, nmod_t mod, int nlimbs)
+    nn_ptr * const B, slong m, slong k, slong n, int op, nmod_t mod, dot_params_t params)
 {
     slong i, j;
     ulong c;
@@ -33,7 +33,7 @@ _nmod_mat_addmul_basic_op(nn_ptr * D, nn_ptr * const C, nn_ptr * const A,
     {
         for (j = 0; j < n; j++)
         {
-            c = _nmod_vec_dot_ptr(A[i], B, j, k, mod, nlimbs);
+            c = _nmod_vec_dot_ptr(A[i], B, j, k, mod, params);
 
             if (op == 1)
                 c = nmod_add(C[i][j], c, mod);
@@ -47,7 +47,7 @@ _nmod_mat_addmul_basic_op(nn_ptr * D, nn_ptr * const C, nn_ptr * const A,
 
 static inline void
 _nmod_mat_addmul_transpose_op(nn_ptr * D, const nn_ptr * C, const nn_ptr * A,
-    const nn_ptr * B, slong m, slong k, slong n, int op, nmod_t mod, int nlimbs)
+    const nn_ptr * B, slong m, slong k, slong n, int op, nmod_t mod, dot_params_t params)
 {
     nn_ptr tmp;
     ulong c;
@@ -63,7 +63,7 @@ _nmod_mat_addmul_transpose_op(nn_ptr * D, const nn_ptr * C, const nn_ptr * A,
     {
         for (j = 0; j < n; j++)
         {
-            c = _nmod_vec_dot(A[i], tmp + j*k, k, mod, nlimbs);
+            c = _nmod_vec_dot(A[i], tmp + j*k, k, mod, params);
 
             if (op == 1)
                 c = nmod_add(C[i][j], c, mod);
@@ -164,7 +164,6 @@ _nmod_mat_mul_classical_op(nmod_mat_t D, const nmod_mat_t C,
                                 const nmod_mat_t A, const nmod_mat_t B, int op)
 {
     slong m, k, n;
-    int nlimbs;
     nmod_t mod;
 
     mod = A->mod;
@@ -172,7 +171,7 @@ _nmod_mat_mul_classical_op(nmod_mat_t D, const nmod_mat_t C,
     k = A->c;
     n = B->c;
 
-    if (k == 0)
+    if (k == 0 || mod.n == 1)  // covers params.method == _DOT0
     {
         if (op == 0)
             nmod_mat_zero(D);
@@ -181,9 +180,10 @@ _nmod_mat_mul_classical_op(nmod_mat_t D, const nmod_mat_t C,
         return;
     }
 
-    nlimbs = _nmod_vec_dot_bound_limbs(k, mod);
+    const dot_params_t params = _nmod_vec_dot_params(k, mod);
 
-    if (nlimbs == 1 && m > 10 && k > 10 && n > 10)
+    // TODO vec_dot changes --> thresholds to re-examine
+    if (params.method == _DOT1 && m > 10 && k > 10 && n > 10)
     {
         _nmod_mat_addmul_packed_op(D->rows, (op == 0) ? NULL : C->rows,
             A->rows, B->rows, m, k, n, op, D->mod);
@@ -192,19 +192,13 @@ _nmod_mat_mul_classical_op(nmod_mat_t D, const nmod_mat_t C,
         || n < NMOD_MAT_MUL_TRANSPOSE_CUTOFF
         || k < NMOD_MAT_MUL_TRANSPOSE_CUTOFF)
     {
-        if ((mod.n & (mod.n - 1)) == 0)
-            nlimbs = 1;
-
         _nmod_mat_addmul_basic_op(D->rows, (op == 0) ? NULL : C->rows,
-            A->rows, B->rows, m, k, n, op, D->mod, nlimbs);
+            A->rows, B->rows, m, k, n, op, D->mod, params);
     }
     else
     {
-        if ((mod.n & (mod.n - 1)) == 0)
-            nlimbs = 1;
-
         _nmod_mat_addmul_transpose_op(D->rows, (op == 0) ? NULL : C->rows,
-            A->rows, B->rows, m, k, n, op, D->mod, nlimbs);
+            A->rows, B->rows, m, k, n, op, D->mod, params);
     }
 }
 

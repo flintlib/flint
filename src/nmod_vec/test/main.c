@@ -13,7 +13,7 @@
 
 #include "t-add_sub_neg.c"
 #include "t-discrete_log_pohlig_hellman.c"
-#include "t-dot_bound_limbs.c"
+#include "t-dot_nlimbs.c"
 #include "t-dot.c"
 #include "t-dot_ptr.c"
 #include "t-nmod.c"
@@ -29,7 +29,7 @@ test_struct tests[] =
 {
     TEST_FUNCTION(nmod_vec_add_sub_neg),
     TEST_FUNCTION(nmod_vec_discrete_log_pohlig_hellman),
-    TEST_FUNCTION(nmod_vec_dot_bound_limbs),
+    TEST_FUNCTION(_nmod_vec_dot_params),
     TEST_FUNCTION(nmod_vec_dot),
     TEST_FUNCTION(nmod_vec_dot_ptr),
     TEST_FUNCTION(nmod_vec_nmod),

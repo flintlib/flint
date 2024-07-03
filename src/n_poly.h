@@ -357,7 +357,7 @@ void n_poly_mod_addmul_linear(n_poly_t A, const n_poly_t B,
 void n_poly_mod_scalar_addmul_nmod(n_poly_t A, const n_poly_t B,
                                    const n_poly_t C, ulong d0, nmod_t ctx);
 
-ulong _n_poly_eval_pow(n_poly_t P, n_poly_t alphapow, int nlimbs,
+ulong _n_poly_eval_pow(n_poly_t P, n_poly_t alphapow, dot_params_t params,
                                                                    nmod_t ctx);
 
 ulong n_poly_mod_eval_pow(n_poly_t P, n_poly_t alphapow,

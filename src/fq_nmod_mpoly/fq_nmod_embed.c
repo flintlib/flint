@@ -352,12 +352,12 @@ void bad_n_fq_embed_lg_to_sm(
     slong smd = fq_nmod_ctx_degree(emb->smctx);
     slong lgd = fq_nmod_ctx_degree(emb->lgctx);
     slong i;
-    int nlimbs = _nmod_vec_dot_bound_limbs(lgd, emb->lgctx->mod);
+    const dot_params_t params = _nmod_vec_dot_params(lgd, emb->lgctx->mod);
 
     n_poly_fit_length(out, lgd);
     for (i = 0; i < lgd; i++)
         out->coeffs[i] = _nmod_vec_dot(emb->lg_to_sm_mat->rows[i], in, lgd,
-                                                      emb->lgctx->mod, nlimbs);
+                                                      emb->lgctx->mod, params);
     FLINT_ASSERT(lgd/smd == emb->h->length - 1);
     out->length = emb->h->length - 1;
     _n_fq_poly_normalise(out, smd);
@@ -438,7 +438,7 @@ void bad_n_fq_embed_sm_to_lg(
     slong smd = fq_nmod_ctx_degree(emb->smctx);
     slong lgd = fq_nmod_ctx_degree(emb->lgctx);
     slong i;
-    int nlimbs = _nmod_vec_dot_bound_limbs(lgd, emb->lgctx->mod);
+    const dot_params_t params = _nmod_vec_dot_params(lgd, emb->lgctx->mod);
     n_poly_stack_t St;  /* TODO: pass the stack in */
     n_fq_poly_struct * q, * in_red;
 
@@ -454,7 +454,7 @@ void bad_n_fq_embed_sm_to_lg(
 
     for (i = 0; i < lgd; i++)
         out[i] = _nmod_vec_dot(emb->sm_to_lg_mat->rows[i], in_red->coeffs,
-                                  smd*in_red->length, emb->lgctx->mod, nlimbs);
+                                  smd*in_red->length, emb->lgctx->mod, params);
 
     n_poly_stack_give_back(St, 2);
 
@@ -544,11 +544,11 @@ void bad_n_fq_embed_sm_elem_to_lg(
     slong smd = fq_nmod_ctx_degree(emb->smctx);
     slong lgd = fq_nmod_ctx_degree(emb->lgctx);
     slong i;
-    int nlimbs = _nmod_vec_dot_bound_limbs(smd, emb->lgctx->mod);
+    const dot_params_t params = _nmod_vec_dot_params(smd, emb->lgctx->mod);
 
     for (i = 0; i < lgd; i++)
         out[i] = _nmod_vec_dot(emb->sm_to_lg_mat->rows[i], in, smd,
-                                                      emb->lgctx->mod, nlimbs);
+                                                      emb->lgctx->mod, params);
 }
 
 void bad_fq_nmod_embed_sm_elem_to_lg(
@@ -559,7 +559,7 @@ void bad_fq_nmod_embed_sm_elem_to_lg(
     slong smd = fq_nmod_ctx_degree(emb->smctx);
     slong lgd = fq_nmod_ctx_degree(emb->lgctx);
     slong i;
-    int nlimbs = _nmod_vec_dot_bound_limbs(smd, emb->lgctx->mod);
+    const dot_params_t params = _nmod_vec_dot_params(smd, emb->lgctx->mod);
 
     FLINT_ASSERT(in->length <= smd);
 
@@ -568,7 +568,7 @@ void bad_fq_nmod_embed_sm_elem_to_lg(
     for (i = 0; i < lgd; i++)
     {
         out->coeffs[i] = _nmod_vec_dot(emb->sm_to_lg_mat->rows[i],
-                              in->coeffs, in->length, emb->lgctx->mod, nlimbs);
+                              in->coeffs, in->length, emb->lgctx->mod, params);
     }
 
     out->length = lgd;

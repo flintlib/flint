@@ -38,21 +38,26 @@ void nmod_mat_rand(nmod_mat_t mat, flint_rand_t state)
 /* direct: dot / dot_rev / dot expr   */
 /*------------------------------------*/
 
+// timings excluding dot_params
 void time_dot(ulong len, ulong n, flint_rand_t state)
 {
     nmod_t mod;
     nmod_init(&mod, n);
-    const int n_limbs = _nmod_vec_dot_bound_limbs(len, mod);
+    const dot_params_t params = _nmod_vec_dot_params(len, mod);
 
     nn_ptr v1 = _nmod_vec_init(len);
     _nmod_vec_rand(v1, state, len, mod);
     nn_ptr v2 = _nmod_vec_init(len);
     _nmod_vec_rand(v2, state, len, mod);
 
+    // store results in volatile variable to avoid that they
+    // are "optimized away" (especially for inlined part)
+    volatile ulong FLINT_SET_BUT_UNUSED(res);
+
     double FLINT_SET_BUT_UNUSED(tcpu), twall;
 
     TIMEIT_START
-    _nmod_vec_dot(v1, v2, len, mod, n_limbs);
+    res = _nmod_vec_dot(v1, v2, len, mod, params);
     TIMEIT_STOP_VALUES(tcpu, twall)
 
     printf("%.2e", twall);
@@ -65,17 +70,21 @@ void time_dot_rev(ulong len, ulong n, flint_rand_t state)
 {
     nmod_t mod;
     nmod_init(&mod, n);
-    const int n_limbs = _nmod_vec_dot_bound_limbs(len, mod);
+    const dot_params_t params = _nmod_vec_dot_params(len, mod);
 
     nn_ptr v1 = _nmod_vec_init(len);
     _nmod_vec_rand(v1, state, len, mod);
     nn_ptr v2 = _nmod_vec_init(len);
     _nmod_vec_rand(v2, state, len, mod);
 
+    // store results in volatile variable to avoid that they
+    // are "optimized away" (especially for inlined part)
+    volatile ulong FLINT_SET_BUT_UNUSED(res);
+
     double FLINT_SET_BUT_UNUSED(tcpu), twall;
 
     TIMEIT_START
-    _nmod_vec_dot_rev(v1, v2, len, mod, n_limbs);
+    res = _nmod_vec_dot_rev(v1, v2, len, mod, params);
     TIMEIT_STOP_VALUES(tcpu, twall)
 
     printf("%.2e", twall);
@@ -84,39 +93,130 @@ void time_dot_rev(ulong len, ulong n, flint_rand_t state)
     _nmod_vec_clear(v2);
 }
 
-void time_dot_expr(ulong len, ulong n, flint_rand_t state)
+void time_dot_ptr(ulong len, ulong n, flint_rand_t state)
 {
     nmod_t mod;
     nmod_init(&mod, n);
-    const int n_limbs = _nmod_vec_dot_bound_limbs(len, mod);
+    const dot_params_t params = _nmod_vec_dot_params(len, mod);
 
-    nn_ptr v1 = _nmod_vec_init(9*len);
-    _nmod_vec_rand(v1, state, 9*len, mod);
-    nn_ptr v2 = _nmod_vec_init(9*len);
-    _nmod_vec_rand(v2, state, 9*len, mod);
+    const ulong offset = UWORD(7);
+
+    nn_ptr v1 = _nmod_vec_init(len);
+    _nmod_vec_rand(v1, state, len, mod);
+    nn_ptr v2tmp = _nmod_vec_init(len);
+    _nmod_vec_rand(v2tmp, state, len, mod);
+    nn_ptr * v2 = flint_malloc(sizeof(nn_ptr) * len);
+    for (ulong i = 0; i < len; i++)
+        v2[i] = &v2tmp[i] + offset;
+
+    // store results in volatile variable to avoid that they
+    // are "optimized away" (especially for inlined part)
+    volatile ulong FLINT_SET_BUT_UNUSED(res);
 
     double FLINT_SET_BUT_UNUSED(tcpu), twall;
 
-    nn_srcptr v1i = v1;
-    nn_srcptr v2i = v2;
-    ulong i, FLINT_SET_BUT_UNUSED(res);
+    TIMEIT_START
+    res = _nmod_vec_dot_ptr(v1, v2, offset, len, mod, params);
+    TIMEIT_STOP_VALUES(tcpu, twall)
+
+    printf("%.2e", twall);
+
+    _nmod_vec_clear(v1);
+    _nmod_vec_clear(v2tmp);
+    flint_free(v2);
+}
+
+// timings including dot_params
+void time_dot_incparams(ulong len, ulong n, flint_rand_t state)
+{
+    nmod_t mod;
+    nmod_init(&mod, n);
+
+    nn_ptr v1 = _nmod_vec_init(len);
+    _nmod_vec_rand(v1, state, len, mod);
+    nn_ptr v2 = _nmod_vec_init(len);
+    _nmod_vec_rand(v2, state, len, mod);
+
+    // store results in volatile variable to avoid that they
+    // are "optimized away" (especially for inlined part)
+    volatile ulong FLINT_SET_BUT_UNUSED(res);
+
+    double FLINT_SET_BUT_UNUSED(tcpu), twall;
 
     TIMEIT_START
-    NMOD_VEC_DOT(res, i, len, v1i[9*len - 1 - 9*i], v2i[9*len - 1 - 9*i], mod, n_limbs);
+    const dot_params_t params = _nmod_vec_dot_params(len, mod);
+    res = _nmod_vec_dot(v1, v2, len, mod, params);
     TIMEIT_STOP_VALUES(tcpu, twall)
 
     printf("%.2e", twall);
 
     _nmod_vec_clear(v1);
     _nmod_vec_clear(v2);
+}
+
+void time_dot_rev_incparams(ulong len, ulong n, flint_rand_t state)
+{
+    nmod_t mod;
+    nmod_init(&mod, n);
+
+    nn_ptr v1 = _nmod_vec_init(len);
+    _nmod_vec_rand(v1, state, len, mod);
+    nn_ptr v2 = _nmod_vec_init(len);
+    _nmod_vec_rand(v2, state, len, mod);
+
+    // store results in volatile variable to avoid that they
+    // are "optimized away" (especially for inlined part)
+    volatile ulong FLINT_SET_BUT_UNUSED(res);
+
+    double FLINT_SET_BUT_UNUSED(tcpu), twall;
+
+    TIMEIT_START
+    const dot_params_t params = _nmod_vec_dot_params(len, mod);
+    res = _nmod_vec_dot_rev(v1, v2, len, mod, params);
+    TIMEIT_STOP_VALUES(tcpu, twall)
+
+    printf("%.2e", twall);
+
+    _nmod_vec_clear(v1);
+    _nmod_vec_clear(v2);
+}
+
+void time_dot_ptr_incparams(ulong len, ulong n, flint_rand_t state)
+{
+    nmod_t mod;
+    nmod_init(&mod, n);
+
+    const ulong offset = UWORD(7);
+
+    nn_ptr v1 = _nmod_vec_init(len);
+    _nmod_vec_rand(v1, state, len, mod);
+    nn_ptr v2tmp = _nmod_vec_init(len);
+    _nmod_vec_rand(v2tmp, state, len, mod);
+    nn_ptr * v2 = flint_malloc(sizeof(nn_ptr) * len);
+    for (ulong i = 0; i < len; i++)
+        v2[i] = &v2tmp[i] + offset;
+
+    // store results in volatile variable to avoid that they
+    // are "optimized away" (especially for inlined part)
+    volatile ulong FLINT_SET_BUT_UNUSED(res);
+
+    double FLINT_SET_BUT_UNUSED(tcpu), twall;
+
+    TIMEIT_START
+    const dot_params_t params = _nmod_vec_dot_params(len, mod);
+    res = _nmod_vec_dot_ptr(v1, v2, offset, len, mod, params);
+    TIMEIT_STOP_VALUES(tcpu, twall)
+
+    printf("%.2e", twall);
+
+    _nmod_vec_clear(v1);
+    _nmod_vec_clear(v2tmp);
+    flint_free(v2);
 }
 
 /*-------------------------*/
 /* indirect: poly          */
 /*-------------------------*/
-
-// void _nmod_poly_inv_series_basecase_preinv1(nn_ptr Qinv, nn_srcptr Q, slong Qlen, slong n, ulong q, nmod_t mod)
-// void _nmod_poly_exp_series(nn_ptr f, nn_srcptr h, slong hlen, slong n, nmod_t mod)
 
 void time_dot_poly_mul(ulong len, ulong n, flint_rand_t state)
 {
@@ -150,7 +250,7 @@ void time_dot_poly_mul(ulong len, ulong n, flint_rand_t state)
 
 void time_dot_poly_inv_series(ulong len, ulong n, flint_rand_t state)
 {
-    if (len > 10000 || n == (UWORD(1) << 63))
+    if (len > 10000 || n % 2 == 0)
     {
         printf("        ");
         return;
@@ -175,10 +275,9 @@ void time_dot_poly_inv_series(ulong len, ulong n, flint_rand_t state)
     _nmod_vec_clear(res);
 }
 
-
 void time_dot_poly_exp_series(ulong len, ulong n, flint_rand_t state)
 {
-    if (len > 10000 || n == (UWORD(1) << 63))
+    if (len > 10000 || n % 2 == 0)
     {
         printf("        ");
         return;
@@ -186,7 +285,7 @@ void time_dot_poly_exp_series(ulong len, ulong n, flint_rand_t state)
 
     gr_ctx_t ctx;
     gr_ctx_init_nmod(ctx, n);
-    int status;
+    int FLINT_SET_BUT_UNUSED(status);
 
     gr_poly_t p;
     gr_poly_init(p, ctx);
@@ -199,9 +298,6 @@ void time_dot_poly_exp_series(ulong len, ulong n, flint_rand_t state)
 
     TIMEIT_START
     status |= gr_poly_exp_series_basecase(res, p, len, ctx);
-
-// int gr_poly_exp_series_basecase(gr_poly_t f, const gr_poly_t h, slong n, gr_ctx_t ctx)
-
     TIMEIT_STOP_VALUES(tcpu, twall)
 
     printf("%.2e", twall);
@@ -209,8 +305,6 @@ void time_dot_poly_exp_series(ulong len, ulong n, flint_rand_t state)
     gr_poly_clear(p, ctx);
     gr_poly_clear(res, ctx);
 }
-
-
 
 /*-------------------------*/
 /* indirect: mat           */
@@ -271,7 +365,7 @@ void time_dot_mat_mul_vec(ulong len, ulong n, flint_rand_t state)
 
 void time_dot_mat_solve_tril(ulong len, ulong n, flint_rand_t state)
 {
-    if (len > 4000 || n == (UWORD(1) << 63))
+    if (len > 4000 || n % 2 == 0)
     {
         printf("        ");
         return;
@@ -296,7 +390,7 @@ void time_dot_mat_solve_tril(ulong len, ulong n, flint_rand_t state)
 
 void time_dot_mat_solve_tril_vec(ulong len, ulong n, flint_rand_t state)
 {
-    if (len > 10000 || n == (UWORD(1) << 63))
+    if (len > 10000 || n % 2 == 0)
     {
         printf("        ");
         return;
@@ -321,7 +415,7 @@ void time_dot_mat_solve_tril_vec(ulong len, ulong n, flint_rand_t state)
 
 void time_dot_mat_solve_triu(ulong len, ulong n, flint_rand_t state)
 {
-    if (len > 4000 || n == (UWORD(1) << 63))
+    if (len > 4000 || n % 2 == 0)
     {
         printf("        ");
         return;
@@ -346,7 +440,7 @@ void time_dot_mat_solve_triu(ulong len, ulong n, flint_rand_t state)
 
 void time_dot_mat_solve_triu_vec(ulong len, ulong n, flint_rand_t state)
 {
-    if (len > 10000 || n == (UWORD(1)<<63))
+    if (len > 10000 || n % 2 == 0)
     {
         printf("        ");
         return;
@@ -381,46 +475,67 @@ int main(int argc, char ** argv)
     flint_rand_set_seed(state, time(NULL), time(NULL)+129384125L);
 
     // modulus bitsize
-    const slong nbits = 12;
-    const ulong bits[] = {0, 12, 28, 30, 31, 32, 40, 50, 60, 61, 62, 63, 64};
+    const slong nbits = 14;
+    const ulong bits[] = {12, 28, 30, 31, 32, 40, 50, 60, 61, 62, 63, 64, 232, 263};
 
     // vector lengths
-    const slong nlens = 14;
-    const ulong lens[] = {1, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 100000, 1000000};
+    const slong nlens = 20;
+    const ulong lens[] = {1, 2, 3, 4, 5, 7, 10, 15, 25, 35, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 100000, 1000000};
 
     // bench functions
-    const slong nfuns = 12;
+    const slong nfuns = 15;
     typedef void (*timefun) (ulong, ulong, flint_rand_t);
     const timefun funs[] = {
         time_dot,                    // 0
-        time_dot_rev,                // 1
-        time_dot_expr,               // 2
-        time_dot_poly_mul,           // 3
-        time_dot_poly_inv_series,    // 4
-        time_dot_poly_exp_series,    // 5
-        time_dot_mat_mul,            // 6
-        time_dot_mat_solve_tril,     // 7
-        time_dot_mat_solve_triu,     // 8
-        time_dot_mat_mul_vec,        // 9
-        time_dot_mat_solve_tril_vec, // 10
-        time_dot_mat_solve_triu_vec, // 11
+        time_dot_incparams,          // 1
+        time_dot_rev,                // 2
+        time_dot_rev_incparams,      // 3
+        time_dot_ptr,                // 4
+        time_dot_ptr_incparams,      // 5
+        time_dot_poly_mul,           // 6
+        time_dot_poly_inv_series,    // 7
+        time_dot_poly_exp_series,    // 8
+        time_dot_mat_mul,            // 9
+        time_dot_mat_solve_tril,     // 10
+        time_dot_mat_solve_triu,     // 11
+        time_dot_mat_mul_vec,        // 12
+        time_dot_mat_solve_tril_vec, // 13
+        time_dot_mat_solve_triu_vec, // 14
     };
 
     const char * description[] = {
-        "#0  --> vec dot           ",
-        "#1  --> vec dot rev       ",
-        "#2  --> vec dot expr      ",
-        "#3  --> poly_mul          ",
-        "#4  --> poly_inv_series   ",
-        "#5  --> poly_exp_series   ",
-        "#6  --> mat_mul           ",
-        "#7  --> mat_solve_tril    ",
-        "#8  --> mat_solve_triu    ",
-        "#9  --> mat_mul_vec       ",
-        "#10 --> mat_solve_tril_vec",
-        "#11 --> mat_solve_triu_vec"
+        "#0  --> vec dot               ",
+        "#1  --> vec dot inc params    ",
+        "#2  --> vec dot rev           ",
+        "#3  --> vec dot rev inc params",
+        "#4  --> vec dot ptr           ",
+        "#5  --> vec dot ptr inc params",
+        "#6  --> poly_mul              ",
+        "#7  --> poly_inv_series       ",
+        "#8  --> poly_exp_series       ",
+        "#9  --> mat_mul               ",
+        "#10 --> mat_solve_tril        ",
+        "#11 --> mat_solve_triu        ",
+        "#12 --> mat_mul_vec           ",
+        "#13 --> mat_solve_tril_vec    ",
+        "#14 --> mat_solve_triu_vec    "
     };
 
+    if (argc == 1)  // show usage
+    {
+        printf("Usage: `%s [fun] [nbits] [len]`\n", argv[0]);
+        printf("   Each argument is optional; no argument shows this help.\n");
+        printf("   - fun: id number of the timed function (see below),\n");
+        printf("          exception: fun == -1 times all available functions successively\n");
+        printf("   - nbits: number of bits for the modulus, chosen as nextprime(2**(nbits-1))\n");
+        printf("          exception: nbits == 232 and 263 (moduli 2**32, 2**63)\n");
+        printf("   - len: length for the vector, row and column dimension for the matrices\n");
+        printf("\nAvailable functions:\n");
+        for (slong j = 0; j < nfuns; j++)
+            printf("   %s\n", description[j]);
+
+        return 0;
+    }
 
     printf("#warmup... ");
     for (slong i = 0; i < 10; i++)
@@ -430,7 +545,7 @@ int main(int argc, char ** argv)
     }
     printf("\n");
 
-    if (argc == 1)  // launching full suite
+    if (argc == 2 && atoi(argv[1]) == -1)  // launching full suite
     {
         for (slong ifun = 0; ifun < nfuns; ifun++)
         {
@@ -447,7 +562,13 @@ int main(int argc, char ** argv)
                 const slong b = bits[j];
 
                 printf("%-10ld", b);
-                const ulong n = (b==0) ? (UWORD(1) << 63) : n_nextprime(UWORD(1) << (b-1), 0);
+                ulong n;
+                if (b == 232)
+                    n = UWORD(1) << 32;
+                else if (b == 263)
+                    n = UWORD(1) << 63;
+                else
+                    n = n_nextprime(UWORD(1) << (b-1), 0);
                 for (slong i = 0; i < nlens; i++)
                 {
                     tfun(lens[i], n, state);
@@ -472,7 +593,13 @@ int main(int argc, char ** argv)
             const slong b = bits[j];
 
             printf("%-10ld", b);
-            const ulong n = (b==0) ? (UWORD(1) << 63) : n_nextprime(UWORD(1) << (b-1), 0);
+            ulong n;
+            if (b == 232)
+                n = UWORD(1) << 32;
+            else if (b == 263)
+                n = UWORD(1) << 63;
+            else
+                n = n_nextprime(UWORD(1) << (b-1), 0);
             for (slong i = 0; i < nlens; i++)
             {
                 tfun(lens[i], n, state);
@@ -493,7 +620,13 @@ int main(int argc, char ** argv)
         printf("\n");
 
         printf("%-10ld", b);
-        const ulong n = (b==0) ? (UWORD(1) << 63) : n_nextprime(UWORD(1) << (b-1), 0);
+        ulong n;
+        if (b == 232)
+            n = UWORD(1) << 32;
+        else if (b == 263)
+            n = UWORD(1) << 63;
+        else
+            n = n_nextprime(UWORD(1) << (b-1), 0);
         for (slong i = 0; i < nlens; i++)
         {
             tfun(lens[i], n, state);
@@ -514,7 +647,13 @@ int main(int argc, char ** argv)
         printf("\n");
 
         printf("%-10ld", b);
-        const ulong n = (b==0) ? (UWORD(1) << 63) : n_nextprime(UWORD(1) << (b-1), 0);
+        ulong n;
+        if (b == 232)
+            n = UWORD(1) << 32;
+        else if (b == 263)
+            n = UWORD(1) << 63;
+        else
+            n = n_nextprime(UWORD(1) << (b-1), 0);
 
         tfun(len, n, state);
         printf("\n");

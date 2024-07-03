@@ -537,7 +537,7 @@ stirling_2_nmod(const unsigned int * divtab, ulong n, ulong k, nmod_t mod)
     nn_ptr t, u;
     slong i, bin_len, pow_len;
     ulong s1, s2, bden, bd;
-    int bound_limbs;
+    dot_params_t params;
     TMP_INIT;
     TMP_START;
 
@@ -575,13 +575,13 @@ stirling_2_nmod(const unsigned int * divtab, ulong n, ulong k, nmod_t mod)
     for (i = 1; i < bin_len; i += 2)
         t[i] = nmod_neg(t[i], mod);
 
-    bound_limbs = _nmod_vec_dot_bound_limbs(bin_len, mod);
-    s1 = _nmod_vec_dot(t, u, bin_len, mod, bound_limbs);
+    params = _nmod_vec_dot_params(bin_len, mod);
+    s1 = _nmod_vec_dot(t, u, bin_len, mod, params);
 
     if (pow_len > bin_len)
     {
-        bound_limbs = _nmod_vec_dot_bound_limbs(pow_len - bin_len, mod);
-        s2 = _nmod_vec_dot_rev(u + bin_len, t + k - pow_len + 1, pow_len - bin_len, mod, bound_limbs);
+        params = _nmod_vec_dot_params(pow_len - bin_len, mod);
+        s2 = _nmod_vec_dot_rev(u + bin_len, t + k - pow_len + 1, pow_len - bin_len, mod, params);
         if (k % 2)
             s1 = nmod_sub(s1, s2, mod);
         else

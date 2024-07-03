@@ -26,7 +26,7 @@ with op = -1, computes D = C - A*B
 
 static inline void
 _nmod_mat_addmul_basic_op(nn_ptr * D, nn_ptr * const C, nn_ptr * const A,
-    nn_ptr * const B, slong m, slong k, slong n, int op, nmod_t mod, int nlimbs)
+    nn_ptr * const B, slong m, slong k, slong n, int op, nmod_t mod, dot_params_t params)
 {
     slong i, j;
     ulong c;
@@ -35,7 +35,7 @@ _nmod_mat_addmul_basic_op(nn_ptr * D, nn_ptr * const C, nn_ptr * const A,
     {
         for (j = 0; j < n; j++)
         {
-            c = _nmod_vec_dot_ptr(A[i], B, j, k, mod, nlimbs);
+            c = _nmod_vec_dot_ptr(A[i], B, j, k, mod, params);
 
             if (op == 1)
                 c = nmod_add(C[i][j], c, mod);
@@ -55,7 +55,7 @@ typedef struct
     slong k;
     slong m;
     slong n;
-    slong nlimbs;
+    dot_params_t params;
     const nn_ptr * A;
     const nn_ptr * C;
     nn_ptr * D;
@@ -76,7 +76,7 @@ _nmod_mat_addmul_transpose_worker(void * arg_ptr)
     slong k = arg.k;
     slong m = arg.m;
     slong n = arg.n;
-    slong nlimbs = arg.nlimbs;
+    dot_params_t params = arg.params;
     const nn_ptr * A = arg.A;
     const nn_ptr * C = arg.C;
     nn_ptr * D = arg.D;
@@ -114,7 +114,7 @@ _nmod_mat_addmul_transpose_worker(void * arg_ptr)
         {
             for (j = jstart ; j < jend; j++)
             {
-                c = _nmod_vec_dot(A[i], tmp + j*k, k, mod, nlimbs);
+                c = _nmod_vec_dot(A[i], tmp + j*k, k, mod, params);
 
                 if (op == 1)
                     c = nmod_add(C[i][j], c, mod);
@@ -130,7 +130,7 @@ _nmod_mat_addmul_transpose_worker(void * arg_ptr)
 static inline void
 _nmod_mat_addmul_transpose_threaded_pool_op(nn_ptr * D, const nn_ptr * C,
                             const nn_ptr * A, const nn_ptr * B, slong m,
-                          slong k, slong n, int op, nmod_t mod, int nlimbs,
+                          slong k, slong n, int op, nmod_t mod, dot_params_t params,
                                thread_pool_handle * threads, slong num_threads)
 {
     nn_ptr tmp;
@@ -164,7 +164,7 @@ _nmod_mat_addmul_transpose_threaded_pool_op(nn_ptr * D, const nn_ptr * C,
         args[i].k       = k;
         args[i].m       = m;
         args[i].n       = n;
-        args[i].nlimbs  = nlimbs;
+        args[i].params  = params;
         args[i].A       = A;
         args[i].C       = C;
         args[i].D       = D;
@@ -312,7 +312,7 @@ _nmod_mat_addmul_packed_worker(void * arg_ptr)
     }
 }
 
-/* Assumes nlimbs = 1 */
+/* Assumes nlimbs = 1  <->  params.method <= _DOT1 */
 static void
 _nmod_mat_addmul_packed_threaded_pool_op(nn_ptr * D,
       const nn_ptr * C, const nn_ptr * A, const nn_ptr * B,
@@ -420,7 +420,6 @@ _nmod_mat_mul_classical_threaded_pool_op(nmod_mat_t D, const nmod_mat_t C,
                                thread_pool_handle * threads, slong num_threads)
 {
     slong m, k, n;
-    int nlimbs;
     nmod_t mod;
 
     mod = A->mod;
@@ -428,20 +427,19 @@ _nmod_mat_mul_classical_threaded_pool_op(nmod_mat_t D, const nmod_mat_t C,
     k = A->c;
     n = B->c;
 
-    nlimbs = _nmod_vec_dot_bound_limbs(k, mod);
+    dot_params_t params = _nmod_vec_dot_params(k, mod);
 
-    if (nlimbs == 1 && m > 10 && k > 10 && n > 10)
+    if (params.method == _DOT0)
+        return;
+    if (params.method == _DOT1 && m > 10 && k > 10 && n > 10)
     {
         _nmod_mat_addmul_packed_threaded_pool_op(D->rows, (op == 0) ? NULL : C->rows,
             A->rows, B->rows, m, k, n, op, D->mod, threads, num_threads);
     }
     else
     {
-        if ((mod.n & (mod.n - 1)) == 0)
-            nlimbs = 1;
-
         _nmod_mat_addmul_transpose_threaded_pool_op(D->rows, (op == 0) ? NULL : C->rows,
-            A->rows, B->rows, m, k, n, op, D->mod, nlimbs, threads, num_threads);
+            A->rows, B->rows, m, k, n, op, D->mod, params, threads, num_threads);
     }
 }
 
@@ -466,10 +464,10 @@ _nmod_mat_mul_classical_threaded_op(nmod_mat_t D, const nmod_mat_t C,
         || A->c < NMOD_MAT_MUL_TRANSPOSE_CUTOFF
         || B->c < NMOD_MAT_MUL_TRANSPOSE_CUTOFF)
     {
-        slong nlimbs = _nmod_vec_dot_bound_limbs(A->c, D->mod);
+        dot_params_t params = _nmod_vec_dot_params(A->c, D->mod);
 
         _nmod_mat_addmul_basic_op(D->rows, (op == 0) ? NULL : C->rows,
-            A->rows, B->rows, A->r, A->c, B->c, op, D->mod, nlimbs);
+            A->rows, B->rows, A->r, A->c, B->c, op, D->mod, params);
 
         return;
     }

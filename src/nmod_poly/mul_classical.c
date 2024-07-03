@@ -20,7 +20,7 @@ void
 _nmod_poly_mul_classical(nn_ptr res, nn_srcptr poly1,
                          slong len1, nn_srcptr poly2, slong len2, nmod_t mod)
 {
-    slong i, j, bits, log_len, nlimbs, n1, n2;
+    slong i, j, n1, n2;
     int squaring;
     ulong c;
 
@@ -38,11 +38,9 @@ _nmod_poly_mul_classical(nn_ptr res, nn_srcptr poly1,
 
     squaring = (poly1 == poly2 && len1 == len2);
 
-    log_len = FLINT_BIT_COUNT(len2);
-    bits = FLINT_BITS - (slong) mod.norm;
-    bits = 2 * bits + log_len;
+    const dot_params_t params = _nmod_vec_dot_params(FLINT_MIN(len1, len2), mod);
 
-    if (bits <= FLINT_BITS)
+    if (params.method <= _DOT1)
     {
         flint_mpn_zero(res, len1 + len2 - 1);
 
@@ -82,11 +80,6 @@ _nmod_poly_mul_classical(nn_ptr res, nn_srcptr poly1,
         return;
     }
 
-    if (bits <= 2 * FLINT_BITS)
-        nlimbs = 2;
-    else
-        nlimbs = 3;
-
     if (squaring)
     {
         for (i = 0; i < 2 * len1 - 1; i++)
@@ -94,7 +87,7 @@ _nmod_poly_mul_classical(nn_ptr res, nn_srcptr poly1,
             n1 = FLINT_MAX(0, i - len1 + 1);
             n2 = FLINT_MIN(len1 - 1, (i + 1) / 2 - 1);
 
-            c = _nmod_vec_dot_rev(poly1 + n1, poly1 + i - n2, n2 - n1 + 1, mod, nlimbs);
+            c = _nmod_vec_dot_rev(poly1 + n1, poly1 + i - n2, n2 - n1 + 1, mod, params);
             c = nmod_add(c, c, mod);
 
             if (i % 2 == 0 && i / 2 < len1)
@@ -112,7 +105,7 @@ _nmod_poly_mul_classical(nn_ptr res, nn_srcptr poly1,
 
             res[i] = _nmod_vec_dot_rev(poly1 + i - n2,
                                        poly2 + i - n1,
-                                       n1 + n2 - i + 1, mod, nlimbs);
+                                       n1 + n2 - i + 1, mod, params);
         }
     }
 }

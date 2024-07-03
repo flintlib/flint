@@ -29,16 +29,14 @@ _nmod_poly_inv_series_basecase_preinv1(nn_ptr Qinv, nn_srcptr Q, slong Qlen, slo
     }
     else
     {
-        slong i, j, l;
-        int nlimbs;
+        slong i, l;
         ulong s;
-
-        nlimbs = _nmod_vec_dot_bound_limbs(FLINT_MIN(n, Qlen), mod);
+        const dot_params_t params = _nmod_vec_dot_params(FLINT_MIN(n, Qlen) - 1, mod);
 
         for (i = 1; i < n; i++)
         {
             l = FLINT_MIN(i, Qlen - 1);
-            NMOD_VEC_DOT(s, j, l, Q[j + 1], Qinv[i - 1 - j], mod, nlimbs);
+            s = _nmod_vec_dot_rev(Q+1, Qinv + i-l, l, mod, params);
 
             if (q == 1)
                 Qinv[i] = nmod_neg(s, mod);
