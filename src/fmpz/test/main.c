@@ -190,6 +190,8 @@
 #include "t-xgcd_canonical_bezout.c"
 #include "t-xgcd_partial.c"
 #include "t-xor.c"
+#include "t-sum_powers_horner.c"
+#include "t-sum_powers_div.c"
 #include "t-sum_powers.c"
 
 /* Array of test functions ***************************************************/
@@ -360,7 +362,9 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_xgcd),
     TEST_FUNCTION(fmpz_xgcd_canonical_bezout),
     TEST_FUNCTION(fmpz_xgcd_partial),
-    TEST_FUNCTION(fmpz_xor)
+    TEST_FUNCTION(fmpz_xor),
+    TEST_FUNCTION(fmpz_sum_powers_horner),
+    TEST_FUNCTION(fmpz_sum_powers_div),
     TEST_FUNCTION(fmpz_sum_powers)
 };
 

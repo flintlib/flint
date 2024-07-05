@@ -13,7 +13,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-void _fmpz_sum_powers_naive(fmpz_t f, const fmpz_t g, ulong exp)
+void _fmpz_sum_powers_naive_horner(fmpz_t f, const fmpz_t g, ulong exp)
 {
 	fmpz_t t;
 	fmpz_init(t);
@@ -29,7 +29,7 @@ void _fmpz_sum_powers_naive(fmpz_t f, const fmpz_t g, ulong exp)
 	fmpz_clear(t);
 }
 
-TEST_FUNCTION_START(fmpz_sum_powers, state)
+TEST_FUNCTION_START(fmpz_sum_powers_horner, state)
 {
 	int i, result;
 
@@ -50,24 +50,24 @@ TEST_FUNCTION_START(fmpz_sum_powers, state)
 		aliasing = n_randint(state, 2);
 
 		/* The reference result */
-		_fmpz_sum_powers_naive(c, a, exp);
+		_fmpz_sum_powers_naive_horner(c, a, exp);
 
-		/* general function */
+		/* Horner-style evaluation */
 		if (aliasing == 1)
 		{
-			fmpz_sum_powers(a, a, exp);
+			fmpz_sum_powers_horner(a, a, exp);
 			fmpz_set(b, a);
 		}
 		else
 		{
-			fmpz_sum_powers(b, a, exp);
+			fmpz_sum_powers_horner(b, a, exp);
 		}
 
 		result = (fmpz_cmp(c, b) == 0);
 
 		if (!result)
 		{
-			flint_printf("FAIL in general method:\n");
+			flint_printf("FAIL in horner evaluation:\n");
 
 			flint_printf("Expected: ");
 			fmpz_print(c);
