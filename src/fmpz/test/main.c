@@ -193,6 +193,7 @@
 #include "t-sum_powers_horner.c"
 #include "t-sum_powers_div.c"
 #include "t-sum_powers.c"
+#include "t-sum_divisors.c"
 
 /* Array of test functions ***************************************************/
 
@@ -365,7 +366,8 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_xor),
     TEST_FUNCTION(fmpz_sum_powers_horner),
     TEST_FUNCTION(fmpz_sum_powers_div),
-    TEST_FUNCTION(fmpz_sum_powers)
+    TEST_FUNCTION(fmpz_sum_powers),
+    TEST_FUNCTION(fmpz_sum_divisors)
 };
 
 /* main function *************************************************************/
