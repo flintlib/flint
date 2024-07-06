@@ -64,12 +64,12 @@ fmpz_sum_divisors(fmpz_t f, const fmpz_t g)
 void
 fmpz_sum_divisors_proper(fmpz_t f, const fmpz_t g)
 {
-	fmpz_t temp;
-	fmpz_init(temp);
+    fmpz_t temp;
+    fmpz_init(temp);
 
-	fmpz_sum_divisors(temp, g);
+    fmpz_sum_divisors(temp, g);
 
-	fmpz_sub(f, temp, g);
+    fmpz_sub(f, temp, g);
 
-	fmpz_clear(temp);
+    fmpz_clear(temp);
 }

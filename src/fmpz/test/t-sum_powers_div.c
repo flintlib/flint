@@ -15,76 +15,76 @@
 
 void _fmpz_sum_powers_naive_div(fmpz_t f, const fmpz_t g, ulong exp)
 {
-	fmpz_t t;
-	fmpz_init(t);
+    fmpz_t t;
+    fmpz_init(t);
 
-	fmpz_zero(f);
+    fmpz_zero(f);
 
-	for (ulong i = 0; i <= exp; i++)
-	{
-		fmpz_pow_ui(t, g, i);
-		fmpz_add(f, f, t);
-	}
+    for (ulong i = 0; i <= exp; i++)
+    {
+        fmpz_pow_ui(t, g, i);
+        fmpz_add(f, f, t);
+    }
 
-	fmpz_clear(t);
+    fmpz_clear(t);
 }
 
 TEST_FUNCTION_START(fmpz_sum_powers_div, state)
 {
-	int i, result;
+    int i, result;
 
-	for (i = 0; i < 1000 * flint_test_multiplier(); i++)
-	{
-		fmpz_t a, b, c;
-		ulong exp;
-		int aliasing;
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    {
+        fmpz_t a, b, c;
+        ulong exp;
+        int aliasing;
 
-		fmpz_init(a);
-		fmpz_init(b);
-		fmpz_init(c);
+        fmpz_init(a);
+        fmpz_init(b);
+        fmpz_init(c);
 
-		fmpz_randtest(a, state, 100);
+        fmpz_randtest(a, state, 100);
 
-		exp = n_randint(state, 250);
+        exp = n_randint(state, 250);
 
-		aliasing = n_randint(state, 2);
+        aliasing = n_randint(state, 2);
 
-		/* The reference result */
-		_fmpz_sum_powers_naive_div(c, a, exp);
+        /* The reference result */
+        _fmpz_sum_powers_naive_div(c, a, exp);
 
-		/* polynomial division method */
-		if (aliasing == 1)
-		{
-			fmpz_sum_powers_div(a, a, exp);
-			fmpz_set(b, a);
-		}
-		else
-		{
-			fmpz_sum_powers_div(b, a, exp);
-		}
+        /* polynomial division method */
+        if (aliasing == 1)
+        {
+            fmpz_sum_powers_div(a, a, exp);
+            fmpz_set(b, a);
+        }
+        else
+        {
+            fmpz_sum_powers_div(b, a, exp);
+        }
 
-		result = (fmpz_cmp(c, b) == 0);
+        result = (fmpz_cmp(c, b) == 0);
 
-		if (!result)
-		{
-			flint_printf("FAIL in polynomial division method:\n");
+        if (!result)
+        {
+            flint_printf("FAIL:\n");
 
-			flint_printf("Expected: ");
-			fmpz_print(c);
-			flint_printf("\n");
+            flint_printf("Expected: ");
+            fmpz_print(c);
+            flint_printf("\n");
 
-			flint_printf("Actual: ");
-			fmpz_print(b);
-			flint_printf("\n");
+            flint_printf("Actual: ");
+            fmpz_print(b);
+            flint_printf("\n");
 
-			fflush(stdout);
-			flint_abort();
-		}
+            fflush(stdout);
+            flint_abort();
+        }
 
-		fmpz_clear(a);
-		fmpz_clear(b);
-		fmpz_clear(c);
-	}
+        fmpz_clear(a);
+        fmpz_clear(b);
+        fmpz_clear(c);
+    }
 
-	TEST_FUNCTION_END(state);
+    TEST_FUNCTION_END(state);
 }
