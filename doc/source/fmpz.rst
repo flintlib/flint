@@ -960,10 +960,8 @@ Basic arithmetic
     Assumes that `m \neq 0`, raises an ``abort`` signal otherwise.
 
 .. function:: void fmpz_sum_powers_horner(fmpz_t f, const fmpz_t g, ulong e)
-
-.. function:: void fmpz_sum_powers_div(fmpz_t f, const fmpz_t g, ulong e)
-
-.. function:: void fmpz_sum_powers(fmpz_t f, const fmpz_t g, ulong e)
+              void fmpz_sum_powers_div(fmpz_t f, const fmpz_t g, ulong e)
+	      void fmpz_sum_powers(fmpz_t f, const fmpz_t g, ulong e)
 
    Sets `f` to the sum of powers of `g`, starting at `g^0 = 1` up to and
    including `p^e`.

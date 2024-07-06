@@ -67,18 +67,10 @@ TEST_FUNCTION_START(fmpz_sum_powers, state)
 
         if (!result)
         {
-            flint_printf("FAIL:\n");
-
-            flint_printf("Expected: ");
-            fmpz_print(c);
-            flint_printf("\n");
-
-            flint_printf("Actual: ");
-            fmpz_print(b);
-            flint_printf("\n");
-
-            fflush(stdout);
-            flint_abort();
+            TEST_FUNCTION_FAIL(
+                "Expected: %{fmpz}\n"
+                "Got: %{fmpz}\n",
+                c, b);
         }
 
         fmpz_clear(a);

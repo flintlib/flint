@@ -18,7 +18,7 @@ fmpz_sum_divisors(fmpz_t f, const fmpz_t g)
     fmpz_factor_t factors;
     fmpz * temp;
     ulong exp;
-    ulong i;
+    slong i;
 
     fmpz * p;
 
