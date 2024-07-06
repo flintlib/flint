@@ -176,6 +176,10 @@
 #include "t-submul.c"
 #include "t-submul_si.c"
 #include "t-submul_ui.c"
+#include "t-sum_powers_horner.c"
+#include "t-sum_powers_div.c"
+#include "t-sum_powers.c"
+#include "t-sum_divisors.c"
 #include "t-swap.c"
 #include "t-tdiv_q_2exp.c"
 #include "t-tdiv_q.c"
@@ -190,10 +194,6 @@
 #include "t-xgcd_canonical_bezout.c"
 #include "t-xgcd_partial.c"
 #include "t-xor.c"
-#include "t-sum_powers_horner.c"
-#include "t-sum_powers_div.c"
-#include "t-sum_powers.c"
-#include "t-sum_divisors.c"
 
 /* Array of test functions ***************************************************/
 
@@ -350,6 +350,10 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_submul),
     TEST_FUNCTION(fmpz_submul_si),
     TEST_FUNCTION(fmpz_submul_ui),
+    TEST_FUNCTION(fmpz_sum_powers_horner),
+    TEST_FUNCTION(fmpz_sum_powers_div),
+    TEST_FUNCTION(fmpz_sum_powers),
+    TEST_FUNCTION(fmpz_sum_divisors),
     TEST_FUNCTION(fmpz_swap),
     TEST_FUNCTION(fmpz_tdiv_q_2exp),
     TEST_FUNCTION(fmpz_tdiv_q),
@@ -363,11 +367,7 @@ test_struct tests[] =
     TEST_FUNCTION(fmpz_xgcd),
     TEST_FUNCTION(fmpz_xgcd_canonical_bezout),
     TEST_FUNCTION(fmpz_xgcd_partial),
-    TEST_FUNCTION(fmpz_xor),
-    TEST_FUNCTION(fmpz_sum_powers_horner),
-    TEST_FUNCTION(fmpz_sum_powers_div),
-    TEST_FUNCTION(fmpz_sum_powers),
-    TEST_FUNCTION(fmpz_sum_divisors)
+    TEST_FUNCTION(fmpz_xor)
 };
 
 /* main function *************************************************************/

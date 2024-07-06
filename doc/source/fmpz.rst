@@ -965,10 +965,11 @@ Basic arithmetic
 
 .. function:: void fmpz_sum_powers(fmpz_t f, const fmpz_t g, ulong e)
 
-   Sets `f` to the sum of powers of g, starting at `g^0 = 1` up to and
+   Sets `f` to the sum of powers of `g`, starting at `g^0 = 1` up to and
    including `p^e`.
 
-   The `horner` method uses a horner-style method to evaluate the sum.
+   The `horner` method uses a horner-style method to evaluate the sum
+   iteratively.
 
    The `div` method uses polynomial division to evaluate the sum with a
    single exponentiation and a single division.
