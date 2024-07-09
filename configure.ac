@@ -306,7 +306,7 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         param_path="x86_64/zen3"
         ;;
       zen4)
-        gcc_cflags_arch="-march=znver4"
+        gcc_cflags_arch="-march=znver4 -march=znver3"
         param_path="x86_64/zen3"
         have_avx512="yes"
         ;;
@@ -1225,11 +1225,22 @@ then
     for opt in $gcc_cflags_optlist;
     do
         eval tmp=\"\$gcc_cflags_${opt}\" # " Just to fix highlighting
+        # found_single is for checking if we have found a flag that should be
+        # alone in its type. Example: On Skylake, -march=skylake should not be
+        # accompanied by -march=broadwell; instead, if we find that
+        # -march=skylake is accepted, we do not want to check -march=broadwell.
+        found_single="no"
         for flag in $tmp;
         do
-            if test opt = "arch";
+            if test "$found_single" = "yes";
             then
-                AX_CHECK_COMPILE_FLAG([$flag],[save_CFLAGS="$flag $save_CFLAGS"],
+                found_single="no"
+                break
+            elif test "$opt" = "arch";
+            then
+                AX_CHECK_COMPILE_FLAG([$flag],
+                                      [save_CFLAGS="$flag $save_CFLAGS"
+                                       found_single="yes"],
                                       [unset flint_cv_have_fft_small_x86_i
                                        unset flint_cv_have_fft_small_arm_i])
             else
