@@ -18,6 +18,8 @@
 extern "C" {
 #endif
 
+typedef struct { ulong m0, m1; } nn_pair_t;
+
 #define FLINT_MAX_FACTORS_IN_LIMB 15
 
 typedef struct

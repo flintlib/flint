@@ -11,6 +11,7 @@
 
 #include "ulong_extras.h"
 
+#if N_GCDEXT_METHOD == 0
 ulong
 n_xgcd(ulong * a, ulong * b, ulong x, ulong y)
 {
@@ -145,3 +146,46 @@ n_xgcd(ulong * a, ulong * b, ulong x, ulong y)
 
     return u3;
 }
+#elif N_GCDEXT_METHOD == 1
+ulong
+n_xgcd(ulong * a, ulong * b, ulong x, ulong y)
+{
+    slong u1, u2, v1, v2, t1, t2;
+    ulong u3, v3, quot, rem;
+
+    FLINT_ASSERT(x >= y);
+
+    u1 = v2 = 1;
+    u2 = v1 = 0;
+    u3 = x;
+    v3 = y;
+
+    while (v3)
+    {
+        quot = u3 / v3;
+        rem = u3 - v3 * quot;
+        t1 = u2;
+        u2 = u1 - quot * u2;
+        u1 = t1;
+        u3 = v3;
+        t2 = v2;
+        v2 = v1 - quot * v2;
+        v1 = t2;
+        v3 = rem;
+    }
+
+    /* Remarkably, |u1| < x/2, thus comparison with 0 is valid */
+    if (u1 <= WORD(0))
+    {
+        u1 += y;
+        v1 -= x;
+    }
+
+    *a = u1;
+    *b = -v1;
+
+    return u3;
+}
+#else
+# error
+#endif

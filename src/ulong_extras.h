@@ -110,7 +110,16 @@ ulong n_gcd(ulong x, ulong y)
 }
 
 ulong n_xgcd(ulong * a, ulong * b, ulong x, ulong y);
-ulong n_gcdinv(ulong * a, ulong x, ulong y);
+
+nn_pair_t _n_gcdinv(ulong x, ulong y);
+
+ULONG_EXTRAS_INLINE ulong n_gcdinv(ulong * a, ulong x, ulong y)
+{
+    nn_pair_t ret = _n_gcdinv(x, y);
+    *a = ret.m0;
+    return ret.m1;
+}
+
 ulong n_CRT(ulong r1, ulong m1, ulong r2, ulong m2);
 
 /* Checked arithmetic ********************************************************/

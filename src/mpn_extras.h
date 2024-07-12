@@ -22,6 +22,7 @@
 #endif
 
 #include <gmp.h>
+#include "flint-mparam.h"
 #include "longlong.h"
 
 #ifdef __cplusplus
@@ -608,13 +609,7 @@ FLINT_DLL extern const flint_mpn_sqrhigh_normalised_func_t flint_mpn_sqrhigh_nor
 
 #endif
 
-/* FIXME: this tuning is for x86_64_adx with fft_small */
-/* NOTE: we assume that the same cutoff is optimal for both mulhigh and mullow */
-#define FLINT_MPN_MULHIGH_MULDERS_CUTOFF 50
-#define FLINT_MPN_MULHIGH_MUL_CUTOFF 2000
-#define FLINT_MPN_MULHIGH_K_TAB_SIZE 2048
-
-FLINT_DLL extern const signed short flint_mpn_mulhigh_k_tab[FLINT_MPN_MULHIGH_K_TAB_SIZE];
+FLINT_DLL extern const short flint_mpn_mulhigh_k_tab[];
 
 mp_limb_t flint_mpn_mullow_basecase(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_size_t n);
 void _flint_mpn_mullow_n_mulders_recursive(mp_ptr rp, mp_srcptr np, mp_srcptr mp, mp_size_t n);
@@ -680,10 +675,6 @@ void flint_mpn_mul_or_mulhigh_n(mp_ptr rp, mp_srcptr xp, mp_srcptr yp, mp_size_t
     else
         flint_mpn_mul_n(rp, xp, yp, n);
 }
-
-#define FLINT_MPN_SQRHIGH_MULDERS_CUTOFF 90
-#define FLINT_MPN_SQRHIGH_SQR_CUTOFF 2000
-#define FLINT_MPN_SQRHIGH_K_TAB_SIZE 2048
 
 #if FLINT_HAVE_ASSEMBLY_x86_64_adx
 mp_limb_t _flint_mpn_sqrhigh_basecase_even(mp_ptr, mp_srcptr, mp_size_t);
