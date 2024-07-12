@@ -9,20 +9,19 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "gr.h"
 #include "gr_mat.h"
 #include "gr_vec.h"
 
 /* preinvert when appropriate */
 
-#define GR_MAT_DIV_SCALAR(SCALAR_TYPE, res, mat, x, ctx) \
+#define GR_MAT_DIVEXACT_SCALAR(SCALAR_TYPE, res, mat, x, ctx) \
     slong i, r, c;                                       \
     int status = GR_SUCCESS;                             \
     r = gr_mat_nrows(res, ctx);                          \
     c = gr_mat_ncols(res, ctx);                          \
     if (c != 0)                                          \
         for (i = 0; i < r; i++)                          \
-            status |= _gr_vec_div_##SCALAR_TYPE(         \
+            status |= _gr_vec_divexact_##SCALAR_TYPE(    \
                 res->rows[i],                            \
                 mat->rows[i],                            \
                 c, x, ctx                                \
@@ -30,17 +29,17 @@
     return status;                                       \
 
 
-int gr_mat_div_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t ctx)
-{ GR_MAT_DIV_SCALAR(scalar, res, mat, x, ctx); }
+int gr_mat_divexact_scalar(gr_mat_t res, const gr_mat_t mat, gr_srcptr x, gr_ctx_t ctx)
+{ GR_MAT_DIVEXACT_SCALAR(scalar, res, mat, x, ctx); }
 
-int gr_mat_div_scalar_si(gr_mat_t res, const gr_mat_t mat, slong x, gr_ctx_t ctx)
-{ GR_MAT_DIV_SCALAR(scalar_si, res, mat, x, ctx); }
+int gr_mat_divexact_scalar_si(gr_mat_t res, const gr_mat_t mat, slong x, gr_ctx_t ctx)
+{ GR_MAT_DIVEXACT_SCALAR(scalar_si, res, mat, x, ctx); }
 
-int gr_mat_div_scalar_ui(gr_mat_t res, const gr_mat_t mat, ulong x, gr_ctx_t ctx)
-{ GR_MAT_DIV_SCALAR(scalar_ui, res, mat, x, ctx); }
+int gr_mat_divexact_scalar_ui(gr_mat_t res, const gr_mat_t mat, ulong x, gr_ctx_t ctx)
+{ GR_MAT_DIVEXACT_SCALAR(scalar_ui, res, mat, x, ctx); }
 
-int gr_mat_div_scalar_fmpz(gr_mat_t res, const gr_mat_t mat, fmpz_t x, gr_ctx_t ctx)
-{ GR_MAT_DIV_SCALAR(scalar_fmpz, res, mat, x, ctx); }
+int gr_mat_divexact_scalar_fmpz(gr_mat_t res, const gr_mat_t mat, fmpz_t x, gr_ctx_t ctx)
+{ GR_MAT_DIVEXACT_SCALAR(scalar_fmpz, res, mat, x, ctx); }
 
-int gr_mat_div_scalar_fmpq(gr_mat_t res, const gr_mat_t mat, fmpq_t x, gr_ctx_t ctx)
-{ GR_MAT_DIV_SCALAR(scalar_fmpq, res, mat, x, ctx); }
+int gr_mat_divexact_scalar_fmpq(gr_mat_t res, const gr_mat_t mat, fmpq_t x, gr_ctx_t ctx)
+{ GR_MAT_DIVEXACT_SCALAR(scalar_fmpq, res, mat, x, ctx); }
