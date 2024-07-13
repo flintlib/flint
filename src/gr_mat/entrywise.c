@@ -119,3 +119,30 @@ gr_mat_entrywise_unary_predicate_any(gr_method_unary_predicate f, const gr_mat_t
 
     return ans;
 }
+
+truth_t
+gr_mat_entrywise_binary_predicate_all(gr_method_binary_predicate f, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
+{
+    slong R, C, i, j;
+    slong sz = ctx->sizeof_elem;
+    truth_t val, ans = T_TRUE;
+
+    R = gr_mat_nrows(mat1, ctx);
+    C = gr_mat_ncols(mat1, ctx);
+
+    if (R != gr_mat_nrows(mat2, ctx) || C != gr_mat_ncols(mat2, ctx))
+        return T_FALSE;
+
+    for (i = 0; i < R; i++)
+    {
+        for (j = 0; j < C; j++)
+        {
+            val = f(GR_MAT_ENTRY(mat1, i, j, sz), GR_MAT_ENTRY(mat2, i, j, sz), ctx);
+            if (val == T_FALSE)
+                return T_FALSE;
+            ans = truth_and(ans, val);
+        }
+    }
+
+    return ans;
+}

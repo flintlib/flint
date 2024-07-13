@@ -98,7 +98,7 @@ nfloat_randtest(nfloat_ptr res, flint_rand_t state, gr_ctx_t ctx)
     int status;
 
     arf_init(t);
-    arf_randtest(t, state, NFLOAT_CTX_PREC(ctx), 10);
+    arf_randtest(t, state, NFLOAT_CTX_PREC(ctx), n_randint(state, 2) ? 2 : 10);
     status = nfloat_set_arf(res, t, ctx);
     arf_clear(t);
     return status;
