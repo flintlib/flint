@@ -214,6 +214,33 @@ Basic row, column and entry operations
     This predicate is always decidable (even if the underlying ring
     is not computable), returning ``T_TRUE`` or ``T_FALSE``.
 
+Entrywise operations
+-------------------------------------------------------------------------------
+
+.. function:: int gr_mat_entrywise_unary_op(gr_mat_t res, gr_method_unary_op f, const gr_mat_t mat, gr_ctx_t ctx)
+
+    Sets *res* to the application of the function *f* to the
+    entries of matrix *mat*. Returns ``GR_DOMAIN`` if the matrix dimensions do not match.
+
+.. function:: int gr_mat_entrywise_binary_op(gr_mat_t res, gr_method_binary_op f, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
+
+    Sets *res* to the application of the function *f*
+    to the entries of *mat1* as first argument and the entries of *mat2*
+    as second argument.
+    Returns ``GR_DOMAIN`` if the matrix dimensions do not match.
+
+.. function:: int gr_mat_entrywise_binary_op_scalar(gr_mat_t res, gr_method_binary_op f, const gr_mat_t mat, gr_srcptr c, gr_ctx_t ctx)
+
+    Sets *res* to the application of the function *f*
+    to the entries of *mat* as first argument and the scalar *c*
+    as second argument.
+    Returns ``GR_DOMAIN`` if the matrix dimensions do not match.
+
+.. function:: truth_t gr_mat_entrywise_unary_predicate_all(gr_method_unary_predicate f, const gr_mat_t mat, gr_ctx_t ctx)
+              truth_t gr_mat_entrywise_unary_predicate_any(gr_method_unary_predicate f, const gr_mat_t mat, gr_ctx_t ctx)
+
+    Returns whether the predicate *f* is true for all entries,
+    respectively for any entry, in the matrix *mat*.
 
 Arithmetic
 -------------------------------------------------------------------------------
