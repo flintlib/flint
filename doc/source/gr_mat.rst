@@ -855,6 +855,13 @@ on each test iteration, otherwise the given ring is tested.
     Tests the given function ``solve_impl`` for correctness as an implementation
     of :func:`gr_mat_nonsingular_solve_tril` / :func:`gr_mat_nonsingular_solve_triu`.
 
+.. function:: void gr_mat_test_approx_mul_max_norm(gr_method_mat_binary_op mul_impl, gr_srcptr rel_tol, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+
+    Tests the given implementation of matrix multiplication for accuracy
+    over an approximate numerical ring by checking that
+    `|C-AB| \le |A||B| rel\_tol` holds in the max norm,
+    using classical multiplication for reference.
+
 .. function:: void gr_mat_test_approx_mul_pos_entrywise_accurate(gr_method_mat_binary_op mul_impl, gr_srcptr rel_tol, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
 
     Tests the given implementation of matrix multiplication for accuracy
