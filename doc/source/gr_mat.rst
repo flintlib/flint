@@ -248,6 +248,24 @@ Entrywise operations
     in *mat1* paired with the corresponding entries in *mat2*.
     Returns ``T_FALSE`` if the matrix dimensions are not compatible.
 
+Norms
+-------------------------------------------------------------------------------
+
+.. function:: int gr_mat_norm_max(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+
+    Max norm: `\max_{i,j} |a_{i,j}|`.
+
+.. function:: int gr_mat_norm_1(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+
+    1-norm (largest absolute column sum): `\max_{1\le j \le n} \sum_{i=1}^m |a_{i,j}|`.
+
+.. function:: int gr_mat_norm_inf(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+
+    Infinity-norm (largest absolute row sum): `\max_{1\le i \le m} \sum_{j=1}^n |a_{i,j}|`.
+
+.. function:: int gr_mat_norm_frobenius(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+
+    Frobenius norm: `\sqrt{\sum_{i,j} |a_{i,j}|^2}`.
 
 Arithmetic
 -------------------------------------------------------------------------------

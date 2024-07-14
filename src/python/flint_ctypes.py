@@ -5509,6 +5509,60 @@ class gr_mat(gr_elem):
             if status & GR_DOMAIN: raise ValueError
         return x
 
+    def norm_max(self):
+        """
+            >>> Mat(RR)([[1,2,3],[4,5,6],[7,8,9]]).norm_max()
+            9.000000000000000
+        """
+        element_ring = self.parent()._element_ring
+        res = element_ring()
+        status = libgr.gr_mat_norm_max(res._ref, self._ref, element_ring._ref)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return res
+
+
+    def norm_1(self):
+        """
+            >>> Mat(RR)([[1,2,3],[4,5,6],[7,8,9]]).norm_1()
+            18.00000000000000
+        """
+        element_ring = self.parent()._element_ring
+        res = element_ring()
+        status = libgr.gr_mat_norm_1(res._ref, self._ref, element_ring._ref)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return res
+
+    def norm_inf(self):
+        """
+            >>> Mat(RR)([[1,2,3],[4,5,6],[7,8,9]]).norm_inf()
+            24.00000000000000
+        """
+        element_ring = self.parent()._element_ring
+        res = element_ring()
+        status = libgr.gr_mat_norm_inf(res._ref, self._ref, element_ring._ref)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return res
+
+    def norm_frobenius(self):
+        """
+            >>> Mat(RR)([[1,2,3],[4,5,6],[7,8,9]]).norm_frobenius()
+            [16.88194301613413 +/- 3.73e-15]
+        """
+        element_ring = self.parent()._element_ring
+        res = element_ring()
+        status = libgr.gr_mat_norm_frobenius(res._ref, self._ref, element_ring._ref)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return res
+
+
     def nullspace(self):
         """
         Right kernel (nullspace) of this matrix.
