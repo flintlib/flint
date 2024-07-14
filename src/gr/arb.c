@@ -33,6 +33,55 @@ gr_arb_ctx;
 
 #define ARB_CTX_PREC(ring_ctx) (((gr_arb_ctx *)((ring_ctx)))->prec)
 
+#define DEF_FUNC(fname) \
+int \
+_gr_arb_ ## fname(arb_t res, const arb_t x, const gr_ctx_t ctx) \
+{ \
+    arb_ ## fname(res, x, ARB_CTX_PREC(ctx)); \
+    return GR_SUCCESS; \
+} \
+
+#define DEF_FUNC_NOPREC(fname) \
+int \
+_gr_arb_ ## fname(arb_t res, const arb_t x, const gr_ctx_t ctx) \
+{ \
+    arb_ ## fname(res, x); \
+    return GR_SUCCESS; \
+} \
+
+
+#define DEF_2FUNC(fname) \
+int \
+_gr_arb_ ## fname(arb_t res1, arb_t res2, const arb_t x, const gr_ctx_t ctx) \
+{ \
+    arb_ ## fname(res1, res2, x, ARB_CTX_PREC(ctx)); \
+    return GR_SUCCESS; \
+} \
+
+#define DEF_FUNC2(fname) \
+int \
+_gr_arb_ ## fname(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx) \
+{ \
+    arb_ ## fname(res, x, y, ARB_CTX_PREC(ctx)); \
+    return GR_SUCCESS; \
+} \
+
+#define DEF_FUNC_SING(fname) \
+int \
+_gr_arb_ ## fname(arb_t res, const arb_t x, const gr_ctx_t ctx) \
+{ \
+    arb_ ## fname(res, x, ARB_CTX_PREC(ctx)); \
+    return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; \
+} \
+
+#define DEF_FUNC2_SING(fname) \
+int \
+_gr_arb_ ## fname(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx) \
+{ \
+    arb_ ## fname(res, x, y, ARB_CTX_PREC(ctx)); \
+    return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; \
+} \
+
 int _gr_arb_ctx_set_real_prec(gr_ctx_t ctx, slong prec)
 {
     prec = FLINT_MAX(prec, 2);
@@ -407,26 +456,13 @@ _gr_arb_equal(const arb_t x, const arb_t y, const gr_ctx_t ctx)
     return T_FALSE;
 }
 
-int
-_gr_arb_set(arb_t res, const arb_t x, const gr_ctx_t ctx)
-{
-    arb_set(res, x);
-    return GR_SUCCESS;
-}
-
-int
-_gr_arb_neg(arb_t res, const arb_t x, const gr_ctx_t ctx)
-{
-    arb_neg(res, x);
-    return GR_SUCCESS;
-}
-
-int
-_gr_arb_add(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx)
-{
-    arb_add(res, x, y, ARB_CTX_PREC(ctx));
-    return GR_SUCCESS;
-}
+DEF_FUNC_NOPREC(set)
+DEF_FUNC_NOPREC(neg)
+DEF_FUNC2(add)
+DEF_FUNC2(sub)
+DEF_FUNC2(addmul)
+DEF_FUNC2(submul)
+DEF_FUNC(sqr)
 
 int
 _gr_arb_add_si(arb_t res, const arb_t x, slong y, const gr_ctx_t ctx)
@@ -446,13 +482,6 @@ int
 _gr_arb_add_fmpz(arb_t res, const arb_t x, const fmpz_t y, const gr_ctx_t ctx)
 {
     arb_add_fmpz(res, x, y, ARB_CTX_PREC(ctx));
-    return GR_SUCCESS;
-}
-
-int
-_gr_arb_sub(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx)
-{
-    arb_sub(res, x, y, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
@@ -506,30 +535,9 @@ _gr_arb_mul_fmpz(arb_t res, const arb_t x, const fmpz_t y, const gr_ctx_t ctx)
 }
 
 int
-_gr_arb_addmul(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx)
-{
-    arb_addmul(res, x, y, ARB_CTX_PREC(ctx));
-    return GR_SUCCESS;
-}
-
-int
-_gr_arb_submul(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx)
-{
-    arb_submul(res, x, y, ARB_CTX_PREC(ctx));
-    return GR_SUCCESS;
-}
-
-int
 _gr_arb_mul_two(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     arb_mul_2exp_si(res, x, 1);
-    return GR_SUCCESS;
-}
-
-int
-_gr_arb_sqr(arb_t res, const arb_t x, const gr_ctx_t ctx)
-{
-    arb_sqr(res, x, ARB_CTX_PREC(ctx));
     return GR_SUCCESS;
 }
 
@@ -810,40 +818,12 @@ _gr_arb_rsqrt(arb_t res, const arb_t x, const gr_ctx_t ctx)
     }
 }
 
-int
-_gr_arb_floor(arb_t res, const arb_t x, const gr_ctx_t ctx)
-{
-    arb_floor(res, x, ARB_CTX_PREC(ctx));
-    return GR_SUCCESS;
-}
-
-int
-_gr_arb_ceil(arb_t res, const arb_t x, const gr_ctx_t ctx)
-{
-    arb_ceil(res, x, ARB_CTX_PREC(ctx));
-    return GR_SUCCESS;
-}
-
-int
-_gr_arb_trunc(arb_t res, const arb_t x, const gr_ctx_t ctx)
-{
-    arb_trunc(res, x, ARB_CTX_PREC(ctx));
-    return GR_SUCCESS;
-}
-
-int
-_gr_arb_nint(arb_t res, const arb_t x, const gr_ctx_t ctx)
-{
-    arb_nint(res, x, ARB_CTX_PREC(ctx));
-    return GR_SUCCESS;
-}
-
-int
-_gr_arb_abs(arb_t res, const arb_t x, const gr_ctx_t ctx)
-{
-    arb_abs(res, x);
-    return GR_SUCCESS;
-}
+DEF_FUNC(floor)
+DEF_FUNC(ceil)
+DEF_FUNC(trunc)
+DEF_FUNC(nint)
+DEF_FUNC_NOPREC(abs)
+DEF_FUNC_NOPREC(sgn)
 
 int
 _gr_arb_conj(arb_t res, const arb_t x, const gr_ctx_t ctx)
@@ -856,13 +836,6 @@ int
 _gr_arb_im(arb_t res, const arb_t x, const gr_ctx_t ctx)
 {
     arb_zero(res);
-    return GR_SUCCESS;
-}
-
-int
-_gr_arb_sgn(arb_t res, const arb_t x, const gr_ctx_t ctx)
-{
-    arb_sgn(res, x);
     return GR_SUCCESS;
 }
 
@@ -956,47 +929,6 @@ _gr_arb_glaisher(arb_t res, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
-#define DEF_FUNC(fname) \
-int \
-_gr_arb_ ## fname(arb_t res, const arb_t x, const gr_ctx_t ctx) \
-{ \
-    arb_ ## fname(res, x, ARB_CTX_PREC(ctx)); \
-    return GR_SUCCESS; \
-} \
-
-#define DEF_2FUNC(fname) \
-int \
-_gr_arb_ ## fname(arb_t res1, arb_t res2, const arb_t x, const gr_ctx_t ctx) \
-{ \
-    arb_ ## fname(res1, res2, x, ARB_CTX_PREC(ctx)); \
-    return GR_SUCCESS; \
-} \
-
-#define DEF_FUNC2(fname) \
-int \
-_gr_arb_ ## fname(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx) \
-{ \
-    arb_ ## fname(res, x, y, ARB_CTX_PREC(ctx)); \
-    return GR_SUCCESS; \
-} \
-
-#define DEF_FUNC_SING(fname) \
-int \
-_gr_arb_ ## fname(arb_t res, const arb_t x, const gr_ctx_t ctx) \
-{ \
-    arb_ ## fname(res, x, ARB_CTX_PREC(ctx)); \
-    return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; \
-} \
-
-#define DEF_FUNC2_SING(fname) \
-int \
-_gr_arb_ ## fname(arb_t res, const arb_t x, const arb_t y, const gr_ctx_t ctx) \
-{ \
-    arb_ ## fname(res, x, y, ARB_CTX_PREC(ctx)); \
-    return arb_is_finite(res) ? GR_SUCCESS : GR_UNABLE; \
-} \
-
-
 DEF_FUNC(exp)
 DEF_FUNC(expm1)
 DEF_FUNC_SING(log1p)
@@ -1015,6 +947,9 @@ _gr_arb_log(arb_t res, const arb_t x, const gr_ctx_t ctx)
 
     return GR_UNABLE;
 }
+
+DEF_FUNC2(min)
+DEF_FUNC2(max)
 
 DEF_FUNC(sin)
 DEF_FUNC(cos)
@@ -1863,6 +1798,8 @@ gr_method_tab_input _arb_methods_input[] =
     {GR_METHOD_ARG,             (gr_funcptr) _gr_arb_arg},
     {GR_METHOD_CMP,             (gr_funcptr) _gr_arb_cmp},
     {GR_METHOD_CMPABS,          (gr_funcptr) _gr_arb_cmpabs},
+    {GR_METHOD_MIN,             (gr_funcptr) _gr_arb_min},
+    {GR_METHOD_MAX,             (gr_funcptr) _gr_arb_max},
     {GR_METHOD_I,               (gr_funcptr) gr_not_in_domain},
     {GR_METHOD_PI,              (gr_funcptr) _gr_arb_pi},
     {GR_METHOD_EULER,           (gr_funcptr) _gr_arb_euler},

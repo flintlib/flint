@@ -1318,6 +1318,34 @@ gr_generic_cmpabs_other(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_
 }
 
 int
+gr_generic_min(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+{
+    int cmp;
+
+    if (gr_cmp(&cmp, x, y, ctx) != GR_SUCCESS)
+        return GR_UNABLE;
+
+    if (cmp <= 0)
+        return gr_set(res, x, ctx);
+    else
+        return gr_set(res, y, ctx);
+}
+
+int
+gr_generic_max(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+{
+    int cmp;
+
+    if (gr_cmp(&cmp, x, y, ctx) != GR_SUCCESS)
+        return GR_UNABLE;
+
+    if (cmp >= 0)
+        return gr_set(res, x, ctx);
+    else
+        return gr_set(res, y, ctx);
+}
+
+int
 gr_generic_bernoulli_ui(gr_ptr res, ulong n, gr_ctx_t ctx)
 {
     if (ctx->which_ring == GR_CTX_FMPQ)
@@ -2664,6 +2692,8 @@ const gr_method_tab_input _gr_generic_methods[] =
     {GR_METHOD_CMPABS,                  (gr_funcptr) gr_generic_cmpabs},
     {GR_METHOD_CMP_OTHER,               (gr_funcptr) gr_generic_cmp_other},
     {GR_METHOD_CMPABS_OTHER,            (gr_funcptr) gr_generic_cmpabs_other},
+    {GR_METHOD_MIN,                     (gr_funcptr) gr_generic_min},
+    {GR_METHOD_MAX,                     (gr_funcptr) gr_generic_max},
 
     {GR_METHOD_EXP,                     (gr_funcptr) gr_generic_exp},
     {GR_METHOD_EXPM1,                   (gr_funcptr) gr_generic_expm1},

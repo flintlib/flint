@@ -1125,6 +1125,9 @@ GR_INLINE WARN_UNUSED_RESULT truth_t gr_abs_lt(gr_srcptr x, gr_srcptr y, gr_ctx_
 GR_INLINE WARN_UNUSED_RESULT truth_t gr_abs_ge(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { __GR_CMP(gr_cmpabs, cmp >= 0) }
 GR_INLINE WARN_UNUSED_RESULT truth_t gr_abs_gt(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { __GR_CMP(gr_cmpabs, cmp > 0) }
 
+GR_INLINE WARN_UNUSED_RESULT int gr_min(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, MIN)(res, x, y, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_max(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, MAX)(res, x, y, ctx); }
+
 GR_INLINE WARN_UNUSED_RESULT int gr_gen(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, GEN)(res, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_gens(gr_vec_t res, gr_ctx_t ctx) { return GR_VEC_CTX_OP(ctx, GENS)(res, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_gens_recursive(gr_vec_t res, gr_ctx_t ctx) { return GR_VEC_CTX_OP(ctx, GENS_RECURSIVE)(res, ctx); }

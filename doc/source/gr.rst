@@ -856,6 +856,10 @@ Ordering methods
     Wrappers of ``gr_cmp`` and ``gr_cmpabs`` returning truth values
     for the comparison operations ``<=``, ``<``, ``>=``, ``>``.
 
+.. function:: int gr_min(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              int gr_max(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+
+    Minimum and maximum value.
 
 Enclosure and interval methods
 ........................................................................
