@@ -13,6 +13,7 @@
 
 #include "t-add_sub_n.c"
 #include "t-addmul_submul.c"
+#include "t-mat_mul.c"
 #include "t-nfloat.c"
 #include "t-nfloat_complex.c"
 
@@ -22,6 +23,7 @@ test_struct tests[] =
 {
     TEST_FUNCTION(add_sub_n),
     TEST_FUNCTION(addmul_submul),
+    TEST_FUNCTION(mat_mul),
     TEST_FUNCTION(nfloat),
     TEST_FUNCTION(nfloat_complex),
 };

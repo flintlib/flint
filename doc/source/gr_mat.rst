@@ -154,6 +154,7 @@ Assignment and special values
 .. function:: int gr_mat_set(gr_mat_t res, const gr_mat_t mat, gr_ctx_t ctx)
               int gr_mat_set_fmpz_mat(gr_mat_t res, const fmpz_mat_t mat, gr_ctx_t ctx)
               int gr_mat_set_fmpq_mat(gr_mat_t res, const fmpq_mat_t mat, gr_ctx_t ctx)
+              int gr_mat_set_gr_mat_other(gr_mat_t res, const gr_mat_t mat, gr_ctx_t mat_ctx, gr_ctx_t ctx)
 
     Sets *res* to the value of *mat*.
 
@@ -213,6 +214,58 @@ Basic row, column and entry operations
     This predicate is always decidable (even if the underlying ring
     is not computable), returning ``T_TRUE`` or ``T_FALSE``.
 
+Entrywise operations
+-------------------------------------------------------------------------------
+
+.. function:: int gr_mat_entrywise_unary_op(gr_mat_t res, gr_method_unary_op f, const gr_mat_t mat, gr_ctx_t ctx)
+
+    Sets *res* to the application of the function *f* to the
+    entries of matrix *mat*. Returns ``GR_DOMAIN`` if the matrix dimensions do not match.
+
+.. function:: int gr_mat_entrywise_binary_op(gr_mat_t res, gr_method_binary_op f, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
+
+    Sets *res* to the application of the function *f*
+    to the entries of *mat1* as first argument and the entries of *mat2*
+    as second argument.
+    Returns ``GR_DOMAIN`` if the matrix dimensions do not match.
+
+.. function:: int gr_mat_entrywise_binary_op_scalar(gr_mat_t res, gr_method_binary_op f, const gr_mat_t mat, gr_srcptr c, gr_ctx_t ctx)
+
+    Sets *res* to the application of the function *f*
+    to the entries of *mat* as first argument and the scalar *c*
+    as second argument.
+    Returns ``GR_DOMAIN`` if the matrix dimensions do not match.
+
+.. function:: truth_t gr_mat_entrywise_unary_predicate_all(gr_method_unary_predicate f, const gr_mat_t mat, gr_ctx_t ctx)
+              truth_t gr_mat_entrywise_unary_predicate_any(gr_method_unary_predicate f, const gr_mat_t mat, gr_ctx_t ctx)
+
+    Returns whether the predicate *f* is true for all entries,
+    respectively for any entry, in the matrix *mat*.
+
+.. function:: truth_t gr_mat_entrywise_binary_predicate_all(gr_method_binary_predicate f, const gr_mat_t mat1, const gr_mat_t mat2, gr_ctx_t ctx)
+
+    Returns whether the binary predicate *f* is true for all entries
+    in *mat1* paired with the corresponding entries in *mat2*.
+    Returns ``T_FALSE`` if the matrix dimensions are not compatible.
+
+Norms
+-------------------------------------------------------------------------------
+
+.. function:: int gr_mat_norm_max(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+
+    Max norm: `\max_{i,j} |a_{i,j}|`.
+
+.. function:: int gr_mat_norm_1(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+
+    1-norm (largest absolute column sum): `\max_{1\le j \le n} \sum_{i=1}^m |a_{i,j}|`.
+
+.. function:: int gr_mat_norm_inf(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+
+    Infinity-norm (largest absolute row sum): `\max_{1\le i \le m} \sum_{j=1}^n |a_{i,j}|`.
+
+.. function:: int gr_mat_norm_frobenius(gr_ptr res, const gr_mat_t mat, gr_ctx_t ctx)
+
+    Frobenius norm: `\sqrt{\sum_{i,j} |a_{i,j}|^2}`.
 
 Arithmetic
 -------------------------------------------------------------------------------
@@ -802,6 +855,19 @@ on each test iteration, otherwise the given ring is tested.
     Tests the given function ``solve_impl`` for correctness as an implementation
     of :func:`gr_mat_nonsingular_solve_tril` / :func:`gr_mat_nonsingular_solve_triu`.
 
+.. function:: void gr_mat_test_approx_mul_max_norm(gr_method_mat_binary_op mul_impl, gr_srcptr rel_tol, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+
+    Tests the given implementation of matrix multiplication for accuracy
+    over an approximate numerical ring by checking that
+    `|C-AB| \le |A||B| rel\_tol` holds in the max norm,
+    using classical multiplication for reference.
+
+.. function:: void gr_mat_test_approx_mul_pos_entrywise_accurate(gr_method_mat_binary_op mul_impl, gr_srcptr rel_tol, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
+
+    Tests the given implementation of matrix multiplication for accuracy
+    over an approximate numerical ring by generating nonnegative matrices
+    and checking that the entrywise relative error compared to
+    classical multiplication does not exceed *rel_tol*.
 
 .. raw:: latex
 

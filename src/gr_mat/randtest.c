@@ -16,16 +16,23 @@
 int
 gr_mat_randtest(gr_mat_t mat, flint_rand_t state, gr_ctx_t ctx)
 {
-    int status;
-    slong i, r, c;
+    int status = GR_SUCCESS;
+    slong i, j, r, c;
+    slong sz = ctx->sizeof_elem;
 
     r = gr_mat_nrows(mat, ctx);
     c = gr_mat_ncols(mat, ctx);
 
-    status = GR_SUCCESS;
-    for (i = 0; i < r; i++)
+    if (n_randint(state, 10) == 0)
     {
-        status |= _gr_vec_randtest(mat->rows[i], state, c, ctx);
+        for (i = 0; i < r; i++)
+            for (j = 0; j < c; j++)
+                status |= gr_randtest(GR_MAT_ENTRY(mat, i, j, sz), state, ctx);
+    }
+    else
+    {
+        for (i = 0; i < r; i++)
+            status |= _gr_vec_randtest(mat->rows[i], state, c, ctx);
     }
 
     return status;

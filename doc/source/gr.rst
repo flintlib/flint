@@ -844,6 +844,23 @@ Ordering methods
     of *x* is less than, equal or greater than the absolute value of *y*.
     This may return ``GR_DOMAIN`` if the ring is not an ordered ring.
 
+.. function:: truth_t gr_le(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              truth_t gr_lt(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              truth_t gr_ge(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              truth_t gr_gt(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              truth_t gr_abs_le(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              truth_t gr_abs_lt(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              truth_t gr_abs_ge(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              truth_t gr_abs_gt(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+
+    Wrappers of ``gr_cmp`` and ``gr_cmpabs`` returning truth values
+    for the comparison operations ``<=``, ``<``, ``>=``, ``>``.
+
+.. function:: int gr_min(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+              int gr_max(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+
+    Minimum and maximum value.
+
 Enclosure and interval methods
 ........................................................................
 

@@ -221,9 +221,6 @@ matrix_set_other(gr_mat_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
     else if (x_ctx->which_ring == GR_CTX_GR_MAT)
     {
         const gr_mat_struct * xmat = x;
-        slong i, j;
-        int status;
-        slong sz, xsz;
 
         if (res->r != xmat->r || res->c != xmat->c)
         {
@@ -233,24 +230,8 @@ matrix_set_other(gr_mat_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
                 return GR_DOMAIN;
         }
 
-        sz = MATRIX_CTX(ctx)->base_ring->sizeof_elem;
-        xsz = MATRIX_CTX(x_ctx)->base_ring->sizeof_elem;
-
-        for (i = 0; i < xmat->r; i++)
-        {
-            for (j = 0; j < xmat->c; j++)
-            {
-                status = gr_set_other(GR_MAT_ENTRY(res, i, j, sz),
-                            GR_MAT_ENTRY(xmat, i, j, xsz),
-                            MATRIX_CTX(x_ctx)->base_ring,
+        return gr_mat_set_gr_mat_other(res, xmat, MATRIX_CTX(x_ctx)->base_ring,
                             MATRIX_CTX(ctx)->base_ring);
-
-                if (status != GR_SUCCESS)
-                    return status;
-            }
-        }
-
-        return GR_SUCCESS;
     }
     else
     {

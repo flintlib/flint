@@ -1109,6 +1109,25 @@ GR_INLINE WARN_UNUSED_RESULT int gr_cmpabs(int * res, gr_srcptr x, gr_srcptr y, 
 GR_INLINE WARN_UNUSED_RESULT int gr_cmp_other(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx) { return GR_BINARY_OP_OTHER_GET_INT(ctx, CMP_OTHER)(res, x, y, y_ctx, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_cmpabs_other(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_ctx_t ctx) { return GR_BINARY_OP_OTHER_GET_INT(ctx, CMPABS_OTHER)(res, x, y, y_ctx, ctx); }
 
+#define __GR_CMP(cfun, expr) \
+    int cmp; \
+    if ((cfun)(&cmp, x, y, ctx) != GR_SUCCESS) \
+        return T_UNKNOWN; \
+    return (expr) ? T_TRUE : T_FALSE; \
+
+GR_INLINE WARN_UNUSED_RESULT truth_t gr_le(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { __GR_CMP(gr_cmp, cmp <= 0) }
+GR_INLINE WARN_UNUSED_RESULT truth_t gr_lt(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { __GR_CMP(gr_cmp, cmp < 0) }
+GR_INLINE WARN_UNUSED_RESULT truth_t gr_ge(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { __GR_CMP(gr_cmp, cmp >= 0) }
+GR_INLINE WARN_UNUSED_RESULT truth_t gr_gt(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { __GR_CMP(gr_cmp, cmp > 0) }
+
+GR_INLINE WARN_UNUSED_RESULT truth_t gr_abs_le(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { __GR_CMP(gr_cmpabs, cmp <= 0) }
+GR_INLINE WARN_UNUSED_RESULT truth_t gr_abs_lt(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { __GR_CMP(gr_cmpabs, cmp < 0) }
+GR_INLINE WARN_UNUSED_RESULT truth_t gr_abs_ge(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { __GR_CMP(gr_cmpabs, cmp >= 0) }
+GR_INLINE WARN_UNUSED_RESULT truth_t gr_abs_gt(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { __GR_CMP(gr_cmpabs, cmp > 0) }
+
+GR_INLINE WARN_UNUSED_RESULT int gr_min(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, MIN)(res, x, y, ctx); }
+GR_INLINE WARN_UNUSED_RESULT int gr_max(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx) { return GR_BINARY_OP(ctx, MAX)(res, x, y, ctx); }
+
 GR_INLINE WARN_UNUSED_RESULT int gr_gen(gr_ptr res, gr_ctx_t ctx) { return GR_CONSTANT_OP(ctx, GEN)(res, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_gens(gr_vec_t res, gr_ctx_t ctx) { return GR_VEC_CTX_OP(ctx, GENS)(res, ctx); }
 GR_INLINE WARN_UNUSED_RESULT int gr_gens_recursive(gr_vec_t res, gr_ctx_t ctx) { return GR_VEC_CTX_OP(ctx, GENS_RECURSIVE)(res, ctx); }

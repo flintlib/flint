@@ -1196,6 +1196,41 @@ class gr_ctx:
     def arg(ctx, x):
         return ctx._unary_op(x, libgr.gr_arg, "arg($x)")
 
+    def min(ctx, x, y):
+        """
+            >>> QQ.min(QQ(1)/3, QQ(1)/4)
+            1/4
+            >>> RR.min(3, RR.pi())
+            3.000000000000000
+            >>> RR.min(RR("11 +/- 1"), RR("12 +/- 3"))
+            [1e+1 +/- 2.01]
+            >>> CC.min(2, 3)
+            2.000000000000000
+            >>> CC.min(2, CC.i())
+            Traceback (most recent call last):
+              ...
+            FlintUnableError: failed to compute min(x, y) in {Complex numbers (acb, prec = 53)} for {x = 2.000000000000000}, {y = 1.000000000000000*I}
+
+        """
+        return ctx._binary_op(x, y, libgr.gr_min, "min($x, $y)")
+
+    def max(ctx, x, y):
+        """
+            >>> QQ.max(QQ(1)/3, QQ(1)/4)
+            1/3
+            >>> RR.max(3, RR.pi())
+            [3.141592653589793 +/- 5.61e-16]
+            >>> RR.max(RR("10 +/- 1"), RR("9 +/- 3"))
+            [1e+1 +/- 2.01]
+            >>> CC.max(2, 3)
+            3.000000000000000
+            >>> CC.max(2, CC.i())
+            Traceback (most recent call last):
+              ...
+            FlintUnableError: failed to compute max(x, y) in {Complex numbers (acb, prec = 53)} for {x = 2.000000000000000}, {y = 1.000000000000000*I}
+        """
+        return ctx._binary_op(x, y, libgr.gr_max, "max($x, $y)")
+
     def inf(ctx):
         """
         Positive infinity (for extended number sets which support it).
@@ -5473,6 +5508,60 @@ class gr_mat(gr_elem):
             if status & GR_UNABLE: raise NotImplementedError
             if status & GR_DOMAIN: raise ValueError
         return x
+
+    def norm_max(self):
+        """
+            >>> Mat(RR)([[1,2,3],[4,5,6],[7,8,9]]).norm_max()
+            9.000000000000000
+        """
+        element_ring = self.parent()._element_ring
+        res = element_ring()
+        status = libgr.gr_mat_norm_max(res._ref, self._ref, element_ring._ref)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return res
+
+
+    def norm_1(self):
+        """
+            >>> Mat(RR)([[1,2,3],[4,5,6],[7,8,9]]).norm_1()
+            18.00000000000000
+        """
+        element_ring = self.parent()._element_ring
+        res = element_ring()
+        status = libgr.gr_mat_norm_1(res._ref, self._ref, element_ring._ref)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return res
+
+    def norm_inf(self):
+        """
+            >>> Mat(RR)([[1,2,3],[4,5,6],[7,8,9]]).norm_inf()
+            24.00000000000000
+        """
+        element_ring = self.parent()._element_ring
+        res = element_ring()
+        status = libgr.gr_mat_norm_inf(res._ref, self._ref, element_ring._ref)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return res
+
+    def norm_frobenius(self):
+        """
+            >>> Mat(RR)([[1,2,3],[4,5,6],[7,8,9]]).norm_frobenius()
+            [16.88194301613413 +/- 3.73e-15]
+        """
+        element_ring = self.parent()._element_ring
+        res = element_ring()
+        status = libgr.gr_mat_norm_frobenius(res._ref, self._ref, element_ring._ref)
+        if status:
+            if status & GR_UNABLE: raise NotImplementedError
+            if status & GR_DOMAIN: raise ValueError
+        return res
+
 
     def nullspace(self):
         """

@@ -1005,6 +1005,32 @@ _gr_acb_cmpabs(int * res, const acb_t x, const acb_t y, const gr_ctx_t ctx)
 }
 
 int
+_gr_acb_min(acb_t res, const acb_t x, const acb_t y, const gr_ctx_t ctx)
+{
+    if (arb_is_zero(acb_imagref(x)) && arb_is_zero(acb_imagref(y)))
+    {
+        arb_min(acb_realref(res), acb_realref(x), acb_realref(y), ACB_CTX_PREC(ctx));
+        arb_zero(acb_imagref(res));
+        return GR_SUCCESS;
+    }
+    else
+        return GR_UNABLE;
+}
+
+int
+_gr_acb_max(acb_t res, const acb_t x, const acb_t y, const gr_ctx_t ctx)
+{
+    if (arb_is_zero(acb_imagref(x)) && arb_is_zero(acb_imagref(y)))
+    {
+        arb_max(acb_realref(res), acb_realref(x), acb_realref(y), ACB_CTX_PREC(ctx));
+        arb_zero(acb_imagref(res));
+        return GR_SUCCESS;
+    }
+    else
+        return GR_UNABLE;
+}
+
+int
 _gr_acb_pi(acb_t res, const gr_ctx_t ctx)
 {
     acb_const_pi(res, ACB_CTX_PREC(ctx));
@@ -1330,13 +1356,7 @@ _gr_acb_gamma_fmpq(acb_t res, const fmpq_t x, const gr_ctx_t ctx)
     }
 }
 
-
-int
-_gr_acb_rgamma(acb_t res, const acb_t x, const gr_ctx_t ctx)
-{
-    acb_rgamma(res, x, ACB_CTX_PREC(ctx));
-    return GR_SUCCESS;
-}
+DEF_FUNC(rgamma)
 
 int
 _gr_acb_lgamma(acb_t res, const acb_t x, const gr_ctx_t ctx)
@@ -1642,12 +1662,7 @@ int _gr_acb_stieltjes(acb_t res, const fmpz_t n, const acb_t a, const gr_ctx_t c
     return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
 }
 
-int
-_gr_acb_dirichlet_eta(acb_t res, const acb_t x, const gr_ctx_t ctx)
-{
-    acb_dirichlet_eta(res, x, ACB_CTX_PREC(ctx));
-    return GR_SUCCESS;
-}
+DEF_FUNC(dirichlet_eta)
 
 /* todo
 int
@@ -2220,6 +2235,8 @@ gr_method_tab_input _acb_methods_input[] =
     {GR_METHOD_ARG,             (gr_funcptr) _gr_acb_arg},
     {GR_METHOD_CMP,             (gr_funcptr) _gr_acb_cmp},
     {GR_METHOD_CMPABS,          (gr_funcptr) _gr_acb_cmpabs},
+    {GR_METHOD_MIN,             (gr_funcptr) _gr_acb_min},
+    {GR_METHOD_MAX,             (gr_funcptr) _gr_acb_max},
     {GR_METHOD_PI,              (gr_funcptr) _gr_acb_pi},
     {GR_METHOD_EXP,             (gr_funcptr) _gr_acb_exp},
     {GR_METHOD_EXPM1,           (gr_funcptr) _gr_acb_expm1},
