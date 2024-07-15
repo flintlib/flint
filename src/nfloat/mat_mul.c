@@ -854,7 +854,12 @@ cleanup:
 }
 
 /* Minimum precision for using fixed-point arithmetic */
-#define NFLOAT_MAT_MUL_FIXED_CUTOFF 192
+
+/* TODO: for *unsigned* matrices, there is a speedup already for
+   prec = 192. Consider inlining fixed-point additions/subtractions for
+   4 and 5 limbs to extend this to general matrices. */
+/* #define NFLOAT_MAT_MUL_FIXED_CUTOFF 192 */
+#define NFLOAT_MAT_MUL_FIXED_CUTOFF 320
 
 /* first cutoff:  classical -> fixed_classical
    second cutoff: fixed_classical -> waksman */
