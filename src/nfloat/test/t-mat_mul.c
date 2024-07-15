@@ -41,7 +41,7 @@ TEST_FUNCTION_START(mat_mul, state)
         GR_MUST_SUCCEED(gr_mul_2exp_si(tol, tol, -prec + 2, ctx));
 
         gr_mat_test_approx_mul_max_norm(
-            (gr_method_mat_binary_op) _nfloat_mat_mul_waksman,
+            (gr_method_mat_binary_op) nfloat_mat_mul_waksman,
             tol, state, (prec <= 256) ? 10 : 1, 10, ctx);
 
         gr_mat_test_approx_mul_max_norm(
@@ -50,7 +50,7 @@ TEST_FUNCTION_START(mat_mul, state)
                         (prec <= 256) ? 40 : 20, ctx);
 
         gr_mat_test_approx_mul_max_norm(
-            (gr_method_mat_binary_op) _nfloat_mat_mul_fixed_classical,
+            (gr_method_mat_binary_op) nfloat_mat_mul_fixed_classical,
             tol, state, (prec <= 256) ? 10 : 1,
                         (prec <= 256) ? 40 : 20, ctx);
 
@@ -77,7 +77,7 @@ TEST_FUNCTION_START(mat_mul, state)
         GR_MUST_SUCCEED(gr_mul_2exp_si(tol, tol, -prec + 6, ctx));
 
         gr_mat_test_approx_mul_pos_entrywise_accurate(
-            (gr_method_mat_binary_op) _nfloat_mat_mul_waksman,
+            (gr_method_mat_binary_op) nfloat_mat_mul_waksman,
             tol, state, (prec <= 256) ? 10 : 1, 10, ctx);
 
         gr_mat_test_approx_mul_pos_entrywise_accurate(
@@ -86,7 +86,7 @@ TEST_FUNCTION_START(mat_mul, state)
                         (prec <= 256) ? 40 : 20, ctx);
 
         gr_mat_test_approx_mul_pos_entrywise_accurate(
-            (gr_method_mat_binary_op) _nfloat_mat_mul_fixed_classical,
+            (gr_method_mat_binary_op) nfloat_mat_mul_fixed_classical,
             tol, state, (prec <= 256) ? 10 : 1,
                         (prec <= 256) ? 40 : 20, ctx);
 

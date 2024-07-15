@@ -396,7 +396,7 @@ _nfloat_mat_mul_fixed(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, int waksma
 
     extra_bits = Adelta + Bdelta + pad_top + pad_bot;
 
-    if (extra_bits > max_extra_bits)
+    if (extra_bits >= max_extra_bits)
         return gr_mat_mul_classical(C, A, B, ctx);
 
     Aexp = Amax + pad_top;
@@ -408,13 +408,13 @@ _nfloat_mat_mul_fixed(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, int waksma
 }
 
 int
-_nfloat_mat_mul_fixed_classical(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+nfloat_mat_mul_fixed_classical(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 {
     return _nfloat_mat_mul_fixed(C, A, B, 0, 100000, ctx);
 }
 
 int
-_nfloat_mat_mul_waksman(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+nfloat_mat_mul_waksman(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 {
     return _nfloat_mat_mul_fixed(C, A, B, 1, 100000, ctx);
 }
