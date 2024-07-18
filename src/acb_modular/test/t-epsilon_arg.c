@@ -39,7 +39,7 @@ acb_modular_epsilon_arg_naive(fmpq_t arg, const psl2z_t g)
         fmpz_mul_ui(fmpq_denref(arg), c, 12);
         fmpq_canonicalise(arg);
 
-        arith_dedekind_sum(t, d, c);
+        fmpq_dedekind_sum(t, d, c);
         fmpq_sub(arg, arg, t);
 
         fmpq_clear(t);

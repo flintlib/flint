@@ -28,7 +28,7 @@ __ramanujan_even_common_denom(fmpz * num, fmpz * den, slong start, slong n)
     fmpz_init(cden);
 
     /* Common denominator */
-    arith_primorial(cden, n + 1);
+    fmpz_primorial(cden, n + 1);
 
     start += start % 2;
 
