@@ -308,7 +308,7 @@ yes|no)
 esac],
 enable_avx512="no")
 
-# Note: This is maintainer level only. Currently only used for Nemo CI.
+# NOTE: This is maintainer level only. Currently only used for Nemo CI.
 AC_ARG_ENABLE(mpfr-check,[],
 [case $enableval in
 yes|no)
@@ -318,6 +318,18 @@ yes|no)
     ;;
 esac],
 enable_mpfr_check="yes")
+
+# NOTE: Maintainer level only. Avoids any sort of optimization to speed up
+# builds.
+AC_ARG_ENABLE(fast-build,[],
+[case $enableval in
+yes|no)
+    ;;
+*)
+    AC_MSG_ERROR([Bad value $enableval for --enable-fast-build. Need yes or no.])
+    ;;
+esac],
+enable_fast_build="no")
 
 ################################################################################
 # packages
@@ -518,7 +530,11 @@ fi
 # architecture specifics
 ################################################################################
 
-gcc_cflags="-O3 -pedantic -std=c11"
+if test "$enable_fast_build" = "no";
+then
+    gcc_cflags="-O3 "
+fi
+gcc_cflags="$gcc_cflags-pedantic -std=c11"
 gcc_warnings="-Werror=implicit-function-declaration -Wall -Wno-stringop-overread -Wno-stringop-overflow -Wno-maybe-uninitialized"
 
 dnl We only try to provide specifics for those systems that currently supports
@@ -1246,7 +1262,10 @@ then
             fi
         done
     done
-    AX_CHECK_COMPILE_FLAG([-funroll-loops],[unroll_loops="yes"])
+    if test "$enable_fast_build" = no;
+    then
+        AX_CHECK_COMPILE_FLAG([-funroll-loops],[unroll_loops="yes"])
+    fi
     if test "$unroll_loops" = "yes";
     then
         AC_SUBST(UNROLL_LOOPS,1)
