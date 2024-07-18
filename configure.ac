@@ -164,294 +164,6 @@ dnl AC_CANONICAL_HOST
 AC_CONFIG_HEADERS(src/config.h src/flint-config.h)
 
 ################################################################################
-# architecture specifics
-################################################################################
-
-gcc_cflags="-O3 -pedantic -std=c11"
-gcc_warnings="-Werror=implicit-function-declaration -Wall -Wno-stringop-overread -Wno-stringop-overflow -Wno-maybe-uninitialized"
-
-dnl We only try to provide specifics for those systems that currently supports
-dnl our assembly routines. If more combinations are wished for than what is
-dnl specified, please open up an issue at
-dnl <https://github.com/flintlib/flint/issues/> and we will consider it.
-dnl
-dnl For these systems we aim to provide:
-dnl
-dnl   gcc_cflags     flags for GCC-compatible compilers
-dnl
-dnl   asm_path       directory for assembly, relative to src/mpn_extras
-dnl   param_path     directory for flint-mparam.h, relative to src/mpn_extras
-dnl
-dnl For x86_64 systems, we can also set:
-dnl
-dnl   have_avx512    system has AVX512F and AVX512DQ (we assume this implies have_avx2)
-dnl   have_avx2      system has AVX2 and FMA
-
-case $host in
-
-  ARM64_PATTERN)
-    gcc_cflags="$gcc_cflags"
-    gcc_cflags_optlist="arch tune"
-    asm_path="arm64"
-    param_path="arm64"
-    flint_cv_have_fft_small_arm_i="yes"
-
-    # NOTE: Cortex values where taken from
-    # https://developer.arm.com/Processors/Cortex-XXX
-    case $host_cpu in
-      armcortexa35 | armcortexa35neon)
-        gcc_cflags_arch="-march=armv8-a"
-        gcc_cflags_tune="-mtune=cortex-a35"
-        ;;
-      armcortexa53 | armcortexa53neon)
-        gcc_cflags_arch="-march=armv8-a"
-        gcc_cflags_tune="-mtune=cortex-a53"
-        ;;
-      armcortexa55 | armcortexa55neon)
-        gcc_cflags_arch="-march=armv8.2-a"
-        gcc_cflags_tune="-mtune=cortex-a55"
-        ;;
-      armcortexa57 | armcortexa57neon)
-        gcc_cflags_arch="-march=armv8-a"
-        gcc_cflags_tune="-mtune=cortex-a57"
-        ;;
-      armcortexa72 | armcortexa72neon)
-        gcc_cflags_arch="-march=armv8-a"
-        gcc_cflags_tune="-mtune=cortex-a72"
-        ;;
-      armcortexa73 | armcortexa73neon)
-        gcc_cflags_arch="-march=armv8-a"
-        gcc_cflags_tune="-mtune=cortex-a73"
-        ;;
-      armcortexa75 | armcortexa75neon)
-        gcc_cflags_arch="-march=armv8.2-a"
-        gcc_cflags_tune="-mtune=cortex-a75"
-        ;;
-      armcortexa76 | armcortexa76neon)
-        gcc_cflags_arch="-march=armv8.2-a"
-        gcc_cflags_tune="-mtune=cortex-a76"
-        ;;
-      armcortexa77 | armcortexa77neon)
-        gcc_cflags_arch="-march=armv8.2-a"
-        gcc_cflags_tune="-mtune=cortex-a77"
-        ;;
-      armcortexa65 | armcortexa65neon)
-        gcc_cflags_arch="-march=armv8.2-a"
-        gcc_cflags_tune="-mtune=cortex-a65"
-        ;;
-      armcortexa34 | armcortexa34neon)
-        gcc_cflags_arch="-march=armv8-a"
-        gcc_cflags_tune="-mtune=cortex-a34"
-        ;;
-      armcortexa78 | armcortexa78neon)
-        gcc_cflags_arch="-march=armv8.2-a"
-        gcc_cflags_tune="-mtune=cortex-a78"
-        ;;
-      armexynosm1)
-        gcc_cflags_arch="-march=armv8-a"
-        gcc_cflags_tune="-mtune=exynos-m1"
-        ;;
-      armthunderx)
-        gcc_cflags_arch="-march=armv8-a"
-        gcc_cflags_tune="-mtune=thunderx"
-        ;;
-      armxgene1)
-        gcc_cflags_arch="-march=armv8-a"
-        gcc_cflags_tune="-mtune=xgene1"
-        ;;
-      applem1*)
-        gcc_cflags_arch="-march=armv8.5-a"
-        gcc_cflags_tune=""
-        ;;
-      applem2*)
-        gcc_cflags_arch="-march=armv8.6-a"
-        gcc_cflags_tune=""
-        ;;
-      applem3*)
-        gcc_cflags_arch="-march=armv8.6-a"
-        gcc_cflags_tune=""
-        ;;
-      aarch64* | armv8*)
-        gcc_cflags_arch="-march=armv8-a"
-        gcc_cflags_tune=""
-        ;;
-      *)
-        AC_MSG_ERROR([Error in deciding flags for $host.
-Please report at <https://github.com/flintlib/flint/issues/>])
-        ;;
-    esac
-    ;;
-
-
-  X86_64_ADX_PATTERN)
-    gcc_cflags="$gcc_cflags"
-    gcc_cflags_optlist="arch"
-    asm_path="x86_64/broadwell"
-    param_path="x86_64/broadwell"
-
-    have_avx512="no"
-    have_avx2="yes"
-
-    case $host_cpu in
-      zen)
-        gcc_cflags_arch="-march=znver1"
-        param_path="x86_64/zen3"
-        ;;
-      zen2)
-        gcc_cflags_arch="-march=znver2"
-        param_path="x86_64/zen3"
-        ;;
-      zen3)
-        gcc_cflags_arch="-march=znver3"
-        param_path="x86_64/zen3"
-        ;;
-      zen4)
-        gcc_cflags_arch="-march=znver4 -march=znver3"
-        param_path="x86_64/zen3"
-        have_avx512="yes"
-        ;;
-      coreibwl | broadwell)
-        gcc_cflags_arch="-march=broadwell"
-        param_path="x86_64/skylake"
-        ;;
-      skylake)
-        gcc_cflags_arch="-march=skylake"
-        param_path="x86_64/skylake"
-        ;;
-      skylake_server)
-        gcc_cflags_arch="-march=skylake-avx512"
-        param_path="x86_64/skylake"
-        have_avx512="yes"
-        ;;
-      cannonlake)
-        gcc_cflags_arch="-march=cannonlake"
-        param_path="x86_64/skylake"
-        have_avx512="yes"
-        ;;
-      kabylake)
-        gcc_cflags_arch="-march=skylake"
-        param_path="x86_64/skylake"
-        ;;
-      icelake)
-        gcc_cflags_arch="-march=icelake-client"
-        param_path="x86_64/skylake"
-        have_avx512="yes"
-        ;;
-      icelake_server)
-        gcc_cflags_arch="-march=icelake-server"
-        param_path="x86_64/skylake"
-        have_avx512="yes"
-        ;;
-      rocketlake)
-        gcc_cflags_arch="-march=rocketlake"
-        param_path="x86_64/skylake"
-        have_avx512="yes"
-        ;;
-      tigerlake)
-        gcc_cflags_arch="-march=tigerlake"
-        param_path="x86_64/skylake"
-        have_avx512="yes"
-        ;;
-      alderlake)
-        gcc_cflags_arch="-march=alderlake"
-        param_path="x86_64/skylake"
-        ;;
-      raptorlake)
-        gcc_cflags_arch="-march=alderlake"
-        param_path="x86_64/skylake"
-        ;;
-      knightslanding)
-        gcc_cflags_arch="-march=knl"
-        param_path="x86_64/skylake"
-        ;;
-      sapphirerapids)
-        gcc_cflags_arch="-march=sapphirerapids"
-        param_path="x86_64/skylake"
-        have_avx512="yes"
-        ;;
-      cometlake)
-        gcc_cflags_arch="-march=kabylake"
-        param_path="x86_64/skylake"
-        ;;
-      *)
-        AC_MSG_ERROR([Error in deciding flags for $host.
-Please report at <https://github.com/flintlib/flint/issues/>])
-        ;;
-    esac
-
-    case $host in
-	  *-*-mingw* | *-*-msys | *-*-cygwin)
-        flint_nonstd_abi="yes"
-        asm_path=""
-        param_path="x86_64"
-	    ;;
-	esac
-
-    if test "$have_avx512" = "yes";
-    then
-        have_avx2="yes"
-    fi
-
-    if test "$have_avx2" = "yes";
-    then
-        flint_cv_have_fft_small_x86_i="yes"
-    fi
-	;;
-
-  X86_64_PATTERN)
-    # NOTE: We do not care if the user specifies noavx!
-    gcc_cflags="$gcc_cflags"
-    gcc_cflags_optlist="arch"
-    asm_path=""
-    param_path="x86_64"
-
-    case $host_cpu in
-      coreiibr | ivybridge)
-        gcc_cflags_arch="-march=ivybridge"
-        ;;
-      coreihwl | haswell)
-        gcc_cflags_arch="-march=haswell"
-        ;;
-      piledriver | bd2)
-        gcc_cflags_arch="-march=bdver2"
-        ;;
-      steamroller | bd3)
-        gcc_cflags_arch="-march=bdver3"
-        ;;
-      excavator | bd4)
-        gcc_cflags_arch="-march=bdver4"
-        have_avx2="yes"
-        ;;
-      x86_64v3)
-        gcc_cflags_arch="-march=x86-64-v3"
-        have_avx2="yes"
-        ;;
-      x86_64v4)
-        gcc_cflags_arch="-march=x86-64-v4"
-        have_avx512="yes"
-        ;;
-    esac
-
-    if test "$have_avx512" = "yes";
-    then
-        have_avx2="yes"
-    fi
-
-    if test "$have_avx2" = "yes";
-    then
-        flint_cv_have_fft_small_x86_i="yes"
-    fi
-	;;
-
-  *)
-    asm_path=""
-    param_path="generic"
-    gcc_cflags="$gcc_cflags"
-    ;;
-
-esac
-
-################################################################################
 # features
 ################################################################################
 
@@ -801,6 +513,294 @@ if test "$with_ntl" != "no" || test -n "$ntl_include_path" || test -n "$ntl_lib_
 then
     with_ntl="yes"
 fi
+
+################################################################################
+# architecture specifics
+################################################################################
+
+gcc_cflags="-O3 -pedantic -std=c11"
+gcc_warnings="-Werror=implicit-function-declaration -Wall -Wno-stringop-overread -Wno-stringop-overflow -Wno-maybe-uninitialized"
+
+dnl We only try to provide specifics for those systems that currently supports
+dnl our assembly routines. If more combinations are wished for than what is
+dnl specified, please open up an issue at
+dnl <https://github.com/flintlib/flint/issues/> and we will consider it.
+dnl
+dnl For these systems we aim to provide:
+dnl
+dnl   gcc_cflags     flags for GCC-compatible compilers
+dnl
+dnl   asm_path       directory for assembly, relative to src/mpn_extras
+dnl   param_path     directory for flint-mparam.h, relative to src/mpn_extras
+dnl
+dnl For x86_64 systems, we can also set:
+dnl
+dnl   have_avx512    system has AVX512F and AVX512DQ (we assume this implies have_avx2)
+dnl   have_avx2      system has AVX2 and FMA
+
+case $host in
+
+  ARM64_PATTERN)
+    gcc_cflags="$gcc_cflags"
+    gcc_cflags_optlist="arch tune"
+    asm_path="arm64"
+    param_path="arm64"
+    flint_cv_have_fft_small_arm_i="yes"
+
+    # NOTE: Cortex values where taken from
+    # https://developer.arm.com/Processors/Cortex-XXX
+    case $host_cpu in
+      armcortexa35 | armcortexa35neon)
+        gcc_cflags_arch="-march=armv8-a"
+        gcc_cflags_tune="-mtune=cortex-a35"
+        ;;
+      armcortexa53 | armcortexa53neon)
+        gcc_cflags_arch="-march=armv8-a"
+        gcc_cflags_tune="-mtune=cortex-a53"
+        ;;
+      armcortexa55 | armcortexa55neon)
+        gcc_cflags_arch="-march=armv8.2-a"
+        gcc_cflags_tune="-mtune=cortex-a55"
+        ;;
+      armcortexa57 | armcortexa57neon)
+        gcc_cflags_arch="-march=armv8-a"
+        gcc_cflags_tune="-mtune=cortex-a57"
+        ;;
+      armcortexa72 | armcortexa72neon)
+        gcc_cflags_arch="-march=armv8-a"
+        gcc_cflags_tune="-mtune=cortex-a72"
+        ;;
+      armcortexa73 | armcortexa73neon)
+        gcc_cflags_arch="-march=armv8-a"
+        gcc_cflags_tune="-mtune=cortex-a73"
+        ;;
+      armcortexa75 | armcortexa75neon)
+        gcc_cflags_arch="-march=armv8.2-a"
+        gcc_cflags_tune="-mtune=cortex-a75"
+        ;;
+      armcortexa76 | armcortexa76neon)
+        gcc_cflags_arch="-march=armv8.2-a"
+        gcc_cflags_tune="-mtune=cortex-a76"
+        ;;
+      armcortexa77 | armcortexa77neon)
+        gcc_cflags_arch="-march=armv8.2-a"
+        gcc_cflags_tune="-mtune=cortex-a77"
+        ;;
+      armcortexa65 | armcortexa65neon)
+        gcc_cflags_arch="-march=armv8.2-a"
+        gcc_cflags_tune="-mtune=cortex-a65"
+        ;;
+      armcortexa34 | armcortexa34neon)
+        gcc_cflags_arch="-march=armv8-a"
+        gcc_cflags_tune="-mtune=cortex-a34"
+        ;;
+      armcortexa78 | armcortexa78neon)
+        gcc_cflags_arch="-march=armv8.2-a"
+        gcc_cflags_tune="-mtune=cortex-a78"
+        ;;
+      armexynosm1)
+        gcc_cflags_arch="-march=armv8-a"
+        gcc_cflags_tune="-mtune=exynos-m1"
+        ;;
+      armthunderx)
+        gcc_cflags_arch="-march=armv8-a"
+        gcc_cflags_tune="-mtune=thunderx"
+        ;;
+      armxgene1)
+        gcc_cflags_arch="-march=armv8-a"
+        gcc_cflags_tune="-mtune=xgene1"
+        ;;
+      applem1*)
+        gcc_cflags_arch="-march=armv8.5-a"
+        gcc_cflags_tune=""
+        ;;
+      applem2*)
+        gcc_cflags_arch="-march=armv8.6-a"
+        gcc_cflags_tune=""
+        ;;
+      applem3*)
+        gcc_cflags_arch="-march=armv8.6-a"
+        gcc_cflags_tune=""
+        ;;
+      aarch64* | armv8*)
+        gcc_cflags_arch="-march=armv8-a"
+        gcc_cflags_tune=""
+        ;;
+      *)
+        AC_MSG_ERROR([Error in deciding flags for $host.
+Please report at <https://github.com/flintlib/flint/issues/>])
+        ;;
+    esac
+    ;;
+
+
+  X86_64_ADX_PATTERN)
+    gcc_cflags="$gcc_cflags"
+    gcc_cflags_optlist="arch"
+    asm_path="x86_64/broadwell"
+    param_path="x86_64/broadwell"
+
+    have_avx512="no"
+    have_avx2="yes"
+
+    case $host_cpu in
+      zen)
+        gcc_cflags_arch="-march=znver1"
+        param_path="x86_64/zen3"
+        ;;
+      zen2)
+        gcc_cflags_arch="-march=znver2"
+        param_path="x86_64/zen3"
+        ;;
+      zen3)
+        gcc_cflags_arch="-march=znver3"
+        param_path="x86_64/zen3"
+        ;;
+      zen4)
+        gcc_cflags_arch="-march=znver4 -march=znver3"
+        param_path="x86_64/zen3"
+        have_avx512="yes"
+        ;;
+      coreibwl | broadwell)
+        gcc_cflags_arch="-march=broadwell"
+        param_path="x86_64/skylake"
+        ;;
+      skylake)
+        gcc_cflags_arch="-march=skylake"
+        param_path="x86_64/skylake"
+        ;;
+      skylake_server)
+        gcc_cflags_arch="-march=skylake-avx512"
+        param_path="x86_64/skylake"
+        have_avx512="yes"
+        ;;
+      cannonlake)
+        gcc_cflags_arch="-march=cannonlake"
+        param_path="x86_64/skylake"
+        have_avx512="yes"
+        ;;
+      kabylake)
+        gcc_cflags_arch="-march=skylake"
+        param_path="x86_64/skylake"
+        ;;
+      icelake)
+        gcc_cflags_arch="-march=icelake-client"
+        param_path="x86_64/skylake"
+        have_avx512="yes"
+        ;;
+      icelake_server)
+        gcc_cflags_arch="-march=icelake-server"
+        param_path="x86_64/skylake"
+        have_avx512="yes"
+        ;;
+      rocketlake)
+        gcc_cflags_arch="-march=rocketlake"
+        param_path="x86_64/skylake"
+        have_avx512="yes"
+        ;;
+      tigerlake)
+        gcc_cflags_arch="-march=tigerlake"
+        param_path="x86_64/skylake"
+        have_avx512="yes"
+        ;;
+      alderlake)
+        gcc_cflags_arch="-march=alderlake"
+        param_path="x86_64/skylake"
+        ;;
+      raptorlake)
+        gcc_cflags_arch="-march=alderlake"
+        param_path="x86_64/skylake"
+        ;;
+      knightslanding)
+        gcc_cflags_arch="-march=knl"
+        param_path="x86_64/skylake"
+        ;;
+      sapphirerapids)
+        gcc_cflags_arch="-march=sapphirerapids"
+        param_path="x86_64/skylake"
+        have_avx512="yes"
+        ;;
+      cometlake)
+        gcc_cflags_arch="-march=kabylake"
+        param_path="x86_64/skylake"
+        ;;
+      *)
+        AC_MSG_ERROR([Error in deciding flags for $host.
+Please report at <https://github.com/flintlib/flint/issues/>])
+        ;;
+    esac
+
+    case $host in
+	  *-*-mingw* | *-*-msys | *-*-cygwin)
+        flint_nonstd_abi="yes"
+        asm_path=""
+        param_path="x86_64"
+	    ;;
+	esac
+
+    if test "$have_avx512" = "yes";
+    then
+        have_avx2="yes"
+    fi
+
+    if test "$have_avx2" = "yes";
+    then
+        flint_cv_have_fft_small_x86_i="yes"
+    fi
+	;;
+
+  X86_64_PATTERN)
+    # NOTE: We do not care if the user specifies noavx!
+    gcc_cflags="$gcc_cflags"
+    gcc_cflags_optlist="arch"
+    asm_path=""
+    param_path="x86_64"
+
+    case $host_cpu in
+      coreiibr | ivybridge)
+        gcc_cflags_arch="-march=ivybridge"
+        ;;
+      coreihwl | haswell)
+        gcc_cflags_arch="-march=haswell"
+        ;;
+      piledriver | bd2)
+        gcc_cflags_arch="-march=bdver2"
+        ;;
+      steamroller | bd3)
+        gcc_cflags_arch="-march=bdver3"
+        ;;
+      excavator | bd4)
+        gcc_cflags_arch="-march=bdver4"
+        have_avx2="yes"
+        ;;
+      x86_64v3)
+        gcc_cflags_arch="-march=x86-64-v3"
+        have_avx2="yes"
+        ;;
+      x86_64v4)
+        gcc_cflags_arch="-march=x86-64-v4"
+        have_avx512="yes"
+        ;;
+    esac
+
+    if test "$have_avx512" = "yes";
+    then
+        have_avx2="yes"
+    fi
+
+    if test "$have_avx2" = "yes";
+    then
+        flint_cv_have_fft_small_x86_i="yes"
+    fi
+	;;
+
+  *)
+    asm_path=""
+    param_path="generic"
+    gcc_cflags="$gcc_cflags"
+    ;;
+
+esac
 
 ################################################################################
 # programs
