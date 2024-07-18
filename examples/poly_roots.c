@@ -85,13 +85,13 @@ int main(int argc, char *argv[])
         }
         else if (!strcmp(argv[i], "t"))
         {
-            arith_chebyshev_t_polynomial(g, atol(argv[i+1]));
+            fmpz_poly_chebyshev_t(g, atol(argv[i+1]));
             fmpz_poly_mul(f, f, g);
             i++;
         }
         else if (!strcmp(argv[i], "u"))
         {
-            arith_chebyshev_u_polynomial(g, atol(argv[i+1]));
+            fmpz_poly_chebyshev_u(g, atol(argv[i+1]));
             fmpz_poly_mul(f, f, g);
             i++;
         }
@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
         {
             fmpq_poly_t h;
             fmpq_poly_init(h);
-            arith_legendre_polynomial(h, atol(argv[i+1]));
+            fmpq_poly_legendre_p(h, atol(argv[i+1]));
             fmpq_poly_get_numerator(g, h);
             fmpz_poly_mul(f, f, g);
             fmpq_poly_clear(h);
@@ -107,13 +107,13 @@ int main(int argc, char *argv[])
         }
         else if (!strcmp(argv[i], "c"))
         {
-            arith_cyclotomic_polynomial(g, atol(argv[i+1]));
+            fmpz_poly_cyclotomic(g, atol(argv[i+1]));
             fmpz_poly_mul(f, f, g);
             i++;
         }
         else if (!strcmp(argv[i], "s"))
         {
-            arith_swinnerton_dyer_polynomial(g, atol(argv[i+1]));
+            fmpz_poly_swinnerton_dyer(g, atol(argv[i+1]));
             fmpz_poly_mul(f, f, g);
             i++;
         }

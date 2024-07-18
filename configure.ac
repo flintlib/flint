@@ -164,10 +164,377 @@ dnl AC_CANONICAL_HOST
 AC_CONFIG_HEADERS(src/config.h src/flint-config.h)
 
 ################################################################################
+# features
+################################################################################
+
+AC_ARG_ENABLE(pthread,
+[AS_HELP_STRING([--enable-pthread],[Enable pthread [default=yes]])],
+[case $enableval in
+yes|no)
+    ;;
+*)
+    AC_MSG_ERROR([Bad value $enableval for --enable-pthread. Need yes or no.])
+    ;;
+esac],
+enable_pthread="yes")
+
+AC_ARG_ENABLE(reentrant,
+[AS_HELP_STRING([--enable-reentrant],[Build reentrant version of library [default=no]])],
+[case $enableval in
+yes|no)
+    ;;
+*)
+    AC_MSG_ERROR([Bad value $enableval for --enable-reentrant. Need yes or no.])
+    ;;
+esac],
+enable_reentrant="no")
+
+AC_ARG_ENABLE(thread-safe,
+[AS_HELP_STRING([--enable-thread-safe],[Enable thread-local storage [default=yes]])],
+[case $enableval in
+yes|no)
+    ;;
+*)
+    AC_MSG_ERROR([Bad value $enableval for --enable-tls. Need yes or no.])
+    ;;
+esac],
+enable_thread_safe="yes")
+
+if test -n "$enable_tls";
+then
+    AC_MSG_ERROR([--enable-tls is an old feature. Please use --enable-thread-safe instead.])
+fi
+
+AC_ARG_ENABLE(assert,
+[AS_HELP_STRING([--enable-assert],[Enable use of asserts [default=no]])],
+[case $enableval in
+yes|no)
+    ;;
+*)
+    AC_MSG_ERROR([Bad value $enableval for --enable-assert. Need yes or no.])
+    ;;
+esac],
+enable_assert="no")
+
+AC_ARG_ENABLE(coverage,
+[AS_HELP_STRING([--enable-coverage],[Enable test coverage [default=no]])],
+[case $enableval in
+yes|no)
+    ;;
+*)
+    AC_MSG_ERROR([Bad value $enableval for --enable-coverage. Need yes or no.])
+    ;;
+esac],
+enable_coverage="no")
+
+AC_ARG_ENABLE(debug,
+[AS_HELP_STRING([--enable-debug],[Compile FLINT with debug information [default=yes]])],
+[case $enableval in
+yes|no)
+    if test "$enableval" = "no" && test "$enable_coverage" = "yes";
+    then
+        AC_MSG_ERROR([Debug information is required by coverage.])
+    fi
+    ;;
+*)
+    AC_MSG_ERROR([Bad value $enableval for --enable-debug. Need yes or no.])
+    ;;
+esac],
+enable_debug="yes")
+
+AC_ARG_ENABLE(dependency-tracking,
+[AS_HELP_STRING([--enable-dependency-tracking],[Enable GCC automated dependency tracking [default=yes]])],
+[case $enableval in
+yes|no)
+    ;;
+*)
+    AC_MSG_ERROR([Bad value $enableval for --enable-dependency-tracking. Need yes or no.])
+    ;;
+esac],
+enable_dependency_tracking="yes")
+
+AC_ARG_ENABLE(pretty-tests,
+[AS_HELP_STRING([--enable-pretty-tests],[Enable pretty printing for tests [default=yes]])],
+[case $enableval in
+yes|no)
+    ;;
+*)
+    AC_MSG_ERROR([Bad value $enableval for --enable-pretty-tests. Need yes or no.])
+    ;;
+esac],
+enable_pretty_tests="yes")
+
+AC_ARG_ENABLE(gmp-internals,
+[AS_HELP_STRING([--enable-gmp-internals],[Enable calling GMP internals directly [default=yes]])],
+[case $enableval in
+yes|no)
+    ;;
+*)
+    AC_MSG_ERROR([Bad value $enableval for --enable-gmp-internals. Need yes or no.])
+    ;;
+esac],
+enable_gmp_internals="yes")
+
+AC_ARG_ENABLE(assembly,
+[AS_HELP_STRING([--enable-assembly],[Enable assembly routines (if available) [default=yes]])],
+[case $enableval in
+yes|no)
+    ;;
+*)
+    AC_MSG_ERROR([Bad value $enableval for --enable-assembly. Need yes or no.])
+    ;;
+esac],
+enable_assembly="yes")
+
+AC_ARG_ENABLE(avx2,
+[AS_HELP_STRING([--enable-avx2],[Enable AVX2 instructions [default=no]])],
+[case $enableval in
+yes|no)
+    ;;
+*)
+    AC_MSG_ERROR([Bad value $enableval for --enable-avx2. Need yes or no.])
+    ;;
+esac],
+enable_avx2="no")
+
+AC_ARG_ENABLE(avx512,
+[AS_HELP_STRING([--enable-avx512],[Enable AVX512 instructions [default=no]])],
+[case $enableval in
+yes|no)
+    ;;
+*)
+    AC_MSG_ERROR([Bad value $enableval for --enable-avx512. Need yes or no.])
+    ;;
+esac],
+enable_avx512="no")
+
+# NOTE: This is maintainer level only. Currently only used for Nemo CI.
+AC_ARG_ENABLE(mpfr-check,[],
+[case $enableval in
+yes|no)
+    ;;
+*)
+    AC_MSG_ERROR([Bad value $enableval for --enable-mpfr-check. Need yes or no.])
+    ;;
+esac],
+enable_mpfr_check="yes")
+
+# NOTE: Maintainer level only. Avoids any sort of optimization to speed up
+# builds.
+AC_ARG_ENABLE(fast-build,[],
+[case $enableval in
+yes|no)
+    ;;
+*)
+    AC_MSG_ERROR([Bad value $enableval for --enable-fast-build. Need yes or no.])
+    ;;
+esac],
+enable_fast_build="no")
+
+################################################################################
+# packages
+################################################################################
+
+AC_ARG_WITH(gmp_include,
+[AS_HELP_STRING([--with-gmp-include=DIR],[GMP include directory])],
+CPPFLAGS="$CPPFLAGS -I$withval"
+gmp_include_path="$withval"
+)
+
+AC_ARG_WITH(gmp_lib,
+[AS_HELP_STRING([--with-gmp-lib=DIR],[GMP library directory])],
+LDFLAGS="$LDFLAGS -L$withval"
+gmp_lib_path="$withval"
+)
+
+AC_ARG_WITH(gmp,
+[AS_HELP_STRING([--with-gmp[[=DIR]]],[GMP install directory])],
+if test "$with_gmp" = "no";
+then
+    AC_MSG_FAILURE([The use of GMP is mandatory.])
+elif test "$with_gmp" = "yes";
+then
+    :
+elif test -z "$gmp_include_path" && test -z "$gmp_lib_path";
+then
+    CPPFLAGS="$CPPFLAGS -I$withval/include"
+    LDFLAGS="$LDFLAGS -L$withval/lib"
+    gmp_include_path="$withval/include"
+    gmp_lib_path="$withval/lib"
+    with_gmp="yes"
+else
+    AC_MSG_FAILURE([Cannot use --with-gmp along with --with-gmp-include or --with-gmp-lib.])
+fi,
+with_gmp="yes"
+)
+
+AC_ARG_WITH(mpfr_include,
+[AS_HELP_STRING([--with-mpfr-include=DIR],[MPFR include directory])],
+CPPFLAGS="$CPPFLAGS -I$withval"
+mpfr_include_path="$withval"
+)
+
+AC_ARG_WITH(mpfr_lib,
+[AS_HELP_STRING([--with-mpfr-lib=DIR],[MPFR library directory])],
+LDFLAGS="$LDFLAGS -L$withval"
+mpfr_lib_path="$withval"
+)
+
+AC_ARG_WITH(mpfr,
+[AS_HELP_STRING([--with-mpfr[[=DIR]]],[MPFR install directory])],
+if test "$with_mpfr" = "no";
+then
+    AC_MSG_FAILURE([The use of MPFR is mandatory.])
+elif test "$with_mpfr" = "yes";
+then
+    :
+elif test -z "$mpfr_include_path" && test -z "$mpfr_lib_path";
+then
+    CPPFLAGS="$CPPFLAGS -I$withval/include"
+    LDFLAGS="$LDFLAGS -L$withval/lib"
+    mpfr_include_path="$withval/include"
+    mpfr_lib_path="$withval/lib"
+    with_mpfr="yes"
+else
+    AC_MSG_FAILURE([Cannot use --with-mpfr along with --with-mpfr-include or --with-mpfr-lib.])
+fi,
+with_mpfr="yes"
+)
+
+AC_ARG_WITH(blas_include,
+[AS_HELP_STRING([--with-blas-include=DIR],[Use BLAS and specify its include directory])],
+CPPFLAGS="$CPPFLAGS -I$withval"
+blas_include_path="$withval"
+)
+
+AC_ARG_WITH(blas_lib,
+[AS_HELP_STRING([--with-blas-lib=DIR],[Use BLAS and specify its library directory])],
+LDFLAGS="$LDFLAGS -L$withval"
+blas_lib_path="$withval"
+)
+
+AC_ARG_WITH(blas,
+[AS_HELP_STRING([--with-blas[[=DIR]]],[Use BLAS and specify its install directory])],
+if test "$with_blas" = "yes";
+then
+    :
+elif test "$with_blas" = "no";
+then
+    if test -n "$blas_include_path" || test -n "$blas_lib_path";
+    then
+        AC_MSG_FAILURE([--with-blas-include or --with-blas-lib was specified but --with-blas=no.])
+    fi
+elif test -z "$blas_include_path" && test -z "$blas_lib_path";
+then
+    CPPFLAGS="$CPPFLAGS -I$withval/include"
+    LDFLAGS="$LDFLAGS -L$withval/lib"
+    blas_include_path="$withval/include"
+    blas_lib_path="$withval/lib"
+    with_blas="yes"
+else
+    AC_MSG_FAILURE([Cannot use --with-blas along with --with-blas-include or --with-blas-lib.])
+fi,
+with_blas="no"
+)
+
+if test "$with_blas" != "no" || test -n "$blas_include_path" || test -n "$blas_lib_path";
+then
+    with_blas="yes"
+fi
+
+AC_ARG_WITH(gc_include,
+[AS_HELP_STRING([--with-gc-include=DIR],[Use GC and specify its include directory])],
+CPPFLAGS="$CPPFLAGS -I$withval"
+gc_include_path="$withval",
+with_gc_include="no"
+)
+
+AC_ARG_WITH(gc_lib,
+[AS_HELP_STRING([--with-gc-lib=DIR],[Use GC and specify its library directory])],
+LDFLAGS="$LDFLAGS -L$withval"
+gc_lib_path="$withval",
+with_gc_lib="no"
+)
+
+AC_ARG_WITH(gc,
+[AS_HELP_STRING([--with-gc[[=DIR]]],[Use GC and optionally specify its install directory])],
+if test "$with_gc" = "yes";
+then
+    :
+elif test "$with_gc" = "no";
+then
+    if test -n "$gc_include_path" || test -n "$gc_lib_path";
+    then
+        AC_MSG_FAILURE([--with-gc-include or --with-gc-lib was specified but --with-gc=no.])
+    fi
+elif test -z "$gc_include_path" && test -z "$gc_lib_path";
+then
+    CPPFLAGS="$CPPFLAGS -I$withval/include"
+    LDFLAGS="$LDFLAGS -L$withval/lib"
+    gc_include_path="$withval/include"
+    gc_lib_path="$withval/lib"
+    with_gc="yes"
+else
+    AC_MSG_FAILURE([Cannot use --with-gc along with --with-gc-include or --with-gc-lib.])
+fi,
+with_gc="no"
+)
+
+if test "$with_gc" != "no" || test -n "$gc_include_path" || test -n "$gc_lib_path";
+then
+    with_gc="yes"
+fi
+
+AC_ARG_WITH(ntl_include,
+[AS_HELP_STRING([--with-ntl-include=DIR],[Use NTL (in tests) and specify its include directory])],
+CPPFLAGS="$CPPFLAGS -I$withval"
+ntl_include_path="$withval"
+)
+
+AC_ARG_WITH(ntl_lib,
+[AS_HELP_STRING([--with-ntl-lib=DIR],[Use NTL (in tests) and specify its library directory])],
+LDFLAGS="$LDFLAGS -L$withval"
+ntl_lib_path="$withval"
+)
+
+AC_ARG_WITH(ntl,
+[AS_HELP_STRING([--with-ntl[[=DIR]]],[Use NTL (in tests) and optionally specify its install directory])],
+if test "$with_ntl" = "yes";
+then
+    :
+elif test "$with_ntl" = "no";
+then
+    if test -n "$ntl_include_path" || test -n "$ntl_lib_path";
+    then
+        AC_MSG_FAILURE([--with-ntl-include or --with-ntl-lib was specified but --with-ntl=no.])
+    fi
+elif test -z "$ntl_include_path" && test -z "$ntl_lib_path";
+then
+    CPPFLAGS="$CPPFLAGS -I$withval/include"
+    LDFLAGS="$LDFLAGS -L$withval/lib"
+    ntl_include_path="$withval/include"
+    ntl_lib_path="$withval/lib"
+    with_ntl="yes"
+else
+    AC_MSG_FAILURE([Cannot use --with-ntl along with --with-ntl-include or --with-ntl-lib.])
+fi,
+with_ntl="no"
+)
+
+if test "$with_ntl" != "no" || test -n "$ntl_include_path" || test -n "$ntl_lib_path";
+then
+    with_ntl="yes"
+fi
+
+################################################################################
 # architecture specifics
 ################################################################################
 
-gcc_cflags="-O3 -pedantic -std=c11"
+if test "$enable_fast_build" = "no";
+then
+    gcc_cflags="-O3 "
+fi
+gcc_cflags="$gcc_cflags-pedantic -std=c11"
 gcc_warnings="-Werror=implicit-function-declaration -Wall -Wno-stringop-overread -Wno-stringop-overflow -Wno-maybe-uninitialized"
 
 dnl We only try to provide specifics for those systems that currently supports
@@ -450,359 +817,6 @@ Please report at <https://github.com/flintlib/flint/issues/>])
     ;;
 
 esac
-
-################################################################################
-# features
-################################################################################
-
-AC_ARG_ENABLE(pthread,
-[AS_HELP_STRING([--enable-pthread],[Enable pthread [default=yes]])],
-[case $enableval in
-yes|no)
-    ;;
-*)
-    AC_MSG_ERROR([Bad value $enableval for --enable-pthread. Need yes or no.])
-    ;;
-esac],
-enable_pthread="yes")
-
-AC_ARG_ENABLE(reentrant,
-[AS_HELP_STRING([--enable-reentrant],[Build reentrant version of library [default=no]])],
-[case $enableval in
-yes|no)
-    ;;
-*)
-    AC_MSG_ERROR([Bad value $enableval for --enable-reentrant. Need yes or no.])
-    ;;
-esac],
-enable_reentrant="no")
-
-# Synonym for thread-safe. Only here for say to users that it is deprecated.
-AC_ARG_ENABLE(tls)
-AC_ARG_ENABLE(thread-safe,
-[AS_HELP_STRING([--enable-thread-safe],[Enable thread-local storage [default=yes]])],
-[case $enableval in
-yes|no)
-    ;;
-*)
-    AC_MSG_ERROR([Bad value $enableval for --enable-tls. Need yes or no.])
-    ;;
-esac],
-enable_thread_safe="yes")
-
-if test -n "$enable_tls";
-then
-    AC_MSG_ERROR([--enable-tls is an old feature. Please use --enable-thread-safe instead.])
-fi
-
-AC_ARG_ENABLE(assert,
-[AS_HELP_STRING([--enable-assert],[Enable use of asserts [default=no]])],
-[case $enableval in
-yes|no)
-    ;;
-*)
-    AC_MSG_ERROR([Bad value $enableval for --enable-assert. Need yes or no.])
-    ;;
-esac],
-enable_assert="no")
-
-AC_ARG_ENABLE(coverage,
-[AS_HELP_STRING([--enable-coverage],[Enable test coverage [default=no]])],
-[case $enableval in
-yes|no)
-    ;;
-*)
-    AC_MSG_ERROR([Bad value $enableval for --enable-coverage. Need yes or no.])
-    ;;
-esac],
-enable_coverage="no")
-
-AC_ARG_ENABLE(debug,
-[AS_HELP_STRING([--enable-debug],[Compile FLINT with debug information [default=yes]])],
-[case $enableval in
-yes|no)
-    if test "$enableval" = "no" && test "$enable_coverage" = "yes";
-    then
-        AC_MSG_ERROR([Debug information is required by coverage.])
-    fi
-    ;;
-*)
-    AC_MSG_ERROR([Bad value $enableval for --enable-debug. Need yes or no.])
-    ;;
-esac],
-enable_debug="yes")
-
-AC_ARG_ENABLE(dependency-tracking,
-[AS_HELP_STRING([--enable-dependency-tracking],[Enable GCC automated dependency tracking [default=yes]])],
-[case $enableval in
-yes|no)
-    ;;
-*)
-    AC_MSG_ERROR([Bad value $enableval for --enable-dependency-tracking. Need yes or no.])
-    ;;
-esac],
-enable_dependency_tracking="yes")
-
-AC_ARG_ENABLE(pretty-tests,
-[AS_HELP_STRING([--enable-pretty-tests],[Enable pretty printing for tests [default=yes]])],
-[case $enableval in
-yes|no)
-    ;;
-*)
-    AC_MSG_ERROR([Bad value $enableval for --enable-pretty-tests. Need yes or no.])
-    ;;
-esac],
-enable_pretty_tests="yes")
-
-AC_ARG_ENABLE(gmp-internals,
-[AS_HELP_STRING([--enable-gmp-internals],[Enable calling GMP internals directly [default=yes]])],
-[case $enableval in
-yes|no)
-    ;;
-*)
-    AC_MSG_ERROR([Bad value $enableval for --enable-gmp-internals. Need yes or no.])
-    ;;
-esac],
-enable_gmp_internals="yes")
-
-AC_ARG_ENABLE(assembly,
-[AS_HELP_STRING([--enable-assembly],[Enable assembly routines (if available) [default=yes]])],
-[case $enableval in
-yes|no)
-    ;;
-*)
-    AC_MSG_ERROR([Bad value $enableval for --enable-assembly. Need yes or no.])
-    ;;
-esac],
-enable_assembly="yes")
-
-AC_ARG_ENABLE(avx2,
-[AS_HELP_STRING([--enable-avx2],[Enable AVX2 instructions [default=no]])],
-[case $enableval in
-yes|no)
-    ;;
-*)
-    AC_MSG_ERROR([Bad value $enableval for --enable-avx2. Need yes or no.])
-    ;;
-esac],
-enable_avx2="no")
-
-AC_ARG_ENABLE(avx512,
-[AS_HELP_STRING([--enable-avx512],[Enable AVX512 instructions [default=no]])],
-[case $enableval in
-yes|no)
-    ;;
-*)
-    AC_MSG_ERROR([Bad value $enableval for --enable-avx512. Need yes or no.])
-    ;;
-esac],
-enable_avx512="no")
-
-# Note: This is maintainer level only. Currently only used for Nemo CI.
-AC_ARG_ENABLE(mpfr-check,[],
-[case $enableval in
-yes|no)
-    ;;
-*)
-    AC_MSG_ERROR([Bad value $enableval for --enable-mpfr-check. Need yes or no.])
-    ;;
-esac],
-enable_mpfr_check="yes")
-
-################################################################################
-# packages
-################################################################################
-
-AC_ARG_WITH(gmp_include,
-[AS_HELP_STRING([--with-gmp-include=DIR],[GMP include directory])],
-CPPFLAGS="$CPPFLAGS -I$withval"
-gmp_include_path="$withval"
-)
-
-AC_ARG_WITH(gmp_lib,
-[AS_HELP_STRING([--with-gmp-lib=DIR],[GMP library directory])],
-LDFLAGS="$LDFLAGS -L$withval"
-gmp_lib_path="$withval"
-)
-
-AC_ARG_WITH(gmp,
-[AS_HELP_STRING([--with-gmp[[=DIR]]],[GMP install directory])],
-if test "$with_gmp" = "no";
-then
-    AC_MSG_FAILURE([The use of GMP is mandatory.])
-elif test "$with_gmp" = "yes";
-then
-    :
-elif test -z "$gmp_include_path" && test -z "$gmp_lib_path";
-then
-    CPPFLAGS="$CPPFLAGS -I$withval/include"
-    LDFLAGS="$LDFLAGS -L$withval/lib"
-    gmp_include_path="$withval/include"
-    gmp_lib_path="$withval/lib"
-    with_gmp="yes"
-else
-    AC_MSG_FAILURE([Cannot use --with-gmp along with --with-gmp-include or --with-gmp-lib.])
-fi,
-with_gmp="yes"
-)
-
-AC_ARG_WITH(mpfr_include,
-[AS_HELP_STRING([--with-mpfr-include=DIR],[MPFR include directory])],
-CPPFLAGS="$CPPFLAGS -I$withval"
-mpfr_include_path="$withval"
-)
-
-AC_ARG_WITH(mpfr_lib,
-[AS_HELP_STRING([--with-mpfr-lib=DIR],[MPFR library directory])],
-LDFLAGS="$LDFLAGS -L$withval"
-mpfr_lib_path="$withval"
-)
-
-AC_ARG_WITH(mpfr,
-[AS_HELP_STRING([--with-mpfr[[=DIR]]],[MPFR install directory])],
-if test "$with_mpfr" = "no";
-then
-    AC_MSG_FAILURE([The use of MPFR is mandatory.])
-elif test "$with_mpfr" = "yes";
-then
-    :
-elif test -z "$mpfr_include_path" && test -z "$mpfr_lib_path";
-then
-    CPPFLAGS="$CPPFLAGS -I$withval/include"
-    LDFLAGS="$LDFLAGS -L$withval/lib"
-    mpfr_include_path="$withval/include"
-    mpfr_lib_path="$withval/lib"
-    with_mpfr="yes"
-else
-    AC_MSG_FAILURE([Cannot use --with-mpfr along with --with-mpfr-include or --with-mpfr-lib.])
-fi,
-with_mpfr="yes"
-)
-
-AC_ARG_WITH(blas_include,
-[AS_HELP_STRING([--with-blas-include=DIR],[Use BLAS and specify its include directory])],
-CPPFLAGS="$CPPFLAGS -I$withval"
-blas_include_path="$withval"
-)
-
-AC_ARG_WITH(blas_lib,
-[AS_HELP_STRING([--with-blas-lib=DIR],[Use BLAS and specify its library directory])],
-LDFLAGS="$LDFLAGS -L$withval"
-blas_lib_path="$withval"
-)
-
-AC_ARG_WITH(blas,
-[AS_HELP_STRING([--with-blas[[=DIR]]],[Use BLAS and specify its install directory])],
-if test "$with_blas" = "yes";
-then
-    :
-elif test "$with_blas" = "no";
-then
-    if test -n "$blas_include_path" || test -n "$blas_lib_path";
-    then
-        AC_MSG_FAILURE([--with-blas-include or --with-blas-lib was specified but --with-blas=no.])
-    fi
-elif test -z "$blas_include_path" && test -z "$blas_lib_path";
-then
-    CPPFLAGS="$CPPFLAGS -I$withval/include"
-    LDFLAGS="$LDFLAGS -L$withval/lib"
-    blas_include_path="$withval/include"
-    blas_lib_path="$withval/lib"
-    with_blas="yes"
-else
-    AC_MSG_FAILURE([Cannot use --with-blas along with --with-blas-include or --with-blas-lib.])
-fi,
-with_blas="no"
-)
-
-if test "$with_blas" != "no" || test -n "$blas_include_path" || test -n "$blas_lib_path";
-then
-    with_blas="yes"
-fi
-
-AC_ARG_WITH(gc_include,
-[AS_HELP_STRING([--with-gc-include=DIR],[Use GC and specify its include directory])],
-CPPFLAGS="$CPPFLAGS -I$withval"
-gc_include_path="$withval",
-with_gc_include="no"
-)
-
-AC_ARG_WITH(gc_lib,
-[AS_HELP_STRING([--with-gc-lib=DIR],[Use GC and specify its library directory])],
-LDFLAGS="$LDFLAGS -L$withval"
-gc_lib_path="$withval",
-with_gc_lib="no"
-)
-
-AC_ARG_WITH(gc,
-[AS_HELP_STRING([--with-gc[[=DIR]]],[Use GC and optionally specify its install directory])],
-if test "$with_gc" = "yes";
-then
-    :
-elif test "$with_gc" = "no";
-then
-    if test -n "$gc_include_path" || test -n "$gc_lib_path";
-    then
-        AC_MSG_FAILURE([--with-gc-include or --with-gc-lib was specified but --with-gc=no.])
-    fi
-elif test -z "$gc_include_path" && test -z "$gc_lib_path";
-then
-    CPPFLAGS="$CPPFLAGS -I$withval/include"
-    LDFLAGS="$LDFLAGS -L$withval/lib"
-    gc_include_path="$withval/include"
-    gc_lib_path="$withval/lib"
-    with_gc="yes"
-else
-    AC_MSG_FAILURE([Cannot use --with-gc along with --with-gc-include or --with-gc-lib.])
-fi,
-with_gc="no"
-)
-
-if test "$with_gc" != "no" || test -n "$gc_include_path" || test -n "$gc_lib_path";
-then
-    with_gc="yes"
-fi
-
-AC_ARG_WITH(ntl_include,
-[AS_HELP_STRING([--with-ntl-include=DIR],[Use NTL (in tests) and specify its include directory])],
-CPPFLAGS="$CPPFLAGS -I$withval"
-ntl_include_path="$withval"
-)
-
-AC_ARG_WITH(ntl_lib,
-[AS_HELP_STRING([--with-ntl-lib=DIR],[Use NTL (in tests) and specify its library directory])],
-LDFLAGS="$LDFLAGS -L$withval"
-ntl_lib_path="$withval"
-)
-
-AC_ARG_WITH(ntl,
-[AS_HELP_STRING([--with-ntl[[=DIR]]],[Use NTL (in tests) and optionally specify its install directory])],
-if test "$with_ntl" = "yes";
-then
-    :
-elif test "$with_ntl" = "no";
-then
-    if test -n "$ntl_include_path" || test -n "$ntl_lib_path";
-    then
-        AC_MSG_FAILURE([--with-ntl-include or --with-ntl-lib was specified but --with-ntl=no.])
-    fi
-elif test -z "$ntl_include_path" && test -z "$ntl_lib_path";
-then
-    CPPFLAGS="$CPPFLAGS -I$withval/include"
-    LDFLAGS="$LDFLAGS -L$withval/lib"
-    ntl_include_path="$withval/include"
-    ntl_lib_path="$withval/lib"
-    with_ntl="yes"
-else
-    AC_MSG_FAILURE([Cannot use --with-ntl along with --with-ntl-include or --with-ntl-lib.])
-fi,
-with_ntl="no"
-)
-
-if test "$with_ntl" != "no" || test -n "$ntl_include_path" || test -n "$ntl_lib_path";
-then
-    with_ntl="yes"
-fi
 
 ################################################################################
 # programs
@@ -1248,7 +1262,10 @@ then
             fi
         done
     done
-    AX_CHECK_COMPILE_FLAG([-funroll-loops],[unroll_loops="yes"])
+    if test "$enable_fast_build" = no;
+    then
+        AX_CHECK_COMPILE_FLAG([-funroll-loops],[unroll_loops="yes"])
+    fi
     if test "$unroll_loops" = "yes";
     then
         AC_SUBST(UNROLL_LOOPS,1)
