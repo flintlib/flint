@@ -477,8 +477,6 @@ yes|no)
 esac],
 enable_reentrant="no")
 
-# Synonym for thread-safe. Only here for say to users that it is deprecated.
-AC_ARG_ENABLE(tls)
 AC_ARG_ENABLE(thread-safe,
 [AS_HELP_STRING([--enable-thread-safe],[Enable thread-local storage [default=yes]])],
 [case $enableval in
