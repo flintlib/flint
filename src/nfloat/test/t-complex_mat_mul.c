@@ -17,7 +17,7 @@
 int
 nfloat_complex_mat_mul_block1(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 {
-    return nfloat_complex_mat_mul_block(C, A, B, 1, ctx);
+    return nfloat_complex_mat_mul_block(C, A, B, 2, ctx);
 }
 
 TEST_FUNCTION_START(complex_mat_mul, state)
