@@ -57,9 +57,6 @@ void gr_mat_test_approx_mul_max_norm(gr_method_mat_binary_op mul_impl, gr_srcptr
 
         status |= gr_mat_randtest(A, state, ctx);
         status |= gr_mat_randtest(B, state, ctx);
-        status |= gr_mat_entrywise_unary_op(A, (gr_method_unary_op) gr_abs, A, ctx);
-        status |= gr_mat_entrywise_unary_op(B, (gr_method_unary_op) gr_abs, B, ctx);
-
         status |= gr_mat_randtest(C, state, ctx);
         status |= gr_mat_randtest(D, state, ctx);
 
