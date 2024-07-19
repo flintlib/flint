@@ -1792,8 +1792,8 @@ gr_method_tab_input _nfloat_complex_methods_input[] =
 /*
     {GR_METHOD_POLY_MULLOW,     (gr_funcptr) nfloat_complex_poly_mullow},
     {GR_METHOD_POLY_ROOTS_OTHER,(gr_funcptr) nfloat_complex_poly_roots_other},
-    {GR_METHOD_MAT_MUL,         (gr_funcptr) nfloat_complex_mat_mul},
 */
+    {GR_METHOD_MAT_MUL,         (gr_funcptr) nfloat_complex_mat_mul},
     {GR_METHOD_MAT_DET,         (gr_funcptr) gr_mat_det_generic_field},
     {GR_METHOD_MAT_FIND_NONZERO_PIVOT,     (gr_funcptr) gr_mat_find_nonzero_pivot_large_abs},
 
