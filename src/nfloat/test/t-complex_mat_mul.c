@@ -58,12 +58,9 @@ TEST_FUNCTION_START(complex_mat_mul, state)
             tol, state, (prec <= 256) ? 10 : 1,
                         (prec <= 256) ? 40 : 20, ctx);
 
-/*
-        if (n_randint(state, 4) == 0)
-            gr_mat_test_approx_mul_max_norm(
-                (gr_method_mat_binary_op) nfloat_complex_mat_mul,
-                tol, state, 1, 120, ctx);
-*/
+        gr_mat_test_approx_mul_max_norm(
+            (gr_method_mat_binary_op) nfloat_complex_mat_mul,
+            tol, state, 1, 120, ctx);
 
         gr_heap_clear(tol, ctx);
         gr_ctx_clear(ctx);
