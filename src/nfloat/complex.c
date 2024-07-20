@@ -15,6 +15,7 @@
 #include "gr_generic.h"
 #include "acf.h"
 #include "acb.h"
+#include "mag.h"
 #include "nfloat.h"
 
 static int
@@ -1542,17 +1543,141 @@ nfloat_complex_cmp(int * res, nfloat_complex_srcptr x, nfloat_complex_srcptr y, 
     return nfloat_cmp(res, NFLOAT_COMPLEX_RE(x, ctx), NFLOAT_COMPLEX_RE(y, ctx), ctx);
 }
 
+#include "double_extras.h"
+
 int
 nfloat_complex_cmpabs(int * res, nfloat_complex_srcptr x, nfloat_complex_srcptr y, gr_ctx_t ctx)
 {
+    nfloat_srcptr a, b, c, d;
+    slong aexp, bexp, cexp, dexp, xexp, yexp, exp;
+    slong xn = NFLOAT_CTX_NLIMBS(ctx);
+
     if (NFLOAT_CTX_HAS_INF_NAN(ctx))
         return GR_UNABLE;
 
-    if (!NFLOAT_IS_ZERO(NFLOAT_COMPLEX_IM(x, ctx)) ||
-        !NFLOAT_IS_ZERO(NFLOAT_COMPLEX_IM(y, ctx)))
-        return GR_UNABLE;
+    a = NFLOAT_COMPLEX_RE(x, ctx);
+    b = NFLOAT_COMPLEX_IM(x, ctx);
+    c = NFLOAT_COMPLEX_RE(y, ctx);
+    d = NFLOAT_COMPLEX_IM(y, ctx);
 
-    return nfloat_cmpabs(res, NFLOAT_COMPLEX_RE(x, ctx), NFLOAT_COMPLEX_RE(y, ctx), ctx);
+    if (NFLOAT_IS_ZERO(b))
+    {
+        if (NFLOAT_IS_ZERO(d))
+            return nfloat_cmpabs(res, a, c, ctx);
+        if (NFLOAT_IS_ZERO(c))
+            return nfloat_cmpabs(res, a, d, ctx);
+        if (NFLOAT_IS_ZERO(a))
+        {
+            *res = -1;
+            return GR_SUCCESS;
+        }
+    }
+
+    if (NFLOAT_IS_ZERO(a))
+    {
+        if (NFLOAT_IS_ZERO(d))
+            return nfloat_cmpabs(res, b, c, ctx);
+        if (NFLOAT_IS_ZERO(c))
+            return nfloat_cmpabs(res, b, d, ctx);
+    }
+
+    if (NFLOAT_IS_ZERO(c) && NFLOAT_IS_ZERO(d))
+    {
+        *res = 1;
+        return GR_SUCCESS;
+    }
+
+    aexp = NFLOAT_EXP(a);
+    bexp = NFLOAT_EXP(b);
+    cexp = NFLOAT_EXP(c);
+    dexp = NFLOAT_EXP(d);
+
+    /* 0.5 * 2^xexp <= |x| < sqrt(2) * 2^xexp */
+    xexp = FLINT_MAX(aexp, bexp);
+    /* 0.5 * 2^yexp <= |y| < sqrt(2) * 2^yexp */
+    yexp = FLINT_MAX(cexp, dexp);
+
+    if (xexp + 2 < yexp)
+    {
+        *res = -1;
+        return GR_SUCCESS;
+    }
+
+    if (xexp > yexp + 2)
+    {
+        *res = 1;
+        return GR_SUCCESS;
+    }
+
+    exp = FLINT_MAX(xexp, yexp);
+
+    double tt, xx = 0.0, yy = 0.0;
+
+    if (aexp >= exp - 53)
+    {
+        tt = d_mul_2exp_inrange(NFLOAT_D(a)[xn - 1], aexp - exp - FLINT_BITS);
+        xx += tt * tt;
+    }
+
+    if (bexp >= exp - 53)
+    {
+        tt = d_mul_2exp_inrange(NFLOAT_D(b)[xn - 1], bexp - exp - FLINT_BITS);
+        xx += tt * tt;
+    }
+
+    if (cexp >= exp - 53)
+    {
+        tt = d_mul_2exp_inrange(NFLOAT_D(c)[xn - 1], cexp - exp - FLINT_BITS);
+        yy += tt * tt;
+    }
+
+    if (dexp >= exp - 53)
+    {
+        tt = d_mul_2exp_inrange(NFLOAT_D(d)[xn - 1], dexp - exp - FLINT_BITS);
+        yy += tt * tt;
+    }
+
+    if (xx < yy * 0.999999)
+    {
+        *res = -1;
+        return GR_SUCCESS;
+    }
+
+    if (xx * 0.999999 > yy)
+    {
+        *res = 1;
+        return GR_SUCCESS;
+    }
+
+    arf_struct s[5];
+
+    arf_init(s + 0);
+    arf_init(s + 1);
+    arf_init(s + 2);
+    arf_init(s + 3);
+    arf_init(s + 4);
+
+    nfloat_get_arf(s + 0, a, ctx);
+    nfloat_get_arf(s + 1, b, ctx);
+    nfloat_get_arf(s + 2, c, ctx);
+    nfloat_get_arf(s + 3, d, ctx);
+
+    arf_mul(s + 0, s + 0, s + 0, ARF_PREC_EXACT, ARF_RND_DOWN);
+    arf_mul(s + 1, s + 1, s + 1, ARF_PREC_EXACT, ARF_RND_DOWN);
+    arf_mul(s + 2, s + 2, s + 2, ARF_PREC_EXACT, ARF_RND_DOWN);
+    arf_mul(s + 3, s + 3, s + 3, ARF_PREC_EXACT, ARF_RND_DOWN);
+    arf_neg(s + 2, s + 2);
+    arf_neg(s + 3, s + 3);
+    arf_sum(s + 4, s, 4, 30, ARF_RND_DOWN);
+    *res = arf_sgn(s + 4);
+
+    arf_clear(s + 0);
+    arf_clear(s + 1);
+    arf_clear(s + 2);
+    arf_clear(s + 3);
+    arf_clear(s + 4);
+
+    return GR_SUCCESS;
 }
 
 int
@@ -1794,6 +1919,9 @@ gr_method_tab_input _nfloat_complex_methods_input[] =
     {GR_METHOD_POLY_ROOTS_OTHER,(gr_funcptr) nfloat_complex_poly_roots_other},
 */
     {GR_METHOD_MAT_MUL,         (gr_funcptr) nfloat_complex_mat_mul},
+    {GR_METHOD_MAT_NONSINGULAR_SOLVE_TRIL,  (gr_funcptr) nfloat_complex_mat_nonsingular_solve_tril},
+    {GR_METHOD_MAT_NONSINGULAR_SOLVE_TRIU,  (gr_funcptr) nfloat_complex_mat_nonsingular_solve_triu},
+    {GR_METHOD_MAT_LU,                      (gr_funcptr) nfloat_complex_mat_lu},
     {GR_METHOD_MAT_DET,         (gr_funcptr) gr_mat_det_generic_field},
     {GR_METHOD_MAT_FIND_NONZERO_PIVOT,     (gr_funcptr) gr_mat_find_nonzero_pivot_large_abs},
 

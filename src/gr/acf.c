@@ -666,13 +666,144 @@ _gr_acf_cmp(int * res, const acf_t x, const acf_t y, const gr_ctx_t ctx)
     return GR_SUCCESS;
 }
 
+/* ignores ctx, so we can pass in the acf context */
+int
+_gr_arf_cmpabs(int * res, const arf_t x, const arf_t y, const gr_ctx_t ctx);
+
+#include "double_extras.h"
+
 int
 _gr_acf_cmpabs(int * res, const acf_t x, const acf_t y, const gr_ctx_t ctx)
 {
-    if (!arf_is_zero(acf_imagref(x)) || !arf_is_zero(acf_imagref(y)))
-        return GR_UNABLE;
+    arf_srcptr a = acf_realref(x);
+    arf_srcptr b = acf_imagref(x);
+    arf_srcptr c = acf_realref(y);
+    arf_srcptr d = acf_imagref(y);
 
-    *res = arf_cmpabs(acf_realref(x), acf_realref(y));
+    if (arf_is_zero(b))
+    {
+        if (arf_is_zero(d))
+            return _gr_arf_cmpabs(res, a, c, ctx);
+        if (arf_is_zero(c))
+            return _gr_arf_cmpabs(res, a, d, ctx);
+        if (arf_is_zero(a))
+        {
+            *res = -1;
+            return GR_SUCCESS;
+        }
+    }
+
+    if (arf_is_zero(a))
+    {
+        if (arf_is_zero(d))
+            return _gr_arf_cmpabs(res, b, c, ctx);
+        if (arf_is_zero(c))
+            return _gr_arf_cmpabs(res, b, d, ctx);
+    }
+
+    if (arf_is_zero(c) && arf_is_zero(d))
+    {
+        *res = 1;
+        return GR_SUCCESS;
+    }
+
+    if (ARF_IS_LAGOM(a) && ARF_IS_LAGOM(b) && ARF_IS_LAGOM(c) && ARF_IS_LAGOM(d))
+    {
+        slong aexp, bexp, cexp, dexp, xexp, yexp, exp;
+
+        aexp = arf_is_zero(a) ? WORD_MIN : ARF_EXP(a);
+        bexp = arf_is_zero(b) ? WORD_MIN : ARF_EXP(b);
+        cexp = arf_is_zero(c) ? WORD_MIN : ARF_EXP(c);
+        dexp = arf_is_zero(d) ? WORD_MIN : ARF_EXP(d);
+
+        /* 0.5 * 2^xexp <= |x| < sqrt(2) * 2^xexp */
+        xexp = FLINT_MAX(aexp, bexp);
+        /* 0.5 * 2^yexp <= |y| < sqrt(2) * 2^yexp */
+        yexp = FLINT_MAX(cexp, dexp);
+
+        if (xexp + 2 < yexp)
+        {
+            *res = -1;
+            return GR_SUCCESS;
+        }
+
+        if (xexp > yexp + 2)
+        {
+            *res = 1;
+            return GR_SUCCESS;
+        }
+
+        exp = FLINT_MAX(xexp, yexp);
+
+        double tt, xx = 0.0, yy = 0.0;
+        nn_srcptr xp;
+        slong xn;
+
+        if (aexp >= exp - 53)
+        {
+            ARF_GET_MPN_READONLY(xp, xn, a);
+            tt = d_mul_2exp_inrange(xp[xn - 1], aexp - exp - FLINT_BITS);
+            xx += tt * tt;
+        }
+
+        if (bexp >= exp - 53)
+        {
+            ARF_GET_MPN_READONLY(xp, xn, b);
+            tt = d_mul_2exp_inrange(xp[xn - 1], bexp - exp - FLINT_BITS);
+            xx += tt * tt;
+        }
+
+        if (cexp >= exp - 53)
+        {
+            ARF_GET_MPN_READONLY(xp, xn, c);
+            tt = d_mul_2exp_inrange(xp[xn - 1], cexp - exp - FLINT_BITS);
+            yy += tt * tt;
+        }
+
+        if (dexp >= exp - 53)
+        {
+            ARF_GET_MPN_READONLY(xp, xn, d);
+            tt = d_mul_2exp_inrange(xp[xn - 1], dexp - exp - FLINT_BITS);
+            yy += tt * tt;
+        }
+
+        if (xx < yy * 0.999999)
+        {
+            *res = -1;
+            return GR_SUCCESS;
+        }
+
+        if (xx * 0.999999 > yy)
+        {
+            *res = 1;
+            return GR_SUCCESS;
+        }
+    }
+
+    arf_struct s[5];
+
+    arf_init(s + 0);
+    arf_init(s + 1);
+    arf_init(s + 2);
+    arf_init(s + 3);
+    arf_init(s + 4);
+
+    arf_mul(s + 0, a, a, ARF_PREC_EXACT, ARF_RND_DOWN);
+    arf_mul(s + 1, b, b, ARF_PREC_EXACT, ARF_RND_DOWN);
+    arf_mul(s + 2, c, c, ARF_PREC_EXACT, ARF_RND_DOWN);
+    arf_mul(s + 3, d, d, ARF_PREC_EXACT, ARF_RND_DOWN);
+    arf_neg(s + 2, s + 2);
+    arf_neg(s + 3, s + 3);
+    arf_sum(s + 4, s, 4, 30, ARF_RND_DOWN);
+
+    *res = arf_sgn(s + 4);
+
+    arf_clear(s + 0);
+    arf_clear(s + 1);
+    arf_clear(s + 2);
+    arf_clear(s + 3);
+    arf_clear(s + 4);
+
     return GR_SUCCESS;
 }
 

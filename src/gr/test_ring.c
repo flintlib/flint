@@ -2904,7 +2904,7 @@ gr_test_ordered_ring_cmpabs(gr_ctx_t R, flint_rand_t state, int test_flags)
         status = GR_TEST_FAIL;
     }
 
-    if (status & GR_DOMAIN && !(status & GR_UNABLE))
+    if (gr_ctx_is_ordered_ring(R) == T_TRUE && (status & GR_DOMAIN && !(status & GR_UNABLE)))
     {
         status = GR_TEST_FAIL;
     }
@@ -4315,10 +4315,9 @@ gr_test_ring(gr_ctx_t R, slong iters, int test_flags)
     gr_test_iter(R, state, "pow: ui/si/fmpz/fmpq", gr_test_pow_type_variants, iters, test_flags & (~GR_TEST_ALWAYS_ABLE));
 
     if (gr_ctx_is_ordered_ring(R) == T_TRUE)
-    {
         gr_test_iter(R, state, "ordered_ring_cmp", gr_test_ordered_ring_cmp, iters, test_flags);
-        gr_test_iter(R, state, "ordered_ring_cmpabs", gr_test_ordered_ring_cmpabs, iters, test_flags);
-    }
+
+    gr_test_iter(R, state, "ordered_ring_cmpabs", gr_test_ordered_ring_cmpabs, iters, test_flags);
 
     gr_test_iter(R, state, "numerator_denominator", gr_test_numerator_denominator, iters, test_flags);
     gr_test_iter(R, state, "complex_parts", gr_test_complex_parts, iters, test_flags);
