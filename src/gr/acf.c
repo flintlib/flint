@@ -686,6 +686,11 @@ _gr_acf_cmpabs(int * res, const acf_t x, const acf_t y, const gr_ctx_t ctx)
             return _gr_arf_cmpabs(res, a, c, ctx);
         if (arf_is_zero(c))
             return _gr_arf_cmpabs(res, a, d, ctx);
+        if (arf_is_zero(a))
+        {
+            *res = -1;
+            return GR_SUCCESS;
+        }
     }
 
     if (arf_is_zero(a))
@@ -696,20 +701,10 @@ _gr_acf_cmpabs(int * res, const acf_t x, const acf_t y, const gr_ctx_t ctx)
             return _gr_arf_cmpabs(res, b, d, ctx);
     }
 
-    if (arf_is_zero(c))
+    if (arf_is_zero(c) && arf_is_zero(d))
     {
-        if (arf_is_zero(a))
-            return _gr_arf_cmpabs(res, b, d, ctx);
-        if (arf_is_zero(b))
-            return _gr_arf_cmpabs(res, a, d, ctx);
-    }
-
-    if (arf_is_zero(d))
-    {
-        if (arf_is_zero(a))
-            return _gr_arf_cmpabs(res, b, c, ctx);
-        if (arf_is_zero(b))
-            return _gr_arf_cmpabs(res, a, c, ctx);
+        *res = 1;
+        return GR_SUCCESS;
     }
 
     if (ARF_IS_LAGOM(a) && ARF_IS_LAGOM(b) && ARF_IS_LAGOM(c) && ARF_IS_LAGOM(d))

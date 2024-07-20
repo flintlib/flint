@@ -1566,6 +1566,11 @@ nfloat_complex_cmpabs(int * res, nfloat_complex_srcptr x, nfloat_complex_srcptr 
             return nfloat_cmpabs(res, a, c, ctx);
         if (NFLOAT_IS_ZERO(c))
             return nfloat_cmpabs(res, a, d, ctx);
+        if (NFLOAT_IS_ZERO(a))
+        {
+            *res = -1;
+            return GR_SUCCESS;
+        }
     }
 
     if (NFLOAT_IS_ZERO(a))
@@ -1576,20 +1581,10 @@ nfloat_complex_cmpabs(int * res, nfloat_complex_srcptr x, nfloat_complex_srcptr 
             return nfloat_cmpabs(res, b, d, ctx);
     }
 
-    if (NFLOAT_IS_ZERO(c))
+    if (NFLOAT_IS_ZERO(c) && NFLOAT_IS_ZERO(d))
     {
-        if (NFLOAT_IS_ZERO(a))
-            return nfloat_cmpabs(res, b, d, ctx);
-        if (NFLOAT_IS_ZERO(b))
-            return nfloat_cmpabs(res, a, d, ctx);
-    }
-
-    if (NFLOAT_IS_ZERO(d))
-    {
-        if (NFLOAT_IS_ZERO(a))
-            return nfloat_cmpabs(res, b, c, ctx);
-        if (NFLOAT_IS_ZERO(b))
-            return nfloat_cmpabs(res, a, c, ctx);
+        *res = 1;
+        return GR_SUCCESS;
     }
 
     aexp = NFLOAT_EXP(a);
