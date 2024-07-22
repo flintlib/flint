@@ -298,6 +298,23 @@ then
     fi
     echo "PASS"
     exit 0
+elif test "$1" = "aliquot";
+then
+    echo -n "aliquot...."
+    res=$($2/aliquot)
+    if test "$?" != "0";
+    then
+        echo "FAIL"
+        exit 1
+    fi
+    echo "$res" | perl -0ne 'if (/\b117 : 179931895322\b/) { $found=1; last } END { exit !$found }'
+    if test "$?" != "0";
+    then
+        echo "FAIL"
+        exit 2
+    fi
+    echo "PASS"
+    exit 0
 else
     exit 3
 fi
