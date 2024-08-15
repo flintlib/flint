@@ -12,8 +12,8 @@
 #include "test_helpers.h"
 #include "fq_default_poly.h"
 
-/// Given a fq_default_ctx, compute two random polynomials f1, f2 and a 
-/// random element a, and ensure f1(a) * f2(b) == (f1 * f2)(a).
+/* Given a fq_default_ctx, compute two random polynomials f1, f2 and a 
+   random element a, and ensure f1(a) * f2(b) == (f1 * f2)(a). */
 void
 test_eval_with_ctx(fq_default_ctx_t ctx,
                    flint_rand_t state)
@@ -51,6 +51,7 @@ test_eval_with_ctx(fq_default_ctx_t ctx,
         if (!result)
         {
             flint_printf("FAIL:\n");
+            fq_default_ctx_print(ctx), flint_printf("\n\n");
             fq_default_poly_print(f1, ctx), flint_printf("\n\n");
             fq_default_poly_print(f2, ctx), flint_printf("\n\n");
             fq_default_poly_print(f3, ctx), flint_printf("\n\n");
@@ -80,37 +81,37 @@ TEST_FUNCTION_START(fq_default_poly_evaluate, state)
     fmpz_init(p);
 
     /* Repeat the whole test 10 times to capture different degrees */
-    for (i = 0; i < 10; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
-        /* Test FQ_ZECH type with GF(3^k), k < 12 */
-        k = n_randint(state, 12);
-        fmpz_set_ui(p, 3);
-        fq_default_ctx_init_type(ctx, p, k, "x", 1);
+        /* GF(p^k) with p, k chosen so the type is likely to be FQ_ZECH */
+        k = n_randint(state, 7);
+        fmpz_randprime(p, state, 7, 0);
+        fq_default_ctx_init(ctx, p, k, "x");
         test_eval_with_ctx(ctx, state);
         fq_default_ctx_clear(ctx);
 
-        /* Test FQ_NMOD type with GF(163^k), k < 8  */
-        k = n_randint(state, 8);
-        fmpz_set_ui(p, 163);
-        fq_default_ctx_init_type(ctx, p, 3, "x", 2);
+        /* GF(p^k) with p, k chosen so the type is likely to be FQ_NMOD */
+        k = n_randint(state, 16);
+        fmpz_randprime(p, state, 30, 0);
+        fq_default_ctx_init(ctx, p, k, "x");
         test_eval_with_ctx(ctx, state);
         fq_default_ctx_clear(ctx);
 
-        /* Test FQ type with GF((2^127 - 1)^k), k < 8 */
-        k = n_randint(state, 8);
-        fmpz_set_str(p, "170141183460469231731687303715884105727", 10);
-        fq_default_ctx_init_type(ctx, p, 2, "x", 3);
+        /* Test FQ type with GF(p^k) */
+        k = n_randint(state, 16);
+        fmpz_randprime(p, state, 80, 0);
+        fq_default_ctx_init_type(ctx, p, k, "x", 3);
         test_eval_with_ctx(ctx, state);
         fq_default_ctx_clear(ctx);
 
-        /* Test NMOD type with GF(65537) */
-        fmpz_set_ui(p, 65537);
+        /* Test NMOD type with GF(p) */
+        fmpz_randprime(p, state, 30, 0);
         fq_default_ctx_init_type(ctx, p, 1, "x", 4);
         test_eval_with_ctx(ctx, state);
         fq_default_ctx_clear(ctx);
 
-        /* Test FMPZ_MOD type with GF(2^127 - 1) */
-        fmpz_set_str(p, "170141183460469231731687303715884105727", 10);
+        /* Test FMPZ_MOD type with GF(p) */
+        fmpz_randprime(p, state, 80, 0);
         fq_default_ctx_init_type(ctx, p, 1, "x", 5);
         test_eval_with_ctx(ctx, state);
         fq_default_ctx_clear(ctx);
