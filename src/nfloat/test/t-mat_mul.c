@@ -27,6 +27,24 @@ TEST_FUNCTION_START(mat_mul, state)
     slong iter;
     gr_ptr tol;
 
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
+    {
+        prec = 64;
+
+        nfloat_ctx_init(ctx, prec, 0);
+
+        tol = gr_heap_init(ctx);
+        GR_MUST_SUCCEED(gr_one(tol, ctx));
+        GR_MUST_SUCCEED(gr_mul_2exp_si(tol, tol, -prec + 2, ctx));
+
+        gr_mat_test_approx_mul_max_norm(
+            (gr_method_mat_binary_op) nfloat_mat_mul_fixed_classical,
+            tol, state, 10, 10, ctx);
+
+        gr_heap_clear(tol, ctx);
+        gr_ctx_clear(ctx);
+    }
+
     for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
         if (n_randint(state, 5))
