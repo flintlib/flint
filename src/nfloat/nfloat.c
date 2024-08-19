@@ -17,64 +17,6 @@
 #include "gr_generic.h"
 #include "gr_special.h"
 
-/* todo: define in longlong.h */
-#if FLINT_BITS == 64 && defined(__GNUC__) && defined(__AVX2__)
-
-#define add_sssssaaaaaaaaaa(s4,s3,s2,s1,s0, a4,a3,a2,a1,a0, b4,b3,b2,b1,b0)  \
-  __asm__ ("addq %14,%q4\n\tadcq %12,%q3\n\tadcq %10,%q2\n\tadcq %8,%q1\n\tadcq %6,%q0"    \
-       : "=r" (s4), "=&r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                    \
-       : "0"  ((ulong)(a4)), "rme" ((ulong)(b4)),                 \
-         "1"  ((ulong)(a3)), "rme" ((ulong)(b3)),                 \
-         "2"  ((ulong)(a2)), "rme" ((ulong)(b2)),                 \
-         "3"  ((ulong)(a1)), "rme" ((ulong)(b1)),                 \
-         "4"  ((ulong)(a0)), "rme" ((ulong)(b0)))
-
-
-#define sub_ddddmmmmssss(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0)  \
-  __asm__ ("subq %11,%q3\n\tsbbq %9,%q2\n\tsbbq %7,%q1\n\tsbbq %5,%q0"    \
-       : "=r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                    \
-       : "0"  ((ulong)(a3)), "rme" ((ulong)(b3)),                 \
-         "1"  ((ulong)(a2)), "rme" ((ulong)(b2)),                 \
-         "2"  ((ulong)(a1)), "rme" ((ulong)(b1)),                 \
-         "3"  ((ulong)(a0)), "rme" ((ulong)(b0)))
-
-#define sub_dddddmmmmmsssss(s4,s3,s2,s1,s0, a4,a3,a2,a1,a0, b4,b3,b2,b1,b0)  \
-  __asm__ ("subq %14,%q4\n\tsbbq %12,%q3\n\tsbbq %10,%q2\n\tsbbq %8,%q1\n\tsbbq %6,%q0"    \
-       : "=r" (s4), "=&r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0)                    \
-       : "0"  ((ulong)(a4)), "rme" ((ulong)(b4)),                 \
-         "1"  ((ulong)(a3)), "rme" ((ulong)(b3)),                 \
-         "2"  ((ulong)(a2)), "rme" ((ulong)(b2)),                 \
-         "3"  ((ulong)(a1)), "rme" ((ulong)(b1)),                 \
-         "4"  ((ulong)(a0)), "rme" ((ulong)(b0)))
-#else
-
-#define add_sssssaaaaaaaaaa(s4, s3, s2, s1, s0, a4, a3, a2, a1, a0, b4, b3, b2, b1, b0)         \
-  do {                                                                                          \
-    ulong __t0 = 0;                                                                         \
-    add_ssssaaaaaaaa(__t0, s2, s1, s0, (ulong) 0, a2, a1, a0, (ulong) 0, b2, b1, b0);   \
-    add_ssaaaa(s4, s3, a4, a3, b4, b3);                                                         \
-    add_ssaaaa(s4, s3, s4, s3, (ulong) 0, __t0);                                            \
-  } while (0)
-
-
-#define sub_ddddmmmmssss(s3, s2, s1, s0, a3, a2, a1, a0, b3, b2, b1, b0)        \
-  do {                                                                          \
-    ulong __t1, __u1;                                                       \
-    sub_dddmmmsss(__t1, s1, s0, (ulong) 0, a1, a0, (ulong) 0, b1, b0);  \
-    sub_ddmmss(__u1, s2, (ulong) 0, a2, (ulong) 0, b2);                 \
-    sub_ddmmss(s3, s2, (a3) - (b3), s2, -__u1, -__t1);                          \
-  } while (0)
-
-#define sub_dddddmmmmmsssss(s4, s3, s2, s1, s0, a4, a3, a2, a1, a0, b4, b3, b2, b1, b0)         \
-  do {                                                                                          \
-    ulong __t2, __u2;                                                                       \
-    sub_ddddmmmmssss(__t2, s2, s1, s0, (ulong) 0, a2, a1, a0, (ulong) 0, b2, b1, b0);   \
-    sub_ddmmss(__u2, s3, (ulong) 0, a3, (ulong) 0, b3);                                 \
-    sub_ddmmss(s4, s3, (a4) - (b4), s3, -__u2, -__t2);                                          \
-  } while (0)
-
-#endif
-
 int
 nfloat_write(gr_stream_t out, nfloat_srcptr x, gr_ctx_t ctx)
 {

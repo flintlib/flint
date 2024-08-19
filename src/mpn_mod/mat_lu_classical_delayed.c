@@ -11,12 +11,6 @@
 
 #include "mpn_mod.h"
 
-/* for wide add_ssss.... macros. todo; these ought to be provided
-   everywhere */
-#if FLINT_BITS == 64 && defined(__AVX2__)
-#include "crt_helpers.h"
-#endif
-
 /* todo: optimize for when 2n rather than 2n+1 limbs suffice */
 int
 mpn_mod_mat_lu_classical_delayed(slong * res_rank, slong * P, gr_mat_t A, const gr_mat_t A_in, int rank_check, gr_ctx_t ctx)
@@ -143,7 +137,6 @@ mpn_mod_mat_lu_classical_delayed(slong * res_rank, slong * P, gr_mat_t A, const 
             mpn_mod_mul(e, REDUCED(i, col), d, ctx);
             mpn_mod_neg(f, e, ctx);
 
-#if defined(add_sssssaaaaaaaaaa)
             if (n == 2)
             {
                 for (j = col + 1; j < ncols; j++)
@@ -161,7 +154,6 @@ mpn_mod_mat_lu_classical_delayed(slong * res_rank, slong * P, gr_mat_t A, const 
                 REDUCED(i, rank - 1)[1] = e[1];
             }
             else
-#endif
             {
                 if (col + 1 < ncols)
                 {
