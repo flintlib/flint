@@ -199,3 +199,22 @@ void fq_default_ctx_modulus(fmpz_mod_poly_t p, const fq_default_ctx_t ctx)
         fmpz_mod_poly_set(p, FQ_DEFAULT_CTX_FQ(ctx)->modulus, mod);
     }
 }
+
+/* FIXME: fq_ctx_init_randtest only tests nmod sized primes, so that's
+   all we'll do here too? */
+void fq_default_ctx_init_randtest(fq_default_ctx_t ctx, flint_rand_t state, int type)
+{
+    ulong prime;
+    slong degree;
+    fmpz_t p;
+
+    /* select a prime and degree to create the finite field */
+    prime = _nmod_poly_conway_rand(&degree, state, type);
+
+    /* fq_default initialisation wants an fmpz_t for the prime */
+    fmpz_init(p);
+    fmpz_set_ui(p, prime);
+
+    /* Initialise the context using the prime and degree selected above */
+    fq_default_ctx_init(ctx, p, degree, "x");
+}

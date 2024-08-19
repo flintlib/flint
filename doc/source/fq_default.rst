@@ -104,10 +104,13 @@ Context Management
 
     Prints the context information to ``stdout``.
 
-.. function:: void fq_default_ctx_randtest(fq_default_ctx_t ctx)
+.. function:: void fq_default_ctx_init_randtest(fq_default_ctx_t ctx, flint_rand_t state, int type)
 
-    Initializes ``ctx`` to a random finite field.  Assumes that
-    ``fq_default_ctx_init`` has not been called on ``ctx`` already.
+    Initializes ``ctx`` to a random finite field where the prime and degree is
+    set according to ``type``.
+    Assumes that ``fq_default_ctx_init`` has not been called on ``ctx`` already.
+    To see what prime and degrees may be output, see
+    ``type`` in :func:`_nmod_poly_conway_rand`.
 
 .. function:: void fq_default_get_coeff_fmpz(fmpz_t c, fq_default_t op, slong n, const fq_default_ctx_t ctx)
 

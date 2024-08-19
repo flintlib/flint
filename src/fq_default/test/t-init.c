@@ -81,5 +81,21 @@ TEST_FUNCTION_START(fq_default_init, state)
         fmpz_clear(p);
     }
 
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    {
+        fq_default_ctx_t ctx;
+        fq_default_t fq;
+
+        /* Sets the type used internally for prime selection.
+           See _nmod_poly_conway_rand for more info. */
+        int type = n_randint(state, 4);
+
+        fq_default_ctx_init_randtest(ctx, state, type);
+        fq_default_init(fq, ctx);
+        fq_default_clear(fq, ctx);
+        fq_default_randtest(fq, state, ctx);
+        fq_default_ctx_clear(ctx);
+    }
+
     TEST_FUNCTION_END(state);
 }
