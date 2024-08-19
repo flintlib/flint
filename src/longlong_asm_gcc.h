@@ -95,42 +95,6 @@
       "4" ((ulong)(a1)), _ASM_RME ((ulong)(b1)), \
       "5" ((ulong)(a0)), _ASM_RME ((ulong)(b0)))
 
-# define add_sssssssaaaaaaaaaaaaaa(s6, s5, s4, s3, s2, s1, s0, a6, a5, a4, a3, a2, a1, a0, b6, b5, b4, b3, b2, b1, b0) \
-  __asm__(_ASM_ADD " %20,%" _ASM_PRE "6\n"   \
-     "\t" _ASM_ADC " %18,%" _ASM_PRE "5\n"   \
-     "\t" _ASM_ADC " %16,%" _ASM_PRE "4\n"   \
-     "\t" _ASM_ADC " %14,%" _ASM_PRE "3\n"   \
-     "\t" _ASM_ADC " %12,%" _ASM_PRE "2\n"   \
-     "\t" _ASM_ADC " %10,%" _ASM_PRE "1\n"   \
-     "\t" _ASM_ADC " %8,%" _ASM_PRE "0"     \
-    : "=r" (s6), "=&r" (s5), "=&r" (s4), "=&r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0) \
-    : "0" ((ulong)(a6)), _ASM_RME ((ulong)(b6)), \
-      "1" ((ulong)(a5)), _ASM_RME ((ulong)(b5)), \
-      "2" ((ulong)(a4)), _ASM_RME ((ulong)(b4)), \
-      "3" ((ulong)(a3)), _ASM_RME ((ulong)(b3)), \
-      "4" ((ulong)(a2)), _ASM_RME ((ulong)(b2)), \
-      "5" ((ulong)(a1)), _ASM_RME ((ulong)(b1)), \
-      "6" ((ulong)(a0)), _ASM_RME ((ulong)(b0)))
-
-# define add_ssssssssaaaaaaaaaaaaaaaa(s7, s6, s5, s4, s3, s2, s1, s0, a7, a6, a5, a4, a3, a2, a1, a0, b7, b6, b5, b4, b3, b2, b1, b0) \
-  __asm__(_ASM_ADD " %23,%" _ASM_PRE "7\n"   \
-     "\t" _ASM_ADC " %21,%" _ASM_PRE "6\n"   \
-     "\t" _ASM_ADC " %19,%" _ASM_PRE "5\n"   \
-     "\t" _ASM_ADC " %17,%" _ASM_PRE "4\n"   \
-     "\t" _ASM_ADC " %15,%" _ASM_PRE "3\n"   \
-     "\t" _ASM_ADC " %13,%" _ASM_PRE "2\n"   \
-     "\t" _ASM_ADC " %11,%" _ASM_PRE "1\n"   \
-     "\t" _ASM_ADC " %9,%" _ASM_PRE "0"     \
-    : "=r" (s7), "=&r" (s6), "=&r" (s5), "=&r" (s4), "=&r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0) \
-    : "0" ((ulong)(a7)), _ASM_RME ((ulong)(b7)), \
-      "1" ((ulong)(a6)), _ASM_RME ((ulong)(b6)), \
-      "2" ((ulong)(a5)), _ASM_RME ((ulong)(b5)), \
-      "3" ((ulong)(a4)), _ASM_RME ((ulong)(b4)), \
-      "4" ((ulong)(a3)), _ASM_RME ((ulong)(b3)), \
-      "5" ((ulong)(a2)), _ASM_RME ((ulong)(b2)), \
-      "6" ((ulong)(a1)), _ASM_RME ((ulong)(b1)), \
-      "7" ((ulong)(a0)), _ASM_RME ((ulong)(b0)))
-
 # define sub_ddmmss(d1, d0, m1, m0, s1, s0) \
   __asm__(_ASM_SUB " %5,%" _ASM_PRE "1\n"   \
      "\t" _ASM_SBB " %3,%" _ASM_PRE "0"     \
@@ -186,6 +150,45 @@
       "4" ((ulong)(m1)), _ASM_RME ((ulong)(s1)), \
       "5" ((ulong)(m0)), _ASM_RME ((ulong)(s0)))
 
+/* x86 does not have enough registers */
+# if FLINT_BITS == 64 && defined (__amd64__)
+
+# define add_sssssssaaaaaaaaaaaaaa(s6, s5, s4, s3, s2, s1, s0, a6, a5, a4, a3, a2, a1, a0, b6, b5, b4, b3, b2, b1, b0) \
+  __asm__(_ASM_ADD " %20,%" _ASM_PRE "6\n"   \
+     "\t" _ASM_ADC " %18,%" _ASM_PRE "5\n"   \
+     "\t" _ASM_ADC " %16,%" _ASM_PRE "4\n"   \
+     "\t" _ASM_ADC " %14,%" _ASM_PRE "3\n"   \
+     "\t" _ASM_ADC " %12,%" _ASM_PRE "2\n"   \
+     "\t" _ASM_ADC " %10,%" _ASM_PRE "1\n"   \
+     "\t" _ASM_ADC " %8,%" _ASM_PRE "0"     \
+    : "=r" (s6), "=&r" (s5), "=&r" (s4), "=&r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0) \
+    : "0" ((ulong)(a6)), _ASM_RME ((ulong)(b6)), \
+      "1" ((ulong)(a5)), _ASM_RME ((ulong)(b5)), \
+      "2" ((ulong)(a4)), _ASM_RME ((ulong)(b4)), \
+      "3" ((ulong)(a3)), _ASM_RME ((ulong)(b3)), \
+      "4" ((ulong)(a2)), _ASM_RME ((ulong)(b2)), \
+      "5" ((ulong)(a1)), _ASM_RME ((ulong)(b1)), \
+      "6" ((ulong)(a0)), _ASM_RME ((ulong)(b0)))
+
+# define add_ssssssssaaaaaaaaaaaaaaaa(s7, s6, s5, s4, s3, s2, s1, s0, a7, a6, a5, a4, a3, a2, a1, a0, b7, b6, b5, b4, b3, b2, b1, b0) \
+  __asm__(_ASM_ADD " %23,%" _ASM_PRE "7\n"   \
+     "\t" _ASM_ADC " %21,%" _ASM_PRE "6\n"   \
+     "\t" _ASM_ADC " %19,%" _ASM_PRE "5\n"   \
+     "\t" _ASM_ADC " %17,%" _ASM_PRE "4\n"   \
+     "\t" _ASM_ADC " %15,%" _ASM_PRE "3\n"   \
+     "\t" _ASM_ADC " %13,%" _ASM_PRE "2\n"   \
+     "\t" _ASM_ADC " %11,%" _ASM_PRE "1\n"   \
+     "\t" _ASM_ADC " %9,%" _ASM_PRE "0"     \
+    : "=r" (s7), "=&r" (s6), "=&r" (s5), "=&r" (s4), "=&r" (s3), "=&r" (s2), "=&r" (s1), "=&r" (s0) \
+    : "0" ((ulong)(a7)), _ASM_RME ((ulong)(b7)), \
+      "1" ((ulong)(a6)), _ASM_RME ((ulong)(b6)), \
+      "2" ((ulong)(a5)), _ASM_RME ((ulong)(b5)), \
+      "3" ((ulong)(a4)), _ASM_RME ((ulong)(b4)), \
+      "4" ((ulong)(a3)), _ASM_RME ((ulong)(b3)), \
+      "5" ((ulong)(a2)), _ASM_RME ((ulong)(b2)), \
+      "6" ((ulong)(a1)), _ASM_RME ((ulong)(b1)), \
+      "7" ((ulong)(a0)), _ASM_RME ((ulong)(b0)))
+
 # define sub_dddddddmmmmmmmsssssss(d6, d5, d4, d3, d2, d1, d0, m6, m5, m4, m3, m2, m1, m0, s6, s5, s4, s3, s2, s1, s0) \
   __asm__(_ASM_SUB " %20,%" _ASM_PRE "6\n"   \
      "\t" _ASM_SBB " %18,%" _ASM_PRE "5\n"   \
@@ -221,6 +224,8 @@
       "5" ((ulong)(m2)), _ASM_RME ((ulong)(s2)), \
       "6" ((ulong)(m1)), _ASM_RME ((ulong)(s1)), \
       "7" ((ulong)(m0)), _ASM_RME ((ulong)(s0)))
+
+#endif
 
 # if defined(__BMI2__) && defined(__amd64__)
 #  define umul_ppmm(w1, w0, u, v) \

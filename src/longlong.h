@@ -108,7 +108,6 @@ flint_bitcnt_t FLINT_BIT_COUNT(ulong x)
 
 /* Addition and subtraction */
 #if !defined(add_ssaaaa)
-
 # define add_ssaaaa(s1, s0, a1, a0, b1, b0) \
   do { \
     ulong __t0 = (a0); \
@@ -148,22 +147,6 @@ flint_bitcnt_t FLINT_BIT_COUNT(ulong x)
     add_ssaaaa(s5, s4, s5, s4, (ulong) 0, __t1); \
   } while (0)
 
-#define add_sssssssaaaaaaaaaaaaaa(s6, s5, s4, s3, s2, s1, s0, a6, a5, a4, a3, a2, a1, a0, b6, b5, b4, b3, b2, b1, b0) \
-  do { \
-    ulong __t2 = 0; \
-    add_ssssssaaaaaaaaaaaa(__t2, s4, s3, s2, s1, s0, (ulong) 0, a4, a3, a2, a1, a0, (ulong) 0, b4, b3, b2, b1, b0); \
-    add_ssaaaa(s6, s5, a6, a5, b6, b5); \
-    add_ssaaaa(s6, s5, s6, s5, (ulong) 0, __t2); \
-  } while (0)
-
-#define add_ssssssssaaaaaaaaaaaaaaaa(s7, s6, s5, s4, s3, s2, s1, s0, a7, a6, a5, a4, a3, a2, a1, a0, b7, b6, b5, b4, b3, b2, b1, b0) \
-  do { \
-    ulong __t3 = 0; \
-    add_sssssssaaaaaaaaaaaaaa(__t3, s5, s4, s3, s2, s1, s0, (ulong) 0, a5, a4, a3, a2, a1, a0, (ulong) 0, b5, b4, b3, b2, b1, b0); \
-    add_ssaaaa(s7, s6, a7, a6, b7, b6); \
-    add_ssaaaa(s7, s6, s7, s6, (ulong) 0, __t3); \
-  } while (0)
-
 # define sub_ddmmss(s1, s0, a1, a0, b1, b0) \
   do { \
     ulong __t0 = (a0); \
@@ -201,6 +184,27 @@ flint_bitcnt_t FLINT_BIT_COUNT(ulong x)
     sub_dddddmmmmmsssss(__t3, s3, s2, s1, s0, (ulong) 0, a3, a2, a1, a0, (ulong) 0, b3, b2, b1, b0);\
     sub_ddmmss(__u3, s4, (ulong) 0, a4, (ulong) 0, b4);                                             \
     sub_ddmmss(s5, s4, (a5) - (b5), s4, -__u3, -__t3);                                                      \
+  } while (0)
+
+#endif
+
+/* extra wide variants might not have inline asm if there are not enough registers */
+#if !defined(add_sssssssaaaaaaaaaaaaaa)
+
+#define add_sssssssaaaaaaaaaaaaaa(s6, s5, s4, s3, s2, s1, s0, a6, a5, a4, a3, a2, a1, a0, b6, b5, b4, b3, b2, b1, b0) \
+  do { \
+    ulong __t2 = 0; \
+    add_ssssssaaaaaaaaaaaa(__t2, s4, s3, s2, s1, s0, (ulong) 0, a4, a3, a2, a1, a0, (ulong) 0, b4, b3, b2, b1, b0); \
+    add_ssaaaa(s6, s5, a6, a5, b6, b5); \
+    add_ssaaaa(s6, s5, s6, s5, (ulong) 0, __t2); \
+  } while (0)
+
+#define add_ssssssssaaaaaaaaaaaaaaaa(s7, s6, s5, s4, s3, s2, s1, s0, a7, a6, a5, a4, a3, a2, a1, a0, b7, b6, b5, b4, b3, b2, b1, b0) \
+  do { \
+    ulong __t3 = 0; \
+    add_sssssssaaaaaaaaaaaaaa(__t3, s5, s4, s3, s2, s1, s0, (ulong) 0, a5, a4, a3, a2, a1, a0, (ulong) 0, b5, b4, b3, b2, b1, b0); \
+    add_ssaaaa(s7, s6, a7, a6, b7, b6); \
+    add_ssaaaa(s7, s6, s7, s6, (ulong) 0, __t3); \
   } while (0)
 
 #define sub_dddddddmmmmmmmsssssss(s6, s5, s4, s3, s2, s1, s0, a6, a5, a4, a3, a2, a1, a0, b6, b5, b4, b3, b2, b1, b0)       \
