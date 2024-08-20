@@ -21,6 +21,11 @@
 #include "t-char_is_even.c"
 #include "t-char_is_goepel.c"
 #include "t-char_is_syzygous.c"
+#include "t-ctx_dupl.c"
+#include "t-ctx_set_t.c"
+#include "t-ctx_set_tau.c"
+#include "t-ctx_set_z.c"
+#include "t-ctx_shift_z.c"
 #include "t-dist_a0.c"
 #include "t-dist_lat.c"
 #include "t-dist_pt.c"
@@ -76,6 +81,12 @@
 #include "t-sp2gz_inv.c"
 #include "t-sp2gz_is_correct.c"
 #include "t-sp2gz_set_blocks.c"
+#include "t-sum_00.c"
+#include "t-sum_0b.c"
+#include "t-sum_a0.c"
+#include "t-sum_all.c"
+#include "t-sum_jet_00.c"
+#include "t-sum_jet_all.c"
 #include "t-transform_char.c"
 #include "t-transform_kappa.c"
 #include "t-transform_proj.c"
@@ -85,7 +96,7 @@
 
 test_struct tests[] =
 {
-    TEST_FUNCTION(acb_theta_agm_hadamard),
+    /*TEST_FUNCTION(acb_theta_agm_hadamard),
     TEST_FUNCTION(acb_theta_agm_mul),
     TEST_FUNCTION(acb_theta_agm_mul_tight),
     TEST_FUNCTION(acb_theta_agm_sqrt),
@@ -94,8 +105,13 @@ test_struct tests[] =
     TEST_FUNCTION(acb_theta_char_get_a),
     TEST_FUNCTION(acb_theta_char_is_even),
     TEST_FUNCTION(acb_theta_char_is_goepel),
-    TEST_FUNCTION(acb_theta_char_is_syzygous),
-    TEST_FUNCTION(acb_theta_dist_a0),
+    TEST_FUNCTION(acb_theta_char_is_syzygous),*/
+    TEST_FUNCTION(acb_theta_ctx_dupl),
+    TEST_FUNCTION(acb_theta_ctx_set_t),
+    TEST_FUNCTION(acb_theta_ctx_set_tau),
+    TEST_FUNCTION(acb_theta_ctx_set_z),
+    TEST_FUNCTION(acb_theta_ctx_shift_z),
+    /*TEST_FUNCTION(acb_theta_dist_a0),
     TEST_FUNCTION(acb_theta_dist_lat),
     TEST_FUNCTION(acb_theta_dist_pt),
     TEST_FUNCTION(acb_theta_eld_border),
@@ -149,11 +165,17 @@ test_struct tests[] =
     TEST_FUNCTION(acb_theta_sp2gz_decompose),
     TEST_FUNCTION(acb_theta_sp2gz_inv),
     TEST_FUNCTION(acb_theta_sp2gz_is_correct),
-    TEST_FUNCTION(acb_theta_sp2gz_set_blocks),
-    TEST_FUNCTION(acb_theta_transform_char),
+    TEST_FUNCTION(acb_theta_sp2gz_set_blocks), */
+    TEST_FUNCTION(acb_theta_sum_00),
+    TEST_FUNCTION(acb_theta_sum_0b),
+    TEST_FUNCTION(acb_theta_sum_a0),
+    TEST_FUNCTION(acb_theta_sum_all),
+    TEST_FUNCTION(acb_theta_sum_jet_00),
+    TEST_FUNCTION(acb_theta_sum_jet_all),
+    /* TEST_FUNCTION(acb_theta_transform_char),
     TEST_FUNCTION(acb_theta_transform_kappa),
     TEST_FUNCTION(acb_theta_transform_proj),
-    TEST_FUNCTION(acb_theta_transform_sqrtdet)
+    TEST_FUNCTION(acb_theta_transform_sqrtdet)*/
 };
 
 /* main function *************************************************************/

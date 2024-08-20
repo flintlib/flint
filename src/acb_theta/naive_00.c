@@ -60,7 +60,6 @@ acb_theta_naive_00_gen(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     if (b)
     {
         acb_theta_naive_worker(th, 1, new_zs, nb, tau, E, 0, prec, worker);
-
         for (k = 0; k < nb; k++)
         {
             acb_mul(&th[k], &th[k], &cs[k], prec);

@@ -98,7 +98,6 @@ worker(acb_ptr dth, acb_srcptr v1, acb_srcptr v2, const slong * precs, slong len
             acb_mul(&aux[(n * a1 + b) * nb + j], &aux[(n * a1 + b) * nb + j], x, prec);
         }
     }
-
     _acb_vec_add(dth, dth, aux, nb * n * n, fullprec);
 
     flint_free(tups);
