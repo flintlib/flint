@@ -92,8 +92,8 @@ TEST_FUNCTION_START(fq_default_init, state)
 
         fq_default_ctx_init_randtest(ctx, state, type);
         fq_default_init(fq, ctx);
-        fq_default_clear(fq, ctx);
         fq_default_randtest(fq, state, ctx);
+        fq_default_clear(fq, ctx);
         fq_default_ctx_clear(ctx);
     }
 
