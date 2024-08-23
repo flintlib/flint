@@ -173,77 +173,102 @@ void acb_theta_jet_ql_radius(arf_t eps, arf_t err, const arb_t c, const arb_t rh
 void acb_theta_naive_term(acb_t res, acb_srcptr z, const acb_mat_t tau, const slong * tup,
     const slong * n, slong prec);
 
-/* Context structure for theta function evaluations */
+/* Context structures for theta function evaluations */
 
-struct acb_theta_ctx_struct
+void acb_theta_ctx_exp_inv(acb_t exp_inv, const acb_t exp, const acb_t x, int is_real, slong prec);
+void acb_theta_ctx_sqr_inv(acb_t sqr_inv, const acb_t inv, const acb_t sqr, int is_real, slong prec);
+
+struct acb_theta_ctx_tau_struct
 {
     acb_mat_struct tau;
     arb_mat_struct Y;
     arb_mat_struct Yinv;
-    acb_mat_struct exp_tau_div_4;
-    acb_mat_struct exp_tau_div_2;
-    acb_mat_struct exp_tau;
-    acb_struct * exp_zs;
-    acb_struct * exp_zs_inv; /* todo: only g >= 2 ? */
-    acb_struct * exp_2zs;
-    acb_struct * exp_2zs_inv;
-    acb_struct * cs;
-    arb_struct * us;
-    arb_struct * as;
-    slong nb;
+    acb_mat_t exp_tau_div_4;
+    acb_mat_t exp_tau_div_2;
+    acb_mat_t exp_tau;
 
-    /* g >= 2 only */
+    /* g > 1 only */
     arb_mat_struct C;
     arb_mat_struct Cinv;
-    acb_mat_struct exp_tau_inv;
-    arb_struct * vs;
-
-    /* Quasilinear algorithm only */
-    int t_is_zero;
-    int z_is_zero;
-    int z_is_real;
-
-    /* g >= 2 and quasilinear algorithm only */
-    arb_struct * d0;
-    arb_struct * d;
+    acb_mat_t exp_tau_div_4_inv;
+    acb_mat_t exp_tau_div_2_inv;
+    acb_mat_t exp_tau_inv;
+    acb_ptr exp_tau_a_div_2;
+    acb_ptr exp_tau_a;
+    acb_ptr exp_tau_a_div_2_inv;
+    acb_ptr exp_tau_a_inv;
+    acb_ptr exp_a_tau_a_div_4;
 };
 
-typedef struct acb_theta_ctx_struct acb_theta_ctx_t[1];
+typedef struct acb_theta_ctx_tau_struct acb_theta_ctx_tau_t[1];
 
+#define acb_theta_ctx_g(ctx) (acb_mat_nrows(&(ctx)->tau))
 #define acb_theta_ctx_tau(ctx) (&(ctx)->tau)
 #define acb_theta_ctx_y(ctx) (&(ctx)->Y)
 #define acb_theta_ctx_yinv(ctx) (&(ctx)->Yinv)
-#define acb_theta_ctx_exp_tau_div_4(ctx) (&(ctx)->exp_tau_div_4)
-#define acb_theta_ctx_exp_tau_div_2(ctx) (&(ctx)->exp_tau_div_2)
-#define acb_theta_ctx_exp_tau(ctx) (&(ctx)->exp_tau)
-#define acb_theta_ctx_exp_zs(ctx) ((ctx)->exp_zs)
-#define acb_theta_ctx_exp_zs_inv(ctx) ((ctx)->exp_zs_inv)
-#define acb_theta_ctx_exp_2zs(ctx) ((ctx)->exp_2zs)
-#define acb_theta_ctx_exp_2zs_inv(ctx) ((ctx)->exp_2zs_inv)
-#define acb_theta_ctx_cs(ctx) ((ctx)->cs)
-#define acb_theta_ctx_us(ctx) ((ctx)->us)
-#define acb_theta_ctx_as(ctx) ((ctx)->as)
-#define acb_theta_ctx_nb(ctx) ((ctx)->nb)
+#define acb_theta_ctx_exp_tau_div_4(ctx) ((ctx)->exp_tau_div_4)
+#define acb_theta_ctx_exp_tau_div_2(ctx) ((ctx)->exp_tau_div_2)
+#define acb_theta_ctx_exp_tau(ctx) ((ctx)->exp_tau)
 #define acb_theta_ctx_cho(ctx) (&(ctx)->C)
 #define acb_theta_ctx_choinv(ctx) (&(ctx)->Cinv)
-#define acb_theta_ctx_exp_tau_inv(ctx) (&(ctx)->exp_tau_inv)
-#define acb_theta_ctx_vs(ctx) ((ctx)->vs)
-#define acb_theta_ctx_d0(ctx) ((ctx)->d0)
-#define acb_theta_ctx_d(ctx) ((ctx)->d)
-slong acb_theta_ctx_g(const acb_theta_ctx_t ctx);
+#define acb_theta_ctx_exp_tau_div_4_inv(ctx) ((ctx)->exp_tau_div_4_inv)
+#define acb_theta_ctx_exp_tau_div_2_inv(ctx) ((ctx)->exp_tau_div_2_inv)
+#define acb_theta_ctx_exp_tau_inv(ctx) ((ctx)->exp_tau_inv)
+#define acb_theta_ctx_exp_tau_a_div_2(ctx, a) ((ctx)->exp_tau_a_div_2 + (a) * g)
+#define acb_theta_ctx_exp_tau_a(ctx, a) ((ctx)->exp_tau_a + (a) * g)
+#define acb_theta_ctx_exp_tau_a_div_2_inv(ctx, a) ((ctx)->exp_tau_a_div_2_inv + (a) * g)
+#define acb_theta_ctx_exp_tau_a_inv(ctx, a) ((ctx)->exp_tau_a_inv + (a) * g)
+#define acb_theta_ctx_exp_a_tau_a_div_4(ctx, a) ((ctx)->exp_a_tau_a_div_4 + (a))
 
-void acb_theta_ctx_init(acb_theta_ctx_t ctx, slong nb, slong g);
-void acb_theta_ctx_clear(acb_theta_ctx_t ctx);
+void acb_theta_ctx_tau_init(acb_theta_ctx_tau_t ctx, slong g);
+void acb_theta_ctx_tau_clear(acb_theta_ctx_tau_t ctx);
+void acb_theta_ctx_tau_set(acb_theta_ctx_tau_t ctx, const acb_mat_t tau, slong prec);
+void acb_theta_ctx_tau_dupl(acb_theta_ctx_tau_t ctx, slong prec);
 
-void acb_theta_ctx_set_tau(acb_theta_ctx_t ctx, const acb_mat_t tau, slong prec);
-void acb_theta_ctx_set_z(acb_theta_ctx_t ctx, acb_srcptr z, slong j, slong prec);
-void acb_theta_ctx_set_z_ql(acb_theta_ctx_t ctx, acb_srcptr z, slong prec);
-void acb_theta_ctx_set_t(acb_theta_ctx_t ctx, const acb_ptr t, slong prec);
-void acb_theta_ctx_dupl(acb_theta_ctx_t ctx, slong prec);
-void acb_theta_ctx_common_v(arb_ptr v, const acb_theta_ctx_t ctx, slong prec);
-void acb_theta_ctx_copy_tau(acb_theta_ctx_t new_ctx, const acb_theta_ctx_t ctx);
-void acb_theta_ctx_shift_z(acb_theta_ctx_t new_ctx, const acb_theta_ctx_t ctx,
-    slong start, slong nb, ulong a, slong prec);
+typedef struct
+{
+    slong g;
+    acb_ptr z;
+    acb_ptr exp_z;
+    acb_struct c;
+    arb_ptr r;
+    int is_real;
+
+    /* g > 1 only */
+    acb_ptr exp_2z;
+    acb_ptr exp_z_inv;
+    acb_ptr exp_2z_inv;
+    arb_ptr v;
+    arb_struct u;
+}
+acb_theta_ctx_z_struct;
+
+typedef acb_theta_ctx_z_struct acb_theta_ctx_z_t[1];
+
+#define acb_theta_ctx_z(ctx) ((ctx)->z)
+#define acb_theta_ctx_exp_z(ctx) ((ctx)->exp_z)
+#define acb_theta_ctx_exp_z_inv(ctx) ((ctx)->exp_z_inv)
+#define acb_theta_ctx_exp_2z(ctx) ((ctx)->exp_2z)
+#define acb_theta_ctx_exp_2z_inv(ctx) ((ctx)->exp_2z_inv)
+#define acb_theta_ctx_c(ctx) (&(ctx)->c)
+#define acb_theta_ctx_u(ctx) (&(ctx)->u)
+#define acb_theta_ctx_r(ctx) ((ctx)->r)
+#define acb_theta_ctx_v(ctx) ((ctx)->v)
+#define acb_theta_ctx_is_real(ctx) ((ctx)->is_real)
+
+void acb_theta_ctx_z_init(acb_theta_ctx_z_t ctx, slong g);
+void acb_theta_ctx_z_clear(acb_theta_ctx_z_t ctx);
+acb_theta_ctx_z_struct * acb_theta_ctx_z_vec_init(slong nb, slong g);
+void acb_theta_ctx_z_vec_clear(acb_theta_ctx_z_struct * vec, slong nb);
+void acb_theta_ctx_z_set(acb_theta_ctx_z_t ctx, acb_srcptr z, const acb_theta_ctx_tau_t ctx_tau, slong prec);
+int acb_theta_ctx_z_overlaps(const acb_theta_ctx_z_t ctx1, const acb_theta_ctx_z_t ctx2);
+
+void acb_theta_ctx_z_add_real(acb_theta_ctx_z_t res, const acb_theta_ctx_z_t ctx,
+    const acb_theta_ctx_z_t ctx_real, slong prec);
+void acb_theta_ctx_z_dupl(acb_theta_ctx_z_t ctx, slong prec);
+void acb_theta_ctx_z_shift_a0(acb_theta_ctx_z_t res, const acb_theta_ctx_z_t ctx,
+    const acb_theta_ctx_tau_t ctx_tau, ulong a, slong prec);
+void acb_theta_ctx_z_common_v(arb_ptr v, const acb_theta_ctx_z_struct * vec, slong nb, slong prec);
 
 /* Summation algorithms */
 
@@ -267,29 +292,50 @@ void acb_theta_sum_jet_all_worker(acb_ptr th, acb_srcptr v1, acb_srcptr v2,
     const slong * precs, slong len, const acb_t cofactor, const slong * coords,
     slong ord, slong g, slong prec, slong fullprec);
 
-void acb_theta_sum_00(acb_ptr th, const acb_theta_ctx_t ctx, slong prec);
-void acb_theta_sum_0b(acb_ptr th, const acb_theta_ctx_t ctx, slong prec);
-void acb_theta_sum_a0(acb_ptr th, const acb_theta_ctx_t ctx, slong start,
-    slong nb, int z_is_real, slong prec);
-void acb_theta_sum_all(acb_ptr th, const acb_theta_ctx_t ctx, slong start,
-    slong nb, int z_is_real, slong prec);
-void acb_theta_sum_jet_00(acb_ptr th, const acb_theta_ctx_t ctx, slong ord, slong prec);
-void acb_theta_sum_jet_all(acb_ptr th, const acb_theta_ctx_t ctx, slong ord, slong prec);
+void acb_theta_sum_00(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
+    const acb_theta_ctx_tau_t ctx_tau, slong prec);
+void acb_theta_sum_0b(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
+    const acb_theta_ctx_tau_t ctx_tau, slong prec);
+void acb_theta_sum_a0(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
+    const acb_theta_ctx_tau_t ctx_tau, arb_srcptr distances, slong prec);
+void acb_theta_sum_all(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
+    const acb_theta_ctx_tau_t ctx_tau, arb_srcptr distances, slong prec);
+void acb_theta_sum_jet_00(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
+    const acb_theta_ctx_tau_t ctx_tau, slong ord, slong prec);
+void acb_theta_sum_jet_all(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
+    const acb_theta_ctx_tau_t ctx_tau, slong ord, slong prec);
 
-/* Quasilinear algorithms */
+/* Quasilinear algorithms on exact input */
 
+slong acb_theta_ql_nb_steps(slong* split, const acb_theta_ctx_tau_t ctx_tau, slong prec);
+int acb_theta_ql_setup(acb_ptr rts, acb_ptr ts, slong * t_indices, acb_srcptr zs, slong nb,
+    const acb_mat_t tau, slong nb_steps, int all, int sqr, slong prec);
+/* int acb_theta_ql_steps(acb_ptr th, const slong * t_indices, acb_srcptr rts,
+    acb_srcptr th_init, slong nb_steps, int all, int sqr, slong prec);
+int acb_theta_ql_split(acb_ptr th, acb_srcptr ts, const slong * t_indices,
+    acb_srcptr zs, slong nb, int all, slong prec);
+int acb_theta_ql_exact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
+int all, int sqr, slong prec); */
 
-/* void acb_theta_sum_fixed_ab(acb_ptr th, ulong ab, const acb_theta_ctx_t ctx, slong prec);
-   void acb_theta_sum_all(acb_ptr th, int sqr, const acb_theta_ctx_t ctx, slong prec); */
-/* void acb_theta_sum_jet_00(acb_ptr dth, const acb_theta_ctx_t ctx, slong ord, slong prec); */
-/* void acb_theta_sum_jet_fixed_ab(acb_ptr dth, const acb_theta_ctx_t ctx, slong ord, slong prec);
-   void acb_theta_sum_jet_all(acb_ptr dth, const acb_theta_ctx_t ctx, slong ord, slong prec); */
+/* Main functions */
 
-/* Quasi-linear algorithm: internal functions */
+/* void acb_theta_00_notransform(acb_ptr th, acb_srcptr zs, slong nb,
+    const acb_mat_t tau, slong prec);
+void acb_theta_all_notransform(acb_ptr th, acb_srcptr zs, slong nb,
+    const acb_mat_t tau, int sqr, slong prec);
+void acb_theta_jet_00_notransform(acb_ptr th, acb_srcptr zs, slong nb,
+    const acb_mat_t tau, slong ord, slong prec);
+void acb_theta_jet_all_notransform(acb_ptr th, acb_srcptr zs, slong nb,
+    const acb_mat_t tau, slong ord, slong prec);
 
-slong acb_theta_ql_nb_steps_from_ctx(slong* split, const acb_theta_ctx_t ctx, slong prec);
-
-
+void acb_theta_00(acb_ptr th, acb_srcptr zs, slong nb,
+    const acb_mat_t tau, slonc prec);
+void acb_theta_all(acb_ptr th, acb_srcptr zs, slong nb,
+    const acb_mat_t tau, int sqr, slonc prec);
+void acb_theta_jet_00(acb_ptr th, acb_srcptr zs, slong nb,
+    const acb_mat_t tau, slong ord, slong prec);
+void acb_theta_jet_all(acb_ptr th, acb_srcptr zs, slong nb,
+const acb_mat_t tau, slong ord, slong prec); */
 
 /* ************************************************************************* */
 

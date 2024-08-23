@@ -9,11 +9,18 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "acb_mat.h"
+#include "acb.h"
 #include "acb_theta.h"
 
-slong
-acb_theta_ctx_g(const acb_theta_ctx_t ctx)
+void acb_theta_ctx_sqr_inv(acb_t sqr_inv, const acb_t inv, const acb_t sqr,
+    int z_is_real, slong prec)
 {
-    return acb_mat_nrows(acb_theta_ctx_exp_tau(ctx));
+    if (z_is_real)
+    {
+        acb_conj(sqr_inv, sqr);
+    }
+    else
+    {
+        acb_sqr(sqr_inv, inv, prec);
+    }
 }

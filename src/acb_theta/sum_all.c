@@ -15,15 +15,21 @@
 #include "acb_theta.h"
 
 void
-acb_theta_sum_all(acb_ptr th, const acb_theta_ctx_t ctx, slong start,
-    slong nb, int z_is_real, slong prec)
+acb_theta_sum_all(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
+    const acb_theta_ctx_tau_t ctx_tau, arb_srcptr distances, slong prec)
 {
-    slong g = acb_theta_ctx_g(ctx);
+    slong g = acb_theta_ctx_g(ctx_tau);
     slong n = 1 << g;
     acb_ptr res;
-    acb_theta_ctx_t new_ctx;
+    acb_theta_ctx_z_struct * new_vec;
     slong new_prec;
     slong a, b, j, dot;
+
+    FLINT_ASSERT(nb >= 0);
+    if (nb == 0)
+    {
+        return;
+    }
 
     if (g == 1)
     {
@@ -32,32 +38,33 @@ acb_theta_sum_all(acb_ptr th, const acb_theta_ctx_t ctx, slong start,
         {
             /* acb_modular_theta_sum takes shifted precisions into account */
             acb_modular_theta_sum(&res[0], &res[1], &res[2], &res[3],
-                &acb_theta_ctx_exp_zs(ctx)[start + j], 0,
-                acb_mat_entry(acb_theta_ctx_exp_tau(ctx), 0, 0), 1, prec);
+                acb_theta_ctx_exp_z(&vec[j]), acb_theta_ctx_is_real(&vec[j]),
+                acb_mat_entry(acb_theta_ctx_exp_tau(ctx_tau), 0, 0), 1, prec);
             acb_set(&th[4 * j], &res[2]);
             acb_set(&th[4 * j + 1], &res[3]);
             acb_set(&th[4 * j + 2], &res[1]);
             acb_neg(&th[4 * j + 3], &res[0]);
             _acb_vec_scalar_mul(th + 4 * j + 2, th + 4 * j + 2, 2,
-                acb_mat_entry(acb_theta_ctx_exp_tau_div_4(ctx), 0, 0), prec);
+                acb_mat_entry(acb_theta_ctx_exp_tau_div_4(ctx_tau), 0, 0), prec);
             _acb_vec_scalar_mul(th + 4 * j, th + 4 * j, 4,
-                &acb_theta_ctx_cs(ctx)[start + j], prec);
+                acb_theta_ctx_c(&vec[j]), prec);
         }
         _acb_vec_clear(res, 4);
     }
     else
     {
         /* Update the context for each a, call sum_00 with the right precision */
-        acb_theta_ctx_init(new_ctx, nb, g);
+        new_vec = acb_theta_ctx_z_vec_init(nb, g);
         res = _acb_vec_init(n * nb);
 
-        acb_theta_ctx_copy_tau(new_ctx, ctx);
         for (a = 0; a < n; a++)
         {
-            acb_theta_ctx_shift_z(new_ctx, ctx, start, nb, a, prec);
-            new_prec = prec + acb_theta_dist_addprec(
-                (z_is_real ? &acb_theta_ctx_d0(ctx)[a] : &acb_theta_ctx_d(ctx)[a]));
-            acb_theta_sum_0b(res, new_ctx, new_prec);
+            for (j = 0; j < nb; j++)
+            {
+                acb_theta_ctx_z_shift_a0(&new_vec[j], &vec[j], ctx_tau, a, prec);
+            }
+            new_prec = prec + acb_theta_dist_addprec(&distances[a]);
+            acb_theta_sum_0b(res, new_vec, nb, ctx_tau, new_prec);
             for (j = 0; j < nb; j++)
             {
                 _acb_vec_set(th + n * n * j + n * a, res + n * j, n);
@@ -72,7 +79,7 @@ acb_theta_sum_all(acb_ptr th, const acb_theta_ctx_t ctx, slong start,
             }
         }
 
+        acb_theta_ctx_z_vec_clear(new_vec, nb);
         _acb_vec_clear(res, n * nb);
-        acb_theta_ctx_clear(new_ctx);
     }
 }

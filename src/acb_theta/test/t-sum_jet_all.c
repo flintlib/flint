@@ -28,28 +28,30 @@ TEST_FUNCTION_START(acb_theta_sum_jet_all, state)
         slong mag_bits = n_randint(state, 4);
         slong nbz = n_randint(state, 4);
         slong nbth = acb_theta_jet_nb(ord, g);
-        acb_theta_ctx_t ctx;
+        acb_mat_t tau;
+        acb_ptr zs;
+        acb_theta_ctx_tau_t ctx_tau;
+        acb_theta_ctx_z_struct * vec;
         acb_ptr th1, th2;
         slong j;
 
-        acb_mat_t tau;
-        acb_ptr zs;
-
         acb_mat_init(tau, g, g);
         zs = _acb_vec_init(nbz * g);
-        acb_theta_ctx_init(ctx, nbz, g);
+        acb_theta_ctx_tau_init(ctx_tau, g);
+        vec = acb_theta_ctx_z_vec_init(nbz, g);
         th1 = _acb_vec_init(nbz * nbth * n2);
         th2 = _acb_vec_init(nbz * nbth * n2);
 
         acb_siegel_randtest_reduced(tau, state, prec, mag_bits);
         acb_siegel_randtest_vec(zs, state, nbz * g, prec);
 
-        acb_theta_ctx_set_tau(ctx, tau, prec);
+        acb_theta_ctx_tau_set(ctx_tau, tau, prec);
         for (j = 0; j < nbz; j++)
         {
-            acb_theta_ctx_set_z(ctx, zs + j * g, j, prec);
+            acb_theta_ctx_z_set(&vec[j], zs + j * g, ctx_tau, prec);
         }
-        acb_theta_sum_jet_all(th1, ctx, ord, prec);
+        acb_theta_sum_jet_all(th1, vec, nbz, ctx_tau, ord, prec);
+
         for (j = 0; j < nbz; j++)
         {
             acb_theta_jet_naive_all(th2 + j * n2 * nbth, zs + j * g, tau, ord, prec);
@@ -74,7 +76,8 @@ TEST_FUNCTION_START(acb_theta_sum_jet_all, state)
 
         acb_mat_clear(tau);
         _acb_vec_clear(zs, nbz * g);
-        acb_theta_ctx_clear(ctx);
+        acb_theta_ctx_tau_clear(ctx_tau);
+        acb_theta_ctx_z_vec_clear(vec, nbz);
         _acb_vec_clear(th1, nbz * n2 * nbth);
         _acb_vec_clear(th2, nbz * n2 * nbth);
     }

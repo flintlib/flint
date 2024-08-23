@@ -15,13 +15,14 @@
 #include "acb_theta.h"
 
 void
-acb_theta_sum_0b(acb_ptr th, const acb_theta_ctx_t ctx, slong prec)
+acb_theta_sum_0b(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
+    const acb_theta_ctx_tau_t ctx_tau, slong prec)
 {
-    slong g = acb_theta_ctx_g(ctx);
+    slong g = acb_theta_ctx_g(ctx_tau);
     slong n = 1 << g;
-    slong nb = acb_theta_ctx_nb(ctx);
     slong j, k;
 
+    FLINT_ASSERT(nb >= 0);
     if (nb == 0)
     {
         return;
@@ -35,12 +36,11 @@ acb_theta_sum_0b(acb_ptr th, const acb_theta_ctx_t ctx, slong prec)
         for (j = 0; j < nb; j++)
         {
             /* acb_modular_theta_sum recomputes the inverse of exp_z */
-            /* todo: store w_is_unit as part of context */
             acb_modular_theta_sum(&res[0], &res[1], &res[2], &res[3],
-                &acb_theta_ctx_exp_zs(ctx)[j], 0,
-                acb_mat_entry(acb_theta_ctx_exp_tau(ctx), 0, 0), 1, prec);
-            acb_mul(&th[2 * j], &res[2], &acb_theta_ctx_cs(ctx)[j], prec);
-            acb_mul(&th[2 * j + 1], &res[3], &acb_theta_ctx_cs(ctx)[j], prec);
+                acb_theta_ctx_exp_z(&vec[j]), acb_theta_ctx_is_real(&vec[j]),
+                acb_mat_entry(acb_theta_ctx_exp_tau(ctx_tau), 0, 0), 1, prec);
+            acb_mul(&th[2 * j], &res[2], acb_theta_ctx_c(&vec[j]), prec);
+            acb_mul(&th[2 * j + 1], &res[3], acb_theta_ctx_c(&vec[j]), prec);
         }
         _acb_vec_clear(res, 4);
     }
@@ -58,19 +58,20 @@ acb_theta_sum_0b(acb_ptr th, const acb_theta_ctx_t ctx, slong prec)
         arb_init(err);
         v = _arb_vec_init(g);
 
-        acb_theta_ctx_common_v(v, ctx, prec);
-        acb_theta_naive_radius(R2, eps, acb_theta_ctx_cho(ctx), 0, prec);
-        b = acb_theta_eld_set(E, acb_theta_ctx_cho(ctx), R2, v);
+        acb_theta_ctx_z_common_v(v, vec, nb, prec);
+        acb_theta_naive_radius(R2, eps, acb_theta_ctx_cho(ctx_tau), 0, prec);
+        b = acb_theta_eld_set(E, acb_theta_ctx_cho(ctx_tau), R2, v);
 
         if (b)
         {
-            acb_theta_sum_work(th, n, acb_theta_ctx_exp_2zs(ctx), acb_theta_ctx_exp_2zs_inv(ctx), nb,
-                acb_theta_ctx_exp_tau(ctx), acb_theta_ctx_exp_tau_inv(ctx), E, 0,
-                prec, acb_theta_sum_0b_worker);
             for (j = 0; j < nb; j++)
             {
-                _acb_vec_scalar_mul(th + j * n, th + j * n, n, &acb_theta_ctx_cs(ctx)[j], prec);
-                arb_mul_arf(err, &acb_theta_ctx_us(ctx)[j], eps, prec);
+                acb_theta_sum_work(th + j * n, n, acb_theta_ctx_exp_2z(&vec[j]),
+                    acb_theta_ctx_exp_2z_inv(&vec[j]), 1,
+                    acb_theta_ctx_exp_tau(ctx_tau), acb_theta_ctx_exp_tau_inv(ctx_tau), E, 0,
+                    prec, acb_theta_sum_0b_worker);
+                _acb_vec_scalar_mul(th + j * n, th + j * n, n, acb_theta_ctx_c(&vec[j]), prec);
+                arb_mul_arf(err, acb_theta_ctx_u(&vec[j]), eps, prec);
                 for (k = 0; k < n; k++)
                 {
                     acb_add_error_arb(&th[j * n + k], err);

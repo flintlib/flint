@@ -16,10 +16,9 @@
 #include "acb_theta.h"
 
 void
-acb_theta_ctx_clear(acb_theta_ctx_t ctx)
+acb_theta_ctx_tau_clear(acb_theta_ctx_tau_t ctx)
 {
     slong g = acb_theta_ctx_g(ctx);
-    slong nb = acb_theta_ctx_nb(ctx);
     slong n = 1 << g;
 
     acb_mat_clear(acb_theta_ctx_tau(ctx));
@@ -28,21 +27,18 @@ acb_theta_ctx_clear(acb_theta_ctx_t ctx)
     acb_mat_clear(acb_theta_ctx_exp_tau_div_4(ctx));
     acb_mat_clear(acb_theta_ctx_exp_tau_div_2(ctx));
     acb_mat_clear(acb_theta_ctx_exp_tau(ctx));
-    _acb_vec_clear(acb_theta_ctx_exp_zs(ctx), nb * g);
-    _acb_vec_clear(acb_theta_ctx_exp_zs_inv(ctx), nb * g);
-    _acb_vec_clear(acb_theta_ctx_exp_2zs(ctx), nb * g);
-    _acb_vec_clear(acb_theta_ctx_exp_2zs_inv(ctx), nb * g);
-    _acb_vec_clear(acb_theta_ctx_cs(ctx), nb);
-    _arb_vec_clear(acb_theta_ctx_us(ctx), nb);
-    _arb_vec_clear(acb_theta_ctx_as(ctx), nb * g);
 
-    if (g >= 2)
+    if (g > 1)
     {
         arb_mat_clear(acb_theta_ctx_cho(ctx));
         arb_mat_clear(acb_theta_ctx_choinv(ctx));
+        acb_mat_clear(acb_theta_ctx_exp_tau_div_4_inv(ctx));
+        acb_mat_clear(acb_theta_ctx_exp_tau_div_2_inv(ctx));
         acb_mat_clear(acb_theta_ctx_exp_tau_inv(ctx));
-        _arb_vec_clear(acb_theta_ctx_vs(ctx), nb * g);
-        _arb_vec_clear(acb_theta_ctx_d0(ctx), n);
-        _arb_vec_clear(acb_theta_ctx_d(ctx), n);
+        _acb_vec_clear(ctx->exp_tau_a_div_2, n * g);
+        _acb_vec_clear(ctx->exp_tau_a, n * g);
+        _acb_vec_clear(ctx->exp_tau_a_div_2_inv, n * g);
+        _acb_vec_clear(ctx->exp_tau_a_inv, n * g);
+        _acb_vec_clear(ctx->exp_a_tau_a_div_4, n);
     }
 }

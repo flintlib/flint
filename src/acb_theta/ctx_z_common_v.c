@@ -25,18 +25,21 @@ _arb_vec_union(arb_ptr res, arb_srcptr v1, arb_srcptr v2, slong len, slong prec)
     }
 }
 
-void acb_theta_ctx_common_v(arb_ptr v, const acb_theta_ctx_t ctx, slong prec)
+void
+acb_theta_ctx_z_common_v(arb_ptr v, const acb_theta_ctx_z_struct * vec, slong nb, slong prec)
 {
-    slong g = acb_theta_ctx_g(ctx);
-    slong nb = acb_theta_ctx_nb(ctx);
+    slong g;
     slong j;
+
+    FLINT_ASSERT(nb >= 0);
 
     if (nb == 0) return;
 
-    _arb_vec_set(v, acb_theta_ctx_vs(ctx), g);
+    g = vec->g;
+    _arb_vec_set(v, acb_theta_ctx_v(vec), g);
     for (j = 1; j < nb; j++)
     {
-	_arb_vec_union(v, v, acb_theta_ctx_vs(ctx) + j * g, g, prec);
+        _arb_vec_union(v, v, acb_theta_ctx_v(vec + j), g, prec);
     }
 }
 

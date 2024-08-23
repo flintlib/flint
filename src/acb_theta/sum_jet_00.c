@@ -14,22 +14,22 @@
 #include "acb_modular.h"
 #include "acb_theta.h"
 
-void
-acb_theta_sum_jet_00(acb_ptr th, const acb_theta_ctx_t ctx, slong ord, slong prec)
+void acb_theta_sum_jet_00(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
+    const acb_theta_ctx_tau_t ctx_tau, slong ord, slong prec)
 {
-    slong g = acb_theta_ctx_g(ctx);
+    slong g = acb_theta_ctx_g(ctx_tau);
     slong nbth = acb_theta_jet_nb(ord, g);
-    slong nbz = acb_theta_ctx_nb(ctx);
-    arb_ptr a;
+    arb_ptr r;
     acb_ptr aux;
     slong j, k;
 
-    if (nbz == 0)
+    FLINT_ASSERT(nb >= 0);
+    if (nb == 0)
     {
         return;
     }
 
-    a = _arb_vec_init(g);
+    r = _arb_vec_init(g);
     aux = _acb_vec_init(nbth);
 
     if (g == 1)
@@ -37,14 +37,13 @@ acb_theta_sum_jet_00(acb_ptr th, const acb_theta_ctx_t ctx, slong ord, slong pre
         acb_ptr res;
 
         res = _acb_vec_init(4 * nbth);
-        for (j = 0; j < nbz; j++)
+        for (j = 0; j < nb; j++)
         {
             /* acb_modular_theta_sum recomputes the inverse of exp_z */
-            /* todo: store w_is_unit as part of context */
             acb_modular_theta_sum(res, res + nbth, res + 2 * nbth, res + 3 * nbth,
-                &acb_theta_ctx_exp_zs(ctx)[j], 0,
-                acb_mat_entry(acb_theta_ctx_exp_tau(ctx), 0, 0), ord + 1, prec);
-            _acb_vec_scalar_mul(th + j * nbth, res + 2 * nbth, nbth, &acb_theta_ctx_cs(ctx)[j], prec);
+                acb_theta_ctx_exp_z(&vec[j]), acb_theta_ctx_is_real(&vec[j]),
+                acb_mat_entry(acb_theta_ctx_exp_tau(ctx_tau), 0, 0), ord + 1, prec);
+            _acb_vec_scalar_mul(th + j * nbth, res + 2 * nbth, nbth, acb_theta_ctx_c(&vec[j]), prec);
         }
         _acb_vec_clear(res, 4 * nbth);
     }
@@ -69,20 +68,21 @@ acb_theta_sum_jet_00(acb_ptr th, const acb_theta_ctx_t ctx, slong ord, slong pre
         fmpz_init(m);
         fmpz_init(t);
 
-        acb_theta_ctx_common_v(v, ctx, prec);
-        acb_theta_jet_naive_radius(R2, eps, acb_theta_ctx_cho(ctx), v, ord, prec);
-        b = acb_theta_eld_set(E, acb_theta_ctx_cho(ctx), R2, v);
+        acb_theta_ctx_z_common_v(v, vec, nb, prec);
+        acb_theta_jet_naive_radius(R2, eps, acb_theta_ctx_cho(ctx_tau), v, ord, prec);
+        b = acb_theta_eld_set(E, acb_theta_ctx_cho(ctx_tau), R2, v);
 
         if (b)
         {
             /* Sum series, rescale by c factor */
-            acb_theta_sum_work(th, nbth, acb_theta_ctx_exp_2zs(ctx), acb_theta_ctx_exp_2zs_inv(ctx), nbz,
-                acb_theta_ctx_exp_tau(ctx), acb_theta_ctx_exp_tau_inv(ctx), E, ord,
-                prec, acb_theta_sum_jet_00_worker);
-            for (j = 0; j < nbz; j++)
+            for (j = 0; j < nb; j++)
             {
-                _acb_vec_scalar_mul(th + j * nbth, th + j * nbth, nbth, &acb_theta_ctx_cs(ctx)[j], prec);
-                arb_mul_arf(err, &acb_theta_ctx_us(ctx)[j], eps, prec);
+                acb_theta_sum_work(th + j * nbth, nbth, acb_theta_ctx_exp_2z(&vec[j]),
+                    acb_theta_ctx_exp_2z_inv(&vec[j]), 1,
+                    acb_theta_ctx_exp_tau(ctx_tau), acb_theta_ctx_exp_tau_inv(ctx_tau), E, ord,
+                    prec, acb_theta_sum_jet_00_worker);
+                _acb_vec_scalar_mul(th + j * nbth, th + j * nbth, nbth, acb_theta_ctx_c(&vec[j]), prec);
+                arb_mul_arf(err, acb_theta_ctx_u(&vec[j]), eps, prec);
                 for (k = 0; k < nbth; k++)
                 {
                     acb_add_error_arb(&th[j * nbth + k], err);
@@ -104,7 +104,7 @@ acb_theta_sum_jet_00(acb_ptr th, const acb_theta_ctx_t ctx, slong ord, slong pre
                     fmpz_mul(m, m, t);
                 }
                 acb_div_fmpz(c, c, m, prec);
-                for (j = 0; j < nbz; j++)
+                for (j = 0; j < nb; j++)
                 {
                     acb_mul(&th[j * nbth + k], &th[j * nbth + k], c, prec);
                 }
@@ -112,7 +112,7 @@ acb_theta_sum_jet_00(acb_ptr th, const acb_theta_ctx_t ctx, slong ord, slong pre
         }
         else
         {
-            for (j = 0; j < nbz * nbth; j++)
+            for (j = 0; j < nb * nbth; j++)
             {
                 acb_indeterminate(&th[j]);
             }
@@ -130,14 +130,14 @@ acb_theta_sum_jet_00(acb_ptr th, const acb_theta_ctx_t ctx, slong ord, slong pre
     }
 
     /* Both for genus 1 and higher, adjust derivatives due to reduction */
-    for (j = 0; j < nbz; j++)
+    for (j = 0; j < nb; j++)
     {
-        _arb_vec_neg(a, acb_theta_ctx_as(ctx) + j * g, g);
-        _arb_vec_scalar_mul_2exp_si(a, a, g, 1);
-        acb_theta_jet_exp_pi_i(aux, a, ord, g, prec);
+        _arb_vec_neg(r, acb_theta_ctx_r(&vec[j]), g);
+        _arb_vec_scalar_mul_2exp_si(r, r, g, 1);
+        acb_theta_jet_exp_pi_i(aux, r, ord, g, prec);
         acb_theta_jet_mul(th + j * nbth, th + j * nbth, aux, ord, g, prec);
     }
 
-    _arb_vec_clear(a, g);
+    _arb_vec_clear(r, g);
     _acb_vec_clear(aux, nbth);
 }

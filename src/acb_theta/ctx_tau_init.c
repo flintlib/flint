@@ -16,12 +16,10 @@
 #include "acb_theta.h"
 
 void
-acb_theta_ctx_init(acb_theta_ctx_t ctx, slong nb, slong g)
+acb_theta_ctx_tau_init(acb_theta_ctx_tau_t ctx, slong g)
 {
     slong n = 1 << g;
-
     FLINT_ASSERT(g >= 1);
-    FLINT_ASSERT(nb >= 0);
 
     acb_mat_init(acb_theta_ctx_tau(ctx), g, g);
     arb_mat_init(acb_theta_ctx_y(ctx), g, g);
@@ -29,26 +27,18 @@ acb_theta_ctx_init(acb_theta_ctx_t ctx, slong nb, slong g)
     acb_mat_init(acb_theta_ctx_exp_tau_div_4(ctx), g, g);
     acb_mat_init(acb_theta_ctx_exp_tau_div_2(ctx), g, g);
     acb_mat_init(acb_theta_ctx_exp_tau(ctx), g, g);
-    acb_theta_ctx_exp_zs(ctx) = _acb_vec_init(nb * g);
-    acb_theta_ctx_exp_zs_inv(ctx) = _acb_vec_init(nb * g);
-    acb_theta_ctx_exp_2zs(ctx) = _acb_vec_init(nb * g);
-    acb_theta_ctx_exp_2zs_inv(ctx) = _acb_vec_init(nb * g);
-    acb_theta_ctx_cs(ctx) = _acb_vec_init(nb);
-    acb_theta_ctx_us(ctx) = _arb_vec_init(nb);
-    acb_theta_ctx_as(ctx) = _arb_vec_init(nb * g);
-    acb_theta_ctx_nb(ctx) = nb;
 
-    if (g >= 2)
+    if (g > 1)
     {
         arb_mat_init(acb_theta_ctx_cho(ctx), g, g);
         arb_mat_init(acb_theta_ctx_choinv(ctx), g, g);
+        acb_mat_init(acb_theta_ctx_exp_tau_div_4_inv(ctx), g, g);
+        acb_mat_init(acb_theta_ctx_exp_tau_div_2_inv(ctx), g, g);
         acb_mat_init(acb_theta_ctx_exp_tau_inv(ctx), g, g);
-        acb_theta_ctx_vs(ctx) = _arb_vec_init(nb * g);
-        acb_theta_ctx_d0(ctx) = _arb_vec_init(n);
-        acb_theta_ctx_d(ctx) = _arb_vec_init(n);
+        ctx->exp_tau_a_div_2 = _acb_vec_init(g * n);
+        ctx->exp_tau_a = _acb_vec_init(g * n);
+        ctx->exp_tau_a_div_2_inv = _acb_vec_init(g * n);
+        ctx->exp_tau_a_inv = _acb_vec_init(g * n);
+        ctx->exp_a_tau_a_div_4 = _acb_vec_init(n);
     }
-
-    ctx->t_is_zero = -1;
-    ctx->z_is_zero = -1;
-    ctx->z_is_real = -1;
 }

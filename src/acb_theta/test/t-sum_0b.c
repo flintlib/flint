@@ -26,28 +26,29 @@ TEST_FUNCTION_START(acb_theta_sum_0b, state)
         slong prec = 100 + n_randint(state, 200);
         slong mag_bits = n_randint(state, 4);
         slong nb = 1 + n_randint(state, 4);
-        acb_theta_ctx_t ctx;
+        acb_mat_t tau;
+        acb_ptr zs;
+        acb_theta_ctx_tau_t ctx_tau;
+        acb_theta_ctx_z_struct * vec;
         acb_ptr th1, th2;
         slong j;
 
-        acb_mat_t tau;
-        acb_ptr zs;
-
         acb_mat_init(tau, g, g);
         zs = _acb_vec_init(nb * g);
-        acb_theta_ctx_init(ctx, nb, g);
+        acb_theta_ctx_tau_init(ctx_tau, g);
+        vec = acb_theta_ctx_z_vec_init(nb, g);
         th1 = _acb_vec_init(n * nb);
         th2 = _acb_vec_init(n * nb);
 
         acb_siegel_randtest_reduced(tau, state, prec, mag_bits);
         acb_siegel_randtest_vec(zs, state, nb * g, prec);
 
-        acb_theta_ctx_set_tau(ctx, tau, prec);
+        acb_theta_ctx_tau_set(ctx_tau, tau, prec);
         for (j = 0; j < nb; j++)
         {
-            acb_theta_ctx_set_z(ctx, zs + j * g, j, prec);
+            acb_theta_ctx_z_set(&vec[j], zs + j * g, ctx_tau, prec);
         }
-        acb_theta_sum_0b(th1, ctx, prec);
+        acb_theta_sum_0b(th1, vec, nb, ctx_tau, prec);
         acb_theta_naive_0b(th2, zs, nb, tau, prec);
 
         if (!_acb_vec_overlaps(th1, th2, n * nb))
@@ -69,7 +70,8 @@ TEST_FUNCTION_START(acb_theta_sum_0b, state)
 
         acb_mat_clear(tau);
         _acb_vec_clear(zs, nb * g);
-        acb_theta_ctx_clear(ctx);
+        acb_theta_ctx_tau_clear(ctx_tau);
+        acb_theta_ctx_z_vec_clear(vec, nb);
         _acb_vec_clear(th1, n * nb);
         _acb_vec_clear(th2, n * nb);
     }

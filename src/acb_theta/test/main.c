@@ -21,11 +21,14 @@
 #include "t-char_is_even.c"
 #include "t-char_is_goepel.c"
 #include "t-char_is_syzygous.c"
-#include "t-ctx_dupl.c"
-#include "t-ctx_set_t.c"
-#include "t-ctx_set_tau.c"
-#include "t-ctx_set_z.c"
-#include "t-ctx_shift_z.c"
+#include "t-ctx_exp_inv.c"
+#include "t-ctx_sqr_inv.c"
+#include "t-ctx_tau_set.c"
+#include "t-ctx_tau_dupl.c"
+#include "t-ctx_z_set.c"
+#include "t-ctx_z_add_real.c"
+#include "t-ctx_z_dupl.c"
+#include "t-ctx_z_shift_a0.c"
 #include "t-dist_a0.c"
 #include "t-dist_lat.c"
 #include "t-dist_pt.c"
@@ -96,8 +99,8 @@
 
 test_struct tests[] =
 {
-    /*TEST_FUNCTION(acb_theta_agm_hadamard),
-    TEST_FUNCTION(acb_theta_agm_mul),
+    /* TEST_FUNCTION(acb_theta_agm_hadamard),*/
+    /* TEST_FUNCTION(acb_theta_agm_mul),
     TEST_FUNCTION(acb_theta_agm_mul_tight),
     TEST_FUNCTION(acb_theta_agm_sqrt),
     TEST_FUNCTION(acb_theta_all),
@@ -106,11 +109,14 @@ test_struct tests[] =
     TEST_FUNCTION(acb_theta_char_is_even),
     TEST_FUNCTION(acb_theta_char_is_goepel),
     TEST_FUNCTION(acb_theta_char_is_syzygous),*/
-    TEST_FUNCTION(acb_theta_ctx_dupl),
-    TEST_FUNCTION(acb_theta_ctx_set_t),
-    TEST_FUNCTION(acb_theta_ctx_set_tau),
-    TEST_FUNCTION(acb_theta_ctx_set_z),
-    TEST_FUNCTION(acb_theta_ctx_shift_z),
+    TEST_FUNCTION(acb_theta_ctx_exp_inv),
+    TEST_FUNCTION(acb_theta_ctx_sqr_inv),
+    TEST_FUNCTION(acb_theta_ctx_tau_set),
+    TEST_FUNCTION(acb_theta_ctx_tau_dupl),
+    TEST_FUNCTION(acb_theta_ctx_z_set),
+    TEST_FUNCTION(acb_theta_ctx_z_add_real),
+    TEST_FUNCTION(acb_theta_ctx_z_dupl),
+    TEST_FUNCTION(acb_theta_ctx_z_shift_a0),
     /*TEST_FUNCTION(acb_theta_dist_a0),
     TEST_FUNCTION(acb_theta_dist_lat),
     TEST_FUNCTION(acb_theta_dist_pt),
