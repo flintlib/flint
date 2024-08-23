@@ -11,6 +11,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "longlong.h"
 #include "nmod.h"
 #include "nmod_vec.h"
 
@@ -99,8 +100,12 @@ void _nmod_vec_scalar_mul_nmod_shoup(nn_ptr res, nn_srcptr vec,
                                slong len, ulong c, nmod_t mod)
 {
     slong i;
-    ulong w_pr;
-    w_pr = n_mulmod_precomp_shoup(c, mod.n);
+    //ulong w_pr;
+    //w_pr = n_mulmod_precomp_shoup(c, mod.n);
+    ulong w_pr, r;
+    udiv_qrnnd(w_pr, r, c, UWORD(0), mod.n);
+    //udiv_qrnnd_preinv(w_pr, r, c << mod.norm, UWORD(0), mod.n << mod.norm, mod.ninv);
+
     for (i = 0; i < len; i++)
         res[i] = n_mulmod_shoup(c, vec[i], w_pr, mod.n);
 }
