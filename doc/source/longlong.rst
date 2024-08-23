@@ -89,4 +89,4 @@ Division
 .. macro:: udiv_qrnnd_preinv(q, r, n1, n0, d, di)
 
     Works like ``udiv_qrnnd``, but takes a precomputed inverse ``di`` as 
-    computed by :func:`n_preinvert_limb`.
+    computed by :func:`n_preinvert_limb_prenorm`.
