@@ -19,12 +19,12 @@ void sample(void * arg, ulong count)
 
     for (ulong i = 0; i < count; i++)
     {
-        ulong bits = n_randint(state, 62) + 1;  // mulmod_shoup requires d with < 64 bits
-        ulong d = n_randbits(state, bits);  // d has between 1 and 63 bits
-        ulong a = n_randlimb(state);  // a need not be reduced mod d
+        ulong bits = n_randint(state, FLINT_BITS - 1) + 1;  // 1...63
+        ulong d = n_randbits(state, bits);  // 0 < d < 2**(FLINT_BITS-1) required by mulmod_shoup
+        ulong a = n_randlimb(state);  // a is arbitrary
 
         for (ulong j = 0; j < 1000; j++)
-            array[j] = n_randint(state, d);  // this does need to be reduced
+            array[j] = n_randint(state, d);  // must be < d
 
         prof_start();
         for (ulong j = 0; j < 1000; j++)
@@ -47,12 +47,12 @@ void sample_no_precomp(void * arg, ulong count)
 
     for (ulong i = 0; i < count; i++)
     {
-        ulong bits = n_randint(state, 62) + 1;  // mulmod_shoup requires d with < 64 bits
-        ulong d = n_randbits(state, bits);  // d has between 1 and 63 bits
-        ulong a = n_randint(state, d);  // a need to be reduced mod d
+        ulong bits = n_randint(state, FLINT_BITS - 1) + 1;  // 1...63
+        ulong d = n_randbits(state, bits);  // 0 < d < 2**(FLINT_BITS-1) required by mulmod_shoup
+        ulong a = n_randint(state, d);  // a must be < d
 
         for (ulong j = 0; j < 1000; j++)
-            array[j] = n_randlimb(state);  // this does not need to be reduced
+            array[j] = n_randlimb(state);  // array[j] is arbitrary
 
         ulong apre, r;
         udiv_qrnnd(apre, r, a, UWORD(0), d);
