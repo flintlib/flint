@@ -44,10 +44,7 @@ void _nmod_vec_scalar_addmul_nmod_generic(nn_ptr res, nn_srcptr vec,
 void _nmod_vec_scalar_addmul_nmod_shoup(nn_ptr res, nn_srcptr vec,
 				             slong len, ulong c, nmod_t mod)
 {
-    //const ulong c_pr = n_mulmod_precomp_shoup(c, mod.n);
-    // --> faster for small len without function call:
-    ulong c_pr, unused;
-    udiv_qrnnd(c_pr, unused, c, UWORD(0), mod.n);
+    const ulong c_pr = n_mulmod_precomp_shoup(c, mod.n);
 
     for (slong i = 0; i < len; i++)
     {
@@ -99,10 +96,7 @@ void _nmod_vec_scalar_mul_nmod(nn_ptr res, nn_srcptr vec,
 void _nmod_vec_scalar_mul_nmod_shoup(nn_ptr res, nn_srcptr vec,
                                slong len, ulong c, nmod_t mod)
 {
-    // const ulong c_pr = n_mulmod_precomp_shoup(c, mod.n);
-    // --> faster for small len without function call:
-    ulong c_pr, unused;
-    udiv_qrnnd(c_pr, unused, c, UWORD(0), mod.n);
+    const ulong c_pr = n_mulmod_precomp_shoup(c, mod.n);
 
     for (slong i = 0; i < len; i++)
         res[i] = n_mulmod_shoup(c, vec[i], c_pr, mod.n);

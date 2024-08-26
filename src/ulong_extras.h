@@ -170,7 +170,13 @@ ulong n_mulmod_precomp(ulong a, ulong b, ulong n, double ninv);
 ulong n_mulmod_preinv(ulong a, ulong b, ulong n, ulong ninv, ulong norm);
 
 /* Shoup's modular multiplication with precomputation: explanations in the doc and in mulmod_precomp_shoup.c */
-ulong n_mulmod_precomp_shoup(ulong a, ulong n);
+ULONG_EXTRAS_INLINE
+ulong n_mulmod_precomp_shoup(ulong a, ulong n)
+{
+   ulong a_precomp, r;
+   udiv_qrnnd(a_precomp, r, a, UWORD(0), n);
+   return a_precomp;
+}
 
 ULONG_EXTRAS_INLINE
 ulong n_mulmod_shoup(ulong a, ulong b, ulong a_precomp, ulong n)

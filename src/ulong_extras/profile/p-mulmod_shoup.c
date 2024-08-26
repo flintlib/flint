@@ -31,9 +31,8 @@ void sample(void * arg, ulong count)
         prof_start();
         for (ulong j = 0; j < NB_ITER; j++)
         {
-            ulong aj, r;
-            udiv_qrnnd(aj, r, array[j], UWORD(0), d);
-            array[j] = n_mulmod_shoup(array[j], a, aj, d);
+            const ulong aj_pr = n_mulmod_precomp_shoup(array[j], d);
+            array[j] = n_mulmod_shoup(array[j], a, aj_pr, d);
         }
         prof_stop();
     }
@@ -56,12 +55,11 @@ void sample_no_precomp(void * arg, ulong count)
         for (ulong j = 0; j < NB_ITER; j++)
             array[j] = n_randlimb(state);  // array[j] is arbitrary
 
-        ulong apre, r;
-        udiv_qrnnd(apre, r, a, UWORD(0), d);
+        const ulong a_pr = n_mulmod_precomp_shoup(a, d);
 
         prof_start();
         for (ulong j = 0; j < NB_ITER; j++)
-            array[j] = n_mulmod_shoup(a, array[j], apre, d);
+            array[j] = n_mulmod_shoup(a, array[j], a_pr, d);
         prof_stop();
     }
 
@@ -85,9 +83,7 @@ void sample_precomp_only(void * arg, ulong count)
         prof_start();
         for (ulong j = 0; j < NB_ITER; j++)
         {
-            //ulong aj = n_mulmod_precomp_shoup(array[j], d);
-            ulong aj, r;
-            udiv_qrnnd(aj, r, array[j], UWORD(0), d);
+            const ulong FLINT_SET_BUT_UNUSED(aj_pr) = n_mulmod_precomp_shoup(array[j], d);
         }
         prof_stop();
     }

@@ -13,14 +13,6 @@
 
 #include "ulong_extras.h"
 
-/* Returns a_precomp = floor(a * 2**FLINT_BITS / n), requires a < n */
-ulong
-n_mulmod_precomp_shoup(ulong a, ulong n)
-{
-   ulong a_precomp, r;
-   udiv_qrnnd(a_precomp, r, a, UWORD(0), n);
-   return a_precomp;
-}
 
 /*-------------------------------------------------------------*/
 /* notes on Shoup's modular multiplication with precomputation */
@@ -42,11 +34,17 @@ n_mulmod_precomp_shoup(ulong a, ulong n)
 // hence the initial step is seen as a precomputation (done only once, depends on a and n only)
 
 // PRECOMPUTATION:
+//
+// [ ulong n_mulmod_precomp_shoup(ulong a, ulong n) ]
+//
 // We compute a_precomp = floor(a * W / n),
 // This requires a < n, for use of udiv_qrnnd (as in n_mulmod_precomp_shoup) and
 // to ensure a_precomp fits in a word (i.e. a_precomp < W).
 
 // MAIN COMPUTATION:
+//
+// [ ulong n_mulmod_shoup(ulong a, ulong b, ulong a_precomp, ulong n) ]
+//
 // 1. a_precomp * b = p_hi * W + p_lo     (high part of double-word multiplication, p_lo will not be used)
 // 2. res = a*b - p_hi*n                  (single-word multiplications)
 // 3. if res >= n, return res-n, else return res
@@ -69,3 +67,4 @@ n_mulmod_precomp_shoup(ulong a, ulong n)
 // res == (a*b mod n) + n.
 //
 // Step 3. we detect which case we are in and correct the possible excess.
+
