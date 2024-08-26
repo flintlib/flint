@@ -133,7 +133,7 @@ int main(void)
    flint_bitcnt_t i;
 
    flint_printf("unit: all measurements in c/l\n");
-   flint_printf("profiled: general function | precomp shoup function\n");
+   flint_printf("profiled: general branching | precomp shoup | generic\n");
    flint_printf("bit/len\t");
    for (int len = 1; len <= 16; ++len)
        flint_printf("%d\t\t", len);

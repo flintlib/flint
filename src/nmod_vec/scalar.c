@@ -44,14 +44,14 @@ void _nmod_vec_scalar_addmul_nmod_generic(nn_ptr res, nn_srcptr vec,
 void _nmod_vec_scalar_addmul_nmod_shoup(nn_ptr res, nn_srcptr vec,
 				             slong len, ulong c, nmod_t mod)
 {
-    slong i;
-    ulong t, cinv;
+    //const ulong c_pr = n_mulmod_precomp_shoup(c, mod.n);
+    // --> faster for small len without function call:
+    ulong c_pr, unused;
+    udiv_qrnnd(c_pr, unused, c, UWORD(0), mod.n);
 
-    cinv = n_mulmod_precomp_shoup(c, mod.n);
-
-    for (i = 0; i < len; i++)
+    for (slong i = 0; i < len; i++)
     {
-        t = n_mulmod_shoup(c, vec[i], cinv, mod.n);
+        ulong t = n_mulmod_shoup(c, vec[i], c_pr, mod.n);
         res[i] = _nmod_add(res[i], t, mod);
     }
 }
@@ -99,13 +99,11 @@ void _nmod_vec_scalar_mul_nmod(nn_ptr res, nn_srcptr vec,
 void _nmod_vec_scalar_mul_nmod_shoup(nn_ptr res, nn_srcptr vec,
                                slong len, ulong c, nmod_t mod)
 {
-    slong i;
-    //ulong w_pr;
-    //w_pr = n_mulmod_precomp_shoup(c, mod.n);
-    ulong w_pr, r;
-    udiv_qrnnd(w_pr, r, c, UWORD(0), mod.n);
-    //udiv_qrnnd_preinv(w_pr, r, c << mod.norm, UWORD(0), mod.n << mod.norm, mod.ninv);
+    // const ulong c_pr = n_mulmod_precomp_shoup(c, mod.n);
+    // --> faster for small len without function call:
+    ulong c_pr, unused;
+    udiv_qrnnd(c_pr, unused, c, UWORD(0), mod.n);
 
-    for (i = 0; i < len; i++)
-        res[i] = n_mulmod_shoup(c, vec[i], w_pr, mod.n);
+    for (slong i = 0; i < len; i++)
+        res[i] = n_mulmod_shoup(c, vec[i], c_pr, mod.n);
 }
