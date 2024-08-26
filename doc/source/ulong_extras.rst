@@ -607,17 +607,14 @@ Modular Arithmetic
 .. function:: ulong n_mulmod_shoup(ulong a, ulong b, ulong a_precomp, ulong n)
 
     Returns `a b \bmod n` given ``a_precomp``, a precomputed scaled
-    approximation of `a / n` equal to `\lfloor a \cdot
-    2^{\mathtt{FLINT\_BITS}} / n \rfloor`. This requires `n <
-    2^{\mathtt{FLINT\_BITS} - 1}` and has no restrictions on `a` and `b`; note
-    that if ``a_precomp`` is computed by :func:`n_mulmod_precomp_shoup`, the
-    latter requires `a < n`.  Works faster than other ``mulmod`` routines
-    (e.g.  :func:`n_mulmod2_preinv`) in situations where the same `a` is
-    multiplied by several `b`'s, which amortizes the time for precomputing
-    ``a_precomp``. Typical examples are scalar multiplication of vectors such
-    as :func:`_nmod_vec_scalar_mul_nmod` or of matrices such as
-    :func:`_nmod_vec_scalar_mul_nmod`.
-
+    approximation of `a / n` equal to `\lfloor a \cdot 2^{\mathtt{FLINT\_BITS}}
+    / n \rfloor`. This requires `n < 2^{\mathtt{FLINT\_BITS} - 1}` and `a < n`,
+    there is no restriction on `b`. Works faster than other ``mulmod``
+    routines (e.g. :func:`n_mulmod2_preinv`) in situations where one repeats
+    modular multiplications with fixed `a` and `n` and several values of `b`'s,
+    which amortizes the time for precomputing ``a_precomp``. Examples are
+    scalar multiplication of vectors such as :func:`_nmod_vec_scalar_mul_nmod`
+    or of matrices such as :func:`_nmod_vec_scalar_mul_nmod`.
 
 
 Divisibility testing

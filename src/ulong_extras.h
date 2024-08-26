@@ -169,6 +169,7 @@ ulong n_lll_mod_preinv(ulong a_hi, ulong a_mi, ulong a_lo, ulong n, ulong ninv);
 ulong n_mulmod_precomp(ulong a, ulong b, ulong n, double ninv);
 ulong n_mulmod_preinv(ulong a, ulong b, ulong n, ulong ninv, ulong norm);
 
+/* Shoup's modular multiplication with precomputation: explanations in the doc and in mulmod_precomp_shoup.c */
 ulong n_mulmod_precomp_shoup(ulong a, ulong n);
 
 ULONG_EXTRAS_INLINE
@@ -177,14 +178,14 @@ ulong n_mulmod_shoup(ulong a, ulong b, ulong a_precomp, ulong n)
     ulong res, p_hi, p_lo;
 
     umul_ppmm(p_hi, p_lo, a_precomp, b);
-    res = a * b;
-    res -= p_hi * n;
+    res = a * b - p_hi * n;
 
     if (res >= n)
         res -= n;
 
     return res;
 }
+
 
 ULONG_EXTRAS_INLINE
 ulong n_mulmod2_preinv(ulong a, ulong b, ulong n, ulong ninv)
