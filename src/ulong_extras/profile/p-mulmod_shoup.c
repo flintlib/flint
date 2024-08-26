@@ -12,9 +12,11 @@
 #include "profiler.h"
 #include "ulong_extras.h"
 
+#define NB_ITER 1000
+
 void sample(void * arg, ulong count)
 {
-    nn_ptr array = (nn_ptr) flint_malloc(1000*sizeof(ulong));
+    nn_ptr array = (nn_ptr) flint_malloc(NB_ITER*sizeof(ulong));
     FLINT_TEST_INIT(state);
 
     for (ulong i = 0; i < count; i++)
@@ -23,11 +25,11 @@ void sample(void * arg, ulong count)
         ulong d = n_randbits(state, bits);  // 0 < d < 2**(FLINT_BITS-1) required by mulmod_shoup
         ulong a = n_randlimb(state);  // a is arbitrary
 
-        for (ulong j = 0; j < 1000; j++)
+        for (ulong j = 0; j < NB_ITER; j++)
             array[j] = n_randint(state, d);  // must be < d
 
         prof_start();
-        for (ulong j = 0; j < 1000; j++)
+        for (ulong j = 0; j < NB_ITER; j++)
         {
             ulong aj, r;
             udiv_qrnnd(aj, r, array[j], UWORD(0), d);
@@ -42,7 +44,7 @@ void sample(void * arg, ulong count)
 
 void sample_no_precomp(void * arg, ulong count)
 {
-    nn_ptr array = (nn_ptr) flint_malloc(1000*sizeof(ulong));
+    nn_ptr array = (nn_ptr) flint_malloc(NB_ITER*sizeof(ulong));
     FLINT_TEST_INIT(state);
 
     for (ulong i = 0; i < count; i++)
@@ -51,15 +53,42 @@ void sample_no_precomp(void * arg, ulong count)
         ulong d = n_randbits(state, bits);  // 0 < d < 2**(FLINT_BITS-1) required by mulmod_shoup
         ulong a = n_randint(state, d);  // a must be < d
 
-        for (ulong j = 0; j < 1000; j++)
+        for (ulong j = 0; j < NB_ITER; j++)
             array[j] = n_randlimb(state);  // array[j] is arbitrary
 
         ulong apre, r;
         udiv_qrnnd(apre, r, a, UWORD(0), d);
 
         prof_start();
-        for (ulong j = 0; j < 1000; j++)
+        for (ulong j = 0; j < NB_ITER; j++)
             array[j] = n_mulmod_shoup(a, array[j], apre, d);
+        prof_stop();
+    }
+
+    flint_rand_clear(state);
+    flint_free(array);
+}
+
+void sample_precomp_only(void * arg, ulong count)
+{
+    nn_ptr array = (nn_ptr) flint_malloc(NB_ITER*sizeof(ulong));
+    FLINT_TEST_INIT(state);
+
+    for (ulong i = 0; i < count; i++)
+    {
+        ulong bits = n_randint(state, FLINT_BITS - 1) + 1;  // 1...63
+        ulong d = n_randbits(state, bits);  // 0 < d < 2**(FLINT_BITS-1) required by mulmod_shoup
+
+        for (ulong j = 0; j < NB_ITER; j++)
+            array[j] = n_randint(state, d);  // must be < d
+
+        prof_start();
+        for (ulong j = 0; j < NB_ITER; j++)
+        {
+            //ulong aj = n_mulmod_precomp_shoup(array[j], d);
+            ulong aj, r;
+            udiv_qrnnd(aj, r, array[j], UWORD(0), d);
+        }
         prof_stop();
     }
 
@@ -75,11 +104,15 @@ int main(void)
 
     prof_repeat(&min, &max, sample, NULL);
     flint_printf("   - including precomputation: %.3f cycles / %.3f cycles\n",
-            (min/(double)FLINT_CLOCK_SCALE_FACTOR)/1000, (max/(double)FLINT_CLOCK_SCALE_FACTOR)/1000);
+            (min/(double)FLINT_CLOCK_SCALE_FACTOR)/NB_ITER, (max/(double)FLINT_CLOCK_SCALE_FACTOR)/NB_ITER);
 
     prof_repeat(&min, &max, sample_no_precomp, NULL);
     flint_printf("   - excluding precomputation: %.3f cycles / %.3f cycles\n",
-            (min/(double)FLINT_CLOCK_SCALE_FACTOR)/1000, (max/(double)FLINT_CLOCK_SCALE_FACTOR)/1000);
+            (min/(double)FLINT_CLOCK_SCALE_FACTOR)/NB_ITER, (max/(double)FLINT_CLOCK_SCALE_FACTOR)/NB_ITER);
+
+    prof_repeat(&min, &max, sample_precomp_only, NULL);
+    flint_printf("   - precomputation alone: %.3f cycles / %.3f cycles\n",
+            (min/(double)FLINT_CLOCK_SCALE_FACTOR)/NB_ITER, (max/(double)FLINT_CLOCK_SCALE_FACTOR)/NB_ITER);
 
     return 0;
 }

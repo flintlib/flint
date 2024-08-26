@@ -169,24 +169,21 @@ ulong n_lll_mod_preinv(ulong a_hi, ulong a_mi, ulong a_lo, ulong n, ulong ninv);
 ulong n_mulmod_precomp(ulong a, ulong b, ulong n, double ninv);
 ulong n_mulmod_preinv(ulong a, ulong b, ulong n, ulong ninv, ulong norm);
 
-ulong n_mulmod_precomp_shoup(ulong w, ulong p);
+ulong n_mulmod_precomp_shoup(ulong a, ulong n);
 
 ULONG_EXTRAS_INLINE
-ulong n_mulmod_shoup(ulong w, ulong t, ulong w_precomp, ulong p)
+ulong n_mulmod_shoup(ulong a, ulong b, ulong a_precomp, ulong n)
 {
-    ulong q, r, p_hi, p_lo;
+    ulong res, p_hi, p_lo;
 
-    umul_ppmm(p_hi, p_lo, w_precomp, t);
-    q = p_hi;
-    (void) p_lo; /* unused */
+    umul_ppmm(p_hi, p_lo, a_precomp, b);
+    res = a * b;
+    res -= p_hi * n;
 
-    r = w * t;
-    r -= q * p;
+    if (res >= n)
+        res -= n;
 
-    if (r >= p)
-        r -= p;
-
-    return r;
+    return res;
 }
 
 ULONG_EXTRAS_INLINE

@@ -596,18 +596,28 @@ Modular Arithmetic
     ``m`` then 0 is returned by the function and the location ``sqrt``
     points to is set to NULL.
 
-.. function:: ulong n_mulmod_shoup(ulong w, ulong t, ulong w_precomp, ulong p)
+.. function:: ulong n_mulmod_precomp_shoup(ulong a, ulong n)
 
-    Returns `w t \bmod{p}` given a precomputed scaled approximation of `w / p`
-    computed by :func:`n_mulmod_precomp_shoup`. The value of `p` should be
-    less than `2^{\mathtt{FLINT\_BITS} - 1}`. `w` and `t` should be less than `p`.
-    Works faster than :func:`n_mulmod2_preinv` if `w` fixed and `t` from array
-    (for example, scalar multiplication of vector).
+    Returns ``a_precomp``, a scaled approximation of `a / n`. This requires `a
+    < n`. Precisely, ``a_precomp``  is the integer `\lfloor a \cdot
+    2^{\mathtt{FLINT\_BITS}} / n \rfloor`, and is intended to be used as the
+    precomputed data for :func:`n_mulmod_shoup`, which requires `n <
+    2^{\mathtt{FLINT\_BITS} - 1}`.
 
-.. function:: ulong n_mulmod_precomp_shoup(ulong w, ulong p)
+.. function:: ulong n_mulmod_shoup(ulong a, ulong b, ulong a_precomp, ulong n)
 
-    Returns `w'`, scaled approximation of `w / p`. `w'`  is equal to the integer
-    part of `w \cdot 2^{\mathtt{FLINT\_BITS}} / p`.
+    Returns `a b \bmod n` given ``a_precomp``, a precomputed scaled
+    approximation of `a / n` equal to `\lfloor a \cdot
+    2^{\mathtt{FLINT\_BITS}} / n \rfloor`. This requires `n <
+    2^{\mathtt{FLINT\_BITS} - 1}` and has no restrictions on `a` and `b`; note
+    that if ``a_precomp`` is computed by :func:`n_mulmod_precomp_shoup`, the
+    latter requires `a < n`.  Works faster than other ``mulmod`` routines
+    (e.g.  :func:`n_mulmod2_preinv`) in situations where the same `a` is
+    multiplied by several `b`'s, which amortizes the time for precomputing
+    ``a_precomp``. Typical examples are scalar multiplication of vectors such
+    as :func:`_nmod_vec_scalar_mul_nmod` or of matrices such as
+    :func:`_nmod_vec_scalar_mul_nmod`.
+
 
 
 Divisibility testing
