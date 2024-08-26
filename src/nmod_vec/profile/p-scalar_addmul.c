@@ -12,7 +12,6 @@
 
 #include "profiler.h"
 #include "ulong_extras.h"
-#include "nmod.h"
 #include "nmod_vec.h"
 
 typedef struct
@@ -209,4 +208,3 @@ int main(void)
 
    return 0;
 }
-
