@@ -80,7 +80,7 @@ main(void)
     fmpz_poly_clear(f);
     fmpz_poly_clear(g);
 
-    flint_rand_clear(state);
+    FLINT_TEST_CLEAR(state);
 
     return 0;
 }
