@@ -126,6 +126,6 @@ int main(void)
     }
     flint_printf("]\n");
 
-    flint_rand_clear(state);
+    FLINT_TEST_CLEAR(state);
     return 0;
 }

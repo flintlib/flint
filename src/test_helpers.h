@@ -101,7 +101,7 @@ int TEMPLATE5(test, T, label1, T, label2)(void)         \
 
 #define TEST_FUNCTION_END(state)                        \
     _end_time_ = clock();                               \
-    FLINT_TEST_CLEANUP(state);                          \
+    FLINT_TEST_CLEAR(state);                            \
     if (_label_len_ < 48)                               \
         printf("%.48s%6.2f   (" _GREEN_B "PASS" _RESET ")\n", \
                 _test_io_string_,                       \
@@ -115,7 +115,7 @@ int TEMPLATE5(test, T, label1, T, label2)(void)         \
 
 #define TEST_GR_FUNCTION_END(state, count_success, count_domain, count_unable) \
     _end_time_ = clock();                               \
-    FLINT_TEST_CLEANUP(state);                          \
+    FLINT_TEST_CLEAR(state);                            \
     printf("%.*s\n  "                                   \
             "%5" _WORD_FMT "d success, "                \
             "%5" _WORD_FMT "d domain, "                 \
@@ -129,7 +129,7 @@ int TEMPLATE5(test, T, label1, T, label2)(void)         \
 }
 
 #define TEST_FUNCTION_END_SKIPPED(state)                \
-    FLINT_TEST_CLEANUP(state);                          \
+    FLINT_TEST_CLEAR(state);                            \
     if (_label_len_ < 54)                               \
         printf("%.*s(" _YELLOW_B "SKIPPED" _RESET ")\n", \
                 54, _test_io_string_);                  \

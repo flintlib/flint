@@ -351,7 +351,7 @@ FLINT_INLINE ulong n_randint(flint_rand_t state, ulong limit)
    FLINT_GC_INIT(); \
    flint_rand_init(xxx)
 
-#define FLINT_TEST_CLEANUP(xxx) \
+#define FLINT_TEST_CLEAR(xxx) \
    flint_rand_clear(xxx); \
    flint_cleanup_master();
 
