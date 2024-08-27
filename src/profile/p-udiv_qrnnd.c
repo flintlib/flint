@@ -45,8 +45,8 @@ void sample(void * arg, ulong count)
          if (array[j] == 0) flint_printf("\r");
    }
 
-   flint_rand_clear(state);
    flint_free(array);
+   FLINT_TEST_CLEAR(state);
 }
 
 int main(void)

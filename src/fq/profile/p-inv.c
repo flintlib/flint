@@ -63,7 +63,7 @@ main(void)
 
     flint_printf ( " cpu = %wd ms, wall = %wd ms \n " , cpu , wall );
 
-    FLINT_TEST_CLEANUP(state);
+    FLINT_TEST_CLEAR(state);
 
     return 0;
 

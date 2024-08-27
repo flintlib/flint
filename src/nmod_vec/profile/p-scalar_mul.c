@@ -118,9 +118,9 @@ void sample_generic(void * arg, ulong count)
       prof_stop();
    }
 
-   flint_rand_clear(state);
    _nmod_vec_clear(vec);
    _nmod_vec_clear(vec2);
+   FLINT_TEST_CLEAR(state);
 }
 
 int main(void)

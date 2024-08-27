@@ -760,5 +760,7 @@ int main(void)
         flint_free(ns);
     }
 
+    FLINT_TEST_CLEAR(state)
+
     return 0;
 }

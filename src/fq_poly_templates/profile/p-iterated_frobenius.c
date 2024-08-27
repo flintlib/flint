@@ -173,7 +173,7 @@ main(int argc, char** argv)
     fmpz_clear(p);
     fmpz_clear(q);
 
-    FLINT_TEST_CLEANUP(state);
+    FLINT_TEST_CLEAR(state);
 
     return 0;
 }

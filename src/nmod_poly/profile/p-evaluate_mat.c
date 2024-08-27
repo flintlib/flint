@@ -79,6 +79,6 @@ main(void)
         nmod_mat_clear(C);
     }
 
-    FLINT_TEST_CLEANUP(state);
+    FLINT_TEST_CLEAR(state);
     return 0;
 }
