@@ -16,7 +16,9 @@
 
 TEST_FUNCTION_START(n_mulmod_shoup, state)
 {
-    for (ulong i = 0; i < 10000 * flint_test_multiplier(); i++)
+    int i, result;
+
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
 
         const ulong d = n_randtest_not_zero(state) / 2 + 1;  // 0 < d < 2**(FLINT_BITS-1)
@@ -33,7 +35,7 @@ TEST_FUNCTION_START(n_mulmod_shoup, state)
         p1 %= d;
         udiv_qrnnd(q, r2, p1, p2, d);
 
-        int result = (r1 == r2);
+        result = (r1 == r2);
         if (!result)
             TEST_FUNCTION_FAIL(
                     "a = %wu, b = %wu, d = %wu, w_pr = %wu\n"
