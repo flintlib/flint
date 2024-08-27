@@ -129,7 +129,7 @@ int TEMPLATE5(test, T, label1, T, label2)(void)         \
 }
 
 #define TEST_FUNCTION_END_SKIPPED(state)                \
-    FLINT_TEST_CLEAR(state);                          \
+    FLINT_TEST_CLEAR(state);                            \
     if (_label_len_ < 54)                               \
         printf("%.*s(" _YELLOW_B "SKIPPED" _RESET ")\n", \
                 54, _test_io_string_);                  \
