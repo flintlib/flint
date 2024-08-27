@@ -101,7 +101,7 @@ int TEMPLATE5(test, T, label1, T, label2)(void)         \
 
 #define TEST_FUNCTION_END(state)                        \
     _end_time_ = clock();                               \
-    FLINT_TEST_CLEAR(state);                          \
+    FLINT_TEST_CLEAR(state);                            \
     if (_label_len_ < 48)                               \
         printf("%.48s%6.2f   (" _GREEN_B "PASS" _RESET ")\n", \
                 _test_io_string_,                       \
