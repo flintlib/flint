@@ -22,9 +22,11 @@ ulong n_mulmod_and_precomp_shoup(ulong * ab_precomp, ulong a, ulong b, ulong a_p
 /*-------------------------------------------------------------*/
 
 // Sources:
+// - David Harvey, Faster arithmetic for number-theoretic transforms, 2014
+//     J.Symbolic Computation (http://dx.doi.org/10.1016/j.jsc.2013.09.002)
 // - NTL code (in particular file FFT.cpp, consulted in NTL v11.5.1)
 // - Victor Shoup, "Arithmetic Software Libraries", 2021 (https://doi.org/10.1017/9781108854207.012)
-//   (chapter 9 of the book https://doi.org/10.1017/9781108854207 )
+//     (chapter 9 of the book https://doi.org/10.1017/9781108854207 )
 
 // below, B == FLINT_BITS, W == 2**B
 
