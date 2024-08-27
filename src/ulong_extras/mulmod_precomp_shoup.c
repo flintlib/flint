@@ -13,6 +13,9 @@
 
 #include "ulong_extras.h"
 
+ulong n_mulmod_and_precomp_shoup(ulong * ab_precomp, ulong a, ulong b, ulong a_precomp, ulong b_precomp, ulong n)
+{
+}
 
 /*-------------------------------------------------------------*/
 /* notes on Shoup's modular multiplication with precomputation */

@@ -192,6 +192,10 @@ ulong n_mulmod_shoup(ulong a, ulong b, ulong a_precomp, ulong n)
     return res;
 }
 
+// returns a*b mod n, and computes ab_precomp = precomputation for a*b mod n
+ulong n_mulmod_and_precomp_shoup(ulong * ab_precomp, ulong a, ulong b, ulong a_precomp, ulong b_precomp, ulong n);
+
+
 
 ULONG_EXTRAS_INLINE
 ulong n_mulmod2_preinv(ulong a, ulong b, ulong n, ulong ninv)
