@@ -50,9 +50,9 @@ void sample(void * arg, ulong count)
       prof_stop();
    }
 
-   flint_rand_clear(state);
    _nmod_vec_clear(vec);
    _nmod_vec_clear(vec2);
+   FLINT_TEST_CLEAR(state);
 }
 
 void sample_shoup(void * arg, ulong count)
@@ -84,9 +84,9 @@ void sample_shoup(void * arg, ulong count)
       prof_stop();
    }
 
-   flint_rand_clear(state);
    _nmod_vec_clear(vec);
    _nmod_vec_clear(vec2);
+   FLINT_TEST_CLEAR(state);
 }
 
 void sample_generic(void * arg, ulong count)
@@ -99,8 +99,8 @@ void sample_generic(void * arg, ulong count)
    slong i, j;
    nn_ptr vec = _nmod_vec_init(length);
    nn_ptr vec2 = _nmod_vec_init(length);
-   FLINT_TEST_INIT(state);
 
+   FLINT_TEST_INIT(state);
 
    for (i = 0; i < count; i++)
    {

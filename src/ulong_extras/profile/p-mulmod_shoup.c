@@ -37,8 +37,8 @@ void sample(void * arg, ulong count)
         prof_stop();
     }
 
-    flint_rand_clear(state);
     flint_free(array);
+    FLINT_TEST_CLEAR(state);
 }
 
 void sample_no_precomp(void * arg, ulong count)
@@ -63,8 +63,8 @@ void sample_no_precomp(void * arg, ulong count)
         prof_stop();
     }
 
-    flint_rand_clear(state);
     flint_free(array);
+    FLINT_TEST_CLEAR(state);
 }
 
 void sample_precomp_only(void * arg, ulong count)
@@ -88,8 +88,8 @@ void sample_precomp_only(void * arg, ulong count)
         prof_stop();
     }
 
-    flint_rand_clear(state);
     flint_free(array);
+    FLINT_TEST_CLEAR(state);
 }
 
 int main(void)
