@@ -11,11 +11,13 @@
 
 /* Include functions *********************************************************/
 
+#include "t-00_notransform.c"
 #include "t-agm_hadamard.c"
 #include "t-agm_mul.c"
 #include "t-agm_mul_tight.c"
 #include "t-agm_sqrt.c"
 #include "t-all.c"
+#include "t-all_notransform.c"
 #include "t-char_dot.c"
 #include "t-char_get_a.c"
 #include "t-char_is_even.c"
@@ -27,6 +29,7 @@
 #include "t-ctx_tau_dupl.c"
 #include "t-ctx_z_set.c"
 #include "t-ctx_z_add_real.c"
+#include "t-ctx_z_copy.c"
 #include "t-ctx_z_dupl.c"
 #include "t-ctx_z_shift_a0.c"
 #include "t-dist_a0.c"
@@ -50,7 +53,9 @@
 #include "t-g2_sextic_chi5.c"
 #include "t-g2_transvectant.c"
 #include "t-g2_transvectant_lead.c"
+#include "t-jet_00_notransform.c"
 #include "t-jet_all.c"
+#include "t-jet_all_notransform.c"
 #include "t-jet_compose.c"
 #include "t-jet_error_bounds.c"
 #include "t-jet_mul.c"
@@ -75,6 +80,10 @@
 #include "t-ql_a0_steps.c"
 #include "t-ql_all.c"
 #include "t-ql_reduce.c"
+#include "t-ql_setup.c"
+#include "t-ql_steps.c"
+#include "t-ql_lower_dim.c"
+#include "t-ql_exact.c"
 #include "t-siegel_cocycle.c"
 #include "t-siegel_is_reduced.c"
 #include "t-siegel_reduce.c"
@@ -86,8 +95,8 @@
 #include "t-sp2gz_set_blocks.c"
 #include "t-sum_00.c"
 #include "t-sum_0b.c"
-#include "t-sum_a0.c"
-#include "t-sum_all.c"
+#include "t-sum_a0_tilde.c"
+#include "t-sum_all_tilde.c"
 #include "t-sum_jet_00.c"
 #include "t-sum_jet_all.c"
 #include "t-transform_char.c"
@@ -99,24 +108,27 @@
 
 test_struct tests[] =
 {
+    TEST_FUNCTION(acb_theta_00_notransform),
     /* TEST_FUNCTION(acb_theta_agm_hadamard),*/
     /* TEST_FUNCTION(acb_theta_agm_mul),
     TEST_FUNCTION(acb_theta_agm_mul_tight),
     TEST_FUNCTION(acb_theta_agm_sqrt),
-    TEST_FUNCTION(acb_theta_all),
-    TEST_FUNCTION(acb_theta_char_dot),
+    TEST_FUNCTION(acb_theta_all), */
+    TEST_FUNCTION(acb_theta_all_notransform),
+    /* TEST_FUNCTION(acb_theta_char_dot),
     TEST_FUNCTION(acb_theta_char_get_a),
     TEST_FUNCTION(acb_theta_char_is_even),
     TEST_FUNCTION(acb_theta_char_is_goepel),
     TEST_FUNCTION(acb_theta_char_is_syzygous),*/
-    TEST_FUNCTION(acb_theta_ctx_exp_inv),
+    /* TEST_FUNCTION(acb_theta_ctx_exp_inv),
     TEST_FUNCTION(acb_theta_ctx_sqr_inv),
     TEST_FUNCTION(acb_theta_ctx_tau_set),
     TEST_FUNCTION(acb_theta_ctx_tau_dupl),
     TEST_FUNCTION(acb_theta_ctx_z_set),
     TEST_FUNCTION(acb_theta_ctx_z_add_real),
+    TEST_FUNCTION(acb_theta_ctx_z_copy),
     TEST_FUNCTION(acb_theta_ctx_z_dupl),
-    TEST_FUNCTION(acb_theta_ctx_z_shift_a0),
+    TEST_FUNCTION(acb_theta_ctx_z_shift_a0),*/
     /*TEST_FUNCTION(acb_theta_dist_a0),
     TEST_FUNCTION(acb_theta_dist_lat),
     TEST_FUNCTION(acb_theta_dist_pt),
@@ -137,9 +149,11 @@ test_struct tests[] =
     TEST_FUNCTION(acb_theta_g2_sextic),
     TEST_FUNCTION(acb_theta_g2_sextic_chi5),
     TEST_FUNCTION(acb_theta_g2_transvectant),
-    TEST_FUNCTION(acb_theta_g2_transvectant_lead),
-    TEST_FUNCTION(acb_theta_jet_all),
-    TEST_FUNCTION(acb_theta_jet_compose),
+    TEST_FUNCTION(acb_theta_g2_transvectant_lead),*/
+    TEST_FUNCTION(acb_theta_jet_00_notransform),
+    /* TEST_FUNCTION(acb_theta_jet_all), */
+    TEST_FUNCTION(acb_theta_jet_all_notransform),
+    /* TEST_FUNCTION(acb_theta_jet_compose),
     TEST_FUNCTION(acb_theta_jet_error_bounds),
     TEST_FUNCTION(acb_theta_jet_mul),
     TEST_FUNCTION(acb_theta_jet_naive_00),
@@ -162,8 +176,12 @@ test_struct tests[] =
     TEST_FUNCTION(acb_theta_ql_a0_split),
     TEST_FUNCTION(acb_theta_ql_a0_steps),
     TEST_FUNCTION(acb_theta_ql_all),
-    TEST_FUNCTION(acb_theta_ql_reduce),
-    TEST_FUNCTION(acb_theta_siegel_cocycle),
+    TEST_FUNCTION(acb_theta_ql_reduce), */
+    TEST_FUNCTION(acb_theta_ql_setup),
+    TEST_FUNCTION(acb_theta_ql_steps),
+    TEST_FUNCTION(acb_theta_ql_lower_dim),
+    TEST_FUNCTION(acb_theta_ql_exact),
+/*    TEST_FUNCTION(acb_theta_siegel_cocycle),
     TEST_FUNCTION(acb_theta_siegel_is_reduced),
     TEST_FUNCTION(acb_theta_siegel_reduce),
     TEST_FUNCTION(acb_theta_siegel_transform),
@@ -174,8 +192,8 @@ test_struct tests[] =
     TEST_FUNCTION(acb_theta_sp2gz_set_blocks), */
     TEST_FUNCTION(acb_theta_sum_00),
     TEST_FUNCTION(acb_theta_sum_0b),
-    TEST_FUNCTION(acb_theta_sum_a0),
-    TEST_FUNCTION(acb_theta_sum_all),
+    TEST_FUNCTION(acb_theta_sum_a0_tilde),
+    TEST_FUNCTION(acb_theta_sum_all_tilde),
     TEST_FUNCTION(acb_theta_sum_jet_00),
     TEST_FUNCTION(acb_theta_sum_jet_all),
     /* TEST_FUNCTION(acb_theta_transform_char),

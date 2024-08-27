@@ -23,6 +23,7 @@ acb_theta_jet_error_bounds(arb_ptr err, acb_srcptr z, const acb_mat_t tau,
     arb_mat_t tau_err;
     arb_ptr z_err;
     arb_t e, f;
+    arf_t half;
     slong nb = acb_theta_jet_nb(ord, g);
     slong nb_dth = acb_theta_jet_nb(ord + 2, g);
     slong * tups;
@@ -34,19 +35,31 @@ acb_theta_jet_error_bounds(arb_ptr err, acb_srcptr z, const acb_mat_t tau,
     z_err = _arb_vec_init(g);
     arb_init(e);
     arb_init(f);
+    arf_init(half);
     tups = flint_malloc(nb * g * sizeof(slong));
     new_tups = flint_malloc(g * sizeof(slong));
 
     /* Get input errors on z, tau */
+    arf_set_si(half, 1);
+    arf_mul_2exp_si(half, half, -1);
     for (l = 0; l < g; l++)
     {
         for (m = l; m < g; m++)
         {
+            arb_zero(e);
             acb_get_rad_ubound_arf(arb_midref(e), acb_mat_entry(tau, l, m), prec);
             arb_set(arb_mat_entry(tau_err, l, m), e);
         }
-        acb_get_rad_ubound_arf(arb_midref(e), &z[l], prec);
-        arb_set(&z_err[l], e);
+        arb_zero(e);
+        arb_zero(f);
+        /* Use that theta is 1-periodic in re(z) */
+        arf_set_mag(arb_midref(e), arb_radref(acb_imagref(&z[l])));
+        arf_set_mag(arb_midref(f), arb_radref(acb_realref(&z[l])));
+        arf_min(arb_midref(f), arb_midref(f), half);
+        arb_sqr(e, e, prec);
+        arb_sqr(f, f, prec);
+        arb_add(e, e, f, prec);
+        arb_sqrt(&z_err[l], e, prec);
     }
 
     /* We need order ord + 2 to use the heat equation. */
@@ -111,6 +124,7 @@ acb_theta_jet_error_bounds(arb_ptr err, acb_srcptr z, const acb_mat_t tau,
     _arb_vec_clear(z_err, g);
     arb_clear(e);
     arb_clear(f);
+    arf_clear(half);
     flint_free(tups);
     flint_free(new_tups);
 }

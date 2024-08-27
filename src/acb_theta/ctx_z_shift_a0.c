@@ -61,10 +61,10 @@ acb_theta_ctx_z_shift_a0(acb_theta_ctx_z_t res, const acb_theta_ctx_z_t ctx,
     }
     acb_mul(acb_theta_ctx_c(res), c, acb_theta_ctx_exp_a_tau_a_div_4(ctx_tau, a), prec);
 
-    /* Compute c, u, r, v */
+    /* Compute c, r, v; u and uinv must be left invariant */
     _arb_vec_set(acb_theta_ctx_r(res), acb_theta_ctx_r(res), g);
     acb_abs(abs, acb_theta_ctx_c(res), prec);
-    arb_mul(acb_theta_ctx_u(res), acb_theta_ctx_u(ctx), abs, prec);
+    arb_set(acb_theta_ctx_u(res), acb_theta_ctx_u(ctx));
     acb_mul(acb_theta_ctx_c(res), acb_theta_ctx_c(res), acb_theta_ctx_c(ctx), prec);
 
     acb_theta_char_get_arb(v_shift, a, g);

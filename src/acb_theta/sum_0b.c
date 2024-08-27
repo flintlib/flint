@@ -71,6 +71,7 @@ acb_theta_sum_0b(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
                     acb_theta_ctx_exp_tau(ctx_tau), acb_theta_ctx_exp_tau_inv(ctx_tau), E, 0,
                     prec, acb_theta_sum_0b_worker);
                 _acb_vec_scalar_mul(th + j * n, th + j * n, n, acb_theta_ctx_c(&vec[j]), prec);
+
                 arb_mul_arf(err, acb_theta_ctx_u(&vec[j]), eps, prec);
                 for (k = 0; k < n; k++)
                 {

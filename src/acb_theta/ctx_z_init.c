@@ -23,6 +23,8 @@ acb_theta_ctx_z_init(acb_theta_ctx_z_t ctx, slong g)
     acb_theta_ctx_exp_z(ctx) = _acb_vec_init(g);
     acb_init(acb_theta_ctx_c(ctx));
     acb_theta_ctx_r(ctx) = _arb_vec_init(g);
+    arb_init(acb_theta_ctx_u(ctx));
+    arb_init(acb_theta_ctx_uinv(ctx));
 
     if (g > 1)
     {
@@ -30,6 +32,5 @@ acb_theta_ctx_z_init(acb_theta_ctx_z_t ctx, slong g)
         acb_theta_ctx_exp_z_inv(ctx) = _acb_vec_init(g);
         acb_theta_ctx_exp_2z_inv(ctx) = _acb_vec_init(g);
         acb_theta_ctx_v(ctx) = _arb_vec_init(g);
-        arb_init(acb_theta_ctx_u(ctx));
     }
 }

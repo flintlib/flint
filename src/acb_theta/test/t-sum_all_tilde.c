@@ -14,7 +14,7 @@
 #include "arb_mat.h"
 #include "acb_theta.h"
 
-TEST_FUNCTION_START(acb_theta_sum_all, state)
+TEST_FUNCTION_START(acb_theta_sum_all_tilde, state)
 {
     slong iter;
 
@@ -24,6 +24,7 @@ TEST_FUNCTION_START(acb_theta_sum_all, state)
         slong g = 1 + n_randint(state, 3);
         slong n = 1 << g;
         slong prec = 100 + n_randint(state, 100);
+        slong hp = prec + 100;
         slong mag_bits = n_randint(state, 4);
         acb_mat_t tau;
         acb_ptr z;
@@ -40,14 +41,15 @@ TEST_FUNCTION_START(acb_theta_sum_all, state)
         th1 = _acb_vec_init(n * n);
         th2 = _acb_vec_init(n * n);
 
-        acb_siegel_randtest_reduced(tau, state, prec, mag_bits);
-        acb_siegel_randtest_vec(z, state, g, prec);
+        acb_siegel_randtest_reduced(tau, state, hp, mag_bits);
+        acb_siegel_randtest_vec(z, state, g, hp);
         acb_theta_ctx_tau_set(ctx_tau, tau, prec);
         acb_theta_ctx_z_set(ctx, z, ctx_tau, prec);
         acb_theta_dist_a0(d, z, tau, prec);
 
-        acb_theta_sum_all(th1, ctx, 1, ctx_tau, d, prec);
-        acb_theta_naive_all(th2, z, 1, tau, prec);
+        acb_theta_sum_all_tilde(th1, ctx, 1, ctx_tau, d, prec);
+        acb_theta_naive_all(th2, z, 1, tau, hp);
+        _acb_vec_scalar_mul_arb(th1, th1, n * n, acb_theta_ctx_u(ctx), prec);
 
         if (!_acb_vec_overlaps(th1, th2, n * n))
         {

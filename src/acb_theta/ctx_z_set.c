@@ -78,13 +78,13 @@ acb_theta_ctx_z_set(acb_theta_ctx_z_t ctx, acb_srcptr z, const acb_theta_ctx_tau
     _arb_vec_set(acb_theta_ctx_r(ctx), r, g);
 
     /* u is exp(pi y^T Yinv y) and v is C(t - r) */
+    arb_dot(u, NULL, 0, y, 1, t, 1, g, prec);
+    arb_const_pi(acb_theta_ctx_u(ctx), prec);
+    arb_mul(acb_theta_ctx_u(ctx), acb_theta_ctx_u(ctx), u, prec);
+    arb_exp(acb_theta_ctx_u(ctx), acb_theta_ctx_u(ctx), prec);
+    arb_inv(acb_theta_ctx_uinv(ctx), acb_theta_ctx_u(ctx), prec);
     if (g > 1)
     {
-        arb_dot(u, NULL, 0, y, 1, t, 1, g, prec);
-        arb_const_pi(acb_theta_ctx_u(ctx), prec);
-        arb_mul(acb_theta_ctx_u(ctx), acb_theta_ctx_u(ctx), u, prec);
-        arb_exp(acb_theta_ctx_u(ctx), acb_theta_ctx_u(ctx), prec);
-
         _arb_vec_sub(t, t, r, g, prec);
         arb_mat_vector_mul_col(acb_theta_ctx_v(ctx), acb_theta_ctx_cho(ctx_tau), t, prec);
     }

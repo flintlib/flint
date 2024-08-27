@@ -47,7 +47,10 @@ acb_theta_ctx_z_dupl(acb_theta_ctx_z_t ctx, slong prec)
         }
     }
 
+    /* Compute other quantities */
     acb_sqr(acb_theta_ctx_c(ctx), acb_theta_ctx_c(ctx), prec);
+    arb_sqr(acb_theta_ctx_u(ctx), acb_theta_ctx_u(ctx), prec);
+    arb_sqr(acb_theta_ctx_uinv(ctx), acb_theta_ctx_uinv(ctx), prec);
     /* r does not change. */
     if (g > 1)
     {
@@ -57,7 +60,6 @@ acb_theta_ctx_z_dupl(acb_theta_ctx_z_t ctx, slong prec)
         arb_set_si(sqrt2, 2);
         arb_sqrt(sqrt2, sqrt2, prec);
 
-        arb_sqr(acb_theta_ctx_u(ctx), acb_theta_ctx_u(ctx), prec);
         _arb_vec_scalar_mul(acb_theta_ctx_v(ctx), acb_theta_ctx_v(ctx), g, sqrt2, prec);
 
         arb_clear(sqrt2);
