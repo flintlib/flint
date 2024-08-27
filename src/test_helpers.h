@@ -115,7 +115,7 @@ int TEMPLATE5(test, T, label1, T, label2)(void)         \
 
 #define TEST_GR_FUNCTION_END(state, count_success, count_domain, count_unable) \
     _end_time_ = clock();                               \
-    FLINT_TEST_CLEAR(state);                          \
+    FLINT_TEST_CLEAR(state);                            \
     printf("%.*s\n  "                                   \
             "%5" _WORD_FMT "d success, "                \
             "%5" _WORD_FMT "d domain, "                 \
