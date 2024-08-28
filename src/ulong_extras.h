@@ -16,6 +16,7 @@
 #ifndef ULONG_EXTRAS_H
 #define ULONG_EXTRAS_H
 
+#include "longlong_asm_clang.h"
 #ifdef ULONG_EXTRAS_INLINES_C
 #define ULONG_EXTRAS_INLINE
 #else
@@ -194,15 +195,34 @@ ulong n_mulmod_shoup(ulong a, ulong b, ulong a_precomp, ulong n)
 
 // returns a*b mod n, and computes ab_precomp = precomputation for a*b mod n
 ULONG_EXTRAS_INLINE
-void n_mulmod_precomp_shoup_full(ulong * a_pr_hi, ulong * a_pr_lo, ulong a, ulong n)
+void n_mulmod_precomp_shoup_hi_lo(ulong * a_pr_hi, ulong * a_pr_lo, ulong a, ulong n)
 {
     udiv_qrnnd(*a_pr_hi, *a_pr_lo, a, UWORD(0), n);
 }
 
-ulong n_mulmod_shoup_with_precomp(ulong * ab_pr,
-        ulong a, ulong b,
-        ulong a_pr_hi, ulong a_pr_lo, ulong b_pr,
-        ulong n);
+ULONG_EXTRAS_INLINE
+void n_mulmod_shoup_with_product_precomp(ulong * ab, ulong * ab_precomp,
+                                         ulong a, ulong b,
+                                         ulong a_pr_hi, ulong a_pr_lo, ulong b_precomp,
+                                         ulong n)
+{
+    ulong p_hi, p_lo;
+
+    // 1/ a*b mod n using a_pr_hi
+    // one 2-word product, two 1-word products
+    umul_ppmm(p_hi, *ab_precomp, a_pr_hi, b);
+    *ab = a * b - p_hi * n;
+    if (*ab >= n)
+        *ab -= n;
+
+    // 2/ floor(a_lo * b / n)
+    // one 2-word product, two 1-word products
+    umul_ppmm(p_hi, p_lo, b_precomp, a_pr_lo);
+    p_lo = b * a_pr_lo - p_hi * n;
+    *ab_precomp += p_hi;
+    if (p_lo >= n)
+        *ab_precomp += 1;
+}
 
 
 
