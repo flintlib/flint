@@ -604,6 +604,24 @@ Modular Arithmetic
     precomputed data for :func:`n_mulmod_shoup`, which requires `n <
     2^{\mathtt{FLINT\_BITS} - 1}`.
 
+.. function:: void n_mulmod_precomp_shoup_quo_rem(ulong * a_pr_quo, ulong * a_pr_rem, ulong a, ulong n)
+
+     Sets ``a_pr_quo`` to the above scaled approximation of `\lfloor a \cdot
+     2^{\mathtt{FLINT\_BITS}} / n \rfloor`, which is the quotient in the integer
+     division of `a \cdot 2^{\mathtt{FLINT\_BITS}}` by `n`, and also sets
+     ``a_pr_rem`` to the remainder in this division. This requires `a < n` and
+     is intended to be used as the precomputed data for
+     :func:`n_mulmod_and_precomp_shoup`, which requires `n <
+     2^{\mathtt{FLINT\_BITS} - 1}`.
+
+.. function:: ulong n_mulmod_precomp_shoup_rem_from_quo(ulong a_pr_quo, ulong n)
+
+    Returns the remainder in the integer division of `a \cdot
+    2^{\mathtt{FLINT\_BITS}}` by `n`. This requires `a < n` and is intended to
+    be used as the precomputed data for :func:`n_mulmod_and_precomp_shoup`,
+    which requires `n < 2^{\mathtt{FLINT\_BITS} - 1}`. This is faster than
+    :func:`n_mulmod_precomp_shoup_quo_rem` when ``a_pr_quo`` is already known.
+
 .. function:: ulong n_mulmod_shoup(ulong a, ulong b, ulong a_precomp, ulong n)
 
     Returns `a b \bmod n` given ``a_precomp``, a precomputed scaled
@@ -616,6 +634,20 @@ Modular Arithmetic
     scalar multiplication of vectors such as :func:`_nmod_vec_scalar_mul_nmod`
     or of matrices such as :func:`_nmod_vec_scalar_mul_nmod`.
 
+.. function:: void n_mulmod_and_precomp_shoup(ulong * ab, ulong * ab_precomp, \
+                             ulong a, ulong b,                                \
+                             ulong a_pr_quo, ulong a_pr_rem, ulong b_precomp, \
+                             ulong n)
+
+    Sets ``ab`` to `a b \bmod n` and sets ``ab_precomp`` to the precomputed
+    scaled approximation for ``ab / n``, that is, `\lfloor (ab \bmod n) \cdot
+    2^{\mathtt{FLINT\_BITS}} / n \rfloor`. This requires `n <
+    2^{\mathtt{FLINT\_BITS} - 1}`, `a < n`, and `b < n`. The input ``a_pr_quo``
+    and ``a_pr_rem`` is as in the description of
+    :func:`n_mulmod_precomp_shoup_quo_rem`, and ``b_precomp`` is as in the
+    description of :func:`n_mulmod_precomp_shoup`. This can be used for example
+    when seeking a list of powers of `a` along with associated precomputed data
+    to speed up repeated modular multiplications by these fixed powers.
 
 Divisibility testing
 --------------------------------------------------------------------------------

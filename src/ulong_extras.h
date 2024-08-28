@@ -225,7 +225,6 @@ void n_mulmod_and_precomp_shoup(ulong * ab, ulong * ab_precomp,
 }
 
 
-
 ULONG_EXTRAS_INLINE
 ulong n_mulmod2_preinv(ulong a, ulong b, ulong n, ulong ninv)
 {
