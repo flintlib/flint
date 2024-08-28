@@ -212,15 +212,11 @@ void n_mulmod_and_precomp_shoup(ulong * ab, ulong * ab_precomp,
 {
     ulong p_hi, p_lo;
 
-    // 1/ a*b mod n using a_pr_quo
-    // one 2-word product, two 1-word products
     umul_ppmm(p_hi, *ab_precomp, a_pr_quo, b);
     *ab = a * b - p_hi * n;
     if (*ab >= n)
         *ab -= n;
 
-    // 2/ floor(a_rem * b / n)
-    // one 2-word product, two 1-word products
     umul_ppmm(p_hi, p_lo, b_precomp, a_pr_rem);
     p_lo = b * a_pr_rem - p_hi * n;
     *ab_precomp += p_hi;
