@@ -504,23 +504,17 @@ Scalar multiplication and division
     Adds ``poly`` multiplied by `c` to ``res``. The element `c` is assumed
     to be less than the modulus of ``poly``.
 
-.. function:: void _nmod_poly_make_monic(nn_ptr output, nn_srcptr input, slong len, nmod_t mod)
+.. function:: void _nmod_poly_make_monic(nn_ptr res, nn_srcptr poly, slong len, nmod_t mod)
 
-    Sets ``output`` to be the scalar multiple of ``input`` of
-    length ``len > 0`` that has leading coefficient one, if such a
-    polynomial exists. If the leading coefficient of ``input`` is not
-    invertible, ``output`` is set to the multiple of ``input`` whose
-    leading coefficient is the greatest common divisor of the leading
-    coefficient and the modulus of ``input``.
+    Requires that ``res`` and ``poly`` have length at least ``len``, with ``len
+    > 0``, and that ``poly[len-1]`` is invertible modulo ``mod.n``. Sets
+    ``res[i]`` to the modular product of `c` and ``poly[i]`` for `i` from `0`
+    to ``len-1``, where `c` is the inverse of ``poly[len-1]``.
 
-.. function:: void nmod_poly_make_monic(nmod_poly_t output, const nmod_poly_t input)
+.. function:: void nmod_poly_make_monic(nmod_poly_t res, const nmod_poly_t poly)
 
-    Sets ``output`` to be the scalar multiple of ``input`` with leading
-    coefficient one, if such a polynomial exists. If ``input`` is zero
-    an exception is raised. If the leading coefficient of ``input`` is not
-    invertible, ``output`` is set to the multiple of ``input`` whose
-    leading coefficient is the greatest common divisor of the leading
-    coefficient and the modulus of ``input``.
+    Sets ``res`` to be the scalar multiple of ``poly`` with leading coefficient
+    one. If ``poly`` is zero, an exception is raised.
 
 
 Bit packing and unpacking
