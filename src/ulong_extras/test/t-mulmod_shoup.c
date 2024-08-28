@@ -17,7 +17,6 @@
 TEST_FUNCTION_START(n_mulmod_shoup, state)
 {
     int i, result;
-    printf("\n\n\nYESYESYES\n\n\n");
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
