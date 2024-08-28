@@ -73,6 +73,7 @@
 #include "t-mulmod_precomp.c"
 #include "t-mulmod_preinv.c"
 #include "t-mulmod_shoup.c"
+#include "t-mulmod_and_precomp_shoup.c"
 #include "t-nextprime.c"
 #include "t-nth_prime_bounds.c"
 #include "t-urandint.c"

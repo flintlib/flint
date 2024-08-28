@@ -16,7 +16,6 @@
 #ifndef ULONG_EXTRAS_H
 #define ULONG_EXTRAS_H
 
-#include "longlong_asm_clang.h"
 #ifdef ULONG_EXTRAS_INLINES_C
 #define ULONG_EXTRAS_INLINE
 #else
@@ -201,10 +200,10 @@ void n_mulmod_precomp_shoup_hi_lo(ulong * a_pr_hi, ulong * a_pr_lo, ulong a, ulo
 }
 
 ULONG_EXTRAS_INLINE
-void n_mulmod_shoup_with_product_precomp(ulong * ab, ulong * ab_precomp,
-                                         ulong a, ulong b,
-                                         ulong a_pr_hi, ulong a_pr_lo, ulong b_precomp,
-                                         ulong n)
+void n_mulmod_and_precomp_shoup(ulong * ab, ulong * ab_precomp,
+                                ulong a, ulong b,
+                                ulong a_pr_hi, ulong a_pr_lo, ulong b_precomp,
+                                ulong n)
 {
     ulong p_hi, p_lo;
 

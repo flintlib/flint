@@ -1,6 +1,4 @@
 /*
-    Copyright (C) 2015 William Hart
-    Copyright (C) 2015 Vladimir Glazachev
     Copyright (C) 2024 Vincent Neiger
 
     This file is part of FLINT.
@@ -14,10 +12,10 @@
 #include "test_helpers.h"
 #include "ulong_extras.h"
 
-TEST_FUNCTION_START(n_mulmod_shoup, state)
+TEST_FUNCTION_START(n_mulmod_and_precomp_shoup, state)
 {
     int i, result;
-    printf("\n\n\nYESYESYES\n\n\n");
+        printf("\n\n\nYESYESYES\n\n\n");
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
@@ -25,22 +23,30 @@ TEST_FUNCTION_START(n_mulmod_shoup, state)
         const ulong a = n_randtest(state) % d;  // a must be < d
         const ulong b = n_randtest(state);  // b is arbitrary
 
-        // mulmod_shoup
-        const ulong a_pr = n_mulmod_precomp_shoup(a, d);
-        const ulong r1 = n_mulmod_shoup(a, b, a_pr, d);
+        // mulmod_and_precomp_shoup
+        ulong a_pr_hi, a_pr_lo, ab, ab_precomp;
 
-        // trivial mulmod
+        n_mulmod_precomp_shoup_hi_lo(&a_pr_hi, &a_pr_lo, a, d);
+        const ulong b_precomp = n_mulmod_precomp_shoup(b, d);
+        n_mulmod_and_precomp_shoup(&ab, &ab_precomp, a, b, a_pr_hi, a_pr_lo, b_precomp, d);
+
+        // check ab == a*b % n
         ulong r2, q, p1, p2;
         umul_ppmm(p1, p2, a, b);
         p1 %= d;
         udiv_qrnnd(q, r2, p1, p2, d);
+        result = (ab == r2);
 
-        result = (r1 == r2);
+        // check precomp values:
+        //result = result & (a_pr_hi == n_mulmod_precomp_shoup(a, d));
+        //result = result & (ab_precomp == n_mulmod_precomp_shoup(ab, d));
+
         if (!result)
             TEST_FUNCTION_FAIL(
-                    "a = %wu, b = %wu, d = %wu, a_pr = %wu\n"
-                    "q = %wu, r1 = %wu, r2 = %wu\n",
-                    a, b, d, a_pr, q, r1, r2);
+                    "a = %wu, b = %wu, d = %wu, \n",
+                    "a_pr_hi = %wu, a_pr_lo = %wu, b_precomp = %wu\n"
+                    "q = %wu, r1 = %wu, r2 = %wu, ab_precomp = %wu\n",
+                    a, b, d, a_pr_hi, a_pr_lo, b_precomp, q, ab, r2, ab_precomp);
     }
 
     TEST_FUNCTION_END(state);
