@@ -58,19 +58,17 @@ void sample_direct(void * arg, ulong count)
         ulong bits = n_randint(state, FLINT_BITS - 1) + 1;  // 1...63
         ulong d = n_randbits(state, bits);  // 0 < d < 2**(FLINT_BITS-1) required by mulmod_shoup
         ulong a = n_randint(state, d);  // a < d required for precomputation
-        ulong a_pr_quo, a_pr_rem;
-        n_mulmod_precomp_shoup_quo_rem(&a_pr_quo, &a_pr_rem, a, d);
+        ulong a_precomp = n_mulmod_precomp_shoup(a, d);
 
         for (ulong j = 0; j < NB_ITER; j++)
         {
             array[j] = n_randint(state, d);  // < d required for precomputation
-            array_pr[j] = n_mulmod_precomp_shoup(array[j], d);
         }
 
         prof_start();
         for (ulong j = 0; j < NB_ITER; j++)
         {
-            array[j] = n_mulmod_shoup(a, array[j], a_pr_quo, d);
+            array[j] = n_mulmod_shoup(a, array[j], a_precomp, d);
             array_pr[j] = n_mulmod_precomp_shoup(array[j], d);
         }
         prof_stop();
