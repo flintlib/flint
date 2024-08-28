@@ -173,9 +173,9 @@ ulong n_mulmod_preinv(ulong a, ulong b, ulong n, ulong ninv, ulong norm);
 ULONG_EXTRAS_INLINE
 ulong n_mulmod_precomp_shoup(ulong a, ulong n)
 {
-   ulong a_precomp, r;
-   udiv_qrnnd(a_precomp, r, a, UWORD(0), n);
-   return a_precomp;
+    ulong a_precomp, r;
+    udiv_qrnnd(a_precomp, r, a, UWORD(0), n);
+    return a_precomp;
 }
 
 ULONG_EXTRAS_INLINE
@@ -193,7 +193,16 @@ ulong n_mulmod_shoup(ulong a, ulong b, ulong a_precomp, ulong n)
 }
 
 // returns a*b mod n, and computes ab_precomp = precomputation for a*b mod n
-ulong n_mulmod_and_precomp_shoup(ulong * ab_precomp, ulong a, ulong b, ulong a_precomp, ulong b_precomp, ulong n);
+ULONG_EXTRAS_INLINE
+void n_mulmod_precomp_shoup_full(ulong * a_pr_hi, ulong * a_pr_lo, ulong a, ulong n)
+{
+    udiv_qrnnd(*a_pr_hi, *a_pr_lo, a, UWORD(0), n);
+}
+
+ulong n_mulmod_shoup_with_precomp(ulong * ab_pr,
+        ulong a, ulong b,
+        ulong a_pr_hi, ulong a_pr_lo, ulong b_pr,
+        ulong n);
 
 
 
