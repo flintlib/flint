@@ -192,32 +192,37 @@ ulong n_mulmod_shoup(ulong a, ulong b, ulong a_precomp, ulong n)
     return res;
 }
 
-// returns a*b mod n, and computes ab_precomp = precomputation for a*b mod n
 ULONG_EXTRAS_INLINE
-void n_mulmod_precomp_shoup_hi_lo(ulong * a_pr_hi, ulong * a_pr_lo, ulong a, ulong n)
+void n_mulmod_precomp_shoup_quo_rem(ulong * a_pr_quo, ulong * a_pr_rem, ulong a, ulong n)
 {
-    udiv_qrnnd(*a_pr_hi, *a_pr_lo, a, UWORD(0), n);
+    udiv_qrnnd(*a_pr_quo, *a_pr_rem, a, UWORD(0), n);
+}
+
+ULONG_EXTRAS_INLINE
+ulong n_mulmod_precomp_shoup_rem_from_quo(ulong a_pr_quo, ulong n)
+{
+    return - a_pr_quo * n;
 }
 
 ULONG_EXTRAS_INLINE
 void n_mulmod_and_precomp_shoup(ulong * ab, ulong * ab_precomp,
                                 ulong a, ulong b,
-                                ulong a_pr_hi, ulong a_pr_lo, ulong b_precomp,
+                                ulong a_pr_quo, ulong a_pr_rem, ulong b_precomp,
                                 ulong n)
 {
     ulong p_hi, p_lo;
 
-    // 1/ a*b mod n using a_pr_hi
+    // 1/ a*b mod n using a_pr_quo
     // one 2-word product, two 1-word products
-    umul_ppmm(p_hi, *ab_precomp, a_pr_hi, b);
+    umul_ppmm(p_hi, *ab_precomp, a_pr_quo, b);
     *ab = a * b - p_hi * n;
     if (*ab >= n)
         *ab -= n;
 
-    // 2/ floor(a_lo * b / n)
+    // 2/ floor(a_rem * b / n)
     // one 2-word product, two 1-word products
-    umul_ppmm(p_hi, p_lo, b_precomp, a_pr_lo);
-    p_lo = b * a_pr_lo - p_hi * n;
+    umul_ppmm(p_hi, p_lo, b_precomp, a_pr_rem);
+    p_lo = b * a_pr_rem - p_hi * n;
     *ab_precomp += p_hi;
     if (p_lo >= n)
         *ab_precomp += 1;
