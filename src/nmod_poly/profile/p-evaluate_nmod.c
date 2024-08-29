@@ -96,7 +96,7 @@ void sample_generic(void * arg, ulong count)
     FLINT_TEST_CLEAR(state);
 }
 
-void sample_shoup(void * arg, ulong count)
+void sample_precomp(void * arg, ulong count)
 {
     ulong n;
     nmod_t mod;
@@ -128,7 +128,7 @@ void sample_shoup(void * arg, ulong count)
         for (j = 0; j < 100; j++)
         {
             const ulong pt_precomp = n_mulmod_precomp_shoup(pt, n);
-            _nmod_poly_evaluate_nmod_shoup(poly, length, pt, pt_precomp, mod);
+            _nmod_poly_evaluate_nmod_precomp(poly, length, pt, pt_precomp, mod);
         }
         prof_stop();
     }
@@ -138,7 +138,7 @@ void sample_shoup(void * arg, ulong count)
     FLINT_TEST_CLEAR(state);
 }
 
-void sample_shoup_lazy(void * arg, ulong count)
+void sample_precomp_lazy(void * arg, ulong count)
 {
     ulong n;
     nmod_t mod;
@@ -170,7 +170,7 @@ void sample_shoup_lazy(void * arg, ulong count)
         for (j = 0; j < 100; j++)
         {
             const ulong pt_precomp = n_mulmod_precomp_shoup(pt, n);
-            _nmod_poly_evaluate_nmod_shoup_lazy(poly, length, pt, pt_precomp, mod);
+            _nmod_poly_evaluate_nmod_precomp_lazy(poly, length, pt, pt_precomp, mod);
         }
         prof_stop();
     }
@@ -189,13 +189,13 @@ int main(void)
     double min, max;
     double mins[18]; // note: max seems to be consistently identical or extremely close to min
     double mins_generic[18];
-    double mins_shoup[18];
-    double mins_shoup_lazy[18];
+    double mins_precomp[18];
+    double mins_precomp_lazy[18];
     info_t info;
     flint_bitcnt_t i;
 
     flint_printf("unit: all measurements in c/l\n");
-    flint_printf("profiled: interface | generic | shoup | shoup_lazy\n");
+    flint_printf("profiled: interface | generic | precomp | precomp_lazy\n");
 
     for (i = 62; i <= FLINT_BITS; i++)
     {
@@ -210,10 +210,10 @@ int main(void)
             mins[len-1] = min;
             prof_repeat(&min, &max, sample_generic, (void *) &info);
             mins_generic[len-1] = min;
-            prof_repeat(&min, &max, sample_shoup, (void *) &info);
-            mins_shoup[len-1] = min;
-            prof_repeat(&min, &max, sample_shoup_lazy, (void *) &info);
-            mins_shoup_lazy[len-1] = min;
+            prof_repeat(&min, &max, sample_precomp, (void *) &info);
+            mins_precomp[len-1] = min;
+            prof_repeat(&min, &max, sample_precomp_lazy, (void *) &info);
+            mins_precomp_lazy[len-1] = min;
         }
 
         if (i < FLINT_BITS-1)
@@ -224,8 +224,8 @@ int main(void)
                         lengths[len],
                         (mins[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100),
                         (mins_generic[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100),
-                        (mins_shoup[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100),
-                        (mins_shoup_lazy[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100));
+                        (mins_precomp[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100),
+                        (mins_precomp_lazy[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100));
                 flint_printf("\n");
             }
         }
@@ -237,8 +237,8 @@ int main(void)
                         lengths[len],
                         (mins[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100),
                         (mins_generic[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100),
-                        (mins_shoup[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100),
-                        (mins_shoup_lazy[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100));
+                        (mins_precomp[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100),
+                        (mins_precomp_lazy[len-1]/(double)FLINT_CLOCK_SCALE_FACTOR)/(lengths[len]*100));
                 flint_printf("\n");
             }
         }
