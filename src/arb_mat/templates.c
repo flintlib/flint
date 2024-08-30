@@ -20,7 +20,7 @@
 
 /* comparisons ***************************************************************/
 
-/* Checks if matrix fullfills a criteria */
+/* Checks if matrix fulfills a criteria */
 #define IS_OP(func_name, T, OP)                 \
 int func_name(const T am)                       \
 {                                               \

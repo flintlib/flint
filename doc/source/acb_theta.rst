@@ -944,7 +944,7 @@ Quasi-linear algorithms: AGM steps
     sign is determined by *rts*: each `r_k` will overlap the corresponding
     entry of *rts* but not its opposite. Exceptional cases are handled as
     follows: if both square roots of `a_k` overlap *rts*, then `r_k` is set to
-    their :func:`acb_union`; if none ovelaps *rts*, then `r_k` is set to an
+    their :func:`acb_union`; if none overlaps *rts*, then `r_k` is set to an
     indeterminate value.
 
 .. function:: void acb_theta_agm_mul(acb_ptr res, acb_srcptr a1, acb_srcptr a2, slong g, slong prec)
@@ -1032,7 +1032,7 @@ domain, however `\mathrm{Im}(\tau)` may have large eigenvalues.
     return value is 1 iff all the calls to *worker* succeed.
 
     For each `0\leq a < 2^g`, we compute *R2* and *eps* as in
-    :func:`acb_theta_naive_radius` at shifted absolte precision *prec*. Note
+    :func:`acb_theta_naive_radius` at shifted absolute precision *prec*. Note
     that `n^T \mathrm{Im}(\tau) n\geq \lVert C_1 n_1\rVert^2`, where `C_1`
     denotes the lower-right block of `C` of dimensions
     `(g-s)\times(g-s)`. Thus, in order to compute `\theta_{a,0}(z, 2^n\tau)` at
@@ -1712,7 +1712,7 @@ Checks that the result of :func:`acb_theta_naive_term` is `n^k
 
     ./build/acb_theta/test/main acb_theta_naive_00
 
-Checks that the ouput of :func:`acb_theta_naive_00` overlaps the first entry of
+Checks that the output of :func:`acb_theta_naive_00` overlaps the first entry of
 the output of :func:`acb_theta_naive_0b`.
 
 .. code-block:: bash

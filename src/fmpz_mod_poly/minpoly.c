@@ -119,7 +119,7 @@ _fmpz_mod_poly_minpoly_hgcd(fmpz * poly, const fmpz * seq, slong len, const fmpz
     leng = len;
     FMPZ_VEC_NORM(g, leng);
 
-    /* leng is invalid intput for hgcd. todo: change hgcd to allow this? */
+    /* leng is invalid input for hgcd. todo: change hgcd to allow this? */
     if (leng == 0)
     {
         fmpz_one(M[0]);
