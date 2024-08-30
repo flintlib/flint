@@ -58,7 +58,7 @@ Generic string parsing
       for exponents. If this flag is set, exponents are parsed as arbitrary subexpressions
       within the same ring.
     * ``GR_PARSE_BALANCE_ADDITIONS`` - attempt to improve performance for huge sums
-      by reording additions (useful for polynomials)
+      by reordering additions (useful for polynomials)
 
 Generic arithmetic
 -----------------------------------------------------------------------------------------

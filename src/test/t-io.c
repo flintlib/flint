@@ -480,7 +480,7 @@ TEST_FUNCTION_START(flint_fprintf, state)
         nmod_mat_t xnmod_mat; nmod_mat_t xnmod_mat_window;
         fmpz_mat_t xfmpz_mat;
 
-        /* NOTE: We need extra checks with fmpq_poly as it is treated differntly in
+        /* NOTE: We need extra checks with fmpq_poly as it is treated differently in
          * __flint_poly_fprint. */
         nmod_poly_t xnmod_poly_zero, xnmod_poly_constant, xnmod_poly;
         fmpz_poly_t xfmpz_poly;

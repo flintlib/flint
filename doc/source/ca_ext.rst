@@ -14,7 +14,7 @@ The content of a :type:`ca_ext_t` can be one of the following:
   instances.
 * A builtin symbolic constant such as `\pi`. (This is just a special
   case of the above with a zero-length argument list.)
-* (Not implemented): a user-defined constant or function defined by suppling
+* (Not implemented): a user-defined constant or function defined by supplying
   a function pointer for Arb numerical evaluation to specified precision.
 
 The :type:`ca_ext_t` structure is heavy-weight object, not just meant to act
