@@ -205,15 +205,15 @@ void fq_default_ctx_init_randtest(fq_default_ctx_t ctx, flint_rand_t state)
 {
     fmpz_t prime;
     slong deg;
-    
+
     /* Select a context type [1,...,5] */
     int ctx_type = 1 + n_randint(state, 5);
     switch (ctx_type)
     {
         /* Create GF(p^d) for FQ_ZECH context */
         case FQ_DEFAULT_FQ_ZECH:
-            fmpz_randprime(prime, state, 2 + n_randint(state, 4), 1);
-            deg = 1 + n_randint(state, 4);
+            fmpz_randprime(prime, state, 2 + n_randint(state, 3), 1);
+            deg = 1 + n_randint(state, 3);
             break;
         /* Create GF(p^d) for FQ_NMOD context */
         case FQ_DEFAULT_FQ_NMOD:
