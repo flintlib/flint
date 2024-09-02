@@ -54,7 +54,7 @@ TEST_FUNCTION_START(acb_theta_g2_sextic_chi5, state)
             flint_abort();
         }
 
-        acb_theta_all(th, z, tau, 0, prec);
+        acb_theta_all(th, z, 1, tau, 0, prec);
         acb_theta_g2_chi5(c2, th, prec);
 
         if (!acb_overlaps(c1, c2))

@@ -67,7 +67,7 @@ TEST_FUNCTION_START(acb_theta_g2_sextic, state)
             acb_mul(d, d, t, prec);
             acb_mul_2exp_si(d, d, -12);
 
-            acb_theta_all(th2, z, tau, 1, prec);
+            acb_theta_all(th2, z, 1, tau, 1, prec);
             acb_theta_g2_chi10(t, th2, prec);
 
             if (!acb_overlaps(d, t))

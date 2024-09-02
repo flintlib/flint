@@ -25,7 +25,7 @@ acb_theta_g2_chi8_6(acb_poly_t res, const acb_mat_t tau, slong prec)
     z = _acb_vec_init(2);
     acb_init(c);
 
-    acb_theta_jet_all(dth, z, tau, 1, prec);
+    acb_theta_jet_all(dth, z, 1, tau, 1, prec);
     acb_theta_g2_chi3_6(res, dth, prec);
     for (k = 0; k < 16; k++)
     {

@@ -66,7 +66,7 @@ TEST_FUNCTION_START(acb_theta_g2_covariants, state)
         acb_siegel_randtest_reduced(tau, state, prec, bits);
         sp2gz_randtest(mat, state, bits);
 
-        acb_theta_all(th2, z, tau, 1, prec);
+        acb_theta_all(th2, z, 1, tau, 1, prec);
         acb_theta_g2_psi4(psi4, th2, prec);
         acb_theta_g2_sextic(u, tau, prec);
         acb_theta_g2_covariants(cov1, u, prec);

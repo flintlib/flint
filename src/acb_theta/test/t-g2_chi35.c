@@ -38,7 +38,7 @@ TEST_FUNCTION_START(acb_theta_g2_chi35, state)
 
         sp2gz_randtest(mat, state, mag_bits);
         acb_siegel_randtest_reduced(tau, state, prec, mag_bits);
-        acb_theta_all(th, z, tau, 0, prec);
+        acb_theta_all(th, z, 1, tau, 0, prec);
 
         acb_theta_g2_chi35(r, th, prec);
         acb_theta_transform_proj(th, mat, th, 0, prec);

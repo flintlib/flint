@@ -73,9 +73,9 @@ TEST_FUNCTION_START(acb_theta_all_notransform, state)
             }
         }
 
-        /* flint_printf("\n\ng = %wd, prec = %wd, nb = %wd, sqr = %wd\n",
+        /*flint_printf("\n\ng = %wd, prec = %wd, nb = %wd, sqr = %wd\n",
             g, prec, nb, sqr);
-        acb_mat_printd(tau, 5);
+         acb_mat_printd(tau, 5);
         _acb_vec_printd(zs, nb * g, 5);
         flint_printf("result of sum:\n");
         _acb_vec_printd(test, n * n * nb, 5); */

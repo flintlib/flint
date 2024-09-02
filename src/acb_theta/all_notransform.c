@@ -15,7 +15,7 @@
 #include "acb_theta.h"
 
 static void
-acb_theta_ql_dupl_all(acb_ptr th2, acb_srcptr th0, acb_srcptr th, slong g, slong prec)
+acb_theta_all_dupl(acb_ptr th2, acb_srcptr th0, acb_srcptr th, slong g, slong prec)
 {
     slong n = 1 << g;
     acb_ptr v;
@@ -45,7 +45,7 @@ acb_theta_ql_dupl_all(acb_ptr th2, acb_srcptr th0, acb_srcptr th, slong g, slong
 }
 
 static void
-acb_theta_ql_add_err(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
+acb_theta_all_add_err(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     int sqr, slong prec)
 {
     slong g = acb_mat_nrows(tau);
@@ -105,27 +105,34 @@ acb_theta_ql_add_err(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
 }
 
 static void
-acb_theta_ql_all_sum(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
+acb_theta_all_sum(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     int sqr, slong prec)
 {
     slong g = acb_mat_nrows(tau);
     slong n = 1 << g;
     acb_theta_ctx_tau_t ctx_tau;
     acb_theta_ctx_z_struct * vec;
-    acb_ptr new_th;
+    acb_ptr zero, new_th;
     arb_ptr distances;
+    int add_zero;
     slong j;
 
     FLINT_ASSERT(nb > 0);
 
+    add_zero = sqr && !_acb_vec_is_zero(zs, g);
     acb_theta_ctx_tau_init(ctx_tau, g);
-    vec = acb_theta_ctx_z_vec_init(nb, g);
+    vec = acb_theta_ctx_z_vec_init(nb + add_zero, g);
     distances = _arb_vec_init(n); /* set to zero */
+    zero = _acb_vec_init(g);
 
     acb_theta_ctx_tau_set(ctx_tau, tau, prec);
+    if (add_zero)
+    {
+        acb_theta_ctx_z_set(&vec[0], zero, ctx_tau, prec);
+    }
     for (j = 0; j < nb; j++)
     {
-        acb_theta_ctx_z_set(&vec[j], zs + j * g, ctx_tau, prec);
+        acb_theta_ctx_z_set(&vec[add_zero + j], zs + j * g, ctx_tau, prec);
     }
 
     if (!sqr)
@@ -134,37 +141,39 @@ acb_theta_ql_all_sum(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     }
     else
     {
-        new_th = _acb_vec_init(nb * n);
+        new_th = _acb_vec_init((nb + add_zero) * n);
 
         acb_theta_ctx_tau_dupl(ctx_tau, prec);
-        for (j = 0; j < nb; j++)
+        for (j = 0; j < nb + add_zero; j++)
         {
             acb_theta_ctx_z_dupl(&vec[j], prec);
         }
 
-        acb_theta_sum_a0_tilde(new_th, vec, nb, ctx_tau, distances, prec);
+        acb_theta_sum_a0_tilde(new_th, vec, nb + add_zero, ctx_tau, distances, prec);
         for (j = 0; j < nb; j++)
         {
-            acb_theta_ql_dupl_all(th + j * n * n, new_th,
-                new_th + j * n, g, prec);
+            acb_theta_all_dupl(th + j * n * n, new_th,
+                new_th + (add_zero + j) * n, g, prec);
         }
 
-        _acb_vec_clear(new_th, nb * n);
+        _acb_vec_clear(new_th, (nb + add_zero) * n);
     }
 
     for (j = 0; j < nb; j++)
     {
+        /* if sqr, then u was squared during duplication. */
         _acb_vec_scalar_mul_arb(th + j * n * n, th + j * n * n, n * n,
-            acb_theta_ctx_u(&vec[j]), prec);
+            acb_theta_ctx_u(&vec[add_zero + j]), prec);
     }
 
     acb_theta_ctx_tau_clear(ctx_tau);
     acb_theta_ctx_z_vec_clear(vec, nb);
     _arb_vec_clear(distances, n);
+    _acb_vec_clear(zero, g);
 }
 
 static void
-acb_theta_ql_all_mid_err(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
+acb_theta_all_mid_err(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     const slong * pattern, int sqr, slong prec)
 {
     slong g = acb_mat_nrows(tau);
@@ -174,17 +183,13 @@ acb_theta_ql_all_mid_err(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t ta
     arb_mat_t Yinv;
     arb_ptr y, w;
     arb_t u, pi;
-    int add_zero = 0;
+    int add_zero;
     slong j, k;
     int res;
 
     FLINT_ASSERT(nb > 0);
 
-    if (!_acb_vec_is_zero(zs, g))
-    {
-        add_zero = 1;
-    }
-
+    add_zero = !_acb_vec_is_zero(zs, g);
     acb_mat_init(new_tau, g, g);
     new_z = _acb_vec_init((nb + add_zero) * g);
     arb_mat_init(Yinv, g, g);
@@ -220,7 +225,7 @@ acb_theta_ql_all_mid_err(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t ta
         {
             for (j = 0; j < nb; j++)
             {
-                acb_theta_ql_dupl_all(th + j * n * n, new_th,
+                acb_theta_all_dupl(th + j * n * n, new_th,
                     new_th + (j + add_zero) * n, g, prec);
             }
         }
@@ -268,7 +273,7 @@ acb_theta_ql_all_mid_err(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t ta
             _acb_vec_scalar_mul_arb(th + j * n * n, th + j * n * n, n * n, u, prec);
         }
         /* Add error bounds */
-        acb_theta_ql_add_err(th, zs, nb, tau, sqr, prec);
+        acb_theta_all_add_err(th, zs, nb, tau, sqr, prec);
     }
     else
     {
@@ -341,11 +346,11 @@ acb_theta_all_notransform(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t t
 
     if (use_sum)
     {
-        acb_theta_ql_all_sum(th, zs, nb, tau, sqr, prec);
+        acb_theta_all_sum(th, zs, nb, tau, sqr, prec);
     }
     else
     {
-        acb_theta_ql_all_mid_err(th, zs, nb, tau, pattern, sqr, prec);
+        acb_theta_all_mid_err(th, zs, nb, tau, pattern, sqr, prec);
     }
 
     arb_mat_clear(cho);
