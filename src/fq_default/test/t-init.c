@@ -86,11 +86,7 @@ TEST_FUNCTION_START(fq_default_init, state)
         fq_default_ctx_t ctx;
         fq_default_t fq;
 
-        /* Sets the type used internally for prime selection.
-           See _nmod_poly_conway_rand for more info. */
-        int type = n_randint(state, 4);
-
-        fq_default_ctx_init_randtest(ctx, state, type);
+        fq_default_ctx_init_randtest(ctx, state);
         fq_default_init(fq, ctx);
         fq_default_randtest(fq, state, ctx);
         fq_default_clear(fq, ctx);
