@@ -517,7 +517,7 @@ void _nfixed_dot_4(nn_ptr res, nn_srcptr x, slong xstride, nn_srcptr y, slong ys
         add_sssaaaaaa(t2, t1, t0, t2, t1, t0, 0, u1, u0);
     }
 
-    if ((slong) t1 < WORD(0))
+    if ((slong) t2 < WORD(0))
     {
         sub_dddmmmsss(t2, t1, t0, 0, 0, 0, t2, t1, t0);
         sub_ddddmmmmssss(s3, s2, s1, s0, s3, s2, s1, s0, 0, t2, t1, t0);
@@ -559,15 +559,96 @@ void _nfixed_dot_5(nn_ptr res, nn_srcptr x, slong xstride, nn_srcptr y, slong ys
 
     for (j = 1; j < len; j++)
     {
-        nfixed_mul(tmp, x + j * xstride, y + ystride, nlimbs);
+        nfixed_mul(tmp, x + j * xstride, y + j * ystride, nlimbs);
 
-        if (tmp[0])
+        if (tmp[0] == 0)
             NN_ADD_5(spos + 1, spos + 1, tmp + 1);
         else
             NN_ADD_5(sneg + 1, sneg + 1, tmp + 1);
     }
 
     nfixed_sub_5(res, spos, sneg);
+}
+
+void _nfixed_dot_6(nn_ptr res, nn_srcptr x, slong xstride, nn_srcptr y, slong ystride, slong len)
+{
+    slong j;
+    slong nlimbs = 6;
+
+    ulong tmp[7];
+    ulong spos[7] = { 0, 0, 0, 0, 0, 0, 0 };
+    ulong sneg[7] = { 0, 0, 0, 0, 0, 0, 0 };
+
+    if (x[0] == y[0])
+        flint_mpn_mulhigh_n(spos + 1, x + 1, y + 1, nlimbs);
+    else
+        flint_mpn_mulhigh_n(sneg + 1, x + 1, y + 1, nlimbs);
+
+    for (j = 1; j < len; j++)
+    {
+        nfixed_mul(tmp, x + j * xstride, y + j * ystride, nlimbs);
+
+        if (tmp[0] == 0)
+            NN_ADD_6(spos + 1, spos + 1, tmp + 1);
+        else
+            NN_ADD_6(sneg + 1, sneg + 1, tmp + 1);
+    }
+
+    nfixed_sub_6(res, spos, sneg);
+}
+
+void _nfixed_dot_7(nn_ptr res, nn_srcptr x, slong xstride, nn_srcptr y, slong ystride, slong len)
+{
+    slong j;
+    slong nlimbs = 7;
+
+    ulong tmp[8];
+    ulong spos[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+    ulong sneg[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+
+    if (x[0] == y[0])
+        flint_mpn_mulhigh_n(spos + 1, x + 1, y + 1, nlimbs);
+    else
+        flint_mpn_mulhigh_n(sneg + 1, x + 1, y + 1, nlimbs);
+
+    for (j = 1; j < len; j++)
+    {
+        nfixed_mul(tmp, x + j * xstride, y + j * ystride, nlimbs);
+
+        if (tmp[0] == 0)
+            NN_ADD_7(spos + 1, spos + 1, tmp + 1);
+        else
+            NN_ADD_7(sneg + 1, sneg + 1, tmp + 1);
+    }
+
+    nfixed_sub_7(res, spos, sneg);
+}
+
+void _nfixed_dot_8(nn_ptr res, nn_srcptr x, slong xstride, nn_srcptr y, slong ystride, slong len)
+{
+    slong j;
+    slong nlimbs = 8;
+
+    ulong tmp[9];
+    ulong spos[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    ulong sneg[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+    if (x[0] == y[0])
+        flint_mpn_mulhigh_n(spos + 1, x + 1, y + 1, nlimbs);
+    else
+        flint_mpn_mulhigh_n(sneg + 1, x + 1, y + 1, nlimbs);
+
+    for (j = 1; j < len; j++)
+    {
+        nfixed_mul(tmp, x + j * xstride, y + j * ystride, nlimbs);
+
+        if (tmp[0] == 0)
+            NN_ADD_8(spos + 1, spos + 1, tmp + 1);
+        else
+            NN_ADD_8(sneg + 1, sneg + 1, tmp + 1);
+    }
+
+    nfixed_sub_8(res, spos, sneg);
 }
 
 /* A is (m x n), B is (n x p), C is (m x p) */
@@ -580,6 +661,14 @@ _nfixed_mat_mul_classical(nn_ptr C, nn_srcptr A, nn_srcptr B, slong m, slong n, 
 #define A_ENTRY(i, j) ((A) + ((i) * n + (j)) * (nlimbs + 1))
 #define B_ENTRY(i, j) ((B) + ((i) * p + (j)) * (nlimbs + 1))
 #define C_ENTRY(i, j) ((C) + ((i) * p + (j)) * (nlimbs + 1))
+
+    if (n == 1)
+    {
+        for (i = 0; i < m; i++)
+            for (j = 0; j < p; j++)
+                nfixed_mul(C_ENTRY(i, j), A_ENTRY(i, 0), B_ENTRY(0, j), nlimbs);
+        return;
+    }
 
     if (nlimbs == 2)
     {
@@ -604,6 +693,24 @@ _nfixed_mat_mul_classical(nn_ptr C, nn_srcptr A, nn_srcptr B, slong m, slong n, 
         for (i = 0; i < m; i++)
             for (j = 0; j < p; j++)
                 _nfixed_dot_5(C_ENTRY(i, j), A_ENTRY(i, 0), nlimbs + 1, B_ENTRY(0, j), (nlimbs + 1) * p, n);
+    }
+    else if (nlimbs == 6)
+    {
+        for (i = 0; i < m; i++)
+            for (j = 0; j < p; j++)
+                _nfixed_dot_6(C_ENTRY(i, j), A_ENTRY(i, 0), nlimbs + 1, B_ENTRY(0, j), (nlimbs + 1) * p, n);
+    }
+    else if (nlimbs == 7)
+    {
+        for (i = 0; i < m; i++)
+            for (j = 0; j < p; j++)
+                _nfixed_dot_7(C_ENTRY(i, j), A_ENTRY(i, 0), nlimbs + 1, B_ENTRY(0, j), (nlimbs + 1) * p, n);
+    }
+    else if (nlimbs == 8)
+    {
+        for (i = 0; i < m; i++)
+            for (j = 0; j < p; j++)
+                _nfixed_dot_8(C_ENTRY(i, j), A_ENTRY(i, 0), nlimbs + 1, B_ENTRY(0, j), (nlimbs + 1) * p, n);
     }
     else
     {
@@ -661,7 +768,7 @@ addmul_addadd_4(nn_ptr val0, nn_ptr val1, nn_ptr val2, nn_ptr c, nn_srcptr a1, n
 {
     nfixed_add_4(val1, a1, b1);
     nfixed_add_4(val2, a2, b2);
-    nfixed_mul(val0, val1, val2, 5);
+    nfixed_mul(val0, val1, val2, 4);
     nfixed_add_4(c, c, val0);
 }
 
@@ -679,7 +786,7 @@ addmul_addadd_6(nn_ptr val0, nn_ptr val1, nn_ptr val2, nn_ptr c, nn_srcptr a1, n
 {
     nfixed_add_6(val1, a1, b1);
     nfixed_add_6(val2, a2, b2);
-    nfixed_mul(val0, val1, val2, 5);
+    nfixed_mul(val0, val1, val2, 6);
     nfixed_add_6(c, c, val0);
 }
 
@@ -688,7 +795,7 @@ addmul_addadd_7(nn_ptr val0, nn_ptr val1, nn_ptr val2, nn_ptr c, nn_srcptr a1, n
 {
     nfixed_add_7(val1, a1, b1);
     nfixed_add_7(val2, a2, b2);
-    nfixed_mul(val0, val1, val2, 5);
+    nfixed_mul(val0, val1, val2, 7);
     nfixed_add_7(c, c, val0);
 }
 
@@ -697,7 +804,7 @@ addmul_addadd_8(nn_ptr val0, nn_ptr val1, nn_ptr val2, nn_ptr c, nn_srcptr a1, n
 {
     nfixed_add_8(val1, a1, b1);
     nfixed_add_8(val2, a2, b2);
-    nfixed_mul(val0, val1, val2, 5);
+    nfixed_mul(val0, val1, val2, 8);
     nfixed_add_8(c, c, val0);
 }
 
@@ -988,6 +1095,14 @@ _nfixed_mat_mul_classical2(_nfixed_mat_t C, const _nfixed_mat_t A, const _nfixed
 #define B_ENTRY(i, j) ((Bptr) + (i) * Bstride + (j) * (nlimbs + 1))
 #define C_ENTRY(i, j) ((Cptr) + (i) * Cstride + (j) * (nlimbs + 1))
 
+    if (n == 1)
+    {
+        for (i = 0; i < m; i++)
+            for (j = 0; j < p; j++)
+                nfixed_mul(C_ENTRY(i, j), A_ENTRY(i, 0), B_ENTRY(0, j), nlimbs);
+        return;
+    }
+
     if (nlimbs == 2)
     {
         for (i = 0; i < m; i++)
@@ -1011,6 +1126,24 @@ _nfixed_mat_mul_classical2(_nfixed_mat_t C, const _nfixed_mat_t A, const _nfixed
         for (i = 0; i < m; i++)
             for (j = 0; j < p; j++)
                 _nfixed_dot_5(C_ENTRY(i, j), A_ENTRY(i, 0), nlimbs + 1, B_ENTRY(0, j), Bstride, n);
+    }
+    else if (nlimbs == 6)
+    {
+        for (i = 0; i < m; i++)
+            for (j = 0; j < p; j++)
+                _nfixed_dot_6(C_ENTRY(i, j), A_ENTRY(i, 0), nlimbs + 1, B_ENTRY(0, j), Bstride, n);
+    }
+    else if (nlimbs == 7)
+    {
+        for (i = 0; i < m; i++)
+            for (j = 0; j < p; j++)
+                _nfixed_dot_7(C_ENTRY(i, j), A_ENTRY(i, 0), nlimbs + 1, B_ENTRY(0, j), Bstride, n);
+    }
+    else if (nlimbs == 8)
+    {
+        for (i = 0; i < m; i++)
+            for (j = 0; j < p; j++)
+                _nfixed_dot_8(C_ENTRY(i, j), A_ENTRY(i, 0), nlimbs + 1, B_ENTRY(0, j), Bstride, n);
     }
     else
     {
@@ -1061,7 +1194,7 @@ _nfixed_mat_mul_strassen2(_nfixed_mat_t C, const _nfixed_mat_t A, const _nfixed_
 
     if (ar < cutoff || ac < cutoff || bc < cutoff)
     {
-        if (nlimbs <= 3)
+        if (nlimbs <= 5)
             _nfixed_mat_mul_classical2(C, A, B, nlimbs);
         else
             _nfixed_mat_mul_waksman3(C, A, B, nlimbs);
