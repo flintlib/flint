@@ -15,6 +15,7 @@
 #include "flint-mparam.h"
 #include "ulong_extras.h"
 #include "nmod_mat.h"
+#include "nmod.h"
 #include "fmpz.h"
 
 /*******************/
@@ -31,8 +32,7 @@ _nmod_mat_scalar_addmul_ui_generic(nmod_mat_t C, const nmod_mat_t A,
         {
             nmod_mat_entry(C, i, j) =
                 n_addmod(nmod_mat_entry(A, i, j),
-                         n_mulmod2_preinv(nmod_mat_entry(B, i, j), c,
-                                          B->mod.n, B->mod.ninv),
+                         nmod_mul(nmod_mat_entry(B, i, j), c, B->mod),
                          A->mod.n);
         }
     }
@@ -83,10 +83,8 @@ _nmod_mat_scalar_mul_generic(nmod_mat_t B, const nmod_mat_t A, ulong c)
 {
     for (slong i = 0; i < A->r; i++)
         for (slong j = 0; j < A->c; j++)
-            nmod_mat_entry(B, i, j) = n_mulmod2_preinv(
-                    nmod_mat_entry(A, i, j), c, A->mod.n, A->mod.ninv);
+            nmod_mat_entry(B, i, j) = nmod_mul(nmod_mat_entry(A, i, j), c, A->mod);
 }
-
 
 void
 _nmod_mat_scalar_mul_precomp(nmod_mat_t B, const nmod_mat_t A, ulong c, ulong c_pr)
