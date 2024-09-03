@@ -76,6 +76,12 @@ Memory management
     Swaps two matrices by swapping the individual entries rather than swapping
     the contents of the structs.
 
+.. function:: void nmod_mat_set_mod(nmod_mat_t mat, ulong n);
+
+    Sets the modulus of an already initialized matrix ``mat`` to be `n`. Row
+    and column dimensions are unchanged, and allocated memory is unaffected.
+    Caution: this does not reduce the entries of ``mat`` modulo `n`.
+
 
 Basic properties and manipulation
 --------------------------------------------------------------------------------

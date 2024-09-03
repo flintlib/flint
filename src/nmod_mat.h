@@ -54,7 +54,6 @@ slong nmod_mat_ncols(const nmod_mat_t mat)
    return mat->c;
 }
 
-/* TODO: Document */
 void nmod_mat_set_mod(nmod_mat_t mat, ulong n);
 
 /* Memory management */
