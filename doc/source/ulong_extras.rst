@@ -666,8 +666,9 @@ Shoup. For references, see
     and ``a_pr_rem`` is as in the description of
     :func:`n_mulmod_precomp_shoup_quo_rem`, and ``b_precomp`` is as in the
     description of :func:`n_mulmod_precomp_shoup`. This can be used for example
-    when seeking a list of powers of `a` along with associated precomputed data
-    to speed up repeated modular multiplications by these fixed powers.
+    when seeking a list of powers `[a \bmod n, a^2 \bmod n, a^3 \bmod n,
+    \ldots]` along with associated precomputed data to speed up repeated
+    modular multiplications by these fixed powers.
 
 Here are some explanations. Let `B = \mathtt{FLINT\_BITS}`, and `W = 2^B`. We have as input
 `a, b, n`, and the goal is mainly to output `ab \bmod n`. Constraints are: `a <
@@ -688,31 +689,70 @@ The variant ending in ``_quo_rem`` computes the same quotient
 already known.
 
 **Modular multiplication:** The main function is ``n_mulmod_shoup``, which
-takes `a, b, \mathtt{a\_precomp}, n` as input and returns `ab \bmod n`. The
-steps are:
+takes `a, b, \hat{a}, n` as input and returns `ab \bmod n`, where `\hat{a} =
+\mathtt{a\_precomp}`. The steps are:
 
-1. find ``p_hi, p_lo`` such that ``a_precomp * b = p_hi * W + p_lo``     (high part of a double-word multiplication, ``p_lo`` will not be used)
-2. ``res = a*b - p_hi*n``                  (two single-word multiplications)
-3. if `\mathtt{res} \ge n`, return `\mathtt{res}-n`, else return `\mathtt{res}`
+1. find `\mathtt{p_hi}, \mathtt{p_lo}` such that `\hat{a} b = \mathtt{p_hi} W + \mathtt{p_lo}`     (high part of a double-word multiplication, `\mathtt{p_lo}` will not be used)
+2. compute `c = ab - \mathtt{p_hi} n`                  (two single-word multiplications)
+3. if `c \ge n`, return `c-n`, else return `c`
 
-*Step 1.* One has `\mathtt{p\_hi} = \lfloor ab/n \rfloor` or `\mathtt{p\_hi} = \lfloor ab/n \rfloor - 1`.
+*Step 1.* One has `\mathtt{p_hi} = \lfloor ab/n \rfloor` or `\mathtt{p_hi} = \lfloor ab/n \rfloor - 1`.
 
-Proof: Write `aW = \mathtt{a\_precomp} \cdot n + r`, with `0 \le r < n`.
-Thus `\mathtt{a\_precomp} \cdot b / W = \frac{ab}{n} - \frac{rb}{nW}`.
-So `\mathtt{p\_hi} = \lfloor \mathtt{a\_precomp} \cdot b / W \rfloor =
-\lfloor \frac{ab}{n} - \frac{rb}{nW} \rfloor`.
-Clearly `\mathtt{p\_hi} \le \lfloor \frac{ab}{n} \rfloor`.
-And `rb < nW` (since `r < n` and `b < W`) so `-\frac{rb}{nW} > -1`, hence `\mathtt{p\_hi} \ge \lfloor \frac{ab}{n} \rfloor - 1`.
+Proof: Write `aW = \hat{a} n + r`, with `0 \le r < n`.  Thus `\frac{\hat{a}
+b}{W} = \frac{ab}{n} - \frac{rb}{nW}`.  So `\mathtt{p_hi} = \lfloor
+\frac{\hat{a} b}{W} \rfloor = \lfloor \frac{ab}{n} - \frac{rb}{nW} \rfloor`.
+Clearly `\mathtt{p_hi} \le \lfloor \frac{ab}{n} \rfloor`. And `rb < nW` (since
+`r < n` and `b < W`) so `-\frac{rb}{nW} > -1`, hence `\mathtt{p_hi} \ge
+\lfloor \frac{ab}{n} \rfloor - 1`.
 
-*Step 2.* It follows that either `\mathtt{res} = ab \bmod n` or `\mathtt{res} = (ab \bmod n) + n`.
+*Step 2.* It follows that either `c = ab \bmod n` or `c = (ab \bmod n) + n`.
 
 This is where the restriction on `n` comes into play: allowing `n` to have `B`
-bits prevents us from detecting which case we are in (a comparison such as `\mathtt{res}
-\ge n` would not tell). Since `n` has `< B` bits, `\mathtt{res} \ge n` if and
-only if `\mathtt{res} = (ab \bmod n) + n`.
+bits prevents us from detecting which case we are in (a comparison such as `c
+\ge n` would not tell). Since `n` has `< B` bits, `c \ge n` if and only if `c =
+(ab \bmod n) + n`.
 
 *Step 3.* we use this to detect which case we are in and correct the possible
 excess.
+
+**Combining precomputation and multiplication:** The main function is
+``n_mulmod_and_precomp_shoup``. The goal is to compute not only `ab \bmod n`,
+but also the corresponding quotient `\mathtt{ab\_precomp} = \lfloor (ab \bmod
+n) \cdot W / n \rfloor`. For this we require as input both the precomputed
+quotient and remainder for `a` (that is, ``a_pr_quo`` and ``a_pr_rem``), as
+well as the precomputed quotient for ``b`` (``b_precomp``). This adds the
+constraint that `b < n`.
+
+To simplify notation, write the integer division `aW = \hat{a} n + \check{a}`
+so that `\hat{a} = \mathtt{a\_pr\_quo}` and `\check{a} = \mathtt{a\_pr\_rem}`,
+and similarly for `bW = \hat{b} n + \check{b}` with `\hat{b} =
+\mathtt{b\_precomp}` (we will not use `\check{b}`).
+
+The first three steps follow the above-described approach to compute `ab \bmod
+n` using `\hat{a}` (but this time, the lower part of the double-word
+multiplication is kept):
+
+1. find `d, \hat{c}` such that `\hat{a} b = d W + \hat{c}` (double-word multiplication)
+2. compute `c = a b - d n` (two single-word multiplications)
+3. if `c \ge n` then `c \gets c - n`
+
+At this stage, `c = ab \bmod n`, and `\hat{c} = \hat{a} b \bmod W`. Now suppose
+we have the quotient `q = \lfloor \frac{\check{a} b}{n} \rfloor` in the
+division of `\check{a}b` by `n`. The claim is that `\hat{c} + q` is the sought
+precomputation quotient for `ab \bmod n` up to a multiple of `W`, that is,
+`\hat{c} + q = \lfloor \frac{c W}{n} \rfloor \bmod W`. Indeed, one has `\lfloor
+\frac{c W}{n} \rfloor = \lfloor \frac{ab W}{n} \rfloor \bmod W`, and it remains
+to observe that `\lfloor \frac{ab W}{n} \rfloor = \lfloor
+\frac{(\hat{a}n+\check{a}) b}{n} \rfloor = \hat{a} b + \lfloor \frac{\check{a}
+b}{n} \rfloor = \hat{c} + q \bmod W`.
+
+Therefore the remaining steps consist in computing the quotient `q`, which can
+be done via the modular multiplication of `\check{a}` by `b` using the
+precomputed quotient for `b`:
+
+4. find `q,e` such that `\hat{b} \check{a} = q W + e` (high-part of double word multiplication, `e` will not be used)
+5. compute `h = b \check{a} - q n` (two single-word multiplications)
+6. if `h \ge n` then `q \gets q+1`
 
 Divisibility testing
 --------------------------------------------------------------------------------
