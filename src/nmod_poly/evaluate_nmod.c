@@ -10,6 +10,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "flint-mparam.h"
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 #include "nmod.h"
@@ -86,7 +87,7 @@ _nmod_poly_evaluate_nmod_precomp_lazy(nn_srcptr poly, slong len, ulong c, ulong 
     for ( ; m >= 0; m--)
     {
         // computes either val = (c*val mod n) or val = (c*val mod n) + n
-        // see (FIXME location) n_mulmod_shoup explanations for details
+        // see documentation of ulong_extras for details
         umul_ppmm(p_hi, p_lo, c_precomp, val);
         val = c * val - p_hi * mod.n;
         // lazy addition, yields val in [0..3n-1)
@@ -112,10 +113,10 @@ nmod_poly_evaluate_nmod(const nmod_poly_t poly, ulong c)
     if (poly->length == 1 || c == 0)
         return poly->coeffs[0];
 
-    // if degree below the n_mulmod_shoup threshold (FIXME issue #2059)
+    // if degree below the n_mulmod_shoup threshold
     // or modulus forbids n_mulmod_shoup usage, use nmod_mul
-    if ((poly->length <= 10)         
-           || (poly->mod.norm == 0)) // 
+    if ((poly->length <= FLINT_MULMOD_SHOUP_THRESHOLD)
+           || (poly->mod.norm == 0))
     {
         return _nmod_poly_evaluate_nmod(poly->coeffs, poly->length, c, poly->mod);
     }
