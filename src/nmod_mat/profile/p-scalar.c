@@ -11,7 +11,6 @@
 
 #include "profiler.h"
 #include "ulong_extras.h"
-#include "nmod_vec.h"
 #include "nmod_mat.h"
 
 typedef struct
