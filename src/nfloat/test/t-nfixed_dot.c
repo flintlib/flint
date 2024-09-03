@@ -153,3 +153,7 @@ TEST_FUNCTION_START(nfixed_dot, state)
 
     TEST_FUNCTION_END(state);
 }
+
+#undef MAXLEN
+#undef MINLIMBS
+#undef MAXLIMBS

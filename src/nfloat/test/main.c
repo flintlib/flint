@@ -16,6 +16,7 @@
 #include "t-complex_mat_mul.c"
 #include "t-mat_mul.c"
 #include "t-nfixed_dot.c"
+#include "t-nfixed_mat_mul.c"
 #include "t-nfloat.c"
 #include "t-nfloat_complex.c"
 
@@ -28,6 +29,7 @@ test_struct tests[] =
     TEST_FUNCTION(complex_mat_mul),
     TEST_FUNCTION(mat_mul),
     TEST_FUNCTION(nfixed_dot),
+    TEST_FUNCTION(nfixed_mat_mul),
     TEST_FUNCTION(nfloat),
     TEST_FUNCTION(nfloat_complex),
 };

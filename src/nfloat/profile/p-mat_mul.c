@@ -21,7 +21,6 @@
 #include "double_extras.h"
 
 #define TABN (NFLOAT_MAX_LIMBS + 1)
-#define WAKSMAN_MIN_PREC 320
 
 #if 1
 #undef TIMEIT_END_REPEAT
@@ -57,11 +56,11 @@ randmat(gr_mat_t mat, flint_rand_t state, gr_ctx_t ctx)
     }
 }
 
-void tune_fixed_vs_waksman(int * cutoffs)
+void tune_classical_vs_fixed(int * cutoffs)
 {
     gr_ctx_t ctx;
     gr_mat_t A, B, C;
-    slong i, n;
+    slong i, n, nn;
     slong prec;
     double FLINT_SET_BUT_UNUSED(__), t1, t2;
 
@@ -71,14 +70,16 @@ void tune_fixed_vs_waksman(int * cutoffs)
     for (i = 0; i < TABN; i++)
         cutoffs[i] = -1;
 
-    for (prec = WAKSMAN_MIN_PREC; prec <= NFLOAT_MAX_LIMBS * FLINT_BITS; prec += 64)
+    for (prec = 64; prec <= NFLOAT_MAX_LIMBS * FLINT_BITS; prec += 64)
     {
         flint_printf("prec = %wd\n", prec);
 
         nfloat_ctx_init(ctx, prec, 0);
 
-        for (n = 2; n <= 128; n++)
+        for (nn = 1; nn <= 128; nn++)
         {
+            n = (nn == 1) ? 128 : nn;
+
             gr_mat_init(A, n, n, ctx);
             gr_mat_init(B, n, n, ctx);
             gr_mat_init(C, n, n, ctx);
@@ -87,11 +88,11 @@ void tune_fixed_vs_waksman(int * cutoffs)
             randmat(B, state, ctx);
 
             TIMEIT_START
-            GR_MUST_SUCCEED(nfloat_mat_mul_fixed_classical(C, A, B, ctx));
+            GR_MUST_SUCCEED(gr_mat_mul_classical(C, A, B, ctx));
             TIMEIT_STOP_VALUES(__, t1)
 
             TIMEIT_START
-            GR_MUST_SUCCEED(nfloat_mat_mul_waksman(C, A, B, ctx));
+            GR_MUST_SUCCEED(nfloat_mat_mul_fixed(C, A, B, 1000, ctx));
             TIMEIT_STOP_VALUES(__, t2)
 
             flint_printf("%wd  %wd   %e   %e   %.3f\n", prec, n, t1, t2, t1 / t2);
@@ -100,11 +101,19 @@ void tune_fixed_vs_waksman(int * cutoffs)
             gr_mat_clear(B, ctx);
             gr_mat_clear(C, ctx);
 
-            if (t2 < t1 * 0.99)
+            if (nn == 1)
+            {
+                if (t2 < t1)
+                    continue;
+                else
+                    break;
+            }
+
+            if (t2 < t1)
             {
                 cutoffs[prec / 64] = n;
 
-                flint_printf("short tab_fixed_classical_vs_waksman[] = {\n");
+                flint_printf("short tab_classical_vs_fixed[] = {\n");
                 for (i = 0; i <= prec / 64; i++)
                     flint_printf("    %d, /* prec = %wd */\n", cutoffs[i], i * 64);
                 flint_printf("}\n");
@@ -117,30 +126,26 @@ void tune_fixed_vs_waksman(int * cutoffs)
     flint_rand_clear(state);
 }
 
-void tune_strassen(int * cutoffs)
+slong ns[] = { 2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64, 80, 96, 112, 128, 144, 160, 192, 224, 256, 288, 320, 352, 0 };
+
+void prof_classical_vs_fixed()
 {
     gr_ctx_t ctx;
     gr_mat_t A, B, C;
-    slong i, n;
+    slong i, ni, n;
     slong prec;
     double FLINT_SET_BUT_UNUSED(__), t1, t2;
-    int prev_ok = 0;
 
     flint_rand_t state;
     flint_rand_init(state);
 
-    for (i = 0; i < TABN; i++)
-        cutoffs[i] = -1;
-
-    for (prec = 64; prec <= NFLOAT_MAX_LIMBS * FLINT_BITS; prec += 64)
+    for (prec = 64; prec <= NFLOAT_MAX_LIMBS * FLINT_BITS; prec = (prec < 1024) ? prec + 64 : prec + 256)
     {
-        flint_printf("prec = %wd\n", prec);
-
-        prev_ok = 0;
+        flint_printf("%wd     ", prec);
 
         nfloat_ctx_init(ctx, prec, 0);
 
-        for (n = 2; n <= 128; n++)
+        for (ni = 8; (n = ns[ni]) != 0; ni++)
         {
             gr_mat_init(A, n, n, ctx);
             gr_mat_init(B, n, n, ctx);
@@ -150,131 +155,85 @@ void tune_strassen(int * cutoffs)
             randmat(B, state, ctx);
 
             TIMEIT_START
-            if (prec < WAKSMAN_MIN_PREC)
-                GR_MUST_SUCCEED(nfloat_mat_mul_fixed_classical(C, A, B, ctx));
-            else
-                GR_MUST_SUCCEED(nfloat_mat_mul_waksman(C, A, B, ctx));
+            GR_MUST_SUCCEED(gr_mat_mul_classical(C, A, B, ctx));
             TIMEIT_STOP_VALUES(__, t1)
 
             TIMEIT_START
-            GR_MUST_SUCCEED(nfloat_mat_mul_strassen(C, A, B, n, ctx));
+            GR_MUST_SUCCEED(nfloat_mat_mul_fixed(C, A, B, 1000, ctx));
             TIMEIT_STOP_VALUES(__, t2)
 
-            flint_printf("%wd  %wd   %e   %e   %.3f\n", prec, n, t1, t2, t1 / t2);
+            flint_printf("%.3f  ", t1 / t2);
+            fflush(stdout);
 
             gr_mat_clear(A, ctx);
             gr_mat_clear(B, ctx);
             gr_mat_clear(C, ctx);
-
-            if (t2 < t1 * 0.99)
-            {
-                if (prev_ok)
-                {
-                    cutoffs[prec / 64] = n;
-
-                    flint_printf("short tab_strassen[] = {\n");
-                    for (i = 0; i <= prec / 64; i++)
-                        flint_printf("    %d, /* prec = %wd */\n", cutoffs[i], i * 64);
-                    flint_printf("}\n");
-
-                    break;
-                }
-                else
-                {
-                    prev_ok = 1;
-                }
-            }
-            else
-            {
-                prev_ok = 0;
-            }
         }
+
+        flint_printf("\n");
     }
 
     flint_rand_clear(state);
 }
 
+void prof_fixed_vs_block()
+{
+    gr_ctx_t ctx;
+    gr_mat_t A, B, C;
+    slong i, ni, n;
+    slong prec;
+    double FLINT_SET_BUT_UNUSED(__), t1, t2;
 
-short tab_fixed_classical_vs_waksman[] = {
-    -1, /* prec = 0 */
-    -1, /* prec = 64 */
-    -1, /* prec = 128 */
-    -1, /* prec = 192 */
-    -1, /* prec = 256 */
-    16, /* prec = 320 */
-    10, /* prec = 384 */
-    7, /* prec = 448 */
-    7, /* prec = 512 */
-    6, /* prec = 576 */
-    5, /* prec = 640 */
-    4, /* prec = 704 */
-    4, /* prec = 768 */
-    4, /* prec = 832 */
-    4, /* prec = 896 */
-    4, /* prec = 960 */
-    4, /* prec = 1024 */
-    4, /* prec = 1088 */
-    4, /* prec = 1152 */
-    4, /* prec = 1216 */
-    4, /* prec = 1280 */
-    3, /* prec = 1344 */
-    4, /* prec = 1408 */
-    3, /* prec = 1472 */
-    3, /* prec = 1536 */
-    3, /* prec = 1600 */
-    3, /* prec = 1664 */
-    3, /* prec = 1728 */
-    3, /* prec = 1792 */
-    3, /* prec = 1856 */
-    3, /* prec = 1920 */
-    3, /* prec = 1984 */
-    3, /* prec = 2048 */
-    3, /* prec = 2112 */
-    3, /* prec = 2176 */
-    3, /* prec = 2240 */
-    3, /* prec = 2304 */
-    3, /* prec = 2368 */
-    3, /* prec = 2432 */
-    3, /* prec = 2496 */
-    3, /* prec = 2560 */
-    3, /* prec = 2624 */
-    3, /* prec = 2688 */
-    3, /* prec = 2752 */
-    3, /* prec = 2816 */
-    3, /* prec = 2880 */
-    3, /* prec = 2944 */
-    3, /* prec = 3008 */
-    2, /* prec = 3072 */
-    3, /* prec = 3136 */
-    3, /* prec = 3200 */
-    2, /* prec = 3264 */
-    2, /* prec = 3328 */
-    2, /* prec = 3392 */
-    2, /* prec = 3456 */
-    2, /* prec = 3520 */
-    3, /* prec = 3584 */
-    2, /* prec = 3648 */
-    2, /* prec = 3712 */
-    2, /* prec = 3776 */
-    2, /* prec = 3840 */
-    2, /* prec = 3904 */
-    2, /* prec = 3968 */
-    2, /* prec = 4032 */
-    2, /* prec = 4096 */
-    2, /* prec = 4160 */
-    2, /* prec = 4224 */
-};
+    flint_rand_t state;
+    flint_rand_init(state);
 
+    flint_printf("        ");
+    for (ni = 8; (n = ns[ni]) != 0; ni++)
+        flint_printf("%5wd  ", n);
+    flint_printf("\n");
 
+    for (prec = 64; prec <= NFLOAT_MAX_LIMBS * FLINT_BITS; prec = (prec < 1024) ? prec + 64 : prec + 256)
+    {
+        flint_printf("%4wd     ", prec);
+
+        nfloat_ctx_init(ctx, prec, 0);
+
+        for (ni = 8; (n = ns[ni]) != 0; ni++)
+        {
+            gr_mat_init(A, n, n, ctx);
+            gr_mat_init(B, n, n, ctx);
+            gr_mat_init(C, n, n, ctx);
+
+            randmat(A, state, ctx);
+            randmat(B, state, ctx);
+
+            TIMEIT_START
+            GR_MUST_SUCCEED(nfloat_mat_mul_fixed(C, A, B, 1000, ctx));
+            TIMEIT_STOP_VALUES(__, t1)
+
+            TIMEIT_START
+            GR_MUST_SUCCEED(nfloat_mat_mul_block(C, A, B, 1, ctx));
+            TIMEIT_STOP_VALUES(__, t2)
+
+            flint_printf("%.3f  ", t1 / t2);
+            fflush(stdout);
+
+            gr_mat_clear(A, ctx);
+            gr_mat_clear(B, ctx);
+            gr_mat_clear(C, ctx);
+        }
+
+        flint_printf("\n");
+    }
+
+    flint_rand_clear(state);
+}
 
 int main()
 {
-    int tab_fixed_classical_vs_waksman[TABN];
-    int tab_strassen[TABN];
+    int tab_classical_vs_fixed[TABN];
 
-    tune_strassen(tab_strassen);
-
-
-    tune_fixed_vs_waksman(tab_fixed_classical_vs_waksman);
-
+    //tune_classical_vs_fixed(tab_classical_vs_fixed);
+    //prof_classical_vs_fixed();
+    prof_fixed_vs_block();
 }
