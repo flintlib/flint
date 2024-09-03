@@ -13,6 +13,9 @@
 #include "ulong_extras.h"
 #include "nmod_mat.h"
 
+void _nmod_mat_scalar_mul_generic(nmod_mat_t B, const nmod_mat_t A, ulong c);
+void _nmod_mat_scalar_mul_precomp(nmod_mat_t B, const nmod_mat_t A, ulong c, ulong c_pr);
+
 typedef struct
 {
     flint_bitcnt_t bits;
