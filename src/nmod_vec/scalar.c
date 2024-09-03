@@ -2,6 +2,7 @@
     Copyright (C) 2010, 2015 William Hart
     Copyright (C) 2015 Vladimir Glazachev
     Copyright (C) 2021 Fredrik Johansson
+    Copyright (C) 2024 Vincent Neiger
 
     This file is part of FLINT.
 
@@ -11,8 +12,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "longlong.h"
-#include "nmod.h"
+#include "flint-mparam.h"
 #include "nmod_vec.h"
 
 void _nmod_vec_scalar_addmul_nmod_fullword(nn_ptr res, nn_srcptr vec,
@@ -58,7 +58,7 @@ void _nmod_vec_scalar_addmul_nmod(nn_ptr res, nn_srcptr vec,
 {
     if (NMOD_BITS(mod) == FLINT_BITS)
         _nmod_vec_scalar_addmul_nmod_fullword(res, vec, len, c, mod);
-    else if (len > 10)
+    else if (len > FLINT_MULMOD_SHOUP_THRESHOLD)
         _nmod_vec_scalar_addmul_nmod_shoup(res, vec, len, c, mod);
     else
         _nmod_vec_scalar_addmul_nmod_generic(res, vec, len, c, mod);
@@ -82,17 +82,6 @@ void _nmod_vec_scalar_mul_nmod_generic(nn_ptr res, nn_srcptr vec,
         NMOD_MUL_PRENORM(res[i], vec[i], c << mod.norm, mod);
 }
 
-void _nmod_vec_scalar_mul_nmod(nn_ptr res, nn_srcptr vec,
-                               slong len, ulong c, nmod_t mod)
-{
-    if (NMOD_BITS(mod) == FLINT_BITS)
-        _nmod_vec_scalar_mul_nmod_fullword(res, vec, len, c, mod);
-    else if (len > 10)
-        _nmod_vec_scalar_mul_nmod_shoup(res, vec, len, c, mod);
-    else
-        _nmod_vec_scalar_mul_nmod_generic(res, vec, len, c, mod);
-}
-
 void _nmod_vec_scalar_mul_nmod_shoup(nn_ptr res, nn_srcptr vec,
                                slong len, ulong c, nmod_t mod)
 {
@@ -100,4 +89,15 @@ void _nmod_vec_scalar_mul_nmod_shoup(nn_ptr res, nn_srcptr vec,
 
     for (slong i = 0; i < len; i++)
         res[i] = n_mulmod_shoup(c, vec[i], c_pr, mod.n);
+}
+
+void _nmod_vec_scalar_mul_nmod(nn_ptr res, nn_srcptr vec,
+                               slong len, ulong c, nmod_t mod)
+{
+    if (NMOD_BITS(mod) == FLINT_BITS)
+        _nmod_vec_scalar_mul_nmod_fullword(res, vec, len, c, mod);
+    else if (len > FLINT_MULMOD_SHOUP_THRESHOLD)
+        _nmod_vec_scalar_mul_nmod_shoup(res, vec, len, c, mod);
+    else
+        _nmod_vec_scalar_mul_nmod_generic(res, vec, len, c, mod);
 }

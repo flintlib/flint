@@ -46,11 +46,12 @@ void sample(void * arg, ulong count)
         for (slong j = 0; j < 100; j++)
             nmod_mat_nmod_vec_mul(res, vec, length, mat);
         prof_stop();
+
+        nmod_mat_clear(mat);
     }
 
     _nmod_vec_clear(vec);
     _nmod_vec_clear(res);
-    nmod_mat_clear(mat);
     FLINT_TEST_CLEAR(state);
 }
 

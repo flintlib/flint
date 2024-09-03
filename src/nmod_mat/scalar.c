@@ -11,31 +11,33 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "flint-mparam.h"
 #include "ulong_extras.h"
 #include "nmod_mat.h"
 #include "fmpz.h"
 
 void
-nmod_mat_scalar_addmul_ui(nmod_mat_t dest, const nmod_mat_t X,
-                                          const nmod_mat_t Y, const ulong b)
+nmod_mat_scalar_addmul_ui(nmod_mat_t C, const nmod_mat_t A,
+                                          const nmod_mat_t B, const ulong c)
 {
     slong i, j;
 
-    if (b == UWORD(0))
+    if (c == UWORD(0))
     {
-        if (dest != X)
-            nmod_mat_set(dest, X);
+        if (C != A)
+            nmod_mat_set(C, A);
         return;
     }
 
-    for (i = 0; i < X->r; i++)
+    for (i = 0; i < A->r; i++)
     {
-        for (j = 0; j < X->c; j++)
+        for (j = 0; j < A->c; j++)
         {
-            nmod_mat_entry(dest, i, j) =
-                n_addmod(nmod_mat_entry(X, i, j),
-                    n_mulmod2_preinv(nmod_mat_entry(Y, i, j), b, Y->mod.n,
-                                                        Y->mod.ninv), X->mod.n);
+            nmod_mat_entry(C, i, j) =
+                n_addmod(nmod_mat_entry(A, i, j),
+                         n_mulmod2_preinv(nmod_mat_entry(B, i, j), c,
+                                          B->mod.n, B->mod.ninv),
+                         A->mod.n);
         }
     }
 }
@@ -55,15 +57,15 @@ nmod_mat_scalar_mul(nmod_mat_t B, const nmod_mat_t A, ulong c)
     {
         nmod_mat_neg(B, A);
     }
-    else if (A->r * A->c > 10 && A->mod.norm > 0)
+    else if (A->r * A->c > FLINT_MULMOD_SHOUP_THRESHOLD && A->mod.norm > 0)
     {
         slong i, j;
-        ulong w_pr = n_mulmod_precomp_shoup(c, A->mod.n);
+        ulong c_pr = n_mulmod_precomp_shoup(c, A->mod.n);
 
         for (i = 0; i < A->r; i++)
             for (j = 0; j < A->c; j++)
                 nmod_mat_entry(B, i, j) = n_mulmod_shoup(
-                    c, nmod_mat_entry(A, i, j), w_pr, A->mod.n);
+                    c, nmod_mat_entry(A, i, j), c_pr, A->mod.n);
     }
     else
     {
@@ -77,7 +79,7 @@ nmod_mat_scalar_mul(nmod_mat_t B, const nmod_mat_t A, ulong c)
 }
 
 void
-nmod_mat_scalar_mul_fmpz(nmod_mat_t res, const nmod_mat_t M, const fmpz_t c)
+nmod_mat_scalar_mul_fmpz(nmod_mat_t B, const nmod_mat_t A, const fmpz_t c)
 {
-    nmod_mat_scalar_mul(res, M, fmpz_get_nmod(c, res->mod));
+    nmod_mat_scalar_mul(B, A, fmpz_get_nmod(c, B->mod));
 }

@@ -139,11 +139,9 @@ void nmod_mat_neg(nmod_mat_t B, const nmod_mat_t A);
 /* Matrix-scalar arithmetic */
 
 void nmod_mat_scalar_mul(nmod_mat_t B, const nmod_mat_t A, ulong c);
-void nmod_mat_scalar_addmul_ui(nmod_mat_t dest,
-                       const nmod_mat_t X, const nmod_mat_t Y, const ulong b);
-
-
-void nmod_mat_scalar_mul_fmpz(nmod_mat_t res, const nmod_mat_t M, const fmpz_t c);
+void nmod_mat_scalar_addmul_ui(nmod_mat_t C,
+                       const nmod_mat_t A, const nmod_mat_t B, const ulong c);
+void nmod_mat_scalar_mul_fmpz(nmod_mat_t B, const nmod_mat_t A, const fmpz_t c);
 
 /* Matrix multiplication */
 
