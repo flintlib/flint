@@ -674,7 +674,7 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         ;;
       zen4)
         gcc_cflags_arch="-march=znver4 -march=znver3"
-        param_path="x86_64/zen3"
+        param_path="x86_64/zen4"
         have_avx512="yes"
         ;;
       coreibwl | broadwell)

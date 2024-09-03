@@ -169,62 +169,6 @@ ulong n_lll_mod_preinv(ulong a_hi, ulong a_mi, ulong a_lo, ulong n, ulong ninv);
 ulong n_mulmod_precomp(ulong a, ulong b, ulong n, double ninv);
 ulong n_mulmod_preinv(ulong a, ulong b, ulong n, ulong ninv, ulong norm);
 
-/* Shoup's modular multiplication with precomputation: explanations in the doc and in mulmod_precomp_shoup.c */
-ULONG_EXTRAS_INLINE
-ulong n_mulmod_precomp_shoup(ulong a, ulong n)
-{
-    ulong a_precomp, r;
-    udiv_qrnnd(a_precomp, r, a, UWORD(0), n);
-    return a_precomp;
-}
-
-ULONG_EXTRAS_INLINE
-ulong n_mulmod_shoup(ulong a, ulong b, ulong a_precomp, ulong n)
-{
-    ulong res, p_hi, p_lo;
-
-    umul_ppmm(p_hi, p_lo, a_precomp, b);
-    res = a * b - p_hi * n;
-
-    if (res >= n)
-        res -= n;
-
-    return res;
-}
-
-ULONG_EXTRAS_INLINE
-void n_mulmod_precomp_shoup_quo_rem(ulong * a_pr_quo, ulong * a_pr_rem, ulong a, ulong n)
-{
-    udiv_qrnnd(*a_pr_quo, *a_pr_rem, a, UWORD(0), n);
-}
-
-ULONG_EXTRAS_INLINE
-ulong n_mulmod_precomp_shoup_rem_from_quo(ulong a_pr_quo, ulong n)
-{
-    return - a_pr_quo * n;
-}
-
-ULONG_EXTRAS_INLINE
-void n_mulmod_and_precomp_shoup(ulong * ab, ulong * ab_precomp,
-                                ulong a, ulong b,
-                                ulong a_pr_quo, ulong a_pr_rem, ulong b_precomp,
-                                ulong n)
-{
-    ulong p_hi, p_lo;
-
-    umul_ppmm(p_hi, *ab_precomp, a_pr_quo, b);
-    *ab = a * b - p_hi * n;
-    if (*ab >= n)
-        *ab -= n;
-
-    umul_ppmm(p_hi, p_lo, b_precomp, a_pr_rem);
-    p_lo = b * a_pr_rem - p_hi * n;
-    *ab_precomp += p_hi;
-    if (p_lo >= n)
-        *ab_precomp += 1;
-}
-
-
 ULONG_EXTRAS_INLINE
 ulong n_mulmod2_preinv(ulong a, ulong b, ulong n, ulong ninv)
 {
@@ -321,6 +265,63 @@ ulong n_invmod(ulong x, ulong y)
 
    return r;
 }
+
+/* Modular multiplication with fixed operand **********************************/
+
+ULONG_EXTRAS_INLINE
+ulong n_mulmod_precomp_shoup(ulong a, ulong n)
+{
+    ulong a_precomp, r;
+    udiv_qrnnd(a_precomp, r, a, UWORD(0), n);
+    return a_precomp;
+}
+
+ULONG_EXTRAS_INLINE
+ulong n_mulmod_shoup(ulong a, ulong b, ulong a_precomp, ulong n)
+{
+    ulong res, p_hi, p_lo;
+
+    umul_ppmm(p_hi, p_lo, a_precomp, b);
+    res = a * b - p_hi * n;
+
+    if (res >= n)
+        res -= n;
+
+    return res;
+}
+
+ULONG_EXTRAS_INLINE
+void n_mulmod_precomp_shoup_quo_rem(ulong * a_pr_quo, ulong * a_pr_rem, ulong a, ulong n)
+{
+    udiv_qrnnd(*a_pr_quo, *a_pr_rem, a, UWORD(0), n);
+}
+
+ULONG_EXTRAS_INLINE
+ulong n_mulmod_precomp_shoup_rem_from_quo(ulong a_pr_quo, ulong n)
+{
+    return - a_pr_quo * n;
+}
+
+ULONG_EXTRAS_INLINE
+void n_mulmod_and_precomp_shoup(ulong * ab, ulong * ab_precomp,
+                                ulong a, ulong b,
+                                ulong a_pr_quo, ulong a_pr_rem, ulong b_precomp,
+                                ulong n)
+{
+    ulong p_hi, p_lo;
+
+    umul_ppmm(p_hi, *ab_precomp, a_pr_quo, b);
+    *ab = a * b - p_hi * n;
+    if (*ab >= n)
+        *ab -= n;
+
+    umul_ppmm(p_hi, p_lo, b_precomp, a_pr_rem);
+    p_lo = b * a_pr_rem - p_hi * n;
+    *ab_precomp += p_hi;
+    if (p_lo >= n)
+        *ab_precomp += 1;
+}
+
 
 /* Primitive roots and discrete logarithms ***********************************/
 

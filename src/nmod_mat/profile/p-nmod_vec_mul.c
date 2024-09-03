@@ -63,7 +63,6 @@ int main(void)
     flint_bitcnt_t i;
 
     flint_printf("unit: all measurements in c/l\n");
-    //flint_printf("profiled: general branching | precomp shoup | generic\n");
     flint_printf("bit/len\t");
     for (int len = 1; len <= 16; ++len)
         flint_printf("%d\t", len);
@@ -80,27 +79,15 @@ int main(void)
 
             prof_repeat(&min, &max, sample, (void *) &info);
             mins[len-1] = min;
-            //prof_repeat(&min, &max, sample_shoup, (void *) &info);
-            //mins_shoup[len-1] = min;
-            //prof_repeat(&min, &max, sample_generic, (void *) &info);
-            //mins_generic[len-1] = min;
         }
 
         info.length = 32;
         prof_repeat(&min, &max, sample, (void *) &info);
         mins[16] = min;
-        //prof_repeat(&min, &max, sample_shoup, (void *) &info);
-        //mins_shoup[16] = min;
-        //prof_repeat(&min, &max, sample_generic, (void *) &info);
-        //mins_generic[16] = min;
 
         info.length = 256;
         prof_repeat(&min, &max, sample, (void *) &info);
         mins[17] = min;
-        //prof_repeat(&min, &max, sample_shoup, (void *) &info);
-        //mins_shoup[17] = min;
-        //prof_repeat(&min, &max, sample_generic, (void *) &info);
-        //mins_generic[17] = min;
 
         if (i < FLINT_BITS)
         {
@@ -111,7 +98,7 @@ int main(void)
             flint_printf("\t%.1lf",
                     (mins[16]/(double)FLINT_CLOCK_SCALE_FACTOR)/(32*32*100));
             flint_printf("\t%.1lf",
-                    (mins[17]/(double)FLINT_CLOCK_SCALE_FACTOR)/(65536*100));
+                    (mins[17]/(double)FLINT_CLOCK_SCALE_FACTOR)/(256*256*100));
             flint_printf("\n");
         }
         else

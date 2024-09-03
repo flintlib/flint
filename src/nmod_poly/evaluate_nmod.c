@@ -87,7 +87,7 @@ _nmod_poly_evaluate_nmod_precomp_lazy(nn_srcptr poly, slong len, ulong c, ulong 
     for ( ; m >= 0; m--)
     {
         // computes either val = (c*val mod n) or val = (c*val mod n) + n
-        // see documentation of ulong_extras for details
+        // see documentation of ulong_extras / n_mulmod_shoup for details
         umul_ppmm(p_hi, p_lo, c_precomp, val);
         val = c * val - p_hi * mod.n;
         // lazy addition, yields val in [0..3n-1)
@@ -97,10 +97,9 @@ _nmod_poly_evaluate_nmod_precomp_lazy(nn_srcptr poly, slong len, ulong c, ulong 
 
     // correct excess
     if (val >= 2*mod.n)
-        val -= 2*mod.n;
+        return val - 2*mod.n;
     if (val >= mod.n)
-        val -= mod.n;
-
+        return val - mod.n;
     return val;
 }
 
