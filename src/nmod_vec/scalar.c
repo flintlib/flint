@@ -106,7 +106,7 @@ void _nmod_vec_scalar_mul_nmod(nn_ptr res, nn_srcptr vec,
         _nmod_vec_set(res, vec, len);
     else if (c == mod.n - UWORD(1))
         _nmod_vec_neg(res, vec, len, mod);
-    if (NMOD_BITS(mod) == FLINT_BITS)
+    else if (NMOD_BITS(mod) == FLINT_BITS)
         _nmod_vec_scalar_mul_nmod_fullword(res, vec, len, c, mod);
     else if (len > FLINT_MULMOD_SHOUP_THRESHOLD)
         _nmod_vec_scalar_mul_nmod_shoup(res, vec, len, c, mod);
