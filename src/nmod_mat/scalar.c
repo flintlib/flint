@@ -40,8 +40,6 @@ nmod_mat_scalar_addmul_ui(nmod_mat_t dest, const nmod_mat_t X,
     }
 }
 
-#define UWORD_HALF (UWORD_MAX / 2 + 1)
-
 void
 nmod_mat_scalar_mul(nmod_mat_t B, const nmod_mat_t A, ulong c)
 {
@@ -57,7 +55,7 @@ nmod_mat_scalar_mul(nmod_mat_t B, const nmod_mat_t A, ulong c)
     {
         nmod_mat_neg(B, A);
     }
-    else if (A->r * A->c > 10 && A->mod.n < UWORD_HALF)
+    else if (A->r * A->c > 10 && A->mod.norm > 0)
     {
         slong i, j;
         ulong w_pr = n_mulmod_precomp_shoup(c, A->mod.n);
