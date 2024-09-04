@@ -26,7 +26,7 @@ acb_theta_ql_exact_sum(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
 
     FLINT_ASSERT(nb >= 1);
 
-    acb_theta_ctx_tau_init(ctx_tau, g);
+    acb_theta_ctx_tau_init(ctx_tau, 1, g);
     vec = acb_theta_ctx_z_vec_init(nb, g);
 
     acb_theta_ctx_tau_set(ctx_tau, tau, prec);
@@ -360,7 +360,7 @@ acb_theta_ql_exact_steps(acb_ptr th, acb_srcptr zs, slong nb,
         acb_ptr new_z;
         arb_ptr d;
 
-        acb_theta_ctx_tau_init(ctx_tau, g);
+        acb_theta_ctx_tau_init(ctx_tau, 1, g);
         aux = acb_theta_ctx_z_vec_init(3, g);
         new_z = _acb_vec_init(g);
         d = _arb_vec_init(n);
@@ -460,7 +460,6 @@ int acb_theta_ql_exact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
     arb_ptr distances;
     slong nb_steps, split;
     slong lp = ACB_THETA_LOW_PREC;
-    slong j;
     int res = 1;
 
     FLINT_ASSERT(nb >= 1);
@@ -477,10 +476,7 @@ int acb_theta_ql_exact(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau,
 
     if (nb_steps > 0 || shifted_prec)
     {
-        for (j = 0; j < nb; j++)
-        {
-            acb_theta_dist_a0(distances + j * n, zs + j * g, tau, lp);
-        }
+        acb_theta_agm_distances(distances, zs, nb, tau, lp);
     }
 
     if (nb_steps == 0 && split == 0)

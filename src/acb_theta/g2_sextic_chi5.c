@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "fmpz_mat.h"
 #include "acb_poly.h"
 #include "acb_mat.h"
 #include "acb_theta.h"
@@ -61,9 +62,32 @@ acb_theta_g2_sextic_chi5(acb_poly_t res, acb_t chi5, const acb_mat_t tau, slong 
     }
     else
     {
-        _acb_vec_indeterminate(dth, n2 * nb);
+        /* Use sum_bound to avoid returning NaN */
+        arb_t c, rho;
+        arb_init(c);
+        arb_init(rho);
+
+        acb_theta_sum_bound(c, rho, zero, tau, 0);
+        for (k = 0; k < nb * n2; k++)
+        {
+            arb_zero_pm_one(acb_realref(&dth[k]));
+            arb_zero_pm_one(acb_imagref(&dth[k]));
+            acb_mul_arb(&dth[k], &dth[k], c, prec);
+            if (k % nb != 0) /* order 1 */
+            {
+                acb_div_arb(&dth[k], &dth[k], rho, prec);
+            }
+        }
+
+        for (k = 0; k < n2; k++)
+        {
+            acb_set(&th[k], &dth[k * nb]);
+        }
         acb_theta_g2_chi3_6(res, dth, prec);
         acb_theta_g2_chi5(chi5, th, prec);
+
+        arb_clear(c);
+        arb_clear(rho);
     }
 
     fmpz_mat_clear(mat);

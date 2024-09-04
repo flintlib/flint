@@ -31,7 +31,6 @@ TEST_FUNCTION_START(acb_theta_jet_all, state)
         acb_mat_t tau;
         acb_ptr z;
         acb_ptr th, test;
-        slong k;
 
         acb_mat_init(tau, g, g);
         z = _acb_vec_init(nb * g);
@@ -41,10 +40,7 @@ TEST_FUNCTION_START(acb_theta_jet_all, state)
         /* Sample tau not too far from reduced domain */
         acb_siegel_randtest_reduced(tau, state, prec, bits);
         acb_mat_scalar_mul_2exp_si(tau, tau, -1);
-        for (k = 0; k < nb; k++)
-        {
-            acb_siegel_randtest_vec_reduced(z + k * g, state, tau, 0, prec);
-        }
+        acb_siegel_randtest_vec_reduced(z, state, nb, tau, 0, prec);
         _acb_vec_scalar_mul_2exp_si(z, z, nb * g, 1);
 
         /* Call jet_all at precision mprec, test against jet_all_notransform */

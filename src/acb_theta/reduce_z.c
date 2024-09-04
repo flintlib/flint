@@ -57,8 +57,7 @@ acb_theta_reduce_z(acb_ptr new_zs, arb_ptr rs, acb_ptr cs, acb_srcptr zs,
     t = _acb_vec_init(g);
     x = _acb_vec_init(g);
 
-    acb_siegel_cho(cho, tau, prec);
-    acb_siegel_yinv(yinv, tau, prec);
+    acb_siegel_cho_yinv(cho, yinv, tau, prec);
 
     for (j = 0; j < nb; j++)
     {
@@ -101,11 +100,10 @@ acb_theta_reduce_z(acb_ptr new_zs, arb_ptr rs, acb_ptr cs, acb_srcptr zs,
         }
         else
         {
-            /* Still OK; set real part to [0,2] */
+            /* Still OK; set real part to [-1,1] */
             for (k = 0; k < g; k++)
             {
-                arb_unit_interval(acb_realref(&x[k]));
-                arb_mul_2exp_si(acb_realref(&x[k]), acb_realref(&x[k]), 1);
+                arb_zero_pm_one(acb_realref(&x[k]));
             }
             res = 1;
         }

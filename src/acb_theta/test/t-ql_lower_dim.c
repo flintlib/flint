@@ -27,7 +27,6 @@ TEST_FUNCTION_START(acb_theta_ql_lower_dim, state)
         slong nba = 1 << (g - s);
         ulong a = n_randint(state, nba);
         slong prec = 100 + n_randint(state, 100);
-        slong bits = n_randint(state, 4);
         int all = n_randint(state, 2);
         slong nbth = (all ? n * n : n);
         slong nbth0 = (all ? n0 * n0 : n0);
@@ -47,21 +46,20 @@ TEST_FUNCTION_START(acb_theta_ql_lower_dim, state)
         acb_mat_init(tau, g, g);
         z = _acb_vec_init(g);
         d = _arb_vec_init(n);
-        d0 = _arb_vec_init(n0);
-        acb_theta_ctx_tau_init(ctx_tau, g);
-        acb_theta_ctx_tau_init(ctx_tau0, s);
+        acb_theta_ctx_tau_init(ctx_tau, 1, g);
+        acb_theta_ctx_tau_init(ctx_tau0, 1, s);
         acb_theta_ctx_z_init(ctx_z, g);
         acb_theta_ctx_z_init(ctx_z0, s);
         th = _acb_vec_init(nbth);
         test = _acb_vec_init(nbth);
         arf_init(err);
 
-        acb_siegel_randtest_reduced(tau, state, prec, bits);
-        acb_siegel_randtest_vec(z, state, g, prec);
+        acb_siegel_randtest_compact(tau, state, 0, prec);
+        acb_siegel_randtest_vec_reduced(z, state, 1, tau, 0, prec);
 
         acb_theta_ctx_tau_set(ctx_tau, tau, prec);
         acb_theta_ctx_z_set(ctx_z, z, ctx_tau, prec);
-        acb_theta_dist_a0(d, z, tau, ACB_THETA_LOW_PREC);
+        acb_theta_agm_distances(d, z, 1, tau, ACB_THETA_LOW_PREC);
         if (all)
         {
             acb_theta_sum_all_tilde(th, ctx_z, 1, ctx_tau, d, prec);
@@ -71,30 +69,31 @@ TEST_FUNCTION_START(acb_theta_ql_lower_dim, state)
             acb_theta_sum_a0_tilde(th, ctx_z, 1, ctx_tau, d, prec);
         }
 
-        /* flint_printf("\n\ng = %wd, s = %wd, all = %wd, a = %wd, tau, z:\n", g, s, all, a);
+        /*flint_printf("\n\ng = %wd, s = %wd, all = %wd, a = %wd, tau, z:\n", g, s, all, a);
            acb_mat_printd(tau, 5);
            _acb_vec_printd(z, g, 5); */
 
         res = acb_theta_ql_lower_dim(&z0s, &cofactors, &pts, &nb, err,
             &fullprec, z, tau, d, s, a, prec);
 
-        /* flint_printf("ql_lower_dim: got res = %wd, nb = %wd, fullprec = %wd\n", res, nb, fullprec); */
+        /*flint_printf("ql_lower_dim: got res = %wd, nb = %wd, fullprec = %wd\n", res, nb, fullprec); */
 
         th0s = _acb_vec_init(nb * nbth0);
+        d0 = _arb_vec_init(nb * n0);
         acb_mat_window_init(tau0, tau, 0, 0, s, s);
 
         acb_theta_ctx_tau_set(ctx_tau0, tau0, prec);
+        acb_theta_agm_distances(d0, z0s, nb, tau0, ACB_THETA_LOW_PREC);
         for (j = 0; j < nb; j++)
         {
-            acb_theta_dist_a0(d0, z0s + j * s, tau0, ACB_THETA_LOW_PREC);
             acb_theta_ctx_z_set(ctx_z0, z0s + j * s, ctx_tau0, prec);
             if (all)
             {
-                acb_theta_sum_all_tilde(th0s + j * nbth0, ctx_z0, 1, ctx_tau0, d0, prec);
+                acb_theta_sum_all_tilde(th0s + j * nbth0, ctx_z0, 1, ctx_tau0, d0 + j * n0, prec);
             }
             else
             {
-                acb_theta_sum_a0_tilde(th0s + j * nbth0, ctx_z0, 1, ctx_tau0, d0, prec);
+                acb_theta_sum_a0_tilde(th0s + j * nbth0, ctx_z0, 1, ctx_tau0, d0 + j * n0, prec);
             }
         }
 
@@ -102,8 +101,8 @@ TEST_FUNCTION_START(acb_theta_ql_lower_dim, state)
         {
             acb_theta_ql_recombine(test, th0s, cofactors, pts, nb, err, fullprec,
                 s, a, all, g, prec);
-            /* _acb_vec_printd(th, nbth, 5);
-               _acb_vec_printd(test, nbth, 5); */
+            /*_acb_vec_printd(th, nbth, 5);
+              _acb_vec_printd(test, nbth, 5); */
             if (all)
             {
                 for (j = 0; j < n * n; j++)
@@ -134,7 +133,7 @@ TEST_FUNCTION_START(acb_theta_ql_lower_dim, state)
         acb_mat_window_clear(tau0);
         _acb_vec_clear(z, g);
         _arb_vec_clear(d, n);
-        _arb_vec_clear(d0, n0);
+        _arb_vec_clear(d0, nb * n0);
         _acb_vec_clear(z0s, nb * s);
         _acb_vec_clear(cofactors, nb);
         arf_clear(err);

@@ -10,6 +10,7 @@
 */
 
 #include "acb.h"
+#include "fmpz_mat.h"
 #include "acb_mat.h"
 #include "acb_theta.h"
 
@@ -22,7 +23,8 @@ acb_theta_00(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong pre
     acb_ptr new_zs, exps, cs, units;
     arb_ptr rs;
     acb_t s;
-    slong kappa, e, ab;
+    slong kappa, e;
+    ulong ab;
     slong j;
     int res;
 
@@ -52,9 +54,9 @@ acb_theta_00(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong pre
     if (res)
     {
         /* Setup */
-        ab = acb_theta_transform_char(&e, mat, 0);
+        acb_theta_char_table(&ab, &e, mat, 0);
         _acb_vec_unit_roots(units, 8, 8, prec);
-        kappa = acb_theta_transform_kappa(s, mat, new_tau, prec);
+        kappa = acb_siegel_kappa(s, mat, new_tau, prec);
 
         acb_theta_one_notransform(th, new_zs, nb, new_tau, ab, prec);
 
@@ -74,8 +76,21 @@ acb_theta_00(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong pre
     }
     else
     {
-        /* todo: replace with upper bound */
-        _acb_vec_indeterminate(th, nb);
+        /* Use sum_bound to avoid returning NaN */
+        arb_t c, rho;
+        arb_init(c);
+        arb_init(rho);
+
+        for (j = 0; j < nb; j++)
+        {
+            acb_theta_sum_bound(c, rho, zs + j * g, tau, 0);
+            arb_zero_pm_one(acb_realref(&th[j]));
+            arb_zero_pm_one(acb_imagref(&th[j]));
+            acb_mul_arb(&th[j], &th[j], c, prec);
+        }
+
+        arb_clear(c);
+        arb_clear(rho);
     }
 
     fmpz_mat_clear(mat);

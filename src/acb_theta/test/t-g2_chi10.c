@@ -41,9 +41,9 @@ TEST_FUNCTION_START(acb_theta_g2_chi10, state)
         }
 
         acb_theta_g2_chi10(r, th2, prec);
-        acb_theta_transform_proj(th2, mat, th2, 1, prec);
+        acb_theta_char_shuffle(th2, mat, th2, 1, prec);
         acb_theta_g2_chi10(s, th2, prec);
-        if (acb_theta_transform_kappa2(mat) % 2 == 1)
+        if (acb_siegel_kappa2(mat) % 2 == 1)
         {
             acb_neg(s, s);
         }

@@ -105,26 +105,26 @@ acb_theta_eld_next_R2(arf_t next_R2, const arf_t R2, const arb_t gamma, const ar
 static void
 acb_theta_eld_init_children(acb_theta_eld_t E, slong nr, slong nl)
 {
-    slong d = acb_theta_eld_dim(E);
-    slong g = acb_theta_eld_ambient_dim(E);
+    slong d = E->dim;
+    slong g = E->ambient_dim;
     slong k;
 
     if (nr > 0) /* should always be the case */
     {
         E->rchildren = flint_malloc(nr * sizeof(struct acb_theta_eld_struct));
-        acb_theta_eld_nr(E) = nr;
+        E->nr = nr;
         for (k = 0; k < nr; k++)
         {
-            acb_theta_eld_init(acb_theta_eld_rchild(E, k), d - 1, g);
+            acb_theta_eld_init(&E->rchildren[k], d - 1, g);
         }
     }
     if (nl > 0)
     {
         E->lchildren = flint_malloc(nl * sizeof(struct acb_theta_eld_struct));
-        acb_theta_eld_nl(E) = nl;
+        E->nl = nl;
         for (k = 0; k < nl; k++)
         {
-            acb_theta_eld_init(acb_theta_eld_lchild(E, k), d - 1, g);
+            acb_theta_eld_init(&E->lchildren[k], d - 1, g);
         }
     }
 }
@@ -134,8 +134,8 @@ acb_theta_eld_init_interval(acb_theta_eld_t E, const arb_mat_t C,
     const arf_t R2, arb_srcptr v, slong * last_coords)
 {
     slong min, mid, max;
-    slong d = acb_theta_eld_dim(E);
-    slong g = acb_theta_eld_ambient_dim(E);
+    slong d = E->dim;
+    slong g = E->ambient_dim;
     slong lp = ACB_THETA_LOW_PREC;
     slong k;
     arb_t x, ctr;
@@ -169,9 +169,9 @@ acb_theta_eld_init_interval(acb_theta_eld_t E, const arb_mat_t C,
 
     if (res)
     {
-        acb_theta_eld_min(E) = min;
-        acb_theta_eld_mid(E) = mid;
-        acb_theta_eld_max(E) = max;
+        E->min = min;
+        E->mid = mid;
+        E->max = max;
     }
 
     arb_clear(x);
@@ -186,17 +186,16 @@ static int
 acb_theta_eld_set_rec(acb_theta_eld_t E, const arb_mat_t C,
     const arf_t R2, arb_srcptr v, slong * last_coords)
 {
-    slong d = acb_theta_eld_dim(E);
-    slong g = acb_theta_eld_ambient_dim(E);
+    slong d = E->dim;
+    slong g = E->ambient_dim;
+    slong min, mid, max;
     slong lp = ACB_THETA_LOW_PREC;
-    slong min, mid, max, k;
     arf_t next_R2;
     slong *next_coords;
     arb_ptr v_diff;
     arb_ptr v_mid;
     arb_ptr next_v;
-    slong c;
-    slong nr, nl;
+    slong c, nr, nl, k;
     int res;
 
     res = acb_theta_eld_init_interval(E, C, R2, v, last_coords);
@@ -204,34 +203,34 @@ acb_theta_eld_set_rec(acb_theta_eld_t E, const arb_mat_t C,
     {
         return 0;
     }
-    min = acb_theta_eld_min(E);
-    mid = acb_theta_eld_mid(E);
-    max = acb_theta_eld_max(E);
+    min = E->min;
+    mid = E->mid;
+    max = E->max;
 
     /* Induction only if d > 1 and min <= max */
     if (min > max)
     {
-        acb_theta_eld_nb_pts(E) = 0;
+        E->nb_pts = 0;
         if (d == 1)
         {
-            acb_theta_eld_nb_border(E) = 2;
+            E->nb_border = 2;
         }
         else
         {
-            acb_theta_eld_nb_border(E) = 0;
+            E->nb_border = 0;
         }
         for (k = 0; k < d; k++)
         {
-            acb_theta_eld_box(E, k) = 0;
+            E->box[k] = 0;
         }
         return 1;
     }
     else if (d == 1)
     {
-        acb_theta_eld_nb_pts(E) = max - min + 1;
-        acb_theta_eld_nb_border(E) = 2;
-        acb_theta_eld_box(E, 0) = FLINT_MAX(max, -min);
-        return (acb_theta_eld_nb_pts(E) <= ACB_THETA_ELD_MAX_PTS);
+        E->nb_pts = max - min + 1;
+        E->nb_border = 2;
+        E->box[0] = FLINT_MAX(max, -min);
+        return (E->nb_pts <= ACB_THETA_ELD_MAX_PTS);
     }
 
     /* Begin main function */
@@ -259,12 +258,12 @@ acb_theta_eld_set_rec(acb_theta_eld_t E, const arb_mat_t C,
     }
 
     /* Set children recursively */
-    acb_theta_eld_nb_pts(E) = 0;
-    acb_theta_eld_nb_border(E) = 0;
-    acb_theta_eld_box(E, d - 1) = FLINT_MAX(max, -min);
+    E->nb_pts = 0;
+    E->nb_border = 0;
+    E->box[d - 1] = FLINT_MAX(max, -min);
     for (k = 0; k < d - 1; k++)
     {
-        acb_theta_eld_box(E, k) = 0;
+        E->box[k] = 0;
     }
 
     /* Right loop */
@@ -279,14 +278,13 @@ acb_theta_eld_set_rec(acb_theta_eld_t E, const arb_mat_t C,
         c = mid + k;
         acb_theta_eld_next_R2(next_R2, R2, arb_mat_entry(C, d - 1, d - 1), &v[d - 1], c);
         next_coords[0] = c;
-        res = acb_theta_eld_set_rec(acb_theta_eld_rchild(E, k), C, next_R2,
-            next_v, next_coords);
+        res = acb_theta_eld_set_rec(&E->rchildren[k], C, next_R2, next_v, next_coords);
         if (res)
         {
-            acb_theta_eld_nb_pts(E) += acb_theta_eld_nb_pts(acb_theta_eld_rchild(E, k));
-            acb_theta_eld_nb_border(E) += acb_theta_eld_nb_border(acb_theta_eld_rchild(E, k));
-            slong_vec_max(E->box, E->box, acb_theta_eld_rchild(E, k)->box, d - 1);
-            res = (acb_theta_eld_nb_pts(E) <= ACB_THETA_ELD_MAX_PTS);
+            E->nb_pts += (&E->rchildren[k])->nb_pts;
+            E->nb_border += (&E->rchildren[k])->nb_border;
+            slong_vec_max(E->box, E->box, (&E->rchildren[k])->box, d - 1);
+            res = ((E->nb_pts) <= ACB_THETA_ELD_MAX_PTS);
         }
     }
 
@@ -299,15 +297,14 @@ acb_theta_eld_set_rec(acb_theta_eld_t E, const arb_mat_t C,
         c = mid - (k + 1);
         acb_theta_eld_next_R2(next_R2, R2, arb_mat_entry(C, d - 1, d - 1), &v[d - 1], c);
         next_coords[0] = c;
-        res = acb_theta_eld_set_rec(acb_theta_eld_lchild(E, k), C, next_R2,
-            next_v, next_coords);
+        res = acb_theta_eld_set_rec(&E->lchildren[k], C, next_R2, next_v, next_coords);
 
-        if (res) /* we expect this always holds */
+        if (res)
         {
-            acb_theta_eld_nb_pts(E) += acb_theta_eld_nb_pts(acb_theta_eld_lchild(E, k));
-            acb_theta_eld_nb_border(E) += acb_theta_eld_nb_border(acb_theta_eld_lchild(E, k));
-            slong_vec_max(E->box, E->box, acb_theta_eld_lchild(E, k)->box, d - 1);
-            res = (acb_theta_eld_nb_pts(E) <= ACB_THETA_ELD_MAX_PTS);
+            E->nb_pts += (&E->lchildren[k])->nb_pts;
+            E->nb_border += (&E->lchildren[k])->nb_border;
+            slong_vec_max(E->box, E->box, (&E->lchildren[k])->box, d - 1);
+            res = ((E->nb_pts) <= ACB_THETA_ELD_MAX_PTS);
         }
     }
 
@@ -322,8 +319,8 @@ acb_theta_eld_set_rec(acb_theta_eld_t E, const arb_mat_t C,
 int
 acb_theta_eld_set(acb_theta_eld_t E, const arb_mat_t C, const arf_t R2, arb_srcptr v)
 {
-    slong d = acb_theta_eld_dim(E);
-    slong g = acb_theta_eld_ambient_dim(E);
+    slong d = E->dim;
+    slong g = E->ambient_dim;
 
     acb_theta_eld_clear(E);
     acb_theta_eld_init(E, d, g);

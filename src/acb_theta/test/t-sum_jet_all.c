@@ -41,7 +41,7 @@ TEST_FUNCTION_START(acb_theta_sum_jet_all, state)
         acb_mat_init(tau, g, g);
         acb_mat_init(tau11, 1, 1);
         zs = _acb_vec_init(nbz * g);
-        acb_theta_ctx_tau_init(ctx_tau, g);
+        acb_theta_ctx_tau_init(ctx_tau, 0, g);
         vec = acb_theta_ctx_z_vec_init(nbz, g);
         th = _acb_vec_init(nbz * nbth * n2);
         aux = _acb_vec_init(nbz * 4 * (ord + 1));
@@ -53,10 +53,7 @@ TEST_FUNCTION_START(acb_theta_sum_jet_all, state)
             acb_siegel_randtest_reduced(tau11, state, prec, bits);
             acb_set(acb_mat_entry(tau, j, j), acb_mat_entry(tau11, 0, 0));
         }
-        for (j = 0; j < nbz; j++)
-        {
-            acb_siegel_randtest_vec_reduced(zs + j * g, state, tau, 0, prec);
-        }
+        acb_siegel_randtest_vec_reduced(zs, state, nbz, tau, 0, prec);
 
         /* Call sum_jet_all at precision mprec */
         acb_theta_ctx_tau_set(ctx_tau, tau, prec);
@@ -98,7 +95,7 @@ TEST_FUNCTION_START(acb_theta_sum_jet_all, state)
             ulong ab, a1b1;
 
             tups = flint_malloc(nbth * g * sizeof(slong));
-            acb_theta_ctx_tau_init(ctx_tau11, 1);
+            acb_theta_ctx_tau_init(ctx_tau11, 0, 1);
             vec_g1 = acb_theta_ctx_z_vec_init(nbz, 1);
 
             acb_theta_jet_tuples(tups, ord, g);

@@ -36,10 +36,10 @@ acb_theta_ctx_z_common_v(arb_ptr v, const acb_theta_ctx_z_struct * vec, slong nb
     if (nb == 0) return;
 
     g = vec->g;
-    _arb_vec_set(v, acb_theta_ctx_v(vec), g);
+    _arb_vec_set(v, vec->v, g);
     for (j = 1; j < nb; j++)
     {
-        _arb_vec_union(v, v, acb_theta_ctx_v(vec + j), g, prec);
+        _arb_vec_union(v, v, (vec + j)->v, g, prec);
     }
 }
 

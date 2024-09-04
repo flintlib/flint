@@ -28,6 +28,7 @@ TEST_FUNCTION_START(acb_theta_char_dot, state)
         fmpz_t m;
         slong x1, x2;
         acb_t x3, x4;
+        slong j;
         int res;
 
         n = flint_malloc(g * sizeof(slong));
@@ -40,7 +41,10 @@ TEST_FUNCTION_START(acb_theta_char_dot, state)
         fmpz_init(m);
 
         x1 = acb_theta_char_dot(a, b, g);
-        acb_theta_char_get_slong(n, b, g);
+        for (j = 0; j < g; j++)
+        {
+            n[g - 1 - j] = (b >> j) % 2;
+        }
         x2 = acb_theta_char_dot_slong(a, n, g);
         acb_theta_char_get_acb(v, b, g);
         acb_theta_char_dot_acb(x3, a, v, g, prec);

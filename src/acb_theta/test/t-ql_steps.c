@@ -23,7 +23,6 @@ TEST_FUNCTION_START(acb_theta_ql_steps, state)
         slong g = 1 + n_randint(state, 3);
         slong n = 1 << g;
         slong prec = 100 + n_randint(state, 200);
-        slong bits = n_randint(state, 4);
         slong nb = 1 + n_randint(state, 4);
         slong nb_steps = 1 + n_randint(state, 4);
         int all = n_randint(state, 2);
@@ -32,10 +31,9 @@ TEST_FUNCTION_START(acb_theta_ql_steps, state)
         acb_ptr zs, t, rts, rts_all;
         acb_ptr th, th_init, test;
         arb_ptr distances;
-        arb_t y;
         slong * easy_steps;
         slong guard, hp;
-        slong j, k;
+        slong j;
         int res;
 
         acb_mat_init(tau, g, g);
@@ -50,46 +48,17 @@ TEST_FUNCTION_START(acb_theta_ql_steps, state)
         th_init = _acb_vec_init(3 * n * nb);
         test = _acb_vec_init(nb * nbth);
         distances = _arb_vec_init(nb * n);
-        arb_init(y);
         easy_steps = flint_malloc(nb * sizeof(slong));
 
-        /* Sample tau with reasonable imaginary part */
-        res = 0;
-        while(!res)
-        {
-            acb_siegel_randtest_reduced(tau, state, prec, bits);
-            arb_sub_si(y, acb_imagref(acb_mat_entry(tau, g - 1, g - 1)), 200, prec);
-            res = arb_is_negative(y);
-        }
-        acb_siegel_randtest_vec(zs + g, state, (nb - 1) * g, prec);
-
-        /* Strip tau, z of error */
-        for (j = 0; j < g; j++)
-        {
-            for (k = j; k < g; k++)
-            {
-                acb_get_mid(acb_mat_entry(tau, j, k), acb_mat_entry(tau, j, k));
-                acb_set(acb_mat_entry(tau, k, j), acb_mat_entry(tau, j, k));
-            }
-        }
-        for (j = 0; j < nb * g; j++)
-        {
-            acb_get_mid(&zs[j], &zs[j]);
-        }
-
-        /* Compute distances */
-        for (j = 0; j < nb; j++)
-        {
-            acb_theta_dist_a0(distances + j * n, zs + j * g, tau, prec);
-        }
-
+        acb_siegel_randtest_compact(tau, state, 1, prec);
+        acb_siegel_randtest_vec_reduced(zs + g, state, nb - 1, tau, 1, prec);
+        acb_theta_agm_distances(distances, zs, nb, tau, prec);
         res = acb_theta_ql_setup(rts, rts_all, t, &guard, easy_steps, zs, nb, tau,
             distances, nb_steps, all, prec);
-
+        hp = prec + guard * nb_steps;
         /* flint_printf("\n\ng = %wd, prec = %wd, nb = %wd, nb_steps = %wd, all = %wd\n", g, prec, nb, nb_steps, all);
            acb_mat_printd(tau, 5);
            _acb_vec_printd(zs, nb * g, 5); */
-        hp = prec + guard * nb_steps;
 
         if (res)
         {
@@ -102,7 +71,7 @@ TEST_FUNCTION_START(acb_theta_ql_steps, state)
             acb_ptr new_z;
             arb_ptr d;
 
-            acb_theta_ctx_tau_init(ctx, g);
+            acb_theta_ctx_tau_init(ctx, 1, g);
             aux = acb_theta_ctx_z_vec_init(3, g);
             acb_mat_init(new_tau, g, g);
             new_z = _acb_vec_init(g);
@@ -192,7 +161,6 @@ TEST_FUNCTION_START(acb_theta_ql_steps, state)
         _acb_vec_clear(th_init, 3 * n * nb);
         _acb_vec_clear(test, nbth * nb);
         _arb_vec_clear(distances, nb * n);
-        arb_clear(y);
         flint_free(easy_steps);
     }
 

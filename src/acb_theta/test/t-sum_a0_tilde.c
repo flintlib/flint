@@ -25,7 +25,6 @@ TEST_FUNCTION_START(acb_theta_sum_a0_tilde, state)
         slong n = 1 << g;
         slong mprec = 100 + n_randint(state, 100);
         slong prec = mprec + 50;
-        slong bits = n_randint(state, 4);
         acb_mat_t tau;
         acb_ptr z;
         acb_theta_ctx_tau_t ctx_tau;
@@ -36,17 +35,17 @@ TEST_FUNCTION_START(acb_theta_sum_a0_tilde, state)
 
         acb_mat_init(tau, g, g);
         z = _acb_vec_init(g);
-        acb_theta_ctx_tau_init(ctx_tau, g);
+        acb_theta_ctx_tau_init(ctx_tau, 1, g);
         acb_theta_ctx_z_init(ctx, g);
         d = _arb_vec_init(n);
         th1 = _acb_vec_init(n);
         th2 = _acb_vec_init(n * n);
 
-        acb_siegel_randtest_reduced(tau, state, prec, bits);
+        acb_siegel_randtest_compact(tau, state, 0, prec);
         acb_siegel_randtest_vec(z, state, g, prec);
         acb_theta_ctx_tau_set(ctx_tau, tau, prec);
         acb_theta_ctx_z_set(ctx, z, ctx_tau, prec);
-        acb_theta_dist_a0(d, z, tau, prec);
+        acb_theta_agm_distances(d, z, 1, tau, prec);
 
         /* Call sum_a0_tilde at precision mprec, test against sum_all_tilde */
         acb_theta_sum_a0_tilde(th1, ctx, 1, ctx_tau, d, mprec);

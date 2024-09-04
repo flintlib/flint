@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "fmpz_mat.h"
 #include "acb_theta.h"
 
 TEST_FUNCTION_START(acb_theta_g2_character, state)
@@ -21,20 +22,24 @@ TEST_FUNCTION_START(acb_theta_g2_character, state)
     {
         fmpz_mat_t mat;
         slong bits = n_randint(state, 10);
-        slong ab, eps, u, test;
+        ulong * chars;
+        slong * es;
+        slong ab, eps, test;
 
         fmpz_mat_init(mat, 4, 4);
         sp2gz_randtest(mat, state, bits);
+        chars = flint_malloc(16 * sizeof(ulong));
+        es = flint_malloc(16 * sizeof(slong));
 
         eps = acb_theta_g2_character(mat);
 
-        test = 10 * acb_theta_transform_kappa2(mat); /* 10 theta constants */
+        test = 10 * acb_siegel_kappa2(mat); /* 10 theta constants */
+        acb_theta_char_table(chars, es, mat, -1);
         for (ab = 0; ab < 16; ab++)
         {
             if (acb_theta_char_is_even(ab, 2))
             {
-                acb_theta_transform_char(&u, mat, ab);
-                test += u;
+                test += es[ab];
             }
         }
         if (test % 4 != 0)
@@ -55,6 +60,8 @@ TEST_FUNCTION_START(acb_theta_g2_character, state)
         }
 
         fmpz_mat_clear(mat);
+        flint_free(chars);
+        flint_free(es);
     }
 
     TEST_FUNCTION_END(state);

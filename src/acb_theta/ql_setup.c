@@ -11,10 +11,38 @@
 
 #include "arb.h"
 #include "acb.h"
+#include "arb_mat.h"
 #include "acb_mat.h"
 #include "acb_theta.h"
 
 #define ACB_THETA_QL_TRY 4
+
+static void
+acb_theta_ctx_tau_copy(acb_theta_ctx_tau_t res, const acb_theta_ctx_tau_t ctx)
+{
+    slong g = ctx->g;
+    slong n = 1 << g;
+
+    FLINT_ASSERT(res->g == g);
+
+    arb_mat_set(&res->yinv, &ctx->yinv);
+    acb_mat_set(res->exp_tau_div_4, ctx->exp_tau_div_4);
+    acb_mat_set(res->exp_tau_div_2, ctx->exp_tau_div_2);
+    acb_mat_set(res->exp_tau, ctx->exp_tau);
+
+    if (g > 1)
+    {
+        arb_mat_set(&res->cho, &ctx->cho);
+        acb_mat_set(res->exp_tau_div_4_inv, ctx->exp_tau_div_4_inv);
+        acb_mat_set(res->exp_tau_div_2_inv, ctx->exp_tau_div_2_inv);
+        acb_mat_set(res->exp_tau_inv, ctx->exp_tau_inv);
+        _acb_vec_set(res->exp_tau_a_div_2, ctx->exp_tau_a_div_2, n * g);
+        _acb_vec_set(res->exp_tau_a, ctx->exp_tau_a, n * g);
+        _acb_vec_set(res->exp_tau_a_div_2_inv, ctx->exp_tau_a_div_2_inv, n * g);
+        _acb_vec_set(res->exp_tau_a_inv, ctx->exp_tau_a_inv, n * g);
+        _acb_vec_set(res->exp_a_tau_a_div_4, ctx->exp_a_tau_a_div_4, n);
+    }
+}
 
 static int
 _acb_vec_contains_zero(acb_srcptr vec, slong nb)
@@ -62,8 +90,8 @@ acb_theta_ql_setup(acb_ptr rts, acb_ptr rts_all, acb_ptr t, slong * guard, slong
         return 1;
     }
 
-    acb_theta_ctx_tau_init(ctx_tau, g);
-    acb_theta_ctx_tau_init(ctx_tau_dupl, g);
+    acb_theta_ctx_tau_init(ctx_tau, 1, g);
+    acb_theta_ctx_tau_init(ctx_tau_dupl, 1, g);
     vec = acb_theta_ctx_z_vec_init(nb, g);
     aux = acb_theta_ctx_z_vec_init(2, g);
     acb_theta_ctx_z_init(ctxt, g);

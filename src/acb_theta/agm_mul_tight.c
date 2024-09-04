@@ -82,7 +82,7 @@ acb_theta_agm_mul_tight_gen(acb_ptr res, acb_srcptr a0, acb_srcptr a,
 
     for (k = 0; k < n; k++)
     {
-        hprec = FLINT_MAX(hprec, prec + acb_theta_dist_addprec(&d[k]));
+        hprec = FLINT_MAX(hprec, prec + acb_theta_agm_addprec(&d[k]));
         acb_get_mid(&v0[k], &a0[k]);
         acb_get_mid(&v[k], &a[k]);
     }
@@ -139,7 +139,7 @@ acb_theta_agm_mul_tight_g1(acb_ptr res, acb_srcptr a0, acb_srcptr a,
     {
         acb_sqr(t, &a[0], prec);
         acb_sqr(&aux[0], &a[1], prec);
-        acb_add(&aux[0], &aux[0], t, prec + acb_theta_dist_addprec(&d[0]));
+        acb_add(&aux[0], &aux[0], t, prec + acb_theta_agm_addprec(&d[0]));
         acb_mul(&aux[1], &a[0], &a[1], prec);
         acb_mul_2exp_si(&aux[1], &aux[1], 1);
     }
@@ -147,10 +147,10 @@ acb_theta_agm_mul_tight_g1(acb_ptr res, acb_srcptr a0, acb_srcptr a,
     {
         acb_mul(t, &a0[0], &a[0], prec);
         acb_mul(&aux[0], &a0[1], &a[1], prec);
-        acb_add(&aux[0], &aux[0], t, prec + acb_theta_dist_addprec(&d[0]));
+        acb_add(&aux[0], &aux[0], t, prec + acb_theta_agm_addprec(&d[0]));
         acb_mul(t, &a0[0], &a[1], prec);
         acb_mul(&aux[1], &a0[1], &a[0], prec);
-        acb_add(&aux[1], &aux[1], t, prec + acb_theta_dist_addprec(&d[1]));
+        acb_add(&aux[1], &aux[1], t, prec + acb_theta_agm_addprec(&d[1]));
     }
     _acb_vec_scalar_mul_2exp_si(res, aux, 2, -1);
 

@@ -26,22 +26,23 @@ void acb_theta_one_notransform(acb_ptr th, acb_srcptr zs, slong nb,
     if (g == 1)
     {
         /* call acb_modular_theta_sum directly */
-        acb_theta_ctx_tau_t ctx_tau;
-        acb_theta_ctx_z_t ctx;
+        acb_t w, q14, q;
         acb_ptr res;
 
-        acb_theta_ctx_tau_init(ctx_tau, g);
-        acb_theta_ctx_z_init(ctx, g);
+        acb_init(w);
+        acb_init(q14);
+        acb_init(q);
         res = _acb_vec_init(4);
 
-        acb_theta_ctx_tau_set(ctx_tau, tau, prec);
+        acb_mul_2exp_si(q14, acb_mat_entry(tau, 0, 0), -2);
+        acb_exp_pi_i(q14, q14, prec);
+        acb_pow_ui(q, q14, 4, prec);
+
         for (j = 0; j < nb; j++)
         {
-            acb_theta_ctx_z_set(ctx, zs + j * g, ctx_tau, prec);
-            /* acb_modular_theta_sum recomputes the inverse of exp_z */
+            acb_exp_pi_i(w, &zs[j], prec);
             acb_modular_theta_sum(&res[0], &res[1], &res[2], &res[3],
-                acb_theta_ctx_exp_z(ctx), acb_theta_ctx_is_real(ctx),
-                acb_mat_entry(acb_theta_ctx_exp_tau(ctx_tau), 0, 0), 1, prec);
+                w, acb_is_real(&zs[j]), q, 1, prec);
             if (ab == 0)
             {
                 acb_set(&th[j], &res[2]);
@@ -60,14 +61,13 @@ void acb_theta_one_notransform(acb_ptr th, acb_srcptr zs, slong nb,
             }
             if (ab >= 2)
             {
-                acb_mul(&th[j], &th[j],
-                    acb_mat_entry(acb_theta_ctx_exp_tau_div_4(ctx_tau), 0, 0), prec);
+                acb_mul(&th[j], &th[j], q14, prec);
             }
-            acb_mul(&th[j], &th[j], acb_theta_ctx_c(ctx), prec);
         }
 
-        acb_theta_ctx_tau_clear(ctx_tau);
-        acb_theta_ctx_z_clear(ctx);
+        acb_clear(w);
+        acb_clear(q14);
+        acb_clear(q);
         _acb_vec_clear(res, 4);
     }
     else if (ab == 0)

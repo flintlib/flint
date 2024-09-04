@@ -17,15 +17,20 @@
 /* This is the all-important function to increase performance. */
 
 int
-acb_theta_ql_nb_steps(slong * pattern, const arb_mat_t cho, slong prec)
+acb_theta_ql_nb_steps(slong * pattern, const acb_mat_t tau, slong prec)
 {
-    slong g = arb_mat_nrows(cho);
+    slong g = acb_mat_nrows(tau);
     slong lp = ACB_THETA_LOW_PREC;
+    arb_mat_t cho, yinv;
     arb_t x, t;
     slong s, nb;
 
     arb_init(x);
     arb_init(t);
+    arb_mat_init(cho, g, g);
+    arb_mat_init(yinv, g, g);
+
+    acb_siegel_cho_yinv(cho, yinv, tau, lp);
 
     for (s = 0; s < g; s++)
     {
@@ -68,5 +73,7 @@ acb_theta_ql_nb_steps(slong * pattern, const arb_mat_t cho, slong prec)
 
     arb_clear(x);
     arb_clear(t);
+    arb_mat_clear(cho);
+    arb_mat_clear(yinv);
     return 1;
 }

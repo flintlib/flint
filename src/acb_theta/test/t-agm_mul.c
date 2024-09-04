@@ -29,33 +29,31 @@ TEST_FUNCTION_START(acb_theta_agm_mul, state)
         acb_ptr z;
         acb_theta_ctx_tau_t ctx_tau;
         acb_theta_ctx_z_t ctx0, ctx;
-        arb_ptr d0, d;
+        arb_ptr ds;
         acb_ptr th2, th_dupl, test;
         slong j;
 
         acb_mat_init(tau, g, g);
         z = _acb_vec_init(2 * g);
-        acb_theta_ctx_tau_init(ctx_tau, g);
+        acb_theta_ctx_tau_init(ctx_tau, 1, g);
         acb_theta_ctx_z_init(ctx0, g);
         acb_theta_ctx_z_init(ctx, g);
         th2 = _acb_vec_init(2 * n);
         th_dupl = _acb_vec_init(2 * n);
         test = _acb_vec_init(2 * n);
-        d0 = _arb_vec_init(n);
-        d = _arb_vec_init(n);
+        ds = _arb_vec_init(2 * n);
 
         acb_siegel_randtest_reduced(tau, state, prec, bits);
-        acb_siegel_randtest_vec_reduced(z + g, state, tau, 0, prec);
+        acb_siegel_randtest_vec_reduced(z + g, state, 1, tau, 0, prec);
 
         acb_theta_ctx_tau_set(ctx_tau, tau, prec);
         acb_theta_ctx_z_set(ctx0, z, ctx_tau, prec);
         acb_theta_ctx_z_set(ctx, z + g, ctx_tau, prec);
-        acb_theta_dist_a0(d0, z, tau, prec);
-        acb_theta_dist_a0(d, z + g, tau, prec);
+        acb_theta_agm_distances(ds, z, 2, tau, prec);
 
         /* Make test vector using sum_a0_tilde squared */
-        acb_theta_sum_a0_tilde(test, ctx0, 1, ctx_tau, d0, prec);
-        acb_theta_sum_a0_tilde(test + n, ctx, 1, ctx_tau, d, prec);
+        acb_theta_sum_a0_tilde(test, ctx0, 1, ctx_tau, ds, prec);
+        acb_theta_sum_a0_tilde(test + n, ctx, 1, ctx_tau, ds + n, prec);
         for (j = 0; j < 2 * n; j++)
         {
             acb_sqr(&test[j], &test[j], prec);
@@ -65,10 +63,9 @@ TEST_FUNCTION_START(acb_theta_agm_mul, state)
         acb_theta_ctx_tau_dupl(ctx_tau, prec);
         acb_theta_ctx_z_dupl(ctx0, prec);
         acb_theta_ctx_z_dupl(ctx, prec);
-        _arb_vec_scalar_mul_2exp_si(d0, d0, n, 1);
-        _arb_vec_scalar_mul_2exp_si(d, d, n, 1);
-        acb_theta_sum_a0_tilde(th_dupl, ctx0, 1, ctx_tau, d0, prec);
-        acb_theta_sum_a0_tilde(th_dupl + n, ctx, 1, ctx_tau, d, prec);
+        _arb_vec_scalar_mul_2exp_si(ds, ds, 2 * n, 1);
+        acb_theta_sum_a0_tilde(th_dupl, ctx0, 1, ctx_tau, ds, prec);
+        acb_theta_sum_a0_tilde(th_dupl + n, ctx, 1, ctx_tau, ds + n, prec);
 
         /* Call agm_mul at precision mprec and compare with test */
         acb_theta_agm_mul(th2, th_dupl, th_dupl, g, mprec);
@@ -98,8 +95,7 @@ TEST_FUNCTION_START(acb_theta_agm_mul, state)
         _acb_vec_clear(th2, 2 * n);
         _acb_vec_clear(th_dupl, 2 * n);
         _acb_vec_clear(test, 2 * n);
-        _arb_vec_clear(d0, n);
-        _arb_vec_clear(d, n);
+        _arb_vec_clear(ds, 2 * n);
     }
 
     TEST_FUNCTION_END(state);

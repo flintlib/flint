@@ -18,18 +18,15 @@ acb_theta_ctx_z_clear(acb_theta_ctx_z_t ctx)
 {
     slong g = ctx->g;
 
-    _acb_vec_clear(acb_theta_ctx_z(ctx), g);
-    _acb_vec_clear(acb_theta_ctx_exp_z(ctx), g);
-    acb_clear(acb_theta_ctx_c(ctx));
-    _arb_vec_clear(acb_theta_ctx_r(ctx), g);
-    arb_clear(acb_theta_ctx_uinv(ctx));
-    arb_clear(acb_theta_ctx_u(ctx));
+    _acb_vec_clear(ctx->exp_z, g);
+    arb_clear(&ctx->u);
+    arb_clear(&ctx->uinv);
 
     if (g > 1)
     {
-        _acb_vec_clear(acb_theta_ctx_exp_2z(ctx), g);
-        _acb_vec_clear(acb_theta_ctx_exp_z_inv(ctx), g);
-        _acb_vec_clear(acb_theta_ctx_exp_2z_inv(ctx), g);
-        _arb_vec_clear(acb_theta_ctx_v(ctx), g);
+        _acb_vec_clear(ctx->exp_2z, g);
+        _acb_vec_clear(ctx->exp_z_inv, g);
+        _acb_vec_clear(ctx->exp_2z_inv, g);
+        _arb_vec_clear(ctx->v, g);
     }
 }

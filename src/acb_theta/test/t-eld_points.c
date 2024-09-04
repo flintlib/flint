@@ -72,7 +72,7 @@ TEST_FUNCTION_START(acb_theta_eld_points, state)
         {
             for (j = 0; j < g; j++)
             {
-                if (FLINT_ABS(all_pts[k * g + j]) > acb_theta_eld_box(E, j))
+                if (FLINT_ABS(all_pts[k * g + j]) > (E->box[j]))
                 {
                     flint_printf("FAIL: point outside box\n");
                     flint_printf("\n");
@@ -85,7 +85,7 @@ TEST_FUNCTION_START(acb_theta_eld_points, state)
         {
             for (k = 0; k < g; k++)
             {
-                pt[k] = n_randint(state, acb_theta_eld_box(E, k) + 1);
+                pt[k] = n_randint(state, (E->box[k]) + 1);
             }
             if (acb_theta_eld_contains(E, pt))
             {

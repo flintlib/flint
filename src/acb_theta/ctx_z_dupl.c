@@ -20,38 +20,34 @@ acb_theta_ctx_z_dupl(acb_theta_ctx_z_t ctx, slong prec)
     acb_ptr temp;
     slong j;
 
-    _acb_vec_scalar_mul_2exp_si(acb_theta_ctx_z(ctx),
-        acb_theta_ctx_z(ctx), g, 1);
     /* Compute exponentials, swapping vectors around if g > 1 */
     if (g == 1)
     {
         for (j = 0; j < g; j++)
         {
-            acb_sqr(&acb_theta_ctx_exp_z(ctx)[j], &acb_theta_ctx_exp_z(ctx)[j], prec);
+            acb_sqr(&ctx->exp_z[j], &ctx->exp_z[j], prec);
         }
     }
     else
     {
-        temp = acb_theta_ctx_exp_z(ctx);
-        acb_theta_ctx_exp_z(ctx) = acb_theta_ctx_exp_2z(ctx);
-        acb_theta_ctx_exp_2z(ctx) = temp;
-        temp = acb_theta_ctx_exp_z_inv(ctx);
-        acb_theta_ctx_exp_z_inv(ctx) = acb_theta_ctx_exp_2z_inv(ctx);
-        acb_theta_ctx_exp_2z_inv(ctx) = temp;
+        temp = ctx->exp_z;
+        ctx->exp_z = ctx->exp_2z;
+        ctx->exp_2z = temp;
+        temp = ctx->exp_z_inv;
+        ctx->exp_z_inv = ctx->exp_2z_inv;
+        ctx->exp_2z_inv = temp;
         for (j = 0; j < g; j++)
         {
-            acb_sqr(&acb_theta_ctx_exp_2z(ctx)[j], &acb_theta_ctx_exp_z(ctx)[j], prec);
-            acb_theta_ctx_sqr_inv(&acb_theta_ctx_exp_2z_inv(ctx)[j],
-                &acb_theta_ctx_exp_z_inv(ctx)[j], &acb_theta_ctx_exp_2z(ctx)[j],
-                acb_theta_ctx_is_real(ctx), prec);
+            acb_sqr(&ctx->exp_2z[j], &ctx->exp_z[j], prec);
+            acb_theta_ctx_sqr_inv(&ctx->exp_2z_inv[j], &ctx->exp_z_inv[j],
+                &ctx->exp_2z[j], ctx->is_real, prec);
         }
     }
 
     /* Compute other quantities */
-    acb_sqr(acb_theta_ctx_c(ctx), acb_theta_ctx_c(ctx), prec);
-    arb_sqr(acb_theta_ctx_u(ctx), acb_theta_ctx_u(ctx), prec);
-    arb_sqr(acb_theta_ctx_uinv(ctx), acb_theta_ctx_uinv(ctx), prec);
-    /* r does not change. */
+    arb_sqr(&ctx->u, &ctx->u, prec);
+    arb_sqr(&ctx->uinv, &ctx->uinv, prec);
+
     if (g > 1)
     {
         arb_t sqrt2;
@@ -60,7 +56,7 @@ acb_theta_ctx_z_dupl(acb_theta_ctx_z_t ctx, slong prec)
         arb_set_si(sqrt2, 2);
         arb_sqrt(sqrt2, sqrt2, prec);
 
-        _arb_vec_scalar_mul(acb_theta_ctx_v(ctx), acb_theta_ctx_v(ctx), g, sqrt2, prec);
+        _arb_vec_scalar_mul(ctx->v, ctx->v, g, sqrt2, prec);
 
         arb_clear(sqrt2);
     }

@@ -20,7 +20,7 @@ void acb_theta_jet_00_notransform(acb_ptr th, acb_srcptr zs, slong nb,
     acb_theta_ctx_z_struct * vec;
     slong j;
 
-    acb_theta_ctx_tau_init(ctx_tau, g);
+    acb_theta_ctx_tau_init(ctx_tau, 0, g);
     vec = acb_theta_ctx_z_vec_init(nb, g);
 
     acb_theta_ctx_tau_set(ctx_tau, tau, prec);

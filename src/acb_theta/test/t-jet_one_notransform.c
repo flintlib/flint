@@ -40,10 +40,7 @@ TEST_FUNCTION_START(acb_theta_jet_one_notransform, state)
         all = _acb_vec_init(n2 * nb * nbth);
 
         acb_siegel_randtest_reduced(tau, state, prec, bits);
-        for (k = 0; k < nb; k++)
-        {
-            acb_siegel_randtest_vec_reduced(z + k * g, state, tau, 0, prec);
-        }
+        acb_siegel_randtest_vec_reduced(z, state, nb, tau, 0, prec);
 
         acb_theta_jet_one_notransform(th, z, nb, tau, ord, ab, prec);
 

@@ -19,18 +19,15 @@ acb_theta_ctx_z_init(acb_theta_ctx_z_t ctx, slong g)
     FLINT_ASSERT(g >= 1);
 
     ctx->g = g;
-    acb_theta_ctx_z(ctx) = _acb_vec_init(g);
-    acb_theta_ctx_exp_z(ctx) = _acb_vec_init(g);
-    acb_init(acb_theta_ctx_c(ctx));
-    acb_theta_ctx_r(ctx) = _arb_vec_init(g);
-    arb_init(acb_theta_ctx_u(ctx));
-    arb_init(acb_theta_ctx_uinv(ctx));
+    ctx->exp_z = _acb_vec_init(g);
+    arb_init(&ctx->u);
+    arb_init(&ctx->uinv);
 
     if (g > 1)
     {
-        acb_theta_ctx_exp_2z(ctx) = _acb_vec_init(g);
-        acb_theta_ctx_exp_z_inv(ctx) = _acb_vec_init(g);
-        acb_theta_ctx_exp_2z_inv(ctx) = _acb_vec_init(g);
-        acb_theta_ctx_v(ctx) = _arb_vec_init(g);
+        ctx->exp_2z = _acb_vec_init(g);
+        ctx->exp_z_inv = _acb_vec_init(g);
+        ctx->exp_2z_inv = _acb_vec_init(g);
+        ctx->v = _arb_vec_init(g);
     }
 }

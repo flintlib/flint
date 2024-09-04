@@ -32,7 +32,7 @@ TEST_FUNCTION_START(acb_theta_ctx_z_add_real, state)
         z = _acb_vec_init(g);
         t = _acb_vec_init(g);
         w = _acb_vec_init(g);
-        acb_theta_ctx_tau_init(ctx_tau, g);
+        acb_theta_ctx_tau_init(ctx_tau, 0, g);
         acb_theta_ctx_z_init(ctx1, g);
         acb_theta_ctx_z_init(ctx2, g);
 
@@ -54,27 +54,6 @@ TEST_FUNCTION_START(acb_theta_ctx_z_add_real, state)
         if (!acb_theta_ctx_z_overlaps(ctx1, ctx2))
         {
             flint_printf("FAIL\n");
-            _acb_vec_printd(acb_theta_ctx_z(ctx1), g, 5);
-            _acb_vec_printd(acb_theta_ctx_z(ctx2), g, 5);
-            _acb_vec_printd(acb_theta_ctx_exp_z(ctx1), g, 5);
-            _acb_vec_printd(acb_theta_ctx_exp_z(ctx2), g, 5);
-            acb_printd(acb_theta_ctx_c(ctx1), 5);
-            flint_printf("\n");
-            acb_printd(acb_theta_ctx_c(ctx2), 5);
-            flint_printf("\n");
-            _arb_vec_printd(acb_theta_ctx_r(ctx1), g, 5);
-            _arb_vec_printd(acb_theta_ctx_r(ctx2), g, 5);
-            if (g > 1)
-            {
-                _acb_vec_printd(acb_theta_ctx_exp_2z(ctx1), g, 5);
-                _acb_vec_printd(acb_theta_ctx_exp_2z(ctx2), g, 5);
-                _acb_vec_printd(acb_theta_ctx_exp_z_inv(ctx1), g, 5);
-                _acb_vec_printd(acb_theta_ctx_exp_z_inv(ctx2), g, 5);
-                _acb_vec_printd(acb_theta_ctx_exp_2z_inv(ctx1), g, 5);
-                _acb_vec_printd(acb_theta_ctx_exp_2z_inv(ctx2), g, 5);
-                _arb_vec_printd(acb_theta_ctx_v(ctx1), g, 5);
-                _arb_vec_printd(acb_theta_ctx_v(ctx2), g, 5);
-            }
             flint_abort();
         }
 

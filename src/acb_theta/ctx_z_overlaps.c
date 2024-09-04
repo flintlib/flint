@@ -22,28 +22,17 @@ int acb_theta_ctx_z_overlaps(const acb_theta_ctx_z_t ctx1, const acb_theta_ctx_z
         return 0;
     }
 
-    res = _acb_vec_overlaps(acb_theta_ctx_z(ctx1),
-        acb_theta_ctx_z(ctx2), g)
-        && _acb_vec_overlaps(acb_theta_ctx_exp_z(ctx1),
-            acb_theta_ctx_exp_z(ctx2), g)
-        && acb_overlaps(acb_theta_ctx_c(ctx1),
-            acb_theta_ctx_c(ctx2))
-        && _arb_vec_overlaps(acb_theta_ctx_r(ctx1),
-            acb_theta_ctx_r(ctx2), g)
-        && (acb_theta_ctx_is_real(ctx1) == acb_theta_ctx_is_real(ctx2))
-        && arb_overlaps(acb_theta_ctx_u(ctx1), acb_theta_ctx_u(ctx2))
-        && arb_overlaps(acb_theta_ctx_uinv(ctx1), acb_theta_ctx_uinv(ctx2));
+    res =  _acb_vec_overlaps(ctx1->exp_z, ctx2->exp_z, g)
+        && (ctx1->is_real == ctx2->is_real)
+        && arb_overlaps(&ctx1->u, &ctx2->u)
+        && arb_overlaps(&ctx1->uinv, &ctx2->uinv);
 
     if (g > 1)
     {
-        res = res && _acb_vec_overlaps(acb_theta_ctx_exp_2z(ctx1),
-            acb_theta_ctx_exp_2z(ctx2), g)
-            && _acb_vec_overlaps(acb_theta_ctx_exp_z_inv(ctx1),
-                acb_theta_ctx_exp_z_inv(ctx2), g)
-            && _acb_vec_overlaps(acb_theta_ctx_exp_2z_inv(ctx1),
-                acb_theta_ctx_exp_2z_inv(ctx2), g)
-            && _arb_vec_overlaps(acb_theta_ctx_v(ctx1),
-                acb_theta_ctx_v(ctx2), g);
+        res = res && _acb_vec_overlaps(ctx1->exp_2z, ctx2->exp_2z, g)
+            && _acb_vec_overlaps(ctx1->exp_z_inv, ctx2->exp_z_inv, g)
+            && _acb_vec_overlaps(ctx1->exp_2z_inv, ctx2->exp_2z_inv, g)
+            && _arb_vec_overlaps(ctx1->v, ctx2->v, g);
     }
 
     return res;

@@ -41,7 +41,7 @@ TEST_FUNCTION_START(acb_theta_g2_psi4, state)
         }
 
         acb_theta_g2_psi4(r, th2, prec);
-        acb_theta_transform_proj(th2, mat, th2, 1, prec);
+        acb_theta_char_shuffle(th2, mat, th2, 1, prec);
         acb_theta_g2_psi4(s, th2, prec);
 
         if (!acb_overlaps(r, s))

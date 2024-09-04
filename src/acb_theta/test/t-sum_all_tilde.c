@@ -26,7 +26,6 @@ TEST_FUNCTION_START(acb_theta_sum_all_tilde, state)
         slong n2 = 1 << (2 * g);
         slong mprec = 100 + n_randint(state, 100);
         slong prec = mprec + 50;
-        slong bits = n_randint(state, 4);
         acb_mat_t tau, tau11;
         acb_ptr z;
         acb_theta_ctx_tau_t ctx_tau;
@@ -38,7 +37,7 @@ TEST_FUNCTION_START(acb_theta_sum_all_tilde, state)
         acb_mat_init(tau, g, g);
         acb_mat_init(tau11, 1, 1);
         z = _acb_vec_init(g);
-        acb_theta_ctx_tau_init(ctx_tau, g);
+        acb_theta_ctx_tau_init(ctx_tau, 1, g);
         acb_theta_ctx_z_init(ctx, g);
         d = _arb_vec_init(n);
         th = _acb_vec_init(n2);
@@ -47,18 +46,18 @@ TEST_FUNCTION_START(acb_theta_sum_all_tilde, state)
 
         for (j = 0; j < g; j++)
         {
-            acb_siegel_randtest_reduced(tau11, state, prec, bits);
+            acb_siegel_randtest_compact(tau11, state, 0, prec);
             acb_set(acb_mat_entry(tau, j, j), acb_mat_entry(tau11, 0, 0));
         }
         acb_theta_ctx_tau_set(ctx_tau, tau, prec);
 
-        acb_siegel_randtest_vec_reduced(z, state, tau, 0, prec);
+        acb_siegel_randtest_vec_reduced(z, state, 1, tau, 0, prec);
         acb_theta_ctx_z_set(ctx, z, ctx_tau, prec);
-        acb_theta_dist_a0(d, z, tau, prec);
+        acb_theta_agm_distances(d, z, 1, tau, prec);
 
         /* Call sum_all_tilde at precision mprec, test against modular_theta */
         acb_theta_sum_all_tilde(th, ctx, 1, ctx_tau, d, mprec);
-        _acb_vec_scalar_mul_arb(th, th, n2, acb_theta_ctx_u(ctx), prec);
+        _acb_vec_scalar_mul_arb(th, th, n2, &ctx->u, prec);
 
         for (j = 0; j < n2; j++)
         {
