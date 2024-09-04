@@ -20,7 +20,155 @@
 #include "gr_special.h"
 #include "fmpz_mat.h"
 
-/* todo: retune classical -> fixed -> block cutoffs */
+/* todo: check errors which depend on nlimbs */
+
+/* cutoffs classical -> block */
+#define CUTOFF_CLASSICAL_BLOCK 70
+
+#define TAB_INDEX(prec) (FLINT_MIN(prec, 4224) / 64)
+
+/* cutoffs for classical -> fixed */
+static short tab_classical_vs_fixed[] = {
+    -1, /* prec = 0 */
+    14, /* prec = 64 */
+    16, /* prec = 128 */
+    5, /* prec = 192 */
+    7, /* prec = 256 */
+    3, /* prec = 320 */
+    3, /* prec = 384 */
+    3, /* prec = 448 */
+    3, /* prec = 512 */
+    10, /* prec = 576 */
+    5, /* prec = 640 */
+    4, /* prec = 704 */
+    4, /* prec = 768 */
+    4, /* prec = 832 */
+    4, /* prec = 896 */
+    4, /* prec = 960 */
+    4, /* prec = 1024 */
+    4, /* prec = 1088 */
+    3, /* prec = 1152 */
+    4, /* prec = 1216 */
+    4, /* prec = 1280 */
+    4, /* prec = 1344 */
+    4, /* prec = 1408 */
+    4, /* prec = 1472 */
+    4, /* prec = 1536 */
+    4, /* prec = 1600 */
+    3, /* prec = 1664 */
+    3, /* prec = 1728 */
+    3, /* prec = 1792 */
+    3, /* prec = 1856 */
+    3, /* prec = 1920 */
+    3, /* prec = 1984 */
+    3, /* prec = 2048 */
+    3, /* prec = 2112 */
+    3, /* prec = 2176 */
+    3, /* prec = 2240 */
+    3, /* prec = 2304 */
+    3, /* prec = 2368 */
+    3, /* prec = 2432 */
+    3, /* prec = 2496 */
+    3, /* prec = 2560 */
+    3, /* prec = 2624 */
+    3, /* prec = 2688 */
+    3, /* prec = 2752 */
+    3, /* prec = 2816 */
+    3, /* prec = 2880 */
+    3, /* prec = 2944 */
+    3, /* prec = 3008 */
+    3, /* prec = 3072 */
+    3, /* prec = 3136 */
+    3, /* prec = 3200 */
+    2, /* prec = 3264 */
+    3, /* prec = 3328 */
+    3, /* prec = 3392 */
+    3, /* prec = 3456 */
+    2, /* prec = 3520 */
+    2, /* prec = 3584 */
+    2, /* prec = 3648 */
+    3, /* prec = 3712 */
+    2, /* prec = 3776 */
+    2, /* prec = 3840 */
+    2, /* prec = 3904 */
+    2, /* prec = 3968 */
+    2, /* prec = 4032 */
+    3, /* prec = 4096 */
+    2, /* prec = 4160 */
+    2, /* prec = 4224 */
+};
+
+/* cutoffs for fixed -> block */
+static short tab_fixed_vs_block[] = {
+    -1, /* prec = 0 */
+    50, /* prec = 64 */
+    94, /* prec = 128 */
+    124, /* prec = 192 */
+    86, /* prec = 256 */
+    196, /* prec = 320 */
+    215, /* prec = 384 */
+    236, /* prec = 448 */
+    236, /* prec = 512 */
+    196, /* prec = 576 */
+    215, /* prec = 640 */
+    196, /* prec = 704 */
+    196, /* prec = 768 */
+    196, /* prec = 832 */
+    179, /* prec = 896 */
+    179, /* prec = 960 */
+    179, /* prec = 1024 */
+    179, /* prec = 1088 */
+    149, /* prec = 1152 */
+    149, /* prec = 1216 */
+    163, /* prec = 1280 */
+    149, /* prec = 1344 */
+    149, /* prec = 1408 */
+    149, /* prec = 1472 */
+    149, /* prec = 1536 */
+    124, /* prec = 1600 */
+    124, /* prec = 1664 */
+    124, /* prec = 1728 */
+    124, /* prec = 1792 */
+    124, /* prec = 1856 */
+    124, /* prec = 1920 */
+    103, /* prec = 1984 */
+    124, /* prec = 2048 */
+    124, /* prec = 2112 */
+    124, /* prec = 2176 */
+    103, /* prec = 2240 */
+    103, /* prec = 2304 */
+    103, /* prec = 2368 */
+    103, /* prec = 2432 */
+    103, /* prec = 2496 */
+    103, /* prec = 2560 */
+    103, /* prec = 2624 */
+    94, /* prec = 2688 */
+    94, /* prec = 2752 */
+    94, /* prec = 2816 */
+    94, /* prec = 2880 */
+    86, /* prec = 2944 */
+    86, /* prec = 3008 */
+    86, /* prec = 3072 */
+    79, /* prec = 3136 */
+    79, /* prec = 3200 */
+    79, /* prec = 3264 */
+    79, /* prec = 3328 */
+    79, /* prec = 3392 */
+    79, /* prec = 3456 */
+    79, /* prec = 3520 */
+    79, /* prec = 3584 */
+    79, /* prec = 3648 */
+    79, /* prec = 3712 */
+    79, /* prec = 3776 */
+    79, /* prec = 3840 */
+    79, /* prec = 3904 */
+    79, /* prec = 3968 */
+    79, /* prec = 4032 */
+    79, /* prec = 4096 */
+    79, /* prec = 4160 */
+    79, /* prec = 4224 */
+};
+
 
 FLINT_FORCE_INLINE void
 _nfloat_get_nfixed(nn_ptr res, nn_srcptr x, slong exp, slong fix_nlimbs, gr_ctx_t ctx)
@@ -133,14 +281,14 @@ nfloat_mat_mul_fixed(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, slong max_e
     /* Currently, we don't handle zeros. (They pose no problem, but zero entries in
        the output may not be exact. To be done.) */
     if (Amin < NFLOAT_MIN_EXP || Bmin < NFLOAT_MIN_EXP)
-        return gr_mat_mul_classical(C, A, B, ctx);
+        return GR_UNABLE;
 
     Adelta = Amax - Amin;
     Bdelta = Bmax - Bmin;
 
     /* sanity check */
     if (Adelta > 10 * prec || Bdelta > 10 * prec)
-        return gr_mat_mul_classical(C, A, B, ctx);
+        return GR_UNABLE;
 
     /*
     To double check: for Waksman,
@@ -155,7 +303,7 @@ nfloat_mat_mul_fixed(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, slong max_e
     extra_bits = Adelta + Bdelta + pad_top + pad_bot;
 
     if (extra_bits >= max_extra_bits)
-        return gr_mat_mul_classical(C, A, B, ctx);
+        return GR_UNABLE;
 
     Aexp = Amax + pad_top;
     Bexp = Bmax + pad_top;
@@ -897,41 +1045,13 @@ cleanup:
     return status;
 }
 
-/* Minimum precision for using fixed-point arithmetic */
-
-/* TODO: for *unsigned* matrices, there is a speedup already for
-   prec = 192. Consider inlining fixed-point additions/subtractions for
-   4 and 5 limbs to extend this to general matrices. */
-/* #define NFLOAT_MAT_MUL_FIXED_CUTOFF 192 */
-#define NFLOAT_MAT_MUL_FIXED_CUTOFF 320
-
-/* first cutoff:  classical -> fixed_classical
-   second cutoff: fixed_classical -> waksman */
-static const int nfloat_mat_mul_cutoff_tab[][2] = {
-    {0,  0},    /* prec = 0   */
-    {0,  0},    /* prec = 64  */
-    {0,  0},    /* prec = 128 */
-    {32, 32},   /* prec = 192 */
-    {8, 20},    /* prec = 256 */
-    {4, 15},    /* prec = 320 */
-    {3, 10},    /* prec = 384 */
-    {3, 10},    /* prec = 448 */
-    {3, 8},     /* prec = 512 */
-    {10, 10},   /* prec = 576 */
-    {4, 5},     /* prec = 640 */
-};
-
-/* {4, 4} from this point */
-#define NFLOAT_MAT_MUL_CUTOFF_4 704
-/* {3, 3} from this point */
-#define NFLOAT_MAT_MUL_CUTOFF_3 1600
-
 int
 nfloat_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 {
     slong cutoff1, cutoff2, dim;
     slong prec;
     slong max_extra_prec;
+    int status;
 
     slong m = A->r;
     slong n = A->c;
@@ -942,34 +1062,24 @@ nfloat_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
     if (dim <= 2 || NFLOAT_CTX_HAS_INF_NAN(ctx))
         return gr_mat_mul_classical(C, A, B, ctx);
 
-    if (dim <= 80)
+    cutoff1 = tab_classical_vs_fixed[TAB_INDEX(prec)];
+
+    if (dim < cutoff1)
+        return gr_mat_mul_classical(C, A, B, ctx);
+
+    cutoff2 = tab_fixed_vs_block[TAB_INDEX(prec)];
+
+    if (dim < cutoff2)
     {
-        prec = NFLOAT_CTX_PREC(ctx);
-
-        if (prec < NFLOAT_MAT_MUL_FIXED_CUTOFF)
-            return gr_mat_mul_classical(C, A, B, ctx);
-
-        if (prec >= NFLOAT_MAT_MUL_CUTOFF_3)
-            cutoff1 = cutoff2 = 3;
-        else if (prec >= NFLOAT_MAT_MUL_CUTOFF_4)
-            cutoff1 = cutoff2 = 4;
-        else
-        {
-            cutoff1 = nfloat_mat_mul_cutoff_tab[prec / 64][0];
-            cutoff2 = nfloat_mat_mul_cutoff_tab[prec / 64][1];
-        }
-
-        if (dim < cutoff1)
-            return gr_mat_mul_classical(C, A, B, ctx);
-
         max_extra_prec = (prec < 768) ? 64 : prec / 4;
 
-        return nfloat_mat_mul_fixed(C, A, B, max_extra_prec, ctx);
+        status = nfloat_mat_mul_fixed(C, A, B, max_extra_prec, ctx);
+
+        if (status == GR_UNABLE && dim < CUTOFF_CLASSICAL_BLOCK)
+            return gr_mat_mul_classical(C, A, B, ctx);
     }
-    else
-    {
-        return nfloat_mat_mul_block(C, A, B, 70, ctx);
-    }
+
+    return nfloat_mat_mul_block(C, A, B, CUTOFF_CLASSICAL_BLOCK, ctx);
 }
 
 static void

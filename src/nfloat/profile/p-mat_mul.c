@@ -176,6 +176,66 @@ void prof_classical_vs_fixed()
     flint_rand_clear(state);
 }
 
+void tune_fixed_vs_block(int * cutoffs)
+{
+    gr_ctx_t ctx;
+    gr_mat_t A, B, C;
+    slong i, n;
+    slong prec;
+    double FLINT_SET_BUT_UNUSED(__), t1, t2;
+
+    flint_rand_t state;
+    flint_rand_init(state);
+
+    for (i = 0; i < TABN; i++)
+        cutoffs[i] = -1;
+
+    for (prec = 64; prec <= NFLOAT_MAX_LIMBS * FLINT_BITS; prec += 64)
+    {
+        flint_printf("prec = %wd\n", prec);
+
+        nfloat_ctx_init(ctx, prec, 0);
+
+        for (n = 16; ; n = FLINT_MAX(n + 1, n * 1.1))
+        {
+            gr_mat_init(A, n, n, ctx);
+            gr_mat_init(B, n, n, ctx);
+            gr_mat_init(C, n, n, ctx);
+
+            randmat(A, state, ctx);
+            randmat(B, state, ctx);
+
+            TIMEIT_START
+            GR_MUST_SUCCEED(nfloat_mat_mul_fixed(C, A, B, 1000, ctx));
+            TIMEIT_STOP_VALUES(__, t1)
+
+            TIMEIT_START
+            GR_MUST_SUCCEED(nfloat_mat_mul_block(C, A, B, 1, ctx));
+            TIMEIT_STOP_VALUES(__, t2)
+
+            flint_printf("%wd  %wd   %e   %e   %.3f\n", prec, n, t1, t2, t1 / t2);
+
+            gr_mat_clear(A, ctx);
+            gr_mat_clear(B, ctx);
+            gr_mat_clear(C, ctx);
+
+            if (t2 < t1)
+            {
+                cutoffs[prec / 64] = n;
+
+                flint_printf("short tab_fixed_vs_block[] = {\n");
+                for (i = 0; i <= prec / 64; i++)
+                    flint_printf("    %d, /* prec = %wd */\n", cutoffs[i], i * 64);
+                flint_printf("}\n");
+
+                break;
+            }
+        }
+    }
+
+    flint_rand_clear(state);
+}
+
 void prof_fixed_vs_block()
 {
     gr_ctx_t ctx;
@@ -229,11 +289,73 @@ void prof_fixed_vs_block()
     flint_rand_clear(state);
 }
 
+void tune_classical_vs_block(int * cutoffs)
+{
+    gr_ctx_t ctx;
+    gr_mat_t A, B, C;
+    slong i, n;
+    slong prec;
+    double FLINT_SET_BUT_UNUSED(__), t1, t2;
+
+    flint_rand_t state;
+    flint_rand_init(state);
+
+    for (i = 0; i < TABN; i++)
+        cutoffs[i] = -1;
+
+    for (prec = 64; prec <= NFLOAT_MAX_LIMBS * FLINT_BITS; prec += 64)
+    {
+        flint_printf("prec = %wd\n", prec);
+
+        nfloat_ctx_init(ctx, prec, 0);
+
+        for (n = 16; ; n = FLINT_MAX(n + 1, n * 1.1))
+        {
+            gr_mat_init(A, n, n, ctx);
+            gr_mat_init(B, n, n, ctx);
+            gr_mat_init(C, n, n, ctx);
+
+            randmat(A, state, ctx);
+            randmat(B, state, ctx);
+
+            TIMEIT_START
+            GR_MUST_SUCCEED(gr_mat_mul_classical(C, A, B, ctx));
+            TIMEIT_STOP_VALUES(__, t1)
+
+            TIMEIT_START
+            GR_MUST_SUCCEED(nfloat_mat_mul_block(C, A, B, 1, ctx));
+            TIMEIT_STOP_VALUES(__, t2)
+
+            flint_printf("%wd  %wd   %e   %e   %.3f\n", prec, n, t1, t2, t1 / t2);
+
+            gr_mat_clear(A, ctx);
+            gr_mat_clear(B, ctx);
+            gr_mat_clear(C, ctx);
+
+            if (t2 < t1)
+            {
+                cutoffs[prec / 64] = n;
+
+                flint_printf("short tab_classical_vs_block[] = {\n");
+                for (i = 0; i <= prec / 64; i++)
+                    flint_printf("    %d, /* prec = %wd */\n", cutoffs[i], i * 64);
+                flint_printf("}\n");
+
+                break;
+            }
+        }
+    }
+
+    flint_rand_clear(state);
+}
+
 int main()
 {
-    int tab_classical_vs_fixed[TABN];
+    int tab[TABN];
 
-    //tune_classical_vs_fixed(tab_classical_vs_fixed);
+    //tune_classical_vs_fixed(tab);
+    //tune_fixed_vs_block(tab);
     //prof_classical_vs_fixed();
-    prof_fixed_vs_block();
+    //prof_fixed_vs_block();
+    tune_classical_vs_block(tab);
 }
