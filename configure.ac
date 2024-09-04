@@ -673,7 +673,7 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         param_path="x86_64/zen3"
         ;;
       zen4)
-        gcc_cflags_arch="-march=znver4 -march=znver3"
+        gcc_cflags_arch="-march=znver4"
         param_path="x86_64/zen4"
         have_avx512="yes"
         ;;
