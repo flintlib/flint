@@ -114,8 +114,12 @@ nmod_poly_evaluate_nmod(const nmod_poly_t poly, ulong c)
 
     // if degree below the n_mulmod_shoup threshold
     // or modulus forbids n_mulmod_shoup usage, use nmod_mul
+#if FLINT_MULMOD_SHOUP_THRESHOLD < 2
+    if (poly->mod.norm == 0)  // here poly->length >= threshold
+#else
     if ((poly->length <= FLINT_MULMOD_SHOUP_THRESHOLD)
            || (poly->mod.norm == 0))
+#endif
     {
         return _nmod_poly_evaluate_nmod(poly->coeffs, poly->length, c, poly->mod);
     }

@@ -65,7 +65,11 @@ nmod_mat_scalar_addmul_ui(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B,
         nmod_mat_add(C, A, B);
     else if (c == A->mod.n - UWORD(1))
         nmod_mat_sub(C, A, B);
+#if FLINT_MULMOD_SHOUP_THRESHOLD == 0
+    else if (A->mod.norm > 0)
+#else
     else if (A->r * A->c > FLINT_MULMOD_SHOUP_THRESHOLD && A->mod.norm > 0)
+#endif
     {
         const ulong c_pr = n_mulmod_precomp_shoup(c, A->mod.n);
         _nmod_mat_scalar_addmul_ui_precomp(C, A, B, c, c_pr);
@@ -104,7 +108,11 @@ nmod_mat_scalar_mul(nmod_mat_t B, const nmod_mat_t A, ulong c)
         nmod_mat_set(B, A);
     else if (c == A->mod.n - UWORD(1))
         nmod_mat_neg(B, A);
+#if FLINT_MULMOD_SHOUP_THRESHOLD == 0
+    else if (A->mod.norm > 0)
+#else
     else if (A->r * A->c > FLINT_MULMOD_SHOUP_THRESHOLD && A->mod.norm > 0)
+#endif
     {
         const ulong c_pr = n_mulmod_precomp_shoup(c, A->mod.n);
         _nmod_mat_scalar_mul_precomp(B, A, c, c_pr);

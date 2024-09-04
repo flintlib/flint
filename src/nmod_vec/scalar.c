@@ -64,10 +64,15 @@ void _nmod_vec_scalar_addmul_nmod(nn_ptr res, nn_srcptr vec,
         _nmod_vec_sub(res, res, vec, len, mod);
     else if (NMOD_BITS(mod) == FLINT_BITS)
         _nmod_vec_scalar_addmul_nmod_fullword(res, vec, len, c, mod);
+#if FLINT_MULMOD_SHOUP_THRESHOLD == 0
+    else
+        _nmod_vec_scalar_addmul_nmod_shoup(res, vec, len, c, mod);
+#else
     else if (len > FLINT_MULMOD_SHOUP_THRESHOLD)
         _nmod_vec_scalar_addmul_nmod_shoup(res, vec, len, c, mod);
     else
         _nmod_vec_scalar_addmul_nmod_generic(res, vec, len, c, mod);
+#endif
 }
 
 void _nmod_vec_scalar_mul_nmod_fullword(nn_ptr res, nn_srcptr vec,
@@ -108,8 +113,13 @@ void _nmod_vec_scalar_mul_nmod(nn_ptr res, nn_srcptr vec,
         _nmod_vec_neg(res, vec, len, mod);
     else if (NMOD_BITS(mod) == FLINT_BITS)
         _nmod_vec_scalar_mul_nmod_fullword(res, vec, len, c, mod);
+#if FLINT_MULMOD_SHOUP_THRESHOLD == 0
+    else
+        _nmod_vec_scalar_mul_nmod_shoup(res, vec, len, c, mod);
+#else
     else if (len > FLINT_MULMOD_SHOUP_THRESHOLD)
         _nmod_vec_scalar_mul_nmod_shoup(res, vec, len, c, mod);
     else
         _nmod_vec_scalar_mul_nmod_generic(res, vec, len, c, mod);
+#endif
 }
