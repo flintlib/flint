@@ -701,12 +701,12 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         ;;
       icelake)
         gcc_cflags_arch="-march=icelake-client"
-        param_path="x86_64/skylake"
+        param_path="x86_64/icelake"
         have_avx512="yes"
         ;;
       icelake_server)
         gcc_cflags_arch="-march=icelake-server"
-        param_path="x86_64/skylake"
+        param_path="x86_64/icelake"
         have_avx512="yes"
         ;;
       rocketlake)
