@@ -169,6 +169,216 @@ static short tab_fixed_vs_block[] = {
     79, /* prec = 4224 */
 };
 
+static short tab_complex_classical_vs_fixed[] = {
+    -1, /* prec = 0 */
+    6, /* prec = 64 */
+    6, /* prec = 128 */
+    3, /* prec = 192 */
+    4, /* prec = 256 */
+    2, /* prec = 320 */
+    2, /* prec = 384 */
+    2, /* prec = 448 */
+    2, /* prec = 512 */
+    6, /* prec = 576 */
+    2, /* prec = 640 */
+    2, /* prec = 704 */
+    2, /* prec = 768 */
+    2, /* prec = 832 */
+    2, /* prec = 896 */
+    2, /* prec = 960 */
+    2, /* prec = 1024 */
+    2, /* prec = 1088 */
+    2, /* prec = 1152 */
+    2, /* prec = 1216 */
+    2, /* prec = 1280 */
+    2, /* prec = 1344 */
+    2, /* prec = 1408 */
+    3, /* prec = 1472 */
+    3, /* prec = 1536 */
+    2, /* prec = 1600 */
+    2, /* prec = 1664 */
+    2, /* prec = 1728 */
+    2, /* prec = 1792 */
+    2, /* prec = 1856 */
+    2, /* prec = 1920 */
+    2, /* prec = 1984 */
+    2, /* prec = 2048 */
+    2, /* prec = 2112 */
+    2, /* prec = 2176 */
+    2, /* prec = 2240 */
+    2, /* prec = 2304 */
+    2, /* prec = 2368 */
+    2, /* prec = 2432 */
+    2, /* prec = 2496 */
+    2, /* prec = 2560 */
+    2, /* prec = 2624 */
+    2, /* prec = 2688 */
+    2, /* prec = 2752 */
+    2, /* prec = 2816 */
+    2, /* prec = 2880 */
+    2, /* prec = 2944 */
+    2, /* prec = 3008 */
+    2, /* prec = 3072 */
+    2, /* prec = 3136 */
+    2, /* prec = 3200 */
+    2, /* prec = 3264 */
+    2, /* prec = 3328 */
+    2, /* prec = 3392 */
+    2, /* prec = 3456 */
+    2, /* prec = 3520 */
+    2, /* prec = 3584 */
+    2, /* prec = 3648 */
+    2, /* prec = 3712 */
+    2, /* prec = 3776 */
+    2, /* prec = 3840 */
+    2, /* prec = 3904 */
+    2, /* prec = 3968 */
+    2, /* prec = 4032 */
+    2, /* prec = 4096 */
+    2, /* prec = 4160 */
+    2, /* prec = 4224 */
+};
+
+static short tab_complex_fixed_vs_block[] = {
+    -1, /* prec = 0 */
+    66, /* prec = 64 */
+    414, /* prec = 128 */
+    500, /* prec = 192 */
+    215, /* prec = 256 */
+    455, /* prec = 320 */
+    455, /* prec = 384 */
+    414, /* prec = 448 */
+    500, /* prec = 512 */
+    196, /* prec = 576 */
+    215, /* prec = 640 */
+    215, /* prec = 704 */
+    215, /* prec = 768 */
+    196, /* prec = 832 */
+    215, /* prec = 896 */
+    215, /* prec = 960 */
+    196, /* prec = 1024 */
+    196, /* prec = 1088 */
+    179, /* prec = 1152 */
+    163, /* prec = 1216 */
+    149, /* prec = 1280 */
+    163, /* prec = 1344 */
+    149, /* prec = 1408 */
+    149, /* prec = 1472 */
+    149, /* prec = 1536 */
+    124, /* prec = 1600 */
+    149, /* prec = 1664 */
+    124, /* prec = 1728 */
+    124, /* prec = 1792 */
+    124, /* prec = 1856 */
+    124, /* prec = 1920 */
+    103, /* prec = 1984 */
+    124, /* prec = 2048 */
+    124, /* prec = 2112 */
+    124, /* prec = 2176 */
+    103, /* prec = 2240 */
+    103, /* prec = 2304 */
+    103, /* prec = 2368 */
+    103, /* prec = 2432 */
+    103, /* prec = 2496 */
+    103, /* prec = 2560 */
+    103, /* prec = 2624 */
+    103, /* prec = 2688 */
+    103, /* prec = 2752 */
+    94, /* prec = 2816 */
+    103, /* prec = 2880 */
+    94, /* prec = 2944 */
+    94, /* prec = 3008 */
+    86, /* prec = 3072 */
+    86, /* prec = 3136 */
+    79, /* prec = 3200 */
+    86, /* prec = 3264 */
+    79, /* prec = 3328 */
+    79, /* prec = 3392 */
+    79, /* prec = 3456 */
+    79, /* prec = 3520 */
+    86, /* prec = 3584 */
+    79, /* prec = 3648 */
+    79, /* prec = 3712 */
+    79, /* prec = 3776 */
+    79, /* prec = 3840 */
+    79, /* prec = 3904 */
+    79, /* prec = 3968 */
+    79, /* prec = 4032 */
+    79, /* prec = 4096 */
+    79, /* prec = 4160 */
+    79, /* prec = 4224 */
+};
+
+static short tab_complex_classical_vs_block[] = {
+    -1, /* prec = 0 */
+    36, /* prec = 64 */
+    79, /* prec = 128 */
+    60, /* prec = 192 */
+    50, /* prec = 256 */
+    50, /* prec = 320 */
+    46, /* prec = 384 */
+    55, /* prec = 448 */
+    60, /* prec = 512 */
+    55, /* prec = 576 */
+    39, /* prec = 640 */
+    39, /* prec = 704 */
+    39, /* prec = 768 */
+    39, /* prec = 832 */
+    28, /* prec = 896 */
+    28, /* prec = 960 */
+    39, /* prec = 1024 */
+    24, /* prec = 1088 */
+    28, /* prec = 1152 */
+    24, /* prec = 1216 */
+    24, /* prec = 1280 */
+    16, /* prec = 1344 */
+    24, /* prec = 1408 */
+    16, /* prec = 1472 */
+    20, /* prec = 1536 */
+    16, /* prec = 1600 */
+    16, /* prec = 1664 */
+    16, /* prec = 1728 */
+    16, /* prec = 1792 */
+    16, /* prec = 1856 */
+    16, /* prec = 1920 */
+    16, /* prec = 1984 */
+    16, /* prec = 2048 */
+    16, /* prec = 2112 */
+    16, /* prec = 2176 */
+    16, /* prec = 2240 */
+    16, /* prec = 2304 */
+    16, /* prec = 2368 */
+    16, /* prec = 2432 */
+    16, /* prec = 2496 */
+    16, /* prec = 2560 */
+    16, /* prec = 2624 */
+    16, /* prec = 2688 */
+    16, /* prec = 2752 */
+    16, /* prec = 2816 */
+    16, /* prec = 2880 */
+    16, /* prec = 2944 */
+    16, /* prec = 3008 */
+    16, /* prec = 3072 */
+    16, /* prec = 3136 */
+    16, /* prec = 3200 */
+    16, /* prec = 3264 */
+    16, /* prec = 3328 */
+    16, /* prec = 3392 */
+    16, /* prec = 3456 */
+    16, /* prec = 3520 */
+    16, /* prec = 3584 */
+    16, /* prec = 3648 */
+    16, /* prec = 3712 */
+    16, /* prec = 3776 */
+    16, /* prec = 3840 */
+    16, /* prec = 3904 */
+    16, /* prec = 3968 */
+    16, /* prec = 4032 */
+    16, /* prec = 4096 */
+    16, /* prec = 4160 */
+    16, /* prec = 4224 */
+};
+
 
 FLINT_FORCE_INLINE void
 _nfloat_get_nfixed(nn_ptr res, nn_srcptr x, slong exp, slong fix_nlimbs, gr_ctx_t ctx)
@@ -1045,43 +1255,6 @@ cleanup:
     return status;
 }
 
-int
-nfloat_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
-{
-    slong cutoff1, cutoff2, dim;
-    slong prec;
-    slong max_extra_prec;
-    int status;
-
-    slong m = A->r;
-    slong n = A->c;
-    slong p = B->c;
-
-    dim = FLINT_MIN(n, FLINT_MIN(m, p));
-
-    if (dim <= 2 || NFLOAT_CTX_HAS_INF_NAN(ctx))
-        return gr_mat_mul_classical(C, A, B, ctx);
-
-    cutoff1 = tab_classical_vs_fixed[TAB_INDEX(prec)];
-
-    if (dim < cutoff1)
-        return gr_mat_mul_classical(C, A, B, ctx);
-
-    cutoff2 = tab_fixed_vs_block[TAB_INDEX(prec)];
-
-    if (dim < cutoff2)
-    {
-        max_extra_prec = (prec < 768) ? 64 : prec / 4;
-
-        status = nfloat_mat_mul_fixed(C, A, B, max_extra_prec, ctx);
-
-        if (status == GR_UNABLE && dim < CUTOFF_CLASSICAL_BLOCK)
-            return gr_mat_mul_classical(C, A, B, ctx);
-    }
-
-    return nfloat_mat_mul_block(C, A, B, CUTOFF_CLASSICAL_BLOCK, ctx);
-}
-
 static void
 _nfloat_complex_mat_exp_range(slong * _Amin, slong * _Amax, const gr_mat_t A, gr_ctx_t ctx)
 {
@@ -1207,14 +1380,14 @@ nfloat_complex_mat_mul_fixed(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, slo
     /* Currently, we don't handle zeros. (They pose no problem, but zero entries in
        the output may not be exact. To be done.) */
     if (Amin < NFLOAT_MIN_EXP || Bmin < NFLOAT_MIN_EXP)
-        return gr_mat_mul_classical(C, A, B, ctx);
+        return GR_UNABLE;
 
     Adelta = Amax - Amin;
     Bdelta = Bmax - Bmin;
 
     /* sanity check */
     if (Adelta > 10 * prec || Bdelta > 10 * prec)
-        return gr_mat_mul_classical(C, A, B, ctx);
+        return GR_UNABLE;
 
     /*
     To double check: for Waksman,
@@ -1229,7 +1402,7 @@ nfloat_complex_mat_mul_fixed(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, slo
     extra_bits = Adelta + Bdelta + pad_top + pad_bot;
 
     if (extra_bits >= max_extra_bits)
-        return gr_mat_mul_classical(C, A, B, ctx);
+        return GR_UNABLE;
 
     Aexp = Amax + pad_top;
     Bexp = Bmax + pad_top;
@@ -1498,13 +1671,50 @@ nfloat_complex_mat_mul_reorder(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, g
 }
 
 int
+nfloat_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+{
+    slong cutoff1, cutoff2, dim;
+    slong prec;
+    slong max_extra_prec;
+    int status;
+
+    slong m = A->r;
+    slong n = A->c;
+    slong p = B->c;
+
+    dim = FLINT_MIN(n, FLINT_MIN(m, p));
+
+    if (dim <= 2 || NFLOAT_CTX_HAS_INF_NAN(ctx))
+        return gr_mat_mul_classical(C, A, B, ctx);
+
+    cutoff1 = tab_classical_vs_fixed[TAB_INDEX(prec)];
+
+    if (dim < cutoff1)
+        return gr_mat_mul_classical(C, A, B, ctx);
+
+    cutoff2 = tab_fixed_vs_block[TAB_INDEX(prec)];
+
+    if (dim < cutoff2)
+    {
+        max_extra_prec = (prec < 768) ? 64 : prec / 4;
+
+        status = nfloat_mat_mul_fixed(C, A, B, max_extra_prec, ctx);
+
+        if (status == GR_UNABLE && dim < CUTOFF_CLASSICAL_BLOCK)
+            return gr_mat_mul_classical(C, A, B, ctx);
+    }
+
+    return nfloat_mat_mul_block(C, A, B, CUTOFF_CLASSICAL_BLOCK, ctx);
+}
+
+int
 nfloat_complex_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 {
-    slong dim;
-    slong block_cutoff;
+    slong cutoff1, cutoff2, cutoff3, dim;
     slong prec;
     slong max_extra_prec;
     int A_real = 0, B_real = 0;
+    int status;
 
     slong m = A->r;
     slong n = A->c;
@@ -1526,34 +1736,31 @@ nfloat_complex_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t 
 
     prec = NFLOAT_CTX_PREC(ctx);
 
-    if (prec <= 256)
-        block_cutoff = 80;
-    else if (prec <= 512)
-        block_cutoff = 160;
-    else if (prec <= 3072)
-        block_cutoff = 100;
-    else
-        block_cutoff = 80;
+    cutoff1 = tab_complex_classical_vs_fixed[TAB_INDEX(prec)];
 
-    if (dim < block_cutoff)
+    if (dim < cutoff1)
+        return gr_mat_mul_classical(C, A, B, ctx);
+
+    cutoff2 = tab_complex_fixed_vs_block[TAB_INDEX(prec)];
+    cutoff3 = tab_complex_classical_vs_block[TAB_INDEX(prec)];
+
+    if (dim < cutoff2)
     {
-        if (prec <= 128 || (prec <= 256 && n <= 4) || (prec == 576 && n <= 6))
-            return gr_mat_mul_classical(C, A, B, ctx);
-
         max_extra_prec = (prec < 768) ? 64 : prec / 4;
 
-        return nfloat_complex_mat_mul_fixed(C, A, B, max_extra_prec, ctx);
+        status = nfloat_complex_mat_mul_fixed(C, A, B, max_extra_prec, ctx);
+
+        if (status == GR_UNABLE && dim < cutoff3)
+            return gr_mat_mul_classical(C, A, B, ctx);
+    }
+
+    if (_nfloat_complex_mat_parts_are_well_scaled(A, ctx) &&
+        _nfloat_complex_mat_parts_are_well_scaled(B, ctx))
+    {
+        return nfloat_complex_mat_mul_block(C, A, B, cutoff3, ctx);
     }
     else
     {
-        if (_nfloat_complex_mat_parts_are_well_scaled(A, ctx) &&
-            _nfloat_complex_mat_parts_are_well_scaled(B, ctx))
-        {
-            return nfloat_complex_mat_mul_block(C, A, B, block_cutoff - 10, ctx);
-        }
-        else
-        {
-            return _nfloat_complex_mat_mul_reorder(C, A, B, A_real, B_real, ctx);
-        }
+        return _nfloat_complex_mat_mul_reorder(C, A, B, A_real, B_real, ctx);
     }
 }
