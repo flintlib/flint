@@ -25,7 +25,7 @@ acb_theta_sum_jet_all(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
     acb_ptr aux;
     arb_t u;
     acb_t c;
-    slong j, k, l;
+    slong j, k;
 
     FLINT_ASSERT(nb >= 0);
     if (nb == 0)
@@ -148,18 +148,7 @@ acb_theta_sum_jet_all(acb_ptr th, const acb_theta_ctx_z_struct * vec, slong nb,
         {
             acb_theta_jet_mul(th + j * n2 * nbth + k * nbth, th + j * n2 * nbth + k * nbth,
                 aux, ord, g, prec);
-            arb_zero(u);
-            for (l = 0; l < g; l++)
-            {
-                if ((k >> (g - 1 - l)) % 2 == 1)
-                {
-                    arb_add(u, u, &r[l], prec);
-                }
-            }
-            acb_onei(c);
-            acb_pow_arb(c, c, u, prec);
-            _acb_vec_scalar_mul(th + j * n2 * nbth + k * nbth,
-                th + j * n2 * nbth + k * nbth, nbth, c, prec);
+            /* No signs because 2r is divisible by 4 */
         }
     }
 

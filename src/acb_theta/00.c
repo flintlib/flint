@@ -17,13 +17,14 @@ void
 acb_theta_00(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec)
 {
     slong g = acb_mat_nrows(tau);
-    fmpz_mat_t mat, gamma;
-    acb_mat_t new_tau, c, cinv, N;
-    acb_ptr new_zs, y;
-    acb_ptr aux, units;
-    acb_t s, t;
+    fmpz_mat_t mat;
+    acb_mat_t new_tau, N, ct;
+    acb_ptr new_zs, exps, cs, units;
+    arb_ptr rs;
+    acb_t s;
     slong kappa, e, ab;
     slong j;
+    int res;
 
     if (nb <= 0)
     {
@@ -32,50 +33,43 @@ acb_theta_00(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong pre
 
     fmpz_mat_init(mat, 2 * g, 2 * g);
     acb_mat_init(new_tau, g, g);
-    acb_mat_init(c, g, g);
-    acb_mat_init(cinv, g, g);
     acb_mat_init(N, g, g);
+    acb_mat_init(ct, g, g);
     new_zs = _acb_vec_init(nb * g);
-    y = _acb_vec_init(g);
-    aux = _acb_vec_init(nb);
+    exps = _acb_vec_init(nb);
+    cs = _acb_vec_init(nb);
     units = _acb_vec_init(8);
+    rs = _arb_vec_init(nb * g);
     acb_init(s);
-    acb_init(t);
 
-    acb_siegel_reduce(mat, tau, prec);
-    acb_siegel_transform_cocycle_inv(new_tau, c, cinv, mat, tau, prec);
-    _acb_vec_unit_roots(units, 8, 8, prec);
-
-    acb_mat_transpose(cinv, cinv);
-    for (j = 0; j < nb; j++)
+    /* Reduce tau then z */
+    res = acb_theta_reduce_tau(new_zs, new_tau, mat, N, ct, exps, zs, nb, tau, prec);
+    if (res)
     {
-        acb_mat_vector_mul_col(new_zs + j * g, cinv, zs + j * g, prec);
+        res = acb_theta_reduce_z(new_zs, rs, cs, new_zs, nb, new_tau, prec);
     }
 
-    if (acb_siegel_is_reduced(new_tau, -10, prec))
+    if (res)
     {
-        /* todo: reduce z here. */
-
-        sp2gz_inv(mat, mat);
+        /* Setup */
         ab = acb_theta_transform_char(&e, mat, 0);
-
-        acb_theta_one_notransform(aux, new_zs, nb, new_tau, ab, prec);
-
+        _acb_vec_unit_roots(units, 8, 8, prec);
         kappa = acb_theta_transform_kappa(s, mat, new_tau, prec);
 
-        fmpz_mat_window_init(gamma, mat, g, 0, 2 * g, g);
-        acb_mat_set_fmpz_mat(N, gamma);
-        acb_mat_mul(N, c, N, prec);
-        fmpz_mat_window_clear(gamma);
+        acb_theta_one_notransform(th, new_zs, nb, new_tau, ab, prec);
 
+        /* Account for reduce_z */
         for (j = 0; j < nb; j++)
         {
-            acb_mat_vector_mul_col(y, N, new_zs + j * g, prec);
-            acb_dot(t, NULL, 0, new_zs + j * g, 1, y, 1, g, prec);
-            acb_exp_pi_i(t, t, prec);
-            acb_mul(t, t, s, prec);
-            acb_mul(t, t, &units[(kappa + e) % 8], prec);
-            acb_mul(&th[j], &aux[j], t, prec);
+            acb_mul(&th[j], &th[j], &cs[j], prec);
+        }
+
+        /* Account for reduce_tau */
+        for (j = 0; j < nb; j++)
+        {
+            acb_mul(&th[j], &th[j], &exps[j], prec);
+            acb_mul(&th[j], &th[j], s, prec);
+            acb_mul(&th[j], &th[j], &units[(kappa + e) % 8], prec);
         }
     }
     else
@@ -86,13 +80,12 @@ acb_theta_00(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong pre
 
     fmpz_mat_clear(mat);
     acb_mat_clear(new_tau);
-    acb_mat_clear(c);
-    acb_mat_clear(cinv);
     acb_mat_clear(N);
+    acb_mat_clear(ct);
     _acb_vec_clear(new_zs, nb * g);
-    _acb_vec_clear(y, g);
-    _acb_vec_clear(aux, nb);
+    _acb_vec_clear(exps, nb);
+    _acb_vec_clear(cs, nb);
     _acb_vec_clear(units, 8);
+    _arb_vec_clear(rs, nb * g);
     acb_clear(s);
-    acb_clear(t);
 }

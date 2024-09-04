@@ -17,26 +17,25 @@ TEST_FUNCTION_START(acb_theta_jet_00, state)
 {
     slong iter;
 
-    /* Test: agrees with jet_all */
-    for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
+    /* Test: agrees with jet_00_notransform */
+    for (iter = 0; iter < 25 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 2);
-        slong n2 = 1 << (2 * g);
-        slong nb = n_randint(state, 3);
+        slong nb = 1 + n_randint(state, 3);
         slong ord = n_randint(state, 3);
-        slong prec = 100 + n_randint(state, 400);
+        slong mprec = 100 + n_randint(state, 400);
+        slong prec = mprec + 50;
         slong bits = n_randint(state, 4);
         slong nbth = acb_theta_jet_nb(ord, g);
         acb_mat_t tau;
         acb_ptr z;
-        acb_ptr th, test, all;
+        acb_ptr th, test;
         slong k;
 
         acb_mat_init(tau, g, g);
         z = _acb_vec_init(nb * g);
         th = _acb_vec_init(nb * nbth);
         test = _acb_vec_init(nb * nbth);
-        all = _acb_vec_init(nb * n2 * nbth);
 
         /* Sample tau not too far from reduced domain */
         acb_siegel_randtest_reduced(tau, state, prec, bits);
@@ -45,17 +44,15 @@ TEST_FUNCTION_START(acb_theta_jet_00, state)
         {
             acb_siegel_randtest_vec_reduced(z + k * g, state, tau, 0, prec);
         }
+        _acb_vec_scalar_mul_2exp_si(z, z, nb * g, 1);
 
         flint_printf("g = %wd, prec = %wd, nb = %wd, ord = %wd, tau, z:\n", g, prec, nb, ord);
         acb_mat_printd(tau, 5);
         _acb_vec_printd(z, nb * g, 5);
 
+        /* Call jet_00 at precision mprec, compare with jet_00_notransform */
         acb_theta_jet_00(th, z, nb, tau, ord, prec);
-        acb_theta_jet_all(all, z, nb, tau, ord, prec);
-        for (k = 0; k < nb; k++)
-        {
-            _acb_vec_set(test + k * nbth, all + k * n2 * nbth, nbth);
-        }
+        acb_theta_jet_00_notransform(test, z, nb, tau, ord, prec);
 
         flint_printf("th, test:\n");
         _acb_vec_printd(th, nb * nbth, 5);
@@ -77,7 +74,6 @@ TEST_FUNCTION_START(acb_theta_jet_00, state)
         _acb_vec_clear(z, nb * g);
         _acb_vec_clear(th, nb * nbth);
         _acb_vec_clear(test, nb * nbth);
-        _acb_vec_clear(all, nb * n2 * nbth);
     }
 
     TEST_FUNCTION_END(state);

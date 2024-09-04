@@ -29,12 +29,12 @@ TEST_FUNCTION_START(acb_theta_jet_naive_radius, state)
         slong nb = acb_theta_jet_nb(ord, g);
         acb_theta_eld_t E;
         acb_mat_t tau;
-        arb_mat_t C;
+        arb_mat_t C, Yinv;
         arf_t R2, eps;
-        acb_ptr z, new_z;
-        arb_ptr v, a;
-        acb_t c, term;
-        arb_t u, abs, sum;
+        acb_ptr z;
+        arb_ptr y, v;
+        acb_t term;
+        arb_t u, pi, abs, sum;
         slong nb_pts;
         slong * pts;
         slong * tups;
@@ -43,27 +43,32 @@ TEST_FUNCTION_START(acb_theta_jet_naive_radius, state)
 
         acb_mat_init(tau, g, g);
         arb_mat_init(C, g, g);
+        arb_mat_init(Yinv, g, g);
         arf_init(R2);
         arf_init(eps);
         acb_theta_eld_init(E, g, g);
         z = _acb_vec_init(g);
-        new_z = _acb_vec_init(g);
         v = _arb_vec_init(g);
-        a = _arb_vec_init(g);
-        acb_init(c);
+        y = _arb_vec_init(g);
         acb_init(term);
         arb_init(u);
+        arb_init(pi);
         arb_init(abs);
         arb_init(sum);
         tups = flint_malloc(g * nb * sizeof(slong));
 
         acb_siegel_randtest_reduced(tau, state, prec, bits);
-        for (k = 0; k < g; k++)
-        {
-            acb_randtest_precise(&z[k], state, prec, bits);
-        }
+        acb_siegel_randtest_vec_reduced(z, state, tau, 0, prec);
+
         acb_siegel_cho(C, tau, prec);
-        acb_theta_naive_reduce(v, new_z, a, c, u, z, 1, tau, prec);
+        acb_siegel_yinv(Yinv, tau, prec);
+        _acb_vec_get_imag(y, z, g);
+        arb_mat_vector_mul_col(v, Yinv, y, prec);
+        arb_dot(u, NULL, 0, v, 1, y, 1, g, prec);
+        arb_const_pi(pi, prec);
+        arb_mul(u, u, pi, prec);
+        arb_exp(u, u, prec);
+        arb_mat_vector_mul_col(v, C, v, prec);
 
         acb_theta_jet_naive_radius(R2, eps, C, v, ord, mprec);
         arb_mul_arf(u, u, eps, prec);
@@ -86,16 +91,12 @@ TEST_FUNCTION_START(acb_theta_jet_naive_radius, state)
             arb_zero(sum);
             for (k = 0; k < nb_pts; k++)
             {
-                acb_theta_naive_term(term, new_z, tau, tups + j * g, pts + k * g, prec);
+                acb_theta_naive_term(term, z, tau, tups + j * g, pts + k * g, prec);
                 acb_abs(abs, term, prec);
                 arb_add(sum, sum, abs, prec);
             }
 
-            acb_abs(abs, c, prec);
-            arb_mul(sum, sum, abs, prec);
-            arb_sub(abs, sum, u, prec);
-
-            if (arb_is_positive(abs))
+            if (arb_gt(sum, u))
             {
                 flint_printf("FAIL\n");
                 flint_printf("sum, bound:\n");
@@ -113,16 +114,16 @@ TEST_FUNCTION_START(acb_theta_jet_naive_radius, state)
 
         acb_mat_clear(tau);
         arb_mat_clear(C);
+        arb_mat_clear(Yinv);
         arf_clear(R2);
         arf_clear(eps);
         acb_theta_eld_clear(E);
         _acb_vec_clear(z, g);
-        _acb_vec_clear(new_z, g);
         _arb_vec_clear(v, g);
-        _arb_vec_clear(a, g);
-        acb_clear(c);
+        _arb_vec_clear(y, g);
         acb_clear(term);
         arb_clear(u);
+        arb_clear(pi);
         arb_clear(abs);
         arb_clear(sum);
         flint_free(pts);

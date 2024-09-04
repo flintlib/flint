@@ -42,11 +42,12 @@ TEST_FUNCTION_START(acb_theta_00, state)
         {
             acb_siegel_randtest_vec_reduced(z + k * g, state, tau, 0, prec);
         }
+        _acb_vec_scalar_mul_2exp_si(z, z, nb * g, 1);
 
         acb_theta_00(th, z, nb, tau, prec);
         acb_theta_00_notransform(test, z, nb, tau, prec);
 
-        /*   flint_printf("g = %wd, prec = %wd, nb = %wd, tau, z:\n", g, prec, nb);
+        /*   flint_printf("\n\ng = %wd, prec = %wd, nb = %wd, tau, z:\n", g, prec, nb);
             acb_mat_printd(tau, 5);
             _acb_vec_printd(z, nb * g, 5);
             flint_printf("th, test:\n");

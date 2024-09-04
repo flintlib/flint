@@ -17,7 +17,7 @@ TEST_FUNCTION_START(acb_theta_jet_all, state)
 {
     slong iter;
 
-    /* Test: agrees with sum_jet_all */
+    /* Test: agrees with jet_all_notransform */
     for (iter = 0; iter < 25 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 2);
@@ -30,31 +30,26 @@ TEST_FUNCTION_START(acb_theta_jet_all, state)
         slong nbth = acb_theta_jet_nb(ord, g);
         acb_mat_t tau;
         acb_ptr z;
-        acb_theta_ctx_tau_t ctx_tau;
-        acb_theta_ctx_z_struct * vec;
         acb_ptr th, test;
         slong k;
 
         acb_mat_init(tau, g, g);
         z = _acb_vec_init(nb * g);
-        acb_theta_ctx_tau_init(ctx_tau, g);
-        vec = acb_theta_ctx_z_vec_init(nb, g);
         th = _acb_vec_init(nb * n2 * nbth);
         test = _acb_vec_init(nb * n2 * nbth);
 
         /* Sample tau not too far from reduced domain */
         acb_siegel_randtest_reduced(tau, state, prec, bits);
         acb_mat_scalar_mul_2exp_si(tau, tau, -1);
-        acb_theta_ctx_tau_set(ctx_tau, tau, prec);
         for (k = 0; k < nb; k++)
         {
             acb_siegel_randtest_vec_reduced(z + k * g, state, tau, 0, prec);
-            acb_theta_ctx_z_set(&vec[k], z + k * g, ctx_tau, prec);
         }
+        _acb_vec_scalar_mul_2exp_si(z, z, nb * g, 1);
 
-        /* Call jet_all at precision mprec, test against sum_jet_all */
+        /* Call jet_all at precision mprec, test against jet_all_notransform */
         acb_theta_jet_all(th, z, nb, tau, ord, mprec);
-        acb_theta_sum_jet_all(test, vec, nb, ctx_tau, ord, prec);
+        acb_theta_jet_all_notransform(test, z, nb, tau, ord, prec);
 
         if (!_acb_vec_overlaps(th, test, nb * n2 * nbth))
         {
@@ -70,8 +65,6 @@ TEST_FUNCTION_START(acb_theta_jet_all, state)
 
         acb_mat_clear(tau);
         _acb_vec_clear(z, nb * g);
-        acb_theta_ctx_tau_clear(ctx_tau);
-        acb_theta_ctx_z_vec_clear(vec, nb);
         _acb_vec_clear(th, nb * n2 * nbth);
         _acb_vec_clear(test, nb * n2 * nbth);
     }

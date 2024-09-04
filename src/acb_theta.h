@@ -150,6 +150,7 @@ void acb_theta_jet_mul(acb_ptr res, acb_srcptr v1, acb_srcptr v2, slong ord,
 void acb_theta_jet_compose(acb_ptr res, acb_srcptr v, const acb_mat_t N,
     slong ord, slong prec);
 void acb_theta_jet_exp_pi_i(acb_ptr res, arb_srcptr a, slong ord, slong g, slong prec);
+void acb_theta_jet_exp_qf(acb_ptr res, acb_srcptr z, const acb_mat_t N, slong ord, slong prec);
 
 void acb_theta_jet_error_bounds(arb_ptr err, acb_srcptr z, const acb_mat_t tau,
     acb_srcptr dth, slong ord, slong prec);
@@ -279,6 +280,11 @@ void acb_theta_jet_ql_finite_diff(acb_ptr dth, const arf_t eps, const arf_t err,
 
 /* Main functions */
 
+int acb_theta_reduce_tau(acb_ptr new_zs, acb_mat_t new_tau, fmpz_mat_t mat, acb_mat_t N,
+    acb_mat_t ct, acb_ptr exps, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec);
+int acb_theta_reduce_z(acb_ptr new_zs, arb_ptr rs, acb_ptr cs, acb_srcptr zs,
+    slong nb, const acb_mat_t tau, slong prec);
+
 void acb_theta_00_notransform(acb_ptr th, acb_srcptr zs, slong nb,
     const acb_mat_t tau, slong prec);
 void acb_theta_one_notransform(acb_ptr th, acb_srcptr zs, slong nb,
@@ -326,13 +332,6 @@ void acb_theta_g2_sextic(acb_poly_t res, const acb_mat_t tau, slong prec);
 void acb_theta_g2_sextic_chi5(acb_poly_t res, acb_t chi5, const acb_mat_t tau, slong prec);
 void acb_theta_g2_covariants(acb_poly_struct * res, const acb_poly_t f, slong prec);
 void acb_theta_g2_covariants_lead(acb_ptr res, const acb_poly_t f, slong prec);
-
-/* ************************************************************************* */
-
-/* Naive algorithms */
-
-void acb_theta_naive_reduce(arb_ptr v, acb_ptr new_zs, arb_ptr as, acb_ptr cs, arb_ptr us,
-    acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec);
 
 #ifdef __cplusplus
 }

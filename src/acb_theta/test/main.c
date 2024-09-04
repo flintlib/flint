@@ -65,7 +65,6 @@
 #include "t-jet_ql_radius.c"
 #include "t-jet_tuples.c"
 #include "t-naive_radius.c"
-#include "t-naive_reduce.c"
 #include "t-naive_term.c"
 #include "t-one_notransform.c"
 #include "t-ql_setup.c"
@@ -142,21 +141,20 @@ test_struct tests[] =
     TEST_FUNCTION(acb_theta_jet_one_notransform),
     /* TEST_FUNCTION(acb_theta_jet_compose), */
     TEST_FUNCTION(acb_theta_jet_error_bounds),
-    /* TEST_FUNCTION(acb_theta_jet_mul),
-       TEST_FUNCTION(acb_theta_jet_naive_radius), */
+    /* TEST_FUNCTION(acb_theta_jet_mul), */
+    TEST_FUNCTION(acb_theta_jet_naive_radius),
     TEST_FUNCTION(acb_theta_jet_ql_bounds),
     /* TEST_FUNCTION(acb_theta_jet_ql_finite_diff),
     TEST_FUNCTION(acb_theta_jet_ql_radius),
-    TEST_FUNCTION(acb_theta_jet_tuples),
+    TEST_FUNCTION(acb_theta_jet_tuples), */
     TEST_FUNCTION(acb_theta_naive_radius),
-    TEST_FUNCTION(acb_theta_naive_reduce),
-    TEST_FUNCTION(acb_theta_naive_term),*/
+    /* TEST_FUNCTION(acb_theta_naive_term),*/
     TEST_FUNCTION(acb_theta_one_notransform),
     TEST_FUNCTION(acb_theta_ql_setup),
     TEST_FUNCTION(acb_theta_ql_steps),
     TEST_FUNCTION(acb_theta_ql_lower_dim),
     TEST_FUNCTION(acb_theta_ql_exact),
-/*    TEST_FUNCTION(acb_theta_siegel_cocycle),
+    /* TEST_FUNCTION(acb_theta_siegel_cocycle),
     TEST_FUNCTION(acb_theta_siegel_is_reduced),
     TEST_FUNCTION(acb_theta_siegel_reduce),
     TEST_FUNCTION(acb_theta_siegel_transform),
