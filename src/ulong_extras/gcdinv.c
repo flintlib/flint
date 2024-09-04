@@ -11,9 +11,11 @@
 
 #include "ulong_extras.h"
 
-ulong
-n_gcdinv(ulong * s, ulong x, ulong y)
+#if N_GCDEXT_METHOD == 0
+nn_pair_t
+_n_gcdinv(ulong x, ulong y)
 {
+    nn_pair_t ret;
     slong v1, v2, t2;
     ulong d, r, quot, rem;
 
@@ -111,7 +113,45 @@ n_gcdinv(ulong * s, ulong x, ulong y)
     if (v1 < WORD(0))
         v1 += y;
 
-    (*s) = v1;
+    ret.m0 = v1;
+    ret.m1 = x;
 
-    return x;
+    return ret;
 }
+#elif N_GCDEXT_METHOD == 1
+nn_pair_t
+_n_gcdinv(ulong x, ulong y)
+{
+    nn_pair_t ret;
+    slong v1, v2, t2;
+    ulong d, r, quot, rem;
+
+    FLINT_ASSERT(y > x);
+
+    v1 = 0;
+    v2 = 1;
+    r = x;
+    x = y;
+
+    while (r)
+    {
+        quot = x / r;
+        rem = x - r * quot;
+        x = r;
+        t2 = v2;
+        v2 = v1 - quot * v2;
+        v1 = t2;
+        r = rem;
+    }
+
+    if (v1 < WORD(0))
+        v1 += y;
+
+    ret.m0 = v1;
+    ret.m1 = x;
+
+    return ret;
+}
+#else
+# error
+#endif
