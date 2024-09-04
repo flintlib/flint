@@ -17,13 +17,14 @@ TEST_FUNCTION_START(acb_theta_all, state)
 {
     slong iter;
 
-    /* Test: agrees with naive_all */
+    /* Test: agrees with all_notransform */
     for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 2);
         slong n2 = 1 << (2 * g);
         slong nb = n_randint(state, 3);
-        slong prec = 100 + n_randint(state, 400);
+        slong mprec = 50 + n_randint(state, 400);
+        slong prec = mprec + 50;
         slong bits = n_randint(state, 4);
         int sqr = n_randint(state, 2);
         acb_mat_t tau;
@@ -44,29 +45,15 @@ TEST_FUNCTION_START(acb_theta_all, state)
             acb_siegel_randtest_vec_reduced(z + k * g, state, tau, 0, prec);
         }
 
-        acb_theta_all(th, z, nb, tau, sqr, prec);
-        acb_theta_naive_all(test, z, nb, tau, prec);
-        if (sqr)
-        {
-            for (k = 0; k < nb * n2; k++)
-            {
-                acb_sqr(&test[k], &test[k], prec);
-            }
-        }
-
-        /*
-            flint_printf("g = %wd, prec = %wd, nb = %wd, sqr = %wd, tau, z:\n", g, prec, nb, sqr);
-            acb_mat_printd(tau, 5);
-            _acb_vec_printd(z, nb * g, 5);
-            flint_printf("th, test:\n");
-            _acb_vec_printd(th, nb * n2, 5);
-            _acb_vec_printd(test, nb * n2, 5);
-        */
+        /* Call theta_all at precision mprec, test against all_notransform */
+        acb_theta_all(th, z, nb, tau, sqr, mprec);
+        acb_theta_all_notransform(test, z, nb, tau, sqr, prec);
 
         if (!_acb_vec_overlaps(th, test, nb * n2))
         {
             flint_printf("FAIL\n");
-            flint_printf("g = %wd, prec = %wd, nb = %wd, sqr = %wd, tau, z:\n", g, prec, nb, sqr);
+            flint_printf("g = %wd, mprec = %wd, prec = %wd, nb = %wd, sqr = %wd, tau, z:\n",
+                g, mprec, prec, nb, sqr);
             acb_mat_printd(tau, 5);
             _acb_vec_printd(z, nb * g, 5);
             flint_printf("th, test:\n");

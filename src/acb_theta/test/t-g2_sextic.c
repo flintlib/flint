@@ -23,18 +23,13 @@ TEST_FUNCTION_START(acb_theta_g2_sextic, state)
     {
         slong g = 2;
         slong n = 1 << (2 * g);
-        slong prec = 100 + n_randint(state, 100);
+        slong prec = 100 + n_randint(state, 1000);
         slong bits = n_randint(state, 4);
         acb_mat_t tau;
         acb_ptr z, th2, roots;
         acb_poly_t f;
         acb_t d, t;
         slong nb, k, j;
-
-        if (iter % 20 == 0)
-        {
-            prec += 10000; /* necessary for full test coverage */
-        }
 
         acb_mat_init(tau, g, g);
         z = _acb_vec_init(g);

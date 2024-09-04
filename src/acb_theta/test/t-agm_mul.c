@@ -17,72 +17,89 @@ TEST_FUNCTION_START(acb_theta_agm_mul, state)
 {
     slong iter;
 
-    /* Test: duplication formula */
+    /* Test: duplication formula using sum_a0_tilde */
     for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 3);
-        slong prec = 100 + n_randint(state, 200);
-        slong mag_bits = n_randint(state, 2);
-        slong rad_exp = -5;
         slong n = 1 << g;
-
+        slong mprec = 100 + n_randint(state, 200);
+        slong prec = mprec + 50;
+        slong bits = n_randint(state, 2);
         acb_mat_t tau;
         acb_ptr z;
-        arf_t rad;
-        acb_ptr th;
-        acb_ptr th_dupl;
-        acb_ptr test;
-        arb_t err;
-        slong k;
+        acb_theta_ctx_tau_t ctx_tau;
+        acb_theta_ctx_z_t ctx0, ctx;
+        arb_ptr d0, d;
+        acb_ptr th2, th_dupl, test;
+        slong j;
 
         acb_mat_init(tau, g, g);
-        arf_init(rad);
         z = _acb_vec_init(2 * g);
-        th = _acb_vec_init(2 * n);
+        acb_theta_ctx_tau_init(ctx_tau, g);
+        acb_theta_ctx_z_init(ctx0, g);
+        acb_theta_ctx_z_init(ctx, g);
+        th2 = _acb_vec_init(2 * n);
         th_dupl = _acb_vec_init(2 * n);
         test = _acb_vec_init(2 * n);
-        arb_init(err);
+        d0 = _arb_vec_init(n);
+        d = _arb_vec_init(n);
 
-        acb_siegel_randtest_reduced(tau, state, prec, mag_bits);
-        arf_one(rad);
-        arf_mul_2exp_si(rad, rad, rad_exp);
-        for (k = 0; k < g; k++)
+        acb_siegel_randtest_reduced(tau, state, prec, bits);
+        acb_siegel_randtest_vec_reduced(z + g, state, tau, 0, prec);
+
+        acb_theta_ctx_tau_set(ctx_tau, tau, prec);
+        acb_theta_ctx_z_set(ctx0, z, ctx_tau, prec);
+        acb_theta_ctx_z_set(ctx, z + g, ctx_tau, prec);
+        acb_theta_dist_a0(d0, z, tau, prec);
+        acb_theta_dist_a0(d, z + g, tau, prec);
+
+        /* Make test vector using sum_a0_tilde squared */
+        acb_theta_sum_a0_tilde(test, ctx0, 1, ctx_tau, d0, prec);
+        acb_theta_sum_a0_tilde(test + n, ctx, 1, ctx_tau, d, prec);
+        for (j = 0; j < 2 * n; j++)
         {
-            acb_urandom(&z[k], state, prec);
+            acb_sqr(&test[j], &test[j], prec);
         }
-        _acb_vec_scalar_mul_2exp_si(z, z, g, rad_exp);
 
-        acb_theta_naive_0b(th, z, 2, tau, prec);
-        acb_mat_scalar_mul_2exp_si(tau, tau, 1);
-        acb_theta_naive_0b(th_dupl, z, 2, tau, prec);
-        _acb_vec_sqr(th_dupl, th_dupl, 2 * n, prec);
+        /* Duplicate to get input of agm_mul */
+        acb_theta_ctx_tau_dupl(ctx_tau, prec);
+        acb_theta_ctx_z_dupl(ctx0, prec);
+        acb_theta_ctx_z_dupl(ctx, prec);
+        _arb_vec_scalar_mul_2exp_si(d0, d0, n, 1);
+        _arb_vec_scalar_mul_2exp_si(d, d, n, 1);
+        acb_theta_sum_a0_tilde(th_dupl, ctx0, 1, ctx_tau, d0, prec);
+        acb_theta_sum_a0_tilde(th_dupl + n, ctx, 1, ctx_tau, d, prec);
 
-        acb_theta_agm_mul(test, th, th + n, g, prec);
-        acb_theta_agm_mul(test + n, th + n, th + n, g, prec);
+        /* Call agm_mul at precision mprec and compare with test */
+        acb_theta_agm_mul(th2, th_dupl, th_dupl, g, mprec);
+        acb_theta_agm_mul(th2 + n, th_dupl, th_dupl + n, g, mprec);
+        _acb_vec_scalar_mul_2exp_si(th2, th2, 2 * n, g);
 
-        if (!_acb_vec_overlaps(test, th_dupl, 2 * n))
+        if (!_acb_vec_overlaps(test, th2, 2 * n))
         {
             flint_printf("FAIL (overlap)\n");
             flint_printf("g = %wd, prec = %wd, tau, z:\n", g, prec);
-            acb_mat_printd(tau, 10);
-            _acb_vec_printd(z, g, 10);
-            flint_printf("theta:\n");
-            _acb_vec_printd(th, 2 * n, 10);
-            flint_printf("dupl:\n");
-            _acb_vec_printd(th_dupl, 2 * n, 10);
+            acb_mat_printd(tau, 5);
+            _acb_vec_printd(z, 2 * g, 5);
+            flint_printf("th2:\n");
+            _acb_vec_printd(th2, 2 * n, 5);
+            flint_printf("th_dupl:\n");
+            _acb_vec_printd(th_dupl, 2 * n, 5);
             flint_printf("test:\n");
-            _acb_vec_printd(test, 2 * n, 10);
-            fflush(stdout);
+            _acb_vec_printd(test, 2 * n, 5);
             flint_abort();
         }
 
         acb_mat_clear(tau);
-        arf_clear(rad);
         _acb_vec_clear(z, 2 * g);
-        _acb_vec_clear(th, 2 * n);
+        acb_theta_ctx_tau_clear(ctx_tau);
+        acb_theta_ctx_z_clear(ctx0);
+        acb_theta_ctx_z_clear(ctx);
+        _acb_vec_clear(th2, 2 * n);
         _acb_vec_clear(th_dupl, 2 * n);
         _acb_vec_clear(test, 2 * n);
-        arb_clear(err);
+        _arb_vec_clear(d0, n);
+        _arb_vec_clear(d, n);
     }
 
     TEST_FUNCTION_END(state);

@@ -18,14 +18,14 @@ TEST_FUNCTION_START(acb_theta_sum_a0_tilde, state)
 {
     slong iter;
 
-    /* Test: matches naive_fixed_ab up to u^(-1) */
-    for (iter = 0; iter < 50 * flint_test_multiplier(); iter++)
+    /* Test: matches sum_all_tilde */
+    for (iter = 0; iter < 25 * flint_test_multiplier(); iter++)
     {
         slong g = 1 + n_randint(state, 3);
         slong n = 1 << g;
-        slong prec = 100 + n_randint(state, 100);
-        slong hp = prec + 100;
-        slong mag_bits = n_randint(state, 4);
+        slong mprec = 100 + n_randint(state, 100);
+        slong prec = mprec + 50;
+        slong bits = n_randint(state, 4);
         acb_mat_t tau;
         acb_ptr z;
         acb_theta_ctx_tau_t ctx_tau;
@@ -40,20 +40,21 @@ TEST_FUNCTION_START(acb_theta_sum_a0_tilde, state)
         acb_theta_ctx_z_init(ctx, g);
         d = _arb_vec_init(n);
         th1 = _acb_vec_init(n);
-        th2 = _acb_vec_init(n);
+        th2 = _acb_vec_init(n * n);
 
-        acb_siegel_randtest_reduced(tau, state, hp, mag_bits);
-        acb_siegel_randtest_vec(z, state, g, hp);
+        acb_siegel_randtest_reduced(tau, state, prec, bits);
+        acb_siegel_randtest_vec(z, state, g, prec);
         acb_theta_ctx_tau_set(ctx_tau, tau, prec);
         acb_theta_ctx_z_set(ctx, z, ctx_tau, prec);
         acb_theta_dist_a0(d, z, tau, prec);
 
-        acb_theta_sum_a0_tilde(th1, ctx, 1, ctx_tau, d, prec);
+        /* Call sum_a0_tilde at precision mprec, test against sum_all_tilde */
+        acb_theta_sum_a0_tilde(th1, ctx, 1, ctx_tau, d, mprec);
+        acb_theta_sum_all_tilde(th2, ctx, 1, ctx_tau, d, prec);
         for (a = 0; a < n; a++)
         {
-            acb_theta_naive_fixed_ab(&th2[a], a << g, z, 1, tau, hp);
+            acb_set(&th2[a], &th2[a << g]);
         }
-        _acb_vec_scalar_mul_arb(th2, th2, n, acb_theta_ctx_uinv(ctx), prec);
 
         if (!_acb_vec_overlaps(th1, th2, n))
         {
@@ -78,7 +79,7 @@ TEST_FUNCTION_START(acb_theta_sum_a0_tilde, state)
         acb_theta_ctx_z_clear(ctx);
         _arb_vec_clear(d, n);
         _acb_vec_clear(th1, n);
-        _acb_vec_clear(th2, n);
+        _acb_vec_clear(th2, n * n);
     }
 
     TEST_FUNCTION_END(state);

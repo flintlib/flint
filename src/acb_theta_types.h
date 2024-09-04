@@ -76,6 +76,9 @@ acb_theta_ctx_z_struct;
 
 typedef acb_theta_ctx_z_struct acb_theta_ctx_z_t[1];
 
+typedef void (*acb_theta_sum_worker_t)(acb_ptr, acb_srcptr, acb_srcptr, const slong *,
+    slong, const acb_t, const slong *, slong, slong, slong, slong);
+
 #ifdef __cplusplus
 }
 #endif

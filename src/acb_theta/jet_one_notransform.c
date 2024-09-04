@@ -87,13 +87,18 @@ void acb_theta_jet_one_notransform(acb_ptr th, acb_srcptr zs, slong nb,
         _acb_vec_clear(res, 4 * nbth);
         _arb_vec_clear(r, g);
     }
+    else if (ab == 0)
+    {
+        /* Call jet_00_notransform directly */
+        acb_theta_jet_00_notransform(th, zs, nb, tau, ord, prec);
+    }
     else
     {
+        /* theta_ab(z, tau) = exp(pi i a^T tau a/4) exp(2 pi i a^T (z + b/2))
+           theta_00(z + tau a/2 + b/2, tau) */
         acb_ptr new_zs, v, w, aux;
         arb_ptr u;
         acb_t c, x;
-        /* theta_ab(z, tau) = exp(pi i a^T tau a/4) exp(2 pi i a^T (z + b/2))
-           theta_00(z + tau a/2 + b/2, tau) */
 
         new_zs = _acb_vec_init(nb * g);
         v = _acb_vec_init(g);

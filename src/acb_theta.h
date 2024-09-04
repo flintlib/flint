@@ -225,9 +225,6 @@ void acb_theta_ctx_z_common_v(arb_ptr v, const acb_theta_ctx_z_struct * vec, slo
 
 /* Summation algorithms */
 
-typedef void (*acb_theta_sum_worker_t)(acb_ptr, acb_srcptr, acb_srcptr, const slong *,
-    slong, const acb_t, const slong *, slong, slong, slong, slong);
-
 void acb_theta_sum_work(acb_ptr th, slong len, acb_srcptr exp_zs, acb_srcptr exp_zs_inv,
     slong nb, const acb_mat_t exp_tau, const acb_mat_t exp_tau_inv, const acb_theta_eld_t E,
     slong ord, slong prec, acb_theta_sum_worker_t worker);
@@ -308,7 +305,6 @@ void acb_theta_jet_all(acb_ptr th, acb_srcptr zs, slong nb,
 
 #define ACB_THETA_G2_COV_NB 26
 
-void acb_theta_g2_jet_naive_1(acb_ptr dth, const acb_mat_t tau, slong prec);
 void acb_theta_g2_detk_symj(acb_poly_t res, const acb_mat_t m, const acb_poly_t f,
     slong k, slong j, slong prec);
 void acb_theta_g2_transvectant(acb_poly_t res, const acb_poly_t g, const acb_poly_t h,
@@ -335,35 +331,8 @@ void acb_theta_g2_covariants_lead(acb_ptr res, const acb_poly_t f, slong prec);
 
 /* Naive algorithms */
 
-typedef void (*acb_theta_naive_worker_t)(acb_ptr, acb_srcptr, acb_srcptr, const slong *,
-    slong, const acb_t, const slong *, slong, slong, slong, slong);
-
 void acb_theta_naive_reduce(arb_ptr v, acb_ptr new_zs, arb_ptr as, acb_ptr cs, arb_ptr us,
     acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec);
-
-
-void acb_theta_naive_worker(acb_ptr th, slong len, acb_srcptr zs, slong nb,
-    const acb_mat_t tau, const acb_theta_eld_t E, slong ord, slong prec,
-    acb_theta_naive_worker_t worker);
-
-void acb_theta_naive_00(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec);
-void acb_theta_naive_0b(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec);
-
-void acb_theta_naive_fixed_ab(acb_ptr th, ulong ab, acb_srcptr zs, slong nb,
-    const acb_mat_t tau, slong prec);
-void acb_theta_naive_fixed_a(acb_ptr th, ulong a, acb_srcptr zs, slong nb,
-    const acb_mat_t tau, slong prec);
-void acb_theta_naive_all(acb_ptr th, acb_srcptr zs, slong nb, const acb_mat_t tau, slong prec);
-
-/* Naive algorithms for derivatives */
-
-
-void acb_theta_jet_naive_00(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
-    slong ord, slong prec);
-void acb_theta_jet_naive_fixed_ab(acb_ptr dth, ulong ab, acb_srcptr z, const acb_mat_t tau,
-    slong ord, slong prec);
-void acb_theta_jet_naive_all(acb_ptr dth, acb_srcptr z, const acb_mat_t tau,
-    slong ord, slong prec);
 
 #ifdef __cplusplus
 }

@@ -20,14 +20,18 @@ TEST_FUNCTION_START(acb_theta_jet_ql_bounds, state)
     /* Test: bounds are finite, theta values correctly bounded */
     for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
+        slong g = 1 + n_randint(state, 3);
+        slong n = 1 << g;
         slong lp = ACB_THETA_LOW_PREC;
         slong prec = lp + 100;
         slong bits = n_randint(state, 4);
         slong ord = 1 + n_randint(state, 10);
-        slong g = 1 + n_randint(state, 3);
         slong n2 = 1 << (2 * g);
         acb_mat_t tau;
         acb_ptr z, x, th;
+        acb_theta_ctx_tau_t ctx_tau;
+        acb_theta_ctx_z_t ctx;
+        arb_ptr d;
         arb_t c, rho, abs, t;
         slong k;
 
@@ -35,6 +39,9 @@ TEST_FUNCTION_START(acb_theta_jet_ql_bounds, state)
         z = _acb_vec_init(g);
         x = _acb_vec_init(g);
         th = _acb_vec_init(n2);
+        acb_theta_ctx_tau_init(ctx_tau, g);
+        acb_theta_ctx_z_init(ctx, g);
+        d = _arb_vec_init(n);
         arb_init(c);
         arb_init(rho);
         arb_init(abs);
@@ -68,7 +75,12 @@ TEST_FUNCTION_START(acb_theta_jet_ql_bounds, state)
         }
         _acb_vec_scalar_mul_arb(x, x, g, rho, prec);
         _acb_vec_add(x, x, z, g, prec);
-        acb_theta_naive_all(th, x, 1, tau, lp);
+
+        acb_theta_ctx_tau_set(ctx_tau, tau, lp);
+        acb_theta_ctx_z_set(ctx, x, ctx_tau, lp);
+        acb_theta_dist_a0(d, x, tau, lp);
+        acb_theta_sum_all_tilde(th, ctx, 1, ctx_tau, d, lp);
+        _acb_vec_scalar_mul_arb(th, th, n2, acb_theta_ctx_u(ctx), lp);
 
         arb_zero(abs);
         for (k = 0; k < n2; k++)
@@ -96,6 +108,9 @@ TEST_FUNCTION_START(acb_theta_jet_ql_bounds, state)
         _acb_vec_clear(z, g);
         _acb_vec_clear(x, g);
         _acb_vec_clear(th, n2);
+        acb_theta_ctx_tau_clear(ctx_tau);
+        acb_theta_ctx_z_clear(ctx);
+        _arb_vec_clear(d, n);
         arb_clear(c);
         arb_clear(rho);
         arb_clear(abs);

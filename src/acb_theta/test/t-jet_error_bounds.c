@@ -31,6 +31,8 @@ TEST_FUNCTION_START(acb_theta_jet_error_bounds, state)
         slong hprec = mprec + n_randint(state, 50);
         acb_mat_t tau1, tau2, tau3;
         acb_ptr z1, z2, z3, dth;
+        acb_theta_ctx_tau_t ctx_tau;
+        acb_theta_ctx_z_t ctx_z;
         arb_ptr err;
         acb_ptr d1, d2, test;
         acb_t x;
@@ -42,6 +44,8 @@ TEST_FUNCTION_START(acb_theta_jet_error_bounds, state)
         z1 = _acb_vec_init(g);
         z2 = _acb_vec_init(g);
         z3 = _acb_vec_init(g);
+        acb_theta_ctx_tau_init(ctx_tau, g);
+        acb_theta_ctx_z_init(ctx_z, g);
         dth = _acb_vec_init(n * nb_der);
         err = _arb_vec_init(n * nb);
         d1 = _acb_vec_init(n * nb);
@@ -85,9 +89,18 @@ TEST_FUNCTION_START(acb_theta_jet_error_bounds, state)
             flint_abort();
         }
 
-        acb_theta_jet_naive_all(d1, z1, tau1, ord, hprec);
-        acb_theta_jet_naive_all(d2, z2, tau2, ord, hprec);
-        acb_theta_jet_naive_all(dth, z3, tau3, ord + 2, lprec);
+        acb_theta_ctx_tau_set(ctx_tau, tau1, hprec);
+        acb_theta_ctx_z_set(ctx_z, z1, ctx_tau, hprec);
+        acb_theta_sum_jet_all(d1, ctx_z, 1, ctx_tau, ord, hprec);
+
+        acb_theta_ctx_tau_set(ctx_tau, tau2, hprec);
+        acb_theta_ctx_z_set(ctx_z, z2, ctx_tau, hprec);
+        acb_theta_sum_jet_all(d2, ctx_z, 1, ctx_tau, ord, hprec);
+
+        acb_theta_ctx_tau_set(ctx_tau, tau3, lprec);
+        acb_theta_ctx_z_set(ctx_z, z3, ctx_tau, lprec);
+        acb_theta_sum_jet_all(dth, ctx_z, 1, ctx_tau, ord + 2, lprec);
+
         for (k = 0; k < n; k++)
         {
             acb_theta_jet_error_bounds(err + k * nb, z3, tau3, dth + k * nb_der, ord, lprec);
@@ -121,6 +134,8 @@ TEST_FUNCTION_START(acb_theta_jet_error_bounds, state)
         _acb_vec_clear(z1, g);
         _acb_vec_clear(z2, g);
         _acb_vec_clear(z3, g);
+        acb_theta_ctx_tau_clear(ctx_tau);
+        acb_theta_ctx_z_clear(ctx_z);
         _acb_vec_clear(dth, n * nb_der);
         _arb_vec_clear(err, n * nb);
         _acb_vec_clear(d1, n * nb);
