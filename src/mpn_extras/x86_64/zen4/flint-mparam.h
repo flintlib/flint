@@ -9,14 +9,18 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+/* parameters found for AMD Ryzen 7 PRO 7840U */
+
 #ifndef FLINT_MPARAM_H
 #define FLINT_MPARAM_H
 
+/* TODO these were taken directly from zen3 flint-mparam.h  ----> */
 #define FLINT_FFT_SMALL_MUL_THRESHOLD            400
 #define FLINT_FFT_SMALL_SQR_THRESHOLD            800
 
 #define FLINT_FFT_MUL_THRESHOLD                32000
 #define FLINT_FFT_SQR_THRESHOLD                32000
+/* <---- these were taken directly from zen3 flint-mparam.h  */
 
 #define FFT_TAB \
    { { 4, 4 }, { 4, 3 }, { 3, 2 }, { 2, 2 }, { 2, 0 } }
