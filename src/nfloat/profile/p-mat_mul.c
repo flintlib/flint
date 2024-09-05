@@ -394,6 +394,9 @@ void prof_mul()
             gr_mat_clear(A, ctx);
             gr_mat_clear(B, ctx);
             gr_mat_clear(C, ctx);
+
+            if (t1 > 3.0)
+                break;
         }
 
         flint_printf("\n");
