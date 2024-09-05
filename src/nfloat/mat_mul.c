@@ -22,9 +22,6 @@
 
 /* todo: check errors which depend on nlimbs */
 
-/* cutoffs classical -> block */
-#define CUTOFF_CLASSICAL_BLOCK 70
-
 #define TAB_INDEX(prec) (FLINT_MIN(prec, 4224) / 64)
 
 /* cutoffs for classical -> fixed */
@@ -309,6 +306,8 @@ static short tab_complex_fixed_vs_block[] = {
     79, /* prec = 4224 */
 };
 
+#if 0
+
 static short tab_complex_classical_vs_block[] = {
     -1, /* prec = 0 */
     36, /* prec = 64 */
@@ -379,6 +378,7 @@ static short tab_complex_classical_vs_block[] = {
     16, /* prec = 4224 */
 };
 
+#endif
 
 FLINT_FORCE_INLINE void
 _nfloat_get_nfixed(nn_ptr res, nn_srcptr x, slong exp, slong fix_nlimbs, gr_ctx_t ctx)
@@ -1673,7 +1673,7 @@ nfloat_complex_mat_mul_reorder(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, g
 int
 nfloat_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 {
-    slong cutoff1, cutoff2, dim;
+    slong cutoff1, cutoff2, cutoff3, dim;
     slong prec;
     slong max_extra_prec;
     int status;
@@ -1687,12 +1687,17 @@ nfloat_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
     if (dim <= 2 || NFLOAT_CTX_HAS_INF_NAN(ctx))
         return gr_mat_mul_classical(C, A, B, ctx);
 
+    /* classical -> fixed-point */
     cutoff1 = tab_classical_vs_fixed[TAB_INDEX(prec)];
 
     if (dim < cutoff1)
         return gr_mat_mul_classical(C, A, B, ctx);
 
+    /* fixed-point -> block */
     cutoff2 = tab_fixed_vs_block[TAB_INDEX(prec)];
+
+    /* classical -> block */
+    cutoff3 = 80;
 
     if (dim < cutoff2)
     {
@@ -1700,11 +1705,14 @@ nfloat_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 
         status = nfloat_mat_mul_fixed(C, A, B, max_extra_prec, ctx);
 
-        if (status == GR_UNABLE && dim < CUTOFF_CLASSICAL_BLOCK)
+        if (status == GR_SUCCESS)
+            return status;
+
+        if (status == GR_UNABLE && dim < cutoff3)
             return gr_mat_mul_classical(C, A, B, ctx);
     }
 
-    return nfloat_mat_mul_block(C, A, B, CUTOFF_CLASSICAL_BLOCK, ctx);
+    return nfloat_mat_mul_block(C, A, B, cutoff3 - 10, ctx);
 }
 
 int
@@ -1742,13 +1750,27 @@ nfloat_complex_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t 
         return gr_mat_mul_classical(C, A, B, ctx);
 
     cutoff2 = tab_complex_fixed_vs_block[TAB_INDEX(prec)];
-    cutoff3 = tab_complex_classical_vs_block[TAB_INDEX(prec)];
+
+    /* classical -> block */
+    /* tuned for uniform matrices, so maybe not accurate in practice */
+    /* cutoff3 = tab_complex_classical_vs_block[TAB_INDEX(prec)]; */
+    if (prec <= 256)
+        cutoff3 = 80;
+    else if (prec <= 512)
+        cutoff3 = 160;
+    else if (prec <= 3072)
+        cutoff3 = 100;
+    else
+        cutoff3 = 80;
 
     if (dim < cutoff2)
     {
         max_extra_prec = (prec < 768) ? 64 : prec / 4;
 
         status = nfloat_complex_mat_mul_fixed(C, A, B, max_extra_prec, ctx);
+
+        if (status == GR_SUCCESS)
+            return status;
 
         if (status == GR_UNABLE && dim < cutoff3)
             return gr_mat_mul_classical(C, A, B, ctx);
@@ -1757,7 +1779,7 @@ nfloat_complex_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t 
     if (_nfloat_complex_mat_parts_are_well_scaled(A, ctx) &&
         _nfloat_complex_mat_parts_are_well_scaled(B, ctx))
     {
-        return nfloat_complex_mat_mul_block(C, A, B, cutoff3, ctx);
+        return nfloat_complex_mat_mul_block(C, A, B, cutoff3 - 10, ctx);
     }
     else
     {

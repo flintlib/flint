@@ -126,7 +126,7 @@ void tune_classical_vs_fixed(int * cutoffs)
     flint_rand_clear(state);
 }
 
-slong ns[] = { 2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64, 80, 96, 112, 128, 144, 160, 192, 224, 256, 288, 320, 352, 0 };
+slong ns[] = { 2, 3, 4, 8, 16, 24, 32, 48, 64, 80, 96, 128, 144, 256, 512, 1024, 0 };
 
 void prof_classical_vs_fixed()
 {

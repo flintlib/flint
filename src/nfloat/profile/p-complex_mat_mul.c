@@ -130,7 +130,7 @@ void tune_classical_vs_fixed(int * cutoffs)
     flint_rand_clear(state);
 }
 
-slong ns[] = { 2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64, 80, 96, 112, 128, 144, 160, 192, 224, 256, 288, 320, 352, 0 };
+slong ns[] = { 2, 3, 4, 8, 16, 24, 32, 48, 64, 80, 96, 128, 144, 256, 512, 1024, 0 };
 
 void prof_classical_vs_fixed()
 {
@@ -353,6 +353,59 @@ void tune_classical_vs_block(int * cutoffs)
     flint_rand_clear(state);
 }
 
+void prof_mul()
+{
+    gr_ctx_t ctx;
+    gr_mat_t A, B, C;
+    slong i, ni, n;
+    slong prec;
+    double FLINT_SET_BUT_UNUSED(__), t1, t2;
+
+    flint_rand_t state;
+    flint_rand_init(state);
+
+    flint_printf("        ");
+    for (ni = 0; (n = ns[ni]) != 0; ni++)
+        flint_printf("%5wd  ", n);
+    flint_printf("\n");
+
+    for (prec = 64; prec <= NFLOAT_MAX_LIMBS * FLINT_BITS; prec = (prec < 1024) ? prec + 64 : prec + 256)
+    {
+        flint_printf("%4wd     ", prec);
+
+        nfloat_complex_ctx_init(ctx, prec, 0);
+
+        for (ni = 0; (n = ns[ni]) != 0; ni++)
+        {
+            gr_mat_init(A, n, n, ctx);
+            gr_mat_init(B, n, n, ctx);
+            gr_mat_init(C, n, n, ctx);
+
+            randmat(A, state, ctx);
+            randmat(B, state, ctx);
+
+            TIMEIT_START
+            GR_MUST_SUCCEED(gr_mat_mul_classical(C, A, B, ctx));
+            TIMEIT_STOP_VALUES(__, t1)
+
+            TIMEIT_START
+            GR_MUST_SUCCEED(nfloat_complex_mat_mul(C, A, B, ctx));
+            TIMEIT_STOP_VALUES(__, t2)
+
+            flint_printf("%.3f  ", t1 / t2);
+            fflush(stdout);
+
+            gr_mat_clear(A, ctx);
+            gr_mat_clear(B, ctx);
+            gr_mat_clear(C, ctx);
+        }
+
+        flint_printf("\n");
+    }
+
+    flint_rand_clear(state);
+}
+
 int main()
 {
     int tab[TABN];
@@ -361,5 +414,6 @@ int main()
     //tune_fixed_vs_block(tab);
     //prof_classical_vs_fixed();
     //prof_fixed_vs_block();
-    tune_classical_vs_block(tab);
+    //tune_classical_vs_block(tab);
+    prof_mul();
 }
