@@ -103,7 +103,6 @@ void sample_precomp(void * arg, ulong count)
         if (n == UWORD(0)) n++;
 
         ulong c = n_randint(state, n);
-        const ulong c_pr = n_mulmod_precomp_shoup(c, n);
 
         nmod_mat_init(mat, length, length, n);
         nmod_mat_randtest(mat, state);
@@ -112,7 +111,10 @@ void sample_precomp(void * arg, ulong count)
 
         prof_start();
         for (slong j = 0; j < 100; j++)
+        {
+            const ulong c_pr = n_mulmod_precomp_shoup(c, n);
             _nmod_mat_scalar_mul_precomp(res, mat, c, c_pr);
+        }
         prof_stop();
 
         nmod_mat_clear(mat);
