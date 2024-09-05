@@ -679,7 +679,7 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         ;;
       coreibwl | broadwell)
         gcc_cflags_arch="-march=broadwell"
-        param_path="x86_64/skylake"
+        param_path="x86_64/broadwell"
         ;;
       skylake)
         gcc_cflags_arch="-march=skylake"
