@@ -42,7 +42,7 @@ slong _nmod_poly_hgcd(nn_ptr *M, slong *lenM,
     with
 
     (1) A and B are consecutive remainders in the euclidean remainder
-        sequence for a, b satsifying 2*deg(A) >= deg(a) > 2*deg(B)
+        sequence for a, b satisfying 2*deg(A) >= deg(a) > 2*deg(B)
 
     (2) M is a product of [[qi 1][1 0]] where the qi are the quotients
         obtained in (1)

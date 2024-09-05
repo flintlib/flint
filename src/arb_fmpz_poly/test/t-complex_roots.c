@@ -130,20 +130,20 @@ TEST_FUNCTION_START(arb_fmpz_poly_complex_roots, state)
                         fmpz_poly_set_coeff_ui(g, j, j+1);
                     break;
                 case 1:
-                    arith_chebyshev_t_polynomial(g, n);
+                    fmpz_poly_chebyshev_t(g, n);
                     break;
                 case 2:
-                    arith_chebyshev_u_polynomial(g, n);
+                    fmpz_poly_chebyshev_u(g, n);
                     break;
                 case 3:
-                    arith_legendre_polynomial(h, n);
+                    fmpq_poly_legendre_p(h, n);
                     fmpq_poly_get_numerator(g, h);
                     break;
                 case 4:
-                    arith_cyclotomic_polynomial(g, n);
+                    fmpz_poly_cyclotomic(g, n);
                     break;
                 case 5:
-                    arith_swinnerton_dyer_polynomial(g, n % 4);
+                    fmpz_poly_swinnerton_dyer(g, n % 4);
                     break;
                 case 6:
                     arith_bernoulli_polynomial(h, n);

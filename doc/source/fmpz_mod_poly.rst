@@ -1909,7 +1909,7 @@ Berlekamp-Massey Algorithm
 
 .. function:: const fmpz * fmpz_mod_berlekamp_massey_points(const fmpz_mod_berlekamp_massey_t B)
 
-    Return a pointer the array of points stored in ``B``. This may be ``NULL`` if func::fmpz_mod_berlekamp_massey_point_count returns ``0``.
+    Return a pointer the array of points stored in ``B``. This may be ``NULL`` if :func:`fmpz_mod_berlekamp_massey_point_count` returns ``0``.
 
 .. function:: const fmpz_mod_poly_struct * fmpz_mod_berlekamp_massey_V_poly(const fmpz_mod_berlekamp_massey_t B)
 

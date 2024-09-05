@@ -288,7 +288,7 @@ See https://arxiv.org/abs/cs/0701183 for the algorithm of Villard.
     The return from these functions is always conclusive: the functions
     * :func:`fmpz_mat_is_reduced` or :func:`fmpz_mat_is_reduced_gram`
     * :func:`fmpz_mat_is_reduced_with_removal` or :func:`fmpz_mat_is_reduced_gram_with_removal`
-    are optimzied by calling the above heuristics first and returning right away if they give a conclusive answer.
+    are optimized by calling the above heuristics first and returning right away if they give a conclusive answer.
 
 
 Modified ULLL

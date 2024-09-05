@@ -12,7 +12,7 @@ Authors:
 Introduction
 --------------------------------------------------------------------------------
 
-This module contains functionality for creating, listing and reducing binary quadratic forms. A ``qfb`` struct consists of three ``fmpz_t`` s, `a`, `b` and `c`, and basic algorithms for operations such as reduction, composition and enumerating are inplemented and described below.
+This module contains functionality for creating, listing and reducing binary quadratic forms. A ``qfb`` struct consists of three ``fmpz_t`` s, `a`, `b` and `c`, and basic algorithms for operations such as reduction, composition and enumerating are implemented and described below.
 
 Currently the code only works for definite binary quadratic forms.
 

@@ -88,7 +88,7 @@ exact_cpu=
 # can't be done, or don't work.
 #
 # When a number of probes are done, test -z "$exact_cpu" can be used instead
-# of putting each probe under an "else" of the preceeding.  That can stop
+# of putting each probe under an "else" of the preceding.  That can stop
 # the code getting horribly nested and marching off the right side of the
 # screen.
 

@@ -161,7 +161,7 @@ get_timings(double* s, slong degree, flint_bitcnt_t bits, slong length)
 
     flint_free(h);
 
-    FLINT_TEST_CLEANUP(state);
+    FLINT_TEST_CLEAR(state);
 
     return s[0] > s[1];
 }

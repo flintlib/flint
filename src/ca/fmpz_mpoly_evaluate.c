@@ -19,7 +19,7 @@ The conversion to Horner form can be stated as recursive. However, the call
 stack has depth proportial to the length of the input polynomial in the worst
 case. Therefore, we must convert it to an iterative algorithm.
 
-The proceedure is
+The procedure is
 
 HornerForm(f):
 

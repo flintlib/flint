@@ -178,7 +178,7 @@ sample_new(void * arg, ulong count)
     fmpz_clear(a);
     fmpz_clear(b);
 
-    flint_rand_clear(state);
+    FLINT_TEST_CLEAR(state);
 }
 
 void
@@ -210,7 +210,7 @@ sample_old(void * arg, ulong count)
     fmpz_clear(a);
     fmpz_clear(b);
 
-    flint_rand_clear(state);
+    FLINT_TEST_CLEAR(state);
 }
 
 int

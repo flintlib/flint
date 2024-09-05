@@ -22,8 +22,6 @@
 #include "t-bernoulli_number_denom.c"
 #include "t-bernoulli_number_vec.c"
 #include "t-bernoulli_polynomial.c"
-#include "t-chebyshev_t_polynomial.c"
-#include "t-chebyshev_u_polynomial.c"
 #include "t-divisors.c"
 #include "t-euler_number_vec.c"
 #include "t-euler_number_zeta.c"
@@ -34,7 +32,6 @@
 #include "t-ramanujan_tau.c"
 #include "t-stirling.c"
 #include "t-sum_of_squares.c"
-#include "t-swinnerton_dyer_polynomial.c"
 
 /* Array of test functions ***************************************************/
 
@@ -49,8 +46,6 @@ test_struct tests[] =
     TEST_FUNCTION(arith_bernoulli_number_denom),
     TEST_FUNCTION(arith_bernoulli_number_vec),
     TEST_FUNCTION(arith_bernoulli_polynomial),
-    TEST_FUNCTION(arith_chebyshev_t_polynomial),
-    TEST_FUNCTION(arith_chebyshev_u_polynomial),
     TEST_FUNCTION(arith_divisors),
     TEST_FUNCTION(arith_euler_number_vec),
     TEST_FUNCTION(arith_euler_number_zeta),
@@ -61,7 +56,6 @@ test_struct tests[] =
     TEST_FUNCTION(arith_ramanujan_tau),
     TEST_FUNCTION(arith_stirling),
     TEST_FUNCTION(arith_sum_of_squares),
-    TEST_FUNCTION(arith_swinnerton_dyer_polynomial)
 };
 
 /* main function *************************************************************/

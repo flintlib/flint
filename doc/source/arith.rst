@@ -6,16 +6,6 @@
 This module implements arithmetic functions, number-theoretic and
 combinatorial special number sequences and polynomials.
 
-Primorials
---------------------------------------------------------------------------------
-
-
-.. function:: void arith_primorial(fmpz_t res, slong n)
-
-    Sets ``res`` to ``n`` primorial or `n \#`, the product of all prime
-    numbers less than or equal to `n`.
-
-
 Harmonic numbers
 --------------------------------------------------------------------------------
 
@@ -343,12 +333,6 @@ Multiplicative functions
 --------------------------------------------------------------------------------
 
 
-.. function:: void arith_euler_phi(fmpz_t res, const fmpz_t n)
-              int arith_moebius_mu(const fmpz_t n)
-              void arith_divisor_sigma(fmpz_t res, ulong k, const fmpz_t n)
-
-    These are aliases for the functions in the fmpz module.
-
 .. function:: void arith_divisors(fmpz_poly_t res, const fmpz_t n)
 
     Set the coefficients of the polynomial ``res`` to the divisors of `n`,
@@ -407,21 +391,6 @@ Landau's function
     Implements the "basic algorithm" given in
     [DelegliseNicolasZimmermann2009]_. The running time is
     `O(n^{3/2} / \sqrt{\log n})`.
-
-
-
-Dedekind sums
---------------------------------------------------------------------------------
-
-
-.. function:: void arith_dedekind_sum_naive(fmpq_t s, const fmpz_t h, const fmpz_t k)
-              double arith_dedekind_sum_coprime_d(double h, double k)
-              void arith_dedekind_sum_coprime_large(fmpq_t s, const fmpz_t h, const fmpz_t k)
-              void arith_dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k)
-              void arith_dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k)
-
-
-    These are aliases for the functions in the fmpq module.
 
 
 Number of partitions

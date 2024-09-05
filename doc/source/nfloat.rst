@@ -154,7 +154,7 @@ Context objects
     (for example, ``prec = 53`` actually creates a domain with
     64-bit precision).
 
-    Returns ``GR_UNABLE`` without initializating the context object
+    Returns ``GR_UNABLE`` without initializing the context object
     if the given precision is too large to be supported, otherwise
     returns ``GR_SUCCESS``.
 

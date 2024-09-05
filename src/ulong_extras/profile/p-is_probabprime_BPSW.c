@@ -41,7 +41,7 @@ void sample(void * arg, ulong count)
       if (!res) flint_printf("Error\n");
    }
 
-   flint_rand_clear(state);
+   FLINT_TEST_CLEAR(state);
 }
 
 int main(void)
