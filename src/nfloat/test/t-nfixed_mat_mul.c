@@ -23,13 +23,13 @@ TEST_FUNCTION_START(nfixed_mat_mul, state)
     nn_ptr a;
     int which;
 
-    slong MAXN = 10;
+    slong MAXN = 12;
     slong MINLIMBS = 2;
     slong MAXLIMBS = 12;
 
     for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
     {
-        which = n_randint(state, 4);
+        which = n_randint(state, 6);
 
         m = 1 + n_randint(state, MAXN);
         n = 1 + n_randint(state, MAXN);
