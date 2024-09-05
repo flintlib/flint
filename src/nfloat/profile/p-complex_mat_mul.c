@@ -366,7 +366,7 @@ void prof_mul()
 
     flint_printf("        ");
     for (ni = 0; (n = ns[ni]) != 0; ni++)
-        flint_printf("%5wd  ", n);
+        flint_printf("%5wd ", n);
     flint_printf("\n");
 
     for (prec = 64; prec <= NFLOAT_MAX_LIMBS * FLINT_BITS; prec = (prec < 1024) ? prec + 64 : prec + 256)
@@ -392,7 +392,7 @@ void prof_mul()
             GR_MUST_SUCCEED(nfloat_complex_mat_mul(C, A, B, ctx));
             TIMEIT_STOP_VALUES(__, t2)
 
-            flint_printf("%.3f  ", t1 / t2);
+            flint_printf("%.3f ", t1 / t2);
             fflush(stdout);
 
             gr_mat_clear(A, ctx);

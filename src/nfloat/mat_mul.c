@@ -26,7 +26,7 @@
 
 /* cutoffs for classical -> fixed */
 static short tab_classical_vs_fixed[] = {
-    -1, /* prec = 0 */
+    14, /* prec = 0 */
     14, /* prec = 64 */
     16, /* prec = 128 */
     5, /* prec = 192 */
@@ -97,7 +97,7 @@ static short tab_classical_vs_fixed[] = {
 
 /* cutoffs for fixed -> block */
 static short tab_fixed_vs_block[] = {
-    -1, /* prec = 0 */
+    50, /* prec = 0 */
     50, /* prec = 64 */
     94, /* prec = 128 */
     124, /* prec = 192 */
@@ -167,7 +167,7 @@ static short tab_fixed_vs_block[] = {
 };
 
 static short tab_complex_classical_vs_fixed[] = {
-    -1, /* prec = 0 */
+    6, /* prec = 0 */
     6, /* prec = 64 */
     6, /* prec = 128 */
     3, /* prec = 192 */
@@ -237,7 +237,7 @@ static short tab_complex_classical_vs_fixed[] = {
 };
 
 static short tab_complex_fixed_vs_block[] = {
-    -1, /* prec = 0 */
+    66, /* prec = 0 */
     66, /* prec = 64 */
     414, /* prec = 128 */
     500, /* prec = 192 */
@@ -309,7 +309,7 @@ static short tab_complex_fixed_vs_block[] = {
 #if 0
 
 static short tab_complex_classical_vs_block[] = {
-    -1, /* prec = 0 */
+    36, /* prec = 0 */
     36, /* prec = 64 */
     79, /* prec = 128 */
     60, /* prec = 192 */
@@ -1686,6 +1686,8 @@ nfloat_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 
     if (dim <= 2 || NFLOAT_CTX_HAS_INF_NAN(ctx))
         return gr_mat_mul_classical(C, A, B, ctx);
+
+    prec = NFLOAT_CTX_PREC(ctx);
 
     /* classical -> fixed-point */
     cutoff1 = tab_classical_vs_fixed[TAB_INDEX(prec)];
