@@ -737,7 +737,7 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         have_avx512="yes"
         ;;
       cometlake)
-        gcc_cflags_arch="-march=kabylake"
+        gcc_cflags_arch="-march=skylake"
         param_path="x86_64/skylake"
         ;;
       *)
