@@ -190,6 +190,47 @@ flint_mpn_signed_sub_n(mp_ptr res, mp_srcptr x, mp_srcptr y, mp_size_t n)
     }
 }
 
+/* add without carry in or carry out */
+#define NN_ADD_2(r, u, v) add_ssaaaa((r)[1], (r)[0], (u)[1], (u)[0], (v)[1], (v)[0])
+#define NN_ADD_3(r, u, v) add_sssaaaaaa((r)[2], (r)[1], (r)[0], (u)[2], (u)[1], (u)[0], (v)[2], (v)[1], (v)[0])
+#define NN_ADD_4(r, u, v) add_ssssaaaaaaaa((r)[3], (r)[2], (r)[1], (r)[0], (u)[3], (u)[2], (u)[1], (u)[0], (v)[3], (v)[2], (v)[1], (v)[0])
+#define NN_ADD_5(r, u, v) add_sssssaaaaaaaaaa((r)[4], (r)[3], (r)[2], (r)[1], (r)[0], (u)[4], (u)[3], (u)[2], (u)[1], (u)[0], (v)[4], (v)[3], (v)[2], (v)[1], (v)[0])
+#define NN_ADD_6(r, u, v) add_ssssssaaaaaaaaaaaa((r)[5], (r)[4], (r)[3], (r)[2], (r)[1], (r)[0], (u)[5], (u)[4], (u)[3], (u)[2], (u)[1], (u)[0], (v)[5], (v)[4], (v)[3], (v)[2], (v)[1], (v)[0])
+#define NN_ADD_7(r, u, v) add_sssssssaaaaaaaaaaaaaa((r)[6], (r)[5], (r)[4], (r)[3], (r)[2], (r)[1], (r)[0], (u)[6], (u)[5], (u)[4], (u)[3], (u)[2], (u)[1], (u)[0], (v)[6], (v)[5], (v)[4], (v)[3], (v)[2], (v)[1], (v)[0])
+#define NN_ADD_8(r, u, v) add_ssssssssaaaaaaaaaaaaaaaa((r)[7], (r)[6], (r)[5], (r)[4], (r)[3], (r)[2], (r)[1], (r)[0], (u)[7], (u)[6], (u)[5], (u)[4], (u)[3], (u)[2], (u)[1], (u)[0], (v)[7], (v)[6], (v)[5], (v)[4], (v)[3], (v)[2], (v)[1], (v)[0])
+
+#define NN_SUB_2(r, u, v) sub_ddmmss((r)[1], (r)[0], (u)[1], (u)[0], (v)[1], (v)[0])
+#define NN_SUB_3(r, u, v) sub_dddmmmsss((r)[2], (r)[1], (r)[0], (u)[2], (u)[1], (u)[0], (v)[2], (v)[1], (v)[0])
+#define NN_SUB_4(r, u, v) sub_ddddmmmmssss((r)[3], (r)[2], (r)[1], (r)[0], (u)[3], (u)[2], (u)[1], (u)[0], (v)[3], (v)[2], (v)[1], (v)[0])
+#define NN_SUB_5(r, u, v) sub_dddddmmmmmsssss((r)[4], (r)[3], (r)[2], (r)[1], (r)[0], (u)[4], (u)[3], (u)[2], (u)[1], (u)[0], (v)[4], (v)[3], (v)[2], (v)[1], (v)[0])
+#define NN_SUB_6(r, u, v) sub_ddddddmmmmmmssssss((r)[5], (r)[4], (r)[3], (r)[2], (r)[1], (r)[0], (u)[5], (u)[4], (u)[3], (u)[2], (u)[1], (u)[0], (v)[5], (v)[4], (v)[3], (v)[2], (v)[1], (v)[0])
+#define NN_SUB_7(r, u, v) sub_dddddddmmmmmmmsssssss((r)[6], (r)[5], (r)[4], (r)[3], (r)[2], (r)[1], (r)[0], (u)[6], (u)[5], (u)[4], (u)[3], (u)[2], (u)[1], (u)[0], (v)[6], (v)[5], (v)[4], (v)[3], (v)[2], (v)[1], (v)[0])
+#define NN_SUB_8(r, u, v) sub_ddddddddmmmmmmmmssssssss((r)[7], (r)[6], (r)[5], (r)[4], (r)[3], (r)[2], (r)[1], (r)[0], (u)[7], (u)[6], (u)[5], (u)[4], (u)[3], (u)[2], (u)[1], (u)[0], (v)[7], (v)[6], (v)[5], (v)[4], (v)[3], (v)[2], (v)[1], (v)[0])
+
+#define DEF_SIGNED_SUB(n) \
+FLINT_FORCE_INLINE int \
+flint_mpn_signed_sub_ ## n(mp_ptr res, mp_srcptr x, mp_srcptr y) \
+{ \
+    if (mpn_cmp(x, y, n) >= 0) \
+    { \
+        NN_SUB_ ## n(res, x, y); \
+        return 0; \
+    } \
+    else \
+    { \
+        NN_SUB_ ## n(res, y, x); \
+        return 1; \
+    } \
+}
+
+DEF_SIGNED_SUB(2)
+DEF_SIGNED_SUB(3)
+DEF_SIGNED_SUB(4)
+DEF_SIGNED_SUB(5)
+DEF_SIGNED_SUB(6)
+DEF_SIGNED_SUB(7)
+DEF_SIGNED_SUB(8)
+
 FLINT_FORCE_INLINE void
 flint_mpn_signed_div2(mp_ptr res, mp_srcptr x, mp_size_t n)
 {
