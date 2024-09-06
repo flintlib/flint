@@ -1319,18 +1319,22 @@ _nfixed_mat_mul_strassen2(_nfixed_mat_t C, const _nfixed_mat_t A, const _nfixed_
         _nfixed_mat_t Bc, Cc;
         _nfixed_mat_window_init(Bc, B, 0, 2 * bnc, ac, bc, nlimbs);
         _nfixed_mat_window_init(Cc, C, 0, 2 * bnc, ar, bc, nlimbs);
-        _nfixed_mat_mul_strassen2(Cc, A, Bc, cutoff, nlimbs);
+
+        _nfixed_mat_mul_classical2(Cc, A, Bc, nlimbs);
         _nfixed_mat_window_clear(Bc, nlimbs);
         _nfixed_mat_window_clear(Cc, nlimbs);
     }
 
     if (ar > 2 * anr)
     {
-        _nfixed_mat_t Ar, Cr;
+        _nfixed_mat_t Ar, Bc, Cr;
         _nfixed_mat_window_init(Ar, A, 2 * anr, 0, ar, ac, nlimbs);
-        _nfixed_mat_window_init(Cr, C, 2 * anr, 0, ar, bc, nlimbs);
-        _nfixed_mat_mul_strassen2(Cr, Ar, B, cutoff, nlimbs);
+        _nfixed_mat_window_init(Bc, B, 0, 0, ac, 2 * bnc, nlimbs);
+        _nfixed_mat_window_init(Cr, C, 2 * anr, 0, ar, 2 * bnc, nlimbs);
+
+        _nfixed_mat_mul_classical2(Cr, Ar, Bc, nlimbs);
         _nfixed_mat_window_clear(Ar, nlimbs);
+        _nfixed_mat_window_clear(Bc, nlimbs);
         _nfixed_mat_window_clear(Cr, nlimbs);
     }
 
@@ -1348,7 +1352,7 @@ _nfixed_mat_mul_strassen2(_nfixed_mat_t C, const _nfixed_mat_t A, const _nfixed_
 
         /* todo: faster */
         _nfixed_mat_init(tmp, mt, nt, nlimbs);
-        _nfixed_mat_mul_strassen2(tmp, Ac, Br, cutoff, nlimbs);
+        _nfixed_mat_mul_classical2(tmp, Ac, Br, nlimbs);
         _nfixed_mat_add(Cb, Cb, tmp, nlimbs);
         _nfixed_mat_clear(tmp, nlimbs);
         _nfixed_mat_window_clear(Ac, nlimbs);
