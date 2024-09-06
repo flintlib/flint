@@ -504,23 +504,17 @@ Scalar multiplication and division
     Adds ``poly`` multiplied by `c` to ``res``. The element `c` is assumed
     to be less than the modulus of ``poly``.
 
-.. function:: void _nmod_poly_make_monic(nn_ptr output, nn_srcptr input, slong len, nmod_t mod)
+.. function:: void _nmod_poly_make_monic(nn_ptr res, nn_srcptr poly, slong len, nmod_t mod)
 
-    Sets ``output`` to be the scalar multiple of ``input`` of
-    length ``len > 0`` that has leading coefficient one, if such a
-    polynomial exists. If the leading coefficient of ``input`` is not
-    invertible, ``output`` is set to the multiple of ``input`` whose
-    leading coefficient is the greatest common divisor of the leading
-    coefficient and the modulus of ``input``.
+    Requires that ``res`` and ``poly`` have length at least ``len``, with ``len
+    > 0``, and that ``poly[len-1]`` is invertible modulo ``mod.n``. Sets
+    ``res[i]`` to the modular product of `c` and ``poly[i]`` for `i` from `0`
+    to ``len-1``, where `c` is the inverse of ``poly[len-1]``.
 
-.. function:: void nmod_poly_make_monic(nmod_poly_t output, const nmod_poly_t input)
+.. function:: void nmod_poly_make_monic(nmod_poly_t res, const nmod_poly_t poly)
 
-    Sets ``output`` to be the scalar multiple of ``input`` with leading
-    coefficient one, if such a polynomial exists. If ``input`` is zero
-    an exception is raised. If the leading coefficient of ``input`` is not
-    invertible, ``output`` is set to the multiple of ``input`` whose
-    leading coefficient is the greatest common divisor of the leading
-    coefficient and the modulus of ``input``.
+    Sets ``res`` to be the scalar multiple of ``poly`` with leading coefficient
+    one. If ``poly`` is zero, an exception is raised.
 
 
 Bit packing and unpacking
@@ -1240,17 +1234,42 @@ Evaluation
 --------------------------------------------------------------------------------
 
 
+.. function:: ulong _nmod_poly_evaluate_nmod_precomp(nn_srcptr poly, slong len, ulong c, ulong c_precomp, nmod_t mod)
+
+    Evaluates ``poly`` at the value ``c`` and reduces modulo the given modulus
+    of ``poly``. The value ``c`` should be reduced modulo the modulus, and the
+    modulus must be less than `2^{\mathtt{FLINT\_BITS} - 1}`. The algorithm
+    used is Horner's method, with multiplications done via
+    :func:`n_mulmod_shoup` using the precomputed ``c_precomp`` obtained via
+    :func:`n_mulmod_precomp_shoup`.
+
+.. function:: ulong _nmod_poly_evaluate_nmod_precomp_lazy(nn_srcptr poly, slong len, ulong c, ulong c_precomp, nmod_t mod)
+
+    Evaluates ``poly`` at the value ``c`` and reduces modulo the given modulus
+    of ``poly``. The value ``c`` should be reduced modulo the modulus, and the
+    modulus `n` must satisfy `3n-2 < 2^{\mathtt{FLINT\_BITS}}` (this is `n \le
+    6148914691236517205` for 64 bits, and `n \le 1431655765` for 32 bits). The
+    algorithm used is Horner's method, with multiplications done as in
+    :func:`n_mulmod_shoup` using the precomputed ``c_precomp`` obtained via
+    :func:`n_mulmod_precomp_shoup`. Reductions modulo the modulus are delayed
+    to the very end of the computation.
+
 .. function:: ulong _nmod_poly_evaluate_nmod(nn_srcptr poly, slong len, ulong c, nmod_t mod)
 
-    Evaluates ``poly`` at the value ``c`` and reduces modulo the
-    given modulus of ``poly``. The value ``c`` should be reduced
-    modulo the modulus. The algorithm used is Horner's method.
+    Evaluates ``poly`` at the value ``c`` and reduces modulo the given modulus
+    of ``poly``. The value ``c`` should be reduced modulo the modulus. The
+    algorithm used is Horner's method, with multiplications done via
+    :func:`nmod_mul`.
 
 .. function:: ulong nmod_poly_evaluate_nmod(const nmod_poly_t poly, ulong c)
 
-    Evaluates ``poly`` at the value ``c`` and reduces modulo the
-    modulus of ``poly``. The value ``c`` should be reduced modulo
-    the modulus. The algorithm used is Horner's method.
+    Evaluates ``poly`` at the value ``c`` and reduces modulo the modulus of
+    ``poly``. The value ``c`` should be reduced modulo the modulus. The
+    algorithm used is Horner's method, with multiplications and additions done
+    differently depending on the modulus ``poly->mod`` and on the degree (calls
+    one of :func:`_nmod_poly_evaluate_nmod`,
+    :func:`_nmod_poly_evaluate_nmod_precomp`,
+    :func:`_nmod_poly_evaluate_nmod_precomp_lazy`).
 
 .. function:: void nmod_poly_evaluate_mat_horner(nmod_mat_t dest, const nmod_poly_t poly, const nmod_mat_t c)
 

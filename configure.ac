@@ -673,13 +673,13 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         param_path="x86_64/zen3"
         ;;
       zen4)
-        gcc_cflags_arch="-march=znver4 -march=znver3"
-        param_path="x86_64/zen3"
+        gcc_cflags_arch="-march=znver4"
+        param_path="x86_64/zen4"
         have_avx512="yes"
         ;;
       coreibwl | broadwell)
         gcc_cflags_arch="-march=broadwell"
-        param_path="x86_64/skylake"
+        param_path="x86_64/broadwell"
         ;;
       skylake)
         gcc_cflags_arch="-march=skylake"
@@ -701,12 +701,12 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         ;;
       icelake)
         gcc_cflags_arch="-march=icelake-client"
-        param_path="x86_64/skylake"
+        param_path="x86_64/icelake"
         have_avx512="yes"
         ;;
       icelake_server)
         gcc_cflags_arch="-march=icelake-server"
-        param_path="x86_64/skylake"
+        param_path="x86_64/icelake"
         have_avx512="yes"
         ;;
       rocketlake)
@@ -737,7 +737,7 @@ Please report at <https://github.com/flintlib/flint/issues/>])
         have_avx512="yes"
         ;;
       cometlake)
-        gcc_cflags_arch="-march=kabylake"
+        gcc_cflags_arch="-march=skylake"
         param_path="x86_64/skylake"
         ;;
       *)

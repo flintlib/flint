@@ -12,13 +12,12 @@
 #include "profiler.h"
 #include "ulong_extras.h"
 
-void sample(void * arg, ulong count)
+void sample_mulmod2(void * arg, ulong count)
 {
    ulong a, d, dinv;
    nn_ptr array = (nn_ptr) flint_malloc(1000*sizeof(ulong));
    ulong i;
    FLINT_TEST_INIT(state);
-
 
    for (i = 0; i < count; i++)
    {
@@ -45,13 +44,50 @@ void sample(void * arg, ulong count)
    FLINT_TEST_CLEAR(state);
 }
 
+void sample_mulmod(void * arg, ulong count)
+{
+   ulong a, d, dinv, norm;
+   nn_ptr array = (nn_ptr) flint_malloc(1000*sizeof(ulong));
+   ulong i;
+   FLINT_TEST_INIT(state);
+
+   for (i = 0; i < count; i++)
+   {
+      int j;
+      ulong bits = n_randint(state, 53) + 1;
+      d = n_randbits(state, bits);
+      a = n_randint(state, d);
+      dinv = n_preinvert_limb(d);
+      norm = flint_clz(d);
+
+      for (j = 0; j < 1000; j++)
+      {
+         array[j] = n_randint(state, d);
+      }
+
+      prof_start();
+      for (j = 0; j < 1000; j++)
+      {
+         array[j] = n_mulmod_preinv(a, array[j], d, dinv, norm);
+      }
+      prof_stop();
+   }
+
+   flint_free(array);
+   FLINT_TEST_CLEAR(state);
+}
+
+
 int main(void)
 {
    double min, max;
 
-   prof_repeat(&min, &max, sample, NULL);
+   prof_repeat(&min, &max, sample_mulmod2, NULL);
+   flint_printf("mulmod2_preinv min time is %.3f cycles, max time is %.3f cycles\n",
+           (min/(double)FLINT_CLOCK_SCALE_FACTOR)/1000, (max/(double)FLINT_CLOCK_SCALE_FACTOR)/1000);
 
-   flint_printf("mulmod2_precomp min time is %.3f cycles, max time is %.3f cycles\n",
+   prof_repeat(&min, &max, sample_mulmod, NULL);
+   flint_printf("mulmod_preinv min time is %.3f cycles, max time is %.3f cycles\n",
            (min/(double)FLINT_CLOCK_SCALE_FACTOR)/1000, (max/(double)FLINT_CLOCK_SCALE_FACTOR)/1000);
 
    return 0;

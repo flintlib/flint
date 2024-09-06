@@ -27,4 +27,11 @@
 #define FFT_N_NUM                                 19
 #define FFT_MULMOD_2EXPP1_CUTOFF                 128
 
+/* warning: set by default, likely not optimal         */
+/* if you have the relevant architecture, you can help */
+/* determine this by running profiling files:          */
+/*    nmod_vec's p-scalar_mul, p-scalar_addmul         */
+/*    nmod_mat's p-nmod_vec_mul                        */
+#define FLINT_MULMOD_SHOUP_THRESHOLD 10
+
 #endif
