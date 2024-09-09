@@ -13,7 +13,6 @@
 
 #include "t-add_ssaaaa.c"
 #include "t-add_sssaaaaaa.c"
-#include "t-add_ssssaaaaaaaa.c"
 #include "t-flint_clz.c"
 #include "t-flint_ctz.c"
 #include "t-io.c"
@@ -32,7 +31,6 @@ test_struct tests[] =
 {
     TEST_FUNCTION(add_ssaaaa),
     TEST_FUNCTION(add_sssaaaaaa),
-    TEST_FUNCTION(add_ssssaaaaaaaa),
     TEST_FUNCTION(flint_clz),
     TEST_FUNCTION(flint_ctz),
     TEST_FUNCTION(flint_fprintf),

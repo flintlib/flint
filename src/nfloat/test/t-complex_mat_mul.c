@@ -20,6 +20,12 @@ nfloat_complex_mat_mul_block1(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr
     return nfloat_complex_mat_mul_block(C, A, B, 2, ctx);
 }
 
+int
+nfloat_complex_mat_mul_fixed1(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+{
+    return nfloat_complex_mat_mul_fixed(C, A, B, 1000, ctx);
+}
+
 TEST_FUNCTION_START(complex_mat_mul, state)
 {
     gr_ctx_t ctx;
@@ -45,7 +51,7 @@ TEST_FUNCTION_START(complex_mat_mul, state)
             tol, state, 10, 4, ctx);
 
         gr_mat_test_approx_mul_max_norm(
-            (gr_method_mat_binary_op) nfloat_complex_mat_mul_waksman,
+            (gr_method_mat_binary_op) nfloat_complex_mat_mul_fixed1,
             tol, state, (prec <= 256) ? 100 : 1, 10, ctx);
 
         gr_mat_test_approx_mul_max_norm(
@@ -54,7 +60,7 @@ TEST_FUNCTION_START(complex_mat_mul, state)
                         (prec <= 256) ? 40 : 20, ctx);
 
         gr_mat_test_approx_mul_max_norm(
-            (gr_method_mat_binary_op) nfloat_complex_mat_mul_fixed_classical,
+            (gr_method_mat_binary_op) nfloat_complex_mat_mul_fixed1,
             tol, state, (prec <= 256) ? 10 : 1,
                         (prec <= 256) ? 40 : 20, ctx);
 

@@ -55,7 +55,7 @@ int main(void)
          flint_printf("Factor not found!\n");
    } while(1);
 
-   flint_rand_clear(state);
+   FLINT_TEST_CLEAR(state);
 
    fmpz_clear(n);
    fmpz_clear(p);

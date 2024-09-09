@@ -338,7 +338,7 @@ main(void)
         flint_printf(" %06wu", tab[10][i]);
     printf("\n");
 
-    FLINT_TEST_CLEANUP(state);
+    FLINT_TEST_CLEAR(state);
 
     flint_printf("factors found: %wd\n", omega);
     return 0;

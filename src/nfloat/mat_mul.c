@@ -11,273 +11,374 @@
 
 #include "mpn_extras.h"
 #include "gr.h"
+#include "gr_vec.h"
 #include "gr_mat.h"
 #include "gr_generic.h"
 #include "acf.h"
 #include "acb.h"
 #include "nfloat.h"
-
-#include "gr.h"
-#include "nfloat.h"
-#include "gr_vec.h"
-#include "gr_mat.h"
 #include "gr_special.h"
 #include "fmpz_mat.h"
 
+/* todo: check errors which depend on nlimbs */
 
-int
-nfloat_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx);
+#define TAB_INDEX(prec) (FLINT_MIN(prec, 4224) / 64)
 
+/* cutoffs for classical -> fixed */
+static short tab_classical_vs_fixed[] = {
+    14, /* prec = 0 */
+    14, /* prec = 64 */
+    16, /* prec = 128 */
+    5, /* prec = 192 */
+    7, /* prec = 256 */
+    3, /* prec = 320 */
+    3, /* prec = 384 */
+    3, /* prec = 448 */
+    3, /* prec = 512 */
+    10, /* prec = 576 */
+    5, /* prec = 640 */
+    4, /* prec = 704 */
+    4, /* prec = 768 */
+    4, /* prec = 832 */
+    4, /* prec = 896 */
+    4, /* prec = 960 */
+    4, /* prec = 1024 */
+    4, /* prec = 1088 */
+    3, /* prec = 1152 */
+    4, /* prec = 1216 */
+    4, /* prec = 1280 */
+    4, /* prec = 1344 */
+    4, /* prec = 1408 */
+    4, /* prec = 1472 */
+    4, /* prec = 1536 */
+    4, /* prec = 1600 */
+    3, /* prec = 1664 */
+    3, /* prec = 1728 */
+    3, /* prec = 1792 */
+    3, /* prec = 1856 */
+    3, /* prec = 1920 */
+    3, /* prec = 1984 */
+    3, /* prec = 2048 */
+    3, /* prec = 2112 */
+    3, /* prec = 2176 */
+    3, /* prec = 2240 */
+    3, /* prec = 2304 */
+    3, /* prec = 2368 */
+    3, /* prec = 2432 */
+    3, /* prec = 2496 */
+    3, /* prec = 2560 */
+    3, /* prec = 2624 */
+    3, /* prec = 2688 */
+    3, /* prec = 2752 */
+    3, /* prec = 2816 */
+    3, /* prec = 2880 */
+    3, /* prec = 2944 */
+    3, /* prec = 3008 */
+    3, /* prec = 3072 */
+    3, /* prec = 3136 */
+    3, /* prec = 3200 */
+    2, /* prec = 3264 */
+    3, /* prec = 3328 */
+    3, /* prec = 3392 */
+    3, /* prec = 3456 */
+    2, /* prec = 3520 */
+    2, /* prec = 3584 */
+    2, /* prec = 3648 */
+    3, /* prec = 3712 */
+    2, /* prec = 3776 */
+    2, /* prec = 3840 */
+    2, /* prec = 3904 */
+    2, /* prec = 3968 */
+    2, /* prec = 4032 */
+    3, /* prec = 4096 */
+    2, /* prec = 4160 */
+    2, /* prec = 4224 */
+};
 
-/* For printing */
-#include "arf.h"
+/* cutoffs for fixed -> block */
+static short tab_fixed_vs_block[] = {
+    50, /* prec = 0 */
+    50, /* prec = 64 */
+    94, /* prec = 128 */
+    124, /* prec = 192 */
+    86, /* prec = 256 */
+    196, /* prec = 320 */
+    215, /* prec = 384 */
+    236, /* prec = 448 */
+    236, /* prec = 512 */
+    196, /* prec = 576 */
+    215, /* prec = 640 */
+    196, /* prec = 704 */
+    196, /* prec = 768 */
+    196, /* prec = 832 */
+    179, /* prec = 896 */
+    179, /* prec = 960 */
+    179, /* prec = 1024 */
+    179, /* prec = 1088 */
+    149, /* prec = 1152 */
+    149, /* prec = 1216 */
+    163, /* prec = 1280 */
+    149, /* prec = 1344 */
+    149, /* prec = 1408 */
+    149, /* prec = 1472 */
+    149, /* prec = 1536 */
+    124, /* prec = 1600 */
+    124, /* prec = 1664 */
+    124, /* prec = 1728 */
+    124, /* prec = 1792 */
+    124, /* prec = 1856 */
+    124, /* prec = 1920 */
+    103, /* prec = 1984 */
+    124, /* prec = 2048 */
+    124, /* prec = 2112 */
+    124, /* prec = 2176 */
+    103, /* prec = 2240 */
+    103, /* prec = 2304 */
+    103, /* prec = 2368 */
+    103, /* prec = 2432 */
+    103, /* prec = 2496 */
+    103, /* prec = 2560 */
+    103, /* prec = 2624 */
+    94, /* prec = 2688 */
+    94, /* prec = 2752 */
+    94, /* prec = 2816 */
+    94, /* prec = 2880 */
+    86, /* prec = 2944 */
+    86, /* prec = 3008 */
+    86, /* prec = 3072 */
+    79, /* prec = 3136 */
+    79, /* prec = 3200 */
+    79, /* prec = 3264 */
+    79, /* prec = 3328 */
+    79, /* prec = 3392 */
+    79, /* prec = 3456 */
+    79, /* prec = 3520 */
+    79, /* prec = 3584 */
+    79, /* prec = 3648 */
+    79, /* prec = 3712 */
+    79, /* prec = 3776 */
+    79, /* prec = 3840 */
+    79, /* prec = 3904 */
+    79, /* prec = 3968 */
+    79, /* prec = 4032 */
+    79, /* prec = 4096 */
+    79, /* prec = 4160 */
+    79, /* prec = 4224 */
+};
 
-/* Arithmetic on fixed-point numbers in (-1,1) */
-/* x[0] stores the sign bit, x[1], ..., x[n] store the absolute value */
+static short tab_complex_classical_vs_fixed[] = {
+    6, /* prec = 0 */
+    6, /* prec = 64 */
+    6, /* prec = 128 */
+    3, /* prec = 192 */
+    4, /* prec = 256 */
+    2, /* prec = 320 */
+    2, /* prec = 384 */
+    2, /* prec = 448 */
+    2, /* prec = 512 */
+    6, /* prec = 576 */
+    2, /* prec = 640 */
+    2, /* prec = 704 */
+    2, /* prec = 768 */
+    2, /* prec = 832 */
+    2, /* prec = 896 */
+    2, /* prec = 960 */
+    2, /* prec = 1024 */
+    2, /* prec = 1088 */
+    2, /* prec = 1152 */
+    2, /* prec = 1216 */
+    2, /* prec = 1280 */
+    2, /* prec = 1344 */
+    2, /* prec = 1408 */
+    3, /* prec = 1472 */
+    3, /* prec = 1536 */
+    2, /* prec = 1600 */
+    2, /* prec = 1664 */
+    2, /* prec = 1728 */
+    2, /* prec = 1792 */
+    2, /* prec = 1856 */
+    2, /* prec = 1920 */
+    2, /* prec = 1984 */
+    2, /* prec = 2048 */
+    2, /* prec = 2112 */
+    2, /* prec = 2176 */
+    2, /* prec = 2240 */
+    2, /* prec = 2304 */
+    2, /* prec = 2368 */
+    2, /* prec = 2432 */
+    2, /* prec = 2496 */
+    2, /* prec = 2560 */
+    2, /* prec = 2624 */
+    2, /* prec = 2688 */
+    2, /* prec = 2752 */
+    2, /* prec = 2816 */
+    2, /* prec = 2880 */
+    2, /* prec = 2944 */
+    2, /* prec = 3008 */
+    2, /* prec = 3072 */
+    2, /* prec = 3136 */
+    2, /* prec = 3200 */
+    2, /* prec = 3264 */
+    2, /* prec = 3328 */
+    2, /* prec = 3392 */
+    2, /* prec = 3456 */
+    2, /* prec = 3520 */
+    2, /* prec = 3584 */
+    2, /* prec = 3648 */
+    2, /* prec = 3712 */
+    2, /* prec = 3776 */
+    2, /* prec = 3840 */
+    2, /* prec = 3904 */
+    2, /* prec = 3968 */
+    2, /* prec = 4032 */
+    2, /* prec = 4096 */
+    2, /* prec = 4160 */
+    2, /* prec = 4224 */
+};
 
-void
-nfixed_print(nn_srcptr x, slong nlimbs, slong exp)
-{
-    arf_t t;
-    arf_init(t);
-    _arf_set_mpn_fixed(t, x + 1, nlimbs, nlimbs, x[0], nlimbs * FLINT_BITS, ARF_RND_DOWN);
-    arf_mul_2exp_si(t, t, exp);
-    arf_printd(t, nlimbs * FLINT_BITS / 3.321928 + 1);
-    arf_clear(t);
-}
+static short tab_complex_fixed_vs_block[] = {
+    66, /* prec = 0 */
+    66, /* prec = 64 */
+    414, /* prec = 128 */
+    500, /* prec = 192 */
+    215, /* prec = 256 */
+    455, /* prec = 320 */
+    455, /* prec = 384 */
+    414, /* prec = 448 */
+    500, /* prec = 512 */
+    196, /* prec = 576 */
+    215, /* prec = 640 */
+    215, /* prec = 704 */
+    215, /* prec = 768 */
+    196, /* prec = 832 */
+    215, /* prec = 896 */
+    215, /* prec = 960 */
+    196, /* prec = 1024 */
+    196, /* prec = 1088 */
+    179, /* prec = 1152 */
+    163, /* prec = 1216 */
+    149, /* prec = 1280 */
+    163, /* prec = 1344 */
+    149, /* prec = 1408 */
+    149, /* prec = 1472 */
+    149, /* prec = 1536 */
+    124, /* prec = 1600 */
+    149, /* prec = 1664 */
+    124, /* prec = 1728 */
+    124, /* prec = 1792 */
+    124, /* prec = 1856 */
+    124, /* prec = 1920 */
+    103, /* prec = 1984 */
+    124, /* prec = 2048 */
+    124, /* prec = 2112 */
+    124, /* prec = 2176 */
+    103, /* prec = 2240 */
+    103, /* prec = 2304 */
+    103, /* prec = 2368 */
+    103, /* prec = 2432 */
+    103, /* prec = 2496 */
+    103, /* prec = 2560 */
+    103, /* prec = 2624 */
+    103, /* prec = 2688 */
+    103, /* prec = 2752 */
+    94, /* prec = 2816 */
+    103, /* prec = 2880 */
+    94, /* prec = 2944 */
+    94, /* prec = 3008 */
+    86, /* prec = 3072 */
+    86, /* prec = 3136 */
+    79, /* prec = 3200 */
+    86, /* prec = 3264 */
+    79, /* prec = 3328 */
+    79, /* prec = 3392 */
+    79, /* prec = 3456 */
+    79, /* prec = 3520 */
+    86, /* prec = 3584 */
+    79, /* prec = 3648 */
+    79, /* prec = 3712 */
+    79, /* prec = 3776 */
+    79, /* prec = 3840 */
+    79, /* prec = 3904 */
+    79, /* prec = 3968 */
+    79, /* prec = 4032 */
+    79, /* prec = 4096 */
+    79, /* prec = 4160 */
+    79, /* prec = 4224 */
+};
 
+#if 0
 
-/* todo: don't do this */
-#define NFIXED_MAX_NLIMBS (2 * NFLOAT_MAX_LIMBS)
+static short tab_complex_classical_vs_block[] = {
+    36, /* prec = 0 */
+    36, /* prec = 64 */
+    79, /* prec = 128 */
+    60, /* prec = 192 */
+    50, /* prec = 256 */
+    50, /* prec = 320 */
+    46, /* prec = 384 */
+    55, /* prec = 448 */
+    60, /* prec = 512 */
+    55, /* prec = 576 */
+    39, /* prec = 640 */
+    39, /* prec = 704 */
+    39, /* prec = 768 */
+    39, /* prec = 832 */
+    28, /* prec = 896 */
+    28, /* prec = 960 */
+    39, /* prec = 1024 */
+    24, /* prec = 1088 */
+    28, /* prec = 1152 */
+    24, /* prec = 1216 */
+    24, /* prec = 1280 */
+    16, /* prec = 1344 */
+    24, /* prec = 1408 */
+    16, /* prec = 1472 */
+    20, /* prec = 1536 */
+    16, /* prec = 1600 */
+    16, /* prec = 1664 */
+    16, /* prec = 1728 */
+    16, /* prec = 1792 */
+    16, /* prec = 1856 */
+    16, /* prec = 1920 */
+    16, /* prec = 1984 */
+    16, /* prec = 2048 */
+    16, /* prec = 2112 */
+    16, /* prec = 2176 */
+    16, /* prec = 2240 */
+    16, /* prec = 2304 */
+    16, /* prec = 2368 */
+    16, /* prec = 2432 */
+    16, /* prec = 2496 */
+    16, /* prec = 2560 */
+    16, /* prec = 2624 */
+    16, /* prec = 2688 */
+    16, /* prec = 2752 */
+    16, /* prec = 2816 */
+    16, /* prec = 2880 */
+    16, /* prec = 2944 */
+    16, /* prec = 3008 */
+    16, /* prec = 3072 */
+    16, /* prec = 3136 */
+    16, /* prec = 3200 */
+    16, /* prec = 3264 */
+    16, /* prec = 3328 */
+    16, /* prec = 3392 */
+    16, /* prec = 3456 */
+    16, /* prec = 3520 */
+    16, /* prec = 3584 */
+    16, /* prec = 3648 */
+    16, /* prec = 3712 */
+    16, /* prec = 3776 */
+    16, /* prec = 3840 */
+    16, /* prec = 3904 */
+    16, /* prec = 3968 */
+    16, /* prec = 4032 */
+    16, /* prec = 4096 */
+    16, /* prec = 4160 */
+    16, /* prec = 4224 */
+};
 
-FLINT_FORCE_INLINE
-void nfixed_add(nn_ptr res, nn_srcptr a, nn_srcptr b, slong nlimbs)
-{
-    int asgn, bsgn;
-    asgn = a[0];
-    bsgn = b[0];
-
-    if (asgn == bsgn)
-    {
-        res[0] = asgn;
-        mpn_add_n(res + 1, a + 1, b + 1, nlimbs);
-    }
-    else
-    {
-        res[0] = asgn ^ flint_mpn_signed_sub_n(res + 1, a + 1, b + 1, nlimbs);
-    }
-}
-
-FLINT_FORCE_INLINE
-void nfixed_sub(nn_ptr res, nn_srcptr a, nn_srcptr b, slong nlimbs)
-{
-    int asgn, bsgn;
-    asgn = a[0];
-    bsgn = b[0];
-
-    if (asgn != bsgn)
-    {
-        res[0] = asgn;
-        mpn_add_n(res + 1, a + 1, b + 1, nlimbs);
-    }
-    else
-    {
-        res[0] = asgn ^ flint_mpn_signed_sub_n(res + 1, a + 1, b + 1, nlimbs);
-    }
-}
-
-FLINT_FORCE_INLINE
-void _nfixed_vec_add(nn_ptr res, nn_srcptr a, nn_srcptr b, slong len, slong nlimbs)
-{
-    slong i;
-
-    for (i = 0; i < len; i++)
-        nfixed_add(res + i * (nlimbs + 1), a + i * (nlimbs + 1), b + i * (nlimbs + 1), nlimbs);
-}
-
-FLINT_FORCE_INLINE
-void _nfixed_vec_sub(nn_ptr res, nn_srcptr a, nn_srcptr b, slong len, slong nlimbs)
-{
-    slong i;
-
-    for (i = 0; i < len; i++)
-        nfixed_sub(res + i * (nlimbs + 1), a + i * (nlimbs + 1), b + i * (nlimbs + 1), nlimbs);
-}
-
-FLINT_FORCE_INLINE
-void nfixed_mul(nn_ptr res, nn_srcptr a, nn_srcptr b, slong nlimbs)
-{
-    int asgn, bsgn;
-    asgn = a[0];
-    bsgn = b[0];
-    res[0] = asgn ^ bsgn;
-    flint_mpn_mulhigh_n(res + 1, a + 1, b + 1, nlimbs);
-}
-
-FLINT_FORCE_INLINE
-void nfixed_sqr(nn_ptr res, nn_srcptr a, slong nlimbs)
-{
-    res[0] = 0;
-    flint_mpn_sqrhigh(res + 1, a + 1, nlimbs);
-}
-
-FLINT_FORCE_INLINE
-void nfixed_div2(nn_ptr res, nn_srcptr a, slong nlimbs)
-{
-    res[0] = a[0];
-    mpn_rshift(res + 1, a + 1, nlimbs, 1);
-}
-
-/* A is (m x n), B is (n x p), C is (m x p) */
-void
-_nfixed_mat_mul_classical(nn_ptr C, nn_srcptr A, nn_srcptr B, slong m, slong n, slong p, slong nlimbs)
-{
-    slong i, j, k;
-    nn_ptr t;
-    TMP_INIT;
-
-    TMP_START;
-
-    t = TMP_ALLOC((nlimbs + 1) * sizeof(ulong));
-
-#define A_ENTRY(i, j) ((A) + ((i) * n + (j)) * (nlimbs + 1))
-#define B_ENTRY(i, j) ((B) + ((i) * p + (j)) * (nlimbs + 1))
-#define C_ENTRY(i, j) ((C) + ((i) * p + (j)) * (nlimbs + 1))
-
-    for (i = 0; i < m; i++)
-    {
-        for (j = 0; j < p; j++)
-        {
-            nfixed_mul(C_ENTRY(i, j), A_ENTRY(i, 0), B_ENTRY(0, j), nlimbs);
-
-            for (k = 1; k < n; k++)
-            {
-                nfixed_mul(t, A_ENTRY(i, k), B_ENTRY(k, j), nlimbs);
-                nfixed_add(C_ENTRY(i, j), C_ENTRY(i, j), t, nlimbs);
-            }
-        }
-    }
-
-    TMP_END;
-
-#undef A_ENTRY
-#undef B_ENTRY
-#undef C_ENTRY
-}
-
-/* compute c += (a1 + b1) * (a2 + b2) */
-/* val0, val1, val2 are scratch space */
-FLINT_FORCE_INLINE void
-addmul_addadd(nn_ptr val0, nn_ptr val1, nn_ptr val2, nn_ptr c, nn_srcptr a1, nn_srcptr b1, nn_srcptr a2, nn_srcptr b2, slong nlimbs)
-{
-    nfixed_add(val1, a1, b1, nlimbs);
-    nfixed_add(val2, a2, b2, nlimbs);
-    nfixed_mul(val0, val1, val2, nlimbs);
-    nfixed_add(c, c, val0, nlimbs);
-}
-
-/* compute c += (a1 - b1) * (a2 - b2) */
-/* val0, val1, val2 are scratch space */
-FLINT_FORCE_INLINE void
-addmul_subsub(nn_ptr val0, nn_ptr val1, nn_ptr val2, nn_ptr c, nn_srcptr a1, nn_srcptr b1, nn_srcptr a2, nn_srcptr b2, slong nlimbs)
-{
-    nfixed_sub(val1, a1, b1, nlimbs);
-    nfixed_sub(val2, a2, b2, nlimbs);
-    nfixed_mul(val0, val1, val2, nlimbs);
-    nfixed_add(c, c, val0, nlimbs);
-}
-
-void
-_nfixed_mat_mul_waksman(nn_ptr C, nn_srcptr A, nn_srcptr B, slong m, slong n, slong p, slong nlimbs)
-{
-    slong l, j, k;
-
-    nn_ptr Ctmp = flint_calloc((nlimbs + 1) * ((p + m) + 5), sizeof(ulong));
-                                            /* Ctmp itself has m * p entries */
-    nn_ptr Crow = Ctmp;                     /* Crow has p entries */
-    nn_ptr Ccol = Crow + (nlimbs + 1) * p;  /* Ccol has m entries */
-    nn_ptr val0 = Ccol + (nlimbs + 1) * m;  /* val0 has room for 2 sums */
-    nn_ptr val1 = val0 + (nlimbs + 1) * 2;  /* val1 has room for 1 sum   */
-    nn_ptr val2 = val1 + (nlimbs + 1);      /* val2 has room for 1 sum   */
-    nn_ptr crow = val2 + (nlimbs + 1);      /* crow has room for 1 sum   */
-
-#define A_ENTRY(i, j) ((A) + ((i) * n + (j)) * (nlimbs + 1))
-#define B_ENTRY(i, j) ((B) + ((i) * p + (j)) * (nlimbs + 1))
-#define C_ENTRY(i, j) ((C) + ((i) * p + (j)) * (nlimbs + 1))
-
-#define Crow_ENTRY(ii) (Crow + (ii) * (nlimbs + 1))
-#define Ccol_ENTRY(ii) (Ccol + (ii) * (nlimbs + 1))
-
-    slong np = n >> 1;
-
-    for (j = 1; j <= np; j++)
-    {
-        slong j2 = (j << 1) - 1;
-
-        for (k = 0; k < p; k++)
-        {
-            addmul_addadd(val0, val1, val2, C_ENTRY(0, k), A_ENTRY(0, j2-1), B_ENTRY(j2, k), A_ENTRY(0, j2), B_ENTRY(j2-1, k), nlimbs);
-            addmul_subsub(val0, val1, val2, Crow_ENTRY(k), A_ENTRY(0, j2-1), B_ENTRY(j2, k), A_ENTRY(0, j2), B_ENTRY(j2-1, k), nlimbs);
-        }
-
-        for (l = 1; l < m; l++)
-        {
-            addmul_addadd(val0, val1, val2, C_ENTRY(l, 0), A_ENTRY(l, j2-1), B_ENTRY(j2, 0), A_ENTRY(l, j2), B_ENTRY(j2-1, 0), nlimbs);
-            addmul_subsub(val0, val1, val2, Ccol_ENTRY(l), A_ENTRY(l, j2-1), B_ENTRY(j2, 0), A_ENTRY(l, j2), B_ENTRY(j2-1, 0), nlimbs);
-        }
-
-        for (k = 1; k < p; k++)
-        {
-            for (l = 1; l < m; l++)
-            {
-                addmul_addadd(val0, val1, val2, C_ENTRY(l, k), A_ENTRY(l, j2-1), B_ENTRY(j2, k), A_ENTRY(l, j2), B_ENTRY(j2-1, k), nlimbs);
-            }
-        }
-    }
-
-    for (l = 1; l < m; l++)
-    {
-        nfixed_add(val1, Ccol_ENTRY(l), C_ENTRY(l, 0), nlimbs);
-        nfixed_div2(Ccol_ENTRY(l), val1, nlimbs);
-        nfixed_sub(C_ENTRY(l, 0), C_ENTRY(l, 0), Ccol_ENTRY(l), nlimbs);
-    }
-
-    nfixed_add(val1, Crow, C_ENTRY(0, 0), nlimbs);
-    nfixed_div2(val0, val1, nlimbs);
-    nfixed_sub(C_ENTRY(0, 0), C_ENTRY(0, 0), val0, nlimbs);
-
-    for (k = 1; k < p; k++)
-    {
-        nfixed_add(crow, Crow_ENTRY(k), C_ENTRY(0, k), nlimbs);
-        nfixed_div2(val1, crow, nlimbs);
-        nfixed_sub(C_ENTRY(0, k), C_ENTRY(0, k), val1, nlimbs);
-        nfixed_sub(crow, val1, val0, nlimbs);
-
-        for (l = 1; l < m; l++)
-        {
-            nfixed_sub(val2, C_ENTRY(l, k), crow, nlimbs);
-            nfixed_sub(C_ENTRY(l, k), val2, Ccol_ENTRY(l), nlimbs);
-        }
-    }
-
-    if ((n & 1) == 1)
-    {
-        for (l = 0; l < m; l++)
-        {
-            for (k = 0; k < p; k++)
-            {
-                nfixed_mul(val0, A_ENTRY(l, n-1), B_ENTRY(n-1, k), nlimbs);
-                nfixed_add(C_ENTRY(l, k), C_ENTRY(l, k), val0, nlimbs);
-            }
-        }
-    }
-
-    flint_free(Ctmp);
-
-#undef A_ENTRY
-#undef B_ENTRY
-#undef C_ENTRY
-}
+#endif
 
 FLINT_FORCE_INLINE void
 _nfloat_get_nfixed(nn_ptr res, nn_srcptr x, slong exp, slong fix_nlimbs, gr_ctx_t ctx)
@@ -329,7 +430,7 @@ _nfloat_mat_exp_range(slong * _Amin, slong * _Amax, const gr_mat_t A, gr_ctx_t c
 }
 
 int
-_nfloat_mat_mul_fixed_given_exp(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, slong Aexp, slong Bexp, slong fnlimbs, int waksman, gr_ctx_t ctx)
+_nfloat_mat_mul_fixed_given_exp(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, slong Aexp, slong Bexp, slong fnlimbs, gr_ctx_t ctx)
 {
     nn_ptr T, TA, TB, TC;
     slong i, j;
@@ -357,10 +458,7 @@ _nfloat_mat_mul_fixed_given_exp(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, 
         for (j = 0; j < p; j++)
             _nfloat_get_nfixed(TB + i * fdnlimbs * p + j * fdnlimbs, GR_MAT_ENTRY(B, i, j, sz), Bexp, fnlimbs, ctx);
 
-    if (waksman)
-        _nfixed_mat_mul_waksman(TC, TA, TB, m, n, p, fnlimbs);
-    else
-        _nfixed_mat_mul_classical(TC, TA, TB, m, n, p, fnlimbs);
+    _nfixed_mat_mul(TC, TA, TB, m, n, p, fnlimbs);
 
     for (i = 0; i < m; i++)
         for (j = 0; j < p; j++)
@@ -372,7 +470,7 @@ _nfloat_mat_mul_fixed_given_exp(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, 
 }
 
 int
-_nfloat_mat_mul_fixed(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, int waksman, slong max_extra_bits, gr_ctx_t ctx)
+nfloat_mat_mul_fixed(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, slong max_extra_bits, gr_ctx_t ctx)
 {
     slong Amax, Amin, Bmax, Bmin, Adelta, Bdelta, Aexp, Bexp;
     slong prec;
@@ -393,14 +491,14 @@ _nfloat_mat_mul_fixed(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, int waksma
     /* Currently, we don't handle zeros. (They pose no problem, but zero entries in
        the output may not be exact. To be done.) */
     if (Amin < NFLOAT_MIN_EXP || Bmin < NFLOAT_MIN_EXP)
-        return gr_mat_mul_classical(C, A, B, ctx);
+        return GR_UNABLE;
 
     Adelta = Amax - Amin;
     Bdelta = Bmax - Bmin;
 
     /* sanity check */
     if (Adelta > 10 * prec || Bdelta > 10 * prec)
-        return gr_mat_mul_classical(C, A, B, ctx);
+        return GR_UNABLE;
 
     /*
     To double check: for Waksman,
@@ -415,28 +513,15 @@ _nfloat_mat_mul_fixed(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, int waksma
     extra_bits = Adelta + Bdelta + pad_top + pad_bot;
 
     if (extra_bits >= max_extra_bits)
-        return gr_mat_mul_classical(C, A, B, ctx);
+        return GR_UNABLE;
 
     Aexp = Amax + pad_top;
     Bexp = Bmax + pad_top;
     fbits = prec + extra_bits;
     fnlimbs = (fbits + FLINT_BITS - 1) / FLINT_BITS;
 
-    return _nfloat_mat_mul_fixed_given_exp(C, A, B, Aexp, Bexp, fnlimbs, waksman, ctx);
+    return _nfloat_mat_mul_fixed_given_exp(C, A, B, Aexp, Bexp, fnlimbs, ctx);
 }
-
-int
-nfloat_mat_mul_fixed_classical(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
-{
-    return _nfloat_mat_mul_fixed(C, A, B, 0, 100000, ctx);
-}
-
-int
-nfloat_mat_mul_waksman(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
-{
-    return _nfloat_mat_mul_fixed(C, A, B, 1, 100000, ctx);
-}
-
 
 static void
 _nfloat_2exp_get_fmpz(fmpz_t res, nfloat_srcptr x, slong fixexp, gr_ctx_t ctx)
@@ -1170,83 +1255,6 @@ cleanup:
     return status;
 }
 
-/* Minimum precision for using fixed-point arithmetic */
-
-/* TODO: for *unsigned* matrices, there is a speedup already for
-   prec = 192. Consider inlining fixed-point additions/subtractions for
-   4 and 5 limbs to extend this to general matrices. */
-/* #define NFLOAT_MAT_MUL_FIXED_CUTOFF 192 */
-#define NFLOAT_MAT_MUL_FIXED_CUTOFF 320
-
-/* first cutoff:  classical -> fixed_classical
-   second cutoff: fixed_classical -> waksman */
-static const int nfloat_mat_mul_cutoff_tab[][2] = {
-    {0,  0},    /* prec = 0   */
-    {0,  0},    /* prec = 64  */
-    {0,  0},    /* prec = 128 */
-    {32, 32},   /* prec = 192 */
-    {8, 20},    /* prec = 256 */
-    {4, 15},    /* prec = 320 */
-    {3, 10},    /* prec = 384 */
-    {3, 10},    /* prec = 448 */
-    {3, 8},     /* prec = 512 */
-    {10, 10},   /* prec = 576 */
-    {4, 5},     /* prec = 640 */
-};
-
-/* {4, 4} from this point */
-#define NFLOAT_MAT_MUL_CUTOFF_4 704
-/* {3, 3} from this point */
-#define NFLOAT_MAT_MUL_CUTOFF_3 1600
-
-int
-nfloat_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
-{
-    slong cutoff1, cutoff2, dim;
-    int use_waksman = 0;
-    slong prec;
-    slong max_extra_prec;
-
-    slong m = A->r;
-    slong n = A->c;
-    slong p = B->c;
-
-    dim = FLINT_MIN(n, FLINT_MIN(m, p));
-
-    if (dim <= 2 || NFLOAT_CTX_HAS_INF_NAN(ctx))
-        return gr_mat_mul_classical(C, A, B, ctx);
-
-    if (dim <= 80)
-    {
-        prec = NFLOAT_CTX_PREC(ctx);
-
-        if (prec < NFLOAT_MAT_MUL_FIXED_CUTOFF)
-            return gr_mat_mul_classical(C, A, B, ctx);
-
-        if (prec >= NFLOAT_MAT_MUL_CUTOFF_3)
-            cutoff1 = cutoff2 = 3;
-        else if (prec >= NFLOAT_MAT_MUL_CUTOFF_4)
-            cutoff1 = cutoff2 = 4;
-        else
-        {
-            cutoff1 = nfloat_mat_mul_cutoff_tab[prec / 64][0];
-            cutoff2 = nfloat_mat_mul_cutoff_tab[prec / 64][1];
-        }
-
-        if (dim < cutoff1)
-            return gr_mat_mul_classical(C, A, B, ctx);
-
-        use_waksman = (dim >= cutoff2);
-        max_extra_prec = (prec < 768) ? 64 : prec / 4;
-
-        return _nfloat_mat_mul_fixed(C, A, B, use_waksman, max_extra_prec, ctx);
-    }
-    else
-    {
-        return nfloat_mat_mul_block(C, A, B, 70, ctx);
-    }
-}
-
 static void
 _nfloat_complex_mat_exp_range(slong * _Amin, slong * _Amax, const gr_mat_t A, gr_ctx_t ctx)
 {
@@ -1281,7 +1289,7 @@ _nfloat_complex_mat_exp_range(slong * _Amin, slong * _Amax, const gr_mat_t A, gr
 }
 
 int
-_nfloat_complex_mat_mul_fixed_given_exp(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, slong Aexp, slong Bexp, slong fnlimbs, int waksman, gr_ctx_t ctx)
+_nfloat_complex_mat_mul_fixed_given_exp(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, slong Aexp, slong Bexp, slong fnlimbs, gr_ctx_t ctx)
 {
     nn_ptr T, Aa, Ab, Ba, Bb, AaBa, AbBb, Cb;
     slong i, j;
@@ -1327,46 +1335,23 @@ _nfloat_complex_mat_mul_fixed_given_exp(gr_mat_t C, const gr_mat_t A, const gr_m
 
     /* (Aa Ba - Ab Bb) + ((Aa + Ab)(Ba + Bb) - Aa Ba - Ab Bb) i */
 
-    if (waksman)
-    {
-        _nfixed_mat_mul_waksman(AaBa, Aa, Ba, m, n, p, fnlimbs);
-        _nfixed_mat_mul_waksman(AbBb, Ab, Bb, m, n, p, fnlimbs);
-        _nfixed_vec_add(Aa, Aa, Ab, m * n, fnlimbs);
-        _nfixed_vec_add(Ba, Ba, Bb, n * p, fnlimbs);
-        _nfixed_mat_mul_waksman(Cb, Aa, Ba, m, n, p, fnlimbs);
-        _nfixed_vec_sub(Cb, Cb, AaBa, m * p, fnlimbs);
-        _nfixed_vec_sub(Cb, Cb, AbBb, m * p, fnlimbs);
+    _nfixed_mat_mul(AaBa, Aa, Ba, m, n, p, fnlimbs);
+    _nfixed_mat_mul(AbBb, Ab, Bb, m, n, p, fnlimbs);
+    _nfixed_vec_add(Aa, Aa, Ab, m * n, fnlimbs);
+    _nfixed_vec_add(Ba, Ba, Bb, n * p, fnlimbs);
+    _nfixed_mat_mul(Cb, Aa, Ba, m, n, p, fnlimbs);
+    _nfixed_vec_sub(Cb, Cb, AaBa, m * p, fnlimbs);
+    _nfixed_vec_sub(Cb, Cb, AbBb, m * p, fnlimbs);
 
-        for (i = 0; i < m; i++)
-            for (j = 0; j < p; j++)
-                _nfloat_set_nfixed(NFLOAT_COMPLEX_IM(GR_MAT_ENTRY(C, i, j, sz), ctx), Cb + i * fdnlimbs * p + j * fdnlimbs, Aexp + Bexp, fnlimbs, ctx);
+    for (i = 0; i < m; i++)
+        for (j = 0; j < p; j++)
+            _nfloat_set_nfixed(NFLOAT_COMPLEX_IM(GR_MAT_ENTRY(C, i, j, sz), ctx), Cb + i * fdnlimbs * p + j * fdnlimbs, Aexp + Bexp, fnlimbs, ctx);
 
-        _nfixed_vec_sub(Cb, AaBa, AbBb, m * p, fnlimbs);
+    _nfixed_vec_sub(Cb, AaBa, AbBb, m * p, fnlimbs);
 
-        for (i = 0; i < m; i++)
-            for (j = 0; j < p; j++)
-                _nfloat_set_nfixed(NFLOAT_COMPLEX_RE(GR_MAT_ENTRY(C, i, j, sz), ctx), Cb + i * fdnlimbs * p + j * fdnlimbs, Aexp + Bexp, fnlimbs, ctx);
-    }
-    else
-    {
-        _nfixed_mat_mul_classical(AaBa, Aa, Ba, m, n, p, fnlimbs);
-        _nfixed_mat_mul_classical(AbBb, Ab, Bb, m, n, p, fnlimbs);
-        _nfixed_vec_add(Aa, Aa, Ab, m * n, fnlimbs);
-        _nfixed_vec_add(Ba, Ba, Bb, n * p, fnlimbs);
-        _nfixed_mat_mul_classical(Cb, Aa, Ba, m, n, p, fnlimbs);
-        _nfixed_vec_sub(Cb, Cb, AaBa, m * p, fnlimbs);
-        _nfixed_vec_sub(Cb, Cb, AbBb, m * p, fnlimbs);
-
-        for (i = 0; i < m; i++)
-            for (j = 0; j < p; j++)
-                _nfloat_set_nfixed(NFLOAT_COMPLEX_IM(GR_MAT_ENTRY(C, i, j, sz), ctx), Cb + i * fdnlimbs * p + j * fdnlimbs, Aexp + Bexp, fnlimbs, ctx);
-
-        _nfixed_vec_sub(Cb, AaBa, AbBb, m * p, fnlimbs);
-
-        for (i = 0; i < m; i++)
-            for (j = 0; j < p; j++)
-                _nfloat_set_nfixed(NFLOAT_COMPLEX_RE(GR_MAT_ENTRY(C, i, j, sz), ctx), Cb + i * fdnlimbs * p + j * fdnlimbs, Aexp + Bexp, fnlimbs, ctx);
-    }
+    for (i = 0; i < m; i++)
+        for (j = 0; j < p; j++)
+            _nfloat_set_nfixed(NFLOAT_COMPLEX_RE(GR_MAT_ENTRY(C, i, j, sz), ctx), Cb + i * fdnlimbs * p + j * fdnlimbs, Aexp + Bexp, fnlimbs, ctx);
 
     flint_free(T);
 
@@ -1374,7 +1359,7 @@ _nfloat_complex_mat_mul_fixed_given_exp(gr_mat_t C, const gr_mat_t A, const gr_m
 }
 
 int
-_nfloat_complex_mat_mul_fixed(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, int waksman, slong max_extra_bits, gr_ctx_t ctx)
+nfloat_complex_mat_mul_fixed(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, slong max_extra_bits, gr_ctx_t ctx)
 {
     slong Amax, Amin, Bmax, Bmin, Adelta, Bdelta, Aexp, Bexp;
     slong prec;
@@ -1395,14 +1380,14 @@ _nfloat_complex_mat_mul_fixed(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, in
     /* Currently, we don't handle zeros. (They pose no problem, but zero entries in
        the output may not be exact. To be done.) */
     if (Amin < NFLOAT_MIN_EXP || Bmin < NFLOAT_MIN_EXP)
-        return gr_mat_mul_classical(C, A, B, ctx);
+        return GR_UNABLE;
 
     Adelta = Amax - Amin;
     Bdelta = Bmax - Bmin;
 
     /* sanity check */
     if (Adelta > 10 * prec || Bdelta > 10 * prec)
-        return gr_mat_mul_classical(C, A, B, ctx);
+        return GR_UNABLE;
 
     /*
     To double check: for Waksman,
@@ -1417,26 +1402,14 @@ _nfloat_complex_mat_mul_fixed(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, in
     extra_bits = Adelta + Bdelta + pad_top + pad_bot;
 
     if (extra_bits >= max_extra_bits)
-        return gr_mat_mul_classical(C, A, B, ctx);
+        return GR_UNABLE;
 
     Aexp = Amax + pad_top;
     Bexp = Bmax + pad_top;
     fbits = prec + extra_bits;
     fnlimbs = (fbits + FLINT_BITS - 1) / FLINT_BITS;
 
-    return _nfloat_complex_mat_mul_fixed_given_exp(C, A, B, Aexp, Bexp, fnlimbs, waksman, ctx);
-}
-
-int
-nfloat_complex_mat_mul_fixed_classical(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
-{
-    return _nfloat_complex_mat_mul_fixed(C, A, B, 0, 100000, ctx);
-}
-
-int
-nfloat_complex_mat_mul_waksman(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
-{
-    return _nfloat_complex_mat_mul_fixed(C, A, B, 1, 100000, ctx);
+    return _nfloat_complex_mat_mul_fixed_given_exp(C, A, B, Aexp, Bexp, fnlimbs, ctx);
 }
 
 FLINT_FORCE_INLINE slong
@@ -1698,14 +1671,60 @@ nfloat_complex_mat_mul_reorder(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, g
 }
 
 int
+nfloat_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
+{
+    slong cutoff1, cutoff2, cutoff3, dim;
+    slong prec;
+    slong max_extra_prec;
+    int status;
+
+    slong m = A->r;
+    slong n = A->c;
+    slong p = B->c;
+
+    dim = FLINT_MIN(n, FLINT_MIN(m, p));
+
+    if (dim <= 2 || NFLOAT_CTX_HAS_INF_NAN(ctx))
+        return gr_mat_mul_classical(C, A, B, ctx);
+
+    prec = NFLOAT_CTX_PREC(ctx);
+
+    /* classical -> fixed-point */
+    cutoff1 = tab_classical_vs_fixed[TAB_INDEX(prec)];
+
+    if (dim < cutoff1)
+        return gr_mat_mul_classical(C, A, B, ctx);
+
+    /* fixed-point -> block */
+    cutoff2 = tab_fixed_vs_block[TAB_INDEX(prec)];
+
+    /* classical -> block */
+    cutoff3 = 80;
+
+    if (dim < cutoff2)
+    {
+        max_extra_prec = (prec < 768) ? 64 : prec / 4;
+
+        status = nfloat_mat_mul_fixed(C, A, B, max_extra_prec, ctx);
+
+        if (status == GR_SUCCESS)
+            return status;
+
+        if (status == GR_UNABLE && dim < cutoff3)
+            return gr_mat_mul_classical(C, A, B, ctx);
+    }
+
+    return nfloat_mat_mul_block(C, A, B, cutoff3 - 10, ctx);
+}
+
+int
 nfloat_complex_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t ctx)
 {
-    slong dim;
-    slong block_cutoff;
-    int use_waksman = 0;
+    slong cutoff1, cutoff2, cutoff3, dim;
     slong prec;
     slong max_extra_prec;
     int A_real = 0, B_real = 0;
+    int status;
 
     slong m = A->r;
     slong n = A->c;
@@ -1727,45 +1746,45 @@ nfloat_complex_mat_mul(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t 
 
     prec = NFLOAT_CTX_PREC(ctx);
 
+    cutoff1 = tab_complex_classical_vs_fixed[TAB_INDEX(prec)];
+
+    if (dim < cutoff1)
+        return gr_mat_mul_classical(C, A, B, ctx);
+
+    cutoff2 = tab_complex_fixed_vs_block[TAB_INDEX(prec)];
+
+    /* classical -> block */
+    /* tuned for uniform matrices, so maybe not accurate in practice */
+    /* cutoff3 = tab_complex_classical_vs_block[TAB_INDEX(prec)]; */
     if (prec <= 256)
-        block_cutoff = 80;
+        cutoff3 = 80;
     else if (prec <= 512)
-        block_cutoff = 160;
+        cutoff3 = 160;
     else if (prec <= 3072)
-        block_cutoff = 100;
+        cutoff3 = 100;
     else
-        block_cutoff = 80;
+        cutoff3 = 80;
 
-    if (dim < block_cutoff)
+    if (dim < cutoff2)
     {
-        if (prec <= 128 || (prec <= 256 && n <= 4) || (prec == 576 && n <= 6))
-            return gr_mat_mul_classical(C, A, B, ctx);
-
-        if (prec <= 320)
-            use_waksman = 0;
-        else if (prec <= 448)
-            use_waksman = (dim >= 20);
-        else if (prec <= 640)
-            use_waksman = (dim >= 6);
-        else if (prec <= 1536)
-            use_waksman = (dim >= 4);
-        else
-            use_waksman = (dim >= 3);
-
         max_extra_prec = (prec < 768) ? 64 : prec / 4;
 
-        return _nfloat_complex_mat_mul_fixed(C, A, B, use_waksman, max_extra_prec, ctx);
+        status = nfloat_complex_mat_mul_fixed(C, A, B, max_extra_prec, ctx);
+
+        if (status == GR_SUCCESS)
+            return status;
+
+        if (status == GR_UNABLE && dim < cutoff3)
+            return gr_mat_mul_classical(C, A, B, ctx);
+    }
+
+    if (_nfloat_complex_mat_parts_are_well_scaled(A, ctx) &&
+        _nfloat_complex_mat_parts_are_well_scaled(B, ctx))
+    {
+        return nfloat_complex_mat_mul_block(C, A, B, cutoff3 - 10, ctx);
     }
     else
     {
-        if (_nfloat_complex_mat_parts_are_well_scaled(A, ctx) &&
-            _nfloat_complex_mat_parts_are_well_scaled(B, ctx))
-        {
-            return nfloat_complex_mat_mul_block(C, A, B, block_cutoff - 10, ctx);
-        }
-        else
-        {
-            return _nfloat_complex_mat_mul_reorder(C, A, B, A_real, B_real, ctx);
-        }
+        return _nfloat_complex_mat_mul_reorder(C, A, B, A_real, B_real, ctx);
     }
 }

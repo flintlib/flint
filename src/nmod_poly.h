@@ -482,6 +482,8 @@ void nmod_poly_integral(nmod_poly_t x_int, const nmod_poly_t x);
 /* Evaluation  ***************************************************************/
 
 ulong _nmod_poly_evaluate_nmod(nn_srcptr poly, slong len, ulong c, nmod_t mod);
+ulong _nmod_poly_evaluate_nmod_precomp(nn_srcptr poly, slong len, ulong c, ulong c_precomp, nmod_t mod);
+ulong _nmod_poly_evaluate_nmod_precomp_lazy(nn_srcptr poly, slong len, ulong c, ulong c_precomp, nmod_t mod);
 ulong nmod_poly_evaluate_nmod(const nmod_poly_t poly, ulong c);
 
 void _nmod_poly_evaluate_nmod_vec(nn_ptr ys, nn_srcptr coeffs, slong len, nn_srcptr xs, slong n, nmod_t mod);

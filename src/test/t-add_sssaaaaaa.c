@@ -12,17 +12,19 @@
 
 #include <gmp.h>
 #include "ulong_extras.h"
+#include "mpn_extras.h"
 #include "test_helpers.h"
 
 TEST_FUNCTION_START(add_sssaaaaaa, state)
 {
-    int i, j, result;
+    int i, j, n, result;
 
     for (i = 0; i < 100000 * flint_test_multiplier(); i++)
     {
-        ulong s[3], t[3], a[3], b[3];
+        ulong s[8], t[8], a[8], b[8];
+        int aliasing;
 
-        for (j = 0; j < 3; j++)
+        for (j = 0; j < 8; j++)
         {
             s[j] = n_randtest(state);
             t[j] = n_randtest(state);
@@ -30,21 +32,69 @@ TEST_FUNCTION_START(add_sssaaaaaa, state)
             b[j] = n_randtest(state);
         }
 
-        add_sssaaaaaa(s[2], s[1], s[0], a[2], a[1], a[0], b[2], b[1], b[0]);
+        aliasing = n_randint(state, 2);
 
-        mpn_add_n(t, a, b, 3);
+        for (n = 2; n < 8; n++)
+        {
+            if (aliasing)
+            {
+                for (j = 0; j < 8; j++)
+                    s[j] = a[j];
 
-        result = ((s[2] == t[2]) && (s[1] == t[1]) && (s[0] == t[0]));
-        if (!result)
-            TEST_FUNCTION_FAIL(
-                    "a[2] = %wu, a[1] = %wu, a[0] = %wu\n"
-                    "b[2] = %wu, b[1] = %wu, b[0] = %wu\n"
-                    "s[2] = %wu, s[1] = %wu, s[0] = %wu\n"
-                    "t[2] = %wu, t[1] = %wu, t[0] = %wu\n",
-                    a[2], a[1], a[0],
-                    b[2], b[1], b[0],
-                    s[2], s[1], s[0],
-                    t[2], t[1], t[0]);
+                if (n == 2)
+                    NN_ADD_2(s, s, b);
+                else if (n == 3)
+                    NN_ADD_3(s, s, b);
+                else if (n == 4)
+                    NN_ADD_4(s, s, b);
+                else if (n == 5)
+                    NN_ADD_5(s, s, b);
+                else if (n == 6)
+                    NN_ADD_6(s, s, b);
+                else if (n == 7)
+                    NN_ADD_7(s, s, b);
+                else if (n == 8)
+                    NN_ADD_8(s, s, b);
+            }
+            else
+            {
+                if (n == 2)
+                    NN_ADD_2(s, a, b);
+                else if (n == 3)
+                    NN_ADD_3(s, a, b);
+                else if (n == 4)
+                    NN_ADD_4(s, a, b);
+                else if (n == 5)
+                    NN_ADD_5(s, a, b);
+                else if (n == 6)
+                    NN_ADD_6(s, a, b);
+                else if (n == 7)
+                    NN_ADD_7(s, a, b);
+                else if (n == 8)
+                    NN_ADD_8(s, a, b);
+            }
+
+            mpn_add_n(t, a, b, n);
+
+            result = flint_mpn_equal_p(s, t, n);
+
+            if (!result)
+            {
+                TEST_FUNCTION_FAIL(
+                        "Aliasing: %d\n"
+                        "n = %d\n"
+                        "a = %{ulong*}\n"
+                        "b = %{ulong*}\n"
+                        "s = %{ulong*}\n"
+                        "t = %{ulong*}\n",
+                        aliasing,
+                        n,
+                        a, n,
+                        b, n,
+                        s, n,
+                        t, n);
+            }
+        }
     }
 
     TEST_FUNCTION_END(state);

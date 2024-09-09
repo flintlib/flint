@@ -1146,7 +1146,7 @@ static size_t __flint_poly_fprint(FILE * fs, const void * ip, flint_type_t type)
     }
     else
     {
-        /* fmpq_poly is special as it is an fmpz_poly with a denomitator
+        /* fmpq_poly is special as it is an fmpz_poly with a denominator
          * strapped onto it */
         const fmpz * coeffs = ((const fmpq_poly_struct *) ip)->coeffs;
         const fmpz * den = ((const fmpq_poly_struct *) ip)->den;

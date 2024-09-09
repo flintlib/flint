@@ -259,7 +259,7 @@ some notes on precomp:
 (1) the global twiddle factors need to be precomputed
 (2) when the big buffer for temp space needs to be reallocated, the accesses
     to the new space all incur page faults. These occur out of order in the
-    beginning of the calculation and contribute noticably to the run time.
+    beginning of the calculation and contribute noticeably to the run time.
 
 Therefore, there is a penalty for the first run of a computation of a certain
 size. If the data comes out like

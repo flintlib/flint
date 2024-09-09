@@ -41,7 +41,7 @@ TEST_TEMPLATE_FUNCTION_START(T, poly_set_nmod_poly, state)
 #endif
 
         nmod_poly_randtest(b, state, len);
-        p = n_randint(state, 10);
+        p = n_randint(state, b->mod.n);
 
         TEMPLATE(T, poly_set_nmod_poly)(a, b, ctx);
         TEMPLATE(T, set_ui)(r, p, ctx);

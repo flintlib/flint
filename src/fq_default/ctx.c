@@ -199,3 +199,43 @@ void fq_default_ctx_modulus(fmpz_mod_poly_t p, const fq_default_ctx_t ctx)
         fmpz_mod_poly_set(p, FQ_DEFAULT_CTX_FQ(ctx)->modulus, mod);
     }
 }
+
+/* Create a random fq_default_ctx picked from the five internal representations */
+void fq_default_ctx_init_randtest(fq_default_ctx_t ctx, flint_rand_t state)
+{
+    fmpz_t prime;
+    slong deg;
+
+    /* Select a context type [1,...,5] */
+    int ctx_type = 1 + n_randint(state, 5);
+    switch (ctx_type)
+    {
+        /* Create GF(p^d) for FQ_ZECH context */
+        case FQ_DEFAULT_FQ_ZECH:
+            fmpz_randprime(prime, state, 2 + n_randint(state, 3), 1);
+            deg = 1 + n_randint(state, 3);
+            break;
+        /* Create GF(p^d) for FQ_NMOD context */
+        case FQ_DEFAULT_FQ_NMOD:
+            fmpz_randprime(prime, state, 2 + n_randint(state, 29), 1);
+            deg = 1 + n_randint(state, 15);
+            break;
+        /* Create GF(p^d) for FQ context */
+        case FQ_DEFAULT_FQ:
+            fmpz_randprime(prime, state, 2 + n_randint(state, 62), 1);
+            deg = 1 + n_randint(state, 7);
+            break;
+        /* Create GF(p) for NMOD context */
+        case FQ_DEFAULT_NMOD:
+            fmpz_randprime(prime, state, 2 + n_randint(state, 29), 1);
+            deg = 1;
+            break;
+        /* Create GF(p) for FMPZ_MOD context */
+        case FQ_DEFAULT_FMPZ_MOD:
+            fmpz_randprime(prime, state, 2 + n_randint(state, 62), 1);
+            deg = 1;
+            break;
+        default: FLINT_UNREACHABLE;
+    }
+    fq_default_ctx_init_type(ctx, prime, deg, "a", ctx_type);
+}
