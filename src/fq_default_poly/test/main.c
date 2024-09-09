@@ -14,6 +14,7 @@
 #include "t-init.c"
 #include "t-inlines.c"
 #include "t-set_fmpz_poly.c"
+#include "t-evaluate_fq_default.c"
 
 /* Array of test functions ***************************************************/
 
@@ -21,7 +22,8 @@ test_struct tests[] =
 {
     TEST_FUNCTION(fq_default_poly_init),
     TEST_FUNCTION(fq_default_poly_inlines),
-    TEST_FUNCTION(fq_default_poly_set_fmpz_poly)
+    TEST_FUNCTION(fq_default_poly_set_fmpz_poly),
+    TEST_FUNCTION(fq_default_poly_evaluate)
 };
 
 /* main function *************************************************************/
