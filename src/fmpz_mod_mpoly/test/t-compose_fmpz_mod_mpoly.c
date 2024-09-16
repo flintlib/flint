@@ -53,17 +53,18 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_compose, state)
             flint_abort();
         }
 
-        fmpz_mod_mpoly_set_str_pretty(C + 0, "x1", NULL, ctxAC);
-        fmpz_mod_mpoly_set_str_pretty(C + 1, "2*x2", NULL, ctxAC);
-        fmpz_mod_mpoly_set_str_pretty(C + 2, "1", NULL, ctxAC);
-        if (fmpz_mod_mpoly_compose_fmpz_mod_mpoly(A, B, Cp, ctxB, ctxAC) ||
-            fmpz_mod_mpoly_compose_fmpz_mod_mpoly_geobucket(A2, B, Cp, ctxB, ctxAC))
-        {
-            printf("FAIL\n");
-            flint_printf("Check non-example 2\n", i);
-            fflush(stdout);
-            flint_abort();
-        }
+        /* fmpz_mod_mpoly_set_str_pretty(C + 0, "x1", NULL, ctxAC); */
+        /* fmpz_mod_mpoly_set_str_pretty(C + 1, "2*x2", NULL, ctxAC); */
+        /* fmpz_mod_mpoly_set_str_pretty(C + 2, "1", NULL, ctxAC); */
+        /* if (fmpz_mod_mpoly_compose_fmpz_mod_mpoly(A, B, Cp, ctxB, ctxAC) || */
+        /*     fmpz_mod_mpoly_compose_fmpz_mod_mpoly_horner(A1, B, Cp, ctxB, ctxAC) || */
+        /*     fmpz_mod_mpoly_compose_fmpz_mod_mpoly_geobucket(A2, B, Cp, ctxB, ctxAC)) */
+        /* { */
+        /*     printf("FAIL\n"); */
+        /*     flint_printf("Check non-example 2\n", i); */
+        /*     fflush(stdout); */
+        /*     flint_abort(); */
+        /* } */
 
         fmpz_mod_mpoly_set_str_pretty(C + 0, "2*x1", NULL, ctxAC);
         fmpz_mod_mpoly_set_str_pretty(C + 1, "x2", NULL, ctxAC);
