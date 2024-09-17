@@ -1,4 +1,5 @@
 /*
+    Copyright (C) 2007 Marco Bodrato
     Copyright (C) 2024 Fredrik Johansson
 
     This file is part of FLINT.
