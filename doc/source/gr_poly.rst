@@ -174,7 +174,8 @@ Arithmetic
               int gr_poly_mul_toom33(gr_poly_t res, const gr_poly_t poly1, const gr_poly_t poly2, gr_ctx_t ctx);
 
     Balanced Toom-3 multiplication with interpolation in five points,
-    using the Bodrato evaluation scheme. Assumes commutativity and division by 3.
+    using the Bodrato evaluation scheme. Assumes commutativity and that the ring
+    supports exact division by 2 and 3.
     Not optimized for squaring.
     The underscore method requires positive lengths and does not support aliasing.
     This function calls :func:`_gr_poly_mul` recursively rather than itself, so to get a recursive
