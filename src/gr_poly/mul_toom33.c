@@ -28,6 +28,7 @@ _gr_poly_mul_toom33(gr_ptr res, gr_srcptr f, slong flen, gr_srcptr g, slong glen
     gr_srcptr U0, U1, U2, V0, V1, V2;
     gr_ptr tmp, W0, W1, W2, W3, W4;
     slong m, U2len, V2len, U1len, V1len, U0len, V0len, rlen, len;
+    slong W4len;
     slong sz = ctx->sizeof_elem;
     slong alloc;
     int status = GR_SUCCESS;
@@ -101,14 +102,16 @@ _gr_poly_mul_toom33(gr_ptr res, gr_srcptr f, slong flen, gr_srcptr g, slong glen
     else
         status |= _gr_vec_zero(W0, 2 * m, ctx);
     /* W4 = U2 * V2 */
+    /* We compute this length accurately instead of zero-extending. */
     if (U2len > 0 && V2len > 0)
     {
+        W4len = U2len + V2len - 1;
         status |= _gr_poly_mul(W4, U2, U2len, V2, V2len, ctx);
-        status |= _gr_vec_zero(GR_ENTRY(W4, U2len + V2len - 1, sz), 2 * m - (U2len + V2len - 1), ctx);
     }
     else
-        status |= _gr_vec_zero(W4, 2 * m, ctx);
-
+    {
+        W4len = 0;
+    }
 
     /* toom42 variant */
     /* U = U3*x^(3m) + U2*x^(2m) + U1*x^m + U0 */
@@ -143,16 +146,16 @@ _gr_poly_mul_toom33(gr_ptr res, gr_srcptr f, slong flen, gr_srcptr g, slong glen
     /* W2 = ((W2 - W1) >> 1) - (W4 << 1) */
     status |= _gr_vec_sub(W2, W2, W1, len, ctx);
     status |= _gr_vec_mul_scalar_2exp_si(W2, W2, len, -1, ctx);
-    status |= _gr_vec_mul_scalar_2exp_si(res, W4, len, 1, ctx);
-    status |= _gr_vec_sub(W2, W2, res, len, ctx);
+    status |= _gr_vec_mul_scalar_2exp_si(res, W4, W4len, 1, ctx);
+    status |= _gr_vec_sub(W2, W2, res, W4len, ctx);
     /* W1 = W1 - W3 - W4 */
     status |= _gr_vec_sub(W1, W1, W3, len, ctx);
-    status |= _gr_vec_sub(W1, W1, W4, len, ctx);
+    status |= _gr_poly_sub(W1, W1, len, W4, W4len, ctx);
     /* W3 = W3 - W2 */
     status |= _gr_vec_sub(W3, W3, W2, len, ctx);
 
     /* Recomposition: */
-    /* W = W4 * x^(4m) + W2*x^(3m) + W1*x^(2m) + W3*x^m + W0 */
+    /* W = W4 * x^(4m) + W2*x^(3m) + W1*x^(2m) + W*x^m + W0 */
 
     rlen = flen + glen - 1;
     len = FLINT_MIN(rlen, m);
@@ -164,7 +167,7 @@ _gr_poly_mul_toom33(gr_ptr res, gr_srcptr f, slong flen, gr_srcptr g, slong glen
     len = FLINT_MIN(rlen - 3 * m, m);
     status |= _gr_vec_add(GR_ENTRY(res, 3 * m, sz), W2, GR_ENTRY(W1, m, sz), len, ctx);
     len = FLINT_MIN(rlen - 4 * m, m);
-    status |= _gr_vec_add(GR_ENTRY(res, 4 * m, sz), W4, GR_ENTRY(W2, m, sz), len, ctx);
+    status |= _gr_poly_add(GR_ENTRY(res, 4 * m, sz), W4, FLINT_MIN(W4len, len), GR_ENTRY(W2, m, sz), len, ctx);
     len = FLINT_MIN(rlen - 5 * m, m);
     status |= _gr_vec_set(GR_ENTRY(res, 5 * m, sz), GR_ENTRY(W4, m, sz), len, ctx);
 
