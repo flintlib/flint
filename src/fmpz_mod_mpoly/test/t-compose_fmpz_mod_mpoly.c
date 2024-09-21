@@ -23,7 +23,7 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_compose, state)
         fmpz_mod_mpoly_struct C[3];
         fmpz_mod_mpoly_ctx_t ctxAC, ctxB;
 
-        fmpz_init_set_ui(p, 100003);
+        fmpz_init_set_ui(p, 13);
         fmpz_mod_mpoly_ctx_init(ctxB, 3, ORD_LEX, p);
         fmpz_mod_mpoly_ctx_init(ctxAC, 2, ORD_LEX, p);
 
@@ -53,18 +53,18 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_compose, state)
             flint_abort();
         }
 
-        /* fmpz_mod_mpoly_set_str_pretty(C + 0, "x1", NULL, ctxAC); */
-        /* fmpz_mod_mpoly_set_str_pretty(C + 1, "2*x2", NULL, ctxAC); */
-        /* fmpz_mod_mpoly_set_str_pretty(C + 2, "1", NULL, ctxAC); */
-        /* if (fmpz_mod_mpoly_compose_fmpz_mod_mpoly(A, B, Cp, ctxB, ctxAC) || */
-        /*     fmpz_mod_mpoly_compose_fmpz_mod_mpoly_horner(A1, B, Cp, ctxB, ctxAC) || */
-        /*     fmpz_mod_mpoly_compose_fmpz_mod_mpoly_geobucket(A2, B, Cp, ctxB, ctxAC)) */
-        /* { */
-        /*     printf("FAIL\n"); */
-        /*     flint_printf("Check non-example 2\n", i); */
-        /*     fflush(stdout); */
-        /*     flint_abort(); */
-        /* } */
+        fmpz_mod_mpoly_set_str_pretty(C + 0, "x1", NULL, ctxAC);
+        fmpz_mod_mpoly_set_str_pretty(C + 1, "2*x2", NULL, ctxAC);
+        fmpz_mod_mpoly_set_str_pretty(C + 2, "1", NULL, ctxAC);
+        if (!fmpz_mod_mpoly_compose_fmpz_mod_mpoly(A, B, Cp, ctxB, ctxAC) ||
+            !fmpz_mod_mpoly_compose_fmpz_mod_mpoly_horner(A1, B, Cp, ctxB, ctxAC) ||
+            !fmpz_mod_mpoly_compose_fmpz_mod_mpoly_geobucket(A2, B, Cp, ctxB, ctxAC))
+        {
+            printf("FAIL\n");
+            flint_printf("Check non-example 2\n", i);
+            fflush(stdout);
+            flint_abort();
+        }
 
         fmpz_mod_mpoly_set_str_pretty(C + 0, "2*x1", NULL, ctxAC);
         fmpz_mod_mpoly_set_str_pretty(C + 1, "x2", NULL, ctxAC);
@@ -102,7 +102,7 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_compose, state)
         slong len;
         flint_bitcnt_t exp_bits;
 
-        fmpz_init_set_ui(p, 100003);
+        fmpz_init_set_ui(p, 13);
         fmpz_mod_mpoly_ctx_init_rand(ctxB, state, 20, p);
         fmpz_mod_mpoly_ctx_init_rand(ctxAC, state, 20, p);
 
@@ -197,7 +197,7 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_compose, state)
         fmpz_mod_mpoly_t f, g, g1, g2;
         fmpz_mod_mpoly_ctx_t ctx;
 
-        fmpz_init_set_ui(p, 100003);
+        fmpz_init_set_ui(p, 13);
         fmpz_mod_mpoly_ctx_init_rand(ctx, state, 10, p);
 
         vals1 = (fmpz_mod_mpoly_struct **) flint_malloc(ctx->minfo->nvars*
@@ -270,7 +270,7 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_compose, state)
         slong len1, len2;
         slong exp_bound1, exp_bound2;
 
-        fmpz_init_set_ui(p, 100003);
+        fmpz_init_set_ui(p, 13);
         fmpz_mod_mpoly_ctx_init_rand(ctx1, state, 6, p);
         fmpz_mod_mpoly_ctx_init_rand(ctx2, state, 6, p);
 
