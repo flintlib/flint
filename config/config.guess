@@ -946,7 +946,8 @@ main ()
           else if (model == 0x9a) cpu_64bit = 1, cpu_avx=1, modelstr = "alderlake";  /* Alder Lake P */
           else if (model == 0x9c) cpu_64bit = 1,            modelstr = "tremont";    /* Tremont */
           else if (model == 0x9e) cpu_64bit = 1, cpu_avx=1, modelstr = "kabylake";   /* Kaby Lake desktop */
-          else if (model == 0xa5) cpu_64bit = 1, cpu_avx=1, modelstr = "cometlake";  /* Comet Lake */
+          else if (model == 0xa5) cpu_64bit = 1, cpu_avx=1, modelstr = "cometlake";  /* Comet Lake S, H */
+          else if (model == 0xa6) cpu_64bit = 1, cpu_avx=1, modelstr = "cometlake";  /* Comet Lake U */
           else if (model == 0xa7) cpu_64bit = 1, cpu_avx=1, modelstr = "rocketlake"; /* Rocket Lake S */
           else if (model == 0xba) cpu_64bit = 1, cpu_avx=1, modelstr = "raptorlake"; /* Raptor Lake */
           else if (model == 0xb7) cpu_64bit = 1, cpu_avx=1, modelstr = "raptorlake"; /* Raptor Lake */
