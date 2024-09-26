@@ -149,7 +149,7 @@ int gr_mat_mul_strassen(gr_mat_t C, const gr_mat_t A, const gr_mat_t B, gr_ctx_t
     {
         gr_mat_t Ar, Br, Cr;
         gr_mat_window_init(Ar, A, 2 * anr, 0, ar, ac, ctx);
-        gr_mat_window_init(Cr, C, 2 * anr, 0, ar, bc, ctx);
+        gr_mat_window_init(Cr, C, 2 * anr, 0, ar, 2 * bnc, ctx);
 
         /* don't compute the overlapping entries twice */
         if (bc > 2 * bnc)
