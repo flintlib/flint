@@ -18,14 +18,16 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_compose, state)
 
     {
         fmpz_t p;
-        fmpz_mod_mpoly_t A, A1, A2, B;
+        slong nvarsAC = 2, nvarsB = 3;
+        fmpz_mod_mpoly_t A, A1, A2, B, B2;
         fmpz_mod_mpoly_struct * Cp[3];
         fmpz_mod_mpoly_struct C[3];
         fmpz_mod_mpoly_ctx_t ctxAC, ctxB;
+        slong * c;
 
         fmpz_init_set_ui(p, 13);
-        fmpz_mod_mpoly_ctx_init(ctxB, 3, ORD_LEX, p);
-        fmpz_mod_mpoly_ctx_init(ctxAC, 2, ORD_LEX, p);
+        fmpz_mod_mpoly_ctx_init(ctxB, nvarsB, ORD_LEX, p);
+        fmpz_mod_mpoly_ctx_init(ctxAC, nvarsAC, ORD_LEX, p);
 
         fmpz_mod_mpoly_init(B, ctxB);
         fmpz_mod_mpoly_init(A, ctxAC);
@@ -62,7 +64,30 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_compose, state)
         if (!fmpz_mod_mpoly_compose_fmpz_mod_mpoly(A, B, Cp, ctxB, ctxAC) ||
             !fmpz_mod_mpoly_compose_fmpz_mod_mpoly_horner(A1, B, Cp, ctxB, ctxAC) ||
             !fmpz_mod_mpoly_compose_fmpz_mod_mpoly_geobucket(A2, B, Cp, ctxB, ctxAC))
-            TEST_FUNCTION_FAIL("Check example 3\n");
+            TEST_FUNCTION_FAIL("Check example nvarsB\n");
+
+        /* Aliased generator composition */
+        c = (slong *) flint_malloc(nvarsB*sizeof(slong));
+        fmpz_mod_mpoly_init(B2, ctxB);
+        fmpz_mod_mpoly_set(B2, B, ctxB);
+        for (i = 0; i < nvarsB; i++)
+            c[i] = i;
+
+        fmpz_mod_mpoly_compose_fmpz_mod_mpoly_gen(B2, B2, c, ctxB, ctxB);
+        if (!fmpz_mod_mpoly_equal(B, B2, ctxB))
+            TEST_FUNCTION_FAIL("Check composition with aliased generators\n");
+
+        /* Reverse the generators, twice */
+        for (i = 0; i < nvarsB; i++)
+            c[i] = nvarsB - i - 1;
+
+        fmpz_mod_mpoly_compose_fmpz_mod_mpoly_gen(B2, B2, c, ctxB, ctxB);
+        if (fmpz_mod_mpoly_equal(B, B2, ctxB))
+            TEST_FUNCTION_FAIL("Check composition with reversed aliased generators\n");
+
+        fmpz_mod_mpoly_compose_fmpz_mod_mpoly_gen(B2, B2, c, ctxB, ctxB);
+        if (!fmpz_mod_mpoly_equal(B, B2, ctxB))
+            TEST_FUNCTION_FAIL("Check composition with un-reversed aliased generators\n");
 
         fmpz_mod_mpoly_clear(B, ctxB);
         fmpz_mod_mpoly_clear(A, ctxAC);
