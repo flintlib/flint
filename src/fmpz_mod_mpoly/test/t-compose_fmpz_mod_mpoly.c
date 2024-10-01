@@ -64,7 +64,7 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_compose, state)
         if (!fmpz_mod_mpoly_compose_fmpz_mod_mpoly(A, B, Cp, ctxB, ctxAC) ||
             !fmpz_mod_mpoly_compose_fmpz_mod_mpoly_horner(A1, B, Cp, ctxB, ctxAC) ||
             !fmpz_mod_mpoly_compose_fmpz_mod_mpoly_geobucket(A2, B, Cp, ctxB, ctxAC))
-            TEST_FUNCTION_FAIL("Check example nvarsB\n");
+            TEST_FUNCTION_FAIL("Check example 3\n");
 
         /* Aliased generator composition */
         c = (slong *) flint_malloc(nvarsB*sizeof(slong));
