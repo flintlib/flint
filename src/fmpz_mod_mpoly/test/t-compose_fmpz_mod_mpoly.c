@@ -25,7 +25,8 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_compose, state)
         fmpz_mod_mpoly_ctx_t ctxAC, ctxB;
         slong * c;
 
-        fmpz_init_set_ui(p, 13);
+        fmpz_init(p);
+        fmpz_randprime(p, state, n_randint(state, 15) + 2, 0);
         fmpz_mod_mpoly_ctx_init(ctxB, nvarsB, ORD_LEX, p);
         fmpz_mod_mpoly_ctx_init(ctxAC, nvarsAC, ORD_LEX, p);
 
@@ -132,7 +133,8 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_compose, state)
         slong len;
         flint_bitcnt_t exp_bits;
 
-        fmpz_init_set_ui(p, 13);
+        fmpz_init(p);
+        fmpz_randprime(p, state, n_randint(state, 15) + 2, 0);
         fmpz_mod_mpoly_ctx_init_rand(ctxB, state, 20, p);
         fmpz_mod_mpoly_ctx_init_rand(ctxAC, state, 20, p);
 
@@ -217,7 +219,8 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_compose, state)
         fmpz_mod_mpoly_t f, g, g1, g2;
         fmpz_mod_mpoly_ctx_t ctx;
 
-        fmpz_init_set_ui(p, 13);
+        fmpz_init(p);
+        fmpz_randprime(p, state, n_randint(state, 15) + 2, 0);
         fmpz_mod_mpoly_ctx_init_rand(ctx, state, 10, p);
 
         vals1 = (fmpz_mod_mpoly_struct **) flint_malloc(ctx->minfo->nvars*
@@ -280,7 +283,8 @@ TEST_FUNCTION_START(fmpz_mod_mpoly_compose, state)
         slong len1, len2;
         slong exp_bound1, exp_bound2;
 
-        fmpz_init_set_ui(p, 13);
+        fmpz_init(p);
+        fmpz_randprime(p, state, n_randint(state, 15) + 2, 0);
         fmpz_mod_mpoly_ctx_init_rand(ctx1, state, 6, p);
         fmpz_mod_mpoly_ctx_init_rand(ctx2, state, 6, p);
 

@@ -24,9 +24,12 @@ TEST_FUNCTION_START(nmod_mpoly_compose_nmod_mpoly, state)
         nmod_mpoly_struct C[3];
         nmod_mpoly_ctx_t ctxAC, ctxB;
         slong * c;
+        ulong modulus;
 
-        nmod_mpoly_ctx_init(ctxB, nvarsB, ORD_LEX, 13);
-        nmod_mpoly_ctx_init(ctxAC, nvarsAC, ORD_LEX, 13);
+        modulus = n_randint(state, FLINT_BITS - 1) + 1;
+        modulus = n_randbits(state, modulus);
+        nmod_mpoly_ctx_init(ctxB, nvarsB, ORD_LEX, modulus);
+        nmod_mpoly_ctx_init(ctxAC, nvarsAC, ORD_LEX, modulus);
 
         nmod_mpoly_init(B, ctxB);
         nmod_mpoly_init(A, ctxAC);
