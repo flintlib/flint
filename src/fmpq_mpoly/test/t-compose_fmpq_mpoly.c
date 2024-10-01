@@ -44,19 +44,19 @@ TEST_FUNCTION_START(fmpq_mpoly_compose_fmpq_mpoly, state)
         fmpq_mpoly_set_str_pretty(C + 1, "x1 - x2", NULL, ctxAC);
         fmpq_mpoly_set_str_pretty(C + 2, "1", NULL, ctxAC);
         if (fmpq_mpoly_compose_fmpq_mpoly(A, B, Cp, ctxB, ctxAC))
-            TEST_FUNCTION_FAIL("Check non-example 1\n", i);
+            TEST_FUNCTION_FAIL("Check non-example 1\n");
 
         fmpq_mpoly_set_str_pretty(C + 0, "x1", NULL, ctxAC);
         fmpq_mpoly_set_str_pretty(C + 1, "2*x2", NULL, ctxAC);
         fmpq_mpoly_set_str_pretty(C + 2, "1", NULL, ctxAC);
         if (fmpq_mpoly_compose_fmpq_mpoly(A, B, Cp, ctxB, ctxAC))
-            TEST_FUNCTION_FAIL("Check non-example 2\n", i);
+            TEST_FUNCTION_FAIL("Check non-example 2\n");
 
         fmpq_mpoly_set_str_pretty(C + 0, "2*x1", NULL, ctxAC);
         fmpq_mpoly_set_str_pretty(C + 1, "x2", NULL, ctxAC);
         fmpq_mpoly_set_str_pretty(C + 2, "1", NULL, ctxAC);
         if (!fmpq_mpoly_compose_fmpq_mpoly(A, B, Cp, ctxB, ctxAC))
-            TEST_FUNCTION_FAIL("Check example 3\n", i);
+            TEST_FUNCTION_FAIL("Check example 3\n");
 
         /* Aliased generator composition */
         c = (slong *) flint_malloc(nvarsB*sizeof(slong));

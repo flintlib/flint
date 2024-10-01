@@ -47,7 +47,7 @@ TEST_FUNCTION_START(nmod_mpoly_compose_nmod_mpoly, state)
         if (nmod_mpoly_compose_nmod_mpoly(A, B, Cp, ctxB, ctxAC) ||
             nmod_mpoly_compose_nmod_mpoly_horner(A1, B, Cp, ctxB, ctxAC) ||
             nmod_mpoly_compose_nmod_mpoly_geobucket(A2, B, Cp, ctxB, ctxAC))
-            TEST_FUNCTION_FAIL("Check non-example 1\n", i);
+            TEST_FUNCTION_FAIL("Check non-example 1\n");
 
         nmod_mpoly_set_str_pretty(C + 0, "x1", NULL, ctxAC);
         nmod_mpoly_set_str_pretty(C + 1, "2*x2", NULL, ctxAC);
@@ -55,7 +55,7 @@ TEST_FUNCTION_START(nmod_mpoly_compose_nmod_mpoly, state)
         if (!nmod_mpoly_compose_nmod_mpoly(A, B, Cp, ctxB, ctxAC) ||
             !nmod_mpoly_compose_nmod_mpoly_horner(A1, B, Cp, ctxB, ctxAC) ||
             !nmod_mpoly_compose_nmod_mpoly_geobucket(A2, B, Cp, ctxB, ctxAC))
-            TEST_FUNCTION_FAIL("Check non-example 2\n", i);
+            TEST_FUNCTION_FAIL("Check non-example 2\n");
 
         nmod_mpoly_set_str_pretty(C + 0, "2*x1", NULL, ctxAC);
         nmod_mpoly_set_str_pretty(C + 1, "x2", NULL, ctxAC);
@@ -63,7 +63,7 @@ TEST_FUNCTION_START(nmod_mpoly_compose_nmod_mpoly, state)
         if (!nmod_mpoly_compose_nmod_mpoly(A, B, Cp, ctxB, ctxAC) ||
             !nmod_mpoly_compose_nmod_mpoly_horner(A1, B, Cp, ctxB, ctxAC) ||
             !nmod_mpoly_compose_nmod_mpoly_geobucket(A2, B, Cp, ctxB, ctxAC))
-            TEST_FUNCTION_FAIL("Check example 3\n", i);
+            TEST_FUNCTION_FAIL("Check example 3\n");
 
         /* Aliased generator composition */
         c = (slong *) flint_malloc(nvarsB*sizeof(slong));
