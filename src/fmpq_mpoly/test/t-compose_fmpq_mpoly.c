@@ -44,34 +44,20 @@ TEST_FUNCTION_START(fmpq_mpoly_compose_fmpq_mpoly, state)
         fmpq_mpoly_set_str_pretty(C + 1, "x1 - x2", NULL, ctxAC);
         fmpq_mpoly_set_str_pretty(C + 2, "1", NULL, ctxAC);
         if (fmpq_mpoly_compose_fmpq_mpoly(A, B, Cp, ctxB, ctxAC))
-        {
-            printf("FAIL\n");
-            flint_printf("Check non-example 1\n", i);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("Check non-example 1\n", i);
 
         fmpq_mpoly_set_str_pretty(C + 0, "x1", NULL, ctxAC);
         fmpq_mpoly_set_str_pretty(C + 1, "2*x2", NULL, ctxAC);
         fmpq_mpoly_set_str_pretty(C + 2, "1", NULL, ctxAC);
         if (fmpq_mpoly_compose_fmpq_mpoly(A, B, Cp, ctxB, ctxAC))
-        {
-            printf("FAIL\n");
-            flint_printf("Check non-example 2\n", i);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("Check non-example 2\n", i);
 
         fmpq_mpoly_set_str_pretty(C + 0, "2*x1", NULL, ctxAC);
         fmpq_mpoly_set_str_pretty(C + 1, "x2", NULL, ctxAC);
         fmpq_mpoly_set_str_pretty(C + 2, "1", NULL, ctxAC);
         if (!fmpq_mpoly_compose_fmpq_mpoly(A, B, Cp, ctxB, ctxAC))
-        {
-            printf("FAIL\n");
-            flint_printf("Check example 3\n", i);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("Check example 3\n", i);
+
         /* Aliased generator composition */
         c = (slong *) flint_malloc(nvarsB*sizeof(slong));
         fmpq_mpoly_init(B1, ctxB);
@@ -169,22 +155,12 @@ TEST_FUNCTION_START(fmpq_mpoly_compose_fmpq_mpoly, state)
             fmpq_mpoly_compose_fmpq_mpoly_gen(A, B, c, ctxB, ctxAC);
 
             if (!fmpq_mpoly_compose_fmpq_mpoly(A1, B, C, ctxB, ctxAC))
-            {
-                printf("FAIL\n");
-                flint_printf("Check composition success with generators\n"
-                                                     "i: %wd, j: %wd\n", i, j);
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL("Check composition success with generators\n"
+                                   "i: %wd, j: %wd\n", i, j);
 
             if (!fmpq_mpoly_equal(A, A1, ctxAC))
-            {
-                printf("FAIL\n");
-                flint_printf("Check composition with generators\n"
-                                                     "i: %wd, j: %wd\n", i, j);
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL("Check composition with generators\n"
+                                   "i: %wd, j: %wd\n", i, j);
 
             fmpq_mpoly_assert_canonical(A, ctxAC);
             fmpq_mpoly_assert_canonical(A1, ctxAC);
@@ -234,20 +210,10 @@ TEST_FUNCTION_START(fmpq_mpoly_compose_fmpq_mpoly, state)
         coeff_bits = n_randint(state, 100) + 1;
         fmpq_mpoly_randtest_bits(f, state, len1, coeff_bits, exp_bits, ctx);
         if (!fmpq_mpoly_compose_fmpq_mpoly(g, f, vals1, ctx, ctx))
-        {
-            printf("FAIL\n");
-            flint_printf("Check composition success\ni: %wd\n", i);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("Check composition success\ni: %wd\n", i);
 
         if (!fmpq_mpoly_equal(f, g, ctx))
-        {
-            printf("FAIL\n");
-            flint_printf("Check composition with identity\ni: %wd\n", i);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("Check composition with identity\ni: %wd\n", i);
 
         fmpq_mpoly_clear(g, ctx);
         fmpq_mpoly_clear(f, ctx);
@@ -314,41 +280,21 @@ TEST_FUNCTION_START(fmpq_mpoly_compose_fmpq_mpoly, state)
             vals3[v] = (fmpq *) flint_malloc(sizeof(fmpq));
             fmpq_init(vals3[v]);
             if (!fmpq_mpoly_evaluate_all_fmpq(vals3[v], vals1[v], vals2, ctx2))
-            {
-                printf("FAIL\n");
-                flint_printf("Check evaluation success\ni: %wd\n", i);
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL("Check evaluation success\ni: %wd\n", i);
         }
 
         fmpq_mpoly_randtest_bound(f, state, len1, coeff_bits, exp_bound1, ctx1);
 
         if (!fmpq_mpoly_compose_fmpq_mpoly(g, f, vals1, ctx1, ctx2))
-        {
-            printf("FAIL\n");
-            flint_printf("Check composition success\ni: %wd\n", i);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("Check composition success\ni: %wd\n", i);
         fmpq_mpoly_assert_canonical(g, ctx2);
 
         if (!fmpq_mpoly_evaluate_all_fmpq(fe, f, vals3, ctx1) ||
             !fmpq_mpoly_evaluate_all_fmpq(ge, g, vals2, ctx2))
-        {
-            printf("FAIL\n");
-            flint_printf("Check evaluation success\ni: %wd\n", i);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("Check evaluation success\ni: %wd\n", i);
 
         if (!fmpq_equal(fe, ge))
-        {
-            printf("FAIL\n");
-            flint_printf("Check composition and evalall commute\ni: %wd\n", i);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("Check composition and evalall commute\ni: %wd\n", i);
 
         for (v = 0; v < nvars1; v++)
         {

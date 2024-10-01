@@ -47,12 +47,7 @@ TEST_FUNCTION_START(nmod_mpoly_compose_nmod_mpoly, state)
         if (nmod_mpoly_compose_nmod_mpoly(A, B, Cp, ctxB, ctxAC) ||
             nmod_mpoly_compose_nmod_mpoly_horner(A1, B, Cp, ctxB, ctxAC) ||
             nmod_mpoly_compose_nmod_mpoly_geobucket(A2, B, Cp, ctxB, ctxAC))
-        {
-            printf("FAIL\n");
-            flint_printf("Check non-example 1\n", i);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("Check non-example 1\n", i);
 
         nmod_mpoly_set_str_pretty(C + 0, "x1", NULL, ctxAC);
         nmod_mpoly_set_str_pretty(C + 1, "2*x2", NULL, ctxAC);
@@ -60,12 +55,7 @@ TEST_FUNCTION_START(nmod_mpoly_compose_nmod_mpoly, state)
         if (!nmod_mpoly_compose_nmod_mpoly(A, B, Cp, ctxB, ctxAC) ||
             !nmod_mpoly_compose_nmod_mpoly_horner(A1, B, Cp, ctxB, ctxAC) ||
             !nmod_mpoly_compose_nmod_mpoly_geobucket(A2, B, Cp, ctxB, ctxAC))
-        {
-            printf("FAIL\n");
-            flint_printf("Check non-example 2\n", i);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("Check non-example 2\n", i);
 
         nmod_mpoly_set_str_pretty(C + 0, "2*x1", NULL, ctxAC);
         nmod_mpoly_set_str_pretty(C + 1, "x2", NULL, ctxAC);
@@ -73,12 +63,7 @@ TEST_FUNCTION_START(nmod_mpoly_compose_nmod_mpoly, state)
         if (!nmod_mpoly_compose_nmod_mpoly(A, B, Cp, ctxB, ctxAC) ||
             !nmod_mpoly_compose_nmod_mpoly_horner(A1, B, Cp, ctxB, ctxAC) ||
             !nmod_mpoly_compose_nmod_mpoly_geobucket(A2, B, Cp, ctxB, ctxAC))
-        {
-            printf("FAIL\n");
-            flint_printf("Check example 3\n", i);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("Check example 3\n", i);
 
         /* Aliased generator composition */
         c = (slong *) flint_malloc(nvarsB*sizeof(slong));
@@ -190,24 +175,14 @@ TEST_FUNCTION_START(nmod_mpoly_compose_nmod_mpoly, state)
             if (!nmod_mpoly_compose_nmod_mpoly(A1, B, C, ctxB, ctxAC) ||
                 !nmod_mpoly_compose_nmod_mpoly_horner(A2, B, C, ctxB, ctxAC) ||
                 !nmod_mpoly_compose_nmod_mpoly_geobucket(A3, B, C, ctxB, ctxAC))
-            {
-                printf("FAIL\n");
-                flint_printf("Check composition success with generators\n"
-                                                     "i: %wd, j: %wd\n", i, j);
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL("Check composition success with generators\n"
+                                   "i: %wd, j: %wd\n", i, j);
 
             if (!nmod_mpoly_equal(A, A1, ctxAC) ||
                 !nmod_mpoly_equal(A, A2, ctxAC) ||
                 !nmod_mpoly_equal(A, A3, ctxAC))
-            {
-                printf("FAIL\n");
-                flint_printf("Check composition with generators\n"
-                                                     "i: %wd, j: %wd\n", i, j);
-                fflush(stdout);
-                flint_abort();
-            }
+                TEST_FUNCTION_FAIL("Check composition with generators\n"
+                                   "i: %wd, j: %wd\n", i, j);
 
             nmod_mpoly_assert_canonical(A, ctxAC);
             nmod_mpoly_assert_canonical(A1, ctxAC);
@@ -270,24 +245,14 @@ TEST_FUNCTION_START(nmod_mpoly_compose_nmod_mpoly, state)
             !nmod_mpoly_compose_nmod_mpoly_geobucket(g2, f, vals1, ctx, ctx) ||
             !nmod_mpoly_equal(g, g1, ctx) ||
             !nmod_mpoly_equal(g, g2, ctx))
-        {
-            printf("FAIL\n");
-            flint_printf("Check composition success\ni: %wd\n", i);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("Check composition success\ni: %wd\n", i);
 
         nmod_mpoly_assert_canonical(g, ctx);
         nmod_mpoly_assert_canonical(g1, ctx);
         nmod_mpoly_assert_canonical(g2, ctx);
 
         if (!nmod_mpoly_equal(f, g, ctx))
-        {
-            printf("FAIL\n");
-            flint_printf("Check composition with identity\ni: %wd\n", i);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("Check composition with identity\ni: %wd\n", i);
 
         nmod_mpoly_clear(f, ctx);
         nmod_mpoly_clear(g, ctx);
@@ -364,12 +329,7 @@ TEST_FUNCTION_START(nmod_mpoly_compose_nmod_mpoly, state)
             !nmod_mpoly_compose_nmod_mpoly_geobucket(g2, f, vals1, ctx1, ctx2) ||
             !nmod_mpoly_equal(g, g1, ctx2) ||
             !nmod_mpoly_equal(g, g2, ctx2))
-        {
-            printf("FAIL\n");
-            flint_printf("Check composition success\ni: %wd\n", i);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("Check composition success\ni: %wd\n", i);
 
         nmod_mpoly_assert_canonical(g, ctx2);
         nmod_mpoly_assert_canonical(g1, ctx2);
@@ -379,12 +339,7 @@ TEST_FUNCTION_START(nmod_mpoly_compose_nmod_mpoly, state)
         ge = nmod_mpoly_evaluate_all_ui(g, vals2, ctx2);
 
         if (fe != ge)
-        {
-            printf("FAIL\n");
-            flint_printf("Check composition and evalall commute\ni: %wd\n", i);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("Check composition and evalall commute\ni: %wd\n", i);
 
         for (v = 0; v < nvars1; v++)
         {
@@ -449,12 +404,7 @@ TEST_FUNCTION_START(nmod_mpoly_compose_nmod_mpoly, state)
         if (!nmod_mpoly_compose_nmod_mpoly(g, f, vals1, ctx1, ctx2) ||
             !nmod_mpoly_compose_nmod_mpoly_geobucket(g1, f, vals1, ctx1, ctx2) ||
             !nmod_mpoly_compose_nmod_mpoly_horner(g2, f, vals1, ctx1, ctx2))
-        {
-            printf("FAIL\n");
-            flint_printf("Check composition success\ni: %wd\n", i);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("Check composition success\ni: %wd\n", i);
 
         nmod_mpoly_assert_canonical(g, ctx2);
         nmod_mpoly_assert_canonical(g1, ctx2);
@@ -462,12 +412,7 @@ TEST_FUNCTION_START(nmod_mpoly_compose_nmod_mpoly, state)
 
         if (!nmod_mpoly_is_ui(g, ctx2) ||
             nmod_mpoly_get_ui(g, ctx2) != nmod_mpoly_evaluate_all_ui(f, vals2, ctx1))
-        {
-            printf("FAIL\n");
-            flint_printf("Check composition with constants matches evalall\ni: %wd\n", i);
-            fflush(stdout);
-            flint_abort();
-        }
+            TEST_FUNCTION_FAIL("Check composition with constants matches evalall\ni: %wd\n", i);
 
         for (v = 0; v < nvars1; v++)
         {
