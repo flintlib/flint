@@ -17,13 +17,15 @@ TEST_FUNCTION_START(fmpq_mpoly_compose_fmpq_mpoly, state)
     slong i, j, v;
 
     {
-        fmpq_mpoly_t A, A1, A2, B;
+        slong nvarsAC = 2, nvarsB = 3;
+        fmpq_mpoly_t A, A1, A2, B, B1;
         fmpq_mpoly_struct * Cp[3];
         fmpq_mpoly_struct C[3];
         fmpq_mpoly_ctx_t ctxAC, ctxB;
+        slong * c;
 
-        fmpq_mpoly_ctx_init(ctxB, 3, ORD_LEX);
-        fmpq_mpoly_ctx_init(ctxAC, 2, ORD_LEX);
+        fmpq_mpoly_ctx_init(ctxB, nvarsB, ORD_LEX);
+        fmpq_mpoly_ctx_init(ctxAC, nvarsAC, ORD_LEX);
 
         fmpq_mpoly_init(B, ctxB);
         fmpq_mpoly_init(A, ctxAC);
@@ -70,11 +72,47 @@ TEST_FUNCTION_START(fmpq_mpoly_compose_fmpq_mpoly, state)
             fflush(stdout);
             flint_abort();
         }
+        /* Aliased generator composition */
+        c = (slong *) flint_malloc(nvarsB*sizeof(slong));
+        fmpq_mpoly_init(B1, ctxB);
+        fmpq_mpoly_set(B1, B, ctxB);
+        for (i = 0; i < nvarsB; i++)
+            c[i] = i;
+
+        fmpq_mpoly_compose_fmpq_mpoly_gen(B1, B1, c, ctxB, ctxB);
+        if (!fmpq_mpoly_equal(B, B1, ctxB))
+            TEST_FUNCTION_FAIL("Check composition with aliased generators\n");
+
+        /* Reverse the generators, twice */
+        for (i = 0; i < nvarsB; i++)
+            c[i] = nvarsB - i - 1;
+
+        fmpq_mpoly_compose_fmpq_mpoly_gen(B1, B1, c, ctxB, ctxB);
+        if (fmpq_mpoly_equal(B, B1, ctxB))
+            TEST_FUNCTION_FAIL("Check composition with reversed aliased generators\n");
+
+        fmpq_mpoly_compose_fmpq_mpoly_gen(B1, B1, c, ctxB, ctxB);
+        if (!fmpq_mpoly_equal(B, B1, ctxB))
+            TEST_FUNCTION_FAIL("Check composition with un-reversed aliased generators\n");
+
+        /* Composition with zero polys */
+        fmpq_mpoly_zero(B1, ctxB);
+
+        fmpq_mpoly_compose_fmpq_mpoly_gen(A, B1, c, ctxB, ctxAC);
+        if (!fmpq_mpoly_is_zero(B1, ctxB))
+            TEST_FUNCTION_FAIL("Check composition with generators of zero poly\n");
+
+        fmpq_mpoly_set_str_pretty(C + 0, "2*x1", NULL, ctxAC);
+        fmpq_mpoly_set_str_pretty(C + 1, "x2", NULL, ctxAC);
+        fmpq_mpoly_set_str_pretty(C + 2, "1", NULL, ctxAC);
+        if (!fmpq_mpoly_compose_fmpq_mpoly(A, B1, Cp, ctxB, ctxAC))
+            TEST_FUNCTION_FAIL("Check example 4\n");
+
+        if (!fmpq_mpoly_is_zero(A, ctxAC))
+            TEST_FUNCTION_FAIL("Check composition with zero poly\n");
 
         fmpq_mpoly_clear(B, ctxB);
         fmpq_mpoly_clear(A, ctxAC);
-        fmpq_mpoly_clear(A1, ctxAC);
-        fmpq_mpoly_clear(A2, ctxAC);
         for (i = 0; i < 3; i++)
             fmpq_mpoly_clear(C + i, ctxAC);
 

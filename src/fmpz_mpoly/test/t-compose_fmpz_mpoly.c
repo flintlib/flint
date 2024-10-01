@@ -17,13 +17,15 @@ TEST_FUNCTION_START(fmpz_mpoly_compose_fmpz_mpoly, state)
     slong i, j, v;
 
     {
-        fmpz_mpoly_t A, A1, A2, B;
+        slong nvarsAC = 2, nvarsB = 3;
+        fmpz_mpoly_t A, A1, A2, B, B1;
         fmpz_mpoly_struct * Cp[3];
         fmpz_mpoly_struct C[3];
         fmpz_mpoly_ctx_t ctxAC, ctxB;
+        slong * c;
 
-        fmpz_mpoly_ctx_init(ctxB, 3, ORD_LEX);
-        fmpz_mpoly_ctx_init(ctxAC, 2, ORD_LEX);
+        fmpz_mpoly_ctx_init(ctxB, nvarsB, ORD_LEX);
+        fmpz_mpoly_ctx_init(ctxAC, nvarsAC, ORD_LEX);
 
         fmpz_mpoly_init(B, ctxB);
         fmpz_mpoly_init(A, ctxAC);
@@ -76,6 +78,49 @@ TEST_FUNCTION_START(fmpz_mpoly_compose_fmpz_mpoly, state)
             fflush(stdout);
             flint_abort();
         }
+
+        /* Aliased generator composition */
+        c = (slong *) flint_malloc(nvarsB*sizeof(slong));
+        fmpz_mpoly_init(B1, ctxB);
+        fmpz_mpoly_set(B1, B, ctxB);
+        for (i = 0; i < nvarsB; i++)
+            c[i] = i;
+
+        fmpz_mpoly_compose_fmpz_mpoly_gen(B1, B1, c, ctxB, ctxB);
+        if (!fmpz_mpoly_equal(B, B1, ctxB))
+            TEST_FUNCTION_FAIL("Check composition with aliased generators\n");
+
+        /* Reverse the generators, twice */
+        for (i = 0; i < nvarsB; i++)
+            c[i] = nvarsB - i - 1;
+
+        fmpz_mpoly_compose_fmpz_mpoly_gen(B1, B1, c, ctxB, ctxB);
+        if (fmpz_mpoly_equal(B, B1, ctxB))
+            TEST_FUNCTION_FAIL("Check composition with reversed aliased generators\n");
+
+        fmpz_mpoly_compose_fmpz_mpoly_gen(B1, B1, c, ctxB, ctxB);
+        if (!fmpz_mpoly_equal(B, B1, ctxB))
+            TEST_FUNCTION_FAIL("Check composition with un-reversed aliased generators\n");
+
+        /* Composition with zero polys */
+        fmpz_mpoly_zero(B1, ctxB);
+
+        fmpz_mpoly_compose_fmpz_mpoly_gen(A, B1, c, ctxB, ctxAC);
+        if (!fmpz_mpoly_is_zero(B1, ctxB))
+            TEST_FUNCTION_FAIL("Check composition with generators of zero poly\n");
+
+        fmpz_mpoly_set_str_pretty(C + 0, "2*x1", NULL, ctxAC);
+        fmpz_mpoly_set_str_pretty(C + 1, "x2", NULL, ctxAC);
+        fmpz_mpoly_set_str_pretty(C + 2, "1", NULL, ctxAC);
+        if (!fmpz_mpoly_compose_fmpz_mpoly(A, B1, Cp, ctxB, ctxAC) ||
+            !fmpz_mpoly_compose_fmpz_mpoly_horner(A1, B1, Cp, ctxB, ctxAC) ||
+            !fmpz_mpoly_compose_fmpz_mpoly_geobucket(A2, B1, Cp, ctxB, ctxAC))
+            TEST_FUNCTION_FAIL("Check example 4\n");
+
+        if (!fmpz_mpoly_is_zero(A, ctxAC) ||
+            !fmpz_mpoly_is_zero(A1, ctxAC) ||
+            !fmpz_mpoly_is_zero(A2, ctxAC))
+            TEST_FUNCTION_FAIL("Check composition with zero poly\n");
 
         fmpz_mpoly_clear(B, ctxB);
         fmpz_mpoly_clear(A, ctxAC);

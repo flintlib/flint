@@ -18,13 +18,15 @@ TEST_FUNCTION_START(nmod_mpoly_compose_nmod_mpoly, state)
     slong i, j, v;
 
     {
-        nmod_mpoly_t A, A1, A2, B;
+        slong nvarsAC = 2, nvarsB = 3;
+        nmod_mpoly_t A, A1, A2, B, B1;
         nmod_mpoly_struct * Cp[3];
         nmod_mpoly_struct C[3];
         nmod_mpoly_ctx_t ctxAC, ctxB;
+        slong * c;
 
-        nmod_mpoly_ctx_init(ctxB, 3, ORD_LEX, 13);
-        nmod_mpoly_ctx_init(ctxAC, 2, ORD_LEX, 13);
+        nmod_mpoly_ctx_init(ctxB, nvarsB, ORD_LEX, 13);
+        nmod_mpoly_ctx_init(ctxAC, nvarsAC, ORD_LEX, 13);
 
         nmod_mpoly_init(B, ctxB);
         nmod_mpoly_init(A, ctxAC);
@@ -77,6 +79,49 @@ TEST_FUNCTION_START(nmod_mpoly_compose_nmod_mpoly, state)
             fflush(stdout);
             flint_abort();
         }
+
+        /* Aliased generator composition */
+        c = (slong *) flint_malloc(nvarsB*sizeof(slong));
+        nmod_mpoly_init(B1, ctxB);
+        nmod_mpoly_set(B1, B, ctxB);
+        for (i = 0; i < nvarsB; i++)
+            c[i] = i;
+
+        nmod_mpoly_compose_nmod_mpoly_gen(B1, B1, c, ctxB, ctxB);
+        if (!nmod_mpoly_equal(B, B1, ctxB))
+            TEST_FUNCTION_FAIL("Check composition with aliased generators\n");
+
+        /* Reverse the generators, twice */
+        for (i = 0; i < nvarsB; i++)
+            c[i] = nvarsB - i - 1;
+
+        nmod_mpoly_compose_nmod_mpoly_gen(B1, B1, c, ctxB, ctxB);
+        if (nmod_mpoly_equal(B, B1, ctxB))
+            TEST_FUNCTION_FAIL("Check composition with reversed aliased generators\n");
+
+        nmod_mpoly_compose_nmod_mpoly_gen(B1, B1, c, ctxB, ctxB);
+        if (!nmod_mpoly_equal(B, B1, ctxB))
+            TEST_FUNCTION_FAIL("Check composition with un-reversed aliased generators\n");
+
+        /* Composition with zero polys */
+        nmod_mpoly_zero(B1, ctxB);
+
+        nmod_mpoly_compose_nmod_mpoly_gen(A, B1, c, ctxB, ctxAC);
+        if (!nmod_mpoly_is_zero(B1, ctxB))
+            TEST_FUNCTION_FAIL("Check composition with generators of zero poly\n");
+
+        nmod_mpoly_set_str_pretty(C + 0, "2*x1", NULL, ctxAC);
+        nmod_mpoly_set_str_pretty(C + 1, "x2", NULL, ctxAC);
+        nmod_mpoly_set_str_pretty(C + 2, "1", NULL, ctxAC);
+        if (!nmod_mpoly_compose_nmod_mpoly(A, B1, Cp, ctxB, ctxAC) ||
+            !nmod_mpoly_compose_nmod_mpoly_horner(A1, B1, Cp, ctxB, ctxAC) ||
+            !nmod_mpoly_compose_nmod_mpoly_geobucket(A2, B1, Cp, ctxB, ctxAC))
+            TEST_FUNCTION_FAIL("Check example 4\n");
+
+        if (!nmod_mpoly_is_zero(A, ctxAC) ||
+            !nmod_mpoly_is_zero(A1, ctxAC) ||
+            !nmod_mpoly_is_zero(A2, ctxAC))
+            TEST_FUNCTION_FAIL("Check composition with zero poly\n");
 
         nmod_mpoly_clear(B, ctxB);
         nmod_mpoly_clear(A, ctxAC);
