@@ -477,7 +477,7 @@ FLINT_FORCE_INLINE vec4n CAT6(vec4n, permute, i0, i1, i2, i3)(vec4n a) { \
 DEFINE_IT(3,2,1,0)
 #undef DEFINE_IT
 
-FLINT_FORCE_INLINE vec4n vec4n_zero()
+FLINT_FORCE_INLINE vec4n vec4n_zero(void)
 {
     return _mm256_setzero_si256();
 }
