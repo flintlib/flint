@@ -71,6 +71,33 @@ AS_VAR_POPDEF([CACHEVAR])dnl
 ])dnl AX_CXX_CHECK_COMPILE_FLAGS
 
 
+# Copyright (C) 1996-2024 Free Software Foundation, Inc.
+
+# This file is free software; the Free Software Foundation
+# gives unlimited permission to copy and/or distribute it,
+# with or without modifications, as long as this notice is preserved.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY, to the extent permitted by law; without
+# even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE.
+
+
+dnl  AX_INIT
+dnl  -----------------------
+dnl  If build directory is not source directory, this function throws if source
+dnl  directory is already configured.
+
+AC_DEFUN([AX_INIT],[dnl
+if test "$ac_abs_confdir" != "`pwd`"; dnl ' Vim syntax fix
+then
+  if test -f $srcdir/config.status;
+  then
+    AC_MSG_ERROR([source directory already configured; run "make distclean" there first])
+  fi
+fi])
+
+
 dnl Copyright (C) 2024 Albin Ahlbäck
 dnl
 dnl This file is part of FLINT.
@@ -477,8 +504,9 @@ gmp_tmpconfigm4i=cnfm4i.tmp
 gmp_tmpconfigm4p=cnfm4p.tmp
 rm -f $gmp_tmpconfigm4 $gmp_tmpconfigm4i $gmp_tmpconfigm4p
 
-# All CPUs use asm-defs.m4
-echo ["include][(\`src/mpn_extras/asm-defs.m4')"] >>$gmp_tmpconfigm4i
+echo ["define(<CONFIG_TOP_SRCDIR>,<\`$srcdir'>)"] >>$gmp_tmpconfigm4
+
+echo ["include][(CONFIG_TOP_SRCDIR\`/src/mpn_extras/asm-defs.m4')"] >>$gmp_tmpconfigm4i
 ])
 
 
@@ -535,7 +563,7 @@ dnl
 
 AC_DEFUN([GMP_INCLUDE_MPN],
 [AC_REQUIRE([GMP_INIT])
-echo ["include(\`$1')"] >> $gmp_tmpconfigm4i
+echo ["include][(CONFIG_TOP_SRCDIR\`/$1')"] >>$gmp_tmpconfigm4i
 ])
 
 
