@@ -160,7 +160,7 @@ void flint_parallel_do(do_func_t f, void * args, slong n, int thread_limit, int 
     }
     else
     {
-        slong i, num_threads, num_workers;
+        slong num_threads, num_workers;
         thread_pool_handle * handles;
 
         num_workers = flint_request_threads(&handles, thread_limit);
