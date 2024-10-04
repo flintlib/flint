@@ -827,6 +827,9 @@ dnl AC_PROG_CC
 
 AC_PROG_MKDIR_P
 
+FLINT_CC_IS_GCC
+FLINT_CC_IS_CLANG
+
 ################################################################################
 # environment variables
 ################################################################################
@@ -1178,9 +1181,12 @@ AC_CHECK_FUNCS([aligned_alloc _aligned_malloc])
 # CFLAGS
 ################################################################################
 
-# The following is needed for Clang to check for unknown options.
-FLINT_CLANG([AX_CHECK_COMPILE_FLAG([-Werror=unknown-warning-option],
-                                   [CFLAGS="-Werror=unknown-warning-option"])])
+if test "$flint_cv_cc_is_clang" = "yes";
+then
+    # The following is needed for Clang to check for unknown options.
+    AX_CHECK_COMPILE_FLAG([-Werror=unknown-warning-option],
+                          [CFLAGS="-Werror=unknown-warning-option"])
+fi
 
 if test "$enable_coverage" = "yes";
 then
@@ -1322,6 +1328,7 @@ then
     GMP_PROG_M4
     GMP_PATH_NM
 
+    CL_ASM_NOEXECSTACK
     GMP_ASM_TEXT
     GMP_ASM_DATA
     GMP_ASM_LABEL_SUFFIX

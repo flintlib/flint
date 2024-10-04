@@ -91,8 +91,8 @@ LIBS2:=-lflint $(LIBS)
 PIC_FLAG:=@PIC_FLAG@
 
 ifeq ($(WANT_ASSEMBLY),1)
-ASM_OBJ_FLAGS:=$(filter-out -D%,$(CPPFLAGS) $(LIB_CPPFLAGS)) $(filter-out -funroll-loops -pedantic, $(CFLAGS))
-ASM_LOBJ_FLAGS:=$(filter-out -D%,$(PIC_FLAG)) $(ASM_OBJ_FLAGS)
+ASMFLAGS:=@ASMFLAGS@
+ASM_PIC_FLAG:=$(filter-out -D%,$(PIC_FLAG))
 endif
 
 UNROLL_LOOPS:=@UNROLL_LOOPS@
@@ -580,7 +580,7 @@ endef
 ifeq ($(WANT_ASSEMBLY),1)
 %.o: %.s
 	@echo "  CC  $(<:$(BUILD_DIR)/%.s=%.asm)"
-	@$(CC) $(ASM_OBJ_FLAGS) -c $< -o $@
+	@$(CC) $(ASMFLAGS) -c $< -o $@
 endif
 
 $(foreach dir, $(DIRS), $(eval $(call xxx_OBJS_rule,$(dir))))
@@ -600,7 +600,7 @@ endef
 ifeq ($(WANT_ASSEMBLY),1)
 %.lo: %_pic.s
 	@echo "  CC  $(<:$(BUILD_DIR)/%.s=%.asm)"
-	@$(CC) $(ASM_LOBJ_FLAGS) -c $< -o $@
+	@$(CC) $(ASMFLAGS) $(ASM_PIC_FLAG) -c $< -o $@
 endif
 
 $(foreach dir, $(DIRS), $(eval $(call xxx_LOBJS_rule,$(dir))))
