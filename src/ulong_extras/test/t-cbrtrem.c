@@ -15,9 +15,10 @@
 
 TEST_FUNCTION_START(n_cbrtrem, state)
 {
-    int i, result;
+    slong ix;
+    int result;
 
-    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
+    for (ix = 0; ix < 10000 * flint_test_multiplier(); ix++)
     {
         ulong a, b, c, i, j;
         mpz_t e, f, g;
