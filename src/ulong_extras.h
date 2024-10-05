@@ -400,7 +400,7 @@ void n_nth_prime_bounds(ulong *lo, ulong *hi, ulong n);
 ulong n_prime_pi(ulong n);
 void n_prime_pi_bounds(ulong *lo, ulong *hi, ulong n);
 
-ulong n_nextprime(ulong n, int FLINT_UNUSED(proved));
+ulong n_nextprime(ulong n, int proved);
 
 /* Factorisation *************************************************************/
 

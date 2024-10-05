@@ -85,7 +85,7 @@ mpn_mod_init(nn_ptr x, gr_ctx_t ctx)
 }
 
 MPN_MOD_INLINE void
-mpn_mod_clear(nn_ptr FLINT_UNUSED(x), gr_ctx_t FLINT_UNUSED(ctx))
+mpn_mod_clear(nn_ptr x, gr_ctx_t ctx)
 {
 }
 
@@ -187,7 +187,7 @@ int mpn_mod_div(nn_ptr res, nn_srcptr x, nn_srcptr y, gr_ctx_t ctx);
 /* Vector functions */
 
 int _mpn_mod_vec_zero(nn_ptr res, slong len, gr_ctx_t ctx);
-int _mpn_mod_vec_clear(nn_ptr FLINT_UNUSED(res), slong FLINT_UNUSED(len), gr_ctx_t FLINT_UNUSED(ctx));
+int _mpn_mod_vec_clear(nn_ptr res, slong len, gr_ctx_t ctx);
 int _mpn_mod_vec_set(nn_ptr res, nn_srcptr x, slong len, gr_ctx_t ctx);
 void _mpn_mod_vec_swap(nn_ptr vec1, nn_ptr vec2, slong len, gr_ctx_t ctx);
 int _mpn_mod_vec_neg(nn_ptr res, nn_srcptr x, slong len, gr_ctx_t ctx);

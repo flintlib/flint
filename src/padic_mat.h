@@ -177,7 +177,7 @@ void padic_mat_neg(padic_mat_t B, const padic_mat_t A, const padic_ctx_t ctx);
 
 void _padic_mat_scalar_mul_padic(padic_mat_t B,
                                  const padic_mat_t A, const padic_t c,
-                                 const padic_ctx_t FLINT_UNUSED(ctx));
+                                 const padic_ctx_t ctx);
 void padic_mat_scalar_mul_padic(padic_mat_t B,
                                 const padic_mat_t A, const padic_t c,
                                 const padic_ctx_t ctx);

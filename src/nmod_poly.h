@@ -314,7 +314,7 @@ void _nmod_poly_KS2_reduce(nn_ptr res, slong s, nn_srcptr op, slong n, ulong w, 
 
 void _nmod_poly_KS2_recover_reduce1(nn_ptr res, slong s, nn_srcptr op1, nn_srcptr op2, slong n, ulong b, nmod_t mod);
 void _nmod_poly_KS2_recover_reduce2(nn_ptr res, slong s, nn_srcptr op1, nn_srcptr op2, slong n, ulong b, nmod_t mod);
-void _nmod_poly_KS2_recover_reduce2b(nn_ptr res, slong s, nn_srcptr op1, nn_srcptr op2, slong n, ulong FLINT_UNUSED(b), nmod_t mod);
+void _nmod_poly_KS2_recover_reduce2b(nn_ptr res, slong s, nn_srcptr op1, nn_srcptr op2, slong n, ulong b, nmod_t mod);
 void _nmod_poly_KS2_recover_reduce3(nn_ptr res, slong s, nn_srcptr op1, nn_srcptr op2, slong n, ulong b, nmod_t mod);
 void _nmod_poly_KS2_recover_reduce(nn_ptr res, slong s, nn_srcptr op1, nn_srcptr op2, slong n, ulong b, nmod_t mod);
 
@@ -451,7 +451,7 @@ void nmod_poly_div_series_basecase(nmod_poly_t Q, const nmod_poly_t A, const nmo
 void _nmod_poly_div_series(nn_ptr Q, nn_srcptr A, slong Alen, nn_srcptr B, slong Blen, slong n, nmod_t mod);
 void nmod_poly_div_series(nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B, slong n);
 
-void _nmod_poly_div_newton_n_preinv(nn_ptr Q, nn_srcptr A, slong lenA, nn_srcptr FLINT_UNUSED(B), slong lenB, nn_srcptr Binv, slong lenBinv, nmod_t mod);
+void _nmod_poly_div_newton_n_preinv(nn_ptr Q, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, nn_srcptr Binv, slong lenBinv, nmod_t mod);
 void nmod_poly_div_newton_n_preinv (nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B, const nmod_poly_t Binv);
 
 void _nmod_poly_divrem_newton_n_preinv (nn_ptr Q, nn_ptr R, nn_srcptr A, slong lenA, nn_srcptr B, slong lenB, nn_srcptr Binv, slong lenBinv, nmod_t mod);
@@ -602,7 +602,7 @@ void nmod_poly_compose_mod_brent_kung_preinv(nmod_poly_t res,
 
 void
 _nmod_poly_compose_mod_brent_kung_vec_preinv(nmod_poly_struct * res,
-        const nmod_poly_struct * polys, slong FLINT_UNUSED(lenpolys), slong l,
+        const nmod_poly_struct * polys, slong lenpolys, slong l,
         nn_srcptr g, slong glen, nn_srcptr poly, slong len,
         nn_srcptr polyinv, slong leninv, nmod_t mod);
 
@@ -623,7 +623,7 @@ nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(nmod_poly_struct * res
 void _nmod_poly_compose_mod_brent_kung_vec_preinv_threaded_pool(
         nmod_poly_struct * res,
         const nmod_poly_struct * polys,
-        slong FLINT_UNUSED(lenpolys), slong l,
+        slong lenpolys, slong l,
         nn_srcptr g, slong glen,
         nn_srcptr poly, slong len,
         nn_srcptr polyinv, slong leninv,

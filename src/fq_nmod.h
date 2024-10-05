@@ -72,7 +72,7 @@ void fq_nmod_ctx_print(const fq_nmod_ctx_t ctx);
 void fq_nmod_init(fq_nmod_t rop, const fq_nmod_ctx_t ctx);
 void fq_nmod_init2(fq_nmod_t rop, const fq_nmod_ctx_t ctx);
 
-void fq_nmod_clear(fq_nmod_t rop, const fq_nmod_ctx_t FLINT_UNUSED(ctx));
+void fq_nmod_clear(fq_nmod_t rop, const fq_nmod_ctx_t ctx);
 
 void _fq_nmod_sparse_reduce(ulong *R, slong lenR, const fq_nmod_ctx_t ctx);
 void _fq_nmod_dense_reduce(ulong* R, slong lenR, const fq_nmod_ctx_t ctx);
@@ -82,14 +82,14 @@ void fq_nmod_reduce(fq_nmod_t rop, const fq_nmod_ctx_t ctx);
 /* Basic arithmetic **********************************************************/
 
 void fq_nmod_add(fq_nmod_t rop, const fq_nmod_t op1,
-                                 const fq_nmod_t op2, const fq_nmod_ctx_t FLINT_UNUSED(ctx));
+                                 const fq_nmod_t op2, const fq_nmod_ctx_t ctx);
 
 void fq_nmod_sub(fq_nmod_t rop, const fq_nmod_t op1,
                                  const fq_nmod_t op2, const fq_nmod_ctx_t ctx);
 
 void fq_nmod_sub_one(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t ctx);
 
-void fq_nmod_neg(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t FLINT_UNUSED(ctx));
+void fq_nmod_neg(fq_nmod_t rop, const fq_nmod_t op1, const fq_nmod_ctx_t ctx);
 
 void fq_nmod_mul(fq_nmod_t rop,
             const fq_nmod_t op1, const fq_nmod_t op2, const fq_nmod_ctx_t ctx);
@@ -139,40 +139,40 @@ void fq_nmod_rand_not_zero(fq_nmod_t rop, flint_rand_t state, const fq_nmod_ctx_
 
 /* Comparison ****************************************************************/
 
-int fq_nmod_equal(const fq_nmod_t op1, const fq_nmod_t op2, const fq_nmod_ctx_t FLINT_UNUSED(ctx));
-int fq_nmod_is_zero(const fq_nmod_t op, const fq_nmod_ctx_t FLINT_UNUSED(ctx));
-int fq_nmod_is_one(const fq_nmod_t op, const fq_nmod_ctx_t FLINT_UNUSED(ctx));
-int fq_nmod_cmp(const fq_nmod_t a, const fq_nmod_t b, const fq_nmod_ctx_t FLINT_UNUSED(ctx));
+int fq_nmod_equal(const fq_nmod_t op1, const fq_nmod_t op2, const fq_nmod_ctx_t ctx);
+int fq_nmod_is_zero(const fq_nmod_t op, const fq_nmod_ctx_t ctx);
+int fq_nmod_is_one(const fq_nmod_t op, const fq_nmod_ctx_t ctx);
+int fq_nmod_cmp(const fq_nmod_t a, const fq_nmod_t b, const fq_nmod_ctx_t ctx);
 
 /* Assignments and conversions ***********************************************/
 
-void fq_nmod_set(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t FLINT_UNUSED(ctx));
+void fq_nmod_set(fq_nmod_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 void fq_nmod_set_si(fq_nmod_t rop, const slong x, const fq_nmod_ctx_t ctx);
 void fq_nmod_set_ui(fq_nmod_t rop, const ulong x, const fq_nmod_ctx_t ctx);
 void fq_nmod_set_fmpz(fq_nmod_t rop, const fmpz_t x, const fq_nmod_ctx_t ctx);
 void fq_nmod_set_nmod_poly(fq_nmod_t a, const nmod_poly_t b, const fq_nmod_ctx_t ctx);
 
-int fq_nmod_get_fmpz(fmpz_t a, const fq_nmod_t b, const fq_nmod_ctx_t FLINT_UNUSED(ctx));
+int fq_nmod_get_fmpz(fmpz_t a, const fq_nmod_t b, const fq_nmod_ctx_t ctx);
 void fq_nmod_get_nmod_poly(nmod_poly_t a, const fq_nmod_t b, const fq_nmod_ctx_t ctx);
 
-void fq_nmod_swap(fq_nmod_t op1, fq_nmod_t op2, const fq_nmod_ctx_t FLINT_UNUSED(ctx));
+void fq_nmod_swap(fq_nmod_t op1, fq_nmod_t op2, const fq_nmod_ctx_t ctx);
 
-void fq_nmod_zero(fq_nmod_t rop,  const fq_nmod_ctx_t FLINT_UNUSED(ctx));
-void fq_nmod_one(fq_nmod_t rop,  const fq_nmod_ctx_t FLINT_UNUSED(ctx));
+void fq_nmod_zero(fq_nmod_t rop,  const fq_nmod_ctx_t ctx);
+void fq_nmod_one(fq_nmod_t rop,  const fq_nmod_ctx_t ctx);
 
 void fq_nmod_gen(fq_nmod_t rop, const fq_nmod_ctx_t ctx);
 
 /* Output ********************************************************************/
 
 #ifdef FLINT_HAVE_FILE
-int fq_nmod_fprint(FILE * file, const fq_nmod_t op, const fq_nmod_ctx_t FLINT_UNUSED(ctx));
+int fq_nmod_fprint(FILE * file, const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 int fq_nmod_fprint_pretty(FILE * file, const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 #endif
 
-void fq_nmod_print(const fq_nmod_t op, const fq_nmod_ctx_t FLINT_UNUSED(ctx));
+void fq_nmod_print(const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 void fq_nmod_print_pretty(const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 
-char * fq_nmod_get_str(const fq_nmod_t op, const fq_nmod_ctx_t FLINT_UNUSED(ctx));
+char * fq_nmod_get_str(const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 char * fq_nmod_get_str_pretty(const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 
 /* Special functions *********************************************************/
@@ -195,7 +195,7 @@ void fq_nmod_norm(fmpz_t rop, const fq_nmod_t op, const fq_nmod_ctx_t ctx);
 /* Bit packing ******************************************************/
 
 void fq_nmod_bit_pack(fmpz_t f, const fq_nmod_t op, flint_bitcnt_t bit_size,
-                 const fq_nmod_ctx_t FLINT_UNUSED(ctx));
+                 const fq_nmod_ctx_t ctx);
 
 void fq_nmod_bit_unpack(fq_nmod_t rop, const fmpz_t f, flint_bitcnt_t bit_size,
                    const fq_nmod_ctx_t ctx);

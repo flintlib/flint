@@ -370,7 +370,7 @@ void fmpq_poly_shift_right(fmpq_poly_t res, const fmpq_poly_t poly, slong n);
 #ifdef FMPZ_H
 void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r, const fmpz * A, const fmpz_t a, slong lenA, const fmpz * B, const fmpz_t b, slong lenB, const fmpz_preinvn_t inv);
 void _fmpq_poly_div(fmpz * Q, fmpz_t q, const fmpz * A, const fmpz_t a, slong lenA, const fmpz * B, const fmpz_t b, slong lenB, const fmpz_preinvn_t inv);
-void _fmpq_poly_rem(fmpz * R, fmpz_t r, const fmpz * A, const fmpz_t a, slong lenA, const fmpz * B, const fmpz_t FLINT_UNUSED(b), slong lenB, const fmpz_preinvn_t inv);
+void _fmpq_poly_rem(fmpz * R, fmpz_t r, const fmpz * A, const fmpz_t a, slong lenA, const fmpz * B, const fmpz_t b, slong lenB, const fmpz_preinvn_t inv);
 #endif
 
 void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R, const fmpq_poly_t poly1, const fmpq_poly_t poly2);
@@ -379,7 +379,7 @@ void fmpq_poly_rem(fmpq_poly_t R, const fmpq_poly_t poly1, const fmpq_poly_t pol
 
 /*  Precomputed inverse  *****************************************************/
 
-fmpq_poly_struct * _fmpq_poly_powers_precompute(const fmpz * B, const fmpz_t FLINT_UNUSED(denB), slong len);
+fmpq_poly_struct * _fmpq_poly_powers_precompute(const fmpz * B, const fmpz_t denB, slong len);
 void fmpq_poly_powers_precompute(fmpq_poly_powers_precomp_t pinv, fmpq_poly_t poly);
 
 void _fmpq_poly_powers_clear(fmpq_poly_struct * powers, slong len);
@@ -694,7 +694,7 @@ void _fmpq_poly_content(fmpq_t res,
 void fmpq_poly_content(fmpq_t res, const fmpq_poly_t poly);
 
 void _fmpq_poly_primitive_part(fmpz * rpoly, fmpz_t rden,
-                               const fmpz * poly, const fmpz_t FLINT_UNUSED(den), slong len);
+                               const fmpz * poly, const fmpz_t den, slong len);
 
 void fmpq_poly_primitive_part(fmpq_poly_t res, const fmpq_poly_t poly);
 
@@ -703,7 +703,7 @@ int _fmpq_poly_is_monic(const fmpz * poly, const fmpz_t den, slong len);
 int fmpq_poly_is_monic(const fmpq_poly_t poly);
 
 void _fmpq_poly_make_monic(fmpz * rpoly, fmpz_t rden,
-                      const fmpz * poly, const fmpz_t FLINT_UNUSED(den), slong len);
+                      const fmpz * poly, const fmpz_t den, slong len);
 
 void fmpq_poly_make_monic(fmpq_poly_t res, const fmpq_poly_t poly);
 

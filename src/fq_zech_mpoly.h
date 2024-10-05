@@ -185,7 +185,7 @@ void fq_zech_mpoly_clear(fq_zech_mpoly_t A,
 
 FQ_ZECH_MPOLY_INLINE
 void _fq_zech_mpoly_set_length(fq_zech_mpoly_t A, slong newlen,
-                                                 const fq_zech_mpoly_ctx_t FLINT_UNUSED(ctx))
+                                                 const fq_zech_mpoly_ctx_t ctx)
 {
     FLINT_ASSERT(newlen <= A->alloc);
     A->length = newlen;
@@ -193,7 +193,7 @@ void _fq_zech_mpoly_set_length(fq_zech_mpoly_t A, slong newlen,
 
 FQ_ZECH_MPOLY_INLINE
 void fq_zech_mpoly_truncate(fq_zech_mpoly_t A, slong newlen,
-                                                 const fq_zech_mpoly_ctx_t FLINT_UNUSED(ctx))
+                                                 const fq_zech_mpoly_ctx_t ctx)
 {
     if (A->length > newlen)
     {
@@ -233,7 +233,7 @@ int fq_zech_mpoly_equal(const fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
 
 FQ_ZECH_MPOLY_INLINE
 void fq_zech_mpoly_swap(fq_zech_mpoly_t A, fq_zech_mpoly_t B,
-                                                 const fq_zech_mpoly_ctx_t FLINT_UNUSED(ctx))
+                                                 const fq_zech_mpoly_ctx_t ctx)
 {
     FLINT_SWAP(fq_zech_mpoly_struct, *A, *B);
 }
@@ -272,7 +272,7 @@ void fq_zech_mpoly_one(fq_zech_mpoly_t A, const fq_zech_mpoly_ctx_t ctx)
 }
 
 FQ_ZECH_MPOLY_INLINE
-int fq_zech_mpoly_is_zero(const fq_zech_mpoly_t A, const fq_zech_mpoly_ctx_t FLINT_UNUSED(ctx))
+int fq_zech_mpoly_is_zero(const fq_zech_mpoly_t A, const fq_zech_mpoly_ctx_t ctx)
 {
    return A->length == 0;
 }
@@ -331,7 +331,7 @@ void fq_zech_mpoly_get_coeff_vars_ui(fq_zech_mpoly_t C,
                                   slong length, const fq_zech_mpoly_ctx_t ctx);
 
 FQ_ZECH_MPOLY_INLINE fq_zech_struct * fq_zech_mpoly_leadcoeff(
-                        const fq_zech_mpoly_t A, const fq_zech_mpoly_ctx_t FLINT_UNUSED(ctx))
+                        const fq_zech_mpoly_t A, const fq_zech_mpoly_ctx_t ctx)
 {
     FLINT_ASSERT(A->length > 0);
     return A->coeffs + 0;
@@ -350,7 +350,7 @@ int fq_zech_mpoly_is_canonical(const fq_zech_mpoly_t A,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
 FQ_ZECH_MPOLY_INLINE
-slong fq_zech_mpoly_length(const fq_zech_mpoly_t A, const fq_zech_mpoly_ctx_t FLINT_UNUSED(ctx))
+slong fq_zech_mpoly_length(const fq_zech_mpoly_t A, const fq_zech_mpoly_ctx_t ctx)
 {
     return A->length;
 }
@@ -626,7 +626,7 @@ void fq_zech_mpoly_inflate(fq_zech_mpoly_t A, const fq_zech_mpoly_t B,
 /* Univariates ***************************************************************/
 
 void fq_zech_mpoly_univar_init(fq_zech_mpoly_univar_t A,
-                                                const fq_zech_mpoly_ctx_t FLINT_UNUSED(ctx));
+                                                const fq_zech_mpoly_ctx_t ctx);
 
 void fq_zech_mpoly_univar_clear(fq_zech_mpoly_univar_t A,
                                                 const fq_zech_mpoly_ctx_t ctx);
@@ -651,21 +651,21 @@ void fq_zech_mpoly_from_univar(fq_zech_mpoly_t A,
 
 FQ_ZECH_MPOLY_INLINE
 void fq_zech_mpoly_univar_swap(fq_zech_mpoly_univar_t A,
-                       fq_zech_mpoly_univar_t B, const fq_zech_mpoly_ctx_t FLINT_UNUSED(ctx))
+                       fq_zech_mpoly_univar_t B, const fq_zech_mpoly_ctx_t ctx)
 {
     FLINT_SWAP(fq_zech_mpoly_univar_struct, *A, *B);
 }
 
-int fq_zech_mpoly_univar_degree_fits_si(const fq_zech_mpoly_univar_t A, const fq_zech_mpoly_ctx_t FLINT_UNUSED(ctx));
+int fq_zech_mpoly_univar_degree_fits_si(const fq_zech_mpoly_univar_t A, const fq_zech_mpoly_ctx_t ctx);
 
 FQ_ZECH_MPOLY_INLINE
 slong fq_zech_mpoly_univar_length(const fq_zech_mpoly_univar_t A,
-                                                 const fq_zech_mpoly_ctx_t FLINT_UNUSED(ctx))
+                                                 const fq_zech_mpoly_ctx_t ctx)
 {
     return A->length;
 }
 
-slong fq_zech_mpoly_univar_get_term_exp_si(fq_zech_mpoly_univar_t A, slong i, const fq_zech_mpoly_ctx_t FLINT_UNUSED(ctx));
+slong fq_zech_mpoly_univar_get_term_exp_si(fq_zech_mpoly_univar_t A, slong i, const fq_zech_mpoly_ctx_t ctx);
 
 FQ_ZECH_MPOLY_INLINE
 void fq_zech_mpoly_univar_get_term_coeff(fq_zech_mpoly_t c,
@@ -738,7 +738,7 @@ int fq_zech_mpolyu_is_canonical(const fq_zech_mpolyu_t poly,
                                                 const fq_zech_mpoly_ctx_t ctx);
 
 void fq_zech_mpolyu_init(fq_zech_mpolyu_t A, flint_bitcnt_t bits,
-                                                const fq_zech_mpoly_ctx_t FLINT_UNUSED(ctx));
+                                                const fq_zech_mpoly_ctx_t ctx);
 
 void fq_zech_mpolyu_clear(fq_zech_mpolyu_t A,
                                                const fq_zech_mpoly_ctx_t uctx);
