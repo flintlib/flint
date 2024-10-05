@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2023 Fredrik Johansson
+    Copyright (C) 2024 Albin Ahlbäck
 
     This file is part of FLINT.
 
@@ -9,18 +9,11 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "gr_poly.h"
+#ifndef TEST_UTIL_H
+#define TEST_UTIL_H
 
-void gr_poly_init(gr_poly_t poly, gr_ctx_t FLINT_UNUSED(ctx))
-{
-    poly->coeffs = NULL;
-    poly->length = 0;
-    poly->alloc = 0;
-}
+#include "gr.h"
 
-void
-gr_poly_init2(gr_poly_t poly, slong len, gr_ctx_t ctx)
-{
-    gr_poly_init(poly, ctx);
-    gr_poly_fit_length(poly, len, ctx);
-}
+FLINT_DLL extern gr_static_method_table _ca_methods;
+
+#endif

@@ -54,7 +54,7 @@ void _gr_poly_tree_free(gr_ptr * tree, slong len, gr_ctx_t ctx)
     }
 }
 
-int
+static int
 _gr_poly_mul_monic(gr_ptr res, gr_srcptr poly1, slong len1, gr_srcptr poly2, slong len2, gr_ctx_t ctx)
 {
     int status = GR_SUCCESS;
@@ -176,7 +176,6 @@ _gr_poly_evaluate_vec_fast_precomp(gr_ptr vs, gr_srcptr poly,
     {
         if (len == 1)
         {
-            gr_ptr tmp;
             GR_TMP_INIT(tmp, ctx);
             status |= gr_neg(tmp, tree[0], ctx);
             status |= _gr_poly_evaluate(vs, poly, plen, tmp, ctx);

@@ -37,8 +37,6 @@ gr_poly_xgcd_wrapper(gr_method_poly_xgcd_op _xgcd_op, gr_poly_t G, gr_poly_t S, 
         const slong lenA = A->length, lenB = B->length;
         int status = GR_SUCCESS;
         slong sz = ctx->sizeof_elem;
-        gr_ptr t;
-
 
         if (lenA == 0)          /* lenA = lenB = 0 */
         {
@@ -48,6 +46,8 @@ gr_poly_xgcd_wrapper(gr_method_poly_xgcd_op _xgcd_op, gr_poly_t G, gr_poly_t S, 
         }
         else if (lenB == 0)     /* lenA > lenB = 0 */
         {
+            gr_ptr t;
+
             GR_TMP_INIT(t, ctx);
             status |= gr_inv(t, GR_ENTRY(A->coeffs, lenA - 1, sz), ctx);
             status |= gr_poly_mul_scalar(G, A, t, ctx);
@@ -62,6 +62,8 @@ gr_poly_xgcd_wrapper(gr_method_poly_xgcd_op _xgcd_op, gr_poly_t G, gr_poly_t S, 
         }
         else if (lenB == 1)  /* lenA >= lenB = 1 */
         {
+            gr_ptr t;
+
             GR_TMP_INIT(t, ctx);
             status |= gr_inv(t, B->coeffs, ctx);
             status |= gr_poly_set_scalar(T, t, ctx);

@@ -13,13 +13,12 @@
 #include "ulong_extras.h"
 #include "fmpq.h"
 #include "gr_poly.h"
-
-FLINT_DLL extern gr_static_method_table _ca_methods;
+#include "util_test.h"
 
 /* Defined in t-pow_series_fmpq.c, t-pow_series_ui.c and t-pow_ui.c */
 #define test test_pow_series_fmpq
 int
-test(flint_rand_t state, int which)
+test(flint_rand_t state, int FLINT_UNUSED(which))
 {
     gr_ctx_t ctx;
     slong n;
