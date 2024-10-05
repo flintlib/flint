@@ -14,7 +14,7 @@
 #include "nmod.h"
 #include "nmod_mat.h"
 
-int check_rref_form(slong * perm, nmod_mat_t A, slong rank)
+static int check_rref_form(slong * FLINT_UNUSED(perm), nmod_mat_t A, slong rank)
 {
     slong i, j, k, prev_pivot;
 
