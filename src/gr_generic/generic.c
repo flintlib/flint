@@ -28,27 +28,27 @@
 #endif
 
 int
-gr_generic_ctx_clear(gr_ctx_t ctx)
+gr_generic_ctx_clear(gr_ctx_t FLINT_UNUSED(ctx))
 {
     return GR_SUCCESS;
 }
 
-truth_t gr_generic_ctx_predicate(gr_ctx_t ctx)
+truth_t gr_generic_ctx_predicate(gr_ctx_t FLINT_UNUSED(ctx))
 {
     return T_UNKNOWN;
 }
 
-truth_t gr_generic_ctx_predicate_true(gr_ctx_t ctx)
+truth_t gr_generic_ctx_predicate_true(gr_ctx_t FLINT_UNUSED(ctx))
 {
     return T_TRUE;
 }
 
-truth_t gr_generic_ctx_predicate_false(gr_ctx_t ctx)
+truth_t gr_generic_ctx_predicate_false(gr_ctx_t FLINT_UNUSED(ctx))
 {
     return T_FALSE;
 }
 
-truth_t gr_generic_ctx_is_zero_ring(gr_ctx_t ctx)
+static truth_t gr_generic_ctx_is_zero_ring(gr_ctx_t ctx)
 {
     gr_ptr t;
     int status;
@@ -83,7 +83,7 @@ gr_generic_set_shallow(gr_ptr res, gr_srcptr x, const gr_ctx_t ctx)
     memcpy(res, x, ctx->sizeof_elem);
 }
 
-int gr_generic_write_n(gr_stream_t out, gr_srcptr x, slong n, gr_ctx_t ctx)
+int gr_generic_write_n(gr_stream_t out, gr_srcptr x, slong FLINT_UNUSED(n), gr_ctx_t ctx)
 {
     return gr_write(out, x, ctx);
 }
@@ -141,7 +141,7 @@ int gr_generic_randtest_small(gr_ptr x, flint_rand_t state, gr_ctx_t ctx)
     return status;
 }
 
-slong _gr_generic_length(gr_srcptr x, gr_ctx_t ctx)
+static slong _gr_generic_length(gr_srcptr FLINT_UNUSED(x), gr_ctx_t FLINT_UNUSED(ctx))
 {
     return 0;
 }
@@ -904,7 +904,7 @@ int gr_generic_set_fmpz_10exp_fmpz(gr_ptr res, const fmpz_t x, const fmpz_t y, g
     }
 }
 
-int gr_generic_get_fexpr_serialize(fexpr_t res, gr_srcptr x, gr_ctx_t ctx)
+static int gr_generic_get_fexpr_serialize(fexpr_t res, gr_srcptr x, gr_ctx_t ctx)
 {
     return gr_get_fexpr(res, x, ctx);
 }
@@ -988,16 +988,16 @@ int gr_generic_div_fmpq(gr_ptr res, gr_srcptr x, const fmpq_t y, gr_ctx_t ctx)
 
     if (fmpq_is_zero(y))   /* for non-rings? */
     {
-        gr_ptr t;
+        gr_ptr tg;
         status = GR_SUCCESS;
 
-        GR_TMP_INIT(t, ctx);
+        GR_TMP_INIT(tg, ctx);
 
-        status |= gr_set_fmpq(t, y, ctx);
+        status |= gr_set_fmpq(tg, y, ctx);
         if (status == GR_SUCCESS)
-            status = gr_div(res, x, t, ctx);
+            status = gr_div(res, x, tg, ctx);
 
-        GR_TMP_CLEAR(t, ctx);
+        GR_TMP_CLEAR(tg, ctx);
         return status;
     }
 
@@ -1047,7 +1047,7 @@ int gr_generic_divexact(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
     return gr_div(res, x, y, ctx);
 }
 
-truth_t gr_generic_div_nonunique(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+static truth_t gr_generic_div_nonunique(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 {
     truth_t zero;
     int status;
@@ -1074,7 +1074,7 @@ truth_t gr_generic_div_nonunique(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t 
     return GR_UNABLE;
 }
 
-truth_t gr_generic_divides(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+static truth_t gr_generic_divides(gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 {
     gr_ptr t;
     truth_t zero;
@@ -1215,7 +1215,7 @@ int gr_generic_numerator(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
     return gr_set(res, x, ctx);
 }
 
-int gr_generic_denominator(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
+int gr_generic_denominator(gr_ptr res, gr_srcptr FLINT_UNUSED(x), gr_ctx_t ctx)
 {
     return gr_one(res, ctx);
 }
@@ -1269,7 +1269,7 @@ gr_generic_rsqrt(gr_ptr res, gr_srcptr x, gr_ctx_t ctx)
 }
 
 int
-gr_generic_cmp(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
+gr_generic_cmp(int * FLINT_UNUSED(res), gr_srcptr FLINT_UNUSED(x), gr_srcptr FLINT_UNUSED(y), gr_ctx_t FLINT_UNUSED(ctx))
 {
     return GR_UNABLE;
 }
@@ -1317,7 +1317,7 @@ gr_generic_cmpabs_other(int * res, gr_srcptr x, gr_srcptr y, gr_ctx_t y_ctx, gr_
     return status;
 }
 
-int
+static int
 gr_generic_min(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 {
     int cmp;
@@ -1331,7 +1331,7 @@ gr_generic_min(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
         return gr_set(res, y, ctx);
 }
 
-int
+static int
 gr_generic_max(gr_ptr res, gr_srcptr x, gr_srcptr y, gr_ctx_t ctx)
 {
     int cmp;
@@ -1475,7 +1475,6 @@ gr_generic_bernoulli_vec(gr_ptr res, slong len, gr_ctx_t ctx)
 
         if (0 && len <= 3000)
         {
-            slong i;
             bernoulli_cache_compute(len);
             for (i = 0; i < len; i++)
                 bernoulli_fmpq_ui(t + i, i);
@@ -1494,8 +1493,6 @@ gr_generic_bernoulli_vec(gr_ptr res, slong len, gr_ctx_t ctx)
         return status;
     }
 }
-
-void arb_fmpz_euler_number_ui(fmpz_t res, ulong n);
 
 int
 gr_generic_eulernum_ui(gr_ptr res, ulong n, gr_ctx_t ctx)

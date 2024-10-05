@@ -237,11 +237,6 @@ WARN_UNUSED_RESULT int gr_generic_vec_dot_fmpz(gr_ptr res, gr_srcptr initial, in
 WARN_UNUSED_RESULT int gr_generic_vec_set_powers(gr_ptr res, gr_srcptr x, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_vec_reciprocals(gr_ptr res, slong len, gr_ctx_t ctx);
 
-WARN_UNUSED_RESULT int gr_generic_pow_fmpz_sliding(gr_ptr f, gr_srcptr g, const fmpz_t pow, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_generic_pow_ui_sliding(gr_ptr f, gr_srcptr g, ulong pow, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_generic_pow_fmpz_binexp(gr_ptr res, gr_srcptr x, const fmpz_t exp, gr_ctx_t ctx);
-WARN_UNUSED_RESULT int gr_generic_pow_ui_binexp(gr_ptr res, gr_srcptr x, ulong e, gr_ctx_t ctx);
-
 WARN_UNUSED_RESULT int gr_generic_vec_add(gr_ptr res, gr_srcptr src1, gr_srcptr src2, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_vec_sub(gr_ptr res, gr_srcptr src1, gr_srcptr src2, slong len, gr_ctx_t ctx);
 WARN_UNUSED_RESULT int gr_generic_vec_mul(gr_ptr res, gr_srcptr src1, gr_srcptr src2, slong len, gr_ctx_t ctx);
