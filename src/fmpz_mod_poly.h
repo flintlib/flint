@@ -26,6 +26,8 @@
 extern "C" {
 #endif
 
+FLINT_HEADER_START
+
 #define FMPZ_MOD_POLY_HGCD_CUTOFF  128      /* HGCD: Basecase -> Recursion      */
 #define FMPZ_MOD_POLY_GCD_CUTOFF  256       /* GCD:  Euclidean -> HGCD          */
 
@@ -970,6 +972,8 @@ void fmpz_mod_poly_fmpz_sub(fmpz_mod_poly_t res, const fmpz_t c,
 
 #define fmpz_mod_poly_set_coeff_mpz _Pragma("GCC error \"'fmpz_mod_poly_set_coeff_mpz' is deprecated. Use 'fmpz_mod_poly_set_coeff_fmpz' instead.\"")
 #define fmpz_mod_poly_get_coeff_mpz _Pragma("GCC error \"'fmpz_mod_poly_get_coeff_mpz' is deprecated. Use 'fmpz_mod_poly_get_coeff_fmpz' instead.\"")
+
+FLINT_HEADER_END
 
 #ifdef __cplusplus
 }
