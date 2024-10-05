@@ -25,6 +25,8 @@
 extern "C" {
 #endif
 
+FLINT_HEADER_START
+
 #define GR_MAT_ENTRY(mat,i,j,sz) GR_ENTRY((mat)->rows[i], j, sz)
 #define gr_mat_nrows(mat, ctx) ((mat)->r)
 #define gr_mat_ncols(mat, ctx) ((mat)->c)
@@ -304,6 +306,8 @@ void gr_mat_test_nonsingular_solve_tril(gr_method_mat_binary_op_with_flag solve_
 void gr_mat_test_nonsingular_solve_triu(gr_method_mat_binary_op_with_flag solve_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
 void gr_mat_test_approx_mul_max_norm(gr_method_mat_binary_op mul_impl, gr_srcptr rel_tol, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
 void gr_mat_test_approx_mul_pos_entrywise_accurate(gr_method_mat_binary_op mul_impl, gr_srcptr rel_tol, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx);
+
+FLINT_HEADER_END
 
 #ifdef __cplusplus
 }

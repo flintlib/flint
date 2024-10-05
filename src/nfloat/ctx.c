@@ -12,6 +12,7 @@
 #include "nfloat.h"
 #include "gr.h"
 #include "gr_mat.h"
+#include "gr_generic.h"
 
 int _nfloat_methods_initialized = 0;
 

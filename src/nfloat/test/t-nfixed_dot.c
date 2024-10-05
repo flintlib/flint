@@ -66,14 +66,6 @@ void nfixed_mul(nn_ptr res, nn_srcptr a, nn_srcptr b, slong nlimbs)
     flint_mpn_mulhigh_n(res + 1, a + 1, b + 1, nlimbs);
 }
 
-void _nfixed_dot_2(nn_ptr res, nn_srcptr x, slong xstride, nn_srcptr y, slong ystride, slong len);
-void _nfixed_dot_3(nn_ptr res, nn_srcptr x, slong xstride, nn_srcptr y, slong ystride, slong len);
-void _nfixed_dot_4(nn_ptr res, nn_srcptr x, slong xstride, nn_srcptr y, slong ystride, slong len);
-void _nfixed_dot_5(nn_ptr res, nn_srcptr x, slong xstride, nn_srcptr y, slong ystride, slong len);
-void _nfixed_dot_6(nn_ptr res, nn_srcptr x, slong xstride, nn_srcptr y, slong ystride, slong len);
-void _nfixed_dot_7(nn_ptr res, nn_srcptr x, slong xstride, nn_srcptr y, slong ystride, slong len);
-void _nfixed_dot_8(nn_ptr res, nn_srcptr x, slong xstride, nn_srcptr y, slong ystride, slong len);
-
 TEST_FUNCTION_START(nfixed_dot, state)
 {
     slong iter, len, i, nlimbs;

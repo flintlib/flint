@@ -35,7 +35,7 @@
         (r1) = __r1; (r2) = __r2; (r3) = __r3;                            \
     } while (0)
 
-void
+static void
 _nfloat_vec_dot_set_initial(ulong * s, slong sexp, nfloat_srcptr x, int subtract, slong nlimbs)
 {
     slong xexp, delta;
@@ -72,7 +72,7 @@ _nfloat_vec_dot_set_initial(ulong * s, slong sexp, nfloat_srcptr x, int subtract
 }
 
 /* n is the number of limbs of s and x */
-void
+static void
 _nfloat_vec_dot_add_limbs(ulong * s, slong sexp, mp_srcptr x, slong xexp, int subtract, slong n)
 {
     slong delta, delta_limbs, delta_bits;
@@ -123,7 +123,7 @@ _nfloat_vec_dot_add_limbs(ulong * s, slong sexp, mp_srcptr x, slong xexp, int su
 
 #include <math.h>
 
-void
+static void
 _nfloat_vec_dot_addmul(ulong * s, slong sexp, nfloat_srcptr xi, nfloat_srcptr yi, int subtract, slong nlimbs)
 {
     slong xexp, delta;
@@ -207,7 +207,7 @@ _nfloat_vec_dot_addmul(ulong * s, slong sexp, nfloat_srcptr xi, nfloat_srcptr yi
     }
 }
 
-int
+static int
 __nfloat_vec_dot(nfloat_ptr res, nfloat_srcptr initial, int subtract, nfloat_srcptr x, slong sizeof_xstep, nfloat_srcptr y, slong sizeof_ystep, slong len, gr_ctx_t ctx)
 {
     if (NFLOAT_CTX_NLIMBS(ctx) == 1 && !(NFLOAT_CTX_FLAGS(ctx) & (NFLOAT_ALLOW_INF | NFLOAT_ALLOW_NAN)))
@@ -768,7 +768,7 @@ _flint_mpn_signed_add_n(nn_ptr res, nn_srcptr x, int xsgnbit, nn_srcptr y, int y
     return xsgnbit;
 }
 
-int
+static int
 __nfloat_complex_vec_dot(nfloat_complex_ptr res, nfloat_complex_srcptr initial, int subtract, nfloat_complex_srcptr x, slong xstep, nfloat_complex_srcptr y, slong ystep, slong len, gr_ctx_t ctx)
 {
     slong i, pad_bits;
