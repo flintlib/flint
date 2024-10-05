@@ -82,11 +82,8 @@ void _fmpz_poly_num_real_roots_sturm(slong * n_neg, slong * n_pos, const fmpz * 
         if (lenA <= 1)
             break;
 
-        {
-            fmpz *T;
-            slong len;
-            T = A, A = B, B = T, len = lenA, lenA = lenB, lenB = len;
-        }
+        FLINT_SWAP(fmpz *, A, B);
+        FLINT_SWAP(slong, lenA, lenB);
 
         if (delta == 1)
         {

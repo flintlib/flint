@@ -14,6 +14,12 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 /*
    Implements karatsuba multiplication. There is no basecase crossover, so
    this is only efficient when the coefficients are large (the main usage
