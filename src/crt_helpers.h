@@ -25,6 +25,8 @@
 extern "C" {
 #endif
 
+FLINT_HEADER_START
+
 #if defined(__AVX2__)
 
 FLINT_FORCE_INLINE unsigned char _addcarry_ulong(unsigned char cf, ulong x, ulong y, ulong* s)
@@ -457,6 +459,8 @@ DEFINE_IT(5, 4)
 DEFINE_IT(6, 5)
 DEFINE_IT(7, 6)
 #undef DEFINE_IT
+
+FLINT_HEADER_END
 
 #ifdef __cplusplus
 }

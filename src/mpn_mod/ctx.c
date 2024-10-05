@@ -12,15 +12,12 @@
 #include "fmpz.h"
 #include "mpn_mod.h"
 #include "gr.h"
+#include "gr_generic.h"
 
 int _mpn_mod_methods_initialized = 0;
 
 gr_static_method_table _mpn_mod_methods;
 
-#if defined(__GNUC__)
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wcast-function-type"
-#endif
 gr_method_tab_input _mpn_mod_methods_input[] =
 {
     {GR_METHOD_CTX_WRITE,       (gr_funcptr) mpn_mod_ctx_write},
@@ -135,9 +132,6 @@ gr_method_tab_input _mpn_mod_methods_input[] =
     {GR_METHOD_MAT_DET,         (gr_funcptr) mpn_mod_mat_det},
     {0,                         (gr_funcptr) NULL},
 };
-#if defined(__GNUC__)
-# pragma GCC diagnostic pop
-#endif
 
 int
 _gr_ctx_init_mpn_mod(gr_ctx_t ctx, nn_srcptr n, slong nlimbs)

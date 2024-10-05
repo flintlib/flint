@@ -234,8 +234,6 @@ _mpn_mod_poly_divrem_basecase_preinv1(nn_ptr Q, nn_ptr R,
 
                 if (nlimbs == 2)
                 {
-                    ulong t[4];
-
                     if (slimbs == 5)
                     {
                         for (j = 0; j < lenB - 1; j++)
