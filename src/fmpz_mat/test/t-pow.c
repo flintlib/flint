@@ -14,9 +14,9 @@
 
 TEST_FUNCTION_START(fmpz_mat_pow, state)
 {
-    slong i;
+    slong ix;
 
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (ix = 0; ix < 100 * flint_test_multiplier(); ix++)
     {
         fmpz_mat_t A, B, C;
         slong i, n;

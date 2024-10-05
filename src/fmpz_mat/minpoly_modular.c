@@ -27,7 +27,7 @@ static inline long double _log2(const long double x)
     return log(x) * MINPOLY_M_LOG2E;
 }
 
-slong _fmpz_mat_minpoly_small(fmpz * rop, const fmpz_mat_t op)
+static slong _fmpz_mat_minpoly_small(fmpz * rop, const fmpz_mat_t op)
 {
     slong len = 0;
 
@@ -46,7 +46,7 @@ slong _fmpz_mat_minpoly_small(fmpz * rop, const fmpz_mat_t op)
     return len;
 }
 
-void _fmpz_mat_bound_ovals_of_cassini(fmpz_t b, const fmpz_mat_t op)
+static void _fmpz_mat_bound_ovals_of_cassini(fmpz_t b, const fmpz_mat_t op)
 {
    slong n = op->r, i, j;
    fmpz * v1;
