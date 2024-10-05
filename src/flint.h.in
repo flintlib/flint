@@ -125,6 +125,8 @@ typedef const ulong * nn_srcptr;
 # define FLINT_RETURNS_NONNULL __attribute__((returns_nonnull))
 # define FLINT_MALLOC __attribute__((malloc))
 # define FLINT_DEPRECATED __attribute__((deprecated))
+# define FLINT_HEADER_START _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wunused-parameter\"")
+# define FLINT_HEADER_END _Pragma("GCC diagnostic pop")
 #else
 # define __attribute__(x)
 # if defined(_MSC_VER)
@@ -145,6 +147,8 @@ typedef const ulong * nn_srcptr;
 # define FLINT_RETURNS_NONNULL
 # define FLINT_MALLOC
 # define FLINT_DEPRECATED
+# define FLINT_HEADER_START
+# define FLINT_HEADER_END
 #endif
 
 #if defined(__cplusplus)
