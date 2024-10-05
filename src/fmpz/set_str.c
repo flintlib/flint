@@ -154,7 +154,7 @@ _fmpz_get_str_recursive(fmpz_t res, const char * s, slong slen, const slong * ex
     }
 }
 
-void
+static void
 fmpz_set_str_bsplit_threaded(fmpz_t res, const char * s, slong slen)
 {
     slong k, depth;
