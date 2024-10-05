@@ -25,9 +25,6 @@
 extern "C" {
 #endif
 
-/* defined in mpn_extras.h */
-mp_limb_t flint_mpn_sumdiff_n(mp_ptr s, mp_ptr d, mp_srcptr x, mp_srcptr y, mp_size_t n);
-
 #define fft_sumdiff(t, u, r, s, n) \
    (n == 0 ? 0 : flint_mpn_sumdiff_n(t, u, r, s, n))
 
