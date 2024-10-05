@@ -187,47 +187,47 @@ static mp_limb_t _flint_mpn_mul_n_14(mp_ptr res, mp_srcptr u, mp_srcptr v, mp_si
     return res[n + 13];
 }
 
-mp_limb_t flint_mpn_mul_9_9(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_9(res, u, v, 9); }
-mp_limb_t flint_mpn_mul_10_9(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_9(res, u, v, 10); }
-mp_limb_t flint_mpn_mul_11_9(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_9(res, u, v, 11); }
-mp_limb_t flint_mpn_mul_12_9(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_9(res, u, v, 12); }
-mp_limb_t flint_mpn_mul_13_9(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_9(res, u, v, 13); }
-mp_limb_t flint_mpn_mul_14_9(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_9(res, u, v, 14); }
-mp_limb_t flint_mpn_mul_15_9(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_9(res, u, v, 15); }
-mp_limb_t flint_mpn_mul_16_9(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_9(res, u, v, 16); }
+static mp_limb_t flint_mpn_mul_9_9(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_9(res, u, v, 9); }
+static mp_limb_t flint_mpn_mul_10_9(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_9(res, u, v, 10); }
+static mp_limb_t flint_mpn_mul_11_9(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_9(res, u, v, 11); }
+static mp_limb_t flint_mpn_mul_12_9(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_9(res, u, v, 12); }
+static mp_limb_t flint_mpn_mul_13_9(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_9(res, u, v, 13); }
+static mp_limb_t flint_mpn_mul_14_9(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_9(res, u, v, 14); }
+static mp_limb_t flint_mpn_mul_15_9(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_9(res, u, v, 15); }
+static mp_limb_t flint_mpn_mul_16_9(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_9(res, u, v, 16); }
 
-mp_limb_t flint_mpn_mul_10_10(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_10(res, u, v, 10); }
-mp_limb_t flint_mpn_mul_11_10(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_10(res, u, v, 11); }
-mp_limb_t flint_mpn_mul_12_10(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_10(res, u, v, 12); }
-mp_limb_t flint_mpn_mul_13_10(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_10(res, u, v, 13); }
-mp_limb_t flint_mpn_mul_14_10(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_10(res, u, v, 14); }
-mp_limb_t flint_mpn_mul_15_10(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_10(res, u, v, 15); }
-mp_limb_t flint_mpn_mul_16_10(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_10(res, u, v, 16); }
+static mp_limb_t flint_mpn_mul_10_10(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_10(res, u, v, 10); }
+static mp_limb_t flint_mpn_mul_11_10(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_10(res, u, v, 11); }
+static mp_limb_t flint_mpn_mul_12_10(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_10(res, u, v, 12); }
+static mp_limb_t flint_mpn_mul_13_10(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_10(res, u, v, 13); }
+static mp_limb_t flint_mpn_mul_14_10(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_10(res, u, v, 14); }
+static mp_limb_t flint_mpn_mul_15_10(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_10(res, u, v, 15); }
+static mp_limb_t flint_mpn_mul_16_10(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_10(res, u, v, 16); }
 
-mp_limb_t flint_mpn_mul_11_11(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_11(res, u, v, 11); }
-mp_limb_t flint_mpn_mul_12_11(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_11(res, u, v, 12); }
-mp_limb_t flint_mpn_mul_13_11(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_11(res, u, v, 13); }
-mp_limb_t flint_mpn_mul_14_11(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_11(res, u, v, 14); }
-mp_limb_t flint_mpn_mul_15_11(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_11(res, u, v, 15); }
-mp_limb_t flint_mpn_mul_16_11(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_11(res, u, v, 16); }
+static mp_limb_t flint_mpn_mul_11_11(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_11(res, u, v, 11); }
+static mp_limb_t flint_mpn_mul_12_11(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_11(res, u, v, 12); }
+static mp_limb_t flint_mpn_mul_13_11(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_11(res, u, v, 13); }
+static mp_limb_t flint_mpn_mul_14_11(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_11(res, u, v, 14); }
+static mp_limb_t flint_mpn_mul_15_11(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_11(res, u, v, 15); }
+static mp_limb_t flint_mpn_mul_16_11(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_11(res, u, v, 16); }
 
-mp_limb_t flint_mpn_mul_12_12(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_12(res, u, v, 12); }
-mp_limb_t flint_mpn_mul_13_12(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_12(res, u, v, 13); }
-mp_limb_t flint_mpn_mul_14_12(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_12(res, u, v, 14); }
-mp_limb_t flint_mpn_mul_15_12(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_12(res, u, v, 15); }
-mp_limb_t flint_mpn_mul_16_12(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_12(res, u, v, 16); }
+static mp_limb_t flint_mpn_mul_12_12(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_12(res, u, v, 12); }
+static mp_limb_t flint_mpn_mul_13_12(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_12(res, u, v, 13); }
+static mp_limb_t flint_mpn_mul_14_12(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_12(res, u, v, 14); }
+static mp_limb_t flint_mpn_mul_15_12(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_12(res, u, v, 15); }
+static mp_limb_t flint_mpn_mul_16_12(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_12(res, u, v, 16); }
 
-mp_limb_t flint_mpn_mul_13_13(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_13(res, u, v, 13); }
-mp_limb_t flint_mpn_mul_14_13(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_13(res, u, v, 14); }
-mp_limb_t flint_mpn_mul_15_13(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_13(res, u, v, 15); }
-mp_limb_t flint_mpn_mul_16_13(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_13(res, u, v, 16); }
+static mp_limb_t flint_mpn_mul_13_13(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_13(res, u, v, 13); }
+static mp_limb_t flint_mpn_mul_14_13(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_13(res, u, v, 14); }
+static mp_limb_t flint_mpn_mul_15_13(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_13(res, u, v, 15); }
+static mp_limb_t flint_mpn_mul_16_13(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_13(res, u, v, 16); }
 
-mp_limb_t flint_mpn_mul_14_14(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_14(res, u, v, 14); }
-mp_limb_t flint_mpn_mul_15_14(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_14(res, u, v, 15); }
-mp_limb_t flint_mpn_mul_16_14(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_14(res, u, v, 16); }
+static mp_limb_t flint_mpn_mul_14_14(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_14(res, u, v, 14); }
+static mp_limb_t flint_mpn_mul_15_14(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_14(res, u, v, 15); }
+static mp_limb_t flint_mpn_mul_16_14(mp_ptr res, mp_srcptr u, mp_srcptr v) { return _flint_mpn_mul_n_14(res, u, v, 16); }
 
 
-mp_limb_t flint_mpn_mul_15_15(mp_ptr res, mp_srcptr u, mp_srcptr v)
+static mp_limb_t flint_mpn_mul_15_15(mp_ptr res, mp_srcptr u, mp_srcptr v)
 {
 #if 1
     mp_limb_t tmp[22], cy;
@@ -242,7 +242,7 @@ mp_limb_t flint_mpn_mul_15_15(mp_ptr res, mp_srcptr u, mp_srcptr v)
     return res[29];
 }
 
-mp_limb_t flint_mpn_mul_16_15(mp_ptr res, mp_srcptr u, mp_srcptr v)
+static mp_limb_t flint_mpn_mul_16_15(mp_ptr res, mp_srcptr u, mp_srcptr v)
 {
 #if 0
     mp_limb_t tmp[23], cy;
@@ -257,7 +257,7 @@ mp_limb_t flint_mpn_mul_16_15(mp_ptr res, mp_srcptr u, mp_srcptr v)
     return res[30];
 }
 
-mp_limb_t flint_mpn_mul_16_16(mp_ptr res, mp_srcptr u, mp_srcptr v)
+static mp_limb_t flint_mpn_mul_16_16(mp_ptr res, mp_srcptr u, mp_srcptr v)
 {
 #if 0
     mp_limb_t tmp[24], cy;
