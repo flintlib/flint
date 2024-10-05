@@ -22,6 +22,12 @@
 #include "gr_poly.h"
 #include "ca.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 typedef struct
 {
     /* todo: use which_ring */
@@ -64,19 +70,19 @@ _gr_qqbar_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 }
 
 void
-_gr_qqbar_init(qqbar_t x, const gr_ctx_t ctx)
+_gr_qqbar_init(qqbar_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     qqbar_init(x);
 }
 
 void
-_gr_qqbar_clear(qqbar_t x, const gr_ctx_t ctx)
+_gr_qqbar_clear(qqbar_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     qqbar_clear(x);
 }
 
 void
-_gr_qqbar_swap(qqbar_t x, qqbar_t y, const gr_ctx_t ctx)
+_gr_qqbar_swap(qqbar_t x, qqbar_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     qqbar_t t;
     *t = *x;
@@ -85,7 +91,7 @@ _gr_qqbar_swap(qqbar_t x, qqbar_t y, const gr_ctx_t ctx)
 }
 
 void
-_gr_qqbar_set_shallow(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
+_gr_qqbar_set_shallow(qqbar_t res, const qqbar_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     *res = *x;
 }
@@ -130,7 +136,7 @@ void
 qqbar_get_decimal_root_nearest(char ** re_s, char ** im_s, const qqbar_t x, slong default_digits);
 
 int
-_gr_qqbar_write(gr_stream_t out, const qqbar_t x, const gr_ctx_t ctx)
+_gr_qqbar_write(gr_stream_t out, const qqbar_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     char *re_s, *im_s;
 
@@ -189,49 +195,49 @@ _gr_qqbar_write(gr_stream_t out, const qqbar_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_qqbar_zero(qqbar_t x, const gr_ctx_t ctx)
+_gr_qqbar_zero(qqbar_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     qqbar_zero(x);
     return GR_SUCCESS;
 }
 
 int
-_gr_qqbar_one(qqbar_t x, const gr_ctx_t ctx)
+_gr_qqbar_one(qqbar_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     qqbar_one(x);
     return GR_SUCCESS;
 }
 
 int
-_gr_qqbar_set_si(qqbar_t res, slong v, const gr_ctx_t ctx)
+_gr_qqbar_set_si(qqbar_t res, slong v, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     qqbar_set_si(res, v);
     return GR_SUCCESS;
 }
 
 int
-_gr_qqbar_set_ui(qqbar_t res, ulong v, const gr_ctx_t ctx)
+_gr_qqbar_set_ui(qqbar_t res, ulong v, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     qqbar_set_ui(res, v);
     return GR_SUCCESS;
 }
 
 int
-_gr_qqbar_set_fmpz(qqbar_t res, const fmpz_t v, const gr_ctx_t ctx)
+_gr_qqbar_set_fmpz(qqbar_t res, const fmpz_t v, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     qqbar_set_fmpz(res, v);
     return GR_SUCCESS;
 }
 
 int
-_gr_qqbar_set_fmpq(qqbar_t res, const fmpq_t v, const gr_ctx_t ctx)
+_gr_qqbar_set_fmpq(qqbar_t res, const fmpq_t v, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     qqbar_set_fmpq(res, v);
     return GR_SUCCESS;
 }
 
 int
-_gr_qqbar_set_d(qqbar_t res, double v, const gr_ctx_t ctx)
+_gr_qqbar_set_d(qqbar_t res, double v, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (qqbar_set_d(res, v))
         return GR_SUCCESS;
@@ -240,31 +246,31 @@ _gr_qqbar_set_d(qqbar_t res, double v, const gr_ctx_t ctx)
 }
 
 truth_t
-_gr_qqbar_is_zero(const qqbar_t x, const gr_ctx_t ctx)
+_gr_qqbar_is_zero(const qqbar_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     return qqbar_is_zero(x) ? T_TRUE : T_FALSE;
 }
 
 truth_t
-_gr_qqbar_is_one(const qqbar_t x, const gr_ctx_t ctx)
+_gr_qqbar_is_one(const qqbar_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     return qqbar_is_one(x) ? T_TRUE : T_FALSE;
 }
 
 truth_t
-_gr_qqbar_is_neg_one(const qqbar_t x, const gr_ctx_t ctx)
+_gr_qqbar_is_neg_one(const qqbar_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     return qqbar_is_neg_one(x) ? T_TRUE : T_FALSE;
 }
 
 truth_t
-_gr_qqbar_equal(const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
+_gr_qqbar_equal(const qqbar_t x, const qqbar_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     return qqbar_equal(x, y) ? T_TRUE : T_FALSE;
 }
 
 int
-_gr_qqbar_set(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
+_gr_qqbar_set(qqbar_t res, const qqbar_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     qqbar_set(res, x);
     return GR_SUCCESS;
@@ -345,7 +351,7 @@ _gr_qqbar_set_other(qqbar_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 }
 
 int
-_gr_qqbar_get_fmpz(fmpz_t res, const qqbar_t x, const gr_ctx_t ctx)
+_gr_qqbar_get_fmpz(fmpz_t res, const qqbar_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (!qqbar_is_integer(x))
         return GR_DOMAIN;
@@ -355,7 +361,7 @@ _gr_qqbar_get_fmpz(fmpz_t res, const qqbar_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_qqbar_get_ui(ulong * res, const qqbar_t x, const gr_ctx_t ctx)
+_gr_qqbar_get_ui(ulong * res, const qqbar_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fmpz_t t;
     int status;
@@ -381,7 +387,7 @@ _gr_qqbar_get_ui(ulong * res, const qqbar_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_qqbar_get_si(slong * res, const qqbar_t x, const gr_ctx_t ctx)
+_gr_qqbar_get_si(slong * res, const qqbar_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fmpz_t t;
     int status;
@@ -407,7 +413,7 @@ _gr_qqbar_get_si(slong * res, const qqbar_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_qqbar_get_fmpq(fmpq_t res, const qqbar_t x, const gr_ctx_t ctx)
+_gr_qqbar_get_fmpq(fmpq_t res, const qqbar_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (!qqbar_is_rational(x))
         return GR_DOMAIN;
@@ -417,7 +423,7 @@ _gr_qqbar_get_fmpq(fmpq_t res, const qqbar_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_qqbar_get_d(double * res, const qqbar_t x, const gr_ctx_t ctx)
+_gr_qqbar_get_d(double * res, const qqbar_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     arb_t t;
 
@@ -432,7 +438,7 @@ _gr_qqbar_get_d(double * res, const qqbar_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_qqbar_get_fexpr(fexpr_t res, const qqbar_t x, const gr_ctx_t ctx)
+_gr_qqbar_get_fexpr(fexpr_t res, const qqbar_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (!qqbar_get_fexpr_formula(res, x, QQBAR_FORMULA_GAUSSIANS | QQBAR_FORMULA_QUADRATICS))
         qqbar_get_fexpr_root_nearest(res, x);
@@ -440,7 +446,7 @@ _gr_qqbar_get_fexpr(fexpr_t res, const qqbar_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_qqbar_get_fexpr_serialize(fexpr_t res, const qqbar_t x, const gr_ctx_t ctx)
+_gr_qqbar_get_fexpr_serialize(fexpr_t res, const qqbar_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     qqbar_get_fexpr_repr(res, x);
     return GR_SUCCESS;
@@ -464,7 +470,7 @@ int _gr_qqbar_set_fexpr(gr_ptr res, fexpr_vec_t inputs, gr_vec_t outputs, const 
 }
 
 int
-_gr_qqbar_neg(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
+_gr_qqbar_neg(qqbar_t res, const qqbar_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     qqbar_neg(res, x);
     return GR_SUCCESS;
@@ -482,28 +488,28 @@ _gr_qqbar_add(qqbar_t res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
 }
 
 int
-_gr_qqbar_add_si(qqbar_t res, const qqbar_t x, slong y, const gr_ctx_t ctx)
+_gr_qqbar_add_si(qqbar_t res, const qqbar_t x, slong y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     qqbar_add_si(res, x, y);
     return GR_SUCCESS;
 }
 
 int
-_gr_qqbar_add_ui(qqbar_t res, const qqbar_t x, ulong y, const gr_ctx_t ctx)
+_gr_qqbar_add_ui(qqbar_t res, const qqbar_t x, ulong y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     qqbar_add_ui(res, x, y);
     return GR_SUCCESS;
 }
 
 int
-_gr_qqbar_add_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t y, const gr_ctx_t ctx)
+_gr_qqbar_add_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     qqbar_add_fmpz(res, x, y);
     return GR_SUCCESS;
 }
 
 int
-_gr_qqbar_add_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y, const gr_ctx_t ctx)
+_gr_qqbar_add_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     qqbar_add_fmpq(res, x, y);
     return GR_SUCCESS;
@@ -521,28 +527,28 @@ _gr_qqbar_sub(qqbar_t res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
 }
 
 int
-_gr_qqbar_sub_si(qqbar_t res, const qqbar_t x, slong y, const gr_ctx_t ctx)
+_gr_qqbar_sub_si(qqbar_t res, const qqbar_t x, slong y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     qqbar_sub_si(res, x, y);
     return GR_SUCCESS;
 }
 
 int
-_gr_qqbar_sub_ui(qqbar_t res, const qqbar_t x, ulong y, const gr_ctx_t ctx)
+_gr_qqbar_sub_ui(qqbar_t res, const qqbar_t x, ulong y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     qqbar_sub_ui(res, x, y);
     return GR_SUCCESS;
 }
 
 int
-_gr_qqbar_sub_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t y, const gr_ctx_t ctx)
+_gr_qqbar_sub_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     qqbar_sub_fmpz(res, x, y);
     return GR_SUCCESS;
 }
 
 int
-_gr_qqbar_sub_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y, const gr_ctx_t ctx)
+_gr_qqbar_sub_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     qqbar_sub_fmpq(res, x, y);
     return GR_SUCCESS;
@@ -560,35 +566,35 @@ _gr_qqbar_mul(qqbar_t res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
 }
 
 int
-_gr_qqbar_mul_si(qqbar_t res, const qqbar_t x, slong y, const gr_ctx_t ctx)
+_gr_qqbar_mul_si(qqbar_t res, const qqbar_t x, slong y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     qqbar_mul_si(res, x, y);
     return GR_SUCCESS;
 }
 
 int
-_gr_qqbar_mul_ui(qqbar_t res, const qqbar_t x, ulong y, const gr_ctx_t ctx)
+_gr_qqbar_mul_ui(qqbar_t res, const qqbar_t x, ulong y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     qqbar_mul_ui(res, x, y);
     return GR_SUCCESS;
 }
 
 int
-_gr_qqbar_mul_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t y, const gr_ctx_t ctx)
+_gr_qqbar_mul_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     qqbar_mul_fmpz(res, x, y);
     return GR_SUCCESS;
 }
 
 int
-_gr_qqbar_mul_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y, const gr_ctx_t ctx)
+_gr_qqbar_mul_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     qqbar_mul_fmpq(res, x, y);
     return GR_SUCCESS;
 }
 
 int
-_gr_qqbar_inv(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
+_gr_qqbar_inv(qqbar_t res, const qqbar_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (qqbar_is_zero(x))
     {
@@ -620,7 +626,7 @@ _gr_qqbar_div(qqbar_t res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
 }
 
 int
-_gr_qqbar_div_si(qqbar_t res, const qqbar_t x, slong y, const gr_ctx_t ctx)
+_gr_qqbar_div_si(qqbar_t res, const qqbar_t x, slong y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (y == 0)
     {
@@ -634,7 +640,7 @@ _gr_qqbar_div_si(qqbar_t res, const qqbar_t x, slong y, const gr_ctx_t ctx)
 }
 
 int
-_gr_qqbar_div_ui(qqbar_t res, const qqbar_t x, ulong y, const gr_ctx_t ctx)
+_gr_qqbar_div_ui(qqbar_t res, const qqbar_t x, ulong y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (y == 0)
     {
@@ -648,7 +654,7 @@ _gr_qqbar_div_ui(qqbar_t res, const qqbar_t x, ulong y, const gr_ctx_t ctx)
 }
 
 int
-_gr_qqbar_div_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t y, const gr_ctx_t ctx)
+_gr_qqbar_div_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (fmpz_is_zero(y))
     {
@@ -662,7 +668,7 @@ _gr_qqbar_div_fmpz(qqbar_t res, const qqbar_t x, const fmpz_t y, const gr_ctx_t 
 }
 
 int
-_gr_qqbar_div_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y, const gr_ctx_t ctx)
+_gr_qqbar_div_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (fmpq_is_zero(y))
     {
@@ -676,7 +682,7 @@ _gr_qqbar_div_fmpq(qqbar_t res, const qqbar_t x, const fmpq_t y, const gr_ctx_t 
 }
 
 truth_t
-_gr_qqbar_is_invertible(const qqbar_t x, const gr_ctx_t ctx)
+_gr_qqbar_is_invertible(const qqbar_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     return !qqbar_is_zero(x) ? T_TRUE : T_FALSE;
 }
@@ -877,14 +883,14 @@ _gr_qqbar_rsqrt(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_qqbar_numerator(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
+_gr_qqbar_numerator(qqbar_t res, const qqbar_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     qqbar_numerator(res, x);
     return GR_SUCCESS;
 }
 
 int
-_gr_qqbar_denominator(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
+_gr_qqbar_denominator(qqbar_t res, const qqbar_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fmpz_t t;
     fmpz_init(t);
@@ -896,7 +902,7 @@ _gr_qqbar_denominator(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 
 /* todo: could special-case rationals */
 int
-_gr_qqbar_floor(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
+_gr_qqbar_floor(qqbar_t res, const qqbar_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (qqbar_is_integer(x))
     {
@@ -915,7 +921,7 @@ _gr_qqbar_floor(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_qqbar_ceil(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
+_gr_qqbar_ceil(qqbar_t res, const qqbar_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (qqbar_is_integer(x))
     {
@@ -934,7 +940,7 @@ _gr_qqbar_ceil(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_qqbar_trunc(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
+_gr_qqbar_trunc(qqbar_t res, const qqbar_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (qqbar_is_integer(x))
     {
@@ -968,7 +974,7 @@ _gr_qqbar_trunc(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 
 /* todo: fast numerical path */
 int
-_gr_qqbar_nint(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
+_gr_qqbar_nint(qqbar_t res, const qqbar_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (qqbar_is_integer(x))
     {
@@ -1020,7 +1026,7 @@ _gr_qqbar_i(qqbar_t res, const gr_ctx_t ctx)
 }
 
 int
-_gr_qqbar_abs(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
+_gr_qqbar_abs(qqbar_t res, const qqbar_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     qqbar_abs(res, x);
     return GR_SUCCESS;
@@ -1028,7 +1034,7 @@ _gr_qqbar_abs(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 
 /* todo: exploit when we know that the field is real */
 int
-_gr_qqbar_conj(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
+_gr_qqbar_conj(qqbar_t res, const qqbar_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     qqbar_conj(res, x);
     return GR_SUCCESS;
@@ -1036,7 +1042,7 @@ _gr_qqbar_conj(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 
 /* todo: exploit when we know that the field is real */
 int
-_gr_qqbar_re(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
+_gr_qqbar_re(qqbar_t res, const qqbar_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     qqbar_re(res, x);
     return GR_SUCCESS;
@@ -1044,28 +1050,28 @@ _gr_qqbar_re(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
 
 /* todo: exploit when we know that the field is real */
 int
-_gr_qqbar_im(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
+_gr_qqbar_im(qqbar_t res, const qqbar_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     qqbar_im(res, x);
     return GR_SUCCESS;
 }
 
 int
-_gr_qqbar_sgn(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
+_gr_qqbar_sgn(qqbar_t res, const qqbar_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     qqbar_sgn(res, x);
     return GR_SUCCESS;
 }
 
 int
-_gr_qqbar_csgn(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx)
+_gr_qqbar_csgn(qqbar_t res, const qqbar_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     qqbar_set_si(res, qqbar_csgn(x));
     return GR_SUCCESS;
 }
 
 int
-_gr_qqbar_cmp(int * res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
+_gr_qqbar_cmp(int * res, const qqbar_t x, const qqbar_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (!qqbar_is_real(x) || !qqbar_is_real(y))
         return GR_DOMAIN;
@@ -1075,7 +1081,7 @@ _gr_qqbar_cmp(int * res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
 }
 
 int
-_gr_qqbar_cmpabs(int * res, const qqbar_t x, const qqbar_t y, const gr_ctx_t ctx)
+_gr_qqbar_cmpabs(int * res, const qqbar_t x, const qqbar_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     *res = qqbar_cmpabs(x, y);
     return GR_SUCCESS;
@@ -1130,7 +1136,7 @@ _gr_qqbar_ ## fn(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx) \
 
 #define TRIG3(fn) \
 int \
-_gr_qqbar_ ## fn(qqbar_t res, const qqbar_t x, const gr_ctx_t ctx) \
+_gr_qqbar_ ## fn(qqbar_t res, const qqbar_t x, const gr_ctx_t FLINT_UNUSED(ctx)) \
 { \
     fmpq_t t; \
     slong p; \
@@ -1165,7 +1171,7 @@ TRIG3(acsc_pi)
 
 /* todo: quickly skip nonreal roots over the real algebraic numbers */
 int
-_gr_qqbar_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
+_gr_qqbar_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int FLINT_UNUSED(flags), gr_ctx_t ctx)
 {
     int status;
     gr_ctx_t ZZ, Rx;

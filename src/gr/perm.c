@@ -13,6 +13,13 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 #include "gr.h"
+#include "gr_generic.h"
+
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
 
 #define PERM_N(ctx) (*((ulong *) (ctx)))
 
@@ -41,14 +48,14 @@ _gr_perm_init(perm_t res, gr_ctx_t ctx)
 }
 
 int
-_gr_perm_clear(perm_t res, gr_ctx_t ctx)
+_gr_perm_clear(perm_t res, gr_ctx_t FLINT_UNUSED(ctx))
 {
     _perm_clear(res->entries);
     return GR_SUCCESS;
 }
 
 void
-_gr_perm_swap(perm_t x, perm_t y, gr_ctx_t ctx)
+_gr_perm_swap(perm_t x, perm_t y, gr_ctx_t FLINT_UNUSED(ctx))
 {
     perm_struct t = *x;
     *x = *y;
@@ -58,7 +65,7 @@ _gr_perm_swap(perm_t x, perm_t y, gr_ctx_t ctx)
 int
 _gr_perm_write(gr_stream_t out, perm_t x, gr_ctx_t ctx)
 {
-    slong i;
+    ulong i;
 
     gr_stream_write(out, "[");
 

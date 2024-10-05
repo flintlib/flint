@@ -20,6 +20,12 @@
 #include "gr_poly.h"
 #include "gr_generic.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 typedef struct
 {
     nmod_t nmod;
@@ -34,7 +40,6 @@ _gr_nmod_ctx_struct;
 
 /* when used as finite field when defining polynomial x - a, allow storing the coefficient a */
 #define NMOD_CTX_A(ring_ctx) (&((((_gr_nmod_ctx_struct *)(ring_ctx))->a)))
-
 
 void
 _gr_nmod_ctx_write(gr_stream_t out, gr_ctx_t ctx)
@@ -61,18 +66,18 @@ _gr_nmod_ctx_set_is_field(gr_ctx_t ctx, truth_t is_field)
 }
 
 void
-_gr_nmod_init(ulong * x, const gr_ctx_t ctx)
+_gr_nmod_init(ulong * x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     x[0] = 0;
 }
 
 void
-_gr_nmod_clear(ulong * x, const gr_ctx_t ctx)
+_gr_nmod_clear(ulong * FLINT_UNUSED(x), const gr_ctx_t FLINT_UNUSED(ctx))
 {
 }
 
 void
-_gr_nmod_swap(ulong * x, ulong * y, const gr_ctx_t ctx)
+_gr_nmod_swap(ulong * x, ulong * y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     ulong t;
     t = *x;
@@ -81,7 +86,7 @@ _gr_nmod_swap(ulong * x, ulong * y, const gr_ctx_t ctx)
 }
 
 void
-_gr_nmod_set_shallow(ulong * res, const ulong * x, const gr_ctx_t ctx)
+_gr_nmod_set_shallow(ulong * res, const ulong * x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     *res = *x;
 }
@@ -94,14 +99,14 @@ _gr_nmod_randtest(ulong * res, flint_rand_t state, const gr_ctx_t ctx)
 }
 
 int
-_gr_nmod_write(gr_stream_t out, const ulong * x, const gr_ctx_t ctx)
+_gr_nmod_write(gr_stream_t out, const ulong * x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     gr_stream_write_ui(out, x[0]);
     return GR_SUCCESS;
 }
 
 int
-_gr_nmod_zero(ulong * x, const gr_ctx_t ctx)
+_gr_nmod_zero(ulong * x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     x[0] = 0;
     return GR_SUCCESS;
@@ -137,7 +142,7 @@ _gr_nmod_set_fmpz(ulong * res, const fmpz_t v, const gr_ctx_t ctx)
 }
 
 int
-_gr_nmod_get_fmpz(fmpz_t res, const ulong * x, const gr_ctx_t ctx)
+_gr_nmod_get_fmpz(fmpz_t res, const ulong * x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fmpz_set_ui(res, x[0]);
     return GR_SUCCESS;
@@ -237,7 +242,7 @@ _gr_nmod_set_other(ulong * res, gr_ptr v, gr_ctx_t v_ctx, const gr_ctx_t ctx)
 }
 
 truth_t
-_gr_nmod_is_zero(const ulong * x, const gr_ctx_t ctx)
+_gr_nmod_is_zero(const ulong * x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     return (x[0] == 0) ? T_TRUE : T_FALSE;
 }
@@ -255,13 +260,13 @@ _gr_nmod_is_neg_one(const ulong * x, const gr_ctx_t ctx)
 }
 
 truth_t
-_gr_nmod_equal(const ulong * x, const ulong * y, const gr_ctx_t ctx)
+_gr_nmod_equal(const ulong * x, const ulong * y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     return (x[0] == y[0]) ? T_TRUE : T_FALSE;
 }
 
 int
-_gr_nmod_set(ulong * res, const ulong * x, const gr_ctx_t ctx)
+_gr_nmod_set(ulong * res, const ulong * x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     res[0] = x[0];
     return GR_SUCCESS;
@@ -575,7 +580,7 @@ _gr_nmod_pow_fmpz(ulong * res, const ulong * x, const fmpz_t y, gr_ctx_t ctx)
 
 
 void
-_gr_nmod_vec_init(ulong * res, slong len, gr_ctx_t ctx)
+_gr_nmod_vec_init(ulong * res, slong len, gr_ctx_t FLINT_UNUSED(ctx))
 {
     slong i;
 
@@ -584,12 +589,12 @@ _gr_nmod_vec_init(ulong * res, slong len, gr_ctx_t ctx)
 }
 
 void
-_gr_nmod_vec_clear(ulong * res, slong len, gr_ctx_t ctx)
+_gr_nmod_vec_clear(ulong * FLINT_UNUSED(res), slong FLINT_UNUSED(len), gr_ctx_t FLINT_UNUSED(ctx))
 {
 }
 
 int
-_gr_nmod_vec_set(ulong * res, const ulong * vec, slong len, gr_ctx_t ctx)
+_gr_nmod_vec_set(ulong * res, const ulong * vec, slong len, gr_ctx_t FLINT_UNUSED(ctx))
 {
     slong i;
 
@@ -600,7 +605,7 @@ _gr_nmod_vec_set(ulong * res, const ulong * vec, slong len, gr_ctx_t ctx)
 }
 
 int
-_gr_nmod_vec_normalise(slong * res, const ulong * vec, slong len, gr_ctx_t ctx)
+_gr_nmod_vec_normalise(slong * res, const ulong * vec, slong len, gr_ctx_t FLINT_UNUSED(ctx))
 {
     while (len > 0 && vec[len - 1] == 0)
         len--;
@@ -610,7 +615,7 @@ _gr_nmod_vec_normalise(slong * res, const ulong * vec, slong len, gr_ctx_t ctx)
 }
 
 slong
-_gr_nmod_vec_normalise_weak(const ulong * vec, slong len, gr_ctx_t ctx)
+_gr_nmod_vec_normalise_weak(const ulong * vec, slong len, gr_ctx_t FLINT_UNUSED(ctx))
 {
     while (len > 0 && vec[len - 1] == 0)
         len--;
@@ -943,7 +948,7 @@ _gr_nmod_vec_reciprocals(ulong * res, slong len, gr_ctx_t ctx)
         return GR_SUCCESS;
     }
 
-    if (mod.n <= len || mod.n % 2 == 0)
+    if (mod.n <= (ulong) len || mod.n % 2 == 0)
         return GR_DOMAIN;
 
     res[0] = 1;

@@ -21,6 +21,12 @@
 #include "gr_poly.h"
 #include "gr_generic.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 typedef struct
 {
     nf_struct * nf;
@@ -81,7 +87,7 @@ _gr_nf_clear(nf_elem_t x, const gr_ctx_t ctx)
 }
 
 void
-_gr_nf_swap(nf_elem_t x, nf_elem_t y, const gr_ctx_t ctx)
+_gr_nf_swap(nf_elem_t x, nf_elem_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     nf_elem_t t;
     *t = *x;
@@ -90,7 +96,7 @@ _gr_nf_swap(nf_elem_t x, nf_elem_t y, const gr_ctx_t ctx)
 }
 
 void
-_gr_nf_set_shallow(nf_elem_t res, const nf_elem_t x, const gr_ctx_t ctx)
+_gr_nf_set_shallow(nf_elem_t res, const nf_elem_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     *res = *x;
 }
@@ -165,8 +171,6 @@ _gr_nf_set_fmpq(nf_elem_t res, const fmpq_t v, const gr_ctx_t ctx)
     nf_elem_set_fmpq(res, v, NF_CTX(ctx));
     return GR_SUCCESS;
 }
-
-int gr_generic_set_other(gr_ptr res, gr_srcptr x, gr_ctx_t xctx, gr_ctx_t ctx);
 
 int
 _gr_nf_set_other(nf_elem_t res, gr_ptr v, gr_ctx_t v_ctx, gr_ctx_t ctx)

@@ -20,6 +20,12 @@
 #include "gr_poly.h"
 #include "gr_special.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 #define GR_CA_CTX(ring_ctx) ((ca_ctx_struct *)(GR_CTX_DATA_AS_PTR(ring_ctx)))
 
 int
@@ -63,7 +69,7 @@ _gr_ca_clear(ca_t x, gr_ctx_t ctx)
 }
 
 void
-_gr_ca_swap(ca_t x, ca_t y, gr_ctx_t ctx)
+_gr_ca_swap(ca_t x, ca_t y, gr_ctx_t FLINT_UNUSED(ctx))
 {
     ca_t t;
     *t = *x;
@@ -72,7 +78,7 @@ _gr_ca_swap(ca_t x, ca_t y, gr_ctx_t ctx)
 }
 
 void
-_gr_ca_set_shallow(ca_t res, const ca_t x, const gr_ctx_t ctx)
+_gr_ca_set_shallow(ca_t res, const ca_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     *res = *x;
 }
@@ -1484,7 +1490,7 @@ _gr_ca_poly_mullow(ca_ptr res,
 }
 
 int
-_gr_ca_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
+_gr_ca_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int FLINT_UNUSED(flags), gr_ctx_t ctx)
 {
     int status = GR_SUCCESS;
     ca_vec_t ca_roots;

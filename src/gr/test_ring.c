@@ -20,6 +20,12 @@
 #include "gr_mat.h"
 #include "gr_poly.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 typedef int ((*gr_test_function)(gr_ctx_t, flint_rand_t, int));
 
 int
@@ -629,7 +635,7 @@ gr_test_get_set_fexpr(gr_ctx_t R, flint_rand_t state, int test_flags)
 }
 
 int
-gr_test_ctx_get_str(gr_ctx_t R, flint_rand_t state, int test_flags)
+gr_test_ctx_get_str(gr_ctx_t R, flint_rand_t FLINT_UNUSED(state), int FLINT_UNUSED(test_flags))
 {
     int status = GR_SUCCESS;
     char * s;
@@ -1388,7 +1394,7 @@ gr_test_zero_one(gr_ctx_t R, flint_rand_t state, int test_flags)
 }
 
 int
-gr_test_randtest_not_zero(gr_ctx_t R, flint_rand_t state, int test_flags)
+gr_test_randtest_not_zero(gr_ctx_t R, flint_rand_t state, int FLINT_UNUSED(test_flags))
 {
     int status;
     gr_ptr a;
@@ -4021,7 +4027,7 @@ gr_test_approx_binary_op_type_variants(gr_ctx_t R,
 }
 
 int
-gr_test_approx_dot(gr_ctx_t R, gr_ctx_t R_ref, slong maxlen, gr_srcptr rel_tol, flint_rand_t state, int test_flags)
+gr_test_approx_dot(gr_ctx_t R, gr_ctx_t R_ref, slong maxlen, gr_srcptr rel_tol, flint_rand_t state, int FLINT_UNUSED(test_flags))
 {
     slong i, len;
     gr_ptr s0, vec1, vec2, res;

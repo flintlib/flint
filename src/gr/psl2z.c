@@ -12,35 +12,42 @@
 #include "fmpz_mat.h"
 #include "acb_modular.h"
 #include "gr.h"
+#include "gr_generic.h"
 
-int _gr_psl2z_ctx_write(gr_stream_t out, gr_ctx_t ctx)
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
+int _gr_psl2z_ctx_write(gr_stream_t out, gr_ctx_t FLINT_UNUSED(ctx))
 {
     gr_stream_write(out, "Modular group (psl2z)");
     return GR_SUCCESS;
 }
 
 int
-_gr_psl2z_init(psl2z_t res, gr_ctx_t ctx)
+_gr_psl2z_init(psl2z_t res, gr_ctx_t FLINT_UNUSED(ctx))
 {
     psl2z_init(res);
     return GR_SUCCESS;
 }
 
 int
-_gr_psl2z_clear(psl2z_t res, gr_ctx_t ctx)
+_gr_psl2z_clear(psl2z_t res, gr_ctx_t FLINT_UNUSED(ctx))
 {
     psl2z_clear(res);
     return GR_SUCCESS;
 }
 
 void
-_gr_psl2z_swap(psl2z_t x, psl2z_t y, gr_ctx_t ctx)
+_gr_psl2z_swap(psl2z_t x, psl2z_t y, gr_ctx_t FLINT_UNUSED(ctx))
 {
     psl2z_swap(x, y);
 }
 
 int
-_gr_psl2z_write(gr_stream_t out, psl2z_t x, gr_ctx_t ctx)
+_gr_psl2z_write(gr_stream_t out, psl2z_t x, gr_ctx_t FLINT_UNUSED(ctx))
 {
     gr_stream_write(out, "[[");
     gr_stream_write_fmpz(out, &x->a);
@@ -55,7 +62,7 @@ _gr_psl2z_write(gr_stream_t out, psl2z_t x, gr_ctx_t ctx)
 }
 
 int
-_gr_psl2z_randtest(psl2z_t res, flint_rand_t state, gr_ctx_t ctx)
+_gr_psl2z_randtest(psl2z_t res, flint_rand_t state, gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (n_randint(state, 4))
         psl2z_randtest(res, state, 8);
@@ -65,20 +72,20 @@ _gr_psl2z_randtest(psl2z_t res, flint_rand_t state, gr_ctx_t ctx)
 }
 
 truth_t
-_gr_psl2z_equal(const psl2z_t x, const psl2z_t y, gr_ctx_t ctx)
+_gr_psl2z_equal(const psl2z_t x, const psl2z_t y, gr_ctx_t FLINT_UNUSED(ctx))
 {
     return psl2z_equal(x, y) ? T_TRUE : T_FALSE;
 }
 
 int
-_gr_psl2z_set(psl2z_t res, const psl2z_t x, gr_ctx_t ctx)
+_gr_psl2z_set(psl2z_t res, const psl2z_t x, gr_ctx_t FLINT_UNUSED(ctx))
 {
     psl2z_set(res, x);
     return GR_SUCCESS;
 }
 
 int
-_gr_psl2z_set_other(psl2z_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
+_gr_psl2z_set_other(psl2z_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (x_ctx->which_ring == GR_CTX_PSL2Z)
     {
@@ -124,20 +131,20 @@ _gr_psl2z_set_other(psl2z_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 }
 
 int
-_gr_psl2z_one(psl2z_t res, gr_ctx_t ctx)
+_gr_psl2z_one(psl2z_t res, gr_ctx_t FLINT_UNUSED(ctx))
 {
     psl2z_one(res);
     return GR_SUCCESS;
 }
 
 truth_t
-_gr_psl2z_is_one(const psl2z_t x, gr_ctx_t ctx)
+_gr_psl2z_is_one(const psl2z_t x, gr_ctx_t FLINT_UNUSED(ctx))
 {
     return psl2z_is_one(x) ? T_TRUE : T_FALSE;
 }
 
 int
-_gr_psl2z_mul(psl2z_t res, const psl2z_t x, const psl2z_t y, gr_ctx_t ctx)
+_gr_psl2z_mul(psl2z_t res, const psl2z_t x, const psl2z_t y, gr_ctx_t FLINT_UNUSED(ctx))
 {
     psl2z_mul(res, x, y);
     return GR_SUCCESS;
@@ -145,7 +152,7 @@ _gr_psl2z_mul(psl2z_t res, const psl2z_t x, const psl2z_t y, gr_ctx_t ctx)
 
 /* todo: should be generic. also want left division */
 int
-_gr_psl2z_div(psl2z_t res, const psl2z_t x, const psl2z_t y, gr_ctx_t ctx)
+_gr_psl2z_div(psl2z_t res, const psl2z_t x, const psl2z_t y, gr_ctx_t FLINT_UNUSED(ctx))
 {
     psl2z_t t;
     psl2z_init(t);
@@ -156,7 +163,7 @@ _gr_psl2z_div(psl2z_t res, const psl2z_t x, const psl2z_t y, gr_ctx_t ctx)
 }
 
 int
-_gr_psl2z_inv(psl2z_t res, const psl2z_t x, gr_ctx_t ctx)
+_gr_psl2z_inv(psl2z_t res, const psl2z_t x, gr_ctx_t FLINT_UNUSED(ctx))
 {
     psl2z_inv(res, x);
     return GR_SUCCESS;

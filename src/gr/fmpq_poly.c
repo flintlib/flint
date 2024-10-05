@@ -20,6 +20,12 @@
 #include "gr_vec.h"
 #include "gr_generic.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 #define FMPQ_POLY_CTX(ctx) POLYNOMIAL_CTX(ctx)
 #define FMPQ_POLY_CTX_VAR(ctx) (FMPQ_POLY_CTX(ctx)->var)
 
@@ -52,26 +58,26 @@ int _gr_fmpq_poly_ctx_set_gen_names(gr_ctx_t ctx, const char ** s)
 
 
 int
-_gr_fmpq_poly_ctx_write(gr_stream_t out, gr_ctx_t ctx)
+_gr_fmpq_poly_ctx_write(gr_stream_t out, gr_ctx_t FLINT_UNUSED(ctx))
 {
     gr_stream_write(out, "Polynomials over rationals (fmpq_poly)");
     return GR_SUCCESS;
 }
 
 void
-_gr_fmpq_poly_init(fmpq_poly_t x, const gr_ctx_t ctx)
+_gr_fmpq_poly_init(fmpq_poly_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fmpq_poly_init(x);
 }
 
 void
-_gr_fmpq_poly_clear(fmpq_poly_t x, const gr_ctx_t ctx)
+_gr_fmpq_poly_clear(fmpq_poly_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fmpq_poly_clear(x);
 }
 
 void
-_gr_fmpq_poly_swap(fmpq_poly_t x, fmpq_poly_t y, const gr_ctx_t ctx)
+_gr_fmpq_poly_swap(fmpq_poly_t x, fmpq_poly_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fmpq_poly_t t;
     *t = *x;
@@ -80,14 +86,14 @@ _gr_fmpq_poly_swap(fmpq_poly_t x, fmpq_poly_t y, const gr_ctx_t ctx)
 }
 
 void
-_gr_fmpq_poly_set_shallow(fmpq_poly_t res, const fmpq_poly_t x, const gr_ctx_t ctx)
+_gr_fmpq_poly_set_shallow(fmpq_poly_t res, const fmpq_poly_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     *res = *x;
 }
 
 /* todo: limits */
 int
-_gr_fmpq_poly_randtest(fmpq_poly_t res, flint_rand_t state, const gr_ctx_t ctx)
+_gr_fmpq_poly_randtest(fmpq_poly_t res, flint_rand_t state, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (n_randint(state, 10) == 0)
         fmpq_poly_randtest(res, state, 4, 100);
@@ -105,21 +111,21 @@ _gr_fmpq_poly_write(gr_stream_t out, const fmpq_poly_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_fmpq_poly_zero(fmpq_poly_t x, const gr_ctx_t ctx)
+_gr_fmpq_poly_zero(fmpq_poly_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fmpq_poly_zero(x);
     return GR_SUCCESS;
 }
 
 int
-_gr_fmpq_poly_one(fmpq_poly_t x, const gr_ctx_t ctx)
+_gr_fmpq_poly_one(fmpq_poly_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fmpq_poly_one(x);
     return GR_SUCCESS;
 }
 
 int
-_gr_fmpq_poly_gen(fmpq_poly_t x, const gr_ctx_t ctx)
+_gr_fmpq_poly_gen(fmpq_poly_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fmpq_poly_zero(x);
     fmpq_poly_set_coeff_ui(x, 1, 1);
@@ -127,28 +133,28 @@ _gr_fmpq_poly_gen(fmpq_poly_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_fmpq_poly_set_si(fmpq_poly_t res, slong v, const gr_ctx_t ctx)
+_gr_fmpq_poly_set_si(fmpq_poly_t res, slong v, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fmpq_poly_set_si(res, v);
     return GR_SUCCESS;
 }
 
 int
-_gr_fmpq_poly_set_ui(fmpq_poly_t res, ulong v, const gr_ctx_t ctx)
+_gr_fmpq_poly_set_ui(fmpq_poly_t res, ulong v, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fmpq_poly_set_ui(res, v);
     return GR_SUCCESS;
 }
 
 int
-_gr_fmpq_poly_set_fmpz(fmpq_poly_t res, const fmpz_t v, const gr_ctx_t ctx)
+_gr_fmpq_poly_set_fmpz(fmpq_poly_t res, const fmpz_t v, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fmpq_poly_set_fmpz(res, v);
     return GR_SUCCESS;
 }
 
 int
-_gr_fmpq_poly_set_other(fmpq_poly_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t ctx)
+_gr_fmpq_poly_set_other(fmpq_poly_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (x_ctx->which_ring == GR_CTX_FMPZ)
     {
@@ -235,7 +241,7 @@ _gr_fmpq_poly_set_other(fmpq_poly_t res, gr_srcptr x, gr_ctx_t x_ctx, const gr_c
 }
 
 int
-_gr_fmpq_poly_get_ui(ulong * res, const fmpq_poly_t x, const gr_ctx_t ctx)
+_gr_fmpq_poly_get_ui(ulong * res, const fmpq_poly_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (fmpq_poly_length(x) == 0)
     {
@@ -260,7 +266,7 @@ _gr_fmpq_poly_get_ui(ulong * res, const fmpq_poly_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_fmpq_poly_get_si(slong * res, const fmpq_poly_t x, const gr_ctx_t ctx)
+_gr_fmpq_poly_get_si(slong * res, const fmpq_poly_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (fmpq_poly_length(x) == 0)
     {
@@ -285,7 +291,7 @@ _gr_fmpq_poly_get_si(slong * res, const fmpq_poly_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_fmpq_poly_get_fmpz(fmpz_t res, const fmpq_poly_t x, const gr_ctx_t ctx)
+_gr_fmpq_poly_get_fmpz(fmpz_t res, const fmpq_poly_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (fmpq_poly_length(x) == 0)
     {
@@ -303,7 +309,7 @@ _gr_fmpq_poly_get_fmpz(fmpz_t res, const fmpq_poly_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_fmpq_poly_get_fmpq(fmpq_t res, const fmpq_poly_t x, const gr_ctx_t ctx)
+_gr_fmpq_poly_get_fmpq(fmpq_t res, const fmpq_poly_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (fmpq_poly_length(x) == 0)
     {
@@ -323,87 +329,87 @@ _gr_fmpq_poly_get_fmpq(fmpq_t res, const fmpq_poly_t x, const gr_ctx_t ctx)
 
 
 truth_t
-_gr_fmpq_poly_is_zero(const fmpq_poly_t x, const gr_ctx_t ctx)
+_gr_fmpq_poly_is_zero(const fmpq_poly_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     return fmpq_poly_is_zero(x) ? T_TRUE : T_FALSE;
 }
 
 truth_t
-_gr_fmpq_poly_is_one(const fmpq_poly_t x, const gr_ctx_t ctx)
+_gr_fmpq_poly_is_one(const fmpq_poly_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     return fmpq_poly_is_one(x) ? T_TRUE : T_FALSE;
 }
 
 truth_t
-_gr_fmpq_poly_is_neg_one(const fmpq_poly_t x, const gr_ctx_t ctx)
+_gr_fmpq_poly_is_neg_one(const fmpq_poly_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     return (x->length == 1 && x->coeffs[0] == -1 && fmpz_is_one(x->den)) ? T_TRUE : T_FALSE;
 }
 
 truth_t
-_gr_fmpq_poly_equal(const fmpq_poly_t x, const fmpq_poly_t y, const gr_ctx_t ctx)
+_gr_fmpq_poly_equal(const fmpq_poly_t x, const fmpq_poly_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     return fmpq_poly_equal(x, y) ? T_TRUE : T_FALSE;
 }
 
 int
-_gr_fmpq_poly_set(fmpq_poly_t res, const fmpq_poly_t x, const gr_ctx_t ctx)
+_gr_fmpq_poly_set(fmpq_poly_t res, const fmpq_poly_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fmpq_poly_set(res, x);
     return GR_SUCCESS;
 }
 
 int
-_gr_fmpq_poly_neg(fmpq_poly_t res, const fmpq_poly_t x, const gr_ctx_t ctx)
+_gr_fmpq_poly_neg(fmpq_poly_t res, const fmpq_poly_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fmpq_poly_neg(res, x);
     return GR_SUCCESS;
 }
 
 int
-_gr_fmpq_poly_add(fmpq_poly_t res, const fmpq_poly_t x, const fmpq_poly_t y, const gr_ctx_t ctx)
+_gr_fmpq_poly_add(fmpq_poly_t res, const fmpq_poly_t x, const fmpq_poly_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fmpq_poly_add(res, x, y);
     return GR_SUCCESS;
 }
 
 int
-_gr_fmpq_poly_sub(fmpq_poly_t res, const fmpq_poly_t x, const fmpq_poly_t y, const gr_ctx_t ctx)
+_gr_fmpq_poly_sub(fmpq_poly_t res, const fmpq_poly_t x, const fmpq_poly_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fmpq_poly_sub(res, x, y);
     return GR_SUCCESS;
 }
 
 int
-_gr_fmpq_poly_mul(fmpq_poly_t res, const fmpq_poly_t x, const fmpq_poly_t y, const gr_ctx_t ctx)
+_gr_fmpq_poly_mul(fmpq_poly_t res, const fmpq_poly_t x, const fmpq_poly_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fmpq_poly_mul(res, x, y);
     return GR_SUCCESS;
 }
 
 int
-_gr_fmpq_poly_mul_ui(fmpq_poly_t res, const fmpq_poly_t x, ulong y, const gr_ctx_t ctx)
+_gr_fmpq_poly_mul_ui(fmpq_poly_t res, const fmpq_poly_t x, ulong y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fmpq_poly_scalar_mul_ui(res, x, y);
     return GR_SUCCESS;
 }
 
 int
-_gr_fmpq_poly_mul_si(fmpq_poly_t res, const fmpq_poly_t x, slong y, const gr_ctx_t ctx)
+_gr_fmpq_poly_mul_si(fmpq_poly_t res, const fmpq_poly_t x, slong y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fmpq_poly_scalar_mul_si(res, x, y);
     return GR_SUCCESS;
 }
 
 int
-_gr_fmpq_poly_mul_fmpz(fmpq_poly_t res, const fmpq_poly_t x, const fmpz_t y, const gr_ctx_t ctx)
+_gr_fmpq_poly_mul_fmpz(fmpq_poly_t res, const fmpq_poly_t x, const fmpz_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fmpq_poly_scalar_mul_fmpz(res, x, y);
     return GR_SUCCESS;
 }
 
 int
-_gr_fmpq_poly_mul_two(fmpq_poly_t res, const fmpq_poly_t x, const gr_ctx_t ctx)
+_gr_fmpq_poly_mul_two(fmpq_poly_t res, const fmpq_poly_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     /* fmpq_poly_scalar_mul_2exp(res, x, 1); */
     fmpq_poly_scalar_mul_ui(res, x, 2);
@@ -411,14 +417,14 @@ _gr_fmpq_poly_mul_two(fmpq_poly_t res, const fmpq_poly_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_fmpq_poly_sqr(fmpq_poly_t res, const fmpq_poly_t x, const gr_ctx_t ctx)
+_gr_fmpq_poly_sqr(fmpq_poly_t res, const fmpq_poly_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fmpq_poly_mul(res, x, x);
     return GR_SUCCESS;
 }
 
 int
-_gr_fmpq_poly_inv(fmpq_poly_t res, const fmpq_poly_t x, const gr_ctx_t ctx)
+_gr_fmpq_poly_inv(fmpq_poly_t res, const fmpq_poly_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (x->length == 1)
     {
@@ -432,7 +438,7 @@ _gr_fmpq_poly_inv(fmpq_poly_t res, const fmpq_poly_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_fmpq_poly_div(fmpq_poly_t res, const fmpq_poly_t x, const fmpq_poly_t y, const gr_ctx_t ctx)
+_gr_fmpq_poly_div(fmpq_poly_t res, const fmpq_poly_t x, const fmpq_poly_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (fmpq_poly_is_zero(y))
     {
@@ -448,7 +454,7 @@ _gr_fmpq_poly_div(fmpq_poly_t res, const fmpq_poly_t x, const fmpq_poly_t y, con
 }
 
 int
-_gr_fmpq_poly_divexact(fmpq_poly_t res, const fmpq_poly_t x, const fmpq_poly_t y, const gr_ctx_t ctx)
+_gr_fmpq_poly_divexact(fmpq_poly_t res, const fmpq_poly_t x, const fmpq_poly_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (fmpq_poly_is_zero(y))
     {
@@ -462,7 +468,7 @@ _gr_fmpq_poly_divexact(fmpq_poly_t res, const fmpq_poly_t x, const fmpq_poly_t y
 }
 
 int
-_gr_fmpq_poly_divexact_ui(fmpq_poly_t res, const fmpq_poly_t x, ulong y, const gr_ctx_t ctx)
+_gr_fmpq_poly_divexact_ui(fmpq_poly_t res, const fmpq_poly_t x, ulong y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (y == 0)
     {
@@ -476,7 +482,7 @@ _gr_fmpq_poly_divexact_ui(fmpq_poly_t res, const fmpq_poly_t x, ulong y, const g
 }
 
 int
-_gr_fmpq_poly_divexact_si(fmpq_poly_t res, const fmpq_poly_t x, slong y, const gr_ctx_t ctx)
+_gr_fmpq_poly_divexact_si(fmpq_poly_t res, const fmpq_poly_t x, slong y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (y == 0)
     {
@@ -490,7 +496,7 @@ _gr_fmpq_poly_divexact_si(fmpq_poly_t res, const fmpq_poly_t x, slong y, const g
 }
 
 int
-_gr_fmpq_poly_divexact_fmpz(fmpq_poly_t res, const fmpq_poly_t x, const fmpz_t y, const gr_ctx_t ctx)
+_gr_fmpq_poly_divexact_fmpz(fmpq_poly_t res, const fmpq_poly_t x, const fmpz_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (fmpz_is_zero(y))
     {
@@ -505,14 +511,14 @@ _gr_fmpq_poly_divexact_fmpz(fmpq_poly_t res, const fmpq_poly_t x, const fmpz_t y
 
 
 truth_t
-_gr_fmpq_poly_is_invertible(const fmpq_poly_t x, const gr_ctx_t ctx)
+_gr_fmpq_poly_is_invertible(const fmpq_poly_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     return (x->length == 1) ? T_TRUE : T_FALSE;
 }
 
 /* todo: efficient algo */
 truth_t
-_gr_fmpq_poly_divides(const fmpq_poly_t x, const fmpq_poly_t y, const gr_ctx_t ctx)
+_gr_fmpq_poly_divides(const fmpq_poly_t x, const fmpq_poly_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     truth_t res;
     fmpq_poly_t tmp;
@@ -525,7 +531,7 @@ _gr_fmpq_poly_divides(const fmpq_poly_t x, const fmpq_poly_t y, const gr_ctx_t c
 }
 
 int
-_gr_fmpq_poly_euclidean_div(fmpq_poly_t res, const fmpq_poly_t x, const fmpq_poly_t y, const gr_ctx_t ctx)
+_gr_fmpq_poly_euclidean_div(fmpq_poly_t res, const fmpq_poly_t x, const fmpq_poly_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (fmpq_poly_is_zero(y))
     {
@@ -539,7 +545,7 @@ _gr_fmpq_poly_euclidean_div(fmpq_poly_t res, const fmpq_poly_t x, const fmpq_pol
 }
 
 int
-_gr_fmpq_poly_euclidean_rem(fmpq_poly_t res, const fmpq_poly_t x, const fmpq_poly_t y, const gr_ctx_t ctx)
+_gr_fmpq_poly_euclidean_rem(fmpq_poly_t res, const fmpq_poly_t x, const fmpq_poly_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (fmpq_poly_is_zero(y))
     {
@@ -553,7 +559,7 @@ _gr_fmpq_poly_euclidean_rem(fmpq_poly_t res, const fmpq_poly_t x, const fmpq_pol
 }
 
 int
-_gr_fmpq_poly_euclidean_divrem(fmpq_poly_t res1, fmpq_poly_t res2, const fmpq_poly_t x, const fmpq_poly_t y, const gr_ctx_t ctx)
+_gr_fmpq_poly_euclidean_divrem(fmpq_poly_t res1, fmpq_poly_t res2, const fmpq_poly_t x, const fmpq_poly_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (fmpq_poly_is_zero(y))
     {
@@ -567,21 +573,21 @@ _gr_fmpq_poly_euclidean_divrem(fmpq_poly_t res1, fmpq_poly_t res2, const fmpq_po
 }
 
 int
-_gr_fmpq_poly_gcd(fmpq_poly_t res, const fmpq_poly_t x, const fmpq_poly_t y, const gr_ctx_t ctx)
+_gr_fmpq_poly_gcd(fmpq_poly_t res, const fmpq_poly_t x, const fmpq_poly_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fmpq_poly_gcd(res, x, y);
     return GR_SUCCESS;
 }
 
 int
-_gr_fmpq_poly_lcm(fmpq_poly_t res, const fmpq_poly_t x, const fmpq_poly_t y, const gr_ctx_t ctx)
+_gr_fmpq_poly_lcm(fmpq_poly_t res, const fmpq_poly_t x, const fmpq_poly_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fmpq_poly_lcm(res, x, y);
     return GR_SUCCESS;
 }
 
 int
-_gr_fmpq_poly_pow_ui(fmpq_poly_t res, const fmpq_poly_t x, ulong exp, const gr_ctx_t ctx)
+_gr_fmpq_poly_pow_ui(fmpq_poly_t res, const fmpq_poly_t x, ulong exp, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fmpq_poly_pow(res, x, exp);
     return GR_SUCCESS;
@@ -638,7 +644,7 @@ _gr_fmpq_poly_pow_fmpz(fmpq_poly_t res, const fmpq_poly_t x, const fmpz_t exp, g
 }
 
 int
-_gr_fmpq_poly_numerator(fmpq_poly_t res, const fmpq_poly_t x, const gr_ctx_t ctx)
+_gr_fmpq_poly_numerator(fmpq_poly_t res, const fmpq_poly_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fmpq_poly_set(res, x);
     fmpz_one(fmpq_poly_denref(res));
@@ -646,7 +652,7 @@ _gr_fmpq_poly_numerator(fmpq_poly_t res, const fmpq_poly_t x, const gr_ctx_t ctx
 }
 
 int
-_gr_fmpq_poly_denominator(fmpq_poly_t res, const fmpq_poly_t x, const gr_ctx_t ctx)
+_gr_fmpq_poly_denominator(fmpq_poly_t res, const fmpq_poly_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     fmpq_poly_set_fmpz(res, fmpq_poly_denref(x));
     return GR_SUCCESS;

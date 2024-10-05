@@ -16,6 +16,12 @@
 #include "gr_vec.h"
 #include "gr_generic.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 typedef struct
 {
     fmpz_mpoly_ctx_t mctx;
@@ -104,7 +110,7 @@ _gr_fmpz_mpoly_swap(fmpz_mpoly_t poly1, fmpz_mpoly_t poly2, gr_ctx_t ctx)
 }
 
 void
-_gr_fmpz_mpoly_set_shallow(fmpz_mpoly_t res, const fmpz_mpoly_t poly, gr_ctx_t ctx)
+_gr_fmpz_mpoly_set_shallow(fmpz_mpoly_t res, const fmpz_mpoly_t poly, gr_ctx_t FLINT_UNUSED(ctx))
 {
     *res = *poly;
 }
@@ -131,7 +137,7 @@ _gr_fmpz_mpoly_randtest_small(fmpz_mpoly_t res, flint_rand_t state, gr_ctx_t ctx
 }
 
 slong
-_gr_fmpz_mpoly_length(const fmpz_mpoly_t x, gr_ctx_t ctx)
+_gr_fmpz_mpoly_length(const fmpz_mpoly_t x, gr_ctx_t FLINT_UNUSED(ctx))
 {
     return x->length;
 }
@@ -254,7 +260,7 @@ _gr_fmpz_mpoly_neg(fmpz_mpoly_t res, const fmpz_mpoly_t mat, gr_ctx_t ctx)
 int
 _gr_fmpz_mpoly_add(fmpz_mpoly_t res, const fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, gr_ctx_t ctx)
 {
-    if (poly1->length + poly2->length > ctx->size_limit)
+    if ((ulong) (poly1->length + poly2->length) > ctx->size_limit)
     {
         fmpz_mpoly_zero(res, MPOLYNOMIAL_MCTX(ctx));
         return GR_UNABLE;
@@ -288,7 +294,7 @@ _gr_fmpz_mpoly_add_fmpz(fmpz_mpoly_t res, const fmpz_mpoly_t poly1, const fmpz_t
 int
 _gr_fmpz_mpoly_sub(fmpz_mpoly_t res, const fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, gr_ctx_t ctx)
 {
-    if (poly1->length + poly2->length > ctx->size_limit)
+    if ((ulong) (poly1->length + poly2->length) > ctx->size_limit)
     {
         fmpz_mpoly_zero(res, MPOLYNOMIAL_MCTX(ctx));
         return GR_UNABLE;
@@ -322,7 +328,7 @@ _gr_fmpz_mpoly_sub_fmpz(fmpz_mpoly_t res, const fmpz_mpoly_t poly1, const fmpz_t
 int
 _gr_fmpz_mpoly_mul(fmpz_mpoly_t res, const fmpz_mpoly_t poly1, const fmpz_mpoly_t poly2, gr_ctx_t ctx)
 {
-    if (poly1->length * poly2->length > ctx->size_limit)  /* todo: * can overflow */
+    if ((ulong) (poly1->length * poly2->length) > ctx->size_limit)  /* todo: * can overflow */
     {
         fmpz_mpoly_zero(res, MPOLYNOMIAL_MCTX(ctx));
         return GR_UNABLE;
@@ -491,7 +497,7 @@ _gr_fmpz_mpoly_gcd(fmpz_mpoly_t res, const fmpz_mpoly_t poly1, const fmpz_mpoly_
 }
 
 int
-_gr_fmpz_mpoly_factor(fmpz_mpoly_t c, gr_vec_t factors, gr_vec_t exponents, gr_srcptr x, int flags, gr_ctx_t ctx)
+_gr_fmpz_mpoly_factor(fmpz_mpoly_t c, gr_vec_t factors, gr_vec_t exponents, gr_srcptr x, int FLINT_UNUSED(flags), gr_ctx_t ctx)
 {
     fmpz_mpoly_factor_t fac;
     gr_ctx_t ZZ;

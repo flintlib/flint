@@ -29,6 +29,12 @@
 #include "gr_poly.h"
 #include "nfloat.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 typedef struct
 {
     slong prec;
@@ -66,19 +72,19 @@ _gr_acb_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 }
 
 void
-_gr_acb_init(acb_t x, const gr_ctx_t ctx)
+_gr_acb_init(acb_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     acb_init(x);
 }
 
 void
-_gr_acb_clear(acb_t x, const gr_ctx_t ctx)
+_gr_acb_clear(acb_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     acb_clear(x);
 }
 
 void
-_gr_acb_swap(acb_t x, acb_t y, const gr_ctx_t ctx)
+_gr_acb_swap(acb_t x, acb_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     acb_t t;
     *t = *x;
@@ -87,7 +93,7 @@ _gr_acb_swap(acb_t x, acb_t y, const gr_ctx_t ctx)
 }
 
 void
-_gr_acb_set_shallow(acb_t res, const acb_t x, const gr_ctx_t ctx)
+_gr_acb_set_shallow(acb_t res, const acb_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     *res = *x;
 }
@@ -101,7 +107,7 @@ _gr_acb_randtest(acb_t res, flint_rand_t state, const gr_ctx_t ctx)
 }
 
 int
-__gr_acb_write(gr_stream_t out, const acb_t x, slong digits, int flags, const gr_ctx_t ctx)
+__gr_acb_write(gr_stream_t out, const acb_t x, slong digits, int flags, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (arb_is_zero(acb_imagref(x)))
     {
@@ -171,14 +177,14 @@ _gr_acb_write_n(gr_stream_t out, gr_srcptr x, slong n, gr_ctx_t ctx)
 }
 
 int
-_gr_acb_zero(acb_t x, const gr_ctx_t ctx)
+_gr_acb_zero(acb_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     acb_zero(x);
     return GR_SUCCESS;
 }
 
 int
-_gr_acb_one(acb_t x, const gr_ctx_t ctx)
+_gr_acb_one(acb_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     acb_one(x);
     return GR_SUCCESS;
@@ -308,7 +314,7 @@ _gr_acb_set_other(acb_t res, gr_srcptr x, gr_ctx_t x_ctx, gr_ctx_t ctx)
 }
 
 int
-_gr_acb_set_interval_mid_rad(acb_t res, const acb_t m, const acb_t r, const gr_ctx_t ctx)
+_gr_acb_set_interval_mid_rad(acb_t res, const acb_t m, const acb_t r, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     mag_t rad1, rad2;
     mag_init(rad1);
@@ -329,7 +335,7 @@ int _gr_arf_get_si(slong * res, const arf_t x, const gr_ctx_t ctx);
 int _gr_arf_get_ui(ulong * res, const arf_t x, const gr_ctx_t ctx);
 
 int
-_gr_acb_get_fmpz(fmpz_t res, const acb_t x, const gr_ctx_t ctx)
+_gr_acb_get_fmpz(fmpz_t res, const acb_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (!acb_is_int(x))
     {
@@ -343,7 +349,7 @@ _gr_acb_get_fmpz(fmpz_t res, const acb_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_acb_get_si(slong * res, const acb_t x, const gr_ctx_t ctx)
+_gr_acb_get_si(slong * res, const acb_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (!acb_is_int(x))
     {
@@ -357,7 +363,7 @@ _gr_acb_get_si(slong * res, const acb_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_acb_get_ui(ulong * res, const acb_t x, const gr_ctx_t ctx)
+_gr_acb_get_ui(ulong * res, const acb_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (!acb_is_int(x))
     {
@@ -371,14 +377,14 @@ _gr_acb_get_ui(ulong * res, const acb_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_acb_get_d(double * res, const acb_t x, const gr_ctx_t ctx)
+_gr_acb_get_d(double * res, const acb_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     *res = arf_get_d(arb_midref(acb_realref(x)), ARF_RND_NEAR);
     return GR_SUCCESS;
 }
 
 truth_t
-_gr_acb_is_zero(const acb_t x, const gr_ctx_t ctx)
+_gr_acb_is_zero(const acb_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (acb_is_zero(x))
         return T_TRUE;
@@ -390,7 +396,7 @@ _gr_acb_is_zero(const acb_t x, const gr_ctx_t ctx)
 }
 
 truth_t
-_gr_acb_is_one(const acb_t x, const gr_ctx_t ctx)
+_gr_acb_is_one(const acb_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (acb_is_one(x))
         return T_TRUE;
@@ -402,7 +408,7 @@ _gr_acb_is_one(const acb_t x, const gr_ctx_t ctx)
 }
 
 truth_t
-_gr_acb_is_neg_one(const acb_t x, const gr_ctx_t ctx)
+_gr_acb_is_neg_one(const acb_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (acb_equal_si(x, -1))
         return T_TRUE;
@@ -414,7 +420,7 @@ _gr_acb_is_neg_one(const acb_t x, const gr_ctx_t ctx)
 }
 
 truth_t
-_gr_acb_equal(const acb_t x, const acb_t y, const gr_ctx_t ctx)
+_gr_acb_equal(const acb_t x, const acb_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (acb_is_exact(x) && acb_equal(x, y))
         return T_TRUE;
@@ -426,14 +432,14 @@ _gr_acb_equal(const acb_t x, const acb_t y, const gr_ctx_t ctx)
 }
 
 int
-_gr_acb_set(acb_t res, const acb_t x, const gr_ctx_t ctx)
+_gr_acb_set(acb_t res, const acb_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     acb_set(res, x);
     return GR_SUCCESS;
 }
 
 int
-_gr_acb_neg(acb_t res, const acb_t x, const gr_ctx_t ctx)
+_gr_acb_neg(acb_t res, const acb_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     acb_neg(res, x);
     return GR_SUCCESS;
@@ -538,7 +544,7 @@ _gr_acb_submul(acb_t res, const acb_t x, const acb_t y, const gr_ctx_t ctx)
 }
 
 int
-_gr_acb_mul_two(acb_t res, const acb_t x, const gr_ctx_t ctx)
+_gr_acb_mul_two(acb_t res, const acb_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     acb_mul_2exp_si(res, x, 1);
     return GR_SUCCESS;
@@ -552,21 +558,21 @@ _gr_acb_sqr(acb_t res, const acb_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_acb_mul_2exp_si(acb_t res, const acb_t x, slong y, const gr_ctx_t ctx)
+_gr_acb_mul_2exp_si(acb_t res, const acb_t x, slong y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     acb_mul_2exp_si(res, x, y);
     return GR_SUCCESS;
 }
 
 int
-_gr_acb_mul_2exp_fmpz(acb_t res, const acb_t x, const fmpz_t y, const gr_ctx_t ctx)
+_gr_acb_mul_2exp_fmpz(acb_t res, const acb_t x, const fmpz_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     acb_mul_2exp_fmpz(res, x, y);
     return GR_SUCCESS;
 }
 
 int
-_gr_acb_set_fmpz_2exp_fmpz(acb_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t ctx)
+_gr_acb_set_fmpz_2exp_fmpz(acb_t res, const fmpz_t x, const fmpz_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     arb_set_fmpz_2exp(acb_realref(res), x, y);
     arb_zero(acb_imagref(res));
@@ -574,7 +580,7 @@ _gr_acb_set_fmpz_2exp_fmpz(acb_t res, const fmpz_t x, const fmpz_t y, const gr_c
 }
 
 int
-_gr_acb_get_fmpz_2exp_fmpz(fmpz_t res1, fmpz_t res2, const acb_t x, const gr_ctx_t ctx)
+_gr_acb_get_fmpz_2exp_fmpz(fmpz_t res1, fmpz_t res2, const acb_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (!acb_is_exact(x) || !acb_is_real(x))
         return GR_UNABLE;
@@ -664,7 +670,7 @@ _gr_acb_div_fmpz(acb_t res, const acb_t x, const fmpz_t y, const gr_ctx_t ctx)
 }
 
 truth_t
-_gr_acb_is_invertible(const acb_t x, const gr_ctx_t ctx)
+_gr_acb_is_invertible(const acb_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (acb_is_zero(x))
         return T_FALSE;
@@ -773,7 +779,7 @@ _gr_acb_pow_fmpq(acb_t res, const acb_t x, const fmpq_t exp, const gr_ctx_t ctx)
 }
 
 truth_t
-_gr_acb_is_square(const acb_t x, const gr_ctx_t ctx)
+_gr_acb_is_square(const acb_t FLINT_UNUSED(x), const gr_ctx_t FLINT_UNUSED(ctx))
 {
     return T_TRUE;
 }
@@ -876,7 +882,7 @@ _gr_acb_nint(acb_t res, const acb_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_acb_i(acb_t res, const gr_ctx_t ctx)
+_gr_acb_i(acb_t res, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     acb_onei(res);
     return GR_SUCCESS;
@@ -891,14 +897,14 @@ _gr_acb_abs(acb_t res, const acb_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_acb_conj(acb_t res, const acb_t x, const gr_ctx_t ctx)
+_gr_acb_conj(acb_t res, const acb_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     acb_conj(res, x);
     return GR_SUCCESS;
 }
 
 int
-_gr_acb_re(acb_t res, const acb_t x, const gr_ctx_t ctx)
+_gr_acb_re(acb_t res, const acb_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     arb_set(acb_realref(res), acb_realref(x));
     arb_zero(acb_imagref(res));
@@ -906,7 +912,7 @@ _gr_acb_re(acb_t res, const acb_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_acb_im(acb_t res, const acb_t x, const gr_ctx_t ctx)
+_gr_acb_im(acb_t res, const acb_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     arb_set(acb_realref(res), acb_imagref(x));
     arb_zero(acb_imagref(res));
@@ -956,7 +962,7 @@ _gr_acb_ ## fname(acb_t res, const acb_t x, const acb_t y, const gr_ctx_t ctx) \
 DEF_FUNC(sgn)
 
 int
-_gr_acb_csgn(acb_t res, const acb_t x, const gr_ctx_t ctx)
+_gr_acb_csgn(acb_t res, const acb_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     acb_csgn(acb_realref(res), x);
     arb_zero(acb_imagref(res));
@@ -972,7 +978,7 @@ _gr_acb_arg(acb_t res, const acb_t x, const gr_ctx_t ctx)
 }
 
 int
-_gr_acb_cmp(int * res, const acb_t x, const acb_t y, const gr_ctx_t ctx)
+_gr_acb_cmp(int * res, const acb_t x, const acb_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     if (arb_is_zero(acb_imagref(x)) && arb_is_zero(acb_imagref(y)) &&
         ((arb_is_exact(acb_realref(x)) && arb_is_exact(acb_realref(y))) || !arb_overlaps(acb_realref(x), acb_realref(y))))
@@ -1055,19 +1061,19 @@ _gr_acb_cmpabs(int * res, const acb_t x, const acb_t y, const gr_ctx_t ctx)
         }
         else
         {
-            arb_t t, u;
+            arb_t tb, u;
 
-            arb_init(t);
+            arb_init(tb);
             arb_init(u);
 
-            arb_mul(t, a, a, prec);
-            arb_addmul(t, b, b, prec);
+            arb_mul(tb, a, a, prec);
+            arb_addmul(tb, b, b, prec);
             arb_mul(u, c, c, prec);
             arb_addmul(u, d, d, prec);
 
-            if ((arb_is_exact(t) && arb_is_exact(u)) || !arb_overlaps(t, u))
+            if ((arb_is_exact(tb) && arb_is_exact(u)) || !arb_overlaps(tb, u))
             {
-                *res = arf_cmp(arb_midref(t), arb_midref(u));
+                *res = arf_cmp(arb_midref(tb), arb_midref(u));
                 status = GR_SUCCESS;
             }
             else
@@ -1077,7 +1083,7 @@ _gr_acb_cmpabs(int * res, const acb_t x, const acb_t y, const gr_ctx_t ctx)
                 status = GR_UNABLE;
             }
 
-            arb_clear(t);
+            arb_clear(tb);
             arb_clear(u);
         }
 
@@ -1684,7 +1690,7 @@ int _gr_acb_hypgeom_1f1(acb_t res, const acb_t a, const acb_t b, const acb_t x, 
     return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
 }
 
-int _gr_acb_hypgeom_u(acb_t res, const acb_t a, const acb_t b, const acb_t x, int flags, const gr_ctx_t ctx)
+int _gr_acb_hypgeom_u(acb_t res, const acb_t a, const acb_t b, const acb_t x, int FLINT_UNUSED(flags), const gr_ctx_t ctx)
 {
     acb_hypgeom_u(res, a, b, x, ACB_CTX_PREC(ctx));
     return acb_is_finite(res) ? GR_SUCCESS : GR_UNABLE;
@@ -1992,7 +1998,7 @@ roots_accurate(acb_ptr roots, slong len, slong prec)
 
 /* hidden feature: also works with arb ctx */
 int
-_gr_acb_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int flags, gr_ctx_t ctx)
+_gr_acb_poly_roots(gr_vec_t roots, gr_vec_t mult, const gr_poly_t poly, int FLINT_UNUSED(flags), gr_ctx_t ctx)
 {
     slong prec, initial_prec, target_prec, isolated, maxiter, maxprec, deg, i;
     acb_ptr croots;
@@ -2193,7 +2199,7 @@ _gr_acb_mat_exp(acb_mat_t res, const acb_mat_t x, gr_ctx_t ctx)
 }
 
 int
-_gr_acb_mat_diagonalization(gr_vec_t D, acb_mat_t L, acb_mat_t R, const acb_mat_t A, int flags, gr_ctx_t ctx)
+_gr_acb_mat_diagonalization(gr_vec_t D, acb_mat_t L, acb_mat_t R, const acb_mat_t A, int FLINT_UNUSED(flags), gr_ctx_t ctx)
 {
     int status;
     slong n;

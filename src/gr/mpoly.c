@@ -17,6 +17,14 @@
 #include "gr_mpoly.h"
 #include "gr_generic.h"
 
+/* FIXME: Should these functions be static or not? */
+
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 typedef struct
 {
     gr_ctx_struct * base_ring;
@@ -142,7 +150,7 @@ _gr_gr_mpoly_swap(gr_mpoly_t poly1, gr_mpoly_t poly2, gr_ctx_t ctx)
 }
 
 void
-_gr_gr_mpoly_set_shallow(gr_mpoly_t res, const gr_mpoly_t poly, gr_ctx_t ctx)
+_gr_gr_mpoly_set_shallow(gr_mpoly_t res, const gr_mpoly_t poly, gr_ctx_t FLINT_UNUSED(ctx))
 {
     *res = *poly;
 }
@@ -154,7 +162,7 @@ _gr_gr_mpoly_randtest(gr_mpoly_t res, flint_rand_t state, gr_ctx_t ctx)
 }
 
 slong
-_gr_gr_mpoly_length(const gr_mpoly_t x, gr_ctx_t ctx)
+_gr_gr_mpoly_length(const gr_mpoly_t x, gr_ctx_t FLINT_UNUSED(ctx))
 {
     return x->length;
 }
@@ -284,7 +292,7 @@ _gr_gr_mpoly_neg(gr_mpoly_t res, const gr_mpoly_t mat, gr_ctx_t ctx)
 int
 _gr_gr_mpoly_add(gr_mpoly_t res, const gr_mpoly_t poly1, const gr_mpoly_t poly2, gr_ctx_t ctx)
 {
-    if (poly1->length + poly2->length > ctx->size_limit)
+    if ((ulong) (poly1->length + poly2->length) > ctx->size_limit)
         return GR_UNABLE | gr_mpoly_zero(res, MPOLYNOMIAL_MCTX(ctx), MPOLYNOMIAL_ELEM_CTX(ctx));
 
     return gr_mpoly_add(res, poly1, poly2, MPOLYNOMIAL_MCTX(ctx), MPOLYNOMIAL_ELEM_CTX(ctx));
@@ -293,7 +301,7 @@ _gr_gr_mpoly_add(gr_mpoly_t res, const gr_mpoly_t poly1, const gr_mpoly_t poly2,
 int
 _gr_gr_mpoly_sub(gr_mpoly_t res, const gr_mpoly_t poly1, const gr_mpoly_t poly2, gr_ctx_t ctx)
 {
-    if (poly1->length + poly2->length > ctx->size_limit)
+    if ((ulong) (poly1->length + poly2->length) > ctx->size_limit)
         return GR_UNABLE | gr_mpoly_zero(res, MPOLYNOMIAL_MCTX(ctx), MPOLYNOMIAL_ELEM_CTX(ctx));
 
     return gr_mpoly_sub(res, poly1, poly2, MPOLYNOMIAL_MCTX(ctx), MPOLYNOMIAL_ELEM_CTX(ctx));
@@ -302,7 +310,7 @@ _gr_gr_mpoly_sub(gr_mpoly_t res, const gr_mpoly_t poly1, const gr_mpoly_t poly2,
 int
 _gr_gr_mpoly_mul(gr_mpoly_t res, const gr_mpoly_t poly1, const gr_mpoly_t poly2, gr_ctx_t ctx)
 {
-    if (poly1->length * poly2->length > ctx->size_limit)
+    if ((ulong) (poly1->length * poly2->length) > ctx->size_limit)
         return GR_UNABLE | gr_mpoly_zero(res, MPOLYNOMIAL_MCTX(ctx), MPOLYNOMIAL_ELEM_CTX(ctx));
 
     return gr_mpoly_mul(res, poly1, poly2, MPOLYNOMIAL_MCTX(ctx), MPOLYNOMIAL_ELEM_CTX(ctx));

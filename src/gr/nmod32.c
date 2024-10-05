@@ -10,11 +10,17 @@
 */
 
 #include "fmpz.h"
-//#include "fmpq.h"
 #include "nmod.h"
 #include "nmod_vec.h"
 #include "gr.h"
 #include "gr_mat.h"
+#include "gr_generic.h"
+
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
 
 #define NMOD32_CTX_REF(ring_ctx) (((nmod_t *)((ring_ctx))))
 #define NMOD32_CTX(ring_ctx) (*NMOD32_CTX_REF(ring_ctx))
@@ -33,24 +39,24 @@ nmod32_ctx_write(gr_stream_t out, gr_ctx_t ctx)
 /* we don't want to call n_is_prime because this predicate should
    be fast. allow storing a flag in the context object? */
 truth_t
-nmod32_ctx_is_field(const gr_ctx_t ctx)
+nmod32_ctx_is_field(const gr_ctx_t FLINT_UNUSED(ctx))
 {
     return T_UNKNOWN;
 }
 
 void
-nmod32_init(nmod32_t x, const gr_ctx_t ctx)
+nmod32_init(nmod32_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     x[0] = 0;
 }
 
 void
-nmod32_clear(nmod32_t x, const gr_ctx_t ctx)
+nmod32_clear(nmod32_t FLINT_UNUSED(x), const gr_ctx_t FLINT_UNUSED(ctx))
 {
 }
 
 void
-nmod32_swap(nmod32_t x, nmod32_t y, const gr_ctx_t ctx)
+nmod32_swap(nmod32_t x, nmod32_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     nmod32_t t;
     *t = *x;
@@ -59,7 +65,7 @@ nmod32_swap(nmod32_t x, nmod32_t y, const gr_ctx_t ctx)
 }
 
 void
-nmod32_set_shallow(nmod32_t res, const nmod32_t x, const gr_ctx_t ctx)
+nmod32_set_shallow(nmod32_t res, const nmod32_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     *res = *x;
 }
@@ -72,14 +78,14 @@ nmod32_randtest(nmod32_t res, flint_rand_t state, const gr_ctx_t ctx)
 }
 
 int
-nmod32_write(gr_stream_t out, const nmod32_t x, const gr_ctx_t ctx)
+nmod32_write(gr_stream_t out, const nmod32_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     gr_stream_write_ui(out, x[0]);
     return GR_SUCCESS;
 }
 
 int
-nmod32_zero(nmod32_t x, const gr_ctx_t ctx)
+nmod32_zero(nmod32_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     x[0] = 0;
     return GR_SUCCESS;
@@ -124,7 +130,7 @@ nmod32_set_fmpz(nmod32_t res, const fmpz_t v, const gr_ctx_t ctx)
 }
 
 truth_t
-nmod32_is_zero(const nmod32_t x, const gr_ctx_t ctx)
+nmod32_is_zero(const nmod32_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     return (x[0] == 0) ? T_TRUE : T_FALSE;
 }
@@ -142,13 +148,13 @@ nmod32_is_neg_one(const nmod32_t x, const gr_ctx_t ctx)
 }
 
 truth_t
-nmod32_equal(const nmod32_t x, const nmod32_t y, const gr_ctx_t ctx)
+nmod32_equal(const nmod32_t x, const nmod32_t y, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     return (x[0] == y[0]) ? T_TRUE : T_FALSE;
 }
 
 int
-nmod32_set(nmod32_t res, const nmod32_t x, const gr_ctx_t ctx)
+nmod32_set(nmod32_t res, const nmod32_t x, const gr_ctx_t FLINT_UNUSED(ctx))
 {
     res[0] = x[0];
     return GR_SUCCESS;
@@ -330,7 +336,7 @@ nmod32_div_nonunique(nmod32_t res, const nmod32_t x, const nmod32_t y, const gr_
 }
 
 void
-_nmod32_vec_init(nmod32_struct * res, slong len, gr_ctx_t ctx)
+_nmod32_vec_init(nmod32_struct * res, slong len, gr_ctx_t FLINT_UNUSED(ctx))
 {
     slong i;
 
@@ -339,12 +345,12 @@ _nmod32_vec_init(nmod32_struct * res, slong len, gr_ctx_t ctx)
 }
 
 void
-_nmod32_vec_clear(nmod32_struct * res, slong len, gr_ctx_t ctx)
+_nmod32_vec_clear(nmod32_struct * FLINT_UNUSED(res), slong FLINT_UNUSED(len), gr_ctx_t FLINT_UNUSED(ctx))
 {
 }
 
 int
-_nmod32_vec_set(nmod32_struct * res, const nmod32_struct * vec, slong len, gr_ctx_t ctx)
+_nmod32_vec_set(nmod32_struct * res, const nmod32_struct * vec, slong len, gr_ctx_t FLINT_UNUSED(ctx))
 {
     slong i;
 

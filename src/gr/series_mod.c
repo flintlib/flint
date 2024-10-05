@@ -21,6 +21,12 @@
 # include <string.h>
 #endif
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 static const char * default_var = "x";
 
 static void _gr_gr_series_mod_ctx_clear(gr_ctx_t ctx)
@@ -173,7 +179,7 @@ static int _gr_gr_series_mod_set(gr_poly_t res, const gr_poly_t x, gr_ctx_t ctx)
     return gr_poly_set(res, x, SERIES_MOD_ELEM_CTX(ctx));
 }
 
-static void _gr_gr_series_mod_set_shallow(gr_poly_t res, const gr_poly_t x, gr_ctx_t ctx)
+static void _gr_gr_series_mod_set_shallow(gr_poly_t res, const gr_poly_t x, gr_ctx_t FLINT_UNUSED(ctx))
 {
     *res = *x;
 }
