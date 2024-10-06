@@ -25,6 +25,8 @@
 extern "C" {
 #endif
 
+FLINT_HEADER_START
+
 /* Factoring  ****************************************************************/
 
 void fmpz_mod_poly_factor_init(fmpz_mod_poly_factor_t fac,
@@ -169,6 +171,8 @@ int fmpz_mod_poly_roots_factored_with_length_limit(fmpz_mod_poly_factor_t x0,
 
 void fmpz_mod_poly_factor_get_fmpz_mod_poly(fmpz_mod_poly_t z,
                 fmpz_mod_poly_factor_t fac, slong i, const fmpz_mod_ctx_t ctx);
+
+FLINT_HEADER_END
 
 #ifdef __cplusplus
 }
