@@ -21,8 +21,10 @@
 #include "fq_zech_mpoly.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
+
+FLINT_HEADER_START
 
 typedef struct
 {
@@ -746,6 +748,8 @@ void _fq_zech_mpoly_set_fq_zech_bpoly_var1_zero(
 /* misc **********************************************************************/
 
 int fq_zech_next(fq_zech_t x, const fq_zech_ctx_t ctx);
+
+FLINT_HEADER_END
 
 #ifdef __cplusplus
 }

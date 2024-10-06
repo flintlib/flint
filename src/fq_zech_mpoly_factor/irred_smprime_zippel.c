@@ -40,7 +40,7 @@ static void fq_zech_mpoly_delete_duplicate_terms(
 }
 
 
-slong fq_zech_mpolyu_find_term(const fq_zech_mpolyu_t A, ulong e)
+static slong fq_zech_mpolyu_find_term(const fq_zech_mpolyu_t A, ulong e)
 {
     slong i;
     for (i = 0; i < A->length; i++)
@@ -50,7 +50,7 @@ slong fq_zech_mpolyu_find_term(const fq_zech_mpolyu_t A, ulong e)
 }
 
 
-void fq_zech_poly_product_roots(fq_zech_poly_t P, fq_zech_struct * r,
+static void fq_zech_poly_product_roots(fq_zech_poly_t P, fq_zech_struct * r,
                                             slong n, const fq_zech_ctx_t fqctx)
 {
     slong i;
@@ -230,7 +230,7 @@ static void _fq_zech_mpoly_monomial_evals_indirect(
 }
 
 
-int fq_zech_zip_find_coeffs_new(
+static int fq_zech_zip_find_coeffs_new(
     fq_zech_struct * coeffs,             /* length mlength */
     const fq_zech_struct * monomials,    /* length mlength */
     slong mlength,
@@ -611,7 +611,7 @@ static void fq_zech_poly_eval_step(
 }
 
 
-void fq_zech_polyu_eval_step(
+static void fq_zech_polyu_eval_step(
     fq_zech_polyu_t E,
     fq_zech_polyun_t A,
     const fq_zech_ctx_t ctx)
@@ -632,7 +632,7 @@ void fq_zech_polyu_eval_step(
 }
 
 
-void fq_zech_polyu3_add_zip_limit1(
+static void fq_zech_polyu3_add_zip_limit1(
     fq_zech_polyun_t Z,
     const fq_zech_polyun_t A,
     const ulong deg1,
@@ -870,7 +870,7 @@ static int fq_zech_mpoly_from_zip(
 }
 
 /* bit counts of all degrees should be < FLINT_BITS/3 */
-int fq_zech_mpoly_hlift_zippel(
+static int fq_zech_mpoly_hlift_zippel(
     slong m,
     fq_zech_mpoly_struct * B,
     slong r,
