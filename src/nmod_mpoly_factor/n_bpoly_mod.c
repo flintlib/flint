@@ -486,7 +486,7 @@ int n_bpoly_mod_divides(
     /* ksub not faster :( */
     if (0 && A->length > B->length && B->length > 2)
     {
-        n_poly_t a, b, q, r;
+        n_poly_t a, b, r;
         slong j;
         slong Adeg = n_bpoly_degree1(A);
         slong Bdeg = n_bpoly_degree1(B);

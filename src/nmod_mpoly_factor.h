@@ -21,9 +21,10 @@
 #include "nmod_mpoly.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
+FLINT_HEADER_START
 
 void nmod_mpoly_get_bpoly(n_bpoly_t A, const nmod_mpoly_t B,
                            slong var0, slong var1, const nmod_mpoly_ctx_t ctx);
@@ -455,6 +456,8 @@ int n_polyu2n_add_zip_must_match(n_polyun_t Z, const n_bpoly_t A,
 
 int n_polyun_zip_solve(nmod_mpoly_t A, n_polyun_t Z, n_polyun_t H,
                                      n_polyun_t M, const nmod_mpoly_ctx_t ctx);
+
+FLINT_HEADER_END
 
 #ifdef __cplusplus
 }
