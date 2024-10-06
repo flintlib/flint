@@ -148,7 +148,7 @@ nmod_poly_is_irreducible(const nmod_poly_t f)
     return 1;
 }
 
-void
+static void
 nmod_poly_powpowmod(nmod_poly_t res, const nmod_poly_t pol,
                                     ulong exp, ulong exp2, const nmod_poly_t f)
 {
