@@ -22,8 +22,10 @@
 #include "fmpz_mpoly.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
+
+FLINT_HEADER_START
 
 /*****************************************************************************/
 
@@ -535,6 +537,8 @@ void fmpz_mpoly_compression_do(fmpz_mpoly_t L,
 void fmpz_mpoly_compression_undo(fmpz_mpoly_t A, flint_bitcnt_t Abits,
     const fmpz_mpoly_ctx_t Actx, fmpz_mpoly_t L, const fmpz_mpoly_ctx_t Lctx,
                                                         mpoly_compression_t M);
+
+FLINT_HEADER_END
 
 #ifdef __cplusplus
 }

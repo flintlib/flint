@@ -12,6 +12,13 @@
 #include "fmpz.h"
 #include "fmpz_mpoly_factor.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+# pragma message "fmpz_mpoly_factor_add is currently unused/untested/undocumented!"
+#endif
+
 int fmpz_mpoly_factor_add(
     fmpz_mpoly_factor_t A,
     const fmpz_mpoly_factor_t B,

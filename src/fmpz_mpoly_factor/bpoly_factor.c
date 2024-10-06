@@ -15,7 +15,8 @@
 #include "fmpz_mpoly_factor.h"
 #include "fmpz_mod_mpoly_factor.h"
 
-void fmpz_tpoly_print(fmpz_tpoly_t A, const char * xvar, const char * yvar, const char * zvar)
+#if 0
+static void fmpz_tpoly_print(fmpz_tpoly_t A, const char * xvar, const char * yvar, const char * zvar)
 {
     slong i;
     int first;
@@ -36,10 +37,9 @@ void fmpz_tpoly_print(fmpz_tpoly_t A, const char * xvar, const char * yvar, cons
     if (first)
         flint_printf("0");
 }
+#endif
 
-
-
-void fmpz_mod_bpoly_set_fmpz_bpoly(
+static void fmpz_mod_bpoly_set_fmpz_bpoly(
     fmpz_mod_bpoly_t A,
     const fmpz_bpoly_t B,
     const fmpz_mod_ctx_t ctx)
@@ -54,7 +54,7 @@ void fmpz_mod_bpoly_set_fmpz_bpoly(
     }
 }
 
-void fmpz_mod_bpoly_set_polyx(
+static void fmpz_mod_bpoly_set_polyx(
     fmpz_mod_bpoly_t A,
     const fmpz_mod_poly_t B,
     const fmpz_mod_ctx_t ctx)
@@ -70,7 +70,7 @@ void fmpz_mod_bpoly_set_polyx(
     }
 }
 
-void fmpz_mod_bpoly_set_polyy(
+static void fmpz_mod_bpoly_set_polyy(
     fmpz_mod_bpoly_t A,
     const fmpz_mod_poly_t B,
     const fmpz_mod_ctx_t ctx)
@@ -81,7 +81,7 @@ void fmpz_mod_bpoly_set_polyy(
 }
 
 
-void fmpz_mod_bpoly_add_poly_shift(
+static void fmpz_mod_bpoly_add_poly_shift(
     fmpz_mod_bpoly_t A,
     const fmpz_mod_poly_t B,
     slong yshift,
@@ -106,7 +106,7 @@ void fmpz_mod_bpoly_add_poly_shift(
 
 
 
-void fmpz_bpoly_set(fmpz_bpoly_t A, const fmpz_bpoly_t B)
+static void fmpz_bpoly_set(fmpz_bpoly_t A, const fmpz_bpoly_t B)
 {
     slong i;
 
@@ -119,7 +119,7 @@ void fmpz_bpoly_set(fmpz_bpoly_t A, const fmpz_bpoly_t B)
         fmpz_poly_set(A->coeffs + i, B->coeffs + i);
 }
 
-void fmpz_bpoly_make_primitive(fmpz_poly_t g, fmpz_bpoly_t A)
+static void fmpz_bpoly_make_primitive(fmpz_poly_t g, fmpz_bpoly_t A)
 {
     slong Alen = A->length;
     slong i;
@@ -146,7 +146,7 @@ void fmpz_bpoly_make_primitive(fmpz_poly_t g, fmpz_bpoly_t A)
     fmpz_poly_clear(q);
 }
 
-int fmpz_bpoly_divides(fmpz_bpoly_t Q, fmpz_bpoly_t A, fmpz_bpoly_t B)
+static int fmpz_bpoly_divides(fmpz_bpoly_t Q, fmpz_bpoly_t A, fmpz_bpoly_t B)
 {
     slong i, qoff;
     int divides;
@@ -204,7 +204,7 @@ cleanup:
     return divides;
 }
 
-void fmpz_bpoly_set_fmpz_mod_bpoly(
+static void fmpz_bpoly_set_fmpz_mod_bpoly(
     fmpz_bpoly_t A,
     const fmpz_mod_bpoly_t B,
     const fmpz_mod_ctx_t ctx)
@@ -224,7 +224,7 @@ void fmpz_bpoly_set_fmpz_mod_bpoly(
     }
 }
 
-void fmpz_bpoly_eval(fmpz_poly_t E, const fmpz_bpoly_t A, const fmpz_t alpha)
+static void fmpz_bpoly_eval(fmpz_poly_t E, const fmpz_bpoly_t A, const fmpz_t alpha)
 {
     slong i;
     fmpz_t t;
@@ -241,7 +241,7 @@ void fmpz_bpoly_eval(fmpz_poly_t E, const fmpz_bpoly_t A, const fmpz_t alpha)
     fmpz_clear(t);
 }
 
-void fmpz_bpoly_taylor_shift(fmpz_bpoly_t A, const fmpz_t alpha)
+static void fmpz_bpoly_taylor_shift(fmpz_bpoly_t A, const fmpz_t alpha)
 {
     slong i;
     for (i = A->length - 1; i >= 0; i--)
@@ -267,7 +267,7 @@ typedef struct {
 
 typedef bpoly_info_struct bpoly_info_t[1];
 
-void bpoly_info_init(bpoly_info_t I, slong r, const fmpz_t p, ulong k)
+static void bpoly_info_init(bpoly_info_t I, slong r, const fmpz_t p, ulong k)
 {
     slong i;
 
@@ -305,7 +305,7 @@ void bpoly_info_init(bpoly_info_t I, slong r, const fmpz_t p, ulong k)
     }
 }
 
-void bpoly_info_clear(bpoly_info_t I)
+static void bpoly_info_clear(bpoly_info_t I)
 {
     slong i;
 
@@ -339,7 +339,7 @@ void bpoly_info_clear(bpoly_info_t I)
     set out[i] so that
     1/(f[0]*f[1]*...*f[n-1]) = out[0]/f[0] + ... + out[n-1]/f[n-1]
 */
-int partial_fraction_coeffs(
+static int partial_fraction_coeffs(
     fmpz_mod_poly_struct * out,
     const fmpz_mod_poly_struct * f,
     slong n,
@@ -386,7 +386,7 @@ int partial_fraction_coeffs(
 }
 
 
-int bpoly_info_disolve(bpoly_info_t I)
+static int bpoly_info_disolve(bpoly_info_t I)
 {
     slong i, j;
     fmpz_t pj, t1;

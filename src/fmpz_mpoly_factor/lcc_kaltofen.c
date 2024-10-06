@@ -187,7 +187,7 @@ static void _make_bases_coprime(
     fmpz_poly_clear(g);
 }
 
-void fmpz_poly_vector_insert_poly(fmpz_bpoly_t v, const fmpz_poly_t a)
+static void fmpz_poly_vector_insert_poly(fmpz_bpoly_t v, const fmpz_poly_t a)
 {
     slong i;
 
@@ -200,7 +200,7 @@ void fmpz_poly_vector_insert_poly(fmpz_bpoly_t v, const fmpz_poly_t a)
     v->length++;
 }
 
-
+#if 0
 void fmpz_poly_factor_print_pretty(fmpz_poly_factor_t f, const char * x)
 {
     slong i;
@@ -212,6 +212,7 @@ void fmpz_poly_factor_print_pretty(fmpz_poly_factor_t f, const char * x)
         flint_printf(")^%wd", f->exp[i]);
     }
 }
+#endif
 
 static int _try_lift(
     fmpz_mpoly_struct * lifts,  /* length r */
@@ -405,7 +406,7 @@ cleanup_less:
 }
 
 /* assume content(b) = 1 for now */
-void fmpz_mpoly_factor_divexact_mpoly_pow_ui(
+static void fmpz_mpoly_factor_divexact_mpoly_pow_ui(
     fmpz_mpoly_factor_t A,
     const fmpz_mpoly_t b_in,
     ulong e,
