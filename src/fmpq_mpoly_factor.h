@@ -24,6 +24,8 @@
 extern "C" {
 #endif
 
+FLINT_HEADER_START
+
 void fmpq_mpoly_factor_init(fmpq_mpoly_factor_t f,
                                                    const fmpq_mpoly_ctx_t ctx);
 
@@ -95,6 +97,8 @@ void _fmpq_mpoly_factor_swap_fmpz_mpoly_factor(fmpq_mpoly_factor_t f,
 
 int fmpq_mpoly_factor_expand(fmpq_mpoly_t A,
                       const fmpq_mpoly_factor_t f, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_HEADER_END
 
 #ifdef __cplusplus
 }
