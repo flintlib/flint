@@ -366,10 +366,10 @@ void mpoly_gcd_info_measure_brown(
     eblend = 1;
     if (I->Gdeflate_deg_bounds_are_nice)
     {
-        slong k = perm[m - 1];
         slong limit = mpoly_gcd_info_get_brown_upper_limit(I, m - 1, 0);
         slong expected_stab;
 
+        k = perm[m - 1];
         expected_stab = FLINT_MIN(I->Adeflate_deg[k], I->Bdeflate_deg[k]);
         expected_stab = expected_stab - I->Gdeflate_deg_bound[k];
         expected_stab = FLINT_MIN(expected_stab, I->Gdeflate_deg_bound[k]);

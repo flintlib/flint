@@ -190,10 +190,10 @@ again:
         {
             for (k = 0; k < l; k++)
             {
-                slong tot = 0;
+                slong tot2 = 0;
                 for (j = 0; j < n; j++)
-                    tot += S[k*n + j];
-                S[k*n + i] = tot - best_min;
+                    tot2 += S[k*n + j];
+                S[k*n + i] = tot2 - best_min;
             }
             for (k = 0; k < n; k++)
             {

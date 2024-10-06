@@ -28,18 +28,20 @@ extern "C" {
 /* choose m so that (m + 1)/(n - m) ~= la/lb, i.e. m = (n*la - lb)/(la + lb) */
 slong mpoly_divide_threads(slong n, double la, double lb);
 
-#ifdef _MSC_VER
-# define DECLSPEC_IMPORT __declspec(dllimport)
-#else
-# define DECLSPEC_IMPORT
-#endif
+#ifndef __GMP_H__
+# ifdef _MSC_VER
+#  define DECLSPEC_IMPORT __declspec(dllimport)
+# else
+#  define DECLSPEC_IMPORT
+# endif
 DECLSPEC_IMPORT ulong __gmpn_add_n(nn_ptr, nn_srcptr, nn_srcptr, long int);
 DECLSPEC_IMPORT ulong __gmpn_sub_n(nn_ptr, nn_srcptr, nn_srcptr, long int);
 DECLSPEC_IMPORT ulong __gmpn_addmul_1(nn_ptr, nn_srcptr, long int, ulong);
 DECLSPEC_IMPORT ulong __gmpn_submul_1(nn_ptr, nn_srcptr, long int, ulong);
 DECLSPEC_IMPORT ulong __gmpn_rshift(nn_ptr, nn_srcptr, long int, unsigned int);
 DECLSPEC_IMPORT ulong __gmpn_mul_1(nn_ptr, nn_srcptr, long int, ulong);
-#undef DECLSPEC_IMPORT
+# undef DECLSPEC_IMPORT
+#endif
 
 /* context *******************************************************************/
 
