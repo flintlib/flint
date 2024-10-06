@@ -16,9 +16,9 @@
 
 TEST_FUNCTION_START(fmpq_mat_is_integral, state)
 {
-    int i;
+    slong ix;
 
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (ix = 0; ix < 100 * flint_test_multiplier(); ix++)
     {
         fmpq_mat_t A;
         fmpz_mat_t B;

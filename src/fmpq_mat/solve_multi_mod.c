@@ -17,6 +17,8 @@
 #include "fmpz_mat.h"
 #include "fmpq_mat.h"
 
+int _fmpq_mat_check_solution_fmpz_mat(const fmpq_mat_t X, const fmpz_mat_t A, const fmpz_mat_t B);
+
 static ulong fmpz_mat_find_good_prime_and_solve(nmod_mat_t Xmod,
 		                 nmod_mat_t Amod, nmod_mat_t Bmod,
                 const fmpz_mat_t A, const fmpz_mat_t B, const fmpz_t det_bound)
@@ -48,44 +50,6 @@ static ulong fmpz_mat_find_good_prime_and_solve(nmod_mat_t Xmod,
 
     fmpz_clear(tested);
     return p;
-}
-
-static int
-_fmpq_mat_check_solution_fmpz_mat(const fmpq_mat_t X, const fmpz_mat_t A, const fmpz_mat_t B)
-{
-    slong i, j;
-    fmpz_mat_t Xclear, AXclear;
-    fmpz_t t;
-    fmpz * Xden;
-    int ok;
-
-    Xden = _fmpz_vec_init(X->c);
-    fmpz_mat_init(Xclear, X->r, X->c);
-    fmpz_mat_init(AXclear, B->r, B->c);
-    fmpz_init(t);
-
-    fmpq_mat_get_fmpz_mat_colwise(Xclear, Xden, X);
-    fmpz_mat_mul(AXclear, A, Xclear);
-
-    ok = 1;
-    for (i = 0; i < B->r && ok; i++)
-    {
-        for (j = 0; j < B->c && ok; j++)
-        {
-            /* AXclear[i,j] / Xden[j] = B[i,j]  */
-            fmpz_mul(t, fmpz_mat_entry(B, i, j), Xden + j);
-
-            if (!fmpz_equal(t, fmpz_mat_entry(AXclear, i, j)))
-                ok = 0;
-        }
-    }
-
-    _fmpz_vec_clear(Xden, X->c);
-    fmpz_mat_clear(Xclear);
-    fmpz_mat_clear(AXclear);
-    fmpz_clear(t);
-
-    return ok;
 }
 
 static void
