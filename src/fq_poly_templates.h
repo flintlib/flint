@@ -21,6 +21,8 @@
 extern "C" {
 #endif
 
+FLINT_HEADER_START
+
 /*  Memory management ********************************************************/
 
 void TEMPLATE(T, poly_init)(TEMPLATE(T, poly_t) poly, const TEMPLATE(T, ctx_t) ctx);
@@ -1040,6 +1042,8 @@ void TEMPLATE(T, mat_charpoly)(TEMPLATE(T, poly_t) p,
 
 void TEMPLATE(T, mat_minpoly) (TEMPLATE(T, poly_t) p,
                       const TEMPLATE(T, mat_t) X, const TEMPLATE(T, ctx_t) ctx);
+
+FLINT_HEADER_END
 
 #ifdef __cplusplus
 }
