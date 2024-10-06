@@ -26,6 +26,8 @@
 extern "C" {
 #endif
 
+FLINT_HEADER_START
+
 /* Context object ************************************************************/
 
 FMPQ_MPOLY_INLINE
@@ -803,6 +805,8 @@ void fmpq_mpoly_univar_swap_term_coeff(fmpq_mpoly_t c,
 ******************************************************************************/
 
 void fmpq_mpoly_remainder_test(const fmpq_mpoly_t r, const fmpq_mpoly_t g, const fmpq_mpoly_ctx_t ctx);
+
+FLINT_HEADER_END
 
 #ifdef __cplusplus
 }
