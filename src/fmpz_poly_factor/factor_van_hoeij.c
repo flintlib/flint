@@ -25,7 +25,7 @@
 # include <math.h>
 #endif
 
-slong _heuristic_van_hoeij_starting_precision(const fmpz_poly_t f,
+static slong _heuristic_van_hoeij_starting_precision(const fmpz_poly_t f,
                                                             slong r, ulong p)
 {
    fmpz_t lead_b, trail_b;
@@ -51,7 +51,7 @@ slong _heuristic_van_hoeij_starting_precision(const fmpz_poly_t f,
    resize the matrix M to num_rows, where num_rows <= M->r
    the algorithm assumes rows have been permuted in memory by LLL
 */
-void fmpz_mat_van_hoeij_resize_matrix(fmpz_mat_t M, slong num_rows)
+static void fmpz_mat_van_hoeij_resize_matrix(fmpz_mat_t M, slong num_rows)
 {
    slong i, j;
    fmpz ** empty_rows;
