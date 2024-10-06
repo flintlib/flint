@@ -16,6 +16,12 @@
 #include "fmpz_mod_poly.h"
 #include "qadic.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 static int __fmpz_mod_poly_invmod(fmpz *A,
                           const fmpz *B, slong lenB,
                           const fmpz *P, slong lenP, const fmpz_t p)
@@ -795,7 +801,7 @@ _qadic_sqrt_2(fmpz *rop, const fmpz *op, slong len,
 
     Assumes that \code{(op, len)} has valuation $0$.
  */
-int _qadic_sqrt(fmpz *rop, const fmpz *op, slong len,
+static int _qadic_sqrt(fmpz *rop, const fmpz *op, slong len,
                 const fmpz *a, const slong *j, slong lena,
                 const fmpz_t p, slong N)
 {
