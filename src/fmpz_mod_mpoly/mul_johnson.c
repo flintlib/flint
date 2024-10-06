@@ -36,7 +36,7 @@ fmpz_mod_ctx_get_modulus_mpz_read_only(mpz_t m, const fmpz_mod_ctx_t ctx)
     }
 }
 
-void _fmpz_mod_mpoly_mul_johnson1(
+static void _fmpz_mod_mpoly_mul_johnson1(
     fmpz_mod_mpoly_t A,
     const fmpz * Bcoeffs, const ulong * Bexps, slong Blen,
     const fmpz * Ccoeffs, const ulong * Cexps, slong Clen,

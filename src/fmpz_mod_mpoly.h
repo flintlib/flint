@@ -29,6 +29,8 @@
 extern "C" {
 #endif
 
+FLINT_HEADER_START
+
 /* type definitions **********************************************************/
 
 /*
@@ -954,6 +956,8 @@ void fmpz_mod_mpoly_from_mpolyl_perm_inflate(fmpz_mod_mpoly_t A,
 ******************************************************************************/
 
 void fmpz_mod_mpoly_remainder_strongtest(const fmpz_mod_mpoly_t r, const fmpz_mod_mpoly_t g, const fmpz_mod_mpoly_ctx_t ctx);
+
+FLINT_HEADER_END
 
 #ifdef __cplusplus
 }
