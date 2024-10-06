@@ -405,7 +405,7 @@ int nmod_mpolyun_equal(
 }
 
 
-
+#if 0
 /* if the coefficient doesn't exist, a new one is created (and set to zero) */
 n_poly_struct * _nmod_mpolyn_get_coeff(nmod_mpolyn_t A,
                                       ulong * pow, const nmod_mpoly_ctx_t uctx)
@@ -478,9 +478,9 @@ create_new:
 
     return xk;
 }
+#endif
 
-
-
+#if 0
 /* if the coefficient doesn't exist, a new one is created (and set to zero) */
 nmod_mpolyn_struct * _nmod_mpolyun_get_coeff(nmod_mpolyun_t A,
                                         ulong pow, const nmod_mpoly_ctx_t uctx)
@@ -551,9 +551,9 @@ create_new:
 
     return xk;
 }
+#endif
 
-
-
+#if 0
 void nmod_mpoly_to_mpolyun_perm_deflate_bivar(
     nmod_mpolyun_t A,
     const nmod_mpoly_t B,
@@ -605,8 +605,9 @@ void nmod_mpoly_to_mpolyun_perm_deflate_bivar(
         mpoly_monomial_zero(Ac->exps + NA*0, NA);
     }
 }
+#endif
 
-
+#if 0
 /*
     Convert B to A using the variable permutation perm.
     The uctx should be the context of the coefficients of A.
@@ -697,7 +698,7 @@ void nmod_mpoly_to_mpolyun_perm_deflate(
 
     TMP_END;
 }
-
+#endif
 
 void nmod_mpoly_to_mpolyn_perm_deflate_threaded_pool(
     nmod_mpolyn_t A,

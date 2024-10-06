@@ -30,6 +30,8 @@
 extern "C" {
 #endif
 
+FLINT_HEADER_START
+
 FLINT_FORCE_INLINE
 ulong * nmod_mpoly_term_coeff_ref(nmod_mpoly_t A, slong i,
                                                     const nmod_mpoly_ctx_t ctx)
@@ -1462,6 +1464,8 @@ void nmod_mpoly_geobucket_sub(nmod_mpoly_geobucket_t B, nmod_mpoly_t p, const nm
 ******************************************************************************/
 
 void nmod_mpoly_remainder_strongtest(const nmod_mpoly_t r, const nmod_mpoly_t g, const nmod_mpoly_ctx_t ctx);
+
+FLINT_HEADER_END
 
 #ifdef __cplusplus
 }
