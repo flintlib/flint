@@ -21,8 +21,10 @@
 #include "fq_nmod_mpoly.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
+
+FLINT_HEADER_START
 
 /*****************************************************************************/
 
@@ -509,6 +511,8 @@ void _fq_nmod_mpoly_eval_rest_to_n_fq_bpoly(n_bpoly_t E,
 void _fq_nmod_mpoly_set_n_fq_bpoly_gen1_zero(fq_nmod_mpoly_t A,
                          flint_bitcnt_t Abits, const n_bpoly_t B, slong var,
                                                 const fq_nmod_mpoly_ctx_t ctx);
+
+FLINT_HEADER_END
 
 #ifdef __cplusplus
 }

@@ -138,7 +138,7 @@ static void fq_nmod_polyu_mul(
 #endif
 
 
-void n_fq_poly_fill_power(
+static void n_fq_poly_fill_power(
     n_fq_poly_t alphapow,
     slong e,
     const fq_nmod_ctx_t ctx,
@@ -161,7 +161,7 @@ void n_fq_poly_fill_power(
 }
 
 
-void fq_nmod_polyu3_interp_reduce_bpoly(
+static void fq_nmod_polyu3_interp_reduce_bpoly(
     n_bpoly_t Ap,
     const n_polyu_t A,
     n_fq_poly_t alphapow,
@@ -230,7 +230,7 @@ void fq_nmod_polyu3_interp_reduce_bpoly(
         T(x0, x1, x2) == B(x0, x1) mod (x2 + alpha)
 */
 
-void fq_nmod_polyu3n_interp_lift_sm_bpoly(
+static void fq_nmod_polyu3n_interp_lift_sm_bpoly(
     slong * lastdeg,
     n_polyun_t T,
     const n_bpoly_t A,
@@ -271,7 +271,7 @@ void fq_nmod_polyu3n_interp_lift_sm_bpoly(
 
     T = F + modulus*(A - F(alpha))
 */
-int fq_nmod_polyu3n_interp_crt_sm_bpoly(
+static int fq_nmod_polyu3n_interp_crt_sm_bpoly(
     slong * lastdeg,
     n_polyun_t F,
     n_polyun_t T,
