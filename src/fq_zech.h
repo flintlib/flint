@@ -26,10 +26,13 @@
 
 #include "fq_zech_types.h"
 
-/* Data types and context ****************************************************/
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+FLINT_HEADER_START
+
+/* Data types and context ****************************************************/
 
 void fq_zech_ctx_init_ui(fq_zech_ctx_t ctx, ulong p, slong d, const char * var);
 int _fq_zech_ctx_init_conway_ui(fq_zech_ctx_t ctx, ulong p, slong d, const char * var);
@@ -284,6 +287,8 @@ void fq_zech_ctx_init_conway(fq_zech_ctx_t, fmpz_t, slong, const char *);
 void fq_zech_ctx_init_random(fq_zech_ctx_t, fmpz_t, slong, const char *);
 
 void fq_zech_ctx_order(fmpz_t, const fq_zech_ctx_t);
+
+FLINT_HEADER_END
 
 #ifdef T
 #undef T
