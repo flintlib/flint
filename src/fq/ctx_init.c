@@ -19,7 +19,7 @@
 #include "fq.h"
 
 /* Assumes that everything fits inside a small fmpz */
-void
+static void
 fq_ctx_init_set_clear_small_fq_nmod_ctx(fq_ctx_t c1, fq_nmod_ctx_t c2)
 {
     fmpz_mod_ctx_struct * ctxp = c1->ctxp;
