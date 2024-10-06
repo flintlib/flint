@@ -34,7 +34,6 @@ TEMPLATE(T, mat_rref) (TEMPLATE(T, mat_t) B, const TEMPLATE(T, mat_t) A, const T
     if (B->r == 1)
     {
         TEMPLATE(T, struct) * c;
-        slong i, j;
         slong r = 0;
 
         for (i = 0; i < B->c; i++)

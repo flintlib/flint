@@ -17,8 +17,10 @@
 #include "templates.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
+
+FLINT_HEADER_START
 
 /* Memory management  ********************************************************/
 
@@ -343,6 +345,8 @@ void TEMPLATE(T, mat_similarity) (TEMPLATE(T, mat_t) A, slong r,
  * void TEMPLATE(T, mat_minpoly) (TEMPLATE(T, poly_t) p,
  *                   const TEMPLATE(T, mat_t) X, const TEMPLATE(T, ctx_t) ctx);
  */
+
+FLINT_HEADER_END
 
 #ifdef __cplusplus
 }
