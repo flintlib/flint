@@ -83,7 +83,7 @@ FUNC_HEAD
         for (i = 0; i < d; i++)
         {
             expo[i] = _fmpz_vec_get_d_vec_2exp(appB->rows[i], B->rows[i], n);
-            max_exp = FLINT_MAX(max_exp, expo[i]);
+            max_exp = FLINT_MAX((int) max_exp, expo[i]);
         }
         max_iter =
             (ulong) ((d - 1) +
@@ -444,7 +444,7 @@ FUNC_HEAD
         for (i = 0; i < d; i++)
         {
             fmpz_get_d_2exp(&exp, fmpz_mat_entry(GM, i, i));
-            max_exp = FLINT_MAX(max_exp, (expo[i] = exp));
+            max_exp = FLINT_MAX((int) max_exp, (expo[i] = exp));
         }
         max_iter =
             (ulong) ((d - 1) +
@@ -457,8 +457,7 @@ FUNC_HEAD
         kappamax = 0;
         i = 0;
 
-        do
-            ;
+        do { }
         while ((fmpz_cmp_ui(fmpz_mat_entry(GM, i, i), 0) <= 0) && (++i < d));
 
         zeros = i - 1;          /* all vectors B[i] with i <= zeros are zero vectors */

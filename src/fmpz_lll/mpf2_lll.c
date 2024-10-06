@@ -370,8 +370,7 @@ FUNC_HEAD
         kappamax = 0;
         i = 0;
 
-        do
-            ;
+        do { }
         while ((fmpz_cmp_ui(fmpz_mat_entry(GM, i, i), 0) <= 0) && (++i < d));
 
         zeros = i - 1;          /* all vectors B[i] with i <= zeros are zero vectors */
