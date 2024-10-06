@@ -107,7 +107,6 @@ TEST_FUNCTION_START(fmpq_poly_resultant, state)
     {
         fmpq_poly_t f, g;
         fmpq_t x, y;
-        int result;
 
         fmpq_poly_init(f);
         fmpq_poly_init(g);

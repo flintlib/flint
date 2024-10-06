@@ -17,7 +17,7 @@ void
 _fmpq_poly_sin_cos_series_basecase_can(fmpz * S, fmpz_t Sden,
     fmpz * C, fmpz_t Cden, const fmpz * A, const fmpz_t Aden, slong Alen, slong n, int can);
 
-void
+static void
 _fmpq_poly_cos_series_basecase(fmpz * g, fmpz_t gden,
                        const fmpz * h, const fmpz_t hden, slong hlen, slong n)
 {
@@ -36,7 +36,7 @@ _fmpq_poly_cos_series_basecase(fmpz * g, fmpz_t gden,
     _fmpz_vec_clear(tmp, n + 1);
 }
 
-void
+static void
 _fmpq_poly_cos_series_tangent(fmpz * g, fmpz_t gden,
                        const fmpz * h, const fmpz_t hden, slong hlen, slong n)
 {
