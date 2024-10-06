@@ -26,6 +26,8 @@
 extern "C" {
 #endif
 
+FLINT_HEADER_START
+
 FMPZ_MPOLY_INLINE
 fmpz * fmpz_mpoly_term_coeff_ref(fmpz_mpoly_t A, slong i,
                                                     const fmpz_mpoly_ctx_t ctx)
@@ -932,6 +934,8 @@ void _fmpz_mpoly_addmul_uiuiui_fmpz(ulong * c, slong d1, slong d2)
 
 void fmpz_mpoly_remainder_test(const fmpz_mpoly_t r, const fmpz_mpoly_t g, const fmpz_mpoly_ctx_t ctx);
 void fmpz_mpoly_remainder_strongtest(const fmpz_mpoly_t r, const fmpz_mpoly_t g, const fmpz_mpoly_ctx_t ctx);
+
+FLINT_HEADER_END
 
 #ifdef __cplusplus
 }

@@ -139,7 +139,7 @@ cleanup:
    TODO: copy this strategy for the "small" case (i.e. no fmpz arithmetic)
          to the other fmpz mpoly mul/div functions.
 */
-slong _fmpz_mpoly_sqrt_heap1(
+static slong _fmpz_mpoly_sqrt_heap1(
     fmpz ** polyq, ulong ** expq, slong * allocq,
     const fmpz * Acoeffs, const ulong * Aexps, slong Alen,
     flint_bitcnt_t bits,

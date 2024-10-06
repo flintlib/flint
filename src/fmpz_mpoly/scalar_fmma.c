@@ -135,7 +135,7 @@ static slong _fmpz_mpoly_scalar_fmma(
 }
 
 /* A = A*a + B*b */
-void fmpz_mpoly_scalar_fmma_inplace(
+static void fmpz_mpoly_scalar_fmma_inplace(
     fmpz_mpoly_t A,
     const fmpz_t a,
     const fmpz_mpoly_t B,

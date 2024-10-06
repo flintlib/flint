@@ -34,7 +34,7 @@
    The quotient and remainder terms are appended to the existing terms in
    those polys.
 */
-slong _fmpz_mpoly_divrem_array_tight(slong * lenr,
+static slong _fmpz_mpoly_divrem_array_tight(slong * lenr,
  fmpz ** polyq, ulong ** expq, slong * allocq, slong len0,
        fmpz ** polyr, ulong ** expr, slong * allocr, slong len1,
                   const fmpz * poly2, const ulong * exp2, slong len2,
@@ -432,7 +432,7 @@ big:
    of the quotient poly. It is assumed that poly2 is not zero. The
    quotient and remainder are written in reverse order.
 */
-slong _fmpz_mpoly_divrem_array_chunked(slong * lenr,
+static slong _fmpz_mpoly_divrem_array_chunked(slong * lenr,
             fmpz ** polyq, ulong ** expq, slong * allocq,
                  fmpz ** polyr, ulong ** expr, slong * allocr,
                 const fmpz * poly2, const ulong * exp2, slong len2,
@@ -740,19 +740,19 @@ big:
    /* if not done, use multiprecision coeffs instead */
    if (len == 0 && l == 0)
    {
-      fmpz * p2 = (fmpz *) TMP_ALLOC(prod*sizeof(fmpz));
+      fmpz * p2f = (fmpz *) TMP_ALLOC(prod*sizeof(fmpz));
 
       for (j = 0; j < prod; j++)
-            fmpz_init(p2 + j);
+            fmpz_init(p2f + j);
 
       /* for each chunk of poly2 */
       for (i = 0; i < l2; i++)
       {
          for (j = 0; j < prod; j++)
-            fmpz_zero(p2 + j);
+            fmpz_zero(p2f + j);
 
          /* convert relevant coeff/chunk of poly2 to array format */
-         _fmpz_mpoly_to_fmpz_array(p2, poly2 + i2[i], e2 + i2[i], n2[i]);
+         _fmpz_mpoly_to_fmpz_array(p2f, poly2 + i2[i], e2 + i2[i], n2[i]);
 
          /* submuls */
 
@@ -774,19 +774,19 @@ big:
 	             l = 0;
 
                 for (j = 0; j < prod; j++)
-                   fmpz_clear(p2 + j);
+                   fmpz_clear(p2f + j);
 		     goto cleanup3;
 	          }
 	       }
 
-               _fmpz_mpoly_submul_array1_fmpz(p2, (*polyq) + i1[j],
+               _fmpz_mpoly_submul_array1_fmpz(p2f, (*polyq) + i1[j],
                     (*expq) + i1[j], n1[j], poly3 + i3[k], e3 + i3[k], n3[k]);
 	    }
          }
 
          /* convert chunk from array format */
          tlen = _fmpz_mpoly_from_fmpz_array(&temp, &texp, &talloc,
-                                                      p2, mults, num, bits, 0);
+                                                      p2f, mults, num, bits, 0);
 
          if (tlen != 0) /* nonzero coeff/chunk */
          {
@@ -828,7 +828,7 @@ big:
 	             l = 0;
 
                 for (j = 0; j < prod; j++)
-                   fmpz_clear(p2 + j);
+                   fmpz_clear(p2f + j);
 	             goto cleanup3;
                   }
 	       }
@@ -870,7 +870,7 @@ big:
       }
 
       for (j = 0; j < prod; j++)
-            fmpz_clear(p2 + j);
+            fmpz_clear(p2f + j);
    }
 
    /* if there were quotient terms */

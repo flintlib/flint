@@ -1108,19 +1108,19 @@ big:
    /* if not done, use multiprecision coeffs instead */
    if (len == 0)
    {
-      fmpz * p2 = (fmpz *) TMP_ALLOC(prod*sizeof(fmpz));
+      fmpz * p2f = (fmpz *) TMP_ALLOC(prod*sizeof(fmpz));
 
       for (j = 0; j < prod; j++)
-            fmpz_init(p2 + j);
+            fmpz_init(p2f + j);
 
       /* for each chunk of poly2 */
       for (i = 0; i < l2 - skip; i++)
       {
          for (j = 0; j < prod; j++)
-            fmpz_zero(p2 + j);
+            fmpz_zero(p2f + j);
 
          /* convert relevant coeff/chunk of poly2 to array format */
-         _fmpz_mpoly_to_fmpz_array(p2, poly2 + i2[i], e2 + i2[i], n2[i]);
+         _fmpz_mpoly_to_fmpz_array(p2f, poly2 + i2[i], e2 + i2[i], n2[i]);
 
          /* submuls */
 
@@ -1140,14 +1140,14 @@ big:
                   goto cleanup;
                }
 
-               _fmpz_mpoly_submul_array1_fmpz(p2, (*poly1) + i1[j],
+               _fmpz_mpoly_submul_array1_fmpz(p2f, (*poly1) + i1[j],
                      (*exp1) + i1[j], n1[j], poly3 + i3[k], e3 + i3[k], n3[k]);
             }
          }
 
          /* convert chunk from array format */
          tlen = _fmpz_mpoly_from_fmpz_array(&temp, &texp, &talloc,
-                                                      p2, mults, num, bits, 0);
+                                                      p2f, mults, num, bits, 0);
 
          /* for terms where there may be a nonzero quotient if exact */
          if (i < l1)
@@ -1211,7 +1211,7 @@ big:
 cleanup2:
 
       for (j = 0; j < prod; j++)
-            fmpz_clear(p2 + j);
+            fmpz_clear(p2f + j);
    }
 
    /* if quotient was exact */

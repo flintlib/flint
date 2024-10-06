@@ -14,6 +14,7 @@
 #include "mpoly.h"
 #include "fmpz_mpoly.h"
 
+#if 0
 /*
     assuming that the conversion can be done, set poly1 and poly1_shift
     so that poly2 is poly1 * X^poly1_shift
@@ -51,7 +52,9 @@ void fmpz_mpoly_to_fmpz_poly(fmpz_poly_t poly1, slong * poly1_shift,
 
     *poly1_shift = _shift;
 }
+#endif
 
+#if 0
 /*
     set poly1 to poly2 * X^shift2 in the variable var
 */
@@ -102,7 +105,7 @@ void fmpz_mpoly_from_fmpz_poly(fmpz_mpoly_t poly1, const fmpz_poly_t poly2,
 
     TMP_END;
 }
-
+#endif
 
 /*
     set A(x_var^Bstride[var]) to B/xbar^Bshifts

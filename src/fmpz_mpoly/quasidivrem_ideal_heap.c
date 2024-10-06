@@ -14,7 +14,7 @@
 #include "mpoly.h"
 #include "fmpz_mpoly.h"
 
-slong _fmpz_mpoly_quasidivrem_ideal_heap1(fmpz_t scale, fmpz_mpoly_struct ** polyq,
+static slong _fmpz_mpoly_quasidivrem_ideal_heap1(fmpz_t scale, fmpz_mpoly_struct ** polyq,
   fmpz ** polyr, ulong ** expr, slong * allocr, const fmpz * poly2,
      const ulong * exp2, slong len2, fmpz_mpoly_struct * const * poly3,
                      ulong * const * exp3, slong len, slong bits,
@@ -188,10 +188,10 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap1(fmpz_t scale, fmpz_mpoly_struct ** pol
                 fmpz_mpoly_fit_length(polyq[w], q_len[w] + 1, ctx);
                 if (q_len[w] + 1 > qs_alloc[w])
                 {
-                    slong len = FLINT_MAX(q_len[w] + 1, 2*qs_alloc[w]);
-                    qs[w] = (fmpz *) flint_realloc(qs[w], len*sizeof(fmpz));
-                    flint_mpn_zero((nn_ptr) (qs[w] + qs_alloc[w]), len - qs_alloc[w]);
-                    qs_alloc[w] = len;
+                    slong len0 = FLINT_MAX(q_len[w] + 1, 2*qs_alloc[w]);
+                    qs[w] = (fmpz *) flint_realloc(qs[w], len0*sizeof(fmpz));
+                    flint_mpn_zero((nn_ptr) (qs[w] + qs_alloc[w]), len0 - qs_alloc[w]);
+                    qs_alloc[w] = len0;
                 }
 
                 fmpz_gcd(gcd, acc_lg, poly3[w]->coeffs + 0);
@@ -230,10 +230,10 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap1(fmpz_t scale, fmpz_mpoly_struct ** pol
         _fmpz_mpoly_fit_length(&r_coeff, &r_exp, allocr, r_len + 1, 1);
         if (r_len + 1 > rs_alloc)
         {
-            slong len = FLINT_MAX(r_len + 1, 2*rs_alloc);
-            rs = (fmpz *) flint_realloc(rs, len*sizeof(fmpz));
-            flint_mpn_zero((nn_ptr) (rs + rs_alloc), len - rs_alloc);
-            rs_alloc = len;
+            slong len0 = FLINT_MAX(r_len + 1, 2*rs_alloc);
+            rs = (fmpz *) flint_realloc(rs, len0*sizeof(fmpz));
+            flint_mpn_zero((nn_ptr) (rs + rs_alloc), len0 - rs_alloc);
+            rs_alloc = len0;
         }
         fmpz_set(r_coeff + r_len, acc_lg);
         fmpz_set(rs + r_len, scale);
@@ -298,7 +298,7 @@ exp_overflow:
 
 
 
-slong _fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale, fmpz_mpoly_struct ** polyq,
+static slong _fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale, fmpz_mpoly_struct ** polyq,
   fmpz ** polyr, ulong ** expr, slong * allocr, const fmpz * poly2,
      const ulong * exp2, slong len2, fmpz_mpoly_struct * const * poly3,
                      ulong * const * exp3, slong len, slong N, slong bits,
@@ -507,10 +507,10 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale, fmpz_mpoly_struct ** poly
                 fmpz_mpoly_fit_length(polyq[w], q_len[w] + 1, ctx);
                 if (q_len[w] + 1 > qs_alloc[w])
                 {
-                    slong len = FLINT_MAX(q_len[w] + 1, 2*qs_alloc[w]);
-                    qs[w] = (fmpz *) flint_realloc(qs[w], len*sizeof(fmpz));
-                    flint_mpn_zero((nn_ptr) (qs[w] + qs_alloc[w]), len - qs_alloc[w]);
-                    qs_alloc[w] = len;
+                    slong len0 = FLINT_MAX(q_len[w] + 1, 2*qs_alloc[w]);
+                    qs[w] = (fmpz *) flint_realloc(qs[w], len0*sizeof(fmpz));
+                    flint_mpn_zero((nn_ptr) (qs[w] + qs_alloc[w]), len0 - qs_alloc[w]);
+                    qs_alloc[w] = len0;
                 }
 
                 fmpz_gcd(gcd, acc_lg, poly3[w]->coeffs + 0);
@@ -551,10 +551,10 @@ slong _fmpz_mpoly_quasidivrem_ideal_heap(fmpz_t scale, fmpz_mpoly_struct ** poly
         _fmpz_mpoly_fit_length(&r_coeff, &r_exp, allocr, r_len + 1, N);
         if (r_len + 1 > rs_alloc)
         {
-            slong len = FLINT_MAX(r_len + 1, 2*rs_alloc);
-            rs = (fmpz *) flint_realloc(rs, len*sizeof(fmpz));
-            flint_mpn_zero((nn_ptr) (rs + rs_alloc), len - rs_alloc);
-            rs_alloc = len;
+            slong len0 = FLINT_MAX(r_len + 1, 2*rs_alloc);
+            rs = (fmpz *) flint_realloc(rs, len0*sizeof(fmpz));
+            flint_mpn_zero((nn_ptr) (rs + rs_alloc), len0 - rs_alloc);
+            rs_alloc = len0;
         }
         fmpz_set(r_coeff + r_len, acc_lg);
         fmpz_set(rs + r_len, scale);

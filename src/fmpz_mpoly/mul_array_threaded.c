@@ -76,7 +76,7 @@ _worker_arg_struct;
     LEX
 ******************/
 
-void _fmpz_mpoly_mul_array_threaded_worker_LEX(void * varg)
+static void _fmpz_mpoly_mul_array_threaded_worker_LEX(void * varg)
 {
     slong i, j, Pi;
     _worker_arg_struct * arg = (_worker_arg_struct *) varg;
@@ -219,7 +219,7 @@ void _fmpz_mpoly_mul_array_threaded_worker_LEX(void * varg)
 }
 
 
-void _fmpz_mpoly_mul_array_chunked_threaded_LEX(
+static void _fmpz_mpoly_mul_array_chunked_threaded_LEX(
     fmpz_mpoly_t P,
     const fmpz_mpoly_t A,
     const fmpz_mpoly_t B,
@@ -478,7 +478,7 @@ cleanup:
 *****************************/
 
 
-void _fmpz_mpoly_mul_array_threaded_worker_DEG(void * varg)
+static void _fmpz_mpoly_mul_array_threaded_worker_DEG(void * varg)
 {
     slong i, j, Pi;
     _worker_arg_struct * arg = (_worker_arg_struct *) varg;
@@ -634,7 +634,7 @@ void _fmpz_mpoly_mul_array_threaded_worker_DEG(void * varg)
 
 
 
-void _fmpz_mpoly_mul_array_chunked_threaded_DEG(
+static void _fmpz_mpoly_mul_array_chunked_threaded_DEG(
     fmpz_mpoly_t P,
     const fmpz_mpoly_t A,
     const fmpz_mpoly_t B,

@@ -26,7 +26,7 @@
    we divide from right to left and use a heap with smallest exponent at head.
    [1] http://www.cecm.sfu.ca/~rpearcea/sdmp/sdmp_paper.pdf
 */
-slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
+static slong _fmpz_mpoly_divides_monagan_pearce1(fmpz ** poly1, ulong ** exp1,
          slong * alloc, const fmpz * poly2, const ulong * exp2, slong len2,
                 const fmpz * poly3, const ulong * exp3, slong len3, slong bits,
                                                                   ulong maskhi)
