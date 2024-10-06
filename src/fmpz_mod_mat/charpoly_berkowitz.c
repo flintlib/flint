@@ -18,7 +18,7 @@
 #include "gr.h"
 #include "gr_mat.h"
 
-void _fmpz_mod_mat_charpoly_berkowitz(fmpz* cp, const fmpz_mod_mat_t mat,
+static void _fmpz_mod_mat_charpoly_berkowitz(fmpz* cp, const fmpz_mod_mat_t mat,
                                                       const fmpz_mod_ctx_t ctx)
 {
     gr_ctx_t gr_ctx;

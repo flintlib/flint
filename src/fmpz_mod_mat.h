@@ -23,8 +23,10 @@
 #include "fmpz_mod_types.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
+
+FLINT_HEADER_START
 
 #define FMPZ_MOD_MAT_MUL_TRANSPOSE_CUTOFF 10
 
@@ -284,6 +286,8 @@ void fmpz_mod_mat_invert_cols(fmpz_mod_mat_t mat, slong * perm, const fmpz_mod_c
 {
     fmpz_mat_invert_cols(mat, perm);
 }
+
+FLINT_HEADER_END
 
 #ifdef __cplusplus
 }
