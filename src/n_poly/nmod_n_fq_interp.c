@@ -390,7 +390,7 @@ static int _fill_matrices2(
     n_poly_t g, h;
     ulong g0i, c;
 
-    if (2*d >= ctx.n)
+    if (2 * (ulong) d >= ctx.n)
         return 0;
 
     n_poly_init2(g, 2*d + 2);
@@ -653,7 +653,7 @@ int nmod_eval_interp_set_degree_modulus(
 
     FLINT_ASSERT(deg >= 0);
 
-    if (p < 3 || (p % 2) == 0 || deg >= p)
+    if (p < 3 || (p % 2) == 0 || (ulong) deg >= p)
         return 0;
 
     if ((p % 4) == 1)

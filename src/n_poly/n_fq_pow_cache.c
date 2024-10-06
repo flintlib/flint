@@ -136,7 +136,7 @@ void n_fq_pow_cache_mulpow_ui(
     ulong e,
     n_poly_t pos,
     n_poly_t bin,
-    n_poly_t neg,
+    n_poly_t FLINT_UNUSED(neg),
     const fq_nmod_ctx_t ctx)
 {
     slong d = fq_nmod_ctx_degree(ctx);
@@ -153,8 +153,8 @@ void n_fq_pow_cache_mulpow_ui(
 
     if (e < 50)
     {
-        n_poly_fit_length(pos, d*(FLINT_MAX(e + 1, i) + N_FQ_MUL_ITCH));
-        while (i <= e)
+        n_poly_fit_length(pos, d * (FLINT_MAX(e + 1, (ulong) i) + N_FQ_MUL_ITCH));
+        while ((ulong) i <= e)
         {
             FLINT_ASSERT(d*(i + 1 + N_FQ_MUL_ITCH) <= pos->alloc);
             _n_fq_mul(pos->coeffs + d*i, pos->coeffs + d*1,
@@ -223,7 +223,7 @@ void n_fq_pow_cache_mulpow_neg_ui(
         i = neg->length;
 
         n_poly_fit_length(neg, d*(e + 1));
-        while (i <= e)
+        while ((ulong) i <= e)
         {
             _n_fq_mul(neg->coeffs + d*i, neg->coeffs + d*1,
                                      neg->coeffs + d*(i - 1), ctx, tmp);

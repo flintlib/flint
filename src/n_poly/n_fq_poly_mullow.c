@@ -17,7 +17,13 @@
 # include "fq_nmod_poly.h"
 #endif
 
-void _n_fq_poly_mullow_(
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
+static void _n_fq_poly_mullow_(
     ulong * rop,
     const ulong * op1, slong len1,
     const ulong * op2, slong len2,
