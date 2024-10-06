@@ -31,7 +31,7 @@ arith_bell_number_nmod2(unsigned int * divtab, nn_ptr facs, nn_ptr pows, ulong n
     pows[0] = nmod_pow_ui(0, n, mod);
     pows[1] = nmod_pow_ui(1, n, mod);
 
-    for (i = 2; i <= n; i++)
+    for (i = 2; (ulong) i <= n; i++)
     {
         if (divtab[2 * i] == 1)
             pows[i] = nmod_pow_ui(i, n, mod);
@@ -41,7 +41,7 @@ arith_bell_number_nmod2(unsigned int * divtab, nn_ptr facs, nn_ptr pows, ulong n
 
     s2 = s1 = s0 = 0;
 
-    for (t = i = 0; i <= n; i++)
+    for (t = i = 0; (ulong) i <= n; i++)
     {
         if (i % 2 == 0)
             t = nmod_add(t, facs[i], mod);

@@ -69,7 +69,7 @@ static void
 sum_of_squares_recursive(fmpz_t r, slong k, ulong n)
 {
     fmpz_t t, u;
-    slong i, j;
+    ulong i, j;
 
     fmpz_init(t);
     fmpz_init(u);

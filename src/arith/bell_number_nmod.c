@@ -28,7 +28,7 @@ const ulong bell_number_tab[] =
 static const char bell_mod_2[3] = {1, 1, 0};
 static const char bell_mod_3[13] = {1, 1, 2, 2, 0, 1, 2, 1, 0, 0, 1, 0, 1};
 
-ulong
+static ulong
 arith_bell_number_nmod_fallback(ulong n, nmod_t mod)
 {
     nn_ptr bvec;
@@ -90,19 +90,19 @@ arith_bell_number_nmod(ulong n, nmod_t mod)
         pows[0] = nmod_pow_ui(0, n, mod);
         pows[1] = nmod_pow_ui(1, n, mod);
 
-        for (i = 2; i <= n; i++)
+        for (i = 2; (ulong) i <= n; i++)
         {
             if (pows[i] == 0)
                 pows[i] = nmod_pow_ui(i, n, mod);
 
-            for (j = 2; j <= i && i * j <= n; j++)
+            for (j = 2; j <= i && (ulong) (i * j) <= n; j++)
                 if (pows[i * j] == 0)
                     pows[i * j] = nmod_mul(pows[i], pows[j], mod);
         }
 
         s2 = s1 = s0 = 0;
 
-        for (t = i = 0; i <= n; i++)
+        for (t = i = 0; (ulong) i <= n; i++)
         {
             if (i % 2 == 0)
                 t = nmod_add(t, facs[i], mod);

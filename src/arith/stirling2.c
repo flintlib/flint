@@ -32,7 +32,8 @@ stirling_2_bound_2exp(ulong n, ulong k)
 {
     double bnk;
     int exp;
-    slong bnk_exp, j;
+    slong bnk_exp;
+    ulong j;
 
     /* binomial coefficients */
     bnk = 1.0;
@@ -138,7 +139,7 @@ triangular_2(nn_ptr c, slong n, slong klen)
     }
 }
 
-void
+static void
 arith_stirling_number_2_vec_triangular(fmpz * row, slong n, slong klen)
 {
     ulong c[2 * MAX_N_2LIMB + 2];
@@ -181,7 +182,7 @@ arith_stirling_number_2_vec_triangular(fmpz * row, slong n, slong klen)
         fmpz_set_ui(row + k, k == n);
 }
 
-void
+static void
 arith_stirling_number_2_vec_convolution(fmpz * res, ulong n, slong klen)
 {
     slong k, kodd, len;
@@ -191,7 +192,7 @@ arith_stirling_number_2_vec_convolution(fmpz * res, ulong n, slong klen)
     if (klen <= 0)
         return;
 
-    len = FLINT_MIN(klen - 1, n - 1);
+    len = FLINT_MIN(klen - 1, (slong) n - 1);
 
     t = _fmpz_vec_init(len + 1);
     u = _fmpz_vec_init(len);
@@ -228,7 +229,7 @@ arith_stirling_number_2_vec_convolution(fmpz * res, ulong n, slong klen)
 
     fmpz_set_ui(res + 0, n == 0);
     for (k = n; k < klen; k++)
-        fmpz_set_ui(res + k, n == k);
+        fmpz_set_ui(res + k, (slong) n == k);
 
     _fmpz_vec_clear(t, len + 1);
     _fmpz_vec_clear(u, len);
@@ -303,7 +304,7 @@ arith_stirling_number_2_nmod_vec(nn_ptr res, const unsigned int * divtab, ulong 
 
 #define CRT_MAX_RESOLUTION 16
 
-void
+static void
 arith_stirling_number_2_vec_multi_mod(fmpz * res, ulong n, slong klen)
 {
     fmpz_comb_t comb[CRT_MAX_RESOLUTION];
@@ -328,7 +329,7 @@ arith_stirling_number_2_vec_multi_mod(fmpz * res, ulong n, slong klen)
         return;
     }
 
-    if (klen > n + 1)
+    if ((ulong) klen > n + 1)
     {
         _fmpz_vec_zero(res + n + 1, klen - n - 1);
         klen = n + 1;
@@ -432,7 +433,7 @@ arith_stirling_number_2_vec(fmpz * row, ulong n, slong klen)
 {
     if (n <= 80)
         arith_stirling_number_2_vec_triangular(row, n, klen);
-    else if (klen < n / 2)
+    else if (klen < (slong) (n / 2))
         arith_stirling_number_2_vec_convolution(row, n, klen);
     else
         arith_stirling_number_2_vec_multi_mod(row, n, klen);
@@ -486,7 +487,8 @@ stirling_2_powsum(fmpz_t s, ulong n, ulong k)
 {
     fmpz_t t, u;
     fmpz *b;
-    slong i, j, m, max_b;
+    slong i;
+    ulong j, m, max_b;
 
     max_b = (k + 1) / 2;
 
@@ -542,7 +544,7 @@ stirling_2_nmod(const unsigned int * divtab, ulong n, ulong k, nmod_t mod)
     TMP_START;
 
     pow_len = k + 1;
-    bin_len = FLINT_MIN(pow_len, k / 2 + 1);
+    bin_len = FLINT_MIN(pow_len, (slong) k / 2 + 1);
 
     t = TMP_ALLOC(bin_len * sizeof(ulong));
     u = TMP_ALLOC(pow_len * sizeof(ulong));

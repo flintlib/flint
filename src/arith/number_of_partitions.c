@@ -9,6 +9,7 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
+#include "arith.h"
 #include "partitions.h"
 
 /* compatibility wrapper */

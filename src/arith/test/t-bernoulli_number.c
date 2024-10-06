@@ -59,18 +59,18 @@ TEST_FUNCTION_START(arith_bernoulli_number, state)
     /* Check non underscore versions */
     do
     {
-        slong N = 100;
+        slong N0 = 100;
         fmpq * x;
         fmpq_t t;
 
         fmpq_init(t);
-        x = flint_malloc(sizeof(fmpq) * N);
+        x = flint_malloc(sizeof(fmpq) * N0);
 
-        for (n = 0; n < N; n++)
+        for (n = 0; n < N0; n++)
             fmpq_init(x + n);
 
-        arith_bernoulli_number_vec(x, N);
-        for (n = 0; n < N; n++)
+        arith_bernoulli_number_vec(x, N0);
+        for (n = 0; n < N0; n++)
         {
             arith_bernoulli_number(t, n);
             if (!fmpq_equal(x + n, t))
@@ -81,7 +81,7 @@ TEST_FUNCTION_START(arith_bernoulli_number, state)
             }
         }
 
-        for (n = 0; n < N; n++)
+        for (n = 0; n < N0; n++)
             fmpq_clear(x + n);
         flint_free(x);
         fmpq_clear(t);

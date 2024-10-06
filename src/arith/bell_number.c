@@ -27,7 +27,8 @@ static void
 arith_bell_number_recursive(fmpz_t res, ulong n)
 {
     ulong t[3 * MAX_N_3LIMBS];
-    slong i, k;
+    ulong i;
+    slong k;
 
     t[0] = 1;
     for (i = 1; i < FLINT_MIN(n, MAX_N_1LIMBS); i++)
