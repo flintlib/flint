@@ -23,8 +23,10 @@
 #include "mpoly_types.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
+
+FLINT_HEADER_START
 
 FQ_ZECH_MPOLY_INLINE
 nmod_t fq_zech_ctx_mod(const fq_zech_ctx_t ctx)
@@ -759,6 +761,8 @@ void fq_zech_mpolyu_fit_length(fq_zech_mpolyu_t A, slong length,
 
 void fq_zech_mpolyu_one(fq_zech_mpolyu_t A,
                                                const fq_zech_mpoly_ctx_t uctx);
+
+FLINT_HEADER_END
 
 #ifdef __cplusplus
 }
