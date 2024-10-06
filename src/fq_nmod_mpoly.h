@@ -27,8 +27,10 @@
 #endif
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
+
+FLINT_HEADER_START
 
 /* Internal type definitions *************************************************/
 
@@ -1512,6 +1514,8 @@ void fq_nmod_mpoly_geobucket_sub(fq_nmod_mpoly_geobucket_t B,
 ******************************************************************************/
 
 void fq_nmod_mpoly_remainder_strongtest(const fq_nmod_mpoly_t r, const fq_nmod_mpoly_t g, const fq_nmod_mpoly_ctx_t ctx);
+
+FLINT_HEADER_END
 
 #ifdef __cplusplus
 }
