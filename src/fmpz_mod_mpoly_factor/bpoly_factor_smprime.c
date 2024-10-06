@@ -592,7 +592,7 @@ static void fmpz_mod_bpoly_lift_start(
         combine the factors in L according to the rows of N
         and then replace N by an identity matrix
 */
-void fmpz_mod_bpoly_lift_combine(
+static void fmpz_mod_bpoly_lift_combine(
     fmpz_mod_bpoly_lift_t L,
     fmpz_mod_mat_t N,
     const fmpz_mod_bpoly_t monicA,

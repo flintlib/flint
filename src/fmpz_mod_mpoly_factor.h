@@ -25,6 +25,8 @@
 extern "C" {
 #endif
 
+FLINT_HEADER_START
+
 FMPZ_MOD_MPOLY_FACTOR_INLINE
 void fmpz_mod_mpoly_factor_init(fmpz_mod_mpoly_factor_t f,
                                                 const fmpz_mod_mpoly_ctx_t ctx)
@@ -1385,6 +1387,8 @@ int fmpz_mod_polyun_zip_solve(
     fmpz_mod_polyun_t H,
     fmpz_mod_polyun_t M,
     const fmpz_mod_mpoly_ctx_t ctx);
+
+FLINT_HEADER_END
 
 #ifdef __cplusplus
 }

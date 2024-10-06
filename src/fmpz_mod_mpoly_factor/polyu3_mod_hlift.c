@@ -150,7 +150,7 @@ static void fmpz_mod_polyu_mul(
 #endif
 
 
-void fmpz_mod_poly_fill_powers(
+static void fmpz_mod_poly_fill_powers(
     fmpz_mod_poly_t alphapow,
     slong target,
     const fmpz_mod_ctx_t ctx)
@@ -171,7 +171,7 @@ void fmpz_mod_poly_fill_powers(
 }
 
 
-void fmpz_mod_polyu3_interp_reduce_2sm_bpoly(
+static void fmpz_mod_polyu3_interp_reduce_2sm_bpoly(
     fmpz_mod_bpoly_t Ap,
     fmpz_mod_bpoly_t Am,
     const fmpz_mod_polyu_t A,
@@ -265,7 +265,7 @@ void fmpz_mod_polyu3_interp_reduce_2sm_bpoly(
         T(x0, x1, x2) == B(x0, x1) mod (x2 + alpha)
 */
 
-void fmpz_mod_polyu3n_interp_lift_2sm_bpoly(
+static void fmpz_mod_polyu3n_interp_lift_2sm_bpoly(
     slong * lastdeg,
     fmpz_mod_polyun_t T,
     const fmpz_mod_bpoly_t A,
@@ -406,7 +406,7 @@ void fmpz_mod_polyu3n_interp_lift_2sm_bpoly(
 }
 
 
-int fmpz_mod_polyu3n_interp_crt_2sm_bpoly(
+static int fmpz_mod_polyu3n_interp_crt_2sm_bpoly(
     slong * lastdeg,
     fmpz_mod_polyun_t F,
     fmpz_mod_polyun_t T,

@@ -13,6 +13,7 @@
 #include "mpoly.h"
 #include "fmpz_mod_mpoly_factor.h"
 
+#if 0
 /*
     E = A(v = alpha)
     A is in R[v][x]
@@ -36,7 +37,9 @@ void fmpz_mod_polyu1n_intp_reduce_sm_poly(
     }
     fmpz_clear(v);
 }
+#endif
 
+#if 0
 /*
     A = B
     A, B are in R[X]
@@ -67,8 +70,9 @@ void fmpz_mod_polyu1n_intp_lift_sm_poly(
     }
     A->length = Ai;
 }
+#endif
 
-
+#if 0
 /*
     F = F + modulus*(A - F(v = alpha))
     no assumptions about matching monomials
@@ -176,6 +180,7 @@ int fmpz_mod_polyu1n_intp_crt_sm_poly(
     *lastdeg = lastlen - 1;
     return changed;
 }
+#endif
 
 
 void fmpz_mod_polyu1n_interp_reduce_2sm_poly(
