@@ -570,7 +570,7 @@ static void sd_ifft_basecase_5_0(const sd_fft_ctx_t Q, double* X, ulong j_mr, ul
 
 /* use with n = m-2 and m >= 6 */
 #define EXTEND_BASECASE(n, m) \
-void CAT3(sd_ifft_basecase, m, 1)(const sd_fft_ctx_t Q, double* X) \
+static void CAT3(sd_ifft_basecase, m, 1)(const sd_fft_ctx_t Q, double* X) \
 { \
     ulong l = n_pow2(m - 2); \
     CAT3(sd_ifft_basecase, n, 1)(Q, X+0*l); \
@@ -585,7 +585,7 @@ void CAT3(sd_ifft_basecase, m, 1)(const sd_fft_ctx_t Q, double* X) \
         FLINT_ASSERT(i == l); \
     } \
 } \
-void CAT3(sd_ifft_basecase, m, 0)(const sd_fft_ctx_t Q, double* X, ulong j_mr, ulong j_bits) \
+static void CAT3(sd_ifft_basecase, m, 0)(const sd_fft_ctx_t Q, double* X, ulong j_mr, ulong j_bits) \
 { \
     ulong l = n_pow2(m - 2); \
     FLINT_ASSERT(j_bits != 0); \
@@ -609,7 +609,7 @@ EXTEND_BASECASE(7, 9)
 #undef EXTEND_BASECASE
 
 /* parameter 1: j can be zero */
-void sd_ifft_base_8_1(const sd_fft_ctx_t Q, double* x, ulong j)
+static void sd_ifft_base_8_1(const sd_fft_ctx_t Q, double* x, ulong j)
 {
     ulong j_bits, j_mr;
 
@@ -622,7 +622,7 @@ void sd_ifft_base_8_1(const sd_fft_ctx_t Q, double* x, ulong j)
 }
 
 /* parameter 0: j cannot be zero */
-void sd_ifft_base_8_0(const sd_fft_ctx_t Q, double* x, ulong j)
+static void sd_ifft_base_8_0(const sd_fft_ctx_t Q, double* x, ulong j)
 {
     ulong j_bits, j_mr;
 
@@ -633,7 +633,7 @@ void sd_ifft_base_8_0(const sd_fft_ctx_t Q, double* x, ulong j)
     sd_ifft_basecase_8_0(Q, x, j_mr, j_bits);
 }
 
-void sd_ifft_base_9_1(const sd_fft_ctx_t Q, double* x, ulong j)
+static void sd_ifft_base_9_1(const sd_fft_ctx_t Q, double* x, ulong j)
 {
     ulong j_bits, j_mr;
 

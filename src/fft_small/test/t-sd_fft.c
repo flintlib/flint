@@ -51,7 +51,7 @@ void test_sd_fft_trunc(sd_fft_ctx_t Q, ulong minL, ulong maxL, ulong ireps, flin
 
             sd_fft_trunc(Q, data, L, itrunc, otrunc);
 
-            for (int check_reps = 0; check_reps < 2+50/(1+L); check_reps++)
+            for (ulong check_reps = 0; check_reps < 2+50/(1+L); check_reps++)
             {
                 i = n_randint(state, otrunc);
                 double point = sd_fft_ctx_w(Q, i);
@@ -73,7 +73,7 @@ void test_sd_fft_trunc(sd_fft_ctx_t Q, ulong minL, ulong maxL, ulong ireps, flin
             sd_fft_trunc(Q, data, L, trunc, trunc);
             sd_ifft_trunc(Q, data, L, trunc);
 
-            for (int check_reps = 0; check_reps < 2+90/(1+L); check_reps++)
+            for (ulong check_reps = 0; check_reps < 2+90/(1+L); check_reps++)
             {
                 i = n_randint(state, trunc);
                 double m = vec1d_reduce_0n_to_pmhn(nmod_pow_ui(2, L, Q->mod), Q->p);
