@@ -14,8 +14,8 @@
 ulong
 dirichlet_order_char(const dirichlet_group_t G, const dirichlet_char_t x)
 {
-    ulong k, g;
-    g = G->expo;
+    slong k;
+    ulong g = G->expo;
 
     for (k = 0; k < G->num; k++)
         g = n_gcd(g, G->PHI[k] * x->log[k]);

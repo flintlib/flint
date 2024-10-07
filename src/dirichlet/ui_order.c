@@ -12,7 +12,7 @@
 #include "dirichlet.h"
 
 /* order of an element knowing the factorization of a multiple */
-ulong
+static ulong
 nmod_order_precomp(ulong a, nmod_t mod, ulong expo, n_factor_t fac)
 {
     int k;

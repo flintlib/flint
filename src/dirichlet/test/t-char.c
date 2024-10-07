@@ -20,7 +20,8 @@ TEST_FUNCTION_START(dirichlet_char, state)
     {
         dirichlet_group_t G;
         dirichlet_char_t x, y;
-        ulong q, n, k, sum;
+        ulong q, n, sum;
+        slong k;
         slong ref;
 
         q = 1 + n_randint(state, 1000 * (1 + iter / 100));
@@ -54,7 +55,7 @@ TEST_FUNCTION_START(dirichlet_char, state)
                 flint_printf("loop index = %wu\n\n", n);
                 flint_abort();
             }
-            if (sum != ref && q > 1)
+            if ((slong) sum != ref && q > 1)
             {
                 flint_printf("FAIL: sum test\n\n");
                 flint_printf("q = %wu\n\n", q);
@@ -70,7 +71,7 @@ TEST_FUNCTION_START(dirichlet_char, state)
             for (n = 1; dirichlet_char_next_primitive(x, G) >= 0; n++);
 
             ref = dirichlet_group_num_primitive(G);
-            if (n != ref)
+            if ((slong) n != ref)
             {
                 flint_printf("FAIL: number of primitive elements\n\n");
                 flint_printf("q = %wu\n\n", q);
@@ -82,7 +83,6 @@ TEST_FUNCTION_START(dirichlet_char, state)
             /* some random elements, check log and exp */
             for (n = 0; n < 30; n++)
             {
-                slong k;
                 ulong m;
 
                 for (m = 1; n_gcd(m, q) > 1; m = n_randint(state, q));

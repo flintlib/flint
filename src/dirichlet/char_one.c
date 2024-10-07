@@ -14,7 +14,7 @@
 void
 dirichlet_char_one(dirichlet_char_t x, const dirichlet_group_t G)
 {
-    ulong k;
+    slong k;
     for (k = 0; k < G->num ; k++)
         x->log[k] = 0;
     x->n = 1;

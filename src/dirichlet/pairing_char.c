@@ -14,7 +14,8 @@
 ulong
 dirichlet_pairing_char(const dirichlet_group_t G, const dirichlet_char_t chi, const dirichlet_char_t x)
 {
-    ulong v = 0, k;
+    slong k;
+    ulong v = 0;
     nmod_t order;
 
     nmod_init(&order, G->expo);
