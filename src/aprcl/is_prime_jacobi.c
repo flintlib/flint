@@ -542,7 +542,8 @@ primality_test_status
 _aprcl_is_prime_jacobi(const fmpz_t n, const aprcl_config config)
 {
     int *lambdas;
-    ulong i, j, nmod4;
+    slong i, j;
+    ulong nmod4;
     primality_test_status result;
     fmpz_t temp, p2, ndec, ndecdiv, u, q_pow;
 

@@ -23,8 +23,7 @@
 nn_ptr
 aprcl_f_table(const ulong q)
 {
-    int i;
-    ulong g, g_pow, qinv;
+    ulong i, g, g_pow, qinv;
     nn_ptr g_table, f_table;
 
     g = n_primitive_root_prime(q);

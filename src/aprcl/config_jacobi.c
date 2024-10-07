@@ -77,7 +77,8 @@ aprcl_R_value(const fmpz_t n)
 static void
 _aprcl_config_jacobi_reduce_s2(aprcl_config conf, const fmpz_t n)
 {
-    ulong i, j, q;
+    slong i, j;
+    ulong q;
     double * w;
     n_factor_t q_factors;
     fmpz_t new_s, p;
@@ -98,10 +99,10 @@ _aprcl_config_jacobi_reduce_s2(aprcl_config conf, const fmpz_t n)
 
         for (j = 0; j < q_factors.num; j++)
         {
-            ulong p, euler_phi;
+            ulong px, euler_phi;
 
-            p = q_factors.p[j];
-            euler_phi = n_pow(p, q_factors.exp[j] - 1) * (p - 1);
+            px = q_factors.p[j];
+            euler_phi = n_pow(px, q_factors.exp[j] - 1) * (px - 1);
             euler_phi = euler_phi * euler_phi;
 
             w[i] += euler_phi;

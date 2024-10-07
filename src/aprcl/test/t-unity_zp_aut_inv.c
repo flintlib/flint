@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "ulong_extras.h"
 #include "fmpz.h"
 #include "aprcl.h"
 
@@ -50,7 +51,6 @@ TEST_FUNCTION_START(aprcl_unity_zp_aut_inv, state)
 
         for (j = 0; j < 100; j++)
         {
-            ulong ind;
             fmpz_t val;
 
             fmpz_init(val);

@@ -15,7 +15,7 @@
 void
 unity_zpq_copy(unity_zpq f, const unity_zpq g)
 {
-    slong i;
+    ulong i;
 
     for (i = 0; i < f->p; i++)
     {

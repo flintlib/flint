@@ -16,7 +16,7 @@
 void
 unity_zpq_clear(unity_zpq f)
 {
-    slong i;
+    ulong i;
 
     for (i = 0; i < f->p; i++)
     {
