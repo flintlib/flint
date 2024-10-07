@@ -359,9 +359,9 @@ ulong n_euler_phi(ulong n);
 
 FLINT_DLL extern const unsigned int flint_primes_small[];
 
-extern FLINT_TLS_PREFIX ulong * _flint_primes[FLINT_BITS];
-extern FLINT_TLS_PREFIX double * _flint_prime_inverses[FLINT_BITS];
-extern FLINT_TLS_PREFIX slong _flint_primes_used;
+FLINT_TLS_PREFIX extern ulong * _flint_primes[FLINT_BITS];
+FLINT_TLS_PREFIX extern double * _flint_prime_inverses[FLINT_BITS];
+FLINT_TLS_PREFIX extern slong _flint_primes_used;
 
 void n_primes_init(n_primes_t iter);
 void n_primes_clear(n_primes_t iter);

@@ -730,8 +730,8 @@ void arf_urandom(arf_t x, flint_rand_t state, slong bits, arf_rnd_t rnd);
 #define ARF_MUL_STACK_ALLOC 40
 #define ARF_MUL_TLS_ALLOC 1000
 
-extern FLINT_TLS_PREFIX nn_ptr __arf_mul_tmp;
-extern FLINT_TLS_PREFIX slong __arf_mul_alloc;
+FLINT_TLS_PREFIX extern nn_ptr __arf_mul_tmp;
+FLINT_TLS_PREFIX extern slong __arf_mul_alloc;
 
 extern void _arf_mul_tmp_cleanup(void);
 
@@ -826,8 +826,8 @@ arf_mul_fmpz(arf_ptr z, arf_srcptr x, const fmpz_t y, slong prec, arf_rnd_t rnd)
 #define ARF_ADD_STACK_ALLOC 40
 #define ARF_ADD_TLS_ALLOC 1000
 
-extern FLINT_TLS_PREFIX nn_ptr __arf_add_tmp;
-extern FLINT_TLS_PREFIX slong __arf_add_alloc;
+FLINT_TLS_PREFIX extern nn_ptr __arf_add_tmp;
+FLINT_TLS_PREFIX extern slong __arf_add_alloc;
 
 extern void _arf_add_tmp_cleanup(void);
 
