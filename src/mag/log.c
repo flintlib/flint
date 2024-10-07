@@ -159,12 +159,12 @@ mag_log(mag_t z, const mag_t x)
         else
         {
             /* log(2^exp) = exp*log(2), log(2) < 744261118/2^30 */
-            fmpz_t t;
-            fmpz_init(t);
-            fmpz_mul_ui(t, MAG_EXPREF(x), 744261118);
-            mag_set_fmpz(z, t);
+            fmpz_t tmp;
+            fmpz_init(tmp);
+            fmpz_mul_ui(tmp, MAG_EXPREF(x), 744261118);
+            mag_set_fmpz(z, tmp);
             mag_mul_2exp_si(z, z, -30);
-            fmpz_clear(t);
+            fmpz_clear(tmp);
         }
     }
 }
@@ -213,13 +213,13 @@ mag_log_lower(mag_t z, const mag_t x)
         else
         {
             /* log(2^exp) = exp*log(2), log(2) > 744261117/2^30 */
-            fmpz_t t;
-            fmpz_init(t);
-            fmpz_sub_ui(t, MAG_EXPREF(x), 1);  /* lower bound for x */
-            fmpz_mul_ui(t, t, 744261117);
-            mag_set_fmpz_lower(z, t);
+            fmpz_t tmp;
+            fmpz_init(tmp);
+            fmpz_sub_ui(tmp, MAG_EXPREF(x), 1);  /* lower bound for x */
+            fmpz_mul_ui(tmp, tmp, 744261117);
+            mag_set_fmpz_lower(z, tmp);
             mag_mul_2exp_si(z, z, -30);
-            fmpz_clear(t);
+            fmpz_clear(tmp);
         }
     }
 }
