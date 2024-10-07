@@ -13,6 +13,12 @@
 #include "acb.h"
 #include "acb_hypgeom.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 void
 acb_gamma_stirling_choose_param(int * reflect, slong * r, slong * n,
     const acb_t z, int use_reflect, int digamma, slong prec);
@@ -20,7 +26,6 @@ acb_gamma_stirling_choose_param(int * reflect, slong * r, slong * n,
 void acb_gamma_stirling_bound(mag_ptr err, const acb_t z, slong k0, slong knum, slong n);
 
 void arb_gamma_stirling_coeff(arb_t b, ulong k, int digamma, slong prec);
-
 
 void
 acb_gamma_stirling_eval(acb_t s, const acb_t z, slong nterms, int digamma, slong prec)

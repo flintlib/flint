@@ -12,7 +12,7 @@
 #include "acb.h"
 
 void
-acb_get_rad_ubound_arf(arf_t u, const acb_t z, slong prec)
+acb_get_rad_ubound_arf(arf_t u, const acb_t z, slong FLINT_UNUSED(prec))
 {
     /* fixme: this bound is very sloppy */
 

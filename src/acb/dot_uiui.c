@@ -68,10 +68,10 @@ acb_dot_uiui(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong x
                 acb_zero(res);
             else
             {
-                arf_t t;
-                arf_shallow_set_uiui(t, y[1], y[0]);
-                arb_mul_arf(acb_realref(res), acb_realref(x), t, prec);
-                arb_mul_arf(acb_imagref(res), acb_imagref(x), t, prec);
+                arf_t tf;
+                arf_shallow_set_uiui(tf, y[1], y[0]);
+                arb_mul_arf(acb_realref(res), acb_realref(x), tf, prec);
+                arb_mul_arf(acb_imagref(res), acb_imagref(x), tf, prec);
                 if (subtract)
                     acb_neg(res, res);
             }

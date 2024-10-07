@@ -67,7 +67,7 @@ acb_rising_ui_get_mag(mag_t bound, const acb_t s, ulong n)
     else
     {
         arb_t a;
-        slong k;
+        ulong k;
         mag_t bound2, t, u;
 
         arb_init(a);

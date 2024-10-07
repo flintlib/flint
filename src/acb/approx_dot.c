@@ -84,7 +84,7 @@ _arb_dot_output(arb_t res, nn_ptr sum, slong sn, int negative,
         xn = ARF_SIZE(xm); \
         xnegative = ARF_SGNBIT(xm); \
         shift = s_sum_exp - xexp; \
-        if (shift >= s_sn * FLINT_BITS) \
+        if (shift >= (ulong) s_sn * FLINT_BITS) \
         { \
         } \
         else \
@@ -173,7 +173,7 @@ _arf_complex_mul_gauss(arf_t e, arf_t f, const arf_t a, const arf_t b,
 FLINT_DLL extern slong acb_dot_gauss_dot_cutoff;
 #define GAUSS_CUTOFF acb_dot_gauss_dot_cutoff
 
-void
+static void
 acb_approx_dot_simple(acb_t res, const acb_t initial, int subtract,
     acb_srcptr x, slong xstep, acb_srcptr y, slong ystep, slong len, slong prec)
 {
@@ -584,7 +584,7 @@ acb_approx_dot(acb_t res, const acb_t initial, int subtract, acb_srcptr x, slong
                     exp = xexp + yexp;
                     shift = sum_exp - exp;
 
-                    if (shift >= sn * FLINT_BITS)
+                    if (shift >= (ulong) sn * FLINT_BITS)
                     {
                     }
                     else if (xn <= 2 && yn <= 2 && sn <= 3)
