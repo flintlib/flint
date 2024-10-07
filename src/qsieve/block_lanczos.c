@@ -484,7 +484,7 @@ static slong find_nonsingular_sub(uint64_t *t, slong *s,
 }
 
 /*-------------------------------------------------------------------*/
-void mul_MxN_Nx64(slong vsize, slong dense_rows,
+static void mul_MxN_Nx64(slong vsize, slong dense_rows,
 		slong ncols, la_col_t *A,
 		uint64_t *x, uint64_t *b) {
 
@@ -524,7 +524,7 @@ void mul_MxN_Nx64(slong vsize, slong dense_rows,
 }
 
 /*-------------------------------------------------------------------*/
-void mul_trans_MxN_Nx64(slong dense_rows, slong ncols,
+static void mul_trans_MxN_Nx64(slong dense_rows, slong ncols,
 			la_col_t *A, uint64_t *x, uint64_t *b) {
 
 	/* Multiply the vector x[] by the transpose of the
@@ -587,7 +587,7 @@ static void transpose_vector(slong ncols, uint64_t *v, uint64_t **trans) {
 }
 
 /*-----------------------------------------------------------------------*/
-void combine_cols(slong ncols,
+static void combine_cols(slong ncols,
 		uint64_t *x, uint64_t *v,
 		uint64_t *ax, uint64_t *av) {
 

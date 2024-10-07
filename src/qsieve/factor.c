@@ -38,7 +38,7 @@
 # include <windows.h>
 #endif
 
-int compare_facs(const void * a, const void * b)
+static int compare_facs(const void * a, const void * b)
 {
    fmpz * x = (fmpz *) a;
    fmpz * y = (fmpz *) b;
@@ -285,7 +285,7 @@ void qsieve_factor(fmpz_factor_t factors, const fmpz_t n)
 #endif
 
             if (qs_inf->full_relation + qs_inf->num_cycles >=
-                ((slong) (1.10*qs_inf->num_primes) + qs_inf->ks_primes + qs_inf->extra_rels))
+                (slong) ((slong) (1.10*qs_inf->num_primes) + qs_inf->ks_primes + qs_inf->extra_rels))
             {
                 int ok;
 
