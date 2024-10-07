@@ -91,7 +91,7 @@ _arf_set_round_mpn(arf_t y, slong * exp_shift, nn_srcptr x, slong xn,
     val_bits = flint_ctz(x[val_limbs]);
     val = val_limbs * FLINT_BITS + val_bits;
 
-    if (exp - val <= prec)
+    if (exp - val <= (ulong) prec)
     {
         inexact = 0;
         increment = 0;
@@ -113,7 +113,7 @@ _arf_set_round_mpn(arf_t y, slong * exp_shift, nn_srcptr x, slong xn,
             /* If exactly one excess bit, there is a tie; the rounding
                direction is determined by the bit to the left of the
                truncation point. */
-            if (exp - val - 1 == prec)
+            if (exp - val - 1 == (ulong) prec)
             {
                 increment = (x[val_limbs] >> val_bits) & 1;
             }

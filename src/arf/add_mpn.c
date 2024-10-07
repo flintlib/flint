@@ -216,9 +216,9 @@ _arf_add_mpn(arf_t z, nn_srcptr xp, slong xn, int xsgnbit, const fmpz_t xexp,
     }
 
     /* x +/- eps */
-    if (shift > prec + FLINT_BITS + 1 &&
+    if (shift > (ulong) prec + FLINT_BITS + 1 &&
         prec != ARF_PREC_EXACT &&
-        shift > (xn + 1) * FLINT_BITS)
+        shift > (ulong) (xn + 1) * FLINT_BITS)
     {
         zn = (prec + FLINT_BITS - 1) / FLINT_BITS;
         zn_original = zn = FLINT_MAX(zn, xn) + 2;
