@@ -63,13 +63,13 @@ fmpzi_remove_one_plus_i(fmpzi_t res, const fmpzi_t x)
     if (odd)
     {
         /* (a+bi) / (1+i) = ((a+b)/2) + ((b-a)/2)i */
-        fmpz_t t;
-        fmpz_init(t);
-        fmpz_add(t, fmpzi_realref(res), fmpzi_imagref(res));
+        fmpz_t tmp;
+        fmpz_init(tmp);
+        fmpz_add(tmp, fmpzi_realref(res), fmpzi_imagref(res));
         fmpz_sub(fmpzi_imagref(res), fmpzi_imagref(res), fmpzi_realref(res));
-        fmpz_tdiv_q_2exp(fmpzi_realref(res), t, 1);
+        fmpz_tdiv_q_2exp(fmpzi_realref(res), tmp, 1);
         fmpz_tdiv_q_2exp(fmpzi_imagref(res), fmpzi_imagref(res), 1);
-        fmpz_clear(t);
+        fmpz_clear(tmp);
     }
 
     return 2 * s + odd;

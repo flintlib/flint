@@ -28,7 +28,7 @@ Simple fact: If I is a finite interval containing an integer with I > 1, then
 
 Outputs shouldn't alias the inputs.
 */
-void _fmpz_mat22_shortest_l_infinity(
+static void _fmpz_mat22_shortest_l_infinity(
     fmpz_t u1, fmpz_t u2,
     fmpz_t t1, fmpz_t t2,
     const fmpz_t c, const fmpz_t b, const fmpz_t a)
@@ -181,7 +181,7 @@ void _fmpz_mat22_shortest_l_infinity(
 }
 
 
-void _fmpzi_gcd_fmpz_shortest(
+static void _fmpzi_gcd_fmpz_shortest(
     fmpz_t gx, fmpz_t gy,
     const fmpz_t ax_, const fmpz_t ay_,
     const fmpz_t b)
@@ -294,7 +294,7 @@ cleanup_stage1:
     it turns out that A = 1 and B = 0, and we rely on _shortest_l_infinity
     returning (1,0) or (0,1) instead of (1,1) in this case.
 */
-void _fmpzi_gcd_shortest(
+static void _fmpzi_gcd_shortest(
     fmpz_t gx, fmpz_t gy,
     const fmpz_t ax, const fmpz_t ay,
     const fmpz_t bx_, const fmpz_t by_)

@@ -81,20 +81,20 @@ fmpzi_divrem_approx(fmpzi_t q, fmpzi_t r, const fmpzi_t x, const fmpzi_t y)
 
         if (r != NULL)
         {
-            fmpzi_t t, u;
+            fmpzi_t tf, uf;
 
-            fmpzi_init(t);
-            fmpzi_init(u);
+            fmpzi_init(tf);
+            fmpzi_init(uf);
 
-            fmpz_set_d(fmpzi_realref(u), qa);
-            fmpz_set_d(fmpzi_imagref(u), qb);
+            fmpz_set_d(fmpzi_realref(uf), qa);
+            fmpz_set_d(fmpzi_imagref(uf), qb);
 
-            fmpzi_mul(t, u, y);
-            fmpzi_sub(r, x, t);
-            fmpzi_swap(q, u);
+            fmpzi_mul(tf, uf, y);
+            fmpzi_sub(r, x, tf);
+            fmpzi_swap(q, uf);
 
-            fmpzi_clear(t);
-            fmpzi_clear(u);
+            fmpzi_clear(tf);
+            fmpzi_clear(uf);
         }
         else
         {

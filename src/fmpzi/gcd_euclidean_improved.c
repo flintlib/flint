@@ -20,6 +20,12 @@
 #define GCD_MIN_D COEFF_MIN
 #endif
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 void
 _fmpzi_gcd_dddd(fmpzi_t res, double a, double b, double c, double d)
 {
