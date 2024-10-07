@@ -15,7 +15,7 @@
 /*
    find which power of the base is the exponent of f
 */
-ulong find_power(qfb_t f, fmpz_t n, ulong base)
+static ulong find_power(qfb_t f, fmpz_t n, ulong base)
 {
    ulong s = 1;
 
@@ -28,11 +28,12 @@ ulong find_power(qfb_t f, fmpz_t n, ulong base)
    return s;
 }
 
-ulong qfb_exponent_element_stage2(qfb_t f, fmpz_t n, ulong B2_sqrt)
+static ulong qfb_exponent_element_stage2(qfb_t f, fmpz_t n, ulong B2_sqrt)
 {
    qfb_t pow, pow2, f2;
    fmpz_t L, r;
-   slong i, i2, ret = 0;
+   ulong i;
+   slong i2, ret = 0;
    slong depth = FLINT_BIT_COUNT(B2_sqrt) + 1;
    qfb_hash_t * qhash = qfb_hash_init(depth);
 
@@ -311,7 +312,7 @@ do_restart:
          go_restart;
       }
 
-      iters = FLINT_MIN(2*iters, hi);
+      iters = FLINT_MIN(2 * iters, (slong) hi);
    } while (pr <= B1);
 
    ret = 0;

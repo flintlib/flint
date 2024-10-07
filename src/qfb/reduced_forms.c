@@ -17,7 +17,7 @@
    into n prime powers whose maximum values are stored in exp,
    storing the values at the current iteration in pows.
 */
-int pow_incr(int * pows, int * exp, int n)
+static int pow_incr(int * pows, int * exp, int n)
 {
     int i;
 
@@ -125,7 +125,7 @@ slong qfb_reduced_forms_large(qfb ** forms, slong d)
                */
                ulong c = ((ulong) (b*b) + (ulong) (-d))/(4*(ulong) a);
 
-               if (c >= (ulong) a && (b >= 0 || a != c)) /* we have a form */
+               if (c >= (ulong) a && (b >= 0 || (ulong) a != c)) /* we have a form */
                {
                    ulong g;
 
@@ -200,7 +200,7 @@ slong qfb_reduced_forms(qfb ** forms, slong d)
         for (i = 0; i < num; i++) /* sieve with each sqrt mod p */
         {
             ulong off = s[i];
-            while (off <= blim)
+            while (off <= (ulong) blim)
             {
                 b2 = (off*off - (ulong) d)/4;
 
