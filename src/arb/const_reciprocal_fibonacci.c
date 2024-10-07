@@ -39,7 +39,7 @@ typedef struct
 bsplit_args_struct;
 
 static void
-bsplit_init(bsplit_t x, void * args)
+bsplit_init(bsplit_t x, void * FLINT_UNUSED(args))
 {
     arb_init(x->P);
     arb_init(x->R);
@@ -48,7 +48,7 @@ bsplit_init(bsplit_t x, void * args)
 }
 
 static void
-bsplit_clear(bsplit_t x, void * args)
+bsplit_clear(bsplit_t x, void * FLINT_UNUSED(args))
 {
     arb_clear(x->P);
     arb_clear(x->R);
@@ -56,7 +56,7 @@ bsplit_clear(bsplit_t x, void * args)
 }
 
 static void
-bsplit_basecase(bsplit_t res, slong n, slong n1, void * args)
+bsplit_basecase(bsplit_t res, slong n, slong n1, void * FLINT_UNUSED(args))
 {
     fmpz_t f1, f2, f1f2, f22, f4, t;
 
@@ -113,7 +113,7 @@ bsplit_basecase(bsplit_t res, slong n, slong n1, void * args)
 }
 
 static void
-bsplit_merge(bsplit_t res, bsplit_t X1, bsplit_t X2, bsplit_args_struct * args)
+bsplit_merge(bsplit_t FLINT_UNUSED(res), bsplit_t X1, bsplit_t X2, bsplit_args_struct * args)
 {
     slong prec = args->prec;
     slong a = X1->a;

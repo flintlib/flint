@@ -1273,7 +1273,7 @@ void _arb_exp_taylor_rs(nn_ptr y, ulong * error,
             old_denom = factorial_tab_denom[k+1];
 
             /* change denominators */
-            if (new_denom != old_denom && k < N - 1)
+            if (new_denom != old_denom && (ulong) k < N - 1)
             {
                 mpn_divrem_1(s, 0, s, xn + 1, old_denom);
             }

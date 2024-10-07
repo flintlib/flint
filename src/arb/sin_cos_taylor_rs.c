@@ -97,7 +97,7 @@ void _arb_sin_cos_taylor_rs(nn_ptr ysin, nn_ptr ycos,
                 old_denom = factorial_tab_denom[2 * k + cosorsin + 2];
 
                 /* change denominators */
-                if (new_denom != old_denom && k < N - 1)
+                if (new_denom != old_denom && (ulong) k < N - 1)
                 {
                     if (alternating && (k % 2 == 0))
                         s[xn] += old_denom;

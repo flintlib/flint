@@ -26,7 +26,7 @@ _arb_dot_add_generic(nn_ptr sum, nn_ptr serr, nn_ptr tmp, slong sn,
     nn_srcptr xptr, slong xn,
     int negative, flint_bitcnt_t shift);
 
-void
+static void
 arb_approx_dot_simple(arb_t res, const arb_t initial, int subtract,
     arb_srcptr x, slong xstep, arb_srcptr y, slong ystep, slong len, slong prec)
 {
@@ -223,7 +223,7 @@ arb_approx_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong
 
             shift = sum_exp - xexp;
 
-            if (shift < sn * FLINT_BITS)
+            if (shift < (ulong) sn * FLINT_BITS)
             {
                 xptr = (xn <= ARF_NOPTR_LIMBS) ? ARF_NOPTR_D(xm) : ARF_PTR_D(xm);
                 _arb_dot_add_generic(sum, &serr, tmp, sn, xptr, xn, xnegative ^ subtract, shift);
@@ -252,7 +252,7 @@ arb_approx_dot(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong
             exp = xexp + yexp;
             shift = sum_exp - exp;
 
-            if (shift >= sn * FLINT_BITS)
+            if (shift >= (ulong) sn * FLINT_BITS)
             {
                 /* do nothing */
             }

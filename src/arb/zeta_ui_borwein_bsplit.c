@@ -11,6 +11,12 @@
 
 #include "arb.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 /* With parameter n, the error is bounded by 3/(3+sqrt(8))^n */
 #define ERROR_A 1.5849625007211561815 /* log2(3) */
 #define ERROR_B 2.5431066063272239453 /* log2(3+sqrt(8)) */

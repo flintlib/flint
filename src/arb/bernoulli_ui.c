@@ -16,7 +16,7 @@
 void
 arb_bernoulli_ui(arb_t b, ulong n, slong prec)
 {
-    if (n < bernoulli_cache_num)
+    if (n < (ulong) bernoulli_cache_num)
     {
         arb_set_fmpq(b, bernoulli_cache + n, prec);
     }

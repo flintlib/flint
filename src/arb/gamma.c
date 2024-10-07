@@ -9,13 +9,20 @@
     (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 */
 
-#include "acb.h"
+#include "arb.h"
 #include "arb_hypgeom.h"
+#include "acb.h"
 #include "bernoulli.h"
+
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
 
 /* todo: move/cleanup helper functions */
 
-void
+static void
 acb_gamma_bound_phase(mag_t bound, const acb_t z)
 {
     arf_t x, y, t, u;
@@ -176,8 +183,6 @@ arb_gamma_stirling_coeff(arb_t b, ulong k, int digamma, slong prec)
     arb_div_fmpz(b, b, d, prec);
     fmpz_clear(d);
 }
-
-
 
 void
 arb_gamma_stirling_eval(arb_t s, const arb_t z, slong nterms, int digamma, slong prec)

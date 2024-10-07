@@ -63,7 +63,7 @@ arf_log_via_mpfr(arf_t z, const arf_t x, slong prec, arf_rnd_t rnd)
 }
 #endif
 
-void
+static void
 arb_log_arf_huge(arb_t z, const arf_t x, slong prec)
 {
     arf_t t;
@@ -186,18 +186,18 @@ arb_log_arf(arb_t z, const arf_t x, slong prec)
         }
         else if (2 * closeness_to_one > prec + 1)
         {
-            arf_t t, u;
-            arf_init(t);
-            arf_init(u);
-            arf_sub_ui(t, x, 1, ARF_PREC_EXACT, ARF_RND_DOWN);
-            arf_mul(u, t, t, ARF_PREC_EXACT, ARF_RND_DOWN);
-            arf_mul_2exp_si(u, u, -1);
-            inexact = arf_sub(arb_midref(z), t, u, prec, ARB_RND);
+            arf_t tf, uf;
+            arf_init(tf);
+            arf_init(uf);
+            arf_sub_ui(tf, x, 1, ARF_PREC_EXACT, ARF_RND_DOWN);
+            arf_mul(uf, tf, tf, ARF_PREC_EXACT, ARF_RND_DOWN);
+            arf_mul_2exp_si(uf, uf, -1);
+            inexact = arf_sub(arb_midref(z), tf, uf, prec, ARB_RND);
             mag_set_ui_2exp_si(arb_radref(z), 1, -3 * closeness_to_one);
             if (inexact)
                 arf_mag_add_ulp(arb_radref(z), arb_radref(z), arb_midref(z), prec);
-            arf_clear(t);
-            arf_clear(u);
+            arf_clear(tf);
+            arf_clear(uf);
             return;
         }
 

@@ -29,7 +29,7 @@ typedef struct
 
 typedef euler_bsplit_1_struct euler_bsplit_1_t[1];
 
-static void euler_bsplit_1_init(euler_bsplit_1_t s, void * args)
+static void euler_bsplit_1_init(euler_bsplit_1_t s, void * FLINT_UNUSED(args))
 {
     arb_init(s->P);
     arb_init(s->Q);
@@ -39,7 +39,7 @@ static void euler_bsplit_1_init(euler_bsplit_1_t s, void * args)
     arb_init(s->V);
 }
 
-static void euler_bsplit_1_clear(euler_bsplit_1_t s, void * args)
+static void euler_bsplit_1_clear(euler_bsplit_1_t s, void * FLINT_UNUSED(args))
 {
     arb_clear(s->P);
     arb_clear(s->Q);
@@ -142,7 +142,7 @@ euler_bsplit_1_basecase(euler_bsplit_1_t s, slong n1, slong n2, bsplit_args_t * 
 }
 
 static void
-euler_bsplit_1(euler_bsplit_1_t s, slong n1, slong n2, slong N, slong wp, int cont)
+euler_bsplit_1(euler_bsplit_1_t s, slong n1, slong n2, slong N, slong wp, int FLINT_UNUSED(cont))
 {
     bsplit_args_t args;
 
@@ -171,14 +171,14 @@ typedef struct
 
 typedef euler_bsplit_2_struct euler_bsplit_2_t[1];
 
-static void euler_bsplit_2_init(euler_bsplit_2_t s, void * args)
+static void euler_bsplit_2_init(euler_bsplit_2_t s, void * FLINT_UNUSED(args))
 {
     arb_init(s->P);
     arb_init(s->Q);
     arb_init(s->T);
 }
 
-static void euler_bsplit_2_clear(euler_bsplit_2_t s, void * args)
+static void euler_bsplit_2_clear(euler_bsplit_2_t s, void * FLINT_UNUSED(args))
 {
     arb_clear(s->P);
     arb_clear(s->Q);
@@ -266,7 +266,7 @@ euler_bsplit_2_basecase(euler_bsplit_2_t s, slong n1, slong n2, bsplit_args_t * 
 
 static void
 euler_bsplit_2(arb_t P, arb_t Q, arb_t T, slong n1, slong n2,
-                        slong N, slong wp, int cont)
+                        slong N, slong wp, int FLINT_UNUSED(cont))
 {
     euler_bsplit_2_t s;
     bsplit_args_t args;
@@ -360,7 +360,7 @@ arb_log_ui_smooth(arb_t s, ulong n, slong prec)
     arb_clear(t);
 }
 
-void
+static void
 arb_const_euler_eval(arb_t res, slong prec)
 {
     euler_bsplit_1_t sum;
@@ -461,7 +461,7 @@ arb_const_euler_eval(arb_t res, slong prec)
     euler_bsplit_1_clear(sum, NULL);
 }
 
-ARB_DEF_CACHED_CONSTANT(arb_const_euler_brent_mcmillan, arb_const_euler_eval)
+_ARB_DEF_CACHED_CONSTANT(static, static, arb_const_euler_brent_mcmillan, arb_const_euler_eval)
 
 FLINT_DLL extern const ulong arb_hypgeom_gamma_tab_limbs[];
 

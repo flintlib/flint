@@ -12,7 +12,7 @@
 #include "arb.h"
 
 /* todo: make arb_pow_fmpz automatic */
-void
+static void
 _arb_10_pow_fmpz(arb_t res, const fmpz_t m, slong prec)
 {
     slong bits = fmpz_bits(m);
@@ -67,7 +67,7 @@ arb_get_fmpz_mid_rad_10exp(fmpz_t mid, fmpz_t rad, fmpz_t exp, const arb_t x, sl
         fmpz_set(e, ARF_EXPREF(arb_radref(x)));
 
     prec = fmpz_bits(e);
-    prec = FLINT_MAX(prec, FLINT_BIT_COUNT(n)) + 15;
+    prec = FLINT_MAX((ulong) prec, FLINT_BIT_COUNT(n)) + 15;
 
     arb_const_log2(t, prec);
     arb_const_log10(u, prec);

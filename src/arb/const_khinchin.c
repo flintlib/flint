@@ -12,12 +12,12 @@
 #include <math.h>
 #include "arb.h"
 
-void
+static void
 arb_const_khinchin_eval_param(arb_t s, ulong N, ulong M, slong prec)
 {
     arb_t t, u, h;
     arb_ptr pows;
-    slong k, n;
+    ulong k, n;
 
     arb_init(t);
     arb_init(u);
@@ -92,7 +92,7 @@ arb_const_khinchin_eval_param(arb_t s, ulong N, ulong M, slong prec)
     arb_clear(h);
 }
 
-void
+static void
 arb_const_khinchin_eval(arb_t K, slong prec)
 {
     ulong N, M;

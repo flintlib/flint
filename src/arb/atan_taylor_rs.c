@@ -641,7 +641,7 @@ void _arb_atan_taylor_rs(nn_ptr y, ulong * error,
             old_denom = odd_reciprocal_tab_denom[k+1];
 
             /* change denominators */
-            if (new_denom != old_denom && k < N - 1)
+            if (new_denom != old_denom && (ulong) k < N - 1)
             {
                 /* hack when s is negative: add 1 to get a positive number */
                 if (alternating && (k % 2 == 0))

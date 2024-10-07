@@ -77,9 +77,9 @@ arb_dot_siui(arb_t res, const arb_t initial, int subtract, arb_srcptr x, slong x
                 arb_zero(res);
             else
             {
-                arf_t t;
-                arf_shallow_set_siui(t, y[1], y[0]);
-                arb_mul_arf(res, x, t, prec);
+                arf_t tf;
+                arf_shallow_set_siui(tf, y[1], y[0]);
+                arb_mul_arf(res, x, tf, prec);
                 if (subtract)
                     arb_neg(res, res);
             }
