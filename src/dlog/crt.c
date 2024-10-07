@@ -15,8 +15,7 @@
 ulong
 dlog_crt(const dlog_crt_t t, ulong b)
 {
-    int k;
-    ulong r = 0;
+    ulong k, r = 0;
     for (k = 0; k < t->num; k++)
     {
         ulong bk, rk;

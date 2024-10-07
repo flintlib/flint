@@ -19,8 +19,7 @@ dlog_once(ulong b, ulong a, const nmod_t mod, ulong n)
         return 0;
     if (n < 50)
     {
-        slong k;
-        ulong ak = 1;
+        ulong k, ak = 1;
 
         for (k = 0; k < n; k++)
         {

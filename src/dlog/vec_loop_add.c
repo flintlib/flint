@@ -14,7 +14,7 @@
 
 /* vector of log(k,a)*loga % order in Z/modZ */
 void
-dlog_vec_loop_add(ulong * v, ulong nv, ulong a, ulong va, nmod_t mod, ulong na, nmod_t order)
+dlog_vec_loop_add(ulong * v, ulong nv, ulong a, ulong va, nmod_t mod, ulong FLINT_UNUSED(na), nmod_t order)
 {
     ulong x, xp, vx;
     vx = 0;

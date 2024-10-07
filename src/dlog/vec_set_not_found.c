@@ -15,7 +15,7 @@ void
 dlog_vec_set_not_found(ulong *v, ulong nv, nmod_t mod)
 {
     n_factor_t fac;
-    ulong i;
+    slong i;
 
     n_factor_init(&fac);
     n_factor(&fac, mod.n, 1);

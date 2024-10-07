@@ -15,7 +15,7 @@
 ulong
 dlog_power_init(dlog_power_t t, ulong a, ulong mod, ulong p, ulong e, ulong num)
 {
-    int k;
+    ulong k;
     nmod_init(&t->mod, mod);
     t->p = p;
     t->e = e;

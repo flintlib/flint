@@ -14,7 +14,7 @@
 void
 dlog_crt_clear(dlog_crt_t t)
 {
-    int k;
+    ulong k;
     flint_free(t->expo);
     flint_free(t->crt_coeffs);
     for (k = 0; k < t->num; k++)

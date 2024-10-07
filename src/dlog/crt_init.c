@@ -15,7 +15,7 @@
 ulong
 dlog_crt_init(dlog_crt_t t, ulong a, ulong mod, ulong n, ulong num)
 {
-    int k;
+    ulong k;
     n_factor_t fac;
     ulong * M, * u;
     ulong cost = 0;

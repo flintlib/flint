@@ -23,8 +23,7 @@ dlog_single(ulong b, ulong a, const nmod_t mod, ulong n)
 {
     if (n < 50)
     {
-        int k;
-        ulong ak = 1;
+        ulong k, ak = 1;
 
         for (k=0; k < n; k++)
         {

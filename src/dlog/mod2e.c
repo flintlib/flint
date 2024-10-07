@@ -15,8 +15,7 @@
 ulong
 dlog_mod2e_1mod4(ulong b1, ulong e, ulong inv5, nmod_t pe)
 {
-    slong f;
-    ulong pf1, pf, x, xf;
+    ulong f, pf1, pf, x, xf;
     pf1 = 1;
     pf = 4;
     x = 0;
