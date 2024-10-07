@@ -1,20 +1,24 @@
 #
-# Copyright (C) 2023 Albin Ahlbäck
+#   Copyright (C) 2023, 2024 Albin Ahlbäck
 #
-# This file is part of FLINT.
+#   This file is part of FLINT.
 #
-# FLINT is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Lesser General Public License (LGPL) as published
-# by the Free Software Foundation; either version 3 of the License, or
-# (at your option) any later version.  See <https://www.gnu.org/licenses/>.
+#   FLINT is free software: you can redistribute it and/or modify it under
+#   the terms of the GNU Lesser General Public License (LGPL) as published
+#   by the Free Software Foundation; either version 3 of the License, or
+#   (at your option) any later version.  See <https://www.gnu.org/licenses/>.
 #
 
+# These point to the building directory
 FLINT_DIR:=.
 SRC_DIR:=src
 BUILD_DIR:=build
-ABS_FLINT_DIR:='$(patsubst %/,%, $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))'
+
+# These point to the source directory
+ABS_FLINT_DIR:=@abs_srcdir@
 ABS_SRC_DIR:=$(ABS_FLINT_DIR)/$(SRC_DIR)
-ABS_BUILD_DIR:=$(ABS_FLINT_DIR)/$(SRC_DIR)
+
+IS_OUT_OF_TREE:=@IS_OUT_OF_TREE@
 
 FLINT_VERSION:=@FLINT_VERSION_FULL@
 FLINT_MAJOR_SO:=@FLINT_MAJOR_SO@
@@ -66,10 +70,8 @@ WANT_NTL:=@WANT_NTL@
 
 WANT_DEPS:=@WANT_DEPS@
 
-WANT_CXX:=@WANT_CXX@
-
 WANT_ASSEMBLY:=@WANT_ASSEMBLY@
-ASM_PATH:=$(SRC_DIR)/mpn_extras/@ASM_PATH@
+ASM_PATH:=$(ABS_SRC_DIR)/mpn_extras/@ASM_PATH@
 
 GMP_LIB_PATH:=@GMP_LIB_PATH@
 MPFR_LIB_PATH:=@MPFR_LIB_PATH@
@@ -79,8 +81,8 @@ NTL_LIB_PATH:=@NTL_LIB_PATH@
 
 CFLAGS:=@CFLAGS@
 TESTCFLAGS:=@TESTCFLAGS@
-CPPFLAGS:=@CPPFLAGS@ -DBUILDING_FLINT
-CPPFLAGS2:=-L$(FLINT_DIR) $(CPPFLAGS)
+CPPFLAGS:=-I$(ABS_SRC_DIR) -I$(SRC_DIR) @CPPFLAGS@ -DBUILDING_FLINT
+CPPFLAGS2:=-L$(ABS_FLINT_DIR) $(CPPFLAGS)
 LIB_CPPFLAGS:=@LIB_CPPFLAGS@
 CXXFLAGS:=@CXXFLAGS@
 LIBS:=@LIBS@
@@ -107,7 +109,7 @@ endif
 
 LDFLAGS:=@LDFLAGS@
 EXTRA_SHARED_FLAGS:=@EXTRA_SHARED_FLAGS@ $(foreach path, $(sort $(GMP_LIB_PATH) $(MPFR_LIB_PATH) $(BLAS_LIB_PATH) $(GC_LIB_PATH) $(NTL_LIB_PATH)), @WL@-rpath,$(path))
-EXE_LDFLAGS:=$(LDFLAGS) $(foreach path, $(sort $(ABS_FLINT_DIR) $(GMP_LIB_PATH) $(MPFR_LIB_PATH) $(BLAS_LIB_PATH) $(GC_LIB_PATH) $(NTL_LIB_PATH)), @WL@-rpath,$(path))
+EXE_LDFLAGS:=$(LDFLAGS) $(foreach path, $(sort $(FLINT_DIR) $(GMP_LIB_PATH) $(MPFR_LIB_PATH) $(BLAS_LIB_PATH) $(GC_LIB_PATH) $(NTL_LIB_PATH)), @WL@-rpath,$(path))
 
 # Obtain level of parallel
 JOBS:=$(filter -j%,$(MAKEFLAGS))
@@ -137,7 +139,8 @@ CFG_FILES :=                                                                \
         $(FLINT_DIR)/config.log         $(SRC_DIR)/flint.h                  \
         $(SRC_DIR)/gmpcompat.h          $(FLINT_DIR)/flint.pc               \
         $(FLINT_DIR)/Makefile           $(SRC_DIR)/fmpz/fmpz.c              \
-        $(SRC_DIR)/config.m4            $(SRC_DIR)/flint-mparam.h
+        $(FLINT_DIR)/config.m4          $(SRC_DIR)/flint-mparam.h           \
+        $(FLINT_DIR)/config.status
 
 ################################################################################
 # directories
@@ -236,7 +239,7 @@ BUILD_DIRS +=                                                               \
 endif
 ifeq ($(WANT_ASSEMBLY),1)
 BUILD_DIRS +=                                                               \
-        $(patsubst $(SRC_DIR)/%,$(BUILD_DIR)/%,$(ASM_PATH))
+        $(patsubst $(ABS_SRC_DIR)/%,$(BUILD_DIR)/%,$(ASM_PATH))
 endif
 
 INSTALL_DIRS :=                                                             \
@@ -250,26 +253,30 @@ endif
 # headers
 ################################################################################
 
-HEADERS := $(wildcard $(SRC_DIR)/*.h)
+HEADERS := $(wildcard $(ABS_SRC_DIR)/*.h)
 
 ################################################################################
 # sources
 ################################################################################
 
 define xxx_SOURCES
-$(1)_SOURCES := $(wildcard $(SRC_DIR)/$(1)/*.c)
+$(1)_SOURCES := $(wildcard $(ABS_SRC_DIR)/$(1)/*.c)
 endef
 $(foreach dir, $(DIRS), $(eval $(call xxx_SOURCES,$(dir))))
 
+ifeq ($(IS_OUT_OF_TREE),1)
+fmpz_SOURCES += $(SRC_DIR)/fmpz/fmpz.c
+endif
+
 # We clear some template files
-fmpz_lll_SOURCES := $(filter-out $(SRC_DIR)/fmpz_lll/babai.c $(SRC_DIR)/fmpz_lll/mpf2_lll.c $(SRC_DIR)/fmpz_lll/d_lll.c,$(fmpz_lll_SOURCES))
+fmpz_lll_SOURCES := $(filter-out $(ABS_SRC_DIR)/fmpz_lll/babai.c $(ABS_SRC_DIR)/fmpz_lll/mpf2_lll.c $(ABS_SRC_DIR)/fmpz_lll/d_lll.c,$(fmpz_lll_SOURCES))
 
 SOURCES := $(foreach dir,$(DIRS),$($(dir)_SOURCES))
 
 ifeq ($(WANT_ASSEMBLY),1)
 mpn_extras_ASM_SOURCES := $(wildcard $(ASM_PATH)/*.asm)
-mpn_extras_PIC_S_SOURCES := $(patsubst $(SRC_DIR)/%.asm,$(BUILD_DIR)/%_pic.s,$(mpn_extras_ASM_SOURCES))
-mpn_extras_S_SOURCES := $(patsubst $(SRC_DIR)/%.asm,$(BUILD_DIR)/%.s,$(mpn_extras_ASM_SOURCES))
+mpn_extras_PIC_S_SOURCES := $(patsubst $(ABS_SRC_DIR)/%.asm,$(BUILD_DIR)/%_pic.s,$(mpn_extras_ASM_SOURCES))
+mpn_extras_S_SOURCES := $(patsubst $(ABS_SRC_DIR)/%.asm,$(BUILD_DIR)/%.s,$(mpn_extras_ASM_SOURCES))
 ifneq ($(SHARED), 0)
 mpn_extras_SOURCES += $(mpn_extras_PIC_S_SOURCES)
 endif
@@ -279,34 +286,34 @@ endif
 endif
 
 define xxx_PROF_SOURCES
-$(1)_PROF_SOURCES := $(wildcard $(SRC_DIR)/$(1)/profile/*.c)
+$(1)_PROF_SOURCES := $(wildcard $(ABS_SRC_DIR)/$(1)/profile/*.c)
 endef
-_PROF_SOURCES := $(wildcard $(SRC_DIR)/profile/*.c)
+_PROF_SOURCES := $(wildcard $(ABS_SRC_DIR)/profile/*.c)
 $(foreach dir, $(DIRS), $(eval $(call xxx_PROF_SOURCES,$(dir))))
 PROF_SOURCES := $(foreach dir,$(DIRS),$($(dir)_PROF_SOURCES)) $(_PROF_SOURCES)
 
 # FIXME: De-hardcode fq_zech_vec from this.
-fq_zech_vec_TEST_SOURCES := $(wildcard $(SRC_DIR)/fq_zech_vec/test/main.c)
+fq_zech_vec_TEST_SOURCES := $(wildcard $(ABS_SRC_DIR)/fq_zech_vec/test/main.c)
 define xxx_TEST_SOURCES
-$(1)_TEST_SOURCES := $(wildcard $(SRC_DIR)/$(1)/test/main.c)
+$(1)_TEST_SOURCES := $(wildcard $(ABS_SRC_DIR)/$(1)/test/main.c)
 endef
-_TEST_SOURCES := $(wildcard $(SRC_DIR)/test/main.c)
+_TEST_SOURCES := $(wildcard $(ABS_SRC_DIR)/test/main.c)
 $(foreach dir, $(DIRS), $(eval $(call xxx_TEST_SOURCES,$(dir))))
 TEST_SOURCES := $(_TEST_SOURCES) $(foreach dir,$(DIRS),$($(dir)_TEST_SOURCES)) $(fq_zech_vec_TEST_SOURCES)
 # NOTE: We do not add CPP files to C files in SOURCES in order to not screw up
 # the `patsubst' in the object files.
 ifneq ($(WANT_NTL), 0)
-interfaces_TEST_SOURCES := $(SRC_DIR)/interfaces/test/t-NTL-interface.cpp
+interfaces_TEST_SOURCES := $(ABS_SRC_DIR)/interfaces/test/t-NTL-interface.cpp
 endif
 
 define xxx_TUNE_SOURCES
-$(1)_TUNE_SOURCES := $(wildcard $(SRC_DIR)/$(1)/tune/*.c)
+$(1)_TUNE_SOURCES := $(wildcard $(ABS_SRC_DIR)/$(1)/tune/*.c)
 endef
-_TUNE_SOURCES := $(wildcard $(SRC_DIR)/tune/*.c)
+_TUNE_SOURCES := $(wildcard $(ABS_SRC_DIR)/tune/*.c)
 $(foreach dir, $(DIRS), $(eval $(call xxx_TUNE_SOURCES,$(dir))))
 TUNE_SOURCES := $(foreach dir,$(DIRS),$($(dir)_TUNE_SOURCES)) $(_TUNE_SOURCES)
 
-EXMP_SOURCES := $(wildcard $(FLINT_DIR)/examples/*.c)
+EXMP_SOURCES := $(wildcard $(ABS_FLINT_DIR)/examples/*.c)
 
 ################################################################################
 # objects
@@ -314,9 +321,14 @@ EXMP_SOURCES := $(wildcard $(FLINT_DIR)/examples/*.c)
 
 ifneq ($(STATIC), 0)
 define xxx_OBJS
-$(1)_OBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(filter-out %.s,$($(1)_SOURCES)))
+$(1)_OBJS := $(patsubst $(ABS_SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(filter-out %.s,$($(1)_SOURCES)))
 endef
 $(foreach dir, $(DIRS), $(eval $(call xxx_OBJS,$(dir))))
+
+ifeq ($(IS_OUT_OF_TREE),1)
+fmpz_OBJS := $(subst $(SRC_DIR)/fmpz/fmpz.c,$(BUILD_DIR)/fmpz/fmpz.o,$(fmpz_OBJS))
+endif
+
 ifeq ($(WANT_ASSEMBLY),1)
 mpn_extras_OBJS += $(patsubst %.s,%.o,$(mpn_extras_S_SOURCES))
 endif
@@ -329,9 +341,14 @@ endif
 
 ifneq ($(SHARED), 0)
 define xxx_LOBJS
-$(1)_LOBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.lo,$(filter-out %.s, $($(1)_SOURCES)))
+$(1)_LOBJS := $(patsubst $(ABS_SRC_DIR)/%.c,$(BUILD_DIR)/%.lo,$(filter-out %.s, $($(1)_SOURCES)))
 endef
 $(foreach dir, $(DIRS), $(eval $(call xxx_LOBJS,$(dir))))
+
+ifeq ($(IS_OUT_OF_TREE),1)
+fmpz_LOBJS := $(subst $(SRC_DIR)/fmpz/fmpz.c,$(BUILD_DIR)/fmpz/fmpz.lo,$(fmpz_LOBJS))
+endif
+
 ifeq ($(WANT_ASSEMBLY),1)
 mpn_extras_LOBJS += $(patsubst %_pic.s,%.lo,$(mpn_extras_PIC_S_SOURCES))
 endif
@@ -343,16 +360,16 @@ endif
 ################################################################################
 
 define xxx_PROFS
-$(1)_PROFS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%$(EXEEXT),$($(1)_PROF_SOURCES))
+$(1)_PROFS := $(patsubst $(ABS_SRC_DIR)/%.c,$(BUILD_DIR)/%$(EXEEXT),$($(1)_PROF_SOURCES))
 endef
-_PROFS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%$(EXEEXT),$(_PROF_SOURCES))
+_PROFS := $(patsubst $(ABS_SRC_DIR)/%.c,$(BUILD_DIR)/%$(EXEEXT),$(_PROF_SOURCES))
 $(foreach dir, $(DIRS), $(eval $(call xxx_PROFS,$(dir))))
 PROFS := $(foreach dir,$(DIRS),$($(dir)_PROFS)) $(_PROFS)
 
 define xxx_TESTS
-$(1)_TESTS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%$(EXEEXT),$($(1)_TEST_SOURCES))
+$(1)_TESTS := $(patsubst $(ABS_SRC_DIR)/%.c,$(BUILD_DIR)/%$(EXEEXT),$($(1)_TEST_SOURCES))
 endef
-_TESTS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%$(EXEEXT),$(_TEST_SOURCES))
+_TESTS := $(patsubst $(ABS_SRC_DIR)/%.c,$(BUILD_DIR)/%$(EXEEXT),$(_TEST_SOURCES))
 $(foreach dir, $(DIRS), $(eval $(call xxx_TESTS,$(dir))))
 ifneq ($(WANT_NTL), 0)
 interfaces_TESTS := $(BUILD_DIR)/interfaces/test/t-NTL-interface$(EXEEXT)
@@ -360,13 +377,13 @@ endif
 TESTS := $(_TESTS) $(foreach dir,$(DIRS),$($(dir)_TESTS)) $(interfaces_TESTS)
 
 define xxx_TUNES
-$(1)_TUNES := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%$(EXEEXT),$($(1)_TUNE_SOURCES))
+$(1)_TUNES := $(patsubst $(ABS_SRC_DIR)/%.c,$(BUILD_DIR)/%$(EXEEXT),$($(1)_TUNE_SOURCES))
 endef
-_TUNES := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%$(EXEEXT),$(_TUNE_SOURCES))
+_TUNES := $(patsubst $(ABS_SRC_DIR)/%.c,$(BUILD_DIR)/%$(EXEEXT),$(_TUNE_SOURCES))
 $(foreach dir, $(DIRS), $(eval $(call xxx_TUNES,$(dir))))
 TUNES := $(foreach dir,$(DIRS),$($(dir)_TUNES)) $(_TUNES)
 
-EXMPS := $(patsubst $(FLINT_DIR)/%.c,$(BUILD_DIR)/%$(EXEEXT),$(EXMP_SOURCES))
+EXMPS := $(patsubst $(ABS_FLINT_DIR)/%.c,$(BUILD_DIR)/%$(EXEEXT),$(EXMP_SOURCES))
 
 ################################################################################
 ################################################################################
@@ -559,10 +576,10 @@ DEPFLAGS = -MMD -MP -MF $(@:%=%.d)
 ################################################################################
 
 ifeq ($(WANT_ASSEMBLY),1)
-$(BUILD_DIR)/%.s: $(SRC_DIR)/%.asm $(FLINT_DIR)/config.m4 | $(BUILD_DIR)/mpn_extras/@ASM_PATH@
+$(BUILD_DIR)/%.s: $(ABS_SRC_DIR)/%.asm $(FLINT_DIR)/config.m4 | $(BUILD_DIR)/mpn_extras/@ASM_PATH@
 	@$(M4) $< > $@
 
-$(BUILD_DIR)/%_pic.s: $(SRC_DIR)/%.asm $(FLINT_DIR)/config.m4 | $(BUILD_DIR)/mpn_extras/@ASM_PATH@
+$(BUILD_DIR)/%_pic.s: $(ABS_SRC_DIR)/%.asm $(FLINT_DIR)/config.m4 | $(BUILD_DIR)/mpn_extras/@ASM_PATH@
 	@$(M4) -DPIC $< > $@
 endif
 
@@ -572,10 +589,16 @@ endif
 
 ifneq ($(STATIC), 0)
 define xxx_OBJS_rule
-$(BUILD_DIR)/$(1)/%.o: $(SRC_DIR)/$(1)/%.c | $(BUILD_DIR)/$(1)
-	@echo "  CC  $$(<:$(SRC_DIR)/%=%)"
+$(BUILD_DIR)/$(1)/%.o: $(ABS_SRC_DIR)/$(1)/%.c | $(BUILD_DIR)/$(1)
+	@echo "  CC  $$(<:$(ABS_SRC_DIR)/%=%)"
 	@$(CC) $(CFLAGS) $($(1)_CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $$< -o $$@ $$(DEPFLAGS)
 endef
+
+ifeq ($(IS_OUT_OF_TREE),1)
+$(BUILD_DIR)/fmpz/fmpz.o: $(SRC_DIR)/fmpz/fmpz.c | $(BUILD_DIR)/fmpz
+	@echo "  CC  $(<:$(SRC_DIR)/%=%)"
+	@$(CC) $(CFLAGS) $(fmpz_CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $< -o $@ $(DEPFLAGS)
+endif
 
 ifeq ($(WANT_ASSEMBLY),1)
 %.o: %.s
@@ -592,10 +615,16 @@ endif
 
 ifneq ($(SHARED), 0)
 define xxx_LOBJS_rule
-$(BUILD_DIR)/$(1)/%.lo: $(SRC_DIR)/$(1)/%.c | $(BUILD_DIR)/$(1)
-	@echo "  CC  $$(<:$(SRC_DIR)/%=%)"
+$(BUILD_DIR)/$(1)/%.lo: $(ABS_SRC_DIR)/$(1)/%.c | $(BUILD_DIR)/$(1)
+	@echo "  CC  $$(<:$(ABS_SRC_DIR)/%=%)"
 	@$(CC) $(PIC_FLAG) $(CFLAGS) $($(1)_CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $$< -o $$@ $$(DEPFLAGS)
 endef
+
+ifeq ($(IS_OUT_OF_TREE),1)
+$(BUILD_DIR)/fmpz/fmpz.lo: $(SRC_DIR)/fmpz/fmpz.c | $(BUILD_DIR)/fmpz
+	@echo "  CC  $(<:$(SRC_DIR)/%=%)"
+	@$(CC) $(PIC_FLAG) $(CFLAGS) $(fmpz_CFLAGS) $(CPPFLAGS) $(LIB_CPPFLAGS) -c $< -o $@ $(DEPFLAGS)
+endif
 
 ifeq ($(WANT_ASSEMBLY),1)
 %.lo: %_pic.s
@@ -611,25 +640,25 @@ endif
 ################################################################################
 
 ifeq ($(SHARED), 0)
-$(BUILD_DIR)/profile/%$(EXEEXT): $(SRC_DIR)/profile/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/profile
-	@echo "  CC  $(<:$(SRC_DIR)/%=%)"
+$(BUILD_DIR)/profile/%$(EXEEXT): $(ABS_SRC_DIR)/profile/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/profile
+	@echo "  CC  $(<:$(ABS_SRC_DIR)/%=%)"
 	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
 else
-$(BUILD_DIR)/profile/%$(EXEEXT): $(SRC_DIR)/profile/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/profile
-	@echo "  CC  $(<:$(SRC_DIR)/%=%)"
+$(BUILD_DIR)/profile/%$(EXEEXT): $(ABS_SRC_DIR)/profile/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/profile
+	@echo "  CC  $(<:$(ABS_SRC_DIR)/%=%)"
 	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
 endif
 
 ifeq ($(SHARED), 0)
 define xxx_PROFS_rule
-$(BUILD_DIR)/$(1)/profile/%$(EXEEXT): $(SRC_DIR)/$(1)/profile/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/$(1)/profile
-	@echo "  CC  $$(<:$(SRC_DIR)/%=%)"
+$(BUILD_DIR)/$(1)/profile/%$(EXEEXT): $(ABS_SRC_DIR)/$(1)/profile/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/$(1)/profile
+	@echo "  CC  $$(<:$(ABS_SRC_DIR)/%=%)"
 	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) $$(DEPFLAGS)
 endef
 else
 define xxx_PROFS_rule
-$(BUILD_DIR)/$(1)/profile/%$(EXEEXT): $(SRC_DIR)/$(1)/profile/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/$(1)/profile
-	@echo "  CC  $$(<:$(SRC_DIR)/%=%)"
+$(BUILD_DIR)/$(1)/profile/%$(EXEEXT): $(ABS_SRC_DIR)/$(1)/profile/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/$(1)/profile
+	@echo "  CC  $$(<:$(ABS_SRC_DIR)/%=%)"
 	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) $$(DEPFLAGS)
 endef
 endif
@@ -637,25 +666,25 @@ endif
 $(foreach dir, $(DIRS), $(eval $(call xxx_PROFS_rule,$(dir))))
 
 ifeq ($(SHARED), 0)
-$(BUILD_DIR)/test/%$(EXEEXT): $(SRC_DIR)/test/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/test
-	@echo "  CC  $(<:$(SRC_DIR)/%=%)"
+$(BUILD_DIR)/test/%$(EXEEXT): $(ABS_SRC_DIR)/test/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/test
+	@echo "  CC  $(<:$(ABS_SRC_DIR)/%=%)"
 	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
 else
-$(BUILD_DIR)/test/%$(EXEEXT): $(SRC_DIR)/test/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/test
-	@echo "  CC  $(<:$(SRC_DIR)/%=%)"
+$(BUILD_DIR)/test/%$(EXEEXT): $(ABS_SRC_DIR)/test/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/test
+	@echo "  CC  $(<:$(ABS_SRC_DIR)/%=%)"
 	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
 endif
 
 ifeq ($(SHARED), 0)
 define xxx_TESTS_rule
-$(BUILD_DIR)/$(1)/test/%$(EXEEXT): $(SRC_DIR)/$(1)/test/%.c $(FLINT_DIR)/libflint.a | $(BUILD_DIR)/$(1)/test
-	@echo "  CC  $$(<:$(SRC_DIR)/%=%)"
+$(BUILD_DIR)/$(1)/test/%$(EXEEXT): $(ABS_SRC_DIR)/$(1)/test/%.c $(FLINT_DIR)/libflint.a | $(BUILD_DIR)/$(1)/test
+	@echo "  CC  $$(<:$(ABS_SRC_DIR)/%=%)"
 	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) $$(DEPFLAGS)
 endef
 else
 define xxx_TESTS_rule
-$(BUILD_DIR)/$(1)/test/%$(EXEEXT): $(SRC_DIR)/$(1)/test/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/$(1)/test
-	@echo "  CC  $$(<:$(SRC_DIR)/%=%)"
+$(BUILD_DIR)/$(1)/test/%$(EXEEXT): $(ABS_SRC_DIR)/$(1)/test/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/$(1)/test
+	@echo "  CC  $$(<:$(ABS_SRC_DIR)/%=%)"
 	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) $$(DEPFLAGS)
 endef
 endif
@@ -664,36 +693,36 @@ $(foreach dir, $(DIRS), $(eval $(call xxx_TESTS_rule,$(dir))))
 
 ifneq ($(WANT_NTL), 0)
 ifeq ($(SHARED), 0)
-$(BUILD_DIR)/interfaces/test/t-NTL-interface$(EXEEXT): $(SRC_DIR)/interfaces/test/t-NTL-interface.cpp $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/interfaces/test
-	@echo "  CXX $(<:$(SRC_DIR)/%=%)"
+$(BUILD_DIR)/interfaces/test/t-NTL-interface$(EXEEXT): $(ABS_SRC_DIR)/interfaces/test/t-NTL-interface.cpp $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/interfaces/test
+	@echo "  CXX $(<:$(ABS_SRC_DIR)/%=%)"
 	@$(CXX) $(CXXFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
 else
-$(BUILD_DIR)/interfaces/test/t-NTL-interface$(EXEEXT): $(SRC_DIR)/interfaces/test/t-NTL-interface.cpp | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/interfaces/test
-	@echo "  CXX $(<:$(SRC_DIR)/%=%)"
+$(BUILD_DIR)/interfaces/test/t-NTL-interface$(EXEEXT): $(ABS_SRC_DIR)/interfaces/test/t-NTL-interface.cpp | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/interfaces/test
+	@echo "  CXX $(<:$(ABS_SRC_DIR)/%=%)"
 	@$(CXX) $(CXXFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
 endif
 endif
 
 ifeq ($(SHARED), 0)
-$(BUILD_DIR)/tune/%$(EXEEXT): $(SRC_DIR)/tune/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/tune
-	@echo "  CC  $(<:$(SRC_DIR)/%=%)"
+$(BUILD_DIR)/tune/%$(EXEEXT): $(ABS_SRC_DIR)/tune/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/tune
+	@echo "  CC  $(<:$(ABS_SRC_DIR)/%=%)"
 	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
 else
-$(BUILD_DIR)/tune/%$(EXEEXT): $(SRC_DIR)/tune/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/tune
-	@echo "  CC  $(<:$(SRC_DIR)/%=%)"
+$(BUILD_DIR)/tune/%$(EXEEXT): $(ABS_SRC_DIR)/tune/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/tune
+	@echo "  CC  $(<:$(ABS_SRC_DIR)/%=%)"
 	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS)
 endif
 
 ifeq ($(SHARED), 0)
 define xxx_TUNES_rule
-$(BUILD_DIR)/$(1)/tune/%$(EXEEXT): $(SRC_DIR)/$(1)/tune/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/$(1)/tune
-	@echo "  CC  $$(<:$(SRC_DIR)/%=%)"
+$(BUILD_DIR)/$(1)/tune/%$(EXEEXT): $(ABS_SRC_DIR)/$(1)/tune/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/$(1)/tune
+	@echo "  CC  $$(<:$(ABS_SRC_DIR)/%=%)"
 	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) $$(DEPFLAGS)
 endef
 else
 define xxx_TUNES_rule
-$(BUILD_DIR)/$(1)/tune/%$(EXEEXT): $(SRC_DIR)/$(1)/tune/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/$(1)/tune
-	@echo "  CC  $$(<:$(SRC_DIR)/%=%)"
+$(BUILD_DIR)/$(1)/tune/%$(EXEEXT): $(ABS_SRC_DIR)/$(1)/tune/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/$(1)/tune
+	@echo "  CC  $$(<:$(ABS_SRC_DIR)/%=%)"
 	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $$< -o $$@ $(EXE_LDFLAGS) $(LIBS2) $$(DEPFLAGS)
 endef
 endif
@@ -701,12 +730,12 @@ endif
 $(foreach dir, $(DIRS), $(eval $(call xxx_TUNES_rule,$(dir))))
 
 ifeq ($(SHARED), 0)
-$(BUILD_DIR)/examples/%$(EXEEXT): $(FLINT_DIR)/examples/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/examples $(BUILD_DIR)/include
-	@echo "  CC  $(<:$(SRC_DIR)/%=%)"
+$(BUILD_DIR)/examples/%$(EXEEXT): $(ABS_FLINT_DIR)/examples/%.c $(FLINT_DIR)/$(FLINT_LIB_STATIC) | $(BUILD_DIR)/examples $(BUILD_DIR)/include
+	@echo "  CC  $(<:$(ABS_FLINT_DIR)/%=%)"
 	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS) -I$(BUILD_DIR)/include
 else
-$(BUILD_DIR)/examples/%$(EXEEXT): $(FLINT_DIR)/examples/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/examples $(BUILD_DIR)/include
-	@echo "  CC  $(<:$(SRC_DIR)/%=%)"
+$(BUILD_DIR)/examples/%$(EXEEXT): $(ABS_FLINT_DIR)/examples/%.c | $(FLINT_DIR)/$(FLINT_LIB_FULL) $(BUILD_DIR)/examples $(BUILD_DIR)/include
+	@echo "  CC  $(<:$(ABS_FLINT_DIR)/%=%)"
 	@$(CC) $(TESTCFLAGS) $(CPPFLAGS2) $< -o $@ $(EXE_LDFLAGS) $(LIBS2) $(DEPFLAGS) -I$(BUILD_DIR)/include
 endif
 
@@ -717,7 +746,7 @@ endif
 examples: library $(EXMPS)
 
 %_EXMP_RUN: %
-	@$(FLINT_DIR)/dev/check_examples.sh $(patsubst $(BUILD_DIR)/examples/%,%,$<) $(BUILD_DIR)/examples
+	@$(ABS_FLINT_DIR)/dev/check_examples.sh $(patsubst $(BUILD_DIR)/examples/%,%,$<) $(BUILD_DIR)/examples
 
 checkexamples: examples $(EXMPS:%=%_EXMP_RUN)
 
@@ -760,12 +789,12 @@ endif
 ifdef PYTHON
 ifeq ($(findstring linux,$(HOST_OS)),linux)
 check: library
-	@LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:$(ABS_FLINT_DIR) python3 $(SRC_DIR)/python/flint_ctypes.py
+	@LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:$(ABS_FLINT_DIR) python3 $(ABS_SRC_DIR)/python/flint_ctypes.py
 	@echo ''
 	@echo 'All Python tests passed.'
 else
 check: library
-	@python3 $(SRC_DIR)/python/flint_ctypes.py
+	@python3 $(ABS_SRC_DIR)/python/flint_ctypes.py
 	@echo ''
 	@echo 'All Python tests passed.'
 endif
@@ -939,47 +968,37 @@ endif
 
 ifneq ($(MAINTAINER_MODE),no)  # disable this for releases?
 ifneq ($(shell command -v autoconf 2> /dev/null),)
-configure: configure.ac
+$(ABS_FLINT_DIR)/configure: $(ABS_FLINT_DIR)/configure.ac
 	@echo "Running autoconf"
-	@autoconf
+	@cd $(ABS_FLINT_DIR) && autoconf && cd - >/dev/null
 else
-configure: configure.ac
+$(ABS_FLINT_DIR)/configure: $(ABS_FLINT_DIR)/configure.ac
 	$(warning autoconf not available, proceeding with stale configure)
 endif
 endif
 
-config.status: configure
+config.status: $(ABS_FLINT_DIR)/configure
 	./config.status --recheck
 
-Makefile: Makefile.in config.status
+Makefile: $(ABS_FLINT_DIR)/Makefile.in config.status
 	./config.status $@
 
-flint.pc: flint.pc.in config.status
+flint.pc: $(ABS_FLINT_DIR)/flint.pc.in config.status
 	./config.status $@
 
-src/flint.h: src/flint.h.in config.status
+$(SRC_DIR)/flint.h: $(ABS_SRC_DIR)/flint.h.in config.status
 	./config.status $@
 
 libtool: config.status
 	./config.status $@
 
-# The following are only linked during configuration
-
-# src/gmpcompat.h: src/@GMPCOMPAT_H_IN@ config.status
-# 	./config.status $@
-# 
-# src/fmpz/fmpz.c: @FMPZ_C_IN@ config.status
-# 	./config.status $@
-#
-# src/flint-mparam.h: src/mpn_extras/@PARAM_PATH@/flint-mparam.h config.status
-# 	./config.status $@
-
 ################################################################################
 # maintainer stuff
 ################################################################################
 
+# NOTE: Requires source directory is build directory
 dist:
-	dev/make_dist.sh $(FLINT_VERSION)
+	$(FLINT_DIR)/dev/make_dist.sh $(FLINT_VERSION)
 
 ################################################################################
 # makefile debugging
