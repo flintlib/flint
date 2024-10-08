@@ -16,7 +16,7 @@ void
 acb_hypgeom_legendre_p_uiui_rec(acb_t res, ulong n, ulong m, const acb_t z, slong prec)
 {
     acb_t t, u, v;
-    slong k;
+    ulong k;
 
     if (!acb_is_finite(z))
     {
@@ -30,7 +30,7 @@ acb_hypgeom_legendre_p_uiui_rec(acb_t res, ulong n, ulong m, const acb_t z, slon
         return;
     }
 
-    if ((n - m) / 4 > prec)
+    if ((slong) ((n - m) / 4) > prec)
     {
         acb_indeterminate(res);
         return;

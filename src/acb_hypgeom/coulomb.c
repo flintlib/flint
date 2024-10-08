@@ -37,7 +37,7 @@ acb_hypgeom_coulomb_is_real(int * C, int * F, int * G, const acb_t l1, const acb
     }
 }
 
-void
+static void
 _acb_hypgeom_coulomb(acb_t F, acb_t G, acb_t Hpos, acb_t Hneg, const acb_t l, const acb_t eta, const acb_t z, int asymp, slong prec)
 {
     acb_t u, v, lu, lv, z1, z2, m, h, T1, T2, U1, U2, H1, H2, C, theta;

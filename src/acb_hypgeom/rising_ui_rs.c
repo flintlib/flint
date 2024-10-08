@@ -23,7 +23,8 @@
 void
 acb_hypgeom_rising_ui_rs(acb_t res, const acb_t x, ulong n, ulong m, slong prec)
 {
-    slong i, k, l, m0, climbs, climbs_max, wp;
+    slong i, k, l, climbs, climbs_max, wp;
+    ulong m0;
     acb_ptr xpow;
     acb_t t, u;
     nn_ptr c;
@@ -40,7 +41,8 @@ acb_hypgeom_rising_ui_rs(acb_t res, const acb_t x, ulong n, ulong m, slong prec)
 
     TMP_START;
 
-    if (m == 0 || m == -1)
+    /* FIXME: Why is m allowed to be -1 when it is unsigned? */
+    if (m == 0 || (slong) m == -1)
     {
         if (n <= 6)
             m = 2;
@@ -67,7 +69,7 @@ acb_hypgeom_rising_ui_rs(acb_t res, const acb_t x, ulong n, ulong m, slong prec)
     acb_init(t);
     acb_init(u);
 
-    for (k = 0; k < n; k += m)
+    for (k = 0; (ulong) k < n; k += m)
     {
         l = FLINT_MIN(m, n - k);
         climbs = FLINT_BIT_COUNT(k + l - 1) * l;

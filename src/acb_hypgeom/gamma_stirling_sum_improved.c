@@ -117,12 +117,12 @@ acb_hypgeom_gamma_stirling_sum_improved(acb_t s, const acb_t z, slong N, slong K
 
             while (Mk[k] > 2)
             {
-                slong err, Mnew;
+                slong errs, Mnew;
 
                 Mnew = Mk[k] - 1;
-                err = term_mags[Mnew] - log2_k * (2 * Mnew) + FLINT_BIT_COUNT(N - Mnew);
+                errs = term_mags[Mnew] - log2_k * (2 * Mnew) + FLINT_BIT_COUNT(N - Mnew);
 
-                if (err < -prec)
+                if (errs < -prec)
                     Mk[k] = Mnew;
                 else
                     break;
@@ -147,15 +147,15 @@ acb_hypgeom_gamma_stirling_sum_improved(acb_t s, const acb_t z, slong N, slong K
 
         for (k = 1; k < K; k++)
         {
-            mag_t t;
-            mag_init(t);
-            mag_set_ui_lower(t, k);
-            mag_inv(t, t);
-            mag_pow_ui(t, t, 2 * Mk[k]);
-            mag_mul_ui(t, t, N - Mk[k]);
-            mag_mul_2exp_si(t, t, term_mags[Mk[k]]);
-            mag_add(err, err, t);
-            mag_clear(t);
+            mag_t tm;
+            mag_init(tm);
+            mag_set_ui_lower(tm, k);
+            mag_inv(tm, tm);
+            mag_pow_ui(tm, tm, 2 * Mk[k]);
+            mag_mul_ui(tm, tm, N - Mk[k]);
+            mag_mul_2exp_si(tm, tm, term_mags[Mk[k]]);
+            mag_add(err, err, tm);
+            mag_clear(tm);
         }
     }
     else

@@ -13,6 +13,13 @@
 #include "arb_hypgeom.h"
 #include "acb_hypgeom.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+# pragma message "_mag_gt_norm_ui only needs a symbol for test"
+#endif
+
 int
 acb_hypgeom_u_asymp_determine_region(const mag_t r,
     const mag_t zlo, const acb_t z);
@@ -391,7 +398,7 @@ _acb_is_nonnegative_real(const acb_t z)
     return arb_is_zero(acb_imagref(z)) && arb_is_nonnegative(acb_realref(z));
 }
 
-void
+static void
 acb_hypgeom_gamma_upper_nointegration(acb_t res, const acb_t s, const acb_t z, int regularized, slong prec)
 {
     if (!acb_is_finite(s) || !acb_is_finite(z))

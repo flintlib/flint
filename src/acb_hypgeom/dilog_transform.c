@@ -135,36 +135,36 @@ acb_hypgeom_dilog_transform(acb_t res, const acb_t z, int algorithm, slong prec)
             else if (algorithm == 6)
             {
                 /* Li_2((1+i)/2) = (5 pi^2 / 96 - log(2)^2/8) + (C - pi log(2) / 8) i */
-                arb_t t;
-                arb_init(t);
+                arb_t tb;
+                arb_init(tb);
                 acb_set_d_d(a, 0.5, 0.5);
-                arb_const_pi(t, prec);
+                arb_const_pi(tb, prec);
                 arb_const_log2(acb_imagref(u), prec);
                 arb_mul(acb_realref(u), acb_imagref(u), acb_imagref(u), prec);
-                arb_mul(acb_imagref(u), acb_imagref(u), t, prec);
+                arb_mul(acb_imagref(u), acb_imagref(u), tb, prec);
                 acb_mul_2exp_si(u, u, -3);
-                arb_mul(t, t, t, prec);
-                arb_mul_ui(t, t, 5, prec);
-                arb_div_ui(t, t, 96, prec);
-                arb_sub(acb_realref(u), t, acb_realref(u), prec);
-                arb_const_catalan(t, prec);
-                arb_sub(acb_imagref(u), t, acb_imagref(u), prec);
-                arb_clear(t);
+                arb_mul(tb, tb, tb, prec);
+                arb_mul_ui(tb, tb, 5, prec);
+                arb_div_ui(tb, tb, 96, prec);
+                arb_sub(acb_realref(u), tb, acb_realref(u), prec);
+                arb_const_catalan(tb, prec);
+                arb_sub(acb_imagref(u), tb, acb_imagref(u), prec);
+                arb_clear(tb);
             }
             else
             {
                 /* Li_2(1+i) = pi^2/16 + (C + pi log(2)/4) i */
-                arb_t t;
-                arb_init(t);
+                arb_t tb;
+                arb_init(tb);
                 acb_set_d_d(a, 1.0, 1.0);
                 arb_const_pi(acb_realref(u), prec);
                 arb_mul_2exp_si(acb_realref(u), acb_realref(u), -2);
-                arb_const_log2(t, prec);
-                arb_mul(acb_imagref(u), acb_realref(u), t, prec);
-                arb_const_catalan(t, prec);
-                arb_add(acb_imagref(u), acb_imagref(u), t, prec);
+                arb_const_log2(tb, prec);
+                arb_mul(acb_imagref(u), acb_realref(u), tb, prec);
+                arb_const_catalan(tb, prec);
+                arb_add(acb_imagref(u), acb_imagref(u), tb, prec);
                 arb_mul(acb_realref(u), acb_realref(u), acb_realref(u), prec);
-                arb_clear(t);
+                arb_clear(tb);
             }
 
             if (arf_sgn(arb_midref(acb_imagref(z))) < 0)
