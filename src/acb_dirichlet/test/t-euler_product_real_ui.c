@@ -10,6 +10,7 @@
 */
 
 #include "test_helpers.h"
+#include "arb.h"
 #include "acb_dirichlet.h"
 
 #ifdef __GNUC__
@@ -18,6 +19,8 @@
 # include <math.h>
 #endif
 
+/* chi cannot be a global variable in these tests */
+#define chi this_chi
 const signed char chi[8][6] = {
   {1, 1},
   {2, 0, 1},
@@ -129,3 +132,4 @@ TEST_FUNCTION_START(acb_dirichlet_euler_product_real_ui, state)
 
     TEST_FUNCTION_END(state);
 }
+#undef chi

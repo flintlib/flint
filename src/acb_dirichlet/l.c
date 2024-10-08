@@ -19,7 +19,7 @@
 # include <math.h>
 #endif
 
-void
+static void
 acb_dirichlet_l_general(acb_t res, const acb_t s,
     const dirichlet_group_t G, const dirichlet_char_t chi, slong prec)
 {

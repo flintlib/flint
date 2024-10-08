@@ -21,7 +21,7 @@
 # include <math.h>
 #endif
 
-int
+static int
 acb_dirichlet_l_fmpq_use_afe(ulong q, const fmpq_t s, slong prec)
 {
     double cutoff;

@@ -14,7 +14,7 @@
 #include "acb_dirichlet.h"
 
 static void
-integral_tail(mag_t bound, const acb_t z, const acb_t log_z, const acb_t s, const acb_t a, const arb_t R, slong prec)
+integral_tail(mag_t bound, const acb_t FLINT_UNUSED(z), const acb_t log_z, const acb_t s, const acb_t a, const arb_t R, slong prec)
 {
     arb_t C, s1;
     mag_t t;
@@ -156,7 +156,7 @@ integrand2(acb_ptr res, const acb_t t, void * param, slong order, slong prec)
     return _integrand(res, t, param, order, 1, prec);
 }
 
-void
+static void
 _acb_dirichlet_lerch_phi_integral(acb_t res, const acb_t z, const acb_t s, const acb_t a, slong prec)
 {
     acb_t log_z, t, u, v, w, zero, N;

@@ -81,7 +81,6 @@ void _acb_dirichlet_euler_product_real_ui(arb_t res, ulong s,
     arb_t t, u;
     ulong p;
     mag_t err;
-    slong num_threads;
 
     if (s <= 1)
     {
@@ -108,13 +107,13 @@ void _acb_dirichlet_euler_product_real_ui(arb_t res, ulong s,
 
         if (chi[2 % mod] != 0)
         {
-            arf_t t;
-            arf_init(t);
-            arf_set_si_2exp_si(t, chi[2 % mod], -s);
+            arf_t tf;
+            arf_init(tf);
+            arf_set_si_2exp_si(tf, chi[2 % mod], -s);
             if (reciprocal)
-                arf_neg(t, t);
-            arb_add_arf(res, res, t, prec);
-            arf_clear(t);
+                arf_neg(tf, tf);
+            arb_add_arf(res, res, tf, prec);
+            arf_clear(tf);
         }
 
         arb_add_error_2exp_si(res, 2 - (3 * s) / 2);
@@ -141,9 +140,7 @@ void _acb_dirichlet_euler_product_real_ui(arb_t res, ulong s,
        which gives prec ^ 1.2956 here. */
     limit = 100 + prec * sqrt(prec);
 
-    num_threads = flint_get_num_available_threads();
-
-    if (num_threads > 1 && prec > 5000 && s > 5000)
+    if (flint_get_num_available_threads() > 1 && prec > 5000 && s > 5000)
     {
         n_primes_t iter;
         slong i;

@@ -20,8 +20,7 @@ acb_dirichlet_powsum_sieved(acb_ptr z, const acb_t s, ulong n, slong len, slong 
 {
     slong * divisors;
     slong powers_alloc;
-    slong i, j, k, ibound, power_of_two, horner_point;
-    ulong kprev;
+    ulong i, j, k, ibound, kprev, power_of_two, horner_point;
     int critical_line, integer;
 
     acb_ptr powers;
