@@ -13,7 +13,7 @@
 #include "arb_hypgeom.h"
 
 static void
-factor(arb_t A, const fmpq * a, slong alen, const fmpq * b, slong blen, const fmpz_t bden, const arb_t z, slong k, slong prec)
+factor(arb_t A, const fmpq * a, slong alen, const fmpq * FLINT_UNUSED(b), slong FLINT_UNUSED(blen), const fmpz_t bden, const arb_t z, slong k, slong prec)
 {
     slong i;
 

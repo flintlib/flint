@@ -20,8 +20,8 @@
 double arf_get_d_log2_abs_approx_clamped(const arf_t x);
 
 /* todo: minima and maxima at multiples of pi */
-void
-arb_hypgeom_si_wide(arb_t res, const arb_t z, slong prec)
+static void
+arb_hypgeom_si_wide(arb_t res, const arb_t FLINT_UNUSED(z), slong FLINT_UNUSED(prec))
 {
     mag_set_ui_2exp_si(arb_radref(res), 1988502269, -30);
     arf_zero(arb_midref(res));

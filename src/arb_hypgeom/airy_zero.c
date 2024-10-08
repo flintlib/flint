@@ -55,7 +55,7 @@ static const double initial[4][10] = {{
  -3098043823061022.0,-3359196018589429.0,-3610552233837226.0,
 }};
 
-void
+static void
 _arb_hypgeom_airy_zero(arb_t res, const fmpz_t n, int which, slong prec)
 {
     slong asymp_accuracy, wp;

@@ -22,7 +22,7 @@
 #endif
 
 static void
-taylor_M(mag_t M, const arb_t a, const arb_t z, const mag_t x, slong Rexp)
+taylor_M(mag_t M, const arb_t a, const arb_t z, const mag_t FLINT_UNUSED(x), slong Rexp)
 {
     arb_t t, u;
     arb_init(t);

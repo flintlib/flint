@@ -219,7 +219,7 @@ arb_hypgeom_erfinv_guess(arb_t res, const arb_t x, const arb_t one_sub_x, slong 
     }
 }
 
-void
+static void
 arb_hypgeom_erfinv_precise(arb_t res, const arb_t x, const arb_t one_sub_x, int near_one, slong prec)
 {
     slong wp;

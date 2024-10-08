@@ -45,7 +45,7 @@ mag_pow_fmpq_fast(mag_t res, const mag_t x, const fmpq_t e)
     fmpz_clear(b);
 }
 
-slong
+static slong
 _arb_hypgeom_gamma_upper_fmpq_inf_choose_N_1(mag_t err, const fmpq_t a, const arb_t z, int prefactor, const mag_t abs_tol)
 {
     slong N, aa, ab;
@@ -136,7 +136,8 @@ _arb_hypgeom_gamma_upper_fmpq_inf_choose_N(mag_t err, const fmpq_t a, const arb_
     return _arb_hypgeom_gamma_upper_fmpq_inf_choose_N_1(err, a, z, 1, abs_tol);
 }
 
-slong
+#if 0
+static slong
 _arb_hypgeom_gamma_upper_fmpq_inf_choose_N_rel(mag_t err, const fmpq_t a, const arb_t z, slong prec)
 {
     mag_t tol;
@@ -147,6 +148,7 @@ _arb_hypgeom_gamma_upper_fmpq_inf_choose_N_rel(mag_t err, const fmpq_t a, const 
     mag_clear(tol);
     return N;
 }
+#endif
 
 static void
 upper_bsplit(arb_t M, arb_t S, arb_t Q, const fmpz_t ap, const fmpz_t aq, const arb_t z, slong na, slong nb, int cont, slong prec)

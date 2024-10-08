@@ -152,7 +152,7 @@ const double arb_hypgeom_rgamma_d_tab[128] = {
 
 /* Crude upper bound for psi(x) for x > 0, adequate for perturbation bounds
    for gamma. */
-double
+static double
 d_abs_digamma_ubound(double x)
 {
     if (x <= 1.0)
@@ -184,7 +184,7 @@ d_abs_digamma_ubound(double x)
 
 /* Upper or lower bound (depending on direction) for gamma(x),
    assuming x > 0, no overflow. */
-double
+static double
 _arb_hypgeom_d_gamma(double x, int direction)
 {
     double s, t, p;
@@ -221,7 +221,7 @@ _arb_hypgeom_d_gamma(double x, int direction)
 }
 
 /* Set res = [a, b]; not checking overflow or underflow. */
-void arb_set_interval_d_fast(arb_t res, double a, double b, slong prec)
+static void arb_set_interval_d_fast(arb_t res, double a, double b, slong prec)
 {
     double mid, rad;
 
@@ -361,11 +361,11 @@ arb_hypgeom_gamma_taylor(arb_t res, const arb_t x, int reciprocal, slong prec)
     /* 1/gamma(x) = (-1)^r * rgamma(1+x-r) * rf(1+r-x,-r) * (x-r) */
     if (dx < 0.0)
     {
-        arb_t t, u, v;
+        arb_t t, ub, vb;
 
         arb_init(t);
-        arb_init(u);
-        arb_init(v);
+        arb_init(ub);
+        arb_init(vb);
 
         arb_sub_si(t, x, r, prec + 10);
 
@@ -377,16 +377,16 @@ arb_hypgeom_gamma_taylor(arb_t res, const arb_t x, int reciprocal, slong prec)
         }
         else
         {
-            arb_add_si(u, x, 1 - r, prec + 10);
+            arb_add_si(ub, x, 1 - r, prec + 10);
 
             success = 1;
-            if (reciprocal && !arb_is_positive(u))
+            if (reciprocal && !arb_is_positive(ub))
             {
                 /* todo: accurate wide interval */
                 success = 0;
             }
 
-            success = arb_hypgeom_gamma_taylor(u, u, reciprocal, prec + 10);
+            success = arb_hypgeom_gamma_taylor(ub, ub, reciprocal, prec + 10);
 
             if (success)
             {
@@ -405,30 +405,30 @@ arb_hypgeom_gamma_taylor(arb_t res, const arb_t x, int reciprocal, slong prec)
                         b = b * ((d + i) * (1 + 1e-15));
                     }
 
-                    arb_set_interval_d_fast(v, a, b, 53);
+                    arb_set_interval_d_fast(vb, a, b, 53);
 
                     if (reciprocal)
                     {
-                        arb_mul(res, u, v, prec + 10);
+                        arb_mul(res, ub, vb, prec + 10);
                         arb_mul(res, res, t, prec);
                     }
                     else
                     {
-                        arb_div(res, u, v, prec + 10);
+                        arb_div(res, ub, vb, prec + 10);
                         arb_div(res, res, t, prec);
                     }
                 }
                 else
                 {
-                    arb_neg(v, x);
-                    arb_add_si(v, v, 1 + r, prec + 10);
-                    arb_hypgeom_rising_ui_rec(v, v, -r, prec + 10);
-                    arb_mul(v, v, t, prec + 10);
+                    arb_neg(vb, x);
+                    arb_add_si(vb, vb, 1 + r, prec + 10);
+                    arb_hypgeom_rising_ui_rec(vb, vb, -r, prec + 10);
+                    arb_mul(vb, vb, t, prec + 10);
 
                     if (reciprocal)
-                        arb_mul(res, u, v, prec);
+                        arb_mul(res, ub, vb, prec);
                     else
-                        arb_div(res, u, v, prec);
+                        arb_div(res, ub, vb, prec);
                 }
 
                 if (r % 2)
@@ -437,8 +437,8 @@ arb_hypgeom_gamma_taylor(arb_t res, const arb_t x, int reciprocal, slong prec)
         }
 
         arb_clear(t);
-        arb_clear(u);
-        arb_clear(v);
+        arb_clear(ub);
+        arb_clear(vb);
         return success;
     }
 

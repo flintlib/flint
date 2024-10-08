@@ -21,6 +21,12 @@
 # include <math.h>
 #endif
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 static double
 d_log2_fac(double n)
 {

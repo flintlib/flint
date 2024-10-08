@@ -36,9 +36,8 @@ static double log2_bin_uiui_fast(ulong n, ulong k)
     return n * htab[FLINT_MIN(k, 15)];
 }
 
-/* x is unused but part of the API */
 void
-arb_hypgeom_legendre_p_ui_deriv_bound(mag_t dp, mag_t dp2, ulong n, const arb_t x, const arb_t x2sub1)
+arb_hypgeom_legendre_p_ui_deriv_bound(mag_t dp, mag_t dp2, ulong n, const arb_t FLINT_UNUSED(x), const arb_t x2sub1)
 {
     mag_t c, t, u;
 
@@ -81,7 +80,8 @@ arb_hypgeom_legendre_p_ui(arb_t res, arb_t res_prime, ulong n, const arb_t x, sl
     double log2x, log2u, tolerance, asymp_error;
     double yy, log2nsy, log2k, size;
     slong wp;
-    slong d, k, K_zero, K_one, K_asymp;
+    slong d;
+    ulong k, K_zero, K_one, K_asymp;
     int basecase_ok;
 
     if (!arb_is_finite(x) || n > UWORD_MAX / 4)

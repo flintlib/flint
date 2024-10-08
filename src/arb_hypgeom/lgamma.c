@@ -16,7 +16,7 @@ void arb_hypgeom_gamma_stirling_choose_param(int * reflect, slong * r, slong * n
 int arb_hypgeom_gamma_exact(arb_t res, const arb_t x, int reciprocal, slong prec);
 void arb_hypgeom_gamma_stirling_inner(arb_t s, const arb_t z, slong N, slong prec);
 
-void
+static void
 arb_hypgeom_lgamma_stirling(arb_t y, const arb_t x, slong prec)
 {
     int reflect;

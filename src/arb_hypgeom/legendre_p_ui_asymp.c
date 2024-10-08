@@ -138,7 +138,7 @@ _arb_hypgeom_legendre_p_ui_asymp_error(mag_t res, ulong n, const mag_t y, slong 
     mag_fac_ui(u, K);
     mag_div(t, u, t);
 
-    if (K < n / 16)
+    if (K < (slong) (n / 16))
     {
         /* (2n)^K */
         mag_set_ui_lower(u, n);
@@ -167,7 +167,7 @@ _arb_hypgeom_legendre_p_ui_asymp_error(mag_t res, ulong n, const mag_t y, slong 
     mag_clear(u);
 }
 
-int
+static int
 arb_abs_le_ui(const arb_t x, ulong n)
 {
     arf_struct u[3];
@@ -199,7 +199,7 @@ arb_abs_le_ui(const arb_t x, ulong n)
     return res;
 }
 
-void
+static void
 _arb_hypgeom_legendre_p_ui_asymp(arb_t res, ulong n, const arb_t x,
     const arb_t y, acb_srcptr w4pow, const arb_t binom, slong m, slong K, slong prec)
 {

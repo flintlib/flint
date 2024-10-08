@@ -16,7 +16,7 @@
 #include "arb_hypgeom.h"
 #include "hypgeom.h"
 
-void
+static void
 arb_gamma_const_1_3_eval(arb_t s, slong prec)
 {
     hypgeom_t series;
@@ -50,9 +50,9 @@ arb_gamma_const_1_3_eval(arb_t s, slong prec)
     arb_clear(u);
 }
 
-ARB_DEF_CACHED_CONSTANT(arb_gamma_const_1_3, arb_gamma_const_1_3_eval)
+_ARB_DEF_CACHED_CONSTANT(static, static, arb_gamma_const_1_3, arb_gamma_const_1_3_eval)
 
-void
+static void
 arb_gamma_const_1_4_eval(arb_t x, slong prec)
 {
     arb_t t, u;
@@ -77,13 +77,13 @@ arb_gamma_const_1_4_eval(arb_t x, slong prec)
     arb_clear(u);
 }
 
-ARB_DEF_CACHED_CONSTANT(arb_gamma_const_1_4, arb_gamma_const_1_4_eval)
+_ARB_DEF_CACHED_CONSTANT(static, static, arb_gamma_const_1_4, arb_gamma_const_1_4_eval)
 
 
 void arb_hypgeom_gamma_stirling_choose_param(int * reflect, slong * r, slong * n, const arb_t x, int use_reflect, int digamma, slong prec);
 void arb_hypgeom_gamma_stirling_inner(arb_t s, const arb_t z, slong N, slong prec);
 
-void
+static void
 arb_hypgeom_gamma_fmpq_stirling(arb_t y, const fmpq_t a, slong prec)
 {
     int reflect;
@@ -138,7 +138,7 @@ arb_hypgeom_gamma_fmpq_stirling(arb_t y, const fmpq_t a, slong prec)
     arb_clear(x);
 }
 
-void
+static void
 arb_hypgeom_gamma_small_frac(arb_t y, unsigned int p, unsigned int q, slong prec)
 {
     slong wp = prec + 4;
@@ -227,7 +227,7 @@ slong _arb_get_exp_pos(const slong * tab, slong step);
 static void
 bsplit2(arb_t P, arb_t Q, const fmpz_t zp, const fmpz_t zq,
     const slong * xexp, arb_srcptr xpow,
-    ulong N, slong a, slong b, int cont, slong prec)
+    ulong N, slong a, slong b, int FLINT_UNUSED(cont), slong prec)
 {
     if (b - a == 1)
     {
@@ -477,7 +477,7 @@ arb_hypgeom_gamma_fmpq_general_off1(arb_t res, const fmpq_t z, slong prec)
 }
 
 /* assumes z in (0, 1] */
-void
+static void
 arb_hypgeom_gamma_fmpq_hyp(arb_t res, const fmpq_t z, slong prec)
 {
     fmpq_t t;
@@ -489,7 +489,7 @@ arb_hypgeom_gamma_fmpq_hyp(arb_t res, const fmpq_t z, slong prec)
     fmpq_clear(t);
 }
 
-void
+static void
 arb_hypgeom_gamma_fmpq_outward(arb_t y, const fmpq_t x, slong prec)
 {
     fmpq_t a;
@@ -553,7 +553,7 @@ arb_hypgeom_gamma_fmpq_outward(arb_t y, const fmpq_t x, slong prec)
     arb_clear(u);
 }
 
-int
+static int
 arb_hypgeom_gamma_fmpq_taylor(arb_t y, const fmpq_t x, slong prec)
 {
     fmpq_t a;
@@ -668,7 +668,7 @@ arb_hypgeom_gamma_fmpq(arb_t y, const fmpq_t x, slong prec)
         }
     }
 
-    if (q != 1 && prec > 7000 + 300 * fmpz_bits(fmpq_denref(x)) &&
+    if (q != 1 && prec > 7000 + 300 * (slong) fmpz_bits(fmpq_denref(x)) &&
         (slong) fmpz_bits(fmpq_numref(x)) - (slong) fmpz_bits(fmpq_denref(x)) < FLINT_BITS &&
         fabs(fmpq_get_d(x)) < 0.03 * prec * sqrt(prec))
     {

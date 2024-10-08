@@ -18,7 +18,7 @@
 #define EXP1 2.7182818284590452354
 #define INV_LOG2 1.4426950408889634074
 
-void
+static void
 arb_hypgeom_erf_one_eps(arb_t res, const arb_t z)
 {
     mag_t t, u;
@@ -52,7 +52,7 @@ arb_hypgeom_erf_one_eps(arb_t res, const arb_t z)
     mag_clear(u);
 }
 
-void
+static void
 arb_hypgeom_erf_propagated_error(mag_t err, const arb_t z)
 {
     mag_t x;
@@ -75,7 +75,7 @@ arb_hypgeom_erf_propagated_error(mag_t err, const arb_t z)
     mag_clear(x);
 }
 
-void
+static void
 arb_hypgeom_erf_1f1b(arb_t res, const arb_t z, slong prec)
 {
     arb_t t, u;
@@ -95,14 +95,14 @@ arb_hypgeom_erf_1f1b(arb_t res, const arb_t z, slong prec)
     }
     else
     {
-        double u, dz;
+        double ud, dz;
         dz = arf_get_d(arb_midref(z), ARF_RND_DOWN);
         dz = fabs(dz);
-        u = -dz * dz + prec * LOG2 + log(dz);
+        ud = -dz * dz + prec * LOG2 + log(dz);
         if (dz < 1.0)
-          u = FLINT_MAX(u, 1e-6);
-        u = u / d_lambertw(u / (EXP1 * dz * dz));
-        N = u + 1;
+          ud = FLINT_MAX(ud, 1e-6);
+        ud = ud / d_lambertw(ud / (EXP1 * dz * dz));
+        N = ud + 1;
     }
 
     N = FLINT_MAX(N, 1);
@@ -128,7 +128,7 @@ arb_hypgeom_erf_1f1b(arb_t res, const arb_t z, slong prec)
     mag_clear(err);
 }
 
-void
+static void
 arb_hypgeom_erf_asymp(arb_t res, const arb_t z, slong N, int complementary, slong prec, slong prec2)
 {
     arb_t t, u;
@@ -139,7 +139,6 @@ arb_hypgeom_erf_asymp(arb_t res, const arb_t z, slong N, int complementary, slon
         (complementary && arb_rel_accuracy_bits(z) < prec)))
     {
         arb_t zmid;
-        mag_t err;
 
         arb_init(zmid);
         mag_init(err);
@@ -195,7 +194,7 @@ arb_hypgeom_erf_asymp(arb_t res, const arb_t z, slong N, int complementary, slon
     mag_clear(tm);
 }
 
-void
+static void
 arb_hypgeom_erf_1f1(arb_t res, const arb_t z, slong prec, slong wp)
 {
     if (arb_rel_accuracy_bits(z) >= wp)
@@ -243,7 +242,7 @@ arb_extract_bits(arb_t t, const arb_t z, slong b)
 
 /* Compute Gamma(a,z) using the bit-burst algorithm.
    Todo: allow passing precomputed Gamma(a) as input. */
-void
+static void
 _arb_gamma_upper_fmpq_bb(arb_t res, const fmpq_t a, const arb_t z, const mag_t abs_tol, slong prec_lower, slong prec_upper)
 {
     slong start_bits, bits, wp, NN;
