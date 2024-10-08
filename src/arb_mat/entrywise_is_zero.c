@@ -14,7 +14,7 @@
 #include "arb_mat.h"
 
 void
-_arb_mat_entrywise_is_zero(fmpz_mat_t dest, const arb_mat_t src)
+arb_mat_entrywise_is_zero(fmpz_mat_t dest, const arb_mat_t src)
 {
     slong i, j;
     fmpz_mat_zero(dest);
