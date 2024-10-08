@@ -11,6 +11,12 @@
 
 #include "acb_dft.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 /* swap each element with one with bit-reversed index */
 void
 acb_dft_rad2_reorder(acb_ptr v, slong n)

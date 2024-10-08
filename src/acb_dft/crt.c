@@ -39,6 +39,7 @@ crt_init(crt_t c, ulong n)
     }
 }
 
+#if 0
 void
 crt_print(const crt_t c)
 {
@@ -51,6 +52,7 @@ crt_print(const crt_t c)
         flint_printf("Z/%wuZ ", c->m[k]);
     flint_printf("\n");
 }
+#endif
 
 #if 0
 /* lexicographic index of crt elt j */
