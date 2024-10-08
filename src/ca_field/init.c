@@ -13,7 +13,7 @@
 #include "ca_ext.h"
 #include "ca_field.h"
 
-void
+static void
 _ca_ctx_init_mctx(ca_ctx_t ctx, slong len)
 {
     while (ctx->mctx_len < len)
@@ -33,7 +33,7 @@ _ca_ctx_init_mctx(ca_ctx_t ctx, slong len)
 
 
 void
-ca_field_init_qq(ca_field_t K, ca_ctx_t ctx)
+ca_field_init_qq(ca_field_t K, ca_ctx_t FLINT_UNUSED(ctx))
 {
     CA_FIELD_LENGTH(K) = 0;
     CA_FIELD_EXT(K) = NULL;

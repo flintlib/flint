@@ -13,11 +13,17 @@
 #include "ca_ext.h"
 #include "ca_field.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 void _ca_field_ideal_insert_clear_mpoly(ca_field_t K, fmpz_mpoly_t poly, fmpz_mpoly_ctx_t mctx, ca_ctx_t ctx);
 
 
 /* todo: optimize */
-truth_t ca_check_equal_neg(const ca_t x, const ca_t y, ca_ctx_t ctx)
+static truth_t ca_check_equal_neg(const ca_t x, const ca_t y, ca_ctx_t ctx)
 {
     ca_t t;
     truth_t res;
@@ -29,7 +35,7 @@ truth_t ca_check_equal_neg(const ca_t x, const ca_t y, ca_ctx_t ctx)
 }
 
 /* set a*x_a + b*x_b + c */
-void
+static void
 fmpz_mpoly_set_linear_three_term_si(fmpz_mpoly_t poly, slong a, slong xa, slong b, slong xb, slong c, const fmpz_mpoly_ctx_t ctx)
 {
     ulong * exp;
@@ -52,6 +58,7 @@ fmpz_mpoly_set_linear_three_term_si(fmpz_mpoly_t poly, slong a, slong xa, slong 
     flint_free(exp);
 }
 
+#if 0
 /* set a*x_a*x_a2 + b*x_b + c */
 void
 fmpz_mpoly_set_linear2_three_term_si(fmpz_mpoly_t poly, slong a, slong xa, slong xa2, slong b, slong xb, slong c, const fmpz_mpoly_ctx_t ctx)
@@ -77,6 +84,7 @@ fmpz_mpoly_set_linear2_three_term_si(fmpz_mpoly_t poly, slong a, slong xa, slong
 
     flint_free(exp);
 }
+#endif
 
 /* Set the term c * x_var^x_exp */
 void
@@ -102,7 +110,7 @@ fmpz_mpoly_set_coeff_si_x(fmpz_mpoly_t poly,
 }
 
 
-void
+static void
 fmpz_mpoly_set_coeff_si_xy(fmpz_mpoly_t poly,
         slong c,
         slong x_var, ulong x_exp,

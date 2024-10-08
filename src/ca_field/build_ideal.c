@@ -21,8 +21,14 @@
 
 #include "gr.h"
 
-slong
-acb_multi_lindep(fmpz_mat_t rel, acb_srcptr vec, slong len, int check, slong prec)
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
+static slong
+acb_multi_lindep(fmpz_mat_t rel, acb_srcptr vec, slong len, int FLINT_UNUSED(check), slong prec)
 {
     fmpz_mat_t A;
     arf_t tmpr, halfr;
@@ -184,7 +190,7 @@ acb_multi_lindep(fmpz_mat_t rel, acb_srcptr vec, slong len, int check, slong pre
 void _nf_elem_get_fmpz_poly_den_shallow(fmpz_poly_t pol, fmpz_t den, const nf_elem_t a, const nf_t nf);
 
 void
-_ca_field_ideal_insert_clear_mpoly(ca_field_t K, fmpz_mpoly_t poly, fmpz_mpoly_ctx_t mctx, ca_ctx_t ctx)
+_ca_field_ideal_insert_clear_mpoly(ca_field_t K, fmpz_mpoly_t poly, fmpz_mpoly_ctx_t mctx, ca_ctx_t FLINT_UNUSED(ctx))
 {
     if (poly->length == 0)
     {
@@ -199,7 +205,7 @@ _ca_field_ideal_insert_clear_mpoly(ca_field_t K, fmpz_mpoly_t poly, fmpz_mpoly_c
     fmpz_mpoly_clear(poly, mctx);
 }
 
-int ext_as_pow_pq(slong *p, slong *q, const ca_ext_t x, ca_ctx_t ctx)
+static int ext_as_pow_pq(slong *p, slong *q, const ca_ext_t x, ca_ctx_t ctx)
 {
     if (CA_EXT_HEAD(x) == CA_Sqrt)
     {
@@ -226,7 +232,7 @@ int ext_as_pow_pq(slong *p, slong *q, const ca_ext_t x, ca_ctx_t ctx)
     return 0;
 }
 
-int
+static int
 ca_field_prove_log_relation(ca_field_t K, const fmpz * rel,
     acb_srcptr z,
     const slong * logs,
@@ -315,7 +321,7 @@ ca_field_prove_log_relation(ca_field_t K, const fmpz * rel,
     return success;
 }
 
-slong
+static slong
 ca_field_insert_log_relation(ca_field_t K,
     fmpz * rel,
     const slong * logs,
@@ -375,7 +381,7 @@ ca_field_insert_log_relation(ca_field_t K,
 
 
 /* Find log relations. */
-void
+static void
 ca_field_build_ideal_logs(ca_field_t K, ca_ctx_t ctx)
 {
     slong * logs;
@@ -517,11 +523,11 @@ ca_field_build_ideal_logs(ca_field_t K, ca_ctx_t ctx)
     flint_free(logs);
 }
 
-int
+static int
 ca_field_prove_multiplicative_relation(ca_field_t K, const fmpz * rel,
-    acb_srcptr z,
+    acb_srcptr FLINT_UNUSED(z),
     const slong * powers,
-    slong num_powers, slong prec, ca_ctx_t ctx)
+    slong num_powers, slong FLINT_UNUSED(prec), ca_ctx_t ctx)
 {
     ca_t t, u;
     slong i;
@@ -676,7 +682,7 @@ qqbar_end:
     return success;
 }
 
-slong
+static slong
 ca_field_insert_multiplicative_relation(ca_field_t K,
     fmpz * rel,
     const slong * powers,
@@ -735,7 +741,7 @@ ca_field_insert_multiplicative_relation(ca_field_t K,
 
 /* Find relations involving exponentials, powers and roots. */
 /* Todo: more special cases (including roots of unity) */
-void
+static void
 ca_field_build_ideal_multiplicative(ca_field_t K, ca_ctx_t ctx)
 {
     slong i, len;
@@ -1114,7 +1120,6 @@ ca_field_build_ideal(ca_field_t K, ca_ctx_t ctx)
 
     if (ctx->options[CA_OPT_USE_GROEBNER])
     {
-        slong i;
         int want_groebner;
 
         want_groebner = 1;

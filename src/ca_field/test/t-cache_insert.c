@@ -14,7 +14,7 @@
 #include "ca_ext.h"
 #include "ca_field.h"
 
-static int _ca_field_equal_ext(const ca_field_t K, ca_ext_struct ** x, slong len, ca_ctx_t ctx)
+static int _ca_field_equal_ext(const ca_field_t K, ca_ext_struct ** x, slong len, ca_ctx_t FLINT_UNUSED(ctx))
 {
     slong i;
 
