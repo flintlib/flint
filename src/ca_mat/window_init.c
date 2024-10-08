@@ -13,7 +13,7 @@
 
 void
 ca_mat_window_init(ca_mat_t window, const ca_mat_t mat,
-    slong r1, slong c1, slong r2, slong c2, ca_ctx_t ctx)
+    slong r1, slong c1, slong r2, slong c2, ca_ctx_t FLINT_UNUSED(ctx))
 {
     slong i;
     window->entries = NULL;

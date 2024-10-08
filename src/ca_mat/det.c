@@ -13,7 +13,7 @@
 #include "fmpq_mat.h"
 #include "ca_mat.h"
 
-int
+static int
 _ca_mat_is_fmpq(const ca_mat_t A, ca_ctx_t ctx)
 {
     slong i, j;
@@ -26,8 +26,8 @@ _ca_mat_is_fmpq(const ca_mat_t A, ca_ctx_t ctx)
     return 1;
 }
 
-int
-_ca_mat_fmpq_is_fmpz(const ca_mat_t A, ca_ctx_t ctx)
+static int
+_ca_mat_fmpq_is_fmpz(const ca_mat_t A, ca_ctx_t FLINT_UNUSED(ctx))
 {
     slong i, j;
 
