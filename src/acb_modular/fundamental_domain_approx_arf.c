@@ -43,8 +43,8 @@ acb_modular_fundamental_domain_approx_arf(psl2z_t g,
             break;
         }
 
-        if (fmpz_bits(&g->a) > prec || fmpz_bits(&g->b) > prec ||
-            fmpz_bits(&g->c) > prec || fmpz_bits(&g->d) > prec)
+        if ((slong) fmpz_bits(&g->a) > prec || (slong) fmpz_bits(&g->b) > prec ||
+            (slong) fmpz_bits(&g->c) > prec || (slong) fmpz_bits(&g->d) > prec)
         {
             psl2z_one(g);
             break;
