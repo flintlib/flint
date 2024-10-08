@@ -244,12 +244,18 @@ esac
 if test "$enableval" = "yes" && test "$cflags_set" = "yes";
 then
     AC_MSG_ERROR([Cannot enable sanity check and push other CFLAGS at the same time.])
+elif test "$enableval" = "yes" && test "$testcflags_set" = "yes";
+then
+    AC_MSG_ERROR([Cannot enable sanity check and push other TESTCFLAGS at the same time.])
 fi],
 enable_sanity_check="no")
 
 # NOTE: -Wdeclaration-after-statement and -Wcast-qual is not in here. We also
 # remove -Wcast-function-type for GR.
 sanity_check_CFLAGS="-Werror -Wall -Wextra -Wno-cast-function-type -Wcast-align -Wmissing-declarations -Wmissing-prototypes -Wnested-externs -Wpointer-arith -Wredundant-decls -Wshadow -pedantic -std=c11 -O0"
+
+# We take CFLAGS but ignore -Wsign-compare, -Wmissing-declarations and -Wmissing-prototypes.
+sanity_check_TESTCFLAGS="-Werror -Wall -Wextra -Wno-cast-function-type -Wno-sign-compare -Wcast-align -Wnested-externs -Wpointer-arith -Wredundant-decls -Wshadow -pedantic -std=c11 -O0"
 
 AC_ARG_ENABLE(debug,
 [AS_HELP_STRING([--enable-debug],[Compile FLINT with debug information [default=yes]])],
@@ -1266,6 +1272,7 @@ then
         else
             AX_CHECK_COMPILE_FLAG([$flag],
                                   [save_CFLAGS="$flag $save_CFLAGS"
+                                   sanity_check_TESTCFLAGS="$flag $sanity_check_TESTCFLAGS"
                                    found_single="yes"],
                                   [unset flint_cv_have_fft_small_x86_i
                                    unset flint_cv_have_fft_small_arm_i])
@@ -1322,7 +1329,12 @@ fi
 
 if test "$testcflags_set" = "no";
 then
-    TESTCFLAGS="$CFLAGS"
+    if test "$enable_sanity_check" = "no";
+    then
+        TESTCFLAGS="$CFLAGS"
+    else
+        TESTCFLAGS="$sanity_check_TESTCFLAGS"
+    fi
 else
     TESTCFLAGS="$TESTCFLAGS $save_CFLAGS"
 fi
