@@ -84,7 +84,7 @@ TEST_FUNCTION_START(bernoulli_mod_p_harvey, state)
     }
 
     {
-        slong n, N, iter;
+        slong n, N;
         ulong x, y, z, p, pinv;
         fmpz * num;
         fmpz * den;
