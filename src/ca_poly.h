@@ -55,7 +55,7 @@ void _ca_poly_set_length(ca_poly_t poly, slong len, ca_ctx_t ctx);
 void _ca_poly_normalise(ca_poly_t poly, ca_ctx_t ctx);
 
 CA_POLY_INLINE void
-ca_poly_swap(ca_poly_t poly1, ca_poly_t poly2, ca_ctx_t ctx)
+ca_poly_swap(ca_poly_t poly1, ca_poly_t poly2, ca_ctx_t FLINT_UNUSED(ctx))
 {
     FLINT_SWAP(ca_poly_struct, *poly1, *poly2);
 }
@@ -159,7 +159,7 @@ ca_poly_div_ca(ca_poly_t res, const ca_poly_t poly, const ca_t c, ca_ctx_t ctx)
 
 /* todo: improve, document */
 CA_POLY_INLINE void
-ca_poly_div_fmpz(ca_poly_t res, const ca_poly_t poly, const fmpz_t c, ca_ctx_t ctx)
+ca_poly_div_fmpz(ca_poly_t res, const ca_poly_t FLINT_UNUSED(poly), const fmpz_t c, ca_ctx_t ctx)
 {
     ca_t t;
     ca_init(t, ctx);

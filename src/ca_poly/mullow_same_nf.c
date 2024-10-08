@@ -49,7 +49,7 @@ get_lcm(fmpz_t Aden, ca_srcptr A, slong Alen, ca_field_t K, slong bits_limit, ca
         else
             fmpz_lcm(Aden, Aden, _nf_denref(CA_NF_ELEM(A + i), CA_FIELD_NF(K)));
 
-        if (fmpz_bits(Aden) > bits_limit)
+        if (fmpz_bits(Aden) > (flint_bitcnt_t) bits_limit)
             return 0;
     }
 

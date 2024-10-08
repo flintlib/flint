@@ -12,7 +12,7 @@
 #include "ca_poly.h"
 
 void
-ca_poly_init(ca_poly_t poly, ca_ctx_t ctx)
+ca_poly_init(ca_poly_t poly, ca_ctx_t FLINT_UNUSED(ctx))
 {
     poly->coeffs = NULL;
     poly->length = 0;
