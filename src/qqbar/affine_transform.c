@@ -69,11 +69,11 @@ qqbar_scalar_op(qqbar_t res, const qqbar_t x, const fmpz_t a, const fmpz_t b, co
     /* Special case: set to rational */
     if (fmpz_is_zero(a))
     {
-        fmpq_t t;
-        fmpq_init(t);
-        fmpq_set_fmpz_frac(t, b, c);
-        qqbar_set_fmpq(res, t);
-        fmpq_clear(t);
+        fmpq_t tq;
+        fmpq_init(tq);
+        fmpq_set_fmpz_frac(tq, b, c);
+        qqbar_set_fmpq(res, tq);
+        fmpq_clear(tq);
         return;
     }
 
@@ -82,18 +82,18 @@ qqbar_scalar_op(qqbar_t res, const qqbar_t x, const fmpz_t a, const fmpz_t b, co
     /* Special case: rational arithmetic */
     if (d == 1)
     {
-        fmpq_t t;
-        fmpq_init(t);
-        fmpz_neg(fmpq_numref(t), QQBAR_POLY(x)->coeffs);
-        fmpz_set(fmpq_denref(t), QQBAR_POLY(x)->coeffs + 1);
+        fmpq_t tq;
+        fmpq_init(tq);
+        fmpz_neg(fmpq_numref(tq), QQBAR_POLY(x)->coeffs);
+        fmpz_set(fmpq_denref(tq), QQBAR_POLY(x)->coeffs + 1);
         if (!fmpz_is_one(a))
-            fmpq_mul_fmpz(t, t, a);
+            fmpq_mul_fmpz(tq, tq, a);
         if (!fmpz_is_zero(b))
-            fmpq_add_fmpz(t, t, b);
+            fmpq_add_fmpz(tq, tq, b);
         if (!fmpz_is_one(c))
-            fmpq_div_fmpz(t, t, c);
-        qqbar_set_fmpq(res, t);
-        fmpq_clear(t);
+            fmpq_div_fmpz(tq, tq, c);
+        qqbar_set_fmpq(res, tq);
+        fmpq_clear(tq);
         return;
     }
 

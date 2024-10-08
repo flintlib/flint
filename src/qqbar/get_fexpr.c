@@ -18,6 +18,12 @@
 #include "ulong_extras.h"
 #include "qqbar.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 static ulong _deflation(const fmpz * poly, slong len)
 {
     fmpz_poly_t t;
@@ -26,7 +32,7 @@ static ulong _deflation(const fmpz * poly, slong len)
     return arb_fmpz_poly_deflation(t);
 }
 
-void
+static void
 fexpr_set_arb(fexpr_t res, const arb_t x)
 {
     fexpr_t mid, rad, h;
@@ -47,7 +53,7 @@ fexpr_set_arb(fexpr_t res, const arb_t x)
     fexpr_clear(h);
 }
 
-void
+static void
 fexpr_set_acb(fexpr_t res, const acb_t x)
 {
     if (arb_is_zero(acb_imagref(x)))
@@ -83,7 +89,7 @@ fexpr_set_acb(fexpr_t res, const acb_t x)
 }
 
 /* todo: better code (no temporaries) */
-void
+static void
 fexpr_set_list_fmpz_poly(fexpr_t res, const fmpz_poly_t poly)
 {
     fexpr_struct * coeffs;
@@ -140,7 +146,7 @@ qqbar_get_fexpr_repr(fexpr_t res, const qqbar_t x)
 }
 
 
-void
+static void
 _qqbar_get_fexpr_root_nearest(fexpr_t res, const fmpz_poly_t poly, const char * re_s, const char * im_s)
 {
     fexpr_t Decimal, a, b, I, s;
@@ -417,7 +423,7 @@ qqbar_get_fexpr_root_indexed(fexpr_t res, const qqbar_t x)
     _qqbar_vec_clear(conjugates, d);
 }
 
-void
+static void
 fexpr_sqrt(fexpr_t res, const fexpr_t a)
 {
     /* todo: handle aliasing in call1 */
@@ -440,7 +446,7 @@ fexpr_sqrt(fexpr_t res, const fexpr_t a)
     }
 }
 
-void
+static void
 fexpr_div_ui(fexpr_t res, const fexpr_t a, ulong c)
 {
     fexpr_t t, u;
@@ -454,12 +460,12 @@ fexpr_div_ui(fexpr_t res, const fexpr_t a, ulong c)
 }
 
 /* cos(pi p/q) */
-void
+static void
 _fexpr_cos_pi_pq(fexpr_t res, slong p, ulong q)
 {
     int sign = 1;
     int sine = 0;
-    ulong g;
+    ulong g, p_us;
     fexpr_t t, u;
 
     if (p < 0)
@@ -469,38 +475,39 @@ _fexpr_cos_pi_pq(fexpr_t res, slong p, ulong q)
     }
 
     p = p % (2 * q);
+    p_us = p;
 
-    if (p > q)
+    if (p_us > q)
     {
-        p = 2 * q - p;
+        p_us = 2 * q - p_us;
     }
 
-    if (2 * p > q)
+    if (2 * p_us > q)
     {
-        p = q - p;
+        p_us = q - p_us;
         sign = -1;
     }
 
-    if (p == 0)
+    if (p_us == 0)
     {
         fexpr_set_si(res, sign);
         return;
     }
 
-    if (2 * p == q)
+    if (2 * p_us == q)
     {
         fexpr_set_ui(res, 0);
         return;
     }
 
-    if (3 * p == q)
+    if (3 * p_us == q)
     {
         fexpr_set_si(res, sign);
         fexpr_div_ui(res, res, 2);
         return;
     }
 
-    if (4 * p == q)
+    if (4 * p_us == q)
     {
         fexpr_set_ui(res, 2);
         fexpr_sqrt(res, res);
@@ -510,7 +517,7 @@ _fexpr_cos_pi_pq(fexpr_t res, slong p, ulong q)
         return;
     }
 
-    if (6 * p == q)
+    if (6 * p_us == q)
     {
         fexpr_set_ui(res, 3);
         fexpr_sqrt(res, res);
@@ -520,7 +527,7 @@ _fexpr_cos_pi_pq(fexpr_t res, slong p, ulong q)
         return;
     }
 
-    if (12 * p == q || 12 * p == 5 * q)
+    if (12 * p_us == q || 12 * p_us == 5 * q)
     {
         fexpr_init(t);
         fexpr_init(u);
@@ -529,7 +536,7 @@ _fexpr_cos_pi_pq(fexpr_t res, slong p, ulong q)
         fexpr_sqrt(t, t);
         fexpr_set_ui(u, 1);
 
-        if (12 * p == q)
+        if (12 * p_us == q)
             fexpr_add(res, t, u);
         else
             fexpr_sub(res, t, u);
@@ -548,30 +555,30 @@ _fexpr_cos_pi_pq(fexpr_t res, slong p, ulong q)
         return;
     }
 
-    if (4 * p > q)
+    if (4 * p_us > q)
     {
-        p = q - 2 * p;
+        p_us = q - 2 * p_us;
         q = 2 * q;
         sine = 1;
     }
 
-    g = n_gcd(p, q);
+    g = n_gcd(p_us, q);
     if (g != 1)
     {
-        p /= g;
+        p_us /= g;
         q /= g;
     }
 
     fexpr_init(t);
     fexpr_init(u);
 
-    if (p == 1)
+    if (p_us == 1)
     {
         fexpr_set_symbol_builtin(res, FEXPR_Pi);
     }
     else
     {
-        fexpr_set_ui(t, p);
+        fexpr_set_ui(t, p_us);
         fexpr_set_symbol_builtin(u, FEXPR_Pi);
         fexpr_mul(res, t, u);
     }
@@ -596,7 +603,7 @@ qqbar_try_as_cyclotomic(qqbar_t zeta, fmpq_poly_t poly, const qqbar_t x)
 {
     ulong * phi;
     ulong N1, N2, d2, order, d;
-    slong p, q, i;
+    ulong p, q, i;
     double U;
     slong bits;
     int success;
@@ -657,8 +664,8 @@ qqbar_try_as_cyclotomic(qqbar_t zeta, fmpq_poly_t poly, const qqbar_t x)
 }
 
 /* poly(exp(2 pi i / n)) */
-void
-_qqbar_get_fexpr_cyclotomic(fexpr_t res, const fmpq_poly_t poly, slong n, int pure_real, int pure_imag)
+static void
+_qqbar_get_fexpr_cyclotomic(fexpr_t res, const fmpq_poly_t poly, slong n, int pure_real, int FLINT_UNUSED(pure_imag))
 {
     fexpr_vec_t terms;
     fexpr_t term, t, u, v, w;

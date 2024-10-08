@@ -83,7 +83,7 @@ _qqbar_evaluate_fmpq_poly(qqbar_t res, const fmpz * poly, const fmpz_t den, slon
     }
     else
     {
-        fmpq_poly_t t, minpoly;
+        fmpq_poly_t minpoly;
         nf_t nf;
         nf_elem_t elem;
         fmpq_mat_t mat;
@@ -93,20 +93,24 @@ _qqbar_evaluate_fmpq_poly(qqbar_t res, const fmpz * poly, const fmpz_t den, slon
         /* todo: other special cases; deflation? */
         is_power = _fmpz_vec_is_zero(poly, len - 1);
 
-        /* nf_init wants an fmpq_poly_t, so mock up one */
-        t->coeffs = QQBAR_POLY(x)->coeffs;
-        t->den[0] = 1;
-        t->length = QQBAR_POLY(x)->length;
-        t->alloc = QQBAR_POLY(x)->alloc;
+        {
+            fmpq_poly_t t;
 
-        nf_init(nf, t);
-        nf_elem_init(elem, nf);
+            /* nf_init wants an fmpq_poly_t, so mock up one */
+            t->coeffs = QQBAR_POLY(x)->coeffs;
+            t->den[0] = 1;
+            t->length = QQBAR_POLY(x)->length;
+            t->alloc = QQBAR_POLY(x)->alloc;
 
-        t->coeffs = (fmpz *) poly;
-        t->length = len;
-        t->den[0] = *den;
-        t->alloc = len;
-        nf_elem_set_fmpq_poly(elem, t, nf);
+            nf_init(nf, t);
+            nf_elem_init(elem, nf);
+
+            t->coeffs = (fmpz *) poly;
+            t->length = len;
+            t->den[0] = *den;
+            t->alloc = len;
+            nf_elem_set_fmpq_poly(elem, t, nf);
+        }
 
         fmpq_mat_init(mat, d, d);
         nf_elem_rep_mat(mat, elem, nf);

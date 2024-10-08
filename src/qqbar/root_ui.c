@@ -49,7 +49,7 @@ _qqbar_fast_detect_simple_principal_surd(const qqbar_t x)
     /* The imaginary part enclosure may not be exactly zero; we
        can still use the enclosure if it is precise enough to guarantee
        that there are no collisions with the conjugate roots. */
-    if (acb_rel_accuracy_bits(QQBAR_ENCLOSURE(x)) > FLINT_BIT_COUNT(d) + 5)
+    if (acb_rel_accuracy_bits(QQBAR_ENCLOSURE(x)) > (slong) FLINT_BIT_COUNT(d) + 5)
         return arb_is_positive(acb_realref(QQBAR_ENCLOSURE(x)));
 
     return 0;
@@ -87,12 +87,12 @@ qqbar_root_ui(qqbar_t res, const qqbar_t x, ulong n)
         /* todo: could also handle conjugates of such roots */
         if ((d == 1 && (n == 2 || qqbar_sgn_re(x) > 0)) || _qqbar_fast_detect_simple_principal_surd(x))
         {
-            fmpq_t t;
-            fmpq_init(t);
-            fmpz_neg(fmpq_numref(t), QQBAR_COEFFS(x));
-            fmpz_set(fmpq_denref(t), QQBAR_COEFFS(x) + d);
-            qqbar_fmpq_root_ui(res, t, d * n);
-            fmpq_clear(t);
+            fmpq_t tq;
+            fmpq_init(tq);
+            fmpz_neg(fmpq_numref(tq), QQBAR_COEFFS(x));
+            fmpz_set(fmpq_denref(tq), QQBAR_COEFFS(x) + d);
+            qqbar_fmpq_root_ui(res, tq, d * n);
+            fmpq_clear(tq);
             return;
         }
 
@@ -103,7 +103,7 @@ qqbar_root_ui(qqbar_t res, const qqbar_t x, ulong n)
             ulong q;
             if (qqbar_is_root_of_unity(&p, &q, x))
             {
-                if (2 * p > q)
+                if (2 * (ulong) p > q)
                     p -= q;
                 qqbar_root_of_unity(res, p, q * n);
                 return;

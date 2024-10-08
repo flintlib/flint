@@ -15,7 +15,7 @@
 #include "arb_fmpz_poly.h"
 #include "qqbar.h"
 
-void
+static void
 _qqbar_randtest(qqbar_t res, flint_rand_t state, slong deg, slong bits, int real)
 {
     fmpz_poly_t pol;
@@ -29,10 +29,10 @@ _qqbar_randtest(qqbar_t res, flint_rand_t state, slong deg, slong bits, int real
     {
         fmpq_t t;
         fmpq_init(t);
-        do {
+        do
             fmpq_randtest(t, state, bits);
-        } while (fmpz_bits(fmpq_numref(t)) > bits ||
-                 fmpz_bits(fmpq_denref(t)) > bits);
+        while (fmpz_bits(fmpq_numref(t)) > (ulong) bits
+                || fmpz_bits(fmpq_denref(t)) > (ulong) bits);
         qqbar_set_fmpq(res, t);
         fmpq_clear(t);
         return;

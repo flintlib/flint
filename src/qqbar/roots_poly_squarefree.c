@@ -115,7 +115,7 @@ _qqbar_roots_poly_squarefree(qqbar_ptr roots, qqbar_srcptr coeffs, slong len, sl
     {
         ulong hi, lo;
         umul_ppmm(hi, lo, conjugations, qqbar_degree(coeffs + i));
-        if (hi != 0 || lo > deg_limit)
+        if (hi != 0 || lo > (ulong) deg_limit)
             return 0;
         conjugations = lo;
     }

@@ -26,7 +26,7 @@
 
 int qqbar_set_fexpr(qqbar_t res, const fexpr_t expr);
 
-int
+static int
 _fexpr_parse_arf(arf_t res, const fexpr_t expr)
 {
     if (fexpr_is_integer(expr))
@@ -148,7 +148,7 @@ _fexpr_parse_arf(arf_t res, const fexpr_t expr)
     return 0;
 }
 
-int
+static int
 _fexpr_parse_mag(mag_t res, const fexpr_t expr)
 {
     int success;
@@ -179,7 +179,7 @@ _fexpr_parse_mag(mag_t res, const fexpr_t expr)
 }
 
 
-int
+static int
 _fexpr_parse_arb(arb_t res, const fexpr_t expr)
 {
     if (fexpr_is_builtin_call(expr, FEXPR_RealBall) && fexpr_nargs(expr) == 2)
@@ -195,7 +195,7 @@ _fexpr_parse_arb(arb_t res, const fexpr_t expr)
     return 0;
 }
 
-int
+static int
 _fexpr_parse_acb(acb_t res, const fexpr_t expr)
 {
     fexpr_t t, u;
@@ -229,7 +229,7 @@ _fexpr_parse_acb(acb_t res, const fexpr_t expr)
     return 0;
 }
 
-int
+static int
 fmpq_set_decimal(fmpq_t res, const char * inp, slong max_bits)
 {
     char * emarker;
@@ -480,7 +480,7 @@ _fexpr_get_rational_arg_pi(fmpq_t res, const fexpr_t expr, int times_i)
     return 0;
 }
 
-void
+static void
 qqbar_set_fmpz_poly_root_indexed(qqbar_t res, const fmpz_poly_t poly, slong root_index)
 {
     qqbar_ptr roots;
@@ -492,7 +492,7 @@ qqbar_set_fmpz_poly_root_indexed(qqbar_t res, const fmpz_poly_t poly, slong root
     _qqbar_vec_clear(roots, d);
 }
 
-void
+static void
 qqbar_set_fmpz_poly_root_nearest(qqbar_t res, const fmpz_poly_t poly, const qqbar_t point)
 {
     qqbar_ptr roots;
@@ -587,11 +587,11 @@ qqbar_set_fexpr(qqbar_t res, const fexpr_t expr)
 
     if (fexpr_is_integer(expr))
     {
-        fmpz_t t;
-        fmpz_init(t);
-        fexpr_get_fmpz(t, expr);
-        qqbar_set_fmpz(res, t);
-        fmpz_clear(t);
+        fmpz_t tq;
+        fmpz_init(tq);
+        fexpr_get_fmpz(tq, expr);
+        qqbar_set_fmpz(res, tq);
+        fmpz_clear(tq);
         return 1;
     }
 
@@ -1027,17 +1027,17 @@ qqbar_set_fexpr(qqbar_t res, const fexpr_t expr)
                     success = success && qqbar_is_rational(t) && (!qqbar_is_zero(res) || qqbar_sgn_re(t) >= 0);
                     if (success)
                     {
-                        fmpz_t p, q;
+                        fmpz_t p, qz;
                         fmpz_init(p);
-                        fmpz_init(q);
+                        fmpz_init(qz);
                         fmpz_neg(p, QQBAR_COEFFS(t));
-                        fmpz_set(q, QQBAR_COEFFS(t) + 1);
+                        fmpz_set(qz, QQBAR_COEFFS(t) + 1);
 
-                        success = (fmpz_bits(q) <= 20 && fmpz_bits(p) <= FLINT_BITS - 4);
+                        success = (fmpz_bits(qz) <= 20 && fmpz_bits(p) <= FLINT_BITS - 4);
 
                         if (success)
                         {
-                            qqbar_root_ui(res, res, *q);
+                            qqbar_root_ui(res, res, *qz);
                             if (*p >= 0)
                                 qqbar_pow_ui(res, res, *p);
                             else
