@@ -12,7 +12,7 @@
 #include "ca.h"
 
 void
-ca_factor_init(ca_factor_t fac, ca_ctx_t ctx)
+ca_factor_init(ca_factor_t fac, ca_ctx_t FLINT_UNUSED(ctx))
 {
     fac->base = NULL;
     fac->exp = NULL;

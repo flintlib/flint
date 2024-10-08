@@ -72,12 +72,12 @@ ca_check_is_imaginary(const ca_t x, ca_ctx_t ctx)
             /* todo: precision to do this should depend on complexity of the polynomials, degree of the elements... */
             if (prec == 64)
             {
-                ca_t t;
-                ca_init(t, ctx);
-                ca_conj_deep(t, x, ctx);
-                ca_neg(t, t, ctx);
-                res = ca_check_equal(t, x, ctx);
-                ca_clear(t, ctx);
+                ca_t tc;
+                ca_init(tc, ctx);
+                ca_conj_deep(tc, x, ctx);
+                ca_neg(tc, tc, ctx);
+                res = ca_check_equal(tc, x, ctx);
+                ca_clear(tc, ctx);
                 if (res != T_UNKNOWN)
                     break;
             }

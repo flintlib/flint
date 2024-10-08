@@ -77,11 +77,11 @@ ca_check_is_negative_real(const ca_t x, ca_ctx_t ctx)
 
             if (prec == 64 && is_real == T_UNKNOWN)
             {
-                ca_t t;
-                ca_init(t, ctx);
-                ca_conj_deep(t, x, ctx);
-                is_real = ca_check_equal(t, x, ctx);
-                ca_clear(t, ctx);
+                ca_t tc;
+                ca_init(tc, ctx);
+                ca_conj_deep(tc, x, ctx);
+                is_real = ca_check_equal(tc, x, ctx);
+                ca_clear(tc, ctx);
                 if (is_real == T_FALSE)
                 {
                     res = T_FALSE;

@@ -11,7 +11,7 @@
 
 #include "ca.h"
 
-slong
+static slong
 nf_elem_bits(const nf_elem_t x, nf_t nf)
 {
     slong b, c;
@@ -39,7 +39,7 @@ nf_elem_bits(const nf_elem_t x, nf_t nf)
     }
 }
 
-void
+static void
 _ca_pow_binexp(ca_t res, const ca_t x, slong n, ca_ctx_t ctx)
 {
     if (n == 0)
@@ -164,7 +164,7 @@ ca_pow_si_arithmetic(ca_t res, const ca_t x, slong n, ca_ctx_t ctx)
 
 
 /* (z^a)^b, assuming z != 0 */
-void
+static void
 ca_pow_pow(ca_t res, const ca_t z, const ca_t a, const ca_t b, ca_ctx_t ctx)
 {
     ca_t t, u, pi;
@@ -220,7 +220,7 @@ ca_pow_pow(ca_t res, const ca_t z, const ca_t a, const ca_t b, ca_ctx_t ctx)
 }
 
 /* warning: must have already checked for special values */
-void
+static void
 _ca_pow_inert(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
 {
     _ca_function_fxy(res, CA_Pow, x, y, ctx);
@@ -228,7 +228,7 @@ _ca_pow_inert(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
     ca_condense_field(res, ctx);
 }
 
-void
+static void
 _ca_pow_general(ca_t res, const ca_t x, const ca_t y, ca_ctx_t ctx)
 {
     if (CA_IS_SPECIAL(x) || CA_IS_SPECIAL(y))

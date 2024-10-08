@@ -36,11 +36,11 @@ ca_sqrt_factor(ca_t res, const ca_t x, ulong flags, ca_ctx_t ctx)
 
         if (CA_IS_QQ(x, ctx))
         {
-            qqbar_t t;
-            qqbar_init(t);
-            qqbar_fmpq_root_ui(t, CA_FMPQ(x), 2);
-            ca_set_qqbar(res, t, ctx);
-            qqbar_clear(t);
+            qqbar_t tq;
+            qqbar_init(tq);
+            qqbar_fmpq_root_ui(tq, CA_FMPQ(x), 2);
+            ca_set_qqbar(res, tq, ctx);
+            qqbar_clear(tq);
             return;
         }
 

@@ -11,6 +11,12 @@
 
 #include "ca.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 #define CMP_UNDEFINED -2
 #define CMP_UNKNOWN -3
 

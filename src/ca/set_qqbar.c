@@ -14,6 +14,12 @@
 #include "ca_ext.h"
 #include "ca_field.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 #define FACTOR_SMOOTH_BOUND 32
 
 /* Write |n| = A * B^2 */
@@ -138,7 +144,7 @@ slong ca_ctx_get_quadratic_field(ca_ctx_t ctx, const fmpz_t A)
 
 #else
 
-ca_field_srcptr ca_ctx_get_quadratic_field(ca_ctx_t ctx, const fmpz_t A)
+static ca_field_srcptr ca_ctx_get_quadratic_field(ca_ctx_t ctx, const fmpz_t A)
 {
     ca_field_srcptr res;
     qqbar_t x;
@@ -163,7 +169,7 @@ ca_field_srcptr ca_ctx_get_quadratic_field(ca_ctx_t ctx, const fmpz_t A)
 
 #endif
 
-ca_field_srcptr ca_ctx_get_cyclotomic_field(ca_ctx_t ctx, ulong n)
+static ca_field_srcptr ca_ctx_get_cyclotomic_field(ca_ctx_t ctx, ulong n)
 {
     ca_field_srcptr res;
     qqbar_t x;

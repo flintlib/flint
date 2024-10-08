@@ -11,6 +11,12 @@
 
 #include "ca.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 int
 ca_ext_can_evaluate_qqbar(const ca_ext_t x, ca_ctx_t ctx)
 {

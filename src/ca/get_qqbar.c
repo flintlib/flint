@@ -220,7 +220,7 @@ ca_get_qqbar(qqbar_t res, const ca_t x, ca_ctx_t ctx)
                     if (fmpz_bits(fmpq_denref(CA_FMPQ(exp))) > 20 ||
                         fmpz_bits(fmpq_numref(CA_FMPQ(exp))) > 20 ||
                         *fmpq_denref(CA_FMPQ(exp)) * qqbar_degree(xs + i) > ctx->options[CA_OPT_QQBAR_DEG_LIMIT] ||
-                        (qqbar_height_bits(xs + i) + 1) * fmpz_bits(fmpq_numref(CA_FMPQ(exp))) > ctx->options[CA_OPT_PREC_LIMIT])
+                        (qqbar_height_bits(xs + i) + 1) * fmpz_bits(fmpq_numref(CA_FMPQ(exp))) > (ulong) ctx->options[CA_OPT_PREC_LIMIT])
                         goto cleanup;
 
                     qqbar_root_ui(xs + i, xs + i, *fmpq_denref(CA_FMPQ(exp)));

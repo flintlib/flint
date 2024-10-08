@@ -11,7 +11,7 @@
 
 #include "ca.h"
 
-int ca_as_fmpq_pi_i(fmpq_t res, const ca_t x, ca_ctx_t ctx)
+static int ca_as_fmpq_pi_i(fmpq_t res, const ca_t x, ca_ctx_t ctx)
 {
     ca_field_ptr K;
     ca_t t;
@@ -44,7 +44,7 @@ int ca_as_fmpq_pi_i(fmpq_t res, const ca_t x, ca_ctx_t ctx)
     return found;
 }
 
-ca_ext_ptr
+static ca_ext_ptr
 ca_is_fmpq_times_gen_as_ext(fmpq_t c, const ca_t x, ca_ctx_t ctx)
 {
     ca_field_ptr K;
