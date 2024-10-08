@@ -15,23 +15,22 @@
 void gr_mat_test_mul(gr_method_mat_binary_op mul_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
 {
     slong iter;
-    gr_ctx_ptr given_ctx = ctx;
 
     for (iter = 0; iter < iters; iter++)
     {
         gr_mat_t A, B, C, D;
         slong a, b, c;
         int status = GR_SUCCESS;
-        gr_ctx_t my_ctx;
-        gr_ctx_ptr ctx;
+        gr_ctx_t ctx2;
+        gr_ctx_ptr ctxptr;
 
-        if (given_ctx == NULL)
+        if (ctx == NULL)
         {
-            gr_ctx_init_random(my_ctx, state);
-            ctx = my_ctx;
+            gr_ctx_init_random(ctx2, state);
+            ctxptr = ctx2;
         }
         else
-            ctx = given_ctx;
+            ctxptr = ctx;
 
         if (n_randint(state, 4) == 0)
         {
@@ -44,61 +43,61 @@ void gr_mat_test_mul(gr_method_mat_binary_op mul_impl, flint_rand_t state, slong
             c = n_randint(state, maxn);
         }
 
-        gr_mat_init(A, a, b, ctx);
-        gr_mat_init(B, b, c, ctx);
-        gr_mat_init(C, a, c, ctx);
-        gr_mat_init(D, a, c, ctx);
+        gr_mat_init(A, a, b, ctxptr);
+        gr_mat_init(B, b, c, ctxptr);
+        gr_mat_init(C, a, c, ctxptr);
+        gr_mat_init(D, a, c, ctxptr);
 
-        status |= gr_mat_randtest(A, state, ctx);
-        status |= gr_mat_randtest(B, state, ctx);
-        status |= gr_mat_randtest(C, state, ctx);
-        status |= gr_mat_randtest(D, state, ctx);
+        status |= gr_mat_randtest(A, state, ctxptr);
+        status |= gr_mat_randtest(B, state, ctxptr);
+        status |= gr_mat_randtest(C, state, ctxptr);
+        status |= gr_mat_randtest(D, state, ctxptr);
 
         if (b == c && n_randint(state, 2))
         {
-            status |= gr_mat_set(C, A, ctx);
-            status |= mul_impl(C, C, B, ctx);
+            status |= gr_mat_set(C, A, ctxptr);
+            status |= mul_impl(C, C, B, ctxptr);
         }
         else if (a == b && n_randint(state, 2))
         {
-            status |= gr_mat_set(C, B, ctx);
-            status |= mul_impl(C, A, C, ctx);
+            status |= gr_mat_set(C, B, ctxptr);
+            status |= mul_impl(C, A, C, ctxptr);
         }
         else if (a == b && b == c && n_randint(state, 2))
         {
-            status |= gr_mat_set(B, A, ctx);
-            status |= mul_impl(C, A, A, ctx);
+            status |= gr_mat_set(B, A, ctxptr);
+            status |= mul_impl(C, A, A, ctxptr);
         }
         else if (a == b && b == c && n_randint(state, 2))
         {
-            status |= gr_mat_set(B, A, ctx);
-            status |= gr_mat_set(C, A, ctx);
-            status |= mul_impl(C, C, C, ctx);
+            status |= gr_mat_set(B, A, ctxptr);
+            status |= gr_mat_set(C, A, ctxptr);
+            status |= mul_impl(C, C, C, ctxptr);
         }
         else
         {
-            status |= mul_impl(C, A, B, ctx);
+            status |= mul_impl(C, A, B, ctxptr);
         }
 
-        status |= gr_mat_mul_classical(D, A, B, ctx);
+        status |= gr_mat_mul_classical(D, A, B, ctxptr);
 
-        if (status == GR_SUCCESS && gr_mat_equal(C, D, ctx) == T_FALSE)
+        if (status == GR_SUCCESS && gr_mat_equal(C, D, ctxptr) == T_FALSE)
         {
             flint_printf("FAIL:\n");
-            gr_ctx_println(ctx);
-            flint_printf("A:\n"); gr_mat_print(A, ctx); flint_printf("\n\n");
-            flint_printf("B:\n"); gr_mat_print(B, ctx); flint_printf("\n\n");
-            flint_printf("C:\n"); gr_mat_print(C, ctx); flint_printf("\n\n");
-            flint_printf("D:\n"); gr_mat_print(D, ctx); flint_printf("\n\n");
+            gr_ctx_println(ctxptr);
+            flint_printf("A:\n"); gr_mat_print(A, ctxptr); flint_printf("\n\n");
+            flint_printf("B:\n"); gr_mat_print(B, ctxptr); flint_printf("\n\n");
+            flint_printf("C:\n"); gr_mat_print(C, ctxptr); flint_printf("\n\n");
+            flint_printf("D:\n"); gr_mat_print(D, ctxptr); flint_printf("\n\n");
             flint_abort();
         }
 
-        gr_mat_clear(A, ctx);
-        gr_mat_clear(B, ctx);
-        gr_mat_clear(C, ctx);
-        gr_mat_clear(D, ctx);
+        gr_mat_clear(A, ctxptr);
+        gr_mat_clear(B, ctxptr);
+        gr_mat_clear(C, ctxptr);
+        gr_mat_clear(D, ctxptr);
 
-        if (given_ctx == NULL)
-            gr_ctx_clear(ctx);
+        if (ctx == NULL)
+            gr_ctx_clear(ctxptr);
     }
 }

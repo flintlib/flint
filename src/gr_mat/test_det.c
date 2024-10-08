@@ -15,20 +15,19 @@
 void gr_mat_test_det(gr_method_mat_unary_op_get_scalar det_impl, flint_rand_t state, slong iters, slong maxn, gr_ctx_t ctx)
 {
     slong iter;
-    gr_ctx_ptr given_ctx = ctx;
 
     for (iter = 0; iter < iters; iter++)
     {
-        gr_ctx_t my_ctx;
-        gr_ctx_ptr ctx;
+        gr_ctx_t ctx2;
+        gr_ctx_ptr ctxptr;
 
-        if (given_ctx == NULL)
+        if (ctx == NULL)
         {
-            gr_ctx_init_random(my_ctx, state);
-            ctx = my_ctx;
+            gr_ctx_init_random(ctx2, state);
+            ctxptr = ctx2;
         }
         else
-            ctx = given_ctx;
+            ctxptr = ctx;
 
         {
             gr_mat_t A, B, AB;
@@ -38,84 +37,84 @@ void gr_mat_test_det(gr_method_mat_unary_op_get_scalar det_impl, flint_rand_t st
 
             n = n_randint(state, maxn + 1);
 
-            gr_mat_init(A, n, n, ctx);
-            gr_mat_init(B, n, n, ctx);
-            gr_mat_init(AB, n, n, ctx);
+            gr_mat_init(A, n, n, ctxptr);
+            gr_mat_init(B, n, n, ctxptr);
+            gr_mat_init(AB, n, n, ctxptr);
 
-            detA = gr_heap_init(ctx);
-            detB = gr_heap_init(ctx);
-            detAB = gr_heap_init(ctx);
-            detAdetB = gr_heap_init(ctx);
+            detA = gr_heap_init(ctxptr);
+            detB = gr_heap_init(ctxptr);
+            detAB = gr_heap_init(ctxptr);
+            detAdetB = gr_heap_init(ctxptr);
 
-            status |= gr_mat_randtest(A, state, ctx);
-            status |= gr_mat_randtest(B, state, ctx);
-            status |= gr_mat_mul(AB, A, B, ctx);
+            status |= gr_mat_randtest(A, state, ctxptr);
+            status |= gr_mat_randtest(B, state, ctxptr);
+            status |= gr_mat_mul(AB, A, B, ctxptr);
 
-            status |= det_impl(detA, A, ctx);
-            status |= det_impl(detB, B, ctx);
-            status |= det_impl(detAB, AB, ctx);
-            status |= gr_mul(detAdetB, detA, detB, ctx);
+            status |= det_impl(detA, A, ctxptr);
+            status |= det_impl(detB, B, ctxptr);
+            status |= det_impl(detAB, AB, ctxptr);
+            status |= gr_mul(detAdetB, detA, detB, ctxptr);
 
             /* Check that the output isn't just 0 */
-            if (status == GR_SUCCESS && gr_mat_is_one(A, ctx) == T_TRUE &&
-                  gr_is_one(detA, ctx) == T_FALSE)
+            if (status == GR_SUCCESS && gr_mat_is_one(A, ctxptr) == T_TRUE &&
+                  gr_is_one(detA, ctxptr) == T_FALSE)
             {
                 flint_printf("FAIL\n\n");
-                gr_ctx_println(ctx);
-                flint_printf("A = "); gr_mat_print(A, ctx); flint_printf("\n");
-                flint_printf("detA = "); gr_print(detA, ctx); flint_printf("\n");
+                gr_ctx_println(ctxptr);
+                flint_printf("A = "); gr_mat_print(A, ctxptr); flint_printf("\n");
+                flint_printf("detA = "); gr_print(detA, ctxptr); flint_printf("\n");
                 flint_abort();
             }
 
-            if (status == GR_SUCCESS && gr_equal(detAB, detAdetB, ctx) == T_FALSE)
+            if (status == GR_SUCCESS && gr_equal(detAB, detAdetB, ctxptr) == T_FALSE)
             {
                 flint_printf("FAIL\n\n");
-                gr_ctx_println(ctx);
-                flint_printf("A = "); gr_mat_print(A, ctx); flint_printf("\n");
-                flint_printf("B = "); gr_mat_print(B, ctx); flint_printf("\n");
-                flint_printf("AB = "); gr_mat_print(AB, ctx); flint_printf("\n");
-                flint_printf("detA = "); gr_print(detA, ctx); flint_printf("\n");
-                flint_printf("detB = "); gr_print(detB, ctx); flint_printf("\n");
-                flint_printf("detAB = "); gr_print(detAB, ctx); flint_printf("\n");
-                flint_printf("detAdetB = "); gr_print(detAdetB, ctx); flint_printf("\n");
+                gr_ctx_println(ctxptr);
+                flint_printf("A = "); gr_mat_print(A, ctxptr); flint_printf("\n");
+                flint_printf("B = "); gr_mat_print(B, ctxptr); flint_printf("\n");
+                flint_printf("AB = "); gr_mat_print(AB, ctxptr); flint_printf("\n");
+                flint_printf("detA = "); gr_print(detA, ctxptr); flint_printf("\n");
+                flint_printf("detB = "); gr_print(detB, ctxptr); flint_printf("\n");
+                flint_printf("detAB = "); gr_print(detAB, ctxptr); flint_printf("\n");
+                flint_printf("detAdetB = "); gr_print(detAdetB, ctxptr); flint_printf("\n");
                 flint_abort();
             }
 
             if ((status & GR_DOMAIN) && !(status & GR_UNABLE))
             {
                 flint_printf("FAIL (flags)\n\n");
-                gr_ctx_println(ctx);
-                flint_printf("A = "); gr_mat_print(A, ctx); flint_printf("\n");
-                flint_printf("B = "); gr_mat_print(B, ctx); flint_printf("\n");
-                flint_printf("AB = "); gr_mat_print(AB, ctx); flint_printf("\n");
+                gr_ctx_println(ctxptr);
+                flint_printf("A = "); gr_mat_print(A, ctxptr); flint_printf("\n");
+                flint_printf("B = "); gr_mat_print(B, ctxptr); flint_printf("\n");
+                flint_printf("AB = "); gr_mat_print(AB, ctxptr); flint_printf("\n");
                 flint_abort();
             }
 
-            gr_mat_clear(A, ctx);
-            gr_mat_clear(B, ctx);
-            gr_mat_clear(AB, ctx);
+            gr_mat_clear(A, ctxptr);
+            gr_mat_clear(B, ctxptr);
+            gr_mat_clear(AB, ctxptr);
 
             /* Check error handling */
-            gr_mat_init(A, n, n + 1, ctx);
-            status = det_impl(detA, A, ctx);
+            gr_mat_init(A, n, n + 1, ctxptr);
+            status = det_impl(detA, A, ctxptr);
 
             if (status == GR_SUCCESS)
             {
                 flint_printf("FAIL (nonsquare matrix)\n\n");
-                gr_ctx_println(ctx);
-                flint_printf("A = "); gr_mat_print(A, ctx); flint_printf("\n");
+                gr_ctx_println(ctxptr);
+                flint_printf("A = "); gr_mat_print(A, ctxptr); flint_printf("\n");
                 flint_abort();
             }
 
-            gr_mat_clear(A, ctx);
+            gr_mat_clear(A, ctxptr);
 
-            gr_heap_clear(detA, ctx);
-            gr_heap_clear(detB, ctx);
-            gr_heap_clear(detAB, ctx);
-            gr_heap_clear(detAdetB, ctx);
+            gr_heap_clear(detA, ctxptr);
+            gr_heap_clear(detB, ctxptr);
+            gr_heap_clear(detAB, ctxptr);
+            gr_heap_clear(detAdetB, ctxptr);
         }
 
-        if (given_ctx == NULL)
-            gr_ctx_clear(ctx);
+        if (ctx == NULL)
+            gr_ctx_clear(ctxptr);
     }
 }
