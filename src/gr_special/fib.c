@@ -76,18 +76,18 @@ gr_generic_fib2_fmpz(gr_ptr v, gr_ptr u, const fmpz_t n, gr_ctx_t ctx)
 
     if (fmpz_sgn(n) < 0)
     {
-        fmpz_t t;
-        fmpz_init(t);
-        fmpz_neg(t, n);
-        fmpz_add_ui(t, t, 1);
+        fmpz_t tz;
+        fmpz_init(tz);
+        fmpz_neg(tz, n);
+        fmpz_add_ui(tz, tz, 1);
 
-        status |= gr_generic_fib2_fmpz(u, v, t, ctx);
-        if (fmpz_is_even(t))
+        status |= gr_generic_fib2_fmpz(u, v, tz, ctx);
+        if (fmpz_is_even(tz))
             status |= gr_neg(u, u, ctx);
         else
             status |= gr_neg(v, v, ctx);
 
-        fmpz_clear(t);
+        fmpz_clear(tz);
         return status;
     }
 
@@ -104,11 +104,11 @@ gr_generic_fib2_fmpz(gr_ptr v, gr_ptr u, const fmpz_t n, gr_ctx_t ctx)
     bit = nbits - FIBTAB_BITS;
 
     {
-        fmpz_t t;
-        fmpz_init(t);
-        fmpz_tdiv_q_2exp(t, n, bit);
-        i = *t;
-        fmpz_clear(t);
+        fmpz_t tz;
+        fmpz_init(tz);
+        fmpz_tdiv_q_2exp(tz, n, bit);
+        i = *tz;
+        fmpz_clear(tz);
     }
 
     if (!COEFF_IS_MPZ(*n))

@@ -336,7 +336,6 @@ gr_generic_harmonic_ui(gr_ptr res, ulong n, gr_ctx_t ctx)
 
     if (n > 100 && gr_ctx_has_real_prec(ctx) == T_TRUE)
     {
-        gr_ptr t;
         GR_TMP_INIT(t, ctx);
         status |= gr_set_ui(t, n, ctx);
         status |= gr_add_ui(t, t, 1, ctx);
@@ -349,11 +348,11 @@ gr_generic_harmonic_ui(gr_ptr res, ulong n, gr_ctx_t ctx)
 
     if (n <= 100 || gr_ctx_is_finite_characteristic(ctx) == T_FALSE)
     {
-        fmpq_t t;
-        fmpq_init(t);
-        fmpq_harmonic_ui(t, n);
-        status = gr_set_fmpq(res, t, ctx);
-        fmpq_clear(t);
+        fmpq_t tq;
+        fmpq_init(tq);
+        fmpq_harmonic_ui(tq, n);
+        status = gr_set_fmpq(res, tq, ctx);
+        fmpq_clear(tq);
         return status;
     }
 
