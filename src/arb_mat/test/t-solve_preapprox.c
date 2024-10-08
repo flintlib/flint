@@ -100,20 +100,20 @@ TEST_FUNCTION_START(arb_mat_solve_preapprox, state)
 
         /* Sample a square matrix QE with inf-norm less than 1. */
         {
-            fmpq_t m;
-            fmpq_init(m);
+            fmpq_t mq;
+            fmpq_init(mq);
             fmpq_mat_randtest(QE, state, qbits);
-            _fmpq_mat_inf_norm(m, QE);
-            if (!fmpq_is_zero(m))
+            _fmpq_mat_inf_norm(mq, QE);
+            if (!fmpq_is_zero(mq))
             {
                 slong p, q;
                 q = 64;
                 p = n_randint(state, q);
-                fmpq_inv(m, m);
-                _fmpq_mul_si_frac(m, m, p, q);
-                _fmpq_mat_scalar_mul_fmpq(QE, QE, m);
+                fmpq_inv(mq, mq);
+                _fmpq_mul_si_frac(mq, mq, p, q);
+                _fmpq_mat_scalar_mul_fmpq(QE, QE, mq);
             }
-            fmpq_clear(m);
+            fmpq_clear(mq);
         }
 
         /* Sample an unrestricted square matrix QR. */

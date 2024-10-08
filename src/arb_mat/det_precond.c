@@ -26,7 +26,7 @@ _apply_permutation(arb_mat_t A, slong * P, slong n)
 
 /* Enclosure of det(I + eps) using Gershgorin circles.
    Can be improved. */
-void
+static void
 arb_mat_det_one_gershgorin(arb_t det, const arb_mat_t A)
 {
     slong n, i, j;

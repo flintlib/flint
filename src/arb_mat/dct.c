@@ -14,7 +14,7 @@
 #include "acb_dirichlet.h"
 
 void
-arb_mat_dct(arb_mat_t res, int kind, slong prec)
+arb_mat_dct(arb_mat_t res, int FLINT_UNUSED(kind), slong prec)
 {
     acb_dirichlet_roots_t roots;
     acb_t t;

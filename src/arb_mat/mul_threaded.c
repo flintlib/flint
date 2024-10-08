@@ -29,7 +29,7 @@ typedef struct
 }
 _worker_arg;
 
-void
+static void
 _arb_mat_mul_thread(void * arg_ptr)
 {
     _worker_arg arg = *((_worker_arg *) arg_ptr);
