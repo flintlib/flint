@@ -23,7 +23,7 @@
 slong
 _arb_poly_swinnerton_dyer_ui_prec(ulong n)
 {
-    slong i;
+    ulong i;
     double u, N;
 
     N = UWORD(1) << n;
@@ -69,7 +69,7 @@ _arb_poly_swinnerton_dyer_ui(arb_ptr T, ulong n, slong trunc, slong prec)
     tmp2 = flint_malloc((N / 4 + 1) * sizeof(arb_struct));
     tmp3 = _arb_vec_init(N / 2);
 
-    for (i = 0; i < n; i++)
+    for (i = 0; (ulong) i < n; i++)
         arb_sqrt_ui(square_roots + i, n_nth_prime(i + 1), prec);
 
     /* Build deflated quadratic factors */
@@ -77,7 +77,7 @@ _arb_poly_swinnerton_dyer_ui(arb_ptr T, ulong n, slong trunc, slong prec)
     {
         arb_zero(T + i);
 
-        for (j = 0; j < n; j++)
+        for (j = 0; (ulong) j < n; j++)
         {
             if ((i >> j) & 1)
                 arb_add(T + i, T + i, square_roots + j, prec);
@@ -90,7 +90,7 @@ _arb_poly_swinnerton_dyer_ui(arb_ptr T, ulong n, slong trunc, slong prec)
     }
 
     /* For each level... */
-    for (i = 0; i < n - 1; i++)
+    for (i = 0; (ulong) i < n - 1; i++)
     {
         slong stride = UWORD(1) << i;
 

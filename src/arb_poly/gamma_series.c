@@ -11,6 +11,12 @@
 
 #include "arb_poly.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 void arb_gamma_stirling_bound(mag_ptr err, const arb_t x, slong k0, slong knum, slong n);
 
 void arb_hypgeom_gamma_stirling_choose_param(int * reflect, slong * r, slong * n,
@@ -88,7 +94,7 @@ bsplit(arb_ptr Q, arb_ptr T, const arb_t z, slong a, slong b, slong num, slong p
     }
 }
 
-void
+static void
 _arb_poly_mullow_cpx(arb_ptr res, arb_srcptr src, slong len, const arb_t c, slong trunc, slong prec)
 {
     slong i;
@@ -105,7 +111,7 @@ _arb_poly_mullow_cpx(arb_ptr res, arb_srcptr src, slong len, const arb_t c, slon
     arb_mul(res, src, c, prec);
 }
 
-void
+static void
 _arb_poly_log_cpx_series(arb_ptr res, const arb_t c, slong num, slong prec)
 {
     slong i;
