@@ -24,6 +24,8 @@
 extern "C" {
 #endif
 
+FLINT_HEADER_START
+
 /* Types *********************************************************************/
 
 /* note: types and macros are defined in ca.h since they are needed there */
@@ -86,6 +88,8 @@ void ca_ext_get_acb_raw(acb_t res, ca_ext_t x, slong prec, ca_ctx_t ctx);
 void ca_ext_cache_init(ca_ext_cache_t cache, ca_ctx_t ctx);
 void ca_ext_cache_clear(ca_ext_cache_t cache, ca_ctx_t ctx);
 ca_ext_ptr ca_ext_cache_insert(ca_ext_cache_t cache, const ca_ext_t x, ca_ctx_t ctx);
+
+FLINT_HEADER_END
 
 #ifdef __cplusplus
 }

@@ -14,7 +14,7 @@
 #define INITIAL_HASH_SIZE 16
 
 void
-ca_ext_cache_init(ca_ext_cache_t cache, ca_ctx_t ctx)
+ca_ext_cache_init(ca_ext_cache_t cache, ca_ctx_t FLINT_UNUSED(ctx))
 {
     slong i;
 
