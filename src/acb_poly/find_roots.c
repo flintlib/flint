@@ -19,7 +19,7 @@
 #include "gr_poly.h"
 #include "nfloat.h"
 
-slong
+static slong
 _acb_get_mid_mag(const acb_t z)
 {
     slong rm, im;
@@ -30,7 +30,8 @@ _acb_get_mid_mag(const acb_t z)
     return FLINT_MAX(rm, im);
 }
 
-slong
+#if 0
+static slong
 _acb_get_rad_mag(const acb_t z)
 {
     slong rm, im;
@@ -49,6 +50,7 @@ _acb_get_rad_mag(const acb_t z)
 
     return FLINT_MAX(rm, im);
 }
+#endif
 
 /* Compute res[0, ..., n-1] = {i} indexing the convex hull of {i, y[i]}. */
 static slong convex_hull(slong * res, const double * y, slong len)
@@ -68,7 +70,7 @@ static slong convex_hull(slong * res, const double * y, slong len)
     return n;
 }
 
-void
+static void
 _acb_poly_roots_initial_values(acb_ptr roots, acb_srcptr poly, slong deg, slong prec)
 {
     double * alog;
@@ -152,8 +154,8 @@ _acb_poly_roots_initial_values(acb_ptr roots, acb_srcptr poly, slong deg, slong 
 
 /* todo: this method often gets called with degree 2 or 3 polynomials;
    consider doing something direct there */
-int
-_acb_poly_find_roots_iter(gr_ptr w, gr_ptr z, gr_srcptr f, gr_srcptr f_prime, slong deg, slong maxiter, gr_ctx_t fp_ctx, gr_ctx_t acb_ctx, slong prec)
+static int
+_acb_poly_find_roots_iter(gr_ptr w, gr_ptr z, gr_srcptr f, gr_srcptr FLINT_UNUSED(f_prime), slong deg, slong maxiter, gr_ctx_t fp_ctx, gr_ctx_t acb_ctx, slong prec)
 {
     slong iter, i;
     slong rootmag, max_rootmag, correction, max_correction;

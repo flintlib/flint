@@ -119,7 +119,7 @@ _acb_poly_zeta_em_sum(acb_ptr z, const acb_t s, const acb_t a, int deflate, ulon
     _acb_vec_add(sum, sum, u, d, prec);
 
     /* Euler-Maclaurin formula tail */
-    if (d < 5 || d < M / 10)
+    if (d < 5 || d < (slong) (M / 10))
         _acb_poly_zeta_em_tail_naive(u, s, Na, t, M, d, prec);
     else
         _acb_poly_zeta_em_tail_bsplit(u, s, Na, t, M, d, prec);

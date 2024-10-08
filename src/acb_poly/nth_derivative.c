@@ -26,7 +26,7 @@ acb_poly_nth_derivative(acb_poly_t res, const acb_poly_t poly, ulong n, slong pr
 {
     const slong len = poly->length;
 
-    if (len <= n)
+    if ((ulong) len <= n)
     {
         acb_poly_zero(res);
     }

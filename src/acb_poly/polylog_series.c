@@ -12,8 +12,14 @@
 #include "acb_poly.h"
 #include "acb_hypgeom.h"
 
+/* FIXME: Remove this guard against warnings. Best thing would probably be to
+ * implement an *-impl.h to keep track of local functions. */
+#ifdef __GNUC__
+# pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
+
 /* note: will not return a wrong value, as arf_get_si aborts on overflow */
-slong
+static slong
 arb_get_si_lower(const arb_t x)
 {
     arf_t t;
@@ -30,7 +36,7 @@ arb_get_si_lower(const arb_t x)
     return v;
 }
 
-slong
+static slong
 polylog_choose_terms(mag_t err, slong sigma, const mag_t z, slong d, slong prec)
 {
     slong N;
