@@ -19,7 +19,7 @@
     and assuming exponent vectors fit into one word
     and assuming that all bit positions that need to be sorted are in totalmask
 */
-void _gr_mpoly_radix_sort1(
+static void _gr_mpoly_radix_sort1(
     gr_ptr Acoeffs,
     ulong * Aexps,
     slong left, slong right,
@@ -103,7 +103,7 @@ void _gr_mpoly_radix_sort1(
     sort terms in [left, right) by exponent
     assuming that bits in position >= pos are already sorted
 */
-void _gr_mpoly_radix_sort(
+static void _gr_mpoly_radix_sort(
     gr_ptr Acoeffs,
     ulong * Aexps,
     slong left, slong right,

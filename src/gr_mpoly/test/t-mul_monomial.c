@@ -11,8 +11,7 @@
 
 #include "test_helpers.h"
 #include "gr_mpoly.h"
-
-FLINT_DLL extern gr_static_method_table _ca_methods;
+#include "util_test.h"
 
 TEST_FUNCTION_START(gr_mpoly_mul_monomial, state)
 {
