@@ -17,7 +17,7 @@
 #ifndef sin_x
 #define sin_x sin_x
 int
-sin_x(acb_ptr out, const acb_t inp, void * params, slong order, slong prec)
+sin_x(acb_ptr out, const acb_t inp, void * FLINT_UNUSED(params), slong order, slong prec)
 {
     int xlen = FLINT_MIN(2, order);
 

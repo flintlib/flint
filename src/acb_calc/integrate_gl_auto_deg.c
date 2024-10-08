@@ -39,7 +39,7 @@ gl_cache_struct;
 
 FLINT_TLS_PREFIX gl_cache_struct * gl_cache = NULL;
 
-void gl_cleanup(void)
+static void gl_cleanup(void)
 {
     slong i;
 
@@ -59,7 +59,7 @@ void gl_cleanup(void)
     gl_cache = NULL;
 }
 
-void gl_init(void)
+static void gl_init(void)
 {
     gl_cache = flint_calloc(1, sizeof(gl_cache_struct));
     flint_register_cleanup_function(gl_cleanup);
@@ -83,7 +83,7 @@ nodes_worker(slong jj, nodes_work_t * work)
 
 /* if k >= 0, compute the node and weight of index k */
 /* if k < 0, compute the first (n+1)/2 nodes and weights (the others are given by symmetry) */
-void
+static void
 acb_calc_gl_node(arb_ptr x, arb_ptr w, slong i, slong k, slong prec)
 {
     slong n, kk, wp;
@@ -350,34 +350,34 @@ acb_calc_integrate_gl_auto_deg(acb_t res, slong * eval_count,
         if (nt >= 2 && best_n >= 2)
         {
             gl_work_t work;
-            acb_ptr v;
-            arb_ptr x, w;
+            acb_ptr vp;
+            arb_ptr xp, wp;
 
-            v = _acb_vec_init(best_n);
-            w = _arb_vec_init((best_n + 1) / 2);
-            x = _arb_vec_init((best_n + 1) / 2);
+            vp = _acb_vec_init(best_n);
+            wp = _arb_vec_init((best_n + 1) / 2);
+            xp = _arb_vec_init((best_n + 1) / 2);
 
-            acb_calc_gl_node(x, w, i, -1, prec);
+            acb_calc_gl_node(xp, wp, i, -1, prec);
 
             work.n = best_n;
-            work.x = x;
-            work.w = w;
+            work.x = xp;
+            work.w = wp;
             work.prec = prec;
             work.delta = delta;
             work.mid = mid;
-            work.v = v;
+            work.v = vp;
             work.f = f;
             work.param = param;
 
             flint_parallel_do((do_func_t) gl_worker, &work, best_n, -1, FLINT_PARALLEL_STRIDED);
 
-            acb_add(s, v, v + 1, prec);
+            acb_add(s, vp, vp + 1, prec);
             for (k = 2; k < best_n; k++)
-                acb_add(s, s, v + k, prec);
+                acb_add(s, s, vp + k, prec);
 
-            _acb_vec_clear(v, best_n);
-            _arb_vec_clear(x, (best_n + 1) / 2);
-            _arb_vec_clear(w, (best_n + 1) / 2);
+            _acb_vec_clear(vp, best_n);
+            _arb_vec_clear(xp, (best_n + 1) / 2);
+            _arb_vec_clear(wp, (best_n + 1) / 2);
         }
         else
         {

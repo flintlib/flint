@@ -14,7 +14,7 @@
 #include "acb_calc.h"
 
 int
-f_zero(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
+f_zero(acb_ptr res, const acb_t FLINT_UNUSED(z), void * FLINT_UNUSED(param), slong order, slong FLINT_UNUSED(prec))
 {
     if (order > 1)
         flint_abort();  /* Would be needed for Taylor method. */
@@ -25,7 +25,7 @@ f_zero(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
 }
 
 int
-f_indet(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
+f_indet(acb_ptr res, const acb_t FLINT_UNUSED(z), void * FLINT_UNUSED(param), slong order, slong FLINT_UNUSED(prec))
 {
     if (order > 1)
         flint_abort();  /* Would be needed for Taylor method. */
@@ -36,7 +36,7 @@ f_indet(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
 }
 
 int
-f_cube(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
+f_cube(acb_ptr res, const acb_t z, void * FLINT_UNUSED(param), slong order, slong prec)
 {
     if (order > 1)
         flint_abort();  /* Would be needed for Taylor method. */
@@ -47,7 +47,7 @@ f_cube(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
 }
 
 int
-f_sin(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
+f_sin(acb_ptr res, const acb_t z, void * FLINT_UNUSED(param), slong order, slong prec)
 {
     if (order > 1)
         flint_abort();  /* Would be needed for Taylor method. */
@@ -58,7 +58,7 @@ f_sin(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
 }
 
 int
-f_sqrt(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
+f_sqrt(acb_ptr res, const acb_t z, void * FLINT_UNUSED(param), slong order, slong prec)
 {
     if (order > 1)
         flint_abort();  /* Would be needed for Taylor method. */
@@ -69,7 +69,7 @@ f_sqrt(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
 }
 
 int
-f_rsqrt(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
+f_rsqrt(acb_ptr res, const acb_t z, void * FLINT_UNUSED(param), slong order, slong prec)
 {
     if (order > 1)
         flint_abort();  /* Would be needed for Taylor method. */
@@ -80,7 +80,7 @@ f_rsqrt(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
 }
 
 int
-f_log(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
+f_log(acb_ptr res, const acb_t z, void * FLINT_UNUSED(param), slong order, slong prec)
 {
     if (order > 1)
         flint_abort();  /* Would be needed for Taylor method. */
@@ -91,7 +91,7 @@ f_log(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
 }
 
 int
-f_pow_pi(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
+f_pow_pi(acb_ptr res, const acb_t z, void * FLINT_UNUSED(param), slong order, slong prec)
 {
     if (order > 1)
         flint_abort();  /* Would be needed for Taylor method. */
@@ -103,7 +103,7 @@ f_pow_pi(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
 }
 
 int
-f_circle(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
+f_circle(acb_ptr res, const acb_t z, void * FLINT_UNUSED(param), slong order, slong prec)
 {
     if (order > 1)
         flint_abort();  /* Would be needed for Taylor method. */
@@ -117,7 +117,7 @@ f_circle(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
 
 /* f(z) = sin(z + exp(z)) -- Rump's oscillatory example */
 int
-f_rump(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
+f_rump(acb_ptr res, const acb_t z, void * FLINT_UNUSED(param), slong order, slong prec)
 {
     if (order > 1)
         flint_abort();  /* Would be needed for Taylor method. */
@@ -132,7 +132,7 @@ f_rump(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
 /* f(z) = |z^4 + 10z^3 + 19z^2 - 6z - 6| exp(z)   (for real z) --
    Helfgott's integral on MathOverflow */
 int
-f_helfgott(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
+f_helfgott(acb_ptr res, const acb_t z, void * FLINT_UNUSED(param), slong order, slong prec)
 {
     if (order > 1)
         flint_abort();  /* Would be needed for Taylor method. */
@@ -161,7 +161,7 @@ f_helfgott(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
 
 /* f(z) = z sin(1/z), assume on real interval */
 int
-f_essing2(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
+f_essing2(acb_ptr res, const acb_t z, void * FLINT_UNUSED(param), slong order, slong prec)
 {
     if (order > 1)
         flint_abort();  /* Would be needed for Taylor method. */
@@ -185,7 +185,7 @@ f_essing2(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
 
 /* f(z) = sech(10(x-0.2))^2 + sech(100(x-0.4))^4 + sech(1000(x-0.6))^6 */
 int
-f_spike(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
+f_spike(acb_ptr res, const acb_t z, void * FLINT_UNUSED(param), slong order, slong prec)
 {
     acb_t a, b, c;
 
@@ -225,7 +225,7 @@ f_spike(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
 
 /* abs(sin(x))*cos(1+x) */
 int
-f_abs(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
+f_abs(acb_ptr res, const acb_t z, void * FLINT_UNUSED(param), slong order, slong prec)
 {
     acb_t s, c;
     acb_init(s);
@@ -242,7 +242,7 @@ f_abs(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
 
 /* sign(sin(x))*cos(1+x) */
 int
-f_sgn(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
+f_sgn(acb_ptr res, const acb_t z, void * FLINT_UNUSED(param), slong order, slong prec)
 {
     acb_t s, c;
     acb_init(s);
@@ -259,7 +259,7 @@ f_sgn(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
 
 /* heaviside(sin(x))*cos(1+x) */
 int
-f_heaviside(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
+f_heaviside(acb_ptr res, const acb_t z, void * FLINT_UNUSED(param), slong order, slong prec)
 {
     acb_t s, c;
     acb_init(s);
@@ -276,7 +276,7 @@ f_heaviside(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
 
 /* floor(x-5) cos(1+x) */
 int
-f_floor(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
+f_floor(acb_ptr res, const acb_t z, void * FLINT_UNUSED(param), slong order, slong prec)
 {
     acb_t c;
     acb_init(c);
@@ -293,7 +293,7 @@ f_floor(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
 
 /* ceil(x-5) cos(1+x) */
 int
-f_ceil(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
+f_ceil(acb_ptr res, const acb_t z, void * FLINT_UNUSED(param), slong order, slong prec)
 {
     acb_t c;
     acb_init(c);
@@ -308,7 +308,7 @@ f_ceil(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
 
 /* max(sin(x),cos(x)) */
 int
-f_max(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
+f_max(acb_ptr res, const acb_t z, void * FLINT_UNUSED(param), slong order, slong prec)
 {
     acb_t s, c;
     acb_init(s);
@@ -322,7 +322,7 @@ f_max(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
 
 /* min(sin(x),cos(x)) */
 int
-f_min(acb_ptr res, const acb_t z, void * param, slong order, slong prec)
+f_min(acb_ptr res, const acb_t z, void * FLINT_UNUSED(param), slong order, slong prec)
 {
     acb_t s, c;
     acb_init(s);
