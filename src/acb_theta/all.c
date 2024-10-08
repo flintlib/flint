@@ -17,7 +17,7 @@ void
 acb_theta_all(acb_ptr th, acb_srcptr z, const acb_mat_t tau, int sqr, slong prec)
 {
     slong g = acb_mat_nrows(tau);
-    slong n2 = 1 << (2 * g);
+    ulong n2 = 1 << (2 * g);
     fmpz_mat_t mat, gamma;
     acb_mat_t w, c, N;
     acb_ptr x, y, aux, units;
