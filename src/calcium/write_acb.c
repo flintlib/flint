@@ -12,7 +12,7 @@
 #include "acb.h"
 #include "calcium.h"
 
-void
+static void
 calcium_write_arb(calcium_stream_t out, const arb_t x, slong digits, ulong flags)
 {
     calcium_write_free(out, arb_get_str(x, digits, flags));
