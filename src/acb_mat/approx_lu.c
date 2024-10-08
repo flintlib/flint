@@ -82,7 +82,7 @@ _acb_vec_approx_scalar_addmul(acb_ptr res, acb_srcptr vec,
     acb_clear(t);
 }
 
-int
+static int
 acb_mat_approx_lu_classical(slong * P, acb_mat_t LU, const acb_mat_t A, slong prec)
 {
     acb_t d, e;
@@ -143,7 +143,7 @@ acb_mat_approx_lu_classical(slong * P, acb_mat_t LU, const acb_mat_t A, slong pr
     return result;
 }
 
-int
+static int
 acb_mat_approx_lu_recursive(slong * P, acb_mat_t LU, const acb_mat_t A, slong prec)
 {
     slong i, m, n, r1, r2, n1;

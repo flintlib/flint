@@ -12,7 +12,7 @@
 #include "acb.h"
 #include "acb_mat.h"
 
-slong
+static slong
 acb_mat_gauss_partial(acb_mat_t A, slong prec)
 {
     acb_t e;
@@ -59,7 +59,7 @@ acb_mat_gauss_partial(acb_mat_t A, slong prec)
     return rank * sign;
 }
 
-void
+static void
 acb_vec_get_arf_2norm_squared_bound(arf_t s, acb_srcptr vec, slong len, slong prec)
 {
     slong i;
@@ -79,7 +79,7 @@ acb_vec_get_arf_2norm_squared_bound(arf_t s, acb_srcptr vec, slong len, slong pr
     arf_clear(t);
 }
 
-void
+static void
 acb_mat_det_lu_inplace(acb_t det, acb_mat_t A, slong prec)
 {
     slong i, n, sign, rank;
