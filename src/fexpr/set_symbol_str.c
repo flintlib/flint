@@ -36,7 +36,6 @@ fexpr_set_symbol_str(fexpr_t res, const char * s)
 
     if (len <= FEXPR_SMALL_SYMBOL_LEN)
     {
-        slong i;
         ulong data;
 
         data = FEXPR_TYPE_SMALL_SYMBOL;

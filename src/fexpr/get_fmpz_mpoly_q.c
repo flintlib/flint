@@ -100,7 +100,6 @@ cleanup1:
         if (fexpr_is_builtin_call(expr, FEXPR_Pow) && (fexpr_nargs(expr) == 2))
         {
             fexpr_t base, exp;
-            int success;
 
             fexpr_view_arg(base, expr, 0);
             fexpr_view_arg(exp, expr, 1);

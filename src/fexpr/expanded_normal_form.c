@@ -13,7 +13,7 @@
 #include "fexpr.h"
 
 int
-fexpr_expanded_normal_form(fexpr_t res, const fexpr_t expr, ulong flags)
+fexpr_expanded_normal_form(fexpr_t res, const fexpr_t expr, ulong FLINT_UNUSED(flags))
 {
     fexpr_vec_t args;
     fmpz_mpoly_ctx_t ctx;
