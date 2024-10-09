@@ -609,6 +609,12 @@ qqbar_set_fexpr(qqbar_t res, const fexpr_t expr)
             return 1;
         }
 
+        if (fexpr_is_builtin_symbol(expr, FEXPR_TetranacciConstant))
+        {
+            qqbar_tetranacci_constant(res);
+            return 1;
+        }
+
         return 0;
     }
 
