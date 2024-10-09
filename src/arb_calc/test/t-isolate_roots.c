@@ -15,7 +15,7 @@
 
 /* sin((pi/2)x) */
 static int
-sin_pi2_x(arb_ptr out, const arb_t inp, void * params, slong order, slong prec)
+sin_pi2_x(arb_ptr out, const arb_t inp, void * FLINT_UNUSED(params), slong order, slong prec)
 {
     arb_ptr x;
 
