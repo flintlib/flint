@@ -17,9 +17,10 @@
 
 TEST_FUNCTION_START(fmpz_vec_scalar_fdiv_q_fmpz, state)
 {
-    int i, result;
+    slong ix;
+    int result;
 
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (ix = 0; ix < 1000 * flint_test_multiplier(); ix++)
     {
         fmpz *a, *b, *c;
         fmpz_t n;
@@ -78,7 +79,7 @@ TEST_FUNCTION_START(fmpz_vec_scalar_fdiv_q_fmpz, state)
     }
 
     /* Test aliasing of a and c */
-    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
+    for (ix = 0; ix < 1000 * flint_test_multiplier(); ix++)
     {
         fmpz *a, *b;
         fmpz_t n;
